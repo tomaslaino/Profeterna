@@ -286,8 +286,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   [Tidningen](#tidningen))
 - [x] **Supportrarnas matchblad (2026-11-10, användarens önskemål):** i Helgarderat och under *Supportrarna* i
   tidningen på pulten är varje match en artikel: rubrik, bild, en kort introduktion, hemmalaget, bortalaget och en
-  sammanfattning, med avsparken och källorna med datum bredvid och ibland ett citat. Bilden är veckans bilder av lagen
-  ur tidningen inför omgången, och utan dem står lagens sköldar mot varandra. Nattjobbet skriver matchbladen; det
+  sammanfattning, med avsparken och källorna med datum bredvid och ibland ett citat. Bilden är veckans bild av vart
+  och ett av lagen, som GitHub Actions hämtar före bygget, och utan dem står lagens sköldar mot varandra. Nattjobbet skriver matchbladen; det
   första numret är skrivet för hand. Bara veckans källor är förberett men avslaget medan vi provar (se
   [Helgarderat](#helgarderat))
 - [x] **En ren framsida (2026-11-10, användarens önskemål: "Tidningen ser plottrig ut"):** Helgarderats framsida har
@@ -929,6 +929,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Att lägga tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Sedan ("Gör tidningen lite
   större") ligger kupongerna i högen tätare, så att namnen nätt och jämnt syns, och tidningen fick det som blev över.
   Se [Tidningen](#tidningen).
+- **Riktiga bilder i matchbladen, hämtade av GitHub Actions (2026-11-10, användarens önskemål):** "Fixa så att det
+  kommer riktiga bilder nu". Molnmiljön där matchbladen skrevs når inte nyhetssajterna, och tidningen inför omgången
+  (`data/tidning.json`), vars bilder matchbladen först lånade, var inte utlagd för omgången. Men GitHub Actions, som
+  bygger sajten var 30:e minut, når dem. Där hämtar nu `scripts/tidning/matchbilder.mjs` före bygget veckans bild av
+  varje lag i `data/poddsidor.json` med samma kod som tidningens bilder på iMacen (src/analyser/tidning-bilder.mjs,
+  som nu kan förminska med ImageMagick när `sips` saknas), en gång per omgång, och bygget lägger dem i matchbladen.
+  Se *Bilden* under [Helgarderat](#helgarderat).
 - **Matchblad i stället för punkter (2026-11-10, användarens önskemål):** "Jag vill inte att det ska vara punkter och
   uppdelat på det där sättet. Jag vill att det ska vara ett matchblad med information. Först en kort introduktion, sen
   diskussion om ena laget, sen det andra och sist en sammanfattning. … Få med en aktuell bild för varje vs-match. …
@@ -7232,13 +7239,27 @@ och bredvid den en smal spalt med *Matchen* (avsparken och numret på kupongen),
 med datum och länk (*Podden SK3 TV (9 nov)*, två avsnitt av samma podd: *(2 och 9 nov)*). I telefonen kommer den smala
 spalten efter texten. Baksidan har källorna per match, med länkar till avsnitten, forumtrådarna och artiklarna.
 
-**Bilden** är matchbladets egen när sidan har en (`bild`: `url` eller `fil` i `data/tidning-bilder/`, `kalla`, `foto`,
-`sida`, `datum`, `text`), annars veckans bilder av lagen ur tidningen inför omgången: `data/tidning.json` har för varje
-match en bild per lag, som iMacen hämtar (se *Veckans bilder i tidningen* under [Analyserna](#analyserna)), och då står
-hemma och borta bredvid varandra med lagets namn på en mörk list och fotograferna under. Bilderna är svartvita som
-tryck på papperet. Utan bild, eller om den inte går att hämta, står lagens sköldar mot varandra med namnen under, på
-en tonad yta med grön överkant; går bara den ena bilden inte att hämta får den halvan lagets sköld. Att hämta en
-bild per match till det första numret gick inte: molnmiljön når inte nyhetssajterna (2026-11-10).
+**Bilden** är veckans bild av vart och ett av lagen, hemma och borta bredvid varandra med lagets namn på en mörk list
+och fotograferna och källorna under, svartvita som tryck på papperet. Den kommer i första hand ur matchbladet självt
+(`bilder` i sajtens `data/poddsidor.json`), annars ur tidningen inför omgången (`data/tidning.json`, se *Veckans bilder
+i tidningen* under [Analyserna](#analyserna)). En sida kan också ha en egen bild (`bild`: `url` eller `fil`, `kalla`,
+`foto`, `sida`, `datum`, `text`) över hela bredden. Utan bild, eller om den inte går att hämta, står lagens sköldar mot
+varandra med namnen under, på en tonad yta med grön överkant; går bara den ena bilden inte att hämta får den halvan
+lagets sköld.
+
+Matchbladets bilder hämtas av GitHub Actions före bygget (2026-11-10, användarens önskemål: "Fixa så att det kommer
+riktiga bilder nu"), eftersom molnmiljön där matchbladen skrevs inte når nyhetssajterna, men GitHub gör det:
+[scripts/tidning/matchbilder.mjs](scripts/tidning/matchbilder.mjs) tar lagen i `data/poddsidor.json` och hämtar en bild
+per lag med samma kod som tidningens bilder på iMacen (`veckansBilder` i src/analyser/tidning-bilder.mjs): de insatta
+mediernas artiklar om laget först, sedan Bing News, sidans delningsbild från de senaste åtta dagarna, liggande och
+minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Bilden förminskas till 800
+bildpunkter med ImageMagick (på iMacen med `sips` som förut); en jämn grafik känns igen på under 0,10 byte per
+bildpunkt i 320 bildpunkters bredd (foton låg på 0,15–0,31 och en enfärgad grafik med text på 0,04; `sips` behåller
+färgprofilen och har kvar gränsen 0,15). Bilderna sparas i källcachen (`data/cache/matchbilder/`), som workflowen
+behåller mellan körningarna, så att de hämtas en gång per omgång; ett lag utan bild prövas igen efter sex timmar. Ut
+kommer `data/matchbilder/` och `data/matchbilder.json`, och bygget lägger bilderna i matchbladen (`bilder: [hemma,
+borta]`). ImageMagick installeras i workflowen bara när något ska hämtas och det saknas, och steget får aldrig stoppa
+bygget. `node scripts/tidning/matchbilder.mjs --behover` säger om något ska hämtas.
 
 Texterna och uppställningen av lagets text och källor (`poddText`, `poddKallor`, `poddKallText`, `poddCitat`) kommer
 från `RumTidning`, så att det står samma sak i båda tidningarna. Ett nummer från före matchbladen (provnumret) får
@@ -7282,7 +7303,11 @@ att hämta (sköldarna mot varandra) och en halva som saknas, ett blad utan bild
 inget som sticker ut åt sidan, och *Supportrarna* i tidningen på pulten ritad för sig. Med Node: `sidaAv` med ett
 svar som håller, ett med tipsord och okända tal och ett som inte går att läsa, `sidaUtan`, `skrivSida` med ett
 påhittat svar och `poddsidor`. Inte provat med riktiga bilder, i Safari, i en riktig telefon eller med nattjobbet
-själv.
+själv. Matchbladens bilder provades 2026-11-10 med ett låtsasnät (påhittade Bing-svar och artikelsidor och brusbilder
+från ImageMagick): 24 av 24 lag fick en bild (Gillingham ur de insattas artikel, de andra ur Bing), en andra körning
+hämtade inget och tog bilderna ur cachen, bygget lade dem i alla tolv matchbladen och sidan visade dem i 1280 bredd och
+390 × 844. Gränsen för grafik mättes på fotona i public/ och en ritad grafik. Den första riktiga hämtningen är
+workflowens.
 
 ### Närbilderna
 
