@@ -284,6 +284,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   ikryssade), och efter omgången står gängets rätt och rätt rad på den. Inuti står allt från båda: före omgången Tipset,
   notiserna, analysen och supportrarna, efter den resultaten, betygen, skrällen och krönikan, och *Åtta knep* sist (se
   [Tidningen](#tidningen))
+- [x] **Löpsedeln är Helgarderats, och tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål: "Döp om
+  löpsedeln till Helgarderat också", "Kan du ordna så att tidningen ser mer 'äkta' ut - med riktigt papper"):** veckans
+  löpsedel har Helgarderats namn och gröna tryck i stället för Sportbladets eller Expressens, och tidningen har löpsedelns
+  papper: gråaktigt och matt med fibrer och buktor, tryckfärg som inte har täckt överallt, dämpade färger och ett veck på
+  mitten (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären) och *Papperet* under [Tidningen](#tidningen))
 
 ## Publicering
 
@@ -877,8 +882,22 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   sätt. Lägg tidningen på höger sida om kupongen". Tipsguiden mellan notan och kupongen och kvällstidningen till höger om
   kupongen är nu en tidning, Helgarderat, där kvällstidningen låg. Framsidan är Tipsguidens (den har en egen, och
   kvällstidningens var en kopia av löpsedeln) i utkastets utseende, och efter omgången står gängets rätt och rätt rad på
-  den. Inuti står det som stod i båda, och den finns alltid, som Tipsguiden. L tar upp den. Löpsedeln i fönstret är kvar,
-  Sportbladets eller Expressens, och dess rubrik *STORA TIPSGUIDEN* är kvällstidningens egen. Se [Tidningen](#tidningen).
+  den. Inuti står det som stod i båda, och den finns alltid, som Tipsguiden. L tar upp den. Löpsedeln i fönstret var då
+  kvar, Sportbladets eller Expressens; samma dag blev också den Helgarderats (se nästa punkt). Se [Tidningen](#tidningen).
+- **Löpsedeln är Helgarderats (2026-11-10, användarens önskemål):** "Döp om löpsedeln till Helgarderat också". Veckans
+  löpsedel är samma tidning som ligger på pulten: namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade
+  framför, och raden som lyfts fram i rubriken, vinjetten och plustecknet gröna i stället för röda. Förut var den
+  Sportbladets eller Expressens, två veckor i taget. Rubrikerna är desamma; *BARA I {T}* blir *BARA I HELGARDERAT*, och
+  när det inte finns något att skriva om gör den reklam för det som står i tidningen (*SÅ TAR DU HEM 13 RÄTT*, *SÅ BLIR
+  DU RIK PÅ TIPSET*) i stället för Tipsguiden. Rutorna står på ett ställe (`RumTidning.rutor`), som tidningen,
+  löpsedeln och Helgarderats egen sida använder. Se *Löpsedeln* under [Tobaksaffären](#tobaksaffären).
+- **Tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål):** "Kan du ordna så att tidningen ser mer
+  'äkta' ut - med riktigt papper etc. Just nu ser den inte helt verklighetstrogen ut". Helgarderat såg ut som ett tryckt
+  kort: vitt och jämnt papper med ett prickraster över allt, mättade färger, en tom ruta under kupongens rader och en
+  skugga som om den svävade. Nu har den samma papper som löpsedeln: gråaktigt och matt med fibrer, ojämn ton och buktor,
+  tryckfärg som inte har täckt överallt och kanter som har gulnat. Färgerna är tryckfärgens (svärtan inte helt svart, det
+  gröna och röda dämpade, och det vita i texten är papperet), kupongens rader fyller rutan, vecket på mitten är en ås med
+  ljus ovanför och skugga under, och skuggan ligger tätt intill pulten. Se *Papperet* under [Tidningen](#tidningen).
 - **Löpsedeln är en löpsedel, och tidningen ligger på pulten (2026-11-10, användarens önskemål):** "När man zoomade
   in den här så fick man hela tidningen - så ska det inte vara. Då är det bättre om du visualiserar tidningen på ett
   lämpligt ställe på animationsbilden eller hos Hasse Backe (om det tar mycket grafik hos sämre datorer/mobiltelefoner
@@ -3881,20 +3900,21 @@ licensen är okända, så ingen rad står under närbilden) och *Havertz strike 
 i Porto den 29 maj 2021 (Kai Havertz). Löpsedeln är fem år gammal: papperet har gulnat,
 det röda har bleknat och den har legat vikt på mitten.
 
-**Löpsedeln** är veckans, från en riktig kvällstidning som de andra (Tomas önskemål):
-**Sportbladet**, Aftonbladets sportdel, på sitt rosa papper, eller **Expressen** på vitt med det
-röda namnet, två veckor i taget (`TIDNINGAR` i rum-affischer.js). Namnen är skrivna som text,
-inte tidningarnas loggor, och rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
+**Löpsedeln** är veckans och är **Helgarderats**, samma tidning som ligger på pulten (2026-11-10, Tomas önskemål:
+"Döp om löpsedeln till Helgarderat också"): namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade med
+kulspetspenna framför (`TIDNINGEN` i rum-affischer.js, rutorna ur `RumTidning.rutor`), och det som lyfts fram grönt.
+Förut var den från en riktig kvällstidning som de andra: Sportbladet på sitt rosa papper eller Expressen med det röda
+namnet, två veckor i taget. Rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
 önskemål 2026-11-08): matt tidningspapper, gråaktigt eller blekrosa, med fibrer, ojämn ton och buktor
 från fukten, svärta och rött som inte har täckt överallt, ett veck på mitten och kanterna klippta med
 sax i några raka klipp (`klipp` i rum-affischer.js, ny varje vecka). Det vita i texten är papperet,
 och inget filter ligger på texten, som annars blir suddig i närbilden. Överst namnet så brett som papperet, under det
-vinjetten (*SPIKEN*, *KRISEN*, *BARA I SPORTBLADET*) och datumet, rubriken i Anton, mitt på
+vinjetten (*SPIKEN*, *KRISEN*, *BARA I HELGARDERAT*) och datumet, rubriken i Anton, mitt på
 papperet och från kant till kant – varje rad så stor som ryms i bredden men ingen mer än 1,55
 gånger den minsta, och har raderna fått krympa för att rymmas på höjden dras de ut på bredden
-igen (högst 1,42 gånger), en av dem röd eller vit på rött, och rader med Å, Ä eller Ö med luft
+igen (högst 1,42 gånger), en av dem grön eller papper på grönt, och rader med Å, Ä eller Ö med luft
 ovanför (också i vinjetten) – raden under och, under ett streck, veckans näst största nyhet
-(helst av ett annat slag) efter ett rött plustecken. Utan någon står något ur
+(helst av ett annat slag) efter ett grönt plustecken. Utan någon står något ur
 kvällstidningens vanliga utbud där (*HOROSKOPET: TIPPA X*, *BÄST I TEST: TIPSPENNOR*). Tonen är
 kvällstidningens, stora ord och allvar på ytan, men torr: modellen heter *datorn* och *avböjer
 att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enligt datorn)*, och
@@ -3934,11 +3954,11 @@ rum-affischer.js):
 Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
 Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
 30 %; nästa omgångs 90 %. Omgångar och kuponger som spoilerskyddet döljer räknas inte.
-Utan något att skriva om står tipsguiden (*STORA TIPSGUIDEN*, *SÅ BLIR DU RIK PÅ TIPSET* – *8
-enkla knep – nummer 5 gör alla fel*). Tidningen är från dagen det hände (tre timmar efter sista
+Utan något att skriva om gör den reklam för det som står i tidningen (*SÅ TAR DU HEM 13 RÄTT*, *SÅ BLIR DU RIK PÅ
+TIPSET* – *8 enkla knep – nummer 5 gör alla fel*). Tidningen är från dagen det hände (tre timmar efter sista
 avsparken), och för nästa omgång från idag. Ett klick går fram till löpsedeln, som till de andra affischerna
 (2026-11-10; förut öppnade det tidningen), och som inget annat i rummet leder den ut ur det. Tidningen den
-gör reklam för ligger på pulten (se [Tidningen](#tidningen)). För bilder: `?rum-tidning=sb|ex`, `?rum-rubrik=<typ>` och
+gör reklam för ligger på pulten (se [Tidningen](#tidningen)). För bilder: `?rum-rubrik=<typ>` och
 `?rum-variant=<tal>`.
 
 **Fikat** står på pulten vissa dagar, i three.js som sakerna
@@ -6991,8 +7011,20 @@ tidningen på höger sida om kupongen"): förut låg två tidningar på pulten, 
 veckans kvällstidning till höger om kupongen (L), med löpsedeln som förstasida. Nu är de en: Helgarderat ligger där
 kvällstidningen låg, med Tipsguidens framsida i Helgarderats utseende, och har allt som stod i dem båda – före omgången
 Tipsguidens sidor, efter den kvällstidningens, och *Åtta knep* sist. Som Tipsguiden finns den alltid, också mellan
-omgångarna. L tar upp den; G gör ingenting längre. Löpsedeln i fönstret är kvar som förut, Sportbladets eller
-Expressens, och dess kopia som förstasida (`sedel`, `omritad` och `data-rub` i rum-affischer.js) är borttagen.
+omgångarna. L tar upp den; G gör ingenting längre. Löpsedelns kopia som förstasida (`sedel`, `omritad` och `data-rub`
+i rum-affischer.js) är borttagen, och samma dag blev löpsedeln också Helgarderats (se *Löpsedeln* under
+[Tobaksaffären](#tobaksaffären)).
+
+**Papperet** (2026-11-10, användarens önskemål: "Kan du ordna så att tidningen ser mer 'äkta' ut - med riktigt papper
+etc."): tidningspapper som löpsedelns, med samma bilder (`--fiber`, `--bukt`, `--prickar` och `--flackar`, som står i
+rum-tidning.css och som löpsedeln också använder). Papperet är gråaktigt och matt, med fibrer, ojämn ton och buktor från
+fukten, och kanterna har gulnat. Tryckfärgen har inte täckt överallt: papperet lyser igenom i prickar och fläckar i det
+svarta, gröna och röda (`.hf-blad` på framsidan, `::before` på sidorna). Färgerna är tryckfärgens, svärtan inte helt svart
+och det gröna och röda dämpade, och det vita i text på färg är papperet. Framsidan är förstorad med zoom, så mönstren
+delas med förstoringen (`--zz`), och de är lika fina på pulten som framme. På sidorna ligger buktorna i sin egen form,
+upprepade nedåt. På pulten är vecket på mitten en ås med ljus ovanför och skugga under, den undre halvan lite mörkare,
+papperet buktar svagt i rummets ljus och skuggan ligger tätt intill. Kupongens rader fyller rutan på framsidan (högst
+5,6 bildpunkter höga), så att den inte står tom under dem. Bara bilder: inga filter och inga blandningslägen.
 
 **På pulten** (2026-11-10, användarens önskemål: "När man zoomade in den här så fick man hela tidningen - så ska det
 inte vara"): ett klick på löpsedeln går bara fram till den, som de andra löpsedlarna, och tidningen ligger till höger

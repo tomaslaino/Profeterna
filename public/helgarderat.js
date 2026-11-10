@@ -68,14 +68,8 @@
   };
 
   // Rutorna 1, X och 2 som på kupongen, tecknet tryckt ovanför och ett kryss i kulspetspenna i varje: helgarderat.
-  // Varje kryss är draget lite olika och går en bit utanför rutan.
-  const KRYSS = [
-    'M4.5 6.2 C13 14.6 24 25.8 35.6 35.1 M34.2 4.6 C25.8 14.1 15.6 25.2 5.3 36.4',
-    'M5.6 4.9 C14.6 14.2 23.4 23.6 34.6 36.2 M36.1 6.4 C26.6 15 15.2 26 3.9 34.6',
-    'M3.8 7.1 C12.8 15.2 25.4 24.4 36.3 34 M33.4 3.9 C26.3 13.5 17 26.1 7.2 37.1',
-  ];
-  const rutor = () => `<svg class="hg-rutor" viewBox="0 0 134 64" aria-hidden="true">${['1', 'X', '2'].map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
-    `<text x="19.5" y="15" text-anchor="middle">${t}</text><g transform="translate(0 23.2)"><rect width="39" height="39" class="r"/><path d="${KRYSS[i]}" class="k"/></g></g>`).join('')}</svg>`;
+  // Samma som på tidningen och löpsedeln i rummet (RumTidning.rutor).
+  const rutor = () => RT.rutor('hg-rutor');
 
   const STAMPEL = (s, typ = 'podd') => {
     const k = T.slag[s] ? s : 'h';
