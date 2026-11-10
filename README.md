@@ -990,7 +990,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och med samma väder i fönstren hos honom som i rummet. Sedan: "Det får gärna vara stora fönster - så att vi alltså
   inte har kvar ciggarett-paketen osv. Gör det snyggt och konkordant med den animerade sidan med alla grabbarna".
   Väggen bakom honom är ett stort glasparti med mörkgrå poster som skyltfönstret i rummet, och utsikten ritas en gång
-  per väder och ljus. Se [Hasse Backe](#hasse-backe), *Utsikten*.
+  per väder och ljus. Samma dag: "Det ser lite grynigt ut där i trät och metallen där bakom hasse ... det är samma
+  ställe!" Karmarna är matta som i rummet, och ett kantbevarande filter tar kornet efter bakningen
+  (scripts/hasse/README.md). Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån

@@ -54,15 +54,15 @@ grupp(() => {
   box([8000, 0, 2000], [20, 4000, 3000], 0, RGB('#3a2a1c'));
   box([0, 0, 5200], [9000, 4000, 20], 0, RGB('#2a2018'));
 });
-// Karmarna: mörkgrå metall som skyltfönstret i rummet (#3a3a3c i rum.js), runt varje ruta en bit in i väggen,
-// så att posterna mellan rutorna blir dubbelt så breda som karmen.
+// Karmarna: matt mörkgrå som skyltfönstret i rummet (#3a3a3c i rum.js), runt varje ruta en bit in i väggen,
+// så att posterna mellan rutorna blir dubbelt så breda som karmen. (Blanka gnistrade de av himlen i spåret.)
 grupp(() => {
   const K = FO.KARM, z0 = VAGG - FO.DJUP + 20, z1 = VAGG - 40, z = (z0 + z1) / 2, dz = (z1 - z0) / 2, M = RGB('#3a3a3c');
   for (const [x0, x1] of FO.X) {
-    box([(x0 + x1) / 2, FO.Y1 - K / 2, z], [(x1 - x0) / 2, K / 2, dz], 12, M);
-    box([(x0 + x1) / 2, FO.Y0 + K / 2, z], [(x1 - x0) / 2, K / 2, dz], 12, M);
-    box([x0 + K / 2, (FO.Y0 + FO.Y1) / 2, z], [K / 2, (FO.Y1 - FO.Y0) / 2 - K, dz], 12, M);
-    box([x1 - K / 2, (FO.Y0 + FO.Y1) / 2, z], [K / 2, (FO.Y1 - FO.Y0) / 2 - K, dz], 12, M);
+    box([(x0 + x1) / 2, FO.Y1 - K / 2, z], [(x1 - x0) / 2, K / 2, dz], 0, M);
+    box([(x0 + x1) / 2, FO.Y0 + K / 2, z], [(x1 - x0) / 2, K / 2, dz], 0, M);
+    box([x0 + K / 2, (FO.Y0 + FO.Y1) / 2, z], [K / 2, (FO.Y1 - FO.Y0) / 2 - K, dz], 0, M);
+    box([x1 - K / 2, (FO.Y0 + FO.Y1) / 2, z], [K / 2, (FO.Y1 - FO.Y0) / 2 - K, dz], 0, M);
   }
 });
 const T = -300; // bakdiskens ovansida, så som bardisken i rummet: skiva, fronten med fyllningar i ramar, mässingskrokar
@@ -375,7 +375,8 @@ void main() {
   vec3 ro = ${v3(KP)} + o.x * ${v3(KR)} + o.y * ${v3(KU)};
   vec3 rd = normalize(rc.x * ${v3(KR)} + rc.y * ${v3(KU)} + rc.z * ${v3(KB)});
   vec4 c = spara(ro, rd);
-  ut = texelFetch(uPrev, f, 0) + vec4(min(c.rgb, vec3(3.5)), c.a);
+  // (enstaka strålar som råkar träffa en lampa i en blank yta blir annars gnistor i träet)
+  ut = texelFetch(uPrev, f, 0) + vec4(min(c.rgb, vec3(2.)), c.a);
 }`;
 const FS2 = `#version 300 es
 precision highp float; uniform sampler2D uT; uniform float uN, uRa; out vec4 ut;
