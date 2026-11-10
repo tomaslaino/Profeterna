@@ -44,8 +44,10 @@
 // det tipsguiden. Som de andra föremålen leder den inte ut ur rummet: ett klick
 // går fram till den (rum.js).
 //
-// affischer(back, { short, namn }) → { slit(w, seed), data(rows, old) }
-//   short: kortare lagnamn, namn: namnet på skårtavlan (rum.js)
+// affischer(back, { short, namn, omritad }) → { slit(w, seed), data(rows, old), sedel(), rubrik() }
+//   short: kortare lagnamn, namn: namnet på skårtavlan (rum.js), omritad: när
+//   veckans löpsedel har ritats om (kvällstidningen på pulten har samma
+//   förstasida, tidningPult i rum.js)
 //   rows: omgångens rader (roundRows i rum.js), old: de färdigspelade
 //   kupongerna (Historik.coupons()); säsongens omgångar läses ur TP.season
 //   (tippare.js).
@@ -277,10 +279,9 @@ const datum = (t) => fDatum.format(new Date(t)).toUpperCase();
 const nar = (t) => `${fDag.format(new Date(t)).replace('.', '')} ${fTid.format(new Date(t)).replace(':', '.')}`;
 const tal = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
 const S = ['1', 'X', '2'];
-// Namnet som på skårtavlan (tavelnamn i rum.js: efternamnet, Dogge för
-// Johansson), annars efternamnet; och genitiv (Tejders, men Ros).
-const efter = (p) => String(p.name || p.id || '').trim().split(/\s+/).pop();
-let namnAv = efter;
+// Namnet vi kallas (Tippoang.kallas: efternamnet, Dogge för Johansson), som på
+// skårtavlan; och genitiv (Tejders, men Ros).
+let namnAv = (p) => Tippoang.kallas(p);
 const gen = (namn) => (/[sxz]$/i.test(namn) ? namn : `${namn}s`);
 const lag = (match) => String(match || '').split(/\s+[–-]\s+/);
 
@@ -651,7 +652,7 @@ function klipp(fro) {
   return `polygon(${p.join(', ')})`;
 }
 
-export function affischer(back, { short = (x) => x, namn = null } = {}) {
+export function affischer(back, { short = (x) => x, namn = null, omritad = null } = {}) {
   if (namn) namnAv = namn;
   if (!document.querySelector('link[href="rum-affischer.css"]')) {
     const css = document.createElement('link');
@@ -682,8 +683,8 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const api = {
     // Veckans rubrik (rubrik ovan), som tidningen i rum.js utgår från. → { typ, tidning, datum, id … }, eller null
     rubrik: () => senastR,
-    // Löpsedeln som den sitter, utan tejpen: tidningen i rum.js lägger fram samma papper,
-    // med samma storlekar på raderna, så att de inte kan bli olika. → elementet, eller null
+    // Löpsedeln som den sitter, utan tejpen: kvällstidningen i rum.js har samma papper som förstasida, på
+    // pulten och framme, med samma storlekar på raderna, så att de inte kan bli olika. → elementet, eller null
     sedel() {
       const ark = l.querySelector('.ark');
       if (!ark || !senastR) return null;
@@ -696,6 +697,7 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
     slit(w, seed) {
       for (const el of [f, n, v, c]) bleks(el, w);
       slit(l, w, seed + 5);
+      if (omritad) omritad();
     },
     // rubriken räknas om när datan ändras (rum-saker.js frågar bara då)
     data(rows, old) {
@@ -722,6 +724,7 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
       if (k === ritad) return;
       ritad = k;
       rita(l, r, vagg);
+      if (omritad) omritad();
     },
   };
   return api;

@@ -5,7 +5,7 @@
 // fönstret, stationsuret och orakelramen med mässingsskylten på bakväggen,
 // cigarettpaketen uppe på högra väggen, ramarna kring skårtavlan och
 // korktavlan, bardisken med barstolarna, kupongstället på disken och bladet
-// med radions stationer på fönsterkarmen bredvid radion.
+// med radions stationer på väggen bredvid radion.
 //
 // Allt ritas med en och samma WebGL-duk utanför sidan och kopieras till en
 // vanlig duk per sak, i det plan där den platta saken låg, så att den följer
@@ -48,10 +48,11 @@ const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // det målade bandet på bakväggen, mellan taket och fönsterkarmen och lika brett
 // som fönstret (i bakväggens bild)
 const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
-// bladet med radions stationer på fönsterkarmen till höger om radion, mellan radion (som står framför
-// karmen, på fönsterbänken) och veckans löpsedel, ovanför fönsterbänkens bakkant (radiolapp): ett blad ur
-// ett litet block, lagom för tio stationer och fritt från antennen
-const LAPP = { x: 957, y: 518, w: 27, h: 34 };
+// bladet med radions stationer på väggen till höger om radion (radiolapp): i remsan mellan fönsterkarmen
+// (x 958) och veckans löpsedel (x 986, LOPPLATS i rum-affischer.js) med luft till båda, och en bit ovanför
+// fönsterbänken (y 552), så att det sitter på en enda yta och inte når ned till bänken; ett blad ur ett
+// litet block, lagom för tio stationer
+const LAPP = { x: 961, y: 513, w: 23, h: 29 };
 // Sakerna och dukarna (plan: 0 = väggen). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
@@ -209,8 +210,15 @@ export async function inredning(el, opt = {}) {
     cam.updateMatrixWorld();
     return cam;
   }
+  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot pokalhyllan med
+  // Tipsligan, som också lyser på disken under. De finns i alla sakers ljus, så att alla delar samma
+  // grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i bildrutorna.
+  const SPOTAR = [
+    { fran: [1050, 30, 330], mot: [1050, -372, WZ], styrka: 1.6, vinkel: 0.34 },
+    { fran: [880, 30, 470], mot: [WX, -366, 377], styrka: 0.8, vinkel: 0.36 },
+  ];
   // ljuset som i rummet: lysröret ovanför och framför till vänster, neonen
-  // från fönstret och tv:n från hörnet
+  // från fönstret, tv:n från hörnet och spotarna
   function wallLights(b, box, skugga = true) {
     const { scene } = b;
     scene.add(new THREE.HemisphereLight('#eadcc0', '#3a2a1a', 0.55));
@@ -238,6 +246,13 @@ export async function inredning(el, opt = {}) {
     const f = new THREE.DirectionalLight('#ffd9b0', 0.35);
     f.position.set(760, -400, 1000);
     scene.add(f);
+    for (const { fran, mot, styrka, vinkel } of SPOTAR) {
+      const s = new THREE.SpotLight('#ffe2b8', 0, 0, vinkel, 0.9, 2);
+      s.position.set(...fran);
+      s.target.position.set(...mot);
+      s.intensity = styrka * s.position.distanceToSquared(s.target.position);
+      scene.add(s, s.target);
+    }
   }
   // skuggorna faller bara där det finns vägg (högra väggen bara ovanför disken)
   function catcher(b, g, rot, pos, o = 0.42) {
@@ -1281,9 +1296,9 @@ export async function inredning(el, opt = {}) {
   }
 
   // ---------- bladet vid radion ----------
-  // Ett blad som har rivits ur ett spiralblock och tejpats på fönsterkarmen bredvid radion med två bitar
-  // gulnad tejp: halva spiralhål överst, blå linjer och röd marginal, vikt en gång på mitten, och nedtill
-  // släpper det från karmen, mest i hörnet. Radions stationer står där för hand (KANALER och rad i
+  // Ett blad som har rivits ur ett spiralblock och tejpats rakt på väggen bredvid radion med två korta
+  // bitar gulnad tejp över överkanten: halva spiralhål överst, blå linjer och röd marginal, vikt en gång på
+  // mitten, och nedtill står det ut en aning från väggen. Radions stationer står där för hand (KANALER och rad i
   // rum-radio.js) i en spalt: FM i blått och under det AM i rött, varje band med sin rubrik och frekvenserna
   // under varandra, och den station som hörs ringas in med samma penna (nu). Papperet har samma struktur som allt papper på sajten (rum/papper.webp), fibrer och en
   // kaffering, och ritas en gång. rader() ger raderna som andelar av duken, så att rum-radio.js kan lägga
@@ -1493,13 +1508,13 @@ export async function inredning(el, opt = {}) {
     });
     ytan.wrapS = ytan.wrapT = THREE.RepeatWrapping;
     ytan.repeat.set(EW / 6, EH / 6);
-    // Böjen (x, y: 0–1 från övre vänstra hörnet): överst håller tejpen, nedtill släpper bladet från
-    // karmen, mest i hörnet, och vikningen står ut lite.
-    const bojd = (x, y) => 1.3 * Math.max(0, (y - 0.14) / 0.86) ** 2.4 * (0.35 + 0.65 * x * x)
-      + 2 * Math.max(0, (x + y - 1.5) / 0.5) ** 2
-      + 0.3 * Math.sin(Math.PI * x) * Math.sin(Math.PI * Math.min(1, y * 1.1))
-      + 0.8 * Math.max(0, 1 - Math.abs(y - 0.52) / 0.5) - 0.4
-      + 0.07 * Math.sin(x * 9 + y * 5);
+    // Böjen (x, y: 0–1 från övre vänstra hörnet): överst håller tejpen bladet mot väggen, och längre ned
+    // står det ut en aning, jämnt över bredden, med vikningen som en svag rygg. Bladet ligger plant nog
+    // att se uppsatt ut: inget hörn som rullar sig.
+    const bojd = (x, y) => 0.45 * Math.max(0, (y - 0.12) / 0.88) ** 1.6
+      + 0.12 * Math.sin(Math.PI * x) * Math.sin(Math.PI * Math.min(1, y * 1.1))
+      + 0.18 * Math.max(0, 1 - Math.abs(y - 0.52) / 0.4) - 0.3
+      + 0.03 * Math.sin(x * 9 + y * 5);
     const geo = new THREE.PlaneGeometry(W, H, 24, 32);
     const pos = geo.attributes.position;
     for (let i = 0; i < pos.count; i++) pos.setZ(i, bojd(pos.getX(i) / W + 0.5, 0.5 - pos.getY(i) / H));
@@ -1507,38 +1522,34 @@ export async function inredning(el, opt = {}) {
     const papp = mat('#ffffff', { map: karta, bumpMap: ytan, bumpScale: 0.5, roughness: 0.9, sheen: 0.3, sheenRoughness: 0.8, sheenColor: new THREE.Color('#ffffff'), side: THREE.DoubleSide, alphaTest: 0.5, envMapIntensity: 0.35 });
     const grupp = new THREE.Group();
     grupp.position.set(760 + (LAPP.x + LAPP.w / 2 - 760) / s, -(400 + (LAPP.y + LAPP.h / 2 - 400) / s), Z);
-    grupp.rotation.z = 0.02;
+    grupp.rotation.z = 0.006;
     b.scene.add(grupp);
     const blad = new THREE.Mesh(geo, papp);
     grupp.add(blad);
-    // skuggan på karmen: tät där tejpen håller, längre ner och mjukare där bladet släpper (ritad, så att
-    // den också finns utan skuggkarta)
-    const skugga = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.45, H * 1.38), new THREE.MeshBasicMaterial({
-      map: tex(128, 176, (c, w, h) => {
-        const sx = w / 1.45;
-        const sy = h / 1.38;
+    // skuggan på väggen: tät och nära överst, där tejpen håller, och lite mjukare nedtill, där bladet står
+    // ut (ritad, så att den också finns utan skuggkarta)
+    const skugga = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.3, H * 1.24), new THREE.MeshBasicMaterial({
+      map: tex(128, 160, (c, w, h) => {
+        const sx = w / 1.3;
+        const sy = h / 1.24;
         const x0 = (w - sx) / 2 - 4 * w;
         const y0 = (h - sy) / 2;
         c.shadowOffsetX = 4 * w;
-        c.shadowColor = 'rgba(0,0,0,0.5)';
-        c.shadowBlur = 4;
-        c.fillRect(x0, y0 + sy * 0.03, sx, sy * 0.96);
-        c.shadowColor = 'rgba(0,0,0,0.75)';
-        c.shadowBlur = 12;
-        c.beginPath();
-        c.moveTo(x0 + sx * 0.06, y0 + sy * 0.45);
-        c.lineTo(x0 + sx * 1.03, y0 + sy * 0.45);
-        c.lineTo(x0 + sx * 1.08, y0 + sy * 1.05);
-        c.lineTo(x0 + sx * 0.09, y0 + sy * 1.03);
-        c.fill();
+        c.shadowColor = 'rgba(0,0,0,0.45)';
+        c.shadowBlur = 3;
+        c.fillRect(x0, y0 + sy * 0.02, sx, sy * 0.98);
+        c.shadowColor = 'rgba(0,0,0,0.4)';
+        c.shadowBlur = 7;
+        c.fillRect(x0 + sx * 0.02, y0 + sy * 0.5, sx * 0.98, sy * 0.52);
       }),
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.6,
       depthWrite: false,
     }));
-    skugga.position.set(0.6, -1, -0.5);
+    skugga.position.set(0.25, -0.45, -0.5);
     grupp.add(skugga);
-    // tejpen i de övre hörnen
+    // tejpen: två korta bitar över överkanten, en en bit in från vart hörn, nästan raka – halva på bladet
+    // och halva på väggen ovanför, och inget som sticker ut åt sidorna
     const tejpMat = mat('#ffffff', {
       map: tex(128, 48, (c, w, h) => {
         c.fillStyle = 'rgba(236,222,170,0.62)';
@@ -1557,10 +1568,11 @@ export async function inredning(el, opt = {}) {
       depthWrite: false,
       envMapIntensity: 0.6,
     });
-    for (const [x, y, r] of [[-W / 2 + 2.5, H / 2 - 1.2, 0.5], [W / 2 - 2.5, H / 2 - 1.1, -0.42]]) {
-      const t = new THREE.Mesh(new THREE.PlaneGeometry(8.5, 3.2), tejpMat);
-      t.position.set(x, y, 0.3);
-      t.rotation.z = r;
+    for (const [x, y, r] of [[-W / 2 + 3.6, H / 2 - 0.15, 0.07], [W / 2 - 3.6, H / 2 - 0.05, -0.05]]) {
+      // (de rivna ändarna uppåt och nedåt)
+      const t = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.6), tejpMat);
+      t.position.set(x, y, -0.2);
+      t.rotation.z = Math.PI / 2 + r;
       grupp.add(t);
     }
     // ringen kring den station som hörs: ett pennstreck runt raden som går lite om sig själv
@@ -1650,8 +1662,7 @@ export async function inredning(el, opt = {}) {
   knapp.dataset.sak = 'ur';
   knapp.setAttribute('aria-label', 'Uret');
   planes[0].append(knapp);
-  // knappen kring bladet vid radion: ett klick går fram till det (SAKER.radiolapp i rum.js), och
-  // veckans löpsedel sitter över dess kant
+  // knappen kring bladet vid radion: ett klick går fram till det (SAKER.radiolapp i rum.js)
   const lappKnapp = window.RumRadio && window.RumRadio.rad ? document.createElement('button') : null;
   if (lappKnapp) {
     lappKnapp.type = 'button';

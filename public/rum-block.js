@@ -10,7 +10,7 @@
 // överst med hans röda penna, så att det syns också på håll.
 // Han har rättat det, och raden Poäng förklarar han om man ropar till honom (protHasse i rum.js), men
 // domarna över gänget säger han i baren (gang här, doma i rum-hasse.js). Ett klick på blocket lyfter det och lägger fram det
-// stort (protokollet i rum.js), och ett klick på löpsedeln i fönstret öppnar tidningen
+// stort (protokollet i rum.js), och ett klick på kvällstidningen på pulten öppnar tidningen
 // (tidningen i rum.js). Gänget håller upp sina lappar (lappar här och i rum-3d.js), och
 // modellens siffra står på videons blå ruta.
 //
@@ -26,7 +26,6 @@
   const TAL = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'];
   const ordet = (n) => TAL[n] || String(n);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const efternamn = (s) => String(s || '').trim().split(/\s+/).pop();
   const lista = (l) => (l.length < 2 ? l.join('') : `${l.slice(0, -1).join(', ')} och ${l.at(-1)}`);
   // gängets bläck på papper och handstil (som namnen på kupongen), Hasse sist
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
@@ -70,7 +69,7 @@
       const hasse = p.id === HASSE;
       const g = info.find((x) => x.id === p.id);
       return {
-        id: p.id, namn: efternamn(p.name), none: Boolean(p.none), ok: p.ok || 0, n: p.n || 0, pts: p.pts || 0, award: award[p.id] || null,
+        id: p.id, namn: Tippoang.kallas(p), none: Boolean(p.none), ok: p.ok || 0, n: p.n || 0, pts: p.pts || 0, award: award[p.id] || null,
         rows: p.rows || [], ink: hasse ? INK[3] : INK[Math.max(0, i)], hand: hasse ? 3 : Math.max(0, i),
         bild: hasse ? HASSE_BILD : (g && g.bild) || null,
       };
@@ -482,8 +481,10 @@
   // skrivmaskinen börjar varje rad på ett annat anslag (--anslag i papper.css)
   const ANSLAG = ['ss01', 'ss04', 'ss02', 'ss06', 'ss03', 'ss05', 'normal'];
 
-  // → html för blocket. tat: den smala versionen (telefonen).
-  function html(sum, { tat = false } = {}) {
+  // → html för blocket. tat: den smala versionen (telefonen). matcher: raderna går att klicka på (bladet framme,
+  // protokollet i rum.js), och varje cell på raden har radens nummer (data-rad, från 0), så att ett klick var som
+  // helst på raden lägger fram matchbladet efter matchen; matchen är en knapp.
+  function html(sum, { tat = false, matcher = false } = {}) {
     const kol = spalter(sum);
     const P = (id) => sum.folk.find((p) => p.id === id);
     const nyckel = String(sum.id || sum.nr || '');
@@ -504,17 +505,22 @@
     // Allas tecken står på skrivmaskin i samma svarta färgband, så att spalterna går att läsa rakt ned och jämföra.
     // Det som satt är överstruket med märkpennan och står i full svärta; det som inte satt står kvar, men svagare
     // (fel), så att skillnaden syns också utan färg. Är matchen inte avgjord är inget av dem svagare.
+    const radNr = (i) => (matcher ? ` data-rad="${i}"` : '');
     const cell = (r, s, i, k, j) => {
       const c = r.kol[s.id] || {};
       const fel = c.t && !c.ok && r.res != null;
-      return `<span class="rb-c${j}${c.ok ? ' ratt' : ''}${fel ? ' fel' : ''}${s.id === 'K' ? ' k' : ''}" style="font-feature-settings:'${ANSLAG[(i + k + 5) % 7]}'">` +
+      return `<span class="rb-c${j}${c.ok ? ' ratt' : ''}${fel ? ' fel' : ''}${s.id === 'K' ? ' k' : ''}"${radNr(i)} style="font-feature-settings:'${ANSLAG[(i + k + 5) % 7]}'">` +
         `${c.ok ? strykning(`${nyckel}${r.nr}${s.id}`, String(c.t).length) : ''}${c.t ? `<i>${esc(c.t)}</i>` : ''}</span>`;
     };
     // varannan rad tonad hela vägen över, så att ögat hittar från matchen till var och ens tecken
     const rader = sum.rader.map((r, i) => {
       const j = i % 2 ? ' j' : '';
-      return `<span class="rb-m${j}" style="font-feature-settings:'${ANSLAG[i % 7]}'"><u>${r.nr}</u><span>${esc(r.h)} – ${esc(r.b)}</span><em>${esc(r.mal)}</em></span>` +
-        `<span class="rb-fa${j}" style="font-feature-settings:'${ANSLAG[(i + 3) % 7]}'">${r.tecken}</span>` +
+      const lagen = `${esc(r.h)} – ${esc(r.b)}`;
+      const knapp = matcher
+        ? `<button type="button" class="rb-mk"${radNr(i)} aria-label="${esc(`Match ${r.nr}: ${r.hemma || r.h} – ${r.borta || r.b}${r.mal ? `, ${r.mal}` : ''}`)}">${lagen}</button>`
+        : `<span>${lagen}</span>`;
+      return `<span class="rb-m${j}"${radNr(i)} style="font-feature-settings:'${ANSLAG[i % 7]}'"><u>${r.nr}</u>${knapp}<em>${esc(r.mal)}</em></span>` +
+        `<span class="rb-fa${j}"${radNr(i)} style="font-feature-settings:'${ANSLAG[(i + 3) % 7]}'">${r.tecken}</span>` +
         kol.map((s, k) => cell(r, s, i, k, j)).join('');
     }).join('');
     // summorna på skrivmaskin; bara kupongens betyg är skrivet med pennan
@@ -538,8 +544,54 @@
     // bandet som på kupongen, och omgångens namn för hand på den tryckta raden under
     const band = `<span class="rb-band"><small>Matchfixarna${sum.nr ? ` · Kupong ${esc(sum.nr)}` : ''}</small><b>Protokoll</b></span>`;
     const omg = `<span class="rb-omg"><span>Omgång</span><b>${sum.namn ? esc(sum.namn) : ''}</b></span>`;
-    return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}" style="--n:${kol.length}" role="img" aria-label="${esc(label)}">${band}${omg}` +
+    // (med knappar på raderna är bladet ingen bild längre)
+    return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}${matcher ? ' matcher' : ''}" style="--n:${kol.length}" role="${matcher ? 'group' : 'img'}" aria-label="${esc(label)}">${band}${omg}` +
       `<span class="rb-g"><span class="rb-sp la">Nr · Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${ratt}${rader}${pts}</span></span>`;
+  }
+
+  // ---------- en match ur protokollet ----------
+  //
+  // Hur det gick i en match, till matchbladet efter matchen (Rättningen i rum-matchblad.js): protokollets
+  // spalter i samma ordning – kupongen, var och en i gänget och Hasse – och sedan datorns tecken (det troligaste
+  // före avspark, som Modellen i Olympen) och tipset i analysen när det finns. Varje tips med datorns chans för
+  // tecknet före avspark, poängen (samma regel som raden Poäng, tippoang.js) och spelkassan (10 kr till datorns
+  // odds, som i Olympen och på lappen under domen). Ensam rätt: ingen annan i gänget hade rätt (rödpennans
+  // stjärna, som på lappen).
+  // i: radens nummer från 0. analysen: tecknen i analysens tips ('1X'), skrivna före avspark, eller ''.
+  // → { r, pr, tips: [{ id, namn, t, ok, fel, prob, schablon, pts, kassa, ensam, jmf }], ratt, av } eller null.
+  function match(sum, i, { analysen = '' } = {}) {
+    const r = sum && sum.rader && sum.rader[i];
+    if (!r) return null;
+    const pr = Array.isArray(r.pr) ? r.pr : null;
+    const klar = r.res != null;
+    const tips = (t, ok, extra) => {
+      if (!t) return { t: '', ok: false, fel: false, prob: null, pts: null, kassa: null, ensam: false, ...extra };
+      const prob = Tippoang.chance(t, Tippoang.pct(t, pr));
+      return {
+        t, ok: klar && ok, fel: klar && !ok, prob, schablon: !pr, pts: klar ? Tippoang.points(ok, prob) : null,
+        kassa: klar ? (ok ? KASSA / prob : 0) - KASSA : null, ensam: false, ...extra,
+      };
+    };
+    const ut = spalter(sum).map((s) => {
+      const c = r.kol[s.id] || {};
+      return tips(c.t || '', Boolean(c.ok), { id: s.id, namn: s.namn, ensam: Boolean(c.ensam) });
+    });
+    const dator = pr ? Tippoang.modelSign(pr) : '';
+    if (dator) ut.push(tips(dator, klar && dator === r.tecken, { id: 'D', namn: 'Datorn', jmf: true }));
+    const a = Tippoang.sign(analysen);
+    if (a) ut.push(tips(a, klar && a.includes(r.tecken), { id: 'A', namn: 'Analysen', jmf: true }));
+    const med = ut.filter((x) => !x.jmf && x.t);
+    return { r, pr, tips: ut, ratt: med.filter((x) => x.ok).length, av: med.length };
+  }
+
+  // Porträttet till en spalt (s ur spalter): kupongens tre ansikten om lott, ett uppklistrat foto, eller
+  // initialen i bläcket när fotot saknas – som spalthuvudena i protokollet.
+  function portratt(sum, s) {
+    const nyckel = String(sum.id || sum.nr || '');
+    const foto = (src, key) => `<img src="${esc(src)}" alt="" draggable="false" style="${hand(`${nyckel}f${key}`, 0.5)}">`;
+    if (s.id === 'K') return `<span class="rb-lag">${sum.folk.filter((p) => p.id !== HASSE && p.bild).map((p) => foto(p.bild, `K${p.id}`)).join('')}</span>`;
+    const k = spalter(sum).find((x) => x.id === s.id) || s;
+    return k.bild ? foto(k.bild, k.id) : `<span class="rb-ik" style="background:${k.ink || KUPONG.ink}">${esc(String(k.namn || '?').charAt(0))}</span>`;
   }
 
   // ---------- Hasses exempel ----------
@@ -571,5 +623,5 @@
     return T.mest(bast.p.namn, bast.sign, bast.r.h, bast.r.b, Math.round((1 - bast.pts) * 100), poang(bast.pts).replace('+', ''));
   }
 
-  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, RING, html, exempel, betyg, TEXT };
+  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, kr, RING, STJARNA, strykning, html, match, portratt, exempel, betyg, TEXT };
 });

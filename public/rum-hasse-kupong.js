@@ -75,7 +75,7 @@ window.RumHasseKupong = (ctx) => {
       });
     }
   }
-  // Vet kupongen inte vem du är frågar han vems den är innan han fyller i den: efternamnen på dem som inte
+  // Vet kupongen inte vem du är frågar han vems den är innan han fyller i den: namnen (Tippoang.kallas) på dem som inte
   // har lämnat in står i rutornas ställe, lika stora, och den du väljer blir den du är, som när du väljer
   // namn på kupongen (Samtal.pult.vem). Sedan sen().
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -88,7 +88,7 @@ window.RumHasseKupong = (ctx) => {
     v.setAttribute('role', 'group');
     v.setAttribute('aria-label', REP().fyller.vem);
     v.innerHTML = p.s.gang.filter((g) => p.val.includes(g.id))
-      .map((g) => `<button type="button" class="rh-ruta" data-vem="${esc(g.id)}"><i>${esc(String(g.namn || g.id).trim().split(/\s+/).pop())}</i></button>`).join('');
+      .map((g) => `<button type="button" class="rh-ruta" data-vem="${esc(g.id)}"><i>${esc(Tippoang.kallas(g))}</i></button>`).join('');
     t.style.display = 'none';
     t.after(v);
     K.vems = { t, v };
@@ -310,7 +310,13 @@ window.RumHasseKupong = (ctx) => {
       const steg = fran === 'hand' ? [[hand, ner, 300, ease.in, true]] : [[disk, fore, 240, ease.mjuk, false], [fore, ner, 420, ease.in, true]];
       if (!await kor(...steg)) return;
     }
-    if (K.el === el) { el.remove(); K.el = null; K.fas = null; }
+    if (K.el === el) {
+      el.remove();
+      K.el = null;
+      K.fas = null;
+      // tillbaka på pulten, med det han har skrivit (pultPapper i rum-hasse.js)
+      if (ctx.pulten) ctx.pulten();
+    }
   }
   function klickPa(e) {
     e.stopPropagation();

@@ -39,14 +39,27 @@
 // tar fram ett annat. Sidan man har framme följer med nästa gång bladet tas fram under
 // besöket.
 //
+// Efter matchen (efter: protokollet, ett klick på en rad i protokollet i rum.js) är det
+// samma blad med sidor om hur det gick, i den ordning man vill veta det:
+//   Rättningen  allas tips i matchen i protokollets ordning – kupongen, gänget och Hasse –
+//               och sedan datorns tecken och analysens tips, med tecknet överstruket med
+//               märkpennan när det satt, datorns chans för det, poängen och spelkassan
+//               (RumBlock.match räknar som protokollet); under dem datorn och spelbolagen
+//               före avspark i kupongens rutor, med facit överstruket
+//   Matchen     matchrutans Matchen (matchruta.js): målen, korten, bytena och
+//               statistiken från ESPN
+//   Prognos, Analys (tipset rättat), Startelvor och Tabellen som förut
+// Sidan man har framme efter matchen följer med på samma sätt, för sig.
+//
 // RumMatchblad.load(id) → Promise med matchens fil (null om den inte går att hämta)
-// RumMatchblad.fram({ inom, matcher, id, kupong, tillbaka, smal, calm, nar }) → blad: bladet för sig,
-//   mitt i fönstret (hos Hasse Backe och från tv:n), se fram nedan
-// RumMatchblad.oppna({ host, matcher, id, kupong, tillbaka, ut, calm }) → blad
+// RumMatchblad.fram({ inom, matcher, id, kupong, tillbaka, smal, calm, nar, efter }) → blad: bladet för sig,
+//   mitt i fönstret (hos Hasse Backe, från tv:n och från protokollet), se fram nedan
+// RumMatchblad.oppna({ host, matcher, id, kupong, tillbaka, ut, calm, efter }) → blad
 //   host      där bladet läggs (kupongen i handen, eller lagret över baren)
 //   matcher   omgångens matcher i kupongens ordning ({ id, home, away, kickoff, comp }),
 //             för matchens nummer i bandet
 //   tillbaka  dit krysset i bandet leder (kupongen, Hasse), ut() när man trycker på det
+//   efter     protokollets sammanställning (RumBlock), matcher i dess ordning: bladet efter matchen
 //   blad.flik(n)  nästa eller förra sida, blad.ut(nu)  tar bort bladet, blad.el  bladet,
 //   blad.id  dess match
 
@@ -65,9 +78,19 @@ window.RumMatchblad = (() => {
   const fSkriven = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   // Sidorna, i bladets ordning. Alla står alltid där, så att flikarna står still.
   const SIDOR = [['lagen', 'Lagen'], ['prognos', 'Prognos'], ['analys', 'Analys'], ['elvor', 'Startelvor'], ['tabellen', 'Tabellen'], ['moten', 'Mötena']];
+  // efter matchen, från protokollet: hur det gick först
+  const EFTER = [['rattning', 'Rättningen'], ['matchen', 'Matchen'], ['prognos', 'Prognos'], ['analys', 'Analys'], ['elvor', 'Startelvor'], ['tabellen', 'Tabellen']];
   // möten på sidan, som kortet i kortregistret (MOTEN i rum-register.js)
   const MOTEN = 11;
   let flik = 'lagen';
+  let flikEfter = 'rattning';
+  // bladets sidor och den som är framme, före eller efter matchen
+  const sidor = (ctx) => (ctx.efter ? EFTER : SIDOR);
+  const vald = (ctx) => (ctx.efter ? flikEfter : flik);
+  const valj = (ctx, id) => {
+    if (ctx.efter) flikEfter = id;
+    else flik = id;
+  };
 
   const cache = new Map();
   function load(id) {
@@ -109,9 +132,15 @@ window.RumMatchblad = (() => {
   const prick = (cls) => `<i class="rl-prick ${cls}"></i>`;
 
   // 1 X 2 ser likadant ut på Lagen och Prognos: kupongens tre rutor med oddset stort,
-  // och under dem chansen i procent i stapeln.
-  function trio(lab, tal, p) {
-    return `<div class="rb-rutor">${tal.map((v, i) => `<span class="rb-ruta" title="${esc(`${lab[i]}: ${p[i]} %`)}"><i>${'1X2'[i]}</i><b>${v}</b></span>`).join('')}</div>` +
+  // och under dem chansen i procent i stapeln. Efter matchen (facit: 0–2) är det protokollets
+  // färger och inga andra: facit överstruket med märkpennan och de andra två rutorna svagare,
+  // och chansen på skrivmaskin under varje ruta i stället för den färgade stapeln.
+  function trio(lab, tal, p, facit = null, key = '') {
+    const cls = (i) => (facit == null ? '' : i === facit ? ' ratt' : ' fel');
+    const mp = (i) => (i === facit && window.RumBlock ? RumBlock.strykning(`${key}${i}`, 3) : '');
+    const rutor = `<div class="rb-rutor">${tal.map((v, i) => `<span class="rb-ruta${cls(i)}" title="${esc(`${lab[i]}: ${p[i]} %${i === facit ? ' – facit' : ''}`)}">${mp(i)}<i>${'1X2'[i]}</i><b>${v}</b></span>`).join('')}</div>`;
+    if (facit != null) return rutor + `<div class="rb-chanser">${p.map((v, i) => `<span${cls(i) ? ` class="${cls(i).trim()}"` : ''}>${v}&nbsp;%</span>`).join('')}</div>`;
+    return rutor +
       `<div class="tug-stack">${p.map((v, i) => `<span class="s${i}" style="flex:${v} 1 0">${v >= 6 ? `${v}&nbsp;%` : ''}</span>`).join('')}</div>`;
   }
 
@@ -195,7 +224,8 @@ window.RumMatchblad = (() => {
 
   // Som matchbladets flik Prognos (forecastCard, journalCard och stepsCard i app.js):
   // en spelad match med prognos före avspark visar den, annars prognosen efter 90 minuter.
-  function prognos(d, m) {
+  // Efter matchen (från protokollet) är facit överstruket, och resultatet bland de troligaste.
+  function prognos(d, m, ctx = {}) {
     const j = d.journal && d.journal.counted;
     const fore = Boolean(m.completed && j);
     const p = fore ? j : d.prediction;
@@ -204,11 +234,15 @@ window.RumMatchblad = (() => {
     const w = hela(p.p);
     const goals = p.goals ? `${dec(p.goals[0])}–${dec(p.goals[1])}` : '–';
     const top = p.scores && p.scores.top ? p.scores.top.slice(0, 3) : [];
+    const res = ctx.efter && fore ? facitAv(ctx) : null;
+    const rad = res == null ? null : ctx.efter.sum.rader[ctx.efter.i];
+    const blev = (t) => Boolean(rad && rad.mal === `${t.home}–${t.away}`);
+    const mp = (t) => (blev(t) && window.RumBlock ? RumBlock.strykning(`topp${m.id}`, 2) : '');
     const tva = '<div class="rl-halvor">' +
       `<div>${rubrad('Förväntade mål')}<b class="rl-tal">${goals}</b></div>` +
-      (top.length ? `<div>${rubrad('Troligast')}<span class="rb-topp">${top.map((t) => `<span class="rl-m"><b>${t.home}–${t.away}</b><small>${fmt(1 / t.p)}</small></span>`).join('')}</span></div>` : '') +
+      (top.length ? `<div>${rubrad('Troligast')}<span class="rb-topp">${top.map((t) => `<span class="rl-m${blev(t) ? ' blev' : ''}"><b>${mp(t)}<span>${t.home}–${t.away}</span></b><small>${fmt(1 / t.p)}</small></span>`).join('')}</span></div>` : '') +
       '</div>';
-    return del(rubrad(fore ? 'Prognos före avspark' : 'Prognos efter 90 minuter') + trio([m.home, 'Oavgjort', m.away], w.map(ur), w)) +
+    return del(rubrad(fore ? 'Prognos före avspark' : 'Prognos efter 90 minuter') + trio([m.home, 'Oavgjort', m.away], w.map(ur), w, res, `prog${m.id}`)) +
       del(tva) + (fore ? '' : steg(d, m));
   }
 
@@ -264,7 +298,7 @@ window.RumMatchblad = (() => {
       return s ? `<span title="${esc(`${s.source}: ${s.title}`)}">${k}</span>` : k;
     }).join(',')}</sup>`).replace(/(\d) %/g, '$1&nbsp;%');
   }
-  function analys(d, m, a) {
+  function analys(d, m, a, ctx = {}) {
     if (a === undefined) return '<p class="rl-vant">Hämtar …</p>';
     if (!a) {
       const kommer = !m.completed && Date.parse(m.kickoff) > Date.now();
@@ -278,17 +312,25 @@ window.RumMatchblad = (() => {
     let tips = '';
     const t = a.tip;
     const kommande = !m.completed && m.status === 'STATUS_SCHEDULED' && Date.parse(m.kickoff) > Date.now() && d.prediction && d.prediction.status === 'ok';
-    if (t && kommande) {
+    // efter matchen (från protokollet): tipset står kvar när det skrevs före avspark, rättat – facit
+    // överstruket med märkpennan som i protokollet, och om det satt till höger om rubriken
+    const res = ctx.efter && tipsetAv(a, m) ? facitAv(ctx) : null;
+    if (t && (kommande || res != null)) {
       const alla = t.signs && t.signs.length === 3;
       const ring = (i) => (!alla && t.signs.includes(i) && window.Papper ? Papper.ring(`penna${m.id}${i}`, 'rb-ring', 23) : '');
       const at = alla ? 1 : t.signs && t.signs.length ? Math.min(...t.signs) : -1;
-      const rutor = `<span class="rb-tecken">${[0, 1, 2].map((i) => `<span class="rb-tecknet"><b>${'1X2'[i]}</b>${ring(i)}${i === at && t.note ? `<em>${esc(t.note)}</em>` : ''}</span>`).join('')}</span>`;
+      const cls = (i) => (res == null ? '' : i === res ? ' ratt' : ' fel');
+      const mp = (i) => (i === res && window.RumBlock ? RumBlock.strykning(`tips${m.id}${i}`, 1) : '');
+      const rutor = `<span class="rb-tecken">${[0, 1, 2].map((i) => `<span class="rb-tecknet${cls(i)}">${mp(i)}<b>${'1X2'[i]}</b>${ring(i)}${i === at && t.note ? `<em>${esc(t.note)}</em>` : ''}</span>`).join('')}</span>`;
       const text = t.text.split(/\n\s*\n/).filter((x) => x.trim()).map((x) => `<p>${refs(x.trim(), t.sources)}</p>`).join('');
-      tips = del(rubrad('Tipset') + (t.signs && t.signs.length ? rutor : '') + text, 'rb-tipset');
+      const dom = res == null ? '' : `Facit <b>${'1X2'[res]}</b> · ${t.signs.includes(res) ? 'satt' : 'satt inte'}`;
+      tips = del(rubrad('Tipset', dom) + (t.signs && t.signs.length ? rutor : '') + text, 'rb-tipset');
     }
-    return del(rubrad(a.author ? `Av ${a.author}` : 'Analysen', skriven ? esc(skriven) : '') +
+    const art = del(rubrad(a.author ? `Av ${a.author}` : 'Analysen', skriven ? esc(skriven) : '') +
       `<h3>${esc(a.title)}</h3>${a.lead ? `<p class="rb-ingress">${refs(a.lead, a.sources)}</p>` : ''}` +
-      (a.paragraphs || []).map((x) => `<p>${refs(x, a.sources)}</p>`).join('') + kallor, 'rb-art') + tips;
+      (a.paragraphs || []).map((x) => `<p>${refs(x, a.sources)}</p>`).join('') + kallor, 'rb-art');
+    // (efter matchen vill man först se hur tipset gick)
+    return res != null ? tips + art : art + tips;
   }
 
   // ---------- Startelvor ----------
@@ -390,13 +432,105 @@ window.RumMatchblad = (() => {
     return `<div class="rb-moten">${rubrad('Tidigare möten', `${prick('h')}${lagnamn(m.home)} <b>${n.V} V · ${n.O} O · ${n.F} F</b>`)}${rows}</div>`;
   }
 
+  // ---------- efter matchen: Rättningen ----------
+
+  // Facit i matchen bladet gäller (0–2), eller null.
+  const facitAv = (ctx) => {
+    const r = ctx.efter && ctx.efter.sum.rader[ctx.efter.i];
+    return r && r.res != null ? r.res : null;
+  };
+  // Analysens tecken ('1X') när tipset är skrivet före avspark – då står det för något –, annars ''.
+  function tipsetAv(a, m) {
+    const t = a && a.tip;
+    if (!t || !Array.isArray(t.signs) || !t.signs.length) return '';
+    return Date.parse(a.writtenAt) < Date.parse(a.avspark || m.kickoff) ? t.signs.map((n) => '1X2'[n]).join('') : '';
+  }
+  const procent = (p) => `${Math.round(p * 100)}&nbsp;%`;
+
+  // Allas tips i matchen (RumBlock.match): en rad per spalt i protokollet, i samma ordning, och sedan datorns
+  // tecken och analysens tips som jämförelse. Tecknet på skrivmaskin, överstruket med märkpennan när det satt
+  // och svagare när det inte satt, som i protokollet; rödpennans stjärna när ingen annan i gänget hade rätt.
+  function tipsen(ctx, x, a) {
+    const { sum } = ctx.efter;
+    const key = `${sum.id || sum.nr || ''}:${x.r.nr}:`;
+    const sp = (t, title) => `<span class="rr-h"${title ? ` title="${esc(title)}"` : ''}>${t}</span>`;
+    // rubriken och hur många som hade rätt står på samma rad som kolumnernas namn
+    const ratt = x.r.tecken && x.av ? `<span class="rr-av">${x.ratt} av ${x.av} rätt</span>` : '';
+    const huvud = `<span class="rr-rad rr-huvud"><span class="rr-rub"><span class="rl-rub">Tipsen</span>${ratt}</span>${sp('Tecken')}` +
+      `${sp('Chans', 'Datorns chans för tecknet före avspark')}${sp('Poäng', '1 om tipset satt, minus datorns chans för tecknet')}${sp('Kassan', '10 kr på tipset till datorns odds')}</span>`;
+    const forfattare = String((a && a.author) || 'analysen').replace(/\s*\(påhittad\)\s*$/, '');
+    const rad = (t, k) => {
+      const vem = t.id === 'D' ? '<span class="rr-ik dator" aria-hidden="true"><i></i></span>'
+        : t.id === 'A' ? '<span class="rr-ik art" aria-hidden="true"></span>' : RumBlock.portratt(sum, t);
+      const tecken = t.t ? `${t.ok ? RumBlock.strykning(`${key}${t.id}`, t.t.length) : ''}<i>${esc(t.t)}</i>${t.ensam ? RumBlock.STJARNA : ''}` : '<i>–</i>';
+      const chans = t.prob == null ? '' : t.schablon ? `<span title="Datorn gav ingen prognos för matchen, så chansen är schablonen">≈${procent(t.prob)}</span>` : procent(t.prob);
+      const om = !t.t ? `${t.namn}: inget tips`
+        : `${t.id === 'A' ? `Tipset av ${forfattare}` : t.namn}: ${t.t} – ${t.ok ? 'satt' : t.fel ? 'satt inte' : 'inte avgjord'}${t.ensam ? ', ensam rätt i gänget' : ''}`;
+      const forsta = t.jmf && !(x.tips[k - 1] || {}).jmf;
+      return `<span class="rr-rad${t.id === 'K' ? ' k' : ''}${forsta ? ' jmf' : ''}${t.t ? '' : ' tom'}" title="${esc(om)}">` +
+        `<span class="rr-vem">${vem}<span class="rr-namn">${esc(t.namn)}</span></span>` +
+        `<span class="rr-t${t.ok ? ' ratt' : ''}${t.fel ? ' fel' : ''}">${tecken}</span><span class="rr-ch">${chans}</span>` +
+        `<span class="rr-po">${t.pts == null ? '' : RumBlock.poang(t.pts)}</span><span class="rr-kr">${t.kassa == null ? '' : `${RumBlock.kr(t.kassa)}&nbsp;kr`}</span></span>`;
+    };
+    return del(`<div class="rr-tips">${huvud}${x.tips.map(rad).join('')}</div>`, 'rr-tipsen');
+  }
+
+  // Datorn och spelbolagen före avspark, sida vid sida i kupongens rutor (som på Prognos och Lagen), med facit
+  // överstruket: hur troligt datorn tyckte att det var, och vad det betalade.
+  function fore(ctx, x, d) {
+    const { m } = ctx;
+    const res = x.r.res;
+    const lab = [m.home, 'Oavgjort', m.away];
+    const key = `${ctx.efter.sum.id || ''}:${x.r.nr}:`;
+    const dator = x.pr
+      ? rubrad('Datorn', res == null ? '' : `<b>${'1X2'[res]}</b> fick ${x.pr[res]}&nbsp;%`, 'Datorns prognos före avspark') + trio(lab, x.pr.map(ur), x.pr, res, `${key}d`)
+      : rubrad('Datorn') + '<p class="rb-inga">Datorn gav ingen prognos för matchen.</p>';
+    let bolag;
+    if (d === undefined) bolag = `${rubrad('Spelbolagen')}<p class="rb-inga">Hämtar …</p>`;
+    else {
+      const b = d && g('bookOdds') ? bookOdds(d) : null;
+      if (!b || !b.x || !b.x.every((v) => v > 1)) bolag = `${rubrad('Spelbolagen')}<p class="rb-inga">${esc((d && d.odds && d.odds.note) || 'Inga odds för matchen.')}</p>`;
+      else {
+        const inv = b.x.map((v) => 1 / v);
+        const sum = inv[0] + inv[1] + inv[2];
+        const odd = (v) => (g('odds') ? odds(v) : dec(v, 2));
+        bolag = rubrad(b.name, res == null ? '' : `<b>${'1X2'[res]}</b> betalade ${odd(b.x[res])}`, b.title) +
+          trio(lab, b.x.map(odd), hela(inv.map((v) => v / sum)), res, `${key}b`);
+      }
+    }
+    return del(`<div class="rl-halvor rr-fore"><div>${dator}</div><div>${bolag}</div></div>`);
+  }
+
+  function rattningen(ctx, d, a) {
+    const x = window.RumBlock && RumBlock.match ? RumBlock.match(ctx.efter.sum, ctx.efter.i, { analysen: tipsetAv(a, ctx.m) }) : null;
+    if (!x) return tom('Rättningen går inte att visa just nu.');
+    return tipsen(ctx, x, a) + fore(ctx, x, d);
+  }
+
+  // ---------- efter matchen: Matchen ----------
+
+  // Matchrutans flik Matchen (matchruta.js): målen, korten, bytena och statistiken från ESPN, hämtade när
+  // sidan tas fram. Utan matchens fil räcker matchen själv.
+  function matchenSida(sida, ctx, d) {
+    const { m } = ctx;
+    const c = g('compOf') ? compOf(m.comp) : null;
+    if (!window.Matchruta || !c || !c.espn) {
+      sida.innerHTML = tom('Matchen går inte att visa här.');
+      return;
+    }
+    sida.innerHTML = Matchruta.eventsPane(d && d.match ? d.match : m);
+    Matchruta.hydrate(sida, d && d.match ? d : { match: m, squads: {} }, c.espn);
+  }
+
   // ---------- bladet ----------
 
   // Mellan lagen: tiden och tävlingen, och över dem resultatet när matchen är spelad
   // (inte när resultaten är dolda), som i biljetten överst i matchbladet.
   function mellan(m) {
     const comp = g('compOf') ? compOf(m.comp) : null;
-    const nar = `${fNar.format(new Date(m.kickoff))}${comp && comp.short ? ` · ${comp.short}` : ''}`;
+    // (en match ur ett gammalt protokoll kan sakna avsparken)
+    const t = Date.parse(m.kickoff);
+    const nar = [Number.isFinite(t) ? fNar.format(new Date(t)) : '', comp && comp.short ? comp.short : ''].filter(Boolean).join(' · ');
     const klart = m.completed && m.score && !(window.Spoiler && Spoiler.hidden(m));
     return `${klart ? `<b>${m.score.home}–${m.score.away}</b>` : ''}<small>${esc(nar)}</small>`;
   }
@@ -407,8 +541,8 @@ window.RumMatchblad = (() => {
       `<button type="button" class="rl-stang" data-ut aria-label="${esc(`Tillbaka till ${ctx.tillbaka}`)}" title="${esc(`Tillbaka till ${ctx.tillbaka}`)}"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9"/></svg></button></span>` +
       `<div class="rl-topp"><span class="rl-t h">${crest(m.home)}<b>${lagnamn(m.home)}</b></span>` +
       `<span class="rl-nar">${mellan(m)}</span><span class="rl-t a"><b>${lagnamn(m.away)}</b>${crest(m.away)}</span></div>` +
-      `<div class="rb-flikar" role="tablist" aria-label="Matchbladet">${SIDOR.map(([id, namn]) =>
-        `<button type="button" role="tab" data-flik="${id}" aria-selected="${id === flik}"${id === flik ? '' : ' tabindex="-1"'}>${namn}</button>`).join('')}</div>` +
+      `<div class="rb-flikar${ctx.efter ? ' efter' : ''}" role="tablist" aria-label="Matchbladet">${sidor(ctx).map(([id, namn]) =>
+        `<button type="button" role="tab" data-flik="${id}" aria-selected="${id === vald(ctx)}"${id === vald(ctx) ? '' : ' tabindex="-1"'}>${namn}</button>`).join('')}</div>` +
       '<div class="rb-sida" role="tabpanel" tabindex="-1"></div>';
   }
 
@@ -416,7 +550,7 @@ window.RumMatchblad = (() => {
   // sedan det som hämtas för just den sidan.
   async function rita(el, ctx) {
     const sida = el.querySelector('.rb-sida');
-    const nu = flik;
+    const nu = vald(ctx);
     const m = ctx.m;
     sida.dataset.sida = nu;
     sida.scrollTop = 0;
@@ -428,11 +562,24 @@ window.RumMatchblad = (() => {
     }
     const kvar = () => el.isConnected && sida.dataset.sida === nu;
     const d = ctx.d;
+    // efter matchen: Rättningen räknas ur protokollet och står direkt, och spelbolagen och analysens tips
+    // fylls i när matchens fil och analyserna har kommit; Matchen hämtar sitt själv
+    if (nu === 'rattning') {
+      sida.innerHTML = rattningen(ctx, d, ctx.a);
+      if (ctx.a !== undefined) return;
+      ctx.a = await analysen(m.id);
+      if (kvar()) sida.innerHTML = rattningen(ctx, ctx.d, ctx.a);
+      return;
+    }
+    if (nu === 'matchen') {
+      matchenSida(sida, ctx, d);
+      return;
+    }
     if (d === undefined) sida.innerHTML = '<p class="rl-vant">Hämtar …</p>';
     else if (!d || !d.teams) sida.innerHTML = '<p class="rl-vant">Siffrorna går inte att hämta just nu.</p>';
     if (!d || !d.teams) return;
     if (nu === 'lagen') sida.innerHTML = lagen(d, m);
-    else if (nu === 'prognos') sida.innerHTML = prognos(d, m);
+    else if (nu === 'prognos') sida.innerHTML = prognos(d, m, ctx);
     else if (nu === 'moten') sida.innerHTML = moten(d, m);
     else if (nu === 'elvor') {
       // en spelad match med dolt resultat: elvorna har målen och korten (som rubriken i matchrutan)
@@ -444,9 +591,9 @@ window.RumMatchblad = (() => {
       const c = g('compOf') ? compOf(m.comp) : {};
       if (window.Matchruta) Matchruta.hydrate(sida, d, c.espn);
     } else if (nu === 'analys') {
-      sida.innerHTML = analys(d, m, undefined);
+      sida.innerHTML = analys(d, m, undefined, ctx);
       const a = await analysen(m.id);
-      if (kvar()) sida.innerHTML = analys(d, m, a);
+      if (kvar()) sida.innerHTML = analys(d, m, a, ctx);
     } else if (nu === 'tabellen') {
       sida.innerHTML = '<p class="rl-vant">Hämtar …</p>';
       const html = await tabellen(d);
@@ -460,18 +607,18 @@ window.RumMatchblad = (() => {
     if (window.Matchruta && !document.querySelector('dialog.mr-modal[open]')) Matchruta.stop();
   }
 
-  function oppna({ host, matcher, id, kupong, tillbaka, ut, calm = () => false }) {
+  function oppna({ host, matcher, id, kupong, tillbaka, ut, calm = () => false, efter = null }) {
     const B = { el: null, id: null, ctx: null };
     function lagg() {
       const i = matcher.findIndex((x) => String(x.id) === String(id));
       const m = matcher[i];
       if (!m) return;
-      const ctx = { m, nr: i + 1, kupong, tillbaka, d: undefined };
+      const ctx = { m, nr: i + 1, kupong, tillbaka, d: undefined, efter: efter ? { sum: efter, i } : null, a: undefined };
       const el = document.createElement('div');
       el.className = 'rum-blad';
       el.tabIndex = -1;
       el.setAttribute('role', 'dialog');
-      el.setAttribute('aria-label', `Matchbladet: ${m.home} – ${m.away}`);
+      el.setAttribute('aria-label', `${efter ? 'Efter matchen' : 'Matchbladet'}: ${m.home} – ${m.away}`);
       el.dataset.id = String(m.id);
       el.innerHTML = topp(ctx);
       host.appendChild(el);
@@ -495,8 +642,8 @@ window.RumMatchblad = (() => {
         if (B.el !== el) return;
         const f = e.target.closest('[data-flik]');
         if (f) {
-          if (f.dataset.flik !== flik) {
-            flik = f.dataset.flik;
+          if (f.dataset.flik !== vald(ctx)) {
+            valj(ctx, f.dataset.flik);
             rita(el, ctx);
           }
           return;
@@ -515,9 +662,11 @@ window.RumMatchblad = (() => {
     }
     // piltangenterna (rum.js och rum-hasse.js): förra eller nästa sida
     B.flik = (n) => {
-      const i = SIDOR.findIndex(([s]) => s === flik) + n;
-      if (!B.el || i < 0 || i >= SIDOR.length) return;
-      flik = SIDOR[i][0];
+      if (!B.el) return;
+      const S = sidor(B.ctx);
+      const i = S.findIndex(([s]) => s === vald(B.ctx)) + n;
+      if (i < 0 || i >= S.length) return;
+      valj(B.ctx, S[i][0]);
       rita(B.el, B.ctx);
     };
     B.ut = (nu = false) => {
@@ -540,12 +689,12 @@ window.RumMatchblad = (() => {
   }
 
   // Bladet för sig, när ingen kupong är i handen (Matchbladet hos Hasse Backe, matchens rad på
-  // tv:n): i kupongens mått (KUP i rum.js) och lika stort som kupongen i handen (held i rum.js),
+  // tv:n, en rad i protokollet): i kupongens mått (KUP i rum.js) och lika stort som kupongen i handen (held i rum.js),
   // mitt i fönstret över ett mörker. Det läggs bort med krysset i bandet, Esc eller ett klick
   // utanför, och då är man kvar där man var. Klick och pekare stannar i lagret.
   //   inom      där lagret läggs (hans vy, rummet), smal()  kupongen är den smala (telefonen på höjden)
   //   nar ut    efter att bladet har lagts bort (till exempel för att flytta fokus)
-  function fram({ inom, matcher, id, kupong, tillbaka, smal = false, calm = () => false, nar = null }) {
+  function fram({ inom, matcher, id, kupong, tillbaka, smal = false, calm = () => false, nar = null, efter = null }) {
     const lager = document.createElement('div');
     lager.className = 'rum-bladlager';
     lager.innerHTML = '<i class="rum-bladdimma"></i><div class="rum-bladhand"></div>';
@@ -579,7 +728,7 @@ window.RumMatchblad = (() => {
       // klickets väg, inte var målet sitter nu: Visa ändå ritar om sidan under klicket
       if (!e.composedPath().some((n) => n instanceof Element && n.matches('.rum-blad'))) ut();
     });
-    const inre = oppna({ host: hand, matcher, id, kupong, tillbaka, ut: (nu) => ut(nu), calm });
+    const inre = oppna({ host: hand, matcher, id, kupong, tillbaka, ut: (nu) => ut(nu), calm, efter });
     B = {
       flik: (n) => inre.flik(n),
       ut,

@@ -5,7 +5,8 @@
 // spela(ctx, { typ: 'dunk' | 'klirr' | 'skrap' | 'vissla' | 'anda', styrka, sort, mjuk, ms, f, f1 }), från figurens händelser
 // (handelser i rum-hasse-3d.js) och pennan på din kupong (rum-hasse-kupong.js). sort: 'hand' (handflatan), 'nave' (lillfingersidan av näven) eller
 // 'bada' (båda händerna). mjuk: koppen ställs ned, inte tappas. vissla: en ton han visslar, f till f1 Hz under ms;
-// anda: han andas på glasögonen (sort 'ha') eller blåser på naglarna ('blas').
+// anda: han andas på glasögonen (sort 'ha'), blåser på naglarna ('blas') eller andas ut länge ('pust');
+// fnys: han fnyser genom näsan; prassel: tidningen som rycks rak eller viks (mjuk: lugnare).
 // Elden (cigarren som tänds, rum-hasse-eld.js): fras (stickan mot plånen och lågan som tar), puff (ett bloss
 // när han tänder), skak (han skakar ut stickan), lock och stang (tändarens lock upp och igen) och hjul (hjulet
 // mot flintan; tar: lågan tar).
@@ -204,13 +205,14 @@ function anda(ctx, mal, t, e) {
   const o = ut(ctx, mal, -0.05);
   const lang = Math.max(0.1, (e.ms || 400) / 1000);
   const ha = e.sort === 'ha';
+  const pust = e.sort === 'pust';
   const b = ctx.createBufferSource();
   b.buffer = bruset(ctx);
   const fl = ctx.createBiquadFilter();
   fl.type = 'bandpass';
-  fl.frequency.value = ha ? slump(650, 800) : slump(1800, 2400);
-  fl.Q.value = ha ? 0.9 : 1.4;
-  const topp = ha ? 0.22 : 0.12;
+  fl.frequency.value = ha ? slump(650, 800) : pust ? slump(950, 1200) : slump(1800, 2400);
+  fl.Q.value = ha ? 0.9 : pust ? 0.7 : 1.4;
+  const topp = ha ? 0.22 : pust ? 0.15 : 0.12;
   const g = ctx.createGain();
   g.gain.setValueAtTime(0, t);
   g.gain.linearRampToValueAtTime(topp, t + lang * 0.25);
@@ -235,6 +237,20 @@ function svep(ctx, mal, t, typ, f, q, a, upp, ned, f1 = f) {
   g.gain.linearRampToValueAtTime(0, t + upp + ned);
   b.connect(fl).connect(g).connect(mal);
   b.start(t, Math.random() * 0.4, upp + ned + 0.05);
+}
+// En fnysning genom näsan: två korta, dova luftstötar, den andra svagare.
+function fnys(ctx, mal, t) {
+  const o = ut(ctx, mal, -0.05);
+  svep(ctx, o, t, 'bandpass', slump(1100, 1400), 1.3, 0.45, 0.012, 0.09);
+  svep(ctx, o, t + slump(0.11, 0.14), 'bandpass', slump(1000, 1250), 1.3, 0.22, 0.01, 0.07);
+}
+// Tidningen som rycks rak eller viks: torrt knaster i papperet och en dov fläkt när den slår.
+function prassel(ctx, mal, t, mjuk) {
+  const o = ut(ctx, mal, -0.1);
+  const s = mjuk ? 0.6 : 1;
+  for (let i = 0; i < 7; i++) bruston(ctx, t + slump(0, 0.22), 'highpass', slump(3000, 5200), 0.7, slump(0.04, 0.09) * s, 0.012, o, 0.05);
+  svep(ctx, o, t + 0.03, 'bandpass', slump(1600, 2200), 0.6, 0.1 * s, 0.02, 0.16);
+  svep(ctx, o, t + 0.06, 'lowpass', 380, 0.8, 0.14 * s, 0.015, 0.09);
 }
 // Stickan dras mot plånen: ett torrt skrap med knaster i, och lågan som fräser till och tar.
 function fras(ctx, mal, t) {
@@ -282,6 +298,8 @@ export function spela(ctx, e) {
   else if (e.typ === 'vissla' && e.f) vissla(ctx, mal, t, e);
   else if (e.typ === 'anda') anda(ctx, mal, t, e);
   else if (e.typ === 'fras') fras(ctx, mal, t);
+  else if (e.typ === 'fnys') fnys(ctx, mal, t);
+  else if (e.typ === 'prassel') prassel(ctx, mal, t, Boolean(e.mjuk));
   else if (e.typ === 'puff') puff(ctx, mal, t);
   else if (e.typ === 'skak') skak(ctx, mal, t);
   else if (e.typ === 'lock') lock(ctx, mal, t, e.upp !== false);

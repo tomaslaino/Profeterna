@@ -35,11 +35,6 @@ window.Utmarkelser = (() => {
     const o = 1 / prob;
     return typeof fmtOdds === 'function' ? fmtOdds(o) : o.toFixed(2).replace('.', ',');
   };
-  const surname = (n) => {
-    const s = String(n || '');
-    const i = s.indexOf(' ');
-    return i > 0 ? s.slice(i + 1) : s;
-  };
   const signOf = (s) => (s.home > s.away ? '1' : s.home === s.away ? 'X' : '2');
   const count = (list, f) => list.filter(f).length;
 
@@ -526,7 +521,7 @@ window.Utmarkelser = (() => {
   function panel(a, idx) {
     const sc = scene(a, idx);
     const figs = a.people.map((p) => fig(p, sc.on || '')).join('');
-    const names = a.people.map((p) => esc2(surname(p.name || p.id))).join('<span class="ut-amp"> &amp; </span>');
+    const names = a.people.map((p) => esc2(Tippoang.kallas(p))).join('<span class="ut-amp"> &amp; </span>');
     return `<figure class="ut-panel ut-${a.key} ut-${a.tone}" aria-label="${esc2(a.title)}: ${esc2(a.people.map((p) => p.name).join(' och '))}">` +
       `<div class="ut-scene">${sc.back || ''}<div class="ut-figs n${a.people.length}">${figs}</div>${sc.front || ''}</div>` +
       `<figcaption><span class="ut-title">${esc2(a.title)}</span><b class="ut-name">${names}</b>` +

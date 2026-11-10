@@ -70,7 +70,7 @@ window.RumHasse = (() => {
     vy.id = 'rum-hasse-vy';
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
-    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><canvas class="rh-disk"></canvas><i class="rh-mork"></i></div>' +
+    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
       '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i><i class="rh-korn" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
@@ -130,13 +130,19 @@ window.RumHasse = (() => {
       // Esc, eller pilen åt höger: man vänder sig tillbaka mot rummet (dit kom man med pilen åt vänster, rum.js)
       if (e.key === 'Escape' || (e.key === 'ArrowRight' && !e.repeat && !(e.target instanceof Element && e.target.closest('input, textarea, select')))) stang();
     }, true);
-    // ljuset medan man sitter hos honom (ljusNu)
-    setInterval(() => { if (H.on && !H.svanger && !document.hidden) ljusNu(); }, 60000);
+    // ljuset medan man sitter hos honom (ljusNu), och det som ligger på pulten om det har ändrats i rummet
+    setInterval(() => {
+      if (!H.on || H.svanger || document.hidden) return;
+      ljusNu();
+      pultPapper();
+    }, 60000);
     addEventListener('resize', () => {
       if (!H.on) return;
       // (vriden telefon: han sitter på ett annat sätt, och bygg byter figuren och bilden)
       if (hog() !== H.hog) bygg();
       else passa();
+      // (rummet lägger pulten på sitt sätt i det nya fönstret, .rum.smal, i sin egen resize)
+      requestAnimationFrame(() => { if (H.on) pultPapper(); });
     });
     // pekar man på kaffet och notan hämtas hans bilder
     rum.addEventListener('pointerover', (e) => { if (e.pointerType === 'mouse' && e.target.closest && e.target.closest('#rum-hasse') && ledigt()) forladda(); });
@@ -385,7 +391,7 @@ window.RumHasse = (() => {
         if (n !== H.diskNr || !H.fig) return;
         const ny = H.diskVagg !== H.vaggNr;
         H.diskVagg = H.vaggNr;
-        return H.fig.diskBild($('.rh-disk'), v, { bild, ny, ...b });
+        return H.fig.diskBild($('.rh-disk'), v, { bild, ny, ...b, nota: $('.rh-nota') });
       }).catch(() => {});
       clearTimeout(H.diskT);
       if (H.on) H.diskT = setTimeout(rita, 150);
@@ -409,8 +415,82 @@ window.RumHasse = (() => {
       s.setProperty('--mork', `${(hoger + 70).toFixed(0)}px`);
     }
     if (H.kupong) H.kupong.passa();
+    pultPapper();
     passaSpalter();
     return disk;
+  }
+
+  // ---------- det som ligger på pulten ----------
+  //
+  // Det som ligger på pulten i rummet ligger där också här: kupongen, efter omgången protokollet, och Tipsguiden,
+  // på pultens arm som går fram längs ens högra sida (papper i rum-hasse-3d.js). Samma papper med samma innehåll,
+  // i rummets ordning (Tipsguiden under kupongen), under notan, koppen och hans händer. Var de ligger räknas ur
+  // rummet, ur pappret och transformerna i rummets plan, så att det stämmer också i telefonen, där rummet lägger dem
+  // annorlunda (.rum.smal). Kupongen är borta från pulten medan han har den (din kupong, rum-hasse-kupong.js), och när
+  // han lämnar tillbaka den ritas rummet om först (omRum), så att hans kryss syns på den. Förut var pultens arm tom här,
+  // fast protokollet låg där i rummet (ändrat 2026-11-10).
+  function pultPapper(omRum = false) {
+    const c = $('.rh-pulten');
+    // (utan papper: en äldre rum-hasse-3d.js i webbläsarens cache)
+    if (!c || !H.v || !H.m || !H.m.papper) return;
+    if (omRum && window.Rum && Rum.redraw) Rum.redraw();
+    const kup = H.rum.querySelector('#rum-kupong');
+    const blad = kup && kup.querySelector(':scope > .rum-block');
+    const guide = H.rum.querySelector('#rum-tipsguiden');
+    const lista = [
+      guide && guide.childElementCount && !guide.classList.contains('uppe') ? ['tg', guide, guide.innerHTML] : null,
+      blad ? (H.rum.classList.contains('protokoll-uppe') ? null : ['blad', blad, blad.outerHTML])
+        : kup && kup.childElementCount && !kup.querySelector('.rum-vand') ? ['kup', kup, kup.innerHTML] : null,
+    ].filter(Boolean);
+    H.papper = H.papper || {};
+    const kvar = new Set();
+    for (const [kl, fran, html] of lista) {
+      const s = iScenen(fran);
+      const p = s && H.m.papper(H.v, s.hornen, s.w, s.h);
+      if (!p) continue;
+      let e = H.papper[kl];
+      if (!e || e.html !== html) {
+        if (e) e.remove();
+        e = document.createElement('div');
+        e.className = `rh-pa ${kl}`;
+        e.innerHTML = kl === 'kup' ? `<span class="rum-kup rh-pa-kup">${html}</span>` : kl === 'tg' ? `<span class="rh-pa-tg">${html}</span>` : html;
+        e.html = html;
+        H.papper[kl] = e;
+      }
+      Object.assign(e.style, { width: `${s.w}px`, height: `${s.h}px`, transform: p.form, clipPath: p.klipp });
+      // (i rummets ordning: Tipsguiden underst)
+      c.append(e);
+      kvar.add(kl);
+    }
+    for (const kl of Object.keys(H.papper)) {
+      if (kvar.has(kl)) continue;
+      H.papper[kl].remove();
+      delete H.papper[kl];
+    }
+  }
+  // Ett papper i rummet: dess hörn i rummets scen, genom dess och föräldrarnas transformer upp till planet det ligger
+  // i (planet står i vila i scenens bildpunkter). → { w, h, hornen }, eller null
+  function iScenen(el) {
+    const plan = el.closest('.rum-pl');
+    const kedja = [];
+    for (let e = el; e !== plan; e = e.offsetParent) {
+      if (!e) return null;
+      kedja.unshift(e);
+    }
+    let M = new DOMMatrix();
+    for (const e of kedja) {
+      const cs = getComputedStyle(e);
+      const [ox, oy] = cs.transformOrigin.split(' ').map(parseFloat);
+      M = M.translate(e.offsetLeft + ox, e.offsetTop + oy).multiply(new DOMMatrix(cs.transform === 'none' ? undefined : cs.transform)).translate(-ox, -oy);
+    }
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!w || !h) return null;
+    const hornen = [[0, 0], [w, 0], [w, h], [0, h]].map(([x, y]) => {
+      const q = M.transformPoint(new DOMPoint(x, y));
+      return [q.x / q.w, q.y / q.w];
+    });
+    return { w, h, hornen };
   }
 
   async function bygg() {
@@ -785,11 +865,16 @@ window.RumHasse = (() => {
     return ut;
   }, []);
 
-  // Du, om kupongen vet vem du är: en tränare säger efternamnet.
+  // Du, om kupongen vet vem du är: det vi kallas (Tippoang.kallas: efternamnet, Dogge för Johansson).
   function dittNamn() {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
-    return g && g.namn ? g.namn.trim().split(/\s+/).pop() : '';
+    return g && g.namn ? Tippoang.kallas(g) : '';
+  }
+  // Vem i gänget enheten står på, eller null.
+  function duId() {
+    const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
+    return (p && p.vem) || null;
   }
   // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
   // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
@@ -2188,7 +2273,11 @@ window.RumHasse = (() => {
       l.append(b);
     }
     const n = folk.filter((p) => h.includes(p.id)).length;
-    rad(lott(n === folk.length ? r.domar.alla : n ? r.domar.igen : r.domar.fraga));
+    // (vet han vem du är och har du lämnat in, börjar han med din kupong; ditt namn som i domen)
+    const du = folk.find((p) => p.id === duId() && !p.none);
+    const d = r.domar;
+    const lista = n === folk.length ? d.alla : du && d.du ? (!n ? d.du.forst : h.includes(du.id) ? d.du.hort : d.du.inte) : n ? d.igen : d.fraga;
+    rad(fyll(lott(lista), { namn: du ? (du.bast ? du.namn : kallar(du.namn, `${sum.id}:${du.id}`)) : '' }));
     // (Revisorn och Semesterfiraren bara när det finns någon de kan vara)
     const extra = [folk.some((p) => p.lage === 'forsakring') && r.domar.revisorn, folk.some((p) => p.none) && r.domar.borta].filter(Boolean);
     const prat = extra.length ? (H.domPrat && H.domPrat.id === `${sum.id}:${extra.length}` ? H.domPrat.lista : [...r.domar.ledig, ...extra.flat()]) : r.domar.ledig;
@@ -2571,7 +2660,7 @@ window.RumHasse = (() => {
   }
   // Din kupong hos honom (rum-hasse-kupong.js)
   function K() {
-    if (!H.kupong) H.kupong = window.RumHasseKupong({ H, $, calm, spela, sag, lott, REP, ljud: hands });
+    if (!H.kupong) H.kupong = window.RumHasseKupong({ H, $, calm, spela, sag, lott, REP, ljud: hands, pulten: () => pultPapper(true) });
     return H.kupong;
   }
 
