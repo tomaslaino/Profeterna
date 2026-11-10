@@ -514,17 +514,30 @@ window.Rum = (() => {
     }).catch(() => { /* utan moduler: pulten utan ringar */ });
   }
 
-  function sill() {
+  // Fönsterbänken sitter på bakväggen under fönstret och ligger i väggens plan (-600, 1,035 gånger), så att
+  // den följer väggen, fönstret och löpsedlarna när rummet vrids; radion och tomflaskorna på den gör det också
+  // (OGA_Z i rum-3d.js). Förut låg den i gängets plan (-330) och gled med radion upp till 15 px mot fönstret.
+  // Den är ritad i scenens mått och görs lika mycket mindre som planet förstorar, så att den står där den
+  // stod, och den ligger över det andra i planet (.rum-bank i rum.css), som den gjorde framför det.
+  function bank() {
     const S = 568;
-    return svg(`<polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" fill="url(#rum-sill)"/>
+    return svg(`<g transform="translate(800 500) scale(${(1 / 1.035).toFixed(5)}) translate(-800 -500)">
+  <polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" fill="url(#rum-sill)"/>
   <polygon points="262,${S - 14} 958,${S - 14} 984,${S + 10} 236,${S + 10}" filter="url(#rum-prick)" opacity=".6"/>
   <rect x="236" y="${S + 10}" width="748" height="12" fill="#4a453c"/>
   <g stroke="#cfc6b0" stroke-opacity=".45" stroke-width="1.6"><line x1="300" y1="${S + 10}" x2="342" y2="${S + 10}"/><line x1="610" y1="${S + 10}" x2="628" y2="${S + 10}"/><line x1="880" y1="${S + 10}" x2="930" y2="${S + 10}"/></g>
-  <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/>`, '', [220, 540, 780, 75]) +
+  <rect x="236" y="${S + 22}" width="748" height="6" fill="#000" opacity=".3" filter="url(#rum-b4)"/></g>`, 'rum-bank', [220, 540, 780, 75]);
+  }
+
+  // Skenet från neonen över fönsterbänken och gängets duk (rum-3d.js), i planet -330.
+  function sill() {
+    const S = 568;
+    return (
       // det svaga skenet från neonen för sig, med en fjärdedel av bildpunkterna i telefonen
       // (inte i telefonen och inte från steg 1, .rum-svag i rum.css)
       (LATT ? '' : svg(`<ellipse cx="560" cy="${S - 150}" rx="360" ry="150" fill="#ff3a2a" opacity=".05" filter="url(#rum-b40)" class="rum-svag"/>`, 'rum-sken', [40, 120, 1040, 600], 0.25)) +
-      '<canvas id="rum-3d" class="rum-3d" width="1440" height="560"></canvas>';
+      '<canvas id="rum-3d" class="rum-3d" width="1440" height="560"></canvas>'
+    );
   }
 
   // Tv:n i hörnet (rum-tv.js).
@@ -1306,7 +1319,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}

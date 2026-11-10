@@ -3398,6 +3398,18 @@ kassettens dukar ritas om större första gången (`radioFin`), och de små dela
 och `?rum-radio-lage=fm:90.4` hur den står inställd, utan ljud; `?rum-radio`
 sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
 
+**Fönsterbänken följer väggen** (2026-11-10). Rummet vrids kring planet -330, där gängets duk ligger. Där låg
+också fönsterbänken, medan fönstret, löpsedlarna och bladet med stationerna sitter på bakväggen i planet -600,
+så när musen rörde sig gled bänken, radion och tomflaskorna mot fönstret bakom: 13–15 px i sidled och 7–8 i
+höjdled mot skivan med löpsedlarna i ytterlägena (Chrome, 1400 × 875). Nu ligger bänken i bakväggens plan
+(`bank` i rum.js, lika mycket mindre som planet förstorar, så att den står där den stod, och över det andra i
+planet som förut), och gänget vrids inte längre i sin duk. Musen flyttar i stället kameran som ett öga, och
+bilden står still i det djup där radion och flaskorna står (`OGA_Z` och `sikta` i rum-3d.js), så att de rör sig
+som väggen: nu högst en bildpunkt mot skivan och bladet. Det ändrar gänget på tre sätt: det rör sig som om det
+satt närmare fönstret än förut (och mer mot pulten), ljuset och skuggorna står still när musen rör sig (förut
+vreds gänget mot lamporna), och den som tittar på en följer kameran. I närbilderna av det som sitter på väggen
+tonar bänken inte längre bort med gänget, utan sitter kvar under fönstret.
+
 **Dansen** (2026-11-08, `DANSER` i rum-dans.js, `dansPose`, `dansHand` och `dansFingrar` i rum-3d.js):
 italodisco som i de italienska tv-programmen runt 1980, sittande på barstolen, i 120 slag i minuten
 (takten är genrens och inte låtens: högtalarna och lysdioderna följer ljudet, men dansen följer inte en ljudström). Det som är i händerna ställs på bordet och
