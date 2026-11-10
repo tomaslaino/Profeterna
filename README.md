@@ -3837,7 +3837,7 @@ i rum-3d.js, 1,2 i stället för 1,5). Vad det kostar: se *Mätt 2026-11-08* i [
 **Bordet på höjden (2026-11-08, användarens önskemål):** pulten tog 45 % av fönstrets höjd, och nedre delen av
 den var tomt trä. Rummet kan inte förstoras utan att någon i gänget hamnar utanför bilden, så scenen står i stället
 längre ner: 60 % av det scenen inte fyller på höjden ligger över den (`TAK_SMAL` i rum.js, förut 24 %), och pulten
-tar ungefär 36 %. Aldrig så långt ner att guldordet hamnar utanför fönstret (`FOT_SMAL`), så i ett riktigt lågt
+tar ungefär 36 %. Aldrig så långt ner att pingklockan hamnar utanför fönstret (`FOT_SMAL`), så i ett riktigt lågt
 fönster (375 × 553) tar den 42 %. Kupongen ligger förminskad till 80 % med mitten i (640, 819) (`kupLigg`, `kupY`
 och rum.css), så att hela kupongen fortfarande syns utan att man drar; handen och högen räknas från samma mått.
 Protokollet fyller kupongens ruta och är lika stort som förut. Taket som då syns är ritat (`tak` i rum.js): i

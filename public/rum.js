@@ -1572,7 +1572,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const kupY = () => (R.smal ? 819 : 853);
   const kupLigg = () => (R.smal ? 0.8 : 1);
   // hur stor del av det scenen inte fyller på höjden som hamnar över den (taket), och var i scenen
-  // guldordet under kupongen slutar, som måste rymmas i fönstret (pan)
+  // pingklockan under kupongen slutar, som måste rymmas i fönstret (pan)
   const TAK_SMAL = 0.6;
   const FOT_SMAL = 1090;
   const PENNOR = { bred: [{ x: 276.4, y: 340.6, a: -11 }, { x: 362, y: 440, a: -6 }], smal: [{ x: 268, y: 610, a: -5 }, { x: 268, y: 612, a: -2 }] };
@@ -6030,7 +6030,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
     R.ox = -ow * R.px;
     // (scenen är lägre än fönstret i telefonen på höjden: mest tak över och lite pult under, så att
-    // rummet får bilden och bordet ungefär en tredjedel, men aldrig så lågt att guldordet hamnar utanför)
+    // rummet får bilden och bordet ungefär en tredjedel, men aldrig så lågt att pingklockan hamnar utanför)
     R.oy = oh < -1 ? Math.max(0, Math.min(-oh * TAK_SMAL, innerHeight - 16 - FOT_SMAL * R.k)) : -oh * R.py;
     const s = R.el.querySelector('.rum-stage');
     const glid = drag && R.el.classList.contains('chromium') && !calm();
