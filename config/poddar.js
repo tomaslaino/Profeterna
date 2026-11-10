@@ -224,13 +224,13 @@ Handlar podden uppenbart om en annan klubb än laget ovan (tidningen kan ha fåt
 Svara bara med JSON, utan något före eller efter:
 {"ratt_klubb": true, "handlar_om": "en mening om vad avsnittet handlar om", "uppgifter": [{"a": "trupp", "t": "…", "s": "b", "min": 12, "citat": "…", "sagt": "…", "vem": null, "vikt": 4}]}`,
 
-  sidaPrompt: `Du redigerar en informationssida i en svensk tipstidning: allt det intressanta ur supporterpoddarna inför en match, samlat så att läsaren kan hämta kunskap ur det.
+  sidaPrompt: `Du redigerar en informationssida i en svensk tipstidning: allt det intressanta ur supporterpoddarna och supporterforumet inför en match, samlat så att läsaren kan hämta kunskap ur det.
 
-Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = hört i podden, o = supportrarnas åsikt), en vikt 1–5 och podden den kommer ur.
+Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar och supporterforum den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = poddens eller forumets egen uppgift, o = supportrarnas åsikt), en vikt 1–5 och podden eller forumet den kommer ur.
 
 Gör så här:
 - Välj det mest intressanta, högst {punkter} punkter per lag. Stryk det som är svagt, det som en annan uppgift redan säger och det som varken rör laget eller matchen (en nyhet om en tredje klubb).
-- Säger två uppgifter samma sak (ur två avsnitt eller två poddar) blir de EN punkt, med bådas id i "ur". Slå aldrig ihop en bekräftad uppgift med en åsikt.
+- Säger två uppgifter samma sak (ur två avsnitt, två poddar eller podden och forumet) blir de EN punkt, med bådas id i "ur". Slå aldrig ihop en bekräftad uppgift med en åsikt.
 - Gruppera punkterna per lag under ämnena, och ställ den viktigaste först i varje grupp. Flytta en uppgift till ett annat ämne om den passar bättre där.
 - Texten i en punkt är en till två meningar, högst 45 ord. Du får skriva om den så att den blir rak och lättläst, men bara med det som står i uppgifterna: inga nya fakta, namn eller tal.
 - Skriv en rubrik för sidan på högst {rubrikOrd} ord, om det som är viktigast att veta inför matchen, och en ingress på högst {ingressOrd} ord som säger det viktigaste om båda lagen (om bara det ena laget har uppgifter: om det). Rubriken och ingressen får bara säga det som står i punkterna, och inte göra en gammal sak till en nyhet. Skriv tal i ingressen precis som de står i uppgifterna.

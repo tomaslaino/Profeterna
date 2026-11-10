@@ -1671,7 +1671,7 @@ de flesta körningar har inget att göra och anropar inte Claude.
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00, och när
-  supporterpoddarna har gett nya uppgifter (se nedan).
+  supporterpoddarna eller supporterforumen har gett nya uppgifter (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1773,7 +1773,7 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
   egen text och sidan en rubrik ur mallen. Högst fem citat per lag trycks, de tyngsta punkternas. Går svaret inte att
   läsa står uppgifterna som de är, grupperade (`sidaUtan`), och sidan redigeras nästa natt. Inga tips.
 - **Ut på sajten:** analysjobbet (scripts/analyser/skriv.mjs, var 15:e minut) lägger sidorna i `data/poddsidor.json`
-  när de har ändrats, utan något anrop till Claude. Tidningen i rummet visar dem under *Supporterpoddarna*, en sida per
+  när de har ändrats, utan något anrop till Claude. Tidningen i rummet visar dem under *Supportrarna*, en sida per
   match (se [Tidningen](#tidningen)).
 - **Notiserna** (*Så mår tipslagen*) får fortfarande de bästa uppgifterna per lag (högst fyra) under *ur
   supporterpoddarna* i sitt underlag, och den mest intressanta ska bära notisen, med *enligt supporterpodden …*.
@@ -1819,6 +1819,60 @@ handlade inte om laget). Det provet visade och det som ändrades:
 - Rubriken gjorde gammalt till nytt (en tränare som lämnade i juni). Anvisningarna säger nu att bara det som gäller
   laget och matchen får med, och att gammalt inte får bli nyhet.
 - Namn under citatet kom med i ungefär vart fjärde citat (utskriften skiljer inte på rösterna); annars står podden.
+
+**Supporterforumen** (2026-11-10, användarens önskan: *lägg till det viktigaste forumet för varje lag som den går
+igenom inför tidningssläppet – som källmaterial för info om laget*): samma nattjobb läser, före poddarna, lagets
+viktigaste supporterforum för varje lag i omgången ([src/analyser/forum.mjs](src/analyser/forum.mjs), gränserna,
+forumen och prompterna i [config/forum.js](config/forum.js)). Uppgifterna hamnar bredvid poddarnas: på
+informationssidan och, under *ur supporterforumet*, i tidningens underlag.
+
+```
+omgångens lag → lagets forum (config/forum.js) → tavlan → de bästa trådarna → sista sidan → inläggen → claude -p → omgang.json
+```
+
+- **Forumen:** det viktigaste supporterforumet för vart och ett av de 92 ligalagen som går att läsa, uppslaget och
+  prövat 10 november 2026, står i `kanda`, med tavlan där a-laget diskuteras. 44 lag har ett. De andra 48 står i
+  `utan`: det stora forumet spärrar allt som inte är en webbläsare (RedCafe, Bluemoon, Grand Old Team, VillaTalk,
+  Charlton Life, OTIB, Pompey Chimes, Red Passion, Molineux Mix …), säger nej till AI-assistenter i robots.txt (alla
+  forum hos ProBoards, som The Oatcake och Down At The Mac, och UpTheClarets, Stagsnet och One Boro), är nedlagt eller
+  tyst, eller är byggt så att det inte går att läsa ut (Luton Outlaws, Tigers Talk). Där det största forumet var spärrat
+  står det näst viktigaste, om det lever (Vital Football för Villa, City, Newcastle, Swansea, Wigan m.fl.). Ett lag som
+  varken står i `kanda` eller `utan` (en klubb utanför ligan) letas upp av Claude, åtta lag per anrop, och används
+  bara om läsaren kan läsa tavlan och den har inlägg de senaste 21 dagarna. Registret ligger i `forum.json`.
+- **Läsningen** görs som en vanlig läsare: några sidor per lag och natt, med namnet *Matchfixarna/1.0 (forumlasare)*,
+  och med samma regler i robots.txt som Anthropics användarstyrda läsare (Claude-User). Säger forumet nej till
+  AI-assistenters läsning (Claude-User, ChatGPT-User, Perplexity-User eller `Content-Signal: ai-input=no`) läses det
+  inte alls; spärrar mot AI-träning (ClaudeBot, GPTBot, CCBot) gäller inte, eftersom inget tränas och bara korta
+  översatta citat trycks. En sida som svarar 403, visar Cloudflares kontroll eller kräver inloggning räknas som
+  spärrad, och det görs inga försök att ta sig förbi.
+- **Trådarna:** tavlans trådar i sidans ordning (den senast aktiva först). Tråden om just den här matchen
+  (motståndaren i rubriken) går först, sedan aktiva trådar med en rubrik om laget (skador, uppställning, tränaren,
+  ägarna); biljetter, resor, lekar, tävlingar, poddar, historia och annat stryks, liksom trådar utan inlägg den senaste
+  veckan. Högst fem kandidater läses tills tre har minst två nya inlägg. Läsaren går till trådens sista sida och tar
+  med sidan före om den sista har färre än tolv inlägg.
+- **Inläggen:** läsaren känner igen XenForo (1 och 2), Invision, phpBB (och Forumotion), SMF, vBulletin, MyBB, Vanilla,
+  FansNetwork (som TWTD), The Fishy och Discourse (via dess JSON). Ur varje inlägg tas användarnamnet, tiden och
+  inläggets egen text; citat ur andra inlägg, signaturer och knappar stryks. Bara inlägg från de senaste sju dagarna
+  följer med, högst 1 500 tecken per inlägg och 60 000 per lag.
+- **Uppgifterna:** Claude får inläggen numrerade, med namn och tid, och tar ut allt som är intressant inför matchen,
+  högst tio, med samma ämnen, slag och vikt som poddarnas. Citatet ska stå ordagrant i inlägget (annars stryks
+  uppgiften), och namnet under citatet är användarnamnet på det inlägget, inte Claudes. Har inläggen inte ändrats
+  sedan förra natten görs inget nytt anrop.
+- **Sidan och tidningen:** sidan tar lagets två senaste forumläsningar (utöver de tre senaste poddavsnitten), och
+  redaktören slår ihop det podden och forumet säger båda. Tidningens notiser får den senaste läsningens bästa
+  uppgifter under *ur supporterforumet*, och forumtrådarna räknas som lästa källor.
+
+```
+node scripts/tidning/poddar.mjs --bara-forum                          bara forumen, för omgångens lag
+node scripts/tidning/poddar.mjs --utan-forum                          bara poddarna
+node scripts/tidning/poddar.mjs --lag "Sheffield Wednesday" --mot "Plymouth Argyle" --bara-forum --fil prov-forum.json
+```
+
+**Provet 2026-11-10**: samma påhittade omgång som poddarnas (13 matcher i League One och League Two), med bara
+forumen. 11 av de 26 lagen har ett forum, alla 11 lästes (tre trådar och 12–53 inlägg per lag) och gav 67 uppgifter,
+1–10 per lag, på 13–46 sekunder per lag. 8 sidor skrevs om; där både podden och forumet hade något (Newport, Colchester)
+står de bredvid varandra, och redaktören slog ihop det de båda sa. Inför provet prövades alla 92 lag: av forumen
+agenterna hittade gick 44 att läsa, och läsaren fick ut inlägg med namn och tid ur alla 44.
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -6554,11 +6608,13 @@ rum.js).
   när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
   anfang och utan källhänvisningarna i klamrar, och i en ruta hans tecken, marginalen och motiveringen. Källorna står
   sist.
-- *Supporterpoddarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna* under
-  [Analyserna](#analyserna)), i kupongens ordning: rubrik och ingress, hemmalaget till vänster och bortalaget till
-  höger med poddarna de bygger på, och punkterna under sina ämnen. Varje punkt har slaget som stämpel (*Bekräftat* i
-  svart, *Hört i podden* i rött, *Supportrarnas åsikt* streckad), och de tyngsta har citatet under, med den som säger
-  det och podden. Har bara det ena laget något får det hela bredden i två spalter. Slagen förklaras i sidfoten.
+- *Supportrarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna* och
+  *Supporterforumen* under [Analyserna](#analyserna)), i kupongens ordning: rubrik och ingress, hemmalaget till
+  vänster och bortalaget till höger med poddarna och forumet de bygger på, och punkterna under sina ämnen. Varje punkt
+  har slaget som stämpel (*Bekräftat* i svart, poddens eller forumets egen uppgift i rött – *Hört i podden*, *Från
+  forumet* eller *Hört bland supportrarna* när båda säger det – och *Supportrarnas åsikt* streckad), och de tyngsta
+  har citatet under, med den som säger det och podden, eller användarnamnet och forumet. Har bara det ena laget något
+  får det hela bredden i två spalter. Slagen förklaras i sidfoten.
   *I tidningen* pekar på den första av sidorna.
 
 Notiserna och analyserna hämtas när man pekar på eller trycker på löpsedeln, och klicket väntar på dem i högst två och en

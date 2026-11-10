@@ -10,8 +10,8 @@
 //   inför omgången   Tipset (omgångens matcher med avsparken, datorns procent och Sixten Bråvalls tecken,
 //                    och Tipsligan), Så mår tipslagen (notiserna ur data/tidning.json, skrivna på iMacen),
 //                    Veckans analys (Sixtens artikel om matchen som löpsedeln handlar om, annars den
-//                    jämnaste, ur data/analyser.json) och Supporterpoddarna: en informationssida per
-//                    match med det intressanta ur lagens supporterpoddar (data/poddsidor.json),
+//                    jämnaste, ur data/analyser.json) och Supportrarna: en informationssida per
+//                    match med det intressanta ur lagens supporterpoddar och forum (data/poddsidor.json),
 //                    grupperat efter ämne, med slag, podd och citat.
 //   efter omgången   Omgången (resultaten, rätt rad och siffrorna), Betygen, Skrällen och citaten (det ni
 //                    skrev på kupongen, med facit under) och Hasse Backes krönika med Tipsligan efteråt.
@@ -76,7 +76,7 @@
       tipset: 'Tipset',
       notiser: 'Så mår tipslagen',
       analys: 'Veckans analys',
-      poddar: 'Supporterpoddarna',
+      poddar: 'Supportrarna',
       omgangen: 'Omgången',
       betygen: 'Betygen',
       skrallen: 'Skrällen',
@@ -100,15 +100,20 @@
     },
     poddar: {
       slag: { b: 'Bekräftat', h: 'Hört i podden', o: 'Supportrarnas åsikt' },
+      // Slaget h är källans egen uppgift: poddens, forumets eller båda.
+      egen: { podd: 'Hört i podden', forum: 'Från forumet', blandat: 'Hört bland supportrarna' },
       amnen: { trupp: 'Skador och trupp', elva: 'Väntad uppställning', spel: 'Så spelar laget', klubb: 'Tränaren och klubben', match: 'Inför matchen' },
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
       ur: (l) => `Ur ${l}`,
-      ingen: 'Ingen supporterpodd att hämta något ur den här veckan.',
-      forklaring: [
-        ['b', 'podden återger något som klubben, tränaren eller en spelare har sagt, eller något som har hänt.'],
-        ['h', 'poddens egna uppgifter, intryck från läktaren och rykten.'],
-        ['o', 'vad de som följer laget varje vecka tycker och hoppas.'],
-      ],
+      ingen: 'Ingen supporterpodd eller forum att hämta något ur den här veckan.',
+      forumet: (n) => `forumet ${n}`,
+      forklaring: {
+        b: 'podden eller forumet återger något som klubben, tränaren eller en spelare har sagt, eller något som har hänt.',
+        podd: 'poddens egna uppgifter, intryck från läktaren och rykten.',
+        forum: 'det supportrarna på forumet själva har sett och hört, och rykten.',
+        blandat: 'det podden och forumet båda tar upp: egna uppgifter och rykten.',
+        o: 'vad de som följer laget varje vecka tycker och hoppas.',
+      },
       citaten: 'Citaten är översatta från engelska.',
     },
     omgangen: {
@@ -349,24 +354,29 @@
     const amne = (a) => T.amnen[a] || (ps.amnen && ps.amnen[a]) || T.amnen.match;
     const match = (x) => (u.matcher || []).find((m) => String(m.id) === String(x.id));
     const nr = (x) => (match(x) ? match(x).nr : x.nr);
-    const stampel = (k) => `<i class="tn-slag s-${T.slag[k] ? k : 'h'}">${esc(T.slag[k] || T.slag.h)}</i>`;
+    const stampel = (k, typ = 'podd') => { const kk = T.slag[k] ? k : 'h'; return `<i class="tn-slag s-${kk}">${esc(kk === 'h' ? (T.egen[typ] || T.slag.h) : T.slag[kk])}</i>`; };
     return l.slice().sort((a, b) => nr(a) - nr(b)).map((x) => {
       const m = match(x);
       const namn = m ? [m.h, m.b] : (x.lag || []);
       const delar = x.delar.map((d, i) => {
-        const kallor = (d.kallor || []).filter((k) => k && k.podd);
+        const kallor0 = (d.kallor || []).filter((k) => k && k.podd);
+        // Forumet läses varje natt: det står en gång, med den senaste läsningens datum.
+        const kallor = kallor0.filter((k, i) => k.typ !== 'forum' || kallor0.findIndex((x) => x.typ === 'forum' && x.podd === k.podd) === i);
         const flera = new Set(kallor.map((k) => k.podd)).size > 1;
-        const ur = kallor.length ? T.ur(lista(kallor.map((k) => `${poddNamn(k.podd)}${kortDatum(k.datum) ? ` (${kortDatum(k.datum)})` : ''}`))) : '';
+        const ur = kallor.length ? T.ur(lista(kallor.map((k) => `${k.typ === 'forum' ? T.forumet(k.podd) : poddNamn(k.podd)}${kortDatum(k.datum) ? ` (${kortDatum(k.datum)})` : ''}`))) : '';
         const grupper = (d.grupper || []).map((g) => `<div class="tn-pod-grupp"><h5>${esc(amne(g.amne))}</h5>${(g.punkter || []).filter((p) => p && p.t).map((p) => {
           const c = p.citat && p.citat.sagt ? p.citat : null;
           const vem = c ? (c.vem ? `${c.vem}, ${poddNamn(c.podd)}` : poddNamn(c.podd)) : '';
-          return `<div class="tn-pod-punkt">${stampel(p.s)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>` +
+          return `<div class="tn-pod-punkt">${stampel(p.s, p.typ)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>` +
             (c ? `<blockquote><p>”${esc(hel(c.sagt))}”</p>${vem ? `<cite>${esc(vem)}</cite>` : ''}</blockquote>` : '') + '</div>';
         }).join('')}</div>`).join('');
         return `<section class="tn-pod-lag${grupper ? '' : ' tom'}"><h4>${esc(namn[i] || d.lag || '')}</h4>${ur ? `<p class="tn-kalla">${esc(ur)}</p>` : ''}${grupper || `<p class="tn-pod-ingen">${esc(T.ingen)}</p>`}</section>`;
       }).join('');
       const harCitat = x.delar.some((d) => (d.grupper || []).some((g) => (g.punkter || []).some((p) => p.citat)));
-      const fot = `<p class="tn-pod-fot">${T.forklaring.map(([k, t]) => `${stampel(k)} ${esc(t)}`).join(' ')}${harCitat ? ` ${esc(T.citaten)}` : ''}</p>`;
+      // Förklaringen till stämplarna: en för varje slags egen uppgift som står på sidan.
+      const typer = new Set(x.delar.flatMap((d) => (d.grupper || []).flatMap((g) => (g.punkter || []).filter((p) => p.s === 'h').map((p) => p.typ || 'podd'))));
+      const egna = ['podd', 'forum', 'blandat'].filter((t) => typer.has(t));
+      const fot = `<p class="tn-pod-fot">${[['b', 'podd'], ...(egna.length ? egna : ['podd']).map((t) => ['h', t]), ['o', 'podd']].map(([k, t]) => `${stampel(k, t)} ${esc(T.forklaring[k === 'h' ? t : k])}`).join(' ')}${harCitat ? ` ${esc(T.citaten)}` : ''}</p>`;
       return {
         namn: TEXT.sidor.poddar,
         html: vinjett(TEXT.sidor.poddar, `${nr(x) ? `${nr(x)} · ` : ''}${namn.join('–')}`) + `<h3 class="tn-rub stor">${esc(x.rubrik || T.rubrik(namn[0], namn[1]))}</h3>` +

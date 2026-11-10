@@ -16,7 +16,7 @@ import { squadOf } from './underlag.mjs';
 import { citer, see, jsonOf, unknownNumbers } from './kontroller.mjs';
 import { senasteTid } from './tider.mjs';
 import { claudeSvar } from './claude.mjs';
-import { poddUnderlag, poddNyckel } from './poddar.mjs';
+import { poddUnderlag, forumUnderlag, poddNyckel } from './poddar.mjs';
 
 const H = 3600000;
 const REF_RE = /\[(\d+(?:\s*[,;]\s*\d+)*)\]/g;
@@ -70,6 +70,9 @@ export function tidningsUnderlag(round, details = {}, poddar = null) {
     const par = d && d.match ? [d.match.home, d.match.away] : String(x.match || '').split(/\s+[–-]\s+/);
     const ur = Object.fromEntries(par.map((lag) => [lag, poddUnderlag(poddar, lag)]).filter(([, l]) => l.length));
     if (Object.keys(ur).length) rad['ur supporterpoddarna'] = ur;
+    // Och ur lagens supporterforum (src/analyser/forum.mjs), som läses samma natt.
+    const forum = Object.fromEntries(par.map((lag) => [lag, forumUnderlag(poddar, lag)]).filter(([, l]) => l.length));
+    if (Object.keys(forum).length) rad['ur supporterforumet'] = forum;
     return { nr: i + 1, ...rad };
   });
   return { matcher };
@@ -131,6 +134,8 @@ export async function skrivTidning(round, { details = {}, poddar = null, now = (
   const seen = new Map();
   // Poddavsnitten är källor som tidningen själv har lyssnat på: adresserna räknas som sedda.
   for (const m of underlag.matcher) for (const l of Object.values(m['ur supporterpoddarna'] || {})) for (const a of l) if (a.adress) see(seen, a.adress, `${a.podd}: ${a.avsnitt}`, a.datum);
+  // Forumtrådarna likaså.
+  for (const m of underlag.matcher) for (const l of Object.values(m['ur supporterforumet'] || {})) for (const a of l) if (a.adress) see(seen, a.adress, `${a.forum}: ${a.tradar[0] || 'forumet'}`, a.datum);
   const read = [];
   const meta = { searches: 0, fetches: 0, seconds: 0, dollars: 0 };
   const opts = { system: systemPrompt(), model: tc.model, effort: tc.effort, timeoutMs: tc.timeoutMs };
