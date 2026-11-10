@@ -208,7 +208,9 @@ window.RumHasse = (() => {
   }
 
   // väggen bakom honom (scripts/hasse/bak.html), med sina mått i rum-hasse-scen.js (BAK): på natten bara
-  // neonskyltens och gatans sken, annars också i lysrörets ljus (ljuset nedan); dagsljuset genom fönstret är en egen bild
+  // neonskyltens och gatans sken, annars också i lysrörets ljus (ljuset nedan); dagsljuset genom fönstret är en egen bild.
+  // Bakom honom är väggen ett stort glasparti, genomskinligt i bilderna, och där syns utsikten mot S:t Eriksbron
+  // och Fridhemsplan i rummets väder (rum-hasse-ute.js, ute nedan).
   const hogt = () => (hog() ? '-hog' : '');
   const bakbild = (lys = false) => `rum/hasse-bak${lys ? '-lys' : ''}${hogt()}.webp`;
   const dagbild = () => `rum/hasse-bak-dag${hogt()}.webp`;
@@ -267,7 +269,8 @@ window.RumHasse = (() => {
   async function ljusNu() {
     const forr = H.ljus;
     const l = ljuset();
-    if (forr && Math.abs(l.k - forr.k) < 0.004 && Math.abs(l.f - forr.f) < 0.01 && Math.abs(l.dag - forr.dag) < 0.01) return;
+    // (och utsikten när vädret har ändrats)
+    if (forr && Math.abs(l.k - forr.k) < 0.004 && Math.abs(l.f - forr.f) < 0.01 && Math.abs(l.dag - forr.dag) < 0.01 && uteSig() === H.uteSig) return;
     tand();
     bilder(H.ljus);
     const v = await vagg();
@@ -277,10 +280,42 @@ window.RumHasse = (() => {
     H.vaggNr = (H.vaggNr || 0) + 1;
     passa();
   }
-  // Väggen: bilden i lysrörets eller nattens ljus – medan lysröret dämpas eller tänds båda, den tända
-  // ovanpå så tänd som röret är – och fönsterljuset (bakat för sig i vitt) ovanpå i fönstrets färg och
-  // styrka, som ljus läggs till ljus, på en duk. Disken speglar samma duk. Ritas när han öppnas och när
-  // ljuset ändras (ljusNu). Utan dagsljus och toning syns bilden som den är.
+  // Utsikten genom fönstren, underst på väggens duk: ritad en gång per väder och ljus (rum-hasse-ute.js), förstorad
+  // till bildens mått, och glaset med dropparna, snön och frosten. Utan den: himlen i rummets färger.
+  const uteLage = () => (H.hog ? 'hog' : 'bred');
+  const uteNu = () => {
+    const v = window.Vader ? Vader.nu() : null;
+    return v && window.RumUte && RumUte.farg ? { v, L: RumUte.light(v) } : null;
+  };
+  function uteSig() {
+    const u = H.ute && uteNu();
+    return u ? H.ute.sig(u.v, u.L) : H.uteSig;
+  }
+  function ute(x, W, Hh) {
+    const u = uteNu();
+    if (H.ute && u) {
+      try {
+        const d = H.ute.utsikt(u.v, u.L, uteLage());
+        x.imageSmoothingQuality = 'high';
+        x.drawImage(d, 0, 0, W, Hh);
+        H.ute.glas(x, u.v, u.L, uteLage(), W, Hh);
+        H.uteSig = H.ute.sig(u.v, u.L);
+        return;
+      } catch (e) {
+        // som utan utsikten
+      }
+    }
+    const s = u ? u.L.sky : ['#0a1020', '#141c31', '#1a2236'];
+    const g = x.createLinearGradient(0, 0, 0, Hh * 0.4);
+    g.addColorStop(0, s[0]);
+    g.addColorStop(1, s[2]);
+    x.fillStyle = g;
+    x.fillRect(0, 0, W, Hh);
+  }
+  // Väggen: utsikten underst (ute), bilden i lysrörets eller nattens ljus ovanpå – medan lysröret dämpas eller
+  // tänds båda, den tända ovanpå så tänd som röret är – och fönsterljuset (bakat för sig i vitt) överst i
+  // fönstrets färg och styrka, som ljus läggs till ljus, på en duk. Disken speglar samma duk. Ritas när han
+  // öppnas och när ljuset eller vädret ändras (ljusNu).
   async function vagg() {
     const l = H.ljus;
     const tant = $('img.rh-lys');
@@ -288,15 +323,16 @@ window.RumHasse = (() => {
     const bas = l.lys ? tant : mork;
     await bas.decode().catch(() => {});
     const blanda = blandar(l) && (await (l.lys ? mork : tant).decode().then(() => true, () => false));
-    H.vy.classList.remove('vagg');
+    if (!bas.naturalWidth) {
+      H.vy.classList.remove('vagg');
+      return bas;
+    }
     const dag = l.f >= 0.02;
-    if ((!dag && !blanda) || !bas.naturalWidth) return bas;
     if (dag && (!H.dag || H.dag.src.indexOf(dagbild()) < 0)) {
       H.dag = new Image();
       H.dag.src = dagbild();
     }
     const medDag = dag && (await H.dag.decode().then(() => true, () => false));
-    if (!medDag && !blanda) return bas;
     const W = bas.naturalWidth;
     const Hh = bas.naturalHeight;
     const t = H.dagDuk || (H.dagDuk = document.createElement('canvas'));
@@ -308,18 +344,22 @@ window.RumHasse = (() => {
       tx.globalCompositeOperation = 'multiply';
       tx.fillStyle = `rgb(${l.c.map((x) => Math.round(x * 255)).join(',')})`;
       tx.fillRect(0, 0, W, Hh);
+      // (multiply fyller också fönstren, där bilden är genomskinlig: där ska inget ljus läggas på utsikten)
+      tx.globalCompositeOperation = 'destination-in';
+      tx.drawImage(H.dag, 0, 0, W, Hh);
       tx.globalCompositeOperation = 'source-over';
     }
     const c = $('.rh-vagg');
     c.width = W;
     c.height = Hh;
     const x = c.getContext('2d');
+    ute(x, W, Hh);
     if (blanda) {
       x.drawImage(mork, 0, 0, W, Hh);
       x.globalAlpha = l.k;
       x.drawImage(tant, 0, 0, W, Hh);
       x.globalAlpha = 1;
-    } else x.drawImage(bas, 0, 0);
+    } else x.drawImage(bas, 0, 0, W, Hh);
     x.globalCompositeOperation = 'lighter';
     for (let k = medDag ? l.f * 0.45 : 0; k > 0.005; k -= 1) {
       x.globalAlpha = Math.min(1, k);
@@ -337,6 +377,7 @@ window.RumHasse = (() => {
       const l = ljuset();
       H.bilder = [bakbild(l.lys), ...(blandar(l) ? [bakbild(!l.lys)] : []), 'rum/hasse-atlas.webp', ...(l.f >= 0.02 ? [dagbild()] : [])].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
       H.bilder.push(import('./rum-hasse-3d.js').then((m) => { H.m = m; }));
+      H.bilder.push(import('./rum-hasse-ute.js').then((m) => { H.ute = m; }, () => {}));
     }
     return H.bilder;
   }

@@ -1079,6 +1079,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   vanliga animationssidan och den med Hasse Backe hör ihop". Namnet och foten står kvar när kameran slår och
   hos honom, neonskyltens sken faller in från affären till höger, och man vänder sig dit och tillbaka med
   samma drag som man ser sig omkring med (eller pilarna). Se [Hasse Backe](#hasse-backe), *Samma sida*.
+- **Utsikten mot Fridhemsplan bakom Hasse Backe (2026-11-10, användarens önskemål):** "Kan du ordna bakgrunden
+  bakom hasse Så att man får känslan av att man tittar bort mot Fridhemsplan", som från baren Bron med S:t
+  Eriksbron och de två tornen på andra sidan, "på ett snyggt sätt och så att det inte drar en massa onödig grafik",
+  och med samma väder i fönstren hos honom som i rummet. Sedan: "Det får gärna vara stora fönster - så att vi alltså
+  inte har kvar ciggarett-paketen osv. Gör det snyggt och konkordant med den animerade sidan med alla grabbarna".
+  Väggen bakom honom är ett stort glasparti med mörkgrå poster som skyltfönstret i rummet, och utsikten ritas en gång
+  per väder och ljus. Samma dag: "Det ser lite grynigt ut där i trät och metallen där bakom hasse ... det är samma
+  ställe!" Karmarna är matta som i rummet, och ett kantbevarande filter tar kornet efter bakningen
+  (scripts/hasse/README.md). Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -5114,7 +5123,8 @@ klockan och hämtar vädret från Open-Meteo (fritt, utan nyckel, en gång i kva
 på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
 [public/rum-ute.css](public/rum-ute.css) för det som rör sig; de som går förbi, löven,
 fåglarna och flaggan ritas i små dukar (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
-Utan nätet är det mulet och månadens vanliga temperatur.
+Utan nätet är det mulet och månadens vanliga temperatur. Samma himmel och väder syns genom glaset bakom Hasse
+Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)).
 
 - **Utsikten från Bron (2026-11-10, användarens önskemål):** som från baren Bron, där S:t Eriksgatan går upp på
   S:t Eriksbron. På andra sidan gatan går brons gröna räcke, med en trappa ned i vänstra rutan och en stenpelare där
@@ -6028,9 +6038,9 @@ längst ut på pulten står hans kaffe vid notan, och där ligger hans hand. Ett
 och kameran slår snabbt åt vänster till honom. Där sitter han vid pultens hörn: samma pult som man
 står vid, som går fram längs ens högra sida och viker av åt vänster förbi honom. Han sitter på andra
 sidan om den, vänd mot en, med underarmarna på pulten, kaffet och notan vid den vänstra handen i hörnet
-och cigarren i askkoppen vid den högra. Bakom honom är samma slitna affär som gänget sitter i: furupanelen
-med paketen på en hylla, skylten *Kredit ges ej* (notan vid hans hand säger *Skrivs på Notts County*), och
-bardisken med tidningsbunten, kaffebryggaren och kassan. Samtalet står i en spalt till vänster om honom (på höjden under honom)
+och cigarren i askkoppen vid den högra. Bakom honom är ett stort glasparti ovanför bardisken, med tunna mörkgrå
+poster som skyltfönstret i rummet, och där ute syns S:t Eriksbron, spåren och de två tornhusen vid Fridhemsplan i
+samma väder som genom rummets fönster (se *Utsikten*). Samtalet står i en spalt till vänster om honom (på höjden under honom)
 och kommer när kameran har stannat. Ett klick på bilden utanför samtalet går tillbaka, liksom Esc, utom på sakerna
 på disken (se *Sakerna på disken*). Medan han väntar på att man ska välja gör han något litet då och då – trummar med fingrarna,
 tittar bort, nickar för sig själv, suckar (se *Vilan*) – och ibland njuter han av kaffet (på ett av sex
@@ -6045,7 +6055,7 @@ vid i rummet går fram längs ens högra sida när man har vänt sig åt vänste
 vänster förbi honom (benet framför honom). Han sitter på andra sidan om benet, så långt ut mot hörnet att
 händerna ligger vid geringssnittet, med kaffet och notan på hörnet bredvid, som händerna, kaffet och notan på
 pulten i rummet (`PLATS`: han sitter 27 cm längre ut än förut, ändrat 2026-11-09). Bakom honom är
-affärens vägg med hyllorna. Kameran är ens öga: 1,8 m framför honom, rakt framifrån (kroppen är ett
+glaspartiet ut mot bron (se *Utsikten*). Kameran är ens öga: 1,8 m framför honom, rakt framifrån (kroppen är ett
 foto taget framifrån, djupet i [public/rum-hasse-3d.js](public/rum-hasse-3d.js), och tål inte mycket
 från sidan), 45 cm högre än hans ögon och lutad 14° nedåt, som när man står och han sitter. Det gör
 att pulten ses uppifrån som i rummet: koppen ungefär 35° uppifrån och det inre hörnet 39°, mot 17°
@@ -6198,11 +6208,32 @@ På figuren, disken och koppen är det ett brett, mjukt ljus från höger och li
 `LJUS`, `DAG`), så att hans vänstra sida är ljus och den andra faller av mjukt, och när det är dag ger
 lamporna, neonen och gatans ljus vika. Skuggorna på disken faller då åt vänster, bort från fönstret,
 och disken är ljusast närmast affären, och lika ljus som pulten i rummet. Väggen har fönsterljuset spårat för sig, i vitt, från samma
-fönster och med hans skugga (`hasse-bak-dag.webp`, `?dag=1` i [scripts/hasse/bak.html](scripts/hasse/bak.html)),
+fönster och med hans skugga, och himlens ljus genom glaspartiet bakom honom, som glänser i bardiskens skiva (`hasse-bak-dag.webp`, `?dag=1` i [scripts/hasse/bak.html](scripts/hasse/bak.html)),
 och sidan lägger det på väggens bild i fönstrets färg och styrka, som ljus läggs till ljus, på en duk
 som disken också speglar (`vagg`). Förut var baren alltid en mörk kvällsbar, också mitt på dagen när
 rummet bredvid var ljust, och sedan låg ett dis i himlens färg över hela bilden, också över honom, medan
 ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
+
+**Utsikten.** Som från baren Bron vid S:t Eriksbron ser man genom glaset bakom honom ut över spåren mot
+Kungsholmen och Fridhemsplan: den gröna bron som kommer in från höger och går bort mot andra sidan, med räcket och
+lyktstolparna, slänten och träden ned mot spåren, vattnet, husraden längs stranden och de två tornhusen där bron
+slutar – det grå höghuset och tegelhuset med den ärgade kupolen, till höger om hans huvud. Glaset är tre stora
+rutor från bardiskens skiva och upp förbi bildens överkant (`FONSTER` i
+[public/rum-hasse-scen.js](public/rum-hasse-scen.js)), med karmar och poster i samma mörkgrå som skyltfönstret i
+rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna, och barstolen står kvar. Vädret och ljuset
+är rummets (`Vader.nu`, `RumUte.light` och färgerna i `RumUte.farg`, samma som gatan genom skyltfönstret): himlens
+färger efter klockan, molnen, den låga solens sken, den kalla dagen, tända fönster och lyktor när det skymmer, en
+grön skylt och en röd lampa på höghuset på kvällen, regn och snö som ett dis, dimma som tar andra sidan, snö på
+taken, bron och träden, och löven efter årstiden. På glaset sitter, som i rummet, droppar efter regn, snö i
+nederkanten och frost i hörnen när det är kallare än −3°, och när det är mörkt ute speglar glaset den varma baren.
+Allt står still: utsikten ritas en gång när ljuset eller vädret ändras
+([public/rum-hasse-ute.js](public/rum-hasse-ute.js), `sig`), i halv upplösning och lika oskarp som kamerans
+skärpedjup gör det som är långt borta, med lyktorna som oskarpa skivor. Den läggs underst på väggens duk (`ute` i
+rum-hasse.js) med väggen ovanpå, som är genomskinlig i fönstren, så den kostar ingenting medan man sitter hos honom
+(omkring 25 ms att rita, och högst en gång i minuten), och disken speglar den med väggen. Kameran ser 14° nedåt, så
+genom fönstren skulle man egentligen mest se spåren under bron; utsikten är lyft, så att himlen, tornen och bron
+syns. Förut var väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*,
+tidningsbunten, kaffebryggaren och kassan (ändrat 2026-11-10).
 
 **Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, vit som i baren

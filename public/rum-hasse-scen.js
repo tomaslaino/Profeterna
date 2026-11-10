@@ -37,6 +37,12 @@ export const SCEN = {
   // var han sitter längs benet, i pultens mått (rum-pult.js): så långt ut mot hörnet att händerna ligger
   // vid geringssnittet, som i rummet. Förut satt han vid x = 0, 27 cm längre in på benet (ändrat 2026-11-09).
   PLATS: 450,
+  // Fönstren bakom honom (barens mått), som på baren Bron vid S:t Eriksbron: ett stort glasparti ut mot bron och
+  // Fridhemsplan, från bardiskens skiva och upp förbi bildens överkant. Rutorna (X: vänster och höger kant) sitter
+  // kant i kant, och karmen (KARM bred, mörkgrå som skyltfönstret i rummet) går runt var och en, så att posterna
+  // emellan blir dubbelt så breda. Ingen post står bakom hans huvud. Glaset sitter DJUP in i väggen. Väggen
+  // (scripts/hasse/bak.html) och utsikten (rum-hasse-ute.js) läser samma mått.
+  FONSTER: { Y0: -278, Y1: 1500, X: [[-4600, -1260], [-1260, 1540], [1540, 4600]], KARM: 34, DJUP: 120 },
 };
 
 // Kameran: läget, och axlarna i världen (höger, upp och bakåt; den tittar mot −bak). Rotationen är
