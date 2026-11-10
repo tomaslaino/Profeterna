@@ -16,7 +16,7 @@ import { squadOf } from './underlag.mjs';
 import { citer, see, jsonOf, unknownNumbers } from './kontroller.mjs';
 import { senasteTid } from './tider.mjs';
 import { claudeSvar } from './claude.mjs';
-import { poddUnderlag, forumUnderlag, poddNyckel } from './poddar.mjs';
+import { poddUnderlag, forumUnderlag, mediaUnderlag, poddNyckel } from './poddar.mjs';
 
 const H = 3600000;
 const REF_RE = /\[(\d+(?:\s*[,;]\s*\d+)*)\]/g;
@@ -73,6 +73,9 @@ export function tidningsUnderlag(round, details = {}, poddar = null) {
     // Och ur lagens supporterforum (src/analyser/forum.mjs), som läses samma natt.
     const forum = Object.fromEntries(par.map((lag) => [lag, forumUnderlag(poddar, lag)]).filter(([, l]) => l.length));
     if (Object.keys(forum).length) rad['ur supporterforumet'] = forum;
+    // Och ur de insatta medierna (src/analyser/media.mjs): veckans artiklar som tidningen har läst.
+    const media = Object.fromEntries(par.map((lag) => [lag, mediaUnderlag(poddar, lag)]).filter(([, l]) => l.length));
+    if (Object.keys(media).length) rad['ur insatta medier'] = media;
     return { nr: i + 1, ...rad };
   });
   return { matcher };
@@ -136,6 +139,8 @@ export async function skrivTidning(round, { details = {}, poddar = null, now = (
   for (const m of underlag.matcher) for (const l of Object.values(m['ur supporterpoddarna'] || {})) for (const a of l) if (a.adress) see(seen, a.adress, `${a.podd}: ${a.avsnitt}`, a.datum);
   // Forumtrådarna likaså.
   for (const m of underlag.matcher) for (const l of Object.values(m['ur supporterforumet'] || {})) for (const a of l) if (a.adress) see(seen, a.adress, `${a.forum}: ${a.tradar[0] || 'forumet'}`, a.datum);
+  // Och artiklarna i de insatta medierna.
+  for (const m of underlag.matcher) for (const l of Object.values(m['ur insatta medier'] || {})) for (const a of l) if (a.adress) see(seen, a.adress, `${a.kalla}: ${a.titel || 'artikeln'}`, a.datum);
   const read = [];
   const meta = { searches: 0, fetches: 0, seconds: 0, dollars: 0 };
   const opts = { system: systemPrompt(), model: tc.model, effort: tc.effort, timeoutMs: tc.timeoutMs };
