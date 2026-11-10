@@ -17,7 +17,6 @@
 //                    grupperat efter ämne, med slag, podd och citat.
 //   efter omgången   Omgången (resultaten, rätt rad och siffrorna), Betygen, Skrällen och citaten (det ni
 //                    skrev på kupongen, med facit under) och Hasse Backes krönika med Tipsligan efteråt.
-//   alltid, sist     Åtta knep.
 //
 // Allt räknas ur omgångens data, och samma omgång ger samma tidning på alla enheter: där texten kan
 // variera väljer omgångens id. Inget här anropar någon språkmodell: notiserna och analysen är skrivna i
@@ -87,51 +86,15 @@
       betygen: 'Betygen',
       skrallen: 'Skrällen',
       kronikan: 'Krönikan',
-      knep: 'Åtta knep',
     },
-    // Framsidan: rubriken och raden under väljs av omgången. Inför omgången är Rysaren den jämnaste matchen och
-    // Spika den största favoriten; efter den står gängets rätt i rubriken, rätt rad på kupongen och skrällen i
-    // stjärnan. Priset är tre kronor, tre rader: helgarderat.
+    // Framsidan: numret, vilken omgång det gäller och veckans bild. Priset är tre kronor, tre rader: helgarderat.
     forsta: {
-      rubrik: [
-        ['Så tar du hem', '13 rätt'],
-        ['Allt om', 'helgens 13'],
-        ['Här är den', 'säkra raden'],
-      ],
-      under: ['Experterna avslöjar allt', 'Datorn, notiserna och Sixten', 'Nästan i alla fall'],
-      kupongen: 'Kupongen',
-      datorn: 'Datorn',
       nr: (n) => `Nr ${n}`,
       vecka: (v) => `Vecka ${v}`,
       pris: '3 kr',
-      rysaren: 'Rysaren',
-      spika: 'Spika',
-      knep: ['8 enkla knep', 'Femman gör alla fel'],
-      efter: {
-        rubrik: ['Gänget fick', 'Facit:', 'Det blev'],
-        ratt: (n) => `${n} rätt`,
-        utanKupong: ['Här är', 'facit'],
-        under: ['Betygen, skrällen och krönikan', 'Hasse Backe förklarar allt', 'Vem kom sist?'],
-        rattRad: 'Rätt rad',
-        resultat: 'Resultaten',
-        skrall: 'Skräll',
-        kronikan: 'Krönikan',
-      },
-    },
-    knep: {
-      rubrik: 'Så blir du rik på tipset',
-      ingress: 'Åtta enkla knep. Nummer 5 gör alla fel.',
-      lista: [
-        ['Spika inte allt', 'Tretton favoriter låter som en säker rad, men de vinner nästan aldrig alla på samma lördag.'],
-        ['Gardera det jämna', 'Där ingen utgång har mer än fyra chanser på tio är en gardering billigare än ett tecken man ångrar.'],
-        ['Formen före tabellen', 'Ett lag som har vunnit fyra raka bryr sig inte om var det står i tabellen.'],
-        ['Hemmaplan är värd något', 'Särskilt i regn, i november och längre ner i divisionerna.'],
-        ['Tippa inte med hjärtat', 'Ditt eget lag ska ha det tecken det förtjänar, inte det du önskar dig.'],
-        ['Läs notiserna', 'En skadad målvakt syns inte alltid i oddsen, men den står i lokaltidningen.'],
-        ['Lämna in i tid', 'Spelstoppet väntar inte på någon, och en kupong i fickan har aldrig vunnit något.'],
-        ['Lyssna inte på experterna', 'Inte ens på oss.'],
-      ],
-      stampel: 'Här gör alla fel',
+      infor: (dag) => `Inför ${dag}`,
+      efter: (dag) => `Efter ${dag}`,
+      foto: (f) => `Foto: ${f}`,
     },
     tipset: {
       rubrik: 'Omgångens matcher',
@@ -728,13 +691,6 @@
     const n = Math.round((mandag - FORSTA) / (7 * 864e5)) + 1;
     return n >= 1 ? n : null;
   }
-  // Det troligaste tecknet enligt datorn, och hur troligt det är.
-  const troligast = (p) => {
-    if (!p) return null;
-    const max = Math.max(...p);
-    return { tecken: SIGNS[p.indexOf(max)], max };
-  };
-
   // Rutorna 1, X och 2 framför namnet, som på kupongen, alla ikryssade med kulspetspenna: helgarderat. Kryssen är
   // dragna lite olika och går en bit utanför rutan. Samma rutor på löpsedeln (rum-affischer.js) och på Helgarderats
   // egen sida (helgarderat.js), med sin klass (kl).
@@ -746,73 +702,49 @@
   const rutor = (kl = 'hf-rutor') => `<svg class="${kl}" viewBox="0 0 134 64" aria-hidden="true">${SIGNS.map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
     `<text x="19.5" y="15" text-anchor="middle">${t}</text><g transform="translate(0 23.2)"><rect width="39" height="39" class="r"/><path d="${KRYSS[i]}" class="k"/></g></g>`).join('')}</svg>`;
 
-  // Framsidan, 100 × 140 (zoom i rum.js): numret, datumet och priset, namnet, en rubrik, kupongen och puffarna.
-  // Inför omgången står kupongens matcher med datorns tecken (först på raden, så att Spika inte skymmer dem), och
-  // efter den rätt rad med resultaten och skrällen. Samma på pulten och när den är framme.
+  // Inför lördagen den 14 november: omgångens första dag
+  const fVdagLang = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long' });
+  const fDagManad = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', day: 'numeric', month: 'long' });
+  const omgangsdag = (t) => `${fVdagLang.format(new Date(t))}en den ${fDagManad.format(new Date(t))}`;
+  // Veckans bild på framsidan: ett av veckans foton av lagen (bilder i data/tidning.json, se notisBilder), helst ur
+  // notisen om matchen som Veckans analys handlar om (efter omgången skrällen), annars den första i kupongens
+  // ordning som har ett. Rubriken är notisens. → { src, reserv, foto, rubrik } eller null
+  function veckansBild(u, sum) {
+    let pref = u.analys ? u.analys.nr : null;
+    if (sum) {
+      try { pref = (skrall(u, sum) || { r: {} }).r.nr; } catch (e) { pref = null; }
+    }
+    const med = (u.notiser || []).map((n) => ({ n, b: notisBilder(u, n).filter((x) => x && !x.skold) })).filter((x) => x.b.length);
+    const v = med.find((x) => x.n.nr === pref) || med[0];
+    return v ? { ...v.b[0], rubrik: v.n.rubrik } : null;
+  }
+
+  // Framsidan, 100 × 140 (zoom i rum.js), utan annat än det som säger vilket nummer det är (2026-11-10, användarens
+  // önskemål: "Tidningen ser plottrig ut. Ta bort massa saker där som vi är ointresserade av"): veckan, datumet och
+  // priset, namnet, numret stort med omgångens dag och namn under, och veckans bild med notisens rubrik. Utan bild
+  // står numret ensamt, större. Samma på pulten och när den är framme.
   function forsta(u0) {
     const u = { namnAv: (id, n) => n, ...u0 };
     const G = TEXT.forsta;
     const sum = u.efter || null;
-    const m = sum ? [] : u.matcher || [];
-    const nyckel0 = (sum && sum.id) || u.id || m.map((x) => x.id).join(',');
-    const i = frö(`${nyckel0}${sum ? 'hge' : 'hg'}`) % G.rubrik.length;
+    const m = u.matcher || [];
     const forst = Math.min(...m.map((x) => Date.parse(x.avspark)).filter(Number.isFinite));
-    // numret och veckan: inför omgången den första matchens, efter den dagens
-    const dagen = !sum && Number.isFinite(forst) ? forst : Number.isFinite(u.datum) ? u.datum : NaN;
+    // numret och veckan: omgångens första matchs, annars dagens
+    const dagen = Number.isFinite(forst) ? forst : Number.isFinite(u.datum) ? u.datum : NaN;
     const nr = Number.isFinite(dagen) ? nummer(dagen) : null;
     const v = Number.isFinite(dagen) ? vecka(dagen) : null;
-    const numret = [nr != null ? G.nr(nr) : '', v != null ? G.vecka(v) : ''].filter(Boolean).join(' · ');
     const dag = Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '';
-    const puff = (kick, text, kl = '') => `<span class="hf-puff${kl ? ` ${kl}` : ''}"><b>${esc(kick)}</b><span>${esc(text)}</span></span>`;
-    const stjarna = (kick, text) => `<span class="hf-spik"><b>${esc(kick)}</b><span>${esc(text)}</span></span>`;
-    const kup = (rub, under, rader, spik = '') => `<div class="hf-kup"><p><b>${esc(rub.toUpperCase())}</b>${under ? `<span>${esc(under)}</span>` : ''}</p><ol>${rader}</ol>${spik}</div>`;
-    let r1;
-    let r2;
-    let underRad;
-    let innehall;
-    if (sum) {
-      const E = G.efter;
-      const ok = sum.kupong && sum.kupong.n ? sum.kupong.ok : null;
-      [r1, r2] = ok == null ? E.utanKupong : [E.rubrik[i % E.rubrik.length], E.ratt(ok)];
-      underRad = E.under[i % E.under.length];
-      const rader = (sum.rader || []).map((r) => `<li><b>${r.nr}</b><i>${esc(r.tecken || '')}</i><span>${matchNamn(r.h, r.b)}</span><em>${esc(r.mal || '')}</em></li>`).join('');
-      let sk = null;
-      let kr = null;
-      try { sk = skrall(u, sum); } catch (e) { sk = null; }
-      try { kr = kronika(u, sum); } catch (e) { kr = null; }
-      const puffar = [kr ? puff(E.kronikan, kr.rubrik) : '', puff(G.knep[0], G.knep[1], 'gul')].join('');
-      innehall = kup(E.rattRad, E.resultat, rader, sk ? stjarna(E.skrall, sk.r.res === 1 ? `${sk.r.h}–${sk.r.b}` : `${sk.v}!`) : '') + `<div class="hf-puffar">${puffar}</div>`;
-    } else {
-      [r1, r2] = G.rubrik[i];
-      underRad = G.under[i % G.under.length];
-      const rader = m.map((x) => {
-        const t = troligast(x.pr);
-        return `<li><b>${x.nr}</b><i>${t ? t.tecken : ''}</i><span>${matchNamn(x.h, x.b)}</span></li>`;
-      }).join('');
-      const med = m.map((x) => ({ x, t: troligast(x.pr) })).filter((y) => y.t);
-      const jamn = med.filter((y) => y.t.max <= 42).sort((a, b) => a.t.max - b.t.max)[0];
-      const fav = med.filter((y) => y.t.max >= 68 && y.t.tecken !== 'X').sort((a, b) => b.t.max - a.t.max)[0];
-      const puffar = [jamn ? puff(G.rysaren, `${jamn.x.h}–${jamn.x.b}`) : '', puff(G.knep[0], G.knep[1], 'gul')].join('');
-      innehall = rader ? kup(G.kupongen, G.datorn, rader, fav ? stjarna(G.spika, `${fav.t.tecken === '1' ? fav.x.h : fav.x.b}!`) : '') + `<div class="hf-puffar">${puffar}</div>`
-        // utan kupong: knepen på framsidan
-        : kup(TEXT.knep.rubrik, '', TEXT.knep.lista.map(([t], n) => `<li><b>${n + 1}</b><span>${esc(t)}</span></li>`).join(''));
-    }
-    return `<div class="hf-forsta${sum ? ' efter' : ''}" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
-      `<div class="hf-linje"><b>${esc(numret)}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
+    const omg = Number.isFinite(forst) ? (sum ? G.efter : G.infor)(omgangsdag(forst)) : '';
+    const namn = sum ? sum.namn : u.namn;
+    const b = veckansBild(u, sum);
+    const bild = b ? `<figure class="hf-bild"><canvas class="hf-foto" width="320" height="200" data-bild="${esc(b.src)}"${b.reserv ? ` data-reserv="${esc(b.reserv)}"` : ''}></canvas>` +
+      `<figcaption><b>${esc(hel(b.rubrik || ''))}</b>${b.foto ? `<small>${esc(G.foto(b.foto))}</small>` : ''}</figcaption></figure>` : '';
+    return `<div class="hf-forsta${bild ? '' : ' utan-bild'}" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
+      `<div class="hf-linje"><b>${v != null ? esc(G.vecka(v)) : ''}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
       `<div class="hf-namn">${rutor()}<b>${NAMN.toUpperCase()}</b></div>` +
-      `<h2 class="hf-rub"><b>${esc(r1)}</b><b class="gron">${esc(r2)}</b></h2><p class="hf-under">${esc(underRad)}</p>` +
-      innehall + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
-  }
-
-  // Åtta knep, som alltid står sist: tidningens råd, och nummer 5 är det alla gör fel.
-  function knep() {
-    const K = TEXT.knep;
-    const rader = K.lista.map(([t, s], i) => `<li${i === 4 ? ' class="fel"' : ''}><b>${i + 1}</b><div><h4>${esc(t)}</h4><p>${esc(s)}</p>` +
-      `${i === 4 ? `<span class="hf-stampel">${esc(K.stampel)}</span>` : ''}</div></li>`).join('');
-    return {
-      namn: TEXT.sidor.knep,
-      html: vinjett(TEXT.sidor.knep) + rubrik(K.rubrik, 'stor') + `<p class="tn-ingress">${esc(K.ingress)}</p><ol class="hf-knep">${rader}</ol>`,
-    };
+      `<div class="hf-numret">${nr != null ? `<b>${esc(G.nr(nr))}</b>` : ''}${omg ? `<span>${esc(omg)}</span>` : ''}` +
+      `${namn ? `<em>”${esc(String(namn).replace(/[.!?…]+$/, ''))}”</em>` : ''}</div>` +
+      bild + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
 
   // ---------- tidningen ----------
@@ -834,12 +766,12 @@
     const blad = sidor.map((s, i) => `<section class="tn-ark tn-sida" id="tn-sida-${i + 2}" aria-label="Sidan ${i + 2}: ${esc(s.namn)}">${folio(u, i + 2)}${s.html}</section>`).join('');
     return { inne, blad, sidor: sidor.map((s) => s.namn) };
   }
-  // Hela tidningen: framsidan och sidorna – efter omgången (u.efter) om den, annars inför den – och Åtta knep sist,
-  // som alltid finns. → { forsta, inne, blad, sidor }
+  // Hela tidningen: framsidan och sidorna, efter omgången (u.efter) om den, annars inför den. Utan omgång står bara
+  // framsidan. → { forsta, inne, blad, sidor }
   function tidning(u0) {
     const u = { namnAv: (id, n) => n, ...u0 };
     u.datumText = u.datumText || (Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '');
-    const lista = u.efter ? [omgangen, betygen, skrallen, kronikan, knep] : [tipset, notiser, analys, poddar, knep];
+    const lista = u.efter ? [omgangen, betygen, skrallen, kronikan] : [tipset, notiser, analys, poddar];
     return { inne: '', blad: '', sidor: [], ...sidorna(u, lista), forsta: forsta(u) };
   }
 

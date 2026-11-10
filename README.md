@@ -289,6 +289,9 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   vänster, punkterna till höger med en liten markör för slaget – källorna med datum, och högst ett citat per sida.
   Nattjobbet skriver högst sex punkter per lag, en kort mening var, och sparar datumet för varje punkt. Bara veckans
   källor är förberett men avslaget medan vi provar (se [Helgarderat](#helgarderat))
+- [x] **En ren framsida (2026-11-10, användarens önskemål: "Tidningen ser plottrig ut"):** Helgarderats framsida har
+  bara namnet, numret med omgångens dag och namn, och veckans bild med notisens rubrik; *Spika*, *Rysaren*, kupongen och
+  *Åtta knep* är borta (se *Framsidan* under [Tidningen](#tidningen))
 - [x] **Löpsedeln är Helgarderats, och tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål: "Döp om
   löpsedeln till Helgarderat också", "Kan du ordna så att tidningen ser mer 'äkta' ut - med riktigt papper"):** veckans
   löpsedel har Helgarderats namn och gröna tryck i stället för Sportbladets eller Expressens, och tidningen har löpsedelns
@@ -896,6 +899,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   när det inte finns något att skriva om gör den reklam för det som står i tidningen (*SÅ TAR DU HEM 13 RÄTT*, *SÅ BLIR
   DU RIK PÅ TIPSET*) i stället för Tipsguiden. Rutorna står på ett ställe (`RumTidning.rutor`), som tidningen,
   löpsedeln och Helgarderats egen sida använder. Se *Löpsedeln* under [Tobaksaffären](#tobaksaffären).
+- **En ren framsida: numret och veckans bild (2026-11-10, användarens önskemål):** "Tidningen ser plottrig ut. Ta bort
+  massa saker där som vi är ointresserade av - rysaren, 8 enkla knep etc. Tänker att det kan vara en aktuell bild som
+  passar omgången eller bara vilken helgarderat-upplaga/nummer det handlar om". Framsidan har nu bara namnet, numret
+  stort med omgångens dag och namn, och ett av veckans foton av lagen med notisens rubrik; utan bild står numret ensamt.
+  Rubriken, kupongen med datorns tecken, *Spika*, *Rysaren*, puffarna och efter omgången gängets rätt och rätt rad är
+  borta, och sidan *Åtta knep* också. Löpsedeln gör inte längre reklam för knepen. Se *Framsidan* under
+  [Tidningen](#tidningen).
 - **Tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål):** "Kan du ordna så att tidningen ser mer
   'äkta' ut - med riktigt papper etc. Just nu ser den inte helt verklighetstrogen ut". Helgarderat såg ut som ett tryckt
   kort: vitt och jämnt papper med ett prickraster över allt, mättade färger, en tom ruta under kupongens rader och en
@@ -3979,8 +3989,8 @@ rum-affischer.js):
 Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
 Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
 30 %; nästa omgångs 90 %. Omgångar och kuponger som spoilerskyddet döljer räknas inte.
-Utan något att skriva om gör den reklam för det som står i tidningen (*SÅ TAR DU HEM 13 RÄTT*, *SÅ BLIR DU RIK PÅ
-TIPSET* – *8 enkla knep – nummer 5 gör alla fel*). Tidningen är från dagen det hände (tre timmar efter sista
+Utan något att skriva om gör den reklam för det som står i tidningen (*SÅ MÅR TIPSLAGEN*, *DET SUPPORTRARNA VET*,
+*ALLA MATCHERNA*). Tidningen är från dagen det hände (tre timmar efter sista
 avsparken), och för nästa omgång från idag. Ett klick går fram till löpsedeln, som till de andra affischerna
 (2026-11-10; förut öppnade det tidningen), och som inget annat i rummet leder den ut ur det. Tidningen den
 gör reklam för ligger på pulten (se [Tidningen](#tidningen)). För bilder: `?rum-rubrik=<typ>` och
@@ -7035,8 +7045,8 @@ det som ska stå där (`upplaga` och `tidningen` i rum.js).
 tidningen på höger sida om kupongen"): förut låg två tidningar på pulten, Tipsguiden mellan notan och kupongen (G) och
 veckans kvällstidning till höger om kupongen (L), med löpsedeln som förstasida. Nu är de en: Helgarderat ligger där
 kvällstidningen låg, med Tipsguidens framsida i Helgarderats utseende, och har allt som stod i dem båda – före omgången
-Tipsguidens sidor, efter den kvällstidningens, och *Åtta knep* sist. Som Tipsguiden finns den alltid, också mellan
-omgångarna. L tar upp den; G gör ingenting längre. Löpsedelns kopia som förstasida (`sedel`, `omritad` och `data-rub`
+Tipsguidens sidor och efter den kvällstidningens. Som Tipsguiden finns den alltid, också mellan omgångarna. (Samma dag
+blev framsidan renare och *Åtta knep* försvann, se *Framsidan*.) L tar upp den; G gör ingenting längre. Löpsedelns kopia som förstasida (`sedel`, `omritad` och `data-rub`
 i rum-affischer.js) är borttagen, och samma dag blev löpsedeln också Helgarderats (se *Löpsedeln* under
 [Tobaksaffären](#tobaksaffären)).
 
@@ -7048,8 +7058,7 @@ svarta, gröna och röda (`.hf-blad` på framsidan, `::before` på sidorna). Fä
 och det gröna och röda dämpade, och det vita i text på färg är papperet. Framsidan är förstorad med zoom, så mönstren
 delas med förstoringen (`--zz`), och de är lika fina på pulten som framme. På sidorna ligger buktorna i sin egen form,
 upprepade nedåt. På pulten är vecket på mitten en ås med ljus ovanför och skugga under, den undre halvan lite mörkare,
-papperet buktar svagt i rummets ljus och skuggan ligger tätt intill. Kupongens rader fyller rutan på framsidan (högst
-5,6 bildpunkter höga), så att den inte står tom under dem. Bara bilder: inga filter och inga blandningslägen.
+papperet buktar svagt i rummets ljus och skuggan ligger tätt intill. Bara bilder: inga filter och inga blandningslägen.
 
 **På pulten** (2026-11-10, användarens önskemål: "När man zoomade in den här så fick man hela tidningen - så ska det
 inte vara"): ett klick på löpsedeln går bara fram till den, som de andra löpsedlarna, och tidningen ligger till höger
@@ -7070,7 +7079,7 @@ telefoner. Fläkten, fikat och askkoppen (rum-saker.js) står till höger om hö
 
 Numret gäller omgången som rummet visar (`upplaga` i rum.js), också när den är spelad utan sammanställning (dolda
 resultat): det gamla numret ligger kvar tills nästa kupong kommer. Mellan omgångarna är det numret för den senaste
-kupongen, och utan någon kupong står knepen på framsidan. Det räknas som på Helgarderats egen sida (`RumTidning.nummer`:
+kupongen, och utan någon kupong står bara numret på framsidan. Det räknas som på Helgarderats egen sida (`RumTidning.nummer`:
 Nr 1 är veckan med lördagen den 14 november 2026), med veckan efter (*Nr 1 · Vecka 46*); före det första numret står
 bara veckan. Före omgången är det daterat dagen före den första matchen, efter den dagen efter den sista, eller idag om
 den dagen inte har kommit än.
@@ -7136,8 +7145,6 @@ Samma omgång ger samma tidning på alla enheter: där texten kan variera välje
 (Dogge för Johansson), som på löpsedeln. Inget anropar en språkmodell: notiserna och analysen är skrivna i förväg på
 iMacen, och resten är mallar i `TEXT` i rum-tidning.js, som `npm run repliker` kollar mot det som är underkänt (i
 krönikan säger Hasse ni och er). Med dolda resultat finns ingen sammanställning, och då är tidningen den före omgången.
-Sist, före och efter omgången, står *Åtta knep* (*Så blir du rik på tipset*: tidningens råd, och nummer 5, *Tippa inte
-med hjärtat*, med stämpeln *Här gör alla fel*), som alltid finns.
 Esc, *Lägg tillbaka*, bakåt eller ett klick utanför lägger bort den, pilarna och mellanslag rullar, och medan den är
 framme står rummet still.
 
@@ -7149,17 +7156,28 @@ provat i hela rummet, i Safari eller i en riktig telefon.
 #### Framsidan
 
 Framsidan är tidningens egen och samma på pulten och framme (`forsta` i [public/rum-tidning.js](public/rum-tidning.js),
-100 × 140, förstorad med zoom). Den var Tipsguidens (2026-11-09, användarens önskemål: "nåt nr av tipsguiden … som man
-kan plocka upp o läsa") och har sedan 2026-11-10 Helgarderats utseende: överst *Nr* och veckan, datumet och priset (3 kr,
-tre rader), sedan namnet *HELGARDERAT* i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 framför, ikryssade med
-kulspetspenna som på utkastet, och dubbla streck under. Inför omgången står en rubrik som omgången väljer (*Så tar du
-hem 13 rätt*, *Allt om helgens 13*, *Här är den säkra raden*), kupongens matcher med datorns troligaste tecken under ett
-grönt band, *Spika* i en röd stjärna för den största favoriten (minst 68 %, inte krysset), *Rysaren* för den jämnaste
-(ingen utgång över 42 %) och en puff för knepen. Efter omgången står gängets rätt i rubriken (*Gänget fick 10 rätt*,
-*Facit: 10 rätt*, *Det blev 10 rätt*; utan gängets kupong *Här är facit*), *Rätt rad* med resultaten på kupongen,
-*Skräll* i stjärnan när datorn gav det som hände högst 40 % och en puff för Hasse Backes krönika med dess rubrik.
-Utan någon kupong står knepen på framsidan. Texterna står i `TEXT.forsta` och `TEXT.knep` och kollas av `npm run
-repliker`.
+100 × 140, förstorad med zoom). Den säger bara vilket nummer det är och visar veckans bild (2026-11-10, användarens
+önskemål: "Tidningen ser plottrig ut. Ta bort massa saker där som vi är ointresserade av - rysaren, 8 enkla knep etc.
+Tänker att det kan vara en aktuell bild som passar omgången eller bara vilken helgarderat-upplaga/nummer det handlar
+om"):
+
+- överst veckan, datumet och priset (3 kr, tre rader), och namnet *HELGARDERAT* i flaskgrönt i Alfa Slab One med
+  rutorna 1, X och 2 framför, ikryssade med kulspetspenna som på Helgarderats egen sida, och dubbla streck under;
+- numret stort i grönt (*Nr 1*, räknat som på Helgarderats egen sida), med omgångens dag under (*Inför lördagen den 14
+  november*, efter omgången *Efter …*) och omgångens namn (*”Näten på City Ground håller fint”*);
+- veckans bild, rastrerad i svartvitt som tidningens andra bilder: ett av veckans foton av lagen (`bilder` i
+  `data/tidning.json`, se *Veckans bilder i tidningen* under [Analyserna](#analyserna)), med notisens rubrik och
+  fotografen under. Den är helst ur notisen om matchen som *Veckans analys* handlar om (efter omgången skrällen), annars
+  den första i kupongens ordning som har ett foto (`veckansBild`). Notiserna hämtas när rummet fylls, högst var femte
+  minut, och framsidan ritas om när de har kommit (`hamtaNotiser` och `tidningPult` i rum.js). Hos Hasse Backe ritas
+  bilden på nytt i kopian.
+
+Finns ingen bild står numret ensamt, större, mitt på sidan. Förut stod där en rubrik (*Här är den säkra raden*), kupongen
+med datorns tecken, *Spika* och *Rysaren* och en puff för *Åtta knep*, och efter omgången gängets rätt och rätt rad;
+sidan *Åtta knep* är också borta. Texterna står i `TEXT.forsta` och kollas av `npm run repliker`.
+
+Provat 2026-11-10 i headless Chromium med en påhittad `data/tidning.json` (fem notiser, en med foto) och utan den, på
+pulten med högen och framme, och efter omgången med Node. Inte provat med veckans riktiga bilder, som iMacen hämtar.
 
 #### Helgarderat
 

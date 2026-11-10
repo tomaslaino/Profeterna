@@ -478,12 +478,12 @@ function framat(rows, alla, short) {
   return out;
 }
 
-// Utan något att skriva om: knepen och kupongen i tidningen (som på dess
-// framsida), och nyheten längst ner när veckan bara har en.
+// Utan något att skriva om: det som står i tidningen (notiserna, det
+// supportrarna vet och Tipset), och nyheten längst ner när veckan bara har en.
 const GUIDEN = { typ: 'guide', poang: 0, v: [
-  { kick: 'EXTRA', rad: [['SÅ TAR DU'], ['HEM 13', 1], ['RÄTT']], under: 'Experterna avslöjar allt – hela kupongen' },
-  { kick: 'KNEPEN', rad: [['SÅ BLIR'], ['DU RIK', 1], ['PÅ TIPSET']], under: '8 enkla knep – nummer 5 gör alla fel' },
-  { kick: 'EXPERTERNA', rad: [['SÅ SLÅR'], ['DU'], ['DATORN', 1]], under: 'Hela listan – steg för steg' },
+  { kick: 'EXTRA', rad: [['SÅ MÅR'], ['TIPSLAGEN', 1]], under: 'Skador, sviter och vad tränarna säger' },
+  { kick: 'SUPPORTRARNA', rad: [['DET'], ['SUPPORTRARNA', 1], ['VET']], under: 'Poddarna och forumen inför helgen' },
+  { kick: 'TIPSET', rad: [['ALLA'], ['MATCHERNA', 1]], under: 'Datorns procent och Sixtens tecken' },
 ] };
 const PLUS = ['HOROSKOPET: TIPPA X', 'BÄST I TEST: TIPSPENNOR', '13 RÄTT – SÅ DELAR DU VINSTEN', 'LÄKAREN: SÅ PÅVERKAR TIPSET SÖMNEN'];
 
