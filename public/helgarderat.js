@@ -5,9 +5,9 @@
 // Tidningen med det supportrarna vet inför lördagens matcher: det intressanta ur lagens supporterpoddar, forum
 // och insatta medier (fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar), en sida per match (samma
 // uppgifter som Supportrarna i tidningen bakom löpsedeln, rum-tidning.js).
-// Det här är ett utkast som visar hur tidningen ser ut, med provomgången som poddjobbet gjorde 2026-11-10
-// (helgarderat/utkast.json, i samma form som data/poddsidor.json). Var i rummet tidningen ska ligga är inte
-// bestämt.
+// Sidan visar veckans omgång ur data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, så länge
+// omgångens sista match är högst tre dagar gammal. Annars visar den provnumret: provomgången som poddjobbet gjorde
+// 2026-11-10 (helgarderat/utkast.json, i samma form). Var i rummet tidningen ska ligga är inte bestämt.
 //
 //   Framsidan   namnet med tre ikryssade rutor (1, X och 2: helgarderat), numret, datumet och priset (tre rader,
 //               tre kronor), etta (matchen med mest i), Lördagens matcher med sidnumren, Hört bland
@@ -141,6 +141,8 @@
   // ---------- sidorna ----------
 
   const sidnr = (s) => s.nr + 1;
+  // Numret: provnumret är Nr 1, veckans nummer har veckan.
+  const numret = (u, lordag) => [u.prov ? 'Nr 1' : '', lordag ? `Vecka ${vecka(lordag)}` : ''].filter(Boolean).join(' · ');
   const folio = (u, nr) => `<div class="hg-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><a href="#forsta">Helgarderat</a><span>${esc(u.datumText)}</span></div>`;
 
   function forstasidan(u) {
@@ -151,9 +153,9 @@
     const lordag = sidor.map((s) => s.avspark).filter(giltig).sort()[0];
     const lor = lordag ? `Inför ${fVdagLang.format(new Date(lordag))}en den ${fDagMan.format(new Date(lordag))}` : '';
     const huvud = `<header class="hg-huvud">` +
-      `<div class="hg-overrad"><span>Nr 1${lordag ? ` · Vecka ${vecka(lordag)}` : ''}</span><span>${esc(stor(u.datumText))}</span><span>Pris 3 kr</span></div>` +
+      `<div class="hg-overrad"><span>${esc(numret(u, lordag))}</span><span>${esc(stor(u.datumText))}</span><span>Pris 3 kr</span></div>` +
       `<h1 class="hg-namn">${rutor()}<span>Helgarderat</span></h1>` +
-      `<div class="hg-slogan"><span>Det supportrarna vet</span><span class="hg-stampel">Provnummer</span><span>${esc(lor)}</span></div></header>`;
+      `<div class="hg-slogan"><span>Det supportrarna vet</span>${u.prov ? '<span class="hg-stampel">Provnummer</span>' : ''}<span>${esc(lor)}</span></div></header>`;
     const ettan = `<article class="hg-etta">` +
       `<p class="hg-kick"><b>${s1.nr}</b><span>${skold(lag1[0], 'liten')}${esc(lag1[0])}–${skold(lag1[1], 'liten')}${esc(lag1[1])}</span><em>${esc(avspark(s1.avspark))}</em></p>` +
       `<h2><a href="#sida-${sidnr(s1)}">${esc(hel(s1.rubrik || T.rubrik(lag1[0], lag1[1])))}</a></h2>` +
@@ -215,13 +217,20 @@
     return `<section class="hg-ark hg-sida hg-baksida" id="sida-${nr}" aria-label="Sidan ${nr}: Källorna">${folio(u, nr)}` +
       `<div class="hg-vinjett enkel"><b>Källorna</b></div><div class="hg-kallor">${kallor}</div>` +
       `<div class="hg-stamplar">${stamplar}</div>` +
-      `<p class="hg-kolofon"><span class="hg-litet">Helgarderat</span>Nr 1 · Provnummer · ${esc(T.citaten)}</p></section>`;
+      `<p class="hg-kolofon"><span class="hg-litet">Helgarderat</span>${esc(numret(u, u.sidor.map((s) => s.avspark).filter(giltig).sort()[0]))}${u.prov ? ' · Provnummer' : ''} · ${esc(T.citaten)}</p></section>`;
   }
 
-  function rita(data) {
-    const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
+  const sidorna = (data) => ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
+  // Veckans omgång gäller tills tre dagar efter dess sista match.
+  const aktuell = (data, now = Date.now()) => {
+    const tider = sidorna(data).map((s) => Date.parse(s.avspark)).filter(Number.isFinite);
+    return tider.length > 0 && Math.max(...tider) > now - 3 * 864e5;
+  };
+
+  function rita(data, prov) {
+    const sidor = sidorna(data);
     if (!sidor.length) throw new Error('inga sidor');
-    const u = { ...data, sidor, datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '' };
+    const u = { ...data, sidor, prov, datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '' };
     rot.innerHTML = forstasidan(u) + sidor.map((s) => matchsidan(u, s)).join('') + baksidan(u);
     rot.removeAttribute('aria-busy');
     // en länk till en sida (#sida-5) när den kommer in utifrån
@@ -232,8 +241,9 @@
   }
 
   const skoldar = window.Skoldar ? Skoldar.ready : Promise.resolve();
-  Promise.all([fetch('helgarderat/utkast.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)), skoldar.catch(() => null)])
-    .then(([data]) => rita(data))
+  const hamta = (url) => fetch(url, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  Promise.all([hamta('data/poddsidor.json'), hamta('helgarderat/utkast.json'), skoldar.catch(() => null)])
+    .then(([veckans, utkast]) => (aktuell(veckans) ? rita(veckans, false) : rita(utkast, true)))
     .catch((e) => {
       console.warn('Helgarderat:', e);
       rot.innerHTML = '<section class="hg-ark hg-fel"><p>Tidningen kunde inte hämtas.</p></section>';

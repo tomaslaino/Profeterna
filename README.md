@@ -6945,9 +6945,13 @@ i Safari eller i en riktig telefon.
 
 #### Helgarderat
 
-Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Ett utkast
+Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Den
 ligger på sajten som en egen sida, [matchfixarna.se/helgarderat.html](https://matchfixarna.se/helgarderat.html)
-("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"). Var namnet ska stå i
+("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"), och visar veckans
+omgång av sig själv: informationssidorna i `data/poddsidor.json`, som nattjobbet på iMacen skriver inför varje omgång
+ur poddarna, forumen och de insatta medierna (se [Analyserna](#analyserna)), så länge omgångens sista match är högst
+tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång nu? Det ska det ju"). Då står veckan i
+huvudet och ingen stämpel. Annars visar den provnumret (*Nr 1*, med stämpeln *Provnummer*). Var namnet ska stå i
 rummet, på hela tidningen bakom löpsedeln, bara på poddsidorna eller på en egen tidning, är inte bestämt, så rummet är
 orört. Sidan har noindex och ingen länk från resten av sajten.
 
@@ -6956,9 +6960,12 @@ flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2,
 är 3 kr, tre rader. Framsidan har en stämpel, *Provnummer*, och ettan och tvåan är matcherna med flest uppgifter, helst
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har ett stort citat, helst
 om truppen och med ett namn. Bredvid står *Lördagens matcher* med sidnumren och under *Hört bland supportrarna*, med en
-egen uppgift (slaget h) ur var och en av tre andra matcher. Sedan kommer en sida per match med lagen bredvid varandra,
+egen uppgift (slaget h) ur poddarna eller forumen, ur var och en av tre andra matcher, och *De insatta skriver*, med en
+uppgift ur de insatta medierna ur tre matcher som inte redan står på framsidan, när det finns. Sedan kommer en sida per match med lagen bredvid varandra,
 uppgifterna under sina ämnen, stämplarna och citaten. Har bara det ena laget något får det hela bredden i två spalter.
-Baksidan har källorna per match, med länkar till avsnitten och forumtrådarna, och stämplarna. Texterna för slagen,
+Baksidan har källorna per match, med länkar till avsnitten, forumtrådarna och artiklarna, och stämplarna. De
+insattas egna uppgifter har stämpeln *Enligt insatta* i grönt, och källans namn står vid punkten när laget har flera
+källor. Texterna för slagen,
 ämnena och förklaringarna kommer från `RumTidning.TEXT.poddar`, så att det står samma sak i båda tidningarna. Under
 720 px är allt en spalt.
 
@@ -6966,11 +6973,20 @@ Innehållet är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov
 One och Two den 14 november). Den ligger i [public/helgarderat/utkast.json](public/helgarderat/utkast.json) och är
 uttagen med `poddsidor` i src/analyser/poddar.mjs, samma uttag som `data/poddsidor.json`, så att varken utskrifterna
 eller de engelska citaten följer med. Numren är 1–12 i kupongens ordning, utan luckan efter matchen som saknade sida.
+De insatta medierna lades till för hand 2026-11-10, innan nattjobbet hade läst något: elva uppgifter om fem lag
+(Blackpool ur The Bloomfield Bulletin, Gillingham ur Gills Journal, Port Vale ur The Valiant, Salford ur SalfordNow,
+Shrewsbury ur A Large Grouse och Shropshire Live), alla från 4–9 november. De letades fram med sökningar i en
+molnmiljö där sidorna inte gick att öppna, så de bygger på det sökträffarna säger om artiklarna och har inga citat;
+nattjobbet läser artiklarna själv och tar citaten ordagrant ur dem. För de andra nitton lagen hittades inget från
+veckan i oberoende medier, eller så räckte sökningarna inte till.
 
 Provat med en provserver (public/ ur arbetskopian och resten från matchfixarna.se) i webbläsarpanelen, i 1280 × 900 och
 375 × 812, och med huvudlös Chrome i 1280 bredd: framsidan, en sida där båda lagen har något, en där bara det ena har
 det (Wigan–Barnsley), baksidan och att inget sticker ut åt sidan i telefonen. Inte provat i Safari eller i en riktig
-telefon.
+telefon. De insatta medierna och veckans omgång provades 2026-11-10 i huvudlös Chromium med public/ ur arbetskopian
+(utan sköldarna), i 1280 bredd och 390 × 844: rutan *De insatta skriver*, en sida där ett lag bara har de insatta
+(Blackpool), baksidan, inget fel i konsolen och inget som sticker ut åt sidan, och med en påhittad
+`data/poddsidor.json` att veckans omgång visas utan provstämpel och att provnumret kommer tillbaka utan den.
 
 ### Närbilderna
 
