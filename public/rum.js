@@ -24,7 +24,8 @@
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras när du ser deras tips.
 //   kvällstidningen bakom högen (L): veckans tidning, samma som löpsedeln,
-//   hopvikt; den tas upp och läses (tidningen, rum-tidning.js).
+//   med rubriken ovanför kupongerna; den tas upp och läses (tidningen,
+//   rum-tidning.js).
 //   kupongstället på disken (N): en blank kupong för nästa omgång – veckans
 //   Stryktips – tas i handen, bara att titta på (openStall).
 //   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
@@ -643,7 +644,7 @@ window.Rum = (() => {
   // Tipsguiden ligger på pulten mellan Hasses nota och kupongen, med kupongen en bit över sig: ett klick,
   // eller G, och man tar upp den och läser (tidningen). Framsidan skrivs i fill (guidePult).
   const guideHtml = () => `<a class="rum-sak" id="rum-tipsguiden" ${KNAPP} aria-label="Tipsguiden"></a>`;
-  // Veckans kvällstidning ligger hopvikt till höger om kupongen, bakom högen, som lägger sig över den: ett
+  // Veckans kvällstidning ligger till höger om kupongen, bakom högen, som ligger på dess nedre del: ett
   // klick, eller L, och man tar upp den och läser (tidningen). Framsidan är löpsedelns (tidningPult); utan
   // någon tidning (mellan omgångarna) ligger den inte där.
   const tidningHtml = () => `<a class="rum-sak" id="rum-kvallstidningen" ${KNAPP} aria-label="Kvällstidningen" hidden></a>`;
@@ -1967,13 +1968,16 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const T = (dx, dy, z, rx, rz, s, ry = 0) => `translate(${r1(dx)}px, ${r1(dy)}px) perspective(1300px) translateZ(${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
   const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
   // mitten (x, y) och vridningen för den första, andra och tredje i högen
-  // (askkoppen och dosan står till höger om den, i rum-saker.js: HOGEN där)
-  const HOG = { s: 0.3, at: [[1204, 790, 5], [1196, 836, -4], [1208, 882, 2]], skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
+  // (askkoppen och dosan står till höger om den, i rum-saker.js: HOGEN där).
+  // Bakom högen ligger kvällstidningen, och högen ligger så långt fram att
+  // tidningens rubrik syns ovanför den; på höjden är kupongerna högre (420 ×
+  // 620), och där ligger den ännu lite längre fram (smal).
+  const HOG = { s: 0.3, at: [[1204, 852, 5], [1196, 898, -4], [1208, 944, 2]], smal: 18, skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
   function slot(i) {
     const [x, y, a] = HOG.at[i % HOG.at.length];
     const n = Math.floor(i / HOG.at.length);
-    return { dx: x + 14 * n - kupX(), dy: y + 10 * n - kupY(), a };
+    return { dx: x + 14 * n - kupX(), dy: y + 10 * n + (R.smal ? HOG.smal : 0) - kupY(), a };
   }
   const restAt = (sl) => T(sl.dx, sl.dy, 0, 44, sl.a, HOG.s);
 
@@ -3666,7 +3670,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- tidningen ----------
   //
-  // Veckans kvällstidning (rum-tidning.js), samma som löpsedeln, ligger hopvikt på pulten bakom högen: ett
+  // Veckans kvällstidning (rum-tidning.js), samma som löpsedeln, ligger på pulten bakom högen: ett
   // klick, eller L, och den lyfts och läggs fram över rummet, som står still så länge. Efter omgången (R.summa)
   // handlar den om omgången som är spelad, och före den om omgången som kommer: matcherna, notiserna ur
   // data/tidning.json och Veckans analys ur data/analyser.json. Mellan omgångarna finns ingen tidning, och då
@@ -3781,7 +3785,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
   // Kvällstidningen på pulten, när den har ändrats (fill, och när löpsedeln har ritats om: omritad i
-  // rum-affischer.js): löpsedelns papper som förstasida, hopvikt, så länge det finns en tidning att läsa.
+  // rum-affischer.js): löpsedelns papper som förstasida, så länge det finns en tidning att läsa. Den är så stor
+  // att rubriken slutar ovanför kupongerna i högen (HOG): RUBRIK bildpunkter ner på papperet, före pultens
+  // perspektiv, ligger den första kupongens överkant, och rubriken slutar rub ner av sedelns 140 (rum-affischer.js).
+  const RUBRIK = 156;
   function tidningPult() {
     const a = R.el && R.el.querySelector('#rum-kvallstidningen');
     if (!a) return;
@@ -3794,6 +3801,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     a.skrivet = k;
     a.replaceChildren(s);
     a.setAttribute('aria-label', u.tid === 'ex' ? 'Expressen' : 'Sportbladet');
+    const rub = Number(s.dataset.rub) || 112;
+    a.style.setProperty('--z', Math.min(1.55, Math.max(1.25, RUBRIK / rub)).toFixed(3));
   }
   // Ett klick på kvällstidningen, eller L: före omgången hämtas notiserna och analyserna först (högst ett
   // par sekunder), så att de kommer med, och sedan lyfts den från pulten och läggs fram, som Tipsguiden.
@@ -3872,7 +3881,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // läggs tillbaka. (UPPE: samma funktioner i samma ordning som --vila i rum-tidning.css, så att de glider dit)
   const UPPE = {
     'rum-tipsguiden': 'perspective(1100px) translate3d(40px, -170px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.1)',
-    'rum-kvallstidningen': 'perspective(1100px) translate3d(-240px, -150px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.1)',
+    'rum-kvallstidningen': 'perspective(1100px) translate3d(-240px, -60px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.3)',
   };
   // den på pulten som tidningen framme (slag) är
   const pultTidning = (slag) => R.el && R.el.querySelector(slag === 'guide' ? '#rum-tipsguiden' : '#rum-kvallstidningen');
