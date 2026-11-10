@@ -29,7 +29,10 @@
 .artikel + .analysis .analysis-text ~ button.analyze,
 .artikel + .analysis .unknown + button.analyze { margin-top: 10px; }
 
-dialog.mr-modal .artikel .art-title { color: var(--pp-ink); }
+/* på papperet: löptexten på skrivmaskinen med jämna anslag (--renskrift, typsnitt.css), som i rummets matchblad */
+dialog.mr-modal .artikel :is(.art-title, .art-lead, .analysis-text, .news-sources),
+dialog.mr-modal .artikel + .analysis .analysis-text { font-family: var(--renskrift); }
+dialog.mr-modal .artikel .art-title { font-weight: 400; color: var(--pp-ink); }
 dialog.mr-modal .artikel sup.ref a,
 dialog.mr-modal .artikel + .analysis sup.ref a { color: var(--pp-pen); }
 dialog.mr-modal .artikel + .analysis .fc-main { margin-bottom: 22px; }
