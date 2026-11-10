@@ -3463,7 +3463,10 @@ Ett mål går före radion.
 
 Radion står i gängets duk, som är ritad för hela rummet. När kameran är framme ritas bara det som syns av duken,
 i närbildens skärpa (`narbild`), och duken läggs över just den delen: gänget står kvar och rör sig, och rummet
-kostar mindre än på håll (en fjärdedel av trianglarna, uppmätt 2026-11-08). Skalans, tejpens och
+kostar mindre än på håll (en fjärdedel av trianglarna, uppmätt 2026-11-08). Den delen räknas ur dit kameran går
+(`R.kamMal` från `aim`, `radioNara` i rum.js), inte ur var duken syns i stunden: den mättes förut 640 ms efter
+klicket, och hade kameran eller rummets vridning inte hunnit fram (Safari börjar kameran några bildrutor sent, och
+en långsam dator hinner inte) ritades en annan del än den som syntes, och radion skars av i kanten (2026-11-10). Skalans, tejpens och
 kassettens dukar ritas om större första gången (`radioFin`), och de små delarna ritas bara på väg fram och nära
 (`radioDetalj`). Radion kostar 2 % fler ritningar i rummet än bergsprängaren. `?rum-sak=radio` visar närbilden
 och `?rum-radio-lage=fm:90.4` hur den står inställd, utan ljud; `?rum-radio`
