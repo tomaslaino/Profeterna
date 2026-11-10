@@ -353,7 +353,7 @@
   // Supporterpoddarna: ett matchblad per match (data/poddsidor.json, skrivna på iMacen av scripts/tidning/poddar.mjs).
   // Användarens önskemål 2026-11-10: "ett matchblad med information. Först en kort introduktion, sen diskussion om
   // ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för varje match. Sidan
-  // har rubriken, veckans bilder av lagen (samma som notisen, ur data/tidning.json), introduktionen, ett stycke eller
+  // har rubriken, veckans bilder av lagen (matchbladets egna, annars notisens ur data/tidning.json), introduktionen, ett stycke eller
   // tre om hemmalaget och om bortalaget, sammanfattningen och sist källorna med datum. Ett nummer från före artiklarna
   // (utan text under laget) får uppgifterna som löptext, ett stycke per ämne. Helgarderat (helgarderat.js) ställer upp
   // samma matchblad med poddText, poddKallor, poddKallText och poddCitat härifrån.
@@ -414,9 +414,15 @@
     return l.slice().sort((a, b) => nr(a) - nr(b)).map((x) => {
       const m = match(x);
       const namn = m ? [m.h, m.b] : (x.lag || []);
-      // veckans bilder av lagen, som i notisen om samma match
+      // veckans bilder av lagen: matchbladets egna (data/matchbilder/, som GitHub Actions hämtar), annars notisens
       const n = (u.notiser || []).find((y) => y && String(y.id) === String(x.id));
-      const bilder = n ? notisBilder(u, n) : [];
+      const skold = (lag) => (lag && typeof u.skold === 'function' ? u.skold(lag) || '' : '');
+      const egna = Array.isArray(x.bilder) && x.bilder.some((b) => b && b.fil) ? namn.map((lag, i) => {
+        const b = x.bilder[i];
+        if (b && b.fil) return { src: `data/matchbilder/${b.fil}`, reserv: skold(lag), lag, foto: fotograf(b) };
+        return skold(lag) ? { src: skold(lag), skold: true, lag } : null;
+      }) : null;
+      const bilder = egna || (n ? notisBilder(u, n) : []);
       const foto = fotoText(bilder.filter((b) => b && !b.skold).map((b) => b.foto));
       const lagen = x.delar.map((d, i) => {
         const text = poddText(d);

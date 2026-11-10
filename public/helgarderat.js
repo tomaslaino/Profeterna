@@ -19,9 +19,10 @@
 //               smal spalt bredvid avsparken, källorna med datum och, ibland, ett citat
 //   Baksidan    källorna, avsnitt, forumtrådar och artiklar med datum och länk
 //
-// Bilden: matchens egen (bild i sidan), annars veckans bilder av lagen ur tidningen inför omgången (data/tidning.json
-// och data/tidning-bilder/, som iMacen hämtar), hemma och borta bredvid varandra. Utan bild, eller om den inte går att
-// hämta, står lagens sköldar mot varandra.
+// Bilden: matchens egen (bild i sidan), annars veckans bilder av lagen, hemma och borta bredvid varandra: matchbladets
+// (bilder, som GitHub Actions hämtar före bygget, scripts/tidning/matchbilder.mjs) eller tidningens inför omgången
+// (data/tidning.json och data/tidning-bilder/, som iMacen hämtar). Utan bild, eller om den inte går att hämta, står
+// lagens sköldar mot varandra.
 // Texterna och uppställningen av lagets text och källor (poddText, poddKallor, poddKallText, poddCitat) kommer från
 // RumTidning, så att det står samma sak i båda tidningarna.
 
@@ -87,10 +88,13 @@
 
   // Veckans tidning inför omgången (data/tidning.json): notiserna har veckans bilder av lagen, hemma och borta.
   let tidningen = null;
-  // → { en: {src, …} } (matchens egen bild), { tva: [hemma, borta] } (veckans bilder av lagen) eller null
+  // → { en: {src, …} } (matchens egen bild), { tva: [hemma, borta] } (veckans bilder av lagen) eller null.
+  // Veckans bilder av lagen: matchbladets egna (bilder, som GitHub Actions hämtar till data/matchbilder/, se
+  // scripts/tidning/matchbilder.mjs), annars tidningens.
   function bilderna(s) {
     const b = s.bild;
     if (b && (b.url || b.fil)) return { en: { ...b, src: b.url || `data/tidning-bilder/${b.fil}` } };
+    if (Array.isArray(s.bilder) && s.bilder.some((x) => x && x.fil)) return { tva: [0, 1].map((i) => (s.bilder[i] && s.bilder[i].fil ? { ...s.bilder[i], src: `data/matchbilder/${s.bilder[i].fil}` } : null)) };
     const n = tidningen && (tidningen.notiser || []).find((x) => x && String(x.id) === String(s.id));
     const l = n && Array.isArray(n.bilder) ? [0, 1].map((i) => (n.bilder[i] && n.bilder[i].fil ? { ...n.bilder[i], src: `data/tidning-bilder/${n.bilder[i].fil}` } : null)) : [];
     return l.some(Boolean) ? { tva: l } : null;
