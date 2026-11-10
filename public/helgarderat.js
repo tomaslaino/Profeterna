@@ -94,7 +94,11 @@
   function bilderna(s) {
     const b = s.bild;
     if (b && (b.url || b.fil)) return { en: { ...b, src: b.url || `data/tidning-bilder/${b.fil}` } };
-    if (Array.isArray(s.bilder) && s.bilder.some((x) => x && x.fil)) return { tva: [0, 1].map((i) => (s.bilder[i] && s.bilder[i].fil ? { ...s.bilder[i], src: `data/matchbilder/${s.bilder[i].fil}` } : null)) };
+    if (Array.isArray(s.bilder) && s.bilder.some((x) => x && x.fil)) {
+      const l = [0, 1].map((i) => (s.bilder[i] && s.bilder[i].fil ? { ...s.bilder[i], src: `data/matchbilder/${s.bilder[i].fil}`, lag: (s.lag || [])[i] } : null));
+      // Har bara det ena laget ett foto står det över hela bredden, med lagets namn.
+      return l.every(Boolean) ? { tva: l } : { en: l.find(Boolean) };
+    }
     const n = tidningen && (tidningen.notiser || []).find((x) => x && String(x.id) === String(s.id));
     const l = n && Array.isArray(n.bilder) ? [0, 1].map((i) => (n.bilder[i] && n.bilder[i].fil ? { ...n.bilder[i], src: `data/tidning-bilder/${n.bilder[i].fil}` } : null)) : [];
     return l.some(Boolean) ? { tva: l } : null;
@@ -114,7 +118,8 @@
       const text = b.en.text ? `${esc(hel(b.en.text))} ` : '';
       const av = fotoAv(b.en);
       const kalla = av ? `<span>Foto: ${b.en.sida ? `<a href="${esc(b.en.sida)}" target="_blank" rel="noopener">${esc(av)}</a>` : esc(av)}</span>` : '';
-      return `<figure class="hg-bild en${kl}"><div class="hg-foto">${img(b.en, b.en.text || lag.join('–'))}</div>${vs}` +
+      const namnet = b.en.lag ? `<b>${esc(kl.includes('liten') ? kort(b.en.lag) : b.en.lag)}</b>` : '';
+      return `<figure class="hg-bild en${kl}"><div class="hg-foto">${img(b.en, b.en.text || b.en.lag || lag.join('–'))}${namnet}</div>${vs}` +
         (text || kalla ? `<figcaption>${text}${kalla}</figcaption>` : '') + '</figure>';
     }
     const halvor = b.tva.map((x, i) => `<div class="hg-foto${x ? '' : ' fel'}">${x ? img(x, lag[i] || '') : ''}<span class="hg-reserv">${skold(lag[i], 'vs')}</span><b>${esc(kort(lag[i]))}</b></div>`).join('');
