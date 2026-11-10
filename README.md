@@ -799,6 +799,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   det helt på väggen mellan karmen och veckans löpsedel, en bit ovanför bänken och lite mindre (23 × 29 i stället för
   27 × 34), hänger rakt och ligger nästan plant, med två korta tejpbitar över överkanten. Se
   [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Ett större blad vid radion (2026-11-10, användarens önskemål):** "Gör lappen större, den syns knappt nära
+  radion". Bredden ges av väggremsan mellan karmen och veckans löpsedel, och den användes redan nästan helt; det som
+  höll nere handstilen var att tretton rader skulle rymmas på 29 i höjd. Bladet är nu 25,5 × 45 (förut 23 × 29), och
+  handstilen ungefär 1,7 gånger så stor. Närbilden av radion tar med det större bladet och går därför lite mindre
+  nära i liggande fönster; där och i stående är handstilen ändå klart större än förut. Löpsedeln och allt annat
+  står kvar. Se [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Det går att förstå vad som är vad vid radion, och skruvarna är kryss (2026-11-10, användarens önskemål):**
   "Alltså man förstår inte riktigt vad det är som händer här. Dessutom är det något konstigt med skruven som sätter
   fast chelsea-löpsedeln." Under bladet låg en halvgenomskinlig ruta på väggen: prickarna i fönsterbänkens sten
@@ -3416,8 +3422,9 @@ ned till frekvensen (`tejpPlats`). Ett tryck på ett namn går dit, byter band o
 (`radioEtikett` i rum-3d.js, som hittar namnet under fingret). Frekvenserna står på ett blad ur ett litet
 spiralblock som är tejpat på väggen till höger om radion (`radiolapp` i rum-inredning.js, en egen duk i bakväggens
 plan, så att det sitter fast på väggen när rummet vrids). Det sitter helt i väggremsan mellan fönsterkarmen och
-veckans löpsedel, med luft till båda och en bit ovanför fönsterbänken, så att det inte går över karmens kant eller
-ned till bänken (`LAPP`). Nära, där det syns, ska omgivningen gå att förstå: karmen har en profil (ljus ytterkant
+veckans löpsedel och en bit ovanför fönsterbänken, så att det inte går över karmens kant eller ned till bänken
+(`LAPP`). Remsan ger bredden (25,5), så bladet är högt (45): där får raderna plats med en handstil som syns nära
+radion, och det längsta namnet (*Guldkanalen 80-tal*) trycks ihop en aning i sidled. Nära, där det syns, ska omgivningen gå att förstå: karmen har en profil (ljus ytterkant
 och en fals i skugga mot glaset, `KARM` i rum.js) i stället för att vara en slät mörk platta, och fönsterbänken slutar
 med en ren sned kant under bladet (stenens prickar klipps efter bänken, `sill`). Bladet är i 3D: rivet ur spiralen med halva hål, blå linjer och röd marginal och vikt en
 gång. Det hänger rakt, med två korta bitar gulnad tejp över överkanten en bit in från hörnen, och ligger nästan

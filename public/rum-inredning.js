@@ -49,10 +49,10 @@ const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // som fönstret (i bakväggens bild)
 const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
 // bladet med radions stationer på väggen till höger om radion (radiolapp): i remsan mellan fönsterkarmen
-// (x 958) och veckans löpsedel (x 986, LOPPLATS i rum-affischer.js) med luft till båda, och en bit ovanför
-// fönsterbänken (y 552), så att det sitter på en enda yta och inte når ned till bänken; ett blad ur ett
-// litet block, lagom för tio stationer
-const LAPP = { x: 961, y: 513, w: 23, h: 29 };
+// (x 958) och veckans löpsedel (x 986, LOPPLATS i rum-affischer.js), så brett som remsan medger, och en bit
+// ovanför fönsterbänken (y 554), så att det sitter på en enda yta och inte når ned till bänken. Bredden är
+// given, så bladet är högt: där får raderna plats med en handstil som syns nära radion (radiolapp)
+const LAPP = { x: 959.5, y: 503, w: 25.5, h: 45 };
 // Sakerna och dukarna (plan: 0 = väggen). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
@@ -1323,8 +1323,10 @@ export async function inredning(el, opt = {}) {
       PLAN.push({ band, j: j0 });
       st.forEach((k, i) => PLAN.push({ band, k, j: j0 + 1 + i }));
     }
-    const TOPP = 4.4;
-    const RAD = Math.min(2.4, (EH - TOPP - 1.6) / Math.max(1, PLAN[PLAN.length - 1].j));
+    // (raderna så höga som bladet räcker till; bredden sätter gränsen för handstilen, och det längsta namnet,
+    // Guldkanalen 80-tal, trycks ihop en aning i sidled av skriv)
+    const TOPP = 4.8;
+    const RAD = Math.min(3.4, (EH - TOPP - 1.6) / Math.max(1, PLAN[PLAN.length - 1].j));
     // marginalen, frekvensernas högerkant (FX, efter den bredaste) och namnen efter dem
     const MARG = 2.2;
     const KOL = MARG + 0.5;
@@ -1469,7 +1471,8 @@ export async function inredning(el, opt = {}) {
         c.font = `700 ${fs}px Caveat, cursive`;
         const fw = c.measureText(f).width;
         skriv(f, FX * u - fw, bas * u, fs, farg, 0, x.j * 3);
-        const nb = skriv(namn, NX * u, bas * u, fs, farg, (EW - NX - 0.8) * u, x.j * 3 + 1);
+        // (luft till högerkanten också för det längsta namnet)
+        const nb = skriv(namn, NX * u, bas * u, fs, farg, (EW - NX - 1.4) * u, x.j * 3 + 1);
         rader.push({ id: x.k.id, band: x.band, x0: KOL, x1: EW - 0.6, topp: linje - RAD, ned: linje, bas, fran: FX - fw / u, slut: NX + nb / u });
       }
       // kanterna lite mörkare, som ljuset faller
