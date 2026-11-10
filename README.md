@@ -930,7 +930,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   större") ligger kupongerna i högen tätare, så att namnen nätt och jämnt syns, och tidningen fick det som blev över.
   Se [Tidningen](#tidningen).
 - **Riktiga bilder i matchbladen, hämtade av GitHub Actions (2026-11-10, användarens önskemål):** "Fixa så att det
-  kommer riktiga bilder nu". Molnmiljön där matchbladen skrevs når inte nyhetssajterna, och tidningen inför omgången
+  kommer riktiga bilder nu". Den första hämtningen gav 21 av 24 lag en bild, men flera ur artiklar om motståndaren
+  (Fleetwoods matchguide om Rochdale, *York City smash Northampton*, *Wycombe defeat Accrington*), övergångsrykten
+  och en minnesartikel, alltså troligen fel lag på bilden. Därför tar matchbladen bara artiklar som handlar om laget
+  självt, och ett lag utan en sådan får sin sköld. Molnmiljön där matchbladen skrevs når inte nyhetssajterna, och tidningen inför omgången
   (`data/tidning.json`), vars bilder matchbladen först lånade, var inte utlagd för omgången. Men GitHub Actions, som
   bygger sajten var 30:e minut, når dem. Där hämtar nu `scripts/tidning/matchbilder.mjs` före bygget veckans bild av
   varje lag i `data/poddsidor.json` med samma kod som tidningens bilder på iMacen (src/analyser/tidning-bilder.mjs,
@@ -1947,7 +1950,10 @@ fotograf; för de lägre divisionerna är det delningsbilden (`og:image`) i noti
 `<lag> FC` och `<lag> football` (lokaltidningarna och klubbarnas sidor). Rubriken ska nämna laget och handla om
 fotboll (*Southampton communities gather* är inte Southampton), inte damlaget, akademin eller ungdomslagen, och
 ingen liveblogg; en rubrik som också nämner motståndaren eller ett annat av omgångens lag, en förhandstitt och ett
-värvningsrykte (spelaren i den andra klubbens tröja) kommer sist. Bilden ska vara från de senaste åtta dagarna,
+värvningsrykte (spelaren i den andra klubbens tröja) kommer sist. Sedan 2026-11-10 kommer också en rubrik där en annan
+klubb står före laget (*York City smash Northampton Town*) och en minnesartikel sist, och en sida på en annan klubbs
+egen sajt eller hos dess lokaltidning (fleetwoodtownfc.com om Rochdale, readingchronicle.co.uk om ett annat lag) läses
+inte. Bilden ska vara från de senaste åtta dagarna,
 liggande, minst 480 bildpunkter bred och inte en logga (adressen) eller en grafik (en jämn bild packas hårt: under
 0,15 byte per bildpunkt). Sajter vars delningsbild är en grafik med text och sköldar (GOAL, OneFootball, Football
 Insider, Football League World m.fl.) och sajterna som är spärrade på datorn läses inte. Samma bild används inte för två
@@ -7252,7 +7258,10 @@ riktiga bilder nu"), eftersom molnmiljön där matchbladen skrevs inte når nyhe
 [scripts/tidning/matchbilder.mjs](scripts/tidning/matchbilder.mjs) tar lagen i `data/poddsidor.json` och hämtar en bild
 per lag med samma kod som tidningens bilder på iMacen (`veckansBilder` i src/analyser/tidning-bilder.mjs): de insatta
 mediernas artiklar om laget först, sedan Bing News, sidans delningsbild från de senaste åtta dagarna, liggande och
-minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Bilden förminskas till 800
+minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Till skillnad från tidningen
+tas bara artiklar som handlar om laget självt (`MIN_POANG`): inte en där motståndaren eller en annan klubb står först i
+rubriken, en förhandstitt med odds, ett övergångsrykte eller en minnesartikel, eftersom bilden då oftast visar fel lag.
+Hellre lagets sköld än fel lag. Bilden förminskas till 800
 bildpunkter med ImageMagick (på iMacen med `sips` som förut); en jämn grafik känns igen på under 0,10 byte per
 bildpunkt i 320 bildpunkters bredd (foton låg på 0,15–0,31 och en enfärgad grafik med text på 0,04; `sips` behåller
 färgprofilen och har kvar gränsen 0,15). Bilderna sparas i källcachen (`data/cache/matchbilder/`), som workflowen
@@ -7306,8 +7315,9 @@ påhittat svar och `poddsidor`. Inte provat med riktiga bilder, i Safari, i en r
 själv. Matchbladens bilder provades 2026-11-10 med ett låtsasnät (påhittade Bing-svar och artikelsidor och brusbilder
 från ImageMagick): 24 av 24 lag fick en bild (Gillingham ur de insattas artikel, de andra ur Bing), en andra körning
 hämtade inget och tog bilderna ur cachen, bygget lade dem i alla tolv matchbladen och sidan visade dem i 1280 bredd och
-390 × 844. Gränsen för grafik mättes på fotona i public/ och en ritad grafik. Den första riktiga hämtningen är
-workflowens.
+390 × 844. Gränsen för grafik mättes på fotona i public/ och en ritad grafik. Den första riktiga hämtningen
+(workflowen 2026-11-10 17.37) gav 21 av 24 lag en bild; källorna står i stegets logg, men bilderna själva gick inte
+att se härifrån. Reglerna för rätt lag provades med Node på rubrikerna från den hämtningen.
 
 ### Närbilderna
 

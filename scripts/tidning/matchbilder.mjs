@@ -2,7 +2,8 @@
 // Matchbladens bilder (Helgarderat, användarens önskemål 2026-11-10: "Fixa så att det kommer riktiga bilder nu"):
 // veckans bild av varje lag i data/poddsidor.json, hämtad på GitHub Actions före bygget med samma kod som
 // tidningens bilder på iMacen (src/analyser/tidning-bilder.mjs: de insatta mediernas artiklar om laget och Bing
-// News, sidans delningsbild från den senaste veckan, inga loggor eller grafik), förminskad med ImageMagick.
+// News, sidans delningsbild från den senaste veckan, inga loggor eller grafik), förminskad med ImageMagick. Bara
+// artiklar som handlar om laget självt räknas (MIN_POANG): inte en annan klubbs sajt eller artikel, inte ett rykte.
 //
 // Bilderna sparas i källcachen (data/cache/matchbilder/), som workflowen behåller mellan körningarna, så att de
 // hämtas en gång per omgång; ett lag utan bild prövas igen efter FORSOK_TIMMAR. Ut: data/matchbilder/<fil>.jpg och
@@ -27,6 +28,11 @@ const UT_JSON = path.join(DATA, 'matchbilder.json');
 const FORSOK_TIMMAR = 6;
 // Bildernas bredd: halva matchbladet i dubbel upplösning.
 const BREDD = 800;
+// Bara artiklar som handlar om laget (poang i tidning-bilder.mjs minst 0): inte om en annan klubb, ett rykte eller
+// en minnesstund, så att bilden hellre saknas än visar fel lag (2026-11-10, efter den första hämtningen).
+const MIN_POANG = 0;
+// Byts den väljs bilderna om (cachen gäller bara samma version).
+const VERSION = 2;
 const BEHOVER = process.argv.includes('--behover');
 
 const las = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
@@ -51,7 +57,7 @@ for (const s of ps.sidor) {
 }
 
 let index = las(INDEX, null);
-if (!index || index.omgang !== omgang || !index.lag) index = { omgang, lag: {} };
+if (!index || index.omgang !== omgang || index.version !== VERSION || !index.lag) index = { omgang, version: VERSION, lag: {} };
 const now = Date.now();
 const harBild = (lag) => { const x = index.lag[lag]; return Boolean(x && x.fil && fs.existsSync(path.join(CACHE, x.fil))); };
 const nyligen = (lag) => { const x = index.lag[lag]; return Boolean(x && x.forsokt && now - Date.parse(x.forsokt) < FORSOK_TIMMAR * 36e5); };
@@ -67,7 +73,7 @@ if (saknas.length && !bildverktyg()) {
   console.log('matchbilder: varken sips eller ImageMagick finns, inga nya bilder');
 } else if (saknas.length) {
   console.log(`matchbilder: hämtar bilder för ${saknas.length} lag (omgången ${omgang})`);
-  const hittade = await veckansBilder(saknas, { mapp: CACHE, mot, kallor, bredd: BREDD, now, logg: (t) => console.log(`  ${t}`) });
+  const hittade = await veckansBilder(saknas, { mapp: CACHE, mot, kallor, bredd: BREDD, minPoang: MIN_POANG, now, logg: (t) => console.log(`  ${t}`) });
   for (const lag of saknas) index.lag[lag] = hittade.get(lag) || { forsokt: new Date(now).toISOString() };
 }
 
