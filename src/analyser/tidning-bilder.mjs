@@ -184,6 +184,8 @@ async function bbc(lag, { fetchImpl, now, rang, dagar = DAGAR }) {
     const titel = falt('title');
     const d = Date.parse(falt('pubDate'));
     const t = /<media:thumbnail\b[^>]*\burl="([^"]+)"/.exec(x);
+    // BBC Sounds och iPlayer har programmets bild, inte ett foto från veckan
+    if (/\/(sounds|iplayer)\//.test(falt('link'))) continue;
     if (!t || !Number.isFinite(d) || now - d > dagar * DAG || !namner(titel, lag) || ANDRA_LAG.test(titel) || LIVE.test(titel)) continue;
     const tl = titel.toLowerCase();
     ut.push({ bild: bbcBild(t[1]), titel, kalla: 'BBC Sport', foto: null, sida: falt('link').split('?')[0] || null, datum: new Date(d).toISOString(), poang: rang(titel) + 1, egen: !RYKTE.test(tl) && !MINNE.test(tl) });
@@ -229,7 +231,7 @@ async function franSidan(k, { fetchImpl, now, dagar = DAGAR }) {
 }
 
 // Lagets kandidater, bäst först: rubriken som handlar mest om laget, ESPN (med fotograf) före
-// sidorna, och den nyaste. Sidorna läses i den ordningen tills det finns fyra bilder att välja på.
+// sidorna, och den nyaste. Sidorna läses i den ordningen tills det finns sex bilder att välja på.
 async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg, minPoang = -Infinity, egnaBbc = false, dagar = DAGAR }) {
   const rang = (titel) => poang(titel, lag, { mot, alla });
   const opts = { fetchImpl, now, rang, dagar };
@@ -248,7 +250,7 @@ async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg
   const ut = [];
   const sett = new Set();
   for (const k of lista) {
-    if (ut.length >= 4) break;
+    if (ut.length >= 6) break;
     if (k.bild) { ut.push(k); continue; }
     if (sett.has(k.sida)) continue;
     sett.add(k.sida);
