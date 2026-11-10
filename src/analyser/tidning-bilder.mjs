@@ -27,8 +27,9 @@ export const DAGAR = 8;
 const BREDD = 320;
 const MIN_BREDD = 480;
 const DAG = 86400000;
-// Sajter vars delningsbild är en hopklippt grafik med text och sköldar, inte ett foto.
-const GRAFIK = ['footballleagueworld.co.uk', 'givemesport.com', 'thisisfutbol.com', 'teamtalk.com', 'football365.com', 'sportskeeda.com', 'footballinsider247.com', 'goal.com', 'onefootball.com', 'msn.com', 'aol.com', 'yahoo.com', 'youtube.com'];
+// Sajter vars delningsbild är en hopklippt grafik med text och sköldar, inte ett foto, och sajter som skrapar andras
+// artiklar (el-balad.com).
+const GRAFIK = ['el-balad.com', 'footballleagueworld.co.uk', 'givemesport.com', 'thisisfutbol.com', 'teamtalk.com', 'football365.com', 'sportskeeda.com', 'footballinsider247.com', 'goal.com', 'onefootball.com', 'msn.com', 'aol.com', 'yahoo.com', 'youtube.com'];
 const INTE_FOTO = /logo|placeholder|default[-_.]|fallback|badge|crest|favicon|icon[-_.]|share[-_]?image|social[-_]?(share|card)|og[-_]default|blank\./i;
 // Damlaget, akademin och ungdomslagen är inte laget i omgången.
 const ANDRA_LAG = /\b(women|ladies|wfc|academy|youth|under[- ]?(18|19|21|23)s?|u-?(18|19|21|23)s?)\b/i;
@@ -56,9 +57,29 @@ export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').to
 
 // Lagets namn i texter: söknamnen i config/news.js (Bradford City, Bradford, Bantams).
 export const namnen = (lag) => (newsCfg.names && newsCfg.names[lag]) || [lag];
+const ordRe = (n) => new RegExp(`[^a-z]${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^a-z]`);
 export function namner(text, lag) {
   const t = ` ${String(text || '').toLowerCase()} `;
-  return namnen(lag).filter((n) => n.length >= 4).some((n) => new RegExp(`[^a-z]${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^a-z]`).test(t));
+  return namnen(lag).filter((n) => n.length >= 4).some((n) => ordRe(n).test(t));
+}
+// Var i texten laget nämns först (999 om inte alls).
+const forstI = (t, lag) => Math.min(...namnen(lag).filter((n) => n.length >= 4).map((n) => { const m = ordRe(n).exec(t); return m ? m.index : 999; }));
+
+// Alla klubbarna i config/news.js. En artikel där en annan klubb står före laget i rubriken (York City smash
+// Northampton Town), eller som ligger på en annan klubbs egen sajt (fleetwoodtownfc.com om Rochdale) eller hos en
+// annan klubbs lokaltidning (readingchronicle.co.uk), handlar om den klubben, och bilden visar dess spelare.
+const KLUBBAR = Object.keys(newsCfg.names || {});
+const kompakt = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+export function annanKlubbForst(titel, lag) {
+  const t = ` ${String(titel || '').toLowerCase()} `;
+  const var_ = forstI(t, lag);
+  const egna = new Set(namnen(lag).map((n) => n.toLowerCase()));
+  return KLUBBAR.some((k) => k !== lag && !namnen(k).some((n) => egna.has(n.toLowerCase())) && forstI(t, k) < var_);
+}
+export function annanKlubbsSajt(url, lag) {
+  const h = kompakt(hostOf(url));
+  const i = (k) => namnen(k).some((n) => kompakt(n).length >= 6 && h.includes(kompakt(n)));
+  return !i(lag) && KLUBBAR.some((k) => k !== lag && i(k));
 }
 
 // Sidans delningsbild, namn och datum ur <meta> och JSON-LD.
@@ -114,8 +135,11 @@ export function poang(titel, lag, { mot = null, alla = [] } = {}) {
   if (alla.some((x) => x !== lag && x !== mot && namner(titel, x))) p -= 1;
   if (/\b(vs?\.?|versus)\b|\d+\s*-\s*\d+/.test(t)) p -= 1;
   if (/predict|preview|odds|tips\b|line-?ups?|player ratings/.test(t)) p -= 1;
-  // ett rykte om en värvning har spelaren i den andra klubbens tröja
-  if (/\b(racing|race|target(s|ing)?|eye(s|ing)?|linked|interest(ed)?|swoop|bid|chase|chasing|monitor(s|ing)?|scout(s|ed|ing)?)\b/.test(t)) p -= 1;
+  // ett rykte om en värvning eller en övergång har spelaren i den andra klubbens tröja
+  if (/\b(racing|race|target(s|ed|ing)?|eye(s|ing)?|linked|interest(ed)?|swoop|bid|chase|chasing|pursuit|rekindle[sd]?|monitor(s|ing)?|scout(s|ed|ing)?|joins|joined|signs for|january|transfer)\b/.test(t)) p -= 2;
+  // en annan klubb först i rubriken, och minnesord om en tidigare spelare
+  if (annanKlubbForst(titel, lag)) p -= 2;
+  if (/\b(tributes?|dies|died|death|funeral|passed away|obituary|rip)\b/.test(t)) p -= 2;
   return p;
 }
 
@@ -161,7 +185,7 @@ async function bing(lag, { fetchImpl, now, rang }) {
 function sidanDuger(titel, url, lag) {
   const ord = ordI(titel, url);
   const helt = /\s/.test(lag) && String(titel || '').toLowerCase().includes(lag.toLowerCase());
-  return namner(titel, lag) && (helt || FOTBOLL.test(ord)) && !sparrad(url) && !newsCfg.excludeTitle.test(ord) && !ANDRA_LAG.test(ord) && !LIVE.test(ord);
+  return namner(titel, lag) && (helt || FOTBOLL.test(ord)) && !sparrad(url) && !annanKlubbsSajt(url, lag) && !newsCfg.excludeTitle.test(ord) && !ANDRA_LAG.test(ord) && !LIVE.test(ord);
 }
 
 // En sida → kandidat med sidans delningsbild, om sidan är från veckan.
@@ -176,7 +200,7 @@ async function franSidan(k, { fetchImpl, now }) {
 
 // Lagets kandidater, bäst först: rubriken som handlar mest om laget, ESPN (med fotograf) före
 // sidorna, och den nyaste. Sidorna läses i den ordningen tills det finns fyra bilder att välja på.
-async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg }) {
+async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg, minPoang = -Infinity }) {
   const rang = (titel) => poang(titel, lag, { mot, alla });
   const opts = { fetchImpl, now, rang };
   const lista = [];
@@ -186,6 +210,8 @@ async function kandidater(lag, { espnId, kallor, mot, alla, fetchImpl, now, logg
   }
   try { lista.push(...(await bing(lag, opts))); } catch (err) { logg(`bilder: Bing för ${lag}: ${err.message}`); }
   lista.sort((a, b) => b.poang - a.poang || Boolean(b.bild) - Boolean(a.bild) || Date.parse(b.datum || 0) - Date.parse(a.datum || 0));
+  // Med minPoang (matchbladen) tas bara artiklar som handlar om laget och inte om en annan klubb, ett rykte eller en minnesstund.
+  for (let i = lista.length - 1; i >= 0; i--) if (lista[i].poang < minPoang) lista.splice(i, 1);
   const ut = [];
   const sett = new Set();
   for (const k of lista) {
@@ -272,11 +298,12 @@ async function iTur(lista, n, f) {
 
 // lagen: lagnamnen. espnId: lag → ESPN:s id (data/skoldar.json). kallor: lag → notisens källor
 // [{url, title, source, publishedAt}]. mot: lag → motståndaren i omgången. mapp: dit bilderna skrivs.
-// bredd: bildens bredd i bildpunkter (BREDD i tidningen, större i matchbladen).
+// bredd: bildens bredd i bildpunkter (BREDD i tidningen, större i matchbladen). minPoang: lägsta poäng för artikeln
+// (poang), så att en bild hellre saknas än visar fel lag.
 // → Map lag → { lag, fil, kalla, foto, sida, datum, w, h } för de lag som fick en bild
-export async function veckansBilder(lagen, { mapp, espnId = {}, kallor = {}, mot = {}, now = Date.now(), fetchImpl = globalThis.fetch, logg = () => {}, bredd = BREDD } = {}) {
+export async function veckansBilder(lagen, { mapp, espnId = {}, kallor = {}, mot = {}, now = Date.now(), fetchImpl = globalThis.fetch, logg = () => {}, bredd = BREDD, minPoang = -Infinity } = {}) {
   const unika = [...new Set(lagen.filter(Boolean))];
-  const kand = await iTur(unika, 4, (lag) => kandidater(lag, { espnId: espnId[lag], kallor: kallor[lag], mot: mot[lag] || null, alla: unika, fetchImpl, now, logg }));
+  const kand = await iTur(unika, 4, (lag) => kandidater(lag, { espnId: espnId[lag], kallor: kallor[lag], mot: mot[lag] || null, alla: unika, fetchImpl, now, logg, minPoang }));
   // bilderna i tur och ordning, så att samma bild inte hamnar hos två lag
   fs.mkdirSync(mapp, { recursive: true });
   const tagna = new Set();
