@@ -4643,6 +4643,26 @@ Chrome ritar i rätt skala). Inte mätt i den riktiga telefonen: `?rum-mat` där
 och bilden stämmer, men flytet är inte mätt där. Bakom videon nära syns trappor på kanterna av det som står längre bort: det är kvar,
 för att rita det skarpare tar flera gånger så mycket ritminne.
 
+### Spotarna i taket
+
+Användarens önskemål (2026-11-10): "spotlights på lite lämpliga ställen som lyser upp saker mjukt men bra", utan att
+det blir mycket mer grafiskt belastande. Två spotar i taket lyser på det man ska se på väggarna: orakelramen och
+pokalhyllan med Tipsligan, vars ljus också faller på disken under, där kortregistret står (`SPOT` i rum.js, `SPOTAR` i
+rum-inredning.js).
+
+- **På väggarna** är ljuset målat i väggens egen bild (`spotYta` i `bg`), som ritas en gång: inget nytt lager och inget
+  som ritas i bildrutorna, och fläcken följer väggen när kameran vrids eller går fram. Den läggs på med färgskiftning
+  (`color-dodge`), som gör väggen ljusare i sin egen färg – furan och ådringen syns i ljuset – i stället för att lägga
+  en ljus hinna över den.
+- **I 3D** finns spotarna i ljuset för alla inredningens saker (`wallLights`): guldramen, ramen kring Tipsligan,
+  paketen och disken fångar samma ljus. Sakerna ritas en gång (uret en gång i sekunden), och med samma ljus överallt
+  delar de grafikprogram, så att inga nya behöver byggas när rummet startar. Gänget, som ritas 30 gånger i sekunden,
+  har inga nya ljus.
+- **På kvällen** går mörkret i `.rum-vign` runt spotarna, som runt neonen och tv:n.
+
+Prövat i Chrome med mjukvarugrafik som dator (1440 × 900) på dagen och kvällen och som telefon: rummet byggs utan fel
+och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt ritas i dem.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är
