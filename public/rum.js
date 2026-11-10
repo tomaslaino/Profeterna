@@ -1981,10 +1981,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
   // mitten (x, y) och vridningen för den första, andra och tredje i högen
   // (askkoppen och dosan står till höger om den, i rum-saker.js: HOGEN där).
-  // Bakom högen ligger kvällstidningen, och högen ligger så långt fram att
-  // tidningens rubrik syns ovanför den; på höjden är kupongerna högre (420 ×
-  // 620), och där ligger den ännu lite längre fram (smal).
-  const HOG = { s: 0.3, at: [[1204, 852, 5], [1196, 898, -4], [1208, 944, 2]], smal: 18, skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
+  // Bakom högen ligger kvällstidningen, och högen ligger så långt fram, och
+  // kupongerna så tätt att namnen nätt och jämnt syns, att tidningens rubrik
+  // syns ovanför den; på höjden är kupongerna högre (420 × 620), och där
+  // ligger den ännu lite längre fram (smal).
+  const HOG = { s: 0.3, at: [[1204, 874, 5], [1196, 910, -4], [1208, 946, 2]], smal: 18, skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
   function slot(i) {
     const [x, y, a] = HOG.at[i % HOG.at.length];
@@ -3846,7 +3847,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // rum-affischer.js): löpsedelns papper som förstasida, så länge det finns en tidning att läsa. Den är så stor
   // att rubriken slutar ovanför kupongerna i högen (HOG): RUBRIK bildpunkter ner på papperet, före pultens
   // perspektiv, ligger den första kupongens överkant, och rubriken slutar rub ner av sedelns 140 (rum-affischer.js).
-  const RUBRIK = 156;
+  const RUBRIK = 180;
   function tidningPult() {
     const a = R.el && R.el.querySelector('#rum-kvallstidningen');
     if (!a) return;
@@ -3860,7 +3861,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     a.replaceChildren(s);
     a.setAttribute('aria-label', u.tid === 'ex' ? 'Expressen' : 'Sportbladet');
     const rub = Number(s.dataset.rub) || 112;
-    a.style.setProperty('--z', Math.min(1.55, Math.max(1.25, RUBRIK / rub)).toFixed(3));
+    a.style.setProperty('--z', Math.min(1.75, Math.max(1.4, RUBRIK / rub)).toFixed(3));
   }
   // Ett klick på kvällstidningen, eller L: före omgången hämtas notiserna och analyserna först (högst ett
   // par sekunder), så att de kommer med, och sedan lyfts den från pulten och läggs fram, som Tipsguiden.
