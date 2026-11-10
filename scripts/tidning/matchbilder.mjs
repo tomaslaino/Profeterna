@@ -33,7 +33,7 @@ const BREDD = 800;
 // en minnesstund, så att bilden hellre saknas än visar fel lag (2026-11-10, efter den första hämtningen).
 const MIN_POANG = 0;
 // Byts den väljs bilderna om (cachen gäller bara samma version).
-const VERSION = 5;
+const VERSION = 6;
 // Andra försöket för ett lag utan bild: allt i lagets eget BBC-flöde duger utom rykten och minnesord (en
 // matchrapport där motståndaren står först, cupförlusten), och artiklar upp till så här många dagar gamla.
 const ANDRA_DAGAR = 14;

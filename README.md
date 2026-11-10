@@ -7349,7 +7349,8 @@ bilder åt Wimbledon och Newport också"): då duger allt i lagets eget BBC-flö
 matchrapport där motståndaren står först, och artiklar upp till två veckor gamla. Samma bild används aldrig för två
 lag, inte heller mellan försöken, och för ett lag som blir utan står de bästa kandidaterna i loggen. BBC:s bilder tas
 i 976 bildpunkters bredd i alla adressformat (`bbcBild`: …/ace/standard/240/…, …/news/240/… och
-…/images/ic/240x135/…; det sista gav Newport en för liten bild). Bing News frågas också efter *<lag> boss* (tränaren är oftast i klubbens kläder, hos
+…/images/ic/240x135/…; det sista gav Newport en för liten bild), och BBC Sounds och iPlayer läses inte (programmets
+bild, inte ett foto). Varje lag prövar upp till sex bilder. Bing News frågas också efter *<lag> boss* (tränaren är oftast i klubbens kläder, hos
 lokaltidningen), och det gäller tidningens bilder också. Har bara det ena laget en bild står den över hela bredden med
 lagets namn. Bilden förminskas till 800
 bildpunkter med ImageMagick (på iMacen med `sips` som förut); en jämn grafik känns igen på under 0,10 byte per
@@ -7414,7 +7415,8 @@ shropshirestar.com, Substack). Sedan frågas också efter tränaren, och en ensa
 låtsasflöde: bilden i 976 bildpunkters bredd och en matchrapport i lagets eget flöde godtas). Det gav 22 av 24; AFC
 Wimbledon (inget som klarade reglerna) och Newport (BBC-bilden i fel format) blev utan. Det andra försöket och de nya
 adressformaten provades med ett låtsasnät: Newport fick sin bild i första försöket och Wimbledon i det andra, ur
-cupförlusten mot Crewe.
+cupförlusten mot Crewe. Workflowen gav sedan alla 24 lag en bild, men Newports var ett BBC Sounds-avsnitt, så de
+läses inte längre.
 
 ### Närbilderna
 
