@@ -3611,6 +3611,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return t.notiser.filter((n) => n && n.rubrik && n.text && (!n.id || ids.has(String(n.id))))
       .map((n) => ({ nr: n.nr, id: n.id, match: n.match, rubrik: n.rubrik, text: n.text, kallor: n.kallor || n.källor || [], lag: n.lag, bilder: n.bilder }));
   }
+  // data/poddsidor.json: informationssidorna ur supporterpoddarna, en per match. Hämtas med notiserna.
+  let poddData = null;
+  let poddAt = 0;
+  let poddReq = null;
+  function hamtaPoddsidor() {
+    if (poddReq && Date.now() - poddAt < 5 * 60000) return poddReq;
+    poddAt = Date.now();
+    poddReq = fetch('data/poddsidor.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+      .then((t) => { poddData = t && Array.isArray(t.sidor) ? t : null; return poddData; });
+    return poddReq;
+  }
+  // Sidorna för omgångens matcher, högst tio dagar gamla.
+  function poddsidorFor(rd) {
+    const t = poddData;
+    if (!t || !rd || !(Date.now() - Date.parse(t.uppdaterad) < NOTIS_DAGAR * 864e5)) return null;
+    const ids = new Set(rd.ids);
+    const sidor = t.sidor.filter((x) => x && ids.has(String(x.id)));
+    return sidor.length ? { amnen: t.amnen || null, sidor } : null;
+  }
   // Tipsligan: säsongens omgångar som syns (kampRounds, som skårtavlan), utan och med omgången id.
   // → { fore, efter, omg } eller null
   function tidningsLiga(id, medDen) {
@@ -3658,6 +3677,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       nr: typeof couponNumber === 'function' ? couponNumber(rd.ids) : null,
       matcher,
       notiser: notiserFor(rd),
+      poddsidor: poddsidorFor(rd),
       liga: tidningsLiga(rd.id, false),
       analys: a ? { nr: vald.nr, h: vald.h, b: vald.b, avspark: a.avspark, title: a.title, lead: a.lead, paragraphs: a.paragraphs, author: a.author, sources: a.sources,
         tip: a.tip && tecknen(a.tip.signs) ? { sign: tecknen(a.tip.signs), note: a.tip.note, text: a.tip.text } : null } : null,
@@ -3669,6 +3689,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const rd = round();
     if (!rd || rd.next) return;
     hamtaNotiser();
+    hamtaPoddsidor();
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
   // Ett klick på löpsedeln: tidningen om det finns en, annars närbilden. Före omgången hämtas notiserna
@@ -3683,7 +3704,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       sak('lopsedel');
       return;
     }
-    const vanta = Promise.all([hamtaNotiser(), typeof loadAnalyser === 'function' ? loadAnalyser() : null]);
+    const vanta = Promise.all([hamtaNotiser(), hamtaPoddsidor(), typeof loadAnalyser === 'function' ? loadAnalyser() : null]);
     const gans = new Promise((ok) => setTimeout(ok, 2500));
     R.tidningVantar = true;
     Promise.race([vanta, gans]).catch(() => {}).then(() => {

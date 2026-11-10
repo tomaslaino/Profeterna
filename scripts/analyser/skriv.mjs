@@ -48,6 +48,7 @@ import { skrivHasse, hasseKlar } from '../../src/analyser/hasse.mjs';
 import { skrivNamn, namnNyckel } from '../../src/analyser/namn.mjs';
 import { skrivKommentar } from '../../src/analyser/kommentar.mjs';
 import { skrivTidning, attSkrivaTidning } from '../../src/analyser/tidning.mjs';
+import { poddsidor } from '../../src/analyser/poddar.mjs';
 import { veckansBilder, lagenI } from '../../src/analyser/tidning-bilder.mjs';
 import { attSkriva } from '../../src/analyser/tider.mjs';
 
@@ -81,6 +82,7 @@ const FIL = {
   namn: path.join(dataDir, 'omgangsnamn.json'),
   historik: path.join(dataDir, 'kupong-historik.json'),
   tidning: path.join(dataDir, 'tidning.json'),
+  poddsidor: path.join(dataDir, 'poddsidor.json'),
 };
 
 const H = 3600000;
@@ -191,10 +193,10 @@ const fardata = (p) => hamta(`${site}/data/${p}?t=${Date.now()}`);
 
 // ---------- det som väntar på att sparas ----------
 
-const tomtVantande = () => ({ analyser: {}, hasse: {}, namn: {}, kommentarer: {}, omgang: null, tidning: null });
+const tomtVantande = () => ({ analyser: {}, hasse: {}, namn: {}, kommentarer: {}, omgang: null, tidning: null, poddsidor: null });
 let vantande = { ...tomtVantande(), ...lasJson(VANTANDE, {}) };
 const sparaVantande = () => skrivJson(VANTANDE, vantande);
-const finnsVantande = () => Boolean(vantande.omgang || vantande.tidning) || ['analyser', 'hasse', 'namn', 'kommentarer'].some((k) => Object.keys(vantande[k]).length);
+const finnsVantande = () => Boolean(vantande.omgang || vantande.tidning || vantande.poddsidor) || ['analyser', 'hasse', 'namn', 'kommentarer'].some((k) => Object.keys(vantande[k]).length);
 
 function lasAnalyser() {
   const d = lasJson(FIL.analyser, null) || {};
@@ -229,6 +231,7 @@ function laggIn() {
   }
 
   if (vantande.tidning) skrivJson(FIL.tidning, vantande.tidning);
+  if (vantande.poddsidor) skrivJson(FIL.poddsidor, vantande.poddsidor);
 
   const ids = Object.keys(vantande.kommentarer);
   if (ids.length) {
@@ -268,7 +271,7 @@ function spara(vad) {
       tillMain();
       laggIn();
       // (tidning.json finns inte förrän den första tidningen är skriven)
-      git('add', '--', ...['analyser.json', 'omgangsnamn.json', 'kupong-historik.json', 'tidning.json'].map((f) => `data/${f}`).filter((f) => fs.existsSync(path.join(ROOT, f))));
+      git('add', '--', ...['analyser.json', 'omgangsnamn.json', 'kupong-historik.json', 'tidning.json', 'poddsidor.json'].map((f) => `data/${f}`).filter((f) => fs.existsSync(path.join(ROOT, f))));
       if (git('status', '--porcelain', '--', 'data').trim()) {
         git('commit', '-q', '-m', vad);
         git('push', '-q', 'origin', 'HEAD:main');
@@ -428,6 +431,19 @@ async function tidningen(round) {
   } catch (err) {
     hanteraFel(err, nyckel, `tidningen för ${round.id}`);
   }
+}
+
+// Informationssidorna ur supporterpoddarna (scripts/tidning/poddar.mjs skriver dem varje natt):
+// läggs ut när de har ändrats. Inget anrop till Claude här.
+function poddsidorna(round) {
+  const ny = poddsidor(lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null), round);
+  if (!ny) return;
+  const nu = vantande.poddsidor || lasJson(FIL.poddsidor, null);
+  if (nu && nu.omgang === ny.omgang && JSON.stringify(nu.sidor) === JSON.stringify(ny.sidor)) return;
+  if (TORRT) { logg(`skulle lägga ut ${ny.sidor.length} informationssidor ur poddarna`); return; }
+  vantande.poddsidor = ny;
+  logg(`poddsidor: ${round.id}, ${ny.sidor.length} matcher`);
+  spara(`Supporterpoddarna inför omgången ${round.id}`);
 }
 
 async function kommentarerna() {
@@ -635,6 +651,7 @@ async function main() {
   }
 
   if (round) {
+    poddsidorna(round);
     await namnet(round);
     if (!lage.stoppad) await analyserna(round, roster);
     if (!lage.stoppad) await tidningen(round);

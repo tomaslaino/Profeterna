@@ -1744,30 +1744,54 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
                                                    tidningen inför omgången får uppgifterna i sitt underlag
 ```
 
-- **Poddarna hittas en gång per lag.** Claude får lagen och svarar med poddarnas namn (ett anrop för alla nya lag,
-  med sökningar på nätet). Namnet slås upp hos Apple Podcasts (`itunes.apple.com/search`), som ger flödets adress,
-  och podden räknas bara om flödet har ett avsnitt de senaste 28 dagarna. Ett påhittat namn faller alltså bort av sig
-  självt. Resultatet sparas i `register.json`; ett lag med podd letas upp igen efter 60 dagar, ett utan efter 7.
-  Poddar vi redan känner står i `kanda` i config/poddar.js.
+- **Poddarna hittas en gång per lag.** Först frågas Apple Podcasts (`itunes.apple.com/search`) efter lagets namn:
+  träffarna som är sport och har ett avsnitt de senaste 28 dagarna är kandidater (`appleKandidater`). Sedan får Claude
+  lagen med kandidaterna under, tio lag per anrop, och väljer supporterpoddarna bland dem eller lägger till en den
+  känner till eller söker fram. En podd räknas bara om flödet lever, så ett påhittat namn faller bort av sig självt.
+  Resultatet sparas i `register.json`; ett lag med podd letas upp igen efter 60 dagar, ett utan efter 7. Poddar vi
+  redan känner står i `kanda` i config/poddar.js. Visar ett avsnitt att podden handlar om en annan klubb (`ratt_klubb`
+  i svaret) tas den bort ur registret.
 - **Veckans avsnitt:** högst sex dagar gammalt och minst tolv minuter långt. Nämner rubriken motståndaren är det
   förhandssnacket och går först, annars det nyaste. Ett nytt avsnitt per lag och natt.
 - **Utskriften:** `curl` hämtar ljudet, `ffmpeg` tar de första 60 minuterna och `whisper-cli` (whisper.cpp, modellen
   `ggml-large-v3-turbo-q5_0`) skriver ut dem, med lagens och spelarnas namn som ledtråd så att de stavas rätt. Ljudet
   tas bort direkt. Ett avsnitt tar 5–10 minuter på iMacen (M1), en hel omgång några timmar.
-- **Det mest intressanta:** Claude får utskriften, ett stycke per minut, och tar ut högst fyra uppgifter som kan ändra
-  hur man ser på matchen – skador som inte är officiella, väntade byten, hur laget egentligen spelar, tränarens
-  ställning, oro i klubben – var och en med slag (*bekräftat*, *hört i podden*, *supportrarnas åsikt*), minut och vikt
-  1–5. Referat, tabelläge och småprat ska inte med, och en tom lista är ett godkänt svar.
-- **Kontrollen:** varje uppgift ska ha ett ordagrant citat på 8–20 ord som går att hitta i utskriften (`citatStar`),
-  annars stryks den. Tipsord stryks också. Citaten trycks inte.
-- **Tidningen** får de bästa uppgifterna per lag (vikt 3 eller mer, högst fyra per lag ur de två senaste avsnitten)
-  under *ur supporterpoddarna* i sitt underlag. Prompten säger att den mest intressanta ska bära notisen, med
-  *enligt supporterpodden …*, och avsnittet står bland källorna. Har det kommit nya uppgifter sedan sidan skrevs
-  skrivs den om vid nästa kontroll (`poddTimmar` i config/tidning.js, högst var sjätte timme).
+- **Uppgifterna:** Claude får utskriften, ett stycke per minut, och tar ut allt som är intressant inför matchen, högst
+  tolv uppgifter per avsnitt. Var och en har ett ämne (*skador och trupp*, *väntad uppställning*, *så spelar laget*,
+  *tränaren och klubben*, *inför matchen*), ett slag (*bekräftat*, *hört i podden*, *supportrarnas åsikt*), minut,
+  vikt 1–5, ett ordagrant citat ur utskriften, citatet på svenska (`sagt`) och vem som säger det (`vem`) när det
+  framgår. Referat, tabelläge och småprat ska inte med, och en tom lista är ett godkänt svar.
+- **Kontrollen:** citatet på 8–30 ord ska gå att hitta i utskriften (`citatStar`), annars stryks uppgiften. Tipsord
+  stryks också. Namnet på den som talar följer bara med om det står i utskriften (`vemStar`); maskinen skiljer inte
+  på rösterna, så oftast står bara poddens namn under citatet.
+- **Informationssidan per match** (användarens önskan 2026-11-10: *längre informationssidor per match som man kan
+  hämta kunskap ur*, med citat och vem som säger det): när uppgifterna för en match har ändrats får Claude båda lagens
+  uppgifter (vikt 3 eller mer, ur lagets tre senaste avsnitt) och redigerar sidan, utan verktyg (`skrivSida`): väljer
+  högst nio punkter per lag, slår ihop det som sägs två gånger, grupperar under ämnena och skriver rubrik och ingress.
+  Varje punkt måste peka på uppgifter som finns (`ur`), och slaget, podden och citatet tas därifrån, inte ur svaret.
+  En text, rubrik eller ingress med tipsord eller tal som inte står i uppgifterna stryks: punkten får då uppgiftens
+  egen text och sidan en rubrik ur mallen. Högst fem citat per lag trycks, de tyngsta punkternas. Går svaret inte att
+  läsa står uppgifterna som de är, grupperade (`sidaUtan`), och sidan redigeras nästa natt. Inga tips.
+- **Ut på sajten:** analysjobbet (scripts/analyser/skriv.mjs, var 15:e minut) lägger sidorna i `data/poddsidor.json`
+  när de har ändrats, utan något anrop till Claude. Tidningen i rummet visar dem under *Supporterpoddarna*, en sida per
+  match (se [Tidningen](#tidningen)).
+- **Notiserna** (*Så mår tipslagen*) får fortfarande de bästa uppgifterna per lag (högst fyra) under *ur
+  supporterpoddarna* i sitt underlag, och den mest intressanta ska bära notisen, med *enligt supporterpodden …*.
+  Har det kommit nya uppgifter sedan sidan skrevs skrivs den om vid nästa kontroll (`poddTimmar` i config/tidning.js,
+  högst var sjätte timme).
+
+```json
+{ "omgang": "…", "uppdaterad": "…", "amnen": { "trupp": "Skador och trupp" },
+  "sidor": [ { "id": "401880745", "nr": 3, "match": "Stockport County – Reading", "lag": ["…", "…"], "rubrik": "…",
+               "ingress": "…", "delar": [ { "lag": "…", "kallor": [ { "podd": "…", "avsnitt": "…", "datum": "…", "adress": "…" } ],
+                 "grupper": [ { "amne": "trupp", "punkter": [ { "t": "…", "s": "b", "podd": ["…"],
+                                "citat": { "sagt": "…", "vem": null, "podd": "…" } } ] } ] } ] } ] }
+```
 
 Allt ligger utanför repot, i `~/Library/Application Support/Matchfixarna/Tidning/`: `register.json`, `omgang.json`
-(omgångens avsnitt och uppgifter), `utskrifter/` (tas bort efter tre veckor) och modellen. Ljudet och utskrifterna
-är andras och läggs aldrig i repot eller på sajten; dit kommer bara tidningens egna meningar och poddens namn.
+(omgångens avsnitt, uppgifter och sidor), `utskrifter/` (tas bort efter tre veckor) och modellen. Ljudet och utskrifterna
+är andras och läggs aldrig i repot eller på sajten; dit kommer tidningens egna meningar, poddens namn och korta citat
+i svensk översättning, med podden som källa.
 Jobbet rör aldrig git och går som allt annat på Claude-kontot, inte med API-nycklar. Loggen:
 `~/Library/Logs/Matchfixarna/poddar.log`. Installera med `scripts/tidning/installera.sh` (kräver
 `brew install whisper-cpp` och modellen i mappen).
@@ -1776,6 +1800,8 @@ Jobbet rör aldrig git och går som allt annat på Claude-kontot, inte med API-n
 node scripts/tidning/poddar.mjs --torrt     vilka avsnitt som skulle skrivas ut
 node scripts/tidning/poddar.mjs --visa      det som är uttaget för omgången
 node scripts/tidning/poddar.mjs --lag "Reading" --mot "Stockport County"     ett lag på prov (prov.json)
+node scripts/tidning/poddar.mjs --prov 401880745,401880747     en påhittad omgång av sajtens matcher (prov.json)
+node scripts/tidning/poddar.mjs --sidor     skriver bara om informationssidorna
 ```
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
@@ -6512,6 +6538,12 @@ rum.js).
   när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
   anfang och utan källhänvisningarna i klamrar, och i en ruta hans tecken, marginalen och motiveringen. Källorna står
   sist.
+- *Supporterpoddarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna* under
+  [Analyserna](#analyserna)), i kupongens ordning: rubrik och ingress, hemmalaget till vänster och bortalaget till
+  höger med poddarna de bygger på, och punkterna under sina ämnen. Varje punkt har slaget som stämpel (*Bekräftat* i
+  svart, *Hört i podden* i rött, *Supportrarnas åsikt* streckad), och de tyngsta har citatet under, med den som säger
+  det och podden. Har bara det ena laget något får det hela bredden i två spalter. Slagen förklaras i sidfoten.
+  *I tidningen* pekar på den första av sidorna.
 
 Notiserna och analyserna hämtas när man pekar på eller trycker på löpsedeln, och klicket väntar på dem i högst två och en
 halv sekund. Mellan omgångarna (ingen omgång, bara de närmaste matcherna) finns ingen tidning, och då går kameran fram

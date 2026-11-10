@@ -15,6 +15,9 @@
 //   node scripts/tidning/poddar.mjs --visa               visar det som är uttaget för omgången
 //   node scripts/tidning/poddar.mjs --lag "Reading" --mot "Stockport County"
 //                                                        ett lag på prov (sparas i prov.json)
+//   node scripts/tidning/poddar.mjs --prov 401880745,401880747
+//                                                        en påhittad omgång av sajtens matcher (prov.json)
+//   node scripts/tidning/poddar.mjs --sidor              skriver bara om informationssidorna
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -23,7 +26,7 @@ import path from 'node:path';
 import pc from '../../config/poddar.js';
 import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
-import { fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag } from '../../src/analyser/poddar.mjs';
+import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
 
 const ARGV = process.argv.slice(2);
 const flagga = (n) => ARGV.includes(n);
@@ -32,12 +35,15 @@ const TORRT = flagga('--torrt');
 const VISA = flagga('--visa');
 const ETT_LAG = varde('--lag');
 const MOT = varde('--mot');
+const PROV = varde('--prov');
+const BARA_SIDOR = flagga('--sidor');
+const FIL_UT = varde('--fil');
 
 const HEM = os.homedir();
 const MAPP = process.env.PODDAR_MAPP || path.join(HEM, 'Library', 'Application Support', 'Matchfixarna', pc.mapp);
 const LOGG = path.join(HEM, 'Library', 'Logs', 'Matchfixarna', 'poddar.log');
 const REGISTER = path.join(MAPP, 'register.json');
-const OMGANG = path.join(MAPP, ETT_LAG ? 'prov.json' : 'omgang.json');
+const OMGANG = path.join(MAPP, FIL_UT || (ETT_LAG || PROV ? 'prov.json' : 'omgang.json'));
 const LAS = path.join(MAPP, 'las');
 const DAG = 86400000;
 const site = String(process.env.ANALYSER_SAJT || kupongCfg.site).replace(/\/+$/, '');
@@ -95,7 +101,7 @@ async function omgangensLag(round) {
     if (par.length !== 2) continue;
     const trupp = (s) => (d && d.squads && d.squads[s] && Array.isArray(d.squads[s].players) ? d.squads[s].players.map((p) => p && p.name).filter(Boolean) : []);
     const spelare = [...trupp('home'), ...trupp('away')];
-    ut.push({ lag: par[0], mot: par[1], avspark: x.avspark, spelare }, { lag: par[1], mot: par[0], avspark: x.avspark, spelare });
+    ut.push({ lag: par[0], mot: par[1], avspark: x.avspark, spelare, match: String(x.id) }, { lag: par[1], mot: par[0], avspark: x.avspark, spelare, match: String(x.id) });
   }
   return ut;
 }
@@ -106,20 +112,27 @@ async function fyllRegistret(register, lagen) {
   if (!nya.length) return;
   if (TORRT) { logg(`skulle leta upp poddar för ${nya.join(', ')}`); return; }
   const okanda = nya.filter((l) => !pc.kanda[l]);
-  let svar = {};
+  const svar = {};
+  const kandidater = {};
   if (okanda.length) {
     logg(`letar poddar för ${okanda.length} lag`);
-    try {
-      svar = await fragaEfterPoddar(okanda);
-    } catch (err) {
-      if (err instanceof Stopp) throw err;
-      logg(`poddarna gick inte att leta upp: ${err.message}`);
-      return;
+    for (const lag of okanda) kandidater[lag] = await appleKandidater(lag).catch(() => []);
+    // Några lag i taget, så att vart och ett blir ordentligt genomgånget.
+    for (let i = 0; i < okanda.length; i += pc.letaPerAnrop) {
+      const del = okanda.slice(i, i + pc.letaPerAnrop);
+      try {
+        Object.assign(svar, await fragaEfterPoddar(del, { kandidater }));
+      } catch (err) {
+        if (err instanceof Stopp) throw err;
+        logg(`poddarna gick inte att leta upp (${del.join(', ')}): ${err.message}`);
+      }
     }
   }
   for (const lag of nya) {
+    // Gick frågan inte att ställa letas laget upp igen nästa natt.
+    if (!pc.kanda[lag] && !svar[lag]) continue;
     const namn = pc.kanda[lag] || svar[lag] || [];
-    const poddar = await levandePoddar(namn, { logg });
+    const poddar = await levandePoddar(namn, { logg, kandidater: kandidater[lag] || [] });
     // Ett lag som hade en podd behåller den om ingen ny hittas (flödet kan ha varit nere).
     const gamla = (register[lag] && register[lag].poddar) || [];
     register[lag] = { poddar: poddar.length ? poddar : gamla, kollad: new Date().toISOString() };
@@ -149,6 +162,36 @@ function visa(fil) {
     const t = poddUnderlag(fil, lag);
     if (!t.length) console.log('  → inget till tidningen');
   }
+  for (const s of Object.values(fil.sidor || {})) {
+    console.log(`\n=== ${s.match}${s.redigerad ? '' : ' (oredigerad)'}\n${s.rubrik || '(ingen rubrik)'}\n${s.ingress || ''}`);
+    for (const d of s.delar) {
+      console.log(`\n  ${d.lag}${d.kallor.length ? ` – ${d.kallor.map((k) => `${k.podd} (${k.datum})`).join(', ')}` : ' – ingen podd den här veckan'}`);
+      for (const g of d.grupper) {
+        console.log(`   ${pc.amnen[g.amne]}`);
+        for (const p of g.punkter) console.log(`    [${p.s}] ${p.t}${p.citat ? `\n        ”${p.citat.sagt}” (${p.citat.vem || 'i podden'})` : ''}`);
+      }
+    }
+  }
+}
+
+// Informationssidorna: en per match där något lag har uppgifter. Skrivs om när uppgifterna ändras.
+async function sidorna(fil, matcher) {
+  fil.sidor = fil.sidor || {};
+  let n = 0;
+  for (const m of matcher) {
+    const nyckel = sidNyckel(sidansUnderlag(fil, m.lagen));
+    const nu = fil.sidor[m.id];
+    if (nu && nu.nyckel === nyckel && nu.redigerad) continue;
+    if (TORRT) { logg(`skulle skriva sidan ${m.lagen.join(' – ')}`); continue; }
+    const s = await skrivSida(fil, m.lagen, { avspark: m.avspark, logg });
+    if (!s) { delete fil.sidor[m.id]; continue; }
+    fil.sidor[m.id] = { id: m.id, match: m.lagen.join(' – '), lag: m.lagen, avspark: m.avspark, skriven: new Date().toISOString(), ...s };
+    fil.uppdaterad = new Date().toISOString();
+    skrivJson(OMGANG, fil);
+    n++;
+    logg(`sidan ${m.lagen.join(' – ')}: ${s.delar.map((d) => d.grupper.reduce((a, g) => a + g.punkter.length, 0)).join(' + ')} punkter${s.redigerad ? '' : ', oredigerad'} (${s.sekunder} s)`);
+  }
+  return n;
 }
 
 async function main() {
@@ -161,7 +204,17 @@ async function main() {
   let round = null;
   let lagen;
   if (ETT_LAG) {
-    lagen = [{ lag: ETT_LAG, mot: MOT, avspark: null, spelare: [] }];
+    lagen = [{ lag: ETT_LAG, mot: MOT, avspark: null, spelare: [], match: 'prov' }];
+  } else if (PROV) {
+    const ids = PROV.split(',').map((x) => x.trim()).filter(Boolean);
+    const matcher = [];
+    for (const id of ids) {
+      const d = await hamta(`${site}/data/match/${id}.json?t=${Date.now()}`);
+      if (!d || !d.match) { logg(`matchen ${id} finns inte på sajten`); continue; }
+      matcher.push({ id, match: `${d.match.home} – ${d.match.away}`, avspark: new Date(d.match.kickoff).toISOString() });
+    }
+    round = { id: `prov:${ids.join(',')}`, matcher };
+    lagen = await omgangensLag(round);
   } else {
     const j = await hamta(`${samtalUrl}?t=${Date.now()}`);
     round = j && j.ok && j.samtal && Array.isArray(j.samtal.matcher) && j.samtal.matcher.length ? j.samtal : null;
@@ -182,11 +235,16 @@ async function main() {
 
   const id = round ? round.id : `prov:${ETT_LAG}`;
   let fil = lasJson(OMGANG, null);
-  if (!fil || fil.omgang !== id) fil = { omgang: id, uppdaterad: null, lag: {} };
+  if (!fil || fil.omgang !== id) fil = { omgang: id, uppdaterad: null, lag: {}, sidor: {} };
+  // Matcherna som får en sida: [{id, lagen: [hemma, borta], avspark}]
+  const matcher = [...new Map(lagen.map((l) => [l.match, l])).keys()].map((m) => {
+    const par = lagen.filter((l) => l.match === m);
+    return { id: m, lagen: par.length === 2 ? [par[0].lag, par[1].lag] : [par[0].lag, par[0].mot].filter(Boolean), avspark: par[0].avspark };
+  });
 
   let gjorda = 0;
   let nya = 0;
-  for (const l of lagen) {
+  for (const l of BARA_SIDOR ? [] : lagen) {
     const poddar = (register[l.lag] && register[l.lag].poddar) || [];
     if (!poddar.length) continue;
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
@@ -210,6 +268,12 @@ async function main() {
         for (let i = 0; annanUtskrift() && i < 30; i++) await new Promise((ok) => setTimeout(ok, 60000));
         const utskrift = await skrivUt(a, { mapp: MAPP, ledtrad: whisperLedtrad(l.lag, l.mot, l.spelare), logg });
         const u = await taUt(a, utskrift, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare });
+        if (!u.rattKlubb) {
+          // Fel podd i registret (en annan klubb med liknande namn): den tas bort och laget letas upp igen om en vecka.
+          logg(`${l.lag}: ${a.podd} handlar om en annan klubb (${u.handlarOm || '–'}) och tas bort ur registret`);
+          if (register[l.lag]) { register[l.lag].poddar = register[l.lag].poddar.filter((p) => p.namn !== a.podd); skrivJson(REGISTER, register); }
+          u.uppgifter = [];
+        }
         post.avsnitt = post.avsnitt.filter((x) => x.id !== a.id);
         post.avsnitt.push({ id: a.id, podd: a.podd, titel: a.titel, datum: a.datum, sida: a.sida, apple: a.apple || null, version: pc.promptVersion, uttaget: new Date().toISOString(), handlarOm: u.handlarOm, uppgifter: u.uppgifter });
         nya += u.uppgifter.length;
@@ -222,8 +286,15 @@ async function main() {
       }
     }
   }
-  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter`);
-  if (ETT_LAG && !TORRT) visa(fil);
+  let sidor = 0;
+  try {
+    sidor = await sidorna(fil, matcher);
+  } catch (err) {
+    if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
+    throw err;
+  }
+  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter, ${sidor} sidor`);
+  if ((ETT_LAG || PROV) && !TORRT) visa(fil);
 }
 
 main().catch((err) => {
