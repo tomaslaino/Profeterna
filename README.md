@@ -1804,6 +1804,22 @@ node scripts/tidning/poddar.mjs --prov 401880745,401880747     en påhittad omg�
 node scripts/tidning/poddar.mjs --sidor     skriver bara om informationssidorna
 ```
 
+**Provet 2026-11-10**: en påhittad omgång av lördagen den 14 novembers 13 matcher i League One och League Two
+(26 lag, 22 av dem nya), körd två gånger i följd. 19 avsnitt skrevs ut, 179 uppgifter togs ut och 12 av 13 matcher
+fick en sida (Bristol Rovers–Chesterfield blev utan: Rovers podd hade inget avsnitt den veckan och Chesterfields
+handlade inte om laget). Det provet visade och det som ändrades:
+- Ett enda anrop för 22 lag gav ingen podd för nio av dem. Nu får Claude Apples träffar per lag och tio lag per
+  anrop, och de 85 lag som har en känd podd står i `kanda` i config/poddar.js.
+- En podd med rätt namn kan vara fel podd (*Across the Pitch* var japansk, inte Accringtons). `ratt_klubb` i
+  uttaget stryker en sådan ur registret; den raden är borttagen ur `kanda`.
+- Flera poddar i de lägre serierna kommer ungefär en gång i månaden (Barnsley, MK Dons, Rochdale, Bristol Rovers).
+  De lagen står då utan del på sidan, och sidan ställs upp för ett lag.
+- Ingressen ströks för räkneord som *fyra* och *sex* (redaktören räknar ihop spelare). Små räkneord i bokstäver
+  släpps nu; siffror kontrolleras som förut.
+- Rubriken gjorde gammalt till nytt (en tränare som lämnade i juni). Anvisningarna säger nu att bara det som gäller
+  laget och matchen får med, och att gammalt inte får bli nyhet.
+- Namn under citatet kom med i ungefär vart fjärde citat (utskriften skiljer inte på rösterna); annars står podden.
+
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
 finslipa för sig; ändringar på `main` gäller från nästa körning. Ska redan skrivna analyser av

@@ -173,9 +173,11 @@ export async function levandePoddar(namnLista, { now = Date.now(), logg = () => 
   return ut;
 }
 
-// Ska laget letas upp (igen)? post: registrets rad för laget.
-export function skaLetas(post, now = Date.now()) {
+// Ska laget letas upp (igen)? post: registrets rad för laget. kanda: lagets poddar i
+// config/poddar.js; har de ändrats sedan raden skrevs gäller de nya genast.
+export function skaLetas(post, now = Date.now(), kanda = null) {
   if (!post || !post.kollad) return true;
+  if (kanda && JSON.stringify(kanda) !== JSON.stringify(post.kanda || null)) return true;
   const dagar = (post.poddar || []).length ? pc.letaOmDagar.med : pc.letaOmDagar.utan;
   return now - Date.parse(post.kollad) > dagar * DAG;
 }
@@ -397,6 +399,8 @@ export function sidaUtan(underlag, lagen) {
   };
 }
 
+const RAKNEORD = /^(två|tre|fyra|fem|sex|sju|åtta|nio|tio|elva|tolv)$/i;
+
 // Redaktörens svar → sidan. Varje punkt måste bygga på uppgifter som finns för laget;
 // en text med nya tal eller tipsord byts mot uppgiftens egen. → sidan, eller null.
 export function sidaAv(content, underlag, lagen) {
@@ -408,7 +412,8 @@ export function sidaAv(content, underlag, lagen) {
   const text = (v, flest, vad) => {
     const t = typeof v === 'string' ? v.trim() : '';
     const tips = t.match(TIPS_RE);
-    const tal = unknownNumbers([t], [allt, lagen.join(' ')]);
+    // Redaktören får räkna ihop (”fyra spelare borta”): små räkneord i bokstäver släpps.
+    const tal = unknownNumbers([t], [allt, lagen.join(' ')]).filter((x) => !RAKNEORD.test(String(x)));
     const why = !t ? 'saknas' : antalOrd(t) > flest ? `${antalOrd(t)} ord` : tips ? `tipsord (${tips[0]})` : tal.length ? `okända tal (${tal.join(', ')})` : null;
     if (why) fel.push(`${vad}: ${why}`);
     return why ? null : t;

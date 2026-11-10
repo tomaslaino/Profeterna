@@ -108,7 +108,7 @@ async function omgangensLag(round) {
 
 // Registret fylls på för lagen som saknas eller är gamla: ett anrop till Claude för alla.
 async function fyllRegistret(register, lagen) {
-  const nya = lagen.filter((l) => skaLetas(register[l]));
+  const nya = lagen.filter((l) => skaLetas(register[l], Date.now(), pc.kanda[l] || null));
   if (!nya.length) return;
   if (TORRT) { logg(`skulle leta upp poddar för ${nya.join(', ')}`); return; }
   const okanda = nya.filter((l) => !pc.kanda[l]);
@@ -135,7 +135,7 @@ async function fyllRegistret(register, lagen) {
     const poddar = await levandePoddar(namn, { logg, kandidater: kandidater[lag] || [] });
     // Ett lag som hade en podd behåller den om ingen ny hittas (flödet kan ha varit nere).
     const gamla = (register[lag] && register[lag].poddar) || [];
-    register[lag] = { poddar: poddar.length ? poddar : gamla, kollad: new Date().toISOString() };
+    register[lag] = { poddar: poddar.length ? poddar : gamla, kollad: new Date().toISOString(), ...(pc.kanda[lag] ? { kanda: pc.kanda[lag] } : {}) };
     logg(`${lag}: ${poddar.length ? poddar.map((p) => p.namn).join(', ') : `ingen podd hittad${namn.length ? ` (${namn.join(', ')})` : ''}`}`);
     skrivJson(REGISTER, register);
   }
