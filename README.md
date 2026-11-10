@@ -787,6 +787,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   på AM. Tejpen har fått större handstil, och varje namn står över sin frekvens; ett tryck på ett namn går dit.
   Bladet är mindre och sitter fritt från antennen, med allt i en spalt: FM med sin rubrik överst, AM under, och
   frekvenserna rakt under varandra. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Bladet vid radion sitter ordentligt uppsatt (2026-11-10, användarens önskemål):** "det här pappret ser lite
+  underligt uppsatt ut - kan du ordna det på ett snyggt och bra sätt". Bladet gick en bit in över fönsterkarmens kant,
+  nådde ned till fönsterbänken, hade ett nedre hörn som rullade sig och tejp som stack ut snett från hörnen. Nu sitter
+  det helt på väggen mellan karmen och veckans löpsedel, en bit ovanför bänken och lite mindre (23 × 29 i stället för
+  27 × 34), hänger rakt och ligger nästan plant, med två korta tejpbitar över överkanten. Se
+  [Tobaksaffären](#tobaksaffären), *Radion*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -3364,10 +3370,12 @@ Web Audio). Stationerna står för hand på maskeringstejpen vid skalan (FM ovan
 namn mitt över sin frekvens, närmast skalan, och bara när grannen står för nära i raden längre ut, med ett streck
 ned till frekvensen (`tejpPlats`). Ett tryck på ett namn går dit, byter band om det behövs och sätter på radion
 (`radioEtikett` i rum-3d.js, som hittar namnet under fingret). Frekvenserna står på ett blad ur ett litet
-spiralblock som är tejpat på fönsterkarmen till höger om radion, mellan radion och veckans löpsedel (`radiolapp` i
-rum-inredning.js, en egen duk i bakväggens plan, så att det sitter fast på karmen när rummet vrids). Bladet är i
-3D: rivet ur spiralen med halva hål, blå linjer och röd marginal, vikt en gång, två bitar gulnad tejp överst, och
-nedtill släpper det från karmen (mest i hörnet) med en skugga under. Papperet har samma struktur som allt papper
+spiralblock som är tejpat på väggen till höger om radion (`radiolapp` i rum-inredning.js, en egen duk i bakväggens
+plan, så att det sitter fast på väggen när rummet vrids). Det sitter helt i väggremsan mellan fönsterkarmen och
+veckans löpsedel, med luft till båda och en bit ovanför fönsterbänken, så att det inte går över karmens kant eller
+ned till bänken (`LAPP`). Bladet är i 3D: rivet ur spiralen med halva hål, blå linjer och röd marginal och vikt en
+gång. Det hänger rakt, med två korta bitar gulnad tejp över överkanten en bit in från hörnen, och ligger nästan
+plant mot väggen: nedtill står det ut en aning, med en tät skugga. Papperet har samma struktur som allt papper
 på sajten (rum/papper.webp), fibrer och en kaffering, och mörknar med rummet när lysröret släcks. Bladet är lagom
 för tio stationer och sitter fritt från antennen. Allt står i en spalt, en rad per linje: *FM MHz* med ett streck
 under och FM-stationerna i blått, en tom rad, och *AM kHz* med AM-stationerna i rött, med samma pennor som på tejpen.
