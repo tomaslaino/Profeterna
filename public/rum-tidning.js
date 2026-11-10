@@ -144,6 +144,13 @@
       // Slaget h är källans egen uppgift: poddens, forumets, de insatta mediernas eller flera av dem.
       egen: { podd: 'Hört i podden', forum: 'Från forumet', media: 'Enligt insatta', blandat: 'Hört bland supportrarna' },
       amnen: { trupp: 'Skador och trupp', elva: 'Väntad uppställning', spel: 'Så spelar laget', klubb: 'Tränaren och klubben', match: 'Inför matchen' },
+      // Ämnet med ett ord, i spalten till vänster om punkterna.
+      kort: { trupp: 'Truppen', elva: 'Elvan', spel: 'Spelet', klubb: 'Klubben', match: 'Matchen' },
+      // Markören framför punkten, och nyckeln under sidan.
+      nyckel: { b: 'Bekräftat', h: 'Egen uppgift eller rykte', o: 'Åsikt' },
+      // Källans slag i raden under laget: Ur podden …, forumet … och (de insatta) bara namnet.
+      typord: { podd: 'podden', forum: 'forumet', media: '' },
+      och: 'och',
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
       ur: (l) => `Ur ${l}`,
       ingen: 'Ingen supporterpodd, inget forum och inget från de insatta att hämta något ur den här veckan.',
@@ -154,6 +161,7 @@
         forum: 'det supportrarna på forumet själva har sett och hört, och rykten.',
         media: 'det skribenter som följer laget varje vecka – fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar – själva har tagit reda på, och rykten.',
         blandat: 'det flera av källorna tar upp: egna uppgifter och rykten.',
+        h: 'det poddarna, forumen och de insatta själva har sett, hört eller tagit reda på, och rykten.',
         o: 'vad de som följer laget varje vecka tycker och hoppas.',
       },
       // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan
@@ -385,44 +393,110 @@
   }
 
   // Supporterpoddarna: en informationssida per match (data/poddsidor.json, skrivna på iMacen av
-  // scripts/tidning/poddar.mjs). Hemmalaget till vänster och bortalaget till höger, uppgifterna under
-  // sina ämnen, var och en med slaget som stämpel och, för de tyngsta, vad som sades och av vem.
+  // scripts/tidning/poddar.mjs). Hemmalaget till vänster och bortalaget till höger. Användarens önskemål
+  // 2026-11-10: "betydligt mer organiserat/snyggt och överblickbart … kortfattad och snygg information", med
+  // datum på referenserna. Under laget står källorna med sina datum (Ur podden SK3 TV (9 nov) och forumet …),
+  // sedan ämnena med ett ord i en smal spalt till vänster och punkterna till höger, var och en med en liten
+  // markör för slaget (nyckeln står under sidan). Källan och datumet står vid punkten bara när laget har flera
+  // källor, eller när punkten har ett eget datum som inte syns i raden (ett foruminlägg). Hela sidan har högst
+  // ett citat, det bästa, under laget det gäller. Helgarderat (helgarderat.js) ställer upp sidorna likadant med
+  // poddLaget, poddCitat och poddUr härifrån.
   const fKort = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', day: 'numeric', month: 'short' });
   const kortDatum = (d) => (Number.isFinite(Date.parse(d)) ? fKort.format(new Date(d)).replace('.', '') : '');
   // "The Tilehurst End - A Reading FC Podcast" → "The Tilehurst End"
   const poddNamn = (n) => String(n || '').split(/\s+[-–|:]\s+/)[0].trim() || String(n || '');
+  const iso = (d) => (typeof d === 'string' && /^\d{4}-\d\d-\d\d/.test(d) ? d.slice(0, 10) : '');
+  // ['2026-11-02', '2026-11-09'] → "2 och 9 nov", ['2026-10-28', '2026-11-03'] → "28 okt och 3 nov"
+  function datumen(l0) {
+    const d = [...new Set([].concat(l0).map(iso).filter(Boolean))].sort().map(kortDatum).filter(Boolean);
+    const man = d.map((x) => x.split(' ')[1]);
+    return lista(man.every((m) => m === man[0]) ? d.map((x, i) => (i < d.length - 1 ? x.split(' ')[0] : x)) : d);
+  }
+  const kallansNamn = (k) => (k.typ === 'podd' ? poddNamn(k.podd) : String(k.podd || ''));
+  // Lagets källor och punkter. → { kallor: [{podd, typ, adress, datum: [...]}], rader: [{amne, punkter: [{t, s, ref}]}] }
+  // Samma podd, forum eller insatta medium står en gång, med alla sina datum (två avsnitt: 2 och 9 nov).
+  function poddLaget(d) {
+    // i underlagets ordning (poddarna, forumet, de insatta), och länken till det senaste
+    const kallor = [];
+    for (const k of ((d && d.kallor) || []).filter((y) => y && y.podd)) {
+      const typ = ['forum', 'media'].includes(k.typ) ? k.typ : 'podd';
+      let x = kallor.find((y) => y.typ === typ && y.podd === k.podd);
+      if (!x) kallor.push((x = { podd: k.podd, typ, adress: null, datum: [], senast: '' }));
+      const dt = iso(k.datum);
+      if (dt && !x.datum.includes(dt)) x.datum = [...x.datum, dt].sort();
+      if (k.adress && (!x.adress || dt >= x.senast)) x.adress = k.adress;
+      if (dt > x.senast) x.senast = dt;
+    }
+    const flera = kallor.length > 1;
+    // Punktens datum: punktens eget (nattjobbet sparar det från 2026-11-10: foruminläggets dag, avsnittets,
+    // artikelns), annars källans när den bara har ett.
+    const ref = (p) => {
+      const namn = [].concat(p.podd || []).filter(Boolean);
+      const egna = Array.isArray(p.datum) ? p.datum : namn.map(() => p.datum);
+      return lista(namn.map((n, i) => {
+        const k = kallor.find((y) => y.podd === n);
+        const eget = iso(egna[i]);
+        if (!flera) return eget && k && (k.datum.length > 1 || !k.datum.includes(eget)) ? kortDatum(eget) : '';
+        const dt = eget || (k && k.datum.length === 1 ? k.datum[0] : '');
+        return [k ? kallansNamn(k) : poddNamn(n), kortDatum(dt)].filter(Boolean).join('\u00a0');
+      }).filter(Boolean));
+    };
+    const rader = ((d && d.grupper) || []).map((g) => ({
+      amne: g.amne,
+      punkter: (g.punkter || []).filter((p) => p && p.t).map((p) => ({ t: p.t, s: TEXT.poddar.slag[p.s] ? p.s : 'h', ref: ref(p) })),
+    })).filter((r) => r.punkter.length);
+    return { kallor, rader };
+  }
+  // Källorna som en rad under laget: Ur podden SK3 TV (9 nov) och forumet Owlstalk (10 nov). lank: med länkar.
+  function poddUr(kallor, lank = false) {
+    const T = TEXT.poddar;
+    if (!kallor.length) return '';
+    return esc(T.ur('\u0001')).replace('\u0001', lista(kallor.map((k) => {
+      const namn = esc(kallansNamn(k));
+      const a = lank && k.adress ? `<a href="${esc(k.adress)}" target="_blank" rel="noopener">${namn}</a>` : namn;
+      return `${T.typord[k.typ] ? `${esc(T.typord[k.typ])} ` : ''}${a}${k.datum.length ? ` (${esc(datumen(k.datum))})` : ''}`;
+    })));
+  }
+  // Sidans enda citat: helst om truppen eller elvan, sedan med ett namn, och inte för långt eller för kort. Lika
+  // bra: det som står först, alltså det tyngsta.
+  // → { i (lagets plats), sagt, vem } eller null
+  function poddCitat(delar) {
+    const l = [];
+    (delar || []).forEach((d, i) => {
+      for (const g of (d && d.grupper) || []) for (const p of g.punkter || []) if (p && p.t && p.citat && p.citat.sagt) l.push({ i, d, amne: g.amne, p, c: p.citat });
+    });
+    const poang = (x) => (['trupp', 'elva'].includes(x.amne) ? 2 : 0) + (x.c.vem ? 1 : 0) - (x.c.sagt.length > 170 ? 4 : 0) - (x.c.sagt.length < 45 ? 2 : 0);
+    const x = l.map((y, n) => ({ ...y, n })).sort((a, b) => poang(b) - poang(a) || a.n - b.n)[0];
+    if (!x) return null;
+    const k = poddLaget(x.d).kallor.find((y) => y.podd === x.c.podd);
+    const namn = [].concat(x.p.podd || []);
+    const eget = iso(Array.isArray(x.p.datum) ? x.p.datum[namn.indexOf(x.c.podd)] : x.p.datum);
+    const dt = eget || (k && k.datum.length === 1 ? k.datum[0] : '');
+    return { i: x.i, sagt: x.c.sagt, vem: stor([x.c.vem, TEXT.poddar.kalla(x.c), kortDatum(dt)].filter(Boolean).join(', ')) };
+  }
   function poddar(u) {
     const ps = u.poddsidor;
     const l = ((ps && ps.sidor) || []).filter((x) => x && Array.isArray(x.delar) && x.delar.some((d) => d && (d.grupper || []).length));
     if (!l.length) return null;
     const T = TEXT.poddar;
-    const amne = (a) => T.amnen[a] || (ps.amnen && ps.amnen[a]) || T.amnen.match;
+    const kort = (a) => T.kort[a] || T.kort.match;
     const match = (x) => (u.matcher || []).find((m) => String(m.id) === String(x.id));
     const nr = (x) => (match(x) ? match(x).nr : x.nr);
-    const stampel = (k, typ = 'podd') => { const kk = T.slag[k] ? k : 'h'; return `<i class="tn-slag s-${kk}">${esc(kk === 'h' ? (T.egen[typ] || T.slag.h) : T.slag[kk])}</i>`; };
+    const mark = (k) => `<i class="tn-mark s-${k}" role="img" aria-label="${esc(T.nyckel[k])}" title="${esc(T.nyckel[k])}"></i>`;
     return l.slice().sort((a, b) => nr(a) - nr(b)).map((x) => {
       const m = match(x);
       const namn = m ? [m.h, m.b] : (x.lag || []);
+      const cit = poddCitat(x.delar);
       const delar = x.delar.map((d, i) => {
-        const kallor0 = (d.kallor || []).filter((k) => k && k.podd);
-        // Forumet läses varje natt: det står en gång, med den senaste läsningens datum. Två artiklar ur
-        // samma insatta medium står också en gång.
-        const kallor = kallor0.filter((k, i) => !['forum', 'media'].includes(k.typ) || kallor0.findIndex((x) => x.typ === k.typ && x.podd === k.podd) === i);
-        const flera = new Set(kallor.map((k) => k.podd)).size > 1;
-        const ur = kallor.length ? T.ur(lista(kallor.map((k) => `${T.kalla(k)}${kortDatum(k.datum) ? ` (${kortDatum(k.datum)})` : ''}`))) : '';
-        const grupper = (d.grupper || []).map((g) => `<div class="tn-pod-grupp"><h5>${esc(amne(g.amne))}</h5>${(g.punkter || []).filter((p) => p && p.t).map((p) => {
-          const c = p.citat && p.citat.sagt ? p.citat : null;
-          const vem = c ? (c.vem ? `${c.vem}, ${T.kalla(c)}` : T.kalla(c)) : '';
-          return `<div class="tn-pod-punkt">${stampel(p.s, p.typ)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>` +
-            (c ? `<blockquote><p>”${esc(hel(c.sagt))}”</p>${vem ? `<cite>${esc(vem)}</cite>` : ''}</blockquote>` : '') + '</div>';
-        }).join('')}</div>`).join('');
-        return `<section class="tn-pod-lag${grupper ? '' : ' tom'}"><h4>${esc(namn[i] || d.lag || '')}</h4>${ur ? `<p class="tn-kalla">${esc(ur)}</p>` : ''}${grupper || `<p class="tn-pod-ingen">${esc(T.ingen)}</p>`}</section>`;
+        const lag = poddLaget(d);
+        const ur = poddUr(lag.kallor);
+        const rader = lag.rader.map((r) => `<div class="tn-pod-rad"><b>${esc(kort(r.amne))}</b><ul>${r.punkter.map((p) =>
+          `<li>${mark(p.s)}${esc(hel(p.t))}${p.ref ? ` <small>${esc(p.ref)}</small>` : ''}</li>`).join('')}</ul></div>`).join('');
+        const c = cit && cit.i === i ? `<blockquote class="tn-pod-citat"><p>”${esc(hel(cit.sagt))}”</p><cite>${esc(cit.vem)}</cite></blockquote>` : '';
+        return `<section class="tn-pod-lag${rader ? '' : ' tom'}"><h4>${esc(namn[i] || d.lag || '')}</h4>${ur ? `<p class="tn-kalla">${ur}</p>` : ''}` +
+          `${rader ? `<div class="tn-pod-rader">${rader}</div>` : `<p class="tn-pod-ingen">${esc(T.ingen)}</p>`}${c}</section>`;
       }).join('');
-      const harCitat = x.delar.some((d) => (d.grupper || []).some((g) => (g.punkter || []).some((p) => p.citat)));
-      // Förklaringen till stämplarna: en för varje slags egen uppgift som står på sidan.
-      const typer = new Set(x.delar.flatMap((d) => (d.grupper || []).flatMap((g) => (g.punkter || []).filter((p) => p.s === 'h').map((p) => p.typ || 'podd'))));
-      const egna = ['podd', 'forum', 'media', 'blandat'].filter((t) => typer.has(t));
-      const fot = `<p class="tn-pod-fot">${[['b', 'podd'], ...(egna.length ? egna : ['podd']).map((t) => ['h', t]), ['o', 'podd']].map(([k, t]) => `${stampel(k, t)} ${esc(T.forklaring[k === 'h' ? t : k])}`).join(' ')}${harCitat ? ` ${esc(T.citaten)}` : ''}</p>`;
+      const fot = `<p class="tn-pod-fot">${['b', 'h', 'o'].map((k) => `<span>${mark(k)}${esc(T.nyckel[k])}</span>`).join('')}${cit ? `<span>${esc(T.citaten)}</span>` : ''}</p>`;
       return {
         namn: TEXT.sidor.poddar,
         html: vinjett(TEXT.sidor.poddar, `${nr(x) ? `${nr(x)} · ` : ''}${namn.join('–')}`) + `<h3 class="tn-rub stor">${esc(x.rubrik || T.rubrik(namn[0], namn[1]))}</h3>` +
@@ -781,5 +855,5 @@
     }
   }
 
-  return { html, guide, forsta, rastrera, kronika, skrall, citaten, omdome, poddNamn, TEXT };
+  return { html, guide, forsta, rastrera, kronika, skrall, citaten, omdome, poddNamn, poddLaget, poddCitat, poddUr, kortDatum, TEXT };
 });

@@ -50,18 +50,28 @@ module.exports = {
   // En uppgift under den här vikten (1–5) följer inte med till tidningen.
   minstVikt: 3,
 
-  // Informationssidan per match (användarens önskan 2026-11-10: längre sidor som man
-  // kan hämta kunskap ur, grupperade, med slag, podd, citat och vem som säger det).
+  // Informationssidan per match (användarens önskan 2026-11-10: sidor som man kan hämta
+  // kunskap ur, grupperade, med slag och källa). Samma dag, senare: "betydligt mer
+  // organiserat/snyggt och överblickbart … kortfattad och snygg information", något citat
+  // ibland och källorna med datum. Därför färre och kortare punkter och ett citat per lag
+  // att välja bland; tidningen trycker högst ett per sida.
   sidan: {
+    // Byts den skrivs sidorna om nästa natt, utan att avsnitten tas ut på nytt.
+    version: '2026-11-10.5',
     // Lagets senaste avsnitt som sidan bygger på, och högst så många punkter per lag.
     avsnitt: 3,
-    // Med de insatta medierna (2026-11-10) finns det mer att välja bland: tolv per lag.
-    punkterPerLag: 12,
-    // Högst så många av punkterna får sitt citat tryckt.
-    citatPerLag: 6,
+    punkterPerLag: 6,
+    // Så många ord får en punkt ha (en kort mening).
+    punktOrd: 22,
+    // Högst så många av punkterna har sitt citat med; tidningen väljer ett för hela sidan.
+    citatPerLag: 1,
     rubrikOrd: 9,
-    ingressOrd: 45,
+    ingressOrd: 32,
     effort: 'medium',
+    // Bara källor från kupongens vecka (måndag till matchen): helst så, men inte medan vi
+    // provar (användarens beslut 2026-11-10: "gör ett undantag nu när vi bara testar").
+    // Sätt till true när provperioden är slut; sidorna skrivs då om nästa natt.
+    baraVeckan: false,
   },
   // Ämnena som uppgifterna grupperas i, i den ordning de står på sidan.
   amnen: {
@@ -225,15 +235,15 @@ Handlar podden uppenbart om en annan klubb än laget ovan (tidningen kan ha fåt
 Svara bara med JSON, utan något före eller efter:
 {"ratt_klubb": true, "handlar_om": "en mening om vad avsnittet handlar om", "uppgifter": [{"a": "trupp", "t": "…", "s": "b", "min": 12, "citat": "…", "sagt": "…", "vem": null, "vikt": 4}]}`,
 
-  sidaPrompt: `Du redigerar en informationssida i en svensk tipstidning: allt det intressanta ur supporterpoddarna, supporterforumet och de insatta medierna inför en match, samlat så att läsaren kan hämta kunskap ur det.
+  sidaPrompt: `Du redigerar en informationssida i en svensk tipstidning: det viktigaste ur supporterpoddarna, supporterforumet och de insatta medierna inför en match, kort och överblickbart, så att läsaren ser läget för båda lagen på en gång.
 
 Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar) den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift, o = supportrarnas eller skribentens åsikt), en vikt 1–5 och podden, forumet eller de insatta (källans namn) den kommer ur. Ta med det bästa ur alla tre slagen av källor.
 
 Gör så här:
-- Välj det mest intressanta, högst {punkter} punkter per lag. Stryk det som är svagt, det som en annan uppgift redan säger och det som varken rör laget eller matchen (en nyhet om en tredje klubb).
+- Välj det mest intressanta, högst {punkter} punkter per lag: det som säger mest om matchen. Färre är bättre än fler. Stryk det som är svagt, det som en annan uppgift redan säger och det som varken rör laget eller matchen (en nyhet om en tredje klubb).
 - Säger två uppgifter samma sak (ur två avsnitt, två poddar, podden och forumet eller en artikel) blir de EN punkt, med bådas id i "ur". Slå aldrig ihop en bekräftad uppgift med en åsikt.
 - Gruppera punkterna per lag under ämnena, och ställ den viktigaste först i varje grupp. Flytta en uppgift till ett annat ämne om den passar bättre där.
-- Texten i en punkt är en till två meningar, högst 45 ord. Du får skriva om den så att den blir rak och lättläst, men bara med det som står i uppgifterna: inga nya fakta, namn eller tal.
+- Texten i en punkt är EN kort mening, högst {punktOrd} ord: det som läsaren behöver veta, utan "värdarna säger att", "enligt podden" och utfyllnad (källan och datumet står bredvid i tidningen). Börja med det viktiga, gärna med namnet: "Jack Marriott är tillbaka och fick en kvart mot Plymouth." Du får skriva om uppgiften så att den blir rak och kort, men bara med det som står i uppgifterna: inga nya fakta, namn eller tal.
 - Skriv en rubrik för sidan på högst {rubrikOrd} ord, om det som är viktigast att veta inför matchen, och en ingress på högst {ingressOrd} ord som säger det viktigaste om båda lagen (om bara det ena laget har uppgifter: om det). Rubriken och ingressen får bara säga det som står i punkterna, och inte göra en gammal sak till en nyhet. Skriv tal i ingressen precis som de står i uppgifterna.
 
 Inga tips: inte vem som vinner, vilket tecken man ska välja eller vem som är favorit, och inga odds. Vanlig svenska utan engelska ord där det finns svenska.

@@ -303,7 +303,7 @@ async function sidorna(fil, matcher) {
   fil.sidor = fil.sidor || {};
   let n = 0;
   for (const m of matcher) {
-    const nyckel = sidNyckel(sidansUnderlag(fil, m.lagen));
+    const nyckel = sidNyckel(sidansUnderlag(fil, m.lagen, { avspark: m.avspark }));
     const nu = fil.sidor[m.id];
     if (nu && nu.nyckel === nyckel && nu.redigerad) continue;
     if (TORRT) { logg(`skulle skriva sidan ${m.lagen.join(' – ')}`); continue; }
