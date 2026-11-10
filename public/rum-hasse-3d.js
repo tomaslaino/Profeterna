@@ -58,11 +58,14 @@ function skrivTid(n) { return skrivSlut(n) + SKRIV.HALL + SKRIV.TILLBAKA + SKRIV
 // lutad framåt så att sidorna vänds upp mot hans ögon, som när man läser något i knät: det är han man ska se, inte
 // tidningen, och kameran, som står högre än han, ser den snett uppifrån, så att sidorna inte går att läsa (Tomas
 // önskemål 2026-11-09 och 2026-11-10). Lutad bakåt, mot honom, vändes förstasidan rakt mot kameran, och kanterna,
-// som viks mot honom, sjönk ned i disken. I läget LAS tittar han ned i den, med huvudet lite vridet
-// och böjt mot den och blicken ned åt den (blickX åt hans högra sida, blickY nedåt), brynen lite nere (då ler han
-// mindre: NOJD i rita) och axlarna uppe. Bitarna utgår från LAS (L) och LAS_T, så att han läser där tidningen är och
-// inte tittar in i kameran; där han ser på en är blicken satt för sig (EN_X med huvudet kvar mot tidningen).
-const LAS = { pitch: 1.25, yaw: -0.3, lut: 0.03, axV: 10, axH: 10, brynX: -0.12, brynY: -0.08, blund: 0.66, blickY: 11, blickX: -3, kis: 0.06 };
+// som viks mot honom, sjönk ned i disken. I läget LAS tittar han ned i den genom glasögonen, med huvudet lite vridet
+// och tydligt böjt mot den, ögonlocken långt nere och blicken ned åt den (blickX åt hans högra sida, blickY nedåt),
+// brynen lite nere (då ler han mindre: NOJD i rita) och axlarna uppe. Förut var huvudet bara lite böjt (pitch 1,25),
+// glasögonen hamnade under ögonen (NICK i figuren) och pupillen sköts så långt ned att springan mellan locken visade
+// irisens överkant: då såg det ut som att han kikade på en över glasögonen (Tomas 2026-11-10). Bitarna utgår från
+// LAS (L) och LAS_T, så att han läser där tidningen är och inte tittar in i kameran; där han ser på en är blicken satt
+// för sig (EN_X med huvudet kvar mot tidningen), och där han lyfter huvudet mot en går det lika högt som förut.
+const LAS = { pitch: 2, yaw: -0.3, lut: 0.03, axV: 10, axH: 10, brynX: -0.12, brynY: -0.08, blund: 0.82, blickY: 3, blickX: -3, kis: 0.06 };
 const L = (x, d = 0) => LAS[x] + d;
 // blicken längs raderna: d åt vänster (−) eller höger (+) om mitten av spalten
 const rad = (d) => L('blickX', 0.6 * d);
@@ -300,7 +303,7 @@ const LASBIT = {
       brynX: [[1.15, -0.12], [1.3, 0.9], [2.4, 0.85], [2.7, -0.55], [3.6, -0.5], [4.4, 0.1], [5.0, -0.12]],
       brynY: [[1.15, -0.08], [1.3, 0.95], [2.4, 0.9], [2.7, -0.65], [3.6, -0.6], [4.4, 0.05], [5.0, -0.08]],
       andas: [[1.1, 0], [1.3, -5], [2.45, -4], [2.7, 4], [3.6, 2], [4.2, 0]],
-      pitch: [[1.15, L('pitch')], [1.3, L('pitch', 0.04)], [2.45, L('pitch', 0.06)], [2.8, L('pitch', -0.75)], [3.2, L('pitch', -0.72)], [3.42, L('pitch', -0.42)], [3.7, L('pitch', -0.72)], [4.4, L('pitch', -0.7)], [5.0, L('pitch')], [5.5, L('pitch', 0.1)], [5.8, L('pitch')]],
+      pitch: [[1.15, L('pitch')], [1.3, L('pitch', 0.04)], [2.45, L('pitch', 0.06)], [2.8, L('pitch', -1.5)], [3.2, L('pitch', -1.47)], [3.42, L('pitch', -1.17)], [3.7, L('pitch', -1.47)], [4.4, L('pitch', -1.45)], [5.0, L('pitch')], [5.5, L('pitch', 0.1)], [5.8, L('pitch')]],
       lut: [[2.45, 0.03], [2.8, -0.03], [4.3, -0.02], [5.0, 0.03]], axV: [[2.45, 10], [2.75, 20], [4.2, 16], [5.0, 10]], axH: [[2.45, 10], [2.75, 18], [4.2, 14], [5.0, 10]],
       le: [[3.3, 0], [3.9, 0.4], [4.6, 0.3], [5.4, 0.15], [6.2, 0]], kis: [[3.4, 0.06], [3.9, 0.3], [4.6, 0.25], [5.3, 0.06]],
     },
@@ -319,7 +322,7 @@ const LASBIT = {
       blickY: [[0.35, L('blickY')], [0.55, -1.5], [0.9, -0.8], [4.3, -0.8], [4.7, L('blickY')]],
       blund: [[0.35, L('blund')], [0.55, 0.12], [3.6, 0.15], [4.0, 0.25], [4.7, L('blund')]],
       yaw: [[0.5, L('yaw')], [0.95, L('yaw', 0.2)], [4.3, L('yaw', 0.2)], [4.9, L('yaw')]],
-      pitch: [[0.5, L('pitch')], [0.95, L('pitch', -0.5)], [1.45, L('pitch', -0.5)], [1.62, L('pitch', -0.28)], [1.85, L('pitch', -0.5)], [2.1, L('pitch', -0.5)], [2.27, L('pitch', -0.28)], [2.5, L('pitch', -0.5)], [4.3, L('pitch', -0.48)], [4.9, L('pitch')]],
+      pitch: [[0.5, L('pitch')], [0.95, L('pitch', -1.25)], [1.45, L('pitch', -1.25)], [1.62, L('pitch', -1.03)], [1.85, L('pitch', -1.25)], [2.1, L('pitch', -1.25)], [2.27, L('pitch', -1.03)], [2.5, L('pitch', -1.25)], [4.3, L('pitch', -1.23)], [4.9, L('pitch')]],
       brynX: [[0.5, -0.12], [0.85, -0.6], [3.6, -0.55], [4.0, 0.25], [4.5, 0.2], [5.0, -0.12]],
       brynY: [[0.5, -0.08], [0.85, -0.75], [3.6, -0.7], [4.0, 0.2], [4.5, 0.15], [5.0, -0.08]],
       kis: [[0.5, 0.06], [0.85, 0.3], [3.6, 0.3], [4.0, 0.35], [4.6, 0.06]], stel: [[0.5, 0], [0.8, 0.8], [3.6, 0.8], [3.95, 0]],
@@ -358,7 +361,7 @@ const LASBIT = {
       stel: [[1.0, 0], [1.12, 1], [3.2, 1], [3.8, 0]],
       brynX: [[1.0, -0.12], [1.15, 0.8], [1.6, 0.7], [2.0, -0.5], [3.2, -0.45], [3.8, 0.15], [4.6, 0.1], [5.2, -0.12]],
       brynY: [[1.0, -0.08], [1.15, 0.85], [1.6, 0.75], [2.0, -0.6], [3.2, -0.55], [3.8, 0.1], [4.6, 0.05], [5.2, -0.08]],
-      pitch: [[1.5, L('pitch')], [2.1, L('pitch', -0.85)], [2.75, L('pitch', -0.82)], [2.95, L('pitch', -0.5)], [3.2, L('pitch', -0.82)], [4.3, L('pitch', -0.8)], [5.0, L('pitch')], [5.9, L('pitch', 0.08)], [6.2, L('pitch')]],
+      pitch: [[1.5, L('pitch')], [2.1, L('pitch', -1.6)], [2.75, L('pitch', -1.57)], [2.95, L('pitch', -1.25)], [3.2, L('pitch', -1.57)], [4.3, L('pitch', -1.55)], [5.0, L('pitch')], [5.9, L('pitch', 0.08)], [6.2, L('pitch')]],
       yaw: [[1.5, L('yaw')], [2.1, L('yaw', 0.15)], [4.3, L('yaw', 0.15)], [5.0, L('yaw')]],
       lut: [[1.5, 0.03], [2.1, -0.03], [4.3, -0.02], [5.0, 0.03]], axV: [[1.5, 10], [2.1, 20], [4.3, 16], [5.0, 10]], axH: [[1.5, 10], [2.1, 18], [4.3, 14], [5.0, 10]],
       andas: [[1.0, 0], [1.15, -4], [1.6, -3], [2.0, 4], [3.2, 0]],
@@ -4231,11 +4234,26 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const gB = { p: v(), q: new THREE.Quaternion(), s: v() };
   const gW = new THREE.Matrix4();
   const gM = new THREE.Matrix4();
-  const iVarld = (namn, ut) => gM.multiplyMatrices(GL[namn].h ? HM : mk, GL[namn].m).decompose(ut.p, ut.q, ut.s);
   const PA_ANSIKTET = new Set(['pa', 'glid', 'nasa']);
+  // På näsan följer de med uppåt när han böjer huvudet över tidningen (NICK: upp till så många bildpunkter i fotot,
+  // mellan huvudets lutning NICK0 och NICK1 i radianer nedåt; nick sätts i rita). Bågen sitter långt framför ögonen
+  // (näsdynorna vilar på näsryggen), så när han böjde huvudet och kameran såg honom uppifrån hamnade den under ögonen,
+  // och han såg ut att kika på en över den i stället för att läsa genom den. Med huvudet rakare sitter de där de alltid
+  // har suttit, och längst ned på näsan (nasa) ser han fortfarande över dem.
+  const NICK = 34;
+  const NICK0 = 0.1;
+  const NICK1 = 0.28;
+  let nick = 0;
+  const upp = (namn) => (PA_ANSIKTET.has(namn) ? NICK * ss(NICK0, NICK1, nick) : 0);
+  const gU = new THREE.Matrix4();
+  const iVarld = (namn, ut) => {
+    if (GL[namn].h) gM.copy(HM).multiply(gU.makeTranslation(0, upp(namn), 0)).multiply(GL[namn].m);
+    else gM.multiplyMatrices(mk, GL[namn].m);
+    gM.decompose(ut.p, ut.q, ut.s);
+  };
   // glasen över ögonen (förstorar dem i skuggaren): hur mycket, och glasens mitt i fotot (y)
   const LINS = { styrka: 0, y: 400 };
-  const linsY = (namn) => 900 - GL[namn].m.elements[13];
+  const linsY = (namn) => 900 - GL[namn].m.elements[13] - upp(namn);
   // bågens läge i världen (gW) vid t; → hur mycket den sitter i fickan (0–1)
   function glasLage(t, G) {
     huvudM();
@@ -4618,6 +4636,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const glod = cc ? spar(cc.glod, t) : 0;
     const yaw = YAW0 + 0.22 * (kan('yaw') + 0.1 * drift(n, 0.8, 0.37, 1.33) * (1 - iMun * 0.6) + talar * 0.28 * Math.sin(n * 2.7 + 1));
     const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * 0.3 * Math.sin(n * 6.1) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
+    nick = pitch;
     const roll = -(kan('roll') + 0.012 * drift(n, 0.29, 0.61, 0.13) + talar * 0.03 * Math.sin(n * 3.3));
     eu.set(pitch, yaw, roll, 'YXZ');
     mh.makeRotationFromEuler(eu);
