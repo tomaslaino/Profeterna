@@ -270,7 +270,7 @@
    Tipsguiden (--vila; lyft i rum.js lyfter den därifrån), vriden kring överkanten, som står still när --z ändras.
    Mellan omgångarna finns ingen tidning (hidden). */
 #rum-kvallstidningen {
-  --z: 1.4;
+  --z: 1.6;
   --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(4deg) scale(1);
   position: absolute; left: calc(1222px - var(--z) * 50px); top: 660px; width: calc(var(--z) * 100px); height: calc(var(--z) * 140px); overflow: hidden;
   transform: var(--vila); transform-origin: 50% 0;

@@ -270,7 +270,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   löpsedlarna. Tidningen ligger i stället på pulten till höger om kupongen, bakom högen med de inlämnade
   kupongerna: samma tidning och samma förstasida som löpsedeln, och ett klick eller L lyfter den och lägger fram den
   som förut. Samma dag ("Gör så att rubriken syns ovanför kupongerna"): högen ligger längre fram, och tidningen är så
-  stor att rubriken slutar ovanför kupongerna. Den är ritad som Tipsguiden, i sidan och inte i 3D, och kostar lika lite som den (se
+  stor att rubriken slutar ovanför kupongerna. Och sedan ("Gör tidningen lite större"): kupongerna i högen ligger
+  tätare, och tidningen är ungefär 15 % större. Den är ritad som Tipsguiden, i sidan och inte i 3D, och kostar lika lite som den (se
   [Tidningen](#tidningen))
 
 ## Publicering
@@ -862,7 +863,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   uppifrån) och Hasses disk (i telefonen täcker samtalet den) var de andra ställena. Fläkten, fikat och askkoppen står till höger om högen
   och tidningen. Först låg tidningen hopvikt, och kupongerna täckte rubriken; samma dag ("Gör så att rubriken syns
   ovanför kupongerna") flyttades högen fram och tidningen gjordes mindre, så att hela rubriken syns ovanför dem.
-  Att lägga tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Se [Tidningen](#tidningen).
+  Att lägga tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Sedan ("Gör tidningen lite
+  större") ligger kupongerna i högen tätare, så att namnen nätt och jämnt syns, och tidningen fick det som blev över.
+  Se [Tidningen](#tidningen).
 - **Ett nummer av Tipsguiden att ta upp (2026-11-09, användarens önskemål):** "Jag vill att det ska ligga nåt nr av
   tipsguiden på animationssidan nånstans som man kan plocka upp o läsa". Tidningen fanns då bara när man
   klickade på löpsedeln i fönstret, och mellan omgångarna inte alls. Nu ligger Tipsguiden, tidningens tipsbilaga, på pulten
@@ -6935,10 +6938,12 @@ högen med de inlämnade kupongerna, som ligger på dess nedre del (`#rum-kvalls
 [public/rum-tidning.css](public/rum-tidning.css)). Förstasidan är upp: löpsedelns papper, med vecket på mitten, och
 överkanten ligger vid pultens bakkant. Samma dag ("Gör så att rubriken syns ovanför kupongerna") syns hela rubriken
 ovanför kupongerna: förut låg tidningen hopvikt, 2,5 gånger så stor som sedeln, och högen täckte allt under namnet och
-vinjetten. Nu ligger högen 62 bildpunkter längre fram (`HOG` i rum.js, `HOGEN` i rum-saker.js; i telefonen på höjden,
-där kupongerna är högre, 80), och tidningen är så stor att rubriken slutar strax ovanför den första kupongen: sedeln
+vinjetten. Nu ligger den första kupongen i högen 84 bildpunkter längre fram och den sista 64, med 36 i stället för 46
+mellan dem (`HOG` i rum.js, `HOGEN` i rum-saker.js; i telefonen på höjden, där kupongerna är högre, 18 till), och tidningen är så stor att rubriken slutar strax ovanför den första kupongen: sedeln
 säger var rubriken slutar (`data-rub`, 111 av 140 med två rader under rubriken och 117 med en), och tidningen förstoras
-`RUBRIK / rub` gånger (`--z`, 1,25–1,55, ungefär 1,4). Det som står under rubriken ligger under kupongerna. Att lägga
+`RUBRIK / rub` gånger (`--z`, 1,4–1,75, ungefär 1,6). Samma dag, "Gör tidningen lite större": först låg högen 62
+längre fram med 46 mellan kupongerna och tidningen var ungefär 1,4 gånger sedeln; nu ligger kupongerna så tätt att
+namnen nätt och jämnt syns, och tidningen är ungefär 15 % större. Det som står under rubriken ligger under kupongerna. Att lägga
 tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Den ligger lite snett och platt i
 pultens perspektiv som Tipsguiden på andra sidan kupongen (`--vila`, vriden kring överkanten, så att den ligger kvar vid
 bakkanten när `--z` ändras), i rummets ljus. Förstasidan
@@ -6955,8 +6960,9 @@ lördagen efter) i 1440 × 900, 1920 × 1080, 390 × 844 (dra åt höger, tryck)
 ett klick, ett tryck och L lyfter den och lägger fram den, Esc, *Lägg tillbaka* och bakåt lägger tillbaka den, också
 med minskad rörelse, och ett klick på löpsedeln går bara fram till sedeln. Fläkten, fikat, askkoppen och dosan i alla
 fyra uppställningarna står fritt från tidningen, och högen med tre kuponger (ditritad för provet, där `pile` lägger dem)
-ligger under rubriken: i 1440 × 900 slutar rubrikens sista rad 6 bildpunkter ovanför den första kupongen, i 1920 × 1080
-8 och i 390 × 844 8. I 1920 × 1080 syns den tredje kupongen till ungefär hälften (förut nästan hel). Inte provat efter
+ligger under rubriken: i 1440 × 900 slutar rubrikens sista rad 5 bildpunkter ovanför den första kupongen, i 1920 × 1080
+7 och i 390 × 844 7, och namnen på kupongerna syns. I 1920 × 1080 syns den tredje kupongen till ungefär hälften (förut,
+när tidningen låg hopvikt, nästan hel). Inte provat efter
 omgången (sammanställningen kräver tjänsten), att ta sin kupong ur högen, i Safari eller i en riktig telefon.
 
 **Före omgången** (omgången finns och är inte spelad):
