@@ -44,6 +44,7 @@ const UNDERKANT = [
   [/\bförsäkring\b/i, 'gardering: på en kupong garderar man sig'],
   [/\bDär har du hela\b/i, 'Det var hela gänget.'],
   [/\bfinns inte att säga\b/i, 'Mer än så finns det inte att säga.'],
+  [/\bVem (vill du höra om|av er ska jag ta)\b/i, 'Vems kupong ska jag ta nu?: säg att det är en kupong han ska döma'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
@@ -67,7 +68,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
   'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
-  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
+  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
   'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
@@ -113,9 +114,14 @@ for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'i
   if (!(repliker.domord && repliker.domord[k])) fel.push(`domord.${k} saknas`);
   if (!(k === 'forsakring' || (repliker.domar && repliker.domar.in && repliker.domar.in[k]))) fel.push(`domar.in.${k} saknas`);
 }
+// Frågan över listan med gänget (gangLista i rum-hasse.js) sägs i ett svep och får vara två meningar, men ska
+// rymmas på två rader också i den smalaste telefonen, med det längsta namnet.
+const FRAGOR = ['domar.fraga', 'domar.igen', 'domar.alla', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte'];
+const LANGST = Object.entries(repliker.felnamn || {}).flat(2).reduce((a, b) => (b.length > a.length ? b : a), '');
+for (const vag of FRAGOR) for (const t of varde(vag) || []) if (t.replace('{namn}', LANGST).length > 62) fel.push(`${vag}: "${t}" är för lång: högst 62 tecken med namnet, annars flyttar sig gänget`);
 // Till gruppen säger han ni och er: det är bara ni som använder sidan (Tomas 2026-11-09).
 for (const [vag, t] of alla) if (/\bgäng/i.test(t)) fel.push(`${vag}: "${t}" säger gänget. Skriv ni, er eller allihop.`);
-for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !['domar.fraga', 'domar.alla'].includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
+for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !FRAGOR.includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
 for (const k of ['1', 'X', '2']) {
   const t = repliker.tecken && repliker.tecken[k];
   if (!t || !t.du || !t.bestamd) fel.push(`tecken.${k} saknar du eller bestamd`);

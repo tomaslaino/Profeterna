@@ -500,10 +500,25 @@
   // han eller hon: skriv namnet, eller om kupongen. Till gruppen säger han ni och er, aldrig gänget: det är
   // bara ni som använder sidan. Ordet i guld står i domord, och namnen han nästan kan i felnamn.
   domar: {
-    // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla.
-    fraga: ['Jag har rättat omgången. Vem av er ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom era kuponger. Vem tar vi först?', 'Jag har rödpennan framme. Vem av er tar vi först?', 'Omgången är spelad. Vem av er ska jag ta först?'],
-    igen: ['Vem vill du höra om nu?', 'Vem av er ska jag ta nu?', 'Vem av er ska få sin dom nu?', 'Vem av er står på tur?'],
-    alla: ['Nu har ni fått höra allihop.', 'Nu har var och en av er fått sitt.', 'Nu har ni fått höra allihop. Jag har sett bättre kuponger.', 'Det var ni allihop. Mer än så finns det inte att säga.'],
+    // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla. Frågan
+    // säger vad han ska göra (döma en kupong) och att det är kupongen man väljer, inte bara en person: "Vem vill
+    // du höra om nu?" sa inte vad han skulle säga (Tomas 2026-11-10). Högst två rader (cirka 55 tecken).
+    fraga: ['Jag har rättat era kuponger. Vems ska jag börja med?', 'Jag har ett omdöme om varje kupong. Vems tar vi först?', 'Jag har rödpennan framme. Vems kupong tar vi först?', 'Omgången är spelad. Vems kupong ska jag bedöma först?', 'Protokollet är klart. Vems kupong ska jag döma först?'],
+    igen: ['Vems kupong ska jag ta nu?', 'Vems kupong ska jag döma nu?', 'Vems kupong vill du ha mitt omdöme om nu?', 'Vems kupong står på tur?'],
+    alla: ['Nu har jag dömt varenda kupong.', 'Nu har var och en av er fått sitt.', 'Alla era kuponger är dömda. Jag har sett bättre.', 'Det var alla era kuponger. Mer än så finns det inte att säga.'],
+    // I stället för fraga och igen när han vet vem du är (den enheten står på) och du lämnade in: först
+    // (ingen dömd än), hort (din kupong är dömd) och inte (andras är dömda men inte din). {namn} är ditt.
+    du: {
+      forst: [
+        'Jag gissar att du vill höra om din kupong först, {namn}.',
+        'Din kupong först, {namn}, eller någon annans?',
+        'Jag har rättat din kupong, {namn}. Ska vi ta den först?',
+        'Du gjorde ditt bästa, {namn}. Nu ska du få höra om det räckte.',
+        'Din kupong har jag synpunkter på. Du gjorde ändå ditt bästa.',
+      ],
+      hort: ['Din kupong är dömd. Vems ska jag ta nu?', 'Nu vet du vad jag tycker om din kupong. Vems tar vi nu?', 'Din kupong har vi avverkat. Vems tar vi nu?', 'Du har fått din dom. Vems kupong ska jag döma nu?'],
+      inte: ['Din egen kupong har du inte vågat fråga om än, {namn}.', 'Vill du höra om din egen kupong nu, {namn}?', 'Din kupong väntar fortfarande på sin dom, {namn}.'],
+    },
     // Om man står kvar vid listan med gänget och inte väljer någon.
     ledig: [
       'Ingen av er har bett om ursäkt än.',
