@@ -1,15 +1,15 @@
-/* Kvällstidningen (rum-tidning.js, tidningen i rum.js), som ligger på pulten: sedeln överst som framsida och sidorna
-   under, en under en, på samma papper. Platt papper som ritas en gång, utan skuggfilter och utan
-   blandningslägen, och medan den är framme står rummet still. Smal (under 470 px): en spalt. */
+/* Helgarderat (rum-tidning.js, tidningen i rum.js), som ligger på pulten: framsidan överst och sidorna under, en
+   under en, på samma papper. Tryck i svart och flaskgrönt som utkastet (helgarderat.css), och rött bara där det
+   betyder något: stämplarna, det som föll och det datorn gav under 25 %. Platt papper som ritas en gång, utan
+   skuggfilter och utan blandningslägen, och medan den är framme står rummet still. Smal (under 470 px): en spalt. */
 .rum-tidningen { position: absolute; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px 10px; box-sizing: border-box; background: rgba(9, 6, 3, 0.76); animation: tn-in 0.22s ease-out; }
 @keyframes tn-in { from { opacity: 0; } to { opacity: 1; } }
 .rum.smal .rum-tidningen { padding: 8px 10px 6px; }
 
-.tn { --k: 6; --p: #eeebe1; --rod: #d5141b; --svart: #17130e; --gra: #5b5248; --streck: rgba(23, 19, 14, 0.28); --serif: Georgia, Fraunces, "Times New Roman", serif; --sans: "Helvetica Neue", Arial, sans-serif;
+.tn { --k: 6; --p: #efebe0; --gron: #1b5435; --rod: #c22a1f; --svart: #17130e; --gra: #5b5248; --streck: rgba(23, 19, 14, 0.28); --serif: Georgia, Fraunces, "Times New Roman", serif; --sans: "Helvetica Neue", Arial, sans-serif;
   flex: none; display: flex; flex-direction: column; gap: 14px; width: calc(var(--k) * 100px); color: var(--svart); font-family: var(--sans); cursor: default; animation: tn-upp 0.28s cubic-bezier(0.2, 0.7, 0.3, 1); }
 @keyframes tn-upp { from { transform: translateY(18px); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .rum-tidningen, .tn { animation: none; } }
-.tn.tid-sb { --p: #eebac6; --rod: #d0141d; --gra: #5e4a4e; }
 .tn-ark { position: relative; box-sizing: border-box; background: radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 0.6px, rgba(0, 0, 0, 0) 0.8px) 0 0 / 2.6px 2.6px, var(--p); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); }
 .tn-sida { padding: 10px calc(var(--k) * 4px) 22px; scroll-margin-top: 10px; }
 .tn p { margin: 0; }
@@ -18,14 +18,11 @@
 .tn th, .tn td { border: 0; text-transform: none; letter-spacing: 0; vertical-align: middle; }
 .tn button:hover { border-color: transparent; color: inherit; }
 
-/* framsidan: löpsedeln (sedel i rum-affischer.js) med sin zoom, och innehållet under den */
-.tn .rt-sedel { position: relative; transform: none; filter: none; pointer-events: none; }
-/* samma täta raster som i rummet: sedeln är förstorad, men inte prickarna (de går vidare i papperet) */
-.tn .rt-sedel .tryck { background: linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%), radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.14) 0 calc(0.6px / var(--k)), rgba(0, 0, 0, 0) calc(0.8px / var(--k))) 0 0 / calc(2.6px / var(--k)) calc(2.6px / var(--k)); }
+/* framsidan (.hf-forsta nedan) med sin zoom, och innehållet under den */
 .tn-inne { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0 calc(var(--k) * 4px); padding: 9px 0 13px; border-top: 3px solid var(--svart); font: 800 12px/1 var(--sans); letter-spacing: 0.08em; }
 .tn-inne > b { margin-right: 4px; }
 .tn-inne button { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0; border: 0; background: none; color: inherit; font: 700 14px/1 var(--serif); letter-spacing: 0; cursor: pointer; }
-.tn-inne button i { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 3px; box-sizing: border-box; background: var(--rod); color: #fff; font: 800 11px/1 var(--sans); font-style: normal; }
+.tn-inne button i { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 3px; box-sizing: border-box; background: var(--gron); color: #fff; font: 800 11px/1 var(--sans); font-style: normal; }
 @media (hover: hover) { .tn-inne button:hover span { text-decoration: underline; text-underline-offset: 3px; } }
 
 /* sidhuvudet: sidnumret ytterst, tidningens namn och datumet */
@@ -37,12 +34,13 @@
 
 /* vinjetten: avdelningen i svart och det som gäller hela sidan till höger */
 .tn-vinjett { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 10px; border-bottom: 3px solid var(--svart); }
-.tn-vinjett b { padding: 5px 9px 3px; background: var(--svart); color: var(--p); font: 400 25px/1 Anton, Impact, sans-serif; letter-spacing: 0.03em; }
+.tn-vinjett b { padding: 5px 9px 3px; background: var(--gron); color: #fff; font: 400 25px/1 Anton, Impact, sans-serif; letter-spacing: 0.03em; }
 .tn-vinjett span { font: 800 11.5px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; text-align: right; }
 .tn .tn-rub { margin: 4px 0 8px; font: 400 32px/1.02 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.01em; }
 .tn-rub.stor { font-size: 38px; text-transform: none; }
 .tn-rub.jatte { font-size: 54px; line-height: 0.96; }
-.tn-rub .rod, .tn .rod { color: var(--rod); }
+.tn .rod { color: var(--rod); }
+.tn-rub .rod { color: var(--gron); }
 .tn-omgnamn { margin: -4px 0 10px; font: italic 400 15px/1.25 var(--serif); }
 .tn-ingress { margin: 0 0 10px !important; font: 400 15px/1.35 var(--serif); }
 .tn-ingress + .tn-spalter { padding-top: 10px; border-top: 1px solid var(--svart); }
@@ -65,10 +63,10 @@
 /* brödtexten: rak högerkant och avstavning, som i tidningen, och anfang i början */
 .tn-artikel { column-count: 2; column-gap: 18px; column-rule: 1px solid var(--streck); }
 .tn-artikel p { margin: 0 0 8px; font: 400 14.5px/1.4 var(--serif); text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
-.tn-artikel:not(.kursiv) > p:first-child::first-letter { float: left; margin: 4px 6px 0 0; color: var(--rod); font: 400 3.15em/0.82 Anton, Impact, sans-serif; }
+.tn-artikel:not(.kursiv) > p:first-child::first-letter { float: left; margin: 4px 6px 0 0; color: var(--gron); font: 400 3.15em/0.82 Anton, Impact, sans-serif; }
 .tn-artikel.kursiv p { font-style: italic; }
 .tn-tipsruta { break-inside: avoid; margin: 4px 0 8px; padding: 0 9px 8px; background: rgba(255, 255, 255, 0.28); border-bottom: 1px solid var(--streck); }
-.tn-tipsruta .tn-rad-rub { border-top-color: var(--rod); color: var(--rod); }
+.tn-tipsruta .tn-rad-rub { border-top-color: var(--gron); color: var(--gron); }
 .tn-tecken { display: flex; align-items: baseline; gap: 9px; margin: 2px 0 6px !important; }
 .tn-tecken b { font: 400 44px/1 Anton, Impact, sans-serif; }
 .tn-tecken em { font: italic 400 14px/1.2 var(--serif); }
@@ -104,7 +102,7 @@
 .tn-fakta { margin-top: 14px; padding: 0 10px 9px; background: rgba(23, 19, 14, 0.07); }
 .tn-fakta > div { column-count: 2; column-gap: 18px; }
 .tn.smal .tn-fakta > div { column-count: 1; }
-.tn-fakta > b { display: block; margin: 0 -10px 7px; padding: 6px 10px 5px; background: var(--rod); color: #fff; font: 800 12.5px/1 var(--sans); letter-spacing: 0.08em; }
+.tn-fakta > b { display: block; margin: 0 -10px 7px; padding: 6px 10px 5px; background: var(--gron); color: #fff; font: 800 12.5px/1 var(--sans); letter-spacing: 0.08em; }
 .tn-fakta p { break-inside: avoid; margin: 0 0 6px; font: 400 13px/1.32 var(--sans); }
 .tn-fakta p:last-child { margin-bottom: 0; }
 
@@ -138,7 +136,7 @@
 .tn-pod-rader { margin-top: 6px; }
 .tn-pod-rad { display: grid; grid-template-columns: 62px minmax(0, 1fr); column-gap: 9px; padding: 7px 0; border-top: 1px solid var(--streck); }
 .tn-pod-rad:first-child { padding-top: 2px; border-top: 0; }
-.tn-pod-rad > b { padding-top: 3px; color: var(--rod); font: 800 10px/1.3 var(--sans); letter-spacing: 0.07em; text-transform: uppercase; }
+.tn-pod-rad > b { padding-top: 3px; color: var(--gron); font: 800 10px/1.3 var(--sans); letter-spacing: 0.07em; text-transform: uppercase; }
 .tn-pod-rad ul { margin: 0; padding: 0; list-style: none; }
 .tn-pod-rad li { position: relative; padding-left: 13px; font: 400 14px/1.36 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
 .tn-pod-rad li + li { margin-top: 5px; }
@@ -150,7 +148,7 @@
 .tn-mark.s-h { border-radius: 50%; background: var(--rod); }
 .tn-mark.s-o { border: 1.4px solid var(--gra); border-radius: 50%; }
 /* sidans enda citat, under laget det gäller */
-.tn .tn-pod-citat { margin: 10px 0 0; padding: 1px 0 1px 9px; border: 0; border-left: 3px solid var(--rod); background: none; }
+.tn .tn-pod-citat { margin: 10px 0 0; padding: 1px 0 1px 9px; border: 0; border-left: 3px solid var(--gron); background: none; }
 .tn-pod-citat p { font: italic 400 15px/1.32 var(--serif); }
 .tn-pod-citat cite { display: block; margin-top: 3px; font: 700 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; color: var(--gra); }
 .tn-pod-citat cite::before { content: "– "; }
@@ -165,7 +163,7 @@
 .tn-nm { display: flex; align-items: center; justify-content: space-between; gap: 6px; font: 400 23px/1 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.02em; }
 .tn-boll { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 12px; flex: none; }
 .tn-boll i { display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 50%; border: 1.4px solid var(--svart); }
-.tn-boll i.on { background: var(--rod); border-color: var(--rod); }
+.tn-boll i.on { background: var(--gron); border-color: var(--gron); }
 .tn-stat { display: flex; flex-wrap: wrap; gap: 0 9px; margin: 5px 0 4px !important; font: 400 12.5px/1.2 var(--sans); }
 .tn-stat b { font-weight: 800; }
 .tn-om { font: 400 13.5px/1.3 var(--serif); }
@@ -201,90 +199,81 @@
 .tn.smal .tn-p { width: 2em; }
 .tn.smal .tn-betyg-kort { grid-template-columns: 76px minmax(0, 1fr); }
 
-/* ---------- Tipsguiden (RumTidning.guide, tipsguiden i rum.js) ---------- */
+/* ---------- framsidan (RumTidning.forsta) ---------- */
 
-/* Tidningens tipsbilaga på gulnat tidningspapper. Framsidan är 100 × 140 som sedeln och förstoras med zoom:
-   på pulten (1,9) och när den är framme (--k, passaTidning). */
-.tn.tid-tg { --p: #eee6c8; --rod: #cc1a1f; --gra: #5d5444; }
-.tg-forsta { --tg-p: #eee6c8; --tg-rod: #cc1a1f; --tg-svart: #17130e;
-  position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100px; height: 140px; overflow: hidden; padding: 0 3.5px 3px;
-  background: radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.13) 0 0.25px, rgba(0, 0, 0, 0) 0.35px) 0 0 / 1.1px 1.1px, var(--tg-p);
-  color: var(--tg-svart); font-family: "Helvetica Neue", Arial, sans-serif; text-align: left; }
-.tg-namn { margin: 0 -3.5px; padding: 3px 0 2px; background: var(--tg-rod); color: #fff6e2; text-align: center; }
-.tg-namn b { display: block; font: 400 18px/1 Anton, Impact, sans-serif; letter-spacing: 0.35px; }
-.tg-linje { display: flex; justify-content: space-between; align-items: baseline; gap: 2px; padding: 1.5px 0 1.2px; border-bottom: 0.5px solid var(--tg-svart); font: 700 2.9px/1.1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; white-space: nowrap; }
-.tg-linje span:nth-child(2) { font-weight: 400; }
-.tg-forsta .tg-rub { margin: 3.2px 0 0; padding: 0; border: 0; color: inherit; text-align: center; text-transform: uppercase; }
-.tg-rub b { display: block; font: 400 9px/0.98 Anton, Impact, sans-serif; letter-spacing: 0.1px; white-space: nowrap; }
-.tg-rub b.rod { margin-top: 1.6px; font-size: 16.5px; line-height: 0.96; color: var(--tg-rod); }
-.tg-forsta .tg-under { margin: 1.4px 0 2.4px; text-align: center; font: italic 700 4.1px/1.1 Georgia, Fraunces, serif; }
-.tg-kup { position: relative; flex: 1 1 auto; min-height: 0; padding: 1.3px 1.6px 0.6px; border: 0.6px solid var(--tg-svart); background: rgba(255, 252, 240, 0.4); }
-.tg-forsta .tg-kup p { display: flex; gap: 1.6px; align-items: baseline; margin: 0 0 0.6px; padding-bottom: 0.8px; border-bottom: 0.4px solid var(--tg-svart); font: 800 2.7px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.25px; }
-.tg-kup p span { font-weight: 600; letter-spacing: 0; text-transform: none; }
-.tg-kup ol { margin: 0; padding: 0; list-style: none; }
-.tg-kup li { display: flex; align-items: center; gap: 1.2px; border-bottom: 0.2px solid rgba(23, 19, 14, 0.28); font: 600 2.75px/1.22 "Helvetica Neue", Arial, sans-serif; }
-.tg-kup li:last-child { border-bottom: 0; }
-.tg-kup li b { flex: 0 0 3.4px; text-align: right; font-weight: 800; }
-.tg-kup li span { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.tg-kup li i { flex: 0 0 3.3px; background: var(--tg-svart); color: var(--tg-p); font-style: normal; font-weight: 800; text-align: center; }
-/* Spika: favoriten i en röd stjärna över kupongens hörn, där raderna är tomma */
-.tg-spik { position: absolute; right: -2.5px; top: -4px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 23px; height: 23px; border-radius: 50%; background: var(--tg-rod); color: #fff6e2; text-align: center; transform: rotate(9deg); box-shadow: 0 0 0 0.5px var(--tg-p); }
-.tg-spik b { font: 400 5.2px/1 Anton, Impact, sans-serif; text-transform: uppercase; }
-.tg-spik span { max-width: 20px; overflow: hidden; font: 800 2.9px/1.05 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
-.tg-puffar { display: flex; gap: 1.5px; margin-top: 2px; }
-.tg-puff { flex: 1 1 0; min-width: 0; padding: 1.3px 1.6px 1.1px; background: var(--tg-svart); color: var(--tg-p); }
-.tg-puff.gul { background: #efbf2c; color: var(--tg-svart); }
-.tg-puff b { display: block; font: 400 4.7px/1 Anton, Impact, sans-serif; text-transform: uppercase; white-space: nowrap; }
-.tg-puff span { display: block; overflow: hidden; font: 700 2.7px/1.2 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
+/* 100 × 140, förstorad med zoom: på pulten (2,5) och när den är framme (--k, passaTidning i rum.js). Numret, datumet
+   och priset överst, namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade med kulspetspenna, som på
+   utkastet (helgarderat.css), och dubbla streck under. Sedan rubriken, kupongen med ett grönt band överst och
+   puffarna. Spika och Skräll står i en röd stjärna över kupongens hörn, där raderna är tomma. */
+.hf-forsta { --hf-p: #efebe0; --hf-gron: #1b5435; --hf-rod: #c22a1f; --hf-svart: #15120e; --hf-gra: #5c564c; --hf-penna: #2347a8;
+  position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100px; height: 140px; overflow: hidden; padding: 1.4px 3.5px 3px;
+  background: radial-gradient(circle at 50% 50%, rgba(40, 30, 14, 0.13) 0 0.25px, rgba(0, 0, 0, 0) 0.35px) 0 0 / 1.1px 1.1px, var(--hf-p);
+  color: var(--hf-svart); font-family: "Helvetica Neue", Arial, sans-serif; text-align: left; }
+.hf-linje { display: flex; justify-content: space-between; align-items: baseline; gap: 2px; padding: 0 0 1px; border-bottom: 0.4px solid var(--hf-svart); color: var(--hf-gra); font: 700 2.6px/1.1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.12px; white-space: nowrap; }
+.hf-linje b { color: var(--hf-svart); text-transform: uppercase; }
+.hf-linje span:nth-child(2) { font-weight: 400; }
+.hf-namn { display: flex; align-items: center; justify-content: center; gap: 1.4px; margin: 0 -1px; padding: 2.6px 0 2.2px; border-bottom: 1.4px double var(--hf-svart); color: var(--hf-gron); white-space: nowrap; }
+.hf-namn b { font: 400 8.7px/1 "Alfa Slab One", Rockwell, Georgia, serif; letter-spacing: 0; }
+.hf-rutor { flex: none; width: 13px; height: auto; overflow: visible; }
+.hf-rutor .r { fill: rgba(255, 255, 255, 0.45); stroke: var(--hf-gron); stroke-width: 3.4; }
+.hf-rutor text { fill: var(--hf-gron); font: 800 19px/1 Fraunces, Georgia, serif; }
+.hf-rutor .k { fill: none; stroke: var(--hf-penna); stroke-width: 4.6; stroke-linecap: round; opacity: 0.9; }
+.hf-forsta .hf-rub { margin: 2.6px 0 0; padding: 0; border: 0; color: inherit; text-align: center; text-transform: uppercase; }
+.hf-rub b { display: block; font: 400 8.6px/0.98 Anton, Impact, sans-serif; letter-spacing: 0.1px; white-space: nowrap; }
+.hf-rub b.gron { margin-top: 1.4px; font-size: 16px; line-height: 0.96; color: var(--hf-gron); }
+.hf-forsta .hf-under { margin: 1.3px 0 2.2px; text-align: center; font: italic 700 4px/1.1 Georgia, Fraunces, serif; }
+.hf-kup { position: relative; flex: 1 1 auto; min-height: 0; padding: 0 1.6px 0.6px; border: 0.6px solid var(--hf-svart); background: rgba(255, 252, 240, 0.4); }
+.hf-forsta .hf-kup p { display: flex; gap: 1.6px; align-items: baseline; margin: 0 -1.6px 0.6px; padding: 1px 1.6px 0.8px; background: var(--hf-gron); color: #fff; font: 800 2.7px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.25px; }
+.hf-kup p span { font-weight: 600; letter-spacing: 0; text-transform: none; }
+.hf-kup ol { margin: 0; padding: 0; list-style: none; }
+.hf-kup li { display: flex; align-items: center; gap: 1.2px; border-bottom: 0.2px solid rgba(23, 19, 14, 0.28); font: 600 2.75px/1.22 "Helvetica Neue", Arial, sans-serif; }
+.hf-kup li:last-child { border-bottom: 0; }
+.hf-kup li b { flex: 0 0 3.4px; text-align: right; font-weight: 800; }
+.hf-kup li span { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.hf-kup li i { flex: 0 0 3.3px; background: var(--hf-gron); color: #fff; font-style: normal; font-weight: 800; text-align: center; }
+.hf-kup li em { flex: none; margin-left: 0.4px; font-style: normal; font-weight: 800; }
+/* efter omgången: resultatet direkt efter matchen, så att stjärnan inte skymmer det */
+.hf-forsta.efter .hf-kup li span { flex: 0 1 auto; }
+.hf-spik { position: absolute; right: -2.5px; top: -4px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 23px; height: 23px; border-radius: 50%; background: var(--hf-rod); color: #fff6e2; text-align: center; transform: rotate(9deg); box-shadow: 0 0 0 0.5px var(--hf-p); }
+.hf-spik b { font: 400 5.2px/1 Anton, Impact, sans-serif; text-transform: uppercase; }
+.hf-spik span { max-width: 20px; overflow: hidden; font: 800 2.9px/1.05 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
+.hf-puffar { display: flex; gap: 1.5px; margin-top: 2px; }
+.hf-puff { flex: 1 1 0; min-width: 0; padding: 1.3px 1.6px 1.1px; background: var(--hf-svart); color: var(--hf-p); }
+.hf-puff.gul { background: #efbf2c; color: var(--hf-svart); }
+.hf-puff b { display: block; font: 400 4.7px/1 Anton, Impact, sans-serif; text-transform: uppercase; white-space: nowrap; }
+.hf-puff span { display: block; overflow: hidden; font: 700 2.7px/1.2 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
 
-/* framme: framsidan överst på första arket, som sedeln */
-.tn .tg-forsta { flex: none; }
+/* framme: framsidan överst på första arket */
+.tn .hf-forsta { flex: none; }
 
-/* Åtta knep: numret stort i rött, och nummer 5 med en stämpel */
-.tg-knep { margin: 4px 0 0; padding: 0; list-style: none; column-count: 2; column-gap: 18px; column-rule: 1px solid var(--streck); }
-.tg-knep li { position: relative; display: flex; gap: 10px; break-inside: avoid; padding: 8px 0 10px; border-bottom: 1px solid var(--streck); }
-.tg-knep li > b { flex: none; width: 30px; color: var(--rod); font: 400 42px/0.9 Anton, Impact, sans-serif; text-align: center; }
-.tn .tg-knep h4 { margin: 3px 0 4px; font: 400 19px/1.05 Anton, Impact, sans-serif; text-transform: uppercase; }
-.tg-knep p { font: 400 14.5px/1.38 var(--serif); }
-.tg-knep li.fel { padding-right: 6px; background: rgba(239, 191, 44, 0.32); }
-.tg-stampel { display: inline-block; margin-top: 7px; padding: 4px 8px 2px; border: 2.5px solid var(--rod); color: var(--rod); font: 400 16px/1 Anton, Impact, sans-serif; text-transform: uppercase; transform: rotate(-4deg); opacity: 0.88; }
-.tn.smal .tg-knep { column-count: 1; }
+/* Åtta knep: numret stort i grönt, och nummer 5 med en röd stämpel */
+.hf-knep { margin: 4px 0 0; padding: 0; list-style: none; column-count: 2; column-gap: 18px; column-rule: 1px solid var(--streck); }
+.hf-knep li { position: relative; display: flex; gap: 10px; break-inside: avoid; padding: 8px 0 10px; border-bottom: 1px solid var(--streck); }
+.hf-knep li > b { flex: none; width: 30px; color: var(--gron); font: 400 42px/0.9 Anton, Impact, sans-serif; text-align: center; }
+.tn .hf-knep h4 { margin: 3px 0 4px; font: 400 19px/1.05 Anton, Impact, sans-serif; text-transform: uppercase; }
+.hf-knep p { font: 400 14.5px/1.38 var(--serif); }
+.hf-knep li.fel { padding-right: 6px; background: rgba(239, 191, 44, 0.32); }
+.hf-stampel { display: inline-block; margin-top: 7px; padding: 4px 8px 2px; border: 2.5px solid var(--rod); color: var(--rod); font: 400 16px/1 Anton, Impact, sans-serif; text-transform: uppercase; transform: rotate(-4deg); opacity: 0.88; }
+.tn.smal .hf-knep { column-count: 1; }
 
-/* På pulten (plane 0 i rum.js): mellan Hasses nota och kupongen, med kupongen en bit över sig, i rummets
-   ljus. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån (UPPE, samma funktioner).
-   Samma framsida ligger på pulten hos Hasse Backe (.rh-pa-tg, pultPapper i rum-hasse.js). */
-#rum-tipsguiden {
-  --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(-8deg) scale(1);
-  position: absolute; left: 338px; top: 628px; width: 190px; height: 266px;
-  transform: var(--vila); transform-origin: 50% 50%;
-  box-shadow: 0 14px 18px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.35);
-}
-#rum-tipsguiden.uppe { visibility: hidden; }
-#rum-tipsguiden.lyfts { z-index: 4; }
-#rum-tipsguiden .tg-pult, .rh-pa-tg .tg-pult { position: relative; display: block; zoom: 1.9; }
-/* ljuset uppifrån och lite skugga mot kanterna, och tidningen buktar en aning vid vecket i mitten */
-#rum-tipsguiden .tg-pult::after, .rh-pa-tg .tg-pult::after { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0) 47%, rgba(40, 22, 6, 0.16) 50%, rgba(255, 246, 225, 0.08) 51.5%, rgba(0, 0, 0, 0) 55%),
-              linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.22) 70%, rgba(20, 10, 2, 0.34)); }
+/* ---------- på pulten (tidningPult i rum.js) ---------- */
 
-/* ---------- kvällstidningen på pulten (tidningPult i rum.js) ---------- */
-
-/* Veckans tidning med förstasidan upp: löpsedelns papper (sedel i rum-affischer.js), förstorat --z gånger. Den
-   ligger till höger om kupongen, med överkanten vid pultens bakkant, och högen ligger på dess nedre del: --z
-   (tidningPult i rum.js) gör att rubriken slutar ovanför kupongerna. Lite snett och platt i pultens perspektiv som
-   Tipsguiden (--vila; lyft i rum.js lyfter den därifrån), vriden kring överkanten, som står still när --z ändras.
-   Mellan omgångarna finns ingen tidning (hidden). */
-#rum-kvallstidningen {
-  --z: 1.6;
+/* Förstasidan upp, förstorad --z gånger. Den ligger till höger om kupongen, med överkanten vid pultens bakkant, och
+   högen ligger på dess nedre del: --z gör att numret, namnet, rubriken och kupongens första rader syns ovanför
+   kupongerna (HOG i rum.js). Lite snett och platt i pultens perspektiv, i rummets ljus och med ett veck på mitten,
+   vriden kring överkanten. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån (UPPE, samma
+   funktioner). Samma tidning ligger på pulten hos Hasse Backe (.rh-pa-hg, pultPapper i rum-hasse.js). */
+#rum-helgarderat, .rh-pa-hg { --z: 1.75; }
+#rum-helgarderat {
   --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(4deg) scale(1);
   position: absolute; left: calc(1222px - var(--z) * 50px); top: 660px; width: calc(var(--z) * 100px); height: calc(var(--z) * 140px); overflow: hidden;
   transform: var(--vila); transform-origin: 50% 0;
   box-shadow: 0 14px 18px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.35);
 }
-#rum-kvallstidningen[hidden] { display: none; }
-#rum-kvallstidningen.uppe { visibility: hidden; }
-#rum-kvallstidningen.lyfts { z-index: 4; }
-#rum-kvallstidningen .rt-sedel { position: relative; transform: none; filter: none; pointer-events: none; zoom: var(--z); }
-/* ljuset uppifrån och lite skugga mot kanterna (vecket på mitten har sedeln själv, .veck) */
-#rum-kvallstidningen::after { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.2) 60%, rgba(20, 10, 2, 0.3)); }
+#rum-helgarderat.uppe { visibility: hidden; }
+#rum-helgarderat.lyfts { z-index: 4; }
+#rum-helgarderat .hf-pult, .rh-pa-hg .hf-pult { position: relative; display: block; zoom: var(--z); }
+/* ljuset uppifrån och lite skugga mot kanterna, och vecket på mitten */
+#rum-helgarderat::after, .rh-pa-hg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 49%, rgba(40, 22, 6, 0.14) 50%, rgba(255, 246, 225, 0.1) 51%, rgba(0, 0, 0, 0) 52.5%),
+              linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.2) 60%, rgba(20, 10, 2, 0.3)); }

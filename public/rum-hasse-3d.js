@@ -671,7 +671,7 @@ export function iBild(v, x, y, z = 0) {
   const [u, w] = iKamera([x, y, z], KAM);
   return [v.cx + v.s * u, v.ey + v.s * w];
 }
-// Ett papper som ligger på pulten i rummet (kupongen, protokollet och Tipsguiden; pultPapper i rum-hasse.js) på
+// Ett papper som ligger på pulten i rummet (kupongen, protokollet och Helgarderat; pultPapper i rum-hasse.js) på
 // samma ställe i hans bild, där pultens arm går fram längs ens högra sida: på tvären, med överkanten mot armens
 // bortre kant. hornen: pappret i rummets scen (övre vänstra, övre högra, nedre högra och nedre vänstra hörnet),
 // w × h: pappret i sina egna bildpunkter. Rummets papper ligger i ett ritat perspektiv och inte genom rummets kamera

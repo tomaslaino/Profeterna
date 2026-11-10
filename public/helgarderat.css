@@ -1,7 +1,7 @@
 /* Helgarderat (helgarderat.html, helgarderat.js): tidningen med det supportrarna vet, ark för ark på den mörka
    disken. Eget utseende: tidningspapper med tryck i svart och flaskgrönt, namnet i Alfa Slab One och tre rutor
-   (1, X och 2) som är ikryssade med kulspetspenna. Markörerna för slaget betyder samma sak som i tidningen bakom
-   löpsedeln (rum-tidning.css). Smalt (under 720 px): en spalt. */
+   (1, X och 2) som är ikryssade med kulspetspenna. Markörerna för slaget betyder samma sak som i tidningen på pulten
+   i rummet (rum-tidning.css), som har samma namn och färger. Smalt (under 720 px): en spalt. */
 
 html { background: #1a1510; }
 body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
