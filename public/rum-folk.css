@@ -3,10 +3,11 @@
 /* Natten: lysröret är släckt. Mörkret ligger i samma lager som när
    lysröret tänds (.rum-mork i rum.css), med ljus kvar där gatan lyser in
    genom fönstret och dörren, från tv:n och lite över pulten; nära tv:n,
-   videon, en sak och med kupongen i handen är det borta. */
+   videon, en sak och med kupongen i handen är det borta. Det tonas in från
+   23 till midnatt och ut från sex till sju (--natt-grad på mörkret, rum-folk.js). */
 .rum.natt .rum-mork {
   display: block;
-  opacity: 0.84;
+  opacity: calc(0.84 * var(--natt-grad, 1));
   background: #04050a;
   transition: opacity 0.3s;
   -webkit-mask: none;

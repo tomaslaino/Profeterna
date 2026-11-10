@@ -246,7 +246,8 @@ const DISK = G.length;
 // (pulten vid hörnet: benet framför honom och armen som går fram mot en, förbi kameran)
 grupp(() => {
   const { Y, Z, DJUP } = SCEN.DISK;
-  const xi = SCEN.HORN.X, xo = xi + SCEN.HORN.B, zl = 4400;
+  // (pultens mått → barens: han sitter vid PLATS)
+  const xi = SCEN.HORN.X - SCEN.PLATS, xo = xi + SCEN.HORN.B, zl = 4400;
   box([(xo - 7000) / 2, Y - 20, Z + DJUP / 2], [(xo + 7000) / 2, 20, DJUP / 2], 10);
   box([(xo - 7000) / 2, (Y - 40 + GOLV) / 2, Z + DJUP / 2 + 60], [(xo + 7000) / 2, (Y - 40 - GOLV) / 2, DJUP / 2 - 60], 8);
   box([(xi + xo) / 2, Y - 20, (Z + DJUP + zl) / 2], [(xo - xi) / 2, 20, (zl - Z - DJUP) / 2], 10);

@@ -7,28 +7,32 @@
 // Stationerna ligger på sina frekvenser (KANALER, de svenska på sina frekvenser i Stockholm och
 // Göteborg, AM-bandets på mellanvågen där de sänder eller har sänt, som talkSPORT och Sport 890) och är
 // riktiga webbradiokanaler. Mellan dem hörs brus
-// (på AM dessutom knaster och den pipton som sjunker när man närmar sig stationen). Samma visare går över
+// (på AM dessutom knaster och den pipton som sjunker när man närmar sig stationen). När stationen väl hörs
+// är det rent på båda banden, också om den hackar till (AM har kvar sitt smala band och sin fading). Samma visare går över
 // båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station.
 //
-// En station som man har hört en stund är hittad: den skrivs på tejpen vid skalan och står som ett ord
-// under radion (bara bandet som spaken står på), och ett klick på ordet går dit (hittade, sparas i
-// webbläsaren). Italo Disco är hittad från början, och visaren står där första gången.
+// Tio stationer står för hand på tejpen vid skalan (FM ovanför, AM under), och med frekvenserna på ett
+// blad ur ett spiralblock som är tejpat på fönsterkarmen bredvid radion (lappen, och radiolapp i
+// rum-inredning.js). Ett tryck på ett namn på tejpen eller en rad på bladet går dit och sätter på radion.
+// Första gången står visaren på Italo Disco.
 //
 // Ljudet går genom Web Audio (allt är CORS-öppet, kontrollerat 2026-11-08): AM låter som AM (smalt band
 // och långsam fading), och lysdioderna och högtalarna följer det som faktiskt hörs. Slutar en adress
 // svara provas reservadressen och sedan samma adress utan Web Audio (A.fri), så att en station som
-// har bytt server ändå hörs. Ljudet måste sättas igång av ett tryck, och det gör reglagen och orden. Gänget sjunger och dansar till musik (fig.radio), inte till
+// har bytt server ändå hörs. Ljudet måste sättas igång av ett tryck, och det gör reglagen och lappen. Gänget sjunger och dansar till musik (fig.radio), inte till
 // brus eller prat, och slutar inte förrän fyra sekunder efter att musiken har försvunnit: den som drar i
 // spaken ska inte få dem att börja om. Radion stängs av när man lämnar rummet (av).
 //
-//   RumRadio.mount({ el, fig, now })     när gänget har laddats
+//   RumRadio.mount({ el, fig, now, inr, sak })  när gänget har laddats (inr: inredningen med bladet,
+//                                        sak(namn): kameran går fram till något)
 //   RumRadio.nara(på)                    reglagen läggs över radion (kameran är framme) eller tas bort
-//   RumRadio.fot()                       orden under radion
+//   RumRadio.ram(r, topp, hojd, m, bara) närbilden: radion (r) och bladet (m) i fönstret, eller bara bladet
+//   RumRadio.rad(kanal)                  [frekvensen, namnet] som de står på bladet
 //   RumRadio.kraft()                     POWER: på med bandet som spaken står på, eller av
 //   RumRadio.bandspak('fm' | 'am')       bandspaken (är radion av flyttas bara spaken)
 //   RumRadio.av()                        stäng av
-//   RumRadio.prova('fm:104.3', alla)     för bilder, utan ljud (?rum-radio-lage, ?rum-radio-alla)
-//   RumRadio.lage()                      hur det står till (band, frekvens, kanal, hörs, hittade)
+//   RumRadio.prova('fm:90.4')            för bilder, utan ljud (?rum-radio-lage)
+//   RumRadio.lage()                      hur det står till (band, frekvens, kanal, hörs)
 window.RumRadio = (() => {
   // lasa: så här nära är stationen ren, tappa: så här långt bort har den försvunnit i bruset
   const BAND = {
@@ -38,58 +42,20 @@ window.RumRadio = (() => {
   const khz = (x) => `https://${x}-ice.stream.khz.se/${x}_mp3`;
   // (direkt till servrarna: live1.sr.se och flera andra skickar vidare utan CORS, och då spelas inget)
   const sr = (x) => ({ url: `https://edge1.sr.se/${x}-mp3-96`, reserv: `https://edge2.sr.se/${x}-mp3-96` });
-  const rai = (x) => `https://icecdn-19d24861e90342cc8decb03c24c8a419.msvdn.net/icecastRelay/${x}/icecast`;
-  // (i frekvensordning: orden under radion står som de står här)
+  // De stationer som hör hemma i tobaksaffären (2026-11-09, de essentiella av 49): italodiscon som gänget
+  // dansar till, svensk radio, IFK:s Göteborg, DL:s Nacional i Montevideo och engelsk fotboll.
+  // (i frekvensordning: lappen står som de står här)
   const KANALER = [
-    { id: 'skargard', band: 'fm', f: 88.1, namn: 'Skärgårdsradion', kort: 'Skärgård', url: khz('fm06'), musik: true },
-    { id: 'dansband', band: 'fm', f: 88.7, namn: 'Dansbandskanalen', kort: 'Dansband', url: 'https://stream.dbmedia.se/dbkMP3', musik: true },
-    { id: 'marca', band: 'fm', f: 89.3, namn: 'Radio Marca', kort: 'Marca', url: 'https://streaming.enacast.com/radiomarcaasturiasHD.mp3', musik: false },
-    { id: 'country', band: 'fm', f: 89.9, namn: 'Go Country', kort: 'Country', url: khz('wr14'), musik: true },
     { id: 'italo', band: 'fm', f: 90.4, namn: 'Italo Disco', kort: 'Italo', url: 'https://italo-disco.stream.laut.fm/italo-disco', musik: true },
-    { id: 'fip', band: 'fm', f: 91, namn: 'FIP', kort: 'FIP', url: 'https://icecast.radiofrance.fr/fip-midfi.mp3', musik: true },
-    { id: 'rai2', band: 'fm', f: 91.7, namn: 'Rai Radio 2', kort: 'Rai 2', url: rai('S35942484/yp5F67151K92'), musik: true },
     { id: 'p1', band: 'fm', f: 92.4, namn: 'P1', kort: 'P1', ...sr('p1'), musik: false },
-    { id: 'guld60', band: 'fm', f: 93, namn: 'Guldkanalen 60-tal', kort: '60-tal', url: 'https://stream.dbmedia.se/gk60tal96', musik: true },
     { id: 'guld', band: 'fm', f: 93.7, namn: 'Guldkanalen 80-tal', kort: '80-tal', url: 'https://stream.dbmedia.se/gk80tal96', musik: true },
-    { id: 'nostalgi', band: 'fm', f: 94.2, namn: 'Radio Nostalgi', kort: 'Nostalgi', url: 'https://live-bauerse-fm.sharp-stream.com/nostalgi_mp3', musik: true },
-    { id: 'gamla', band: 'fm', f: 94.8, namn: 'Gamla Favoriter', kort: 'Gamla', url: khz('wr09'), musik: true },
-    { id: 'power', band: 'fm', f: 95.3, namn: 'Power Hit Radio', kort: 'Power', url: khz('fm04'), musik: true },
-    { id: 'p2', band: 'fm', f: 96.2, namn: 'P2', kort: 'P2', ...sr('p2'), musik: true },
     { id: 'rock', band: 'fm', f: 97.7, namn: 'Rockklassiker', kort: 'Rock', url: 'https://live-bauerse-fm.sharp-stream.com/rockklassiker_instream_se_aacp', musik: true },
-    { id: 'hitmix', band: 'fm', f: 98.5, namn: 'HitMix 90’s', kort: '90-tal', url: khz('wr19'), musik: true },
     { id: 'p3', band: 'fm', f: 99.3, namn: 'P3', kort: 'P3', ...sr('p3'), musik: true },
-    { id: 'disco', band: 'fm', f: 100.6, namn: 'Disco 54', kort: 'Disco', url: khz('wr15'), musik: true },
-    { id: 'nova', band: 'fm', f: 101.3, namn: 'Radio Nova', kort: 'Nova', url: 'https://novazz.ice.infomaniak.ch/novazz-128.mp3', musik: true },
-    { id: 'p4g', band: 'fm', f: 101.9, namn: 'P4 Göteborg', kort: 'P4 G', ...sr('p4gbg'), musik: false },
-    { id: 'rtl', band: 'fm', f: 102.5, namn: 'RTL 102.5', kort: 'RTL', url: 'https://streamingv2.shoutcast.com/rtl-1025', musik: true },
-    { id: 'p4', band: 'fm', f: 103.3, namn: 'P4 Stockholm', kort: 'P4 S', ...sr('p4sth'), musik: false },
-    { id: 'mix', band: 'fm', f: 104.3, namn: 'Mix Megapol', kort: 'Mix', url: 'https://live-bauerse-fm.sharp-stream.com/mixmegapol_instream_se_mp3', musik: true },
-    { id: 'r105', band: 'fm', f: 105.1, namn: 'Radio 105', kort: '105', url: 'https://icecast.unitedradio.it/Radio105.mp3', musik: true },
-    { id: 'bandit', band: 'fm', f: 106.3, namn: 'Bandit Rock', kort: 'Bandit', url: khz('fm02'), musik: true },
+    { id: 'p4g', band: 'fm', f: 101.9, namn: 'P4 Göteborg', kort: 'P4', ...sr('p4gbg'), musik: false },
     { id: 'rix', band: 'fm', f: 106.7, namn: 'Rix FM', kort: 'Rix', url: khz('fm01'), musik: true },
-    { id: 'star', band: 'fm', f: 107.1, namn: 'Star FM', kort: 'Star', url: khz('fm05'), musik: true },
-    { id: 'club', band: 'fm', f: 107.8, namn: 'Power Club', kort: 'Club', url: khz('wr06'), musik: true },
-    { id: 'rural', band: 'am', f: 610, namn: 'Radio Rural', kort: 'Rural', url: 'https://radiolatina.live/9206/stream', musik: false },
-    { id: 'rivadavia', band: 'am', f: 630, namn: 'Radio Rivadavia', kort: 'Rivadavia', url: 'https://radio02.ferozo.com/proxy/ra02001331?mp=/stream', musik: false },
-    { id: 'clasica', band: 'am', f: 650, namn: 'Clásica', kort: 'Clásica', url: 'https://radios.iwstreaming.uy/8032/stream', musik: true },
-    { id: 'sarandi', band: 'am', f: 690, namn: 'Sarandí', kort: 'Sarandí', url: 'https://radiolatina.live:10977/sarandi', musik: false },
-    { id: 'mitre', band: 'am', f: 790, namn: 'Radio Mitre', kort: 'Mitre', url: 'https://sc.host-live.com:10810/stream', musik: false },
-    { id: 'espectador', band: 'am', f: 810, namn: 'El Espectador', kort: 'Espectador', url: 'https://espectador-1.nty.uy/', musik: false },
-    { id: 'carve', band: 'am', f: 850, namn: 'Radio Carve', kort: 'Carve', url: 'https://icecast22.innovanexo.com:9000/radiocarve850.mp3', musik: false },
-    { id: 'nacional', band: 'am', f: 870, namn: 'Radio Nacional', kort: 'Nacional', url: 'https://sa.mp3.icecast.magma.edge-access.net/sc_rad1', musik: false },
     { id: 'sport', band: 'am', f: 890, namn: 'Sport 890', kort: 'Sport 890', url: 'https://radiolatina.live:10976/sport', reserv: 'https://puma.streemlion.com:2415/stream', musik: false },
-    { id: 'rai', band: 'am', f: 900, namn: 'Rai Radio 1', kort: 'Rai', url: rai('S16355530/Q4zh3NTu28Rx'), musik: false },
-    { id: 'montecarlo', band: 'am', f: 930, namn: 'Radio Monte Carlo', kort: 'Monte Carlo', url: 'https://icecast22.innovanexo.com:9000/montecarlo.mp3', reserv: 'https://icecast15.innovanexo.com:9000/montecarlo.mp3', musik: true },
-    { id: 'reloj', band: 'am', f: 950, namn: 'Radio Reloj', kort: 'Reloj', url: 'https://icecast.teveo.cu/b3jbfThq', musik: false },
-    { id: 'universal', band: 'am', f: 970, namn: '970 Universal', kort: 'Universal', url: 'https://970universal-3.nty.uy/', musik: false },
-    { id: 'cope', band: 'am', f: 999, namn: 'COPE', kort: 'COPE', url: 'https://net1-cope-rrcast.flumotion.com/cope/net1-low.mp3', musik: false },
     { id: 'talksport', band: 'am', f: 1053, namn: 'talkSPORT', kort: 'talkSPORT', url: 'https://radio.talksport.com/stream', musik: false },
-    { id: 'talksport2', band: 'am', f: 1089, namn: 'talkSPORT 2', kort: 'talk 2', url: 'https://talksport.live.stream.broadcasting.news/stream2', musik: false },
     { id: 'caroline', band: 'am', f: 1159, namn: 'Radio Caroline', kort: 'Caroline', url: 'https://happy.radiocaroline.nl/listen/classic_rock/radio128.mp3', musik: true },
-    { id: 'p6', band: 'am', f: 1179, namn: 'P6', kort: 'P6', ...sr('p6'), musik: false },
-    { id: 'rmc', band: 'am', f: 1467, namn: 'RMC', kort: 'RMC', url: 'https://audio.bfmtv.com/rmcradio_128.mp3', musik: false },
-    { id: 'vaticana', band: 'am', f: 1530, namn: 'Radio Vaticana', kort: 'Vatikanen', url: 'https://radio.vaticannews.va/stream-it', musik: false },
-    { id: 'gold', band: 'am', f: 1548, namn: 'Gold', kort: 'Gold', url: 'https://media-ssl.musicradio.com/GoldMP3', musik: true },
   ];
   const kanal = (id) => KANALER.find((k) => k.id === id) || null;
   const pAv = (band, f) => (f - BAND[band].fran) / (BAND[band].till - BAND[band].fran);
@@ -97,23 +63,24 @@ window.RumRadio = (() => {
   const kl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const mjuk = (a, b, x) => { const t = kl((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 
-  // Det som sparas: visaren, volymen och vad man har hittat (och radion är av när man kommer tillbaka)
+  // Det som sparas: visaren och volymen (och radion är av när man kommer tillbaka)
   const NYCKEL = 'rum-radio';
-  const S = { band: 'av', sist: 'fm', p: pAv('fm', 90.4), vol: 0.55, hittade: ['italo'] };
+  const S = { band: 'av', sist: 'fm', p: pAv('fm', 90.4), vol: 0.55 };
   try {
     const x = JSON.parse(localStorage.getItem(NYCKEL) || 'null');
     if (x) {
       if (Number.isFinite(x.p)) S.p = kl(x.p);
       if (Number.isFinite(x.vol)) S.vol = kl(x.vol);
       if (BAND[x.sist]) S.sist = x.sist;
-      if (Array.isArray(x.hittade)) S.hittade = [...new Set(['italo', ...x.hittade.filter((i) => kanal(i))])];
+      // (stod visaren på en station som inte finns kvar börjar den på Italo Disco igen)
+      if (narmast(S.sist, fAv(S.sist, S.p)).d > BAND[S.sist].fanga) Object.assign(S, { sist: 'fm', p: pAv('fm', 90.4) });
     }
   } catch (err) { /* då börjar den från början */ }
   let sparaT = 0;
   function spara() {
     clearTimeout(sparaT);
     sparaT = setTimeout(() => {
-      try { localStorage.setItem(NYCKEL, JSON.stringify({ p: S.p, vol: S.vol, sist: S.sist, hittade: S.hittade })); } catch (err) { /* bara den här gången */ }
+      try { localStorage.setItem(NYCKEL, JSON.stringify({ p: S.p, vol: S.vol, sist: S.sist })); } catch (err) { /* bara den här gången */ }
     }, 400);
   }
 
@@ -122,7 +89,7 @@ window.RumRadio = (() => {
   // visaren: den går mot mal (N.mal) med lite tröghet, och ljudet följer den
   const N = { mal: S.p, raf: 0, sen: 0, drag: false };
   // ljudet (A.ctx först efter ett tryck)
-  const A = { ctx: null, el: null, fri: null, friPa: false, steg: 0, kanal: null, klar: false, narmast: null, s: 0, fade: 1, las: 0, slapp: 0, hittaT: 0, gangT: 0, gang: false, omT: 0, fel: {}, basSn: 0 };
+  const A = { ctx: null, el: null, fri: null, friPa: false, steg: 0, kanal: null, klar: false, fick: null, narmast: null, s: 0, fade: 1, las: 0, slapp: 0, gangT: 0, gang: false, omT: 0, fel: {}, basSn: 0 };
 
   function narmast(band, f) {
     let bast = null;
@@ -152,7 +119,15 @@ window.RumRadio = (() => {
     A.el = el;
     A.utv = c.createGain();
     A.utv.gain.value = S.vol ** 1.6;
-    A.utv.connect(c.destination);
+    // (ett tak: starka stationer på hög volym slår annars i botten och sprakar)
+    A.tak = c.createDynamicsCompressor();
+    A.tak.threshold.value = -1;
+    A.tak.knee.value = 0;
+    A.tak.ratio.value = 20;
+    A.tak.attack.value = 0.002;
+    A.tak.release.value = 0.12;
+    A.utv.connect(A.tak);
+    A.tak.connect(c.destination);
     A.mix = c.createGain();
     A.mix.connect(A.utv);
     A.an = c.createAnalyser();
@@ -178,18 +153,21 @@ window.RumRadio = (() => {
     A.lp.connect(A.topp);
     A.topp.connect(A.stn);
     A.stn.connect(A.mix);
-    // bruset, knastret på AM och piptonen mellan AM-stationerna
+    // bruset, knastret mellan AM-stationerna och piptonen när man närmar sig en
     const vit = c.createBuffer(1, c.sampleRate * 3, c.sampleRate);
     const v = vit.getChannelData(0);
     for (let i = 0; i < v.length; i++) v[i] = Math.random() * 2 - 1;
-    const pop = c.createBuffer(1, c.sampleRate * 5, c.sampleRate);
-    const q = pop.getChannelData(0);
-    for (let n = 0; n < 34; n++) {
-      const at = Math.floor(Math.random() * (q.length - 800));
-      const st = 0.25 + Math.random() * 0.75;
-      const len = 40 + Math.floor(Math.random() * 500);
-      for (let i = 0; i < len; i++) q[at + i] += st * (Math.random() * 2 - 1) * (1 - i / len) ** 2;
-    }
+    const knaster = (sek, antal) => {
+      const b = c.createBuffer(1, Math.floor(c.sampleRate * sek), c.sampleRate);
+      const q = b.getChannelData(0);
+      for (let n = 0; n < antal; n++) {
+        const at = Math.floor(Math.random() * (q.length - 800));
+        const st = 0.25 + Math.random() * 0.75;
+        const len = 40 + Math.floor(Math.random() * 500);
+        for (let i = 0; i < len; i++) q[at + i] += st * (Math.random() * 2 - 1) * (1 - i / len) ** 2;
+      }
+      return b;
+    };
     const slinga = (b) => { const s = c.createBufferSource(); s.buffer = b; s.loop = true; s.start(); return s; };
     A.bHp = c.createBiquadFilter();
     A.bHp.type = 'highpass';
@@ -201,14 +179,14 @@ window.RumRadio = (() => {
     A.bHp.connect(A.bLp);
     A.bLp.connect(A.brus);
     A.brus.connect(A.mix);
-    A.pop = c.createGain();
-    A.pop.gain.value = 0;
     const popLp = c.createBiquadFilter();
     popLp.type = 'lowpass';
     popLp.frequency.value = 2600;
-    slinga(pop).connect(popLp);
-    popLp.connect(A.pop);
-    A.pop.connect(A.mix);
+    popLp.connect(A.mix);
+    A.pop = c.createGain();
+    A.pop.gain.value = 0;
+    slinga(knaster(5, 34)).connect(A.pop);
+    A.pop.connect(popLp);
     A.viss = c.createOscillator();
     A.viss.type = 'sine';
     A.visG = c.createGain();
@@ -218,7 +196,7 @@ window.RumRadio = (() => {
     A.viss.start();
     A.fri = new Audio();
     A.fri.preload = 'auto';
-    const spelar = () => { clearTimeout(A.omT); A.klar = true; lyssna(); };
+    const spelar = () => { clearTimeout(A.omT); A.klar = true; A.fick = A.kanal; lyssna(); };
     const vantar = () => { A.klar = false; lyssna(); };
     const spela = (x, u) => {
       x.src = u;
@@ -261,7 +239,7 @@ window.RumRadio = (() => {
     // (fadingen på AM och att den ibland hänger sig efter en dold flik)
     setInterval(() => {
       if (S.band === 'am' && A.klar) {
-        A.fade = 0.68 + Math.random() * 0.32;
+        A.fade = 0.82 + Math.random() * 0.18;
         lyssna();
       } else if (A.fade !== 1) A.fade = 1;
     }, 1400);
@@ -290,6 +268,7 @@ window.RumRadio = (() => {
     A.steg = 0;
     A.kanal = k;
     A.klar = false;
+    A.fick = null;
     A.el.src = k.url;
     const p = A.el.play();
     if (p && p.catch) p.catch(() => {});
@@ -330,14 +309,18 @@ window.RumRadio = (() => {
       }
       const am = S.band === 'am';
       const ren = hors ? s : 0;
+      // Bruset tystnar när visaren står på stationen (bara en station som inte svarar ger brus): medan den
+      // laddas hörs lite av det, och när den väl har hörts är det rent, också om den hackar till (A.fick).
+      const fatt = Boolean(k && A.kanal === k && A.fick === k);
+      const bar = hors || fatt ? s : k && A.kanal === k ? s * 0.9 : 0;
       param(A.stn.gain, hors && !A.friPa ? ren * (am ? A.fade : 1) : 0, am ? 0.35 : 0.04);
       if (A.friPa) A.fri.volume = kl(ren * S.vol ** 1.6);
-      param(A.brus.gain, (am ? 0.32 : 0.3) * (1 - ren * (am ? 0.72 : 0.97)) * (am ? 2 - A.fade : 1), 0.04);
-      param(A.pop.gain, am ? 0.34 * (1 - 0.65 * ren) : 0, 0.05);
+      param(A.brus.gain, am ? 0.32 * (1 - bar) * (2 - A.fade) : 0.3 * (1 - bar), 0.04);
+      param(A.pop.gain, am ? 0.34 * (1 - bar) : 0, 0.05);
       // (AM: tonen mellan stationerna, som sjunker tills man står rätt)
       if (am && d > B.lasa * 0.7 && d < B.tappa * 1.6) {
         param(A.viss.frequency, 120 + d * 340, 0.02);
-        param(A.visG.gain, 0.022 * (1 - ren), 0.04);
+        param(A.visG.gain, 0.022 * (1 - bar), 0.04);
       } else param(A.visG.gain, 0, 0.04);
     } else if (A.ctx) {
       clearTimeout(A.las);
@@ -348,9 +331,6 @@ window.RumRadio = (() => {
       param(A.visG.gain, 0, 0.02);
       if (!pa && A.kanal) slapp();
     }
-    // hittad: den som har hörts en stund på rätt ställe
-    clearTimeout(A.hittaT);
-    if (k && hors && s > 0.7 && !S.hittade.includes(k.id)) A.hittaT = setTimeout(() => hittad(k), 900);
     // gänget: musik sätter igång dem direkt, och de slutar först en stund efter att musiken är borta
     const musik = Boolean(pa && k && k.musik && hors && s > 0.5);
     if (musik || !pa) {
@@ -361,7 +341,7 @@ window.RumRadio = (() => {
       A.gangT = setTimeout(() => { A.gangT = 0; gangSatt(false); }, 4000);
     }
     till3d({ s: hors ? s * (S.band === 'am' ? 0.45 + 0.55 * A.fade : 1) : s * 0.12 });
-    fotNu();
+    lappNu();
   }
   // Hur mycket som hörs just nu, till lysdioderna och högtalarna (rum-3d.js, radioRita).
   function niva() {
@@ -405,15 +385,7 @@ window.RumRadio = (() => {
     const g = fig();
     if (!g || !g.radioLage) return;
     g.radioLage({ band: S.band, sist: S.sist, p: S.p, vol: S.vol, lampa: S.band === 'av' ? 0 : 1, niva });
-    g.radioEtiketter(KANALER.map((k) => ({ id: k.id, band: k.band, p: pAv(k.band, k.f), kort: k.kort })), S.hittade);
-  }
-  function hittad(k) {
-    if (O.tyst || S.hittade.includes(k.id)) return;
-    S.hittade.push(k.id);
-    spara();
-    const g = fig();
-    if (g && g.radioSkriv) g.radioSkriv(k.id, O.now());
-    fotOm(k.id);
+    g.radioEtiketter(KANALER.map((k) => ({ id: k.id, band: k.band, p: pAv(k.band, k.f), kort: k.kort })));
   }
 
   // ---------- visaren ----------
@@ -466,7 +438,6 @@ window.RumRadio = (() => {
     till3d({ band, sist: S.sist, lampa: band === 'av' ? 0 : 1 });
     lyssna();
     knappar();
-    fotBand();
     spara();
   }
   const KLONK = [820, 0.055, 0.65];
@@ -483,7 +454,6 @@ window.RumRadio = (() => {
     S.sist = band;
     till3d({ sist: band });
     knappar();
-    fotBand();
     spara();
   }
   function volym(v) {
@@ -504,7 +474,8 @@ window.RumRadio = (() => {
 
   // ---------- reglagen ----------
   // Genomskinliga knappar över delarna i 3D, placerade när kameran är framme. Fingret når dem också
-  // när radion är liten (MINST), och i bilden ser man den riktiga delen röra sig under.
+  // när radion är liten (MINST), och i bilden ser man den riktiga delen röra sig under. Lappen med
+  // frekvenserna (nedan) står bland dem.
   const U = { el: null, pa: false };
   const MINST = 42;
   function bygg() {
@@ -518,7 +489,9 @@ window.RumRadio = (() => {
       + '<div class="r-del r-spak" role="slider" tabindex="0" aria-label="Stationsspaken" aria-valuemin="0" aria-valuemax="100"></div>'
       + '<div class="r-del r-ratt r-vol" role="slider" tabindex="0" aria-label="Volymen" aria-valuemin="0" aria-valuemax="100"></div>'
       + '<button type="button" class="r-del r-kraft" aria-label="På och av"></button>'
-      + '<button type="button" class="r-del r-band"></button>';
+      + '<button type="button" class="r-del r-band"></button>'
+      + '<button type="button" class="r-lapp" aria-label="Gå fram till lappen med stationerna" hidden></button>'
+      + `<div class="r-rader" hidden>${KANALER.map((k) => `<button type="button" class="r-st" data-k="${k.id}" aria-pressed="false">${rad(k).join(' ')}</button>`).join('')}</div>`;
     O.el.append(d);
     U.el = d;
     // (reglagen är inget drag i rummet: svepet i rum.js ska inte se dem, och inte stoppa nästa klick)
@@ -529,6 +502,18 @@ window.RumRadio = (() => {
     U.vol = d.querySelector('.r-vol');
     U.kraft = d.querySelector('.r-kraft');
     U.band = d.querySelector('.r-band');
+    U.lapp = d.querySelector('.r-lapp');
+    U.rader = d.querySelector('.r-rader');
+    U.st = {};
+    for (const b of U.rader.querySelectorAll('.r-st')) U.st[b.dataset.k] = b;
+    U.rader.addEventListener('click', (e) => {
+      const b = e.target.closest('.r-st');
+      if (b) valj(b.dataset.k);
+    });
+    // (raderna är för små här: kameran går fram till bladet)
+    U.lapp.addEventListener('click', () => { if (!U.lapp.classList.contains('las') && O.sak) O.sak('radiolapp'); });
+    U.nu = null;
+    lappNu();
     U.kraft.addEventListener('click', kraft);
     // bandspaken: upp är FM och ner är AM, och ett tryck slår över den
     let y0 = null;
@@ -577,6 +562,14 @@ window.RumRadio = (() => {
       const p = handP(e);
       const vidSpaken = Math.abs(p - N.mal) < 0.05;
       grepp = vidSpaken ? N.mal - p : 0;
+      // (ett namn på tejpen: dit, på det bandet, och radion sätts på; spakens yta når upp över AM-tejpen)
+      const g = fig();
+      const namn = !vidSpaken && g && g.radioEtikett ? g.radioEtikett(...dukPunkt(e)) : null;
+      if (namn) {
+        fri = true;
+        valj(namn);
+        return;
+      }
       // (nedanför skenan hänger bara kulan: ett tryck bredvid den är ett tryck på fronten)
       const r = U.spak.getBoundingClientRect();
       fri = !vidSpaken && e.currentTarget === U.spak && e.clientY > r.top + r.height * 0.42;
@@ -654,6 +647,7 @@ window.RumRadio = (() => {
     satt(U.vol, d.vol);
     satt(U.kraft, d.kraft);
     satt(U.band, d.band);
+    lappPlats();
   }
   function nara(pa) {
     bygg();
@@ -665,51 +659,87 @@ window.RumRadio = (() => {
     }
   }
 
-  // ---------- orden under radion ----------
-  // Bara bandet som spaken står på: med alla stationer hittade är det annars en hel spalt ord.
-  const ordHtml = (k) => `<button type="button" class="r-ord" data-k="${k.id}">${k.namn}</button>`;
-  const ordLista = (band) => KANALER.filter((k) => k.band === band && S.hittade.includes(k.id)).map(ordHtml).join('');
-  const fot = () => `<div class="radio-fot" data-radio data-band="${S.sist}">${ordLista(S.sist)}</div>`;
-  function fotBand() {
-    const f = document.querySelector('.radio-fot');
-    if (!f || f.dataset.band === S.sist) return;
-    f.dataset.band = S.sist;
-    f.innerHTML = ordLista(S.sist);
-    f.dataset.nu = '\u0000';
-    fotNu();
+  // ---------- lappen ----------
+  // Ett blad ur ett spiralblock, tejpat på fönsterkarmen till höger om radion (radiolapp i rum-inredning.js):
+  // stationerna för hand i en spalt, FM i blått och under det AM i rött, och den station som hörs är inringad
+  // (lappNu). Det sitter där från början, och nära radion kommer det med i bilden (ram). Över raderna ligger
+  // genomskinliga knappar när de är stora nog att läsa (LASBAR): ett klick går dit och sätter på radion.
+  // Annars är bladet en knapp som går fram till det (SAKER.radiolapp i rum.js), och där räcker det.
+  const frekvens = (k) => (BAND[k.band].steg < 1 ? k.f.toFixed(1).replace('.', ',') : String(k.f));
+  // (frekvensen står redan framför namnet: Sport 890 blir Sport och RTL 102.5 blir RTL)
+  const lappNamn = (k) => k.namn.split(' ').filter((o) => o.replace(',', '.') !== String(k.f)).join(' ') || k.namn;
+  // en rad på bladet: frekvensen och namnet
+  const rad = (k) => [frekvens(k), lappNamn(k)];
+  // (så här höga måste raderna vara i bilden för att gå att läsa och träffa)
+  const LASBAR = 14;
+  const lapp = () => {
+    const L = O.inr && O.inr() && O.inr().lapp;
+    // (bladet blev klart efter att stationen hittades)
+    if (L && L.sagt !== U.nu) {
+      L.sagt = U.nu;
+      L.nu(U.nu);
+    }
+    return L || null;
+  };
+  // Närbilden: r är rutan runt radion och m bladet, utan zoom och med rummet rakt, och topp och hojd den del
+  // av fönstret som de får. Radion och bladet tillsammans, eller bara bladet (bara: SAKER.radiolapp) när
+  // raderna blir för små bredvid radion. → zoomen och var radions mitt ska stå i fönstret.
+  function ram(r, topp, hojd, m, bara) {
+    if (!r || !m || !m.width) return null;
+    const W = innerWidth;
+    // (luft i sidorna, så att tejpen på bladet inte hamnar i fönsterkanten)
+    const kant = Math.max(12, W * 0.03);
+    const U0 = { left: Math.min(r.left, m.left), top: Math.min(r.top, m.top), right: Math.max(r.right, m.right), bottom: Math.max(r.bottom, m.bottom) };
+    const passa = (q) => Math.min((W - 2 * kant) / (q.right - q.left), (hojd * 0.97) / (q.bottom - q.top));
+    let q = U0;
+    let z = passa(U0);
+    const L = lapp();
+    if (bara && z * m.height * (L ? L.rad : 1 / 33) < LASBAR) {
+      q = m;
+      z = passa(m);
+    }
+    const mitt = (x) => [(x.left + x.right) / 2, (x.top + x.bottom) / 2];
+    const [rx, ry] = mitt(r);
+    const [qx, qy] = mitt(q);
+    return { zoom: z, x: W / 2 + (rx - qx) * z, y: topp + hojd / 2 + (ry - qy) * z };
   }
-  function fotNu() {
-    const f = document.querySelector('.radio-fot');
-    if (!f) return;
-    const nu = S.band !== 'av' && A.narmast && A.s > 0.5 ? A.narmast.id : null;
-    if (f.dataset.nu === (nu || '')) return;
-    f.dataset.nu = nu || '';
-    for (const b of f.querySelectorAll('.r-ord')) b.classList.toggle('nu', b.dataset.k === nu);
+  // (när kameran är framme: knapparna över raderna, eller över hela bladet)
+  function lappPlats() {
+    const L = lapp();
+    if (!U.rader || !L) {
+      if (U.rader) U.rader.hidden = U.lapp.hidden = true;
+      return;
+    }
+    const c = L.canvas.getBoundingClientRect();
+    const ruta = (el, [l, t, h, b]) => Object.assign(el.style, { left: `${(c.left + l * c.width).toFixed(1)}px`, top: `${(c.top + t * c.height).toFixed(1)}px`, width: `${((h - l) * c.width).toFixed(1)}px`, height: `${((b - t) * c.height).toFixed(1)}px` });
+    let minst = Infinity;
+    for (const { id, r } of L.rader()) {
+      const b = U.st[id];
+      if (!b) continue;
+      ruta(b, r);
+      minst = Math.min(minst, (r[3] - r[1]) * c.height);
+    }
+    // (bladet ligger under raderna: ett tryck bredvid dem lämnar inte närbilden)
+    const las = minst >= LASBAR;
+    U.rader.hidden = !las;
+    U.lapp.hidden = false;
+    U.lapp.classList.toggle('las', las);
+    U.lapp.tabIndex = las ? -1 : 0;
+    U.lapp.setAttribute('aria-hidden', String(las));
+    ruta(U.lapp, L.sida());
   }
-  // (ett nytt ord kommer på sin plats i frekvensordning och tonar fram; de som står flyttar sig så lite det går)
-  function fotOm(id) {
-    const f = document.querySelector('.radio-fot');
-    if (!f) return;
-    const k = kanal(id);
-    if (k.band !== f.dataset.band) return;
-    const t = document.createElement('template');
-    t.innerHTML = ordHtml(k);
-    const b = t.content.firstChild;
-    b.classList.add('ny');
-    const fore = [...f.querySelectorAll('.r-ord')].find((x) => kanal(x.dataset.k).f > k.f);
-    f.insertBefore(b, fore || null);
-    f.dataset.nu = '\u0000';
-    fotNu();
+  function lappNu() {
+    const nu = S.band !== 'av' && A.narmast && A.s > 0.5 ? A.narmast.id : '';
+    // (bladet kan ha blivit klart sedan förra gången)
+    lapp();
+    if (U.nu === nu) return;
+    U.nu = nu;
+    lapp();
+    if (U.st) for (const [id, b] of Object.entries(U.st)) b.setAttribute('aria-pressed', String(id === nu));
   }
 
   function mount(o) {
     Object.assign(O, o);
-    O.el.addEventListener('click', (e) => {
-      const b = e.target.closest && e.target.closest('.radio-fot .r-ord');
-      if (!b) return;
-      e.preventDefault();
-      valj(b.dataset.k);
-    });
     allt3d();
   }
   function av() {
@@ -720,10 +750,9 @@ window.RumRadio = (() => {
     lyssna();
     knappar();
   }
-  // För bilder: 'fm:104.3' eller 'av', utan ljud. alla: allt är hittat.
-  function prova(lage, alla) {
+  // För bilder: 'fm:90.4' eller 'av', utan ljud.
+  function prova(lage) {
     O.tyst = true;
-    if (alla) S.hittade = KANALER.map((k) => k.id);
     const [band, f] = String(lage || 'fm').split(':');
     if (BAND[band]) {
       S.band = band;
@@ -743,11 +772,10 @@ window.RumRadio = (() => {
     hors: Boolean(A.klar),
     laddad: A.kanal && A.kanal.id,
     s: A.s,
-    hittade: S.hittade.slice(),
     gang: A.gang,
     tid: A.el ? A.el.currentTime : 0,
     ctx: A.ctx && A.ctx.state,
   });
 
-  return { BAND, KANALER, mount, nara, placera, fot, av, prova, lage, valj, kraft, bandspak, volym };
+  return { BAND, KANALER, rad, mount, nara, placera, ram, av, prova, lage, valj, kraft, bandspak, volym };
 })();

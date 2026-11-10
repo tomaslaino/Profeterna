@@ -93,6 +93,33 @@
     'Du ser inte klokare ut än sist, {namn}.',
     'Jag har inte ändrat mig medan du var borta, {namn}.',
   ],
+  // När man kommer och klockan säger något (tidNu i rum-hasse.js): strax före spelstopp (bradskar, alltid),
+  // mitt i natten (natt), tidigt på morgonen (morgon) och sent på kvällen (kvall), då ibland i stället för
+  // de vanliga. Raden står ovanför listan och får ta högst två rader (cirka 50 tecken).
+  tid: {
+    bradskar: [
+      'Spelstoppet är snart. Vilken match tar vi först?',
+      'Du har bråttom, inte jag. Vilken match gäller det?',
+      'Du kommer i sista stund. Vilken match tar vi?',
+      'Spelstoppet närmar sig. Vilken match tar vi?',
+    ],
+    natt: [
+      'Du kan inte sova, ser jag. Vilken match gäller det?',
+      'Svaren sover aldrig. Vilken match tar vi?',
+      'Affären har stängt, men för dig sitter jag kvar.',
+      'Jag sover inte när det finns en kupong kvar.',
+    ],
+    morgon: [
+      'Du är tidigt ute. Vilken match har du vaknat med?',
+      'Första koppen är den bästa. Vilken match tar vi?',
+      'Jag har läst morgontidningen. Den har fel.',
+    ],
+    kvall: [
+      'Det är sent. Vilken match håller dig vaken?',
+      'Vi stänger snart. Vilken match vill du hinna med?',
+      'På kvällen tippar man bäst. Vilken match tar vi?',
+    ],
+  },
 
   // Efter en analys.
   nasta: [
@@ -270,21 +297,21 @@
     ],
     // I tävlingen, när omgången är klar: bäst och sämst i gänget. Säger han i stället för första raden ovan.
     forst: [
-      'Jag slog hela gänget. Det är inget att orda om.',
-      'Gänget kan skriva av mig nästa gång. Det är ingen skam.',
-      'Nu har gänget sett hur det går till.',
-      'Gänget får gärna fråga hur jag bar mig åt.',
-      'Gänget tog i, och jag vann ändå.',
-      'Gänget har mycket att lära, men jag har tid.',
+      'Jag slog er allihop. Det är inget att orda om.',
+      'Ni kan skriva av mig nästa gång. Det är ingen skam.',
+      'Nu har ni sett hur det går till.',
+      'Ni får gärna fråga hur jag bar mig åt.',
+      'Ni tog i, och jag vann ändå.',
+      'Ni har mycket att lära, men jag har tid.',
     ],
     sist: [
-      'Att jag kom sist i gänget beror på matcherna.',
-      'Jag kom sist i gänget, men jag tippade rätt.',
-      'Någon måste komma sist i gänget. Jag ställde upp.',
-      'Jag kom sist i gänget. Det säger mer om gänget.',
-      'Gänget hade tur, och jag hade rätt.',
-      'Jag kom sist i gänget för att det skulle bli spännande.',
-      'Jag kom sist i gänget, och jag är ensam om att ha tänkt.',
+      'Att jag kom efter er beror på matcherna.',
+      'Jag kom sist, men jag tippade rätt.',
+      'Någon av oss måste komma sist. Jag ställde upp.',
+      'Jag kom sist. Det säger mer om er.',
+      'Ni hade tur, och jag hade rätt.',
+      'Jag släppte förbi er för att det skulle bli spännande.',
+      'Jag kom efter er, och jag är ensam om att ha tänkt.',
     ],
     // Han sa det exakta resultatet i en av matcherna i listan: det säger han efter en stund.
     exakt: [
@@ -328,35 +355,177 @@
     ],
   },
 
+  // Medan matcherna pågår och ställningen syns (stallning i rum-hasse.js): först ratt, hur många av hans tecken
+  // som sitter just nu, och sedan en rad för läget (alla, bra, mitten, daligt), som ska kunna följa efter
+  // "Just nu har jag fyra rätt av sju." Sedan, då och då, ställningen i en match (leder eller lika) och en
+  // kommentar: haller när hans tecken sitter (hallerLika också när det är hans kryss), emot och emotLika när
+  // det inte gör det. Han tvivlar aldrig: står det fel är det matchen som har fel. Blir det mål medan man
+  // sitter där säger han mal och sedan malBra (för honom, också när det fattas ett mål till), malLugn (emot, men
+  // tecknet sitter ändå) eller malFel (tecknet sitter inte, och det fattas mer än förut). Kommentarerna sägs alltid efter ställningen.
+  // {lag} är laget som leder, {mot} det andra, och {res} ställningen med ledarens mål först; i lika och mal
+  // är {match} matchen med korta lagnamn och {res} som på kupongen. Ställningen sägs tyst.
+  stallning: {
+    ratt: ['Just nu har jag {ratt} rätt av {av}.'],
+    alla: [
+      'Allt går som jag har sagt.',
+      'Lagen har läst min analys.',
+      'Ingen match har överraskat mig än.',
+      'Så ser det ut när man har gjort hemläxan.',
+      'Spelbolagen har börjat svettas.',
+    ],
+    bra: [
+      'Resten är bara en tidsfråga.',
+      'Det går som planerat. Undantagen rättar sig.',
+      'De andra matcherna rättar sig snart.',
+      'Det ser ut som vanligt.',
+    ],
+    mitten: [
+      'Matcherna är inte slut än.',
+      'Det reder ut sig före slutsignalen.',
+      'De svåra matcherna avgörs alltid sent.',
+      'Det är slutresultatet som räknas, inte ställningen.',
+    ],
+    daligt: [
+      'Fotboll spelas i nittio minuter. Jag tippar på slutresultatet.',
+      'Domarna har inte sin bästa dag.',
+      'Det är inte jag som spelar, det är lagen.',
+      'Lagen har inte förstått vad som gäller än.',
+      'Sådana här ställningar brukar inte hålla.',
+    ],
+    leder: ['{lag} leder med {res} mot {mot}.', '{lag} leder mot {mot} med {res}.'],
+    lika: ['Det står {res} i {match}.', 'I {match} står det {res}.'],
+    haller: [
+      'Precis som jag sa.',
+      'Det var inte svårt att räkna ut.',
+      'Det är orsak och verkan.',
+      'Ingen här är förvånad.',
+      'Det kunde du ha läst i min analys.',
+      'Så ser det ut när man har läst på.',
+    ],
+    hallerLika: ['Krysset sitter som det ska.', 'Där sitter krysset.', 'Kryss, som jag sa.', 'Båda lagen vet att det ska bli kryss.'],
+    emot: [
+      'Matchen är inte slut än.',
+      'Det har ingen bett dem om.',
+      'Det räknas inte förrän domaren blåser av.',
+      'Domaren har inte förstått matchen.',
+      'Jag tippar inte på ställningen mitt i matchen.',
+      'De har inte läst min analys.',
+    ],
+    emotLika: [
+      'Det här blir inget kryss.',
+      'Någon gör mål till slut, och jag vet vem.',
+      'Lagen har inte bestämt sig än.',
+    ],
+    mal: ['Mål i {match}. Det står {res}.'],
+    malBra: [
+      'Där kom målet jag väntade på.',
+      'Det var bara en tidsfråga.',
+      'Det går som jag har räknat ut.',
+      'Målet kom när det skulle.',
+      'Nu börjar matchen likna min analys.',
+    ],
+    malLugn: [
+      'Det gör ingenting.',
+      'Det målet hade jag räknat med.',
+      'Ett mål hit eller dit spelar ingen roll.',
+      'Det målet bjuder jag på. Tecknet sitter ändå.',
+    ],
+    malFel: [
+      'Det ändrar ingenting.',
+      'Det målet godkänner inte jag.',
+      'Det målet hade inte jag dömt.',
+      'Jag låtsas att jag inte såg det.',
+    ],
+  },
+
+  // Radion på fönsterbänken hörs också hos honom (omRadion i rum-hasse.js): en gång per station säger han
+  // något om den, i stället för en rad medan han väntar, och nickar med när det är musik. brus är när radion
+  // står mellan stationerna. Varje rad sägs ensam, efter det han sa förut, så den ska säga vad den handlar om.
+  // Inget om honom själv som inte går att veta: han är en riktig person. Högst två rader ovanför listan
+  // (cirka 50 tecken).
+  radio: {
+    italo: [
+      'Italodisco är bra musik att tippa till.',
+      'Italodiscon håller takten i nittio minuter.',
+      'Ett lag ska spela som italodisco, i samma takt.',
+    ],
+    guld: [
+      'När den här låten kom hade lagen en backlinje.',
+      'Åttiotalsmusik påminner mig om sunt förnuft.',
+    ],
+    rock: [
+      'Rocken har för mycket gitarr och för lite ordning.',
+      'Rocken låter som en engelsk match i november.',
+    ],
+    p1: [
+      'P1 pratar om allt utom det som är viktigt.',
+      'Lyssna du på P1. Jag har redan alla svaren.',
+    ],
+    p3: [
+      'P3 spelar musik för folk som inte tippar.',
+      'Jag lyssnar hellre på pennan mot kupongen än på P3.',
+    ],
+    p4g: [
+      'Göteborgsradion vet vad organisation är.',
+      'I Göteborg tippar man hemmaseger i alla väder.',
+    ],
+    rix: [
+      'Rix FM är lika lättsmält som en etta på favoriten.',
+      'Rix FM överraskar aldrig. Det gillar jag.',
+    ],
+    sport: [
+      'Radion i Montevideo pratar fotboll på riktigt.',
+      'Intensidá, verticalidá … Ursäkta. Back to basis.',
+      'Organización förstår jag utan översättning.',
+    ],
+    talksport: [
+      'I engelsk sportradio gissar de, men jag vet.',
+      'På talkSPORT har de inte förstått sin egen liga.',
+    ],
+    caroline: [
+      'Radio Caroline låter fortfarande som piratradio.',
+      'Caroline sände utan tillstånd. Så ska man spika.',
+    ],
+    brus: [
+      'Radion står mitt emellan, och det blir aldrig bra.',
+      'Det där bruset låter som spelbolagens analyser.',
+    ],
+  },
+
   // Efter omgången, så länge protokollet ligger på pulten (tills nästa Stryktips kommer): han dömer var och
   // en i gänget, en i taget (gangLista och doma i rum-hasse.js, läget i RumBlock.gang). Om sig själv säger
   // han inget här. En dom är en inledning med namnet, en eller två saker ur kupongen och ett slut, och
   // raderna väljs efter omgången och personen, så att domen är densamma varje gång och på alla enheter.
   // Varje rad är en mening, så att domen står i ett stycke och ändå går att läsa upp mening för mening. Inget
-  // han eller hon: skriv namnet, eller om kupongen. Ordet i guld står i domord.
+  // han eller hon: skriv namnet, eller om kupongen. Till gruppen säger han ni och er, aldrig gänget: det är
+  // bara ni som använder sidan. Ordet i guld står i domord, och namnen han nästan kan i felnamn.
   domar: {
     // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla.
-    fraga: ['Jag har rättat omgången. Vem ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom gängets kuponger. Vem tar vi först?', 'Jag har rödpennan framme. Vem i gänget tar vi först?', 'Omgången är spelad. Vem i gänget ska jag ta först?'],
-    igen: ['Vem vill du höra om nu?', 'Vem i gänget ska jag ta nu?', 'Vem i gänget ska få sin dom nu?', 'Vem i gänget är nästa på tur?'],
-    alla: ['Nu har du hört om hela gänget.', 'Nu har alla i gänget fått sitt.', 'Nu har du hört om hela gänget. Det var inte upplyftande.', 'Det var hela gänget. Mer än så finns det inte att säga.'],
+    fraga: ['Jag har rättat omgången. Vem av er ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom era kuponger. Vem tar vi först?', 'Jag har rödpennan framme. Vem av er tar vi först?', 'Omgången är spelad. Vem av er ska jag ta först?'],
+    igen: ['Vem vill du höra om nu?', 'Vem av er ska jag ta nu?', 'Vem av er ska få sin dom nu?', 'Vem av er står på tur?'],
+    alla: ['Nu har ni fått höra allihop.', 'Nu har var och en av er fått sitt.', 'Nu har ni fått höra allihop. Jag har sett bättre kuponger.', 'Det var ni allihop. Mer än så finns det inte att säga.'],
     // Om man står kvar vid listan med gänget och inte väljer någon.
     ledig: [
-      'Ingen i gänget har bett om ursäkt än.',
-      'Gänget brukar inte vilja höra mina domar.',
+      'Ingen av er har bett om ursäkt än.',
+      'Ni brukar inte vilja höra mina domar.',
+      'Jag har dömt bättre tippare än er.',
+      'Trean har fortfarande inte bett om ursäkt.',
       'Protokollet ligger här, om någon vill överklaga.',
       'Mina domar går inte att överklaga.',
       'Jag dömer rättvist, och det är det som gör ont.',
       'Nästa kupong blir lika lätt som den här var.',
     ],
-    // Över matcherna, med det han sa och hur de slutade.
-    matcherna: ['Här är matcherna och hur de slutade.', 'Här är matcherna. Där facit och jag är oense har facit fel.'],
+    // Med i ledig när någon vann på helgarderingar (forsakring), och när någon inte lämnade in. Vem han
+    // menar säger han inte.
+    revisorn: ['Revisorn har inte sagt ett ord i dag.', 'Revisorn har redan gått hem.'],
+    borta: ['Semesterfiraren har inte hört av sig.'],
     // Inledningen, efter hur det gick i gänget (forsakring har forst).
     in: {
-      forst: ['{namn} var bäst i gänget, och det kommer vi att få höra.', '{namn} slog resten av gänget den här gången.', '{namn} vann omgången, och ingen är mer förvånad än {namn}.'],
+      forst: ['{namn} var bäst av er, och det kommer vi att få höra.', '{namn} slog resten av er den här gången.', '{namn} vann omgången, och ingen är mer förvånad än {namn}.'],
       alla: ['{namn} hade alla rätt.', '{namn} hade varenda match rätt.', '{namn} hade inte ett enda fel på kupongen.'],
-      mitten: ['{namn} hamnade mitt i gänget, och ingen märkte det.', '{namn} kom varken först eller sist, och det är också en konst.', '{namn} låg mitt i gänget, där det är lä.'],
-      sist: ['{namn} kom sist i gänget.', '{namn} var sämst i gänget.', '{namn} hade hela gänget framför sig den här omgången.'],
-      sistLika: ['{namn} kom sist trots lika många rätt som någon annan i gänget.', '{namn} hade lika många rätt som någon annan i gänget och kom ändå sist.'],
+      mitten: ['{namn} hamnade i mitten, och ingen av er märkte det.', '{namn} kom varken först eller sist, och det är också en konst.', '{namn} låg i mitten, där det är lä.'],
+      sist: ['{namn} kom sist av er.', '{namn} var sämst av er.', '{namn} hade resten av er framför sig den här omgången.'],
+      sistLika: ['{namn} kom sist trots lika många rätt som någon av er andra.', '{namn} hade lika många rätt som någon av er andra och kom ändå sist.'],
       inget: ['{namn} lämnade inte in någon kupong.', '{namn} stod över den här omgången.'],
     },
     // Sakerna ur kupongen. Helgarderingarna sätts bara när alla satt.
@@ -364,7 +533,7 @@
       en: ['Det fanns en helgardering på kupongen, och den satt.', 'Helgarderingen satt, och det är inte så konstigt.'],
       fler: ['Det fanns {antal} helgarderingar på kupongen, och alla satt.', 'Alla {antal} helgarderingarna satt, och det är inte så konstigt.'],
     },
-    forsakring: ['Där de andra hade fel var det helgarderat.'],
+    forsakring: ['Där de andra hade fel hade {namn} helgarderat.'],
     spik: {
       ingen: ['Det fanns inte en enda spik på kupongen.', 'Inte en enda match vågade {namn} spika.'],
       enda: ['Den enda spiken satt.', 'Kupongen hade en spik, och den satt.'],
@@ -384,14 +553,19 @@
       forsakring: ['Så kan man också köpa sig en seger.', 'Det kallas gardering, inte kunskap.'],
       forst: ['Jag kallar det hela flyt, men det får man inte säga högt.', 'Det kommer att låta om segern vid pulten hela veckan.', 'Att vinna ska {namn} inte vänja sig vid.', 'Nästa omgång ser vi vad segern var värd.'],
       alla: ['Den kupongen hade jag kunnat fylla i själv.', 'Jag hade tippat likadant.', 'En kupong ska ha alla rätt, det har jag alltid sagt.'],
-      mitten: ['En mittenplats är ingen skam, men ingen ära heller.', 'I mitten syns man inte, och det är nog lika bra.', 'Mitt i gänget kan man sitta länge utan att någon frågar något.'],
+      mitten: ['En mittenplats är ingen skam, men ingen ära heller.', 'I mitten syns man inte, och det är nog lika bra.', 'I mitten kan man sitta länge utan att någon frågar något.'],
       sist: ['Det krävs en viss talang för att komma sist.', 'Någon måste komma sist, och den här gången ställde {namn} upp.', 'Nästa omgång kan bara bli bättre, och det är det bästa jag kan säga.', 'Den kupongen ska vi inte prata mer om.'],
       sistLika: ['Man måste ha rätt i rätt matcher, inte bara i många.', 'Lätta rätt ger få poäng, och det vet alla utom {namn}.'],
       inget: ['Den som inte tippar kan inte ha fel.', 'Att inte lämna in är det säkraste jag har sett.', 'Att stå över är också ett sätt att spara pengar.'],
     },
   },
-  // Ordet han slår i disken när han dömer någon i gänget, som domen över en match. Sägs inte.
-  domord: { forsakring: 'Garderat', forst: 'Flyt', alla: 'Felfritt', mitten: 'Osynlig', sist: 'Talang', sistLika: 'Snöpligt', inget: 'Klokt' },
+  // Ordet han slår i disken när han dömer någon i gänget, som domen över en match. Sägs inte. Det står
+  // också ensamt under namnet i listan och ska därför beskriva personen: Garderad, inte Garderat.
+  domord: { forsakring: 'Garderad', forst: 'Turlig', alla: 'Felfri', mitten: 'Osynlig', sist: 'Generös', sistLika: 'Snuvad', inget: 'Klok' },
+  // Namnen han nästan kan. Ibland säger han ett av dem i stället för det riktiga, i domen (aldrig om den som
+  // vann) och när han hälsar på dig (kallar i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
+  // Efternamnen i gänget; rösten får dem också (src/rost.js). Sägs inte som egna rader.
+  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Johansson: ['Johanson', 'Johansen'] },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
   // att säga i vilken ordning som helst, och när det finns en match kvar att fråga om.
@@ -621,13 +795,14 @@
   ejKlar: ['Den har jag inte kommit till än.', 'Den tar jag sen.', 'Den tar jag när jag har druckit upp kaffet.', 'Den sparar jag till sist.', 'Den är så lätt att jag inte har brytt mig om den än.', 'Den ska jag titta på när tidningarna har slutat gissa.', 'Den får ligga till sig en stund.'],
   utanRost: 'Jag har tappat rösten. Läs här.',
 
-  // Anslagstavlan (rum-anslag.js): med en lapp i handen ropar man till honom (Hasse, vad
-  // betyder procenten?), och han svarar från baren, utanför bilden. Först en rad ur svar, sedan
-  // förklaringen i stycken med en mening i taget, så att varje mening får sitt ljud. Mellan
-  // förklaringen och rad (vad han själv gör med det) kommer ett exempel ur lappen som sidan
-  // räknar fram; det ändras med datan och har därför inget ljud. Talen förklaras som under
-  // Statistik → Lagen (divisioner.js): ändras en lapp ska hans svar följa med.
-  anslagSvar: ['Det ska jag tala om för dig.', 'Det är enklare än det ser ut.', 'Hör här, så ska jag förklara.', 'Där frågade du rätt man.', 'Det ska jag förklara så att till och med du förstår.', 'Det trodde jag att alla visste.', 'Jag trodde att du skulle fråga något svårt.', 'Det där frågar bara den som aldrig har tippat.'],
+  // Anslagstavlan (rum-anslag.js) och protokollet (rum.js): med en lapp eller protokollet framme
+  // ropar man till honom (Hasse, vad betyder procenten?), och han svarar från baren, utanför bilden
+  // (rum-hasse-svar.js). Först en rad ur ropSvar, sedan förklaringen i stycken med en mening i taget,
+  // så att varje mening får sitt ljud. Mellan förklaringen och rad (vad han själv gör med det) kommer
+  // ett exempel som sidan räknar fram; det ändras med datan och har därför inget ljud. Talen på
+  // lapparna förklaras som under Statistik → Lagen (divisioner.js), och poängen som i tippoang.js:
+  // ändras en lapp eller poängen ska hans svar följa med.
+  ropSvar: ['Det ska jag tala om för dig.', 'Det är enklare än det ser ut.', 'Hör här, så ska jag förklara.', 'Där frågade du rätt man.', 'Det ska jag förklara så att till och med du förstår.', 'Det trodde jag att alla visste.', 'Jag trodde att du skulle fråga något svårt.', 'Det där frågar bara den som aldrig har tippat.'],
   anslag: {
     form: {
       forklaring: [[
@@ -722,5 +897,25 @@
         'För den som har haft det tufft gäller det omvända.',
       ]],
     },
+  },
+  // Protokollet (Hasse, hur räknas poängen?): raden Poäng längst ner, som i tippoang.js. Exemplet
+  // (RumBlock.exempel) står mellan förklaringen och rad.
+  protokoll: {
+    forklaring: [[
+      'Antalet rätt säger bara hur ofta du hade rätt, inte hur svårt det var.',
+      'Det är det poängen gör.',
+    ], [
+      'För varje match får du en poäng om tipset satt, och från den drar jag datorns chans för det du tippade.',
+      'En favorit på 70 % ger alltså 0,3 om den vinner och kostar 0,7 om den inte gör det.',
+      'En skräll på 20 % ger 0,8 om den sitter och kostar bara 0,2 om den spricker.',
+      'Garderar du läggs chanserna ihop, så en helgardering ger alltid noll.',
+    ], [
+      'Den som inte vet mer än datorn hamnar runt noll, vad den än tippar.',
+      'Plus betyder att du tippade bättre än datorn, och minus att du tippade sämre.',
+    ]],
+    rad: [[
+      'Rätt kan vem som helst få med tillräckligt många garderingar.',
+      'Poängen visar vem som faktiskt kan tippa, och därför ringar jag in den som har högst.',
+    ]],
   },
 });

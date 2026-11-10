@@ -11,6 +11,11 @@
 // 3D-värld (.rh-pan). Hans bild är en egen värld där rummet inte syns: kameran står framför honom vid
 // pulten (rum-hasse-scen.js), och kaffet, notan och handen på pulten i rummet är samma som i hörnet.
 //
+// Samma sida: det är bara kameran som svänger. Namnet och foten står kvar på vägen och hos honom
+// (Tillbaka där Vanlig sida stod), neonskyltens röda sken faller in från affären till höger som över
+// gänget i rummet (--neon), och man vänder sig med samma drag som man ser sig omkring med: i rummet
+// åt höger från dess vänstra kant (swipe i rum.js) eller pilen åt vänster, hos honom åt andra hållet.
+//
 // Grafiken: panoreringen är färdiga mellanbilder som grafikprocessen spelar upp själv. Väggen bakom
 // honom är en färdig bild, disken ritas en gång på en egen duk och figuren på en duk som bara är så
 // stor som han och det han gör. Figuren finns bara medan man tittar på honom; då står rummet still och
@@ -85,6 +90,21 @@ window.RumHasse = (() => {
       e.stopPropagation();
       stang();
     });
+    // Samma drag som i rummet (swipe i rum.js): där drar man bilden åt höger för att se åt vänster, och
+    // längst till vänster sitter han. Här drar man den åt vänster och vänder sig tillbaka mot rummet.
+    let drag = null;
+    vy.addEventListener('pointerdown', (e) => { drag = e.isPrimary && e.pointerType !== 'mouse' && !e.target.closest('.rh-kupong, .rum-blad, input') ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+    vy.addEventListener('pointercancel', () => { drag = null; });
+    vy.addEventListener('pointerup', (e) => {
+      const d = drag;
+      drag = null;
+      if (!d || e.pointerId !== d.id || H.blad) return;
+      const dx = e.clientX - d.x;
+      if (dx <= -64 && -dx > 1.5 * Math.abs(e.clientY - d.y)) stang();
+    });
+    // namnet står kvar hos honom (rum-hasse.css) och leder som i rummet dit: tillbaka
+    const namn = rum.querySelector('.rum-brand');
+    if (namn) namn.addEventListener('click', () => { if (H.on) stang(); });
     // ljudet av och på: stannar hos honom
     vy.querySelector('.rh-ljud').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -107,8 +127,11 @@ window.RumHasse = (() => {
         }
         return;
       }
-      if (e.key === 'Escape') stang();
+      // Esc, eller pilen åt höger: man vänder sig tillbaka mot rummet (dit kom man med pilen åt vänster, rum.js)
+      if (e.key === 'Escape' || (e.key === 'ArrowRight' && !e.repeat && !(e.target instanceof Element && e.target.closest('input, textarea, select')))) stang();
     }, true);
+    // ljuset medan man sitter hos honom (ljusNu)
+    setInterval(() => { if (H.on && !H.svanger && !document.hidden) ljusNu(); }, 60000);
     addEventListener('resize', () => {
       if (!H.on) return;
       // (vriden telefon: han sitter på ett annat sätt, och bygg byter figuren och bilden)
@@ -167,17 +190,20 @@ window.RumHasse = (() => {
   const hogt = () => (hog() ? '-hog' : '');
   const bakbild = (lys = false) => `rum/hasse-bak${lys ? '-lys' : ''}${hogt()}.webp`;
   const dagbild = () => `rum/hasse-bak-dag${hogt()}.webp`;
-  // Ljuset i baren som i rummet (rum.js, rum-folk.js, rum-ute.js): lysröret i affärens tak är tänt utom
-  // mellan midnatt och sex, och dagsljuset faller in genom affärens stora fönster till höger efter klockan
-  // och vädret. lys: lysröret, dag: hur ljust det är ute (0–1), f: fönsterljusets styrka, c: dess färg.
+  // Ljuset i baren som i rummet (rum.js, rum-folk.js, rum-ute.js): lysröret i affärens tak dämpas långsamt
+  // från elva på kvällen, är släckt från midnatt och tänds lika långsamt från sex till sju (RumFolk.nattGrad),
+  // och dagsljuset faller in genom affärens stora fönster till höger efter klockan och vädret. k: hur tänt
+  // lysröret är (0–1), lys: mer tänt än släckt, dag: hur ljust det är ute (0–1), f: fönsterljusets styrka,
+  // c: dess färg.
   // Färgen är himlens nere vid taken, men vitare, som ögat ser dagsljus inne; solen gör den varmare och
   // starkare, låg sol gyllene, och i den blå timmen blåare. Mulet blir den grå och svagare, i regn mer.
   const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
   function ljuset() {
     const v = window.Vader ? Vader.nu() : null;
     const L = v && window.RumUte ? RumUte.light(v) : null;
-    const natt = window.RumFolk ? RumFolk.natt() : false;
-    const ut = { lys: !natt, dag: L ? L.dag : 0, f: 0, c: [1, 1, 1] };
+    const R = window.RumFolk;
+    const k = R ? 1 - (R.nattGrad ? R.nattGrad() : R.natt() ? 1 : 0) : 1;
+    const ut = { lys: k >= 0.5, k, dag: L ? L.dag : 0, f: 0, c: [1, 1, 1] };
     if (!L || L.dag < 0.01) return ut;
     const a = hex(L.sky[1]);
     const b = hex(L.sky[2]);
@@ -195,47 +221,85 @@ window.RumHasse = (() => {
     const l = ljuset();
     H.ljus = l;
     H.vy.classList.toggle('lys', l.lys);
-    H.vy.style.setProperty('--natt', l.lys ? '0' : (1 - l.dag).toFixed(2));
+    H.vy.style.setProperty('--natt', ((1 - l.k) * (1 - l.dag)).toFixed(3));
+    // neonskyltens sken från affären till höger (.rh-ton i rum-hasse.css): som i rummet starkast när det är
+    // mörkt ute och lysröret är släckt, och nästan borta i dagsljus
+    H.vy.style.setProperty('--neon', ((1 - 0.85 * l.dag) * (1 - 0.4 * l.k)).toFixed(3));
     if (H.m && H.m.DAG) {
-      // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret som förut
+      // fönstret i figurens ljus (rum-hasse-arm.js), och lysröret så tänt som det är
       H.m.DAG.value.set(...l.c.map((x) => x * l.f * 0.8), l.dag);
-      if (l.lys) H.m.LYS.value.set(0.587, 0.593, 0.606, 0.75);
-      else H.m.LYS.value.set(0, 0, 0, 0);
+      H.m.LYS.value.set(0.587 * l.k, 0.593 * l.k, 0.606 * l.k, 0.75 * l.k);
     }
     return l;
   }
-  // Väggen med dagsljuset: bilden i lysrörets eller nattens ljus, och fönsterljuset (bakat för sig i vitt)
-  // ovanpå i fönstrets färg och styrka, som ljus läggs till ljus, på en duk. Disken speglar samma duk.
-  // Ritas när han öppnas. Utan dagsljus syns bilden som den är.
+  // (medan lysröret dämpas eller tänds behövs båda bilderna av väggen)
+  const blandar = (l) => l.k > 0.002 && l.k < 0.998;
+  // väggens bilder: den som syns, och båda medan lysröret tonas (bara de som inte redan är där)
+  function bilder(l) {
+    const satt = (sel, u) => { const i = $(sel); if (!i.src || !i.src.endsWith(u)) i.src = u; };
+    if (l.lys || blandar(l)) satt('img.rh-lys', bakbild(true));
+    if (!l.lys || blandar(l)) satt('img.rh-bak:not(.rh-lys)', bakbild(false));
+  }
+  // Medan man sitter hos honom följer ljuset klockan (en gång i minuten, som rummet): lysröret dämpas
+  // och tänds långsamt, och dagsljuset ändras. Väggen och disken ritas om när det har ändrats.
+  async function ljusNu() {
+    const forr = H.ljus;
+    const l = ljuset();
+    if (forr && Math.abs(l.k - forr.k) < 0.004 && Math.abs(l.f - forr.f) < 0.01 && Math.abs(l.dag - forr.dag) < 0.01) return;
+    tand();
+    bilder(H.ljus);
+    const v = await vagg();
+    if (!H.on || H.svanger) return;
+    H.vaggBild = v;
+    // (disken speglar väggen: ritas om med den nya)
+    H.vaggNr = (H.vaggNr || 0) + 1;
+    passa();
+  }
+  // Väggen: bilden i lysrörets eller nattens ljus – medan lysröret dämpas eller tänds båda, den tända
+  // ovanpå så tänd som röret är – och fönsterljuset (bakat för sig i vitt) ovanpå i fönstrets färg och
+  // styrka, som ljus läggs till ljus, på en duk. Disken speglar samma duk. Ritas när han öppnas och när
+  // ljuset ändras (ljusNu). Utan dagsljus och toning syns bilden som den är.
   async function vagg() {
     const l = H.ljus;
-    const bas = $(l.lys ? 'img.rh-lys' : 'img.rh-bak:not(.rh-lys)');
+    const tant = $('img.rh-lys');
+    const mork = $('img.rh-bak:not(.rh-lys)');
+    const bas = l.lys ? tant : mork;
     await bas.decode().catch(() => {});
+    const blanda = blandar(l) && (await (l.lys ? mork : tant).decode().then(() => true, () => false));
     H.vy.classList.remove('vagg');
-    if (l.f < 0.02 || !bas.naturalWidth) return bas;
-    if (!H.dag || H.dag.src.indexOf(dagbild()) < 0) {
+    const dag = l.f >= 0.02;
+    if ((!dag && !blanda) || !bas.naturalWidth) return bas;
+    if (dag && (!H.dag || H.dag.src.indexOf(dagbild()) < 0)) {
       H.dag = new Image();
       H.dag.src = dagbild();
     }
-    try { await H.dag.decode(); } catch (e) { return bas; }
+    const medDag = dag && (await H.dag.decode().then(() => true, () => false));
+    if (!medDag && !blanda) return bas;
     const W = bas.naturalWidth;
     const Hh = bas.naturalHeight;
     const t = H.dagDuk || (H.dagDuk = document.createElement('canvas'));
-    t.width = W;
-    t.height = Hh;
-    const tx = t.getContext('2d');
-    tx.drawImage(H.dag, 0, 0, W, Hh);
-    tx.globalCompositeOperation = 'multiply';
-    tx.fillStyle = `rgb(${l.c.map((x) => Math.round(x * 255)).join(',')})`;
-    tx.fillRect(0, 0, W, Hh);
-    tx.globalCompositeOperation = 'source-over';
+    if (medDag) {
+      t.width = W;
+      t.height = Hh;
+      const tx = t.getContext('2d');
+      tx.drawImage(H.dag, 0, 0, W, Hh);
+      tx.globalCompositeOperation = 'multiply';
+      tx.fillStyle = `rgb(${l.c.map((x) => Math.round(x * 255)).join(',')})`;
+      tx.fillRect(0, 0, W, Hh);
+      tx.globalCompositeOperation = 'source-over';
+    }
     const c = $('.rh-vagg');
     c.width = W;
     c.height = Hh;
     const x = c.getContext('2d');
-    x.drawImage(bas, 0, 0);
+    if (blanda) {
+      x.drawImage(mork, 0, 0, W, Hh);
+      x.globalAlpha = l.k;
+      x.drawImage(tant, 0, 0, W, Hh);
+      x.globalAlpha = 1;
+    } else x.drawImage(bas, 0, 0);
     x.globalCompositeOperation = 'lighter';
-    for (let k = l.f * 0.45; k > 0.005; k -= 1) {
+    for (let k = medDag ? l.f * 0.45 : 0; k > 0.005; k -= 1) {
       x.globalAlpha = Math.min(1, k);
       x.drawImage(t, 0, 0);
     }
@@ -249,7 +313,7 @@ window.RumHasse = (() => {
   function forladda() {
     if (!H.bilder) {
       const l = ljuset();
-      H.bilder = [bakbild(l.lys), 'rum/hasse-atlas.webp', ...(l.f >= 0.02 ? [dagbild()] : [])].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
+      H.bilder = [bakbild(l.lys), ...(blandar(l) ? [bakbild(!l.lys)] : []), 'rum/hasse-atlas.webp', ...(l.f >= 0.02 ? [dagbild()] : [])].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
       H.bilder.push(import('./rum-hasse-3d.js').then((m) => { H.m = m; }));
     }
     return H.bilder;
@@ -260,7 +324,7 @@ window.RumHasse = (() => {
   // till vänster om honom; på höjden står han överst och samtalet under händerna. Kaffet och notan till
   // höger får gärna hamna utanför bilden i smala fönster.
   function matt() {
-    const { MATT, BORD, KOPP, iBild } = H.m;
+    const { MATT, BORD, NOTAN, iBild } = H.m;
     const W = innerWidth;
     const Hj = innerHeight;
     const o = { cx: 0, ey: 0, s: 1 };
@@ -271,6 +335,10 @@ window.RumHasse = (() => {
     const v = { W, H: Hj };
     if (H.hog) {
       v.s = Math.min((0.36 * Hj) / (kant - topp), W / 1080);
+      // Samtalet börjar under händerna och notan, men högst vid 60 % av höjden (sa.top nedan). Når notan längre
+      // ned blir bilden så mycket mindre att den slutar ovanför samtalet, i stället för att texten står på den.
+      const lagst = Math.max(iBild(o, 0, BORD.Y, 900)[1], ...(NOTAN ? NOTAN.horn : []).map((q) => iBild(o, ...q)[1]));
+      v.s = Math.min(v.s, (Hj * 0.57 - 10) / (lagst - topp));
       v.cx = W * 0.5 - mitt * v.s;
       v.ey = Hj * 0.03 - topp * v.s;
     } else {
@@ -286,8 +354,8 @@ window.RumHasse = (() => {
     }
     v.kant = iBild(v, 0, BORD.Y, BORD.Z)[1];
     v.vanster = iBild(v, ...MATT.vanster)[0];
-    // händerna, och notan framför kaffet, på disken
-    v.hand = Math.max(iBild(v, 0, BORD.Y, 900)[1], iBild(v, KOPP[0] + 60, BORD.Y, KOPP[2] + 450)[1]);
+    // händerna, och notan framför dem, på disken (utan NOTAN: en äldre rum-hasse-3d.js i cachen)
+    v.hand = Math.max(iBild(v, 0, BORD.Y, 900)[1], ...(NOTAN ? NOTAN.horn : []).map((q) => iBild(v, ...q)[1]));
     // duken: det han gör ska rymmas, inom fönstret
     const p = MATT.ram(H.hog).map((q) => iBild(v, ...q));
     v.x = Math.max(0, Math.floor(Math.min(...p.map((q) => q[0]))));
@@ -351,9 +419,9 @@ window.RumHasse = (() => {
     await Promise.all(forladda());
     H.m = H.m || await import('./rum-hasse-3d.js');
     Object.assign(GEST, H.m.KLIPP);
-    // väggen i lysrörets ljus, eller i nattens (bara den som syns hämtas)
+    // väggen i lysrörets ljus, eller i nattens (bara den som syns hämtas, båda medan lysröret tonas)
     const l = tand();
-    $(l.lys ? 'img.rh-lys' : 'img.rh-bak:not(.rh-lys)').src = bakbild(l.lys);
+    bilder(l);
     // och dagsljuset genom fönstret på den
     H.vaggBild = await vagg();
     // (fönstret har vridits sedan sist: han sitter på ett annat sätt)
@@ -362,6 +430,8 @@ window.RumHasse = (() => {
       H.figHog = H.hog;
       H.fig = await H.m.figuren($('.rh-duk'), { hog: H.hog, latt: latt() || steg() >= 2, pr: pixlar() });
     }
+    // cigarren som den var, eller slocknad om han har låtit den ligga sedan sist
+    cigarrIgen();
     H.vy.classList.toggle('enkel', steg() >= 1 || latt());
     // (disken hinner ritas innan kameran slår dit, men den väntar man inte länge på)
     await Promise.race([passa(), new Promise((ok) => setTimeout(ok, 1500))]);
@@ -448,15 +518,16 @@ window.RumHasse = (() => {
       slappSen();
       return;
     }
-    H.matcher = false;
     fraga();
     H.on = true;
     H.oppnar = false;
     H.T = 0;
+    // (har det gått dåligt för honom läser han redan när man kommer)
+    if (H.upptagen) lasNu();
     // rummet står still medan man tittar åt hans håll, och rätar upp sig efter musen på vägen
     if (window.Rum && Rum.vila) Rum.vila(true);
     Object.assign(H.world.style, { transition: 'transform 0.2s ease-out, translate 0.2s ease-out, rotate 0.2s ease-out', translate: 'none', rotate: 'none', transform: 'translateZ(-330px) rotateX(0deg) rotateY(0deg) translateZ(330px)' });
-    H.fig.rita(0, performance.now() / 1000);
+    H.fig.rita(H.T, performance.now() / 1000);
     H.svanger = true;
     H.rum.classList.add('hasse-pan');
     if (calm()) { tona(1, framme); return; }
@@ -505,10 +576,22 @@ window.RumHasse = (() => {
         H.trum = ms + SMATT[0] + Math.random() * (SMATT[1] - SMATT[0]);
         if (!calm() && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) smatt();
       }
+      // och när det har gått dåligt för honom tar han fram tidningen igen efter en stund (upptagen)
+      if (H.upptagen && ms > H.lasT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
+        H.lasT = ms + 1e9;
+        gest(lasaNamn());
+      }
       // och ibland njuter han av kaffet eller tar cigarren ur askkoppen, varannan gång
       if (ms > H.vanaT && !H.klipp && !H.ko.length && !H.fig.ror() && (!H.sagt || H.sagt.klar) && ['fraga', 'val', 'klar'].includes(H.fas)) {
         H.vanaT = ms + VANA[0] + Math.random() * (VANA[1] - VANA[0]);
         vana();
+      }
+      // cigarren slocknar om han låter den ligga
+      slocknar(ms);
+      // mitt i omgången: har ställningen ändrats sedan sist (stallningSteg)
+      if (ms > (H.stallningT || 0)) {
+        H.stallningT = ms + 5000;
+        stallningSteg();
       }
       const ror = H.klipp || H.ko.length || (H.sagt && !H.sagt.klar) || H.fig.ror();
       if (ms - last < takt(ror)) return;
@@ -708,6 +791,15 @@ window.RumHasse = (() => {
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
     return g && g.namn ? g.namn.trim().split(/\s+/).pop() : '';
   }
+  // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
+  // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
+  function tidNu(lista) {
+    const nu = Date.now();
+    const forsta = Math.min(...lista.map((m) => Date.parse(m.avspark)));
+    if (forsta > nu && forsta - nu < 90 * 60000) return 'bradskar';
+    const h = Number(new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', hourCycle: 'h23' }).format(nu));
+    return h < 5 ? 'natt' : h < 8 ? 'morgon' : h >= 22 ? 'kvall' : null;
+  }
   // När spelstoppet är: på lördag, i morgon, i dag. Tomt om det är passerat.
   function spelstopp(lista) {
     const nu = Date.now();
@@ -743,7 +835,77 @@ window.RumHasse = (() => {
   // kaffet och cigarren varannan gång, kaffet först
   function vana() {
     H.vana = (H.vana + 1) % 2;
-    gest(H.vana ? ettAv('kaffe', 'klunk') : ettAv('cigarr', 'cigarr'));
+    gest(H.vana ? ettAv('kaffe', 'klunk') : cigarrGest());
+  }
+  // Cigarren (H.cig): tänd eller slocknad i askkoppen, när han rökte den sist (rokT, ms) och hur länge den
+  // brinner av sig själv sedan (liv, ms), och tändstickorna kvar i stället och de brända i askkoppen
+  // (rum-hasse-eld.js). Låter han den ligga slocknar den (CIG_LIV), och nästa gång han tar den tänder han den
+  // (gruppen tanda i rum-hasse-3d.js, med stickorna eller tändaren) i stället för att röka; den slocknade drar
+  // han bara på när den verkligen har slocknat (slocknad, när han verkar upptagen). När man kommer har den
+  // ibland slocknat (CIG_SLOCKNAD); med minskad rörelse brinner den. Stället fylls på när man inte tittar.
+  const CIG_LIV = [150000, 280000];
+  const CIG_SLOCKNAD = 0.45;
+  const CIG_ANTAL = 9;
+  const cigLiv = () => CIG_LIV[0] + Math.random() * (CIG_LIV[1] - CIG_LIV[0]);
+  function cigarren() {
+    if (!H.cig) {
+      const tand = calm() || Math.random() >= CIG_SLOCKNAD;
+      H.cig = { tand, rokT: performance.now() - (tand ? Math.random() * CIG_LIV[0] * 0.6 : 0), liv: cigLiv(), kvar: CIG_ANTAL - Math.floor(Math.random() * 3), branda: Math.floor(Math.random() * 3) };
+    }
+    return H.cig;
+  }
+  // till figuren: som den är, direkt (när han har hämtats, och när man kommer tillbaka)
+  function cigarrIgen() {
+    const c = cigarren();
+    if (c.tand && !calm() && performance.now() - c.rokT > c.liv) c.tand = false;
+    if (c.kvar < 3 && !H.on) c.kvar = CIG_ANTAL;
+    if (H.fig && H.fig.cigarr) H.fig.cigarr({ tand: c.tand, direkt: true, kvar: c.kvar, branda: c.branda });
+  }
+  // den slocknar sakta medan man tittar (glöden och röken tonar ut)
+  function slocknar(ms) {
+    const c = cigarren();
+    if (!c.tand || calm() || H.klipp || ms - c.rokT < c.liv) return;
+    c.tand = false;
+    if (H.fig && H.fig.cigarr) H.fig.cigarr({ tand: false });
+  }
+  // efter ett cigarrklipp: han har rökt, och har han tänt den brinner den (en sticka till i askkoppen)
+  function rokt(k) {
+    const c = cigarren();
+    c.rokT = performance.now();
+    c.liv = cigLiv();
+    if (!k.tander) return;
+    c.tand = true;
+    if (k.tander === 'sticka') {
+      c.kvar = Math.max(0, c.kvar - 1);
+      c.branda = Math.min(4, c.branda + 1);
+    }
+    cigarrIgen();
+  }
+  // röker den, eller tänder den om den har slocknat: med tändaren när stickorna är slut
+  function cigarrGest() {
+    const c = cigarren();
+    if (c.tand) return ettAv('cigarr', 'cigarr');
+    const alla = grupp('tanda');
+    if (!alla.length) return 'cigarr';
+    for (let i = 0; i < alla.length; i++) {
+      const namn = ettAv('tanda');
+      if (c.kvar > 0 || GEST[namn].tander !== 'sticka') return namn;
+    }
+    return alla.find((n) => GEST[n].tander !== 'sticka') || alla[0];
+  }
+  // Det han gör när han verkar upptagen (gruppen lasa), men han drar inte på cigarren som om den har slocknat
+  // när den brinner (slocknad); när man just kommer (forst) kan den ha slocknat.
+  function lasaNamn(forst = false) {
+    const c = cigarren();
+    let namn = ettAv('lasa', 'lasa');
+    if (namn !== 'slocknad' || !c.tand) return namn;
+    if (forst && !calm()) {
+      c.tand = false;
+      cigarrIgen();
+      return namn;
+    }
+    namn = ettAv('lasa', 'lasa');
+    return namn === 'slocknad' ? 'lasa' : namn;
   }
   // Medan han väntar på en tar han kaffet och cigarren varannan gång då och då (minst och längst i ms
   // mellan gångerna). Ska något spelas medan han håller cigarren (skynda) lägger han tillbaka den fortare.
@@ -770,6 +932,13 @@ window.RumHasse = (() => {
   }
   function smatt() {
     if (spana()) return;
+    // när radion spelar musik trummar han med fingrarna eller nickar med oftare
+    const r = radioNu();
+    if (r && r.musik && Math.random() < 0.6) {
+      if (Math.random() < 0.7) H.fig.trumma(Math.random() < 0.5 ? 'varv' : 'lugnt', 'B');
+      else gest('nicka');
+      return;
+    }
     if (!SMATT_L.length) SMATT_L.push('trumma', 'trumma', ...grupp('smatt'));
     const namn = lott(SMATT_L);
     if (namn === 'trumma') H.fig.trumma(TRUMSATT[Math.floor(Math.random() * TRUMSATT.length)], 'B');
@@ -804,6 +973,15 @@ window.RumHasse = (() => {
     // (och inför att han skriver på din kupong, och när han suddar ut det han skrev)
     const fort = (k.skynda && (H.ko.length || ((k.grupp === 'smatt' || k.grupp === 'spana') && H.sagt && !H.sagt.klar))) || (H.ko.length && H.ko[0].brad) || k.bort;
     H.T = Math.min(k.till, H.T + dt * (fort ? 2.5 : 1));
+    // Tidningen: väntar något annat lägger han ned den vid nästa gräns mellan bitarna (slag), där han läser
+    // som vanligt, och hoppar direkt till ned (lasa i rum-hasse-3d.js).
+    if (k.slag && H.ko.length && !k.nerNu) {
+      const a = T0 - k.fran;
+      const b = H.T - k.fran;
+      const g = k.slag.find((s) => s > a && s <= b);
+      if (g != null) H.T = k.fran + k.ner + (b - g);
+      if (g != null || b >= k.ner) k.nerNu = true;
+    }
     // slagen i disken och koppen på fatet: bilden rycker till, och det hörs
     for (const e of H.fig.handelser(T0, H.T)) hands(e);
     if (k.vid && H.T >= k.vid[0]) {
@@ -814,6 +992,8 @@ window.RumHasse = (() => {
     if (H.T >= k.till) {
       H.T = k.vila;
       H.klipp = null;
+      if (k.grupp === 'cigarr' || k.tander) rokt(k);
+      if (k.grupp === 'lasa') H.lasT = performance.now() + LAS_PAUS[0] + Math.random() * (LAS_PAUS[1] - LAS_PAUS[0]);
       if (k.sen) k.sen();
     }
   }
@@ -1099,7 +1279,9 @@ window.RumHasse = (() => {
     if (f) f();
   }
   // Meningen han läser syns i rutan: rutan rullar bara när den inte gör det.
-  function synas(ruta, el) {
+  function synas(text, el) {
+    // (under en dom rullar texten med lappen under den)
+    const ruta = text.closest('.rh-rull') || text;
     const r = el.getBoundingClientRect();
     const b = ruta.getBoundingClientRect();
     if (r.bottom > b.bottom) ruta.scrollTop += r.bottom - b.bottom + 8;
@@ -1248,13 +1430,54 @@ window.RumHasse = (() => {
   // En rad överst: det han frågar eller säger mellan analyserna.
   const rad = (text, sen) => repliker([{ text }], { i: $('.rh-sagt'), sen, rad: true, direkt: calm() });
   // Rader som kommer med jämna mellanrum medan han väntar på en.
+  // En rad kan vara en funktion, som tar fram texten när den sägs: en text, eller { lista, gest } med flera
+  // repliker efter varandra och en gest efteråt (ställningen nedan), eller null om det inte finns något att
+  // säga just då. Ett mål medan man sitter där (H.malKo) går före, så snart han har sagt klart.
   function pratSteg(ms) {
+    if (H.klipp || H.ko.length || (H.sagt && !H.sagt.klar)) return;
     const v = H.prat;
-    if (!v || ms < v.nasta || H.klipp || H.ko.length || (H.sagt && !H.sagt.klar)) return;
+    if (H.malKo && H.malKo.length) {
+      sagRader(H.malKo.shift());
+      if (v) v.nasta = Math.max(v.nasta, ms + v.gang);
+      return;
+    }
+    if (!v || ms < v.nasta) return;
     if (v.i >= v.rader.length) { H.prat = null; return; }
+    // (går radion i rummet säger han något om den, en gång per station, i stället för nästa rad)
+    const radio = omRadion();
+    if (radio) {
+      sagRader(radio);
+      v.nasta = ms + v.gang;
+      return;
+    }
     const r = v.rader[v.i++];
-    rad(typeof r === 'function' ? r() : r);
-    v.nasta = ms + v.gang;
+    const x = typeof r === 'function' ? r() : r;
+    if (x) sagRader(x);
+    v.nasta = ms + (x ? v.gang : 500);
+  }
+  // Radion på fönsterbänken (rum-radio.js) hörs också här. Står den på en station säger han något om den
+  // (radio i rum-hasse-repliker.js) och nickar med, och mellan stationerna något om bruset; en gång per
+  // station så länge sidan är öppen. → { lista, gest } eller null
+  function radioNu() {
+    const R = window.RumRadio;
+    const l = R && R.lage ? R.lage() : null;
+    if (!l || l.band === 'av') return null;
+    if (!l.kanal) return { id: 'brus', musik: false };
+    const k = (R.KANALER || []).find((x) => x.id === l.kanal);
+    return l.hors && k ? { id: k.id, musik: Boolean(k.musik) } : null;
+  }
+  function omRadion() {
+    const r = radioNu();
+    const rader = r && REP().radio && REP().radio[r.id];
+    if (!rader || !rader.length) return null;
+    H.radioSagt = H.radioSagt || new Set();
+    if (H.radioSagt.has(r.id)) return null;
+    H.radioSagt.add(r.id);
+    return { lista: [{ text: lott(rader) }], gest: r.musik ? 'nicka' : 'brynet' };
+  }
+  function sagRader(x) {
+    if (typeof x === 'string') { rad(x); return; }
+    repliker(x.lista, { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: x.gest ? () => gest(x.gest) : null });
   }
 
   // ---------- en match i taget ----------
@@ -1390,25 +1613,29 @@ window.RumHasse = (() => {
     H.fraga = {};
     H.fas = 'fraga';
     H.prat = null;
-    // efter omgången dömer han gänget, och matcherna står bakom Matcherna (domarna nedan)
-    const sum = summan();
-    if (sum && !H.matcher && gangLista(sum)) return;
+    H.upptagen = false;
+    // efter omgången dömer han gänget (domarna nedan)
+    if (gangLista(summan())) return;
     const lista = kupongen();
     const fragat = minns(lista);
     const nu = Date.now();
-    s.innerHTML = `<h2 class="rh-sagt"></h2><div class="rh-lista"></div>${sum ? '<div class="rh-slut"><button type="button" class="rh-vag rh-tillgang">Gänget</button></div>' : ''}`;
-    if (sum) s.querySelector('.rh-tillgang').addEventListener('click', () => { H.matcher = false; fraga(); });
+    const igang = lista.some((m) => Date.parse(m.avspark) <= nu);
+    const borjat = lista.length && !lista.some((m) => Date.parse(m.avspark) > nu);
+    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-lista"></div>';
     const forsta = listan(lista, fragat);
-    const forstaText = sum ? lott(REP().domar.matcherna) : forstaRad(lista, fragat, forst);
+    // Mitt i omgången, när det finns en ställning att tala om, säger han hur det står (stallningen nedan) i
+    // stället för att be en välja match. Spelstoppet har då varit: Stryktipset stänger vid första avsparken.
+    const iSpel = igang && !borjat && pagarNagot(lista);
+    const forstaText = iSpel ? null : forstaRad(lista, fragat, forst);
     if (forstaText) rad(forstaText);
-    const dag = spelstopp(lista);
-    H.prat = lista.length && forsta ? vantar(REP().ledig, 8, 14000, dag) : null;
+    const dag = igang ? '' : spelstopp(lista);
+    const ledigt = () => (lista.length && forsta ? vantar(REP().ledig, 8, 14000, dag) : null);
+    H.prat = iSpel ? null : ledigt();
     // När omgången har börjat står alla hans tips på raderna (hansRader), och när alla matcher har börjat
     // säger han hur det gick. Öppnar man honom medan rummet laddas kan matcherna och säsongen komma
     // efter samtalet: då ritas listan om, och han säger det först då.
-    const igang = lista.some((m) => Date.parse(m.avspark) <= nu);
-    const borjat = lista.length && !lista.some((m) => Date.parse(m.avspark) > nu);
     const vem = H.fraga;
+    H.listan = null;
     const vanta = datan(igang);
     const fram = (tips) => {
       if (H.fraga !== vem || H.fas !== 'fraga') return;
@@ -1416,8 +1643,17 @@ window.RumHasse = (() => {
       const topp = l.scrollTop;
       listan(lista, fragat, tips);
       l.scrollTop = topp;
+      // (ställningen följs medan han sitter där: stallningSteg)
+      if (igang) {
+        H.listan = { vem, lista, fragat, tips, borjat };
+        stallningSteg();
+      }
       // (efter omgången säger han inget om hur det gick för honom: då dömer han gänget)
       if (borjat && !summan()) efterat(lista, tips);
+      else if (iSpel && !lagetNu(lista, tips)) {
+        rad(forstaRad(lista, fragat, forst));
+        H.prat = ledigt();
+      }
     };
     if (igang) Promise.resolve(vanta).then(() => hansRader(lista, fragat)).then(fram);
     else if (vanta) vanta.then(() => fram(fragat));
@@ -1458,8 +1694,9 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     const l = s.querySelector('.rh-lista');
     const nu = Date.now();
-    const facit = new Map(lista.map((m) => [m.id, slutade(m, nu)]));
-    const medFacit = [...facit.values()].some(Boolean);
+    // (i matcher som pågår står ställningen i samma spalt, och spalten heter Ställning så länge)
+    const facit = new Map(lista.map((m) => [m.id, slutade(m, nu) || star(m, nu)]));
+    const medFacit = [...facit.values()].some((f) => f && f.star) ? 'star' : [...facit.values()].some(Boolean);
     // (med din spalt också blir det trångt: då står spalterna tätare)
     s.classList.toggle('tre', medFacit && K().kan());
     const kol = s.querySelector('.rh-kol');
@@ -1472,7 +1709,7 @@ window.RumHasse = (() => {
       b.type = 'button';
       const f = facit.get(m.id);
       // (det du har på raden står för hand längst ut, i en egen spalt)
-      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(tips[m.id], f)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
+      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(tips[m.id], f && !f.star ? f : null)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
       b.disabled = Date.parse(m.avspark) <= nu;
       // (en match som har börjat går inte att fråga om, men hans tips ska gå att läsa)
       b.classList.toggle('spelad', Boolean(f) || b.disabled);
@@ -1519,8 +1756,15 @@ window.RumHasse = (() => {
     const s = r.state === 'final' && r.res != null && ((r.m && r.m.score90) || r.score);
     return s ? { h: s.home, b: s.away, utfall: r.res } : null;
   }
+  // Ställningen i en match som pågår: { h, b, star: true }, eller null (inte i gång, slut eller dold).
+  function star(m, nu = Date.now()) {
+    if (typeof gradeRow !== 'function') return null;
+    const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, nu);
+    return r.state === 'live' && r.score ? { h: r.score.home, b: r.score.away, star: true } : null;
+  }
   // Rutan i spalten Facit, med strecket mitt i spalten som i hans resultat. Tom på rader som inte har slutat.
-  const facitRuta = (f) => `<b class="rh-facit">${f ? `<span class="rh-vh">Slutade </span><i>${esc(f.h)}</i>–<i>${esc(f.b)}</i>` : ''}</b>`;
+  // En match som pågår har sin ställning där, i kursiv (star).
+  const facitRuta = (f) => `<b class="rh-facit${f && f.star ? ' star' : ''}">${f ? `<span class="rh-vh">${f.star ? 'Står ' : 'Slutade '}</span><i>${esc(f.h)}</i>–<i>${esc(f.b)}</i>` : ''}</b>`;
   // Vem som säger vad, överst i listan: Hasse (porträtt och namn i guld) över hans rutor och
   // resultat, du (porträtt i din färg och namnet i din handstil, som på kupongen) över det du har.
   // Huvudet är byggt som en rad, med osynliga rutor som håller bredden, så att det står mitt över
@@ -1543,7 +1787,7 @@ window.RumHasse = (() => {
         ? `<u><span class="rh-vem du k${i}"><span class="rh-ans"${g.bild ? ` style="background-image: url('${esc(g.bild)}')"` : ''}></span><span class="rh-namn">${esc(namn)}</span></span></u>`
         : '<u><span class="rh-vem du"><span class="rh-namn">Du</span></span></u>';
     }
-    const slut = medFacit ? '<b class="rh-facit"><span class="rh-vem facit">Facit</span></b>' : '';
+    const slut = medFacit ? `<b class="rh-facit"><span class="rh-vem facit">${medFacit === 'star' ? 'Ställning' : 'Facit'}</span></b>` : '';
     return `<div class="rh-kol" aria-hidden="true">${hans}${slut}${din}</div>`;
   }
   // Huvudet lika brett som raderna (en rullningslist tar plats i listan), och namnen bara när de
@@ -1576,8 +1820,13 @@ window.RumHasse = (() => {
     const namn = dittNamn();
     if (forst) {
       if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : enAv(r.allaKvar);
-      if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn });
-      return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn });
+      // (vad klockan är: strax före spelstopp alltid, annars ibland)
+      const tid = hela && tidNu(oppna);
+      if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
+      // (ibland säger han ett namn som nästan stämmer)
+      const kallad = namn && Math.random() < 0.25 ? kallar(namn, String(Math.random()), 1) : namn;
+      if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
+      return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn: kallad });
     }
     if (!kvar) return enAv(hela || !r.allaKvar ? r.alla : r.allaKvar);
     if (kvar === 1) return enAv(r.enKvar);
@@ -1646,6 +1895,13 @@ window.RumHasse = (() => {
     // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
     const g = e && hurDetGick(lista, tips);
     if (!g) return;
+    // medan matcherna pågår säger han hur det står (ställningen nedan)
+    if (g.lage === 'pagar' && lagetNu(lista, tips, e.pagar)) {
+      H.upptagen = false;
+      return;
+    }
+    // har det gått dåligt läser han tidningen (tidningen nedan)
+    upptagen(g.lage === 'inget' ? 'inget' : g.plats === 'worst' ? 'sist' : g.lage === 'daligt' ? 'daligt' : null);
     const rader = e[g.lage];
     const plats = g.plats === 'best' ? e.forst : g.plats === 'worst' ? e.sist : null;
     const sagt = [];
@@ -1659,14 +1915,208 @@ window.RumHasse = (() => {
     H.prat = { rader: sedan, i: 0, nasta: performance.now() + 20000, gang: 20000 };
   }
 
+  // ---------- ställningen ----------
+  //
+  // Medan matcherna pågår (liveställningen, KP.live i kupong.js) står ställningen i listan, och han säger hur
+  // många av hans tecken som sitter just nu och vad han tycker om det (stallning.ratt och läget), och sedan
+  // då och då ställningen i en match i taget med en kommentar. Går det emot honom är det matchen som har
+  // fel. Blir det mål i någon av hans matcher medan man sitter där säger han det så snart han har pratat
+  // klart (malKo i pratSteg). Ställningen i ord står med korta lagnamn och sägs tyst (rösten kan inte ha alla
+  // lag och ställningar); kommentaren efter hörs. Har du valt att dölja resultat säger han inget om det.
+  const SAGT_KORT = { "Nott'm Forest": 'Forest', 'Man City': 'City', 'Man Utd': 'United', 'Sheff Utd': 'Sheffield United', 'Sheff Wed': 'Sheffield Wednesday' };
+  const lagKort = (n) => {
+    const k = window.Papper && Papper.kort ? Papper.kort(n) : String(n || '');
+    return SAGT_KORT[k] || k;
+  };
+  // (Birmingham–Swansea, men West Brom – Millwall; ordfogarna runt strecket håller ihop raden)
+  const matchNamn = (h, b) => (/\s/.test(h + b) ? `${h} – ${b}` : `${h}\u2060–\u2060${b}`);
+  // Har någon match i listan en ställning (pågår eller har slutat) som inte är dold?
+  function pagarNagot(lista) {
+    if (typeof gradeRow !== 'function') return false;
+    const nu = Date.now();
+    return lista.some((m) => {
+      const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, nu);
+      return (r.state === 'live' || r.state === 'final') && r.score;
+    });
+  }
+  // Hans rader med en ställning: { rader: [{ m, r, pa, live }], ratt, av, live }, { dolt: true } om någon
+  // av dem är dold, eller null.
+  function levande(lista, tips) {
+    if (typeof gradeRow !== 'function') return null;
+    const nu = Date.now();
+    const rader = [];
+    for (const m of lista) {
+      const tecken = String(tips[m.id] || '').split(' ')[0];
+      if (!tecken) continue;
+      const r = gradeRow({ id: m.id, sign: tecken, label: m.namn }, nu);
+      if (r.state === 'hidden') return { dolt: true };
+      if ((r.state === 'live' || r.state === 'final') && r.score && r.res != null && r.m) rader.push({ m, r, pa: Boolean(r.hit), live: r.state === 'live' });
+    }
+    return { rader, ratt: rader.filter((x) => x.pa).length, av: rader.length, live: rader.filter((x) => x.live) };
+  }
+  // Hur det står till, som i hurDetGick: rätten mot vad chanserna var värda.
+  function stallningsLage(l) {
+    if (l.av >= 2 && l.ratt === l.av) return 'alla';
+    const p = l.rader.map((x) => Math.min(0.99, Math.max(0.01, (x.r.p == null ? 50 : x.r.p) / 100)));
+    const spridning = Math.sqrt(p.reduce((a, q) => a + q * (1 - q), 0));
+    const z = spridning ? (l.ratt - p.reduce((a, q) => a + q, 0)) / spridning : 0;
+    return z >= BRA && l.ratt * 2 > l.av ? 'bra' : z <= -BRA ? 'daligt' : 'mitten';
+  }
+  // Ställningen i en match och hans kommentar. → { lista, gest }
+  function omMatchen(x) {
+    const S = REP().stallning;
+    const s = x.r.score;
+    const h = lagKort(x.r.m.home);
+    const b = lagKort(x.r.m.away);
+    const lika = s.home === s.away;
+    const o = {
+      match: matchNamn(h, b), lag: s.home > s.away ? h : b, mot: s.home > s.away ? b : h,
+      // (den som leder först: Burnley leder med 2–0)
+      res: lika ? `${s.home}–${s.away}` : `${Math.max(s.home, s.away)}–${Math.min(s.home, s.away)}`,
+    };
+    const dom = x.pa ? (lika && x.r.sign.length === 1 ? [...S.haller, ...S.hallerLika] : S.haller) : lika ? S.emotLika : S.emot;
+    return { lista: [{ text: fyll(lott(lika ? S.lika : S.leder), o), paus: 1400 }, { text: lott(dom) }] };
+  }
+  // En match i taget, helst en som pågår och som han inte har tagit nyss. → { lista } eller null
+  function enMatch(lista, tips) {
+    const l = levande(lista, tips);
+    if (!l || l.dolt || !l.av) return null;
+    const val = l.live.length ? l.live : l.rader;
+    H.stallningSagt = H.stallningSagt || new Set();
+    let kvar = val.filter((x) => !H.stallningSagt.has(x.m.id));
+    if (!kvar.length) {
+      H.stallningSagt.clear();
+      kvar = val;
+    }
+    const x = kvar[Math.floor(Math.random() * kvar.length)];
+    H.stallningSagt.add(x.m.id);
+    return omMatchen(x);
+  }
+  // Han säger hur det står och pratar sedan om en match i taget, med extra (efter.pagar) emellan.
+  // → false om det inte finns någon ställning att tala om.
+  function lagetNu(lista, tips, extra = null) {
+    const S = REP().stallning;
+    // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
+    const l = S && levande(lista, tips);
+    if (!l || l.dolt || !l.av) return false;
+    const lage = stallningsLage(l);
+    const tal = REP().tal;
+    // (med en enda match att räkna blir det "en rätt av en": då tar han den matchen direkt)
+    if (l.av < 2) sagRader(enMatch(lista, tips));
+    else {
+      repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(S[lage]) }],
+        { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck' }[lage]) });
+    }
+    const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);
+    const rader = [match, match, extra ? () => lott(extra) : match, match, match, match];
+    H.prat = { rader, i: 0, nasta: performance.now() + 20000, gang: 20000 };
+    return true;
+  }
+  // Var femte sekund medan listan syns mitt i omgången: har något ändrats ritas listan om, och har det blivit
+  // mål i någon av hans matcher säger han det. När den sista matchen har slutat säger han hur det gick.
+  function stallningSteg() {
+    const v = H.listan;
+    if (!v || !H.on || H.fraga !== v.vem || H.fas !== 'fraga' || !REP().stallning) return;
+    const l = levande(v.lista, v.tips);
+    if (!l || l.dolt) return;
+    const ny = new Map(l.rader.map((x) => [x.m.id, { h: x.r.score.home, b: x.r.score.away, live: x.live }]));
+    const forut = v.stand;
+    v.stand = ny;
+    if (!forut) return;
+    let andrat = ny.size !== forut.size;
+    let mal = null;
+    for (const x of l.rader) {
+      const a = forut.get(x.m.id);
+      const b = ny.get(x.m.id);
+      if (!a || a.h !== b.h || a.b !== b.b || a.live !== b.live) andrat = true;
+      // (mål i en match som har hunnit sluta säger han inget om: då säger han hur det gick)
+      if (a && b.live && b.h + b.b > a.h + a.b) mal = { x, a, b };
+    }
+    if (!andrat) return;
+    const lst = $('.rh-lista');
+    if (lst) {
+      const topp = lst.scrollTop;
+      listan(v.lista, v.fragat, v.tips);
+      lst.scrollTop = topp;
+    }
+    if (mal) {
+      // Hur många mål som fattas till hans tecken (in) och till något annat (ut), före och efter målet: för
+      // honom när det fattas färre till hans tecken eller fler till något annat, lugn när tecknet sitter ändå,
+      // och fel annars.
+      const S = REP().stallning;
+      const { x, a, b } = mal;
+      const avstand = (s, o) => (o === 0 ? Math.max(0, s.b - s.h + 1) : o === 1 ? Math.abs(s.h - s.b) : Math.max(0, s.h - s.b + 1));
+      const fattas = (s, hans) => Math.min(Infinity, ...[0, 1, 2].filter((o) => x.r.sign.includes(KORT[o]) === hans).map((o) => avstand(s, o)));
+      const hur = fattas(b, true) < fattas(a, true) || (!fattas(b, true) && fattas(b, false) > fattas(a, false)) ? 'malBra' : !fattas(b, true) ? 'malLugn' : 'malFel';
+      const match = matchNamn(lagKort(x.r.m.home), lagKort(x.r.m.away));
+      H.malKo = [{ lista: [{ text: fyll(lott(S.mal), { match, res: `${b.h}–${b.b}` }), paus: 1400 }, { text: lott(S[hur]) }], gest: { malBra: 'skrocka', malLugn: 'smacka', malFel: 'brynet' }[hur] }];
+    }
+    // den sista matchen har slutat: hur det gick (efterat), en gång
+    const pagade = [...forut.values()].some((x) => x.live);
+    if (v.borjat && pagade && !l.live.length && !summan()) {
+      H.malKo = null;
+      efterat(v.lista, v.tips);
+    }
+  }
+
+  // ---------- tidningen ----------
+  //
+  // När det har gått dåligt för honom gömmer han sig bakom tidningen, skyldig men nöjd med sig själv: han
+  // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
+  // just kommit läser han redan. Tidningen är dagens DN eller SvD (dagens i rum-hasse-tidning.js), med glasögonen
+  // på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den direkt.
+  // Han har fler sätt att verka upptagen (samma grupp lasa: raknar, tomKopp, slocknad, putsa, vissla, naglar),
+  // och i dem blir han ertappad och låtsas som ingenting; har man just kommit håller han redan på (fram).
+  // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
+  // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
+  const LAS_PAUS = [4000, 10000];
+  function upptagen(lage) {
+    H.upptagen = Boolean(lage) && !calm() && Boolean(H.fig && H.m && H.m.dagens);
+    if (!H.upptagen) return;
+    // (trycks en gång om dagen, och igen i en ny figur)
+    const d = H.m.dagens();
+    if (H.lasDag !== d.dag || H.lasFig !== H.fig) {
+      H.lasDag = d.dag;
+      H.lasFig = H.fig;
+      H.fig.tidning(d);
+    }
+    H.lasT = performance.now() + (H.on ? 1500 : 0);
+  }
+  // han läser redan (efter upp), eller håller redan på med något annat, strax innan man ertappar honom (fram)
+  function lasNu() {
+    const k = GEST[lasaNamn(true)];
+    if (!k || calm()) return;
+    H.klipp = { ...k };
+    H.T = k.fran + (k.fram ?? H.m.LAS_START);
+  }
+  // Hans omgång i sammanställningen: tävlingskupongen om han spelade, annars det han sa. → { lage, ok, n }
+  // (lage null när det inte gick dåligt), eller null.
+  function hansOmgang(sum) {
+    const p = (sum.folk || []).find((x) => x.id === 'HB' && !x.none && x.n);
+    let ok;
+    let n;
+    let z;
+    let sist = false;
+    if (p) {
+      ({ ok, n } = p);
+      const s = Math.sqrt((p.rows || []).reduce((a, r) => a + (r && r.prob != null ? r.prob * (1 - r.prob) : 0), 0));
+      z = s ? p.pts / s : 0;
+      sist = p.award === 'worst';
+    } else if (sum.backe && sum.backe.n) {
+      ({ ok, n } = sum.backe);
+      z = sum.backe.pts / Math.sqrt(n * 0.2);
+    } else return null;
+    return { lage: n >= 3 && !ok ? 'inget' : sist ? 'sist' : z <= -BRA ? 'daligt' : null, ok, n };
+  }
+
   // ---------- domarna efter omgången ----------
   //
   // När omgången är spelad och protokollet ligger på pulten (Rum.summa, tills nästa Stryktips kommer
-  // måndagen efter kl. 16) dömer han gänget: listan har var och en med rätt och poäng, bäst först, och
-  // den man väljer får sin dom slagen i disken i guld, som domen över en match, och några meningar om sin
-  // kupong (domar och domord i rum-hasse-repliker.js, läget i RumBlock.gang). Om sig själv säger han inget
-  // här. Raderna väljs efter omgången och personen, så att domen är densamma varje gång och på alla
-  // enheter. Matcherna står kvar bakom Matcherna, utan det han säger om hur det gick för honom (efterat).
+  // måndagen efter kl. 16) dömer han gänget. Listan har var och ens porträtt och namn i gängets ordning, som
+  // på kupongen, utan siffror. Den man väljer får sin dom slagen i disken i guld, som domen över en match,
+  // några meningar om sin kupong (domar och domord i rum-hasse-repliker.js, läget i RumBlock.gang) och lappen
+  // ur protokollet med kupongen och siffrorna (RumBlock.lapp). Om sig själv säger han inget här. Raderna väljs
+  // efter omgången och personen, så att domen är densamma varje gång och på alla enheter.
   const summan = () => (window.Rum && Rum.summa && window.RumBlock && RumBlock.gang && REP().domar ? Rum.summa() : null);
   // Samma rad för samma nyckel: ett tal ur nyckeln, inte slumpen.
   function fast(lista, nyckel) {
@@ -1675,6 +2125,14 @@ window.RumHasse = (() => {
     return lista[h % lista.length];
   }
   const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
+  // Namnen sitter inte riktigt: var chans:e gång säger han ett som nästan stämmer (felnamn i
+  // rum-hasse-repliker.js), och samma nyckel ger samma namn. Han rättar sig aldrig.
+  function kallar(namn, nyckel, chans = 3) {
+    const ord = String(namn).trim().split(/\s+/);
+    const fel = (REP().felnamn || {})[ord[ord.length - 1]];
+    if (!fel || !fel.length || fast([...Array(chans).keys()], `${nyckel}:fel`) !== 0) return namn;
+    return [...ord.slice(0, -1), fast(fel, `${nyckel}:namn`)].join(' ');
+  }
   // Vilka i gänget du har hört domen över, på enheten för den omgången: deras ord står i guld i listan.
   const HORT = 'profeterna.hasse.domar';
   function hort(id) {
@@ -1694,37 +2152,48 @@ window.RumHasse = (() => {
     v.push(vem);
     try { localStorage.setItem(HORT, JSON.stringify({ id, vem: v })); } catch (e) { /* bara den här gången */ }
   }
-  // Porträttet i personens färg (som på kupongen), och siffrorna som i protokollet.
+  // Porträttet i personens färg (som på kupongen).
   const ansikte = (p) => `<span class="rh-ans"${p.bild ? ` style="background-image: url('${esc(p.bild)}')"` : ''}></span>`;
-  const siffror = (p) => (p.none ? '' : `${p.ok} rätt, ${RumBlock.poang(p.pts)}`);
+  // Gänget i sin ordning, så att var och en står på samma plats varje omgång.
+  const iOrdning = (sum) => RumBlock.gang(sum).sort((a, b) => a.hand - b.hand);
+  // Säsongen till lappen (data/tippare.json, som Olympen läser) utan omgångar som spoilerskyddet döljer, eller
+  // null så länge den inte är hämtad.
+  function sasong() {
+    if (typeof TP === 'undefined' || !TP.season) return null;
+    const dold = typeof tpRoundHidden === 'function' ? tpRoundHidden : () => false;
+    return (TP.season.rounds || []).filter((r) => !dold(r));
+  }
 
-  // Listan: var och en i gänget, bäst först, med rätt och poäng som i protokollet och ringen kring den
-  // bästas poäng. → false om det inte finns någon att döma.
+  // Listan: var och ens porträtt och namn, och ordet i guld under dem man har hört om. → false om det inte finns
+  // någon att döma.
   function gangLista(sum) {
-    const folk = RumBlock.gang(sum);
+    const folk = sum ? iOrdning(sum) : [];
     if (!folk.length) return false;
+    // om sig själv säger han inget, men har det gått dåligt läser han tidningen (tidningen nedan)
+    const han = hansOmgang(sum);
+    if (han) upptagen(han.lage);
     const s = $('.rh-samtal');
     const r = REP();
     const h = hort(sum.id);
-    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-ghu" aria-hidden="true"><span>Rätt</span><span>Poäng</span></div><div class="rh-lista rh-gang"></div>' +
-      '<div class="rh-slut"><button type="button" class="rh-vag rh-tillmatcher">Matcherna</button></div>';
+    s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-gang"></div>';
     const l = s.querySelector('.rh-gang');
     for (const p of folk) {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = `k${p.hand}`;
-      const ord = h.includes(p.id) ? r.domord[p.lage] : '';
-      const po = p.none ? '' : RumBlock.poang(p.pts);
-      b.innerHTML = `${ansikte(p)}<span class="rh-gnm"><span class="rh-namn">${esc(p.namn)}</span>${ord ? `<em>${esc(ord)}</em>` : ''}</span>` +
-        `<b class="rh-gratt">${p.none ? '–' : p.ok}</b><b class="rh-gpo">${p.bast ? `<span class="rh-vann">${po}${RumBlock.RING(70, 30)}</span>` : po}</b>`;
-      b.setAttribute('aria-label', `${p.namn}${p.none ? '' : `, ${siffror(p)}`}`);
+      b.className = `k${p.hand}${p.none ? ' inget' : ''}`;
+      const ord = h.includes(p.id) ? r.domord[p.lage] || '' : '';
+      b.innerHTML = `${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><em>${esc(ord)}</em>`;
+      b.setAttribute('aria-label', ord ? `${p.namn}, ${ord}` : p.namn);
       b.addEventListener('click', () => doma(p.id));
       l.append(b);
     }
-    s.querySelector('.rh-tillmatcher').addEventListener('click', () => { H.matcher = true; fraga(); });
     const n = folk.filter((p) => h.includes(p.id)).length;
     rad(lott(n === folk.length ? r.domar.alla : n ? r.domar.igen : r.domar.fraga));
-    H.prat = vantar(r.domar.ledig, 4, 20000);
+    // (Revisorn och Semesterfiraren bara när det finns någon de kan vara)
+    const extra = [folk.some((p) => p.lage === 'forsakring') && r.domar.revisorn, folk.some((p) => p.none) && r.domar.borta].filter(Boolean);
+    const prat = extra.length ? (H.domPrat && H.domPrat.id === `${sum.id}:${extra.length}` ? H.domPrat.lista : [...r.domar.ledig, ...extra.flat()]) : r.domar.ledig;
+    if (extra.length) H.domPrat = { id: `${sum.id}:${extra.length}`, lista: prat };
+    H.prat = vantar(prat, 4, 20000);
     klick();
     return true;
   }
@@ -1733,7 +2202,9 @@ window.RumHasse = (() => {
   function domText(p, sum) {
     const d = REP().domar;
     const tal = (n) => REP().tal[n] || String(n);
-    const mening = (lista, del, n = 0) => fyll(fast(lista, `${sum.id}:${p.id}:${del}`), { namn: p.namn, antal: tal(n), Antal: versal(tal(n)) });
+    // (den som vann kan han; de andra kallar han ibland nästan rätt, samma i hela domen)
+    const namn = p.bast ? p.namn : kallar(p.namn, `${sum.id}:${p.id}`);
+    const mening = (lista, del, n = 0) => fyll(fast(lista, `${sum.id}:${p.id}:${del}`), { namn, antal: tal(n), Antal: versal(tal(n)) });
     const hel = () => (p.hel && p.helRatt === p.hel ? mening(p.hel === 1 ? d.hel.en : d.hel.fler, 'hel', p.hel) : null);
     const spik = () => {
       const k = d.spik;
@@ -1751,17 +2222,18 @@ window.RumHasse = (() => {
     return [mening(d.in[p.lage === 'forsakring' ? 'forst' : p.lage], 'in'), ...fakta.map((f) => f()), mening(d.ut[p.lage], 'ut')].filter(Boolean);
   }
 
-  // Du väljer någon i gänget: domen slås i disken (som i svara), texten står direkt och går att läsa upp,
-  // och sedan nästa du inte har hört om, eller hela gänget.
+  // Du väljer någon i gänget: domen slås i disken (som i svara), texten står direkt och går att läsa upp, och
+  // under den ligger lappen. Sedan nästa du inte har hört om, eller hela gänget.
   function doma(id) {
     const sum = summan();
-    const folk = sum ? RumBlock.gang(sum) : [];
+    const folk = sum ? iOrdning(sum) : [];
     const p = folk.find((x) => x.id === id);
     if (!p) { fraga(); return; }
     const s = $('.rh-samtal');
     vakna();
     tystna();
-    H.fraga = {};
+    const vem = {};
+    H.fraga = vem;
     H.fas = 'klar';
     H.prat = null;
     H.sagt = null;
@@ -1771,11 +2243,20 @@ window.RumHasse = (() => {
     const i = folk.indexOf(p);
     const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !h.includes(q.id));
     const d = REP().domord[p.lage] || '';
-    s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><small>${esc(siffror(p))}</small></div>` +
-      `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div><div class="rh-text"></div>` +
+    s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span></div>` +
+      `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
+      `<div class="rh-rull"><div class="rh-text"></div>${RumBlock.lapp(sum, p.id, { sasong: sasong() })}</div>` +
       `<div class="rh-slut">${nasta ? `<button type="button" class="rh-knapp huvud rh-gnasta">Nästa: ${esc(nasta.namn)}</button>` : ''}<button type="button" class="rh-knapp${nasta ? '' : ' huvud'} rh-galla">Hela gänget</button></div>`;
     const ruta = repliker(domText(p, sum).map((text, n) => ({ text, ny: n === 0 })), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
-    ruta.scrollTop = 0;
+    s.querySelector('.rh-rull').scrollTop = 0;
+    // säsongen kommer på lappen när den är hämtad
+    const vanta = !p.none && !sasong() ? datan(true) : null;
+    if (vanta) {
+      vanta.then(() => {
+        const l = H.fraga === vem && sasong() && s.querySelector('.rd-lapp');
+        if (l) l.outerHTML = RumBlock.lapp(sum, p.id, { sasong: sasong() });
+      });
+    }
     const dom = s.querySelector('.rh-dom');
     const visa = () => dom.classList.remove('vantar');
     const slag = ettAv('dom', 'slag');
@@ -1786,7 +2267,7 @@ window.RumHasse = (() => {
     if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
     const slut = s.querySelector('.rh-slut');
     if (nasta) slut.querySelector('.rh-gnasta').addEventListener('click', () => doma(nasta.id));
-    slut.querySelector('.rh-galla').addEventListener('click', () => { H.matcher = false; fraga(); });
+    slut.querySelector('.rh-galla').addEventListener('click', () => fraga());
     lasKnapp(slut, ruta);
     klick();
   }
@@ -1861,6 +2342,8 @@ window.RumHasse = (() => {
     if (H.kupong && H.kupong.paDisken) H.kupong.borta();
     fraga();
     const l = $('.rh-lista');
+    // (har omgången hunnit bli spelad står gänget där i stället)
+    if (!l) return;
     l.scrollTop = H.listaTopp || 0;
     rad(lott(REP().gissar));
     if (!e.detail) {
@@ -1992,6 +2475,11 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     const vem = H.fraga;
     H.fas = 'klar';
+    // har cigarren slocknat tänder han den gärna när han har sagt sitt
+    if (!cigarren().tand && Math.random() < 0.5) {
+      H.vana = 1;
+      H.vanaT = Math.min(H.vanaT, performance.now() + 2500 + Math.random() * 4000);
+    }
     // tillbaka till vilan efter det han håller på med, om det inte slutar där
     const sist = H.ko.length ? H.ko[H.ko.length - 1] : H.klipp;
     if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
@@ -2095,7 +2583,8 @@ window.RumHasse = (() => {
     H.vy.addEventListener('click', (e) => {
       // kupongen i handen: ett klick tar den med sig
       if (H.kupong && H.kupong.klickUtanfor(e)) { e.stopImmediatePropagation(); return; }
-      if (H.fas === 'fraga' || e.target.closest('a, button, .rh-kupong') || !e.target.closest('.rh-samtal')) return;
+      // (lappen under en dom är till för att titta på)
+      if (H.fas === 'fraga' || e.target.closest('a, button, .rh-kupong, .rd-lapp') || !e.target.closest('.rh-samtal')) return;
       e.stopImmediatePropagation();
       framat();
     }, true);

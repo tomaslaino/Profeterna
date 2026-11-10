@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Supporterpoddarna till tidningen: scripts/tidning/poddar.mjs. Mallen fylls i av
+  installera.sh och hamnar i ~/Library/LaunchAgents.
+
+  Varje natt kl. 02.15, när datorn inte används, och lördag kl. 08.00 för avsnitten som kom
+  på fredagskvällen. Sover datorn körs jobbet när den vaknar. LowPriorityIO och Nice: utskriften
+  får inte tränga undan något annat. Skriptet körs ur analysernas klon och rör aldrig git.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>se.matchfixarna.poddar</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__NODE__</string>
+    <string>__KLON__/scripts/tidning/poddar.mjs</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__KLON__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>15</integer></dict>
+    <dict><key>Weekday</key><integer>6</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+  </array>
+  <key>Nice</key>
+  <integer>10</integer>
+  <key>LowPriorityIO</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>__HEM__/Library/Logs/Matchfixarna/poddar-launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HEM__/Library/Logs/Matchfixarna/poddar-launchd.log</string>
+</dict>
+</plist>

@@ -20,11 +20,11 @@
    en duk ovanpå. Allt läggs i fönstrets bildpunkter (passa i rum-hasse.js). */
 .rum-hasse-vy { position: absolute; inset: 0; overflow: hidden; pointer-events: auto; color: #f6efdc; font-family: Fraunces, Georgia, serif; background: #120c07;
   /* papperets fibrer, som på kupongen (papper.css) */
-  --korn: var(--pp-grain);
+  --korn: var(--pp-grain); }
 .rum-hasse-vy[hidden] { display: none; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }
 .rh-scen .rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
-/* väggen i lysrörets ljus (tänt utom mellan midnatt och sex, som i rummet), annars i nattens */
+/* väggen i lysrörets ljus (tänt utom på natten; medan det dämpas och tänds båda, ritade på duken nedan), annars i nattens */
 .rh-scen img.rh-lys, .rum-hasse-vy.lys .rh-scen img.rh-bak:not(.rh-lys) { display: none; }
 .rum-hasse-vy.lys .rh-scen img.rh-lys { display: block; }
 /* på dagen: väggen med dagsljuset genom affärens fönster, ritad på en duk (vagg i rum-hasse.js) */
@@ -44,6 +44,12 @@
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .4 0 0 0 .22 -.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay; animation: rh-korn 0.5s steps(1) infinite; }
 @keyframes rh-korn { 0% { transform: translate(0, 0); } 25% { transform: translate(-7%, 4%); } 50% { transform: translate(5%, -6%); } 75% { transform: translate(-3%, -8%); } }
+/* Neonskylten i affärens fönster, strax utanför bilden till höger: samma röda sken som över gänget i
+   rummet, starkast på kvällen och natten och svagt på dagen (--neon, tand i rum-hasse.js). En färdig
+   toning utan blandning, så att den inte kostar något. */
+.rh-ton::before { content: ""; position: absolute; inset: 0; opacity: var(--neon, 0);
+  background: radial-gradient(62% 78% at 109% 16%, rgba(255, 58, 40, 0.44), rgba(255, 58, 40, 0.17) 45%, rgba(255, 58, 40, 0) 100%); }
+.rum-hasse-vy.hog .rh-ton::before { background: radial-gradient(100% 44% at 112% 12%, rgba(255, 58, 40, 0.44), rgba(255, 58, 40, 0.17) 45%, rgba(255, 58, 40, 0) 100%); }
 .rum-hasse-vy.enkel .rh-korn { display: none; }
 .rum.hasse-pan .rh-korn { animation-play-state: paused; }
 /* samtalet kommer när man har vänt sig mot honom */
@@ -52,7 +58,7 @@
 .rh-samtal { position: absolute; top: 12%; bottom: 52px; z-index: 2; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
 .rh-sagt { flex: none; min-height: 1.15em; font: 700 1.62em/1.15 Fraunces, Georgia, serif; margin: 0 0 0.4em; }
 /* över matchlistan alltid plats för två rader, så att listan står still vad han än säger */
-.rh-sagt:has(+ .rh-lista, + .rh-kol, + .rh-ghu) { min-height: 2.3em; text-wrap: balance; }
+.rh-sagt:has(+ .rh-lista, + .rh-kol) { min-height: 2.3em; text-wrap: balance; }
 .rh-o { visibility: hidden; }
 .rh-o.s { visibility: visible; }
 .rh-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
@@ -73,6 +79,9 @@
 .rh-facit { flex: none; align-self: center; display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; margin-left: 0.75em; font-weight: 700; color: #f6efdc; white-space: nowrap; }
 .rh-facit i { font-style: normal; text-align: right; }
 .rh-facit i + i { text-align: left; }
+/* ställningen i en match som pågår: kursiv och lite svagare, för den är inte facit än */
+.rh-facit.star { font-weight: 500; color: rgba(246, 239, 220, 0.74); }
+.rh-facit.star i { font-style: italic; }
 .rh-lista button.spelad > i, .rh-lista button.spelad > span { color: rgba(246, 239, 220, 0.62); }
 .rh-lista button.spelad .rh-tips small { color: rgba(246, 239, 220, 0.62); }
 .rh-lista button.spelad .rh-tips small.exakt { color: #ffd86b; }
@@ -104,34 +113,43 @@
 .rh-kol.trangt .du .rh-ans + .rh-namn, .rh-kol.trangare .rh-ans + .rh-namn { display: none; }
 .rh-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (hover: hover) { .rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; } }
-/* Gänget efter omgången (gangLista och doma i rum-hasse.js): porträtten i var och ens färg och namnen i
-   deras handstil, som på kupongen, rätt och poäng i raka spalter som i protokollet, och ringen kring den
-   bästas poäng. Ordet han har slagit i disken står i guld efter namnet, när man har hört domen. */
-.rh-ghu, .rh-gang button { display: grid; grid-template-columns: 2.1em minmax(0, 1fr) 2.4em 3.7em; column-gap: 0.45em; align-items: center; }
-.rh-ghu { flex: none; padding-bottom: 0.35em; }
-.rh-ghu span { font: 700 11px/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; color: rgba(246, 239, 220, 0.7); text-align: right; }
-.rh-ghu span:first-child { grid-column: 3; }
-.rh-gang button { padding: 0.5em 0; }
-.rh-gang button > .rh-ans, .rh-gvem > .rh-ans { --a: 1.75em; }
+/* Gänget efter omgången (gangLista i rum-hasse.js): var och ens porträtt i sin färg och namnet i sin handstil,
+   som på kupongen, sida vid sida i gängets ordning och utan siffror (de står på lappen under domen). Ordet han
+   har slagit i disken står som en stämpel i guld under namnet när man har hört domen; platsen för den finns från
+   början, så att inget flyttar sig. */
+.rh-sagt:has(+ .rh-gang) { min-height: 2.3em; text-wrap: balance; }
+.rh-gang { flex: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(6.2em, 1fr)); gap: 0.4em; margin-top: 1.1em; }
+.rh-gang button { display: flex; flex-direction: column; align-items: center; gap: 0.75em; min-width: 0; padding: 0.6em 0.2em 0.5em; border: 0; background: none; color: inherit; font: inherit; text-shadow: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.rh-gang .rh-ans { --a: 5.4em; box-shadow: 0 0 0 3px var(--ring), 0 0 0 4.5px rgba(14, 8, 4, 0.55), 0 12px 24px rgba(0, 0, 0, 0.6); transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.18s; }
+.rh-gang .rh-namn { max-width: 100%; overflow: hidden; color: #f6efdc; white-space: nowrap; text-overflow: ellipsis; transition: color 0.15s; }
+.rh-gang button.k0 .rh-namn { font-size: 1.25em; }
+.rh-gang button.k1 .rh-namn { font-size: 1.4em; }
+.rh-gang button.k2 .rh-namn { font-size: 1.7em; }
+.rum-hasse-vy.hog .rh-gang .rh-ans { --a: 4.8em; }
+.rh-gang em { box-sizing: border-box; min-height: 1.95em; padding: 0.45em 0.6em 0.4em; border: 1.5px solid #ffd86b; border-radius: 3px; font: normal 700 0.7em/1 Fraunces, Georgia, serif; letter-spacing: 0.16em; text-transform: uppercase; color: #ffd86b; rotate: -3deg; box-shadow: 0 0 14px rgba(255, 216, 107, 0.18), inset 0 0 10px rgba(255, 216, 107, 0.12); }
+.rh-gang em:empty { visibility: hidden; }
+/* den som inte lämnade in */
+.rh-gang .inget .rh-ans { filter: grayscale(1) brightness(0.72); }
+.rh-gang .inget .rh-namn { color: rgba(246, 239, 220, 0.6); }
+@media (hover: hover) {
+  .rh-gang button:hover .rh-ans { transform: translateY(-3px) scale(1.04); box-shadow: 0 0 0 3px #ffd86b, 0 0 0 4.5px rgba(14, 8, 4, 0.55), 0 0 26px rgba(255, 216, 107, 0.35), 0 16px 28px rgba(0, 0, 0, 0.6); }
+  .rh-gang button:hover .rh-namn { color: #ffd86b; }
+}
+.rh-gang button:active .rh-ans { transform: scale(0.97); }
+.rh-gang button:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; border-radius: 6px; }
 .rh-gang .k0 .rh-ans, .rh-gvem.k0 .rh-ans { --ring: var(--gang-0); }
 .rh-gang .k1 .rh-ans, .rh-gvem.k1 .rh-ans { --ring: var(--gang-1); }
 .rh-gang .k2 .rh-ans, .rh-gvem.k2 .rh-ans { --ring: var(--gang-2); }
-.rh-gnm { display: flex; align-items: baseline; gap: 0.7em; min-width: 0; overflow: hidden; }
-.rh-gnm em { flex: none; font: normal 700 0.68em/1 Fraunces, Georgia, serif; letter-spacing: 0.14em; text-transform: uppercase; color: #ffd86b; white-space: nowrap; }
-.rh-gang .rh-namn, .rh-gvem .rh-namn { flex: none; color: #f6efdc; white-space: nowrap; }
+.rh-gvem .rh-namn { flex: none; color: #f6efdc; white-space: nowrap; }
 .rh-gang .k0 .rh-namn, .rh-gvem.k0 .rh-namn { font: 400 1.05em/1.3 "Cedarville Cursive", Caveat, cursive; }
 .rh-gang .k1 .rh-namn, .rh-gvem.k1 .rh-namn { font: 400 1.2em/1.2 "Mr Dafoe", Caveat, cursive; }
 .rh-gang .k2 .rh-namn, .rh-gvem.k2 .rh-namn { font: 400 1.45em/1 "Reenie Beanie", Caveat, cursive; }
-.rh-gratt { text-align: right; font: 700 1.6em/1 Caveat, cursive; }
-.rh-gpo { justify-self: end; padding-right: 0.15em; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.rh-vann { position: relative; display: inline-block; padding: 0.15em 0.35em; }
-.rh-vann .rb-ring { position: absolute; inset: -0.1em -0.25em; width: calc(100% + 0.5em); height: calc(100% + 0.2em); overflow: visible; pointer-events: none; }
-.rh-vann .rb-ring path { fill: none; stroke: #ff6a55; stroke-width: 2; stroke-linecap: round; }
 /* domen: vem det gäller överst, där matchen står när han svarar om en match */
-.rh-gvem { display: flex; align-items: center; gap: 0.55em; }
-.rh-gvem small { font-size: 0.86em; font-weight: 700; opacity: 0.85; }
-/* matcherna efter omgången: Gänget under listan */
-.rh-lista + .rh-slut { min-height: 0; }
+.rh-gvem { display: flex; align-items: center; gap: 0.6em; }
+.rh-gvem > .rh-ans { --a: 2.1em; }
+/* under domen rullar texten och lappen ur protokollet (RumBlock.lapp, rum-block.css) tillsammans */
+.rh-rull { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding-right: 0.5em; }
+.rh-rull > .rh-text { flex: none; min-height: 0; overflow: visible; padding-right: 0; }
 .rh-lista button:disabled { opacity: 1; cursor: default; }
 .rh-match { flex: none; font-weight: 600; opacity: 0.85; }
 .rh-dom { flex: none; margin: 0.06em 0 0.18em; font: 800 clamp(58px, 7vw, 104px)/1 Fraunces, Georgia, serif; color: #ffd86b; text-shadow: 0 3px 0 #6b4a10, 0 8px 18px rgba(0, 0, 0, 0.75); transform-origin: 12% 70%; animation: rh-dom 0.13s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
@@ -186,7 +204,11 @@
 .rh-slag { animation: rh-slag 0.42s linear; }
 /* --slag: hur hårt han slår (rum-hasse.js) */
 @keyframes rh-slag { 0% { translate: 0 0; } 18% { translate: 0 var(--slag, 9px); } 42% { translate: 0 calc(var(--slag, 9px) * -0.55); } 70% { translate: 0 calc(var(--slag, 9px) * 0.22); } 100% { translate: 0 0; } }
-.rum.hasse-pan .rum-ft, .rum.hasse-pan .rum-hdr, .rum.hasse-framme .rum-hdr { display: none; }
+/* Namnet och foten står kvar medan man vänder sig och hos honom: det är samma sida, det är bara kameran
+   som har svängt. Samtalet börjar under namnet (där det syns: i fönster smalare än 8:5, rum.css). */
+@media not all and (min-aspect-ratio: 8/5) { .rum-hasse-vy:not(.hog) .rh-samtal { top: max(12%, 78px); } }
+/* (men inte över matchbladet eller kupongen i handen, som i rummet) */
+.rum-sving:has(.rum-hasse-vy .rum-bladlager, .rh-kupong.over) ~ .rum-hdr { opacity: 0; pointer-events: none; }
 .rh-fot { position: absolute; bottom: 14px; z-index: 2; display: flex; justify-content: flex-end; pointer-events: none; }
 .rh-ljud { flex: none; font-size: 12px; pointer-events: auto; }
 /* ljudet av och på, längst till vänster */

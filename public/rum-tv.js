@@ -144,9 +144,13 @@ window.RumTv = (() => {
   const fWhen = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   const partsOf = (f, d) => Object.fromEntries(f.formatToParts(d).map((x) => [x.type, x.value.replace('.', '')]));
 
+  // Stockholms klocka, samma som uret och utsikten (vader.js: ?rum-klocka, och
+  // stilla i en fast bild)
+  const klockan = () => (window.Vader && Vader.tid ? Vader.tid() : Date.now());
+
   // Rubrikraden: sidnumret (grönt medan det rullar), namnet, datumet och klockan.
   function head(nr, rolling) {
-    const p = partsOf(fHead, new Date());
+    const p = partsOf(fHead, new Date(klockan()));
     return line(' ', [String(nr), rolling ? 'g' : 'w'], ' Matchfix Text  ', pad(`${p.weekday} ${p.day} ${p.month}`, 10), ' ', [`${p.hour}:${p.minute}:${p.second}`, 'y']);
   }
 
@@ -494,7 +498,7 @@ window.RumTv = (() => {
       // på håll bläddrar undersidorna själva var tolfte sekund
       const subs = subsOf(T.nr);
       if (!T.near && !T.roll && subs > 1) {
-        const sub = Math.floor(Date.now() / 12000) % subs;
+        const sub = Math.floor(klockan() / 12000) % subs;
         if (sub !== T.sub) {
           T.sub = sub;
           draw(true);

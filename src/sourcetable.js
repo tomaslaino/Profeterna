@@ -66,9 +66,9 @@ const PROVIDERS = [
     id: 'Svenska Spel',
     name: 'Svenska Spel',
     url: 'https://spela.svenskaspel.se/stryktipset',
-    gives: 'Veckans Stryktips och hur Svenska folket spelar det.',
-    used: 'Hämta Stryktipset och Svenska folket på kupongen',
-    live: 'Hämtas via sajtens kupongtjänst när kupongen är öppen, varje minut fram till spelstoppet.',
+    gives: 'Veckans Stryktips, hur Svenska folket spelar det, oddsen och favoritskapet.',
+    used: 'Hämta Stryktipset och siffrorna på gängets kupong',
+    live: 'Hämtas via sajtens kupongtjänst när gängets kupong är framme, varje minut fram till spelstoppet. Sista läget för oddsen sparas av tjänsten.',
   },
   {
     id: 'YouTube',

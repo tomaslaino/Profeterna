@@ -1,0 +1,59 @@
+/* Hasse svarar från baren (rum-hasse-svar.js), vid anslagstavlan och vid protokollet: det man ropar
+   till honom står under det man har framme (.hs-ropa), och han lutar sig in från baren nere till vänster
+   (.hs-fig, kostymfotot) och svarar i en mörk pratbubbla med guldkant vars spets (.hs-svans) pekar mot
+   hans mun. Orden syns när han har sagt dem och det han redan har sagt är lite dämpat, som hans tal i
+   baren (rum-hasse.css: .rh-rep, .rh-o). Bakom mörknar det lite från vänster, och helt när bubblan
+   ligger över det man har framme. Delarna står i fönstrets mått (left och top räknas i fönstret). */
+.hs-ropa { border: 0; padding: 0; background: none; cursor: pointer; font: italic 17px Fraunces, Georgia, serif; color: #e9cf8e; text-decoration: underline dotted; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
+@media (hover: hover) { .hs-ropa:hover { color: #fbe8b8; } }
+.hs-ropa:empty { display: none; }
+.hs-mork { position: absolute; left: 0; top: 0; bottom: 0; width: 0; opacity: 0; pointer-events: none; background: linear-gradient(to right, rgba(14, 8, 4, 0.5) calc(100% - 90px), rgba(14, 8, 4, 0)); transition: opacity 0.3s ease; }
+.hs-mork.over { right: 0; width: auto; background: rgba(14, 8, 4, 0.86); }
+.hs-mork.on { opacity: 1; }
+/* läge, storlek och utsnitt sätts i placera */
+.hs-fig {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  background: url(rum/hasse-atlas.webp) no-repeat;
+  transform-origin: 0 100%;
+  /* i rummets dova ljus, och med en skugga mot det bakom */
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.7)) brightness(0.92) sepia(0.15);
+}
+.hs-svans { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; visibility: hidden; pointer-events: none; }
+.hs-svans .f { fill: rgb(24, 16, 10); }
+.hs-svans .k { fill: none; stroke: rgba(233, 207, 142, 0.75); stroke-width: 1.5; stroke-linejoin: round; }
+.hs-fig.on, .hs-svans.on { visibility: visible; }
+.hs-bubbla {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 400px;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+  padding: 18px 22px 6px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  visibility: hidden;
+  pointer-events: none;
+  color: #f6efdc;
+  background: rgba(24, 16, 10, 0.94);
+  border: 1.5px solid rgba(233, 207, 142, 0.75);
+  border-radius: 24px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  font: 400 clamp(15.5px, 1.22vw, 18px)/1.42 Fraunces, Georgia, serif;
+  text-align: left;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+.hs-bubbla.on { visibility: visible; pointer-events: auto; }
+.hs-bubbla p { margin: 0 0 0.62em; }
+.hs-bubbla .hs-o { visibility: hidden; }
+.hs-bubbla.on .hs-o.s { visibility: visible; }
+.hs-rep { color: rgba(246, 239, 220, 0.66); }
+.hs-rep.nu, .hs-bubbla.klar .hs-rep { color: #f6efdc; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-mork { transition: none; }
+}

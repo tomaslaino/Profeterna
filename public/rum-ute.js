@@ -651,7 +651,14 @@ window.RumUte = (() => {
       }
     });
     const defs = '<defs><radialGradient id="rum-ute-frost" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#eef6ff" stop-opacity=".55"/><stop offset=".6" stop-color="#eef6ff" stop-opacity=".18"/><stop offset="1" stop-color="#eef6ff" stop-opacity="0"/></radialGradient></defs>';
-    return `<svg class="rum-layer" viewBox="0 0 1600 1000" aria-hidden="true">${defs}${s}</svg>${html}`;
+    // (bara så stor som fönstret och dörren, och ingen alls utan droppar, snö och frost: annars lade
+    // grafikkortet ett tomt lager över hela utsikten i varje bildruta. Utanför glaset är väggen.)
+    if (!s) return html;
+    const x0 = Math.min(...rects.map((p) => p.x));
+    const y0 = Math.min(...rects.map((p) => p.y));
+    const w = Math.max(...rects.map((p) => p.x + p.w)) - x0;
+    const h = Math.max(...rects.map((p) => p.y + p.h)) - y0;
+    return `<svg class="rum-layer" viewBox="${x0} ${y0} ${w} ${h}" style="left:${x0}px; top:${y0}px; width:${w}px; height:${h}px" aria-hidden="true">${defs}${s}</svg>${html}`;
   }
 
   // ---------- att rita ----------
@@ -880,14 +887,17 @@ window.RumUte = (() => {
   }
 
   // figuren f i ställningen efter t ms
+  // (i gatans duk är figurens bild en ruta i ett gemensamt ark, med hörnet i ax, ay)
   function rita(f, t) {
     const g = f.bakad ? kladd(f.bw, f.bh) : f.x;
+    const ax = f.ax || 0;
+    const ay = f.ay || 0;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.globalAlpha = 1;
-    g.clearRect(0, 0, f.bw, f.bh);
+    g.clearRect(ax, ay, f.bw, f.bh);
     g.save();
     g.beginPath();
-    g.rect(f.P * f.s, f.P * f.s, f.w * f.s, f.h * f.s);
+    g.rect(ax + f.P * f.s, ay + f.P * f.s, f.w * f.s, f.h * f.s);
     g.clip();
     delarna(g, f, t, f.B);
     g.restore();
@@ -913,8 +923,9 @@ window.RumUte = (() => {
       if (vb.length !== 4 || !(w > 0) || !(h > 0)) continue;
       const st = svg.style;
       const steg = (parseFloat(st.getPropertyValue('--steg')) || 0.9) * 1000;
-      // molnen är så suddiga att det räcker med en bildpunkt per px
-      const sk = LATT ? (blur >= 3 ? 0.2 : 0.5) : blur >= 3 ? Math.min(1, s) : s;
+      // molnen är så suddiga att det räcker med en bildpunkt per px; i gatans
+      // duk är figuren en bild i dukens upplösning (GAT_S), utan oskärpa
+      const sk = samla && ror ? GAT_S : LATT ? (blur >= 3 ? 0.2 : 0.5) : blur >= 3 ? Math.min(1, s) : s;
       const bakad = FILTER && blur > 0 && !(samla && ror);
       const P = bakad ? Math.ceil(blur * 3) : 0;
       const c = document.createElement('canvas');
@@ -923,7 +934,7 @@ window.RumUte = (() => {
       c.style.cssText = `${svg.getAttribute('style') || ''}; width:${w + 2 * P}px; height:${h + 2 * P}px; margin:${-P}px 0 0 ${-P}px`;
       const bw = Math.ceil((w + 2 * P) * sk);
       const bh = Math.ceil((h + 2 * P) * sk);
-      // (det som rör sig ritas direkt i gatans duk)
+      // (figurerna i gatans duk ritas i ett gemensamt ark, ark)
       const x = samla && ror ? null : c.getContext('2d');
       if (x) {
         c.width = bw;
@@ -945,15 +956,17 @@ window.RumUte = (() => {
       if (samla) {
         const lov = svg.classList.contains('rum-lov');
         Object.assign(f, {
-          mx: w / vb[2], my: h / vb[3], vx: vb[0], vy: vb[1], lov,
+          lov,
           y0: lov ? parseFloat(st.getPropertyValue('--y0')) || 0 : parseFloat(st.top) || 0,
           y1: lov ? parseFloat(st.getPropertyValue('--y1')) || 0 : 0,
           al: st.opacity === '' ? 1 : parseFloat(st.opacity),
           dur: (parseFloat(st.animationDuration) || 0) * 1000,
           fore: -(parseFloat(st.animationDelay) || 0) * 1000,
-          bas: [0, 0, 0, 0, 0, 0],
+          // det som far förbi fort nog att hacka i gängets takt (molnen driver
+          // några px i sekunden, och flaggan står på sin stång)
+          fort: f.glid && !svg.classList.contains('rum-moln'),
         });
-        // (det som bara är suddigt, molnen, ritas en gång och läggs ut som bild)
+        // (molnen ritas en gång, det andra i gängets takt: stall)
         if (!f.ror) rita(f, 0);
         svg.remove();
         ut.push(f);
@@ -963,7 +976,43 @@ window.RumUte = (() => {
       svg.replaceWith(c);
       if (f.ror) ut.push(f);
     }
+    if (samla) ark(ut.filter((f) => f.ror));
     return ut;
+  }
+
+  // Figurernas bilder i gatans duk ligger i ett gemensamt ark, en ruta var med en
+  // tom bildpunkt runt: som ett tjugotal små dukar var de var sin yta på
+  // grafikkortet, och gatan blev dyrare att lägga ut i varje bildruta.
+  function ark(lista) {
+    if (!lista.length) return;
+    const W = Math.max(256, ...lista.map((f) => f.bw + 2));
+    let x = 0;
+    let y = 0;
+    let rad = 0;
+    for (const f of lista) {
+      if (x + f.bw + 2 > W) {
+        x = 0;
+        y += rad;
+        rad = 0;
+      }
+      f.ax = x + 1;
+      f.ay = y + 1;
+      x += f.bw + 2;
+      rad = Math.max(rad, f.bh + 2);
+    }
+    const c = document.createElement('canvas');
+    c.width = W;
+    c.height = y + rad;
+    // (i processorn: det är litet, tar inget ritminne, och grafikkortet läser in det
+    // bara när ställningarna har ändrats)
+    const g = c.getContext('2d', { willReadFrequently: true });
+    for (const f of lista) {
+      f.c = c;
+      f.x = g;
+      f.B[4] += f.ax;
+      f.B[5] += f.ay;
+      rita(f, 0);
+    }
   }
 
   // I telefonen ritas gatan (husen och det som står framför dem, inte skylten)
@@ -1052,10 +1101,17 @@ window.RumUte = (() => {
   //
   // I telefonen ritas allt på gatan i en och samma duk, stor som det som syns
   // genom fönstret och dörren: himlen, molnen, fåglarna, husen och de som går
-  // förbi, i gängets takt. Förut gled ett par dussin små dukar var för sig på
-  // grafikkortet, och då måste hela scenen, med husen och himlen över varandra,
-  // ritas om 60 gånger i sekunden fast gänget bara rör sig 15–20 gånger. En
-  // ofärgad duk (alpha: false) gör dessutom att det bakom den inte ritas alls.
+  // förbi. Förut gled ett par dussin små dukar var för sig på grafikkortet, med
+  // husen och himlen över varandra i flera lager. En ofärgad duk (alpha: false)
+  // gör dessutom att det bakom den inte ritas alls.
+  //
+  // Ställningen (benen, armarna, hjulen, vingarna, flaggan) ritas i gängets takt
+  // i en ruta per figur (stall, ark), men var figurerna är på gatan räknas om i
+  // varje bildruta, högst 60 gånger i sekunden (glid från rum.js), medan något som
+  // far förbi syns: i gängets takt, 15–20 gånger i sekunden och på datorns lägsta
+  // steg 5–8, hoppade en bil 10–50 px åt gången och de som går förbi ryckte fram.
+  // Att lägga ut bilderna är ett par dussin kopieringar i en liten duk. Syns bara
+  // molnen, som driver några px i sekunden, ritas gatan i gängets takt som förut.
   const GAT_S = 0.5;
   function gatduk(el, rects) {
     if (el._gat || !rects || !rects.length) return;
@@ -1072,13 +1128,37 @@ window.RumUte = (() => {
     el.classList.add('samlad');
     el.prepend(c);
   }
-  function ritaGatan(el, t) {
+  // var figuren f är på gatan efter nu ms: [x, y] (vänstra övre hörnet)
+  function plats(f, nu) {
+    if (!f.glid || !(f.dur > 0)) return [f.x0, f.y0];
+    const q = (nu + f.fore) / f.dur;
+    const p = q - Math.floor(q);
+    return [f.x0 + f.fran + (f.till - f.fran) * p, f.lov ? f.y0 + (f.y1 - f.y0) * p : f.y0];
+  }
+  // syns genom fönstret eller dörren (m px marginal)
+  const synsUte = (G, x, f, m = 0) => x + f.w + f.P >= G.b.x - m && x - f.P <= G.b.x + G.b.w + m;
+
+  // Ställningarna efter nu ms i figurernas bilder, för dem som syns (eller strax
+  // kommer in: 40 px är mer än en bil hinner mellan två av gängets bilder).
+  function stall(el, nu) {
     const G = el._gat;
-    if (!G || !G.himmel || !G.gata) return;
+    if (!G || !el._dukar || RORELSE_AV.matches) return;
+    for (const k of ['himliv', 'liv']) {
+      for (const f of el._dukar[k] || []) {
+        if (f.ror && synsUte(G, plats(f, nu)[0], f, 40)) rita(f, nu);
+      }
+    }
+  }
+
+  // Lägger ut gatan efter nu ms (utan nu: klockan, eller den fasta tiden i en
+  // stillbild). → om något som far förbi syns (el._fort): då ska gatan ritas i
+  // varje bildruta (glid).
+  function ritaGatan(el, nu) {
+    const G = el._gat;
+    if (!G || !G.himmel || !G.gata) return false;
     const { g, b } = G;
-    // (i en stillbild står klockan still, också när bilderna blir klara efteråt)
-    if (t != null) el._fast = t;
-    const nu = el._fast != null ? el._fast : performance.now();
+    if (nu == null) nu = el._fast != null ? el._fast : performance.now();
+    let fort = false;
     const bakgrund = (d) => {
       g.setTransform(1, 0, 0, 1, 0, 0);
       g.globalAlpha = 1;
@@ -1088,35 +1168,20 @@ window.RumUte = (() => {
       if (RORELSE_AV.matches) return;
       for (let i = 0; i < lista.length; i++) {
         const f = lista[i];
-        let x = f.x0;
-        let y = f.y0;
-        if (f.glid && f.dur > 0) {
-          const q = (nu + f.fore) / f.dur;
-          const p = q - Math.floor(q);
-          x += f.fran + (f.till - f.fran) * p;
-          if (f.lov) y += (f.y1 - f.y0) * p;
-        }
-        if (x + f.w < b.x || x > b.x + b.w) continue;
-        if (!f.ror) {
-          g.setTransform(1, 0, 0, 1, 0, 0);
-          g.globalAlpha = f.al;
-          g.drawImage(f.c, (x - b.x - f.P) * GAT_S, (y - b.y - f.P) * GAT_S, (f.w + 2 * f.P) * GAT_S, (f.h + 2 * f.P) * GAT_S);
-          continue;
-        }
-        const B = f.bas;
-        B[0] = f.mx * GAT_S;
-        B[3] = f.my * GAT_S;
-        B[4] = (x - b.x - f.vx * f.mx) * GAT_S;
-        B[5] = (y - b.y - f.vy * f.my) * GAT_S;
-        delarna(g, f, nu, B);
+        const [x, y] = plats(f, nu);
+        if (!synsUte(G, x, f)) continue;
+        if (f.fort) fort = true;
+        g.globalAlpha = f.al;
+        g.drawImage(f.c, f.ax || 0, f.ay || 0, f.bw, f.bh, (x - b.x - f.P) * GAT_S, (y - b.y - f.P) * GAT_S, (f.w + 2 * f.P) * GAT_S, (f.h + 2 * f.P) * GAT_S);
       }
     };
     bakgrund(G.himmel);
     figurer(el._dukar.himliv || []);
     for (const d of G.gata) bakgrund(d);
     figurer(el._dukar.liv || []);
-    // regnet och snön: banden faller (och snön driver) i samma takt
+    // regnet och snön: banden faller (och snön driver)
     if (G.fall) {
+      if (!RORELSE_AV.matches) fort = true;
       g.setTransform(1, 0, 0, 1, 0, 0);
       for (const f of G.fall) {
         const q = RORELSE_AV.matches ? 0.5 : nu / f.dur;
@@ -1130,10 +1195,49 @@ window.RumUte = (() => {
         g.globalAlpha = f.al;
         g.drawImage(f.c, (x - b.x) * GAT_S, (FALL.y - (f.h / 2) * (1 - p) - b.y) * GAT_S, f.w * GAT_S, f.h * GAT_S);
       }
-      g.globalAlpha = 1;
     }
+    g.globalAlpha = 1;
+    // blixten (åska) över hela gatan, som lagret .rum-blixt med sina två ljus
+    if (G.blixt && !RORELSE_AV.matches) {
+      const a = 1 - (1 - blixtA(nu / 17000)) * (1 - blixtA((nu + 11000) / 29000));
+      if (a > 0.004) {
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.globalAlpha = 0.45 * a;
+        g.fillStyle = '#eef3ff';
+        g.fillRect(0, 0, g.canvas.width, g.canvas.height);
+        g.globalAlpha = 1;
+      }
+    }
+    // dropparna, snön och frosten på rutan (bakaGlas)
+    if (G.glas) {
+      const q = G.glas;
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.drawImage(q.c, (q.x - b.x) * GAT_S, (q.y - b.y) * GAT_S, q.w * GAT_S, q.h * GAT_S);
+    }
+    el._fort = fort;
+    return fort;
   }
   const RORELSE_AV = matchMedia('(prefers-reduced-motion: reduce)');
+  // blixtens styrka efter q varv (nyckelbilderna rum-blixt i rum-ute.css, rakt mellan dem)
+  const BLIXT = [[0, 0], [0.9, 0], [0.906, 0.85], [0.912, 0.08], [0.92, 0.6], [0.94, 0], [1, 0]];
+  function blixtA(q) {
+    const p = q - Math.floor(q);
+    for (let i = 1; i < BLIXT.length; i++) {
+      const [x1, y1] = BLIXT[i];
+      if (p > x1) continue;
+      const [x0, y0] = BLIXT[i - 1];
+      return y0 + ((y1 - y0) * (p - x0)) / (x1 - x0);
+    }
+    return 0;
+  }
+
+  // I varje bildruta från rum.js (ms: bildrutans tid), medan gatan syns och rör
+  // sig: gatan läggs ut på nytt bara när något som far förbi syns, annars i
+  // gängets takt (takt). → om gatan ska ritas i varje bildruta.
+  function glid(el, ms) {
+    if (!el || !el._gat || !el._fort || el._fast != null) return false;
+    return ritaGatan(el, ms);
+  }
 
   // Regnets och snöns band (fall) som bilder, en gång, i gatans duk: som egna lager gled de över hela
   // utsikten på grafikkortet, och då ritades hela rummet om 60 gånger i sekunden medan det regnade.
@@ -1175,6 +1279,40 @@ window.RumUte = (() => {
     ritaGatan(el);
   }
 
+  // Dropparna, snön och frosten på rutan (glas) som en bild i gatans duk i telefonen, en gång. Som eget
+  // lager över fönstret och dörren lade grafikkortet dem över rummet i varje bildruta (0,4 skärmytor),
+  // fast de står still. Där ritas utsikten ändå med 0,4 bildpunkter per px (rum.css).
+  async function bakaGlas(x, el) {
+    const G = el._gat;
+    const gen = (x._gen = (x._gen || 0) + 1);
+    G.glas = null;
+    const svg = x.querySelector(':scope > svg');
+    if (!svg) return ritaGatan(el);
+    const vb = svg.viewBox.baseVal;
+    const k = svg.cloneNode(true);
+    k.removeAttribute('style');
+    k.removeAttribute('class');
+    k.setAttribute('width', vb.width);
+    k.setAttribute('height', vb.height);
+    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(k)], { type: 'image/svg+xml' }));
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      if (x._gen !== gen || el._gat !== G) return;
+      const c = document.createElement('canvas');
+      c.width = Math.ceil(vb.width * GAT_S);
+      c.height = Math.ceil(vb.height * GAT_S);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      img.src = '';
+      G.glas = { c, x: vb.x, y: vb.y, w: vb.width, h: vb.height };
+      svg.style.display = 'none';
+      ritaGatan(el);
+    } catch { /* då står SVG:n kvar */ } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
   // Ställningarna efter t ms (rum.js: i gängets takt, eller den fasta
   // tiden i en stillbild); bara det som syns genom fönstret och dörren.
   // Var en figur är läses bara för en figur i taget: i Safari räknar varje
@@ -1182,7 +1320,15 @@ window.RumUte = (() => {
   // något har ändrats. Däremellan räknas läget fram ur farten.
   let tur = 0;
   function takt(el, t, glesa = true) {
-    if (el && el._gat) return ritaGatan(el, t);
+    if (el && el._gat) {
+      // (i en stillbild står klockan still, också när bilderna blir klara efteråt)
+      if (t != null) el._fast = t;
+      const nu = el._fast != null ? el._fast : performance.now();
+      stall(el, nu);
+      // (far något förbi läggs gatan ut i nästa bildruta, glid)
+      if (!el._fort || el._fast != null) ritaGatan(el, nu);
+      return;
+    }
     if (!el || !el._duk) return;
     const [X0, X1] = el._x || [-Infinity, Infinity];
     const nu = performance.now();
@@ -1269,7 +1415,10 @@ window.RumUte = (() => {
     }
     const sig = sigs(v, L);
     sig.blixt = String(v.slag === 'aska');
-    const draw = { himmel: () => himmel(v, L), himliv: () => himmelsliv(v, L), gata: () => gata(v, L), liv: () => gatliv(v, L), fall: () => fall(v), glas: () => glas(v, rects), blixt: () => (v.slag === 'aska' ? '<i></i><i class="b2"></i>' : '') };
+    // (med gatan i en duk blinkar blixten där, ritaGatan: två lager i hela utsiktens storlek som
+    // tonade upp och ner på grafikkortet gjorde att hela rummet ritades om 60 gånger i sekunden)
+    if (el._gat) el._gat.blixt = v.slag === 'aska';
+    const draw = { himmel: () => himmel(v, L), himliv: () => himmelsliv(v, L), gata: () => gata(v, L), liv: () => gatliv(v, L), fall: () => fall(v), glas: () => glas(v, rects), blixt: () => (v.slag === 'aska' && !el._gat ? '<i></i><i class="b2"></i>' : '') };
     let changed = false;
     // dukarna: bildpunkter per px som utsikten syns (högst 2), och det som
     // syns genom fönstret och dörren (med marginal)
@@ -1287,12 +1436,17 @@ window.RumUte = (() => {
       if (k === 'gata' && SAMLA) bakaGata(x, G && ((d) => { G.gata = d; ritaGatan(el); }));
       if (k === 'himmel' && SAMLA) bakaHimmel(x, G && ((d) => { G.himmel = d; ritaGatan(el); }));
       if (k === 'fall' && G) bakaFall(x, el);
+      // (i datorn står de kvar i full skärpa: gatans duk har en halv bildpunkt per px)
+      if (k === 'glas' && G && LATT) bakaGlas(x, el);
       changed = true;
     }
     el._duk = [...(el._dukar.liv || []), ...(el._dukar.himliv || [])];
-    if (el._gat && changed) ritaGatan(el);
+    if (el._gat && changed) {
+      stall(el, el._fast != null ? el._fast : performance.now());
+      ritaGatan(el);
+    }
     return changed;
   }
 
-  return { paint, light, takt };
+  return { paint, light, takt, glid };
 })();

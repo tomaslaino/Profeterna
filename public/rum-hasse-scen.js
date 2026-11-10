@@ -11,8 +11,9 @@
 // lite högre än han (man står, han sitter) och så nära att pulten ses uppifrån som i rummet.
 //
 // Barens egna mått (x längs benet åt höger, z ut ur väggen mot en): p i figurens värld = Ry(BAR)·p.
-// Pultens arm (HORN) ligger i barens mått mellan x = HORN.X och HORN.X + HORN.B och går från benets bakre
-// kant fram mot en, förbi kameran.
+// Pultens mått (rum-pult.js, samma som rummets) är barens förskjutna längs benet: han sitter vid x = PLATS.
+// Pultens arm (HORN) ligger i pultens mått mellan x = HORN.X och HORN.X + HORN.B och går från benets bakre
+// kant fram mot en, förbi kameran; i barens mått alltså PLATS längre till vänster, nära ens högra sida.
 const DEG = Math.PI / 180;
 
 export const SCEN = {
@@ -28,11 +29,14 @@ export const SCEN = {
   // baren: positivt vriden, så att benets högra del går bort från en och pultens arm går fram förbi
   // kamerans högra sida (man har vänt sig lite mindre än en rät vinkel)
   BAR: 8,
-  // disken i barens mått: ovansidan Y, den bakre kanten Z och djupet; väggen bakom honom
+  // disken: ovansidan Y, den bakre kanten Z och djupet; väggen bakom honom
   DISK: { Y: -290, Z: 185, DJUP: 900 },
-  // pultens arm mot en: dess vänstra kant och bredden (lika bred som benet, som pulten i rummet)
+  // pultens arm mot en, i pultens mått: dess vänstra kant och bredden (lika bred som benet, som pulten i rummet)
   HORN: { X: 110, B: 900 },
   VAGG: -1100,
+  // var han sitter längs benet, i pultens mått (rum-pult.js): så långt ut mot hörnet att händerna ligger
+  // vid geringssnittet, som i rummet. Förut satt han vid x = 0, 27 cm längre in på benet (ändrat 2026-11-09).
+  PLATS: 450,
 };
 
 // Kameran: läget, och axlarna i världen (höger, upp och bakåt; den tittar mot −bak). Rotationen är
@@ -68,6 +72,11 @@ export function franBaren(p, vinkel = SCEN.BAR) {
   const c = Math.cos(b);
   const s = Math.sin(b);
   return [p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c];
+}
+
+// Från pultens mått (rum-pult.js, samma som rummets) till figurens värld: han sitter vid x = PLATS.
+export function franPulten(p) {
+  return franBaren([p[0] - SCEN.PLATS, p[1], p[2]]);
 }
 
 // Diskens bakre plan i figurens värld: n·(x, z) = c, med n (vågrät) ut mot affären. Framför planet
