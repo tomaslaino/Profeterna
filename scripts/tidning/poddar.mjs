@@ -28,7 +28,6 @@
 //   node scripts/tidning/poddar.mjs --utan-media         utan de insatta medierna
 
 import { execFileSync } from 'node:child_process';
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -37,7 +36,7 @@ import fc from '../../config/forum.js';
 import mc from '../../config/media.js';
 import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
-import { lasForum, taUtForum, lasningsNyckel, forumPost, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
+import { lasForum, taUtForum, lasningsNyckel, forumPoster, forumenAv, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
 import { letaArtiklar, lasArtikel, nyaArtiklar, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
 import { senasteTid, nastaTid } from '../../src/analyser/tider.mjs';
 import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
@@ -182,8 +181,9 @@ async function fyllRegistret(register, lagen) {
   }
 }
 
-// Forumregistret: lagen i config/forum.js prövas (lever tavlan och går den att läsa?), lagen som
-// varken står där eller bland dem utan forum letas upp av Claude, några i taget.
+// Forumregistret: lagens forum i config/forum.js prövas (lever tavlan och går den att läsa?), lagen
+// som varken står där eller bland dem utan forum letas upp av Claude, några i taget. Registret har
+// en lista per lag: alla forum som gick att läsa, det viktigaste först.
 async function fyllForum(reg, lagen) {
   const nya = lagen.filter((l) => !fc.utan.includes(l) && forumSkaLetas(reg[l], Date.now(), fc.kanda[l] || null));
   if (!nya.length) return;
@@ -202,49 +202,73 @@ async function fyllForum(reg, lagen) {
   }
   for (const lag of nya) {
     if (!fc.kanda[lag] && !(lag in svar)) continue;
-    const f = fc.kanda[lag] || svar[lag];
-    const p = f ? await provaForum(f).catch((err) => ({ ok: false, orsak: err.message })) : { ok: false, orsak: 'inget forum hittat' };
-    // Ett känt forum som inte svarar just nu får stå kvar; det prövas igen nästa gång.
-    const forum = p.ok ? f : (fc.kanda[lag] && reg[lag] && reg[lag].forum) || null;
-    reg[lag] = { forum, kollad: new Date().toISOString(), ...(fc.kanda[lag] ? { kant: fc.kanda[lag] } : {}), ...(p.ok ? {} : { fel: p.orsak }) };
-    logg(`${lag}: ${p.ok ? `forumet ${f.namn} (${p.tradar} trådar)` : `inget forum att läsa${f ? ` (${f.namn}: ${p.orsak})` : ''}`}`);
+    const kanda = forumenAv(fc.kanda[lag]);
+    const forut = forumenAv(reg[lag] && reg[lag].forum);
+    const prova = kanda.length ? kanda : forumenAv(svar[lag]);
+    const forum = [];
+    const fel = {};
+    for (const f of prova.slice(0, fc.flestForum)) {
+      const p = await provaForum(f).catch((err) => ({ ok: false, orsak: err.message }));
+      // Ett känt forum som inte svarar just nu får stå kvar; det prövas igen nästa gång.
+      if (p.ok || (kanda.length && forut.some((x) => x.namn === f.namn))) forum.push(f);
+      if (!p.ok) fel[f.namn] = p.orsak;
+      logg(`${lag}: ${p.ok ? `forumet ${f.namn} (${p.tradar} trådar)` : `forumet ${f.namn} gick inte att läsa (${p.orsak})${forum.includes(f) ? ', står kvar' : ''}`}`);
+    }
+    if (!prova.length) logg(`${lag}: inget forum hittat`);
+    reg[lag] = { forum, kollad: new Date().toISOString(), ...(fc.kanda[lag] ? { kant: fc.kanda[lag] } : {}), ...(Object.keys(fel).length ? { fel } : !prova.length ? { fel: 'inget forum hittat' } : {}) };
     skrivJson(FORUMREG, reg);
   }
 }
 
-// Läser lagens forum och tar ut det intressanta. Samma inlägg som förra läsningen läses inte av
-// Claude igen. → antal nya uppgifter
+// Läser alla lagets forum och tar ut det intressanta ur dem tillsammans, ett anrop per lag. Samma
+// inlägg som förra läsningen läses inte av Claude igen. Varje forum sparas som en egen läsning,
+// så att det står som källa för sig. → antal nya uppgifter
 async function lasForumen(fil, reg, lagen) {
   let nya = 0;
   for (const l of lagen) {
-    const forum = reg[l.lag] && reg[l.lag].forum;
-    if (!forum) continue;
+    const forumen = forumenAv(reg[l.lag] && reg[l.lag].forum);
+    if (!forumen.length) continue;
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
     post.mot = l.mot;
-    try {
-      const lasning = await lasForum(forum, { mot: l.mot, logg });
-      if (!lasning.tradar.length) { logg(`${l.lag}: ${forum.namn} – inga nya inlägg i trådarna inför matchen`); continue; }
-      const nyckel = lasningsNyckel(lasning);
-      const forra = post.avsnitt.filter((a) => a.typ === 'forum').sort((a, b) => b.uttaget.localeCompare(a.uttaget))[0];
-      if (forra && forra.nyckel === nyckel && forra.version === fc.promptVersion) { logg(`${l.lag}: ${forum.namn} – inget nytt sedan förra läsningen`); continue; }
-      if (TORRT) { logg(`skulle läsa ${l.lag}: ${forum.namn} – ${lasning.tradar.map((t) => `"${t.titel}" (${t.inlagg.length})`).join(', ')}`); continue; }
-      const id = `f${crypto.createHash('sha1').update(`${l.lag}|${nyckel}`).digest('hex').slice(0, 11)}`;
-      const u = await taUtForum(lasning, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare, id });
-      if (!u.rattKlubb) {
-        logg(`${l.lag}: ${forum.namn} handlar om en annan klubb (${u.handlarOm || '–'}) och tas bort ur registret`);
-        reg[l.lag] = { forum: null, kollad: new Date().toISOString(), fel: 'fel klubb' };
-        skrivJson(FORUMREG, reg);
-        continue;
+    const lasningar = [];
+    for (const forum of forumen) {
+      try {
+        const lasning = await lasForum(forum, { mot: l.mot, logg });
+        if (lasning.tradar.length) lasningar.push(lasning);
+        else logg(`${l.lag}: ${forum.namn} – inga nya inlägg i trådarna inför matchen`);
+      } catch (err) {
+        if (err instanceof Stopp) throw err;
+        logg(`${err instanceof Sparrad ? 'SPÄRRAT' : 'FEL'} ${l.lag}: ${forum.namn}: ${err.message}`);
       }
-      // Högst fyra läsningar per lag ligger kvar i omgången (sidan och tidningen tar de senaste).
-      post.avsnitt = [...post.avsnitt.filter((a) => a.typ !== 'forum'), ...post.avsnitt.filter((a) => a.typ === 'forum' && a.id !== id).sort((a, b) => b.uttaget.localeCompare(a.uttaget)).slice(0, 3), forumPost(lasning, u, { id, nyckel, version: fc.promptVersion })];
+    }
+    if (!lasningar.length) continue;
+    const namn = lasningar.map((x) => x.forum.namn).join(', ');
+    try {
+      const nyckel = lasningsNyckel(lasningar);
+      const forra = post.avsnitt.filter((a) => a.typ === 'forum').sort((a, b) => b.uttaget.localeCompare(a.uttaget))[0];
+      if (forra && (forra.lasning || forra.nyckel) === nyckel && forra.version === fc.promptVersion) { logg(`${l.lag}: ${namn} – inget nytt sedan förra läsningen`); continue; }
+      if (TORRT) { logg(`skulle läsa ${l.lag}: ${lasningar.map((x) => `${x.forum.namn} – ${x.tradar.map((t) => `"${t.titel}" (${t.inlagg.length})`).join(', ')}`).join('; ')}`); continue; }
+      const u = await taUtForum(lasningar, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare });
+      if (u.felForum.length) {
+        logg(`${l.lag}: ${u.felForum.join(', ')} handlar om en annan klubb (${u.handlarOm || '–'}) och tas bort ur registret`);
+        const kvar = forumenAv(reg[l.lag] && reg[l.lag].forum).filter((f) => !u.felForum.includes(f.namn));
+        reg[l.lag] = { ...(reg[l.lag] || {}), forum: kvar, kollad: new Date().toISOString(), fel: { ...((reg[l.lag] && typeof reg[l.lag].fel === 'object' && reg[l.lag].fel) || {}), ...Object.fromEntries(u.felForum.map((n) => [n, 'fel klubb'])) } };
+        skrivJson(FORUMREG, reg);
+      }
+      const poster = forumPoster(lasningar, u, { lag: l.lag, nyckel, version: fc.promptVersion });
+      if (!poster.length) continue;
+      // Högst fyra läsningar per forum ligger kvar i omgången (sidan och tidningen tar de senaste).
+      const nyaId = new Set(poster.map((p) => p.id));
+      const gamla = post.avsnitt.filter((a) => a.typ === 'forum' && !nyaId.has(a.id) && !u.felForum.includes(a.podd)).sort((a, b) => b.uttaget.localeCompare(a.uttaget));
+      const behall = gamla.filter((a, i) => gamla.slice(0, i).filter((x) => x.podd === a.podd).length < 3);
+      post.avsnitt = [...post.avsnitt.filter((a) => a.typ !== 'forum'), ...behall, ...poster];
       nya += u.uppgifter.length;
       fil.uppdaterad = new Date().toISOString();
       skrivJson(OMGANG, fil);
-      logg(`${l.lag}: ${forum.namn} – ${lasning.tradar.length} trådar, ${lasning.tradar.reduce((n, t) => n + t.inlagg.length, 0)} inlägg: ${u.uppgifter.length} uppgifter${u.strukna ? `, ${u.strukna} strukna` : ''} (${u.sekunder} s)`);
+      logg(`${l.lag}: ${poster.map((p) => `${p.podd} – ${p.tradar.length} trådar, ${p.tradar.reduce((n, t) => n + t.inlagg, 0)} inlägg, ${p.uppgifter.length} uppgifter`).join('; ')}${u.strukna ? ` (${u.strukna} strukna)` : ''} (${u.sekunder} s)`);
     } catch (err) {
       if (err instanceof Stopp) throw err;
-      logg(`${err instanceof Sparrad ? 'SPÄRRAT' : 'FEL'} ${l.lag}: ${forum.namn}: ${err.message}`);
+      logg(`FEL ${l.lag}: ${namn}: ${err.message}`);
     }
   }
   return nya;

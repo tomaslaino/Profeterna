@@ -372,8 +372,10 @@ export function sidansUnderlag(fil, lagen, { avspark = null } = {}) {
     const med = (x, a) => x.id && x.vikt >= pc.minstVikt && (!fran || dagAv(x, a) >= fran);
     const alla = ((post && post.avsnitt) || []).filter((a) => (a.uppgifter || []).some((x) => med(x, a)))
       .sort((a, b) => b.datum.localeCompare(a.datum));
-    // Forumet och medierna läses vid varje genomgång: de räknas för sig, så att poddarna står kvar.
-    const avsnitt = [...alla.filter(arPodd).slice(0, pc.sidan.avsnitt), ...alla.filter((a) => a.typ === 'forum').slice(0, fc.tillSidan), ...alla.filter((a) => a.typ === 'media').slice(0, mc.tillSidan)];
+    // Forumen och medierna läses vid varje genomgång: de räknas för sig, så att poddarna står kvar,
+    // och varje forum för sig (de senaste läsningarna av vart och ett av lagets forum).
+    const forum = alla.filter((a) => a.typ === 'forum');
+    const avsnitt = [...alla.filter(arPodd).slice(0, pc.sidan.avsnitt), ...forum.filter((a, i) => forum.slice(0, i).filter((x) => x.podd === a.podd).length < fc.tillSidan), ...alla.filter((a) => a.typ === 'media').slice(0, mc.tillSidan)];
     ut.lag[lag] = avsnitt.flatMap((a) => a.uppgifter.filter((x) => med(x, a)).map((x) => ({ id: x.id, a: x.a || 'match', s: x.s, vikt: x.vikt, t: x.t, sagt: x.sagt || null, vem: x.vem || null, podd: a.podd, typ: a.typ || 'podd', datum: dagAv(x, a) })));
     ut.kallor[lag] = avsnitt.map((a) => ({ podd: a.podd, avsnitt: a.titel, datum: a.datum.slice(0, 10), adress: a.sida || a.apple || null, typ: a.typ || 'podd' }));
   }
@@ -526,14 +528,19 @@ export function poddUnderlag(fil, lag) {
   return ut;
 }
 
-// Det tidningen får ur lagets supporterforum: den senaste läsningens bästa uppgifter.
+// Det tidningen får ur lagets supporterforum: de bästa uppgifterna ur den senaste läsningen av
+// vart och ett av forumen, högst pc.uppgifterPerLag tillsammans, och forumen i den ordningen.
 // → [{forum, tradar, datum, adress, uppgifter: [{uppgift, slag}]}]
 export function forumUnderlag(fil, lag) {
   const post = fil && fil.lag && fil.lag[lag];
   if (!post || !Array.isArray(post.avsnitt)) return [];
-  return post.avsnitt.filter((a) => a.typ === 'forum' && (a.uppgifter || []).some((x) => x.vikt >= pc.minstVikt))
-    .sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, fc.tillTidningen)
-    .map((a) => ({ forum: a.podd, tradar: (a.tradar || []).map((t) => t.titel), datum: a.datum.slice(0, 10), adress: a.sida || null, uppgifter: a.uppgifter.filter((x) => x.vikt >= pc.minstVikt).slice(0, pc.uppgifterPerLag).map((x) => ({ uppgift: x.t, slag: FORUMSLAG[x.s] || FORUMSLAG.h })) }));
+  const lasningar = post.avsnitt.filter((a) => a.typ === 'forum' && (a.uppgifter || []).some((x) => x.vikt >= pc.minstVikt))
+    .sort((a, b) => b.datum.localeCompare(a.datum));
+  const senaste = lasningar.filter((a, i) => lasningar.slice(0, i).filter((x) => x.podd === a.podd).length < fc.tillTidningen);
+  const basta = senaste.flatMap((a) => a.uppgifter.filter((x) => x.vikt >= pc.minstVikt).map((x) => ({ a, x })))
+    .sort((p, q) => q.x.vikt - p.x.vikt).slice(0, pc.uppgifterPerLag);
+  return senaste.filter((a) => basta.some((b) => b.a === a)).sort((p, q) => Math.max(...basta.filter((b) => b.a === q).map((b) => b.x.vikt)) - Math.max(...basta.filter((b) => b.a === p).map((b) => b.x.vikt)))
+    .map((a) => ({ forum: a.podd, tradar: (a.tradar || []).map((t) => t.titel), datum: a.datum.slice(0, 10), adress: a.sida || null, uppgifter: basta.filter((b) => b.a === a).map(({ x }) => ({ uppgift: x.t, slag: FORUMSLAG[x.s] || FORUMSLAG.h })) }));
 }
 
 // Det tidningen får ur de insatta medierna: de senaste artiklarnas bästa uppgifter.

@@ -303,6 +303,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   står *I tidningen* med avdelningarna och *På kupongen* med omgångens matcher, var och en med prickar fram till
   sidnumret och rubriken på sin sida under. Ett klick går dit, och *Helgarderat* i sidhuvudet går tillbaka. Efter
   omgången står resultatet i stället för sidnumret (se *Innehållet* under [Tidningen](#tidningen))
+- [x] **Alla relevanta forum (2026-11-10, användarens önskemål: "Har du lagt in så att alla relevanta forum gås igenom
+  för lagen när artiklarna om matcherna skrivs i Helgarderat … Ordna det annars!"):** nattjobbet läser alla lagets
+  supporterforum som går att läsa, inte bara det viktigaste: 57 av de 92 ligalagen har sammanlagt 78 forum (förut 44
+  lag med ett var), och 19 lag har mer än ett. Claude tar ut det intressanta ur alla forumen i ett anrop per lag,
+  varje forum står som källa för sig i matchbladet, och det som sägs i flera forum väger tyngre (se *Supporterforumen*
+  under [Analyserna](#analyserna))
 
 ## Publicering
 
@@ -1493,6 +1499,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   mycket grafik … gamla mobiler och datorer ska kunna klara av sidan". En ampellilja i lerkruka på
   fönsterbänkens vänstra ände och en liten pilea i en glaserad kruka fram till vänster på barbordet, båda i ett
   enda ritanrop med pennkoppens material. Se [Tobaksaffären](#tobaksaffären), *Växterna*.
+- **Alla relevanta forum, inte bara det viktigaste (2026-11-10, användarens önskemål):** "Har du lagt in så att alla
+  relevanta forum gås igenom för lagen när artiklarna om matcherna skrivs i Helgarderat" och "Ordna det annars!". Det
+  var inte så: varje lag hade ett forum. Nu har varje lag en lista, det viktigaste först och högst fyra. Relevant är
+  ett forum där lagets egna supportrar diskuterar a-laget varje vecka; lagets tavla på ett allmänt forum (NOT606)
+  räknas bara där den har lagets egna matchtrådar. Forum som spärrar eller säger nej till AI-läsare läses fortfarande
+  inte. Alla forumen tas ut i ett Claude-anrop per lag, så att fler forum inte blir fler anrop. Se
+  *Supporterforumen* under [Analyserna](#analyserna).
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -2090,46 +2103,62 @@ handlade inte om laget). Det provet visade och det som ändrades:
 - Namn under citatet kom med i ungefär vart fjärde citat (utskriften skiljer inte på rösterna); annars står podden.
 
 **Supporterforumen** (2026-11-10, användarens önskan: *lägg till det viktigaste forumet för varje lag som den går
-igenom inför tidningssläppet – som källmaterial för info om laget*): samma nattjobb läser, före poddarna, lagets
-viktigaste supporterforum för varje lag i omgången ([src/analyser/forum.mjs](src/analyser/forum.mjs), gränserna,
-forumen och prompterna i [config/forum.js](config/forum.js)). Uppgifterna hamnar bredvid poddarnas: på
-informationssidan och, under *ur supporterforumet*, i tidningens underlag.
+igenom inför tidningssläppet – som källmaterial för info om laget*, och samma kväll: "Har du lagt in så att alla
+relevanta forum gås igenom för lagen när artiklarna om matcherna skrivs i Helgarderat … Ordna det annars!"): samma
+nattjobb läser, före poddarna, alla relevanta supporterforum för varje lag i omgången
+([src/analyser/forum.mjs](src/analyser/forum.mjs), gränserna, forumen och prompterna i
+[config/forum.js](config/forum.js)). Uppgifterna hamnar bredvid poddarnas, med forumet som källa: på
+informationssidan och matchbladet i Helgarderat och, under *ur supporterforumet*, i tidningens underlag.
 
 ```
-omgångens lag → lagets forum (config/forum.js) → tavlan → de bästa trådarna → sista sidan → inläggen → claude -p → omgang.json
+omgångens lag → lagets forum (config/forum.js) → varje forums tavla → de bästa trådarna → sista sidan → inläggen
+  → claude -p, ett anrop per lag för alla forumen → en läsning per forum → omgang.json
 ```
 
-- **Forumen:** det viktigaste supporterforumet för vart och ett av de 92 ligalagen som går att läsa, uppslaget och
-  prövat 10 november 2026, står i `kanda`, med tavlan där a-laget diskuteras. 44 lag har ett. De andra 48 står i
-  `utan`: det stora forumet spärrar allt som inte är en webbläsare (RedCafe, Bluemoon, Grand Old Team, VillaTalk,
-  Charlton Life, OTIB, Pompey Chimes, Red Passion, Molineux Mix …), säger nej till AI-assistenter i robots.txt (alla
-  forum hos ProBoards, som The Oatcake och Down At The Mac, och UpTheClarets, Stagsnet och One Boro), är nedlagt eller
-  tyst, eller är byggt så att det inte går att läsa ut (Luton Outlaws, Tigers Talk). Där det största forumet var spärrat
-  står det näst viktigaste, om det lever (Vital Football för Villa, City, Newcastle, Swansea, Wigan m.fl.). Ett lag som
-  varken står i `kanda` eller `utan` (en klubb utanför ligan) letas upp av Claude, åtta lag per anrop, och används
-  bara om läsaren kan läsa tavlan och den har inlägg de senaste 21 dagarna. Registret ligger i `forum.json`.
+- **Forumen:** alla relevanta supporterforum för vart och ett av de 92 ligalagen som går att läsa, det viktigaste
+  först (högst fyra, `flestForum`), står i `kanda` med tavlan (högst två) där a-laget diskuteras. Först stod bara
+  det viktigaste forumet där, för 44 lag. Samma kväll letades alla relevanta upp lag för lag och prövades med läsaren:
+  fristående forum, lagets tavla hos Vital Football och FansNetwork, och sist lagets tavla på NOT606 (ett allmänt
+  forum med en tavla per klubb) där den har lagets egna matchtrådar. Nu har 57 lag sammanlagt 78 forum, och 19 av dem
+  har mer än ett (Tottenham tre: Glory-Glory, Spurs Community och Proper Spursy). Nya lag med forum är bland andra
+  Birmingham (Small Heath Alliance), Leyton Orient (LOFC Forum), Gillingham (Vital), Walsall (Up The Saddlers) och
+  Blackpool (Vital). NOT606:s tavla är inte med där den mest handlade om annat och laget har andra forum
+  (Southampton, Swansea, Norwich, Tottenham, Leicester och Cardiff). De andra 35 lagen står i `utan`: forumen spärrar
+  allt som inte är en webbläsare (RedCafe, Bluemoon, Grand Old Team, VillaTalk, Charlton Life, OTIB, Pompey Chimes,
+  Red Passion, Molineux Mix, Wolves Forum, Foxes Talk, WACCOE, DCFCFans …), säger nej till AI-assistenter i robots.txt
+  (alla forum hos ProBoards, som The Oatcake och Down At The Mac, och UpTheClarets, Stagsnet, One Boro, Viking Chat
+  och Gasheads), är nedlagda eller tysta (Tigers Talk hade inget nytt på fyra veckor), eller har bara en tavla om
+  annat. Ett lag som varken står i `kanda` eller `utan` (en klubb utanför ligan) letas upp av Claude, åtta lag per
+  anrop och alla relevanta forum per lag, och ett forum används bara om läsaren kan läsa tavlan och den har inlägg de
+  senaste 21 dagarna. Registret ligger i `forum.json`, med en lista per lag; ett forum som inte svarar en natt prövas
+  igen nästa natt (`letaOmDagar.fel`), och ett som redan stod i registret står kvar så länge.
 - **Läsningen** görs som en vanlig läsare: några sidor per lag och natt, med namnet *Matchfixarna/1.0 (forumlasare)*,
   och med samma regler i robots.txt som Anthropics användarstyrda läsare (Claude-User). Säger forumet nej till
   AI-assistenters läsning (Claude-User, ChatGPT-User, Perplexity-User eller `Content-Signal: ai-input=no`) läses det
   inte alls; spärrar mot AI-träning (ClaudeBot, GPTBot, CCBot) gäller inte, eftersom inget tränas och bara korta
-  översatta citat trycks. En sida som svarar 403, visar Cloudflares kontroll eller kräver inloggning räknas som
-  spärrad, och det görs inga försök att ta sig förbi.
+  översatta citat trycks. En sida som svarar 403, visar Cloudflares eller en annan webbläsarkontroll (*Checking your
+  browser*) eller kräver inloggning räknas som spärrad, och det görs inga försök att ta sig förbi.
 - **Trådarna:** tavlans trådar i sidans ordning (den senast aktiva först). Tråden om just den här matchen
   (motståndaren i rubriken) går först, sedan aktiva trådar med en rubrik om laget (skador, uppställning, tränaren,
   ägarna); biljetter, resor, lekar, tävlingar, poddar, historia och annat stryks, liksom trådar utan inlägg den senaste
-  veckan. Högst fem kandidater läses tills tre har minst två nya inlägg. Läsaren går till trådens sista sida och tar
-  med sidan före om den sista har färre än tolv inlägg.
-- **Inläggen:** läsaren känner igen XenForo (1 och 2), Invision, phpBB (och Forumotion), SMF, vBulletin, MyBB, Vanilla,
-  FansNetwork (som TWTD), The Fishy och Discourse (via dess JSON). Ur varje inlägg tas användarnamnet, tiden och
-  inläggets egen text; citat ur andra inlägg, signaturer och knappar stryks. Bara inlägg från de senaste sju dagarna
-  följer med, högst 1 500 tecken per inlägg och 60 000 per lag.
-- **Uppgifterna:** Claude får inläggen numrerade, med namn och tid, och tar ut allt som är intressant inför matchen,
-  högst tio, med samma ämnen, slag och vikt som poddarnas. Citatet ska stå ordagrant i inlägget (annars stryks
-  uppgiften), och namnet under citatet är användarnamnet på det inlägget, inte Claudes. Har inläggen inte ändrats
-  sedan förra natten görs inget nytt anrop.
-- **Sidan och tidningen:** sidan tar lagets två senaste forumläsningar (utöver de tre senaste poddavsnitten), och
-  redaktören slår ihop det podden och forumet säger båda. Tidningens notiser får den senaste läsningens bästa
-  uppgifter under *ur supporterforumet*, och forumtrådarna räknas som lästa källor.
+  veckan. Högst fem kandidater läses per forum tills tre har minst två nya inlägg. Läsaren går till trådens sista sida
+  och tar med sidan före om den sista har färre än tolv inlägg.
+- **Inläggen:** läsaren känner igen XenForo (1 och 2), Invision, phpBB (också med sökvänliga adresser, och
+  Forumotion), SMF, vBulletin, MyBB, Vanilla, FansNetwork (som TWTD), The Fishy, Phorum (Small Heath Alliance) och
+  Discourse (via dess JSON). Ur varje inlägg tas användarnamnet, tiden och inläggets egen text; citat ur andra inlägg,
+  signaturer och knappar stryks. Bara inlägg från de senaste sju dagarna följer med, högst 1 500 tecken per inlägg och
+  90 000 per lag, delat lika mellan forumen (det ett forum inte behöver går till de andra).
+- **Uppgifterna:** Claude får inläggen ur alla lagets forum på en gång, numrerade, med namn och tid och med forumets
+  namn vid varje tråd, och tar ut allt som är intressant inför matchen, högst tolv, med samma ämnen, slag och vikt som
+  poddarnas. Det som sägs i flera forum tas en gång. Citatet ska stå ordagrant i inlägget (annars stryks uppgiften),
+  namnet under citatet är användarnamnet på det inlägget, inte Claudes, och uppgiften hör till inläggets forum. Ett
+  forum som uppenbart handlar om en annan klubb anges i `fel_forum`: dess uppgifter stryks och det tas bort ur
+  registret. Varje forum sparas som en egen läsning (`forumPoster`), så att det står som källa för sig. Det är ett
+  anrop per lag hur många forum laget än har, och har inget av forumen något nytt sedan förra natten görs inget anrop.
+- **Sidan och tidningen:** sidan tar de två senaste läsningarna av vart och ett av lagets forum (utöver de tre senaste
+  poddavsnitten), och redaktören slår ihop det som sägs på flera håll, i två forum eller i podden och ett forum, och
+  säger att det sägs på flera håll. Tidningens notiser får de bästa uppgifterna ur den senaste läsningen av varje
+  forum, högst fyra tillsammans, under *ur supporterforumet*, och forumtrådarna räknas som lästa källor.
 
 ```
 node scripts/tidning/poddar.mjs --bara-forum                          bara forumen, för omgångens lag
@@ -2142,6 +2171,17 @@ forumen. 11 av de 26 lagen har ett forum, alla 11 lästes (tre trådar och 12–
 1–10 per lag, på 13–46 sekunder per lag. 8 sidor skrevs om; där både podden och forumet hade något (Newport, Colchester)
 står de bredvid varandra, och redaktören slog ihop det de båda sa. Inför provet prövades alla 92 lag: av forumen
 agenterna hittade gick 44 att läsa, och läsaren fick ut inlägg med namn och tid ur alla 44.
+
+**Alla relevanta forum, provet 2026-11-10 (kväll)**: alla 78 forum i `kanda` prövades med läsaren, tavlan och de
+trådar den skulle läsa, på 29 sekunder: alla gick att läsa och hade inlägg de senaste 21 dagarna (Vital Talk of the
+Tyne hade just då inget från den senaste veckan). Med Node, på påhittade läsningar: delningen av utrymmet mellan
+forumen, `fel_forum`, en läsning per forum med egna uppgifter och id, de två senaste läsningarna per forum till sidan
+och de bästa fyra till tidningen, och sökningen efter forum med flera svar per klubb. Hela kedjan provades för
+Tottenham (`--lag "Tottenham Hotspur" --mot Chelsea --bara-forum`) med skrivbordsappens Claude Code 2.1.321
+(`ANALYSER_CLAUDE`; den i ~/.local/bin på MacBooken, 2.1.220, var för gammal för modellen): de tre forumen lästes
+(67, 22 och 25 inlägg), ett anrop på 37 sekunder gav nio uppgifter (tre, fem och en per forum), och matchbladet har
+alla tre forumen som källor och säger var något sägs (*På Spurs Community menar supportrarna …*). Inte provat på
+iMacen eller med en hel omgång.
 
 **De insatta medierna** (2026-11-10, användarens önskan: *mer information om stryktipslagen än från lagforumen och
 de transkriberade poddavsnitten – den mest relevanta informationen som står i alternativa medier men som är
