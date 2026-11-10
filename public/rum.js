@@ -3192,6 +3192,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const w = document.getElementById('rum-kamera');
     const dx = r1(to[0] - 800 - z * (p[0] - 800));
     const dy = r1(to[1] - 500 - z * (p[1] - 500));
+    // (dit kameran går, för närbilden av radion: radioNara)
+    R.kamMal = { dx, dy, z };
     const borta = Boolean(dx || dy || z !== 1);
     const satt = () => {
       w.classList.remove('glid');
@@ -4514,16 +4516,23 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const c = R.el.querySelector('#rum-3d');
     R.fig.narbild(null);
-    const r = c.getBoundingClientRect();
+    // Det som syns av duken när kameran har kommit fram, räknat ur dit den går (aim) och inte mätt: medan
+    // kameran och rummet fortfarande rörde sig (i Safari börjar kameran några bildrutor sent, och en
+    // långsam dator hinner inte fram på 640 ms) mättes en annan del än den som syns sedan, och radion
+    // skars av i kanten. Nära radion står rummet rakt (sak), så duken ligger som i scenen: scenen ligger i
+    // fönstret förskjuten R.ox, R.oy och R.k gånger så stor (pan), och kameran förstorar z gånger kring
+    // scenens mitt och flyttar dx, dy.
+    const { dx, dy, z } = R.kamMal;
     const W = c.offsetWidth;
     const H = c.offsetHeight;
-    const k = r.width / W;
-    const pad = 8 / k;
-    const x0 = Math.max(0, -r.left / k - pad);
-    const y0 = Math.max(0, -r.top / k - pad);
-    const x1 = Math.min(W, (innerWidth - r.left) / k + pad);
-    const y1 = Math.min(H, (innerHeight - r.top) / k + pad);
-    R.fig.narbild({ x: x0, y: y0, w: x1 - x0, h: y1 - y0, pr: k * Math.min(devicePixelRatio || 1, 2), bred: r.width * Math.min(devicePixelRatio || 1, 2) });
+    const k = R.k * z;
+    const ix = (x) => 800 + ((x - R.ox) / R.k - 800 - dx) / z - c.offsetLeft;
+    const iy = (y) => 500 + ((y - R.oy) / R.k - 500 - dy) / z - R.cTop;
+    const x0 = Math.max(0, ix(-8));
+    const y0 = Math.max(0, iy(-8));
+    const x1 = Math.min(W, ix(innerWidth + 8));
+    const y1 = Math.min(H, iy(innerHeight + 8));
+    R.fig.narbild({ x: x0, y: y0, w: x1 - x0, h: y1 - y0, pr: k * Math.min(devicePixelRatio || 1, 2), bred: W * k * Math.min(devicePixelRatio || 1, 2) });
     if (window.RumRadio) RumRadio.nara(true);
   }
 
