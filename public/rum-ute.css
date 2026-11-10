@@ -51,22 +51,19 @@
 /* I telefonen är oskärpan i CSS borta från allt stort och allt som rör sig: den
    blev ett eget pass på grafikkortet för varje figur och över hela gatan i varje
    bildruta. Dukarna är grova och mjuka ändå (LATT i rum-ute.js), och gatan ritas
-   en gång i två grova dukar (bakaGata). Skylten står kvar som text med en liten
-   oskärpa: den är liten. */
+   en gång i en grov duk (bakaGata). */
 @media (max-width: 700px), (max-height: 500px) {
   .rum-ute canvas.duk, .rum-ute-himmel, .rum-ute-gata { filter: none; }
-  .rum-ute-gata > svg.skylt { filter: blur(0.8px); }
 }
 
 /* hela gatan i en duk (gatduk i rum-ute.js): det som syns genom fönstret och dörren */
 .rum-gatduk { position: absolute; }
 .rum-ute.samlad .rum-ute-himmel, .rum-ute.samlad .rum-ute-gata { filter: none; }
-.rum-ute.samlad .rum-ute-gata > svg.skylt { filter: blur(0.8px); }
 /* (blixten är ett lager över husen här, inte bara över himlen) */
 .rum-ute.samlad .rum-blixt { opacity: 0.45; }
-/* De tomma lagren syns inte, och gatans lager har ingen egen storlek (bara skyltarna, som har sin
-   egen, står kvar där). Annars blev de, eftersom de ligger över duken, ett lager i hela utsiktens
-   storlek som grafikkortet lade över rummet i varje bildruta, 0,8 skärmytor i telefonen. Glaset
+/* De tomma lagren syns inte, och gatans lager har ingen egen storlek. Annars blev de, eftersom de
+   ligger över duken, ett lager i hela utsiktens storlek som grafikkortet lade över rummet i varje
+   bildruta, 0,8 skärmytor i telefonen. Glaset
    likaså: dropparna, snön och frosten (en SVG så stor som fönstret och dörren) och rännilarna har
    egna mått. */
 .rum-ute.samlad > div.rum-layer:empty { display: none; }

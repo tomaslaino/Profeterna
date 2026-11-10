@@ -45,6 +45,11 @@ const UNDERKANT = [
   [/\bDär har du hela\b/i, 'Det var hela gänget.'],
   [/\bfinns inte att säga\b/i, 'Mer än så finns det inte att säga.'],
   [/\bVem (vill du höra om|av er ska jag ta)\b/i, 'Vems kupong ska jag ta nu?: säg att det är en kupong han ska döma'],
+  // Den han talar med kan vara den han dömer, och i gänget är han inte med (Tomas 2026-11-10).
+  [/\bvi (att )?få höra\b/i, 'det kommer resten att få höra: i gänget är han inte med'],
+  [/\b(ni|er) andra\b/i, 'de andra: den han talar med kan vara den han dömer'],
+  [/\bandras domar\b/i, 'domarna över de andra: domarna är hans'],
+  [/\bVems vill du höra (först|nu)\?/i, 'Vilken vill du höra först? eller Vems kupong tar vi nu?: det är hans bedömning man hör'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
