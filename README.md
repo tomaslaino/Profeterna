@@ -793,6 +793,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   på AM. Tejpen har fått större handstil, och varje namn står över sin frekvens; ett tryck på ett namn går dit.
   Bladet är mindre och sitter fritt från antennen, med allt i en spalt: FM med sin rubrik överst, AM under, och
   frekvenserna rakt under varandra. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Utsikten från Bron vid S:t Eriksbron (2026-11-10, användarens önskemål):** "Jag vill att bakgrunden (utanför
+  fönstret) ska se ut som på barbilden … Det ska inte vara detaljerat och dra grafik - det ska vara en känsla av att
+  baren geografiskt befinner sig där bron befinner sig idag", och "så att det inte drar en massa grafik för sämre
+  datorer/mobiltelefoner". Husen mittemot med pizzerian och konditoriet, kyrktornet, byggkranen och den parkerade bilen
+  är borta. I stället syns brons gröna räcke med stan på andra sidan i vänstra rutan och dörren och det laxrosa
+  hörnhuset vid brofästet i den högra, som på bilderna av baren Bron. Lättare än förut: en SVG i stället för tre och en
+  fjärdedel så många element. Se *Utsikten och vädret* under [Tobaksaffären](#tobaksaffären).
 - **Bladet vid radion sitter ordentligt uppsatt (2026-11-10, användarens önskemål):** "det här pappret ser lite
   underligt uppsatt ut - kan du ordna det på ett snyggt och bra sätt". Bladet gick en bit in över fönsterkarmens kant,
   nådde ned till fönsterbänken, hade ett nedre hörn som rullade sig och tejp som stack ut snett från hörnen. Nu sitter
@@ -4767,36 +4774,48 @@ och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt r
 
 ### Utsikten och vädret
 
-Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är
-där just nu. [public/vader.js](public/vader.js) räknar solens höjd och månens fas ur
+Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
+och dörren syns utsikten därifrån som den är just nu. [public/vader.js](public/vader.js) räknar solens höjd och månens fas ur
 klockan och hämtar vädret från Open-Meteo (fritt, utan nyckel, en gång i kvarten; sparas
 på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
 [public/rum-ute.css](public/rum-ute.css) för det som rör sig; de som går förbi, löven,
 fåglarna och flaggan ritas i små dukar (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
 Utan nätet är det mulet och månadens vanliga temperatur.
 
+- **Utsikten från Bron (2026-11-10, användarens önskemål):** som från baren Bron, där S:t Eriksgatan går upp på
+  S:t Eriksbron. På andra sidan gatan går brons gröna räcke, med en trappa ned i vänstra rutan och en stenpelare där
+  det börjar vid det laxrosa hörnhuset, som tar högra rutan: mörka omfattningar kring fönstren, granit kring de stora
+  fönstren i bottenvåningen, en port, en vägglykta, en flaggstång och en tagg på hörnet, och vid pelaren en stolpe med
+  gatuskylten och parkeringsförbudet och en cykel mot räcket. Bortom räcket sticker trädtopparna och
+  kontaktledningarna över järnvägen under bron upp, och bakom dem står stan på andra sidan – ockra, terrakotta, gult
+  och ljus puts, högre till vänster, med en kyrkspira och ett högt torn. Det ska kännas som platsen, inte vara en
+  karta: få och stora former i en enda SVG (i telefonen en enda grov duk), som bara ritas om när ljuset eller vädret
+  ändras. Gatans lager har ungefär en fjärdedel så många element som husen mittemot hade (300 mot 1 200 på dagen),
+  och i telefonen läggs en duk ut per bildruta i stället för två.
 - **Kall gata, varmt rum (2026-11-08):** medan det är ljust går färgerna ute mot blågrått, så att gänget och det varma
   rummet lyfter från gatan (`kall` i rum-ute.js). Det görs i färgerna när gatan ritas, också på dem som går förbi,
-  inte med ett filter, så det kostar inget sedan. På kvällen och natten står allt som förut.
-- **Ljuset:** himlen över de lägre taken går från natt via blå timme och solnedgång till
-  dag, grå när det är mulet. Fasaderna mittemot (gul, terrakotta och ljus puts) är nästan
-  svarta på natten, blåaktiga i skymningen och varma i låg sol, med skuggan från huset vi
-  sitter i nertill; bakom syns ett kyrktorn med ärgad spira och en byggkran med en röd lampa.
-  Fönstren tänds efter klockan (många på kvällen, nästan inga mitt i natten),
-  gatlyktorna när det skymmer, pizzerian är öppen 11–23 (till 1 fredag och lördag) och
-  konditoriet 7–19 utom på söndagar. På klara nätter syns stjärnorna och månen när den är
-  uppe. Dagsljuset faller in i rummet och på gänget bakifrån, på natten gatlyktornas sken.
+  inte med ett filter, så det kostar inget sedan. På kvällen och natten står allt som förut. Bron och husen tappar
+  mindre färg (30 %) än himlen (40 %) och de som går förbi (58 %), så att hörnhuset är laxrosa och stan varm som från
+  Bron (`KALL`).
+- **Ljuset:** himlen ovanför stan går från natt via blå timme och solnedgång till
+  dag, grå när det är mulet. Husen är nästan svarta på natten, blåaktiga i skymningen och
+  varma i låg sol; hörnhuset har skuggan från huset vi sitter i nertill. Fönstren tänds
+  efter klockan (många på kvällen, nästan inga mitt i natten), i stan på andra sidan som
+  spridda ljus, och tornet har en röd lampa i mörkret. Lyktstolpen på bron och vägglyktan på
+  hörnhuset tänds när det skymmer. På klara nätter syns stjärnorna och månen när den är
+  uppe. Dagsljuset faller in i rummet och på gänget bakifrån, på natten lyktornas sken.
 - **Vädret:** moln som driver, regn och duggregn som lutar i vinden, snö som driver i
   sidled, blöt gata med lyktornas spegling, dimma, blixtar vid åska (som också lyser upp
   rummet). Droppar sitter på glaset efter regn, snö samlas i rutornas nederkant och frosten
   kryper in från hörnen när det är kallare än −3°. Snötäcke ger vita tak, fönsterbleck,
   trottoarer och plogvallar.
-- **Folk och trafik:** på trottoaren mittemot går folk förbi (fler på dagen och kvällen,
+- **Folk och trafik:** på brons trottoar mittemot går folk förbi (fler på dagen och kvällen,
   nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
   snö. Bilar och taxi kör åt var sitt håll med strålkastarna tända när det är mörkt, och
-  blåbussen kommer var fjärde minut.
-- **Årstiderna:** löv som blåser förbi och ligger på trottoaren på hösten, plogbilen när
+  blåbussen, 4:an som går över bron, kommer var fjärde minut.
+- **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och
+  orange på hösten och kala annars; löv blåser förbi och ligger på trottoaren på hösten, plogbilen när
   det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till
   tjugondag Knut, en gran som bärs hem i december och fyrverkerier på nyårsnatten (och
   lite här och var på nyårsafton). Måsar och kråkor på dagen, tornseglare på
