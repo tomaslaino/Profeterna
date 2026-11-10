@@ -3,9 +3,10 @@
 // ---------- utsikten i tobaksaffären ----------
 //
 // Gatan utanför skyltfönstret och dörren (rum.js), efter Stockholms klocka,
-// årstid och väder (vader.js): himlen över de lägre taken med moln, månen
-// och stjärnorna, fasaderna mittemot med pizzerian, gatlyktorna och en
-// parkerad bil, och de som går, cyklar och åker förbi. Utsikten ligger bakom
+// årstid och väder (vader.js). Det är utsikten från baren Bron vid
+// S:t Eriksbron: himlen med moln, månen och stjärnorna, brons räcke med stan
+// på andra sidan och det laxrosa hörnhuset vid brofästet, lyktstolparna, och
+// de som går, cyklar och åker förbi. Utsikten ligger bakom
 // väggen i det bakersta planet och syns genom hålen i den (masken rum-hal i
 // rum.js), i scenens koordinater: den som går förbi syns först i dörren och
 // sedan i fönstret.
@@ -18,8 +19,9 @@
 //
 //   RumUte.paint(el, v) ritar om de lager som har ändrats (v = Vader.nu())
 //
-// Årstiderna: löv som blåser förbi och ligger på gatan på hösten, snö på
-// taken, plogbilen och pulkor på vintern, adventsstjärnor och ljusstakar i
+// Årstiderna: träden nedanför bron gröna, gula eller kala, löv som blåser
+// förbi och ligger på gatan på hösten, snö på taken och räcket, plogbilen och
+// pulkor på vintern, adventsstjärnor och ljusstakar i
 // fönstren från första advent till tjugondag Knut, en gran som bärs hem i
 // december och fyrverkerier på nyårsnatten; måsar på dagen och tornseglare
 // på sommarkvällarna, flaggan på flaggdagarna, räven mitt i natten.
@@ -94,12 +96,12 @@ window.RumUte = (() => {
     let s = `<defs><linearGradient id="rum-ute-sky" gradientUnits="userSpaceOnUse" x1="0" y1="110" x2="0" y2="250"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>
       <radialGradient id="rum-ute-mane" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e8eef8" stop-opacity=".5"/><stop offset="1" stop-color="#e8eef8" stop-opacity="0"/></radialGradient></defs>
       <rect x="-80" y="90" width="1100" height="340" fill="url(#rum-ute-sky)"/>`;
-    // stjärnorna, svaga i stadens ljus
+    // stjärnorna, svaga i stadens ljus (till vänster om hörnhuset)
     const st = (1 - sm(-9, -6, v.sol)) * (1 - sm(0.15, 0.55, L.m));
     if (st > 0.02) {
       const R = rng(41);
-      for (let i = 0; i < 46; i++) {
-        const x = 260 + R() * 700;
+      for (let i = 0; i < 40; i++) {
+        const x = 40 + R() * 580;
         const y = 132 + R() * 90;
         s += `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1(0.5 + R() * 0.8)}" fill="#f2f4ff" opacity="${r1(st * (0.25 + R() * 0.5))}"/>`;
       }
@@ -108,7 +110,7 @@ window.RumUte = (() => {
     const mo = v.mane;
     const mv = sm(2, 8, mo.h) * (1 - sm(-3, 2, v.sol)) * (1 - sm(0.45, 0.85, L.m));
     if (mv > 0.03 && mo.fas > 0.04 && mo.fas < 0.96) {
-      const cx = 900; const cy = 160; const r = 8.5;
+      const cx = 560; const cy = 160; const r = 8.5;
       const wax = mo.fas < 0.5;
       const k = (1 - Math.cos(2 * Math.PI * mo.fas)) / 2;
       const rx = r1(r * Math.abs(Math.cos(2 * Math.PI * mo.fas)));
@@ -167,8 +169,7 @@ window.RumUte = (() => {
       const cols = ['#ffd36a', '#ff5a4a', '#7dffb0', '#ffffff', '#7ab8ff', '#ff8ad8'];
       for (let i = 0; i < n; i++) {
         const c = pick(R, cols);
-        const left = R() < 0.6;
-        const x = left ? 280 + R() * 160 : 790 + R() * 150;
+        const x = R() < 0.35 ? 70 + R() * 140 : 290 + R() * 300;
         const y = 142 + R() * 50;
         const rr = 14 + R() * 16;
         let rays = '';
@@ -184,16 +185,39 @@ window.RumUte = (() => {
   }
 
   // ---------- gatan ----------
+  //
+  // Utsikten från baren Bron vid S:t Eriksbron: på andra sidan S:t Eriksgatan går brons gröna
+  // räcke, med en trappa ned, och bortom det syns trädtopparna och kontaktledningarna över
+  // järnvägen under bron och stan på andra sidan, med en kyrkspira och ett högt torn. Till höger
+  // står det laxrosa hörnhuset vid brofästet, med en stenpelare där räcket börjar. Det ska kännas
+  // som platsen, inte vara en karta: få och stora former, som ritas en gång (i telefonen en grov
+  // duk, bakaGata) och bara på nytt när ljuset eller vädret ändras.
 
-  // Husen mittemot (x, bredd, takfoten): de lägre har tak och skorstenar
-  // och himmel över sig. Det första syns i dörren, de andra i fönstret.
-  const HUS = [
-    { x: -60, w: 250, tak: 96, dag: '#b6a083', natt: '#0e1119' },
-    { x: 190, w: 260, tak: 178, dag: '#d3a54f', natt: '#12141c', skorsten: [[232, 14, 24], [404, 12, 20]] },
-    { x: 450, w: 330, tak: 100, dag: '#a2583f', natt: '#0d1017' },
-    { x: 780, w: 240, tak: 214, dag: '#cdc2a6', natt: '#111520', skorsten: [[934, 12, 18]] },
+  // Stan på andra sidan (x, bredd, takfoten, takets höjd): högre till vänster, lägre bort mot
+  // hörnhuset. Raden bakom är en enda siluett i diset som sticker upp över den.
+  const STAD = [
+    { x: -80, w: 150, tak: 290, th: 14, dag: '#d2b384' },
+    { x: 70, w: 72, tak: 300, th: 9, dag: '#d98a3c' },
+    { x: 142, w: 88, tak: 306, th: 7, dag: '#ecd6a4' },
+    { x: 230, w: 80, tak: 313, th: 6, dag: '#c76a42' },
+    { x: 310, w: 100, tak: 318, th: 6, dag: '#e3b24c' },
+    { x: 410, w: 72, tak: 323, th: 5, dag: '#eadfc6' },
+    { x: 482, w: 60, tak: 327, th: 5, dag: '#b9764e' },
+    { x: 542, w: 100, tak: 331, th: 5, dag: '#dcb06a' },
   ];
+  const BAKOM = 'M-80 400 V270 H40 V282 H120 V290 H200 V296 H262 V300 H330 V304 H372 V300 H420 V310 H470 V314 H540 V318 H600 V320 H640 V400 Z';
+  // trädtopparna nedanför bron, som når upp över räcket (mitten, toppen, bredden)
+  const TRAD = [[-30, 370, 90], [150, 364, 100], [330, 371, 64], [430, 362, 120], [590, 370, 70]];
+  // räcket: från vänster till stenpelaren vid hörnhuset (HORN), med trappan ned mellan TRAPP
+  const RACKE = 377;
+  const TRAPP = [296, 352];
+  const HORN = 628;
   const WARM = ['#ffd58a', '#ffc56b', '#f6e7c1', '#ffcf7a', '#a9c4ff'];
+
+  // löven på träden: ljusgröna i maj, gröna på sommaren, gula på hösten, annars kala
+  const lovet = (v) => (v.manad === 5 ? 'ljus' : v.manad >= 6 && v.manad <= 8 ? 'gron'
+    : (v.manad === 9 && v.dag >= 20) || v.manad === 10 || (v.manad === 11 && v.dag <= 25) ? 'host'
+      : v.manad === 9 ? 'gron' : 'kal');
 
   // allmänna flaggdagar (påsk, pingst, midsommar och valdagen räknas ut)
   function flaggdag(v) {
@@ -213,128 +237,165 @@ window.RumUte = (() => {
   // hissad från klockan 8 (9 på vintern) till solnedgången, senast 21
   const flagga = (v) => flaggdag(v) && v.timme >= (v.manad >= 11 || v.manad <= 2 ? 9 : 8) && v.timme < 21 && v.sol > -1;
 
-  function fonster(v, L, b, x, y, R) {
+  // Ett fönster (w × h) i hörnhuset: glaset speglar himlen på dagen och är tänt efter klockan
+  // på kvällen, med karmen (mittpost och tvärpost), ibland gardiner, i advent en stjärna eller
+  // en ljusstake, och blecket under.
+  function fonster(v, L, x, y, w, h, R) {
     const r = R(); const rc = R(); const ro = R(); const rd = R();
-    const glas = mix(mix(b.natt, '#ffffff', 0.03), mix('#222932', L.sky[2], 0.32), L.dag);
-    let s = `<rect x="${x}" y="${y}" width="14" height="17" fill="${glas}"/>`;
-    if (r < L.tand) s += `<rect x="${x}" y="${y}" width="14" height="17" fill="${WARM[(rc * 5) | 0]}" opacity="${r1((0.28 + ro * 0.4) * (1 - 0.8 * L.dag))}"/>`;
+    const k = w / 14;
+    const tv = r1(y + h * 0.36);
+    const tand = r < L.tand;
+    let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${mix(mix('#120e11', '#ffffff', 0.03), mix('#222932', L.sky[2], 0.32), L.dag)}"/>`;
+    if (tand) s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${WARM[(rc * 5) | 0]}" opacity="${r1((0.28 + ro * 0.4) * (1 - 0.8 * L.dag))}"/>`;
+    if (L.dag > 0.2) s += `<path d="M${x} ${y} H${r1(x + w * 0.62)} L${x} ${r1(y + h * 0.55)} Z" fill="${L.sky[1]}" opacity="${r1(0.3 * L.dag)}"/>`;
     if (L.dag > 0.05) {
       const fr = mix('#fbf6ea', '#8d96a3', 0.3 * L.m);
-      if (rd < 0.45) s += `<rect x="${x + 1}" y="${y + 1}" width="3" height="15" fill="#efe6d4" opacity="${r1(0.55 * L.dag)}"/><rect x="${x + 10}" y="${y + 1}" width="3" height="15" fill="#efe6d4" opacity="${r1(0.55 * L.dag)}"/>`;
-      s += `<g stroke="${fr}" stroke-width="1.3" fill="none" opacity="${r1(0.85 * L.dag)}"><rect x="${x}" y="${y}" width="14" height="17"/><line x1="${x + 7}" y1="${y}" x2="${x + 7}" y2="${y + 17}"/><line x1="${x}" y1="${y + 6}" x2="${x + 14}" y2="${y + 6}"/></g>`;
-    }
+      if (rd < 0.45) s += `<g fill="#efe6d4" opacity="${r1(0.55 * L.dag)}"><rect x="${x + 1}" y="${y + 1}" width="${r1(w * 0.2)}" height="${h - 2}"/><rect x="${r1(x + w * 0.8 - 1)}" y="${y + 1}" width="${r1(w * 0.2)}" height="${h - 2}"/></g>`;
+      s += `<g stroke="${fr}" stroke-width="1.8" fill="none" opacity="${r1(0.85 * L.dag)}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/><path d="M${x + w / 2} ${tv} V${y + h} M${x} ${tv} H${x + w}"/></g>`;
+    } else if (tand) s += `<path d="M${x + w / 2} ${tv} V${y + h} M${x} ${tv} H${x + w}" stroke="#1a120c" stroke-width="1.8" opacity=".55"/>`;
     // adventsstjärnor och ljusstakar, tända från eftermiddagen
     if (v.advent && rd > 0.66) {
       const on = 1 - 0.55 * L.dag;
+      const cx = x + w / 2;
       if (rc < 0.55) {
-        const cx = x + 7; const cy = y + 6.5;
+        const cy = r1(y + h * 0.58);
         let pts = '';
-        for (let j = 0; j < 10; j++) { const a = -Math.PI / 2 + j * Math.PI / 5; const rr = j % 2 ? 1.7 : 4; pts += `${r1(cx + Math.cos(a) * rr)},${r1(cy + Math.sin(a) * rr)} `; }
-        s += `<circle cx="${cx}" cy="${cy}" r="7" fill="#ffb24a" opacity="${r1(0.35 * on)}"/><polygon points="${pts}" fill="#ffc874" opacity="${r1(0.5 + 0.5 * on)}"/>`;
+        for (let j = 0; j < 10; j++) { const a = -Math.PI / 2 + j * Math.PI / 5; const rr = (j % 2 ? 1.7 : 4) * k; pts += `${r1(cx + Math.cos(a) * rr)},${r1(cy + Math.sin(a) * rr)} `; }
+        s += `<circle cx="${cx}" cy="${cy}" r="${r1(7 * k)}" fill="#ffb24a" opacity="${r1(0.35 * on)}"/><polygon points="${pts}" fill="#ffc874" opacity="${r1(0.5 + 0.5 * on)}"/>`;
       } else {
-        s += `<polygon points="${x + 1.5},${y + 16.5} ${x + 12.5},${y + 16.5} ${x + 7},${y + 11}" fill="#1c140c" opacity=".85"/>`;
-        for (let j = 0; j < 7; j++) { const t = j / 6; s += `<circle cx="${r1(x + 2 + t * 10)}" cy="${r1(y + 16 - (1 - Math.abs(t - 0.5) * 2) * 5)}" r=".9" fill="#fff0b4" opacity="${r1(0.4 + 0.6 * on)}"/>`; }
-        s += `<ellipse cx="${x + 7}" cy="${y + 14}" rx="7" ry="4" fill="#ffc874" opacity="${r1(0.25 * on)}"/>`;
+        const b = y + h - 0.5;
+        s += `<polygon points="${r1(x + 1.5 * k)},${b} ${r1(x + w - 1.5 * k)},${b} ${cx},${r1(b - 5.5 * k)}" fill="#1c140c" opacity=".85"/>`;
+        for (let j = 0; j < 7; j++) { const t = j / 6; s += `<circle cx="${r1(x + 2 * k + t * (w - 4 * k))}" cy="${r1(b - (1 - Math.abs(t - 0.5) * 2) * 5 * k)}" r="${r1(0.9 * k)}" fill="#fff0b4" opacity="${r1(0.4 + 0.6 * on)}"/>`; }
+        s += `<ellipse cx="${cx}" cy="${r1(b - 2.5 * k)}" rx="${r1(7 * k)}" ry="${r1(4 * k)}" fill="#ffc874" opacity="${r1(0.25 * on)}"/>`;
       }
     }
-    s += `<rect x="${x - 1.5}" y="${y + 17}" width="17" height="2.2" fill="${mix('#191c23', '#d9d3c5', L.dag * (1 - 0.3 * L.m))}"/>`;
-    if (v.snotackt) s += `<rect x="${x - 1.5}" y="${y + 15.6}" width="17" height="1.8" rx=".9" fill="${snowC(L)}"/>`;
+    s += `<rect x="${r1(x - 2)}" y="${y + h}" width="${w + 4}" height="2.6" fill="${mix('#191c23', '#d9d3c5', L.dag * (1 - 0.3 * L.m))}"/>`;
+    if (v.snotackt) s += `<rect x="${r1(x - 2)}" y="${r1(y + h - 1.4)}" width="${w + 4}" height="2.2" rx="1" fill="${snowC(L)}"/>`;
     return s;
   }
 
   function gata(v, L) {
     let s = '';
-    const R = rng(17);
+    const sno = v.snotackt ? snowC(L) : null;
+    // diset: det som är långt bort går mot himlens färg nere vid taken
+    const dis = (c, t) => mix(c, L.sky[2], t);
     const fern = mix(mix('#0b0e16', L.sky[2], 0.22 + 0.4 * L.dag), '#4a5262', 0.25 * L.dag);
-    // stan bakom: tak och ett kyrktorn med ärgad spira, och en byggkran
-    s += `<path d="M770 214 L770 202 L800 202 L806 196 L836 196 L836 204 L872 204 L872 214 Z M876 214 L876 198 L904 198 L910 192 L950 192 L950 214 Z" fill="${fern}"/>
-      <path d="M180 178 L180 166 L214 166 L214 160 L262 160 L262 170 L320 170 L326 163 L376 163 L376 172 L452 172 L452 178 Z" fill="${fern}"/>
-      <rect x="856" y="168" width="14" height="40" fill="${fern}"/><path d="M855 169 L863 128 L871 169 Z" fill="${mix(fern, '#6f9484', 0.35 * L.dag)}"/><circle cx="863" cy="127" r="1.6" fill="${mix(fern, '#d8b25a', 0.6 * L.dag)}"/>
-      <g stroke="${mix(fern, '#c9a23a', 0.35 * L.dag)}" stroke-width="1.6" fill="none"><path d="M292 172 V122 M290 128 H350 M292 128 L304 122 M292 128 L278 124 H270"/><path d="M336 128 V140" stroke-width="1"/></g>`;
-    if (L.lampor) s += '<circle cx="292" cy="121" r="1.8" fill="#ff3b30"/><circle cx="292" cy="121" r="5" fill="#ff3b30" opacity=".35"/>';
-    if (v.snotackt) s += `<path d="M770 204 L800 204 L806 198 L836 198 M876 200 L904 200 L910 194 L950 194 M180 168 L214 168 M262 172 L320 172 L326 165 L376 165" stroke="${snowC(L)}" stroke-width="2.4" fill="none" opacity=".8"/>`;
 
-    // husen
-    const sunTop = 400 - Math.max(0, Math.min(300, 333 - 300 * Math.tan(Math.max(1, v.sol) * Math.PI / 180)));
-    HUS.forEach((b, bi) => {
-      const f = facade(b.dag, b.natt, L);
-      const shade = mix(f, '#56658a', 0.14 * L.sol);
-      const lit = mix(mix(f, '#fff0d2', 0.22 * L.sol), '#f0a46a', 0.25 * L.guld * L.sol);
-      s += `<rect x="${b.x}" y="${b.tak}" width="${b.w}" height="${400 - b.tak}" fill="${shade}"/>`;
-      if (L.sol > 0.03 && sunTop > b.tak) s += `<rect x="${b.x}" y="${b.tak}" width="${b.w}" height="${r1(sunTop - b.tak)}" fill="${lit}"/>`;
-      // takfoten och taket
-      if (b.tak > 120) {
-        const roof = mix('#0a0c12', mix('#35373b', L.sky[2], 0.25), L.dag);
-        s += `<polygon points="${b.x},${b.tak} ${b.x + b.w},${b.tak} ${b.x + b.w - 6},${b.tak - 16} ${b.x + 6},${b.tak - 16}" fill="${v.snotackt ? snowC(L) : roof}"/>`;
-        for (const [cx, cw, ch] of b.skorsten || []) {
-          s += `<rect x="${cx}" y="${b.tak - 16 - ch}" width="${cw}" height="${ch + 4}" fill="${mix(b.natt, '#8a5a44', L.dag * 0.9)}"/><rect x="${cx - 2}" y="${b.tak - 18 - ch}" width="${cw + 4}" height="3" fill="${v.snotackt ? snowC(L) : mix('#0a0c12', '#4a4a4c', L.dag)}"/>`;
+    // stan på andra sidan: raden bakom, en kyrkspira och ett högt torn (med en röd lampa i mörkret)
+    s += `<path d="${BAKOM}" fill="${dis(fern, 0.15)}"/>
+      <rect x="196" y="282" width="14" height="30" fill="${fern}"/><path d="M196 283 L203 250 L210 283 Z" fill="${mix(fern, '#6f9484', 0.35 * L.dag)}"/>
+      <rect x="498" y="254" width="16" height="80" fill="${dis(facade('#a6afb9', '#0e1119', L), 0.25)}"/><rect x="496" y="252" width="20" height="5" fill="${dis(mix('#0a0c12', '#5d646e', L.dag), 0.2)}"/>
+      <path d="M502 260 V330 M510 260 V330" stroke="${dis(mix('#0a0c12', '#7d8691', L.dag), 0.25)}" stroke-width="1.4"/>`;
+    if (L.lampor) s += '<circle cx="506" cy="249" r="1.8" fill="#ff3b30"/><circle cx="506" cy="249" r="5" fill="#ff3b30" opacity=".35"/>';
+    // husen, med tak och fönsterrader (tända efter klockan, mörka prickar på dagen)
+    const RS = rng(53);
+    let morka = '';
+    const tanda = ['', ''];
+    const roof = sno || dis(mix('#0a0c12', mix('#3a3d44', L.sky[2], 0.25), L.dag), 0.2);
+    for (const b of STAD) {
+      const f = dis(facade(b.dag, '#0d1017', L), 0.16);
+      s += `<rect x="${b.x}" y="${b.tak}" width="${b.w}" height="${400 - b.tak}" fill="${f}"/><polygon points="${b.x},${b.tak} ${b.x + b.w},${b.tak} ${b.x + b.w - 3},${b.tak - b.th} ${b.x + 3},${b.tak - b.th}" fill="${roof}"/>`;
+      if (b.th >= 9) for (let x = b.x + 14; x < b.x + b.w - 12; x += 26) s += `<rect x="${x}" y="${b.tak - b.th + 2}" width="7" height="${b.th - 3}" fill="${f}"/>`;
+      for (let y = b.tak + 6; y < 392; y += 10) {
+        for (let x = b.x + 5; x < b.x + b.w - 6; x += 8) {
+          const w = `M${x} ${y}h2.6v3.4h-2.6z`;
+          morka += w;
+          const r = RS();
+          if (r < L.tand * 0.8) tanda[r < L.tand * 0.3 ? 0 : 1] += w;
         }
       }
-      s += `<rect x="${b.x}" y="${b.tak}" width="${b.w}" height="7" fill="${mix(f, '#ffffff', 0.12 * L.dag)}"/><rect x="${b.x}" y="${b.tak + 7}" width="${b.w}" height="2" fill="#000" opacity=".25"/>`;
-      if (v.snotackt) s += `<rect x="${b.x}" y="${b.tak - 1.5}" width="${b.w}" height="2.5" fill="${snowC(L)}"/>`;
-      const RW = rng(17 + bi * 101);
-      for (let wy = Math.max(116, b.tak + 20); wy < 280; wy += 30) {
-        for (let wx = b.x + 14; wx < b.x + b.w - 18; wx += 30) s += fonster(v, L, b, wx, wy, RW);
-      }
-      // sockeln
-      s += `<rect x="${b.x}" y="386" width="${b.w}" height="14" fill="${mix(mix(b.natt, '#000', 0.2), '#6d6a66', L.dag)}"/>`;
-    });
-
-    // bottenvåningarna: en port med lykta, ett konditori i det första huset och pizzerian
-    const open = (a, z) => v.timme >= a && v.timme < z;
-    const kond = open(7, 19) && v.veckodag !== 'sön';
-    const port = mix('#0a0806', '#4a3020', L.dag);
-    s += `<path d="M300 400 V350 Q317 334 334 350 V400 Z" fill="${port}"/><line x1="317" y1="344" x2="317" y2="400" stroke="#000" stroke-opacity=".35"/>
-      <circle cx="317" cy="330" r="2.5" fill="${L.lampor ? '#ffe2b0' : mix('#1a1a1a', '#bdb6a6', L.dag)}"/>${L.lampor ? '<circle cx="317" cy="330" r="12" fill="url(#rum-sodium)" opacity=".5"/>' : ''}
-      <rect x="40" y="318" width="120" height="66" fill="${kond ? '#ffd9a0' : mix('#0c0d10', mix('#2a3038', L.sky[2], 0.3), L.dag)}" opacity="${kond ? r1(0.32 - 0.12 * L.dag) : 1}"/>
-      <rect x="40" y="318" width="120" height="66" fill="none" stroke="${mix('#0d0f14', '#e9e2cf', L.dag)}" stroke-width="2"/>
-      <rect x="40" y="300" width="120" height="14" fill="${mix('#131012', '#6e2e2a', L.dag)}"/>`;
-    let skylt = `<text x="100" y="311" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="11" fill="${mix('#6a5a44', '#f2e4c8', L.dag)}" opacity="${kond || L.dag > 0.3 ? 0.9 : 0.4}">Konditori</text>`;
-    if (kond) s += '<g fill="#3a2414" opacity=".5"><rect x="56" y="360" width="24" height="3"/><rect x="104" y="356" width="34" height="3"/><circle cx="66" cy="352" r="5"/><circle cx="118" cy="348" r="5"/></g>';
-    if (v.arstid !== 'vinter' && !v.snotackt && kond) {
-      for (let i = 0; i < 5; i++) s += `<rect x="${44 + i * 22}" y="388" width="14" height="10" fill="${mix('#2a2a2a', '#7a7068', L.dag)}"/><circle cx="${51 + i * 22}" cy="386" r="6" fill="${['#e2483a', '#f2c23a', '#f3ead9', '#b24ad0', '#ff8a3a'][i]}" opacity="${r1(0.3 + 0.6 * L.dag)}"/>`;
     }
-    const pizza = open(11, 23) || (['fre', 'lör'].includes(v.veckodag) && (v.timme >= 11 || v.timme < 1));
-    const inne = pizza ? '#ffcf8a' : '#0c0a08';
-    s += `<rect x="560" y="312" width="210" height="88" fill="${mix('#1a1410', '#3a2c22', L.dag)}"/><rect x="566" y="330" width="198" height="64" fill="${inne}" opacity="${pizza ? r1(0.32 - 0.1 * L.dag) : 1}"/>
-      <rect x="566" y="330" width="198" height="64" fill="${mix('#3a2414', L.sky[2], 0.5 * L.dag)}" opacity="${r1(0.25 + 0.2 * L.dag)}"/>
-      <g fill="#1a1410"><rect x="630" y="330" width="4" height="64"/><rect x="698" y="330" width="4" height="64"/>
-        <rect x="584" y="372" width="30" height="4"/><rect x="588" y="376" width="3" height="18"/><rect x="608" y="376" width="3" height="18"/>
-        <rect x="716" y="370" width="34" height="4"/><rect x="722" y="374" width="3" height="20"/><rect x="744" y="374" width="3" height="20"/></g>
-      ${pizza ? '<rect x="650" y="350" width="34" height="8" rx="4" fill="#fff4d8" opacity=".5"/>' : ''}<rect x="580" y="292" width="170" height="26" fill="${mix('#0e1a12', '#1f3a2a', L.dag)}"/>
-      <path d="M808 400 V352 H834 V400 Z" fill="${port}"/><rect x="852" y="332" width="70" height="52" fill="${mix('#0c0d10', mix('#2a3038', L.sky[2], 0.35), L.dag)}"/>`;
-    skylt += `<text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="${pizza ? '#9bf5b5' : '#2c4a36'}">Pizzeria</text>
-      ${pizza ? `<text x="665" y="312" text-anchor="middle" font-family="Fraunces" font-style="italic" font-weight="700" font-size="21" fill="#4fe08a" filter="url(#rum-ute-b4)" opacity="${r1(1 - 0.6 * L.dag)}">Pizzeria</text>` : ''}`;
-    // Skyltarnas text i en egen liten SVG mellan husen och det som står
-    // framför dem (lyktstolpen framför konditoriet): Chrome lägger ut text i
-    // SVG på nytt i varje bildruta medan rummet vrids, och då ritades hela
-    // gatan om varje gång.
-    const husen = s;
-    s = '';
+    if (L.dag > 0.05) s += `<path d="${morka}" fill="${dis(mix('#1e2228', L.sky[2], 0.15), 0.1)}" opacity="${r1(0.5 * L.dag)}"/>`;
+    if (L.dag < 0.7) tanda.forEach((d, i) => { if (d) s += `<path d="${d}" fill="${WARM[i]}" opacity="${r1((i ? 0.5 : 0.9) * (1 - 0.9 * L.dag))}"/>`; });
 
+    // kontaktledningarna över järnvägen, mellan träden
+    s += `<g stroke="${dis(mix('#0c0e12', '#59606a', L.dag), 0.2)}" fill="none"><path d="M34 400 V352 M78 400 V352 M30 356 H82 M228 400 V354 M272 400 V354 M224 358 H276" stroke-width="2"/><path d="M-80 364 H320" stroke-width=".8" opacity=".6"/></g>`;
+
+    // trädtopparna
+    const lov = lovet(v);
+    const tc = { ljus: ['#6f9a48', '#86ad55'], gron: ['#2f5a34', '#3f6d3c'], host: ['#b8792e', '#c99a3a'], kal: ['#5e5650', '#6e665e'] }[lov];
+    const tm = (c) => {
+      const t = mix('#07090c', mix(c, '#7f8894', 0.25 * L.m), Math.pow(L.dag, 1.1));
+      return sno && lov === 'kal' ? mix(t, sno, 0.35) : t;
+    };
+    const RT = rng(31);
+    let trad = '';
+    for (const [tx, top, tw] of TRAD) {
+      trad += `<rect x="${r1(tx - tw * 0.42)}" y="${top + 14}" width="${r1(tw * 0.84)}" height="${400 - top - 14}" fill="${tm(tc[0])}"/>`;
+      for (let j = 0; j < 4; j++) trad += `<ellipse cx="${r1(tx + (j / 3 - 0.5) * tw * 0.66)}" cy="${r1(top + 12 + RT() * 7)}" rx="${r1(tw * (0.2 + RT() * 0.08))}" ry="${r1(12 + RT() * 6)}" fill="${tm(tc[j % 2])}"/>`;
+    }
+    s += lov === 'kal' ? `<g opacity=".6">${trad}</g>` : trad;
+
+    // brons räcke: överliggare, underliggare, spjälor och stolpar, trappan ned och stenpelaren vid huset
+    const gron = mix('#10141a', mix('#3f7d55', '#6a8a78', 0.3 * L.m), L.dag);
+    const [t0, t1] = TRAPP;
+    let spjalor = '';
+    for (let x = -78; x < HORN - 20; x += 5.5) {
+      const y = x > t0 && x < t1 ? RACKE + 2 + (x - t0) / (t1 - t0) * 22 : RACKE + 3;
+      if (y < 393) spjalor += `M${r1(x)} ${r1(y)}V396`;
+    }
+    let stolpar = '';
+    for (let x = -76; x < HORN - 24; x += 64) if (x < t0 - 6 || x > t1 + 6) stolpar += `<rect x="${x}" y="${RACKE - 3}" width="4" height="${403 - RACKE}"/>`;
+    s += `<g fill="${gron}" stroke="${gron}"><path d="${spjalor}" stroke-width="1.2" fill="none"/>
+      <path d="M-80 ${RACKE + 1.5} H${t0} L${t1} 399 M${t1} ${RACKE + 1.5} H${HORN - 16}" stroke-width="3.5" fill="none"/><path d="M-80 396 H${t0} M${t1} 396 H${HORN - 16}" stroke-width="2.4" fill="none"/>
+      ${stolpar}<rect x="${t0 - 2}" y="${RACKE - 4}" width="5" height="${404 - RACKE}"/><rect x="${t1 - 2}" y="${RACKE - 4}" width="5" height="${404 - RACKE}"/></g>`;
+    if (sno) s += `<path d="M-80 ${RACKE - 0.5} H${t0} L${t1} 397 M${t1} ${RACKE - 0.5} H${HORN - 16}" stroke="${sno}" stroke-width="2" fill="none"/>`;
+    const granit = mix('#121316', mix('#a7a39b', '#8f949a', 0.3 * L.m), L.dag);
+    s += `<rect x="${HORN - 18}" y="366" width="18" height="36" fill="${granit}"/><rect x="${HORN - 20}" y="363" width="22" height="5" fill="${mix(granit, '#000000', 0.15)}"/>`;
+    if (sno) s += `<rect x="${HORN - 20}" y="361" width="22" height="3" rx="1.5" fill="${sno}"/>`;
+
+    // hörnhuset: laxrosa puts med solen på den övre delen, mörka omfattningar kring fönstren,
+    // granit kring de stora fönstren i bottenvåningen under mörka överstycken, och en port
+    const sunTop = 400 - Math.max(0, Math.min(300, 333 - 300 * Math.tan(Math.max(1, v.sol) * Math.PI / 180)));
+    const f = facade('#e08a5a', '#120e11', L);
+    s += `<rect x="${HORN}" y="80" width="480" height="320" fill="${mix(f, '#56658a', 0.14 * L.sol)}"/>`;
+    if (L.sol > 0.03 && sunTop > 80) s += `<rect x="${HORN}" y="80" width="480" height="${r1(sunTop - 80)}" fill="${mix(mix(f, '#fff0d2', 0.22 * L.sol), '#f0a46a', 0.25 * L.guld * L.sol)}"/>`;
+    const omf = mix('#0d0d10', mix('#4a4746', '#8a8f96', 0.25 * L.m), L.dag);
+    const RW = rng(23);
+    s += `<rect x="${HORN}" y="80" width="3" height="320" fill="${mix(f, '#000000', 0.2)}"/>`;
+    for (const cx of [676, 776, 876, 976, 1076]) {
+      for (const y of [140, 214]) s += `<rect x="${cx - 17}" y="${y - 3}" width="34" height="50" fill="${omf}"/>${fonster(v, L, cx - 14, y, 28, 44, RW)}`;
+      s += `<rect x="${cx - 19}" y="306" width="38" height="86" fill="${granit}"/><rect x="${cx - 23}" y="299" width="46" height="7" fill="${omf}"/>`;
+      if (cx === 976) s += `<rect x="${cx - 14}" y="314" width="28" height="86" fill="${mix('#0a0806', '#5a3a24', L.dag)}"/><path d="M${cx - 11} 330 V320 Q${cx} 312 ${cx + 11} 320 V330 Z" fill="${mix('#0c0d10', mix('#2a3038', L.sky[2], 0.35), L.dag)}"/>`;
+      else s += `${fonster(v, L, cx - 15, 312, 30, 46, RW)}<rect x="${cx - 13}" y="364" width="26" height="22" fill="${mix(f, '#000000', 0.12)}"/>`;
+      if (sno) s += `<rect x="${cx - 23}" y="297" width="46" height="2.5" rx="1" fill="${sno}"/>`;
+    }
+    s += `<rect x="${HORN}" y="390" width="480" height="10" fill="${granit}"/>
+      <path d="M635 352 q4 -16 8 -2 q3 -14 7 0 q2 -9 6 -3 M637 341 l18 -6" stroke="${mix('#141018', '#8a52c2', L.dag)}" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>`;
     // flaggstången (flaggan vajar i livet på gatan)
-    if (flagga(v)) s += `<line x1="712" y1="204" x2="744" y2="178" stroke="${mix('#222', '#e9e4d8', L.dag)}" stroke-width="1.8"/><circle cx="744" cy="178" r="1.6" fill="${mix('#3a3020', '#d8b25a', L.dag)}"/>`;
+    s += `<line x1="712" y1="204" x2="744" y2="178" stroke="${mix('#222', '#e9e4d8', L.dag)}" stroke-width="1.8"/><circle cx="744" cy="178" r="1.6" fill="${mix('#3a3020', '#d8b25a', L.dag)}"/>`;
 
-    // marken: trottoaren, kantstenen och gatan – torr, våt eller snöig
+    // stolpen med gatuskylten och parkeringsförbudet vid pelaren, och en cykel mot räcket
+    const syn = (c) => mix('#0b0c10', c, 0.15 + 0.85 * L.dag);
+    s += `<rect x="599" y="294" width="2.4" height="108" fill="${syn('#4a4e54')}"/><rect x="588" y="294" width="25" height="7" fill="${syn('#f2f2ee')}"/><rect x="592" y="297" width="17" height="1.2" fill="${syn('#2a2a2a')}"/>
+      <circle cx="600" cy="313" r="6" fill="${syn('#2a5aa8')}" stroke="${syn('#c8322a')}" stroke-width="1.6"/><path d="M596 309 L604 317" stroke="${syn('#c8322a')}" stroke-width="1.4"/><rect x="595" y="321" width="10" height="5" fill="${syn('#e8a030')}"/>
+      <g fill="none" stroke="${syn('#2b2f36')}" stroke-width="1.3"><circle cx="537" cy="394" r="6.5"/><circle cx="560" cy="394" r="6.5"/><path d="M537 394 L545 394 L541 384 M545 394 L555 384 L541 384 M555 384 L560 394 M555 384 L556 379 M541 384 L540 381"/></g>`;
+
+    // marken: trottoaren på bron, kantstenen och gatan – torr, våt eller snöig
     const dry = [mix('#25262b', '#a19f99', L.dag), mix('#121318', '#5b5d61', L.dag)];
     const wet = [mix('#2a2b30', '#6c6e72', L.dag), mix('#121318', '#383b40', L.dag)];
     let [walk, road] = L.wet || v.blott ? wet : dry;
-    if (v.snotackt) { walk = snowC(L); road = mix('#262b36', '#a3a9b0', L.dag); }
+    if (sno) { walk = sno; road = mix('#262b36', '#a3a9b0', L.dag); }
     s += `<rect x="-80" y="400" width="1100" height="11" fill="${walk}"/><rect x="-80" y="411" width="1100" height="3" fill="${mix(walk, '#000', 0.35)}"/><rect x="-80" y="414" width="1100" height="310" fill="${road}"/>`;
-    if (v.snotackt) {
+    if (sno) {
       s += `<g fill="${mix(road, '#000', 0.25)}"><rect x="-80" y="470" width="1100" height="9"/><rect x="-80" y="500" width="1100" height="9"/><rect x="-80" y="536" width="1100" height="11"/></g>`;
-      const RS = rng(9);
+      const RP = rng(9);
       let p = 'M-80 418';
-      for (let x = -80; x <= 1020; x += 20) p += ` Q${x + 10} ${r1(404 - RS() * 8)} ${x + 20} ${r1(416 + RS() * 3)}`;
-      s += `<path d="${p} L1020 420 L-80 420 Z" fill="${mix(snowC(L), '#9aa2ad', 0.2)}"/>`;
-    } else if (v.blott && L.dag > 0.2) {
-      s += `<rect x="-80" y="416" width="1100" height="60" fill="${L.sky[2]}" opacity="${r1(0.18 * L.dag)}" filter="url(#rum-ute-b4)"/>`;
-      const RP = rng(13);
-      for (let i = 0; i < 7; i++) s += `<ellipse cx="${r1(RP() * 1000)}" cy="${r1(430 + RP() * 120)}" rx="${r1(20 + RP() * 40)}" ry="${r1(2 + RP() * 3)}" fill="${L.sky[1]}" opacity="${r1(0.25 * L.dag)}"/>`;
+      for (let x = -80; x <= 1020; x += 20) p += ` Q${x + 10} ${r1(404 - RP() * 8)} ${x + 20} ${r1(416 + RP() * 3)}`;
+      s += `<path d="${p} L1020 420 L-80 420 Z" fill="${mix(sno, '#9aa2ad', 0.2)}"/>`;
+    } else {
+      // mittlinjen
+      let d = '';
+      for (let x = -60; x < 1020; x += 110) d += `M${x} 515.5h48`;
+      s += `<path d="${d}" stroke="${mix('#3a3c40', '#e2e0da', L.dag)}" stroke-width="3" opacity="${r1(0.35 + 0.25 * L.dag)}"/>`;
+      if (v.blott && L.dag > 0.2) {
+        s += `<rect x="-80" y="416" width="1100" height="60" fill="${L.sky[2]}" opacity="${r1(0.18 * L.dag)}" filter="url(#rum-ute-b4)"/>`;
+        const RP = rng(13);
+        for (let i = 0; i < 7; i++) s += `<ellipse cx="${r1(RP() * 1000)}" cy="${r1(430 + RP() * 120)}" rx="${r1(20 + RP() * 40)}" ry="${r1(2 + RP() * 3)}" fill="${L.sky[1]}" opacity="${r1(0.25 * L.dag)}"/>`;
+      }
     }
     // höstlöven på trottoaren och i rännstenen
-    const host = (v.manad === 9 && v.dag >= 20) || v.manad === 10 || (v.manad === 11 && v.dag <= 25);
-    if (host && !v.snotackt) {
+    if (lov === 'host' && !sno) {
       const RL = rng(29);
       const cols = ['#c7682a', '#d99a2b', '#a8452a', '#8a5a2a', '#c9a23a'];
       for (let i = 0; i < 70; i++) {
@@ -344,35 +405,24 @@ window.RumUte = (() => {
       }
     }
 
-    // gatlyktorna
-    for (const [sx, k] of [[330, 1], [520, 0.8], [880, 1], [120, 0.9]]) {
-      s += `<rect x="${sx - 2}" y="250" width="4" height="165" fill="${mix('#1a1c22', '#3e4248', L.dag)}"/><path d="M${sx - 7} 252 Q${sx} 242 ${sx + 7} 252 Z" fill="${mix('#14161a', '#2e3236', L.dag)}"/>`;
-      if (v.snotackt) s += `<path d="M${sx - 7} 248 Q${sx} 240 ${sx + 7} 248 Z" fill="${snowC(L)}"/>`;
+    // brons lyktstolpe (i dörren) och vägglyktan på hörnhuset
+    const sx = 140;
+    s += `<rect x="${sx - 2}" y="250" width="4" height="152" fill="${mix('#1a1c22', '#3e4248', L.dag)}"/><path d="M${sx - 7} 252 Q${sx} 242 ${sx + 7} 252 Z" fill="${mix('#14161a', '#2e3236', L.dag)}"/>
+      <path d="M716 296 h8 v-4 M722 292 v-8" stroke="${mix('#14161a', '#3a3c40', L.dag)}" stroke-width="1.6" fill="none"/><rect x="718" y="284" width="8" height="10" rx="1.5" fill="${mix('#14161a', '#2e3236', L.dag)}"/>`;
+    if (sno) s += `<path d="M${sx - 7} 248 Q${sx} 240 ${sx + 7} 248 Z" fill="${sno}"/>`;
+    for (const [lx, ly, k] of [[sx, 252, 0.9], [722, 289, 0.7]]) {
       if (L.lampor) {
         const big = 1 + 0.8 * L.dimma;
-        s += `<circle cx="${sx}" cy="252" r="${r1(60 * k * big)}" fill="url(#rum-sodium)" opacity="${r1(0.7 * (1 - L.dag))}"/><circle cx="${sx}" cy="252" r="4" fill="#ffe2b0"/>`;
-        if (L.wet || v.blott) s += `<rect x="${sx - 7}" y="418" width="14" height="140" fill="url(#rum-streak)" filter="url(#rum-ute-b4)" opacity="${r1(1 - L.dag)}"/>`;
-        else if (v.snotackt) s += `<ellipse cx="${sx}" cy="418" rx="70" ry="16" fill="#ffc27a" opacity="${r1(0.16 * (1 - L.dag))}" filter="url(#rum-ute-b4)"/>`;
-      } else s += `<circle cx="${sx}" cy="252" r="3" fill="${mix('#2a2a2a', '#c8ccd0', L.dag)}"/>`;
+        s += `<circle cx="${lx}" cy="${ly}" r="${r1(60 * k * big)}" fill="url(#rum-sodium)" opacity="${r1(0.7 * (1 - L.dag))}"/><circle cx="${lx}" cy="${ly}" r="${r1(4 * k)}" fill="#ffe2b0"/>`;
+        if (L.wet || v.blott) s += `<rect x="${lx - 7}" y="418" width="14" height="140" fill="url(#rum-streak)" filter="url(#rum-ute-b4)" opacity="${r1(1 - L.dag)}"/>`;
+        else if (sno) s += `<ellipse cx="${lx}" cy="418" rx="70" ry="16" fill="#ffc27a" opacity="${r1(0.16 * (1 - L.dag))}" filter="url(#rum-ute-b4)"/>`;
+      } else s += `<circle cx="${lx}" cy="${ly}" r="${r1(3 * k)}" fill="${mix('#2a2a2a', '#c8ccd0', L.dag)}"/>`;
     }
-
-    // bilen som står parkerad vid trottoaren
-    const car = mix('#08090c', '#3b4a5f', L.dag * (1 - 0.25 * L.m));
-    s += `<path d="M682 474 V462 Q683 455 692 453 L702 443 Q706 439 714 439 L734 439 Q741 439 745 445 L750 452 Q756 454 756 462 V474 Z" fill="${car}"/>
-      <path d="M704 451 L710 444 L726 444 L726 451 Z M729 451 L729 444 L739 444 L744 451 Z" fill="${mix('#020203', mix('#1e252e', L.sky[2], 0.4), L.dag)}"/>
-      <circle cx="696" cy="474" r="6.5" fill="#050506"/><circle cx="742" cy="474" r="6.5" fill="#050506"/><circle cx="696" cy="474" r="2.6" fill="${mix('#151515', '#8a8e92', L.dag)}"/><circle cx="742" cy="474" r="2.6" fill="${mix('#151515', '#8a8e92', L.dag)}"/>`;
-    if (v.snotackt) s += `<path d="M703 441 Q706 437 714 437 L734 437 Q741 437 745 443 Z" fill="${snowC(L)}"/><rect x="684" y="451" width="16" height="3" rx="1.5" fill="${snowC(L)}"/>`;
-    if (L.lampor) {
-      s += '<circle cx="754" cy="458" r="3" fill="#ff4a3a"/><circle cx="754" cy="458" r="12" fill="#ff3b30" opacity=".4" filter="url(#rum-ute-b4)"/>';
-      if (L.wet || v.blott) s += '<rect x="749" y="476" width="9" height="80" fill="url(#rum-streakred)" filter="url(#rum-ute-b4)"/>';
-    }
-    s += `<rect x="560" y="420" width="210" height="90" fill="#ffcf8a" opacity="${pizza ? r1(0.07 * (1 - L.dag)) : 0}" filter="url(#rum-ute-b10)"/>`;
 
     // dimman lägger sig över allt
     if (L.dimma > 0.05) s += `<rect x="-80" y="90" width="1100" height="640" fill="${mix('#2a2622', '#aeb3b6', L.dag)}" opacity="${r1(0.5 * L.dimma)}"/>`;
-    const ruta = (inner, [x, y, w, h] = [0, 0, 1600, 1000]) => `<svg class="rum-layer${w < 1600 ? ' skylt' : ''}" viewBox="${x} ${y} ${w} ${h}" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px">${inner}</svg>`;
-    return ruta(`<defs><filter id="rum-ute-b4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter><filter id="rum-ute-b10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter></defs>${husen}`) +
-      ruta(skylt, [30, 280, 740, 50]) + ruta(s);
+    // (allt i en SVG: i telefonen blir den en enda grov duk, bakaGata)
+    return `<svg class="rum-layer" viewBox="0 0 1600 1000" style="left:0; top:0; width:1600px; height:1000px"><defs><filter id="rum-ute-b4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter></defs>${s}</svg>`;
   }
 
   // ---------- livet på gatan ----------
@@ -670,7 +720,7 @@ window.RumUte = (() => {
     return {
       himmel: [base, bucket(L.dag, 20), bucket(v.sol, 1), v.mane.h > 2, bucket(v.mane.fas, 30), bucket(L.m, 10)].join(),
       himliv: [base, bucket(L.dag, 5), bucket(L.guld, 4), v.arstid, v.timme >> 2, v.nyar, v.manad === 12 && v.dag === 31 && v.timme >= 18, v.timme >= 18 && v.timme < 23, bucket(L.m, 5)].join(),
-      gata: [base, bucket(L.dag, 20), bucket(L.sol, 10), bucket(L.guld, 10), bucket(L.tand, 50), L.lampor, v.timme, v.veckodag, bucket(L.m, 10)].join(),
+      gata: [base, bucket(L.dag, 20), bucket(L.sol, 10), bucket(L.guld, 10), bucket(L.tand, 50), L.lampor, lovet(v), bucket(L.m, 10)].join(),
       liv: [base, bucket(L.dag, 4), L.lampor, v.timme >> 1, v.arstid, v.manad === 12, bucket(v.kanns, 0.1), bucket(v.vind, 0.25), flagga(v)].join(),
       fall: [v.fall, v.slag, bucket(v.mangd, 5), Math.round(v.vind / 3)].join(),
       glas: [v.fall, v.blott, v.snotackt, Math.round(v.temp)].join(),
@@ -1015,7 +1065,7 @@ window.RumUte = (() => {
     }
   }
 
-  // I telefonen ritas gatan (husen och det som står framför dem, inte skylten)
+  // I telefonen ritas gatan (bron, stan och hörnhuset och det som står framför dem)
   // en gång i en grov duk, 0,4 bildpunkter per px: förstorad är den lika mjuk
   // som med oskärpan i CSS, som var ett pass på grafikkortet över hela gatan i
   // varje bildruta. Ett filter inne i SVG:n blev dyrare än så: Safari släpper
@@ -1026,7 +1076,7 @@ window.RumUte = (() => {
     const gen = (x._gen = (x._gen || 0) + 1);
     const xs = new XMLSerializer();
     const dukar = [];
-    const svgs = [...x.querySelectorAll(':scope > svg:not(.skylt)')];
+    const svgs = [...x.querySelectorAll(':scope > svg')];
     for (const svg of svgs) {
       const k = svg.cloneNode(true);
       k.removeAttribute('style');
@@ -1354,13 +1404,16 @@ window.RumUte = (() => {
     });
   }
 
+
   // Kall gata, varmt rum: ute går färgerna mot blågrått medan det är ljust, så att gänget och det varma
   // rummet lyfter från gatan. Det görs i färgerna när gatan ritas (också de som går förbi), inte med
-  // ett filter, så det kostar inget sedan. På kvällen och natten står allt som det brukar.
-  function kall(svg, L, himlen) {
+  // ett filter, så det kostar inget sedan. På kvällen och natten står allt som det brukar. mat0: hur
+  // mycket färgen går ur – mindre i himlen, och i bron och husen så att hörnhuset är laxrosa och stan
+  // varm som från Bron, mer i dem som går förbi.
+  function kall(svg, L, mat0) {
     const t = Math.min(1, L.dag * 1.3);
     if (t < 0.03) return svg;
-    const mat = (himlen ? 0.4 : 0.58) * t;
+    const mat = mat0 * t;
     const kon = 1 - 0.16 * t;
     const lju = 1 - 0.06 * t;
     const bla = [110, 140, 175];
@@ -1374,25 +1427,7 @@ window.RumUte = (() => {
     });
   }
 
-  // Kall gata, varmt rum: ute går färgerna mot blågrått medan det är ljust, så att gänget och det varma
-  // rummet lyfter från gatan. Det görs i färgerna när gatan ritas (också de som går förbi), inte med
-  // ett filter, så det kostar inget sedan. På kvällen och natten står allt som det brukar.
-  function kall(svg, L, himlen) {
-    const t = Math.min(1, L.dag * 1.3);
-    if (t < 0.03) return svg;
-    const mat = (himlen ? 0.4 : 0.58) * t;
-    const kon = 1 - 0.16 * t;
-    const lju = 1 - 0.06 * t;
-    const bla = [110, 140, 175];
-    return svg.replace(/#[0-9a-f]{6}\b/gi, (c) => {
-      const [r, g, b] = rgb(c);
-      const y = 0.3 * r + 0.59 * g + 0.11 * b;
-      return hx([r, g, b].map((x, i) => {
-        const a = (128 + (y + (x - y) * (1 - mat) - 128) * kon) * lju;
-        return a + (bla[i] - a) * 0.2 * t;
-      }));
-    });
-  }
+  const KALL = { himmel: 0.4, gata: 0.3, liv: 0.58, himliv: 0.58 };
 
   // el: utsiktens lager i rum.js; rects: fönstrets och dörrens glas
   function paint(el, v, rects) {
@@ -1430,7 +1465,7 @@ window.RumUte = (() => {
       if (el._sig[k] === sig[k]) continue;
       el._sig[k] = sig[k];
       const x = el.querySelector(`[data-lager="${k}"]`);
-      x.innerHTML = ['himmel', 'gata', 'liv', 'himliv'].includes(k) ? kall(draw[k](), L, k === 'himmel') : draw[k]();
+      x.innerHTML = KALL[k] ? kall(draw[k](), L, KALL[k]) : draw[k]();
       if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s, Boolean(el._gat));
       const G = el._gat;
       if (k === 'gata' && SAMLA) bakaGata(x, G && ((d) => { G.gata = d; ritaGatan(el); }));
