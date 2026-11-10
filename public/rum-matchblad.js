@@ -449,7 +449,8 @@ window.RumMatchblad = (() => {
 
   // Allas tips i matchen (RumBlock.match): en rad per spalt i protokollet, i samma ordning, och sedan datorns
   // tecken och analysens tips som jämförelse. Tecknet på skrivmaskin, överstruket med märkpennan när det satt
-  // och svagare när det inte satt, som i protokollet; rödpennans stjärna när ingen annan i gänget hade rätt.
+  // och svagare när det inte satt, som i protokollet. Ingen rödpenna här: att ingen annan i gänget hade rätt står
+  // bara när man pekar på raden.
   function tipsen(ctx, x, a) {
     const { sum } = ctx.efter;
     const key = `${sum.id || sum.nr || ''}:${x.r.nr}:`;
@@ -462,7 +463,7 @@ window.RumMatchblad = (() => {
     const rad = (t, k) => {
       const vem = t.id === 'D' ? '<span class="rr-ik dator" aria-hidden="true"><i></i></span>'
         : t.id === 'A' ? '<span class="rr-ik art" aria-hidden="true"></span>' : RumBlock.portratt(sum, t);
-      const tecken = t.t ? `${t.ok ? RumBlock.strykning(`${key}${t.id}`, t.t.length) : ''}<i>${esc(t.t)}</i>${t.ensam ? RumBlock.STJARNA : ''}` : '<i>–</i>';
+      const tecken = t.t ? `${t.ok ? RumBlock.strykning(`${key}${t.id}`, t.t.length) : ''}<i>${esc(t.t)}</i>` : '<i>–</i>';
       const chans = t.prob == null ? '' : t.schablon ? `<span title="Datorn gav ingen prognos för matchen, så chansen är schablonen">≈${procent(t.prob)}</span>` : procent(t.prob);
       const om = !t.t ? `${t.namn}: inget tips`
         : `${t.id === 'A' ? `Tipset av ${forfattare}` : t.namn}: ${t.t} – ${t.ok ? 'satt' : t.fel ? 'satt inte' : 'inte avgjord'}${t.ensam ? ', ensam rätt i gänget' : ''}`;

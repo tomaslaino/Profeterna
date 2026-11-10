@@ -1149,7 +1149,8 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   stället för den blå, grå och orange stapeln, datorn är en svart ruta i stället för videons blå, statistiken under *Matchen*
   står i bläck (den som leder mörkare) i stället för i lagens färger, bytenas pilar är svarta, och analysens ringar är samma
   blå penna som raden i marginalen – de var röda, eftersom protokollets röda penna (`.rb-ring path` i rum-block.css) tog över
-  också i matchbladet före matchen.
+  också i matchbladet före matchen. Samma dag, på användarens önskemål: "ta bort den röda stjärnan också" – rödpennans
+  stjärna för ensam rätt står inte längre i *Rättningen* (på lappen under domen finns den kvar).
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -3472,6 +3473,18 @@ kassettens dukar ritas om större första gången (`radioFin`), och de små dela
 (`radioDetalj`). Radion kostar 2 % fler ritningar i rummet än bergsprängaren. `?rum-sak=radio` visar närbilden
 och `?rum-radio-lage=fm:90.4` hur den står inställd, utan ljud; `?rum-radio`
 sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
+
+**Fönsterbänken följer väggen** (2026-11-10). Rummet vrids kring planet -330, där gängets duk ligger. Där låg
+också fönsterbänken, medan fönstret, löpsedlarna och bladet med stationerna sitter på bakväggen i planet -600,
+så när musen rörde sig gled bänken, radion och tomflaskorna mot fönstret bakom: 13–15 px i sidled och 7–8 i
+höjdled mot skivan med löpsedlarna i ytterlägena (Chrome, 1400 × 875). Nu ligger bänken i bakväggens plan
+(`bank` i rum.js, lika mycket mindre som planet förstorar, så att den står där den stod, och över det andra i
+planet som förut), och gänget vrids inte längre i sin duk. Musen flyttar i stället kameran som ett öga, och
+bilden står still i det djup där radion och flaskorna står (`OGA_Z` och `sikta` i rum-3d.js), så att de rör sig
+som väggen: nu högst en bildpunkt mot skivan och bladet. Det ändrar gänget på tre sätt: det rör sig som om det
+satt närmare fönstret än förut (och mer mot pulten), ljuset och skuggorna står still när musen rör sig (förut
+vreds gänget mot lamporna), och den som tittar på en följer kameran. I närbilderna av det som sitter på väggen
+tonar bänken inte längre bort med gänget, utan sitter kvar under fönstret.
 
 **Dansen** (2026-11-08, `DANSER` i rum-dans.js, `dansPose`, `dansHand` och `dansFingrar` i rum-3d.js):
 italodisco som i de italienska tv-programmen runt 1980, sittande på barstolen, i 120 slag i minuten
@@ -6741,8 +6754,8 @@ den ordning man vill veta hur det gick:
 - **Rättningen** – allas tips i matchen, en rad var i protokollets ordning (kupongen, gänget och Hasse), och under en
   streckad linje datorns tecken (det troligaste före avspark, som *Modellen* i Olympen) och tipset i analysen när det är
   skrivet före avspark (Sixten Bråvalls, `tip` i `data/analyser.json`). Tecknet står på skrivmaskin som i protokollet,
-  överstruket med märkpennan när det satt och svagare när det inte satt, med rödpennans stjärna när ingen annan i gänget
-  hade rätt, och efter det datorns chans för tecknet före avspark, poängen (samma regel som raden Poäng: rätt minus
+  överstruket med märkpennan när det satt och svagare när det inte satt (att ingen annan i gänget hade rätt står när man
+  pekar på raden), och efter det datorns chans för tecknet före avspark, poängen (samma regel som raden Poäng: rätt minus
   chansen) och spelkassan (10 kr till datorns odds, som i Olympen och på lappen under domen). Överst hur många som hade
   rätt. Under tipsen datorn och spelbolagen före avspark sida vid sida (under varandra i telefonen) i kupongens rutor, med
   chansen på skrivmaskin under varje ruta och facit överstruket med märkpennan: hur troligt datorn tyckte att det var och vad

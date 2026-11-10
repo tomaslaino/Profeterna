@@ -330,7 +330,6 @@
 .rr-t { display: flex; align-items: center; justify-content: center; height: 27px; font: 400 17px/1 var(--skriv); color: var(--pp-ink); }
 .rr-t i { position: relative; font-style: normal; }
 .rr-t.fel { color: rgba(34, 31, 27, 0.4); }
-.rr-t .rd-stj { position: relative; margin-left: 3px; width: 11px; height: 11px; align-self: flex-start; margin-top: 3px; }
 .rr-ch, .rr-po, .rr-kr { padding-right: 3px; text-align: right; white-space: nowrap; }
 .rr-ch { font-size: 12px; color: var(--pp-ink-soft); }
 .rr-po, .rr-kr { font-size: 13.5px; color: var(--pp-ink); }
