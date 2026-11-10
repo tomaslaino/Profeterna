@@ -121,6 +121,38 @@
 .tn-bilder .tn-foto.skold { background: #fff; }
 .tn-bilder figcaption { position: absolute; left: 0; bottom: 0; max-width: 100%; box-sizing: border-box; padding: 2px 6px 1px; overflow: hidden; background: rgba(23, 19, 14, 0.82); color: #fff; font: 800 10px/1.3 var(--sans); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; }
 
+/* supporterpoddarna: en informationssida per match, hemmalaget till vänster och bortalaget till höger */
+.tn-pod { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; row-gap: 16px; align-items: start; padding-top: 10px; border-top: 1px solid var(--svart); }
+.tn.smal .tn-pod { grid-template-columns: minmax(0, 1fr); }
+/* bara det ena laget har något: det får hela bredden, i två spalter, och det andra står sist */
+.tn-pod.en { grid-template-columns: minmax(0, 1fr); }
+.tn-pod.en .tn-pod-lag:not(.tom) { column-count: 2; column-gap: 20px; column-rule: 1px solid var(--streck); }
+.tn.smal .tn-pod.en .tn-pod-lag { column-count: 1; }
+.tn-pod.en .tn-pod-lag h4, .tn-pod.en .tn-pod-lag > .tn-kalla { column-span: all; }
+.tn-pod.en .tn-pod-grupp:first-of-type { margin-top: 8px; }
+.tn-pod.en .tn-pod-punkt, .tn-pod.en .tn-pod-grupp h5 { break-inside: avoid; break-after: avoid; }
+.tn-pod.en .tn-pod-punkt { break-after: auto; }
+.tn-pod.en .tn-pod-lag.tom { order: 2; }
+.tn .tn-pod-lag h4 { margin: 0 0 3px; padding: 5px 0 3px; border-top: 3px solid var(--svart); border-bottom: 1px solid var(--svart); font: 400 24px/1 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+.tn-pod-lag > .tn-kalla { margin: 4px 0 2px; }
+.tn-pod-grupp { margin-top: 11px; }
+.tn .tn-pod-grupp h5 { margin: 0 0 6px; padding: 0; color: var(--rod); font: 800 11.5px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
+.tn-pod-punkt { margin: 0 0 9px; padding-bottom: 9px; border-bottom: 1px dotted rgba(23, 19, 14, 0.45); }
+.tn-pod-grupp .tn-pod-punkt:last-child { border-bottom: 0; padding-bottom: 0; }
+.tn-pod-punkt > p { margin-top: 3px; font: 400 14px/1.38 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.tn-pod-punkt > small { margin-left: 6px; font: italic 400 11px/1.2 var(--serif); color: var(--gra); }
+.tn-slag { display: inline-block; box-sizing: border-box; padding: 2px 5px 1px; border: 1.2px solid var(--svart); font: 800 9.5px/1.15 var(--sans); font-style: normal; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; vertical-align: 1px; }
+.tn-slag.s-b { background: var(--svart); color: var(--p); }
+.tn-slag.s-h { border-color: var(--rod); color: var(--rod); }
+.tn-slag.s-o { border-style: dashed; color: var(--gra); border-color: var(--gra); }
+.tn .tn-pod-punkt blockquote { margin: 6px 0 0; padding: 0 0 0 9px; border: 0; border-left: 3px solid var(--rod); background: none; }
+.tn-pod-punkt blockquote p { font: italic 400 14.5px/1.32 var(--serif); }
+.tn-pod-punkt cite { display: block; margin-top: 2px; font: 700 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; color: var(--gra); }
+.tn-pod-punkt cite::before { content: "– "; }
+.tn-pod-ingen { margin-top: 10px !important; font: italic 400 13.5px/1.35 var(--serif); color: var(--gra); }
+.tn-pod-fot { margin-top: 14px !important; padding-top: 7px; border-top: 1px solid var(--streck); font: 400 11.5px/1.75 var(--sans); color: var(--gra); }
+.tn-pod-fot .tn-slag { font-size: 8.5px; }
+
 /* betygen */
 .tn-betygen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; row-gap: 14px; }
 .tn-betyg-kort { display: grid; grid-template-columns: 88px minmax(0, 1fr); column-gap: 10px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--streck); }
@@ -163,3 +195,68 @@
 .tn.smal .tn-tabell { font-size: 12.5px; }
 .tn.smal .tn-p { width: 2em; }
 .tn.smal .tn-betyg-kort { grid-template-columns: 76px minmax(0, 1fr); }
+
+/* ---------- Tipsguiden (RumTidning.guide, tipsguiden i rum.js) ---------- */
+
+/* Tidningens tipsbilaga på gulnat tidningspapper. Framsidan är 100 × 140 som sedeln och förstoras med zoom:
+   på pulten (1,9) och när den är framme (--k, passaTidning). */
+.tn.tid-tg { --p: #eee6c8; --rod: #cc1a1f; --gra: #5d5444; }
+.tg-forsta { --tg-p: #eee6c8; --tg-rod: #cc1a1f; --tg-svart: #17130e;
+  position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100px; height: 140px; overflow: hidden; padding: 0 3.5px 3px;
+  background: radial-gradient(circle at 50% 50%, rgba(40, 24, 8, 0.13) 0 0.25px, rgba(0, 0, 0, 0) 0.35px) 0 0 / 1.1px 1.1px, var(--tg-p);
+  color: var(--tg-svart); font-family: "Helvetica Neue", Arial, sans-serif; text-align: left; }
+.tg-namn { margin: 0 -3.5px; padding: 3px 0 2px; background: var(--tg-rod); color: #fff6e2; text-align: center; }
+.tg-namn b { display: block; font: 400 18px/1 Anton, Impact, sans-serif; letter-spacing: 0.35px; }
+.tg-linje { display: flex; justify-content: space-between; align-items: baseline; gap: 2px; padding: 1.5px 0 1.2px; border-bottom: 0.5px solid var(--tg-svart); font: 700 2.9px/1.1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; white-space: nowrap; }
+.tg-linje span:nth-child(2) { font-weight: 400; }
+.tg-forsta .tg-rub { margin: 3.2px 0 0; padding: 0; border: 0; color: inherit; text-align: center; text-transform: uppercase; }
+.tg-rub b { display: block; font: 400 9px/0.98 Anton, Impact, sans-serif; letter-spacing: 0.1px; white-space: nowrap; }
+.tg-rub b.rod { margin-top: 1.6px; font-size: 16.5px; line-height: 0.96; color: var(--tg-rod); }
+.tg-forsta .tg-under { margin: 1.4px 0 2.4px; text-align: center; font: italic 700 4.1px/1.1 Georgia, Fraunces, serif; }
+.tg-kup { position: relative; flex: 1 1 auto; min-height: 0; padding: 1.3px 1.6px 0.6px; border: 0.6px solid var(--tg-svart); background: rgba(255, 252, 240, 0.4); }
+.tg-forsta .tg-kup p { display: flex; gap: 1.6px; align-items: baseline; margin: 0 0 0.6px; padding-bottom: 0.8px; border-bottom: 0.4px solid var(--tg-svart); font: 800 2.7px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.25px; }
+.tg-kup p span { font-weight: 600; letter-spacing: 0; text-transform: none; }
+.tg-kup ol { margin: 0; padding: 0; list-style: none; }
+.tg-kup li { display: flex; align-items: center; gap: 1.2px; border-bottom: 0.2px solid rgba(23, 19, 14, 0.28); font: 600 2.75px/1.22 "Helvetica Neue", Arial, sans-serif; }
+.tg-kup li:last-child { border-bottom: 0; }
+.tg-kup li b { flex: 0 0 3.4px; text-align: right; font-weight: 800; }
+.tg-kup li span { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tg-kup li i { flex: 0 0 3.3px; background: var(--tg-svart); color: var(--tg-p); font-style: normal; font-weight: 800; text-align: center; }
+/* Spika: favoriten i en röd stjärna över kupongens hörn, där raderna är tomma */
+.tg-spik { position: absolute; right: -2.5px; top: -4px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 23px; height: 23px; border-radius: 50%; background: var(--tg-rod); color: #fff6e2; text-align: center; transform: rotate(9deg); box-shadow: 0 0 0 0.5px var(--tg-p); }
+.tg-spik b { font: 400 5.2px/1 Anton, Impact, sans-serif; text-transform: uppercase; }
+.tg-spik span { max-width: 20px; overflow: hidden; font: 800 2.9px/1.05 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
+.tg-puffar { display: flex; gap: 1.5px; margin-top: 2px; }
+.tg-puff { flex: 1 1 0; min-width: 0; padding: 1.3px 1.6px 1.1px; background: var(--tg-svart); color: var(--tg-p); }
+.tg-puff.gul { background: #efbf2c; color: var(--tg-svart); }
+.tg-puff b { display: block; font: 400 4.7px/1 Anton, Impact, sans-serif; text-transform: uppercase; white-space: nowrap; }
+.tg-puff span { display: block; overflow: hidden; font: 700 2.7px/1.2 "Helvetica Neue", Arial, sans-serif; white-space: nowrap; text-overflow: ellipsis; }
+
+/* framme: framsidan överst på första arket, som sedeln */
+.tn .tg-forsta { flex: none; }
+
+/* Åtta knep: numret stort i rött, och nummer 5 med en stämpel */
+.tg-knep { margin: 4px 0 0; padding: 0; list-style: none; column-count: 2; column-gap: 18px; column-rule: 1px solid var(--streck); }
+.tg-knep li { position: relative; display: flex; gap: 10px; break-inside: avoid; padding: 8px 0 10px; border-bottom: 1px solid var(--streck); }
+.tg-knep li > b { flex: none; width: 30px; color: var(--rod); font: 400 42px/0.9 Anton, Impact, sans-serif; text-align: center; }
+.tn .tg-knep h4 { margin: 3px 0 4px; font: 400 19px/1.05 Anton, Impact, sans-serif; text-transform: uppercase; }
+.tg-knep p { font: 400 14.5px/1.38 var(--serif); }
+.tg-knep li.fel { padding-right: 6px; background: rgba(239, 191, 44, 0.32); }
+.tg-stampel { display: inline-block; margin-top: 7px; padding: 4px 8px 2px; border: 2.5px solid var(--rod); color: var(--rod); font: 400 16px/1 Anton, Impact, sans-serif; text-transform: uppercase; transform: rotate(-4deg); opacity: 0.88; }
+.tn.smal .tg-knep { column-count: 1; }
+
+/* På pulten (plane 0 i rum.js): mellan Hasses nota och kupongen, med kupongen en bit över sig, i rummets
+   ljus. --tg-vila är läget där den ligger, och guideLyft i rum.js lyfter den därifrån (samma funktioner). */
+#rum-tipsguiden {
+  --tg-vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(-8deg) scale(1);
+  position: absolute; left: 338px; top: 628px; width: 190px; height: 266px;
+  transform: var(--tg-vila); transform-origin: 50% 50%;
+  box-shadow: 0 14px 18px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.35);
+}
+#rum-tipsguiden.uppe { visibility: hidden; }
+#rum-tipsguiden.lyfts { z-index: 4; }
+#rum-tipsguiden .tg-pult { position: relative; display: block; zoom: 1.9; }
+/* ljuset uppifrån och lite skugga mot kanterna, och tidningen buktar en aning vid vecket i mitten */
+#rum-tipsguiden .tg-pult::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0) 47%, rgba(40, 22, 6, 0.16) 50%, rgba(255, 246, 225, 0.08) 51.5%, rgba(0, 0, 0, 0) 55%),
+              linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.22) 70%, rgba(20, 10, 2, 0.34)); }

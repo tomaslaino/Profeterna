@@ -5,8 +5,9 @@
 // När alla matcher i omgången är spelade (och syns: Dölj resultat följs genom
 // tpScore i tippare.js) ligger bara Hasse Backes protokoll på pulten i
 // tobaksaffären, tills nästa kupong kommer måndagen efter kl. 16: en blankett som kupongen, med facit och en spalt för
-// kupongen, var och en i gänget och Hasse. Allas tecken står kvar, och det som satt är överstruket, så att
-// raderna går att läsa utan förklaring. Rätt står överst med hans röda penna, så att det syns också på håll.
+// kupongen, var och en i gänget och Hasse. Allas tecken står kvar på skrivmaskin, och det som satt är överstruket och
+// svartare än det som inte satt, så att raderna går att läsa utan förklaring, också i svartvitt. Kupongens rätt står
+// överst med hans röda penna, så att det syns också på håll.
 // Han har rättat det, och raden Poäng förklarar han om man ropar till honom (protHasse i rum.js), men
 // domarna över gänget säger han i baren (gang här, doma i rum-hasse.js). Ett klick på blocket lyfter det och lägger fram det
 // stort (protokollet i rum.js), och ett klick på löpsedeln i fönstret öppnar tidningen
@@ -396,9 +397,10 @@
   // ---------- blocket ----------
 
   // Blocket är en blankett ur samma tryckeri som kupongen (rum.css, .rum-kup): bandet i terrakotta,
-  // synkmarkeringarna i vänsterkanten, tryckta linjer och varannan rad tonad. Det som skrivits för hand står
-  // aldrig exakt likadant två gånger, och det som satt är överstruket med en grön märkpenna. Slumpen utgår
-  // från omgången, raden och spalten, så att bladet ser likadant ut varje gång det ritas (som i papper.js).
+  // synkmarkeringarna i vänsterkanten, tryckta linjer och varannan rad tonad. Allt ifyllt står på skrivmaskin utom
+  // Hasses röda penna, och det som satt är överstruket med en grön märkpenna. Pennan och märkpennan drar aldrig
+  // exakt likadant två gånger; slumpen utgår från omgången, raden och spalten, så att bladet ser likadant ut varje
+  // gång det ritas (som i papper.js).
   function rng(key) {
     let a = 2166136261;
     for (let i = 0; i < key.length; i++) a = Math.imul(a ^ key.charCodeAt(i), 16777619);
@@ -445,8 +447,7 @@
     return `<svg class="rb-mp" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true" style="opacity:${(0.86 + r() * 0.14).toFixed(2)}"><path d="${d}"/><path class="ned" d="${ned}"/><path class="rand" d="${rand}"/></svg>`;
   }
 
-  // Hasses röda penna: ringen kring vinnaren och kupongens betyg
-  const ROD = '#c8281e';
+  // Hasses röda penna (#c8281e i rum-block.css): ringen kring vinnaren och kupongens betyg.
   // Betygets ring, som kupongens betyg på papperet (ring i papper.js): ett varv och lite till, som inte
   // möts där pennan sattes ned, olika i varje omgång.
   function betygRing(key) {
@@ -488,40 +489,43 @@
     const nyckel = String(sum.id || sum.nr || '');
     // porträtten är fotografier som klistrats upp, vart och ett lite snett
     const foto = (src, key, extra = '') => `<img src="${esc(src)}" alt="" draggable="false" style="${hand(`${nyckel}f${key}`, 0.7)}${extra}">`;
+    // Spalthuvudena: porträtten och namnen på skrivmaskin, som Kupong.
     const huvud = (s) => {
       if (s.id === 'K') {
         // kupongen är gängets: deras tre ansikten
         const lag = sum.folk.filter((p) => p.id !== HASSE && p.bild).map((p) => foto(p.bild, `K${p.id}`)).join('');
-        return `<span class="rb-sp k"><span class="rb-lag">${lag}</span><span class="rb-nm kup" style="${hand(`${nyckel}nK`, 0.5)}">Kupong</span></span>`;
+        return `<span class="rb-sp k"><span class="rb-lag">${lag}</span><span class="rb-nm">Kupong</span></span>`;
       }
       // vinnaren: samma ring som runt poängen, så att det syns redan uppifrån
       const vann = P(s.id) && P(s.id).award === 'best';
-      return `<span class="rb-sp" style="--i:${s.ink}"><span class="rb-bild">${s.bild ? foto(s.bild, s.id) : `<span class="rb-ik" style="background:${s.ink}">${esc(s.namn.charAt(0))}</span>`}${vann ? RING(50, 50) : ''}</span>` +
-        `<span class="rb-nm h${s.hand}" style="${hand(`${nyckel}n${s.id}`, 0.5)}">${esc(s.namn)}</span></span>`;
+      return `<span class="rb-sp"><span class="rb-bild">${s.bild ? foto(s.bild, s.id) : `<span class="rb-ik" style="background:${s.ink}">${esc(s.namn.charAt(0))}</span>`}${vann ? RING(50, 50) : ''}</span>` +
+        `<span class="rb-nm">${esc(s.namn)}</span></span>`;
     };
-    // Allas tecken står kvar i sitt bläck, och det som satt är överstruket.
-    const cell = (r, s, j) => {
+    // Allas tecken står på skrivmaskin i samma svarta färgband, så att spalterna går att läsa rakt ned och jämföra.
+    // Det som satt är överstruket med märkpennan och står i full svärta; det som inte satt står kvar, men svagare
+    // (fel), så att skillnaden syns också utan färg. Är matchen inte avgjord är inget av dem svagare.
+    const cell = (r, s, i, k, j) => {
       const c = r.kol[s.id] || {};
-      const key = `${nyckel}${r.nr}${s.id}`;
-      const tecken = esc(c.t || '');
-      return `<span class="rb-c${j}${c.ok ? ' ratt' : ''}${s.id === 'K' ? ' k' : ''}" style="--i:${s.ink}">${c.ok ? strykning(key, String(c.t).length) : ''}` +
-        (tecken ? `<i style="${hand(key)}">${tecken}</i>` : '') + '</span>';
+      const fel = c.t && !c.ok && r.res != null;
+      return `<span class="rb-c${j}${c.ok ? ' ratt' : ''}${fel ? ' fel' : ''}${s.id === 'K' ? ' k' : ''}" style="font-feature-settings:'${ANSLAG[(i + k + 5) % 7]}'">` +
+        `${c.ok ? strykning(`${nyckel}${r.nr}${s.id}`, String(c.t).length) : ''}${c.t ? `<i>${esc(c.t)}</i>` : ''}</span>`;
     };
     // varannan rad tonad hela vägen över, så att ögat hittar från matchen till var och ens tecken
     const rader = sum.rader.map((r, i) => {
       const j = i % 2 ? ' j' : '';
       return `<span class="rb-m${j}" style="font-feature-settings:'${ANSLAG[i % 7]}'"><u>${r.nr}</u><span>${esc(r.h)} – ${esc(r.b)}</span><em>${esc(r.mal)}</em></span>` +
         `<span class="rb-fa${j}" style="font-feature-settings:'${ANSLAG[(i + 3) % 7]}'">${r.tecken}</span>` +
-        kol.map((s) => cell(r, s, j)).join('');
+        kol.map((s, k) => cell(r, s, i, k, j)).join('');
     }).join('');
-    const rad = (cls, la, varden, farg = (s) => s.ink) => `<span class="rb-su la ${cls}">${la}</span>` + kol.map((s, i) => `<span class="rb-su ${cls}${s.id === 'K' ? ' k' : ''}" style="color:${farg(s)}">` +
-      (varden[i] === '' ? '' : `<i style="${hand(`${nyckel}${cls}${s.id}`, 0.8)}">${varden[i]}</i>`) + '</span>').join('');
+    // summorna på skrivmaskin; bara kupongens betyg är skrivet med pennan
+    const rad = (cls, la, varden) => `<span class="rb-su la ${cls}">${la}</span>` + kol.map((s, i) => `<span class="rb-su ${cls}${s.id === 'K' ? ' k' : ''}">` +
+      (varden[i] === '' ? '' : `<i${s.id === 'K' ? ` style="${hand(`${nyckel}${cls}${s.id}`, 0.8)}"` : ''}>${varden[i]}</i>`) + '</span>').join('');
     // Rätt står överst, direkt under porträtten: det är det man vill se först, och det syns också när bladet
     // ligger på pulten (där nederkanten kan vara utanför bilden). Kupongen är allas, och dess rätt är omgångens
     // betyg: störst, med Hasses röda rättningspenna och inringat, som kupongens betyg på papperet (papper.js).
-    // Var och ens rätt står i det egna bläcket, så att betyget är det enda rödringade på raden.
+    // Var och ens rätt står mindre på skrivmaskin, så att betyget är det enda handskrivna och rödringade på raden.
     const betyg = `<span class="rb-betyg">${sum.kupong.ok}<small>/${sum.kupong.n || sum.n}</small>${betygRing(`${nyckel}betyg`)}</span>`;
-    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? betyg : s.id === 'B' ? (sum.backe.n ? sum.backe.ok : '') : P(s.id).none ? '–' : P(s.id).ok)), (s) => (s.id === 'K' ? ROD : s.ink));
+    const ratt = rad('tot', `Rätt av ${sum.n}`, kol.map((s) => (s.id === 'K' ? betyg : s.id === 'B' ? (sum.backe.n ? sum.backe.ok : '') : P(s.id).none ? '–' : P(s.id).ok)));
     const pts = rad('po', 'Poäng', kol.map((s) => {
       if (s.id === 'K') return '';
       if (s.id === 'B') return sum.backe.n ? poang(sum.backe.pts) : '';
@@ -533,7 +537,7 @@
     const label = `Hasse Backes protokoll: kupongen ${sum.kupong.ok} rätt, ${bakom}`;
     // bandet som på kupongen, och omgångens namn för hand på den tryckta raden under
     const band = `<span class="rb-band"><small>Matchfixarna${sum.nr ? ` · Kupong ${esc(sum.nr)}` : ''}</small><b>Protokoll</b></span>`;
-    const omg = `<span class="rb-omg"><span>Omgång</span><b>${sum.namn ? `<i style="${hand(`${nyckel}omg`, 0.3)}">${esc(sum.namn)}</i>` : ''}</b></span>`;
+    const omg = `<span class="rb-omg"><span>Omgång</span><b>${sum.namn ? esc(sum.namn) : ''}</b></span>`;
     return `<span class="rum-block n${kol.length}${tat ? ' tat' : ''}" style="--n:${kol.length}" role="img" aria-label="${esc(label)}">${band}${omg}` +
       `<span class="rb-g"><span class="rb-sp la">Nr · Match</span><span class="rb-sp la fa">Facit</span>${kol.map(huvud).join('')}${ratt}${rader}${pts}</span></span>`;
   }

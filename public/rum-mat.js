@@ -51,7 +51,7 @@ window.RumMat = (R) => {
     const oy = R.k * 1000 - innerHeight;
     R.px = R.pxHem === undefined ? 0.5 : R.pxHem;
     R.py = 0.5;
-    R.el.querySelector('.rum-stage').style.transform = `translate(${(-ox * R.px).toFixed(1)}px, ${(oy < -1 ? -oy * 0.24 : -oy / 2).toFixed(1)}px) scale(${R.k.toFixed(4)})`;
+    R.el.querySelector('.rum-stage').style.transform = `translate(${(-ox * R.px).toFixed(1)}px, ${(oy < -1 ? R.oy : -oy / 2).toFixed(1)}px) scale(${R.k.toFixed(4)})`;
   };
 
   (async () => {

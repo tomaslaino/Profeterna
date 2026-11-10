@@ -259,6 +259,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   omgången) och *Veckans analys*; efter den *Omgången* (resultaten, rätt rad och siffrorna), *Betygen*,
   *Skrällen* med det ni skrev på kupongen, och Hasse Backes krönika med Tipsligan. Förut fanns den bara efter
   omgången, med betygen, skrällen och två meningar från Hasse (se *Tidningen* under [Tobaksaffären](#tidningen))
+- [x] **Tipsguiden på pulten (2026-11-09, användarens önskemål: "nåt nr av tipsguiden … som man kan plocka upp o
+  läsa"):** tidningens tipsbilaga ligger på pulten mellan Hasses nota och kupongen, med kupongen en bit över sig. Ett
+  klick eller G lyfter den, och den läggs fram som tidningen bakom löpsedeln, med en egen framsida (namnet, veckans
+  nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
+  knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
+  [Tidningen](#tidningen))
 
 ## Publicering
 
@@ -651,6 +657,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Gänget byter plats vid bordet (2026-10-25, användarens önskemål):** var tredje dag
   sitter de på en ny plats, så att var och en får sin tur bakom bordet och på var sida –
   samma för alla som tittar, efter dagen i Stockholm. Se [Tobaksaffären](#tobaksaffären).
+- **Lägre bord i telefonen (2026-11-08, användarens önskemål):** på höjden tog bordet nästan halva
+  skärmen. Nu tar det ungefär en tredjedel, och rummet och ett ritat tak får resten; alla i gänget och
+  hela kupongen syns fortfarande utan att man drar. Se [I telefonen](#i-telefonen).
 - **Tobaksaffären också i telefonen (2026-10-24, användarens önskemål):** rummet står nu i
   alla fönster utom de allra minsta, i telefonen också, och den vanliga förstasidan finns
   kvar som *Vanlig sida*. Scenen fyller höjden, och man ser sig omkring med fingret – scenen
@@ -819,6 +828,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   kupong i den smala formen, och användaren bad om något skrivet på stället: en tryckt skylt *Nästa
   omgång* i bandets färg överst. Skylten är en del av stället och inga ord bredvid det, som beslutet
   nedan säger. Se *Nästa omgång ur kupongstället* under [Kupongen i handen](#kupongen-i-handen).
+- **Ett nummer av Tipsguiden att ta upp (2026-11-09, användarens önskemål):** "Jag vill att det ska ligga nåt nr av
+  tipsguiden på animationssidan nånstans som man kan plocka upp o läsa". Tidningen bakom löpsedeln fanns bara när man
+  klickade på sedeln i fönstret, och mellan omgångarna inte alls. Nu ligger Tipsguiden, tidningens tipsbilaga, på pulten
+  i tobaksaffären, och ett klick tar upp den. Den har ingen text bredvid sig (beslutet nedan): namnet står på tidningen.
+  Hasse Backes rum är oförändrat. Se *Tipsguiden* under [Tidningen](#tidningen).
 - **Inga förklarande ord i tobaksaffären (2026-11-09, användarens beslut):** rummet ska vara
   intuitivt. Guldordet bredvid kupongen på pulten (*Läs protokollet*, *Fyll i resten*, *Följ
   kupongen*) är borta: kupongen och protokollet tas fram med ett klick på dem eller K. Kvar
@@ -850,6 +864,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   samma sak på förstasidans ruta"): under *Alla inne* de omtvistade matcherna med inringade nummer,
   bockarna och var och ens tecken i sin färg. Se *Kupongen i handen*, *Pennan visar vägen*, och
   [Inför uppgörelsen](#inför-uppgörelsen), punkt 1 och 4.
+- **Det syns vem som står till svars (2026-11-09, användarens önskemål):** "Organisera det vi ska
+  diskutera och det som nån ska stå till svars för på ett läckert sätt." Högarna och lappen tar en
+  match i taget, men det syns inte på ett ställe vem som ska svara för vad. En tabell med en rad per
+  match provades men blev drygt 1 100 punkter lång i telefonen, och användaren valde att behålla
+  högarna och lappen och lägga till raden *Till svars* och ringarna. Se *Till svars* under
+  [Inför uppgörelsen](#inför-uppgörelsen), punkt 4.
 - **Expressens löpsedel från VM 94 (2026-11-03, användarens önskemål):** VM 94-affischen med
   fotot från hemkomsten är utbytt mot en mer verklighetstrogen löpsedel, lite solblekt och
   sliten: *JAAAAAAAA! BRONS!* med Tomas foto från Rose Bowl. Den sitter på skivan som de andra.
@@ -1074,6 +1094,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   så att siffrorna går att läsa på håll, varannan rad är tonad hela vägen över och kupongens spalt har en linje mot de
   andras. Under bladet står *Hasse, hur räknas poängen?*, och han svarar från baren som vid anslagstavlan; det som båda
   använder ligger i [public/rum-hasse-svar.js](public/rum-hasse-svar.js). Se *Sammanställningen efter omgången*.
+- **Protokollet på skrivmaskin, tydligt också i svartvitt (2026-11-10, användarens önskemål):** "kan du ordna så att
+  kolumnerna under rubriken där det står kupong, laino etc - där det står X2 osv i olika färger - att de görs om - antingen i en
+  snyggare font så att det blir tydligt eller på något annat sätt", "även för någon som har svart-vit skärm. Det är fortfarande
+  viktigast att kupongpoängen som vi alla delar på (i det här fallet 10/13) blir tydligast!", och om omgångens namn: "Det här kan
+  du f ö också skriva med skrivmaskinstext". Tecknen stod för hand i fem bläck, lite snett, och rätt syntes bara på den gröna
+  märkpennan, som i svartvitt blir nästan osynlig. Nu står allt ifyllt på skrivmaskin i samma svarta färgband – omgångens namn,
+  namnen under porträtten, tecknen, var och ens rätt och poängen – och det som inte satt står ljusgrått, så att det som satt
+  syns i ljushet och inte bara i färg. Var och ens rätt är mindre än förut, så att kupongens *10/13* med rödpennan, inringat,
+  är det enda handskrivna på raden och syns först. Provat i headless Chromium i färg och i gråskala, i den breda och den
+  smala versionen och med sex spalter. Se *Sammanställningen efter omgången*.
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -1677,7 +1707,7 @@ de flesta körningar har inget att göra och anropar inte Claude.
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00, och när
-  supporterpoddarna har gett nya uppgifter (se nedan).
+  supporterpoddarna eller supporterforumen har gett nya uppgifter (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1750,30 +1780,54 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
                                                    tidningen inför omgången får uppgifterna i sitt underlag
 ```
 
-- **Poddarna hittas en gång per lag.** Claude får lagen och svarar med poddarnas namn (ett anrop för alla nya lag,
-  med sökningar på nätet). Namnet slås upp hos Apple Podcasts (`itunes.apple.com/search`), som ger flödets adress,
-  och podden räknas bara om flödet har ett avsnitt de senaste 28 dagarna. Ett påhittat namn faller alltså bort av sig
-  självt. Resultatet sparas i `register.json`; ett lag med podd letas upp igen efter 60 dagar, ett utan efter 7.
-  Poddar vi redan känner står i `kanda` i config/poddar.js.
+- **Poddarna hittas en gång per lag.** Först frågas Apple Podcasts (`itunes.apple.com/search`) efter lagets namn:
+  träffarna som är sport och har ett avsnitt de senaste 28 dagarna är kandidater (`appleKandidater`). Sedan får Claude
+  lagen med kandidaterna under, tio lag per anrop, och väljer supporterpoddarna bland dem eller lägger till en den
+  känner till eller söker fram. En podd räknas bara om flödet lever, så ett påhittat namn faller bort av sig självt.
+  Resultatet sparas i `register.json`; ett lag med podd letas upp igen efter 60 dagar, ett utan efter 7. Poddar vi
+  redan känner står i `kanda` i config/poddar.js. Visar ett avsnitt att podden handlar om en annan klubb (`ratt_klubb`
+  i svaret) tas den bort ur registret.
 - **Veckans avsnitt:** högst sex dagar gammalt och minst tolv minuter långt. Nämner rubriken motståndaren är det
   förhandssnacket och går först, annars det nyaste. Ett nytt avsnitt per lag och natt.
 - **Utskriften:** `curl` hämtar ljudet, `ffmpeg` tar de första 60 minuterna och `whisper-cli` (whisper.cpp, modellen
   `ggml-large-v3-turbo-q5_0`) skriver ut dem, med lagens och spelarnas namn som ledtråd så att de stavas rätt. Ljudet
   tas bort direkt. Ett avsnitt tar 5–10 minuter på iMacen (M1), en hel omgång några timmar.
-- **Det mest intressanta:** Claude får utskriften, ett stycke per minut, och tar ut högst fyra uppgifter som kan ändra
-  hur man ser på matchen – skador som inte är officiella, väntade byten, hur laget egentligen spelar, tränarens
-  ställning, oro i klubben – var och en med slag (*bekräftat*, *hört i podden*, *supportrarnas åsikt*), minut och vikt
-  1–5. Referat, tabelläge och småprat ska inte med, och en tom lista är ett godkänt svar.
-- **Kontrollen:** varje uppgift ska ha ett ordagrant citat på 8–20 ord som går att hitta i utskriften (`citatStar`),
-  annars stryks den. Tipsord stryks också. Citaten trycks inte.
-- **Tidningen** får de bästa uppgifterna per lag (vikt 3 eller mer, högst fyra per lag ur de två senaste avsnitten)
-  under *ur supporterpoddarna* i sitt underlag. Prompten säger att den mest intressanta ska bära notisen, med
-  *enligt supporterpodden …*, och avsnittet står bland källorna. Har det kommit nya uppgifter sedan sidan skrevs
-  skrivs den om vid nästa kontroll (`poddTimmar` i config/tidning.js, högst var sjätte timme).
+- **Uppgifterna:** Claude får utskriften, ett stycke per minut, och tar ut allt som är intressant inför matchen, högst
+  tolv uppgifter per avsnitt. Var och en har ett ämne (*skador och trupp*, *väntad uppställning*, *så spelar laget*,
+  *tränaren och klubben*, *inför matchen*), ett slag (*bekräftat*, *hört i podden*, *supportrarnas åsikt*), minut,
+  vikt 1–5, ett ordagrant citat ur utskriften, citatet på svenska (`sagt`) och vem som säger det (`vem`) när det
+  framgår. Referat, tabelläge och småprat ska inte med, och en tom lista är ett godkänt svar.
+- **Kontrollen:** citatet på 8–30 ord ska gå att hitta i utskriften (`citatStar`), annars stryks uppgiften. Tipsord
+  stryks också. Namnet på den som talar följer bara med om det står i utskriften (`vemStar`); maskinen skiljer inte
+  på rösterna, så oftast står bara poddens namn under citatet.
+- **Informationssidan per match** (användarens önskan 2026-11-10: *längre informationssidor per match som man kan
+  hämta kunskap ur*, med citat och vem som säger det): när uppgifterna för en match har ändrats får Claude båda lagens
+  uppgifter (vikt 3 eller mer, ur lagets tre senaste avsnitt) och redigerar sidan, utan verktyg (`skrivSida`): väljer
+  högst nio punkter per lag, slår ihop det som sägs två gånger, grupperar under ämnena och skriver rubrik och ingress.
+  Varje punkt måste peka på uppgifter som finns (`ur`), och slaget, podden och citatet tas därifrån, inte ur svaret.
+  En text, rubrik eller ingress med tipsord eller tal som inte står i uppgifterna stryks: punkten får då uppgiftens
+  egen text och sidan en rubrik ur mallen. Högst fem citat per lag trycks, de tyngsta punkternas. Går svaret inte att
+  läsa står uppgifterna som de är, grupperade (`sidaUtan`), och sidan redigeras nästa natt. Inga tips.
+- **Ut på sajten:** analysjobbet (scripts/analyser/skriv.mjs, var 15:e minut) lägger sidorna i `data/poddsidor.json`
+  när de har ändrats, utan något anrop till Claude. Tidningen i rummet visar dem under *Supportrarna*, en sida per
+  match (se [Tidningen](#tidningen)).
+- **Notiserna** (*Så mår tipslagen*) får fortfarande de bästa uppgifterna per lag (högst fyra) under *ur
+  supporterpoddarna* i sitt underlag, och den mest intressanta ska bära notisen, med *enligt supporterpodden …*.
+  Har det kommit nya uppgifter sedan sidan skrevs skrivs den om vid nästa kontroll (`poddTimmar` i config/tidning.js,
+  högst var sjätte timme).
+
+```json
+{ "omgang": "…", "uppdaterad": "…", "amnen": { "trupp": "Skador och trupp" },
+  "sidor": [ { "id": "401880745", "nr": 3, "match": "Stockport County – Reading", "lag": ["…", "…"], "rubrik": "…",
+               "ingress": "…", "delar": [ { "lag": "…", "kallor": [ { "podd": "…", "avsnitt": "…", "datum": "…", "adress": "…" } ],
+                 "grupper": [ { "amne": "trupp", "punkter": [ { "t": "…", "s": "b", "podd": ["…"],
+                                "citat": { "sagt": "…", "vem": null, "podd": "…" } } ] } ] } ] } ] }
+```
 
 Allt ligger utanför repot, i `~/Library/Application Support/Matchfixarna/Tidning/`: `register.json`, `omgang.json`
-(omgångens avsnitt och uppgifter), `utskrifter/` (tas bort efter tre veckor) och modellen. Ljudet och utskrifterna
-är andras och läggs aldrig i repot eller på sajten; dit kommer bara tidningens egna meningar och poddens namn.
+(omgångens avsnitt, uppgifter och sidor), `utskrifter/` (tas bort efter tre veckor) och modellen. Ljudet och utskrifterna
+är andras och läggs aldrig i repot eller på sajten; dit kommer tidningens egna meningar, poddens namn och korta citat
+i svensk översättning, med podden som källa.
 Jobbet rör aldrig git och går som allt annat på Claude-kontot, inte med API-nycklar. Loggen:
 `~/Library/Logs/Matchfixarna/poddar.log`. Installera med `scripts/tidning/installera.sh` (kräver
 `brew install whisper-cpp` och modellen i mappen).
@@ -1782,7 +1836,79 @@ Jobbet rör aldrig git och går som allt annat på Claude-kontot, inte med API-n
 node scripts/tidning/poddar.mjs --torrt     vilka avsnitt som skulle skrivas ut
 node scripts/tidning/poddar.mjs --visa      det som är uttaget för omgången
 node scripts/tidning/poddar.mjs --lag "Reading" --mot "Stockport County"     ett lag på prov (prov.json)
+node scripts/tidning/poddar.mjs --prov 401880745,401880747     en påhittad omgång av sajtens matcher (prov.json)
+node scripts/tidning/poddar.mjs --sidor     skriver bara om informationssidorna
 ```
+
+**Provet 2026-11-10**: en påhittad omgång av lördagen den 14 novembers 13 matcher i League One och League Two
+(26 lag, 22 av dem nya), körd två gånger i följd. 19 avsnitt skrevs ut, 179 uppgifter togs ut och 12 av 13 matcher
+fick en sida (Bristol Rovers–Chesterfield blev utan: Rovers podd hade inget avsnitt den veckan och Chesterfields
+handlade inte om laget). Det provet visade och det som ändrades:
+- Ett enda anrop för 22 lag gav ingen podd för nio av dem. Nu får Claude Apples träffar per lag och tio lag per
+  anrop, och de 85 lag som har en känd podd står i `kanda` i config/poddar.js.
+- En podd med rätt namn kan vara fel podd (*Across the Pitch* var japansk, inte Accringtons). `ratt_klubb` i
+  uttaget stryker en sådan ur registret; den raden är borttagen ur `kanda`.
+- Flera poddar i de lägre serierna kommer ungefär en gång i månaden (Barnsley, MK Dons, Rochdale, Bristol Rovers).
+  De lagen står då utan del på sidan, och sidan ställs upp för ett lag.
+- Ingressen ströks för räkneord som *fyra* och *sex* (redaktören räknar ihop spelare). Små räkneord i bokstäver
+  släpps nu; siffror kontrolleras som förut.
+- Rubriken gjorde gammalt till nytt (en tränare som lämnade i juni). Anvisningarna säger nu att bara det som gäller
+  laget och matchen får med, och att gammalt inte får bli nyhet.
+- Namn under citatet kom med i ungefär vart fjärde citat (utskriften skiljer inte på rösterna); annars står podden.
+
+**Supporterforumen** (2026-11-10, användarens önskan: *lägg till det viktigaste forumet för varje lag som den går
+igenom inför tidningssläppet – som källmaterial för info om laget*): samma nattjobb läser, före poddarna, lagets
+viktigaste supporterforum för varje lag i omgången ([src/analyser/forum.mjs](src/analyser/forum.mjs), gränserna,
+forumen och prompterna i [config/forum.js](config/forum.js)). Uppgifterna hamnar bredvid poddarnas: på
+informationssidan och, under *ur supporterforumet*, i tidningens underlag.
+
+```
+omgångens lag → lagets forum (config/forum.js) → tavlan → de bästa trådarna → sista sidan → inläggen → claude -p → omgang.json
+```
+
+- **Forumen:** det viktigaste supporterforumet för vart och ett av de 92 ligalagen som går att läsa, uppslaget och
+  prövat 10 november 2026, står i `kanda`, med tavlan där a-laget diskuteras. 44 lag har ett. De andra 48 står i
+  `utan`: det stora forumet spärrar allt som inte är en webbläsare (RedCafe, Bluemoon, Grand Old Team, VillaTalk,
+  Charlton Life, OTIB, Pompey Chimes, Red Passion, Molineux Mix …), säger nej till AI-assistenter i robots.txt (alla
+  forum hos ProBoards, som The Oatcake och Down At The Mac, och UpTheClarets, Stagsnet och One Boro), är nedlagt eller
+  tyst, eller är byggt så att det inte går att läsa ut (Luton Outlaws, Tigers Talk). Där det största forumet var spärrat
+  står det näst viktigaste, om det lever (Vital Football för Villa, City, Newcastle, Swansea, Wigan m.fl.). Ett lag som
+  varken står i `kanda` eller `utan` (en klubb utanför ligan) letas upp av Claude, åtta lag per anrop, och används
+  bara om läsaren kan läsa tavlan och den har inlägg de senaste 21 dagarna. Registret ligger i `forum.json`.
+- **Läsningen** görs som en vanlig läsare: några sidor per lag och natt, med namnet *Matchfixarna/1.0 (forumlasare)*,
+  och med samma regler i robots.txt som Anthropics användarstyrda läsare (Claude-User). Säger forumet nej till
+  AI-assistenters läsning (Claude-User, ChatGPT-User, Perplexity-User eller `Content-Signal: ai-input=no`) läses det
+  inte alls; spärrar mot AI-träning (ClaudeBot, GPTBot, CCBot) gäller inte, eftersom inget tränas och bara korta
+  översatta citat trycks. En sida som svarar 403, visar Cloudflares kontroll eller kräver inloggning räknas som
+  spärrad, och det görs inga försök att ta sig förbi.
+- **Trådarna:** tavlans trådar i sidans ordning (den senast aktiva först). Tråden om just den här matchen
+  (motståndaren i rubriken) går först, sedan aktiva trådar med en rubrik om laget (skador, uppställning, tränaren,
+  ägarna); biljetter, resor, lekar, tävlingar, poddar, historia och annat stryks, liksom trådar utan inlägg den senaste
+  veckan. Högst fem kandidater läses tills tre har minst två nya inlägg. Läsaren går till trådens sista sida och tar
+  med sidan före om den sista har färre än tolv inlägg.
+- **Inläggen:** läsaren känner igen XenForo (1 och 2), Invision, phpBB (och Forumotion), SMF, vBulletin, MyBB, Vanilla,
+  FansNetwork (som TWTD), The Fishy och Discourse (via dess JSON). Ur varje inlägg tas användarnamnet, tiden och
+  inläggets egen text; citat ur andra inlägg, signaturer och knappar stryks. Bara inlägg från de senaste sju dagarna
+  följer med, högst 1 500 tecken per inlägg och 60 000 per lag.
+- **Uppgifterna:** Claude får inläggen numrerade, med namn och tid, och tar ut allt som är intressant inför matchen,
+  högst tio, med samma ämnen, slag och vikt som poddarnas. Citatet ska stå ordagrant i inlägget (annars stryks
+  uppgiften), och namnet under citatet är användarnamnet på det inlägget, inte Claudes. Har inläggen inte ändrats
+  sedan förra natten görs inget nytt anrop.
+- **Sidan och tidningen:** sidan tar lagets två senaste forumläsningar (utöver de tre senaste poddavsnitten), och
+  redaktören slår ihop det podden och forumet säger båda. Tidningens notiser får den senaste läsningens bästa
+  uppgifter under *ur supporterforumet*, och forumtrådarna räknas som lästa källor.
+
+```
+node scripts/tidning/poddar.mjs --bara-forum                          bara forumen, för omgångens lag
+node scripts/tidning/poddar.mjs --utan-forum                          bara poddarna
+node scripts/tidning/poddar.mjs --lag "Sheffield Wednesday" --mot "Plymouth Argyle" --bara-forum --fil prov-forum.json
+```
+
+**Provet 2026-11-10**: samma påhittade omgång som poddarnas (13 matcher i League One och League Two), med bara
+forumen. 11 av de 26 lagen har ett forum, alla 11 lästes (tre trådar och 12–53 inlägg per lag) och gav 67 uppgifter,
+1–10 per lag, på 13–46 sekunder per lag. 8 sidor skrevs om; där både podden och forumet hade något (Newport, Colchester)
+står de bredvid varandra, och redaktören slog ihop det de båda sa. Inför provet prövades alla 92 lag: av forumen
+agenterna hittade gick 44 att läsa, och läsaren fick ut inlägg med namn och tid ur alla 44.
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -2258,6 +2384,15 @@ under omgången.
    gängets kryss, så att ingen rad flyttar sig medan pennan rör sig. Överst står för hand hur många
    omtvistade matcher som är kvar: *Sex kvar*, *Allt klubbat*, *Inget att prata om*. Det vi är
    eniga om och det klubbade träder tillbaka, men inte det vi är eniga om mot modellen.
+
+   **Till svars** (2026-11-09, `svarRad` och `tillSvars` i samtal.js): lappen tar en match i taget,
+   så överst på papperet, under antalet kvar, står var och en i ett svagt band av sitt bläck med hur
+   många matcher hen har kvar att svara för: *3 till svars*, *Klar*, *Går fri* eller *Inte inne än*.
+   I rutorna är porträttet ringat på det tecken man står till svars för, och de andra porträtten i
+   matchen träder tillbaka tills den är klubbad. Det är samma personer och tecken som frågan på
+   lappen. Ett tryck på ett porträtt, i raden eller överst, lyfter fram hens tips och tonar ner de
+   matcher hen inte svarar för. Raden står inte där när ingen särskild ska svara för något, och inte
+   när ingen match längre går att fylla i.
 
    **Lappen** (`lapp`, `fraga` och `visaLapp` i samtal.js): ett tryck på en match tar fram allt som bara behövs
    när man pratar om den, längst ner på skärmen och ovanpå det som står där, så att inget på
@@ -3724,13 +3859,24 @@ lysröret och hela kupongen med alla rader utan att man drar. Förut fyllde scen
 515 av scenens 1600 punkter fick plats på bredden: en i gänget var utanför bilden och kupongen skars av vid
 rad elva. Nu är förstoringen `max(bredd / 760, höjd / 1330)` (`fit` i rum.js), högst så mycket som fyller
 fönstret, och scenen räcker inte till fönstrets höjd. Därför är `.rum-stage` inte klippt där, och taket
-(`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, lite tak över och mest pult
+(`.rum-tak`) och pulten (`.rum-pult-mer`, resten av träet) fortsätter utanför scenen, mest tak över och lite pult
 under (`pan`); ljuset (`.rum-warm`, `.rum-vign`) och nattens mörker (rum-folk.css) räcker lika långt, och
 medan lysröret tänds täcker `.rum-mork-ut` det som är utanför. Man står vid gänget när man kommer in (`HEM_SMAL`,
 `R.pxHem`, som kameran också vrids från), kupongen ligger under dem (`kupX`) och pingklockan står under
 kupongen, där tummen är. Pennan vilar nedanför raderna i stället för på rad 9–10. Gänget
 är ungefär en fjärdedel mindre på skärmen, och duken har därför färre bildpunkter med samma skärpa (`PR`
 i rum-3d.js, 1,2 i stället för 1,5). Vad det kostar: se *Mätt 2026-11-08* i [Ljuset efter klockan](#ljuset-efter-klockan).
+
+**Bordet på höjden (2026-11-08, användarens önskemål):** pulten tog 45 % av fönstrets höjd, och nedre delen av
+den var tomt trä. Rummet kan inte förstoras utan att någon i gänget hamnar utanför bilden, så scenen står i stället
+längre ner: 60 % av det scenen inte fyller på höjden ligger över den (`TAK_SMAL` i rum.js, förut 24 %), och pulten
+tar ungefär 36 %. Aldrig så långt ner att pingklockan hamnar utanför fönstret (`FOT_SMAL`), så i ett riktigt lågt
+fönster (375 × 553) tar den 42 %. Kupongen ligger förminskad till 80 % med mitten i (640, 819) (`kupLigg`, `kupY`
+och rum.css), så att hela kupongen fortfarande syns utan att man drar; handen och högen räknas från samma mått.
+Protokollet fyller kupongens ruta och är lika stort som förut. Taket som då syns är ritat (`tak` i rum.js): i
+bakväggens plan, så att det sitter ihop med `bg` när kameran vrids, med plattor mot flyktpunkten, lysrörets sken
+som klingar av och högerväggen som fortsätter upp över en list där hyllorna slutar. Färgerna är mätta mot `bg` i
+skarven, och `.rum-warm` räcker lika långt upp, annars syntes den.
 
 Rummet står i alla fönster utom de allra minsta (`Rum.fits`: minst 280 × 260 px), i
 telefonen också. Scenen täcker fönstret som på datorn, också på höjden i telefonen (en tid
@@ -3756,8 +3902,7 @@ svep uppåt eller neråt bladen i lapparna till nästa division.
 
 **Kupongen på höjden** (`.rum.smal`: smalare än 600 px och högre än bred): kupongen på
 pulten, i handen och i högen är smal och hög, 420 × 620 i stället för 660 × 470, som en
-riktig stryktipskupong, med samma mitt så att högen och handen ligger där de ligger (`KUP`
-i rum.js). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
+riktig stryktipskupong (`KUP` i rum.js; på pulten förminskad, se *Bordet på höjden*). Raderna har två våningar – lagen överst, dagen och motiveringen under – och
 rutorna är större (44 × 26). Lagen har de korta namnen (*Tottenham –
 Crystal Palace*, *Southampton – QPR*; `short` i rum.js, där Bristol City, Bristol Rovers och
 Notts County behåller hela namnet och Milton Keynes Dons blir MK Dons), så att de ryms i
@@ -6407,16 +6552,19 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
 nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): en blankett ur
 samma tryckeri som kupongen – samma papper, bandet i terrakotta (*Protokoll*, med kupongens nummer), synkmarkeringarna i
-vänsterkanten, tryckta linjer, varannan rad tonad hela vägen över och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
-en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och spalterna är kupongen (gängets tre
-ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
-bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
-märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
-raden och spalten). Överst, direkt under porträtten, står *Rätt av 13* stort: det ska synas också på håll, när bladet ligger
+vänsterkanten, tryckta linjer, varannan rad tonad hela vägen över och tryckeriets rad längs högerkanten. Allt ifyllt står på
+skrivmaskin utom Hasses röda penna: omgångens namn på en tryckt rad under bandet, resultaten och facit, och spalterna, som är
+kupongen (gängets tre ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton och namnet under.
+Allas tecken står kvar i samma svarta färgband, så att man ser vad var och en spelade och kan läsa spalterna rakt ned;
+det som satt är överstruket med grön märkpenna och står i full svärta, och det som inte satt står ljusgrått. Rätt och fel
+skiljer sig alltså i ljushet och inte bara i färg, så att bladet går att läsa också på en svartvit skärm. Märkpennans drag är
+lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången, raden och spalten).
+Överst, direkt under porträtten, står *Rätt av 13* stort: det ska synas också på håll, när bladet ligger
 på pulten, och där är det bladets nederkant som hamnar utanför bilden (bladet ligger i skala 0,76 på pulten). Kupongen är allas,
 och dess rätt är omgångens betyg, skrivet som kupongens betyg på papperet under Kupong (*10/13* med Hasses röda rättningspenna,
 inringat och lite snett, `betygRing` i rum-block.js som `ring` i papper.js). Det sticker ut åt vänster, in i den tomma delen av
-raden, och är det enda röda på raden: var och ens rätt står i det egna bläcket. Sist står poängen. Vinnaren är inringad, både på
+raden, och är det enda handskrivna och röda på raden: var och ens rätt står mindre på skrivmaskin. Sist står poängen, också på
+skrivmaskin. Vinnaren är inringad, både på
 porträttet och runt poängen; utöver betyget är det de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
@@ -6520,6 +6668,14 @@ rum.js).
   när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
   anfang och utan källhänvisningarna i klamrar, och i en ruta hans tecken, marginalen och motiveringen. Källorna står
   sist.
+- *Supportrarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna* och
+  *Supporterforumen* under [Analyserna](#analyserna)), i kupongens ordning: rubrik och ingress, hemmalaget till
+  vänster och bortalaget till höger med poddarna och forumet de bygger på, och punkterna under sina ämnen. Varje punkt
+  har slaget som stämpel (*Bekräftat* i svart, poddens eller forumets egen uppgift i rött – *Hört i podden*, *Från
+  forumet* eller *Hört bland supportrarna* när båda säger det – och *Supportrarnas åsikt* streckad), och de tyngsta
+  har citatet under, med den som säger det och podden, eller användarnamnet och forumet. Har bara det ena laget något
+  får det hela bredden i två spalter. Slagen förklaras i sidfoten.
+  *I tidningen* pekar på den första av sidorna.
 
 Notiserna och analyserna hämtas när man pekar på eller trycker på löpsedeln, och klicket väntar på dem i högst två och en
 halv sekund. Mellan omgångarna (ingen omgång, bara de närmaste matcherna) finns ingen tidning, och då går kameran fram
@@ -6553,6 +6709,64 @@ Provat i headless Chromium med en påhittad sida (omgången 2026-11-07 ur `data/
 `data/kupong-historik.json` och `data/analyser.json`, och påhittade notiser) i 1440 × 900 och 412 × 915, och
 kantfallen (Hasse vann och kom sist, någon utan kupong, inga porträtt, ingen notis och ingen analys) med Node. Inte
 provat i hela rummet, i Safari eller i en riktig telefon.
+
+#### Tipsguiden
+
+Tidningens tipsbilaga ligger på pulten, på gulnat tidningspapper (2026-11-09, användarens önskemål: "nåt nr av
+tipsguiden … som man kan plocka upp o läsa"). Den ligger mellan Hasse Backes nota och kupongen, under dem båda, lite
+snett och platt i pultens perspektiv som notan (`#rum-tipsguiden` i [public/rum-tidning.css](public/rum-tidning.css),
+`--tg-vila`), så att namnet och rubriken syns i luckan, i datorn och i telefonen. Ett klick, eller G, och den lyfts
+mot en, över kupongen, och läggs fram som tidningen bakom löpsedeln (`tidningen(true, 'guide')` i rum.js), med *Lägg
+tillbaka*, Esc och bakåt som där; då läggs den tillbaka på pulten. Med minskad rörelse läggs den fram direkt. Den som
+har sagt vem den är pekar på den medan den är framme (`tipsguiden` i rum-folk.js).
+
+Framsidan är dess egen och samma på pulten och framme (`forsta` i [public/rum-tidning.js](public/rum-tidning.js),
+100 × 140 som sedeln, förstorad med zoom): namnet *TIPSGUIDEN* i rött, *Nr* och veckan för den första matchen,
+datumet och priset, en rubrik som omgången väljer (*Så tar du hem 13 rätt*, *Allt om helgens 13*, *Här är den säkra
+raden*), kupongens matcher med datorns troligaste tecken, *Spika* för den största favoriten (minst 68 %, inte krysset),
+*Rysaren* för den jämnaste (ingen utgång över 42 %) och en puff för knepen. Inuti står sidorna inför omgången – *Tipset*,
+*Så mår tipslagen*, *Veckans analys* och *Supportrarna*, samma som i tidningen – och sist *Åtta knep* (*Så blir du rik på tipset*:
+kvällstidningens råd, och nummer 5, *Tippa inte med hjärtat*, med stämpeln *Här gör alla fel*), som alltid finns.
+Texterna står i `TEXT.guide` och `TEXT.knep` och kollas av `npm run repliker`.
+
+Numret gäller omgången som rummet visar (`guideUpplaga` i rum.js), också när den är spelad: det gamla numret ligger kvar
+tills nästa kupong kommer. Mellan omgångarna är det numret för den senaste kupongen, och utan någon kupong står knepen
+på framsidan. Det är daterat dagen före den första matchen, eller idag om den dagen inte har kommit än. Notiserna,
+supporterpoddarnas sidor och analyserna hämtas när man pekar på eller trycker på tidningen, som på löpsedeln.
+
+Provat i headless Chrome med det lokala bygget (omgången 2026-11-07, spelad) i 1440 × 900, 1920 × 1080 och 390 × 844:
+tidningen syns på pulten, ett klick träffar den, den lyfts över protokollet och läggs fram med alla sidor, och Esc lägger
+tillbaka den. *Så mår tipslagen* med en påhittad `data/tidning.json`, och framsidan utan matcher med Node. Inte provat
+i Safari eller i en riktig telefon.
+
+#### Helgarderat
+
+Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Ett utkast
+ligger på sajten som en egen sida, [matchfixarna.se/helgarderat.html](https://matchfixarna.se/helgarderat.html)
+("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"). Var namnet ska stå i
+rummet, på hela tidningen bakom löpsedeln, bara på poddsidorna eller på en egen tidning, är inte bestämt, så rummet är
+orört. Sidan har noindex och ingen länk från resten av sajten.
+
+Utkastet har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)): tidningspapper med tryck i svart och
+flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2, alla ikryssade med kulspetspenna. Priset
+är 3 kr, tre rader. Framsidan har en stämpel, *Provnummer*, och ettan och tvåan är matcherna med flest uppgifter, helst
+där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har ett stort citat, helst
+om truppen och med ett namn. Bredvid står *Lördagens matcher* med sidnumren och under *Hört bland supportrarna*, med en
+egen uppgift (slaget h) ur var och en av tre andra matcher. Sedan kommer en sida per match med lagen bredvid varandra,
+uppgifterna under sina ämnen, stämplarna och citaten. Har bara det ena laget något får det hela bredden i två spalter.
+Baksidan har källorna per match, med länkar till avsnitten och forumtrådarna, och stämplarna. Texterna för slagen,
+ämnena och förklaringarna kommer från `RumTidning.TEXT.poddar`, så att det står samma sak i båda tidningarna. Under
+720 px är allt en spalt.
+
+Innehållet är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov-omgang-forum.json`, tolv matcher i League
+One och Two den 14 november). Den ligger i [public/helgarderat/utkast.json](public/helgarderat/utkast.json) och är
+uttagen med `poddsidor` i src/analyser/poddar.mjs, samma uttag som `data/poddsidor.json`, så att varken utskrifterna
+eller de engelska citaten följer med. Numren är 1–12 i kupongens ordning, utan luckan efter matchen som saknade sida.
+
+Provat med en provserver (public/ ur arbetskopian och resten från matchfixarna.se) i webbläsarpanelen, i 1280 × 900 och
+375 × 812, och med huvudlös Chrome i 1280 bredd: framsidan, en sida där båda lagen har något, en där bara det ena har
+det (Wigan–Barnsley), baksidan och att inget sticker ut åt sidan i telefonen. Inte provat i Safari eller i en riktig
+telefon.
 
 ### Närbilderna
 

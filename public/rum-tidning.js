@@ -8,9 +8,11 @@
 // tidningens namn och datumet i huvudet som i en riktig tidning. Vad som står i den beror på omgången:
 //
 //   inför omgången   Tipset (omgångens matcher med avsparken, datorns procent och Sixten Bråvalls tecken,
-//                    och Tipsligan), Så mår tipslagen (notiserna ur data/tidning.json, skrivna på iMacen)
-//                    och Veckans analys (Sixtens artikel om matchen som löpsedeln handlar om, annars den
-//                    jämnaste, ur data/analyser.json).
+//                    och Tipsligan), Så mår tipslagen (notiserna ur data/tidning.json, skrivna på iMacen),
+//                    Veckans analys (Sixtens artikel om matchen som löpsedeln handlar om, annars den
+//                    jämnaste, ur data/analyser.json) och Supportrarna: en informationssida per
+//                    match med det intressanta ur lagens supporterpoddar och forum (data/poddsidor.json),
+//                    grupperat efter ämne, med slag, podd och citat.
 //   efter omgången   Omgången (resultaten, rätt rad och siffrorna), Betygen, Skrällen och citaten (det ni
 //                    skrev på kupongen, med facit under) och Hasse Backes krönika med Tipsligan efteråt.
 //
@@ -21,8 +23,16 @@
 // RumTidning.html(upplaga) → html för sidorna under sedeln. upplaga:
 //   { tid: 'sb'|'ex', datum, nr, namn, namnAv(id, namn),
 //     efter: sammanställningen (RumBlock.bygg) eller null, citat: { notes, efter } (Samtal.pult.gang()),
-//     liga: { fore: [...], efter: [...], omg } (Tippoang.season), matcher, notiser, analys }
+//     liga: { fore: [...], efter: [...], omg } (Tippoang.season), matcher, notiser, analys,
+//     poddsidor: { amnen, sidor } }
 // RumTidning.rastrera(rot) ritar porträtten på sina dukar, svartvita och rastrerade.
+//
+// Tipsguiden är tidningens tipsbilaga, och ett nummer ligger på pulten i tobaksaffären (tipsguiden i rum.js):
+// ett klick tar upp det och lägger fram det som tidningen. Framsidan är dess egen (forsta, 100 × 140 som
+// sedeln, samma på pulten och i handen), och sidorna är de inför omgången – Tipset, Så mår tipslagen, Veckans
+// analys och Supportrarna – och Åtta knep, som alltid finns.
+// RumTidning.guide(upplaga) → { forsta, inne, blad, sidor }, med samma upplaga som före omgången.
+// RumTidning.forsta(upplaga) → framsidan.
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -63,7 +73,7 @@
   const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
   const fTid = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
   const avspark = (t) => (Number.isFinite(Date.parse(t)) ? `${fDag.format(new Date(t)).replace('.', '')} ${fTid.format(new Date(t)).replace(':', '.')}` : '');
-  const NAMN = { sb: 'Sportbladet', ex: 'Expressen' };
+  const NAMN = { sb: 'Sportbladet', ex: 'Expressen', tg: 'Tipsguiden' };
 
   // ---------- texterna ----------
   // Tidningens egen röst är kvällstidningens, torr och saklig. Krönikan är Hasse Backes: han har alltid
@@ -73,14 +83,48 @@
       tipset: 'Tipset',
       notiser: 'Så mår tipslagen',
       analys: 'Veckans analys',
+      poddar: 'Supportrarna',
       omgangen: 'Omgången',
       betygen: 'Betygen',
       skrallen: 'Skrällen',
       kronikan: 'Krönikan',
+      knep: 'Åtta knep',
+    },
+    // Tipsguidens framsida: rubriken och raden under väljs av omgången, Rysaren är den jämnaste matchen
+    // och Spika den största favoriten.
+    guide: {
+      rubrik: [
+        ['Så tar du hem', '13 rätt'],
+        ['Allt om', 'helgens 13'],
+        ['Här är den', 'säkra raden'],
+      ],
+      under: ['Experterna avslöjar allt', 'Datorn, notiserna och Sixten', 'Nästan i alla fall'],
+      kupongen: 'Kupongen',
+      datorn: 'Datorn',
+      nr: (n) => `Nr ${n}`,
+      pris: '15 kr',
+      rysaren: 'Rysaren',
+      spika: 'Spika',
+      knep: ['8 enkla knep', 'Femman gör alla fel'],
+    },
+    knep: {
+      rubrik: 'Så blir du rik på tipset',
+      ingress: 'Åtta enkla knep. Nummer 5 gör alla fel.',
+      lista: [
+        ['Spika inte allt', 'Tretton favoriter låter som en säker rad, men de vinner nästan aldrig alla på samma lördag.'],
+        ['Gardera det jämna', 'Där ingen utgång har mer än fyra chanser på tio är en gardering billigare än ett tecken man ångrar.'],
+        ['Formen före tabellen', 'Ett lag som har vunnit fyra raka bryr sig inte om var det står i tabellen.'],
+        ['Hemmaplan är värd något', 'Särskilt i regn, i november och längre ner i divisionerna.'],
+        ['Tippa inte med hjärtat', 'Ditt eget lag ska ha det tecken det förtjänar, inte det du önskar dig.'],
+        ['Läs notiserna', 'En skadad målvakt syns inte alltid i oddsen, men den står i lokaltidningen.'],
+        ['Lämna in i tid', 'Spelstoppet väntar inte på någon, och en kupong i fickan har aldrig vunnit något.'],
+        ['Lyssna inte på experterna', 'Inte ens på oss.'],
+      ],
+      stampel: 'Här gör alla fel',
     },
     tipset: {
       rubrik: 'Omgångens matcher',
-      datorn: 'Datorn',
+      datorn: 'med datorns tecken',
       experten: 'Sixten',
       ingetTecken: 'Sixten Bråvall har inte tippat den här matchen än.',
     },
@@ -93,6 +137,24 @@
     },
     analys: {
       tipset: 'Sixtens tips',
+    },
+    poddar: {
+      slag: { b: 'Bekräftat', h: 'Hört i podden', o: 'Supportrarnas åsikt' },
+      // Slaget h är källans egen uppgift: poddens, forumets eller båda.
+      egen: { podd: 'Hört i podden', forum: 'Från forumet', blandat: 'Hört bland supportrarna' },
+      amnen: { trupp: 'Skador och trupp', elva: 'Väntad uppställning', spel: 'Så spelar laget', klubb: 'Tränaren och klubben', match: 'Inför matchen' },
+      rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
+      ur: (l) => `Ur ${l}`,
+      ingen: 'Ingen supporterpodd eller forum att hämta något ur den här veckan.',
+      forumet: (n) => `forumet ${n}`,
+      forklaring: {
+        b: 'podden eller forumet återger något som klubben, tränaren eller en spelare har sagt, eller något som har hänt.',
+        podd: 'poddens egna uppgifter, intryck från läktaren och rykten.',
+        forum: 'det supportrarna på forumet själva har sett och hört, och rykten.',
+        blandat: 'det podden och forumet båda tar upp: egna uppgifter och rykten.',
+        o: 'vad de som följer laget varje vecka tycker och hoppas.',
+      },
+      citaten: 'Citaten är översatta från engelska.',
     },
     omgangen: {
       rubrik: 'Resultaten',
@@ -317,6 +379,52 @@
     };
   }
 
+  // Supporterpoddarna: en informationssida per match (data/poddsidor.json, skrivna på iMacen av
+  // scripts/tidning/poddar.mjs). Hemmalaget till vänster och bortalaget till höger, uppgifterna under
+  // sina ämnen, var och en med slaget som stämpel och, för de tyngsta, vad som sades och av vem.
+  const fKort = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', day: 'numeric', month: 'short' });
+  const kortDatum = (d) => (Number.isFinite(Date.parse(d)) ? fKort.format(new Date(d)).replace('.', '') : '');
+  // "The Tilehurst End - A Reading FC Podcast" → "The Tilehurst End"
+  const poddNamn = (n) => String(n || '').split(/\s+[-–|:]\s+/)[0].trim() || String(n || '');
+  function poddar(u) {
+    const ps = u.poddsidor;
+    const l = ((ps && ps.sidor) || []).filter((x) => x && Array.isArray(x.delar) && x.delar.some((d) => d && (d.grupper || []).length));
+    if (!l.length) return null;
+    const T = TEXT.poddar;
+    const amne = (a) => T.amnen[a] || (ps.amnen && ps.amnen[a]) || T.amnen.match;
+    const match = (x) => (u.matcher || []).find((m) => String(m.id) === String(x.id));
+    const nr = (x) => (match(x) ? match(x).nr : x.nr);
+    const stampel = (k, typ = 'podd') => { const kk = T.slag[k] ? k : 'h'; return `<i class="tn-slag s-${kk}">${esc(kk === 'h' ? (T.egen[typ] || T.slag.h) : T.slag[kk])}</i>`; };
+    return l.slice().sort((a, b) => nr(a) - nr(b)).map((x) => {
+      const m = match(x);
+      const namn = m ? [m.h, m.b] : (x.lag || []);
+      const delar = x.delar.map((d, i) => {
+        const kallor0 = (d.kallor || []).filter((k) => k && k.podd);
+        // Forumet läses varje natt: det står en gång, med den senaste läsningens datum.
+        const kallor = kallor0.filter((k, i) => k.typ !== 'forum' || kallor0.findIndex((x) => x.typ === 'forum' && x.podd === k.podd) === i);
+        const flera = new Set(kallor.map((k) => k.podd)).size > 1;
+        const ur = kallor.length ? T.ur(lista(kallor.map((k) => `${k.typ === 'forum' ? T.forumet(k.podd) : poddNamn(k.podd)}${kortDatum(k.datum) ? ` (${kortDatum(k.datum)})` : ''}`))) : '';
+        const grupper = (d.grupper || []).map((g) => `<div class="tn-pod-grupp"><h5>${esc(amne(g.amne))}</h5>${(g.punkter || []).filter((p) => p && p.t).map((p) => {
+          const c = p.citat && p.citat.sagt ? p.citat : null;
+          const vem = c ? (c.vem ? `${c.vem}, ${poddNamn(c.podd)}` : poddNamn(c.podd)) : '';
+          return `<div class="tn-pod-punkt">${stampel(p.s, p.typ)}${flera && (p.podd || []).length ? `<small>${esc(lista(p.podd.map(poddNamn)))}</small>` : ''}<p>${esc(hel(p.t))}</p>` +
+            (c ? `<blockquote><p>”${esc(hel(c.sagt))}”</p>${vem ? `<cite>${esc(vem)}</cite>` : ''}</blockquote>` : '') + '</div>';
+        }).join('')}</div>`).join('');
+        return `<section class="tn-pod-lag${grupper ? '' : ' tom'}"><h4>${esc(namn[i] || d.lag || '')}</h4>${ur ? `<p class="tn-kalla">${esc(ur)}</p>` : ''}${grupper || `<p class="tn-pod-ingen">${esc(T.ingen)}</p>`}</section>`;
+      }).join('');
+      const harCitat = x.delar.some((d) => (d.grupper || []).some((g) => (g.punkter || []).some((p) => p.citat)));
+      // Förklaringen till stämplarna: en för varje slags egen uppgift som står på sidan.
+      const typer = new Set(x.delar.flatMap((d) => (d.grupper || []).flatMap((g) => (g.punkter || []).filter((p) => p.s === 'h').map((p) => p.typ || 'podd'))));
+      const egna = ['podd', 'forum', 'blandat'].filter((t) => typer.has(t));
+      const fot = `<p class="tn-pod-fot">${[['b', 'podd'], ...(egna.length ? egna : ['podd']).map((t) => ['h', t]), ['o', 'podd']].map(([k, t]) => `${stampel(k, t)} ${esc(T.forklaring[k === 'h' ? t : k])}`).join(' ')}${harCitat ? ` ${esc(T.citaten)}` : ''}</p>`;
+      return {
+        namn: TEXT.sidor.poddar,
+        html: vinjett(TEXT.sidor.poddar, `${nr(x) ? `${nr(x)} · ` : ''}${namn.join('–')}`) + `<h3 class="tn-rub stor">${esc(x.rubrik || T.rubrik(namn[0], namn[1]))}</h3>` +
+          (x.ingress ? `<p class="tn-ingress fet">${esc(hel(x.ingress))}</p>` : '') + `<div class="tn-pod${x.delar.filter((d) => (d.grupper || []).length).length < 2 ? ' en' : ''}">${delar}</div>${fot}`,
+      };
+    });
+  }
+
   // ---------- efter omgången ----------
 
   // De som tippade, och var och ens plats i omgången (lika poäng och rätt ger samma plats).
@@ -509,13 +617,75 @@
     };
   }
 
+  // ---------- Tipsguiden ----------
+
+  // Veckans nummer (ISO-veckan) för tiden t, i Stockholm.
+  const fYmd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
+  function vecka(t) {
+    const [y, m, d] = fYmd.format(new Date(t)).split('-').map(Number);
+    const dag = new Date(Date.UTC(y, m - 1, d));
+    dag.setUTCDate(d + 4 - (dag.getUTCDay() || 7));
+    return Math.ceil(((dag - Date.UTC(dag.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7);
+  }
+  // Det troligaste tecknet enligt datorn, och hur troligt det är.
+  const troligast = (p) => {
+    if (!p) return null;
+    const max = Math.max(...p);
+    return { tecken: SIGNS[p.indexOf(max)], max };
+  };
+
+  // Framsidan, 100 × 140 som löpsedeln (zoom i rum.js): namnet, numret och datumet, en rubrik, kupongens
+  // matcher med datorns tecken (först på raden, så att Spika inte skymmer dem), och puffarna. Samma på pulten och när den är framme.
+  function forsta(u0) {
+    const u = { ...u0 };
+    const G = TEXT.guide;
+    const m = u.matcher || [];
+    const nyckel0 = u.id || m.map((x) => x.id).join(',');
+    const i = frö(`${nyckel0}tg`) % G.rubrik.length;
+    const [r1, r2] = G.rubrik[i];
+    const forst = Math.min(...m.map((x) => Date.parse(x.avspark)).filter(Number.isFinite));
+    const nr = Number.isFinite(forst) ? vecka(forst) : Number.isFinite(u.datum) ? vecka(u.datum) : null;
+    const dag = Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '';
+    const rader = m.map((x) => {
+      const t = troligast(x.pr);
+      return `<li><b>${x.nr}</b><i>${t ? t.tecken : ''}</i><span>${matchNamn(x.h, x.b)}</span></li>`;
+    }).join('');
+    const med = m.map((x) => ({ x, t: troligast(x.pr) })).filter((y) => y.t);
+    const jamn = med.filter((y) => y.t.max <= 42).sort((a, b) => a.t.max - b.t.max)[0];
+    const fav = med.filter((y) => y.t.max >= 68 && y.t.tecken !== 'X').sort((a, b) => b.t.max - a.t.max)[0];
+    const puff = (kick, text, kl = '') => `<span class="tg-puff${kl ? ` ${kl}` : ''}"><b>${esc(kick)}</b><span>${esc(text)}</span></span>`;
+    const puffar = [
+      jamn ? puff(G.rysaren, `${jamn.x.h}–${jamn.x.b}`) : '',
+      puff(G.knep[0], G.knep[1], 'gul'),
+    ].join('');
+    const spik = fav ? `<span class="tg-spik"><b>${esc(G.spika)}</b><span>${esc(fav.t.tecken === '1' ? fav.x.h : fav.x.b)}!</span></span>` : '';
+    return `<div class="tg-forsta" aria-label="Tipsguiden${nr ? ` nr ${nr}` : ''}"><div class="tg-namn"><b>TIPSGUIDEN</b></div>` +
+      `<div class="tg-linje"><b>${nr ? esc(G.nr(nr)) : ''}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
+      `<h2 class="tg-rub"><b>${esc(r1)}</b><b class="rod">${esc(r2)}</b></h2><p class="tg-under">${esc(G.under[i % G.under.length])}</p>` +
+      (rader ? `<div class="tg-kup"><p><b>${esc(G.kupongen.toUpperCase())}</b><span>${esc(G.datorn)}</span></p><ol>${rader}</ol>${spik}</div>` +
+        `<div class="tg-puffar">${puffar}</div>`
+        // utan kupong: knepen på framsidan
+        : `<div class="tg-kup"><p><b>${esc(TEXT.knep.rubrik.toUpperCase())}</b></p><ol>${TEXT.knep.lista.map(([t], n) => `<li><b>${n + 1}</b><span>${esc(t)}</span></li>`).join('')}</ol></div>`) +
+      '</div>';
+  }
+
+  // Åtta knep, som alltid står i Tipsguiden: kvällstidningens råd, och nummer 5 är det alla gör fel.
+  function knep() {
+    const K = TEXT.knep;
+    const rader = K.lista.map(([t, s], i) => `<li${i === 4 ? ' class="fel"' : ''}><b>${i + 1}</b><div><h4>${esc(t)}</h4><p>${esc(s)}</p>` +
+      `${i === 4 ? `<span class="tg-stampel">${esc(K.stampel)}</span>` : ''}</div></li>`).join('');
+    return {
+      namn: TEXT.sidor.knep,
+      html: vinjett(TEXT.sidor.knep) + rubrik(K.rubrik, 'stor') + `<p class="tn-ingress">${esc(K.ingress)}</p><ol class="tg-knep">${rader}</ol>`,
+    };
+  }
+
   // ---------- tidningen ----------
 
-  // → { html, sidor: [namn] }: sidorna under sedeln, och innehållet som står under den.
-  function html(u0) {
-    const u = { namnAv: (id, n) => n, ...u0 };
-    u.datumText = u.datumText || (Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '');
-    const sidor = (u.efter ? [omgangen, betygen, skrallen, kronikan] : [tipset, notiser, analys]).map((f) => {
+  // Sidorna ur listan, med sidnummer från 2 (framsidan är 1). En avdelning kan vara flera sidor: supporterpoddarna
+  // har en per match. → { inne, blad, sidor } eller null
+  function sidorna(u, lista) {
+    const sidor = lista.flatMap((f) => {
       try {
         return f(u);
       } catch (e) {
@@ -524,9 +694,26 @@
       }
     }).filter(Boolean);
     if (!sidor.length) return null;
-    const inne = `<nav class="tn-inne" aria-label="I tidningen"><b>I TIDNINGEN</b>${sidor.map((s, i) => `<button type="button" data-sida="${i + 2}"><span>${esc(s.namn)}</span><i>${i + 2}</i></button>`).join('')}</nav>`;
+    // I tidningen: avdelningens första sida
+    const inne = `<nav class="tn-inne" aria-label="I tidningen"><b>I TIDNINGEN</b>${sidor.map((s, i) => (i && sidor[i - 1].namn === s.namn ? '' : `<button type="button" data-sida="${i + 2}"><span>${esc(s.namn)}</span><i>${i + 2}</i></button>`)).join('')}</nav>`;
     const blad = sidor.map((s, i) => `<section class="tn-ark tn-sida" id="tn-sida-${i + 2}" aria-label="Sidan ${i + 2}: ${esc(s.namn)}">${folio(u, i + 2)}${s.html}</section>`).join('');
     return { inne, blad, sidor: sidor.map((s) => s.namn) };
+  }
+  const forbered = (u0) => {
+    const u = { namnAv: (id, n) => n, ...u0 };
+    u.datumText = u.datumText || (Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '');
+    return u;
+  };
+  // → { inne, blad, sidor: [namn] }: sidorna under sedeln, och innehållet som står under den.
+  function html(u0) {
+    const u = forbered(u0);
+    return sidorna(u, u.efter ? [omgangen, betygen, skrallen, kronikan] : [tipset, notiser, analys, poddar]);
+  }
+  // Tipsguiden: framsidan och sidorna inför omgången, och Åtta knep sist (finns alltid).
+  // → { forsta, inne, blad, sidor }
+  function guide(u0) {
+    const u = forbered({ ...u0, tid: 'tg', efter: null });
+    return { ...sidorna(u, [tipset, notiser, analys, poddar, knep]), forsta: forsta(u) };
   }
 
   // Tidningsbilderna: svartvita och rastrerade, ritade en gång på dukar (CSS-blandning kostar i telefonen).
@@ -588,5 +775,5 @@
     }
   }
 
-  return { html, rastrera, kronika, skrall, citaten, omdome, TEXT };
+  return { html, guide, forsta, rastrera, kronika, skrall, citaten, omdome, poddNamn, TEXT };
 });

@@ -4,16 +4,18 @@
 //
 // Ljudet och utskrifterna stannar i mappen utanför repot. Varje uppgift måste ha ett
 // ordagrant citat som går att hitta i utskriften, annars stryks den: det är samma tanke som
-// analysernas kontroller, att inget får komma ur minnet.
+// analysernas kontroller, att inget får komma ur minnet. Uppgifterna samlas sedan till en
+// informationssida per match (skrivSida), grupperad efter ämne, med slag, podd och citat.
 
 import { execFile } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import pc from '../../config/poddar.js';
+import fc from '../../config/forum.js';
 import newsCfg from '../../config/news.js';
-import { jsonOf } from './kontroller.mjs';
-import { claudeSvar } from './claude.mjs';
+import { jsonOf, unknownNumbers } from './kontroller.mjs';
+import { claudeSvar, Stopp } from './claude.mjs';
 
 const DAG = 86400000;
 const UA = 'Matchfixarna/1.0 (poddlasare)';
@@ -106,12 +108,40 @@ export async function sokPodd(namn, opts = {}) {
   return traff ? { namn: traff.collectionName, flode: traff.feedUrl, apple: traff.collectionViewUrl || null } : null;
 }
 
-// Frågar Claude efter poddarnas namn för lagen. → {lag: [namn, …]}
-export async function fragaEfterPoddar(lagen, { claude = claudeSvar } = {}) {
+const vanta = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+// Poddarna som Apple Podcasts hittar på lagets namn och som lever: kandidaterna som Claude
+// väljer bland (fragaEfterPoddar). Apple tål ungefär tjugo sökningar i minuten, därav pausen.
+// → [{namn, av, flode, apple, senast}]
+export async function appleKandidater(lag, { now = Date.now(), paus = 3200, ...opts } = {}) {
+  const ut = new Map();
+  for (const term of [`${lag} podcast`, `${lag} fc`]) {
+    let j = null;
+    for (let i = 0; i < 2 && !j; i++) {
+      try {
+        j = JSON.parse(await hamtaText(`https://itunes.apple.com/search?media=podcast&entity=podcast&country=gb&limit=12&term=${encodeURIComponent(term)}`, opts));
+      } catch { await vanta(paus * 4); }
+    }
+    await vanta(paus);
+    for (const r of (j && j.results) || []) {
+      const sport = [r.primaryGenreName, ...(r.genres || [])].some((g) => /sport|soccer|football/i.test(String(g)));
+      const senast = Date.parse(r.releaseDate || '');
+      if (!r.feedUrl || !sport || !(now - senast < pc.levandeDagar * DAG) || ut.has(r.feedUrl)) continue;
+      ut.set(r.feedUrl, { namn: r.collectionName, av: r.artistName || null, flode: r.feedUrl, apple: r.collectionViewUrl || null, senast: new Date(senast).toISOString().slice(0, 10) });
+    }
+    if (ut.size >= 3) break;
+  }
+  return [...ut.values()].slice(0, 8);
+}
+
+// Frågar Claude efter poddarnas namn för lagen. kandidater: {lag: [{namn, av, senast}]} ur
+// appleKandidater. → {lag: [namn, …]}
+export async function fragaEfterPoddar(lagen, { claude = claudeSvar, kandidater = {} } = {}) {
+  const rad = (l) => `- ${l}${(kandidater[l] || []).length ? `\n${kandidater[l].map((k) => `    · ${k.namn}${k.av ? ` (av ${k.av})` : ''}, senaste avsnitt ${k.senast}`).join('\n')}` : '\n    (inga träffar hos Apple Podcasts)'}`;
   const r = await claude({
     system: pc.letaPrompt.replace('{sokningar}', pc.sokningar),
-    prompt: `Klubbarna:\n${lagen.map((l) => `- ${l}`).join('\n')}`,
-    tools: ['WebSearch'], model: pc.model, effort: 'low', timeoutMs: pc.timeoutMs,
+    prompt: `Klubbarna, och under var och en poddarna som Apple Podcasts hittar på klubbens namn:\n${lagen.map(rad).join('\n')}`,
+    tools: ['WebSearch'], model: pc.model, effort: pc.letaEffort, timeoutMs: pc.timeoutMs,
   });
   const j = jsonOf(r.content);
   const ut = {};
@@ -122,13 +152,15 @@ export async function fragaEfterPoddar(lagen, { claude = claudeSvar } = {}) {
   return ut;
 }
 
-// Poddarna med ett flöde som lever, av namnen. → [{namn, flode, apple}]
-export async function levandePoddar(namnLista, { now = Date.now(), logg = () => {}, ...opts } = {}) {
+// Poddarna med ett flöde som lever, av namnen. kandidater: lagets träffar hos Apple
+// (appleKandidater); står namnet där behövs ingen ny sökning. → [{namn, flode, apple}]
+export async function levandePoddar(namnLista, { now = Date.now(), logg = () => {}, kandidater = [], ...opts } = {}) {
   const ut = [];
   for (const namn of namnLista) {
     if (ut.length >= pc.poddarPerLag) break;
     try {
-      const p = await sokPodd(namn, opts);
+      const k = kandidater.find((x) => ren(x.namn) === ren(namn));
+      const p = k ? { namn: k.namn, flode: k.flode, apple: k.apple } : await sokPodd(namn, opts);
       if (!p) { logg(`  ${namn}: finns inte hos Apple Podcasts`); continue; }
       if (ut.some((x) => x.flode === p.flode)) continue;
       const f = await hamtaFlode(p.flode, opts);
@@ -142,9 +174,11 @@ export async function levandePoddar(namnLista, { now = Date.now(), logg = () => 
   return ut;
 }
 
-// Ska laget letas upp (igen)? post: registrets rad för laget.
-export function skaLetas(post, now = Date.now()) {
+// Ska laget letas upp (igen)? post: registrets rad för laget. kanda: lagets poddar i
+// config/poddar.js; har de ändrats sedan raden skrevs gäller de nya genast.
+export function skaLetas(post, now = Date.now(), kanda = null) {
   if (!post || !post.kollad) return true;
+  if (kanda && JSON.stringify(kanda) !== JSON.stringify(post.kanda || null)) return true;
   const dagar = (post.poddar || []).length ? pc.letaOmDagar.med : pc.letaOmDagar.utan;
   return now - Date.parse(post.kollad) > dagar * DAG;
 }
@@ -250,10 +284,20 @@ export function citatStar(citat, utskrift) {
   return false;
 }
 
-const TIPS_RE = /\b(spik\w*|\w*gardera\w*|\w*gardering\w*|odds\w*)\b/i;
+const TIPS_RE = /\b(spik\w*|\w*gardera\w*|\w*gardering\w*|odds\w*|favorit(?:en|er|erna)?|skräll\w*)\b/i;
+const antalOrd = (s) => String(s || '').split(/\s+/).filter(Boolean).length;
+const AMNEN = Object.keys(pc.amnen);
+
+// Står namnet i utskriften? Förnamnet räcker (maskinen stavar efternamn hur som helst).
+export function vemStar(vem, utskrift) {
+  const n = ordAv(vem).filter((o) => o.length >= 3);
+  if (!n.length || n.length > 4) return false;
+  return ` ${ordAv(String(utskrift).replace(/\[\d+\]/g, ' ')).join(' ')} `.includes(` ${n[0]} `);
+}
 
 // Claudes svar → uppgifterna som håller: rätt form, citatet står i utskriften, inga tips.
-// → {handlarOm, uppgifter: [{t, s, min, vikt, citat}], strukna}
+// Citatet på svenska (sagt) och vem som säger det följer med när de håller.
+// → {handlarOm, uppgifter: [{a, t, s, min, vikt, citat, sagt, vem}], strukna}
 export function uppgifterAv(content, utskrift) {
   let j;
   try { j = jsonOf(content); } catch { return null; }
@@ -263,16 +307,21 @@ export function uppgifterAv(content, utskrift) {
   for (const x of j.uppgifter) {
     const t = x && typeof x.t === 'string' ? x.t.trim() : '';
     const s = x && ['b', 'h', 'o'].includes(x.s) ? x.s : 'h';
+    const a = x && AMNEN.includes(x.a) ? x.a : 'match';
     const vikt = Math.max(1, Math.min(5, Math.round(Number(x && x.vikt) || 3)));
-    const ok = t && t.split(/\s+/).length <= 60 && !TIPS_RE.test(t) && citatStar(x.citat, utskrift);
+    const ok = t && antalOrd(t) <= 65 && !TIPS_RE.test(t) && citatStar(x.citat, utskrift);
     if (!ok) { strukna++; continue; }
-    uppgifter.push({ t, s, min: Number.isFinite(Number(x.min)) ? Math.round(Number(x.min)) : null, vikt, citat: String(x.citat).trim() });
+    const sagt0 = typeof x.sagt === 'string' ? x.sagt.trim().replace(/^[”"»«'‘’]+|[”"»«'‘’]+$/g, '') : '';
+    const sagt = sagt0 && antalOrd(sagt0) >= 4 && antalOrd(sagt0) <= 50 && !TIPS_RE.test(sagt0) ? sagt0 : null;
+    const vem0 = typeof x.vem === 'string' ? x.vem.trim() : '';
+    const vem = sagt && vem0 && vem0.length <= 40 && vemStar(vem0, utskrift) ? vem0 : null;
+    uppgifter.push({ a, t, s, min: Number.isFinite(Number(x.min)) ? Math.round(Number(x.min)) : null, vikt, citat: String(x.citat).trim(), sagt, vem });
   }
-  uppgifter.sort((a, b) => b.vikt - a.vikt);
-  return { handlarOm: typeof j.handlar_om === 'string' ? j.handlar_om.trim() : null, uppgifter: uppgifter.slice(0, pc.uppgifterPerAvsnitt), strukna };
+  uppgifter.sort((p, q) => q.vikt - p.vikt);
+  return { rattKlubb: j.ratt_klubb !== false, handlarOm: typeof j.handlar_om === 'string' ? j.handlar_om.trim() : null, uppgifter: uppgifter.slice(0, pc.uppgifterPerAvsnitt), strukna };
 }
 
-// Tar ut det mest intressanta ur ett utskrivet avsnitt. → {handlarOm, uppgifter, strukna, sekunder}
+// Tar ut det intressanta ur ett utskrivet avsnitt. → {handlarOm, uppgifter, strukna, sekunder}
 export async function taUt(a, utskrift, { lag, mot = null, avspark = null, spelare = [], now = () => new Date(), claude = claudeSvar } = {}) {
   const fraga = [
     `Idag är det ${nowFmt.format(now())}.`,
@@ -284,19 +333,155 @@ export async function taUt(a, utskrift, { lag, mot = null, avspark = null, spela
   const r = await claude({ system: pc.urvalPrompt.replace('{flest}', pc.uppgifterPerAvsnitt), prompt: fraga, tools: [], model: pc.model, effort: pc.effort, timeoutMs: pc.timeoutMs });
   const u = r.refused ? null : uppgifterAv(r.content, utskrift);
   if (!u) throw new Error(r.refused ? 'Claude avböjde' : 'svaret gick inte att läsa');
+  // Uppgiftens id: avsnittet och platsen i listan. Sidan hänvisar till dem.
+  u.uppgifter.forEach((x, i) => { x.id = `${a.id}-${i + 1}`; });
   return { ...u, sekunder: r.seconds };
+}
+
+// ---------- informationssidan per match ----------
+
+const SAKERHET = ['b', 'h', 'o'];
+
+// Det sidan bygger på: lagets senaste poddavsnitt och forumläsningar (src/analyser/forum.mjs)
+// och deras uppgifter med vikt nog. typ: 'podd' eller 'forum'; podd är poddens eller forumets namn.
+// → {lag: {namn: [{id, a, s, vikt, t, sagt, vem, podd, typ}]}, kallor: {namn: [{podd, avsnitt, datum, adress, typ}]}}
+export function sidansUnderlag(fil, lagen) {
+  const ut = { lag: {}, kallor: {} };
+  for (const lag of lagen) {
+    const post = fil && fil.lag && fil.lag[lag];
+    const alla = ((post && post.avsnitt) || []).filter((a) => (a.uppgifter || []).some((x) => x.id && x.vikt >= pc.minstVikt))
+      .sort((a, b) => b.datum.localeCompare(a.datum));
+    // Forumet läses varje natt: dess läsningar räknas för sig, så att poddarna står kvar.
+    const avsnitt = [...alla.filter((a) => a.typ !== 'forum').slice(0, pc.sidan.avsnitt), ...alla.filter((a) => a.typ === 'forum').slice(0, fc.tillSidan)];
+    ut.lag[lag] = avsnitt.flatMap((a) => a.uppgifter.filter((x) => x.id && x.vikt >= pc.minstVikt).map((x) => ({ id: x.id, a: x.a || 'match', s: x.s, vikt: x.vikt, t: x.t, sagt: x.sagt || null, vem: x.vem || null, podd: a.podd, typ: a.typ || 'podd', datum: (x.tid || a.datum).slice(0, 10) })));
+    ut.kallor[lag] = avsnitt.map((a) => ({ podd: a.podd, avsnitt: a.titel, datum: a.datum.slice(0, 10), adress: a.sida || a.apple || null, typ: a.typ || 'podd' }));
+  }
+  return ut;
+}
+
+// Uppgifterna sidan bygger på, som en nyckel: ändras den skrivs sidan om.
+export const sidNyckel = (u) => `${pc.promptVersion}|${Object.values(u.lag).flat().map((x) => x.id).sort().join(',')}`;
+
+// En punkt på sidan av en eller flera uppgifter (ur) och, om den håller, redaktörens text.
+function punkt(ur, text) {
+  const kalla = ur.slice().sort((p, q) => q.vikt - p.vikt);
+  const eget = `${kalla.map((x) => x.t).join('\n')}`;
+  const t0 = typeof text === 'string' ? text.trim() : '';
+  const hall = t0 && antalOrd(t0) <= 65 && !TIPS_RE.test(t0) && !unknownNumbers([t0], [eget]).length;
+  const med = kalla.find((x) => x.sagt);
+  const typer = [...new Set(kalla.map((x) => x.typ || 'podd'))];
+  return {
+    t: hall ? t0 : kalla[0].t,
+    // det minst säkra slaget gäller
+    s: SAKERHET[Math.max(...kalla.map((x) => SAKERHET.indexOf(x.s)))] || 'h',
+    vikt: kalla[0].vikt,
+    podd: [...new Set(kalla.map((x) => x.podd))],
+    typ: typer.length > 1 ? 'blandat' : typer[0],
+    ...(med ? { citat: { sagt: med.sagt, vem: med.vem || null, podd: med.podd, typ: med.typ || 'podd' } } : {}),
+  };
+}
+
+// Grupperna i ämnenas ordning, högst pc.sidan.punkterPerLag punkter och citat på de tyngsta.
+function delAv(lag, grupper, kallor) {
+  let kvar = pc.sidan.punkterPerLag;
+  const alla = grupper.flatMap((g) => g.punkter).sort((p, q) => q.vikt - p.vikt);
+  const behall = new Set(alla.slice(0, kvar));
+  const medCitat = new Set(alla.filter((p) => behall.has(p) && p.citat).slice(0, pc.sidan.citatPerLag));
+  const ut = [];
+  for (const amne of AMNEN) {
+    const punkter = grupper.filter((g) => g.amne === amne).flatMap((g) => g.punkter).filter((p) => behall.has(p))
+      .map((p) => { const { vikt, citat, ...r } = p; return medCitat.has(p) ? { ...r, citat } : r; });
+    if (punkter.length) ut.push({ amne, punkter });
+  }
+  return { lag, kallor, grupper: ut };
+}
+
+// Sidan utan redaktör: uppgifterna som de är, grupperade efter ämne och med de tyngsta först.
+export function sidaUtan(underlag, lagen) {
+  return {
+    rubrik: null,
+    ingress: null,
+    delar: lagen.map((lag) => delAv(lag, AMNEN.map((amne) => ({ amne, punkter: underlag.lag[lag].filter((x) => x.a === amne).sort((p, q) => q.vikt - p.vikt).map((x) => punkt([x])) })), underlag.kallor[lag])),
+  };
+}
+
+const RAKNEORD = /^(två|tre|fyra|fem|sex|sju|åtta|nio|tio|elva|tolv)$/i;
+
+// Redaktörens svar → sidan. Varje punkt måste bygga på uppgifter som finns för laget;
+// en text med nya tal eller tipsord byts mot uppgiftens egen. → sidan, eller null.
+export function sidaAv(content, underlag, lagen) {
+  let j;
+  try { j = jsonOf(content); } catch { return null; }
+  if (!j || !j.lag || typeof j.lag !== 'object') return null;
+  const allt = Object.values(underlag.lag).flat().map((x) => `${x.t}\n${x.sagt || ''}`).join('\n');
+  const fel = [];
+  const text = (v, flest, vad) => {
+    const t = typeof v === 'string' ? v.trim() : '';
+    const tips = t.match(TIPS_RE);
+    // Redaktören får räkna ihop (”fyra spelare borta”): små räkneord i bokstäver släpps.
+    const tal = unknownNumbers([t], [allt, lagen.join(' ')]).filter((x) => !RAKNEORD.test(String(x)));
+    const why = !t ? 'saknas' : antalOrd(t) > flest ? `${antalOrd(t)} ord` : tips ? `tipsord (${tips[0]})` : tal.length ? `okända tal (${tal.join(', ')})` : null;
+    if (why) fel.push(`${vad}: ${why}`);
+    return why ? null : t;
+  };
+  const delar = lagen.map((lag) => {
+    const per = new Map(underlag.lag[lag].map((x) => [x.id, x]));
+    const tagna = new Set();
+    const grupper = (Array.isArray(j.lag[lag]) ? j.lag[lag] : []).map((g) => ({
+      amne: g && AMNEN.includes(g.amne) ? g.amne : 'match',
+      punkter: (Array.isArray(g && g.punkter) ? g.punkter : []).map((p) => {
+        const ur = [...new Set(Array.isArray(p && p.ur) ? p.ur.map(String) : [])].filter((id) => per.has(id) && !tagna.has(id)).map((id) => per.get(id));
+        if (!ur.length) return null;
+        for (const x of ur) tagna.add(x.id);
+        // en bekräftad uppgift och en åsikt hör inte ihop: då gäller bara den första
+        const samma = ur.filter((x) => (x.s === 'o') === (ur[0].s === 'o'));
+        return punkt(samma, p.t);
+      }).filter(Boolean),
+    }));
+    return delAv(lag, grupper, underlag.kallor[lag]);
+  });
+  // Tappade redaktören bort ett lag som har uppgifter gäller inte svaret.
+  if (lagen.some((lag, i) => underlag.lag[lag].length && !delar[i].grupper.length)) return null;
+  return { rubrik: text(j.rubrik, pc.sidan.rubrikOrd + 3, 'rubriken'), ingress: text(j.ingress, pc.sidan.ingressOrd + 15, 'ingressen'), delar, fel };
+}
+
+// Skriver matchens informationssida av uppgifterna i poddfilen. lagen: [hemma, borta].
+// → {rubrik, ingress, delar: [{lag, kallor, grupper: [{amne, punkter: [{t, s, podd, citat}]}]}], nyckel, redigerad, sekunder}
+// eller null om inget lag har något. Fel från Claude Code (Stopp) kastas; annars blir sidan oredigerad.
+export async function skrivSida(fil, lagen, { avspark = null, now = () => new Date(), claude = claudeSvar, logg = () => {} } = {}) {
+  const underlag = sidansUnderlag(fil, lagen);
+  if (!Object.values(underlag.lag).some((l) => l.length)) return null;
+  const nyckel = sidNyckel(underlag);
+  let sida = null;
+  let sekunder = 0;
+  try {
+    const system = pc.sidaPrompt.replace('{punkter}', pc.sidan.punkterPerLag).replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd);
+    const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [x.typ === 'forum' ? 'forum' : 'podd']: x.podd, datum: x.datum, uppgift: x.t }))])) };
+    const r = await claude({ system, prompt: `Idag är det ${nowFmt.format(now())}.\n\nUnderlaget (JSON):\n${JSON.stringify(data)}`, tools: [], model: pc.model, effort: pc.sidan.effort, timeoutMs: pc.timeoutMs });
+    sekunder = r.seconds;
+    sida = r.refused ? null : sidaAv(r.content, underlag, lagen);
+    if (!sida) logg(`  sidan ${lagen.join(' – ')}: redaktörens svar höll inte, uppgifterna står som de är`);
+    else if (sida.fel.length) logg(`  sidan ${lagen.join(' – ')}: ${sida.fel.join('; ')}`);
+    if (sida) delete sida.fel;
+  } catch (err) {
+    if (err instanceof Stopp) throw err;
+    logg(`  sidan ${lagen.join(' – ')}: ${err.message}`);
+  }
+  const redigerad = Boolean(sida);
+  return { ...(sida || sidaUtan(underlag, lagen)), nyckel, redigerad, sekunder };
 }
 
 // ---------- till tidningen ----------
 
 const SLAG = { b: 'bekräftat', h: 'hört i podden', o: 'supportrarnas åsikt' };
+const FORUMSLAG = { b: 'bekräftat', h: 'skrivet på forumet', o: 'supportrarnas åsikt' };
 
 // Det tidningen får om ett lag ur omgångens poddfil (scripts/tidning/poddar.mjs):
 // de senaste avsnittens bästa uppgifter. → [{podd, avsnitt, datum, adress, uppgifter: [{uppgift, slag}]}]
 export function poddUnderlag(fil, lag) {
   const post = fil && fil.lag && fil.lag[lag];
   if (!post || !Array.isArray(post.avsnitt)) return [];
-  const avsnitt = post.avsnitt.filter((a) => a.uppgifter && a.uppgifter.length).sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, pc.avsnittTillTidningen);
+  const avsnitt = post.avsnitt.filter((a) => a.typ !== 'forum' && a.uppgifter && a.uppgifter.length).sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, pc.avsnittTillTidningen);
   let kvar = pc.uppgifterPerLag;
   const ut = [];
   for (const a of avsnitt) {
@@ -309,8 +494,31 @@ export function poddUnderlag(fil, lag) {
   return ut;
 }
 
-// Avsnitten som ligger i poddfilen, som en nyckel: ändras den har det kommit nytt.
+// Det tidningen får ur lagets supporterforum: den senaste läsningens bästa uppgifter.
+// → [{forum, tradar, datum, adress, uppgifter: [{uppgift, slag}]}]
+export function forumUnderlag(fil, lag) {
+  const post = fil && fil.lag && fil.lag[lag];
+  if (!post || !Array.isArray(post.avsnitt)) return [];
+  return post.avsnitt.filter((a) => a.typ === 'forum' && (a.uppgifter || []).some((x) => x.vikt >= pc.minstVikt))
+    .sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, fc.tillTidningen)
+    .map((a) => ({ forum: a.podd, tradar: (a.tradar || []).map((t) => t.titel), datum: a.datum.slice(0, 10), adress: a.sida || null, uppgifter: a.uppgifter.filter((x) => x.vikt >= pc.minstVikt).slice(0, pc.uppgifterPerLag).map((x) => ({ uppgift: x.t, slag: FORUMSLAG[x.s] || FORUMSLAG.h })) }));
+}
+
+// Avsnitten (och forumläsningarna) som ligger i poddfilen, som en nyckel: ändras den har det kommit nytt.
 export function poddNyckel(fil) {
   if (!fil || !fil.lag) return '';
   return Object.values(fil.lag).flatMap((p) => (p.avsnitt || []).filter((a) => a.uppgifter && a.uppgifter.some((x) => x.vikt >= pc.minstVikt)).map((a) => a.id)).sort().join(',');
+}
+
+// Informationssidorna som de läggs ut (data/poddsidor.json): omgångens matcher i kupongens
+// ordning, bara de som har en sida. Citaten på engelska och utskrifterna följer aldrig med.
+// → {omgang, uppdaterad, sidor: [{id, nr, match, lag, rubrik, ingress, delar}]} eller null
+export function poddsidor(fil, round) {
+  if (!fil || !round || fil.omgang !== round.id || !fil.sidor) return null;
+  const sidor = round.matcher.map((x, i) => {
+    const s = fil.sidor[String(x.id)];
+    if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => d.grupper.length)) return null;
+    return { id: String(x.id), nr: i + 1, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null, delar: s.delar };
+  }).filter(Boolean);
+  return sidor.length ? { omgang: round.id, uppdaterad: fil.uppdaterad, amnen: pc.amnen, sidor } : null;
 }
