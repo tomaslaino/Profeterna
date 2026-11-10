@@ -318,10 +318,11 @@ window.RumMatchblad = (() => {
     if (t && (kommande || res != null)) {
       const alla = t.signs && t.signs.length === 3;
       const ring = (i) => (!alla && t.signs.includes(i) && window.Papper ? Papper.ring(`penna${m.id}${i}`, 'rb-ring', 23) : '');
-      const at = alla ? 1 : t.signs && t.signs.length ? Math.min(...t.signs) : -1;
       const cls = (i) => (res == null ? '' : i === res ? ' ratt' : ' fel');
       const mp = (i) => (i === res && window.RumBlock ? RumBlock.strykning(`tips${m.id}${i}`, 1) : '');
-      const rutor = `<span class="rb-tecken">${[0, 1, 2].map((i) => `<span class="rb-tecknet${cls(i)}">${mp(i)}<b>${'1X2'[i]}</b>${ring(i)}${i === at && t.note ? `<em>${esc(t.note)}</em>` : ''}</span>`).join('')}</span>`;
+      // raden i marginalen efter rutorna: vid ett av två intilliggande tecken skulle nästa ruta täcka den
+      const rutor = `<span class="rb-tecken">${[0, 1, 2].map((i) => `<span class="rb-tecknet${cls(i)}">${mp(i)}<b>${'1X2'[i]}</b>${ring(i)}</span>`).join('')}` +
+        `${t.note ? `<em>${esc(t.note)}</em>` : ''}</span>`;
       const text = t.text.split(/\n\s*\n/).filter((x) => x.trim()).map((x) => `<p>${refs(x.trim(), t.sources)}</p>`).join('');
       const dom = res == null ? '' : `Facit <b>${'1X2'[res]}</b> · ${t.signs.includes(res) ? 'satt' : 'satt inte'}`;
       tips = del(rubrad('Tipset', dom) + (t.signs && t.signs.length ? rutor : '') + text, 'rb-tipset');
