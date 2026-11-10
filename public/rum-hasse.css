@@ -22,6 +22,8 @@
   /* papperets fibrer, som på kupongen (papper.css) */
   --korn: var(--pp-grain); }
 .rum-hasse-vy[hidden] { display: none; }
+/* kaffet, askkoppen och de andra sakerna på disken går att klicka på (sakerna i rum-hasse.js) */
+.rum-hasse-vy.rh-pa-sak { cursor: pointer; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }
 .rh-scen .rh-bak { position: absolute; left: 0; top: 0; display: block; max-width: none; }
 /* väggen i lysrörets ljus (tänt utom på natten; medan det dämpas och tänds båda, ritade på duken nedan), annars i nattens */
