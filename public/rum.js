@@ -27,6 +27,8 @@
 //   Stryktips – tas i handen, bara att titta på (openStall).
 //   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
 //   i baren utanför bilden (H): man vänder sig dit (rum-hasse.js).
+//   Tipsguiden mellan notan och kupongen (G): tas upp och läses, som tidningen
+//   bakom löpsedeln (tidningen, rum-tidning.js).
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
 // text-tv:n med samma ämne tänds.
 //
@@ -576,6 +578,10 @@ window.Rum = (() => {
       '<span class="skrivs">Skrivs på</span><span class="nc">Notts County</span></span>' +
       `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
   }
+
+  // Tipsguiden ligger på pulten mellan Hasses nota och kupongen, med kupongen en bit över sig: ett klick,
+  // eller G, och man tar upp den och läser (tidningen). Framsidan skrivs i fill (guidePult).
+  const guideHtml = () => `<a class="rum-sak" id="rum-tipsguiden" ${KNAPP} aria-label="Tipsguiden"></a>`;
 
   // Ett klick på kaffet eller H: man vänder sig mot honom (rum-hasse.js).
   function tillHasse(a = R.el.querySelector('#rum-hasse')) {
@@ -1250,7 +1256,7 @@ window.Rum = (() => {
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
   // bara med tangentbord och mus.
   // (kupongstället kommer med inredningen, och tangenter körs igen då)
-  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-stall', 'Nästa omgång', 'N']];
+  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-stall', 'Nästa omgång', 'N'], ['#rum-tipsguiden', 'Tipsguiden', 'G']];
   function tangenter() {
     if (!matchMedia('(hover: hover)').matches) return;
     for (const [sel, namn, k] of TANGENT) {
@@ -1276,7 +1282,7 @@ ${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}`, 1.05)}
-${plane(0, paper() + hasseHtml())}
+${plane(0, guideHtml() + paper() + hasseHtml())}
 </div></div>
 <div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div><i class="rum-mork-ut"></i>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
@@ -2099,6 +2105,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
+    guidePult(set);
     levande();
     if (p && p.gang && p.s.spel && window.Folket) Folket.hamta(p.s.spel.nr).then((ny) => { if (ny && R.on) levande(); });
     const pa = document.getElementById('rum-kupong');
@@ -3032,7 +3039,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.vnara) return 'video';
     if (R.ans && R.ans.on()) return 'anslag';
     if (R.reg && R.reg.on()) return 'register';
-    if (R.tidning) return 'lopsedel';
+    if (R.tidning) return R.tidning.dataset.slag === 'guide' ? 'tipsguiden' : 'lopsedel';
     return R.sak || null;
   }
 
@@ -3166,6 +3173,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // ett nytt klick medan tidningen väntar på notiserna gäller i stället (oppnaTidning)
     R.tidningVantar = false;
     if (a.id === 'rum-hasse') tillHasse(a);
+    else if (a.id === 'rum-tipsguiden') oppnaGuiden();
     else if (a.dataset.sak === 'lopsedel') oppnaTidning();
     else if (a.dataset.sak) sak(a.dataset.sak);
     else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
@@ -3626,7 +3634,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const g = window.Samtal && Samtal.pult && Samtal.pult.gang ? Samtal.pult.gang() : null;
       return { ...u, efter: R.summa, citat: g ? { notes: g.notes || {}, efter: g.efter || {} } : null, liga: tidningsLiga(R.summa.id, true) };
     }
-    const rd = round();
+    const f = infor(round(), rub);
+    return f ? { ...u, ...f } : null;
+  }
+  // Det som står i tidningen inför omgången rd: matcherna, notiserna, Tipsligan och Veckans analys (om matchen
+  // som löpsedeln handlar om, rub, annars den jämnaste som inte har börjat). Är alla matcherna spelade finns
+  // ingen tidning inför den, utom med gammal (Tipsguiden, som ligger kvar). → { nr, matcher, notiser, liga, analys } eller null
+  function infor(rd, rub, gammal = false) {
     if (!rd || rd.next || typeof matchById !== 'function') return null;
     const per = analyserData ? analyserData.per : new Map();
     const matcher = rd.ids.map((id, i) => {
@@ -3636,15 +3650,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return { nr: i + 1, id: String(id), h: short(m.home), b: short(m.away), avspark: m.kickoff, pr: m.j && m.j.p ? m.j.p : m.f ? m.f.p : null, expert: a && a.tip ? tecknen(a.tip.signs) : '', klar: Boolean(m.completed) };
     }).filter(Boolean);
     // en omgång som är färdigspelad utan sammanställning (dolda resultat) har ingen tidning inför sig
-    if (!matcher.length || matcher.every((x) => x.klar)) return null;
-    // Veckans analys: om matchen som löpsedeln handlar om, annars den jämnaste som inte har börjat
+    if (!matcher.length || (!gammal && matcher.every((x) => x.klar))) return null;
     const med = matcher.filter((x) => { const a = per.get(x.id); return a && a.title && (a.paragraphs || []).length; });
     const kvar = med.filter((x) => !(Date.parse(x.avspark) <= Date.now()));
     const jamn = (l) => l.filter((x) => x.pr).sort((a, b) => Math.max(...a.pr) - Math.max(...b.pr))[0] || l[0];
     const vald = (rub && med.find((x) => x.id === String(rub.id))) || jamn(kvar) || jamn(med);
     const a = vald ? per.get(vald.id) : null;
     return {
-      ...u,
       nr: typeof couponNumber === 'function' ? couponNumber(rd.ids) : null,
       matcher,
       notiser: notiserFor(rd),
@@ -3673,18 +3685,101 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       sak('lopsedel');
       return;
     }
+    vantaPaTidning(() => { if (!tidningen()) sak('lopsedel'); });
+  }
+  // Notiserna och analyserna, högst två och en halv sekund; sedan gor(), om inget annat har hänt.
+  function vantaPaTidning(gor) {
     const vanta = Promise.all([hamtaNotiser(), typeof loadAnalyser === 'function' ? loadAnalyser() : null]);
     const gans = new Promise((ok) => setTimeout(ok, 2500));
     R.tidningVantar = true;
     Promise.race([vanta, gans]).catch(() => {}).then(() => {
       if (!R.tidningVantar) return;
       R.tidningVantar = false;
-      if (R.on && !R.tidning && !tidningen()) sak('lopsedel');
+      if (R.on && !R.tidning) gor();
     });
   }
-  function tidningen(pa = true) {
+
+  // ---------- Tipsguiden ----------
+  //
+  // Tidningens tipsbilaga (RumTidning.guide) ligger på pulten mellan Hasses nota och kupongen, med kupongen
+  // en bit över sig. Numret gäller omgången som rummet visar, också när den är spelad – det gamla numret ligger
+  // kvar tills nästa kupong kommer –, och mellan omgångarna den senaste kupongen. Ett klick, eller G, och man
+  // tar upp den: den lyfts från pulten och läggs fram som tidningen bakom löpsedeln, med sin egen framsida.
+  function guideUpplaga() {
+    const rd = round();
+    let f = infor(rd, null, true);
+    let id = rd && rd.id;
+    if (!f) {
+      const c = (R.old || []).find((x) => x && (x.rows || []).length && !(window.Historik && Historik.hidden && Historik.hidden(x)));
+      if (c) {
+        id = c.id || null;
+        f = infor({ id, ids: c.rows.map((r) => String(r.id)) }, null, true);
+      }
+    }
+    // numret kom ut dagen före den första matchen, och har man det redan i handen är det från idag
+    const forst = f ? Math.min(...f.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite)) : NaN;
+    const dag = Number.isFinite(forst) ? Math.min(Date.now(), forst - 18 * 3600e3) : Date.now();
+    return {
+      ...(f || { matcher: [] }),
+      id,
+      datum: dag,
+      namnAv: (pid, namn) => tavelnamn({ id: pid, name: namn }),
+      skold: (lag) => (window.Skoldar && Skoldar.src ? Skoldar.src(lag) : ''),
+    };
+  }
+  // Framsidan på pulten, när den har ändrats (set i fill).
+  function guidePult(set) {
+    if (!window.RumTidning || !RumTidning.forsta) return;
+    set('rum-tipsguiden', `<span class="tg-pult">${RumTidning.forsta(guideUpplaga())}</span>`);
+  }
+  // Notiserna och analyserna till Tipsguiden, när man pekar på den eller sätter fingret på den.
+  function forberedGuiden() {
+    if (R.tidning) return;
+    hamtaNotiser();
+    if (typeof loadAnalyser === 'function') loadAnalyser();
+  }
+  // Ett klick på Tipsguiden: notiserna och analyserna först (som löpsedeln), och sedan lyfts den från
+  // pulten och läggs fram.
+  function oppnaGuiden() {
+    if (!window.RumTidning || !RumTidning.guide || R.tidning) return;
+    vantaPaTidning(() => guideLyft(false).then(() => {
+      if (R.on && !R.tidning) tidningen(true, 'guide');
+      else guideLyft(true);
+    }));
+  }
+  // Den lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka.
+  // (samma funktioner i samma ordning som --tg-vila i rum-tidning.css, så att den glider dit)
+  const GUIDE_UPPE = 'perspective(1100px) translate3d(40px, -170px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.1)';
+  function guideLyft(bort) {
+    const a = R.el && R.el.querySelector('#rum-tipsguiden');
+    if (!a) return Promise.resolve();
+    for (const x of a.getAnimations()) x.cancel();
+    if (bort) a.classList.remove('uppe');
+    if (calm()) {
+      if (!bort) a.classList.add('uppe');
+      return Promise.resolve();
+    }
+    const vila = getComputedStyle(a).getPropertyValue('--tg-vila').trim();
+    const k = [{ transform: vila, opacity: 1 }, { transform: GUIDE_UPPE, opacity: 0 }];
+    // (över kupongen och notan medan den är i luften)
+    a.classList.add('lyfts');
+    const an = bort ? a.animate(k.reverse(), { duration: 340, easing: 'cubic-bezier(0.25, 0.7, 0.35, 1)' })
+      : a.animate(k, { duration: 260, easing: 'cubic-bezier(0.45, 0, 0.75, 0.55)', fill: 'forwards' });
+    // (i en telefon som inte hinner rita blir det inte längre än så här)
+    const klar = Promise.race([an.finished.catch(() => {}), new Promise((ok) => setTimeout(ok, 330))])
+      .then(() => { if (!a.getAnimations().some((x) => x !== an && x.playState === 'running')) a.classList.remove('lyfts'); });
+    if (bort) return klar;
+    return klar.then(() => {
+      a.classList.add('uppe');
+      an.cancel();
+    });
+  }
+
+  // Tidningen framme över rummet: bakom löpsedeln (slag lopsedel), eller Tipsguiden från pulten (guide).
+  function tidningen(pa = true, slag = 'lopsedel') {
     if (!pa) {
       if (!R.tidning) return false;
+      if (R.tidning.dataset.slag === 'guide') guideLyft(true);
       R.tidning.remove();
       R.tidning = null;
       R.vilar = false;
@@ -3692,18 +3787,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return false;
     }
     if (R.tidning) return true;
-    const sedel = R.saker && R.saker.sedel && R.saker.sedel();
-    if (!sedel || !window.RumTidning) return false;
-    const u = upplaga(sedel);
-    const t = u && RumTidning.html(u);
+    if (!window.RumTidning) return false;
+    let u;
+    let t;
+    let forst;
+    if (slag === 'guide') {
+      u = { ...guideUpplaga(), tid: 'tg' };
+      t = RumTidning.guide(u);
+      forst = t && t.forsta;
+    } else {
+      forst = R.saker && R.saker.sedel && R.saker.sedel();
+      if (!forst) return false;
+      u = upplaga(forst);
+      t = u && RumTidning.html(u);
+    }
     if (!t) return false;
     const el = document.createElement('div');
     el.className = 'rum-tidningen';
+    el.dataset.slag = slag;
     el.tabIndex = -1;
-    const namn = u.tid === 'ex' ? 'Expressen' : 'Sportbladet';
+    const namn = u.tid === 'tg' ? 'Tipsguiden' : u.tid === 'ex' ? 'Expressen' : 'Sportbladet';
     el.innerHTML = `<div class="tn tid-${u.tid}" role="document" aria-label="${esc(namn)}"><div class="tn-ark tn-forsta">${t.inne}</div>${t.blad}</div>` +
       '<button type="button" class="tn-tillbaka">Lägg tillbaka</button>';
-    el.querySelector('.tn-forsta').prepend(sedel);
+    if (slag === 'guide') el.querySelector('.tn-forsta').insertAdjacentHTML('afterbegin', forst);
+    else el.querySelector('.tn-forsta').prepend(forst);
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
     el.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -3716,6 +3823,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       if (!e.target.closest('.tn-ark') || e.target.closest('.tn-tillbaka')) tidningen(false);
     });
+    const pa0 = slag === 'guide' && R.el.querySelector('#rum-tipsguiden');
+    if (pa0) pa0.classList.add('uppe');
     R.el.append(el);
     R.tidning = el;
     R.vilar = true;
@@ -3726,8 +3835,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     el.focus({ preventScroll: true });
     return true;
   }
-  // Sedeln så stor som ryms med början av nästa rad under sig, så att det syns att tidningen fortsätter.
-  // Den är 100 × 140 i rummet, och sidorna under får samma bredd (--k); under 470 px står allt i en spalt.
+  // Framsidan (sedeln eller Tipsguidens) så stor som ryms med början av nästa rad under sig, så att det syns
+  // att tidningen fortsätter. Den är 100 × 140 i rummet, och sidorna under får samma bredd (--k); under 470 px
+  // står allt i en spalt.
   function passaTidning() {
     const t = R.tidning;
     if (!t) return;
@@ -3735,7 +3845,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const tn = t.querySelector('.tn');
     tn.style.setProperty('--k', k.toFixed(3));
     tn.classList.toggle('smal', k * 100 < 470);
-    t.querySelector('.rt-sedel').style.zoom = k.toFixed(3);
+    t.querySelector('.rt-sedel, .tg-forsta').style.zoom = k.toFixed(3);
   }
 
   // Gängets kupong med baksidan upp vänds på pulten: den lyfts och vänds
@@ -5892,9 +6002,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const a = !R.kup && e.target.closest('.rum-sak, .rum-tag');
       hot(a ? a.dataset.nav : null);
       if (a && a.dataset.sak === 'lopsedel') forberedTidning();
+      else if (a && a.id === 'rum-tipsguiden') forberedGuiden();
     });
-    // tidningen hämtar notiserna och analyserna redan när fingret sätts på löpsedeln
-    el.addEventListener('pointerdown', (e) => { if (e.target.closest('[data-sak="lopsedel"]')) forberedTidning(); }, { passive: true });
+    // tidningen hämtar notiserna och analyserna redan när fingret sätts på löpsedeln eller Tipsguiden
+    el.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('[data-sak="lopsedel"]')) forberedTidning();
+      else if (e.target.closest('#rum-tipsguiden')) forberedGuiden();
+    }, { passive: true });
     el.addEventListener('click', (e) => {
       // Namnet leder till rummet, där man redan är. Som länk blev det en rad i historiken som nästa
       // bakåt stannade på (rum-bak.js).
@@ -6029,6 +6143,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       else if (k === 'n') openStall();
       else if (k === 'v') zoomVideo(!R.vnara);
       else if (k === 'h' && !R.zoom && !R.vnara) tillHasse();
+      else if (k === 'g' && !R.zoom && !R.vnara) oppnaGuiden();
       else if (k === 'escape' && R.zoom) zoomTv(false);
       else if (k === 'escape' && R.vnara) zoomVideo(false);
     });
