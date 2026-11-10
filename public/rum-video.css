@@ -99,18 +99,18 @@
 }
 .vy-kant > b { background: linear-gradient(180deg, #a87650 0 1.8px, #653a21 1.8px 6.5px, #341b0d 6.5px 11px, rgba(0, 0, 0, 0.55) 11px); }
 .rum.vid-nara .vhs-yta:not(.vhs-skugga, .vhs-pol) { pointer-events: auto; }
-/* sidorna i svart plast, med springor i bakre halvan */
+/* sidorna i grafitgrå plast som framsidan, med springor i bakre halvan */
 .vhs-sida {
   background:
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 15px, rgba(0, 0, 0, 0.72) 15px 19px, rgba(255, 255, 255, 0.06) 19px 20px) 52% 9% / 40% 42% no-repeat,
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 6%),
-    linear-gradient(90deg, #3a3631, #2b2925 60%, #23211e);
+    linear-gradient(90deg, #3c3d41, #2e2f32 60%, #252629);
 }
 .vhs-sida.v { background-position: 48% 9%, 0 0, 0 0; filter: brightness(0.5); }
 .vhs-sida.h { box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.08); }
-.vhs-topp { background: linear-gradient(0deg, #4a463f, #36332e); box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.12); }
-.vhs-bak { background: #121110; }
-.vhs-fot { background: #070606; }
+.vhs-topp { background: linear-gradient(0deg, #4b4c50, #37383b); box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.12); }
+.vhs-bak { background: #141517; }
+.vhs-fot { background: #08080a; }
 /* fruktlådan: sidan i tre brädor av furu med springor emellan, taket, och
    innanför öppningen vänstra väggen i ljuset, botten och baksidan */
 .lada-sida {
@@ -323,18 +323,26 @@
   transform: translateZ(0.5px);
 }
 .vhs-vfd.blink { animation: vhs-blink 1s steps(1) infinite; }
+/* displayen bakom rökfärgat glas, med en glans snett över */
+.vhs-vfd::after { content: ""; position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(166deg, rgba(255, 255, 255, 0.1) 0 36%, rgba(255, 255, 255, 0) 36%); }
 @keyframes vhs-blink { 50% { opacity: 0.12; } }
+/* Knapparna som på en video från 90-talet: kuddformade i silvergrå plast,
+   med tecknen tryckta i svart, var och en i sin fördjupning i spalten
+   (brunnar i rum-video.js). */
 .vhs-k {
   display: grid;
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #5d5a54, #36342f 55%, #25231f);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 2px 0 #050505;
-  color: #ddd7c9;
-  font: 700 13px/1 system-ui, sans-serif;
+  border-radius: 3.5px;
+  background:
+    radial-gradient(130% 90% at 50% 8%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg, #a5a6aa, #87888c 48%, #6c6d71);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.28), 0 1.5px 0 #050506;
+  color: #1b1c1e;
+  font: 700 12px/1 system-ui, sans-serif;
   letter-spacing: -2px;
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
   pointer-events: none;
   cursor: pointer;
   transform: translateZ(0.5px);
@@ -347,8 +355,8 @@
 @media (max-width: 700px), (max-height: 500px) {
   .vhs-k::after { content: ""; position: absolute; inset: -4px -14px -4px -8px; }
 }
-.rum.vid-nara .vhs-k:is(:hover, :focus-visible) { background: linear-gradient(180deg, #77736b, #47443e 55%, #2d2b27); color: #fff; outline: none; }
-.vhs-k:active { transform: translate3d(0, 2px, 0.5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15); }
+.rum.vid-nara .vhs-k:is(:hover, :focus-visible) { background: radial-gradient(130% 90% at 50% 8%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 62%), linear-gradient(180deg, #c4c5c9, #a3a4a8 48%, #85868a); color: #000; outline: none; }
+.vhs-k:active { transform: translate3d(0, 1.5px, 0.5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
 .vhs-led { fill: #e2311f; filter: drop-shadow(0 0 0.6px #ff4a30); }
 .rum-vhs:is([data-lage="spelar"], [data-lage="laddar"], [data-lage="spolar"], [data-lage="paus"], [data-lage="vind"], [data-lage="brus"]) .vhs-led { fill: #45ff74; filter: drop-shadow(0 0 0.6px #45ff74); }
 .vhs-lucka { transform-box: fill-box; transform-origin: 50% 0; transition: transform 0.18s ease; }

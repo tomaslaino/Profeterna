@@ -49,10 +49,10 @@ const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // som fönstret (i bakväggens bild)
 const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
 // bladet med radions stationer på väggen till höger om radion (radiolapp): i remsan mellan fönsterkarmen
-// (x 958) och veckans löpsedel (x 986, LOPPLATS i rum-affischer.js) med luft till båda, och en bit ovanför
-// fönsterbänken (y 552), så att det sitter på en enda yta och inte når ned till bänken; ett blad ur ett
-// litet block, lagom för tio stationer
-const LAPP = { x: 961, y: 513, w: 23, h: 29 };
+// (x 958) och veckans löpsedel (x 986, LOPPLATS i rum-affischer.js), så brett som remsan medger, och en bit
+// ovanför fönsterbänken (y 554), så att det sitter på en enda yta och inte når ned till bänken. Bredden är
+// given, så bladet är högt: där får raderna plats med en handstil som syns nära radion (radiolapp)
+const LAPP = { x: 959.5, y: 503, w: 25.5, h: 45 };
 // Sakerna och dukarna (plan: 0 = väggen). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
@@ -210,8 +210,15 @@ export async function inredning(el, opt = {}) {
     cam.updateMatrixWorld();
     return cam;
   }
+  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot pokalhyllan med
+  // Tipsligan, som också lyser på disken under. De finns i alla sakers ljus, så att alla delar samma
+  // grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i bildrutorna.
+  const SPOTAR = [
+    { fran: [1050, 30, 330], mot: [1050, -372, WZ], styrka: 1.6, vinkel: 0.34 },
+    { fran: [880, 30, 470], mot: [WX, -366, 377], styrka: 0.8, vinkel: 0.36 },
+  ];
   // ljuset som i rummet: lysröret ovanför och framför till vänster, neonen
-  // från fönstret och tv:n från hörnet
+  // från fönstret, tv:n från hörnet och spotarna
   function wallLights(b, box, skugga = true) {
     const { scene } = b;
     scene.add(new THREE.HemisphereLight('#eadcc0', '#3a2a1a', 0.55));
@@ -239,6 +246,13 @@ export async function inredning(el, opt = {}) {
     const f = new THREE.DirectionalLight('#ffd9b0', 0.35);
     f.position.set(760, -400, 1000);
     scene.add(f);
+    for (const { fran, mot, styrka, vinkel } of SPOTAR) {
+      const s = new THREE.SpotLight('#ffe2b8', 0, 0, vinkel, 0.9, 2);
+      s.position.set(...fran);
+      s.target.position.set(...mot);
+      s.intensity = styrka * s.position.distanceToSquared(s.target.position);
+      scene.add(s, s.target);
+    }
   }
   // skuggorna faller bara där det finns vägg (högra väggen bara ovanför disken)
   function catcher(b, g, rot, pos, o = 0.42) {
@@ -1143,8 +1157,8 @@ export async function inredning(el, opt = {}) {
 
   // Plywood i två kedjor: så här sätter den upp det som har hand om det.
   // Sedlarna är knappar ovanpå (rum-affischer.js), med skivans framsida i deras
-  // plan. Blyertsmåtten står kvar, en Dymo-remsa under varje sedel och
-  // vattenpasset ligger ovanpå. Skuggorna under sedlarna och på glaset är
+  // plan, och en Dymo-remsa under varje sedel. Skivan är färdig: inga
+  // blyertsmått och inget vattenpass. Skuggorna under sedlarna och på glaset är
   // bakade, så att sedlarna inte behöver något filter och det ser likadant ut
   // utan skuggkarta.
   function skiva(b) {
@@ -1174,29 +1188,11 @@ export async function inredning(el, opt = {}) {
     ply.repeat.set(1, h / w);
     const kant = mat('#c7ab7b', { roughness: 0.7 });
     b.mesh(new THREE.BoxGeometry(w, h, D), [kant, kant, kant, kant, mat('#fff', { map: ply, roughness: 0.74, envMapIntensity: 0.8 }), kant]).position.set(x + w / 2, -(y + h / 2), -D / 2);
-    // blyertsen och skuggorna under sedlarna, på framsidan
+    // skuggorna under sedlarna, på framsidan
     const SK = 3;
     const rit = tex(w * SK, h * SK, (c) => {
       c.scale(SK, SK);
       c.translate(-x, -y);
-      c.strokeStyle = 'rgba(38,36,40,.5)';
-      c.lineWidth = 0.34;
-      const streck = (x0, y0, x1, y1) => {
-        c.beginPath();
-        c.moveTo(x0, y0);
-        c.lineTo(x1, y1);
-        c.stroke();
-      };
-      for (const r of rader.slice(0, 2)) for (const k of [r.x, r.x + sedel.w]) streck(k, y, k, y + h);
-      for (const r of [rader[0], rader[2]]) for (const k of [r.y, r.y + sedel.h]) streck(x, k, x + w, k);
-      c.setLineDash([3.2, 2]);
-      streck(x + w / 2, y, x + w / 2, y + h);
-      c.setLineDash([]);
-      c.fillStyle = 'rgba(30,28,34,.72)';
-      c.font = '700 5.6px Caveat, cursive';
-      c.textAlign = 'center';
-      for (const r of rader.slice(0, 2)) c.fillText(String(sedel.w), r.x + sedel.w / 2, r.y - 3);
-      c.fillText(String(w / 2), x + w / 2 + 4, y + h - 4);
       c.shadowColor = 'rgba(24,12,0,.62)';
       c.shadowBlur = 2.2 * SK;
       c.shadowOffsetX = 0.45 * SK;
@@ -1256,29 +1252,6 @@ export async function inredning(el, opt = {}) {
       s.scale.set(1, 0.42, 1);
       s.position.set(kx, -(y + 2), 1.6);
     }
-    // vattenpasset, med bubblan mitt emellan strecken: det är det som är poängen
-    const pw = 120, ph = 10, px = x + (w - pw) / 2, py = y - ph;
-    b.mesh(new RB(pw, ph, 6.5, 2, 0.9), mat('#e7b416', { roughness: 0.44, metalness: 0.18, envMapIntensity: 0.7 })).position.set(px + pw / 2, -(py + ph / 2), -2.25);
-    for (const ax of [px + 1.3, px + pw - 1.3]) b.mesh(new RB(2.6, ph + 0.4, 7, 2, 0.5), mat('#1b1b1b', { roughness: 0.6 })).position.set(ax, -(py + ph / 2), -2.25);
-    b.mesh(new THREE.BoxGeometry(22, 5.2, 0.2), mat('#20201c', { roughness: 0.7 })).position.set(px + pw / 2, -(py + ph / 2), 1.05);
-    const ror = tex(196, 34, (c, W, H) => {
-      c.fillStyle = '#b6d24a';
-      c.fillRect(0, 0, W, H);
-      const g = c.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, 'rgba(255,255,255,.4)');
-      g.addColorStop(0.5, 'rgba(255,255,255,0)');
-      g.addColorStop(1, 'rgba(40,60,0,.45)');
-      c.fillStyle = g;
-      c.fillRect(0, 0, W, H);
-      c.fillStyle = 'rgba(20,20,10,.9)';
-      c.fillRect(W / 2 - 24, 0, 3, H);
-      c.fillRect(W / 2 + 21, 0, 3, H);
-      c.fillStyle = 'rgba(240,250,190,.95)';
-      c.beginPath();
-      c.ellipse(W / 2, H / 2, 17, H / 2 - 4, 0, 0, Math.PI * 2);
-      c.fill();
-    });
-    b.mesh(new THREE.BoxGeometry(19.6, 3.6, 0.2), mat('#fff', { map: ror, roughness: 0.15, envMapIntensity: 0.7 })).position.set(px + pw / 2, -(py + ph / 2), 1.15);
   }
 
   // ---------- bladet vid radion ----------
@@ -1309,8 +1282,10 @@ export async function inredning(el, opt = {}) {
       PLAN.push({ band, j: j0 });
       st.forEach((k, i) => PLAN.push({ band, k, j: j0 + 1 + i }));
     }
-    const TOPP = 4.4;
-    const RAD = Math.min(2.4, (EH - TOPP - 1.6) / Math.max(1, PLAN[PLAN.length - 1].j));
+    // (raderna så höga som bladet räcker till; bredden sätter gränsen för handstilen, och det längsta namnet,
+    // Guldkanalen 80-tal, trycks ihop en aning i sidled av skriv)
+    const TOPP = 4.8;
+    const RAD = Math.min(3.4, (EH - TOPP - 1.6) / Math.max(1, PLAN[PLAN.length - 1].j));
     // marginalen, frekvensernas högerkant (FX, efter den bredaste) och namnen efter dem
     const MARG = 2.2;
     const KOL = MARG + 0.5;
@@ -1455,7 +1430,8 @@ export async function inredning(el, opt = {}) {
         c.font = `700 ${fs}px Caveat, cursive`;
         const fw = c.measureText(f).width;
         skriv(f, FX * u - fw, bas * u, fs, farg, 0, x.j * 3);
-        const nb = skriv(namn, NX * u, bas * u, fs, farg, (EW - NX - 0.8) * u, x.j * 3 + 1);
+        // (luft till högerkanten också för det längsta namnet)
+        const nb = skriv(namn, NX * u, bas * u, fs, farg, (EW - NX - 1.4) * u, x.j * 3 + 1);
         rader.push({ id: x.k.id, band: x.band, x0: KOL, x1: EW - 0.6, topp: linje - RAD, ned: linje, bas, fran: FX - fw / u, slut: NX + nb / u });
       }
       // kanterna lite mörkare, som ljuset faller

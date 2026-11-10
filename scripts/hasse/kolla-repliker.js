@@ -44,6 +44,12 @@ const UNDERKANT = [
   [/\bförsäkring\b/i, 'gardering: på en kupong garderar man sig'],
   [/\bDär har du hela\b/i, 'Det var hela gänget.'],
   [/\bfinns inte att säga\b/i, 'Mer än så finns det inte att säga.'],
+  [/\bVem (vill du höra om|av er ska jag ta)\b/i, 'Vems kupong ska jag ta nu?: säg att det är en kupong han ska döma'],
+  // Den han talar med kan vara den han dömer, och i gänget är han inte med (Tomas 2026-11-10).
+  [/\bvi (att )?få höra\b/i, 'det kommer resten att få höra: i gänget är han inte med'],
+  [/\b(ni|er) andra\b/i, 'de andra: den han talar med kan vara den han dömer'],
+  [/\bandras domar\b/i, 'domarna över de andra: domarna är hans'],
+  [/\bVems vill du höra (först|nu)\?/i, 'Vilken vill du höra först? eller Vems kupong tar vi nu?: det är hans bedömning man hör'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
@@ -67,7 +73,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
   'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
-  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
+  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
   'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
@@ -113,9 +119,23 @@ for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'i
   if (!(repliker.domord && repliker.domord[k])) fel.push(`domord.${k} saknas`);
   if (!(k === 'forsakring' || (repliker.domar && repliker.domar.in && repliker.domar.in[k]))) fel.push(`domar.in.${k} saknas`);
 }
+// Frågan över listan med gänget (gangLista i rum-hasse.js) sägs i ett svep och får vara två meningar. Den ska
+// säga vad han har att ge och att det gäller en kupong (Tomas 2026-11-10: "höra om din kupong" tar för givet att
+// man vet att han ska säga något om den), och rymmas på tre rader i den smalaste telefonen med det längsta namnet.
+const FRAGOR = ['domar.fraga', 'domar.igen', 'domar.alla', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte'];
+const LANGST = Object.entries(repliker.felnamn || {}).flat(2).reduce((a, b) => (b.length > a.length ? b : a), '');
+const GOR = /\b(tycker|bedöm\w*|dom|domen|döm\w*|synpunkter|kommenterar|säga något)\b/i;
+for (const vag of FRAGOR) {
+  for (const t of varde(vag) || []) {
+    if (t.replace('{namn}', LANGST).length > 80) fel.push(`${vag}: "${t}" är för lång: högst 80 tecken med namnet, annars flyttar sig gänget`);
+    if (vag === 'domar.alla') continue;
+    if (/\bhöra om\b/i.test(t)) fel.push(`${vag}: "${t}" säger höra om. Säg vad han ska göra: vad jag tycker om, min bedömning av, domen över.`);
+    if (!/kupong/i.test(t) || !GOR.test(t)) fel.push(`${vag}: "${t}" säger inte vad han ska göra med kupongen. Skriv till exempel: Vems kupong ska jag döma nu?`);
+  }
+}
 // Till gruppen säger han ni och er: det är bara ni som använder sidan (Tomas 2026-11-09).
 for (const [vag, t] of alla) if (/\bgäng/i.test(t)) fel.push(`${vag}: "${t}" säger gänget. Skriv ni, er eller allihop.`);
-for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !['domar.fraga', 'domar.alla'].includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
+for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !FRAGOR.includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
 for (const k of ['1', 'X', '2']) {
   const t = repliker.tecken && repliker.tecken[k];
   if (!t || !t.du || !t.bestamd) fel.push(`tecken.${k} saknar du eller bestamd`);
@@ -138,7 +158,7 @@ for (const t of blockTexter(block.TEXT)) {
   if (!/[.?!]$/.test(t) && !/^[A-ZÅÄÖ][a-zåäö]+( [a-zåäö]+){1,4}$/.test(t)) fel.push(`protokollet: "${t}" saknar punkt`);
 }
 
-// Tidningen bakom löpsedeln (public/rum-tidning.js) sägs inte heller. Det som är underkänt gäller, en mening ska
+// Tidningen Helgarderat på pulten (public/rum-tidning.js) sägs inte heller. Det som är underkänt gäller, en mening ska
 // sluta med punkt (rubrikerna har ingen, och orden i tabellerna är kortare än fem ord), och i krönikan säger Hasse ni och er.
 const tidningsTexter = (o, vag = '') => (typeof o === 'string' ? [[vag, o]] : typeof o === 'function' ? [[vag, o(9, 11, '1–0', 18)]]
   : Array.isArray(o) ? o.flatMap((x) => tidningsTexter(x, vag)) : Object.entries(o).flatMap(([k, v]) => tidningsTexter(v, vag ? `${vag}.${k}` : k)));

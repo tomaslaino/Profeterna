@@ -310,7 +310,13 @@ window.RumHasseKupong = (ctx) => {
       const steg = fran === 'hand' ? [[hand, ner, 300, ease.in, true]] : [[disk, fore, 240, ease.mjuk, false], [fore, ner, 420, ease.in, true]];
       if (!await kor(...steg)) return;
     }
-    if (K.el === el) { el.remove(); K.el = null; K.fas = null; }
+    if (K.el === el) {
+      el.remove();
+      K.el = null;
+      K.fas = null;
+      // tillbaka på pulten, med det han har skrivit (pultPapper i rum-hasse.js)
+      if (ctx.pulten) ctx.pulten();
+    }
   }
   function klickPa(e) {
     e.stopPropagation();

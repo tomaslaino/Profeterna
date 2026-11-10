@@ -252,8 +252,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   påsar under ögonen, sedan kommer de igång, och efter en stund utan musik eller klick somnar de
   om. Lysröret dämpas långsamt från 23 till midnatt (förut släcktes det vid midnatt) och tänds lika
   långsamt från sex till sju (se *Natten* och *Sömnen* under [Tobaksaffären](#tobaksaffären))
-- [x] **Tidningen (2026-11-09, användarens önskemål: "förbättra tidningen otroligt mycket"):** löpsedeln i
-  tobaksaffären öppnar veckans tidning också före omgången, och den är en riktig tidning: sedeln som framsida,
+- [x] **Tidningen (2026-11-09, användarens önskemål: "förbättra tidningen otroligt mycket"):** veckans tidning i
+  tobaksaffären finns också före omgången, och den är en riktig tidning: sedeln som framsida,
   *I tidningen* med sidorna, och sidor med sidhuvud, avdelningar, spalter och tabeller. Före omgången *Tipset*
   (matcherna, datorns procent, Sixten Bråvalls tecken och Tipsligan), *Så mår tipslagen* (notiserna inför
   omgången) och *Veckans analys*; efter den *Omgången* (resultaten, rätt rad och siffrorna), *Betygen*,
@@ -261,10 +261,43 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   omgången, med betygen, skrällen och två meningar från Hasse (se *Tidningen* under [Tobaksaffären](#tidningen))
 - [x] **Tipsguiden på pulten (2026-11-09, användarens önskemål: "nåt nr av tipsguiden … som man kan plocka upp o
   läsa"):** tidningens tipsbilaga ligger på pulten mellan Hasses nota och kupongen, med kupongen en bit över sig. Ett
-  klick eller G lyfter den, och den läggs fram som tidningen bakom löpsedeln, med en egen framsida (namnet, veckans
+  klick eller G lyfter den, och den läggs fram som kvällstidningen, med en egen framsida (namnet, veckans
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Kvällstidningen på pulten (2026-11-10, användarens önskemål: "När man zoomade in den här så fick man hela
+  tidningen - så ska det inte vara"):** ett klick på veckans löpsedel går bara fram till sedeln, som de andra
+  löpsedlarna. Tidningen ligger i stället på pulten till höger om kupongen, bakom högen med de inlämnade
+  kupongerna: samma tidning och samma förstasida som löpsedeln, och ett klick eller L lyfter den och lägger fram den
+  som förut. Samma dag ("Gör så att rubriken syns ovanför kupongerna"): högen ligger längre fram, och tidningen är så
+  stor att rubriken slutar ovanför kupongerna. Och sedan ("Gör tidningen lite större"): kupongerna i högen ligger
+  tätare, och tidningen är ungefär 15 % större. Den är ritad som Tipsguiden, i sidan och inte i 3D, och kostar lika lite som den (se
+  [Tidningen](#tidningen))
+- [x] **Helgarderat Nr 1 (2026-11-10, användarens önskemål: "gör första numret av Helgarderat nu och inte väntar på
+  det"):** numret inför lördagen den 14 november ligger på sajten, utan provstämpel, med *Nr 1 · Vecka 46* i huvudet.
+  Det är lagt för hand ur provomgångens material, som är lördagens matcher och veckans källor; nattjobbet byter ut
+  det när det har skrivit sidorna för omgången. Provnumret är nu *Nr 0* (se *Helgarderat* under
+  [Tidningen](#helgarderat))
+- [x] **En tidning, Helgarderat (2026-11-10, användarens önskemål: "döp om tidningarna till 'Helgarderat'. Sen vill jag
+  bara ha en tidning - inte två stycken"):** Tipsguiden och kvällstidningen är ihopslagna till Helgarderat, som ligger
+  till höger om kupongen, bakom högen. Framsidan är Tipsguidens i Helgarderats utseende (namnet i flaskgrönt med 1, X och 2
+  ikryssade), och efter omgången står gängets rätt och rätt rad på den. Inuti står allt från båda: före omgången Tipset,
+  notiserna, analysen och supportrarna, efter den resultaten, betygen, skrällen och krönikan, och *Åtta knep* sist (se
+  [Tidningen](#tidningen))
+- [x] **Supportrarnas matchblad (2026-11-10, användarens önskemål):** i Helgarderat och under *Supportrarna* i
+  tidningen på pulten är varje match en artikel: rubrik, bild, en kort introduktion, hemmalaget, bortalaget och en
+  sammanfattning, med avsparken och källorna med datum bredvid och ibland ett citat. Bilden är veckans bild av vart
+  och ett av lagen, som GitHub Actions hämtar före bygget, och utan dem står lagens sköldar mot varandra. Nattjobbet skriver matchbladen; det
+  första numret är skrivet för hand. Bara veckans källor är förberett men avslaget medan vi provar (se
+  [Helgarderat](#helgarderat))
+- [x] **En ren framsida (2026-11-10, användarens önskemål: "Tidningen ser plottrig ut"):** Helgarderats framsida har
+  bara namnet, numret med omgångens dag och namn, och veckans bild med notisens rubrik; *Spika*, *Rysaren*, kupongen och
+  *Åtta knep* är borta (se *Framsidan* under [Tidningen](#tidningen))
+- [x] **Löpsedeln är Helgarderats, och tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål: "Döp om
+  löpsedeln till Helgarderat också", "Kan du ordna så att tidningen ser mer 'äkta' ut - med riktigt papper"):** veckans
+  löpsedel har Helgarderats namn och gröna tryck i stället för Sportbladets eller Expressens, och tidningen har löpsedelns
+  papper: gråaktigt och matt med fibrer och buktor, tryckfärg som inte har täckt överallt, dämpade färger och ett veck på
+  mitten (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären) och *Papperet* under [Tidningen](#tidningen))
 
 ## Publicering
 
@@ -355,7 +388,8 @@ blir mer ansträngt för datorer o mobiler").
 - **Papperets tre röster:** allt papper (kupongen, matchbladet, protokollet, kortregistret,
   anslagstavlan) har samma pappersstruktur och samma tre röster, så att det ser ut att komma ur samma
   låda: det förtryckta (`--tryck`, Fraunces i terrakotta: band, rubriker, rutor, nummer), det
-  maskinskrivna (`--skriv`: lag, tider, värden) och pennan (`--pp-hand`). Färgerna står på ett ställe,
+  maskinskrivna (`--skriv`: lag, tider, värden; löptext som analysen i `--renskrift`, se nedan) och pennan
+  (`--pp-hand`). Färgerna står på ett ställe,
   i [public/papper.css](public/papper.css), som också pekar om `--display` och `--sans` till
   skrivmaskinen på papperet. En skrivmaskin har inget fetstilt: det som ska framhållas stryks under.
 - **Skrivmaskin** är Special Elite (Apache 2.0) ombyggd av
@@ -365,6 +399,9 @@ blir mer ansträngt för datorer o mobiler").
   bokstav blir den andra lik utan att sidan gör något, också på en duk i three.js och utan fler
   element i rummet. `ss01`–`ss06` börjar raden på ett annat anslag; papper.css använder dem (`--anslag`)
   där samma text står på flera rader. Originalen ligger i scripts/typsnitt/kalla/.
+  **Renskrift** kommer ur samma skript: samma maskin och samma bredd, men med ett normalt anslag av varje
+  tecken, utan hopp och fel (`--renskrift`). Den är till löptext – analysen och tipset i matchbladet, i
+  rummet och på sajten – där hoppen och de svaga anslagen gör att ögat får läsa bokstav för bokstav.
   Pappersstrukturen bakas av [scripts/rum/papper.mjs](scripts/rum/papper.mjs).
 - **Rummets 3D-filer redan i `<head>`:** står tobaksaffären (klassen `rum-vantar`) lägger ett skript
   efter importmapen `modulepreload` för three.js och dess tre tillägg, rum-3d.js och de moduler den
@@ -787,12 +824,33 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   på AM. Tejpen har fått större handstil, och varje namn står över sin frekvens; ett tryck på ett namn går dit.
   Bladet är mindre och sitter fritt från antennen, med allt i en spalt: FM med sin rubrik överst, AM under, och
   frekvenserna rakt under varandra. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Utsikten från Bron vid S:t Eriksbron (2026-11-10, användarens önskemål):** "Jag vill att bakgrunden (utanför
+  fönstret) ska se ut som på barbilden … Det ska inte vara detaljerat och dra grafik - det ska vara en känsla av att
+  baren geografiskt befinner sig där bron befinner sig idag", och "så att det inte drar en massa grafik för sämre
+  datorer/mobiltelefoner". Husen mittemot med pizzerian och konditoriet, kyrktornet, byggkranen och den parkerade bilen
+  är borta. I stället syns brons gröna räcke med stan på andra sidan i vänstra rutan och dörren och det laxrosa
+  hörnhuset vid brofästet i den högra, som på bilderna av baren Bron. Lättare än förut: en SVG i stället för tre och en
+  fjärdedel så många element. Se *Utsikten och vädret* under [Tobaksaffären](#tobaksaffären).
 - **Bladet vid radion sitter ordentligt uppsatt (2026-11-10, användarens önskemål):** "det här pappret ser lite
   underligt uppsatt ut - kan du ordna det på ett snyggt och bra sätt". Bladet gick en bit in över fönsterkarmens kant,
   nådde ned till fönsterbänken, hade ett nedre hörn som rullade sig och tejp som stack ut snett från hörnen. Nu sitter
   det helt på väggen mellan karmen och veckans löpsedel, en bit ovanför bänken och lite mindre (23 × 29 i stället för
   27 × 34), hänger rakt och ligger nästan plant, med två korta tejpbitar över överkanten. Se
   [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Ett större blad vid radion (2026-11-10, användarens önskemål):** "Gör lappen större, den syns knappt nära
+  radion". Bredden ges av väggremsan mellan karmen och veckans löpsedel, och den användes redan nästan helt; det som
+  höll nere handstilen var att tretton rader skulle rymmas på 29 i höjd. Bladet är nu 25,5 × 45 (förut 23 × 29), och
+  handstilen ungefär 1,7 gånger så stor. Närbilden av radion tar med det större bladet och går därför lite mindre
+  nära i liggande fönster; där och i stående är handstilen ändå klart större än förut. Löpsedeln och allt annat
+  står kvar. Se [Tobaksaffären](#tobaksaffären), *Radion*.
+- **Det går att förstå vad som är vad vid radion, och skruvarna är kryss (2026-11-10, användarens önskemål):**
+  "Alltså man förstår inte riktigt vad det är som händer här. Dessutom är det något konstigt med skruven som sätter
+  fast chelsea-löpsedeln." Under bladet låg en halvgenomskinlig ruta på väggen: prickarna i fönsterbänkens sten
+  fyllde filtrets hela rektangel, också trianglarna utanför bänkens sneda ändar. Nu klipps de efter bänken. Karmen
+  var en slät mörk platta nära; nu har den en ljus ytterkant och en fals i skugga mot glaset och mittposten, så att
+  den syns som en karm (i rummet på håll knappt märkbart). Skruvarnas stjärnspår var två gradienter i små rutor som
+  avrundades till hela bildpunkter, så att korset blev ett krokigt tecken nära; nu är spåret en liten SVG. Se
+  [Tobaksaffären](#tobaksaffären), *Radion* och *Affischerna*.
 - **Man väljer sig själv med ett klick på sin figur (2026-11-03, användarens önskemål):**
   ett klick på sin egen figur vid bordet gör en till den som fyller i kupongen – samma val
   som porträtten på kupongen – och figuren räcker upp handen med pennan, lyfter kupongen mot
@@ -828,9 +886,98 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   kupong i den smala formen, och användaren bad om något skrivet på stället: en tryckt skylt *Nästa
   omgång* i bandets färg överst. Skylten är en del av stället och inga ord bredvid det, som beslutet
   nedan säger. Se *Nästa omgång ur kupongstället* under [Kupongen i handen](#kupongen-i-handen).
+- **En tidning på pulten, och den heter Helgarderat (2026-11-10, användarens önskemål):** "Jag vill att du döper om
+  tidningarna till 'Helgarderat'. Sen vill jag bara ha en tidning - inte två stycken. Du får slå ihop dem på ett snyggt
+  sätt. Lägg tidningen på höger sida om kupongen". Tipsguiden mellan notan och kupongen och kvällstidningen till höger om
+  kupongen är nu en tidning, Helgarderat, där kvällstidningen låg. Framsidan är Tipsguidens (den har en egen, och
+  kvällstidningens var en kopia av löpsedeln) i utkastets utseende, och efter omgången står gängets rätt och rätt rad på
+  den. Inuti står det som stod i båda, och den finns alltid, som Tipsguiden. L tar upp den. Löpsedeln i fönstret var då
+  kvar, Sportbladets eller Expressens; samma dag blev också den Helgarderats (se nästa punkt). Se [Tidningen](#tidningen).
+- **Löpsedeln är Helgarderats (2026-11-10, användarens önskemål):** "Döp om löpsedeln till Helgarderat också". Veckans
+  löpsedel är samma tidning som ligger på pulten: namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade
+  framför, och raden som lyfts fram i rubriken, vinjetten och plustecknet gröna i stället för röda. Förut var den
+  Sportbladets eller Expressens, två veckor i taget. Rubrikerna är desamma; *BARA I {T}* blir *BARA I HELGARDERAT*, och
+  när det inte finns något att skriva om gör den reklam för det som står i tidningen (*SÅ TAR DU HEM 13 RÄTT*, *SÅ BLIR
+  DU RIK PÅ TIPSET*) i stället för Tipsguiden. Rutorna står på ett ställe (`RumTidning.rutor`), som tidningen,
+  löpsedeln och Helgarderats egen sida använder. Se *Löpsedeln* under [Tobaksaffären](#tobaksaffären).
+- **En ren framsida: numret och veckans bild (2026-11-10, användarens önskemål):** "Tidningen ser plottrig ut. Ta bort
+  massa saker där som vi är ointresserade av - rysaren, 8 enkla knep etc. Tänker att det kan vara en aktuell bild som
+  passar omgången eller bara vilken helgarderat-upplaga/nummer det handlar om". Framsidan har nu bara namnet, numret
+  stort med omgångens dag och namn, och ett av veckans foton av lagen med notisens rubrik; utan bild står numret ensamt.
+  Rubriken, kupongen med datorns tecken, *Spika*, *Rysaren*, puffarna och efter omgången gängets rätt och rätt rad är
+  borta, och sidan *Åtta knep* också. Löpsedeln gör inte längre reklam för knepen. Sedan: "Kör den med en bild -
+  skippa den där rubriken under: ”Näten på City Ground håller fint”" och "Gör det snyggt utan den!": omgångens namn är
+  borta, dagen står mellan två tunna streck, och det finns alltid en bild – matchbladens foton, som GitHub Actions
+  hämtar, före notisernas, och lagens sköldar när inget foto finns. Se *Framsidan* under [Tidningen](#tidningen).
+- **Tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål):** "Kan du ordna så att tidningen ser mer
+  'äkta' ut - med riktigt papper etc. Just nu ser den inte helt verklighetstrogen ut". Helgarderat såg ut som ett tryckt
+  kort: vitt och jämnt papper med ett prickraster över allt, mättade färger, en tom ruta under kupongens rader och en
+  skugga som om den svävade. Nu har den samma papper som löpsedeln: gråaktigt och matt med fibrer, ojämn ton och buktor,
+  tryckfärg som inte har täckt överallt och kanter som har gulnat. Färgerna är tryckfärgens (svärtan inte helt svart, det
+  gröna och röda dämpade, och det vita i texten är papperet), kupongens rader fyller rutan, vecket på mitten är en ås med
+  ljus ovanför och skugga under, och skuggan ligger tätt intill pulten. Se *Papperet* under [Tidningen](#tidningen).
+- **Löpsedeln är en löpsedel, och tidningen ligger på pulten (2026-11-10, användarens önskemål):** "När man zoomade
+  in den här så fick man hela tidningen - så ska det inte vara. Då är det bättre om du visualiserar tidningen på ett
+  lämpligt ställe på animationsbilden eller hos Hasse Backe (om det tar mycket grafik hos sämre datorer/mobiltelefoner
+  att ha den på förstasidan). Jag tänker alltså att löpsedeln ska vara kvar men att det ska finnas en tidning på något
+  lämpligt ställe". Ett klick på veckans löpsedel går nu bara fram till sedeln, som de andra. Tidningen ligger
+  på pulten till höger om kupongen, bakom högen med de inlämnade kupongerna, med löpsedelns förstasida: där syns den
+  stort och tydligt, i datorn utan att man drar och i telefonen när man drar åt höger, och den motsvarar Tipsguiden på
+  andra sidan kupongen. Den är ritad som Tipsguiden, i sidan och inte i 3D: papperet ritas en gång och flyttas sedan
+  bara med rummet, så den kostar inte mer i svaga telefoner än Tipsguiden. Bardisken (för liten, man ser den snett
+  uppifrån) och Hasses disk (i telefonen täcker samtalet den) var de andra ställena. Fläkten, fikat och askkoppen står till höger om högen
+  och tidningen. Först låg tidningen hopvikt, och kupongerna täckte rubriken; samma dag ("Gör så att rubriken syns
+  ovanför kupongerna") flyttades högen fram och tidningen gjordes mindre, så att hela rubriken syns ovanför dem.
+  Att lägga tidningen över kupongerna gick inte: porträttet och namnet sitter överst på dem. Sedan ("Gör tidningen lite
+  större") ligger kupongerna i högen tätare, så att namnen nätt och jämnt syns, och tidningen fick det som blev över.
+  Se [Tidningen](#tidningen).
+- **Riktiga bilder i matchbladen, hämtade av GitHub Actions (2026-11-10, användarens önskemål):** "Fixa så att det
+  kommer riktiga bilder nu". Den första hämtningen gav 21 av 24 lag en bild, men flera ur artiklar om motståndaren
+  (Fleetwoods matchguide om Rochdale, *York City smash Northampton*, *Wycombe defeat Accrington*), övergångsrykten
+  och en minnesartikel, alltså troligen fel lag på bilden. Därför tar matchbladen bara artiklar som handlar om laget
+  självt, och ett lag utan en sådan får sin sköld. Molnmiljön där matchbladen skrevs når inte nyhetssajterna, och tidningen inför omgången
+  (`data/tidning.json`), vars bilder matchbladen först lånade, var inte utlagd för omgången. Men GitHub Actions, som
+  bygger sajten var 30:e minut, når dem. Där hämtar nu `scripts/tidning/matchbilder.mjs` före bygget veckans bild av
+  varje lag i `data/poddsidor.json` med samma kod som tidningens bilder på iMacen (src/analyser/tidning-bilder.mjs,
+  som nu kan förminska med ImageMagick när `sips` saknas), en gång per omgång, och bygget lägger dem i matchbladen.
+  Se *Bilden* under [Helgarderat](#helgarderat).
+- **Matchblad i stället för punkter (2026-11-10, användarens önskemål):** "Jag vill inte att det ska vara punkter och
+  uppdelat på det där sättet. Jag vill att det ska vara ett matchblad med information. Först en kort introduktion, sen
+  diskussion om ena laget, sen det andra och sist en sammanfattning. … Få med en aktuell bild för varje vs-match. …
+  Jag tillar de sobra färgerna men det ser plottrigt ut det där. Gör snygga artiklar allmänt med inför-information
+  inför de respektive matcherna." Varje match är nu en artikel: rubrik, bild, introduktion, ett till tre stycken om
+  hemmalaget och om bortalaget och en sammanfattning i en grön ruta, och i en smal spalt bredvid avsparken, källorna
+  med datum och ibland ett citat. Markörerna, ämnesspalten och stämplarna är borta, liksom framsidans rutor *Hört
+  bland supportrarna* och *De insatta skriver*; där står i stället tre matcher till med bild. Bilden är veckans
+  bilder av lagen som tidningen inför omgången redan hämtar (hemma och borta bredvid varandra, svartvita). Att
+  hämta en bild per match härifrån gick inte: molnmiljön når inte nyhetssajterna. Utan bild står lagens sköldar mot
+  varandra. Nattjobbets redaktör skriver matchbladet (`sidaPrompt` i config/poddar.js), och det första numret är
+  skrivet för hand ur samma uppgifter. Se [Helgarderat](#helgarderat).
+- **Supportrarnas sidor: kort, ordnat och med datum (2026-11-10, användarens önskemål, ersatt samma dag av
+  matchbladen ovan):** "Man vill ju att det ska
+  vara betydligt mer organiserat/snyggt och överblickbart än vad det är just nu med en massa citat, rubriker efter
+  varandra etc. Det kan väl vara något citat vid något tillfälle i texterna men jag vill att det ska vara kortfattad
+  och snygg information. Eventuella referenser ska finnas med datum från när podden släpptes t ex eller datum när
+  informationen skrevs på forumet t ex. … Helst ska ju poddarna och citaten vara från veckan när kupongen spelas -
+  men gör ett undantag nu när vi bara testar." Varje punkt hade en stämpel, nästan varje punkt ett citat, och
+  ämnena stod som rubriker under varandra. Nu står ämnet med ett ord i en smal spalt till vänster (*Truppen*,
+  *Elvan*, *Spelet*, *Klubben*, *Matchen*) och punkterna till höger, var och en med en liten markör i stället för
+  stämpeln (svart fyrkant: bekräftat, röd prick: egen uppgift eller rykte, ring: åsikt), och nyckeln står en gång
+  längst ner. Under laget står källorna med sina datum (*Ur podden SK3 TV (9 nov) och forumet Owlstalk (10 nov)*),
+  och vid punkten bara när laget har flera källor eller punkten har ett eget datum som inte syns där (ett
+  foruminlägg). Sidan har högst ett citat. Nattjobbet skriver högst sex punkter per lag, en mening på högst 22 ord
+  var, utan "värdarna säger att", och sparar dagen för varje punkt (foruminläggets, avsnittets eller artikelns).
+  Bara källor från kupongens vecka (måndag till matchen) finns som `sidan.baraVeckan` i config/poddar.js, avslaget
+  tills provperioden är slut. Se [Helgarderat](#helgarderat).
+- **Helgarderats första nummer nu, inte efter nattjobbet (2026-11-10, användarens önskemål):** "Jag vill att du gör
+  första numret av Helgarderat nu och inte väntar på det". Nattjobbets första riktiga körning skulle bli natten
+  efter. Provomgången från iMacen samma natt var redan lördagens matcher med veckans avsnitt, foruminlägg och
+  artiklar, så det första numret är samma tolv sidor, lagda i `data/poddsidor.json` och visade utan provstämpel.
+  Numren räknas från det: Nr 1 är veckan med lördagen den 14 november, och provnumret blev ett nollnummer, *Nr 0*.
+  Se [Helgarderat](#helgarderat).
 - **Ett nummer av Tipsguiden att ta upp (2026-11-09, användarens önskemål):** "Jag vill att det ska ligga nåt nr av
-  tipsguiden på animationssidan nånstans som man kan plocka upp o läsa". Tidningen bakom löpsedeln fanns bara när man
-  klickade på sedeln i fönstret, och mellan omgångarna inte alls. Nu ligger Tipsguiden, tidningens tipsbilaga, på pulten
+  tipsguiden på animationssidan nånstans som man kan plocka upp o läsa". Tidningen fanns då bara när man
+  klickade på löpsedeln i fönstret, och mellan omgångarna inte alls. Nu ligger Tipsguiden, tidningens tipsbilaga, på pulten
   i tobaksaffären, och ett klick tar upp den. Den har ingen text bredvid sig (beslutet nedan): namnet står på tidningen.
   Hasse Backes rum är oförändrat. Se *Tipsguiden* under [Tidningen](#tidningen).
 - **Inga förklarande ord i tobaksaffären (2026-11-09, användarens beslut):** rummet ska vara
@@ -882,6 +1029,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   stora, med skruv i hörnen, Dymo-remsor, blyertsmåtten kvar och vattenpasset ovanpå. Det får
   inte tynga grafiken. Veckans löpsedel är kvar för hand, men i telefonen på väggen, där
   Chelsea satt. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Skivan är färdig: inget vattenpass och inga blyertsmått (2026-11-10, användarens beslut):** "Du kan ta bort den
+  där vattenpasset (eller vad det är?) ovan plywoodskivan och dessutom ta bort den inritade 80 cm-grejen. Den ska vara
+  klar." Vattenpasset ovanpå och blyertsen på framsidan (strecken efter sedlarnas kanter, mittlinjen och måtten 80 och
+  93) är borta. Kvar är plywooden, kedjorna, skruvarna, remsorna och skuggorna under sedlarna. Se
+  [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Chelseas löpsedel på väggen (2026-11-03, användarens önskemål):** till höger om
   skyltfönstret, under oraklet, sitter The Sun on Sundays löpsedel från dagen efter Chelseas
   seger i Champions League 2021, med Tomas foto av laget med pokalen. Den sitter med två
@@ -1104,6 +1256,31 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   syns i ljushet och inte bara i färg. Var och ens rätt är mindre än förut, så att kupongens *10/13* med rödpennan, inringat,
   är det enda handskrivna på raden och syns först. Provat i headless Chromium i färg och i gråskala, i den breda och den
   smala versionen och med sex spalter. Se *Sammanställningen efter omgången*.
+- **Matcherna i protokollet går att ta fram (2026-11-10, användarens önskemål):** "Jag vill kunna klicka på matcherna för att
+  få någon form av redogörelse av hur det gick med bettningen och bettingrekommendationen som datorn gav. Använd samma
+  struktur som när man klickar på matcherna i en vanlig kupong - bara det att det är en efter-match-sammanfattning av matchen
+  inklusive en redogörelse av hur det gick." Ett klick på en rad i protokollet (framme, från pulten eller korktavlan) lägger
+  fram matchbladet efter matchen: samma blad som från kupongen, men med sidorna *Rättningen* (allas tips i matchen med
+  datorns chans, poäng och spelkassa, och datorns och analysens råd som jämförelse; datorn och spelbolagen före avspark med
+  facit överstruket), *Matchen* (mål, kort och statistik), *Prognos*, *Analys* (tipset rättat, först), *Startelvor* och
+  *Tabellen*. Se *Matchbladet efter matchen* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
+- **Matchbladet efter matchen i protokollets färger (2026-11-10, användarens önskemål):** "Det är lite fööör mycket färger
+  på de där kupongerna - kan du ordna så att det blir bra/snyggt, passar med temat". Bladet efter matchen har nu bara
+  protokollets färger: papperet, skrivmaskinens svart, tryckets terrakotta, den gröna märkpennan över facit och det som satt,
+  och en penna i taget. Kupongens rutor (datorn och spelbolagen, och *Prognos*) har chansen på skrivmaskin under varje ruta i
+  stället för den blå, grå och orange stapeln, datorn är en svart ruta i stället för videons blå, statistiken under *Matchen*
+  står i bläck (den som leder mörkare) i stället för i lagens färger, bytenas pilar är svarta, och analysens ringar är samma
+  blå penna som raden i marginalen – de var röda, eftersom protokollets röda penna (`.rb-ring path` i rum-block.css) tog över
+  också i matchbladet före matchen. Samma dag, på användarens önskemål: "ta bort den röda stjärnan också" – rödpennans
+  stjärna för ensam rätt står inte längre i *Rättningen* (på lappen under domen finns den kvar).
+- **Analysen i matchbladet går att läsa (2026-11-10, användarens önskemål):** "det blev av någon anledning lite svårt
+  att läsa det här. Kan du ordna", och "Det handlar inte om svenskan/språket i sig utan om annat". Sedan allt papper kom på
+  skrivmaskin (2026-11-08) stod analysen i samma typsnitt som lagen och tiderna, där varje bokstav hoppar, lutar och slår
+  olika hårt – det som gör en tid levande gör en lång text tröttsam. Löptexten står nu på samma maskin med jämna anslag
+  (*Renskrift*, ur samma byggskript), lite större (13,5 i stället för 12,5 px i rummets blad); också analysen i
+  matchbladet på sajten. Raden i marginalen (*Boro, men skakigt*) stod till höger om den första inringade rutan och
+  hamnade under nästa ruta när tipset hade två tecken bredvid varandra; nu står den efter alla tre rutorna. Provat i
+  headless Chromium i den breda och den smala versionen.
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -1173,6 +1350,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hamna under samtalets text (`matt` i [public/rum-hasse.js](public/rum-hasse.js)). Väggen bakom honom är
   ombakad för den nya platsen (i bakningen syns pulten bara som skugga och ljus på väggen). Se [Hasse Backe](#hasse-backe),
   *Bilden* och *Kaffet i rummet*.
+- **Protokollet och Tipsguiden på pulten också hos Hasse Backe (2026-11-10, användarens önskemål):** "kan du justera det
+  här bordet/inzoomningen på hasse, då det inte riktigt ser ut som att det tillhör det bordet på animationsbilden där man
+  bara tittar rakt fram. Där finns det ju bl a ett protokoll - vilket inte ses på frontalbilden på hasse". I rummet ligger
+  protokollet (före omgången kupongen) och Tipsguiden på pulten bredvid notan, men hos honom var pultens arm tom. Nu ligger
+  samma papper på samma ställe där: på tvären längs armen som går fram längs ens högra sida, med överkanten mot armens
+  bortre kant, Tipsguiden under protokollet och notan och koppen överst, som i rummet. I telefonen ligger protokollet på
+  armen under notan; på datorn, där armen går ut ur bilden nere till höger, syns dess övre hörn. Kameran och bildens
+  utsnitt är oförändrade. Se [Hasse Backe](#hasse-backe), *Det som ligger på pulten*.
 - **Hasse läser DN och SvD, med läsglasögon (2026-11-09, användarens önskemål):** "Kan du göra tidningarna bättre som
   hasse läser - han läser SVD och DN. Det ska verka vara riktiga tidningar och det behöver inte vara någon sportdel", och
   "Han får sätta på sig och ta av sig glasögonen när han läser tidningarna - ordna olika animeringar kopplat till detta".
@@ -1722,7 +1907,7 @@ de flesta körningar har inget att göra och anropar inte Claude.
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00, och när
-  supporterpoddarna eller supporterforumen har gett nya uppgifter (se nedan).
+  supporterpoddarna, supporterforumen eller de insatta medierna har gett nya uppgifter (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1772,7 +1957,10 @@ fotograf; för de lägre divisionerna är det delningsbilden (`og:image`) i noti
 `<lag> FC` och `<lag> football` (lokaltidningarna och klubbarnas sidor). Rubriken ska nämna laget och handla om
 fotboll (*Southampton communities gather* är inte Southampton), inte damlaget, akademin eller ungdomslagen, och
 ingen liveblogg; en rubrik som också nämner motståndaren eller ett annat av omgångens lag, en förhandstitt och ett
-värvningsrykte (spelaren i den andra klubbens tröja) kommer sist. Bilden ska vara från de senaste åtta dagarna,
+värvningsrykte (spelaren i den andra klubbens tröja) kommer sist. Sedan 2026-11-10 kommer också en rubrik där en annan
+klubb står före laget (*York City smash Northampton Town*) och en minnesartikel sist, och en sida på en annan klubbs
+egen sajt eller hos dess lokaltidning (fleetwoodtownfc.com om Rochdale, readingchronicle.co.uk om ett annat lag) läses
+inte. Bilden ska vara från de senaste åtta dagarna,
 liggande, minst 480 bildpunkter bred och inte en logga (adressen) eller en grafik (en jämn bild packas hårt: under
 0,15 byte per bildpunkt). Sajter vars delningsbild är en grafik med text och sköldar (GOAL, OneFootball, Football
 Insider, Football League World m.fl.) och sajterna som är spärrade på datorn läses inte. Samma bild används inte för två
@@ -1815,14 +2003,21 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
 - **Kontrollen:** citatet på 8–30 ord ska gå att hitta i utskriften (`citatStar`), annars stryks uppgiften. Tipsord
   stryks också. Namnet på den som talar följer bara med om det står i utskriften (`vemStar`); maskinen skiljer inte
   på rösterna, så oftast står bara poddens namn under citatet.
-- **Informationssidan per match** (användarens önskan 2026-11-10: *längre informationssidor per match som man kan
-  hämta kunskap ur*, med citat och vem som säger det): när uppgifterna för en match har ändrats får Claude båda lagens
-  uppgifter (vikt 3 eller mer, ur lagets tre senaste avsnitt) och redigerar sidan, utan verktyg (`skrivSida`): väljer
-  högst nio punkter per lag, slår ihop det som sägs två gånger, grupperar under ämnena och skriver rubrik och ingress.
-  Varje punkt måste peka på uppgifter som finns (`ur`), och slaget, podden och citatet tas därifrån, inte ur svaret.
-  En text, rubrik eller ingress med tipsord eller tal som inte står i uppgifterna stryks: punkten får då uppgiftens
-  egen text och sidan en rubrik ur mallen. Högst fem citat per lag trycks, de tyngsta punkternas. Går svaret inte att
-  läsa står uppgifterna som de är, grupperade (`sidaUtan`), och sidan redigeras nästa natt. Inga tips.
+- **Matchbladet per match** (användarens önskemål 2026-11-10: *ett matchblad med information – först en kort
+  introduktion, sen diskussion om ena laget, sen det andra och sist en sammanfattning*, med källorna och datum):
+  när uppgifterna för en match har ändrats får Claude båda lagens uppgifter (vikt 3 eller mer, ur lagets tre senaste
+  avsnitt, med källan, dagen och citatet) och skriver bladet, utan verktyg (`skrivSida`): rubrik (högst 9 ord),
+  introduktion (`ingress`, högst 45 ord), ett till tre stycken löptext per lag (`text`, högst 150 ord), en
+  sammanfattning (`summering`, högst 45 ord) och, när det finns ett talande, id för ett citat. Texten ska säga
+  varifrån något kommer där det spelar roll och hålla isär det bekräftade, rykten och åsikter. En rubrik,
+  introduktion, sammanfattning eller lagtext med tipsord, för många ord eller tal som inte står i uppgifterna stryks:
+  rubriken får mallen, introduktionen och sammanfattningen faller bort, och lagets text blir de tyngsta uppgifterna
+  som löptext, ett stycke per ämne (`textUtan`). Citatet tas ur uppgiften, aldrig ur svaret. Under laget sparas
+  också de åtta tyngsta uppgifterna (`grupper`), med `datum` bredvid `podd`, en dag per källa: foruminläggets, annars
+  avsnittets eller artikelns. Går svaret inte att läsa blir bladet uppgifterna som löptext (`sidaUtan`), och det
+  skrivs om nästa natt. Inga tips. Byts `sidan.version` skrivs bladen om nästa natt utan att avsnitten tas ut på
+  nytt. Med `sidan.baraVeckan` tas bara uppgifter från kupongens vecka med (måndag till matchen, `veckansMandag`);
+  det är avslaget medan vi provar (användarens beslut 2026-11-10).
 - **Ut på sajten:** analysjobbet (scripts/analyser/skriv.mjs, var 15:e minut) lägger sidorna i `data/poddsidor.json`
   när de har ändrats, utan något anrop till Claude. Tidningen i rummet visar dem under *Supportrarna*, en sida per
   match (se [Tidningen](#tidningen)).
@@ -1834,9 +2029,10 @@ omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp
 ```json
 { "omgang": "…", "uppdaterad": "…", "amnen": { "trupp": "Skador och trupp" },
   "sidor": [ { "id": "401880745", "nr": 3, "match": "Stockport County – Reading", "lag": ["…", "…"], "rubrik": "…",
-               "ingress": "…", "delar": [ { "lag": "…", "kallor": [ { "podd": "…", "avsnitt": "…", "datum": "…", "adress": "…" } ],
-                 "grupper": [ { "amne": "trupp", "punkter": [ { "t": "…", "s": "b", "podd": ["…"],
-                                "citat": { "sagt": "…", "vem": null, "podd": "…" } } ] } ] } ] } ] }
+               "ingress": "…", "summering": "…", "citat": { "sagt": "…", "vem": null, "podd": "…", "typ": "podd", "datum": "2026-11-09" },
+               "delar": [ { "lag": "…", "kallor": [ { "podd": "…", "avsnitt": "…", "datum": "…", "adress": "…" } ],
+                 "text": ["…", "…"],
+                 "grupper": [ { "amne": "trupp", "punkter": [ { "t": "…", "s": "b", "podd": ["…"], "datum": ["2026-11-09"] } ] } ] } ] } ] }
 ```
 
 Allt ligger utanför repot, i `~/Library/Application Support/Matchfixarna/Tidning/`: `register.json`, `omgang.json`
@@ -1924,6 +2120,53 @@ forumen. 11 av de 26 lagen har ett forum, alla 11 lästes (tre trådar och 12–
 1–10 per lag, på 13–46 sekunder per lag. 8 sidor skrevs om; där både podden och forumet hade något (Newport, Colchester)
 står de bredvid varandra, och redaktören slog ihop det de båda sa. Inför provet prövades alla 92 lag: av forumen
 agenterna hittade gick 44 att läsa, och läsaren fick ut inlägg med namn och tid ur alla 44.
+
+**De insatta medierna** (2026-11-10, användarens önskan: *mer information om stryktipslagen än från lagforumen och
+de transkriberade poddavsnitten – den mest relevanta informationen som står i alternativa medier men som är
+initierade*): samma nattjobb letar, efter forumen och före poddarna, upp veckans artiklar om varje lag i omgången i de
+oberoende medier som följer laget på nära håll ([src/analyser/media.mjs](src/analyser/media.mjs), gränserna, de
+uteslutna sajterna och prompterna i [config/media.js](config/media.js)). Uppgifterna hamnar bredvid poddarnas och
+forumens: på informationssidan och, under *ur insatta medier*, i tidningens underlag.
+
+```
+omgångens lag → claude -p söker (WebSearch) → artiklarna läses av jobbet själv → claude -p tar ut (utan verktyg) → omgang.json
+```
+
+- **Vad som räknas:** fansajter och fanzines med egna skribenter, klubbnära nyhetsbrev (Substack o.d.) och bloggar,
+  oberoende lokala reportrar med egen sajt och supporterföreningens egna besked. Inte de stora mediehusen och deras
+  lokaltidningar (BBC, Sky, de nationella tidningarna, Reach, National World, Newsquest), klubbens och ligans sajter,
+  spelsajter, aggregatorer som skriver om alla klubbar (Football League World, TEAMtalk, GiveMeSport …), statistiksajter,
+  forum, sociala medier eller poddarnas värdar. Prompten säger det, och `utesluten` i config/media.js stryker de
+  sajterna ur svaret ändå.
+- **Sökningen:** ett anrop per lag, bara `WebSearch` (högst sex sökningar), som väljer högst fyra artiklar från de
+  senaste åtta dagarna, helst från olika källor och en förhandstitt på just nästa match först. En adress följer bara
+  med om den kom upp i en sökning, så att en påhittad adress faller bort av sig själv.
+- **Läsningen** görs av jobbet, som forumen: med namnet *Matchfixarna/1.0 (forumlasare)* och samma regler i robots.txt
+  (Claude-User; säger sajten nej till AI-assistenters läsning läses den inte). Artikelns rubrik, datum och skribent tas
+  ur sidans metadata och JSON-LD, texten ur `<article>` (annars `<main>`) utan meny, sidfot och inbäddat. En artikel
+  som är äldre än åtta dagar, kortare än 500 tecken (en puff eller en betalvägg) eller spärrad hoppas över.
+- **Uppgifterna:** Claude får artiklarna numrerade, med källa, rubrik, datum och skribent, och tar ut allt som är
+  intressant inför matchen, högst åtta per lag, med samma ämnen, slag och vikt som poddarnas. Citatet ska stå
+  ordagrant i artikeln (annars stryks uppgiften), och vem som säger det (tränaren, en spelare eller skribenten)
+  följer bara med om namnet står i artikeln. Varje artikel sparas som en egen post (`typ: 'media'`), och en artikel
+  som redan är läst med samma text läses inte av Claude igen; de sex nyaste per lag ligger kvar.
+- **Sidan och tidningen:** sidan tar lagets tre senaste artiklar (utöver de tre senaste poddavsnitten och de två
+  senaste forumläsningarna), och redaktören tar med det bästa ur alla tre slagen och slår ihop det som sägs på flera
+  håll. Sidan har nu plats för tolv punkter per lag, och sex citat. Tidningens notiser får de två senaste
+  artiklarnas bästa uppgifter, och artiklarna räknas som lästa källor. På sidorna står källans namn, och en
+  uppgift som är de insattas egen har stämpeln *Enligt insatta*.
+
+```
+node scripts/tidning/poddar.mjs --bara-media                          bara de insatta medierna, för omgångens lag
+node scripts/tidning/poddar.mjs --utan-media                          utan dem
+node scripts/tidning/poddar.mjs --lag "Blackpool" --mot "AFC Wimbledon" --bara-media --fil prov-media.json
+```
+
+Provat 2026-11-10 utan nät, i Node med påhittade sidor och påhittade svar från Claude: att sökningens adresser
+stryks när de inte kom upp eller hör till en utesluten sajt, att rubrik, datum, skribent och text tas ur sidan, att
+robots.txt, en för gammal artikel och ett citat som inte står i artikeln stoppar, och att artiklarna når
+informationssidan, tidningens underlag och nyckeln som skriver om tidningen. Inte provat på iMacen med riktiga
+sökningar: den första riktiga körningen är natten efter att ändringen kommit till main.
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -2941,7 +3184,8 @@ Så fort något ligger framme (en närbild, tv:n, tavlan, registret, videon, Has
 stället, samma ord på samma ställe för alla saker, och lägger bort det översta som bakåtknappen (se
 [Bakåt](#bakåt)). Förut var *Vanlig sida* det enda ord som syntes nära något, och det leder bort från rummet.
 Tangenterna (K kupongen, T tv:n,
-A anslagstavlan, R kortregistret, V videon, H Hasse, N nästa omgång ur kupongstället) står inte i foten – där låg de över kupongen i
+A anslagstavlan, R kortregistret, V videon, H Hasse, N nästa omgång ur kupongstället och L
+tidningen Helgarderat) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
@@ -3401,8 +3645,11 @@ ned till frekvensen (`tejpPlats`). Ett tryck på ett namn går dit, byter band o
 (`radioEtikett` i rum-3d.js, som hittar namnet under fingret). Frekvenserna står på ett blad ur ett litet
 spiralblock som är tejpat på väggen till höger om radion (`radiolapp` i rum-inredning.js, en egen duk i bakväggens
 plan, så att det sitter fast på väggen när rummet vrids). Det sitter helt i väggremsan mellan fönsterkarmen och
-veckans löpsedel, med luft till båda och en bit ovanför fönsterbänken, så att det inte går över karmens kant eller
-ned till bänken (`LAPP`). Bladet är i 3D: rivet ur spiralen med halva hål, blå linjer och röd marginal och vikt en
+veckans löpsedel och en bit ovanför fönsterbänken, så att det inte går över karmens kant eller ned till bänken
+(`LAPP`). Remsan ger bredden (25,5), så bladet är högt (45): där får raderna plats med en handstil som syns nära
+radion, och det längsta namnet (*Guldkanalen 80-tal*) trycks ihop en aning i sidled. Nära, där det syns, ska omgivningen gå att förstå: karmen har en profil (ljus ytterkant
+och en fals i skugga mot glaset, `KARM` i rum.js) i stället för att vara en slät mörk platta, och fönsterbänken slutar
+med en ren sned kant under bladet (stenens prickar klipps efter bänken, `sill`). Bladet är i 3D: rivet ur spiralen med halva hål, blå linjer och röd marginal och vikt en
 gång. Det hänger rakt, med två korta bitar gulnad tejp över överkanten en bit in från hörnen, och ligger nästan
 plant mot väggen: nedtill står det ut en aning, med en tät skugga. Papperet har samma struktur som allt papper
 på sajten (rum/papper.webp), fibrer och en kaffering, och mörknar med rummet när lysröret släcks. Bladet är lagom
@@ -3429,11 +3676,26 @@ Ett mål går före radion.
 
 Radion står i gängets duk, som är ritad för hela rummet. När kameran är framme ritas bara det som syns av duken,
 i närbildens skärpa (`narbild`), och duken läggs över just den delen: gänget står kvar och rör sig, och rummet
-kostar mindre än på håll (en fjärdedel av trianglarna, uppmätt 2026-11-08). Skalans, tejpens och
+kostar mindre än på håll (en fjärdedel av trianglarna, uppmätt 2026-11-08). Den delen räknas ur dit kameran går
+(`R.kamMal` från `aim`, `radioNara` i rum.js), inte ur var duken syns i stunden: den mättes förut 640 ms efter
+klicket, och hade kameran eller rummets vridning inte hunnit fram (Safari börjar kameran några bildrutor sent, och
+en långsam dator hinner inte) ritades en annan del än den som syntes, och radion skars av i kanten (2026-11-10). Skalans, tejpens och
 kassettens dukar ritas om större första gången (`radioFin`), och de små delarna ritas bara på väg fram och nära
 (`radioDetalj`). Radion kostar 2 % fler ritningar i rummet än bergsprängaren. `?rum-sak=radio` visar närbilden
 och `?rum-radio-lage=fm:90.4` hur den står inställd, utan ljud; `?rum-radio`
 sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
+
+**Fönsterbänken följer väggen** (2026-11-10). Rummet vrids kring planet -330, där gängets duk ligger. Där låg
+också fönsterbänken, medan fönstret, löpsedlarna och bladet med stationerna sitter på bakväggen i planet -600,
+så när musen rörde sig gled bänken, radion och tomflaskorna mot fönstret bakom: 13–15 px i sidled och 7–8 i
+höjdled mot skivan med löpsedlarna i ytterlägena (Chrome, 1400 × 875). Nu ligger bänken i bakväggens plan
+(`bank` i rum.js, lika mycket mindre som planet förstorar, så att den står där den stod, och över det andra i
+planet som förut), och gänget vrids inte längre i sin duk. Musen flyttar i stället kameran som ett öga, och
+bilden står still i det djup där radion och flaskorna står (`OGA_Z` och `sikta` i rum-3d.js), så att de rör sig
+som väggen: nu högst en bildpunkt mot skivan och bladet. Det ändrar gänget på tre sätt: det rör sig som om det
+satt närmare fönstret än förut (och mer mot pulten), ljuset och skuggorna står still när musen rör sig (förut
+vreds gänget mot lamporna), och den som tittar på en följer kameran. I närbilderna av det som sitter på väggen
+tonar bänken inte längre bort med gänget, utan sitter kvar under fönstret.
 
 **Dansen** (2026-11-08, `DANSER` i rum-dans.js, `dansPose`, `dansHand` och `dansFingrar` i rum-3d.js):
 italodisco som i de italienska tv-programmen runt 1980, sittande på barstolen, i 120 slag i minuten
@@ -3666,10 +3928,11 @@ LÖSSNUS.
 ([public/rum-affischer.js](public/rum-affischer.js), rum-affischer.css; rum-saker.js sätter upp
 dem): en plywoodskiva i två kedjor från karmen, i årsordning (IFK 1982 och Nacional 1988 överst,
 VM 94 och Chelsea 2021 under), lika stora (80 × 120), raka och alltid på samma ställe. Det ska
-synas att en person har hand om det: en skruv med bricka i varje hörn, en Dymo-remsa under varje
-sedel, blyertsmåtten står kvar på skivan och vattenpasset ligger ovanpå, med bubblan mitt
-emellan strecken. Måtten (`SKIVA`) delas med rum-inredning.js, som ritar skivan, kedjorna, remsorna
-och passet i 3D en gång (`skiva`, duken `skiva` i `#rum-skiva`) och skarpare i närbilden. Sedlarna
+synas att en person har hand om det: en skruv med bricka i varje hörn (stjärnspåret är en liten SVG, så att det är
+ett rent kryss också i närbilden) och en Dymo-remsa under varje
+sedel. Skivan är färdig: inga blyertsmått och inget vattenpass (de fanns till 2026-11-10). Måtten
+(`SKIVA`) delas med rum-inredning.js, som ritar skivan, kedjorna och remsorna i 3D en gång
+(`skiva`, duken `skiva` i `#rum-skiva`) och skarpare i närbilden. Sedlarna
 är knappar ovanpå, skruvarna följer med i sedlarnas lager (CSS) och skuggorna är bakade i skivan,
 så att sedlarna inte behöver något filter. Innan skivan är ritad är `#rum-skiva` en enda färg, så
 att sedlarna inte hänger i luften. Skivan ska inte tynga grafiken, och det gör den inte: mätt i Chrome
@@ -3723,20 +3986,21 @@ licensen är okända, så ingen rad står under närbilden) och *Havertz strike 
 i Porto den 29 maj 2021 (Kai Havertz). Löpsedeln är fem år gammal: papperet har gulnat,
 det röda har bleknat och den har legat vikt på mitten.
 
-**Löpsedeln** är veckans, från en riktig kvällstidning som de andra (Tomas önskemål):
-**Sportbladet**, Aftonbladets sportdel, på sitt rosa papper, eller **Expressen** på vitt med det
-röda namnet, två veckor i taget (`TIDNINGAR` i rum-affischer.js). Namnen är skrivna som text,
-inte tidningarnas loggor, och rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
+**Löpsedeln** är veckans och är **Helgarderats**, samma tidning som ligger på pulten (2026-11-10, Tomas önskemål:
+"Döp om löpsedeln till Helgarderat också"): namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade med
+kulspetspenna framför (`TIDNINGEN` i rum-affischer.js, rutorna ur `RumTidning.rutor`), och det som lyfts fram grönt.
+Förut var den från en riktig kvällstidning som de andra: Sportbladet på sitt rosa papper eller Expressen med det röda
+namnet, två veckor i taget. Rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
 önskemål 2026-11-08): matt tidningspapper, gråaktigt eller blekrosa, med fibrer, ojämn ton och buktor
 från fukten, svärta och rött som inte har täckt överallt, ett veck på mitten och kanterna klippta med
 sax i några raka klipp (`klipp` i rum-affischer.js, ny varje vecka). Det vita i texten är papperet,
 och inget filter ligger på texten, som annars blir suddig i närbilden. Överst namnet så brett som papperet, under det
-vinjetten (*SPIKEN*, *KRISEN*, *BARA I SPORTBLADET*) och datumet, rubriken i Anton, mitt på
+vinjetten (*SPIKEN*, *KRISEN*, *BARA I HELGARDERAT*) och datumet, rubriken i Anton, mitt på
 papperet och från kant till kant – varje rad så stor som ryms i bredden men ingen mer än 1,55
 gånger den minsta, och har raderna fått krympa för att rymmas på höjden dras de ut på bredden
-igen (högst 1,42 gånger), en av dem röd eller vit på rött, och rader med Å, Ä eller Ö med luft
+igen (högst 1,42 gånger), en av dem grön eller papper på grönt, och rader med Å, Ä eller Ö med luft
 ovanför (också i vinjetten) – raden under och, under ett streck, veckans näst största nyhet
-(helst av ett annat slag) efter ett rött plustecken. Utan någon står något ur
+(helst av ett annat slag) efter ett grönt plustecken. Utan någon står något ur
 kvällstidningens vanliga utbud där (*HOROSKOPET: TIPPA X*, *BÄST I TEST: TIPSPENNOR*). Tonen är
 kvällstidningens, stora ord och allvar på ytan, men torr: modellen heter *datorn* och *avböjer
 att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enligt datorn)*, och
@@ -3776,11 +4040,11 @@ rum-affischer.js):
 Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
 Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
 30 %; nästa omgångs 90 %. Omgångar och kuponger som spoilerskyddet döljer räknas inte.
-Utan något att skriva om står tipsguiden (*STORA TIPSGUIDEN*, *SÅ BLIR DU RIK PÅ TIPSET* – *8
-enkla knep – nummer 5 gör alla fel*). Tidningen är från dagen det hände (tre timmar efter sista
-avsparken), och för nästa omgång från idag. Ett klick öppnar tidningen (se [Tidningen](#tidningen)), och
-mellan omgångarna, när det inte finns någon, går kameran fram till löpsedeln som till de andra affischerna; som
-inget annat i rummet leder den ut ur det. För bilder: `?rum-tidning=sb|ex`, `?rum-rubrik=<typ>` och
+Utan något att skriva om gör den reklam för det som står i tidningen (*SÅ MÅR TIPSLAGEN*, *DET SUPPORTRARNA VET*,
+*ALLA MATCHERNA*). Tidningen är från dagen det hände (tre timmar efter sista
+avsparken), och för nästa omgång från idag. Ett klick går fram till löpsedeln, som till de andra affischerna
+(2026-11-10; förut öppnade det tidningen), och som inget annat i rummet leder den ut ur det. Tidningen den
+gör reklam för ligger på pulten (se [Tidningen](#tidningen)). För bilder: `?rum-rubrik=<typ>` och
 `?rum-variant=<tal>`.
 
 **Fikat** står på pulten vissa dagar, i three.js som sakerna
@@ -3789,18 +4053,21 @@ grädde och lock med florsocker på fettisdagen, två pepparkakshjärtan och en 
 glasyr på en servett i december, två lussekatter med russin på luciadagen, två
 kanelbullar med pärlsocker i pappersform den 4 oktober, chokladägg i röd, blå, grön och
 guldfolie i påskveckan (skärtorsdagen till annandag påsk) och tre chokladbollar på en
-servett den 11 maj. Det står bakom högen om det får plats där, annars till höger, fritt
-från askkoppen, dosan, locket, prisen och fläkten. Dagen är Stockholms (`Vader.nu()`,
+servett den 11 maj. Det står till höger om högen, fritt från askkoppen, dosan, locket,
+prisen och fläkten (bakom högen ligger tidningen Helgarderat, se [Tidningen](#tidningen); förut stod
+fikat där). Dagen är Stockholms (`Vader.nu()`,
 läst var tionde sekund som vädret). Går det dåligt med tippningen har någon redan tagit
 för sig: locket ligger bredvid den ena semlan och det är en grop i grädden, gubben saknar
 huvudet (tandmärken), en lussekatt, en kanelbulle och ett par ägg är borta och ett ägg är
 skalat med folien tillplattad bredvid, och det är fler smulor och mer florsocker.
 
 **Platserna och slitaget skiftar från dag till dag** (dagen i Stockholm som frö): sakerna
-på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst bak till höger, i
-mitten eller bakom högen och då vänd åt höger, askkoppen och dosan om vartannat, några
+på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst bak, till höger, i
+mitten eller till vänster, askkoppen och dosan om vartannat, några
 pixlar hit eller dit), locket och prisen läggs där det finns plats, och inget av det, askan
-eller smulorna hamnar på högen (`HOGEN`, samma plats som `HOG` i rum.js). Slitaget följer tippningen: andelen fel
+eller smulorna hamnar på högen (`HOGEN`, samma plats som `HOG` i rum.js) eller på tidningen
+bakom den: allt står till höger om dem (`free`, x ≥ 1345 i pultens bildpunkter). Förut kunde
+fläkten stå bakom högen, där tidningen ligger nu. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
 bredvid, snuset spills, fläkten (om den står där) går på trean och löpsedlarna på skivan bleks;
@@ -4690,38 +4957,70 @@ Chrome ritar i rätt skala). Inte mätt i den riktiga telefonen: `?rum-mat` där
 och bilden stämmer, men flytet är inte mätt där. Bakom videon nära syns trappor på kanterna av det som står längre bort: det är kvar,
 för att rita det skarpare tar flera gånger så mycket ritminne.
 
+### Spotarna i taket
+
+Användarens önskemål (2026-11-10): "spotlights på lite lämpliga ställen som lyser upp saker mjukt men bra", utan att
+det blir mycket mer grafiskt belastande. Två spotar i taket lyser på det man ska se på väggarna: orakelramen och
+pokalhyllan med Tipsligan, vars ljus också faller på disken under, där kortregistret står (`SPOT` i rum.js, `SPOTAR` i
+rum-inredning.js).
+
+- **På väggarna** är ljuset målat i väggens egen bild (`spotYta` i `bg`), som ritas en gång: inget nytt lager och inget
+  som ritas i bildrutorna, och fläcken följer väggen när kameran vrids eller går fram. Den läggs på med färgskiftning
+  (`color-dodge`), som gör väggen ljusare i sin egen färg – furan och ådringen syns i ljuset – i stället för att lägga
+  en ljus hinna över den.
+- **I 3D** finns spotarna i ljuset för alla inredningens saker (`wallLights`): guldramen, ramen kring Tipsligan,
+  paketen och disken fångar samma ljus. Sakerna ritas en gång (uret en gång i sekunden), och med samma ljus överallt
+  delar de grafikprogram, så att inga nya behöver byggas när rummet startar. Gänget, som ritas 30 gånger i sekunden,
+  har inga nya ljus.
+- **På kvällen** går mörkret i `.rum-vign` runt spotarna, som runt neonen och tv:n.
+
+Prövat i Chrome med mjukvarugrafik som dator (1440 × 900) på dagen och kvällen och som telefon: rummet byggs utan fel
+och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt ritas i dem.
+
 ### Utsikten och vädret
 
-Tobaksaffären ligger i Stockholm, och genom skyltfönstret och dörren syns gatan som den är
-där just nu. [public/vader.js](public/vader.js) räknar solens höjd och månens fas ur
+Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
+och dörren syns utsikten därifrån som den är just nu. [public/vader.js](public/vader.js) räknar solens höjd och månens fas ur
 klockan och hämtar vädret från Open-Meteo (fritt, utan nyckel, en gång i kvarten; sparas
 på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
 [public/rum-ute.css](public/rum-ute.css) för det som rör sig; de som går förbi, löven,
 fåglarna och flaggan ritas i små dukar (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
 Utan nätet är det mulet och månadens vanliga temperatur.
 
+- **Utsikten från Bron (2026-11-10, användarens önskemål):** som från baren Bron, där S:t Eriksgatan går upp på
+  S:t Eriksbron. På andra sidan gatan går brons gröna räcke, med en trappa ned i vänstra rutan och en stenpelare där
+  det börjar vid det laxrosa hörnhuset, som tar högra rutan: mörka omfattningar kring fönstren, granit kring de stora
+  fönstren i bottenvåningen, en port, en vägglykta, en flaggstång och en tagg på hörnet, och vid pelaren en stolpe med
+  gatuskylten och parkeringsförbudet och en cykel mot räcket. Bortom räcket sticker trädtopparna och
+  kontaktledningarna över järnvägen under bron upp, och bakom dem står stan på andra sidan – ockra, terrakotta, gult
+  och ljus puts, högre till vänster, med en kyrkspira och ett högt torn. Det ska kännas som platsen, inte vara en
+  karta: få och stora former i en enda SVG (i telefonen en enda grov duk), som bara ritas om när ljuset eller vädret
+  ändras. Gatans lager har ungefär en fjärdedel så många element som husen mittemot hade (300 mot 1 200 på dagen),
+  och i telefonen läggs en duk ut per bildruta i stället för två.
 - **Kall gata, varmt rum (2026-11-08):** medan det är ljust går färgerna ute mot blågrått, så att gänget och det varma
   rummet lyfter från gatan (`kall` i rum-ute.js). Det görs i färgerna när gatan ritas, också på dem som går förbi,
-  inte med ett filter, så det kostar inget sedan. På kvällen och natten står allt som förut.
-- **Ljuset:** himlen över de lägre taken går från natt via blå timme och solnedgång till
-  dag, grå när det är mulet. Fasaderna mittemot (gul, terrakotta och ljus puts) är nästan
-  svarta på natten, blåaktiga i skymningen och varma i låg sol, med skuggan från huset vi
-  sitter i nertill; bakom syns ett kyrktorn med ärgad spira och en byggkran med en röd lampa.
-  Fönstren tänds efter klockan (många på kvällen, nästan inga mitt i natten),
-  gatlyktorna när det skymmer, pizzerian är öppen 11–23 (till 1 fredag och lördag) och
-  konditoriet 7–19 utom på söndagar. På klara nätter syns stjärnorna och månen när den är
-  uppe. Dagsljuset faller in i rummet och på gänget bakifrån, på natten gatlyktornas sken.
+  inte med ett filter, så det kostar inget sedan. På kvällen och natten står allt som förut. Bron och husen tappar
+  mindre färg (30 %) än himlen (40 %) och de som går förbi (58 %), så att hörnhuset är laxrosa och stan varm som från
+  Bron (`KALL`).
+- **Ljuset:** himlen ovanför stan går från natt via blå timme och solnedgång till
+  dag, grå när det är mulet. Husen är nästan svarta på natten, blåaktiga i skymningen och
+  varma i låg sol; hörnhuset har skuggan från huset vi sitter i nertill. Fönstren tänds
+  efter klockan (många på kvällen, nästan inga mitt i natten), i stan på andra sidan som
+  spridda ljus, och tornet har en röd lampa i mörkret. Lyktstolpen på bron och vägglyktan på
+  hörnhuset tänds när det skymmer. På klara nätter syns stjärnorna och månen när den är
+  uppe. Dagsljuset faller in i rummet och på gänget bakifrån, på natten lyktornas sken.
 - **Vädret:** moln som driver, regn och duggregn som lutar i vinden, snö som driver i
   sidled, blöt gata med lyktornas spegling, dimma, blixtar vid åska (som också lyser upp
   rummet). Droppar sitter på glaset efter regn, snö samlas i rutornas nederkant och frosten
   kryper in från hörnen när det är kallare än −3°. Snötäcke ger vita tak, fönsterbleck,
   trottoarer och plogvallar.
-- **Folk och trafik:** på trottoaren mittemot går folk förbi (fler på dagen och kvällen,
+- **Folk och trafik:** på brons trottoar mittemot går folk förbi (fler på dagen och kvällen,
   nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
   snö. Bilar och taxi kör åt var sitt håll med strålkastarna tända när det är mörkt, och
-  blåbussen kommer var fjärde minut.
-- **Årstiderna:** löv som blåser förbi och ligger på trottoaren på hösten, plogbilen när
+  blåbussen, 4:an som går över bron, kommer var fjärde minut.
+- **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och
+  orange på hösten och kala annars; löv blåser förbi och ligger på trottoaren på hösten, plogbilen när
   det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till
   tjugondag Knut, en gran som bärs hem i december och fyrverkerier på nyårsnatten (och
   lite här och var på nyårsafton). Måsar och kråkor på dagen, tornseglare på
@@ -4967,7 +5266,8 @@ tredjedelar (1 X 2) eller halvor (hemma och borta).
   Lagen, *Förväntade mål*, de tre troligaste resultaten i formens rutor och *Vad drog åt vilket håll*
   med staplarna i bladets högra halva. För en spelad match prognosen före avspark.
 - **Analys** – den färdiga analysen med rubrik, ingress, stycken och källor, och tipset under med
-  tecknen inringade och raden i marginalen, som matchrutans flik Analysera. Källorna står som text
+  tecknen inringade och raden i marginalen efter rutorna, som matchrutans flik Analysera. Texten står på
+  skrivmaskinen med jämna anslag (*Renskrift*, se *Skrivmaskin* under [Mindre filer](#mindre-filer)). Källorna står som text
   (källan och rubriken när man pekar på numret), utan länkar ut ur rummet. Finns ingen analys än står
   samma rad som i matchrutan.
 - **Startelvor** – matchrutans startelvor ([public/matchruta.js](public/matchruta.js)), 365Scores eller
@@ -4985,6 +5285,9 @@ tredjedelar (1 X 2) eller halvor (hemma och borta).
 - **Mötena** – samma möten som kortet i kortregistret: säsongens och tidigare säsongers, de elva
   senaste, med lagens prickar och ställningen i formens rutor sedd från hemmalaget på bladet, och
   hemmalagets V–O–F till höger om rubriken.
+
+Efter matchen finns samma blad med andra sidor, från raderna i protokollet (se *Matchbladet efter matchen* under
+[Sammanställningen efter omgången](#sammanställningen-efter-omgången)).
 
 En sida som inte ryms flyttas med hjulet eller fingret inom bladet och tonar bort mot papperet nederst.
 Bladet gäller en match: man bläddrar inte mellan matcherna (2026-11-08: "Man gör inte det"), utan lägger
@@ -5321,18 +5624,23 @@ Statistik följa med, och tvärtom.
 
 ### Videon
 
-En liten Sony-tv med inbyggd video står på disken nere i hörnet till höger, med ryggen mot
-väggen och rutan vänd ut mot rummet och gänget, i svart plast med blå bild när ingen kassett
-spelar, *STOPP* i hörnet och klockan på displayen som blinkar på 12:00, som den alltid gjort
-([public/rum-video.js](public/rum-video.js), [public/rum-video.css](public/rum-video.css)).
+En liten Sony-tv med inbyggd video från 90-talet står på disken nere i hörnet till höger, med
+ryggen mot väggen och rutan vänd ut mot rummet och gänget, i grafitgrå plast med blå bild när
+ingen kassett spelar, *STOPP* i hörnet och klockan på displayen som blinkar på 12:00, som den
+alltid gjort ([public/rum-video.js](public/rum-video.js), [public/rum-video.css](public/rum-video.css)).
 SONY står i silver mitt ovanför rutan och Trinitron under den, som på Sonys tv-apparater; båda
 är ritade som former i framsidans ritning (`SONY` och `TRINITRON` – en fet, bred antikva med
-raka seriffer och en jämntjock linje), inte som text, så att de är skarpa nära.
+raka seriffer och en jämntjock linje), inte som text, så att de är skarpa nära. Det som gör den
+till 90-tal (2026-11-10): plasten har ett fint korn, rutans ram är nedsänkt och fasad, galler med
+runda hål, knappar i silvergrå plast med tecknen tryckta i svart, var och en i sin fördjupning,
+och under en skåra videodelen – kassettfacket i en ram av krom, *HQ* och *Hi-Fi STEREO* under
+det, displayen bakom rökfärgat glas och lampan i en ring. Måtten är desamma som förut, så att
+kameran och knapparna fungerar som de gjorde.
 Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan och skenet på
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
 väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
 ryms i bilden; i det perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en.
-Under rutan sitter kassettfacket och displayen, och till höger om rutan en spalt med knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏ under varandra, med högtalargaller över och under. Repriserna på VHS,
+Under rutan sitter kassettfacket och displayen, och till höger om rutan en spalt med knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏ under varandra, med hålgaller till högtalaren över och under. Repriserna på VHS,
 också de lådor (ryggen, taket och ändarna), står i en fruktlåda i furu bredvid, lite längre
 in längs väggen: två fack med en mellanvägg (`MV`), tretton kassetter höga, med en tejpbit
 över varje fack – dagen för förra omgången (*LÖR 24/10*) och *INFÖR 31/10* – och ÄPPLEN ·
@@ -5624,7 +5932,7 @@ ritas en gång på en egen duk under figuren (`diskBild`): benet framför honom 
 i skugga under den tjocka skivan. Träet speglar väggen bakom honom svagt: den
 speglade strålen träffar väggen, och där hämtas färgen ur väggens bild, suddigare ju längre strålen
 går; han själv speglas som en mörk form. Notan ligger under fatet,
-samma nota som på pulten, med den främre änden lite uppböjd. Den ritas på en duk efter notan i rummet
+samma nota som på pulten, med den främre änden lite uppböjd, ovanpå det som ligger på pulten (se *Det som ligger på pulten*). Den ritas på en duk efter notan i rummet
 (`#rum-hasse .nota` i rum.css): samma typsnitt, rader, vinklar och pappersstruktur, med baslinjerna mätta
 där. Notan, koppen, fatet, askkoppen och cigarren får barens ljus, men bara dess styrka och dagsljusets
 färg (`ljusDag` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)): de skiftar med dagsljuset som han och
@@ -5685,6 +5993,28 @@ lysrörets och dagens, svalare än barens lampor och lite ljusare, och rummets e
 så att träet har samma dämpade bruna som framför honom och inte är orange. Förut var pulten i rummet en målad bild
 med plankor som gick mot en, mer orange, utan hörn, med ringarna utspridda för sig, en list i aluminium mot en och
 inga ringar i hans bild (ändrat 2026-11-08).
+
+**Det som ligger på pulten.** Det som ligger på pulten i rummet ligger där också i hans bild: kupongen, efter omgången
+protokollet, och tidningen Helgarderat (`pultPapper` i [public/rum-hasse.js](public/rum-hasse.js)). Det är samma papper med samma
+innehåll, kopierade ur rummet, och de ligger på pultens arm som går fram längs ens högra sida: på tvären, med överkanten mot
+armens bortre kant och raderna mot en, i rummets ordning (tidningen underst) och under notan, koppen och hans händer.
+Var de ligger räknas ur rummet: pappersbladets hörn i rummets scen (dess och kupongens transformer i rummets plan), genom
+rummets kamera ned på pulten (`franRum` i [public/rum-pult.js](public/rum-pult.js)) och genom hans kamera upp i hans bild,
+som en `matrix3d` (`papper` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Rummets papper ligger i ett ritat
+perspektiv (rum.css) och inte genom rummets kamera, så hörnen blir ingen rektangel på pulten; bladet läggs därför från sitt
+övre vänstra hörn, längs överkanten och i överkantens skala, så att det som syns i rummet (hörnet bredvid notan och kanten
+längs pulten) hamnar på samma ställe. Protokollets nedre del, som i rummet går ut över pultens kant mot en och är utanför
+bilden, skärs bort där skivan börjar runda av: härifrån ses kanten nästan rakt från sidan. Eftersom läget räknas ur
+rummet stämmer det också i telefonen, där rummet lägger bladen annorlunda (`.rum.smal`). Skuggan ligger tätt intill utan
+att falla åt något håll, och på natten mörknar papperet som pulten (`--natt`). Notan ritas på en egen liten duk ovanpå
+dem (`.rh-nota`, i `diskBild`), med en svag skugga, och disken utan den. Kupongen är borta från pulten medan han har den
+(se *Din kupong*), och när den är tillbaka ritas rummet om, så att hans kryss syns på den. Tidningen ligger till höger
+om kupongen i rummet och därför längre fram på armen, nedanför bilden i datorn, och högen med inlämnade kuponger, dosan
+och askkoppen längre bort på pulten, också de nedanför bilden. Pingklockan, som står bredvid notan till
+uppgörelsen, finns inte här: rummet ritar koppen, notan och klockan på ett ungefär och inte genom sin kamera, och räknad
+därifrån hamnade den under hans kaffefat. I telefonen ligger protokollet under samtalet, mörkt som pulten där. Förut var pultens arm tom i hans bild, fast protokollet och
+Tipsguiden låg där i rummet (ändrat 2026-11-10; samma dag blev Tipsguiden och kvällstidningen en tidning, Helgarderat,
+till höger om kupongen).
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på 0,42 s, som när kameran slås åt vänster: fort i början,
@@ -6097,7 +6427,15 @@ ryms på två rader ovanför listan också i den smalaste telefonen.
 
 **Domarna efter omgången** (2026-11-08, listan och lappen 2026-11-09). Så länge protokollet ligger på pulten, alltså från
 att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
-gå igenom matcherna. Han frågar vem han ska börja med, och gänget står sida vid sida i sin ordning, som på kupongen: stora
+gå igenom matcherna. Han frågar vems kupong han ska döma först, och frågan säger först vad han har att ge och sedan
+vems: *Jag säger gärna vad jag tycker om era kuponger. Vems ska jag börja med?* Att han ska gå igenom en kupong och
+säga något om den vet man inte i förväg, så *Vem vill du höra om nu?* och *Jag gissar att du vill höra om din kupong*
+räcker inte (2026-11-10; `npm run repliker` säger till om en fråga saknar kupongen eller det han ska göra, eller säger
+*höra om*). Vet han vem du är (den enheten står på) och du lämnade in, börjar han med din: *Jag har dömt era kuponger.
+Vill du höra domen över din först, Laino?*, sedan *Nu vet du vad jag tycker om din kupong. Ska jag ta någon annans?*,
+eller, om du hellre lyssnar på de andra, *Jag har synpunkter på din kupong också, Laino.* (`domar.du`). Frågan är ofta
+tre rader, och de tre raderna finns från början, så att gänget inte flyttar sig när han säger något annat medan han
+väntar; i låga telefoner är porträtten mindre, så att allt ryms ovanför foten också i 375 × 667. Gänget står sida vid sida i sin ordning, som på kupongen: stora
 porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
 Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderad*, *Turlig*, *Felfri*, *Osynlig*,
 *Generös*, *Snuvad*, *Klok*: ordet beskriver personen), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
@@ -6105,6 +6443,9 @@ kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderin
 många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
 i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
 på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
+Han talar till den som står vid disken, och det kan vara den han dömer: de övriga är *de andra* eller *resten*, och *vi* är
+han och den han talar med, aldrig gänget, där han inte är med (*Dogge var bäst av er, och det kommer resten att få höra*,
+inte *vi*; 2026-11-10, `npm run repliker` säger till).
 
 Under meningarna ligger *lappen*, en remsa av protokollets blankett om just den kupongen, med samma papper, band och tryck
 (`lapp` i [public/rum-block.js](public/rum-block.js), stilen i [public/rum-block.css](public/rum-block.css)). Överst en spalt
@@ -6136,8 +6477,8 @@ utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
 dagens morgontidning, skyldig men nöjd med sig själv. Har man just kommit läser han redan; han läser rad för rad, tittar upp
 över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen syns, nickar åt det som står,
-rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` och
-`lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
+rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` till
+`lasa5`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
 händerna lågt, rakt upp bakom diskens kant tills den är över den, och för den sedan fram över disken och flyttar upp
 händerna; i knät hänger armarna nedåt. Han läser den som man läser något i knät: lågt framför sig, strax över disken och
 lite åt sin högra sida, uppslagen och halvt hopvikt, och lutad framåt så att sidorna vänds upp mot hans ögon, med
@@ -6150,14 +6491,37 @@ som ett V med ryggen mot en och överkanten lite framåt, så att båda sidorna 
 önskemål 2026-11-10; vriden bara åt ena hållet vändes den andra halvan, förstasidan eller vädret, rakt mot en). Innan han
 lägger ned den för han in den framför sig igen och upp över diskens kant. Ingen del av tidningen går ned i disken i något av
 klippen (räknat var hundradels sekund: som lägst 14 enheter över skivan, när ryggen passerar diskens kant; provat i
-headless Chromium med mjukvarugrafik i 1280 × 800 och i telefonen, 412 × 915, med bilder genom `lasa` och `lasa2`, 2026-11-10).
+headless Chromium med mjukvarugrafik i 1280 × 800 och i telefonen, 412 × 915, med bilder genom alla fem klippen, 2026-11-10).
 Behöver han händerna, som när han
 slår en dom i disken, läser han klart raden och lägger ned den direkt. Dåligt är inte ett rätt, sämst i gänget, eller rätten
 långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han sa (`hansOmgang` och `efterat` i
 [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och när han dömer gänget. Med
 minskad rörelse läser han inte.
 
-Han läser Dagens Nyheter (`lasa`) eller Svenska Dagbladet (`lasa2`), och de ska se ut som de riktiga (Tomas önskemål
+I tre av de fem klippen (`lasa3`, `lasa4` och `lasa5`, 2026-11-10, Tomas önskemål: han läser men låtsas lite, som Walter i
+*The Big Lebowski*, att han inte hade fel) står det något i tidningen som säger att han hade fel. Han medger ingenting:
+antingen är det tidningen som har fel, eller så har inget hänt, och det visar han med eftertryck. Det är fem nya bitar som
+blandas med de vanliga:
+
+- `skaka`: blicken stannar mitt i raden, brynen dras ihop och han skakar långsamt på huvudet åt det som står, fnyser och
+  ger tidningen en knäpp. Sedan tittar han upp på en med höjda bryn och ett snett leende (har du sett, vilket trams?).
+- `resultat`: leendet försvinner och han stirrar på raden och håller andan, blinkar två gånger, och tidningen sjunker
+  ihop. Så rycker han den rak med ett prassel, sträcker på sig med hakan upp och blicken rakt fram förbi en, nickar
+  bestämt och ler igen, som om inget har hänt.
+- `harJagFel`: ögonen upp på en och huvudet halvvägs upp, brynen ned och inget leende, och två korta, bestämda nickar mot
+  en. Han håller blicken en stund och pustar belåtet: nej, just det.
+- `lugn`: han sänker tidningen lite, drar ett djupt andetag med slutna ögon och axlarna uppe, andas ut länge och tittar
+  på en med ett alldeles för lugnt leende och en långsam nick.
+- `vika`: leendet försvinner och han viker ihop tidningen till hälften med ett prassel, sträcker på sig med hakan upp
+  och nickar bestämt (så, det var det). Sedan slår han upp den igen och läser vidare. Helt hopvikt hamnade händerna
+  tätt ihop framför bröstet och armarna syntes inte, därför bara till hälften.
+
+Fnysningen, utandningen och prasslet räknas fram med Web Audio som de andra ljuden (`fnys`, `anda` med `pust` och
+`prassel` i [public/rum-hasse-ljud.js](public/rum-hasse-ljud.js); `ljud` i bitarna) och hörs bara med ljudet på. De är
+räknade fram i en `OfflineAudioContext` (toppar 0,06–0,10, som andetaget på glasögonen) men inte lyssnade på. Bitarna är provade bild för bild i headless Chromium (1280 × 800), med närbilder av
+ansiktet, och tidningen går inte ned i disken i något av de nya klippen (samma räkning som ovan).
+
+Han läser Dagens Nyheter (`lasa`, `lasa3` och `lasa5`) eller Svenska Dagbladet (`lasa2` och `lasa4`), och de ska se ut som de riktiga (Tomas önskemål
 2026-11-09): tabloid på grått tidningspapper, med namnet i tidningens stil (skrivet som text, inte loggan: DN:s i en Bodoni,
 Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade versaler), dagens datum, nummer, årgång och pris,
 tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
@@ -6559,6 +6923,13 @@ pulten ligger 20 bildpunkter till vänster om mains nya läge. Provat i headless
 bild: vilan, talet, slaget, gesterna, klunken (tätt när handen tar och ställer koppen), cigarren och
 pennan i 1440 × 900, vilan, klunken och talet i telefonen (412 × 915), och handen på pulten i rummet.
 
+Det som ligger på pulten (2026-11-10) är provat i headless Chromium med mjukvarugrafik, i hela sidan med `?rum-kval=0`
+och ett påhittat protokoll lagt i rummets pult (kupongtjänsten gick inte att nå från provet): rummet och hans bild i
+1440 × 900, 1024 × 700 och 2000 × 1080 och telefonen på höjden (390 × 844), med protokollet och med kupongen, på dagen och
+på natten (klockan 01.30), och att kupongen döljs medan han har den. Typsnitten och färgerna i kopiorna är jämförda med
+rummets, element för element. Inte provat i Safari eller på en riktig telefon, och inte med en riktig omgång eller medan
+han fyller i din kupong.
+
 Samma pult och samma armar (2026-11-08) är provade i headless Chromium med mjukvarugrafik, i hela sidan med
 `?rum-kval=0` (rummets fulla steg, som på en Mac): rummet och hans bild i 1440 × 900 med täthet 1 och 2, och
 telefonen på höjden (390 × 844). Färgerna är mätta i bilderna: pulten i rummet längst bak 24° nyans, 25 % mättnad
@@ -6607,6 +6978,40 @@ person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under po
 Ett klick på blocket eller K lyfter det från pulten och lägger fram det stort över rummet, och *Lägg tillbaka*, Esc eller ett
 klick utanför lägger tillbaka det (`protokollet` i rum.js).
 
+**Matchbladet efter matchen** (2026-11-10, användarens önskemål: "klicka på matcherna för att få någon form av redogörelse
+av hur det gick med bettningen och bettingrekommendationen som datorn gav"). När bladet är framme – från pulten eller
+korktavlan – är varje rad en väg in: ett klick var som helst på raden, eller på matchen, som är en knapp, lägger fram
+matchbladet för den matchen över protokollet (`protMatch` i rum.js, `efter` i [public/rum-matchblad.js](public/rum-matchblad.js)).
+Med musen tonas raden man pekar på hela vägen över och matchen stryks under. Det är samma blad som från kupongen i handen –
+bandet med kupongens nummer och *Match 3*, lagen med resultatet mellan sig och flikarna –, men med sidorna efter matchen, i
+den ordning man vill veta hur det gick:
+
+- **Rättningen** – allas tips i matchen, en rad var i protokollets ordning (kupongen, gänget och Hasse), och under en
+  streckad linje datorns tecken (det troligaste före avspark, som *Modellen* i Olympen) och tipset i analysen när det är
+  skrivet före avspark (Sixten Bråvalls, `tip` i `data/analyser.json`). Tecknet står på skrivmaskin som i protokollet,
+  överstruket med märkpennan när det satt och svagare när det inte satt (att ingen annan i gänget hade rätt står när man
+  pekar på raden), och efter det datorns chans för tecknet före avspark, poängen (samma regel som raden Poäng: rätt minus
+  chansen) och spelkassan (10 kr till datorns odds, som i Olympen och på lappen under domen). Överst hur många som hade
+  rätt. Under tipsen datorn och spelbolagen före avspark sida vid sida (under varandra i telefonen) i kupongens rutor, med
+  chansen på skrivmaskin under varje ruta och facit överstruket med märkpennan: hur troligt datorn tyckte att det var och vad
+  det betalade. Bladet efter matchen har bara protokollets färger (papperet, skrivmaskinens svart, tryckets terrakotta, den
+  gröna märkpennan och en penna i taget), så lagens blå och terrakotta staplar står inte här. Allt räknas ur protokollets sammanställning (`RumBlock.match`), så att poängen per match
+  summerar till raden Poäng (kontrollerat för de tre frysta omgångarna); bara spelbolagen och analysen hämtas.
+- **Matchen** – matchrutans *Matchen* ([public/matchruta.js](public/matchruta.js)): målen, korten och bytena som en
+  tidslinje till vänster och statistiken till höger (under varandra i telefonen), med staplarna i bläck och den som leder
+  mörkare, och publiken, hämtade från ESPN när sidan tas fram.
+- **Prognos** – som förut, med facit och resultatet bland de troligaste överstrukna.
+- **Analys** – det rättade tipset först (facit överstruket och om det satt till höger om rubriken), och artikeln under.
+  Tecknen är inringade med samma blå penna som raden i marginalen, också före matchen.
+- **Startelvor** och **Tabellen** – som förut.
+
+Sidan man har framme följer med till nästa match under besöket, för sig och skild från bladet före matchen. Krysset, Esc,
+bakåt eller ett klick utanför lägger bort bladet, och protokollet ligger kvar som det låg med fokus på raden; piltangenterna
+byter sida. Läggs protokollet tillbaka går bladet med. En match ur ett äldre protokoll som inte längre finns i spelprogrammet
+får lagen och resultatet ur protokollet. Provat i headless Chromium i hela sidan, med omgångens protokoll ur de frysta
+filerna (Kupong 3) och påhittade matchfiler och ESPN-svar, i 1440 × 900 och 412 × 915: alla sidor, Esc, ett klick utanför,
+piltangenterna och att det vanliga matchbladet före matchen är som förut. Inte provat i Safari eller i en riktig telefon.
+
 **Hasse om poängen** (2026-11-09, användarens önskemål). Under bladet står *Hasse, hur räknas poängen?*: ett klick eller H,
 så lutar han sig in från baren och svarar som vid anslagstavlan (*Ropa till Hasse* under [Anslagstavlan](#anslagstavlan);
 delarna, talet och hans plats i [public/rum-hasse-svar.js](public/rum-hasse-svar.js)). Han säger att antalet rätt inte säger
@@ -6626,7 +7031,7 @@ Lägg tillbaka mitt i svaret. Anslagstavlans svar ser pixel för pixel likadant 
 rum-hasse-svar.js. Inte provat i Safari eller i en riktig telefon.
 
 Ett klick på
-löpsedeln i fönstret öppnar tidningen om omgången (se [Tidningen](#tidningen)). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
+Helgarderat på pulten öppnar tidningen, som då handlar om omgången (se [Tidningen](#tidningen)). Gänget håller upp skyltar med sina rätt (`lappar` i rum-3d.js), medan resten av figuren lever som
 vanligt. Skyltarna står kvar till måndagen efter omgången kl. 16, också om någon har valt matcher till en ny omgång för hand före det
 (`lappar` i rum-block.js läser då den förra omgången, `forra` i GET /samtal), men inte sedan den har börjat. Så länge
 lägger ett klick på någon i gänget ner hens skylt på bordet, och ett klick till på hen eller skylten tar upp den igen
@@ -6674,16 +7079,70 @@ förut, och inte fler trianglar. Blocket och tidningen är platt papper som rita
 
 ### Tidningen
 
-Ett klick på veckans löpsedel lägger fram tidningen över rummet (2026-11-09, användarens önskemål: "förbättra tidningen
-otroligt mycket"; förut fanns den bara efter omgången, med betygen, skrällen och två meningar från Hasse). Den är samma
-tidning som löpsedeln, Sportbladet eller Expressen, på samma papper, och överst ligger sedeln själv, förstorad, som
-framsida (`sedel` i rum-affischer.js kopierar papperet, så att de inte kan bli olika). Under den står *I tidningen* med
-sidorna och deras nummer, och ett klick där rullar fram till sidan. Sidorna ligger under varandra som ark, var och en med
-sidnumret ytterst, tidningens namn och datumet (löpsedelns) i huvudet, en avdelning i svart och rubriker i Anton,
-brödtext med rak högerkant och avstavning och porträtten rastrerade i svartvitt. I datorn står texten i två spalter och
-i telefonen (smalare än 470 bildpunkter) i en. Allt står i [public/rum-tidning.js](public/rum-tidning.js) och
-[public/rum-tidning.css](public/rum-tidning.css); rummet samlar ihop det som ska stå där (`upplaga` och `tidningen` i
-rum.js).
+Tidningen i tobaksaffären heter Helgarderat. Den ligger på pulten till höger om kupongen, och ett klick på den lägger
+fram den över rummet (2026-11-09, användarens önskemål: "förbättra tidningen otroligt mycket"; förut fanns den bara
+efter omgången, med betygen, skrällen och två meningar från Hasse). Överst ligger dess egen framsida (se *Framsidan*
+nedan), och under den står *I tidningen* med sidorna och deras nummer, och ett klick där rullar fram till sidan. Sidorna
+ligger under varandra som ark, var och en med sidnumret ytterst, *Helgarderat* och datumet i huvudet, en avdelning i en
+grön vinjett och rubriker i Anton, brödtext med rak högerkant och avstavning och porträtten rastrerade i svartvitt.
+Trycket är svart och flaskgrönt som på Helgarderats egen sida (se *Helgarderat* nedan), och rött står bara där det
+betyder något: stämplarna, pilen för den som föll i Tipsligan och datorns chans när den var under 25 %. I datorn står
+texten i två spalter och i telefonen (smalare än 470 bildpunkter) i en. Allt står i
+[public/rum-tidning.js](public/rum-tidning.js) och [public/rum-tidning.css](public/rum-tidning.css); rummet samlar ihop
+det som ska stå där (`upplaga` och `tidningen` i rum.js).
+
+**En tidning, Helgarderat** (2026-11-10, användarens önskemål: "Jag vill att du döper om tidningarna till
+'Helgarderat'. Sen vill jag bara ha en tidning - inte två stycken. Du får slå ihop dem på ett snyggt sätt. Lägg
+tidningen på höger sida om kupongen"): förut låg två tidningar på pulten, Tipsguiden mellan notan och kupongen (G) och
+veckans kvällstidning till höger om kupongen (L), med löpsedeln som förstasida. Nu är de en: Helgarderat ligger där
+kvällstidningen låg, med Tipsguidens framsida i Helgarderats utseende, och har allt som stod i dem båda – före omgången
+Tipsguidens sidor och efter den kvällstidningens. Som Tipsguiden finns den alltid, också mellan omgångarna. (Samma dag
+blev framsidan renare och *Åtta knep* försvann, se *Framsidan*.) L tar upp den; G gör ingenting längre. Löpsedelns kopia som förstasida (`sedel`, `omritad` och `data-rub`
+i rum-affischer.js) är borttagen, och samma dag blev löpsedeln också Helgarderats (se *Löpsedeln* under
+[Tobaksaffären](#tobaksaffären)).
+
+**Papperet** (2026-11-10, användarens önskemål: "Kan du ordna så att tidningen ser mer 'äkta' ut - med riktigt papper
+etc."): tidningspapper som löpsedelns, med samma bilder (`--fiber`, `--bukt`, `--prickar` och `--flackar`, som står i
+rum-tidning.css och som löpsedeln också använder). Papperet är gråaktigt och matt, med fibrer, ojämn ton och buktor från
+fukten, och kanterna har gulnat. Tryckfärgen har inte täckt överallt: papperet lyser igenom i prickar och fläckar i det
+svarta, gröna och röda (`.hf-blad` på framsidan, `::before` på sidorna). Färgerna är tryckfärgens, svärtan inte helt svart
+och det gröna och röda dämpade, och det vita i text på färg är papperet. Framsidan är förstorad med zoom, så mönstren
+delas med förstoringen (`--zz`), och de är lika fina på pulten som framme. På sidorna ligger buktorna i sin egen form,
+upprepade nedåt. På pulten är vecket på mitten en ås med ljus ovanför och skugga under, den undre halvan lite mörkare,
+papperet buktar svagt i rummets ljus och skuggan ligger tätt intill. Bara bilder: inga filter och inga blandningslägen.
+
+**På pulten** (2026-11-10, användarens önskemål: "När man zoomade in den här så fick man hela tidningen - så ska det
+inte vara"): ett klick på löpsedeln går bara fram till den, som de andra löpsedlarna, och tidningen ligger till höger
+om kupongen, bakom högen med de inlämnade kupongerna, som ligger på dess nedre del (`#rum-helgarderat` i rum.js och
+[public/rum-tidning.css](public/rum-tidning.css)). Förstasidan är upp, med ett veck på mitten, och överkanten ligger
+vid pultens bakkant. Samma dag, när det var kvällstidningen som låg där ("Gör så att rubriken syns ovanför
+kupongerna" och "Gör tidningen lite större"), flyttades högen fram: den första kupongen ligger 84 bildpunkter längre
+fram och den sista 64, med 36 i stället för 46 mellan dem, så tätt att namnen nätt och jämnt syns (`HOG` i rum.js,
+`HOGEN` i rum-saker.js; i telefonen på höjden, där kupongerna är högre, 18 till). Att lägga tidningen över kupongerna
+gick inte: porträttet och namnet sitter överst på dem. Helgarderat är 1,75 gånger framsidan (`--z`), och ovanför
+kupongerna syns numret, namnet, hela rubriken och kupongens första rader. Den ligger lite snett och platt i pultens
+perspektiv (`--vila`, vriden kring överkanten), i rummets ljus. Framsidan skrivs om när det som står på den har ändrats
+(`tidningPult` i rum.js, i `fill`). Ett klick, eller L, och den lyfts mot en och läggs fram (`tidningen` i rum.js);
+*Lägg tillbaka*, Esc och bakåt lägger tillbaka den på pulten. Med minskad rörelse läggs den fram direkt. Den är ritad i
+sidan, inte i 3D, och papperet ritas en gång och flyttas sedan bara med rummet, så den kostar lite också i svaga
+telefoner. Fläkten, fikat och askkoppen (rum-saker.js) står till höger om högen och tidningen. Den som har sagt vem den
+är pekar på den medan den är framme (`helgarderat` i rum-folk.js).
+
+Numret gäller omgången som rummet visar (`upplaga` i rum.js), också när den är spelad utan sammanställning (dolda
+resultat): det gamla numret ligger kvar tills nästa kupong kommer. Mellan omgångarna är det numret för den senaste
+kupongen, och utan någon kupong står bara numret på framsidan. Det räknas som på Helgarderats egen sida (`RumTidning.nummer`:
+Nr 1 är veckan med lördagen den 14 november 2026), med veckan efter (*Nr 1 · Vecka 46*); före det första numret står
+bara veckan. Före omgången är det daterat dagen före den första matchen, efter den dagen efter den sista, eller idag om
+den dagen inte har kommit än.
+
+Provat 2026-11-10 i headless Chromium med public/ ur arbetskopian och en påhittad omgång (kupongen 2026-11-07 flyttad
+till lördagen efter) i 1440 × 900, 390 × 844 (dra åt höger, tryck) och 844 × 390, med en hög av tre kuponger
+ditritad för provet där `pile` lägger dem: tidningen ligger till höger om kupongen med namnet, rubriken och kupongens
+första rader ovanför högen, ett klick, ett tryck och L lägger fram den, och Esc, *Lägg tillbaka* och bakåt lägger
+tillbaka den. Också med det minskade bygget (`--minify`), och Helgarderats egen sida med det delade numret. Framsidan
+och hela tidningen efter omgången med en påhittad sammanställning, och tidningen utan kupong, med Node och på en
+provsida. Hos Hasse Backe ligger tidningen längre fram på pultens arm, nedanför bilden i datorn. Inte provat efter en
+riktig omgång (sammanställningen kräver tjänsten), i Safari eller i en riktig telefon.
 
 **Före omgången** (omgången finns och är inte spelad):
 
@@ -6701,18 +7160,16 @@ rum.js).
   när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
   anfang och utan källhänvisningarna i klamrar, och i en ruta hans tecken, marginalen och motiveringen. Källorna står
   sist.
-- *Supportrarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna* och
-  *Supporterforumen* under [Analyserna](#analyserna)), i kupongens ordning: rubrik och ingress, hemmalaget till
-  vänster och bortalaget till höger med poddarna och forumet de bygger på, och punkterna under sina ämnen. Varje punkt
-  har slaget som stämpel (*Bekräftat* i svart, poddens eller forumets egen uppgift i rött – *Hört i podden*, *Från
-  forumet* eller *Hört bland supportrarna* när båda säger det – och *Supportrarnas åsikt* streckad), och de tyngsta
-  har citatet under, med den som säger det och podden, eller användarnamnet och forumet. Har bara det ena laget något
-  får det hela bredden i två spalter. Slagen förklaras i sidfoten.
+- *Supportrarna*: ett matchblad per match ur `data/poddsidor.json` (se *Supporterpoddarna*, *Supporterforumen* och
+  *De insatta medierna* under [Analyserna](#analyserna)), i kupongens ordning: rubriken, veckans bilder av lagen
+  (samma som notisen om matchen), introduktionen, hemmalaget och bortalaget i två spalter, ibland ett citat,
+  sammanfattningen i en grön ruta och sist källorna med datum och fotograferna. Ett nummer från före matchbladen får
+  uppgifterna som löptext. Samma blad som på sajtens [Helgarderat](#helgarderat) (`poddText`, `poddKallor`,
+  `poddKallText` och `poddCitat` i rum-tidning.js).
   *I tidningen* pekar på den första av sidorna.
 
-Notiserna och analyserna hämtas när man pekar på eller trycker på löpsedeln, och klicket väntar på dem i högst två och en
-halv sekund. Mellan omgångarna (ingen omgång, bara de närmaste matcherna) finns ingen tidning, och då går kameran fram
-till löpsedeln som förut.
+Notiserna, supporterpoddarnas sidor och analyserna hämtas när man pekar på eller trycker på tidningen, och klicket väntar
+på dem i högst två och en halv sekund.
 
 **Efter omgången** (sammanställningen finns, se [Sammanställningen efter omgången](#sammanställningen-efter-omgången)):
 
@@ -6743,63 +7200,155 @@ Provat i headless Chromium med en påhittad sida (omgången 2026-11-07 ur `data/
 kantfallen (Hasse vann och kom sist, någon utan kupong, inga porträtt, ingen notis och ingen analys) med Node. Inte
 provat i hela rummet, i Safari eller i en riktig telefon.
 
-#### Tipsguiden
+#### Framsidan
 
-Tidningens tipsbilaga ligger på pulten, på gulnat tidningspapper (2026-11-09, användarens önskemål: "nåt nr av
-tipsguiden … som man kan plocka upp o läsa"). Den ligger mellan Hasse Backes nota och kupongen, under dem båda, lite
-snett och platt i pultens perspektiv som notan (`#rum-tipsguiden` i [public/rum-tidning.css](public/rum-tidning.css),
-`--tg-vila`), så att namnet och rubriken syns i luckan, i datorn och i telefonen. Ett klick, eller G, och den lyfts
-mot en, över kupongen, och läggs fram som tidningen bakom löpsedeln (`tidningen(true, 'guide')` i rum.js), med *Lägg
-tillbaka*, Esc och bakåt som där; då läggs den tillbaka på pulten. Med minskad rörelse läggs den fram direkt. Den som
-har sagt vem den är pekar på den medan den är framme (`tipsguiden` i rum-folk.js).
+Framsidan är tidningens egen och samma på pulten och framme (`forsta` i [public/rum-tidning.js](public/rum-tidning.js),
+100 × 140, förstorad med zoom). Den säger bara vilket nummer det är och visar veckans bild (2026-11-10, användarens
+önskemål: "Tidningen ser plottrig ut. Ta bort massa saker där som vi är ointresserade av - rysaren, 8 enkla knep etc.
+Tänker att det kan vara en aktuell bild som passar omgången eller bara vilken helgarderat-upplaga/nummer det handlar
+om"):
 
-Framsidan är dess egen och samma på pulten och framme (`forsta` i [public/rum-tidning.js](public/rum-tidning.js),
-100 × 140 som sedeln, förstorad med zoom): namnet *TIPSGUIDEN* i rött, *Nr* och veckan för den första matchen,
-datumet och priset, en rubrik som omgången väljer (*Så tar du hem 13 rätt*, *Allt om helgens 13*, *Här är den säkra
-raden*), kupongens matcher med datorns troligaste tecken, *Spika* för den största favoriten (minst 68 %, inte krysset),
-*Rysaren* för den jämnaste (ingen utgång över 42 %) och en puff för knepen. Inuti står sidorna inför omgången – *Tipset*,
-*Så mår tipslagen*, *Veckans analys* och *Supportrarna*, samma som i tidningen – och sist *Åtta knep* (*Så blir du rik på tipset*:
-kvällstidningens råd, och nummer 5, *Tippa inte med hjärtat*, med stämpeln *Här gör alla fel*), som alltid finns.
-Texterna står i `TEXT.guide` och `TEXT.knep` och kollas av `npm run repliker`.
+- överst veckan, datumet och priset (3 kr, tre rader), och namnet *HELGARDERAT* i flaskgrönt i Alfa Slab One med
+  rutorna 1, X och 2 framför, ikryssade med kulspetspenna som på Helgarderats egen sida, och dubbla streck under;
+- numret stort i grönt (*Nr 1*, räknat som på Helgarderats egen sida), med omgångens dag under mellan två tunna
+  streck (*Inför lördagen den 14 november*, efter omgången *Efter …*). Omgångens namn stod också där en stund, men
+  togs bort ("skippa den där rubriken under");
+- veckans bild, alltid ("Kör den med en bild"), rastrerad i svartvitt som tidningens andra bilder: ett av veckans
+  foton av lagen, i första hand matchbladets (`bilder` i `data/poddsidor.json`, filerna i `data/matchbilder/`, som
+  GitHub Actions hämtar till varje omgång) med matchbladets rubrik, annars notisens (`bilder` i `data/tidning.json`,
+  som iMacen hämtar, se *Veckans bilder i tidningen* under [Analyserna](#analyserna)) med notisens rubrik, och
+  fotografen under. Den är helst om matchen som *Veckans analys* handlar om (efter omgången skrällen), annars den
+  första i kupongens ordning som har ett foto (`veckansBild`). Finns inget foto står lagens sköldar för samma match
+  där, tryckta direkt på papperet (`genom` i `RumTidning.rastrera`: svärtan som täckning, utan vit ruta), med matchen
+  och avsparken, efter omgången resultatet. Bilden och rubriken står mitt i det utrymme som blir över. Notiserna och
+  matchbladen hämtas när rummet fylls, högst var femte minut, och framsidan ritas om när de har kommit
+  (`hamtaNotiser`, `hamtaPoddsidor` och `tidningPult` i rum.js). Hos Hasse Backe ritas bilden på nytt i kopian.
 
-Numret gäller omgången som rummet visar (`guideUpplaga` i rum.js), också när den är spelad: det gamla numret ligger kvar
-tills nästa kupong kommer. Mellan omgångarna är det numret för den senaste kupongen, och utan någon kupong står knepen
-på framsidan. Det är daterat dagen före den första matchen, eller idag om den dagen inte har kommit än. Notiserna,
-supporterpoddarnas sidor och analyserna hämtas när man pekar på eller trycker på tidningen, som på löpsedeln.
+Utan omgång och utan sköldar står numret ensamt, större. Förut stod där en rubrik (*Här är den säkra raden*), kupongen
+med datorns tecken, *Spika* och *Rysaren* och en puff för *Åtta knep*, och efter omgången gängets rätt och rätt rad;
+sidan *Åtta knep* är också borta. Texterna står i `TEXT.forsta` och kollas av `npm run repliker`.
 
-Provat i headless Chrome med det lokala bygget (omgången 2026-11-07, spelad) i 1440 × 900, 1920 × 1080 och 390 × 844:
-tidningen syns på pulten, ett klick träffar den, den lyfts över protokollet och läggs fram med alla sidor, och Esc lägger
-tillbaka den. *Så mår tipslagen* med en påhittad `data/tidning.json`, och framsidan utan matcher med Node. Inte provat
-i Safari eller i en riktig telefon.
+Provat 2026-11-10 i headless Chromium med påhittade matchblad med foto, en påhittad `data/tidning.json` (fem notiser,
+en med foto) och utan båda (sköldarna, med två sköldar ur rummet i lagens ställe), på pulten med högen och framme, och
+efter omgången med Node. Inte provat med veckans riktiga bilder och sköldar, som bygget och iMacen hämtar.
 
 #### Helgarderat
 
-Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Ett utkast
+Helgarderat är namnet på tidningen med det supportrarna vet (2026-11-10: "Kalla tidningen för Helgarderat"). Den
 ligger på sajten som en egen sida, [matchfixarna.se/helgarderat.html](https://matchfixarna.se/helgarderat.html)
-("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"). Var namnet ska stå i
-rummet, på hela tidningen bakom löpsedeln, bara på poddsidorna eller på en egen tidning, är inte bestämt, så rummet är
-orört. Sidan har noindex och ingen länk från resten av sajten.
+("gör ett utkast av tidningen Helgarderat så att man får se hur den ser ut. Lägg ut på sajten"), och visar veckans
+omgång av sig själv: informationssidorna i `data/poddsidor.json`, som nattjobbet på iMacen skriver inför varje omgång
+ur poddarna, forumen och de insatta medierna (se [Analyserna](#analyserna)), så länge omgångens sista match är högst
+tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång nu? Det ska det ju"). Då står numret
+och veckan i huvudet (*Nr 1 · Vecka 46*) och ingen stämpel. Annars visar den provnumret, ett nollnummer (*Nr 0*, med
+stämpeln *Provnummer*). Numret räknas på veckorna: Nr 1 är veckan med lördagen den 14 november 2026, och sedan
+ett nummer i veckan där omgången börjar (`nummer` i [public/helgarderat.js](public/helgarderat.js)).
 
-Utkastet har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)): tidningspapper med tryck i svart och
+**Det första numret** (2026-11-10, användarens önskemål: "Jag vill att du gör första numret av Helgarderat nu och
+inte väntar på det") gäller lördagen den 14 november och lades i `data/poddsidor.json` för hand, innan nattjobbet
+hade kört: samma tolv sidor som provnumret, eftersom provomgången var lördagens matcher och dess avsnitt,
+foruminlägg och artiklar är veckans (4–10 november). Bara `omgang` (`2026-11-14`) och `uppdaterad` skiljer. Att
+läsa poddarna, forumen och artiklarna på nytt gick inte i molnmiljön, där varken kupongtjänsten eller källorna
+gick att nå; det gör nattjobbet. När det skriver sidorna för omgången (inför lördagen) byter
+`poddsidorna` i scripts/analyser/skriv.mjs ut filen, eftersom omgångens id inte är `2026-11-14`, och numret står
+kvar som Nr 1. Kupongen kunde inte hämtas härifrån, så det är inte kontrollerat att de tolv matcherna och deras
+ordning är omgångens; i rummet syns bara sidorna för omgångens matcher (`poddsidorFor` i rum.js). Samma dag fick
+tidningen på pulten i rummet namnet och utseendet, och numret räknas likadant där (`RumTidning.nummer`, se ovan).
+Sidan har noindex och ingen länk från resten av sajten.
+
+Tidningen har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)): tidningspapper med tryck i svart och
 flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2, alla ikryssade med kulspetspenna. Priset
-är 3 kr, tre rader. Framsidan har en stämpel, *Provnummer*, och ettan och tvåan är matcherna med flest uppgifter, helst
-där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har ett stort citat, helst
-om truppen och med ett namn. Bredvid står *Lördagens matcher* med sidnumren och under *Hört bland supportrarna*, med en
-egen uppgift (slaget h) ur var och en av tre andra matcher. Sedan kommer en sida per match med lagen bredvid varandra,
-uppgifterna under sina ämnen, stämplarna och citaten. Har bara det ena laget något får det hela bredden i två spalter.
-Baksidan har källorna per match, med länkar till avsnitten och forumtrådarna, och stämplarna. Texterna för slagen,
-ämnena och förklaringarna kommer från `RumTidning.TEXT.poddar`, så att det står samma sak i båda tidningarna. Under
-720 px är allt en spalt.
+är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
+där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har bilden och, om
+matchbladet har ett, citatet. Bredvid står *Lördagens matcher* med sidnumren, och under *Fler matcher*: tre matcher
+till med bild, rubrik och introduktionens första mening. Sedan kommer ett matchblad per match.
 
-Innehållet är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov-omgang-forum.json`, tolv matcher i League
+**Matchbladet** (2026-11-10, användarens önskemål: "ett matchblad med information. Först en kort introduktion, sen
+diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för varje match;
+samma dag var det först punkter under ämnen med markörer, och dessförinnan stämplar och citat vid varje punkt):
+rubriken, bilden, introduktionen i fetstil, ett avsnitt per lag med lagets namn och sköld som rubrik och ett till tre
+stycken löptext, och sist sammanfattningen i en ruta med grön kant. Brödtexten står i en spalt som är lätt att läsa,
+och bredvid den en smal spalt med *Matchen* (avsparken och numret på kupongen), ibland ett citat och *Källorna* per lag
+med datum och länk (*Podden SK3 TV (9 nov)*, två avsnitt av samma podd: *(2 och 9 nov)*). I telefonen kommer den smala
+spalten efter texten. Baksidan har källorna per match, med länkar till avsnitten, forumtrådarna och artiklarna.
+
+**Bilden** är veckans bild av vart och ett av lagen, hemma och borta bredvid varandra med lagets namn på en mörk list
+och fotograferna och källorna under, svartvita som tryck på papperet. Den kommer i första hand ur matchbladet självt
+(`bilder` i sajtens `data/poddsidor.json`), annars ur tidningen inför omgången (`data/tidning.json`, se *Veckans bilder
+i tidningen* under [Analyserna](#analyserna)). En sida kan också ha en egen bild (`bild`: `url` eller `fil`, `kalla`,
+`foto`, `sida`, `datum`, `text`) över hela bredden. Utan bild, eller om den inte går att hämta, står lagens sköldar mot
+varandra med namnen under, på en tonad yta med grön överkant; går bara den ena bilden inte att hämta får den halvan
+lagets sköld.
+
+Matchbladets bilder hämtas av GitHub Actions före bygget (2026-11-10, användarens önskemål: "Fixa så att det kommer
+riktiga bilder nu"), eftersom molnmiljön där matchbladen skrevs inte når nyhetssajterna, men GitHub gör det:
+[scripts/tidning/matchbilder.mjs](scripts/tidning/matchbilder.mjs) tar lagen i `data/poddsidor.json` och hämtar en bild
+per lag med samma kod som tidningens bilder på iMacen (`veckansBilder` i src/analyser/tidning-bilder.mjs): de insatta
+mediernas artiklar om laget först, sedan Bing News, sidans delningsbild från de senaste åtta dagarna, liggande och
+minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Till skillnad från tidningen
+tas bara artiklar som handlar om laget självt (`MIN_POANG`): inte en där motståndaren eller en annan klubb står först i
+rubriken, en förhandstitt med odds, ett övergångsrykte eller en minnesartikel, eftersom bilden då oftast visar fel lag.
+Hellre lagets sköld än fel lag. Bing News frågas också efter *<lag> boss* (tränaren är oftast i klubbens kläder, hos
+lokaltidningen), och det gäller tidningens bilder också. Har bara det ena laget en bild står den över hela bredden med
+lagets namn. Bilden förminskas till 800
+bildpunkter med ImageMagick (på iMacen med `sips` som förut); en jämn grafik känns igen på under 0,10 byte per
+bildpunkt i 320 bildpunkters bredd (foton låg på 0,15–0,31 och en enfärgad grafik med text på 0,04; `sips` behåller
+färgprofilen och har kvar gränsen 0,15). Bilderna sparas i källcachen (`data/cache/matchbilder/`), som workflowen
+behåller mellan körningarna, så att de hämtas en gång per omgång; ett lag utan bild prövas igen efter sex timmar. Ut
+kommer `data/matchbilder/` och `data/matchbilder.json`, och bygget lägger bilderna i matchbladen (`bilder: [hemma,
+borta]`). ImageMagick installeras i workflowen bara när något ska hämtas och det saknas, och steget får aldrig stoppa
+bygget. `node scripts/tidning/matchbilder.mjs --behover` säger om något ska hämtas.
+
+Texterna och uppställningen av lagets text och källor (`poddText`, `poddKallor`, `poddKallText`, `poddCitat`) kommer
+från `RumTidning`, så att det står samma sak i båda tidningarna. Ett nummer från före matchbladen (provnumret) får
+lagets uppgifter som löptext, ett stycke per ämne. Under 720 px är allt en spalt.
+
+Matchbladen i det första numret är skrivna för hand 2026-11-10 ur uppgifterna i `data/poddsidor.json`, utan nya fakta,
+namn eller tal (talen kontrollerade med `unknownNumbers`), och fyra av dem har ett citat. När nattjobbet skriver
+omgångens blad (`sidan.version` i config/poddar.js) byts de ut. Helst ska källorna vara från kupongens vecka, men inte
+medan vi provar: `sidan.baraVeckan` är förberett och avslaget (användarens beslut 2026-11-10).
+
+Provnumrets innehåll är provomgången som poddjobbet gjorde på iMacen 2026-11-10 (`prov-omgang-forum.json`, tolv matcher i League
 One och Two den 14 november). Den ligger i [public/helgarderat/utkast.json](public/helgarderat/utkast.json) och är
 uttagen med `poddsidor` i src/analyser/poddar.mjs, samma uttag som `data/poddsidor.json`, så att varken utskrifterna
 eller de engelska citaten följer med. Numren är 1–12 i kupongens ordning, utan luckan efter matchen som saknade sida.
+De insatta medierna lades till för hand 2026-11-10, innan nattjobbet hade läst något: elva uppgifter om fem lag
+(Blackpool ur The Bloomfield Bulletin, Gillingham ur Gills Journal, Port Vale ur The Valiant, Salford ur SalfordNow,
+Shrewsbury ur A Large Grouse och Shropshire Live), alla från 4–9 november. De letades fram med sökningar i en
+molnmiljö där sidorna inte gick att öppna, så de bygger på det sökträffarna säger om artiklarna och har inga citat;
+nattjobbet läser artiklarna själv och tar citaten ordagrant ur dem. För de andra nitton lagen hittades inget från
+veckan i oberoende medier, eller så räckte sökningarna inte till.
 
 Provat med en provserver (public/ ur arbetskopian och resten från matchfixarna.se) i webbläsarpanelen, i 1280 × 900 och
 375 × 812, och med huvudlös Chrome i 1280 bredd: framsidan, en sida där båda lagen har något, en där bara det ena har
 det (Wigan–Barnsley), baksidan och att inget sticker ut åt sidan i telefonen. Inte provat i Safari eller i en riktig
-telefon.
+telefon. De insatta medierna och veckans omgång provades 2026-11-10 i huvudlös Chromium med public/ ur arbetskopian
+(utan sköldarna), i 1280 bredd och 390 × 844: rutan *De insatta skriver*, en sida där ett lag bara har de insatta
+(Blackpool), baksidan, inget fel i konsolen och inget som sticker ut åt sidan, och med en påhittad
+`data/poddsidor.json` att veckans omgång visas utan provstämpel och att provnumret kommer tillbaka utan den. Det första
+numret provades 2026-11-10 i huvudlös Chromium med public/ ur arbetskopian och `data/poddsidor.json` (utan sköldarna),
+i 1280 bredd och 390 × 844: *Nr 1 · Vecka 46* i huvudet och i kolofonen, ingen stämpel, tolv sidor och baksidan, och
+inget som sticker ut åt sidan; utan filen *Nr 0 · Vecka 46* med stämpeln. Den nya uppställningen av sidorna provades
+2026-11-10 i huvudlös Chromium med public/ ur arbetskopian och `data/poddsidor.json` (utan sköldarna och typsnitten),
+i 1280 bredd och 390 × 844: framsidan, en sida där båda lagen har något (Stockport–Reading), en där bara det ena har
+det (Wigan–Barnsley, med två källor och datum vid punkterna), Colchester–Gillingham i telefonen, inget fel i konsolen
+och inget som sticker ut åt sidan; *Supportrarna* i tidningen på pulten med samma data ritad för sig. Med Node:
+`sidansUnderlag` med och utan `baraVeckan`, `punkt` med datum per källa och `veckansMandag`. Inte provat i Safari, i
+en riktig telefon eller med nattjobbet själv. Matchbladen provades 2026-11-10 i huvudlös Chromium med public/ ur
+arbetskopian, det första numret och en påhittad `data/tidning.json` med provbilder (utan sköldarna, som hämtas från
+ESPN), i 1280 bredd och 390 × 844: framsidan med *Fler matcher*, ett blad med två bilder, ett med en bild som inte går
+att hämta (sköldarna mot varandra) och en halva som saknas, ett blad utan bild, telefonen, inget fel i konsolen och
+inget som sticker ut åt sidan, och *Supportrarna* i tidningen på pulten ritad för sig. Med Node: `sidaAv` med ett
+svar som håller, ett med tipsord och okända tal och ett som inte går att läsa, `sidaUtan`, `skrivSida` med ett
+påhittat svar och `poddsidor`. Inte provat med riktiga bilder, i Safari, i en riktig telefon eller med nattjobbet
+själv. Matchbladens bilder provades 2026-11-10 med ett låtsasnät (påhittade Bing-svar och artikelsidor och brusbilder
+från ImageMagick): 24 av 24 lag fick en bild (Gillingham ur de insattas artikel, de andra ur Bing), en andra körning
+hämtade inget och tog bilderna ur cachen, bygget lade dem i alla tolv matchbladen och sidan visade dem i 1280 bredd och
+390 × 844. Gränsen för grafik mättes på fotona i public/ och en ritad grafik. Den första riktiga hämtningen
+(workflowen 2026-11-10 17.37) gav 21 av 24 lag en bild; källorna står i stegets logg, men bilderna själva gick inte
+att se härifrån. Reglerna för rätt lag provades med Node på rubrikerna från den hämtningen; körningen efter dem gav
+14 av 24 lag en bild, och flera lokaltidningar svarade HTTP 403 på GitHubs servrar. Sedan frågas också efter
+tränaren, och en ensam bild står över hela bredden (provat i 390 × 844 och 1280 bredd).
 
 ### Närbilderna
 

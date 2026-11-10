@@ -900,6 +900,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* gänget (rum-3d.js): ända ut till scenens vänsterkant, så att den som går iväg går ut ur bilden */
 .rum-3d { position: absolute; left: 0; top: 120px; width: 1440px; height: 560px; pointer-events: none; }
+/* fönsterbänken i väggens plan (bank i rum.js) ligger över det andra där, som när den låg framför det
+   (skenet från neonen i fönstret går ner över bänkens bakkant) */
+.rum-pl > .rum-bank { z-index: 1; }
 
 /* ---------- röken under taket och dammet i ljuset ---------- */
 

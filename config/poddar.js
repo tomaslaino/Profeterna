@@ -50,17 +50,28 @@ module.exports = {
   // En uppgift under den här vikten (1–5) följer inte med till tidningen.
   minstVikt: 3,
 
-  // Informationssidan per match (användarens önskan 2026-11-10: längre sidor som man
-  // kan hämta kunskap ur, grupperade, med slag, podd, citat och vem som säger det).
+  // Matchbladet per match. Användarens önskemål 2026-11-10, sist: "ett matchblad med information.
+  // Först en kort introduktion, sen diskussion om ena laget, sen det andra och sist en
+  // sammanfattning", snygga artiklar med inför-information och något citat ibland (förut
+  // punkter under ämnen, med stämplar och citat). Källorna och datumen står bredvid i tidningen.
   sidan: {
-    // Lagets senaste avsnitt som sidan bygger på, och högst så många punkter per lag.
+    // Byts den skrivs bladen om nästa natt, utan att avsnitten tas ut på nytt.
+    version: '2026-11-10.6',
+    // Lagets senaste avsnitt som bladet bygger på, och så många av uppgifterna som sparas
+    // under laget (och blir löptext när redaktörens text inte håller).
     avsnitt: 3,
-    punkterPerLag: 9,
-    // Högst så många av punkterna får sitt citat tryckt.
-    citatPerLag: 5,
+    punkterPerLag: 8,
+    // Introduktionen, varje lags text (högst så många stycken) och sammanfattningen.
     rubrikOrd: 9,
     ingressOrd: 45,
+    stycken: 3,
+    lagOrd: 150,
+    summeringOrd: 45,
     effort: 'medium',
+    // Bara källor från kupongens vecka (måndag till matchen): helst så, men inte medan vi
+    // provar (användarens beslut 2026-11-10: "gör ett undantag nu när vi bara testar").
+    // Sätt till true när provperioden är slut; bladen skrivs då om nästa natt.
+    baraVeckan: false,
   },
   // Ämnena som uppgifterna grupperas i, i den ordning de står på sidan.
   amnen: {
@@ -224,19 +235,19 @@ Handlar podden uppenbart om en annan klubb än laget ovan (tidningen kan ha fåt
 Svara bara med JSON, utan något före eller efter:
 {"ratt_klubb": true, "handlar_om": "en mening om vad avsnittet handlar om", "uppgifter": [{"a": "trupp", "t": "…", "s": "b", "min": 12, "citat": "…", "sagt": "…", "vem": null, "vikt": 4}]}`,
 
-  sidaPrompt: `Du redigerar en informationssida i en svensk tipstidning: allt det intressanta ur supporterpoddarna och supporterforumet inför en match, samlat så att läsaren kan hämta kunskap ur det.
+  sidaPrompt: `Du skriver ett matchblad i en svensk tipstidning: en kort artikel inför en match, byggd på det som supportrarna och de som följer lagen varje vecka säger i sina poddar, forum och insatta medier. Läsaren tippar Stryktipset och vill förstå läget i båda lagen.
 
-Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar och supporterforum den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = poddens eller forumets egen uppgift, o = supportrarnas åsikt), en vikt 1–5 och podden eller forumet den kommer ur.
+Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar) den här veckan. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift eller ett rykte, o = supportrarnas eller skribentens åsikt), en vikt 1–5, källans namn (podd, forum eller insatta), dagen då det sades och ibland ett citat.
 
-Gör så här:
-- Välj det mest intressanta, högst {punkter} punkter per lag. Stryk det som är svagt, det som en annan uppgift redan säger och det som varken rör laget eller matchen (en nyhet om en tredje klubb).
-- Säger två uppgifter samma sak (ur två avsnitt, två poddar eller podden och forumet) blir de EN punkt, med bådas id i "ur". Slå aldrig ihop en bekräftad uppgift med en åsikt.
-- Gruppera punkterna per lag under ämnena, och ställ den viktigaste först i varje grupp. Flytta en uppgift till ett annat ämne om den passar bättre där.
-- Texten i en punkt är en till två meningar, högst 45 ord. Du får skriva om den så att den blir rak och lättläst, men bara med det som står i uppgifterna: inga nya fakta, namn eller tal.
-- Skriv en rubrik för sidan på högst {rubrikOrd} ord, om det som är viktigast att veta inför matchen, och en ingress på högst {ingressOrd} ord som säger det viktigaste om båda lagen (om bara det ena laget har uppgifter: om det). Rubriken och ingressen får bara säga det som står i punkterna, och inte göra en gammal sak till en nyhet. Skriv tal i ingressen precis som de står i uppgifterna.
+Skriv så här:
+- rubrik: högst {rubrikOrd} ord, om det viktigaste inför matchen.
+- ingress: introduktionen, två eller tre meningar, högst {ingressOrd} ord, om det viktigaste i båda lagen (om bara det ena laget har uppgifter: om det).
+- lag: ett avsnitt per lag, hemmalaget först. Ett till {stycken} stycken löptext, sammanlagt högst {lagOrd} ord. Börja med det som väger tyngst (skador, avstängningar, väntad elva), sedan hur laget spelar och sist klubben och matchen. Skriv sammanhängande och lättläst, som en reporter, inte som en lista, och utan upprepningar. Säg varifrån något kommer där det spelar roll ("enligt podden …", "på forumet … menar flera"), och håll isär det bekräftade, rykten och supportrarnas åsikter. Ta med det viktigaste ur alla tre slagen av källor, och stryk det som är svagt eller rör en tredje klubb. Ange i "ur" id för uppgifterna avsnittet bygger på. Har laget inga uppgifter blir texten en tom lista.
+- summering: sammanfattningen, två eller tre meningar, högst {summeringOrd} ord, om läget i båda lagen inför matchen.
+- citat: id för en uppgift vars citat är talande och värt att trycka, eller null. Hellre inget än ett svagt.
 
-Inga tips: inte vem som vinner, vilket tecken man ska välja eller vem som är favorit, och inga odds. Vanlig svenska utan engelska ord där det finns svenska.
+Bara det som står i uppgifterna: inga nya fakta, namn eller tal, och gör inte en gammal sak till en nyhet. Skriv tal precis som de står i uppgifterna. Inga tips: inte vem som vinner, vilket tecken man ska välja eller vem som är favorit, och inga odds. Vanlig svenska utan engelska ord där det finns svenska.
 
 Svara bara med JSON, utan något före eller efter:
-{"rubrik": "…", "ingress": "…", "lag": {"<lagets namn som i underlaget>": [{"amne": "trupp", "punkter": [{"ur": ["<id>"], "t": "…"}]}]}}`,
+{"rubrik": "…", "ingress": "…", "lag": {"<lagets namn som i underlaget>": {"ur": ["<id>"], "text": ["…", "…"]}}, "summering": "…", "citat": null}`,
 };

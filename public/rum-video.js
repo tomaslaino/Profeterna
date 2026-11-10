@@ -204,41 +204,69 @@ window.RumVideo = (() => {
   // enheter där versalhöjden är 100.
   const TRINITRON = { w: 496, d: 'M0 0H58M29 0V100M76 30V100M76 62C76 40 88 30 108 31M126 30V100M126 7v.1M152 30V100M152 62C152 40 164 30 180 30S206 40 206 60V100M230 30V100M230 7v.1M262 8V84C262 96 270 100 286 99M248 34H284M306 30V100M306 62C306 40 318 30 338 31M353 65A30 35 0 1 0 413 65A30 35 0 1 0 353 65M436 30V100M436 62C436 40 448 30 464 30S490 40 490 60V100' };
 
-  // Framsidan: höljet, rutans ram med SONY mitt ovanför rutan och Trinitron
-  // under, spalten med högtalargaller över och under knapparna, kassettfacket,
-  // displayen och fötterna.
+  // Framsidan, som en Sony från 90-talet: höljet i grafitgrå plast med fint
+  // korn, rutans ram nedsänkt och fasad (ljus i underkant, där ljuset faller
+  // in) med SONY mitt ovanför rutan och Trinitron under, spalten med
+  // hålgaller över och under knapparna (varje knapp i en egen fördjupning),
+  // och under en skåra videodelen: kassettfacket i en ram av krom, HQ och
+  // Hi-Fi STEREO under det, displayen bakom rökfärgat glas och lampan i en
+  // ring. Måtten (TV, GLAS, FACK, VFD, SPALT, KNAPP) är desamma som förut.
   function galler(y0, y1) {
+    // hål i rader, varannan rad förskjuten ett halvt steg
+    const [dx, dy] = [0.86, 0.78];
+    const [a, b] = [SPALT.x + 1.15, SPALT.x + SPALT.w - 1.15];
     let d = '';
-    for (let y = y0; y < y1 - 0.2; y += 1.15) d += `M${r2(SPALT.x + 1.2)} ${r2(y)}H${r2(SPALT.x + SPALT.w - 1.2)}`;
+    for (let y = y0, i = 0; y < y1 - 0.1; y += dy, i++) {
+      for (let x = a + (i % 2) * dx / 2; x <= b + 0.01; x += dx) d += `M${r2(x)} ${r2(y)}h.001`;
+    }
     return d;
   }
+  // en nedsänkt yta: en ljus kant upptill och en mörk nedtill (fals), och i
+  // fördjupningen skugga upptill och ljus nedtill (fas)
+  const sankt = (x, y, w, h, r) => `<rect x="${r2(x - 0.35)}" y="${r2(y - 0.35)}" width="${r2(w + 0.7)}" height="${r2(h + 0.7)}" rx="${r2(r + 0.35)}" fill="url(#vhs-fals)"/>` +
+    `<rect x="${r2(x)}" y="${r2(y)}" width="${r2(w)}" height="${r2(h)}" rx="${r2(r)}" fill="url(#vhs-fas)"/>`;
   function tvSvg() {
     const { x, y, w, h } = TV;
     const g = GLAS;
     const f = FACK;
     const k = 2 / 100;
     const kt = 1.4 / 100;
+    const sk = f.y - 1.6;
+    const gy = [SPALT.y + 2, KNAPP.y - 1.3, KNAPP.y + 5 * KNAPP.d + KNAPP.h + 1.4, SPALT.y + SPALT.h - 1.8];
+    const brunnar = Array.from({ length: 6 }, (_, i) => `<rect x="${r2(KNAPP.x - 0.4)}" y="${r2(KNAPP.y + i * KNAPP.d - 0.4)}" width="${r2(KNAPP.w + 0.8)}" height="${r2(KNAPP.h + 0.8)}" rx="1" fill="#080809"/>`).join('');
     return `<g class="massiv">
     <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.4" fill="url(#vhs-kropp)"/>
-    <rect x="${x + 1}" y="${y + 0.3}" width="${w - 2}" height=".5" rx=".25" fill="#fff" opacity=".16"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.4" filter="url(#vhs-korn)" opacity=".14"/>
+    <path d="M${x} ${sk}H${x + w}V${y + h - 2.4}A2.4 2.4 0 0 1 ${x + w - 2.4} ${y + h}H${x + 2.4}A2.4 2.4 0 0 1 ${x} ${y + h - 2.4}Z" fill="#000" opacity=".16"/>
+    <rect x="${x + 1}" y="${y + 0.3}" width="${w - 2}" height=".5" rx=".25" fill="#fff" opacity=".2"/>
     <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.4" fill="url(#vhs-dager)"/>
-    <rect x="${g.x - 3}" y="${g.y - 3}" width="${g.w + 6}" height="${g.h + 6}" rx="3.4" fill="#0b0a0a" stroke="#34312d" stroke-width=".45"/>
+    ${sankt(g.x - 3, g.y - 3, g.w + 6, g.h + 6, 3.4)}
     <rect x="${g.x - 0.8}" y="${g.y - 0.8}" width="${g.w + 1.6}" height="${g.h + 1.6}" rx="5.6" fill="#040404"/>
     <path d="${SONY.d}" transform="translate(${r2(g.x + g.w / 2 - SONY.w * k / 2)} ${r2((y + g.y - 3) / 2 - 50 * k)}) scale(${k})" fill="url(#vhs-silver)"/>
-    <path d="${TRINITRON.d}" transform="translate(${r2(g.x + g.w / 2 - TRINITRON.w * kt / 2)} ${r2(g.y + g.h + 1.8 - 50 * kt)}) scale(${kt})" fill="none" stroke="#bdb8ae" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="${SPALT.x}" y="${SPALT.y}" width="${SPALT.w}" height="${SPALT.h}" rx="2" fill="#100f0e" stroke="#34312d" stroke-width=".45"/>
-    <path d="${galler(SPALT.y + 2.2, KNAPP.y - 1.6)}${galler(KNAPP.y + 5 * KNAPP.d + KNAPP.h + 1.8, SPALT.y + SPALT.h - 1.8)}" fill="none" stroke="#2b2925" stroke-width=".5" stroke-linecap="round"/>
-    <line x1="${x + 2}" y1="${f.y - 1.5}" x2="${x + w - 2}" y2="${f.y - 1.5}" stroke="#8a857b" stroke-width=".3" opacity=".55"/>
-    <rect x="${f.x - 0.6}" y="${f.y - 0.6}" width="${f.w + 1.2}" height="${f.h + 1.2}" rx="1" fill="#4c4944"/>
+    <path d="${TRINITRON.d}" transform="translate(${r2(g.x + g.w / 2 - TRINITRON.w * kt / 2)} ${r2(g.y + g.h + 1.8 - 50 * kt)}) scale(${kt})" fill="none" stroke="#c9c8c4" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+    ${sankt(SPALT.x, SPALT.y, SPALT.w, SPALT.h, 2)}
+    <path d="${galler(gy[0], gy[1])}${galler(gy[2], gy[3])}" transform="translate(0 .13)" fill="none" stroke="#6b6c70" stroke-width=".5" stroke-linecap="round" opacity=".5"/>
+    <path d="${galler(gy[0], gy[1])}${galler(gy[2], gy[3])}" fill="none" stroke="#050506" stroke-width=".46" stroke-linecap="round"/>
+    ${brunnar}
+    <path d="M${x + 1.2} ${sk}H${x + w - 1.2}" stroke="#09090a" stroke-width=".32"/>
+    <path d="M${x + 1.2} ${sk + 0.3}H${x + w - 1.2}" stroke="#77787c" stroke-width=".2" opacity=".6"/>
+    <rect x="${f.x - 0.7}" y="${f.y - 0.7}" width="${f.w + 1.4}" height="${f.h + 1.4}" rx="1.1" fill="url(#vhs-krom)"/>
     <rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".7" fill="#030303"/>
     <rect class="vhs-lucka" x="${f.x + 0.5}" y="${f.y + 0.45}" width="${f.w - 1}" height="${f.h - 0.9}" rx=".4" fill="url(#vhs-lucka)"/>
-    <rect x="${VFD.x}" y="${VFD.y}" width="${VFD.w}" height="${VFD.h}" rx=".6" fill="#06100d" stroke="#2c2a27" stroke-width=".3"/>
-    <circle class="vhs-led" cx="${x + 2.6}" cy="${f.y + f.h / 2}" r=".62"/>
+    <rect x="${f.x + 0.2}" y="${f.y + f.h + 1.45}" width="3.5" height="1.85" rx=".35" fill="none" stroke="#a9aaad" stroke-width=".2"/>
+    <rect x="${VFD.x - 0.6}" y="${VFD.y - 0.6}" width="${VFD.w + 1.2}" height="${VFD.h + 1.2}" rx="1" fill="url(#vhs-krom)" opacity=".7"/>
+    <rect x="${VFD.x}" y="${VFD.y}" width="${VFD.w}" height="${VFD.h}" rx=".5" fill="url(#vhs-rok)"/>
+    <circle cx="${x + 2.6}" cy="${f.y + f.h / 2}" r="1" fill="#0b0b0c" stroke="url(#vhs-krom)" stroke-width=".3"/>
+    <circle class="vhs-led" cx="${x + 2.6}" cy="${f.y + f.h / 2}" r=".58"/>
+    <circle cx="${x + 2.42}" cy="${f.y + f.h / 2 - 0.2}" r=".18" fill="#fff" opacity=".45"/>
   </g>`;
   }
   function tvText() {
     const f = FACK;
-    return `<text x="${f.x + f.w / 2}" y="${f.y + f.h + 2.4}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="1.3" letter-spacing=".4" fill="#8f8a80">HQ · STEREO</text>`;
+    const y = f.y + f.h + 2.85;
+    const sans = 'Helvetica Neue, Helvetica, Arial, sans-serif';
+    return `<text x="${f.x + 1.95}" y="${y}" text-anchor="middle" font-family="${sans}" font-weight="700" font-size="1.3" fill="#c3c4c7">HQ</text>` +
+      `<text x="${f.x + f.w}" y="${y}" text-anchor="end" font-family="${sans}" font-size="1.35" fill="#c3c4c7"><tspan font-weight="700" font-style="italic" font-size="1.55">Hi-Fi</tspan><tspan dx=".7" letter-spacing=".42">STEREO</tspan></text>`;
   }
 
   // Lådans övriga sidor, i bildpunkter: vänster och höger sida med
@@ -309,10 +337,15 @@ window.RumVideo = (() => {
   function tvRitning() {
     const b = { x: TV.x, y: TV.y, w: TV.w, h: TV.h };
     return ritning(b, `<defs>
-    <linearGradient id="vhs-kropp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36332f"/><stop offset=".07" stop-color="#262421"/><stop offset=".85" stop-color="#191816"/><stop offset="1" stop-color="#0f0e0d"/></linearGradient>
-    <linearGradient id="vhs-dager" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".05"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
-    <linearGradient id="vhs-silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ebe8e1"/><stop offset=".55" stop-color="#c4bfb5"/><stop offset="1" stop-color="#99948a"/></linearGradient>
-    <linearGradient id="vhs-lucka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3935"/><stop offset=".18" stop-color="#1b1a18"/><stop offset="1" stop-color="#0c0c0b"/></linearGradient>
+    <linearGradient id="vhs-kropp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4b4f"/><stop offset=".07" stop-color="#3a3b3f"/><stop offset=".85" stop-color="#2c2d30"/><stop offset="1" stop-color="#202124"/></linearGradient>
+    <linearGradient id="vhs-dager" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".06"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
+    <linearGradient id="vhs-fals" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18191b"/><stop offset=".5" stop-color="#2a2b2e"/><stop offset="1" stop-color="#6d6e72"/></linearGradient>
+    <linearGradient id="vhs-fas" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d0d0f"/><stop offset=".55" stop-color="#1b1c1e"/><stop offset="1" stop-color="#36373a"/></linearGradient>
+    <linearGradient id="vhs-silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f1ef"/><stop offset=".55" stop-color="#c9c9c6"/><stop offset="1" stop-color="#9c9c99"/></linearGradient>
+    <linearGradient id="vhs-krom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a4a5a9"/><stop offset=".45" stop-color="#5f6064"/><stop offset="1" stop-color="#2e2f32"/></linearGradient>
+    <linearGradient id="vhs-lucka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c4d51"/><stop offset=".16" stop-color="#2b2c2f"/><stop offset=".22" stop-color="#26272a"/><stop offset=".22" stop-color="#0f1011"/><stop offset=".27" stop-color="#0f1011"/><stop offset=".27" stop-color="#3b3c40"/><stop offset=".34" stop-color="#232427"/><stop offset="1" stop-color="#151618"/></linearGradient>
+    <linearGradient id="vhs-rok" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1416"/><stop offset="1" stop-color="#030809"/></linearGradient>
+    <filter id="vhs-korn" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="3" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .52  0 0 0 -2.2 1.25"/></filter>
   </defs>
   ${tvSvg()}`) + ritning(b, tvText());
   }

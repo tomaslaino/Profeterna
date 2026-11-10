@@ -14,7 +14,8 @@
    - det förtryckta (--tryck): bandet, rubrikerna, rutorna och numren, i
      terrakotta, som en blankett tryckt i en färg;
    - det maskinskrivna (--skriv): lagen, tiderna och alla värden, i färgbandets
-     svart. Typsnittet slår varje bokstav olika (typsnitt.css);
+     svart. Typsnittet slår varje bokstav olika (typsnitt.css); löptext (analysen)
+     står på samma maskin med jämna anslag (--renskrift), annars blir den svårläst;
    - pennan (--pp-hand): kryssen, ringarna, namnen och ställningen.
    --display och --sans pekar om till skrivmaskinen på papperet, så att allt som
    inte är förtryckt blir maskinskrivet av sig självt. En skrivmaskin har inget

@@ -1,5 +1,5 @@
 /* Sammanställningen efter omgången (rum-block.js): Hasse Backes protokoll, en blankett som kupongen, och
-   tidningen bakom löpsedeln (den står i rum-tidning.css). Allt är platt papper som ritas en gång, utan skuggfilter och
+   tidningen Helgarderat (den står i rum-tidning.css). Allt är platt papper som ritas en gång, utan skuggfilter och
    blandning, och inget ritas om medan kameran står still. */
 
 /* ---------- blocket ---------- */
@@ -151,6 +151,13 @@
 .rt-pil:disabled { visibility: hidden; }
 @media (hover: hover) { .rt-pil:hover { color: #d3e3ff; } }
 .rum-protokoll > .rum-block { user-select: none; -webkit-user-select: none; }
+/* framme går raderna att ta fram (protMatch i rum.js): ett klick var som helst på raden lägger fram matchbladet efter
+   matchen, matchen är en knapp, och med musen tonas raden man pekar på hela vägen över (.pek), med matchen understruken */
+.rum-block.matcher .rb-g > [data-rad] { cursor: pointer; }
+.rb-mk { flex: 1; min-width: 0; overflow: hidden; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; line-height: 1.5; text-align: left; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.rb-mk:focus-visible { outline: 2px solid #2146a6; outline-offset: 1px; }
+.rb-g > .pek::after { content: ""; position: absolute; inset: 0; background: rgba(169, 69, 43, 0.13); pointer-events: none; }
+.rb-g > .pek .rb-mk { text-decoration: underline; text-decoration-color: var(--pp-dots); text-underline-offset: 3px; }
 
 /* ---------- lappen under domen ---------- */
 /* (RumBlock.lapp, hos Hasse i baren): en remsa av protokollets blankett, med samma papper, band och tryck – kryssen i

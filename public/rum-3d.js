@@ -14,9 +14,11 @@
 //
 // Världen: x = scenens x − 800, y = 400 − scenens y, z mot betraktaren;
 // 1 enhet = 1 px i fönsterbänkens plan (kameran 1400 px bort, som scenens
-// perspektiv). Allt rör sig efter klockan t (sekunder): samma t ger samma bild,
-// också röken, som räknas fram för varje rökbloss ur var glöden var när det
-// föddes.
+// perspektiv). Musen flyttar kameran som ett öga, och bilden står still i
+// djupet där radion och tomflaskorna står, så att de följer bakväggen och
+// fönstret när rummet vrids (OGA_Z, sikta). Allt rör sig efter klockan t
+// (sekunder): samma t ger samma bild, också röken, som räknas fram för varje
+// rökbloss ur var glöden var när det föddes.
 //
 // Den som inte har lämnat in en öppen omgång sitter med kupongen och pennan i
 // stället för flaskan och cigaretten, som står på bordet. Fem saker
@@ -141,6 +143,13 @@ import { vaxter } from './rum-vaxter.js';
 const DEG = Math.PI / 180;
 const D = 1400;
 const SILL = -168;
+// Rummet vrids kring planet -330, där duken ligger, men fönsterbänken sitter på bakväggen i planet -600
+// (rum.js), 270 bakom och 1400/2000 så stor på skärmen. Musen flyttar därför ögat (draw, sikta) så att
+// bilden står still i djupet OGA_Z: då rör sig det som står på bänken (BANK_Z: radion och tomflaskorna,
+// z 8–30) lika mycket som väggen bakom. Förut vreds gänget kring duken, så att radion och flaskorna
+// gled upp till 15 px mot fönstret, löpsedlarna och bladet med stationerna.
+const BANK_Z = 16;
+const OGA_Z = BANK_Z + 270 * (1400 / 2000) * (D - BANK_Z) / D;
 // Barbordet: runt, framför fönsterbänken, med skivan y över sitsarna
 // (barstolarnas sitsar är i fönsterbänkens höjd, SILL).
 const BORD = { x: -186, z: 250, r: 118, y: 32 };
@@ -353,7 +362,20 @@ export async function figurer(canvas, opt = {}) {
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(H / 2 / D) / DEG, FW / H, 50, 5000);
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
-  cam.setViewOffset(FW, H, L0 - (800 - FW / 2), 0, W, H);
+  // Ögat, där betraktaren står (OGA: gänget tittar dit, looks), flyttas efter musen (draw), och bilden
+  // förskjuts så att djupet OGA_Z står kvar (en bit av en större bild, som när duken inte är mitt i).
+  // Ljuset står kvar, som när man själv rör sig: förut vreds gänget och skuggorna mot lamporna. NARA är
+  // den del av duken som ritas i närbilden av radion (narbild), annars hela duken.
+  const OGA = new THREE.Vector3(0, 0, D);
+  let NARA = null;
+  function sikta() {
+    const k = D / (D - OGA_Z);
+    const [x, y, w, h] = NARA ? [NARA.x, NARA.y, NARA.w, NARA.h] : [0, 0, W, H];
+    cam.position.copy(OGA);
+    cam.setViewOffset(FW, H, L0 - (800 - FW / 2) + x - OGA.x * k, y + OGA.y * k, w, h);
+    cam.updateMatrixWorld();
+  }
+  sikta();
 
   // ljuset: lysröret framifrån ovan, neonen bakom till vänster, terminalen till höger
   // (lysröret och det allmänna ljuset dämpas på natten, draw)
@@ -394,12 +416,8 @@ export async function figurer(canvas, opt = {}) {
   win.target.position.set(-150, -40, 0);
   scene.add(win, win.target);
 
-  const pivot = new THREE.Group();
-  pivot.position.y = -100;
-  scene.add(pivot);
   const root = new THREE.Group();
-  root.position.y = 100;
-  pivot.add(root);
+  scene.add(root);
 
   const catcher = new THREE.Mesh(new THREE.PlaneGeometry(1100, 220), new THREE.ShadowMaterial({ opacity: 0.42 }));
   catcher.rotation.x = -Math.PI / 2;
@@ -3417,8 +3435,6 @@ export async function figurer(canvas, opt = {}) {
   // HEJ: när man började och slutade peka på någon i gänget ({ at, ut }).
   const PK = {};
   const HEJ = {};
-  // betraktaren
-  const OGA = new THREE.Vector3(0, 0, D);
   const pekW = (o, t) => { const x = PK[o.F.key]; return x ? x.w0 + ((x.on ? 1 : 0) - x.w0) * sm(x.wAt, x.wAt + 0.5, t) : 0; };
   // den som sover vaknar inte (och den som håller på att vakna gör det först)
   const hejW = (o, t) => { const h = HEJ[o.F.key]; return h ? sm(h.at, h.at + 0.35, t) * (1 - sm(h.ut, h.ut + 0.6, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
@@ -6420,6 +6436,9 @@ export async function figurer(canvas, opt = {}) {
       headV = 0;
     }
     lastMx = mx;
+    // ögat efter musen, som rummets vridning i rum.js (camT: 4,5 grader åt sidorna, 2,6 upp och ner)
+    OGA.x = -Math.tan(mx * 4.5 * DEG) * (D - OGA_Z);
+    OGA.y = Math.tan(my * 2.6 * DEG) * (D - OGA_Z);
     // (röken först: den ställer figuren när blosset föddes, emitter)
     smoke(t);
     ringar(t);
@@ -6456,8 +6475,7 @@ export async function figurer(canvas, opt = {}) {
     hemi.intensity = hemiDag * (Q.enkel ? HEMI_ENKEL : 1) * (1 - 0.55 * natt);
     const tv = Math.max(tvW(t), 0.55 * natt);
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
-    pivot.rotation.y = mx * 4.5 * DEG;
-    pivot.rotation.x = my * 2.6 * DEG;
+    sikta();
     r.render(scene, cam);
     if (Q.skugga > 1 && Q.n++ % Q.skugga === 0) skuggaSen();
     if (ombyggda.length) slappOmbyggda();
@@ -6503,7 +6521,6 @@ export async function figurer(canvas, opt = {}) {
   // ritas, med pr bildpunkter per dukens punkt. Duken läggs över just den delen, så att gänget står kvar
   // och rör sig i närbildens skärpa och resten av rummet inte kostar något. null: hela duken igen.
   // Allt görs före nästa bild, så att duken aldrig hinner visas tom.
-  let NARA = null;
   let prNu = PR;
   const T0 = parseFloat(getComputedStyle(canvas).top) || 0;
   function narbild(ruta) {
@@ -6512,23 +6529,22 @@ export async function figurer(canvas, opt = {}) {
       // (längsta sidan högst 2880 bildpunkter)
       const pr = Math.min(ruta.pr, 2880 / Math.max(ruta.w, ruta.h));
       NARA = Object.assign({}, ruta, { pr });
-      cam.setViewOffset(FW, H, L0 - (800 - FW / 2) + ruta.x, ruta.y, ruta.w, ruta.h);
+      sikta();
       r.setPixelRatio(pr);
       r.setSize(ruta.w, ruta.h, false);
       Object.assign(canvas.style, { left: `${L0 + ruta.x}px`, top: `${T0 + ruta.y}px`, width: `${ruta.w}px`, height: `${ruta.h}px` });
       radioFin(ruta.bred * (RM.W * RM.SK) / W);
     } else {
       NARA = null;
-      cam.setViewOffset(FW, H, L0 - (800 - FW / 2), 0, W, H);
+      sikta();
       r.setPixelRatio(prNu);
       r.setSize(W, H, false);
       for (const k of ['left', 'top', 'width', 'height']) canvas.style.removeProperty(k);
     }
-    cam.updateMatrixWorld();
     r.render(scene, cam);
     if (opt.rita) opt.rita();
   }
-  // Radions delar sedda ur kameran (utan musens vridning): radioRuta i dukens punkter (det kameran siktar
+  // Radions delar sedda ur kameran (med ögat i vila): radioRuta i dukens punkter (det kameran siktar
   // på), radioDelar som andelar av duken ([vänster, topp, höger, botten]), radioP var på skalan punkten
   // (nx, ny) i duken (−1…1) är.
   const rVek = new THREE.Vector3();
@@ -6543,16 +6559,16 @@ export async function figurer(canvas, opt = {}) {
     return [(x0 + 1) / 2, (1 - y1) / 2, (x1 + 1) / 2, (1 - y0) / 2];
   }
   function radioRuta() {
-    const a = pivot.rotation.x;
-    const b = pivot.rotation.y;
-    pivot.rotation.set(0, 0, pivot.rotation.z);
+    const [ox, oy] = [OGA.x, OGA.y];
+    OGA.x = OGA.y = 0;
+    sikta();
     scene.updateMatrixWorld(true);
-    cam.updateMatrixWorld();
     const fram = rProj([-RM.W / 2, -0.5, RM.W / 2, RM.H + 7.5]);
     const bak = rProj([-RM.W / 2, -0.5, RM.W / 2, RM.H + 7.5, -RM.F]);
     const [x0, y0, x1, y1] = [Math.min(fram[0], bak[0]), Math.min(fram[1], bak[1]), Math.max(fram[2], bak[2]), Math.max(fram[3], bak[3])];
-    pivot.rotation.x = a;
-    pivot.rotation.y = b;
+    OGA.x = ox;
+    OGA.y = oy;
+    sikta();
     return { x: x0 * W, y: y0 * H, w: (x1 - x0) * W, h: (y1 - y0) * H };
   }
   function radioDelar() {
