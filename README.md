@@ -6078,11 +6078,15 @@ ryms på två rader ovanför listan också i den smalaste telefonen.
 
 **Domarna efter omgången** (2026-11-08, listan och lappen 2026-11-09). Så länge protokollet ligger på pulten, alltså från
 att omgången är spelad tills nästa Stryktips kommer måndagen efter kl. 16 (`Rum.summa`), dömer han gänget i stället för att
-gå igenom matcherna. Han frågar vems kupong han ska döma först, och frågan säger alltid att det är en kupong han ska
-döma (*Vems kupong ska jag ta nu?*, inte *Vem vill du höra om nu?*, 2026-11-10). Vet han vem du är (den enheten står på)
-och du lämnade in, börjar han med din: *Din kupong först, Laino, eller någon annans?*, sedan *Din kupong är dömd. Vems
-ska jag ta nu?*, eller, om du hellre lyssnar på de andra, *Din egen kupong har du inte vågat fråga om än* (`domar.du`).
-Frågan ryms på två rader också i den smalaste telefonen (`npm run repliker`). Gänget står sida vid sida i sin ordning, som på kupongen: stora
+gå igenom matcherna. Han frågar vems kupong han ska döma först, och frågan säger först vad han har att ge och sedan
+vems: *Jag säger gärna vad jag tycker om era kuponger. Vems ska jag börja med?* Att han ska gå igenom en kupong och
+säga något om den vet man inte i förväg, så *Vem vill du höra om nu?* och *Jag gissar att du vill höra om din kupong*
+räcker inte (2026-11-10; `npm run repliker` säger till om en fråga saknar kupongen eller det han ska göra, eller säger
+*höra om*). Vet han vem du är (den enheten står på) och du lämnade in, börjar han med din: *Jag har dömt era kuponger.
+Vill du höra domen över din först, Laino?*, sedan *Nu vet du vad jag tycker om din kupong. Ska jag ta någon annans?*,
+eller, om du hellre lyssnar på de andra, *Jag har synpunkter på din kupong också, Laino.* (`domar.du`). Frågan är ofta
+tre rader, och de tre raderna finns från början, så att gänget inte flyttar sig när han säger något annat medan han
+väntar; i låga telefoner är porträtten mindre, så att allt ryms ovanför foten också i 375 × 667. Gänget står sida vid sida i sin ordning, som på kupongen: stora
 porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
 Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderad*, *Turlig*, *Felfri*, *Osynlig*,
 *Generös*, *Snuvad*, *Klok*: ordet beskriver personen), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur

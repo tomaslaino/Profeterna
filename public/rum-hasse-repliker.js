@@ -500,24 +500,42 @@
   // han eller hon: skriv namnet, eller om kupongen. Till gruppen säger han ni och er, aldrig gänget: det är
   // bara ni som använder sidan. Ordet i guld står i domord, och namnen han nästan kan i felnamn.
   domar: {
-    // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla. Frågan
-    // säger vad han ska göra (döma en kupong) och att det är kupongen man väljer, inte bara en person: "Vem vill
-    // du höra om nu?" sa inte vad han skulle säga (Tomas 2026-11-10). Högst två rader (cirka 55 tecken).
-    fraga: ['Jag har rättat era kuponger. Vems ska jag börja med?', 'Jag har ett omdöme om varje kupong. Vems tar vi först?', 'Jag har rödpennan framme. Vems kupong tar vi först?', 'Omgången är spelad. Vems kupong ska jag bedöma först?', 'Protokollet är klart. Vems kupong ska jag döma först?'],
-    igen: ['Vems kupong ska jag ta nu?', 'Vems kupong ska jag döma nu?', 'Vems kupong vill du ha mitt omdöme om nu?', 'Vems kupong står på tur?'],
+    // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla. Varje
+    // fråga säger vad han har att ge (vad han tycker, sin bedömning, sin dom) och att det gäller en kupong,
+    // innan den frågar vems: att han ska gå igenom kupongen och säga något om den vet man inte i förväg.
+    // "Vem vill du höra om nu?" och "Jag gissar att du vill höra om din kupong" sa inte vad han skulle göra
+    // (Tomas 2026-11-10). Högst tre rader i den smalaste telefonen.
+    fraga: [
+      'Jag har rättat era kuponger och har synpunkter på alla. Vems tar jag först?',
+      'Jag har en bedömning av var och en av era kuponger. Vems vill du höra först?',
+      'Jag säger gärna vad jag tycker om era kuponger. Vems ska jag börja med?',
+      'Omgången är spelad, och jag har en dom över varje kupong. Vems tar vi först?',
+      'Rödpennan har gått över era kuponger. Vems vill du höra min dom över?',
+    ],
+    igen: ['Vems kupong ska jag säga något om nu?', 'Vems kupong vill du höra min bedömning av nu?', 'Vems kupong ska jag döma nu?', 'Jag har synpunkter på fler kuponger. Vems tar vi nu?'],
     alla: ['Nu har jag dömt varenda kupong.', 'Nu har var och en av er fått sitt.', 'Alla era kuponger är dömda. Jag har sett bättre.', 'Det var alla era kuponger. Mer än så finns det inte att säga.'],
     // I stället för fraga och igen när han vet vem du är (den enheten står på) och du lämnade in: först
     // (ingen dömd än), hort (din kupong är dömd) och inte (andras är dömda men inte din). {namn} är ditt.
     du: {
       forst: [
-        'Jag gissar att du vill höra om din kupong först, {namn}.',
-        'Din kupong först, {namn}, eller någon annans?',
-        'Jag har rättat din kupong, {namn}. Ska vi ta den först?',
-        'Du gjorde ditt bästa, {namn}. Nu ska du få höra om det räckte.',
-        'Din kupong har jag synpunkter på. Du gjorde ändå ditt bästa.',
+        'Jag gissar att du vill veta vad jag tycker om din kupong, {namn}.',
+        'Jag har synpunkter på varje kupong. Ska jag börja med din, {namn}?',
+        'Jag kommenterar gärna era kuponger. Din först, {namn}, eller någon annans?',
+        'Jag har dömt era kuponger. Vill du höra domen över din först, {namn}?',
+        'Jag har en bedömning av din kupong, {namn}. Du gjorde i alla fall ditt bästa.',
       ],
-      hort: ['Din kupong är dömd. Vems ska jag ta nu?', 'Nu vet du vad jag tycker om din kupong. Vems tar vi nu?', 'Din kupong har vi avverkat. Vems tar vi nu?', 'Du har fått din dom. Vems kupong ska jag döma nu?'],
-      inte: ['Din egen kupong har du inte vågat fråga om än, {namn}.', 'Vill du höra om din egen kupong nu, {namn}?', 'Din kupong väntar fortfarande på sin dom, {namn}.'],
+      hort: [
+        'Nu vet du vad jag tycker om din kupong. Ska jag ta någon annans?',
+        'Din kupong har fått sin dom. Vems kupong ska jag döma nu?',
+        'Du har hört min bedömning av din kupong. Vems vill du höra nu?',
+        'Mer än så har jag inte att säga om din kupong. Vems ska jag döma nu?',
+      ],
+      inte: [
+        'Jag har synpunkter på din kupong också, {namn}.',
+        'Vill du höra vad jag tycker om din egen kupong nu, {namn}?',
+        'Din kupong väntar fortfarande på min dom, {namn}.',
+        'De andras domar hör du gärna, {namn}. Din kupong har jag också dömt.',
+      ],
     },
     // Om man står kvar vid listan med gänget och inte väljer någon.
     ledig: [
