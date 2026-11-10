@@ -2561,7 +2561,9 @@ om, och ber om en handfull förslag där det roligaste vinner (förslagen sparas
 utan förklaring på kupongen i rummet, så sedan 2026-11-10 kräver instruktionen också att det går att
 förstå på egen hand – vilket lag det gäller och vad som menas – och låter som något en svensk säger,
 inte som en engelsk bild översatt ord för ord (*Näten på City Ground håller fint* om att Forest inte
-gjort mål hemma är exemplet på motsatsen). Omgången
+gjort mål hemma är exemplet på motsatsen). Samma dag byttes de tre första namnen för hand, i alla filer
+där de står: *Oxford och Cambridge ror i takt*, *Bournemouth sparkar hellre uppåt* och *Forest sparar
+målen till City*. Omgången
 och matchernas underlag läses ur tjänsten och den publicerade sajten (`data/match/<id>.json`: arena,
 odds, tabell, hemma- och bortafacit, form, mål mot xG, vila, tidigare möten), en sammanfattning
 räknas fram (lag som spelar flera gånger, största favorit, jämnaste match, chansen till alla rätt med
