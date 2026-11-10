@@ -37,12 +37,33 @@
 .tn th, .tn td { border: 0; text-transform: none; letter-spacing: 0; vertical-align: middle; }
 .tn button:hover { border-color: transparent; color: inherit; }
 
-/* framsidan (.hf-forsta nedan) med sin zoom, och innehållet under den */
-.tn-inne { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0 calc(var(--k) * 4px); padding: 9px 0 13px; border-top: 3px solid var(--svart); font: 800 12px/1 var(--sans); letter-spacing: 0.08em; }
-.tn-inne > b { margin-right: 4px; }
-.tn-inne button { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0; border: 0; background: none; color: inherit; font: 700 14px/1 var(--serif); letter-spacing: 0; cursor: pointer; }
-.tn-inne button i { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 3px; box-sizing: border-box; background: var(--gron); color: var(--p); font: 800 11px/1 var(--sans); font-style: normal; }
-@media (hover: hover) { .tn-inne button:hover span { text-decoration: underline; text-underline-offset: 3px; } }
+/* framsidan (.hf-forsta nedan) med sin zoom, och innehållet under den (innehall i rum-tidning.js): I tidningen och
+   På kupongen, i två spalter där det finns plats och läst nedåt, med prickar fram till sidnumret som i en riktig
+   tidning. Kupongens nummer i Anton som sidnumren i huvudet, matchen i fetstil och sidans rubrik under i kursiv, som
+   Lördagens matcher på Helgarderats egen sida (helgarderat.css). Samma papper som sidorna (::before och ::after, ut
+   till arkets kanter). */
+.tn-inne { position: relative; margin: 0 calc(var(--k) * 4px); padding: 0 0 18px; }
+.tn-inne::before, .tn-inne::after { content: ""; position: absolute; inset: 0 calc(var(--k) * -4px); z-index: 1; pointer-events: none; }
+.tn-inne::before { background: var(--p2); -webkit-mask: var(--prickar) 0 0 / 90px 90px, var(--flackar) 0 0 / 140px 140px; mask: var(--prickar) 0 0 / 90px 90px, var(--flackar) 0 0 / 140px 140px; }
+.tn-inne::after { background: var(--fiber) 0 0 / 150px 150px, var(--bukt) 0 0 / 100% auto; opacity: 0.8; }
+.tn-inne-del + .tn-inne-del { margin-top: 14px; }
+.tn .tn-inne-rub { margin: 0 0 3px; padding-top: 7px; border-top: 3px solid var(--svart); font: 800 12.5px/1 var(--sans); letter-spacing: 0.08em; }
+.tn-inne ol { margin: 0; padding: 0; list-style: none; columns: 2 220px; column-gap: 24px; column-rule: 1px solid var(--streck); }
+.tn-inne li { break-inside: avoid; margin: 0; padding: 0; }
+.tn-inne button { display: grid; grid-template-columns: minmax(0, max-content) minmax(18px, 1fr) auto; align-items: baseline; column-gap: 6px; width: 100%; min-height: 30px; padding: 5px 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: 0; text-align: left; cursor: pointer; }
+.tn-inne .matcher button { grid-template-columns: 19px minmax(0, max-content) minmax(18px, 1fr) auto; column-gap: 5px; padding: 6px 0 7px; }
+.tn-inne button > b { font: 400 18px/1 Anton, Impact, sans-serif; }
+.tn-inne button > span { font: 700 14.5px/1.2 var(--serif); }
+/* ett långt namn bryts, och prickarna och sidnumret står på den sista raden */
+.tn-inne button > :is(em, i, strong) { align-self: end; }
+/* efter omgången resultatet i stället för sidnumret */
+.tn-inne button > strong { margin-bottom: 1px; font: 800 14px/1.2 var(--sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* prickarna fram till sidnumret, på raden */
+.tn-inne button > em { height: 3px; margin-bottom: 5px; background: radial-gradient(circle at 1.5px 1.5px, var(--gra) 0.9px, transparent 1.3px) 100% 0 / 5px 3px repeat-x; }
+.tn-inne button > i { display: inline-grid; place-items: center; min-width: 21px; height: 20px; padding: 0 3px; box-sizing: border-box; background: var(--gron); color: var(--p); font: 800 11.5px/1 var(--sans); font-style: normal; font-variant-numeric: tabular-nums; }
+.tn-inne button > small { grid-column: 2 / 4; margin-top: 2px; color: var(--gra); font: italic 400 12.5px/1.3 var(--serif); }
+.tn-inne button:focus-visible { outline: 2px solid var(--gron); outline-offset: 2px; }
+@media (hover: hover) { .tn-inne button:hover span, .tn-folio button:hover { text-decoration: underline; text-underline-offset: 3px; } }
 
 /* sidhuvudet: sidnumret ytterst, tidningens namn och datumet */
 .tn-folio { display: flex; align-items: baseline; gap: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--svart); font: 600 10.5px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--gra); }
@@ -50,6 +71,8 @@
 .tn-folio span:last-child { margin-left: auto; }
 .tn-folio.h { flex-direction: row-reverse; }
 .tn-folio.h span:last-child { margin: 0 auto 0 0; }
+/* namnet går till innehållet */
+.tn .tn-folio button { padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
 
 /* vinjetten: avdelningen i svart och det som gäller hela sidan till höger */
 .tn-vinjett { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 10px; border-bottom: 3px solid var(--svart); }
@@ -187,6 +210,7 @@
 .tn.smal { gap: 10px; }
 .tn.smal .tn-sida { padding: 8px 14px 18px; }
 .tn.smal .tn-inne { margin: 0 14px; }
+.tn.smal .tn-inne::before, .tn.smal .tn-inne::after { inset: 0 -14px; }
 .tn.smal .tn-delad, .tn.smal .tn-betygen { grid-template-columns: minmax(0, 1fr); }
 .tn.smal .tn-artikel, .tn.smal .tn-spalter { column-count: 1; }
 .tn.smal .tn-rub { font-size: 27px; }

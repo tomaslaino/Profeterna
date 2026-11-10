@@ -298,6 +298,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   löpsedel har Helgarderats namn och gröna tryck i stället för Sportbladets eller Expressens, och tidningen har löpsedelns
   papper: gråaktigt och matt med fibrer och buktor, tryckfärg som inte har täckt överallt, dämpade färger och ett veck på
   mitten (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären) och *Papperet* under [Tidningen](#tidningen))
+- [x] **Innehållet i Helgarderat (2026-11-10, användarens önskemål: "en innehållsförteckning - med matcherna på
+  kupongen - på ett snyggt sätt", "Som man alltså kan klicka sig fram till"):** under framsidan i tidningen på pulten
+  står *I tidningen* med avdelningarna och *På kupongen* med omgångens matcher, var och en med prickar fram till
+  sidnumret och rubriken på sin sida under. Ett klick går dit, och *Helgarderat* i sidhuvudet går tillbaka. Efter
+  omgången står resultatet i stället för sidnumret (se *Innehållet* under [Tidningen](#tidningen))
 
 ## Publicering
 
@@ -7114,9 +7119,27 @@ förut, och inte fler trianglar. Blocket och tidningen är platt papper som rita
 Tidningen i tobaksaffären heter Helgarderat. Den ligger på pulten till höger om kupongen, och ett klick på den lägger
 fram den över rummet (2026-11-09, användarens önskemål: "förbättra tidningen otroligt mycket"; förut fanns den bara
 efter omgången, med betygen, skrällen och två meningar från Hasse). Överst ligger dess egen framsida (se *Framsidan*
-nedan), och under den står *I tidningen* med sidorna och deras nummer, och ett klick där rullar fram till sidan. Sidorna
+nedan), och under den innehållet (se *Innehållet* nedan). Sidorna
 ligger under varandra som ark, var och en med sidnumret ytterst, *Helgarderat* och datumet i huvudet, en avdelning i en
 grön vinjett och rubriker i Anton, brödtext med rak högerkant och avstavning och porträtten rastrerade i svartvitt.
+*Helgarderat* i huvudet går tillbaka till innehållet.
+
+**Innehållet** (2026-11-10, användarens önskemål: "Kan du ordna så att tidningen 'Helgarderat' får en
+innehållsförteckning - med matcherna på kupongen - på ett snyggt sätt", "Som man alltså kan klicka sig fram till"): under
+framsidan, på samma papper, står *I tidningen* med avdelningarna och deras första sida och *På kupongen* med omgångens
+matcher i kupongens ordning, i två spalter i datorn och en i telefonen, läst nedåt. Varje rad har prickar fram till
+sidnumret i en grön ruta, som i en riktig tidning. Matchen har kupongens nummer i Anton, lagen i fetstil och under dem
+rubriken på sidan den står på, i kursiv, som *Lördagens matcher* på Helgarderats egen sida. Sidan är den som handlar mest
+om matchen: matchbladet under *Supportrarna*, annars *Veckans analys*, notisen i *Så mår tipslagen* eller raden i
+*Tipset* (`om` och `vikt` på varje sida, `innehall` i rum-tidning.js). Efter omgången står resultatet i stället för
+sidnumret, eftersom alla matcher står i *Omgången*, och raden går dit. Ett klick på en rad rullar fram till sidan, och på
+en sida med flera matcher (notiserna, tabellerna) till matchen (`data-till` och `data-match`, `tidningen` i rum.js). Ett
+långt namn bryts, och prickarna och sidnumret står då på den sista raden.
+
+Provat 2026-11-10 i headless Chrome i hela rummet med en påhittad kupong för lördagen (de tolv matchbladen och en
+match utan) i 1440 × 900 och 412 × 915, och på en provsida med påhittade notiser, en påhittad analys och en påhittad
+sammanställning efter omgången: raderna går till rätt sida och rätt notis och rad, och *Helgarderat* i huvudet tillbaka.
+Inte provat i Safari eller i en riktig telefon.
 Trycket är svart och flaskgrönt som på Helgarderats egen sida (se *Helgarderat* nedan), och rött står bara där det
 betyder något: stämplarna, pilen för den som föll i Tipsligan och datorns chans när den var under 25 %. I datorn står
 texten i två spalter och i telefonen (smalare än 470 bildpunkter) i en. Allt står i
@@ -7198,7 +7221,7 @@ riktig omgång (sammanställningen kräver tjänsten), i Safari eller i en rikti
   sammanfattningen i en grön ruta och sist källorna med datum och fotograferna. Ett nummer från före matchbladen får
   uppgifterna som löptext. Samma blad som på sajtens [Helgarderat](#helgarderat) (`poddText`, `poddKallor`,
   `poddKallText` och `poddCitat` i rum-tidning.js).
-  *I tidningen* pekar på den första av sidorna.
+  *I tidningen* pekar på den första av sidorna, och *På kupongen* på var och en (se *Innehållet* ovan).
 
 Notiserna, supporterpoddarnas sidor och analyserna hämtas när man pekar på eller trycker på tidningen, och klicket väntar
 på dem i högst två och en halv sekund.

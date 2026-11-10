@@ -87,6 +87,11 @@
       skrallen: 'Skrällen',
       kronikan: 'Krönikan',
     },
+    // Innehållet under framsidan: avdelningarna och kupongens matcher.
+    inne: {
+      tidningen: 'I tidningen',
+      kupongen: 'På kupongen',
+    },
     // Framsidan: numret, vilken omgång det gäller och veckans bild. Priset är tre kronor, tre rader: helgarderat.
     forsta: {
       nr: (n) => `Nr ${n}`,
@@ -214,10 +219,11 @@
   // ---------- delarna ----------
 
   // Sidhuvudet som i en tidning: sidnumret ytterst, tidningens namn och datumet.
+  // Namnet går tillbaka till innehållet under framsidan (tidningen i rum.js), som på Helgarderats egen sida.
   const folio = (u, nr) => {
     const namn = esc(NAMN);
     const dag = esc(u.datumText || '');
-    return `<div class="tn-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><span>${namn}</span><span>${dag}</span></div>`;
+    return `<div class="tn-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><button type="button" data-till="innehall">${namn}</button><span>${dag}</span></div>`;
   };
   // Vinjetten överst på sidan: avdelningen, och till höger det som gäller hela sidan.
   const vinjett = (namn, hoger = '') => `<div class="tn-vinjett"><b>${esc(namn.toUpperCase())}</b>${hoger ? `<span>${esc(hoger)}</span>` : ''}</div>`;
@@ -270,13 +276,14 @@
   function tipset(u) {
     const m = u.matcher || [];
     if (!m.length) return null;
-    const rad = m.map((x) => `<tr><td class="tn-nr">${x.nr}</td><td class="tn-match"><span>${matchNamn(x.h, x.b)}</span><small>${esc(avspark(x.avspark))}</small></td>${procent(x.pr)}<td class="tn-tk">${esc(x.expert || '')}</td></tr>`).join('');
+    const rad = m.map((x) => `<tr data-match="${esc(x.id)}"><td class="tn-nr">${x.nr}</td><td class="tn-match"><span>${matchNamn(x.h, x.b)}</span><small>${esc(avspark(x.avspark))}</small></td>${procent(x.pr)}<td class="tn-tk">${esc(x.expert || '')}</td></tr>`).join('');
     const T = TEXT.tipset;
     const tabell = `<table class="tn-tabell tn-tips"><thead><tr><th></th><th></th><th colspan="3">${esc(T.datorn)}, %</th><th>${esc(T.experten)}</th></tr>` +
       `<tr class="sm"><th></th><th></th><th>1</th><th>X</th><th>2</th><th></th></tr></thead><tbody>${rad}</tbody></table>`;
     const l = u.liga && u.liga.efter && u.liga.efter.length ? liga(u, u.liga.efter, null, u.liga.omg) : '';
     return {
       namn: TEXT.sidor.tipset,
+      om: m.map((x) => ({ id: String(x.id) })),
       html: vinjett(TEXT.sidor.tipset, u.nr ? `Kupong ${u.nr}` : '') + rubrik(T.rubrik) + tabell + (l ? `<div class="tn-under">${l}</div>` : ''),
     };
   }
@@ -318,17 +325,21 @@
     // i kupongens ordning, med kupongens nummer
     const match = (n) => (u.matcher || []).find((x) => String(x.id) === String(n.id)) || (u.matcher || []).find((x) => x.nr === n.nr);
     const nr = (n) => (match(n) ? match(n).nr : n.nr);
-    const sida = l.slice().sort((a, b) => nr(a) - nr(b)).map((n) => {
+    const id = (n) => String(match(n) ? match(n).id : n.id || '');
+    const ordning = l.slice().sort((a, b) => nr(a) - nr(b));
+    const sida = ordning.map((n) => {
       const m = match(n);
       const kicker = m ? matchNamn(m.h, m.b) : esc(n.match || '');
       const k = kallorna(n.kallor);
       const bilder = notisBilder(u, n);
       const foto = fotoText(bilder.filter((x) => x && !x.skold).map((x) => x.foto));
-      return `<article class="tn-notis">${bildrad(bilder, m ? [m.h, m.b] : lagI(n))}<p class="tn-kick"><b>${m ? m.nr : n.nr}</b>${kicker}</p><h4>${esc(n.rubrik)}</h4><p>${esc(utanRef(n.text))}</p>` +
+      return `<article class="tn-notis"${id(n) ? ` data-match="${esc(id(n))}"` : ''}>${bildrad(bilder, m ? [m.h, m.b] : lagI(n))}<p class="tn-kick"><b>${m ? m.nr : n.nr}</b>${kicker}</p><h4>${esc(n.rubrik)}</h4><p>${esc(utanRef(n.text))}</p>` +
         (k.length || bilder.length ? `<p class="tn-kalla">${esc(k.join(', '))}${k.length && foto ? '. ' : ''}<span class="tn-fotoav">${esc(foto)}</span></p>` : '') + '</article>';
     }).join('');
     return {
       namn: TEXT.sidor.notiser,
+      om: ordning.filter(id).map((n) => ({ id: id(n), rubrik: n.rubrik })),
+      vikt: 1,
       html: vinjett(TEXT.sidor.notiser) + `<p class="tn-ingress">${esc(TEXT.notiser.ingress)}</p><div class="tn-spalter">${sida}</div>`,
     };
   }
@@ -341,8 +352,11 @@
     const t = a.tip;
     const tips = t && t.sign ? `<aside class="tn-tipsruta"><p class="tn-rad-rub"><b>${esc(TEXT.analys.tipset.toUpperCase())}</b></p><p class="tn-tecken"><b>${esc(t.sign)}</b>${t.note ? `<em>${esc(t.note)}</em>` : ''}</p>` +
       (t.text ? `<p>${esc(utanRef(t.text))}</p>` : '') + '</aside>' : '';
+    const m = a.nr ? (u.matcher || []).find((x) => x.nr === a.nr) : null;
     return {
       namn: TEXT.sidor.analys,
+      om: m ? [{ id: String(m.id), rubrik: a.title }] : [],
+      vikt: 2,
       html: vinjett(TEXT.sidor.analys, `${a.nr ? `${a.nr} · ` : ''}${a.h}–${a.b}`) + `<h3 class="tn-rub stor">${esc(a.title)}</h3>` +
         (a.lead ? `<p class="tn-ingress fet">${esc(utanRef(a.lead))}</p>` : '') +
         `<p class="tn-byline">${esc(String(a.author || 'Sixten Bråvall').replace(/\s*\(påhittad\)\s*$/, ''))}${a.avspark ? ` · avspark ${esc(avspark(a.avspark))}` : ''}</p>` +
@@ -435,6 +449,8 @@
       }).filter(Boolean);
       return {
         namn: TEXT.sidor.poddar,
+        om: [{ id: String(m ? m.id : x.id), rubrik: x.rubrik }],
+        vikt: 3,
         html: vinjett(TEXT.sidor.poddar, `${nr(x) ? `${nr(x)} · ` : ''}${namn.join('–')}`) + `<h3 class="tn-rub stor">${esc(x.rubrik || T.rubrik(namn[0], namn[1]))}</h3>` +
           bildrad(bilder, namn) + (x.ingress ? `<p class="tn-ingress fet">${esc(hel(x.ingress))}</p>` : '') +
           `<div class="tn-artikel tn-matchblad">${lagen}${cit ? `<blockquote class="tn-mb-citat"><p>”${esc(hel(cit.sagt))}”</p><cite>${esc(cit.vem)}</cite></blockquote>` : ''}</div>` +
@@ -468,7 +484,7 @@
     const rader = sum.rader.map((r) => {
       const p = r.res != null && r.pr ? pr(r.pr[r.res]) : null;
       const ratt = folk.filter((x) => r.ratt.includes(x.id)).length;
-      return `<tr><td class="tn-nr">${r.nr}</td><td class="tn-match"><span>${matchNamn(r.h, r.b)}</span></td><td class="tn-res">${esc(r.mal)}</td><td class="tn-tk">${esc(r.tecken)}</td>` +
+      return `<tr data-match="${esc(r.id)}"><td class="tn-nr">${r.nr}</td><td class="tn-match"><span>${matchNamn(r.h, r.b)}</span></td><td class="tn-res">${esc(r.mal)}</td><td class="tn-tk">${esc(r.tecken)}</td>` +
         `<td class="tn-p${p != null && p <= 25 ? ' rod' : ''}">${p == null ? '–' : `${p} %`}</td><td class="tn-ratt">${folk.length ? `${ratt}/${folk.length}` : ''}</td></tr>`;
     }).join('');
     const tabell = `<table class="tn-tabell tn-res-tab"><thead><tr><th></th><th></th><th>Res</th><th>Tecken</th><th title="Datorns chans för det som hände">Datorn</th><th title="Hur många av er som hade rätt">Rätt</th></tr></thead><tbody>${rader}</tbody></table>`;
@@ -490,6 +506,7 @@
     const siffror = s.length ? `<aside class="tn-fakta"><b>${esc(T.siffror.toUpperCase())}</b><div>${s.map((t) => `<p>${esc(hel(t))}</p>`).join('')}</div></aside>` : '';
     return {
       namn: TEXT.sidor.omgangen,
+      om: sum.rader.map((r) => ({ id: String(r.id) })),
       html: vinjett(TEXT.sidor.omgangen, sum.nr ? `Kupong ${sum.nr}` : '') + rubrik(T.rubrik) + (sum.namn ? `<p class="tn-omgnamn">”${esc(sum.namn.replace(/[.!?…]+$/, ''))}”</p>` : '') +
         tabell + rad + siffror,
     };
@@ -737,6 +754,36 @@
 
   // ---------- tidningen ----------
 
+  // Innehållet under framsidan (2026-11-10, användarens önskemål: "en innehållsförteckning - med matcherna på
+  // kupongen - på ett snyggt sätt", "som man alltså kan klicka sig fram till"), som i en riktig tidning: I tidningen
+  // med avdelningarna och deras första sida, och På kupongen med omgångens matcher i kupongens ordning, var och en med
+  // sidan som handlar mest om den (s.om och s.vikt: matchbladet, annars Veckans analys, notisen eller raden i Tipset)
+  // och under matchen sidans rubrik, som Lördagens matcher på Helgarderats egen sida. Efter omgången står resultatet
+  // i stället för sidnumret (alla matcher står i Omgången, och tretton tvåor säger ingenting), och raden går dit. Varje rad har prickar fram till sidnumret och går dit med ett
+  // klick (tidningen i rum.js): data-till är sidan och data-match matchen, på en sida med flera matcher.
+  function innehall(u, sidor) {
+    const T = TEXT.inne;
+    // hoger: sidnumret, efter omgången resultatet
+    const rad = (nr, namn, under = '', match = '', hoger = `<i>${nr}</i>`) => `<li><button type="button" data-till="sida-${nr}"${match ? ` data-match="${esc(match)}"` : ''}>` +
+      `${namn}<em></em>${hoger}${under ? `<small>${esc(hel(under))}</small>` : ''}</button></li>`;
+    const avd = sidor.map((s, i) => (i && sidor[i - 1].namn === s.namn ? '' : rad(i + 2, `<span>${esc(s.namn)}</span>`))).join('');
+    const matcher = (u.matcher || []).slice().sort((a, b) => a.nr - b.nr).map((m) => {
+      const id = String(m.id);
+      // sidan med högst vikt, och bland dem den första
+      let bast = null;
+      sidor.forEach((s, i) => {
+        const om = (s.om || []).find((x) => x && x.id === id);
+        if (om && (!bast || (s.vikt || 0) > bast.vikt)) bast = { nr: i + 2, vikt: s.vikt || 0, rubrik: om.rubrik || '' };
+      });
+      if (!bast) return '';
+      const r = u.efter ? (u.efter.rader || []).find((x) => String(x.id) === id) : null;
+      const namn = `<b>${esc(m.nr)}</b><span>${matchNamn(m.h, m.b)}</span>`;
+      return r && r.mal ? rad(bast.nr, namn, '', id, `<strong>${esc(hel(r.mal))}</strong>`) : rad(bast.nr, namn, bast.rubrik, id);
+    }).join('');
+    const del = (rub, rader, kl) => `<div class="tn-inne-del ${kl}"><p class="tn-inne-rub"><b>${esc(rub.toUpperCase())}</b></p><ol>${rader}</ol></div>`;
+    return `<nav class="tn-inne" id="tn-innehall" aria-label="${esc(T.tidningen)}">${del(T.tidningen, avd, 'avd')}${matcher ? del(T.kupongen, matcher, 'matcher') : ''}</nav>`;
+  }
+
   // Sidorna ur listan, med sidnummer från 2 (framsidan är 1). En avdelning kan vara flera sidor: supporterpoddarna
   // har en per match. → { inne, blad, sidor } eller null
   function sidorna(u, lista) {
@@ -749,8 +796,7 @@
       }
     }).filter(Boolean);
     if (!sidor.length) return null;
-    // I tidningen: avdelningens första sida
-    const inne = `<nav class="tn-inne" aria-label="I tidningen"><b>I TIDNINGEN</b>${sidor.map((s, i) => (i && sidor[i - 1].namn === s.namn ? '' : `<button type="button" data-sida="${i + 2}"><span>${esc(s.namn)}</span><i>${i + 2}</i></button>`)).join('')}</nav>`;
+    const inne = innehall(u, sidor);
     const blad = sidor.map((s, i) => `<section class="tn-ark tn-sida" id="tn-sida-${i + 2}" aria-label="Sidan ${i + 2}: ${esc(s.namn)}">${folio(u, i + 2)}${s.html}</section>`).join('');
     return { inne, blad, sidor: sidor.map((s) => s.namn) };
   }

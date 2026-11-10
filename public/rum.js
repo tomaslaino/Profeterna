@@ -3956,11 +3956,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) el.addEventListener(n, (e) => e.stopPropagation());
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      // I tidningen: till sidan
-      const b = e.target.closest('.tn-inne button[data-sida]');
-      const s = b && el.querySelector(`#tn-sida-${b.dataset.sida}`);
+      // Innehållet: till sidan, och på en sida med flera matcher till matchen. Namnet i sidhuvudet: till innehållet.
+      const b = e.target.closest('button[data-till]');
+      const s = b && el.querySelector(`#tn-${b.dataset.till}`);
       if (s) {
-        el.scrollTo({ top: s.offsetTop - 8, behavior: calm() ? 'auto' : 'smooth' });
+        const m = (b.dataset.match && [...s.querySelectorAll('[data-match]')].find((x) => x.dataset.match === b.dataset.match)) || s;
+        let y = 0;
+        for (let n = m; n && n !== el; n = n.offsetParent) y += n.offsetTop;
+        el.scrollTo({ top: y - (m === s ? 8 : 14), behavior: calm() ? 'auto' : 'smooth' });
         return;
       }
       if (!e.target.closest('.tn-ark') || e.target.closest('.tn-tillbaka')) tidningen(false);
