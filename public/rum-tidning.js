@@ -672,23 +672,44 @@
   const fVdagLang = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long' });
   const fDagManad = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', day: 'numeric', month: 'long' });
   const omgangsdag = (t) => `${fVdagLang.format(new Date(t))}en den ${fDagManad.format(new Date(t))}`;
-  // Veckans bild på framsidan: ett av veckans foton av lagen (bilder i data/tidning.json, se notisBilder), helst ur
-  // notisen om matchen som Veckans analys handlar om (efter omgången skrällen), annars den första i kupongens
-  // ordning som har ett. Rubriken är notisens. → { src, reserv, foto, rubrik } eller null
+  // Veckans bild på framsidan: ett av veckans foton av lagen, matchbladets (data/matchbilder/, som GitHub Actions hämtar
+  // till varje omgång) eller notisens (data/tidning-bilder/, som iMacen hämtar), med matchbladets eller notisens rubrik.
+  // Helst om matchen som Veckans analys handlar om (efter omgången skrällen), annars den första i kupongens ordning som
+  // har ett foto. Finns inget foto står lagens sköldar för den matchen där, så att framsidan alltid har en bild.
+  // → { foto: { src, reserv, foto } | null, skoldar: [src, src] | null, rubrik, under } eller null
   function veckansBild(u, sum) {
-    let pref = u.analys ? u.analys.nr : null;
+    const m = u.matcher || [];
+    let pref = null;
     if (sum) {
-      try { pref = (skrall(u, sum) || { r: {} }).r.nr; } catch (e) { pref = null; }
+      try { pref = (skrall(u, sum) || { r: {} }).r.id; } catch (e) { pref = null; }
+    } else if (u.analys) pref = (m.find((x) => x.nr === u.analys.nr) || {}).id;
+    const ids = [...new Set([pref, ...m.map((x) => x.id)].filter(Boolean).map(String))];
+    const skold = (lag) => (lag && typeof u.skold === 'function' ? u.skold(lag) || '' : '');
+    const sidor = (u.poddsidor && u.poddsidor.sidor) || [];
+    for (const id of ids) {
+      const x = sidor.find((y) => y && String(y.id) === id);
+      const i = x && Array.isArray(x.bilder) ? x.bilder.findIndex((b) => b && b.fil) : -1;
+      if (i >= 0) {
+        const b = x.bilder[i];
+        return { foto: { src: `data/matchbilder/${b.fil}`, reserv: skold((x.lag || [])[i]), foto: fotograf(b) }, rubrik: x.rubrik || '' };
+      }
+      const n = (u.notiser || []).find((y) => y && String(y.id) === id);
+      const f = n ? notisBilder(u, n).find((y) => y && !y.skold) : null;
+      if (f) return { foto: f, rubrik: n.rubrik || '' };
     }
-    const med = (u.notiser || []).map((n) => ({ n, b: notisBilder(u, n).filter((x) => x && !x.skold) })).filter((x) => x.b.length);
-    const v = med.find((x) => x.n.nr === pref) || med[0];
-    return v ? { ...v.b[0], rubrik: v.n.rubrik } : null;
+    // utan foto: sköldarna, med matchen och avsparken (efter omgången resultatet)
+    const x = m.find((y) => String(y.id) === ids[0]);
+    if (!x) return null;
+    const skoldar = [skold(x.hemma), skold(x.borta)];
+    if (!skoldar.some(Boolean)) return null;
+    const r = sum && (sum.rader || []).find((y) => String(y.id) === String(x.id));
+    return { skoldar, rubrik: `${x.h}–${x.b}`, under: r && r.mal ? r.mal : avspark(x.avspark) };
   }
 
   // Framsidan, 100 × 140 (zoom i rum.js), utan annat än det som säger vilket nummer det är (2026-11-10, användarens
   // önskemål: "Tidningen ser plottrig ut. Ta bort massa saker där som vi är ointresserade av"): veckan, datumet och
-  // priset, namnet, numret stort med omgångens dag och namn under, och veckans bild med notisens rubrik. Utan bild
-  // står numret ensamt, större. Samma på pulten och när den är framme.
+  // priset, namnet, numret stort med omgångens dag under, och veckans bild (veckansBild) med rubriken. Samma på pulten
+  // och när den är framme.
   function forsta(u0) {
     const u = { namnAv: (id, n) => n, ...u0 };
     const G = TEXT.forsta;
@@ -701,15 +722,16 @@
     const v = Number.isFinite(dagen) ? vecka(dagen) : null;
     const dag = Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '';
     const omg = Number.isFinite(forst) ? (sum ? G.efter : G.infor)(omgangsdag(forst)) : '';
-    const namn = sum ? sum.namn : u.namn;
     const b = veckansBild(u, sum);
-    const bild = b ? `<figure class="hf-bild"><canvas class="hf-foto" width="320" height="200" data-bild="${esc(b.src)}"${b.reserv ? ` data-reserv="${esc(b.reserv)}"` : ''}></canvas>` +
-      `<figcaption><b>${esc(hel(b.rubrik || ''))}</b>${b.foto ? `<small>${esc(G.foto(b.foto))}</small>` : ''}</figcaption></figure>` : '';
+    const duk = (src, reserv, kl, w, h) => `<canvas class="${kl}" width="${w}" height="${h}" data-bild="${esc(src)}"${reserv ? ` data-reserv="${esc(reserv)}"` : ''}></canvas>`;
+    const under = b && (b.foto ? (b.foto.foto ? G.foto(b.foto.foto) : '') : b.under);
+    const bild = !b ? '' : `<figure class="hf-bild">${b.foto ? duk(b.foto.src, b.foto.reserv, 'hf-foto', 320, 200)
+      : `<div class="hf-foto hf-skoldar">${b.skoldar.map((x) => (x ? duk(x, '', 'skold genom', 160, 160) : '<span></span>')).join('<i>–</i>')}</div>`}` +
+      `<figcaption><b>${esc(hel(b.rubrik || ''))}</b>${under ? `<small>${esc(under)}</small>` : ''}</figcaption></figure>`;
     return `<div class="hf-forsta${bild ? '' : ' utan-bild'}" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
       `<div class="hf-linje"><b>${v != null ? esc(G.vecka(v)) : ''}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
       `<div class="hf-namn">${rutor()}<b>${NAMN.toUpperCase()}</b></div>` +
-      `<div class="hf-numret">${nr != null ? `<b>${esc(G.nr(nr))}</b>` : ''}${omg ? `<span>${esc(omg)}</span>` : ''}` +
-      `${namn ? `<em>”${esc(String(namn).replace(/[.!?…]+$/, ''))}”</em>` : ''}</div>` +
+      `<div class="hf-numret">${nr != null ? `<b>${esc(G.nr(nr))}</b>` : ''}${omg ? `<span>${esc(omg)}</span>` : ''}</div>` +
       bild + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
 
@@ -765,10 +787,14 @@
         const { width: W, height: H } = c;
         const iw = img.naturalWidth;
         const ih = img.naturalHeight;
+        // (genom: trycket ligger direkt på papperet, utan någon vit ruta – sköldarna på framsidan)
+        const genom = c.classList.contains('genom');
         if (c.classList.contains('skold')) {
           const k = (Math.min(W / iw, H / ih) * 0.78);
-          x.fillStyle = '#fff';
-          x.fillRect(0, 0, W, H);
+          if (!genom) {
+            x.fillStyle = '#fff';
+            x.fillRect(0, 0, W, H);
+          }
           x.drawImage(img, (W - iw * k) / 2, (H - ih * k) / 2, iw * k, ih * k);
         } else {
           const k = Math.max(W / iw, H / ih);
@@ -783,12 +809,22 @@
         for (let y = 0; y < H; y++) {
           for (let i = 0; i < W; i++) {
             const o = (y * W + i) * 4;
-            const g = Math.min(1, Math.max(0, ((0.3 * p[o] + 0.59 * p[o + 1] + 0.11 * p[o + 2]) / 255 - 0.5) * 1.25 + 0.55));
+            // (det genomskinliga är papper)
+            const a = genom ? p[o + 3] / 255 : 1;
+            const g = Math.min(1, Math.max(0, ((a * (0.3 * p[o] + 0.59 * p[o + 1] + 0.11 * p[o + 2]) / 255 + 1 - a) - 0.5) * 1.25 + 0.55));
             // punkternas storlek efter hur mörkt det är: 45 grader, med tonen kvar under
             const uu = ((i + y) / ruta) % 1;
             const vv = ((i - y + 4 * H) / ruta) % 1;
             const r = Math.hypot(uu - 0.5, vv - 0.5) / 0.71;
             const v2 = g * 0.72 + (r < 1 - g ? 0 : 0.28);
+            if (genom) {
+              // svärtan som täckning: papperet lyser igenom där trycket är ljust
+              p[o] = 28;
+              p[o + 1] = 24;
+              p[o + 2] = 18;
+              p[o + 3] = Math.round((1 - v2) * 255);
+              continue;
+            }
             p[o] = 28 + v2 * 208;
             p[o + 1] = 24 + v2 * 208;
             p[o + 2] = 18 + v2 * 200;
