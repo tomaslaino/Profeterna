@@ -865,11 +865,16 @@ window.RumHasse = (() => {
     return ut;
   }, []);
 
-  // Du, om kupongen vet vem du är: en tränare säger efternamnet.
+  // Du, om kupongen vet vem du är: det vi kallas (Tippoang.kallas: efternamnet, Dogge för Johansson).
   function dittNamn() {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
-    return g && g.namn ? g.namn.trim().split(/\s+/).pop() : '';
+    return g && g.namn ? Tippoang.kallas(g) : '';
+  }
+  // Vem i gänget enheten står på, eller null.
+  function duId() {
+    const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
+    return (p && p.vem) || null;
   }
   // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
   // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
@@ -2268,7 +2273,11 @@ window.RumHasse = (() => {
       l.append(b);
     }
     const n = folk.filter((p) => h.includes(p.id)).length;
-    rad(lott(n === folk.length ? r.domar.alla : n ? r.domar.igen : r.domar.fraga));
+    // (vet han vem du är och har du lämnat in, börjar han med din kupong; ditt namn som i domen)
+    const du = folk.find((p) => p.id === duId() && !p.none);
+    const d = r.domar;
+    const lista = n === folk.length ? d.alla : du && d.du ? (!n ? d.du.forst : h.includes(du.id) ? d.du.hort : d.du.inte) : n ? d.igen : d.fraga;
+    rad(fyll(lott(lista), { namn: du ? (du.bast ? du.namn : kallar(du.namn, `${sum.id}:${du.id}`)) : '' }));
     // (Revisorn och Semesterfiraren bara när det finns någon de kan vara)
     const extra = [folk.some((p) => p.lage === 'forsakring') && r.domar.revisorn, folk.some((p) => p.none) && r.domar.borta].filter(Boolean);
     const prat = extra.length ? (H.domPrat && H.domPrat.id === `${sum.id}:${extra.length}` ? H.domPrat.lista : [...r.domar.ledig, ...extra.flat()]) : r.domar.ledig;

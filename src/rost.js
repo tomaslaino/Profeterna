@@ -3,9 +3,10 @@
 // Hasse Backes röst (fiktiv) i tobaksaffären: ljudet till allt han säger, så att
 // det hörs (public/rum-hasse.js). Han säger två slags saker:
 //   - de färdiga replikerna i public/rum-hasse-repliker.js, med fälten ifyllda
-//     ({namn} efternamnen i gänget, {dag} när spelstoppet är, {du} och {Bada}
-//     tecken i ord, {res} resultatet 0–0 till 4–4, {ratt} och {av} hur många rätt
-//     han hade av hur många, {antal} och {Antal} två till tretton i domarna), och
+//     ({namn} namnen vi kallas, Tippoang.kallas: efternamnen och Dogge för
+//     Johansson, {dag} när spelstoppet är, {du} och {Bada} tecken i ord, {res}
+//     resultatet 0–0 till 4–4, {ratt} och {av} hur många rätt han hade av hur
+//     många, {antal} och {Antal} två till tretton i domarna), och
 //   - sin text till varje analys i data/analyser.json (hasse.stycken), mening för
 //     mening, delad som sidan delar den (public/rum-hasse-meningar.js).
 //
@@ -36,6 +37,7 @@ const path = require('path');
 const hc = require('../config/hasse');
 const repliker = require('../public/rum-hasse-repliker.js');
 const meningar = require('../public/rum-hasse-meningar.js');
+const Tippoang = require('../public/tippoang.js');
 const { CACHE_DIR } = require('./store');
 
 const rc = hc.rost;
@@ -75,7 +77,7 @@ function mallar(o, ut = [], nyckel = '') {
 // Varje replik med fälten ifyllda på alla sätt som sidan kan fylla dem.
 function repliktexter(gang = []) {
   // (och namnen han nästan kan: felnamn)
-  const namn = [...new Set(gang.map((g) => String(g.namn || '').trim().split(/\s+/).pop()).filter(Boolean)
+  const namn = [...new Set(gang.map((g) => Tippoang.kallas(g)).filter(Boolean)
     .flatMap((n) => [n, ...((repliker.felnamn || {})[n] || [])]))];
   const ut = new Set();
   for (const mall of mallar(repliker)) {

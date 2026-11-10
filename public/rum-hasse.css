@@ -117,7 +117,9 @@
    som på kupongen, sida vid sida i gängets ordning och utan siffror (de står på lappen under domen). Ordet han
    har slagit i disken står som en stämpel i guld under namnet när man har hört domen; platsen för den finns från
    början, så att inget flyttar sig. */
-.rh-sagt:has(+ .rh-gang) { min-height: 2.3em; text-wrap: balance; }
+/* frågan över dem är ofta tre rader (den säger vad han har att ge innan den frågar vems), och raderna han säger
+   medan han väntar står på samma plats: tre rader från början, så att gänget inte flyttar sig */
+.rh-sagt:has(+ .rh-gang) { min-height: 3.45em; text-wrap: balance; }
 .rh-gang { flex: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(6.2em, 1fr)); gap: 0.4em; margin-top: 1.1em; }
 .rh-gang button { display: flex; flex-direction: column; align-items: center; gap: 0.75em; min-width: 0; padding: 0.6em 0.2em 0.5em; border: 0; background: none; color: inherit; font: inherit; text-shadow: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .rh-gang .rh-ans { --a: 5.4em; box-shadow: 0 0 0 3px var(--ring), 0 0 0 4.5px rgba(14, 8, 4, 0.55), 0 12px 24px rgba(0, 0, 0, 0.6); transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.18s; }
@@ -126,6 +128,13 @@
 .rh-gang button.k1 .rh-namn { font-size: 1.4em; }
 .rh-gang button.k2 .rh-namn { font-size: 1.7em; }
 .rum-hasse-vy.hog .rh-gang .rh-ans { --a: 4.8em; }
+/* låga telefoner: mindre porträtt, så att frågan och gänget ryms ovanför foten också i 375 × 667 */
+@media (max-height: 800px) {
+  .rum-hasse-vy.hog .rh-gang { margin-top: 0.5em; }
+  .rum-hasse-vy.hog .rh-gang button { gap: 0.5em; }
+  .rum-hasse-vy.hog .rh-gang .rh-ans { --a: 4em; }
+}
+@media (max-height: 700px) { .rum-hasse-vy.hog .rh-gang .rh-ans { --a: 3.4em; } }
 .rh-gang em { box-sizing: border-box; min-height: 1.95em; padding: 0.45em 0.6em 0.4em; border: 1.5px solid #ffd86b; border-radius: 3px; font: normal 700 0.7em/1 Fraunces, Georgia, serif; letter-spacing: 0.16em; text-transform: uppercase; color: #ffd86b; rotate: -3deg; box-shadow: 0 0 14px rgba(255, 216, 107, 0.18), inset 0 0 10px rgba(255, 216, 107, 0.12); }
 .rh-gang em:empty { visibility: hidden; }
 /* den som inte lämnade in */

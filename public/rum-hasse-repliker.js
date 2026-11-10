@@ -12,7 +12,7 @@
 // (scripts/hasse/kolla-repliker.js) fäller det som går att fälla, och underkända uttryck
 // läggs till där.
 //
-// {namn} ditt efternamn, {dag} när spelstoppet är (på lördag, i morgon, i dag),
+// {namn} det du kallas (efternamnet, Dogge för Johansson), {dag} när spelstoppet är (på lördag, i morgon, i dag),
 // {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1),
 // {ratt} och {av} hur många rätt han hade av hur många, i ord (två, sex), {antal} och {Antal} ett tal
 // från två till tretton i ord (i domarna).
@@ -500,10 +500,43 @@
   // han eller hon: skriv namnet, eller om kupongen. Till gruppen säger han ni och er, aldrig gänget: det är
   // bara ni som använder sidan. Ordet i guld står i domord, och namnen han nästan kan i felnamn.
   domar: {
-    // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla.
-    fraga: ['Jag har rättat omgången. Vem av er ska jag börja med?', 'Protokollet är klart. Vem vill du höra om först?', 'Jag har gått igenom era kuponger. Vem tar vi först?', 'Jag har rödpennan framme. Vem av er tar vi först?', 'Omgången är spelad. Vem av er ska jag ta först?'],
-    igen: ['Vem vill du höra om nu?', 'Vem av er ska jag ta nu?', 'Vem av er ska få sin dom nu?', 'Vem av er står på tur?'],
-    alla: ['Nu har ni fått höra allihop.', 'Nu har var och en av er fått sitt.', 'Nu har ni fått höra allihop. Jag har sett bättre kuponger.', 'Det var ni allihop. Mer än så finns det inte att säga.'],
+    // Över listan med gänget: första gången, när man har hört om några och när man har hört om alla. Varje
+    // fråga säger vad han har att ge (vad han tycker, sin bedömning, sin dom) och att det gäller en kupong,
+    // innan den frågar vems: att han ska gå igenom kupongen och säga något om den vet man inte i förväg.
+    // "Vem vill du höra om nu?" och "Jag gissar att du vill höra om din kupong" sa inte vad han skulle göra
+    // (Tomas 2026-11-10). Högst tre rader i den smalaste telefonen.
+    fraga: [
+      'Jag har rättat era kuponger och har synpunkter på alla. Vems tar jag först?',
+      'Jag har en bedömning av var och en av era kuponger. Vems vill du höra först?',
+      'Jag säger gärna vad jag tycker om era kuponger. Vems ska jag börja med?',
+      'Omgången är spelad, och jag har en dom över varje kupong. Vems tar vi först?',
+      'Rödpennan har gått över era kuponger. Vems vill du höra min dom över?',
+    ],
+    igen: ['Vems kupong ska jag säga något om nu?', 'Vems kupong vill du höra min bedömning av nu?', 'Vems kupong ska jag döma nu?', 'Jag har synpunkter på fler kuponger. Vems tar vi nu?'],
+    alla: ['Nu har jag dömt varenda kupong.', 'Nu har var och en av er fått sitt.', 'Alla era kuponger är dömda. Jag har sett bättre.', 'Det var alla era kuponger. Mer än så finns det inte att säga.'],
+    // I stället för fraga och igen när han vet vem du är (den enheten står på) och du lämnade in: först
+    // (ingen dömd än), hort (din kupong är dömd) och inte (andras är dömda men inte din). {namn} är ditt.
+    du: {
+      forst: [
+        'Jag gissar att du vill veta vad jag tycker om din kupong, {namn}.',
+        'Jag har synpunkter på varje kupong. Ska jag börja med din, {namn}?',
+        'Jag kommenterar gärna era kuponger. Din först, {namn}, eller någon annans?',
+        'Jag har dömt era kuponger. Vill du höra domen över din först, {namn}?',
+        'Jag har en bedömning av din kupong, {namn}. Du gjorde i alla fall ditt bästa.',
+      ],
+      hort: [
+        'Nu vet du vad jag tycker om din kupong. Ska jag ta någon annans?',
+        'Din kupong har fått sin dom. Vems kupong ska jag döma nu?',
+        'Du har hört min bedömning av din kupong. Vems vill du höra nu?',
+        'Mer än så har jag inte att säga om din kupong. Vems ska jag döma nu?',
+      ],
+      inte: [
+        'Jag har synpunkter på din kupong också, {namn}.',
+        'Vill du höra vad jag tycker om din egen kupong nu, {namn}?',
+        'Din kupong väntar fortfarande på min dom, {namn}.',
+        'De andras domar hör du gärna, {namn}. Din kupong har jag också dömt.',
+      ],
+    },
     // Om man står kvar vid listan med gänget och inte väljer någon.
     ledig: [
       'Ingen av er har bett om ursäkt än.',
@@ -564,8 +597,9 @@
   domord: { forsakring: 'Garderad', forst: 'Turlig', alla: 'Felfri', mitten: 'Osynlig', sist: 'Generös', sistLika: 'Snuvad', inget: 'Klok' },
   // Namnen han nästan kan. Ibland säger han ett av dem i stället för det riktiga, i domen (aldrig om den som
   // vann) och när han hälsar på dig (kallar i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
-  // Efternamnen i gänget; rösten får dem också (src/rost.js). Sägs inte som egna rader.
-  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Johansson: ['Johanson', 'Johansen'] },
+  // Namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för Johansson); rösten får dem också (src/rost.js).
+  // Sägs inte som egna rader.
+  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Dogge: ['Docke', 'Dugge'] },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
   // att säga i vilken ordning som helst, och när det finns en match kvar att fråga om.

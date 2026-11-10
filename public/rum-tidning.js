@@ -1,10 +1,11 @@
 'use strict';
 
-// ---------- tidningen bakom löpsedeln ----------
+// ---------- kvällstidningen ----------
 //
-// Ett klick på löpsedeln i tobaksaffären (rum-affischer.js) öppnar veckans tidning – Sportbladet eller
-// Expressen, samma som löpsedeln – och lägger fram den över rummet (tidningen i rum.js). Överst ligger
-// sedeln själv, förstorad, som tidningens framsida, och under den sidorna, en under en, med sidnummer,
+// Veckans tidning – Sportbladet eller Expressen, samma som löpsedeln (rum-affischer.js) – ligger hopvikt på
+// pulten i tobaksaffären, och ett klick tar upp den och lägger fram den över rummet (tidningPult och
+// tidningen i rum.js). Överst ligger sedeln själv, förstorad, som tidningens framsida (på pulten syns dess övre
+// halva), och under den sidorna, en under en, med sidnummer,
 // tidningens namn och datumet i huvudet som i en riktig tidning. Vad som står i den beror på omgången:
 //
 //   inför omgången   Tipset (omgångens matcher med avsparken, datorns procent och Sixten Bråvalls tecken,
@@ -27,7 +28,7 @@
 //     poddsidor: { amnen, sidor } }
 // RumTidning.rastrera(rot) ritar porträtten på sina dukar, svartvita och rastrerade.
 //
-// Tipsguiden är tidningens tipsbilaga, och ett nummer ligger på pulten i tobaksaffären (tipsguiden i rum.js):
+// Tipsguiden är tidningens tipsbilaga, och ett nummer ligger också på pulten (tipsguiden i rum.js):
 // ett klick tar upp det och lägger fram det som tidningen. Framsidan är dess egen (forsta, 100 × 140 som
 // sedeln, samma på pulten och i handen), och sidorna är de inför omgången – Tipset, Så mår tipslagen, Veckans
 // analys och Supportrarna – och Åtta knep, som alltid finns.

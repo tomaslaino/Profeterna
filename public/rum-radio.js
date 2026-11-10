@@ -12,7 +12,7 @@
 // båda banden, som på en riktig radio, så ett byte av band hamnar sällan på en station.
 //
 // Tio stationer står för hand på tejpen vid skalan (FM ovanför, AM under), och med frekvenserna på ett
-// blad ur ett spiralblock som är tejpat på fönsterkarmen bredvid radion (lappen, och radiolapp i
+// blad ur ett spiralblock som är tejpat på väggen bredvid radion (lappen, och radiolapp i
 // rum-inredning.js). Ett tryck på ett namn på tejpen eller en rad på bladet går dit och sätter på radion.
 // Första gången står visaren på Italo Disco.
 //
@@ -660,7 +660,7 @@ window.RumRadio = (() => {
   }
 
   // ---------- lappen ----------
-  // Ett blad ur ett spiralblock, tejpat på fönsterkarmen till höger om radion (radiolapp i rum-inredning.js):
+  // Ett blad ur ett spiralblock, tejpat på väggen till höger om radion (radiolapp i rum-inredning.js):
   // stationerna för hand i en spalt, FM i blått och under det AM i rött, och den station som hörs är inringad
   // (lappNu). Det sitter där från början, och nära radion kommer det med i bilden (ram). Över raderna ligger
   // genomskinliga knappar när de är stora nog att läsa (LASBAR): ett klick går dit och sätter på radion.
