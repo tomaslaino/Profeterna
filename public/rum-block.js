@@ -10,7 +10,7 @@
 // överst med hans röda penna, så att det syns också på håll.
 // Han har rättat det, och raden Poäng förklarar han om man ropar till honom (protHasse i rum.js), men
 // domarna över gänget säger han i baren (gang här, doma i rum-hasse.js). Ett klick på blocket lyfter det och lägger fram det
-// stort (protokollet i rum.js), och ett klick på löpsedeln i fönstret öppnar tidningen
+// stort (protokollet i rum.js), och ett klick på kvällstidningen på pulten öppnar tidningen
 // (tidningen i rum.js). Gänget håller upp sina lappar (lappar här och i rum-3d.js), och
 // modellens siffra står på videons blå ruta.
 //

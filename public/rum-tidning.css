@@ -1,4 +1,4 @@
-/* Tidningen bakom löpsedeln (rum-tidning.js, tidningen i rum.js): sedeln överst som framsida och sidorna
+/* Kvällstidningen (rum-tidning.js, tidningen i rum.js), som ligger på pulten: sedeln överst som framsida och sidorna
    under, en under en, på samma papper. Platt papper som ritas en gång, utan skuggfilter och utan
    blandningslägen, och medan den är framme står rummet still. Smal (under 470 px): en spalt. */
 .rum-tidningen { position: absolute; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 12px 10px; box-sizing: border-box; background: rgba(9, 6, 3, 0.76); animation: tn-in 0.22s ease-out; }
@@ -246,17 +246,39 @@
 .tn.smal .tg-knep { column-count: 1; }
 
 /* På pulten (plane 0 i rum.js): mellan Hasses nota och kupongen, med kupongen en bit över sig, i rummets
-   ljus. --tg-vila är läget där den ligger, och guideLyft i rum.js lyfter den därifrån (samma funktioner). */
+   ljus. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån (UPPE, samma funktioner).
+   Samma framsida ligger på pulten hos Hasse Backe (.rh-pa-tg, pultPapper i rum-hasse.js). */
 #rum-tipsguiden {
-  --tg-vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(-8deg) scale(1);
+  --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(-8deg) scale(1);
   position: absolute; left: 338px; top: 628px; width: 190px; height: 266px;
-  transform: var(--tg-vila); transform-origin: 50% 50%;
+  transform: var(--vila); transform-origin: 50% 50%;
   box-shadow: 0 14px 18px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.35);
 }
 #rum-tipsguiden.uppe { visibility: hidden; }
 #rum-tipsguiden.lyfts { z-index: 4; }
-#rum-tipsguiden .tg-pult { position: relative; display: block; zoom: 1.9; }
+#rum-tipsguiden .tg-pult, .rh-pa-tg .tg-pult { position: relative; display: block; zoom: 1.9; }
 /* ljuset uppifrån och lite skugga mot kanterna, och tidningen buktar en aning vid vecket i mitten */
-#rum-tipsguiden .tg-pult::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+#rum-tipsguiden .tg-pult::after, .rh-pa-tg .tg-pult::after { content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(90deg, rgba(0, 0, 0, 0) 47%, rgba(40, 22, 6, 0.16) 50%, rgba(255, 246, 225, 0.08) 51.5%, rgba(0, 0, 0, 0) 55%),
+              linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.22) 70%, rgba(20, 10, 2, 0.34)); }
+
+/* ---------- kvällstidningen på pulten (tidningPult i rum.js) ---------- */
+
+/* Veckans tidning, vikt på mitten med förstasidan upp: löpsedelns papper (sedel i rum-affischer.js), förstorat
+   2,5 gånger, och den övre halvan syns. Den ligger till höger om kupongen bakom högen, som lägger sig över den,
+   lite snett och platt i pultens perspektiv som Tipsguiden (--vila; lyft i rum.js lyfter den därifrån). Mellan
+   omgångarna finns ingen tidning (hidden). */
+#rum-kvallstidningen {
+  --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(5deg) scale(1);
+  position: absolute; left: 1088px; top: 648px; width: 250px; height: 175px; overflow: hidden;
+  transform: var(--vila); transform-origin: 50% 50%;
+  box-shadow: 0 1.5px 0 rgba(214, 205, 186, 0.85), 0 14px 18px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.35);
+}
+#rum-kvallstidningen[hidden] { display: none; }
+#rum-kvallstidningen.uppe { visibility: hidden; }
+#rum-kvallstidningen.lyfts { z-index: 4; }
+#rum-kvallstidningen .rt-sedel { position: relative; transform: none; filter: none; pointer-events: none; zoom: 2.5; }
+/* ljuset uppifrån och lite skugga mot kanterna, och papperet rundar av mot vecket nertill */
+#rum-kvallstidningen::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 84%, rgba(40, 22, 6, 0.16) 95%, rgba(255, 246, 225, 0.12) 99%),
               linear-gradient(170deg, rgba(255, 240, 205, 0.08), rgba(40, 22, 6, 0.22) 70%, rgba(20, 10, 2, 0.34)); }

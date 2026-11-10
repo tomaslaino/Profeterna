@@ -22,7 +22,7 @@
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, byggGlasogon, GLAS, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
-import { PULT_GLSL, SKIVA, ringar, NRING } from './rum-pult.js';
+import { PULT_GLSL, SKIVA, ringar, NRING, L as PULT_L, franRum } from './rum-pult.js';
 import { byggTidning, ytan } from './rum-hasse-tidning.js';
 import { byggStall, byggSticka, byggBranda, byggTandare, byggLaga, brandLage, STALL, STICKA, TANDARE, BRANDA } from './rum-hasse-eld.js';
 export { dagens } from './rum-hasse-tidning.js';
@@ -670,6 +670,63 @@ export const NOTAN = (() => {
 export function iBild(v, x, y, z = 0) {
   const [u, w] = iKamera([x, y, z], KAM);
   return [v.cx + v.s * u, v.ey + v.s * w];
+}
+// Ett papper som ligger på pulten i rummet (kupongen, protokollet och Tipsguiden; pultPapper i rum-hasse.js) på
+// samma ställe i hans bild, där pultens arm går fram längs ens högra sida: på tvären, med överkanten mot armens
+// bortre kant. hornen: pappret i rummets scen (övre vänstra, övre högra, nedre högra och nedre vänstra hörnet),
+// w × h: pappret i sina egna bildpunkter. Rummets papper ligger i ett ritat perspektiv och inte genom rummets kamera
+// (RUM i rum-pult.js), så på pulten blir hörnen ingen rektangel; pappret läggs därför från sitt övre vänstra hörn,
+// längs överkanten och i överkantens skala, så att det som syns i rummet (hörnet bredvid notan och kanten längs
+// pulten) hamnar på samma ställe. Det som går ut över pultens kant mot en, där det i rummet är utanför bilden,
+// skärs bort vid kanten: härifrån ses kanten nästan rakt från sidan. → { form: matrix3d i fönstrets bildpunkter,
+// klipp: det av pappret (med en marginal för skuggan) som ligger på pulten, som clip-path, eller '' }
+export function papper(v, hornen, w, h) {
+  const [a, b, , d] = hornen.map(([x, y]) => franRum(x, y));
+  const lx = b[0] - a[0];
+  const lz = b[1] - a[1];
+  const l = Math.hypot(lx, lz);
+  if (!(l > 1) || !(w > 0) || !(h > 0)) return null;
+  const k = l / w;
+  const ex = [lx / l, lz / l];
+  // nedåt på pappret: vinkelrätt mot överkanten, åt det håll nederkanten ligger
+  const ey = ex[1] * (d[0] - a[0]) - ex[0] * (d[1] - a[1]) > 0 ? [ex[1], -ex[0]] : [-ex[1], ex[0]];
+  const pa = (u, q) => [a[0] + k * (ex[0] * u + ey[0] * q), a[1] + k * (ex[1] * u + ey[1] * q)];
+  const iFonstret = ([x, z]) => iBild(v, ...franPulten([x, PULT_L.Y + 0.6, z]));
+  const form = matris3d(w, h, [pa(0, 0), pa(w, 0), pa(w, h), pa(0, h)].map(iFonstret));
+  // pultens ovansida slutar där framkanten börjar runda av (R1 i diskBild nedan): x ≥ xi + R1
+  const kant = PULT_L.xi + SKIVA.RADIE * 0.75;
+  const f = ([u, q]) => pa(u, q)[0] - kant;
+  const M = 60;
+  const ram = [[-M, -M], [w + M, -M], [w + M, h + M], [-M, h + M]];
+  if (ram.every((p) => f(p) >= 0)) return { form, klipp: '' };
+  const kvar = [];
+  ram.forEach((p, i) => {
+    const q = ram[(i + 1) % 4];
+    if (f(p) >= 0) kvar.push(p);
+    if ((f(p) >= 0) !== (f(q) >= 0)) {
+      const t = f(p) / (f(p) - f(q));
+      kvar.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]);
+    }
+  });
+  if (kvar.length < 3) return null;
+  return { form, klipp: `polygon(${kvar.map(([u, q]) => `${u.toFixed(1)}px ${q.toFixed(1)}px`).join(', ')})` };
+}
+// matrix3d från rektangeln w × h (hörnet uppe till vänster i 0, 0) till fyra punkter i fönstret
+function matris3d(w, h, [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]) {
+  const dx1 = x1 - x2;
+  const dx2 = x3 - x2;
+  const dx3 = x0 - x1 + x2 - x3;
+  const dy1 = y1 - y2;
+  const dy2 = y3 - y2;
+  const dy3 = y0 - y1 + y2 - y3;
+  const den = dx1 * dy2 - dx2 * dy1;
+  const g = (dx3 * dy2 - dx2 * dy3) / den;
+  const i = (dx1 * dy3 - dx3 * dy1) / den;
+  const a = x1 - x0 + g * x1;
+  const b = x3 - x0 + i * x3;
+  const d = y1 - y0 + g * y1;
+  const e = y3 - y0 + i * y3;
+  return `matrix3d(${[a / w, d / w, 0, g / w, b / h, e / h, 0, i / h, 0, 0, 1, 0, x0, y0, 0, 1].map((n) => +n.toFixed(9)).join(',')})`;
 }
 // Det som ska rymmas: hjässan, och allt som rör sig (armarna i gesterna, koppen när han dricker,
 // händerna, koppen, askkoppen och skuggorna på disken). Gesten där armen går ut åt sidan är smalare på höjden.
@@ -1353,10 +1410,37 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     C.fov = (2 * Math.atan(v.H / 2 / (v.s * D))) / DEG;
     C.aspect = v.W / v.H;
     C.setViewOffset(v.W, v.H, v.W / 2 - v.cx + box.x, v.H / 2 - v.ey + box.y, box.w, box.h);
+    // Notan ligger ovanpå det som ligger på pulten (papper ovan, pultPapper i rum-hasse.js), som i rummet: med
+    // en egen duk (bak.nota) ritas den där för sig, och disken utan den.
+    const egen = bak.nota instanceof HTMLCanvasElement;
+    nota.visible = !egen;
     r.render(SD, C);
+    nota.visible = true;
     const g = ut.getContext('2d');
     g.clearRect(0, 0, ut.width, ut.height);
     g.drawImage(r.domElement, 0, 0, ut.width, ut.height);
+    if (egen) {
+      // bara så stor som notan, med den uppböjda änden och lite marginal
+      const p = NOTAN.horn.flatMap((q) => [iBild(v, ...q), iBild(v, q[0], q[1] + 40, q[2])]);
+      const x0 = Math.max(0, Math.floor(Math.min(...p.map((q) => q[0])) - 8));
+      const y1 = Math.max(0, Math.floor(Math.min(...p.map((q) => q[1])) - 8));
+      const nb = { x: x0, y: y1, w: Math.max(1, Math.min(v.W, Math.ceil(Math.max(...p.map((q) => q[0])) + 8)) - x0), h: Math.max(1, Math.min(v.H, Math.ceil(Math.max(...p.map((q) => q[1])) + 8)) - y1) };
+      const ut2 = bak.nota;
+      Object.assign(ut2.style, { left: `${nb.x}px`, top: `${nb.y}px`, width: `${nb.w}px`, height: `${nb.h}px` });
+      ut2.width = Math.round(nb.w * pr);
+      ut2.height = Math.round(nb.h * pr);
+      r.setSize(nb.w, nb.h, false);
+      C.setViewOffset(v.W, v.H, v.W / 2 - v.cx + nb.x, v.H / 2 - v.ey + nb.y, nb.w, nb.h);
+      diskM.visible = false;
+      r.render(SD, C);
+      diskM.visible = true;
+      const g2 = ut2.getContext('2d');
+      g2.clearRect(0, 0, ut2.width, ut2.height);
+      // med en svag skugga tätt intill, där den ligger på pappret
+      Object.assign(g2, { shadowColor: 'rgba(0, 0, 0, 0.32)', shadowBlur: 4 * pr });
+      g2.drawImage(r.domElement, 0, 0, ut2.width, ut2.height);
+      Object.assign(g2, { shadowColor: 'rgba(0, 0, 0, 0)', shadowBlur: 0 });
+    }
     // och figuren igen
     kamera(v);
     return box;
