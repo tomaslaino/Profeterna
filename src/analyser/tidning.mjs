@@ -16,6 +16,7 @@ import { squadOf } from './underlag.mjs';
 import { citer, see, jsonOf, unknownNumbers } from './kontroller.mjs';
 import { senasteTid } from './tider.mjs';
 import { claudeSvar } from './claude.mjs';
+import { poddUnderlag, poddNyckel } from './poddar.mjs';
 
 const H = 3600000;
 const REF_RE = /\[(\d+(?:\s*[,;]\s*\d+)*)\]/g;
@@ -38,7 +39,7 @@ export const systemPrompt = () => tc.systemPrompt
 // om omgången fanns när klockan slog och sidan är äldre än tiden och minstTimmar. Matcher
 // som har börjat räknas inte, och när alla har börjat står sidan kvar som den är.
 // → {skriv, tid, varfor}
-export function attSkrivaTidning(round, nu, { now = Date.now(), tvinga = false } = {}) {
+export function attSkrivaTidning(round, nu, { now = Date.now(), tvinga = false, poddar = null } = {}) {
   const tid = senasteTid(now, tc.tider);
   const ids = round.matcher.map((x) => String(x.id));
   if (!round.matcher.some((x) => Date.parse(x.avspark) > now)) return { skriv: false, tid, varfor: 'alla matcher har börjat' };
@@ -48,13 +49,15 @@ export function attSkrivaTidning(round, nu, { now = Date.now(), tvinga = false }
   const skriven = Date.parse(nu.skriven) || 0;
   const galler = tid >= (Date.parse(round.skapad) || 0);
   if (galler && skriven < tid && now - skriven >= tc.minstTimmar * H) return { skriv: true, tid, varfor: 'ny tid' };
+  // Nya uppgifter ur supporterpoddarna sedan sidan skrevs (poddar: omgångens poddfil).
+  if (poddar && poddar.omgang === round.id && poddNyckel(poddar) && poddNyckel(poddar) !== (nu.poddar || '') && now - skriven >= tc.poddTimmar * H) return { skriv: true, tid, varfor: 'nya poddar' };
   return { skriv: false, tid, varfor: 'aktuell' };
 }
 
 // Underlaget: omgångens matcher i kupongens ordning, numrerade, med det namnet också
 // får (tabelläget, formen, schemat, möten) och skadelistan – men utan odds, eftersom
 // notisen inte ska handla om dem. details: match-id → data/match/<id>.json.
-export function tidningsUnderlag(round, details = {}) {
+export function tidningsUnderlag(round, details = {}, poddar = null) {
   const matcher = round.matcher.map((x, i) => {
     const d = details[String(x.id)] || null;
     const rad = roundPayload({ matcher: [x] }, { details }).matcher[0];
@@ -63,6 +66,10 @@ export function tidningsUnderlag(round, details = {}) {
     if (d && d.squad && d.match) {
       rad['skador och avstängningar'] = { [d.match.home]: squadOf(d.squad.home), [d.match.away]: squadOf(d.squad.away) };
     }
+    // Det mest intressanta ur lagens supporterpoddar (src/analyser/poddar.mjs).
+    const par = d && d.match ? [d.match.home, d.match.away] : String(x.match || '').split(/\s+[–-]\s+/);
+    const ur = Object.fromEntries(par.map((lag) => [lag, poddUnderlag(poddar, lag)]).filter(([, l]) => l.length));
+    if (Object.keys(ur).length) rad['ur supporterpoddarna'] = ur;
     return { nr: i + 1, ...rad };
   });
   return { matcher };
@@ -118,9 +125,12 @@ function bygg(n, x, seen) {
 // Skriver omgångens tidning. details: match-id → data/match/<id>.json ur den publicerade
 // sajten. → {ok: true, tidning, saknas, meta} eller {ok: false, error}. Fel från Claude
 // Code kastas (src/analyser/claude.mjs).
-export async function skrivTidning(round, { details = {}, now = () => new Date(), claude = claudeSvar } = {}) {
-  const underlag = tidningsUnderlag(round, details);
+export async function skrivTidning(round, { details = {}, poddar = null, now = () => new Date(), claude = claudeSvar } = {}) {
+  if (poddar && poddar.omgang !== round.id) poddar = null;
+  const underlag = tidningsUnderlag(round, details, poddar);
   const seen = new Map();
+  // Poddavsnitten är källor som tidningen själv har lyssnat på: adresserna räknas som sedda.
+  for (const m of underlag.matcher) for (const l of Object.values(m['ur supporterpoddarna'] || {})) for (const a of l) if (a.adress) see(seen, a.adress, `${a.podd}: ${a.avsnitt}`, a.datum);
   const read = [];
   const meta = { searches: 0, fetches: 0, seconds: 0, dollars: 0 };
   const opts = { system: systemPrompt(), model: tc.model, effort: tc.effort, timeoutMs: tc.timeoutMs };
@@ -165,6 +175,8 @@ export async function skrivTidning(round, { details = {}, now = () => new Date()
     skriven: now().toISOString(),
     model,
     version: tc.promptVersion,
+    // Poddavsnitten som låg i underlaget (poddNyckel): ändras de skrivs sidan om.
+    ...(poddar && poddNyckel(poddar) ? { poddar: poddNyckel(poddar) } : {}),
     notiser: [...klara.values()].sort((a, b) => a.nr - b.nr),
   };
   return { ok: true, tidning, saknas: kvar.map((k) => k.nr), meta };

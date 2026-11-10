@@ -1670,7 +1670,8 @@ de flesta körningar har inget att göra och anropar inte Claude.
   slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
-- **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00 (se nedan).
+- **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00, och när
+  supporterpoddarna har gett nya uppgifter (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1730,6 +1731,52 @@ lag. `sips` förminskar den till 320 bildpunkter (15–35 kB). Provat på omgån
 `data/tidning-bilder/` och bygget kopierar den till sajten. Går grenen inte att pusha blir det inga bilder och sidan
 visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiserna (se [Tidningen](#tidningen)). `node scripts/analyser/skriv.mjs --tidning-bilder` hämtar bilderna på nytt till tidningen som
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
+
+**Supporterpoddarna** (2026-11-10, användarens önskan: *transkribera lagens poddar inför nästa stryktips så att
+man får initierad info – det mest intressanta ska med*): varje natt kl. 02.15, och lördag kl. 08.00, lyssnar iMacen
+igenom veckans avsnitt av supporterpoddarna för lagen i omgången ([scripts/tidning/poddar.mjs](scripts/tidning/poddar.mjs),
+launchd-jobbet `se.matchfixarna.poddar`; logiken i [src/analyser/poddar.mjs](src/analyser/poddar.mjs), gränserna och
+prompterna i [config/poddar.js](config/poddar.js)).
+
+```
+omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp → claude -p → omgang.json
+                                                                                             ↓
+                                                   tidningen inför omgången får uppgifterna i sitt underlag
+```
+
+- **Poddarna hittas en gång per lag.** Claude får lagen och svarar med poddarnas namn (ett anrop för alla nya lag,
+  med sökningar på nätet). Namnet slås upp hos Apple Podcasts (`itunes.apple.com/search`), som ger flödets adress,
+  och podden räknas bara om flödet har ett avsnitt de senaste 28 dagarna. Ett påhittat namn faller alltså bort av sig
+  självt. Resultatet sparas i `register.json`; ett lag med podd letas upp igen efter 60 dagar, ett utan efter 7.
+  Poddar vi redan känner står i `kanda` i config/poddar.js.
+- **Veckans avsnitt:** högst sex dagar gammalt och minst tolv minuter långt. Nämner rubriken motståndaren är det
+  förhandssnacket och går först, annars det nyaste. Ett nytt avsnitt per lag och natt.
+- **Utskriften:** `curl` hämtar ljudet, `ffmpeg` tar de första 60 minuterna och `whisper-cli` (whisper.cpp, modellen
+  `ggml-large-v3-turbo-q5_0`) skriver ut dem, med lagens och spelarnas namn som ledtråd så att de stavas rätt. Ljudet
+  tas bort direkt. Ett avsnitt tar 5–10 minuter på iMacen (M1), en hel omgång några timmar.
+- **Det mest intressanta:** Claude får utskriften, ett stycke per minut, och tar ut högst fyra uppgifter som kan ändra
+  hur man ser på matchen – skador som inte är officiella, väntade byten, hur laget egentligen spelar, tränarens
+  ställning, oro i klubben – var och en med slag (*bekräftat*, *hört i podden*, *supportrarnas åsikt*), minut och vikt
+  1–5. Referat, tabelläge och småprat ska inte med, och en tom lista är ett godkänt svar.
+- **Kontrollen:** varje uppgift ska ha ett ordagrant citat på 8–20 ord som går att hitta i utskriften (`citatStar`),
+  annars stryks den. Tipsord stryks också. Citaten trycks inte.
+- **Tidningen** får de bästa uppgifterna per lag (vikt 3 eller mer, högst fyra per lag ur de två senaste avsnitten)
+  under *ur supporterpoddarna* i sitt underlag. Prompten säger att den mest intressanta ska bära notisen, med
+  *enligt supporterpodden …*, och avsnittet står bland källorna. Har det kommit nya uppgifter sedan sidan skrevs
+  skrivs den om vid nästa kontroll (`poddTimmar` i config/tidning.js, högst var sjätte timme).
+
+Allt ligger utanför repot, i `~/Library/Application Support/Matchfixarna/Tidning/`: `register.json`, `omgang.json`
+(omgångens avsnitt och uppgifter), `utskrifter/` (tas bort efter tre veckor) och modellen. Ljudet och utskrifterna
+är andras och läggs aldrig i repot eller på sajten; dit kommer bara tidningens egna meningar och poddens namn.
+Jobbet rör aldrig git och går som allt annat på Claude-kontot, inte med API-nycklar. Loggen:
+`~/Library/Logs/Matchfixarna/poddar.log`. Installera med `scripts/tidning/installera.sh` (kräver
+`brew install whisper-cpp` och modellen i mappen).
+
+```
+node scripts/tidning/poddar.mjs --torrt     vilka avsnitt som skulle skrivas ut
+node scripts/tidning/poddar.mjs --visa      det som är uttaget för omgången
+node scripts/tidning/poddar.mjs --lag "Reading" --mot "Stockport County"     ett lag på prov (prov.json)
+```
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att

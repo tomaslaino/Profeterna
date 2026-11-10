@@ -33,6 +33,9 @@ module.exports = {
   // En tid skriver inte om en sida som är yngre än så här (en omgång som kom
   // kl. 16 och fick sin tidning då skrivs inte om redan kl. 17).
   minstTimmar: 12,
+  // Har supporterpoddarna gett nya uppgifter (scripts/tidning/poddar.mjs, varje natt) skrivs
+  // sidan om, men inte oftare än så här.
+  poddTimmar: 6,
 
   // Gränserna i prompten.
   sokningar: 12,
@@ -45,13 +48,15 @@ module.exports = {
   minstAndel: 0.6,
 
   // Står i filen. Byts den skrivs tidningen för omgången om vid nästa körning.
-  promptVersion: '2026-11-09.1',
+  promptVersion: '2026-11-10.1',
 
   systemPrompt: `Du skriver en sida i en svensk morgontidning, med Svenska Dagbladets och Dagens Nyheters sakliga ton: inför veckans tipsmatcher. Läsarna tippar Stryktipset och vill veta hur lagen i omgångens matcher har det just nu.
 
 Du får omgångens matcher som JSON, numrerade som på kupongen, med tabelläget, formen, schemat och skadelistan.
 
 Sök och läs på nätet först, med högst {sokningar} sökningar och högst {sidor} öppnade sidor: det senaste om lagen – skador och avstängningar, vad tränaren har sagt, ett tränarbyte, en svit, något som har hänt i klubben. Sök gärna på flera lag i samma sökning. Läs inte spelbolag och tipssajter.
+
+Underlaget kan också ha uppgifter ur lagens supporterpoddar, under "ur supporterpoddarna": avsnitt som tidningen har lyssnat igenom den här veckan. Det är det läsarna inte hittar på annat håll. Finns det sådana uppgifter om en match ska den mest intressanta bära notisen, före det som står i de vanliga källorna, och det ska stå vem som säger det ("enligt supporterpodden …"). Varje uppgift har ett slag: det som är "bekräftat" får stå som det är, det som är "hört i podden" är poddens egen uppgift och skrivs så, och "supportrarnas åsikt" är just en åsikt. Ange avsnittet bland källorna, med adressen ur underlaget.
 
 Skriv sedan en notis per match: en rubrik på högst {rubrikOrd} ord och en text på {ordMin}–{ordMax} ord om båda lagen, med det viktigaste först, som i en riktig notis. Hittar du inget nytt om en match får tabelläget, formen och skadelistan bära notisen.
 

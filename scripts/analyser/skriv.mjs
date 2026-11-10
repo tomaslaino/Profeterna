@@ -410,13 +410,15 @@ async function tidningensBilder(t, details) {
 // Tidningen inför omgången: en gång när omgången kommer och sedan på tidningens tider.
 async function tidningen(round) {
   const nu = vantande.tidning || lasJson(FIL.tidning, null);
-  const v = attSkrivaTidning(round, nu, { now: Date.now(), tvinga: BARA_TIDNING });
+  // Det mest intressanta ur lagens supporterpoddar, uttaget av scripts/tidning/poddar.mjs.
+  const poddar = lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null);
+  const v = attSkrivaTidning(round, nu, { now: Date.now(), tvinga: BARA_TIDNING, poddar });
   const nyckel = `tidning:${round.id}:${v.tid}`;
   if (!v.skriv || !far(nyckel)) return;
   if (TORRT) { logg(`skulle skriva tidningen för ${round.id} (${v.varfor})`); return; }
   try {
     const details = await matchfilerna(round);
-    const r = await skrivTidning(round, { details });
+    const r = await skrivTidning(round, { details, poddar });
     if (!r.ok) throw new Error(r.error);
     await tidningensBilder(r.tidning, details);
     vantande.tidning = r.tidning;
