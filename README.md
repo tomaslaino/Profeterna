@@ -5382,18 +5382,23 @@ Statistik följa med, och tvärtom.
 
 ### Videon
 
-En liten Sony-tv med inbyggd video står på disken nere i hörnet till höger, med ryggen mot
-väggen och rutan vänd ut mot rummet och gänget, i svart plast med blå bild när ingen kassett
-spelar, *STOPP* i hörnet och klockan på displayen som blinkar på 12:00, som den alltid gjort
-([public/rum-video.js](public/rum-video.js), [public/rum-video.css](public/rum-video.css)).
+En liten Sony-tv med inbyggd video från 90-talet står på disken nere i hörnet till höger, med
+ryggen mot väggen och rutan vänd ut mot rummet och gänget, i grafitgrå plast med blå bild när
+ingen kassett spelar, *STOPP* i hörnet och klockan på displayen som blinkar på 12:00, som den
+alltid gjort ([public/rum-video.js](public/rum-video.js), [public/rum-video.css](public/rum-video.css)).
 SONY står i silver mitt ovanför rutan och Trinitron under den, som på Sonys tv-apparater; båda
 är ritade som former i framsidans ritning (`SONY` och `TRINITRON` – en fet, bred antikva med
-raka seriffer och en jämntjock linje), inte som text, så att de är skarpa nära.
+raka seriffer och en jämntjock linje), inte som text, så att de är skarpa nära. Det som gör den
+till 90-tal (2026-11-10): plasten har ett fint korn, rutans ram är nedsänkt och fasad, galler med
+runda hål, knappar i silvergrå plast med tecknen tryckta i svart, var och en i sin fördjupning,
+och under en skåra videodelen – kassettfacket i en ram av krom, *HQ* och *Hi-Fi STEREO* under
+det, displayen bakom rökfärgat glas och lampan i en ring. Måtten är desamma som förut, så att
+kameran och knapparna fungerar som de gjorde.
 Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan och skenet på
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
 väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
 ryms i bilden; i det perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en.
-Under rutan sitter kassettfacket och displayen, och till höger om rutan en spalt med knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏ under varandra, med högtalargaller över och under. Repriserna på VHS,
+Under rutan sitter kassettfacket och displayen, och till höger om rutan en spalt med knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏ under varandra, med hålgaller till högtalaren över och under. Repriserna på VHS,
 också de lådor (ryggen, taket och ändarna), står i en fruktlåda i furu bredvid, lite längre
 in längs väggen: två fack med en mellanvägg (`MV`), tretton kassetter höga, med en tejpbit
 över varje fack – dagen för förra omgången (*LÖR 24/10*) och *INFÖR 31/10* – och ÄPPLEN ·
