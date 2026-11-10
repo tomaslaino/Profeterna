@@ -30,6 +30,20 @@
   // inget in, är inte med när tipsen jämförs inför gängets kupong och räknas inte in i den.
   const HASSE = { id: 'HB', namn: 'Hasse Backe' };
 
+  // Vad vi kallar varandra överallt på sidan: efternamnet – alla i gänget heter
+  // Daniel – men Dogge för Daniel Johansson. Hela namnet står bara där det måste:
+  // Om oss, under autograferna på visitkortet och när man pekar på ett namn.
+  // g: {id, namn eller name} eller bara namnet → "Laino", "Dogge", "Backe".
+  const SMEKNAMN = [{ id: 'DJ', namn: 'Daniel Johansson', kallas: 'Dogge' }];
+  function kallas(g) {
+    const o = g && typeof g === 'object' ? g : { namn: g };
+    const n = String(o.namn || o.name || o.id || '').trim();
+    const s = SMEKNAMN.find((x) => (o.id && x.id === o.id) || x.namn === n);
+    if (s) return s.kallas;
+    const i = n.indexOf(' ');
+    return i > 0 ? n.slice(i + 1) : n;
+  }
+
   // "x1" → "1X"; tomt om inget tecken.
   const sign = (s) => {
     const t = String(s || '').toUpperCase();
@@ -140,5 +154,5 @@
     return { people: [...by.values()].sort((a, b) => key(b) - key(a)), model };
   }
 
-  return { SIGNS, BASE, HASSE, SLAG, regelFor, slag, regelOver, regelKlar, sign, hasseSagt, pct, chance, modelSign, points, tally, runda, key, rank, season };
+  return { SIGNS, BASE, HASSE, kallas, SLAG, regelFor, slag, regelOver, regelKlar, sign, hasseSagt, pct, chance, modelSign, points, tally, runda, key, rank, season };
 });

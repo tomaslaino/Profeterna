@@ -785,11 +785,11 @@ window.RumHasse = (() => {
     return ut;
   }, []);
 
-  // Du, om kupongen vet vem du är: en tränare säger efternamnet.
+  // Du, om kupongen vet vem du är: det vi kallas (Tippoang.kallas: efternamnet, Dogge för Johansson).
   function dittNamn() {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
-    return g && g.namn ? g.namn.trim().split(/\s+/).pop() : '';
+    return g && g.namn ? Tippoang.kallas(g) : '';
   }
   // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
   // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
