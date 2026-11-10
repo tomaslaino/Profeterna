@@ -29,7 +29,7 @@
 .rum-radio-reglage .r-del:focus { outline: none; }
 .rum-radio-reglage .r-del:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }
 
-/* Bladet med stationerna på fönsterkarmen (radiolapp i rum-inredning.js): knappen kring duken i rummet, som
+/* Bladet med stationerna på väggen bredvid radion (radiolapp i rum-inredning.js): knappen kring duken i rummet, som
    uret. Nära radion ligger genomskinliga knappar över bladet och raderna (lappen i rum-radio.js): raderna går
    att trycka på när de är stora nog att läsa, annars går ett tryck på bladet fram till det. */
 .rum-radiolapp { position: absolute; display: block; padding: 0; border: 0; background: none; }

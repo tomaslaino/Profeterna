@@ -4085,7 +4085,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (en hel tidningssida: hög, så att rubriken och fotot blir stora)
     nacional: { el: '#rum-nacional', h: 0.94, duk: 'skiva' },
     // kassettradion (rum-radio.js): gänget står kvar, skalan och reglagen kommer när kameran är framme, och
-    // bladet med stationerna på fönsterkarmen bredvid den kommer med i bilden
+    // bladet med stationerna på väggen bredvid den kommer med i bilden
     radio: { el: '#rum-radio', h: 0.98, duk: ['skiva', 'radiolapp'], radio: true, med: '.rum-radiolapp', ram: (r, top, h, m) => (window.RumRadio ? RumRadio.ram(r, top, h, m) : null) },
     // bladet (radiolapp i rum-inredning.js): som radion, men bara bladet när raderna blir för små att läsa
     // bredvid radion (i telefonen), och tillbaka till radion om man kom därifrån
