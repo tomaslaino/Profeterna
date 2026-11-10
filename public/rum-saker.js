@@ -20,12 +20,12 @@
 //
 // Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
 // konditoriet – står till höger om högen där det får plats (rum-fika.js).
-// Bakom högen ligger veckans kvällstidning (#rum-kvallstidningen i rum.js),
+// Bakom högen ligger tidningen Helgarderat (#rum-helgarderat i rum.js),
 // och där står inget, så att den syns och går att ta.
 //
-// saker(el, { calm, short, namn, omritad }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }), sedel(), rubrik() }
+// saker(el, { calm, short, namn }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }), rubrik() }
 // (syns: pulten ritas, rum.js; kval: hur fint, KVAL i rum.js; short och namn: lagen och gänget på löpsedeln;
-// omritad: när löpsedeln har ritats om, som tidningen på pulten utgår från; sedel och rubrik: rum-affischer.js)
+// rubrik: rum-affischer.js)
 
 import { dagens, bord } from './rum-fika.js';
 import { utanSkuggor } from './rum-gpu.js';
@@ -103,7 +103,7 @@ export async function saker(el, opt = {}) {
   const back = planes[0];
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
   // löpsedlarna i fönstret (rum-affischer.js)
-  const aff = back ? affischer(back, { short: opt.short, namn: opt.namn, omritad: opt.omritad }) : null;
+  const aff = back ? affischer(back, { short: opt.short, namn: opt.namn }) : null;
 
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,
   // samma gräns som gängets tunnaste kläder (dress i rum-3d.js). Vädret
@@ -158,7 +158,6 @@ export async function saker(el, opt = {}) {
     }
   }
   return {
-    sedel: () => (aff ? aff.sedel() : null),
     rubrik: () => (aff ? aff.rubrik() : null),
     draw(t, mx, my, rows, old, syns = true) {
       if ((update(rows, old) || !sliten) && three) {

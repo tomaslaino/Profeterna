@@ -422,9 +422,9 @@ window.RumHasse = (() => {
 
   // ---------- det som ligger på pulten ----------
   //
-  // Det som ligger på pulten i rummet ligger där också här: kupongen, efter omgången protokollet, och Tipsguiden,
+  // Det som ligger på pulten i rummet ligger där också här: kupongen, efter omgången protokollet, och Helgarderat,
   // på pultens arm som går fram längs ens högra sida (papper i rum-hasse-3d.js). Samma papper med samma innehåll,
-  // i rummets ordning (Tipsguiden under kupongen), under notan, koppen och hans händer. Var de ligger räknas ur
+  // i rummets ordning (tidningen under kupongen), under notan, koppen och hans händer. Var de ligger räknas ur
   // rummet, ur pappret och transformerna i rummets plan, så att det stämmer också i telefonen, där rummet lägger dem
   // annorlunda (.rum.smal). Kupongen är borta från pulten medan han har den (din kupong, rum-hasse-kupong.js), och när
   // han lämnar tillbaka den ritas rummet om först (omRum), så att hans kryss syns på den. Förut var pultens arm tom här,
@@ -436,9 +436,9 @@ window.RumHasse = (() => {
     if (omRum && window.Rum && Rum.redraw) Rum.redraw();
     const kup = H.rum.querySelector('#rum-kupong');
     const blad = kup && kup.querySelector(':scope > .rum-block');
-    const guide = H.rum.querySelector('#rum-tipsguiden');
+    const tidning = H.rum.querySelector('#rum-helgarderat');
     const lista = [
-      guide && guide.childElementCount && !guide.classList.contains('uppe') ? ['tg', guide, guide.innerHTML] : null,
+      tidning && tidning.childElementCount && !tidning.classList.contains('uppe') ? ['hg', tidning, tidning.innerHTML] : null,
       blad ? (H.rum.classList.contains('protokoll-uppe') ? null : ['blad', blad, blad.outerHTML])
         : kup && kup.childElementCount && !kup.querySelector('.rum-vand') ? ['kup', kup, kup.innerHTML] : null,
     ].filter(Boolean);
@@ -453,12 +453,12 @@ window.RumHasse = (() => {
         if (e) e.remove();
         e = document.createElement('div');
         e.className = `rh-pa ${kl}`;
-        e.innerHTML = kl === 'kup' ? `<span class="rum-kup rh-pa-kup">${html}</span>` : kl === 'tg' ? `<span class="rh-pa-tg">${html}</span>` : html;
+        e.innerHTML = kl === 'kup' ? `<span class="rum-kup rh-pa-kup">${html}</span>` : kl === 'hg' ? `<span class="rh-pa-hg">${html}</span>` : html;
         e.html = html;
         H.papper[kl] = e;
       }
       Object.assign(e.style, { width: `${s.w}px`, height: `${s.h}px`, transform: p.form, clipPath: p.klipp });
-      // (i rummets ordning: Tipsguiden underst)
+      // (i rummets ordning: tidningen underst)
       c.append(e);
       kvar.add(kl);
     }

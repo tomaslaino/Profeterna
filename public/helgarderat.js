@@ -3,10 +3,9 @@
 // ---------- Helgarderat ----------
 //
 // Tidningen med det supportrarna vet inför lördagens matcher: det intressanta ur lagens supporterpoddar och
-// forum, en sida per match (samma uppgifter som Supportrarna i tidningen bakom löpsedeln, rum-tidning.js).
-// Det här är ett utkast som visar hur tidningen ser ut, med provomgången som poddjobbet gjorde 2026-11-10
-// (helgarderat/utkast.json, i samma form som data/poddsidor.json). Var i rummet tidningen ska ligga är inte
-// bestämt.
+// forum, en sida per match (samma uppgifter som Supportrarna i tidningen på pulten i rummet, rum-tidning.js, som
+// också heter Helgarderat). Det här är ett utkast som visar hur tidningen ser ut, med provomgången som poddjobbet
+// gjorde 2026-11-10 (helgarderat/utkast.json, i samma form som data/poddsidor.json).
 //
 //   Framsidan   namnet med tre ikryssade rutor (1, X och 2: helgarderat), numret, datumet och priset (tre rader,
 //               tre kronor), etta (matchen med mest i), Lördagens matcher med sidnumren och Hört bland
