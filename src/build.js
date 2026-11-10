@@ -108,7 +108,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type, espn: c.espn })),
   });
   // Analyserna, omgångarnas namn och tidningen, som de ligger i repot.
-  for (const f of ['analyser.json', 'omgangsnamn.json', 'tidning.json']) {
+  for (const f of ['analyser.json', 'omgangsnamn.json', 'tidning.json', 'poddsidor.json']) {
     const src = path.join(ROOT, 'data', f);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dataDir, f));
   }

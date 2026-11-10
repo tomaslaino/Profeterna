@@ -888,6 +888,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   anslagstavlan, kameran ser snett längs baren, och disken, kaffet och notan hör till hans värld. Kaffet,
   notan och handen ligger kvar på pulten som en ledtråd. Förslaget att han i stället skulle sitta i tv:n som
   expert sades nej till. Se [Hasse Backe](#hasse-backe), *Bilden* och *Panoreringen*.
+- **Rummet och Hasse Backe är samma sida (2026-11-09, användarens önskemål):** "få det bättre o tydligare att
+  vanliga animationssidan och den med Hasse Backe hör ihop". Namnet och foten står kvar när kameran slår och
+  hos honom, neonskyltens sken faller in från affären till höger, och man vänder sig dit och tillbaka med
+  samma drag som man ser sig omkring med (eller pilarna). Se [Hasse Backe](#hasse-backe), *Samma sida*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -1034,6 +1038,23 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Hasses askkopp tar, som notan och porslinet, bara ljusets styrka och dagsljusets färg, och kantljuset
   bakifrån bara som styrka, så att täckbladet inte får neonskyltens röda. Glöden är som förut. Se
   [Hasse Backe](#hasse-backe).
+- **Hasse tar cigarren bekvämt (2026-11-09, användarens önskemål):** "Kan du förbättra hur Hasse tar upp
+  cigarren - byt plats på askkoppen o cigarren om det behövs för att det ska se mer bekvämt o avslappnat
+  ut" Han sträckte ut armen åt sidan, vred handen 60° utåt från vilan och dök ned på cigarren ovanifrån med
+  handleden högt och raka, utspärrade fingrar, efter en hög båge. Nu står askkoppen en bit framför handen
+  och cigarren ligger vänd in mot honom, tvärs över fingrarna när han sträcker fram handen, så att han når
+  den med underarmen rakt fram från armbågen. Handen går lågt över disken, nyper cigarren med flack hand och
+  rak handled, och pek- och långfingret ligger lite samlade. Handen går fri från cigarren när han slår i
+  disken, och askkoppen syns hel i telefonen. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Hasse tänder cigarren när den har slocknat (2026-11-10, användarens önskemål):** "Kan du göra olika
+  sekvenser när cigarren är otänd och Hasse tar upp den, tänder den o njuter på olika sätt. Det kan hända då
+  o då i logiska sekvenser med annat". Cigarren brann alltid. Nu slocknar den om han låter den ligga några
+  minuter (glöden och röken tonar ut), och nästa gång han tar den tänder han den i stället för att röka, på
+  ett av fyra sätt: en tändsticka ur ett ställ i samma porslin som askkoppen, en kaxig sticka mot disken som
+  inte tar, tändaren som strejkar en gång och tändaren i en enda rörelse, och varje gång njuter han på sitt
+  sätt efteråt. Stickorna blir kvar i askkoppen, och är stället tomt tar han tändaren. Den slocknade cigarren
+  han låtsas röka (`slocknad`) kommer bara när den verkligen har slocknat, och har han just sagt sitt om en
+  match tänder han den gärna. Lågan lyser upp handen och ansiktet. Se [Hasse Backe](#hasse-backe), *Elden*.
 - **Hasse Backe spanar på din kupong (2026-11-08, användarens val):** ibland går blicken ned på kupongen,
   med sex olika miner, och när han har sagt vad han tycker om den passar minen orden. Se
   [Hasse Backe](#hasse-backe), *Vilan*.
@@ -1660,7 +1681,8 @@ de flesta körningar har inget att göra och anropar inte Claude.
   slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
   det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
-- **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00 (se nedan).
+- **Tidningen inför omgången** så snart omgången finns, och sedan måndag 17.00 och fredag 16.00, och när
+  supporterpoddarna eller supporterforumen har gett nya uppgifter (se nedan).
 - **Kommentaren till en färdig kupong** när kupongen finns i den publicerade historiken.
 
 **En analys** är ett anrop till `claude -p`: Claude söker och läser på nätet (högst 6 sökningar och
@@ -1720,6 +1742,148 @@ lag. `sips` förminskar den till 320 bildpunkter (15–35 kB). Provat på omgån
 `data/tidning-bilder/` och bygget kopierar den till sajten. Går grenen inte att pusha blir det inga bilder och sidan
 visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiserna (se [Tidningen](#tidningen)). `node scripts/analyser/skriv.mjs --tidning-bilder` hämtar bilderna på nytt till tidningen som
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
+
+**Supporterpoddarna** (2026-11-10, användarens önskan: *transkribera lagens poddar inför nästa stryktips så att
+man får initierad info – det mest intressanta ska med*): varje natt kl. 02.15, och lördag kl. 08.00, lyssnar iMacen
+igenom veckans avsnitt av supporterpoddarna för lagen i omgången ([scripts/tidning/poddar.mjs](scripts/tidning/poddar.mjs),
+launchd-jobbet `se.matchfixarna.poddar`; logiken i [src/analyser/poddar.mjs](src/analyser/poddar.mjs), gränserna och
+prompterna i [config/poddar.js](config/poddar.js)).
+
+```
+omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp → claude -p → omgang.json
+                                                                                             ↓
+                                                   tidningen inför omgången får uppgifterna i sitt underlag
+```
+
+- **Poddarna hittas en gång per lag.** Först frågas Apple Podcasts (`itunes.apple.com/search`) efter lagets namn:
+  träffarna som är sport och har ett avsnitt de senaste 28 dagarna är kandidater (`appleKandidater`). Sedan får Claude
+  lagen med kandidaterna under, tio lag per anrop, och väljer supporterpoddarna bland dem eller lägger till en den
+  känner till eller söker fram. En podd räknas bara om flödet lever, så ett påhittat namn faller bort av sig självt.
+  Resultatet sparas i `register.json`; ett lag med podd letas upp igen efter 60 dagar, ett utan efter 7. Poddar vi
+  redan känner står i `kanda` i config/poddar.js. Visar ett avsnitt att podden handlar om en annan klubb (`ratt_klubb`
+  i svaret) tas den bort ur registret.
+- **Veckans avsnitt:** högst sex dagar gammalt och minst tolv minuter långt. Nämner rubriken motståndaren är det
+  förhandssnacket och går först, annars det nyaste. Ett nytt avsnitt per lag och natt.
+- **Utskriften:** `curl` hämtar ljudet, `ffmpeg` tar de första 60 minuterna och `whisper-cli` (whisper.cpp, modellen
+  `ggml-large-v3-turbo-q5_0`) skriver ut dem, med lagens och spelarnas namn som ledtråd så att de stavas rätt. Ljudet
+  tas bort direkt. Ett avsnitt tar 5–10 minuter på iMacen (M1), en hel omgång några timmar.
+- **Uppgifterna:** Claude får utskriften, ett stycke per minut, och tar ut allt som är intressant inför matchen, högst
+  tolv uppgifter per avsnitt. Var och en har ett ämne (*skador och trupp*, *väntad uppställning*, *så spelar laget*,
+  *tränaren och klubben*, *inför matchen*), ett slag (*bekräftat*, *hört i podden*, *supportrarnas åsikt*), minut,
+  vikt 1–5, ett ordagrant citat ur utskriften, citatet på svenska (`sagt`) och vem som säger det (`vem`) när det
+  framgår. Referat, tabelläge och småprat ska inte med, och en tom lista är ett godkänt svar.
+- **Kontrollen:** citatet på 8–30 ord ska gå att hitta i utskriften (`citatStar`), annars stryks uppgiften. Tipsord
+  stryks också. Namnet på den som talar följer bara med om det står i utskriften (`vemStar`); maskinen skiljer inte
+  på rösterna, så oftast står bara poddens namn under citatet.
+- **Informationssidan per match** (användarens önskan 2026-11-10: *längre informationssidor per match som man kan
+  hämta kunskap ur*, med citat och vem som säger det): när uppgifterna för en match har ändrats får Claude båda lagens
+  uppgifter (vikt 3 eller mer, ur lagets tre senaste avsnitt) och redigerar sidan, utan verktyg (`skrivSida`): väljer
+  högst nio punkter per lag, slår ihop det som sägs två gånger, grupperar under ämnena och skriver rubrik och ingress.
+  Varje punkt måste peka på uppgifter som finns (`ur`), och slaget, podden och citatet tas därifrån, inte ur svaret.
+  En text, rubrik eller ingress med tipsord eller tal som inte står i uppgifterna stryks: punkten får då uppgiftens
+  egen text och sidan en rubrik ur mallen. Högst fem citat per lag trycks, de tyngsta punkternas. Går svaret inte att
+  läsa står uppgifterna som de är, grupperade (`sidaUtan`), och sidan redigeras nästa natt. Inga tips.
+- **Ut på sajten:** analysjobbet (scripts/analyser/skriv.mjs, var 15:e minut) lägger sidorna i `data/poddsidor.json`
+  när de har ändrats, utan något anrop till Claude. Tidningen i rummet visar dem under *Supportrarna*, en sida per
+  match (se [Tidningen](#tidningen)).
+- **Notiserna** (*Så mår tipslagen*) får fortfarande de bästa uppgifterna per lag (högst fyra) under *ur
+  supporterpoddarna* i sitt underlag, och den mest intressanta ska bära notisen, med *enligt supporterpodden …*.
+  Har det kommit nya uppgifter sedan sidan skrevs skrivs den om vid nästa kontroll (`poddTimmar` i config/tidning.js,
+  högst var sjätte timme).
+
+```json
+{ "omgang": "…", "uppdaterad": "…", "amnen": { "trupp": "Skador och trupp" },
+  "sidor": [ { "id": "401880745", "nr": 3, "match": "Stockport County – Reading", "lag": ["…", "…"], "rubrik": "…",
+               "ingress": "…", "delar": [ { "lag": "…", "kallor": [ { "podd": "…", "avsnitt": "…", "datum": "…", "adress": "…" } ],
+                 "grupper": [ { "amne": "trupp", "punkter": [ { "t": "…", "s": "b", "podd": ["…"],
+                                "citat": { "sagt": "…", "vem": null, "podd": "…" } } ] } ] } ] } ] }
+```
+
+Allt ligger utanför repot, i `~/Library/Application Support/Matchfixarna/Tidning/`: `register.json`, `omgang.json`
+(omgångens avsnitt, uppgifter och sidor), `utskrifter/` (tas bort efter tre veckor) och modellen. Ljudet och utskrifterna
+är andras och läggs aldrig i repot eller på sajten; dit kommer tidningens egna meningar, poddens namn och korta citat
+i svensk översättning, med podden som källa.
+Jobbet rör aldrig git och går som allt annat på Claude-kontot, inte med API-nycklar. Loggen:
+`~/Library/Logs/Matchfixarna/poddar.log`. Installera med `scripts/tidning/installera.sh` (kräver
+`brew install whisper-cpp` och modellen i mappen).
+
+```
+node scripts/tidning/poddar.mjs --torrt     vilka avsnitt som skulle skrivas ut
+node scripts/tidning/poddar.mjs --visa      det som är uttaget för omgången
+node scripts/tidning/poddar.mjs --lag "Reading" --mot "Stockport County"     ett lag på prov (prov.json)
+node scripts/tidning/poddar.mjs --prov 401880745,401880747     en påhittad omgång av sajtens matcher (prov.json)
+node scripts/tidning/poddar.mjs --sidor     skriver bara om informationssidorna
+```
+
+**Provet 2026-11-10**: en påhittad omgång av lördagen den 14 novembers 13 matcher i League One och League Two
+(26 lag, 22 av dem nya), körd två gånger i följd. 19 avsnitt skrevs ut, 179 uppgifter togs ut och 12 av 13 matcher
+fick en sida (Bristol Rovers–Chesterfield blev utan: Rovers podd hade inget avsnitt den veckan och Chesterfields
+handlade inte om laget). Det provet visade och det som ändrades:
+- Ett enda anrop för 22 lag gav ingen podd för nio av dem. Nu får Claude Apples träffar per lag och tio lag per
+  anrop, och de 85 lag som har en känd podd står i `kanda` i config/poddar.js.
+- En podd med rätt namn kan vara fel podd (*Across the Pitch* var japansk, inte Accringtons). `ratt_klubb` i
+  uttaget stryker en sådan ur registret; den raden är borttagen ur `kanda`.
+- Flera poddar i de lägre serierna kommer ungefär en gång i månaden (Barnsley, MK Dons, Rochdale, Bristol Rovers).
+  De lagen står då utan del på sidan, och sidan ställs upp för ett lag.
+- Ingressen ströks för räkneord som *fyra* och *sex* (redaktören räknar ihop spelare). Små räkneord i bokstäver
+  släpps nu; siffror kontrolleras som förut.
+- Rubriken gjorde gammalt till nytt (en tränare som lämnade i juni). Anvisningarna säger nu att bara det som gäller
+  laget och matchen får med, och att gammalt inte får bli nyhet.
+- Namn under citatet kom med i ungefär vart fjärde citat (utskriften skiljer inte på rösterna); annars står podden.
+
+**Supporterforumen** (2026-11-10, användarens önskan: *lägg till det viktigaste forumet för varje lag som den går
+igenom inför tidningssläppet – som källmaterial för info om laget*): samma nattjobb läser, före poddarna, lagets
+viktigaste supporterforum för varje lag i omgången ([src/analyser/forum.mjs](src/analyser/forum.mjs), gränserna,
+forumen och prompterna i [config/forum.js](config/forum.js)). Uppgifterna hamnar bredvid poddarnas: på
+informationssidan och, under *ur supporterforumet*, i tidningens underlag.
+
+```
+omgångens lag → lagets forum (config/forum.js) → tavlan → de bästa trådarna → sista sidan → inläggen → claude -p → omgang.json
+```
+
+- **Forumen:** det viktigaste supporterforumet för vart och ett av de 92 ligalagen som går att läsa, uppslaget och
+  prövat 10 november 2026, står i `kanda`, med tavlan där a-laget diskuteras. 44 lag har ett. De andra 48 står i
+  `utan`: det stora forumet spärrar allt som inte är en webbläsare (RedCafe, Bluemoon, Grand Old Team, VillaTalk,
+  Charlton Life, OTIB, Pompey Chimes, Red Passion, Molineux Mix …), säger nej till AI-assistenter i robots.txt (alla
+  forum hos ProBoards, som The Oatcake och Down At The Mac, och UpTheClarets, Stagsnet och One Boro), är nedlagt eller
+  tyst, eller är byggt så att det inte går att läsa ut (Luton Outlaws, Tigers Talk). Där det största forumet var spärrat
+  står det näst viktigaste, om det lever (Vital Football för Villa, City, Newcastle, Swansea, Wigan m.fl.). Ett lag som
+  varken står i `kanda` eller `utan` (en klubb utanför ligan) letas upp av Claude, åtta lag per anrop, och används
+  bara om läsaren kan läsa tavlan och den har inlägg de senaste 21 dagarna. Registret ligger i `forum.json`.
+- **Läsningen** görs som en vanlig läsare: några sidor per lag och natt, med namnet *Matchfixarna/1.0 (forumlasare)*,
+  och med samma regler i robots.txt som Anthropics användarstyrda läsare (Claude-User). Säger forumet nej till
+  AI-assistenters läsning (Claude-User, ChatGPT-User, Perplexity-User eller `Content-Signal: ai-input=no`) läses det
+  inte alls; spärrar mot AI-träning (ClaudeBot, GPTBot, CCBot) gäller inte, eftersom inget tränas och bara korta
+  översatta citat trycks. En sida som svarar 403, visar Cloudflares kontroll eller kräver inloggning räknas som
+  spärrad, och det görs inga försök att ta sig förbi.
+- **Trådarna:** tavlans trådar i sidans ordning (den senast aktiva först). Tråden om just den här matchen
+  (motståndaren i rubriken) går först, sedan aktiva trådar med en rubrik om laget (skador, uppställning, tränaren,
+  ägarna); biljetter, resor, lekar, tävlingar, poddar, historia och annat stryks, liksom trådar utan inlägg den senaste
+  veckan. Högst fem kandidater läses tills tre har minst två nya inlägg. Läsaren går till trådens sista sida och tar
+  med sidan före om den sista har färre än tolv inlägg.
+- **Inläggen:** läsaren känner igen XenForo (1 och 2), Invision, phpBB (och Forumotion), SMF, vBulletin, MyBB, Vanilla,
+  FansNetwork (som TWTD), The Fishy och Discourse (via dess JSON). Ur varje inlägg tas användarnamnet, tiden och
+  inläggets egen text; citat ur andra inlägg, signaturer och knappar stryks. Bara inlägg från de senaste sju dagarna
+  följer med, högst 1 500 tecken per inlägg och 60 000 per lag.
+- **Uppgifterna:** Claude får inläggen numrerade, med namn och tid, och tar ut allt som är intressant inför matchen,
+  högst tio, med samma ämnen, slag och vikt som poddarnas. Citatet ska stå ordagrant i inlägget (annars stryks
+  uppgiften), och namnet under citatet är användarnamnet på det inlägget, inte Claudes. Har inläggen inte ändrats
+  sedan förra natten görs inget nytt anrop.
+- **Sidan och tidningen:** sidan tar lagets två senaste forumläsningar (utöver de tre senaste poddavsnitten), och
+  redaktören slår ihop det podden och forumet säger båda. Tidningens notiser får den senaste läsningens bästa
+  uppgifter under *ur supporterforumet*, och forumtrådarna räknas som lästa källor.
+
+```
+node scripts/tidning/poddar.mjs --bara-forum                          bara forumen, för omgångens lag
+node scripts/tidning/poddar.mjs --utan-forum                          bara poddarna
+node scripts/tidning/poddar.mjs --lag "Sheffield Wednesday" --mot "Plymouth Argyle" --bara-forum --fil prov-forum.json
+```
+
+**Provet 2026-11-10**: samma påhittade omgång som poddarnas (13 matcher i League One och League Two), med bara
+forumen. 11 av de 26 lagen har ett forum, alla 11 lästes (tre trådar och 12–53 inlägg per lag) och gav 67 uppgifter,
+1–10 per lag, på 13–46 sekunder per lag. 8 sidor skrevs om; där både podden och forumet hade något (Newport, Colchester)
+står de bredvid varandra, och redaktören slog ihop det de båda sa. Inför provet prövades alla 92 lag: av forumen
+agenterna hittade gick 44 att läsa, och läsaren fick ut inlägg med namn och tid ur alla 44.
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
@@ -3824,8 +3988,8 @@ och det är det som hackar mest. Med 4 GB minne eller 4 kärnor börjar det ett 
 eller 2 kärnor och med mjukvarugrafik på steg 3, och äldre grafikkretsar (Mali, Adreno, PowerVR, Intel
 HD/UHD) börjar på steg 1 eller 2. Safari säger inget om sådant, där får `kanna` känna efter. Går det under
 45 % av takten hoppar `kanna` direkt till steg 3. Kantutjämningen går inte att stänga av när
-grafiken väl har startat, så i datorn är den av när rummet börjar på steg 1 eller lägre (i telefonen
-på steg 2 eller lägre, `kantutjamning` i rum.js).
+grafiken väl har startat; den är på där duken är så gles att trappstegen syns (`kantutjamning` i rum.js,
+se *Jämnare kanter och jämnare takt* nedan).
 
 Steget sparas i webbläsaren (`rum-kval` i localStorage), så att nästa besök börjar där, i tre
 dagar. I telefonen börjar rummet på steg 1. `?rum-kval=0` (`1`, `2`, `3`) väljer steget och låser
@@ -4205,6 +4369,42 @@ datorn på steg 1 utan 3D 8,5 → 9,1 sammansättningar i sekunden. Med 128 MB r
 tillbaka saknas inga rutor i taket längre; det som ibland fattas är tv:ns sidor och anslagstavlan, gammal och ny kod lika.
 Bilderna (dag, kväll, regn, åska, frost och snö, telefon och dator på steg 0 och 1) är jämförda punkt för punkt: 48–67 dB,
 där det som skiljer är uret, Hasses hand och enstaka kanter. Inte provat i en riktig telefon.
+
+### Jämnare kanter och jämnare takt (2026-11-09)
+
+Användarens önskemål: "Förbättra grafiken på animationssidan … men att det flyter, flimrar och hackar mindre på
+begränsade grafikkort och äldre mobiler." Gänget i 3D är det som både ser sämst ut och kostar mest på en svag
+enhet, så de tre ändringarna gäller det:
+
+- **Kantutjämning där den behövs.** På steg 2 och 3 (och steg 1 i datorn) ritades gänget utan kantutjämning i en duk
+  med en bildpunkt per punkt eller glesare, i en telefon två–tre av skärmens bildpunkter: trappsteg längs huvuden,
+  armar och bordskanten, som kryper när gänget rör sig. Nu är den på på steg 0 och överallt där duken har högst 1,15
+  bildpunkter per punkt (`kantutjamning` i rum.js): alla steg i telefonen, alla steg på en skärm med täthet 1 och från
+  steg 2 med täthet 2. På steg 1 med täthet 2 är duken tät nog och stor nog att den kostar mer än den ger (där som
+  förut). Inte med mjukvarugrafik och inte på PowerVR. Den kostar efter dukens yta, och där är duken liten: mätt på
+  Apple M1 (som ritar i små rutor som telefonerna) 1080 × 420 bildpunkter 3,2–3,9 → 4,8–4,9 ms per bild på steg 2 och
+  1,5–1,8 → 2,3–2,4 ms på steg 3, 15 gånger i sekunden; på steg 1 med täthet 2 (2160 × 840) hade det varit 6,1–6,5 →
+  9,4–9,6 ms.
+- **Röken ur cigaretterna är en enda mesh** (`ROK` i rum-3d.js, som röken på pulten redan var): förut en sprite med
+  eget material per puff, ungefär 145 ritanrop i varje bild av gänget – på steg 3 mer än en tredjedel av alla (382 →
+  238), på steg 0 755 → 611 med skuggorna. I en svag telefon är det anropen som tar tiden, på huvudtråden och i
+  webbläsarens grafikprocess. Bilden är densamma (56,5 respektive 52,4 dB mot förut i två lägen, där det som skiljer är
+  uret och enstaka kanter).
+- **Skuggorna ritas i en egen bildruta.** Där skuggorna räknas om var andra–fjärde bild (steg 1 och 2) gjordes det i
+  samma bild som gänget, så att den bilden bar alla delar två gånger: 427–458 ritanrop mot 248–279 i de andra, i
+  jämn takt, och det är den bilden som blir för lång i en svag telefon. Nu räknas skuggkartan om för sig två
+  bildrutor senare, där inget annat ritas (`skuggaSen` i rum-3d.js): tyngsta bildrutan 458 → 249 anrop, skuggkartan
+  180 för sig. Lika mycket arbete totalt, men ingen bildruta bär allt. Skuggorna är från ställningen gänget just
+  ritades i och syns från nästa bild; de var redan upp till tre bilder gamla.
+
+Mätt i Chrome som telefon (412 × 870, täthet 2,625) med Apple M1:s grafik, gammal och ny kod om vartannat.
+Ritanropen är räknade i grafikanropen och är säkra. Tiderna på huvudtråden med processorn fyra gånger långsammare
+pekar åt samma håll (gängets bild på steg 1 i median ungefär 9,5 → 8,6 ms, 95:e percentilen 11,5–18,5 → 8,7–14,3) men
+datorn var belastad av annat under mätningen, så de är ungefärliga. Rummet och närbilderna (tv:n, tavlan, registret,
+videon) går utan fel som telefon på höjden och på tvären på steg 1–3 och som dator (1440 × 900 täthet 2, 1366 × 768
+täthet 1 på steg 1 och 2). Inte provat i WebKit och inte i en riktig gammal telefon: `matchfixarna.se/?rum-mat` ger
+siffrorna där. Prövat utan effekt: enklare filtrering av skuggorna (`PCFShadowMap`, samma tid på grafikkortet), och
+att slå ihop fler av gängets delar (de som är kvar rör sig var för sig eller har olika material).
 
 ### När något går fel i rummet
 
@@ -5369,7 +5569,7 @@ fingrar. Slår han i disken landar handen en bit åt sidan
 längs sig själv när den lyfts ur vilan, och skjuts in igen på samma sätt, så att fingrarna inte går genom
 den vänstra (`UTDRAG`). Det är bara den vänstra som trummar i vilan. Tummarna ligger intill händerna, så
 att den vänstra tummen inte går ned i disken (`SAMLA`, `TUMME_VILA`); det tonar bort när handen tar
-kaffet, cigarren eller pennan. Askkoppen står så långt till vänster att cigarren i den går fri från handen. Fatet står
+kaffet, cigarren eller pennan. Askkoppen står till vänster om den högra handen och en bit framför den, så långt ut att handen går fri från cigarren när han slår i disken. Fatet står
 på hörnet, och notan ligger på tvären framför hans händer, vänd som i rummet (se *Kaffet i rummet*). Fingrarna lägger sig på disken: ett finger vars två yttre leder skulle nå under
 ovansidan böjs mindre, tills den lägsta punkten ligger på ytan (`golv` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), så att fingertopparna aldrig går ned i disken,
@@ -5423,6 +5623,18 @@ rörelse tonar hans bild in och ut på 0,26 s. Rummet rätar upp sig efter musen
 han syns (`Rum.vila`), och då ritas det inte alls (`visibility: hidden`), men det står kvar som det
 var, så att vägen tillbaka inte behöver bygga om något. I vila har omslagen ingen transform och inget
 filter. `?rum-hasse-pan=0.5` fryser panoreringen på vägen (för bilder).
+
+**Samma sida.** Rummet och hans bild ska läsas som ett ställe där man bara har vänt sig. Namnet
+(*Matchfixarna*, i fönster smalare än 8:5) och foten står därför stilla medan kameran slår och är kvar hos
+honom, med *Tillbaka* där *Vanlig sida* stod; samtalet börjar under namnet, namnet leder tillbaka till
+rummet, och det tonas bort bakom matchbladet och kupongen i handen. Förut försvann båda i panoreringen och
+namnet var borta hos honom, så att det såg ut som en annan sida. Neonskylten i affärens fönster sitter strax
+utanför hans bild till höger, och dess röda sken faller in därifrån som över gänget i rummet (`.rh-ton::before`,
+`--neon` i `tand`): starkast på natten, tydligt på kvällen och nästan borta i dagsljus; en färdig toning utan
+blandning. Man vänder sig med samma drag som man ser sig omkring med i telefonen: när rummets vänstra kant
+redan syns och man drar vidare åt höger (minst 64 bildpunkter, mest i sidled) slår kameran till honom, och
+hos honom drar man åt vänster för att vända sig tillbaka (inte på kupongen eller matchbladet). Med
+tangentbord är det pilen åt vänster i rummet, när inget ligger framme, och pilen åt höger hos honom.
 
 **Ljuset.** Samma ljus på allt i hans bild, på fotot, armarna, händerna, koppen, askkoppen, cigarren
 och disken: varmt framifrån till vänster, ett varmt kantljus bakifrån från barens lampor, och
@@ -5608,10 +5820,13 @@ sidan, och armbågen inte upp över axeln eller in framför magen. Förut pekade
 håll, och då kunde handen sitta nästan i rät vinkel mot underarmen och sticka ut ur manschettens sida,
 så att man såg in i den (ändrat 2026-11-06).
 
-**Cigarren.** Till vänster om hans högra hand står en tung askkopp av samma gods som koppen, med två
-urtag. I det ena ligger cigarren: huvudet på disken, ringen (guld och rött) synlig och glöden över
-askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den och njuter av den en stund, på ett
-av elva sätt som lottas (nedan). Han tittar ned och tar den ovanifrån, och han håller den löst i
+**Cigarren.** Till vänster om hans högra hand och en bit framför den står en tung askkopp av samma gods
+som koppen, med två urtag. I det ena ligger cigarren: huvudet på disken och vänt lite in mot honom, ringen
+(guld och rött) synlig och glöden över askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den
+och njuter av den en stund, på ett av elva sätt som lottas (nedan). Han tittar ned, för handen lågt över
+disken med underarmen rakt fram från armbågen och nyper cigarren med flack hand och rak handled, med
+handflatan nedåt och lite framåt (`P_VILA`); förut sträckte han ut armen åt sidan, vred handen 60° utåt och
+dök ned på den ovanifrån med raka, utspärrade fingrar (ändrat 2026-11-09). Han håller den löst i
 fingertopparna, tummen under och pek- och långfingret ovanpå, med ring- och lillfingret böjda in mot
 handflatan; vid munnen sitter handen under den vid käken, med fingrarna uppåt i underarmens förlängning
 och armbågen nere (förut satt den vid kinden, och då knäcktes handleden åt sidan). Det är cigarren som
@@ -5660,6 +5875,45 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
   och skrockar.
 - `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
   ut den långsamt.
+
+**Elden.** Cigarren slocknar om han låter den ligga: 2,5–4,7 minuter efter att han rökte sist tonar glöden
+och rökslingan ut på en halv minut (`CIG_LIV`, `slocknar` i [public/rum-hasse.js](public/rum-hasse.js)), och
+när man kommer har den slocknat ungefär varannan gång (`CIG_SLOCKNAD`); man kan ha varit borta. När vanan
+sedan kommer till cigarren tänder han den i stället för att röka (gruppen `tanda`, `cigarrGest`), och efteråt
+brinner den. Har han just sagt sitt om en match och den har slocknat tänder han den gärna strax efter. Den
+slocknade cigarren han låtsas röka när han verkar upptagen (`slocknad`) kommer bara när den verkligen har
+slocknat; har man just kommit kan den ha slocknat då. Med minskad rörelse brinner den.
+
+Bakom askkoppen, mot honom, står ett tändsticksställ i askkoppens porslin, med det blå bandet och en
+oglaserad, räfflad plån runt om, med nio långa tändstickor (rödbrun tändsats), och längre ut ligger hans
+tändare i borstat stål (allt i [public/rum-hasse-eld.js](public/rum-hasse-eld.js)). De står där han når
+dem med höger hand och där underarmen går fri från dem i de andra rörelserna, och syns också i telefonen.
+Stickorna han tänder med hamnar brända i askkoppen (högst fyra syns), och stället blir tommare; när det är
+tomt tar han tändaren, och det fylls på när man inte tittar (`H.cig`). Lågan står alltid upp, dras mot glöden
+när han drar och släpar efter när handen rör sig, flammar upp när stickan tar, och lyser upp handen,
+ärmen, ansiktet och cigarren i sitt varma sken (`eldsken` i [public/rum-hasse-arm.js](public/rum-hasse-arm.js)),
+också på natten. Det hörs (rum-hasse-ljud.js): stickan mot plånen, blossen, när han skakar ut den, locket och
+hjulet.
+
+Han biter om cigarren i mungipan och har höger hand fri. Det är stickan och tändaren som styr, som med
+cigarren (`eldArm`, `eldLage` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)): stickan hålls i
+fingertopparna längs fingrarna och snett ut mot tummen, så att underarmen står upp med armbågen nere när
+han tänder; där han sträcker sig efter den har handen sin egen riktning med fingrarna snett ned. Handen vrids
+den kortaste vägen mellan lägena och armbågen ligger åt ett bestämt håll per läge (`POL_E`), annars slog den
+om mellan två lägen. Sätten:
+
+- `tanda`: han drar, men ingenting, och tittar på den med rynkad panna; biter om den, tar en sticka och drar
+  den mot plånen så att den flammar upp, låter svavlet brinna av och tittar på lågan, tänder med tre bloss
+  och röken ur andra mungipan, skakar ut stickan och släpper den i askkoppen, och tittar nöjt på glöden.
+- `disken`: en sticka i ett långt, säkert drag mot disken, med en gest. Ingenting. Han tittar på stickan och
+  stelt på en, drar den mot plånen som vanligt och låtsas som ingenting, tänder, och lutar sig bakåt och
+  blåser ut ett stort moln.
+- `tandaren`: tändaren, locket upp med tummen, och hjulet ger bara gnistor; han tittar misstänksamt på den,
+  drar igen, och då tar det. Han slår igen locket så att lågan dör, lägger tillbaka tändaren och blåser tre
+  rökringar.
+- `tandare2`: locket upp och hjulet på samma gång på vägen upp, och han tittar på en med ett höjt bryn medan
+  han tänder (så gör man), slår igen locket med en knyck, ställer ned tändaren med en liten smäll och visar
+  cigarren för en.
 
 **Händerna när han pratar.** Han är nöjd med det han säger: han ler medan han pratar (se *Minen*), och händerna
 hjälper till på ett av tio sätt (gruppen `tal`). Förut hade han bara ett (`armar`: fingret, handen som
@@ -5810,7 +6064,15 @@ dagens morgontidning, skyldig men nöjd med sig själv. Har man just kommit läs
 rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` och
 `lasa2`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
 händerna lågt, för den fram över disken medan den stiger och flyttar sedan upp händerna; i knät hänger armarna nedåt (håller
-han den högt medan den är nära honom måste armarna vikas, och armbågarna står ut som vingar). Behöver han händerna, som när han
+han den högt medan den är nära honom måste armarna vikas, och armbågarna står ut som vingar). Framme över disken för han den
+åt sin högra sida, ut mot askkoppen, och håller den lågt, lutad bakåt, vriden mot sig och halvt hopvikt, inte utbredd mitt
+framför sig: det är han man ska se, inte tidningen, och av den ser man förstasidan snett från sidan och baksidan bara som en
+kant. Han tittar ned i den med huvudet vridet och böjt mot den i stället för in i kameran (Tomas önskemål 2026-11-09 och
+2026-11-10; `LAS` och `LAS_T`, och bitarna utgår från dem. Åt hans vänstra sida vändes baksidan med vädret mot en, därför
+den högra; den högra armbågen pekar då ned och ut, `POL_SIDA`). Den är halvt hopvikt också när han tar upp den, gömmer sig
+bakom den och lägger ned den. Bara när han gömmer sig för han den framför ansiktet,
+och innan han lägger ned den för han in den framför sig igen, så att hörnet inte går genom armen (provat i headless Chrome i
+1280 × 800 och i telefonen, 412 × 915, med bilder genom `lasa` och `lasa2`). Behöver han händerna, som när han
 slår en dom i disken, läser han klart raden och lägger ned den direkt. Dåligt är inte ett rätt, sämst i gänget, eller rätten
 långt under vad chanserna var värda, med tävlingskupongen om han spelade och annars det han sa (`hansOmgang` och `efterat` i
 [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och när han dömer gänget. Med
@@ -5847,6 +6109,32 @@ framför ansiktet följer huvudet, fickan och handen kroppen), och handen räkna
 från sidan bakom tidningen, eller med pekfingertoppen på bryggan (`glasArm`). På näsan sitter de så nära ansiktet som
 formen tillåter (`paNasan`), och genom glasen ser ögonen lite större ut (`uLins` i ansiktets skuggare). Bågen ritas före
 kroppen, så att huvudet och kavajen döljer skalmarna och det som är nere i fickan.
+
+**Sysslorna** (2026-11-09, användarens önskan: fler saker än tidningen, *ertappad men låtsas som att det inte har hänt
+och gå vidare*, som John Goodman i *The Big Lebowski*). Har det gått dåligt har han sex andra sätt att verka upptagen,
+och de lottas med tidningen (samma grupp `lasa`, klippen `raknar`, `tomKopp`, `slocknad`, `putsa`, `vissla` och
+`naglar` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). I alla märker han mitt i att man tittar: ögonen kommer
+upp på en medan huvudet står kvar, brynen åker upp och leendet han alltid har försvinner (nyckeln `stel`), och han
+håller andan en dryg sekund. Sedan låtsas han som ingenting, med eftertryck, som en man som vet att han har rätt också
+när han inte har det: hakan upp, brynen ned, en bestämd nick, och leendet tillbaka.
+
+- `raknar`: räknar sina rätt på fingrarna med en nick för varje, ett, två, tre; lillfingret tvekar och fälls ned igen.
+  Ertappad med tre fingrar i luften knyter han handen och slår näven i disken.
+- `tomKopp`: dricker ur en tom kopp, lutar den mer och mer och skakar ur de sista dropparna, och tittar ned i den.
+  Ertappad över koppen tar han en klunk som inte finns, *ah*, och ställer ned den med en smäll.
+- `slocknad`: cigarren har slocknat (ingen glöd och ingen rök, `ute`). Han drar, tittar misstänksamt på den, drar
+  hårdare och blåser på glöden. Ertappad med läpparna i ett o drar han ett nöjt bloss och blåser ut rök som inte finns.
+- `putsa`: andas på läsglasögonen, putsar dem mot skjortan i små cirklar (`gnid`, läget `putsa` i `GL`) och håller upp
+  dem mot ljuset (`kika`). Ertappad sätter han på sig dem med en knyck, tittar strängt på en genom dem och nickar.
+- `vissla`: visslar en egen liten slinga upp i taket med pekfingret som knackar i takt (`LAT`). Tonen dör när han ser
+  en; sedan visslar han vidare längs baren, gladare än förut.
+- `naglar`: synar naglarna, blåser på dem och putsar dem mot kavajen. Ertappad blir handen ett pekfinger mot en, två
+  stötar: har jag fel?
+
+Har man just kommit håller han redan på, strax före det man ertappar honom med (`fram` i `KLIPP`, `lasNu` i
+[public/rum-hasse.js](public/rum-hasse.js)). Visslingen och andetagen räknas fram med Web Audio som de andra ljuden
+(`vissla` och `anda` i [public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), `ljud` i `KLIPP`) och hörs bara med ljudet
+på.
 
 Går hans röst inte att få säger han det och visar analysen i skrift. Allt han säger runt omkring är
 färdiga rader, utan AI, i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Står man kvar säger han något då och då:
@@ -6162,6 +6450,14 @@ släpper cigarren i mungipan och tar den igen; slaget, gesterna och klunken ser 
 sidan (1440 × 900) finns alla elva i lotten, och `tand` och `ringar` spelades utan fel. Inte provade i
 Safari eller i en riktig telefon.
 
+Elden (2026-11-10) är provad i headless Chrome (Metal) med provserver mot sajten: varje klipp bild för bild,
+närbilder av handen, stickan, tändaren och lågan, i dag- och nattljus och i 390 × 844; armbågens förflyttning
+mellan varje tjugondels sekund (inga hopp utom korta när han lyfter handen), och avståndet mellan underarmen och
+stället i alla klipp (som minst 108 enheter i de gamla, när han knackar av askan). Logiken i
+en levande sida: släckt cigarr, vanan, tändaren, och tänd efteråt utan att en sticka gick åt. Ljuden är
+räknade fram utan fel (OfflineAudioContext), men ingen har lyssnat på dem. Inte provad i Safari eller i en
+riktig telefon.
+
 Slagen, kaffet, cigarren och ljuden (2026-11-05) är provade i headless Chrome med mjukvarugrafik: figuren
 ensam i 1440 × 900 och 412 × 915, varje klipp bild för bild och de med rök och ånga i följd, och
 klippen före ombyggnaden jämförda bild för bild med klippen efter (lika, utom slaget i originalet, som
@@ -6323,6 +6619,14 @@ rum.js).
   när rubriken gäller en match), annars den jämnaste matchen som inte har börjat: rubriken, ingressen, texten med
   anfang och utan källhänvisningarna i klamrar, och i en ruta hans tecken, marginalen och motiveringen. Källorna står
   sist.
+- *Supportrarna*: en informationssida per match ur `data/poddsidor.json` (se *Supporterpoddarna* och
+  *Supporterforumen* under [Analyserna](#analyserna)), i kupongens ordning: rubrik och ingress, hemmalaget till
+  vänster och bortalaget till höger med poddarna och forumet de bygger på, och punkterna under sina ämnen. Varje punkt
+  har slaget som stämpel (*Bekräftat* i svart, poddens eller forumets egen uppgift i rött – *Hört i podden*, *Från
+  forumet* eller *Hört bland supportrarna* när båda säger det – och *Supportrarnas åsikt* streckad), och de tyngsta
+  har citatet under, med den som säger det och podden, eller användarnamnet och forumet. Har bara det ena laget något
+  får det hela bredden i två spalter. Slagen förklaras i sidfoten.
+  *I tidningen* pekar på den första av sidorna.
 
 Notiserna och analyserna hämtas när man pekar på eller trycker på löpsedeln, och klicket väntar på dem i högst två och en
 halv sekund. Mellan omgångarna (ingen omgång, bara de närmaste matcherna) finns ingen tidning, och då går kameran fram
@@ -6372,14 +6676,14 @@ Framsidan är dess egen och samma på pulten och framme (`forsta` i [public/rum-
 datumet och priset, en rubrik som omgången väljer (*Så tar du hem 13 rätt*, *Allt om helgens 13*, *Här är den säkra
 raden*), kupongens matcher med datorns troligaste tecken, *Spika* för den största favoriten (minst 68 %, inte krysset),
 *Rysaren* för den jämnaste (ingen utgång över 42 %) och en puff för knepen. Inuti står sidorna inför omgången – *Tipset*,
-*Så mår tipslagen* och *Veckans analys*, samma som i tidningen – och sist *Åtta knep* (*Så blir du rik på tipset*:
+*Så mår tipslagen*, *Veckans analys* och *Supportrarna*, samma som i tidningen – och sist *Åtta knep* (*Så blir du rik på tipset*:
 kvällstidningens råd, och nummer 5, *Tippa inte med hjärtat*, med stämpeln *Här gör alla fel*), som alltid finns.
 Texterna står i `TEXT.guide` och `TEXT.knep` och kollas av `npm run repliker`.
 
 Numret gäller omgången som rummet visar (`guideUpplaga` i rum.js), också när den är spelad: det gamla numret ligger kvar
 tills nästa kupong kommer. Mellan omgångarna är det numret för den senaste kupongen, och utan någon kupong står knepen
-på framsidan. Det är daterat dagen före den första matchen, eller idag om den dagen inte har kommit än. Notiserna och
-analyserna hämtas när man pekar på eller trycker på tidningen, som på löpsedeln.
+på framsidan. Det är daterat dagen före den första matchen, eller idag om den dagen inte har kommit än. Notiserna,
+supporterpoddarnas sidor och analyserna hämtas när man pekar på eller trycker på tidningen, som på löpsedeln.
 
 Provat i headless Chrome med det lokala bygget (omgången 2026-11-07, spelad) i 1440 × 900, 1920 × 1080 och 390 × 844:
 tidningen syns på pulten, ett klick träffar den, den lyfts över protokollet och läggs fram med alla sidor, och Esc lägger

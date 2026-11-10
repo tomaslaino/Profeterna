@@ -2731,12 +2731,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     } catch (err) { /* utan WebGL gör det inget */ }
     return R.gpuNamn;
   }
-  // Kantutjämning i gänget och sakerna: den kan inte stängas av sedan, och på en svag grafikkrets i
-  // en dator är den dyr, så där bara på steg 0. Telefonernas grafik ritar i små rutor, där den kostar
-  // lite (mätt på Apple-grafik: ungefär en fjärdedel av gängets tid på grafikkortet), och utan den
-  // kryper trappstegen längs ansikten och armar när gänget rör sig, vilket ser ut som flimmer.
-  // På steg 1. (Inte på PowerVR, vars drivrutin redan kraschar av skuggkartan, rum-gpu.js.)
-  const kantutjamning = () => R.kval === 0 || (LATT && R.kval === 1 && !/PowerVR/i.test(gpuNamn()));
+  // Kantutjämning i gänget och sakerna. Den kan inte stängas av sedan, och den kostar efter dukens yta,
+  // så förut var den bara på på steg 0 (och steg 1 i telefonen). Men det är på de lägre stegen den
+  // behövs: där är duken en bildpunkt per punkt eller glesare, två–tre av skärmens bildpunkter i en
+  // telefon, och utan utjämning kryper trappstegen längs ansikten och armar när gänget rör sig, vilket
+  // ser ut som flimmer. Där är duken också liten (en fjärdedel av ytan på steg 0 med täthet 2), så att
+  // den kostar lite. Alltså: på steg 0, och annars där duken har högst 1,15 bildpunkter per punkt –
+  // alla steg i telefonen, alla steg på en skärm med täthet 1, och från steg 2 med täthet 2. Inte med
+  // mjukvarugrafik, där processorn räknar varje prov, och inte på PowerVR, vars drivrutin redan
+  // kraschar av skuggkartan (rum-gpu.js). Mätt: se README, Jämnare kanter och jämnare takt.
+  const kantutjamning = () => {
+    if (R.kval === 0) return true;
+    if (/SwiftShader|llvmpipe|softpipe|Software|Basic Render|PowerVR/i.test(gpuNamn())) return false;
+    // (dukens täthet som i figurer i rum-3d.js)
+    const tathet = LATT ? 1.5 : Math.min(window.devicePixelRatio || 1, 2);
+    return Math.max(0.75, tathet * KVAL[R.kval].pr) <= 1.15;
+  };
   R.kval = 0;
   if (R.q.has('rum-kval')) {
     R.kval = Math.max(0, Math.min(KVAL.length - 1, Math.round(Number(R.q.get('rum-kval'))) || 0));
@@ -3609,6 +3619,25 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return t.notiser.filter((n) => n && n.rubrik && n.text && (!n.id || ids.has(String(n.id))))
       .map((n) => ({ nr: n.nr, id: n.id, match: n.match, rubrik: n.rubrik, text: n.text, kallor: n.kallor || n.källor || [], lag: n.lag, bilder: n.bilder }));
   }
+  // data/poddsidor.json: informationssidorna ur supporterpoddarna, en per match. Hämtas med notiserna.
+  let poddData = null;
+  let poddAt = 0;
+  let poddReq = null;
+  function hamtaPoddsidor() {
+    if (poddReq && Date.now() - poddAt < 5 * 60000) return poddReq;
+    poddAt = Date.now();
+    poddReq = fetch('data/poddsidor.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+      .then((t) => { poddData = t && Array.isArray(t.sidor) ? t : null; return poddData; });
+    return poddReq;
+  }
+  // Sidorna för omgångens matcher, högst tio dagar gamla.
+  function poddsidorFor(rd) {
+    const t = poddData;
+    if (!t || !rd || !(Date.now() - Date.parse(t.uppdaterad) < NOTIS_DAGAR * 864e5)) return null;
+    const ids = new Set(rd.ids);
+    const sidor = t.sidor.filter((x) => x && ids.has(String(x.id)));
+    return sidor.length ? { amnen: t.amnen || null, sidor } : null;
+  }
   // Tipsligan: säsongens omgångar som syns (kampRounds, som skårtavlan), utan och med omgången id.
   // → { fore, efter, omg } eller null
   function tidningsLiga(id, medDen) {
@@ -3660,6 +3689,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       nr: typeof couponNumber === 'function' ? couponNumber(rd.ids) : null,
       matcher,
       notiser: notiserFor(rd),
+      poddsidor: poddsidorFor(rd),
       liga: tidningsLiga(rd.id, false),
       analys: a ? { nr: vald.nr, h: vald.h, b: vald.b, avspark: a.avspark, title: a.title, lead: a.lead, paragraphs: a.paragraphs, author: a.author, sources: a.sources,
         tip: a.tip && tecknen(a.tip.signs) ? { sign: tecknen(a.tip.signs), note: a.tip.note, text: a.tip.text } : null } : null,
@@ -3671,6 +3701,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const rd = round();
     if (!rd || rd.next) return;
     hamtaNotiser();
+    hamtaPoddsidor();
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
   // Ett klick på löpsedeln: tidningen om det finns en, annars närbilden. Före omgången hämtas notiserna
@@ -3687,9 +3718,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     vantaPaTidning(() => { if (!tidningen()) sak('lopsedel'); });
   }
-  // Notiserna och analyserna, högst två och en halv sekund; sedan gor(), om inget annat har hänt.
+  // Notiserna, supporterpoddarnas sidor och analyserna, högst två och en halv sekund; sedan gor(), om inget
+  // annat har hänt.
   function vantaPaTidning(gor) {
-    const vanta = Promise.all([hamtaNotiser(), typeof loadAnalyser === 'function' ? loadAnalyser() : null]);
+    const vanta = Promise.all([hamtaNotiser(), hamtaPoddsidor(), typeof loadAnalyser === 'function' ? loadAnalyser() : null]);
     const gans = new Promise((ok) => setTimeout(ok, 2500));
     R.tidningVantar = true;
     Promise.race([vanta, gans]).catch(() => {}).then(() => {
@@ -3732,10 +3764,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!window.RumTidning || !RumTidning.forsta) return;
     set('rum-tipsguiden', `<span class="tg-pult">${RumTidning.forsta(guideUpplaga())}</span>`);
   }
-  // Notiserna och analyserna till Tipsguiden, när man pekar på den eller sätter fingret på den.
+  // Notiserna, poddsidorna och analyserna till Tipsguiden, när man pekar på den eller sätter fingret på den.
   function forberedGuiden() {
     if (R.tidning) return;
     hamtaNotiser();
+    hamtaPoddsidor();
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
   // Ett klick på Tipsguiden: notiserna och analyserna först (som löpsedeln), och sedan lyfts den från
@@ -5915,6 +5948,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         else if (R.reg && R.reg.on() && el.querySelector('.rum-regn.lyft')) R.reg.key(k);
         return;
       }
+      // Hasse Backe sitter till vänster om det man ser: börjar draget där rummets vänstra kant redan
+      // syns och går vidare åt det hållet vänder man sig till honom (hos honom drar man tillbaka åt
+      // andra hållet, rum-hasse.js)
+      if (e.pointerType !== 'mouse' && (R.k * W - innerWidth <= 1 || P.px <= 0.002) && dx >= 64 && dx > 1.5 * Math.abs(dy) && !R.sak && !R.protokoll && !R.kup) {
+        tillHasse();
+        return;
+      }
       // farten de sista bildpunkterna, i bildpunkter per millisekund
       const [t0, x0, y0] = P.spar[0];
       const dt = Math.max(16, e.timeStamp - t0);
@@ -6144,6 +6184,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       else if (k === 'v') zoomVideo(!R.vnara);
       else if (k === 'h' && !R.zoom && !R.vnara) tillHasse();
       else if (k === 'g' && !R.zoom && !R.vnara) oppnaGuiden();
+      // (han sitter till vänster: pilen dit vänder en också, när inget ligger framme)
+      else if (k === 'arrowleft' && !e.repeat && !R.zoom && !R.vnara && !R.sak && !R.protokoll) tillHasse();
       else if (k === 'escape' && R.zoom) zoomTv(false);
       else if (k === 'escape' && R.vnara) zoomVideo(false);
     });
