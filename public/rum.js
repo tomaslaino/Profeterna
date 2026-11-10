@@ -2190,8 +2190,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // gängets kupong, när du ser de andras tips (uppgörelsen)
     set('rum-kupong', couponHtml(rd, rows, p && p.gang ? view(p, 'gang') : p && !p.inne ? view(p, 'fyll') : null));
     tidningPult();
-    // (notiserna, högst var femte minut: veckans bild på framsidan)
+    // (notiserna och matchbladen, högst var femte minut: veckans bild på framsidan står i dem)
     hamtaNotiser();
+    hamtaPoddsidor();
     levande();
     if (p && p.gang && p.s.spel && window.Folket) Folket.hamta(p.s.spel.nr).then((ny) => { if (ny && R.on) levande(); });
     const pa = document.getElementById('rum-kupong');
@@ -3768,7 +3769,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (poddReq && Date.now() - poddAt < 5 * 60000) return poddReq;
     poddAt = Date.now();
     poddReq = fetch('data/poddsidor.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
-      .then((t) => { poddData = t && Array.isArray(t.sidor) ? t : null; return poddData; });
+      .then((t) => {
+        poddData = t && Array.isArray(t.sidor) ? t : null;
+        // (veckans bild på framsidan står också i matchbladen)
+        if (R.on) tidningPult();
+        return poddData;
+      });
     return poddReq;
   }
   // Sidorna för omgångens matcher, högst tio dagar gamla.
@@ -3806,8 +3812,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const ids = R.summa.rader.map((r) => String(r.id));
       return {
         ...u, id: R.summa.id, efter: R.summa, citat: g ? { notes: g.notes || {}, efter: g.efter || {} } : null, liga: tidningsLiga(R.summa.id, true),
-        matcher: ids.map((id) => ({ id, avspark: typeof matchById === 'function' && matchById(id) ? matchById(id).kickoff : null })),
+        matcher: R.summa.rader.map((r) => ({ nr: r.nr, id: String(r.id), h: r.h, b: r.b, hemma: r.hemma, borta: r.borta,
+          avspark: typeof matchById === 'function' && matchById(String(r.id)) ? matchById(String(r.id)).kickoff : null })),
         notiser: notiserFor({ id: R.summa.id, ids }),
+        poddsidor: poddsidorFor({ id: R.summa.id, ids }),
         datum: Number.isFinite(sista) ? Math.min(Date.now(), sista + 20 * 3600e3) : Date.now(),
       };
     }
@@ -3815,17 +3823,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const rub = R.saker && R.saker.rubrik ? R.saker.rubrik() : null;
     let f = infor(rd, rub, true);
     let id = rd && rd.id;
-    let namn = rd && f ? rd.name : null;
     if (!f) {
       const c = (R.old || []).find((x) => x && (x.rows || []).length && !(window.Historik && Historik.hidden && Historik.hidden(x)));
       if (c) {
         id = c.id || null;
-        namn = c.name || null;
         f = infor({ id, ids: c.rows.map((r) => String(r.id)) }, null, true);
       }
     }
     const forst = f ? Math.min(...avsparkar(f.matcher.map((x) => x.id))) : NaN;
-    return { ...u, ...(f || { matcher: [] }), id, namn, datum: Number.isFinite(forst) ? Math.min(Date.now(), forst - 18 * 3600e3) : Date.now() };
+    return { ...u, ...(f || { matcher: [] }), id, datum: Number.isFinite(forst) ? Math.min(Date.now(), forst - 18 * 3600e3) : Date.now() };
   }
   // Det som står i tidningen inför omgången rd: matcherna, notiserna, Tipsligan och Veckans analys (om matchen
   // som löpsedeln handlar om, rub, annars den jämnaste som inte har börjat). Är alla matcherna spelade finns
@@ -3837,7 +3843,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const m = matchById(id);
       if (!m) return null;
       const a = per.get(String(id));
-      return { nr: i + 1, id: String(id), h: short(m.home), b: short(m.away), avspark: m.kickoff, pr: m.j && m.j.p ? m.j.p : m.f ? m.f.p : null, expert: a && a.tip ? tecknen(a.tip.signs) : '', klar: Boolean(m.completed) };
+      return { nr: i + 1, id: String(id), h: short(m.home), b: short(m.away), hemma: m.home, borta: m.away, avspark: m.kickoff, pr: m.j && m.j.p ? m.j.p : m.f ? m.f.p : null, expert: a && a.tip ? tecknen(a.tip.signs) : '', klar: Boolean(m.completed) };
     }).filter(Boolean);
     // en omgång som är färdigspelad utan sammanställning (dolda resultat) har ingen tidning inför sig
     if (!matcher.length || (!gammal && matcher.every((x) => x.klar))) return null;

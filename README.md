@@ -905,8 +905,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   passar omgången eller bara vilken helgarderat-upplaga/nummer det handlar om". Framsidan har nu bara namnet, numret
   stort med omgångens dag och namn, och ett av veckans foton av lagen med notisens rubrik; utan bild står numret ensamt.
   Rubriken, kupongen med datorns tecken, *Spika*, *Rysaren*, puffarna och efter omgången gängets rätt och rätt rad är
-  borta, och sidan *Åtta knep* också. Löpsedeln gör inte längre reklam för knepen. Se *Framsidan* under
-  [Tidningen](#tidningen).
+  borta, och sidan *Åtta knep* också. Löpsedeln gör inte längre reklam för knepen. Sedan: "Kör den med en bild -
+  skippa den där rubriken under: ”Näten på City Ground håller fint”" och "Gör det snyggt utan den!": omgångens namn är
+  borta, dagen står mellan två tunna streck, och det finns alltid en bild – matchbladens foton, som GitHub Actions
+  hämtar, före notisernas, och lagens sköldar när inget foto finns. Se *Framsidan* under [Tidningen](#tidningen).
 - **Tidningen på riktigt tidningspapper (2026-11-10, användarens önskemål):** "Kan du ordna så att tidningen ser mer
   'äkta' ut - med riktigt papper etc. Just nu ser den inte helt verklighetstrogen ut". Helgarderat såg ut som ett tryckt
   kort: vitt och jämnt papper med ett prickraster över allt, mättade färger, en tom ruta under kupongens rader och en
@@ -7189,21 +7191,27 @@ om"):
 
 - överst veckan, datumet och priset (3 kr, tre rader), och namnet *HELGARDERAT* i flaskgrönt i Alfa Slab One med
   rutorna 1, X och 2 framför, ikryssade med kulspetspenna som på Helgarderats egen sida, och dubbla streck under;
-- numret stort i grönt (*Nr 1*, räknat som på Helgarderats egen sida), med omgångens dag under (*Inför lördagen den 14
-  november*, efter omgången *Efter …*) och omgångens namn (*”Näten på City Ground håller fint”*);
-- veckans bild, rastrerad i svartvitt som tidningens andra bilder: ett av veckans foton av lagen (`bilder` i
-  `data/tidning.json`, se *Veckans bilder i tidningen* under [Analyserna](#analyserna)), med notisens rubrik och
-  fotografen under. Den är helst ur notisen om matchen som *Veckans analys* handlar om (efter omgången skrällen), annars
-  den första i kupongens ordning som har ett foto (`veckansBild`). Notiserna hämtas när rummet fylls, högst var femte
-  minut, och framsidan ritas om när de har kommit (`hamtaNotiser` och `tidningPult` i rum.js). Hos Hasse Backe ritas
-  bilden på nytt i kopian.
+- numret stort i grönt (*Nr 1*, räknat som på Helgarderats egen sida), med omgångens dag under mellan två tunna
+  streck (*Inför lördagen den 14 november*, efter omgången *Efter …*). Omgångens namn stod också där en stund, men
+  togs bort ("skippa den där rubriken under");
+- veckans bild, alltid ("Kör den med en bild"), rastrerad i svartvitt som tidningens andra bilder: ett av veckans
+  foton av lagen, i första hand matchbladets (`bilder` i `data/poddsidor.json`, filerna i `data/matchbilder/`, som
+  GitHub Actions hämtar till varje omgång) med matchbladets rubrik, annars notisens (`bilder` i `data/tidning.json`,
+  som iMacen hämtar, se *Veckans bilder i tidningen* under [Analyserna](#analyserna)) med notisens rubrik, och
+  fotografen under. Den är helst om matchen som *Veckans analys* handlar om (efter omgången skrällen), annars den
+  första i kupongens ordning som har ett foto (`veckansBild`). Finns inget foto står lagens sköldar för samma match
+  där, tryckta direkt på papperet (`genom` i `RumTidning.rastrera`: svärtan som täckning, utan vit ruta), med matchen
+  och avsparken, efter omgången resultatet. Bilden och rubriken står mitt i det utrymme som blir över. Notiserna och
+  matchbladen hämtas när rummet fylls, högst var femte minut, och framsidan ritas om när de har kommit
+  (`hamtaNotiser`, `hamtaPoddsidor` och `tidningPult` i rum.js). Hos Hasse Backe ritas bilden på nytt i kopian.
 
-Finns ingen bild står numret ensamt, större, mitt på sidan. Förut stod där en rubrik (*Här är den säkra raden*), kupongen
+Utan omgång och utan sköldar står numret ensamt, större. Förut stod där en rubrik (*Här är den säkra raden*), kupongen
 med datorns tecken, *Spika* och *Rysaren* och en puff för *Åtta knep*, och efter omgången gängets rätt och rätt rad;
 sidan *Åtta knep* är också borta. Texterna står i `TEXT.forsta` och kollas av `npm run repliker`.
 
-Provat 2026-11-10 i headless Chromium med en påhittad `data/tidning.json` (fem notiser, en med foto) och utan den, på
-pulten med högen och framme, och efter omgången med Node. Inte provat med veckans riktiga bilder, som iMacen hämtar.
+Provat 2026-11-10 i headless Chromium med påhittade matchblad med foto, en påhittad `data/tidning.json` (fem notiser,
+en med foto) och utan båda (sköldarna, med två sköldar ur rummet i lagens ställe), på pulten med högen och framme, och
+efter omgången med Node. Inte provat med veckans riktiga bilder och sköldar, som bygget och iMacen hämtar.
 
 #### Helgarderat
 

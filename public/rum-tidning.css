@@ -226,21 +226,24 @@
 .hf-rutor .r { fill: none; stroke: var(--hf-gron); stroke-width: 3.4; }
 .hf-rutor text { fill: var(--hf-gron); font: 800 19px/1 Fraunces, Georgia, serif; }
 .hf-rutor .k { fill: none; stroke: var(--hf-penna); stroke-width: 4.6; stroke-linecap: round; opacity: 0.9; }
-/* numret: stort i grönt, med omgångens dag och namn under */
-.hf-numret { display: flex; flex-direction: column; align-items: center; margin: 3.4px 0 3px; text-align: center; }
-.hf-numret b { color: var(--hf-gron); font: 400 17px/0.92 Anton, Impact, sans-serif; letter-spacing: 0.2px; text-transform: uppercase; }
-.hf-numret span { margin-top: 1.6px; font: 800 2.9px/1.2 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.3px; text-transform: uppercase; }
-.hf-numret em { margin-top: 1px; font: italic 600 3.8px/1.2 Georgia, Fraunces, serif; }
+/* numret: stort i grönt, med omgångens dag under mellan två tunna streck */
+.hf-numret { display: flex; flex-direction: column; align-items: center; margin: 3.6px 0 3.4px; text-align: center; }
+.hf-numret b { color: var(--hf-gron); font: 400 19px/0.9 Anton, Impact, sans-serif; letter-spacing: 0.2px; text-transform: uppercase; }
+.hf-numret span { display: flex; align-items: center; gap: 2.4px; align-self: stretch; margin-top: 2px; font: 800 2.9px/1.2 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.35px; text-transform: uppercase; white-space: nowrap; }
+.hf-numret span::before, .hf-numret span::after { content: ""; flex: 1 1 auto; border-top: 0.4px solid var(--hf-svart); }
 .hf-forsta.utan-bild .hf-numret { flex: 1 1 auto; justify-content: center; margin: 0 0 12px; }
 .hf-forsta.utan-bild .hf-numret b { font-size: 42px; }
-.hf-forsta.utan-bild .hf-numret span { margin-top: 3px; font-size: 4px; }
-.hf-forsta.utan-bild .hf-numret em { margin-top: 1.6px; font-size: 5px; }
-/* veckans bild över hela bredden, med rubriken under */
-.hf-bild { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; margin: 0; padding-top: 2.4px; border-top: 0.6px solid var(--hf-svart); }
+.hf-forsta.utan-bild .hf-numret span { margin-top: 3px; font-size: 3.6px; }
+/* veckans bild över hela bredden, med rubriken och fotografen under; utan foto lagens sköldar */
+/* (bilden och rubriken mitt i det som blir över, så att det inte står en tom remsa längst ned) */
+.hf-bild { display: flex; flex-direction: column; justify-content: center; flex: 1 1 auto; min-height: 0; margin: 0; padding-bottom: 3px; }
 .hf-foto { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; background: #cbc4b4; }
-.hf-bild figcaption { margin-top: 2px; }
-.hf-bild figcaption b { display: block; font: 400 7px/1 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.1px; }
-.hf-bild figcaption small { display: block; margin-top: 1px; color: var(--hf-gra); font: 600 2.3px/1.2 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; }
+.hf-skoldar { display: flex; align-items: center; justify-content: center; gap: 4px; aspect-ratio: 2 / 1; background: none; }
+.hf-skoldar canvas, .hf-skoldar span { width: 42%; height: auto; aspect-ratio: 1; }
+.hf-skoldar i { color: var(--hf-gron); font: 400 12px/1 Anton, Impact, sans-serif; font-style: normal; }
+.hf-bild figcaption { margin-top: 2.2px; }
+.hf-bild figcaption b { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; font: 400 6.6px/1.02 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.1px; }
+.hf-bild figcaption small { display: block; margin-top: 1.1px; color: var(--hf-gra); font: 600 2.3px/1.2 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; }
 
 /* framme: framsidan överst på första arket */
 .tn .hf-forsta { flex: none; }
