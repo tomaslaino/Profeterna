@@ -1473,6 +1473,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hela namn i löptext (Omgångens tippare, *Tippade inte:* och *Ta bort kupongen?*) står nu samma korta namn
   för alla, så att inte bara en heter något annat. Hela namnet står kvar där det måste: Om oss, tryckt
   under autograferna på visitkortet (autografen är *Dogge*) och när man pekar på ett namn.
+- **Gröna växter i fönstret och på barbordet (2026-11-10, användarens önskemål):** "en snygg grön växt i
+  fönstret och en till någonstans på barbordet – så att det blir lite grönt", och "det får inte dra speciellt
+  mycket grafik … gamla mobiler och datorer ska kunna klara av sidan". En ampellilja i lerkruka på
+  fönsterbänkens vänstra ände och en liten pilea i en glaserad kruka fram till vänster på barbordet, båda i ett
+  enda ritanrop med pennkoppens material. Se [Tobaksaffären](#tobaksaffären), *Växterna*.
 - **Kuponghistoriken flyttar till Olympen (2026-10-20, användarens önskemål):** Kupong
   handlar bara om nästa kupong – växlaren Omgången | Historik försvinner. De färdigspelade
   kupongerna står sist i Olympen under rubriken *Grupparbetena* (`#olympen/kuponger`, en
@@ -3371,6 +3376,20 @@ fönstret (`malat` och `MAL` i rum-inredning.js, i takets duk): ett band i oxidr
 bokstäver i Alfa Slab One, och en stjärna och två linjer på vardera sidan. Färgen har nötts, så att
 panelens ådring och fogar syns igenom. Det är färg och inget föremål, så det har ingen kropp och
 ingen skugga. Det leder ingenstans, och på natten mörknar det med lysröret.
+
+**Växterna** (2026-11-10, [public/rum-vaxter.js](public/rum-vaxter.js), `vaxter`, `LILJA` och `PILEA` i
+rum-3d.js): en ampellilja i en lerkruka på ett fat står bakåt på fönsterbänkens vänstra ände, med långa
+randiga blad som böjer sig utåt och ner och två revor med småplantor som hänger över bänkens ände, och en
+liten pilea (pannkaksväxt) med runda blad i en senapsgul glaserad kruka står fram till vänster på
+barbordet, framför pennkoppen och vänster om tårtan. Där är bordets enda fläck som inget annat når: huvudet
+på den som sover eller dunkar pannan i bordet, händerna, skyltarna och tårtan håller sig minst 13 därifrån
+i alla tre placeringarna (uppmätt i 3D). Ampelliljan står där varken DJ:s tomflaskor eller den som går
+iväg kommer nära, och bladen sträcker sig åt sidorna och bakåt, inte fram över bänkens kant. Rummet ska
+klara gamla telefoner och datorer, så växterna kostar nästan inget: båda är en geometri med färgen i
+hörnen, ett ritanrop (två med skuggkartan) och drygt 5 000 trianglar mot flera hundra tusen för gänget,
+och de ritas med pennkoppens material, så att ingen ny shader behöver kompileras. Materialet ritar bara
+framsidan, så bladen har båda sidorna i geometrin. Ingenting rör sig. I en stående telefon syns pilean,
+men ampelliljan hamnar nästan helt utanför bilden till vänster.
 
 **Gänget** sitter på barstolar runt ett runt barbord framför fönsterbänken, med benen
 hängande: DL och DJ på sidorna, vända in mot bordet, och DT bakom (`BORD` och `FIGS` i
