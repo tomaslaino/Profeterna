@@ -1079,6 +1079,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   så att siffrorna går att läsa på håll, varannan rad är tonad hela vägen över och kupongens spalt har en linje mot de
   andras. Under bladet står *Hasse, hur räknas poängen?*, och han svarar från baren som vid anslagstavlan; det som båda
   använder ligger i [public/rum-hasse-svar.js](public/rum-hasse-svar.js). Se *Sammanställningen efter omgången*.
+- **Protokollet på skrivmaskin, tydligt också i svartvitt (2026-11-10, användarens önskemål):** "kan du ordna så att
+  kolumnerna under rubriken där det står kupong, laino etc - där det står X2 osv i olika färger - att de görs om - antingen i en
+  snyggare font så att det blir tydligt eller på något annat sätt", "även för någon som har svart-vit skärm. Det är fortfarande
+  viktigast att kupongpoängen som vi alla delar på (i det här fallet 10/13) blir tydligast!", och om omgångens namn: "Det här kan
+  du f ö också skriva med skrivmaskinstext". Tecknen stod för hand i fem bläck, lite snett, och rätt syntes bara på den gröna
+  märkpennan, som i svartvitt blir nästan osynlig. Nu står allt ifyllt på skrivmaskin i samma svarta färgband – omgångens namn,
+  namnen under porträtten, tecknen, var och ens rätt och poängen – och det som inte satt står ljusgrått, så att det som satt
+  syns i ljushet och inte bara i färg. Var och ens rätt är mindre än förut, så att kupongens *10/13* med rödpennan, inringat,
+  är det enda handskrivna på raden och syns först. Provat i headless Chromium i färg och i gråskala, i den breda och den
+  smala versionen och med sex spalter. Se *Sammanställningen efter omgången*.
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -6506,16 +6516,19 @@ och de nya raderna har Tomas röst först när iMacen har läst upp dem (till de
 När alla matcher i omgången är spelade ligger bara Hasse Backes protokoll på pulten, i kupongens ställe, tills
 nästa kupong kommer måndagen efter kl. 16 ([public/rum-block.js](public/rum-block.js), [public/rum-block.css](public/rum-block.css)): en blankett ur
 samma tryckeri som kupongen – samma papper, bandet i terrakotta (*Protokoll*, med kupongens nummer), synkmarkeringarna i
-vänsterkanten, tryckta linjer, varannan rad tonad hela vägen över och tryckeriets rad längs högerkanten. Omgångens namn står för hand på
-en tryckt rad under bandet. Raderna har resultat och facit på skrivmaskin, och spalterna är kupongen (gängets tre
-ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton. Allas tecken står kvar i var och ens
-bläck, så att man ser vad var och en spelade, och det som satt är överstruket med grön märkpenna. Handstilen och
-märkpennans drag är lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången,
-raden och spalten). Överst, direkt under porträtten, står *Rätt av 13* stort: det ska synas också på håll, när bladet ligger
+vänsterkanten, tryckta linjer, varannan rad tonad hela vägen över och tryckeriets rad längs högerkanten. Allt ifyllt står på
+skrivmaskin utom Hasses röda penna: omgångens namn på en tryckt rad under bandet, resultaten och facit, och spalterna, som är
+kupongen (gängets tre ansikten), var och en i gänget och Hasse, med porträtten uppklistrade som foton och namnet under.
+Allas tecken står kvar i samma svarta färgband, så att man ser vad var och en spelade och kan läsa spalterna rakt ned;
+det som satt är överstruket med grön märkpenna och står i full svärta, och det som inte satt står ljusgrått. Rätt och fel
+skiljer sig alltså i ljushet och inte bara i färg, så att bladet går att läsa också på en svartvit skärm. Märkpennans drag är
+lite olika i varje ruta, men samma omgång ser likadan ut varje gång (slumpen utgår från omgången, raden och spalten).
+Överst, direkt under porträtten, står *Rätt av 13* stort: det ska synas också på håll, när bladet ligger
 på pulten, och där är det bladets nederkant som hamnar utanför bilden (bladet ligger i skala 0,76 på pulten). Kupongen är allas,
 och dess rätt är omgångens betyg, skrivet som kupongens betyg på papperet under Kupong (*10/13* med Hasses röda rättningspenna,
 inringat och lite snett, `betygRing` i rum-block.js som `ring` i papper.js). Det sticker ut åt vänster, in i den tomma delen av
-raden, och är det enda röda på raden: var och ens rätt står i det egna bläcket. Sist står poängen. Vinnaren är inringad, både på
+raden, och är det enda handskrivna och röda på raden: var och ens rätt står mindre på skrivmaskin. Sist står poängen, också på
+skrivmaskin. Vinnaren är inringad, både på
 porträttet och runt poängen; utöver betyget är det de enda ringarna på blocket. Hasse har rättat det och skrivit under, och mer står inte där:
 domarna över gänget säger han i baren (se [Hasse Backe](#hasse-backe), *Domarna efter omgången*). Förut stod en dom per
 person längst ner (ändrat 2026-11-08). I telefonen försvinner namnen under porträtten. Har Hasse ingen kupong i omgången
