@@ -1137,6 +1137,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   datorns chans, poäng och spelkassa, och datorns och analysens råd som jämförelse; datorn och spelbolagen före avspark med
   facit överstruket), *Matchen* (mål, kort och statistik), *Prognos*, *Analys* (tipset rättat, först), *Startelvor* och
   *Tabellen*. Se *Matchbladet efter matchen* under [Sammanställningen efter omgången](#sammanställningen-efter-omgången).
+- **Matchbladet efter matchen i protokollets färger (2026-11-10, användarens önskemål):** "Det är lite fööör mycket färger
+  på de där kupongerna - kan du ordna så att det blir bra/snyggt, passar med temat". Bladet efter matchen har nu bara
+  protokollets färger: papperet, skrivmaskinens svart, tryckets terrakotta, den gröna märkpennan över facit och det som satt,
+  och en penna i taget. Kupongens rutor (datorn och spelbolagen, och *Prognos*) har chansen på skrivmaskin under varje ruta i
+  stället för den blå, grå och orange stapeln, datorn är en svart ruta i stället för videons blå, statistiken under *Matchen*
+  står i bläck (den som leder mörkare) i stället för i lagens färger, bytenas pilar är svarta, och analysens ringar är samma
+  blå penna som raden i marginalen – de var röda, eftersom protokollets röda penna (`.rb-ring path` i rum-block.css) tog över
+  också i matchbladet före matchen.
 - **Kupongens rätt som omgångens betyg i protokollet (2026-11-09, användarens önskemål):** "Går det att göra totalpoängen
   för oss alla - vår gemensamma rad - ännu tydligare? Kanske ringa in nån siffra eller annat. Jag är öppen för förslag - men
   gör det tydligare!" Kupongens rätt skrivs nu som kupongens betyg på papperet under Kupong: *10/13* med rödpennan, inringat
@@ -6731,15 +6739,17 @@ den ordning man vill veta hur det gick:
   överstruket med märkpennan när det satt och svagare när det inte satt, med rödpennans stjärna när ingen annan i gänget
   hade rätt, och efter det datorns chans för tecknet före avspark, poängen (samma regel som raden Poäng: rätt minus
   chansen) och spelkassan (10 kr till datorns odds, som i Olympen och på lappen under domen). Överst hur många som hade
-  rätt. Under tipsen datorn och spelbolagen före avspark sida vid sida (under varandra i telefonen) i kupongens rutor med
-  chansen i stapeln under, som på *Prognos* och *Lagen*, och facit överstruket med märkpennan: hur troligt datorn tyckte att
-  det var och vad det betalade. Allt räknas ur protokollets sammanställning (`RumBlock.match`), så att poängen per match
+  rätt. Under tipsen datorn och spelbolagen före avspark sida vid sida (under varandra i telefonen) i kupongens rutor, med
+  chansen på skrivmaskin under varje ruta och facit överstruket med märkpennan: hur troligt datorn tyckte att det var och vad
+  det betalade. Bladet efter matchen har bara protokollets färger (papperet, skrivmaskinens svart, tryckets terrakotta, den
+  gröna märkpennan och en penna i taget), så lagens blå och terrakotta staplar står inte här. Allt räknas ur protokollets sammanställning (`RumBlock.match`), så att poängen per match
   summerar till raden Poäng (kontrollerat för de tre frysta omgångarna); bara spelbolagen och analysen hämtas.
 - **Matchen** – matchrutans *Matchen* ([public/matchruta.js](public/matchruta.js)): målen, korten och bytena som en
-  tidslinje till vänster och statistiken till höger (under varandra i telefonen), och publiken, hämtade från ESPN när sidan
-  tas fram.
+  tidslinje till vänster och statistiken till höger (under varandra i telefonen), med staplarna i bläck och den som leder
+  mörkare, och publiken, hämtade från ESPN när sidan tas fram.
 - **Prognos** – som förut, med facit och resultatet bland de troligaste överstrukna.
 - **Analys** – det rättade tipset först (facit överstruket och om det satt till höger om rubriken), och artikeln under.
+  Tecknen är inringade med samma blå penna som raden i marginalen, också före matchen.
 - **Startelvor** och **Tabellen** – som förut.
 
 Sidan man har framme följer med till nästa match under besöket, för sig och skild från bladet före matchen. Krysset, Esc,

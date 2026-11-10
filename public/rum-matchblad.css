@@ -129,6 +129,9 @@
 .rb-ruta > i, .rb-ruta > b, .rb-tecknet > b { position: relative; }
 .rb-ruta.fel > i, .rb-ruta.fel > b, .rb-tecknet.fel > b { opacity: 0.42; }
 .rum-blad .rb-ruta .rb-mp, .rum-blad .rb-tecknet .rb-mp { left: 3px; top: 2px; width: calc(100% - 6px); height: calc(100% - 4px); }
+/* chansen under rutorna på skrivmaskin, facit i full svärta */
+.rb-chanser { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 4px; font: 400 11.5px/14px var(--skriv); color: rgba(34, 31, 27, 0.45); text-align: center; font-variant-numeric: tabular-nums; }
+.rb-chanser .ratt { color: var(--pp-ink); }
 .rum-blad .tug-stack span { overflow: hidden; font: 600 9px/13px var(--sans); color: #fff; text-align: center; font-variant-numeric: tabular-nums; }
 
 /* ---------- Lagen ---------- */
@@ -197,6 +200,8 @@
 .rb-tecknet b { font: 700 15px/1 var(--display); color: var(--pp-ink); }
 .rb-ring { position: absolute; top: -26%; left: -18%; width: 136%; height: 152%; overflow: visible; fill: none; stroke: var(--pp-pen); stroke-width: 1.8; stroke-linecap: round; pointer-events: none; }
 .rb-ring path { vector-effect: non-scaling-stroke; }
+/* (samma penna som raden i marginalen: protokollets röda penna, .rb-ring path i rum-block.css, är Hasses) */
+.rb-tecknet .rb-ring path { stroke: var(--pp-pen); stroke-width: 1.8; }
 .rb-tecknet em { position: absolute; left: calc(100% + 10px); bottom: 7px; font: 700 21px/1 var(--pp-hand); font-style: normal; white-space: nowrap; color: var(--pp-pen); transform: rotate(-5deg); transform-origin: left bottom; pointer-events: none; }
 
 /* ---------- Startelvor (matchruta.js, tryckt som i matchbladet) ---------- */
@@ -318,8 +323,8 @@
 .rr-vem .rb-lag img { width: 14px; height: 17px; border-width: 1px; }
 .rr-vem .rb-lag img + img { margin-left: -4.5px; }
 /* datorn: videons blå ruta (rum-video.css), och analysen: en tidningsspalt */
-.rr-ik.dator { position: relative; background: radial-gradient(ellipse 80% 75% at 50% 45%, #2f52e0, #2441c4 60%, #1a2f96); }
-.rr-ik.dator i { position: absolute; left: 3px; bottom: 4px; width: 6px; height: 2px; background: #f4f6ff; }
+.rr-ik.dator { position: relative; background: #2a2520; }
+.rr-ik.dator i { position: absolute; left: 3px; bottom: 4px; width: 6px; height: 2px; background: var(--pp-box); }
 .rr-ik.art { background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(34, 31, 27, 0.45) 3px 4px) 3px 3px / 10px 13px no-repeat, #f4efe3; }
 /* tecknet på skrivmaskin, som i protokollet */
 .rr-t { display: flex; align-items: center; justify-content: center; height: 27px; font: 400 17px/1 var(--skriv); color: var(--pp-ink); }
@@ -356,14 +361,16 @@
 .rum-blad .mr-ht span { font-family: var(--tryck); font-size: 9.5px; letter-spacing: 0.16em; color: var(--pp-faint); }
 .rum-blad .mr-b.goal { width: 11px; height: 11px; border-color: var(--pp-ink); background: var(--pp-box) radial-gradient(circle, var(--pp-ink) 0 2px, transparent 2.4px); }
 .rum-blad .mr-b.goal.own { background-color: color-mix(in srgb, var(--pp-no) 35%, var(--pp-box)); }
-.rum-blad .mr-b.yc, .rum-blad .mr-b.rc { width: 8px; height: 11px; border-radius: 1px; box-shadow: 0 0 0 1px rgba(34, 31, 27, 0.35); }
-.rum-blad .mr-b.sub::before { color: var(--pp-ok); }
-.rum-blad .mr-b.sub::after { color: var(--pp-no); }
+.rum-blad .mr-b.yc, .rum-blad .mr-b.rc { width: 8px; height: 11px; border-radius: 1px; background: #dcbc52; box-shadow: 0 0 0 1px rgba(34, 31, 27, 0.35); }
+.rum-blad .mr-b.rc { background: #c8281e; }
+.rum-blad .mr-b.sub::before, .rum-blad .mr-b.sub::after { color: var(--pp-ink-soft); }
 .rum-blad .mr-stat { grid-template-columns: 40px minmax(0, 1fr) 40px; row-gap: 3px; padding: 3px 0 4px; }
 .rum-blad .mr-stat > b { font: 400 14px/1.1 var(--display); color: var(--pp-ink); }
 .rum-blad .mr-stat > span { font-size: 11px; color: var(--pp-ink-soft); }
 .rum-blad .mr-bar { gap: 2px; height: 4px; }
-.rum-blad .mr-bar i { border-radius: 1px; opacity: 0.35; }
+/* staplarna i bläck och inte i lagens färger: den som leder mörk, den andra ljus */
+.rum-blad .mr-matchen .mr-bar i { border-radius: 1px; background: var(--pp-ink); opacity: 0.14; }
+.rum-blad .mr-matchen .mr-stat.h .mr-bar i:first-child, .rum-blad .mr-matchen .mr-stat.a .mr-bar i:last-child { opacity: 0.5; }
 .rum-blad .mr-facts { grid-column: 2; margin: 6px 0 0; padding-top: 5px; border-top: 1px solid var(--pp-line); font-size: 11.5px; color: var(--pp-ink-soft); }
 .rum-blad .mr-facts b { font-weight: 400; color: var(--pp-ink); }
 
@@ -416,7 +423,7 @@
 .rum.smal .rl-m { gap: 2px; }
 .rum.smal .rl-m b { height: 30px; font-size: 12.5px; line-height: 27px; border-width: 1.3px; }
 .rum.smal .rl-m small { font-size: 8.5px; letter-spacing: -0.03em; }
-.rum.smal .rb-rutor { gap: 7px; }
+.rum.smal .rb-rutor, .rum.smal .rb-chanser { gap: 7px; }
 .rum.smal .rb-ruta { gap: 6px; }
 .rum.smal .rb-ruta b { font-size: 21px; }
 .rum.smal .rb-steg { grid-template-columns: 158px minmax(0, 1fr); gap: 6px; font-size: 11px; }

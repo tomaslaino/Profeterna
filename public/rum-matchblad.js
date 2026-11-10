@@ -132,12 +132,15 @@ window.RumMatchblad = (() => {
   const prick = (cls) => `<i class="rl-prick ${cls}"></i>`;
 
   // 1 X 2 ser likadant ut på Lagen och Prognos: kupongens tre rutor med oddset stort,
-  // och under dem chansen i procent i stapeln. Efter matchen (facit: 0–2) är facit överstruket
-  // med märkpennan, som i protokollet, och de andra två rutorna svagare.
+  // och under dem chansen i procent i stapeln. Efter matchen (facit: 0–2) är det protokollets
+  // färger och inga andra: facit överstruket med märkpennan och de andra två rutorna svagare,
+  // och chansen på skrivmaskin under varje ruta i stället för den färgade stapeln.
   function trio(lab, tal, p, facit = null, key = '') {
     const cls = (i) => (facit == null ? '' : i === facit ? ' ratt' : ' fel');
     const mp = (i) => (i === facit && window.RumBlock ? RumBlock.strykning(`${key}${i}`, 3) : '');
-    return `<div class="rb-rutor">${tal.map((v, i) => `<span class="rb-ruta${cls(i)}" title="${esc(`${lab[i]}: ${p[i]} %${i === facit ? ' – facit' : ''}`)}">${mp(i)}<i>${'1X2'[i]}</i><b>${v}</b></span>`).join('')}</div>` +
+    const rutor = `<div class="rb-rutor">${tal.map((v, i) => `<span class="rb-ruta${cls(i)}" title="${esc(`${lab[i]}: ${p[i]} %${i === facit ? ' – facit' : ''}`)}">${mp(i)}<i>${'1X2'[i]}</i><b>${v}</b></span>`).join('')}</div>`;
+    if (facit != null) return rutor + `<div class="rb-chanser">${p.map((v, i) => `<span${cls(i) ? ` class="${cls(i).trim()}"` : ''}>${v}&nbsp;%</span>`).join('')}</div>`;
+    return rutor +
       `<div class="tug-stack">${p.map((v, i) => `<span class="s${i}" style="flex:${v} 1 0">${v >= 6 ? `${v}&nbsp;%` : ''}</span>`).join('')}</div>`;
   }
 
