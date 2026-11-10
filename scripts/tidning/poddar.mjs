@@ -290,11 +290,10 @@ function visa(fil) {
     console.log(`\n=== ${s.match}${s.redigerad ? '' : ' (oredigerad)'}\n${s.rubrik || '(ingen rubrik)'}\n${s.ingress || ''}`);
     for (const d of s.delar) {
       console.log(`\n  ${d.lag}${d.kallor.length ? ` – ${d.kallor.map((k) => `${k.typ === 'forum' ? 'forumet ' : k.typ === 'media' ? 'insatta ' : ''}${k.podd} (${k.datum})`).join(', ')}` : ' – ingen podd, inget forum och inget från de insatta den här veckan'}`);
-      for (const g of d.grupper) {
-        console.log(`   ${pc.amnen[g.amne]}`);
-        for (const p of g.punkter) console.log(`    [${p.s}${p.typ && p.typ !== 'podd' ? ` ${p.typ}` : ''}] ${p.t}${p.citat ? `\n        ”${p.citat.sagt}” (${[p.citat.vem, p.citat.podd].filter(Boolean).join(', ')})` : ''}`);
-      }
+      for (const t of d.text || []) console.log(`    ${t}`);
     }
+    if (s.summering) console.log(`\n  Sammanfattning: ${s.summering}`);
+    if (s.citat) console.log(`  ”${s.citat.sagt}” (${[s.citat.vem, s.citat.podd, s.citat.datum].filter(Boolean).join(', ')})`);
   }
 }
 
@@ -313,7 +312,7 @@ async function sidorna(fil, matcher) {
     fil.uppdaterad = new Date().toISOString();
     skrivJson(OMGANG, fil);
     n++;
-    logg(`sidan ${m.lagen.join(' – ')}: ${s.delar.map((d) => d.grupper.reduce((a, g) => a + g.punkter.length, 0)).join(' + ')} punkter${s.redigerad ? '' : ', oredigerad'} (${s.sekunder} s)`);
+    logg(`matchbladet ${m.lagen.join(' – ')}: ${s.delar.map((d) => (d.text || []).length).join(' + ')} stycken${s.redigerad ? '' : ', oredigerat'} (${s.sekunder} s)`);
   }
   return n;
 }
