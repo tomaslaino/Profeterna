@@ -6280,6 +6280,9 @@ kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderin
 många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
 i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
 på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
+Han talar till den som står vid disken, och det kan vara den han dömer: de övriga är *de andra* eller *resten*, och *vi* är
+han och den han talar med, aldrig gänget, där han inte är med (*Dogge var bäst av er, och det kommer resten att få höra*,
+inte *vi*; 2026-11-10, `npm run repliker` säger till).
 
 Under meningarna ligger *lappen*, en remsa av protokollets blankett om just den kupongen, med samma papper, band och tryck
 (`lapp` i [public/rum-block.js](public/rum-block.js), stilen i [public/rum-block.css](public/rum-block.css)). Överst en spalt
