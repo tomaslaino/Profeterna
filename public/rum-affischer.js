@@ -44,10 +44,8 @@
 // det tipsguiden. Som de andra föremålen leder den inte ut ur rummet: ett klick
 // går fram till den (rum.js).
 //
-// affischer(back, { short, namn, omritad }) → { slit(w, seed), data(rows, old), sedel(), rubrik() }
-//   short: kortare lagnamn, namn: namnet på skårtavlan (rum.js), omritad: när
-//   veckans löpsedel har ritats om (kvällstidningen på pulten har samma
-//   förstasida, tidningPult i rum.js)
+// affischer(back, { short, namn }) → { slit(w, seed), data(rows, old), rubrik() }
+//   short: kortare lagnamn, namn: namnet på skårtavlan (rum.js)
 //   rows: omgångens rader (roundRows i rum.js), old: de färdigspelade
 //   kupongerna (Historik.coupons()); säsongens omgångar läses ur TP.season
 //   (tippare.js).
@@ -607,9 +605,6 @@ function rita(el, r, vagg) {
   const underRader = Math.max(1, Math.ceil((bredd(r.under, UNDER) * 4.6) / BRED));
   const hog = 140 - 6.5 - 18 - 12 - (underRader * 5.52 + 2.5) - (r.plus ? 11.8 : 0) - 5 - 1;
   passa(el, { rad, bred: BRED, hog, max: MAX, topp: 1.55, prick: 0.2, drag: 1.42, sp: 0.2 });
-  // var rubriken slutar på papperet (kanten, raden under och den andra nyheten under den): tidningen på
-  // pulten är så stor att den slutar ovanför kupongerna i högen (tidningPult i rum.js)
-  el.dataset.rub = (140 - 3.5 - (underRader * 5.52 + 2.5) - (r.plus ? 11.8 : 0)).toFixed(1);
 }
 
 // ---------- slitaget och platserna ----------
@@ -655,7 +650,7 @@ function klipp(fro) {
   return `polygon(${p.join(', ')})`;
 }
 
-export function affischer(back, { short = (x) => x, namn = null, omritad = null } = {}) {
+export function affischer(back, { short = (x) => x, namn = null } = {}) {
   if (namn) namnAv = namn;
   if (!document.querySelector('link[href="rum-affischer.css"]')) {
     const css = document.createElement('link');
@@ -684,24 +679,12 @@ export function affischer(back, { short = (x) => x, namn = null, omritad = null 
     Promise.all([document.fonts.load('400 30px Anton'), document.fonts.load('400 30px "Alfa Slab One"')]).then(klar, klar);
   }
   const api = {
-    // Veckans rubrik (rubrik ovan), som tidningen i rum.js utgår från. → { typ, tidning, datum, id … }, eller null
+    // Veckans rubrik (rubrik ovan): Veckans analys i tidningen (rum.js) handlar om matchen den gäller.
+    // → { typ, tidning, datum, id … }, eller null
     rubrik: () => senastR,
-    // Löpsedeln som den sitter, utan tejpen: kvällstidningen i rum.js har samma papper som förstasida, på
-    // pulten och framme, med samma storlekar på raderna, så att de inte kan bli olika. → elementet, eller null
-    sedel() {
-      const ark = l.querySelector('.ark');
-      if (!ark || !senastR) return null;
-      const el = document.createElement('div');
-      el.className = `rum-aff rum-lop tid-${senastR.tidning} rt-sedel`;
-      el.style.setProperty('--blek', l.style.getPropertyValue('--blek'));
-      el.dataset.rub = l.dataset.rub || '';
-      el.append(ark.cloneNode(true));
-      return el;
-    },
     slit(w, seed) {
       for (const el of [f, n, v, c]) bleks(el, w);
       slit(l, w, seed + 5);
-      if (omritad) omritad();
     },
     // rubriken räknas om när datan ändras (rum-saker.js frågar bara då)
     data(rows, old) {
@@ -728,7 +711,6 @@ export function affischer(back, { short = (x) => x, namn = null, omritad = null 
       if (k === ritad) return;
       ritad = k;
       rita(l, r, vagg);
-      if (omritad) omritad();
     },
   };
   return api;

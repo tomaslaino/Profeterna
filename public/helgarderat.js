@@ -4,12 +4,11 @@
 //
 // Tidningen med det supportrarna vet inför lördagens matcher: det intressanta ur lagens supporterpoddar, forum
 // och insatta medier (fansajter, fanzines, nyhetsbrev och oberoende lokala reportrar), en sida per match (samma
-// uppgifter som Supportrarna i tidningen bakom löpsedeln, rum-tidning.js).
+// uppgifter som Supportrarna i tidningen på pulten i rummet, rum-tidning.js, som också heter Helgarderat).
 // Sidan visar veckans nummer ur data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, så länge
 // omgångens sista match är högst tre dagar gammal. Annars visar den provnumret: provomgången som poddjobbet gjorde
 // 2026-11-10 (helgarderat/utkast.json, i samma form). Det första numret (Nr 1, inför lördagen den 14 november 2026)
-// lades i data/poddsidor.json för hand ur samma material, innan nattjobbet hade kört. Var i rummet tidningen ska ligga
-// är inte bestämt.
+// lades i data/poddsidor.json för hand ur samma material, innan nattjobbet hade kört.
 //
 //   Framsidan   namnet med tre ikryssade rutor (1, X och 2: helgarderat), numret, datumet och priset (tre rader,
 //               tre kronor), etta (matchen med mest i), Lördagens matcher med sidnumren, Hört bland
@@ -144,15 +143,9 @@
 
   const sidnr = (s) => s.nr + 1;
   // Numret: det första numret är veckan med lördagen den 14 november 2026 (Nr 1), och sedan ett nummer i veckan,
-  // räknat på veckorna (måndag–söndag) där omgången börjar. Provnumret är ett nollnummer (Nr 0). Båda har veckan.
-  const FORSTA = Date.UTC(2026, 10, 9);
-  function nummer(t) {
-    const [y, m, d] = fYmd.format(new Date(t)).split('-').map(Number);
-    const dag = new Date(Date.UTC(y, m - 1, d));
-    const mandag = dag.getTime() - ((dag.getUTCDay() + 6) % 7) * 864e5;
-    const n = Math.round((mandag - FORSTA) / (7 * 864e5)) + 1;
-    return n >= 1 ? n : null;
-  }
+  // räknat på veckorna (måndag–söndag) där omgången börjar – samma som tidningen på pulten i rummet
+  // (RumTidning.nummer). Provnumret är ett nollnummer (Nr 0). Båda har veckan.
+  const nummer = RT.nummer;
   const numret = (u, lordag) => {
     const nr = u.prov ? 0 : lordag ? nummer(lordag) : null;
     return [nr != null ? `Nr ${nr}` : '', lordag ? `Vecka ${vecka(lordag)}` : ''].filter(Boolean).join(' · ');

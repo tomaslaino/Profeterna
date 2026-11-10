@@ -248,7 +248,7 @@
 /* På natten ligger kupongen i samma mörker som pulten (natten i rum-hasse-arm.js), men går att läsa */
 .rh-kupong::before { content: ""; position: absolute; inset: 0; z-index: 20; pointer-events: none; background: #080608; opacity: calc(0.42 * var(--natt, 0)); }
 .rum.smal .rh-kupong { width: 420px; height: 620px; padding: 0 16px 0 36px; }
-/* Det som ligger på pulten i rummet (pultPapper i rum-hasse.js): kupongen eller protokollet och Tipsguiden, samma
+/* Det som ligger på pulten i rummet (pultPapper i rum-hasse.js): kupongen eller protokollet och Helgarderat, samma
    papper på samma ställe på pultens arm, under notan, koppen och hans händer. Skuggan ligger tätt intill, utan att
    falla åt något håll (ljuset här kommer inte från samma håll som i rummet), och på natten mörknar pappret som
    pulten. Kupongen är borta från pulten medan han har den. */
@@ -259,7 +259,7 @@
 .rh-pa > .rum-block { position: relative; box-shadow: none; }
 .rh-pa-kup { position: relative; display: block; width: 100%; height: 100%; box-sizing: border-box; padding: 0 22px 0 46px; background: var(--pp-grain), var(--pp-kant), linear-gradient(180deg, #f3e9d4, #e7dbc0); color: var(--pp-ink); }
 .rum.smal .rh-pa-kup { padding: 0 16px 0 36px; }
-.rh-pa-tg { display: block; width: 100%; height: 100%; overflow: hidden; }
+.rh-pa-hg { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; }
 .rh-scen:has(> .rh-kupong) > .rh-pulten > .kup { visibility: hidden; }
 /* Hans kryss: samma blyerts med mer tryck, ut över rutans kanter (slarv i rum.js) */
 .rum-kup .kryss.hasse path { stroke-width: 2.8; opacity: 0.92; }
