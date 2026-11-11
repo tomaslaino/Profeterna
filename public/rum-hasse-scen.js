@@ -33,16 +33,19 @@ export const SCEN = {
   DISK: { Y: -290, Z: 185, DJUP: 900 },
   // pultens arm mot en, i pultens mått: dess vänstra kant och bredden (lika bred som benet, som pulten i rummet)
   HORN: { X: 110, B: 900 },
-  VAGG: -1100,
+  // väggen bakom honom (barens mått): så långt bort att det går att komma förbi bakom hans rygg, ungefär 75 cm
+  // mellan ryggen och bardiskens kant. Förut stod disken nästan i ryggen på honom, vid −1100 (ändrat 2026-11-11).
+  VAGG: -1900,
   // var han sitter längs benet, i pultens mått (rum-pult.js): så långt ut mot hörnet att händerna ligger
   // vid geringssnittet, som i rummet. Förut satt han vid x = 0, 27 cm längre in på benet (ändrat 2026-11-09).
   PLATS: 450,
   // Fönstren bakom honom (barens mått), som på baren Bron vid S:t Eriksbron: ett stort glasparti ut mot bron och
-  // Fridhemsplan, från bardiskens skiva och upp förbi bildens överkant. Rutorna (X: vänster och höger kant) sitter
+  // Fridhemsplan, från bardiskens skiva och upp förbi bildens överkant. När väggen flyttades bakåt drogs de ned
+  // (bardisken med dem) och blev bredare, så att de är lika stora i bilden som förut och utsikten står kvar. Rutorna (X: vänster och höger kant) sitter
   // kant i kant, och karmen (KARM bred, mörkgrå som skyltfönstret i rummet) går runt var och en, så att posterna
   // emellan blir dubbelt så breda. Ingen post står bakom hans huvud. Glaset sitter DJUP in i väggen. Väggen
   // (scripts/hasse/bak.html) och utsikten (rum-hasse-ute.js) läser samma mått.
-  FONSTER: { Y0: -278, Y1: 1500, X: [[-4600, -1260], [-1260, 1540], [1540, 4600]], KARM: 34, DJUP: 120 },
+  FONSTER: { Y0: -575, Y1: 1500, X: [[-5400, -1400], [-1400, 1900], [1900, 5500]], KARM: 34, DJUP: 120 },
 };
 
 // Kameran: läget, och axlarna i världen (höger, upp och bakåt; den tittar mot −bak). Rotationen är

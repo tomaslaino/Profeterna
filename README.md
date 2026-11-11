@@ -1213,6 +1213,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   så hög som räcket, ungefär en och en halv våning vid tegelhuset, och stod med fötterna på brons kant, skarpare och
   mörkare än allt annat i utsikten. Nu är den drygt hälften så stor, går på gångbanan bakom räcket med benen
   skymda, och har samma dis som bron och mer oskärpa än förut (knappt hälften av utsiktens; lika oskarp blir den en fläck). Se [Hasse Backe](#hasse-backe), *Utsikten*.
+- **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
+  att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
+  med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
+  syns mellan pulten och bardisken. Fönstren och bardisken är dragna 18 cm nedåt och rutorna bredare, så att
+  glaspartiet är lika stort i bilden som förut och utsikten står kvar. Väggen är ombakad. Se
+  [Hasse Backe](#hasse-backe), *Bilden*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -6196,7 +6202,10 @@ från sidan), 45 cm högre än hans ögon och lutad 14° nedåt, som när man st
 att pulten ses uppifrån som i rummet: koppen ungefär 35° uppifrån och det inre hörnet 39°, mot 17°
 när han satt längre bort bakom en bardisk (ändrat 2026-11-07, se nedan). Pultens arm går fram förbi
 kamerans högra sida, och med ögat 31 cm över hans och 10° lutning såg den ut som en ramp som steg mot
-hörnet; 14 cm högre och 4° mer nedåt ligger den vågrät (ändrat 2026-11-08, väggen ombakad). Benet är vridet 8° (`BAR`),
+hörnet; 14 cm högre och 4° mer nedåt ligger den vågrät (ändrat 2026-11-08, väggen ombakad). Bakom hans rygg
+är det en gång, ungefär 75 cm fram till bardiskens kant, så att folk kommer förbi; golvet (slitna linoleumplattor,
+ljusare där man går) syns mellan pulten och bardisken till höger (`VAGG`; förut stod disken nästan i ryggen på
+honom, ändrat 2026-11-11, väggen ombakad). Benet är vridet 8° (`BAR`),
 så att pultens arm går fram förbi kamerans högra sida, som när man har vänt sig lite mindre än en rät
 vinkel. Eftersom han sitter vid hörnet går armen fram tätt intill en, som pulten man står vid.
 
@@ -6353,7 +6362,8 @@ ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
 Kungsholmen och Fridhemsplan: den gröna bron som kommer in från höger och går bort mot andra sidan, med räcket och
 lyktstolparna, slänten och träden ned mot spåren, vattnet, husraden längs stranden och de två tornhusen där bron
 slutar – det grå höghuset och tegelhuset med den ärgade kupolen, till höger om hans huvud. Glaset är tre stora
-rutor från bardiskens skiva och upp förbi bildens överkant (`FONSTER` i
+rutor från bardiskens skiva och upp förbi bildens överkant, dragna nedåt och bredare när väggen flyttades bakåt så
+att de är lika stora i bilden (`FONSTER` i
 [public/rum-hasse-scen.js](public/rum-hasse-scen.js)), med karmar och poster i samma mörkgrå som skyltfönstret i
 rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna, och barstolen står kvar. Vädret och ljuset
 är rummets (`Vader.nu`, `RumUte.light` och färgerna i `RumUte.farg`, samma som gatan genom skyltfönstret): himlens
