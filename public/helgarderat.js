@@ -14,9 +14,13 @@
 //
 // Användarens önskemål 2026-11-10: "ett matchblad med information. Först en kort introduktion, sen diskussion om ena
 // laget, sen det andra och sist en sammanfattning", snygga artiklar, sobra färger och en aktuell bild för varje match.
+// 2026-11-11 valde användaren utseendet "F, Gula programmet" bland förslagen (ett engelskt matchprogram på löpsedelns
+// gula papper, i svart och rött), "fast utan alla matcher på förstasidan".
 //
-//   Framsidan   namnet med tre ikryssade rutor (1, X och 2: helgarderat), numret, datumet och priset (tre rader,
-//               tre kronor), ettan med bild, tvåan, Lördagens matcher med sidnumren och tre matcher till med bild
+//   Framsidan   ett gult programomslag: numret och priset (tre rader, tre kronor), namnet på ett rött band, lördagens
+//               datum, ettan med bild och programmets märke (rutorna 1, X och 2 ikryssade: helgarderat, och antalet
+//               matcher), och Också i numret: tre matcher till med rubrik och sida. Inte alla matcher; de står ett
+//               matchblad var på sidorna efter
 //   Matchbladen ett per match: rubriken, bilden, introduktionen, hemmalaget, bortalaget och sammanfattningen, och i en
 //               smal spalt bredvid avsparken, källorna med datum och, ibland, ett citat
 //   Baksidan    källorna, avsnitt, forumtrådar och artiklar med datum och länk
@@ -38,7 +42,6 @@
   // resultat och årtal (3–1, 2025–26) bryts inte vid tankstrecket
   const hel = (s) => String(s).replace(/(\d)–(\d)/g, '$1⁠–⁠$2');
   const stor = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
-  const forstaMeningen = (s) => (String(s || '').match(/^.+?[.!?](?=\s|$)/) || [String(s || '')])[0];
 
   // Kortare lagnamn där raden är smal, som på kupongen (Papper.kort i papper.js).
   const KORT = { 'AFC Wimbledon': 'Wimbledon', 'Crewe Alexandra': 'Crewe', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd', 'Milton Keynes Dons': 'MK Dons',
@@ -164,38 +167,45 @@
     return `<p class="hg-kick"><b>${s.nr}</b><span>${esc(l[0])}–${esc(l[1])}</span>${medTid ? `<em>${esc(avspark(s.avspark))}</em>` : ''}</p>`;
   };
 
+  // Rubriken på framsidan: det som kommer efter det första kommatecknet eller tankstrecket, oftast det andra laget,
+  // i rött som på löpsedeln.
+  function tvafarg(r) {
+    const m = String(r).match(/^(.+?(?:,| –))\s+(.+)$/);
+    return m ? `${esc(hel(m[1]))} <span>${esc(hel(m[2]))}</span>` : esc(hel(r));
+  }
+  // Programmets märke över bildens hörn: en svart ring med veckodagen, rutorna 1, X och 2 ikryssade (helgarderat) och
+  // antalet matcher.
+  const marke = (lordag, antal) => `<div class="hg-marke" aria-hidden="true"><span>${esc(lordag ? fVdagLang.format(new Date(lordag)) : 'omgången')}</span>` +
+    `${rutor()}<span>${antal} matcher</span></div>`;
+
   function forstasidan(u) {
     const sidor = u.sidor;
-    const [s1, s2, ...ovriga] = storst(sidor);
+    const [s1, ...ovriga] = storst(sidor);
     const lag1 = s1.lag || [];
     const c = RT.poddCitat(s1.citat);
     const lordag = sidor.map((s) => s.avspark).filter(giltig).sort()[0];
-    const lor = lordag ? `Inför ${fVdagLang.format(new Date(lordag))}en den ${fDagMan.format(new Date(lordag))}` : '';
+    const dagen = lordag ? `${fVdagLang.format(new Date(lordag))} ${fDagMan.format(new Date(lordag))}` : u.datumText;
     const huvud = `<header class="hg-huvud">` +
-      `<div class="hg-overrad"><span>${esc(numret(u, lordag))}</span><span>${esc(stor(u.datumText))}</span><span>Pris 3 kr</span></div>` +
-      `<h1 class="hg-namn">${rutor()}<span>Helgarderat</span></h1>` +
-      `<div class="hg-slogan"><span>Det supportrarna vet</span>${u.prov ? '<span class="hg-stampel">Provnummer</span>' : ''}<span>${esc(lor)}</span></div></header>`;
-    const ettan = `<article class="hg-etta">${figur(s1)}${kick(s1)}` +
-      `<h2><a href="#sida-${sidnr(s1)}">${esc(hel(s1.rubrik || T.rubrik(lag1[0], lag1[1])))}</a></h2>` +
+      `<div class="hg-overrad"><span>${esc(numret(u, lordag))}</span><span>Det supportrarna vet</span><span>Pris 3 kr</span></div>` +
+      `<h1 class="hg-namn">Helgarderat</h1>` +
+      `<div class="hg-dagen"><p>${esc(dagen)}</p>${u.prov ? '<span class="hg-stampel">Provnummer</span>' : ''}</div></header>`;
+    const ettan = `<article class="hg-etta"><div class="hg-omslag">${figur(s1)}${marke(lordag, sidor.length)}</div>${kick(s1)}` +
+      `<h2><a href="#sida-${sidnr(s1)}">${tvafarg(s1.rubrik || T.rubrik(lag1[0], lag1[1]))}</a></h2>` +
       (s1.ingress ? `<p class="hg-ingress">${esc(hel(s1.ingress))}</p>` : '') +
       (c ? citat(c, 'stort') : '') +
       `<p class="hg-vidare"><a href="#sida-${sidnr(s1)}">Matchbladet på sidan ${sidnr(s1)}</a></p></article>`;
-    const lag2 = s2 ? s2.lag || [] : [];
-    const tvaan = s2 ? `<article class="hg-tvaa">${kick(s2)}` +
-      `<h3><a href="#sida-${sidnr(s2)}">${esc(hel(s2.rubrik || T.rubrik(lag2[0], lag2[1])))}</a></h3>` +
-      (s2.ingress ? `<p>${esc(hel(s2.ingress))}</p>` : '') +
-      `<p class="hg-vidare"><a href="#sida-${sidnr(s2)}">Sidan ${sidnr(s2)}</a></p></article>` : '';
-    const matcher = `<nav class="hg-matcher" aria-label="Lördagens matcher"><h3>Lördagens matcher</h3><ol>${sidor.map((s) => {
-      const l = s.lag || [];
-      return `<li><a href="#sida-${sidnr(s)}"><b>${s.nr}</b><span class="hg-m">${esc(kort(l[0]))}–${esc(kort(l[1]))}</span><i>${sidnr(s)}</i>` +
-        `<small>${esc(hel(s.rubrik || ''))}</small></a></li>`;
-    }).join('')}</ol></nav>`;
-    // Tre matcher till, med bild, rubrik och introduktionens första mening, i kupongens ordning.
+    // Också i numret: tre matcher till med rubrik och sida, i kupongens ordning. Resten står bara i matchbladen.
     const fler = ovriga.slice(0, 3).sort((a, b) => a.nr - b.nr);
-    const puffar = fler.length ? `<section class="hg-fler" aria-label="Fler matcher"><h3>Fler matcher</h3><div class="hg-fler-l">${fler.map((s) =>
-      `<article>${figur(s, ' liten')}${kick(s, false)}<h4><a href="#sida-${sidnr(s)}">${esc(hel(s.rubrik || ''))}</a></h4>` +
-      `${s.ingress ? `<p>${esc(hel(forstaMeningen(s.ingress)))}</p>` : ''}<p class="hg-vidare"><a href="#sida-${sidnr(s)}">Sidan ${sidnr(s)}</a></p></article>`).join('')}</div></section>` : '';
-    return `<section class="hg-ark hg-forsta" id="forsta" aria-label="Framsidan">${huvud}<div class="hg-front"><div class="hg-vanster">${ettan}${tvaan}</div>${matcher}</div>${puffar}</section>`;
+    const dag = lordag ? stor(fVdagLang.format(new Date(lordag))) + 'ens' : 'Omgångens';
+    const puffar = `<section class="hg-fler" aria-label="Också i numret"><h3>Också i numret</h3>` +
+      (fler.length ? `<div class="hg-fler-l">${fler.map((s) => {
+        const l = s.lag || [];
+        return `<article>${kick(s, false)}<h4><a href="#sida-${sidnr(s)}">${tvafarg(s.rubrik || T.rubrik(l[0], l[1]))}</a></h4>` +
+          `<p class="hg-vidare"><a href="#sida-${sidnr(s)}">Sidan ${sidnr(s)}</a></p></article>`;
+      }).join('')}</div>` : '') +
+      `<p class="hg-alla"><a href="#sida-${sidnr(sidor[0])}">${esc(hel(`${dag} ${sidor.length} matcher har ett matchblad var på sidorna ` +
+        `${sidnr(sidor[0])}–${sidnr(sidor[sidor.length - 1])}`))}</a></p></section>`;
+    return `<section class="hg-ark hg-forsta" id="forsta" aria-label="Framsidan"><div class="hg-ram">${huvud}${ettan}${puffar}</div></section>`;
   }
 
   // ---------- matchbladen ----------
