@@ -122,30 +122,32 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 
 /* ---------- kupongen: innehållet ---------- */
 
-/* En Stryktipskupong inlagd efter omslaget, i sajtens tipskupongs grafik (papper.css, som inte läses in här):
-   krämvitt papper, bandet i terrakotta, numren och rutorna 1, X och 2 tryckta i terrakotta, lagen på skrivmaskin
-   och en synkmarkering i vänsterkanten per rad. Hela raden leder till matchbladet (pilen efter lagen); en match utan
-   matchblad är blek och utan pil. */
-.hg-kupong { --k-papper: #f1e8d5; --k-tryck: #a9452b; --k-band: #c35f36; --k-kant: #b4664a; --k-linje: rgba(169, 69, 43, 0.25); --k-ton: rgba(169, 69, 43, 0.055); --k-svart: #221f1b;
-  position: relative; box-sizing: border-box; width: min(560px, calc(100% - 24px)); padding: 0 22px 20px 50px; scroll-margin-top: 14px; color: var(--k-svart);
-  background: var(--pp-grain), var(--k-papper); box-shadow: 0 2px 2px rgba(0, 0, 0, 0.45), 0 22px 26px rgba(0, 0, 0, 0.5); font-synthesis: none; }
-.hg-k-band { display: flex; align-items: center; min-height: 56px; margin: 0 -22px 8px -50px; padding: 0 22px 0 50px; background: var(--pp-grain), var(--k-band); color: var(--k-papper); }
-.hg-k-band b { font: 800 30px/1 var(--tryck); letter-spacing: -0.01em; }
-.hg-kupong ol { margin: 0; padding: 0; list-style: none; }
-.hg-kupong li { position: relative; margin: 0; padding: 0; border-bottom: 1px solid var(--k-linje); }
-.hg-kupong li:nth-child(even) { background: var(--k-ton); }
-.hg-kupong li::before { content: ""; position: absolute; top: 50%; left: -36px; width: 17px; height: 7px; margin-top: -3.5px; background: var(--k-svart); }
-.hg-kupong li > a, .hg-kupong li > div { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; min-height: 50px; padding: 0 4px; color: inherit; text-decoration: none; }
-.hg-k-nr { font: 700 15px/1 var(--tryck); font-variant-numeric: tabular-nums; text-align: center; color: var(--k-tryck); }
-.hg-k-lag { font: 400 17px/1.25 var(--skriv); }
-.hg-k-lag > span { white-space: nowrap; }
-.hg-kupong a .hg-k-lag > span:last-child::after { content: "\00a0→"; color: var(--k-tryck); }
-.hg-k-rutor { display: flex; gap: 7px; }
-.hg-k-rutor i { display: grid; place-items: center; width: 38px; height: 26px; box-sizing: border-box; border: 1.2px solid var(--k-kant); border-radius: 2px; background: rgba(251, 247, 236, 0.45);
-  font: 600 13px/1 var(--tryck); font-style: normal; color: rgba(169, 69, 43, 0.62); }
-@media (hover: hover) { .hg-kupong li > a:hover { background: rgba(90, 70, 40, 0.08); } .hg-kupong li > a:hover .hg-k-lag { text-decoration: underline 1px; text-underline-offset: 4px; } }
-.hg-kupong li > a:focus-visible { outline: 2px solid #2146a6; outline-offset: -2px; }
-.hg-kupong li.utan > div { opacity: 0.42; }
+/* Stryktipset som programmets egen sida (val A, Uppställningen, 2026-11-11): tidningspapper med prickraster som
+   matchbladen och en dubbel svart ram som omslaget, namnet i Alfa Slab One på det röda bandet, och en rad per match:
+   numret i den svarta rutan med gul siffra som i matchbladets vinjett, hemmalaget högerställt och bortalaget
+   vänsterställt i Anton kring det röda strecket mitt på sidan, sköldarna intill strecket. Ytterspalterna är lika breda
+   (numret och lika mycket luft till höger), så att strecket står mitt på. Namnen krymper alla lika mycket när det
+   längsta inte ryms (--k-krymp, passaLagen i rum-tidning.js). Hela raden leder till matchbladet; en match utan
+   matchblad är blek. */
+.hg-kupong { position: relative; box-sizing: border-box; width: min(560px, calc(100% - 24px)); padding: 14px 26px 22px; scroll-margin-top: 14px; color: var(--svart);
+  background: radial-gradient(circle at 50% 50%, rgba(40, 30, 14, 0.13) 0 0.6px, rgba(0, 0, 0, 0) 0.8px) 0 0 / 2.6px 2.6px, var(--p);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35); }
+.hg-kupong::before { content: ""; position: absolute; inset: 6px; border: 2px double var(--svart); pointer-events: none; }
+.hg-k-band { display: flex; justify-content: center; margin: 0 -14px 10px; padding: 8px 0 6px; background: #b8231b; color: #f8f2e0; }
+.hg-k-band b { font: 400 40px/1 "Alfa Slab One", Rockwell, Georgia, serif; letter-spacing: 0.01em; text-transform: uppercase; }
+.hg-kupong ol { --k-namn: 22px; margin: 0; padding: 0; list-style: none; }
+.hg-kupong li { margin: 0; padding: 0; border-bottom: 1px solid var(--streck); }
+.hg-kupong li:last-child { border-bottom: 0; }
+.hg-kupong li > a, .hg-kupong li > div { display: grid; grid-template-columns: 30px minmax(0, 1fr) 24px 22px 24px minmax(0, 1fr); align-items: center; column-gap: 8px;
+  min-height: 46px; padding-right: 38px; color: inherit; text-decoration: none; }
+.hg-k-nr { display: grid; place-items: center; width: 30px; height: 30px; background: var(--svart); color: var(--gul); font: 800 17px/1 var(--rubrik); font-variant-numeric: tabular-nums; }
+.hg-k-lag { overflow: hidden; white-space: nowrap; font: 400 calc(var(--k-namn) * var(--k-krymp, 1))/1.15 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+.hg-k-lag.h { text-align: right; }
+.hg-k-mot { color: var(--rod); font: 400 var(--k-namn)/1 Anton, Impact, sans-serif; font-style: normal; text-align: center; }
+.hg-kupong .hg-k-skold { width: 24px; height: 24px; object-fit: contain; vertical-align: 0; }
+.hg-kupong li.utan > div { opacity: 0.38; }
+@media (hover: hover) { .hg-kupong li > a:hover .hg-k-lag { text-decoration: underline 2px var(--rod); text-underline-offset: 4px; } }
+.hg-kupong li > a:focus-visible { outline: 2px solid var(--rod); outline-offset: -2px; }
 .hg-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ---------- matchbladet ---------- */
@@ -210,15 +212,14 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
   .hg-ingress { font-size: 17px; }
   .hg-lagdel p, .hg-summering p { font-size: 16px; }
   .hg-vs { padding: 12px; gap: 8px; }
-  .hg-kupong { width: calc(100% - 16px); padding: 0 12px 14px 34px; }
-  .hg-k-band { min-height: 48px; margin: 0 -12px 6px -34px; padding: 0 12px 0 34px; }
-  .hg-k-band b { font-size: 25px; }
-  .hg-kupong li::before { left: -26px; width: 13px; height: 6px; margin-top: -3px; }
-  .hg-kupong li > a, .hg-kupong li > div { grid-template-columns: 20px minmax(0, 1fr) auto; column-gap: 8px; min-height: 48px; padding: 0 2px; }
-  .hg-k-nr { font-size: 13.5px; }
-  .hg-k-lag { font-size: 14.5px; }
-  .hg-k-rutor { gap: 4px; }
-  .hg-k-rutor i { width: 26px; height: 22px; font-size: 11.5px; }
+  .hg-kupong { width: calc(100% - 16px); padding: 10px 14px 16px; }
+  .hg-kupong::before { inset: 4px; }
+  .hg-k-band { margin: 0 -6px 6px; }
+  .hg-k-band b { font-size: 30px; }
+  .hg-kupong ol { --k-namn: 16.5px; }
+  .hg-kupong li > a, .hg-kupong li > div { grid-template-columns: 24px minmax(0, 1fr) 18px 12px 18px minmax(0, 1fr); column-gap: 5px; min-height: 44px; padding-right: 29px; }
+  .hg-k-nr { width: 24px; height: 24px; font-size: 14px; }
+  .hg-kupong .hg-k-skold { width: 18px; height: 18px; }
 }
 @container (min-width: 721px) and (max-width: 900px) {
   .hg-blad { grid-template-columns: minmax(0, 1fr) 200px; column-gap: 22px; }

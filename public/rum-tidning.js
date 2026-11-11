@@ -12,8 +12,8 @@
 //                märke (veckodagen, rutorna 1, X och 2 ikryssade: helgarderat, och antalet matcher) och matchens
 //                rubrik. 100 × 140, förstorat med zoom: litet på pulten och så stort som ryms när tidningen läses
 //                (passa).
-//   Kupongen     innehållet: en Stryktipskupong inlagd efter omslaget, en rad per match, och raden leder till
-//                matchbladet. Ingen text, inga tider och inga sidnummer.
+//   Kupongen     innehållet: Stryktipset i programmets eget tryck efter omslaget, en rad per match med numret och
+//                lagen mot varandra, och raden leder till matchbladet. Ingen text, inga tider och inga sidnummer.
 //   Matchbladen  ett per match, från sidan 2: rubriken, bilden, introduktionen, hemmalaget, bortalaget och
 //                sammanfattningen, och i en smal spalt avsparken, ibland ett citat och källorna, med en länk till
 //                varje avsnitt, forumtråd och artikel.
@@ -31,7 +31,7 @@
 // RumTidning.upplaga(data, prov, tidning) → upplagan (det som behövs för att rita tidningen), eller null
 // RumTidning.tidning(upplaga) → html: omslaget, kupongen och matchbladen, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
-// RumTidning.passa(rot, bredd, hojd) förstorar omslaget så att det ryms.
+// RumTidning.passa(rot, bredd, hojd) förstorar omslaget så att det ryms och krymper kupongens lagnamn när de inte ryms.
 // RumTidning.rastrera(rot) ritar omslagets bild på sin duk, svartvit och rastrerad, och RumTidning.bildfel(rot) ger
 // en bild i matchbladen som inte går att hämta lagets sköld.
 
@@ -110,7 +110,9 @@
 
   // Kortare lagnamn där raden är smal, som på kupongen (Papper.kort i papper.js).
   const KORT = { 'AFC Wimbledon': 'Wimbledon', 'Crewe Alexandra': 'Crewe', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd', 'Milton Keynes Dons': 'MK Dons',
-    'Preston North End': 'Preston', 'Accrington Stanley': 'Accrington', 'Queens Park Rangers': 'QPR', 'West Bromwich Albion': 'West Brom', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County' };
+    'Preston North End': 'Preston', 'Accrington Stanley': 'Accrington', 'Queens Park Rangers': 'QPR', 'West Bromwich Albion': 'West Brom', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County',
+    'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton', 'Wolverhampton Wanderers': 'Wolves',
+    'Nottingham Forest': "Nott'm Forest", 'AFC Bournemouth': 'Bournemouth' };
   const kort = (n) => KORT[n] || String(n || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
   // Adressen till lagets sköld (skoldar.js), eller ''.
   const skoldSrc = (lag) => (lag && typeof Skoldar !== 'undefined' && Skoldar.src ? Skoldar.src(lag) || '' : '');
@@ -371,6 +373,8 @@
   // eller bredare än 660 (pulten i rum.js och sajten, helgarderat.js). Papperets mönster delas med förstoringen
   // (--zz), så att de är lika fina som på pulten.
   function passa(rot, bredd, hojd) {
+    passaLagen(rot);
+    if (rot && document.fonts) document.fonts.ready.then(() => passaLagen(rot));
     const f = rot && rot.querySelector('.hg-omslaget .hf-forsta');
     if (!f) return;
     const k = Math.max(1, Math.min(bredd / 100, 6.6, Math.max((hojd - 86) / 140, 3.6)));
@@ -382,22 +386,33 @@
 
   // Gängets omgång är Stryktipsets när den har ett nummer därifrån (2026-11-07-st4978) eller tretton matcher.
   const spelet = (u) => (/-st\d+$/.test(u.omgang) || u.kupongen.length === 13 ? TEXT.kupongen.stryktipset : TEXT.kupongen.kupongen);
-  // Innehållet: en Stryktipskupong inlagd efter omslaget, i sajtens tipskupongs grafik (papper.css): bandet och en rad
-  // per match med numret, lagen och rutorna 1, X och 2. Hela raden leder till matchbladet (pilen efter bortalaget); en
-  // match utan matchblad är blek, utan pil och länk. Inget annat (2026-11-11, användarens önskemål: "Förenkla mer – det
-  // är plottrigt och en massa text … flera siffror – det ska det inte vara. Implementera gärna stryktipsets grafik –
-  // och självklart ska allt vara klickbart").
+  // Innehållet: Stryktipset som programmets egen sida (2026-11-11, användarens val A, Uppställningen, bland tre skisser):
+  // namnet på det röda bandet som på omslaget och en rad per match med numret i den svarta rutan som i matchbladets
+  // vinjett, hemmalaget högerställt och bortalaget vänsterställt kring strecket mitt på sidan, med sköldarna intill.
+  // Hela raden leder till matchbladet; en match utan matchblad är blek och utan länk. Inga rutor, tider, sidnummer eller
+  // förklaringar (förut: "Förenkla mer – det är plottrigt och en massa text … och självklart ska allt vara klickbart").
   function kupong(u) {
-    const rutor3 = '<span class="hg-k-rutor" aria-hidden="true"><i>1</i><i>X</i><i>2</i></span>';
+    // en tom ruta där skölden saknas, så att strecket står kvar mitt på
+    const sk = (lag) => skold(lag, 'hg-k-skold') || '<span class="hg-skold hg-k-skold"></span>';
     const rader = u.kupongen.map((m) => {
       const lag = m.lag || [];
-      // raden bryts mellan lagen, inte i ett lagnamn, och pilen står kvar efter bortalaget
-      const rad = `<b class="hg-k-nr">${m.nr}</b><span class="hg-k-lag"><span>${esc(kort(lag[0]))} –</span> <span>${esc(kort(lag[1]))}</span></span>${rutor3}`;
+      const rad = `<b class="hg-k-nr">${m.nr}</b><span class="hg-k-lag h">${esc(kort(lag[0]))}</span>${sk(lag[0])}` +
+        `<i class="hg-k-mot">–</i>${sk(lag[1])}<span class="hg-k-lag b">${esc(kort(lag[1]))}</span>`;
       return m.sida ? `<li><a href="#hg-sida-${u.sida.get(m.sida.nr)}">${rad}</a></li>`
         : `<li class="utan"><div>${rad}<span class="hg-sr"> (${esc(TEXT.kupongen.utan)})</span></div></li>`;
     }).join('');
     return `<section class="hg-kupong" id="hg-kupongen" aria-label="${esc(spelet(u))}: innehållet"><header class="hg-k-band"><b>${esc(spelet(u))}</b></header>` +
       `<ol>${rader}</ol></section>`;
+  }
+  // Lagnamnen krymper alla lika mycket när det längsta inte ryms på raden (som matchlistan på sajten), i stället för att
+  // brytas eller avstavas.
+  function passaLagen(rot) {
+    const ol = rot && rot.querySelector('.hg-kupong ol');
+    if (!ol) return;
+    ol.style.removeProperty('--k-krymp');
+    let k = 1;
+    for (const n of ol.querySelectorAll('.hg-k-lag')) if (n.scrollWidth > n.clientWidth + 0.5) k = Math.min(k, n.clientWidth / n.scrollWidth);
+    if (k < 1) ol.style.setProperty('--k-krymp', String(Math.floor(k * 100) / 100));
   }
 
   // ---------- matchbladen ----------
