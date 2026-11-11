@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Genomskinlig: LauncherActivity visar bara uppstarten och lämnar sedan
+         över till Chrome. -->
+    <style name="Uppstart" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:statusBarColor">@color/natt</item>
+        <item name="android:navigationBarColor">@color/natt</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

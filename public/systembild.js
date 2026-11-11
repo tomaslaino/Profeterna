@@ -522,6 +522,43 @@ window.Systembild = (() => {
     if (e.target.closest('[data-systembild]')) picker();
   });
 
+  // ---------- delat till appen ----------
+  //
+  // En skärmbild som delas till Matchfixarna i telefonen (Dela → Ladda upp
+  // system) tas emot av dela/sw.js, som lägger bilderna i lådan "delat" och
+  // öppnar sidan med ?delat=<antal>#kupong. Här läses de som om de valts med
+  // knappen. Service workern gäller bara /dela/ och registreras här, så att
+  // den finns när man delar – appen och sajten har öppnats minst en gång.
+  if ('serviceWorker' in navigator) {
+    addEventListener('load', () => {
+      navigator.serviceWorker.register('/dela/sw.js', { scope: '/dela/' }).catch(() => {});
+    });
+  }
+
+  async function delade() {
+    const m = /[?&]delat=(\d+)/.exec(location.search);
+    if (!m) return;
+    // Adressen utan ?delat, så att en omladdning inte läser bilderna igen.
+    const q = location.search.replace(/([?&])delat=\d+&?/, '$1').replace(/[?&]$/, '');
+    history.replaceState(history.state, '', location.pathname + q + location.hash);
+    const filer = [];
+    try {
+      const lada = await caches.open('delat');
+      const nycklar = (await lada.keys())
+        .sort((a, b) => a.url.localeCompare(b.url, 'sv', { numeric: true }));
+      for (const req of nycklar) {
+        const svar = await lada.match(req);
+        const blob = await svar.blob();
+        const namn = decodeURIComponent(svar.headers.get('X-Namn') || '') || 'delad-bild';
+        filer.push(new File([blob], namn, { type: blob.type || 'image/png' }));
+        await lada.delete(req);
+      }
+    } catch (_) { /* ingen låda: inget att läsa */ }
+    if (filer.length) run(filer);
+    else toast('Bilden kom inte fram. Tryck på Ladda upp system och välj den där.', { error: true });
+  }
+  delade();
+
   // En bild, på knappen där den står för sig själv (omgångens tomma kupong).
   const ICON = '<svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
     '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 15.5l-5-5L5.5 20"/></svg>';

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Håll fingret på ikonen: genvägarna går till sidan i appen som redan är
+     öppen (ShortcutTrampolineActivity), eller startar den. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="kupong"
+        android:enabled="true"
+        android:icon="@drawable/genvag_kupong"
+        android:shortcutShortLabel="@string/genvag_kupong"
+        android:shortcutLongLabel="@string/genvag_kupong_lang">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="se.matchfixarna.app"
+            android:targetClass="com.google.androidbrowserhelper.trusted.ShortcutTrampolineActivity"
+            android:data="https://matchfixarna.se/#kupong" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="olympen"
+        android:enabled="true"
+        android:icon="@drawable/genvag_olympen"
+        android:shortcutShortLabel="@string/genvag_olympen"
+        android:shortcutLongLabel="@string/genvag_olympen_lang">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="se.matchfixarna.app"
+            android:targetClass="com.google.androidbrowserhelper.trusted.ShortcutTrampolineActivity"
+            android:data="https://matchfixarna.se/#olympen" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="matcher"
+        android:enabled="true"
+        android:icon="@drawable/genvag_matcher"
+        android:shortcutShortLabel="@string/genvag_matcher"
+        android:shortcutLongLabel="@string/genvag_matcher_lang">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="se.matchfixarna.app"
+            android:targetClass="com.google.androidbrowserhelper.trusted.ShortcutTrampolineActivity"
+            android:data="https://matchfixarna.se/#matcher" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="tabeller"
+        android:enabled="true"
+        android:icon="@drawable/genvag_tabeller"
+        android:shortcutShortLabel="@string/genvag_tabeller"
+        android:shortcutLongLabel="@string/genvag_tabeller_lang">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="se.matchfixarna.app"
+            android:targetClass="com.google.androidbrowserhelper.trusted.ShortcutTrampolineActivity"
+            android:data="https://matchfixarna.se/tabeller.html" />
+    </shortcut>
+</shortcuts>

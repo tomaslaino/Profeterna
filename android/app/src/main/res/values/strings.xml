@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appnamn">Matchfixarna</string>
+    <string name="dela_etikett">Ladda upp system</string>
+
+    <string name="genvag_kupong">Kupongen</string>
+    <string name="genvag_kupong_lang">Omgångens kupong</string>
+    <string name="genvag_olympen">Olympen</string>
+    <string name="genvag_olympen_lang">Olympen – ställningen</string>
+    <string name="genvag_matcher">Matcherna</string>
+    <string name="genvag_matcher_lang">Alla matcher</string>
+    <string name="genvag_tabeller">Tabeller</string>
+    <string name="genvag_tabeller_lang">Tabellerna</string>
+
+    <!-- Samma intyg som matchfixarna.se/.well-known/assetlinks.json, från appens håll. -->
+    <string name="asset_statements" translatable="false">[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://matchfixarna.se\"}}]</string>
+
+    <!-- Som share_target i public/manifest.webmanifest. -->
+    <string name="dela" translatable="false">{\"action\": \"https://matchfixarna.se/dela/\", \"method\": \"POST\", \"enctype\": \"multipart/form-data\", \"params\": {\"files\": [{\"name\": \"bild\", \"accept\": [\"image/*\"]}]}}</string>
+</resources>

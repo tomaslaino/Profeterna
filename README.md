@@ -244,6 +244,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   gjorde), så att huvudtråden inte står still mitt i det första man gör. Sajten har ett manifest
   ([public/manifest.webmanifest](public/manifest.webmanifest)) och går att lägga på hemskärmen i
   telefonen som en app – egen ikon, öppnas utan webbläsarens list (se [Mindre filer](#mindre-filer))
+- [x] **Appen för Android (2026-11-11, användarens önskemål):** "Gör en bra och smart matchfixarna-app till
+  android som är anpassad till hemsidan och där grafiken och allt flyter snyggt och bra". Appen
+  ([android/](android/)) är sajten i telefonens egen Chrome som en Trusted Web Activity – samma rum, samma
+  grafik och samma inloggning och tips som i Chrome, utan adressfält – med logon som ikon (också som
+  temaikon), en uppstart i sajtens mörka färg som Chrome tar över utan att något hoppar, genvägar på ikonen
+  (Kupongen, Olympen, Matcherna, Tabeller) och *Dela → Ladda upp system* för en skärmbild av systemet. Se
+  [Appen](#appen)
 - [x] **Gängets kupong i realtid (2026-11-08, användarens önskemål):** den som fyller i gängets
   kupong i uppgörelsen – på papperet eller på pulten i tobaksaffären – gör det på allas kupong.
   Kryssen, det klubbade och *Börja om* syns direkt hos alla som ser kupongen, och knappen blir
@@ -482,7 +489,80 @@ jämförda bildpunkt för bildpunkt: inom bruset).
 `ikon-192.png`, `ikon-512.png` och `ikon-maskbar-512.png` (logon, den maskbara med terrakotta ut till
 kanten för Androids runda och rundade ikoner), länkat från alla sidor utom de två som bara leder vidare.
 I Chrome i Android: menyn → *Lägg till på startskärmen* (*Installera app*). Sidan öppnas då utan
-adressfält och flikar. Ingen service worker: sidan fungerar inte utan nät och hämtas som förut.
+adressfält och flikar. Sajten har bara en service worker, och den gäller bara `/dela/` (delade skärmbilder,
+se [Appen](#appen)): sidan fungerar inte utan nät och hämtas som förut.
+
+## Appen
+
+Matchfixarna som app i Android ([android/](android/), paketet `se.matchfixarna.app`): sajten körs i
+telefonens egen Chrome som en *Trusted Web Activity* (Googles
+[androidbrowserhelper](https://github.com/GoogleChrome/android-browser-helper) 2.7.4). Det är alltså samma
+sida som på matchfixarna.se, med allt som är gjort för Chrome i telefonen (rummets ritning, bakåtgesten,
+PowerVR-vägen) – och samma lagring som i Chrome, så den som har valt namn och lämnat tips där är det också i
+appen. Ingenting av sajten ligger i appen: en ny version av sajten syns direkt, och appen behöver bara byggas
+om när det som står här ändras.
+
+- **Ikonen** är logon byggd som vektor ur [public/logo.svg](public/logo.svg) (planen och myntet på
+  terrakotta), adaptiv för Androids runda och rundade ikoner och med en enfärgad variant för temaikoner
+  (Android 13+).
+- **Uppstarten:** systemets startbild (Android 12+) är den runda ikonen på sajtens mörka färg (`#0e0d0b`).
+  Appen visar sedan samma bild på samma ställe ([drawable/uppstart.xml](android/app/src/main/res/drawable/uppstart.xml),
+  160 dp som systemets), och Chrome tar över den och tonar bort den på 300 ms när sidan har ritat sin första
+  bild. Statusfältet och navigeringsfältet har samma mörka färg.
+- **Genvägar:** håll fingret på ikonen – Kupongen (`/#kupong`), Olympen (`/#olympen`), Matcherna
+  (`/#matcher`) och Tabeller (`/tabeller.html`). Är appen redan öppen går genvägen dit i samma fönster
+  (`ShortcutTrampolineActivity`, `navigate-existing`), annars startar den där.
+- **Länkar** till matchfixarna.se (i sms, mejl, chattar) öppnas i appen.
+- **Dela → Ladda upp system:** en skärmbild av systemet i Svenska Spels app kan delas direkt till appen.
+  Chrome skickar den som ett formulär till `/dela/`, där [public/dela/sw.js](public/dela/sw.js) tar emot den
+  i webbläsaren (GitHub Pages tar inte emot formulär), lägger den i lådan `delat` och öppnar
+  `/?delat=<antal>#kupong`; [public/systembild.js](public/systembild.js) läser bilden som om den valts med
+  knappen och tar bort `?delat` ur adressen. Samma `share_target` står i
+  [public/manifest.webmanifest](public/manifest.webmanifest), så det fungerar också för den som har lagt
+  sajten på hemskärmen från Chrome. Service workern gäller bara adresser under `/dela/` och registreras av
+  systembild.js; den finns alltså först när sajten har öppnats en gång.
+- **Utan Chrome** (eller en annan webbläsare som kan TWA) visas sajten i appens egen WebView.
+- **Aviseringar:** appen tar emot sajtens web push som sina egna aviseringar (`DelegationService`), om
+  sajten någon gång skickar sådana. Den skickar inga i dag.
+
+**Kopplingen till sajten:** [public/.well-known/assetlinks.json](public/.well-known/assetlinks.json) säger
+att appen med signeringsnyckelns fingeravtryck (SHA-256) hör till matchfixarna.se. Chrome kontrollerar den
+innan adressfältet döljs, och Android innan länkar till matchfixarna.se öppnas i appen. Saknas den, eller
+stämmer inte fingeravtrycket, visas sajten med ett smalt adressfält överst (och länkarna öppnas i
+webbläsaren). Bara `matchfixarna.se`: `www.` skickas vidare av GitHub Pages och kan inte intyga något.
+Kontrollera efter publicering:
+`https://digitalassetlinks.googleapis.com/v1/statements:list?source.web.site=https://matchfixarna.se&relation=delegate_permission/common.handle_all_urls`.
+
+**Signeringsnyckeln** ligger bara på datorn som bygger, utanför repot:
+`~/Library/Application Support/Matchfixarna/android/` med `matchfixarna.jks` och `nyckel.properties`
+(`storeFile`, `storePassword`, `keyAlias`, `keyPassword`; skapad 2026-11-11, RSA 4096, giltig i 10 000
+dagar). En uppdatering av appen måste signeras med samma nyckel – annars måste den gamla avinstalleras först –
+så mappen ska säkerhetskopieras. Läggs appen på Google Play signerar Play om den med sin egen nyckel, och då
+ska också Plays fingeravtryck (Play Console → *App integrity*) in i assetlinks.json.
+
+**Bygga:** JDK 17 och Android SDK (plattform 36):
+
+```
+brew install openjdk@17
+brew install --cask android-commandlinetools
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/opt/homebrew/share/android-commandlinetools
+sdkmanager --sdk_root=$ANDROID_HOME "platforms;android-36" "platform-tools"
+cd android && ./gradlew assembleRelease bundleRelease
+```
+
+`app/build/outputs/apk/release/app-release.apk` installeras direkt i telefonen (tillåt installation från
+okänd källa), `app/build/outputs/bundle/release/app-release.aab` är för Google Play. Höj `versionCode` i
+[android/app/build.gradle](android/app/build.gradle) för varje ny version. Utan nyckeln byggs bara
+`assembleDebug`, som Chrome inte litar på (adressfältet syns).
+
+**Provat (2026-11-11):** APK:n (570 kB, minSdk 26, targetSdk 36) är signerad med nyckeln ovan och
+manifestet har aktiviteterna, delningen, länkarna och genvägarna som här. Ikonerna och uppstarten ritade och
+granskade. Delningen provad i Chrome 157 mot en provserver (public/ först, resten från matchfixarna.se):
+service workern registreras med scope `/dela/`, ett formulär med en bild till `/dela/` hamnar på
+`/#kupong`, bilden läses av Ladda upp system och lådan töms; andra sidor styrs inte av service workern.
+Webbläsarpanelen i Claude-appen kan inte registrera service workers alls, så den duger inte att prova i.
+Inte provat i en emulator (för lite plats på datorn); i telefonen provas appen när assetlinks.json är
+publicerad.
 
 ## Lokalt
 
@@ -2562,6 +2642,9 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    skrivrätt till repot).
 
 ### Ladda upp system
+
+I appen och på hemskärmen går det också att dela skärmbilden direkt från telefonens bilder eller
+skärmbildsvyn: *Dela → Ladda upp system* (se [Appen](#appen)).
 
 Knappen *Ladda upp system* (i Ny kupong och Ändra och under omgångens kupong) tar en eller flera skärmbilder av ett spelat system –
 som raderna i Svenska Spels app, med lagen och rutorna 1, X och 2 där de valda är

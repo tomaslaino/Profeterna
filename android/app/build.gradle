@@ -1,0 +1,63 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Appen är sajten (matchfixarna.se) i användarens egen Chrome, som en Trusted
+// Web Activity: samma rum, samma grafik och samma inloggning som i Chrome,
+// utan adressfält. Runt sajten: ikonen, uppstarten, genvägarna och delning av
+// skärmbilder till Ladda upp system. Se README, Appen.
+
+// Signeringsnyckeln ligger utanför repot, på datorn som bygger:
+// ~/Library/Application Support/Matchfixarna/android/nyckel.properties
+// (storeFile, storePassword, keyAlias, keyPassword), eller filen som
+// MATCHFIXARNA_NYCKEL pekar på. Utan den byggs bara debug-versionen.
+def nyckelFil = file(System.getenv('MATCHFIXARNA_NYCKEL')
+        ?: "${System.getProperty('user.home')}/Library/Application Support/Matchfixarna/android/nyckel.properties")
+def nyckel = new Properties()
+if (nyckelFil.exists()) nyckelFil.withInputStream { nyckel.load(it) }
+
+android {
+    namespace 'se.matchfixarna.app'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'se.matchfixarna.app'
+        minSdk 26
+        targetSdk 36
+        versionCode 1
+        versionName '1.0'
+    }
+
+    // Bara svenska (och grundtexterna) ur bibliotekens översättningar.
+    androidResources {
+        localeFilters += ['sv']
+    }
+
+    signingConfigs {
+        release {
+            if (nyckelFil.exists()) {
+                storeFile new File(nyckelFil.parentFile, nyckel['storeFile'])
+                storePassword nyckel['storePassword']
+                keyAlias nyckel['keyAlias']
+                keyPassword nyckel['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            if (nyckelFil.exists()) signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4'
+}

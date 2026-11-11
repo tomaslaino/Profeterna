@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sajtens färger: theme-color, logon (public/logo.svg) och papperet. -->
+<resources>
+    <color name="natt">#FF0E0D0B</color>
+    <color name="terrakotta">#FFC8643A</color>
+    <color name="papper">#FFF3EAD9</color>
+    <color name="guld">#FFD8B06A</color>
+    <color name="rost">#FF9E4526</color>
+</resources>

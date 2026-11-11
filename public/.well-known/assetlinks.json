@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "se.matchfixarna.app",
+      "sha256_cert_fingerprints": [
+        "1B:EF:58:F7:0A:28:73:E2:A5:D0:D9:64:43:71:2B:44:88:BB:E3:91:D0:B2:9B:33:D4:6D:B4:25:CB:04:61:67"
+      ]
+    }
+  }
+]
