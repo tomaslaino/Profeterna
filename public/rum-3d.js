@@ -94,6 +94,10 @@
 // ryck, sakta med en gäspning, eller bakfull med handen mot pannan och en
 // återställare. Först är de groggy, sedan kommer de igång; efter en stund utan
 // musik eller klick somnar de om.
+// Under dagen gör de saker efter klockan (dygnet, DYGN_MENY): sträcker på sig och gäspar
+// stort på morgonen, gnuggar ögonen och rullar på nacken, klappar sig på magen efter
+// lunch, nickar till på eftermiddagen och gäspar med handen för munnen på kvällen – och
+// sent på kvällen smittar gäspningen (gaspSmitta).
 // Dagen efter en omgång (efter) står en prinsesstårta på bordet och oraklet
 // har en papperskrona när det gick bra, och när det gick illa ligger DT:s
 // extraflaska omkullvält i en pöl och kupongen sönderriven i askkoppen.
@@ -521,12 +525,13 @@ export async function figurer(canvas, opt = {}) {
   }
   // Skrattet (skrattW): ögonen hopknipna till bågar med skrattrynkor utåt, som
   // DT:s ansikte, och (DL) munnen vidöppen med tänderna och tungan. DJ:s mun
-  // sitter i skägget (skaggSkratt). Ett ansikte utan ögonvitor skrattar redan (null).
+  // sitter i skägget (skaggSkratt). Ett ansikte utan ögonvitor skrattar redan (null) – utom
+  // när munnen ska bytas (gäspningen, GASP_MUN). Skrattrynkorna vid munnen bara med rynk.
   const MUN = (d) => `<path d="${d}" fill="#4a1712"/><clipPath id="skr-m"><path d="${d}"/></clipPath>`;
   function skrattar(svg, mun) {
     const doc = new DOMParser().parseFromString(svg, 'image/svg+xml');
     const vitor = [...doc.querySelectorAll('path[fill="#f7f1ea"]')];
-    if (!vitor.length) return null;
+    if (!vitor.length && !mun) return null;
     const tal = (el) => el.getAttribute('d').match(/-?[\d.]+/g).map(Number);
     let ny = '';
     for (const v of vitor) {
@@ -547,8 +552,8 @@ export async function figurer(canvas, opt = {}) {
     }
     if (mun) {
       for (const x of doc.querySelectorAll(`[fill="${mun.bort}"], [stroke="${mun.lapp}"], clipPath[id="${mun.klipp}"], g[clip-path="url(#${mun.klipp})"]`)) x.remove();
-      ny += MUN(mun.d) + `<g clip-path="url(#skr-m)"><path d="${mun.tander}" fill="#f4efe6"/><ellipse cx="0" cy="${mun.tunga}" rx="9" ry="4" fill="#a8473f"/></g>`
-        + `<path d="M-13 21 Q-24 26 -27 37 M13 21 Q24 26 27 37" fill="none" stroke="#b06e5c" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>`;
+      ny += MUN(mun.d) + `<g clip-path="url(#skr-m)"><path d="${mun.tander}" fill="#f4efe6"/><ellipse cx="0" cy="${mun.tunga}" rx="${mun.tungaR || 9}" ry="4" fill="#a8473f"/></g>`
+        + (mun.rynk === false ? '' : `<path d="M-13 21 Q-24 26 -27 37 M13 21 Q24 26 27 37" fill="none" stroke="#b06e5c" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>`);
     }
     doc.documentElement.insertAdjacentHTML('beforeend', ny);
     return new XMLSerializer().serializeToString(doc);
@@ -557,6 +562,19 @@ export async function figurer(canvas, opt = {}) {
   const SKRATT_MUN = {
     dl: { bort: '#6b2a24', lapp: '#8a3c33', klipp: 'mdl', d: 'M-20 33 Q0 38 20 33 Q17 52 0 55 Q-17 52 -20 33 Z', tander: 'M-21 32 Q0 37 21 32 L21 40 Q0 45 -21 40 Z', tunga: 50 },
   };
+  // Gäspningen (gaspW): ögonen hopknipna som i skrattet och munnen som ett avlångt O,
+  // med en rad tänder överst och tungan längst ner – DT med sina egna stängda ögon, och
+  // DJ:s mun i skägget (skaggGasp).
+  const GASP_O = (b, h, y) => `M${-b} ${y + h * 0.36} Q${-b} ${y} 0 ${y} Q${b} ${y} ${b} ${y + h * 0.36} Q${b} ${y + h * 0.97} 0 ${y + h} Q${-b} ${y + h * 0.97} ${-b} ${y + h * 0.36} Z`;
+  const GASP_TAND = (b, y) => `M${-b - 1} ${y - 1} L${b + 1} ${y - 1} L${b + 1} ${y + 3.5} Q0 ${y + 5.5} ${-b - 1} ${y + 3.5} Z`;
+  const GASP_MUN = {
+    dl: { bort: '#6b2a24', lapp: '#8a3c33', klipp: 'mdl', d: GASP_O(11, 30, 30), tander: GASP_TAND(11, 30), tunga: 57, tungaR: 6.5, rynk: false },
+    dt: { bort: '#45150f', lapp: '#b5604f', klipp: 'mdt', d: GASP_O(13, 33, 30), tander: GASP_TAND(13, 30), tunga: 60, tungaR: 7.5, rynk: false },
+  };
+  function skaggGasp(svg) {
+    const d = GASP_O(9.5, 26, 29);
+    return svg.replace('</svg>', `${MUN(d)}<g clip-path="url(#skr-m)"><path d="${GASP_TAND(9.5, 29)}" fill="#f1ebe0"/><ellipse cx="0" cy="52" rx="6" ry="3.2" fill="#9c4038"/></g></svg>`);
+  }
   // DJ:s mun i skägget, som skrattar: mörk och öppen med tänderna överst
   function skaggSkratt(svg) {
     const d = 'M-16 31 Q0 35 16 31 Q13 47 0 50 Q-13 47 -16 31 Z';
@@ -4138,7 +4156,7 @@ export async function figurer(canvas, opt = {}) {
         h.p.y += 0.7 * Math.sin(l * 9) * bump(l, 3.2, 3.6, 4.6, 5.0);
         return lerpPose(vila, h, g);
       },
-      // (gäspningen: munnen vidöppen och ögonen hopknipna, som skrattet)
+      // (gäspningen: gäspansiktet med munnen som ett O och ögonen hopknipna, gaspBygg)
       gaspar: (l) => l > 3.0 && l < 4.9,
     },
     bakis: {
@@ -4287,7 +4305,7 @@ export async function figurer(canvas, opt = {}) {
     nerv: [['gral', 0.04], ['titta', 0.06], ['zen', 0.3]],
     deppig: [['skamt', 0.07]],
   };
-  const ALLA = new Set(['skamt', 'gral', 'titta', 'korsaSmitta', 'zenAndas', 'zenDrom', 'zenRingar', 'zenVaggar', 'zenTyst']);
+  const ALLA = new Set(['skamt', 'gral', 'titta', 'korsaSmitta', 'gaspSmitta', 'zenAndas', 'zenDrom', 'zenRingar', 'zenVaggar', 'zenTyst']);
   const allaVakna = (t) => tvW(t) < 0.01 && figs.every((o) => ready(o, t) > 0.99 && sovW(o, t) < 0.01 && groggW(o, t) < 0.05 && !vaknaNu(o, t));
   // (utan hänsyn till den som går iväg, gaNu)
   function grupp0(t) {
@@ -4297,6 +4315,8 @@ export async function figurer(canvas, opt = {}) {
     let namn = null;
     let acc = 0;
     for (const [k, p] of GRUPP[humAt(t0) || 'lugn']) if (!namn && r < (acc += p)) namn = k;
+    // (sent på kvällen smittar gäspningen, gaspChansAt)
+    if (hash(n * 2.47 + 6.1) < gaspChansAt(t0)) namn = 'gaspSmitta';
     if (hash(n * 3.19 + KORS_FRO) < 1.5 * korsChansAt(t0)) namn = 'korsaSmitta';
     // (allsången på ett av sina sätt)
     if (namn === 'allsang') namn = sangVal(n, t0);
@@ -4322,12 +4342,14 @@ export async function figurer(canvas, opt = {}) {
     const l = t - t0;
     const meny = MENY[humAt(t0) || 'lugn'];
     const ks = hash(n * 2.93 + i * 7.7 + KORS_FRO) < korsChansAt(t0) ? korsaVal(o, n, i) : null;
-    if (l < 0 || (!ks && hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans)) return null;
+    // (tiden på dygnet: utöver humörets påhitt, dygnVal)
+    const dv = ks ? null : dygnVal(o, n, i, t0);
+    if (l < 0 || (!ks && !dv && hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans)) return null;
     const val = meny[o.F.key].slice();
     const r = rankAt(o.F.key, t0);
     if (r > 0) val.push('nacke', 'nacke');
     if (r < 0) val.push('kors', 'kors');
-    const namn = ks || val[Math.floor(hash(n * 3.17 + i * 5.3 + 0.25) * val.length)];
+    const namn = ks || dv || val[Math.floor(hash(n * 3.17 + i * 5.3 + 0.25) * val.length)];
     const len = AKTER[namn].len;
     if (l >= len || grupp(t0) || grupp(t0 + len / 2) || grupp(t0 + len)) return null;
     return { namn, l, t0 };
@@ -5517,6 +5539,188 @@ export async function figurer(canvas, opt = {}) {
     blund: (o, x) => FI(o) === roller(x).a && KORS.korsa.blund(x.l),
   };
 
+  // ---------- dygnet ----------
+  // Klockan i Stockholm (ute: Vader.nu()) ger påhitt efter tiden på dygnet, utöver humörets
+  // (dygnVal i egen, DYGN_MENY): på morgonen sträcker de på sig med en stor gäspning
+  // (morgon), gnuggar sig i ögonen (gnugga) och rullar på nacken (nackrull); efter lunch
+  // klappar de sig på magen (magen); på eftermiddagen nickar någon till och rycker upp
+  // och tittar sig omkring som om inget hänt (nickarTill); och på kvällen – och när
+  // någon har väckts mitt i natten – gäspar de med handen för munnen (gaspa), gnuggar
+  // ögonen och sträcker på sig. Sent på kvällen smittar gäspningen (gaspSmitta, GRUPP):
+  // en gäspar, nästa ser det och gäspar, och den tredje försöker låta bli men gäspar ändå.
+  // DYGN: klockan som timmar (h) vid t, räknad fram med t så att samma t ger samma bild.
+  const DYGN = { h: null, t: 0 };
+  const dygnH = (t) => (DYGN.h == null ? null : (((DYGN.h + (t - DYGN.t) / 3600) % 24) + 24) % 24);
+  function dygnSatt(v, t) {
+    if (!v || v.timme == null) return;
+    const h = v.timme + (v.minut || 0) / 60;
+    const nu = dygnH(t);
+    // (bara när klockan har sprungit ifrån, t.ex. efter att datorn sovit)
+    if (nu == null || Math.abs((((h - nu) % 24) + 36) % 24 - 12) > 0.05) { DYGN.h = h; DYGN.t = t; }
+  }
+  // hur mycket det är morgon, lunch, eftermiddag och kväll vid h (0–1)
+  const dygnFas = (h) => ({
+    morgon: bump(h, 6.8, 7.2, 9.2, 10.3),
+    lunch: bump(h, 11.6, 12.1, 13.2, 13.8),
+    efter: bump(h, 14.1, 14.7, 16.2, 17),
+    kvall: h >= 12 ? sm(19.6, 21.4, h) : 1 - sm(6.6, 7.4, h),
+  });
+  // per lucka (AKT_SLOT) och person: chansen när det är fullt ut morgon …, och vad
+  const DYGN_MENY = {
+    morgon: { chans: 0.13, val: ['morgon', 'morgon', 'gnugga', 'nackrull', 'gaspa'] },
+    lunch: { chans: 0.08, val: ['magen'] },
+    efter: { chans: 0.09, val: ['nickarTill', 'nickarTill', 'gaspa'] },
+    kvall: { chans: 0.12, val: ['gaspa', 'gaspa', 'gnugga', 'strack'] },
+  };
+  // (medan matcherna pågår bara en gäspning)
+  function dygnVal(o, n, i, t0) {
+    const h = dygnH(t0);
+    if (h == null) return null;
+    const F = dygnFas(h);
+    const r = hash(n * 5.37 + i * 2.9 + 0.83);
+    let acc = 0;
+    for (const [k, M] of Object.entries(DYGN_MENY)) {
+      if (r >= (acc += M.chans * F[k])) continue;
+      const v = M.val[Math.floor(hash(n * 6.11 + i * 1.7 + 0.29) * M.val.length)];
+      return tvW(t0) > 0.5 && v !== 'gaspa' ? null : v;
+    }
+    return null;
+  }
+  // gäspningen smittar (GRUPP), per lucka: sent på kvällen och lite på morgonen
+  const gaspChansAt = (t0) => { const h = dygnH(t0); if (h == null) return 0; const F = dygnFas(h); return 0.14 * F.kvall * sm(20.5, 21.5, h >= 12 ? h : 24) + 0.05 * F.morgon; };
+
+  // En gäspning, l sekunder in (GASP.len): huvudet bakåt medan hen andas in, munnen öppen
+  // (gäspansiktet med ögonen hopknipna, gaspMun och gaspW) och handen för munnen (gaspHandK),
+  // och sedan en lång utandning.
+  const GASP = { len: 4.6 };
+  const gaspMun = (l) => bump(l, 0.6, 0.85, 2.9, 3.15);
+  const gaspHandK = (l) => bump(l, 0.8, 1.4, 2.9, 3.6);
+  // Medan handen är för munnen vänder hen ansiktet lite mot den och lutar huvudet mindre
+  // bakåt (munnen ligger annars precis där armen inte når, som pannan).
+  function gaspKropp(o, l) {
+    const i = bump(l, 0, 0.9, 2.5, 3.2);
+    const u = bump(l, 2.8, 3.4, 3.9, 4.6);
+    const h = gaspHandK(l) * fri(o).s;
+    return { pitch: -0.24 * i + 0.05 * u + 0.12 * Math.abs(h), lean: -0.06 * i + 0.03 * u, breath: 0.07 * i - 0.03 * u, lift: 1.2 * i, yaw: 0.24 * h, roll: -0.06 * h };
+  }
+  // handflatan för munnen, fingrarna snett uppåt och tvärs över mot andra sidan
+  function gaspHand(o, A) {
+    const s = A.s;
+    const d = huvudAxlar(o);
+    const P = mouthIn(o).addScaledVector(d(0, 0, 1), 1.5).addScaledVector(d(1, 0, 0), s * 4);
+    return handflata(o, P, d(-s * 0.6, 0.72, 0.1), d(s * 0.1, 0.05, 1), new THREE.Vector3(s, -0.8, 0.1));
+  }
+  AKTER.gaspa = {
+    len: 5.6, in: 0.7, ut: 0.9,
+    hand: (o, A, t, l) => (A === fri(o) && gaspHandK(l - 0.5) > 0 ? lerpPose(handRest(o, A, t), gaspHand(o, A), gaspHandK(l - 0.5)) : null),
+    kropp: (o, t, l) => gaspKropp(o, l - 0.5),
+    gasp: (o, t, l) => gaspMun(l - 0.5),
+  };
+
+  // Morgonens sträckning: armarna högt upp och ut och darrar till, ryggen bakåt, en stor
+  // gäspning utan hand för munnen – och en liten skakning på huvudet efteråt.
+  AKTER.morgon = {
+    len: 6.6, in: 1.2, ut: 1.3,
+    hand: (o, A, t, l) => {
+      const h = upp(o, A, 0.42, 0.85, -0.06);
+      h.p.y += 0.5 * Math.sin(l * 7) * bump(l, 2.0, 2.5, 3.6, 4.2);
+      return h;
+    },
+    kropp: (o, t, l) => {
+      const g = bump(l, 0.8, 1.9, 3.8, 5.0);
+      const sk = bump(l, 4.8, 5.1, 5.6, 6.0);
+      return { lean: -0.16 * g, pitch: -0.36 * g, breath: 0.07 * g, lift: 1.5 * g, yaw: 0.14 * Math.sin((l - 4.8) * 9) * sk };
+    },
+    gasp: (o, t, l) => bump(l, 1.9, 2.1, 3.8, 4.0),
+  };
+
+  // Knogarna mot ögonen och gnuggar, sakta, med ögonen stängda (som i uppvaknandet).
+  AKTER.gnugga = {
+    len: 4.8, in: 1.0, ut: 1.0,
+    hand: (o, A, t, l) => {
+      if (A !== fri(o)) return null;
+      const s = A.s;
+      const P = o.F.head;
+      const d = huvudAxlar(o);
+      const at = inHead(o, new THREE.Vector3(s * P.rx * 0.22 + 1.5 * Math.sin(l * 8), P.ry * 0.06 + 0.8 * Math.sin(l * 6), P.rz * 0.96 + o.F.arm * 1.05));
+      return { p: at, y: d(-s * 0.3, 1, -0.1), z: d(0, 0, 1), pole: new THREE.Vector3(s, -0.7, 0.3) };
+    },
+    kropp: () => ({ lean: 0.06, pitch: 0.14 }),
+    blund: (o, x) => x.l > 0.8 && x.l < 4.0,
+  };
+
+  // Rullar sakta på nacken, två varv med ögonen stängda, och drar upp axlarna först.
+  const RULL = { start: 1.0, per: 3.0, n: 2 };
+  AKTER.nackrull = {
+    len: RULL.start + RULL.n * RULL.per + 1.4, in: 0.9, ut: 1.0,
+    kropp: (o, t, l) => {
+      const k = bump(l, RULL.start - 0.3, RULL.start + 0.6, RULL.start + RULL.n * RULL.per - 0.4, RULL.start + RULL.n * RULL.per + 0.4);
+      const f = (2 * Math.PI * (l - RULL.start)) / RULL.per;
+      const ax = bump(l, 0.1, 0.6, 0.9, 1.4);
+      return { pitch: (0.04 + 0.17 * Math.cos(f)) * k, roll: 0.2 * Math.sin(f) * k, lift: 2.2 * ax, breath: 0.05 * ax };
+    },
+    blund: (o, x) => x.l > RULL.start && x.l < RULL.start + RULL.n * RULL.per,
+  };
+
+  // Mätt efter lunchen: bakåtlutad med handen på magen som klappar två gånger två, och en
+  // nöjd utandning.
+  AKTER.magen = {
+    len: 7, in: 1.2, ut: 1.2,
+    hand: (o, A, t, l) => {
+      if (A !== fri(o)) return null;
+      const s = A.s;
+      const d = balAxlar(o);
+      const klapp = Math.max(0, Math.sin((l - 1.6) * 7.5)) ** 2 * (bump(l, 1.6, 1.7, 3.2, 3.4) + bump(l, 4.1, 4.2, 5.4, 5.6));
+      return handflata(o, iBal(o, new THREE.Vector3(-s * o.F.w * 0.08, o.T * 0.5, o.F.depth * 1.0 + 4.5 * klapp)), d(-s, 0.25, 0.15), d(0.1, 0, 1), new THREE.Vector3(s, -0.5, 0.3));
+    },
+    kropp: (o, t, l) => {
+      const u = bump(l, 3.4, 3.8, 4.2, 4.8);
+      return { lean: -0.17, pitch: -0.02 - 0.06 * u, breath: 0.04 - 0.06 * u };
+    },
+  };
+
+  // Eftermiddagen: huvudet sjunker sakta med ögonen stängda, rycker upp, och hen tittar sig
+  // omkring med öppna ögon som om inget hänt.
+  const NICK_TILL = { ryck: 3.7, slut: 6.4 };
+  AKTER.nickarTill = {
+    len: 7.6, in: 0.8, ut: 1.0,
+    kropp: (o, t, l) => {
+      const r = NICK_TILL.ryck;
+      const ner = sm(0.6, r - 0.2, l) * (1 - sm(r, r + 0.22, l));
+      const upp = bump(l, r, r + 0.12, r + 0.25, r + 0.7);
+      const se = bump(l, r + 0.4, r + 0.8, NICK_TILL.slut - 0.6, NICK_TILL.slut);
+      return { pitch: 0.48 * ner - 0.12 * upp, lean: 0.08 * ner, roll: 0.07 * ner * (FI(o) % 2 ? 1 : -1), lift: 2.2 * upp, yaw: 0.32 * Math.sin((l - r - 0.4) * 2.6) * se, breath: -0.03 * ner };
+    },
+    blund: (o, x) => x.l > 1.3 && x.l < NICK_TILL.ryck,
+  };
+
+  // Gäspningen smittar: a gäspar, b ser det och gäspar, c ser på b, försöker låta bli
+  // (huvudet ner och en liten skakning) men gäspar ändå – och skakar på huvudet åt sig själv.
+  const SMITTGASP = [0.6, 3.9, 7.1];
+  const gaspFor = (x, o) => SMITTGASP[rollNr(roller(x), FI(o))];
+  AKTER.gaspSmitta = {
+    len: 12.6, in: 0.4, ut: 0.7,
+    hand: (o, A, t, l, x) => {
+      const k = gaspHandK(l - gaspFor(x, o));
+      return A === fri(o) && k > 0 ? lerpPose(handRest(o, A, t), gaspHand(o, A), k) : null;
+    },
+    kropp: (o, t, l, x) => {
+      const R = roller(x);
+      const j = rollNr(R, FI(o));
+      const g0 = SMITTGASP[j];
+      const ut = gaspKropp(o, l - g0);
+      if (j === 0) return ut;
+      // (tittar på den som gäspade före en, tills det är ens egen tur)
+      const fore = rollVem(R, j - 1);
+      const se = { se: huvudPa(fore), seW: 0.8 * bump(l, SMITTGASP[j - 1] + 0.4, SMITTGASP[j - 1] + 0.9, g0 - 0.3, g0 + 0.2) };
+      if (j === 1) return { ...ut, ...se };
+      const emot = bump(l, g0 - 1.5, g0 - 1.1, g0 - 0.2, g0 + 0.1);
+      const efter = bump(l, g0 + GASP.len - 0.4, g0 + GASP.len, g0 + GASP.len + 0.6, g0 + GASP.len + 1.0);
+      return { ...ut, ...se, pitch: ut.pitch + 0.08 * emot, yaw: 0.08 * Math.sin(l * 8) * emot + 0.12 * Math.sin(l * 8) * efter, breath: ut.breath - 0.02 * emot };
+    },
+    gasp: (o, t, l, x) => gaspMun(l - gaspFor(x, o)),
+  };
+
   // ---------- dansen ----------
   // När radion spelar dansar de (DANSER i rum-dans.js): ner med det som är i händerna, som i
   // korstecknet, och upp med händerna med fingrar. Den som håller upp sin skylt dansar med
@@ -5627,6 +5831,11 @@ export async function figurer(canvas, opt = {}) {
   function skrattW(o, t) {
     const x = aktNu(o, t);
     return x && x.a.skratt ? x.a.skratt(o, t, x.l, x) * x.w : 0;
+  }
+  // och gäspar (gäspansiktet, ansiktsBild)
+  function gaspW(o, t) {
+    const x = aktNu(o, t);
+    return x && x.a.gasp ? x.a.gasp(o, t, x.l, x) * x.w : 0;
   }
 
   // ---------- en går iväg ----------
@@ -6472,6 +6681,43 @@ export async function figurer(canvas, opt = {}) {
     TROTT.p = null;
     for (const k of Object.keys(tex)) if (k.startsWith('trott_')) { tex[k].dispose(); delete tex[k]; }
   }
+  // Gäspansiktena (GASP_MUN, skaggGasp: tex.gasp_dl … gasp_skagg) byggs när någon snart ska
+  // gäspa och släpps en minut efter den sista gäspningen, som de trötta. Tills de är klara
+  // gäspar man med skrattets ansikte.
+  const GASPEN = { p: null, nr: 0, sist: -1e9 };
+  function gaspBygg() {
+    if (GASPEN.p) return;
+    const nr = ++GASPEN.nr;
+    GASPEN.p = (async () => {
+      const ny = {};
+      const jobb = [];
+      const bygg = (k, s) => { if (s) jobb.push(svgTex(s).then((x) => { ny[k] = x; }, () => {})); };
+      try {
+        for (const k of ['dl', 'dt', 'dj']) if (ANS.svg[k]) bygg(`gasp_${k}`, skrattar(ANS.svg[k], GASP_MUN[k]));
+        if (ANS.svg.skagg) bygg('gasp_skagg', skaggGasp(ANS.svg.skagg));
+      } catch (err) {
+        console.warn('Rummet: gäspningarna kunde inte ritas', err);
+      }
+      await Promise.all(jobb);
+      if (nr !== GASPEN.nr) {
+        for (const x of Object.values(ny)) x.dispose();
+        return;
+      }
+      Object.assign(tex, ny);
+    })();
+  }
+  function gaspSlapp() {
+    GASPEN.nr++;
+    GASPEN.p = null;
+    for (const k of Object.keys(tex)) if (k.startsWith('gasp_')) { tex[k].dispose(); delete tex[k]; }
+  }
+  // gäspar någon nu eller om en stund (påhitten med gasp, och uppvaknandet med en sträckning)?
+  const gaspSnart = (t) => figs.some((o) => {
+    const x = aktRa(o, t + 1.5) || aktRa(o, t);
+    if (x && AKTER[x.namn].gasp) return true;
+    const vk = vaknaNu(o, t);
+    return Boolean(vk && vk.satt === 'strack');
+  });
   // tunga, långsamma blinkningar när man just har vaknat (längre ju groggyare)
   const trottBlink = (o, t, gr) => (t + o.phase * 2.3) % 2.6 < 0.2 + 0.4 * Math.max(gr, 0.3);
   // Ansiktet: skrattet (och gäspningen), sömnen och uppvaknandet, annars efter humöret med blinkningarna.
@@ -6484,17 +6730,19 @@ export async function figurer(canvas, opt = {}) {
     const vk = vaknaNu(o, t);
     const gr = groggW(o, t);
     const V = vk && VAKNA[vk.satt];
-    const gasp = Boolean(V && V.gaspar && V.gaspar(vk.l));
+    const gasp = Boolean(V && V.gaspar && V.gaspar(vk.l)) || gaspW(o, t) > 0.3;
+    const G = gasp ? tex[`gasp_${k}`] : null;
     // (ögonlocken blir tunga redan medan hen somnar)
     const trott = sov > 0.15 || vk || gr > 0.3;
     let bild;
-    if ((skrattW(o, t) > 0.3 || gasp) && skratt) bild = skratt;
+    if (G) bild = G;
+    else if ((skrattW(o, t) > 0.3 || gasp) && skratt) bild = skratt;
     else if (sov > 0.5 || gasp || (V && V.blund && V.blund(vk.l))) bild = T.blund || a.blund || a.bas;
     // (med ett ryck: ögonen vidöppna en stund)
     else if (vk && vk.satt === 'ryck' && vk.l < 2.9 && a.blund) bild = a.bas;
     else if (trott && T.bas) bild = !opt.calm && trottBlink(o, t, gr) && T.blund ? T.blund : T.bas;
     else bild = a.blund && ((!opt.calm && blinkar(o, t)) || korsBlund(o, t)) ? a.blund : a.bas;
-    return { bild, skagg: (skrattW(o, t) > 0.3 || gasp) && tex.dj_skagg_skratt ? tex.dj_skagg_skratt : trott && tex.trott_skagg ? tex.trott_skagg : tex.ans_skagg || tex.dj_skagg };
+    return { bild, skagg: gasp && tex.gasp_skagg ? tex.gasp_skagg : (skrattW(o, t) > 0.3 || gasp) && tex.dj_skagg_skratt ? tex.dj_skagg_skratt : trott && tex.trott_skagg ? tex.trott_skagg : tex.ans_skagg || tex.dj_skagg };
   }
   // Z:ana som stiger från den som sover, ett per utandning i hens takt (SOVTAKT): DT snarkar
   // (större och tätare), DJ andas djupt och DL lätt. De driver uppåt och utåt och bleknar, och
@@ -6589,6 +6837,11 @@ export async function figurer(canvas, opt = {}) {
       TROTT.sist = t;
       trottBygg();
     } else if (TROTT.p && t - TROTT.sist > 60) trottSlapp();
+    // gäspansiktena (GASPEN) när någon snart ska gäspa
+    if (gaspSnart(t)) {
+      GASPEN.sist = t;
+      gaspBygg();
+    } else if (GASPEN.p && t - GASPEN.sist > 60) gaspSlapp();
     // ansiktena (ansiktsBild): blinkar (inte i en fast bild), skrattar (skrattW)
     // med ögonen hopknipna och munnen öppen (DJ:s i skägget), sover, vaknar –
     // annars ansiktet efter humöret (ansiktet)
@@ -6858,6 +7111,8 @@ export async function figurer(canvas, opt = {}) {
   let bordFest = { namn: undefined, g: null };
   function ute(v) {
     vNu = v;
+    // (klockan för påhitten efter tiden på dygnet)
+    dygnSatt(v, lastT ?? 0);
     const fest = festen(v);
     if (fest !== bordFest.namn) {
       if (bordFest.g) { bord.remove(bordFest.g); bordFest.g.traverse((x) => { if (x.geometry) x.geometry.dispose(); }); }
