@@ -62,6 +62,8 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-rutor .k { fill: none; stroke: var(--rod); stroke-width: 4.2; stroke-linecap: round; }
 
 .hg-etta .hg-bild { margin-bottom: 14px; }
+/* Miniatyren till BBC:s videor har tv-grafiken över högra halvan: på framsidan syns bara den vänstra, med spelarna. */
+.hg-bild.omslagsbild.video .hg-foto img { transform: scale(1.8); transform-origin: 0 10%; }
 .hg .hg-etta h2 { margin: 4px 0 12px; padding: 0; border: 0; font: 400 clamp(31px, 6vw, 58px)/1.1 var(--anton); letter-spacing: 0.005em; text-transform: uppercase; color: var(--svart); text-wrap: balance; }
 .hg-etta h2 a, .hg-fler-l h4 a { text-decoration: none; }
 .hg-etta h2 span, .hg-fler-l h4 span { color: var(--rod); }

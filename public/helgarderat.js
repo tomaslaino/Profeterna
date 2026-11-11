@@ -18,9 +18,9 @@
 // gula papper, i svart och rött), "fast utan alla matcher på förstasidan".
 //
 //   Framsidan   ett gult programomslag: numret och priset (tre rader, tre kronor), namnet på ett rött band, lördagens
-//               datum, ettan med bild och programmets märke (rutorna 1, X och 2 ikryssade: helgarderat, och antalet
-//               matcher), och Också i numret: tre matcher till med rubrik och sida. Inte alla matcher; de står ett
-//               matchblad var på sidorna efter
+//               datum, ettan med en enda bild och programmets märke (rutorna 1, X och 2 ikryssade: helgarderat, och
+//               antalet matcher), och Också i numret: tre matcher till med rubrik och sida. Inte alla matcher; de står
+//               ett matchblad var på sidorna efter
 //   Matchbladen ett per match: rubriken, bilden, introduktionen, hemmalaget, bortalaget och sammanfattningen, och i en
 //               smal spalt bredvid avsparken, källorna med datum och, ibland, ett citat
 //   Baksidan    källorna, avsnitt, forumtrådar och artiklar med datum och länk
@@ -28,7 +28,7 @@
 // Bilden: matchens egen (bild i sidan), annars veckans bilder av lagen, hemma och borta bredvid varandra: matchbladets
 // (bilder, som GitHub Actions hämtar före bygget, scripts/tidning/matchbilder.mjs) eller tidningens inför omgången
 // (data/tidning.json och data/tidning-bilder/, som iMacen hämtar). Utan bild, eller om den inte går att hämta, står
-// lagens sköldar mot varandra.
+// lagens sköldar mot varandra. Framsidan har bara en av bilderna (enBild).
 // Texterna och uppställningen av lagets text och källor (poddText, poddKallor, poddKallText, poddCitat) kommer från
 // RumTidning, så att det står samma sak i båda tidningarna.
 
@@ -108,23 +108,36 @@
     const l = n && Array.isArray(n.bilder) ? [0, 1].map((i) => (n.bilder[i] && n.bilder[i].fil ? { ...n.bilder[i], src: `data/tidning-bilder/${n.bilder[i].fil}` } : null)) : [];
     return l.some(Boolean) ? { tva: l } : null;
   }
+  // Framsidan har en enda bild, inte lagen bredvid varandra (2026-11-11, användarens önskemål: "bara en bild istället
+  // för allt det här plottriga"): matchens egen, annars ett av lagens foton, helst ett ur en artikel (miniatyren till
+  // BBC:s videor har tv-grafiken över högra halvan, och på framsidan syns bara den vänstra), annars hemmalagets.
+  // Vilket lag det är står i bildtexten, inte i en ruta över bilden. → { en: {src, …, video} } eller null
+  const VIDEO = /bbc\.co\.uk\/sport\/.*\/videos\//;
+  function enBild(s) {
+    const b = bilderna(s);
+    if (!b) return null;
+    const l = (b.en ? [b.en] : b.tva.map((x, i) => x && { ...x, lag: x.lag || (s.lag || [])[i] })).filter(Boolean)
+      .map((x) => ({ ...x, video: VIDEO.test(x.sida || '') }));
+    return { en: l.find((x) => !x.video) || l[0] };
+  }
   // Fotografen och källan: Jane Doe, BBC Sport (8 nov).
   const fotoAv = (b) => [b.foto, b.kalla].filter(Boolean).join(', ') + (b.datum && kortDatum(b.datum) ? ` (${kortDatum(b.datum)})` : '');
   // Bilden överst på matchbladet och på framsidan. Lagens sköldar mot varandra står under bilden och syns när det inte
   // finns någon bild eller den inte går att hämta (.fel).
-  function figur(s, kl = '') {
+  function figur(s, kl = '', b = bilderna(s)) {
     const lag = s.lag || [];
-    const b = bilderna(s);
     const namn = (n) => (kl.includes('liten') ? kort(n) : n || '');
     const vs = `<div class="hg-vs">${[0, 1].map((i) => `<span>${skold(lag[i], 'vs')}<b>${esc(namn(lag[i]))}</b></span>`).join('<i>–</i>')}</div>`;
     const img = (x, alt) => `<img src="${esc(x.src)}" alt="${esc(alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;
     if (!b) return `<figure class="hg-bild vs${kl}">${vs}</figure>`;
     if (b.en) {
-      const text = b.en.text ? `${esc(hel(b.en.text))} ` : '';
+      // på framsidan står laget i bildtexten, inte i en ruta över bilden
+      const iTexten = kl.includes('omslagsbild');
+      const text = b.en.text ? `${esc(hel(b.en.text))} ` : iTexten && b.en.lag ? `${esc(b.en.lag)}. ` : '';
       const av = fotoAv(b.en);
       const kalla = av ? `<span>Foto: ${b.en.sida ? `<a href="${esc(b.en.sida)}" target="_blank" rel="noopener">${esc(av)}</a>` : esc(av)}</span>` : '';
-      const namnet = b.en.lag ? `<b>${esc(kl.includes('liten') ? kort(b.en.lag) : b.en.lag)}</b>` : '';
-      return `<figure class="hg-bild en${kl}"><div class="hg-foto">${img(b.en, b.en.text || b.en.lag || lag.join('–'))}${namnet}</div>${vs}` +
+      const namnet = b.en.lag && !iTexten ? `<b>${esc(kl.includes('liten') ? kort(b.en.lag) : b.en.lag)}</b>` : '';
+      return `<figure class="hg-bild en${b.en.video ? ' video' : ''}${kl}"><div class="hg-foto">${img(b.en, b.en.text || b.en.lag || lag.join('–'))}${namnet}</div>${vs}` +
         (text || kalla ? `<figcaption>${text}${kalla}</figcaption>` : '') + '</figure>';
     }
     const halvor = b.tva.map((x, i) => `<div class="hg-foto${x ? '' : ' fel'}">${x ? img(x, lag[i] || '') : ''}<span class="hg-reserv">${skold(lag[i], 'vs')}</span><b>${esc(kort(lag[i]))}</b></div>`).join('');
@@ -189,7 +202,7 @@
       `<div class="hg-overrad"><span>${esc(numret(u, lordag))}</span><span>Det supportrarna vet</span><span>Pris 3 kr</span></div>` +
       `<h1 class="hg-namn">Helgarderat</h1>` +
       `<div class="hg-dagen"><p>${esc(dagen)}</p>${u.prov ? '<span class="hg-stampel">Provnummer</span>' : ''}</div></header>`;
-    const ettan = `<article class="hg-etta"><div class="hg-omslag">${figur(s1)}${marke(lordag, sidor.length)}</div>${kick(s1)}` +
+    const ettan = `<article class="hg-etta"><div class="hg-omslag">${figur(s1, ' omslagsbild', enBild(s1))}${marke(lordag, sidor.length)}</div>${kick(s1)}` +
       `<h2><a href="#sida-${sidnr(s1)}">${tvafarg(s1.rubrik || T.rubrik(lag1[0], lag1[1]))}</a></h2>` +
       (s1.ingress ? `<p class="hg-ingress">${esc(hel(s1.ingress))}</p>` : '') +
       (c ? citat(c, 'stort') : '') +
