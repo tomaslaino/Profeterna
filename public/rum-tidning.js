@@ -14,8 +14,8 @@
 //                breda som omslaget och minst lika höga, på samma papper och i samma tryck (helgarderat.css).
 //   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
 //                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
-//   Matchbladen  ett per match, från sidan 2 (Tavlan, B): lagen mot varandra överst med sköldarna, dagen,
-//                avsparken och arenan, sedan rubriken, en bild, introduktionen, lagen efter varandra med ett citat
+//   Matchbladen  ett per match, från sidan 2 (Tavlan, B, i omslagets rutor, A): lagen mot varandra överst med
+//                sköldarna, dagen, avsparken och arenan, sedan rubriken, en bild, introduktionen, lagen efter varandra med ett citat
 //                var under, sammanfattningen sist och källorna, med en länk till varje avsnitt, forumtråd och artikel.
 //   Sista sidan  Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, som inte står i matchbladen) och
 //                ett kåseri av en ny person varje vecka (Spalterna), ur data/sista-sidan.json. Utan den slutar tidningen med matchbladen.
@@ -101,6 +101,8 @@
       // klubben och lokaltidningen) bara namnet.
       typord: { podd: 'podden', forum: 'forumet', media: '', lokal: '', motstand: 'intervjun i' },
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
+      // under tavlan, före arenan: numret på kupongen
+      match: (n) => `Match ${n}`,
       // över lagets text, som står efter varandra
       hemma: 'Hemma',
       borta: 'Borta',
@@ -152,6 +154,17 @@
     const mandag = dag.getTime() - ((dag.getUTCDay() + 6) % 7) * 864e5;
     const n = Math.round((mandag - FORSTA) / (7 * 864e5)) + 1;
     return n >= 1 ? n : null;
+  }
+  // Upplagans nummer och lördag: { nr, dag }, nr null före det första numret (provnumret 0) och dag null utan tider.
+  function numret(u) {
+    const dag = u && Number.isFinite(u.lordag) ? new Date(u.lordag) : null;
+    return { dag, nr: !u ? null : u.prov ? 0 : dag ? nummer(dag) : null };
+  }
+  // Sidhuvudets högra del på alla sidor efter omslaget: Nr 1 · lördag 14 november, samma lördag som omslaget (A,
+  // Rutorna, 2026-11-11). Förut stod matchbladens datum där (dagen då de skrevs) och veckan på innehållet.
+  function huvudet(u) {
+    const { nr, dag } = numret(u);
+    return [nr != null ? TEXT.forsta.nr(nr) : '', dag ? `${fVdagLang.format(dag)} ${fDagMan.format(dag)}` : u.datumText].filter(Boolean).join(' · ');
   }
 
   // ---------- supportrarnas texter och källor ----------
@@ -345,8 +358,7 @@
   // en länk och har inga egna. Utan upplaga står bara namnet och rutorna.
   function forsta(u, lankar = false) {
     const G = TEXT.forsta;
-    const dag = u && Number.isFinite(u.lordag) ? new Date(u.lordag) : null;
-    const nr = !u ? null : u.prov ? 0 : dag ? nummer(dag) : null;
+    const { nr, dag } = numret(u);
     const over = [nr != null ? G.nr(nr) : '', dag ? G.vecka(vecka(dag)) : ''].filter(Boolean).join(' · ');
     const mitt = lankar && u ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(spelet(u))}">${rutor()}</a>` : `<div class="hf-mitt">${rutor()}</div>`;
     let ettan = '';
@@ -388,11 +400,7 @@
   // vad som står där. Hela raden leder till sidan; en match utan matchblad är blek och har inget sidnummer. Förut
   // Uppställningen (Stryktipset på rött band, lagen mot varandra med sköldarna), som inte sa var något stod.
   function kupong(u) {
-    const G = TEXT.forsta;
     const I = TEXT.innehall;
-    const dag = Number.isFinite(u.lordag) ? new Date(u.lordag) : null;
-    const nr = u.prov ? 0 : dag ? nummer(dag) : null;
-    const over = [nr != null ? G.nr(nr) : '', dag ? G.vecka(vecka(dag)) : ''].filter(Boolean).join(' · ');
     const rad = (nr, namn, rub, sida) => {
       const inne = `<b class="hg-i-nr">${nr}</b><span class="hg-i-lag">${namn}</span><i class="hg-i-pr"></i><b class="hg-i-s">${sida || ''}</b>` +
         (rub ? `<em class="hg-i-rub">${esc(hel(rub))}</em>` : '');
@@ -406,7 +414,7 @@
     }).join('');
     const S = u.sista;
     const sista = S ? `<ol class="hg-i-sista">${rad('', esc(I.sista), [S.kronika.av, S.sidan.length ? TEXT.sista.vidSidanAv : '', S.kaseri.av].filter(Boolean).join(' · '), u.sistaNr)}</ol>` : '';
-    return `<section class="hg-kupong" id="hg-kupongen" aria-label="${esc(I.titel)}"><header class="hg-i-hd"><a href="#hg-forsta">${NAMN}</a><span>${esc(over)}</span></header>` +
+    return `<section class="hg-kupong" id="hg-kupongen" aria-label="${esc(I.titel)}"><header class="hg-i-hd"><a href="#hg-forsta">${NAMN}</a><span>${esc(huvudet(u))}</span></header>` +
       `<h2 class="hg-i-titel">${esc(I.titel)}</h2><ol>${rader}</ol>${sista}</section>`;
   }
 
@@ -434,8 +442,8 @@
 
   // ---------- matchbladen ----------
 
-  // Sidhuvudet som i en tidning: sidnumret ytterst, namnet (tillbaka till omslaget) och numrets datum.
-  const folio = (u, nr) => `<div class="hg-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><a href="#hg-forsta">${NAMN}</a><span>${esc(u.datumText)}</span></div>`;
+  // Sidhuvudet som i en tidning: sidnumret ytterst, namnet (tillbaka till omslaget) och numret med lördagen (huvudet).
+  const folio = (u, nr) => `<div class="hg-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><a href="#hg-forsta">${NAMN}</a><span>${esc(huvudet(u))}</span></div>`;
   // c: { sagt, vem } (poddCitat). Citaten är översatta från engelska, och det står efter namnet.
   const citat = (c) => `<blockquote class="hg-citat"><p>”${esc(hel(c.sagt))}”</p><cite>${esc(c.vem)} (${esc(TEXT.poddar.oversatt)})</cite></blockquote>`;
   // Lagets stycken som html, med personerna (namn: spelarna och tränaren som redaktören säger står i texten) i fetstil
@@ -460,24 +468,26 @@
       return h;
     });
   }
-  // Lagen mot varandra överst på matchbladet, som en resultattavla (2026-11-11, användarens val B, Tavlan, bland fyra
-  // skisser: "kan du ha den här överst på sidan inklusive den tid och plats de möts"): sköldarna på runda plåtar med
-  // namnen under, hemmalaget till vänster, dagen och avsparken i en ruta i mitten, och under tavlan numret på kupongen
-  // och arenan med orten (s.arena och s.ort, som bygget lägger till ur ESPN:s spelprogram). Utan arena står hela dagen
-  // där i stället.
+  // Lagen mot varandra överst på matchbladet (2026-11-11, användarens val B, Tavlan, bland fyra skisser: "kan du ha den
+  // här överst på sidan inklusive den tid och plats de möts"), sedan samma kväll som omslagets tre rutor (A, Rutorna,
+  // bland tre skisser: "mer kongruent mellan sidorna och snyggare"): hemmalagets sköld, avsparken och bortalagets sköld
+  // i var sin tryckt ruta, med lagen och dagen ovanför där omslaget har 1, X och 2. Under rutorna, mellan två streck som
+  // omslagets datum, numret på kupongen och arenan med orten (s.arena och s.ort, som bygget lägger till ur ESPN:s
+  // spelprogram); utan arena hela dagen. Förut stod lagen på ett tryckt block i terrakotta, det enda fyllda i tidningen.
   function tavla(s, namn) {
-    const lagT = (i) => `<div class="hg-tavla-lag"><span class="hg-plat">${skold(namn(i), 'mot')}</span><b>${esc(namn(i))}</b></div>`;
-    const mitt = giltig(s.avspark) ? `<em>${esc(dagen(s.avspark))}</em><strong>${esc(tid(s.avspark))}</strong>` : '';
+    const kol = (over, inne, kl = '') => `<div class="hg-tavla-kol"><span class="hg-tavla-over">${esc(over)}</span><span class="hg-ruta${kl}">${inne}</span></div>`;
+    const lagK = (i) => kol(namn(i), skold(namn(i), 'mot'));
+    const mitt = giltig(s.avspark) ? kol(dagen(s.avspark), esc(tid(s.avspark)), ' hg-ruta-tid') : '<div class="hg-tavla-kol"></div>';
     const ort = s.ort && !String(s.arena || '').includes(s.ort) ? s.ort : '';
     const plats = s.arena ? [s.arena, ort].filter(Boolean).join(', ') : giltig(s.avspark) ? `${fVdagLang.format(new Date(s.avspark))} ${fDagMan.format(new Date(s.avspark))}` : '';
-    return `<header class="hg-tavla"><div class="hg-tavla-rad">${lagT(0)}<div class="hg-tavla-tid">${mitt}</div>${lagT(1)}</div>` +
-      `<p class="hg-plats"><b>${s.nr}</b><span>${esc(plats)}</span></p></header>`;
+    return `<header class="hg-tavla"><div class="hg-tavla-rad">${lagK(0)}${mitt}${lagK(1)}</div>` +
+      `<p class="hg-plats"><span>${esc([s.nr ? TEXT.poddar.match(s.nr) : '', plats].filter(Boolean).join(' · '))}</span></p></header>`;
   }
   // Matchbladet. Först 2026-11-10 (användarens önskemål: "ett matchblad med information. Först en kort introduktion,
   // sen diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för
   // varje match). Sedan 2026-11-11 Tavlan (B, valt bland fyra skisser): tavlan med lagen, avsparken och arenan överst,
-  // rubriken, en bild, introduktionen och lagen efter varandra, hemmalaget först, var och en under sin sköld och sitt
-  // namn, så att det inte blir ett tomt hål bredvid ett lag med lite text. Spelarnas namn i fetstil, lagets citat under
+  // rubriken, en bild, introduktionen och lagen efter varandra, hemmalaget först, var och en under sitt namn (sköldarna
+  // står i tavlan, sedan Rutorna inte två gånger), så att det inte blir ett tomt hål bredvid ett lag med lite text. Spelarnas namn i fetstil, lagets citat under
   // dess text, sammanfattningen i en tryckt ruta sist och källorna per lag. Förut Sköldarna möts (C3): en vinjett med
   // numret och avsparken överst, sköldarna mot varandra under introduktionen och lagen i två spalter bredvid varandra.
   // Citatet är lagets (d.citat, ett per lag sedan 2026-11-11); ett äldre nummer har ett för sidan (s.citat), och det
@@ -494,7 +504,7 @@
     const lagen = delar.map((d, i) => {
       const text = poddText(d);
       const c = citatFor(i);
-      return `<section class="hg-lagdel"><h3>${skold(namn(i))}<span>${esc(namn(i))}</span><em>${esc(i ? T.borta : T.hemma)}</em></h3>` +
+      return `<section class="hg-lagdel"><h3><span>${esc(namn(i))}</span><em>${esc(i ? T.borta : T.hemma)}</em></h3>` +
         `<div class="hg-lagtext">${text.length ? fetaNamn(text, d.namn).map((t) => `<p>${t}</p>`).join('') : `<p class="hg-ingen">${esc(T.ingen)}</p>`}</div>` +
         (c ? citat(c) : '') + '</section>';
     }).join('');

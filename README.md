@@ -290,6 +290,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Helgarderat i omslagets tryck rakt igenom (2026-11-11, användarens önskemål: "Hur hade du gjort för att tidningen
+  helgarderat skulle bli mer kongruent mellan sidorna och snyggare än vad den är nu"):** alla sidor efter omslaget har
+  samma sidhuvud (*Nr 1 · lördag 14 november*; matchbladen visade förut dagen då texten skrevs), matchbladets tavla är
+  omslagets tre rutor (hemmalagets sköld, avsparken och bortalagets sköld, med lagen och dagen ovanför där omslaget har 1,
+  X och 2, och *Match 1 · Edgeley Park* mellan två streck under), lagen står i röda versaler överallt som den första
+  matchen på omslaget, och introduktionen och sammanfattningen är inte längre feta. Inget är fyllt med färg. Valt bland
+  tre skisser: A *Rutorna*, B *Dagstidningen* (svart tryck, två spalter) och C *Röda bandet* (samma terrakottaband överst
+  på varje sida) (se [Helgarderat](#helgarderat))
 - [x] **Helgarderats sidor lika stora och i samma stil (2026-11-11, användarens önskemål: "Jag vill att sidorna ska vara
   konkordanta med varandra - nu ser de ut att ha lite olika storlek när man öppnar tidningen"):** alla sidor är lika
   breda som omslaget och minst lika höga (innehållet exakt lika stort), och alla har omslagets papper, ram och
@@ -7802,7 +7810,9 @@ rummet), och innehållet, matchbladen och sista sidan är lika breda och minst l
 Alla sidor har omslagets papper (fibrerna, buktorna och trycket som inte har täckt), den tunna tryckta ramen och
 omslagets översta rad som sidhuvud, och kupongens tre röster: tryck i terrakotta (namnet, rubrikerna, numren och
 strecken i Fraunces), skrivmaskin (sidhuvudet, tiderna, lagen i innehållet, bildtexterna och källorna) och den blå
-pennan (omslagets kryss). Brödtexten står i bläck. Priset är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
+pennan (omslagets kryss). Brödtexten står i bläck. Sedan samma kväll (val A *Rutorna*) är omslaget förebild för
+resten: samma sidhuvud efter omslaget (*Nr 1 · lördag 14 november*), matchbladets tavla som omslagets rutor 1, X och 2,
+lagen i röda versaler och rubrikerna i svart kursiv överallt, bara konturer och inget fetstilt utom spelarnas namn. Priset är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har bilden och, om
 matchbladet har ett, citatet. Bredvid står *Lördagens matcher* med sidnumren, och under *Fler matcher*: tre matcher
 till med bild, rubrik och introduktionens första mening. Sedan kommer ett matchblad per match.

@@ -9,7 +9,14 @@
    sajtens papper (papper.css): det tryckta i terrakotta (Fraunces: namnet, rubrikerna, numren, strecken och ramen),
    det maskinskrivna (--skriv: sidhuvudet, tiderna, lagen i förteckningen, bildtexterna och källorna) och pennan
    (omslagets kryss). Brödtexten står i bläck. Förut hade sidorna tre bredder och tre stilar: omslaget, Stryktipset på
-   rött band och matchbladen i programmets svart, rött och gult. */
+   rött band och matchbladen i programmets svart, rött och gult.
+
+   Omslagets tryck rakt igenom (2026-11-11, kväll, användarens val A, Rutorna, bland tre skisser: "Hur hade du gjort för
+   att tidningen helgarderat skulle bli mer kongruent mellan sidorna och snyggare"): bara konturer, inget fyllt block;
+   samma sidhuvud på alla sidor efter omslaget (Nr 1 · lördag 14 november); matchbladets tavla som omslagets rutor 1, X
+   och 2; lagen i röda versaler överallt, som den första matchen på omslaget, och rubrikerna i svart kursiv; inget
+   fetstilt i introduktionen och sammanfattningen. Skisserna som inte valdes: B Dagstidningen (svart tryck, två
+   spalter) och C Röda bandet (samma terrakottaband överst på varje sida). */
 html.hg-html { background: #1a1510; }
 body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
   background: radial-gradient(120% 70% at 50% 0%, #2c241b 0%, #1a1510 60%) fixed, #1a1510; font-synthesis: none; -webkit-text-size-adjust: 100%; }
@@ -134,14 +141,16 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 .hg-kupong li > a, .hg-kupong li > div { display: grid; flex: 1 1 auto; grid-template-columns: 26px auto minmax(12px, 1fr) 30px; column-gap: 8px; align-items: end; align-content: center;
   padding: 4px 0 5px; border-bottom: 1px solid var(--streck); color: inherit; text-decoration: none; }
 .hg-i-nr { grid-row: 1; align-self: center; color: var(--rod); font: 600 14px/1 var(--tryck); font-variant-numeric: tabular-nums; }
-.hg-i-lag { grid-row: 1; min-width: 0; overflow: hidden; font: 400 16px/1.15 var(--skriv); white-space: nowrap; text-overflow: ellipsis; }
+/* lagen i röda versaler och rubriken i svart kursiv, som den första matchen på omslaget (A, Rutorna) */
+.hg-i-lag { grid-row: 1; min-width: 0; overflow: hidden; color: var(--rod); font: 600 14px/1.15 var(--tryck); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; }
 .hg-i-pr { grid-row: 1; align-self: end; margin-bottom: 4px; border-bottom: 2px dotted var(--streck); }
 .hg-i-s { grid-row: 1; color: var(--rod); text-align: right; font: 600 19px/1 var(--tryck); font-variant-numeric: tabular-nums; }
-.hg-i-rub { grid-row: 2; grid-column: 2 / 4; margin-top: 2px; overflow: hidden; color: var(--gra); font: italic 400 13.5px/1.25 var(--tryck); white-space: nowrap; text-overflow: ellipsis; }
+.hg-i-rub { grid-row: 2; grid-column: 2 / 4; margin-top: 2px; overflow: hidden; color: var(--svart); font: italic 400 13.5px/1.25 var(--tryck); white-space: nowrap; text-overflow: ellipsis; }
 .hg-kupong li.utan > div { opacity: 0.4; }
-.hg-kupong li.utan .hg-i-pr { border: 0; }
+.hg-kupong li.utan .hg-i-pr { display: none; }
+/* utan sidnummer får lagen hela raden, så att långa namn inte kapas i telefonen */
+.hg-kupong li.utan .hg-i-lag { grid-column: 2 / 5; }
 .hg-kupong .hg-i-sista { margin-top: 8px; border-top: calc(var(--linje) * 3) double var(--rod); }
-.hg-i-sista .hg-i-lag { color: var(--rod); font: 600 16px/1.15 var(--tryck); }
 .hg-kupong .hg-i-sista li > a { border-bottom: 0; }
 @media (hover: hover) { .hg-kupong li > a:hover .hg-i-lag { text-decoration: underline 1.5px var(--rod); text-underline-offset: 3px; } }
 .hg-kupong li > a:focus-visible { outline: 2px solid var(--rod); outline-offset: 2px; }
@@ -156,40 +165,36 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 .hg-folio.h span { margin: 0 auto 0 0; }
 
 /* Tavlan överst (B, valt 2026-11-11 bland fyra skisser: "kan du ha den här överst på sidan inklusive den tid och plats
-   de möts"): lagen mot varandra på ett tryckt block i terrakotta, från ram till ram, med sköldarna på runda plåtar och
-   namnen under, hemmalaget till vänster, dagen maskinskriven och avsparken maskinskriven i en ruta i mitten. Under
-   tavlan en remsa med numret på kupongen i en tryckt ruta och arenan med orten maskinskriven. Ingen vinjett: allt den
-   sa står här. */
-.hg-tavla { margin: calc(var(--hg-k) * 2.6px) calc(var(--hg-k) * -4px) calc(var(--hg-k) * 3.4px); }
-.hg-tavla-rad { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; column-gap: calc(var(--hg-k) * 2px);
-  padding: calc(var(--hg-k) * 3px) calc(var(--hg-k) * 2.4px) calc(var(--hg-k) * 2.8px); background: var(--rod); color: var(--ruta); }
-.hg-tavla-lag { display: flex; flex-direction: column; align-items: center; gap: calc(var(--hg-k) * 1.6px); min-width: 0; text-align: center; }
-.hg-plat { display: grid; place-items: center; flex: none; width: calc(var(--hg-k) * 13px); height: calc(var(--hg-k) * 13px); border-radius: 50%; background: var(--ruta); }
-.hg-skold.mot { flex: none; width: calc(var(--hg-k) * 9.4px); height: calc(var(--hg-k) * 9.4px); vertical-align: 0; }
-.hg-tavla-lag b { max-width: 100%; font: 600 max(12.5px, calc(var(--hg-k) * 2.6px))/1.15 var(--tryck); letter-spacing: 0.08em; text-transform: uppercase; text-wrap: balance; overflow-wrap: break-word; }
-.hg-tavla-tid { display: flex; flex-direction: column; align-items: center; gap: calc(var(--hg-k) * 1.3px); padding-top: calc(var(--hg-k) * 1.9px); }
-.hg-tavla-tid em { font: 400 calc(var(--hg-k) * 2.9px)/1 var(--skriv); font-style: normal; white-space: nowrap; }
-.hg-tavla-tid strong { padding: calc(var(--hg-k) * 1.3px) calc(var(--hg-k) * 2px) calc(var(--hg-k) * 1px); background: var(--ruta); color: var(--svart);
-  font: 400 calc(var(--hg-k) * 5.4px)/1 var(--skriv); white-space: nowrap; }
-.hg .hg-plats { position: relative; display: flex; justify-content: center; align-items: center; min-height: calc(var(--hg-k) * 4.6px);
-  padding: calc(var(--hg-k) * 1.4px) calc(var(--hg-k) * 8.6px); background: var(--ruta); border-bottom: calc(var(--linje) * 2) solid var(--rod);
-  font: 400 calc(var(--hg-k) * 2.9px)/1.25 var(--skriv); text-align: center; text-wrap: balance; }
-.hg-plats b { position: absolute; left: calc(var(--hg-k) * 2.4px); top: 50%; display: grid; place-items: center; min-width: calc(var(--hg-k) * 4.6px);
-  height: calc(var(--hg-k) * 4.6px); padding: 0 4px; box-sizing: border-box; transform: translateY(-50%); background: var(--p); box-shadow: inset 0 0 0 1.6px var(--rod);
-  color: var(--rod); font: 600 max(14px, calc(var(--hg-k) * 2.8px))/1 var(--tryck); }
+   de möts"), i omslagets rutor (A, Rutorna, samma kväll): tre lika breda spalter med hemmalagets sköld, avsparken
+   maskinskriven och bortalagets sköld i var sin tryckt ruta, och lagen och dagen i röda versaler ovanför där omslaget
+   har 1, X och 2 (rutornas överkant i linje också när ett namn bryts: subgrid). Under rutorna numret på kupongen och
+   arenan mellan två streck, som omslagets datum. Förut ett tryckt block i terrakotta från ram till ram, det enda fyllda
+   i tidningen. */
+.hg-tavla { margin: calc(var(--hg-k) * 4px) 0 calc(var(--hg-k) * 3.6px); }
+.hg-tavla-rad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto; column-gap: calc(var(--hg-k) * 2px); }
+.hg-tavla-kol { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: calc(var(--hg-k) * 1.6px); justify-items: center; min-width: 0; }
+.hg-tavla-over { align-self: end; max-width: 100%; color: var(--rod); font: 600 max(12.5px, calc(var(--hg-k) * 2.7px))/1.15 var(--tryck); letter-spacing: 0.08em;
+  text-align: center; text-transform: uppercase; text-wrap: balance; overflow-wrap: break-word; }
+.hg-ruta { display: grid; place-items: center; width: calc(var(--hg-k) * 17px); height: calc(var(--hg-k) * 17px); box-sizing: border-box; background: var(--ruta);
+  box-shadow: inset 0 0 0 calc(var(--hg-k) * 0.6px) var(--rod); }
+.hg-skold.mot { width: 62%; height: 62%; vertical-align: 0; }
+.hg-ruta-tid { color: var(--svart); font: 400 calc(var(--hg-k) * 5.4px)/1 var(--skriv); white-space: nowrap; }
+.hg .hg-plats { display: flex; align-items: center; gap: calc(var(--hg-k) * 1.6px); margin-top: calc(var(--hg-k) * 2.6px); color: var(--rod);
+  font: 600 max(11.5px, calc(var(--hg-k) * 2.2px))/1.3 var(--tryck); letter-spacing: 0.12em; text-transform: uppercase; }
+.hg-plats::before, .hg-plats::after { content: ""; flex: 1 1 calc(var(--hg-k) * 2px); min-width: 18px; border-top: var(--linje) solid var(--rod); }
+.hg-plats span { flex: 0 1 auto; text-align: center; text-wrap: balance; }
 /* rubriken i kursiv, som omslagets */
 .hg .hg-rub { margin: 0 0 12px; padding: 0; border: 0; color: var(--svart); font: italic 500 clamp(25px, calc(var(--hg-k) * 5.6px), 40px)/1.12 var(--tryck); letter-spacing: -0.005em; }
 
-/* Under rubriken, bilden och introduktionen står lagen efter varandra, hemmalaget först, var och en under sin sköld och
-   sitt namn (och Hemma eller Borta längst ut), med lagets citat under texten. Så blir det inget tomt hål bredvid ett lag
+/* Under rubriken, bilden och introduktionen står lagen efter varandra, hemmalaget först, var och en under sitt namn
+   (och Hemma eller Borta längst ut; sköldarna står i tavlan), med lagets citat under texten. Så blir det inget tomt hål bredvid ett lag
    med lite text, som när lagen stod i två spalter bredvid varandra (Sköldarna möts, före Tavlan). Sist
    sammanfattningen i en tryckt ruta och källorna per lag. Texten har anfang, avstavning och jämn högerkant (text-wrap:
    pretty): det ska vara en njutning att läsa. */
-.hg-ingress { margin: 0 0 22px !important; font: 600 18px/1.45 var(--tryck); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
+.hg-ingress { margin: 0 0 22px !important; font: italic 400 19px/1.45 var(--tryck); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
 .hg-lagdel + .hg-lagdel { margin-top: 28px; }
 .hg .hg-lagdel h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; padding: 0 0 7px; border: 0; border-bottom: var(--linje) solid var(--rod);
-  color: var(--rod); font: 600 18px/1 var(--tryck); letter-spacing: 0.08em; text-transform: uppercase; }
-.hg-lagdel h3 .hg-skold { width: 28px; height: 28px; vertical-align: 0; }
+  color: var(--rod); font: 600 15px/1 var(--tryck); letter-spacing: 0.12em; text-transform: uppercase; }
 .hg-lagdel h3 em { margin-left: auto; font: 600 max(11px, calc(var(--hg-k) * 2.1px))/1 var(--tryck); font-style: normal; letter-spacing: 0.14em; }
 .hg-lagtext p { margin: 0 0 12px !important; font: 400 16px/1.55 var(--serif); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
 .hg-lagtext p:last-child { margin-bottom: 0 !important; }
@@ -205,7 +210,7 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 /* sammanfattningen i en tryckt ruta, som omslagets rutor */
 .hg-summering { margin-top: 26px; padding: 12px 16px 14px; background: var(--ruta); box-shadow: inset 0 0 0 1.6px var(--rod); }
 .hg .hg-summering h3 { margin: 0 0 7px; padding: 0; border: 0; }
-.hg-summering p { margin: 0 !important; font: 600 17px/1.45 var(--tryck); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
+.hg-summering p { margin: 0 !important; font: 400 16px/1.55 var(--serif); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
 .hg-kallor { margin-top: 22px; padding-top: 8px; border-top: var(--linje) solid var(--rod); }
 .hg .hg-kallor h4 { margin: 0 0 6px; padding: 0; border: 0; }
 .hg-kallor > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 30px; }
@@ -220,8 +225,9 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
    spalter (arket är lika brett som omslaget, så den smala spalten bredvid fick inte plats). Smal: allt i en spalt. */
 .hs-grid { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 22px; margin-top: 16px; }
 .hs-by { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-.hs-portratt { display: block; flex: none; width: 58px; height: 58px; border-radius: 50%; background: url(helgarderat/hasse.webp) 50% 50% / cover, #d9d3c4;
-  filter: contrast(1.1); mix-blend-mode: multiply; }
+/* porträttet i en tryckt ruta, som sköldarna i matchbladets tavla (A, Rutorna) */
+.hs-portratt { display: block; flex: none; width: 58px; height: 58px; background: url(helgarderat/hasse.webp) 50% 50% / cover, #d9d3c4;
+  box-shadow: inset 0 0 0 3px var(--rod); filter: contrast(1.1); mix-blend-mode: multiply; }
 .hs-by b { display: block; color: var(--rod); font: 600 max(15px, calc(var(--hg-k) * 3.2px))/1.08 var(--tryck); letter-spacing: 0.08em; text-transform: uppercase; }
 .hs-by em { display: block; margin-top: 4px; }
 .hs-text, .hs-ktext { column-count: 2; column-gap: 30px; }
@@ -253,19 +259,16 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 @container (max-width: 460px) {
   .hg-foto { aspect-ratio: 16 / 9; }
   .hg-ingress { font-size: 17px; }
-  .hg-tavla-rad { column-gap: 8px; padding-left: 10px; padding-right: 10px; }
-  .hg-plat { width: 60px; height: 60px; }
-  .hg-skold.mot { width: 44px; height: 44px; }
-  .hg-tavla-tid { padding-top: 6px; }
-  .hg-tavla-tid em { font-size: 12px; }
-  .hg-tavla-tid strong { font-size: 22px; }
-  .hg .hg-plats { padding-left: 46px; padding-right: 46px; font-size: 13px; }
-  .hg-plats b { left: 10px; min-width: 26px; height: 26px; font-size: 14px; }
-  .hg .hg-lagdel h3 { font-size: 15.5px; letter-spacing: 0.05em; }
+  .hg-tavla-rad { column-gap: 8px; }
+  .hg-tavla-over { font-size: 12px; letter-spacing: 0.05em; }
+  .hg-ruta { width: 72px; height: 72px; }
+  .hg-ruta-tid { font-size: 22px; }
+  .hg .hg-plats { font-size: 11px; letter-spacing: 0.08em; }
+  .hg .hg-lagdel h3 { font-size: 14px; letter-spacing: 0.08em; }
   .hg-citat p { font-size: 18px; }
   .hg-kallor > div { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
   .hg .hg-i-titel { font-size: 34px; }
-  .hg-i-lag { font-size: 15px; }
+  .hg-i-lag { font-size: 13px; letter-spacing: 0.05em; }
   .hg-i-rub { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
   .hs-text, .hs-ktext, .hs-sido ul { column-count: 1; }
 }
