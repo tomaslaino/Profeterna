@@ -13,9 +13,9 @@
 //                med zoom: litet på pulten och så stort som ryms när tidningen läses (passa).
 //   Kupongen     innehållet: Stryktipset i programmets eget tryck efter omslaget, en rad per match med numret och
 //                lagen mot varandra, och raden leder till matchbladet. Ingen text, inga tider och inga sidnummer.
-//   Matchbladen  ett per match, från sidan 2: rubriken, bilden, introduktionen, hemmalaget, bortalaget och
-//                sammanfattningen, och i en smal spalt avsparken, ibland ett citat och källorna, med en länk till
-//                varje avsnitt, forumtråd och artikel.
+//   Matchbladen  ett per match, från sidan 2 (Sköldarna möts, C3): rubriken, en bild, introduktionen, lagen mot
+//                varandra med stora sköldar, lagens text i två lika spalter med ett citat var i jämnhöjd under,
+//                sammanfattningen sist och källorna, med en länk till varje avsnitt, forumtråd och artikel.
 //
 // Det som förut stod i tidningen på pulten (Tipset med Tipsligan, Så mår tipslagen, Veckans analys och numret efter
 // omgången med resultaten, betygen, skrällen och Hasses krönika) och sajtens baksida med källorna är borta: de ska
@@ -31,7 +31,8 @@
 // RumTidning.tidning(upplaga) → html: omslaget, kupongen och matchbladen, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
 // RumTidning.passa(rot, bredd, hojd) förstorar omslaget så att det ryms och krymper kupongens lagnamn när de inte ryms.
-// RumTidning.bildfel(rot) ger en bild i matchbladen som inte går att hämta lagets sköld.
+// RumTidning.bildfel(rot): en bild i matchbladen som inte går att hämta byts mot det andra lagets, och annars tas den
+// bort.
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -62,8 +63,6 @@
   const kortDatum = (d) => (giltig(d) ? fKort.format(new Date(d)).replace('.', '') : '');
   // lör 14 nov 16.00 (matchbladets vinjett)
   const avspark = (t) => (giltig(t) ? `${fVdag.format(new Date(t)).replace('.', '')} ${kortDatum(t)} ${tid(t)}` : '');
-  // Lördag 14 november kl. 16.00
-  const avsparkLang = (t) => (giltig(t) ? `${stor(fVdagLang.format(new Date(t)))} ${fDagMan.format(new Date(t))} kl. ${tid(t)}` : '');
 
   // ---------- texterna ----------
   // Tidningens röst är torr och saklig. (npm run repliker kollar dem mot det som är underkänt.)
@@ -90,8 +89,6 @@
       ingen: 'Ingen supporterpodd, inget forum och inget från de insatta, klubben eller lokaltidningen att hämta något ur den här veckan.',
       sammanfattning: 'Sammanfattning',
       kallorna: 'Källorna',
-      matchen: 'Matchen',
-      kupongen: (n) => `Nr ${n} på kupongen`,
       // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan undertiteln,
       // motståndarens intervju med intervjun i framför och de insatta medierna, klubben och lokaltidningen med sitt
       // eget namn.
@@ -218,33 +215,40 @@
   }
   // Fotografen och källan: Jane Doe, BBC Sport (8 nov).
   const fotoAv = (b) => [b.foto, b.kalla].filter(Boolean).join(', ') + (b.datum && kortDatum(b.datum) ? ` (${kortDatum(b.datum)})` : '');
-  // Bilden överst på matchbladet. Lagens sköldar mot varandra står under bilden och syns när det inte finns någon bild
-  // eller den inte går att hämta (.fel, bildfel).
+  // Miniatyren till BBC:s videor har tv-grafiken över högra halvan; den tas hellre än inget, men förstorad mot vänstra
+  // kanten (.video i helgarderat.css) så att grafiken hamnar utanför.
+  const VIDEO = /bbc\.co\.uk\/sport\/.*\/videos\//;
+  // Bilden överst på matchbladet: en enda över hela bredden (2026-11-11, Sköldarna möts), matchens egen eller ett av
+  // lagens foton, helst inte en videominiatyr. Det andra lagets foto står i data-reserv och tas om den första inte går
+  // att hämta (bildfel). Utan bild står ingen: lagens sköldar står ändå mot varandra under introduktionen.
   function figur(u, s) {
-    const lag = s.lag || [];
     const b = bilderna(u, s);
-    const vs = `<div class="hg-vs">${[0, 1].map((i) => `<span>${skold(lag[i], 'vs')}<b>${esc(lag[i] || '')}</b></span>`).join('<i>–</i>')}</div>`;
-    const img = (x, alt) => `<img src="${esc(x.src)}" alt="${esc(alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;
-    if (!b) return `<figure class="hg-bild vs stor">${vs}</figure>`;
-    if (b.en) {
-      const text = b.en.text ? `${esc(hel(b.en.text))} ` : '';
-      const av = fotoAv(b.en);
-      const kalla = av ? `<span>Foto: ${b.en.sida ? lank(b.en.sida, esc(av)) : esc(av)}</span>` : '';
-      return `<figure class="hg-bild en stor"><div class="hg-foto">${img(b.en, b.en.text || b.en.lag || lag.join('–'))}${b.en.lag ? `<b>${esc(b.en.lag)}</b>` : ''}</div>${vs}` +
-        (text || kalla ? `<figcaption>${text}${kalla}</figcaption>` : '') + '</figure>';
-    }
-    const halvor = b.tva.map((x, i) => `<div class="hg-foto${x ? '' : ' fel'}">${x ? img(x, lag[i] || '') : ''}<span class="hg-reserv">${skold(lag[i], 'vs')}</span><b>${esc(kort(lag[i]))}</b></div>`).join('');
-    const av = b.tva.filter(Boolean).map(fotoAv).filter(Boolean);
-    return `<figure class="hg-bild tva stor"><div class="hg-fotona">${halvor}</div>${vs}${av.length ? `<figcaption><span>Foto: ${esc(av.join(' · '))}</span></figcaption>` : ''}</figure>`;
+    const l = (b ? (b.en ? [b.en] : b.tva.filter(Boolean)) : []).map((x) => ({ ...x, video: VIDEO.test(x.sida || '') }))
+      .sort((x, y) => x.video - y.video);
+    const x = l[0];
+    if (!x) return '';
+    const r = l[1];
+    const text = x.text ? `${esc(hel(x.text))} ` : '';
+    const av = fotoAv(x);
+    const kalla = av ? `<span>Foto: ${x.sida ? lank(x.sida, esc(av)) : esc(av)}</span>` : '';
+    return `<figure class="hg-bild"><div class="hg-foto${x.video ? ' video' : ''}"><img src="${esc(x.src)}" alt="${esc(x.text || x.lag || (s.lag || []).join('–'))}"` +
+      `${r ? ` data-reserv="${esc(r.src)}"${r.video ? ' data-reserv-video' : ''}` : ''} loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>` +
+      (text || kalla ? `<figcaption>${text}${kalla}</figcaption>` : '') + '</figure>';
   }
-  // En bild i matchbladen som inte går att hämta: halvan får lagets sköld, och utan någon bild står sköldarna mot
-  // varandra.
+  // En bild i matchbladen som inte går att hämta: det andra lagets foto i stället, och går inte heller det tas bilden
+  // bort (sköldarna står ändå under introduktionen).
   function bildfel(rot) {
     for (const img of rot.querySelectorAll('.hg-foto img')) {
       const fel = () => {
-        img.closest('.hg-foto').classList.add('fel');
-        const f = img.closest('figure');
-        if (f && ![...f.querySelectorAll('.hg-foto')].some((x) => !x.classList.contains('fel'))) f.classList.add('fel');
+        const r = img.dataset.reserv;
+        if (r) {
+          delete img.dataset.reserv;
+          img.closest('.hg-foto').classList.toggle('video', 'reservVideo' in img.dataset);
+          img.addEventListener('error', fel, { once: true });
+          img.src = r;
+          return;
+        }
+        img.closest('figure').classList.add('fel');
       };
       if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) fel();
       else img.addEventListener('error', fel, { once: true });
@@ -384,34 +388,66 @@
   const folio = (u, nr) => `<div class="hg-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><a href="#hg-forsta">${NAMN}</a><span>${esc(u.datumText)}</span></div>`;
   // c: { sagt, vem } (poddCitat). Citaten är översatta från engelska, och det står efter namnet.
   const citat = (c) => `<blockquote class="hg-citat"><p>”${esc(hel(c.sagt))}”</p><cite>${esc(c.vem)} (${esc(TEXT.poddar.oversatt)})</cite></blockquote>`;
-  // Matchbladet (2026-11-10, användarens önskemål: "ett matchblad med information. Först en kort introduktion, sen
-  // diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för varje
-  // match): rubriken, bilden, introduktionen, lagen efter varandra och sammanfattningen i en gul ruta, och bredvid en
-  // smal spalt med matchen, citatet och källorna.
+  // Lagets stycken som html, med personerna (namn: spelarna och tränaren som redaktören säger står i texten) i fetstil
+  // första gången de nämns. De längsta namnen först, så att Max Lowe blir fet och inte bara Lowe.
+  function fetaNamn(stycken, namn) {
+    const l = [...new Set([].concat(namn || []).map((n) => String(n || '').trim()).filter((n) => n.length > 2))].sort((a, b) => b.length - a.length);
+    const re = (n) => new RegExp(`(^|[^\\p{L}\\p{N}])(${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?![\\p{L}\\p{N}])`, 'gu');
+    const inne = (h, i) => (h.slice(0, i).match(/<strong>/g) || []).length > (h.slice(0, i).match(/<\/strong>/g) || []).length;
+    const sett = new Set();
+    return stycken.map((t) => {
+      let h = esc(hel(t));
+      for (const n of l) {
+        if (sett.has(n)) continue;
+        for (const m of h.matchAll(re(esc(n)))) {
+          const i = m.index + m[1].length;
+          if (inne(h, i)) continue;
+          h = `${h.slice(0, i)}<strong>${m[2]}</strong>${h.slice(i + m[2].length)}`;
+          sett.add(n);
+          break;
+        }
+      }
+      return h;
+    });
+  }
+  // Matchbladet. Först 2026-11-10 (användarens önskemål: "ett matchblad med information. Först en kort introduktion,
+  // sen diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för
+  // varje match). Sedan 2026-11-11 Sköldarna möts (C3, valt bland skisser: "Det ska vara en njutning att läsa texten
+  // också"): rubriken, en bild, introduktionen, lagen mot varandra med stora sköldar (hemmalaget mot mitten, som
+  // matchlistan), lagens text i två lika spalter med spelarnas namn i fetstil, lagets citat i jämnhöjd under texten,
+  // sammanfattningen i en gul ruta sist och källorna per lag. Ingen smal spalt: avsparken och numret står i vinjetten.
+  // Citatet är lagets (d.citat, ett per lag sedan 2026-11-11); ett äldre nummer har ett för sidan (s.citat), och det
+  // står under laget vars källa sa det.
   function matchblad(u, s) {
     const T = TEXT.poddar;
     const nr = u.sida.get(s.nr);
     const lag = s.lag || [];
-    const c = poddCitat(s.citat);
-    const lagen = s.delar.map((d, i) => {
+    const delar = [0, 1].map((i) => s.delar[i] || { lag: lag[i] });
+    const namn = (i) => lag[i] || delar[i].lag || '';
+    const c0 = !delar.some((d) => d.citat) && s.citat ? s.citat : null;
+    const c0lag = c0 ? delar.findIndex((d) => poddKallor(d).some((k) => k.podd === c0.podd)) : -1;
+    const citatFor = (i) => poddCitat(delar[i].citat || (i === c0lag ? c0 : null));
+    const mot = `<div class="hg-mot">${[0, 1].map((i) => `<div class="hg-mot-lag${i ? '' : ' h'}">${skold(namn(i), 'mot')}<b>${esc(namn(i))}</b></div>`).join('<i aria-hidden="true"></i>')}</div>`;
+    const lagen = delar.map((d, i) => {
       const text = poddText(d);
-      return `<section class="hg-lagdel"><h3>${skold(lag[i] || d.lag)}<span>${esc(lag[i] || d.lag || '')}</span></h3>` +
-        (text.length ? text.map((t) => `<p>${esc(hel(t))}</p>`).join('') : `<p class="hg-ingen">${esc(T.ingen)}</p>`) + '</section>';
+      const c = citatFor(i);
+      return `<section class="hg-lagdel"><h3>${skold(namn(i))}<span>${esc(namn(i))}</span></h3>` +
+        `<div class="hg-lagtext">${text.length ? fetaNamn(text, d.namn).map((t) => `<p>${t}</p>`).join('') : `<p class="hg-ingen">${esc(T.ingen)}</p>`}</div>` +
+        (c ? citat(c) : '') + '</section>';
     }).join('');
-    const kallor = s.delar.map((d, i) => {
+    // ett citat för sidan som ingen av lagens källor sa står under spalterna
+    const ensamt = c0 && c0lag < 0 ? poddCitat(c0) : null;
+    const kallor = delar.map((d, i) => {
       const k = poddKallor(d);
-      return k.length ? `<p><b>${esc(lag[i] || d.lag || '')}</b>${stor(poddKallText(k, true))}</p>` : '';
+      return `<p><b>${esc(namn(i))}</b>${k.length ? stor(poddKallText(k, true)) : '–'}</p>`;
     }).join('');
-    const sido = '<aside class="hg-sido">' +
-      `<div class="hg-ruta"><h4>${esc(T.matchen)}</h4><p>${esc(avsparkLang(s.avspark))}</p><p>${esc(T.kupongen(s.nr))}</p></div>` +
-      (c ? citat(c) : '') +
-      (kallor ? `<div class="hg-ruta kallor"><h4>${esc(T.kallorna)}</h4>${kallor}</div>` : '') + '</aside>';
     return `<section class="hg-ark hg-sida" id="hg-sida-${nr}" aria-label="Sidan ${nr}: ${esc(lag.join('–'))}">${folio(u, nr)}` +
       `<div class="hg-vinjett"><b>${s.nr}</b><span>${esc(kort(lag[0]))}–${esc(kort(lag[1]))}</span><em>${esc(avspark(s.avspark))}</em></div>` +
       `<article class="hg-matchblad"><h2 class="hg-rub">${esc(hel(s.rubrik || T.rubrik(lag[0], lag[1])))}</h2>${figur(u, s)}` +
-      `<div class="hg-blad"><div class="hg-brod">${s.ingress ? `<p class="hg-ingress">${esc(hel(s.ingress))}</p>` : ''}${lagen}` +
+      (s.ingress ? `<p class="hg-ingress">${esc(hel(s.ingress))}</p>` : '') + mot + `<div class="hg-lagen">${lagen}</div>` +
+      (ensamt ? `<div class="hg-ensamt">${citat(ensamt)}</div>` : '') +
       (s.summering ? `<section class="hg-summering"><h3>${esc(T.sammanfattning)}</h3><p>${esc(hel(s.summering))}</p></section>` : '') +
-      `</div>${sido}</div></article></section>`;
+      `<div class="hg-kallor"><h4>${esc(T.kallorna)}</h4><div>${kallor}</div></div></article></section>`;
   }
 
   // ---------- tidningen ----------

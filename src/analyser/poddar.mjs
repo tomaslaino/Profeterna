@@ -436,12 +436,17 @@ export function sidaUtan(underlag, lagen) {
   };
 }
 
+// Ett citat som det trycks: på svenska, med vem som sa det, källan och dagen (aldrig det engelska).
+const citatAv = (c) => ({ sagt: c.sagt, vem: c.vem || null, podd: c.podd, typ: c.typ || 'podd', datum: c.datum || null });
+
 const RAKNEORD = /^(två|tre|fyra|fem|sex|sju|åtta|nio|tio|elva|tolv)$/i;
 
-// Redaktörens svar → matchbladet: rubrik, introduktion (ingress), ett till några stycken per lag, sammanfattning och
-// högst ett citat. En text med tipsord, för många ord eller tal som inte står i uppgifterna stryks: rubriken får
-// mallen, introduktionen och sammanfattningen faller bort och lagets text blir uppgifterna som löptext (textUtan).
-// Citatet tas ur uppgiften redaktören pekar på, aldrig ur svaret. → sidan, eller null om svaret inte går att läsa.
+// Redaktörens svar → matchbladet: rubrik, introduktion (ingress), ett till några stycken per lag med lagets citat och
+// personerna som nämns (namn, i fetstil i tidningen), och sammanfattning. Sedan 2026-11-11 har varje lag sitt citat
+// (förut högst ett för sidan, som fortfarande tas emot). En text med tipsord, för många ord eller tal som inte står i
+// uppgifterna stryks: rubriken får mallen, introduktionen och sammanfattningen faller bort och lagets text blir
+// uppgifterna som löptext (textUtan). Citatet tas ur lagets uppgift som redaktören pekar på, aldrig ur svaret, och ett
+// namn som inte står i texten stryks. → sidan, eller null om svaret inte går att läsa.
 export function sidaAv(content, underlag, lagen) {
   let j;
   try { j = jsonOf(content); } catch { return null; }
@@ -471,14 +476,17 @@ export function sidaAv(content, underlag, lagen) {
     const why = !stycken.length ? 'saknas' : stycken.length > pc.sidan.stycken + 1 ? `${stycken.length} stycken` : ord > pc.sidan.lagOrd + 40 ? `${ord} ord`
       : stycken.map((t) => varfor(t, Infinity)).find(Boolean) || null;
     if (why) fel.push(`${lag}: ${why}`);
-    return { ...del, text: why ? textUtan(egna) : stycken };
+    const lc = typeof svar.citat === 'string' && egna.find((x) => x.id === svar.citat && x.sagt);
+    const namn = why ? [] : [...new Set((Array.isArray(svar.namn) ? svar.namn : []).filter((n) => typeof n === 'string').map((n) => n.trim()))]
+      .filter((n) => n.length > 2 && stycken.some((t) => t.includes(n)));
+    return { ...del, text: why ? textUtan(egna) : stycken, ...(lc ? { citat: citatAv(lc) } : {}), ...(namn.length ? { namn } : {}) };
   });
-  const c = typeof j.citat === 'string' && alla.find((x) => x.id === j.citat && x.sagt);
+  const c = !delar.some((d) => d.citat) && typeof j.citat === 'string' && alla.find((x) => x.id === j.citat && x.sagt);
   return {
     rubrik: text(j.rubrik, pc.sidan.rubrikOrd + 3, 'rubriken'),
     ingress: text(j.ingress, pc.sidan.ingressOrd + 15, 'introduktionen'),
     summering: text(j.summering, pc.sidan.summeringOrd + 15, 'sammanfattningen'),
-    citat: c ? { sagt: c.sagt, vem: c.vem || null, podd: c.podd, typ: c.typ || 'podd', datum: c.datum || null } : null,
+    citat: c ? citatAv(c) : null,
     delar,
     fel,
   };

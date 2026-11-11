@@ -280,6 +280,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Helgarderats matchblad: Sköldarna möts (2026-11-11, användarens önskemål: "förbättra tidningen helgarderat -
+  börja med de olika matchbladen och hur du tänker att de ska bli snyggare/mer överblickbara och pedagogiska"):** lagen
+  står mot varandra med stora sköldar under introduktionen (hemmalaget mot mitten, som i matchlistan), och lagens text
+  står i två lika spalter med lagets citat i jämnhöjd under och spelarnas namn i fetstil; sist sammanfattningen i den
+  gula rutan och källorna per lag. Den smala spalten med *Matchen* är borta (avsparken och numret står i vinjetten), och
+  bilden är en enda. Valt i två omgångar bland skisser i den riktiga sidan: först A *Mot varandra* (ämne för ämne), B
+  *Truppen först* och C *Bredvid varandra*, sedan tre varianter av C. Nattjobbet skriver lite kortare, med ett citat per
+  lag och det som inte syns i statistiken ("Det ska vara en njutning att läsa texten också"; se *Matchbladet* under
+  [Helgarderat](#helgarderat))
 - [x] **Helgarderat bredvid högen (2026-11-11, användarens önskemål: "Under våra kuponger dessutom - vilket är helt
   orimligt"):** tidningen ligger hel till höger om högen med de inlämnade kupongerna, inte under dem. Askkoppen,
   snusdosan, fläkten och fikat står i stället bakom högen, där tidningen låg. Valt bland tre skisser i den riktiga
@@ -7628,21 +7637,25 @@ matchbladet har ett, citatet. Bredvid står *Lördagens matcher* med sidnumren, 
 till med bild, rubrik och introduktionens första mening. Sedan kommer ett matchblad per match.
 
 **Matchbladet** (2026-11-10, användarens önskemål: "ett matchblad med information. Först en kort introduktion, sen
-diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för varje match;
-samma dag var det först punkter under ämnen med markörer, och dessförinnan stämplar och citat vid varje punkt):
-rubriken, bilden, introduktionen i fetstil, ett avsnitt per lag med lagets namn och sköld som rubrik och ett till tre
-stycken löptext, och sist sammanfattningen i en ruta med grön kant. Brödtexten står i en spalt som är lätt att läsa,
-och bredvid den en smal spalt med *Matchen* (avsparken och numret på kupongen), ibland ett citat och *Källorna* per lag
-med datum och länk (*Podden SK3 TV (9 nov)*, två avsnitt av samma podd: *(2 och 9 nov)*). I telefonen kommer den smala
-spalten efter texten. Baksidan har källorna per match, med länkar till avsnitten, forumtrådarna och artiklarna.
+diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för varje match).
+Sedan 2026-11-11 *Sköldarna möts* (valt bland skisser, se beslutet ovan): rubriken, en bild över hela bredden,
+introduktionen i fetstil, lagen mot varandra med stora sköldar (hemmalaget högerställt mot mitten), lagens text i två
+lika spalter med anfang och spelarnas namn i fetstil första gången de nämns (`namn` under laget, som nattjobbet ger),
+lagets citat i jämnhöjd under texten (`citat` under laget; ett äldre nummer har ett för sidan, och det står under laget
+vars källa sa det), sist sammanfattningen i en gul ruta och *Källorna* per lag med datum och länk (*Podden SK3 TV (9
+nov)*, två avsnitt av samma podd: *(2 och 9 nov)*). Spalterna ger 55–65 tecken per rad, med avstavning och jämn
+högerkant. I telefonen står lagen under varandra, var och en med sitt namn och sitt citat. Texten är kortare än förut
+(högst 120 ord per lag i stället för 150) och ska vara det som bara de som följer laget varje vecka vet: stämningen,
+vad supportrarna ser i spelet, vem som har lyft sig, rykten och det som rör sig i klubben, och skador och väntad elva
+kort ("Det blir lite torrt här med enbart det essentiella - det går jag ju från statistik och andra API:er", "Det ska
+vara en njutning att läsa texten också"). `sidan.version` i config/poddar.js är bytt, så bladen skrivs om nästa natt.
 
-**Bilden** är veckans bild av vart och ett av lagen, hemma och borta bredvid varandra med lagets namn på en mörk list
-och fotograferna och källorna under, svartvita som tryck på papperet. Den kommer i första hand ur matchbladet självt
-(`bilder` i sajtens `data/poddsidor.json`), annars ur tidningen inför omgången (`data/tidning.json`, se *Veckans bilder
+**Bilden** är en enda över hela bredden (sedan 2026-11-11), svartvit som tryck på papperet, med fotografen och källan
+under: matchens egen eller ett av lagens foton, helst inte en miniatyr till BBC:s videor (den har tv-grafik över högra
+halvan och förstoras annars mot vänstra kanten). Går den inte att hämta tas det andra lagets, och annars ingen.
+Den kommer i första hand ur matchbladet självt (`bilder` i sajtens `data/poddsidor.json`), annars ur tidningen inför omgången (`data/tidning.json`, se *Veckans bilder
 i tidningen* under [Analyserna](#analyserna)). En sida kan också ha en egen bild (`bild`: `url` eller `fil`, `kalla`,
-`foto`, `sida`, `datum`, `text`) över hela bredden. Utan bild, eller om den inte går att hämta, står lagens sköldar mot
-varandra med namnen under, på en tonad yta med grön överkant; går bara den ena bilden inte att hämta får den halvan
-lagets sköld.
+`foto`, `sida`, `datum`, `text`). Utan bild står ingen: lagens sköldar står ändå mot varandra under introduktionen.
 
 Matchbladets bilder hämtas av GitHub Actions före bygget (2026-11-10, användarens önskemål: "Fixa så att det kommer
 riktiga bilder nu"), eftersom molnmiljön där matchbladen skrevs inte når nyhetssajterna, men GitHub gör det:
