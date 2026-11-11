@@ -5567,10 +5567,10 @@ export async function figurer(canvas, opt = {}) {
   });
   // per lucka (AKT_SLOT) och person: chansen när det är fullt ut morgon …, och vad
   const DYGN_MENY = {
-    morgon: { chans: 0.13, val: ['morgon', 'morgon', 'gnugga', 'nackrull', 'gaspa'] },
-    lunch: { chans: 0.08, val: ['magen'] },
-    efter: { chans: 0.09, val: ['nickarTill', 'nickarTill', 'gaspa'] },
-    kvall: { chans: 0.12, val: ['gaspa', 'gaspa', 'gnugga', 'strack'] },
+    morgon: { chans: 0.065, val: ['morgon', 'morgon', 'gnugga', 'nackrull', 'gaspa'] },
+    lunch: { chans: 0.04, val: ['magen'] },
+    efter: { chans: 0.045, val: ['nickarTill', 'nickarTill', 'gaspa'] },
+    kvall: { chans: 0.06, val: ['gaspa', 'gaspa', 'gnugga', 'strack'] },
   };
   // (medan matcherna pågår bara en gäspning)
   function dygnVal(o, n, i, t0) {
@@ -5587,7 +5587,7 @@ export async function figurer(canvas, opt = {}) {
     return null;
   }
   // gäspningen smittar (GRUPP), per lucka: sent på kvällen och lite på morgonen
-  const gaspChansAt = (t0) => { const h = dygnH(t0); if (h == null) return 0; const F = dygnFas(h); return 0.14 * F.kvall * sm(20.5, 21.5, h >= 12 ? h : 24) + 0.05 * F.morgon; };
+  const gaspChansAt = (t0) => { const h = dygnH(t0); if (h == null) return 0; const F = dygnFas(h); return 0.07 * F.kvall * sm(20.5, 21.5, h >= 12 ? h : 24) + 0.025 * F.morgon; };
 
   // En gäspning, l sekunder in (GASP.len): huvudet bakåt medan hen andas in, munnen öppen
   // (gäspansiktet med ögonen hopknipna, gaspMun och gaspW) och handen för munnen (gaspHandK),
