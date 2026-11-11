@@ -12,7 +12,8 @@
   const RT = window.RumTidning;
   if (!rot || !RT) return;
 
-  const passa = () => RT.passa(rot, Math.min(rot.clientWidth - 24, 940), window.innerHeight - 40);
+  // matchbladens uppslag får hela bredden, så att de två sidorna kan stå bredvid varandra
+  const passa = () => RT.passa(rot, Math.min(rot.clientWidth - 24, 940), window.innerHeight - 40, rot.clientWidth - 24);
   // En länk till en sida när den kommer in utifrån, också de gamla (#sida-5, #kupongen och #forsta).
   function tillLanken() {
     const h = location.hash.slice(1);

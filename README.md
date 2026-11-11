@@ -290,6 +290,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Helgarderats matchblad som uppslag (2026-11-11, när matchbladen var två–tre omslag långa):** varje match är två
+  sidor, som när man slår upp en tidning: vänstersidan med tavlan, rubriken, introduktionen och hemmalaget, högersidan
+  med bilden, bortalaget, sammanfattningen och källorna. På datorn står de bredvid varandra, tätt ihop med fästets
+  skugga i mitten och ungefär så höga som omslaget; i telefonen och när två sidor inte ryms (under 1 224 px) under
+  varandra. Tidningen har 26 sidor i stället för 14 (matchbladen på jämna sidor, sista sidan efter dem). Valt bland
+  tre skisser: A *Uppslaget*, B *Fortsättningen* (alla sidor exakt som omslaget, texten fortsätter på nästa, 35 sidor
+  och 66 i telefonen) och C *Vecken* (ett ark vikt där omslaget slutar) (se [Helgarderat](#helgarderat))
 - [x] **Helgarderat i omslagets tryck rakt igenom (2026-11-11, användarens önskemål: "Hur hade du gjort för att tidningen
   helgarderat skulle bli mer kongruent mellan sidorna och snyggare än vad den är nu"):** alla sidor efter omslaget har
   samma sidhuvud (*Nr 1 · lördag 14 november*; matchbladen visade förut dagen då texten skrevs), matchbladets tavla är
@@ -7812,7 +7819,9 @@ omslagets översta rad som sidhuvud, och kupongens tre röster: tryck i terrakot
 strecken i Fraunces), skrivmaskin (sidhuvudet, tiderna, lagen i innehållet, bildtexterna och källorna) och den blå
 pennan (omslagets kryss). Brödtexten står i bläck. Sedan samma kväll (val A *Rutorna*) är omslaget förebild för
 resten: samma sidhuvud efter omslaget (*Nr 1 · lördag 14 november*), matchbladets tavla som omslagets rutor 1, X och 2,
-lagen i röda versaler och rubrikerna i svart kursiv överallt, bara konturer och inget fetstilt utom spelarnas namn. Priset är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
+lagen i röda versaler och rubrikerna i svart kursiv överallt, bara konturer och inget fetstilt utom spelarnas namn.
+Varje matchblad är ett uppslag med två sidor (vänster: tavlan, rubriken, introduktionen och hemmalaget; höger: bilden,
+bortalaget, sammanfattningen och källorna), bredvid varandra när de ryms (`passa`, klassen `hg-tva`). Priset är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har bilden och, om
 matchbladet har ett, citatet. Bredvid står *Lördagens matcher* med sidnumren, och under *Fler matcher*: tre matcher
 till med bild, rubrik och introduktionens första mening. Sedan kommer ett matchblad per match.

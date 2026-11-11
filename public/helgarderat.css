@@ -158,6 +158,19 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 
 /* ---------- matchbladet ---------- */
 
+/* Uppslaget (2026-11-11, användarens val A bland tre skisser): varje match är två sidor. Bredvid varandra (.hg-tva,
+   som passa i rum-tidning.js sätter när de ryms) står de tätt ihop och lika höga, med fästets skugga där de möts;
+   annars under varandra med samma mellanrum som alla ark. Högersidan börjar med bilden eller bortalaget. */
+.hg-uppslag { display: flex; flex-direction: column; align-items: center; gap: inherit; }
+.hg-uppslag > .hg-ark { flex: none; }
+.hg.hg-tva .hg-uppslag { flex-direction: row; align-items: stretch; gap: 0; }
+.hg.hg-tva .hg-vanster { box-shadow: inset calc(var(--hg-k) * -6px) 0 calc(var(--hg-k) * 5px) calc(var(--hg-k) * -3px) rgba(80, 55, 25, 0.32),
+  inset 0 0 calc(var(--hg-k) * 3px) rgba(150, 112, 50, 0.22), -6px 26px 50px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.35); }
+.hg.hg-tva .hg-hoger { box-shadow: inset calc(var(--hg-k) * 6px) 0 calc(var(--hg-k) * 5px) calc(var(--hg-k) * -3px) rgba(80, 55, 25, 0.32),
+  inset 0 0 calc(var(--hg-k) * 3px) rgba(150, 112, 50, 0.22), 6px 26px 50px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.35); }
+.hg-hoger > .hg-matchblad { margin-top: calc(var(--hg-k) * 4px); }
+.hg-hoger .hg-bild { margin-top: 0; }
+
 /* sidnumret ytterst, namnet bredvid och numrets datum längst in (på högersidorna spegelvänt) */
 .hg-folio b { font: 400 calc(var(--hg-k) * 2.9px)/1 var(--skriv); }
 .hg-folio span { margin-left: auto; }

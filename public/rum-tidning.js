@@ -14,9 +14,10 @@
 //                breda som omslaget och minst lika höga, på samma papper och i samma tryck (helgarderat.css).
 //   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
 //                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
-//   Matchbladen  ett per match, från sidan 2 (Tavlan, B, i omslagets rutor, A): lagen mot varandra överst med
-//                sköldarna, dagen, avsparken och arenan, sedan rubriken, en bild, introduktionen, lagen efter varandra med ett citat
-//                var under, sammanfattningen sist och källorna, med en länk till varje avsnitt, forumtråd och artikel.
+//   Matchbladen  ett uppslag (två sidor) per match, från sidan 2 (Tavlan, B, i omslagets rutor, A): lagen mot
+//                varandra överst med sköldarna, dagen, avsparken och arenan, rubriken, introduktionen och hemmalaget
+//                till vänster, och bilden, bortalaget, sammanfattningen och källorna (med en länk till varje avsnitt,
+//                forumtråd och artikel) till höger. Lagen har ett citat var under texten.
 //   Sista sidan  Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, som inte står i matchbladen) och
 //                ett kåseri av en ny person varje vecka (Spalterna), ur data/sista-sidan.json. Utan den slutar tidningen med matchbladen.
 //
@@ -303,7 +304,8 @@
   // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov), veckans tidning
   // (data/tidning.json, för bilderna) och sista sidan (data/sista-sidan.json). Kupongen är omgångens alla matcher i
   // kupongens ordning (data.matcher, också de utan matchblad), var och en med sitt matchblad om den har ett.
-  // Matchbladen har sidorna från 2 (sida), och sista sidan kommer efter dem (sistaNr).
+  // Matchbladen är uppslag med två sidor var, från sidan 2 (sida: vänstersidan, alltid jämn), och sista sidan kommer
+  // efter dem (sistaNr).
   // → upplagan, eller null när numret inte har några matchblad
   function upplaga(data, prov = false, tidning = null, sista = null) {
     const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
@@ -324,10 +326,10 @@
       // omgångens första dag
       lordag: tider.length ? Math.min(...tider) : NaN,
       datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '',
-      sida: new Map(sidor.map((s, i) => [s.nr, i + 2])),
+      sida: new Map(sidor.map((s, i) => [s.nr, 2 * i + 2])),
       notiser: tidning && Array.isArray(tidning.notiser) ? tidning.notiser : [],
       sista: sistaSidan(sista, String(data.omgang || '')),
-      sistaNr: sidor.length + 2,
+      sistaNr: 2 * sidor.length + 2,
     };
     u.ettan = ettan(u);
     return u;
@@ -380,9 +382,15 @@
   // konkordanta med varandra"). Så stort som ryms: högst bredden, och så högt att det mesta av omslaget syns på
   // skärmen, men inte smalare än 600 px, så att matchbladets två spalter får plats, och inte bredare än 760. Papperets
   // mönster delas med förstoringen (--zz), så att de är lika fina som på pulten.
-  function passa(rot, bredd, hojd) {
+  // Matchbladens uppslag (2026-11-11) står med sidorna bredvid varandra (klassen hg-tva) när två sidor ryms på hela
+  // bredden (hel, annars bredd) och är minst 600 px breda, och då krymper alla sidor hellre än att uppslaget delas.
+  // Annars står sidorna under varandra, som i telefonen.
+  function passa(rot, bredd, hojd, hel = bredd) {
     if (!rot) return;
-    const k = Math.max(1, Math.min(bredd / 100, 7.6, Math.max((hojd - 86) / 140, 6)));
+    let k = Math.max(1, Math.min(bredd / 100, 7.6, Math.max((hojd - 86) / 140, 6)));
+    const tva = Math.min(k, hel / 200) >= 6;
+    if (tva) k = Math.min(k, hel / 200);
+    rot.classList.toggle('hg-tva', tva);
     rot.style.setProperty('--hg-k', k.toFixed(3));
     const f = rot.querySelector('.hg-omslaget .hf-forsta');
     if (!f) return;
@@ -486,12 +494,18 @@
   // Matchbladet. Först 2026-11-10 (användarens önskemål: "ett matchblad med information. Först en kort introduktion,
   // sen diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för
   // varje match). Sedan 2026-11-11 Tavlan (B, valt bland fyra skisser): tavlan med lagen, avsparken och arenan överst,
-  // rubriken, en bild, introduktionen och lagen efter varandra, hemmalaget först, var och en under sitt namn (sköldarna
-  // står i tavlan, sedan Rutorna inte två gånger), så att det inte blir ett tomt hål bredvid ett lag med lite text. Spelarnas namn i fetstil, lagets citat under
-  // dess text, sammanfattningen i en tryckt ruta sist och källorna per lag. Förut Sköldarna möts (C3): en vinjett med
-  // numret och avsparken överst, sköldarna mot varandra under introduktionen och lagen i två spalter bredvid varandra.
-  // Citatet är lagets (d.citat, ett per lag sedan 2026-11-11); ett äldre nummer har ett för sidan (s.citat), och det
-  // står under laget vars källa sa det.
+  // rubriken, introduktionen och lagen efter varandra, hemmalaget först, var och en under sitt namn (sköldarna står i
+  // tavlan, sedan Rutorna inte två gånger), så att det inte blir ett tomt hål bredvid ett lag med lite text. Spelarnas
+  // namn i fetstil, lagets citat under dess text, sammanfattningen i en tryckt ruta sist och källorna per lag. Förut
+  // Sköldarna möts (C3): en vinjett med numret och avsparken överst, sköldarna mot varandra under introduktionen och
+  // lagen i två spalter bredvid varandra. Citatet är lagets (d.citat, ett per lag sedan 2026-11-11); ett äldre nummer
+  // har ett för sidan (s.citat), och det står under laget vars källa sa det.
+  //
+  // Uppslaget (samma kväll, användarens val A bland tre skisser, när matchbladen var två–tre omslag långa): varje match
+  // är två sidor, vänstersidan (jämn) med tavlan, rubriken, introduktionen och hemmalaget och högersidan (udda) med
+  // bilden, bortalaget, sammanfattningen och källorna. Bilden står överst till höger, så att sidorna blir ungefär lika
+  // höga. Bredvid varandra när de ryms (passa), annars under varandra. Skisserna som inte valdes: B Fortsättningen
+  // (alla sidor exakt som omslaget, texten fortsätter på nästa sida) och C Vecken (ett ark vikt där omslaget slutar).
   function matchblad(u, s) {
     const T = TEXT.poddar;
     const nr = u.sida.get(s.nr);
@@ -504,22 +518,25 @@
     const lagen = delar.map((d, i) => {
       const text = poddText(d);
       const c = citatFor(i);
-      return `<section class="hg-lagdel"><h3><span>${esc(namn(i))}</span><em>${esc(i ? T.borta : T.hemma)}</em></h3>` +
+      return `<div class="hg-lagen"><section class="hg-lagdel"><h3><span>${esc(namn(i))}</span><em>${esc(i ? T.borta : T.hemma)}</em></h3>` +
         `<div class="hg-lagtext">${text.length ? fetaNamn(text, d.namn).map((t) => `<p>${t}</p>`).join('') : `<p class="hg-ingen">${esc(T.ingen)}</p>`}</div>` +
-        (c ? citat(c) : '') + '</section>';
-    }).join('');
+        (c ? citat(c) : '') + '</section></div>';
+    });
     // ett citat för sidan som ingen av lagens källor sa står under lagen
     const ensamt = c0 && c0lag < 0 ? poddCitat(c0) : null;
     const kallor = delar.map((d, i) => {
       const k = poddKallor(d);
       return `<p><b>${esc(namn(i))}</b>${k.length ? stor(poddKallText(k, true)) : '–'}</p>`;
     }).join('');
-    return `<section class="hg-ark hg-sida" id="hg-sida-${nr}" aria-label="Sidan ${nr}: ${esc(lag.join('–'))}">${folio(u, nr)}` +
-      tavla(s, namn) + `<article class="hg-matchblad"><h2 class="hg-rub">${esc(hel(s.rubrik || T.rubrik(lag[0], lag[1])))}</h2>${figur(u, s)}` +
-      (s.ingress ? `<p class="hg-ingress">${esc(hel(s.ingress))}</p>` : '') + `<div class="hg-lagen">${lagen}</div>` +
+    const match = esc(lag.join('–'));
+    return `<div class="hg-uppslag"><section class="hg-ark hg-sida hg-vanster" id="hg-sida-${nr}" aria-label="Sidan ${nr}: ${match}">${folio(u, nr)}` +
+      tavla(s, namn) + `<article class="hg-matchblad"><h2 class="hg-rub">${esc(hel(s.rubrik || T.rubrik(lag[0], lag[1])))}</h2>` +
+      (s.ingress ? `<p class="hg-ingress">${esc(hel(s.ingress))}</p>` : '') + `${lagen[0]}</article></section>` +
+      `<section class="hg-ark hg-sida hg-hoger" id="hg-sida-${nr + 1}" aria-label="Sidan ${nr + 1}: ${match}">${folio(u, nr + 1)}` +
+      `<div class="hg-matchblad">${figur(u, s)}${lagen[1]}` +
       (ensamt ? `<div class="hg-ensamt">${citat(ensamt)}</div>` : '') +
       (s.summering ? `<section class="hg-summering"><h3>${esc(T.sammanfattning)}</h3><p>${esc(hel(s.summering))}</p></section>` : '') +
-      `<div class="hg-kallor"><h4>${esc(T.kallorna)}</h4><div>${kallor}</div></div></article></section>`;
+      `<div class="hg-kallor"><h4>${esc(T.kallorna)}</h4><div>${kallor}</div></div></div></section></div>`;
   }
 
   // ---------- tidningen ----------
