@@ -5185,8 +5185,15 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)).
 - **Folk och trafik:** på brons trottoar mittemot går folk förbi (fler på dagen och kvällen,
   nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
-  snö. Bilar och taxi kör åt var sitt håll med strålkastarna tända när det är mörkt, och
-  blåbussen, 4:an som går över bron, kommer var fjärde minut.
+  snö. Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
+  fler bilar i rusningen och färre på natten (fler taxi då). Bilarna är olika sorter
+  (sedan, kombi som en gammal Volvo, halvkombi, stadsjeep, Saab, skåpbil och taxi med
+  taklampa) och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
+  Eriksbron kommer i båda riktningarna med några minuters mellanrum: röda 3:an eller 77:an
+  och blåa ledbussen 4:an. I en fil åker alla lika fort på ett band med luckor, så att ingen
+  kör igenom någon annan (bussarna och plogbilen har varsin lucka och kommer var m:e varv),
+  och fordonen ritas en gång och glider bara: de kostar mindre än förut, då de gungade och
+  ritades om i gängets takt (`FORM`, `fordon` och trafiken i `gatliv` i rum-ute.js).
 - **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och
   orange på hösten och kala annars; löv blåser förbi och ligger på trottoaren på hösten, plogbilen när
   det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till

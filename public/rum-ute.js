@@ -471,32 +471,117 @@ window.RumUte = (() => {
     return `<g transform="translate(${cx} ${cy})"><circle r="${r}" fill="none" stroke="${tone('#1a1a1a', L)}" stroke-width="1.3"/><g class="hjul"><line x1="${-r}" y1="0" x2="${r}" y2="0" stroke="${tone('#777', L)}" stroke-width=".5"/><line x1="0" y1="${-r}" x2="0" y2="${r}" stroke="${tone('#777', L)}" stroke-width=".5"/></g></g>`;
   }
 
-  // Ett fordon (vänt åt höger, hjulen i 0): bil, taxi, buss eller plogbil.
-  function vehicle(kind, c, L) {
+  // Fordonen från sidan, vända åt höger med hjulen i y 0 (en meter är ungefär 16 enheter):
+  // b och f bakre och främre änden, hj hjulens x och r deras radie, ly strålkastarnas och
+  // baklyktornas höjd, kaross, rutor, fogarna (dörrarna), handtagen (grepp), listen under
+  // rutorna (lin: y och var den slutar fram), backspegeln och taket (för taxiskylten).
+  const FORM = {
+    sedan: {
+      b: -38, f: 38.5, hj: [-24, 25], r: 5.6, ly: [-13, -16], tak: -29, lin: [-20.6, 14], spegel: [14, -21.5],
+      kaross: 'M-38 -6 V-16.5 Q-38 -19.5 -34.5 -20 L-27 -20.6 Q-19 -28.6 -9 -29 H1 Q8 -28.8 16 -20.6 L33 -18.6 Q38.5 -17.6 38.5 -13 V-6.5 Q38.5 -4 35.5 -4 H-35.5 Q-38 -4 -38 -6 Z',
+      rutor: 'M-24.4 -20.9 Q-18 -27.2 -9.4 -27.5 H-5.4 V-20.9 Z M-4 -27.5 H1 Q7 -27.3 13.2 -20.9 H-4 Z',
+      fog: 'M-4.7 -21 V-5 M14.4 -20.4 L13.8 -7 M-21.5 -20.6 V-12', grepp: 'M-11 -18.4 h3 M6 -18.4 h3',
+    },
+    kombi: {
+      b: -38, f: 38.5, hj: [-24, 25], r: 5.6, ly: [-12.5, -15], tak: -29.5, lin: [-19.8, 13], spegel: [13, -21],
+      kaross: 'M-38 -5.5 V-27.5 Q-38 -29.5 -36 -29.5 H5.5 L15 -19.2 L35.5 -17.6 Q38.5 -17 38.5 -14 V-6.5 Q38.5 -4 36 -4 H-36.5 Q-38 -4 -38 -5.5 Z',
+      rutor: 'M-36 -27.8 H-24.6 V-20.2 H-36 Z M-23.2 -27.8 H-8.6 V-20.2 H-23.2 Z M-7.2 -27.8 H4.8 L12.8 -20.2 H-7.2 Z',
+      fog: 'M-24 -20 V-12 M-8 -20 V-5 M13.2 -19.4 L12.6 -7', grepp: 'M-13 -18 h3 M4 -18 h3', rack: 'M-33 -30.6 H1',
+    },
+    halv: {
+      b: -33.5, f: 34, hj: [-21, 22], r: 5.3, ly: [-12.5, -16], tak: -29, lin: [-21, 12], spegel: [12.5, -21.8],
+      kaross: 'M-33.5 -6 V-22.5 Q-33 -28.6 -27.5 -29 H2 Q7.5 -28.6 14.5 -19.9 L30 -17.4 Q34 -16.6 34 -12.5 V-6.5 Q34 -4 31 -4 H-31.5 Q-33.5 -4 -33.5 -6 Z',
+      rutor: 'M-31 -21.1 L-29.6 -26 Q-28.8 -27.3 -26.8 -27.3 H-15.6 V-21.1 Z M-14.2 -27.3 H1.6 Q6.4 -27.1 11.8 -21.1 H-14.2 Z',
+      fog: 'M-14.9 -21.3 V-5 M12.6 -20 L12.1 -7', grepp: 'M-20 -18.8 h3 M3 -18.8 h3',
+    },
+    suv: {
+      b: -39, f: 39.5, hj: [-25, 26], r: 6.4, ly: [-15, -18], tak: -33, lin: [-23, 15], spegel: [15, -23.6],
+      kaross: 'M-39 -7 V-28.5 Q-38.6 -33 -34.5 -33 H4.5 Q8.5 -32.8 16.5 -22.6 L35.5 -20.6 Q39.5 -19.8 39.5 -15 V-8 Q39.5 -5 36 -5 H-36 Q-39 -5 -39 -7 Z',
+      rutor: 'M-36.6 -31 H-25.2 V-23.2 H-36.6 Z M-23.8 -31 H-7.2 V-23.2 H-23.8 Z M-5.8 -31 H4 Q7.6 -30.8 14 -23.2 H-5.8 Z',
+      fog: 'M-24.5 -23 V-13 M-6.5 -23 V-6 M15 -22.4 L14.4 -8', grepp: 'M-12 -20.5 h3.2 M5 -20.5 h3.2', rack: 'M-34 -34.6 H1',
+    },
+    saab: {
+      b: -36, f: 37, hj: [-22, 23], r: 5.4, ly: [-12, -15], tak: -30, lin: [-21.7, 15], spegel: [15.5, -22.3],
+      kaross: 'M-36 -6 V-16.5 Q-36 -20.5 -31.5 -21.5 Q-26 -29 -16 -30 H1.5 Q7.5 -30 11 -26.5 Q13.5 -22 18.5 -19.6 L33 -16.9 Q37 -16 37 -12 V-6.5 Q37 -4 34 -4 H-34 Q-36 -4 -36 -6 Z',
+      rutor: 'M-28.6 -21.8 Q-24 -28 -16 -28.4 H-6.6 V-21.8 Z M-5.2 -28.4 H1.5 Q6.2 -28.4 9.2 -25.8 Q11.2 -23.4 14.6 -21.8 H-5.2 Z',
+      fog: 'M-5.9 -22 V-5 M15.6 -20.6 L15 -7', grepp: 'M-1 -19.3 h3',
+    },
+    skap: {
+      b: -42, f: 40.5, hj: [-27, 26], r: 5.8, ly: [-13.5, -17], tak: -42.5, lin: [-25, 17], spegel: [30, -26],
+      kaross: 'M-42 -6 V-40 Q-42 -42.5 -39.5 -42.5 H17 Q21.5 -42.5 24.5 -37 L31.5 -24.6 L37.5 -21.6 Q40.5 -20.6 40.5 -16 V-7 Q40.5 -4 37 -4 H-39.5 Q-42 -4 -42 -6 Z',
+      rutor: 'M17.4 -40.2 Q20.8 -40.2 22.8 -36.6 L29.3 -25.2 H17.4 Z',
+      fog: 'M16.6 -41 V-6 M30.6 -24.8 L30 -7 M-8 -41 V-6 M-8 -28 H16', grepp: 'M12 -22 h3.4 M-6 -22 h3',
+    },
+    // stadsbussen (12 m) och ledbussen (18 m)
+    buss: { b: -96, f: 97.5, hj: [-48, 58], r: 7.4, ly: [-12, -16] },
+    ledbuss: { b: -144, f: 145.5, hj: [-105, 6, 102], r: 7.4, ly: [-12, -16] },
+    plog: { b: -40, f: 58, hj: [-24, 24], r: 6.5, ly: [-13, -14] },
+  };
+
+  // Ett fordon a ({ kind, c färgen, taxi, falg, nr linjen }) i gatans ljus, åt dir.
+  function fordon(a, L, dir) {
     const t = (x) => tone(x, L);
     const lamps = L.lampor || L.dimma > 0.4;
-    let s = '';
-    if (kind === 'buss') {
-      s += `<rect x="-86" y="-50" width="172" height="44" rx="5" fill="${t('#2f6db5')}"/><rect x="-86" y="-14" width="172" height="8" fill="${t('#244f86')}"/>`;
-      for (let i = 0; i < 7; i++) s += `<rect x="${-80 + i * 22}" y="-44" width="18" height="18" rx="2" fill="${lamps ? '#f4e8c4' : mix(t('#1b2530'), L.sky[2], 0.3 * L.dag)}" opacity="${lamps ? 0.75 : 1}"/>`;
-      s += `<rect x="70" y="-48" width="14" height="6" fill="#140d02"/><text x="77" y="-43.2" text-anchor="middle" font-family="VT323, monospace" font-size="7" fill="#ffb02a">4</text>`;
-      s += `<circle cx="-56" cy="-4" r="7" fill="#050506"/><circle cx="58" cy="-4" r="7" fill="#050506"/>`;
-    } else if (kind === 'plog') {
+    const F = FORM[a.kind];
+    const glas = lamps ? '#1c1a17' : mix(t('#151b22'), L.sky[2], 0.35 * L.dag);
+    // (siffrorna på bussens skylt vända rätt också när bussen åker åt vänster)
+    const text = (x, y, s, size) => `<text x="${x}" y="${y}"${dir < 0 ? ` transform="matrix(-1 0 0 1 ${2 * x} 0)"` : ''} text-anchor="middle" font-family="VT323, monospace" font-size="${size}" fill="#ffb02a">${s}</text>`;
+    const hjul = (r, falg) => F.hj.map((x) => `<path d="M${r1(x - r - 1.4)} ${-r} A${r1(r + 1.4)} ${r1(r + 1.4)} 0 0 1 ${r1(x + r + 1.4)} ${-r} Z" fill="${t('#141518')}"/><circle cx="${x}" cy="${-r}" r="${r}" fill="#0b0b0c"/><circle cx="${x}" cy="${-r}" r="${r1(r * 0.58)}" fill="${t(falg)}"/><circle cx="${x}" cy="${-r}" r="${r1(r * 0.2)}" fill="${t('#3a3d42')}"/>`).join('');
+    let s = `<ellipse cx="${r1((F.b + F.f) / 2)}" cy="-.4" rx="${r1((F.f - F.b) / 2 + 1.5)}" ry="2.2" fill="#000" opacity=".32"/>`;
+    if (a.kind === 'buss' || a.kind === 'ledbuss') {
+      const c = t(a.c);
+      const kjol = mix(c, '#000000', 0.45);
+      const ruta = lamps ? '#f4e8c4' : mix(t('#1d252e'), L.sky[2], 0.3 * L.dag);
+      const ro = lamps ? ' opacity=".8"' : '';
+      // (kaross och kjol, rutornas svarta band, dörrar och rutor, takets aggregat och skylten)
+      const del = (x0, x1, fram, bak, dorrar, rutor, tak) => {
+        const ns = fram ? `H${x1 - 7.5} Q${x1 - 3} -51 ${x1 - 2} -46.5 L${x1} -15 V-8 Q${x1} -5 ${x1 - 3} -5` : `H${x1} V-5`;
+        const ks = fram ? `H${x1 - 0.2} L${x1} -8 Q${x1} -5 ${x1 - 3} -5` : `H${x1} V-5`;
+        let d = `<path d="M${x0} ${bak ? '-8 V-47 Q' + x0 + ' -51 ' + (x0 + 4) + ' -51' : '-5 V-51'} ${ns} H${bak ? x0 + 3 : x0} ${bak ? `Q${x0} -5 ${x0} -8` : ''} Z" fill="${c}"/>`;
+        d += `<path d="M${x0} -11 ${ks} H${bak ? x0 + 3 : x0} ${bak ? `Q${x0} -5 ${x0} -8` : ''} Z" fill="${kjol}"/>`;
+        d += `<rect x="${x0 + 3}" y="-46.5" width="${x1 - x0 - (fram ? 7 : 4)}" height="20.5" rx="1.5" fill="#121418"/>`;
+        for (const [r0, r2] of rutor) d += `<rect x="${r0}" y="-45.5" width="${r2 - r0}" height="18.5" rx="1.2" fill="${ruta}"${ro}/>`;
+        for (const [d0, d1] of dorrar) d += `<rect x="${d0 - 1}" y="-47" width="${d1 - d0 + 2}" height="38.5" rx="1" fill="#121418"/><rect x="${d0}" y="-46" width="${d1 - d0}" height="36.5" fill="${ruta}"${ro}/><path d="M${(d0 + d1) / 2} -46 V-9.5" stroke="#121418" stroke-width="1" fill="none"/>`;
+        for (const [x, w] of tak) d += `<rect x="${x}" y="-54" width="${w}" height="3.4" rx="1.2" fill="${t('#b9bdc2')}"/>`;
+        if (fram) d += `<path d="M${x1 - 1.8} -46 L${x1 - 0.2} -16" stroke="${ruta}" stroke-width="2.2" fill="none"${ro}/><rect x="${x1 - 36}" y="-50.3" width="18" height="3.6" fill="#140d02"/>${text(x1 - 32, -47, a.nr, 4.2)}<rect x="${x1 - 29}" y="-49.2" width="9" height="1" fill="#ffb02a" opacity=".7"/>`;
+        return d;
+      };
+      if (a.kind === 'buss') s += del(-96, 97.5, true, true, [[-82, -70], [4, 18], [78, 92]], [[-93, -84], [-68, -48], [-46, -26], [-24, 2], [20, 38], [40, 58], [60, 76]], [[-60, 64], [20, 30]]);
+      else {
+        s += del(-144, -21, false, true, [[-62, -48]], [[-141, -121], [-119, -99], [-97, -77], [-75, -64], [-46, -24]], [[-110, 50]]);
+        s += `<rect x="-21.5" y="-49.5" width="11" height="43" fill="#1a1b1e"/><path d="M-19.5 -49 V-7 M-17 -49 V-7 M-14.5 -49 V-7 M-12 -49 V-7" stroke="#3a3c40" stroke-width=".8" fill="none"/>`;
+        s += del(-11, 145.5, true, false, [[52, 66], [124, 138]], [[-8, 10], [12, 30], [32, 50], [68, 86], [88, 106], [108, 122]], [[0, 56], [80, 26]]);
+      }
+      s += hjul(F.r, '#2a2c30');
+    } else if (a.kind === 'plog') {
       s += `<rect x="-40" y="-34" width="50" height="26" rx="3" fill="${t('#e07a1a')}"/><rect x="10" y="-40" width="26" height="32" rx="3" fill="${t('#e88a22')}"/><rect x="16" y="-36" width="16" height="11" rx="1.5" fill="${lamps ? '#e8dcc0' : t('#1a222a')}" opacity=".85"/>
-        <path d="M38 -2 L54 -24 L58 -24 L48 -2 Z" fill="${t('#d8d4c8')}"/><circle cx="-24" cy="-4" r="6.5" fill="#050506"/><circle cx="24" cy="-4" r="6.5" fill="#050506"/>
+        <path d="M38 -2 L54 -24 L58 -24 L48 -2 Z" fill="${t('#d8d4c8')}"/>${hjul(F.r, '#2a2c30')}
         <g class="blink"><circle cx="22" cy="-42" r="2.4" fill="#ffc21a"/><circle cx="22" cy="-42" r="12" fill="#ffb21a" opacity=".45"/></g>`;
     } else {
-      s += `<path d="M-36 -4 V-16 Q-35 -22 -26 -23 L-15 -31 Q-11 -34 -3 -34 L14 -34 Q21 -34 25 -29 L31 -23 Q37 -21 37 -15 V-4 Z" fill="${t(c)}"/>
-        <path d="M-12 -24 L-6 -30 L6 -30 L6 -24 Z M9 -24 L9 -30 L18 -30 L24 -24 Z" fill="${lamps ? '#2a2218' : mix(t('#151b22'), L.sky[2], 0.35 * L.dag)}"/>
-        <circle cx="-22" cy="-4" r="6.2" fill="#050506"/><circle cx="24" cy="-4" r="6.2" fill="#050506"/>`;
-      if (kind === 'taxi') s += `<rect x="-4" y="-38" width="12" height="4" rx="1" fill="${lamps ? '#ffe88a' : t('#e8d050')}"/>`;
+      const c = t(a.c);
+      const mork = mix(c, '#000000', 0.38);
+      s += `<path d="${F.kaross}" fill="${c}"/>`;
+      // (tröskeln och stötfångarna mörkare, listen under rutorna ljusare)
+      s += `<path d="M${F.b + 2.5} ${a.kind === 'suv' ? -7.5 : -6} H${F.f - 2.5}" stroke="${mork}" stroke-width="${a.kind === 'suv' ? 4.4 : 2.6}" fill="none"/>`;
+      s += `<path d="M${F.b + 1.5} ${F.lin[0]} H${F.lin[1]}" stroke="${mix(c, '#ffffff', 0.3)}" stroke-width=".8" fill="none" opacity="${r1(0.4 + 0.4 * L.dag)}"/>`;
+      s += `<path d="${F.rutor}" fill="${glas}"/>`;
+      if (L.dag > 0.3 && !lamps) s += `<path d="${F.rutor}" fill="none" stroke="${L.sky[1]}" stroke-width=".6" opacity="${r1(0.35 * L.dag)}"/>`;
+      s += `<path d="${F.fog}" stroke="${mork}" stroke-width=".6" fill="none"/><path d="${F.grepp}" stroke="${mork}" stroke-width="1" fill="none"/>`;
+      if (F.rack) s += `<path d="${F.rack}" stroke="${t('#2a2c30')}" stroke-width="1.1" fill="none"/>`;
+      s += `<path d="M${F.spegel[0]} ${F.spegel[1]} l2.6 -.4 v-2.2 l-2.4 .4 Z" fill="${mix(c, '#000000', 0.2)}"/>`;
+      const bump = a.kind === 'saab' || a.kind === 'kombi' ? t('#1a1b1e') : mork;
+      s += `<rect x="${F.f - 2.6}" y="${F.ly[0] + 3}" width="3" height="5.6" rx="1" fill="${bump}"/><rect x="${F.b - 0.4}" y="${F.ly[0] + 3}" width="3" height="5.6" rx="1" fill="${bump}"/>`;
+      if (a.taxi) s += `<rect x="${a.kind === 'kombi' ? -18 : -8}" y="${F.tak - 4.2}" width="11" height="4.2" rx="1" fill="${lamps ? '#ffe88a' : t('#e8c43a')}"/><rect x="${a.kind === 'kombi' ? -16.5 : -6.5}" y="${F.tak - 3}" width="8" height="1.4" fill="${t('#1a1a1a')}" opacity=".6"/>`;
+      s += hjul(F.r, a.falg);
     }
-    const front = kind === 'buss' ? 86 : kind === 'plog' ? 36 : 37;
-    const back = kind === 'buss' ? -86 : -40;
+    // strålkastarna (halvljuset är alltid tänt i Sverige) och baklyktorna
+    const [fy, by] = F.ly;
+    const fx = a.kind === 'plog' ? 36 : F.f;
+    s += `<rect x="${fx - 2.2}" y="${fy - 1.4}" width="2.4" height="2.8" rx=".8" fill="#fbf8ec"/>`;
     if (lamps) {
-      s += `<path d="M${front} -14 L${front + 70} -24 L${front + 70} 6 Z" fill="#fff6dc" opacity=".16"/><circle cx="${front - 1}" cy="-13" r="2.4" fill="#fffbe8"/><circle cx="${front - 1}" cy="-13" r="9" fill="#fff2cc" opacity=".45"/>`;
-      s += `<circle cx="${back + 1}" cy="-14" r="2" fill="#ff4a3a"/><circle cx="${back + 1}" cy="-14" r="8" fill="#ff3b30" opacity=".35"/>`;
-    } else s += `<rect x="${front - 4}" y="-15" width="4" height="2" fill="#f4f4ee" opacity=".8"/>`;
+      s += `<path d="M${fx} ${fy - 1} L${fx + 70} ${fy - 11} L${fx + 70} 6 Z" fill="#fff6dc" opacity=".16"/><circle cx="${fx - 1}" cy="${fy}" r="9" fill="#fff2cc" opacity=".45"/>`;
+      s += `<circle cx="${F.b + 1}" cy="${by}" r="2" fill="#ff4a3a"/><circle cx="${F.b + 1}" cy="${by}" r="8" fill="#ff3b30" opacity=".35"/>`;
+    } else s += `<circle cx="${fx - 1}" cy="${fy}" r="3.2" fill="#fffbe8" opacity=".3"/><rect x="${F.b - 0.2}" y="${by - 1.8}" width="2" height="3.6" rx=".6" fill="${t('#9a1c16')}"/>`;
     return s;
   }
 
@@ -513,16 +598,19 @@ window.RumUte = (() => {
     const varmt = v.kanns >= 16;
     let s = '';
     // o: y (fötterna/hjulen), dir, speed (px/s), pause (s utanför bild),
-    // w/ht halva bredden och höjden före skalan k
+    // w/ht halva bredden och höjden före skalan k; för trafiken o.cyc varvets längd (s) i
+    // stället för pause och o.fas var i varvet den är från början, och o.stilla: står still
+    // i sin bild (ritas en gång och glider bara)
     const walk = (inner, o) => {
       const k = o.k || 1;
       const hw = Math.ceil((o.w || 30) * k);
       const ht = Math.ceil((o.ht || 56) * k);
       const dist = 1000 + 2 * (hw + 40);
       const fran = o.dir > 0 ? -(hw + 40) : 1000 + hw + 40;
-      const till = fran + o.dir * (dist + o.pause * o.speed);
-      const cyc = dist / o.speed + o.pause;
-      s += `<svg class="rum-gar${o.cls ? ` ${o.cls}` : ''}" style="left:${-hw}px; top:${r1(o.y - ht)}px; --fran:${fran}px; --till:${r1(till)}px; --steg:${o.steg || 0.9}s; animation-duration:${r1(cyc)}s; animation-delay:-${r1(R() * cyc)}s" viewBox="${-hw} ${-ht} ${2 * hw} ${ht + 6}" width="${2 * hw}" height="${ht + 6}"><g transform="scale(${o.dir * k} ${k})"><g class="gung">${inner}</g></g></svg>`;
+      const cyc = o.cyc || dist / o.speed + o.pause;
+      const till = fran + o.dir * cyc * o.speed;
+      const fore = o.fas != null ? Math.round(o.fas * cyc * 100) / 100 : r1(R() * cyc);
+      s += `<svg class="rum-gar${o.cls ? ` ${o.cls}` : ''}" style="left:${-hw}px; top:${r1(o.y - ht)}px; --fran:${fran}px; --till:${r1(till)}px; --steg:${o.steg || 0.9}s; animation-duration:${r1(cyc)}s; animation-delay:-${fore}s" viewBox="${-hw} ${-ht} ${2 * hw} ${ht + 6}" width="${2 * hw}" height="${ht + 6}"><g transform="scale(${o.dir * k} ${k})">${o.stilla ? inner : `<g class="gung">${inner}</g>`}</g></svg>`;
     };
 
     // de som går på trottoaren mittemot
@@ -578,17 +666,57 @@ window.RumUte = (() => {
       walk(fox, { y: 409, dir: -1, speed: 40, pause: 140, steg: 0.35, cls: 'rav', k: 0.9, w: 20, ht: 18 });
     }
 
-    // trafiken: närmaste filen åt höger, den bortre åt vänster
-    const day = h > 6 && h < 24;
-    const carsN = day ? (h > 7 && h < 20 ? 3 : 2) : 1;
-    for (let i = 0; i < carsN; i++) {
-      const near = i % 2 === 0;
-      const kind = R() < 0.18 ? 'taxi' : 'bil';
-      const c = pick(R, ['#1a1c22', '#c8ccd0', '#8a1e1e', '#2a3a5a', '#e8e4dc', '#4a4e54', '#1e3a2e']);
-      walk(vehicle(kind, kind === 'taxi' ? '#202226' : c, L), { y: near ? 532 : 500, dir: near ? 1 : -1, speed: 150 + R() * 90, pause: 14 + R() * 40, k: near ? 1.45 : 1.25, cls: 'fordon', w: 110, ht: 40 });
+    // trafiken, högertrafik: den närmaste filen åt höger och den bortre åt vänster. Fordonen
+    // i en fil åker lika fort och håller avståndet (ingen kör igenom någon annan): de sitter
+    // på ett band som går runt, B px långt, ett varv på P s. Bussarna som går över S:t
+    // Eriksbron (blåa 4:an, röda 3:an och 77:an) och plogbilen har varsin lucka i bandet och
+    // kommer var m:e varv; resten av varven står luckan tom. Fordonen gungar inte: de ritas en
+    // gång och glider bara (ingen ställning att rita om i gängets takt).
+    const rusning = (h > 7 && h < 9.5) || (h > 15.5 && h < 18.5);
+    const natt = h < 5 || h >= 23.5;
+    const nBil = rusning ? 3 : h > 6.5 && h < 21 ? 2 : 1;
+    const varv = natt ? 60 + R() * 25 : rusning ? 26 + R() * 6 : nBil === 2 ? 32 + R() * 8 : 42 + R() * 10;
+    const MODELL = ['sedan', 'sedan', 'halv', 'halv', 'suv', 'suv', 'kombi', 'kombi', 'saab', 'skap'];
+    const NY = ['#16181d', '#e9e8e4', '#9da3aa', '#5a6068', '#1d2b45', '#7a1d1f', '#3b4a3f', '#c9ccd0', '#2a2c30'];
+    const GAMMAL = ['#8a1e1e', '#d8cbb0', '#22335a', '#2f4a3a', '#e6e2d8', '#5a4632', '#1a1c22', '#6e7f8c'];
+    const bil = () => {
+      const taxi = R() < (natt ? 0.45 : 0.14);
+      const kind = taxi ? (R() < 0.7 ? 'sedan' : 'kombi') : pick(R, MODELL);
+      const c = taxi ? pick(R, ['#16181d', '#26282c', '#e9e8e4']) : kind === 'skap' ? pick(R, ['#eceae4', '#d8dadc', '#2a3f66', '#e4c02a'])
+        : pick(R, kind === 'kombi' || kind === 'saab' ? GAMMAL : NY);
+      return { kind, c, taxi, falg: pick(R, ['#a9adb2', '#5a5e64', '#c8ccd0', '#2a2c30']) };
+    };
+    // (halva bredden w framåt räcker för strålkastarnas ljus, ht högst upp, före skalan)
+    const MATT = { buss: [170, 56], ledbuss: [218, 56], plog: [130, 56], skap: [112, 46] };
+    for (const [y, dir, k, nara] of [[532, 1, 1.45, true], [500, -1, 1.25, false]]) {
+      const lista = [];
+      for (let i = 0; i < nBil; i++) lista.push(bil());
+      if (h > 5.5) {
+        lista.push({ kind: 'buss', c: '#c0262a', nr: pick(R, ['3', '77']), m: 5 });
+        lista.push({ kind: 'ledbuss', c: '#2468b8', nr: '4', m: 7 });
+      }
+      if (nara && (v.snotackt || (sno && v.mangd > 0.3))) lista.push({ kind: 'plog', m: 9 });
+      for (let i = lista.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [lista[i], lista[j]] = [lista[j], lista[i]]; }
+      const fart = 160 + R() * 55;
+      // minsta avståndet bakåt till nästa: från dess front till den här bakänden, och 50 px
+      const min = lista.map((a, i) => (FORM[lista[(i + 1) % lista.length].kind].f - FORM[a.kind].b) * k + 50);
+      const S = min.reduce((x, y2) => x + y2, 0);
+      const P = Math.ceil(Math.max(varv, (S + 400) / fart) * 10) / 10;
+      const B = fart * P;
+      const vikt = lista.map(() => 0.2 + R());
+      const V = vikt.reduce((x, y2) => x + y2, 0);
+      let p = R() * B;
+      lista.forEach((a, i) => {
+        const [w, ht] = MATT[a.kind] || [110, 40];
+        const cyc = P * (a.m || 1);
+        // var i varvet: läget p på bandet (och ett av de m varven för bussen)
+        const u0 = -(Math.ceil(w * k) + 40);
+        const lang = fart * cyc;
+        const q = (((p + Math.floor(R() * (a.m || 1)) * B - u0) % lang) + lang) % lang;
+        walk(fordon(a, L, dir), { y, dir, speed: fart, cyc, fas: q / lang, k, cls: 'fordon', w, ht, stilla: true });
+        p -= min[i] + (B - S) * vikt[i] / V;
+      });
     }
-    if (h > 5.5 && h < 24.5) walk(vehicle('buss', null, L), { y: 500, dir: -1, speed: 105, pause: 230, k: 1.2, cls: 'fordon', w: 160, ht: 54 });
-    if (v.snotackt || (sno && v.mangd > 0.3)) walk(vehicle('plog', null, L), { y: 532, dir: 1, speed: 58, pause: 260, k: 1.4, cls: 'fordon', w: 130, ht: 56 });
 
     // flaggan på flaggdagarna
     if (flagga(v)) {
