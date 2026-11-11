@@ -10,9 +10,8 @@
 //   Nacional 1988     El Días förstasida dagen efter världsmästartiteln i Tokyo
 //                     (DL:s lag), med fotot med pokalerna, gulnad och vikt
 //   löpsedeln         veckans rubrik ur förra omgången eller nästa, se nedan
-//   Chelsea 2021      The Sun on Sundays löpsedel från dagen efter finalen i
-//                     Champions League (Porto, 29 maj 2021), uppnålad på
-//                     furupanelen, se nedan
+//   Chelsea 1998      The Suns löpsedel från dagen efter finalen i
+//                     cupvinnarcupen (Råsunda, 13 maj 1998), se nedan
 //
 // De fyra gamla sitter på Skivan i högra delen av skyltfönstret: en plywoodskiva
 // i två kedjor, i årsordning, lika stora, med en skruv i varje hörn och en
@@ -68,7 +67,7 @@ export const SKIVA = {
   sedel: { w: 80, h: 120 },
   rader: [
     { id: 'rum-ifk', x: 771, y: 244, text: 'IFK 1982' }, { id: 'rum-nacional', x: 859, y: 244, text: 'NACIONAL 1988' },
-    { id: 'rum-vm94', x: 771, y: 394, text: 'VM 1994' }, { id: 'rum-chelsea', x: 859, y: 394, text: 'CHELSEA 2021' },
+    { id: 'rum-vm94', x: 771, y: 394, text: 'VM 1994' }, { id: 'rum-chelsea', x: 859, y: 394, text: 'CHELSEA 1998' },
   ],
 };
 // Löpsedeln: med tejp i fönstrets nedre vänstra hörn, eller med häftstift på
@@ -182,27 +181,31 @@ function passa(el, { rad, bred, hog, max, topp = Infinity, prick = 0, drag = 1, 
   });
 }
 
-// ---------- Chelsea 2021 ----------
+// ---------- Chelsea 1998 ----------
 //
-// En brittisk löpsedel (news bill) från söndagen den 30 maj 2021, från The Sun
-// on Sunday – en riktig tidning, som Tomas ville; namnet är skrivet som text i
-// det röda bandet, inte tidningens logga, och rubriken är vår, inte
-// tidningens. Chelsea vann finalen i Champions League mot Manchester City med
-// 1–0 på Estádio do Dragão i Porto lördagen den 29 maj (Kai Havertz, 42:a
-// minuten) – klubbens andra seger efter 2012 och Thomas Tuchels första
-// säsong. Fotot är laget med pokalen under WINNERS-bågen (rum/chelsea21.jpg,
-// beskuret ur ett foto som Tomas skickade; fotografen är okänd). Den har
-// legat vikt på mitten på vägen hem och har gulnat.
+// En brittisk löpsedel (news bill) från torsdagen den 14 maj 1998, från The
+// Sun – en riktig tidning; namnet är skrivet som text i det röda bandet, inte
+// tidningens logga, och rubriken är vår, inte tidningens. Chelsea vann finalen
+// i cupvinnarcupen mot VfB Stuttgart med 1–0 på Råsunda i Solna onsdagen den
+// 13 maj (Gianfranco Zola, inbytt i andra halvlek, med sin första
+// bollberöring); Gianluca Vialli var spelande tränare. Bara text, som
+// löpsedlarna var på 90-talet. Förut satt The Sun on Sundays löpsedel från
+// finalen i Champions League 2021 här, med foto, men den var det enda i
+// rummet från efter 90-talet (2026-11-11, användarens val: "en engelsk
+// löpsedel från 90-talet som verkar trovärdig"). Den har legat vikt på mitten
+// på vägen hem och har gulnat.
 
 const CHELSEA = {
-  datum: ['SUNDAY', 'MAY 30, 2021'],
-  kick: 'CHAMPIONS LEAGUE FINAL',
-  rad: [['CHELSEA'], ['KINGS OF EUROPE!', 1]],
+  datum: ['THURSDAY', 'MAY 14, 1998'],
+  kick: 'CUP WINNERS\u2019 CUP FINAL',
+  rad: [['BLUES\u2019'], ['EURO'], ['GLORY!', 1]],
   bred: 70,
-  hog: 40,
-  max: 30,
-  under: 'Havertz strike sinks Man City 1-0 in\u00a0Porto',
-  title: 'The Sun on Sundays löpsedel den 30 maj 2021: Chelsea vann Champions League – 1–0 mot Manchester City i finalen i Porto lördagen den 29 maj (Kai Havertz). Kaptenen César Azpilicueta lyfter pokalen.',
+  hog: 74,
+  max: 36,
+  topp: 1.3,
+  drag: 1.25,
+  under: 'Super-sub Zola sinks Stuttgart in\u00a0Stockholm',
+  title: 'The Suns löpsedel den 14 maj 1998: Chelsea vann cupvinnarcupen – 1–0 mot VfB Stuttgart i finalen på Råsunda onsdagen den 13 maj (Gianfranco Zola).',
 };
 
 function chelsea() {
@@ -212,12 +215,11 @@ function chelsea() {
   el.id = 'rum-chelsea';
   el.dataset.sak = 'chelsea';
   el.title = CHELSEA.title;
-  el.setAttribute('aria-label', `Löpsedel: CHELSEA KINGS OF EUROPE! ${CHELSEA.title}`);
-  el.innerHTML = '<span class="ark"><span class="huvud"><b class="sun"><i>The</i>Sun</b><em>on Sunday</em>' +
+  el.setAttribute('aria-label', `Löpsedel: BLUES\u2019 EURO GLORY! ${CHELSEA.title}`);
+  el.innerHTML = '<span class="ark"><span class="huvud"><b class="sun"><i>The</i>Sun</b>' +
     `<small>${CHELSEA.datum.join('<br>')}</small></span>` +
     `<span class="kick">${esc(CHELSEA.kick)}</span>` +
     `<span class="rub">${CHELSEA.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
-    '<span class="foto"><img src="rum/chelsea21.jpg" alt="" draggable="false"></span>' +
     `<span class="under">${esc(CHELSEA.under)}</span><span class="veck"></span><span class="tryck"></span></span>${SKRUVAR}`;
   passa(el, CHELSEA);
   return paSkivan(el);

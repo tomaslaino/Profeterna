@@ -16,7 +16,7 @@
 //   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
 //   (rum-register.js, lådan i three.js i rum-kortlada.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
-//   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 2021 på
+//   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på
 //   skivan och veckans löpsedel, rum-affischer.js) och dörren (med vilka vi
 //   är under): kameran går fram till dem (närbilderna, sak)
 //   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
@@ -4172,7 +4172,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ---------- närbilderna ----------
   //
   // Uret, skårtavlan, oraklet, visitkortet, pokalhyllan, korktavlan, löpsedlarna på
-  // skivan (IFK 1982, Nacional 1988, VM 94 och Chelsea 2021), veckans löpsedel och dörren (data-sak) – och kupongen på pulten när den inte går
+  // skivan (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998), veckans löpsedel och dörren (data-sak) – och kupongen på pulten när den inte går
   // att ta i handen: kameran ställer sig rakt framför och går fram tills
   // saken fyller det mesta av fönstret, och det som är ritat i 3D
   // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många

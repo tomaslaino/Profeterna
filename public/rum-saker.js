@@ -3,7 +3,7 @@
 // ett av spåren, en öppen snusdosa med locket bredvid och, bara när det är
 // varmt i Stockholm, en gulnad bordsfläkt som svänger fram och tillbaka och
 // blåser röken åt sidan när den pekar mot askkoppen. I skyltfönstret
-// sitter löpsedlarna – IFK Göteborg 1982, Nacional 1988, VM 94 och Chelsea 2021
+// sitter löpsedlarna – IFK Göteborg 1982, Nacional 1988, VM 94 och Chelsea 1998
 // på skivan, och veckans löpsedel – som rum-affischer.js ritar och den här
 // filen sätter upp.
 //

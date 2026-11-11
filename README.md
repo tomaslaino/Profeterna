@@ -893,6 +893,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Gänget byter plats vid bordet (2026-10-25, användarens önskemål):** var tredje dag
   sitter de på en ny plats, så att var och en får sin tur bakom bordet och på var sida –
   samma för alla som tittar, efter dagen i Stockholm. Se [Tobaksaffären](#tobaksaffären).
+- **Gänget i prasseloveraller (2026-11-11, användarens val):** tobaksaffären skulle bli "mer
+  genuint 90-tal". Av fyra skisser (rummet som ett framkallat foto, som en hemvideo, gänget i
+  90-talets träningsoveraller och en löpsedel från 90-talet i stället för Chelsea 2021) valde
+  användaren overallerna och löpsedeln: "jag gillar overallidén" och "Vi kan få olika overaller".
+  Utom när det är hett har de glansiga träningsoveraller med mönster över bröstet och ärmarna,
+  tre var som byts varje dag, och samma dag har alla tre olika mönster. Dunjackan, skinnjackan
+  och de andra jackorna efter vädret är borta (utom vid högtiderna). Se *Kläderna* under
+  [Tobaksaffären](#tobaksaffären).
 - **Lägre bord i telefonen (2026-11-08, användarens önskemål):** på höjden tog bordet nästan halva
   skärmen. Nu tar det ungefär en tredjedel, och rummet och ett ritat tak får resten; alla i gänget och
   hela kupongen syns fortfarande utan att man drar. Se [I telefonen](#i-telefonen).
@@ -1238,6 +1246,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   skyltfönstret, under oraklet, sitter The Sun on Sundays löpsedel från dagen efter Chelseas
   seger i Champions League 2021, med Tomas foto av laget med pokalen. Den sitter med två
   häftstift i furun och har gulnat. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Chelsea 1998 i stället för 2021 (2026-11-11, användarens val):** löpsedeln från 2021 var det
+  enda i rummet från efter 90-talet. Användaren valde "en engelsk löpsedel från 90-talet som verkar
+  trovärdig" i stället för skissens svenska: The Suns löpsedel dagen efter Chelseas seger i
+  cupvinnarcupen på Råsunda 1998, bara text som löpsedlarna var då. Fotot från 2021 är borttaget. Se
+  [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Nacionals förstasida på glaset (2026-11-03, användarens önskemål):** till höger i
   skyltfönstret sitter El Días förstasida dagen efter Nacionals seger i Intercontinental Cup
   1988 (DL:s lag), med Tomas foto av laget med pokalerna. Se [Tobaksaffären](#tobaksaffären),
@@ -4379,8 +4392,8 @@ de om (`ute`, som när vädret ändras).
   blåklint, smörblommor och klöver, tätast över pannan.
 
 Vid lucia, jul och nyår byter de om helt – jackorna är av, det är fest inne – och har långbyxor;
-DT kavlar ändå upp ärmen med lejonet. Vid påsk och midsommar har de kläderna efter vädret och bara
-det på huvudet. Det på huvudet ersätter DJ:s mössa, och håret trycks ner under kanten som under
+DT kavlar ändå upp ärmen med lejonet. Vid påsk och midsommar har de overallerna (t-tröja och shorts
+när det är hett) och bara det på huvudet. Det på huvudet ersätter DJ:s mössa, och håret trycks ner under kanten som under
 mössan. Solglasögonen sitter uppskjutna på tomteluvan och hucklet, i håret med partyhatten och är
 av med struten, kronan och kransen (på näsan när solen skiner, som vanligt). Oraklet dagen efter en
 bra omgång bär papperskronan i stället för högtidens (figuren byggs om när kronan kommer eller går),
@@ -4402,7 +4415,7 @@ LÖSSNUS.
 **Affischerna** – de fyra gamla sitter på **skivan** i högra delen av skyltfönstret
 ([public/rum-affischer.js](public/rum-affischer.js), rum-affischer.css; rum-saker.js sätter upp
 dem): en plywoodskiva i två kedjor från karmen, i årsordning (IFK 1982 och Nacional 1988 överst,
-VM 94 och Chelsea 2021 under), lika stora (80 × 120), raka och alltid på samma ställe. Det ska
+VM 94 och Chelsea 1998 under), lika stora (80 × 120), raka och alltid på samma ställe. Det ska
 synas att en person har hand om det: en skruv med bricka i varje hörn (stjärnspåret är en liten SVG, så att det är
 ett rent kryss också i närbilden) och en Dymo-remsa under varje
 sedel. Skivan är färdig: inga blyertsmått och inget vattenpass (de fanns till 2026-11-10). Måtten
@@ -4450,16 +4463,16 @@ som missade sina straffar) står inte med, liksom årgång, nummer och pris. Sid
 delar redan i bilden; rummet lägger bara solens blekning ovanpå, inte affischernas
 prickraster, som blir grovt i närbilden. Närbilden tar 94 % av höjden.
 
-**Chelsea 2021** (DT:s lag) är en
-brittisk löpsedel (news bill) från **The Sun on Sunday**, söndagen den 30 maj 2021, dagen
-efter finalen. Tidningen är riktig, som Tomas ville, men namnet är skrivet som text i det
-röda bandet (inte tidningens logga), och rubriken är vår: *CHAMPIONS LEAGUE FINAL*,
-*CHELSEA* och *KINGS OF EUROPE!*, fotot av laget med pokalen under WINNERS-bågen
-(`public/rum/chelsea21.jpg`, beskuret ur ett foto som Tomas skickade; fotografen och
-licensen är okända, så ingen rad står under närbilden) och *Havertz strike sinks Man City
-1-0 in Porto* under. Chelsea vann finalen mot Manchester City med 1–0 på Estádio do Dragão
-i Porto den 29 maj 2021 (Kai Havertz). Löpsedeln är fem år gammal: papperet har gulnat,
-det röda har bleknat och den har legat vikt på mitten.
+**Chelsea 1998** (DT:s lag) är en
+brittisk löpsedel (news bill) från **The Sun**, torsdagen den 14 maj 1998, dagen efter
+finalen i cupvinnarcupen. Tidningen är riktig, men namnet är skrivet som text i det röda
+bandet (inte tidningens logga), och rubriken är vår: *CUP WINNERS’ CUP FINAL*, *BLUES’*,
+*EURO* och *GLORY!* så stora som ryms (som veckans löpsedel) och *Super-sub Zola sinks
+Stuttgart in Stockholm* under – bara text, som löpsedlarna var på 90-talet. Chelsea vann
+finalen mot VfB Stuttgart med 1–0 på Råsunda i Solna onsdagen den 13 maj 1998 (Gianfranco
+Zola, inbytt). Löpsedeln är gammal: papperet har gulnat, det röda har bleknat och den har
+legat vikt på mitten. Till 2026-11-11 satt The Sun on Sundays löpsedel från finalen i
+Champions League 2021 här, med foto, men den var det enda i rummet från efter 90-talet.
 
 **Löpsedeln** är veckans och är **Helgarderats**, samma tidning som ligger på pulten (2026-11-10, Tomas önskemål:
 "Döp om löpsedeln till Helgarderat också"): namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade med
@@ -5511,11 +5524,15 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)).
   (påsk, pingst, midsommar och valdagen räknas ut) från morgonen till solnedgången.
 - **Kläderna:** gänget klär sig efter hur kallt det känns ute (`dress` i
   [public/rum-3d.js](public/rum-3d.js)). Över 21° t-tröja och shorts – DT i jeansshorts –
-  och solglasögonen på näsan när solen skiner; 15–21° som förut; 8–15° långärmat och
-  långbyxor (DL sweatshirt och chinos, DT öppen flanellskjorta med uppkavlade ärmar, DJ
-  luvtröja); 1–8° jackor (DL fältjacka, DT skinnjacka, DJ dunjacka) och under 1° vinter (DL
-  parkas, DT och DJ dunjackor, DJ med pälskant). När det regnar har de regnjackor (DL gul,
-  DT olivgrön, DJ svart), och när det snöar ligger snö på axlarna och huvudet. DT kavlar
+  och solglasögonen på näsan när solen skiner. Annars har de **prasseloveraller** från
+  90-talet (`OVERALLER`): glansig jacka med hög krage och dragkedja och byxor i samma tyg,
+  mönstret över jackan och ärmarna, och kragen, muddarna och fållen i mönstrets färg. 15–21°
+  är jackan öppen över t-tröjan, kallare stängd. Var och en har tre overaller som byts varje
+  dag (dagen i Stockholm), och samma dag har alla tre olika mönster – sicksack, ett snett fält,
+  ett ok över axlarna eller trianglar – i 90-talets färger (DL cerise, petrol eller lila, DT
+  i Chelseas blå toner, DJ blå, svart eller marin); `?rum-overall=0|1|2` väljer dag för bilder.
+  Mönstret ritas på en duk per overall (`prasselTex`). Förut hade de jackor efter vädret
+  (fältjacka, skinnjacka, dunjacka, parkas, regnjackor); de togs bort med overallerna. När det snöar ligger snö på axlarna och huvudet. DT kavlar
   alltid upp ärmen på armen med lejonet, och halsduken ligger utanpå jackan. Ändras vädret
   medan rummet står öppet byter den som behöver om. Runt högtiderna klär de sig för dem (se
   *Högtiderna* under [Tobaksaffären](#tobaksaffären)).
@@ -7946,7 +7963,7 @@ läses inte längre.
 ### Närbilderna
 
 Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
-Nacional 1988, VM 94 och Chelsea 2021 på skivan och veckans löpsedel) och namnet på dörren
+Nacional 1988, VM 94 och Chelsea 1998 på skivan och veckans löpsedel) och namnet på dörren
 tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan

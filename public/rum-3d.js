@@ -286,41 +286,76 @@ function sitt(F, P) {
   };
 }
 
+// Prasseloverallerna (2026-11-11, användarens val): utom när det är hett har
+// gänget glansiga träningsoveraller från 90-talet – jacka med hög krage och
+// dragkedja och byxor i samma tyg, mönstret över jackan och ärmarna och
+// kragen, muddarna och fållen i mönstrets färg. Var och en har tre som byts
+// varje dag (dagen i Stockholm, räknat från den 25 oktober 2026 som
+// placeringen), och samma dag har alla tre olika mönster: sicksack (två
+// sicksackband över bröstet och en rand under), sned (ett brett fält snett över
+// bröstet), axel (oket över axlarna i en annan färg och en rand under) och
+// trianglar (splitter över bröstet). c: [jackan och byxorna, mönstret,
+// randen, byxornas fåll]. ?rum-overall=0|1|2 för bilder.
+const OVERALLER = {
+  dl: [
+    { m: 'sned', c: ['#c8264a', '#1d2b6b', '#f2efe6', '#931a36'] },
+    { m: 'sicksack', c: ['#0e7d8a', '#4b2a86', '#f0487a', '#0a5a64'] },
+    { m: 'trianglar', c: ['#5b2a86', '#18b2a4', '#f5d33a', '#3f1c60'] },
+  ],
+  dt: [
+    { m: 'sicksack', c: ['#1f4fb8', '#f1ede2', '#d3263a', '#163a88'] },
+    { m: 'axel', c: ['#1b2550', '#2f74d0', '#f2c033', '#121a3a'] },
+    { m: 'sned', c: ['#2456b8', '#121c3a', '#e9e4d6', '#173f8c'] },
+  ],
+  dj: [
+    { m: 'trianglar', c: ['#1a5cab', '#f3f0e8', '#e8762c', '#123f78'] },
+    { m: 'sned', c: ['#151619', '#e0287a', '#21b6c8', '#0b0c0e'] },
+    { m: 'sicksack', c: ['#26244a', '#14a49a', '#f2c033', '#1b1a36'] },
+  ],
+};
+// det glansiga tyget (jackan och byxorna)
+const PRASSEL = { roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.06 };
+function overallNr(v) {
+  const q = new URLSearchParams(location.search).get('rum-overall');
+  let n = Number(q);
+  if (q == null || !Number.isFinite(n)) {
+    const [ar, man, dag] = v ? [v.ar, v.manad, v.dag] : fDag.format(Date.now()).split('-').map(Number);
+    n = Math.round((Date.UTC(ar, man - 1, dag) - Date.UTC(2026, 9, 25)) / 864e5);
+  }
+  return ((Math.floor(n) % 3) + 3) % 3;
+}
+
 // Kläderna efter vädret i Stockholm (v = Vader.nu(), via rum.js): känns-
-// temperaturen avgör lagren – 0 hett (21° och mer), 1 varmt (15–21), 2 svalt
-// (8–15), 3 kallt (1–8), 4 vinter (under 1) – regn ger regnjackor, sol
-// solglasögonen på näsan och snöfall snö på axlarna. DT kavlar alltid upp
-// ärmen på armen med lejonet. Runt högtiderna (fest, rum-fest.js) har de
-// något på huvudet, och vid jul, lucia och nyår andra kläder.
+// temperaturen avgör – 0 hett (21° och mer), 1 varmt (15–21), 2 svalt (8–15),
+// 3 kallt (1–8), 4 vinter (under 1) – sol ger solglasögonen på näsan och
+// snöfall snö på axlarna. När det är hett har de t-tröja och shorts (DT
+// jeansshorts), annars overallerna (OVERALLER), med jackan öppen över
+// t-tröjan när det är varmt och stängd annars. DT kavlar alltid upp ärmen på
+// armen med lejonet. Runt högtiderna (fest, rum-fest.js) har de något på
+// huvudet, och vid jul, lucia och nyår andra kläder (drakt). Jackorna efter
+// vädret (fältjacka, skinnjacka, flanellskjorta, dunjackor, parkas och
+// regnjackor) togs bort med overallerna 2026-11-11; tygerna finns kvar i
+// jackMat.
 //   ben: kort|lang, byxa: [färg, mörkare], troja: { farg, farg2, luva, ficka,
 //            jul (jultröjan), skjorta (med fluga), upp: lejon },
-//   jacka: { typ: oppen|stangd, tyg: bomull|skinn|dun|parka|regn|flanell|sammet,
-//            farg, farg2, luva: slat|pals, krage, tjock, tunn, upp: lejon|bada },
+//   jacka: { typ: oppen|stangd, tyg: bomull|skinn|dun|parka|regn|flanell|sammet|prassel,
+//            farg, farg2, luva: slat|pals, krage, tjock, tunn, upp: lejon|bada,
+//            monster, c (overallens mönster och färger) },
+//   prassel: byxorna i overallens tyg,
 //   fest: lucia|jul|nyar|pask|midsommar
 function dress(key, v) {
   const k = v ? v.kanns : 17;
   const n = k >= 21 ? 0 : k >= 15 ? 1 : k >= 8 ? 2 : k >= 1 ? 3 : 4;
-  const regn = !!v && (v.fall === 'regn' || v.fall === 'blandat') && n >= 1 && n <= 3;
   const d = { n, ben: n <= 1 ? 'kort' : 'lang', glas: !!v && !v.fall && v.sol > 8 && v.moln < 45, sno: !!v && v.fall === 'sno' && n >= 3 };
-  if (key === 'dl') {
-    if (n >= 2) { d.byxa = ['#c9bb98', '#b1a27d']; d.troja = { farg: '#2a3658', farg2: '#1c2642' }; }
-    if (n === 3) d.jacka = { typ: 'oppen', tyg: 'bomull', farg: '#5d6142', farg2: '#43472f', krage: true };
-    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'parka', farg: '#24323f', farg2: '#172230', luva: 'slat', tjock: 1.6 };
-    if (regn) d.jacka = { typ: n === 3 ? 'stangd' : 'oppen', tyg: 'regn', farg: '#e9b724', farg2: '#c99a12', luva: 'slat' };
-  } else if (key === 'dt') {
-    d.ben = n === 0 ? 'kort' : 'lang';
-    if (n === 2) d.jacka = { typ: 'oppen', tyg: 'flanell', farg: '#8c2a24', farg2: '#1e1a1a', krage: true, tunn: true, upp: 'bada' };
-    if (n === 3) d.jacka = { typ: 'oppen', tyg: 'skinn', farg: '#4a2e1e', farg2: '#2e1c12', krage: true, upp: 'lejon' };
-    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#2f3e33', farg2: '#1f2a22', krage: true, tjock: 1.8, upp: 'lejon' };
-    if (regn) d.jacka = { typ: 'oppen', tyg: 'regn', farg: '#4f5a3a', farg2: '#39422a', luva: 'slat', upp: 'lejon' };
-  } else if (key === 'dj') {
-    if (n >= 2) { d.byxa = ['#b8b4ab', '#a29d93']; d.troja = { farg: '#1d1d20', farg2: '#111113', luva: true, ficka: true }; }
-    if (n === 3) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#161618', farg2: '#0b0b0c', krage: true, tjock: 1.5 };
-    if (n === 4) d.jacka = { typ: 'stangd', tyg: 'dun', farg: '#161618', farg2: '#0b0b0c', krage: true, tjock: 2.2, luva: 'pals' };
-    if (regn) d.jacka = { typ: 'stangd', tyg: 'regn', farg: '#18191c', farg2: '#0e0f11', luva: 'slat' };
+  const fest = festen(v);
+  if (n >= 1 && fest !== 'jul' && fest !== 'lucia' && fest !== 'nyar') {
+    const O = OVERALLER[key][overallNr(v)];
+    d.ben = 'lang';
+    d.prassel = true;
+    d.byxa = [O.c[0], O.c[3]];
+    d.jacka = { typ: n === 1 ? 'oppen' : 'stangd', tyg: 'prassel', farg: '#ffffff', farg2: O.c[1], krage: true, monster: O.m, c: O.c, ...(key === 'dt' ? { upp: 'lejon' } : {}) };
   }
   // högtiderna (rum-fest.js): vid jul, lucia och nyår byter de om
-  const fest = festen(v);
   if (fest) { d.fest = fest; drakt(key, d); }
   return d;
 }
@@ -1475,8 +1510,64 @@ export async function figurer(canvas, opt = {}) {
   });
   plaidTex.colorSpace = THREE.NoColorSpace;
   const plaid = (rx, ry) => { const t = plaidTex.clone(); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.needsUpdate = true; return t; };
-  // jackans tyg: matt bomull och parkas, blankt skinn, glänsande nylon (dun, regn), rutig flanell,
-  // sammet (nyårskavajen)
+  // Overallens mönster på en duk per mönster och färger: u går runt kroppen med
+  // mitten fram i 0 (och 1), v från fållen upp till kragen, och duken vänds, så
+  // att bröstet ligger ungefär vid y 45–105 av 256. Det som korsar kanten ritas
+  // också på andra sidan, så att det inte blir någon söm mitt fram.
+  const prasselDukar = new Map();
+  function prasselTex(J) {
+    const k = J.monster + J.c.join();
+    if (prasselDukar.has(k)) return prasselDukar.get(k);
+    const [bas, m1, m2] = J.c;
+    const t = canvasTex(512, 256, (g, w) => {
+      g.fillStyle = bas;
+      g.fillRect(0, 0, w, 256);
+      // ett band mellan två kanter y(x) och y(x) + tjock
+      const falt = (y, tjock, col) => {
+        g.fillStyle = col;
+        g.beginPath();
+        for (let x = 0; x <= w; x += 8) g.lineTo(x, y(x));
+        for (let x = w; x >= 0; x -= 8) g.lineTo(x, y(x) + tjock);
+        g.closePath();
+        g.fill();
+      };
+      if (J.monster === 'sicksack') {
+        const sick = (y0, a) => (x) => y0 + a * (2 * Math.abs(((x / 64) % 2) - 1) - 1);
+        falt(sick(52, 16), 34, m1);
+        falt(sick(86, 16), 34, m2);
+        falt(() => 120, 6, m1);
+      } else if (J.monster === 'sned') {
+        // snett fram (och åt andra hållet bak)
+        const sned = (y0) => (x) => y0 + 34 * Math.sin(2 * Math.PI * x / w);
+        falt(sned(50), 40, m1);
+        falt(sned(96), 8, m2);
+      } else if (J.monster === 'axel') {
+        falt(() => 0, 62, m1);
+        falt(() => 66, 9, m2);
+      } else {
+        for (let i = 0; i < 28; i++) {
+          const x0 = hash(i * 3.1 + 1) * w;
+          const y0 = 44 + hash(i * 5.7 + 2) * 76;
+          const r = 14 + hash(i * 2.3 + 3) * 16;
+          const a = hash(i * 7.9 + 4) * 6.28;
+          g.fillStyle = i % 2 ? m1 : m2;
+          for (const dx of [-w, 0, w]) {
+            g.beginPath();
+            for (let j = 0; j < 3; j++) {
+              const rr = r * (0.75 + 0.5 * hash(i * 11.3 + j));
+              g.lineTo(x0 + dx + Math.cos(a + j * 2.094) * rr, y0 + Math.sin(a + j * 2.094) * rr);
+            }
+            g.closePath();
+            g.fill();
+          }
+        }
+      }
+    });
+    prasselDukar.set(k, t);
+    return t;
+  }
+  // jackans tyg: matt bomull och parkas, blankt skinn, glänsande nylon (dun, regn, overallen), rutig
+  // flanell, sammet (nyårskavajen)
   function jackMat(J, extra = {}) {
     const o = {
       bomull: { roughness: 0.62, clearcoat: 0.3, bumpMap: denim, bumpScale: 0.5 },
@@ -1484,12 +1575,13 @@ export async function figurer(canvas, opt = {}) {
       skinn: { roughness: 0.32, clearcoat: 0.75, clearcoatRoughness: 0.28, bumpMap: knit, bumpScale: 0.25 },
       dun: { roughness: 0.3, clearcoat: 0.85, clearcoatRoughness: 0.16 },
       regn: { roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05 },
+      prassel: { ...PRASSEL, map: J.c ? prasselTex(J) : null },
       flanell: { roughness: 0.82, clearcoat: 0.12, sheen: 0.5, sheenRoughness: 0.7, map: plaid(5, 3) },
       sammet: { roughness: 0.8, clearcoat: 0.05, sheen: 1, sheenRoughness: 0.35, bumpMap: knit, bumpScale: 0.15 },
     }[J.tyg] || {};
     return mat(J.farg, { side: J.typ === 'oppen' ? THREE.DoubleSide : THREE.FrontSide, ...o, ...extra });
   }
-  const edgeMat = (J) => mat(J.farg2, { roughness: J.tyg === 'regn' || J.tyg === 'dun' || J.tyg === 'skinn' ? 0.28 : 0.62, clearcoat: 0.5 });
+  const edgeMat = (J) => mat(J.farg2, { roughness: J.tyg === 'regn' || J.tyg === 'prassel' || J.tyg === 'dun' || J.tyg === 'skinn' ? 0.28 : 0.62, clearcoat: 0.5 });
   const snowMat = mat('#f4f7fa', { roughness: 0.9, clearcoat: 0, sheen: 0.6, sheenRoughness: 0.8, sheenColor: new THREE.Color('#ffffff') });
 
   // Jackan: ett skal utanpå tröjan (bålens profil, lite vidare och längre),
@@ -2827,10 +2919,11 @@ export async function figurer(canvas, opt = {}) {
     const jul = Boolean(D.troja && D.troja.jul);
     const tee = jul ? fab('#ffffff', { map: FEST.jultroja(F.key), bumpMap: knit, bumpScale: 0.6 }) : fab(D.troja ? D.troja.farg : c.tee, { bumpMap: knit, bumpScale: 0.6 });
     const teeArm = jul ? fab('#ffffff', { map: FEST.armar(F.key), bumpMap: knit, bumpScale: 0.6 }) : tee;
-    // DT har jeans (jeansshorts när det är hett), DL och DJ shorts eller långbyxor
-    const jeans = c.pants === 'jeans';
+    // DT har jeans (jeansshorts när det är hett), DL och DJ shorts eller långbyxor; i
+    // overallen byxor av samma glansiga tyg som jackan
+    const jeans = c.pants === 'jeans' && !D.prassel;
     const lang = D.ben === 'lang';
-    const trou = fab(lang && D.byxa ? D.byxa[0] : c.trou, { bumpMap: jeans ? denim : knit, bumpScale: jeans ? 0.9 : 0.5 });
+    const trou = D.prassel ? fab(D.byxa[0], PRASSEL) : fab(lang && D.byxa ? D.byxa[0] : c.trou, { bumpMap: jeans ? denim : knit, bumpScale: jeans ? 0.9 : 0.5 });
     const tee2 = fab(D.troja ? D.troja.farg2 : c.tee2);
     const trou2 = fab(lang && D.byxa ? D.byxa[1] : c.trou2);
     const shoe = mat(c.shoe, {}, 'sko');
