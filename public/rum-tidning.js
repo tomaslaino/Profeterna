@@ -10,7 +10,8 @@
 //
 //   Omslaget     på kupongens papper, utan bild: numret och veckan, priset, namnet, lördagens datum, rutorna 1, X
 //                och 2 ikryssade med pennan (helgarderat) och den första matchen med sin rubrik. 100 × 140, förstorat
-//                med zoom: litet på pulten och så stort som ryms när tidningen läses (passa).
+//                med zoom: litet på pulten och så stort som ryms när tidningen läses (passa). Alla andra sidor är lika
+//                breda som omslaget och minst lika höga, på samma papper och i samma tryck (helgarderat.css).
 //   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
 //                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
 //   Matchbladen  ett per match, från sidan 2 (Sköldarna möts, C3): rubriken, en bild, introduktionen, lagen mot
@@ -33,7 +34,7 @@
 // RumTidning.upplaga(data, prov, tidning, sista) → upplagan (det som behövs för att rita tidningen), eller null
 // RumTidning.tidning(upplaga) → html: omslaget, innehållet, matchbladen och sista sidan, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
-// RumTidning.passa(rot, bredd, hojd) förstorar omslaget så att det ryms och krymper kupongens lagnamn när de inte ryms.
+// RumTidning.passa(rot, bredd, hojd) ger tidningen dess storlek: omslaget så stort som ryms och alla sidor lika breda.
 // RumTidning.bildfel(rot): en bild i matchbladen som inte går att hämta byts mot det andra lagets, och annars tas den
 // bort.
 
@@ -359,15 +360,17 @@
       `<div class="hf-dagen">${dag ? `<span>${esc(`${fVdagLang.format(dag)} ${fDagMan.format(dag)}`)}</span>` : ''}</div>` +
       mitt + ettan + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
-  // Omslaget så stort som ryms: högst bredden, och så högt att det mesta syns på skärmen, men inte smalare än 360 px
-  // eller bredare än 660 (pulten i rum.js och sajten, helgarderat.js). Papperets mönster delas med förstoringen
-  // (--zz), så att de är lika fina som på pulten.
+  // Tidningens storlek (pulten i rum.js och sajten, helgarderat.js): omslaget förstorat k gånger, och alla andra ark
+  // lika breda och minst lika höga (--hg-k i helgarderat.css; 2026-11-11, användarens önskemål: "sidorna ska vara
+  // konkordanta med varandra"). Så stort som ryms: högst bredden, och så högt att det mesta av omslaget syns på
+  // skärmen, men inte smalare än 600 px, så att matchbladets två spalter får plats, och inte bredare än 760. Papperets
+  // mönster delas med förstoringen (--zz), så att de är lika fina som på pulten.
   function passa(rot, bredd, hojd) {
-    passaLagen(rot);
-    if (rot && document.fonts) document.fonts.ready.then(() => passaLagen(rot));
-    const f = rot && rot.querySelector('.hg-omslaget .hf-forsta');
+    if (!rot) return;
+    const k = Math.max(1, Math.min(bredd / 100, 7.6, Math.max((hojd - 86) / 140, 6)));
+    rot.style.setProperty('--hg-k', k.toFixed(3));
+    const f = rot.querySelector('.hg-omslaget .hf-forsta');
     if (!f) return;
-    const k = Math.max(1, Math.min(bredd / 100, 6.6, Math.max((hojd - 86) / 140, 3.6)));
     f.style.zoom = k.toFixed(3);
     f.style.setProperty('--zz', k.toFixed(3));
   }
@@ -424,17 +427,6 @@
       `<section class="hs-kaseri"><h3><span>${esc(T.kaseri)}</span>${esc(hel(S.kaseri.rubrik))}</h3>` +
       `<div class="hs-ktext">${stycken(S.kaseri.stycken)}<p class="hs-sign">${esc(S.kaseri.av)}${S.kaseri.om ? `<span>${esc(stor(S.kaseri.om))}</span>` : ''}</p></div></section></article>` +
       (notiser ? `<aside class="hs-sido"><h4>${esc(T.vidSidanAv)}</h4><ul>${notiser}</ul></aside>` : '') + '</div></section>';
-  }
-
-  // Lagnamnen krymper alla lika mycket när det längsta inte ryms på raden (som matchlistan på sajten), i stället för att
-  // brytas eller avstavas.
-  function passaLagen(rot) {
-    const ol = rot && rot.querySelector('.hg-kupong ol');
-    if (!ol) return;
-    ol.style.removeProperty('--k-krymp');
-    let k = 1;
-    for (const n of ol.querySelectorAll('.hg-k-lag')) if (n.scrollWidth > n.clientWidth + 0.5) k = Math.min(k, n.clientWidth / n.scrollWidth);
-    if (k < 1) ol.style.setProperty('--k-krymp', String(Math.floor(k * 100) / 100));
   }
 
   // ---------- matchbladen ----------

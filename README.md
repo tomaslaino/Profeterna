@@ -280,6 +280,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Helgarderats sidor lika stora och i samma stil (2026-11-11, användarens önskemål: "Jag vill att sidorna ska vara
+  konkordanta med varandra - nu ser de ut att ha lite olika storlek när man öppnar tidningen"):** alla sidor är lika
+  breda som omslaget och minst lika höga (innehållet exakt lika stort), och alla har omslagets papper, ram och
+  sidhuvud och kupongens tre röster: tryck i terrakotta, skrivmaskin och penna. Förut hade omslaget, innehållet och
+  matchbladen tre bredder (553, 560 och 940 px på en vanlig skärm) och tre stilar. Valt bland två skisser: A
+  *Kupongens papper* och B *Matchprogrammet* (svart, rött och gult överallt, också på omslaget) (se
+  [Helgarderat](#helgarderat))
 - [x] **Helgarderats matchblad: Sköldarna möts (2026-11-11, användarens önskemål: "förbättra tidningen helgarderat -
   börja med de olika matchbladen och hur du tänker att de ska bli snyggare/mer överblickbara och pedagogiska"):** lagen
   står mot varandra med stora sköldar under introduktionen (hemmalaget mot mitten, som i matchlistan), och lagens text
@@ -7654,9 +7661,15 @@ ordning är omgångens; i rummet syns bara sidorna för omgångens matcher (`pod
 tidningen på pulten i rummet namnet och utseendet, och numret räknas likadant där (`RumTidning.nummer`, se ovan).
 Sidan har noindex och ingen länk från resten av sajten.
 
-Tidningen har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)): tidningspapper med tryck i svart och
-flaskgrönt, namnet i Alfa Slab One och till vänster om det rutorna 1, X och 2, alla ikryssade med kulspetspenna. Priset
-är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
+Tidningen har ett eget utseende ([public/helgarderat.css](public/helgarderat.css)), och alla sidor hänger ihop
+(2026-11-11, användarens önskemål: "sidorna ska vara konkordanta med varandra … storleksmässigt och stilmässigt", val A
+*Kupongens papper*). Omslaget är 100 × 140 förstorat så att det ryms på skärmen, minst 600 och högst 760 px brett på
+datorn och skärmens bredd i telefonen (`passa` i [public/rum-tidning.js](public/rum-tidning.js), samma på sajten och i
+rummet), och innehållet, matchbladen och sista sidan är lika breda och minst lika höga; innehållet är exakt lika stort.
+Alla sidor har omslagets papper (fibrerna, buktorna och trycket som inte har täckt), den tunna tryckta ramen och
+omslagets översta rad som sidhuvud, och kupongens tre röster: tryck i terrakotta (namnet, rubrikerna, numren och
+strecken i Fraunces), skrivmaskin (sidhuvudet, tiderna, lagen i innehållet, bildtexterna och källorna) och den blå
+pennan (omslagets kryss). Brödtexten står i bläck. Priset är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har bilden och, om
 matchbladet har ett, citatet. Bredvid står *Lördagens matcher* med sidnumren, och under *Fler matcher*: tre matcher
 till med bild, rubrik och introduktionens första mening. Sedan kommer ett matchblad per match.
@@ -7667,9 +7680,9 @@ Sedan 2026-11-11 *Sköldarna möts* (valt bland skisser, se beslutet ovan): rubr
 introduktionen i fetstil, lagen mot varandra med stora sköldar (hemmalaget högerställt mot mitten), lagens text i två
 lika spalter med anfang och spelarnas namn i fetstil första gången de nämns (`namn` under laget, som nattjobbet ger),
 lagets citat i jämnhöjd under texten (`citat` under laget; ett äldre nummer har ett för sidan, och det står under laget
-vars källa sa det), sist sammanfattningen i en gul ruta och *Källorna* per lag med datum och länk (*Podden SK3 TV (9
-nov)*, två avsnitt av samma podd: *(2 och 9 nov)*). Spalterna ger 55–65 tecken per rad, med avstavning och jämn
-högerkant. I telefonen står lagen under varandra, var och en med sitt namn och sitt citat. Texten är kortare än förut
+vars källa sa det), sist sammanfattningen i en tryckt ruta och *Källorna* per lag med datum och länk (*Podden SK3 TV (9
+nov)*, två avsnitt av samma podd: *(2 och 9 nov)*). Spalterna är tidningsspalter (arket är lika brett som omslaget),
+med avstavning och jämn högerkant. I telefonen står lagen under varandra, var och en med sitt namn och sitt citat. Texten är kortare än förut
 (högst 120 ord per lag i stället för 150) och ska vara det som bara de som följer laget varje vecka vet: stämningen,
 vad supportrarna ser i spelet, vem som har lyft sig, rykten och det som rör sig i klubben, och skador och väntad elva
 kort ("Det blir lite torrt här med enbart det essentiella - det går jag ju från statistik och andra API:er", "Det ska
