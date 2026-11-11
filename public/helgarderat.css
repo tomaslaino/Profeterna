@@ -1,18 +1,27 @@
-/* Helgarderat (helgarderat.html, helgarderat.js): tidningen med det supportrarna vet, ark för ark på den mörka
-   disken. Utseendet är det gula matchprogrammet (förslag F, som användaren valde 2026-11-11): framsidan är ett
-   programomslag på löpsedelns gula papper, med namnet i Alfa Slab One på ett rött band, rubrikerna i Anton och
-   programmets märke med rutorna 1, X och 2 ikryssade (helgarderat). Inne i tidningen är papperet ljust och trycket
-   svart och rött, och det gula står kvar i matchens vinjett och i sammanfattningen. Det är samma tidning som ligger
-   på pulten i rummet (rum-tidning.css) och har löpsedeln (rum-affischer.css), med samma utseende. Ett matchblad per
-   match, med bild. Smalt (under 720 px): en spalt. */
-html { background: #1a1510; }
+/* Helgarderat: tidningen med det supportrarna vet inför lördagens matcher (rum-tidning.js). Det finns bara en
+   tidning (2026-11-11), och det här är dess utseende, både på sajtens sida (helgarderat.html) och när den läses i
+   rummet (rum-tidning.css lägger den över rummet och på pulten). Det gula matchprogrammet (förslag F, som användaren
+   valde 2026-11-11): omslaget på löpsedelns gula papper med namnet i Alfa Slab One på ett rött band, kupongen i
+   sajtens tipskupongs grafik och matchbladen på ljust papper med tryck i svart och rött och gult i vinjetten och
+   sammanfattningen. Tidningen (.hg) är en container: smal (under 720 px) står matchbladen i en spalt, på sajten
+   och i rummet. */
+html.hg-html { background: #1a1510; }
 body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
   background: radial-gradient(120% 70% at 50% 0%, #2c241b 0%, #1a1510 60%) fixed, #1a1510; font-synthesis: none; -webkit-text-size-adjust: 100%; }
 
+/* Tidningspapperets bilder, också löpsedelns (rum-affischer.css): fibrerna, buktorna från fukten (mörka och ljusa),
+   och prickarna och fläckarna där tryckfärgen inte har täckt. */
+:root {
+  --fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8 .5' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .25  0 0 0 0 .19  .7 0 0 0 -.27'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --bukt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280'%3E%3Cfilter id='m' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .03' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .23  0 0 0 0 .14  .7 0 0 0 -.31'/%3E%3C/filter%3E%3Crect width='200' height='280' filter='url(%23m)'/%3E%3C/svg%3E");
+  --bukt-ljus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='280'%3E%3Cfilter id='m' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .03' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .97  0 0 0 0 .9  -.9 0 0 0 .4'/%3E%3C/filter%3E%3Crect width='200' height='280' filter='url(%23m)'/%3E%3C/svg%3E");
+  --prickar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  5 0 0 0 -3.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  --flackar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.08' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  .45 0 0 0 -.17'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+
 .hg { --p: #efebe0; --gul: #ffd20a; --svart: #16130f; --rod: #c8201a; --gra: #5c564c; --streck: rgba(22, 19, 15, 0.24);
-  --serif: Georgia, Fraunces, "Times New Roman", serif; --rubrik: Fraunces, Georgia, serif; --sans: "Helvetica Neue", Arial, sans-serif; --slab: "Alfa Slab One", Rockwell, Georgia, serif;
-  --anton: Anton, Impact, "Arial Narrow", sans-serif;
-  display: flex; flex-direction: column; align-items: center; gap: 18px; color: var(--svart); font-family: var(--serif); }
+  --serif: Georgia, Fraunces, "Times New Roman", serif; --rubrik: Fraunces, Georgia, serif; --sans: "Helvetica Neue", Arial, sans-serif;
+  container-type: inline-size; display: flex; flex-direction: column; align-items: center; gap: 18px; color: var(--svart); font-family: var(--serif); }
 .hg p { margin: 0; }
 .hg a { color: inherit; }
 
@@ -23,93 +32,70 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-fel { padding: 40px; font: italic 400 17px/1.4 var(--serif); text-align: center; }
 
 .hg-skold { display: inline-block; width: 1.25em; height: 1.25em; object-fit: contain; vertical-align: -0.22em; filter: grayscale(1) contrast(1.25) brightness(0.92); mix-blend-mode: multiply; }
-.hg-skold.liten { width: 1.15em; height: 1.15em; margin-right: 0.3em; }
 
-/* ---------- framsidan: programomslaget ---------- */
+/* ---------- omslaget (RumTidning.forsta) ---------- */
 
-/* gult papper med prickraster och en dubbel svart ram innanför kanten; banden går från ram till ram */
-.hg-ark.hg-forsta { padding: 12px;
-  background: radial-gradient(circle at 50% 50%, rgba(60, 40, 0, 0.16) 0 0.6px, rgba(0, 0, 0, 0) 0.8px) 0 0 / 2.6px 2.6px, var(--gul); }
-.hg-ram { --in: 26px; padding: 0 var(--in) 24px; border: 3px double var(--svart); }
+/* 100 × 140, förstorat med zoom: på pulten (--z i rum-tidning.css) och i tidningen så stort som ryms (passa i
+   rum-tidning.js). Gult papper med en dubbel svart ram, numret, veckan och priset överst, namnet i vitt i Alfa Slab
+   One på ett rött band, lördagens datum i Anton och en stor bild tryckt i svart direkt på det gula, med programmets
+   märke (veckodagen, rutorna 1, X och 2 ikryssade och antalet matcher) över det övre hörnet och rubriken under.
+   Inget annat (2026-11-11, "Bara omslaget"). */
+.hg-omslaget { flex: none; display: flex; scroll-margin-top: 14px; box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35); }
+.hf-forsta { --hf-p: #f5cb1c; --hf-p2: #eec217; --hf-rod: #b8231b; --hf-svart: #25221e; --hf-gra: #4f4632;
+  position: relative; display: flex; flex-direction: column; flex: none; box-sizing: border-box; width: 100px; height: 140px; overflow: hidden; padding: 3.2px 4.6px 4px;
+  background: linear-gradient(180deg, var(--hf-p), var(--hf-p2));
+  color: var(--hf-svart); font-family: "Helvetica Neue", Arial, sans-serif; text-align: left; }
+/* den dubbla ramen, innanför kanten */
+.hf-forsta::before { content: ""; position: absolute; inset: 1.5px; z-index: 1; border: 1.2px double var(--hf-svart); pointer-events: none; }
+/* Tidningspapper som på löpsedeln (rum-affischer.css): papperet lyser igenom trycket i prickar och fläckar (.hf-blad),
+   och fibrerna, buktorna och de gulnade kanterna ligger över allt (.hf-yta). Omslaget är förstorat med zoom, så
+   mönstren delas med förstoringen (--zz, samma som zoom) och blir lika fina på pulten som framme. */
+.hf-blad, .hf-yta { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.hf-blad { background: inherit;
+  -webkit-mask: var(--prickar) 0 0 / calc(90px / var(--zz, 1)) calc(90px / var(--zz, 1)), var(--flackar) 0 0 / calc(140px / var(--zz, 1)) calc(140px / var(--zz, 1));
+  mask: var(--prickar) 0 0 / calc(90px / var(--zz, 1)) calc(90px / var(--zz, 1)), var(--flackar) 0 0 / calc(140px / var(--zz, 1)) calc(140px / var(--zz, 1)); }
+.hf-yta { background: var(--fiber) 0 0 / calc(150px / var(--zz, 1)) calc(150px / var(--zz, 1)), var(--bukt) 0 0 / 100% 100%;
+  box-shadow: inset 0 0 3px rgba(150, 112, 50, 0.22), inset 0 0 0.5px rgba(90, 64, 30, 0.35); }
+/* numret och veckan till vänster, priset till höger (och ett provnummer i rött mellan dem) */
+.hf-linje { display: flex; justify-content: space-between; align-items: baseline; gap: 2px; padding: 0.6px 0 1.6px; color: var(--hf-svart);
+  font: 700 2.6px/1.1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.12px; text-transform: uppercase; white-space: nowrap; }
+.hf-linje em { color: var(--hf-rod); font-style: normal; font-weight: 800; letter-spacing: 0.3px; }
+/* namnet på ett rött band från ram till ram */
+.hf-namn { display: flex; justify-content: center; margin: 0 -2.3px; padding: 1.9px 0 1.5px; background: var(--hf-rod); color: #f8f2e0; white-space: nowrap; }
+.hf-namn b { font: 400 9.9px/1 "Alfa Slab One", Rockwell, Georgia, serif; letter-spacing: 0.15px; }
+/* lördagens datum i Anton, mellan två tunna streck */
+.hf-dagen { display: flex; align-items: center; gap: 2.4px; min-height: 5.6px; margin: 2.8px 0 3px; font: 400 5.6px/1 Anton, Impact, sans-serif; letter-spacing: 0.3px; text-transform: uppercase; white-space: nowrap; }
+.hf-dagen::before, .hf-dagen::after { content: ""; flex: 1 1 auto; border-top: 0.4px solid var(--hf-svart); }
+/* bilden fyller det som blir över, med rubriken och fotografen under; utan foto lagens sköldar */
+.hf-till { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; color: inherit; text-decoration: none; }
+.hf-bild { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; margin: 0; padding-bottom: 1px; }
+.hf-omslag { position: relative; display: block; flex: 1 1 auto; min-height: 30px; }
+.hf-foto { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; background: none; }
+.hf-skoldar { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.hf-skoldar canvas, .hf-skoldar span { width: 36%; height: auto; aspect-ratio: 1; }
+.hf-skoldar i { color: var(--hf-rod); font: 400 12px/1 Anton, Impact, sans-serif; font-style: normal; }
+.hf-bild figcaption { flex: none; margin-top: 2.2px; }
+.hf-bild figcaption b { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; font: 400 6.6px/1.12 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.1px; }
+.hf-bild figcaption b span { color: var(--hf-rod); }
+.hf-bild figcaption small { display: block; margin-top: 1.1px; color: var(--hf-gra); font: 600 2.3px/1.2 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; }
+@media (hover: hover) { .hf-till:hover figcaption b { text-decoration: underline; text-decoration-thickness: 0.35px; text-underline-offset: 0.8px; } }
+.hf-till:focus-visible { outline: 0.5px solid var(--hf-rod); outline-offset: 0.6px; }
+/* programmets märke: en svart ring, snett över bildens övre hörn */
+.hf-marke { position: absolute; z-index: 1; top: -2.4px; right: -2.2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.9px;
+  width: 24px; height: 24px; box-sizing: border-box; border: 1.5px solid var(--hf-svart); border-radius: 50%; background: var(--hf-p);
+  box-shadow: inset 0 0 0 0.4px var(--hf-p), inset 0 0 0 0.75px var(--hf-svart), 0 0.6px 1.6px rgba(0, 0, 0, 0.3);
+  font: 800 1.85px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; text-transform: uppercase; white-space: nowrap; transform: rotate(-8deg); }
+.hf-forsta.utan-bild .hf-marke { position: relative; top: auto; right: auto; flex: none; align-self: center; width: 30px; height: 30px; margin: auto 0; font-size: 2.3px; }
+.hf-rutor { display: block; flex: none; width: 60%; height: auto; overflow: visible; }
+.hf-rutor .r { fill: rgba(255, 255, 255, 0.45); stroke: var(--hf-svart); stroke-width: 3; }
+.hf-rutor text { fill: var(--hf-svart); font: 800 19px/1 Fraunces, Georgia, serif; }
+.hf-rutor .k { fill: none; stroke: var(--hf-rod); stroke-width: 4.6; stroke-linecap: round; }
 
-.hg-huvud { text-align: center; }
-.hg-overrad { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0 8px;
-  font: 700 11px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; }
-.hg-overrad span:nth-child(2) { font: italic 500 15px/1 var(--rubrik); letter-spacing: 0; text-transform: none; }
-.hg .hg-namn { margin: 0 calc(-1 * var(--in)); padding: 0.17em 0 0.13em; border: 0; background: var(--rod); color: #fff;
-  font: 400 clamp(34px, 9.2vw, 90px)/1 var(--slab); letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap; }
-.hg-dagen { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 16px; margin-bottom: 18px; padding: 12px 0 11px; border-bottom: 3px solid var(--svart); }
-.hg-dagen p { white-space: nowrap; font: 400 clamp(22px, 4vw, 36px)/1 var(--anton); letter-spacing: 0.05em; text-transform: uppercase; }
+/* ---------- bilden i matchbladet ---------- */
 
-/* stämpeln bredvid datumet: ett provnummer */
-.hg .hg-stampel { flex: none; padding: 5px 10px 4px; border: 2.5px solid rgba(200, 32, 26, 0.8); border-radius: 3px; color: rgba(200, 32, 26, 0.86);
-  font: 800 12.5px/1 var(--sans); font-style: normal; letter-spacing: 0.2em; text-transform: uppercase; transform: rotate(-5deg); mix-blend-mode: multiply; }
-
-/* Ettan: bilden i gult och svart, som tryckt på omslaget, med programmets märke över det övre hörnet. Rubriken i
-   Anton, det andra ledet i rött. */
-.hg-omslag { position: relative; }
-.hg-forsta .hg-foto { background: var(--gul); }
-.hg-forsta .hg-foto img { filter: grayscale(1) contrast(1.15); }
-.hg-forsta .hg-vs { background: repeating-linear-gradient(135deg, rgba(22, 19, 15, 0.06) 0 1px, rgba(0, 0, 0, 0) 1px 7px); border-top-color: var(--svart); }
-.hg-forsta .hg-bild figcaption { color: var(--svart); }
-.hg-marke { position: absolute; z-index: 1; top: -12px; right: -14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.55em;
-  width: clamp(86px, 15vw, 132px); aspect-ratio: 1; box-sizing: border-box; border: clamp(5px, 0.9vw, 8px) solid var(--svart); border-radius: 50%;
-  background: var(--gul); box-shadow: inset 0 0 0 2px var(--gul), inset 0 0 0 3.5px var(--svart), 0 6px 14px rgba(0, 0, 0, 0.32);
-  font: 800 clamp(7px, 1.15vw, 11px)/1 var(--sans); letter-spacing: 0.07em; text-transform: uppercase; transform: rotate(-8deg); }
-.hg-rutor { display: block; width: 60%; height: auto; overflow: visible; }
-.hg-rutor .r { fill: rgba(255, 255, 255, 0.55); stroke: var(--svart); stroke-width: 2.8; }
-.hg-rutor text { fill: var(--svart); font: 800 18px/1 var(--rubrik); }
-.hg-rutor .k { fill: none; stroke: var(--rod); stroke-width: 4.2; stroke-linecap: round; }
-
-.hg-etta .hg-bild { margin-bottom: 14px; }
-/* Miniatyren till BBC:s videor har tv-grafiken över högra halvan: på framsidan syns bara den vänstra, med spelarna. */
-.hg-bild.omslagsbild.video .hg-foto img { transform: scale(1.8); transform-origin: 0 10%; }
-.hg .hg-etta h2 { margin: 4px 0 12px; padding: 0; border: 0; font: 400 clamp(31px, 6vw, 58px)/1.1 var(--anton); letter-spacing: 0.005em; text-transform: uppercase; color: var(--svart); text-wrap: balance; }
-.hg-etta h2 a, .hg-fler-l h4 a { text-decoration: none; }
-.hg-etta h2 span, .hg-fler-l h4 span { color: var(--rod); }
-.hg-ingress { margin: 0 0 12px !important; font: 700 16.5px/1.42 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
-.hg-forsta .hg-ingress { font-size: 17.5px; }
-
-/* raden över rubriken: numret, matchen och avsparken, som löpande text så att den bryts som text */
-.hg-kick { margin: 0 0 6px !important; font: 800 11.5px/1.55 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; }
-.hg-kick b { display: inline-grid; place-items: center; min-width: 19px; height: 19px; margin-right: 7px; padding: 0 4px; box-sizing: border-box; vertical-align: 1px; background: var(--svart); color: var(--gul); font: 700 12px/1 var(--rubrik); letter-spacing: 0; }
-.hg-kick em { margin-left: 8px; font-style: normal; font-weight: 600; color: var(--gra); white-space: nowrap; }
-.hg-forsta .hg-kick em { color: var(--svart); }
-.hg-vidare { margin-top: 8px !important; font: 800 11px/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
-.hg-vidare a { color: var(--rod); text-decoration: none; }
-.hg-vidare a::after { content: " →"; }
-.hg-forsta .hg-vidare a { color: var(--svart); }
-.hg-forsta .hg-vidare a::after { color: var(--rod); }
-@media (hover: hover) { .hg-vidare a:hover, .hg-etta h2 a:hover, .hg-fler-l h4 a:hover, .hg-alla a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; } }
-
-/* citaten: vem som säger det under */
-.hg .hg-citat { margin: 7px 0 0; padding: 0 0 0 10px; border: 0; border-left: 3px solid var(--rod); background: none; }
-.hg-citat p { font: italic 400 15px/1.34 var(--serif); }
-.hg-citat cite { display: block; margin-top: 3px; font: 700 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; color: var(--gra); }
-.hg-citat cite::before { content: "– "; }
-.hg .hg-citat.stort { margin: 16px 0 4px; padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--svart); }
-.hg-citat.stort p { font: italic 500 clamp(21px, 2.9vw, 27px)/1.2 var(--rubrik); letter-spacing: -0.005em; }
-.hg-citat.stort cite { margin-top: 7px; font-size: 11.5px; color: var(--svart); }
-
-/* Också i numret: tre matcher till på ett svart band, och var resten står. Inte alla matcher. */
-.hg-fler { margin-top: 24px; }
-.hg .hg-fler > h3 { margin: 0 calc(-1 * var(--in)) 16px; padding: 8px 0 7px; border: 0; background: var(--svart); color: var(--gul);
-  font: 800 12px/1 var(--sans); letter-spacing: 0.18em; text-align: center; text-transform: uppercase; }
-.hg-fler-l { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.hg-fler-l article { display: flex; flex-direction: column; padding: 0 18px; border-left: 1px solid var(--svart); }
-.hg-fler-l article:first-child { padding-left: 0; border-left: 0; }
-.hg-fler-l article:last-child { padding-right: 0; }
-.hg .hg-fler-l h4 { margin: 0 0 8px; padding: 0; border: 0; font: 400 clamp(20px, 2.3vw, 24px)/1.1 var(--anton); letter-spacing: 0.01em; text-transform: uppercase; color: var(--svart); }
-.hg-fler-l .hg-vidare { margin-top: auto !important; padding-top: 4px; }
-.hg-alla { margin-top: 18px !important; padding-top: 10px; border-top: 3px solid var(--svart); text-align: center; font: 800 11.5px/1.35 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
-.hg-alla a { text-decoration: none; }
-.hg-alla a::after { content: " →"; color: var(--rod); }
-
-/* ---------- bilden ---------- */
-
-/* Svartvitt tryck på papperet, som tidningens andra bilder. En bild: hela bredden. Veckans bilder av lagen: hemma
-   och borta bredvid varandra med lagets namn på en mörk list. Utan bild, eller när den inte går att hämta (.fel),
-   står lagens sköldar mot varandra (.hg-vs). */
+/* Svartvitt tryck på papperet. En bild: hela bredden. Veckans bilder av lagen: hemma och borta bredvid varandra med
+   lagets namn på en mörk list. Utan bild, eller när den inte går att hämta (.fel), står lagens sköldar mot varandra
+   (.hg-vs). */
 .hg-bild { position: relative; margin: 0 0 12px; }
 .hg-foto { position: relative; overflow: hidden; aspect-ratio: 16 / 9; background: #d9d3c4; }
 .hg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.08) brightness(0.97); mix-blend-mode: multiply; }
@@ -126,17 +112,13 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-vs { display: none; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 14px; aspect-ratio: 16 / 9; padding: 18px; box-sizing: border-box;
   background: linear-gradient(rgba(255, 210, 10, 0.16), rgba(255, 210, 10, 0.16)), repeating-linear-gradient(135deg, rgba(22, 19, 15, 0.035) 0 1px, rgba(0, 0, 0, 0) 1px 7px); border-top: 4px solid var(--rod); border-bottom: 1px solid var(--svart); }
 .hg-bild.vs .hg-vs, .hg-bild.fel .hg-vs { display: grid; }
-.hg-bild.stor .hg-vs, .hg-etta .hg-vs { aspect-ratio: 3 / 1; }
+.hg-bild.stor .hg-vs { aspect-ratio: 3 / 1; }
 .hg-bild.fel .hg-foto, .hg-bild.fel .hg-fotona, .hg-bild.fel figcaption { display: none; }
 .hg-vs span { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
-.hg-vs b { font: 400 clamp(15px, 2.6vw, 24px)/1.05 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
-.hg-vs i { font: 400 clamp(26px, 5vw, 48px)/1 var(--anton); font-style: normal; color: var(--rod); }
-.hg-skold.vs { width: clamp(48px, 11vw, 104px); height: clamp(48px, 11vw, 104px); vertical-align: 0; }
+.hg-vs b { font: 400 clamp(15px, 2.6cqw, 24px)/1.05 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+.hg-vs i { font: 400 clamp(26px, 5cqw, 48px)/1 Anton, Impact, sans-serif; font-style: normal; color: var(--rod); }
+.hg-skold.vs { width: clamp(48px, 11cqw, 104px); height: clamp(48px, 11cqw, 104px); vertical-align: 0; }
 .hg-reserv .hg-skold.vs { width: 38%; height: auto; max-height: 70%; }
-.hg-bild.liten .hg-vs { gap: 8px; padding: 10px; border-top-width: 3px; }
-.hg-bild.liten .hg-vs b { font-size: 12.5px; }
-.hg-bild.liten .hg-vs i { font-size: 22px; }
-.hg-bild.liten .hg-skold.vs { width: 42px; height: 42px; }
 
 /* ---------- kupongen: innehållet ---------- */
 
@@ -150,7 +132,7 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-k-band { display: flex; align-items: center; min-height: 56px; margin: 0 -22px 8px -50px; padding: 0 22px 0 50px; background: var(--pp-grain), var(--k-band); color: var(--k-papper); }
 .hg-k-band b { font: 800 30px/1 var(--tryck); letter-spacing: -0.01em; }
 .hg-kupong ol { margin: 0; padding: 0; list-style: none; }
-.hg-kupong li { position: relative; border-bottom: 1px solid var(--k-linje); }
+.hg-kupong li { position: relative; margin: 0; padding: 0; border-bottom: 1px solid var(--k-linje); }
 .hg-kupong li:nth-child(even) { background: var(--k-ton); }
 .hg-kupong li::before { content: ""; position: absolute; top: 50%; left: -36px; width: 17px; height: 7px; margin-top: -3.5px; background: var(--k-svart); }
 .hg-kupong li > a, .hg-kupong li > div { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; min-height: 50px; padding: 0 4px; color: inherit; text-decoration: none; }
@@ -166,11 +148,11 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-kupong li.utan > div { opacity: 0.42; }
 .hg-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* ---------- matchens sida ---------- */
+/* ---------- matchbladet ---------- */
 
 .hg-folio { display: flex; align-items: baseline; gap: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--svart); font: 600 10.5px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--gra); }
 .hg-folio b { color: var(--svart); font: 800 18px/1 var(--rubrik); letter-spacing: 0; }
-.hg-folio a { color: var(--rod); font: 400 14px/1 var(--slab); letter-spacing: 0.04em; text-decoration: none; }
+.hg-folio a { color: var(--rod); font: 400 14px/1 "Alfa Slab One", Rockwell, Georgia, serif; letter-spacing: 0.04em; text-decoration: none; }
 .hg-folio span { margin-left: auto; }
 .hg-folio.h { flex-direction: row-reverse; }
 .hg-folio.h span { margin: 0 auto 0 0; }
@@ -180,15 +162,14 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-vinjett b { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; box-sizing: border-box; background: var(--svart); color: var(--gul); font: 800 19px/1 var(--rubrik); }
 .hg-vinjett span { font: 400 25px/1 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
 .hg-vinjett em { margin-left: auto; font: 700 11.5px/1.2 var(--sans); font-style: normal; letter-spacing: 0.08em; text-transform: uppercase; color: var(--svart); text-align: right; }
-.hg-vinjett.enkel b { height: auto; padding: 7px 10px 4px; font: 400 25px/1.1 Anton, Impact, sans-serif; letter-spacing: 0.03em; text-transform: uppercase; }
-.hg .hg-rub { margin: 2px 0 8px; padding: 0; border: 0; font: 800 clamp(27px, 4vw, 40px)/1.04 var(--rubrik); letter-spacing: -0.01em; color: var(--svart); }
+.hg .hg-rub { margin: 2px 0 8px; padding: 0; border: 0; font: 800 clamp(27px, 4cqw, 40px)/1.04 var(--rubrik); letter-spacing: -0.01em; color: var(--svart); }
 
-/* Matchbladet: brödtexten i en spalt som går bra att läsa, och bredvid en smal spalt med matchen, källorna och,
-   ibland, ett citat. Lagen följer på varandra med en rubrik var, och sammanfattningen står sist i en ruta. */
+/* Matchbladet: brödtexten i en spalt som går bra att läsa, och bredvid en smal spalt med matchen, ibland ett citat och
+   källorna, med länkar. Lagen följer på varandra med en rubrik var, och sammanfattningen står sist i en ruta. */
 .hg-matchblad .hg-bild.stor { margin: 6px 0 16px; }
 .hg-blad { display: grid; grid-template-columns: minmax(0, 1fr) 236px; column-gap: 30px; align-items: start; }
 .hg-brod { max-width: 640px; }
-.hg-brod > .hg-ingress { margin-bottom: 18px !important; font-size: 18px; line-height: 1.45; }
+.hg-ingress { margin: 0 0 18px !important; font: 700 18px/1.45 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
 .hg-lagdel { margin-top: 18px; }
 .hg-lagdel:first-of-type { margin-top: 0; }
 .hg .hg-lagdel h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 8px; padding: 7px 0 6px; border: 0; border-top: 1px solid var(--svart); border-bottom: 1px solid var(--streck);
@@ -208,48 +189,27 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-ruta.kallor p { font-size: 13px; color: var(--gra); overflow-wrap: anywhere; }
 .hg-ruta.kallor b { display: block; color: var(--svart); font: 700 11px/1.3 var(--sans); letter-spacing: 0.04em; text-transform: uppercase; }
 .hg-ruta a { color: inherit; text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
-.hg .hg-citat.sida { margin: 0; padding: 10px 0 2px; border: 0; border-top: 1px solid var(--streck); }
-.hg-citat.sida p { color: var(--rod); font: italic 500 18px/1.28 var(--rubrik); }
+/* citatet: rött, med vem som säger det under (och att det är översatt) */
+.hg .hg-citat { margin: 0; padding: 10px 0 2px; border: 0; border-top: 1px solid var(--streck); background: none; }
+.hg-citat p { color: var(--rod); font: italic 500 18px/1.28 var(--rubrik); }
+.hg-citat cite { display: block; margin-top: 4px; font: 700 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; color: var(--gra); }
+.hg-citat cite::before { content: "– "; }
 
-/* ---------- baksidan ---------- */
-
-.hg-kallor { column-count: 3; column-gap: 24px; column-rule: 1px solid var(--streck); }
-.hg-kalla { break-inside: avoid; margin: 0 0 14px; }
-.hg .hg-kalla h4 { display: flex; align-items: center; gap: 7px; margin: 0 0 5px; padding: 0; border: 0; font: 800 12px/1.2 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; }
-.hg-kalla h4 b { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; background: var(--svart); color: var(--gul); font: 700 11.5px/1 var(--rubrik); letter-spacing: 0; }
-.hg-kalla ul { margin: 0; padding: 0; list-style: none; }
-.hg-kalla li { margin: 0 0 5px; font: 400 12.5px/1.35 var(--serif); color: var(--gra); overflow-wrap: anywhere; }
-.hg-kalla li b { color: var(--svart); font-weight: 700; }
-.hg-kalla li a { text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
-.hg-kolofon { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 12px; margin-top: 22px !important; padding-top: 10px; border-top: 1px solid var(--svart);
-  font: 600 10.5px/1.3 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--gra); text-align: center; }
-.hg-litet { color: var(--rod); font: 400 17px/1 var(--slab); letter-spacing: 0.03em; }
-
-/* ---------- smalt: en spalt ---------- */
+/* ---------- smal: en spalt ---------- */
 
 @media (max-width: 720px) {
   body.hg-bord { padding: 10px 0 36px; }
   .hg { gap: 10px; }
+}
+@container (max-width: 720px) {
   .hg-ark { width: calc(100% - 16px); padding: 10px 16px 22px; }
-  .hg-ark.hg-forsta { padding: 7px; }
-  .hg-ram { --in: 14px; padding-bottom: 18px; }
-  .hg-overrad { font-size: 9.5px; letter-spacing: 0.1em; }
-  .hg-overrad span:nth-child(2) { display: none; }
-  .hg-dagen { margin-bottom: 14px; padding: 10px 0 9px; }
-  .hg .hg-stampel { padding: 3px 7px 2px; border-width: 2px; font-size: 10px; letter-spacing: 0.16em; }
-  .hg-marke { top: -9px; right: -7px; }
-  .hg-forsta .hg-ingress { font-size: 16.5px; }
-  .hg-fler-l { grid-template-columns: minmax(0, 1fr); }
-  .hg-fler-l article, .hg-fler-l article:first-child { padding: 12px 0 0; margin-top: 12px; border-left: 0; border-top: 1px solid var(--streck); }
-  .hg-fler-l article:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
   .hg-vinjett span { min-width: 0; font-size: 19px; }
   .hg-vinjett em { font-size: 10px; letter-spacing: 0.05em; white-space: nowrap; }
   .hg-blad { grid-template-columns: minmax(0, 1fr); }
   .hg-sido { margin-top: 22px; }
-  .hg-brod > .hg-ingress { font-size: 17px; }
+  .hg-ingress { font-size: 17px; }
   .hg-lagdel p, .hg-summering p { font-size: 16px; }
   .hg-vs { padding: 12px; gap: 8px; }
-  .hg-kallor { column-count: 1; }
   .hg-kupong { width: calc(100% - 16px); padding: 0 12px 14px 34px; }
   .hg-k-band { min-height: 48px; margin: 0 -12px 6px -34px; padding: 0 12px 0 34px; }
   .hg-k-band b { font-size: 25px; }
@@ -260,13 +220,12 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
   .hg-k-rutor { gap: 4px; }
   .hg-k-rutor i { width: 26px; height: 22px; font-size: 11.5px; }
 }
-@media (min-width: 721px) and (max-width: 900px) {
-  .hg-kallor { column-count: 2; }
+@container (min-width: 721px) and (max-width: 900px) {
   .hg-blad { grid-template-columns: minmax(0, 1fr) 200px; column-gap: 22px; }
 }
 
 @media print {
-  html, body.hg-bord { background: none; padding: 0; }
+  html.hg-html, body.hg-bord { background: none; padding: 0; }
   .hg { gap: 0; }
   .hg-ark { width: auto; box-shadow: none; break-after: page; }
 }
