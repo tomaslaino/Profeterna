@@ -225,4 +225,5 @@ function medUtan(teamId, playerId) {
   return (t && t.get(String(playerId))) || null;
 }
 
-module.exports = { medUtan, MIN };
+// allMatches, oddsIndex och expected används också av kandidatjakten (src/elvkraft.js).
+module.exports = { medUtan, MIN, allMatches, oddsIndex, expected };

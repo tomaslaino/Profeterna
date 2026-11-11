@@ -2075,13 +2075,40 @@ Läsning:
   och marknaden inte (se Beslut). En kandidat som blivit regelversion prövas inte igen –
   nästa kandidatjakt prövar övriga kandidater ovanpå version 2026-10-17.2.
 
+**Utfall 2026-11-11: startelvorna** (användarens önskemål: "någon uträkning för hur
+slagkraftiga lagen är" ur [med och utan spelaren](#med-och-utan-spelaren)). Två faktorer ur
+startelvorna i ligorna 2021/22– ([src/elvkraft.js](src/elvkraft.js)), med värdena valda före
+körningen: *andel av de ordinarie* (startandelarna i de tio senaste ligamatcherna för dagens
+elva delat med de elva ordinaries) och *med och utan de som saknas* (varje ordinarie som inte
+startar dras av med lagets poäng per match mot oddsen med honom minus utan honom, bara ur
+tidigare matcher, krympt med n/(n + 64)). Grundmodell = regelversion 2026-10-17.2, intervall
+97,50 % (två kandidater); 2021/22 är bara underlag för vikten.
+
+| Kandidat | Typ | Matcher | Skillnad | Halvorna | Utfall |
+|---|---|---|---|---|---|
+| Startelvan: andel av de ordinarie (2022/23–) | faktor | 8 746 | −0,0006 (−0,0023 till +0,0012) | −0,0009 / +0,0001 | underkänd – intervallet når noll |
+| Startelvan: med och utan de som saknas (2022/23–) | faktor | 8 746 | +0,0011 (+0,0002 till +0,0020) | +0,0015 / +0,0001 | underkänd – sämre |
+
+Läsning:
+
+- **Elvan pekar åt rätt håll men räcker inte.** Vikten var positiv varje säsong (0,048 →
+  0,025): +2,4 % mål per tiondel mer av den ordinarie elvan än motståndaren, alltså ungefär
+  7 % färre mål för ett lag med sju tiondelar av sin ordinarie elva mot ett med hela.
+  Förbättringen kan ändå vara slump, och den gällde inte andra halvan. Elvan är dessutom känd
+  först en timme före avspark, efter prognosen.
+- **Med och utan-värdena bär ingen stadig information om nästa match.** Vikten hoppade
+  kring noll (0,39 skattad på bara 2021/22, sedan −0,06, 0,02, −0,01 och 0,03), och
+  prognosen blev sämre. Siffrorna i spelarkortet och matchbladet beskriver hur det har gått,
+  men förutsäger inte resultaten bättre än modellen.
+- Lagets förra elva (det som är känt i förväg) prövades inte: den lades inte till efter att
+  utfallet var känt, och den verkliga elvan, som säger mer, klarade sig inte.
+
 **Går inte att pröva än:**
 
 | Idé | Varför |
 |---|---|
 | xG från football-data.co.uk | Finns bara från 2026/27 och leverantören är odokumenterad. Prövas när säsongen gett tillräckligt med matcher. |
 | Skador och avstängningar (FPL) | Bara dagens läge, ingen historik – och bara Premier League. |
-| Startelvor | Ingen fri källa med historik. |
 | Tabell med poängavdrag (ESPN) | Ögonblicksbild utan historik; prövad i stället som tabell räknad ur resultaten. |
 | Rotation i EFL-cupen | EFL-cupens tidigare säsonger hämtas inte; rotationen prövad på FA-cupen 2021/22–. |
 | Marknaden i cuperna | Fri cupoddshistorik saknas; kan bara utvärderas framåt i journalen. |
@@ -2691,6 +2718,11 @@ utan honom, men 25 matcher är få.
   honom, med en decimal: minus (i rött) = laget har tappat utan honom. Detaljerna står i title.
 - FPL:s korta namn i *Saknas* ("Xavi", "Bergvall") kopplas nu till spelarkortet på namnets ord
   inom lagets trupp, om alla ord som finns i truppen pekar på samma spelare.
+
+**Prövat i kandidatjakten (2026-11-11).** Varken andelen av de ordinarie i elvan eller de
+saknades värde ur med och utan gjorde prognosen bättre: värdena hoppade kring noll från säsong
+till säsong. Siffrorna beskriver historien men förutsäger inte nästa match bättre än modellen
+(se [Kandidatjakten](#kandidatjakten)).
 
 **Gränsen.** Båda sidorna måste ha minst tio matcher (`MIN`), annars visas inget – okänt, inte
 noll. 2026-11-11 hade 1 112 spelare siffrorna (Premier League 280, Championship 339, League One

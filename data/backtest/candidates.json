@@ -21,6 +21,18 @@
     "2004/05",
     "2026/27"
    ]
+  },
+  {
+   "ranAt": "2026-11-11T16:25:36.938Z",
+   "rulesVersion": "2026-10-17.2",
+   "data": "4b30ae9fc9c16a0e",
+   "through": "2026-11-08",
+   "candidates": 2,
+   "level": 0.975,
+   "seasons": [
+    "2004/05",
+    "2026/27"
+   ]
   }
  ],
  "entries": [
@@ -1484,6 +1496,192 @@
    ],
    "pass": false,
    "why": "inte bättre än tabelläge ensam"
+  },
+  {
+   "id": "lineup_regulars",
+   "kind": "faktor",
+   "label": "Startelvan: andel av de ordinarie",
+   "motive": "Ett lag som vilar eller saknar sina ordinarie är svagare än dess styrka säger; tränarens val visar vilka som är bäst.",
+   "scope": "ligamatcher 2021/22– med båda elvorna (ESPN:s matchrapporter, data/elvor-historik.json); de ordinarie = flest starter i de tio senaste ligamatcherna",
+   "testedAt": "2026-11-11",
+   "rulesVersion": "2026-10-17.2",
+   "through": "2026-11-08",
+   "fingerprint": "2026-10-17.2|4b30ae9fc9c16a0e|2026-11-08|2d0fc8cae6|2",
+   "verdict": "underkänd",
+   "signalKnown": 10485,
+   "of": 10782,
+   "param": {
+    "beta": [
+     0.0237
+    ]
+   },
+   "paramText": "+2,4 % mål per tiondel mer av den ordinarie elvan än motståndaren",
+   "params": [
+    {
+     "season": "2022/23",
+     "beta": [
+      0.048
+     ]
+    },
+    {
+     "season": "2023/24",
+     "beta": [
+      0.0358
+     ]
+    },
+    {
+     "season": "2024/25",
+     "beta": [
+      0.0343
+     ]
+    },
+    {
+     "season": "2025/26",
+     "beta": [
+      0.0286
+     ]
+    },
+    {
+     "season": "2026/27",
+     "beta": [
+      0.0245
+     ]
+    }
+   ],
+   "n": 8746,
+   "days": 862,
+   "seasons": [
+    "2022/23",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0341,
+    1.0346
+   ],
+   "brier": [
+    0.6215,
+    0.6219
+   ],
+   "diff": -0.0006,
+   "ci": [
+    -0.0023,
+    0.0012
+   ],
+   "level": 0.975,
+   "brierDiff": -0.0005,
+   "halves": [
+    {
+     "seasons": [
+      "2022/23",
+      "2024/25"
+     ],
+     "n": 6108,
+     "diff": -0.0009
+    },
+    {
+     "seasons": [
+      "2025/26",
+      "2026/27"
+     ],
+     "n": 2638,
+     "diff": 0.0001
+    }
+   ],
+   "pass": false,
+   "why": "intervallet når upp till noll – förbättringen kan vara slump"
+  },
+  {
+   "id": "lineup_value",
+   "kind": "faktor",
+   "label": "Startelvan: med och utan de som saknas",
+   "motive": "Ordinarie som inte startar kostar laget det de brukar vara värda – lagets poäng mot oddsen med dem minus utan dem, krympt mot noll.",
+   "scope": "ligamatcher 2021/22– med båda elvorna; spelarnas värde bara ur matcher före matchdagen, under tiden i laget",
+   "testedAt": "2026-11-11",
+   "rulesVersion": "2026-10-17.2",
+   "through": "2026-11-08",
+   "fingerprint": "2026-10-17.2|4b30ae9fc9c16a0e|2026-11-08|1cf41571e8|2",
+   "verdict": "underkänd",
+   "signalKnown": 10492,
+   "of": 10782,
+   "param": {
+    "beta": [
+     0.0131
+    ]
+   },
+   "paramText": "+1,3 % mål per poäng per match i värde som motståndaren saknar mer än laget",
+   "params": [
+    {
+     "season": "2022/23",
+     "beta": [
+      0.3871
+     ]
+    },
+    {
+     "season": "2023/24",
+     "beta": [
+      -0.0569
+     ]
+    },
+    {
+     "season": "2024/25",
+     "beta": [
+      0.0191
+     ]
+    },
+    {
+     "season": "2025/26",
+     "beta": [
+      -0.0114
+     ]
+    },
+    {
+     "season": "2026/27",
+     "beta": [
+      0.0258
+     ]
+    }
+   ],
+   "n": 8746,
+   "days": 862,
+   "seasons": [
+    "2022/23",
+    "2026/27"
+   ],
+   "logLoss": [
+    1.0357,
+    1.0346
+   ],
+   "brier": [
+    0.6227,
+    0.6219
+   ],
+   "diff": 0.0011,
+   "ci": [
+    0.0002,
+    0.002
+   ],
+   "level": 0.975,
+   "brierDiff": 0.0007,
+   "halves": [
+    {
+     "seasons": [
+      "2022/23",
+      "2024/25"
+     ],
+     "n": 6108,
+     "diff": 0.0015
+    },
+    {
+     "seasons": [
+      "2025/26",
+      "2026/27"
+     ],
+     "n": 2638,
+     "diff": 0.0001
+    }
+   ],
+   "pass": false,
+   "why": "högre log-poäng än grundmodellen"
   }
  ],
  "untestable": [
@@ -1497,12 +1695,6 @@
    "id": "injuries",
    "label": "Skador och avstängningar (FPL)",
    "reason": "FPL ger bara dagens läge – ingen historik att pröva bakåt i tiden. Bara Premier League.",
-   "assessedAt": "2026-10-17"
-  },
-  {
-   "id": "lineups",
-   "label": "Startelvor",
-   "reason": "Ingen fri källa med historik; publiceras först strax före avspark.",
    "assessedAt": "2026-10-17"
   },
   {

@@ -134,13 +134,28 @@ const CANDIDATES = [
     covariate: 'market', comps: ['pl', 'ch', 'l1', 'l2'], combine: false,
     scopeText: 'ligamatcher med marknadssnitt (öppning) från 2005/06; vikten skattas på tidigare säsonger',
   },
+  // Startelvorna (2026-11-11, användarens önskemål: "någon uträkning för hur
+  // slagkraftiga lagen är" ur med och utan spelarna). Elvan är känd ungefär en
+  // timme före avspark, så prognosen skulle göras om när den kommer. Värdena
+  // i src/elvkraft.js valdes före första körningen.
+  {
+    id: 'lineup_regulars', kind: 'faktor', label: 'Startelvan: andel av de ordinarie',
+    motive: 'Ett lag som vilar eller saknar sina ordinarie är svagare än dess styrka säger; tränarens val visar vilka som är bäst.',
+    covariate: 'xi', comps: ['pl', 'ch', 'l1', 'l2'], from: 2021,
+    scopeText: 'ligamatcher 2021/22– med båda elvorna (ESPN:s matchrapporter, data/elvor-historik.json); de ordinarie = flest starter i de tio senaste ligamatcherna',
+  },
+  {
+    id: 'lineup_value', kind: 'faktor', label: 'Startelvan: med och utan de som saknas',
+    motive: 'Ordinarie som inte startar kostar laget det de brukar vara värda – lagets poäng mot oddsen med dem minus utan dem, krympt mot noll.',
+    covariate: 'xiv', comps: ['pl', 'ch', 'l1', 'l2'], from: 2021,
+    scopeText: 'ligamatcher 2021/22– med båda elvorna; spelarnas värde bara ur matcher före matchdagen, under tiden i laget',
+  },
 ];
 
 // Det som inte går att pröva än – och varför. Loggas också.
 const UNTESTABLE = [
   { id: 'xg_fdcouk', label: 'xG från football-data.co.uk', reason: 'Finns bara från 2026/27 (inga tidigare säsonger att pröva på), och leverantören är odokumenterad. Prövas när säsongen gett tillräckligt med matcher.' },
   { id: 'injuries', label: 'Skador och avstängningar (FPL)', reason: 'FPL ger bara dagens läge – ingen historik att pröva bakåt i tiden. Bara Premier League.' },
-  { id: 'lineups', label: 'Startelvor', reason: 'Ingen fri källa med historik; publiceras först strax före avspark.' },
   { id: 'table_deductions', label: 'Tabelläge med poängavdrag (ESPN)', reason: 'ESPN:s tabell är en ögonblicksbild utan historik. Prövas i stället som tabell räknad ur resultaten.' },
   { id: 'rotation_lc', label: 'Rotation i EFL-cupen', reason: 'EFL-cupens tidigare säsonger hämtas inte – rotationen prövas på FA-cupen 2021/22–.' },
   { id: 'market_cups', label: 'Marknadens odds i cuperna', reason: 'Fri cupoddshistorik saknas (DraftKings via ESPN är luckig); kan bara utvärderas framåt i journalen.' },
@@ -180,7 +195,9 @@ function covariates(records) {
     return s / n;
   };
   const tidx = F.tableIndex(games);
-  const out = { form: new Map(), table: new Map(), h2h: new Map() };
+  // Startelvorna (src/elvkraft.js): andel av de ordinarie och de saknades värde.
+  const L = require('./elvkraft').lineupSignals(records);
+  const out = { form: new Map(), table: new Map(), h2h: new Map(), xi: L.xi, xiv: L.xiv };
   for (const r of records) {
     const day = F.dayNum(r.d);
     const fh = ppg(team.get(r.h), day, 5);
@@ -374,6 +391,8 @@ function paramText(cand, final) {
     form: 'poäng/match bättre form än motståndaren',
     table: 'poäng/match högre i tabellen än motståndaren',
     h2h: 'mål i målskillnad (snitt av de sex senaste mötena)',
+    xi: 'tiondel mer av den ordinarie elvan än motståndaren',
+    xiv: 'poäng per match i värde som motståndaren saknar mer än laget',
   };
   return covariatesOf(cand).map((k, i) => {
     const pct = (Math.exp(final.beta[i]) - 1) * 100;
