@@ -453,11 +453,13 @@ export function sidaAv(content, underlag, lagen) {
   if (!j || !j.lag || typeof j.lag !== 'object') return null;
   const alla = Object.values(underlag.lag).flat();
   const allt = alla.map((x) => `${x.t}\n${x.sagt || ''}`).join('\n');
+  // Källornas namn får stå i texten: siffran i "SK3 TV" och "The ME7 Podcast" är inget påhittat tal.
+  const kallorna = [...new Set(alla.map((x) => x.podd).filter(Boolean))].join('\n');
   const fel = [];
   const varfor = (t, flest) => {
     const tips = t.match(TIPS_RE);
     // Redaktören får räkna ihop (”fyra spelare borta”): små räkneord i bokstäver släpps.
-    const tal = unknownNumbers([t], [allt, lagen.join(' ')]).filter((x) => !RAKNEORD.test(String(x)));
+    const tal = unknownNumbers([t], [allt, lagen.join(' '), kallorna]).filter((x) => !RAKNEORD.test(String(x)));
     return !t ? 'saknas' : antalOrd(t) > flest ? `${antalOrd(t)} ord` : tips ? `tipsord (${tips[0]})` : tal.length ? `okända tal (${tal.join(', ')})` : null;
   };
   const text = (v, flest, vad) => {

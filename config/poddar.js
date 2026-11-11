@@ -72,9 +72,13 @@ module.exports = {
   // statistik och andra API:er. Ta det som är intressant och som möjligtvis inte alltid kommer med i
   // statistiken" och "Det ska vara en njutning att läsa texten också": kortare lagtext (150 → 120
   // ord), det som inte syns i siffrorna, ett citat per lag och personernas namn (i fetstil i tidningen).
+  // 2026-11-11 (kväll), "skriva om texten i tidningen helgarderat": bättre svenska och mer levande.
+  // Rubriken med en enda vinkel i stället för båda lagens läge, ingressen som drar in läsaren,
+  // lagets text som börjar i en scen eller replik, supportrarnas ord i texten, källan inte i varje
+  // mening, och de engelska ord som uppgifterna har kvar (comeback, wingback, Trophy) på svenska.
   sidan: {
     // Byts den skrivs bladen om nästa natt, utan att avsnitten tas ut på nytt.
-    version: '2026-11-11.1',
+    version: '2026-11-11.2',
     // Lagets senaste avsnitt som bladet bygger på, och så många av uppgifterna som sparas
     // under laget (och blir löptext när redaktörens text inte håller).
     avsnitt: 3,
@@ -258,12 +262,20 @@ Svara bara med JSON, utan något före eller efter:
 Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut den här veckan ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar), ur klubbens egen sajt och lokaltidningen (tränarens presskonferens, klubbens skadebesked, lokaltidningens reporter) och ur motståndarlagets intervju med en av lagets supportrar inför matchen. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift eller ett rykte, o = supportrarnas eller skribentens åsikt), en vikt 1–5, källans namn (podd, forum, insatta, lokalt = klubben eller lokaltidningen, eller intervju = motståndarens intervju med en av lagets supportrar), dagen då det sades och ibland ett citat.
 
 Skriv så här:
-- rubrik: högst {rubrikOrd} ord, om det viktigaste inför matchen.
-- ingress: introduktionen, två eller tre meningar, högst {ingressOrd} ord, om det viktigaste i båda lagen (om bara det ena laget har uppgifter: om det).
-- lag: ett avsnitt per lag, hemmalaget först. Två till {stycken} stycken löptext, sammanlagt högst {lagOrd} ord. Läsaren ser redan tabellen, formen, målen, skadelistan och oddsen på andra ställen, så ge det som bara de som följer laget varje vecka vet och som inte syns i siffrorna: stämningen bland supportrarna, vad de ser i spelet, vem som har lyft sig och vem som har tappat, vad tränaren håller på med, rykten och det som rör sig i klubben. Skador, avstängningar och väntad elva tas med kort, där de hör hemma. Välj det mest intressanta och stryk resten. Det ska vara en njutning att läsa: skriv som en reporter som har stått på läktaren, med varierade meningar och de konkreta detaljerna och bilderna ur underlaget, inte som en lista, utan klichéer och utan upprepningar. Säg varifrån något kommer där det spelar roll ("enligt podden …", "på forumet … menar flera", "tränaren sa på presskonferensen …", "lokaltidningen skriver …"), och håll isär det bekräftade, rykten och supportrarnas åsikter. Ta med det viktigaste ur alla slagen av källor, och stryk det som är svagt eller rör en tredje klubb. Säger flera källor samma sak (till exempel två av lagets forum, eller podden och ett forum) väger det tyngre: skriv det en gång och säg att det sägs på flera håll. Ange i "ur" id för uppgifterna avsnittet bygger på, i "citat" id för en av lagets egna uppgifter vars citat är talande och värt att trycka under texten (hellre null än ett svagt, och inte ett som säger samma sak som texten), och i "namn" personerna (spelare och tränare) som nämns i texten, så som de står där. Har laget inga uppgifter blir texten en tom lista.
-- summering: sammanfattningen, två eller tre meningar, högst {summeringOrd} ord, om läget i båda lagen inför matchen.
+- rubrik: högst {rubrikOrd} ord. En riktig tidningsrubrik med en enda vinkel: det mest talande i veckans underlag, gärna med en torr underton när underlaget bjuder på det, men aldrig krystad. Inte en uppräkning av läget i båda lagen.
+- ingress: två eller tre meningar, högst {ingressOrd} ord. Börja med det som får läsaren att vilja läsa vidare, och få med båda lagen (om bara det ena laget har uppgifter: det). Upprepa inte rubriken.
+- lag: ett avsnitt per lag, hemmalaget först. Två till {stycken} stycken löptext, sammanlagt högst {lagOrd} ord. Läsaren ser redan tabellen, formen, målen, skadelistan och oddsen på andra ställen, så ge det som bara de som följer laget varje vecka vet och som inte syns i siffrorna: stämningen bland supportrarna, vad de ser i spelet, vem som har lyft sig och vem som har tappat, vad tränaren håller på med, rykten och det som rör sig i klubben. Skador, avstängningar och väntad elva tas med kort, där de hör hemma. Välj det mest intressanta och stryk resten. Ta med det viktigaste ur alla slagen av källor, och stryk det som är svagt eller rör en tredje klubb. Ange i "ur" id för uppgifterna avsnittet bygger på, i "citat" id för en av lagets egna uppgifter vars citat är talande och värt att trycka under texten (hellre null än ett svagt, och inte ett som säger samma sak som texten), och i "namn" personerna (spelare och tränare) som nämns i texten, så som de står där. Har laget inga uppgifter blir texten en tom lista.
+- summering: läget före avspark, två eller tre meningar, högst {summeringOrd} ord, med det som väger tyngst i vart och ett av lagen. Med nya ord, inte ingressen en gång till.
 
-Bara det som står i uppgifterna: inga nya fakta, namn eller tal, och gör inte en gammal sak till en nyhet. Skriv tal precis som de står i uppgifterna. Inga tips: inte vem som vinner, vilket tecken man ska välja eller vem som är favorit, och inga odds. Skriv god svenska som en svensk sportjournalist: svensk ordföljd och svenska fotbollsord (vingback, ytterback, inhoppare, startelva), inga engelska ord där det finns svenska och inga direktöversatta uttryck.
+Det ska vara en njutning att läsa, som ett reportage av någon som står på läktaren varje vecka:
+- Börja lagets text i det mest talande, en scen, en replik eller en detalj, inte i en sammanfattning.
+- Låt supportrarna höras: väv gärna in en kort fras ur ett av citaten i underlaget, inom citattecken (”…”).
+- Säg varifrån något kommer när källan nämns första gången och där det spelar roll, och variera hur ("i podden … tror man", "på forumet … är man oense om", "lokaltidningen skriver"), men inte i varje mening. Håll isär det bekräftade, ryktena och supportrarnas åsikter. Säger flera källor samma sak väger det tyngre: skriv det en gång och säg att det sägs på flera håll.
+- Varierade meningar, konkreta detaljer och bilder ur underlaget. Inga listor, klichéer eller upprepningar, och inget om själva underlaget ("det finns bara en uppgift", "inget att hämta den här veckan").
+
+Språket: skriv som en svensk sportjournalist, i hela meningar med svensk ordföljd och svenska fotbollsord. Uppgifterna är översatta från engelska och har ibland kvar engelska ord och uttryck: skriv dem på svenska (comeback → återkomst, wingback → vingback, forward → anfallare, fans → supportrar, Trophy → EFL Trophy, "i den röda zonen" → säg vad det betyder). Ett smeknamn som en svensk läsare inte förstår ersätts med spelarens namn eller stryks. Läs igenom allt innan du svarar och skriv om varje mening som låter översatt, hackar eller inte håller ihop.
+
+Bara det som står i uppgifterna: inga nya fakta, namn eller tal, och gör inte en gammal sak till en nyhet. Skriv tal precis som de står i uppgifterna. Inga tips: inte vem som vinner, vilket tecken man ska välja eller vem som är favorit, och inga odds.
 
 Svara bara med JSON, utan något före eller efter:
 {"rubrik": "…", "ingress": "…", "lag": {"<lagets namn som i underlaget>": {"ur": ["<id>"], "text": ["…", "…"], "citat": null, "namn": ["…"]}}, "summering": "…"}`,
