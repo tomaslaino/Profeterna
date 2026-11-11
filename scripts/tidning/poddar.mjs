@@ -11,6 +11,8 @@
 //   register.json   lagens poddar (namn och flöde), så att de bara letas upp en gång
 //   forum.json      lagens forum (namn och tavla), likaså
 //   omgang.json     omgångens avsnitt, forumläsningar, artiklar och uppgifter; tidningen läser den (scripts/analyser/skriv.mjs)
+//   traff.json      källornas träffsäkerhet: det de sa om truppen, prövat mot matchtruppen efter
+//                   matcherna (config/traff.js, src/analyser/traff.mjs); redaktören läser den
 //   utskrifter/     utskrifterna, ett stycke per minut; tas bort efter tre veckor
 // Skriptet rör aldrig git. Ljudet tas bort så snart det är utskrivet.
 //
@@ -29,6 +31,11 @@
 //   node scripts/tidning/poddar.mjs --utan-media         utan de insatta medierna
 //   node scripts/tidning/poddar.mjs --bara-lokal         bara klubben, lokaltidningen och motståndarens intervju
 //   node scripts/tidning/poddar.mjs --utan-lokal         utan dem
+//   node scripts/tidning/poddar.mjs --traff              prövar bara omgångens spelade matcher och visar källornas
+//                                                        träffsäkerhet (med --fil en annan omgångsfil)
+//
+// Varje körning börjar med att pröva den förra omgångens spelade matcher (src/analyser/traff.mjs),
+// medan deras uppgifter ännu ligger i omgang.json.
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -43,6 +50,7 @@ import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
 import { lasForum, taUtForum, lasningsNyckel, forumPoster, forumenAv, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
 import { letaArtiklar, lasArtikel, nyaArtiklar, lastaAvAndra, renAdress, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
 import { senasteTid, nastaTid } from '../../src/analyser/tider.mjs';
+import { provaOmgangen, kallornasTraff, traffText } from '../../src/analyser/traff.mjs';
 import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, lokalUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
 
 const ARGV = process.argv.slice(2);
@@ -61,12 +69,13 @@ const BARA_MEDIA = flagga('--bara-media');
 const UTAN_MEDIA = flagga('--utan-media');
 const BARA_LOKAL = flagga('--bara-lokal');
 const UTAN_LOKAL = flagga('--utan-lokal');
+const BARA_TRAFF = flagga('--traff');
 // Utan val är det launchd: då går skriptet bara på tiderna (config/poddar.js, tider). --nu
 // eller något annat val kör oavsett tid.
 const PA_TID = !ARGV.length;
 // Vad som körs: forumen, de insatta medierna, klubben och lokaltidningen, och poddarna (informationssidorna
 // skrivs alltid).
-const BARA = BARA_SIDOR || BARA_FORUM || BARA_MEDIA || BARA_LOKAL;
+const BARA = BARA_SIDOR || BARA_FORUM || BARA_MEDIA || BARA_LOKAL || BARA_TRAFF;
 const MED_FORUM = !UTAN_FORUM && (!BARA || BARA_FORUM);
 const MED_MEDIA = !UTAN_MEDIA && (!BARA || BARA_MEDIA);
 const MED_LOKAL = !UTAN_LOKAL && (!BARA || BARA_LOKAL);
@@ -80,6 +89,7 @@ const LOGG = path.join(HEM, 'Library', 'Logs', 'Matchfixarna', 'poddar.log');
 const REGISTER = path.join(MAPP, 'register.json');
 const FORUMREG = path.join(MAPP, 'forum.json');
 const OMGANG = path.join(MAPP, FIL_UT || (ETT_LAG || PROV ? 'prov.json' : 'omgang.json'));
+const TRAFF = path.join(MAPP, 'traff.json');
 const LAS = path.join(MAPP, 'las');
 const TIDER = path.join(MAPP, 'tider.json');
 const DAG = 86400000;
@@ -241,6 +251,8 @@ async function lasForumen(fil, reg, lagen) {
     if (!forumen.length) continue;
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
     post.mot = l.mot;
+    post.match = l.match;
+    post.avspark = l.avspark;
     const lasningar = [];
     for (const forum of forumen) {
       try {
@@ -295,6 +307,8 @@ async function lasMedierna(fil, lagen, { cfg = mc, vad = 'de insatta medierna' }
     if (TORRT) { logg(`skulle leta i ${vad} för ${l.lag}`); continue; }
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
     post.mot = l.mot;
+    post.match = l.match;
+    post.avspark = l.avspark;
     try {
       const andras = lastaAvAndra(post, { cfg });
       const hittade = (await letaArtiklar({ lag: l.lag, mot: l.mot, avspark: l.avspark, cfg })).filter((a) => !andras.has(renAdress(a.adress)));
@@ -353,18 +367,45 @@ function visa(fil) {
     if (s.summering) console.log(`\n  Sammanfattning: ${s.summering}`);
     if (s.citat) console.log(`  ”${s.citat.sagt}” (${[s.citat.vem, s.citat.podd, s.citat.datum].filter(Boolean).join(', ')})`);
   }
+  visaTraff();
+}
+
+// Den förra omgångens spelade matcher prövas mot matchtruppen (src/analyser/traff.mjs).
+async function traffen() {
+  const fil = lasJson(OMGANG, null);
+  if (!fil || !fil.lag) return;
+  const traff = lasJson(TRAFF, {});
+  await provaOmgangen(fil, traff, { site, logg, torrt: TORRT, spara: (t) => skrivJson(TRAFF, t) });
+}
+
+// Källornas träffsäkerhet; med detaljer också varje prövat påstående.
+function visaTraff({ detaljer = false } = {}) {
+  const traff = lasJson(TRAFF, {});
+  if (detaljer) {
+    for (const m of Object.values(traff.matcher || {})) {
+      console.log(`\n${m.match} (${String(m.avspark).slice(0, 10)})${m.domar.length ? '' : ' – inget att pröva'}`);
+      for (const d of m.domar) console.log(`  ${d.dom === 'ratt' ? 'rätt' : 'FEL '}  ${d.lag}: ${d.namn} ${d.sa} – ${TYPORD[d.typ] || ''}${d.kalla} (${d.datum})`);
+    }
+  }
+  const t = Object.values(kallornasTraff(traff)).sort((a, b) => a.lag.localeCompare(b.lag) || (b.ratt + b.fel) - (a.ratt + a.fel));
+  if (!t.length) { console.log('\nTräffsäkerhet: inget prövat än'); return; }
+  console.log('\nTräffsäkerhet (rätt av prövade påståenden om truppen):');
+  for (const x of t) console.log(`  ${x.lag}: ${TYPORD[x.typ] || ''}${x.kalla} – ${x.ratt} av ${x.ratt + x.fel}`);
 }
 
 // Informationssidorna: en per match där något lag har uppgifter. Skrivs om när uppgifterna ändras.
 async function sidorna(fil, matcher) {
   fil.sidor = fil.sidor || {};
   let n = 0;
+  // Källornas träffsäkerhet om truppen (traff.json), till redaktören.
+  const tabell = kallornasTraff(lasJson(TRAFF, {}));
+  const kallTraff = (lag, kalla) => traffText(tabell[`${lag}\n${kalla}`]);
   for (const m of matcher) {
     const nyckel = sidNyckel(sidansUnderlag(fil, m.lagen, { avspark: m.avspark }));
     const nu = fil.sidor[m.id];
     if (nu && nu.nyckel === nyckel && nu.redigerad) continue;
     if (TORRT) { logg(`skulle skriva sidan ${m.lagen.join(' – ')}`); continue; }
-    const s = await skrivSida(fil, m.lagen, { avspark: m.avspark, logg });
+    const s = await skrivSida(fil, m.lagen, { avspark: m.avspark, logg, kallTraff });
     if (!s) { delete fil.sidor[m.id]; continue; }
     fil.sidor[m.id] = { id: m.id, match: m.lagen.join(' – '), lag: m.lagen, avspark: m.avspark, skriven: new Date().toISOString(), ...s };
     fil.uppdaterad = new Date().toISOString();
@@ -383,6 +424,25 @@ async function main() {
   if (fel.length) { logg(`STOPP: ${fel.join(', ')} är satt. Då skulle Claude Code kunna debiteras som API. Ta bort variabeln.`); process.exit(1); }
   if (!tagLas()) { logg('en körning pågår redan'); return; }
   if (MED_PODDAR && !fs.existsSync(path.join(MAPP, pc.modell))) { logg(`STOPP: whisper-modellen saknas (${path.join(MAPP, pc.modell)})`); process.exit(1); }
+
+  if (!TORRT) {
+    const inne = await inloggning().catch((err) => err);
+    const inloggad = inne && inne.loggedIn && inne.apiProvider === 'firstParty' && !/api.?key|console/i.test(String(inne.authMethod));
+    if (!inloggad) { logg('STOPP: Claude Code är inte inloggat med abonnemanget. Kör: claude auth login --claudeai'); process.exit(1); }
+    stada();
+  }
+
+  // Först prövas den förra omgångens spelade matcher, medan deras uppgifter ännu ligger i omgang.json
+  // (den byts mot den nya omgången längre ner).
+  if (BARA_TRAFF || (!ETT_LAG && !PROV)) {
+    try {
+      await traffen();
+    } catch (err) {
+      if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
+      logg(`FEL träffsäkerhet: ${err.message}`);
+    }
+    if (BARA_TRAFF) { visaTraff({ detaljer: true }); return; }
+  }
 
   let round = null;
   let lagen;
@@ -404,13 +464,6 @@ async function main() {
     if (!round) { logg('ingen omgång just nu'); return; }
     lagen = await omgangensLag(round);
     if (!lagen.length) { logg(`${round.id}: alla matcher har börjat`); return; }
-  }
-
-  if (!TORRT) {
-    const inne = await inloggning().catch((err) => err);
-    const inloggad = inne && inne.loggedIn && inne.apiProvider === 'firstParty' && !/api.?key|console/i.test(String(inne.authMethod));
-    if (!inloggad) { logg('STOPP: Claude Code är inte inloggat med abonnemanget. Kör: claude auth login --claudeai'); process.exit(1); }
-    stada();
   }
 
   const register = lasJson(REGISTER, {});
@@ -452,6 +505,8 @@ async function main() {
     if (!poddar.length) continue;
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
     post.mot = l.mot;
+    post.match = l.match;
+    post.avspark = l.avspark;
     const floden = [];
     for (const p of poddar) {
       try {

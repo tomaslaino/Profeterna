@@ -15,6 +15,7 @@ import pc from '../../config/poddar.js';
 import fc from '../../config/forum.js';
 import mc from '../../config/media.js';
 import lc from '../../config/lokal.js';
+import tc from '../../config/traff.js';
 import newsCfg from '../../config/news.js';
 import { jsonOf, unknownNumbers } from './kontroller.mjs';
 import { claudeSvar, Stopp } from './claude.mjs';
@@ -497,7 +498,8 @@ export function sidaAv(content, underlag, lagen) {
 // Skriver matchbladet av uppgifterna i poddfilen. lagen: [hemma, borta].
 // → {rubrik, ingress, summering, citat, delar: [{lag, kallor, grupper, text: [stycken]}], nyckel, redigerad, sekunder}
 // eller null om inget lag har något. Fel från Claude Code (Stopp) kastas; annars blir sidan oredigerad.
-export async function skrivSida(fil, lagen, { avspark = null, now = () => new Date(), claude = claudeSvar, logg = () => {} } = {}) {
+// kallTraff: (lag, källa) → källans träffsäkerhet om truppen som text, eller null (config/traff.js).
+export async function skrivSida(fil, lagen, { avspark = null, now = () => new Date(), claude = claudeSvar, logg = () => {}, kallTraff = () => null } = {}) {
   const underlag = sidansUnderlag(fil, lagen, { avspark });
   if (!Object.values(underlag.lag).some((l) => l.length)) return null;
   const nyckel = sidNyckel(underlag);
@@ -507,7 +509,16 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
     const system = pc.sidaPrompt.replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd).replace('{stycken}', pc.sidan.stycken)
       .replace('{lagOrd}', pc.sidan.lagOrd).replace('{summeringOrd}', pc.sidan.summeringOrd);
     const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [KALLNYCKEL[x.typ] || 'podd']: x.podd, datum: x.datum, uppgift: x.t, ...(x.sagt ? { citat: x.sagt } : {}) }))])) };
-    const r = await claude({ system, prompt: `Idag är det ${nowFmt.format(now())}.\n\nUnderlaget (JSON):\n${JSON.stringify(data)}`, tools: [], model: pc.model, effort: pc.sidan.effort, timeoutMs: pc.timeoutMs });
+    // Källornas träffsäkerhet om truppen, när den är prövad tillräckligt många gånger: redaktören får den
+    // vid uppgiften och en rad om hur den ska användas (config/traff.js).
+    let traffRad = '';
+    for (const lag of lagen) {
+      underlag.lag[lag].forEach((x, i) => {
+        const t = kallTraff(lag, x.podd);
+        if (t) { data.lag[lag][i].traffsakerhet = t; traffRad = tc.redaktor; }
+      });
+    }
+    const r = await claude({ system: system + traffRad, prompt: `Idag är det ${nowFmt.format(now())}.\n\nUnderlaget (JSON):\n${JSON.stringify(data)}`, tools: [], model: pc.model, effort: pc.sidan.effort, timeoutMs: pc.timeoutMs });
     sekunder = r.seconds;
     sida = r.refused ? null : sidaAv(r.content, underlag, lagen);
     if (!sida) logg(`  sidan ${lagen.join(' – ')}: redaktörens svar höll inte, uppgifterna står som löptext`);
