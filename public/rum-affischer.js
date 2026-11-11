@@ -152,7 +152,7 @@ function ifk() {
     `<span class="rub">${GP.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
     '<span class="foto"><img src="rum/ifk82.jpg" alt="" draggable="false"></span>' +
     '<span class="under">3–0 i Hamburg – pokalen hem till Göteborg</span>' +
-    `<span class="veck"></span><span class="tryck"></span></span>${SKRUVAR}`;
+    `<span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>${SKRUVAR}`;
   passa(el, GP);
   return paSkivan(el);
 }
@@ -220,7 +220,7 @@ function chelsea() {
     `<small>${CHELSEA.datum.join('<br>')}</small></span>` +
     `<span class="kick">${esc(CHELSEA.kick)}</span>` +
     `<span class="rub">${CHELSEA.rad.map(([t, rod]) => `<b${rod ? ' class="rod"' : ''}>${esc(t)}</b>`).join('')}</span>` +
-    `<span class="under">${esc(CHELSEA.under)}</span><span class="veck"></span><span class="tryck"></span></span>${SKRUVAR}`;
+    `<span class="under">${esc(CHELSEA.under)}</span><span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>${SKRUVAR}`;
   passa(el, CHELSEA);
   return paSkivan(el);
 }

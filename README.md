@@ -1251,6 +1251,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   trovärdig" i stället för skissens svenska: The Suns löpsedel dagen efter Chelseas seger i
   cupvinnarcupen på Råsunda 1998, bara text som löpsedlarna var då. Fotot från 2021 är borttaget. Se
   [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **IFK och Chelsea utan prickar (2026-11-11, användarens önskemål):** "både IFK och
+  chelsea-löpsedlarna är ju prickiga. Kan du ordna så att de inte är det men att de får rimlig
+  patina". Prickrastret (ett rutnät, 2 px) blev ett mönster i närbilden. Nu har de samma papper som
+  allt annat och ett återhållsamt slitage. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **Nacionals förstasida på glaset (2026-11-03, användarens önskemål):** till höger i
   skyltfönstret sitter El Días förstasida dagen efter Nacionals seger i Intercontinental Cup
   1988 (DL:s lag), med Tomas foto av laget med pokalerna. Se [Tobaksaffären](#tobaksaffären),
@@ -4443,7 +4447,7 @@ medan kameran rör sig. På natten ritas den om en gång, och framsidan ligger i
   plansch, och från GP eftersom det är IFK). Tidningens namn på ett blått band, datumet,
   *UEFA-CUPEN*, *IFK BÄST I EUROPA!* i två rader så stora som ryms (samma mätning som veckans
   löpsedel, `passa`), fotot från Volksparkstadion med laget och pokalen i luften under
-  skylten STADION HAMBURG – svartvitt i rastret, som i tidningen – och *3–0 i Hamburg –
+  skylten STADION HAMBURG – svartvitt, som i tidningen – och *3–0 i Hamburg –
   pokalen hem till Göteborg*. Fotot (`public/rum/ifk82.jpg`) är beskuret ur ett som Tomas
   skickade; fotografen och licensen är okända, så ingen rad står under närbilden. Titeln har
   båda finalerna: 1–0 på Ullevi onsdag 5 maj (Tord Holmgren) och 3–0 i Hamburg onsdag 19 maj
@@ -4460,8 +4464,7 @@ ville, men namnet är skrivet som text (inte tidningens logga) och sidan är vå
 om finalen stämmer, och det källorna inte är överens om (minuten för Koemans mål, vilka i PSV
 som missade sina straffar) står inte med, liksom årgång, nummer och pris. Sidan
 (`public/rum/nacional88.jpg`, 900 × 1332) är tryckt i raster, gulnad, fläckig och vikt i fyra
-delar redan i bilden; rummet lägger bara solens blekning ovanpå, inte affischernas
-prickraster, som blir grovt i närbilden. Närbilden tar 94 % av höjden.
+delar redan i bilden; rummet lägger bara solens blekning ovanpå. Närbilden tar 94 % av höjden.
 
 **Chelsea 1998** (DT:s lag) är en
 brittisk löpsedel (news bill) från **The Sun**, torsdagen den 14 maj 1998, dagen efter
@@ -4473,6 +4476,13 @@ finalen mot VfB Stuttgart med 1–0 på Råsunda i Solna onsdagen den 13 maj 199
 Zola, inbytt). Löpsedeln är gammal: papperet har gulnat, det röda har bleknat och den har
 legat vikt på mitten. Till 2026-11-11 satt The Sun on Sundays löpsedel från finalen i
 Champions League 2021 här, med foto, men den var det enda i rummet från efter 90-talet.
+
+**Papperet på IFK och Chelsea** har inget prickraster: rutnätet (2 px) blev ett mönster av prickar i
+närbilden, och användaren ville ha dem utan prickar men med "rimlig patina" (2026-11-11). De har samma
+pappersstruktur som allt papper på sajten (`public/rum/papper.webp`, här i sedlarnas mått), lite ojämn
+gulning och mörkare kanter (mer med slitaget, `--sep`), och tryckfärgen är ojämn och lite nött där
+papperet lyser igenom (`.blad` med veckans löpsedels `--prickar` och `--flackar` som mask, till hälften),
+mest i en bruten rand längs vecken (`.veck::before`/`::after`). Allt i rum-affischer.css.
 
 **Löpsedeln** är veckans och är **Helgarderats**, samma tidning som ligger på pulten (2026-11-10, Tomas önskemål:
 "Döp om löpsedeln till Helgarderat också"): namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade med
