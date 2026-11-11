@@ -33,7 +33,7 @@
 // böjd.
 //
 // Löpsedeln (rubrik): Helgarderats, tidningen på pulten (rum-tidning.js), med
-// namnet och rutorna som på tidningen och rubriker i kvällstidningens tonläge, torrt
+// namnet på det röda bandet som på tidningen och rubriker i kvällstidningens tonläge, torrt
 // ironiska, om det mest dramatiska som har hänt eller ska hända – i förra
 // omgången den som tippade bäst eller sämst, en ny ledare i Tipsligan, modellen
 // mot gänget, skrällen, krossen och gängets kupong; i nästa omgång den jämnaste
@@ -252,13 +252,13 @@ function nacional() {
 // ---------- löpsedeln: tidningen och rubrikerna ----------
 //
 // Veckans löpsedel är Helgarderats (2026-11-10, Tomas önskemål: "Döp om
-// löpsedeln till Helgarderat också"), samma tidning som ligger på pulten: namnet
-// i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade framför
-// (RumTidning.rutor), och det som lyfts fram i rubriken också grönt. Förut var
+// löpsedeln till Helgarderat också"), samma tidning som ligger på pulten och i
+// samma utseende, det gula matchprogrammet (2026-11-11): gult papper, namnet i
+// Alfa Slab One på ett rött band och det som lyfts fram i rubriken rött. Förut var
 // den Sportbladets eller Expressens, två veckor i taget. Rubrikerna är våra:
 // kvällstidningens tonläge om gängets tips, allvarligt menat på ytan.
 // (T: namnet i vinjetten, {T} i kick)
-const TIDNINGEN = { namn: 'HELGARDERAT', gen: 'Helgarderats', T: 'HELGARDERAT', font: '400 100px "Alfa Slab One", Georgia, serif', bred: 88, rutor: 1.6 };
+const TIDNINGEN = { namn: 'HELGARDERAT', gen: 'Helgarderats', T: 'HELGARDERAT', font: '400 100px "Alfa Slab One", Georgia, serif', bred: 86 };
 
 const fDatum = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', day: 'numeric', month: 'long' });
 const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
@@ -568,12 +568,11 @@ function rita(el, r, vagg) {
   const rad = r.rad.map(([t, s]) => [String(t).toUpperCase(), Number(s) || 0]);
   el.title = `${T.gen} löpsedel: ${radText(rad)} – ${r.under}${r.plus ? `. ${r.plus}` : ''}`;
   el.setAttribute('aria-label', el.title);
-  const rutor = window.RumTidning && RumTidning.rutor ? RumTidning.rutor('rutor') : '';
   const stil = (t, s) => {
     const k = [s === 1 ? 'rod' : s === 2 ? 'inv' : '', PRICK.test(t) ? 'prick' : ''].filter(Boolean).join(' ');
     return k ? ` class="${k}"` : '';
   };
-  el.innerHTML = `<span class="ark"><span class="huvud"><b class="namn">${rutor}${esc(T.namn)}</b></span>` +
+  el.innerHTML = `<span class="ark"><span class="huvud"><b class="namn">${esc(T.namn)}</b></span>` +
     `<span class="linje"><span class="kick${PRICK.test(r.kick) ? ' prick' : ''}">${esc(r.kick)}</span><small>${esc(r.datum)}</small></span>` +
     `<span class="rub">${rad.map(([t, s]) => `<b${stil(t, s)}>${esc(t)}</b>`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span>` +
@@ -582,12 +581,12 @@ function rita(el, r, vagg) {
     `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
   // namnet, vinjetten och den andra nyheten så stora som ryms (sp: spärren
   // mellan bokstäverna och kanterna i em, som i CSS:en; mer: det som står
-  // bredvid i em, rutorna framför namnet)
+  // bredvid i em)
   const fyll = (sel, text, font, bred, max, sp = 0, mer = 0) => {
     const b = el.querySelector(sel);
     if (b) b.style.fontSize = `${Math.min(max, bred / Math.max(0.3, bredd(text, font) + sp * text.length + mer)).toFixed(2)}px`;
   };
-  fyll('.namn', T.namn, T.font, T.bred, 22, 0, rutor ? T.rutor : 0);
+  fyll('.namn', T.namn, T.font, T.bred, 22);
   fyll('.kick', r.kick + '  ', undefined, 66, 6.4, 0.06);
   if (r.plus) fyll('.plus', `+ ${r.plus}`, undefined, 88, 5.6, 0.02);
   // rubriken får det som blir över av höjden: papperet 140 utan kanterna

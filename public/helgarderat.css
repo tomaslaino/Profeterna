@@ -2,9 +2,9 @@
    disken. Utseendet är det gula matchprogrammet (förslag F, som användaren valde 2026-11-11): framsidan är ett
    programomslag på löpsedelns gula papper, med namnet i Alfa Slab One på ett rött band, rubrikerna i Anton och
    programmets märke med rutorna 1, X och 2 ikryssade (helgarderat). Inne i tidningen är papperet ljust och trycket
-   svart och rött, och det gula står kvar i matchens vinjett och i sammanfattningen. Tidningen på pulten i rummet
-   (rum-tidning.css) heter också Helgarderat men har ännu det gröna utseendet. Ett matchblad per match, med bild.
-   Smalt (under 720 px): en spalt. */
+   svart och rött, och det gula står kvar i matchens vinjett och i sammanfattningen. Det är samma tidning som ligger
+   på pulten i rummet (rum-tidning.css) och har löpsedeln (rum-affischer.css), med samma utseende. Ett matchblad per
+   match, med bild. Smalt (under 720 px): en spalt. */
 html { background: #1a1510; }
 body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
   background: radial-gradient(120% 70% at 50% 0%, #2c241b 0%, #1a1510 60%) fixed, #1a1510; font-synthesis: none; -webkit-text-size-adjust: 100%; }

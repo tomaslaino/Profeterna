@@ -207,9 +207,10 @@
 
 /* ---------- löpsedeln: tidningens namn, vinjetten, rubriken och raden under ---------- */
 
-/* Helgarderats löpsedel: namnet i flaskgrönt med rutorna 1, X och 2 ikryssade
-   framför, som på tidningen på pulten (rum-tidning.css), och det som lyfts fram
-   i rubriken grönt (--rod, som det hette när löpsedeln var Expressens).
+/* Helgarderats löpsedel i tidningens utseende, det gula matchprogrammet
+   (2026-11-11, som tidningen på pulten, rum-tidning.css, och Helgarderats egen
+   sida): gult papper, namnet i ljust på ett rött band, vinjetten i gult på svart
+   och det som lyfts fram i rubriken rött.
    Storlekarna på namnet, vinjetten, rubrikens rader och den andra nyheten sätts
    i rum-affischer.js, så att de fyller bredden. */
 .rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))); }
@@ -218,10 +219,9 @@
    den (rum-affischer.js). Två häftstift håller den, så den hänger nästan rak. */
 /* (två skuggor: papperet ligger an mot furun, men buktar ut lite nertill) */
 .rum-lop.pa-vagg { transform: rotate(var(--vrid, 0deg)) scale(0.72); transform-origin: 1.5px 1.5px; filter: drop-shadow(0 0.5px 0.6px rgba(0, 0, 0, 0.5)) drop-shadow(0.6px 2.6px 2.6px rgba(0, 0, 0, 0.32)); }
-/* Tidningspapper, inte vitt: gråaktigt eller blekrosa och matt. Det vita i
-   tryckt text är papperet (ingen vit färg på en tidning), svärtan är inte
-   helt svart och det gröna är tryckfärgens, inte skärmens. */
-.rum-lop { --papper: #ece8dc; --papper2: #e4ddcd; --rod: #22573a; --kick: #22573a; --penna: #2c4ea0; }
+/* Tidningspapper, matt: här gult. Svärtan är inte helt svart och det röda är
+   tryckfärgens, inte skärmens. */
+.rum-lop { --papper: #f5cb1c; --papper2: #ecc015; --rod: #b8231b; --kick: #23201e; }
 .rum-lop .ark {
   display: flex;
   flex-direction: column;
@@ -239,15 +239,12 @@
   justify-content: center;
   align-items: center;
   height: 17px;
-  border-bottom: 1px solid currentColor;
+  margin: 0 -4px;
+  background: var(--rod);
   overflow: hidden;
 }
 .rum-lop .namn { white-space: nowrap; line-height: 1; font-weight: 400; }
-.rum-lop .namn { display: flex; align-items: center; font-family: "Alfa Slab One", Georgia, serif; color: var(--rod); letter-spacing: 0; }
-.rum-lop .namn .rutor { flex: none; width: 1.42em; height: auto; margin-right: 0.18em; overflow: visible; }
-.rum-lop .rutor .r { fill: none; stroke: var(--rod); stroke-width: 3.6; }
-.rum-lop .rutor text { fill: var(--rod); font: 800 19px/1 Fraunces, Georgia, serif; }
-.rum-lop .rutor .k { fill: none; stroke: var(--penna); stroke-width: 4.8; stroke-linecap: round; opacity: 0.9; }
+.rum-lop .namn { display: flex; align-items: center; font-family: "Alfa Slab One", Georgia, serif; color: #f8f2e0; letter-spacing: 0; }
 .rum-lop .linje { display: flex; justify-content: space-between; align-items: center; gap: 2px; margin-top: 2.5px; }
 .rum-lop .kick {
   padding: 0.3em 0.42em 0.2em;

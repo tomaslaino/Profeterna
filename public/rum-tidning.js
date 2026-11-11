@@ -100,6 +100,7 @@
       infor: (dag) => `Inför ${dag}`,
       efter: (dag) => `Efter ${dag}`,
       foto: (f) => `Foto: ${f}`,
+      matcher: (n) => `${n} matcher`,
     },
     tipset: {
       rubrik: 'Omgångens matcher',
@@ -678,9 +679,9 @@
     const n = Math.round((mandag - FORSTA) / (7 * 864e5)) + 1;
     return n >= 1 ? n : null;
   }
-  // Rutorna 1, X och 2 framför namnet, som på kupongen, alla ikryssade med kulspetspenna: helgarderat. Kryssen är
-  // dragna lite olika och går en bit utanför rutan. Samma rutor på löpsedeln (rum-affischer.js) och på Helgarderats
-  // egen sida (helgarderat.js), med sin klass (kl).
+  // Rutorna 1, X och 2 som på kupongen, alla ikryssade: helgarderat. Kryssen är dragna lite olika och går en bit
+  // utanför rutan. De står i programmets märke på framsidan, här och på Helgarderats egen sida (helgarderat.js), med
+  // sin klass (kl).
   const KRYSS = [
     'M4.5 6.2 C13 14.6 24 25.8 35.6 35.1 M34.2 4.6 C25.8 14.1 15.6 25.2 5.3 36.4',
     'M5.6 4.9 C14.6 14.2 23.4 23.6 34.6 36.2 M36.1 6.4 C26.6 15 15.2 26 3.9 34.6',
@@ -730,7 +731,16 @@
   // Framsidan, 100 × 140 (zoom i rum.js), utan annat än det som säger vilket nummer det är (2026-11-10, användarens
   // önskemål: "Tidningen ser plottrig ut. Ta bort massa saker där som vi är ointresserade av"): veckan, datumet och
   // priset, namnet, numret stort med omgångens dag under, och veckans bild (veckansBild) med rubriken. Samma på pulten
-  // och när den är framme.
+  // och när den är framme. Utseendet är det gula matchprogrammet, som Helgarderats egen sida (2026-11-11: "Det är samma
+  // tidning ju"): namnet på ett rött band, bilden tryckt direkt på det gula papperet (genom) och programmets märke över
+  // bildens hörn, med veckodagen, rutorna och antalet matcher. Rubriken med det andra ledet i rött (tvafarg).
+  // Rubriken på framsidan: det som kommer efter det första kommatecknet eller tankstrecket, oftast det andra laget,
+  // i rött, som på Helgarderats egen sida.
+  function tvafarg(r) {
+    const t = String(r).match(/^(.+?(?:,| –))\s+(.+)$/);
+    return t ? `${esc(hel(t[1]))} <span>${esc(hel(t[2]))}</span>` : esc(hel(r));
+  }
+
   function forsta(u0) {
     const u = { namnAv: (id, n) => n, ...u0 };
     const G = TEXT.forsta;
@@ -744,16 +754,18 @@
     const dag = Number.isFinite(u.datum) ? fDatum.format(new Date(u.datum)) : '';
     const omg = Number.isFinite(forst) ? (sum ? G.efter : G.infor)(omgangsdag(forst)) : '';
     const b = veckansBild(u, sum);
+    const marke = Number.isFinite(forst) && m.length ? `<span class="hf-marke" aria-hidden="true"><span>${esc(fVdagLang.format(new Date(forst)))}</span>` +
+      `${rutor()}<span>${esc(G.matcher(m.length))}</span></span>` : '';
     const duk = (src, reserv, kl, w, h) => `<canvas class="${kl}" width="${w}" height="${h}" data-bild="${esc(src)}"${reserv ? ` data-reserv="${esc(reserv)}"` : ''}></canvas>`;
     const under = b && (b.foto ? (b.foto.foto ? G.foto(b.foto.foto) : '') : b.under);
-    const bild = !b ? '' : `<figure class="hf-bild">${b.foto ? duk(b.foto.src, b.foto.reserv, 'hf-foto', 320, 200)
-      : `<div class="hf-foto hf-skoldar">${b.skoldar.map((x) => (x ? duk(x, '', 'skold genom', 160, 160) : '<span></span>')).join('<i>–</i>')}</div>`}` +
-      `<figcaption><b>${esc(hel(b.rubrik || ''))}</b>${under ? `<small>${esc(under)}</small>` : ''}</figcaption></figure>`;
+    const bild = !b ? '' : `<figure class="hf-bild"><span class="hf-omslag">${b.foto ? duk(b.foto.src, b.foto.reserv, 'hf-foto genom', 320, 200)
+      : `<span class="hf-foto hf-skoldar">${b.skoldar.map((x) => (x ? duk(x, '', 'skold genom', 160, 160) : '<span></span>')).join('<i>–</i>')}</span>`}${marke}</span>` +
+      `<figcaption><b>${tvafarg(b.rubrik || '')}</b>${under ? `<small>${esc(under)}</small>` : ''}</figcaption></figure>`;
     return `<div class="hf-forsta${bild ? '' : ' utan-bild'}" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
       `<div class="hf-linje"><b>${v != null ? esc(G.vecka(v)) : ''}</b><span>${esc(dag)}</span><span>${esc(G.pris)}</span></div>` +
-      `<div class="hf-namn">${rutor()}<b>${NAMN.toUpperCase()}</b></div>` +
+      `<div class="hf-namn"><b>${NAMN.toUpperCase()}</b></div>` +
       `<div class="hf-numret">${nr != null ? `<b>${esc(G.nr(nr))}</b>` : ''}${omg ? `<span>${esc(omg)}</span>` : ''}</div>` +
-      bild + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
+      (bild || marke) + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
 
   // ---------- tidningen ----------
