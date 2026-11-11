@@ -110,7 +110,8 @@
        "podd": "SK3 TV",
        "avsnitt": "#118: Cray Wanderers, Grammar School Scarves and Good Tinfoil",
        "datum": "2026-11-09",
-       "adress": "https://shows.acast.com/sk3-tv/episodes/118-cray-wanderers-grammar-school-scarves-and-good-tinfoil"
+       "adress": "https://shows.acast.com/sk3-tv/episodes/118-cray-wanderers-grammar-school-scarves-and-good-tinfoil",
+       "ljud": "https://sphinx.acast.com/p/open/s/66605e235259600012a4b511/e/6af104c1baaf18ccf976bdf9/media.mp3"
       }
      ],
      "grupper": [
@@ -203,7 +204,8 @@
        "podd": "The Tilehurst End - A Reading FC Podcast",
        "avsnitt": "The Tilehurst End Podcast Episode 479: Proboscis",
        "datum": "2026-11-04",
-       "adress": "https://thetilehurstend.podbean.com/e/the-tilehurst-end-podcast-episode-479-proboscis/"
+       "adress": "https://thetilehurstend.podbean.com/e/the-tilehurst-end-podcast-episode-479-proboscis/",
+       "ljud": "https://mcdn.podbean.com/mf/web/7qbu3ggzeqizcevg/TTE_4799q2lm.mp3"
       }
      ],
      "grupper": [
@@ -339,7 +341,8 @@
        "avsnitt": "There's a Job On Here",
        "datum": "2026-11-09",
        "adress": "https://shows.acast.com/64abd7bfd593820011a68d78/episodes/theres-a-job-on-here",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://sphinx.acast.com/p/open/s/64abd7bfd593820011a68d78/e/6af245394853f034c510a214/media.mp3"
       },
       {
        "podd": "Owlstalk",
@@ -494,7 +497,8 @@
        "avsnitt": "Evans Above The Church: Plymouth Argyle 4-0 Alvechurch",
        "datum": "2026-11-09",
        "adress": "https://shows.acast.com/greenwhite/episodes/6af1951957950839ffaec404",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://sphinx.acast.com/p/open/s/6409ea1609d94b0011c13676/e/6af1951957950839ffaec404/media.mp3"
       },
       {
        "podd": "Pasoti",
@@ -659,7 +663,8 @@
        "avsnitt": "We're In The Hat - Boreham Wood To Crewe",
        "datum": "2026-11-08",
        "adress": "https://podcasts.apple.com/gb/podcast/progress-with-unity-podcast/id550919658?uo=4",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://www.buzzsprout.com/7167/episodes/20092125-we-re-in-the-hat-boreham-wood-to-crewe.mp3"
       },
       {
        "podd": "Vital Latics Speyk",
@@ -838,7 +843,8 @@
        "podd": "The Wombles had a Dream Podcast",
        "avsnitt": "Philanthoring",
        "datum": "2026-11-06",
-       "adress": "https://linktr.ee/womblesdream"
+       "adress": "https://linktr.ee/womblesdream",
+       "ljud": "https://sphinx.acast.com/p/open/s/640b02d43375ac0011477c87/e/6aecf26f7defc9098d71a7ac/media.mp3"
       }
      ],
      "grupper": [
@@ -1063,7 +1069,8 @@
        "avsnitt": "Episode 91 - Nightmare Before November",
        "datum": "2026-11-06",
        "adress": "https://shows.acast.com/brewers-babble/episodes/6aece0c65e56bd617c80869b",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://sphinx.acast.com/p/open/s/66bf4c234a224df83af9e940/e/6aece0c65e56bd617c80869b/media.mp3"
       }
      ],
      "grupper": [
@@ -1215,7 +1222,8 @@
        "avsnitt": "Do We Hate Plymouth Parkway?",
        "datum": "2026-11-04",
        "adress": "https://bigbanktheory.libsyn.com/do-we-hate-plymouth-parkway",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://traffic.libsyn.com/secure/bigbanktheory/eMastered_041126.mp3?dest-id=1047509"
       },
       {
        "podd": "Exeweb",
@@ -1335,7 +1343,8 @@
        "avsnitt": "Episode 205 - Getting Spooked in Birkenhead",
        "datum": "2026-11-05",
        "adress": "https://podcasters.spotify.com/pod/show/the-robins-report/episodes/Episode-205---Getting-Spooked-in-Birkenhead-e3rnp5l",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://anchor.fm/s/4f9abdd0/podcast/play/128754293/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-10-4%2Fa6a21ec0-f74e-025c-deeb-2f24181027cc.mp3"
       },
       {
        "podd": "The Robins Nest",
@@ -1501,7 +1510,8 @@
        "avsnitt": "The Preview Show | Worcester City (H)",
        "datum": "2026-11-06",
        "adress": "https://shows.acast.com/beyond-the-barside/episodes/6aecfe152cf7bf4244663215",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://sphinx.acast.com/p/open/s/686ae0f791efcd9815bf7fa7/e/6aecfe152cf7bf4244663215/media.mp3"
       },
       {
        "podd": "The U'sual",
@@ -1627,7 +1637,8 @@
        "avsnitt": "The ME7 Podcast Sunday Space - Gills 0 Barrow 1",
        "datum": "2026-11-08",
        "adress": "https://theme7podcast.substack.com/p/the-me7-podcast-sunday-space-gills-f9a",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://api.substack.com/feed/podcast/224074429/382dbb45591349979fb4f512e796196a.mp3"
       },
       {
        "podd": "Gills Journal",
@@ -1820,7 +1831,8 @@
        "avsnitt": "Dons Despatched",
        "datum": "2026-11-09",
        "adress": "https://shows.acast.com/the-railwaymen/episodes/6af12d6ad2403d96612b0db8",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://sphinx.acast.com/p/open/s/66a78d3dc5030205ce1cb251/e/6af12d6ad2403d96612b0db8/media.mp3"
       }
      ],
      "grupper": [
@@ -1961,7 +1973,8 @@
        "avsnitt": "#299: In it to win it!",
        "datum": "2026-11-09",
        "adress": "https://shows.acast.com/1912exiles/episodes/299-in-it-to-win-it",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://sphinx.acast.com/p/open/s/65bb91a5de7c480017bd8130/e/6af0e48bb68b03091ec45c79/media.mp3"
       },
       {
        "podd": "We Are Exiles",
@@ -2126,7 +2139,8 @@
        "avsnitt": "Scunthorpe (H) FA Cup Preview 26/27",
        "datum": "2026-11-05",
        "adress": "https://shows.acast.com/ale-and-the-vale-a-port-vale-podcast/episodes/scunthorpe-h-fa-cup-preview-2627",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://sphinx.acast.com/p/open/s/65ae51672d1bb800160e9fe0/e/6aed05ea5f0d1d0aa897d816/media.mp3"
       },
       {
        "podd": "One Vale Fan",
@@ -2505,7 +2519,8 @@
        "avsnitt": "9½ Seconds",
        "datum": "2026-11-09",
        "adress": "https://www.sameoldcity.com/p/9-seconds",
-       "typ": "podd"
+       "typ": "podd",
+       "ljud": "https://api.substack.com/feed/podcast/224080398/73c2321a75f83f5087087614de479812.mp3"
       }
      ],
      "grupper": [
@@ -2696,7 +2711,8 @@
        "podd": "It's All Cobblers To Me - Northampton Town Podcast",
        "avsnitt": "York City 4-0 Northampton Town | MATCH REVIEW",
        "datum": "2026-11-09",
-       "adress": "https://podcasts.apple.com/gb/podcast/its-all-cobblers-to-me-northampton-town-podcast/id1436309214?uo=4"
+       "adress": "https://podcasts.apple.com/gb/podcast/its-all-cobblers-to-me-northampton-town-podcast/id1436309214?uo=4",
+       "ljud": "https://pscrb.fm/rss/p/op3.dev/e/traffic.megaphone.fm/COMG6286247328.mp3"
       }
      ],
      "grupper": [
@@ -2838,7 +2854,8 @@
        "podd": "Salopcast",
        "avsnitt": "2026/27 - EMERGENCY POD - Dawn of a new era",
        "datum": "2026-11-09",
-       "adress": "https://soundcloud.com/salopcast/newera"
+       "adress": "https://soundcloud.com/salopcast/newera",
+       "ljud": "https://feeds.soundcloud.com/stream/2435201247-salopcast-newera.mp3"
       },
       {
        "podd": "A Large Grouse",
@@ -2954,7 +2971,8 @@
        "podd": "The Boundary Park Alert System",
        "avsnitt": "BPAS 2026/27 E13: Sutton on the Button.",
        "datum": "2026-11-09",
-       "adress": "https://podcasters.spotify.com/pod/show/oafcpodcast/episodes/BPAS-202627-E13-Sutton-on-the-Button-e3s1dsg"
+       "adress": "https://podcasters.spotify.com/pod/show/oafcpodcast/episodes/BPAS-202627-E13-Sutton-on-the-Button-e3s1dsg",
+       "ljud": "https://anchor.fm/s/361ec770/podcast/play/129070416/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-10-8%2F3b3ce217-89eb-aa1e-3efd-e10ddffe8375.mp3"
       }
      ],
      "grupper": [
