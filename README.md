@@ -250,7 +250,8 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   grafik och samma inloggning och tips som i Chrome, utan adressfält – med logon som ikon (också som
   temaikon), en uppstart i sajtens mörka färg som Chrome tar över utan att något hoppar, genvägar på ikonen
   (Kupongen, Olympen, Matcherna, Tabeller) och *Dela → Ladda upp system* för en skärmbild av systemet. Se
-  [Appen](#appen)
+  [Appen](#appen). Samma dag: "Jag vill att mina vänner ska kunna ladda ner den på ett enkelt sätt bara" –
+  gratis nedladdning på **matchfixarna.se/app** (Google Play kostar 25 dollar och kräver 12 testare i 14 dagar)
 - [x] **Gängets kupong i realtid (2026-11-08, användarens önskemål):** den som fyller i gängets
   kupong i uppgörelsen – på papperet eller på pulten i tobaksaffären – gör det på allas kupong.
   Kryssen, det klubbade och *Börja om* syns direkt hos alla som ser kupongen, och knappen blir
@@ -554,6 +555,16 @@ cd android && ./gradlew assembleRelease bundleRelease
 okänd källa), `app/build/outputs/bundle/release/app-release.aab` är för Google Play. Höj `versionCode` i
 [android/app/build.gradle](android/app/build.gradle) för varje ny version. Utan nyckeln byggs bara
 `assembleDebug`, som Chrome inte litar på (adressfältet syns).
+
+**Nedladdningen:** <https://matchfixarna.se/app> ([public/app/index.html](public/app/index.html),
+[public/appen.css](public/appen.css)) – adressen att skicka till gänget. En guldknapp *Ladda ner till Android*
+och de fyra stegen i telefonen (behåll filen, öppna den, tillåt installationen från Chrome, *Installera ändå*
+om Play Protect varnar). I en iPhone står Safari-vägen (*Dela → Lägg till på hemskärmen*) först, och i appen
+själv (eller sajten installerad från Chrome, `display-mode: standalone`) visas varken knappen eller stegen.
+Filen är [public/app/matchfixarna.apk](public/app/matchfixarna.apk), en kopia av `app-release.apk`: byts
+när appen byggs om, och då ändras versionen och storleken på sidan. Länken *Appen* står i foten på
+förstasidan, Om oss, Tabeller och Statistik, dold i appen (`.bara-webb` i theme.css). Menyikonerna i
+telefonen känner igen länkarna på slutet av adressen (`href$=`), så att de syns också från `app/`.
 
 **Provat (2026-11-11):** APK:n (570 kB, minSdk 26, targetSdk 36) är signerad med nyckeln ovan och
 manifestet har aktiviteterna, delningen, länkarna och genvägarna som här. Ikonerna och uppstarten ritade och

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Appen – Matchfixarna</title>
+  <meta name="description" content="Matchfixarna som app i Android: tobaksaffären, kupongen och Olympen utan adressfält.">
+  <meta name="theme-color" content="#0e0d0b">
+  <link rel="icon" type="image/svg+xml" href="../logo.svg">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="stylesheet" href="../typsnitt.css">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../theme.css">
+  <link rel="stylesheet" href="../enhet.css">
+  <link rel="stylesheet" href="../appen.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html" aria-label="Matchfixarna – till förstasidan">
+        <img class="logo" src="../logo.svg" alt="" width="36" height="36">
+        <span class="brand-txt"><b>Matchfixarna</b></span>
+      </a>
+      <nav class="tabs" aria-label="Sektioner">
+        <div class="tablist">
+          <a class="tab-link" href="../index.html#kupong">Kupong</a>
+          <a class="tab-link" href="../index.html#olympen">Olympen</a>
+          <a class="tab-link" href="../index.html#matcher">Matcher</a>
+        </div>
+        <a class="tab-link" href="../tabeller.html">Tabeller</a>
+        <a class="tab-link" href="../statistik.html">Statistik</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Nedladdningen av appen (android/, README → Appen). Adressen att skicka
+       till gänget: matchfixarna.se/app. matchfixarna.apk byts när appen byggs
+       om; versionen och storleken står här nedan. -->
+  <main class="appen">
+    <div class="appen-topp">
+      <img class="appen-ikon" src="../ikon-192.png" alt="" width="96" height="96">
+      <h2 class="page-title">Matchfixarna i telefonen</h2>
+      <p class="appen-lede">Hela sajten som en app – tobaksaffären, kupongen och Olympen, utan adressfält.</p>
+
+      <div class="appen-android">
+        <a class="appen-knapp" href="matchfixarna.apk" download="Matchfixarna.apk">Ladda ner till Android</a>
+        <p class="appen-fakta">Gratis · version 1.0 · 0,6 MB</p>
+      </div>
+      <p class="appen-redan" hidden>Du har redan appen – det är den du tittar i.</p>
+    </div>
+
+    <ol class="appen-steg" aria-label="Så installerar du">
+      <li><b>Tryck på knappen.</b> Frågar Chrome om du vill behålla filen, svara <i>Ladda ned ändå</i>.</li>
+      <li><b>Öppna filen</b> när den är nedladdad – tryck i aviseringen eller under <i>Nedladdningar</i>.</li>
+      <li><b>Tillåt installationen</b> första gången: <i>Inställningar</i> → <i>Tillåt från den här källan</i>, och tillbaka.</li>
+      <li><b>Installera.</b> Varnar Play Protect för en okänd app, välj <i>Installera ändå</i> – appen kommer inte från Play Butik.</li>
+    </ol>
+
+    <ul class="appen-mer">
+      <li>Håll fingret på ikonen för <b>Kupongen</b>, <b>Olympen</b>, <b>Matcherna</b> och <b>Tabeller</b>.</li>
+      <li>Dela en skärmbild av systemet i Svenska Spels app till <b>Ladda upp system</b>, så fylls kupongen i.</li>
+      <li>Tipsen och namnet du valt i Chrome följer med till appen.</li>
+    </ul>
+
+    <section class="appen-iphone" aria-labelledby="appen-iphone-rubrik">
+      <h3 id="appen-iphone-rubrik">Har du iPhone?</h3>
+      <p>Öppna matchfixarna.se i Safari, tryck på <i>Dela</i> och välj <i>Lägg till på hemskärmen</i>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <img class="logo-sm" src="../logo.svg" alt="" width="20" height="20">
+    <p>Matchfixarna</p>
+    <nav class="foot-links" aria-label="Mer"><a href="../index.html#kallor">Källor</a><a href="../index.html#modell">Modell</a><a href="../om-oss.html">Om oss</a><a href="./" aria-current="page">Appen</a></nav>
+  </footer>
+  <script>
+    // iPhone: Safari-vägen först. I appen (eller sajten installerad från
+    // Chrome): ingen knapp, den behövs inte.
+    (() => {
+      const r = document.documentElement;
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) r.classList.add('ios');
+      if (matchMedia('(display-mode: standalone)').matches || document.referrer.startsWith('android-app://')) {
+        r.classList.add('i-appen');
+        document.querySelector('.appen-redan').hidden = false;
+      }
+    })();
+  </script>
+</body>
+</html>
