@@ -125,8 +125,13 @@ module.exports = {
   // om annat. Ett lag som varken står här eller i kanda letas upp när det står på kupongen.
   utan: ['AFC Wimbledon', 'Barnet', 'Barnsley', 'Bradford City', 'Brentford', 'Bromley', 'Burnley', 'Burton Albion', 'Cambridge United', 'Chesterfield', 'Crawley Town', 'Crewe Alexandra', 'Derby County', 'Doncaster Rovers', 'Everton', 'Fleetwood Town', 'Huddersfield Town', 'Luton Town', 'Mansfield Town', 'Middlesbrough', 'Northampton Town', 'Oldham Athletic', 'Peterborough United', 'Reading', 'Salford City', 'Shrewsbury Town', 'Stevenage', 'Stockport County', 'Stoke City', 'Swindon Town', 'Tranmere Rovers', 'West Bromwich Albion', 'Wolverhampton Wanderers', 'Wrexham', 'York City'],
 
-  // Byts den tas uppgifterna ut på nytt ur forumet.
-  promptVersion: '2026-11-10.2',
+  // Byts den tas uppgifterna ut på nytt ur forumet. 2026-11-11.1, perspektiv före fakta (användaren:
+  // "Det handlar mer om alternativa perspektiv - inte om kall fakta. Men det kan komma mycket relevant
+  // information från forum och poddar också"): urvalet letar efter supportrarnas synsätt, en väl
+  // underbyggd åsikt väger som en nyhet, och skador och elva tas bara med när de inte är officiella,
+  // kort. Provat på Wednesday–Plymouth och Exeter–Cheltenham med samma forum och poddar: skador och
+  // elva gick från 42 av 68 uppgifter till 13 av 71, åsikterna från 26 till 62.
+  promptVersion: '2026-11-11.1',
 
   letaPrompt: `Du hjälper en svensk tipstidning att hitta fotbollsklubbars supporterforum.
 
@@ -139,27 +144,27 @@ Sök på nätet ("<klubben> fans forum", "<klubben> message board", "<klubben> f
 Svara bara med JSON, utan något före eller efter:
 {"klubbar": {"<klubbens namn som i listan>": [{"namn": "<forumets namn>", "tavlor": ["https://…"]}]}}`,
 
-  urvalPrompt: `Du arbetar på en svensk tipstidning. Läsarna tippar Stryktipset och vill inför en match veta det som supportrarna vet men som inte står i tabellen eller i de vanliga tidningarna. Tidningen trycker en informationssida per match som läsaren ska kunna hämta kunskap ur.
+  urvalPrompt: `Du arbetar på en svensk tipstidning. Läsarna vet redan tabellen, formen, skadelistan, den väntade elvan och oddsen; det får de på andra håll. Det de inte får någon annanstans är hur de som lever med laget ser på det. Tidningen trycker ett matchblad per match som ska ge läsaren supportrarnas egna perspektiv, en annan bild än siffrornas.
 
-Du får de senaste inläggen ur lagets supporterforum, ett eller flera, tråd för tråd (med forumets namn vid tråden när de är flera). Varje inlägg har ett nummer i hakparentes, användarnamnet och tiden (brittisk tid). Citat ur andra inlägg är bortplockade. Inläggen är skrivna av supportrar: en del vet saker, de flesta tycker.
+Du får de senaste inläggen ur lagets supporterforum, ett eller flera, tråd för tråd (med forumets namn vid tråden när de är flera). Varje inlägg har ett nummer i hakparentes, användarnamnet och tiden (brittisk tid). Citat ur andra inlägg är bortplockade. Inläggen är skrivna av supportrar: en del vet saker, de flesta tycker, och det är i tyckandet perspektiven finns.
 
-Ta ut ALLT SOM ÄR INTRESSANT inför lagets nästa match, högst {flest} uppgifter, bara ur inlägg från de senaste {dagar} dagarna. Hellre fem bra än tio halvbra, men missa inget som en tippare vill veta. En uppgift är intressant om den kan ändra hur man ser på matchen. Varje uppgift hör till ett ämne:
-- "trupp": vem som är skadad, sjuk, avstängd, tillbaka i träning eller tveksam, särskilt det som inte är officiellt än (någon har sett träningen, hört något, läst tränarens ord),
-- "elva": vilka som väntas starta, byte av målvakt, uppställning eller formation,
-- "spel": hur laget egentligen spelar just nu, bortom resultaten: trötthet, självförtroende, var det läcker, vem som bär laget,
-- "klubb": tränarens ställning, stämningen i truppen, bråk med ägare, löner, köpstopp, protester,
-- "match": något om just den här motståndaren eller matchen (resan, planen, en gammal räkning) och vad de som följer laget varje vecka väntar sig, när det sticker ut.
+Ta ut DE INTRESSANTASTE PERSPEKTIVEN inför lagets nästa match, högst {flest} uppgifter, bara ur inlägg från de senaste {dagar} dagarna. Ett perspektiv är intressant när det får läsaren att se laget eller matchen på ett annat sätt än siffrorna gör: en motbild mot resultaten, en iakttagelse som bara den som ser varje match gör, en rädsla eller en förväntan med skäl, en tro eller misstro som går emot tabellen. En väl underbyggd åsikt är värd lika mycket som en nyhet. Säger många samma sak är det stämningen: skriv det som de många menar. Säger någon emot de andra med goda skäl är det också värt att veta. Hellre fem skarpa än tio halvbra. Varje uppgift hör till ett ämne:
+- "spel": det supportrarna ser i spelet och som inte syns i resultaten: vem som bär laget och vem som har tappat, var det läcker, vad tränaren håller på med, mönster de har sett vecka efter vecka,
+- "klubb": hur de ser på laget och klubben just nu: tron eller misstron, stämningen på läktaren, synen på tränaren och ägarna, oron och hoppet, särskilt när den skiljer sig från bilden utifrån,
+- "match": hur de ser på just den här matchen och motståndaren: vad de är rädda för, vad de ser fram emot, gamla räkningar, vad de väntar sig och varför,
+- "trupp": skador, avstängningar och vem som är tillbaka, bara det som inte är officiellt än (någon har sett träningen eller hört något), i en mening,
+- "elva": vilka som väntas starta, bara när supportrarna ser något särskilt i det (ett val de tycker är fel, en spelare i en ny roll).
 
-Ta INTE med: referat av förra matchen, tabelläget, sådant alla redan vet, skämt, gnäll utan innehåll, köp och sälj av biljetter, resor och forumets egna angelägenheter. Samma sak tas upp en gång, också när den sägs i flera forum: ta den ur inlägget där den sägs tydligast. Säger många samma sak, i ett forum eller i flera, är det värt att veta: skriv det som det många supportrarna menar. Uppgiften ska handla om laget ovan eller om matchen. Finns inget intressant är listan tom, och det är ett bra svar.
+Ta INTE med: referat av förra matchen (men gärna vad supportrarna drog för slutsatser av den), tabelläget, officiella skadebesked och sådant som står i varje tidning, skämt, gnäll utan innehåll, köp och sälj av biljetter, resor och forumets egna angelägenheter. Samma sak tas upp en gång, också när den sägs i flera forum: ta den ur inlägget där den sägs tydligast. Uppgiften ska handla om laget ovan eller om matchen. Finns inget intressant är listan tom, och det är ett bra svar.
 
 Varje uppgift:
 - a: ämnet, ett av "trupp", "elva", "spel", "klubb", "match".
-- t: en till två meningar på vanlig svenska, högst 45 ord, som går att läsa utan att ha sett forumet. Skriv vad som sägs, inte att "forumet diskuterar". De som skriver är supportrarna på forumet. Inga tips: inte vem som vinner eller vilket tecken man ska välja.
+- t: en till två meningar på vanlig svenska, högst 45 ord, som går att läsa utan att ha sett forumet. Skriv vad som sägs, inte att "forumet diskuterar" och inte att det är ett perspektiv eller hur skarpt det är. De som skriver är supportrarna på forumet. Inga tips: inte vem som vinner eller vilket tecken man ska välja.
 - s: "b" om inlägget återger något klubben, tränaren eller en spelare har sagt eller något som har hänt (en nyhet, ett uttalande), "h" om det är supporterns egen uppgift: något hen har sett, hört eller fått veta, eller ett rykte, "o" om det är supportrarnas åsikt eller förhoppning.
 - inlagg: numret på inlägget där det står.
 - citat: 8–30 ord i följd ur just det inlägget, ordagrant som de står där (också med stavfel), där det sägs tydligast eller mest målande.
 - sagt: samma citat på svenska, som det ska tryckas: troget men ledigt översatt, med namnen rättstavade. Lägg inte till något som inte sägs.
-- vikt: 5 = det här kan avgöra matchen eller är en nyhet, 3 = värt att veta, 1 = kuriosa.
+- vikt: 5 = ett perspektiv eller en uppgift som får läsaren att se laget eller matchen på ett nytt sätt, 3 = värt att veta, 1 = kuriosa eller sådant som står i varje tidning. Officiella besked om skador och elva får högst 3.
 
 Bara det som står i inläggen, ingenting ur minnet. Tal bara som de står där.
 

@@ -211,8 +211,13 @@ module.exports = {
     'York City': ['Same Old City', 'The Crux of It'],
   },
 
-  // Byts den tas uppgifterna ut på nytt ur utskrifterna som finns.
-  promptVersion: '2026-11-10.4',
+  // Byts den tas uppgifterna ut på nytt ur utskrifterna som finns. 2026-11-11.1, perspektiv före fakta (användaren:
+  // "Det handlar mer om alternativa perspektiv - inte om kall fakta. Men det kan komma mycket relevant
+  // information från forum och poddar också"): urvalet letar efter supportrarnas synsätt, en väl
+  // underbyggd åsikt väger som en nyhet, och skador och elva tas bara med när de inte är officiella,
+  // kort. Provat på Wednesday–Plymouth och Exeter–Cheltenham med samma forum och poddar: skador och
+  // elva gick från 42 av 68 uppgifter till 13 av 71, åsikterna från 26 till 62.
+  promptVersion: '2026-11-11.1',
 
   letaPrompt: `Du hjälper en svensk tipstidning att hitta engelska fotbollsklubbars supporterpoddar.
 
@@ -227,28 +232,28 @@ Svara bara med JSON, utan något före eller efter:
 
 En tom lista för en klubb där du inte hittar någon.`,
 
-  urvalPrompt: `Du arbetar på en svensk tipstidning. Läsarna tippar Stryktipset och vill inför en match veta det som supportrarna vet men som inte står i tabellen eller i de vanliga tidningarna. Tidningen trycker en informationssida per match som läsaren ska kunna hämta kunskap ur.
+  urvalPrompt: `Du arbetar på en svensk tipstidning. Läsarna vet redan tabellen, formen, skadelistan, den väntade elvan och oddsen; det får de på andra håll. Det de inte får någon annanstans är hur de som lever med laget ser på det. Tidningen trycker ett matchblad per match som ska ge läsaren supportrarnas egna perspektiv, en annan bild än siffrornas.
 
 Du får utskriften av ett avsnitt ur en engelsk supporterpodd, ett stycke per minut med minuten i hakparentes. Utskriften är gjord av en maskin: namn kan vara felstavade, så rätta dem efter spelarlistan om du får en. Det står inte vem som talar.
 
-Ta ut ALLT SOM ÄR INTRESSANT inför lagets nästa match, högst {flest} uppgifter. Hellre fem bra än tolv halvbra, men missa inget som en tippare vill veta. En uppgift är intressant om den kan ändra hur man ser på matchen. Varje uppgift hör till ett ämne:
-- "trupp": vem som är skadad, sjuk, avstängd, tillbaka i träning eller tveksam, särskilt det som inte är officiellt än,
-- "elva": vilka som väntas starta, byte av målvakt, uppställning eller formation,
-- "spel": hur laget egentligen spelar just nu, bortom resultaten: trötthet, självförtroende, var det läcker, vem som bär laget,
-- "klubb": tränarens ställning, stämningen i truppen, bråk med ägare, löner, köpstopp, protester,
-- "match": något om just den här motståndaren eller matchen (resan, planen, en gammal räkning) och vad de som följer laget varje vecka väntar sig, när det sticker ut.
+Ta ut DE INTRESSANTASTE PERSPEKTIVEN inför lagets nästa match, högst {flest} uppgifter. Ett perspektiv är intressant när det får läsaren att se laget eller matchen på ett annat sätt än siffrorna gör: en motbild mot resultaten, en iakttagelse som bara den som ser varje match gör, en rädsla eller en förväntan med skäl, en tro eller misstro som går emot tabellen. En väl underbyggd åsikt är värd lika mycket som en nyhet. Är värdarna oense är det också värt att veta. Hellre fem skarpa än tolv halvbra. Varje uppgift hör till ett ämne:
+- "spel": det supportrarna ser i spelet och som inte syns i resultaten: vem som bär laget och vem som har tappat, var det läcker, vad tränaren håller på med, mönster de har sett vecka efter vecka,
+- "klubb": hur de ser på laget och klubben just nu: tron eller misstron, stämningen på läktaren, synen på tränaren och ägarna, oron och hoppet, särskilt när den skiljer sig från bilden utifrån,
+- "match": hur de ser på just den här matchen och motståndaren: vad de är rädda för, vad de ser fram emot, gamla räkningar, vad de väntar sig och varför,
+- "trupp": skador, avstängningar och vem som är tillbaka, bara det som inte är officiellt än (någon har sett träningen eller hört något), i en mening,
+- "elva": vilka som väntas starta, bara när supportrarna ser något särskilt i det (ett val de tycker är fel, en spelare i en ny roll).
 
-Ta INTE med: referat av förra matchen, tabelläget, sådant alla redan vet, skämt, småprat, reklam, biljetter, tävlingar och poddens egna angelägenheter. Samma sak tas upp en gång. Uppgiften ska handla om laget ovan eller om matchen; det som bara rör en annan klubb hör inte hit. Finns inget intressant är listan tom, och det är ett bra svar.
+Ta INTE med: referat av förra matchen (men gärna vad värdarna drog för slutsatser av den), tabelläget, officiella skadebesked och sådant som står i varje tidning, skämt, småprat, reklam, biljetter, tävlingar och poddens egna angelägenheter. Samma sak tas upp en gång. Uppgiften ska handla om laget ovan eller om matchen; det som bara rör en annan klubb hör inte hit. Finns inget intressant är listan tom, och det är ett bra svar.
 
 Varje uppgift:
 - a: ämnet, ett av "trupp", "elva", "spel", "klubb", "match".
-- t: en till två meningar på vanlig svenska, högst 45 ord, som går att läsa utan att ha hört podden. Skriv vad som sägs, inte att "podden diskuterar". De som pratar är poddens värdar eller supportrarna, inte "poddarna". Inga tips: inte vem som vinner eller vilket tecken man ska välja.
+- t: en till två meningar på vanlig svenska, högst 45 ord, som går att läsa utan att ha hört podden. Skriv vad som sägs, inte att "podden diskuterar" och inte att det är ett perspektiv eller hur skarpt det är. De som pratar är poddens värdar eller supportrarna, inte "poddarna". Inga tips: inte vem som vinner eller vilket tecken man ska välja.
 - s: "b" om podden återger något klubben, tränaren eller en spelare har sagt eller något som har hänt, "h" om det är poddens egna uppgifter, intryck från läktaren eller ett rykte, "o" om det är supportrarnas förhoppning eller tyckande.
 - min: minuten i utskriften där det sägs.
 - citat: 8–30 ord i följd ur utskriften, ordagrant som de står där (också med maskinens stavfel), där det sägs. Välj det ställe där det sägs tydligast eller mest målande, och helst en persons ord i ett stycke, inte ett replikskifte.
 - sagt: samma citat på svenska, som det ska tryckas: troget men ledigt översatt, med namnen rättstavade och utan hummanden och omtagningar. Lägg inte till något som inte sägs.
 - vem: namnet på den som säger det, bara om det framgår av utskriften (någon tilltalas med namn alldeles före, eller presenteras som gäst). Annars null. Gissa aldrig.
-- vikt: 5 = det här kan avgöra matchen eller är en nyhet, 3 = värt att veta, 1 = kuriosa.
+- vikt: 5 = ett perspektiv eller en uppgift som får läsaren att se laget eller matchen på ett nytt sätt, 3 = värt att veta, 1 = kuriosa eller sådant som står i varje tidning. Officiella besked om skador och elva får högst 3.
 
 Bara det som sägs i utskriften, ingenting ur minnet. Tal bara som de sägs.
 
