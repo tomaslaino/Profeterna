@@ -237,8 +237,8 @@ export async function dator(o) {
 
   // ---------- skärmen i rummet ----------
 
-  // Raderna (som terminalen: listor av [text, klass]) i grönt på svart, med
-  // linjer som på ett bildrör. Tomt: bara mörk skärm.
+  // Raderna (som terminalen: listor av [text, klass], [['', 'hr']] är ett
+  // streck) i grönt på svart, med linjer som på ett bildrör. Tomt: bara mörk skärm.
   function skarm(rader) {
     const c = bild.image;
     const g = c.getContext('2d');
@@ -253,11 +253,20 @@ export async function dator(o) {
       rader.slice(0, Math.floor((c.height - 60) / lh)).forEach((rad, i) => {
         let x = 44;
         const y = 34 + i * lh;
+        // ett streck över hela skärmen
+        if (rad.length === 1 && rad[0][1] === 'hr') {
+          g.fillStyle = FARG.d;
+          g.fillRect(x, y + lh / 2 - 1, c.width - 2 * x, 2);
+          return;
+        }
         for (const [t, k] of rad) {
           const w = cw * t.length;
           if (k === 'i') {
             g.fillStyle = FARG[''];
             g.fillRect(x - 6, y - 2, w + 12, lh);
+          } else if (k && k.startsWith('st')) {
+            g.fillStyle = FARG[k === 'st' ? '' : 'd'];
+            g.fillRect(x, y + lh * 0.12, w, lh * 0.66);
           }
           g.fillStyle = FARG[k || ''];
           g.shadowColor = k === 'i' ? 'transparent' : 'rgba(65,255,110,.55)';

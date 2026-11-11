@@ -1070,6 +1070,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
   oddsen bara på anslagstavlan, och lagkorten har det som inte står någon annanstans. Se
   [Vad som står var](#vad-som-står-var).
+- **Datorn har också anslagstavlans siffror, ordnade i flikar (2026-11-11, användarens önskemål):**
+  "kan du göra operativsystemet i datorn i matchfixarna bra och okomplicerat att använda sig av i det här
+  syftet men ändå se ut som en terminal. Lägg in informationen som finns i anslagstavlan där också. Sortera
+  upp informationen på rimliga och bra sätt." Av tre skisser på skärmen (A en numrerad huvudmeny med tavlans
+  lappar som sidor, B kupongen med en matchakt per match, C en menyrad som alltid står överst) valde
+  användaren C, den rekommenderade: *KUPONGEN* (matchakten från B), *OMGÅNGEN* (tavlans åtta lappar),
+  *LAGEN* och *SPELARNA*. Tavlan är kvar, så dess siffror står med flit på två ställen, med samma namn och ur
+  samma källa. Se [Datorn](#datorn).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6059,9 +6067,29 @@ tangentbord, mus och en diskett (*REGISTER säk.kopia*), byggd i three.js som in
 [public/rum-register.css](public/rum-register.css). Datorn tog kortlådans plats och jobb
 2026-11-11: användaren ville ha en 90-talsdator med ett eget operativsystem där man söker
 spelare och lag, och valde bland skisser en terminal som i spion- och actionfilmerna runt
-2000 (grön text på svart i VT323, *MATCHFIXARNA REGISTER 1.94*) och den beiga datorn.
+2000 (grön text på svart i VT323) och den beiga datorn. Samma dag blev terminalen lättare att
+använda och fick anslagstavlans siffror: användaren valde en menyrad bland tre skisser.
 
-Man skriver ett namn (eller *sök isak*) och trycker Enter:
+Överst står menyraden, som alltid står still: *KUPONGEN*, *OMGÅNGEN*, *LAGEN* och
+*SPELARNA*, med den valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den
+tangenterna, omvända över hela bredden; det mellan dem rullar.
+
+- **Kupongen** – omgångens matcher numrerade, med divisionen eller cupen. En match öppnar
+  **matchakten**: lagen sida vid sida med tavlans siffror (*Formen*, *Vilan*, *Styrka*,
+  *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*), skadelistorna när de finns och de senaste
+  mötena med hemmalagets V–O–F. Lagnamnen leder till lagkorten.
+- **Omgången** – tavlans åtta lappar, i två rader under menyraden: *Formen* och *Vilan* match
+  för match (den som har vilat minst, två dagar eller mer, i ljust), *Skador* för de matcher
+  som har en lista, *Styrka* per division (styrkan jämförs bara inom divisionen), *Kryss* från
+  mest till minst, och *Tur* (med staplar), *Oddsen* och *Motstånd* i två listor (tur och otur,
+  slår oddsen och sviker, tufft och lätt hittills). Hela omgångens lag står med, inte bara de
+  översta som på lapparna, och varje rad leder till matchakten.
+- **Lagen** – omgångens lag i bokstavsordning (två spalter på datorn). Ett lag öppnar
+  **lagkortet** (nedan), med omgångens match överst.
+- **Spelarna** – lagens skyttar, flest mål först. En spelare öppnar **spelarkortet** (nedan).
+
+Sökraden söker i hela registret, också lag och spelare utanför omgången: man skriver ett namn
+(eller *sök isak*) och trycker Enter. En siffra och Enter väljer raden med det numret.
 
 - **Spelaren** – efternamn och förnamn, laget, numret och platsen, *Läget* (skadad,
   tveksam eller avstängd med skadan, annars spelklar – bara när laget har en skadelista),
@@ -6077,12 +6105,18 @@ Man skriver ett namn (eller *sök isak*) och trycker Enter:
   säsongens) med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem. Två lag i
   frågan (*arsenal hull*) ger mötet.
 
-Varje kort börjar med *ÅTKOMST BEVILJAD*. Bara den bästa nivån av träffar visas: ett helt
-efternamn går före ett förnamn och före namn som bara börjar så (*isak* ger Isak, inte
-Isak Alemayehu eller Isaksen), sedan den som spelar mest. Flera träffar listas numrerade
-(högst nio); en siffra eller ett tryck väljer. Omgångens matcher står numrerade när datorn
-startar. Lag, spelare och möten i utskriften går att trycka på, så att telefonen klarar sig
-utan tangentbord. ↑/↓ tar fram det man skrev förut, Esc stänger.
+Ett kort ur en sökning börjar med frågan och *ÅTKOMST BEVILJAD*. Bara den bästa nivån av
+träffar visas: ett helt efternamn går före ett förnamn och före namn som bara börjar så
+(*isak* ger Isak, inte Isak Alemayehu eller Isaksen), sedan den som spelar mest. Flera
+träffar listas numrerade (högst nio); en siffra eller ett tryck väljer.
+
+Tangenterna: Esc går tillbaka dit man var (och stänger datorn när man är längst tillbaka),
+↑/↓ markerar en rad och Enter öppnar den, ←/→ bläddrar till förra och nästa match, lapp
+eller lag (och bland flikarna när det inte finns något att bläddra i), och Tab byter flik.
+Raden längst ner säger det med tangenternas namn och går att trycka på; i telefonen står
+där *◄ Tillbaka*, *◄ Förra* och *Nästa ►* i stället. Allt i utskriften går att trycka på,
+så att telefonen klarar sig utan tangentbord; tangentbordet kommer fram först när man
+trycker på sökraden.
 
 Ett klick eller R: datorn står kvar, och kameran svänger fram och ställer sig rakt framför
 skärmen medan rummet mörknar bakom – närbilden är en egen duk över hela fönstret, och
@@ -6097,24 +6131,30 @@ kort, och närbilden ritas bara under svängen.
 
 Dolda resultat: lag- och spelarkorten visar ? när en match i lagens divisioner är dold, med
 *Visa ändå* under skärmen – samma nyckel som anslagstavlan, så att det gäller båda – och
-dolda möten står som ?. Utan WebGL står disken tom. `?rum-register` visar datorn framme i
-en fast bild, och `?rum-register=<fråga>` med den sökningen.
+dolda möten står som ?. Siffrorna från tavlan i matchakten och under *Omgången* (styrkan,
+kryssen, turen, oddsen och motståndet) får ? på samma sätt, och formen och mötena har ? för de
+dolda matcherna. Utan WebGL står disken tom. `?rum-register` visar datorn framme i
+en fast bild, `?rum-register=<fråga>` med den sökningen och `?rum-register=%23mote:<id>`,
+`%23amne:tur`, `%23flik:lagen` … med den vyn.
 
 #### Vad som står var
 
 Statistiken om omgången är fördelad efter vad varje sak är bra på, och varje siffra står på
-ett ställe (2026-11-02, användarens önskemål):
+ett ställe (2026-11-02, användarens önskemål) – utom i matchbladet och datorn, som samlar
+med flit (nedan):
 
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
 | **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror ordnade efter match och lapp | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten och under *Omgången* |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
 match på ett ställe, så dess tal står också på andra ställen – men alltid samma tal under samma
-namn, ur samma källa (konkordansen under *Matchbladet*).
+namn, ur samma källa (konkordansen under *Matchbladet*). Datorn är det andra (2026-11-11,
+användarens önskemål): den har tavlans siffror också, ordnade efter match och lapp, och ändras en
+lapp på tavlan ska datorn följa med (`TAL` i rum-register.js räknar som rum-anslag.js).
 
 Ny statistik placeras efter samma roller: det som gäller en match eller en liga nu på tv:n,
 det som jämför lagen i omgången på tavlan och det som beskriver ett lag eller en spelare i datorn.

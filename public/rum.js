@@ -13,8 +13,8 @@
 //   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
 //   bredvid, som spelas i rutan (rum-video.js)
 //   anslagstavlan lyfts ner (A): lapparna (rum-anslag.js)
-//   datorn på disken kommer nära (R): terminalen där man söker spelare, lag
-//   och möten (rum-register.js, datorn i three.js i rum-dator.js)
+//   datorn på disken kommer nära (R): terminalen med kupongen, omgången (tavlans
+//   siffror), lagen och spelarna (rum-register.js, datorn i three.js i rum-dator.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
 //   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på
 //   skivan och veckans löpsedel, rum-affischer.js) och dörren (med vilka vi
