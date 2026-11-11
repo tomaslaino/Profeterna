@@ -12,6 +12,8 @@
 //   utsikt(v, L, lage) → duken (halva bildens mått, BAK i rum-hasse-scen.js), sparad tills sig(v, L) ändras
 //   glas(x, v, L, lage, W, H) ritar glaset på väggens duk, innan väggen läggs ovanpå
 //   sig(v, L) → en sträng som ändras när utsikten behöver ritas om
+//   rutor(lage) → glasets fyra hörn i varje ruta, i väggbildens bildpunkter
+//   gangare(v, L, lage) → någon som går på bron: figuren i två steg och vägen längs bron (bron i rum-hasse.js)
 
 import { SCEN, BAK, kamera, iKamera, franBaren } from './rum-hasse-scen.js';
 
@@ -47,7 +49,7 @@ function projektion(lage) {
 }
 
 // Rutorna i väggens bild: glaset innanför karmarna, i det plan där det sitter
-function rutor(lage) {
+export function rutor(lage) {
   const { V } = projektion(lage);
   const z = SCEN.VAGG - 80;
   const k = FO.KARM;
@@ -73,7 +75,7 @@ export function utsikt(v, L, lage) {
 
 // Höjderna i utsikten (grader uppåt, negativt under ögat): stranden på andra sidan, där husen står, vattnet
 // nedanför den och spåren i skärningen närmast, ned mot bardisken. Allt står ned grader lägre i bilden.
-const E = { strand: -12.6, vatten: -13.25, spar: -16.0, ned: -1.1 };
+const E = { strand: -12.6, vatten: -13.25, spar: -16.0, ned: -2.4 };
 // Husen på andra sidan, längs stranden (az från, till, takets höjd, fasadens färg på dagen, sadeltak)
 // (samma ockra, terrakotta, gult och ljusa puts som stan genom rummets fönster, STAD i rum-ute.js)
 const HUS = [
@@ -553,4 +555,91 @@ export function glas(x, v, L, lage, W, H) {
     }
     x.restore();
   }
+}
+
+// ---------- någon på bron ----------
+
+// Någon som går på bron då och då (bron i rum-hasse.js). Figuren ritas en gång, från sidan i två steg bredvid
+// varandra, i utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt) och oskarp som det andra
+// långt borta; räcket når till midjan och ligger som ett galler över benen. Vägen är fötternas plats längs bron i väggbildens
+// bildpunkter och hur hög figuren är där (u från bortre änden vid tegelhuset till förbi bildens högra kant).
+// Sidan låter figuren glida dit med en transform, så att inget ritas om medan den går.
+export function gangare(v, L, lage, R = Math.random) {
+  const F = window.RumUte.farg;
+  const { P } = projektion(lage);
+  const KG = F.KALL ? F.KALL.gata : 0.3;
+  const kv = Math.max(0, 1 - L.dag / 0.6) * 0.2;
+  const ton = (dag, natt) => F.mix(F.mix(F.kall(F.facade(dag, natt, L), L, KG), '#000000', 0.15), '#5c3c22', kv);
+  const steg = [];
+  for (let i = 0; i <= 20; i++) {
+    const u = i / 20;
+    const a = BRO.a0 + 0.8 + (42 - 0.8 - BRO.a0) * u ** 1.5;
+    const fot = bro(a, BRO.top) + 0.04;
+    const [x, y] = P(a, fot + E.ned);
+    const [, y2] = P(a, fot + 2 * bro(a, BRO.racke) + E.ned);
+    steg.push([x, y, y - y2]);
+  }
+  // figuren: U bildpunkter hög, med plats för paraplyet ovanför och oskärpan runt om
+  const U = 60;
+  const pad = 12;
+  const B = Math.round(U * 0.55) + 2 * pad;
+  const Hd = Math.round(U * 1.18) + 2 * pad;
+  const duk = document.createElement('canvas');
+  duk.width = 2 * B;
+  duk.height = Hd;
+  const x = duk.getContext('2d');
+  const kall = v.kanns < 5;
+  // (i mörkret lyser brons lyktor lite på den, så att man anar den mot det mörka)
+  const rock = ton(kall ? ['#1c1f26', '#2b2f38', '#3a3226', '#20283a', '#5a2a2a', '#2e3a2e'][(R() * 6) | 0] : ['#6b6458', '#4a5a6a', '#8a4a3a', '#3a4a3a', '#7a6a4a'][(R() * 5) | 0], '#3a2e24');
+  const byxor = ton('#22242a', '#241e19');
+  const hud = ton('#c89878', '#5a4436');
+  const regn = v.fall === 'regn' || v.fall === 'blandat';
+  const mossa = !regn && v.temp < 3;
+  const rack = ton('#2f6243', '#080b0a');
+  if (FILTER) x.filter = 'blur(1.6px)';
+  for (let k = 0; k < 2; k++) {
+    const cx = k * B + B / 2;
+    const fy = Hd - pad;
+    const y = (t) => fy - t * U;
+    x.lineCap = 'round';
+    // benen: isär i det första steget, ihop i det andra
+    x.strokeStyle = byxor;
+    x.lineWidth = U * 0.085;
+    const isar = k ? 0.03 : 0.13;
+    for (const d of [-isar, isar]) { x.beginPath(); x.moveTo(cx, y(0.47)); x.lineTo(cx + d * U, y(0.02)); x.stroke(); }
+    // rocken och armarna
+    x.fillStyle = rock;
+    x.beginPath();
+    x.moveTo(cx - U * 0.1, y(0.8));
+    x.lineTo(cx + U * 0.1, y(0.8));
+    x.lineTo(cx + U * 0.12, y(0.36));
+    x.lineTo(cx - U * 0.12, y(0.36));
+    x.closePath();
+    x.fill();
+    x.strokeStyle = rock;
+    x.lineWidth = U * 0.06;
+    x.beginPath(); x.moveTo(cx, y(0.76)); x.lineTo(cx + (k ? 0.03 : 0.09) * U, y(0.45)); x.stroke();
+    // huvudet, och mössan eller paraplyet
+    x.fillStyle = hud;
+    x.beginPath(); x.arc(cx + U * 0.01, y(0.89), U * 0.075, 0, 2 * Math.PI); x.fill();
+    if (mossa) { x.fillStyle = byxor; x.beginPath(); x.arc(cx + U * 0.01, y(0.91), U * 0.072, Math.PI, 2 * Math.PI); x.fill(); }
+    if (regn) {
+      x.strokeStyle = byxor;
+      x.lineWidth = U * 0.02;
+      x.beginPath(); x.moveTo(cx + U * 0.02, y(0.62)); x.lineTo(cx + U * 0.02, y(1.08)); x.stroke();
+      x.fillStyle = ton(['#1c1f26', '#5a2a2a', '#20283a'][(R() * 3) | 0], '#2c241e');
+      x.beginPath(); x.ellipse(cx + U * 0.02, y(1.06), U * 0.26, U * 0.1, 0, Math.PI, 2 * Math.PI); x.fill();
+    }
+    // räcket framför benen: gallret och handledaren, som i utsikten (bara på figuren)
+    x.globalCompositeOperation = 'source-atop';
+    x.globalAlpha = 0.45;
+    x.fillStyle = rack;
+    x.fillRect(k * B, y(0.5), B, 0.5 * U + 2);
+    x.globalAlpha = 0.8;
+    x.fillRect(k * B, y(0.52), B, U * 0.045);
+    x.globalAlpha = 1;
+    x.globalCompositeOperation = 'source-over';
+  }
+  x.filter = 'none';
+  return { duk, B, H: Hd, fot: [B / 2, Hd - pad], U, steg, mot: R() < 0.5 };
 }

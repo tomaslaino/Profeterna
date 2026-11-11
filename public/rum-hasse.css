@@ -33,6 +33,11 @@
 .rh-scen canvas.rh-vagg, .rum-hasse-vy.vagg .rh-scen img.rh-bak { display: none; }
 .rum-hasse-vy.vagg .rh-scen canvas.rh-vagg { display: block; }
 .rh-disk, .rh-nota, .rh-duk { position: absolute; left: 0; top: 0; display: block; pointer-events: none; }
+/* någon som går på bron då och då (bron i rum-hasse.js): bakom glaset, inom rutorna (clip-path), och bakom honom */
+.rh-bron { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.rh-gar { position: absolute; left: 0; top: 0; }
+.rh-gar-in { width: 100%; height: 100%; overflow: hidden; }
+.rh-gar canvas { display: block; }
 /* väggen och disken mörknar bakom samtalet, så att texten går att läsa */
 .rh-mork { position: absolute; top: 0; bottom: 0; left: 0; width: var(--mork, 40%); background: linear-gradient(to right, rgba(14, 8, 4, 0.8) 72%, rgba(14, 8, 4, 0)); pointer-events: none; transition: opacity 0.32s ease-out; }
 .rum-hasse-vy.hog .rh-mork { z-index: 1; width: auto; right: 0; top: var(--mork, 46%); bottom: 0; background: linear-gradient(to bottom, rgba(18, 12, 7, 0), rgba(18, 12, 7, 0.72) 90px, rgba(18, 12, 7, 0.9) 40%, #120c07 86%); }

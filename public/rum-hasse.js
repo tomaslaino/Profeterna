@@ -70,7 +70,7 @@ window.RumHasse = (() => {
     vy.id = 'rum-hasse-vy';
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
-    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
+    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"></div><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
       '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i><i class="rh-korn" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
@@ -280,6 +280,56 @@ window.RumHasse = (() => {
     H.vaggNr = (H.vaggNr || 0) + 1;
     passa();
   }
+  // Någon som går på bron då och då (gangare i rum-hasse-ute.js), oftare på dagen och kvällen än mitt i natten.
+  // Figuren ritas en gång och glider sedan längs bron med en transform på grafikkortet (Web Animations), bakom
+  // glaset och posterna (.rh-bron, med rutorna som clip-path i passa) och bakom honom. Ingen går när man har bett
+  // om minskad rörelse eller i en fast bild (?rum-t).
+  function bronSnart(forst = false) {
+    clearTimeout(H.bronT);
+    if (!H.on || calm() || /[?&]rum-t\b/.test(location.search)) return;
+    const u = uteNu();
+    const natt = u && u.v.timme >= 1 && u.v.timme < 6 ? 3 : 1;
+    H.bronT = setTimeout(bronGa, (forst ? 3000 + Math.random() * 9000 : 15000 + Math.random() * 45000) * natt);
+  }
+  function bronGa() {
+    const u = uteNu();
+    if (!H.on || H.svanger || !H.ute || !H.ute.gangare || !H.v || !u || document.hidden || H.gar) { bronSnart(); return; }
+    const g = H.ute.gangare(u.v, u.L, uteLage());
+    const b = H.m.BAK[uteLage()];
+    const v = H.v;
+    const f = v.s / b.S;
+    const el = document.createElement('div');
+    el.className = 'rh-gar';
+    Object.assign(el.style, { width: `${g.B}px`, height: `${g.H}px`, transformOrigin: `${g.fot[0]}px ${g.fot[1]}px` });
+    const inre = document.createElement('div');
+    inre.className = 'rh-gar-in';
+    inre.append(g.duk);
+    // (vänd mot där den går: bort mot andra sidan åt vänster, hitåt åt höger)
+    if (!g.mot) inre.style.transform = 'scaleX(-1)';
+    el.append(inre);
+    $('.rh-bron').append(el);
+    const steg = g.mot ? g.steg : [...g.steg].reverse();
+    const n = steg.length - 1;
+    const ram = steg.map(([x, y, h], i) => ({
+      transform: `translate(${(v.cx + (x - b.px) * f - g.fot[0]).toFixed(1)}px, ${(v.ey + (y - b.py) * f - g.fot[1]).toFixed(1)}px) scale(${((h * f) / g.U).toFixed(3)})`,
+      opacity: i === 0 || i === n ? 0 : 1,
+      offset: i / n,
+    }));
+    const sek = 42 + Math.random() * 18;
+    const gang = el.animate(ram, { duration: sek * 1000, easing: 'linear', fill: 'both' });
+    g.duk.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${-g.B}px)` }], { duration: 1100, iterations: Infinity, easing: 'steps(2, jump-none)' });
+    H.gar = { el, gang, geo: [v.cx, v.ey, v.s].join() };
+    gang.onfinish = () => { if (H.gar && H.gar.el === el) bronBort(true); };
+  }
+  function bronBort(nasta = false) {
+    if (H.gar) {
+      H.gar.gang.cancel();
+      H.gar.el.remove();
+      H.gar = null;
+    }
+    clearTimeout(H.bronT);
+    if (nasta) bronSnart();
+  }
   // Utsikten genom fönstren, underst på väggens duk: ritad en gång per väder och ljus (rum-hasse-ute.js), förstorad
   // till bildens mått, och glaset med dropparna, snön och frosten. Utan den: himlen i rummets färger.
   const uteLage = () => (H.hog ? 'hog' : 'bred');
@@ -438,6 +488,12 @@ window.RumHasse = (() => {
     const b = H.m.BAK[H.hog ? 'hog' : 'bred'];
     const f = v.s / b.S;
     for (const i of H.vy.querySelectorAll('.rh-bak')) Object.assign(i.style, { left: `${(v.cx - b.px * f).toFixed(1)}px`, top: `${(v.ey - b.py * f).toFixed(1)}px`, width: `${(b.W * f).toFixed(1)}px`, height: `${(b.H * f).toFixed(1)}px` });
+    // den som går på bron syns bara genom glaset (rutorna, bron nedan); går någon när fönstret ändras får den gå klart utanför bild
+    if (H.ute && H.ute.rutor) {
+      const d = H.ute.rutor(H.hog ? 'hog' : 'bred').map((q) => `M${q.map(([x, y]) => `${(v.cx + (x - b.px) * f).toFixed(1)} ${(v.ey + (y - b.py) * f).toFixed(1)}`).join(' L')} Z`).join(' ');
+      $('.rh-bron').style.clipPath = `path('${d}')`;
+    }
+    if (H.gar && H.gar.geo !== [v.cx, v.ey, v.s].join()) bronBort(true);
     // pulten: ritas en gång, med väggen i träets glans (medan fönstret ändras först när det har stannat)
     let disk = Promise.resolve();
     if (H.fig) {
@@ -661,6 +717,7 @@ window.RumHasse = (() => {
     H.on = true;
     H.oppnar = false;
     H.T = 0;
+    bronSnart(true);
     // (har det gått dåligt för honom läser han redan när man kommer)
     if (H.upptagen) lasNu();
     // rummet står still medan man tittar åt hans håll, och rätar upp sig efter musen på vägen
@@ -701,6 +758,7 @@ window.RumHasse = (() => {
       if (H.rum.hidden) {
         bladetUt(true);
         H.on = false;
+        bronBort();
         H.fraga = null;
         tystna();
         if (H.kupong) H.kupong.stang();
@@ -755,6 +813,7 @@ window.RumHasse = (() => {
     if (window.RumBak) RumBak.bort('hasse');
     bladetUt(true);
     H.on = false;
+    bronBort();
     H.fraga = null;
     tystna();
     if (H.kupong) H.kupong.stang();

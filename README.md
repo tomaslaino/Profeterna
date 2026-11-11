@@ -1113,6 +1113,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   per väder och ljus. Samma dag: "Det ser lite grynigt ut där i trät och metallen där bakom hasse ... det är samma
   ställe!" Karmarna är matta som i rummet, och ett kantbevarande filter tar kornet efter bakningen
   (scripts/hasse/README.md). Se [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Höghuset hela, och någon på bron (2026-11-11, användarens önskemål):** "Sänk utsikten lite så att höghusets
+  topp syns hela", "Ha gärna någon som går på bron lite då och då" och "Det ska inte dra en massa grafik!".
+  Utsikten står 1,3° lägre, och då och då går någon längs bron: en figur som ritas en gång och glider med en
+  transform, bara medan den går. Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -6257,8 +6261,16 @@ skärpedjup gör det som är långt borta, med lyktorna som oskarpa skivor. Den 
 rum-hasse.js) med väggen ovanpå, som är genomskinlig i fönstren, så den kostar ingenting medan man sitter hos honom
 (omkring 25 ms att rita, och högst en gång i minuten), och disken speglar den med väggen. Kameran ser 14° nedåt, så
 genom fönstren skulle man egentligen mest se spåren under bron; utsikten är lyft, så att himlen, tornen och bron
-syns. Förut var väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*,
-tidningsbunten, kaffebryggaren och kassan (ändrat 2026-11-10).
+syns; sedan 2026-11-11 står den ytterligare 1,3° lägre (`E.ned`), så att höghusets topp syns hela med himmel
+ovanför också där skärmens överkant skär väggens bild (y ≈ 37 i den breda bilden, 21 på höjden). Då och då går
+någon på bron (`gangare` i rum-hasse-ute.js, `bron` i rum-hasse.js): var 15–60:e sekund, glesare mitt i natten,
+från tegelhuset hitåt eller bort, i promenadtakt (42–60 s). Figuren ritas en gång, från sidan i två steg, i
+utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt, lite sken från lyktorna i mörkret), med
+räcket som ett galler upp till midjan, och glider sedan längs bron med en transform på grafikkortet; benen byter
+steg med en stegvis förflyttning i samma duk. Den syns bara genom glaset (rutorna som clip-path) och går bakom
+honom. Inget ritas om medan den går, och ingen går med minskad rörelse eller i en fast bild (`?rum-t`). Förut var
+väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
+kaffebryggaren och kassan (ändrat 2026-11-10).
 
 **Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, vit som i baren
