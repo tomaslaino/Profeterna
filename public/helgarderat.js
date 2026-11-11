@@ -27,7 +27,6 @@
       rot.innerHTML = RT.tidning(u);
       rot.removeAttribute('aria-busy');
       passa();
-      RT.rastrera(rot);
       RT.bildfel(rot);
       addEventListener('resize', passa);
       tillLanken();

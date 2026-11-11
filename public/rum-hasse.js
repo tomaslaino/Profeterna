@@ -568,8 +568,6 @@ window.RumHasse = (() => {
         e.className = `rh-pa ${kl}`;
         e.innerHTML = kl === 'kup' ? `<span class="rum-kup rh-pa-kup">${html}</span>` : kl === 'hg' ? `<span class="rh-pa-hg">${html}</span>` : html;
         e.html = html;
-        // (veckans bild på tidningens framsida är en duk, som ritas på nytt i kopian)
-        if (kl === 'hg' && window.RumTidning) RumTidning.rastrera(e);
         H.papper[kl] = e;
       }
       Object.assign(e.style, { width: `${s.w}px`, height: `${s.h}px`, transform: p.form, clipPath: p.klipp });

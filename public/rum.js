@@ -3751,8 +3751,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.tidning) return;
     hamtaTidning();
   }
-  // Omslaget på pulten, när det har ändrats (i fill, och när numret har kommit), med bilden rastrerad (--z i
-  // rum-tidning.css: 1,75 gånger omslaget).
+  // Omslaget på pulten, när det har ändrats (i fill, och när numret har kommit), 1,75 gånger omslaget (--z i
+  // rum-tidning.css).
   function tidningPult() {
     const a = R.el && R.el.querySelector('#rum-helgarderat');
     if (!a || !window.RumTidning || !RumTidning.forsta) return;
@@ -3760,7 +3760,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (a.skrivet === html) return;
     a.skrivet = html;
     a.innerHTML = html;
-    RumTidning.rastrera(a);
   }
   // Ett klick på tidningen, eller L: numret hämtas först (högst ett par sekunder), och sedan lyfts den från pulten och
   // läggs fram.
@@ -3852,7 +3851,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.vilar = true;
     lager('tidningen', () => tidningen(false));
     passaTidning();
-    RumTidning.rastrera(el);
     RumTidning.bildfel(el);
     // pilarna, mellanslag och Page Down bläddrar i tidningen
     el.focus({ preventScroll: true });

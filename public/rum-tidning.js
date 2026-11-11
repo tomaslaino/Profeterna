@@ -5,13 +5,12 @@
 // Tidningen Helgarderat: det supportrarna vet inför lördagens matcher. Det finns en enda tidning (2026-11-11,
 // användarens önskemål: "Det ska alltså bara finnas en tidning"), och den ritas här, av samma kod på sajtens sida
 // (helgarderat.html, helgarderat.js) och på pulten i tobaksaffären (tidningPult och tidningen i rum.js, och hos Hasse
-// Backe, pultPapper i rum-hasse.js). Utseendet är det gula matchprogrammet (helgarderat.css). Tidningen är tre delar,
-// inget mer (bestämt del för del samma dag):
+// Backe, pultPapper i rum-hasse.js). Utseendet står i helgarderat.css. Tidningen är tre delar, inget mer (bestämt del
+// för del samma dag):
 //
-//   Omslaget     numret och veckan, priset, namnet på ett rött band, lördagens datum, en stor bild med programmets
-//                märke (veckodagen, rutorna 1, X och 2 ikryssade: helgarderat, och antalet matcher) och matchens
-//                rubrik. 100 × 140, förstorat med zoom: litet på pulten och så stort som ryms när tidningen läses
-//                (passa).
+//   Omslaget     på kupongens papper, utan bild: numret och veckan, priset, namnet, lördagens datum, rutorna 1, X
+//                och 2 ikryssade med pennan (helgarderat) och den första matchen med sin rubrik. 100 × 140, förstorat
+//                med zoom: litet på pulten och så stort som ryms när tidningen läses (passa).
 //   Kupongen     innehållet: Stryktipset i programmets eget tryck efter omslaget, en rad per match med numret och
 //                lagen mot varandra, och raden leder till matchbladet. Ingen text, inga tider och inga sidnummer.
 //   Matchbladen  ett per match, från sidan 2: rubriken, bilden, introduktionen, hemmalaget, bortalaget och
@@ -32,8 +31,7 @@
 // RumTidning.tidning(upplaga) → html: omslaget, kupongen och matchbladen, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
 // RumTidning.passa(rot, bredd, hojd) förstorar omslaget så att det ryms och krymper kupongens lagnamn när de inte ryms.
-// RumTidning.rastrera(rot) ritar omslagets bild på sin duk, svartvit och rastrerad, och RumTidning.bildfel(rot) ger
-// en bild i matchbladen som inte går att hämta lagets sköld.
+// RumTidning.bildfel(rot) ger en bild i matchbladen som inte går att hämta lagets sköld.
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -76,8 +74,6 @@
       vecka: (v) => `Vecka ${v}`,
       pris: '3 kr',
       prov: 'Provnummer',
-      foto: (f) => `Foto: ${f}`,
-      matcher: (n) => `${n} matcher`,
     },
     kupongen: {
       stryktipset: 'Stryktipset',
@@ -220,25 +216,6 @@
     const l = n && Array.isArray(n.bilder) ? [0, 1].map((i) => (n.bilder[i] && n.bilder[i].fil ? { ...n.bilder[i], src: `data/tidning-bilder/${n.bilder[i].fil}`, lag: (s.lag || [])[i] } : null)) : [];
     return l.some(Boolean) ? { tva: l } : null;
   }
-  // Omslaget har en enda bild, inte lagen bredvid varandra (2026-11-11, användarens önskemål: "bara en bild istället
-  // för allt det här plottriga"): matchens egen, annars ett av lagens foton, helst ett ur en artikel (miniatyren till
-  // BBC:s videor har tv-grafiken över högra halvan, och på omslaget syns bara den vänstra: video), annars hemmalagets.
-  // → { src, lag, video, … } eller null
-  const VIDEO = /bbc\.co\.uk\/sport\/.*\/videos\//;
-  function enBild(u, s) {
-    const b = bilderna(u, s);
-    if (!b) return null;
-    const l = (b.en ? [b.en] : b.tva.map((x, i) => x && { ...x, lag: x.lag || (s.lag || [])[i] })).filter(Boolean)
-      .map((x) => ({ ...x, video: VIDEO.test(x.sida || '') }));
-    return l.find((x) => !x.video) || l[0] || null;
-  }
-  // Fotografen eller sajten, så kort som under en tidningsbild (Getty Images, BBC Sport).
-  function fotograf(b) {
-    const f = String(b.foto || '');
-    if (/getty/i.test(f)) return 'Getty Images';
-    if (f) return f.split('/').pop().replace(/^\s*\(?photo by\s*/i, '').replace(/[()]/g, '').trim() || null;
-    return String(b.kalla || '').split(/\s+[-–|]\s+/)[0].trim() || null;
-  }
   // Fotografen och källan: Jane Doe, BBC Sport (8 nov).
   const fotoAv = (b) => [b.foto, b.kalla].filter(Boolean).join(', ') + (b.datum && kortDatum(b.datum) ? ` (${kortDatum(b.datum)})` : '');
   // Bilden överst på matchbladet. Lagens sköldar mot varandra står under bilden och syns när det inte finns någon bild
@@ -276,13 +253,11 @@
 
   // ---------- upplagan ----------
 
-  // Omslagets match: den med mest i, helst där båda lagen har något, och bland dem den första med en bild. Samma
-  // nummer ger samma omslag.
+  // Omslagets match: den med mest i, helst där båda lagen har något. Samma nummer ger samma omslag.
   const vikt = (s) => s.delar.reduce((a, d) => a + poddText(d).join(' ').length, 0) + (s.delar.filter(harInnehall).length > 1 ? 400 : 0);
   function ettan(u) {
-    const l = u.sidor.slice().sort((a, b) => vikt(b) - vikt(a) || a.nr - b.nr);
-    const s = l.find((x) => enBild(u, x)) || l[0];
-    return s ? { sida: s, bild: enBild(u, s) } : null;
+    const s = u.sidor.slice().sort((a, b) => vikt(b) - vikt(a) || a.nr - b.nr)[0];
+    return s ? { sida: s } : null;
   }
   // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov) och veckans tidning
   // (data/tidning.json, för bilderna). Kupongen är omgångens alla matcher i kupongens ordning (data.matcher, också de
@@ -322,52 +297,40 @@
 
   // ---------- omslaget ----------
 
-  // Rutorna 1, X och 2 som på kupongen, alla ikryssade: helgarderat. Kryssen är dragna lite olika och går en bit
-  // utanför rutan. De står i programmets märke på omslaget, med sin klass (kl).
+  // Rutorna 1, X och 2 som på kupongen, alla ikryssade med pennan: helgarderat. Kryssen är dragna med fart, lite
+  // olika, och går en bit utanför rutan.
   const KRYSS = [
-    'M4.5 6.2 C13 14.6 24 25.8 35.6 35.1 M34.2 4.6 C25.8 14.1 15.6 25.2 5.3 36.4',
-    'M5.6 4.9 C14.6 14.2 23.4 23.6 34.6 36.2 M36.1 6.4 C26.6 15 15.2 26 3.9 34.6',
-    'M3.8 7.1 C12.8 15.2 25.4 24.4 36.3 34 M33.4 3.9 C26.3 13.5 17 26.1 7.2 37.1',
+    'M1.6 3.2 C9 11.5 19 21.6 30.5 31.8 C33.5 34.4 36.4 37 38.9 39.6 M37.4 1.4 C29.5 9.8 19.8 20.7 11.6 29.6 C8.4 33 5.2 36.4 2.4 39.9',
+    'M3.1 1.8 C10.6 10.4 20.4 22.2 29.8 31.4 C32.6 34.2 35.6 36.9 38.2 38.6 M39.6 4.1 C30.2 12.4 21.6 21 13.4 29.7 C10.1 33.1 6.4 36.4 1.4 38.2',
+    'M2.2 2.6 C11.4 10.8 21.2 20.4 30.9 30.2 C33.9 33.2 36.2 35.8 39.4 38.1 M36.1 2.2 C28.9 11.6 20.2 21.4 12.6 30.1 C9.2 33.9 5.9 37.2 3.4 40.4',
   ];
   const rutor = (kl = 'hf-rutor') => `<svg class="${kl}" viewBox="0 0 134 64" aria-hidden="true">${SIGNS.map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
     `<text x="19.5" y="15" text-anchor="middle">${t}</text><g transform="translate(0 23.2)"><rect width="39" height="39" class="r"/><path d="${KRYSS[i]}" class="k"/></g></g>`).join('')}</svg>`;
-  // Rubriken på omslaget: det som kommer efter det första kommatecknet eller tankstrecket, oftast det andra laget,
-  // i rött.
-  function tvafarg(r) {
-    const t = String(r).match(/^(.+?(?:,| –))\s+(.+)$/);
-    return t ? `${esc(hel(t[1]))} <span>${esc(hel(t[2]))}</span>` : esc(hel(r));
-  }
-  const duk = (src, reserv, kl, w, h) => `<canvas class="${kl}" width="${w}" height="${h}" data-bild="${esc(src)}"${reserv ? ` data-reserv="${esc(reserv)}"` : ''}></canvas>`;
 
-  // Omslaget, 100 × 140, bara det som står på ett programomslag (2026-11-11, användarens val: "Bara omslaget"):
-  // numret och veckan, priset, namnet på det röda bandet, lördagens datum, en stor bild med märket över hörnet och
-  // matchens rubrik med fotografen. Bilden är tryckt direkt på det gula papperet (genom) och fyller det som blir över;
-  // utan foto står lagens sköldar där. I tidningen (lankar) går bilden och rubriken till matchbladet; på pulten ligger
-  // omslaget i en länk och har inga egna.
+  // Omslaget, 100 × 140 (2026-11-11, användarens val bland fyra skisser: C, Helgarderingen, "Skippa den där extrainfon
+  // med '13 matcher'"): på kupongens papper och utan bild. Numret, veckan och priset maskinskrivna överst, namnet och
+  // lördagens datum tryckta, rutorna 1, X och 2 ikryssade med pennan i mitten, och nertill den första matchen med sin
+  // rubrik. I tidningen (lankar) går rutorna till kupongen och matchen till sitt matchblad; på pulten ligger omslaget i
+  // en länk och har inga egna. Utan upplaga står bara namnet och rutorna.
   function forsta(u, lankar = false) {
     const G = TEXT.forsta;
     const dag = u && Number.isFinite(u.lordag) ? new Date(u.lordag) : null;
     const nr = !u ? null : u.prov ? 0 : dag ? nummer(dag) : null;
     const over = [nr != null ? G.nr(nr) : '', dag ? G.vecka(vecka(dag)) : ''].filter(Boolean).join(' · ');
-    const antal = u ? u.kupongen.length : 0;
-    const marke = dag && antal ? `<span class="hf-marke" aria-hidden="true"><span>${esc(fVdagLang.format(dag))}</span>${rutor()}<span>${esc(G.matcher(antal))}</span></span>` : '';
-    let bild = '';
+    const mitt = lankar && u ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(spelet(u))}">${rutor()}</a>` : `<div class="hf-mitt">${rutor()}</div>`;
+    let ettan = '';
     if (u && u.ettan) {
       const s = u.ettan.sida;
-      const b = u.ettan.bild;
       const lag = s.lag || [];
-      const foto = b ? duk(b.src, skoldSrc(b.lag || lag[0]), `hf-foto genom${b.video ? ' video' : ''}`, 640, 480)
-        : `<span class="hf-foto hf-skoldar">${lag.slice(0, 2).map((x) => (skoldSrc(x) ? duk(skoldSrc(x), '', 'skold genom', 160, 160) : '<span></span>')).join('<i>–</i>')}</span>`;
-      const av = b ? fotograf(b) : '';
-      const fig = `<figure class="hf-bild"><span class="hf-omslag">${foto}${marke}</span>` +
-        `<figcaption><b>${tvafarg(s.rubrik || TEXT.poddar.rubrik(lag[0], lag[1]))}</b>${av ? `<small>${esc(G.foto(av))}</small>` : ''}</figcaption></figure>`;
-      bild = lankar ? `<a class="hf-till" href="#hg-sida-${u.sida.get(s.nr)}">${fig}</a>` : fig;
+      const inne = `<span class="hf-lagen">${esc(kort(lag[0]))} – ${esc(kort(lag[1]))}</span>` +
+        `<span class="hf-rub">${esc(hel(s.rubrik || TEXT.poddar.rubrik(lag[0], lag[1])))}</span>`;
+      ettan = lankar ? `<a class="hf-ettan" href="#hg-sida-${u.sida.get(s.nr)}">${inne}</a>` : `<div class="hf-ettan">${inne}</div>`;
     }
-    return `<div class="hf-forsta${bild ? '' : ' utan-bild'}" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
-      `<div class="hf-linje"><b>${esc(over)}</b>${u && u.prov ? `<em>${esc(G.prov)}</em>` : ''}<span>${esc(G.pris)}</span></div>` +
-      `<div class="hf-namn"><b>${NAMN.toUpperCase()}</b></div>` +
+    return `<div class="hf-forsta" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
+      `<div class="hf-linje"><span>${esc(over)}</span>${u && u.prov ? `<em>${esc(G.prov)}</em>` : ''}<span>${esc(G.pris)}</span></div>` +
+      `<div class="hf-namn">${NAMN}</div>` +
       `<div class="hf-dagen">${dag ? `<span>${esc(`${fVdagLang.format(dag)} ${fDagMan.format(dag)}`)}</span>` : ''}</div>` +
-      (bild || marke) + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
+      mitt + ettan + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
   // Omslaget så stort som ryms: högst bredden, och så högt att det mesta syns på skärmen, men inte smalare än 360 px
   // eller bredare än 660 (pulten i rum.js och sajten, helgarderat.js). Papperets mönster delas med förstoringen
@@ -459,79 +422,5 @@
     return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') : omslag;
   }
 
-  // Omslagets bild: svartvit och rastrerad, ritad en gång på sin duk (CSS-blandning kostar i telefonen). Ett foto som
-  // inte går att hämta ger lagets sköld (data-reserv). Miniatyren till BBC:s videor (video) förstoras mot vänstra
-  // kanten, så att tv-grafiken till höger inte kommer med.
-  function rastrera(rot) {
-    for (const c of rot.querySelectorAll('canvas[data-bild]')) {
-      const img = new Image();
-      img.onerror = () => {
-        if (!c.dataset.reserv || img.src.endsWith(c.dataset.reserv)) return;
-        c.classList.add('skold');
-        img.src = c.dataset.reserv;
-      };
-      img.onload = () => {
-        const x = c.getContext('2d', { willReadFrequently: true });
-        const { width: W, height: H } = c;
-        const iw = img.naturalWidth;
-        const ih = img.naturalHeight;
-        // (genom: trycket ligger direkt på papperet, utan någon vit ruta)
-        const genom = c.classList.contains('genom');
-        x.clearRect(0, 0, W, H);
-        if (c.classList.contains('skold')) {
-          const k = (Math.min(W / iw, H / ih) * 0.78);
-          if (!genom) {
-            x.fillStyle = '#fff';
-            x.fillRect(0, 0, W, H);
-          }
-          x.drawImage(img, (W - iw * k) / 2, (H - ih * k) / 2, iw * k, ih * k);
-        } else {
-          const k = Math.max(W / iw, H / ih);
-          // lite mer av överkanten
-          let dx = (W - iw * k) / 2;
-          let dy = (H - ih * k) * (W > H * 1.3 ? 0.35 : 0.5);
-          let s = 1;
-          if (c.classList.contains('video')) {
-            // 1,8 gånger, mot vänstra kanten och en tiondel ner
-            s = 1.8;
-            dx *= s;
-            dy = (dy - H * 0.1) * s + H * 0.1;
-          }
-          x.drawImage(img, dx, dy, iw * k * s, ih * k * s);
-        }
-        let d;
-        try { d = x.getImageData(0, 0, W, H); } catch (e) { return; }
-        const p = d.data;
-        const ruta = Math.max(4, Math.round(W / 60));
-        for (let y = 0; y < H; y++) {
-          for (let i = 0; i < W; i++) {
-            const o = (y * W + i) * 4;
-            // (det genomskinliga är papper)
-            const a = genom ? p[o + 3] / 255 : 1;
-            const g = Math.min(1, Math.max(0, ((a * (0.3 * p[o] + 0.59 * p[o + 1] + 0.11 * p[o + 2]) / 255 + 1 - a) - 0.5) * 1.25 + 0.55));
-            // punkternas storlek efter hur mörkt det är: 45 grader, med tonen kvar under
-            const uu = ((i + y) / ruta) % 1;
-            const vv = ((i - y + 4 * H) / ruta) % 1;
-            const r = Math.hypot(uu - 0.5, vv - 0.5) / 0.71;
-            const v2 = g * 0.72 + (r < 1 - g ? 0 : 0.28);
-            if (genom) {
-              // svärtan som täckning: papperet lyser igenom där trycket är ljust
-              p[o] = 28;
-              p[o + 1] = 24;
-              p[o + 2] = 18;
-              p[o + 3] = Math.round((1 - v2) * 255);
-              continue;
-            }
-            p[o] = 28 + v2 * 208;
-            p[o + 1] = 24 + v2 * 208;
-            p[o + 2] = 18 + v2 * 200;
-          }
-        }
-        x.putImageData(d, 0, 0);
-      };
-      img.src = c.dataset.bild;
-    }
-  }
-
-  return { hamta, upplaga, tidning, forsta, passa, rastrera, bildfel, nummer, rutor, TEXT };
+  return { hamta, upplaga, tidning, forsta, passa, bildfel, nummer, rutor, TEXT };
 });
