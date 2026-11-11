@@ -549,5 +549,21 @@ export async function kortlada(o) {
     return F.box;
   }
 
+  // Grafikprogrammen byggs i bakgrunden innan lådan ritas första gången (som gänget i rum-3d.js),
+  // så att huvudtråden inte står still strax efter att rummet visats. Korten finns inte än (deck), så
+  // ett prov av varje sorts material står i lådan medan programmen byggs. Proven behålls (dispose
+  // skulle kasta programmen), och korten får samma program eftersom de har samma sorts material.
+  try {
+    const prov = new THREE.Group();
+    const pg = new THREE.BoxGeometry(1, 1, 1);
+    for (const m of [
+      ...Object.values(M),
+      mat('#8d8a80', { transparent: true, opacity: 0.86, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.15, envMapIntensity: 1 }),
+      new THREE.MeshBasicMaterial({ map: M.kort.map, transparent: true, toneMapped: false }),
+    ]) mesh(pg, m, prov, false);
+    kort.add(prov);
+    await gl.compileAsync(scene, cam);
+    kort.remove(prov);
+  } catch (err) { /* då byggs de när lådan ritas, som förut */ }
   return { deck, paint, open, pick, hover, rise, hide, rect, tilt, resize, box: () => S.box };
 }

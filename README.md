@@ -237,6 +237,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   förlust. Rummet klart i Chrome som telefon på långsamt nät efter 17,0 → 14,3 sekunder, på 4G
   8,5 → 8,1 (11,4 → 10,8 med en långsammare processor), i datorn oförändrat ungefär 2 sekunder; bilden jämförd bildpunkt för bildpunkt (se
   [Mindre filer](#mindre-filer))
+- [x] **Smidigare i telefonen och installerbar (2026-11-11, användarens önskemål):** "det vore kul om det
+  gick att få till så att allt gick lite fortare och smidigare och animationen flöt lite bättre", med samma
+  grafik. Kortlådan, Hasse Backes händer på pulten och Hasse i baren bygger nu sina grafikprogram i
+  bakgrunden innan de ritas första gången (`compileAsync`, som gänget, sakerna och inredningen redan
+  gjorde), så att huvudtråden inte står still mitt i det första man gör. Sajten har ett manifest
+  ([public/manifest.webmanifest](public/manifest.webmanifest)) och går att lägga på hemskärmen i
+  telefonen som en app – egen ikon, öppnas utan webbläsarens list (se [Mindre filer](#mindre-filer))
 - [x] **Gängets kupong i realtid (2026-11-08, användarens önskemål):** den som fyller i gängets
   kupong i uppgörelsen – på papperet eller på pulten i tobaksaffären – gör det på allas kupong.
   Kryssen, det klubbade och *Börja om* syns direkt hos alla som ser kupongen, och knappen blir
@@ -458,6 +465,24 @@ shaderprogram åt fem WebGL-dukar (kortlådan, gänget, sakerna, inredningen och
 5–10 sekunder i datorn med tom shadercache – mer än allt ovan. Sedan har webbläsaren dem sparade.
 Färre program kräver färre olika material eller en gemensam duk, alltså ändringar i rum-3d.js,
 rum-saker.js och rum-inredning.js; det är inte gjort.
+
+**Grafikprogrammen i bakgrunden (2026-11-11):** kortlådan (rum-kortlada.js), Hasses händer på pulten
+(rum-hasse-hand.js) och Hasse i baren (`figuren` i rum-hasse-3d.js) byggde sina program när de ritades första
+gången, och då står huvudtråden still tills grafikdrivern är klar: kortlådan strax efter att rummet
+visats, händerna ungefär en sekund senare och Hasse när man går till honom (panoreringen). Nu byggs de med
+`compileAsync` innan de ritas, som gänget, sakerna och inredningen. Kortlådan har inga kort förrän
+`deck`, så ett prov av varje sorts material står i lådan medan programmen byggs; proven kasseras inte
+(`dispose` skulle kasta programmen), och korten får samma program. Mätt i headless Chrome som telefon
+(412 × 915, SwiftShader), tiden huvudtråden väntade på drivern: kortlådan 810 → 62 ms, händerna
+113 → 15 ms, Hasse 450 → 163 ms (en del av hans program byggs fortfarande om vid första bilden, när
+ljuset och skuggorna är satta). Samma bild före och efter (`?rum-t=4`, rummet, kortregistret och videon
+jämförda bildpunkt för bildpunkt: inom bruset).
+
+**Hemskärmen:** [public/manifest.webmanifest](public/manifest.webmanifest) med ikonerna
+`ikon-192.png`, `ikon-512.png` och `ikon-maskbar-512.png` (logon, den maskbara med terrakotta ut till
+kanten för Androids runda och rundade ikoner), länkat från alla sidor utom de två som bara leder vidare.
+I Chrome i Android: menyn → *Lägg till på startskärmen* (*Installera app*). Sidan öppnas då utan
+adressfält och flikar. Ingen service worker: sidan fungerar inte utan nät och hämtas som förut.
 
 ## Lokalt
 

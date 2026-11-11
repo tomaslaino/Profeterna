@@ -276,6 +276,13 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
     raf = requestAnimationFrame(steg);
   }
 
+  // Grafikprogrammen byggs i bakgrunden innan händerna ritas första gången (som gänget i rum-3d.js):
+  // annars står huvudtråden still medan grafikdrivern bygger dem, i telefonen 100–300 ms strax efter
+  // att rummet visats – ofta mitt i det första man gör.
+  try {
+    await r.compileAsync(S, cam);
+    await r.compileAsync(S2, cam2);
+  } catch (err) { /* då byggs de när händerna ritas, som förut */ }
   placera();
   return {
     trumma,

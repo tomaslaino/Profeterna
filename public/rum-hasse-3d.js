@@ -4830,6 +4830,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     C.setViewOffset(v.W, v.H, v.W / 2 - v.cx + v.x, v.H / 2 - v.ey + v.y, v.w, v.h);
     rita(sistaT, sistaN);
   }
+  // Grafikprogrammen byggs i bakgrunden innan han ritas första gången (som gänget i rum-3d.js):
+  // annars står huvudtråden still medan grafikdrivern bygger dem, och panoreringen till honom
+  // hackar. Panoreringen väntar ändå på bygget (bygg i rum-hasse.js).
+  try {
+    await r.compileAsync(S, C);
+  } catch (err) { /* då byggs de när han ritas, som förut */ }
   return {
     rita,
     kamera,
