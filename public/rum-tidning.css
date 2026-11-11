@@ -287,15 +287,15 @@
 
 /* ---------- på pulten (tidningPult i rum.js) ---------- */
 
-/* Förstasidan upp, förstorad --z gånger. Den ligger till höger om kupongen, med överkanten vid pultens bakkant, och
-   högen ligger på dess nedre del: --z gör att numret, namnet, rubriken och kupongens första rader syns ovanför
-   kupongerna (HOG i rum.js). Lite snett och platt i pultens perspektiv, i rummets ljus och med ett veck på mitten,
-   vriden kring överkanten. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån (UPPE, samma
+/* Förstasidan upp, förstorad --z gånger. Den ligger hel till höger om högen med de inlämnade kupongerna (HOG i rum.js),
+   med överkanten vid pultens bakkant; askkoppen, dosan och fläkten står bakom högen (rum-saker.js). Förut låg den
+   bakom högen, med kupongerna på dess nedre del (ändrat 2026-11-11). Lite snett och platt i pultens perspektiv, i
+   rummets ljus och med ett veck på mitten, vriden kring överkanten. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån (UPPE, samma
    funktioner). Samma tidning ligger på pulten hos Hasse Backe (.rh-pa-hg, pultPapper i rum-hasse.js). */
 #rum-helgarderat, .rh-pa-hg { --z: 1.75; }
 #rum-helgarderat {
-  --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(4deg) scale(1);
-  position: absolute; left: calc(1222px - var(--z) * 50px); top: 660px; width: calc(var(--z) * 100px); height: calc(var(--z) * 140px); overflow: hidden;
+  --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(-3deg) scale(1);
+  position: absolute; left: calc(1415px - var(--z) * 50px); top: 664px; width: calc(var(--z) * 100px); height: calc(var(--z) * 140px); overflow: hidden;
   transform: var(--vila); transform-origin: 50% 0;
   /* tunt papper som ligger an mot pulten: skuggan tätt intill, bara lite mer nertill där det buktar upp */
   box-shadow: 0 0.6px 1px rgba(0, 0, 0, 0.55), 0 3px 7px rgba(0, 0, 0, 0.32);

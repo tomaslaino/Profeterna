@@ -23,7 +23,7 @@
 //   fram till den på pulten.
 //   högen bredvid: de inlämnade kupongerna med baksidan upp; din egen tas i
 //   handen därifrån när du har lämnat in, de andras när du ser deras tips.
-//   Helgarderat bakom högen (L): veckans tidning, med namnet och rubriken
+//   Helgarderat till höger om högen (L): veckans tidning, med namnet och rubriken
 //   ovanför kupongerna; den tas upp och läses (tidningen, rum-tidning.js).
 //   kupongstället på disken (N): en blank kupong för nästa omgång – veckans
 //   Stryktips – tas i handen, bara att titta på (openStall).
@@ -650,7 +650,7 @@ window.Rum = (() => {
       `${kopp}<span class="anga" aria-hidden="true"><i></i><i></i></span></a>`;
   }
 
-  // Helgarderat ligger till höger om kupongen, bakom högen, som ligger på dess nedre del: ett klick, eller L, och
+  // Helgarderat ligger hel till höger om högen med de inlämnade kupongerna: ett klick, eller L, och
   // man tar upp den och läser (tidningen). Framsidan skrivs i fill (tidningPult).
   const tidningHtml = () => `<a class="rum-sak" id="rum-helgarderat" ${KNAPP} aria-label="Helgarderat"></a>`;
 
@@ -1973,10 +1973,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   const T = (dx, dy, z, rx, rz, s, ry = 0) => `translate(${r1(dx)}px, ${r1(dy)}px) perspective(1300px) translateZ(${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s.toFixed(4)})`;
   const glow = (a, drop) => `0 0 0 3px rgba(240, 214, 153, ${a}), 0 0 80px rgba(240, 214, 153, ${(0.45 * a).toFixed(2)}), ${drop}`;
   // mitten (x, y) och vridningen för den första, andra och tredje i högen
-  // (askkoppen och dosan står till höger om den, i rum-saker.js: HOGEN där).
-  // Bakom högen ligger kvällstidningen, och högen ligger så långt fram, och
-  // kupongerna så tätt att namnen nätt och jämnt syns, att tidningens rubrik
-  // syns ovanför den; på höjden är kupongerna högre (420 × 620), och där
+  // (askkoppen och dosan står bakom den och Helgarderat till höger om den,
+  // i rum-saker.js: HOGEN där). Högen ligger så långt fram, och kupongerna
+  // så tätt att namnen nätt och jämnt syns, sedan tidningen låg bakom den
+  // (till 2026-11-11); på höjden är kupongerna högre (420 × 620), och där
   // ligger den ännu lite längre fram (smal).
   const HOG = { s: 0.3, at: [[1204, 874, 5], [1196, 910, -4], [1208, 946, 2]], smal: 18, skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
@@ -3725,7 +3725,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- tidningen ----------
   //
-  // Helgarderat (rum-tidning.js) ligger på pulten till höger om kupongen, bakom högen: ett klick, eller L, och den
+  // Helgarderat (rum-tidning.js) ligger på pulten till höger om högen med de inlämnade kupongerna: ett klick, eller L, och den
   // lyfts och läggs fram över rummet, som står still så länge. Efter omgången (R.summa) handlar den om omgången som
   // är spelad, och före den om omgången som kommer: matcherna, notiserna ur data/tidning.json och Veckans analys ur
   // data/analyser.json. Numret gäller omgången som rummet visar, också när den är spelad utan sammanställning (dolda
@@ -3871,8 +3871,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (typeof loadAnalyser === 'function') loadAnalyser();
   }
   // Framsidan på pulten, när den har ändrats (i fill, och när notiserna har kommit: veckans bild står i dem), med
-  // bilden rastrerad. Den är så stor (--z i rum-tidning.css) att namnet, numret och bilden syns ovanför kupongerna i
-  // högen (HOG).
+  // bilden rastrerad (--z i rum-tidning.css: 1,75 gånger framsidan).
   function tidningPult() {
     const a = R.el && R.el.querySelector('#rum-helgarderat');
     if (!a || !window.RumTidning || !RumTidning.forsta) return;
@@ -3908,7 +3907,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Tidningen lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka. (UPPE: samma
   // funktioner i samma ordning som --vila i rum-tidning.css, så att den glider dit)
-  const UPPE = 'perspective(1100px) translate3d(-240px, -60px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.3)';
+  const UPPE = 'perspective(1100px) translate3d(-434px, -60px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.3)';
   function lyft(a, bort) {
     for (const x of a.getAnimations()) x.cancel();
     if (bort) a.classList.remove('uppe');

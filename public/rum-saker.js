@@ -1,4 +1,4 @@
-// Sakerna i tobaksaffären (rum.js): på pulten till höger om högen med de
+// Sakerna i tobaksaffären (rum.js): på pulten bakom högen med de
 // inlämnade kupongerna, i three.js som gänget (rum-3d.js), en askkopp i bärnstensfärgat glas med fimpar och en cigarett som ryker i
 // ett av spåren, en öppen snusdosa med locket bredvid och, bara när det är
 // varmt i Stockholm, en gulnad bordsfläkt som svänger fram och tillbaka och
@@ -19,9 +19,11 @@
 // röken. ?rum-slit=0…1 bestämmer slitaget (för bilder).
 //
 // Fikat på vissa dagar – semlor, pepparkakor, lussekatter och annat från
-// konditoriet – står till höger om högen där det får plats (rum-fika.js).
-// Bakom högen ligger tidningen Helgarderat (#rum-helgarderat i rum.js),
-// och där står inget, så att den syns och går att ta.
+// konditoriet – står bakom högen där det får plats (rum-fika.js).
+// Till höger om högen ligger tidningen Helgarderat (#rum-helgarderat i rum.js),
+// och där står inget, så att den syns och går att ta (2026-11-11; förut låg
+// tidningen bakom högen, med kupongerna på dess nedre del, och sakerna stod
+// där tidningen ligger nu).
 //
 // saker(el, { calm, short, namn }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }), rubrik() }
 // (syns: pulten ritas, rum.js; kval: hur fint, KVAL i rum.js; short och namn: lagen och gänget på löpsedeln;
@@ -34,27 +36,28 @@ import { affischer } from './rum-affischer.js';
 const DEG = Math.PI / 180;
 const D = 1400;
 const ELEV = 34 * DEG;
-// Sakerna står till höger om högen, kring O i pultens plan (före planets
-// skala 1,095 kring mitten: x ≤ 1530 och y ≤ 850 syns i alla fönster).
-// Duken är större åt vänster och uppåt, så att röken får plats när fläkten
-// blåser den åt sidan, och nedåt.
-const O = { x: 1418, y: 665 };
-const BOX = { x: 1110, y: 400, w: 426, h: 570 };
+// Sakerna står bakom högen, mellan kupongen och tidningen, kring O i pultens
+// plan (före planets skala 1,095 kring mitten: x ≤ 1530 och y ≤ 850 syns i
+// alla fönster). Duken är större åt vänster och uppåt, så att röken får plats
+// när fläkten blåser den åt sidan, och nedåt; den slutar före tidningen.
+const O = { x: 1190, y: 665 };
+const BOX = { x: 882, y: 400, w: 426, h: 570 };
 // Högen med de inlämnade kupongerna till höger om kupongen (HOG i rum.js),
 // i pultens px. Där låg domarens kort och visselpipa förut.
 const HOGEN = { x0: 1080, x1: 1322, y0: 816, y1: 1014 };
 // Platserna på pulten (pultens px), en per dag: fläkten med det håll den
 // svänger kring (grader, 90 = mot betraktaren, 180 = åt vänster),
 // askkoppen och snusdosan. Locket och prisen läggs där det finns plats.
-// (Allt till höger om högen och tidningen, x ≥ 1345.)
+// (Allt bakom högen, mellan kupongen och tidningen, som breder ut sig nedtill
+// i perspektivet: 1100 ≤ x ≤ 1265, y ≤ 806.)
 const LAYOUTS = [
-  { fan: [1478, 672, 160], ash: [1385, 742], snus: [1482, 812] },
-  { fan: [1480, 670, 140], ash: [1462, 792], snus: [1392, 748] },
-  { fan: [1432, 668, 80], ash: [1390, 792], snus: [1490, 804] },
-  { fan: [1392, 668, 100], ash: [1478, 748], snus: [1394, 815] },
+  { fan: [1231, 670, 160], ash: [1138, 724], snus: [1235, 779] },
+  { fan: [1233, 668, 140], ash: [1215, 763], snus: [1145, 729] },
+  { fan: [1185, 667, 80], ash: [1143, 763], snus: [1243, 773] },
+  { fan: [1145, 667, 100], ash: [1231, 729], snus: [1147, 781] },
 ];
-// där det finns plats: till höger om högen och tidningen bakom den
-const free = ([px, py]) => py >= 662 && py <= 846 && px <= 1522 && px >= 1345;
+// där det finns plats: bakom högen, mellan kupongen och tidningen
+const free = ([px, py]) => py >= 662 && py <= 806 && px <= 1265 && px >= 1100;
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -801,8 +804,8 @@ async function props(pult, opt) {
   }
 
   // ---------- fikat ----------
-  // Dagens fika (rum-fika.js): till höger om högen, fritt från askkoppen,
-  // dosan, locket, prisen och fläkten (bakom högen ligger tidningen).
+  // Dagens fika (rum-fika.js): bakom högen, fritt från askkoppen,
+  // dosan, locket, prisen och fläkten (till höger om högen ligger tidningen).
 
   const FK = bord(THREE, { world, mat, mesh, canvasTex, specks, heap, hash });
   let fikat = null;
@@ -814,7 +817,7 @@ async function props(pult, opt) {
     if (fan.visible) busy.push([FAN.x, FAN.z, FAN.R]);
     if (pris.visible) busy.push([pris.position.x, pris.position.z, 8]);
     const cand = [];
-    for (let y = 700; y <= 836; y += 12) for (let x = 1370; x <= 1510; x += 14) cand.push([x, y]);
+    for (let y = 690; y <= 800; y += 12) for (let x = 1120; x <= 1250; x += 13) cand.push([x, y]);
     const ok = cand.find((c) => { const p = onDesk(...c); return free(c) && !paHogen(p.x, p.z, r * 0.8) && busy.every(([bx, bz, br]) => Math.hypot(p.x - bx, p.z - bz) > br + r * 0.8); });
     FK.visa(fikat, onDesk(...(ok || cand[0])), w, s);
   }

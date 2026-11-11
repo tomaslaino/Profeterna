@@ -280,6 +280,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Helgarderat bredvid högen (2026-11-11, användarens önskemål: "Under våra kuponger dessutom - vilket är helt
+  orimligt"):** tidningen ligger hel till höger om högen med de inlämnade kupongerna, inte under dem. Askkoppen,
+  snusdosan, fläkten och fikat står i stället bakom högen, där tidningen låg. Valt bland tre skisser i den riktiga
+  scenen (bredvid högen, hopvikt bakom högen, i ett tidningsställ). Inget nytt ritas, så det kostar lika lite som förut
+  (se *Bredvid högen* under [Tidningen](#tidningen))
 - [x] **Kvällstidningen på pulten (2026-11-10, användarens önskemål: "När man zoomade in den här så fick man hela
   tidningen - så ska det inte vara"):** ett klick på veckans löpsedel går bara fram till sedeln, som de andra
   löpsedlarna. Tidningen ligger i stället på pulten till höger om kupongen, bakom högen med de inlämnade
@@ -4184,7 +4189,7 @@ bra omgång bär papperskronan i stället för högtidens (figuren byggs om när
 och DJ tar av sig struten, kronan och partyhatten när han somnar med huvudet på bordet. Blad,
 blommor, bär, ljus och konfetti är sammanslagna till ett nät per sak, så att det blir få ritanrop.
 
-**Askkoppen, snusdosan och fläkten** står på pulten till höger om högen, i three.js som
+**Askkoppen, snusdosan och fläkten** står på pulten bakom högen, mellan kupongen och tidningen, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
 askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
 spår och ryker; en öppen dosa lössnus med locket bredvid, lutat mot dosan eller upp och ner;
@@ -4325,9 +4330,8 @@ grädde och lock med florsocker på fettisdagen, två pepparkakshjärtan och en 
 glasyr på en servett i december, två lussekatter med russin på luciadagen, två
 kanelbullar med pärlsocker i pappersform den 4 oktober, chokladägg i röd, blå, grön och
 guldfolie i påskveckan (skärtorsdagen till annandag påsk) och tre chokladbollar på en
-servett den 11 maj. Det står till höger om högen, fritt från askkoppen, dosan, locket,
-prisen och fläkten (bakom högen ligger tidningen Helgarderat, se [Tidningen](#tidningen); förut stod
-fikat där). Dagen är Stockholms (`Vader.nu()`,
+servett den 11 maj. Det står bakom högen, fritt från askkoppen, dosan, locket,
+prisen och fläkten (till höger om högen ligger tidningen Helgarderat, se [Tidningen](#tidningen)). Dagen är Stockholms (`Vader.nu()`,
 läst var tionde sekund som vädret). Går det dåligt med tippningen har någon redan tagit
 för sig: locket ligger bredvid den ena semlan och det är en grop i grädden, gubben saknar
 huvudet (tandmärken), en lussekatt, en kanelbulle och ett par ägg är borta och ett ägg är
@@ -4338,8 +4342,9 @@ på pulten står i en av fyra uppställningar (`LAYOUTS` – fläkten längst ba
 mitten eller till vänster, askkoppen och dosan om vartannat, några
 pixlar hit eller dit), locket och prisen läggs där det finns plats, och inget av det, askan
 eller smulorna hamnar på högen (`HOGEN`, samma plats som `HOG` i rum.js) eller på tidningen
-bakom den: allt står till höger om dem (`free`, x ≥ 1345 i pultens bildpunkter). Förut kunde
-fläkten stå bakom högen, där tidningen ligger nu. Slitaget följer tippningen: andelen fel
+till höger om den: allt står bakom högen, mellan kupongen och tidningen (`free`, 1100 ≤ x ≤ 1265
+och y ≤ 806 i pultens bildpunkter; tidningen breder ut sig nedtill i perspektivet). Från
+2026-11-10 till 2026-11-11 låg tidningen bakom högen och sakerna stod där tidningen ligger nu. Slitaget följer tippningen: andelen fel
 bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen, och utan
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
 bredvid, snuset spills, fläkten (om den står där) går på trean och löpsedlarna på skivan bleks;
@@ -7462,9 +7467,10 @@ upprepade nedåt. På pulten är vecket på mitten en ås med ljus ovanför och 
 papperet buktar svagt i rummets ljus och skuggan ligger tätt intill. Bara bilder: inga filter och inga blandningslägen.
 
 **På pulten** (2026-11-10, användarens önskemål: "När man zoomade in den här så fick man hela tidningen - så ska det
-inte vara"): ett klick på löpsedeln går bara fram till den, som de andra löpsedlarna, och tidningen ligger till höger
-om kupongen, bakom högen med de inlämnade kupongerna, som ligger på dess nedre del (`#rum-helgarderat` i rum.js och
-[public/rum-tidning.css](public/rum-tidning.css)). Förstasidan är upp, med ett veck på mitten, och överkanten ligger
+inte vara"): ett klick på löpsedeln går bara fram till den, som de andra löpsedlarna, och tidningen ligger på pulten
+(`#rum-helgarderat` i rum.js och [public/rum-tidning.css](public/rum-tidning.css)), först till höger om kupongen,
+bakom högen med de inlämnade kupongerna, som låg på dess nedre del, och sedan 2026-11-11 hel till höger om högen (se
+*Bredvid högen* nedan). Förstasidan är upp, med ett veck på mitten, och överkanten ligger
 vid pultens bakkant. Samma dag, när det var kvällstidningen som låg där ("Gör så att rubriken syns ovanför
 kupongerna" och "Gör tidningen lite större"), flyttades högen fram: den första kupongen ligger 84 bildpunkter längre
 fram och den sista 64, med 36 i stället för 46 mellan dem, så tätt att namnen nätt och jämnt syns (`HOG` i rum.js,
@@ -7475,8 +7481,16 @@ perspektiv (`--vila`, vriden kring överkanten), i rummets ljus. Framsidan skriv
 (`tidningPult` i rum.js, i `fill`). Ett klick, eller L, och den lyfts mot en och läggs fram (`tidningen` i rum.js);
 *Lägg tillbaka*, Esc och bakåt lägger tillbaka den på pulten. Med minskad rörelse läggs den fram direkt. Den är ritad i
 sidan, inte i 3D, och papperet ritas en gång och flyttas sedan bara med rummet, så den kostar lite också i svaga
-telefoner. Fläkten, fikat och askkoppen (rum-saker.js) står till höger om högen och tidningen. Den som har sagt vem den
-är pekar på den medan den är framme (`helgarderat` i rum-folk.js).
+telefoner. Den som har sagt vem den är pekar på den medan den är framme (`helgarderat` i rum-folk.js).
+
+**Bredvid högen** (2026-11-11, användarens önskemål: "Under våra kuponger dessutom - vilket är helt orimligt"):
+tidningen ligger hel till höger om högen, med överkanten vid pultens bakkant och lite vriden åt andra hållet (`--vila`
+med `rotateZ(-3deg)`), och askkoppen, dosan, fläkten och fikat står bakom högen, där tidningen låg (`LAYOUTS`, `free`,
+`O` och `BOX` i rum-saker.js, ungefär 250 bildpunkter åt vänster). Sakernas duk ligger kvar under kupongen och tidningen
+i sidan och är lika stor, så det blir inga nya lager. Högen ligger kvar där den låg. Valt bland tre skisser i den
+riktiga scenen: bredvid högen, hopvikt bakom högen (bara namnet och numret syns) och uppställd i ett tidningsställ vid
+pultens bakkant. I telefonen på höjden syns tidningen hel när man drar åt höger; hos Hasse Backe ligger den utanför
+bilden, som förut. När den lyfts glider den lika långt in mot mitten som förut (`UPPE` i rum.js).
 
 Numret gäller omgången som rummet visar (`upplaga` i rum.js), också när den är spelad utan sammanställning (dolda
 resultat): det gamla numret ligger kvar tills nästa kupong kommer. Mellan omgångarna är det numret för den senaste
