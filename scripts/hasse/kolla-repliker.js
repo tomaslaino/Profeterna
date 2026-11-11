@@ -73,7 +73,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
   'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
-  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
+  'domar.fraga', 'domar.igen', 'domar.alla', 'domar.glomt', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
   'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
@@ -122,9 +122,9 @@ for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'i
 // Frågan över listan med gänget (gangLista i rum-hasse.js) sägs i ett svep och får vara två meningar. Den ska
 // säga vad han har att ge och att det gäller en kupong (Tomas 2026-11-10: "höra om din kupong" tar för givet att
 // man vet att han ska säga något om den), och rymmas på tre rader i den smalaste telefonen med det längsta namnet.
-const FRAGOR = ['domar.fraga', 'domar.igen', 'domar.alla', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte'];
+const FRAGOR = ['domar.fraga', 'domar.igen', 'domar.alla', 'domar.glomt', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte'];
 const LANGST = Object.entries(repliker.felnamn || {}).flat(2).reduce((a, b) => (b.length > a.length ? b : a), '');
-const GOR = /\b(tycker|bedöm\w*|dom|domen|döm\w*|synpunkter|kommenterar|säga något)\b/i;
+const GOR = /\b(tycker|bedöm\w*|dom|domen|domar\w*|döm\w*|synpunkter|kommenterar|säga något)\b/i;
 for (const vag of FRAGOR) {
   for (const t of varde(vag) || []) {
     if (t.replace('{namn}', LANGST).length > 80) fel.push(`${vag}: "${t}" är för lång: högst 80 tecken med namnet, annars flyttar sig gänget`);

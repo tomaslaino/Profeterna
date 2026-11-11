@@ -122,8 +122,9 @@
 @media (hover: hover) { .rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; } }
 /* Gänget efter omgången (gangLista i rum-hasse.js): var och ens porträtt i sin färg och namnet i sin handstil,
    som på kupongen, sida vid sida i gängets ordning och utan siffror (de står på lappen under domen). Ordet han
-   har slagit i disken står som en stämpel i guld under namnet när man har hört domen; platsen för den finns från
-   början, så att inget flyttar sig. */
+   har slagit i disken står som en stämpel i guld under namnet när man har tryckt och hört domen, bara under
+   besöket (nästa gång är platsen tom tills man trycker igen); platsen finns från början, så att inget flyttar
+   sig. Den man nyss hörde får sin stämpel slagen när man kommer tillbaka till listan. */
 /* frågan över dem är ofta tre rader (den säger vad han har att ge innan den frågar vems), och raderna han säger
    medan han väntar står på samma plats: tre rader från början, så att gänget inte flyttar sig */
 .rh-sagt:has(+ .rh-gang) { min-height: 3.45em; text-wrap: balance; }
@@ -144,6 +145,8 @@
 @media (max-height: 700px) { .rum-hasse-vy.hog .rh-gang .rh-ans { --a: 3.4em; } }
 .rh-gang em { box-sizing: border-box; min-height: 1.95em; padding: 0.45em 0.6em 0.4em; border: 1.5px solid #ffd86b; border-radius: 3px; font: normal 700 0.7em/1 Fraunces, Georgia, serif; letter-spacing: 0.16em; text-transform: uppercase; color: #ffd86b; rotate: -3deg; box-shadow: 0 0 14px rgba(255, 216, 107, 0.18), inset 0 0 10px rgba(255, 216, 107, 0.12); }
 .rh-gang em:empty { visibility: hidden; }
+.rh-gang em.ny { animation: rh-stampel 0.16s cubic-bezier(0.2, 0.7, 0.3, 1) 0.4s both; }
+@keyframes rh-stampel { from { scale: 1.9; opacity: 0; } to { scale: 1; opacity: 1; } }
 /* den som inte lämnade in */
 .rh-gang .inget .rh-ans { filter: grayscale(1) brightness(0.72); }
 .rh-gang .inget .rh-namn { color: rgba(246, 239, 220, 0.6); }
@@ -245,7 +248,7 @@
 .rum-hasse-vy.hog .rh-kol { height: 26px; margin-bottom: 0.2em; }
 .rum-hasse-vy.hog .rh-vem { --a: 24px; }
 .rum-hasse-vy.hog .rh-slut { padding-top: 0.3em; }
-@media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag, .rh-svar { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag, .rh-svar, .rh-gang em.ny { animation: none; } }
 
 /* Din kupong hos honom (rum-hasse-kupong.js): samma kupong som på pulten (rum.css, .rum-kup), på
    disken mellan bordet och figuren, så att hans händer ligger ovanpå den. I luften ligger den över allt. */

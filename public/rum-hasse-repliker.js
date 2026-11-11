@@ -517,6 +517,15 @@
     ],
     igen: ['Vems kupong ska jag säga något om nu?', 'Vems kupong vill du höra min bedömning av nu?', 'Vems kupong ska jag döma nu?', 'Jag har synpunkter på fler kuponger. Vems tar vi nu?'],
     alla: ['Nu har jag dömt varenda kupong.', 'Nu har var och en av er fått sitt.', 'Alla era kuponger är dömda. Jag har sett bättre.', 'Det var alla era kuponger. Mer än så finns det inte att säga.'],
+    // När man kommer tillbaka och har hört alla förut: orden i guld står inte kvar i listan (de syns först när
+    // man trycker), så han erbjuder sig att säga det igen (Tomas 2026-11-11).
+    glomt: [
+      'Varenda kupong är dömd. Har ni glömt något, säger jag det gärna igen.',
+      'Har ni glömt vad jag tycker om era kuponger? Jag säger det gärna en gång till.',
+      'Alla era kuponger är dömda. Den som har glömt sin dom får höra den igen.',
+      'Domarna över era kuponger står fast. Jag läser gärna upp dem igen.',
+      'Mina domar över era kuponger tål att höras två gånger. Vems tar jag igen?',
+    ],
     // I stället för fraga och igen när han vet vem du är (den enheten står på) och du lämnade in: först
     // (ingen dömd än), hort (din kupong är dömd) och inte (andras är dömda men inte din). {namn} är ditt.
     du: {

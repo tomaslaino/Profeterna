@@ -1939,6 +1939,8 @@ window.RumHasse = (() => {
       H.mun = 0;
       H.munMal = null;
       H.T = 0;
+      // (domarna du hörde förra gången står inte kvar i listan)
+      H.nyss = null;
     }
     H.fraga = {};
     H.fas = 'fraga';
@@ -2463,7 +2465,8 @@ window.RumHasse = (() => {
     if (!fel || !fel.length || fast([...Array(chans).keys()], `${nyckel}:fel`) !== 0) return namn;
     return [...ord.slice(0, -1), fast(fel, `${nyckel}:namn`)].join(' ');
   }
-  // Vilka i gänget du har hört domen över, på enheten för den omgången: deras ord står i guld i listan.
+  // Vilka i gänget du har hört domen över, på enheten för den omgången: han vet vem han har dömt, också nästa
+  // gång du kommer.
   const HORT = 'profeterna.hasse.domar';
   function hort(id) {
     if (!H.hort || H.hort.id !== id) {
@@ -2482,6 +2485,13 @@ window.RumHasse = (() => {
     v.push(vem);
     try { localStorage.setItem(HORT, JSON.stringify({ id, vem: v })); } catch (e) { /* bara den här gången */ }
   }
+  // Vilka du har hört domen över sedan du kom fram till honom: bara deras ord står i guld i listan. Nästa gång
+  // står platserna tomma tills du trycker igen, och har du hört alla säger han att han gärna upprepar sig
+  // (domar.glomt). sist: den du nyss hörde, vars ord slås i listan när du kommer tillbaka till den.
+  function nyss(id) {
+    if (!H.nyss || H.nyss.id !== id) H.nyss = { id, vem: [], sist: null };
+    return H.nyss;
+  }
   // Porträttet i personens färg (som på kupongen).
   const ansikte = (p) => `<span class="rh-ans"${p.bild ? ` style="background-image: url('${esc(p.bild)}')"` : ''}></span>`;
   // Gänget i sin ordning, så att var och en står på samma plats varje omgång.
@@ -2494,8 +2504,8 @@ window.RumHasse = (() => {
     return (TP.season.rounds || []).filter((r) => !dold(r));
   }
 
-  // Listan: var och ens porträtt och namn, och ordet i guld under dem man har hört om. → false om det inte finns
-  // någon att döma.
+  // Listan: var och ens porträtt och namn, och ordet i guld under dem man har hört om den här gången. → false om
+  // det inte finns någon att döma.
   function gangLista(sum) {
     const folk = sum ? iOrdning(sum) : [];
     if (!folk.length) return false;
@@ -2505,23 +2515,27 @@ window.RumHasse = (() => {
     const s = $('.rh-samtal');
     const r = REP();
     const h = hort(sum.id);
+    const nu = nyss(sum.id);
     s.innerHTML = '<h2 class="rh-sagt"></h2><div class="rh-gang"></div>';
     const l = s.querySelector('.rh-gang');
     for (const p of folk) {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = `k${p.hand}${p.none ? ' inget' : ''}`;
-      const ord = h.includes(p.id) ? r.domord[p.lage] || '' : '';
-      b.innerHTML = `${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><em>${esc(ord)}</em>`;
+      const ord = nu.vem.includes(p.id) ? r.domord[p.lage] || '' : '';
+      b.innerHTML = `${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><em${ord && p.id === nu.sist ? ' class="ny"' : ''}>${esc(ord)}</em>`;
       b.setAttribute('aria-label', ord ? `${p.namn}, ${ord}` : p.namn);
       b.addEventListener('click', () => doma(p.id));
       l.append(b);
     }
+    nu.sist = null;
     const n = folk.filter((p) => h.includes(p.id)).length;
     // (vet han vem du är och har du lämnat in, börjar han med din kupong; ditt namn som i domen)
     const du = folk.find((p) => p.id === duId() && !p.none);
     const d = r.domar;
-    const lista = n === folk.length ? d.alla : du && d.du ? (!n ? d.du.forst : h.includes(du.id) ? d.du.hort : d.du.inte) : n ? d.igen : d.fraga;
+    // (har du hört alla förut men inte nu, erbjuder han sig att säga det igen)
+    const lista = folk.every((p) => nu.vem.includes(p.id)) ? d.alla : n === folk.length && d.glomt ? d.glomt
+      : du && d.du ? (!n ? d.du.forst : h.includes(du.id) ? d.du.hort : d.du.inte) : n ? d.igen : d.fraga;
     rad(fyll(lott(lista), { namn: du ? (du.bast ? du.namn : kallar(du.namn, `${sum.id}:${du.id}`)) : '' }));
     // (Revisorn och Semesterfiraren bara när det finns någon de kan vara)
     const extra = [folk.some((p) => p.lage === 'forsakring') && r.domar.revisorn, folk.some((p) => p.none) && r.domar.borta].filter(Boolean);
@@ -2557,7 +2571,7 @@ window.RumHasse = (() => {
   }
 
   // Du väljer någon i gänget: domen slås i disken (som i svara), texten står direkt och går att läsa upp, och
-  // under den ligger lappen. Sedan nästa du inte har hört om, eller hela gänget.
+  // under den ligger lappen. Sedan nästa du inte har hört om den här gången, eller hela gänget.
   function doma(id) {
     const sum = summan();
     const folk = sum ? iOrdning(sum) : [];
@@ -2573,9 +2587,11 @@ window.RumHasse = (() => {
     H.sagt = null;
     H.talMal = 0;
     hora(sum.id, p.id);
-    const h = hort(sum.id);
+    const nu = nyss(sum.id);
+    if (!nu.vem.includes(p.id)) nu.vem.push(p.id);
+    nu.sist = p.id;
     const i = folk.indexOf(p);
-    const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !h.includes(q.id));
+    const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !nu.vem.includes(q.id));
     const d = REP().domord[p.lage] || '';
     s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span></div>` +
       `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
