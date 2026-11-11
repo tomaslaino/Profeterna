@@ -1,5 +1,5 @@
 // Helgarderats sista sida: Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, sådant
-// som inte står i matchbladen) och Ombudets kåseri. Skrivs på iMacen med Claude Code på
+// som inte står i matchbladen) och ett kåseri av en påhittad person, en ny varje vecka. Skrivs på iMacen med Claude Code på
 // användarens konto (scripts/analyser/skriv.mjs), ett anrop per omgång när matchbladen har kommit.
 // Prompten och gränserna står i config/sista-sidan.js och sidan sparas i data/sista-sidan.json,
 // som tidningen ritar (public/rum-tidning.js).
@@ -45,8 +45,9 @@ export function attSkrivaSista(round, nu, blad, { now = Date.now(), tvinga = fal
 }
 
 // Underlaget: omgångens matcher i kupongens ordning med matchbladets rubrik, ingress och
-// sammanfattning, så att sidan inte upprepar dem.
-export function sistaUnderlag(round, blad) {
+// sammanfattning, så att sidan inte upprepar dem, och de senaste veckornas kåsörer (tidigare:
+// [{av, om}]), så att kåseriet får en ny.
+export function sistaUnderlag(round, blad, tidigare = []) {
   const s = new Map(((blad && blad.sidor) || []).map((x) => [String(x.id), x]));
   return {
     matcher: round.matcher.map((x, i) => {
@@ -54,6 +55,7 @@ export function sistaUnderlag(round, blad) {
       return { nr: i + 1, match: x.match || null, avspark: x.avspark || null,
         ...(b ? { matchbladet: { rubrik: b.rubrik || null, ingress: b.ingress || null, sammanfattning: b.summering || null } } : { matchbladet: null }) };
     }),
+    'de senaste veckornas kåsörer': tidigare.filter((k) => k && k.av).map((k) => (k.om ? `${k.av}, ${k.om}` : k.av)),
   };
 }
 
@@ -62,12 +64,13 @@ export function sidanAv(content) {
   try {
     const j = jsonOf(content);
     const text = (x) => (x && str(x.rubrik) && Array.isArray(x.stycken) ? { rubrik: str(x.rubrik), stycken: x.stycken.map(str).filter(Boolean) } : null);
+    const k = j['kåseri'];
     const notiser = Array.isArray(j['vid sidan av']) ? j['vid sidan av'] : [];
     return {
       kronika: text(j['krönika']),
       sidan: notiser.map((n) => ({ lag: str(n && n.lag), text: str(n && n.text), kalla: n && n['källa'] && typeof n['källa'].url === 'string' ? n['källa'] : null }))
         .filter((n) => n.lag && n.text),
-      kaseri: text(j['kåseri']),
+      kaseri: text(k) && { av: str(k.av), om: str(k.om), ...text(k) },
     };
   } catch {
     return null;
@@ -87,6 +90,17 @@ export function textFel(t, granser, known) {
   const stora = [...`${t.rubrik} ${helt}`.matchAll(STORA_RE)].map((m) => m[0]).join(' ');
   const bad = stora ? unknownNumbers([stora], known) : [];
   if (bad.length) why.push(`årtal eller resultat som varken står i underlaget eller på en läst sida (${bad.join(', ')})`);
+  return why;
+}
+
+// Det som är fel i kåsören: namnet, vem hen är, och att hen inte har skrivit förut. tidigare: [{av, om}].
+export function kasorFel(k, tidigare = []) {
+  if (!k) return [];
+  const why = [];
+  if (!k.av || ord(k.av) > 4) why.push('inget namn på kåsören, eller ett för långt');
+  if (!k.om || ord(k.om) > 10) why.push('inte vem kåsören är, eller för mycket om det');
+  const enkelt = (s) => String(s || '').toLowerCase().replace(/[^\p{L} ]/gu, '').trim();
+  if (k.av && tidigare.some((x) => x && enkelt(x.av) === enkelt(k.av))) why.push(`${k.av} har redan skrivit ett kåseri`);
   return why;
 }
 
@@ -112,10 +126,13 @@ function byggNotis(n, seen) {
   return { lag: n.lag, text: n.text, kalla: { source: k.source, title: k.title, url: k.url, publishedAt: k.publishedAt } };
 }
 
-// Skriver omgångens sista sida. blad: data/poddsidor.json. → {ok: true, sida, meta} eller
-// {ok: false, error}. Fel från Claude Code kastas (src/analyser/claude.mjs).
-export async function skrivSista(round, blad, { now = () => new Date(), claude = claudeSvar } = {}) {
-  const underlag = sistaUnderlag(round, blad);
+// Skriver omgångens sista sida. blad: data/poddsidor.json, forra: data/sista-sidan.json som den
+// ligger (för de senaste kåsörerna). → {ok: true, sida, meta} eller {ok: false, error}. Fel från
+// Claude Code kastas (src/analyser/claude.mjs).
+export async function skrivSista(round, blad, { forra = null, now = () => new Date(), claude = claudeSvar } = {}) {
+  // De senaste kåsörerna, utom den som skrev en tidigare version av den här omgångens sida.
+  const tidigare = ((forra && forra.kasorer) || []).filter((k) => !(forra.omgang === round.id && forra.kaseri && k.av === forra.kaseri.av)).slice(0, sc.kasorer);
+  const underlag = sistaUnderlag(round, blad, tidigare);
   const lagen = lagI(round);
   const seen = new Map();
   const read = [];
@@ -147,7 +164,7 @@ export async function skrivSista(round, blad, { now = () => new Date(), claude =
       else kronika = svar.kronika;
     }
     if (!kaseri) {
-      const why = textFel(svar.kaseri, sc.kaseri, known);
+      const why = [...textFel(svar.kaseri, sc.kaseri, known), ...kasorFel(svar.kaseri, tidigare)];
       if (why.length) fel.push(`kåseriet: ${why.join(' och ')}`);
       else kaseri = svar.kaseri;
     }
@@ -175,7 +192,9 @@ export async function skrivSista(round, blad, { now = () => new Date(), claude =
     version: sc.promptVersion,
     kronika: { av: 'Hasse Backe', ...kronika },
     sidan: notiser.sort((a, b) => ordning(a.lag) - ordning(b.lag)),
-    kaseri: { av: 'Ombudet', ...kaseri },
+    kaseri,
+    // De senaste veckornas kåsörer, den här först, så att nästa vecka får en ny.
+    kasorer: [{ av: kaseri.av, om: kaseri.om }, ...tidigare].slice(0, sc.kasorer),
   };
   return { ok: true, sida, meta };
 }

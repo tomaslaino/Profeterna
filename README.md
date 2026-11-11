@@ -2145,7 +2145,8 @@ under [Hasse Backe](#hasse-backe)), och tidningen bakom löpsedeln på sidan *S�
 intressant/alternativ spännande information som du finner inför omgången och som du inte har skrivit om i bladet …
 nåt kort kåseri av någon person"*): Hasse Backes krönika (150–220 ord), *Vid sidan av* (fem korta notiser om det udda
 med omgångens lag: historien, arenan, staden, supportrarna, aldrig form, skador eller tränarens ord) och ett kåseri av
-Ombudet, som har sålt tips över disken i tobaksaffären (90–150 ord). Ett anrop per omgång, när omgångens matchblad har
+en påhittad person, en ny varje vecka (90–150 ord, användarens val samma kväll; Claude ser de tolv senaste kåsörerna i
+`kasorer` och får inte ta någon av dem). Ett anrop per omgång, när omgångens matchblad har
 kommit i `data/poddsidor.json`, så att Claude får matchbladens rubriker och sammanfattningar och inte upprepar dem
 ([src/analyser/sista-sidan.mjs](src/analyser/sista-sidan.mjs), prompten och gränserna i
 [config/sista-sidan.js](config/sista-sidan.js)); en ny `promptVersion` skriver om den. Claude får högst 8 sökningar och 4
@@ -2160,7 +2161,8 @@ pågår, oavsett tid. `data/sista-sidan.json`, som bygget kopierar till sajten:
 { "omgang": "2026-11-14", "matcher": ["401880745"], "skriven": "…", "model": "…", "version": "…",
   "kronika": { "av": "Hasse Backe", "rubrik": "…", "stycken": ["…"] },
   "sidan": [ { "lag": "Exeter City", "text": "…", "kalla": { "source": "…", "title": "…", "url": "…", "publishedAt": null } } ],
-  "kaseri": { "av": "Ombudet", "rubrik": "…", "stycken": ["…"] } }
+  "kaseri": { "av": "…", "om": "pensionerad lokförare, Hallsberg", "rubrik": "…", "stycken": ["…"] },
+  "kasorer": [ { "av": "…", "om": "…" } ] }
 ```
 
 **Veckans bilder i tidningen** (2026-11-09, användarens önskan: *bilder från veckan i tipsguiden, för de olika

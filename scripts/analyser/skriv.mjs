@@ -463,7 +463,7 @@ async function sistaSidan(round) {
   if (!v.skriv || !far(nyckel)) return;
   if (TORRT) { logg(`skulle skriva sista sidan för ${round.id} (${v.varfor})`); return; }
   try {
-    const r = await skrivSista(round, blad);
+    const r = await skrivSista(round, blad, { forra: nu });
     if (!r.ok) throw new Error(r.error);
     vantande.sista = r.sida;
     lyckat(nyckel);
@@ -687,7 +687,7 @@ async function main() {
     if (s && s.omgang === round.id) {
       console.log(`\n${s.kronika.av}: ${s.kronika.rubrik}\n\n${s.kronika.stycken.join('\n\n')}`);
       for (const n of s.sidan) console.log(`\n${n.lag}: ${n.text}\n   (${n.kalla.source}: ${n.kalla.url})`);
-      console.log(`\n${s.kaseri.av}: ${s.kaseri.rubrik}\n\n${s.kaseri.stycken.join('\n\n')}`);
+      console.log(`\n${s.kaseri.av}, ${s.kaseri.om}: ${s.kaseri.rubrik}\n\n${s.kaseri.stycken.join('\n\n')}`);
     }
     return;
   }

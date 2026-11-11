@@ -182,7 +182,7 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 /* ---------- sista sidan ---------- */
 
 /* Spalterna (val 1 bland tre skisser, 2026-11-11): Hasse Backes krönika i två spalter med porträttet vid namnet och
-   en röd anfang, kåseriet under ett tjockt streck, och Vid sidan av i en smal spalt bredvid med källan efter varje
+   en röd anfang, kåseriet under ett tjockt streck med kåsörens namn och vem hen är sist, och Vid sidan av i en smal spalt bredvid med källan efter varje
    notis. Smal: allt i en spalt, Vid sidan av sist. */
 .hs-grid { display: grid; grid-template-columns: minmax(0, 1fr) 250px; column-gap: 30px; margin-top: 16px; }
 .hs-by { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
@@ -199,6 +199,7 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 .hs-ktext p { font-size: 15px !important; }
 .hs-ktext p.hs-sign { font: italic 600 15px/1.2 var(--rubrik) !important; text-align: right; }
 .hs-sign::before { content: "– "; }
+.hs-sign span { display: block; margin-top: 3px; color: var(--gra); font: 400 11.5px/1.3 var(--sans); font-style: normal; }
 .hs-sido { padding-top: 7px; border-top: 3px solid var(--svart); }
 .hg .hs-sido h4 { margin: 0 0 4px; padding: 0; border: 0; color: var(--rod); font: 800 11px/1.2 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
 .hs-sido ul { margin: 0; padding: 0; list-style: none; }

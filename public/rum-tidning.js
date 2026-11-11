@@ -17,7 +17,7 @@
 //                varandra med stora sköldar, lagens text i två lika spalter med ett citat var i jämnhöjd under,
 //                sammanfattningen sist och källorna, med en länk till varje avsnitt, forumtråd och artikel.
 //   Sista sidan  Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, som inte står i matchbladen) och
-//                Ombudets kåseri (Spalterna), ur data/sista-sidan.json. Utan den slutar tidningen med matchbladen.
+//                ett kåseri av en ny person varje vecka (Spalterna), ur data/sista-sidan.json. Utan den slutar tidningen med matchbladen.
 //
 // Det som förut stod i tidningen på pulten (Tipset med Tipsligan, Så mår tipslagen, Veckans analys och numret efter
 // omgången med resultaten, betygen, skrällen och Hasses krönika) och sajtens baksida med källorna är borta: de ska
@@ -409,7 +409,8 @@
   // Sista sidan (2026-11-11, användarens önskemål: "någon kort krönika av Hasse Backe och bara allmän
   // intressant/alternativ spännande information … som du inte har skrivit om i bladet … nåt kort kåseri av någon
   // person", och val 1, Spalterna, bland tre skisser): Hasse Backes krönika i två spalter med porträttet vid namnet och
-  // en röd anfang, Vid sidan av i en smal spalt bredvid med källan efter varje notis, och kåseriet under krönikan.
+  // en röd anfang, Vid sidan av i en smal spalt bredvid med källan efter varje notis, och kåseriet under krönikan, med
+  // kåsörens namn och vem hen är sist (en ny varje vecka; före det Ombudet, som inte har något om).
   function sista(u) {
     const S = u.sista;
     const T = TEXT.sista;
@@ -421,7 +422,7 @@
       `<article class="hs-kronika"><div class="hs-by"><span class="hs-portratt" aria-hidden="true"></span><span><b>${esc(S.kronika.av)}</b><em>${esc(T.kronika)}</em></span></div>` +
       `<h2 class="hg-rub">${esc(hel(S.kronika.rubrik))}</h2><div class="hs-text">${stycken(S.kronika.stycken)}</div>` +
       `<section class="hs-kaseri"><h3><span>${esc(T.kaseri)}</span>${esc(hel(S.kaseri.rubrik))}</h3>` +
-      `<div class="hs-ktext">${stycken(S.kaseri.stycken)}<p class="hs-sign">${esc(S.kaseri.av)}</p></div></section></article>` +
+      `<div class="hs-ktext">${stycken(S.kaseri.stycken)}<p class="hs-sign">${esc(S.kaseri.av)}${S.kaseri.om ? `<span>${esc(stor(S.kaseri.om))}</span>` : ''}</p></div></section></article>` +
       (notiser ? `<aside class="hs-sido"><h4>${esc(T.vidSidanAv)}</h4><ul>${notiser}</ul></aside>` : '') + '</div></section>';
   }
 
