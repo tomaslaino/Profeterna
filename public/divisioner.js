@@ -1276,9 +1276,30 @@ function openPlayer(id) {
       }
     }
   }
+  // Laget med och utan honom från start, också för den som inte spelat i år.
+  if (p.mu) panes.push(['medutan', 'Med och utan', medUtan(p), 'Med och utan honom']);
   html += mtabs('player', 'Om spelaren', panes);
   html += mfoot([], `<button type="button" class="dv-mbtn" data-team-open="${esc(p.teamId)}">Truppen i ${esc(p.team)} →</button>`);
   showModal(html);
+}
+
+// Hur laget har gått i ligan med och utan spelaren i startelvan, under hans
+// tid i laget (src/medochutan.js): matcherna, poängen per match och poängen
+// per match mot vad oddsen vid avspark räknade med. Mot oddsen tar hänsyn
+// till att stjärnorna oftare vilar mot de svaga lagen.
+const fMonth = new Intl.DateTimeFormat('sv-SE', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+function medUtan(p) {
+  const since = fMonth.format(new Date(`${p.mu.fran}-15T12:00Z`));
+  const side = ([n, w, d, l, , , xp], title) => {
+    const pm = (3 * w + d) / n;
+    return msec(title, facts([
+      [cell(n), 'Matcher', `Ligamatcher för ${p.team} sedan ${since}`],
+      [`${w}–${d}–${l}`, 'V–O–F', 'Vunna, oavgjorda och förlorade'],
+      [num(pm, 2), 'Poäng per match'],
+      [delta(pm - xp / n, { d: 2 }), 'Mot oddsen', `${num(pm, 2)} poäng per match, ${num(xp / n, 2)} väntade enligt oddsen vid avspark`],
+    ]));
+  };
+  return side(p.mu.m, 'Med honom från start') + side(p.mu.u, 'Utan honom från start');
 }
 
 // Alla matcher, även cuperna (data/matches.json): spoilerskyddet har dem
@@ -1413,6 +1434,7 @@ const GLOSSARY = [
   ['Nollor', 'Andel av lagets matcher utan insläppt mål.', 'statistik'],
   ['Väntat, Tog, Mot oddsen', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – poängen laget tog i samma matcher, och skillnaden. Plus = bättre än oddsen trodde (Slår oddsen), minus = sämre (Sviker).', 'statistik'],
   ['Favorit', 'Matcher där laget hade större chans än motståndaren att vinna, enligt oddsen före avspark.', 'statistik'],
+  ['Med och utan', 'Hur laget har gått i ligan när spelaren startat och när han inte startat (borta eller på bänken), sedan 2021/22 och bara under hans tid i laget: säsonger i följd då han spelat, och för den som står i truppen fram till i dag. Mot oddsen = poäng per match minus vad oddsen vid avspark räknade med, så att det inte ser ut som att laget klarar sig bättre utan stjärnan för att han vilat mot de svaga lagen. Visas när båda sidorna har minst tio matcher. I matchbladet: poängen per match mot oddsen utan honom minus med honom, minus = laget har tappat utan honom.', 'statistik'],
   ['Spel på seger', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
   ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.', 'statistik'],
   ['Grundserien', 'Ligans ordinarie matcher, utan kvalspel (playoff) och cuper.'],

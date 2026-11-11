@@ -248,11 +248,19 @@
 
   async function loadCards(m, squads) {
     if (cards.has(m.id)) return;
-    const ix = { aid: new Map(), h: new Map(), a: new Map() };
+    const ix = { aid: new Map(), h: new Map(), a: new Map(), hw: new Map(), aw: new Map(), mu: new Map() };
     for (const side of ['h', 'a']) {
       const s = squads[side];
       if (!s || s.unknown || !s.comp) continue;
-      for (const p of s.players || []) ix[side].set(norm(p.name), [s.comp, p.id]);
+      for (const p of s.players || []) {
+        const c = [s.comp, p.id];
+        ix[side].set(norm(p.name), c);
+        if (p.mu) ix.mu.set(p.id, p.mu);
+        // namnets ord, för FPL:s korta namn ("Xavi", "Bergvall"); ord som två
+        // i truppen har (van, de) räknas inte
+        const w = ix[side + 'w'];
+        for (const x of words(p.name)) w.set(x, w.has(x) && w.get(x) !== c ? null : c);
+      }
       if (!indexes.has(s.comp)) {
         const p = cardLib().then((S) => S.index(s.comp));
         p.catch(() => indexes.delete(s.comp));
@@ -266,8 +274,43 @@
   }
 
   // Spelaren med kort blir en knapp till kortet; c = [division, id] eller null.
-  const cardOf = (p, ix, side) => (ix && ((p.aid && ix.aid.get(p.aid)) || ix[side].get(norm(p.name)))) || null;
+  // Utan 365Scores id och hela namnet: namnets ord, om alla som finns i lagets
+  // trupp pekar på samma spelare.
+  const words = (name) => norm(name).split(' ').filter((x) => x.length > 1);
+  function byWords(name, w) {
+    if (!w) return null;
+    const hits = new Set();
+    for (const x of words(name)) if (w.get(x)) hits.add(w.get(x));
+    return hits.size === 1 ? [...hits][0] : null;
+  }
+  const cardOf = (p, ix, side) => (ix && ((p.aid && ix.aid.get(p.aid)) || ix[side].get(norm(p.name)) || byWords(p.name, ix[side + 'w']))) || null;
   const cardAttr = (c) => ` type="button" data-card="${esc(c[0])}/${esc(c[1])}"`;
+
+  // ---------- med och utan spelaren ----------
+
+  // Hur laget har gått utan spelaren från start jämfört med när han startat
+  // (src/medochutan.js), i poäng per match mot oddsen vid avspark: minus =
+  // laget har tagit färre poäng än väntat utan honom. Bara före avspark, vid
+  // dem som saknas och de ordinarie (minst hälften av matcherna från start)
+  // som börjar på bänken.
+  const muOf = (c, ix) => (c && ix && ix.mu && ix.mu.get(c[1])) || null;
+  const ordinarie = (mu) => mu && mu.m[0] >= mu.u[0];
+  const pm = (e) => (3 * e[1] + e[2]) / e[0];
+  const xpm = (e) => e[6] / e[0];
+  const dec = (x, d) => x.toFixed(d).replace('.', ',');
+  const MANAD = ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'];
+  function utan(mu, name) {
+    if (!mu) return '';
+    const v = (pm(mu.u) - xpm(mu.u)) - (pm(mu.m) - xpm(mu.m));
+    const t = dec(Math.abs(v), 1) === '0,0' ? '0,0' : `${v < 0 ? '−' : '+'}${dec(Math.abs(v), 1)}`;
+    const vod = (e) => `${e[1]}–${e[2]}–${e[3]}`;
+    const [y, mo] = mu.fran.split('-');
+    const tip = `Utan ${name} från start: ${vod(mu.u)} i ${mu.u[0]} ligamatcher, ${dec(pm(mu.u), 2)} poäng per match (oddsen räknade med ${dec(xpm(mu.u), 2)}). ` +
+      `Med honom: ${vod(mu.m)} i ${mu.m[0]}, ${dec(pm(mu.m), 2)} poäng per match (${dec(xpm(mu.m), 2)}). Sedan ${MANAD[Number(mo) - 1]} ${y}.`;
+    return `<span class="mr-utan${v < 0 ? ' minus' : ''}" title="${esc(tip)}">${t}</span>`;
+  }
+  // Rubriken över en lista där siffran står: "Utan honom" till höger.
+  const h5 = (rubrik, med) => `<h5${med ? ' class="mr-h5u"' : ''}>${rubrik}${med ? '<span>Utan honom</span>' : ''}</h5>`;
 
   function openCard(e) {
     const b = e.target.closest('[data-card]');
@@ -329,27 +372,34 @@
     '<rect x="0.5" y="0.5" width="67" height="104" rx="1"/><path d="M0.5 52.5h67"/><circle cx="34" cy="52.5" r="9.15"/>' +
     '<path d="M13.84 0.5v16.5h40.32V0.5M24.84 0.5v5.5h18.32V0.5M13.84 104.5V88h40.32v16.5M24.84 104.5V99h18.32v5.5"/></svg>';
 
-  function playerList(list, played, top, ix, side) {
+  // muAlla = laget utan spelaren till höger på varje rad; annars bara för de ordinarie
+  // på bänken före avspark (bench = true).
+  function playerList(list, played, top, ix, side, muAlla, bench) {
     return '<ul class="mr-names">' + list.map((p) => {
       const on = played && p.ev && p.ev.on != null ? ` <span class="mr-on" title="Inbytt">${p.ev.on}′</span>` : '';
       const c = cardOf(p, ix, side);
       const name = c ? `<button class="mr-card"${cardAttr(c)}>${esc(p.name)}</button>` : esc(p.name);
-      return `<li><span class="mr-nr">${p.nr == null ? '' : p.nr}</span>${name}${on}${badges(p.ev)}${rating(p, top)}</li>`;
+      const mu = played ? null : muOf(c, ix);
+      const u = muAlla || (bench && ordinarie(mu)) ? utan(mu, p.name) : '';
+      return `<li><span class="mr-nr">${p.nr == null ? '' : p.nr}</span>${name}${on}${badges(p.ev)}${rating(p, top)}${u}</li>`;
     }).join('') + '</ul>';
   }
 
   // kort = bara orsaken på raden; när spelaren väntas tillbaka står i title.
-  function outList(t, ix, side, kort) {
+  // fore = före avspark: då står laget utan honom längst till höger.
+  function outList(t, ix, side, kort, fore) {
+    const mu = (x) => (fore ? muOf(cardOf(x, ix, side), ix) : null);
     const row = (x) => {
       const c = cardOf(x, ix, side);
       const name = c ? `<button class="n mr-card"${cardAttr(c)}>${esc(x.name)}</button>` : `<span class="n">${esc(x.name)}</span>`;
-      return `<li${x.raw ? ` title="${esc(x.raw)}"` : ''}>${name} <span class="muted">${esc(kort ? x.why : [x.why, x.back].filter(Boolean).join(' · '))}</span></li>`;
+      const u = utan(mu(x), x.name);
+      return `<li${u ? ' class="mr-u"' : ''}${x.raw ? ` title="${esc(x.raw)}"` : ''}>${name} <span class="muted">${esc(kort ? x.why : [x.why, x.back].filter(Boolean).join(' · '))}</span>${u}</li>`;
     };
     const gone = t.out.filter((x) => !x.doubtful);
     const unsure = t.out.filter((x) => x.doubtful);
     let h = '';
-    if (gone.length) h += `<h5>Saknas</h5><ul class="mr-out">${gone.map(row).join('')}</ul>`;
-    if (unsure.length) h += `<h5>Osäkra</h5><ul class="mr-out">${unsure.map(row).join('')}</ul>`;
+    if (gone.length) h += `${h5('Saknas', gone.some(mu))}<ul class="mr-out">${gone.map(row).join('')}</ul>`;
+    if (unsure.length) h += `${h5('Osäkra', unsure.some(mu))}<ul class="mr-out">${unsure.map(row).join('')}</ul>`;
     // Frånvaron är känd (FPL) men tom.
     if (!h && t.outKnown) h = '<h5>Saknas</h5><p class="muted">ingen</p>';
     return h;
@@ -363,10 +413,13 @@
       return c ? `<button class="mr-card" title="${esc(p.name)}"${cardAttr(c)}>${esc(p.short || p.name)}</button>` : `<span title="${esc(p.name)}">${esc(p.short || p.name)}</span>`;
     };
     const on = played ? t.bench.filter((p) => p.ev && p.ev.on != null).sort((a, b) => a.ev.on - b.ev.on) : [];
-    const rest = t.bench.filter((p) => !on.includes(p));
+    // före avspark: de ordinarie som börjar på bänken som egna rader med laget utan dem
+    const vana = played ? [] : t.bench.filter((p) => ordinarie(muOf(cardOf(p, ix, cls), ix)));
+    const rest = t.bench.filter((p) => !on.includes(p) && !vana.includes(p));
     const inbytta = on.length ? `<h5>Inbytta</h5>${playerList(on, played, top, ix, cls)}` : '';
-    const ovriga = rest.length ? `<h5>${played ? 'Ej inbytta' : 'Avbytare'}</h5><p class="mr-flod">${rest.map(brief).join(', ')}</p>` : '';
-    const ut = outList(t, ix, cls, true);
+    const ovriga = rest.length || vana.length ? `${h5(played ? 'Ej inbytta' : 'Avbytare', vana.length)}` +
+      `${vana.length ? playerList(vana, played, top, ix, cls, true) : ''}${rest.length ? `<p class="mr-flod">${rest.map(brief).join(', ')}</p>` : ''}` : '';
+    const ut = outList(t, ix, cls, true, !played);
     const coach = t.coach ? `<p class="mr-coach"><span>Tränare</span> ${esc(t.coach)}</p>` : '';
     return `<div class="mr-team ${cls}">${played ? inbytta + ovriga + ut : ut + ovriga}${coach}</div>`;
   }
@@ -375,8 +428,11 @@
     let h = `<div class="mr-team ${cls}"><h4>${esc(name)}${t.formation && !t.placedBoth ? ` <span class="hint">${esc(t.formation)}</span>` : ''}</h4>`;
     if (t.coach) h += `<p class="mr-coach"><span class="muted">Tränare</span> ${esc(t.coach)}</p>`;
     if (t.starters.length && !t.placedBoth) h += `<h5>Startelva</h5>${playerList(t.starters, played, top, ix, cls)}`;
-    if (t.bench.length) h += `<h5>Avbytare</h5>${playerList(t.bench, played, top, ix, cls)}`;
-    h += outList(t, ix, cls);
+    if (t.bench.length) {
+      const vana = !played && t.bench.some((p) => ordinarie(muOf(cardOf(p, ix, cls), ix)));
+      h += `${h5('Avbytare', vana)}${playerList(t.bench, played, top, ix, cls, false, true)}`;
+    }
+    h += outList(t, ix, cls, false, !played);
     return h + '</div>';
   }
 

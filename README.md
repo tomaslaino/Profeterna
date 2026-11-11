@@ -252,6 +252,16 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   (Kupongen, Olympen, Matcherna, Tabeller) och *Dela → Ladda upp system* för en skärmbild av systemet. Se
   [Appen](#appen). Samma dag: "Jag vill att mina vänner ska kunna ladda ner den på ett enkelt sätt bara" –
   gratis nedladdning på **matchfixarna.se/app** (Google Play kostar 25 dollar och kräver 12 testare i 14 dagar)
+- [x] **Med och utan spelaren (2026-11-11, användarens önskemål):** "Går det att få in den här
+  informationen för de respektive spelarna" (StatMuses Man City med och utan Haaland), "det kan säga
+  något om hur betydelsefulla de är för lagen" – "Haaland t ex är mindre viktig än vad man tror - han
+  gör en massa mål - men laget blir sämre", "intressant med tanke på vilka som är på planen lite
+  senare", "för alla spelare där det är möjligt". Spelarkortet har fliken *Med och utan*: lagets
+  ligamatcher med spelaren i startelvan och utan honom, V–O–F, poäng per match och poäng per match mot
+  oddsen vid avspark. I matchrutan och matchbladet står före avspark, längst till höger under *Utan
+  honom*, hur laget har gått utan spelaren vid dem som saknas och vid de ordinarie som börjar på bänken.
+  Underlaget är startelvorna i de fyra ligorna sedan 2021/22, och bara under spelarens tid i laget –
+  StatMuses "utan" var mest City före Haaland. Se [Med och utan spelaren](#med-och-utan-spelaren)
 - [x] **Gängets kupong i realtid (2026-11-08, användarens önskemål):** den som fyller i gängets
   kupong i uppgörelsen – på papperet eller på pulten i tobaksaffären – gör det på allas kupong.
   Kryssen, det klubbade och *Börja om* syns direkt hos alla som ser kupongen, och knappen blir
@@ -634,6 +644,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Skador och avstängningar; speltid, xG/xA, pris och poäng per spelare | Fantasy Premier League (`bootstrap-static`) | PL | 3 h | Status, chans att spela och nyhetstext med datum. Status avser nästa omgång. Speltid och xG (Opta) gäller säsongen hittills, verifierat 2026-10-19. Kopplas till ESPN-truppen inom laget på födelsedatum, annars namnet, bara vid entydig träff (547 av 592 spelare 2026-10-19; okopplade får inga FPL-siffror). |
 | Speltid per spelare | ESPN matchsammanfattning (`summary?event=<id>`, samma som oddsen) | CH, L1, L2 | 6 h, bara nya matcher | Verifierat 2026-10-19 för `eng.1`–`eng.4`: båda startelvorna (alltid 11), byten med minut (tilläggstid som `90'+3'`) och röda kort (även andra gula), med samma spelar-id som trupperna. Minuter = in till ut (full tid, byte eller rött), tilläggstid räknas inte, inbytt i tilläggstid = 1 min. Stickprov: matcher per spelare ur rapporterna = truppens för alla 84 spelare i Birmingham, AFC Wimbledon och Accrington; Arsenal och Coventry högst 6 min från FPL per spelare (0,4 % totalt). En rapport är ~400 kB men hämtas en gång per match och sparas kompakt (~50 kB per liga och säsong); 371 matcher tog 10 s. Minuterna räknas för spelarens första matcher i laget upp till truppens antal (truppen släpar ofta en omgång); har rapporterna färre matcher än truppen är speltiden okänd (1 av 1 846 spelare 2026-10-19). |
 | Startelvor bakåt (för den beräknade startelvan) | ESPN matchsammanfattning (samma rapporter som speltiden) | alla fyra ligor och båda cuperna | 6 h, bara nya matcher | Verifierat 2026-11-07 för ligorna, cuperna och Europacuperna (1 410 elvor): lagets formation (`4-2-3-1`) och varje startande spelares platsnummer 1–11 (`formationPlace`, Optas numrering, målvakten 1), avbytarna med plats 0 och samma spelar-id som trupperna. Positionsnamnen (`LB`, `CD-L`, `AM-R` …) ligger på samma sida som platsnumret i 15 490 av 15 510 platser, men följer inte linjen (i 4-2-3-1 heter de defensiva mittfältarna `LM` och `RM`) – därför en egen tabell från plats till linje och sida per formation ([public/elva.js](public/elva.js)). Sparas kompakt i samma cache som speltiden (`e` per match, ligorna) och i `espn_elvor_<cup>`; matcher sparade före 2026-11-07 hämtas om en gång. Styr inte prognosen. |
+| Startelvor, tidigare säsonger (för med och utan spelaren) | ESPN matchsammanfattning (samma rapporter som speltiden) | alla fyra ligor, 2021/22–2025/26 | en gång, [scripts/elvor-historik.js](scripts/elvor-historik.js) | Verifierat 2026-11-11: båda elvorna (alltid 11) och de inbytta för 10 241 av 10 243 ligamatcher (två i League One 2022/23 saknar elvor hos ESPN) (även kvalet, som saknar odds och inte räknas). Sparas i [data/elvor-historik.json](data/elvor-historik.json), som checkas in. Styr inte prognosen. |
 | National League | football-data.co.uk (`EC`) | underlag för FA-cupens non-league-lag | 12 h | Resultat, skott och odds, ingen xG. |
 | Tidigare säsonger, ligorna | football-data.co.uk (`mmz4281/<säsong>/E0–E3, EC.csv`) | PL–L2, National League | 30 d | E0–E3 2000/01–2025/26 (26 säsonger, 52 672 matcher), EC 2005/06–2025/26 (11 234; 2000/01–2004/05 svarar 300). Fulla säsonger utom League One/Two 2019/20 (400/440 matcher, avbruten säsong) och EC 2019/20–2021/22 (451, 477, 506). En fil per säsong, ~0,25 s styck – allt hämtas på ~4 s. Äldre filer är Windows-1252 (t.ex. "King’s Lynn" i EC 2021/22), nyare UTF-8; läses därefter. Sparar resultat, skott och odds (marknadssnitt hette `BbAv` före 2019/20). |
 | xG, tidigare säsonger | Understat (`getLeagueData/EPL/<år>`) | PL | 30 d, bara kandidatjakten | 2014/15–2025/26, 380/380 matcher med xG varje säsong (verifierat 2026-10-17), alla 4 560 parade mot football-data.co.uk på (hemma, borta). Hämtas av `npm run kandidater`, inte av bygget – används först om xG-kandidaten klarar kravet. |
@@ -2633,6 +2644,51 @@ rotation 7,0.
 - Nyförvärv utan start och utan position i ESPN-truppen kommer inte med.
 - Namnet på planen är efternamnet ur ESPN:s namn, med "van", "de", "Mac" och liknande ("van de
   Ven", "Mac Allister"), inte 365Scores egna korta namn.
+
+## Med och utan spelaren
+
+Hur laget har gått i ligan när spelaren startat och när han inte startat – borta eller på
+bänken – och hur det står sig mot oddsen vid avspark (användarens önskemål 2026-11-11, efter
+StatMuses tabell över Man City med och utan Haaland). Beskrivande; styr inte prognosen
+([src/medochutan.js](src/medochutan.js)).
+
+**Underlaget.** Startelvorna i Premier League, Championship, League One och League Two sedan
+2021/22. Spelade säsonger ändras inte: de hämtades en gång ur ESPN:s matchrapporter med
+[scripts/elvor-historik.js](scripts/elvor-historik.js) och ligger i
+[data/elvor-historik.json](data/elvor-historik.json), en rad per match (hemma- och bortaelvan och
+de inbytta). Innevarande säsong kommer ur samma rapporter i cachen (`espn_minutes_<liga>`).
+Oddsen är football-data.co.uks snitt vid avspark med marginalen bortdragen, som *Mot oddsen* för
+lagen ([src/teamstats.js](src/teamstats.js)); matcher utan odds (kvalet) räknas inte.
+
+**Bara under spelarens tid i laget.** StatMuses 276 matcher med och utan Haaland var sju hela
+säsonger från 2019, så "utan" var mest City innan han kom. Här räknas de säsonger i följd då
+spelaren spelat någon ligamatch för laget, från hans första till hans sista match. Står han i
+lagets trupp i år räknas tiden fram till i dag, om han spelat i år eller i fjol – så att den som
+är långtidsskadad räknas, men inte ett helt år på lån. En säsong utan en enda match (lån,
+skada hela säsongen) bryter tiden.
+
+**Mot oddsen.** Stjärnorna vilar oftare mot de svaga lagen, så laget kan se bättre ut utan dem
+än det är. Därför står poängen per match också mot vad oddsen räknade med i samma matcher.
+Haaland 2022/23–2026-11-11: med honom från start 136 matcher, 2,12 poäng per match mot väntade
+2,15; utan honom 25 matcher, 2,48 mot 2,17. Laget har alltså klarat sig något bättre än väntat
+utan honom, men 25 matcher är få.
+
+**Var det står.**
+- *Spelarkortet* (Statistik och matchbladet): fliken *Med och utan* med två rader – *Med honom
+  från start* och *Utan honom från start* – med matcher, V–O–F, poäng per match och *Mot oddsen*
+  (per match). Också för den som inte spelat i år, till exempel en långtidsskadad.
+- *Matchrutan och matchbladet*, bara före avspark: längst till höger, under rubriken *Utan
+  honom*, vid dem som saknas och vid de ordinarie som börjar på bänken (startat minst hälften av
+  matcherna under sin tid i laget). Siffran är poängen per match mot oddsen utan honom minus med
+  honom, med en decimal: minus (i rött) = laget har tappat utan honom. Detaljerna står i title.
+- FPL:s korta namn i *Saknas* ("Xavi", "Bergvall") kopplas nu till spelarkortet på namnets ord
+  inom lagets trupp, om alla ord som finns i truppen pekar på samma spelare.
+
+**Gränsen.** Båda sidorna måste ha minst tio matcher (`MIN`), annars visas inget – okänt, inte
+noll. 2026-11-11 hade 1 112 spelare siffrorna (Premier League 280, Championship 339, League One
+267, League Two 226), ungefär hälften av årets ordinarie: den som nästan aldrig saknats har för
+få matcher utan. Tio matcher är fortfarande lite: skillnaden mellan med och utan är ofta inom vad slumpen
+ger, och sajten visar inga intervall.
 
 ## Kupongen
 

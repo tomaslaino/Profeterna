@@ -305,6 +305,12 @@ button.mr-pl:focus-visible, .mr-card:focus-visible { outline: 2px solid var(--ac
 .mr-names .mr-badges { position: static; display: inline-flex; gap: 2px; margin-left: 4px; }
 .mr-names .mr-rt { margin-left: auto; padding-left: 10px; font-size: 13px; font-weight: 650; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 .mr-names .mr-rt.top { color: var(--gold-hi); }
+/* laget utan spelaren från start (poäng per match mot oddsen) längst till höger, under "Utan honom" */
+.mr-utan { margin-left: auto; padding-left: 10px; font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mr-team h5.mr-h5u { display: flex; justify-content: space-between; gap: 10px; }
+/* bredvid orsaken: siffran står kvar på första raden när orsaken bryts */
+.mr-out li.mr-u { position: relative; padding-right: 3.4em; }
+.mr-out li.mr-u .mr-utan { position: absolute; top: 3px; right: 0; padding-left: 0; }
 
 /* ---------- Matchen ---------- */
 

@@ -258,6 +258,8 @@
 .rum-blad .mr-out li .muted { font-size: 11px; }
 .rum-blad .mr-nr { width: 1.7em; font-size: 11px; }
 .rum-blad .mr-names .mr-rt { font-size: 11.5px; }
+.rum-blad .mr-utan { font-size: 11.5px; line-height: 16px; }
+.rum-blad .mr-out li.mr-u .mr-utan { top: 0; }
 .rum-blad .mr-flod { margin: 0; font-size: 12px; line-height: 16px; color: var(--pp-ink-soft); }
 .rum-blad .mr-flod .mr-card { color: inherit; }
 .rum-blad .mr-coach { margin: 7px 0 0; font-size: 12px; line-height: 16px; }

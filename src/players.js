@@ -22,6 +22,7 @@ const path = require('path');
 const { CACHE_DIR } = require('./store');
 const { keyOf, espnKey, norm } = require('./teams');
 const { newsSv } = require('./skadetext');
+const { medUtan } = require('./medochutan');
 
 const LEAGUES = COMPETITIONS.filter((c) => c.type === 'league');
 const SEASON_YEAR = Number(SEASON.label.slice(0, 4));
@@ -62,6 +63,8 @@ const statsOf = (p) => p.stats || null;
 const played = (p) => !!(p.stats && p.stats.app > 0);
 const round1 = (x) => Math.round(x * 10) / 10;
 const share = (a, b) => (b > 0 ? Math.round((a / b) * 1000) / 1000 : null);
+// Laget med och utan spelaren från start (src/medochutan.js), bara där underlaget räcker.
+const mu = (p, t) => { const x = medUtan(t.espnId, p.id); return x ? { mu: x } : null; };
 
 function row(p, t, fx) {
   const s = p.stats;
@@ -506,8 +509,8 @@ function divisionPlayers(compId) {
     for (const p of t.players) {
       if (played(p)) rows.push({ ...row(p, t, fx), ...rat(p) });
       all.push(p.stats
-        ? { ...row(p, t, fx), ...emin(p), ...gk(p), ...(goalTypes && goalTypes.map.get(p.id)), ...rat(p), ...ph(p) }
-        : { ...bare(p, t), ...(fx && fx.get(p.id)), ...rat(p), ...ph(p) });
+        ? { ...row(p, t, fx), ...emin(p), ...gk(p), ...(goalTypes && goalTypes.map.get(p.id)), ...rat(p), ...ph(p), ...mu(p, t) }
+        : { ...bare(p, t), ...(fx && fx.get(p.id)), ...rat(p), ...ph(p), ...mu(p, t) });
     }
   }
 
@@ -624,7 +627,7 @@ function teamSquad(teamName) {
     const t = cache && cache.data.teams.find((x) => espnKey(x.name) === k);
     if (!t) continue;
     const standing = standingsFor(c.id).get(t.espnId);
-    const players = t.players.map((p) => (p.stats ? { ...row(p, t), ...gk(p) } : bare(p, t)));
+    const players = t.players.map((p) => (p.stats ? { ...row(p, t), ...gk(p), ...mu(p, t) } : { ...bare(p, t), ...mu(p, t) }));
     const used = players.filter((p) => p.app > 0);
     // Segermålen följer bara med i nyckellistan, inte i hela truppen.
     const goals = goalTypesFor(c.id);

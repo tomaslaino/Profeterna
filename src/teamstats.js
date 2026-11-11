@@ -224,4 +224,4 @@ function teamFiles(strength) {
   return DIVS.map((d) => ({ path: `teams/${d.id}.json`, data: divisionTeams(d, strength) }));
 }
 
-module.exports = { teamFiles, divisionTeams };
+module.exports = { teamFiles, divisionTeams, market };
