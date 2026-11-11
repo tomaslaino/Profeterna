@@ -9,7 +9,13 @@
 // vem som startade, vem som byttes in, vem som satt kvar på bänken och vem i lagets trupp som
 // inte var med. Varje källa (lagets podd, forum, insatta, klubb, lokaltidning) får sina rätt och
 // fel sparade i traff.json bredvid omgang.json, utanför repot. Redaktören som skriver matchbladet
-// får sedan veta hur ofta källan har haft rätt om truppen, och litar mer på den som brukar ha det.
+// får sedan veta hur ofta källan har haft rätt om truppen, och litar mer på den som brukar ha det
+// när källorna säger olika om vem som spelar.
+//
+// Syns inte i tidningen (användaren 2026-11-11: "Det handlar mer om alternativa perspektiv - inte
+// om kall fakta … Siffror osv kan jag få reda på på andra sätt"). Därför väger träffsäkerheten
+// bara i frågan vem som spelar: en källas syn på laget, stämningen och spelet trycks aldrig undan
+// för att den har gissat fel om elvan.
 //
 // Ett anrop till Claude per spelad match som har något att pröva: tretton i veckan, på natten
 // mot tisdag, när omgångens uppgifter ännu ligger kvar i omgang.json.
@@ -56,5 +62,5 @@ Svara bara med JSON, utan något före eller efter. Uppgifter utan något att pr
   // har prövats tillräckligt många gånger.
   redaktor: `
 
-Vissa uppgifter har "traffsakerhet": så ofta källan tidigare har haft rätt om lagets trupp (vem som saknas, vem som är tillbaka, vem som startar), prövat mot matchtruppen efter matcherna. Lita mer på en källa som brukar ha rätt och var försiktigare med en som ofta har fel, särskilt när källorna säger emot varandra. Skriv inte ut siffran och skriv inte om träffsäkerheten i texten.`,
+Vissa uppgifter har "traffsakerhet": så ofta källan tidigare har haft rätt om vilka som spelar (vem som saknas, vem som är tillbaka, vem som startar), prövat mot matchtruppen efter matcherna. Använd den bara när källorna säger olika om vem som spelar. Den säger ingenting om källans syn på laget, stämningen eller det den ser i spelet: där väger källan lika mycket oavsett siffran, och inget perspektiv stryks för den. Skriv inte ut siffran och skriv inte om träffsäkerheten i texten.`,
 };
