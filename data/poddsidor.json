@@ -8,6 +8,86 @@
   "klubb": "Tränaren och klubben",
   "match": "Inför matchen"
  },
+ "matcher": [
+  {
+   "id": "401880745",
+   "nr": 1,
+   "match": "Stockport County – Reading",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401880747",
+   "nr": 2,
+   "match": "Sheffield Wednesday – Plymouth Argyle",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401880744",
+   "nr": 3,
+   "match": "Wigan Athletic – Barnsley",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401880754",
+   "nr": 4,
+   "match": "AFC Wimbledon – Blackpool",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401880749",
+   "nr": 5,
+   "match": "Milton Keynes Dons – Burton Albion",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401881273",
+   "nr": 6,
+   "match": "Exeter City – Cheltenham Town",
+   "avspark": "2026-11-14T12:30:00.000Z"
+  },
+  {
+   "id": "401881276",
+   "nr": 7,
+   "match": "Bristol Rovers – Chesterfield",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401881275",
+   "nr": 8,
+   "match": "Colchester United – Gillingham",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401881274",
+   "nr": 9,
+   "match": "Crewe Alexandra – Newport County",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401881271",
+   "nr": 10,
+   "match": "Port Vale – Accrington Stanley",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401881270",
+   "nr": 11,
+   "match": "Rochdale – York City",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401881268",
+   "nr": 12,
+   "match": "Salford City – Northampton Town",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  },
+  {
+   "id": "401881267",
+   "nr": 13,
+   "match": "Shrewsbury Town – Oldham Athletic",
+   "avspark": "2026-11-14T15:00:00.000Z"
+  }
+ ],
  "sidor": [
   {
    "id": "401880745",
@@ -1394,7 +1474,7 @@
   },
   {
    "id": "401881275",
-   "nr": 7,
+   "nr": 8,
    "match": "Colchester United – Gillingham",
    "lag": [
     "Colchester United",
@@ -1720,7 +1800,7 @@
   },
   {
    "id": "401881274",
-   "nr": 8,
+   "nr": 9,
    "match": "Crewe Alexandra – Newport County",
    "lag": [
     "Crewe Alexandra",
@@ -2026,7 +2106,7 @@
   },
   {
    "id": "401881271",
-   "nr": 9,
+   "nr": 10,
    "match": "Port Vale – Accrington Stanley",
    "lag": [
     "Port Vale",
@@ -2259,7 +2339,7 @@
   },
   {
    "id": "401881270",
-   "nr": 10,
+   "nr": 11,
    "match": "Rochdale – York City",
    "lag": [
     "Rochdale",
@@ -2567,7 +2647,7 @@
   },
   {
    "id": "401881268",
-   "nr": 11,
+   "nr": 12,
    "match": "Salford City – Northampton Town",
    "lag": [
     "Salford City",
@@ -2732,7 +2812,7 @@
   },
   {
    "id": "401881267",
-   "nr": 12,
+   "nr": 13,
    "match": "Shrewsbury Town – Oldham Athletic",
    "lag": [
     "Shrewsbury Town",

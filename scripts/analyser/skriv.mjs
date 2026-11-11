@@ -439,7 +439,7 @@ function poddsidorna(round) {
   const ny = poddsidor(lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null), round);
   if (!ny) return;
   const nu = vantande.poddsidor || lasJson(FIL.poddsidor, null);
-  if (nu && nu.omgang === ny.omgang && JSON.stringify(nu.sidor) === JSON.stringify(ny.sidor)) return;
+  if (nu && nu.omgang === ny.omgang && JSON.stringify([nu.matcher, nu.sidor]) === JSON.stringify([ny.matcher, ny.sidor])) return;
   if (TORRT) { logg(`skulle lägga ut ${ny.sidor.length} informationssidor ur poddarna`); return; }
   vantande.poddsidor = ny;
   logg(`poddsidor: ${round.id}, ${ny.sidor.length} matcher`);

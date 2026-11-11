@@ -594,7 +594,9 @@ export function poddNyckel(fil) {
 
 // Matchbladen som de läggs ut (data/poddsidor.json): omgångens matcher i kupongens ordning, bara de
 // som har ett blad. Citaten på engelska och utskrifterna följer aldrig med; sidans citat är på svenska.
-// → {omgang, uppdaterad, sidor: [{id, nr, match, lag, rubrik, ingress, summering, citat, delar}]} eller null
+// matcher är hela kupongen, också matcherna utan blad, för innehållet i Helgarderat (public/helgarderat.js).
+// → {omgang, uppdaterad, amnen, matcher: [{id, nr, match, avspark}], sidor: [{id, nr, match, lag, rubrik, ingress,
+//   summering, citat, delar}]} eller null
 export function poddsidor(fil, round) {
   if (!fil || !round || fil.omgang !== round.id || !fil.sidor) return null;
   const sidor = round.matcher.map((x, i) => {
@@ -603,5 +605,6 @@ export function poddsidor(fil, round) {
     return { id: String(x.id), nr: i + 1, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null,
       summering: s.summering || null, ...(s.citat ? { citat: s.citat } : {}), delar: s.delar };
   }).filter(Boolean);
-  return sidor.length ? { omgang: round.id, uppdaterad: fil.uppdaterad, amnen: pc.amnen, sidor } : null;
+  const matcher = round.matcher.map((x, i) => ({ id: String(x.id), nr: i + 1, match: x.match || null, avspark: x.avspark || null }));
+  return sidor.length ? { omgang: round.id, uppdaterad: fil.uppdaterad, amnen: pc.amnen, matcher, sidor } : null;
 }

@@ -21,6 +21,10 @@
 //               datum, ettan med en enda bild och programmets märke (rutorna 1, X och 2 ikryssade: helgarderat, och
 //               antalet matcher), och Också i numret: tre matcher till med rubrik och sida. Inte alla matcher; de står
 //               ett matchblad var på sidorna efter
+//   Innehållet  sidan 2, som i ett engelskt matchprogram: hela kupongen, Stryktipsets matcher i kupongens ordning (data
+//               matcher), var och en med matchbladets rubrik och sida, också de som inte har något matchblad, och
+//               vad som står var i tidningen (2026-11-11, användarens önskemål: "en snygg innehållsförteckning där
+//               stryktipset matcher ingår")
 //   Matchbladen ett per match: rubriken, bilden, introduktionen, hemmalaget, bortalaget och sammanfattningen, och i en
 //               smal spalt bredvid avsparken, källorna med datum och, ibland, ett citat
 //   Baksidan    källorna, avsnitt, forumtrådar och artiklar med datum och länk
@@ -165,7 +169,10 @@
     return sidor.slice().sort((a, b) => vikt(b) - vikt(a) || a.nr - b.nr);
   }
 
-  const sidnr = (s) => s.nr + 1;
+  // Sidorna: framsidan 1, innehållet 2, matchbladen i kupongens ordning från sidan 3 och källorna sist (rita).
+  const INNEHALL = 2;
+  let SIDA = new Map(); // kupongens nummer → matchbladets sida
+  const sidnr = (s) => SIDA.get(s.nr);
   // Numret: det första numret är veckan med lördagen den 14 november 2026 (Nr 1), och sedan ett nummer i veckan,
   // räknat på veckorna (måndag–söndag) där omgången börjar – samma som tidningen på pulten i rummet
   // (RumTidning.nummer). Provnumret är ett nollnummer (Nr 0). Båda har veckan.
@@ -202,23 +209,71 @@
       `<div class="hg-overrad"><span>${esc(numret(u, lordag))}</span><span>Det supportrarna vet</span><span>Pris 3 kr</span></div>` +
       `<h1 class="hg-namn">Helgarderat</h1>` +
       `<div class="hg-dagen"><p>${esc(dagen)}</p>${u.prov ? '<span class="hg-stampel">Provnummer</span>' : ''}</div></header>`;
-    const ettan = `<article class="hg-etta"><div class="hg-omslag">${figur(s1, ' omslagsbild', enBild(s1))}${marke(lordag, sidor.length)}</div>${kick(s1)}` +
+    const ettan = `<article class="hg-etta"><div class="hg-omslag">${figur(s1, ' omslagsbild', enBild(s1))}${marke(lordag, u.kupongen.length)}</div>${kick(s1)}` +
       `<h2><a href="#sida-${sidnr(s1)}">${tvafarg(s1.rubrik || T.rubrik(lag1[0], lag1[1]))}</a></h2>` +
       (s1.ingress ? `<p class="hg-ingress">${esc(hel(s1.ingress))}</p>` : '') +
       (c ? citat(c, 'stort') : '') +
       `<p class="hg-vidare"><a href="#sida-${sidnr(s1)}">Matchbladet på sidan ${sidnr(s1)}</a></p></article>`;
-    // Också i numret: tre matcher till med rubrik och sida, i kupongens ordning. Resten står bara i matchbladen.
+    // Också i numret: tre matcher till med rubrik och sida, i kupongens ordning. Alla står i innehållet på sidan 2.
     const fler = ovriga.slice(0, 3).sort((a, b) => a.nr - b.nr);
-    const dag = lordag ? stor(fVdagLang.format(new Date(lordag))) + 'ens' : 'Omgångens';
     const puffar = `<section class="hg-fler" aria-label="Också i numret"><h3>Också i numret</h3>` +
       (fler.length ? `<div class="hg-fler-l">${fler.map((s) => {
         const l = s.lag || [];
         return `<article>${kick(s, false)}<h4><a href="#sida-${sidnr(s)}">${tvafarg(s.rubrik || T.rubrik(l[0], l[1]))}</a></h4>` +
           `<p class="hg-vidare"><a href="#sida-${sidnr(s)}">Sidan ${sidnr(s)}</a></p></article>`;
       }).join('')}</div>` : '') +
-      `<p class="hg-alla"><a href="#sida-${sidnr(sidor[0])}">${esc(hel(`${dag} ${sidor.length} matcher har ett matchblad var på sidorna ` +
-        `${sidnr(sidor[0])}–${sidnr(sidor[sidor.length - 1])}`))}</a></p></section>`;
+      `<p class="hg-alla"><a href="#sida-${INNEHALL}">${esc(`Alla ${u.kupongen.length} matcher på ${spelet(u) === 'Stryktipset' ? 'Stryktipset' : 'kupongen'} ` +
+        `står i innehållet på sidan ${INNEHALL}`)}</a></p></section>`;
     return `<section class="hg-ark hg-forsta" id="forsta" aria-label="Framsidan"><div class="hg-ram">${huvud}${ettan}${puffar}</div></section>`;
+  }
+
+  // ---------- innehållet ----------
+
+  // Kupongen: omgångens alla matcher i kupongens ordning (data.matcher, också de utan matchblad), var och en med sitt
+  // matchblad om den har ett. Utan data.matcher (ett nummer från före innehållet): matchbladen.
+  function kupongen(data, sidor) {
+    const blad = new Map(sidor.map((s) => [String(s.id), s]));
+    const l = Array.isArray(data.matcher) && data.matcher.length ? data.matcher : sidor;
+    return l.map((x, i) => {
+      const s = blad.get(String(x.id)) || null;
+      const lag = s && s.lag ? s.lag : String(x.match || '').split(/\s+[–-]\s+/);
+      return { nr: x.nr || i + 1, lag, avspark: x.avspark || (s && s.avspark) || null, sida: s };
+    }).sort((a, b) => a.nr - b.nr);
+  }
+  // Gängets omgång är Stryktipsets när den har ett nummer därifrån (2026-11-07-st4978) eller tretton matcher.
+  const omgangsNr = (u) => (/-st(\d+)$/.exec(String(u.omgang || '')) || [])[1] || null;
+  const spelet = (u) => (omgangsNr(u) || u.kupongen.length === 13 ? 'Stryktipset' : 'Kupongen');
+
+  // Sidan 2: kupongen som innehållsförteckning, en rad per match med numret, lagen, matchbladets rubrik, avsparken och
+  // sidan. En match utan matchblad står med men utan sida. Under: hur ett matchblad är gjort och tidningens andra sidor.
+  function innehallet(u) {
+    const k = u.kupongen;
+    const lordag = k.map((m) => m.avspark).filter(giltig).sort()[0];
+    const dagen = lordag ? `${fVdagLang.format(new Date(lordag))} ${fDagMan.format(new Date(lordag))}` : '';
+    const nr = omgangsNr(u);
+    const rader = k.map((m) => {
+      const lag = m.lag || [];
+      const rub = m.sida ? m.sida.rubrik || T.rubrik(lag[0], lag[1]) : 'Inget matchblad den här veckan';
+      const sida = m.sida ? sidnr(m.sida) : null;
+      const rad = `<b class="hg-ih-nr">${m.nr}</b><span class="hg-ih-match"><span class="hg-ih-lag">${esc(kort(lag[0]))}–${esc(kort(lag[1]))}</span>` +
+        `<em>${esc(hel(rub))}</em></span><span class="hg-ih-tid">${esc(avspark(m.avspark))}</span>` +
+        `<span class="hg-ih-sida">${sida ? `<small>Sidan </small>${sida}` : '<small>Inget blad</small>'}</span>`;
+      return m.sida ? `<li><a href="#sida-${sida}">${rad}</a></li>` : `<li class="utan"><div>${rad}</div></li>`;
+    }).join('');
+    const kalla = u.sidor.length + 3;
+    const ovr = [['Framsidan', 'forsta', 1], ['Innehållet', `sida-${INNEHALL}`, INNEHALL],
+      [u.sidor.length > 1 ? 'Matchbladen' : 'Matchbladet', `sida-${INNEHALL + 1}`, u.sidor.length > 1 ? `${INNEHALL + 1}–${kalla - 1}` : INNEHALL + 1],
+      ['Källorna', `sida-${kalla}`, kalla]];
+    return `<section class="hg-ark hg-sida hg-innehall" id="sida-${INNEHALL}" aria-label="Sidan ${INNEHALL}: Innehåll">${folio(u, INNEHALL)}` +
+      `<header class="hg-ih-huvud"><div><h2>Innehåll</h2><p>${esc(hel(`Alla ${k.length} matcher i kupongens ordning, med matchbladets sida`))}</p></div>` +
+      `<div class="hg-ih-marke" aria-hidden="true">${rutor()}</div></header>` +
+      `<section class="hg-ih-kupong" aria-label="${esc(spelet(u))}"><h3><span>${esc(spelet(u))}${nr ? ` <i>omgång ${esc(nr)}</i>` : ''}</span><em>${esc(dagen)}</em></h3>` +
+      `<div class="hg-ih-kol" aria-hidden="true"><span>Nr</span><span>Match och matchbladets rubrik</span><span>Avspark</span><span>Sida</span></div>` +
+      `<ol>${rader}</ol></section>` +
+      `<div class="hg-ih-fot"><section class="hg-ruta"><h4>Så är matchbladet gjort</h4><p>Först en kort introduktion, sedan hemmalaget och bortalaget ` +
+      `var för sig, ur lagens supporterpoddar, forum och insatta medier, klubben och lokaltidningen, och sist en sammanfattning. ` +
+      `I spalten bredvid står avsparken, källorna och ibland ett citat.</p></section>` +
+      `<section class="hg-ruta hg-ih-ovr"><h4>I tidningen</h4><ul>${ovr.map(([t, id, s]) => `<li><a href="#${id}"><span>${t}</span><b>${hel(s)}</b></a></li>`).join('')}</ul></section></div></section>`;
   }
 
   // ---------- matchbladen ----------
@@ -250,7 +305,7 @@
 
   // Baksidan: källorna per match, med länk och datum.
   function baksidan(u) {
-    const nr = u.sidor.length + 2;
+    const nr = u.sidor.length + 3;
     const kallor = u.sidor.map((s) => {
       const l = s.delar.flatMap((d) => kallorna(d));
       if (!l.length) return '';
@@ -273,8 +328,9 @@
   function rita(data, prov) {
     const sidor = sidorna(data);
     if (!sidor.length) throw new Error('inga sidor');
-    const u = { ...data, sidor, prov, datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '' };
-    rot.innerHTML = forstasidan(u) + sidor.map((s) => matchsidan(u, s)).join('') + baksidan(u);
+    const u = { ...data, sidor, kupongen: kupongen(data, sidor), prov, datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '' };
+    SIDA = new Map(sidor.map((s, i) => [s.nr, INNEHALL + 1 + i]));
+    rot.innerHTML = forstasidan(u) + innehallet(u) + sidor.map((s) => matchsidan(u, s)).join('') + baksidan(u);
     rot.removeAttribute('aria-busy');
     bildfel();
     // en länk till en sida (#sida-5) när den kommer in utifrån
