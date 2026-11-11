@@ -446,6 +446,7 @@ async function main() {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
   }
+  let ljudNytt = false;
   for (const l of MED_PODDAR ? lagen : []) {
     const poddar = (register[l.lag] && register[l.lag].poddar) || [];
     if (!poddar.length) continue;
@@ -458,6 +459,16 @@ async function main() {
         floden.push({ podd: p.namn, avsnitt: f.avsnitt.map((a) => ({ ...a, apple: p.apple })) });
       } catch (err) {
         logg(`${l.lag}: flödet för ${p.namn} gick inte att läsa (${err.message})`);
+      }
+    }
+    // Avsnittens ljudfiler, till kassetterna i rummet (poddsidor i src/analyser/poddar.mjs, rum-radio.js):
+    // adressen per podd och titel, för de senaste avsnitten i flödet. Ljudet hämtas från poddens server.
+    for (const f of floden) {
+      for (const a of f.avsnitt.slice(0, 6)) {
+        const n = `${f.podd}\n${a.titel}`;
+        if (!a.ljud || (fil.ljud && fil.ljud[n] === a.ljud)) continue;
+        (fil.ljud || (fil.ljud = {}))[n] = a.ljud;
+        ljudNytt = true;
       }
     }
     const val = valjAvsnitt(floden, { mot: l.mot, gjorda: new Set(post.avsnitt.filter((a) => a.version === pc.promptVersion).map((a) => a.id)) }).slice(0, pc.avsnittPerKorning);
@@ -488,6 +499,7 @@ async function main() {
       }
     }
   }
+  if (ljudNytt && !TORRT) skrivJson(OMGANG, fil);
   let sidor = 0;
   try {
     sidor = await sidorna(fil, matcher);

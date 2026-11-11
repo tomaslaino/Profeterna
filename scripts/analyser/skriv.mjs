@@ -444,9 +444,10 @@ async function tidningen(round) {
 // Informationssidorna ur supporterpoddarna (scripts/tidning/poddar.mjs skriver dem på poddarnas tider):
 // läggs ut när de har ändrats. Inget anrop till Claude här.
 function poddsidorna(round) {
-  const ny = poddsidor(lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null), round);
-  if (!ny) return;
   const nu = vantande.poddsidor || lasJson(FIL.poddsidor, null);
+  // (ljudfilerna som redan står i numret följer med: kassetterna i rummet)
+  const ny = poddsidor(lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null), round, nu);
+  if (!ny) return;
   if (nu && nu.omgang === ny.omgang && JSON.stringify([nu.matcher, nu.sidor]) === JSON.stringify([ny.matcher, ny.sidor])) return;
   if (TORRT) { logg(`skulle lägga ut ${ny.sidor.length} informationssidor ur poddarna`); return; }
   vantande.poddsidor = ny;

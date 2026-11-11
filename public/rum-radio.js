@@ -23,8 +23,11 @@
 // brus eller prat, och slutar inte förrän fyra sekunder efter att musiken har försvunnit: den som drar i
 // spaken ska inte få dem att börja om. Radion stängs av när man lämnar rummet (av).
 //
-//   RumRadio.mount({ el, fig, now, inr, sak })  när gänget har laddats (inr: inredningen med bladet,
-//                                        sak(namn): kameran går fram till något)
+// Bredvid radion står ett kassettställ med supporterpoddarnas avsnitt inför omgången (kassetterna nedan,
+// rum-kassetter.js i 3D): en kassett per match, och den spelas i radions kassettdel.
+//
+//   RumRadio.mount({ el, fig, now, inr, sak, sakNu })  när gänget har laddats (inr: inredningen med bladet,
+//                                        sak(namn): kameran går fram till något, sakNu: var den står)
 //   RumRadio.nara(på)                    reglagen läggs över radion (kameran är framme) eller tas bort
 //   RumRadio.ram(r, topp, hojd, m, bara) närbilden: radion (r) och bladet (m) i fönstret, eller bara bladet
 //   RumRadio.rad(kanal)                  [frekvensen, namnet] som de står på bladet
@@ -32,7 +35,8 @@
 //   RumRadio.bandspak('fm' | 'am')       bandspaken (är radion av flyttas bara spaken)
 //   RumRadio.av()                        stäng av
 //   RumRadio.prova('fm:90.4')            för bilder, utan ljud (?rum-radio-lage)
-//   RumRadio.lage()                      hur det står till (band, frekvens, kanal, hörs)
+//   RumRadio.lage()                      hur det står till (band, frekvens, kanal, hörs, bandet)
+//   RumRadio.band                        kassetterna: lista(), i(id), ut(), vand(), tangent(i), lage()
 window.RumRadio = (() => {
   // lasa: så här nära är stationen ren, tappa: så här långt bort har den försvunnit i bruset
   const BAND = {
@@ -157,6 +161,7 @@ window.RumRadio = (() => {
     const vit = c.createBuffer(1, c.sampleRate * 3, c.sampleRate);
     const v = vit.getChannelData(0);
     for (let i = 0; i < v.length; i++) v[i] = Math.random() * 2 - 1;
+    A.vit = vit;
     const knaster = (sek, antal) => {
       const b = c.createBuffer(1, Math.floor(c.sampleRate * sek), c.sampleRate);
       const q = b.getChannelData(0);
@@ -289,6 +294,8 @@ window.RumRadio = (() => {
   // Var visaren står och vad som ska höras: anropas när visaren har rört sig och när något har hänt
   function lyssna() {
     const pa = S.band !== 'av';
+    // (spelar eller spolar bandet är radion tyst)
+    const bandet = pa && bandGar();
     const f = pa ? fAv(S.band, S.p) : 0;
     const { k, d } = pa ? narmast(S.band, f) : { k: null, d: Infinity };
     const B = BAND[S.band];
@@ -296,8 +303,8 @@ window.RumRadio = (() => {
     const provar = O.tyst;
     const hors = provar ? s > 0.5 : Boolean(k && A.kanal === k && A.klar);
     A.narmast = k;
-    A.s = s;
-    if (pa && !provar && A.ctx) {
+    A.s = bandet ? 0 : s;
+    if (pa && !bandet && !provar && A.ctx) {
       clearTimeout(A.las);
       clearTimeout(A.slapp);
       if (s > 0.02 && A.kanal !== k && !A.fel[k.id]) {
@@ -326,13 +333,16 @@ window.RumRadio = (() => {
       clearTimeout(A.las);
       clearTimeout(A.slapp);
       param(A.stn.gain, 0, 0.02);
-      param(A.brus.gain, 0, 0.02);
+      // (ett oinspelat band susar)
+      param(A.brus.gain, bandet && bandSus() ? 0.045 : 0, 0.02);
       param(A.pop.gain, 0, 0.02);
       param(A.visG.gain, 0, 0.02);
-      if (!pa && A.kanal) slapp();
+      if ((!pa || bandet) && A.kanal) slapp();
     }
+    if (A.ctx && T.g) param(T.g.gain, bandet && bandHors() && !T.friPa ? 1 : 0, 0.04);
+    if (T.fri) T.fri.volume = kl(S.vol ** 1.6);
     // gänget: musik sätter igång dem direkt, och de slutar först en stund efter att musiken är borta
-    const musik = Boolean(pa && k && k.musik && hors && s > 0.5);
+    const musik = Boolean(pa && !bandet && k && k.musik && hors && s > 0.5) || Boolean(bandet && bandHors() && T.kas === 'blandband');
     if (musik || !pa) {
       clearTimeout(A.gangT);
       A.gangT = 0;
@@ -340,12 +350,17 @@ window.RumRadio = (() => {
     } else if (A.gang && !A.gangT) {
       A.gangT = setTimeout(() => { A.gangT = 0; gangSatt(false); }, 4000);
     }
-    till3d({ s: hors ? s * (S.band === 'am' ? 0.45 + 0.55 * A.fade : 1) : s * 0.12 });
+    till3d({ s: bandet ? 0 : hors ? s * (S.band === 'am' ? 0.45 + 0.55 * A.fade : 1) : s * 0.12 });
     lappNu();
   }
   // Hur mycket som hörs just nu, till lysdioderna och högtalarna (rum-3d.js, radioRita).
   function niva() {
-    if (!A.ctx || S.band === 'av' || A.friPa) return null;
+    if (!A.ctx || S.band === 'av') return null;
+    if (bandGar()) {
+      // (bandet utan Web Audio: lysdioderna går som tal)
+      if (!bandHors()) return { bas: 0, tot: 0 };
+      if (T.friPa) { const t = performance.now() / 1000; return { bas: 0, tot: 0.32 + 0.32 * Math.abs(Math.sin(t * 5.3) * Math.sin(t * 1.7 + 1)) }; }
+    } else if (A.friPa) return null;
     // styrkan i decibel (−38 dB är inget, −8 dB är allt) och basens slag ovanför sitt medel
     A.an.getByteTimeDomainData(A.vag);
     let sum = 0;
@@ -425,15 +440,20 @@ window.RumRadio = (() => {
     N.afc = setTimeout(fanga, 500);
   }
   // S.band: 'av' eller det band som hörs; S.sist: det band som bandspaken står på.
-  function satt(band, ton) {
+  // (franBand: bandet slog på strömmen, och då slår det av den igen när det stannar)
+  function satt(band, ton, franBand) {
     if (band === S.band) return;
+    if (!franBand) T.slogPa = false;
     ljudStart();
     if (ton) klick(...ton);
     else klick();
     S.band = band;
     if (band !== 'av') S.sist = band;
     bandSatt();
-    if (band === 'av') slapp();
+    if (band === 'av') {
+      slapp();
+      if (T.lage !== 'stop' || T.paus) bandLage('stop', false);
+    }
     else if (A.el && A.kanal && A.kanal.band !== band) slapp();
     till3d({ band, sist: S.sist, lampa: band === 'av' ? 0 : 1 });
     lyssna();
@@ -461,6 +481,7 @@ window.RumRadio = (() => {
     till3d({ vol: S.vol });
     if (A.ctx) param(A.utv.gain, S.vol ** 1.6, 0.03);
     if (A.friPa) A.fri.volume = kl(A.s * S.vol ** 1.6);
+    if (T.fri) T.fri.volume = kl(S.vol ** 1.6);
     if (U.vol) U.vol.setAttribute('aria-valuenow', String(Math.round(S.vol * 100)));
     spara();
   }
@@ -491,6 +512,10 @@ window.RumRadio = (() => {
       + '<button type="button" class="r-del r-kraft" aria-label="På och av"></button>'
       + '<button type="button" class="r-del r-band"></button>'
       + '<button type="button" class="r-lapp" aria-label="Gå fram till lappen med stationerna" hidden></button>'
+      + '<button type="button" class="r-del r-lucka" aria-label="Vänd kassetten"></button>'
+      + TANGENTER.map((n, i) => `<button type="button" class="r-del r-tan" data-i="${i}" aria-label="${n}"></button>`).join('')
+      + '<button type="button" class="r-stall" aria-label="Gå fram till kassetterna" hidden></button>'
+      + '<div class="r-kassetter" hidden></div>'
       + `<div class="r-rader" hidden>${KANALER.map((k) => `<button type="button" class="r-st" data-k="${k.id}" aria-pressed="false">${rad(k).join(' ')}</button>`).join('')}</div>`;
     O.el.append(d);
     U.el = d;
@@ -504,6 +529,19 @@ window.RumRadio = (() => {
     U.band = d.querySelector('.r-band');
     U.lapp = d.querySelector('.r-lapp');
     U.rader = d.querySelector('.r-rader');
+    U.lucka = d.querySelector('.r-lucka');
+    U.tan = [...d.querySelectorAll('.r-tan')];
+    U.stall = d.querySelector('.r-stall');
+    U.kasR = d.querySelector('.r-kassetter');
+    U.lucka.addEventListener('click', bandVand);
+    for (const b of U.tan) b.addEventListener('click', () => tangent(Number(b.dataset.i)));
+    // (ryggarna är för små här: kameran går fram till stället)
+    U.stall.addEventListener('click', () => { if (!U.stall.classList.contains('las') && O.sak) O.sak('kassetter'); });
+    U.kasR.addEventListener('click', (e) => {
+      const b = e.target.closest('.r-kas');
+      if (b) stallKlick(b.dataset.k);
+    });
+    kassettKnappar();
     U.st = {};
     for (const b of U.rader.querySelectorAll('.r-st')) U.st[b.dataset.k] = b;
     U.rader.addEventListener('click', (e) => {
@@ -631,12 +669,12 @@ window.RumRadio = (() => {
     if (!g || !g.radioDelar || !c || !U.el) return;
     const r = c.getBoundingClientRect();
     const d = g.radioDelar();
-    const satt = (el, [l, t, h, b]) => {
+    const satt = (el, [l, t, h, b], minst = MINST) => {
       let x0 = r.left + l * r.width;
       let x1 = r.left + h * r.width;
       let y0 = r.top + t * r.height;
       let y1 = r.top + b * r.height;
-      const lagg = (a0, a1) => { const m = Math.max(0, MINST - (a1 - a0)) / 2; return [a0 - m, a1 + m]; };
+      const lagg = (a0, a1) => { const m = Math.max(0, minst - (a1 - a0)) / 2; return [a0 - m, a1 + m]; };
       [y0, y1] = lagg(y0, y1);
       [x0, x1] = lagg(x0, x1);
       Object.assign(el.style, { left: `${x0.toFixed(1)}px`, top: `${y0.toFixed(1)}px`, width: `${(x1 - x0).toFixed(1)}px`, height: `${(y1 - y0).toFixed(1)}px` });
@@ -647,7 +685,15 @@ window.RumRadio = (() => {
     satt(U.vol, d.vol);
     satt(U.kraft, d.kraft);
     satt(U.band, d.band);
+    const kd = g.kassettDelar ? g.kassettDelar() : null;
+    if (kd) {
+      satt(U.lucka, kd.lucka);
+      // (tangenterna sitter tätt: lite mindre utfyllnad)
+      kd.tangent.forEach((x, i) => satt(U.tan[i], x, 26));
+      U.kd = kd;
+    }
     lappPlats();
+    stallPlats();
   }
   function nara(pa) {
     bygg();
@@ -738,9 +784,346 @@ window.RumRadio = (() => {
     if (U.st) for (const [id, b] of Object.entries(U.st)) b.setAttribute('aria-pressed', String(id === nu));
   }
 
+  // ---------- kassetterna ----------
+  // Kassettstället bredvid radion (rum-kassetter.js i 3D): en kassett per match på kupongen med
+  // supporterpoddarnas senaste avsnitt inför omgången (data/poddsidor.json, ljudet där nattjobbet har hittat
+  // det), A-sidan hemmalagets podd och B-sidan bortalagets. Ett tryck på en kassett i stället: den som sitter
+  // i radion åker tillbaka till sitt fodral, och den nya åker in och spelas. Tangenterna på locket gör det de
+  // brukar (REC går inte: fliken är utbruten), ett tryck på luckan vänder kassetten, och STOP/EJ två gånger
+  // matar ut den. Bandet står kvar där man slutade (sparas per avsnitt), och kassetten minns sin sida.
+  // Medan bandet går är radion tyst; PLAY slår på strömmen och POWER stänger av allt. Ljudet kommer från
+  // poddens egen server, genom Web Audio om servern tillåter det (lysdioderna följer då talet) och annars i
+  // ett vanligt ljudelement. Blandbandet, som sitter i från början, är gängets italodisco.
+  const TANGENTER = ['Inspelning', 'Spela', 'Spola tillbaka', 'Spola fram', 'Stopp, och ut med kassetten', 'Paus'];
+  const EGNA = [
+    { id: 'dansband', text: 'Dansband?', marke: 0 },
+    { id: 'italo2', text: 'Italo 2', liten: 'Bland 89', marke: 1 },
+    { id: 'blandband', text: 'Blandband', marke: 2, spelbar: true, blandband: true },
+  ];
+  const T = { lista: EGNA.slice(), kas: 'blandband', sida: 'A', lage: 'stop', paus: false, el: null, g: null, fri: null, friPa: false, src: null, hors: false, upptagen: 0, spolT: 0, pT: 0, borjan: null, sus: null };
+  const BANDNYCKEL = 'rum-band';
+  let POS = {};
+  try { POS = JSON.parse(localStorage.getItem(BANDNYCKEL) || '{}') || {}; } catch (err) { POS = {}; }
+  let posT = 0;
+  const sparaPos = () => { clearTimeout(posT); posT = setTimeout(() => { try { localStorage.setItem(BANDNYCKEL, JSON.stringify(POS)); } catch (err) { /* bara den här gången */ } }, 300); };
+  const kortNamn = (n) => (window.Papper && Papper.kort ? Papper.kort(n) : String(n || ''));
+  const poddNamn = (n) => String(n || '').split(/\s+[-–|:]\s+/)[0].trim() || String(n || '');
+  const kasAv = (id) => T.lista.find((e) => e && e.id === id) || null;
+  // Omgångens kassetter ur numret: [{ id, nr, text, marke, tom, spelbar, sidor: [{ lag, podd, avsnitt, ljud }] }]
+  function kassetterUr(d) {
+    if (!d || !Array.isArray(d.matcher)) return [];
+    return d.matcher.slice(0, 13).map((m, i) => {
+      const s = (d.sidor || []).find((x) => String(x.id) === String(m.id));
+      const lag = String(m.match || (s && s.match) || '').split(' – ');
+      const sidor = [0, 1].map((j) => {
+        const l = lag[j] || '';
+        const del = s && (s.delar || []).find((x) => x.lag === l);
+        const k = del && (del.kallor || []).find((y) => y && (!y.typ || y.typ === 'podd'));
+        return { lag: l, podd: k ? poddNamn(k.podd) : null, avsnitt: k ? k.avsnitt || null : null, ljud: (k && k.ljud) || null };
+      });
+      const nr = m.nr || i + 1;
+      const tom = !sidor.some((x) => x.podd);
+      return { id: `m${m.id}`, nr, text: tom ? '' : `${nr}  ${kortNamn(lag[0])} – ${kortNamn(lag[1])}`, marke: nr % 3, tom, spelbar: !tom, sidor };
+    });
+  }
+  // etiketten på kassetten i radion (rum-kassetter.js, ritaKassett)
+  function etikett(id, sida) {
+    const e = kasAv(id);
+    if (!e) return null;
+    if (e.blandband) return { sida, rad1: 'Blandband', rad2: '', marke: e.marke };
+    const x = e.sidor[sida === 'A' ? 0 : 1];
+    return { sida, rad1: x.podd ? `${kortNamn(x.lag)} – ${x.podd}` : '', rad2: x.podd ? x.avsnitt || '' : '', marke: e.marke };
+  }
+  // det som finns på sidan som är uppe: { ljud, direkt } eller null (oinspelat)
+  function kalla() {
+    const e = kasAv(T.kas);
+    if (!e) return null;
+    if (e.blandband) return { ljud: kanal('italo').url, direkt: true };
+    const x = e.sidor[T.sida === 'A' ? 0 : 1];
+    return x && x.ljud ? { ljud: x.ljud, direkt: false } : null;
+  }
+  const bandGar = () => Boolean(T.kas && T.lage !== 'stop');
+  const bandHors = () => Boolean(T.kas && T.lage === 'play' && !T.paus && T.hors);
+  const bandSus = () => Boolean(T.kas && T.lage === 'play' && !T.paus && (!kalla() || T.trasig));
+  const aktivt = () => (T.friPa ? T.fri : T.el);
+  function bandLjud() {
+    if (T.el || !A.ctx) return;
+    const el = new Audio();
+    el.crossOrigin = 'anonymous';
+    el.preload = 'auto';
+    T.el = el;
+    T.g = A.ctx.createGain();
+    T.g.gain.value = 0;
+    A.ctx.createMediaElementSource(el).connect(T.g);
+    T.g.connect(A.mix);
+    T.fri = new Audio();
+    T.fri.preload = 'auto';
+    T.fri.volume = kl(S.vol ** 1.6);
+    for (const x of [el, T.fri]) {
+      x.addEventListener('playing', () => { if (x === aktivt()) { T.hors = true; T.trasig = false; lyssna(); } });
+      x.addEventListener('waiting', () => { if (x === aktivt()) { T.hors = false; lyssna(); } });
+      x.addEventListener('ended', () => { if (x === aktivt() && T.lage === 'play') { klick(...KLONK); bandLage('stop', false, true); } });
+      x.addEventListener('loadedmetadata', () => {
+        if (x !== aktivt() || T.borjan == null) return;
+        try { x.currentTime = Math.min(T.borjan, Math.max(0, (x.duration || Infinity) - 2)); } catch (err) { /* från början */ }
+        T.borjan = null;
+      });
+      // (servern tillåter inte Web Audio: samma adress i ett vanligt ljudelement, och sedan sus)
+      x.addEventListener('error', () => {
+        if (!x.getAttribute('src') || x !== aktivt()) return;
+        if (x === T.el && T.src) {
+          T.friPa = true;
+          T.borjan = POS[T.src] || null;
+          tyst(T.el);
+          T.fri.src = T.src;
+          if (T.lage === 'play' && !T.paus) { const p = T.fri.play(); if (p && p.catch) p.catch(() => {}); }
+        } else {
+          T.trasig = true;
+          T.hors = false;
+        }
+        lyssna();
+      });
+    }
+    // spolningens vinande: brus genom ett smalt band, som stiger med farten
+    const n = A.ctx.createBufferSource();
+    n.buffer = A.vit;
+    n.loop = true;
+    const f = A.ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 1800;
+    f.Q.value = 3;
+    T.spolG = A.ctx.createGain();
+    T.spolG.gain.value = 0;
+    T.spolF = f;
+    n.connect(f);
+    f.connect(T.spolG);
+    T.spolG.connect(A.mix);
+    n.start();
+  }
+  // Ljudet för sidan som är uppe, utan att spela (ny sida eller ny kassett: från där bandet stod)
+  function bandLadda() {
+    ljudStart();
+    bandLjud();
+    const k = kalla();
+    if (!T.el) return null;
+    if (!k) {
+      if (T.src) { tyst(T.el); tyst(T.fri); T.src = null; }
+      return null;
+    }
+    if (T.src !== k.ljud) {
+      tyst(T.el);
+      tyst(T.fri);
+      T.friPa = false;
+      T.trasig = false;
+      T.hors = false;
+      T.src = k.ljud;
+      T.borjan = k.direkt ? null : POS[k.ljud] || null;
+      T.el.src = k.ljud;
+      T.el.load();
+    }
+    return aktivt();
+  }
+  function sparaHar() {
+    const x = T.el && aktivt();
+    const k = kalla();
+    if (!x || !k || k.direkt || T.src !== k.ljud || !(x.currentTime > 0)) return;
+    POS[T.src] = Math.round(x.currentTime);
+    sparaPos();
+  }
+  // av: stannar bandet slås strömmen av, om det var bandet som slog på den
+  function bandLage(lage, paus, av) {
+    const var0 = T.lage;
+    T.lage = T.kas ? lage : 'stop';
+    T.paus = Boolean(paus);
+    clearInterval(T.spolT);
+    T.spolT = 0;
+    if (T.spolG) param(T.spolG.gain, 0, 0.05);
+    const x = T.kas && T.lage !== 'stop' ? bandLadda() : T.el && aktivt();
+    if (T.lage === 'play' && !T.paus && x) {
+      const p = x.play();
+      if (p && p.catch) p.catch(() => {});
+    } else {
+      if (T.el && !T.el.paused) T.el.pause();
+      if (T.fri && !T.fri.paused) T.fri.pause();
+      T.hors = false;
+      if (var0 !== 'stop') sparaHar();
+    }
+    if (T.lage === 'ff' || T.lage === 'rew') bandSpola(T.lage === 'ff' ? 1 : -1, x);
+    // (PLAY och spolningen slår på strömmen, och STOP slår av den igen)
+    if (T.lage !== 'stop' && S.band === 'av') {
+      satt(S.sist, KLONK, true);
+      T.slogPa = true;
+    } else if (T.lage === 'stop' && av && T.slogPa) {
+      T.slogPa = false;
+      satt('av', KLONK, true);
+    }
+    clearInterval(T.pT);
+    if (T.lage !== 'stop') T.pT = setInterval(() => { till3dBand(); sparaHar(); }, 1000);
+    till3dBand();
+    lyssna();
+    tangentNu();
+  }
+  // FF och REW: trettio gånger så fort, med vinandet, tills bandet tar slut
+  function bandSpola(r, x) {
+    if (!T.spolG) return;
+    param(T.spolG.gain, 0.05, 0.08);
+    param(T.spolF.frequency, 1500, 0.02);
+    param(T.spolF.frequency, 2600, 1.5);
+    const k = kalla();
+    let tom = 0;
+    T.spolT = setInterval(() => {
+      if (!x || !k || k.direkt || !Number.isFinite(x.duration)) {
+        // (direktsändning, oinspelat, eller inte laddat än: bara ljudet en stund)
+        if ((tom += 1) > 120) { klick(...KLONK); bandLage('stop', false, true); }
+        return;
+      }
+      const n = x.currentTime + r * 3;
+      if (n <= 0 || n >= x.duration - 1) {
+        try { x.currentTime = Math.min(Math.max(0, n), x.duration - 1); } catch (err) { /* där den är */ }
+        klick(...KLONK);
+        bandLage('stop', false, true);
+        return;
+      }
+      try { x.currentTime = n; } catch (err) { /* nästa gång */ }
+    }, 100);
+  }
+  function till3dBand() {
+    const g = fig();
+    if (!g || !g.kassettLage) return;
+    const x = T.el && T.src ? aktivt() : null;
+    const k = kalla();
+    let p = 0;
+    if (x && Number.isFinite(x.duration) && x.duration > 0) p = x.currentTime / x.duration;
+    else if (k && !k.direkt && POS[k.ljud]) p = Math.min(0.9, POS[k.ljud] / 3600);
+    else if (k && k.direkt) p = 0.4;
+    g.kassettLage({ i: T.kas, lage: T.lage, paus: T.paus, p });
+  }
+  const upptagen = () => T.upptagen > performance.now();
+  // En kassett i stället: in i radion (och den som satt där tillbaka), och den spelas
+  function stallKlick(id) {
+    const e = kasAv(id);
+    const g = fig();
+    if (!e || !e.spelbar || !g || !g.kassettFlytt || upptagen()) return;
+    ljudStart();
+    // (från ställets närbild går kameran tillbaka till radion först: kassetten åker in när den står still)
+    if (O.sakNu && O.sakNu() === 'kassetter' && O.sak) {
+      O.sak('radio');
+      T.upptagen = performance.now() + 760;
+      setTimeout(() => { T.upptagen = 0; stallKlick(id); }, 760);
+      return;
+    }
+    if (T.kas === id) {
+      if (T.lage !== 'play' || T.paus) tangent(1);
+      return;
+    }
+    if (T.lage !== 'stop' || T.paus) bandLage('stop', false);
+    if (T.el) { tyst(T.el); tyst(T.fri); T.src = null; }
+    if (T.kas) g.kassettFlytt('ut', T.kas);
+    T.kas = id;
+    // (sidan den stod på sist, annars den första med ett avsnitt)
+    T.sida = POS[`sida:${id}`] || (e.sidor && !e.sidor[0].podd ? 'B' : 'A');
+    const s = g.kassettFlytt('in', id, etikett(id, T.sida));
+    T.upptagen = performance.now() + s * 1000;
+    till3dBand();
+    setTimeout(() => {
+      if (T.kas !== id) return;
+      klick(...KLONK);
+      bandLage('play', false);
+    }, s * 1000);
+  }
+  // STOP/EJ när bandet står: kassetten åker tillbaka till sitt fodral
+  function bandUt() {
+    const g = fig();
+    if (!T.kas || !g || upptagen()) return;
+    bandLage('stop', false, true);
+    const s = g.kassettFlytt('ut', T.kas);
+    T.kas = null;
+    if (T.el) { tyst(T.el); tyst(T.fri); T.src = null; }
+    T.upptagen = performance.now() + s * 1000;
+    till3dBand();
+    lyssna();
+  }
+  // Luckan: kassetten vänds (och spelar vidare på andra sidan om den spelade)
+  function bandVand() {
+    const g = fig();
+    if (!T.kas || !g || upptagen()) return;
+    ljudStart();
+    const var0 = T.lage === 'play' && !T.paus;
+    bandLage('stop', false);
+    if (T.el) { tyst(T.el); tyst(T.fri); T.src = null; }
+    T.sida = T.sida === 'A' ? 'B' : 'A';
+    POS[`sida:${T.kas}`] = T.sida;
+    sparaPos();
+    klick(1400, 0.05, 0.4);
+    const s = g.kassettFlytt('vand', T.kas, etikett(T.kas, T.sida));
+    T.upptagen = performance.now() + s * 1000;
+    const id = T.kas;
+    setTimeout(() => { if (var0 && T.kas === id) bandLage('play', false); }, s * 1000);
+  }
+  // Tangenterna på locket: 0 REC, 1 PLAY, 2 REW, 3 FF, 4 STOP/EJ, 5 PAUS
+  function tangent(i) {
+    ljudStart();
+    klick(...KLONK);
+    const g = fig();
+    if (g && g.kassettTryck) g.kassettTryck(i);
+    // (utan kassett, och med REC, går tangenten ner och upp igen)
+    if (!T.kas || i === 0 || upptagen()) return;
+    if (i === 1) bandLage('play', false);
+    else if (i === 2) bandLage('rew', false);
+    else if (i === 3) bandLage('ff', false);
+    else if (i === 4) {
+      if (T.lage === 'stop' && !T.paus) bandUt();
+      else bandLage('stop', false, true);
+    } else if (i === 5) bandLage(T.lage, !T.paus);
+  }
+  function tangentNu() {
+    if (!U.tan) return;
+    const ner = [false, T.lage === 'play', T.lage === 'rew', T.lage === 'ff', false, T.paus];
+    U.tan.forEach((b, i) => { if (i && i !== 4) b.setAttribute('aria-pressed', String(Boolean(T.kas && ner[i]))); });
+  }
+  // Knapparna över ryggarna i stället (rätt antal när numret har kommit)
+  function kassettKnappar() {
+    if (!U.kasR) return;
+    U.kas = {};
+    U.kasR.innerHTML = T.lista.filter((e) => e && e.spelbar).map((e) => `<button type="button" class="r-kas" data-k="${e.id}">${e.blandband ? 'Blandbandet' : `Kassetten ${e.text.replace(/^\d+\s+/, '')}`}</button>`).join('');
+    for (const b of U.kasR.querySelectorAll('.r-kas')) U.kas[b.dataset.k] = b;
+  }
+  // (när kameran är framme: knapparna över ryggarna, eller över hela stället när de är för små)
+  function stallPlats() {
+    const kd = U.kd;
+    const c = O.el && O.el.querySelector('#rum-3d');
+    if (!kd || !c || !U.stall) return;
+    const r = c.getBoundingClientRect();
+    const ruta = (el, [l, t, h, b]) => Object.assign(el.style, { left: `${(r.left + l * r.width).toFixed(1)}px`, top: `${(r.top + t * r.height).toFixed(1)}px`, width: `${((h - l) * r.width).toFixed(1)}px`, height: `${((b - t) * r.height).toFixed(1)}px` });
+    let minst = Infinity;
+    for (const { id, r: x } of kd.kas) {
+      const b = U.kas && U.kas[id];
+      if (!b) continue;
+      ruta(b, x);
+      minst = Math.min(minst, (x[3] - x[1]) * r.height);
+    }
+    const las = minst >= LASBAR;
+    U.kasR.hidden = !las;
+    U.stall.hidden = false;
+    U.stall.classList.toggle('las', las);
+    U.stall.tabIndex = las ? -1 : 0;
+    U.stall.setAttribute('aria-hidden', String(las));
+    ruta(U.stall, kd.stall);
+  }
+  function kassetterIn(d) {
+    T.lista = EGNA.concat(kassetterUr(d));
+    const g = fig();
+    if (g && g.kassetter) g.kassetter(T.lista, T.kas);
+    kassettKnappar();
+    till3dBand();
+  }
+
   function mount(o) {
     Object.assign(O, o);
     allt3d();
+    const g = fig();
+    if (g && g.kassetter) g.kassetter(T.lista, T.kas);
+    fetch('data/poddsidor.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null).then(kassetterIn);
   }
   function av() {
     if (S.band === 'av') return;
@@ -775,7 +1158,9 @@ window.RumRadio = (() => {
     gang: A.gang,
     tid: A.el ? A.el.currentTime : 0,
     ctx: A.ctx && A.ctx.state,
+    bandet: { kas: T.kas, sida: T.sida, lage: T.lage, paus: T.paus, hors: T.hors, fri: T.friPa, src: T.src, tid: T.el && T.src ? aktivt().currentTime : 0 },
   });
+  const band = { lista: () => T.lista, i: stallKlick, ut: bandUt, vand: bandVand, tangent, lage: () => lage().bandet };
 
-  return { BAND, KANALER, rad, mount, nara, placera, ram, av, prova, lage, valj, kraft, bandspak, volym };
+  return { BAND, KANALER, rad, mount, nara, placera, ram, av, prova, lage, valj, kraft, bandspak, volym, band };
 })();
