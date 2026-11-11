@@ -290,6 +290,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Helgarderat i ett tryck (2026-11-11, användarens önskemål: "just nu känns det lite mixat med olika stilar. Gör det
+  mer enhetligt och snyggt"):** ett typsnitt rakt igenom, Fraunces, också i brödtexten (förut Georgia), och
+  skrivmaskinen bara för det ifyllda (sidhuvudet, avsparken, källorna och signaturen). Fyra nivåer och inget mer:
+  namnet, rubriken (svart, rak och centrerad på alla sidor, också omslaget), etiketten (röda versaler mellan två
+  tryckta streck, som omslagets datum: lagen över texten, *Sammanfattning*, *Källorna*, *Krönika*, *Kåseri*, *Vid
+  sidan av*) och brödtexten. Kursiv bara för citaten, och en sorts ruta, omslagets: sammanfattningen står utan ruta.
+  Valt bland tre skisser: A *Ett tryck*, B *Blanketten* (allt innehåll maskinskrivet på förtryckt papper, som
+  kupongen) och C *Magasinet* (vänsterställt mot en marginalspalt med nummer och sköldar, ingen ram) (se
+  [Helgarderat](#helgarderat))
 - [x] **Helgarderats matchblad som uppslag (2026-11-11, när matchbladen var två–tre omslag långa):** varje match är två
   sidor, som när man slår upp en tidning: vänstersidan med tavlan, rubriken, introduktionen och hemmalaget, högersidan
   med bilden, bortalaget, sammanfattningen och källorna. På datorn står de bredvid varandra, tätt ihop med fästets
@@ -7820,6 +7829,10 @@ strecken i Fraunces), skrivmaskin (sidhuvudet, tiderna, lagen i innehållet, bil
 pennan (omslagets kryss). Brödtexten står i bläck. Sedan samma kväll (val A *Rutorna*) är omslaget förebild för
 resten: samma sidhuvud efter omslaget (*Nr 1 · lördag 14 november*), matchbladets tavla som omslagets rutor 1, X och 2,
 lagen i röda versaler och rubrikerna i svart kursiv överallt, bara konturer och inget fetstilt utom spelarnas namn.
+Sedan samma kväll (val A *Ett tryck*) är Fraunces det enda typsnittet, också i brödtexten, och skrivmaskinen står bara
+för det ifyllda; rubrikerna är raka och centrerade, lagen över texten, *Sammanfattning*, *Källorna*, *Krönika*,
+*Kåseri* och *Vid sidan av* är samma etikett mellan två streck som omslagets datum, sammanfattningen har ingen ruta och
+bara citaten är kursiva.
 Varje matchblad är ett uppslag med två sidor (vänster: tavlan, rubriken, introduktionen och hemmalaget; höger: bilden,
 bortalaget, sammanfattningen och källorna), bredvid varandra när de ryms (`passa`, klassen `hg-tva`). Priset är 3 kr, tre rader. Provnumrets framsida har en stämpel, *Provnummer*. Ettan och tvåan är matcherna med mest text, helst
 där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarderat.js)). Ettan har bilden och, om

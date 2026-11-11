@@ -432,7 +432,9 @@
   // intressant/alternativ spännande information … som du inte har skrivit om i bladet … nåt kort kåseri av någon
   // person", och val 1, Spalterna, bland tre skisser): Hasse Backes krönika i två spalter med porträttet vid namnet och
   // en röd anfang, Vid sidan av i en smal spalt bredvid med källan efter varje notis, och kåseriet under krönikan, med
-  // kåsörens namn och vem hen är sist (en ny varje vecka; före det Ombudet, som inte har något om).
+  // kåsörens namn och vem hen är sist (en ny varje vecka; före det Ombudet, som inte har något om). Sedan Ett tryck
+  // (samma kväll) står Krönika och Kåseri som etiketter (hg-etikett) över porträttet och rubriken, som lagen i
+  // matchbladen.
   function sista(u) {
     const S = u.sista;
     const T = TEXT.sista;
@@ -441,9 +443,9 @@
     const notiser = S.sidan.map((n) => `<li><b>${esc(kort(n.lag))}</b> ${esc(hel(n.text))}` +
       (n.kalla && n.kalla.url ? ` <span class="hs-kalla">${lank(n.kalla.url, esc(n.kalla.source || ''))}</span>` : '') + '</li>').join('');
     return `<section class="hg-ark hg-sida hg-sista" id="hg-sida-${nr}" aria-label="Sidan ${nr}: ${esc(TEXT.innehall.sista)}">${folio(u, nr)}<div class="hs-grid">` +
-      `<article class="hs-kronika"><div class="hs-by"><span class="hs-portratt" aria-hidden="true"></span><span><b>${esc(S.kronika.av)}</b><em>${esc(T.kronika)}</em></span></div>` +
+      `<article class="hs-kronika"><p class="hg-etikett">${esc(T.kronika)}</p><div class="hs-by"><span class="hs-portratt" aria-hidden="true"></span><b>${esc(S.kronika.av)}</b></div>` +
       `<h2 class="hg-rub">${esc(hel(S.kronika.rubrik))}</h2><div class="hs-text">${stycken(S.kronika.stycken)}</div>` +
-      `<section class="hs-kaseri"><h3><span>${esc(T.kaseri)}</span>${esc(hel(S.kaseri.rubrik))}</h3>` +
+      `<section class="hs-kaseri"><p class="hg-etikett">${esc(T.kaseri)}</p><h3>${esc(hel(S.kaseri.rubrik))}</h3>` +
       `<div class="hs-ktext">${stycken(S.kaseri.stycken)}<p class="hs-sign">${esc(S.kaseri.av)}${S.kaseri.om ? `<span>${esc(stor(S.kaseri.om))}</span>` : ''}</p></div></section></article>` +
       (notiser ? `<aside class="hs-sido"><h4>${esc(T.vidSidanAv)}</h4><ul>${notiser}</ul></aside>` : '') + '</div></section>';
   }
@@ -518,7 +520,7 @@
     const lagen = delar.map((d, i) => {
       const text = poddText(d);
       const c = citatFor(i);
-      return `<div class="hg-lagen"><section class="hg-lagdel"><h3><span>${esc(namn(i))}</span><em>${esc(i ? T.borta : T.hemma)}</em></h3>` +
+      return `<div class="hg-lagen"><section class="hg-lagdel"><h3><span>${esc(namn(i))} <em>${esc(i ? T.borta : T.hemma)}</em></span></h3>` +
         `<div class="hg-lagtext">${text.length ? fetaNamn(text, d.namn).map((t) => `<p>${t}</p>`).join('') : `<p class="hg-ingen">${esc(T.ingen)}</p>`}</div>` +
         (c ? citat(c) : '') + '</section></div>';
     });
