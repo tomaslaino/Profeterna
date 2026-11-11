@@ -155,44 +155,49 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 .hg-folio.h { flex-direction: row-reverse; }
 .hg-folio.h span { margin: 0 auto 0 0; }
 
-/* matchens vinjett, som omslagets första match: numret i en tryckt ruta, lagen tryckta och avsparken maskinskriven,
-   över ett streck */
-.hg-vinjett { display: flex; align-items: center; gap: 12px; margin: calc(var(--hg-k) * 2.6px) 0 calc(var(--hg-k) * 2.2px); padding: 0 0 calc(var(--hg-k) * 2.2px);
-  border-bottom: var(--linje) solid var(--rod); }
-.hg-vinjett b { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; box-sizing: border-box; background: var(--ruta);
-  box-shadow: inset 0 0 0 1.6px var(--rod); color: var(--rod); font: 600 17px/1 var(--tryck); }
-.hg-vinjett span { min-width: 0; color: var(--rod); font: 600 max(13px, calc(var(--hg-k) * 3.1px))/1 var(--tryck); letter-spacing: 0.12em; text-transform: uppercase; }
-.hg-vinjett em { margin-left: auto; font: 400 calc(var(--hg-k) * 2.9px)/1.2 var(--skriv); font-style: normal; white-space: nowrap; text-align: right; }
+/* Tavlan överst (B, valt 2026-11-11 bland fyra skisser: "kan du ha den här överst på sidan inklusive den tid och plats
+   de möts"): lagen mot varandra på ett tryckt block i terrakotta, från ram till ram, med sköldarna på runda plåtar och
+   namnen under, hemmalaget till vänster, dagen maskinskriven och avsparken maskinskriven i en ruta i mitten. Under
+   tavlan en remsa med numret på kupongen i en tryckt ruta och arenan med orten maskinskriven. Ingen vinjett: allt den
+   sa står här. */
+.hg-tavla { margin: calc(var(--hg-k) * 2.6px) calc(var(--hg-k) * -4px) calc(var(--hg-k) * 3.4px); }
+.hg-tavla-rad { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; column-gap: calc(var(--hg-k) * 2px);
+  padding: calc(var(--hg-k) * 3px) calc(var(--hg-k) * 2.4px) calc(var(--hg-k) * 2.8px); background: var(--rod); color: var(--ruta); }
+.hg-tavla-lag { display: flex; flex-direction: column; align-items: center; gap: calc(var(--hg-k) * 1.6px); min-width: 0; text-align: center; }
+.hg-plat { display: grid; place-items: center; flex: none; width: calc(var(--hg-k) * 13px); height: calc(var(--hg-k) * 13px); border-radius: 50%; background: var(--ruta); }
+.hg-skold.mot { flex: none; width: calc(var(--hg-k) * 9.4px); height: calc(var(--hg-k) * 9.4px); vertical-align: 0; }
+.hg-tavla-lag b { max-width: 100%; font: 600 max(12.5px, calc(var(--hg-k) * 2.6px))/1.15 var(--tryck); letter-spacing: 0.08em; text-transform: uppercase; text-wrap: balance; overflow-wrap: break-word; }
+.hg-tavla-tid { display: flex; flex-direction: column; align-items: center; gap: calc(var(--hg-k) * 1.3px); padding-top: calc(var(--hg-k) * 1.9px); }
+.hg-tavla-tid em { font: 400 calc(var(--hg-k) * 2.9px)/1 var(--skriv); font-style: normal; white-space: nowrap; }
+.hg-tavla-tid strong { padding: calc(var(--hg-k) * 1.3px) calc(var(--hg-k) * 2px) calc(var(--hg-k) * 1px); background: var(--ruta); color: var(--svart);
+  font: 400 calc(var(--hg-k) * 5.4px)/1 var(--skriv); white-space: nowrap; }
+.hg .hg-plats { position: relative; display: flex; justify-content: center; align-items: center; min-height: calc(var(--hg-k) * 4.6px);
+  padding: calc(var(--hg-k) * 1.4px) calc(var(--hg-k) * 8.6px); background: var(--ruta); border-bottom: calc(var(--linje) * 2) solid var(--rod);
+  font: 400 calc(var(--hg-k) * 2.9px)/1.25 var(--skriv); text-align: center; text-wrap: balance; }
+.hg-plats b { position: absolute; left: calc(var(--hg-k) * 2.4px); top: 50%; display: grid; place-items: center; min-width: calc(var(--hg-k) * 4.6px);
+  height: calc(var(--hg-k) * 4.6px); padding: 0 4px; box-sizing: border-box; transform: translateY(-50%); background: var(--p); box-shadow: inset 0 0 0 1.6px var(--rod);
+  color: var(--rod); font: 600 max(14px, calc(var(--hg-k) * 2.8px))/1 var(--tryck); }
 /* rubriken i kursiv, som omslagets */
 .hg .hg-rub { margin: 0 0 12px; padding: 0; border: 0; color: var(--svart); font: italic 500 clamp(25px, calc(var(--hg-k) * 5.6px), 40px)/1.12 var(--tryck); letter-spacing: -0.005em; }
 
-/* Matchbladet, Sköldarna möts (C3, valt 2026-11-11): introduktionen, lagen mot varandra med stora sköldar (hemmalaget
-   högerställt mot mitten, som i matchlistan), lagens text i två lika spalter med lagets citat i jämnhöjd under
-   (subgrid), sammanfattningen sist i en tryckt ruta och källorna per lag. Spalterna är tidningsspalter (arket är lika
-   brett som omslaget), och texten har anfang, avstavning och jämn högerkant (text-wrap: pretty): det ska vara en
-   njutning att läsa. Ingen smal spalt: avsparken och numret står i vinjetten. */
-.hg-ingress { margin: 0 0 20px !important; font: 600 18px/1.45 var(--tryck); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
-.hg-mot { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; column-gap: 14px; margin: 0 0 20px; padding: 14px 0;
-  border-top: var(--linje) solid var(--rod); border-bottom: var(--linje) solid var(--rod); }
-.hg-mot-lag { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.hg-mot-lag.h { flex-direction: row-reverse; text-align: right; }
-.hg-mot-lag b { min-width: 0; color: var(--rod); font: 600 max(14px, calc(var(--hg-k) * 2.7px))/1.1 var(--tryck); letter-spacing: 0.05em; text-transform: uppercase; overflow-wrap: break-word; }
-.hg-mot > i { display: block; width: 22px; height: 3px; background: var(--rod); }
-.hg-skold.mot { flex: none; width: 68px; height: 68px; vertical-align: 0; }
-.hg-lagen { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 30px; }
-.hg-lagen::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid var(--streck); }
-.hg-lagdel { display: grid; grid-row: span 2; grid-template-rows: subgrid; align-content: start; }
-/* lagets namn över texten bara i telefonen, där spalterna står under varandra */
-.hg .hg-lagdel h3 { display: none; align-items: center; gap: 8px; margin: 0 0 10px; padding: 0 0 7px; border: 0; border-bottom: var(--linje) solid var(--rod);
+/* Under rubriken, bilden och introduktionen står lagen efter varandra, hemmalaget först, var och en under sin sköld och
+   sitt namn (och Hemma eller Borta längst ut), med lagets citat under texten. Så blir det inget tomt hål bredvid ett lag
+   med lite text, som när lagen stod i två spalter bredvid varandra (Sköldarna möts, före Tavlan). Sist
+   sammanfattningen i en tryckt ruta och källorna per lag. Texten har anfang, avstavning och jämn högerkant (text-wrap:
+   pretty): det ska vara en njutning att läsa. */
+.hg-ingress { margin: 0 0 22px !important; font: 600 18px/1.45 var(--tryck); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
+.hg-lagdel + .hg-lagdel { margin-top: 28px; }
+.hg .hg-lagdel h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; padding: 0 0 7px; border: 0; border-bottom: var(--linje) solid var(--rod);
   color: var(--rod); font: 600 18px/1 var(--tryck); letter-spacing: 0.08em; text-transform: uppercase; }
-.hg-lagdel h3 .hg-skold { width: 26px; height: 26px; vertical-align: 0; }
+.hg-lagdel h3 .hg-skold { width: 28px; height: 28px; vertical-align: 0; }
+.hg-lagdel h3 em { margin-left: auto; font: 600 max(11px, calc(var(--hg-k) * 2.1px))/1 var(--tryck); font-style: normal; letter-spacing: 0.14em; }
 .hg-lagtext p { margin: 0 0 12px !important; font: 400 16px/1.55 var(--serif); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
 .hg-lagtext p:last-child { margin-bottom: 0 !important; }
 .hg-lagtext p:first-child:not(.hg-ingen)::first-letter { float: left; margin: 4px 6px 0 0; color: var(--rod); font: 600 46px/0.8 var(--tryck); }
 .hg-lagtext strong { font-weight: 700; hyphens: manual; -webkit-hyphens: manual; }
 .hg-ingen { font: italic 400 15px/1.45 var(--serif) !important; color: var(--gra); }
 /* citatet: rött, med vem som säger det under (och att det är översatt) */
-.hg .hg-citat { align-self: start; margin: 18px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--streck); background: none; }
+.hg .hg-citat { margin: 16px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--streck); background: none; }
 .hg-citat p { color: var(--rod); font: italic 500 17.5px/1.32 var(--tryck); text-wrap: pretty; }
 .hg-citat cite { display: block; margin-top: 6px; font: 400 11.5px/1.35 var(--skriv); font-style: normal; color: var(--gra); }
 .hg-citat cite::before { content: "– "; }
@@ -246,18 +251,17 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 /* Smal (telefonen): arket är lika brett som skärmen, och innanför marginalerna smalare än 460 px. Då står lagen och
    spalterna under varandra. */
 @container (max-width: 460px) {
-  .hg-vinjett { gap: 9px; }
-  .hg-vinjett span { font-size: 12.5px; letter-spacing: 0.06em; }
   .hg-foto { aspect-ratio: 16 / 9; }
   .hg-ingress { font-size: 17px; }
-  .hg-mot { column-gap: 8px; padding: 12px 0; }
-  .hg-mot-lag, .hg-mot-lag.h { flex-direction: column; gap: 8px; text-align: center; }
-  .hg-mot > i { width: 18px; }
-  .hg-skold.mot { width: 60px; height: 60px; }
-  .hg-lagen { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 26px; }
-  .hg-lagen::before { display: none; }
-  .hg-lagdel { display: block; }
-  .hg .hg-lagdel h3 { display: flex; }
+  .hg-tavla-rad { column-gap: 8px; padding-left: 10px; padding-right: 10px; }
+  .hg-plat { width: 60px; height: 60px; }
+  .hg-skold.mot { width: 44px; height: 44px; }
+  .hg-tavla-tid { padding-top: 6px; }
+  .hg-tavla-tid em { font-size: 12px; }
+  .hg-tavla-tid strong { font-size: 22px; }
+  .hg .hg-plats { padding-left: 46px; padding-right: 46px; font-size: 13px; }
+  .hg-plats b { left: 10px; min-width: 26px; height: 26px; font-size: 14px; }
+  .hg .hg-lagdel h3 { font-size: 15.5px; letter-spacing: 0.05em; }
   .hg-citat p { font-size: 18px; }
   .hg-kallor > div { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
   .hg .hg-i-titel { font-size: 34px; }

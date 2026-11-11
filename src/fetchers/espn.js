@@ -78,6 +78,8 @@ function parseEvent(e) {
     round: e.season && e.season.slug ? e.season.slug : null,
     neutral: !!c.neutralSite,
     venue: c.venue ? c.venue.fullName || null : null,
+    // orten, till arenan överst på Helgarderats matchblad (Stadium MK, Milton Keynes)
+    venueCity: c.venue && c.venue.address ? c.venue.address.city || null : null,
     home: team(home),
     away: team(away),
     score: completed ? { home: num(home.score), away: num(away.score) } : null,

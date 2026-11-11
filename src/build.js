@@ -53,7 +53,7 @@ const fs = require('fs');
 const path = require('path');
 const { refreshAll } = require('./refresh');
 const { readCache, CACHE_DIR } = require('./store');
-const { allMatches, matchIds, matchDetail } = require('./matches');
+const { allMatches, matchIds, matchDetail, load: matchData } = require('./matches');
 const { sourceReport } = require('./sourcetable');
 const { forecastAll } = require('./forecast');
 const { readSummaries } = require('./backtest');
@@ -136,6 +136,25 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     }
   } catch (e) {
     if (e.code !== 'ENOENT') console.warn(`Matchbladens bilder: ${e.message}`);
+  }
+  // Arenan och orten till tavlan överst på Helgarderats matchblad (Stadium MK, Milton Keynes), ur ESPN:s spelprogram:
+  // arena och ort på varje matchblad i sajtens data/poddsidor.json. Saknas matchen står bara dagen där.
+  try {
+    const psFil = path.join(dataDir, 'poddsidor.json');
+    const ps = fs.existsSync(psFil) ? JSON.parse(fs.readFileSync(psFil, 'utf8')) : null;
+    if (ps && Array.isArray(ps.sidor)) {
+      const { byId } = matchData();
+      for (const s of ps.sidor) {
+        const m = byId.get(String(s.id));
+        if (m && m.venue) {
+          s.arena = m.venue;
+          if (m.venueCity) s.ort = m.venueCity;
+        }
+      }
+      fs.writeFileSync(psFil, JSON.stringify(ps));
+    }
+  } catch (e) {
+    console.warn(`Matchbladens arenor: ${e.message}`);
   }
   // Tidningens bilder, en per lag (workflowen hämtar grenen tidning-bilder hit).
   const bilder = path.join(ROOT, 'data', 'tidning-bilder');

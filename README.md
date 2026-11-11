@@ -297,6 +297,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   matchbladen tre bredder (553, 560 och 940 px på en vanlig skärm) och tre stilar. Valt bland två skisser: A
   *Kupongens papper* och B *Matchprogrammet* (svart, rött och gult överallt, också på omslaget) (se
   [Helgarderat](#helgarderat))
+- [x] **Helgarderats matchblad: Tavlan (2026-11-11, användarens önskemål: "kan du ha den här överst på sidan inklusive
+  den tid och plats de möts"):** lagen står mot varandra överst på ett tryckt block i terrakotta, med sköldarna på runda
+  plåtar och namnen under, dagen och avsparken maskinskrivna i mitten och under blocket numret på kupongen och arenan
+  med orten (*Stadium MK, Milton Keynes*). Vinjetten är borta, och lagen står efter varandra, hemmalaget först, under
+  sin sköld och sitt namn, så att det inte blir ett tomt hål bredvid ett lag med lite text. Arenan och orten lägger
+  bygget till på matchbladen i sajtens `data/poddsidor.json` (`arena`, `ort`) ur ESPN:s spelprogram; utan dem står
+  hela dagen under tavlan. Valt bland fyra skisser: A *Programbladet*, B *Tavlan*, C *Biljetten* och D *Affischen*
+  (se [Helgarderat](#helgarderat))
 - [x] **Helgarderats matchblad: Sköldarna möts (2026-11-11, användarens önskemål: "förbättra tidningen helgarderat -
   börja med de olika matchbladen och hur du tänker att de ska bli snyggare/mer överblickbara och pedagogiska"):** lagen
   står mot varandra med stora sköldar under introduktionen (hemmalaget mot mitten, som i matchlistan), och lagens text
