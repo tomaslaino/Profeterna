@@ -2077,7 +2077,8 @@ och anropar aldrig någon språkmodell. (Fram till 2026-11-04 skrevs texterna vi
 ```
 launchd               →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
                                      ↓
-       data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json, data/tidning.json
+       data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json, data/tidning.json,
+                              data/sista-sidan.json
                                      ↓
           commit och push till main  →  GitHub Actions  →  matchfixarna.se
 ```
@@ -2139,6 +2140,28 @@ config/tidning.js om sidan är äldre än tiden och minst tolv timmar gammal; n�
 
 `nr` är matchens nummer på kupongen. Tidningen som Hasse Backe läser trycker notiserna på baksidan (se *Tidningen*
 under [Hasse Backe](#hasse-backe)), och tidningen bakom löpsedeln på sidan *Så mår tipslagen* (se [Tidningen](#tidningen)).
+
+**Helgarderats sista sida** (2026-11-11, användarens önskan: *"någon kort krönika av Hasse Backe och bara allmän
+intressant/alternativ spännande information som du finner inför omgången och som du inte har skrivit om i bladet …
+nåt kort kåseri av någon person"*): Hasse Backes krönika (150–220 ord), *Vid sidan av* (fem korta notiser om det udda
+med omgångens lag: historien, arenan, staden, supportrarna, aldrig form, skador eller tränarens ord) och ett kåseri av
+Ombudet, som har sålt tips över disken i tobaksaffären (90–150 ord). Ett anrop per omgång, när omgångens matchblad har
+kommit i `data/poddsidor.json`, så att Claude får matchbladens rubriker och sammanfattningar och inte upprepar dem
+([src/analyser/sista-sidan.mjs](src/analyser/sista-sidan.mjs), prompten och gränserna i
+[config/sista-sidan.js](config/sista-sidan.js)); en ny `promptVersion` skriver om den. Claude får högst 8 sökningar och 4
+sidor. En notis följer bara med om dess källa kom upp i en sökning eller på en läst sida och varje tal i den står där;
+krönikan och kåseriet är fiktion, men årtal och resultat i dem kontrolleras på samma sätt, och ingen del får ha
+tipsspråk (spik, odds, favorit). Det som inte går igenom skrivs om en gång utan verktyg; utan krönikan, kåseriet och
+minst tre notiser blir det ingen sida, och tidningen slutar med matchbladen. Provet 2026-11-11 tog 108 sekunder, 6
+sökningar och 4 sidor. `node scripts/analyser/skriv.mjs --sista-sidan --ut /tmp/prov` skriver den för omgången som
+pågår, oavsett tid. `data/sista-sidan.json`, som bygget kopierar till sajten:
+
+```json
+{ "omgang": "2026-11-14", "matcher": ["401880745"], "skriven": "…", "model": "…", "version": "…",
+  "kronika": { "av": "Hasse Backe", "rubrik": "…", "stycken": ["…"] },
+  "sidan": [ { "lag": "Exeter City", "text": "…", "kalla": { "source": "…", "title": "…", "url": "…", "publishedAt": null } } ],
+  "kaseri": { "av": "Ombudet", "rubrik": "…", "stycken": ["…"] } }
+```
 
 **Veckans bilder i tidningen** (2026-11-09, användarens önskan: *bilder från veckan i tipsguiden, för de olika
 lagen*): när tidningen är skriven hämtar samma jobb en bild från den senaste veckan per lag, med vanliga hämtningar på

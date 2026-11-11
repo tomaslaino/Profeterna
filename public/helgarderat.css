@@ -1,9 +1,9 @@
 /* Helgarderat: tidningen med det supportrarna vet inför lördagens matcher (rum-tidning.js). Det finns bara en
    tidning (2026-11-11), och det här är dess utseende, både på sajtens sida (helgarderat.html) och när den läses i
    rummet (rum-tidning.css lägger den över rummet och på pulten). Omslaget på kupongens papper med tryck i terrakotta
-   och pennans kryss (förslag C, som användaren valde 2026-11-11), kupongen i sajtens tipskupongs grafik och
-   matchbladen på ljust papper med tryck i svart och rött och gult i vinjetten och sammanfattningen (det gula
-   matchprogrammet, förslag F samma dag). Tidningen (.hg) är en container: smal (under 720 px) står matchbladen i en spalt, på sajten
+   och pennans kryss (förslag C, som användaren valde 2026-11-11), innehållet som en förteckning på samma papper som
+   matchbladen, matchbladen på ljust papper med tryck i svart och rött och gult i vinjetten och sammanfattningen (det gula
+   matchprogrammet, förslag F samma dag). Sist kommer sista sidan med Hasse Backes krönika. Tidningen (.hg) är en container: smal (under 720 px) står matchbladen i en spalt, på sajten
    och i rummet. */
 html.hg-html { background: #1a1510; }
 body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
@@ -91,34 +91,35 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 .hg-bild figcaption span { font: 400 10.5px/1.3 var(--sans); font-style: normal; letter-spacing: 0.03em; }
 .hg-bild figcaption a { color: inherit; text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
 
-/* ---------- kupongen: innehållet ---------- */
+/* ---------- innehållet ---------- */
 
-/* Stryktipset som programmets egen sida (val A, Uppställningen, 2026-11-11): tidningspapper med prickraster som
-   matchbladen och en dubbel svart ram som omslaget, namnet i Alfa Slab One på det röda bandet, och en rad per match:
-   numret i den svarta rutan med gul siffra som i matchbladets vinjett, hemmalaget högerställt och bortalaget
-   vänsterställt i Anton kring det röda strecket mitt på sidan, sköldarna intill strecket. Ytterspalterna är lika breda
-   (numret och lika mycket luft till höger), så att strecket står mitt på. Namnen krymper alla lika mycket när det
-   längsta inte ryms (--k-krymp, passaLagen i rum-tidning.js). Hela raden leder till matchbladet; en match utan
-   matchblad är blek. */
-.hg-kupong { position: relative; box-sizing: border-box; width: min(560px, calc(100% - 24px)); padding: 14px 26px 22px; scroll-margin-top: 14px; color: var(--svart);
+/* Förteckningen (val A bland fyra skisser, 2026-11-11: "en innehållssida för tidningen … snyggt och minimalistiskt"):
+   tidningspapper som matchbladen, namnet och numret över ett streck, rubriken, och en rad per match: numret, lagen,
+   prickar till sidnumret och matchbladets rubrik i kursiv under. Sist, under ett dubbelstreck, sista sidan. Hela raden
+   leder till sidan; en match utan matchblad är blek. Prickarna står på lagnamnets baslinje (align-self: end med
+   margin-bottom: last baseline hamnade på fel rad när namnet bröts). */
+.hg-kupong { position: relative; box-sizing: border-box; width: min(560px, calc(100% - 24px)); padding: 18px 30px 22px; scroll-margin-top: 14px; color: var(--svart);
   background: radial-gradient(circle at 50% 50%, rgba(40, 30, 14, 0.13) 0 0.6px, rgba(0, 0, 0, 0) 0.8px) 0 0 / 2.6px 2.6px, var(--p);
   box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35); }
-.hg-kupong::before { content: ""; position: absolute; inset: 6px; border: 2px double var(--svart); pointer-events: none; }
-.hg-k-band { display: flex; justify-content: center; margin: 0 -14px 10px; padding: 8px 0 6px; background: #b8231b; color: #f8f2e0; }
-.hg-k-band b { font: 400 40px/1 "Alfa Slab One", Rockwell, Georgia, serif; letter-spacing: 0.01em; text-transform: uppercase; }
-.hg-kupong ol { --k-namn: 22px; margin: 0; padding: 0; list-style: none; }
-.hg-kupong li { margin: 0; padding: 0; border-bottom: 1px solid var(--streck); }
-.hg-kupong li:last-child { border-bottom: 0; }
-.hg-kupong li > a, .hg-kupong li > div { display: grid; grid-template-columns: 30px minmax(0, 1fr) 24px 22px 24px minmax(0, 1fr); align-items: center; column-gap: 8px;
-  min-height: 46px; padding-right: 38px; color: inherit; text-decoration: none; }
-.hg-k-nr { display: grid; place-items: center; width: 30px; height: 30px; background: var(--svart); color: var(--gul); font: 800 17px/1 var(--rubrik); font-variant-numeric: tabular-nums; }
-.hg-k-lag { overflow: hidden; white-space: nowrap; font: 400 calc(var(--k-namn) * var(--k-krymp, 1))/1.15 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
-.hg-k-lag.h { text-align: right; }
-.hg-k-mot { color: var(--rod); font: 400 var(--k-namn)/1 Anton, Impact, sans-serif; font-style: normal; text-align: center; }
-.hg-kupong .hg-k-skold { width: 24px; height: 24px; object-fit: contain; vertical-align: 0; }
-.hg-kupong li.utan > div { opacity: 0.38; }
-@media (hover: hover) { .hg-kupong li > a:hover .hg-k-lag { text-decoration: underline 2px var(--rod); text-underline-offset: 4px; } }
-.hg-kupong li > a:focus-visible { outline: 2px solid var(--rod); outline-offset: -2px; }
+.hg-i-hd { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 6px; border-bottom: 1px solid var(--svart);
+  font: 600 10.5px/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--gra); }
+.hg-i-hd a { color: var(--rod); font: 400 13px/1 "Alfa Slab One", Rockwell, Georgia, serif; letter-spacing: 0.04em; text-transform: none; text-decoration: none; }
+.hg .hg-i-titel { margin: 16px 0 10px; padding: 0; border: 0; color: var(--svart); font: 800 34px/1 var(--rubrik); letter-spacing: -0.01em; }
+.hg-kupong ol { margin: 0; padding: 0; list-style: none; }
+.hg-kupong li { margin: 0; padding: 0; }
+.hg-kupong li > a, .hg-kupong li > div { display: grid; grid-template-columns: 26px auto minmax(12px, 1fr) 26px; column-gap: 8px; align-items: end;
+  padding: 7px 0 8px; border-bottom: 1px solid var(--streck); color: inherit; text-decoration: none; }
+.hg-i-nr { grid-row: 1; align-self: center; color: var(--gra); font: 800 13px/1 var(--rubrik); font-variant-numeric: tabular-nums; }
+.hg-i-lag { grid-row: 1; min-width: 0; overflow: hidden; font: 600 17.5px/1.15 var(--rubrik); white-space: nowrap; text-overflow: ellipsis; }
+.hg-i-pr { grid-row: 1; align-self: end; margin-bottom: 4px; border-bottom: 2px dotted rgba(22, 19, 15, 0.45); }
+.hg-i-s { grid-row: 1; text-align: right; font: 800 19px/1 var(--rubrik); font-variant-numeric: tabular-nums; }
+.hg-i-rub { grid-row: 2; grid-column: 2 / 4; margin-top: 3px; overflow: hidden; color: var(--gra); font: italic 400 13.5px/1.3 var(--serif); white-space: nowrap; text-overflow: ellipsis; }
+.hg-kupong li.utan > div { opacity: 0.4; }
+.hg-kupong li.utan .hg-i-pr { border: 0; }
+.hg-kupong .hg-i-sista { margin-top: 14px; border-top: 3px double var(--svart); }
+.hg-i-sista .hg-i-lag { color: var(--rod); }
+@media (hover: hover) { .hg-kupong li > a:hover .hg-i-lag { text-decoration: underline 1.5px; text-underline-offset: 3px; } }
+.hg-kupong li > a:focus-visible { outline: 2px solid var(--rod); outline-offset: 2px; }
 .hg-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ---------- matchbladet ---------- */
@@ -178,6 +179,34 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 .hg-kallor b { display: block; color: var(--svart); font: 700 10.5px/1.4 var(--sans); letter-spacing: 0.05em; text-transform: uppercase; }
 .hg-kallor a { color: inherit; text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
 
+/* ---------- sista sidan ---------- */
+
+/* Spalterna (val 1 bland tre skisser, 2026-11-11): Hasse Backes krönika i två spalter med porträttet vid namnet och
+   en röd anfang, kåseriet under ett tjockt streck, och Vid sidan av i en smal spalt bredvid med källan efter varje
+   notis. Smal: allt i en spalt, Vid sidan av sist. */
+.hs-grid { display: grid; grid-template-columns: minmax(0, 1fr) 250px; column-gap: 30px; margin-top: 16px; }
+.hs-by { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.hs-portratt { display: block; flex: none; width: 58px; height: 58px; border-radius: 50%; background: url(helgarderat/hasse.webp) 50% 50% / cover, #d9d3c4;
+  filter: contrast(1.1); mix-blend-mode: multiply; }
+.hs-by b { display: block; font: 400 22px/1 Anton, Impact, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+.hs-by em { display: block; margin-top: 3px; color: var(--rod); font: 800 11px/1 var(--sans); font-style: normal; letter-spacing: 0.12em; text-transform: uppercase; }
+.hs-text, .hs-ktext { column-count: 2; column-gap: 26px; }
+.hs-text p, .hs-ktext p { margin: 0 0 10px !important; font: 400 16px/1.55 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hs-text p:first-child::first-letter { float: left; margin: 4px 7px 0 0; color: var(--rod); font: 800 54px/0.8 var(--rubrik); }
+.hs-kaseri { margin-top: 20px; padding-top: 10px; border-top: 3px solid var(--svart); }
+.hg .hs-kaseri h3 { margin: 0 0 8px; padding: 0; border: 0; color: var(--svart); font: italic 600 23px/1.15 var(--rubrik); }
+.hs-kaseri h3 span { display: block; margin-bottom: 4px; color: var(--rod); font: 800 11px/1 var(--sans); font-style: normal; letter-spacing: 0.12em; text-transform: uppercase; }
+.hs-ktext p { font-size: 15px !important; }
+.hs-ktext p.hs-sign { font: italic 600 15px/1.2 var(--rubrik) !important; text-align: right; }
+.hs-sign::before { content: "– "; }
+.hs-sido { padding-top: 7px; border-top: 3px solid var(--svart); }
+.hg .hs-sido h4 { margin: 0 0 4px; padding: 0; border: 0; color: var(--rod); font: 800 11px/1.2 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
+.hs-sido ul { margin: 0; padding: 0; list-style: none; }
+.hs-sido li { padding: 9px 0; border-bottom: 1px solid var(--streck); font: 400 14px/1.42 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hs-sido li b { font: 700 11px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; }
+.hs-kalla { color: var(--gra); font: 400 11.5px/1 var(--sans); white-space: nowrap; }
+.hs-kalla a { color: inherit; text-decoration-color: rgba(92, 86, 76, 0.5); text-underline-offset: 2px; }
+
 /* ---------- smal: en spalt ---------- */
 
 @media (max-width: 720px) {
@@ -203,16 +232,16 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
   .hg-citat p { font-size: 18px; }
   .hg-summering p { font-size: 17px; }
   .hg-kallor > div { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
-  .hg-kupong { width: calc(100% - 16px); padding: 10px 14px 16px; }
-  .hg-kupong::before { inset: 4px; }
-  .hg-k-band { margin: 0 -6px 6px; }
-  .hg-k-band b { font-size: 30px; }
-  .hg-kupong ol { --k-namn: 16.5px; }
-  .hg-kupong li > a, .hg-kupong li > div { grid-template-columns: 24px minmax(0, 1fr) 18px 12px 18px minmax(0, 1fr); column-gap: 5px; min-height: 44px; padding-right: 29px; }
-  .hg-k-nr { width: 24px; height: 24px; font-size: 14px; }
-  .hg-kupong .hg-k-skold { width: 18px; height: 18px; }
+  .hg-kupong { width: calc(100% - 16px); padding: 12px 16px 18px; }
+  .hg .hg-i-titel { margin: 12px 0 6px; font-size: 28px; }
+  .hg-i-lag { font-size: 16px; }
+  .hg-i-rub { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
+  .hs-grid { grid-template-columns: minmax(0, 1fr); }
+  .hs-text, .hs-ktext { column-count: 1; }
+  .hs-sido { margin-top: 22px; }
 }
 @container (min-width: 721px) and (max-width: 900px) {
+  .hs-grid { grid-template-columns: minmax(0, 1fr) 210px; column-gap: 24px; }
   .hg-lagen, .hg-kallor > div { column-gap: 32px; }
   .hg-mot-lag b { font-size: 24px; }
   .hg-skold.mot { width: 84px; height: 84px; }

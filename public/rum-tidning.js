@@ -5,17 +5,19 @@
 // Tidningen Helgarderat: det supportrarna vet inför lördagens matcher. Det finns en enda tidning (2026-11-11,
 // användarens önskemål: "Det ska alltså bara finnas en tidning"), och den ritas här, av samma kod på sajtens sida
 // (helgarderat.html, helgarderat.js) och på pulten i tobaksaffären (tidningPult och tidningen i rum.js, och hos Hasse
-// Backe, pultPapper i rum-hasse.js). Utseendet står i helgarderat.css. Tidningen är tre delar, inget mer (bestämt del
+// Backe, pultPapper i rum-hasse.js). Utseendet står i helgarderat.css. Tidningen är fyra delar, inget mer (bestämt del
 // för del samma dag):
 //
 //   Omslaget     på kupongens papper, utan bild: numret och veckan, priset, namnet, lördagens datum, rutorna 1, X
 //                och 2 ikryssade med pennan (helgarderat) och den första matchen med sin rubrik. 100 × 140, förstorat
 //                med zoom: litet på pulten och så stort som ryms när tidningen läses (passa).
-//   Kupongen     innehållet: Stryktipset i programmets eget tryck efter omslaget, en rad per match med numret och
-//                lagen mot varandra, och raden leder till matchbladet. Ingen text, inga tider och inga sidnummer.
+//   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
+//                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
 //   Matchbladen  ett per match, från sidan 2 (Sköldarna möts, C3): rubriken, en bild, introduktionen, lagen mot
 //                varandra med stora sköldar, lagens text i två lika spalter med ett citat var i jämnhöjd under,
 //                sammanfattningen sist och källorna, med en länk till varje avsnitt, forumtråd och artikel.
+//   Sista sidan  Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, som inte står i matchbladen) och
+//                Ombudets kåseri (Spalterna), ur data/sista-sidan.json. Utan den slutar tidningen med matchbladen.
 //
 // Det som förut stod i tidningen på pulten (Tipset med Tipsligan, Så mår tipslagen, Veckans analys och numret efter
 // omgången med resultaten, betygen, skrällen och Hasses krönika) och sajtens baksida med källorna är borta: de ska
@@ -24,11 +26,12 @@
 // Numret är data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, och det ligger kvar tills nästa
 // kommer, också efter omgången. Utan det står provnumret (helgarderat/utkast.json, poddjobbets provomgång 2026-11-10).
 // Bilderna är matchbladets (bilder, som GitHub Actions hämtar före bygget, scripts/tidning/matchbilder.mjs), annars
-// veckans bilder av lagen ur data/tidning.json. Inget här anropar någon språkmodell.
+// veckans bilder av lagen ur data/tidning.json. Sista sidan skriver samma nattjobb (src/analyser/sista-sidan.mjs).
+// Inget här anropar någon språkmodell.
 //
 // RumTidning.hamta() → Promise: upplagan, eller null
-// RumTidning.upplaga(data, prov, tidning) → upplagan (det som behövs för att rita tidningen), eller null
-// RumTidning.tidning(upplaga) → html: omslaget, kupongen och matchbladen, i ett element med klassen hg
+// RumTidning.upplaga(data, prov, tidning, sista) → upplagan (det som behövs för att rita tidningen), eller null
+// RumTidning.tidning(upplaga) → html: omslaget, innehållet, matchbladen och sista sidan, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
 // RumTidning.passa(rot, bredd, hojd) förstorar omslaget så att det ryms och krymper kupongens lagnamn när de inte ryms.
 // RumTidning.bildfel(rot): en bild i matchbladen som inte går att hämta byts mot det andra lagets, och annars tas den
@@ -78,6 +81,17 @@
       stryktipset: 'Stryktipset',
       kupongen: 'Kupongen',
       utan: 'inget matchblad',
+    },
+    // Innehållet (Förteckningen): rubriken, och raden till sista sidan med vad som står där.
+    innehall: {
+      titel: 'I detta nummer',
+      sista: 'Sista sidan',
+    },
+    // Sista sidan: krönikan, Vid sidan av och kåseriet.
+    sista: {
+      kronika: 'Krönika',
+      vidSidanAv: 'Vid sidan av',
+      kaseri: 'Kåseri',
     },
     // Matchbladen ur supportrarnas poddar, forum och insatta medier, klubben, lokaltidningen och motståndarens
     // intervju med en av lagets supportrar.
@@ -263,11 +277,18 @@
     const s = u.sidor.slice().sort((a, b) => vikt(b) - vikt(a) || a.nr - b.nr)[0];
     return s ? { sida: s } : null;
   }
-  // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov) och veckans tidning
-  // (data/tidning.json, för bilderna). Kupongen är omgångens alla matcher i kupongens ordning (data.matcher, också de
-  // utan matchblad), var och en med sitt matchblad om den har ett. Matchbladen har sidorna från 2 (sida).
+  // Sista sidan (data/sista-sidan.json) när den är skriven för samma omgång och har allt den ska.
+  function sistaSidan(x, omgang) {
+    if (!x || String(x.omgang || '') !== omgang) return null;
+    const text = (t) => t && t.rubrik && Array.isArray(t.stycken) && t.stycken.some(Boolean);
+    return text(x.kronika) && text(x.kaseri) ? { kronika: x.kronika, kaseri: x.kaseri, sidan: (x.sidan || []).filter((n) => n && n.text) } : null;
+  }
+  // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov), veckans tidning
+  // (data/tidning.json, för bilderna) och sista sidan (data/sista-sidan.json). Kupongen är omgångens alla matcher i
+  // kupongens ordning (data.matcher, också de utan matchblad), var och en med sitt matchblad om den har ett.
+  // Matchbladen har sidorna från 2 (sida), och sista sidan kommer efter dem (sistaNr).
   // → upplagan, eller null när numret inte har några matchblad
-  function upplaga(data, prov = false, tidning = null) {
+  function upplaga(data, prov = false, tidning = null, sista = null) {
     const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
     if (!sidor.length) return null;
     const blad = new Map(sidor.map((s) => [String(s.id), s]));
@@ -288,6 +309,8 @@
       datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '',
       sida: new Map(sidor.map((s, i) => [s.nr, i + 2])),
       notiser: tidning && Array.isArray(tidning.notiser) ? tidning.notiser : [],
+      sista: sistaSidan(sista, String(data.omgang || '')),
+      sistaNr: sidor.length + 2,
     };
     u.ettan = ettan(u);
     return u;
@@ -295,8 +318,8 @@
   // Numret: veckans, och utan det provnumret. → Promise: upplagan, eller null
   const hamtaJson = (url) => fetch(url, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   function hamta() {
-    return Promise.all([hamtaJson('data/poddsidor.json'), hamtaJson('data/tidning.json')])
-      .then(([veckans, t]) => upplaga(veckans, false, t) || hamtaJson('helgarderat/utkast.json').then((x) => upplaga(x, true, t)));
+    return Promise.all([hamtaJson('data/poddsidor.json'), hamtaJson('data/tidning.json'), hamtaJson('data/sista-sidan.json')])
+      .then(([veckans, t, sista]) => upplaga(veckans, false, t, sista) || hamtaJson('helgarderat/utkast.json').then((x) => upplaga(x, true, t)));
   }
 
   // ---------- omslaget ----------
@@ -353,24 +376,55 @@
 
   // Gängets omgång är Stryktipsets när den har ett nummer därifrån (2026-11-07-st4978) eller tretton matcher.
   const spelet = (u) => (/-st\d+$/.test(u.omgang) || u.kupongen.length === 13 ? TEXT.kupongen.stryktipset : TEXT.kupongen.kupongen);
-  // Innehållet: Stryktipset som programmets egen sida (2026-11-11, användarens val A, Uppställningen, bland tre skisser):
-  // namnet på det röda bandet som på omslaget och en rad per match med numret i den svarta rutan som i matchbladets
-  // vinjett, hemmalaget högerställt och bortalaget vänsterställt kring strecket mitt på sidan, med sköldarna intill.
-  // Hela raden leder till matchbladet; en match utan matchblad är blek och utan länk. Inga rutor, tider, sidnummer eller
-  // förklaringar (förut: "Förenkla mer – det är plottrigt och en massa text … och självklart ska allt vara klickbart").
+  // Innehållet (2026-11-11, användarens val A, Förteckningen, bland fyra skisser: "Stryktipssidan ska ju egentligen
+  // vara en innehållssida för tidningen … snyggt och minimalistiskt"): tidningens namn och numret överst, rubriken och
+  // en rad per match med numret, lagen, prickar till sidnumret och matchbladets rubrik under, och sist sista sidan med
+  // vad som står där. Hela raden leder till sidan; en match utan matchblad är blek och har inget sidnummer. Förut
+  // Uppställningen (Stryktipset på rött band, lagen mot varandra med sköldarna), som inte sa var något stod.
   function kupong(u) {
-    // en tom ruta där skölden saknas, så att strecket står kvar mitt på
-    const sk = (lag) => skold(lag, 'hg-k-skold') || '<span class="hg-skold hg-k-skold"></span>';
+    const G = TEXT.forsta;
+    const I = TEXT.innehall;
+    const dag = Number.isFinite(u.lordag) ? new Date(u.lordag) : null;
+    const nr = u.prov ? 0 : dag ? nummer(dag) : null;
+    const over = [nr != null ? G.nr(nr) : '', dag ? G.vecka(vecka(dag)) : ''].filter(Boolean).join(' · ');
+    const rad = (nr, namn, rub, sida) => {
+      const inne = `<b class="hg-i-nr">${nr}</b><span class="hg-i-lag">${namn}</span><i class="hg-i-pr"></i><b class="hg-i-s">${sida || ''}</b>` +
+        (rub ? `<em class="hg-i-rub">${esc(hel(rub))}</em>` : '');
+      return sida ? `<li><a href="#hg-sida-${sida}">${inne}</a></li>`
+        : `<li class="utan"><div>${inne}<span class="hg-sr"> (${esc(TEXT.kupongen.utan)})</span></div></li>`;
+    };
     const rader = u.kupongen.map((m) => {
       const lag = m.lag || [];
-      const rad = `<b class="hg-k-nr">${m.nr}</b><span class="hg-k-lag h">${esc(kort(lag[0]))}</span>${sk(lag[0])}` +
-        `<i class="hg-k-mot">–</i>${sk(lag[1])}<span class="hg-k-lag b">${esc(kort(lag[1]))}</span>`;
-      return m.sida ? `<li><a href="#hg-sida-${u.sida.get(m.sida.nr)}">${rad}</a></li>`
-        : `<li class="utan"><div>${rad}<span class="hg-sr"> (${esc(TEXT.kupongen.utan)})</span></div></li>`;
+      const rub = m.sida ? m.sida.rubrik || TEXT.poddar.rubrik(lag[0], lag[1]) : '';
+      return rad(m.nr, `${esc(kort(lag[0]))} – ${esc(kort(lag[1]))}`, rub, m.sida ? u.sida.get(m.sida.nr) : null);
     }).join('');
-    return `<section class="hg-kupong" id="hg-kupongen" aria-label="${esc(spelet(u))}: innehållet"><header class="hg-k-band"><b>${esc(spelet(u))}</b></header>` +
-      `<ol>${rader}</ol></section>`;
+    const S = u.sista;
+    const sista = S ? `<ol class="hg-i-sista">${rad('', esc(I.sista), [S.kronika.av, S.sidan.length ? TEXT.sista.vidSidanAv : '', S.kaseri.av].filter(Boolean).join(' · '), u.sistaNr)}</ol>` : '';
+    return `<section class="hg-kupong" id="hg-kupongen" aria-label="${esc(I.titel)}"><header class="hg-i-hd"><a href="#hg-forsta">${NAMN}</a><span>${esc(over)}</span></header>` +
+      `<h2 class="hg-i-titel">${esc(I.titel)}</h2><ol>${rader}</ol>${sista}</section>`;
   }
+
+  // ---------- sista sidan ----------
+
+  // Sista sidan (2026-11-11, användarens önskemål: "någon kort krönika av Hasse Backe och bara allmän
+  // intressant/alternativ spännande information … som du inte har skrivit om i bladet … nåt kort kåseri av någon
+  // person", och val 1, Spalterna, bland tre skisser): Hasse Backes krönika i två spalter med porträttet vid namnet och
+  // en röd anfang, Vid sidan av i en smal spalt bredvid med källan efter varje notis, och kåseriet under krönikan.
+  function sista(u) {
+    const S = u.sista;
+    const T = TEXT.sista;
+    const nr = u.sistaNr;
+    const stycken = (l) => l.filter(Boolean).map((p) => `<p>${esc(hel(p))}</p>`).join('');
+    const notiser = S.sidan.map((n) => `<li><b>${esc(kort(n.lag))}</b> ${esc(hel(n.text))}` +
+      (n.kalla && n.kalla.url ? ` <span class="hs-kalla">${lank(n.kalla.url, esc(n.kalla.source || ''))}</span>` : '') + '</li>').join('');
+    return `<section class="hg-ark hg-sida hg-sista" id="hg-sida-${nr}" aria-label="Sidan ${nr}: ${esc(TEXT.innehall.sista)}">${folio(u, nr)}<div class="hs-grid">` +
+      `<article class="hs-kronika"><div class="hs-by"><span class="hs-portratt" aria-hidden="true"></span><span><b>${esc(S.kronika.av)}</b><em>${esc(T.kronika)}</em></span></div>` +
+      `<h2 class="hg-rub">${esc(hel(S.kronika.rubrik))}</h2><div class="hs-text">${stycken(S.kronika.stycken)}</div>` +
+      `<section class="hs-kaseri"><h3><span>${esc(T.kaseri)}</span>${esc(hel(S.kaseri.rubrik))}</h3>` +
+      `<div class="hs-ktext">${stycken(S.kaseri.stycken)}<p class="hs-sign">${esc(S.kaseri.av)}</p></div></section></article>` +
+      (notiser ? `<aside class="hs-sido"><h4>${esc(T.vidSidanAv)}</h4><ul>${notiser}</ul></aside>` : '') + '</div></section>';
+  }
+
   // Lagnamnen krymper alla lika mycket när det längsta inte ryms på raden (som matchlistan på sajten), i stället för att
   // brytas eller avstavas.
   function passaLagen(rot) {
@@ -452,10 +506,10 @@
 
   // ---------- tidningen ----------
 
-  // Hela tidningen: omslaget, kupongen och matchbladen. Utan upplaga står bara omslaget med namnet.
+  // Hela tidningen: omslaget, innehållet, matchbladen och sista sidan. Utan upplaga står bara omslaget med namnet.
   function tidning(u) {
     const omslag = `<section class="hg-omslaget" id="hg-forsta" aria-label="Omslaget">${forsta(u, Boolean(u))}</section>`;
-    return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') : omslag;
+    return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') + (u.sista ? sista(u) : '') : omslag;
   }
 
   return { hamta, upplaga, tidning, forsta, passa, bildfel, nummer, rutor, TEXT };
