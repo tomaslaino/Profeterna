@@ -560,28 +560,40 @@ export function glas(x, v, L, lage, W, H) {
 // ---------- någon på bron ----------
 
 // Någon som går på bron då och då (bron i rum-hasse.js). Figuren ritas en gång, från sidan i två steg bredvid
-// varandra, i utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt) och oskarp som det andra
-// långt borta; räcket når till midjan och ligger som ett galler över benen. Vägen är fötternas plats längs bron i väggbildens
-// bildpunkter och hur hög figuren är där (u från bortre änden vid tegelhuset till förbi bildens högra kant).
-// Sidan låter figuren glida dit med en transform, så att inget ritas om medan den går.
+// varandra, i utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt), lika oskarp och i samma
+// dis som det andra långt borta. Den går på gångbanan innanför räcket, som når till höften och som benen anas
+// bakom. Vägen är fötternas plats längs bron i väggbildens bildpunkter och hur hög figuren är där (u från bortre
+// änden vid tegelhuset till förbi bildens högra kant). Sidan låter figuren glida dit med en transform, så att inget
+// ritas om medan den går.
+// Hur hög figuren är mot räcket (BRO.racke), och hur högt över brons kant fötterna står: räcket i utsikten är
+// ritat högre än ett riktigt, mot husen på andra sidan (en våning är en halv grad vid tegelhuset, där räcket är
+// 0,3°), så en människa är bara lite högre än det. Gångbanan ligger bakom räcket och syns uppifrån, alltså lite
+// högre i bilden än kanten.
+const GANG = { hojd: 1.15, inne: 0.25 };
 export function gangare(v, L, lage, R = Math.random) {
   const F = window.RumUte.farg;
-  const { P } = projektion(lage);
+  const { b, P } = projektion(lage);
   const KG = F.KALL ? F.KALL.gata : 0.3;
+  const KH = F.KALL ? F.KALL.himmel : 0.4;
   const kv = Math.max(0, 1 - L.dag / 0.6) * 0.2;
   const ton = (dag, natt) => F.mix(F.mix(F.kall(F.facade(dag, natt, L), L, KG), '#000000', 0.15), '#5c3c22', kv);
   const steg = [];
   for (let i = 0; i <= 20; i++) {
     const u = i / 20;
     const a = BRO.a0 + 0.8 + (42 - 0.8 - BRO.a0) * u ** 1.5;
-    const fot = bro(a, BRO.top) + 0.04;
+    const rh = bro(a, BRO.racke);
+    const fot = bro(a, BRO.top) + 0.04 + GANG.inne * rh;
     const [x, y] = P(a, fot + E.ned);
-    const [, y2] = P(a, fot + 2 * bro(a, BRO.racke) + E.ned);
+    const [, y2] = P(a, fot + GANG.hojd * rh + E.ned);
     steg.push([x, y, y - y2]);
   }
-  // figuren: U bildpunkter hög, med plats för paraplyet ovanför och oskärpan runt om
+  // figuren: U bildpunkter hög, med plats för paraplyet ovanför och oskärpan runt om. Oskärpan är knappt hälften
+  // av utsiktens (rita: ofokus / 2 i väggbildens bildpunkter) där figuren syns som störst i fönstren: lika oskarp
+  // som bron blir den en fläck som man inte ser är en människa.
   const U = 60;
-  const pad = 12;
+  const ofokus = (20 * b.S * SCEN.D) / (SCEN.D - 120);
+  const sudd = Math.min(3.2, Math.max(1.6, (0.4 * (ofokus / 2) * U) / steg[14][2]));
+  const pad = Math.ceil(Math.max(12, 3 * sudd));
   const B = Math.round(U * 0.55) + 2 * pad;
   const Hd = Math.round(U * 1.18) + 2 * pad;
   const duk = document.createElement('canvas');
@@ -596,7 +608,9 @@ export function gangare(v, L, lage, R = Math.random) {
   const regn = v.fall === 'regn' || v.fall === 'blandat';
   const mossa = !regn && v.temp < 3;
   const rack = ton('#2f6243', '#080b0a');
-  if (FILTER) x.filter = 'blur(1.6px)';
+  // räcket: från fötterna upp till handledaren, i figurens mått
+  const hoft = (1 - GANG.inne) / GANG.hojd;
+  if (FILTER) x.filter = `blur(${sudd.toFixed(2)}px)`;
   for (let k = 0; k < 2; k++) {
     const cx = k * B + B / 2;
     const fy = Hd - pad;
@@ -630,16 +644,34 @@ export function gangare(v, L, lage, R = Math.random) {
       x.fillStyle = ton(['#1c1f26', '#5a2a2a', '#20283a'][(R() * 3) | 0], '#2c241e');
       x.beginPath(); x.ellipse(cx + U * 0.02, y(1.06), U * 0.26, U * 0.1, 0, Math.PI, 2 * Math.PI); x.fill();
     }
-    // räcket framför benen: gallret och handledaren, som i utsikten (bara på figuren)
+    // räcket framför benen: mellan spjälorna anas de, och handledaren går över höften (bara på figuren)
+    x.globalCompositeOperation = 'destination-out';
+    x.globalAlpha = 0.3;
+    x.fillRect(k * B, y(hoft), B, hoft * U + pad);
     x.globalCompositeOperation = 'source-atop';
-    x.globalAlpha = 0.45;
     x.fillStyle = rack;
-    x.fillRect(k * B, y(0.5), B, 0.5 * U + 2);
+    x.globalAlpha = 0.3;
+    x.fillRect(k * B, y(hoft), B, hoft * U + pad);
     x.globalAlpha = 0.8;
-    x.fillRect(k * B, y(0.52), B, U * 0.045);
+    x.fillRect(k * B, y(hoft + 0.02), B, U * 0.05);
     x.globalAlpha = 1;
     x.globalCompositeOperation = 'source-over';
   }
   x.filter = 'none';
+  // samma dis som över bron och utsikten (rita: fas och dimman, regnet eller snön i luften), så att den inte
+  // syns skarpare och mörkare än det som är lika långt bort
+  const dimC = L.sky[2];
+  const lager = (farg, a) => {
+    if (a < 0.005) return;
+    x.globalAlpha = Math.min(1, a);
+    x.fillStyle = farg;
+    x.fillRect(0, 0, duk.width, duk.height);
+  };
+  x.globalCompositeOperation = 'source-atop';
+  lager(dimC, 0.3 * L.dimma);
+  if (L.dimma > 0.02) lager(dimC, 0.3 * L.dimma);
+  if (v.fall) lager(v.fall === 'sno' ? F.kall(F.sno(L), L, KG) : F.kall(L.sky[2], L, KH), (v.fall === 'sno' ? 0.08 : 0.1) + 0.14 * v.mangd);
+  x.globalAlpha = 1;
+  x.globalCompositeOperation = 'source-over';
   return { duk, B, H: Hd, fot: [B / 2, Hd - pad], U, steg, mot: R() < 0.5 };
 }

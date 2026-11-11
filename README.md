@@ -1208,6 +1208,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   topp syns hela", "Ha gärna någon som går på bron lite då och då" och "Det ska inte dra en massa grafik!".
   Utsikten står 1,3° lägre, och då och då går någon längs bron: en figur som ritas en gång och glider med en
   transform, bara medan den går. Se [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Den som går på bron mindre, och innanför räcket (2026-11-11, användarens önskemål):** "Personen på bron ser
+  enorm ut och verkar gå på relingen? Kan du fixa?" och "Eller personen ska vara mindre iaf". Figuren var dubbelt
+  så hög som räcket, ungefär en och en halv våning vid tegelhuset, och stod med fötterna på brons kant, skarpare och
+  mörkare än allt annat i utsikten. Nu är den drygt hälften så stor, går på gångbanan bakom räcket med benen
+  skymda, och har samma dis som bron och mer oskärpa än förut (knappt hälften av utsiktens; lika oskarp blir den en fläck). Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -6366,9 +6371,13 @@ syns; sedan 2026-11-11 står den ytterligare 1,3° lägre (`E.ned`), så att hö
 ovanför också där skärmens överkant skär väggens bild (y ≈ 37 i den breda bilden, 21 på höjden). Då och då går
 någon på bron (`gangare` i rum-hasse-ute.js, `bron` i rum-hasse.js): var 15–60:e sekund, glesare mitt i natten,
 från tegelhuset hitåt eller bort, i promenadtakt (42–60 s). Figuren ritas en gång, från sidan i två steg, i
-utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt, lite sken från lyktorna i mörkret), med
-räcket som ett galler upp till midjan, och glider sedan längs bron med en transform på grafikkortet; benen byter
-steg med en stegvis förflyttning i samma duk. Den syns bara genom glaset (rutorna som clip-path) och går bakom
+utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt, lite sken från lyktorna i mörkret), och
+glider sedan längs bron med en transform på grafikkortet; benen byter steg med en stegvis förflyttning i samma duk.
+Den går på gångbanan innanför räcket, lite högre i bilden än brons kant eftersom man ser bron uppifrån, med
+räcket framför upp till höften så att benen bara anas, och den är 1,15 gånger räckets höjd (`GANG`): räcket och
+lyktstolparna är ritade större än husen på andra sidan skulle säga (en våning är en halv grad vid tegelhuset, där
+räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och knappt hälften av utsiktens oskärpa, så att
+man ser att det är en människa (ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (rutorna som clip-path) och går bakom
 honom. Inget ritas om medan den går, och ingen går med minskad rörelse eller i en fast bild (`?rum-t`). Förut var
 väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
 kaffebryggaren och kassan (ändrat 2026-11-10).
