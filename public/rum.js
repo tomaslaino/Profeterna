@@ -13,8 +13,8 @@
 //   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
 //   bredvid, som spelas i rutan (rum-video.js)
 //   anslagstavlan lyfts ner (A): lapparna (rum-anslag.js)
-//   kortregistret på disken lyfts fram (R): ett kort per lag och per möte
-//   (rum-register.js, lådan i three.js i rum-kortlada.js)
+//   datorn på disken kommer nära (R): terminalen där man söker spelare, lag
+//   och möten (rum-register.js, datorn i three.js i rum-dator.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
 //   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på
 //   skivan och veckans löpsedel, rum-affischer.js) och dörren (med vilka vi
@@ -44,7 +44,7 @@
 // gänget sitter vid bordet (de byter var tredje dag). ?rum-anslag visar anslagstavlan
 // framme (=form, =skador … med den lappen i handen, och &rum-anslag-hasse
 // med Hasses svar om den), ?rum-register
-// kortregistret (=Arsenal … med det kortet i handen). ?rum-stopp=<timmar> som
+// datorn (=isak … med den sökningen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
 // skillnad), ?rum-akt=dl:skamt@6 ett påhitt, ?rum-radio radion på utan ljud (=4: sedan fyra
@@ -1328,7 +1328,7 @@ window.Rum = (() => {
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
   // bara med tangentbord och mus.
   // (kupongstället kommer med inredningen, och tangenter körs igen då)
-  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Kortregistret', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-stall', 'Nästa omgång', 'N'], ['#rum-helgarderat', 'Helgarderat', 'L']];
+  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Datorn', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-stall', 'Nästa omgång', 'N'], ['#rum-helgarderat', 'Helgarderat', 'L']];
   function tangenter() {
     if (!matchMedia('(hover: hover)').matches) return;
     for (const [sel, namn, k] of TANGENT) {
@@ -4133,10 +4133,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.ans.open(false, q);
   }
 
-  // R: kortregistret lyfter från disken, vänder sig mot en och kommer nära
-  // (rum-register.js, lådan i rum-kortlada.js), och kameran går lite mot
-  // disken medan det flyger. Tillbaka flyger det till lådans plats med
-  // kameran där den står när den har gått tillbaka, som anslagstavlan.
+  // R: kameran svänger fram till datorn på disken och ställer sig framför
+  // skärmen (rum-register.js, datorn i rum-dator.js), och rummet går lite mot
+  // disken under tiden. Tillbaka svänger den till datorns plats med rummet
+  // där det står när det har gått tillbaka, som anslagstavlan.
   function register(on) {
     if (!R.reg || !R.reg.ready() || on === R.reg.on()) return;
     if (on) lager('registret', () => register(false));

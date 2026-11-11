@@ -17,7 +17,7 @@
 // plan. X = x, Y = −y och Z pekar mot betraktaren. Sakernas framsida ligger
 // där de platta var ritade och kroppen går tillbaka till väggen (bakväggen
 // Z = WZ, högra väggen X = WX). Bardisken och kupongstället på den ses med
-// samma kamera, som kortlådan (rum-kortlada.js).
+// samma kamera, som datorn (rum-dator.js).
 //
 // Uret ligger i en knapp (.rum-ur) och ramen i länken (.rum-ram): ett klick
 // går fram till dem (närbilderna i rum.js), och där ritas de, och ramen kring
@@ -65,10 +65,10 @@ const BITAR = {
   // duken ligger under sedlarna (#rum-skiva, rum-affischer.js)
   skiva: { plan: 0, box: { x: SKIVA.x - 6, y: 134, w: SKIVA.w + 14, h: SKIVA.y + SKIVA.h + 10 - 134 }, i: '#rum-skiva', at: SKIVA },
   // bardisken med barstolarna, till höger om bilden in i videons hörn; den
-  // ligger under tavlorna på högra väggen och kortlådan (fore)
+  // ligger under tavlorna på högra väggen och datorn (fore)
   disk: { plan: 0, box: { x: 990, y: 470, w: 1110, h: 400 }, fore: '.rum-hv' },
   // kupongstället på disken: det står framför anslagstavlan och ligger över
-  // den, men under kortlådan (z-index i rum-register.css); duken lyser när man
+  // den, men under datorn (z-index i rum-register.css); duken lyser när man
   // pekar på stället (.rum-stall-duk i rum.css)
   stall: { plan: 0, box: { x: 1150, y: 414, w: 110, h: 121 }, cls: 'rum-stall-duk' },
   // bladet med radions stationer (radiolapp): duken ligger i knappen kring bladet, med plats för tejpen
@@ -894,7 +894,7 @@ export async function inredning(el, opt = {}) {
   // ---------- kupongstället ----------
 
   // Kupongstället på bardisken, under anslagstavlan mellan barstolarna och
-  // kortlådan (rum-kortlada.js): ett fack av plexiglas, lågt fram och högt bak,
+  // datorn (rum-dator.js): ett fack av plexiglas, lågt fram och högt bak,
   // med blanka kuponger som lutar bakåt, butikens pennor i ett rör och lappen
   // på plexit. Kupongerna är kupongen på pulten i telefonens smala form
   // (blankett), och överst sitter en tryckt skylt i bandets färg: Nästa

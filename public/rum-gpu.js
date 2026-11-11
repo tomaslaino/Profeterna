@@ -3,7 +3,7 @@
 // grafikkort som hänger sig, och all 3D på sidan försvinner. Det spelar ingen
 // roll hur ofta skuggorna räknas om, hur de filtreras, om bara bordet tar emot
 // dem eller hur fort bilderna ritas; utan skuggkarta håller det. Där ritas 3D-
-// delarna (rum-3d.js, rum-saker.js, rum-inredning.js och rum-kortlada.js)
+// delarna (rum-3d.js, rum-saker.js, rum-inredning.js och rum-dator.js)
 // därför utan skuggor. ?rum-skuggor visar dem ändå, för att prova nya versioner
 // av drivrutinen.
 export function utanSkuggor(renderare) {

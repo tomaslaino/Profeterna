@@ -3640,7 +3640,7 @@ Så fort något ligger framme (en närbild, tv:n, tavlan, registret, videon, Has
 stället, samma ord på samma ställe för alla saker, och lägger bort det översta som bakåtknappen (se
 [Bakåt](#bakåt)). Förut var *Vanlig sida* det enda ord som syntes nära något, och det leder bort från rummet.
 Tangenterna (K kupongen, T tv:n,
-A anslagstavlan, R kortregistret, V videon, H Hasse, N nästa omgång ur kupongstället och L
+A anslagstavlan, R datorn, V videon, H Hasse, N nästa omgång ur kupongstället och L
 tidningen Helgarderat) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
@@ -3649,7 +3649,7 @@ rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public
 bygger tv:n (se [Tv:n](#tvn)), [public/rum-anslag.js](public/rum-anslag.js) och
 [public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)),
 [public/rum-register.js](public/rum-register.js), [public/rum-register.css](public/rum-register.css)
-och [public/rum-kortlada.js](public/rum-kortlada.js) kortregistret (se [Kortregistret](#kortregistret)),
+och [public/rum-dator.js](public/rum-dator.js) datorn (se [Datorn](#datorn)),
 [public/rum-video.js](public/rum-video.js) och [public/rum-video.css](public/rum-video.css) videon
 på disken (se [Videon](#videon)), och [public/rum-3d.js](public/rum-3d.js) ritar gänget och
 [public/rum-inredning.js](public/rum-inredning.js) inredningen (se *Inredningen i 3D* nedan) i
@@ -3697,8 +3697,8 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   under hyllan står hur många pokaler var och en har, flest först.
 - **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag (se
   [Anslagstavlan](#anslagstavlan)).
-- **Kortregistret** (på disken under Tipsligan) → ett kort per lag och per möte i
-  omgången (se [Kortregistret](#kortregistret)).
+- **Datorn** (på disken under Tipsligan) → terminalen där man söker spelare, lag och
+  möten (se [Datorn](#datorn)).
 - **Skårtavlan** (mitt på högra väggen, under pokalhyllan) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
   pågår), lika placering vid lika poäng och antal rätt. Namnen står där som överallt
@@ -4594,8 +4594,8 @@ att sitsen går fri från löpsedeln på väggen; den närmaste syns bara till h
 över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
 det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
 lite uppifrån. Disken ritas en gång, som inredningen, i en duk från disken in i videons hörn
-(så att den är likadan när kameran går dit) under tavlorna och kortlådan. På disken står
-kupongstället, kortregistret, videon och lådan med kassetter. Utan WebGL står den
+(så att den är likadan när kameran går dit) under tavlorna och datorn. På disken står
+kupongstället, datorn, videon och lådan med kassetter. Utan WebGL står den
 platta disken kvar (`disk` i rum.js, och i videons hörn `vaggSvg` i rum-video.js), med samma
 mått. Stället är slitet: nikotingul högervägg och tak, fläckar, nötta
 kanter på disken och pulten, kafferingar, ringar efter glas på disken och brännmärken. Med
@@ -4739,7 +4739,7 @@ Därför:
   först utan och sedan med de bakade bilderna, och ett lager som ritas om hålls i två
   buffertar en stund.
 - **3D-delarna startar en i taget** i telefonen (`tur` i rum.js): gänget, inredningen,
-  sakerna och sist kortlådan (`o.tur` i rum-register.js), var och en när den förra är klar
+  sakerna och sist datorn (`o.tur` i rum-register.js), var och en när den förra är klar
   och rummet syns, med en paus på 0,8 sekunder före den första och mellan dem (Safari släpper
   buffertar som inte används efter ungefär en sekund). Var och en tar några hundra MB medan
   den startar (shaders, texturer, ljuset). En fast bild (`?rum-t`) väntar på alla.
@@ -4774,7 +4774,7 @@ Därför:
   fönstret och dörren. Nära tv:n, videon och anslagstavlan och när scenen är dragen åt
   sidan slipper telefonen alltså rita gänget 30 gånger i sekunden (1920 × 840 bildpunkter
   med mjuka skuggor). Utan rörelser och i en fast bild ritas allt som förut.
-- **3D-delarna** (gänget, sakerna, inredningen och kortlådan) ritas i telefonen med 1,5
+- **3D-delarna** (gänget, sakerna, inredningen och datorn) ritas i telefonen med 1,5
   bildpunkter per punkt, och med skuggkartor på 1024 i stället för 2048
   (`LATT`). Gängets ansikten ritas där i halva storleken (512 × 576), och gänget sparar
   ingen extra kopia av bilden (`preserveDrawingBuffer`). Telefonen börjar dessutom på steg 1
@@ -6050,57 +6050,55 @@ lappar.
 styrka, kryss, tur, odds, vila, motstand) med den lappen i handen, och med
 `&rum-anslag-hasse` också Hasses svar om den.
 
-### Kortregistret
+### Datorn
 
-På disken under Tipsligan står en kortlåda i lackad teak, byggd i three.js
-som inredningen ([public/rum-kortlada.js](public/rum-kortlada.js)), med korten, datan och
-kortet i handen i [public/rum-register.js](public/rum-register.js) och
-[public/rum-register.css](public/rum-register.css). Fram på lådan sitter en mässingshållare
-med en maskinskriven etikett, *KARTOTEK* (`ETIKETT` i rum-kortlada.js). I lådan står,
-framifrån:
+På disken under Tipsligan står en beige allt-i-ett från FACIT med ett litet bildrör,
+tangentbord, mus och en diskett (*REGISTER säk.kopia*), byggd i three.js som inredningen
+([public/rum-dator.js](public/rum-dator.js)). Terminalen, datan och sökningen ligger i
+[public/rum-register.js](public/rum-register.js) och
+[public/rum-register.css](public/rum-register.css). Datorn tog kortlådans plats och jobb
+2026-11-11: användaren ville ha en 90-talsdator med ett eget operativsystem där man söker
+spelare och lag, och valde bland skisser en terminal som i spion- och actionfilmerna runt
+2000 (grön text på svart i VT323, *MATCHFIXARNA REGISTER 1.94*) och den beiga datorn.
 
-- **Lagen** – en grön avdelare av pressad kartong, och bakom den ett registerkort per lag i
-  omgången i bokstavsordning, med en flik av plast i divisionens färg (som på Tabeller) och
-  lagets namn på en papperslapp i den. Kortet är maskinskrivet: namnet, divisionen och
-  skölden urklippt i hörnet, och sedan *Mål* och *xG* för och mot per match, *Favorit* (hur
-  ofta laget har varit favorit), *Skytten* (bäste målskytten och andelen av lagets mål) och
-  *Nästa* (motståndet, hemma eller borta och om hur många dagar, med cupen eller Europacupen
-  när det inte är ligan). Ur `data/teams/<division>.json` och matchens fil.
-- **Mötena** – en röd avdelare, och bakom den ett blått kort per match: alla möten som
-  sajten har (de sex senaste från tidigare säsonger och säsongens) med datum, tävling, lagen
-  och resultatet, och hemmalagets V–O–F i dem med blyerts längst ner. Kortet rymmer elva
-  möten ovanför summan; förut stod bara de åtta senaste, och det äldsta föll bort när
-  säsongen hade gett tre möten (2026-11-03). Inget annat på korten klipps: lagkorten har
-  gott om plats också med de längsta namnen, så de behöver inte vikas som anslagstavlans
-  lappar.
+Man skriver ett namn (eller *sök isak*) och trycker Enter:
 
-Flikarna sitter på fem platser (lagen) och tre (mötena), så att varje flik syns ovanför
-dem framför. Ett klick eller R: lådan lyfter från disken, vänder sig mot en och lutar så att
-man ser ner i den, medan bilden zoomar in och rummet mörknar bakom – närbilden är en egen
-duk över hela fönstret med samma perspektiv som rummet, så att lådan är skarp. Den lutar
-lite efter musen, och kortet under pekaren reser sig. Ett klick på ett kort (eller en
-avdelare: det första kortet bakom den): det reser sig ur lådan och tas i handen i läsbar
-storlek, och pilarna (i telefonen ett svep i sidled) bläddrar mellan korten.
-I en stående telefon är det skärmens bredd som sätter lådans storlek, så där lutar lådan
-brantare (42° i stället för 31°) och använder höjden i stället: raderna av flikar glider
-isär, ingen flik skyms längre av korten framför, och flikarna blir i snitt ungefär 30 %
-större att trycka på, medan texten på dem bara blir lite lägre (2026-11-06). Med
-fingret reser sig kortet under fingret så högt att fliken syns ovanför fingertoppen, byts
-när fingret glider över lådan och tas i handen när fingret släpper; släpper det utanför
-lådan händer ingenting. Vilket kort som står under fingret räknas som om alla kort stod
-nere i lådan, så att det upplyfta kortet inte skymmer de andra, och lådan lutar bara
-efter musen: förut lutade den mot fingret i samma ögonblick som kortet valdes.
-Esc, ett klick utanför eller *Sätt tillbaka*
-sätter tillbaka kortet; Esc, R eller ett klick utanför lådan ställer den på disken igen.
-Pekar man på lådan tänds
-snabbvalet Statistik på text-tv:n. Med `prefers-reduced-motion` står lådan framme direkt.
+- **Spelaren** – efternamn och förnamn, laget, numret och platsen, *Läget* (skadad,
+  tveksam eller avstängd med skadan, annars spelklar – bara när laget har en skadelista),
+  *Speltid* (minuter och starter av lagets matcher), *Mål* och *xG*, och hur laget har gått
+  med och utan honom i startelvan: matcher, V-O-F, poäng per match och vad oddsen väntade
+  sig per match (`mu` i `data/players/<division>.json`, se src/medochutan.js), och sedan när
+  han är i laget.
+- **Laget** – *Mål* och *xG* för och mot per match, *Favorit* (hur ofta laget har varit
+  favorit), *Skytten* (och andelen av lagets mål) och, för lagen i omgången, *Nästa*
+  (motståndet, hemma eller borta och om hur många dagar, med cupen när det inte är ligan).
+  Ur `data/teams/<division>.json`, spelarfilen och matchens fil.
+- **Mötet** – alla möten som sajten har (de sex senaste från tidigare säsonger och
+  säsongens) med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem. Två lag i
+  frågan (*arsenal hull*) ger mötet.
 
-Dolda resultat: lagkorten visar bara namnet och ett frågetecken när en match i lagens
-divisioner är dold, med *Visa ändå* under kortet – samma nyckel som anslagstavlan, så att
-det gäller båda – och dolda möten står som ?. Slitaget skiftar med dagen: kortens lutning i
-lådan och vinkel i handen, hörn som har varit vikta och en kaffering. Utan WebGL står
-disken tom. `?rum-register` visar lådan framme i en fast bild, och `?rum-register=<lag>`
-(eller en del av kortets id, t.ex. `mote:<id>`) med det kortet i handen.
+Varje kort börjar med *ÅTKOMST BEVILJAD*. Bara den bästa nivån av träffar visas: ett helt
+efternamn går före ett förnamn och före namn som bara börjar så (*isak* ger Isak, inte
+Isak Alemayehu eller Isaksen), sedan den som spelar mest. Flera träffar listas numrerade
+(högst nio); en siffra eller ett tryck väljer. Omgångens matcher står numrerade när datorn
+startar. Lag, spelare och möten i utskriften går att trycka på, så att telefonen klarar sig
+utan tangentbord. ↑/↓ tar fram det man skrev förut, Esc stänger.
+
+Ett klick eller R: datorn står kvar, och kameran svänger fram och ställer sig rakt framför
+skärmen medan rummet mörknar bakom – närbilden är en egen duk över hela fönstret, och
+svängen börjar i samma perspektiv som rummet. Där tar terminalen (HTML) över skärmen, med
+linjer och mörka hörn som på ett bildrör och en blinkande markör. Texten är så stor att 20
+rader ryms; i en stående telefon står skärmen högre (så att tangentbordet ryms under) och
+texten är minst 17 px, och det som inte ryms rullar. Ett klick utanför datorn eller Esc
+ställer kameran tillbaka, och skärmen i rummet visar det som stod sist (en bild i en duk,
+ritad bara när den ändras). Slitaget: disketten, musen och tangentbordet ligger lite olika
+varje dag. Datorn är billigare att rita än lådan var: ett tjugotal ritanrop mot omkring 300
+kort, och närbilden ritas bara under svängen.
+
+Dolda resultat: lag- och spelarkorten visar ? när en match i lagens divisioner är dold, med
+*Visa ändå* under skärmen – samma nyckel som anslagstavlan, så att det gäller båda – och
+dolda möten står som ?. Utan WebGL står disken tom. `?rum-register` visar datorn framme i
+en fast bild, och `?rum-register=<fråga>` med den sökningen.
 
 #### Vad som står var
 
@@ -6111,7 +6109,7 @@ ett ställe (2026-11-02, användarens önskemål):
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
 | **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
-| **Kortregistret** | Ett lag i taget, och historiken | Ett lagkort per lag (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match) och mötena med resultaten |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
@@ -6119,7 +6117,7 @@ match på ett ställe, så dess tal står också på andra ställen – men allt
 namn, ur samma källa (konkordansen under *Matchbladet*).
 
 Ny statistik placeras efter samma roller: det som gäller en match eller en liga nu på tv:n,
-det som jämför lagen i omgången på tavlan och det som beskriver ett lag i kortregistret.
+det som jämför lagen i omgången på tavlan och det som beskriver ett lag eller en spelare i datorn.
 En sak liknar en annan med flit: lagets bäste skytt kan stå med samma målantal i
 skytteligan, men kortet visar hur mycket laget hänger på en spelare och skytteligan vem som
 leder. Skårtavlan på väggen visar inte längre tabellen utan gängets egen ställning
