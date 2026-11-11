@@ -2722,7 +2722,8 @@ utan honom, men 25 matcher är få.
 **Prövat i kandidatjakten (2026-11-11).** Varken andelen av de ordinarie i elvan eller de
 saknades värde ur med och utan gjorde prognosen bättre: värdena hoppade kring noll från säsong
 till säsong. Siffrorna beskriver historien men förutsäger inte nästa match bättre än modellen
-(se [Kandidatjakten](#kandidatjakten)).
+(se [Kandidatjakten](#kandidatjakten)). Användaren valde samma dag att behålla siffran under
+*Utan honom* i matchbladet ändå ("Behåll den") – ta inte bort den med hänvisning till utfallet.
 
 **Gränsen.** Båda sidorna måste ha minst tio matcher (`MIN`), annars visas inget – okänt, inte
 noll. 2026-11-11 hade 1 112 spelare siffrorna (Premier League 280, Championship 339, League One
