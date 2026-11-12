@@ -31,8 +31,9 @@
 // Slitaget följer tippningen som sakerna på pulten; löpsedeln blir bara lite
 // böjd.
 //
-// Löpsedeln (rubrik): Helgarderats, tidningen på pulten (rum-tidning.js), med
-// namnet på det röda bandet som på tidningen och rubriker i kvällstidningens tonläge, torrt
+// Löpsedeln (rubrik): Helgarderats, tidningen på pulten (rum-tidning.js), på
+// samma papper och i samma tryck som dess omslag och med samma nummer, och
+// rubriker i kvällstidningens tonläge, torrt
 // ironiska, om det mest dramatiska som har hänt eller ska hända – i förra
 // omgången den som tippade bäst eller sämst, en ny ledare i Tipsligan, modellen
 // mot gänget, skrällen, krossen och gängets kupong; i nästa omgång den jämnaste
@@ -43,11 +44,11 @@
 // det knepen i tidningen. Som de andra föremålen leder den inte ut ur rummet: ett klick
 // går fram till den (rum.js).
 //
-// affischer(back, { short, namn }) → { slit(w, seed), data(rows, old), rubrik() }
+// affischer(back, { short, namn }) → { slit(w, seed), data(rows, old), rubrik(), numret(upplaga) }
 //   short: kortare lagnamn, namn: namnet på skårtavlan (rum.js)
 //   rows: omgångens rader (roundRows i rum.js), old: de färdigspelade
 //   kupongerna (Historik.coupons()); säsongens omgångar läses ur TP.season
-//   (tippare.js).
+//   (tippare.js). upplaga: tidningens nummer på pulten (hgNumret i rum.js).
 // För bilder: ?rum-vecka=<tal> en annan vecka (löpsedelns plats),
 // ?rum-rubrik=<typ> en viss rubrik om den
 // finns (typ i bakat, matchRubriker, kupongRubriker och framat) och
@@ -159,25 +160,35 @@ function ifk() {
 
 // Rubrikens rader så stora som ryms i bredden, och alla mindre om de inte
 // ryms på höjden (bredd mäter med en duk, se löpsedeln nedan).
-// En rad vit på rött (stil 2) har sin kant att rymma också. Med topp blir
+// En rad i en ruta (stil 2) har sin kant att rymma också (kant, i em). Med topp blir
 // ingen rad mer än så många gånger större än den minsta (QPR ska inte ta
 // hela papperet). Med prick får en rad med Å, Ä eller Ö så mycket mer luft
 // ovanför (i em, CSS:en .prick), så att prickarna inte når raden ovanför.
 // Med drag dras en rad som blivit smalare än papperet (för att alla ska rymmas
 // på höjden) ut på bredden, högst så många gånger, som på en riktig löpsedel
 // där rubriken går från kant till kant (spärren mellan bokstäverna, sp px, räknas med).
+// font: typsnittet raderna mäts i (annars Anton), lh: radens höjd i em, och
+// glapp: luften mellan raderna, som i CSS:en. Med res reses rader som inte
+// fyller höjden, högst så många gånger: en rubrik med långa ord (BLACKBURN
+// KÖRDE ÖVER WEST HAM) blir låg när bredden bestämmer, och en löpsedel ska
+// vara full. Då sätts radens höjd och luften över Å, Ä och Ö här.
 const PRICK = /[ÅÄÖ]/i;
-function passa(el, { rad, bred, hog, max, topp = Infinity, prick = 0, drag = 1, sp = 0 }) {
-  const em = rad.map(([t, s]) => bredd(String(t).toUpperCase()) + (s === 2 ? 0.24 : 0));
+function passa(el, { rad, bred, hog, max, topp = Infinity, prick = 0, drag = 1, sp = 0, font, lh = 0.94, glapp = 1.5, res = 1, kant = 0.24 }) {
+  const em = rad.map(([t, s]) => bredd(String(t).toUpperCase(), font) + (s === 2 ? kant : 0));
   const spar = rad.map(([t]) => sp * String(t).length);
   let px = em.map((e, i) => Math.min(max, (bred - spar[i]) / Math.max(0.3, e)));
   px = px.map((x) => Math.min(x, Math.min(...px) * topp));
-  const h = px.reduce((a, x, i) => a + x * (0.94 + (PRICK.test(rad[i][0]) ? prick : 0)), 0) + (rad.length - 1) * 1.5;
+  const h = px.reduce((a, x, i) => a + x * (lh + (PRICK.test(rad[i][0]) ? prick : 0)), 0) + (rad.length - 1) * glapp;
   if (h > hog) px = px.map((x) => x * (hog / h));
+  const upp = res > 1 && h < hog ? Math.min(res, (hog - (rad.length - 1) * glapp) / (h - (rad.length - 1) * glapp)) : 1;
   el.querySelectorAll('.rub b').forEach((b, i) => {
     b.style.fontSize = `${px[i].toFixed(1)}px`;
     const d = Math.min(drag, bred / (px[i] * em[i] + spar[i]));
-    b.style.transform = d > 1.01 ? `scaleX(${d.toFixed(3)})` : '';
+    b.style.transform = d > 1.01 || upp > 1.01 ? `scale(${d > 1.01 ? d.toFixed(3) : 1}, ${upp.toFixed(3)})` : '';
+    if (res > 1) {
+      b.style.lineHeight = (lh * upp).toFixed(3);
+      b.style.marginTop = PRICK.test(rad[i][0]) ? `${(prick * upp).toFixed(3)}em` : '';
+    }
   });
 }
 
@@ -254,13 +265,28 @@ function nacional() {
 // ---------- löpsedeln: tidningen och rubrikerna ----------
 //
 // Veckans löpsedel är Helgarderats (2026-11-10, Tomas önskemål: "Döp om
-// löpsedeln till Helgarderat också"), samma tidning som ligger på pulten och i
-// samma utseende, det gula matchprogrammet (2026-11-11): gult papper, namnet i
-// Alfa Slab One på ett rött band och det som lyfts fram i rubriken rött. Förut var
-// den Sportbladets eller Expressens, två veckor i taget. Rubrikerna är våra:
-// kvällstidningens tonläge om gängets tips, allvarligt menat på ytan.
-// (T: namnet i vinjetten, {T} i kick)
-const TIDNINGEN = { namn: 'HELGARDERAT', gen: 'Helgarderats', T: 'HELGARDERAT', font: '400 100px "Alfa Slab One", Georgia, serif', bred: 86 };
+// löpsedeln till Helgarderat också"), samma tidning som ligger på pulten och
+// samma nummer, i omslagets utseende (2026-11-12: "Förbättra löpsedeln och
+// anpassa till helgarderat-tidningen"): kupongens papper, den tunna tryckta
+// ramen, numret, veckan och priset maskinskrivna överst (samma rad som på
+// omslaget, RumTidning.overst), namnet i terrakotta, vinjetten mellan två
+// streck där omslaget har lördagens datum, och rubriken i samma typsnitt,
+// Fraunces, så fet och stor som ryms, med det som lyfts fram i terrakotta.
+// Förut gick den i det gula matchprogrammet, som tidningen hade en kort tid
+// (gult papper, namnet i Alfa Slab One på ett rött band, rubriken i Anton), och
+// före det var den Sportbladets eller Expressens, två veckor i taget.
+// Rubrikerna är våra: kvällstidningens tonläge om gängets tips, allvarligt
+// menat på ytan.
+// (T: namnet i vinjetten, {T} i kick; pris: utan tidningen)
+const TIDNINGEN = { namn: 'Helgarderat', gen: 'Helgarderats', T: 'HELGARDERAT', pris: '3 kr' };
+// Rubrikens typsnitt: Fraunces som fetast, i snittet för stora storlekar. Duken
+// väljer snitt efter storleken (opsz, högst 144) och mäter därför i 144 px, och
+// CSS:en ställer raderna i samma snitt, så att måttet stämmer i alla storlekar.
+const RUBRIK = '900 144px Fraunces, Georgia, serif';
+const STRECK = '<i class="streck"></i>';
+// (det lilla trycket, vinjetten, raden under och den andra nyheten, står i
+// snittet för de minsta storlekarna, som är bredare: 9 px är det minsta)
+const TRYCK = '600 9px Fraunces, Georgia, serif';
 
 const fDatum = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', day: 'numeric', month: 'long' });
 const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'short' });
@@ -542,19 +568,33 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
 
 // ---------- löpsedeln: papperet ----------
 //
-// Tidningens namn så brett som papperet, en rad med vinjetten (kick) och
-// datumet, rubrikens rader i Anton, var och en så stor som ryms i bredden och
+// Numret, veckan och priset överst, tidningens namn, vinjetten (kick) mellan
+// två streck, rubrikens rader, var och en så stor som ryms i bredden och
 // alla mindre om de inte ryms på höjden, raden under och den andra nyheten
 // längst ner (mätt med en duk, så att inget behöver läggas ut i rummet först).
-const BRED = 92;
-const MAX = 36;
+// BRED: rubriken går lite utanför spalten (87,2), nästan ut till ramen.
+const BRED = 90;
+const MAX = 34;
 let duk = null;
+// textens bredd i em, mätt i typsnittets egen storlek
 function bredd(text, font = '400 100px Anton, Impact, "Arial Narrow", sans-serif') {
   duk = duk || document.createElement('canvas').getContext('2d');
   duk.font = font;
-  return duk.measureText(text).width / 100;
+  return duk.measureText(text).width / (parseFloat(/([\d.]+)px/.exec(font)[1]) || 100);
 }
-const UNDER = '700 100px "Helvetica Neue", Arial, sans-serif';
+
+// Så många rader blir texten i bredden bred (px stor, ord för ord som
+// webbläsaren bryter den; jämna rader, text-wrap: balance, blir lika många).
+function rader(text, font, px, bred) {
+  const mellan = bredd(' ', font) * px;
+  let n = 1;
+  let x = 0;
+  for (const ord of String(text).split(/\s+/).filter(Boolean)) {
+    const w = bredd(ord, font) * px;
+    if (x && x + mellan + w > bred) { n++; x = w; } else x += (x ? mellan : 0) + w;
+  }
+  return n;
+}
 
 function lopsedel() {
   const el = document.createElement('button');
@@ -565,7 +605,7 @@ function lopsedel() {
   return el;
 }
 
-function rita(el, r, vagg) {
+function rita(el, r, vagg, over = '') {
   const T = TIDNINGEN;
   const rad = r.rad.map(([t, s]) => [String(t).toUpperCase(), Number(s) || 0]);
   el.title = `${T.gen} löpsedel: ${radText(rad)} – ${r.under}${r.plus ? `. ${r.plus}` : ''}`;
@@ -574,29 +614,32 @@ function rita(el, r, vagg) {
     const k = [s === 1 ? 'rod' : s === 2 ? 'inv' : '', PRICK.test(t) ? 'prick' : ''].filter(Boolean).join(' ');
     return k ? ` class="${k}"` : '';
   };
-  el.innerHTML = `<span class="ark"><span class="huvud"><b class="namn">${esc(T.namn)}</b></span>` +
-    `<span class="linje"><span class="kick${PRICK.test(r.kick) ? ' prick' : ''}">${esc(r.kick)}</span><small>${esc(r.datum)}</small></span>` +
-    `<span class="rub">${rad.map(([t, s]) => `<b${stil(t, s)}>${esc(t)}</b>`).join('')}</span>` +
+  const pris = (window.RumTidning && RumTidning.TEXT && RumTidning.TEXT.forsta.pris) || T.pris;
+  el.innerHTML = `<span class="ark"><span class="over"><span>${esc(over)}</span><span>${esc(pris)}</span></span>` +
+    `<b class="namn">${esc(T.namn)}</b>` +
+    `<span class="kick"><span>${esc(r.kick)}</span></span>` +
+    // (det som ropas ut, stil 2, står mellan två tryckta streck: egna element, så att de inte reses med raden)
+    `<span class="rub">${rad.map(([t, s]) => `${s === 2 ? STRECK : ''}<b${stil(t, s)}>${esc(t)}</b>${s === 2 ? STRECK : ''}`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span>` +
     (r.plus ? `<span class="plus"><b>+</b>${esc(r.plus)}</span>` : '') +
     '<span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>' +
     `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
-  // namnet, vinjetten och den andra nyheten så stora som ryms (sp: spärren
-  // mellan bokstäverna och kanterna i em, som i CSS:en; mer: det som står
-  // bredvid i em)
-  const fyll = (sel, text, font, bred, max, sp = 0, mer = 0) => {
+  // vinjetten och den andra nyheten så stora som ryms, högst som i CSS:en (sp:
+  // spärren mellan bokstäverna i em, som där; mer: det som står bredvid i em)
+  const fyll = (sel, text, bred, max, sp = 0, mer = 0) => {
     const b = el.querySelector(sel);
-    if (b) b.style.fontSize = `${Math.min(max, bred / Math.max(0.3, bredd(text, font) + sp * text.length + mer)).toFixed(2)}px`;
+    if (b) b.style.fontSize = `${Math.min(max, bred / Math.max(0.3, bredd(text, TRYCK) + sp * text.length + mer)).toFixed(2)}px`;
   };
-  fyll('.namn', T.namn, T.font, T.bred, 22);
-  fyll('.kick', r.kick + '  ', undefined, 66, 6.4, 0.06);
-  if (r.plus) fyll('.plus', `+ ${r.plus}`, undefined, 88, 5.6, 0.02);
-  // rubriken får det som blir över av höjden: papperet 140 utan kanterna
-  // (6,5), namnet (18), vinjetten (12), raden under, den andra nyheten och
-  // luft för ringen och prickarna över Å, Ä och Ö (rub, 5) och en pixel att ta av
-  const underRader = Math.max(1, Math.ceil((bredd(r.under, UNDER) * 4.6) / BRED));
-  const hog = 140 - 6.5 - 18 - 12 - (underRader * 5.52 + 2.5) - (r.plus ? 11.8 : 0) - 5 - 1;
-  passa(el, { rad, bred: BRED, hog, max: MAX, topp: 1.55, prick: 0.2, drag: 1.42, sp: 0.2 });
+  fyll('.kick', r.kick.toUpperCase(), 87.2, 3.6, 0.16, 5);
+  if (r.plus) fyll('.plus', `+ ${r.plus}`.toUpperCase(), 87.2, 4, 0.1);
+  // rubriken får det som blir över av höjden: papperet 140 utan kanterna (8,2),
+  // raden överst (5,9), namnet (18), vinjetten (6,4), raden under, den andra
+  // nyheten, strecken kring det som ropas ut (2,6 var), sin egen luft (4) och en
+  // pixel att ta av
+  const underRader = rader(r.under, TRYCK, 5, 87.2);
+  const streck = rad.filter(([, s]) => s === 2).length * 2 * 2.6;
+  const hog = 140 - 8.2 - 5.9 - 18 - 6.4 - (underRader * 6 + 2.2) - (r.plus ? 9.6 : 0) - streck - 4 - 1;
+  passa(el, { rad, bred: BRED, hog, max: MAX, topp: 1.85, prick: 0.16, drag: 1.1, font: RUBRIK, lh: 0.78, glapp: 1.6, res: 1.3, kant: 0 });
 }
 
 // ---------- slitaget och platserna ----------
@@ -665,15 +708,26 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   let fonter = false;
   let senast = { rows: null, old: null };
   let senastR = null;
-  // Anton måste vara inläst innan raderna mäts: då mäts de om
+  // numret och veckan överst, som på omslaget på pulten (numret nedan)
+  const overst = (u) => (window.RumTidning && RumTidning.overst ? RumTidning.overst(u) : '');
+  let over = overst(null);
+  // Anton (skivans sedlar) och Fraunces (veckans) måste vara inlästa innan
+  // raderna mäts: då mäts de om
   if (document.fonts && document.fonts.load) {
     const klar = () => { fonter = true; passa(f, GP); passa(c, CHELSEA); api.data(senast.rows, senast.old); };
-    Promise.all([document.fonts.load('400 30px Anton'), document.fonts.load('400 30px "Alfa Slab One"')]).then(klar, klar);
+    Promise.all([document.fonts.load('400 30px Anton'), document.fonts.load('900 30px Fraunces', 'ÅÄÖ'), document.fonts.load('600 30px Fraunces', 'ÅÄÖ')]).then(klar, klar);
   }
   const api = {
     // Veckans rubrik (rubrik ovan): Veckans analys i tidningen (rum.js) handlar om matchen den gäller.
     // → { typ, tidning, datum, id … }, eller null
     rubrik: () => senastR,
+    // tidningens nummer på pulten (upplagan, rum.js): löpsedeln är samma nummer
+    numret(u) {
+      const ny = overst(u);
+      if (ny === over) return;
+      over = ny;
+      api.data(senast.rows, senast.old);
+    },
     slit(w, seed) {
       for (const el of [f, n, v, c]) bleks(el, w);
       slit(l, w, seed + 5);
@@ -699,10 +753,10 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         r = { ...GUIDEN.v[0], typ: 'guide', plus: PLUS[0], datum: datum(Date.now()) };
       }
       senastR = r;
-      const k = JSON.stringify([r.kick, r.rad, r.under, r.plus, r.datum, fonter, vagg]);
+      const k = JSON.stringify([r.kick, r.rad, r.under, r.plus, over, fonter, vagg]);
       if (k === ritad) return;
       ritad = k;
-      rita(l, r, vagg);
+      rita(l, r, vagg, over);
     },
   };
   return api;

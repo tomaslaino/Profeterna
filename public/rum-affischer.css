@@ -203,102 +203,143 @@
 }
 .rum-nac .tryck, .rum-vm94 .tryck { inset: 0; background: linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%); }
 
-/* ---------- löpsedeln: tidningens namn, vinjetten, rubriken och raden under ---------- */
+/* ---------- löpsedeln: numret, tidningens namn, vinjetten, rubriken och raden under ---------- */
 
-/* Helgarderats löpsedel i tidningens utseende, det gula matchprogrammet
-   (2026-11-11, som tidningen på pulten, rum-tidning.css, och Helgarderats egen
-   sida): gult papper, namnet i ljust på ett rött band, vinjetten i gult på svart
-   och det som lyfts fram i rubriken rött.
-   Storlekarna på namnet, vinjetten, rubrikens rader och den andra nyheten sätts
-   i rum-affischer.js, så att de fyller bredden. */
+/* Helgarderats löpsedel i tidningens utseende (2026-11-12: "Förbättra löpsedeln
+   och anpassa till helgarderat-tidningen"), som omslaget på pulten
+   (helgarderat.css, .hf-forsta) i samma mått, 100 × 140: kupongens papper, den
+   tunna tryckta ramen, numret, veckan och priset maskinskrivna över ett streck,
+   namnet i terrakotta, vinjetten i röda versaler mellan två streck (där
+   omslaget har lördagens datum) och rubriken i samma typsnitt som tidningens
+   rubriker, Fraunces, här som fetast och i versaler: en löpsedel ska gå att
+   läsa från andra sidan rummet. Det som lyfts fram i rubriken står i
+   terrakotta. Inget fyllt med färg, som i tidningen. Förut det gula
+   matchprogrammet: gult papper, namnet i Alfa Slab One på ett rött band,
+   vinjetten i gult på svart och rubriken i Anton.
+   Storlekarna på vinjetten, rubrikens rader och den andra nyheten sätts i
+   rum-affischer.js, så att de fyller bredden. */
 .rum-lop { width: 100px; transform: rotate(calc(var(--vrid, 0deg) + var(--rot))); }
 /* på väggen: mindre (72 %), så att den ryms mellan fönsterbänkens ände,
    bardiskens kant och den innersta barstolen; disken och barstolarna står framför
    den (rum-affischer.js). Två häftstift håller den, så den hänger nästan rak. */
 /* (två skuggor: papperet ligger an mot furun, men buktar ut lite nertill) */
 .rum-lop.pa-vagg { transform: rotate(var(--vrid, 0deg)) scale(0.72); transform-origin: 1.5px 1.5px; filter: drop-shadow(0 0.5px 0.6px rgba(0, 0, 0, 0.5)) drop-shadow(0.6px 2.6px 2.6px rgba(0, 0, 0, 0.32)); }
-/* Tidningspapper, matt: här gult. Svärtan är inte helt svart och det röda är
-   tryckfärgens, inte skärmens. */
-.rum-lop { --papper: #f5cb1c; --papper2: #ecc015; --rod: #b8231b; --kick: #23201e; }
+/* Papperet, trycket och bläcket är omslagets (--hf-p, --hf-tryck, --hf-svart i
+   helgarderat.css). De tryckta strecken och ramen (--linje) är ritade som
+   ytor och skuggor, inte som kanter: en kant tunnare än en bildpunkt
+   avrundas uppåt, och blev fem gånger för grov i närbilden. */
+.rum-lop { --papper: #f1e8d5; --papper2: #e7dcc4; --rod: #a9452b; --svart: #221f1b; --linje: 0.45px; }
 .rum-lop .ark {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   height: 140px;
-  padding: 3px 4px 3.5px;
-  background: linear-gradient(180deg, var(--papper, #f6f3ea), var(--papper2, #eeeadf));
-  color: #23201e;
+  padding: 3.6px 6.4px 4.6px;
+  background: var(--papper);
+  color: var(--svart);
+  font-family: var(--tryck);
+  text-align: center;
   /* klippt med sax (--klipp, rum-affischer.js): raka klipp i lite olika
      riktning, inte en skuren kant */
   clip-path: var(--klipp, polygon(0 0, 100% 0, 100% calc(100% - var(--curl)), calc(100% - var(--curl)) 100%, 0 100%));
 }
-.rum-lop .huvud {
+/* den tunna tryckta ramen, innanför kanten */
+.rum-lop .ark::before { content: ""; position: absolute; inset: 2.4px; box-shadow: inset 0 0 0 var(--linje) var(--rod); pointer-events: none; }
+/* numret och veckan till vänster och priset till höger, maskinskrivet över ett streck */
+.rum-lop .over {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 17px;
-  margin: 0 -4px;
-  background: var(--rod);
-  overflow: hidden;
-}
-.rum-lop .namn { white-space: nowrap; line-height: 1; font-weight: 400; }
-.rum-lop .namn { display: flex; align-items: center; font-family: "Alfa Slab One", Georgia, serif; color: #f8f2e0; letter-spacing: 0; }
-.rum-lop .linje { display: flex; justify-content: space-between; align-items: center; gap: 2px; margin-top: 2.5px; }
-.rum-lop .kick {
-  padding: 0.3em 0.42em 0.2em;
-  background: var(--kick, #191716);
-  color: var(--papper);
-  font: 400 6px/1 Anton, Impact, sans-serif;
-  letter-spacing: 0.06em;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px;
+  padding: 1.1px 0 1.9px;
+  background: linear-gradient(var(--rod), var(--rod)) 0 100% / 100% var(--linje) no-repeat;
+  font: 400 2.9px/1 var(--skriv);
   white-space: nowrap;
 }
-/* datumet på två rader i högerkanten */
-/* ringen och prickarna över Å, Ä och Ö når över versalerna: mer rött ovanför */
-.rum-lop .kick.prick { padding-top: 0.46em; }
-.rum-lop .linje small { flex: 0 0 20px; text-align: right; font: 700 3.1px/1.15 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.15px; opacity: 0.85; }
+/* (i fönstret ligger tejpen över hörnen: texten börjar innanför den) */
+.rum-lop:not(.pa-vagg) .over { padding-left: 4px; padding-right: 4px; }
+/* namnet, tryckt i terrakotta, lika stort som på omslaget */
+.rum-lop .namn { display: block; margin: 3.8px -2px 0; color: var(--rod); font: 600 14.2px/1 var(--tryck); letter-spacing: -0.2px; white-space: nowrap; }
+/* vinjetten: tidningens etikett, röda versaler mellan två tryckta streck */
+.rum-lop .kick {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 3.6px;
+  margin-top: 2.8px;
+  color: var(--rod);
+  font: 600 3.6px/1 var(--tryck);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.rum-lop .kick::before, .rum-lop .kick::after { content: ""; flex: 1 1 auto; align-self: stretch; background: linear-gradient(var(--rod), var(--rod)) 0 50% / 100% var(--linje) no-repeat; }
+/* (spärren efter sista bokstaven räknas inte in i mitten) */
+.rum-lop .kick span { margin-right: -0.16em; }
 .rum-lop .rub {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1.5px;
-  padding: 3px 0 2px;
-  overflow: hidden;
+  gap: 1.6px;
+  margin: 0 -1.4px;
+  padding: 2px 0;
 }
-/* raderna mitt på papperet, så stora som ryms och utdragna till kanterna
-   (scaleX, passa i rum-affischer.js) */
-.rum-lop .rub b { display: block; text-align: center; transform-origin: 50% 50%; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.2px; }
+/* raderna mitt på papperet, så stora som ryms (passa i rum-affischer.js), i
+   Fraunces som fetast och i snittet för stora storlekar (opsz 144, samma som
+   raderna mäts i) */
+.rum-lop .rub b {
+  display: block;
+  text-align: center;
+  transform-origin: 50% 50%;
+  font-family: var(--tryck);
+  font-weight: 900;
+  font-variation-settings: "opsz" 144;
+  line-height: 0.78;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
 .rum-lop .rub b.rod { color: var(--rod); }
-.rum-lop .rub b.prick { margin-top: 0.2em; }
-.rum-lop .rub b.inv { align-self: center; padding: 0.06em 0.12em 0.02em; background: var(--rod); color: var(--papper); }
-.rum-lop .under { margin-top: 2.5px; text-align: center; font: 700 4.6px/1.2 "Helvetica Neue", Arial, sans-serif; }
-/* den andra nyheten, under ett streck */
+/* ringen och prickarna över Å, Ä och Ö når över versalerna: mer luft ovanför */
+.rum-lop .rub b.prick { margin-top: 0.16em; }
+/* det som ropas ut (GARANTERAT!): i terrakotta mellan två tryckta streck (egna
+   element, så att de inte reses med raden) */
+.rum-lop .rub b.inv { color: var(--rod); }
+.rum-lop .rub .streck { flex: none; height: 1px; background: linear-gradient(var(--rod), var(--rod)) 0 50% / 100% calc(var(--linje) * 2) no-repeat; }
+/* raden under, som rubrikerna i tidningen: rak, i bläck och mitt på */
+.rum-lop .under { margin-top: 2.2px; font: 600 5px/1.2 var(--tryck); letter-spacing: -0.05px; text-wrap: balance; }
+/* den andra nyheten, under ett streck: röda versaler, som lagen på omslaget */
 .rum-lop .plus {
-  margin-top: 3px;
-  padding-top: 2.2px;
-  border-top: 1.2px solid currentColor;
-  font: 400 5.4px/1 Anton, Impact, sans-serif;
-  letter-spacing: 0.02em;
+  margin-top: 2.8px;
+  padding-top: 3.2px;
+  background: linear-gradient(var(--rod), var(--rod)) 0 0 / 100% var(--linje) no-repeat;
+  color: var(--rod);
+  font: 600 4px/1 var(--tryck);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
 }
-.rum-lop .plus b { margin-right: 0.3em; color: var(--rod); font-weight: 400; }
+.rum-lop .plus b { margin-right: 0.35em; color: var(--svart); font-weight: 600; }
 /* Trycket och papperet ovanpå texten, i tre lager (inga filter på texten:
    den blir suddig i närbilden):
    .blad   tryckfärgen har inte täckt överallt: papperet lyser igenom i
-           små prickar och fläckar i det svarta och röda
+           små prickar och fläckar i det svarta och röda, lika fina som på
+           omslaget (där 90 och 140 px på ett sex gånger så stort ark). Förut
+           tre gånger så grova, och då blev den svarta rubriken molnig.
    .veck   den har legat vikt på mitten (--vy)
    .tryck  papperets fibrer, ojämna ton och buktor från fukten, ljuset
            som faller snett in, kanterna som har smutsats ner och gulnat
            (--sep), och gropen runt häftstiften
    Bilderna (--fiber, --bukt, --bukt-ljus, --prickar, --flackar) står i
-   rum-tidning.css, där tidningen på pulten har samma papper. */
+   helgarderat.css, där tidningen har samma papper. */
 .rum-lop .blad, .rum-lop .veck { position: absolute; inset: 0; pointer-events: none; }
 .rum-lop .blad {
-  background: inherit;
-  -webkit-mask: var(--prickar) 0 0 / 50px 50px, var(--flackar) 0 0 / 80px 80px;
-  mask: var(--prickar) 0 0 / 50px 50px, var(--flackar) 0 0 / 80px 80px;
+  background: var(--papper);
+  -webkit-mask: var(--prickar) 0 0 / 15px 15px, var(--flackar) 0 0 / 23.3px 23.3px;
+  mask: var(--prickar) 0 0 / 15px 15px, var(--flackar) 0 0 / 23.3px 23.3px;
+  opacity: 0.32;
 }
 .rum-lop .veck {
   background:
@@ -308,7 +349,7 @@
 .rum-lop .tryck {
   inset: 0;
   background:
-    var(--fiber) 0 0 / 80px 80px,
+    var(--fiber) 0 0 / 25px 25px,
     var(--bukt) 0 0 / 100% 100%,
     linear-gradient(160deg, rgba(0, 0, 0, 0) 30%, rgba(70, 48, 22, 0.1));
   box-shadow: inset 0 0 3px rgba(150, 112, 50, calc(0.12 + var(--sep, 0.1))), inset 0 0 0.6px rgba(90, 64, 30, 0.35);
@@ -317,14 +358,14 @@
   background:
     radial-gradient(circle at 1.5px 1.6px, rgba(50, 34, 14, 0.3), rgba(50, 34, 14, 0) 5px),
     radial-gradient(circle at calc(100% - 1.5px) 1.6px, rgba(50, 34, 14, 0.3), rgba(50, 34, 14, 0) 5px),
-    var(--fiber) 0 0 / 80px 80px,
+    var(--fiber) 0 0 / 25px 25px,
     var(--bukt) 0 0 / 100% 100%,
     linear-gradient(160deg, rgba(0, 0, 0, 0) 30%, rgba(70, 48, 22, 0.1));
 }
 /* inget blänk, papperet är matt; buktornas ljusa sidor (i .veck: inuti
    .tryck hade de bara tagit bort av skuggan) */
 .rum-lop .tryck::after { content: none; }
-/* hörnet som släpper är samma papper (rosa på Sportbladet), mörkare mot vecket */
+/* hörnet som släpper är samma papper, mörkare mot vecket */
 .rum-lop .hund { background: linear-gradient(315deg, rgba(0, 0, 0, 0) 50%, rgba(60, 40, 16, 0) 50%, rgba(60, 40, 16, 0.2)), linear-gradient(315deg, rgba(0, 0, 0, 0) 50%, var(--papper2) 50%); }
 .rum-lop .veck::after { content: ""; position: absolute; inset: 0; background: var(--bukt-ljus) 0 0 / 100% 100%; mix-blend-mode: screen; opacity: 0.5; }
 

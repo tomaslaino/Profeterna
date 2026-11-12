@@ -394,6 +394,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   supportrar inför matchen. Lagets nyheter i Bing News från veckan ges till sökningen, eftersom den annars sällan hittar
   dem. I matchbladet står de som *Plymouth Live (8 nov)* och *intervjun i Owls Online (12 nov)* (se *Klubben,
   lokaltidningen och motståndarens intervju* under [Analyserna](#analyserna))
+- [x] **Löpsedeln i tidningens tryck (2026-11-12, användarens önskemål: "Förbättra löpsedeln och anpassa till
+  helgarderat-tidningen"):** veckans löpsedel ser ut som omslaget på tidningen på pulten och är samma nummer: kupongens
+  papper, den tunna tryckta ramen, *Nr 1 · Vecka 46* och priset maskinskrivna överst, namnet i terrakotta, vinjetten
+  mellan två streck och rubriken i tidningens typsnitt, så fet och stor som ryms. Det gula papperet, det röda bandet
+  och den molniga svärtan är borta (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -4511,20 +4516,30 @@ papperet lyser igenom (`.blad` med veckans löpsedels `--prickar` och `--flackar
 mest i en bruten rand längs vecken (`.veck::before`/`::after`). Allt i rum-affischer.css.
 
 **Löpsedeln** är veckans och är **Helgarderats**, samma tidning som ligger på pulten (2026-11-10, Tomas önskemål:
-"Döp om löpsedeln till Helgarderat också"): namnet i flaskgrönt i Alfa Slab One med rutorna 1, X och 2 ikryssade med
-kulspetspenna framför (`TIDNINGEN` i rum-affischer.js, rutorna ur `RumTidning.rutor`), och det som lyfts fram grönt.
-Förut var den från en riktig kvällstidning som de andra: Sportbladet på sitt rosa papper eller Expressen med det röda
-namnet, två veckor i taget. Rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
-önskemål 2026-11-08): matt tidningspapper, gråaktigt eller blekrosa, med fibrer, ojämn ton och buktor
+"Döp om löpsedeln till Helgarderat också") och samma nummer, i omslagets utseende (2026-11-12: "Förbättra löpsedeln
+och anpassa till helgarderat-tidningen"): kupongens papper, den tunna tryckta ramen, numret, veckan och priset
+maskinskrivna över ett streck (samma rad som på omslaget, `RumTidning.overst`; rum.js ger löpsedeln tidningens nummer,
+`numret` i rum-affischer.js), namnet i terrakotta lika stort som på omslaget, vinjetten (*SPIKEN*, *KRISEN*, *BARA I
+HELGARDERAT*) som tidningens etikett, röda versaler mellan två streck där omslaget har lördagens datum, och rubriken
+i tidningens typsnitt, Fraunces, här som fetast och i versaler, med det som lyfts fram i terrakotta. Inget är fyllt
+med färg, som i tidningen. Förut gick den i det gula matchprogrammet, som tidningen hade en kort tid (gult papper,
+namnet i Alfa Slab One på ett rött band, vinjetten i gult på svart, rubriken i Anton och datumet för dagen det hände),
+och före det var den från en riktig kvällstidning som de andra: Sportbladet på sitt rosa papper eller Expressen med
+det röda namnet, två veckor i taget. Rubrikerna är våra. Papperet ska se ut som en riktig tidning (Tomas
+önskemål 2026-11-08): matt tidningspapper med fibrer, ojämn ton och buktor
 från fukten, svärta och rött som inte har täckt överallt, ett veck på mitten och kanterna klippta med
-sax i några raka klipp (`klipp` i rum-affischer.js, ny varje vecka). Det vita i texten är papperet,
-och inget filter ligger på texten, som annars blir suddig i närbilden. Överst namnet så brett som papperet, under det
-vinjetten (*SPIKEN*, *KRISEN*, *BARA I HELGARDERAT*) och datumet, rubriken i Anton, mitt på
-papperet och från kant till kant – varje rad så stor som ryms i bredden men ingen mer än 1,55
-gånger den minsta, och har raderna fått krympa för att rymmas på höjden dras de ut på bredden
-igen (högst 1,42 gånger), en av dem grön eller papper på grönt, och rader med Å, Ä eller Ö med luft
-ovanför (också i vinjetten) – raden under och, under ett streck, veckans näst största nyhet
-(helst av ett annat slag) efter ett grönt plustecken. Utan någon står något ur
+sax i några raka klipp (`klipp` i rum-affischer.js, ny varje vecka). Fibrerna och prickarna där färgen inte har täckt
+är lika fina som på omslaget; de var tre gånger så grova och gjorde den svarta rubriken molnig i närbilden. Inget
+filter ligger på texten, som annars blir suddig i närbilden, och strecken och ramen är ritade som ytor och skuggor:
+en kant tunnare än en bildpunkt avrundas uppåt och blev fem gånger för grov nära. Rubriken står mitt på
+papperet och nästan ut till ramen – varje rad så stor som ryms i bredden men ingen mer än 1,85
+gånger den minsta, och alla mindre om de inte ryms på höjden. En rubrik med långa ord (*BLACKBURN KÖRDE ÖVER WEST
+HAM*) blir låg när bredden bestämmer, och då reses raderna (högst 1,3 gånger, `res` i `passa`), så att löpsedeln är
+full. Raderna mäts med en duk i samma snitt som de står i (Fraunces väljer snitt efter storleken: rubriken är låst
+till det största, och det lilla trycket mäts i det minsta). Det som ropas ut (*GARANTERAT!*) står i terrakotta mellan
+två streck, och rader med Å, Ä eller Ö har luft
+ovanför – sedan raden under, som tidningens rubriker, och, under ett streck, veckans näst största nyhet
+(helst av ett annat slag) i röda versaler efter ett plustecken. Utan någon står något ur
 kvällstidningens vanliga utbud där (*HOROSKOPET: TIPPA X*, *BÄST I TEST: TIPSPENNOR*). Tonen är
 kvällstidningens, stora ord och allvar på ytan, men torr: modellen heter *datorn* och *avböjer
 att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enligt datorn)*, och

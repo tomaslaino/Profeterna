@@ -162,6 +162,8 @@ export async function saker(el, opt = {}) {
   }
   return {
     rubrik: () => (aff ? aff.rubrik() : null),
+    // tidningens nummer på pulten (rum.js): löpsedeln är samma nummer
+    numret: (u) => { if (aff) aff.numret(u); },
     draw(t, mx, my, rows, old, syns = true) {
       if ((update(rows, old) || !sliten) && three) {
         sliten = true;

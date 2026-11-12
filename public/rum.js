@@ -3169,7 +3169,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.loading = true;
     // askkoppen, snusdosan, fläkten och löpsedlarna (rum-saker.js, rum-affischer.js)
     const andra = [];
-    andra.push(tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
+    andra.push(tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; if (x.numret) x.numret(hgNumret); R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err)));
     // lysröret, neonen, skyltarna, skivan, uret, ramarna, paketen och kupongstället (rum-inredning.js)
     andra.push(tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
@@ -3819,6 +3819,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     hgReq = RumTidning.hamta().catch(() => null).then((u) => {
       if (u) hgNumret = u;
       if (R.on) tidningPult();
+      // (löpsedeln är samma nummer, rum-affischer.js)
+      if (R.saker && R.saker.numret) R.saker.numret(hgNumret);
       return hgNumret;
     });
     return hgReq;

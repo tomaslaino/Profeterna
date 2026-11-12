@@ -35,6 +35,7 @@
 // RumTidning.upplaga(data, prov, tidning, sista) → upplagan (det som behövs för att rita tidningen), eller null
 // RumTidning.tidning(upplaga) → html: omslaget, innehållet, matchbladen och sista sidan, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
+// RumTidning.overst(upplaga) → raden överst på omslaget (Nr 1 · Vecka 46), som också står på löpsedeln (rum-affischer.js)
 // RumTidning.passa(rot, bredd, hojd) ger tidningen dess storlek: omslaget så stort som ryms och alla sidor lika breda.
 // RumTidning.bildfel(rot): en bild i matchbladen som inte går att hämta byts mot det andra lagets, och annars tas den
 // bort.
@@ -358,10 +359,16 @@
   // lördagens datum tryckta, rutorna 1, X och 2 ikryssade med pennan i mitten, och nertill den första matchen med sin
   // rubrik. I tidningen (lankar) går rutorna till kupongen och matchen till sitt matchblad; på pulten ligger omslaget i
   // en länk och har inga egna. Utan upplaga står bara namnet och rutorna.
+  // Raden överst till vänster, numret och veckan (Nr 1 · Vecka 46): också på löpsedeln (rum-affischer.js), som är
+  // samma nummer som tidningen på pulten. Utan upplaga, eller utan tider, så mycket som går att säga.
+  function overst(u) {
+    const { nr, dag } = numret(u);
+    return [nr != null ? TEXT.forsta.nr(nr) : '', dag ? TEXT.forsta.vecka(vecka(dag)) : ''].filter(Boolean).join(' · ');
+  }
   function forsta(u, lankar = false) {
     const G = TEXT.forsta;
     const { nr, dag } = numret(u);
-    const over = [nr != null ? G.nr(nr) : '', dag ? G.vecka(vecka(dag)) : ''].filter(Boolean).join(' · ');
+    const over = overst(u);
     const mitt = lankar && u ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(spelet(u))}">${rutor()}</a>` : `<div class="hf-mitt">${rutor()}</div>`;
     let ettan = '';
     if (u && u.ettan) {
@@ -549,5 +556,5 @@
     return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') + (u.sista ? sista(u) : '') : omslag;
   }
 
-  return { hamta, upplaga, tidning, forsta, passa, bildfel, nummer, rutor, TEXT };
+  return { hamta, upplaga, tidning, forsta, passa, bildfel, nummer, overst, rutor, TEXT };
 });
