@@ -20,6 +20,8 @@
     "express": "^4.19.0"
   },
   "devDependencies": {
-    "esbuild": "^0.25.12"
+    "acorn": "8.19.0",
+    "esbuild": "^0.25.12",
+    "three": "0.160.0"
   }
 }

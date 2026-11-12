@@ -70,6 +70,7 @@ const { buildTippare, fetchSamtal, roundNames, roundNotes } = require('./tippare
 const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
 const rost = require('./rost');
 const { minifySite, packaBinart } = require('./minify');
+const { buntaSidan } = require('./bunta');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const kupongCfg = require('../config/kupong');
@@ -359,11 +360,13 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
 
   packaBinart(tmp);
   const minified = minify ? minifySite(tmp) : null;
+  // (efter minify: buntarna sätts ihop av de redan förminskade filerna, src/bunta.js)
+  const buntat = minify ? buntaSidan(tmp) : null;
 
   // Byt hela katalogen på en gång, så att en halvfärdig sajt aldrig serveras.
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
-  return { generatedAt, minified, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
+  return { generatedAt, minified, buntat, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
 }
 
 function elva(id) {
@@ -441,6 +444,8 @@ if (require.main === module) {
       if (journal) console.log(`Tipparna: ${site.tippare.added.length} nya omgångar, ${site.tippare.frozen.length} avslutade.`);
       const m = site.minified;
       if (m) console.log(`Koden i mindre form: ${m.filer} filer, ${Math.round(m.fore / 1024)} → ${Math.round(m.efter / 1024)} kB${m.fel.length ? `, ${m.fel.length} kvar som de var` : ''}.`);
+      const b = site.buntat;
+      if (b) console.log(`Förstasidan i buntar: ${['stil', 'skript', 'moduler'].map((k) => (b[k] ? `${k} ${b[k].filer} → ${b[k].buntar}` : `${k} som förut`)).join(', ')}.`);
       console.log(`Hasse Backes röst: ${site.rosten.filer} av ${site.rosten.av} meningar har ljud, ${site.rosten.egna} med egen röst${r ? `, ${r.gjorda} nya från Azure${r.saknas ? `, ${r.saknas} saknas` : ''}${r.fel ? ` (${r.fel})` : ''}` : ''}.`);
     })
     .catch((err) => {

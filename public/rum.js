@@ -3067,10 +3067,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function forhamta() {
     if (R.forhamtat || R.ej3d) return;
     R.forhamtat = true;
-    const m = document.querySelector('script[type="importmap"]');
-    const im = m ? JSON.parse(m.textContent).imports : {};
-    const fil = ['environments/RoomEnvironment.js', 'geometries/RoundedBoxGeometry.js', 'utils/BufferGeometryUtils.js'].map((f) => im['three/addons/'] + f);
-    for (const href of ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', 'rum-vaxter.js', 'rum-kassetter.js', im.three, ...fil]) {
+    // (listan står i index.html, RUM_FORHAMTA; det som redan hämtas därifrån hoppas över)
+    for (const href of window.RUM_FORHAMTA || []) {
+      if ([...document.head.querySelectorAll('link[rel="modulepreload"]')].some((x) => x.getAttribute('href') === href)) continue;
       const l = document.createElement('link');
       l.rel = 'modulepreload';
       l.href = href;
