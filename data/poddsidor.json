@@ -98,10 +98,10 @@
     "Reading"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:11:35.780Z",
-   "rubrik": "Reading har tätat bakåt – framåt finns bara Marriott",
-   "ingress": "Stockports målvakt blev utvisad i cupen, och reserven tog god tid på sig att få på handskarna. I Reading jublar supportrarna över Jack Marriotts återkomst, för utan honom hittar bollen sällan in i mål.",
-   "summering": "Stockport bär på trötta ben hos Wootton och Pye men har en Jack Diamond i form. Reading står stadigare bakåt än på länge, men hoppet framåt vilar i stort sett på Marriott.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Readings anfall väntar fortfarande på någon annan än Marriott",
+   "ingress": null,
+   "summering": "Stockport lutar sig mot Diamonds energi men har två överbelastade nyckelspelare, medan Reading har en tränare med nytt förtroende och bara en spelare som supportrarna litar på framför mål.",
    "delar": [
     {
      "lag": "Stockport County",
@@ -192,23 +192,16 @@
       }
      ],
      "text": [
-      "Att målvakten Luca Ashby-Hammond blev utvisad i cupmatchen mot Cray Wanderers tycker värdarna i podden SK3 TV var helt rätt. Mer förvånade var de över hur lång tid reserven Oliver Whatmuff behövde för att få på sig handskarna.",
-      "Matchen räddades i stället från bänken. Kyle Wootton och Ethan Pye har enligt podden spelat så mycket att de ligger farligt nära överbelastning och fick vila från start, men båda hoppade in och vände matchen.",
-      "Mest beröm får ändå Jack Diamond, som tillförde den energi och vilja som saknades i första halvlek. Han har länge varit ojämn men räknas nu till lagets bästa den här säsongen."
+      "I SK3 TV är det inhopparen Jack Diamond som får äran för cupmatchen mot Cray Wanderers. Han gav laget den energi och vilja som saknades i första halvlek, och han som länge varit ojämn räknas nu till säsongens bästa.",
+      "Oron gäller Kyle Wootton och Ethan Pye, som spelat så mycket att de borde vila. Vilan från start gav inte mycket: båda fick hoppa in och rädda matchen, och Pye blev till slut kvar längre än om han startat och bytts ut efter en timme.",
+      "När Luca Ashby-Hammond blev utvisad, helt rätt enligt podden, tog reservmålvakten Oliver Whatmuff god tid på sig med handskarna."
      ],
-     "citat": {
-      "sagt": "Ethan Pye spelade faktiskt fler minuter i dag än han hade gjort om vi hade avgjort och tagit av honom efter en timme.",
-      "vem": null,
-      "podd": "SK3 TV",
-      "typ": "podd",
-      "datum": "2026-11-09"
-     },
      "namn": [
-      "Luca Ashby-Hammond",
-      "Oliver Whatmuff",
+      "Jack Diamond",
       "Kyle Wootton",
       "Ethan Pye",
-      "Jack Diamond"
+      "Luca Ashby-Hammond",
+      "Oliver Whatmuff"
      ]
     },
     {
@@ -319,18 +312,22 @@
       }
      ],
      "text": [
-      "Fyra avslut på en kvart, räknade värdarna i podden The Tilehurst End. Så såg Jack Marriotts återkomst ut mot Plymouth, och de kallar den ”jättebra nyheter”. Utanför honom är avslutningen bedrövlig, tycker de, och även Kyreece Lisbie borde ha gjort fler mål på sina lägen.",
-      "Jamie Reid, ersättaren på topp, väntar fortfarande på sitt första mål och slog bara tre passningar mot Plymouth. Både han och Lewis Wing, som inte har gjort mål i spel, verkar forcera för att komma igång. Någon andra anfallare tror podden ändå inte att Liam Richardson väljer att spela med.",
-      "Bakåt är bilden ljusare: 13 insläppta mål mot 19 vid samma tid förra säsongen, med Paudie O'Conner stabil hela hösten. Josh Knight klarade dessutom en stor del av matchen. Stödet för Richardson har vuxit, och i poddens omröstning har han gått från 1,7 i maj till 3,49 av 5."
+      "Jack Marriott är tillbaka och kom direkt till skott när han fick den sista kvarten mot Plymouth.",
+      "Det behövs, för i podden The Tilehurst End har man sedan slutet av augusti klagat på att avslutningen är ”bedrövlig utanför Marriott”. Jamie Reid, som fått vikariera på topp, väntar fortfarande på sitt första mål, och både han och Lewis Wing tycks forcera för att komma över tröskeln.",
+      "Stämningen kring tränaren Liam Richardson har däremot vänt. I poddens omröstning hade han i maj ett av de lägsta betyg som uppmätts, nu ligger han på 3,49 av 5."
      ],
+     "citat": {
+      "sagt": "Jag tror inte att Liam vill ändra sin stil särskilt mycket bara för att han inte har Marriott tillgänglig.",
+      "vem": null,
+      "podd": "The Tilehurst End - A Reading FC Podcast",
+      "typ": "podd",
+      "datum": "2026-11-04"
+     },
      "namn": [
       "Jack Marriott",
-      "Kyreece Lisbie",
       "Jamie Reid",
       "Lewis Wing",
-      "Liam Richardson",
-      "Paudie O'Conner",
-      "Josh Knight"
+      "Liam Richardson"
      ]
     }
    ]
@@ -344,10 +341,10 @@
     "Plymouth Argyle"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:09:15.380Z",
-   "rubrik": "Ingen vet hur Wednesday ska få ihop en trupp",
-   "ingress": "Hos Sheffield Wednesday tar landslagen spelare, skadorna tar fler och den nye tränaren har bara haft laget i en vecka. Plymouth kommer i stället med spelare på väg tillbaka och en petad anfallare som spelade in sig på en halvtimme.",
-   "summering": "Wednesday ska ställa en elva mitt i landslagsfrånvaro, skador och en avstängning, och tränaren letar fortfarande efter mod och kondition i laget. Plymouth väntar på att backarna ska bli friska och hoppas att Curtis och Baidoo ger anfallet fler vägar än via Pepple.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Svordomar i pausen, rädsla i anfallet",
+   "ingress": null,
+   "summering": "Wednesday har en tränare som tar i med hårda ord och ett lag som inte vågar anfalla. Plymouth hänger på Pepple men trivs på bortaplan, och Curtis knackar på.",
    "delar": [
     {
      "lag": "Sheffield Wednesday",
@@ -500,29 +497,20 @@
       }
      ],
      "text": [
-      "Sjuttio procent av bollen mot Oldham, och ändå nästan inget framåt. I podden The Wednesday Week talar supportrarna om ett psykiskt bakslag från förra säsongen: spelarna verkar rädda för att gå framåt och vet inte hur de ska göra mål. Först när Max Lowe och Sean Fusire byttes in lyfte laget, och bakåt höll bara Di'Shon Bernard måttet. På forumet Owlstalk klagar många på sega första halvlekar, långsamt uppspel och dålig kondition.",
-      "Den nye tränaren kom inte med några ursäkter, bara beskedet att förändringar behövs. Samtidigt krymper truppen. Tre, kanske fyra spelare är borta med landslagen, Burstow, Al-Hamadi, Reece James, Onyango och Gray väntas saknas och Sil Swinkels är avstängd. Lowe, Bernard och Valery kan dessutom ha dragit på sig nya känningar."
+      "Laget ser ”livrädda” ut för att gå framåt, säger man i podden The Wednesday Week, där man inte heller ser någon väg till mål trots 70 procents bollinnehav mot Oldham.",
+      "Den nye tränaren har haft laget i en vecka och bad inte om ursäkt för sina halvtidsanteckningar fulla av svordomar, som spreds snabbt på nätet. Han säger att truppen har legat i en bekvämlighetszon, och på forumet Owlstalk går rykten om att vissa spelare inte ville ha honom.",
+      "Ljuspunkterna var inhopparen Max Lowe och Di'Shon Bernard, som spelade hela cupmatchen efter lång frånvaro."
      ],
      "citat": {
-      "sagt": "Vi har tre, kanske fyra spelare borta på landslagsuppdrag, men matchen kan inte ställas in. Jag vet inte hur han ska få ihop en trupp på lördag.",
-      "vem": "Stevie",
-      "podd": "The Wednesday Week",
-      "typ": "podd",
+      "sagt": "Motståndarna, till och med lag från botten av League Two, verkar bara kunna promenera igenom hela vårt lag hur lätt som helst.",
+      "vem": "Ante's Bubbly",
+      "podd": "Owlstalk",
+      "typ": "forum",
       "datum": "2026-11-09"
      },
      "namn": [
       "Max Lowe",
-      "Sean Fusire",
-      "Di'Shon Bernard",
-      "Burstow",
-      "Al-Hamadi",
-      "Reece James",
-      "Onyango",
-      "Gray",
-      "Sil Swinkels",
-      "Lowe",
-      "Bernard",
-      "Valery"
+      "Di'Shon Bernard"
      ]
     },
     {
@@ -670,8 +658,9 @@
       }
      ],
      "text": [
-      "Ronan Curtis hade varit petad, men på sin första halvtimme för klubben var han inblandad i tre av målen. I podden Green & White menar man att han har spelat sig in i bilden till lördag. Michael Baidoo gjorde mål efter ett inhopp i sin första match på 18 månader. Han var ringrostig i passningsspelet, men han är den offensiva mittfältare som laget har saknat.",
-      "Tom Cleverley säger att Matthew Sorinola, Jack Mackenzie och Caleb Watts kan vara tillbaka till helgen. Joe Edwards är dock skadad och Julio Pleguezuelo verkar vara det igen, så supportrarna tror att Cleverley håller fast vid 4-4-2. Oron gäller Aribim Pepple, som har tappat formen. Borta trivs laget bättre, och där får han och Evans mer yta."
+      "Ronan Curtis hade varit petad men var inblandad i tre av målen på en halvtimme i sitt första inhopp för klubben, och i podden Green & White menar man att han har spelat sig in i bilden till lördag.",
+      "Han kan behövas, för anfallet har blivit endimensionellt och hänger på Aribim Pepple, som trängs ut av två mittbackar och tycks ha tappat formen. Stängs han ute blir laget tandlöst.",
+      "Supportrarna ser ändå ljust på bortamatchen: laget är just nu bättre borta än hemma, och anfallsparet Pepple–Evans får mer yta där."
      ],
      "citat": {
       "sagt": "Michael Baidoo hälsades in på planen som en återvändande hjälte, trots att det var hans första match på 18 månader.",
@@ -682,14 +671,6 @@
      },
      "namn": [
       "Ronan Curtis",
-      "Michael Baidoo",
-      "Tom Cleverley",
-      "Matthew Sorinola",
-      "Jack Mackenzie",
-      "Caleb Watts",
-      "Joe Edwards",
-      "Julio Pleguezuelo",
-      "Cleverley",
       "Aribim Pepple",
       "Evans"
      ]
@@ -705,10 +686,10 @@
     "Barnsley"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:09:06.529Z",
-   "rubrik": "Caldwell valde riktiga karlar, och forumet jublade",
-   "ingress": "Wigan Athletic springer mest av alla lag i League One, och nu har Shaun Caldwell också hittat en elva som supportrarna gillar. Men Reggie Walsh är borta med Englands landslag, och framåt hänger nästan allt på en enda anfallare.",
-   "summering": "Wigan ställer upp med en rutinerad elva som supportrarna äntligen tror på, och med ligans flitigaste ben. Oron gäller beroendet av Christian Saydee och Reyes Cleary på Barnsleys vänsterkant. Barnsley saknar två spelare som är uttagna till landslag.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Caldwell ville ha riktiga karlar, och forumet håller med",
+   "ingress": null,
+   "summering": "Wigan går in med en rutinerad elva som supportrarna vill behålla, ett anfall som vilar tungt på Saydee och en högerkant som måste stänga ute Cleary.",
    "delar": [
     {
      "lag": "Wigan Athletic",
@@ -855,27 +836,25 @@
       }
      ],
      "text": [
-      "”Riktiga karlar.” Så ska Shaun Caldwell ha förklarat varför Charlie Gray och Reggie Walsh fick sitta på bänken i cupsegern. På forumet Vital Latics Speyk tycker flera att han äntligen valde rätt lag, och de vill se Morgan Fox, Max Power och Jensen Weir kvar i startelvan före de unga lånespelarna.",
-      "Jon Mellish flyttades upp på mittfältet för att ge laget mer fysik, gjorde mål och bröt bollen som ledde till 2–0. Boreham Woods tränare tyckte att han var för hårdför och konstaterade dessutom att Wigan springer mest i League One. Supportrarna tar det som ett svar till dem som har ifrågasatt insatsen.",
-      "Framåt hänger det mesta på Christian Saydee, som orkade 71 minuter i cupen, längre än tidigare. På forumet tycker man att laget är alltför beroende av honom. Walsh är borta med Englands landslag."
+      "Shaun Caldwell lät de unga sitta och valde ”riktiga karlar” i cupen, och på forumet Vital Latics Speyk menar man att han äntligen har hittat rätt elva. Morgan Fox, Max Power och Jensen Weir ska vara kvar, och i podden lyfter man fram Jon Mellish, som flyttades upp på mittfältet och bröt bollen före 2–0.",
+      "Framåt hänger nästan allt på Christian Saydee, som har gjort enorm skillnad sedan han kom tillbaka från skadan.",
+      "Inför lördagen varnar en supporter för Reyes Cleary, som var Barnsleys enda riktiga hot på vänsterkanten när Wigan slogs ut ur Ligacupen. Högerbacksplatsen måste tätas."
      ],
      "citat": {
-      "sagt": "Vi måste täta till på högerbacksplatsen, för Cleary var deras främsta, ja enda, hot på vänsterkanten när de knep segern mot oss i Ligacupen.",
-      "vem": "Zeb2",
-      "podd": "Vital Latics Speyk",
-      "typ": "forum",
-      "datum": "2026-11-10"
+      "sagt": "Jag tror ärligt talat att det är precis därför vi startade med honom: lite fysik på mittfältet.",
+      "vem": "Adam Conroy",
+      "podd": "Progress With Unity Podcast",
+      "typ": "podd",
+      "datum": "2026-11-08"
      },
      "namn": [
       "Shaun Caldwell",
-      "Charlie Gray",
-      "Reggie Walsh",
       "Morgan Fox",
       "Max Power",
       "Jensen Weir",
       "Jon Mellish",
       "Christian Saydee",
-      "Walsh"
+      "Reyes Cleary"
      ]
     },
     {
@@ -895,10 +874,10 @@
     "Blackpool"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:09:11.612Z",
-   "rubrik": "Klockan slår sextio, och Wimbledon slutar spela fotboll",
-   "ingress": "I Wimbledons podd är man trött på en tränare som backar hem så fort laget leder, och fyra segrar på 23 matcher gör tålamodet kort. Blackpool kom hem med 1–1 från Sheffield Wednesday, ett steg framåt enligt Ian Evatt, men inte enligt dem som följer laget.",
-   "summering": "Wimbledon måste orka en hel match med en sliten och hopflickad backlinje, och anfallsspelet hänger mycket på Harry Cornick. Blackpool har en tränare under växande tryck och ett lag som alltför lätt blir överkört i de fysiska striderna.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Wimbledon spelar fotboll i en timme, sedan räcker det",
+   "ingress": null,
+   "summering": "Wimbledon släpper matcherna när Jackson backar hem efter en timme. Blackpool förlorar de fysiska striderna för lätt, och kring Evatt växer trycket.",
    "delar": [
     {
      "lag": "AFC Wimbledon",
@@ -1008,12 +987,12 @@
       }
      ],
      "text": [
-      "”Okej, nu räcker det.” Så låter det nästan precis på timmen, enligt podden The Wombles had a Dream: Wimbledon leder och ser hyfsat ut, och då drar Johnny Jackson tillbaka laget. Supportrarna tror inte att truppen orkar försvara så länge, och irritationen är stor. Någon sparkning tror värdarna inte på, men med fyra segrar på de senaste 23 matcherna måste Jackson se upp.",
-      "Backlinjen spretar när bollen går längs marken, lagkaptenen och vicekaptenen hör till de sämsta just nu och Ryan Johnsons ben verkar slut. Skadorna, bland dem Donnell McNeilly, har dessutom flyttat ner Steve Seddon från vänster vingback till vänster mittback, där han inte kommer till sin rätt.",
-      "Framåt är Harry Cornick motorn. När han byttes ut mot Stockport tog det helt stopp."
+      "Nästan precis på timmen säger Wimbledon ”okej, nu räcker det”. Laget leder och ser hyfsat ut, och sedan drar Johnny Jackson tillbaka det.",
+      "I podden The Wombles had a Dream tror man inte att truppen orkar försvara så länge i League One. Harry Cornick är den som får igång anfallen med sitt slit och sina inlägg, och mot Stockport syntes vad som händer när han kliver av.",
+      "Värdarna tror inte att Jackson får sparken, men irritationen över den försiktiga stilen är stor."
      ],
      "citat": {
-      "sagt": "Och nu har vi tre äldre herrar i backlinjen, och ingen av dem presterar särskilt bra.",
+      "sagt": "Men i samma stund som vi tog av Harry Cornick slutade vi göra något överhuvudtaget.",
       "vem": null,
       "podd": "The Wombles had a Dream Podcast",
       "typ": "podd",
@@ -1021,10 +1000,8 @@
      },
      "namn": [
       "Johnny Jackson",
-      "Ryan Johnson",
-      "Donnell McNeilly",
-      "Steve Seddon",
-      "Harry Cornick"
+      "Harry Cornick",
+      "Jackson"
      ]
     },
     {
@@ -1083,13 +1060,12 @@
       }
      ],
      "text": [
-      "Det är kroppsspråket som oroar mest. Skribenten på The Bloomfield Bulletin tycker att det har varit för lätt att springa ifrån Ian Evatts lag och vinna de fysiska striderna mot det den här säsongen, och att en del spelare ser mycket bekymrade ut.",
-      "Evatt kallade 1–1 borta mot Sheffield Wednesday ett steg framåt, men enligt sajten var resultatet bättre än spelet, och trycket på tränaren växer. Truppen har spelare med stor potential som Evatt inte får ut det bästa av just nu, även om skribenten menar att spelarna också måste ta ansvar.",
-      "Finley Munroe är ett exempel. Han blir isolerad ute på vänsterkanten när laget söker sig högerut, och får aldrig visa det han värvades för."
+      "Det har varit för lätt att springa ifrån Blackpool och vinna de fysiska striderna mot laget den här säsongen. Så skriver The Bloomfield Bulletin, som också tycker att en del spelares kroppsspråk är mycket oroande.",
+      "Ian Evatt kallade 1–1 borta mot Sheffield Wednesday ett steg framåt, men skribenten ser ett resultat som var bättre än spelet och ett tryck på tränaren som växer. Spelarna måste dock också ta sitt ansvar, heter det.",
+      "Finley Munroe, som värvades för vänsterkanten, blir isolerad där eftersom spelet dras över till högersidan."
      ],
      "namn": [
       "Ian Evatt",
-      "Evatt",
       "Finley Munroe"
      ]
     }
@@ -1104,10 +1080,10 @@
     "Burton Albion"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:09:47.252Z",
-   "rubrik": "Landskamperna gröper ur Burton inför resan till MK",
-   "ingress": "Burton kommer till Stadium MK utan Caylon Vickers och med två spelare borta på landslagsuppdrag. Även MK Dons kan drabbas av landskamperna: Aaron Collins sägs vara uttagen, men inget är officiellt.",
-   "summering": "Burtons stora fråga är hur laget ska ta sig ur pressen utan Vickers, med en vacklande målvakt bakom sig och en tunnare trupp. Hos MK Dons hänger mycket på om ryktet om Aaron Collins landslagsuttagning blir officiellt.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Burton hittar ingen väg ut ur pressen",
+   "ingress": null,
+   "summering": "MK Dons väntar på besked om Collins landslagsuttagning. Burton saknar Vickers och någon att spela upp bollen på, och supportrarna litar allt mindre på sin målvakt.",
    "delar": [
     {
      "lag": "Milton Keynes Dons",
@@ -1142,11 +1118,13 @@
       }
      ],
      "text": [
-      "På forumet The MooCamp handlar veckan om Aaron Collins. Enligt reportern Peter O'Rourke har han tagits ut i landslaget, troligen sedan någon annan lämnat återbud på grund av skada.",
-      "Ännu är inget officiellt, men supportrarna räknar med att han i så fall saknas mot Burton på lördag."
+      "På supporterforumet The MooCamp räknar man redan med att Aaron Collins blir borta på lördag.",
+      "Reportern Peter O'Rourke uppger att Collins har tagits ut i landslaget, troligen sedan en annan spelare lämnat återbud på grund av skada.",
+      "Uttagningen är ännu inte officiell, men supportrarna har redan börjat planera för en match utan honom."
      ],
      "namn": [
-      "Aaron Collins"
+      "Aaron Collins",
+      "Collins"
      ]
     },
     {
@@ -1281,21 +1259,21 @@
       }
      ],
      "text": [
-      "”Efter matchen fick vi veta att han kan bli borta i upp till sex veckor”, berättar podden Brewers Babble om Caylon Vickers, som supportrarna ser som sommarens bästa värvning. Landslagen tar dessutom mittbacken Toby Sibbick till Uganda och Gbemi Arubi till Irlands U21-lag. Vänstervingbacken Jack Armer kom inte ut efter paus mot Wycombe, och Harvey Araujo eller Emeka Adeile tros ta hans plats. Joe Lewis är däremot tillbaka efter skada.",
-      "Utan Vickers och utan en Kyran Lofthouse att spela på tror supportrarna inte att laget tar sig ur pressen. Tre anfallare turas om utan att någon spelar in sig, och den störste av dem, Matthew Dennis, anses inte slita nog. Will Collar, avgörande på sistone, saknades i startelvan sedan han blivit pappa igen. Målvakten Corey Addai bjöd på Wycombes första mål, och oron är att misstagen börjar väga tyngre än räddningarna."
+      "I podden Brewers Babble ser man inte hur Burton ska spela sig ur pressen.",
+      "Caylon Vickers kan vara borta i upp till sex veckor, och det finns ingen Kyran Lofthouse att slå upp bollen på, så den kommer bara tillbaka. Lag med mer fysik kommer att utnyttja det ”förr eller senare”.",
+      "Oron gäller också målvakten Corey Addai, vars misstag gav Wycombe första målet och som nu riskerar att göra fler misstag än räddningar.",
+      "Dessutom antyder supportrarna att något hänger över klubben och kan kosta poäng i efterhand, men ”ingen vet vad som pågår”."
      ],
+     "citat": {
+      "sagt": "Det är bra att ha en målvakt som räddar skott, men om de här misstagen fortsätter är det ganska meningslöst.",
+      "vem": null,
+      "podd": "Brewers Babble",
+      "typ": "podd",
+      "datum": "2026-11-06"
+     },
      "namn": [
       "Caylon Vickers",
-      "Toby Sibbick",
-      "Gbemi Arubi",
-      "Jack Armer",
-      "Harvey Araujo",
-      "Emeka Adeile",
-      "Joe Lewis",
-      "Vickers",
       "Kyran Lofthouse",
-      "Matthew Dennis",
-      "Will Collar",
       "Corey Addai"
      ]
     }
@@ -1310,10 +1288,10 @@
     "Cheltenham Town"
    ],
    "avspark": "2026-11-14T12:30:00.000Z",
-   "skriven": "2026-11-11T19:09:49.712Z",
-   "rubrik": "Två lag som helst skulle sluta efter en timme",
-   "ingress": "I Exeter tror podden att förlusten mot Salford hade kunnat undvikas om Harry Kite orkat hela matchen. I Cheltenham räcker inte bänken till, och utan Robbie Cundy förlorar laget i luften. Båda lagen tycks tappa när krafterna tryter.",
-   "summering": "Exeter har en Kite i form och en Cox med självförtroende, men oro för orken mot slutet och för om Fitzwater hinner bli spelklar. Cheltenham har McCanns mål, men saknar Evans, är svaga i luftspelet utan Cundy och har svårt att vinna borta.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Två lag som tar slut innan matchen gör det",
+   "ingress": null,
+   "summering": "Exeter har en ny kugge i Kite men tappar orken mot slutet. Cheltenham förlorar luftdueller utan Cundy, och supportrarna väntar på att spelet ska komma ikapp resultaten.",
    "delar": [
     {
      "lag": "Exeter City",
@@ -1431,22 +1409,20 @@
       }
      ],
      "text": [
-      "”Om Kite hade orkat hela matchen kanske vi inte hade förlorat”, säger man i podden The Big Bank Theory om förlusten mot Salford. Harry Kite kom in när Jake Doyle-Hayes fick kliva av i en hemmamatch och har varit bland de bästa på planen två matcher i rad. Men laget tröttnar mot slutet, och bänken håller inte startelvans nivå. Sonny Cox har gjort mål igen och spelar med allt större självförtroende.",
-      "Jack Fitzwater i backlinjen har opererats, och på forumet Exeweb återger supportrarna att tränaren kallat hans chans att hinna bli spelklar till lördag en kamp mot klockan. Podden tror att Edward James i så fall tar hans plats. På forumet diskuteras också hörnmålet mot Huddersfield i FA-cupen, där Jack Bycroft backade mot mållinjen. Alla är dock inte lika kritiska."
+      "Harry Kite kom in när Jake Doyle-Hayes fick gå av och har på kort tid blivit ”lika bra som någon annan där ute”.",
+      "Problemet är att han inte orkar hela matcher. I podden The Big Bank Theory tror man att förlusten mot Salford kanske hade undvikits om han hade gjort det, eftersom bänken inte håller startelvans nivå.",
+      "På forumet Exeweb är man oense om Jack Bycroft efter hörnmålet mot Huddersfield i FA-cupen. Kritikerna såg honom backa mot mållinjen och öppna vinkeln, medan andra tycker att han i stort sett gör det bra."
      ],
      "citat": {
-      "sagt": "Cummins igen. Han är en stjärna, en riktig toppspelare. Samma sak med George Birch.",
-      "vem": null,
-      "podd": "The Big Bank Theory",
-      "typ": "podd",
-      "datum": "2026-11-04"
+      "sagt": "Det som oroar mer på bilderna är hans placering: två meter ut från linjen och på väg tillbaka mot den.",
+      "vem": "grecIAN Harris",
+      "podd": "Exeweb",
+      "typ": "forum",
+      "datum": "2026-11-09"
      },
      "namn": [
       "Harry Kite",
       "Jake Doyle-Hayes",
-      "Sonny Cox",
-      "Jack Fitzwater",
-      "Edward James",
       "Jack Bycroft"
      ]
     },
@@ -1589,23 +1565,20 @@
       }
      ],
      "text": [
-      "Mot Tranmere vann Cheltenhams mittbackar inte en enda nickduell, medan anfallaren Joe Ironside vann allt. I podden The Robins Report kopplar man det till att Robbie Cundy saknas. Han tros vara borta en längre tid, något som framgår ”mer av vad som inte sägs än av vad som sägs”.",
-      "På forumet The Robins Nest påpekar man att truppen är så tunn att Cotterill brukar köra med samma elva. Nu är mittfältaren Jake Evans avstängd, och det finns knappt någon naturlig ersättare. Ingen på bänken kan vända en match, och det går inte att åtgärda förrän i januari.",
-      "Charlie McCann gör mål i en takt som räcker till över 30 för säsongen, men podden menar att resultaten är bättre än spelet. Dessutom är laget ett helt annat hemma på Whaddon Road än på bortaplan."
+      "Mot Tranmere vann Cheltenhams mittbackar inte en enda nickduell, medan anfallaren Joe Ironside vann allt.",
+      "I podden The Robins Report kopplar man det till att Robbie Cundy saknas, och han tros bli borta länge.",
+      "På forumet The Robins Nest oroar man sig för att resultaten har varit bättre än spelet och att det snart ska straffa sig. Startelvan såg helt slut ut efter en timme mot deltidslaget Halifax, och inhopparna gör laget sämre."
      ],
      "citat": {
-      "sagt": "Inhopparna gör oss svagare varje vecka, och startelvan såg helt slut ut efter sextio minuter, och det mot ett deltidslag.",
-      "vem": "Robin",
-      "podd": "The Robins Nest",
-      "typ": "forum",
-      "datum": "2026-11-10"
+      "sagt": "Robbie Cundy är tyvärr borta en tid, att döma av hur det låter. Det framgår mer av vad som inte sägs än av vad som sägs.",
+      "vem": null,
+      "podd": "The Robins Report",
+      "typ": "podd",
+      "datum": "2026-11-05"
      },
      "namn": [
       "Joe Ironside",
-      "Robbie Cundy",
-      "Cotterill",
-      "Jake Evans",
-      "Charlie McCann"
+      "Robbie Cundy"
      ]
     }
    ]
@@ -1619,10 +1592,10 @@
     "Gillingham"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:09:59.835Z",
-   "rubrik": "Gillingham buas hemma men trivs bäst på resande fot",
-   "ingress": "På Priestfield buades det efter senaste hemmamatchen, och pressen på tränaren växer. Nu väntar en resa till Colchester, där anfallet har tunnats ut och supportrarna vill se unge Ronnie Harvey i mittförsvaret.",
-   "summering": "Colchester saknar både Chiwome och Jay Williams och har länge haft svårt att göra mål. Gillingham kommer med en tunn trupp och en tränare under press, men med en bortaform som supportrarna hellre talar om än hemmaformen.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Buade på Priestfield, bättre på resande fot",
+   "ingress": null,
+   "summering": "Colchester bränner lägen och bjuder på misstag bakåt. Gillingham trivs bäst borta, men där börjar nu den svit som enligt en del supportrar kan avgöra Ainsworths framtid.",
    "delar": [
     {
      "lag": "Colchester United",
@@ -1747,28 +1720,22 @@
       }
      ],
      "text": [
-      "Leon Chiwome sträckte baksida lår mot Walsall och har åkt tillbaka till moderklubben Wolves för röntgen. ”Hur frustrerande är inte det”, suckar man i podden Beyond the Barside. Med Kylian Kouassi också borta väntas Jaden Williams spela längst fram.",
-      "Mönstret är välbekant: chanserna skapas men sätts inte, och enskilda misstag bakåt kostar mål, tre stycken mot Walsall. Cupsegern mot Worcester, den första sedan augusti, slutade bara 1–0, och på forumet The U'sual konstaterar flera att motståndarnas målvakt höll Worcester kvar i matchen.",
-      "Mittbacken Jay Williams är på landslagsuppdrag, och supportrarna vill se Ben Perry ihop med unge Ronnie Harvey. Enligt Danny Cowley närmar sig Teddy Bishop, Harry Anderson och Beryly Lubula en återkomst."
+      "Colchester skapar lägen, sätter dem inte och släpper in mål på enskilda misstag bakåt. Så låter diagnosen i Beyond the Barside, även efter det bättre spelet mot Walsall.",
+      "Cupsegern mot Worcester var lagets första sedan augusti, men på forumet The U'sual tycker flera att den borde ha blivit betydligt större. Att anfallaren Leon Chiwome nu är hos Wolves för att röntga baksida låret gör inte saken lättare.",
+      "Med Jay Williams borta med landslaget ville podden se unge Ronnie Harvey spela ihop med Ben Perry i mittförsvaret före lördagen."
      ],
      "citat": {
-      "sagt": "Det här är matchen då han ska komma in, eller hur? Som du säger, när Jay Williams är borta med landslaget.",
-      "vem": null,
-      "podd": "Beyond the Barside",
-      "typ": "podd",
-      "datum": "2026-11-06"
+      "sagt": "Worcesters målvakt höll dem kvar i matchen hela tiden, eftersom anfallarna oftast saknade den där dödande avslutningen.",
+      "vem": "bwildered",
+      "podd": "The U'sual",
+      "typ": "forum",
+      "datum": "2026-11-07"
      },
      "namn": [
       "Leon Chiwome",
-      "Kylian Kouassi",
-      "Jaden Williams",
       "Jay Williams",
-      "Ben Perry",
       "Ronnie Harvey",
-      "Danny Cowley",
-      "Teddy Bishop",
-      "Harry Anderson",
-      "Beryly Lubula"
+      "Ben Perry"
      ]
     },
     {
@@ -1944,27 +1911,20 @@
       }
      ],
      "text": [
-      "Efter cupförlusten mot Barrow buades det på Priestfield. I The ME7 Podcast tror Kian att Gareth Ainsworth får gå om de tre nästa ligamatcherna förloras. Dave påminner om att ägarna har gett tränaren pengar till nyförvärv och tror att han sitter kvar säsongen ut, om inte laget rasar.",
-      "Hemma har laget vunnit en av sex matcher sedan mitten av september, men Kian, som åker på bortamatcherna, ser ett lag som spelar bättre och kämpar hårdare på resa. Avsluten saknar fortfarande skärpa: Ronan Hale och Robbie McKenzie borde ha gjort mål mot Barrow.",
-      "Truppen glesnar. Tom Eaves vilades med en känning, Harry Waldock skadades och Andy Smith skyddar en fotled. Med Conor McManus och Eli King borta får James Brophy spela vingback i trebackslinjen."
+      "Gillingham ligger fyra i ligans bortatabell men långt ner i hemmatabellen. Kian i The ME7 Podcast, som själv åker på bortamatcherna, säger att laget både spelar bättre och kämpar hårdare borta.",
+      "Hemma buades det på Priestfield efter Barrow, och pressen på Gareth Ainsworth växer. Kian tror att tränaren får gå om laget förlorar mot Colchester, Crewe och Salford.",
+      "Hans kollega i podden, Dave, tror tvärtom att ägarna, som har gett Ainsworth pengar till nyförvärv, låter honom sitta kvar säsongen ut."
      ],
      "citat": {
-      "sagt": "Vet du var vi ligger i ligans bortatabell? Vi är fyra. I hemmatabellen är vi 21:a.",
-      "vem": "Kian",
+      "sagt": "Det finns ingen chans i världen att han får gå, om vi inte rasar som en sten.",
+      "vem": "Dave",
       "podd": "The ME7 Podcast",
       "typ": "podd",
       "datum": "2026-11-08"
      },
      "namn": [
       "Gareth Ainsworth",
-      "Ronan Hale",
-      "Robbie McKenzie",
-      "Tom Eaves",
-      "Harry Waldock",
-      "Andy Smith",
-      "Conor McManus",
-      "Eli King",
-      "James Brophy"
+      "Ainsworth"
      ]
     }
    ]
@@ -1978,10 +1938,10 @@
     "Newport County"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:09:54.929Z",
-   "rubrik": "Crewes mittbackar så bra att Demetriou kanske inte behövs",
-   "ingress": "I Crewe undrar man om den skadade Mickey Demetriou ens skulle ta en plats i laget, så övertygande har mittbackarna varit. Newport kommer till Gresty Road med en ny målskytt i form men har ännu inte vunnit en enda bortamatch.",
-   "summering": "Crewe vilar på ett mittbackspar i toppform men har en bänk som tappar greppet sent i matcherna. Newport har fått tillbaka flera spelare och har en Etete i målform, men frågan om kaptenen och den uteblivna bortasegern hänger kvar.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Newport försöker ta med sig hemmatron till Gresty Road",
+   "ingress": null,
+   "summering": "Crewe bygger på ett mittbackspar i toppform och en McNeill i ny roll men litar inte på bänken. Newport har hittat sammanhållningen, men den har ännu inte burit hela vägen på bortaplan.",
    "delar": [
     {
      "lag": "Crewe Alexandra",
@@ -2120,26 +2080,26 @@
       }
      ],
      "text": [
-      "Mickey Demetriou skriver på sitt konto i sociala medier att han har fått ett nytt bakslag. I podden The Railwaymen undrar man ändå om han ens skulle ta en plats i laget. Joshua Stephenson och Luke Offord stängde nämligen Wimbledons långbollsspel, och värdarna kallar dem seriens bästa mittbackspar.",
-      "Charlie McNeill gjorde sin bästa match för klubben som falsk nia. Han sjönk ner och hämtade bollen djupt. Med Conor Thomas och Matúš Holíček centralt kommer Joe White till sin rätt som tia, men man tvivlar på att Thomas orkar spela match efter match.",
-      "Oron gäller inhopparna, som mot Wimbledon lämnade kanterna öppna de sista 15 minuterna. En Crewe-supporter i Newports podd varnar dessutom för att Lewis Billington kan bli frånsprungen av snabba yttrar."
+      "I podden The Railwaymen tror man att Charlie McNeill har hittat sin roll. Som falsk nia som hämtade bollen djupt slapp han bli bortbyggd av större mittbackar och gjorde sin bästa match för klubben.",
+      "Bakom honom kallar man Joshua Stephenson och Luke Offord för ”seriens bästa mittbackspar”, och mot Wimbledon vann Stephenson nästan varje nickduell.",
+      "Oron gäller bänken. När March och Gibson tröttnade lämnade inhopparna Joel Tabiner och Calum Agius kanterna öppna, Adrien Thibaut drog på sig billiga frisparkar och Crewe fick hänga kvar den sista kvarten."
      ],
      "citat": {
-      "sagt": "Tittade man på bänken var den rätt stark. Vi saknar Lankester och Mickey, men annars ingen.",
-      "vem": null,
+      "sagt": "Jag tycker faktiskt att våra inhoppare gjorde oss sämre än deras gjorde dem bättre. Det var där matchen vände.",
+      "vem": "Trev",
       "podd": "The Railwaymen",
       "typ": "podd",
       "datum": "2026-11-09"
      },
      "namn": [
-      "Mickey Demetriou",
+      "Charlie McNeill",
       "Joshua Stephenson",
       "Luke Offord",
-      "Charlie McNeill",
-      "Conor Thomas",
-      "Matúš Holíček",
-      "Joe White",
-      "Lewis Billington"
+      "March",
+      "Gibson",
+      "Joel Tabiner",
+      "Calum Agius",
+      "Adrien Thibaut"
      ]
     },
     {
@@ -2287,25 +2247,19 @@
       }
      ],
      "text": [
-      "Kion Etete gjorde två mål mot Walsall. I podden 1912 Exiles tror man att han kan ha gått om Christian Doidge på topp, men värdarna tvivlar på att båda någonsin blir friska samtidigt. Under Hayden Mullins har laget mindre av bollen men fler skott, och Harrison Biggins är hjärtat med flest mål och målgivande passningar.",
-      "Mittbacken Kyle Cameron missade cupmatchen på grund av influensa men väntas tillbaka. Shaquille Gwengwe och James Crole är spelbara igen, och Mullins säger att Matty Jacob är tillbaka i träning. På forumet We Are Exiles oroar man sig för att lagkaptenen saknades helt i truppen, utan förklaring. Där hoppas man också att självförtroendet från Rodney Parade ska följa med till den första bortasegern."
+      "På forumet We Are Exiles beskriver man ett lag som har slutat skylla på varandra och som inte tappar modet när det släpper in mål, utan kan vända och vinna. Känslan är att ”alla drar åt samma håll”.",
+      "Efter två mål mot Walsall har Kion Etete till och med vunnit över dem som avfärdade honom för hans skadehistorik.",
+      "Det som saknas är en seger på bortaplan. Supportrarna hoppas att tron från Rodney Parade följer med till Gresty Road, och en av dem misstänker att den första bortasegern drar fler med sig."
      ],
      "citat": {
-      "sagt": "Nu gäller det bara att föra över den tron från hemmamatcherna till bortamatcherna. Jag misstänker att när den första bortasegern väl kommer, så följer flera efter.",
-      "vem": "wattsville_boy",
+      "sagt": "Etete gjorde en enastående match. Jag erkänner att jag bedömde honom fel när jag såg honom första gången.",
+      "vem": "George Guest",
       "podd": "We Are Exiles",
       "typ": "forum",
-      "datum": "2026-11-09"
+      "datum": "2026-11-07"
      },
      "namn": [
-      "Kion Etete",
-      "Christian Doidge",
-      "Hayden Mullins",
-      "Harrison Biggins",
-      "Kyle Cameron",
-      "Shaquille Gwengwe",
-      "James Crole",
-      "Matty Jacob"
+      "Kion Etete"
      ]
     }
    ]
@@ -2319,10 +2273,10 @@
     "Accrington Stanley"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:10:20.729Z",
-   "rubrik": "Mittfältaren på vänsterbacken var Stanleys bästa alternativ",
-   "ingress": "I Accrington är skadeläget sådant att en mittfältare fick täcka vänsterkanten i cupen. I Port Vale håller supportrarna tummarna för Connor Hall, och för att Lewis Montsma slipper spela vänster mittback.",
-   "summering": "Port Vale har en anfallslinje där alla fyra har gjort mål, men ett försvar som tappar fokus och kanske får klara sig utan Hall. Accrington kommer med en tunn trupp, där försiktigheten med muskelkänningar och de oförklarade frånvarona ger tydliga spår i elvan.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Vales största oro heter Montsma, inte Hall",
+   "ingress": null,
+   "summering": "Vale oroar sig för vänstersidan i backlinjen och för sin egen bristande koncentration bakåt. Accrington har en så tunn trupp att mittfältare får täppa hål i försvaret och en ung anfallare står ensam.",
    "delar": [
     {
      "lag": "Port Vale",
@@ -2467,9 +2421,9 @@
       }
      ],
      "text": [
-      "”Montsma är en dålig ersättare”, skriver en supporter på forumet One Vale Fan. Där hoppas man att mittbacken Connor Hall inte blir borta länge med den skada han verkar ha fått. Får Lewis Montsma spela vänster mittback befaras han bli ställd gång på gång. Supportrarna ser honom hellre centralt eller till höger i en trebackslinje.",
-      "Försvaret tappar dessutom koncentrationen även mot svaga lag. Mot Rochdale satte sig laget bakåt vid 3–0 och släppte ändå in två mål. Längre fram ser det ljusare ut, där alla fyra anfallarna har gjort mål.",
-      "I podden Ale and the Vale vill man att klubben pratar med Jordan Lawrence-Gabriel, säsongens bästa spelare, före januarifönstret, eftersom hans kontrakt går ut i sommar. Inte heller tränaren John Brady har kontrakt längre än säsongen ut, och klubben har ännu inte sagt något om hans framtid."
+      "Mittbacken Connor Hall verkar ha dragit på sig en skada, men på forumet One Vale Fan oroar man sig mer för den som ska ersätta honom. Lewis Montsma befaras hamna som vänster mittback, där han enligt supportrarna ”blir ställd gång på gång”.",
+      "Det vore illa nog i ett försvar som redan tappar koncentrationen. Mot Rochdale satte sig laget bakåt vid 3–0 och fick se ledningen krympa.",
+      "I podden Ale and the Vale kallas Jordan Lawrence-Gabriel säsongens bäste spelare. Hans kontrakt går ut i sommar, och man vill att klubben pratar med honom före januarifönstret."
      ],
      "citat": {
       "sagt": "Vi är ofta slarviga med bollen och somnar bakåt, och det måste upphöra.",
@@ -2479,11 +2433,9 @@
       "datum": "2026-11-09"
      },
      "namn": [
-      "Montsma",
       "Connor Hall",
       "Lewis Montsma",
-      "Jordan Lawrence-Gabriel",
-      "John Brady"
+      "Jordan Lawrence-Gabriel"
      ]
     },
     {
@@ -2552,13 +2504,14 @@
       }
      ],
      "text": [
-      "Conor Grant är mittfältare, men i cupmatchen fick han spela tillfällig vänsterback. På forumet Accrington Web tycker man att han gjorde det helt okej. Det som oroar är att han var ”det bästa alternativet”. Längst fram stod unge Charlie Warren ensam och blev hårt bevakad av två stora mittbackar.",
-      "Skadelistan är lång. Att Isaac Sinclair behöver opereras har supportrarna förståelse för. Värre tycker de det är att så många andra spelare har försvunnit ur laget utan någon förklaring. Klubben verkar vara försiktig och låter spelare med lättare muskelkänningar stå över hellre än att riskera att skadorna blir värre."
+      "På forumet Accrington Web oroar man sig mindre för Isaac Sinclair, som behöver opereras, än för alla spelare som har försvunnit ur laget utan förklaring. Klubben verkar hellre låta spelare med lättare muskelkänningar stå över än riskera värre skador.",
+      "Följden syntes i cupmatchen, där mittfältaren Conor Grant fick spela vänsterback. Supportrarna tycker att han klarade sig hyggligt, men att det säger en del att han var det bästa alternativet.",
+      "Längst fram stod unge Charlie Warren ensam och blev hårt bevakad av två stora mittbackar."
      ],
      "namn": [
+      "Isaac Sinclair",
       "Conor Grant",
-      "Charlie Warren",
-      "Isaac Sinclair"
+      "Charlie Warren"
      ]
     }
    ]
@@ -2572,10 +2525,10 @@
     "York City"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:10:48.739Z",
-   "rubrik": "Cupsegern köpte Watson lite tid",
-   "ingress": "Efter en cupkväll i Fleetwood som gick till förlängning har Rochdale fått tillbaka spelare och lite andrum, men självförtroendet beskrivs som i botten. York kommer med en målfarlig Alex Hunt och en tränare som såg Northampton-matchen från läktaren.",
-   "summering": "Rochdale har fått tillbaka spelare men har en förlängning i benen och ett självförtroende som behöver lyftas. York bygger på ett mittfält med fyra centrala spelare och en målfarlig Alex Hunt, men frågetecknet kring Mark Kitching och den tunna bredden bakom honom följer med.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Watson fick andrum i Fleetwood, nu väntar York",
+   "ingress": null,
+   "summering": "Rochdale har köpt lite tid åt Watson men bär på minnet av att bli överkörda. York vill ha en tidig ledning och har svårt för lag som parkerar bakom bollen.",
    "delar": [
     {
      "lag": "Rochdale",
@@ -2718,17 +2671,19 @@
       }
      ],
      "text": [
-      "”Skönt att ha två vänsterbackar tillbaka”, skriver en supporter på forumet RochdaleAFC.com efter cupsegern i Fleetwood. Charlie Tasker var åter högerback, Ryan East fick speltid och Casey Pettit värmde upp. De som varit borta länge tros ändå få börja på bänken mot York.",
-      "Under ordinarie tid var laget mest pressat, och först i förlängningen lossnade det. Segern tros köpa Watson lite tid, och den behövs: spelarnas självförtroende ligger ”nere i mattan”. Harvey Gilmour och Babajide Adeeko delades upp och gjorde båda bra matcher. Försvaret släppte bara in en straff, och det utan Sam Sherring, vilket genast väckte debatt.",
-      "York ses som ett stort test, kanske sista chansen att hålla kvar de omkring 3 500 på läktaren före vintern. Många tycks minnas säsongens första möte, då York spelade direkt och körde över laget fysiskt."
+      "Cupsegern i Fleetwood ger Ian Watson lite mer tid, tror man på supporterforumet, och den måste lyfta en trupp vars självförtroende ligger ”nere i mattan”. Alla är inte övertygade, och andra kallar tränarens insatser mest dåliga.",
+      "Försvaret höll bättre utan Sam Sherring, och en del ser det som ett bevis mot honom. Andra påminner om att fyra mål rann in efter att han byttes ut i en annan match.",
+      "Mot York hoppas man att laget har lärt sig av säsongens första match, då motståndarna spelade väldigt direkt och körde över Rochdale fysiskt."
      ],
+     "citat": {
+      "sagt": "Ingen överraskning att vi bara släpper in ett mål, och det på straff, när Sherring inte är med i försvaret.",
+      "vem": "dingdangblue",
+      "podd": "RochdaleAFC.com",
+      "typ": "forum",
+      "datum": "2026-11-07"
+     },
      "namn": [
-      "Charlie Tasker",
-      "Ryan East",
-      "Casey Pettit",
-      "Watson",
-      "Harvey Gilmour",
-      "Babajide Adeeko",
+      "Ian Watson",
       "Sam Sherring"
      ]
     },
@@ -2874,12 +2829,12 @@
       }
      ],
      "text": [
-      "Scott Lindsay såg Northampton-matchen från läktaren efter något han sagt till en funktionär, men i podden Same Old City tror man att han ändå gör matchplanen.",
-      "Med Hiram Boateng och Oliver Banks tillbaka körde York med fyra centrala mittfältare: Boateng och Arthur Read djupt, Alex Hunt och Banks högre upp. Hunt har tre mål på fyra matcher och trivdes längre fram. Ollie Pearce gjorde två mål på topp, och Josh Stones, tillbaka efter en lång skada, gjorde sitt första mål för säsongen som inhoppare och börjar likna fjolårets jobbiga bolljagare igen.",
-      "Mark Kitching byttes ut i halvtid, och bakom honom är bredden tunn. Leder York tidigt trivs laget, men ”det vi inte är så bra på är att bryta ner tio man bakom bollen”."
+      "Scott Lindsay skickades upp på läktaren mot Northampton efter något han sagt till en funktionär, och assisterande tränaren Gary Elphick fick leda laget från bänken. I podden Same Old City är man ändå säker på att Lindsay gör matchplanen och håller genomgången före match.",
+      "Svagheten talar man öppet om. York trivs med en tidig ledning mot ett motstånd som måste gå framåt, men har svårt att bryta ner ett lag som ställer tio man bakom bollen.",
+      "Alex Hunt har blommat ut som en av två tior i stället för som djupt liggande speluppläggare, och tränarna har fått ett intressant uttagningsproblem."
      ],
      "citat": {
-      "sagt": "Zech Medley kom in i halvtid för Kitching. Jag vet inte om det var en skada eller om de sparade på honom. Jag tänkte bara: vid 3–0, varför inte?",
+      "sagt": "Det vi inte är så bra på är att bryta ner tio man bakom bollen. Men om man leder med 1–0 tidigt…",
       "vem": null,
       "podd": "Same Old City",
       "typ": "podd",
@@ -2887,16 +2842,8 @@
      },
      "namn": [
       "Scott Lindsay",
-      "Hiram Boateng",
-      "Oliver Banks",
-      "Boateng",
-      "Arthur Read",
-      "Alex Hunt",
-      "Banks",
-      "Hunt",
-      "Ollie Pearce",
-      "Josh Stones",
-      "Mark Kitching"
+      "Gary Elphick",
+      "Alex Hunt"
      ]
     }
    ]
@@ -2910,10 +2857,10 @@
     "Northampton Town"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:10:15.917Z",
-   "rubrik": "Kaptenen tog tränaren i försvar – läktaren gjorde inte det",
-   "ingress": "I York stod Northamptons spelare och stirrade upp mot sina egna supportrar tills någon hämtade in dem. Nu väntar Salford, som just har förlorat för första gången på nio matcher men har en tränare som ändå såg ljust på spelet.",
-   "summering": "Salford kommer från en bruten segersvit, men tränaren var nöjd med spelet. Hos Northampton är det oklart vem som står i mål, ordinarie spelare väntas tillbaka och tränaren pressas allt hårdare av en läktare som har tappat tålamodet.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Kaptenen friar Hogg, läktaren gör det inte",
+   "ingress": null,
+   "summering": "Salford har en tränare som är lugn trots att segersviten bröts. Northampton spelar under växande krav på ett tränarbyte, och kaptenen och läktaren är inte överens om vems felet är.",
    "delar": [
     {
      "lag": "Salford City",
@@ -2942,8 +2889,8 @@
       }
      ],
      "text": [
-      "Sviten på åtta raka segrar tog slut i FA-cupens första omgång, när Salford föll med 0–1 borta mot Carlisle.",
-      "Tränaren Peter Cklamovski var ändå positiv till spelet efteråt, skriver den insatta sajten SalfordNow. För honom var det en förlust att ta lärdom av, inte ett tecken på att något har brustit."
+      "Peter Cklamovski lät sig inte rubbas av cupförlusten hos Carlisle. Enligt SalfordNow var han positiv till spelet efteråt.",
+      "Förlusten bröt en svit med åtta raka segrar, men i tränarens ögon var det inte spelet som brast."
      ],
      "namn": [
       "Peter Cklamovski"
@@ -3064,23 +3011,21 @@
       }
      ],
      "text": [
-      "Efter matchen i York stod spelarna länge och stirrade mot bortaläktaren, tills Joe Powell hämtade in dem. Enligt podden It's All Cobblers To Me hade stämningen då blivit giftig, med ”otäcka, hemska glåpord” och en supporter som kastades ut.",
-      "Kaptenen Jon Guthrie kallade första halvlek pinsam och lade skulden på spelarna. Chris Hogg tog själv på sig ansvaret, men kraven på att han ska bort har ändå ökat. I podden talar man om omotiverade spelare utan matchplan, om byten position mot position och om att det inte finns någon plan B. Anfallet ses som det stora problemet, och formen håller aldrig mer än två matcher.",
-      "Hoggs reserver fick chansen i cupen men tog den inte, så ordinarie spelare väntas tillbaka. Målvakten Zach Jeacock skadade armen eller axeln och är osäker. Står han över tar James Dadge platsen."
+      "Kraven på att Chris Hogg ska bort växer i podden It's All Cobblers To Me. Ägarna uppmanas bestämma sig ”snabbt”, så att en ny tränare hinner lära känna truppen före januarifönstret.",
+      "Kaptenen Jon Guthrie kallade första halvlek pinsam men lade skulden på spelarna, inte på tränaren. Enligt podden blev stämningen på bortasektionen i York giftig, och en supporter kastades ut. Efteråt blev spelarna länge stående och stirrade mot läktaren, tills Joe Powell hämtade in dem.",
+      "Värst är ändå anfallet: ”Det är nästan en överraskning när vi gör mål”, säger en av värdarna."
      ],
      "citat": {
-      "sagt": "Ägarna har ett stort beslut att fatta, och snabbt. Hur de fattar det visar om de förstår vad det innebär att driva en fotbollsklubb.",
-      "vem": "Rob Duncan",
+      "sagt": "De såg inte motiverade ut och verkade inte veta vad matchplanen var, och det faller på tränaren.",
+      "vem": null,
       "podd": "It's All Cobblers To Me - Northampton Town Podcast",
       "typ": "podd",
       "datum": "2026-11-09"
      },
      "namn": [
-      "Joe Powell",
-      "Jon Guthrie",
       "Chris Hogg",
-      "Zach Jeacock",
-      "James Dadge"
+      "Jon Guthrie",
+      "Joe Powell"
      ]
     }
    ]
@@ -3094,10 +3039,10 @@
     "Oldham Athletic"
    ],
    "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-11T19:10:29.440Z",
-   "rubrik": "Shrewsbury dukar för fest, Oldham minns sprinklerna",
-   "ingress": "Biljetterna är billigare och läktaren väntas fyllas av folk som inte synts på länge när Shrewsbury spelar sin första match under nya ägare. Oldham kommer med trötta ben efter förlängning i cupen, en haltande anfallare och en gammal räkning att göra upp.",
-   "summering": "Shrewsbury går in i en ny ägartid med väntat fulla läktare och en tränare som inte vet om han får sitta kvar. Oldham har två avstängda, trötta ben efter 120 minuter och en anfallare vars skada ännu inte är bekräftad.",
+   "skriven": "2026-11-12T19:33:14.101Z",
+   "rubrik": "Oldham har inte glömt sprinklerna i Shrewsbury",
+   "ingress": null,
+   "summering": "Shrewsbury bjuder in till fest under nya ägare, medan tränarens framtid är oviss. Oldham kommer med slitna kroppar, en anfallsduo som inte litar på varandra och ett gammalt agg.",
    "delar": [
     {
      "lag": "Shrewsbury Town",
@@ -3211,9 +3156,9 @@
       }
      ],
      "text": [
-      "Klubben har sänkt biljettpriset, och i podden Salopcast räknar man med att många som inte varit på match på länge kommer tillbaka mot Oldham. Det blir första matchen under de nya ägarna och, som någon uttrycker det, ”på sätt och vis en fest för klubben”.",
-      "Bekräftat är att Scott Davison har slutfört köpet och äger 87,4 procent via sitt bolag, och att Brad Friedel går in i styrelsen som sportchef. Mer oklart är framtiden för tränaren Gavin Cowan. Supportrarna hoppas att han får sitta kvar åtminstone genom januarifönstret.",
-      "Truppen är liten, men i podden anser man att den saknar dödvikt. I cupsegern borta mot Eastleigh blev det inhopparen Fletcher som avgjorde i 87:e minuten."
+      "Lördagens match blir den första sedan Scott Davison slutförde köpet av klubben, och i podden Salopcast väntar man sig mer fest än vardag. Biljettpriset är sänkt, och många som inte har varit på plats på länge säger att de tänker komma.",
+      "Mitt i firandet hänger en fråga kvar: ingen vet om tränaren Gavin Cowan får sitta kvar hos de nya ägarna, där Brad Friedel blir sportchef. Supportrarna hoppas att han får stanna åtminstone genom januarifönstret.",
+      "Truppen beskrivs som liten men utan dödvikt."
      ],
      "citat": {
       "sagt": "Vilken enad och bra trupp vi har. Det verkar finnas mycket stabilitet och sammanhållning där.",
@@ -3224,9 +3169,8 @@
      },
      "namn": [
       "Scott Davison",
-      "Brad Friedel",
       "Gavin Cowan",
-      "Fletcher"
+      "Brad Friedel"
      ]
     },
     {
@@ -3356,26 +3300,21 @@
       }
      ],
      "text": [
-      "Mike Fondop-Talom haltade av planen efter förlängningen i cupen. I podden The Boundary Park Alert System tror man att han har dragit något eller fått en ordentlig smäll, men inget är officiellt. Det svider, för han har på sistone varit tillbaka i gammal form som lagets fasta punkt på topp.",
-      "Gus Scott-Morriss hade kramp redan före förlängningen, och Kane Drummond och Kai Payne är fortfarande avstängda. Utan Drummonds fart har spelet blivit långbollar och kamp om andrabollar, men med Chilvers, Norburn och Pett några meter högre upp har det börjat fungera.",
-      "Tränaren Mickey Mellon väntar på domarrapporten efter att ha tagit en motståndare runt halsen. Och supportrarna har inte glömt hur Shrewsbury satte på sprinklerna vid 1–0 förra säsongen, fast ett skyfall var på väg."
+      "Oldham kommer till Shrewsbury med 120 cupminuter i benen, och i podden The Boundary Park Alert System väntar man sig trötta kroppar. Gus Scott-Morriss hade kramp redan före full tid, och Mike Fondop-Talom haltade av planen.",
+      "Värdarna tror inte heller att bråket mellan honom och Callum Kavanagh är helt läkt, trots bilden från träningen där de håller om varandra. De menar att Kavanagh inte chansar på Fondop-Taloms nickskarvar.",
+      "Dessutom finns en gammal räkning: förra säsongen satte Shrewsbury på sprinklerna i ledning, fast ett skyfall var på väg."
      ],
      "citat": {
-      "sagt": "Så det beror på vad som står i domarrapporten, för det där kan bli lite fult för honom.",
+      "sagt": "De satte på sprinklerna fast de visste att det skulle börja ösregna, när de ledde med 1–0. De lurade oss ordentligt.",
       "vem": null,
       "podd": "The Boundary Park Alert System",
       "typ": "podd",
       "datum": "2026-11-09"
      },
      "namn": [
-      "Mike Fondop-Talom",
       "Gus Scott-Morriss",
-      "Kane Drummond",
-      "Kai Payne",
-      "Chilvers",
-      "Norburn",
-      "Pett",
-      "Mickey Mellon"
+      "Mike Fondop-Talom",
+      "Callum Kavanagh"
      ]
     }
    ]
