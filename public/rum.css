@@ -103,7 +103,7 @@ a.rum-sak, a.rum-sak:hover { color: inherit; text-decoration: none; }
 
 /* ---------- regnet och neonen ---------- */
 
-.rum-regn { position: absolute; overflow: hidden; }
+.rum-nederbord { position: absolute; overflow: hidden; }
 .rum-regn-b { position: absolute; left: 0; top: 0; width: 100%; animation: rum-regn 0.7s linear infinite; }
 .rum-regn-b svg { display: block; }
 .rum-regn-b.fjarr { animation-duration: 1.25s; opacity: 0.8; }
@@ -408,10 +408,11 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 }
 /* Kupongstället på disken: länken ligger över stället (rum-inredning.js, före
    kortregistrets länk där de möts), och duken i 3D lyser som saken när man
-   pekar på länken. Ett klick tar en kupong för nästa omgång i handen. */
+   pekar på länken (.lyser sätts av rum-inredning.js: med :has() på planet
+   räknades stilen om för hela planet). Ett klick tar en kupong för nästa
+   omgång i handen. */
 .rum-stall { position: absolute; display: block; z-index: 2; }
-.rum-pl:has(> .rum-stall:focus-visible) > .rum-stall-duk { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
-@media (hover: hover) { .rum-pl:has(> .rum-stall:hover) > .rum-stall-duk { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); } }
+.rum-stall-duk.lyser { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
 .rum.sak-nara .rum-pl > .rum-stall-duk { filter: none; }
 .rum-stall-duk { transition: filter 0.25s ease; }
 /* rummet vrids rakt medan kameran går fram till en sak */

@@ -787,7 +787,9 @@ window.RumUte = (() => {
       s += `<div class="rum-sno-v" style="--sway:${sway}px; animation-duration:5s"><div class="rum-regn-b rum-sno-b" style="height:${2 * H}px; animation-duration:${r1(16 - 4 * k)}s">${flakes(Math.round(260 * k * part), 0.6, 1.4, 0.3)}</div></div>`;
       s += `<div class="rum-sno-v" style="--sway:${r1(sway * 1.4)}px; animation-duration:3.6s; animation-delay:-1.4s"><div class="rum-regn-b rum-sno-b" style="height:${2 * H}px; animation-duration:${r1(10 - 3 * k)}s">${flakes(Math.round(220 * k * part), 1.2, 2.6, 0.45)}</div></div>`;
     }
-    return `<div class="rum-regn" style="left:36px; top:120px; width:${W}px; height:${H}px">${s}</div>`;
+    // (inte rum-regn: så heter datorns närbild, rum-register.css, som är dold tills den öppnas –
+    // regnet och snön syntes inte i datorn, och rörelsen gick ändå, i huvudtråden)
+    return `<div class="rum-nederbord" style="left:36px; top:120px; width:${W}px; height:${H}px">${s}</div>`;
   }
 
   // ---------- glaset ----------
@@ -1090,10 +1092,14 @@ window.RumUte = (() => {
   // duk (ritaGatan), och hamnar inte alls i sidan.
   function duka(lager, s, samla = false) {
     const ut = [];
-    for (const svg of [...lager.querySelectorAll(':scope > svg')]) {
-      const ror = svg.querySelector('.gung, .ben, .arm, .hjul, .blink, .snurr, .vinge, .vaj');
+    // Oskärpan läses för alla innan någon byts ut: att läsa stilen efter att den förra figuren
+    // hade tagits bort räknade om den varje gång, ett trettiotal gånger i rad.
+    const alla = [...lager.querySelectorAll(':scope > svg')].map((svg) => {
       const m = /blur\(([\d.]+)px\)/.exec(getComputedStyle(svg).filter);
-      const blur = m ? parseFloat(m[1]) : 0;
+      return [svg, m ? parseFloat(m[1]) : 0];
+    });
+    for (const [svg, blur] of alla) {
+      const ror = svg.querySelector('.gung, .ben, .arm, .hjul, .blink, .snurr, .vinge, .vaj');
       if (!ror && !blur) continue;
       const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
       const w = parseFloat(svg.getAttribute('width'));

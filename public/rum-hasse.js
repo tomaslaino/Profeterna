@@ -75,6 +75,13 @@ window.RumHasse = (() => {
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
     H.vy = vy;
+    // Namnet uppe i hörnet går undan över matchbladet och kupongen i handen (.undan i rum-hasse.css).
+    // Båda läggs och tas bort på flera ställen (rum-matchblad.js, rum-hasse-kupong.js), så vyn bevakas.
+    const hdr = sving.parentElement && sving.parentElement.querySelector(':scope > .rum-hdr');
+    if (hdr && window.MutationObserver) {
+      new MutationObserver(() => hdr.classList.toggle('undan', Boolean(vy.querySelector('.rum-bladlager, .rh-kupong.over'))))
+        .observe(vy, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    }
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
     vy.querySelector('.rh-samtal').addEventListener('click', (e) => e.stopPropagation());
     // Matchbladet: samma blad som på kupongen i rummet läggs fram över baren (bladet)

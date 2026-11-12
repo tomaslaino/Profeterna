@@ -940,6 +940,27 @@ window.Rum = (() => {
     return ut;
   }
 
+  // De bakade bilderna sparas i webbläsaren mellan besöken (Cache Storage), en per filter, ruta
+  // och form. Att räkna ut bruset och packa bilderna tog över en sekund på huvudtråden i en
+  // telefon vid varje besök, innan rummet syntes, och det blev samma bilder som förra gången.
+  // Nyckeln är allt bilden räknas ur, så en fläck som har flyttat sig eller ett ändrat filter
+  // bakas om, och det som inte längre används tas bort. Utan lagring (privat läge, äldre
+  // webbläsare) bakas allt varje gång som förut.
+  const BAKAT = 'rum-bakat-1';
+  // (cyrb53: 53 bitar räcker för att skilja ett hundratal bilder åt)
+  const kondens = (s) => {
+    let a = 0xdeadbeef;
+    let b = 0x41c6ce57;
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      a = Math.imul(a ^ c, 2654435761);
+      b = Math.imul(b ^ c, 1597334677);
+    }
+    a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909);
+    b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909);
+    return (4294967296 * (2097151 & b) + (a >>> 0)).toString(36);
+  };
+
   function baka() {
     const ns = 'http://www.w3.org/2000/svg';
     const idOf = (e) => (/^url\(#([\w-]+)\)$/.exec(e.getAttribute('filter')) || [])[1];
@@ -954,7 +975,18 @@ window.Rum = (() => {
     // bilderna byts in på en gång, så att varje lager ritas om en gång
     const byt = [];
     return (async () => {
-      for (const e of els) {
+      // (svarar lagringen inte inom ett par sekunder bakas bilderna som förut)
+      const inom = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(r, ms, null))]);
+      let lada = null;
+      try {
+        lada = window.caches && !R.q.has('rum-baka') ? await inom(caches.open(BAKAT), 1500) : null;
+      } catch {
+        lada = null;
+      }
+      const defs = kondens(DEFS);
+      const sparade = new Set();
+      // Först rutan och nyckeln för var och en, och det som redan är bakat hämtas på en gång.
+      const jobb = els.map((e) => {
         const id = idOf(e);
         const f = R.el.querySelector(`filter#${id}`);
         const k = e.cloneNode(true);
@@ -962,17 +994,37 @@ window.Rum = (() => {
         mat.append(k);
         const b = k.getBBox();
         k.remove();
+        if (!f || !b.width || !b.height) return { e };
+        // filtrets ruta i andelar av elementets (objectBoundingBox)
+        const del = (a, d) => { const v = f.getAttribute(a); return v == null ? d : parseFloat(v) / (v.endsWith('%') ? 100 : 1); };
+        const x = b.x + del('x', -0.1) * b.width;
+        const y = b.y + del('y', -0.1) * b.height;
+        const w = del('width', 1.2) * b.width;
+        const h = del('height', 1.2) * b.height;
+        const j = { e, id, f, k, x, y, w, h };
+        if (lada) {
+          // bruset räknas bara ur filtret och rutan, oskärpan också ur formens färg (oskarpa)
+          const del2 = [id, BAKA[id], x, y, w, h, xs.serializeToString(f), xs.serializeToString(k), defs];
+          if (!f.firstElementChild || f.firstElementChild.localName !== 'feTurbulence') {
+            const cs = getComputedStyle(e);
+            del2.push(cs.fill, cs.stroke, cs.strokeWidth, cs.fillOpacity, cs.strokeOpacity, cs.strokeLinecap, cs.strokeLinejoin, cs.fillRule);
+          }
+          j.adr = new URL(`rum-bakat/${kondens(del2.join('|'))}.png`, location.href).href;
+          sparade.add(j.adr);
+          j.sparad = inom(lada.match(j.adr).then((r) => (r ? r.blob() : null)).catch(() => null), 2500);
+        }
+        return j;
+      });
+      mat.remove();
+      for (const { e, id, f, k, x, y, w, h, adr, sparad } of jobb) {
         let src = '';
         const img = new Image();
         try {
-          if (!f || !b.width || !b.height) throw new Error('ingen ruta');
-          // filtrets ruta i andelar av elementets (objectBoundingBox)
-          const del = (a, d) => { const v = f.getAttribute(a); return v == null ? d : parseFloat(v) / (v.endsWith('%') ? 100 : 1); };
-          const x = b.x + del('x', -0.1) * b.width;
-          const y = b.y + del('y', -0.1) * b.height;
-          const w = del('width', 1.2) * b.width;
-          const h = del('height', 1.2) * b.height;
-          let blob = (await brus(f, x, y, w, h)) || (await oskarpa(f, e, x, y, w, h, BAKA[id]));
+          if (!f) throw new Error('ingen ruta');
+          let blob = sparad ? await sparad : null;
+          if (blob && !blob.size) blob = null;
+          const ny = !blob;
+          if (!blob) blob = (await brus(f, x, y, w, h)) || (await oskarpa(f, e, x, y, w, h, BAKA[id]));
           if (!blob) {
             const cw = Math.max(1, Math.round(w * BAKA[id]));
             const ch = Math.max(1, Math.round(h * BAKA[id]));
@@ -991,6 +1043,7 @@ window.Rum = (() => {
             c.width = c.height = 0;
           }
           if (!blob) throw new Error('ingen bild');
+          if (ny && lada) lada.put(adr, new Response(blob, { headers: { 'content-type': 'image/png' } })).catch(() => {});
           const im = document.createElementNS(ns, 'image');
           for (const [a, v] of [['href', URL.createObjectURL(blob)], ['x', x], ['y', y], ['width', w], ['height', h], ['preserveAspectRatio', 'none']]) im.setAttribute(a, v);
           for (const a of ['opacity', 'class', 'transform', 'clip-path', 'style']) if (e.hasAttribute(a)) im.setAttribute(a, e.getAttribute(a));
@@ -1004,8 +1057,9 @@ window.Rum = (() => {
           }
         }
       }
-      mat.remove();
       for (const [e, im] of byt) e.replaceWith(im);
+      // (det som låg sparat men inte användes nu)
+      if (lada) lada.keys().then((ks) => Promise.all(ks.filter((q) => !sparade.has(q.url)).map((q) => lada.delete(q)))).catch(() => {});
     })();
   }
 
@@ -1350,7 +1404,7 @@ window.Rum = (() => {
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
 ${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
-${plane(-598, vid('horn'), 1.035, 'rum-pl3d')}
+${plane(-598, vid('horn'), 1.035, 'rum-pl3d rum-pl-vhs')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}`, 1.05)}
@@ -3054,6 +3108,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       nasta();
     });
   }
+  // stunden före den första och mellan dem (WEBKIT står längre ner)
+  const TUR_PAUS = () => (WEBKIT ? 800 : 400);
   // → när alla har startat (för en fast bild)
   const TOM = [];
   const turTom = () => (LATT ? (R.turGar || TUR.length ? new Promise((r) => TOM.push(r)) : Promise.resolve()) : Promise.all(SENA));
@@ -3071,8 +3127,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       t.rej(err);
     }
     // en stund emellan, så att det som startade hinner städa efter sig
-    // (Safari släpper buffertar som inte används efter ungefär en sekund)
-    await new Promise((r) => setTimeout(r, 800));
+    // (Safari släpper buffertar som inte används efter ungefär en sekund; i Chrome
+    // räcker en kortare stund, och rummet står färdigt över en sekund tidigare)
+    await new Promise((r) => setTimeout(r, TUR_PAUS()));
     R.turGar = false;
     nasta();
   }
@@ -6360,7 +6417,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
           setTimeout(() => {
             R.turStart = true;
             nasta();
-          }, 800);
+          }, TUR_PAUS());
         });
     } else if (!R.turStart) {
       R.turStart = true;

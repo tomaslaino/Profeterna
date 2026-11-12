@@ -226,8 +226,11 @@
 /* Namnet och foten står kvar medan man vänder sig och hos honom: det är samma sida, det är bara kameran
    som har svängt. Samtalet börjar under namnet (där det syns: i fönster smalare än 8:5, rum.css). */
 @media not all and (min-aspect-ratio: 8/5) { .rum-hasse-vy:not(.hog) .rh-samtal { top: max(12%, 78px); } }
-/* (men inte över matchbladet eller kupongen i handen, som i rummet) */
-.rum-sving:has(.rum-hasse-vy .rum-bladlager, .rh-kupong.over) ~ .rum-hdr { opacity: 0; pointer-events: none; }
+/* (men inte över matchbladet eller kupongen i handen, som i rummet: .undan sätts av rum-hasse.js.
+   Som :has() på .rum-sving, som hela rummet ligger i, räknade Chrome om stilen för rummets alla
+   4 000 element varje gång ett element någonstans i rummet lades till eller togs bort – varje
+   sekund av klockan på text-tv:n, och ett trettiotal gånger i rad när gatan ritades.) */
+.rum-hdr.undan { opacity: 0; pointer-events: none; }
 .rh-fot { position: absolute; bottom: 14px; z-index: 2; display: flex; justify-content: flex-end; pointer-events: none; }
 .rh-ljud { flex: none; font-size: 12px; pointer-events: auto; }
 /* ljudet av och på, längst till vänster */

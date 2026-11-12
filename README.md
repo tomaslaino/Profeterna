@@ -4766,7 +4766,8 @@ Därför:
 - **3D-delarna startar en i taget** i telefonen (`tur` i rum.js): gänget, inredningen,
   sakerna och sist datorn (`o.tur` i rum-register.js), var och en när den förra är klar
   och rummet syns, med en paus på 0,8 sekunder före den första och mellan dem (Safari släpper
-  buffertar som inte används efter ungefär en sekund). Var och en tar några hundra MB medan
+  buffertar som inte används efter ungefär en sekund; i Chrome 0,4 sekunder sedan 2026-11-12,
+  `TUR_PAUS`). Var och en tar några hundra MB medan
   den startar (shaders, texturer, ljuset). En fast bild (`?rum-t`) väntar på alla.
   Hjälpbufferten till miljöljuset (PMREMGenerator) släpps när ljuset är klart, i alla fyra,
   och i telefonen räknas ljuset i 128 i stället för 256 (`_setSize`; glansen ser likadan ut).
@@ -5270,6 +5271,93 @@ videon) går utan fel som telefon på höjden och på tvären på steg 1–3 och
 täthet 1 på steg 1 och 2). Inte provat i WebKit och inte i en riktig gammal telefon: `matchfixarna.se/?rum-mat` ger
 siffrorna där. Prövat utan effekt: enklare filtrering av skuggorna (`PCFShadowMap`, samma tid på grafikkortet), och
 att slå ihop fler av gängets delar (de som är kvar rör sig var för sig eller har olika material).
+
+### Stilen för hela rummet, regnet som inte syntes och bilder som bakas en gång (2026-11-12)
+
+Användarens önskemål: "göra animeringssidan … snabbare och smidigare". Först mätt, i Chrome som dator (1440 × 900,
+täthet 2) och som telefon (412 × 780, täthet 2,625, processorn fyra gånger långsammare): laddningen, rummet i vila,
+musen i rörelse och vägen fram till närbilderna och tillbaka. Det mesta som kostade låg inte där tiden syntes gå:
+
+- **Regnet och datorns närbild hette likadant.** Regnets och snöns behållare i utsikten hette `.rum-regn`
+  (rum-ute.js), och så heter också närbilden av datorn, förut kortregistret (`#rum-regn`, rum-register.css), som är
+  dold tills den öppnas. Sedan kortregistret kom, 2026-10-24, har regnet och snön därför inte synts i datorn på steg 0,
+  där nederbörden är egna lager (i telefonen och från steg 1 ritas den i gatans duk och har synts hela tiden). Banden
+  rörde sig ändå, och eftersom de inte syntes lät Chrome inte grafikkortet flytta dem: de flyttades från huvudtråden,
+  och varje flytt räknade om alla rummets lager, i varje bild av gänget, också medan kameran gled till och från
+  närbilderna. Behållaren heter nu `.rum-nederbord`. Regnet och snön syns igen och glider på grafikkortet.
+- **Tre regler med `:has()` räknade om stilen för allt i rummet.** Står `:has()` på ett element högt upp, och regeln
+  gäller något annat än elementet självt, räknar Chrome om stilen för allt under det elementet varje gång ett element
+  läggs till eller tas bort där. Regeln som tar undan namnet uppe i hörnet hos Hasse Backe stod på `.rum-sving`, som
+  hela rummet ligger i. Klockan på text-tv:n skriver om sin rad varje sekund, och varje gång räknades stilen om för
+  rummets alla 4 000 element (7–10 ms på en snabb dator, 20–35 med processorn fyra gånger långsammare); när gatans
+  figurer byttes mot dukar hände det ett trettiotal gånger i rad, 0,6 sekunder i ett svep medan rummet laddades i
+  telefonen. Två regler stod på planen (`.rum-pl`): den som stänger av klick utanför videohörnet och den som tänder
+  kupongstället. Nu sätts en klass på det som ska ändras: `.rum-hdr.undan` (rum-hasse.js bevakar sin vy),
+  `.rum-pl-vhs` på videohörnets plan (rum.js) och `.rum-stall-duk.lyser` (rum-inredning.js). Kvar är `:has()` på små
+  saker (en rad i kupongen, tv:n, videohörnet), där det bara gäller ett fåtal element. **Regel framåt:** ingen
+  `:has()` på rummet, `.rum-sving` eller ett plan, och sök efter ett klassnamn i `public/` innan det tas i bruk.
+- **Gatans figurer** läser oskärpan för alla innan någon byts ut (`duka` i rum-ute.js); förut lästes stilen efter
+  varje byte.
+- **De bakade bilderna sparas mellan besöken.** Brus och oskärpa bakas till ett sjuttiotal bilder (5,5 miljoner
+  bildpunkter i telefonen) varje gång rummet byggs. Att räkna ut bruset och packa bilderna tog över en sekund på
+  huvudtråden med processorn fyra gånger långsammare, och i telefonen syns världen först när det är klart. Nu ligger
+  bilderna i webbläsarens lagring (Cache Storage, `rum-bakat-1`, `baka` i rum.js), en per filter, ruta och form, med
+  allt bilden räknas ur som nyckel: en fläck som har flyttat sig eller ett ändrat filter bakas om, och det som inte
+  längre används tas bort. Första besöket bakar som förut, och utan lagring (privat läge) bakas allt varje gång.
+  `?rum-baka` bakar om utan lagringen. Bilderna är desamma, bildpunkt för bildpunkt.
+- **I Chrome i telefonen** väntar 3D-delarna 0,4 sekunder före den första och mellan dem i stället för 0,8
+  (`TUR_PAUS` i rum.js; pausen finns för Safari, som släpper minne efter ungefär en sekund, och där är den kvar), och
+  gängets tre figurer byggs en i taget med en paus emellan (`slappFram` i rum-3d.js), så att ljuset som tänds och ett
+  tryck kommer fram: alla tre i ett svep var laddningens längsta stopp. Inte i datorn, där inredningen och sakerna
+  byggs samtidigt och då gick före, så att gänget stod där tre–sex tiondelar senare.
+
+Mätt i headless Chrome (Apple M5, riktigt grafikkort) mot en lokal server som skickar den publicerade sajtens data,
+med koden förminskad och buntad som på sajten, gammal och ny kod om vartannat:
+
+| | Före | Efter |
+|---|---|---|
+| Dator i regn, stilla: omräkningar av alla lager | 36 i sekunden | 0,2–0,7 |
+| Dator i regn, stilla: huvudtrådens arbete | 169 ms/s | 129 ms/s |
+| Dator, stilla: element som får stilen omräknad | 4 800–5 700 i sekunden | 1 660 |
+| Dator, musen i rörelse: bildrutor som huvudtråden inte hann med | 54–277 av 480 | 0 |
+| Dator, musen i rörelse: omräkningar av alla lager | 55–56 i sekunden | 29–30 |
+| Dator i regn, till eller från en närbild (1,2 s): omräkningar av alla lager | 50–66 | 3–7 |
+| Telefon, stilla: stilen | 25–30 ms/s | 8–9 ms/s |
+| Telefon, stilla: längsta stoppet | 29–38 ms | 10–13 ms |
+| Telefon, fram till videon: stilen, och längsta stoppet | 151 ms, 92 ms | 72 ms, 52 ms |
+| Telefon, återbesök: gänget står där | 4,7 s | 2,8 s |
+| Telefon, återbesök: allt klart | 8,2 s | 4,9 s |
+| Telefon, återbesök: stoppen över 50 ms tillsammans, och det längsta | 2,8 s, 0,47 s | 1,7 s, 0,27 s |
+| Telefon, första besöket: gänget står där | 6,6 s | 5,0 s |
+| Telefon, första besöket: allt klart | 9,8 s | 7,2 s |
+| Dator med processorn fyra gånger långsammare, återbesök: ljuset tänds, och allt klart | 3,3 s, 5,0 s | 2,8 s, 4,2 s |
+| Dator utan broms, återbesök: ljuset tänds, och allt klart | 2,9 s, 3,3 s | 1,4 s, 1,7 s |
+
+Telefonen är mätt med processorn fyra gånger långsammare, laddningen tre varv med fast väder (regn) och medianen,
+resten två varv. Återbesök är ett besök till i samma webbläsare, med filerna och de bakade bilderna sparade. I datorn
+tänds ljuset tidigare för att bakningen inte längre är det sista rummet väntar på (`tand`). Första besöket i datorn är
+ungefär som förut (allt klart 5,3 → 5,2 s med processorn fyra gånger långsammare). Siffrorna svänger med vad datorn
+gör i övrigt: en körning av den gamla koden utan regn hade 1,5 omräkningar av lagren i sekunden, som den nya.
+
+Bilderna med fryst tid (`?rum-t=4`, 1440 × 900) är jämförda bildpunkt för bildpunkt: i halvklart väder skiljer 4 av
+1,3 miljoner bildpunkter med högst 10 av 255 (80,8 dB; samma kod mot sig själv 0), i regn och snö skiljer strecken
+och flingorna i fönstret (0,1–0,2 % av bildpunkterna), som nu syns. Provklickat som dator och som telefon: de bakade
+bilderna är desamma vid återbesök, kupongstället lyser när man pekar, videon nära tar bara emot klick i hörnet,
+namnet går undan hos Hasse Backe över matchbladet och kupongen, och närbilderna går fram och tillbaka utan fel. Inte
+provat i en riktig telefon och inte i Safari: `matchfixarna.se/?rum-mat` ger siffrorna i telefonen.
+
+Kvar: första besöket bakar bilderna på huvudtråden (med processorn fyra gånger långsammare hinner det inte bli klart
+på de fyra sekunder rummet väntar; en egen tråd hade tagit det), när man stänger datorn kopieras dess bild till
+disken i ett stopp på 60–90 ms (`paint` i rum-dator.js), och föremålens sken när musen sveper över dem räknar om
+lagren medan det tonar (30 gånger i sekunden, förut 55).
+
+Mätsättet: en liten server som speglar den publicerade sajten och lägger gammal eller ny kod ovanpå, och `?rum-mat`
+med en egen rum-mat.js som lämnar ut rummets `R`. Vad som räknar om stilen syns i spårkategorin
+`disabled-by-default-devtools.timeline.invalidationTracking` (`StyleInvalidatorInvalidationTracking` med "Invalidation
+set invalidates subtree", och `UpdateLayoutTree` med antalet element), och en animering som inte hamnar på
+grafikkortet i `Animation`-händelsens `compositeFailed` när animeringarna startas om under spårning (131072: syns
+inte). Vädret hämtas inte med både `?rum-vader` och `?rum-grader` i adressen, så att mätningen inte beror på
+vädertjänsten.
 
 ### När något går fel i rummet
 

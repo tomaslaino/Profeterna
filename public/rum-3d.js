@@ -2998,7 +2998,20 @@ export async function figurer(canvas, opt = {}) {
   }
   if (opt.enkel) for (const l of FYLLER) l.visible = false;
   const klar = (o) => { slaIhop(utanSmaSkuggor(o)); if (Q.enkel) enkelMaterial(o.fig); return o; };
-  FIGS.forEach((F, i) => figs.push(klar(build(sitt(F, PLATSER[(i + n) % 3]), dress(F.key, opt.vader)))));
+  // En i taget, och i telefonen får det som väntar på huvudtråden gå före mellan dem (ljuset som
+  // tänds, ett tryck, en bildruta): alla tre i ett svep var det längsta stoppet medan rummet
+  // laddades, en halv sekund i en långsam telefon. (En kanal i stället för en timer: den väntar
+  // inte i en flik i bakgrunden.) Inte i datorn: där byggs inredningen och sakerna samtidigt,
+  // och de gick då före, så att gänget stod där tre–sex tiondelar senare.
+  const slappFram = () => new Promise((ok) => {
+    const k = new MessageChannel();
+    k.port1.onmessage = () => { k.port1.close(); ok(); };
+    k.port2.postMessage(0);
+  });
+  for (let i = 0; i < FIGS.length; i++) {
+    figs.push(klar(build(sitt(FIGS[i], PLATSER[(i + n) % 3]), dress(FIGS[i].key, opt.vader))));
+    if (LATT) await slappFram();
+  }
 
   // D: kläderna (dress)
   function build(F, D) {

@@ -1151,6 +1151,16 @@ export async function inredning(el, opt = {}) {
     lank.setAttribute('aria-label', 'Nästa omgång');
     Object.assign(lank.style, { left: `${Math.floor(x0)}px`, top: `${Math.floor(y0)}px`, width: `${Math.ceil(x1 - x0)}px`, height: `${Math.ceil(y1 - y0)}px` });
     planes[0].append(lank);
+    // Stället lyser när man pekar på länken eller står på den med tangenterna (.lyser i rum.css).
+    // Det var en regel med :has() på planet, och Chrome räknade då om stilen för allt i planet,
+    // 2 600 element, varje gång något lades till eller togs bort i det.
+    const duk = planes[0].querySelector('.rum-stall-duk');
+    let pekar = false;
+    const lys = () => { if (duk) duk.classList.toggle('lyser', pekar || lank.matches(':focus-visible')); };
+    lank.addEventListener('pointerenter', () => { pekar = matchMedia('(hover: hover)').matches; lys(); });
+    lank.addEventListener('pointerleave', () => { pekar = false; lys(); });
+    lank.addEventListener('focus', lys);
+    lank.addEventListener('blur', lys);
   }
 
   // ---------- skivan med löpsedlarna ----------

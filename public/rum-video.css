@@ -455,8 +455,10 @@
 .rum.vid-nara .vhs-hit > i { pointer-events: none; }
 /* nära tar bara hörnet emot klick (ett klick någon annanstans går tillbaka):
    med kameran svängd räknar Chrome annars kortregistret på disken bakom som
-   närmast, där lådan står */
-.rum.vid-nara .rum-pl:not(:has(#rum-vhs)) * { pointer-events: none; }
+   närmast, där lådan står. (Hörnets plan heter rum-pl-vhs, rum.js: med
+   :has(#rum-vhs) här räknade Chrome om stilen för hela rummet varje gång
+   något element i rummet lades till eller togs bort.) */
+.rum.vid-nara .rum-pl:not(.rum-pl-vhs) * { pointer-events: none; }
 .rum:not(.vid-nara) .rum-vhs:has(.vhs-hit:is(:hover, :focus-visible)) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
 
 @media (prefers-reduced-motion: reduce) {
