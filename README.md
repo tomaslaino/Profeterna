@@ -6218,9 +6218,17 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   *Styrka*, *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*, och lagkortens *Mål* och *xG*
   per match (för–mot), *Favorit* och *Skytten*; sedan skadelistorna när de finns och de
   senaste mötena med hemmalagets V–O–F. Etiketterna från tavlan leder till topplistan,
-  lagnamnen till lagkorten och skytten till spelarkortet. Skiljer vilan två dagar eller mer
-  står det tröttare lagets dagar omvänt, som ringen på tavlans almanacksblad (2026-11-12,
-  användarens önskemål: märkningen fanns förut bara på tavlan).
+  lagnamnen till lagkorten och skytten till spelarkortet. Det bättre talet i varje par lyser
+  och det sämre är svagt, så att man ser vem som har övertaget utan att jämföra siffrorna
+  (2026-11-12, användarens val bland fyra skisser: *Arket*, *Skalan*, *Noterat* och *Lyser*).
+  Det gäller *Formen* (minst två poäng på fem matcher), *Vilan* (minst två dagar, samma regel
+  som ringen på tavlans almanacksblad; förut stod det tröttare lagets dagar omvänt),
+  *Styrka* (0,15), *Mot oddsen* (1,5 poäng), *Mål* (0,25 mål per match), *xG* (0,2) och
+  *Favorit* (15 procentenheter) – gränserna står i `SKILJER` i
+  [public/rum-register.js](public/rum-register.js). *Kryssar*, *Tur*, *Motståndet*, *Nästa*
+  och *Skytten* säger inte vem som är bättre och står alltid som vanligt. Talen som räknas
+  inom divisionen jämförs bara när lagen spelar i samma, och inget lyser när resultaten är
+  dolda.
 - **Topplistor** – tavlans lappar som listor över hela omgången, på en rad under menyraden:
   *Styrka* per division (styrkan jämförs bara inom divisionen), *Kryss* från mest till minst,
   och *Tur* (med staplar), *Oddsen* och *Motstånd* i två listor (tur och otur, slår oddsen och

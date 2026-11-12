@@ -10,11 +10,11 @@
 // Överst står menyraden, som alltid står still:
 //   KUPONGEN   omgångens matcher med lagens form; en match öppnar matchakten:
 //              allt om matchen på ett ställe – lagen sida vid sida med formen,
-//              vilan (det tröttare lagets dagar omvänt, som ringen på tavlan),
-//              dagar till nästa match, tavlans tal (styrkan, kryssen,
+//              vilan, dagar till nästa match, tavlans tal (styrkan, kryssen,
 //              turen, mot oddsen och motståndet) och lagkortens siffror (mål
 //              och xG per match, hur ofta laget har varit favorit, skytten),
-//              sedan skadorna och mötena
+//              sedan skadorna och mötena. Det bättre talet i varje par lyser
+//              och det sämre är svagt (SKILJER)
 //   TOPPLISTOR tavlans lappar som listor över hela omgången: styrkan (per
 //              division), kryss, tur och otur, mot oddsen och motståndet
 //   LAGEN      de fyra divisionerna, lagen i omgången ljusa med matchens
@@ -140,6 +140,15 @@ window.RumRegister = (() => {
     odds: (t) => { const x = fdOf(t, 'mkt'); return x ? x.pts - x.xp : null; },
     motstand: (t) => fdOf(t, 'opp'),
   };
+
+  // Matchakten: det bättre talet i varje par lyser och det sämre är svagt, när
+  // talen skiljer sig minst så här mycket (annars står båda som vanligt):
+  // formens poäng på fem matcher, vilans dagar (som ringen på tavlans
+  // almanacksblad, noteVila i rum-anslag.js), styrkan, poängen mot oddsen,
+  // målskillnaden och xG-skillnaden per match och andelen matcher som favorit.
+  // Kryssen, turen, motståndet, nästa match och skytten säger inte vem som är
+  // bättre och står alltid som vanligt.
+  const SKILJER = { form: 2, vila: 2, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, favorit: 0.15 };
 
   // ---------- raderna ----------
   //
@@ -377,7 +386,10 @@ window.RumRegister = (() => {
     // Matchakten: allt om matchen på ett ställe – lagen sida vid sida med
     // läget (formen, vilan, nästa match), tavlans tal och lagkortens siffror,
     // sedan skadorna och mötena. Etiketterna leder till topplistorna, lagen
-    // till lagkorten och skytten till spelarkortet.
+    // till lagkorten och skytten till spelarkortet. Det bättre talet i varje
+    // par lyser och det sämre är svagt (SKILJER); talen som räknas inom
+    // divisionen (styrkan, oddsen, målen, xG och favoritskapet) jämförs bara
+    // när lagen spelar i samma, och inget lyser när resultaten är dolda.
     function akten(m, S, R) {
       const i = A.ms.indexOf(m);
       R.sido = i < 0 ? null : [i > 0 ? `#mote:${A.ms[i - 1].id}` : null, i < A.ms.length - 1 ? `#mote:${A.ms[i + 1].id}` : null];
@@ -388,34 +400,44 @@ window.RumRegister = (() => {
       const sid = ['home', 'away'];
       const T = lag.map(lagOf);
       const r = [rad([`${padL(i + 1, 2)}  `, 'd'], [`${kort(m.home)} – ${kort(m.away)}`, 'v']), rad([`    ${tavNamn(m.comp)} · ${avspark(m.kickoff)}`, 'd']), tom()];
-      r.push(rad([pad('', L)], ...lag.flatMap((n, j) => [[kort(n).slice(0, K - 1), 'v', `#lag:${n}`], [j ? '' : pad('', K - Math.min(kort(n).length, K - 1)), '']])));
+      r.push(rad([pad('', L)], ...lag.flatMap((n, j) => [[kort(n).slice(0, K - 1), '', `#lag:${n}`], [j ? '' : pad('', K - Math.min(kort(n).length, K - 1)), '']])));
       if (T[0] && T[1] && T[0].comp !== T[1].comp) r.push(rad([pad('', L)], [pad(DIVK[T[0].comp], K), 'd'], [DIVK[T[1].comp], 'd']));
-      // en rad: etiketten (som leder till topplistan när det finns en) och lagens värden
-      const raden = (etikett, v, amne) => rad([etikett, 'd', amne ? `#amne:${amne}` : null], [pad('', L - etikett.length)],
-        ...v.flatMap((x, j) => { const b = Array.isArray(x) ? x : [x, '']; return j ? [b] : [b, [pad('', Math.max(1, K - b[0].length))]]; }));
-      const tal = (etikett, amne, fmt) => raden(etikett, T.map((t) => {
+      // laget med det bättre talet (0 eller 1), eller -1 när de är lika eller okända
+      const bast = (v, grans) => (v.every((x) => x != null && Number.isFinite(x)) && Math.abs(v[0] - v[1]) >= grans - 1e-9 ? (v[0] > v[1] ? 0 : 1) : -1);
+      // (talen som räknas inom divisionen: bara när lagen spelar i samma och resultaten syns)
+      const samma = Boolean(T[0] && T[1] && T[0].comp === T[1].comp) && !S.veil;
+      const inom = (f, grans) => (samma ? bast(T.map(f), grans) : -1);
+      // en rad: etiketten (som leder till topplistan när det finns en) och lagens
+      // värden; b är laget med det bättre talet, som lyser medan det andra är svagt
+      const raden = (etikett, v, amne, b = -1) => rad([etikett, 'd', amne ? `#amne:${amne}` : null], [pad('', L - etikett.length)],
+        ...v.flatMap((x, j) => {
+          const q = Array.isArray(x) ? x : [x, ''];
+          const bit = b < 0 ? q : [q[0], j === b ? 'v' : 'd', q[2]];
+          return j ? [bit] : [bit, [pad('', Math.max(1, K - bit[0].length))]];
+        }));
+      const tal = (etikett, amne, fmt, grans) => raden(etikett, T.map((t) => {
         if (S.veil) return '?';
         const v = TAL[amne](t);
         return v == null || !Number.isFinite(v) ? '–' : fmt(v);
-      }), amne);
+      }), amne, grans ? inom(TAL[amne], grans) : -1);
       const per = (f) => T.map((t) => (S.veil ? '?' : f(t) || '–'));
-      r.push(raden('FORMEN', sid.map((s) => formOf(m, s).join('') || '–')));
-      // vilan: skiljer det två dagar eller mer står det tröttare lagets dagar
-      // omvänt, som ringen på tavlans almanacksblad (noteVila i rum-anslag.js)
+      // formen: poängen på fem matcher (inte när någon av dem är dold)
+      const form = sid.map((s) => formOf(m, s));
+      const formP = form.map((f) => (f.length && f.every((c) => c && 'VOF'.includes(c)) ? (5 * f.reduce((p, c) => p + (c === 'V' ? 3 : c === 'O' ? 1 : 0), 0)) / f.length : null));
+      r.push(raden('FORMEN', form.map((f) => f.join('') || '–'), null, bast(formP, SKILJER.form)));
       const vila = sid.map((s) => vilaOf(m, s));
-      const trott = vila[0] != null && vila[1] != null && Math.abs(vila[0] - vila[1]) >= 2 ? (vila[0] < vila[1] ? 0 : 1) : -1;
-      r.push(raden('VILAN', vila.map((d, j) => (d == null ? '–' : [`${d} D`, j === trott ? 'i' : '']))));
+      r.push(raden('VILAN', vila.map((d) => (d == null ? '–' : `${d} D`)), null, bast(vila, SKILJER.vila)));
       r.push(raden('NÄSTA', sid.map((s) => nastaOf(m, s))));
       r.push(tom());
-      r.push(tal('STYRKA', 'styrka', (v) => signed(v, 2)));
+      r.push(tal('STYRKA', 'styrka', (v) => signed(v, 2), SKILJER.styrka));
       r.push(tal('KRYSSAR', 'kryss', pct));
       r.push(tal('TUR', 'tur', (v) => signed(v)));
-      r.push(tal('MOT ODDSEN', 'odds', (v) => signed(v)));
+      r.push(tal('MOT ODDSEN', 'odds', (v) => signed(v), SKILJER.odds));
       r.push(tal('MOTSTÅNDET', 'motstand', (v) => signed(v, 2)));
       r.push(tom());
-      r.push(raden('MÅL', per((t) => (t && t.m ? `${num(t.gf / t.m)}–${num(t.ga / t.m)}` : null))));
-      r.push(raden('xG', per((t) => { const x = fdOf(t, 'xg'); return x && x.n ? `${num(x.f / x.n)}–${num(x.a / x.n)}` : null; })));
-      r.push(raden('FAVORIT', per((t) => { const x = fdOf(t, 'mkt'); return x && x.n ? `${x.fav} AV ${x.n}` : null; })));
+      r.push(raden('MÅL', per((t) => (t && t.m ? `${num(t.gf / t.m)}–${num(t.ga / t.m)}` : null)), null, inom((t) => (t && t.m ? (t.gf - t.ga) / t.m : null), SKILJER.mal)));
+      r.push(raden('xG', per((t) => { const x = fdOf(t, 'xg'); return x && x.n ? `${num(x.f / x.n)}–${num(x.a / x.n)}` : null; }), null, inom((t) => { const x = fdOf(t, 'xg'); return x && x.n ? (x.f - x.a) / x.n : null; }, SKILJER.xg)));
+      r.push(raden('FAVORIT', per((t) => { const x = fdOf(t, 'mkt'); return x && x.n ? `${x.fav} AV ${x.n}` : null; }), null, inom((t) => { const x = fdOf(t, 'mkt'); return x && x.n ? x.fav / x.n : null; }, SKILJER.favorit)));
       r.push(raden('SKYTTEN', T.map((t) => {
         if (S.veil) return '?';
         const s = skytten(t);
