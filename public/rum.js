@@ -3955,11 +3955,41 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       aimTv(calm() ? null : 'glid');
     } else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
   }
-  // så nära som ryms i fönstret (i telefonen fyller tv:n bredden)
+  // Så nära som ryms i fönstret. I telefonen går kameran fram till bilden och
+  // inte till hela lådan: med hela tv:n i bild blev en rad text-tv sju
+  // bildpunkter hög på höjden, och det gick knappt att läsa. Där fyller de
+  // fyrtio tecknen bredden, så att panelen med knappsatsen hamnar utanför (ett
+  // svep i sidled bläddrar, som pilarna: swipe). På bredden ryms hela lådan:
+  // glaset börjar överst och panelen slutar nederst. Måtten i TV_BILD är
+  // frontens egna (292 × 196, rum-tv.css): textens bredd, glasets höjd, höjden
+  // från glasets överkant till panelens nederkant, bildens mitt räknad från
+  // frontens och panelens högerkant likaså. Närmare än nara bildpunkter per
+  // mått går kameran inte – så skarp ritas tv:n nära i telefonen (.skarp i
+  // rum-tv.css).
+  const TV_BILD = { b: 292, text: 176, glas: 144, ner: 155, dx: -27, dy: -3, panel: 134, nara: 2.6 };
   function aimTv(cls) {
     const { c, b, h } = R.tvMatt;
-    const z = Math.min(3.6, (innerWidth - 24) / (b * R.k), (innerHeight - 110) / (h * R.k));
-    aim(c, z, mid(0.5, 0.48), cls);
+    if (!matchMedia('(max-width: 700px), (max-height: 500px)').matches) {
+      const z = Math.min(3.6, (innerWidth - 24) / (b * R.k), (innerHeight - 110) / (h * R.k));
+      aim(c, z, mid(0.5, 0.48), cls);
+      return;
+    }
+    const T = TV_BILD;
+    const [bred, hog] = [innerWidth, innerHeight];
+    // under namnet, som inte står där i breda fönster (rum.css)
+    const topp = matchMedia('(min-aspect-ratio: 8/5)').matches ? 6 : 56;
+    let hela = Math.min(T.nara, (bred - 16) / T.b, (hog - topp - 6) / T.ner);
+    // Tillbaka står nere till höger utom på höjden (.smal): når panelen in
+    // under det på bredden slutar den ovanför
+    if (!R.smal && bred / 2 + T.panel * hela > bred - 100) hela = Math.min(hela, Math.max((bred / 2 - 100) / T.panel, (hog - topp - 50) / T.ner));
+    const bild = Math.min(T.nara, (bred - 8) / T.text, (hog - topp - 6) / T.glas);
+    // hela lådan när texten ändå blir läsbar eller nästan lika stor
+    const allt = hela >= 2 || hela >= bild * 0.87;
+    const s = allt ? hela : bild;
+    // scenens mått per mått i lådan
+    const m = b / T.b;
+    const y = Math.max(hog * 0.46, topp + (T.glas / 2) * s);
+    aim([c[0] + (allt ? 0 : T.dx * m), c[1] + T.dy * m], s / (m * R.k), [mid(0.5)[0], (y - R.oy) / R.k], cls);
   }
 
   // V: videon nära. Kameran går fram till hörnet på disken – tv:n, högen

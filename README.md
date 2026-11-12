@@ -5952,9 +5952,18 @@ text-tv:n suddig på nära håll. På håll ritas den i sin egen storlek: Chrome
 perspektiv minst i dess egen storlek hur litet det än syns, så i tre gånger storleken tog tv:n
 ungefär 60 MB grafikminne också på håll. Storleken byts med vridningen avstängd (`.skarp` på
 `.rum-tvpos`, `zoom` i rum-tv.js): innan tv:n vrids fram och när den har vridits tillbaka.
-I telefonen räcker 1,5 gånger (`zoom: 1.5`), nära och på håll: där går kameran
-högst så nära att tv:n fyller bredden eller höjden mellan namnet och foten, ungefär 1,4 gånger
-lådans mått, och lagren tar en fjärdedel så mycket minne (se [I telefonen](#i-telefonen)).
+I telefonen ritas den 1,5 gånger så stor på håll och 2,5 gånger nära. Där går kameran fram till
+bilden och inte till hela lådan (`aimTv`, `TV_BILD` i rum.js): med hela tv:n i bild var en rad
+text-tv sju bildpunkter hög på höjden och gick knappt att läsa. På höjden fyller de fyrtio
+tecknen bredden (en rad blir tolv bildpunkter i ett fönster på 412), och panelen med knappsatsen
+hamnar utanför – ett svep i sidled bläddrar som ▲ och ▼, och snabbvalen och raderna leder vidare.
+På bredden ryms hela lådan: glaset börjar överst i fönstret och panelen slutar nederst, ovanför
+Tillbaka om den når in under det. Kameran går högst till 2,6 gånger lådans mått, så att bilden
+är skarp. Nära är linjerna över rutan svagare och tecknen en aning fetare i telefonen
+(`-webkit-text-stroke`), och på bredden tar namnets rad inte emot tryck: den ligger över tv:n
+utan att namnet står där. Ritminnet nära tv:n i Chrome som telefon är 58 MB mot 62 förut (kameran ser
+mindre av rummet); i Safari, som ritar varje lager i full storlek gånger pixeltätheten, är det
+inte mätt (se [I telefonen](#i-telefonen)).
 Kameran siktar på frontens mått med tv:n vriden (`zoom(on, rekt)`); Safari i iPhone delar
 måtten med zoomen, och rum.js rättar dem (`rekt`). Tv:n sköter sig själv: rum.js bygger den (`RumTv.html`),
 kopplar in den (`RumTv.mount`), ger den omgångens rader vid varje `fill` (med Stryktipsets

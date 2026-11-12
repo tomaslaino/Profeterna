@@ -69,16 +69,27 @@
 .tv-fot { position: absolute; left: 0; top: 0; width: 292px; height: 196px; transform-style: preserve-3d; transform-origin: 0 0; pointer-events: none; }
 .skarp > .tv-fot { zoom: 3; transform: scale3d(0.3333, 0.3333, 0.3333); }
 
-/* I telefonen i en och en halv gång storleken: där går kameran högst så nära
-   att tv:n fyller bredden (stående) eller höjden mellan namnet och foten
-   (liggande), ungefär 1,4 gånger lådans mått, och Safari ritar varje lager
-   i full storlek gånger skärmens pixeltäthet – i tre gånger storleken tog
-   tv:n nästan 90 MB i en iPhone. Texten påverkas inte (18 px blir 27 px). */
+/* I telefonen i en och en halv gång storleken på håll och två och en halv
+   nära: där går kameran fram tills text-tv:ns fyrtio tecken fyller bredden
+   (stående) eller glaset och panelen höjden (liggande), högst 2,6 gånger
+   lådans mått (aimTv i rum.js), och Safari ritar varje lager i full storlek
+   gånger skärmens pixeltäthet – i tre gånger storleken tog tv:n nästan 90 MB
+   i en iPhone. Texten påverkas inte (18 px blir 27 eller 45 px). */
 @media (max-width: 700px), (max-height: 500px) {
-  .rum-tv3, .tv-fot, .skarp > .rum-tv3, .skarp > .tv-fot { zoom: 1.5; }
-  .rum-tv3, .skarp > .rum-tv3 { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
-  .rum-tv3.nara, .skarp > .rum-tv3.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
-  .tv-fot, .skarp > .tv-fot { transform: scale3d(0.6667, 0.6667, 0.6667); }
+  .rum-tv3, .tv-fot { zoom: 1.5; }
+  .rum-tv3 { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
+  .rum-tv3.nara { transform: scale3d(0.6667, 0.6667, 0.6667) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+  .tv-fot { transform: scale3d(0.6667, 0.6667, 0.6667); }
+  .skarp > .rum-tv3, .skarp > .tv-fot { zoom: 2.5; }
+  .skarp > .rum-tv3 { transform: scale3d(0.4, 0.4, 0.4) translate3d(146px, 98px, -20px) rotateY(-44deg) rotateX(-5deg) translate3d(-146px, -98px, 132px); }
+  .skarp > .rum-tv3.nara { transform: scale3d(0.4, 0.4, 0.4) translate3d(146px, 98px, -20px) rotateY(0deg) rotateX(0deg) translate3d(-146px, -98px, 132px); }
+  .skarp > .tv-fot { transform: scale3d(0.4, 0.4, 0.4); }
+}
+/* På bredden i telefonen ligger namnets rad över tv:n – hemma över lådans
+   övre halva och nära över glaset – och där står inget namn (rum.css): raden
+   är tom och tar inte emot tryck. */
+@media (min-aspect-ratio: 8/5) and (max-height: 500px) {
+  .rum-hdr { pointer-events: none; }
 }
 .tv-fot i { position: absolute; display: block; transform-origin: 0 0; }
 .tv-arm { left: 146px; top: 94px; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(-20px) rotateY(23.6deg) rotateZ(-3.3deg); }
@@ -222,6 +233,10 @@
    med fingret, så att det hackade. I den lilla rutan syns bandet knappt. */
 @media (max-width: 700px), (max-height: 500px) {
   .tv-glas::after { animation: none; display: none; }
+  /* nära: linjerna svagare och tecknen en aning fetare – i telefonen är en
+     rad tolv bildpunkter hög, och de tunna strecken försvann i linjerna */
+  .rum-tv3.nara .tv-scan { opacity: 0.45; }
+  .rum-tv3.nara .tv-glas .tt { -webkit-text-stroke: 0.3px currentColor; }
 }
 
 /* ---------- text-tv: 40 × 25 tecken i 288 × 360, förminskat till rutan med
