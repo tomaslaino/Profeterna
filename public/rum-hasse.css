@@ -5,8 +5,9 @@
    och suddas, så att oskärpan blir vågrät (utanför rummets 3D-värld). */
 .rh-pan, .rh-pan-in, .rum-front { position: absolute; inset: 0; }
 .rum-front { overflow: hidden; }
-/* mellan rummet och hans bild: rummets vägg som far förbi (syns bara i panoreringen) */
-.rh-glipa { display: none; position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(to right, #2c1c10, #4a301b 30%, #1c120a 52%, #3d2817 70%, #2a1a0e); }
+/* mellan rummet och hans bild: rummets vägg som far förbi (syns bara i panoreringen). I vilan står den
+   strax utanför rummets vänstra kant, där kameran hittar den när den börjar vrida sig (luta i rum-hasse.js). */
+.rh-glipa { display: none; position: absolute; left: 0; top: 0; bottom: 0; transform: translate3d(-100%, 0, 0); background: linear-gradient(to right, #2c1c10, #4a301b 30%, #1c120a 52%, #3d2817 70%, #2a1a0e); }
 .rum.hasse-pan .rh-glipa { display: block; }
 .rum.hasse-pan .rh-pan, .rum.hasse-pan .rh-pan-in, .rum.hasse-pan .rum-front, .rum.hasse-pan .rum-hasse-vy { will-change: transform; }
 /* framme: rummet står kvar som det var men ritas inte */
@@ -22,6 +23,13 @@
   /* papperets fibrer, som på kupongen (papper.css) */
   --korn: var(--pp-grain); }
 .rum-hasse-vy[hidden] { display: none; }
+/* Parkerad: hans bild står färdig strax till vänster om rummet (112 % = bredden och glipan, PAN.GLIPA i
+   rum-hasse.js), där panoreringen hämtar den. Den är framme i sidan i ett eget lager, så att grafikkortet
+   har ritat den när kameran svänger, men syns inte och går inte att nå. Samtalet är släckt utan toning
+   (det tonas fram när man är framme), och kornet står still. */
+.rum-hasse-vy.parkerad { transform: translate3d(-112%, 0, 0); will-change: transform; pointer-events: none; }
+.rum-hasse-vy.parkerad .rh-samtal, .rum-hasse-vy.parkerad .rh-fot, .rum-hasse-vy.parkerad .rh-mork { opacity: 0; transition: none; }
+.rum-hasse-vy.parkerad .rh-korn { animation-play-state: paused; }
 /* kaffet, askkoppen och de andra sakerna på disken går att klicka på (sakerna i rum-hasse.js) */
 .rum-hasse-vy.rh-pa-sak { cursor: pointer; }
 .rh-scen { position: absolute; inset: 0; overflow: hidden; }

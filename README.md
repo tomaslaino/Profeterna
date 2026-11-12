@@ -6766,13 +6766,30 @@ Tipsguiden låg där i rummet (ändrat 2026-11-10; samma dag blev Tipsguiden och
 till höger om kupongen).
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
-vägg emellan, och allt glider åt höger på 0,42 s, som när kameran slås åt vänster: fort i början,
-fortast när bilderna byter plats och mjukt på slutet (`ryck`). Oskärpan följer farten och är vågrät,
-störst (4,6 % av bredden) mitt i, så att man aldrig ser båda bilderna skarpa. Den ligger på ett
+vägg emellan, och allt glider åt höger på en halv sekund, som när kameran vrids åt vänster: den kommer
+mjukt i gång, går fortast strax före mitten, när bilderna byter plats, och bromsar in länge och mjukt
+(`glid`; farten och dess ändring är noll i båda ändar). Oskärpan följer farten och är vågrät,
+störst (4,4 % av bredden) mitt i, så att man aldrig ser båda bilderna skarpa. Den ligger på ett
 omslag utanför rummets 3D-värld (`.rh-pan`), som dras ut 40 gånger på bredden och suddas
 (`filter: blur`) medan rummet och hans bild dras ihop lika mycket inuti: då blir oskärpan 40 gånger
-längre på bredden än på höjden. Tillbaka går det likadant åt andra hållet. Panoreringen är 28 färdiga
-mellanbilder som grafikprocessen spelar upp själv, och ingen duk ritas om på vägen. Med minskad
+längre på bredden än på höjden. Tillbaka går det likadant åt andra hållet. Panoreringen är 36 färdiga
+mellanbilder som grafikprocessen spelar upp själv, och ingen duk ritas om på vägen. Förut (till
+2026-11-12) gick den på 0,42 s med ett ryck i början och nästan dubbla farten mitt i.
+
+**I ordning i förväg.** Hans bild görs klar utom synhåll: den står parkerad strax till vänster om rummet
+(`.parkerad`, `parkera`), framme i sidan i ett eget lager men utan att synas eller gå att nå (`inert`),
+och där hämtar panoreringen den. Förut lades den rakt över rummet medan figuren byggdes, så att rummet
+försvann bakom hans vägg i upp till en sekund och kom tillbaka innan kameran svängde, och varje sväng
+väntade på att lagren skulle ritas. Den görs i ordning (`forbered`) när man pekar på handen eller kaffet,
+sätter fingret på dem, eller i telefonen har börjat dra åt höger från rummets vänstra kant, så att klicket
+eller svepet inte behöver vänta; bilderna och koden hämtas till webbläsarens cache redan några sekunder
+efter att rummet har kommit i gång (`hamtaForst`). Är den ändå inte klar börjar kameran vrida sig direkt,
+1,6 % av bredden, och svänger därifrån när bilden är framme (`luta`). Väggen och disken ritas bara om när
+ljuset, vädret, fönstret eller figuren har ändrats (`vaggSom`, `H.diskSom`); förut ritades båda vid varje
+besök, en tiondels sekund. Medan bilden görs i ordning och medan kameran svänger når inga klick rummet eller
+honom. När man går sitter han som han satt medan kameran vänder (förut ritades han om i vilan i samma stund,
+så att tidningen försvann ur handen), och hans bild står kvar parkerad tills figuren lämnas tillbaka (20 s i
+telefonen, 90 s annars). Med minskad
 rörelse tonar hans bild in och ut på 0,26 s. Rummet rätar upp sig efter musen och står still medan
 han syns (`Rum.vila`), och då ritas det inte alls (`visibility: hidden`), men det står kvar som det
 var, så att vägen tillbaka inte behöver bygga om något. I vila har omslagen ingen transform och inget
