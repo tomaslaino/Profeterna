@@ -20,6 +20,13 @@
 // (sekunder): samma t ger samma bild, också röken, som räknas fram för varje
 // rökbloss ur var glöden var när det föddes.
 //
+// Rörelserna är ojämna med flit (2026-11-12): huvudet följer bålen en aning senare, och DJ:s tofs
+// och ändarna på DL:s halsduk släpar efter och svänger förbi (body, SLAP); de stora gesterna –
+// måljublet, skålen, den som blir vald – tar sats och far förbi målet innan de sätter sig (fj);
+// handen går i en båge med handleden strax efter (bage); vilans gungning upprepar sig inte (gung);
+// och man blinkar när blicken flyttas (blickBlink). Allt är räkning i ställningarna: inga nya
+// bilder eller lager, och två ritanrop till (halsdukens ändar).
+//
 // Den som inte har lämnat in en öppen omgång sitter med kupongen och pennan i
 // stället för flaskan och cigaretten, som står på bordet. Fem saker
 // turas om (vanta.ordning): tuggar på pennan och kliar sig bakom örat med den,
@@ -215,6 +222,21 @@ const sm = (a, b, x) => THREE.MathUtils.smoothstep(x, a, b);
 // 0 → 1 → 0 över [a, d] med kanterna [a, b] och [c, d]
 const bump = (t, a, b, c, d) => sm(a, b, t) * (1 - sm(c, d, t));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+// 0 → 1 över [a, b] som sm, men med ansats och överslag: först en aning åt fel håll (an), sedan förbi
+// målet (ov) och tillbaka, framme vid a + FJ (b − a). Det ger tyngd åt de stora gesterna (målet,
+// skålen, den som blir vald): sm och bump är lika mjuka i båda ändar, och då ser rörelsen styrd ut.
+const FJ = 1.6;
+const fj = (a, b, x, an = 0.06, ov = 0.1) => {
+  const u = (x - a) / (b - a);
+  if (u <= 0) return 0;
+  if (u >= FJ) return 1;
+  return sm(0.2, 1, u) - an * bump(u, 0, 0.14, 0.24, 0.5) + ov * bump(u, 0.55, 1, 1.02, FJ);
+};
+// Vilans gungning: två vågor i takter som inte går jämnt upp i varandra (det gyllene snittet), så
+// att slingan aldrig kommer tillbaka likadan. Som Math.sin, och högst 1.
+const gung = (x) => 0.62 * Math.sin(x) + 0.38 * Math.sin(x * 1.618 + 1.9);
+// mjuk gräns: x nära noll, aldrig över m
+const grans = (x, m) => m * Math.tanh(x / m);
 
 // Blank vinyl (v2): hud, tyg, hår och skor.
 const P0 = {
@@ -944,7 +966,7 @@ export async function figurer(canvas, opt = {}) {
       }
       return { pts, nrm };
     }
-    function fringe(e, cols) {
+    function fringe(e, cols, parent) {
       const P = e.pts[e.pts.length - 1];
       const tg = P.clone().sub(e.pts[e.pts.length - 3]).normalize();
       const B = new THREE.Vector3().crossVectors(tg, e.nrm[e.nrm.length - 1]).normalize();
@@ -970,16 +992,28 @@ export async function figurer(canvas, opt = {}) {
     // ändarna: A (längre, med texten) och B (kortare, med skölden) ovanpå den
     const A = end([[-7, T + 1], [-8, T - 6], [-9, T - 16], [-10, T - 30], [-11, T - 44], [-12, T - 56]], TH / 2);
     const Bn = end([[-17, T + 1], [-21, T - 6], [-25, T - 15], [-29, T - 27], [-32, T - 38]], TH * 1.4);
+    // Varje ände är en egen del med leden där den kommer fram under varvet, så att den kan svänga ut
+    // från bröstet (duk, body): leden står i ändens första punkt, och det som hänger i den ritas i
+    // bröstets axlar som förut (inre).
+    const duk = [];
     for (const [e, len] of [[A, 'A'], [Bn, 'B']]) {
+      const led = new THREE.Group();
+      led.position.copy(e.pts[0]);
+      parent.add(led);
+      const inre = new THREE.Group();
+      inre.position.copy(e.pts[0]).negate();
+      led.add(inre);
+      duk.push(led);
       const g = band(e.pts, e.nrm, W, TH);
       const L = g.userData.len;
       const tx = len === 'A'
         ? scarfTex(L, W, C.vit, [...at(L - 10.5), ...at(L - 53)], [L - 40.5, L - 13, F.halsduk.text, C.bla])
         : scarfTex(L, W, C.vit, [...at(L - 10.5), ...at(L - 37)], null, [L - 26, L - 10.5, skold[F.key]]);
       tx.repeat.x = 1 / L;
-      mesh(g, wool(tx), parent);
-      fringe(e, [C.rod, C.vit, C.bla]);
+      mesh(g, wool(tx), inre);
+      fringe(e, [C.rod, C.vit, C.bla], inre);
     }
+    parent.userData.duk = duk;
   }
 
   // DT:s tatuering: ett lejonhuvud i gammal stil (manen kungsblå, konturerna
@@ -1217,6 +1251,9 @@ export async function figurer(canvas, opt = {}) {
     yarn.repeat.set(6, 4);
     const pom = mesh(pg, mat('#ffffff', { vertexColors: true, bumpMap: yarn, bumpScale: 2, roughness: 0.75, sheen: 0.8, sheenRoughness: 0.5, sheenColor: new THREE.Color('#ffffff') }), parent);
     pom.position.copy(at(0.1, Math.PI, 1.135)).add(new THREE.Vector3(0, 6, 0));
+    // (tofsen släpar efter huvudet, body: var den sitter i vila)
+    pom.userData.hem = pom.position.clone();
+    parent.userData.tofs = pom;
     // solglasögonens plats: precis ovanför uppviket fram
     return at(m.f * DEG - ch / (P.ry * 0.9) - 0.12, 0, 1.14);
   }
@@ -3252,7 +3289,7 @@ export async function figurer(canvas, opt = {}) {
     kupBench.updateMatrix();
 
     const o = { F, fig, hud: skin, torso, chest, hg, hc, face: fm, knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest,
-      skratt: tex[`${F.key}_skratt`], skagg, turnNu: F.turn };
+      skratt: tex[`${F.key}_skratt`], skagg, turnNu: F.turn, tofs: hc.userData.tofs || null, duk: chest.userData.duk || null };
     efterFig(o);
     return o;
   }
@@ -3292,27 +3329,76 @@ export async function figurer(canvas, opt = {}) {
     g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
   }
 
+  // Eftersläpet. Allt i body0 händer i samma ögonblick, och då rör sig figuren som ett stycke. Här
+  // följer huvudet bålen SLAP sekunder senare, och det som hänger löst – DJ:s tofs och ändarna på DL:s
+  // halsduk – släpar efter huvudet och bålen och svänger förbi när de stannar. Allt räknas ur klockan
+  // (body0 vid t, t − SLAP …, fem miljondels sekund var), så samma t ger fortfarande samma bild:
+  // farten nu (a) är skillnaden mellan två ställningar, och farten nyss (b) den mellan de två före.
+  // Det lösa går mot farten nu och med farten nyss – det släpar när rörelsen börjar och far förbi när
+  // den slutar. Inte utan rörelser (calm).
+  const SLAP = 0.08;
+  const las = (o) => ({ lean: o.torso.rotation.x, tw: o.torso.rotation.y, side: o.torso.rotation.z, y: o.torso.position.y, hx: o.hg.rotation.x, hy: o.hg.rotation.y, hz: o.hg.rotation.z });
+  function body(o, t) {
+    if (opt.calm) { body0(o, t); slapVila(o); return; }
+    const n = o.tofs ? 3 : o.duk ? 2 : 1;
+    const s = [];
+    for (let i = n; i >= 0; i--) { body0(o, t - i * SLAP); s[i] = las(o); }
+    o.hg.rotation.set(s[1].hx, s[1].hy, s[1].hz);
+    if (o.tofs) {
+      // huvudets vridning i rummet: bålens nu och nackens för SLAP sedan (framåt, åt sidan) och höjden
+      const P = (i) => s[i].lean + s[i + 1].hx;
+      const R = (i) => s[i].side + s[i + 1].hz;
+      const svang = (f) => (-(f(0) - f(1)) + 0.7 * (f(1) - f(2))) / SLAP;
+      // tofsen sitter överst på mössan, en hävarm från nacken: bakåt när huvudet nickar fram, åt
+      // sidan när det lutas och nedtryckt när man far uppåt (högst en halv tofs)
+      const dz = grans(4.5 * svang(P), 6);
+      const dx = grans(-4.5 * svang(R), 6);
+      const dy = grans(0.05 * svang((i) => s[i].y), 2.5);
+      const hem = o.tofs.userData.hem;
+      o.tofs.position.set(hem.x + dx, hem.y + dy, hem.z + dz);
+      o.tofs.rotation.set(dz * 0.04, 0, -dx * 0.04);
+    }
+    if (o.duk) {
+      // halsdukens ändar hänger från halsen framför bröstet: ut från bröstet när bålen far bakåt
+      // eller stannar efter att ha lutat sig fram (inte in i det), och när man studsar; åt sidan när
+      // bålen vrids eller lutas. Den korta änden är lättare och svänger mer.
+      const fram = (-(s[0].lean - s[1].lean) + 0.7 * (s[1].lean - s[2].lean)) / SLAP;
+      const hopp = Math.abs(s[1].y - s[2].y) / SLAP;
+      const W = (i) => s[i].side + 0.5 * s[i].tw;
+      const sida = (-(W(0) - W(1)) + 0.7 * (W(1) - W(2))) / SLAP;
+      o.duk.forEach((g, i) => {
+        const latt = 1 + 0.35 * i;
+        g.rotation.x = -grans(Math.max(0, 0.32 * latt * fram) + 0.004 * latt * hopp, 0.4);
+        g.rotation.z = grans(0.35 * latt * sida, 0.22);
+      });
+    }
+  }
+  // (utan rörelser: det lösa hänger rakt)
+  function slapVila(o) {
+    if (o.tofs) { o.tofs.position.copy(o.tofs.userData.hem); o.tofs.rotation.set(0, 0, 0); }
+    if (o.duk) for (const g of o.duk) g.rotation.set(0, 0, 0);
+  }
   // Bålens och huvudets läge: lutning framåt, andning och blickar – och medan
   // man väntar på kupongen (waitBody) det man gör då.
-  function body(o, t) {
+  function body0(o, t) {
     const k = o.F.key;
     const tt = t + o.phase;
     const drink = drinkW(o, t);
     const drag = dragW(o, t);
     // (lugna och trygga: rak i ryggen med hakan lite upp, och allt går sakta)
-    let lean = 0.07 - 0.12 * drink + 0.015 * Math.sin(tt * 0.3);
-    o.torso.rotation.z = 0.01 * Math.sin(tt * 0.18);
+    let lean = 0.07 - 0.12 * drink + 0.015 * gung(tt * 0.3);
+    o.torso.rotation.z = 0.01 * gung(tt * 0.18);
     let breath = 1;
-    let pitch = -0.07 + 0.02 * Math.sin(tt * 0.25);
+    let pitch = -0.07 + 0.02 * gung(tt * 0.25);
     let yaw = 0;
     // blickarna åt sidan mot bordet (inn, sitt)
     const inn = o.F.inn;
     if (k === 'dl') yaw = inn * (0.18 * bump((t % 21), 12, 13.5, 17, 18.5) - 0.05);
     // (DT nickar instämmande ibland, sakta)
     if (k === 'dt') { pitch += 0.05 * Math.sin(t * 2.6) * bump(t % 26, 8.5, 9.3, 11.6, 12.6); yaw = inn * 0.12 * bump(t % 17, 2, 3, 6, 7); }
-    if (k === 'dj') { yaw = inn * (0.22 - 0.04 * Math.sin(t * 0.45)); pitch += 0.03 * Math.sin(t * 1.6) * talkW(o, t); }
-    // benen hänger lugnt och gungar bara lite
-    const knee = [0, 1].map((i) => 0.07 + 0.06 * Math.sin(t * (k === 'dj' ? 0.5 : 0.6) + o.phase + i * 2.4) * (k === 'dt' ? 0.6 : 1));
+    if (k === 'dj') { yaw = inn * (0.22 - 0.04 * gung(t * 0.45)); pitch += 0.03 * Math.sin(t * 1.6) * talkW(o, t); }
+    // benen hänger lugnt och gungar bara lite (gung: i en takt som inte upprepar sig, som bålen ovan)
+    const knee = [0, 1].map((i) => 0.07 + 0.06 * gung(t * (k === 'dj' ? 0.5 : 0.6) + o.phase + i * 2.4) * (k === 'dt' ? 0.6 : 1));
     const foot = [0.5, 0.5];
     // väntan: rätar på sig när kupongen är inne
     const vw = 1 - sm(0, 0.3, uOf(o, t));
@@ -3331,7 +3417,7 @@ export async function figurer(canvas, opt = {}) {
     const jag = jagW(o, t);
     const skriv = skrivW(o, t);
     if (jag > 0) {
-      lean += (-0.06 - lean) * jag;
+      lean += (-0.06 - lean) * jagW(o, t, true);
       side *= 1 - jag;
       for (let i = 0; i < 2; i++) knee[i] += (0.1 + 0.2 * Math.sin(t * 5.5 + o.phase + i * 2.6) - knee[i]) * jag;
     }
@@ -3346,6 +3432,7 @@ export async function figurer(canvas, opt = {}) {
     // hålls rakt fast bålen lutar sig (annars blir det på sned åt sidan)
     // (den som just tappade raden sjunker ihop och tittar ner i stället)
     const up = cheerW(o, t);
+    const upF = cheerF(o, t);
     const sink = sinkW(o, t);
     // på sidorna sjunker man ihop utåt, inte in framför den bakom bordet
     side += sink * o.F.turn * DEG * 0.3;
@@ -3374,8 +3461,8 @@ export async function figurer(canvas, opt = {}) {
     // framåt med en knyck när handen slår i bordet (malV 2)
     const mv = malV(o);
     const smal = mv === 2 ? bump(t - (M[k] ? M[k].at : 0), 0.45, 0.55, 0.6, 0.9) : 0;
-    lean += -0.1 * up + (mv === 1 ? -0.1 : 0.2) * sink + 0.08 * smal;
-    pitch += -0.22 * up + (mv === 1 ? -0.34 : 0.42) * sink + 0.12 * nodW(o, t);
+    lean += -0.1 * upF + (mv === 1 ? -0.1 : 0.2) * sink + 0.08 * smal;
+    pitch += -0.22 * upF + (mv === 1 ? -0.34 : 0.42) * sink + 0.12 * nodW(o, t);
     // påhitten (akt): lutningen, blicken, benen och andningen
     let lift = 0;
     if (kb) {
@@ -3537,7 +3624,7 @@ export async function figurer(canvas, opt = {}) {
     const x = PK[o.F.key];
     const w = pekW(o, t);
     if (w > 0) out.push([x.fran.clone().lerp(x.p, sm(x.at, x.at + 0.45, t)), w]);
-    const h = hejW(o, t);
+    const h = hejW(o, t, true);
     if (h > 0) out.push([OGA, h]);
     // den man klickade på tittar på en (den som sover vaknar inte)
     const tk = teckenW(o, t) * (1 - sovW(o, t));
@@ -3583,9 +3670,10 @@ export async function figurer(canvas, opt = {}) {
   const HEJ = {};
   const pekW = (o, t) => { const x = PK[o.F.key]; return x ? x.w0 + ((x.on ? 1 : 0) - x.w0) * sm(x.wAt, x.wAt + 0.5, t) : 0; };
   // den som sover vaknar inte (och den som håller på att vakna gör det först)
-  const hejW = (o, t) => { const h = HEJ[o.F.key]; return h ? sm(h.at, h.at + 0.35, t) * (1 - sm(h.ut, h.ut + 0.6, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
+  // (f: med överslag, fj – blicken far lite förbi en och tillbaka, och flaskan lite för långt fram)
+  const hejW = (o, t, f) => { const h = HEJ[o.F.key]; return h ? (f ? fj(h.at, h.at + 0.35, t, 0, 0.1) : sm(h.at, h.at + 0.35, t)) * (1 - sm(h.ut, h.ut + 0.6, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
   // flaskan eller cigaretten lyfts en stund (inte medan man väntar)
-  const skalW = (o, t) => { const h = HEJ[o.F.key]; return h ? bump(t - h.at, 0.15, 0.7, 2.4, 3.2) * (1 - sm(h.ut, h.ut + 0.5, t)) * ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
+  const skalW = (o, t, f) => { const h = HEJ[o.F.key]; return h ? (f ? fj(0.15, 0.7, t - h.at, 0, 0.08) * (1 - sm(2.4, 3.2, t - h.at)) : bump(t - h.at, 0.15, 0.7, 2.4, 3.2)) * (1 - sm(h.ut, h.ut + 0.5, t)) * ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
   // N: natten (hur släckt lysröret är, 0–1, mal), som glider dit på 2,5 sekunder
   const N = { mal: 0, at: -1e9, fran: 0 };
   const nattW = (t) => N.fran + (N.mal - N.fran) * sm(N.at, N.at + 2.5, t);
@@ -3661,6 +3749,9 @@ export async function figurer(canvas, opt = {}) {
   const SOVER = { dl: 'bak', dt: 'nick', dj: 'bord' };
   const sovStil = (o) => (o.inneAt === Infinity ? 'nick' : SOVER[o.F.key]);
   const cheerW = (o, t) => { const m = M[o.F.key]; return m && m.k > 0 ? bump(t - m.at, 0, 0.45, 3.4, 4.6) : 0; };
+  // (jublet med ansats och överslag, fj: bålen och huvudet tar sats framåt innan de far bakåt, och armen
+  // far förbi och sätter sig – bage)
+  const cheerF = (o, t) => { const m = M[o.F.key]; return m && m.k > 0 ? fj(0, 0.45, t - m.at, 0.12, 0.12) * (1 - sm(3.4, 4.6, t - m.at)) : 0; };
   const sinkW = (o, t) => { const m = M[o.F.key]; return m && m.k < 0 ? bump(t - m.at, 0.2, 0.9, 4.2, 5.4) : 0; };
   const nodW = (o, t) => { const m = M[o.F.key]; return m && m.k === 0 ? bump(t - m.at, 0, 0.35, 1.0, 1.7) : 0; };
 
@@ -3672,7 +3763,19 @@ export async function figurer(canvas, opt = {}) {
     const x = t + o.phase * 3.1;
     const n = Math.floor(x / BLINK);
     const d = x - n * BLINK - hash(n * 7.3 + o.phase) * (BLINK - 0.6);
-    return (d >= 0 && d < 0.13) || (hash(n * 3.7 + o.phase) < 0.2 && d >= 0.34 && d < 0.47);
+    return (d >= 0 && d < 0.13) || (hash(n * 3.7 + o.phase) < 0.2 && d >= 0.34 && d < 0.47) || blickBlink(o, t);
+  }
+  // Och när blicken flyttas: man blinkar i början av en vridning, och utan det ser huvudet ut att vridas
+  // i stället för att titta. Vid det man vet när det hände – man pekar på hen eller slutar (HEJ), ett
+  // klick på hen (TK), någon blir vald (VAL), någon börjar peka i rummet eller slutar (PK) och tv:n går
+  // på eller av (S.tvAt, var och en i sin tur) – strax efter att huvudet har börjat röra sig.
+  function blickBlink(o, t) {
+    const k = o.F.key;
+    const vid = (at) => t - at >= 0.06 && t - at < 0.19;
+    const h = HEJ[k];
+    const tk = TK[k];
+    const pk = PK[k];
+    return Boolean((h && (vid(h.at) || vid(h.ut + 0.05))) || (tk && vid(tk.at)) || vid(VAL.at) || (pk && vid(pk.wAt)) || vid(S.tvAt + 0.25 + 0.2 * FI(o)));
   }
 
   // ---------- väntan på kupongen ----------
@@ -3693,8 +3796,9 @@ export async function figurer(canvas, opt = {}) {
   const VAL = { k: null, at: -1e9 };
   const VAL_SLUT = 5.6;
   const valdD = (o, t) => (VAL.k === o.F.key && t >= VAL.at ? t - VAL.at : -1);
-  const valdW = (o, t, a, b, c, d) => { const x = valdD(o, t); return x < 0 ? 0 : bump(x, a, b, c, d) * (1 - sm(0, 0.3, uOf(o, t))); };
-  const jagW = (o, t) => valdW(o, t, 0, 0.35, 1.7, 2.15);
+  const valdW = (o, t, a, b, c, d, f) => { const x = valdD(o, t); return x < 0 ? 0 : (f ? fj(a, b, x, 0.1, 0.12) * (1 - sm(c, d, x)) : bump(x, a, b, c, d)) * (1 - sm(0, 0.3, uOf(o, t))); };
+  // (f: med ansats och överslag, fj – för bålen, handen med pennan och kupongen)
+  const jagW = (o, t, f) => valdW(o, t, 0, 0.35, 1.7, 2.15, f);
   const skrivW = (o, t) => valdW(o, t, 1.9, 2.3, 5.0, VAL_SLUT);
   const valW = (o, t) => valdW(o, t, 0, 0.3, 5.0, VAL_SLUT);
   // TK: tecknet man klickade fram, för var och en ({ namn, at, i: armen, fran:
@@ -3810,13 +3914,13 @@ export async function figurer(canvas, opt = {}) {
     const scratch = tugg * sm(3.4, 4.2, l);
     const chew = tugg - scratch;
     return {
-      lean: 0.2 + 0.24 * kika + 0.08 * suck - 0.08 * vrid + 0.02 * Math.sin(t * 0.5 + o.phase),
+      lean: 0.2 + 0.24 * kika + 0.08 * suck - 0.08 * vrid + 0.02 * gung(t * 0.5 + o.phase),
       pitch: 0.26 + 0.3 * kika - 0.32 * vrid + 0.1 * suck + 0.1 * glance - chew * (0.22 + 0.02 * Math.sin(t * 4)) + 0.12 * scratch,
-      yaw: F.vanta.blick * glance - kika * F.turn * DEG * 0.8 + 0.04 * Math.sin(t * 0.37 + o.phase),
+      yaw: F.vanta.blick * glance - kika * F.turn * DEG * 0.8 + 0.04 * gung(t * 0.37 + o.phase),
       // och lutar sig ut åt sidan mot pulten, inte in framför den bakom bordet
       side: kika * F.turn * DEG * 0.3,
       breath: 1 - 0.04 * suck,
-      knee: [0, 1].map((i) => 0.07 + (1 - ben) * 0.06 * Math.sin(t * 0.6 + o.phase + i * 2.4) + ben * 0.14 * Math.sin(t * 1.8 + o.phase + i * 2.1)),
+      knee: [0, 1].map((i) => 0.07 + (1 - ben) * 0.06 * gung(t * 0.6 + o.phase + i * 2.4) + ben * 0.14 * Math.sin(t * 1.8 + o.phase + i * 2.1)),
       foot: [0, 1].map((i) => 0.5 - (i === F.vanta.fot ? ben * 0.22 * Math.max(0, Math.sin(t * 4.5)) ** 2 : 0)),
     };
   }
@@ -3835,6 +3939,22 @@ export async function figurer(canvas, opt = {}) {
     const z = a.z.clone().lerp(b.z, k);
     return { p: a.p.clone().lerp(b.p, k), y: y.lengthSq() > 1e-3 ? y : b.y, z: z.lengthSq() > 1e-3 ? z : b.z, pole: a.pole.clone().lerp(b.pole, k) };
   }
+  // Som lerpPose, men som en arm rör sig: handen går i en båge (ett lyft mitt på vägen, större ju
+  // längre den ska, och lite framåt så att den går fri från bålen och bordet) i stället för rakt, och
+  // handens vridning kommer strax efter läget, så att handleden följer armen. I ändarna är det samma
+  // ställningar som förut. forbi: k får gå över 1 (överslaget i fj) – inte under 0, där handen
+  // skulle tryckas ner i det den vilar på.
+  const BAGE = new THREE.Vector3(0, 0.94, 0.34);
+  function bage(a, b, k, forbi = false) {
+    if (k <= 0) return a;
+    if (k >= 1 && !forbi) return b;
+    const kk = Math.min(1, k);
+    const kv = kk * kk;
+    const y = a.y.clone().lerp(b.y, kv);
+    const z = a.z.clone().lerp(b.z, kv);
+    const p = a.p.clone().lerp(b.p, Math.min(1.2, k)).addScaledVector(BAGE, Math.min(9, 0.14 * a.p.distanceTo(b.p)) * 4 * kk * (1 - kk));
+    return { p, y: y.lengthSq() > 1e-3 ? y : b.y, z: z.lengthSq() > 1e-3 ? z : b.z, pole: a.pole.clone().lerp(b.pole, kk) };
+  }
   // en punkt i huvudets axlar i figurens
   const inHead = (o, v) => {
     o.torso.updateMatrix(); o.hg.updateMatrix(); o.hc.updateMatrix();
@@ -3852,7 +3972,7 @@ export async function figurer(canvas, opt = {}) {
     const vrid = b[4];
     const Wd = o.F.w;
     const sk = o.kp.s;
-    const jag = jagW(o, t);
+    const jag = Math.max(0, jagW(o, t, true));
     const skriv = skrivW(o, t);
     // så långt fram att den går fri från bröstet när han lutar sig över den
     const c = new THREE.Vector3(sk * Wd * 0.14, o.hipY + o.T * 0.5 + 0.8 * Math.sin(t * 0.9 + o.phase), o.F.depth + 24)
@@ -3923,7 +4043,7 @@ export async function figurer(canvas, opt = {}) {
       const vift = Math.sin((d - 0.35) * 9) * sm(0.3, 0.55, d);
       const dir = new THREE.Vector3(sp * (0.3 + 0.32 * vift), 1, 0.1).normalize();
       const uppe = shoulder(o, o.pen).add(new THREE.Vector3(sp * n * (0.42 + 0.05 * vift), n * 0.7, n * 0.18));
-      hp = lerpPose(hp, grip(penAt(uppe.addScaledVector(dir, PEN_TIP + 3), dir), L, new THREE.Vector3(sp, -0.6, -0.3)), jag);
+      hp = bage(hp, grip(penAt(uppe.addScaledVector(dir, PEN_TIP + 3), dir), L, new THREE.Vector3(sp, -0.6, -0.3)), jagW(o, t, true), true);
     }
     return hp;
   }
@@ -3963,17 +4083,17 @@ export async function figurer(canvas, opt = {}) {
     if (u < 0) return wait;
     const pick = () => grip(A.bench.matrix, (A.thing || A.cig).matrix, new THREE.Vector3(A.s, -0.4, -0.6));
     if (A === o.pen) {
-      if (u < 0.28) return lerpPose(wait, earPose(o, A), sm(0, 0.28, u));
+      if (u < 0.28) return bage(wait, earPose(o, A), sm(0, 0.28, u));
       const next = A.bench ? pick() : handDone(o, A, t);
-      if (u < 0.55) return lerpPose(earPose(o, A), next, sm(0.28, 0.55, u));
-      if (A.bench && u < 0.82) return lerpPose(next, handDone(o, A, t), sm(0.55, 0.82, u));
+      if (u < 0.55) return bage(earPose(o, A), next, sm(0.28, 0.55, u));
+      if (A.bench && u < 0.82) return bage(next, handDone(o, A, t), sm(0.55, 0.82, u));
       return handDone(o, A, t);
     }
     const put = grip(o.kupBench.matrix, A.kup.matrix, new THREE.Vector3(A.s, -0.2, -0.8));
-    if (u < 0.3) return lerpPose(wait, put, sm(0, 0.3, u));
+    if (u < 0.3) return bage(wait, put, sm(0, 0.3, u));
     const next = A.bench ? pick() : handDone(o, A, t);
-    if (u < 0.55) return lerpPose(put, next, sm(0.3, 0.55, u));
-    if (A.bench && u < 0.82) return lerpPose(next, handDone(o, A, t), sm(0.55, 0.82, u));
+    if (u < 0.55) return bage(put, next, sm(0.3, 0.55, u));
+    if (A.bench && u < 0.82) return bage(next, handDone(o, A, t), sm(0.55, 0.82, u));
     return handDone(o, A, t);
   }
   // Vid ett mål: flaskan eller näven upp, handen eller flaskan mot
@@ -3987,12 +4107,12 @@ export async function figurer(canvas, opt = {}) {
     const vk = vaknaNu(o, t);
     const vp = vk && VAKNA[vk.satt].hand ? VAKNA[vk.satt].hand(o, A, t, vk.l, base) : null;
     if (vp) base = lerpPose(base, vp, vk.w);
-    const sk = A === skalArm(o) ? skalW(o, t) : 0;
-    if (sk > 0) base = lerpPose(base, skalPose(o, A, t), sk);
+    const sk = A === skalArm(o) ? skalW(o, t, true) : 0;
+    if (sk > 0) base = bage(base, skalPose(o, A, t), sk, true);
     // påhitten (akt): armen som påhittet använder
     const ak = aktNu(o, t);
     const ap = ak && ak.a.hand ? ak.a.hand(o, A, t, ak.l, ak) : null;
-    if (ap) base = lerpPose(base, ap, ak.w);
+    if (ap) base = bage(base, ap, ak.w);
     // målen, på tre sätt (malV): 0 som förut, 1 båda armarna upp (rätt) eller
     // båda händerna på huvudet (fel), 2 handen som dunkar i bordet av glädje
     // eller slår i det en gång
@@ -4000,8 +4120,10 @@ export async function figurer(canvas, opt = {}) {
     const v = malV(o);
     const up = cheerW(o, t);
     if (up > 0) {
-      if (v === 1) return lerpPose(base, A.thing || A.fist ? cheerPose(o, A, t) : armUpp(o, A, t), up);
-      if (v === 2 ? A === fri(o) : i === o.F.mal.jubel) return lerpPose(base, v === 2 ? slag(o, A, t, true) : cheerPose(o, A, t), up);
+      // (armen upp i en båge och lite förbi, cheerF; slaget i bordet som förut, så att handen träffar skivan)
+      const upF = cheerF(o, t);
+      if (v === 1) return bage(base, A.thing || A.fist ? cheerPose(o, A, t) : armUpp(o, A, t), upF, true);
+      if (v === 2 ? A === fri(o) : i === o.F.mal.jubel) return v === 2 ? lerpPose(base, slag(o, A, t, true), up) : bage(base, cheerPose(o, A, t), upF, true);
     }
     const sink = sinkW(o, t);
     if (sink > 0) {
@@ -6162,7 +6284,7 @@ export async function figurer(canvas, opt = {}) {
         hp = lerpPose(hp, !upp ? lp.bord : lp.lyft < 1 ? lappBage(o, lerpPose(lp.bord, upp, lp.lyft), lp.lyft) : upp, lp.w);
       } else if (iAndra) hp = lerpPose(hp, lappAndra(o, A, lp), lp.L.tva * sm(0.25, 0.9, lp.lyft));
       const grepp = iLapp ? lp.w : iAndra ? lp.L.tva * sm(0.25, 0.9, lp.lyft) : 0;
-      if (tk && tk.A === A) hp = lerpPose(hp, teckenPose(o, A, tk), tk.w);
+      if (tk && tk.A === A) hp = bage(hp, teckenPose(o, A, tk), tk.w);
       if (o.st.w > 0) hp = lerpPose(hp, gaHand(o, A, t, o.st), o.st.w);
       if (A.fist) {
         const f = cheerW(o, t) > 0.35 && malV(o) !== 2;
