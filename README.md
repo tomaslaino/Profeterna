@@ -467,11 +467,23 @@ blir mer ansträngt för datorer o mobiler").
 
 - **JavaScript och CSS** görs mindre i bygget med esbuild, fil för fil
   ([src/minify.js](src/minify.js), `--minify`): blanksteg och kommentarer bort och korta namn på det
-  som bara syns inuti en funktion. Ingen buntning och samma filnamn, så att sidorna, `import()` och
+  som bara syns inuti en funktion. Samma filnamn, så att sidorna, `import()` och
   importmapen pekar på samma filer; namnen högst upp i ett vanligt skript (som andra filer läser)
   står kvar. Med gzip 701 → 437 kB JavaScript och 155 → 103 kB CSS för hela sajten. Går esbuild
   inte att läsa in, eller en fil inte att tolka, står filen kvar som den är. esbuild är ett
   utvecklingsberoende och installeras av `npm ci` på GitHub Actions.
+- **Förstasidan i buntar** (2026-11-12, användarens önskemål: "Slå ihop filerna"): efter
+  förminskningen sätter bygget ihop förstasidans filer ([src/bunta.js](src/bunta.js), också `--minify`).
+  De 41 stilmallarna blir `bunt.css`, de 44 vanliga skripten tre filer (`bunt-1.js` …) och rummets
+  moduler buntas av esbuild tillsammans med three.js, som då hämtas från matchfixarna.se i stället för
+  jsdelivr (three står som utvecklingsberoende, samma version som importmapen). Första besöket går från
+  144 till 70 förfrågningar, och JavaScript och CSS från 951 till 738 kB med gzip. Koden körs i samma
+  ordning: skript utan namn högst upp ligger i var sin funktion med sin egen `'use strict'`, de med
+  namn högst upp ligger som de är i en strikt bunt, och en ny bunt börjar när nästa fil inte får ligga
+  i den som pågår. Filer som hämtas med `import('./fil.js')` behåller sina namn; det de delar hamnar i
+  `del-….js`. Bara `index.html` pekar på buntarna – alla filer ligger kvar under sina egna namn för de
+  andra sidorna. Går en del inte att bunta står den delen kvar som förut. Listan över det som förhämtas
+  till rummet (`RUM_FORHAMTA` i [public/index.html](public/index.html)) räknas om av bygget.
 - **Typsnitten** ligger i [public/typsnitt/](public/typsnitt/) med reglerna i
   [public/typsnitt.css](public/typsnitt.css), som varje sida länkar först. Det är samma woff2-filer
   och samma `@font-face`-regler (vikter, `unicode-range`, `font-display: swap`) som Google Fonts

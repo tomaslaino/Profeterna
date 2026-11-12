@@ -60,8 +60,11 @@
        här, samtidigt som sidans övriga filer – förut först när rum.js hade
        kört (forhamta i rum.js), i telefonen nästan en sekund senare. Sidan
        visas inte förrän gänget står där, så de ligger på vägen dit. Efter
-       importmapen, så att three hämtas därifrån. -->
-  <script>if (document.documentElement.classList.contains('rum-vantar')) (function () { var im = JSON.parse(document.querySelector('script[type="importmap"]').textContent).imports; ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', 'rum-vaxter.js', 'rum-kassetter.js', 'rum-saker.js', 'rum-inredning.js', 'rum-affischer.js', 'rum-neon.js', 'rum-dator.js', im.three, im['three/addons/'] + 'environments/RoomEnvironment.js', im['three/addons/'] + 'geometries/RoundedBoxGeometry.js', im['three/addons/'] + 'utils/BufferGeometryUtils.js'].forEach(function (href) { var l = document.createElement('link'); l.rel = 'modulepreload'; l.href = href; document.head.appendChild(l); }); })();</script>
+       importmapen, så att three hämtas därifrån. Listan (RUM_FORHAMTA) läser
+       också rum.js, och bygget med --minify byter den mot buntarna
+       (src/bunta.js) – första raden ska stå som den står. -->
+  <script id="rum-forhamta">window.RUM_FORHAMTA = (function () { var im = JSON.parse(document.querySelector('script[type="importmap"]').textContent).imports; return ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', 'rum-vaxter.js', 'rum-kassetter.js', 'rum-saker.js', 'rum-inredning.js', 'rum-affischer.js', 'rum-neon.js', 'rum-dator.js', im.three, im['three/addons/'] + 'environments/RoomEnvironment.js', im['three/addons/'] + 'geometries/RoundedBoxGeometry.js', im['three/addons/'] + 'utils/BufferGeometryUtils.js']; })();</script>
+  <script>if (document.documentElement.classList.contains('rum-vantar')) window.RUM_FORHAMTA.forEach(function (href) { var l = document.createElement('link'); l.rel = 'modulepreload'; l.href = href; document.head.appendChild(l); });</script>
 </head>
 <body>
   <header class="topbar">
