@@ -6147,15 +6147,22 @@ Ett klick eller R: datorn står kvar, och kameran svänger fram och ställer sig
 skärmen medan rummet mörknar bakom – närbilden är en egen duk över hela fönstret, och
 svängen börjar i samma perspektiv som rummet. Där tar terminalen (HTML) över skärmen, med
 linjer och mörka hörn som på ett bildrör och en blinkande markör. Texten är så stor att 20
-rader ryms; i en stående telefon står skärmen högre (så att tangentbordet ryms under) och
-texten är minst 17 px, och det som inte ryms rullar. Ett klick utanför datorn eller Esc
+rader ryms, och det som inte ryms rullar. I en stående telefon går kameran närmare, tills
+skärmen fyller höjden under rubrikraden och dess sidor ligger utanför bilden: terminalen går
+från kant till kant med så stor text som 40 tecken på raden tillåter (omkring 23 px i en
+telefon som är 412 px bred, mot 17 förut, då skärmen bara tog en dryg tredjedel av höjden
+och texten knappt gick att läsa), med glesare rader, svagare linjer, ljusare svag text och
+högre tangenter. Den slutar ovanför tangentbordet när man skriver (`visualViewport`), och
+Enter tar bort tangentbordet så att träffarna syns. Medan kameran är på väg står raderna på
+skärmen i rummet där terminalen har dem (`skarmLage`), så att inget flyttar sig när den tar
+över. I en liggande telefon fyller skärmen höjden, och texten är minst 20 px. Ett klick utanför datorn eller Esc
 ställer kameran tillbaka, och skärmen i rummet visar det som stod sist (en bild i en duk,
 ritad bara när den ändras). Slitaget: disketten, musen och tangentbordet ligger lite olika
 varje dag. Datorn är billigare att rita än lådan var: ett tjugotal ritanrop mot omkring 300
 kort, och närbilden ritas bara under svängen.
 
 Dolda resultat: lag- och spelarkorten visar ? när en match i lagens divisioner är dold, med
-*Visa ändå* under skärmen – samma nyckel som anslagstavlan, så att det gäller båda – och
+*Visa ändå* under skärmen (i en stående telefon längst ner, med terminalen ovanför) – samma nyckel som anslagstavlan, så att det gäller båda – och
 dolda möten står som ?. Siffrorna från tavlan i matchakten och under *Omgången* (styrkan,
 kryssen, turen, oddsen och motståndet) får ? på samma sätt, och formen och mötena har ? för de
 dolda matcherna. Utan WebGL står disken tom. `?rum-register` visar datorn framme i

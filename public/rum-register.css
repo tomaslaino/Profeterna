@@ -28,6 +28,7 @@
 
 .reg-term {
   --gron: #41ff6e;
+  --svag: #1c9c3d;
   position: absolute;
   display: none;
   box-sizing: border-box;
@@ -46,7 +47,7 @@
 /* linjerna och de mörka hörnen ovanpå texten */
 .reg-lin { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.26) 0 1px, rgba(0, 0, 0, 0) 1px 3px); box-shadow: inset 0 0 3em 0.6em rgba(0, 0, 0, 0.75); }
 .reg-term .tr { min-height: 1.12em; white-space: pre-wrap; overflow-wrap: anywhere; }
-.reg-term .d { color: #1c9c3d; text-shadow: none; }
+.reg-term .d { color: var(--svag); text-shadow: none; }
 .reg-term .v { color: #c9ffd7; }
 /* omvänt: lite luft på sidorna, utan att något bredvid flyttar sig */
 .reg-term .i { margin: 0 -0.5ch; padding: 0 0.5ch; background: var(--gron); color: #010702; text-shadow: none; }
@@ -76,6 +77,21 @@
 /* Visa ändå (dolda resultat), under skärmen */
 .reg-rad { position: absolute; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; }
 .reg-rad .sp-card { margin: 0; pointer-events: auto; }
+
+/* ---------- stående telefon ---------- */
+
+/* Kameran står så nära att skärmens sidor ligger utanför bilden (rum-dator.js),
+   och terminalen går från kant till kant: mindre luft (LUFT_TEL i
+   rum-register.js) och större text, svagare linjer, mörker bara uppe och nere,
+   ljusare svag text, glesare rader och högre tangenter – allt för att det ska gå att läsa
+   och trycka. */
+.rum-regn.tel .reg-term { --svag: #2bb956; border-radius: 0; line-height: 1.25; }
+.rum-regn.tel .reg-term .tr { min-height: 1.25em; }
+.rum-regn.tel .reg-mark { top: 0.15em; }
+.rum-regn.tel.framme .reg-term { padding: 0.7em 0.6em 0.6em; }
+.rum-regn.tel .reg-lin { background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0 1px, rgba(0, 0, 0, 0) 1px 3px); box-shadow: inset 0 1.4em 1.6em -1em rgba(0, 0, 0, 0.75), inset 0 -1.4em 1.6em -1em rgba(0, 0, 0, 0.75); }
+.rum-regn.tel .reg-fot { line-height: 1.6; }
+.rum-regn.tel .reg-rad { box-sizing: border-box; padding: 0 10px; }
 
 @media (prefers-reduced-motion: reduce) {
   .reg-bak { transition: none; }

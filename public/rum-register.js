@@ -29,7 +29,10 @@
 //
 // Ett klick på datorn (eller R): kameran svänger fram och ställer sig rakt
 // framför skärmen medan rummet mörknar bakom, och terminalen tar över
-// skärmen. Tillbaka visar skärmen i rummet det som stod sist.
+// skärmen. Tillbaka visar skärmen i rummet det som stod sist. I en stående
+// telefon går kameran så nära att skärmen fyller höjden och dess sidor ligger
+// utanför bilden: terminalen går från kant till kant med så stor text som
+// BRED tecken tillåter, och slutar ovanför tangentbordet när man skriver.
 //
 // Dolda resultat (Spoiler): det som räknar med resultaten (styrkan, kryssen,
 // turen, oddsen, motståndet och lag- och spelarkorten) visar ? när en match i
@@ -60,6 +63,11 @@ window.RumRegister = (() => {
   // terminalen: minst så här breda rader (telefonen), och så många rader ryms på höjden (dator)
   const BRED = 40;
   const RADER = 20;
+  // ett tecken i VT323 är så brett (em), och så mycket luft har terminalen i
+  // telefonen (em; som .rum-regn.tel i rum-register.css): sidorna, överst,
+  // nederst och mellan raderna
+  const TECKEN = 0.4;
+  const LUFT_TEL = { sida: 0.6, topp: 0.7, fot: 0.6, rad: 1.25 };
   const FLIKAR = [['kupongen', 'KUPONGEN'], ['omgangen', 'OMGÅNGEN'], ['lagen', 'LAGEN'], ['spelarna', 'SPELARNA']];
   // tavlans lappar, i två rader: lagens läge först, sedan modellens tal
   const AMNEN = [['form', 'FORMEN'], ['vila', 'VILAN'], ['skador', 'SKADOR'], ['styrka', 'STYRKA'], ['kryss', 'KRYSS'], ['tur', 'TUR'], ['odds', 'ODDSEN'], ['motstand', 'MOTSTÅND']];
@@ -704,6 +712,7 @@ window.RumRegister = (() => {
       sp.innerHTML = A.on && S && S.veil && R.slojas && window.Spoiler
         ? Spoiler.card({ title: `${S.n} ${S.n === 1 ? 'match' : 'matcher'} är dolda`, text: 'Datorn räknar med resultaten.', keys: [S.key] })
         : '';
+      lagg();
     }
 
     // Till en vy: den förra sparas, så att Esc går tillbaka dit
@@ -840,8 +849,11 @@ window.RumRegister = (() => {
         const v = inp.value;
         inp.value = '';
         markor();
-        if (v.trim()) kor(v);
-        else { const el = valbara()[A.sel]; if (el) tryck(el.dataset.q); }
+        if (v.trim()) {
+          kor(v);
+          // i telefonen: tangentbordet bort, så att träffarna syns
+          if (!mus.matches) inp.blur();
+        } else { const el = valbara()[A.sel]; if (el) tryck(el.dataset.q); }
         return true;
       }
       if (k === 'Escape') {
@@ -870,14 +882,64 @@ window.RumRegister = (() => {
     // ---------- fram och tillbaka ----------
 
     const at = () => small.getBoundingClientRect();
+    // Rutan terminalen får: skärmen (r, i fönstret). I en stående telefon står
+    // kameran så nära att skärmens sidor ligger utanför bilden (rum-dator.js);
+    // då får den det av skärmen som syns, från kant till kant (tel).
+    function plats(r) {
+      const left = Math.max(0, r.left);
+      const width = Math.min(innerWidth, r.left + r.width) - left;
+      const tel = r.width > innerWidth;
+      // så många rader som ryms på höjden, men inte mindre än att det går att
+      // läsa i telefonen (där rullar det i stället), och så breda rader som
+      // ryms (telefonen: BRED tecken och ett par till, med telefonens luft)
+      const bred = tel ? width / ((BRED + 2.5) * TECKEN + 2 * LUFT_TEL.sida) : (r.width * 0.9) / (BRED * 0.42);
+      // (i ett lågt fönster, en liggande telefon, lite större än så)
+      return { left, top: r.top, width, height: r.height, tel, f: Math.min(Math.max((r.height * 0.88) / (RADER * 1.12), innerHeight < 520 ? 20 : 17), bred) };
+    }
     function placera(r) {
       if (!r) return;
-      Object.assign(term.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
-      // så många rader som ryms på höjden, men inte mindre än att det går att
-      // läsa i telefonen (där rullar det i stället), och så breda rader som ryms
-      const f = Math.min(Math.max((r.height * 0.88) / (RADER * 1.12), 17), (r.width * 0.9) / (BRED * 0.42));
-      term.style.setProperty('--f', `${f.toFixed(2)}px`);
-      radEl.style.top = `${Math.round(r.top + r.height + 36)}px`;
+      const P = plats(r);
+      A.ruta = r;
+      A.plats = P;
+      ov.classList.toggle('tel', P.tel);
+      term.style.setProperty('--f', `${P.f.toFixed(2)}px`);
+      lagg();
+    }
+    // Terminalen på sin ruta, och Visa ändå under skärmen. I telefonen, där
+    // skärmen går ända ner, står Visa ändå längst ner med terminalen ovanför,
+    // och terminalen slutar ovanför tangentbordet när det är framme.
+    function lagg() {
+      const P = A.plats;
+      if (!P) return;
+      let ner = P.top + P.height;
+      let rad = ner + 36;
+      if (P.tel) {
+        const kort = sp.firstElementChild;
+        if (kort) {
+          rad = innerHeight - kort.offsetHeight - 12;
+          ner = rad - 10;
+        }
+        // (bara när man skriver och sidan inte är förstorad med fingrarna)
+        const v = window.visualViewport;
+        if (v && document.activeElement === inp && v.scale < 1.01 && v.height < innerHeight - 120) ner = Math.min(ner, v.offsetTop + v.height - 6);
+      }
+      Object.assign(term.style, { left: `${P.left}px`, top: `${P.top}px`, width: `${P.width}px`, height: `${Math.max(140, ner - P.top)}px` });
+      radEl.style.top = `${Math.round(rad)}px`;
+    }
+    if (window.visualViewport) for (const n of ['resize', 'scroll']) visualViewport.addEventListener(n, () => { if (A.on) lagg(); });
+    inp.addEventListener('blur', () => { if (A.on) lagg(); });
+    // Var terminalens rader står på skärmen i rummet (skärmbildens px, 1024 ×
+    // 768) när terminalen inte fyller skärmen (telefonen), så att inget
+    // flyttar sig när den tar över och lämnar tillbaka; annars null
+    function skarmLage(r) {
+      const P = plats(r);
+      if (!P.tel) return null;
+      const kx = 1024 / r.width;
+      const ky = 768 / r.height;
+      const f = P.f * ky;
+      // (under raderna står sökraden och tangenterna)
+      const n = Math.floor((P.height / P.f - LUFT_TEL.topp - LUFT_TEL.fot - 0.3 - LUFT_TEL.rad - 0.2 - 1.6) / LUFT_TEL.rad);
+      return { x: (P.left - r.left + LUFT_TEL.sida * P.f) * kx, y: LUFT_TEL.topp * f, f, rad: LUFT_TEL.rad, hoger: (P.left + P.width - r.left - LUFT_TEL.sida * P.f) * kx, n: Math.max(4, n) };
     }
     // hur många tecken som ryms på en rad (minst BRED), när terminalen syns
     function matBredd() {
@@ -903,7 +965,14 @@ window.RumRegister = (() => {
         ov.classList.remove('ute', 'framme');
         const r = from || at();
         small.classList.add('borta');
-        return A.L.open(true, o.calm() ? null : r).then((ruta) => {
+        const fram = A.L.open(true, o.calm() ? null : r);
+        // telefonen: raderna på skärmen står där terminalen ställer dem
+        const lage = o.calm() ? null : skarmLage(A.L.ruta());
+        if (lage) {
+          const R = A.R || bygg(A.vy);
+          A.L.skarm([...R.topp, ...R.ut], lage);
+        }
+        return fram.then((ruta) => {
           if (!A.on) return;
           placera(ruta);
           A.L.skarm(null);
@@ -927,12 +996,15 @@ window.RumRegister = (() => {
       // skärmen i rummet visar det som stod sist
       const R = A.R || bygg(A.vy);
       A.skarm = JSON.stringify([R.topp, R.ut]);
-      A.L.skarm([...R.topp, ...R.ut]);
+      // (telefonen: där terminalen hade dem, och som i rummet när kameran är hemma)
+      const lage = o.calm() || !A.ruta ? null : skarmLage(A.ruta);
+      A.L.skarm([...R.topp, ...R.ut], lage);
       const end = () => {
         if (A.on) return;
         if (ov.contains(document.activeElement)) small.focus({ preventScroll: true });
         ov.classList.remove('on', 'ute');
         small.classList.remove('borta');
+        if (lage) A.L.skarm([...R.topp, ...R.ut]);
       };
       return A.L.open(false, o.calm() ? null : from || at()).then(end);
     }

@@ -13,8 +13,10 @@
 // datorn står kvar som den står, och det är kameran som svänger fram och
 // ställer sig rakt framför skärmen (en del av samma bild i början, så att
 // perspektivet är detsamma). Där tar terminalen i rum-register.js över
-// skärmen; i en stående telefon står skärmen högre, så att tangentbordet
-// ryms under.
+// skärmen. I en stående telefon går kameran närmare, tills skärmen fyller
+// höjden under rubrikraden: skärmens sidor hamnar utanför bilden, och
+// terminalen håller sig till det som syns (annars blev texten för liten att
+// läsa).
 //
 // Slitaget: disketten, musen och tangentbordet ligger lite olika varje dag.
 //
@@ -22,8 +24,9 @@
 // betraktaren, i högra väggens mått; ögat står i (760, 400) på avståndet
 // 1000, och disken är Y = −490 mellan X = 1060 och väggen i X = 1140.
 //
-// dator({ duk, nara, calm, box }) → { skarm(rader), paint(), open(on, från) → Promise<ruta>,
-//   ruta(), resize() }  (ruta = skärmens rektangel i fönstret när kameran står framför)
+// dator({ duk, nara, calm, box }) → { skarm(rader, läge), paint(), open(on, från) → Promise<ruta>,
+//   ruta(), resize() }  (ruta = skärmens rektangel i fönstret när kameran står framför;
+//   läge = var raderna står på skärmen, { x, y, f, rad, hoger, n } i skärmbildens px)
 
 const DEG = Math.PI / 180;
 const DAY = 86400000;
@@ -37,10 +40,20 @@ const YAW = -38 * DEG;
 // skärmen (4:3) och dess mitt över disken
 const SK = { w: 32, h: 24, y: 39.5 };
 // närbilden: hur stor del av fönstret skärmen tar och var dess mitt står
-// (andel av höjden), och kamerans synfält där
+// (andel av höjden), och kamerans synfält där. I en stående telefon fyller
+// skärmen höjden mellan rubrikraden (topp) och fönstrets nederkant (fot, px;
+// fotBred i ett stående fönster som inte är smalt, där Tillbaka står nertill).
+// I ett lågt fönster (en liggande telefon) fyller den också höjden under
+// rubrikraden, men hela skärmen syns.
 const NARA = { bred: 0.6, hog: 0.66, mitt: 0.47, fov: 24 * DEG };
-const NARA_TEL = { bred: 0.97, hog: 0.62, mitt: 0.36, fov: 30 * DEG };
+const NARA_TEL = { topp: 60, fot: 14, fotBred: 60, fov: 30 * DEG };
+const NARA_LAG = { bred: 0.9, topp: 56, fot: 10, fov: 24 * DEG };
+// raderna på skärmen i rummet (skärmbildens px, 1024 × 768)
+const RADER = { x: 44, y: 34, f: 34, rad: 1.12, hoger: 980, n: 18 };
 const staende = () => innerWidth < 700 && innerHeight > innerWidth * 1.2;
+// (som R.smal i rum.js: Tillbaka står överst)
+const smal = () => innerWidth < 600 && innerHeight > innerWidth;
+const lagt = () => innerHeight < 520;
 // färgerna på skärmen (samma som terminalen i rum-register.css)
 const FARG = { '': '#41ff6e', d: '#1c9c3d', v: '#c9ffd7', i: '#010702', bak: '#020a04' };
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -522,38 +535,42 @@ export async function dator(o) {
 
   // Raderna (som terminalen: listor av [text, klass], [['', 'hr']] är ett
   // streck) i grönt på svart, med linjer som på ett bildrör. Tomt: bara mörk skärm.
-  function skarm(rader) {
+  // Läget: var raderna står (annars RADER) – i telefonens närbild där
+  // terminalen ställer dem, så att inget flyttar sig när den tar över.
+  function skarm(rader, lage) {
     const c = bild.image;
     const g = c.getContext('2d');
     g.fillStyle = FARG.bak;
     g.fillRect(0, 0, c.width, c.height);
     if (rader) {
-      const f = 34;
-      const lh = f * 1.12;
+      const L = lage || RADER;
+      const f = L.f;
+      const lh = f * L.rad;
+      const k34 = f / RADER.f;
       g.font = `${f}px "VT323", monospace`;
       g.textBaseline = 'top';
       const cw = g.measureText('M').width;
-      rader.slice(0, Math.floor((c.height - 60) / lh)).forEach((rad, i) => {
-        let x = 44;
-        const y = 34 + i * lh;
+      rader.slice(0, L.n).forEach((rad, i) => {
+        let x = L.x;
+        const y = L.y + i * lh;
         // ett streck över hela skärmen
         if (rad.length === 1 && rad[0][1] === 'hr') {
           g.fillStyle = FARG.d;
-          g.fillRect(x, y + lh / 2 - 1, c.width - 2 * x, 2);
+          g.fillRect(x, y + lh / 2 - 1, L.hoger - x, 2);
           return;
         }
         for (const [t, k] of rad) {
           const w = cw * t.length;
           if (k === 'i') {
             g.fillStyle = FARG[''];
-            g.fillRect(x - 6, y - 2, w + 12, lh);
+            g.fillRect(x - 6 * k34, y - 2, w + 12 * k34, lh);
           } else if (k && k.startsWith('st')) {
             g.fillStyle = FARG[k === 'st' ? '' : 'd'];
             g.fillRect(x, y + lh * 0.12, w, lh * 0.66);
           }
           g.fillStyle = FARG[k || ''];
           g.shadowColor = k === 'i' ? 'transparent' : 'rgba(65,255,110,.55)';
-          g.shadowBlur = 8;
+          g.shadowBlur = 8 * k34;
           g.fillText(t, x, y);
           x += w;
         }
@@ -598,15 +615,22 @@ export async function dator(o) {
   // Kameran rakt framför skärmen: läge, vridning och rektangel (mitt på
   // axeln, med skärmens mitt där NARA.mitt säger)
   function framfor() {
-    const N = staende() ? NARA_TEL : NARA;
+    const tel = staende();
+    const lag = !tel && lagt();
+    const N = tel ? NARA_TEL : lag ? NARA_LAG : NARA;
     const h = 2 * E * Math.tan(N.fov / 2);
     const w = (h * innerWidth) / innerHeight;
-    // avståndet där skärmen tar NARA.bred av bredden och högst NARA.hog av höjden
-    const d = Math.max((SK.w * E) / (N.bred * w), (SK.h * E) / (N.hog * h));
+    // telefonen: skärmens höjd är fönstrets utom rubrikraden och lite luft nertill
+    const fot = tel && !smal() ? N.fotBred : N.fot;
+    const hog = tel || lag ? Math.max(0.5, (innerHeight - N.topp - fot) / innerHeight) : N.hog;
+    const mitt = tel || lag ? N.topp / innerHeight + hog / 2 : N.mitt;
+    // avståndet där skärmen tar NARA.bred av bredden och högst NARA.hog av
+    // höjden (den stående telefonen: hela höjden, hur bred skärmen än blir)
+    const d = tel ? (SK.h * E) / (hog * h) : Math.max((SK.w * E) / (N.bred * w), (SK.h * E) / (hog * h));
     const pos = MITT.clone().addScaledVector(NORMAL, d);
     const m = new THREE.Matrix4().lookAt(pos, MITT, new THREE.Vector3(0, 1, 0));
     const q = new THREE.Quaternion().setFromRotationMatrix(m);
-    return { pos, q, r: { x: EYE[0] - w / 2, y: EYE[1] - h * N.mitt, w, h } };
+    return { pos, q, r: { x: EYE[0] - w / 2, y: EYE[1] - h * mitt, w, h } };
   }
   // fönstret i scenens px när datorn i rummet syns där länken står
   function roomRect(from) {
