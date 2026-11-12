@@ -148,8 +148,15 @@ SOURCES.push({
     const now = Date.now();
     const ask = all.filter((e) => !byEvent[e.id]
       && (!without.has(e.id) || now - Date.parse(e.kickoff) < EUROPE_ODDS_RETRY_DAYS * 86400000));
-    const got = await espn.fetchOdds(ask, { tolerant: true });
+    let got = await espn.fetchOdds(ask, { tolerant: true });
     if (ask.length && got.failed.length === ask.length) throw new Error('ESPN svarade inte för någon av matcherna');
+    // De som inte svarade frågas en gång till (2026-11-12: 3 av 37 föll bort i
+    // första försöket och svarade i det andra); annars väntar de till nästa
+    // hämtning.
+    if (got.failed.length) {
+      const again = await espn.fetchOdds(ask.filter((e) => got.failed.includes(e.id)), { tolerant: true });
+      got = { byEvent: { ...got.byEvent, ...again.byEvent }, failed: again.failed };
+    }
     Object.assign(byEvent, got.byEvent);
     const asked = new Set(ask.filter((e) => !got.failed.includes(e.id)).map((e) => e.id));
     const missing = all.filter((e) => !byEvent[e.id] && (without.has(e.id) || asked.has(e.id))).map((e) => e.id);

@@ -8,8 +8,13 @@
 // spelare.
 //
 // Överst står menyraden, som alltid står still:
-//   KUPONGEN   omgångens matcher med lagens form; en match öppnar matchakten:
-//              allt om matchen på ett ställe – lagen sida vid sida med formen,
+//   KUPONGEN   omgångens matcher med lagens form och, där raden ryms, formens
+//              motstånd: hur bra de fem motståndarna var i snitt, 0–100 från
+//              lagets egen divisions svagaste lag till dess starkaste (lag
+//              från utlandet och andra nivåer hamnar i ändarna; ur matchens
+//              fil); en match öppnar matchakten:
+//              allt om matchen på ett ställe – lagen sida vid sida med formen
+//              och dess motstånd,
 //              vilan, dagar till nästa match, tavlans tal (styrkan, kryssen,
 //              turen, mot oddsen och motståndet) och lagkortens siffror (mål
 //              och xG per match, hur ofta laget har varit favorit, skytten),
@@ -40,8 +45,8 @@
 // utanför bilden: terminalen går från kant till kant med så stor text som
 // BRED tecken tillåter, och slutar ovanför tangentbordet när man skriver.
 //
-// Dolda resultat (Spoiler): det som räknar med resultaten (styrkan, kryssen,
-// turen, oddsen, motståndet, lagkortens siffror, truppens speltid och mål och
+// Dolda resultat (Spoiler): det som räknar med resultaten (formens motstånd,
+// styrkan, kryssen, turen, oddsen, motståndet, lagkortens siffror, truppens speltid och mål och
 // spelarkorten) visar ? när en match i
 // lagens divisioner är dold – samma nyckel som anslagstavlan, så att Visa ändå
 // gäller båda – och formen och mötena har ? för de dolda matcherna.
@@ -294,6 +299,17 @@ window.RumRegister = (() => {
       return (A.byTeam.get(m[side]) || []).filter((x) => x.completed && Date.parse(x.kickoff) < before).slice(0, 5)
         .map((x) => (window.Spoiler && Spoiler.hidden(x) ? '?' : letter(x, m[side])));
     }
+    // Formens motstånd: snittet av motståndarnas styrka i lagets fem senaste,
+    // 0–100 (opp.level i matchens fil). null tills filen har hämtats och när
+    // fler än en av matcherna saknar styrka – då säger snittet för lite.
+    function mottOf(m, side) {
+      const d = A.match.get(m.id);
+      const T = d && d.teams && d.teams[side];
+      const f = T && T.form ? T.form.slice(0, 5) : [];
+      const k = f.filter((y) => y.opp && y.opp.level != null);
+      if (!k.length || k.length < f.length - 1) return null;
+      return Math.min(99, Math.round((100 * k.reduce((t, y) => t + y.opp.level, 0)) / k.length));
+    }
     // dagar sedan lagets förra match före avspark, i alla tävlingar
     function vilaOf(m, side) {
       const d = A.match.get(m.id);
@@ -333,17 +349,24 @@ window.RumRegister = (() => {
     const nrAv = (m) => A.ms.indexOf(m) + 1;
 
     // Kupongen: matcherna med lagens form bredvid namnen (och på datorn
-    // divisionen och avsparken till höger)
-    function kupongen(R) {
+    // divisionen och avsparken till höger). Där raden ryms står formens
+    // motstånd mellan formerna, närmast strecket (CARDIFF OFVOV 69 – 41 OOFFO
+    // BURNLEY); i telefonen, där raden är full, står det i matchakten.
+    function kupongen(S, R) {
       if (!A.ms.length) return [rad('INGEN OMGÅNG')];
       const w = 11;
+      // 40 tecken utan motståndet, 46 med; divisionen och avsparken tar 20 till
       const bred = A.bred >= 60;
-      const r = [rad([omgDatum(), 'd']), rad([`${pad('', 3 + w + 4)}FORMEN`, 'd'])];
+      const tal = bred ? A.bred >= 66 : A.bred >= 46;
+      if (tal) R.slojas = true;
+      const r = [rad([omgDatum(), 'd']), rad([tal ? `${pad('', 3 + w + 1)}FORMEN · MOTSTÅNDET` : `${pad('', 3 + w + 4)}FORMEN`, 'd'])];
       A.ms.forEach((m, i) => {
         R.nr[i + 1] = `#mote:${m.id}`;
         const f = ['home', 'away'].map((s) => formOf(m, s).join('') || '–');
+        const t = ['home', 'away'].map((s) => { const v = S.veil ? '?' : mottOf(m, s); return v == null ? '' : String(v); });
         const borta = kort(m.away).slice(0, w);
-        r.push(radQ(`#mote:${m.id}`, [`${padL(i + 1, 2)} `, 'd'], `${padL(kort(m.home).slice(0, w), w)} `, [pad(f[0], 5), 'v'], [' – ', 'd'], [pad(f[1], 5), 'v'], ` ${borta}`,
+        r.push(radQ(`#mote:${m.id}`, [`${padL(i + 1, 2)} `, 'd'], `${padL(kort(m.home).slice(0, w), w)} `, [pad(f[0], 5), 'v'],
+          ...(tal ? [[` ${padL(t[0], 2)}`, ''], [' – ', 'd'], [`${pad(t[1], 2)} `, '']] : [[' – ', 'd']]), [pad(f[1], 5), 'v'], ` ${borta}`,
           ...(bred ? [[pad('', w - borta.length + 4)], [pad(DIVK[m.comp] || up(m.comp || ''), 11), 'd'], [tid(m), 'd']] : [])));
       });
       return r;
@@ -421,10 +444,18 @@ window.RumRegister = (() => {
         return v == null || !Number.isFinite(v) ? '–' : fmt(v);
       }), amne, grans ? inom(TAL[amne], grans) : -1);
       const per = (f) => T.map((t) => (S.veil ? '?' : f(t) || '–'));
-      // formen: poängen på fem matcher (inte när någon av dem är dold)
+      // formen: poängen på fem matcher (inte när någon av dem är dold). Efter
+      // den står formens motstånd, som på kupongen – det säger inte vem som är
+      // bättre och står som vanligt
       const form = sid.map((s) => formOf(m, s));
       const formP = form.map((f) => (f.length && f.every((c) => c && 'VOF'.includes(c)) ? (5 * f.reduce((p, c) => p + (c === 'V' ? 3 : c === 'O' ? 1 : 0), 0)) / f.length : null));
-      r.push(raden('FORMEN', form.map((f) => f.join('') || '–'), null, bast(formP, SKILJER.form)));
+      const formB = bast(formP, SKILJER.form);
+      const mott = sid.map((s) => { const t = S.veil ? '?' : mottOf(m, s); return t == null ? '' : ` ${t}`; });
+      r.push(rad(['FORMEN', 'd'], [pad('', L - 6)], ...form.flatMap((f, j) => {
+        const txt = f.join('') || '–';
+        const bitar = [[txt, formB < 0 ? '' : j === formB ? 'v' : 'd'], [mott[j], '']];
+        return j ? bitar : [...bitar, [pad('', Math.max(1, K - txt.length - mott[j].length))]];
+      })));
       const vila = sid.map((s) => vilaOf(m, s));
       r.push(raden('VILAN', vila.map((d) => (d == null ? '–' : `${d} D`)), null, bast(vila, SKILJER.vila)));
       r.push(raden('NÄSTA', sid.map((s) => nastaOf(m, s))));
@@ -815,7 +846,7 @@ window.RumRegister = (() => {
     function vyRader(vy, S, R) {
       if (vy.flik === 'kupongen') {
         const m = vy.mote && A.ms.find((x) => x.id === vy.mote);
-        return m ? akten(m, S, R) : kupongen(R);
+        return m ? akten(m, S, R) : kupongen(S, R);
       }
       if (vy.flik === 'listor') return listor(vy.amne || AMNEN[0][0], S, R);
       if (vy.spelare) {
