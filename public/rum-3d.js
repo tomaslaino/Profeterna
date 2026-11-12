@@ -753,14 +753,16 @@ export async function figurer(canvas, opt = {}) {
   // skulpterat hår som på en vinylfigur: grova testar med fina fåror, rundade
   // spetsar, tjock kant mot huden, volym framtill, mörkare i fårorna
   function hairGeo(P, h, seed) {
-    // (i telefonen är huvudena några dussin punkter breda: håret var en
-    // tredjedel av gängets alla trianglar)
-    const N = LATT ? seg(360, 180) : seg(480, 300);
-    const M = LATT ? seg(72, 32) : seg(96, 48);
-    const pos = [];
-    const uv = [];
-    const col = [];
-    const idx = [];
+    // Fårorna är mindre än en bildpunkt där gänget står, men som trianglar var
+    // de 92 000 per frisyr – med skuggorna 39 % av allt som ritades i rummet.
+    // Formen räknas därför två gånger: fint (NF × MF), bara för att baka hur
+    // ytan lutar och hur mörk den är i fårorna till en liten bild (harBak), och
+    // grovt (N × M), det som ritas: testarna syns i konturen, fårorna i bilden.
+    const NF = LATT ? 360 : 480;
+    const MF = LATT ? 72 : 96;
+    // (fler runt huvudet än uppåt: luggens spetsar sitter i kanten)
+    const N = LATT ? seg(180, 96) : seg(240, 120);
+    const M = LATT ? seg(20, 10) : seg(28, 14);
     let s0 = seed;
     const rnd = () => (s0 = (s0 * 16807) % 2147483647) / 2147483647;
     const ph = Array.from({ length: 6 }, () => rnd() * 6.283);
@@ -773,6 +775,11 @@ export async function figurer(canvas, opt = {}) {
     const phaseAt = (a, t, dx, dy, dz) => (h.style === 'krona'
       ? h.n * a + wob * (0.8 * Math.sin(a * 5 + ph[2]) + 1.4 * t * Math.sin(a * 2 + ph[3]))
       : h.n * Math.atan2(dx * Math.cos(sw) - dz * Math.sin(sw), dy) + wob * (0.7 * Math.sin(dz * 4 + ph[2]) + 0.4 * Math.sin(dx * 7 + ph[3])));
+    const rutnat = (N, M) => {
+    const pos = [];
+    const uv = [];
+    const col = [];
+    const idx = [];
     for (let i = 0; i <= N; i++) {
       const a = i / N * 2 * Math.PI;
       const ca = Math.cos(a);
@@ -814,10 +821,47 @@ export async function figurer(canvas, opt = {}) {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     g.setIndex(idx);
     g.computeVertexNormals();
+    return { g, col };
+    };
+    // den fina formen som bild: ytans riktning (i hårets egna axlar) i rött,
+    // grönt och blått, mörkheten i fårorna i genomskinligheten; en bildpunkt
+    // per hörn, kolumnerna runt huvudet och raderna från hjässan till kanten
+    const fin = rutnat(NF, MF);
+    const fn = fin.g.attributes.normal.array;
+    const bw = NF + 1; const bh = MF + 1;
+    const data = new Uint8Array(bw * bh * 4);
+    for (let i = 0; i < bw; i++) {
+      for (let j = 0; j < bh; j++) {
+        const v = i * bh + j; const o = (j * bw + i) * 4;
+        for (let k = 0; k < 3; k++) data[o + k] = Math.round((fn[v * 3 + k] * 0.5 + 0.5) * 255);
+        data[o + 3] = Math.round(Math.min(1, fin.col[v * 3]) * 255);
+      }
+    }
+    fin.g.dispose();
+    const bak = new THREE.DataTexture(data, bw, bh, THREE.RGBAFormat);
+    bak.minFilter = bak.magFilter = THREE.LinearFilter;
+    bak.channel = 1;
+    bak.needsUpdate = true;
+    // det grova håret, med var varje hörn ligger i den bilden (uv1)
+    const { g } = rutnat(N, M);
+    const uv1 = [];
+    for (let i = 0; i <= N; i++) for (let j = 0; j <= M; j++) uv1.push((i / N * NF + 0.5) / bw, (j / M * MF + 0.5) / bh);
+    g.setAttribute('uv1', new THREE.Float32BufferAttribute(uv1, 2));
+    g.userData.bak = bak;
     return g;
+  }
+  // Hårets material läser den bakade bilden (hairGeo): riktningen ersätter den
+  // grova ytans (three: normalMap i föremålets axlar), mörkheten läggs på färgen
+  // som förut färgen per hörn. Med en sådan bild hoppar three över bumpkartan
+  // (stråna i hairTex) och låter lacken följa den grova ytan – båda läggs
+  // tillbaka här, så att håret blänker i fårorna som när de var trianglar.
+  function harBak(sh) {
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <map_fragment>', '#include <map_fragment>\n\tdiffuseColor.rgb *= texture2D( normalMap, vNormalMapUv ).a;')
+      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n\tvec3 harN = normal;\n\t#ifdef USE_BUMPMAP\n\t\tnormal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );\n\t#endif')
+      .replace('#include <clearcoat_normal_fragment_begin>', '#include <clearcoat_normal_fragment_begin>\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatNormal = harN;\n\t#endif');
   }
   function glasses(P, parent, at, rr = 1) {
     const g = new THREE.Group();
@@ -3127,7 +3171,8 @@ export async function figurer(canvas, opt = {}) {
     if (!H || H.oron !== false) for (const s of [-1, 1]) ellipsoid([s * P.rx * 0.95, -P.ry * 0.04, -P.rz * 0.08], [P.rx * ear[0], P.ry * ear[1], P.rz * ear[2]], mat(c.skin2, { roughness: 0.55 }), hc, [0, s * ear[3], 0]);
     const ht = hairTex(c.hair, c.hair2, c.hair3, F.key.charCodeAt(1));
     const cap = H ? H.cap : F.mossa;
-    mesh(hairGeo(P, cap ? { ...F.hair, cap } : F.hair, F.key.charCodeAt(1) * 131), mat('#ffffff', { map: ht, vertexColors: true, bumpMap: ht, bumpScale: 1.5 }, 'har'), hc);
+    const harG = hairGeo(P, cap ? { ...F.hair, cap } : F.hair, F.key.charCodeAt(1) * 131);
+    mesh(harG, Object.assign(mat('#ffffff', { map: ht, bumpMap: ht, bumpScale: 1.5, normalMap: harG.userData.bak, normalMapType: THREE.ObjectSpaceNormalMap }, 'har'), { onBeforeCompile: harBak }), hc);
     const onCap = F.mossa && !H ? mossa(F, P, hc) : null;
     if (D.fest === 'nyar') FEST.konfetti(F, outer, chest, P, hc);
     if (D.fest === 'pask') FEST.kinder(F, P, hc);
