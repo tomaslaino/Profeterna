@@ -6218,7 +6218,9 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   *Styrka*, *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*, och lagkortens *Mål* och *xG*
   per match (för–mot), *Favorit* och *Skytten*; sedan skadelistorna när de finns och de
   senaste mötena med hemmalagets V–O–F. Etiketterna från tavlan leder till topplistan,
-  lagnamnen till lagkorten och skytten till spelarkortet.
+  lagnamnen till lagkorten och skytten till spelarkortet. Skiljer vilan två dagar eller mer
+  står det tröttare lagets dagar omvänt, som ringen på tavlans almanacksblad (2026-11-12,
+  användarens önskemål: märkningen fanns förut bara på tavlan).
 - **Topplistor** – tavlans lappar som listor över hela omgången, på en rad under menyraden:
   *Styrka* per division (styrkan jämförs bara inom divisionen), *Kryss* från mest till minst,
   och *Tur* (med staplar), *Oddsen* och *Motstånd* i två listor (tur och otur, slår oddsen och

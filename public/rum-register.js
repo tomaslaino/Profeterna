@@ -10,7 +10,8 @@
 // Överst står menyraden, som alltid står still:
 //   KUPONGEN   omgångens matcher med lagens form; en match öppnar matchakten:
 //              allt om matchen på ett ställe – lagen sida vid sida med formen,
-//              vilan, dagar till nästa match, tavlans tal (styrkan, kryssen,
+//              vilan (det tröttare lagets dagar omvänt, som ringen på tavlan),
+//              dagar till nästa match, tavlans tal (styrkan, kryssen,
 //              turen, mot oddsen och motståndet) och lagkortens siffror (mål
 //              och xG per match, hur ofta laget har varit favorit, skytten),
 //              sedan skadorna och mötena
@@ -399,7 +400,11 @@ window.RumRegister = (() => {
       }), amne);
       const per = (f) => T.map((t) => (S.veil ? '?' : f(t) || '–'));
       r.push(raden('FORMEN', sid.map((s) => formOf(m, s).join('') || '–')));
-      r.push(raden('VILAN', sid.map((s) => { const d = vilaOf(m, s); return d == null ? '–' : `${d} D`; })));
+      // vilan: skiljer det två dagar eller mer står det tröttare lagets dagar
+      // omvänt, som ringen på tavlans almanacksblad (noteVila i rum-anslag.js)
+      const vila = sid.map((s) => vilaOf(m, s));
+      const trott = vila[0] != null && vila[1] != null && Math.abs(vila[0] - vila[1]) >= 2 ? (vila[0] < vila[1] ? 0 : 1) : -1;
+      r.push(raden('VILAN', vila.map((d, j) => (d == null ? '–' : [`${d} D`, j === trott ? 'i' : '']))));
       r.push(raden('NÄSTA', sid.map((s) => nastaOf(m, s))));
       r.push(tom());
       r.push(tal('STYRKA', 'styrka', (v) => signed(v, 2)));
