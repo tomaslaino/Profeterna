@@ -6077,8 +6077,10 @@ styrka, kryss, tur, odds, vila, motstand) med den lappen i handen, och med
 
 ### Datorn
 
-På disken under Tipsligan står en beige allt-i-ett från FACIT med ett litet bildrör,
-tangentbord, mus och en diskett (*REGISTER säk.kopia*), byggd i three.js som inredningen
+På disken under Tipsligan står en IBM Personal System/2 Model 25 från 1990 – allt i ett med
+grå skärmram, den ovala IBM-skylten och 25 i blått, två diskettstationer med blå knappar, ett
+Model M-tangentbord med gråa tangenter och tre lampor, en grå mus – och en diskett
+(*REGISTER säk.kopia*), byggd i three.js som inredningen
 ([public/rum-dator.js](public/rum-dator.js)). Terminalen, datan och sökningen ligger i
 [public/rum-register.js](public/rum-register.js) och
 [public/rum-register.css](public/rum-register.css). Datorn tog kortlådans plats och jobb
@@ -6086,6 +6088,12 @@ tangentbord, mus och en diskett (*REGISTER säk.kopia*), byggd i three.js som in
 spelare och lag, och valde bland skisser en terminal som i spion- och actionfilmerna runt
 2000 (grön text på svart i VT323) och den beiga datorn. Samma dag blev terminalen lättare att
 använda och fick anslagstavlans siffror: användaren valde en menyrad bland tre skisser.
+2026-11-12 skulle datorn se äkta ut, "med märken och allting": tre riktiga datorer från tiden
+skissades på disken efter foton på Wikimedia Commons (Macintosh Color Classic, IBM PS/2
+Model 25 och Compaq Presario 425), och användaren valde IBM:en. Skyltar och symboler ritas i
+dukar (IBM i åtta streck med Alfa Slab One), plasten har ett fint korn, och skärmen sitter i
+en sluttande ram med bildrörets svarta kant runt bilden. Datorn ritas med 41 ritanrop, bara
+när skärmen ändras och medan kameran svänger fram.
 
 Överst står menyraden, som alltid står still: *KUPONGEN*, *OMGÅNGEN*, *LAGEN* och
 *SPELARNA*, med den valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den

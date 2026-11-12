@@ -1,9 +1,11 @@
 // Datorn på disken i tobaksaffären, i three.js som inredningen
 // (rum-inredning.js) och sakerna på pulten (rum-saker.js). Terminalen på
-// skärmen, datan och sökningen sköts av rum-register.js. Datorn är en beige
-// allt-i-ett från FACIT med ett litet bildrör, tangentbord, mus och en
-// diskett bredvid (säkerhetskopian), och den står där kortlådan stod: på
-// disken under Tipsligan, vänd mellan gänget och den som tittar.
+// skärmen, datan och sökningen sköts av rum-register.js. Datorn är en IBM
+// Personal System/2 Model 25 från 1990, som på fotona från tiden: allt i ett
+// med grå skärmram, IBM-skylten, två diskettstationer och ett Model
+// M-tangentbord, en grå mus och en diskett bredvid (säkerhetskopian). Den står
+// där kortlådan stod: på disken under Tipsligan, vänd mellan gänget och den
+// som tittar.
 //
 // I rummet ritas datorn när skärmen ändras, med samma kamera som högra
 // väggen, och kopieras till duken i länken på disken, så att den lyser när
@@ -32,9 +34,8 @@ const FH = 2 * Math.max(EYE[1], 1000 - EYE[1]);
 // datorns mitt i botten, på disken, och hur den är vänd (mellan gänget och ögat)
 const POS = { x: 1104, y: -490, z: 377 };
 const YAW = -38 * DEG;
-// lådan: bredd, höjd och djup; skärmen (4:3) och dess mitt på fronten
-const B = { w: 46, h: 60, d: 50 };
-const SK = { w: 32, h: 24, y: 40 };
+// skärmen (4:3) och dess mitt över disken
+const SK = { w: 32, h: 24, y: 39.5 };
 // närbilden: hur stor del av fönstret skärmen tar och var dess mitt står
 // (andel av höjden), och kamerans synfält där
 const NARA = { bred: 0.6, hog: 0.66, mitt: 0.47, fov: 24 * DEG };
@@ -51,7 +52,7 @@ export async function dator(o) {
   const THREE = await import('three');
   const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
   const { RoundedBoxGeometry: RB } = await import('three/addons/geometries/RoundedBoxGeometry.js');
-  await Promise.all(['40px "VT323"', '40px "Skrivmaskin"'].map((f) => document.fonts.load(f).catch(() => null)));
+  await Promise.all(['40px "VT323"', '40px "Skrivmaskin"', '40px "Alfa Slab One"'].map((f) => document.fonts.load(f).catch(() => null)));
 
   // i telefonen färre bildpunkter, ingen kantutjämning och mindre skuggkartor
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
@@ -128,29 +129,181 @@ export async function dator(o) {
 
   // ---------- datorn ----------
 
-  const plast = (c) => mat(c, { roughness: 0.5, clearcoat: 0.15, clearcoatRoughness: 0.6, envMapIntensity: 0.45 });
-  const BEIGE = plast('#d6ccb0');
-  const BEIGE2 = plast('#c2b796');
-  const TANGENT = plast('#e6dfca');
-  const MORK = plast('#1c1d1f');
+  // Plasten: matt med ett fint korn (en brusbild som bump), som gjuten plast
+  // från tiden. RoundedBoxGeometry har 0–1 per sida, de extruderade delarna
+  // världens enheter, därför två kopior av kornet.
+  const korn = duk(128, 128, (c, w, h) => {
+    const d = c.createImageData(w, h);
+    for (let i = 0; i < w * h; i++) {
+      const v = 112 + hash(i * 0.7313 + 0.17) * 32;
+      d.data[i * 4] = d.data[i * 4 + 1] = d.data[i * 4 + 2] = v;
+      d.data[i * 4 + 3] = 255;
+    }
+    c.putImageData(d, 0, 0);
+  });
+  korn.colorSpace = THREE.NoColorSpace;
+  korn.wrapS = korn.wrapT = THREE.RepeatWrapping;
+  const KORN_RB = korn.clone();
+  KORN_RB.repeat.set(5, 5);
+  const KORN_V = korn.clone();
+  KORN_V.repeat.set(0.11, 0.11);
+  const plast = (c, k = KORN_RB, x = {}) => mat(c, Object.assign({ roughness: 0.6, clearcoat: 0.08, clearcoatRoughness: 0.7, envMapIntensity: 0.45, bumpMap: k, bumpScale: 0.25 }, x));
+  const VIT = plast('#dfdbd0');
+  const VITV = plast('#dfdbd0', KORN_V);
+  const GRA = plast('#a19d94', KORN_V);
+  const GRAT = plast('#aaa69d', KORN_V, { side: THREE.DoubleSide });
   const SLITS = mat('#141414', { roughness: 0.9 });
-  const LED = new THREE.MeshBasicMaterial({ color: '#66ff8c', toneMapped: false });
+  const ROR = mat('#0a0b0b', { roughness: 0.85, envMapIntensity: 0.2, side: THREE.DoubleSide });
   // skärmen: terminalen (skarm) eller tom när terminalen i rum-register.js står ovanpå
   const bild = duk(1024, 768);
   const SKARM = new THREE.MeshBasicMaterial({ map: bild, toneMapped: false, color: new THREE.Color(0.95, 0.95, 0.95) });
   const GLAS = mat('#000000', { transparent: true, opacity: 0.16, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.4 });
 
+  // en rundad rektangel som väg (för plattor med hål) och som punkter (lika
+  // många i varje, så att två kan limmas ihop till en sluttning)
+  function rrVag(p, w, h, r, x = 0, y = 0) {
+    p.moveTo(x - w / 2 + r, y - h / 2);
+    p.lineTo(x + w / 2 - r, y - h / 2);
+    p.absarc(x + w / 2 - r, y - h / 2 + r, r, -Math.PI / 2, 0, false);
+    p.lineTo(x + w / 2, y + h / 2 - r);
+    p.absarc(x + w / 2 - r, y + h / 2 - r, r, 0, Math.PI / 2, false);
+    p.lineTo(x - w / 2 + r, y + h / 2);
+    p.absarc(x - w / 2 + r, y + h / 2 - r, r, Math.PI / 2, Math.PI, false);
+    p.lineTo(x - w / 2, y - h / 2 + r);
+    p.absarc(x - w / 2 + r, y - h / 2 + r, r, Math.PI, 1.5 * Math.PI, false);
+    return p;
+  }
+  function rrPunkter(w, h, r, n = 6) {
+    const ut = [];
+    for (const [cx, cy, a0] of [[w / 2 - r, h / 2 - r, 0], [-w / 2 + r, h / 2 - r, 90], [-w / 2 + r, -h / 2 + r, 180], [w / 2 - r, -h / 2 + r, 270]]) {
+      for (let i = 0; i <= n; i++) {
+        const a = (a0 + (90 * i) / n) * DEG;
+        ut.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+      }
+    }
+    return ut;
+  }
+  // En platta (w × h, framsidan i z, mitten i y) med hål ({ w, h, r, y } i
+  // datorns y), rundad kant runt om
+  function platta(w, h, r, hal, djup, bev, m, p, z, y) {
+    const s = rrVag(new THREE.Shape(), w - 2 * bev, h - 2 * bev, Math.max(0.2, r - bev));
+    for (const H of hal) s.holes.push(rrVag(new THREE.Path(), H.w + 2 * bev, H.h + 2 * bev, H.r + bev, 0, H.y - y));
+    const g = new THREE.ExtrudeGeometry(s, { depth: djup, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 3, curveSegments: 8 });
+    const x = mesh(g, m, p);
+    x.position.set(0, y, z - djup - bev);
+    return x;
+  }
+  // Två rundade rektanglar ({ w, h, r, y, z }) ihoplimmade: ramens sluttning
+  // in mot bildröret och rörets svarta kant
+  function sluttning(a, b, m, p) {
+    const P = [a, b].map((R) => rrPunkter(R.w, R.h, R.r));
+    const n = P[0].length;
+    const pos = [];
+    const idx = [];
+    [a, b].forEach((R, j) => P[j].forEach(([x, y]) => pos.push(x, y + R.y, R.z)));
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      idx.push(i, j, i + n, j, j + n, i + n);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return mesh(g, m, p);
+  }
+  // En tryckt etikett (en duk på ett plan), k bildpunkter per enhet;
+  // rita(c, k) ritar i bildpunkter
+  function etikett(w, h, k, rita, p, x, y, z, o = {}) {
+    const t = duk(Math.round(w * k), Math.round(h * k), (c) => rita(c, k));
+    const m = mat('#ffffff', Object.assign({ map: t, transparent: true, roughness: 0.55, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }, o));
+    const e = mesh(new THREE.PlaneGeometry(w, h), m, p, false);
+    e.position.set(x, y, z);
+    return e;
+  }
+  function rundRekt(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+  // IBM:s åtta streck: bokstäverna i tjock antikva, med sju skåror i
+  // bakgrundens färg; s är bokstävernas höjd
+  function ibm(c, x, y, s, farg, bak) {
+    c.save();
+    c.font = `${s * 1.36}px "Alfa Slab One", "Rockwell", Georgia, serif`;
+    c.textAlign = 'center';
+    c.fillStyle = farg;
+    c.save();
+    c.translate(x, y);
+    c.scale(1.12, 1);
+    c.fillText('IBM', 0, s / 2);
+    c.restore();
+    const b = s / 13.6;
+    const w = c.measureText('IBM').width * 1.2;
+    c.fillStyle = bak;
+    for (let i = 0; i < 7; i++) c.fillRect(x - w / 2, y - s / 2 + b + i * 1.8 * b, w, 0.8 * b);
+    c.restore();
+  }
+  // symbolerna för ljusstyrka och kontrast
+  function sol(c, x, y, r, f) {
+    c.save();
+    c.strokeStyle = f;
+    c.lineWidth = r * 0.28;
+    c.beginPath();
+    c.arc(x, y, r * 0.42, 0, 2 * Math.PI);
+    c.stroke();
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI) / 4;
+      c.beginPath();
+      c.moveTo(x + Math.cos(a) * r * 0.66, y + Math.sin(a) * r * 0.66);
+      c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      c.stroke();
+    }
+    c.restore();
+  }
+  function kontrast(c, x, y, r, f) {
+    c.save();
+    c.strokeStyle = c.fillStyle = f;
+    c.lineWidth = r * 0.22;
+    c.beginPath();
+    c.arc(x, y, r * 0.8, 0, 2 * Math.PI);
+    c.stroke();
+    c.beginPath();
+    c.arc(x, y, r * 0.8, -Math.PI / 2, Math.PI / 2);
+    c.fill();
+    c.restore();
+  }
+  const lampa = (f, r, p, x, y, z) => { const m = mesh(new THREE.SphereGeometry(r, 10, 8), new THREE.MeshBasicMaterial({ color: f, toneMapped: false }), p, false); m.position.set(x, y, z); m.scale.z = 0.5; return m; };
+
+  // IBM Personal System/2 Model 25 (1990): allt i ett, en grå ram kring
+  // skärmen i ett benvitt hölje, den ovala skylten med IBM i streck och
+  // Personal System/2 Model 25 286 uppe till vänster, 25 i blått uppe till
+  // höger, ratterna för ljus och kontrast nere till höger och två
+  // diskettstationer med blå knappar i foten. Förebild: foton på Wikimedia
+  // Commons (IBM PS/2 Model 25, IBM Model M).
   const pc = new THREE.Group();
   pc.position.set(POS.x, POS.y, POS.z);
   pc.rotation.y = YAW;
   scene.add(pc);
-  const { w: W, h: H, d: D } = B;
-  mesh(new RB(W, H - 3, D, 3, 2.2), BEIGE, pc).position.set(0, 3 + (H - 3) / 2, 0);
-  mesh(new RB(W - 4, 3.2, D - 6, 2, 1), BEIGE2, pc).position.set(0, 1.6, 0);
-  // ramen kring skärmen, nedsänkt, och bildröret som buktar lite
-  mesh(new RB(SK.w + 4, SK.h + 5, 2, 2, 1.2), MORK, pc).position.set(0, SK.y, D / 2 - 0.4);
+  const W = 46;
+  const D = 48;
+  const F = D / 2;
+  // foten med diskettstationerna, lite indragen under skärmen
+  mesh(new RB(W - 2.4, 16, D - 4, 1.8, 1.4), VIT, pc).position.set(0, 8, F - 1.5 - (D - 4) / 2);
+  // bildskärmsdelen: höljet, den benvita kanten runt den grå ramen och ramens
+  // sluttning in mot bildröret
+  const MY = 16 + 42.5 / 2;
+  mesh(new RB(W, 42.5, D - 5, 2.6, 2.2), VIT, pc).position.set(0, MY, -2);
+  platta(W, 42.5, 2.6, [{ w: W - 4, h: 38, r: 2, y: MY }], 3, 0.5, VITV, pc, F - 0.8, MY);
+  const HAL = { w: 35.2, h: 27.2, r: 1.6, y: SK.y };
+  platta(W - 1.8, 41, 2, [HAL], 3.3, 0.6, GRA, pc, F, MY);
+  sluttning({ ...HAL, z: F - 0.15 }, { w: SK.w + 2.2, h: SK.h + 2.2, r: 1.2, y: SK.y, z: F - 3.3 }, GRAT, pc);
+  // bildröret: glaset buktar lite, och kring bilden syns rörets svarta kant
   const sg = new THREE.Group();
-  sg.position.set(0, SK.y, D / 2 + 0.7);
+  sg.position.set(0, SK.y, F - 3.6);
   pc.add(sg);
   {
     const g = new THREE.PlaneGeometry(SK.w, SK.h, 24, 18);
@@ -163,68 +316,198 @@ export async function dator(o) {
     g.computeVertexNormals();
     mesh(g, SKARM, sg, false);
     mesh(g.clone(), GLAS, sg, false).position.z = 0.05;
+    sluttning({ w: SK.w + 2.8, h: SK.h + 2.8, r: 1.5, y: 0, z: 0.45 }, { w: SK.w - 1, h: SK.h - 1, r: 0.8, y: 0, z: -0.3 }, ROR, sg).castShadow = false;
+    // skärmens sken på tangentbordet och disken
+    const sken = new THREE.PointLight('#5cff86', 320, 90, 2);
+    sken.position.set(0, -14, 24);
+    sg.add(sken);
   }
-  // skärmens sken på tangentbordet och disken
-  const sken = new THREE.PointLight('#5cff86', 900, 90, 2);
-  sken.position.set(0, -4, 14);
-  sg.add(sken);
-  // diskettluckan, märket och lampan
-  mesh(new THREE.BoxGeometry(14, 1.1, 0.6), SLITS, pc).position.set(9, 18, D / 2 + 0.05);
-  const skylt = duk(80, 18, (c, w, h) => {
-    c.fillStyle = '#c9bd9c';
-    c.fillRect(0, 0, w, h);
-    c.fillStyle = '#5a4a30';
-    c.font = '600 12px "Helvetica Neue", Arial, sans-serif';
+  // skylten: grå oval med IBM i vita streck, snett uppåt
+  const BAK = '#8f897c';
+  etikett(5.8, 3.9, 96, (c, k) => {
+    c.fillStyle = BAK;
+    c.beginPath();
+    c.ellipse(2.9 * k, 1.95 * k, 2.85 * k, 1.9 * k, 0, 0, 2 * Math.PI);
+    c.fill();
+    c.translate(2.9 * k, 1.95 * k);
+    c.rotate(-32 * DEG);
+    ibm(c, -0.25 * k, -0.35 * k, 1.35 * k, '#f4f2ec', BAK);
+    c.fillStyle = '#f4f2ec';
+    c.font = `${0.38 * k}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+    c.fillText('Personal System/2', -0.4 * k, 0.75 * k);
+    c.fillText('Model 25   286', -0.1 * k, 1.2 * k);
+  }, pc, -W / 2 + 5.3, 55.1, F + 0.01, { roughness: 0.4 });
+  etikett(4, 2.6, 64, (c, k) => {
+    c.fillStyle = '#2d5fa8';
+    c.font = `italic 700 ${2.1 * k}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
     c.textAlign = 'center';
     c.textBaseline = 'middle';
-    c.fillText('FACIT', w / 2, h / 2 + 1);
-  });
-  mesh(new THREE.PlaneGeometry(10, 2.2), mat('#ffffff', { map: skylt, roughness: 0.4, metalness: 0.2 }), pc, false).position.set(-12, 18, D / 2 + 0.06);
-  mesh(new THREE.SphereGeometry(0.55, 10, 8), LED, pc, false).position.set(-18, 11, D / 2 + 0.1);
-  // ventilationsspåren på sidan
-  for (let i = 0; i < 9; i++) mesh(new THREE.BoxGeometry(0.4, 1, 20), SLITS, pc, false).position.set(W / 2 + 0.05, 48 - i * 2.4, -4);
+    c.fillText('25', 2 * k, 1.35 * k);
+  }, pc, W / 2 - 4.6, 55.1, F + 0.01);
+  // nere till höger: ljus, kontrast, strömmen och lampan
+  etikett(12, 2, 64, (c, k) => {
+    const f = '#5d5a54';
+    sol(c, 1 * k, 1 * k, 0.5 * k, f);
+    kontrast(c, 4.2 * k, 1 * k, 0.5 * k, f);
+    c.strokeStyle = c.fillStyle = f;
+    c.lineWidth = 0.1 * k;
+    c.beginPath();
+    c.arc(7.4 * k, 1 * k, 0.42 * k, 0, 2 * Math.PI);
+    c.stroke();
+    c.fillRect(10.2 * k, 0.55 * k, 0.12 * k, 0.9 * k);
+  }, pc, 11.4, 19.8, F + 0.01);
+  {
+    const ratt = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.7, 0.7, 0.8, 18).rotateX(90 * DEG), plast('#8c8880'), 3);
+    [7, 10.2, 13.4].forEach((x, i) => ratt.setMatrixAt(i, new THREE.Matrix4().makeTranslation(x + 0.2, 17.8, F + 0.05)));
+    ratt.castShadow = ratt.receiveShadow = true;
+    pc.add(ratt);
+  }
+  lampa('#58ff7a', 0.32, pc, 18.6, 17.8, F + 0.1);
+  // diskettstationerna: springan med luckan, den blå utmatningsknappen och lampan
+  {
+    const FY = 7.6;
+    const lucka = plast('#3a3a3a');
+    const BLA = plast('#2f63ad', KORN_RB, { clearcoat: 0.3 });
+    for (const x of [-10.6, 10.6]) {
+      etikett(17, 7, 32, (c, k) => {
+        c.strokeStyle = 'rgba(70,60,45,.45)';
+        c.lineWidth = 0.12 * k;
+        rundRekt(c, 0.3 * k, 0.3 * k, 16.4 * k, 6.4 * k, 0.6 * k);
+        c.stroke();
+      }, pc, x, FY, F - 1.49);
+      mesh(new THREE.BoxGeometry(11.5, 1.1, 0.6), SLITS, pc, false).position.set(x - 1.2, FY + 0.8, F - 1.6);
+      mesh(new THREE.BoxGeometry(10.6, 0.55, 0.3), lucka, pc, false).position.set(x - 1.2, FY + 0.8, F - 1.4);
+      mesh(new RB(2, 1.3, 1, 1, 0.3), BLA, pc).position.set(x + 5.6, FY - 0.9, F - 1.4);
+      lampa('#2b5a2e', 0.22, pc, x - 6.4, FY - 0.9, F - 1.45);
+    }
+  }
+  // ventilationen på sidan av skärmen
+  {
+    const sl = new THREE.InstancedMesh(new THREE.BoxGeometry(0.4, 0.9, 22), SLITS, 10);
+    for (let i = 0; i < 10; i++) sl.setMatrixAt(i, new THREE.Matrix4().makeTranslation(W / 2 + 0.05, 52 - i * 2.2, -8));
+    sl.receiveShadow = true;
+    pc.add(sl);
+  }
+
+  // ---------- tangentbordet, musen och kablarna ----------
+
+  // IBM Model M (101 tangenter): benvitt hölje, ljusa bokstäver och siffror,
+  // grå Esc, F5–F8, skift- och styrtangenter, piltangenter och räknedelens
+  // tecken, tre lampor uppe till höger och märket uppe till vänster.
+  // Tangenterna som [x, y, bredd, höjd, grå] i tangentbredder.
+  const TB = (() => {
+    const k = [];
+    const rad = (y, lista) => { let x = 0; for (const [w, g, glapp = 0] of lista) { x += glapp; k.push([x, y, w, 1, g]); x += w; } };
+    const L = [1, 0];
+    k.push([0, 0, 1, 1, 1]);
+    for (let i = 0; i < 12; i++) k.push([2 + i + Math.floor(i / 4) * 0.5, 0, 1, 1, i >= 4 && i < 8 ? 1 : 0]);
+    for (let i = 0; i < 3; i++) k.push([15.5 + i, 0, 1, 1, 1]);
+    rad(1.5, [...Array(13).fill(L), [2, 1]]);
+    rad(2.5, [[1.5, 1], ...Array(12).fill(L), [1.5, 0]]);
+    rad(3.5, [[1.75, 1], ...Array(11).fill(L), [2.25, 1]]);
+    rad(4.5, [[2.25, 1], ...Array(10).fill(L), [2.75, 1]]);
+    rad(5.5, [[1.5, 1], [1.5, 1, 1], [7, 0], [1.5, 1], [1.5, 1, 1]]);
+    for (const y of [1.5, 2.5]) for (let i = 0; i < 3; i++) k.push([15.5 + i, y, 1, 1, 1]);
+    k.push([16.5, 4.5, 1, 1, 1]);
+    for (let i = 0; i < 3; i++) k.push([15.5 + i, 5.5, 1, 1, 1]);
+    for (let i = 0; i < 4; i++) k.push([19 + i, 1.5, 1, 1, 1]);
+    for (const y of [2.5, 3.5, 4.5]) for (let i = 0; i < 3; i++) k.push([19 + i, y, 1, 1, 0]);
+    k.push([22, 2.5, 1, 2, 1], [22, 4.5, 1, 2, 1], [19, 5.5, 2, 1, 0], [21, 5.5, 1, 1, 0]);
+    return { k, w: 23, h: 6.5, u: 1.95, kant: [2.2, 2.2, 6, 2.2], h0: 3.2 };
+  })();
 
   // tangentbordet, musen och disketten: på lite olika ställen varje dag
   const dag = Math.floor(Date.now() / DAY);
   const r = (i) => hash(dag * 7.3 + i);
+  const tw = TB.w * TB.u + TB.kant[0] + TB.kant[1];
+  const td = TB.h * TB.u + TB.kant[2] + TB.kant[3];
+  const tb = new THREE.Group();
+  tb.position.set((r(1) - 0.5) * 4 + 1, 0, F + 3.5 + td / 2 + r(2) * 2.5);
+  tb.rotation.set(0, (r(3) - 0.5) * 9 * DEG, 0);
+  pc.add(tb);
   {
-    const tb = new THREE.Group();
-    tb.position.set((r(1) - 0.5) * 5, 0, D / 2 + 12 + r(2) * 3);
-    tb.rotation.set(3 * DEG, (r(3) - 0.5) * 9 * DEG, 0);
-    pc.add(tb);
-    const tw = 42;
-    const td = 15;
-    mesh(new RB(tw, 2.6, td, 2, 0.8), BEIGE, tb).position.y = 1.3;
-    const cols = 15;
-    const rows = 5;
-    const kw = (tw - 4) / cols;
-    const kd = (td - 5) / rows;
-    const inst = new THREE.InstancedMesh(new RB(kw * 0.82, 1.1, kd * 0.8, 1, 0.25), TANGENT, cols * rows + 1);
+    const hus = new THREE.Group();
+    hus.rotation.x = 4 * DEG;
+    hus.position.y = 0.6;
+    tb.add(hus);
+    const H0 = TB.h0;
+    mesh(new RB(tw, H0, td, 2, 0.9), plast('#dcd8cd'), hus).position.y = H0 / 2;
+    const inst = new THREE.InstancedMesh(new RB(1, 1, 1, 1, 0.16), plast('#ffffff'), TB.k.length);
     inst.castShadow = true;
     inst.receiveShadow = true;
     const m4 = new THREE.Matrix4();
-    let n = 0;
-    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
-      if (y === rows - 1 && x > 3 && x < 11) continue;
-      m4.makeTranslation(-tw / 2 + 2 + kw * (x + 0.5) + (y % 2) * kw * 0.25 - kw * 0.12, 3.0 + y * 0.12, -td / 2 + 2.5 + kd * (y + 0.5));
-      inst.setMatrixAt(n++, m4);
+    const q = new THREE.Quaternion();
+    const ljus = new THREE.Color('#e4dfd3');
+    const gra = new THREE.Color('#9e9a92');
+    TB.k.forEach(([x, y, w, h, g], i) => {
+      m4.compose(
+        new THREE.Vector3(-tw / 2 + TB.kant[0] + (x + w / 2) * TB.u, H0 + 0.45, -td / 2 + TB.kant[2] + (y + h / 2) * TB.u),
+        q, new THREE.Vector3(w * TB.u - 0.32, 1.1, h * TB.u - 0.32));
+      inst.setMatrixAt(i, m4);
+      inst.setColorAt(i, g ? gra : ljus);
+    });
+    hus.add(inst);
+    // märket: en grå oval med IBM i blått
+    const e = etikett(4.4, 2.6, 64, (c, k) => {
+      c.fillStyle = '#c9c6bf';
+      c.beginPath();
+      c.ellipse(2.2 * k, 1.3 * k, 2.1 * k, 1.2 * k, 0, 0, 2 * Math.PI);
+      c.fill();
+      c.translate(2.2 * k, 1.3 * k);
+      c.rotate(-20 * DEG);
+      ibm(c, 0, 0, 1 * k, '#264e93', '#c9c6bf');
+    }, hus, -tw / 2 + 5.4, H0 + 0.02, -td / 2 + TB.kant[2] / 2);
+    e.rotation.x = -90 * DEG;
+    // lamporna: Num Lock tänd
+    const lx = -tw / 2 + TB.kant[0] + 19 * TB.u;
+    const lz = -td / 2 + TB.kant[2] + 0.5 * TB.u;
+    mesh(new RB(4 * TB.u, 0.5, 1.7, 1, 0.2), plast('#cfcbc0'), hus).position.set(lx + 2 * TB.u, H0 + 0.1, lz);
+    ['#5cff7e', '#1d3a22', '#1d3a22'].forEach((f, i) => lampa(f, 0.22, hus, lx + (i + 0.5) * (4 / 3) * TB.u, H0 + 0.4, lz + 0.25 * TB.u).scale.set(1.6, 0.6, 0.6));
+  }
+  // musen: IBM:s grå med två knappar, lite smalare och lägre fram
+  const mus = new THREE.Group();
+  mus.position.set(tw / 2 + 6.5 + r(4) * 4, 0, F + 7 + r(5) * 7);
+  mus.rotation.y = (r(6) - 0.5) * 30 * DEG;
+  pc.add(mus);
+  const ML = 9;
+  const MH = 2.6;
+  {
+    const g = new RB(5.6, MH, ML, 3, 0.9);
+    const p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const t = (p.getZ(i) + ML / 2) / ML;
+      p.setX(i, p.getX(i) * (1 - 0.1 * (1 - t)));
+      if (p.getY(i) > 0) p.setY(i, p.getY(i) * (1 - 0.3 * (1 - t)));
     }
-    // mellanslaget
-    m4.compose(new THREE.Vector3(-tw / 2 + 2 + kw * 7.5 - kw * 0.12, 3.5, -td / 2 + 2.5 + kd * 4.5), new THREE.Quaternion(), new THREE.Vector3(6.6, 1, 1));
-    inst.setMatrixAt(n++, m4);
-    inst.count = n;
-    tb.add(inst);
-    const mus = mesh(new RB(5, 2.4, 8.5, 2, 1.1), BEIGE, pc);
-    mus.position.set(28 + r(4) * 5, 1.2, D / 2 + 10 + r(5) * 7);
-    mus.rotation.y = (r(6) - 0.5) * 30 * DEG;
+    g.computeVertexNormals();
+    mesh(g, plast('#a29f98'), mus).position.y = MH / 2;
+    // knapparnas skåror
+    const s = (x, z, w, d) => mesh(new THREE.BoxGeometry(w, 0.1, d), SLITS, mus, false).position.set(x, MH / 2 + (MH / 2) * (1 - 0.3 * (1 - (z + ML / 2) / ML)) - 0.03, z);
+    s(0, -ML / 2 + 3.3, 4.2, 0.12);
+    s(0, -ML / 2 + 1.7, 0.12, 3.2);
+  }
+  // kablarna: musen bakom datorn, tangentbordet in under foten
+  {
+    const km = mat('#2b2b2b', { roughness: 0.5 });
+    const kabel = (pts) => mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([x, z, y = 0.3]) => new THREE.Vector3(x, y, z))), 48, 0.22, 6), km, pc);
+    const fx = mus.position.x - (Math.sin(mus.rotation.y) * ML) / 2;
+    const fz = mus.position.z - (Math.cos(mus.rotation.y) * ML) / 2;
+    kabel([[fx, fz, 0.8], [fx - 1.5, fz - 5], [W / 2 + 4, F - 4], [W / 2 + 3, F - 16], [W / 2 - 4, -F + 6]]);
+    const bx = tb.position.x + Math.cos(tb.rotation.y) * (-tw / 2 + 6) + Math.sin(tb.rotation.y) * (-td / 2);
+    const bz = tb.position.z - Math.sin(tb.rotation.y) * (-tw / 2 + 6) + Math.cos(tb.rotation.y) * (-td / 2);
+    kabel([[bx, bz, 1.2], [bx - 1, bz - 2.5], [-W / 2 + 10, F + 0.5], [-W / 2 + 8, F - 6]]);
+  }
+  // disketten (säkerhetskopian): blå plast, metallucka och en maskinskriven etikett
+  {
     const disk = new THREE.Group();
-    disk.position.set(-29 - r(7) * 5, 0.5, D / 2 + 1 + r(8) * 8);
+    disk.position.set(-W / 2 - 7 - r(7) * 5, 0.5, F + 1 + r(8) * 8);
     disk.rotation.y = (r(9) - 0.3) * 60 * DEG;
     pc.add(disk);
-    mesh(new THREE.BoxGeometry(9.4, 0.9, 9.4), plast('#26323e'), disk);
-    const et = duk(264, 176, (c, w, h) => {
+    mesh(new RB(9.4, 0.9, 9.4, 1, 0.12), plast('#26323e'), disk);
+    mesh(new THREE.BoxGeometry(5.2, 0.06, 3), mat('#b9bcc0', { metalness: 0.9, roughness: 0.35 }), disk, false).position.set(0.4, 0.47, -3.2);
+    const et = duk(264, 176, (c) => {
       c.fillStyle = '#f2ead4';
-      c.fillRect(0, 0, w, h);
+      c.fillRect(0, 0, 264, 176);
       c.fillStyle = '#2b4bb0';
       c.font = '34px "Skrivmaskin", "Courier New", monospace';
       c.fillText('REGISTER', 14, 60);
@@ -232,7 +515,7 @@ export async function dator(o) {
     });
     const e = mesh(new THREE.PlaneGeometry(6.6, 4.4), mat('#ffffff', { map: et, roughness: 0.9 }), disk, false);
     e.rotation.x = -90 * DEG;
-    e.position.set(0, 0.46, -1.2);
+    e.position.set(0, 0.46, 1.6);
   }
 
   // ---------- skärmen i rummet ----------
@@ -310,7 +593,7 @@ export async function dator(o) {
 
   // Skärmens mitt och normal i världen
   pc.updateMatrixWorld(true);
-  const MITT = new THREE.Vector3(0, SK.y, D / 2 + 1.2).applyMatrix4(pc.matrixWorld);
+  const MITT = new THREE.Vector3(0, 0, 0.9).applyMatrix4(sg.matrixWorld);
   const NORMAL = new THREE.Vector3(Math.sin(YAW), 0, Math.cos(YAW));
   // Kameran rakt framför skärmen: läge, vridning och rektangel (mitt på
   // axeln, med skärmens mitt där NARA.mitt säger)
