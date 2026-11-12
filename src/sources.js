@@ -18,6 +18,7 @@ const { readCache, CACHE_DIR } = require('./store');
 
 const VERIFIED = '2026-10-17';
 const ODDS_WINDOW_DAYS = 7;
+const EUROPE_ODDS_RETRY_DAYS = 7;
 
 const SOURCES = [];
 
@@ -112,6 +113,47 @@ SOURCES.push({
     const events = upcomingEvents(ODDS_WINDOW_DAYS);
     if (events === null) throw new Error('inget spelprogram i cachen än');
     return espn.fetchOdds(events);
+  },
+  summarize: (d) => ({
+    n: Object.keys(d.byEvent).length,
+    detail: `${Object.keys(d.byEvent).length} av ${d.requested} matcher har odds`,
+  }),
+});
+
+// Odds för spelade Europamatcher med ett engelskt lag: ur dem räknas det
+// utländska lagets styrka i formen (strengthFromOdds i src/strength.js) –
+// modellen känner bara lagen i England. Läser sin egen förra hämtning, så att
+// en match bara hämtas en gång; en match utan odds frågas om i en vecka
+// efter avspark, sedan inte mer.
+SOURCES.push({
+  id: 'espn_odds_europa',
+  provider: 'ESPN (DraftKings)',
+  short: 'DraftKings',
+  label: 'Odds 1X2 för spelade Europamatcher (motståndets styrka i formen)',
+  comps: ['pl', 'fac', 'lc'],
+  kinds: ['europe'],
+  maxAgeHours: 3,
+  staleAfterHours: 24,
+  verified: '2026-11-12',
+  // Läser spelprogrammen ur cachen – körs därför i andra steget.
+  stage: 2,
+  fetch: async () => {
+    const all = playedEurope();
+    if (all === null) throw new Error('inget spelprogram i cachen än');
+    const prev = readCache('espn_odds_europa');
+    const old = (prev && prev.data) || {};
+    const ids = new Set(all.map((e) => e.id));
+    const byEvent = Object.fromEntries(Object.entries(old.byEvent || {}).filter(([id]) => ids.has(id)));
+    const without = new Set(old.missing || []);
+    const now = Date.now();
+    const ask = all.filter((e) => !byEvent[e.id]
+      && (!without.has(e.id) || now - Date.parse(e.kickoff) < EUROPE_ODDS_RETRY_DAYS * 86400000));
+    const got = await espn.fetchOdds(ask, { tolerant: true });
+    if (ask.length && got.failed.length === ask.length) throw new Error('ESPN svarade inte för någon av matcherna');
+    Object.assign(byEvent, got.byEvent);
+    const asked = new Set(ask.filter((e) => !got.failed.includes(e.id)).map((e) => e.id));
+    const missing = all.filter((e) => !byEvent[e.id] && (without.has(e.id) || asked.has(e.id))).map((e) => e.id);
+    return { byEvent, missing, requested: all.length };
   },
   summarize: (d) => ({
     n: Object.keys(d.byEvent).length,
@@ -392,6 +434,30 @@ function upcomingEvents(days) {
     }
   }
   return any ? out : null;
+}
+
+// Spelade Europamatcher med minst ett engelskt ligalag, ur cachen (ESPN:s
+// lag-id är samma i alla turneringar). Ligakoden för huvudturneringen svarar
+// också för kvalmatcherna (verifierat 2026-11-12). null = inget spelprogram
+// cachat än.
+function playedEurope() {
+  const english = new Set();
+  let any = false;
+  for (const c of COMPETITIONS.filter((x) => x.type === 'league')) {
+    const cache = readCache(`espn_fixtures_${c.id}`);
+    if (!cache || !cache.data) continue;
+    any = true;
+    for (const m of cache.data.matches) for (const t of [m.home, m.away]) if (t && t.espnId) english.add(t.espnId);
+  }
+  if (!any) return null;
+  const out = [];
+  for (const c of EUROPE) {
+    const cache = readCache(`espn_europe_${c.id}`);
+    for (const m of (cache && cache.data && cache.data.matches) || []) {
+      if (m.completed && (english.has(m.home.espnId) || english.has(m.away.espnId))) out.push({ slug: c.espn, id: m.id, kickoff: m.kickoff });
+    }
+  }
+  return out;
 }
 
 // Trupper och spelarstatistik per liga (src/playersources.js).

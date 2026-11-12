@@ -138,12 +138,24 @@ async function fetchStandings(slug) {
 // Odds (DraftKings via ESPN) för kommande matcher. Finns bara i
 // matchsammanfattningen, ett anrop per match. Amerikanska odds räknas om
 // till decimalodds; inget annat görs med dem här (marginalen tas bort i
-// prognosmotorn).
-async function fetchOdds(events) {
+// prognosmotorn). Oddsen ligger kvar i sammanfattningen efter matchen
+// (verifierat 2026-11-12, tillbaka till augusti) – så hämtas oddsen för
+// spelade Europamatcher (espn_odds_europa i src/sources.js). tolerant: en
+// match som inte svarar hamnar i failed (matchernas id) i stället för att
+// fälla alla.
+async function fetchOdds(events, { tolerant = false } = {}) {
   const byEvent = {};
   let missing = 0;
+  const failed = [];
   await mapLimit(events, 4, async ({ slug, id }) => {
-    const j = await getJson(`${SITE}/${slug}/summary?event=${id}`);
+    let j;
+    try {
+      j = await getJson(`${SITE}/${slug}/summary?event=${id}`);
+    } catch (err) {
+      if (!tolerant) throw err;
+      failed.push(id);
+      return;
+    }
     const o = Array.isArray(j.odds) ? j.odds.find(Boolean) : null;
     const h = o && o.homeTeamOdds && o.homeTeamOdds.moneyLine;
     const a = o && o.awayTeamOdds && o.awayTeamOdds.moneyLine;
@@ -161,7 +173,7 @@ async function fetchOdds(events) {
       under: o.underOdds != null ? decimal(o.underOdds) : null,
     };
   });
-  return { byEvent, requested: events.length, missing };
+  return { byEvent, requested: events.length, missing, ...(tolerant ? { failed } : {}) };
 }
 
 function decimal(american) {

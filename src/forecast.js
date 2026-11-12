@@ -679,7 +679,7 @@ function forecastAll({ now = new Date() } = {}) {
   // skattning; fallerar den saknas bara den.
   let strength = null;
   try {
-    strength = strengthTable({ ctx, specs, fitAt: (day) => fitAt(ctx, day) });
+    strength = strengthTable({ ctx, specs, fitAt: (day) => fitAt(ctx, day), lower: LOWER });
   } catch (err) {
     console.error('[forecast] styrkan:', err);
   }

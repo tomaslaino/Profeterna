@@ -16,6 +16,7 @@ const { readCache, CACHE_DIR } = require('./store');
 const { SOURCES, ODDS_WINDOW_DAYS } = require('./sources');
 const { keyOf, espnKey } = require('./teams');
 const { newsSv } = require('./skadetext');
+const { strengthFromOdds } = require('./strength');
 
 const FORM_N = 5;
 // Matchbladet i rummet (sidan Lagen i rum-matchblad.js): de tio senaste matcherna.
@@ -145,6 +146,10 @@ function build() {
     }
   }
   europe.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+  // Oddsen för de spelade Europamatcherna: det utländska lagets styrka i
+  // formen (opponentStrength).
+  const eo = readCache('espn_odds_europa');
+  const europeOdds = (eo && eo.data && eo.data.byEvent) || {};
 
   return {
     matches,
@@ -153,6 +158,7 @@ function build() {
     teamLeague,
     fixturesFetchedAt,
     europe,
+    europeOdds,
     europeFetchedAt,
     referees,
     fd,
@@ -521,7 +527,8 @@ function teamProfile(D, k, before, S = null) {
   // Form: senaste matcherna i alla tävlingar före avspark (även Europa),
   // avgjorda på 90 minuter (straffavgjorda cupmatcher räknas som oavgjorda).
   // Motståndets styrka är modellens senaste skattning, inte den vid matchen
-  // (som tabellen en ögonblicksbild).
+  // (som tabellen en ögonblicksbild); för lag utanför England räknas den ur
+  // matchens odds.
   const cal = calendar(D, k);
   const xgSrc = xgSource(D, leagueId);
   const form = cal.filter((x) => x.completed && x.kickoff < before).map((x) => {
@@ -536,7 +543,7 @@ function teamProfile(D, k, before, S = null) {
       gf, ga,
       result: gf == null ? null : gf > ga ? 'V' : gf < ga ? 'F' : 'O',
       decided: x.shootout ? 'straffar' : x.status === 'STATUS_FINAL_AET' ? 'förlängning' : null,
-      opp: opponentStrength(D, S, leagueId, x.oppKey),
+      opp: opponentStrength(D, S, leagueId, k, x),
       xg: x.comp === leagueId && xgSrc ? xgSrc.of(x.home ? k : x.oppKey, x.home ? x.oppKey : k, x.home) : null,
     };
   });
@@ -610,6 +617,7 @@ function calendar(D, k) {
     if (m.hk !== k && m.ak !== k) return;
     const home = m.hk === k;
     out.push({
+      id: m.id, neutral: !!m.neutral,
       kickoff: m.kickoff, comp: m.comp, europe, home,
       opponent: home ? m.away.name : m.home.name,
       oppKey: home ? m.ak : m.hk,
@@ -664,36 +672,69 @@ function schedule(D, cal, before, leagueId) {
 }
 
 // Modellens styrka per lag och, per liga, ligans styrkor starkast först.
+// National League är med (lagen där är motstånd i FA-cupen och har sin egen
+// skala när de själva spelar), liksom nivån under den och det som behövs för
+// att räkna ett utländskt lags styrka ur oddsen (src/strength.js).
 function strengthIndex(D, strength) {
   if (!strength || !strength.list || !strength.list.length) return null;
   const rating = new Map(strength.list.map((t) => [t.key, t.rating]));
+  const league = new Map(D.teamLeague);
+  for (const t of strength.nl || []) {
+    if (rating.has(t.key)) continue;
+    rating.set(t.key, t.rating);
+    league.set(t.key, 'nl');
+  }
   const byLeague = new Map();
   for (const [k, r] of rating) {
-    const l = D.teamLeague.get(k);
+    const l = league.get(k);
     if (!l) continue;
     if (!byLeague.has(l)) byLeague.set(l, []);
     byLeague.get(l).push(r);
   }
   for (const rs of byLeague.values()) rs.sort((a, b) => b - a);
-  return { rating, byLeague };
+  return {
+    rating, byLeague, league,
+    params: new Map(strength.list.filter((t) => t.a > 0 && t.b > 0).map((t) => [t.key, t])),
+    under: strength.under != null ? strength.under : null,
+    scale: strength.scale || null,
+  };
 }
 
 // Motståndet i en formmatch: level 0–1 från den egna ligans svagaste lag till
-// dess starkaste (lag från andra divisioner hamnar i ändarna), och platsen i
-// sin egen liga efter modellens styrka (rank av of). null när styrkan är
-// okänd (lag utanför de fyra ligorna, t.ex. i Europacuperna).
-function opponentStrength(D, S, leagueId, oppKey) {
-  const r = S && oppKey ? S.rating.get(oppKey) : null;
+// dess starkaste (lag från andra divisioner och från utlandet hamnar i ändarna
+// när de är svagare eller starkare än så), och platsen i sin egen liga efter
+// modellens styrka (rank av of). k = det egna laget, x = matchen ur calendar().
+//
+// Styrkan kommer ur modellen för lagen i Premier League–National League. Lag
+// under National League (FA-cupen) har nivåns gemensamma styrka, som i
+// prognoserna (by: 'nivå'). Lag utanför England (Europacuperna) får styrkan
+// ur matchens odds (by: 'odds'). null när styrkan är okänd: laget har för få
+// matcher i modellen, eller Europamatchen saknar odds.
+function opponentStrength(D, S, leagueId, k, x) {
+  if (!S) return null;
+  const oppKey = x.oppKey;
+  let r = oppKey ? S.rating.get(oppKey) : null;
+  let by = null;
+  if (r == null && x.europe && !oppKey) {
+    const o = x.id ? D.europeOdds[x.id] : null;
+    r = o ? strengthFromOdds(S.scale, S.params.get(k), { home: x.home, neutral: x.neutral }, [o.home, o.draw, o.away]) : null;
+    by = 'odds';
+  } else if (r == null && oppKey && (x.comp === 'fac' || x.comp === 'lc') && !D.teamLeague.has(oppKey) && !inNationalLeague(D, oppKey)) {
+    r = S.under;
+    by = 'nivå';
+  }
   if (r == null) return null;
   const own = S.byLeague.get(leagueId);
-  const theirs = S.byLeague.get(D.teamLeague.get(oppKey));
+  const theirLeague = by ? null : S.league.get(oppKey);
+  const theirs = theirLeague ? S.byLeague.get(theirLeague) : null;
   const top = own && own[0];
   const bottom = own && own[own.length - 1];
   return {
     level: own && top > bottom ? Math.round(100 * Math.min(1, Math.max(0, (r - bottom) / (top - bottom)))) / 100 : null,
     rank: theirs ? theirs.indexOf(r) + 1 : null,
     of: theirs ? theirs.length : null,
-    league: theirs ? competition(D.teamLeague.get(oppKey)).name : null,
+    league: theirs ? competition(theirLeague).name : null,
+    ...(by ? { by } : {}),
   };
 }
 
