@@ -39,13 +39,18 @@ const POS = { x: 1104, y: -490, z: 377 };
 const YAW = -38 * DEG;
 // skärmen (4:3) och dess mitt över disken
 const SK = { w: 32, h: 24, y: 39.5 };
-// närbilden: hur stor del av fönstret skärmen tar och var dess mitt står
-// (andel av höjden), och kamerans synfält där. I en stående telefon fyller
-// skärmen höjden mellan rubrikraden (topp) och fönstrets nederkant (fot, px;
-// fotBred i ett stående fönster som inte är smalt, där Tillbaka står nertill).
+// närbilden: hur stor del av fönstret skärmen tar och var dess mitt står,
+// och kamerans synfält där. På datorn fyller skärmen höjden under namnet
+// (toppNamn där det står, i smalare fönster än 8/5) och ovanför Tillbaka
+// (fot, px; fotKort med Dölj resultat, där Visa ändå står under skärmen),
+// högst max px hög (texten blir då omkring 30 px) och bred av bredden: förut
+// tog den två tredjedelar av höjden, och på en bärbar blev texten 17–22 px.
+// I en stående telefon fyller skärmen höjden mellan rubrikraden (topp) och
+// fönstrets nederkant (fot, px; fotBred i ett stående fönster som inte är
+// smalt, där Tillbaka står nertill).
 // I ett lågt fönster (en liggande telefon) fyller den också höjden under
 // rubrikraden, men hela skärmen syns.
-const NARA = { bred: 0.6, hog: 0.66, mitt: 0.47, fov: 24 * DEG };
+const NARA = { bred: 0.86, topp: 60, toppNamn: 100, fot: 56, fotKort: 132, max: 760, fov: 24 * DEG };
 const NARA_TEL = { topp: 60, fot: 14, fotBred: 60, fov: 30 * DEG };
 const NARA_LAG = { bred: 0.9, topp: 56, fot: 10, fov: 24 * DEG };
 // raderna på skärmen i rummet (skärmbildens px, 1024 × 768)
@@ -620,12 +625,23 @@ export async function dator(o) {
     const N = tel ? NARA_TEL : lag ? NARA_LAG : NARA;
     const h = 2 * E * Math.tan(N.fov / 2);
     const w = (h * innerWidth) / innerHeight;
-    // telefonen: skärmens höjd är fönstrets utom rubrikraden och lite luft nertill
-    const fot = tel && !smal() ? N.fotBred : N.fot;
-    const hog = tel || lag ? Math.max(0.5, (innerHeight - N.topp - fot) / innerHeight) : N.hog;
-    const mitt = tel || lag ? N.topp / innerHeight + hog / 2 : N.mitt;
-    // avståndet där skärmen tar NARA.bred av bredden och högst NARA.hog av
-    // höjden (den stående telefonen: hela höjden, hur bred skärmen än blir)
+    // telefonen: skärmens höjd är fönstrets utom rubrikraden och lite luft
+    // nertill; datorn: mellan namnet och Tillbaka, högst NARA.max
+    const dator = !tel && !lag;
+    const topp = dator && !matchMedia('(min-aspect-ratio: 8/5)').matches ? N.toppNamn : N.topp;
+    let fot = tel && !smal() ? N.fotBred : dator && window.Spoiler && Spoiler.on() ? N.fotKort : N.fot;
+    let plats = innerHeight - topp - fot;
+    // Tillbaka står nere till höger: når skärmen med sin svarta ram (4,5 %
+    // av höjden runt om) in under det slutar ramen ovanför
+    const G = Math.min(N.max, plats);
+    if (dator && innerWidth / 2 + G * (2 / 3 + 0.045) > innerWidth - 140) {
+      fot = Math.max(fot, 60 + 0.045 * G);
+      plats = innerHeight - topp - fot;
+    }
+    const hog = Math.max(0.5, (dator ? Math.min(N.max, plats) : plats) / innerHeight);
+    const mitt = dator ? (topp + plats / 2) / innerHeight : topp / innerHeight + hog / 2;
+    // avståndet där skärmen tar högst NARA.bred av bredden och hog av höjden
+    // (den stående telefonen: hela höjden, hur bred skärmen än blir)
     const d = tel ? (SK.h * E) / (hog * h) : Math.max((SK.w * E) / (N.bred * w), (SK.h * E) / (hog * h));
     const pos = MITT.clone().addScaledVector(NORMAL, d);
     const m = new THREE.Matrix4().lookAt(pos, MITT, new THREE.Vector3(0, 1, 0));

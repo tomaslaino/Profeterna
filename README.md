@@ -6278,7 +6278,12 @@ Ett klick eller R: datorn står kvar, och kameran svänger fram och ställer sig
 skärmen medan rummet mörknar bakom – närbilden är en egen duk över hela fönstret, och
 svängen börjar i samma perspektiv som rummet. Där tar terminalen (HTML) över skärmen, med
 linjer och mörka hörn som på ett bildrör och en blinkande markör. Texten är så stor att 20
-rader ryms, och det som inte ryms rullar. I en stående telefon går kameran närmare, tills
+rader ryms, och det som inte ryms rullar. På datorn fyller skärmen höjden mellan namnet (där
+det står) och Tillbaka, med hela den svarta ramen och en rand av höljet runt om, högst 760 px
+hög (`NARA` i rum-dator.js): förut tog den två tredjedelar av höjden, och texten var 21,6 px i
+ett fönster som en bärbar dators (1470 × 833), nu 28 (1280 × 633: 17 → 20, 1920 × 1083: 30).
+Med Dölj resultat står skärmen lite högre, så att *Visa ändå* får plats under den, och når
+ramen in under Tillbaka slutar den ovanför. I en stående telefon går kameran närmare, tills
 skärmen fyller höjden under rubrikraden och dess sidor ligger utanför bilden: terminalen går
 från kant till kant med så stor text som 40 tecken på raden tillåter (omkring 23 px i en
 telefon som är 412 px bred, mot 17 förut, då skärmen bara tog en dryg tredjedel av höjden
