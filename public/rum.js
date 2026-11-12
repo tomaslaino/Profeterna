@@ -3026,11 +3026,27 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // kortlådan) en i taget i ordning, och först när rummet syns: var och en
   // tar ett par hundra MB medan den startar (shaders, texturer, ljuset), och
   // alla på en gång medan rummet ritades var för mycket för en iPhone. På
-  // datorn startar de på en gång som förut.
+  // datorn startar gänget, inredningen och sakerna på en gång som förut, men
+  // datorn på disken (ordning 3, SIST) först när de står där: den monteras
+  // med rummet och började annars före gänget – femton grafikprogram och
+  // 25 MB texturer som grafikkortet tog itu med medan rummet ännu var mörkt
+  // och väntade på gänget (tand).
   // tur(fn, ordning) → fn():s löfte
   const TUR = [];
+  const SIST = 3;
+  const SENA = [];
+  const efterGanget = new Promise((r) => { R.gangKlart = r; });
   function tur(fn, ordning = 0) {
     if (R.ej3d) return Promise.reject(new Error('grafikkortet har hängt sig'));
+    if (!LATT && ordning >= SIST) {
+      // (en stund efter att gänget har ritats, så att de första bilderna av det går före)
+      const p = efterGanget.then(() => new Promise((r) => setTimeout(r, 300))).then(() => {
+        if (R.ej3d) throw new Error('grafikkortet har hängt sig');
+        return fn();
+      });
+      SENA.push(p.catch(() => {}));
+      return p;
+    }
     if (!LATT) return fn();
     return new Promise((res, rej) => {
       TUR.push({ fn, ordning, res, rej });
@@ -3040,7 +3056,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
   // → när alla har startat (för en fast bild)
   const TOM = [];
-  const turTom = () => (LATT && (R.turGar || TUR.length) ? new Promise((r) => TOM.push(r)) : Promise.resolve());
+  const turTom = () => (LATT ? (R.turGar || TUR.length ? new Promise((r) => TOM.push(r)) : Promise.resolve()) : Promise.all(SENA));
   async function nasta() {
     if (R.turGar || !R.turStart) return;
     if (!TUR.length) {
@@ -3095,11 +3111,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.fig || R.loading) return;
     R.loading = true;
     // askkoppen, snusdosan, fläkten och löpsedlarna (rum-saker.js, rum-affischer.js)
-    tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
-      .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err));
+    const andra = [];
+    andra.push(tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
+      .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err)));
     // lysröret, neonen, skyltarna, skivan, uret, ramarna, paketen och kupongstället (rum-inredning.js)
-    tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
-      .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err));
+    andra.push(tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
+      .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err)));
     try {
       await tur(async () => {
         const mod = await import('./rum-3d.js');
@@ -3125,6 +3142,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // utan WebGL eller utan nätet står rummet kvar utan gänget
       console.warn('Rummet: figurerna kunde inte ritas', err);
     }
+    // nu datorn (tur): gänget står där, eller kommer inte, och de andra två är klara
+    Promise.all(andra).then(R.gangKlart);
     turTom().then(() => setTimeout(slappBilder, still() ? 0 : 1000));
   }
 

@@ -484,6 +484,11 @@ blir mer ansträngt för datorer o mobiler").
   `del-….js`. Bara `index.html` pekar på buntarna – alla filer ligger kvar under sina egna namn för de
   andra sidorna. Går en del inte att bunta står den delen kvar som förut. Listan över det som förhämtas
   till rummet (`RUM_FORHAMTA` i [public/index.html](public/index.html)) räknas om av bygget.
+- **Datorn på disken startar sist, också i datorn** (2026-11-12, användarens önskemål: "Starta gänget
+  först och datorn sist"): i telefonen startade 3D-delarna redan en i taget med gänget först (`tur` i
+  [public/rum.js](public/rum.js)), men i datorn började datorn på disken före gänget, eftersom den
+  monteras med rummet – femton grafikprogram och 25 MB texturer medan rummet ännu var mörkt och väntade
+  på gänget. Nu väntar den tills gänget, inredningen och sakerna står där.
 - **Typsnitten** ligger i [public/typsnitt/](public/typsnitt/) med reglerna i
   [public/typsnitt.css](public/typsnitt.css), som varje sida länkar först. Det är samma woff2-filer
   och samma `@font-face`-regler (vikter, `unicode-range`, `font-display: swap`) som Google Fonts
