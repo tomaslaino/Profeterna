@@ -74,6 +74,10 @@
 .reg-mark { position: absolute; top: 0.08em; left: 2ch; width: 1ch; height: 0.95em; background: var(--gron); box-shadow: 0 0 0.3em rgba(65, 255, 110, 0.5); animation: reg-blink 1.06s steps(1) infinite; }
 @keyframes reg-blink { 50% { opacity: 0; } }
 
+/* ÅTKOMST BEVILJAD i sökraden en stund, när en träff öppnas */
+.rum-regn.beviljad .reg-in::after { content: 'ÅTKOMST BEVILJAD'; position: absolute; left: 6ch; top: 0; padding: 0 0.5ch; margin-left: -0.5ch; background: var(--gron); color: #010702; text-shadow: none; }
+.rum-regn.beviljad .reg-mark { visibility: hidden; }
+
 /* Visa ändå (dolda resultat), under skärmen */
 .reg-rad { position: absolute; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; }
 .reg-rad .sp-card { margin: 0; pointer-events: auto; }
