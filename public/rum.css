@@ -776,6 +776,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum.i-handen .rum-warm, .rum.i-handen .rum-vign { opacity: 0.35; }
 /* nära något ska det gå att läsa, också på kvällen när rummet är mörkare (ljusKlockan) */
 .rum.tv-nara .rum-vign, .rum.vid-nara .rum-vign, .rum.sak-nara .rum-vign { opacity: 0.6; }
+/* och lampornas färger ligger still i bilden medan kameran går fram: nära tv:n
+   färgade neonens rött rutans övre vänstra hörn */
+.rum.tv-nara .rum-warm { opacity: 0.4; }
 /* pennan har följt med kupongen ur högen */
 .rum.i-handen #rum-kupong .pencil { visibility: hidden; }
 

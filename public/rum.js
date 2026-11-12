@@ -4023,12 +4023,31 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // frontens och panelens högerkant likaså. Närmare än nara bildpunkter per
   // mått går kameran inte – så skarp ritas tv:n nära i telefonen (.skarp i
   // rum-tv.css).
-  const TV_BILD = { b: 292, text: 176, glas: 144, ner: 155, dx: -27, dy: -3, panel: 134, nara: 2.6 };
+  const TV_BILD = { b: 292, h: 196, text: 176, glas: 144, ner: 155, dx: -27, dy: -3, panel: 134, nara: 2.6 };
+  const TV_DATOR = 4;
   function aimTv(cls) {
-    const { c, b, h } = R.tvMatt;
+    const { c, b } = R.tvMatt;
     if (!matchMedia('(max-width: 700px), (max-height: 500px)').matches) {
-      const z = Math.min(3.6, (innerWidth - 24) / (b * R.k), (innerHeight - 110) / (h * R.k));
-      aim(c, z, mid(0.5, 0.48), cls);
+      // På datorn fyller fronten höjden under namnet (som bara står där i
+      // smalare fönster, rum.css), högst TV_DATOR bildpunkter per mått:
+      // förut stannade kameran tidigare, och på en bärbar blev en rad
+      // text-tv tolv till fjorton bildpunkter hög. Skarpare än så ritas den
+      // inte nära (.skarp i rum-tv.css).
+      const [bred, hog] = [innerWidth, innerHeight];
+      const topp = matchMedia('(min-aspect-ratio: 8/5)').matches ? 28 : 72;
+      let px = Math.min(TV_DATOR, (bred - 48) / TV_BILD.b, (hog - topp - 36) / TV_BILD.h);
+      let y = topp + (hog - topp - 36) / 2;
+      // Tillbaka står nere till höger: når hyllan under tv:n dit (152 mått åt
+      // sidan och 106 ner från frontens mitt) slutar den ovanför eller före
+      if (bred / 2 + 152 * px > bred - 140 && y + 106 * px > hog - 60) {
+        const fore = (bred / 2 - 140) / 152;
+        const ovan = (hog - topp - 60) / 204;
+        if (ovan >= fore) {
+          px = Math.min(px, ovan);
+          y = Math.min(y, hog - 60 - 106 * px);
+        } else px = fore;
+      }
+      aim(c, px / ((b / TV_BILD.b) * R.k), mid(0.5, y / hog), cls);
       return;
     }
     const T = TV_BILD;

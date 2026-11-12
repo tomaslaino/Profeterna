@@ -146,13 +146,19 @@
   pointer-events: none;
   background: radial-gradient(closest-side, rgba(120, 150, 255, 0.15), rgba(120, 150, 255, 0.05) 55%, rgba(120, 150, 255, 0));
   transition: opacity 0.5s;
+  /* På väggen bakom tv:n (z -127, väggen är -130 här), förstorat kring
+     scenens mitt (800, 500) så att det syns på samma ställe som i planet:
+     (1400 + 470 + 127) / (1400 + 470). I planet låg det framför lådan och
+     lade ett blått dis över rutan, så att texten blev grå. */
+  transform-origin: 0 0;
+  transform: translate3d(-200px, 560px, -127px) scale(1.0679) translate(200px, -560px);
 }
 .tv-sken.av { opacity: 0; }
 /* i telefonen en fjärdedel så stort och förstorat: Safari ritar ett lager i
    dess egen storlek (inte i den förstorade) gånger pixeltätheten, och
    skenet är suddigt ändå */
 @media (max-width: 700px), (max-height: 500px) {
-  .tv-sken { width: 155px; height: 120px; transform: scale(4); transform-origin: 0 0; }
+  .tv-sken { width: 155px; height: 120px; transform: translate3d(-200px, 560px, -127px) scale(1.0679) translate(200px, -560px) scale(4); }
 }
 
 /* ---------- fronten ---------- */

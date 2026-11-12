@@ -5974,9 +5974,11 @@ syns och följer musen, bildrörets kåpa med luftspringor bakom och kaninörone
 en bit folie på det ena. Armen går från leden mitt bak till en väggplatta, och sladden
 hänger i en båge från armen till ett uttag under plattan; armen står still när tv:n vrids
 kring leden. Allt är förminskat mot väggen, så att tv:n inte sticker ut så långt i rummet,
-och nära zoomar kameran in lite mer (3,6). Rutan är lite buktig med rundade hörn, svepljus
+och nära går kameran fram tills fronten fyller fönstret (nedan). Rutan är lite buktig med rundade hörn, svepljus
 och ett svagt ljusband som rullar nedför glaset, i en svart ram med en silverlist, och den
-lyser blått på väggen. Under rutan står Panasonic. Till höger sitter panelen i en svart
+lyser blått på väggen. Skenet ligger på väggen bakom tv:n (z -127 i planet, väggen är -130),
+förstorat kring scenens mitt så att det syns på samma ställe som förut; i planet låg det framför
+lådan och lade ett blått dis över rutan, så att den vita texten blev grå. Under rutan står Panasonic. Till höger sitter panelen i en svart
 nisch: en grön sifferdisplay med sidnumret, knappsatsen med runda grå knappar (1–9 och
 ▼ 0 ▲ längst ner, pilarna ljusare), högtalargallret med springor och strömbrytaren med
 lampan, och under den FASTEXT – snabbvalen i fyra färger.
@@ -6040,6 +6042,13 @@ text-tv:n suddig på nära håll. På håll ritas den i sin egen storlek: Chrome
 perspektiv minst i dess egen storlek hur litet det än syns, så i tre gånger storleken tog tv:n
 ungefär 60 MB grafikminne också på håll. Storleken byts med vridningen avstängd (`.skarp` på
 `.rum-tvpos`, `zoom` i rum-tv.js): innan tv:n vrids fram och när den har vridits tillbaka.
+På datorn fyller fronten höjden under namnet (där det står), högst fyra bildpunkter per mått i
+lådan (`TV_DATOR` i rum.js), och når hyllan under tv:n in under Tillbaka slutar den ovanför.
+Förut stannade kameran vid 3,6 gånger scenen, och i ett fönster som en bärbar dators var en rad
+text-tv 14 bildpunkter hög (1470 × 833); nu är den 21 (1280 × 633: 12 → 15, 1920 × 1083: 18 → 21).
+Fyra bildpunkter per mått är skarpt med täthet 2 och nästan skarpt med täthet 1. Nära tv:n är
+lampornas färger (`.rum-warm`) svagare, som vinjetten: de ligger still i bilden medan kameran går
+fram, och neonens rött färgade rutans övre hörn.
 I telefonen ritas den 1,5 gånger så stor på håll och 2,5 gånger nära. Där går kameran fram till
 bilden och inte till hela lådan (`aimTv`, `TV_BILD` i rum.js): med hela tv:n i bild var en rad
 text-tv sju bildpunkter hög på höjden och gick knappt att läsa. På höjden fyller de fyrtio
