@@ -25,7 +25,15 @@
    streck, som omslagets datum: lagen över texten, Sammanfattning, Källorna, Krönika, Kåseri, Vid sidan av) och
    brödtexten. Kursiv bara för citaten. En sorts ruta, omslagets: sammanfattningen står utan ruta. Skisserna som inte
    valdes: B Blanketten (allt innehåll maskinskrivet på förtryckt papper, som kupongen) och C Magasinet (vänsterställt
-   mot en marginalspalt med nummer och sköldar, ingen ram). */
+   mot en marginalspalt med nummer och sköldar, ingen ram).
+
+   Lättare att läsa (2026-11-12, användarens önskemål: tidningen ska bli "lättare och skönare att läsa genom den grafiska
+   designen och kanske något kortare text", och sedan: "Vi har inte så mycket tid på oss när vi fattar de där besluten"):
+   texten är kortare och har ingen introduktion (config/poddar.js), och formen är Rent tryck (A bland tre skisser; B En
+   kant och C Med pennan valdes inte). Mätt i numret 14/11: papperets moln gjorde att ytor om 40 px under texten skilde
+   21 % i ljushet, prickarna låg över 6,6 % av textytan, brödtexten var 16 px och källorna 11,5–12 px i grått. Nu står
+   texten på rent papper (bara fibrerna och de gulnade kanterna), brödtexten är 17 px, det maskinskrivna under texten
+   är minst 12,5 px i nästan fullt bläck, och luften har tre steg: inom en del, mellan etikett och text, mellan delar. */
 html.hg-html { background: #1a1510; }
 body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: border-box;
   background: radial-gradient(120% 70% at 50% 0%, #2c241b 0%, #1a1510 60%) fixed, #1a1510; font-synthesis: none; -webkit-text-size-adjust: 100%; }
@@ -62,6 +70,11 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hg-ark::before, .hg-kupong::before { content: ""; position: absolute; inset: calc(var(--hg-k) * 2.4px); z-index: 1; border: var(--linje) solid var(--rod); pointer-events: none; }
 .hg-ark::after, .hg-kupong::after { content: ""; position: absolute; inset: 0; z-index: 3; background: var(--p); pointer-events: none;
   -webkit-mask: var(--prickar) 0 0 / 90px 90px, var(--flackar) 0 0 / 140px 140px; mask: var(--prickar) 0 0 / 90px 90px, var(--flackar) 0 0 / 140px 140px; }
+/* Sidorna med löpande text (matchbladen och sista sidan) har rent papper under texten: fibrerna och de gulnade
+   kanterna är kvar, men inte buktorna (mörka moln under raderna, och en skarv där bilden tar slut) och inte prickarna
+   och fläckarna, som låg över bokstäverna. Omslaget och innehållet har kvar sitt slitage. */
+.hg-sida { background: var(--fiber) 0 0 / 150px 150px, var(--p); }
+.hg-sida::after { display: none; }
 /* Sidhuvudet, som omslagets översta rad: maskinskrivet över ett tryckt streck, också namnet (.hg-folio på
    matchbladen och sista sidan, .hg-i-hd på innehållet). */
 .hg-folio, .hg-i-hd { display: flex; align-items: baseline; gap: calc(var(--hg-k) * 2px); padding: calc(var(--hg-k) * 1.1px) 0 calc(var(--hg-k) * 1.5px);
@@ -135,7 +148,7 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 .hg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.08) brightness(0.97); mix-blend-mode: multiply; }
 .hg-foto.video img { transform: scale(1.8); transform-origin: 0 12%; }
 .hg-bild figcaption { margin-top: 5px; font: 400 13px/1.35 var(--tryck); color: var(--gra); }
-.hg-bild figcaption span { font: 400 11.5px/1.35 var(--skriv); font-style: normal; }
+.hg-bild figcaption span { color: rgba(34, 31, 27, 0.86); font: 400 12.5px/1.35 var(--skriv); font-style: normal; }
 .hg-bild figcaption a { color: inherit; text-decoration-color: var(--streck); text-underline-offset: 2px; }
 
 /* ---------- innehållet ---------- */
@@ -219,34 +232,38 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
    med lite text, som när lagen stod i två spalter bredvid varandra (Sköldarna möts, före Tavlan). Sist
    sammanfattningen och källorna per lag. Texten har anfang, avstavning och en jämn högerkant så långt det går (text-wrap:
    pretty): det ska vara en njutning att läsa. Ett tryck: lagets namn (och Hemma eller Borta) som etikett mellan två
-   streck, introduktionen rak och centrerad, sammanfattningen utan ruta och citatet det enda kursiva. */
-.hg-ingress { margin: 0 auto 26px !important; max-width: 31em; font: 400 18.5px/1.5 var(--tryck); text-align: center; hyphens: auto; -webkit-hyphens: auto; text-wrap: balance; }
+   streck, sammanfattningen utan ruta och citatet det enda kursiva. Lättare att läsa: brödtexten 17 px, inga avstavade
+   korta ord, namnen halvfeta. Bladen har ingen introduktion längre (lagen börjar 30 px under rubriken); står det en i
+   ett äldre blad är den vänsterställd som resten av texten. */
+.hg-ingress { margin: 0 0 36px !important; font: 400 19.5px/1.45 var(--tryck); text-align: left; hyphens: manual; -webkit-hyphens: manual; text-wrap: pretty; }
+.hg-rub + .hg-lagen { margin-top: 30px; }
 .hg-lagdel + .hg-lagdel { margin-top: 30px; }
-.hg .hg-lagdel h3 { margin-bottom: 18px; }
+.hg .hg-lagdel h3 { margin-bottom: 14px; }
 /* lagets namn och Hemma eller Borta i en och samma rad, som bryts mellan dem när namnet är långt (telefonen) */
 .hg .hg-lagdel h3 span { flex: 0 1 auto; text-wrap: balance; }
 .hg .hg-lagdel h3 em { margin: 0; font: inherit; letter-spacing: inherit; white-space: nowrap; }
 .hg .hg-lagdel h3 em::before { content: "· "; }
-.hg-lagtext p { margin: 0 0 12px !important; font: 400 16px/1.6 var(--serif); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
+.hg-lagtext p { margin: 0 0 13px !important; font: 400 17px/1.6 var(--serif); hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 7 3 3; text-wrap: pretty; }
 .hg-lagtext p:last-child { margin-bottom: 0 !important; }
-.hg-lagtext p:first-child:not(.hg-ingen)::first-letter { float: left; margin: 5px 7px 0 0; color: var(--rod); font: 600 49px/0.8 var(--tryck); }
-.hg-lagtext strong { font-weight: 600; hyphens: manual; -webkit-hyphens: manual; }
+.hg-lagtext p:first-child:not(.hg-ingen)::first-letter { float: left; margin: 6px 7px 0 0; color: var(--rod); font: 600 52px/0.8 var(--tryck); }
+.hg-lagtext strong { font-weight: 540; hyphens: manual; -webkit-hyphens: manual; }
 .hg-ingen { font: 400 15px/1.45 var(--serif) !important; color: var(--gra); }
 /* citatet: det enda kursiva, i bläck och mitt på under ett kort tryckt streck, med vem som säger det under (och att
    det är översatt) */
-.hg .hg-citat { margin: 20px auto 0; padding: 0; border: 0; max-width: 28em; background: none; text-align: center; }
+.hg .hg-citat { margin: 28px auto 0; padding: 0; border: 0; max-width: 28em; background: none; text-align: center; }
 .hg-citat p { color: var(--svart); font: italic 400 19px/1.4 var(--tryck); text-wrap: balance; }
 .hg-citat p::before { content: ""; display: block; width: 46px; margin: 0 auto 12px; border-top: var(--linje) solid var(--rod); }
-.hg-citat cite { display: block; margin-top: 8px; font: 400 11.5px/1.35 var(--skriv); font-style: normal; color: var(--gra); }
+.hg-citat cite { display: block; margin-top: 10px; font: 400 12.5px/1.35 var(--skriv); font-style: normal; color: rgba(34, 31, 27, 0.86); }
 .hg-ensamt { max-width: 640px; margin: 0 auto; text-align: center; }
 /* sammanfattningen under sin etikett, utan ruta (Ett tryck: en sorts ruta, omslagets) */
-.hg-summering { margin-top: 32px; }
-.hg-summering p { margin: 0 !important; font: 400 16px/1.6 var(--serif); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
-.hg-kallor { margin-top: 30px; }
+.hg-summering { margin-top: 40px; }
+.hg .hg-summering h3 { margin-bottom: 14px; }
+.hg-summering p { margin: 0 !important; font: 400 17px/1.6 var(--serif); hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 7 3 3; text-wrap: pretty; }
+.hg-kallor { margin-top: 38px; }
 .hg .hg-kallor h4 { margin-bottom: 10px; }
 .hg-kallor > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 30px; text-align: center; }
-.hg-kallor p { margin: 0 !important; font: 400 12px/1.45 var(--skriv); color: var(--gra); overflow-wrap: anywhere; }
-.hg-kallor b { display: block; color: var(--rod); font: 600 11px/1.4 var(--tryck); letter-spacing: 0.14em; text-transform: uppercase; }
+.hg-kallor p { margin: 0 !important; font: 400 13px/1.5 var(--skriv); color: rgba(34, 31, 27, 0.9); overflow-wrap: anywhere; }
+.hg-kallor b { display: block; margin-bottom: 2px; color: var(--rod); font: 600 12px/1.4 var(--tryck); letter-spacing: 0.14em; text-transform: uppercase; }
 .hg-kallor a { color: inherit; text-decoration-color: var(--streck); text-underline-offset: 2px; }
 
 /* ---------- sista sidan ---------- */
@@ -254,7 +271,8 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
 /* Spalterna (val 1 bland tre skisser, 2026-11-11): Hasse Backes krönika i två spalter med porträttet vid namnet och
    en tryckt anfang, kåseriet under krönikan med kåsörens namn och vem hen är sist, och Vid sidan av sist, också i två
    spalter (arket är lika brett som omslaget, så den smala spalten bredvid fick inte plats). Smal: allt i en spalt.
-   Ett tryck: Krönika, Kåseri och Vid sidan av som etiketter, porträttet och namnet mitt på, rubrikerna som matchbladens. */
+   Ett tryck: Krönika, Kåseri och Vid sidan av som etiketter, porträttet och namnet mitt på, rubrikerna som matchbladens.
+   Krönikan har matchbladens 17 px där den står i en spalt (telefonen); i två spalter är raderna för korta för det. */
 .hs-grid { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 22px; margin-top: 22px; }
 .hs-by { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 14px; text-align: center; }
 /* porträttet i en tryckt ruta, som sköldarna i matchbladets tavla (A, Rutorna) */
@@ -262,7 +280,7 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
   box-shadow: inset 0 0 0 calc(var(--hg-k) * 0.45px) var(--rod); filter: contrast(1.1); mix-blend-mode: multiply; }
 .hs-by b { display: block; color: var(--rod); font: var(--etikett); font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; }
 .hs-text, .hs-ktext { column-count: 2; column-gap: 30px; }
-.hs-text p, .hs-ktext p { margin: 0 0 10px !important; font: 400 16px/1.6 var(--serif); hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
+.hs-text p, .hs-ktext p { margin: 0 0 10px !important; font: 400 16px/1.6 var(--serif); hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 7 3 3; text-wrap: pretty; }
 .hs-text p:first-child::first-letter { float: left; margin: 5px 7px 0 0; color: var(--rod); font: 600 49px/0.8 var(--tryck); }
 .hs-kaseri { margin-top: 30px; }
 .hs-ktext p { font-size: 15.5px !important; }
@@ -286,11 +304,13 @@ a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--h
    spalterna under varandra. */
 @container (max-width: 460px) {
   .hg-foto { aspect-ratio: 16 / 9; }
-  .hg-ingress { font-size: 17px; }
+  .hg-ingress { font-size: 18px; }
+  .hg-lagtext p, .hg-summering p { line-height: 1.55; }
+  .hs-text p { font-size: 17px; line-height: 1.55; }
   .hg-tavla-rad { column-gap: 8px; }
   .hg-tavla-over { font-size: 12px; letter-spacing: 0.05em; }
-  .hg-ruta { width: 72px; height: 72px; }
-  .hg-ruta-tid { font-size: 22px; }
+  .hg-ruta { width: 60px; height: 60px; }
+  .hg-ruta-tid { font-size: 19px; }
   .hg .hg-plats { font-size: 11px; letter-spacing: 0.08em; }
   .hg :is(.hg-lagdel h3, .hg-plats) { letter-spacing: 0.1em; }
   .hg-citat p { font-size: 18px; }

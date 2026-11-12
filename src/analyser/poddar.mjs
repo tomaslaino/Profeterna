@@ -442,7 +442,8 @@ const citatAv = (c) => ({ sagt: c.sagt, vem: c.vem || null, podd: c.podd, typ: c
 
 const RAKNEORD = /^(två|tre|fyra|fem|sex|sju|åtta|nio|tio|elva|tolv)$/i;
 
-// Redaktörens svar → matchbladet: rubrik, introduktion (ingress), ett till några stycken per lag med lagets citat och
+// Redaktörens svar → matchbladet: rubrik, introduktion (ingress; ingen sedan 2026-11-12, när sidan.ingressOrd är 0),
+// ett till några stycken per lag med lagets citat (bara ett kort: sidan.citatOrd) och
 // personerna som nämns (namn, i fetstil i tidningen), och sammanfattning. Sedan 2026-11-11 har varje lag sitt citat
 // (förut högst ett för sidan, som fortfarande tas emot). En text med tipsord, för många ord eller tal som inte står i
 // uppgifterna stryks: rubriken får mallen, introduktionen och sammanfattningen faller bort och lagets text blir
@@ -476,10 +477,10 @@ export function sidaAv(content, underlag, lagen) {
     const svar = j.lag[lag] && typeof j.lag[lag] === 'object' && !Array.isArray(j.lag[lag]) ? j.lag[lag] : {};
     const stycken = (Array.isArray(svar.text) ? svar.text : [svar.text]).filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim());
     const ord = stycken.reduce((a, t) => a + antalOrd(t), 0);
-    const why = !stycken.length ? 'saknas' : stycken.length > pc.sidan.stycken + 1 ? `${stycken.length} stycken` : ord > pc.sidan.lagOrd + 40 ? `${ord} ord`
+    const why = !stycken.length ? 'saknas' : stycken.length > pc.sidan.stycken + 1 ? `${stycken.length} stycken` : ord > pc.sidan.lagOrd + Math.round(pc.sidan.lagOrd / 3) ? `${ord} ord`
       : stycken.map((t) => varfor(t, Infinity)).find(Boolean) || null;
     if (why) fel.push(`${lag}: ${why}`);
-    const lc = typeof svar.citat === 'string' && egna.find((x) => x.id === svar.citat && x.sagt);
+    const lc = typeof svar.citat === 'string' && egna.find((x) => x.id === svar.citat && x.sagt && antalOrd(x.sagt) <= pc.sidan.citatOrd + 4);
     const namn = why ? [] : [...new Set((Array.isArray(svar.namn) ? svar.namn : []).filter((n) => typeof n === 'string').map((n) => n.trim()))]
       .filter((n) => n.length > 2 && stycken.some((t) => t.includes(n)));
     return { ...del, text: why ? textUtan(egna) : stycken, ...(lc ? { citat: citatAv(lc) } : {}), ...(namn.length ? { namn } : {}) };
@@ -487,7 +488,7 @@ export function sidaAv(content, underlag, lagen) {
   const c = !delar.some((d) => d.citat) && typeof j.citat === 'string' && alla.find((x) => x.id === j.citat && x.sagt);
   return {
     rubrik: text(j.rubrik, pc.sidan.rubrikOrd + 3, 'rubriken'),
-    ingress: text(j.ingress, pc.sidan.ingressOrd + 15, 'introduktionen'),
+    ingress: pc.sidan.ingressOrd ? text(j.ingress, pc.sidan.ingressOrd + 15, 'introduktionen') : null,
     summering: text(j.summering, pc.sidan.summeringOrd + 15, 'sammanfattningen'),
     citat: c ? citatAv(c) : null,
     delar,
@@ -507,7 +508,7 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
   let sekunder = 0;
   try {
     const system = pc.sidaPrompt.replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd).replace('{stycken}', pc.sidan.stycken)
-      .replace('{lagOrd}', pc.sidan.lagOrd).replace('{summeringOrd}', pc.sidan.summeringOrd);
+      .replace('{lagOrd}', pc.sidan.lagOrd).replace('{summeringOrd}', pc.sidan.summeringOrd).replace('{meningar}', pc.sidan.meningar).replace('{citatOrd}', pc.sidan.citatOrd);
     const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [KALLNYCKEL[x.typ] || 'podd']: x.podd, datum: x.datum, uppgift: x.t, ...(x.sagt ? { citat: x.sagt } : {}) }))])) };
     // Källornas träffsäkerhet om truppen, när den är prövad tillräckligt många gånger: redaktören får den
     // vid uppgiften och en rad om hur den ska användas (config/traff.js).

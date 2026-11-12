@@ -15,7 +15,7 @@
 //   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
 //                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
 //   Matchbladen  ett uppslag (två sidor) per match, från sidan 2 (Tavlan, B, i omslagets rutor, A): lagen mot
-//                varandra överst med sköldarna, dagen, avsparken och arenan, rubriken, introduktionen och hemmalaget
+//                varandra överst med sköldarna, dagen, avsparken och arenan, rubriken och hemmalaget
 //                till vänster, och bilden, bortalaget, sammanfattningen och källorna (med en länk till varje avsnitt,
 //                forumtråd och artikel) till höger. Lagen har ett citat var under texten.
 //   Sista sidan  Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, som inte står i matchbladen) och
@@ -515,6 +515,9 @@
   // bilden, bortalaget, sammanfattningen och källorna. Bilden står överst till höger, så att sidorna blir ungefär lika
   // höga. Bredvid varandra när de ryms (passa), annars under varandra. Skisserna som inte valdes: B Fortsättningen
   // (alla sidor exakt som omslaget, texten fortsätter på nästa sida) och C Vecken (ett ark vikt där omslaget slutar).
+  //
+  // Sedan 2026-11-12 (kortare text, "Vi har inte så mycket tid på oss när vi fattar de där besluten") skrivs bladen
+  // utan introduktion: lagets text börjar direkt under rubriken. Ett äldre blad som har en får den tryckt.
   function matchblad(u, s) {
     const T = TEXT.poddar;
     const nr = u.sida.get(s.nr);
