@@ -8,7 +8,7 @@
    höga, och de har omslagets papper, ram, sidhuvud och tryck. Papperets tre röster, som på kupongen och resten av
    sajtens papper (papper.css): det tryckta i terrakotta (Fraunces: namnet, rubrikerna, numren, strecken och ramen),
    det maskinskrivna (--skriv: sidhuvudet, tiderna, lagen i förteckningen, bildtexterna och källorna) och pennan
-   (omslagets kryss). Brödtexten står i bläck. Förut hade sidorna tre bredder och tre stilar: omslaget, Stryktipset på
+   (omslagets kryss, till 2026-11-13; tidningen har ingen penna längre). Brödtexten står i bläck. Förut hade sidorna tre bredder och tre stilar: omslaget, Stryktipset på
    rött band och matchbladen i programmets svart, rött och gult.
 
    Omslagets tryck rakt igenom (2026-11-11, kväll, användarens val A, Rutorna, bland tre skisser: "Hur hade du gjort för
@@ -96,12 +96,13 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 /* ---------- omslaget (RumTidning.forsta) ---------- */
 
 /* 100 × 140, förstorat med zoom: på pulten (--z i rum-tidning.css) och i tidningen --hg-k gånger, som alla ark (passa i
-   rum-tidning.js). Kupongens papper och tryck (papper.css: --pp-paper, --pp-print, --pp-pen), utan bild (förslag C,
-   Helgarderingen, som användaren valde 2026-11-11): numret, veckan och priset maskinskrivna överst, namnet och
-   lördagens datum i terrakotta, rutorna 1, X och 2 ikryssade med den blå pennan i mitten och den första matchen med
-   sin rubrik nertill. Inget annat ("Skippa den där extrainfon med '13 matcher'"). */
+   rum-tidning.js). Kupongens papper och tryck (papper.css: --pp-paper, --pp-print), utan bild. Kalenderbladet
+   (2026-11-13, användarens val F bland fyra minimalistiska skisser, se forsta i rum-tidning.js): numret, veckan och
+   priset maskinskrivna överst, namnet i terrakotta över ett tryckt streck, lördagens datum stort i mitten mellan två
+   etiketter och devisen nertill, kursiv under ett kort streck som tidningens citat. Förut (C, Helgarderingen) rutorna 1,
+   X och 2 ikryssade med den blå pennan i mitten och den första matchen nertill. */
 .hg-omslaget { flex: none; display: flex; scroll-margin-top: 14px; box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35); }
-.hf-forsta { --hf-p: #f1e8d5; --hf-tryck: #a9452b; --hf-svart: #221f1b; --hf-penna: #2146a6; --hf-ruta: #fbf7ec;
+.hf-forsta { --hf-p: #f1e8d5; --hf-tryck: #a9452b; --hf-svart: #221f1b;
   position: relative; display: flex; flex-direction: column; flex: none; box-sizing: border-box; width: 100px; height: 140px; overflow: hidden; padding: 3.6px 6.4px 5px;
   background: var(--hf-p); color: var(--hf-svart); font-family: var(--tryck); text-align: center; }
 /* en tunn tryckt ram, innanför kanten */
@@ -119,23 +120,21 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hf-linje { display: flex; justify-content: space-between; align-items: baseline; gap: 2px; padding: 1.1px 0 1.5px; border-bottom: 0.4px solid var(--hf-tryck);
   font: 400 2.9px/1 var(--skriv); white-space: nowrap; }
 .hf-linje em { color: var(--hf-tryck); font-style: normal; }
-/* namnet och lördagens datum, tryckta i terrakotta */
+/* namnet, tryckt i terrakotta */
 .hf-namn { margin: 4.6px -2px 0; color: var(--hf-tryck); font: 600 14.2px/1 var(--tryck); letter-spacing: -0.2px; white-space: nowrap; }
-.hf-dagen { display: flex; align-items: center; gap: 2px; min-height: 3.1px; margin-top: 2.6px; color: var(--hf-tryck);
-  font: 600 3.1px/1 var(--tryck); letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
-.hf-dagen::before, .hf-dagen::after { content: ""; flex: 1 1 auto; border-top: 0.4px solid var(--hf-tryck); }
-/* rutorna mitt i det som blir över; i tidningen går de till kupongen */
-.hf-mitt { display: flex; flex: 1 1 auto; align-items: center; justify-content: center; min-height: 0; color: inherit; }
-.hf-rutor { display: block; width: 76px; height: auto; overflow: visible; }
-.hf-rutor .r { fill: var(--hf-ruta); stroke: var(--hf-tryck); stroke-width: 1.6; }
-.hf-rutor text { fill: var(--hf-tryck); font: 600 15px/1 var(--tryck); }
-.hf-rutor .k { fill: none; stroke: var(--hf-penna); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; opacity: 0.9; }
-/* den första matchen, under ett streck: lagen tryckta, rubriken rak (Ett tryck: kursiv bara för citat) */
-.hf-ettan { display: block; flex: none; padding-top: 3px; border-top: 0.4px solid var(--hf-tryck); color: inherit; text-decoration: none; }
-.hf-lagen { display: block; overflow: hidden; color: var(--hf-tryck); font: 600 3px/1 var(--tryck); letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; }
-.hf-rub { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; margin-top: 1.4px; font: 600 5px/1.2 var(--tryck); letter-spacing: -0.05px; text-wrap: balance; }
-@media (hover: hover) { a.hf-ettan:hover .hf-rub { text-decoration: underline; text-decoration-thickness: 0.3px; text-underline-offset: 0.8px; } }
-a.hf-ettan:focus-visible, a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 0.6px; }
+/* Kalenderbladet i det som blir över, under ett tryckt streck: dagen stor och tryckt, med vad den gäller ovanför och
+   månaden under, i två lika breda etiketter (röda versaler mellan två streck, som tidningens etiketter). I tidningen
+   går det till innehållet. */
+.hf-mitt { display: flex; flex: 1 1 auto; flex-direction: column; align-items: center; justify-content: center; min-height: 0; margin-top: 2.8px;
+  border-top: 0.4px solid var(--hf-tryck); color: inherit; text-decoration: none; }
+.hf-et { display: flex; align-items: center; gap: 2px; width: 64px; color: var(--hf-tryck); font: 600 3.1px/1 var(--tryck); letter-spacing: 0.5px;
+  text-transform: uppercase; white-space: nowrap; }
+.hf-et::before, .hf-et::after { content: ""; flex: 1 1 auto; border-top: 0.4px solid var(--hf-tryck); }
+.hf-dag { margin: 0.5px -1.6px 0 0; color: var(--hf-tryck); font: 600 54px/0.98 var(--tryck); letter-spacing: 1.6px; font-variant-numeric: lining-nums; }
+/* devisen: kursiv i bläck under ett kort tryckt streck, som tidningens citat */
+.hf-forsta .hf-devis { flex: none; margin: 0; padding-bottom: 2.2px; font: italic 400 5.6px/1.2 var(--tryck); letter-spacing: 0.02px; text-wrap: balance; }
+.hf-devis::before { content: ""; display: block; width: 11px; margin: 0 auto 3px; border-top: 0.4px solid var(--hf-tryck); }
+a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 0.6px; }
 
 /* ---------- bilden i matchbladet ---------- */
 
