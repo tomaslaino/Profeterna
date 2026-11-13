@@ -617,8 +617,8 @@ export const KLIPP = {
   tandare2: { fran: 820, till: 834.0, vila: 0, skynda: true, grupp: 'tanda', tander: 'tandare',
     ljud: [[3.6, { typ: 'lock' }], [3.82, { typ: 'hjul', tar: true }], [5.0, { typ: 'puff' }], [5.6, { typ: 'puff' }], [6.4, { typ: 'lock', upp: false }]], dunk: [[7.0, 0.25, 'hand']] },
   // Fler sätt att slå domen i disken (grupp dom):
-  // knogarna: två lätta knackningar, en blick på en, och en tredje hårt
-  knogar: { fran: 1050, till: 1054.6, vila: 5.5, fri: true, grupp: 'dom', dunk: [[0.72, 0.3, 'knoge'], [1.02, 0.35, 'knoge'], [2.02, 1.05, 'knoge']] },
+  // knogarna: två lätta knackningar, en blick på en, och näven högt upp och ned i disken med full kraft
+  knogar: { fran: 1050, till: 1054.8, vila: 5.5, fri: true, grupp: 'dom', dunk: [[0.72, 0.3, 'knoge'], [1.02, 0.35, 'knoge'], [2.1, 1.45, 'knoge']] },
   // handkanten, som en yxa: ett hugg, och ett till högre upp ifrån
   hugg: { fran: 1056, till: 1060.4, vila: 5.5, fri: true, grupp: 'dom', dunk: [[0.88, 0.6, 'nave'], [1.72, 1.15, 'nave']] },
   // vänster hand: lyfter den högt och slår den i disken, vänd mot en
@@ -629,7 +629,7 @@ export const KLIPP = {
   trycker: { fran: 1073, till: 1078.4, vila: 5.5, fri: true, grupp: 'dom', dunk: [[1.0, 1.3, 'hand']] },
   // De korta, bestämda gesterna medan han pratar (grupp bestamt, med dunka ovan):
   // knogarna i disken två gånger
-  knacka: { fran: 1080, till: 1081.9, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.52, 0.4, 'knoge'], [0.8, 0.55, 'knoge']] },
+  knacka: { fran: 1080, till: 1081.9, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.52, 0.45, 'knoge'], [0.82, 0.8, 'knoge']] },
   // ett hugg med handkanten
   hugga: { fran: 1083, till: 1084.9, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.66, 0.7, 'nave']] },
   // pekfingret i disken två gånger
@@ -1738,25 +1738,33 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       ],
     },
     // Knogarna: han knyter handen löst och knackar två gånger lätt i disken medan han tittar ned, tittar
-    // upp på en, lyfter näven högre och knackar en tredje gång, hårt. Sedan ett litet leende.
+    // upp på en med brynen nere, drar näven högt upp och bakåt, lutar sig bakåt och håller den där ett
+    // ögonblick, och slår den sedan i disken med hela kroppen, så att näven studsar. En nick, och sedan ett
+    // litet leende. (Förut lyfte han näven bara lite inför det tredje slaget, och det var för klent: Tomas
+    // 2026-11-13.)
     knogar: {
       k: {
-        yaw: [[0.4, 0.25], [2.4, 0.3]],
-        pitch: [[0.3, 0.5], [0.72, 0.7], [0.78, 0.95], [1.02, 0.8], [1.08, 1.0], [1.35, 0.1], [1.85, -0.05], [2.02, 0], [2.08, 1.2], [2.35, 0.4], [2.6, 0.75], [2.9, 0.45]],
+        yaw: [[0.4, 0.25], [2.6, 0.3]],
+        pitch: [[0.3, 0.5], [0.72, 0.7], [0.78, 0.95], [1.02, 0.8], [1.08, 1.0], [1.35, 0.1], [1.75, -0.35], [1.95, -0.4], [2.1, 0.1], [2.16, 1.3], [2.45, 0.45], [2.75, 0.95], [3.05, 0.45]],
         blickY: [[0.3, 0], [0.55, 3.5], [1.15, 3.5], [1.4, 0]],
-        lut: [[0.4, 0.04], [1.1, 0.05], [1.85, 0.02], [2.04, 0.11], [2.4, 0.05]],
-        vrid: [[0.4, -0.03], [1.85, -0.05], [2.04, 0.03], [2.4, 0.01]],
-        axV: [[0.3, 8], [1.1, 10], [1.85, 26], [2.04, 2], [2.3, 6]],
-        brynX: [[0.3, 0.2], [1.2, 0.3], [1.5, 0.8], [1.95, 0.7], [2.08, -0.2], [2.5, 0.5]],
-        brynY: [[0.3, -0.2], [1.2, -0.2], [1.5, 0.3], [1.95, -0.6], [2.08, -1.0], [2.5, -0.45]],
-        kis: [[1.4, 0], [1.9, 0.4], [2.3, 0.1], [2.7, 0]],
-        blund: [[2.0, 0], [2.05, 0.85], [2.2, 0]],
-        munn: [[2.0, 0], [2.06, 0.1], [2.25, 0]],
-        le: [[2.6, 0], [3.0, 0.3], [3.7, 0.16]],
+        lut: [[0.4, 0.04], [1.1, 0.05], [1.45, 0.02], [1.75, -0.05], [1.95, -0.06], [2.12, 0.17], [2.45, 0.08], [2.9, 0.05]],
+        vrid: [[0.4, -0.03], [1.45, -0.04], [1.85, -0.1], [2.12, 0.06], [2.5, 0.01]],
+        sid: [[1.45, 0], [1.85, -0.01], [2.12, 0.012], [2.5, 0]],
+        axV: [[0.3, 8], [1.1, 10], [1.75, 40], [1.95, 44], [2.12, -6], [2.4, 4]],
+        axH: [[1.6, 0], [1.9, 8], [2.12, -2], [2.4, 0]],
+        brynX: [[0.3, 0.2], [1.2, 0.3], [1.4, 0.7], [1.6, -0.4], [1.95, -0.5], [2.16, -0.2], [2.7, 0.5]],
+        brynY: [[0.3, -0.2], [1.2, -0.2], [1.4, 0.3], [1.6, -0.9], [1.95, -1.0], [2.16, -1.1], [2.7, -0.45]],
+        kis: [[1.4, 0], [1.7, 0.5], [2.1, 0.55], [2.5, 0.1], [2.9, 0]],
+        blund: [[2.09, 0], [2.13, 0.9], [2.3, 0]],
+        munn: [[1.7, 0], [1.85, 0.06], [2.08, 0], [2.14, 0.14], [2.35, 0]],
+        le: [[2.85, 0], [3.25, 0.3], [3.9, 0.16]],
       },
       A: [
         knoge(0.45, 55), knoge(0.72, 0, true), knoge(0.84, 32), knoge(1.02, 0, true), knoge(1.2, 40),
-        knoge(1.85, 150), knoge(2.02, 0, true), knoge(2.12, 18), knoge(2.24, 0), knoge(3.2, 0),
+        // (högt upp och bakåt, med handleden bakåtböjd så att knogarna pekar fram, och kvar där ett ögonblick)
+        [1.75, [-200, 200, 505], PA, [0.3, -0.45, 0.84], [0.12, -0.88, -0.45], 1, 0],
+        [1.95, [-204, 216, 495], PA, [0.3, -0.42, 0.86], [0.12, -0.9, -0.42], 1, 0],
+        knoge(2.1, 0, true), knoge(2.18, 30), knoge(2.3, 0), knoge(3.4, 0),
       ],
     },
     // Hugget: han lyfter handen rak och på högkant och hugger med handkanten i disken, som med en yxa; lyfter
@@ -1856,13 +1864,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // Medan han pratar, korta: knogarna i disken två gånger, och en nick.
     knacka: {
       k: {
-        pitch: [[0.3, 0.2], [0.52, 0.3], [0.57, 0.8], [0.8, 0.35], [0.85, 1.0], [1.1, 0.2], [1.4, 0]],
+        pitch: [[0.3, 0.2], [0.52, 0.3], [0.57, 0.8], [0.82, 0.2], [0.87, 1.15], [1.1, 0.2], [1.4, 0]],
         lut: [[0.3, 0.02], [0.82, 0.07], [1.2, 0]],
         axV: [[0.3, 10], [0.82, 0], [1.2, 0]],
         brynX: [[0.3, 0.1], [0.82, -0.3], [1.3, 0]],
-        blund: [[0.79, 0], [0.83, 0.6], [0.96, 0]],
+        blund: [[0.81, 0], [0.85, 0.7], [0.98, 0]],
       },
-      A: [knoge(0.3, 70), knoge(0.52, 0, true), knoge(0.64, 40), knoge(0.8, 0, true), knoge(0.95, 20), knoge(1.0, 0), knoge(1.3, 0)],
+      A: [knoge(0.3, 70), knoge(0.52, 0, true), knoge(0.66, 95), knoge(0.82, 0, true), knoge(0.9, 22), knoge(1.0, 0), knoge(1.3, 0)],
     },
     // Medan han pratar: ett hugg med handkanten, och en nick.
     hugga: {

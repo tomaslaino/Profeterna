@@ -96,13 +96,13 @@ function dunk(ctx, mal, t, s, sort) {
   const o = ut(ctx, mal, bada ? 0 : -0.25);
   o.gain.value = Math.min(1, 0.6 + 0.3 * s);
   const k = Math.min(1.4, s);
-  const duns = finger ? 0.12 : knoge ? 0.62 : 1;
+  const duns = finger ? 0.12 : knoge ? 0.8 : 1;
   const klang = finger ? 0.35 : 1;
   // dunsen
   ton(ctx, t, nave ? 88 : knoge ? 128 : 105, nave ? 44 : knoge ? 70 : 52, 0.12, 0.85 * k * duns, bada ? 0.11 : knoge ? 0.06 : 0.085, o, 0.7);
   ton(ctx, t, nave ? 150 : knoge ? 210 : 175, nave ? 92 : knoge ? 130 : 110, 0.08, 0.32 * k * duns, 0.05, o, 0.4);
   // träet: knacket och skivan som klingar
-  bruston(ctx, t, 'bandpass', nave ? 210 : knoge ? 360 : finger ? 900 : 280, knoge || finger ? 2.4 : 1.3, (knoge ? 1.15 : finger ? 0.55 : 0.9) * k, finger ? 0.02 : knoge ? 0.035 : 0.045, o);
+  bruston(ctx, t, 'bandpass', nave ? 210 : knoge ? 360 : finger ? 900 : 280, knoge || finger ? 2.4 : 1.3, (knoge ? 1.3 : finger ? 0.55 : 0.9) * k, finger ? 0.02 : knoge ? 0.035 : 0.045, o);
   bruston(ctx, t, 'bandpass', nave ? 620 : knoge ? 1150 : finger ? 2300 : 760, 2.2, (knoge ? 0.5 : finger ? 0.3 : 0.28) * k, finger ? 0.012 : 0.03, o);
   ton(ctx, t, slump(205, 222), slump(198, 205), 0.2, 0.12 * k * klang, 0.11, o);
   ton(ctx, t, slump(338, 352), slump(330, 338), 0.2, 0.07 * k * klang, 0.08, o);
