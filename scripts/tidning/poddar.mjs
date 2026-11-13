@@ -158,6 +158,9 @@ async function omgangensLag(round) {
   for (const x of round.matcher) {
     if (Date.parse(x.avspark) <= Date.now()) continue;
     const d = await hamta(`${site}/data/match/${x.id}.json?t=${Date.now()}`).catch(() => null);
+    // Landslagen har inga supporterpoddar, forum eller lokaltidningar att läsa: deras matchblad skrivs för hand
+    // (2026-11-13), och de står kvar när bladen läggs ut (poddsidor i src/analyser/poddar.mjs).
+    if (d && d.match && d.match.type === 'intl') continue;
     const par = d && d.match && d.match.home ? [d.match.home, d.match.away] : String(x.match || '').split(/\s+[–-]\s+/);
     if (par.length !== 2) continue;
     const trupp = (s) => (d && d.squads && d.squads[s] && Array.isArray(d.squads[s].players) ? d.squads[s].players.map((p) => p && p.name).filter(Boolean) : []);
