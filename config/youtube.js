@@ -13,6 +13,13 @@
 // order = i vilken ordning spelaren provar klippen (lägst först) –
 // klubbarnas kanaler kommer efter dem.
 //
+// UEFA: UEFA:s egen kanal, för landskamperna i Nations League (2026-11-13,
+// landskamperna på Stryktipset). Lagen står där på engelska ("Sweden vs
+// Bosnia-Herzegovina | Highlights"); src/hojdpunkter.js tar de engelska namnen
+// ur config/landslag.js. Adressen slås upp vid hämtningen, och klipp som inte
+// får visas här sorteras bort som Skys (src/fetchers/youtube.js). Flödet har bara
+// de 15 senaste klippen, så en kväll med många matcher kan några saknas.
+//
 // NAMES: namn som står i titlarna men inte följer av ESPN-namnet (src/
 // hojdpunkter.js tar själv bort "City", "Town", "United" osv. och läser
 // config/team-aliases.js).
@@ -118,6 +125,7 @@ const CHANNELS = [
   { key: 'sky', name: 'Sky Sports Football', id: 'UCZ7wY7MRDSygp63HIEfdQZA' },
   { key: 'efl', name: 'EFL', id: 'UCCmo_NIuQR5eU4AvBa6sEQQ' },
   { key: 'facup', name: 'Emirates FA Cup', path: 'thefacup' },
+  { key: 'uefa', name: 'UEFA', path: '@UEFA' },
 ];
 
 const NAMES = {
@@ -137,6 +145,8 @@ const NAMES = {
   'Crystal Palace': ['Palace'],
   'Peterborough United': ['Posh'],
   'Wycombe Wanderers': ['Wycombe'],
+  // landslagen, under det svenska namnet (de engelska kommer ur config/landslag.js)
+  'Bosnien & Hercegovina': ['Bosnia'],
 };
 
 module.exports = { CLUBS, CHANNELS, NAMES };

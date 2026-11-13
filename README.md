@@ -738,7 +738,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Landskamperna: odds | ESPN matchsammanfattning (DraftKings) | landskamperna | 2 h, tre dagar bakåt till sju dagar fram, sparas | Verifierat 2026-11-13: odds för alla fem landskamperna på Stryktipset 14 november. Ger landskampernas prognos. |
 | Landslagens tidigare matcher | ESPN (`fifa.world` juni–juli 2026, `fifa.worldq.uefa` 2025–mars 2026, `uefa.nations` 2024/25, `fifa.friendly` 2025–2026) | landskamperna – formen och mötena | 7 d | Bara matcher med ett europeiskt landslag. |
 | Landslagens flaggor | ESPN:s bildtjänst (`…/teamlogos/countries/500/<kod>.png`, koden ur lagets logo-adress) | landskamperna | när ett nytt lag kommer | Landslagen ligger inte bland klubbarnas sköldar. Sparas som sköldarna, under det svenska namnet. |
-| Höjdpunkter (YouTube) | Kanalernas öppna flöden (`youtube.com/feeds/videos.xml?channel_id=<id>`, de 15 senaste klippen) och oEmbed (`youtube.com/oembed`) | alla sex | 30 min | Ingen nyckel. Kanalerna i [config/youtube.js](config/youtube.js): Premier League, Sky Sports Premier League, Sky Sports Football, EFL och FA-cupen, plus de 92 ligaklubbarnas egna kanaler (id ur Wikidata P2397 och länkarna på klubbarnas sajter, 2026-10-20). Bara klipp med *highlights* i titeln; damlag, ungdomslag, träningsmatcher, EFL Trophy och gamla matcher sorteras bort. oEmbed sorterar bort klipp som inte får bäddas in (401) eller är borta (404). Flödet har ingen landsspärr – spärrade klipp märks i spelaren, som tar nästa. Matchen hittas på lag och tid: utlagt 95 minuter till sex dygn efter avspark; i en klubbs kanal ska motståndaren stå i titeln, i en sändares båda lagen; ett resultat i titeln ska vara matchens. Spelas inbäddat från `youtube-nocookie.com`. Styr inte prognosen. |
+| Höjdpunkter (YouTube) | Kanalernas öppna flöden (`youtube.com/feeds/videos.xml?channel_id=<id>`, de 15 senaste klippen) och oEmbed (`youtube.com/oembed`) | alla sex | 30 min | Ingen nyckel. Kanalerna i [config/youtube.js](config/youtube.js): Premier League, Sky Sports Premier League, Sky Sports Football, EFL och FA-cupen, UEFA (för landskamperna, 2026-11-13), plus de 92 ligaklubbarnas egna kanaler (id ur Wikidata P2397 och länkarna på klubbarnas sajter, 2026-10-20). Bara klipp med *highlights* i titeln; damlag, ungdomslag, träningsmatcher, EFL Trophy och gamla matcher sorteras bort. oEmbed sorterar bort klipp som inte får bäddas in (401) eller är borta (404). Flödet har ingen landsspärr – spärrade klipp märks i spelaren, som tar nästa. Matchen hittas på lag och tid: utlagt 95 minuter till sex dygn efter avspark; i en klubbs kanal ska motståndaren stå i titeln, i en sändares båda lagen; ett resultat i titeln ska vara matchens. Spelas inbäddat från `youtube-nocookie.com`. Styr inte prognosen. |
 
 **Prövat och inte använt:**
 
@@ -4792,6 +4792,16 @@ rum-affischer.js):
   (*ARSENAL KAN INTE FÖRLORA* – *Vad kan gå fel?*, *GARANTERAT! ARSENAL VINNER*, *SPIKA
   ARSENAL!* – *Vi lovar ingenting*) och jakten på ledaren i Tipsligan (*JAKTEN PÅ TEJDER*,
   *TEJDER OHOTAD?*).
+- *landskamperna* (2026-11-13, när Stryktipset tog in Nations League; användarens önskemål: "Uppdatera hela hemsidan
+  utefter detta"): Sveriges match, med läget i gruppen ur `data/landslag.json` – kan Sverige vinna gruppen med en seger
+  (alla andra har färre poäng även om de vinner resten) blir det *NATIONS LEAGUE: SVERIGE KAN VINNA GRUPPEN* (*Seger
+  mot Bosnien räcker – avspark lör 20.45. Spelbolagen: 63 % för svensk seger*) eller *BLÅGULT: TRE POÄNG TILL
+  GRUPPSEGER*, möter ettan tvåan *TOPPMÖTET: SVERIGE MOT BOSNIEN*, och annars *LANDSLAGET: NU GÄLLER DET*. Den väger
+  0,8 och slår därför det mesta före avspark. Har kupongen minst tre landskamper finns också *SJU LANDSKAMPER PÅ
+  TIPSET* och *LANDSLAGEN TAR ÖVER*, som oftast hamnar längst ner. Landskampernas procent är spelbolagens, inte
+  datorns (se [Landskamperna](#landskamperna)), så i en rubrik om en landskamp – före matchen och efter, skrällen
+  och spiken också – står *spelbolagen* där det annars står *datorn* (`marknadens`), och landslagen har bara första
+  delen av namnet (*Bosnien*, `landKort`). Grupperna hämtas en gång, och löpsedeln ritas om när de har kommit (`landslaget`).
 
 Varje rubrik har en vikt efter hur dramatisk den är (hur få rätt, hur liten chans …).
 Förra omgångens väger fullt tre dagar efter sista avsparken, sedan 55 % och efter sex dagar
@@ -6762,6 +6772,17 @@ KLASS I på brädan. Lådan är också en låda i 3D (sidan med springor mellan 
 och innanför öppningen väggen, mellanväggen, botten och baksidan), i tv:ns mått och vriden
 likadant, med öppningen mot gänget.
 
+**Landskamperna** (2026-11-13, när Stryktipset tog in Nations League). De står i `matches.json` som andra matcher,
+med svenska namn, och ger videon inga fel: utan klipp blir det ingen kassett. Höjdpunkterna kan komma från UEFA:s egen
+kanal (`uefa` i `CHANNELS` i [config/youtube.js](config/youtube.js), adressen `@UEFA` slås upp vid hämtningen), som
+klubbarnas och sändarnas, och knyts till en landskamp när båda lagen står i titeln på engelska – namnen tas ur
+[config/landslag.js](config/landslag.js) (`variants` i [src/hojdpunkter.js](src/hojdpunkter.js); *Sweden vs
+Bosnia-Herzegovina | Highlights* hittar Sverige–Bosnien & Hercegovina, *Northern Ireland* blandas inte ihop med
+Österrike–Irland). Klipp som inte får visas här sorteras bort som Skys. Kanalens flöde har bara de 15 senaste
+klippen och läses var 30:e minut, så en kväll med många matcher kan några saknas. Provat med titlarna ovan; YouTube
+gick inte att nå från molnmiljön, så om UEFA lägger ut Nations Leagues sammandrag som får visas i Sverige märks
+först efter lördagen.
+
 **Kassetterna** är matcher med YouTube-klipp (samma klipp som spelaren på sajten,
 [public/hojdpunkter.js](public/hojdpunkter.js)), högst 13 i varje fack (`FACKEN`): till vänster förra
 omgångens matcher i kupongens ordning, med kupongens nummer på en rund röd lapp (en match
@@ -7594,6 +7615,27 @@ stängt, står alla hans rader ifyllda, också matcher som inte har startat än,
 annars tecknen i hans text, med hans resultat.
 Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
 När alla matcher har börjat säger han hur det gick för honom (`efterat`), tills omgången är spelad.
+
+**Landskamperna** (2026-11-13, när Stryktipset tog in Nations League; användarens önskemål: "Uppdatera hela hemsidan
+utefter detta"). Han ser på landskamperna som den gamla klubbtränaren han är: organisation, några dagars samling och ett
+landslag som inte kan köpa spelare, aldrig division, tabellen i ligan eller supportrarnas poddar, och inga namn på
+riktiga förbundskaptener eller spelare (`land` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)). Väljer
+man en landskamp säger han ibland något om landslagen i stället för de vanliga raderna (*Där avgör organisationen.*),
+om Sveriges match något eget (*Den tippar jag med huvudet.*, *Där vet jag mer än förbundet.*) och om Norges och
+Danmarks något om grannarna (*Grannlandet känner jag väl.*), lika korta som de andra (högst 31 tecken, `npm run
+repliker` säger till). Medan man står där blandas raderna om landslagsuppehållet med de vanliga (*Ett landslag kan
+inte köpa spelare. Man får spela med dem man har.*), och när kupongen har minst tre landskamper börjar han ibland med
+dem (*Det är landslagsuppehåll. Vilken match tar vi först?*). Vad som är en landskamp tar han ur tävlingens typ i
+`meta.json` (`landskamp` och `landRader` i [public/rum-hasse.js](public/rum-hasse.js)). Raderna har inga fält, så
+bygget tar fram deras ljud som för de andra replikerna (src/rost.js). Hans text till analysen av en landskamp får
+samma persona, men med en rad om att det är en landskamp (landslagen, förbundskaptenen och samlingen, inte klubbar,
+division eller ligatabell, och att prognosen är spelbolagens) och kryddan ur `kryddorLand` i
+[config/hasse.js](config/hasse.js) (*Landslagsfotboll är klubbfotboll med tre dagars försäsong.*); de engelska
+matchernas texter ändras inte, så `promptVersion` är densamma. Provat 2026-11-13 i hela rummet med riktig data och
+en lokal kupong med veckans tretton matcher, i 1440 × 900 och 390 × 844: raderna kom på landskamperna och inte på
+de engelska matcherna, och konsolen hade inga fel utom förbindelserna till workers.dev, som molnmiljön inte når. Hans
+text till en landskamp är prövad med ett låtsat svar (kontrollerna godkänner den nya kryddan), inte mot Claude, och
+ljudet är inte prövat här (ingen Azure-nyckel i molnmiljön).
 
 **Ställningen** (2026-11-09). Medan matcherna pågår står ställningen i spalten där facit står efteråt, i kursiv och lite
 svagare, och spalten heter *Ställning* så länge någon match pågår (`star` och `facitRuta` i

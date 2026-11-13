@@ -32,6 +32,7 @@ const { clipUrl } = require('./fetchers/viaplay');
 const { playable } = require('./fetchers/youtube');
 const { ALIASES } = require('../config/team-aliases');
 const { CLUBS, CHANNELS, NAMES } = require('../config/youtube');
+const { SVENSKA } = require('../config/landslag');
 
 const SOURCE_ID = 'viaplay_hojdpunkter';
 const YT_SOURCE_ID = 'youtube_hojdpunkter';
@@ -111,7 +112,8 @@ function highlightsByMatch(matches) {
 //
 // Ett lag står i titeln under ESPN-namnet, under det utan "City", "Town",
 // "United" osv. ("Birmingham"), under namnen i aliastabellerna
-// (config/team-aliases.js, config/youtube.js NAMES) – som hela ord. Det
+// (config/team-aliases.js, config/youtube.js NAMES) och, för ett landslag,
+// under de engelska namnen i config/landslag.js – som hela ord. Det
 // kortaste namnet kan vara tvetydigt ("Bristol", "Manchester"), men bara
 // lagen i matcherna som passar i tid prövas.
 
@@ -133,6 +135,8 @@ function variants(team) {
   add(base.replace(SUFFIX, ''));
   for (const [alias, espn] of Object.entries(ALIASES)) if (espn === team) add(alias);
   for (const alias of NAMES[team] || []) add(alias);
+  // (ett landslag står på engelska i titlarna, under det svenska namnet hos oss)
+  for (const [en, sv] of Object.entries(SVENSKA)) if (sv === team && en !== team) add(en);
   const list = [...out].sort((a, b) => b.length - a.length);
   variantCache.set(team, list);
   return list;

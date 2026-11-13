@@ -103,6 +103,16 @@ module.exports = {
     'Det er helt i orden, som danskarna säger.',
     'Så er det sagt, som vi sa i Köpenhamn.',
   ],
+  // Landskamperna (type 'intl', se README, Landskamperna): där är det landslagen,
+  // förbundskaptenen och samlingen han talar om, inte klubbar, division eller
+  // tabellen i en liga, och kryddan tas härifrån. Bara för landskamper, så de
+  // engelska matchernas texter ändras inte (ingen ny promptVersion).
+  landskamp: 'Det här är en landskamp. Tala om landslagen, förbundskaptenen och samlingen, inte om klubbar, division eller tabellen i en liga. Sajtens prognos är spelbolagens odds utan marginal, inte en egen modell.',
+  kryddorLand: [
+    'En förbundskapten väljer spelare. Han kan inte köpa några.',
+    'Landslagsfotboll är klubbfotboll med tre dagars försäsong.',
+    'Det er helt i orden, som danskarna säger.',
+  ],
   // Bielsa-orden lottas bara när analysen visar att ett lag pressar högt eller
   // har ett rörligt anfallsspel.
   bielsaOrd: ['rotasiones', 'intensidá', 'verticalidá', 'transisiones', 'presjón alta', 'ombre libre'],
