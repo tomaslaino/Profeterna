@@ -2731,7 +2731,10 @@ och kontrollerna skickar tillbaka en artikel eller ett tips som säger *modell* 
 landskamp. Hasse Backe får marknadens odds utan ordet *sajtens prognos*, och omgångens namn ser *marknadens odds*
 för landskamperna och *Nations League* som tävling. Klubbmatchernas underlag och prompt är oförändrade. Provat utan
 Claude, mot bygget med riktig ESPN-data: underlaget, systemprompten, namnets och tidningens underlag och Hasses odds
-för hela veckans omgång (sju landskamper, sex engelska), och att kontrollerna stoppar *modellens*. Inte provat med
+för hela veckans omgång (sju landskamper, sex engelska), och att kontrollerna stoppar *modellens*. Hela vägen genom `skrivAnalys` och `skrivHasse` med påhittade svar från Claude: ett tips med
+*Modellens odds* skickas tillbaka en gång för landskampen och går igenom som förut för den engelska matchen.
+Källornas träffsäkerhet ([src/analyser/traff.mjs](src/analyser/traff.mjs)) hämtar nu matchrapporten för en landskamp
+under `uefa.nations` i stället för att hoppa över den. Inte provat med
 `claude -p` på iMacen; första körningen är den första efter mergen. Veckans sju analyser av landskamperna (rad 1–7,
 vecka 46) skrevs för hand i molnet samma kväll, i jobbets form och prövade med jobbets kontroller (`problems`,
 `tipProblems` och Hasses `granska`), eftersom jobbet inte klarade dem; källorna är sökträffar, för molnmiljön kunde
