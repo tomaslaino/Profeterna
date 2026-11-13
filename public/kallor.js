@@ -85,6 +85,9 @@ function renderSources(d) {
   html += '<p id="sources-summary" class="src-late" hidden></p>';
 
   // Vad som kommer varifrån: en rad per datatyp, en kolumn per tävling.
+  // Landskamperna (Nations League, EM-kvalet, vänskapsmatcherna) efter de
+  // engelska tävlingarna, avskilda med ett streck.
+  const landCol = (i) => (d.competitions[i].intl ? ` class="src-land${d.competitions[i - 1] && d.competitions[i - 1].intl ? '' : ' first'}"` : '');
   const byId = new Map(d.sources.map((s) => [s.id, s]));
   const cell = (c) => {
     if (!c.sourceIds.length && !(c.live || []).length) return `<span class="src-gap" title="${esc(c.gap)}">–</span>`;
@@ -100,8 +103,8 @@ function renderSources(d) {
       ? '<span class="dot s-live" title="hämtas när du tittar"></span>' : srcDot(st)}${esc(name)}</span>`).join('');
   };
   html += '<h3>Vad som kommer varifrån</h3><div class="table-wrap src-cov"><table><thead><tr><th></th>' +
-    d.competitions.map((c) => `<th title="${esc(c.name)}">${esc(c.short)}</th>`).join('') + '</tr></thead><tbody>' +
-    d.coverage.map((row) => `<tr><th scope="row">${esc(row.label)}</th>` + row.cells.map((c) => `<td>${cell(c)}</td>`).join('') + '</tr>').join('') +
+    d.competitions.map((c, i) => `<th title="${esc(c.name)}"${landCol(i)}>${esc(c.short)}</th>`).join('') + '</tr></thead><tbody>' +
+    d.coverage.map((row) => `<tr><th scope="row">${esc(row.label)}</th>` + row.cells.map((c, i) => `<td${landCol(i)}>${cell(c)}</td>`).join('') + '</tr>').join('') +
     '</tbody></table></div>' +
     `<p class="legend src-key">${srcDot('färsk')}färsk ${srcDot('gammal')}gammal ${srcDot('fel')}senaste hämtningen misslyckades ` +
     `${srcDot('okänt')}tom än <span class="dot s-live"></span>hämtas när du tittar <span class="src-gap">–</span> finns inte</p>`;

@@ -1,21 +1,21 @@
 {
- "uppdaterad": "2026-11-07T12:32:37.335Z",
+ "uppdaterad": "2026-11-13T18:23:15.540Z",
  "omgang": {
-  "id": "2026-11-07-st4978",
+  "id": "2026-11-14-st4979",
   "matcher": [
-   "401878757",
-   "401878760",
-   "401879241",
-   "401880171",
-   "401880172",
-   "401880169",
-   "401880168",
-   "401880165",
-   "401880164",
-   "401880163",
-   "401880162",
-   "401931120",
-   "401931121"
+   "401861166",
+   "401861167",
+   "401861165",
+   "401861168",
+   "401861169",
+   "401861170",
+   "401861164",
+   "401880749",
+   "401880747",
+   "401880745",
+   "401880754",
+   "401880744",
+   "401881266"
   ]
  },
  "analyser": [
@@ -1138,6 +1138,1002 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-07T10:50:10.471Z",
     "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880754",
+   "match": "AFC Wimbledon – Blackpool",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:21:07.625Z",
+   "text": "Wimbledon har gott om chanser och ont om mål\n\nAFC Wimbledon tar emot Blackpool i ett möte mellan lag nummer 18 och 19 i League One. Hemmalaget skapar chanser men gör få mål, och förra säsongens två klara segrar mot Blackpool känns långt borta efter cupsorti i Crewe.\n\nJohnnie Jacksons Wimbledon har gjort 9 mål på 13 ligamatcher. Chanserna har ändå funnits, för lagets förväntade mål ligger 2,3 över de mål som faktiskt gått in. Det syntes igen i FA-cupen förra lördagen, när Crewe vann med 2–1. Enligt Yahoo Sports [1] menade Jackson att laget saknade ”quality in decisive moments” och sade: ”We need more to show for it than one goal.” Crewes första mål slogs från mittlinjen, och det kallade han ”Wholly avoidable from ours.” Ett sådant mål släpps in av en mittback som tittar på bollen i stället för att backa hem. Det löser man med en hink bollar.\n\nBlackpool har gjort 17 mål på 12 matcher och hittar alltså nätet, men de har släppt in 21. Borta har det blivit en enda seger. Senast i ligan blev det 1–1 mot Sheffield Wednesday, en vecka efter att Mansfield vunnit med 4–1 på Bloomfield Road. I cupen mot Hornchurch från lägre divisioner stod det 1–1 efter full tid, och det krävdes förlängning. Det var en tung vecka för benen inför en resa till London.\n\nFörra säsongen vann Wimbledon båda mötena, med 2–0 i Blackpool och 4–1 hemma i mars. Sedan dess har mycket hänt. Wimbledon har fått 1 poäng av 12 möjliga i sina fyra senaste ligamatcher och förlorade med 0–5 mot Sheffield Wednesday. Bollen har aldrig läst en tabell, och den har heller aldrig hört talas om förra säsongen.\n\nTipset: X2 (Blackpool, inte mer)\n\nPrognosen ger Blackpool störst chans med odds 2,50, och marknaden har lagen jämnare. Det jag har läst ger inget skäl att lyfta Wimbledon. Jackson beklagar själv att laget saknar kvalitet i de avgörande lägena [1], och hemmalaget har gjort minst mål i ligan av de två. Samtidigt har Blackpool en förlängning i benen och har bara vunnit en bortamatch. Prognosen ger oavgjort större chans än marknaden gör, och 1–1 är det troligaste resultatet. Jag ringar in X och 2.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Wimbledon har gott om chanser och ont om mål",
+   "lead": "AFC Wimbledon tar emot Blackpool i ett möte mellan lag nummer 18 och 19 i League One. Hemmalaget skapar chanser men gör få mål, och förra säsongens två klara segrar mot Blackpool känns långt borta efter cupsorti i Crewe.",
+   "paragraphs": [
+    "Johnnie Jacksons Wimbledon har gjort 9 mål på 13 ligamatcher. Chanserna har ändå funnits, för lagets förväntade mål ligger 2,3 över de mål som faktiskt gått in. Det syntes igen i FA-cupen förra lördagen, när Crewe vann med 2–1. Enligt Yahoo Sports [1] menade Jackson att laget saknade ”quality in decisive moments” och sade: ”We need more to show for it than one goal.” Crewes första mål slogs från mittlinjen, och det kallade han ”Wholly avoidable from ours.” Ett sådant mål släpps in av en mittback som tittar på bollen i stället för att backa hem. Det löser man med en hink bollar.",
+    "Blackpool har gjort 17 mål på 12 matcher och hittar alltså nätet, men de har släppt in 21. Borta har det blivit en enda seger. Senast i ligan blev det 1–1 mot Sheffield Wednesday, en vecka efter att Mansfield vunnit med 4–1 på Bloomfield Road. I cupen mot Hornchurch från lägre divisioner stod det 1–1 efter full tid, och det krävdes förlängning. Det var en tung vecka för benen inför en resa till London.",
+    "Förra säsongen vann Wimbledon båda mötena, med 2–0 i Blackpool och 4–1 hemma i mars. Sedan dess har mycket hänt. Wimbledon har fått 1 poäng av 12 möjliga i sina fyra senaste ligamatcher och förlorade med 0–5 mot Sheffield Wednesday. Bollen har aldrig läst en tabell, och den har heller aldrig hört talas om förra säsongen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Yahoo Sports",
+     "title": "Jackson frustrated as wasteful Dons exit FA Cup",
+     "url": "https://sports.yahoo.com/articles/jackson-frustrated-wasteful-dons-exit-145751522.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Blackpool störst chans med odds 2,50, och marknaden har lagen jämnare. Det jag har läst ger inget skäl att lyfta Wimbledon. Jackson beklagar själv att laget saknar kvalitet i de avgörande lägena [1], och hemmalaget har gjort minst mål i ligan av de två. Samtidigt har Blackpool en förlängning i benen och har bara vunnit en bortamatch. Prognosen ger oavgjort större chans än marknaden gör, och 1–1 är det troligaste resultatet. Jag ringar in X och 2.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Blackpool, inte mer",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Yahoo Sports",
+      "title": "Jackson frustrated as wasteful Dons exit FA Cup",
+      "url": "https://sports.yahoo.com/articles/jackson-frustrated-wasteful-dons-exit-145751522.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:21:07.625Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Wimbledon har gjort nio mål på tretton ligamatcher, fast chanserna har funnits där hela tiden. Tränaren säger själv att laget saknar kvalitet i de lägen som avgör. Jag har sett det förr, i Manchester. Det gick bra då också. Här har det blivit en poäng av tolv möjliga på de fyra senaste matcherna och en förlust med 0–5 mot Sheffield Wednesday.",
+     "Blackpool släpper in för mycket, och de har en förlängning i benen efter cupen. Men de gör mål, och det är precis det Wimbledon inte gör. Ett hemmalag som missar sina lägen blir nervöst när bortalaget tar ledningen, och då öppnar det sig. Förra säsongens två segrar betyder ingenting nu. Lugn nu, jag ringar in tvåan och bara tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
+    "tips": "2026-11-13T18:21:07.625Z",
+    "uppdrag": {
+     "fraser": [
+      "Lugn nu",
+      "Nej nej nej"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:21:31.939Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880749",
+   "match": "Milton Keynes Dons – Burton Albion",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:17:05.034Z",
+   "text": "Burtons tränare sjuk, MK Dons i målberusning\n\nBurton åker till Stadium MK utan Gary Bowyer, som ligger sjuk, och assisterande tränaren Pat Lyons får sköta snacket. Där väntar MK Dons, som har gjort tio mål på sina två senaste ligamatcher hemma och dessutom slagit ut Swindon ur FA-cupen.\n\nDet ser du redan på uppvärmningen när ett lag har fått självförtroende, och MK Dons har fått det. Hemma vann de med 4–1 mot Bromley och med 6–1 mot Doncaster, och sedan slog de Swindon med 2–1 i cupen. Paul Warne bygger på en följd av fyra raka segrar. Inför matchen talade han om konditionen hos Kane Wilson, Ryan Barnett och Rushian Hepburn-Murphy, enligt klubbens egen sida [1]. Han var också noga med att ge motståndaren beröm. ”He knows what he’s doing”, sade Warne om Bowyer enligt MK Citizen [2].\n\nBowyer själv är borta på grund av sjukdom, och därför satt assisterande tränaren Pat Lyons på presskonferensen, enligt Burtons klubbsida [3]. En tränare som kliver in en fredag har inget lätt jobb. Det tar man inte på torsdagsträningen, för den har redan varit. Burton har gjort nästan sex mål fler än chanserna borde ha gett i år, och bara Wycombe har stoppat dem på senare tid. Senast spelade de bort Rushden & Diamonds med 4–0 i cupen.\n\nMötena mellan klubbarna har varit snåla. På sex matcher sedan 2020 har ingen vunnit med mer än ett mål, och tre av dem har slutat oavgjort. I Grusnäs hade vi en gång en assisterande tränare som fick ta ett helt matchmöte på egen hand, och han pratade bara om hörnor. Det var kanske inte så dumt.\n\nTipset: 1X (Hemma, men jämnt)\n\nSpelbolagen ger MK Dons mycket större chans än vår prognos gör, och prognosen ser ingen anledning att avskriva Burton. Fast hemmalagets målform ser verklig ut, och Burton saknar sin tränare [1]. Burtons målskytte ligger dessutom långt över vad chanserna ger, och sådant brukar jämna ut sig. Mötena har varit jämna, så kryss är fullt rimligt. Jag ringar in etta och kryss, och borta får klara sig själv. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som har vunnit fyra raka.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Burtons tränare sjuk, MK Dons i målberusning",
+   "lead": "Burton åker till Stadium MK utan Gary Bowyer, som ligger sjuk, och assisterande tränaren Pat Lyons får sköta snacket. Där väntar MK Dons, som har gjort tio mål på sina två senaste ligamatcher hemma och dessutom slagit ut Swindon ur FA-cupen.",
+   "paragraphs": [
+    "Det ser du redan på uppvärmningen när ett lag har fått självförtroende, och MK Dons har fått det. Hemma vann de med 4–1 mot Bromley och med 6–1 mot Doncaster, och sedan slog de Swindon med 2–1 i cupen. Paul Warne bygger på en följd av fyra raka segrar. Inför matchen talade han om konditionen hos Kane Wilson, Ryan Barnett och Rushian Hepburn-Murphy, enligt klubbens egen sida [1]. Han var också noga med att ge motståndaren beröm. ”He knows what he’s doing”, sade Warne om Bowyer enligt MK Citizen [2].",
+    "Bowyer själv är borta på grund av sjukdom, och därför satt assisterande tränaren Pat Lyons på presskonferensen, enligt Burtons klubbsida [3]. En tränare som kliver in en fredag har inget lätt jobb. Det tar man inte på torsdagsträningen, för den har redan varit. Burton har gjort nästan sex mål fler än chanserna borde ha gett i år, och bara Wycombe har stoppat dem på senare tid. Senast spelade de bort Rushden & Diamonds med 4–0 i cupen.",
+    "Mötena mellan klubbarna har varit snåla. På sex matcher sedan 2020 har ingen vunnit med mer än ett mål, och tre av dem har slutat oavgjort. I Grusnäs hade vi en gång en assisterande tränare som fick ta ett helt matchmöte på egen hand, och han pratade bara om hörnor. Det var kanske inte så dumt."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "MK Dons",
+     "title": "Warne Previews Burton Albion",
+     "url": "https://www.mkdons.com/news/2026/november/12/warne-previews-burton-albion",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "MK Citizen",
+     "title": "“He knows what he’s doing”: Warne on Burton boss Bowyer ahead of clash",
+     "url": "https://www.miltonkeynes.co.uk/sport/football/mk-dons/he-knows-what-hes-doing-warne-on-burton-boss-bowyer-ahead-of-clash-9349019",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Burton Albion FC",
+     "title": "PRESS CONFERENCE: MK DONS (A)",
+     "url": "https://www.burtonalbionfc.co.uk/news/2026/november/13/press-conference--mk-dons--a-",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger MK Dons mycket större chans än vår prognos gör, och prognosen ser ingen anledning att avskriva Burton. Fast hemmalagets målform ser verklig ut, och Burton saknar sin tränare [1]. Burtons målskytte ligger dessutom långt över vad chanserna ger, och sådant brukar jämna ut sig. Mötena har varit jämna, så kryss är fullt rimligt. Jag ringar in etta och kryss, och borta får klara sig själv. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som har vunnit fyra raka.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Hemma, men jämnt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Burton Albion FC",
+      "title": "PRESS CONFERENCE: MK DONS (A)",
+      "url": "https://www.burtonalbionfc.co.uk/news/2026/november/13/press-conference--mk-dons--a-",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:17:05.034Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "MK Dons har gjort tio mål på sina två senaste ligamatcher hemma och har vunnit fyra raka. Ett lag som vinner med 6–1 mot Doncaster har ordning på anfallsspelet, och den ordningen försvinner inte över en natt.",
+     "Burton har gjort nästan sex mål fler än chanserna borde ha gett, och sådan tur brukar ta slut. Dessutom ligger tränaren sjuk, och då får assisterande tränaren styra ett lag som han inte har förberett ensam. Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "Jag vet att mötena mellan klubbarna har varit jämna. Men den här gången har hemmalaget formen, medan bortalaget har en tur som håller på att ta slut och en tränare som är borta. Det är solklart en etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-13T18:17:05.034Z",
+    "uppdrag": {
+     "fraser": [
+      "Solklart",
+      "Då är jag jävligt snäll"
+     ],
+     "krydda": "Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:17:18.628Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880745",
+   "match": "Stockport County – Reading",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:19:56.636Z",
+   "text": "Stockport letar målvakt, Reading letar mittbackar\n\nPå Edgeley Park möts tvåan och sexan i League One, och båda lagen saknar folk där det gör mest ont. Stockport har sin förstemålvakt avstängd, och Reading har en enda frisk mittback från A-truppen. Det blir en eftermiddag för reserver och akademipojkar.\n\nJimmy McNulty har ett problem som sällan dyker upp. Luca Ashby-Hammond är avstängd efter sitt röda kort i cupmatchen mot Cray Wanderers, och enligt The72 [1] kan klubben behöva värva en målvakt i all hast. Hans plan var att ringa Englands U20-förbundskapten Darren Moore om Ollie Whatmuff, 19 år och utlånad från Manchester City: ”My plan is to chat to Darren and beg him!” [1]. Whatmuff spelade under McNulty i Rochdale förra säsongen. ”I've never been in this situation before”, sa McNulty [1]. Jag har varit med om värre, och då hade vi ingen målvakt.\n\nI Reading ser det ännu tunnare ut. Reading Chronicle [2] skriver att Conor Masterson är den enda friska mittbacken från A-truppen. Paudie O'Connor är avstängd efter sitt femte gula kort, Jeriel Dorsett är uttagen av Montserrat och Benn Ward har en bäckenskada. På frågan om Ward hinner bli klar svarade Leam Richardson ”I don't think so” [2]. Josh Knight fick en smäll mot Peterborough, och anfallaren Jacob Brown har fortfarande ont i revbenen. Kaptenen Lewis Wing spelar enligt tränaren på sprutor [2]. Akademispelarna Boyd Beacroft och Philip Duah förbereds, och Udoka Godwin-Malife kan få flytta in från högerbacken [2].\n\nDet här är ett möte där fasta situationer kommer att avgöra mycket. Stockport sköt i snitt 17 skott per match i ligan men har gjort nästan tre mål färre än chanserna borde ge. Mot en ihopplockad backlinje får de nya chanser. Det där löser man med en hink bollar, och gärna på torsdagsträningen.\n\nTipset: 1X (Ettan, kryss bakom)\n\nPrognosen ger Stockport ungefär varannan seger, och spelbolagen tror ännu lite mer på hemmalaget. Det jag läste drar åt samma håll. Reading ställer upp med en enda mittback från A-truppen bredvid omskolade backar och akademispelare, och kaptenen spelar på sprutor [1]. Stockport skapar mycket och har gjort färre mål än chanserna säger, och det brukar jämna ut sig. Det som håller mig tillbaka är målvakten. Ashby-Hammond är avstängd, och det var oklart vem som står i stället [2]. Ett oavgjort resultat är dessutom det troligaste enskilda utfallet i prognosen. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Stockport letar målvakt, Reading letar mittbackar",
+   "lead": "På Edgeley Park möts tvåan och sexan i League One, och båda lagen saknar folk där det gör mest ont. Stockport har sin förstemålvakt avstängd, och Reading har en enda frisk mittback från A-truppen. Det blir en eftermiddag för reserver och akademipojkar.",
+   "paragraphs": [
+    "Jimmy McNulty har ett problem som sällan dyker upp. Luca Ashby-Hammond är avstängd efter sitt röda kort i cupmatchen mot Cray Wanderers, och enligt The72 [1] kan klubben behöva värva en målvakt i all hast. Hans plan var att ringa Englands U20-förbundskapten Darren Moore om Ollie Whatmuff, 19 år och utlånad från Manchester City: ”My plan is to chat to Darren and beg him!” [1]. Whatmuff spelade under McNulty i Rochdale förra säsongen. ”I've never been in this situation before”, sa McNulty [1]. Jag har varit med om värre, och då hade vi ingen målvakt.",
+    "I Reading ser det ännu tunnare ut. Reading Chronicle [2] skriver att Conor Masterson är den enda friska mittbacken från A-truppen. Paudie O'Connor är avstängd efter sitt femte gula kort, Jeriel Dorsett är uttagen av Montserrat och Benn Ward har en bäckenskada. På frågan om Ward hinner bli klar svarade Leam Richardson ”I don't think so” [2]. Josh Knight fick en smäll mot Peterborough, och anfallaren Jacob Brown har fortfarande ont i revbenen. Kaptenen Lewis Wing spelar enligt tränaren på sprutor [2]. Akademispelarna Boyd Beacroft och Philip Duah förbereds, och Udoka Godwin-Malife kan få flytta in från högerbacken [2].",
+    "Det här är ett möte där fasta situationer kommer att avgöra mycket. Stockport sköt i snitt 17 skott per match i ligan men har gjort nästan tre mål färre än chanserna borde ge. Mot en ihopplockad backlinje får de nya chanser. Det där löser man med en hink bollar, och gärna på torsdagsträningen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The72 via Yahoo Sports",
+     "title": "Stockport County may need to sign emergency goalkeeper for Reading clash",
+     "url": "https://uk.sports.yahoo.com/news/stockport-county-may-sign-emergency-100502697.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Reading Chronicle via Yahoo Sports",
+     "title": "Reading FC without key players in defence ahead of Stockport County",
+     "url": "https://uk.sports.yahoo.com/news/reading-fc-without-key-players-120643663.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Stockport ungefär varannan seger, och spelbolagen tror ännu lite mer på hemmalaget. Det jag läste drar åt samma håll. Reading ställer upp med en enda mittback från A-truppen bredvid omskolade backar och akademispelare, och kaptenen spelar på sprutor [1]. Stockport skapar mycket och har gjort färre mål än chanserna säger, och det brukar jämna ut sig. Det som håller mig tillbaka är målvakten. Ashby-Hammond är avstängd, och det var oklart vem som står i stället [2]. Ett oavgjort resultat är dessutom det troligaste enskilda utfallet i prognosen. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Ettan, kryss bakom",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Reading Chronicle via Yahoo Sports",
+      "title": "Reading FC without key players in defence ahead of Stockport County",
+      "url": "https://uk.sports.yahoo.com/news/reading-fc-without-key-players-120643663.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The72 via Yahoo Sports",
+      "title": "Stockport County may need to sign emergency goalkeeper for Reading clash",
+      "url": "https://uk.sports.yahoo.com/news/stockport-county-may-sign-emergency-100502697.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:19:56.636Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Stockport har sin förstemålvakt avstängd, och det skaver lite. Men det är en spelare. Reading har en enda frisk mittback från A-truppen, och bredvid honom står en högerback som fått flytta in och ett par akademipojkar. Kaptenen spelar på sprutor. Den backlinjen är ihopplockad på parkeringen, och den ska hålla mot tvåan i serien på bortaplan.",
+     "Stockport skjuter i snitt 17 skott per match och har gjort färre mål än chanserna borde ge. Mot en sån här backlinje får de skjuta ännu mer, och vid hörnorna blir det rent kaos i straffområdet hos Reading. Reservmålvakten släpper nog in ett, det tål jag. Så er det sagt, som vi sa i Köpenhamn. Etta, och bara etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-13T18:19:56.636Z",
+    "uppdrag": {
+     "fraser": [
+      "Glöm det",
+      "Så är det bara"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:20:14.852Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880744",
+   "match": "Wigan Athletic – Barnsley",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:22:38.938Z",
+   "text": "Fem gånger 1–1 och ingen har tröttnat än\n\nWigan och Barnsley möts i en tidig bottenmatch i League One. De två senaste säsongerna har lagen nästan bara spelat 1–1 mot varandra. Nu har ena laget ont om anfallare, och det andra kommer från en cupfest med sju gjorda mål.\n\nJag har sett många serier men sällan en som är så envis. Av lagens sju senaste möten har fem slutat 1–1, och det senaste kom redan i augusti på Oakwell. Nu möts två lag på plats 21 och 23 i tabellen, och The72 skriver att matchen ”could end up being a decisive one in the League One relegation fight” [1]. Det stämmer. I en sådan här match vinner det lag som står rätt på hörnorna.\n\nWigans problem syns i målprotokollet. Laget har inte gjort mål i 8 av 14 ligamatcher och har gjort drygt åtta mål färre än chanserna borde ha gett. Dessutom skadade sig Scott Hogan mot Mansfield. Enligt Sports Mole lär han missa matchen, och troligen gör Dara Costelloe och Luke Harris det också. Då får Christian Saydee bära anfallet ensam [2]. Gary Caldwell har dessutom kopplats ihop med det lediga jobbet i Aberdeen [1]. Det är ingen lugn vecka att leda en bottenklubb under.\n\nBarnsley har gått åtta ligamatcher utan seger, men mot Aldershot i FA-cupen vann de med 7–2. Makenzie Kirk gjorde två mål och lär leda anfallet, och Daniel Johnson väntas ta plats bredvid Luca Connell. Connor O'Riordan, Ben Hamed Toure och Fabio Jalo är skadade, och Patrick Kelly är borta med Nordirland [2]. Vimal Yoganathan har gjort tre mål på fyra matcher [1]. Det ser du redan på uppvärmningen, när en spelare har börjat träffa.\n\nTipset: 1X (krysset lockar mest)\n\nPrognosen ger Wigan en liten fördel och tror mer på oavgjort än marknaden gör. Det kan jag förstå, för fem av de sju senaste mötena har slutat 1–1. Utan Hogan och troligen utan Costelloe [1] blir Wigan ännu svårare att få att göra mål. Barnsley har inte vunnit på åtta ligamatcher och har bara en bortaseger den här säsongen [2]. Jag ringar därför in hemmaseger och oavgjort och låter bortasegern ligga.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Fem gånger 1–1 och ingen har tröttnat än",
+   "lead": "Wigan och Barnsley möts i en tidig bottenmatch i League One. De två senaste säsongerna har lagen nästan bara spelat 1–1 mot varandra. Nu har ena laget ont om anfallare, och det andra kommer från en cupfest med sju gjorda mål.",
+   "paragraphs": [
+    "Jag har sett många serier men sällan en som är så envis. Av lagens sju senaste möten har fem slutat 1–1, och det senaste kom redan i augusti på Oakwell. Nu möts två lag på plats 21 och 23 i tabellen, och The72 skriver att matchen ”could end up being a decisive one in the League One relegation fight” [1]. Det stämmer. I en sådan här match vinner det lag som står rätt på hörnorna.",
+    "Wigans problem syns i målprotokollet. Laget har inte gjort mål i 8 av 14 ligamatcher och har gjort drygt åtta mål färre än chanserna borde ha gett. Dessutom skadade sig Scott Hogan mot Mansfield. Enligt Sports Mole lär han missa matchen, och troligen gör Dara Costelloe och Luke Harris det också. Då får Christian Saydee bära anfallet ensam [2]. Gary Caldwell har dessutom kopplats ihop med det lediga jobbet i Aberdeen [1]. Det är ingen lugn vecka att leda en bottenklubb under.",
+    "Barnsley har gått åtta ligamatcher utan seger, men mot Aldershot i FA-cupen vann de med 7–2. Makenzie Kirk gjorde två mål och lär leda anfallet, och Daniel Johnson väntas ta plats bredvid Luca Connell. Connor O'Riordan, Ben Hamed Toure och Fabio Jalo är skadade, och Patrick Kelly är borta med Nordirland [2]. Vimal Yoganathan har gjort tre mål på fyra matcher [1]. Det ser du redan på uppvärmningen, när en spelare har börjat träffa."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The72",
+     "title": "Wigan Athletic vs Barnsley predictions as 'decisive' game awaits League One strugglers",
+     "url": "https://the72.co.uk/2026/11/12/wigan-athletic-vs-barnsley-predictions",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sports Mole",
+     "title": "Preview: Wigan Athletic vs Barnsley - prediction, team news, lineups",
+     "url": "https://sportsmole.co.uk/football/wigan-athletic/preview/wigan-vs-barnsley-prediction-team-news-lineups_609021.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Wigan en liten fördel och tror mer på oavgjort än marknaden gör. Det kan jag förstå, för fem av de sju senaste mötena har slutat 1–1. Utan Hogan och troligen utan Costelloe [1] blir Wigan ännu svårare att få att göra mål. Barnsley har inte vunnit på åtta ligamatcher och har bara en bortaseger den här säsongen [2]. Jag ringar därför in hemmaseger och oavgjort och låter bortasegern ligga.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "krysset lockar mest",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Mole",
+      "title": "Preview: Wigan Athletic vs Barnsley - prediction, team news, lineups",
+      "url": "https://sportsmole.co.uk/football/wigan-athletic/preview/wigan-vs-barnsley-prediction-team-news-lineups_609021.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The72",
+      "title": "Wigan Athletic vs Barnsley predictions as 'decisive' game awaits League One strugglers",
+      "url": "https://the72.co.uk/2026/11/12/wigan-athletic-vs-barnsley-predictions",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:22:38.938Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Fem av de sju senaste mötena mellan Wigan och Barnsley har slutat 1–1. Jag brukar inte tro på sådant, men här finns det en förklaring. Det är två lag som har jävligt svårt att vinna matcher.",
+     "Wigan har inte gjort mål i 8 av 14 ligamatcher, och nu saknas troligen Hogan, Costelloe och Harris. Då står Saydee ensam längst fram, och det räcker inte till två mål. Barnsley vann med 7–2 i cupen, men i ligan är de utan seger på åtta matcher och har bara vunnit en gång på bortaplan. Ett cupkalas säger ingenting om en ligamatch där båda lagen slåss för att hålla sig kvar.",
+     "Ingen av dem har ett anfall som kan avgöra matchen. Jag ringar in krysset och bara krysset."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "1–1",
+    "tips": "2026-11-13T18:22:38.938Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Glöm det"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:23:14.575Z",
+    "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861164",
+   "match": "Georgien – Ungern",
+   "avspark": "2026-11-14T17:00Z",
+   "writtenAt": "2026-11-13T18:05:00.000Z",
+   "text": "Georgien har inte gjort ett mål\n\nGeorgien har spelat fyra matcher i Nations League utan att göra mål och ligger sist i grupp B2. Ungern är tvåa med 7 poäng och vann det första mötet med 1–0 i Budapest. I Tbilisi blir det tidig avspark.\n\nSiffrorna för Georgien är nästan för tydliga. Fyra matcher, 0 gjorda mål och 2 insläppta, två förluster och två oavgjorda. Och det blir inte lättare: Khvicha Kvaratskhelia är borta med en allvarlig skada, och Giorgi Kochorashvili är avstängd, skriver Dailysports [1]. Ramaz Svanadze har kallat in 26 spelare med tre debutanter, och det är Georges Mikautadze och Zuriko Davitashvili som ska göra målen [2].\n\nUngern vann i Budapest i oktober när Kerkez gjorde matchens enda mål, enligt PSG:s egen rapport [3]. Marco Rossi har tagit ut 27 spelare, och Roland Sallai och Barnabás Varga är tillbaka efter sina skador [2]. Laget har två segrar på de två senaste matcherna och leder inte gruppen bara för att Nordirland inte släpper in mål.\n\nDet tar vi på torsdagsträningen: när ett lag inte gör mål är det sällan anfallarna det är fel på, utan bollarna som aldrig kommer fram till dem. Georgien har hållit nollan i hälften av matcherna, så det är inget lag som rasar. Men det står ett lag på planen som ska göra mål och inte vet hur, och ett lag som har Dominik Szoboszlai.\n\nTipset: X2 (Georgien gör inga mål)\n\nMarknaden ger Ungern oddset 2,63 och Georgien 3,23, samma som för krysset. Jag lutar åt gästerna. Georgien har inte gjort ett mål i gruppen och saknar både Kvaratskhelia och Kochorashvili [1], medan Ungern har fått tillbaka Sallai och Varga [2]. Men ett lag som har hållit nollan i hälften av matcherna förlorar inte stort, så jag tar krysset och tvåan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Georgien har inte gjort ett mål",
+   "lead": "Georgien har spelat fyra matcher i Nations League utan att göra mål och ligger sist i grupp B2. Ungern är tvåa med 7 poäng och vann det första mötet med 1–0 i Budapest. I Tbilisi blir det tidig avspark.",
+   "paragraphs": [
+    "Siffrorna för Georgien är nästan för tydliga. Fyra matcher, 0 gjorda mål och 2 insläppta, två förluster och två oavgjorda. Och det blir inte lättare: Khvicha Kvaratskhelia är borta med en allvarlig skada, och Giorgi Kochorashvili är avstängd, skriver Dailysports [1]. Ramaz Svanadze har kallat in 26 spelare med tre debutanter, och det är Georges Mikautadze och Zuriko Davitashvili som ska göra målen [2].",
+    "Ungern vann i Budapest i oktober när Kerkez gjorde matchens enda mål, enligt PSG:s egen rapport [3]. Marco Rossi har tagit ut 27 spelare, och Roland Sallai och Barnabás Varga är tillbaka efter sina skador [2]. Laget har två segrar på de två senaste matcherna och leder inte gruppen bara för att Nordirland inte släpper in mål.",
+    "Det tar vi på torsdagsträningen: när ett lag inte gör mål är det sällan anfallarna det är fel på, utan bollarna som aldrig kommer fram till dem. Georgien har hållit nollan i hälften av matcherna, så det är inget lag som rasar. Men det står ett lag på planen som ska göra mål och inte vet hur, och ett lag som har Dominik Szoboszlai."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Dailysports",
+     "title": "Georgia vs Hungary: hosts aim to take revenge and keep promotion hopes alive",
+     "url": "https://dailysports.net/predictions/georgia-hungary-hosts-aim-to-take-revenge-and-keep-promotion-hopes-alive/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "1TV",
+     "title": "Nations League: Hungary v Georgia match preview",
+     "url": "https://1tv.ge/lang/en/news/nations-league-hungary-v-georgia-match-preview-and-live-broadcast-on-gpb-first-channel-1tvsport/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "PSG",
+     "title": "Kvaratskhelia's Georgia narrowly beaten by Hungary",
+     "url": "https://www.psg.fr/en/content/kvaratskhelias-georgia-narrowly-beaten-by-hungary-psg-national-teams-kvaratskhelia-uefa-nations-league-2026-2027",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Ungern oddset 2,63 och Georgien 3,23, samma som för krysset. Jag lutar åt gästerna. Georgien har inte gjort ett mål i gruppen och saknar både Kvaratskhelia och Kochorashvili [1], medan Ungern har fått tillbaka Sallai och Varga [2]. Men ett lag som har hållit nollan i hälften av matcherna förlorar inte stort, så jag tar krysset och tvåan.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Georgien gör inga mål",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Dailysports",
+      "title": "Georgia vs Hungary: hosts aim to take revenge and keep promotion hopes alive",
+      "url": "https://dailysports.net/predictions/georgia-hungary-hosts-aim-to-take-revenge-and-keep-promotion-hopes-alive/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "1TV",
+      "title": "Nations League: Hungary v Georgia match preview",
+      "url": "https://1tv.ge/lang/en/news/nations-league-hungary-v-georgia-match-preview-and-live-broadcast-on-gpb-first-channel-1tvsport/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Georgien har inte gjort ett mål på fyra matcher, och nu är Kvaratskhelia borta. Att de plötsligt skulle hitta nätet, det köper jag aldrig.",
+     "Ungern har fått tillbaka Sallai och Varga och har Szoboszlai. Ett mål räcker, så är det bara. Tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–1",
+    "tips": "2026-11-13T18:05:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Det köper jag aldrig",
+      "Så är det bara"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861165",
+   "match": "Norge – Wales",
+   "avspark": "2026-11-14T17:00Z",
+   "writtenAt": "2026-11-13T18:05:00.000Z",
+   "text": "Norge har förlorat med uddamålet tre gånger\n\nNorge och Wales har 3 poäng var efter 4 matcher, och förloraren riskerar att åka ur högsta divisionen. Wales vann mötet i Cardiff med 2–1. Norge har förlorat tre raka gruppmatcher med just den siffran.\n\nDet märkliga med Norge är att laget inte förlorar stort. Tre raka förluster med 1–2, två mot Portugal och en i Cardiff, och ändå är det ett lag som slog Brasilien i somras och gick till förlängning mot England i VM. Erling Haaland och Martin Ødegaard missade ett träningspass i veckan men är tillbaka, enligt beIN Sports [1]. Ståle Solbakken förlorar däremot Jørgen Strand Larsen, och Alexander Sørloth klarar inte två hela matcher på kort tid [2].\n\nCraig Bellamy har tagit ut 26 spelare. Harry Wilson är tillbaka efter att inte ha spelat för Wales sedan mars, och Joe Rodon har inte spelat sedan augusti på grund av en baksida lår [3]. Jordan James lämnade truppen skadad och ersattes av Kai Andrews från U21 [3]. Wales har bara gjort 2 mål på fyra gruppmatcher, båda i segern mot Norge.\n\nJag har varit med om värre, och då hade vi ingen målvakt. Men det här är en match där det ena laget skjuter och det andra försvarar sig, och Wales har inte hållit nollan en enda gång i gruppen. På Ullevaal är det dessutom tidig avspark, 18.00 svensk tid, och sedan väntar Danmark för Norge och Portugal för Wales.\n\nTipset: 1 (Haaland är tillbaka)\n\nMarknaden ger Norge oddset 1,27 och Wales 12,50, och den här gången håller jag med utan att blinka. Haaland och Ødegaard är tillbaka i träning [1], Wales har gjort 2 mål på fyra matcher och har aldrig hållit nollan i gruppen. Rodon kommer in utan matcher sedan augusti [2]. Tre förluster med uddamålet är otur mer än något annat. Ettan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Norge har förlorat med uddamålet tre gånger",
+   "lead": "Norge och Wales har 3 poäng var efter 4 matcher, och förloraren riskerar att åka ur högsta divisionen. Wales vann mötet i Cardiff med 2–1. Norge har förlorat tre raka gruppmatcher med just den siffran.",
+   "paragraphs": [
+    "Det märkliga med Norge är att laget inte förlorar stort. Tre raka förluster med 1–2, två mot Portugal och en i Cardiff, och ändå är det ett lag som slog Brasilien i somras och gick till förlängning mot England i VM. Erling Haaland och Martin Ødegaard missade ett träningspass i veckan men är tillbaka, enligt beIN Sports [1]. Ståle Solbakken förlorar däremot Jørgen Strand Larsen, och Alexander Sørloth klarar inte två hela matcher på kort tid [2].",
+    "Craig Bellamy har tagit ut 26 spelare. Harry Wilson är tillbaka efter att inte ha spelat för Wales sedan mars, och Joe Rodon har inte spelat sedan augusti på grund av en baksida lår [3]. Jordan James lämnade truppen skadad och ersattes av Kai Andrews från U21 [3]. Wales har bara gjort 2 mål på fyra gruppmatcher, båda i segern mot Norge.",
+    "Jag har varit med om värre, och då hade vi ingen målvakt. Men det här är en match där det ena laget skjuter och det andra försvarar sig, och Wales har inte hållit nollan en enda gång i gruppen. På Ullevaal är det dessutom tidig avspark, 18.00 svensk tid, och sedan väntar Danmark för Norge och Portugal för Wales."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "beIN Sports",
+     "title": "Good News for Norway: Haaland and Ødegaard Return",
+     "url": "https://www.beinsports.com/en-us/soccer/uefa-nations-league/articles/good-news-for-norway-haaland-and-degaard-return-to-training-2026-11-11",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Goal",
+     "title": "Norway sweat on Erling Haaland and Martin Odegaard fitness as Staale Solbakken refuses to reveal key duo's training absence",
+     "url": "https://www.goal.com/en/news/norway-erling-haaland-martin-odegaard-staale-solbakken/blt22ae4006f2f80fd2",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Sky Sports",
+     "title": "Wales: Craig Bellamy announces 26-man squad for UEFA Nations League matches against Norway and Portugal",
+     "url": "https://www.skysports.com/football/news/13607854/wales-craig-bellamy-announces-26-man-squad-for-uefa-nations-league-matches-against-norway-and-portugal",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Norge oddset 1,27 och Wales 12,50, och den här gången håller jag med utan att blinka. Haaland och Ødegaard är tillbaka i träning [1], Wales har gjort 2 mål på fyra matcher och har aldrig hållit nollan i gruppen. Rodon kommer in utan matcher sedan augusti [2]. Tre förluster med uddamålet är otur mer än något annat. Ettan.",
+    "signs": [
+     0
+    ],
+    "note": "Haaland är tillbaka",
+    "sources": [
+     {
+      "n": 1,
+      "source": "beIN Sports",
+      "title": "Good News for Norway: Haaland and Ødegaard Return",
+      "url": "https://www.beinsports.com/en-us/soccer/uefa-nations-league/articles/good-news-for-norway-haaland-and-degaard-return-to-training-2026-11-11",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sky Sports",
+      "title": "Wales: Craig Bellamy announces 26-man squad for UEFA Nations League matches against Norway and Portugal",
+      "url": "https://www.skysports.com/football/news/13607854/wales-craig-bellamy-announces-26-man-squad-for-uefa-nations-league-matches-against-norway-and-portugal",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Tre förluster med uddamålet, och folk tror att Norge är i kris. Nej nej nej. Ett lag som slog Brasilien i somras rasar inte för att det har haft otur i några matcher.",
+     "Wales har gjort 2 mål på fyra matcher och har aldrig hållit nollan i gruppen. Haaland och Ødegaard är tillbaka i träning. Ettan, och jag tror att det blir tydligt."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–0",
+    "tips": "2026-11-13T18:05:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Nej nej nej",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861169",
+   "match": "Nordirland – Ukraina",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T18:05:00.000Z",
+   "text": "Nordirland har inte släppt in ett mål\n\nNordirland leder grupp B2 och har hållit nollan i alla fyra matcherna. Ukraina förlorade det första mötet med 0–3 och ligger trea med 4 poäng. På Windsor Park väntar en match där ett mål kan räcka långt.\n\nMichael O’Neills lag har gjort 4 mål och släppt in 0 på fyra matcher. Det är inte vackert, men det är effektivt, och segern i Ukrainas hemmamatch i oktober blev 3–0. Nu saknas Ceadach O’Neill, den 18-årige yttern från Arsenal, som har lämnat truppen med en skada, och varken Conor Bradley eller Daniel Ballard är med, skriver The False 9 [1]. I stället har förbundskaptenen gett målvakten Dermot Mee och anfallaren Eoin Kenny deras första uttagningar [2].\n\nUkraina har haft det tungt. Två raka hemmaförluster, mot Nordirland och Ungern, och bara 2 gjorda mål i gruppen. Oleksandr Zubkov har lämnat truppen skadad, och Mykola Shaparenko och Vladyslav Vanat har kallats in [3]. Laget har ändå spelare som Ilya Zabarnyi och Vitalii Mykolenko, och det vann 2–0 i Polen i våras.\n\nDet där löser man med en hink bollar, säger jag om lag som inte gör mål, men Nordirland har gått mållöst i två av fyra matcher och klarat sig ändå. Det är ett lag som har förstått att 0–0 också är en poäng. Hemma har laget två oavgjorda och ingen seger i gruppen, och tre dagar senare väntar Ungern borta.\n\nTipset: 1X (nollan håller)\n\nMarknaden ger Nordirland oddset 2,63, krysset 3,13 och Ukraina 3,33. Det är jämnt, och det stämmer med vad jag ser. Nordirland har inte släppt in ett mål i gruppen men har bara spelat oavgjort hemma. Ukraina saknar Zubkov [1], och Nordirland saknar Ceadach O’Neill, Bradley och Ballard [2]. Ett lag som har fyra nollor förlorar sällan, så jag tar ettan och krysset.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Nordirland har inte släppt in ett mål",
+   "lead": "Nordirland leder grupp B2 och har hållit nollan i alla fyra matcherna. Ukraina förlorade det första mötet med 0–3 och ligger trea med 4 poäng. På Windsor Park väntar en match där ett mål kan räcka långt.",
+   "paragraphs": [
+    "Michael O’Neills lag har gjort 4 mål och släppt in 0 på fyra matcher. Det är inte vackert, men det är effektivt, och segern i Ukrainas hemmamatch i oktober blev 3–0. Nu saknas Ceadach O’Neill, den 18-årige yttern från Arsenal, som har lämnat truppen med en skada, och varken Conor Bradley eller Daniel Ballard är med, skriver The False 9 [1]. I stället har förbundskaptenen gett målvakten Dermot Mee och anfallaren Eoin Kenny deras första uttagningar [2].",
+    "Ukraina har haft det tungt. Två raka hemmaförluster, mot Nordirland och Ungern, och bara 2 gjorda mål i gruppen. Oleksandr Zubkov har lämnat truppen skadad, och Mykola Shaparenko och Vladyslav Vanat har kallats in [3]. Laget har ändå spelare som Ilya Zabarnyi och Vitalii Mykolenko, och det vann 2–0 i Polen i våras.",
+    "Det där löser man med en hink bollar, säger jag om lag som inte gör mål, men Nordirland har gått mållöst i två av fyra matcher och klarat sig ändå. Det är ett lag som har förstått att 0–0 också är en poäng. Hemma har laget två oavgjorda och ingen seger i gruppen, och tre dagar senare väntar Ungern borta."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The False 9",
+     "title": "Northern Ireland vs Ukraine Predicted Lineup, Team News and TV (14 November)",
+     "url": "https://thefalse9.com/2026/11/northern-ireland-vs-ukraine-predicted-lineup-team-news.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "The Irish News",
+     "title": "Arsenal prospect Ceadach O’Neill confirmed in Northern Ireland squad",
+     "url": "https://www.irishnews.com/sport/soccer/arsenal-prospect-ceadach-oneill-confirmed-in-northern-ireland-squad-for-nations-league-quadruple-YG7XWHB4WRDPNKF3VRY2TVXA3Q/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Forebet",
+     "title": "Northern Ireland's steel meets Ukraine's control in a tight Group B2 rematch",
+     "url": "https://www.forebet.com/en/football-match-previews/32372-northern-irelands-steel-meets-ukraines-control-in-a-tight-group-b2-rematch",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Nordirland oddset 2,63, krysset 3,13 och Ukraina 3,33. Det är jämnt, och det stämmer med vad jag ser. Nordirland har inte släppt in ett mål i gruppen men har bara spelat oavgjort hemma. Ukraina saknar Zubkov [1], och Nordirland saknar Ceadach O’Neill, Bradley och Ballard [2]. Ett lag som har fyra nollor förlorar sällan, så jag tar ettan och krysset.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "nollan håller",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Forebet",
+      "title": "Northern Ireland's steel meets Ukraine's control in a tight Group B2 rematch",
+      "url": "https://www.forebet.com/en/football-match-previews/32372-northern-irelands-steel-meets-ukraines-control-in-a-tight-group-b2-rematch",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The False 9",
+      "title": "Northern Ireland vs Ukraine Predicted Lineup, Team News and TV (14 November)",
+      "url": "https://thefalse9.com/2026/11/northern-ireland-vs-ukraine-predicted-lineup-team-news.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Nordirland har inte släppt in ett enda mål i gruppen, men hemma har de bara spelat oavgjort. Det är ett lag som har bestämt sig för att inte förlora.",
+     "Ukraina har bara gjort 2 mål och tappar Zubkov. Nej nej nej, här blir det inga mål att tala om. Kryss."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "0–0",
+    "tips": "2026-11-13T18:05:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Äsch",
+      "Nej nej nej"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861170",
+   "match": "Österrike – Irland",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T18:05:00.000Z",
+   "text": "Österrike kan gå upp redan i Linz\n\nÖsterrike leder grupp B3 med 8 poäng och kan säkra återkomsten till Nations Leagues högsta division med en seger mot Irland. Mötet i Dublin i oktober slutade 2–2. Irland ligger trea med 5 poäng.\n\nRalf Rangnick har sagt att han ställer upp med den starkaste elvan han har, och han vet varför: en hemmaseger i Linz kan räcka för att Österrike ska gå upp, skriver ORF [1]. David Alaba saknas med en vadskada, men Christoph Baumgartner är tillbaka efter en lång skadeperiod, och den 17-årige Luca Weinhandl från Sturm Graz är ny i truppen [1, 2]. Österrike har gjort mål i alla gruppmatcher men inte hållit nollan en enda gång.\n\nHeimir Hallgrímsson har sin kapten Nathan Collins tillbaka efter en vadskada, men saknar målvakten Gavin Bazunu, och Evan Ferguson, Josh Cullen och Jaden Umeh är skadade, enligt The42 [3]. Mark Travers står i stället för Bazunu. Seamus Coleman har en roll mittemellan spelare och ledare och spelar inte i Linz, och fem irländare går på gult kort inför Kosovo [4].\n\nIrland har bara en seger på fyra gruppmatcher, men laget förlorar sällan: tre oavgjorda och en förlust på de fem senaste landskamperna. Bollen har aldrig läst en tabell. Senast lagen möttes, i Dublin, slutade det 2–2. Efter Linz väntar Israel borta i Debrecen, och för Irland Kosovo hemma på Aviva Stadium, så ingen av förbundskaptenerna kan spara på något.\n\nTipset: 1X (Linz bär hemmalaget)\n\nMarknaden ger Österrike oddset 1,64 och Irland 5,88. Österrike har allt att spela för och Rangnick ställer upp sitt bästa lag [1], men laget har inte hållit nollan i gruppen och spelade 2–2 i Dublin. Irland saknar Ferguson och Bazunu [2], och en irländare med gult kort tänker redan på Kosovo [3]. Jag tror på Österrike, men inte så mycket att jag släpper krysset. Ettan och krysset.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Österrike kan gå upp redan i Linz",
+   "lead": "Österrike leder grupp B3 med 8 poäng och kan säkra återkomsten till Nations Leagues högsta division med en seger mot Irland. Mötet i Dublin i oktober slutade 2–2. Irland ligger trea med 5 poäng.",
+   "paragraphs": [
+    "Ralf Rangnick har sagt att han ställer upp med den starkaste elvan han har, och han vet varför: en hemmaseger i Linz kan räcka för att Österrike ska gå upp, skriver ORF [1]. David Alaba saknas med en vadskada, men Christoph Baumgartner är tillbaka efter en lång skadeperiod, och den 17-årige Luca Weinhandl från Sturm Graz är ny i truppen [1, 2]. Österrike har gjort mål i alla gruppmatcher men inte hållit nollan en enda gång.",
+    "Heimir Hallgrímsson har sin kapten Nathan Collins tillbaka efter en vadskada, men saknar målvakten Gavin Bazunu, och Evan Ferguson, Josh Cullen och Jaden Umeh är skadade, enligt The42 [3]. Mark Travers står i stället för Bazunu. Seamus Coleman har en roll mittemellan spelare och ledare och spelar inte i Linz, och fem irländare går på gult kort inför Kosovo [4].",
+    "Irland har bara en seger på fyra gruppmatcher, men laget förlorar sällan: tre oavgjorda och en förlust på de fem senaste landskamperna. Bollen har aldrig läst en tabell. Senast lagen möttes, i Dublin, slutade det 2–2. Efter Linz väntar Israel borta i Debrecen, och för Irland Kosovo hemma på Aviva Stadium, så ingen av förbundskaptenerna kan spara på något."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "ORF",
+     "title": "Nations League: Ohne Alaba, mit Baumgartner und Neuling",
+     "url": "https://sport.orf.at/stories/3164385/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sky Sport Austria",
+     "title": "Ein Debütant: Das ist der ÖFB-Kader für die Nations League",
+     "url": "https://www.skysportaustria.at/ein-debuetant-das-ist-der-oefb-kader-fuer-die-nations-league/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "The42",
+     "title": "Collins returns, Bazunu out injured and Coleman set for 'hybrid role' in Ireland squad",
+     "url": "https://www.the42.ie/ireland-squad-20-7216434-Nov2026/",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "The Irish Times",
+     "title": "Séamus Coleman out for Ireland’s Nations League game against Austria",
+     "url": "https://www.irishtimes.com/sport/soccer/2026/11/13/seamus-coleman-out-for-irelands-nations-league-game-against-austria/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Österrike oddset 1,64 och Irland 5,88. Österrike har allt att spela för och Rangnick ställer upp sitt bästa lag [1], men laget har inte hållit nollan i gruppen och spelade 2–2 i Dublin. Irland saknar Ferguson och Bazunu [2], och en irländare med gult kort tänker redan på Kosovo [3]. Jag tror på Österrike, men inte så mycket att jag släpper krysset. Ettan och krysset.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Linz bär hemmalaget",
+    "sources": [
+     {
+      "n": 1,
+      "source": "ORF",
+      "title": "Nations League: Ohne Alaba, mit Baumgartner und Neuling",
+      "url": "https://sport.orf.at/stories/3164385/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The42",
+      "title": "Collins returns, Bazunu out injured and Coleman set for 'hybrid role' in Ireland squad",
+      "url": "https://www.the42.ie/ireland-squad-20-7216434-Nov2026/",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "The Irish Times",
+      "title": "Séamus Coleman out for Ireland’s Nations League game against Austria",
+      "url": "https://www.irishtimes.com/sport/soccer/2026/11/13/seamus-coleman-out-for-irelands-nations-league-game-against-austria/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Österrike kan gå upp med en seger hemma, och Rangnick ställer upp sitt bästa lag. Total kontroll, tycker man. Men de har inte hållit nollan en enda gång i gruppen.",
+     "Irland saknar Ferguson och Bazunu och har spelare på gult kort som redan tänker på Kosovo. Jag har sett det förr, i Manchester. Det gick bra då också. Ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-13T18:05:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Total kontroll",
+      "Lugn nu"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861167",
+   "match": "Portugal – Danmark",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T18:05:00.000Z",
+   "text": "Portugal börjar om utan Ronaldo\n\nPortugal har vunnit alla fyra gruppmatcherna och tar emot Danmark i Braga. Det är Jorge Jesus första samling sedan Cristiano Ronaldo lämnade landslaget. Danmark ligger tvåa med 6 poäng och har Norge hemma tre dagar senare.\n\nMatchen i Braga är den första där Portugal står utan Cristiano Ronaldo för gott. Jorge Jesus tog ut 28 spelare dagen efter att Ronaldo meddelat att han lämnar landslaget, skriver Jornal de Notícias, och även Nuno Mendes och Gonçalo Inácio saknas medan Gustavo Varela och Alberto Costa är nya [1]. Det ser inte ut att ha bekymrat laget hittills: fyra segrar på fyra matcher, 9 gjorda mål, och 4–2 borta i Köpenhamn i oktober.\n\nDanmark har det knepigare. Brian Riemer saknar fortfarande Andreas Christensen [2], och Jesper Lindstrøm är tillbaka i truppen trots att han inte spelat för landslaget på över ett och ett halvt år [3]. Riemer har dessutom spelare som riskerar avstängning: ett gult kort i Braga betyder att man missar Norge [3]. Det är en sådan detalj som avgör en grupp. Det tar vi på torsdagsträningen, säger jag, men landslag har ingen torsdagsträning.\n\nSiffrorna säger att Danmark har både gjort och släppt in 7 mål i gruppen, och att laget håller nollan ibland men aldrig går mållöst. Mötena sedan våren 2025 är jämnare än tabellen: Danmark vann 1–0 hemma i kvartsfinalen, och Portugal vann returen med 3–2 efter full tid. Bollen har aldrig läst en tabell.\n\nTipset: 1 (Portugal utan krångel)\n\nMarknaden ger Portugal oddset 1,59 och Danmark 5,88. Jag ser ingen anledning att gå emot det. Portugal har vunnit alla gruppmatcher och vann i Köpenhamn utan Ronaldo, så hans avsked [1] ändrar mindre än rubrikerna. Danmark saknar Christensen [2], och spelare som riskerar avstängning inför Norge [3] går inte in i närkamperna som de borde. Ettan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Portugal börjar om utan Ronaldo",
+   "lead": "Portugal har vunnit alla fyra gruppmatcherna och tar emot Danmark i Braga. Det är Jorge Jesus första samling sedan Cristiano Ronaldo lämnade landslaget. Danmark ligger tvåa med 6 poäng och har Norge hemma tre dagar senare.",
+   "paragraphs": [
+    "Matchen i Braga är den första där Portugal står utan Cristiano Ronaldo för gott. Jorge Jesus tog ut 28 spelare dagen efter att Ronaldo meddelat att han lämnar landslaget, skriver Jornal de Notícias, och även Nuno Mendes och Gonçalo Inácio saknas medan Gustavo Varela och Alberto Costa är nya [1]. Det ser inte ut att ha bekymrat laget hittills: fyra segrar på fyra matcher, 9 gjorda mål, och 4–2 borta i Köpenhamn i oktober.",
+    "Danmark har det knepigare. Brian Riemer saknar fortfarande Andreas Christensen [2], och Jesper Lindstrøm är tillbaka i truppen trots att han inte spelat för landslaget på över ett och ett halvt år [3]. Riemer har dessutom spelare som riskerar avstängning: ett gult kort i Braga betyder att man missar Norge [3]. Det är en sådan detalj som avgör en grupp. Det tar vi på torsdagsträningen, säger jag, men landslag har ingen torsdagsträning.",
+    "Siffrorna säger att Danmark har både gjort och släppt in 7 mål i gruppen, och att laget håller nollan ibland men aldrig går mållöst. Mötena sedan våren 2025 är jämnare än tabellen: Danmark vann 1–0 hemma i kvartsfinalen, och Portugal vann returen med 3–2 efter full tid. Bollen har aldrig läst en tabell."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Jornal de Notícias",
+     "title": "Convocados de Jorge Jesus para Dinamarca e País de Gales",
+     "url": "https://www.jn.pt/desporto/artigo/a-primeira-convocatoria-de-jorge-jesus-apos-o-adeus-de-cristiano-ronaldo/18145295",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Goal",
+     "title": "Denmark boss Brian Riemer opens up on Andreas Christensen injury absence as Barcelona star misses Nations League squad",
+     "url": "https://www.goal.com/en-us/news/denmark-brian-riemer-andreas-christensen-barcelona-nations-league/blt071c74a6b9d6a6bc",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Tipsbladet PLbold",
+     "title": "Hemmeligt våben i truppen: Riemer afslører stor fordel før de altafgørende kampe",
+     "url": "https://www.plbold.dk/nyhed/hemmeligt-vaaben-i-truppen-riemer-afsloerer-stor-fordel-foer-de-altafgoerende-kampe/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Portugal oddset 1,59 och Danmark 5,88. Jag ser ingen anledning att gå emot det. Portugal har vunnit alla gruppmatcher och vann i Köpenhamn utan Ronaldo, så hans avsked [1] ändrar mindre än rubrikerna. Danmark saknar Christensen [2], och spelare som riskerar avstängning inför Norge [3] går inte in i närkamperna som de borde. Ettan.",
+    "signs": [
+     0
+    ],
+    "note": "Portugal utan krångel",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Jornal de Notícias",
+      "title": "Convocados de Jorge Jesus para Dinamarca e País de Gales",
+      "url": "https://www.jn.pt/desporto/artigo/a-primeira-convocatoria-de-jorge-jesus-apos-o-adeus-de-cristiano-ronaldo/18145295",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Goal",
+      "title": "Denmark boss Brian Riemer opens up on Andreas Christensen injury absence as Barcelona star misses Nations League squad",
+      "url": "https://www.goal.com/en-us/news/denmark-brian-riemer-andreas-christensen-barcelona-nations-league/blt071c74a6b9d6a6bc",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "Tipsbladet PLbold",
+      "title": "Hemmeligt våben i truppen: Riemer afslører stor fordel før de altafgørende kampe",
+      "url": "https://www.plbold.dk/nyhed/hemmeligt-vaaben-i-truppen-riemer-afsloerer-stor-fordel-foer-de-altafgoerende-kampe/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Äsch, Ronaldo hit eller dit. Portugal vann alla fyra gruppmatcherna och vann 4–2 i Köpenhamn utan honom, så avskedet ändrar mindre än folk tror.",
+     "Danmark saknar Christensen och har spelare som riskerar avstängning inför Norge. Sådana spelare går inte in i närkamperna fullt ut. Så er det sagt, som vi sa i Köpenhamn. Ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-13T18:05:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Då är jag jävligt snäll",
+      "Äsch"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861168",
+   "match": "Rumänien – Polen",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T18:05:00.000Z",
+   "text": "Hagi behöver en poäng och har sagt det själv\n\nRumänien har förlorat alla fyra matcherna i gruppen och släppt in 13 mål. När lagen möttes i Polen i oktober vann Polen med 6–0. Nu kommer Robert Lewandowskis lag till Bukarest och behöver vinna för att hänga med i toppen.\n\nGheorghe Hagi har inte haft det lätt sedan han kom tillbaka. Fyra raka förluster i Nations League, och förbundskaptenen har sagt offentligt att om han inte får laget att spela går han hem, skriver G4Media [1]. Han har kallat in 26 spelare, varav bara 8 spelar i hemmaligan, och målvakten Ionuț Radu saknas med en gammal axelskada [2]. Ianis Hagi och Dennis Man är med [2].\n\nPolen är inte heller utan bekymmer. Jan Urban har tagit ut 25 spelare med Robert Lewandowski som kapten, men Jan Bednarek är avstängd och målvakterna Marcin Bułka och Kamil Grabara är skadade [3]. Piotr Zieliński är vicekapten och den som ska hålla ihop mittfältet. Laget vann 6–0 mot Rumänien, men förlorade sedan 0–1 i Bosnien och har gått mållöst i hälften av gruppmatcherna. Tre dagar senare väntar Sverige i Wrocław.\n\nDet är en match mellan ett lag som har tappat tron och ett som har tappat stadgan. Så gjorde vi i Tjäderfors, och där regnade det in. Rumänien vann ändå sin senaste hemmamatch före hösten, 2–1 mot Wales i juni, och Arena Națională är ingen plats där man vinner av farten.\n\nTipset: 2 (Lewandowski räcker)\n\nMarknaden ger Polen oddset 1,92 och Rumänien 4,17, samma odds som för krysset. Rumänien har släppt in 13 mål på fyra matcher och saknar sin bäste målvakt [1]. Polen saknar Bednarek och två målvakter [2], men har Lewandowski och vann med sex mål senast. Ett lag som står på noll poäng och har en förbundskapten som pratar om att gå hem [3] brukar inte vända det på en kväll. Tvåan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Hagi behöver en poäng och har sagt det själv",
+   "lead": "Rumänien har förlorat alla fyra matcherna i gruppen och släppt in 13 mål. När lagen möttes i Polen i oktober vann Polen med 6–0. Nu kommer Robert Lewandowskis lag till Bukarest och behöver vinna för att hänga med i toppen.",
+   "paragraphs": [
+    "Gheorghe Hagi har inte haft det lätt sedan han kom tillbaka. Fyra raka förluster i Nations League, och förbundskaptenen har sagt offentligt att om han inte får laget att spela går han hem, skriver G4Media [1]. Han har kallat in 26 spelare, varav bara 8 spelar i hemmaligan, och målvakten Ionuț Radu saknas med en gammal axelskada [2]. Ianis Hagi och Dennis Man är med [2].",
+    "Polen är inte heller utan bekymmer. Jan Urban har tagit ut 25 spelare med Robert Lewandowski som kapten, men Jan Bednarek är avstängd och målvakterna Marcin Bułka och Kamil Grabara är skadade [3]. Piotr Zieliński är vicekapten och den som ska hålla ihop mittfältet. Laget vann 6–0 mot Rumänien, men förlorade sedan 0–1 i Bosnien och har gått mållöst i hälften av gruppmatcherna. Tre dagar senare väntar Sverige i Wrocław.",
+    "Det är en match mellan ett lag som har tappat tron och ett som har tappat stadgan. Så gjorde vi i Tjäderfors, och där regnade det in. Rumänien vann ändå sin senaste hemmamatch före hösten, 2–1 mot Wales i juni, och Arena Națională är ingen plats där man vinner av farten."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "G4Media",
+     "title": "Lotul României pentru meciurile cu Polonia și Bosnia",
+     "url": "https://www.g4media.ro/lotul-romaniei-pentru-meciurile-cu-polonia-si-bosnia-din-aceasta-luna-ce-schimbari-a-facut-hagi.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Știrile ProTV",
+     "title": "Gheorghe Hagi a anunțat lotul României pentru meciurile din Liga Națiunilor, cu Polonia și Bosnia",
+     "url": "https://stirileprotv.ro/stiri/sport/gheorghe-hagi-a-anuntat-lotul-romaniei-pentru-meciurile-din-liga-natiunilor-cu-polonia-si-bosnia-surprizele-selectionerului.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Wikipedia",
+     "title": "Poland national football team",
+     "url": "https://en.wikipedia.org/wiki/Poland_national_football_team",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Polen oddset 1,92 och Rumänien 4,17, samma odds som för krysset. Rumänien har släppt in 13 mål på fyra matcher och saknar sin bäste målvakt [1]. Polen saknar Bednarek och två målvakter [2], men har Lewandowski och vann med sex mål senast. Ett lag som står på noll poäng och har en förbundskapten som pratar om att gå hem [3] brukar inte vända det på en kväll. Tvåan.",
+    "signs": [
+     2
+    ],
+    "note": "Lewandowski räcker",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Știrile ProTV",
+      "title": "Gheorghe Hagi a anunțat lotul României pentru meciurile din Liga Națiunilor, cu Polonia și Bosnia",
+      "url": "https://stirileprotv.ro/stiri/sport/gheorghe-hagi-a-anuntat-lotul-romaniei-pentru-meciurile-din-liga-natiunilor-cu-polonia-si-bosnia-surprizele-selectionerului.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Wikipedia",
+      "title": "Poland national football team",
+      "url": "https://en.wikipedia.org/wiki/Poland_national_football_team",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "G4Media",
+      "title": "Lotul României pentru meciurile cu Polonia și Bosnia",
+      "url": "https://www.g4media.ro/lotul-romaniei-pentru-meciurile-cu-polonia-si-bosnia-din-aceasta-luna-ce-schimbari-a-facut-hagi.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Rumänien har förlorat alla fyra matcherna och släppt in 13 mål, och förbundskaptenen pratar om att gå hem. Det är ingen organisation, det är ett lag som letar efter en ursäkt.",
+     "Polen saknar Bednarek och två målvakter, men det är lugnt. De har Lewandowski, och de vann med sex mål senast lagen möttes. Tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–2",
+    "tips": "2026-11-13T18:05:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861166",
+   "match": "Sverige – Bosnien & Hercegovina",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T18:05:00.000Z",
+   "text": "Bosnien har redan visat att de håller\n\nSverige toppar gruppen med 10 poäng på 4 matcher, och Bosnien & Hercegovina ligger tvåa med 8 utan en enda förlust. När lagen möttes i Zenica i oktober slutade det 1–1. Tre dagar efter matchen i Solna väntar Polen borta.\n\nDet intressanta med kvällen är att Bosnien redan vet hur man står emot Sverige. I Zenica blev det 1–1, och laget har två segrar och två oavgjorda i gruppen. Förbundskaptenen Sergej Barbarez har tagit ut 26 spelare, och Amar Dedić är tillbaka efter sin skada [1]. Barbarez har sagt att andraplatsen var det minsta målet från början, och att en seger på någon av de två sista matcherna räcker för den [2].\n\nGraham Potter har tagit tillbaka Dejan Kulusevski, och Alieu Njie, 21, och Genesis Antwi, 19, är uttagna till A-landslaget för första gången, enligt SVT [3]. Det tycker jag om. I Tjäderfors tog vi en gång upp en pojke från juniorerna dagen före derbyt, och han höll bollen lugnare än alla de gamla, mest för att ingen hade sagt åt honom att vara nervös.\n\nHemma har Sverige vunnit båda sina gruppmatcher, och laget har gjort mål i alla fyra. Sommaren slutade däremot med 0–3 mot Frankrike i VM. Bosnien har hållit nollan i hälften av gruppmatcherna och spelade 0–0 borta mot Polen. Det ser du redan på uppvärmningen: ett lag som inte har förlorat på fyra matcher kommer inte till Strawberry Arena för att titta på taket.\n\nTipset: 1 (hemmaplan avgör)\n\nMarknaden ger Sverige oddset 1,59 och Bosnien 6,67, och det är snålt mot ett lag som inte har förlorat i gruppen och fick 1–1 i oktober. Men Sverige har vunnit båda hemmamatcherna, Kulusevski är tillbaka [1], och Bosnien har mest att förlora på att öppna upp: en seger mot Rumänien hemma tre dagar senare räcker för andraplatsen [2]. Jag tror att gästerna står lågt och väntar, och då vinner det lag som har bollen. Ettan, men jag sover inte gott.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Bosnien har redan visat att de håller",
+   "lead": "Sverige toppar gruppen med 10 poäng på 4 matcher, och Bosnien & Hercegovina ligger tvåa med 8 utan en enda förlust. När lagen möttes i Zenica i oktober slutade det 1–1. Tre dagar efter matchen i Solna väntar Polen borta.",
+   "paragraphs": [
+    "Det intressanta med kvällen är att Bosnien redan vet hur man står emot Sverige. I Zenica blev det 1–1, och laget har två segrar och två oavgjorda i gruppen. Förbundskaptenen Sergej Barbarez har tagit ut 26 spelare, och Amar Dedić är tillbaka efter sin skada [1]. Barbarez har sagt att andraplatsen var det minsta målet från början, och att en seger på någon av de två sista matcherna räcker för den [2].",
+    "Graham Potter har tagit tillbaka Dejan Kulusevski, och Alieu Njie, 21, och Genesis Antwi, 19, är uttagna till A-landslaget för första gången, enligt SVT [3]. Det tycker jag om. I Tjäderfors tog vi en gång upp en pojke från juniorerna dagen före derbyt, och han höll bollen lugnare än alla de gamla, mest för att ingen hade sagt åt honom att vara nervös.",
+    "Hemma har Sverige vunnit båda sina gruppmatcher, och laget har gjort mål i alla fyra. Sommaren slutade däremot med 0–3 mot Frankrike i VM. Bosnien har hållit nollan i hälften av gruppmatcherna och spelade 0–0 borta mot Polen. Det ser du redan på uppvärmningen: ett lag som inte har förlorat på fyra matcher kommer inte till Strawberry Arena för att titta på taket."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sarajevo Times",
+     "title": "Barbarez announces Squad for Matches against Sweden and Romania",
+     "url": "https://sarajevotimes.com/barbarez-announces-squad-for-matches-against-sweden-and-romania/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sarajevo Times",
+     "title": "Barbarez satisfied with players' Form, aims for a win in Sweden",
+     "url": "https://sarajevotimes.com/barbarez-satisfied-with-players-form-aims-for-a-win-in-sweden/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "SVT",
+     "title": "Här är Sveriges Nations League-trupp",
+     "url": "https://www.svt.se/sport/fotboll/har-ar-sveriges-nations-league-trupp-dejan-kulusevski-med-igen",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Sverige oddset 1,59 och Bosnien 6,67, och det är snålt mot ett lag som inte har förlorat i gruppen och fick 1–1 i oktober. Men Sverige har vunnit båda hemmamatcherna, Kulusevski är tillbaka [1], och Bosnien har mest att förlora på att öppna upp: en seger mot Rumänien hemma tre dagar senare räcker för andraplatsen [2]. Jag tror att gästerna står lågt och väntar, och då vinner det lag som har bollen. Ettan, men jag sover inte gott.",
+    "signs": [
+     0
+    ],
+    "note": "hemmaplan avgör",
+    "sources": [
+     {
+      "n": 1,
+      "source": "SVT",
+      "title": "Här är Sveriges Nations League-trupp",
+      "url": "https://www.svt.se/sport/fotboll/har-ar-sveriges-nations-league-trupp-dejan-kulusevski-med-igen",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sarajevo Times",
+      "title": "Barbarez satisfied with players' Form, aims for a win in Sweden",
+      "url": "https://sarajevotimes.com/barbarez-satisfied-with-players-form-aims-for-a-win-in-sweden/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Bosnien har inte förlorat i gruppen och tog 1–1 mot Sverige i Zenica. Det respekterar jag. Men de vet att en seger mot Rumänien hemma räcker för andraplatsen, och då står de lågt och väntar på misstag.",
+     "Sverige har vunnit båda hemmamatcherna och gjort mål i alla fyra, och Kulusevski är tillbaka. Lugn nu, det här är ett lag som vet vad det ska göra med bollen. Ettan, och då är jag jävligt snäll mot Bosnien."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-13T18:05:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Då är jag jävligt snäll",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
