@@ -399,6 +399,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   papper, den tunna tryckta ramen, *Nr 1 · Vecka 46* och priset maskinskrivna överst, namnet i terrakotta, vinjetten
   mellan två streck och rubriken i tidningens typsnitt, så fet och stor som ryms. Det gula papperet, det röda bandet
   och den molniga svärtan är borta (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären))
+- [x] **Helgarderats omslag: Kalenderbladet (2026-11-13, användarens önskemål: "något mer minimalistiskt - kanske bara
+  tidningsnumret eller något dylikt istället för de där ikryssade rutorna?"):** de ikryssade rutorna 1, X och 2 och den
+  första matchen nertill är borta. I mitten står lördagens datum som ett kalenderblad, dagen stor och tryckt mellan
+  *Inför Stryktipset* och månaden (*Inför omgången* när omgången inte är Stryktipsets), och nertill devisen *Sveriges
+  säkraste tipstidning*, kursiv under ett kort streck som tidningens citat. Numret, veckan och priset står kvar överst.
+  Valt i två omgångar bland skisser på pulten i rummet: först A *Kvällstidningen*, B *Tipsbladet*, C
+  *Matchprogrammet* och D *Fanzinet*, sedan de minimalistiska E *Numret*, F *Lördagen* (vald), G *Rubriken* och H
+  *Bara namnet*; devisen bland ett tjugotal förslag. Löpsedeln har samma papper, ram, översta rad och namn som förut
+  (`forsta` i [public/rum-tidning.js](public/rum-tidning.js), se [Helgarderat](#helgarderat))
 - [x] **Spegeln: man ser vem av de tre man är (2026-11-13, användarens önskemål: "Kan du komma på något smart sätt som
   man kan se vem av de tre som man är inloggad som på animationssidan?", med kravet att det inte får dra mycket
   grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
@@ -1297,6 +1306,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hela sedeln och en affisch) valde användaren löpsedeln: *GRAZIE GIANFRANCO!* under *CUP
   WINNERS’ CUP FINAL* och Tomas foto av laget med pokalen och Zola i mitten, som på IFK:s
   sedel. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Veckans löpsedel i ett ställ utanför dörren (2026-11-13, användarens val):** rummet skulle bli
+  lugnare. Av sex renderade skisser (löpsedlarna vända mot gatan, historien i sepia, en löpsedel i
+  taget, minnesväggen, löpsedelsstället och en kombination) valde användaren bara
+  löpsedelsstället: "Kör bara löpsedelsstället – det är det bästa just nu. Inget annat." Veckans
+  löpsedel står nu i ett svart ställ på trottoaren och syns genom dörrens glas, med gatans ljus.
+  Väggen under oraklet och fönstrets nedre vänstra hörn är fria. Skivan och allt annat är som förut.
+  Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **IFK och Chelsea utan prickar (2026-11-11, användarens önskemål):** "både IFK och
   chelsea-löpsedlarna är ju prickiga. Kan du ordna så att de inte är det men att de får rimlig
   patina". Prickrastret (ett rutnät, 2 px) blev ett mönster i närbilden. Nu har de samma papper som
@@ -1575,7 +1591,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   står i bläck (den som leder mörkare) i stället för i lagens färger, bytenas pilar är svarta, och analysens ringar är samma
   blå penna som raden i marginalen – de var röda, eftersom protokollets röda penna (`.rb-ring path` i rum-block.css) tog över
   också i matchbladet före matchen. Samma dag, på användarens önskemål: "ta bort den röda stjärnan också" – rödpennans
-  stjärna för ensam rätt står inte längre i *Rättningen* (på lappen under domen finns den kvar).
+  stjärna för ensam rätt står inte längre i *Rättningen* (den fanns kvar på lappen under domen, som togs bort 2026-11-13).
 - **Analysen i matchbladet går att läsa (2026-11-10, användarens önskemål):** "det blev av någon anledning lite svårt
   att läsa det här. Kan du ordna", och "Det handlar inte om svenskan/språket i sig utan om annat". Sedan allt papper kom på
   skrivmaskin (2026-11-08) stod analysen i samma typsnitt som lagen och tiderna, där varje bokstav hoppar, lutar och slår
@@ -1603,6 +1619,23 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ordning (inte bäst först, så att var och en står på samma plats varje omgång och listan inte avslöjar något), och under
   domen ligger en lapp ur protokollet med kupongen rad för rad och siffrorna. Se [Hasse Backe](#hasse-backe), *Domarna
   efter omgången*.
+- **Hasse säger vad som sticker ut, och lappen är borta (2026-11-13, användarens önskemål):** "kan du ordna så att han
+  bara kommenterar ens kupong och att man inte ser kupongen här. Han får gärna ta något/några saker som sticker ut från
+  kupongen och kommentera det. Ta bara det viktigaste så att det inte blir mycket och chatigt. Det ska alltså vara lite mer
+  text än vad han säger nu. Ordna det på ett snyggt sätt!", och sedan "Svenskan är ju inte precis toppen. Vet inte om du
+  kan ordna så att han får en bättre svenska - som är bra, undviker swenglish, är hassebacke-aktig och intressant!" Lappen
+  under domen är borta. Han tar i stället upp de två viktigaste sakerna på kupongen – en skräll som satt, en favorit som
+  sprack, en match där ingen annan hade rätt, spikarna, en helgardering som räddade en rätt eller datorns väntade antal rätt
+  – och säger vad han tycker om var och en, i var sitt stycke. Alla domrader är omskrivna med riktiga tipsord (*spiken
+  sprack*, *halvgarderingen höll inte*) och hans torra självsäkerhet (*Sådant händer när favoriterna inte har läst på.*).
+  Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
+- **Hasse lär sig aldrig era namn (2026-11-13, användarens önskemål):** "Jag vill att han ska uttala våra namn fel på
+  fler subtila sätt. Det ska vara som att han aldrig lär sig namnet och/eller inte bryr sig." Av sex förslag valde
+  användaren alla utom att han förväxlar er med varandra. Han har nya felnamn (*Laine*, *Lainen*, *Laiho*, *Tegnér*,
+  *Tajder*, *Tejdel*, *Mogge*, *Dagge*), säger ibland *Daniel*, som ni alla heter, och kallar Dogge *Jansson* eller
+  *Johnsson*. Den som kom sist säger han fel om oftare, i hälften av domarna med fel tappar han namnet efter första
+  meningen, och felet fastnar en omgång, samma när han hälsar och i domen. *Teider* är borta, eftersom det låter som
+  *Tejder* när rösten läser. Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -3735,8 +3768,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   *Omgångens orakel* och namnet (delat: *Laino & Dogge*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
 - **Visitkortet** (på väggen mellan stationsuret och orakelramen, till höger om palmetten,
-  fäst med ett mässingsstift och lite snett; under oraklet sitter veckans löpsedel varannan
-  vecka) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
+  fäst med ett mässingsstift och lite snett) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
   terrakotta, logon och MATCHFIXARNA i guldfolie överst, i mitten våra autografer – det vi kallas
   (*Laino*, *Tejder*, *Dogge*) i var och ens handstil och bläck, samma som på kupongen (`sm-k0`–`sm-k2`), med en släng under
   – över var sin linje med namnet tryckt under, och längst ner devisen från Om oss: *Vi tippar
@@ -4560,16 +4592,20 @@ att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enli
 *Är det Sveriges bästa tippare?* handlar om bäst i gänget. Namnen, resultaten och siffrorna
 stämmer; det påhittade är kvällstidningens fraser (*Nu krävs svar*, *Hela målfesten i bilder*),
 aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre varianter, och
-veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
-Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
-häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
-bardisken, där den är mindre (72 %, så att den ryms mellan fönsterbänkens ände, diskens kant och
-den innersta barstolen, som är inskjuten under skivan) och nästan rak. Den hänger bakom disken och
-barstolarna, som står framför väggen (löpsedeln ligger före diskens duk i bakväggens plan). I
-telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
-ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
-telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade
-kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+veckan väljer bland dem. Den är den enda som byts, och den står i ett **löpsedelsställ** på
+trottoaren utanför dörren, som utanför en riktig tobaksaffär, och syns genom dörrens glas under
+handtaget (2026-11-13, användarens val: rummet skulle bli lugnare). Stället är svartlackerad plåt
+med sedeln 62 % stor bakom plast, på två ben med en tvärslå (`.rum-lopstall` i rum-affischer.css,
+platsen `STALL` i rum-affischer.js). Det står ute: i bakväggens plan direkt efter utsikten, så att
+dörrens karm, handtaget och smutsen på glaset ligger framför det. Det har gatans ljus: ett kallt
+skimmer på dagen, mörker när det är mörkt ute, lyktstolpens varma sken ovanifrån när den lyser och
+snö på ramen när det ligger snö (rum.js sätter `--ute-dag`, `.ute-lampor` och `.ute-sno` med
+utsikten). Ljuset är lager ovanpå, inga filter, och i närbilden (`.lop-nara`) ljusnar det så att
+rubriken går att läsa. Sedeln sitter rak och gulnar lite med slitaget. I telefonen på höjden ligger
+dörren utanför bilden från början; där syns stället när man drar åt vänster. (Först satt den
+ibland under dörrens handtag, sedan i fönstrets högra hörn och till 2026-11-13 varannan vecka med
+tejp i fönstrets nedre vänstra hörn och varannan med häftstift på väggen under oraklet, i telefonen
+alltid på väggen. Till och med 2026-11-05 var den från den påhittade kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
@@ -4645,7 +4681,7 @@ sticker ut en dryg decimeter över den indragna fronten, så att man har plats f
 kanten bär konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält.
 Fronten har fyllningar i ramar, en halv meter isär. Framför står tre barstolar likadana som gängets (röd vinyl med söm, krom, fotring),
 med sitsen 75 cm över golvet och inskjutna under kanten – den innersta ända in under skivan, så
-att sitsen går fri från löpsedeln på väggen; den närmaste syns bara till hälften
+att sitsen gick fri från löpsedeln som satt på väggen till 2026-11-13; den närmaste syns bara till hälften
 över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
 det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
 lite uppifrån. Disken ritas en gång, som inredningen, i en duk från disken in i videons hörn
@@ -4664,7 +4700,7 @@ Rummet läser om datan varje minut medan det står öppet.
 står på samma tid, och Stockholms klocka – uret, text-tv:n och utsikten – står på `?rum-klocka`,
 annars på när sidan laddades), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 `?rum-slit=0…1` slitaget, `?rum-dag=<tal>` dagen för sakerna och affischerna,
-`?rum-vecka=<tal>` veckan för löpsedelns plats och `?rum-rubrik=<typ>` en viss rubrik om den
+`?rum-vecka=<tal>` veckan för löpsedelns rubrikvariant och klipp och `?rum-rubrik=<typ>` en viss rubrik om den
 finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysaren`, `spiken`,
 `jakten`),
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
@@ -6240,7 +6276,7 @@ matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man 
 och matchakten fick lagets plats i divisionen efter varje tal, så att det topplistan visade
 finns kvar där.
 
-Överst står menyraden, som alltid står still: *KUPONGEN* och *LAGEN*, med den valda fliken
+Överst står menyraden, som alltid står still: *KUPONGEN* och *REGISTRET*, med den valda fliken
 omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
 över hela bredden; det mellan dem rullar.
 
@@ -6286,12 +6322,21 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   Saknar fler än en av de fem matcherna styrka visas ingen siffra. Med dolda resultat står
   ett frågetecken, som för tavlans tal. EFL Trophy hämtas inte och finns varken i formen
   eller i siffran.
-- **Lagen** – de fyra divisionerna (*PL*, *CH*, *L1* och *L2* i telefonen), med divisionen
-  som har flest lag i omgången först. Lagen står i bokstavsordning (två spalter på datorn),
-  och lagen i omgången är ljusa. Ett lag öppnar **lagkortet** med truppen,
-  och en spelare i truppen **spelarkortet** (nedan).
+- **Registret** – lagen och spelarna (fliken hette *Lagen* till 2026-11-13, då användaren ville ha
+  en rubrik som rymmer båda; en egen flik för spelarna valdes bort). Underraden säger vad och var:
+  *LAG* eller *SPELARE* till vänster och divisionen till höger, de valda omvända (*PL*, *CH*, *L1*
+  och *L2* när de hela namnen inte ryms, och då står namnet under strecket); ←/→ bläddrar mellan
+  divisionerna. Samma dag ville användaren att underkategorierna skulle vara logiska – med bara
+  divisionerna syntes spelarna först inne i ett lag – och valde det här upplägget före att
+  behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på divisionen
+  som har flest lag i omgången. *LAG* är divisionens lag i bokstavsordning (två spalter på
+  datorn), de i omgången ljusa, och ett lag öppnar **lagkortet** med truppen. *SPELARE* är
+  divisionens spelare från A till Ö (efternamnet) med plats, lag, speltid och mål, och läget
+  (skadad, avstängd) sist när raden ryms: samma spelare som i trupperna, de som har spelat och de
+  skadade. En spelare öppnar **spelarkortet** (nedan), och Esc går tillbaka till samma ställe i
+  listan. En lång lista skrivs rad för rad så långt skärmen räcker och resten på en gång.
 
-Sökraden söker i hela registret, också lag och spelare utanför omgången, och svarar medan man
+Sökraden söker i hela datorn, också lag och spelare utanför omgången, och svarar medan man
 skriver: träffarna står i stället för vyn, den mest sannolika överst och markerad och sedan i
 fallande led, Enter öppnar den markerade, ↑/↓ väljer en annan, och när sökraden töms (eller med
 Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.
@@ -7300,40 +7345,52 @@ eller, om du hellre lyssnar på de andra, *Jag har synpunkter på din kupong ock
 tre rader, och de tre raderna finns från början, så att gänget inte flyttar sig när han säger något annat medan han
 väntar; i låga telefoner är porträtten mindre, så att allt ryms ovanför foten också i 375 × 667. Gänget står sida vid sida i sin ordning, som på kupongen: stora
 porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
-Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderad*, *Turlig*, *Felfri*, *Osynlig*,
-*Generös*, *Snuvad*, *Klok*: ordet beskriver personen), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
-kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
-många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
-i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
-på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
-Han talar till den som står vid disken, och det kan vara den han dömer: de övriga är *de andra* eller *resten*, och *vi* är
-han och den han talar med, aldrig gänget, där han inte är med (*Dogge var bäst av er, och det kommer resten att få höra*,
-inte *vi*; 2026-11-10, `npm run repliker` säger till).
+Den man väljer får sin dom slagen i disken i guld, som domen över en match, och under den några stycken (`doma` och
+`domText`): en inledning efter hur det gick i gänget, det som sticker ut på kupongen med vad han tycker om det, och ett
+slut. Kupongen själv visas inte (2026-11-13). Ordet i guld beskriver personen och läget, och han har ett tiotal för varje
+läge (*Osynlig*, *Lagom* och *Bortglömd* i mitten, *Turlig* och *Mallig* för den som vann, *Generös* och *Blåögd* för den
+som kom sist). Han väljer efter omgången och personen, så att det är samma ord i disken och i listan och på alla enheter
+(`domord` i rum-hasse-repliker.js, `domOrd` i rum-hasse.js; förut ett ord per läge, 2026-11-13). Orden har högst nio
+bokstäver, så att stämpeln under namnet ryms i den smalaste telefonen, och inget ord står under två lägen (`npm run
+repliker` säger till). Det som sticker ut väljs ur protokollet (`saker` i [public/rum-block.js](public/rum-block.js)), efter
+hur mycket det sticker ut, och han tar högst de två viktigaste (bara en för den som vann på helgarderingar, som först får
+sin rad om det): tipset med lägst chans som satt (*Ettan i QPR mot Swansea satt, fast datorn bara gav den 35 procent.*,
+eller att ingen av de andra hade rätt där), tipset med högst chans som inte satt (*Spiken på ettan i Chelsea mot Tottenham
+sprack, fast datorn gav den 62 procent.*), matcher där ingen av de andra hade rätt, en helgardering där det kom ett utfall
+som datorn knappt trodde på, spikar som satt allihop eller sprack, och hur många rätt datorn väntade sig av kupongen när
+det skiljer mycket. Chansen är datorns före avspark, som i poängen. Varje sak är två meningar: vad det är och vad han
+tycker om det (*Sådant händer när favoriterna inte har läst på.*). Spikarna i allmänhet tar han bara när inget annat
+sticker ut. Raderna står under `domar.sak` i rum-hasse-repliker.js och väljs efter omgången och personen, inte på lott,
+så att domen är densamma varje gång och på alla enheter; var och en i gänget får nästa rad i listan, så att samma sak i
+samma omgång låter olika. Varje rad är en mening, så att *Läs upp* kan läsa domen mening för mening. En mening med en match
+hörs inte (rösten kan inte alla lag), så kommentaren efter den ska gå att förstå för sig. Inledningen står lite fetare,
+sakerna indragna bakom ett tunt streck i domens guld, som anteckningar i marginalen, och slutet i kursiv (`.rh-domen` i
+[public/rum-hasse.css](public/rum-hasse.css)). Han talar till den som står vid disken, och det kan vara den han dömer: de
+övriga är *de andra* eller *resten*, och *vi* är han och den han talar med, aldrig gänget, där han inte är med (*Dogge var
+bäst av er, och det kommer resten att få höra*, inte *vi*; 2026-11-10, `npm run repliker` säger till).
 
-Under meningarna ligger *lappen*, en remsa av protokollets blankett om just den kupongen, med samma papper, band och tryck
-(`lapp` i [public/rum-block.js](public/rum-block.js), stilen i [public/rum-block.css](public/rum-block.css)). Överst en spalt
-per match med rutorna 1, X och 2: kryssen i personens bläck, rutan som satt överstruken med den gröna märkpennan som i
-protokollet och facit maskinskrivet under. Rödpennans stjärna vid matchnumret betyder att ingen annan i gänget hade rätt där, och matchen och
-resultatet står i spaltens title. Under rutorna siffrorna med tryckta rubriker: *Rätt* av antalet matcher, *Poäng* (med
-ringen kring vinnarens, som i protokollet), *Plats* i gänget, *Spelkassan* för omgången (10 kr per match till modellens odds,
-garderingar delade som i Olympens spelkassa), *Spikar*, *Halvgarderingar* och *Helgarderingar* som satt av hur många och
-*Ensam rätt*. Sedan *Bästa träffen*, tipset med högst odds som satt, och *Största missen*, tipset med lägst odds som inte
-satt. Sist *Säsongen* när den är hämtad (`data/tippare.json`, samma som Olympen och utan omgångar som spoilerskyddet döljer,
-plus den här omgången om bygget inte har frusit in den än): en stapel per omgång uppåt för plus och nedåt för minus, den här
-överstruken, och poängen och platsen hittills. Den visas från andra omgången. Texten och lappen rullar tillsammans, så att
-man i telefonen rullar ned till lappen.
+Förut låg *lappen* under meningarna, en remsa av protokollets blankett med kupongen rad för rad, siffrorna (rätt, poäng,
+plats, spelkassan, spikar och garderingar, ensam rätt), bästa träffen, största missen och säsongen (2026-11-09). Den togs
+bort 2026-11-13, när han i stället fick säga mer om det som sticker ut.
 
-*Nästa* tar den man inte har hört om än, i gängets ordning, och *Hela gänget* går tillbaka till listan, där ordet han slog i
+Under domen finns bara knappen *Tillbaka*, som går tillbaka till listan, där ordet han slog i
 disken står som en stämpel i guld under namnet på dem man har hört om (på enheten för den omgången,
 `profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst i
 gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
-och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
+och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Under domen stod förut *Nästa: <namn>* och *Hela
+gänget* (ersatta av *Tillbaka* 2026-11-13). Med dolda resultat finns inget protokoll, och då är allt
 som förut.
 
 Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som använder sidan (`npm run repliker` säger till om
-ordet). Namnen sitter inte riktigt: ungefär var tredje dom säger han ett namn som nästan stämmer (*Tejler*, *Docke*;
-`felnamn` i rum-hasse-repliker.js, `kallar` i rum-hasse.js), samma i hela domen och på alla enheter, men aldrig om den som
-vann. Ungefär var fjärde gång han hälsar på dig händer samma sak. Han rättar sig aldrig och säger inget om det. Står man kvar
+ordet). Namnen sitter inte riktigt, som hos den som aldrig lär sig dem och inte bryr sig (`felnamn` i
+rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett namn som låter nästan likadant (*Tejler*,
+*Docke*), ett han kan bättre någon annanstans ifrån (*Laine*, *Tegnér*, *Mogge*), *Daniel*, som ni alla heter och som därför
+aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska höras
+när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
+tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
+mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
+samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
+Domen är densamma varje gång. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
@@ -7417,6 +7474,11 @@ framför ansiktet följer huvudet, fickan och handen kroppen), och handen räkna
 från sidan bakom tidningen, eller med pekfingertoppen på bryggan (`glasArm`). På näsan sitter de så nära ansiktet som
 formen tillåter (`paNasan`), och genom glasen ser ögonen lite större ut (`uLins` i ansiktets skuggare). Bågen ritas före
 kroppen, så att huvudet och kavajen döljer skalmarna och det som är nere i fickan.
+På näsan går skalmarna från gångjärnen till öronen (`ORON` i rum-hasse-3d.js, där örat möter huvudet i fotot) och är så
+långa som det är dit, och kroken går bakåt bakom örat, där huvudet döljer den (`satt` i `byggGlasogon`). Huvudet är ett
+foto på en grund form, där öronen sitter mycket närmare ansiktet än på en riktig skalle: med raka skalmar i full längd
+stack de ut bakom huvudet, och när han böjde det och kameran såg honom uppifrån pekade de rakt upp över pannan som
+antenner (användarens bild 2026-11-13). Ute i luften och i handen pekar de rakt bakåt som förut.
 
 **Sysslorna** (2026-11-09, användarens önskan: fler saker än tidningen, *ertappad men låtsas som att det inte har hänt
 och gå vidare*, som John Goodman i *The Big Lebowski*). Har det gått dåligt har han sex andra sätt att verka upptagen,
@@ -7876,7 +7938,7 @@ den ordning man vill veta hur det gick:
   skrivet före avspark (Sixten Bråvalls, `tip` i `data/analyser.json`). Tecknet står på skrivmaskin som i protokollet,
   överstruket med märkpennan när det satt och svagare när det inte satt (att ingen annan i gänget hade rätt står när man
   pekar på raden), och efter det datorns chans för tecknet före avspark, poängen (samma regel som raden Poäng: rätt minus
-  chansen) och spelkassan (10 kr till datorns odds, som i Olympen och på lappen under domen). Överst hur många som hade
+  chansen) och spelkassan (10 kr till datorns odds, som i Olympen). Överst hur många som hade
   rätt. Under tipsen datorn och spelbolagen före avspark sida vid sida (under varandra i telefonen) i kupongens rutor, med
   chansen på skrivmaskin under varje ruta och facit överstruket med märkpennan: hur troligt datorn tyckte att det var och vad
   det betalade. Bladet efter matchen har bara protokollets färger (papperet, skrivmaskinens svart, tryckets terrakotta, den
@@ -8176,7 +8238,8 @@ rummet), och innehållet, matchbladen och sista sidan är lika breda och minst l
 Alla sidor har omslagets papper (fibrerna, buktorna och trycket som inte har täckt), den tunna tryckta ramen och
 omslagets översta rad som sidhuvud, och kupongens tre röster: tryck i terrakotta (namnet, rubrikerna, numren och
 strecken i Fraunces), skrivmaskin (sidhuvudet, tiderna, lagen i innehållet, bildtexterna och källorna) och den blå
-pennan (omslagets kryss). Brödtexten står i bläck. Sedan samma kväll (val A *Rutorna*) är omslaget förebild för
+pennan (omslagets kryss, till 2026-11-13: sedan dess är omslaget ett kalenderblad med lördagens datum och devisen
+*Sveriges säkraste tipstidning*). Brödtexten står i bläck. Sedan samma kväll (val A *Rutorna*) är omslaget förebild för
 resten: samma sidhuvud efter omslaget (*Nr 1 · lördag 14 november*), matchbladets tavla som omslagets rutor 1, X och 2,
 lagen i röda versaler och rubrikerna i svart kursiv överallt, bara konturer och inget fetstilt utom spelarnas namn.
 Sedan samma kväll (val A *Ett tryck*) är Fraunces det enda typsnittet, också i brödtexten, och skrivmaskinen står bara

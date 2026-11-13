@@ -63,7 +63,8 @@ const FALT = {
   resultat: ['res'],
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
   'efter.ratt': ['ratt', 'av'], 'efter.exakt': ['res'],
-  domar: ['namn', 'antal', 'Antal'],
+  // (i det som sticker ut också matchen, tecknen, datorns chans och resultatet: domText i rum-hasse.js)
+  domar: ['namn', 'antal', 'Antal', 'match', 'tecknet', 'Tecknet', 'den', 'tecknen', 'pct', 'res'],
   'stallning.ratt': ['ratt', 'av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
 };
 // Sidan lottar bland de här, så de måste vara listor.
@@ -76,7 +77,8 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'domar.fraga', 'domar.igen', 'domar.alla', 'domar.glomt', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
-  'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
+  ...['skrall.spik', 'skrall.halv', 'skrall.ensam', 'skrall.om', 'miss.spik', 'miss.halv', 'miss.om', 'ensam.en', 'ensam.fler', 'ensam.om',
+    'raddad.fakta', 'raddad.om', 'spikar.alla', 'spikar.sprack', 'datorn.fler', 'datorn.farre', 'datorn.omFler', 'datorn.omFarre'].map((k) => `domar.sak.${k}`),
   ...['ingen', 'enda', 'endaInte', 'alla', 'inga', 'en', 'fler'].map((k) => `domar.spik.${k}`),
   ...['ratt', 'alla', 'bra', 'mitten', 'daligt', 'leder', 'lika', 'haller', 'hallerLika', 'emot', 'emotLika', 'mal', 'malBra', 'malLugn', 'malFel'].map((k) => `stallning.${k}`),
   ...['italo', 'guld', 'rock', 'p1', 'p3', 'p4g', 'rix', 'sport', 'talksport', 'caroline', 'brus'].map((k) => `radio.${k}`),
@@ -115,9 +117,20 @@ for (const vag of LISTOR) {
   if (Array.isArray(l) && new Set(l).size !== l.length) fel.push(`${vag} har samma rad två gånger`);
 }
 // Domarna: ett ord i guld för varje läge, och varje rad en mening (de läses upp mening för mening).
+// Orden är många för varje läge (domOrd i rum-hasse.js väljer), och stämpeln med ordet under namnet i listan
+// ryms med högst nio bokstäver i den smalaste telefonen (uppmätt 2026-11-13: BORTGLÖMD är 104 av 109 bildpunkter).
+const ORDEN = Object.entries(repliker.domord || {}).flatMap(([k, l]) => (Array.isArray(l) ? l.map((o) => [k, o]) : []));
 for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget']) {
-  if (!(repliker.domord && repliker.domord[k])) fel.push(`domord.${k} saknas`);
+  const l = repliker.domord && repliker.domord[k];
+  if (!Array.isArray(l) || !l.length) fel.push(`domord.${k} måste vara en lista med ord: han väljer ett efter omgången och personen`);
+  else if (new Set(l).size !== l.length) fel.push(`domord.${k} har samma ord två gånger`);
   if (!(k === 'forsakring' || (repliker.domar && repliker.domar.in && repliker.domar.in[k]))) fel.push(`domar.in.${k} saknas`);
+}
+for (const [k, o] of ORDEN) {
+  if (!/^\p{Lu}\p{Ll}+$/u.test(o)) fel.push(`domord.${k}: "${o}" ska vara ett ord med stor bokstav, som beskriver personen`);
+  if (o.length > 9) fel.push(`domord.${k}: "${o}" är för långt: högst nio bokstäver, annars ryms inte stämpeln under namnet`);
+  const andra = [...new Set(ORDEN.filter(([k2, o2]) => o2 === o && k2 !== k).map(([k2]) => k2))];
+  if (andra.length) fel.push(`domord.${k}: "${o}" står också under ${andra.join(', ')}: ordet ska säga vilket läge det är`);
 }
 // Frågan över listan med gänget (gangLista i rum-hasse.js) sägs i ett svep och får vara två meningar. Den ska
 // säga vad han har att ge och att det gäller en kupong (Tomas 2026-11-10: "höra om din kupong" tar för givet att

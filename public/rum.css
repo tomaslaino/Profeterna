@@ -221,7 +221,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* ---------- visitkortet (rum.js, kortHtml) ---------- */
 
 /* På väggen mellan stationsuret och orakelramen, till höger om palmetten
-   (under oraklet sitter veckans löpsedel varannan vecka, rum-affischer.js).
+   (veckans löpsedel står i stället utanför dörren, rum-affischer.js).
    Länken är lite större än kortet, så att det går att träffa med fingret.
    Kortet ritas i sina egna mått (440 × 285, ungefär 85 × 55 mm) och
    förminskas kring stiftet till 44 × 28,5 i scenen. */
