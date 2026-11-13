@@ -17,6 +17,21 @@
    "id": "2026-11-07-st4978",
    "namn": "Näten på City Ground håller fint",
    "syftar": "Forest har inte gjort ett enda mål hemma den här säsongen, så näten på City Ground är fortfarande som nya – och på lördag kommer Manchester City dit."
+  },
+  {
+   "key": "2026-11-14-st4979:401861164,401861165,401861166,401861167,401861168,401861169,401861170,401880744,401880745,401880747,401880749,401880754,401881266",
+   "id": "2026-11-14-st4979",
+   "namn": "Wednesday börjar på lördag",
+   "syftar": "Sheffield Wednesday spelar sin första ligamatch under nye tränaren Dave Challinor – och den spelas på en lördag.",
+   "forslag": [
+    "Wednesday börjar på lördag",
+    "Inget nytt från Windsor Park",
+    "Wimbledon har hemmamatch på två ställen",
+    "Wigan och Barnsley vet redan slutet",
+    "Haaland ville ändå ha lugnt i november"
+   ],
+   "model": "claude-opus-5-5",
+   "generatedAt": "2026-11-13T18:16:18.774Z"
   }
  ]
 }

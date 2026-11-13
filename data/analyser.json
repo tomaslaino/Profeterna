@@ -1,21 +1,21 @@
 {
- "uppdaterad": "2026-11-07T12:32:37.335Z",
+ "uppdaterad": "2026-11-13T18:17:26.288Z",
  "omgang": {
-  "id": "2026-11-07-st4978",
+  "id": "2026-11-14-st4979",
   "matcher": [
-   "401878757",
-   "401878760",
-   "401879241",
-   "401880171",
-   "401880172",
-   "401880169",
-   "401880168",
-   "401880165",
-   "401880164",
-   "401880163",
-   "401880162",
-   "401931120",
-   "401931121"
+   "401861166",
+   "401861167",
+   "401861165",
+   "401861168",
+   "401861169",
+   "401861170",
+   "401861164",
+   "401880749",
+   "401880747",
+   "401880745",
+   "401880754",
+   "401880744",
+   "401881266"
   ]
  },
  "analyser": [
@@ -1138,6 +1138,92 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-07T10:50:10.471Z",
     "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880749",
+   "match": "Milton Keynes Dons – Burton Albion",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:17:05.034Z",
+   "text": "Burtons tränare sjuk, MK Dons i målberusning\n\nBurton åker till Stadium MK utan Gary Bowyer, som ligger sjuk, och assisterande tränaren Pat Lyons får sköta snacket. Där väntar MK Dons, som har gjort tio mål på sina två senaste ligamatcher hemma och dessutom slagit ut Swindon ur FA-cupen.\n\nDet ser du redan på uppvärmningen när ett lag har fått självförtroende, och MK Dons har fått det. Hemma vann de med 4–1 mot Bromley och med 6–1 mot Doncaster, och sedan slog de Swindon med 2–1 i cupen. Paul Warne bygger på en följd av fyra raka segrar. Inför matchen talade han om konditionen hos Kane Wilson, Ryan Barnett och Rushian Hepburn-Murphy, enligt klubbens egen sida [1]. Han var också noga med att ge motståndaren beröm. ”He knows what he’s doing”, sade Warne om Bowyer enligt MK Citizen [2].\n\nBowyer själv är borta på grund av sjukdom, och därför satt assisterande tränaren Pat Lyons på presskonferensen, enligt Burtons klubbsida [3]. En tränare som kliver in en fredag har inget lätt jobb. Det tar man inte på torsdagsträningen, för den har redan varit. Burton har gjort nästan sex mål fler än chanserna borde ha gett i år, och bara Wycombe har stoppat dem på senare tid. Senast spelade de bort Rushden & Diamonds med 4–0 i cupen.\n\nMötena mellan klubbarna har varit snåla. På sex matcher sedan 2020 har ingen vunnit med mer än ett mål, och tre av dem har slutat oavgjort. I Grusnäs hade vi en gång en assisterande tränare som fick ta ett helt matchmöte på egen hand, och han pratade bara om hörnor. Det var kanske inte så dumt.\n\nTipset: 1X (Hemma, men jämnt)\n\nSpelbolagen ger MK Dons mycket större chans än vår prognos gör, och prognosen ser ingen anledning att avskriva Burton. Fast hemmalagets målform ser verklig ut, och Burton saknar sin tränare [1]. Burtons målskytte ligger dessutom långt över vad chanserna ger, och sådant brukar jämna ut sig. Mötena har varit jämna, så kryss är fullt rimligt. Jag ringar in etta och kryss, och borta får klara sig själv. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som har vunnit fyra raka.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Burtons tränare sjuk, MK Dons i målberusning",
+   "lead": "Burton åker till Stadium MK utan Gary Bowyer, som ligger sjuk, och assisterande tränaren Pat Lyons får sköta snacket. Där väntar MK Dons, som har gjort tio mål på sina två senaste ligamatcher hemma och dessutom slagit ut Swindon ur FA-cupen.",
+   "paragraphs": [
+    "Det ser du redan på uppvärmningen när ett lag har fått självförtroende, och MK Dons har fått det. Hemma vann de med 4–1 mot Bromley och med 6–1 mot Doncaster, och sedan slog de Swindon med 2–1 i cupen. Paul Warne bygger på en följd av fyra raka segrar. Inför matchen talade han om konditionen hos Kane Wilson, Ryan Barnett och Rushian Hepburn-Murphy, enligt klubbens egen sida [1]. Han var också noga med att ge motståndaren beröm. ”He knows what he’s doing”, sade Warne om Bowyer enligt MK Citizen [2].",
+    "Bowyer själv är borta på grund av sjukdom, och därför satt assisterande tränaren Pat Lyons på presskonferensen, enligt Burtons klubbsida [3]. En tränare som kliver in en fredag har inget lätt jobb. Det tar man inte på torsdagsträningen, för den har redan varit. Burton har gjort nästan sex mål fler än chanserna borde ha gett i år, och bara Wycombe har stoppat dem på senare tid. Senast spelade de bort Rushden & Diamonds med 4–0 i cupen.",
+    "Mötena mellan klubbarna har varit snåla. På sex matcher sedan 2020 har ingen vunnit med mer än ett mål, och tre av dem har slutat oavgjort. I Grusnäs hade vi en gång en assisterande tränare som fick ta ett helt matchmöte på egen hand, och han pratade bara om hörnor. Det var kanske inte så dumt."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "MK Dons",
+     "title": "Warne Previews Burton Albion",
+     "url": "https://www.mkdons.com/news/2026/november/12/warne-previews-burton-albion",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "MK Citizen",
+     "title": "“He knows what he’s doing”: Warne on Burton boss Bowyer ahead of clash",
+     "url": "https://www.miltonkeynes.co.uk/sport/football/mk-dons/he-knows-what-hes-doing-warne-on-burton-boss-bowyer-ahead-of-clash-9349019",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Burton Albion FC",
+     "title": "PRESS CONFERENCE: MK DONS (A)",
+     "url": "https://www.burtonalbionfc.co.uk/news/2026/november/13/press-conference--mk-dons--a-",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger MK Dons mycket större chans än vår prognos gör, och prognosen ser ingen anledning att avskriva Burton. Fast hemmalagets målform ser verklig ut, och Burton saknar sin tränare [1]. Burtons målskytte ligger dessutom långt över vad chanserna ger, och sådant brukar jämna ut sig. Mötena har varit jämna, så kryss är fullt rimligt. Jag ringar in etta och kryss, och borta får klara sig själv. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som har vunnit fyra raka.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Hemma, men jämnt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Burton Albion FC",
+      "title": "PRESS CONFERENCE: MK DONS (A)",
+      "url": "https://www.burtonalbionfc.co.uk/news/2026/november/13/press-conference--mk-dons--a-",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:17:05.034Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "MK Dons har gjort tio mål på sina två senaste ligamatcher hemma och har vunnit fyra raka. Ett lag som vinner med 6–1 mot Doncaster har ordning på anfallsspelet, och den ordningen försvinner inte över en natt.",
+     "Burton har gjort nästan sex mål fler än chanserna borde ha gett, och sådan tur brukar ta slut. Dessutom ligger tränaren sjuk, och då får assisterande tränaren styra ett lag som han inte har förberett ensam. Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "Jag vet att mötena mellan klubbarna har varit jämna. Men den här gången har hemmalaget formen, medan bortalaget har en tur som håller på att ta slut och en tränare som är borta. Det är solklart en etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-13T18:17:05.034Z",
+    "uppdrag": {
+     "fraser": [
+      "Solklart",
+      "Då är jag jävligt snäll"
+     ],
+     "krydda": "Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:17:18.628Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
