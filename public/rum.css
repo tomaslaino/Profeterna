@@ -904,6 +904,20 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* gänget (rum-3d.js): ända ut till scenens vänsterkant, så att den som går iväg går ut ur bilden */
 .rum-3d { position: absolute; left: 0; top: 120px; width: 1440px; height: 560px; pointer-events: none; }
+/* den du har valt att vara (markera i rum.js): en lapp ovanför huvudet med namnet i din handstil och ditt bläck,
+   som på kupongen. Ytterdelen flyttas till huvudet (duFlytta), lappen står ovanför punkten och lutar lite. */
+.rum-pl > .rum-du { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; }
+.rum-du[hidden] { display: none; }
+.rum-du-in { position: absolute; left: 0; top: 0; display: block; padding: 5px 14px 7px; border-radius: 3px;
+  background: linear-gradient(#fbf5e6, #efe4c9); color: var(--ink); white-space: nowrap; line-height: 1;
+  -webkit-text-stroke: 0.3px currentColor; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 4px 10px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, calc(-100% - 8px)) rotate(-4deg); transform-origin: 50% 100%; }
+/* spetsen ner mot huvudet */
+.rum-du-in::after { content: ''; position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; margin-left: -7px;
+  background: #efe4c9; transform: rotate(45deg); box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.25); z-index: -1; }
+.rum-du.sm-k0 .rum-du-in { font: 400 30px/1 "Cedarville Cursive", Caveat, cursive; }
+.rum-du.sm-k1 .rum-du-in { font: 400 36px/1 "Mr Dafoe", Caveat, cursive; }
+.rum-du.sm-k2 .rum-du-in { font: 400 44px/0.8 "Reenie Beanie", Caveat, cursive; }
 /* fönsterbänken i väggens plan (bank i rum.js) ligger över det andra där, som när den låg framför det
    (skenet från neonen i fönstret går ner över bänkens bakkant) */
 .rum-pl > .rum-bank { z-index: 1; }
