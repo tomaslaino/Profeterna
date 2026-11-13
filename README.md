@@ -6277,9 +6277,9 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   och en spelare i truppen **spelarkortet** (nedan).
 
 Sökraden söker i hela registret, också lag och spelare utanför omgången, och svarar medan man
-skriver: träffarna står i stället för vyn med den bästa markerad, Enter öppnar den, ↑/↓ väljer
-en annan, och när sökraden töms (eller med Esc) kommer vyn tillbaka. En siffra och Enter väljer
-raden med det numret.
+skriver: träffarna står i stället för vyn, den mest sannolika överst och markerad och sedan i
+fallande led, Enter öppnar den markerade, ↑/↓ väljer en annan, och när sökraden töms (eller med
+Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.
 
 - **Spelaren** – efternamn och förnamn, laget, numret och platsen, *Läget* (skadad,
   tveksam eller avstängd med skadan, annars spelklar – bara när laget har en skadelista),
@@ -6301,18 +6301,36 @@ raden med det numret.
 Sökningen hittar lag och spelare i alla fyra divisionerna, omgångens möten, topplistorna
 (*tur*, *styrka*), flikarna och divisionerna (*championship*). Laget kan stå med i frågan
 (*saka arsenal*, *bowen west ham*), och smeknamnen *spurs*, *wolves*, *boro*, *utd*, *qpr*,
-*wba*, *pne*, *mk* och *bha* hittar lagen. Bara den bästa nivån av träffar visas: ett helt
-efternamn går före ett förnamn och före namn som bara börjar så (*isak* ger Isak, inte Isak
-Alemayehu eller Isaksen), sedan den som spelar mest. Hittas inget alls letar den efter
-felstavat – ett eller två fel beroende på längden, med samma första bokstav och hela ord först
-– och skriver *MENADE DU:* över det (*haland* ger Haaland, *midlesbrough* Middlesbrough).
-Träffarna listas numrerade (högst 20). När en träff öppnas blinkar *ÅTKOMST BEVILJAD* en stund
-i sökraden, och Esc går tillbaka till vyn där man började skriva.
+*wba*, *pne*, *mk* och *bha* hittar lagen.
+
+Alla träffar visas, sorterade efter hur sannolikt det är att man menar dem (2026-11-13,
+användarens önskemål: "med det som är mest sannolikt överst alltid och sedan i fallande led").
+Förut visades bara den bästa nivån av träffar, så att *burn* gav Dan Burn men inte Burnley.
+Sannolikheten är två delar lagda ihop (`passar`, `TROLIGT` och `DIVPLUS` i
+[public/rum-register.js](public/rum-register.js)): hur väl frågan passar namnet – ett helt ord
+bäst, ett ord som bara börjar namnet sämre ju fler bokstäver som fattas, hela namnet lite
+bättre, och för en spelare lite sämre när frågan inte träffar efternamnet – och hur ofta man
+söker något sådant: ett möte (två lag i frågan) är nästan säkert det man menar, sedan en flik
+eller topplista när frågan är dess ord, sedan lagen och sist spelarna; lagen högre upp i
+ligasystemet och spelarna med mest speltid lite före, och lag och spelare i omgången också.
+Så går *burn* → Burnley före Dan Burn, Burns och Burnett, *isak* → Isak före Isaksen och Isak
+Alemayehu, och *liv* → Liverpool före Livramento.
+
+Överst i träfflistan står **kategorierna**, som topplistornas rad: *Alla*, *Lag*, *Spelare*,
+*Möten* och *Listor* (flikarna, topplistorna och divisionerna), med antalet träffar när raden
+ryms (inte i telefonen). Den valda är omvänd och de tomma svaga; ett tryck eller Tab (Skift-Tab
+bakåt) byter, och i varje kategori står träffarna i samma ordning, den troligaste överst.
+Kategorin gäller medan man skriver, så länge den har träffar, och en ny sökning börjar med
+*Alla*. Hittas inget alls letar den efter felstavat – ett eller två fel beroende på längden,
+med samma första bokstav och hela ord först – och skriver *MENADE DU:* över det (*haland* ger
+Haaland, *midlesbrough* Middlesbrough). Träffarna listas numrerade (högst 20). När en träff
+öppnas blinkar *ÅTKOMST BEVILJAD* en stund i sökraden, och Esc går tillbaka till vyn där man
+började skriva.
 
 Tangenterna: Esc går tillbaka dit man var (och stänger datorn när man är längst tillbaka),
 ↑/↓ markerar en rad och Enter öppnar den, ←/→ bläddrar till förra och nästa match, lista,
 division, lag eller spelare (och bland flikarna när det inte finns något att bläddra i), och
-Tab byter flik.
+Tab byter flik (i sökningen kategori).
 Raden längst ner säger det med tangenternas namn och går att trycka på; i telefonen står
 där *◄ Tillbaka*, *◄ Förra* och *Nästa ►* i stället. Allt i utskriften går att trycka på,
 så att telefonen klarar sig utan tangentbord; tangentbordet kommer fram först när man
