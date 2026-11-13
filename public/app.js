@@ -209,9 +209,34 @@ window.addEventListener('hashchange', route);
 
 // ---------- matchlista ----------
 
+// Landskamperna (Nations League, EM-kval och vänskapslandskamper, type
+// 'intl') står som en enda tävling i filtren – i matchlistan, Ny kupong och
+// Välj matcher – och bara när det finns landskamper i matcherna (2026-11-13).
+const INTL = { id: 'intl', name: 'Landskamper', short: 'Landskamper' };
+const isIntlComp = (id) => (state.comps.get(id) || {}).type === 'intl';
+function filterComps() {
+  const intl = !state.all || state.all.matches.some((m) => isIntlComp(m.comp));
+  return [...[...state.comps.values()].filter((c) => c.type !== 'intl'), ...(intl ? [INTL] : [])];
+}
+const inComp = (m, comp) => comp === 'all' || m.comp === comp || (comp === INTL.id && isIntlComp(m.comp));
+
+// Landskampernas prognos är marknadens, inte datorns (f.mk, src/forecast.js):
+// procenten står i kursiv med den här förklaringen när man pekar.
+const MK_TITLE = 'Marknadens chans: DraftKings odds utan spelbolagets marginal. Datorn räknar bara de engelska ligorna.';
+const isMk = (m) => Boolean(m && m.f && m.f.mk && !(m.j && m.j.p));
+// Oddset under en ruta på kupongerna, med marknadens i kursiv.
+function oddsSmall(m, text, cls = '') {
+  const mk = isMk(m);
+  const c = [cls, mk ? 'mk' : ''].filter(Boolean).join(' ');
+  return `<small${c ? ` class="${c}"` : ''}${mk ? ` title="${esc(MK_TITLE)}"` : ''}>${text}</small>`;
+}
+// En rad under kupongen som säger vad kursiven betyder, när någon match har den.
+const mkLegend = (ms) => (ms.some(isMk)
+  ? '<p class="mk-legend"><i>Kursiva odds</i> är marknadens: datorn räknar bara på de engelska ligorna, inte på landskamperna.</p>' : '');
+
 function renderChips() {
   // hela namnen, som divisionerna på Tabeller och Statistik
-  const all = [{ id: 'all', name: 'Alla' }, ...state.comps.values()];
+  const all = [{ id: 'all', name: 'Alla' }, ...filterComps()];
   $('#comp-chips').innerHTML = all.map((c) =>
     `<button type="button" data-comp="${c.id}" aria-pressed="${c.id === state.comp}">${esc(c.name)}</button>`).join('');
   for (const b of document.querySelectorAll('#comp-chips button')) {
@@ -226,6 +251,7 @@ async function loadMatches() {
     // Sköldarnas index hämtas samtidigt, så att listan ritas med dem.
     [state.all] = await Promise.all([getJSON('data/matches.json'), window.Skoldar && Skoldar.ready]);
     if (window.Spoiler) Spoiler.useMatches(state.all.matches);
+    renderChips(); // Landskamper bara när det finns landskamper
     renderMatchList();
   } catch (err) {
     el.innerHTML = `<p class="empty">Kunde inte läsa matcherna: ${esc(err.message)}</p>`;
@@ -240,11 +266,10 @@ async function loadMatches() {
 function selectMatches(comp, days) {
   const now = Date.now();
   const span = days * 86400000;
-  const inComp = (m) => comp === 'all' || m.comp === comp;
   const t = (m) => new Date(m.kickoff).getTime();
   return {
-    played: state.all.matches.filter((m) => inComp(m) && m.completed && t(m) >= now - span),
-    upcoming: state.all.matches.filter((m) => inComp(m) && !m.completed && t(m) >= now - 3 * 3600000 && t(m) <= now + span),
+    played: state.all.matches.filter((m) => inComp(m, comp) && m.completed && t(m) >= now - span),
+    upcoming: state.all.matches.filter((m) => inComp(m, comp) && !m.completed && t(m) >= now - 3 * 3600000 && t(m) <= now + span),
   };
 }
 
@@ -343,6 +368,7 @@ function tipTitle(m) {
     const hit = tipHit(m);
     return `Prognosen före avspark ${listOdds(m.j.p).join(' · ')}${hit == null ? '' : hit ? ' – slog in' : ' – slog inte in'}`;
   }
+  if (isMk(m)) return `Marknadens prognos ${listOdds(m.f.p).join(' · ')} (DraftKings utan marginal)`;
   return m.f ? `Prognosen i efterhand ${listOdds(m.f.p).join(' · ')}` : '';
 }
 
@@ -567,8 +593,8 @@ function matchPanes(d) {
   if (started && R) panes.push(['matchen', 'Matchen', R.eventsPane(m)]);
   if (articleOn(d)) panes.push(['analysera', 'Analysera', analysPane(d)]);
   panes.push(['prognos', 'Prognos', prognosPane(d)]);
-  const table = tableDivs(d).length > 0;
-  panes.push(['form', 'Form', formCard(d) + sideCard(d, table)]);
+  const table = tableDivs(d).length > 0 || isLand(d);
+  panes.push(['form', 'Form', formCard(d) + landSenaste(d) + sideCard(d, table)]);
   if (table) panes.push(['tabellen', 'Tabellen', `<div class="mt-wrap" data-mr-table="${esc(m.id)}"><p class="mr-wait">Hämtar tabellen …</p></div>`]);
   return panes;
 }
@@ -662,7 +688,8 @@ function forecastCard(d) {
         `<span class="sub">${esc(p.advance.rule)}${p.advance.firstLeg ? ` · första mötet ${esc(p.advance.firstLeg.home)} ${p.advance.firstLeg.score.home}–${p.advance.firstLeg.score.away} ${esc(p.advance.firstLeg.away)}` : ''}</span></p>`;
   }
   const notes = (p.notes || []).map((n) => `<p class="note">${esc(n)}</p>`).join('');
-  return `<div class="card fc"><h4>${m.completed ? 'Prognos i efterhand' : 'Prognos efter 90 minuter'}</h4>` +
+  const mk = p.kind === 'marknaden' ? 'Marknadens prognos' : 'Prognos';
+  return `<div class="card fc"><h4>${m.completed ? `${mk} i efterhand` : `${mk} efter 90 minuter`}</h4>` +
     fcMain(p.p, [m.home, 'Oavgjort', m.away], m.id, null, null, bookOdds(d)) +
     `<div class="fc-two"><div><h5>Målen</h5>${stats}</div><div><h5>Troligast</h5>${topScores(p)}</div></div>` +
     `${adv}${notes}<div class="fc-foot">${scoreGrid(p, m)}</div></div>`;
@@ -1161,6 +1188,7 @@ function leagueTable(T, keys, cut) {
 async function tableFill(root, d) {
   const el = root.querySelector('[data-mr-table]');
   if (!el) return;
+  if (isLand(d)) return groupFill(root, el, d);
   const ids = tableDivs(d);
   const keys = [d.teams.home.key, d.teams.away.key];
   let html = '';
@@ -1183,6 +1211,59 @@ async function tableFill(root, d) {
     html = `<p class="unknown">Kunde inte läsa tabellen: ${esc(err.message)}</p>`;
   }
   if (state.detail === d && root.contains(el)) el.innerHTML = html;
+}
+
+// ---------- landskamperna ----------
+
+// En landskamp (match.type 'intl', landDetail i src/matches.js): lagen har
+// land med gruppen i Nations League.
+const isLand = (d) => Boolean(d && d.match && (d.match.type === 'intl' || (d.teams.home && d.teams.home.land)));
+let landslagReq = null;
+const loadLandslag = () => {
+  if (!landslagReq) {
+    landslagReq = getJSON('data/landslag.json');
+    landslagReq.catch(() => { landslagReq = null; });
+  }
+  return landslagReq;
+};
+
+// Tabellen för en landskamp: gruppen i Nations League ur data/landslag.json,
+// med matchens lag markerade – båda gruppernas när lagen spelar i olika (en
+// vänskapslandskamp).
+async function groupFill(root, el, d) {
+  const keys = [d.teams.home.key, d.teams.away.key];
+  const ids = [...new Set([d.teams.home, d.teams.away].map((t) => t.land && t.land.grupp).filter(Boolean))];
+  let html;
+  try {
+    const L = await loadLandslag();
+    const groups = ids.map((id) => (L.grupper || []).find((g) => g.id === id)).filter(Boolean);
+    html = groups.length ? groups.map((g) => {
+      const T = { name: `Nations League · ${g.namn}`, teams: g.lag.map((r) => ({ key: `land:${r.espnId}`, rank: r.rank, name: r.lag,
+        m: r.played, w: r.won, d: r.drawn, l: r.lost, gf: r.gf, ga: r.ga, gd: r.gd, pts: r.points, note: r.note })) };
+      return `<div class="card mt-card"><h4>${esc(T.name)}</h4>${leagueTable(T, keys, false)}</div>`;
+    }).join('') : '<p class="unknown">okänt – lagen spelar inte i Nations League.</p>';
+  } catch (err) {
+    html = `<p class="unknown">Kunde inte läsa tabellen: ${esc(err.message)}</p>`;
+  }
+  if (state.detail === d && root.contains(el)) el.innerHTML = html;
+}
+
+// De senaste landskamperna för båda lagen sida vid sida (senaste i
+// matchfilen: VM, VM-kval, Nations League och vänskap sedan hösten 2024).
+function landSenaste(d) {
+  if (!isLand(d)) return '';
+  const col = (name, t) => {
+    const list = (t.senaste || []).slice(0, 10);
+    const li = (x) => {
+      const hide = window.Spoiler && Spoiler.hidesDay(x.date);
+      return `<li><span class="w">${esc(dateOnly(x.date))} · ${esc(x.comp || '')}</span>` +
+        `<span class="h">${x.home ? '' : '@ '}${esc(x.opponent || '')}</span>` +
+        `<b class="${hide ? '' : x.result || ''}">${hide ? '?' : x.gf == null ? '–' : `${x.gf}–${x.ga}`}</b></li>`;
+    };
+    return `<div><h5>${esc(name)}</h5>${list.length ? `<ul class="land-sen">${list.map(li).join('')}</ul>` : '<p class="unknown">okänt</p>'}</div>`;
+  };
+  return '<div class="card mf-land"><h4 title="Alla landskamper sedan hösten 2024: VM, VM-kval, Nations League och vänskap. @ = borta.">Senaste landskamperna</h4>' +
+    `<div class="grid2">${col(d.match.home, d.teams.home)}${col(d.match.away, d.teams.away)}</div></div>`;
 }
 
 // ---------- Analysera ----------

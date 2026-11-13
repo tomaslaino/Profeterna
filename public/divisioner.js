@@ -45,6 +45,8 @@ const state = {
   tf: { cols: 'tabell', sort: 'rank', dir: 1 },
   mtab: { team: null, player: null }, // senast valda flik i lag- och spelarrutan
   form: null, // lagnamn → lagets matcher, senaste först (loadForm)
+  lf: { who: 'lor', sort: 'grupp', dir: 1 }, // tabellen Landslagen
+  landById: null, // matchlistans landskamper efter id (loadLandMatches)
 };
 
 function esc(s) {
@@ -72,7 +74,7 @@ function num(x, d = 1) {
 }
 const pct = (x, d = 0) => (x == null || !Number.isFinite(x) ? '–' : `${num(x * 100, d)} %`);
 const int = (x) => (x == null || !Number.isFinite(x) ? '–' : num(Math.round(x), 0));
-const color = (id) => `var(--dv-${id})`;
+const color = (id) => (id === 'unl' ? 'var(--dv-unl, #2a9db0)' : `var(--dv-${id})`);
 const unknown = (why = 'okänt') => `<span class="unknown">${esc(why)}</span>`;
 const fDateTime = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 const when = (iso) => (iso ? esc(fDateTime.format(new Date(iso))) : 'okänt');
@@ -147,35 +149,39 @@ const ZONES = [
   { test: (n) => /promotion/i.test(n), cls: 'z-up', label: 'Direkt uppflyttning' },
 ];
 const zoneOf = (note) => (note ? ZONES.find((z) => z.test(note)) || null : null);
+// Zonen för en rad: landslagens rader bär sin zon själva (landZone), de
+// engelska läses ur ESPN:s note.
+const zoneRow = (r) => (r && 'zone' in r ? r.zone : zoneOf(r && r.note));
 
 // Zonstrecket med zonens namn där zonen slutar: under de övre zonerna, ovanför
 // nedflyttningen – aldrig i tabellens kant. rows kan ha luckor (null).
 function zoneLine(rows, i, cols) {
   const line = (z) => `<tr class="dv-zline ${z.cls}" aria-hidden="true"><td colspan="${cols}"><div><span>${esc(z.label)}</span></div></td></tr>`;
-  const z = rows[i] && zoneOf(rows[i].note);
+  const z = rows[i] && zoneRow(rows[i]);
   if (!z) return { before: '', after: '' };
   const prev = i > 0 ? rows[i - 1] : undefined;
   const next = i < rows.length - 1 ? rows[i + 1] : undefined;
-  const other = (r) => !r || (zoneOf(r.note) || {}).label !== z.label;
+  const other = (r) => !r || (zoneRow(r) || {}).label !== z.label;
+  const down = z.cls === 'z-down' || z.down;
   return {
-    before: z.cls === 'z-down' && prev !== undefined && other(prev) ? line(z) : '',
-    after: z.cls !== 'z-down' && next !== undefined && other(next) ? line(z) : '',
+    before: down && prev !== undefined && other(prev) ? line(z) : '',
+    after: !down && next !== undefined && other(next) ? line(z) : '',
   };
 }
 
 // Som en vanlig tabell: S V O F, målen och poängen. I telefonen ryms inte
 // målen bredvid långa lagnamn (Wolverhampton) – där räcker +/−.
-function leagueTable(rows) {
+function leagueTable(rows, { attr = (r) => `data-team="${esc(r.espnId)}"` } = {}) {
   const head = '<thead><tr><th class="c">#</th><th>Lag</th><th class="num" title="Spelade matcher">S</th>' +
     '<th class="num" title="Vunna">V</th><th class="num" title="Oavgjorda">O</th><th class="num" title="Förlorade">F</th>' +
     '<th class="num hide-xs" title="Gjorda–insläppta mål">Mål</th><th class="num" title="Målskillnad">+/−</th>' +
     '<th class="num" title="Poäng: 3 för vinst, 1 för oavgjort">P</th></tr></thead>';
   const body = rows.map((r, i) => {
     if (!r) return `<tr class="dv-gap"><td colspan="9">⋯</td></tr>`;
-    const z = zoneOf(r.note);
+    const z = zoneRow(r);
     const zl = zoneLine(rows, i, 9);
     const gd = r.gd > 0 ? `+${r.gd}` : r.gd < 0 ? `−${-r.gd}` : '0';
-    return zl.before + `<tr class="dv-trow ${z ? z.cls : ''}" data-team="${esc(r.espnId)}" tabindex="0" title="${z ? esc(z.label) : ''}">` +
+    return zl.before + `<tr class="dv-trow ${z ? z.cls : ''}" ${attr(r)} tabindex="0" title="${z ? esc(z.label) : ''}">` +
       `<td class="c rank">${r.rank}</td><td class="team">${teamName(r.name)}</td><td class="num">${r.played}</td>` +
       `<td class="num">${r.won}</td><td class="num">${r.drawn}</td><td class="num">${r.lost}</td>` +
       `<td class="num hide-xs">${r.gf}–${r.ga}</td><td class="num">${gd}</td>` +
@@ -1399,6 +1405,293 @@ async function openTeam(id, pick) {
   showModal(html);
 }
 
+// ---------- landslagen ----------
+//
+// Fliken Landslag efter de fyra divisionerna, på båda sidorna. Tabeller har
+// Nations Leagues fjorton grupper (A1–D2), Statistik formen och siffrorna för
+// alla europeiska landslag. Data: data/landslag.json (src/landslag.js) och
+// matchlistan (data/matches.json) för länkarna till matchrutan. Bara det som
+// finns för landslagen visas – inga spelare, inget xG, inga skott.
+// Stryktipsets landskamper spelas på lördagen: grupperna och lagen som spelar
+// då står först och är märkta.
+
+const LAND = 'unl';
+const LAND_COMPS = ['unl', 'emk', 'vsk'];
+const LAND_DIV = { id: LAND, name: 'Landslag' };
+const isLand = (id) => id === LAND;
+let landLoad = null;
+function loadLand() {
+  if (!landLoad) landLoad = getJSON('data/landslag.json').catch((err) => ({ unknown: true, reason: err.message }));
+  return landLoad;
+}
+
+const fDayTime = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', hour: '2-digit', minute: '2-digit' });
+const kick = (iso) => esc(fDayTime.format(new Date(iso)).replace(/^(\w)/, (c) => c.toUpperCase()));
+
+// Stryktipsets dag: lördagen i veckan, och fram till måndag den som var.
+function couponDay(now = Date.now()) {
+  const d = new Date(`${fDay.format(new Date(now - 2 * 86400000))}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
+  return d.toISOString().slice(0, 10);
+}
+// Landskamperna på Stryktipsets dag.
+function couponLand(L) {
+  const day = couponDay();
+  return (L.omgang || []).filter((m) => fDay.format(new Date(m.avspark)) === day)
+    .sort((a, b) => a.avspark.localeCompare(b.avspark) || a.hemma.localeCompare(b.hemma, 'sv'));
+}
+
+// Zonerna i Nations League. ESPN skriver dem en gång per placering (bara i
+// en grupp) och för alla ligor på en rad: "A: Qualifies for QFs; B-D:
+// Promotion". Placeringens text läses för gruppens liga.
+const LAND_ZONES = [
+  { test: /qualif|quarter|QF/i, cls: 'z-eu', label: 'Kvartsfinal' },
+  { test: /promotion play/i, cls: 'z-po', label: 'Kval till uppflyttning' },
+  { test: /promotion/i, cls: 'z-up', label: 'Uppflyttning' },
+  { test: /relegation or play/i, cls: 'z-down', label: 'Nedflyttning eller kval' },
+  { test: /relegation play/i, cls: 'z-po', label: 'Kval mot nedflyttning', down: true },
+  { test: /relegation/i, cls: 'z-down', label: 'Nedflyttning' },
+];
+function landLegend(L) {
+  const byRank = new Map();
+  for (const g of L.grupper) for (const r of g.lag) if (r.note && !byRank.has(r.rank)) byRank.set(r.rank, r.note);
+  return byRank;
+}
+function landZone(legend, liga, rank) {
+  const note = legend.get(rank);
+  if (!note || !liga) return null;
+  for (const part of note.split(';')) {
+    const m = /^\s*([A-D](?:\s*[-,]\s*[A-D])*)\s*:\s*(.+)$/.exec(part);
+    if (!m) continue;
+    const letters = new Set();
+    for (const bit of m[1].split(',')) {
+      const [a, b = a] = bit.split('-').map((x) => x.trim());
+      for (let c = a.charCodeAt(0); c <= b.charCodeAt(0); c++) letters.add(String.fromCharCode(c));
+    }
+    if (letters.has(liga)) return LAND_ZONES.find((z) => z.test.test(m[2])) || null;
+  }
+  return null;
+}
+
+// Flaggan står i sköldarnas index under det svenska namnet.
+const flagName = (name) => teamName(name);
+
+function landMatchLink(m) {
+  return `<a class="dv-lmatch" href="index.html#match/${esc(m.id)}"><span class="dv-lm-when">${kick(m.avspark)}</span>` +
+    `<span class="dv-lm-teams">${esc(m.hemma)}–${esc(m.borta)}</span>` +
+    (m.resultat && m.status !== 'STATUS_SCHEDULED' ? `<b class="dv-lm-res">${landHidden(m.id) ? '?' : `${m.resultat.home}–${m.resultat.away}`}</b>` : '') +
+    '</a>';
+}
+
+function landTablesView(L) {
+  if (!L || L.unknown || !L.grupper || !L.grupper.length) {
+    return `<p class="empty">${unknown(`okänt – ingen tabell hämtad för Nations League${L && L.reason ? ` (${L.reason})` : ''}`)}</p>`;
+  }
+  const legend = landLegend(L);
+  const lor = couponLand(L);
+  const lorGroups = new Set(lor.map((m) => m.grupp).filter(Boolean));
+  const groupCard = (g) => {
+    const rows = g.lag.map((r) => ({ ...r, name: r.lag, zone: landZone(legend, g.liga, r.rank) }));
+    const games = lor.filter((m) => m.grupp === g.id);
+    return `<section class="card dv-card dv-tablecard dv-lgroup${games.length ? ' on' : ''}">` +
+      `<h4>${esc(g.namn)}${games.length ? ' <span class="dv-ltag">Lördag</span>' : ''}</h4>` +
+      leagueTable(rows, { attr: (r) => `data-land="${esc(r.espnId)}"` }) +
+      (games.length ? `<div class="dv-lgames">${games.map(landMatchLink).join('')}</div>` : '') +
+      '</section>';
+  };
+  const first = L.grupper.filter((g) => lorGroups.has(g.id));
+  const rest = L.grupper.filter((g) => !lorGroups.has(g.id));
+  const ligor = ['A', 'B', 'C', 'D'].map((l) => [l, rest.filter((g) => g.liga === l)]).filter(([, gs]) => gs.length);
+  let html = '';
+  if (first.length) {
+    html += '<div class="dv-sechead"><h3>Lördagens grupper</h3><p>Där Stryktipsets landskamper spelas. Klicka på ett lag för formen och matcherna.</p></div>' +
+      `<div class="dv-lgrid">${first.map(groupCard).join('')}</div>`;
+  }
+  html += ligor.map(([l, gs]) => `<div class="dv-sechead"><h3>Liga ${l}</h3></div><div class="dv-lgrid">${gs.map(groupCard).join('')}</div>`).join('');
+  return html + `<p class="src-line">Tabell: ESPN, hämtat ${when(L.kalla && L.kalla.tabell)}. Zonerna enligt ESPN: vad placeringen ger när gruppspelet är klart.</p>`;
+}
+
+// Formrutorna för ett landslag: de fem senaste landskamperna, nyast till
+// vänster, i samma rutor som klubbarnas. En dold match (spoilerskyddet) står
+// som ?.
+function landHidden(id) {
+  const m = state.landById && state.landById.get(String(id));
+  return !!(m && window.Spoiler && Spoiler.hidden(m));
+}
+const landTurn = (r) => r.turneringNamn || r.turnering || '';
+function landRowText(r) {
+  return `${shortDay(`${r.datum}T12:00:00Z`)} · ${landTurn(r)} · ${r.hemma ? 'hemma' : 'borta'} mot ${r.motstand} · ${r.mal[0]}–${r.mal[1]}` +
+    (r.avgjord ? ` (avgjord på ${r.avgjord})` : '');
+}
+function landChips(list, { title = false } = {}) {
+  if (!list.length) return '<span class="dv-nil" title="Inga spelade landskamper">–</span>';
+  return `<span class="form dv-form">${list.map((r) => {
+    const hid = landHidden(r.id);
+    const l = hid ? '?' : r.utfall;
+    const head = hid ? 'Dold' : FORM_RESULT[l];
+    const text = hid ? 'Du har valt att dölja resultat.' : landRowText(r);
+    const attr = title ? ` title="${esc(`${head}: ${text}`)}"` : ` data-tip-head="${esc(head)}" data-tip="${esc(text)}"`;
+    return `<span class="${hid ? 'sp-form' : l}"${attr}>${esc(l)}</span>`;
+  }).join('')}</span>`;
+}
+const LAND_FORM_TIP = 'De fem senaste landskamperna – Nations League, VM, VM-kvalet och vänskapsmatcherna – nyast till vänster: V = vinst, O = oavgjort, F = förlust. Ställningen efter 90 minuter gäller.';
+
+// Ett landslags rad i tabellen Alla landslag.
+const LAND_COLS = [
+  { key: 'lag', label: 'Lag', cls: '', text: true, get: (t) => t.lag },
+  { key: 'grupp', label: 'Grupp', cls: 'c', sub: 'NL', title: 'Gruppen i Nations League (NL)', text: true, get: (t) => t.grupp || 'Ö' },
+  { key: 'form', label: 'Form', cls: '', sub: '5 senaste', title: LAND_FORM_TIP, get: (t) => t.senaste.slice(0, 5).reduce((s, r) => s + FORM_PTS[r.utfall], 0) },
+  { key: 'nl', label: 'P', cls: 'num', sub: 'NL', title: 'Poängen i Nations League och placeringen i gruppen', get: (t) => (t.tabell ? t.tabell.points : null) },
+  { key: 'm', label: 'M', cls: 'num', sub: 'sedan 2024', title: 'Landskamper sedan hösten 2024: Nations League, VM, VM-kvalet och vänskapsmatcherna', get: (t) => t.alla.matcher },
+  { key: 'vof', label: 'V–O–F', cls: 'num', sub: 'poäng/match', title: 'Vunna, oavgjorda och förlorade landskamper sedan hösten 2024. Sorteras på poäng per match (3 för vinst, 1 för oavgjort).', get: (t) => (t.alla.matcher ? (3 * t.alla.v + t.alla.o) / t.alla.matcher : null) },
+  { key: 'mal', label: 'Mål', cls: 'num hide-xs', sub: '+/−', title: 'Gjorda–insläppta mål i landskamperna sedan hösten 2024. Sorteras på målskillnaden.', get: (t) => t.alla.gjorda - t.alla.inslappta },
+  { key: 'nollor', label: 'Nollor', cls: 'num hide-xs', title: 'Landskamper utan insläppt mål sedan hösten 2024', get: (t) => t.alla.nollor },
+  { key: 'nasta', label: 'Nästa', cls: 'hide-xs', title: 'Nästa landskamp', text: true, get: (t) => (t.nasta ? t.nasta.datum : 'z') },
+];
+
+function landSort(list) {
+  const { sort, dir } = state.lf;
+  const c = LAND_COLS.find((x) => x.key === sort) || LAND_COLS[0];
+  return [...list].sort((a, b) => {
+    const x = c.get(a);
+    const y = c.get(b);
+    if (x == null && y == null) return a.lag.localeCompare(b.lag, 'sv');
+    if (x == null) return 1;
+    if (y == null) return -1;
+    const d = c.text ? String(x).localeCompare(String(y), 'sv') : x - y;
+    const rank = (t) => (t.tabell ? t.tabell.rank : 9);
+    return d * dir || (c.key === 'grupp' ? rank(a) - rank(b) : 0) || a.lag.localeCompare(b.lag, 'sv');
+  });
+}
+
+function landTeamRow(t, lorTeams) {
+  const a = t.alla;
+  const nx = t.nasta;
+  const on = lorTeams.has(t.lag);
+  return `<tr class="dv-trow${on ? ' dv-lon' : ''}" data-land="${esc(t.espnId)}" tabindex="0">` +
+    `<td class="team">${flagName(t.lag)}</td>` +
+    `<td class="c">${t.grupp ? esc(t.grupp) : '<span class="dv-nil" title="Inte i Nations League">–</span>'}</td>` +
+    `<td>${landChips(t.senaste.slice(0, 5))}</td>` +
+    `<td class="num">${t.tabell ? `<b>${t.tabell.points}</b> <small class="muted">${ordinal(t.tabell.rank)}</small>` : '<span class="dv-nil">–</span>'}</td>` +
+    `<td class="num">${a.matcher}</td>` +
+    `<td class="num">${a.v}–${a.o}–${a.f}</td>` +
+    `<td class="num hide-xs">${a.gjorda}–${a.inslappta}</td>` +
+    `<td class="num hide-xs">${cell(a.nollor)}</td>` +
+    `<td class="hide-xs">${nx ? `<span class="dv-lnext">${esc(shortDay(nx.datum))} ${nx.hemma ? 'mot' : 'i'} ${esc(nx.motstand)}</span>` : '<span class="dv-nil">–</span>'}</td></tr>`;
+}
+
+function landStatsView(L) {
+  if (!L || L.unknown || !L.lag || !L.lag.length) {
+    return `<p class="empty">${unknown(`okänt – ingen data om landslagen${L && L.reason ? ` (${L.reason})` : ''}`)}</p>`;
+  }
+  const byName = new Map(L.lag.map((t) => [t.lag, t]));
+  const lor = couponLand(L);
+  const lorTeams = new Set(lor.flatMap((m) => [m.hemma, m.borta]));
+  let html = '';
+
+  // Lördagens landskamper: lagen sida vid sida med formen, gruppen och
+  // marknadens chans.
+  if (lor.length) {
+    const side = (name) => {
+      const t = byName.get(name);
+      return `<div class="dv-lside">${flagName(name)}` +
+        `<div class="dv-lside-f">${t ? landChips(t.senaste.slice(0, 5)) : ''}` +
+        `${t && t.tabell ? `<small>${ordinal(t.tabell.rank)} i ${esc(t.grupp)} · ${t.tabell.points} p</small>` : ''}</div></div>`;
+    };
+    html += card('Lördagens landskamper', {
+      hint: 'Stryktipsets dag',
+      tip: 'Formen är de fem senaste landskamperna, nyast till vänster. Chansen är marknadens – DraftKings odds utan spelbolagets marginal – inte modellens.',
+      body: `<ul class="dv-lgamelist">${lor.map((m) => {
+        const p = m.prognos;
+        const res = m.resultat && m.status !== 'STATUS_SCHEDULED' && !(window.Spoiler && landHidden(m.id));
+        return `<li><a href="index.html#match/${esc(m.id)}" class="dv-lgame">` +
+          `<span class="dv-lg-when">${kick(m.avspark)}<small>${esc(m.grupp ? `Grupp ${m.grupp}` : m.turneringNamn)}</small></span>` +
+          side(m.hemma) + side(m.borta) +
+          `<span class="dv-lg-p">${res ? `<b>${m.resultat.home}–${m.resultat.away}</b>`
+            : p ? p.map((v, i) => `<span title="${['Hemmaseger', 'Oavgjort', 'Bortaseger'][i]} enligt marknaden"><small>${'1X2'[i]}</small>${v} %</span>`).join('')
+              : '<span class="dv-nil" title="Inga odds än">–</span>'}</span></a></li>`;
+      }).join('')}</ul>`,
+      src: `Matcherna: ESPN, hämtat ${when(L.kalla && L.kalla.matcher)} · Chansen: DraftKings via ESPN, utan marginal`,
+      cls: 'dv-lgamecard',
+    });
+  }
+
+  // Alla landslag, sorterbart; lördagens lag först om inget annat valts.
+  const seg = [['lor', 'Lördagens lag'], ['alla', 'Alla']];
+  const only = state.lf.who === 'lor' && lorTeams.size;
+  const list = landSort(L.lag.filter((t) => (only ? lorTeams.has(t.lag) : true)));
+  const head = sortHead(LAND_COLS, state.lf, 'data-lsort');
+  html += card('Landslagen', {
+    hint: 'alla landskamper sedan hösten 2024',
+    tip: 'Nations League, VM, VM-kvalet och vänskapsmatcherna sedan september 2024. Ställningen efter 90 minuter gäller. Klicka på ett lag för matcherna.',
+    body: (lorTeams.size ? `<div class="dv-seg" role="group" aria-label="Vilka lag">${seg.map(([id, label]) =>
+      `<button type="button" data-lwho="${id}" aria-pressed="${(only ? 'lor' : 'alla') === id}">${label}</button>`).join('')}</div>` : '') +
+      `<div class="table-wrap dv-tw"><table class="dv-teams dv-landtab">${head}<tbody>${list.map((t) => landTeamRow(t, lorTeams)).join('')}</tbody></table></div>`,
+    src: `Matcherna: ESPN, hämtat ${when(L.kalla && L.kalla.historik)} (tidigare turneringar) och ${when(L.kalla && L.kalla.matcher)} (Nations League)`,
+  });
+  return html;
+}
+
+// Lagkortet för ett landslag: gruppen, Nations League hittills, alla
+// landskamper sedan 2024, nästa match och de tio senaste – med länkar till
+// matchrutan för de matcher sajten har.
+async function openLand(espnId) {
+  const L = await loadLand();
+  if (!L || L.unknown) return;
+  const t = L.lag.find((x) => x.espnId === espnId);
+  if (!t) return;
+  const legend = landLegend(L);
+  const z = t.tabell ? landZone(legend, t.liga, t.tabell.rank) : null;
+  const sub = [t.grupp ? `Nations League, grupp ${t.grupp}` : 'Inte i Nations League', t.tabell ? `${ordinal(t.tabell.rank)} plats` : null, z ? z.label : null];
+  let html = mhead(t.kod || t.lag.slice(0, 2).toUpperCase(), t.lag, [sub.filter(Boolean).map(esc).join(' · ')], ' team',
+    '', window.Skoldar && Skoldar.has(t.lag) ? teamCrest(t.lag) : '');
+  const nl = t.nationsLeague;
+  const a = t.alla;
+  html += kpis([
+    t.tabell ? [cell(t.tabell.points, { strong: true }), 'Poäng i gruppen'] : null,
+    nl.matcher ? [`${nl.gjorda}–${nl.inslappta}`, 'Mål i gruppen'] : null,
+    t.senaste.length ? [landChips(t.senaste.slice(0, 5), { title: true }), 'Form', LAND_FORM_TIP] : null,
+  ]);
+  const have = state.landById || new Map();
+  const link = (id, txt) => (have.has(String(id)) ? `<a href="index.html#match/${esc(id)}">${txt}</a>` : txt);
+  if (t.nasta) {
+    const n = t.nasta;
+    const d = dayNo(Date.parse(n.datum)) - dayNo(Date.now());
+    const live = Date.parse(n.datum) <= Date.now();
+    const whenTxt = live ? 'pågår' : d <= 0 ? 'i dag' : d === 1 ? 'i morgon' : `om ${d} dagar`;
+    html += msec('Nästa match', `<div class="dv-next"><span class="dv-tname">${teamCrest(n.motstand)}<span><b>${link(n.id, esc(n.motstand))}</b>` +
+      `<small>${n.hemma ? 'Hemma' : 'Borta'} · ${esc(fKick.format(new Date(n.datum)))}${n.turnering === 'UNL' ? ' · Nations League' : ''}</small></span></span>` +
+      `<b class="dv-next-when">${whenTxt}</b></div>`);
+  }
+  html += msec('Siffrorna', facts([
+    [`${nl.v}–${nl.o}–${nl.f}`, 'V–O–F i gruppen', `${nl.matcher} matcher i årets Nations League`],
+    [`${nl.gjorda}–${nl.inslappta}`, 'Mål i gruppen', 'Gjorda–insläppta mål i årets Nations League'],
+    [`${a.v}–${a.o}–${a.f}`, 'V–O–F sedan 2024', `${a.matcher} landskamper sedan ${a.fran ? dateLabel(a.fran) : 'hösten'} ${a.fran ? a.fran.slice(0, 4) : '2024'}`],
+    [`${a.gjorda}–${a.inslappta}`, 'Mål sedan 2024', 'Gjorda–insläppta mål sedan hösten 2024'],
+    a.matcher ? [num(a.gjorda / a.matcher, 2), 'Mål per match', 'Gjorda mål per landskamp sedan hösten 2024'] : null,
+    a.matcher ? [`${a.nollor}<small> av ${a.matcher}</small>`, 'Hållit nollan', 'Landskamper utan insläppt mål sedan hösten 2024'] : null,
+  ]));
+  if (t.senaste.length) {
+    html += msec(`De ${t.senaste.length} senaste`, `<ul class="dv-flist">${t.senaste.map((r) => {
+      const hid = landHidden(r.id);
+      const l = hid ? '?' : r.utfall;
+      return `<li><span class="form dv-form"><span class="${hid ? 'sp-form' : l}">${esc(l)}</span></span>` +
+        `<span class="dv-tname">${teamCrest(r.motstand)}<span>${link(r.id, esc(r.motstand))}<small>${r.hemma ? 'hemma' : 'borta'} · ${esc(shortDay(`${r.datum}T12:00:00Z`))} · ${esc(landTurn(r))}</small></span></span>` +
+        `<b>${hid ? '?' : `${r.mal[0]}–${r.mal[1]}${r.avgjord ? '*' : ''}`}</b></li>`;
+    }).join('')}</ul>` + (t.senaste.some((r) => r.avgjord) ? '<p class="dv-note">* Ställningen efter 90 minuter; avgjord i förlängning eller på straffar.</p>' : ''));
+  }
+  html += mfoot([`Matcherna och tabellen: ESPN, hämtat ${when(L.kalla && L.kalla.matcher)}. Skott, xG och trupperna finns inte för landslagen i de fria källorna.`]);
+  showModal(html);
+}
+
+// Matchlistans landskamper efter id (länkarna och spoilerskyddet).
+async function loadLandMatches() {
+  if (state.landById) return state.landById;
+  const all = await allMatches();
+  state.landById = new Map((all || []).filter((m) => LAND_COMPS.includes(m.comp)).map((m) => [String(m.id), m]));
+  return state.landById;
+}
+
 // ---------- ordlistan ----------
 
 // [term, förklaring, sidan den hör till – utan sida på båda]
@@ -1452,7 +1745,8 @@ function frame() {
   const d = state.data;
   return '<div class="dv-head">' +
     `<div class="dv-divs" id="dv-divs" role="group" aria-label="Division">${d.divisions.map((x) =>
-      `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" style="--c:${color(x.id)}">${esc(x.name)}</button>`).join('')}</div>` +
+      `<button type="button" data-div="${x.id}" aria-pressed="${x.id === state.div}" style="--c:${color(x.id)}">${esc(x.name)}</button>`).join('')}` +
+    `<button type="button" data-div="${LAND}" aria-pressed="${isLand(state.div)}" style="--c:${color(LAND)}">${esc(LAND_DIV.name)}</button></div>` +
     '</div>' + viewTabs() + '<div id="dv-view" class="dv-view"></div>' +
     '<p class="detail-foot"><button type="button" class="src-toggle" aria-pressed="false">Visa detaljer</button></p>' + glossary();
 }
@@ -1498,7 +1792,7 @@ async function loadPlayers(div) {
 
 async function renderView() {
   const d = state.data;
-  const dv = d.divisions.find((x) => x.id === state.div) || d.divisions[0];
+  const dv = isLand(state.div) ? LAND_DIV : d.divisions.find((x) => x.id === state.div) || d.divisions[0];
   for (const b of document.querySelectorAll('#dv-divs button')) b.setAttribute('aria-pressed', String(b.dataset.div === dv.id));
   // Smal skärm: rulla flikraden så att den valda divisionen syns hel.
   const tabs = $('#dv-divs');
@@ -1514,6 +1808,19 @@ async function renderView() {
     else a.removeAttribute('aria-current');
   }
   const el = $('#dv-view');
+  const vt = $('#dv-views');
+  if (vt) vt.style.display = isLand(dv.id) ? 'none' : '';
+  if (isLand(dv.id)) {
+    const [L] = await Promise.all([loadLand(), loadLandMatches(), window.Spoiler && Spoiler.on() && Spoiler.matches()]);
+    if (!isLand(state.div)) return;
+    el.classList.remove('sp-veiled');
+    const draw = () => { el.innerHTML = PAGE === 'tabeller' ? landTablesView(L) : landStatsView(L); };
+    if (el.dataset.drawn === LAND) keepScroll(el, draw);
+    else draw();
+    el.dataset.drawn = LAND;
+    veil(dv, state.view);
+    return;
+  }
   const P = await loadPlayers(dv.id);
   const [T] = state.view === 'lag' ? await Promise.all([loadTeams(dv.id), loadForm()]) : [null];
   // Spoilerskyddet behöver matcherna innan något ritas, annars hinner det dolda synas.
@@ -1538,7 +1845,8 @@ async function renderView() {
 // vyn bakom en ridå – tabellen och statistiken räknar redan med resultaten.
 async function veil(dv, view) {
   if (!window.Spoiler || !Spoiler.on()) return;
-  const recent = (await Spoiler.matches()).filter((m) => m.comp === dv.id && Spoiler.hides(m.kickoff));
+  const inDiv = (m) => (isLand(dv.id) ? LAND_COMPS.includes(m.comp) : m.comp === dv.id);
+  const recent = (await Spoiler.matches()).filter((m) => inDiv(m) && Spoiler.hides(m.kickoff));
   const n = recent.filter(Spoiler.hidden).length;
   if (!n || dv.id !== state.div || view !== state.view) return;
   const el = $('#dv-view');
@@ -1549,7 +1857,7 @@ async function veil(dv, view) {
   for (const c of el.children) c.inert = true;
   el.classList.add('sp-veiled');
   el.insertAdjacentHTML('afterbegin', Spoiler.card({
-    title: `${n} ${n === 1 ? 'match' : 'matcher'} i ${dv.name} är dolda`,
+    title: `${n} ${n === 1 ? 'match' : 'matcher'} i ${isLand(dv.id) ? 'landskamperna' : dv.name} är dolda`,
     text: 'Tabellen och statistiken räknar med resultaten.',
     keys: [key],
   }));
@@ -1606,6 +1914,19 @@ function wire() {
       renderView();
       return;
     }
+    const ls = e.target.closest('[data-lsort]');
+    if (ls) {
+      const k = ls.dataset.lsort;
+      const c = LAND_COLS.find((x) => x.key === k);
+      state.lf.dir = state.lf.sort === k ? -state.lf.dir : (c.text ? 1 : -1);
+      state.lf.sort = k;
+      renderView();
+      return;
+    }
+    const lw = e.target.closest('[data-lwho]');
+    if (lw) { state.lf.who = lw.dataset.lwho; renderView(); return; }
+    const ld = e.target.closest('[data-land]');
+    if (ld) { openLand(ld.dataset.land); return; }
     const top = e.target.closest('[data-top]');
     if (top) { openTop(top.dataset.top); return; }
     if (e.target.closest('[data-more]')) {
@@ -1623,7 +1944,9 @@ function wire() {
     const p = e.target.closest('tr[data-pid]');
     if (p) { openPlayer(p.dataset.pid); return; }
     const t = e.target.closest('tr[data-team]');
-    if (t) openTeam(t.dataset.team);
+    if (t) { openTeam(t.dataset.team); return; }
+    const ld = e.target.closest('tr[data-land]');
+    if (ld) openLand(ld.dataset.land);
   });
   root.addEventListener('input', (e) => {
     if (e.target.id === 'pf-q') { state.pf.q = e.target.value; state.pf.limit = 60; updatePlayerTable(); }
@@ -1661,7 +1984,7 @@ function go(div, view) {
 function apply() {
   const { div, view } = parseHash();
   const divs = state.data.divisions;
-  const nd = div && divs.some((x) => x.id === div) ? div : state.div;
+  const nd = div && (isLand(div) || divs.some((x) => x.id === div)) ? div : state.div;
   const nv = view && VIEWS.some((v) => v.id === view) ? view : (div ? VIEWS[0].id : state.view);
   if (nd !== state.div) {
     state.pf = { ...state.pf, q: '', team: '', limit: 60 };
@@ -1765,7 +2088,7 @@ window.addEventListener('hashchange', () => {
     return;
   }
   const { div, view } = parseHash();
-  if (div && state.data.divisions.some((x) => x.id === div)) state.div = div;
+  if (div && (isLand(div) || state.data.divisions.some((x) => x.id === div))) state.div = div;
   if (view && VIEWS.some((v) => v.id === view)) state.view = view;
   $('#divisions').innerHTML = frame();
   setShowSources(showSources());

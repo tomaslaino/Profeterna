@@ -7,7 +7,7 @@
 
 import ac from '../../config/analyser.js';
 import newsCfg from '../../config/news.js';
-import { payloadOf } from './underlag.mjs';
+import { payloadOf, arLandskamp } from './underlag.mjs';
 import { citer, see, partsOf, problems, tipProblems } from './kontroller.mjs';
 import { claudeSvar } from './claude.mjs';
 
@@ -32,6 +32,15 @@ function underlag(d) {
 
 const TECKEN = ['1', 'X', '2'];
 
+// Systemprompten för en landskamp: utan det som bara gäller klubbmatcherna (xG, skadelistan
+// och sajtens prognos) och med ac.landskamp före rösten.
+function landSystem() {
+  return ac.systemPrompt
+    .replace(/Du får matchens siffror som JSON:[^\n]*/, 'Du får matchens siffror som JSON: tabellen i gruppen, formen, tidigare möten, marknadens prognos och spelbolagets odds.')
+    .replace(/Prognosen är sajtens egen:[^\n]*/, 'Prognosen är marknadens: spelbolagets odds utan marginal – lägre odds, större chans.')
+    .replace(/\n\nSå här låter du:$/, `\n\n${ac.landskamp}\n\nSå här låter du:`);
+}
+
 // Hela texten i en sträng: posten ska kunna läsas utan sajten.
 function helText(a) {
   const tip = a.tip ? [`Tipset: ${a.tip.signs.map((i) => TECKEN[i]).join('')} (${a.tip.note})`, a.tip.text] : [];
@@ -47,7 +56,10 @@ export async function skrivAnalys(d, { rost, now = () => new Date(), claude = cl
   const seen = new Map();
   const read = [];
   const meta = { searches: 0, fetches: 0, seconds: 0, dollars: 0 };
-  const opts = { system: `${ac.systemPrompt}\n\n${rost.trim()}`, model: ac.model, effort: ac.effort, timeoutMs: ac.timeoutMs };
+  // En landskamp: andra siffror och marknadens prognos (config/analyser.js, landskamp).
+  const landskamp = arLandskamp(d);
+  const system = landskamp ? landSystem() : ac.systemPrompt;
+  const opts = { system: `${system}\n\n${rost.trim()}`, model: ac.model, effort: ac.effort, timeoutMs: ac.timeoutMs };
   const fraga = `Nu är det ${nowFmt.format(now())} svensk tid.\n\nMatchens siffror (JSON):\n${JSON.stringify(base)}`;
 
   let r = await claude({ ...opts, prompt: fraga, tools: ac.tools, blocked: newsCfg.excludeDomains });
@@ -63,15 +75,15 @@ export async function skrivAnalys(d, { rost, now = () => new Date(), claude = cl
     if (r.refused) return { ok: false, error: 'Claude avböjde att skriva analysen.' };
     const parts = partsOf(r.content);
     const known = [base, read.join('\n')];
-    const artikel = parts ? problems(parts, known) : ['inget svar i rätt form'];
-    const tips = parts && harPrognos(d) ? tipProblems(parts.tip, known) : [];
+    const artikel = parts ? problems(parts, known, { landskamp }) : ['inget svar i rätt form'];
+    const tips = parts && harPrognos(d) ? tipProblems(parts.tip, known, { landskamp }) : [];
     if (parts && !artikel.length) artikelnHaller = { parts, model: r.model, attempt };
     if (!artikel.length && !tips.length) return { ok: true, meta, entry: bygg(d, parts, seen, r.model, attempt, now) };
     const why = [...artikel, ...tips];
     problem = `Svaret hade ${why.join(' och ')}.`;
     if (attempt === 2) break;
     const sagt = read.join('\n\n').slice(0, MAX_LAST);
-    r = await claude({ ...opts, tools: [], prompt: `${fraga}\n\nDu har redan läst på och kan inte söka mer. Det här läste du:\n${sagt}\n\nDitt förra svar:\n${r.content}\n\n${problem} Skriv om det – tal bara som de står i matchens siffror eller på en sida du har öppnat, inga tips i artikeln, och tecknen som "1", "X", "2", två av dem eller "1X2" – och svara bara med samma JSON.` });
+    r = await claude({ ...opts, tools: [], prompt: `${fraga}\n\nDu har redan läst på och kan inte söka mer. Det här läste du:\n${sagt}\n\nDitt förra svar:\n${r.content}\n\n${problem} Skriv om det – tal bara som de står i matchens siffror eller på en sida du har öppnat, inga tips i artikeln${landskamp ? ', prognosen är marknadens och inte modellens' : ''}, och tecknen som "1", "X", "2", två av dem eller "1X2" – och svara bara med samma JSON.` });
   }
   if (artikelnHaller) {
     const { parts, model, attempt } = artikelnHaller;

@@ -16,9 +16,9 @@ const RECENT_MAX = 12;
 // Omgången och dess matcher, som sidan räknar den (public/samtal.js, nameKey).
 export const namnNyckel = (round) => `${round.id}:${round.matcher.map((x) => String(x.id)).sort().join(',')}`;
 
-const COMP = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two', fac: 'FA-cupen', lc: 'Ligacupen' };
+const COMP = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two', fac: 'FA-cupen', lc: 'Ligacupen', unl: 'Nations League', emk: 'EM-kvalet', vsk: 'vänskapslandskamp' };
 // Tävlingarna i lagens form och schema (ESPN:s förkortningar).
-const OTHER = { EFL: 'ligacupen', FAC: 'FA-cupen', CL: 'Champions League', EL: 'Europa League', ECL: 'Conference League' };
+const OTHER = { EFL: 'ligacupen', FAC: 'FA-cupen', CL: 'Champions League', EL: 'Europa League', ECL: 'Conference League', VM: 'VM', VMK: 'VM-kvalet', VSK: 'vänskapsmatch' };
 const RES = { V: 'seger', O: 'oavgjort', F: 'förlust' };
 const tz = { timeZone: 'Europe/Stockholm' };
 const kickFmt = new Intl.DateTimeFormat('sv-SE', { ...tz, weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
@@ -46,7 +46,8 @@ function teamFacts(t, side) {
   }
   const rec = t.record && t.record[side];
   if (rec && rec.n) {
-    out[side === 'home' ? 'hemma i år' : 'borta i år'] = `${count(rec.w, 'ingen seger', 'seger', 'segrar')}, ${count(rec.d, 'ingen oavgjord', 'oavgjord', 'oavgjorda')}, ${count(rec.l, 'ingen förlust', 'förlust', 'förluster')}, ${plural(rec.gf, 'gjort mål', 'gjorda mål')} och ${plural(rec.ga, 'insläppt', 'insläppta')}`;
+    // (för ett landslag är det Nations League hittills)
+    out[`${side === 'home' ? 'hemma' : 'borta'} ${t.land ? 'i Nations League' : 'i år'}`] = `${count(rec.w, 'ingen seger', 'seger', 'segrar')}, ${count(rec.d, 'ingen oavgjord', 'oavgjord', 'oavgjorda')}, ${count(rec.l, 'ingen förlust', 'förlust', 'förluster')}, ${plural(rec.gf, 'gjort mål', 'gjorda mål')} och ${plural(rec.ga, 'insläppt', 'insläppta')}`;
   }
   if (Array.isArray(t.form) && t.form.length) {
     const own = t.league ? t.league.id : null;
@@ -68,6 +69,8 @@ function teamFacts(t, side) {
   }
   return Object.keys(out).length ? out : null;
 }
+
+const marknaden = (d) => Boolean(d && d.prediction && d.prediction.kind === 'marknaden');
 
 // Modellens chans för 1, X och 2 i hela procent, ur underlaget eller
 // matchlistan.
@@ -91,12 +94,14 @@ export function roundPayload(round, { details = {}, history = null, recent = [] 
       home: m ? m.home : null,
       away: m ? m.away : null,
       p,
+      mk: marknaden(d),
       row: {
         match: m ? `${m.home} – ${m.away}` : x.match,
         ...(m && COMP[m.comp] ? { 'tävling': COMP[m.comp] } : {}),
         ...(m && m.venue ? { arena: m.venue } : {}),
         avspark: Number.isFinite(Date.parse(x.avspark)) ? kickFmt.format(new Date(x.avspark)) : 'okänd',
-        'modellens odds': p ? `1: ${pctOdds(p[0])} · X: ${pctOdds(p[1])} · 2: ${pctOdds(p[2])}` : 'okända',
+        // En landskamp har marknadens prognos (spelbolagets odds utan marginal), inte modellens.
+        [marknaden(d) ? 'marknadens odds utan marginal' : 'modellens odds']: p ? `1: ${pctOdds(p[0])} · X: ${pctOdds(p[1])} · 2: ${pctOdds(p[2])}` : 'okända',
         ...(o && o.home ? { 'spelbolagens odds': `1: ${odds(o.home)} · X: ${odds(o.draw)} · 2: ${odds(o.away)}` } : {}),
         ...(d && d.teams ? { hemmalaget: teamFacts(d.teams.home, 'home'), bortalaget: teamFacts(d.teams.away, 'away') } : {}),
         ...(pm.length ? { 'tidigare möten, senast först': pm.slice(0, 6).map((g) => `${g.date.slice(0, 7)} ${g.home} – ${g.away} ${g.score.home}–${g.score.away}`) } : {}),
@@ -113,15 +118,17 @@ export function roundPayload(round, { details = {}, history = null, recent = [] 
   const twice = [...count].filter(([, n]) => n > 1).map(([team, n]) => `${team} (${n} matcher)`);
   if (twice.length) summary['lag som spelar mer än en gång'] = twice;
   const known = rows.filter((r) => r.p);
+  // Med landskamper är prognosen modellens eller marknadens; utan dem står det som förut.
+  const vems = rows.some((r) => r.mk) ? 'prognosens' : 'modellens';
   if (known.length) {
     const best = (r) => Math.max(...r.p);
     const sign = (r) => ['1', 'X', '2'][r.p.indexOf(best(r))];
     const all = known.reduce((a, r) => a * (best(r) / 100), 1);
-    summary['chans till alla rätt med modellens troligaste tecken i varje match'] = `1 på ${Math.round(1 / all).toLocaleString('sv-SE')}${known.length < rows.length ? ` (${known.length} av ${rows.length} matcher)` : ''}`;
+    summary[`chans till alla rätt med ${vems} troligaste tecken i varje match`] = `1 på ${Math.round(1 / all).toLocaleString('sv-SE')}${known.length < rows.length ? ` (${known.length} av ${rows.length} matcher)` : ''}`;
     const fav = known.reduce((a, r) => (best(r) > best(a) ? r : a));
     const even = known.reduce((a, r) => (best(r) < best(a) ? r : a));
     summary['största favorit'] = `${fav.row.match}, ${sign(fav)} (odds ${pctOdds(best(fav))})`;
-    summary['jämnaste match'] = `${even.row.match} (modellens troligaste tecken ${sign(even)} har odds ${pctOdds(best(even))})`;
+    summary['jämnaste match'] = `${even.row.match} (${vems} troligaste tecken ${sign(even)} har odds ${pctOdds(best(even))})`;
   }
 
   const out = { 'omgången i korthet': summary, matcher: rows.map((r) => r.row) };

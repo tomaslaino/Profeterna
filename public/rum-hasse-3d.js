@@ -3,7 +3,8 @@
 // högra. Kameran står framför honom, lite högre, och pulten går fram förbi dess högra sida (rum-hasse-scen.js).
 // Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons) ligger på en formad yta, så att huvudet vrids på riktigt runt nacken och kroppen lutar sig
 // fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna, koppen, askkoppen, cigarren, röken och
-// läsglasögonen finns i rum-hasse-arm.js.
+// läsglasögonen finns i rum-hasse-arm.js. Här väljs var armbågen ska vara (bekvam) och hur handen rör sig
+// mellan nycklarna (nyckel).
 //
 // Disken är pulten vid hörnet, geometri i hans värld, och ritas en gång på en egen duk under figuren
 // (diskBild): pultens trä som speglar väggen bakom honom svagt (bilden från scripts/hasse/bak.html), lister
@@ -1633,6 +1634,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const TUMME_VILA = { A: VILAN.A.tumme, B: VILAN.B.tumme };
   let bortA = 0;
   let bortB = 0;
+  // hur mycket något han håller styr armen (0–1): då räknar det armbågen själv (bekvam nedan)
+  let styrA = 0;
+  let styrB = 0;
   // kaffet: handen till koppens öra och tillbaka (mot) och fingrarna runt örat (krok), när koppen står
   // på fatet igen vid ned
   const grepp = (ned) => ({ mot: [0.1, 1.05, ned + 0.05, ned + 0.5], krok: [[0, 0.1], [1, 0.18], [1.2, 0.72], [ned, 0.72], [ned + 0.2, 0.18], [ned + 0.5, VILA_B[4]]] });
@@ -3463,18 +3467,53 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return HOPP;
   }
   const UTDRAG = 110;
+  // Mellan nycklarna (2026-11-13): handen går genom en nyckel utan att stanna, om den fortsätter åt samma
+  // håll efter den. Förut började och slutade varje sträcka stilla, så att handen stannade upp vid varje
+  // nyckel som en robot. Varje värde följer en mjuk kurva genom nycklarna (monoton, så att den aldrig går
+  // förbi en nyckel: inte ned i disken och inte längre ut än nycklarna säger), och står still där det vänder,
+  // där handen står kvar och före och efter ett slag. Med stillhet i båda ändar är det samma mjuka in och ut
+  // som förut. (n: fältet i nyckeln, 1–4 vektorerna och 5–6 talen, c: komponenten)
+  const nv = (k, n, c) => (n < 5 ? k[n][c] : k[n]);
+  function lutning(K, j, n, c) {
+    if (j <= 0 || j >= K.length - 1) return 0;
+    const p = K[j - 1];
+    const q = K[j];
+    const r = K[j + 1];
+    if (q[7] || r[7]) return 0;
+    const h0 = q[0] - p[0];
+    const h1 = r[0] - q[0];
+    if (h0 < 1e-6 || h1 < 1e-6) return 0;
+    const d0 = (nv(q, n, c) - nv(p, n, c)) / h0;
+    const d1 = (nv(r, n, c) - nv(q, n, c)) / h1;
+    if (d0 * d1 <= 0) return 0;
+    return (3 * (h0 + h1)) / ((2 * h1 + h0) / d0 + (h1 + 2 * h0) / d1);
+  }
   function nyckel(K, t, ut) {
     let i = 1;
     while (i < K.length - 1 && t > K[i][0]) i++;
     const a = K[i - 1];
     const b = K[i];
-    const x = clamp((t - a[0]) / (b[0] - a[0]));
+    const h = b[0] - a[0];
+    const x = clamp((t - a[0]) / h);
     // ett slag: allt fortare, och tvärt stopp
-    const f = b[7] ? x ** 2.2 : x * x * (3 - 2 * x);
-    const l3 = (o, x, y) => o.set(x[0] + (y[0] - x[0]) * f, x[1] + (y[1] - x[1]) * f, x[2] + (y[2] - x[2]) * f);
-    l3(ut.w, a[1], b[1]); l3(ut.pol, a[2], b[2]); l3(ut.F, a[3], b[3]); l3(ut.P, a[4], b[4]);
-    ut.krok = a[5] + (b[5] - a[5]) * f;
-    ut.peka = a[6] + (b[6] - a[6]) * f;
+    const slag = b[7];
+    const f = x ** 2.2;
+    const x2 = x * x;
+    const x3 = x2 * x;
+    const h00 = 2 * x3 - 3 * x2 + 1;
+    const h10 = (x3 - 2 * x2 + x) * h;
+    const h01 = 3 * x2 - 2 * x3;
+    const h11 = (x3 - x2) * h;
+    const kv = (n, c) => {
+      const p = nv(a, n, c);
+      const q = nv(b, n, c);
+      if (slag) return p + (q - p) * f;
+      return h00 * p + h01 * q + h10 * lutning(K, i - 1, n, c) + h11 * lutning(K, i, n, c);
+    };
+    const l3 = (o, n) => o.set(kv(n, 0), kv(n, 1), kv(n, 2));
+    l3(ut.w, 1); l3(ut.pol, 2); l3(ut.F, 3); l3(ut.P, 4);
+    ut.krok = kv(5);
+    ut.peka = kv(6);
     // Den högra handen ligger under den vänstra i vilan. När den lyfts dras den först ut bakåt längs sig
     // själv, och skjuts in på samma sätt när den kommer tillbaka, annars går fingrarna genom den andra handen.
     if (K === VA && a[1] !== b[1] && (a[1] === va.W || b[1] === va.W)) {
@@ -3844,6 +3883,164 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return cW.copy(H).addScaledVector(nU, -26);
   }
   const cU = v();
+  // Armbågen (2026-11-13). Nycklarna säger var handleden ska vara och åt vilket håll armbågen ska peka (pol),
+  // och den riktningen pekade mest utåt: när handen gick upp stod armbågen ute i axelhöjd som en vinge, också
+  // när han bara räknade på fingrarna, knöt näven eller lade handen på bröstet. Nu väljs armbågen på cirkeln
+  // där den kan ligga (som i naturlig, men med handleden given) där det är bekvämt för en som sitter vid en
+  // disk, och snyggt från kameran. Det som kostar:
+  // - handleden böjd (VRIST, som i naturlig, men med ett tak, VRIST_MAX: går den inte att räta vrids handen
+  //   i stället, se nedan, och då ska den inte ensam dra armbågen in framför magen eller upp i luften)
+  // - nyckelns pol (POL): bara en önskan, och svagare ju mer den pekar längs armen
+  // - armbågen högt (GRAV: armen hänger av sin tyngd, och HOJD från HOJD0 under axeln), men aldrig under
+  //   disken (GOLV, där den ligger i vilan)
+  // - armbågen ut som en vinge (UT, från UT0 utanför axeln och längre ut ju längre ut handen är, UT_W), in
+  //   framför magen (INN, från INN0 innanför axeln) eller bakom ryggen (BAK), och armen genom bålen (KROPP, BAL)
+  // - armens böj osynlig (SIL): när armbågen pekar mot kameran ligger överarmen och underarmen på varandra i
+  //   bilden, som en pelare
+  // Lägena vägs ihop mjukt (MJUK) och armbågen följer med en fjäder (FJADER), så att den glider i stället för
+  // att hoppa när det bekväma läget flyttar sig. Det som håller något (cigarren, koppen, pennan, tidningen,
+  // glasögonen, stickan) räknar armbågen själv, och här gäller det mindre ju mer handen styrs därifrån (styr).
+  // Nära vilan (VILA_R) ligger vilans armbåge kvar som den är.
+  // Handleden: böjer den sig ändå mer än en handled gör utan att det ser ansträngt ut (VRIST: mot handflatan,
+  // bakåt, mot tummen och mot lillfingret), vrids handen tillbaka mot underarmen, så lite som möjligt. Böjd åt
+  // sidan vrids den i handflatans plan, så att handflatan ligger kvar (på bröstet, uppåt, mot en).
+  const BEK = { VRIST: 0.7, VRIST_MAX: 1.5, POL: 1, GRAV: 0.4, HOJD: 8, HOJD0: 0.25, INN: 30, INN0: 0.15, GOLV: VILOHOJD.EH, GOLV_V: 80, UT: 8, UT0: 0.25, UT_W: 0.6, BAK: 10, BAK0: 0.05, KROPP: 150, SIL: 40, SIL0: Math.cos(40 * DEG), N: 72, MJUK: 0.2, FJADER: 14, VILA_R: [20, 110] };
+  // bålen (som i djup): en liggande ellips i x och z under axlarna, och armens tjocklek utanför den
+  const BAL = { X: 40, Z: -20, RX: 330, RZ: 170, R: 45 };
+  const bX = v();
+  // hur långt in i bålen punkten p är (0 utanför, 1 i mitten)
+  const iBalen = (p, Sk) => (p.y > Sk.y + 40 ? 0 : Math.max(0, 1 - Math.hypot((p.x - BAL.X) / (BAL.RX + BAL.R), (p.z - BAL.Z) / (BAL.RZ + BAL.R))));
+  const VRIST = { BOJ: 60 * DEG, BAKAT: 50 * DEG, TUM: 20 * DEG, LILL: 35 * DEG };
+  const bC = v();
+  const b1 = v();
+  const b2 = v();
+  const bE = v();
+  const bU = v();
+  const bF = v();
+  const bP = v();
+  const bT = v();
+  const bQ = new THREE.Quaternion();
+  const bQ0 = new THREE.Quaternion();
+  const bK = new Float64Array(72);
+  const bV = v();
+  const bA = v();
+  const bB = v();
+  // Armbågen följer läget den söker med en fjäder (BEK.FJADER, per sekund), så att den inte hoppar när det
+  // bekväma läget flyttar sig fort, som när handen far tillbaka till disken. Hoppar tiden (ett nytt klipp, en
+  // bild som dröjde) står den direkt där den ska. (minne: armbågens vinkel, fart och tid, en per arm)
+  const MINNE = { A: { T: null, th: 0, v: 0 }, B: { T: null, th: 0, v: 0 } };
+  function fjader(m, mal, T) {
+    const dt = m.T === null ? -1 : T - m.T;
+    if (dt === 0) return m.th;
+    m.T = T;
+    if (dt < 0 || dt > 0.25) { m.th = mal; m.v = 0; return mal; }
+    // (kortaste vägen runt)
+    const e = Math.atan2(Math.sin(m.th - mal), Math.cos(m.th - mal));
+    const w = BEK.FJADER;
+    const x = Math.exp(-w * dt);
+    const k = m.v + w * e;
+    m.th = mal + (e + k * dt) * x;
+    m.v = (m.v - w * k * dt) * x;
+    return m.th;
+  }
+  // h: nycklarnas läge (w, pol, F, P; F och P vrids om handleden måste rätas), sida: 1 höger (A), −1 vänster,
+  // vila: vilans handled, styr: 0–1 hur mycket något annat styr armen, T: tiden, m: armens minne (MINNE).
+  // → armbågen i Eut och handleden i Wut
+  function bekvam(Sk, h, sida, vila, styr, T, m, Eut, Wut) {
+    d_.subVectors(h.w, Sk);
+    const hel = d_.length();
+    const tj = Math.min(1.3, Math.max(1, hel / (0.97 * (LA + LB))));
+    const la = LA * tj;
+    const lb = LB * tj;
+    const len = Math.min(hel, la + lb - 4);
+    dir_.copy(d_).normalize();
+    const a = (la * la - lb * lb + len * len) / (2 * len);
+    const r = Math.sqrt(Math.max(0, la * la - a * a));
+    bC.copy(Sk).addScaledVector(dir_, a);
+    // vinklarna runt armen räknas från rakt ned (från rakt fram om armen pekar rakt ned eller upp), inte från
+    // nyckelns pol, som kan ligga nästan längs armen och då vända tvärt
+    b1.set(0, -1, 0).addScaledVector(dir_, dir_.y);
+    if (b1.lengthSq() < 0.01) b1.set(0, 0, 1).addScaledVector(dir_, -dir_.z);
+    b1.normalize();
+    b2.crossVectors(dir_, b1);
+    Wut.copy(Sk).addScaledVector(dir_, len);
+    // nyckelns armbåge (thp) och hur tydligt nyckeln pekar ut den (polq: 0 längs armen)
+    bX.copy(h.pol).addScaledVector(dir_, -h.pol.dot(dir_));
+    const polq = bX.length() / Math.max(1e-6, h.pol.length());
+    const thp = polq > 1e-6 ? Math.atan2(bX.dot(b2), bX.dot(b1)) : 0;
+    const vikt = (1 - styr) * ss(BEK.VILA_R[0], BEK.VILA_R[1], Math.hypot(h.w.x - vila[0], h.w.y - vila[1], h.w.z - vila[2]));
+    if (vikt <= 1e-3 || r < 10) {
+      const th = fjader(m, thp, T);
+      Eut.copy(bC).addScaledVector(b1, r * Math.cos(th)).addScaledVector(b2, r * Math.sin(th));
+      return;
+    }
+    bF.copy(h.F).normalize();
+    bP.copy(h.P).addScaledVector(bF, -h.P.dot(bF)).normalize();
+    bT.crossVectors(bF, bP).multiplyScalar(sida);
+    // (armbågen får gå längre ut ju längre ut handen är)
+    const utRef = BEK.UT0 + BEK.UT_W * Math.max(0, (sida * (Sk.x - Wut.x)) / LA);
+    const kost = (th) => {
+      bE.copy(bC).addScaledVector(b1, r * Math.cos(th)).addScaledVector(b2, r * Math.sin(th));
+      bU.subVectors(Wut, bE).normalize();
+      const fram = bU.dot(bF);
+      const boj = Math.atan2(-bU.dot(bP), fram) + NAT.BAK;
+      const tum = Math.atan2(-bU.dot(bT), fram) + NAT.ULNAR;
+      const y = (bE.y - Sk.y) / LA;
+      const hojd = Math.max(0, y + BEK.HOJD0);
+      const golv = Math.max(0, (BEK.GOLV - bE.y) / LA);
+      const ut = Math.max(0, (sida * (Sk.x - bE.x)) / LA - utRef);
+      const inn = Math.max(0, (sida * (bE.x - Sk.x)) / LA - BEK.INN0);
+      const bak = Math.max(0, (Sk.z - bE.z) / LA - BEK.BAK0);
+      // armbågen, överarmen och underarmen utanför bålen
+      let bal = iBalen(bE, Sk);
+      for (const f of [0.4, 0.75]) bal = Math.max(bal, iBalen(bX.copy(bE).lerp(Wut, f), Sk));
+      bal = Math.max(bal, iBalen(bX.copy(Sk).lerp(bE, 0.6), Sk));
+      // silhuetten: armens böj syns i bilden, så att överarmen och underarmen inte ligger på varandra när
+      // armbågen pekar mot kameran (vinkeln vid armbågen i bilden under SIL0 kostar)
+      bV.fromArray(KAM.pos).sub(bE).normalize();
+      bA.subVectors(Sk, bE);
+      bA.addScaledVector(bV, -bV.dot(bA));
+      bB.subVectors(Wut, bE);
+      bB.addScaledVector(bV, -bV.dot(bB));
+      const sil = Math.max(0, bA.dot(bB) / Math.max(1e-6, bA.length() * bB.length()) - BEK.SIL0);
+      const vr = (boj / (boj > 0 ? NAT.BOJ : NAT.BAKAT)) ** 2 + (tum / (tum > 0 ? NAT.TUM : NAT.LILL)) ** 2;
+      return (BEK.VRIST * vr) / (1 + vr / BEK.VRIST_MAX)
+        + BEK.POL * polq * (1 - Math.cos(th - thp)) + BEK.GRAV * y + BEK.HOJD * hojd * hojd + BEK.GOLV_V * golv * golv
+        + BEK.UT * ut * ut + BEK.INN * inn * inn + BEK.BAK * bak * bak + BEK.KROPP * bal * bal + BEK.SIL * sil * sil;
+    };
+    // Inte bara det bästa läget: medelvärdet av lägena, vägda efter hur bekväma de är (MJUK). När två lägen är
+    // nästan lika bra glider armbågen från det ena till det andra, i stället för att hoppa dit på en bild.
+    let kmin = Infinity;
+    for (let i = 0; i < BEK.N; i++) {
+      bK[i] = kost(((i / BEK.N) * 2 - 1) * Math.PI);
+      kmin = Math.min(kmin, bK[i]);
+    }
+    let sx = 0;
+    let sy = 0;
+    for (let i = 0; i < BEK.N; i++) {
+      const w = Math.exp((kmin - bK[i]) / BEK.MJUK);
+      const th = ((i / BEK.N) * 2 - 1) * Math.PI;
+      sx += w * Math.cos(th);
+      sy += w * Math.sin(th);
+    }
+    // (från nyckelns armbåge mot den bekväma, den kortaste vägen runt, så långt som vikt säger)
+    const thb = Math.atan2(sy, sx);
+    const th = fjader(m, thp + vikt * Math.atan2(Math.sin(thb - thp), Math.cos(thb - thp)), T);
+    Eut.copy(bC).addScaledVector(b1, r * Math.cos(th)).addScaledVector(b2, r * Math.sin(th));
+    // handleden: underarmen i handens mått, med böjningen inom VRIST, och handen vriden dit
+    bU.subVectors(Wut, Eut).normalize();
+    const x = bU.dot(bF);
+    const boj = Math.atan2(-bU.dot(bP), x);
+    const tum = Math.atan2(-bU.dot(bT), x);
+    const bojV = clamp(boj, -VRIST.BAKAT, VRIST.BOJ);
+    const tumV = clamp(tum, -VRIST.LILL, VRIST.TUM);
+    if (bojV === boj && tumV === tum) return;
+    b1.copy(bF).addScaledVector(bP, -Math.tan(bojV)).addScaledVector(bT, -Math.tan(tumV)).normalize();
+    bQ.setFromUnitVectors(b1, bU);
+    bQ.slerp(bQ0, 1 - vikt);
+    h.F.applyQuaternion(bQ);
+    h.P.applyQuaternion(bQ);
+  }
   // upp och ned igen (fyra tider), eller nycklar
   const bump = (x, t) => (Array.isArray(x[0]) ? spar(x, t) : ss(x[0], x[1], t) * (1 - ss(x[2], x[3], t)));
   const rq = new THREE.Quaternion();
@@ -3864,6 +4061,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // hög båge med raka, utspärrade fingrar och dök sedan ned på cigarren.)
     const mot = bump(c.mot, t);
     bortA = mot * 0.5;
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     const upp = bump(c.upp, t);
     // (vilans riktning är armbågens hela längd: båda som enhetsvektorer, annars tar den nya över först på slutet)
     cPol.fromArray(VILA_A[1]).normalize().lerp(POL_UPP, upp);
@@ -4184,6 +4382,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.krok += (spar(E.krok, t) - a.krok) * mot;
     a.peka *= 1 - mot;
     bortA = Math.max(bortA, mot);
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     for (let i = 0; i < 4; i++) extraE[i] = (ex0 ? ex0[i] : 0) * (1 - mot) + EXTRA_E[i] * mot;
     return extraE;
   }
@@ -4324,6 +4523,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     vristTill(Sk, pH, cPol, cU);
     const mot = ss(0.05, SKRIV.MOT, tau) * (1 - ss(T - SKRIV.HEM, T - 0.05, tau));
     bortA = mot;
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     a.w.lerp(cW, mot);
     a.w.y += 90 * mot * (1 - mot);
     a.pol.normalize().lerp(cPol, mot);
@@ -4441,6 +4641,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     bortA = Math.max(bortA, mot);
     bortB = Math.max(bortB, mot);
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
+    styrB = Math.max(styrB, ss(0, 0.35, mot));
     return mot;
   }
 
@@ -4645,6 +4847,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.krok += (s('krok', 0.55) - a.krok) * mot;
     a.peka += (s('peka', 0) - a.peka) * mot;
     bortA = Math.max(bortA, mot);
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     const g = mot * (1 - s('peka', 0));
     for (let i = 0; i < 4; i++) extraG[i] = EXTRA_G[i] * g;
     return extraG;
@@ -4757,6 +4960,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const [m0, m1, m2, m3] = c.mot;
     const mot = ss(m0, m1, t) * (1 - ss(m2, m3, t));
     bortB = mot;
+    styrB = Math.max(styrB, ss(0, 0.35, mot));
     // handen i örat, och armbågen där handleden ser naturlig ut (naturlig): nedåt och utåt, och ut åt
     // sidan (arm) så långt det behövs
     qG.setFromAxisAngle(UPP, GREPP_FAT * (1 - ss(0, GREPP_LYFT, kp.p.y - KUP.y)));
@@ -5000,6 +5204,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     let extraA = null;
     bortA = 0;
     bortB = 0;
+    styrA = 0;
+    styrB = 0;
     const pc = kl && kl.pen;
     if (pc) extraA = pennArm(t, sa, a, { n: pc.n, fran: kl.fran });
     else if (KPG.synlig) {
@@ -5063,7 +5269,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const fB = kl && kl.fB;
     if (fA) svang(fA, t, a);
     if (fB) svang(fB, t, b);
-    ik(sa, a.w, a.pol, E_, Wr_);
+    bekvam(sa, a, 1, VILA_A[0], styrA, t, MINNE.A, E_, Wr_);
     // fingrarna trummar bara i vilan, med den ena eller den andra handen
     const iVila = t < 2.5 || (t > 9.95 && t < 20);
     const trumA = iVila && trumHand === 'A' ? trummar(n) : extraA;
@@ -5074,7 +5280,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     if (fA) A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, spar(fA.spar, t), spar(fA.tumme, t), handForm(fA, t, exA));
     else A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar + SAMLA.A * vA, TUMME + (TUMME_VILA.A - TUMME) * vA, trumA);
     U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
-    ik(sb, b.w, b.pol, E_, Wr_);
+    bekvam(sb, b, -1, VILA_B[0], styrB, t, MINNE.B, E_, Wr_);
     if (fB) B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, spar(fB.spar, t), spar(fB.tumme, t), handForm(fB, t, exB));
     else B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8 + SAMLA.B * vB, TUMME + (TUMME_VILA.B - TUMME) * vB, trumB);
     U.uArm.value[3].copy(sb); U.uArm.value[4].copy(E_); U.uArm.value[5].copy(Wr_);
