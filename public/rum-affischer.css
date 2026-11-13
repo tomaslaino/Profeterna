@@ -372,9 +372,9 @@
 /* ---------- Chelsea 1998: löpsedeln på skivan, gulnad och vikt ---------- */
 
 /* The Suns löpsedel från 1998: namnet i vitt på det röda bandet (text, inte
-   tidningens logga) och bara text under, som löpsedlarna var då. Papperet
-   har gulnat av röken, det röda har bleknat, och den har legat vikt på
-   mitten. */
+   tidningens logga), rubriken och fotot med pokalen och Zola under den
+   (rum/chelsea98.jpg), som på IFK:s sedel. Papperet har gulnat av röken, det
+   röda har bleknat, och den har legat vikt på mitten. */
 .rum-chelsea { --k: 1.0256; }
 .rum-chelsea .ark {
   display: flex;
@@ -411,15 +411,22 @@
 }
 .rum-chelsea .rub {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  justify-content: center;
   gap: 1.4px;
-  min-height: 0;
-  margin: 2px 1.5px 2.5px;
+  margin: 2.2px 1.5px 0;
 }
 .rum-chelsea .rub b { display: block; text-align: center; transform-origin: 50% 50%; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.15px; }
 .rum-chelsea .rub b.rod { color: #c42a22; }
+/* fotot i färg, men tryckt på tidningspapper: lite blekt och gulnat */
+.rum-chelsea .foto { display: block; flex: 1; min-height: 0; margin: 2.4px 1.5px 0; overflow: hidden; }
+.rum-chelsea .foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+  filter: saturate(0.82) sepia(calc(var(--sep, 0.2) + 0.08)) contrast(1.06) brightness(1.02);
+}
 .rum-chelsea .under {
   margin: 2px 1.5px 0;
   padding: 1.6px 4px 0;

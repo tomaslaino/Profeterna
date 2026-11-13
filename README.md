@@ -1282,6 +1282,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   trovärdig" i stället för skissens svenska: The Suns löpsedel dagen efter Chelseas seger i
   cupvinnarcupen på Råsunda 1998, bara text som löpsedlarna var då. Fotot från 2021 är borttaget. Se
   [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Chelsea med Zola (2026-11-13, användarens val):** "jag ville ha något med zola", och fokus
+  ska vara Chelseas seger i cupvinnarcupen. Av fyra skisser (sportsidan, löpsedeln, fotot över
+  hela sedeln och en affisch) valde användaren löpsedeln: *GRAZIE GIANFRANCO!* under *CUP
+  WINNERS’ CUP FINAL* och Tomas foto av laget med pokalen och Zola i mitten, som på IFK:s
+  sedel. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **IFK och Chelsea utan prickar (2026-11-11, användarens önskemål):** "både IFK och
   chelsea-löpsedlarna är ju prickiga. Kan du ordna så att de inte är det men att de får rimlig
   patina". Prickrastret (ett rutnät, 2 px) blev ett mönster i närbilden. Nu har de samma papper som
@@ -4468,13 +4473,16 @@ delar redan i bilden; rummet lägger bara solens blekning ovanpå. Närbilden ta
 **Chelsea 1998** (DT:s lag) är en
 brittisk löpsedel (news bill) från **The Sun**, torsdagen den 14 maj 1998, dagen efter
 finalen i cupvinnarcupen. Tidningen är riktig, men namnet är skrivet som text i det röda
-bandet (inte tidningens logga), och rubriken är vår: *CUP WINNERS’ CUP FINAL*, *BLUES’*,
-*EURO* och *GLORY!* så stora som ryms (som veckans löpsedel) och *Super-sub Zola sinks
-Stuttgart in Stockholm* under – bara text, som löpsedlarna var på 90-talet. Chelsea vann
-finalen mot VfB Stuttgart med 1–0 på Råsunda i Solna onsdagen den 13 maj 1998 (Gianfranco
-Zola, inbytt). Löpsedeln är gammal: papperet har gulnat, det röda har bleknat och den har
-legat vikt på mitten. Till 2026-11-11 satt The Sun on Sundays löpsedel från finalen i
-Champions League 2021 här, med foto, men den var det enda i rummet från efter 90-talet.
+bandet (inte tidningens logga), och rubriken är vår: *CUP WINNERS’ CUP FINAL*, *GRAZIE* och
+*GIANFRANCO!* så stora som ryms (som veckans löpsedel), fotot med pokalen i luften och Zola i
+mitten (`public/rum/chelsea98.jpg`, 550 × 346, som Tomas skickade; fotografen är okänd) och
+*Super-sub Zola wins Euro cup for Blues with his first touch* under, som på IFK:s sedel.
+Chelsea vann finalen mot VfB Stuttgart med 1–0 på Råsunda i Solna onsdagen den 13 maj 1998:
+Gianfranco Zola byttes in och gjorde målet med sin första bollberöring. Löpsedeln är gammal:
+papperet har gulnat, det röda har bleknat, fotot är lite blekt och den har legat vikt på
+mitten. Till 2026-11-13 var den bara text (*BLUES’ EURO GLORY!*), som löpsedlarna var på
+90-talet, och till 2026-11-11 satt The Sun on Sundays löpsedel från finalen i Champions League
+2021 här, med foto, men den var det enda i rummet från efter 90-talet.
 
 **Papperet på IFK och Chelsea** har inget prickraster: rutnätet (2 px) blev ett mönster av prickar i
 närbilden, och användaren ville ha dem utan prickar men med "rimlig patina" (2026-11-11). De har samma
