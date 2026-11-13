@@ -658,10 +658,82 @@ window.Rum = (() => {
     if (window.RumHasse) RumHasse.oppna();
   }
 
-  // Röken som lagt sig under lysröret, och dammet som syns i ljuset.
+  // Röken som har lagt sig i skikt under taket, och dammet som syns i ljuset.
   function haze() {
-    return '<div class="rum-rok"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i></div>' +
+    return `<div class="rum-rok"><canvas width="${ROK.b * ROK.k}" height="${ROK.h * ROK.k}"></canvas></div>` +
       '<canvas class="rum-damm" id="rum-damm" width="800" height="500"></canvas>';
+  }
+  // Röken står still: den målas en gång, i en fjärdedels upplösning, och inget i
+  // den rör sig (det som glider ritas om i varje bildruta). Ett tunt dis, tätast
+  // under taket, tunna skikt ovanför huvudena och lite ljus från lysröret och
+  // neonen. Lagret ligger i gängets plan (−330), framför fönstret, tv:n och
+  // väggen men bakom pulten, i planets mått x −400…2000 och y −60…300
+  // (.rum-rok i rum.css), och tonar ut mot kanterna: uppåt vid taket och nedåt
+  // strax under skikten, så att det täcker så lite av bilden som möjligt.
+  const ROK = { x: -400, y: -60, b: 2400, h: 360, k: 0.25 };
+  function rok(c) {
+    const g = c && c.getContext('2d');
+    if (!g) return;
+    const { x: x0, y: y0, b, h, k } = ROK;
+    g.setTransform(k, 0, 0, k, -x0 * k, -y0 * k);
+    let fro = 11;
+    const slump = () => (fro = (fro * 1664525 + 1013904223) >>> 0) / 4294967296;
+    // ett mjukt moln: en utsträckt radiell gradient
+    const moln = (x, y, rx, ry, a, f = '198, 202, 208', vrid = 0) => {
+      g.save();
+      g.translate(x, y);
+      g.rotate(vrid);
+      g.scale(rx, ry);
+      const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1);
+      gr.addColorStop(0, `rgba(${f}, ${a})`);
+      gr.addColorStop(0.5, `rgba(${f}, ${a * 0.45})`);
+      gr.addColorStop(1, `rgba(${f}, 0)`);
+      g.fillStyle = gr;
+      g.fillRect(-1, -1, 2, 2);
+      g.restore();
+    };
+    // ett skikt: många flata moln längs en svag våg
+    const skikt = (y, x1, x2, a, tj) => {
+      const fas = slump() * 6;
+      for (let x = x1; x < x2; x += 26 + slump() * 30) {
+        const yy = y + Math.sin(x / 170 + fas) * 10 + (slump() - 0.5) * 8;
+        moln(x, yy, 70 + slump() * 110, tj * (0.6 + slump() * 0.8), a * (0.5 + slump() * 0.7), undefined, (slump() - 0.5) * 0.08);
+      }
+    };
+    // disets gradient (kanterna tonas nedan)
+    const dis = g.createLinearGradient(0, 0, 0, 600);
+    dis.addColorStop(0, 'rgba(190, 196, 206, 0.07)');
+    dis.addColorStop(0.45, 'rgba(190, 196, 206, 0.03)');
+    dis.addColorStop(1, 'rgba(190, 196, 206, 0)');
+    g.fillStyle = dis;
+    g.fillRect(x0, y0, b, h);
+    for (const [x, y, rx, ry, a] of [[570, 50, 420, 70, 1], [980, 70, 380, 60, 0.8], [260, 90, 300, 55, 0.7], [1350, 50, 360, 70, 0.8], [760, 120, 340, 40, 0.6], [-60, 60, 300, 70, 0.6], [1650, 90, 260, 60, 0.5]]) {
+      moln(x + (slump() - 0.5) * 40, y, rx, ry, 0.12 * a);
+    }
+    skikt(95, -300, 1900, 0.17, 11);
+    skikt(108, -200, 1700, 0.09, 7);
+    skikt(185, -250, 1850, 0.14, 9);
+    skikt(270, 50, 1550, 0.1, 8);
+    // lysröret (x 345–935) och neonen (x 345–510, y 145–205) lyser upp röken
+    moln(640, 70, 400, 70, 0.09, '245, 242, 228');
+    moln(640, 110, 330, 110, 0.045, '245, 242, 228');
+    moln(425, 175, 150, 70, 0.05, '255, 80, 60');
+    // kanterna
+    g.globalCompositeOperation = 'destination-in';
+    const sida = g.createLinearGradient(x0, 0, x0 + b, 0);
+    sida.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    sida.addColorStop(0.1, '#000');
+    sida.addColorStop(0.9, '#000');
+    sida.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    g.fillStyle = sida;
+    g.fillRect(x0, y0, b, h);
+    const hojd = g.createLinearGradient(0, y0, 0, y0 + h);
+    hojd.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    hojd.addColorStop(80 / h, '#000');
+    hojd.addColorStop(1 - 50 / h, '#000');
+    hojd.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    g.fillStyle = hojd;
+    g.fillRect(x0, y0, b, h);
   }
 
   // ---------- filtren ----------
@@ -1121,30 +1193,6 @@ window.Rum = (() => {
       c.style.cssText = `position:absolute;left:${-m}px;top:${-m}px;width:${w + 2 * m}px;height:${h + 2 * m}px`;
       sk.replaceChildren(c);
     }
-    // röken under taket står still i telefonen (rum.css): en duk i stället för
-    // ett lager i rummets bredd (samma gradient som .rum-rok i)
-    const rok = LATT && R.el.querySelector('.rum-rok');
-    if (rok) {
-      const c = duk(400, 75);
-      const g = c.getContext('2d');
-      const k = c.width / 1600;
-      for (const i of rok.children) {
-        const b = i.offsetWidth * k;
-        const h = i.offsetHeight * k;
-        g.save();
-        g.globalAlpha = parseFloat(getComputedStyle(i).opacity);
-        g.setTransform(b / 2, 0, 0, h / 2, (i.offsetLeft * k) + b / 2, (i.offsetTop * k) + h / 2);
-        const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1);
-        gr.addColorStop(0, 'rgba(200, 204, 210, 0.3)');
-        gr.addColorStop(0.55, 'rgba(200, 204, 210, 0.11)');
-        gr.addColorStop(1, 'rgba(200, 204, 210, 0)');
-        g.fillStyle = gr;
-        g.fillRect(-1, -1, 2, 2);
-        g.restore();
-      }
-      c.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%';
-      rok.replaceChildren(c);
-    }
   }
 
   // Dagsljuset genom fönstret på en duk, som ljuset ovan. Färgen följer himlen
@@ -1442,6 +1490,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); }, latt: () => { if (R.vnara) lattVideo(R.vniva); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
     if (LATT) for (const e of el.querySelectorAll('.ans-bak, .reg-bak')) tonaDuk(e);
+    rok(el.querySelector('.rum-rok canvas'));
     paintUte();
     R.bakat = baka().then(ljusDukar).catch((err) => console.warn('Rummet: ljuset kunde inte bakas', err)).then(() => {
       R.ljusKlar = true;

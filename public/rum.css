@@ -901,21 +901,12 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* ---------- röken under taket och dammet i ljuset ---------- */
 
-.rum-rok i {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(200, 204, 210, 0.3), rgba(200, 204, 210, 0.11) 55%, rgba(200, 204, 210, 0));
-  animation: rum-rok 46s ease-in-out infinite alternate;
-}
-.rum-rok { position: absolute; left: 0; top: -40px; width: 1600px; height: 300px; }
-.rum-rok .r1 { left: 260px; top: 70px; width: 620px; height: 120px; }
-.rum-rok .r2 { left: 640px; top: 96px; width: 520px; height: 96px; animation-duration: 61s; animation-delay: -20s; }
-.rum-rok .r3 { left: 120px; top: 118px; width: 420px; height: 80px; animation-duration: 53s; animation-delay: -9s; opacity: 0.8; }
-.rum-rok .r4 { left: 860px; top: 60px; width: 380px; height: 70px; animation-duration: 39s; animation-delay: -30s; opacity: 0.7; }
-@keyframes rum-rok {
-  from { transform: translateX(-40px) scale(1, 1); }
-  to { transform: translateX(60px) scale(1.12, 0.9); }
-}
+/* röken står still, målad en gång (rok i rum.js); nära tv:n och videon tonas
+   den bort, så att det som står där går att läsa (vid de andra närbilderna går
+   kameran förbi planet, .forbi) */
+.rum-rok { position: absolute; left: -400px; top: -60px; width: 2400px; height: 360px; transition: opacity 0.6s; }
+.rum-rok canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.rum.tv-nara .rum-rok, .rum.vid-nara .rum-rok { opacity: 0; }
 .rum-damm { position: absolute; left: 230px; top: 40px; width: 800px; height: 500px; mix-blend-mode: screen; }
 
 /* ---------- ljus, vinjett och korn ---------- */
@@ -996,11 +987,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   /* Ett blandningsläge över hela rummet betyder att grafikkortet läser in allt
      som är ritat bakom i varje bildruta, en gång per lager. Ljuset läggs därför
      ovanpå som vanligt (nästan
-     samma sak med så svagt ljus), och kornet, som knappt syns så här litet,
-     och röken, som rör sig några bildpunkter i sekunden, får vara. */
+     samma sak med så svagt ljus), och kornet, som knappt syns så här litet, får vara. */
   .rum-warm, .rum-dagsljus, .rum-damm { mix-blend-mode: normal; }
   .rum-grain { display: none; }
-  .rum-rok i { animation: none; }
   .rum-ute { zoom: 0.4; transform: scale(2.5); transform-origin: 0 0; }
   /* toningen bakom kupongen i handen är 2400 × 1800 (left och top delade med zoom) */
   .rum-dimma { zoom: 0.25; left: -1600px; top: -1600px; transform: scale(4); transform-origin: 0 0; }
@@ -1022,7 +1011,6 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 canvas.rum-svag { opacity: 0.05; }
 .rum.enkel .rum-svag { display: none; }
 .rum.enkel svg:has(> .rum-svag) { display: none; }
-.rum.enkel .rum-rok i { animation: none; }
 .rum.enkel .rum-sak { transition: none; }
 /* (ångan ur kaffet står still: en rörelse på grafikkortet gör att hela rummet ritas om 60 gånger i sekunden) */
 /* (dropparna som rinner på rutan likaså) */
@@ -1128,7 +1116,7 @@ canvas.rum-svag { opacity: 0.05; }
 .rum.lag .rum-hand .fin { font-size: 14px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .rum-regn-b, .rum-droppe, .rum-rok i, .rum-ram-glans::after,
+  .rum-regn-b, .rum-droppe, .rum-ram-glans::after,
   .rum-ram .kr-scene *, .rum-ram .kr-scene *::before, .rum-ram .kr-scene *::after { animation: none; }
   .rum-stage, .rum-kamera.glid { transition: none; }
   #rum-hasse .anga { display: none; }
