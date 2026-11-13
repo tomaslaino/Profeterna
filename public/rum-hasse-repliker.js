@@ -15,7 +15,7 @@
 // {namn} det du kallas (efternamnet, Dogge för Johansson), {dag} när spelstoppet är (på lördag, i morgon, i dag),
 // {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1),
 // {ratt} och {av} hur många rätt han hade av hur många, i ord (två, sex), {antal} och {Antal} ett tal
-// från två till tretton i ord (i domarna).
+// från två till tretton i ord (i domarna), och i domarna {match}, {tipset}, {Tipset} och {pct} (se domar.sak).
 //
 // Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
 // (src/rost.js), så filen är både ett skript i sidan
@@ -756,10 +756,11 @@
 
   // Efter omgången, så länge protokollet ligger på pulten (tills nästa Stryktips kommer): han dömer var och
   // en i gänget, en i taget (gangLista och doma i rum-hasse.js, läget i RumBlock.gang). Om sig själv säger
-  // han inget här. En dom är en inledning med namnet, en eller två saker ur kupongen och ett slut, och
-  // raderna väljs efter omgången och personen, så att domen är densamma varje gång och på alla enheter.
-  // Varje rad är en mening, så att domen står i ett stycke och ändå går att läsa upp mening för mening. Inget
-  // han eller hon: skriv namnet, eller om kupongen. Till gruppen säger han ni och er, aldrig gänget: det är
+  // han inget här. En dom är en inledning med namnet, det som sticker ut på kupongen (högst två saker, var och
+  // en med vad han tycker om den) och ett slut, i var sitt stycke. Kupongen visar han inte. Raderna väljs efter
+  // omgången och personen, så att domen är densamma varje gång och på alla enheter. Varje rad är en mening, så
+  // att domen går att läsa upp mening för mening. Inget han eller hon: skriv namnet, eller om kupongen.
+  // Till gruppen säger han ni och er, aldrig gänget: det är
   // bara ni som använder sidan. Han talar till den som står vid disken, och det kan vara den han dömer, så
   // de övriga är de andra eller resten, aldrig ni andra. Vi är han och den han talar med; i gänget är han
   // inte med ("det kommer vi att få höra", Tomas 2026-11-10). Domarna är hans, inte de andras. Ordet i guld
@@ -778,7 +779,7 @@
       'Rödpennan har gått över era kuponger. Vems vill du höra min dom över?',
       'Jag har en dom över var och en av era kuponger. Vems tar vi först?',
       'Era kuponger är rättade, och jag har synpunkter. Vems ska jag börja med?',
-      'Jag har tänkt igenom era kuponger. Vems vill du höra min bedömning av först?',
+      'Jag har gått igenom era kuponger. Vems vill du höra min bedömning av först?',
       'Kaffet är slut, och era kuponger är dömda. Vems tar vi först?',
       'Ingen av era kuponger slipper undan min dom. Vems tar vi först?',
     ],
@@ -799,7 +800,7 @@
       'Det var alla era kuponger. Mer än så finns det inte att säga.',
       'Nu har jag sagt mitt om varenda kupong.',
       'Varenda kupong har fått sin dom, och ingen slapp lindrigt undan.',
-      'Alla era kuponger är dömda. Nästa omgång gör ni bättre ifrån er.',
+      'Alla era kuponger är dömda. Nästa omgång får ni göra bättre ifrån er.',
       'Nu har ni hört vad jag tycker. Domarna står sig.',
     ],
     // När man kommer tillbaka och har hört alla förut: orden i guld står inte kvar i listan (de syns först när
@@ -810,7 +811,7 @@
       'Alla era kuponger är dömda. Den som har glömt sin dom får höra den igen.',
       'Domarna över era kuponger står fast. Jag läser gärna upp dem igen.',
       'Mina domar över era kuponger tål att höras två gånger. Vems tar jag igen?',
-      'Har någon glömt sin dom säger jag den igen. Era kuponger minns jag.',
+      'Har någon glömt sin dom, säger jag den igen. Era kuponger minns jag.',
       'Mina domar över era kuponger glömmer jag inte, men ni gör det tydligen.',
       'Jag kan döma era kuponger en gång till. Det blir samma dom.',
       'Era kuponger är dömda sedan länge. Vems dom vill du höra igen?',
@@ -819,7 +820,7 @@
     // (ingen dömd än), hort (din kupong är dömd) och inte (andras är dömda men inte din). {namn} är ditt.
     du: {
       forst: [
-        'Jag gissar att du vill veta vad jag tycker om din kupong, {namn}.',
+        'Jag antar att du vill veta vad jag tycker om din kupong, {namn}.',
         'Jag har synpunkter på varje kupong. Ska jag börja med din, {namn}?',
         'Jag kommenterar gärna era kuponger. Din först, {namn}, eller någon annans?',
         'Jag har dömt era kuponger. Vill du höra domen över din först, {namn}?',
@@ -828,7 +829,7 @@
         'Din kupong har jag synpunkter på, {namn}. Ska vi ta den först?',
         'Jag har bedömt din kupong, {namn}. Ska jag börja där?',
         'Du vill nog höra vad jag tycker om din kupong, {namn}.',
-        'Din kupong har fått min bedömning, {namn}. Är du redo att höra den?',
+        'Din kupong har fått min bedömning, {namn}. Tål du att höra den?',
       ],
       hort: [
         'Nu vet du vad jag tycker om din kupong. Ska jag ta någon annans?',
@@ -847,7 +848,7 @@
         'Domarna över de andra hör du gärna, {namn}. Din kupong har jag också dömt.',
         'Jag har inte sagt vad jag tycker om din kupong än, {namn}.',
         'Din kupong ligger kvar här, {namn}, och jag har en dom över den.',
-        'Jag har dömt andras kuponger, {namn}. Din har jag också en dom över.',
+        'Jag har dömt de andras kuponger, {namn}, och nu står din på tur.',
         'Ska jag döma din kupong nu, {namn}, eller vill du vänta?',
         'Min bedömning av din kupong väntar, {namn}.',
       ],
@@ -865,7 +866,7 @@
       'Jag har mer att säga om varje kupong.',
       'Domarna är skrivna med bläck, inte blyerts.',
       'Rödpennan ligger kvar på disken.',
-      'Ingen har överklagat en dom av mig och vunnit.',
+      'Ingen har överklagat någon av mina domar och vunnit.',
       'Den som vill veta sanningen om sin kupong vet var jag sitter.',
       'Jag har aldrig sett en kupong som inte gick att förbättra.',
       'Era kuponger säger mycket om er.',
@@ -876,41 +877,38 @@
     // menar säger han inte.
     revisorn: ['Revisorn har inte sagt ett ord i dag.', 'Revisorn har redan gått hem.', 'Revisorn räknar fortfarande på sina garderingar.'],
     borta: ['Semesterfiraren har inte hört av sig.', 'Semesterfiraren skickade inte ens ett vykort.', 'Semesterfiraren har missat en hel omgång.'],
-    // Inledningen, efter hur det gick i gänget (forsakring har forst).
+    // Inledningen, efter hur det gick i gänget (forsakring har forst). Säger han något om mitten här, gör han det
+    // inte i slutet.
     in: {
       forst: [
         '{namn} var bäst av er, och det kommer resten att få höra.',
         '{namn} slog resten av er den här gången.',
-        '{namn} vann omgången, och ingen är mer förvånad än {namn}.',
+        '{namn} vann omgången, och mest förvånad av alla blev {namn}.',
         '{namn} vann den här omgången, och det ska vi inte göra någon sak av.',
-        '{namn} var den som tippade bäst den här gången.',
-        '{namn} kom först, och det var ingen som såg det komma.',
+        '{namn} kom först, och det hade ingen väntat sig.',
       ],
       alla: [
-        '{namn} hade alla rätt.',
-        '{namn} hade varenda match rätt.',
+        '{namn} hade alla rätt, och det ser man inte varje vecka.',
         '{namn} hade inte ett enda fel på kupongen.',
+        'Varenda match satt för {namn}.',
         '{namn} hade rätt i varje match.',
-        'Kupongen som {namn} lämnade in var felfri.',
       ],
       mitten: [
-        '{namn} hamnade i mitten, och det märkte ingen.',
+        '{namn} hamnade i mitten, där ingen tittar.',
+        '{namn} höll sig i mitten, i lä för både beröm och kritik.',
         '{namn} kom varken först eller sist, och det är också en konst.',
-        '{namn} låg i mitten, där det är lä.',
-        '{namn} landade någonstans i mitten.',
         '{namn} var varken bäst eller sämst.',
       ],
       sist: [
-        '{namn} kom sist av er.',
-        '{namn} var sämst av er.',
+        '{namn} kom sist den här gången.',
+        'Sist i mål kom {namn}.',
         '{namn} hade resten av er framför sig den här omgången.',
-        '{namn} hamnade sist den här omgången.',
         '{namn} fick se alla de andra passera.',
         'Längst ner i protokollet står {namn}.',
       ],
       sistLika: [
-        '{namn} kom sist trots lika många rätt som någon av de andra.',
-        '{namn} hade lika många rätt som någon av de andra och kom ändå sist.',
+        '{namn} kom sist trots lika många rätt som en av de andra.',
+        '{namn} hade lika många rätt som en av de andra och kom ändå sist.',
         '{namn} hade lika många rätt som en av de andra men sämre poäng.',
       ],
       inget: [
@@ -920,22 +918,9 @@
         '{namn} lät bli att tippa den här omgången.',
       ],
     },
-    // Sakerna ur kupongen. Helgarderingarna sätts bara när alla satt.
-    hel: {
-      en: [
-        'Det fanns en helgardering på kupongen, och den satt.',
-        'Helgarderingen satt, och det är inte så konstigt.',
-        'Helgarderingen på kupongen satt, och det kräver ingen konst.',
-        'Kupongen hade en helgardering, och den gick förstås hem.',
-      ],
-      fler: [
-        'Det fanns {antal} helgarderingar på kupongen, och alla satt.',
-        'Alla {antal} helgarderingarna satt, och det är inte så konstigt.',
-        'Kupongen hade {antal} helgarderingar, och varenda en satt.',
-        '{Antal} helgarderingar fanns det, och alla gick hem.',
-      ],
-    },
-    forsakring: ['Där bara {namn} hade rätt var det helgarderat.', 'Varje match där bara {namn} hade rätt var helgarderad.'],
+    // Den som vann på helgarderingar (forsakring) får den här raden i inledningen.
+    forsakring: ['Där ingen annan hade rätt hade {namn} helgarderat.', 'Varje match där bara {namn} hade rätt var helgarderad.'],
+    // Spikarna, när inget annat sticker ut, och när alla av minst tre, ingen av minst två eller en av minst tre satt.
     spik: {
       ingen: [
         'Det fanns inte en enda spik på kupongen.',
@@ -943,26 +928,82 @@
         'Kupongen hade inte en spik, och det säger en del.',
       ],
       enda: ['Den enda spiken satt.', 'Kupongen hade en spik, och den satt.', 'Den enda spiken på kupongen höll.'],
-      endaInte: ['Den enda spiken satt inte.', 'Kupongen hade en spik, och den höll inte.', 'Den enda spiken på kupongen gick av.'],
-      alla: ['Alla spikarna satt.', 'Varenda spik satt.', 'Spikarna höll allihop.', 'Spikarna satt där de skulle.', 'Inte en enda spik gick av.'],
-      inga: ['Inte en enda spik satt.', 'Ingen av spikarna höll.', 'Spikarna gick av, varenda en.', 'Alla spikarna sprack.'],
-      en: ['En av spikarna satt.', 'En av spikarna höll, och resten gick av.', 'Bara en av spikarna satt.'],
+      endaInte: ['Den enda spiken sprack.', 'Kupongen hade en spik, och den sprack.', 'Den enda spiken på kupongen höll inte.'],
+      alla: ['Alla spikarna satt.', 'Varenda spik satt.', 'Spikarna höll allihop.', 'Spikarna satt där de skulle.', 'Inte en enda spik sprack.'],
+      inga: ['Inte en enda spik satt.', 'Spikarna sprack allihop.', 'Ingen av spikarna höll.'],
+      en: ['Bara en av spikarna satt.', 'En av spikarna höll, men resten sprack.'],
       fler: ['{Antal} av spikarna satt.', '{Antal} av spikarna höll.', '{Antal} spikar satt.', '{Antal} av spikarna gick hem.'],
     },
-    ensam: {
-      ingen: [
-        'Allt som satt hade någon av de andra också.',
-        'Det fanns ingen match där {namn} var ensam om att ha rätt.',
-        'Ingenstans var {namn} ensam om att ha rätt.',
-      ],
-      en: ['I en match hade ingen av de andra rätt.', 'I en match var {namn} ensam om att ha rätt.', 'Det fanns en match där bara {namn} hade rätt.'],
-      fler: [
-        'I {antal} matcher hade ingen av de andra rätt.',
-        'I {antal} matcher var {namn} ensam om att ha rätt.',
-        'Det fanns {antal} matcher där bara {namn} hade rätt.',
-      ],
+    // Det som sticker ut på kupongen (RumBlock.saker), högst två saker och det viktigaste först: vad det är och
+    // sedan vad han tycker om det (om), en mening var. {match} är matchen (Cardiff mot Burnley), {tecknet} och
+    // {Tecknet} en spik i bestämd form (krysset) och {den} det eller den efter tecknet, {tecknen} en halvgardering
+    // (etta och kryss), {pct} datorns chans
+    // för tipset i procent och {res} hur matchen slutade. En rad med matchen hörs inte (rösten kan inte alla lag),
+    // så kommentaren efter ska gå att förstå för sig. Allt ska vara sant om det som RumBlock.saker har valt.
+    sak: {
+      // tipset med lägst chans som satt; ensam när ingen av de andra hade rätt där
+      skrall: {
+        spik: [
+          '{Tecknet} i {match} satt, fast datorn bara gav {den} {pct} procent.',
+          'Datorn gav {tecknet} i {match} bara {pct} procent, men {namn} spikade {den} och fick rätt.',
+        ],
+        halv: [
+          'Halvgarderingen med {tecknen} i {match} satt, fast datorn bara gav den {pct} procent.',
+          'Datorn gav {tecknen} i {match} bara {pct} procent, och ändå satt halvgarderingen.',
+        ],
+        ensam: [
+          'Bara {namn} hade rätt i {match}, och datorn gav det bara {pct} procent.',
+          'Ingen av de andra hade rätt i {match}, och datorn gav det bara {pct} procent.',
+        ],
+        om: [
+          'Det kallar jag fingertoppskänsla.',
+          'Om det var kunskap eller tur låter jag vara osagt.',
+          'Det hade jag också tippat, om någon hade frågat mig.',
+          'Så ska det tippas, utan att darra på manschetten.',
+        ],
+      },
+      // tipset med högst chans som inte satt
+      miss: {
+        spik: [
+          'Spiken på {tecknet} i {match} sprack, fast datorn gav den {pct} procent.',
+          'Datorn gav {tecknet} i {match} {pct} procent, men spiken sprack ändå.',
+        ],
+        halv: [
+          'Halvgarderingen med {tecknen} i {match} höll inte, fast datorn gav den {pct} procent.',
+          'Datorn gav {tecknen} i {match} {pct} procent, men halvgarderingen höll ändå inte.',
+        ],
+        om: [
+          'Där var det matchen som hade fel, inte kupongen.',
+          'Den matchen borde spelas om.',
+          'Sådant händer när favoriterna inte har läst på.',
+          'Fotboll är orättvist, men sällan så orättvist.',
+        ],
+      },
+      // där ingen av de andra hade rätt: en match, eller hur många
+      ensam: {
+        en: ['I {match} var {namn} ensam om att ha rätt.', 'Ingen av de andra hade rätt i {match}, men det hade {namn}.'],
+        fler: ['I {antal} matcher hade ingen av de andra rätt.', 'I {antal} matcher var {namn} ensam om att ha rätt.'],
+        om: ['Där tänkte {namn} själv, och det ska man inte ta för givet.', 'Ensam är stark, i alla fall ibland.', 'Det kallar jag att gå sin egen väg.'],
+      },
+      // en helgardering där det kom ett utfall som datorn knappt trodde på
+      raddad: {
+        fakta: ['Helgarderingen i {match} kom väl till pass, för där slutade det {res}.', 'Det var tur att {match} var helgarderad, för det slutade {res}.'],
+        om: ['Att gardera sig är inte förbjudet, bara lite fegt.', 'Det kallas att köpa sig fri.'],
+      },
+      // alla spikarna satt, eller ingen eller bara en (raderna står under spik)
+      spikar: {
+        alla: ['En spik ska sitta, det har jag alltid sagt.', 'Så ska spikar se ut.'],
+        sprack: ['En spik som inte sitter är bara en gissning.', 'Då hade det varit billigare att gardera.', 'Spikar ska man slå i, inte strö omkring sig.'],
+      },
+      // rätt mot de rätt datorn väntade sig av kupongen
+      datorn: {
+        fler: ['Datorn trodde på {antal} rätt, och det blev fler.'],
+        farre: ['Datorn trodde på {antal} rätt, och det blev färre.'],
+        omFler: ['Datorn har aldrig förstått sig på fotboll.', 'Mer än så kan ingen begära av en kupong.'],
+        omFarre: ['Den här gången var datorn klokare än {namn}, och det säger inte lite.', 'Man ska inte underskatta en dator, säger jag alltid.'],
+      },
     },
-    // Slutet.
+    // Slutet. Det säger inget om mitten, eftersom inledningen kan ha gjort det.
     ut: {
       forsakring: [
         'Så kan man också köpa sig en seger.',
@@ -974,9 +1015,9 @@
         'Jag kallar det flyt, men det får man inte säga högt.',
         'Det kommer att låta om segern vid pulten hela veckan.',
         'Att vinna ska {namn} inte vänja sig vid.',
-        'Nästa omgång ser vi vad segern var värd.',
+        'Nästa omgång får vi se vad segern var värd.',
         'Segern ska {namn} njuta av, för den kommer inte varje vecka.',
-        'En bra omgång är ännu ingen säsong.',
+        'En svala gör ingen sommar, och en bra omgång ingen säsong.',
       ],
       alla: [
         'Den kupongen hade jag kunnat fylla i själv.',
@@ -986,18 +1027,15 @@
         'Bättre än så går det inte att tippa.',
       ],
       mitten: [
-        'En mittenplats är ingen skam, men ingen ära heller.',
-        'I mitten syns man inte, och det är nog lika bra.',
-        'I mitten kan man sitta länge utan att någon frågar något.',
-        'Mitten är en bra plats att vänta på bättre tider.',
-        'Den kupongen förtjänar varken beröm eller kritik.',
+        'Sådana kuponger vinner inga omgångar, men de förlorar inga heller.',
+        'Nästa omgång får {namn} bestämma sig för åt vilket håll det ska gå.',
+        'Den kupongen kommer ingen att minnas, och det är kanske lika bra.',
       ],
       sist: [
         'Det krävs en viss talang för att komma sist.',
         'Någon måste komma sist, och den här gången ställde {namn} upp.',
-        'Nästa omgång kan bara bli bättre, och det är det bästa jag kan säga.',
+        'Nästa omgång kan bara bli bättre, och det är det vänligaste jag kan säga.',
         'Den kupongen ska vi inte prata mer om.',
-        'Det kan bara gå uppåt härifrån.',
         'Kupongen säger mer än jag vill säga högt.',
         'Jag föreslår att {namn} frågar mig nästa gång.',
       ],
@@ -1008,7 +1046,7 @@
       ],
       inget: [
         'Den som inte tippar kan inte ha fel.',
-        'Att inte lämna in är det säkraste jag har sett.',
+        'Att inte lämna in är det säkraste tipset av alla.',
         'Att stå över är också ett sätt att spara pengar.',
         'Den som står över förlorar aldrig, men vinner aldrig heller.',
         'Det är ett sätt att hålla protokollet rent.',
@@ -1030,10 +1068,17 @@
     inget: ['Klok', 'Vis', 'Sparsam', 'Snål', 'Ledig', 'Bortrest', 'Saknad', 'Glömsk', 'Upptagen', 'Lat'],
   },
   // Namnen han nästan kan. Ibland säger han ett av dem i stället för det riktiga, i domen (aldrig om den som
-  // vann) och när han hälsar på dig (kallar i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
-  // Namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för Johansson); rösten får dem också (src/rost.js).
-  // Sägs inte som egna rader.
-  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Dogge: ['Docke', 'Dugge'] },
+  // vann) och när han hälsar på dig (felNamn och domNamn i rum-hasse.js). Han rättar sig aldrig och säger inget
+  // om det. Felen är sådana som den gör som inte bryr sig: ett namn som låter likadant, ett han kan bättre
+  // någon annanstans ifrån (Laine, Tegnér, Mogge), Daniel, som ni alla heter och som därför aldrig är fel, och
+  // för Dogge ett efternamn i stället för smeknamnet, och då fel efternamn. Varje fel ska höras när rösten läser
+  // (Teider låter som Tejder och är därför borta). Namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för
+  // Johansson); rösten får dem också (src/rost.js). Sägs inte som egna rader.
+  felnamn: {
+    Laino: ['Lainio', 'Leino', 'Laine', 'Lainen', 'Laiho', 'Daniel'],
+    Tejder: ['Tejler', 'Tejdel', 'Tegnér', 'Tajder', 'Daniel'],
+    Dogge: ['Docke', 'Dugge', 'Mogge', 'Dagge', 'Jansson', 'Johnsson', 'Daniel'],
+  },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
   // att säga i vilken ordning som helst, och när det finns en match kvar att fråga om.
