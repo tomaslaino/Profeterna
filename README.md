@@ -8444,6 +8444,41 @@ adressformaten provades med ett låtsasnät: Newport fick sin bild i första fö
 cupförlusten mot Crewe. Workflowen gav sedan alla 24 lag en bild, men Newports var ett BBC Sounds-avsnitt, så de
 läses inte längre.
 
+**Landskamperna i Helgarderat** (2026-11-13, användarens önskemål: "be den producera en ny tidning av helgarderat
+utefter detta så att vi är redo imorgon!"): Nr 1 har kupongens riktiga tretton matcher, sju landskamper i Nations
+League och sex matcher ur League One och League Two. Matchbladen för MK Dons–Burton, Sheffield Wednesday–Plymouth,
+Stockport–Reading, Wimbledon–Blackpool och Wigan–Barnsley är kvar ur provomgången, och de andra sju är borttagna.
+Bladen för landskamperna och för Swindon–Grimsby är skrivna för hand, i samma form som nattjobbets: rubrik,
+lagen var för sig (högst 95 ord), sammanfattning, ett citat per lag när det gick att belägga och källorna med datum och
+länk (`"typ": "media"`, `"hand": true` i `data/poddsidor.json`). De bygger på veckans svenska och utländska press,
+sökt fram med WebSearch. Talen och namnen är kontrollerade mot källornas text, och tipsorden mot `TIPS_RE`. Ett citat
+som bara fanns i andra hand eller i ett referat togs bort (Georgien, Danmark, Nordirland och Swindon har inget). I
+molnmiljön gick artiklarna inte att öppna, så kontrollen gjordes mot sökningarnas utdrag, och några publiceringsdagar
+är räknade ur dem.
+
+- **Utseendet:** en landskamp har flaggan där klubben har skölden (`flagga` på `.hg-skold`, flaggan ur
+  `data/skoldar.json` under lagets svenska namn), och raden under tavlan säger tävlingen och gruppen där klubben inte
+  har något: *Match 1 · Nations League · Grupp B4 · Strawberry Arena, Solna* (`landskamp` på bladet, som bygget lägger
+  till ur matchen och som de handskrivna bladen har själva). Ett handskrivet blad kan ha arenan själv, och då skriver
+  bygget inte över den (ESPN kallar fortfarande Strawberry Arena för Friends Arena). Ett citat som redan var på svenska
+  står utan *(översatt)* (`"oversatt": false`). Innehållet skriver *Sverige – Bosnien* (`KORT`).
+- **Bilderna:** scripts/tidning/matchbilder.mjs söker landslagen med deras engelska namn (ur config/landslag.js):
+  BBC:s lagflöde (`wales`, `northern-ireland`, `republic-of-ireland`; de andra länderna har inget) och Bing News
+  (*Sweden national team*, *Sweden football*, *Sweden Nations League*), och bladets egna källor först, som för
+  klubbarna (`landslag` i src/analyser/tidning-bilder.mjs). Utan bild står flaggorna mot varandra på tavlan.
+- **Nattjobbet:** landslagen har inga supporterpoddar, forum eller lokaltidningar, så poddjobbet hoppar över
+  landskamperna (`omgangensLag` i scripts/tidning/poddar.mjs), och när bladen läggs ut står ett blad som redan ligger
+  ute kvar för en match som jobbet inte har något eget blad till, i samma omgång (samma lördag; `poddsidor(fil,
+  round, nu)` i src/analyser/poddar.mjs). Klubbmatcherna får nattjobbets blad när det har ett.
+
+Provat 2026-11-13 med riktig data från ESPN och bygget (`--no-fetch` efter hämtningen): Helgarderat på sajten och
+tidningen i rummet, på pulten och framme (L), i 1440 × 900 och 390 × 844, med tretton matchblad i kupongens ordning,
+innehållet och sista sidan, utan skriptfel (konsolen visar bara tjänsterna som molnmiljön inte når och den saknade
+`data/tidning.json`). Flaggorna provades med två ritade flaggor, eftersom ESPN:s bildtjänst inte nås härifrån.
+Sammanslagningen i nattjobbet med Node (ett eget blad ersätter, handskrivna står kvar, en annan omgång rörs inte).
+Bildhämtningen för landslagen bara med ett låtsasnät (rätt BBC-flöde och sökord); den riktiga hämtningen gör GitHub
+Actions. Notiserna (*Så mår tipslagen*, `data/tidning.json`) är inte skrivna för landskamperna.
+
 ### Närbilderna
 
 Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,

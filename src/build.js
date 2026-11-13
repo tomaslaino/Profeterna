@@ -151,9 +151,16 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
       const { byId } = matchData();
       for (const s of ps.sidor) {
         const m = byId.get(String(s.id));
-        if (m && m.venue) {
+        // Ett handskrivet blad kan ha arenan själv (Strawberry Arena, som ESPN fortfarande kallar Friends Arena).
+        if (m && m.venue && !s.arena) {
           s.arena = m.venue;
           if (m.venueCity) s.ort = m.venueCity;
+        }
+        // En landskamp: tävlingen och gruppen där klubbarna inte har något (Nations League · Grupp B4), och flaggorna
+        // i lagens ställe (rum-tidning.js).
+        if (m && isIntl(m.comp)) {
+          const c = INTERNATIONAL.find((x) => x.id === m.comp);
+          s.landskamp = { turnering: c ? c.name : null, grupp: String(m.group || '').replace(/^Group\s+/i, '') || null };
         }
       }
       fs.writeFileSync(psFil, JSON.stringify(ps));

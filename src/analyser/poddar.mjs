@@ -617,16 +617,27 @@ export function poddNyckel(fil) {
 // Matchbladen som de läggs ut (data/poddsidor.json): omgångens matcher i kupongens ordning, bara de
 // som har ett blad. Citaten på engelska och utskrifterna följer aldrig med; sidans citat är på svenska.
 // matcher är hela kupongen, också matcherna utan blad, för innehållet i Helgarderat (public/helgarderat.js).
+// nu är numret som ligger ute: ett blad där för en match som jobbet inte har något eget blad till står kvar
+// (2026-11-13, landskamperna: lagen har inga supporterpoddar eller forum, och deras blad är handskrivna i
+// data/poddsidor.json, "hand": true). Det gäller bara samma omgång (samma lördag; numret kan vara lagt innan
+// omgångens id fanns).
 // → {omgang, uppdaterad, amnen, matcher: [{id, nr, match, avspark}], sidor: [{id, nr, match, lag, rubrik, ingress,
 //   summering, citat, delar}]} eller null
-export function poddsidor(fil, round) {
-  if (!fil || !round || fil.omgang !== round.id || !fil.sidor) return null;
+export const sammaOmgang = (a, b) => Boolean(a && b) && String(a).slice(0, 10) === String(b).slice(0, 10);
+export function poddsidor(fil, round, nu = null) {
+  if (!round) return null;
+  const egen = fil && fil.omgang === round.id && fil.sidor ? fil.sidor : {};
+  const forra = new Map(nu && sammaOmgang(nu.omgang, round.id) && Array.isArray(nu.sidor) ? nu.sidor.map((s) => [String(s.id), s]) : []);
   const sidor = round.matcher.map((x, i) => {
-    const s = fil.sidor[String(x.id)];
-    if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => (d.grupper || []).length || (d.text || []).length)) return null;
+    const s = egen[String(x.id)];
+    if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => (d.grupper || []).length || (d.text || []).length)) {
+      const kvar = forra.get(String(x.id));
+      return kvar ? { ...kvar, nr: i + 1, avspark: x.avspark || kvar.avspark || null } : null;
+    }
     return { id: String(x.id), nr: i + 1, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null,
       summering: s.summering || null, ...(s.citat ? { citat: s.citat } : {}), delar: s.delar };
   }).filter(Boolean);
   const matcher = round.matcher.map((x, i) => ({ id: String(x.id), nr: i + 1, match: x.match || null, avspark: x.avspark || null }));
-  return sidor.length ? { omgang: round.id, uppdaterad: fil.uppdaterad, amnen: pc.amnen, matcher, sidor } : null;
+  const uppdaterad = (fil && fil.omgang === round.id && fil.uppdaterad) || (nu && nu.uppdaterad) || null;
+  return sidor.length ? { omgang: round.id, uppdaterad, amnen: pc.amnen, matcher, sidor } : null;
 }

@@ -17,7 +17,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { veckansBilder, bildverktyg } from '../../src/analyser/tidning-bilder.mjs';
+import { createRequire } from 'node:module';
+import { veckansBilder, bildverktyg, landslag, slug } from '../../src/analyser/tidning-bilder.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DATA = path.join(ROOT, 'data');
@@ -48,6 +49,20 @@ if (!ps || !Array.isArray(ps.sidor) || !ps.sidor.length) {
 }
 const omgang = String(ps.omgang || '');
 const lagen = [...new Set(ps.sidor.flatMap((s) => s.lag || []).filter(Boolean))];
+// Landslagen (2026-11-13): sajten skriver Sverige, flödena Sweden. ESPN:s engelska namn ur config/landslag.js ger BBC:s
+// lagflöde (wales, northern-ireland, republic-of-ireland; de andra länderna har inget och faller tillbaka på Bing News)
+// och sökorden. Ett lag utan bild får sin flagga på matchbladet, som en klubb sin sköld.
+{
+  const { SVENSKA } = createRequire(import.meta.url)('../../config/landslag.js');
+  const en = {};
+  for (const [e, sv] of Object.entries(SVENSKA || {})) if (!en[sv]) en[sv] = e === 'Ireland' ? 'Republic of Ireland' : e;
+  for (const lag of lagen) {
+    const e = en[lag];
+    if (!e) continue;
+    const kort = e.replace(/^Republic of /, '');
+    landslag[lag] = { namn: [...new Set([kort, e, lag])], bbc: slug(e), fragor: [`${kort} national team`, `${kort} football`, `${kort} Nations League`] };
+  }
+}
 const mot = Object.fromEntries(ps.sidor.flatMap((s) => (s.lag && s.lag.length === 2 ? [[s.lag[0], s.lag[1]], [s.lag[1], s.lag[0]]] : [])));
 // De insatta mediernas artiklar om laget är veckans och handlar om laget: de prövas före Bing News.
 const kallor = {};
