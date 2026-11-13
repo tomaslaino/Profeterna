@@ -6261,7 +6261,7 @@ matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man 
 och matchakten fick lagets plats i divisionen efter varje tal, så att det topplistan visade
 finns kvar där.
 
-Överst står menyraden, som alltid står still: *KUPONGEN* och *LAGEN*, med den valda fliken
+Överst står menyraden, som alltid står still: *KUPONGEN* och *REGISTRET*, med den valda fliken
 omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
 över hela bredden; det mellan dem rullar.
 
@@ -6307,12 +6307,21 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   Saknar fler än en av de fem matcherna styrka visas ingen siffra. Med dolda resultat står
   ett frågetecken, som för tavlans tal. EFL Trophy hämtas inte och finns varken i formen
   eller i siffran.
-- **Lagen** – de fyra divisionerna (*PL*, *CH*, *L1* och *L2* i telefonen), med divisionen
-  som har flest lag i omgången först. Lagen står i bokstavsordning (två spalter på datorn),
-  och lagen i omgången är ljusa. Ett lag öppnar **lagkortet** med truppen,
-  och en spelare i truppen **spelarkortet** (nedan).
+- **Registret** – lagen och spelarna (fliken hette *Lagen* till 2026-11-13, då användaren ville ha
+  en rubrik som rymmer båda; en egen flik för spelarna valdes bort). Underraden säger vad och var:
+  *LAG* eller *SPELARE* till vänster och divisionen till höger, de valda omvända (*PL*, *CH*, *L1*
+  och *L2* när de hela namnen inte ryms, och då står namnet under strecket); ←/→ bläddrar mellan
+  divisionerna. Samma dag ville användaren att underkategorierna skulle vara logiska – med bara
+  divisionerna syntes spelarna först inne i ett lag – och valde det här upplägget före att
+  behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på divisionen
+  som har flest lag i omgången. *LAG* är divisionens lag i bokstavsordning (två spalter på
+  datorn), de i omgången ljusa, och ett lag öppnar **lagkortet** med truppen. *SPELARE* är
+  divisionens spelare från A till Ö (efternamnet) med plats, lag, speltid och mål, och läget
+  (skadad, avstängd) sist när raden ryms: samma spelare som i trupperna, de som har spelat och de
+  skadade. En spelare öppnar **spelarkortet** (nedan), och Esc går tillbaka till samma ställe i
+  listan. En lång lista skrivs rad för rad så långt skärmen räcker och resten på en gång.
 
-Sökraden söker i hela registret, också lag och spelare utanför omgången, och svarar medan man
+Sökraden söker i hela datorn, också lag och spelare utanför omgången, och svarar medan man
 skriver: träffarna står i stället för vyn, den mest sannolika överst och markerad och sedan i
 fallande led, Enter öppnar den markerade, ↑/↓ väljer en annan, och när sökraden töms (eller med
 Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.
