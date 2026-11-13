@@ -15,7 +15,7 @@
 // {namn} det du kallas (efternamnet, Dogge för Johansson), {dag} när spelstoppet är (på lördag, i morgon, i dag),
 // {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1),
 // {ratt} och {av} hur många rätt han hade av hur många, i ord (två, sex), {antal} och {Antal} ett tal
-// från två till tretton i ord (i domarna).
+// från två till tretton i ord (i domarna), och i domarna {match}, {tipset}, {Tipset} och {pct} (se domar.sak).
 //
 // Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
 // (src/rost.js), så filen är både ett skript i sidan
@@ -494,10 +494,11 @@
 
   // Efter omgången, så länge protokollet ligger på pulten (tills nästa Stryktips kommer): han dömer var och
   // en i gänget, en i taget (gangLista och doma i rum-hasse.js, läget i RumBlock.gang). Om sig själv säger
-  // han inget här. En dom är en inledning med namnet, en eller två saker ur kupongen och ett slut, och
-  // raderna väljs efter omgången och personen, så att domen är densamma varje gång och på alla enheter.
-  // Varje rad är en mening, så att domen står i ett stycke och ändå går att läsa upp mening för mening. Inget
-  // han eller hon: skriv namnet, eller om kupongen. Till gruppen säger han ni och er, aldrig gänget: det är
+  // han inget här. En dom är en inledning med namnet, det som sticker ut på kupongen (högst två saker, var och
+  // en med vad han tycker om den) och ett slut, i var sitt stycke. Kupongen visar han inte. Raderna väljs efter
+  // omgången och personen, så att domen är densamma varje gång och på alla enheter. Varje rad är en mening, så
+  // att domen går att läsa upp mening för mening. Inget han eller hon: skriv namnet, eller om kupongen.
+  // Till gruppen säger han ni och er, aldrig gänget: det är
   // bara ni som använder sidan. Han talar till den som står vid disken, och det kan vara den han dömer, så
   // de övriga är de andra eller resten, aldrig ni andra. Vi är han och den han talar med; i gänget är han
   // inte med ("det kommer vi att få höra", Tomas 2026-11-10). Domarna är hans, inte de andras. Ordet i guld
@@ -564,42 +565,116 @@
     // menar säger han inte.
     revisorn: ['Revisorn har inte sagt ett ord i dag.', 'Revisorn har redan gått hem.'],
     borta: ['Semesterfiraren har inte hört av sig.'],
-    // Inledningen, efter hur det gick i gänget (forsakring har forst).
+    // Inledningen, efter hur det gick i gänget (forsakring har forst). Säger han något om mitten här, gör han det
+    // inte i slutet.
     in: {
-      forst: ['{namn} var bäst av er, och det kommer resten att få höra.', '{namn} slog resten av er den här gången.', '{namn} vann omgången, och ingen är mer förvånad än {namn}.'],
-      alla: ['{namn} hade alla rätt.', '{namn} hade varenda match rätt.', '{namn} hade inte ett enda fel på kupongen.'],
-      mitten: ['{namn} hamnade i mitten, och det märkte ingen.', '{namn} kom varken först eller sist, och det är också en konst.', '{namn} låg i mitten, där det är lä.'],
-      sist: ['{namn} kom sist av er.', '{namn} var sämst av er.', '{namn} hade resten av er framför sig den här omgången.'],
-      sistLika: ['{namn} kom sist trots lika många rätt som någon av de andra.', '{namn} hade lika många rätt som någon av de andra och kom ändå sist.'],
+      forst: [
+        '{namn} var bäst av er, och det kommer resten att få höra.',
+        '{namn} slog resten av er den här gången.',
+        '{namn} vann omgången, och ingen är mer förvånad än {namn}.',
+      ],
+      alla: ['{namn} hade alla rätt, och det ser man inte varje vecka.', '{namn} hade inte ett enda fel på kupongen.', 'Varenda match satt för {namn}.'],
+      mitten: [
+        '{namn} hamnade i mitten, där ingen tittar.',
+        '{namn} höll sig i mitten, i lä för både beröm och kritik.',
+        '{namn} kom varken först eller sist, och det är också en konst.',
+      ],
+      sist: ['{namn} kom sist den här gången.', 'Sist i mål kom {namn}.', '{namn} hade resten av er framför sig den här omgången.'],
+      sistLika: ['{namn} kom sist trots lika många rätt som en av de andra.', '{namn} hade lika många rätt som en av de andra och kom ändå sist.'],
       inget: ['{namn} lämnade inte in någon kupong.', '{namn} stod över den här omgången.'],
     },
-    // Sakerna ur kupongen. Helgarderingarna sätts bara när alla satt.
-    hel: {
-      en: ['Det fanns en helgardering på kupongen, och den satt.', 'Helgarderingen satt, och det är inte så konstigt.'],
-      fler: ['Det fanns {antal} helgarderingar på kupongen, och alla satt.', 'Alla {antal} helgarderingarna satt, och det är inte så konstigt.'],
-    },
-    forsakring: ['Där bara {namn} hade rätt var det helgarderat.'],
+    // Den som vann på helgarderingar (forsakring) får den här raden i inledningen.
+    forsakring: ['Där ingen annan hade rätt hade {namn} helgarderat.'],
+    // Spikarna, när inget annat sticker ut, och när alla av minst tre, ingen av minst två eller en av minst tre satt.
     spik: {
       ingen: ['Det fanns inte en enda spik på kupongen.', 'Inte en enda match vågade {namn} spika.'],
       enda: ['Den enda spiken satt.', 'Kupongen hade en spik, och den satt.'],
-      endaInte: ['Den enda spiken satt inte.', 'Kupongen hade en spik, och den höll inte.'],
+      endaInte: ['Den enda spiken sprack.', 'Kupongen hade en spik, och den sprack.'],
       alla: ['Alla spikarna satt.', 'Varenda spik satt.', 'Spikarna höll allihop.'],
-      inga: ['Inte en enda spik satt.', 'Ingen av spikarna höll.'],
-      en: ['En av spikarna satt.', 'En av spikarna höll, och resten gick av.'],
+      inga: ['Inte en enda spik satt.', 'Spikarna sprack allihop.'],
+      en: ['Bara en av spikarna satt.', 'En av spikarna höll, men resten sprack.'],
       fler: ['{Antal} av spikarna satt.', '{Antal} av spikarna höll.'],
     },
-    ensam: {
-      ingen: ['Allt som satt hade någon av de andra också.', 'Det fanns ingen match där {namn} var ensam om att ha rätt.'],
-      en: ['I en match hade ingen av de andra rätt.', 'I en match var {namn} ensam om att ha rätt.'],
-      fler: ['I {antal} matcher hade ingen av de andra rätt.', 'I {antal} matcher var {namn} ensam om att ha rätt.'],
+    // Det som sticker ut på kupongen (RumBlock.saker), högst två saker och det viktigaste först: vad det är och
+    // sedan vad han tycker om det (om), en mening var. {match} är matchen (Cardiff mot Burnley), {tecknet} och
+    // {Tecknet} en spik i bestämd form (krysset) och {den} det eller den efter tecknet, {tecknen} en halvgardering
+    // (etta och kryss), {pct} datorns chans
+    // för tipset i procent och {res} hur matchen slutade. En rad med matchen hörs inte (rösten kan inte alla lag),
+    // så kommentaren efter ska gå att förstå för sig. Allt ska vara sant om det som RumBlock.saker har valt.
+    sak: {
+      // tipset med lägst chans som satt; ensam när ingen av de andra hade rätt där
+      skrall: {
+        spik: [
+          '{Tecknet} i {match} satt, fast datorn bara gav {den} {pct} procent.',
+          'Datorn gav {tecknet} i {match} bara {pct} procent, men {namn} spikade {den} och fick rätt.',
+        ],
+        halv: [
+          'Halvgarderingen med {tecknen} i {match} satt, fast datorn bara gav den {pct} procent.',
+          'Datorn gav {tecknen} i {match} bara {pct} procent, och ändå satt halvgarderingen.',
+        ],
+        ensam: [
+          'Bara {namn} hade rätt i {match}, och datorn gav det bara {pct} procent.',
+          'Ingen av de andra hade rätt i {match}, och datorn gav det bara {pct} procent.',
+        ],
+        om: [
+          'Det kallar jag fingertoppskänsla.',
+          'Om det var kunskap eller tur låter jag vara osagt.',
+          'Det hade jag också tippat, om någon hade frågat mig.',
+          'Så ska det tippas, utan att darra på manschetten.',
+        ],
+      },
+      // tipset med högst chans som inte satt
+      miss: {
+        spik: [
+          'Spiken på {tecknet} i {match} sprack, fast datorn gav den {pct} procent.',
+          'Datorn gav {tecknet} i {match} {pct} procent, men spiken sprack ändå.',
+        ],
+        halv: [
+          'Halvgarderingen med {tecknen} i {match} höll inte, fast datorn gav den {pct} procent.',
+          'Datorn gav {tecknen} i {match} {pct} procent, men halvgarderingen höll ändå inte.',
+        ],
+        om: [
+          'Där var det matchen som hade fel, inte kupongen.',
+          'Den matchen borde spelas om.',
+          'Sådant händer när favoriterna inte har läst på.',
+          'Fotboll är orättvist, men sällan så orättvist.',
+        ],
+      },
+      // där ingen av de andra hade rätt: en match, eller hur många
+      ensam: {
+        en: ['I {match} var {namn} ensam om att ha rätt.', 'Ingen av de andra hade rätt i {match}, men det hade {namn}.'],
+        fler: ['I {antal} matcher hade ingen av de andra rätt.', 'I {antal} matcher var {namn} ensam om att ha rätt.'],
+        om: ['Där tänkte {namn} själv, och det ska man inte ta för givet.', 'Ensam är stark, i alla fall ibland.', 'Det kallar jag att gå sin egen väg.'],
+      },
+      // en helgardering där det kom ett utfall som datorn knappt trodde på
+      raddad: {
+        fakta: ['Helgarderingen i {match} kom väl till pass, för där slutade det {res}.', 'Det var tur att {match} var helgarderad, för det slutade {res}.'],
+        om: ['Att gardera sig är inte förbjudet, bara lite fegt.', 'Det kallas att köpa sig fri.'],
+      },
+      // alla spikarna satt, eller ingen eller bara en (raderna står under spik)
+      spikar: {
+        alla: ['En spik ska sitta, det har jag alltid sagt.', 'Så ska spikar se ut.'],
+        sprack: ['En spik som inte sitter är bara en gissning.', 'Då hade det varit billigare att gardera.', 'Spikar ska man slå i, inte strö omkring sig.'],
+      },
+      // rätt mot de rätt datorn väntade sig av kupongen
+      datorn: {
+        fler: ['Datorn trodde på {antal} rätt, och det blev fler.'],
+        farre: ['Datorn trodde på {antal} rätt, och det blev färre.'],
+        omFler: ['Datorn har aldrig förstått sig på fotboll.', 'Mer än så kan ingen begära av en kupong.'],
+        omFarre: ['Den här gången var datorn klokare än {namn}, och det säger inte lite.', 'Man ska inte underskatta en dator, säger jag alltid.'],
+      },
     },
-    // Slutet.
+    // Slutet. Det säger inget om mitten, eftersom inledningen kan ha gjort det.
     ut: {
       forsakring: ['Så kan man också köpa sig en seger.', 'Det kallas gardering, inte kunskap.'],
-      forst: ['Jag kallar det flyt, men det får man inte säga högt.', 'Det kommer att låta om segern vid pulten hela veckan.', 'Att vinna ska {namn} inte vänja sig vid.', 'Nästa omgång ser vi vad segern var värd.'],
+      forst: ['Jag kallar det flyt, men det får man inte säga högt.', 'Det kommer att låta om segern vid pulten hela veckan.', 'Att vinna ska {namn} inte vänja sig vid.', 'Nästa omgång får vi se vad segern var värd.'],
       alla: ['Den kupongen hade jag kunnat fylla i själv.', 'Jag hade tippat likadant.', 'En kupong ska ha alla rätt, det har jag alltid sagt.'],
-      mitten: ['En mittenplats är ingen skam, men ingen ära heller.', 'I mitten syns man inte, och det är nog lika bra.', 'I mitten kan man sitta länge utan att någon frågar något.'],
-      sist: ['Det krävs en viss talang för att komma sist.', 'Någon måste komma sist, och den här gången ställde {namn} upp.', 'Nästa omgång kan bara bli bättre, och det är det bästa jag kan säga.', 'Den kupongen ska vi inte prata mer om.'],
+      mitten: [
+        'Sådana kuponger vinner inga omgångar, men de förlorar inga heller.',
+        'Nästa omgång får {namn} bestämma sig för åt vilket håll det ska gå.',
+        'Den kupongen kommer ingen att minnas, och det är kanske lika bra.',
+      ],
+      sist: ['Det krävs en viss talang för att komma sist.', 'Någon måste komma sist, och den här gången ställde {namn} upp.', 'Nästa omgång kan bara bli bättre, och det är det vänligaste jag kan säga.', 'Den kupongen ska vi inte prata mer om.'],
       sistLika: ['Man måste ha rätt i rätt matcher, inte bara i många.', 'Lätta rätt ger få poäng, och det vet alla utom {namn}.'],
       inget: ['Den som inte tippar kan inte ha fel.', 'Att inte lämna in är det säkraste jag har sett.', 'Att stå över är också ett sätt att spara pengar.'],
     },
