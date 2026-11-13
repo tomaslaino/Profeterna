@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-13T18:23:15.540Z",
+ "uppdaterad": "2026-11-13T19:30:16.797Z",
  "omgang": {
   "id": "2026-11-14-st4979",
   "matcher": [
@@ -1295,6 +1295,93 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-13T18:17:18.628Z",
     "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880747",
+   "match": "Sheffield Wednesday – Plymouth Argyle",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T19:29:52.023Z",
+   "text": "Challinor får sin första ligamatch, och målvakt nummer tre\n\nDave Challinor har hunnit med två cupmatcher på Hillsborough-bänken och vunnit ingen av dem. Nu kommer hans första ligamatch, mot ett Plymouth med gott om mål på topp. Han har dessutom en tredjemålvakt i buren och en lång rad spelare på läktaren.\n\nDet har gått fort i Sheffield. Henrik Pedersen tog 18 poäng på de första nio ligamatcherna och hade bara en förlust, men två raka förluster med 0–2 borta mot Notts County och Doncaster blev slutet för honom, skriver Sports Mole [1]. Matt Hamshaw tog sedan två oavgjorda matcher som tillfällig tränare. Därefter blev Challinors början två cuputtåg, mot Oldham i FA-cupen och med 0–4 mot Accrington i EFL Trophy med ett hårt roterat lag [1]. Challinor sa själv efteråt att första halvlek mot Oldham spelades i ett tempo som på en avskedsmatch, och han kräver att laget blir ”miles better” mot Plymouth [2]. En ny tränare som läxar upp spelarna offentligt efter första matchen vill att det ska märkas, och det ser du redan på uppvärmningen.\n\nMatchen hängde dessutom ett tag på en regel som få känner till. Ett lag i League One kan begära uppskjutning om tre spelare kallas till landslaget, men då måste de ha spelat tillräckligt mycket. Av Wednesdays uttagna räknades bara Kieran Morrison i Nordirland, enligt Football League World [2]. Matchen blir alltså av, men truppen är tunn. Joe Lumley och Ashley Maynard-Brewer saknas troligen, så Connal Trueman står i mål. Även Liam Cooper, Reece James och Louie Barry kan bli borta [1]. Davis Keillor-Dunn har gjort mål i sina två senaste matcher [1]. Hos Plymouth och Tom Cleverley har Aribim Pepple gjort åtta mål och Will Evans fem [1]. En trea i mål mot ett anfall som gör mål löser man inte med en hink bollar, men i Tjäderfors klarade vi oss en gång en hel höst med en vänsterback mellan stolparna.\n\nTipset: X2 (Plymouth en hårsmån)\n\nPrognosen ser två jämna lag och ger Plymouth en aning större chans än marknaden gör. Det jag har läst drar åt samma håll. Wednesday har en ny tränare utan seger, en tredjemålvakt i buren och en lång frånvarolista [1]. Cleverleys anfall har dessutom gjort gott om mål [1]. Samtidigt ger en ny tränare ofta laget en extra kraftansträngning i första hemmamatchen, och Challinor har krävt mycket mer av spelarna [2]. Enligt prognosen är 1–1 det troligaste resultatet. Jag ringar in bortasegern och krysset och låter hemmalaget klara sig själva den här gången.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Challinor får sin första ligamatch, och målvakt nummer tre",
+   "lead": "Dave Challinor har hunnit med två cupmatcher på Hillsborough-bänken och vunnit ingen av dem. Nu kommer hans första ligamatch, mot ett Plymouth med gott om mål på topp. Han har dessutom en tredjemålvakt i buren och en lång rad spelare på läktaren.",
+   "paragraphs": [
+    "Det har gått fort i Sheffield. Henrik Pedersen tog 18 poäng på de första nio ligamatcherna och hade bara en förlust, men två raka förluster med 0–2 borta mot Notts County och Doncaster blev slutet för honom, skriver Sports Mole [1]. Matt Hamshaw tog sedan två oavgjorda matcher som tillfällig tränare. Därefter blev Challinors början två cuputtåg, mot Oldham i FA-cupen och med 0–4 mot Accrington i EFL Trophy med ett hårt roterat lag [1]. Challinor sa själv efteråt att första halvlek mot Oldham spelades i ett tempo som på en avskedsmatch, och han kräver att laget blir ”miles better” mot Plymouth [2]. En ny tränare som läxar upp spelarna offentligt efter första matchen vill att det ska märkas, och det ser du redan på uppvärmningen.",
+    "Matchen hängde dessutom ett tag på en regel som få känner till. Ett lag i League One kan begära uppskjutning om tre spelare kallas till landslaget, men då måste de ha spelat tillräckligt mycket. Av Wednesdays uttagna räknades bara Kieran Morrison i Nordirland, enligt Football League World [2]. Matchen blir alltså av, men truppen är tunn. Joe Lumley och Ashley Maynard-Brewer saknas troligen, så Connal Trueman står i mål. Även Liam Cooper, Reece James och Louie Barry kan bli borta [1]. Davis Keillor-Dunn har gjort mål i sina två senaste matcher [1]. Hos Plymouth och Tom Cleverley har Aribim Pepple gjort åtta mål och Will Evans fem [1]. En trea i mål mot ett anfall som gör mål löser man inte med en hink bollar, men i Tjäderfors klarade vi oss en gång en hel höst med en vänsterback mellan stolparna."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sports Mole",
+     "title": "Preview: Sheffield Wednesday vs Plymouth Argyle - prediction, team news, lineups",
+     "url": "https://www.sportsmole.co.uk/football/sheffield-wednesday/preview/sheff-weds-vs-plymouth-prediction-team-news-lineups_609010.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Football League World",
+     "title": "Sheffield Wednesday match v Plymouth Argyle hinges on a little-known EFL rule",
+     "url": "https://footballleagueworld.co.uk/sheffield-wednesday-match-v-plymouth-argyle-hinges-on-a-little-known-efl-rule/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ser två jämna lag och ger Plymouth en aning större chans än marknaden gör. Det jag har läst drar åt samma håll. Wednesday har en ny tränare utan seger, en tredjemålvakt i buren och en lång frånvarolista [1]. Cleverleys anfall har dessutom gjort gott om mål [1]. Samtidigt ger en ny tränare ofta laget en extra kraftansträngning i första hemmamatchen, och Challinor har krävt mycket mer av spelarna [2]. Enligt prognosen är 1–1 det troligaste resultatet. Jag ringar in bortasegern och krysset och låter hemmalaget klara sig själva den här gången.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Plymouth en hårsmån",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Mole",
+      "title": "Preview: Sheffield Wednesday vs Plymouth Argyle - prediction, team news, lineups",
+      "url": "https://www.sportsmole.co.uk/football/sheffield-wednesday/preview/sheff-weds-vs-plymouth-prediction-team-news-lineups_609010.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Football League World",
+      "title": "Sheffield Wednesday match v Plymouth Argyle hinges on a little-known EFL rule",
+      "url": "https://footballleagueworld.co.uk/sheffield-wednesday-match-v-plymouth-argyle-hinges-on-a-little-known-efl-rule/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T19:29:52.023Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Wednesday har en ny tränare som inte har vunnit någon av sina två första matcher, och i den senaste förlorade de med 0–4. Han har läxat upp spelarna offentligt och kräver ett helt annat lag. Det ger lite extra spring i benen, men det hjälper föga när tredjemålvakten står i mål och en lång rad spelare sitter på läktaren.",
+     "Plymouth har en anfallare med åtta mål och en till med fem, och mot en reservbacklinje utan Liam Cooper blir det verticalidá, rakt på, det finns 28 sätt att bryta ner en backlinje och de behöver bara … Ursäkta. Back to basis. Wednesday har en spelare som gjort mål i två raka matcher, så de får in ett. Jag ringar in bortasegern och står för den."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
+    "tips": "2026-11-13T19:29:52.023Z",
+    "uppdrag": {
+     "fraser": [
+      "Lugn nu",
+      "Glöm det"
+     ],
+     "krydda": null,
+     "bielsa": [
+      "verticalidá",
+      "ombre libre"
+     ]
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T19:30:09.026Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
