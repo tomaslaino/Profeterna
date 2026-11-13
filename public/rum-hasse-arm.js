@@ -1402,13 +1402,17 @@ export function byggSkugga(geo, NK, dag = DAG) {
       for (int i = 0; i < ${NK}; i++) {
         float r = uKapH[i].x, h = uKapH[i].y;
         if (r <= 0.) continue;
-        float d = max(0., seg(vP.xz, uKap[i].xy, uKap[i].zw) - r * .4);
+        float s = seg(vP.xz, uKap[i].xy, uKap[i].zw);
+        // (så långt bort att ingen av de tre skuggorna nedan blir en tusendels procent: hoppas över, så att
+        // det mesta av disken bara räknar ett avstånd per kapsel och inte tre)
+        if (s > 4. * r + 2.65 * h) continue;
+        float d = max(0., s - r * .4);
         float rd = r * .72 + h * .34;
         ljus *= 1. - .78 * exp(-d * d / (rd * rd)) / (1. + h * .012);
         // händerna (0 och 2): en tät, mörk skugga där de ligger an mot disken, som en mörk kant längs fingrarna
         // och handens ytterkant, borta när handen lyfts, så att de inte ser ut att sväva
         if (i == 0 || i == 2) {
-          float dc = max(0., seg(vP.xz, uKap[i].xy, uKap[i].zw) - r * .74);
+          float dc = max(0., s - r * .74);
           float rc = r * .36;
           ljus *= 1. - .88 * exp(-dc * dc / (rc * rc)) * (1. - smoothstep(50., 110., h));
         }
