@@ -1171,7 +1171,7 @@ window.RumHasse = (() => {
       H.tal += (H.talMal - H.tal) * Math.min(1, dt * 12);
       // munnen: ljudstyrkan när han hörs, annars följer den talet
       H.mun += ((H.munMal == null ? H.tal : H.munMal) - H.mun) * Math.min(1, dt * 30);
-      H.fig.rita(H.T, ms / 1000, H.tal, H.mun);
+      H.fig.rita(H.T, ms / 1000, H.tal, H.mun, H.klipp);
     };
     H.raf = requestAnimationFrame(tick);
   }
@@ -1702,11 +1702,18 @@ window.RumHasse = (() => {
     if (!k.fri && Math.abs(H.T - k.fran) > 0.01 && Math.abs(H.T - k.vila) > 0.01) return;
     H.ko.push({ ...k });
   }
+  // Varje gång ett klipp spelas går det lite olika fort (fart), och i småsakerna går huvudet och kroppen lite
+  // olika långt (styrka, rita i rum-hasse-3d.js): förut var varje gång exakt likadan som förra. Inte domen och
+  // det han gör vid ett bestämt ord (de följer orden), tidningen eller kupongen.
+  const FART = new Set(['kaffe', 'cigarr', 'smatt', 'spana', 'tal', 'tanda']);
+  const STYRKA = new Set(['smatt', 'spana']);
   function figurSteg(dt) {
     if (!H.klipp) {
       if (!H.ko.length) return;
       H.klipp = H.ko.shift();
       H.T = H.klipp.fran;
+      H.klipp.fart = FART.has(H.klipp.grupp) ? 0.9 + 0.22 * Math.random() : 1;
+      H.klipp.styrka = STYRKA.has(H.klipp.grupp) ? 0.85 + 0.27 * Math.random() : 1;
     }
     const k = H.klipp;
     const T0 = H.T;
@@ -1714,7 +1721,7 @@ window.RumHasse = (() => {
     // börjar prata)
     // (och inför att han skriver på din kupong, och när han suddar ut det han skrev)
     const fort = (k.skynda && (H.ko.length || ((k.grupp === 'smatt' || k.grupp === 'spana') && H.sagt && !H.sagt.klar))) || (H.ko.length && H.ko[0].brad) || k.bort;
-    H.T = Math.min(k.till, H.T + dt * (fort ? 2.5 : 1));
+    H.T = Math.min(k.till, H.T + dt * (fort ? 2.5 : 1) * (k.fart || 1));
     // Tidningen: väntar något annat lägger han ned den vid nästa gräns mellan bitarna (slag), där han läser
     // som vanligt, och hoppar direkt till ned (lasa i rum-hasse-3d.js).
     if (k.slag && H.ko.length && !k.nerNu) {

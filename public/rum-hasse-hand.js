@@ -248,7 +248,9 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
     if (knapp) Object.assign(knapp.style, { left: '-40px', top: `${hh.y0}px`, width: `${hh.x1 + 40}px`, height: `${hh.y1 - hh.y0}px` });
   }
 
-  // ---------- fingrarna trummar: den vänstra handen, överst, från lillfingret till pekfingret, två varv ----------
+  // ---------- fingrarna trummar: den vänstra handen, överst, från lillfingret till pekfingret ----------
+  // Varje gång lite olika: ett och ett halvt till tre varv, olika fort, fingrarna lite ojämnt i tid och höjd, och
+  // ibland bara pekfingret som knackar (förut två varv på 0,86 s, exakt likadant var 7–16:e sekund).
 
   let raf = 0;
   const extra = [0, 0, 0, 0];
@@ -256,18 +258,29 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
     if (raf) return;
     const t0 = performance.now();
     const b = lage.B;
+    const fart = 2.7 + 1.5 * Math.random();
+    const peka = Math.random() < 0.18;
+    const varv = peka ? 3 + Math.floor(Math.random() * 3) : 1.5 + 1.5 * Math.random();
+    const fas = [0, 1, 2, 3].map(() => (Math.random() - 0.5) * 0.3);
+    const hojd = [0, 1, 2, 3].map(() => 0.75 + 0.45 * Math.random());
+    const T = varv / fart;
     const steg = (ms) => {
       const t = (ms - t0) / 1000;
-      if (t > 0.86) {
+      if (t > T) {
         satt('B');
         rita();
         raf = 0;
         return;
       }
       for (let i = 0; i < 4; i++) {
-        // var finger lyfter och faller i sin tur
-        const f = ((t * 3.2) % 1) * 4 - (3 - i);
-        extra[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 : 0;
+        // var finger lyfter och faller i sin tur (eller pekfingret ensamt)
+        if (peka) {
+          const f = (t * fart) % 1;
+          extra[i] = i ? 0.05 : -Math.sin(Math.min(1, f * 1.6) * Math.PI) * 0.42 * hojd[0];
+          continue;
+        }
+        const f = ((t * fart) % 1) * 4 - (3 - i) + fas[i];
+        extra[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 * hojd[i] : 0;
       }
       B.hand.satt(b.H, b.F, b.P, b.v.krok, 0, b.v.spar, b.v.tumme, extra);
       rita();

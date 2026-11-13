@@ -20,6 +20,10 @@
 // väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
 // rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna då (raknar, tomKopp, slocknad, putsa, vissla,
 // naglar), där han blir ertappad och låtsas som ingenting.
+// Inga slingor (2026-11-13): ett klipp spelas inte likadant varje gång. rum-hasse.js väljer fart och styrka för
+// varje gång (fart, styrka: huvudet och kroppen i småsakerna går lite olika långt), händerna står inte stilla som
+// i en bild där nycklarna håller dem i luften (levande), huvudet och brynen följer talet i slag i stället för i
+// jämna vågor (talSlag), och fingrarna trummar olika fort och ojämnt (trumV).
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, byggGlasogon, GLAS, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
@@ -3509,6 +3513,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // där handen står kvar och före och efter ett slag. Med stillhet i båda ändar är det samma mjuka in och ut
   // som förut. (n: fältet i nyckeln, 1–4 vektorerna och 5–6 talen, c: komponenten)
   const nv = (k, n, c) => (n < 5 ? k[n][c] : k[n]);
+  // (huvudets och kroppens vinklar, som styrkan i rita gäller)
+  const STYRS = new Set(['pitch', 'yaw', 'roll', 'lut', 'vrid', 'sid']);
   function lutning(K, j, n, c) {
     if (j <= 0 || j >= K.length - 1) return 0;
     const p = K[j - 1];
@@ -3549,6 +3555,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     l3(ut.w, 1); l3(ut.pol, 2); l3(ut.F, 3); l3(ut.P, 4);
     ut.krok = kv(5);
     ut.peka = kv(6);
+    // (står handen stilla mellan två lika nycklar: hur mycket, med en övergång i båda ändar, för levande)
+    const dw = Math.hypot(b[1][0] - a[1][0], b[1][1] - a[1][1], b[1][2] - a[1][2]);
+    ut.hall = dw < 0.5 && h > 0.5 && !slag ? ss(a[0], a[0] + 0.35, t) * (1 - ss(b[0] - 0.35, b[0], t)) : 0;
     // Den högra handen ligger under den vänstra i vilan. När den lyfts dras den först ut bakåt längs sig
     // själv, och skjuts in på samma sätt när den kommer tillbaka, annars går fingrarna genom den andra handen.
     if (K === VA && a[1] !== b[1] && (a[1] === va.W || b[1] === va.W)) {
@@ -3625,22 +3634,24 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // pekfingret som knackar fyra gånger (peka). [hur länge, varv i sekunden, varv]; fingrarna 0–3 är
   // pek- till lillfingret.
   const TRUM = { varv: [0.86, 3.2], fort: [0.78, 4.4], lugnt: [0.95, 1.1], peka: [1.45, 2.8] };
+  // (varje gång lite olika fort, och fingrarna lite ojämnt i tid och höjd, trumma: fart, fas och hojd)
+  const trumV = { fart: 1, fas: [0, 0, 0, 0], hojd: [1, 1, 1, 1] };
   let trumT = -9;
   let trumS = TRUM.varv;
   let trumPeka = false;
   let trumHand = 'B';
   const trumF = [0, 0, 0, 0];
   function trummar(n) {
-    const t = n - trumT;
+    const t = (n - trumT) * trumV.fart;
     if (t < 0 || t > trumS[0]) return null;
     for (let i = 0; i < 4; i++) {
       if (trumPeka) {
         const f = (t * trumS[1]) % 1;
-        trumF[i] = i ? 0.05 : -Math.sin(Math.min(1, f * 1.6) * Math.PI) * 0.42;
+        trumF[i] = i ? 0.05 : -Math.sin(Math.min(1, f * 1.6) * Math.PI) * 0.42 * trumV.hojd[0];
         continue;
       }
-      const f = ((t * trumS[1]) % 1) * 4 - (3 - i);
-      trumF[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 : 0;
+      const f = ((t * trumS[1]) % 1) * 4 - (3 - i) + trumV.fas[i];
+      trumF[i] = f > 0 && f < 1 ? -Math.sin(f * Math.PI) * 0.3 * trumV.hojd[i] : 0;
     }
     return trumF;
   }
@@ -3680,6 +3691,56 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // Huvudet driver långsamt (svängningar som inte går jämnt ut), och andningen byter takt och djup.
   const drift = (n, a, b, c) => 0.6 * Math.sin(n * a) + 0.4 * Math.sin(n * b + 2) + 0.25 * Math.sin(n * c + 1);
   const andning = (n) => 7 * (0.85 + 0.2 * Math.sin(n * 0.17 + 1)) * Math.sin(n * 1.45 + 0.9 * Math.sin(n * 0.21));
+  // Huvudet medan han pratar: förut i jämna vågor (en nick i sekunden, huvudet fram och tillbaka och brynen upp
+  // och ned i var sin takt), som en metronom. Nu i slag som talet: huvudet går till ett nytt läge på en dryg
+  // kvarts sekund och stannar där till nästa slag, ungefär var åttonde tiondels sekund; ungefär vart fjärde är ett
+  // betonat ord, med en nick och brynen upp, och ungefär vart femte står huvudet kvar. yaw, pitch och roll är −1…1,
+  // nick och bryn 0…1. (Slagen ligger minst en halv sekund isär, så att varje rörelse hinner fram före nästa;
+  // nicken och brynen från förra slaget får klinga ut.)
+  const TALS = { yaw: 0, pitch: 0, roll: 0, nick: 0, bryn: 0 };
+  function talSlag(n) {
+    const B = 0.8;
+    const st = (m) => m * B + 0.3 * hash(m * 1.31 + 0.2);
+    const paus = (m) => hash(m * 4.9 + 0.5) < 0.2;
+    const tung = (m) => !paus(m) && hash(m * 3.7 + 0.1) < 0.27;
+    const mal = (m, c) => 2 * hash(m * 2.3 + c * 0.71 + 0.9) - 1;
+    // (det senaste slaget som inte var en paus, högst fyra bakåt)
+    const sist = (m) => { for (let i = 0; i < 4 && paus(m); i++) m--; return m; };
+    let m = Math.floor(n / B);
+    if (n < st(m)) m--;
+    const fran = sist(m - 1);
+    const till = paus(m) ? fran : m;
+    const k = paus(m) ? 1 : fj(st(m), st(m) + 0.2 + 0.1 * hash(m * 5.3), n);
+    TALS.yaw = mal(fran, 0) + (mal(till, 0) - mal(fran, 0)) * k;
+    TALS.pitch = mal(fran, 1) + (mal(till, 1) - mal(fran, 1)) * k;
+    TALS.roll = mal(fran, 2) + (mal(till, 2) - mal(fran, 2)) * k;
+    const nick = (j) => (tung(j) ? bumpT(n - st(j), 0.05, 0.2, 0.28, 0.65) * (0.7 + 0.3 * hash(j * 6.1)) : 0);
+    const bryn = (j) => (paus(j) ? 0 : tung(j) ? bumpT(n - st(j), 0, 0.14, 0.35, 0.7) : 0.25 * hash(j * 7.7) * bumpT(n - st(j), 0, 0.2, 0.3, 0.6));
+    TALS.nick = Math.max(nick(m), nick(m - 1));
+    TALS.bryn = Math.max(bryn(m), bryn(m - 1));
+    return TALS;
+  }
+  // 0 → 1 över [a, b] med lite överslag (som gänget i rum-3d.js), och 0 → 1 → 0 över [a, d]
+  function fj(a, b, x) {
+    const u = (x - a) / (b - a);
+    if (u <= 0) return 0;
+    if (u >= 1.6) return 1;
+    return ss(0.2, 1, u) + 0.12 * ss(0.55, 1, u) * (1 - ss(1.02, 1.6, u));
+  }
+  const bumpT = (x, a, b, c, d) => ss(a, b, x) * (1 - ss(c, d, x));
+  // Händerna i luften: där nycklarna håller en hand stilla (hall, nyckel) stod den förut helt still, som i en
+  // bild. Nu rör den sig lite, som en hand som hålls uppe gör – inte på disken (en bit ovanför vilans höjd börjar
+  // det) och inte när något i handen styr den (cigarren, koppen, pennan, glasögonen: styr).
+  function levande(h, hall, styr, n, i) {
+    const k = hall * (1 - styr) * ss(BORD.Y + 75, BORD.Y + 135, h.w.y);
+    if (k <= 0.002) return;
+    const f = 1 + i * 0.37;
+    h.w.x += k * 3.5 * drift(n * f, 0.9, 1.7, 2.9);
+    h.w.y += k * 3 * drift(n * f + 3, 1.1, 0.6, 2.3);
+    h.w.z += k * 2.5 * drift(n * f + 7, 0.7, 1.9, 1.3);
+    h.F.x += k * 0.03 * drift(n * f + 11, 1.3, 0.5, 2.1);
+    h.F.z += k * 0.03 * drift(n * f + 13, 0.8, 1.6, 0.4);
+  }
 
   // ---------- cigarren ----------
   // Han tar cigarren ur askkoppen med höger hand, och det är cigarren som styr: dess läge räknas fram
@@ -5165,13 +5226,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // medan han pratar, hemåt till 12,4, sedan klippen i KLIPP), n: klockan för det som alltid rör sig,
   // tal: 1 medan han pratar med händerna vilande, mun: hur mycket munnen rör sig
   // (annars följer den tal och gesterna)
-  function rita(T, n, tal = 0, mun = null) {
+  function rita(T, n, tal = 0, mun = null, v = null) {
     const t = T;
     sistaT = T; sistaN = n;
     const kl = aktivt(t);
-    // klippets skillnad mot vilan, och huvudet, kroppen och brynen
+    // klippets skillnad mot vilan, och huvudet, kroppen och brynen (huvudets och kroppens vinklar lite olika
+    // långt varje gång: v.styrka från rum-hasse.js)
     const d = (x) => (kl && kl.d[x] ? spar(kl.d[x], t) : 0);
-    const kan = (x) => spar(HUV[x], t) + d(x);
+    const st = v && v.styrka ? v.styrka : 1;
+    const kan = (x) => spar(HUV[x], t) + d(x) * (st !== 1 && STYRS.has(x) ? st : 1);
     const skratt = ss(2.75, 3.05, t) * (1 - ss(4.25, 4.6, t));
     const talar = Math.max(tal, ss(5.55, 5.7, t) * (1 - ss(9.4, 9.6, t)));
     const dricker = d('dricker');
@@ -5180,15 +5243,17 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const iMun = cc ? spar(cc.iMun, t) : 0;
     const blaser = cc ? spar(cc.blaser, t) : 0;
     const glod = cc ? spar(cc.glod, t) : 0;
-    const yaw = YAW0 + 0.22 * (kan('yaw') + 0.1 * drift(n, 0.8, 0.37, 1.33) * (1 - iMun * 0.6) + talar * 0.28 * Math.sin(n * 2.7 + 1));
-    const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * 0.3 * Math.sin(n * 6.1) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
+    // (talet i slag, talSlag)
+    const ts = talar > 0.001 ? talSlag(n) : TALS;
+    const yaw = YAW0 + 0.22 * (kan('yaw') + 0.1 * drift(n, 0.8, 0.37, 1.33) * (1 - iMun * 0.6) + talar * 0.24 * ts.yaw);
+    const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * (0.12 * ts.pitch + 0.34 * ts.nick) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
     nick = pitch;
-    const roll = -(kan('roll') + 0.012 * drift(n, 0.29, 0.61, 0.13) + talar * 0.03 * Math.sin(n * 3.3));
+    const roll = -(kan('roll') + 0.012 * drift(n, 0.29, 0.61, 0.13) + talar * 0.03 * ts.roll);
     eu.set(pitch, yaw, roll, 'YXZ');
     mh.makeRotationFromEuler(eu);
     U.uHuvud.value.setFromMatrix4(mh);
     const lut = kan('lut');
-    const vrid = kan('vrid') + talar * 0.015 * Math.sin(n * 2.1);
+    const vrid = kan('vrid') + talar * 0.015 * ts.yaw;
     const sid = kan('sid') + 0.003 * Math.sin(n * 0.55);
     eu.set(lut, vrid, sid, 'YXZ');
     mr.makeRotationFromEuler(eu);
@@ -5200,7 +5265,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const axH = kan('axH') + skratt * 5 * Math.sin(n * 15);
     U.uAx.value.set(axV, axH);
     U.uAndas.value = andning(n) + d('andas') + skratt * 5 * Math.sin(n * 15);
-    const lyft = talar * 0.38 * Math.max(0, Math.sin(n * 4.3));
+    const lyft = talar * 0.38 * ts.bryn;
     // (han blinkar med sitt högra öga, och det brynet går ned lite)
     const vink = d('vink');
     U.vink.value = vink;
@@ -5304,6 +5369,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const fB = kl && kl.fB;
     if (fA) svang(fA, t, a);
     if (fB) svang(fB, t, b);
+    // (händerna i luften lever, levande: bara i gesterna, inte när han har något i händerna i klippet)
+    const saker = Boolean(kl && (kl.kaffe || kl.cig || kl.pen || kl.eld || kl.las));
+    levande(a, saker ? 0 : na.hall, Math.max(styrA, extraA ? 1 : 0, bortA), n, 0);
+    levande(b, saker ? 0 : nb.hall, Math.max(styrB, extraB ? 1 : 0, bortB), n, 1);
     bekvam(sa, a, 1, VILA_A[0], styrA, t, MINNE.A, E_, Wr_);
     // fingrarna trummar bara i vilan, med den ena eller den andra handen
     const iVila = t < 2.5 || (t > 9.95 && t < 20);
@@ -5400,6 +5469,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       trumPeka = sort === 'peka';
       trumHand = hand;
       trumT = sistaN + 0.05;
+      trumV.fart = 0.85 + 0.35 * Math.random();
+      for (let i = 0; i < 4; i++) { trumV.fas[i] = (Math.random() - 0.5) * 0.3; trumV.hojd[i] = 0.75 + 0.45 * Math.random(); }
     },
     // Din kupong på disken, eller null när den inte ligger där: o, ex, ey (kupongens mått → världen),
     // vila: var pennan ligger { x, y, a } (spetsen, och riktningen mot änden i grader).
