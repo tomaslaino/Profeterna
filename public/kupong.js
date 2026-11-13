@@ -768,7 +768,7 @@ function renderCreate(editId) {
   KP.view = { mode: 'new', edit: editId };
   KP.allDays = false;
   const el = $('#coupon');
-  const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
+  const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...filterComps()];
   // Efter Ladda upp system: vad som kom med från bilden (systembild.js).
   const note = window.Systembild ? Systembild.note() : '';
   const tools = '<div class="toolbar kp-tools">' +
@@ -886,7 +886,7 @@ function renderPickList() {
   const q = fold(KP.q.trim());
   const picks = KP.draft.picks;
   const all = pickable().filter((m) => {
-    if (KP.comp !== 'all' && m.comp !== KP.comp) return false;
+    if (!inComp(m, KP.comp)) return false;
     return !q || fold(`${m.home} ${m.away}`).includes(q);
   });
   // Först bara närmaste omgången (och det som redan är valt); sökningen

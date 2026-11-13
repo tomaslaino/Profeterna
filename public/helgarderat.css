@@ -217,6 +217,8 @@ a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 
 .hg-ruta { display: grid; place-items: center; width: calc(var(--hg-k) * 17px); height: calc(var(--hg-k) * 17px); box-sizing: border-box; background: var(--ruta);
   box-shadow: inset 0 0 0 calc(var(--hg-k) * 0.45px) var(--rod); }
 .hg-skold.mot { width: 62%; height: 62%; vertical-align: 0; }
+/* ett landslag: flaggan i sköldens ställe, bredare än hög, så den får mer av rutan (2026-11-13) */
+.hg-skold.mot.flagga { width: 78%; height: 78%; }
 .hg-ruta-tid { color: var(--svart); font: 400 calc(var(--hg-k) * 5.4px)/1 var(--skriv); white-space: nowrap; }
 .hg .hg-plats { display: flex; align-items: center; gap: calc(var(--hg-k) * 1.6px); margin-top: calc(var(--hg-k) * 2.6px); color: var(--rod);
   font: var(--etikett); line-height: 1.3; letter-spacing: 0.16em; text-transform: uppercase; }
