@@ -23,9 +23,11 @@
 //   TOPPLISTOR tavlans lappar som listor över hela omgången: styrkan (per
 //              division), kryss, tur och otur, mot oddsen och motståndet
 //   REGISTRET  lagen och spelarna (fliken hette LAGEN till 2026-11-13; i
-//              koden heter den fortfarande lagen): de fyra divisionerna,
-//              lagen i omgången ljusa; ett lag
-//              öppnar lagkortet med truppen (speltid, mål, de
+//              koden heter den fortfarande lagen). Underraden säger vad och
+//              var: LAG eller SPELARE, och divisionen. LAG är divisionens lag,
+//              de i omgången ljusa; SPELARE är divisionens spelare från A
+//              till Ö med plats, lag, speltid och mål. Ett lag öppnar
+//              lagkortet med truppen (speltid, mål, de
 //              skadade), och en spelare spelarkortet: läget, speltiden, mål
 //              och xG, och hur laget har gått med och utan honom i startelvan
 //              mot oddsen (mu i data/players/<division>.json)
@@ -74,6 +76,8 @@ window.RumRegister = (() => {
   const TAV = { EFL: 'Ligacupen', FAC: 'FA-cupen' };
   // flest träffar i en lista
   const LISTA = 20;
+  // så många rader skrivs en och en; resten av en lång lista kommer på en gång
+  const SKRIV = 50;
   // duken på disken (scenens px), där datorn syns med sin skugga
   const BOX = { x: 1200, y: 425, w: 250, h: 150 };
   // terminalen: minst så här breda rader (telefonen), och så många rader ryms på höjden (dator)
@@ -548,7 +552,21 @@ window.RumRegister = (() => {
       for (const x of omgLag()) { const t = lagOf(x); if (t) n[t.comp] = (n[t.comp] || 0) + 1; }
       return DIVS.slice().sort((a, b) => (n[b] || 0) - (n[a] || 0))[0];
     }
-    const divFlikar = (d, kort2) => rad(...DIVS.flatMap((x, k) => [[kort2 ? DIVK[x] : up(DIVNAME[x]), x === d ? 'i' : '', x === d ? null : `#div:${x}`], [k < DIVS.length - 1 ? '   ' : '', '']]));
+    // Underraden i registret säger vad och var: LAG eller SPELARE till
+    // vänster, divisionen till höger, de valda omvända. Divisionerna har
+    // hela namnen när raden ryms (annars PL, CH, L1 och L2, och namnet står
+    // under strecket).
+    const SLAG = [['lag', 'LAG', 'div'], ['spelare', 'SPELARE', 'spelarna']];
+    const helaNamn = () => 20 + DIVS.reduce((n, x) => n + DIVNAME[x].length + 3, -3) <= A.bred;
+    function regRad(slag, d) {
+      const typ = SLAG.find(([id]) => id === slag)[2];
+      const hela = helaNamn();
+      return rad(
+        ...SLAG.flatMap(([id, namn, t]) => [[namn, id === slag ? 'i' : '', id === slag ? null : `#${t}:${d}`], ['   ', '']]),
+        ['|', 'd'], ['   ', ''],
+        ...DIVS.flatMap((x, k) => [[hela ? up(DIVNAME[x]) : DIVK[x], x === d ? 'i' : '', x === d ? null : `#${typ}:${x}`], [k < DIVS.length - 1 ? '   ' : '', '']]),
+      );
+    }
     // en division: lagen i bokstavsordning (två spalter på datorn), lagen i
     // omgången ljusa
     function lagen(div, R) {
@@ -556,8 +574,8 @@ window.RumRegister = (() => {
       const j = DIVS.indexOf(d);
       R.sido = [j > 0 ? `#div:${DIVS[j - 1]}` : null, j < DIVS.length - 1 ? `#div:${DIVS[j + 1]}` : null];
       const smal = A.bred < 60;
-      const r = [divFlikar(d, smal), streck()];
-      if (smal) r.push(rad([up(DIVNAME[d]), 'd']));
+      const r = [regRad('lag', d), streck()];
+      if (!helaNamn()) r.push(rad([up(DIVNAME[d]), 'd']));
       if (!A.stats) return [...r, prickar('HÄMTAR', '')];
       const l = lagIDiv(d);
       const k = smal ? 1 : 2;
@@ -588,11 +606,13 @@ window.RumRegister = (() => {
       const [sist, forst] = e.split(', ');
       return forst && sist.length + 4 <= n ? `${sist}, ${forst[0]}.` : sist.slice(0, n);
     }
+    // i truppen och i spelarlistan: de som har spelat och de som är skadade (l = laget(x))
+    const medraknad = (x, l) => (x.p.min || 0) > 0 || Boolean(l && l[0] !== 'SPELKLAR');
     function trupp(t, veil) {
       if (!A.P || !t) return null;
       return A.P.spelare.filter((x) => String(x.p.teamId) === String(t.espnId))
         .map((x) => ({ x, l: laget(x) }))
-        .filter(({ x, l }) => (x.p.min || 0) > 0 || (l && l[0] !== 'SPELKLAR'))
+        .filter(({ x, l }) => medraknad(x, l))
         .sort((a, b) => (veil ? (POSORD[a.x.p.pos] ?? 4) - (POSORD[b.x.p.pos] ?? 4) : (b.x.p.min || 0) - (a.x.p.min || 0)) || efternamn(a.x.p.name).localeCompare(efternamn(b.x.p.name), 'sv'));
     }
 
@@ -642,6 +662,36 @@ window.RumRegister = (() => {
       const hit = list.find((a) => { const n = norm(a.name); return n && (n === x.n || t.includes(n) || n.split(' ').every((w) => t.includes(w))); });
       if (!hit) return ['SPELKLAR'];
       return [up(hit.status), ...String(hit.news || '').split(' · ').filter(Boolean).map(up)];
+    }
+
+    // Spelarna i en division från A till Ö (efternamnet): platsen, laget,
+    // speltiden och målen, samma spelare som i trupperna. Läget (skadad,
+    // avstängd) står sist när raden ryms. Med dolda resultat står ? för
+    // speltiden och målen; ordningen avslöjar inget.
+    function spelarna(div, S, R) {
+      const d = DIVS.includes(div) ? div : standardDiv();
+      const j = DIVS.indexOf(d);
+      R.sido = [j > 0 ? `#spelarna:${DIVS[j - 1]}` : null, j < DIVS.length - 1 ? `#spelarna:${DIVS[j + 1]}` : null];
+      R.slojas = true;
+      const r = [regRad('spelare', d), streck()];
+      if (!A.P) return [...r, prickar('HÄMTAR', '')];
+      const l = A.P.spelare.filter((x) => x.div === d).map((x) => ({ x, l: laget(x), e: efternamn(x.p.name) }))
+        .filter(({ x, l: lg }) => medraknad(x, lg))
+        .sort((a, b) => a.e.localeCompare(b.e, 'sv'));
+      if (!l.length) return [...r, rad([up(DIVNAME[d]), 'd']), rad('OKÄNT')];
+      // namnet, platsen (4), laget (T: de korta namnen har högst elva
+      // tecken, utom Chesterfield), MIN och MÅL (5 + 4) och läget när det ryms
+      const T = A.bred >= 60 ? 14 : 12;
+      const W = Math.min(26, A.bred - T - 13);
+      const lage = A.bred - (W + T + 13) >= 9;
+      r.push(rad([pad(`${up(DIVNAME[d])} · ${l.length} SPELARE`, W + 4 + T), 'd'], [`${padL('MIN', 5)}${padL('MÅL', 4)}`, 'd']));
+      for (const { x, l: lg } of l) {
+        const st = lg && lg[0] !== 'SPELKLAR' ? STATUS[lg[0]] || lg[0] : '';
+        r.push(radQ(`#spelare:${x.p.id}`, [pad(namnPa(x.p.name, W - 1), W), st ? 'd' : ''], [pad(x.p.pos || '', 4), 'd'],
+          [pad(kort(x.p.team).slice(0, T - 1), T), 'd'], padL(S.veil ? '?' : x.p.min || 0, 5), padL(S.veil ? '?' : x.p.g || 0, 4),
+          [lage && st ? `  ${st}` : '', 'v']));
+      }
+      return r;
     }
 
     function spelarkort(x, S, R) {
@@ -789,7 +839,8 @@ window.RumRegister = (() => {
     const DELAR = [
       { namn: 'KUPONGEN', typ: 'FLIK', q: '#flik:kupongen', ord: ['kupongen', 'kupong', 'matcherna', 'omgangen', 'formen'] },
       { namn: 'TOPPLISTOR', typ: 'FLIK', q: '#flik:listor', ord: ['topplistor', 'topplistorna', 'listor', 'listorna'] },
-      { namn: 'REGISTRET', typ: 'FLIK', q: '#flik:lagen', ord: ['registret', 'register', 'lagen', 'spelarna', 'trupperna', 'ligorna', 'divisionerna'] },
+      { namn: 'REGISTRET', typ: 'FLIK', q: '#flik:lagen', ord: ['registret', 'register', 'lagen', 'trupperna', 'ligorna', 'divisionerna'] },
+      { namn: 'SPELARE', typ: 'REGISTRET', q: '#spelarna:', ord: ['spelare', 'spelarna'] },
       { namn: 'STYRKA', typ: 'TOPPLISTA', q: '#amne:styrka', ord: ['styrka', 'styrkan', 'starkast', 'svagast'] },
       { namn: 'KRYSS', typ: 'TOPPLISTA', q: '#amne:kryss', ord: ['kryss', 'kryssar', 'oavgjort'] },
       { namn: 'TUR', typ: 'TOPPLISTA', q: '#amne:tur', ord: ['tur', 'turen', 'otur'] },
@@ -931,7 +982,8 @@ window.RumRegister = (() => {
         return x ? spelarkort(x, S, R) : [prickar('HÄMTAR', '')];
       }
       const t = vy.lag && lagOf(vy.lag);
-      return t ? lagkort(t, S, R) : lagen(vy.div, R);
+      if (t) return lagkort(t, S, R);
+      return vy.slag === 'spelare' ? spelarna(vy.div, S, R) : lagen(vy.div, R);
     }
 
     function bygg(vy) {
@@ -983,8 +1035,10 @@ window.RumRegister = (() => {
       rull.scrollTop = 0;
       const delar = h.match(/<div class="tr[^"]*"[^>]*>.*?<\/div>(?=<div class="tr|$)/g) || [];
       let i = 0;
+      // (en lång lista skrivs så långt skärmen räcker, sedan resten på en gång)
       const steg = () => {
         if (sk !== A.sk) return;
+        if (i >= SKRIV) { ut.insertAdjacentHTML('beforeend', delar.slice(i).join('')); return; }
         ut.insertAdjacentHTML('beforeend', delar[i++] || '');
         if (i < delar.length) setTimeout(steg, 9);
       };
@@ -999,14 +1053,20 @@ window.RumRegister = (() => {
       lagg();
     }
 
-    // Till en vy: den förra sparas, så att Esc går tillbaka dit
-    function ga(vy) {
-      A.bak = [...A.bak, A.vy].slice(-30);
+    // Till en vy: den förra sparas, så att Esc går tillbaka dit – med var
+    // den stod rullad och den markerade raden när den syntes (har), så att
+    // man kommer tillbaka till samma ställe i en lång lista
+    function ga(vy, har = true) {
+      A.bak = [...A.bak, har ? { ...A.vy, y: rull.scrollTop, sel: A.sel } : A.vy].slice(-30);
       visa(vy, true);
     }
     function tillbaka() {
       if (!A.bak.length) { o.close(); return; }
-      visa(A.bak.pop(), true);
+      const v = A.bak.pop();
+      if (!v.y) { visa(v, true); return; }
+      visa(v, false);
+      rull.scrollTop = v.y;
+      valj(v.sel, false);
     }
     // förra eller nästa (match, lista, division, lag eller spelare); i flikarnas början flikarna
     function sido(d) {
@@ -1021,7 +1081,7 @@ window.RumRegister = (() => {
       const j = i < 0 ? 0 : i + d;
       if (j >= 0 && j < FLIKAR.length) visa({ flik: FLIKAR[j][0] }, true);
     }
-    // vyn som en tryckbar bit leder till (#mote:…, #lag:…, #spelare:…, #amne:…, #div:…, #flik:… eller #nr)
+    // vyn som en tryckbar bit leder till (#mote:…, #lag:…, #spelare:…, #amne:…, #div:…, #spelarna:…, #flik:… eller #nr)
     const GAMLA = { omgangen: 'listor', spelarna: 'lagen' };
     function vyAv(q) {
       const [typ, ...rest] = q.slice(1).split(':');
@@ -1030,6 +1090,7 @@ window.RumRegister = (() => {
       if (typ === 'mote') return { flik: 'kupongen', mote: id };
       if (typ === 'amne') return { flik: 'listor', amne: id };
       if (typ === 'div') return { flik: 'lagen', div: id };
+      if (typ === 'spelarna') return { flik: 'lagen', div: id, slag: 'spelare' };
       if (typ === 'lag') return lagOf(id) ? { flik: 'lagen', lag: id } : null;
       if (typ === 'spelare') return { flik: 'lagen', spelare: id };
       if (typ === 'flik') return { flik: GAMLA[id] || id };
@@ -1060,10 +1121,10 @@ window.RumRegister = (() => {
       if (q.startsWith('#flik:')) { A.bak = []; visa(vyAv(q), true); return null; }
       const vy = vyAv(q);
       if (iSok) A.vy = fore;
-      if (vy && ((q.startsWith('#amne:') && A.vy.flik === 'listor') || (q.startsWith('#div:') && A.vy.flik === 'lagen' && !A.vy.lag && !A.vy.spelare))) { visa(vy, true); return null; }
+      if (vy && ((q.startsWith('#amne:') && A.vy.flik === 'listor') || ((q.startsWith('#div:') || q.startsWith('#spelarna:')) && A.vy.flik === 'lagen' && !A.vy.lag && !A.vy.spelare))) { visa(vy, true); return null; }
       if (vy) {
         if (vy.mote) loadMatches();
-        ga(vy);
+        ga(vy, !iSok);
         if (iSok) beviljad();
         return null;
       }
