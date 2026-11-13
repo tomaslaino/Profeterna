@@ -83,16 +83,16 @@ window.RumHasse = (() => {
     vy.id = 'rum-hasse-vy';
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
-    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"></div><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
+    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"></div><button type="button" class="rh-lop" hidden></button><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
       '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
     H.vy = vy;
-    // Namnet uppe i hörnet går undan över matchbladet och kupongen i handen (.undan i rum-hasse.css).
+    // Namnet uppe i hörnet går undan över matchbladet, kupongen i handen och löpsedeln inzoomad (.undan i rum-hasse.css).
     // Båda läggs och tas bort på flera ställen (rum-matchblad.js, rum-hasse-kupong.js), så vyn bevakas.
     const hdr = sving.parentElement && sving.parentElement.querySelector(':scope > .rum-hdr');
     if (hdr && window.MutationObserver) {
-      new MutationObserver(() => hdr.classList.toggle('undan', Boolean(vy.querySelector('.rum-bladlager, .rh-kupong.over'))))
+      new MutationObserver(() => hdr.classList.toggle('undan', Boolean(vy.querySelector('.rum-bladlager, .rh-kupong.over, .rh-lop-nara'))))
         .observe(vy, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
     }
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
@@ -142,6 +142,11 @@ window.RumHasse = (() => {
       const dx = e.clientX - d.x;
       if (dx <= -64 && -dx > 1.5 * Math.abs(e.clientY - d.y)) stang();
     });
+    // veckans löpsedel på bardiskens front: ett klick visar den inzoomad (lopNara), och man är kvar hos honom
+    vy.querySelector('.rh-lop').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (H.on && !H.svanger) lopNara();
+    });
     // namnet står kvar hos honom (rum-hasse.css) och leder som i rummet dit: tillbaka
     const namn = rum.querySelector('.rum-brand');
     if (namn) namn.addEventListener('click', () => { if (H.on) stang(); });
@@ -157,6 +162,11 @@ window.RumHasse = (() => {
       // spelarkortet ovanpå bladets startelvor sköter sig självt: Esc stänger bara det, som i rummet
       if (document.querySelector('dialog[open]')) return;
       e.stopPropagation();
+      // med löpsedeln inzoomad: Esc lägger bort den (och man är kvar hos honom)
+      if (H.lop) {
+        if (e.key === 'Escape') lopUt();
+        return;
+      }
       // med matchbladet framme: Esc lägger bort det, och pilarna byter sida
       if (H.blad) {
         const n = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1, ArrowDown: 1 }[e.key];
@@ -175,6 +185,7 @@ window.RumHasse = (() => {
       if (!H.on || H.svanger || document.hidden) return;
       ljusNu();
       pultPapper();
+      lopsedel();
     }, 60000);
     addEventListener('resize', () => {
       if (!H.on) return;
@@ -608,6 +619,7 @@ window.RumHasse = (() => {
     }
     if (H.kupong) H.kupong.passa();
     pultPapper();
+    lopsedel();
     passaSpalter();
     return disk;
   }
@@ -683,6 +695,194 @@ window.RumHasse = (() => {
       return [q.x / q.w, q.y / q.w];
     });
     return { w, h, hornen };
+  }
+
+  // ---------- veckans löpsedel ----------
+  //
+  // Veckans löpsedel (rum-affischer.js, som ritar den åt rummet) hänger här, i en smal svart ram bakom glas, i
+  // mässingskroken i fältet på bardiskens front nedanför till höger om honom (SCEN.LOPSEDEL), i en tunn tråd, så
+  // att ramen lutar lite ut från fronten upptill (2026-11-13: "sätt den här löpsedeln nedanför till höger om
+  // hasse backe – där nere på väggen – på ett snyggt sätt istället"; förut stod den i ett ställ utanför
+  // affärens dörr). Den hör till hans bild: samma kamera (lopsedel i rum-hasse-3d.js), lika oskarp som väggen,
+  // och i det ljus som faller på fronten där, läst ur väggens bild (lopLjus), så att den inte tar mer plats än
+  // det andra på väggen. Pulten ligger framför den. Ett klick visar den inzoomad och skarp (lopNara).
+  // Ramen i sina egna bildpunkter: sedeln (100 × 140) RAM in från kanten, och tråden till kroken ovanför.
+  const LOP = { RAM: 4, W: 108, H: 148 };
+  // Tråden: från kroken (NED över ramen, i ramens mått) ned till fästena på ramens baksida, en bit in från
+  // sidorna och under överkanten, så att det som syns är ett smalt V från kroken till överkanten.
+  const LOP_TRAD = (() => {
+    const ned = 92 / (600 / LOP.W);
+    const fast = [40, 14];
+    const ut = (fast[0] * ned) / (ned + fast[1]);
+    const m = LOP.W / 2;
+    return { ned, d: `M${(m - ut).toFixed(2)} ${ned.toFixed(2)} L${m} 0.4 L${(m + ut).toFixed(2)} ${ned.toFixed(2)}` };
+  })();
+  function lopsedel() {
+    const knapp = $('.rh-lop');
+    const sedel = window.Rum && Rum.lopsedel ? Rum.lopsedel() : null;
+    // (utan sedel: rummets saker är inte ritade än; utan lopsedel: en äldre rum-hasse-3d.js i cachen)
+    clearTimeout(H.lopT);
+    if (!knapp || !H.v || !H.m || !H.m.lopsedel || !sedel || !sedel.childElementCount) {
+      if (knapp) knapp.hidden = true;
+      // (rummets saker ritas efter figurerna, och i telefonen hinner man hit först: igen strax, medan hans bild syns)
+      if (knapp && H.m && H.m.lopsedel) H.lopT = setTimeout(() => { if (!H.vy.hidden) lopsedel(); }, 2500);
+      return;
+    }
+    // samma sedel som i rummets ritning, kopierad när den har ändrats (rubriken, numret, slitaget)
+    const html = sedel.outerHTML;
+    if (html !== H.lopHtml) {
+      H.lopHtml = html;
+      knapp.innerHTML = `<svg class="rh-lop-trad" viewBox="0 0 ${LOP.W} ${LOP_TRAD.ned.toFixed(2)}" aria-hidden="true"><path d="${LOP_TRAD.d}"/></svg>` +
+        `<span class="rh-lop-ram">${html}<i class="rh-lop-glas"></i></span><i class="rh-lop-ljus"></i>`;
+      knapp.setAttribute('aria-label', `${sedel.title || 'Veckans löpsedel'}. Visa den.`);
+    }
+    const b = H.m.BAK[H.hog ? 'hog' : 'bred'];
+    const p = H.m.lopsedel(H.v, LOP.W, LOP.H, b);
+    knapp.style.transform = p.form;
+    knapp.style.setProperty('--oskarp', `${(p.oskarp / p.skala).toFixed(2)}px`);
+    // ljuset ändras med väggen (lysröret, dagsljuset och vädret: vagg) och med fönstret (var ramen syns i bilden)
+    const som = `${H.vaggNr}|${p.ruta.flat().map((x) => x.toFixed(0)).join()}`;
+    if (som !== H.lopLjusSom) {
+      H.lopLjusSom = som;
+      const l = lopLjus(p.ruta);
+      knapp.style.setProperty('--lop-ljus', l ? l[0] : '');
+      knapp.style.setProperty('--lop-ljus2', l ? l[1] : '');
+    }
+    knapp.hidden = false;
+  }
+  // Ljuset på bardiskens front där ramen hänger, läst ur väggens bild (scripts/hasse/bak.html): bilden är trä i
+  // ljus, tonat (aces efter 0,7 gånger ljuset) och gammakorrigerat, så att ljuset är bildpunkten tillbaka genom
+  // tonen, delat med träets färg (barTra i bak.html, fronten i genomsnitt). Samma ljus på sedelns papper ger dess
+  // färg i bilden, och den läggs över ramen som multiplikation (--lop-ljus överst och --lop-ljus2 nederst, där
+  // fronten ofta är mörkare under skivan). Ingen bild av väggen: inget (rum-hasse.css har en dämpad ton).
+  // Papperet reflekterar ungefär tio gånger så mycket som den mörka mahognyn, och i det ljus som träet visar blev
+  // sedeln nästan vit och det ljusaste på väggen. Den ska inte ta uppmärksamheten (2026-11-13: "inte på ett sätt
+  // som stjäl för mycket uppmärksamhet"), så ljuset dämpas (DAMPA) och gulnar som glaset i en bar där det röks
+  // cigarr: den hänger också i skuggan under skivans kant, som bara delvis syns i träet bredvid.
+  const TRA = [0.08, 0.0284, 0.0113];
+  const DAMPA = [0.42, 0.38, 0.32];
+  const PAPPER = [241, 232, 213].map((x) => x / 255);
+  function lopLjus(ruta) {
+    const c = H.vy.classList.contains('vagg') ? $('.rh-vagg') : null;
+    if (!c || !c.width) return null;
+    const xs = ruta.map((q) => q[0]);
+    const ys = ruta.map((q) => q[1]);
+    // (inom ramen, en bit in från kanterna)
+    const x0 = Math.max(0, Math.min(...xs));
+    const x1 = Math.min(c.width, Math.max(...xs));
+    const y0 = Math.max(0, Math.min(...ys));
+    const y1 = Math.min(c.height, Math.max(...ys));
+    if (!(x1 - x0 > 4 && y1 - y0 > 4)) return null;
+    // (en liten kopia av rutan, så att väggens duk inte behöver läsas tillbaka från grafikkortet)
+    const N = 12;
+    const k = H.lopDuk || (H.lopDuk = document.createElement('canvas'));
+    k.width = N;
+    k.height = N;
+    const kx = k.getContext('2d', { willReadFrequently: true });
+    let d;
+    try {
+      kx.clearRect(0, 0, N, N);
+      kx.drawImage(c, x0, y0, x1 - x0, y1 - y0, 0, 0, N, N);
+      d = kx.getImageData(0, 0, N, N).data;
+    } catch (e) {
+      return null;
+    }
+    const lin = (x) => (x / 255) ** 2.2;
+    // aces tillbaka: y = x(2,51x + 0,03) / (x(2,43x + 0,59) + 0,14)
+    const tillbaka = (y) => {
+      const v = Math.min(0.985, y);
+      const a = 2.51 - 2.43 * v;
+      const bb = 0.03 - 0.59 * v;
+      return (-bb + Math.sqrt(bb * bb + 4 * a * 0.14 * v)) / (2 * a);
+    };
+    const aces = (x) => (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14);
+    const halva = (r0, r1) => {
+      const s = [0, 0, 0];
+      let n = 0;
+      for (let y = r0; y < r1; y++) for (let x = 0; x < N; x++) {
+        const i = (y * N + x) * 4;
+        if (d[i + 3] < 200) continue;
+        for (let j = 0; j < 3; j++) s[j] += lin(d[i + j]);
+        n++;
+      }
+      if (!n) return null;
+      // ljuset på fronten, och papperet i det (högst så ljust som papperet självt)
+      const ljus = s.map((x, j) => (tillbaka(x / n) / 0.7 / TRA[j]) * DAMPA[j]);
+      const ton = ljus.map((e, j) => Math.min(1, aces(0.7 * e * lin(PAPPER[j] * 255)) ** (1 / 2.2) / PAPPER[j]));
+      return `rgb(${ton.map((x) => Math.round(x * 255)).join(', ')})`;
+    };
+    const o = halva(0, N / 2);
+    const u = halva(N / 2, N);
+    return o && u ? [o, u] : null;
+  }
+  // Närbilden: löpsedeln förstoras från där den hänger till mitt i bilden, skarp och i fullt ljus, över baren
+  // som mörknar bakom. Ett klick, Esc eller bakåt lägger tillbaka den, och man är kvar hos honom. Med minskad
+  // rörelse tonar den bara in och ut.
+  function lopNara() {
+    const knapp = $('.rh-lop');
+    if (H.lop || !knapp || knapp.hidden || !H.lopHtml) return;
+    const ram = knapp.querySelector('.rh-lop-ram');
+    const fran = ram.getBoundingClientRect();
+    const n = document.createElement('div');
+    n.className = 'rh-lop-nara';
+    n.setAttribute('role', 'dialog');
+    n.setAttribute('aria-label', knapp.getAttribute('aria-label').replace(/\. Visa den\.$/, ''));
+    n.tabIndex = -1;
+    // (ordet Tillbaka i foten lägger bort den som bakåt: RumBak.ned)
+    n.innerHTML = `<i class="rh-lop-fond"></i><div class="rh-lop-bild"><span class="rh-lop-ram">${H.lopHtml}<i class="rh-lop-glas"></i></span></div>`;
+    H.vy.append(n);
+    const bild = n.querySelector('.rh-lop-bild');
+    // så stor som ryms: det mesta av höjden, och inom bredden
+    const k = Math.min((innerHeight * 0.84) / LOP.H, (innerWidth * 0.9) / LOP.W);
+    bild.style.setProperty('--k', k.toFixed(3));
+    const ut = () => lopUt();
+    n.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ut();
+    });
+    H.lop = { n, knapp };
+    knapp.classList.add('nara');
+    if (window.RumBak) RumBak.fram('hasse-lop', (nu) => lopUt(nu));
+    n.focus({ preventScroll: true });
+    const fond = n.querySelector('.rh-lop-fond');
+    if (calm()) {
+      n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+      return;
+    }
+    // från ramen på fronten (dess ruta i fönstret) till mitten
+    const mal = bild.getBoundingClientRect();
+    const s = fran.height / mal.height;
+    const dx = fran.left + fran.width / 2 - (mal.left + mal.width / 2);
+    const dy = fran.top + fran.height / 2 - (mal.top + mal.height / 2);
+    bild.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${s})`, filter: 'brightness(0.55)' }, { transform: 'none', filter: 'brightness(1)' }],
+      { duration: 460, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' });
+    fond.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 360, easing: 'ease-out' });
+    H.lop.fran = [dx, dy, s];
+  }
+  // tillbaka till fronten (nu: direkt, utan rörelse)
+  function lopUt(nu = false) {
+    const L = H.lop;
+    if (!L) return;
+    H.lop = null;
+    if (window.RumBak) RumBak.bort('hasse-lop');
+    const klar = () => {
+      L.n.remove();
+      L.knapp.classList.remove('nara');
+    };
+    if (nu || (window.RumBak && RumBak.snabbt)) {
+      klar();
+      return;
+    }
+    if (H.on) L.knapp.focus({ preventScroll: true });
+    L.n.style.pointerEvents = 'none';
+    if (calm() || !L.fran) {
+      L.n.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' }).finished.then(klar, klar);
+      return;
+    }
+    const [dx, dy, s] = L.fran;
+    L.n.querySelector('.rh-lop-fond').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+    L.n.querySelector('.rh-lop-bild').animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: `translate(${dx}px, ${dy}px) scale(${s})`, filter: 'brightness(0.55)' }],
+      { duration: 340, easing: 'cubic-bezier(0.5, 0, 0.75, 0.6)', fill: 'forwards' }).finished.then(klar, klar);
   }
 
   async function bygg() {
@@ -905,6 +1105,10 @@ window.RumHasse = (() => {
     H.vanaT = H.t0 + VANA[0] * 0.4 + Math.random() * VANA[0] * 0.3;
     loop();
     if (H.utSen) stang();
+    else if (/[?&]rum-lop\b/.test(location.search) && !H.lopVisad) {
+      H.lopVisad = true;
+      lopNara();
+    }
   }
   // Bakåt (rum-bak.js): på väg dit vänder man när man är framme, annars går man tillbaka (nu: direkt).
   function bak(nu) {
@@ -919,6 +1123,7 @@ window.RumHasse = (() => {
       if (!H.on) return;
       // någon har lämnat rummet (bakåt i webbläsaren, en länk): direkt hem
       if (H.rum.hidden) {
+        lopUt(true);
         bladetUt(true);
         H.on = false;
         bronBort();
@@ -974,6 +1179,7 @@ window.RumHasse = (() => {
   async function stang(nu = false) {
     if (!H.on || H.svanger) return;
     if (window.RumBak) RumBak.bort('hasse');
+    lopUt(true);
     bladetUt(true);
     H.on = false;
     bronBort();

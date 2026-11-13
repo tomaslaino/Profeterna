@@ -46,6 +46,18 @@ export const SCEN = {
   // emellan blir dubbelt så breda. Ingen post står bakom hans huvud. Glaset sitter DJUP in i väggen. Väggen
   // (scripts/hasse/bak.html) och utsikten (rum-hasse-ute.js) läser samma mått.
   FONSTER: { Y0: -575, Y1: 1500, X: [[-5400, -1400], [-1400, 1900], [1900, 5500]], KARM: 34, DJUP: 120 },
+  // Kamerans lins (tunn lins, scripts/hasse/bak.html): öppningens radie R, och F, avståndet längs axeln där
+  // det är skarpt (där han sitter). Väggen är oskarp efter den, och löpsedeln på bardisken lika oskarp.
+  LINS: { R: 20, F: 2880 },
+  // Bardiskens front bakom honom (barens mått), som bak.html bygger den: fyllningarnas framsida i Z, ramarna och
+  // stolparna FRAM framför dem, och en mässingskrok överst mitt i varje fält (KROK: krokens skaft, i y). Fälten är
+  // en halv meter breda, med mitten i x = 1650 ± n · 900 (stolparna i x = 1200 ± n · 900).
+  FRONT: { Z: -1560, FRAM: 16, KROK: -898 },
+  // Veckans löpsedel (rum-affischer.js, lopsedel i rum-hasse.js) i en svart ram, som hänger i en tråd i kroken i
+  // fältet nedanför till höger om honom (X, fältets mitt), 2026-11-13: ramens bredd B (höjden följer sedeln),
+  // hur långt under kroken ramens överkant hänger (NED), och hur långt ut från fyllningen ramens framsida står
+  // upptill och nedtill (UT): tråden drar ut överkanten mot kroken, och nederkanten vilar mot fyllningen.
+  LOPSEDEL: { X: 1650, B: 600, NED: 92, UT: [50, 22] },
 };
 
 // Kameran: läget, och axlarna i världen (höger, upp och bakåt; den tittar mot −bak). Rotationen är

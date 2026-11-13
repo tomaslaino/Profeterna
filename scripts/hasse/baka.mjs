@@ -3,6 +3,7 @@
 // bak ger väggen bakom honom i baren (bak.png, eller bak-hog.png för telefonen på höjden), från figurens kamera
 // och i måtten i BAK (public/rum-hasse-scen.js); bak-lys samma vägg med lysröret i affären tänt (bak-lys.png),
 // bak-dag bara dagsljuset genom affärens fönster, i vitt (bak-dag.png).
+// Med RUTA=x0,y0,x1,y1 bakas bara den rutan (resten genomskinligt): lägg in den i den färdiga bilden med lappa.py.
 // Kräver Google Chrome och en filserver på PORT (standard 8765) med public/ i roten och scripts/hasse/ under
 // /skiss/bake/, och cwebp för att göra webp av resultatet. Se scripts/hasse/README.md.
 import fs from 'node:fs';
@@ -11,7 +12,7 @@ const vad = process.argv[2] || 'atlas';
 const n = +(process.argv[3] || 400);
 const ut = process.env.UT || '.';
 const lage = vad.endsWith('-hog') ? 'hog' : 'bred';
-const lys = vad.startsWith('bak-lys') ? '&lys=1' : vad.startsWith('bak-dag') ? '&dag=1' : '';
+const lys = (vad.startsWith('bak-lys') ? '&lys=1' : vad.startsWith('bak-dag') ? '&dag=1' : '') + (process.env.RUTA ? `&ruta=${process.env.RUTA}` : '');
 async function kor(varv) {
   const c = await oppna({ W: 1000, H: 700, D: 1, tid: 14400000 });
   await c.ga(`/skiss/bake/bak.html?lage=${lage}&n=${varv}${lys}`);
@@ -21,7 +22,7 @@ async function kor(varv) {
   const tappad = await c.ev('window.__tappad()');
   c.stang();
   // (grafikkortet kan tappa bort duken när skuggaren översätts första gången: då en gång till)
-  if (tappad || url.length < 200000) { console.log('om igen', tappad, url.length); return kor(varv); }
+  if (tappad || url.length < (process.env.RUTA ? 20000 : 200000)) { console.log('om igen', tappad, url.length); return kor(varv); }
   return url;
 }
 // Kornet: väggen är ändå oskarp, så en liten oskärpa (blur, bildpunkter) och sedan ett kantbevarande filter

@@ -1326,6 +1326,17 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   löpsedel står nu i ett svart ställ på trottoaren och syns genom dörrens glas, med gatans ljus.
   Väggen under oraklet och fönstrets nedre vänstra hörn är fria. Skivan och allt annat är som förut.
   Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Veckans löpsedel hos Hasse Backe (2026-11-13, användarens önskemål):** "kan du sätta den här
+  löpsedeln nedanför till höger om hasse backe – där nere på väggen – på ett snyggt sätt istället.
+  Inte på ett sätt som stjäl för mycket uppmärksamhet men man ska självklart kunna klicka på den och
+  få se den snygg och inzoomad", och "gör det som du tycker blir snyggast". Ställets plats utanför
+  dörren är tom, och sedeln hänger i stället i en smal svart ram bakom glas i en tunn tråd i
+  mässingskroken i fältet på bardiskens front nedanför till höger om honom: fältet är nästan lika
+  stort som en löpsedel, och kroken fanns redan. Den är lika oskarp som väggen, och ljuset läses ur
+  väggens bild men är dämpat, så att den inte tar uppmärksamheten. Ett klick visar den inzoomad och
+  skarp. Barstolen längst till höger är borta ("ta bort barstolen vb"): i breda fönster, som en
+  telefon på bredden, stod den precis bredvid ramen. Bara rutan kring den bakades om, i alla sex
+  väggbilder (`RUTA` i scripts/hasse/baka.mjs, `lappa.py`). Se [Hasse Backe](#hasse-backe), *Veckans löpsedel*.
 - **IFK och Chelsea utan prickar (2026-11-11, användarens önskemål):** "både IFK och
   chelsea-löpsedlarna är ju prickiga. Kan du ordna så att de inte är det men att de får rimlig
   patina". Prickrastret (ett rutnät, 2 px) blev ett mönster i närbilden. Nu har de samma papper som
@@ -4346,7 +4357,7 @@ ned till frekvensen (`tejpPlats`). Ett tryck på ett namn går dit, byter band o
 (`radioEtikett` i rum-3d.js, som hittar namnet under fingret). Frekvenserna står på ett blad ur ett litet
 spiralblock som är tejpat på väggen till höger om radion (`radiolapp` i rum-inredning.js, en egen duk i bakväggens
 plan, så att det sitter fast på väggen när rummet vrids). Det sitter helt i väggremsan mellan fönsterkarmen och
-veckans löpsedel och en bit ovanför fönsterbänken, så att det inte går över karmens kant eller ned till bänken
+där veckans löpsedel satt till 2026-11-13, en bit ovanför fönsterbänken, så att det inte går över karmens kant eller ned till bänken
 (`LAPP`). Remsan ger bredden (25,5), så bladet är högt (45): där får raderna plats med en handstil som syns nära
 radion, och det längsta namnet (*Guldkanalen 80-tal*) trycks ihop en aning i sidled. Nära, där det syns, ska omgivningen gå att förstå: karmen har en profil (ljus ytterkant
 och en fals i skugga mot glaset, `KARM` i rum.js) i stället för att vara en slät mörk platta, och fönsterbänken slutar
@@ -4765,20 +4776,15 @@ att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enli
 *Är det Sveriges bästa tippare?* handlar om bäst i gänget. Namnen, resultaten och siffrorna
 stämmer; det påhittade är kvällstidningens fraser (*Nu krävs svar*, *Hela målfesten i bilder*),
 aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre varianter, och
-veckan väljer bland dem. Den är den enda som byts, och den står i ett **löpsedelsställ** på
-trottoaren utanför dörren, som utanför en riktig tobaksaffär, och syns genom dörrens glas under
-handtaget (2026-11-13, användarens val: rummet skulle bli lugnare). Stället är svartlackerad plåt
-med sedeln 62 % stor bakom plast, på två ben med en tvärslå (`.rum-lopstall` i rum-affischer.css,
-platsen `STALL` i rum-affischer.js). Det står ute: i bakväggens plan direkt efter utsikten, så att
-dörrens karm, handtaget och smutsen på glaset ligger framför det. Det har gatans ljus: ett kallt
-skimmer på dagen, mörker när det är mörkt ute, lyktstolpens varma sken ovanifrån när den lyser och
-snö på ramen när det ligger snö (rum.js sätter `--ute-dag`, `.ute-lampor` och `.ute-sno` med
-utsikten). Ljuset är lager ovanpå, inga filter, och i närbilden (`.lop-nara`) ljusnar det så att
-rubriken går att läsa. Sedeln sitter rak och gulnar lite med slitaget. I telefonen på höjden ligger
-dörren utanför bilden från början; där syns stället när man drar åt vänster. (Först satt den
-ibland under dörrens handtag, sedan i fönstrets högra hörn och till 2026-11-13 varannan vecka med
-tejp i fönstrets nedre vänstra hörn och varannan med häftstift på väggen under oraklet, i telefonen
-alltid på väggen. Till och med 2026-11-05 var den från den påhittade kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+veckan väljer bland dem. Den är den enda som byts, och den sitter inte i rummet: den hänger hos
+**Hasse Backe** i baren, i en svart ram i mässingskroken på bardiskens front till höger om honom, och
+ett klick där visar den inzoomad (se [Hasse Backe](#hasse-backe), *Veckans löpsedel*). Rummet ritar
+den (`lopsedel` och `rita` i rum-affischer.js, `sedel()`, `Rum.lopsedel`) och han kopierar den. Sedeln
+gulnar lite med slitaget. (Först satt den ibland under dörrens handtag, sedan i fönstrets högra hörn,
+till 2026-11-13 varannan vecka med tejp i fönstrets nedre vänstra hörn och varannan med häftstift på
+väggen under oraklet, i telefonen alltid på väggen, och samma dag en stund i ett löpsedelsställ på
+trottoaren utanför dörren, sett genom dörrens glas. Till och med 2026-11-05 var den från den påhittade
+kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
@@ -4844,7 +4850,7 @@ bland omgångens avgjorda matcher, annars i den senaste färdigspelade kupongen,
 rättning ett mellanläge. Går det dåligt fylls askkoppen (1–11 fimpar), askan hamnar
 bredvid, snuset spills, fläkten (om den står där) går på trean och löpsedlarna på skivan bleks;
 går det riktigt illa ryker två cigaretter och en använd pris ligger på pulten (sedlarna sitter fast
-med skruv, och veckans löpsedel är ny och blir bara lite böjd). Dolda
+med skruv, och veckans löpsedel hos Hasse Backe är ny och gulnar bara lite). Dolda
 resultat räknas inte (gradeRow rättar dem inte). Utan WebGL står sedlarna kvar på en slät skiva,
 men inte sakerna på pulten.
 
@@ -7161,6 +7167,33 @@ därifrån hamnade den under hans kaffefat. I telefonen ligger protokollet under
 Tipsguiden låg där i rummet (ändrat 2026-11-10; samma dag blev Tipsguiden och kvällstidningen en tidning, Helgarderat,
 till höger om kupongen).
 
+**Veckans löpsedel.** Veckans löpsedel (se [Tobaksaffären](#tobaksaffären), *Affischerna*) hänger på bardiskens
+front bakom honom, nedanför till höger om honom (`lopsedel` i [public/rum-hasse.js](public/rum-hasse.js), sedan
+2026-11-13; förut stod den i ett ställ utanför affärens dörr). Fronten har fyllningar i ramar, en halv meter breda,
+med en mässingskrok överst i varje, och fältet till höger om honom är nästan lika stort som en löpsedel. Där hänger
+sedeln i en smal svart aluminiumram bakom glas, i en tunn tråd över kroken: ett smalt V syns från kroken till
+ramens överkant, och ramen lutar lite ut från fronten upptill, där tråden drar, medan nederkanten vilar mot
+fyllningen (`SCEN.LOPSEDEL` och `SCEN.FRONT` i [public/rum-hasse-scen.js](public/rum-hasse-scen.js); fronten och
+krokarna står i samma mått i [scripts/hasse/bak.html](scripts/hasse/bak.html)). Den läggs i hans bild genom samma
+kamera som allt annat, som en `matrix3d` (`lopsedel` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)), före pulten,
+som ligger framför den. Den är lika oskarp som väggen: kamerans tunna lins (`SCEN.LINS`, samma som när väggen bakas)
+ger på det djupet en skiva som blir en gaussisk oskärpa, och väggens bild är dessutom suddad i bakningen. Ljuset är
+frontens där den hänger: en liten kopia av väggens duk under ramen läses (`lopLjus`), bildpunkterna räknas tillbaka
+genom bakningens ton (aces och gamma) till ljuset på träet, och samma ljus på sedelns papper läggs över ramen som
+multiplikation, upptill och nedtill för sig (`--lop-ljus`, `--lop-ljus2`). Det följer alltså lysröret, dagsljuset och
+natten som väggen. Papperet reflekterar ungefär tio gånger så mycket som den mörka mahognyn, och med det ljuset blev
+sedeln det ljusaste på väggen; den är därför dämpad och lite gulnad, som glaset i en bar där det röks cigarr (`DAMPA`),
+så att den inte tar uppmärksamheten från honom. Med musen ljusnar den lite. Sedeln är samma som rummet ritar
+(`Rum.lopsedel`), kopierad när rubriken, numret eller slitaget har ändrats. I telefonen på höjden syns bara dess
+vänstra kant vid bildens högra kant, som dörren i rummet. Barstolen som stod framför fältet bredvid, längst till
+höger, är borta: i breda fönster stod den precis intill ramen. Bara rutan kring den bakades om, i alla sex bilder,
+och lades in i de färdiga (se [scripts/hasse/README.md](scripts/hasse/README.md)).
+
+Ett klick på den, eller Enter, förstorar den från fronten till mitt i bilden (`lopNara`), skarp och i fullt ljus i
+sin ram, över baren som mörknar bakom, och namnet uppe i hörnet går undan. Ett klick, Esc, *Tillbaka* i foten eller
+bakåt lägger tillbaka den (`lopUt`, ett eget lager i rum-bak.js), och man är kvar hos honom. Med minskad rörelse
+tonar den in och ut. `?rum-hasse&rum-lop` visar den inzoomad (för bilder).
+
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på en halv sekund, som när kameran vrids åt vänster: den kommer
 mjukt i gång, går fortast strax före mitten, när bilderna byter plats, och bromsar in länge och mjukt
@@ -7243,7 +7276,8 @@ slutar – det grå höghuset och tegelhuset med den ärgade kupolen, till höge
 rutor från bardiskens skiva och upp förbi bildens överkant, dragna nedåt och bredare när väggen flyttades bakåt så
 att de är lika stora i bilden (`FONSTER` i
 [public/rum-hasse-scen.js](public/rum-hasse-scen.js)), med karmar och poster i samma mörkgrå som skyltfönstret i
-rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna, och barstolen står kvar. Vädret och ljuset
+rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna (barstolen till höger togs bort 2026-11-13, se
+*Veckans löpsedel*). Vädret och ljuset
 är rummets (`Vader.nu`, `RumUte.light` och färgerna i `RumUte.farg`, samma som gatan genom skyltfönstret): himlens
 färger efter klockan, molnen, den låga solens sken, den kalla dagen, tända fönster och lyktor när det skymmer, en
 grön skylt och en röd lampa på höghuset på kvällen, regn och snö som ett dis, dimma som tar andra sidan, snö på
@@ -8740,7 +8774,7 @@ Actions. Notiserna (*Så mår tipslagen*, `data/tidning.json`) är inte skrivna 
 ### Närbilderna
 
 Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
-Nacional 1988, VM 94 och Chelsea 1998 på skivan och veckans löpsedel) och namnet på dörren
+Nacional 1988, VM 94 och Chelsea 1998 på skivan; veckans löpsedel hänger hos Hasse Backe) och namnet på dörren
 tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan

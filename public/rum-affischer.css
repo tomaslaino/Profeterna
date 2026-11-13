@@ -1,6 +1,7 @@
 /* Löpsedlarna i tobaksaffären (rum-affischer.js): på skivan IFK Göteborgs
    UEFA-cup 1982, Nacional 1988, Expressens löpsedel från VM 94 och Chelseas
-   seger i cupvinnarcupen 1998, och veckans löpsedel i stället utanför dörren.
+   seger i cupvinnarcupen 1998, och veckans löpsedel, som hänger hos Hasse
+   Backe i baren (rum-hasse.css).
    Slitaget (--sep, --sat, --blek) sätts i rum-affischer.js. */
 
 /* ---------- det gemensamma: papperet ---------- */
@@ -349,64 +350,6 @@
    .tryck hade de bara tagit bort av skuggan) */
 .rum-lop .tryck::after { content: none; }
 .rum-lop .veck::after { content: ""; position: absolute; inset: 0; background: var(--bukt-ljus) 0 0 / 100% 100%; mix-blend-mode: screen; opacity: 0.5; }
-
-/* ---------- löpsedelsstället utanför dörren ---------- */
-
-/* Ett löpsedelsställ på trottoaren, som utanför en riktig tobaksaffär
-   (2026-11-13), sett genom dörrens glas under handtaget (rum-affischer.js,
-   STALL). Ramen är svartlackerad plåt, 70 × 96, med sedeln 62 % stor bakom
-   plast; två ben med en tvärslå når ner på gatan, där stället skuggar. Det
-   står ute, så det har gatans ljus (rum.js sätter --ute-dag, .ute-lampor och
-   .ute-sno med utsikten): ett kallt skimmer på dagen, mörker när det är mörkt
-   ute och lyktstolpens varma sken ovanifrån när den lyser. Ljuset är lager
-   ovanpå, inte filter: text i filter blir suddig i närbilden. I närbilden
-   (.lop-nara) ljusnar det, så att rubriken går att läsa. */
-.rum-lopstall { position: absolute; display: block; width: 70px; height: 184px; pointer-events: none; }
-.rum-lopstall > i { position: absolute; display: block; }
-.rum-lopstall .ram {
-  left: 0;
-  top: 0;
-  width: 70px;
-  height: 96px;
-  border-radius: 1.4px;
-  background: linear-gradient(180deg, #24262a, #141518 60%, #0f1012);
-  box-shadow: inset 0 0 0 0.6px rgba(255, 255, 255, 0.07), inset 0.8px 0.8px 0 rgba(255, 255, 255, 0.06);
-}
-.rum-lopstall .rum-lop { left: 4px; top: 4px; transform: scale(0.62); transform-origin: 0 0; filter: none; }
-/* plasten framför sedeln: ett svagt blänk snett över och en mörk kant mot ramen */
-.rum-lopstall .plast {
-  left: 4px;
-  top: 4px;
-  width: 62px;
-  height: 86.8px;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%, rgba(255, 255, 255, 0) 72%, rgba(255, 255, 255, 0.05) 80%, rgba(255, 255, 255, 0) 88%);
-  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.45), inset 0 0 2px rgba(0, 0, 0, 0.25);
-}
-.rum-lopstall .ben { top: 94px; width: 3.2px; height: 84px; background: linear-gradient(90deg, #2a2c30, #121316); }
-.rum-lopstall .ben.a { left: 3px; }
-.rum-lopstall .ben.b { right: 3px; }
-/* fötterna av gummi */
-.rum-lopstall .ben::after { content: ""; position: absolute; left: -1px; bottom: -1px; width: 5.2px; height: 2px; border-radius: 1px; background: #0b0b0c; }
-.rum-lopstall .sla { left: 4px; top: 150px; width: 62px; height: 2.2px; background: linear-gradient(180deg, #2a2c30, #121316); }
-.rum-lopstall .skugga { left: -12px; top: 172px; width: 94px; height: 11px; background: radial-gradient(closest-side, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0)); }
-/* gatans ljus över ramen och sedeln (inte benen, som är svarta ändå, eller gatan mellan dem) */
-.rum-lopstall .ute { left: 0; top: 0; width: 70px; height: 96px; border-radius: 1.4px; transition: opacity 0.4s; }
-.rum-lopstall .kall { background: #6e8caf; opacity: calc(0.16 * var(--ute-dag, 1)); }
-.rum-lopstall .mork { background: #05070c; opacity: calc(0.12 + 0.5 * (1 - var(--ute-dag, 1))); }
-.rum-lopstall .lampa {
-  display: none;
-  background: radial-gradient(ellipse 130% 90% at 88% -12%, #ffb25c, rgba(255, 178, 92, 0) 70%);
-  opacity: calc(0.3 * (1 - var(--ute-dag, 1)));
-}
-.rum.ute-lampor .rum-lopstall .lampa { display: block; }
-.rum.lop-nara .rum-lopstall .kall { opacity: calc(0.08 * var(--ute-dag, 1)); }
-.rum.lop-nara .rum-lopstall .mork { opacity: calc(0.15 * (1 - var(--ute-dag, 1))); }
-.rum.lop-nara .rum-lopstall .lampa { opacity: calc(0.15 * (1 - var(--ute-dag, 1))); }
-/* snön på ramen: blågrå i mörkret och vit i dagsljuset, som snön på gatan (snowC i rum-ute.js) */
-.rum-lopstall .sno { display: none; left: -1px; top: -2.6px; width: 72px; height: 3.6px; border-radius: 1.8px 1.8px 0.6px 0.6px; background: #6a7286; }
-.rum-lopstall .sno::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #eef2f5; opacity: var(--ute-dag, 1); }
-.rum.ute-sno .rum-lopstall .sno { display: block; }
-@media (prefers-reduced-motion: reduce) { .rum-lopstall .ute { transition: none; } }
 
 /* ---------- Chelsea 1998: löpsedeln på skivan, gulnad och vikt ---------- */
 

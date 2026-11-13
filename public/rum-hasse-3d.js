@@ -740,6 +740,33 @@ export function papper(v, hornen, w, h) {
   if (kvar.length < 3) return null;
   return { form, klipp: `polygon(${kvar.map(([u, q]) => `${u.toFixed(1)}px ${q.toFixed(1)}px`).join(', ')})` };
 }
+// Veckans löpsedel i sin ram på bardiskens front bakom honom (lopsedel i rum-hasse.js): ramen hänger i en tråd
+// i kroken i fältet nedanför till höger om honom (SCEN.LOPSEDEL), lite framåtlutad, eftersom tråden drar ut
+// överkanten och nederkanten vilar mot fyllningen. w × h: ramen i sina egna bildpunkter (höjden i världen följer).
+// bak: väggens bild (BAK). → { form: matrix3d i fönstret, skala: fönstrets bildpunkter på en av ramens,
+// oskarp: hur oskarp den är i fönstrets bildpunkter (som väggen, en gaussisk radie), ruta: ramens hörn i väggens
+// bild, där ljuset på fronten läses (övre vänstra, övre högra, nedre högra, nedre vänstra) }
+export function lopsedel(v, w, h, bak) {
+  const { LOPSEDEL: L, FRONT: F, LINS, D: DS } = SCEN;
+  const topp = F.KROK - L.NED;
+  const hojd = (L.B * h) / w;
+  const hornen = [[-1, topp, L.UT[0]], [1, topp, L.UT[0]], [1, topp - hojd, L.UT[1]], [-1, topp - hojd, L.UT[1]]]
+    .map(([s, y, ut]) => franBaren([L.X + (s * L.B) / 2, y, F.Z + ut]));
+  const fonster = hornen.map((p) => iBild(v, ...p));
+  const form = matris3d(w, h, fonster);
+  const skala = Math.hypot(fonster[1][0] - fonster[0][0], fonster[1][1] - fonster[0][1]) / w;
+  // Skärpedjupet (tunn lins, LINS): en punkt på djupet z blir en skiva med radien R·|1 − F/z|·D/F på avståndet
+  // D, i fönstrets bildpunkter v.s gånger det; som gaussisk oskärpa ungefär halva radien. Bakningen suddar
+  // dessutom väggens bild 1,1 bildpunkter (mjuka i scripts/hasse/baka.mjs).
+  const z = iKamera(franBaren([L.X, topp - hojd / 2, F.Z + L.UT[1]]), KAM)[2];
+  const skiva = LINS.R * Math.abs(1 - LINS.F / z) * (DS / LINS.F) * v.s;
+  const oskarp = Math.hypot(skiva / 2, (1.1 * v.s) / bak.S);
+  const ruta = hornen.map((p) => {
+    const [u, q] = iKamera(p, KAM);
+    return [bak.px + bak.S * u, bak.py + bak.S * q];
+  });
+  return { form, skala, oskarp, ruta };
+}
 // matrix3d från rektangeln w × h (hörnet uppe till vänster i 0, 0) till fyra punkter i fönstret
 function matris3d(w, h, [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]) {
   const dx1 = x1 - x2;
