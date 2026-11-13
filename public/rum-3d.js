@@ -115,7 +115,7 @@
 // figurer(canvas, { calm, vader, detalj, spel, senast, rita }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), radio(på, t), radioPa(), spel({ lage, rank, ansikte }, t),
 // senast(lage), uttryck(),
-// prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t),
+// prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t), spegel(vem | null, nx, ny, t),
 // hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappVand(vem, ner, t), lappProva(vem, hållning, gör, at), natt(på, t), somn(på, t),
 // vakna(vem, t, sätt), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
@@ -130,6 +130,8 @@
 // påhitt om och om igen för bilder (utan påhitt som vanligt), ga att vem går
 // iväg från t − l (för bilder),
 // pekar punkten i rummet som vem pekar på (världens koordinater, null = inget),
+// spegel att vem (din egen figur) tittar på markören i punkten (nx, ny, −1…1 i duken) en stund,
+// null släpper,
 // hej att man pekar på vem (ut = när man slutade, Infinity = pekar fortfarande),
 // vald att vem just valdes som den som fyller i kupongen, tecken att man
 // klickade på vem (namn: vilket tecken, annars nästa),
@@ -3646,6 +3648,9 @@ export async function figurer(canvas, opt = {}) {
     // på natten tittar DL på text-tv (och bort ibland)
     const n = nattW(t) * (1 - tvW(t));
     if (n > 0 && o.F.key === 'dl') out.push([TV, n * (1 - bump((t + o.phase) % 31, 0, 1, 4, 5.2))]);
+    // din egen figur på markören (spegeln), före det man pekar på och hej, som går före
+    const sp = spW(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t));
+    if (sp > 0) out.push([SP[o.F.key].nu.clone(), sp]);
     // dit man pekar, och på den som pekar på en
     const x = PK[o.F.key];
     const w = pekW(o, t);
@@ -3695,6 +3700,19 @@ export async function figurer(canvas, opt = {}) {
   const PK = {};
   const HEJ = {};
   const pekW = (o, t) => { const x = PK[o.F.key]; return x ? x.w0 + ((x.on ? 1 : 0) - x.w0) * sm(x.wAt, x.wAt + 0.5, t) : 0; };
+  // Spegeln (spegel): din egen figur tittar på markören, var den än är i rummet, och följer den
+  // medan musen eller fingret rör sig, som en spegelbild – så att man ser vem av de tre man är.
+  // Punkten är där strålen genom markören går genom planet z framför bordet: figuren tittar ut
+  // mot en och vrider huvudet efter markören. Blicken glider efter (tau, sekunder), tonar in på
+  // in och, när markören har stått still i kvar, tillbaka på ut till det figuren annars gör.
+  // SP: per figur { mal, nu, at, w0, wAt } – markörens punkt, blickens punkt på väg dit, när
+  // markören senast rörde sig, och vikten som tonar in från w0 vid wAt.
+  const SPEGEL = { z: 640, tau: 0.12, in: 0.35, kvar: 3, ut: 0.9 };
+  const SP = {};
+  const spW = (o, t) => {
+    const s = SP[o.F.key];
+    return s ? (s.w0 + (1 - s.w0) * sm(s.wAt, s.wAt + SPEGEL.in, t)) * (1 - sm(s.at + SPEGEL.kvar, s.at + SPEGEL.kvar + SPEGEL.ut, t)) : 0;
+  };
   // den som sover vaknar inte (och den som håller på att vakna gör det först)
   // (f: med överslag, fj – blicken far lite förbi en och tillbaka, och flaskan lite för långt fram)
   const hejW = (o, t, f) => { const h = HEJ[o.F.key]; return h ? (f ? fj(h.at, h.at + 0.35, t, 0, 0.1) : sm(h.at, h.at + 0.35, t)) * (1 - sm(h.ut, h.ut + 0.6, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
@@ -6967,6 +6985,9 @@ export async function figurer(canvas, opt = {}) {
     // ögat efter musen, som rummets vridning i rum.js (camT: 4,5 grader åt sidorna, 2,6 upp och ner)
     OGA.x = -Math.tan(mx * 4.5 * DEG) * (D - OGA_Z);
     OGA.y = Math.tan(my * 2.6 * DEG) * (D - OGA_Z);
+    // spegeln: blicken glider efter markören, lika fort hur glest gänget än ritas
+    const glid = dt > 0 ? 1 - Math.exp(-dt / SPEGEL.tau) : 1;
+    for (const s of Object.values(SP)) s.nu.lerp(s.mal, glid);
     // (röken först: den ställer figuren när blosset föddes, emitter)
     smoke(t);
     ringar(t);
@@ -7388,6 +7409,37 @@ export async function figurer(canvas, opt = {}) {
       x.on = false;
     }
   }
+  // Spegeln: vem tittar på markören i (nx, ny), −1…1 i duken (också utanför den);
+  // vem null släpper, och de andra släpps alltid. Inte med minskad rörelse, utom
+  // bild: som om markören hade stått där länge, och blicken står kvar (?rum-spegel).
+  const spRay = new THREE.Raycaster();
+  const spPlan = new THREE.Plane(new THREE.Vector3(0, 0, 1), -SPEGEL.z);
+  const spPt = new THREE.Vector3();
+  function spegel(vem, nx, ny, t, bild = false) {
+    const k = vem ? String(vem).toLowerCase() : null;
+    // (tillbaka från och med nu)
+    for (const [j, s] of Object.entries(SP)) if (j !== k) s.at = Math.min(s.at, t - SPEGEL.kvar);
+    const o = k && (!opt.calm || bild) ? figs.find((f) => f.F.key === k) : null;
+    if (!o || !Number.isFinite(nx) || !Number.isFinite(ny)) return;
+    spRay.setFromCamera(new THREE.Vector2(nx, ny), cam);
+    if (!spRay.ray.intersectPlane(spPlan, spPt)) return;
+    const s = SP[k] || (SP[k] = { mal: new THREE.Vector3(), nu: new THREE.Vector3(), at: -1e9, w0: 0, wAt: -1e9 });
+    if (bild) {
+      Object.assign(s, { w0: 1, wAt: -1e9, at: 1e9 });
+      s.nu.copy(spPt);
+      s.mal.copy(spPt);
+      return;
+    }
+    const w = spW(o, t);
+    // (stod markören still: tonar in igen därifrån, och från ingenting börjar blicken på markören)
+    if (t > s.at + SPEGEL.kvar) {
+      s.w0 = w;
+      s.wAt = t;
+    }
+    if (w < 0.02) s.nu.copy(spPt);
+    s.mal.copy(spPt);
+    s.at = t;
+  }
   // vem blev just den som fyller i kupongen (ett klick på sin figur,
   // rum-folk.js). Ett klick till medan det pågår gör ingenting.
   function vald(vem, t) {
@@ -7572,5 +7624,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }
