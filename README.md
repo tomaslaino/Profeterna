@@ -7358,11 +7358,12 @@ Förut låg *lappen* under meningarna, en remsa av protokollets blankett med kup
 plats, spelkassan, spikar och garderingar, ensam rätt), bästa träffen, största missen och säsongen (2026-11-09). Den togs
 bort 2026-11-13, när han i stället fick säga mer om det som sticker ut.
 
-*Nästa* tar den man inte har hört om än, i gängets ordning, och *Hela gänget* går tillbaka till listan, där ordet han slog i
+Under domen finns bara knappen *Tillbaka*, som går tillbaka till listan, där ordet han slog i
 disken står som en stämpel i guld under namnet på dem man har hört om (på enheten för den omgången,
 `profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst i
 gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
-och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
+och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Under domen stod förut *Nästa: <namn>* och *Hela
+gänget* (ersatta av *Tillbaka* 2026-11-13). Med dolda resultat finns inget protokoll, och då är allt
 som förut.
 
 Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som använder sidan (`npm run repliker` säger till om
