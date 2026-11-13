@@ -374,7 +374,9 @@
 /* The Suns löpsedel från 1998: namnet i vitt på det röda bandet (text, inte
    tidningens logga), rubriken och fotot med pokalen och Zola under den
    (rum/chelsea98.jpg), som på IFK:s sedel. Papperet har gulnat av röken, det
-   röda har bleknat, och den har legat vikt på mitten. */
+   röda och fotot har bleknat, och den har legat vikt på mitten. Den har lite
+   mer patina än IFK:s sedel (2026-11-13, "liiite mer patina"): gulare
+   papper, mörkare kanter, mer nött färg och ett blekare foto. */
 .rum-chelsea { --k: 1.0256; }
 .rum-chelsea .ark {
   display: flex;
@@ -383,7 +385,7 @@
   width: 78px;
   height: 117px;
   padding: 2.5px 2.5px 3px;
-  background: linear-gradient(180deg, #ece0c1, #dfd0a8);
+  background: linear-gradient(180deg, #e8d9b4, #d8c595);
   color: #1b1712;
 }
 .rum-chelsea .huvud {
@@ -396,7 +398,7 @@
 }
 /* det röda har bleknat (en ton ovanpå, inte ett filter: text i filter ritas
    suddigt i närbilden) */
-.rum-chelsea .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.12); pointer-events: none; }
+.rum-chelsea .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.2); pointer-events: none; }
 .rum-chelsea .huvud .sun { display: flex; align-items: flex-start; white-space: nowrap; font: 900 11px/0.9 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.45px; }
 .rum-chelsea .huvud .sun i { margin: 0.6px 0.5px 0 0; font: 900 4.2px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.1px; font-style: normal; }
 .rum-chelsea .huvud small { flex: 1 0 auto; margin-left: 1.5px; text-align: right; font: 700 2.4px/1.15 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; opacity: 0.9; }
@@ -417,7 +419,7 @@
 }
 .rum-chelsea .rub b { display: block; text-align: center; transform-origin: 50% 50%; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.15px; }
 .rum-chelsea .rub b.rod { color: #c42a22; }
-/* fotot i färg, men tryckt på tidningspapper: lite blekt och gulnat */
+/* fotot i färg, men tryckt på tidningspapper: blekt och gulnat */
 .rum-chelsea .foto { display: block; flex: 1; min-height: 0; margin: 2.4px 1.5px 0; overflow: hidden; }
 .rum-chelsea .foto img {
   display: block;
@@ -425,7 +427,7 @@
   height: 100%;
   object-fit: cover;
   object-position: 50% 40%;
-  filter: saturate(0.82) sepia(calc(var(--sep, 0.2) + 0.08)) contrast(1.06) brightness(1.02);
+  filter: saturate(0.72) sepia(calc(var(--sep, 0.2) + 0.17)) contrast(1.01) brightness(1.02);
 }
 .rum-chelsea .under {
   margin: 2px 1.5px 0;
@@ -440,8 +442,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) calc(52% - 1.2px), rgba(255, 250, 236, 0.38) calc(52% - 0.3px), rgba(50, 32, 12, 0.3) calc(52% + 0.5px), rgba(0, 0, 0, 0) calc(52% + 1.6px));
-  box-shadow: inset 0 0 5px rgba(120, 88, 36, 0.42);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) calc(52% - 1.3px), rgba(255, 250, 236, 0.42) calc(52% - 0.3px), rgba(50, 32, 12, 0.36) calc(52% + 0.5px), rgba(0, 0, 0, 0) calc(52% + 1.8px));
+  box-shadow: inset 0 0 6px rgba(118, 84, 32, 0.52);
 }
 /* ---------- IFK och Chelsea: papperet och slitaget ---------- */
 
@@ -460,6 +462,17 @@
     radial-gradient(48% 34% at 76% 30%, rgba(160, 118, 52, 0.07), rgba(160, 118, 52, 0) 100%),
     radial-gradient(130% 115% at 50% 46%, rgba(122, 86, 40, 0) 58%, rgba(122, 86, 40, calc(0.06 + var(--sep, 0.2) * 0.3)) 100%);
 }
+/* Chelsea är lite äldre: fläckarna och kanterna lite mörkare, och ett
+   gulare hörn där röken har legat på */
+.rum-chelsea .tryck {
+  background:
+    linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%),
+    url(rum/papper.webp) 0 0 / 54px 54px,
+    radial-gradient(60% 40% at 100% 0%, rgba(176, 128, 48, 0.12), rgba(176, 128, 48, 0) 100%),
+    radial-gradient(55% 38% at 24% 72%, rgba(160, 118, 52, 0.12), rgba(160, 118, 52, 0) 100%),
+    radial-gradient(48% 34% at 76% 30%, rgba(160, 118, 52, 0.1), rgba(160, 118, 52, 0) 100%),
+    radial-gradient(130% 115% at 50% 46%, rgba(122, 86, 40, 0) 54%, rgba(122, 86, 40, calc(0.1 + var(--sep, 0.2) * 0.36)) 100%);
+}
 .rum-ifk .blad, .rum-chelsea .blad {
   position: absolute;
   inset: 0;
@@ -470,6 +483,7 @@
   /* halvvägs: färgen är ojämn och lite nött, inte bortskrapad */
   opacity: 0.45;
 }
+.rum-chelsea .blad { opacity: 0.56; }
 /* längs vecken har färgen nötts bort i en bruten rand */
 .rum-ifk .veck::before, .rum-ifk .veck::after, .rum-chelsea .veck::before {
   content: "";

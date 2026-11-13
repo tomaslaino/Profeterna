@@ -4489,7 +4489,10 @@ närbilden, och användaren ville ha dem utan prickar men med "rimlig patina" (2
 pappersstruktur som allt papper på sajten (`public/rum/papper.webp`, här i sedlarnas mått), lite ojämn
 gulning och mörkare kanter (mer med slitaget, `--sep`), och tryckfärgen är ojämn och lite nött där
 papperet lyser igenom (`.blad` med veckans löpsedels `--prickar` och `--flackar` som mask, till hälften),
-mest i en bruten rand längs vecken (`.veck::before`/`::after`). Allt i rum-affischer.css.
+mest i en bruten rand längs vecken (`.veck::before`/`::after`). Chelsea har lite mer patina än IFK
+(2026-11-13, användarens önskemål: "liiite mer patina"): gulare papper, mörkare fläckar och kanter, ett
+gulare hörn uppe till höger, något mer nött färg, ett djupare veck och ett blekare foto. Allt i
+rum-affischer.css.
 
 **Löpsedeln** är veckans och är **Helgarderats**, samma tidning som ligger på pulten (2026-11-10, Tomas önskemål:
 "Döp om löpsedeln till Helgarderat också") och samma nummer, i omslagets utseende (2026-11-12: "Förbättra löpsedeln
