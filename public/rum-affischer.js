@@ -43,7 +43,8 @@
 // ironiska, om det mest dramatiska som har hänt eller ska hända – i förra
 // omgången den som tippade bäst eller sämst, en ny ledare i Tipsligan, modellen
 // mot gänget, skrällen, krossen och gängets kupong; i nästa omgång den jämnaste
-// matchen, den största favoriten och jakten på ledaren. Längst ner den näst
+// matchen, den största favoriten och jakten på ledaren, och när Stryktipset har
+// landskamper Sveriges match och landskamperna (landskamp). Längst ner den näst
 // största nyheten. Förra omgångens nyheter väger tyngst de första dagarna och
 // nästa omgångs bara innan någon av dess matcher har startat. Omgångar och
 // kuponger som spoilerskyddet döljer räknas inte. Utan något att skriva om blir
@@ -308,6 +309,94 @@ let namnAv = (p) => Tippoang.kallas(p);
 const gen = (namn) => (/[sxz]$/i.test(namn) ? namn : `${namn}s`);
 const lag = (match) => String(match || '').split(/\s+[–-]\s+/);
 
+// ---------- landskamperna ----------
+//
+// Landskampernas prognos är spelbolagens, inte datorns (README, Landskamperna),
+// så där säger rubriken spelbolagen. Landslagens namn är Svenska Spels; på
+// löpsedeln räcker första delen (Bosnien & Hercegovina blir Bosnien).
+function arLand(x) {
+  const alla = typeof state !== 'undefined' && state.all && state.all.matches;
+  const comp = x && x.comp ? x.comp : ((alla || []).find((y) => String(y.id) === String(x && x.id)) || {}).comp;
+  const c = comp && typeof state !== 'undefined' && state.comps ? state.comps.get(comp) : null;
+  return c ? c.type === 'intl' : ['unl', 'emk', 'vsk'].includes(comp);
+}
+const landKort = (n) => String(n || '').split(' & ')[0];
+// Rubriker om en landskamp: datorn blir spelbolagen.
+const DATORN = [[/\bdatorn\b/g, 'spelbolagen'], [/\bDatorn\b/g, 'Spelbolagen'], [/\bDATORN\b/g, 'SPELBOLAGEN']];
+const somMarknaden = (t) => DATORN.reduce((s, [re, ny]) => s.replace(re, ny), String(t));
+function marknadens(kand) {
+  return kand.map((k) => ({ ...k, v: k.v.map((v) => ({ ...v, under: somMarknaden(v.under), rad: v.rad.map(([t, ...r]) => [somMarknaden(t), ...r]) })) }));
+}
+// Nations Leagues grupper (data/landslag.json, src/landslag.js), en gång; när de
+// har kommit ritas löpsedeln om (affischer nedan).
+let LANDSLAG = null;
+let landslagHamtas = false;
+function landslaget(klar) {
+  if (LANDSLAG || landslagHamtas || typeof getJSON !== 'function') return LANDSLAG;
+  landslagHamtas = true;
+  getJSON('data/landslag.json').then((d) => { LANDSLAG = d || {}; klar(); }, () => { LANDSLAG = {}; });
+  return null;
+}
+// Kan laget vinna gruppen med en seger mot motståndaren? Alla andra ska ha
+// färre poäng än det även om de vinner resten (motståndaren förlorar ju den
+// här). Lika poäng räknas inte: då avgör målskillnaden.
+function kanVinnaGruppen(g, lagNamn, motNamn) {
+  const rader = (g && g.lag) || [];
+  const tot = 2 * (rader.length - 1);
+  const vi = rader.find((x) => x.lag === lagNamn);
+  if (!vi || !rader.some((x) => x.lag === motNamn)) return false;
+  return rader.filter((x) => x !== vi).every((x) => x.points + 3 * (tot - x.played - (x.lag === motNamn ? 1 : 0)) < vi.points + 3);
+}
+
+// Nästa omgångs landskamper (rows med x.m och x.g): Sveriges match, med läget i
+// gruppen, och att Stryktipset har landskamper (oftast raden längst ner).
+function landskamper(rows, t) {
+  const land = rows.filter((x) => arLand(x.m));
+  const out = [];
+  if (!land.length) return out;
+  const sv = land.find((x) => x.m.home === 'Sverige' || x.m.away === 'Sverige');
+  if (sv) {
+    const hemma = sv.m.home === 'Sverige';
+    const mot = hemma ? sv.m.away : sv.m.home;
+    const M = landKort(mot).toUpperCase();
+    const vs = `${landKort(sv.m.home)}–${landKort(sv.m.away)}`;
+    const n = nar(sv.m.kickoff);
+    const p = sv.g && sv.g.pr ? Math.round(sv.g.pr[hemma ? 0 : 2]) : null;
+    const pr = p != null ? `Spelbolagen: ${p} % för svensk seger` : 'Sverige i Nations League';
+    const gr = String(sv.m.round || '').replace(/^Grupp\s+/i, '');
+    const g = LANDSLAG && (LANDSLAG.grupper || []).find((x) => x.id === gr);
+    const rad = (namn) => (g ? g.lag.find((x) => x.lag === namn) : null);
+    const [vi, de] = [rad('Sverige'), rad(mot)];
+    const v = [];
+    if (g && kanVinnaGruppen(g, 'Sverige', mot)) {
+      v.push(
+        { kick: 'NATIONS LEAGUE', rad: [['SVERIGE'], ['KAN VINNA'], ['GRUPPEN', 1]], under: `Seger mot ${landKort(mot)} räcker – avspark ${n}. ${pr}` },
+        { kick: 'BLÅGULT', rad: [['TRE POÄNG'], ['TILL'], ['GRUPPSEGER', 1]], under: `${vs} ${n}: vinner Sverige är grupp ${gr} klar` },
+      );
+    }
+    if (vi && de && Math.max(vi.rank, de.rank) <= 2) {
+      const d = Math.abs(vi.points - de.points);
+      v.push({ kick: 'TOPPMÖTET', rad: [['SVERIGE'], [`MOT ${M}`, 1]], under: `Etta mot tvåa i grupp ${gr}${d ? ` – ${d} poäng skiljer` : ', lika på poäng'}. Avspark ${n}` });
+    }
+    if (!v.length) {
+      v.push(
+        { kick: 'LANDSLAGET', rad: [['NU'], ['GÄLLER'], ['DET', 1]], under: `${vs} ${n}. ${pr}` },
+        { kick: 'NATIONS LEAGUE', rad: [['SVERIGE'], [`MOT ${M}`, 1]], under: `Avspark ${n}. ${pr}` },
+      );
+    }
+    out.push({ typ: 'sverige', poang: 0.8, t, framat: true, mid: sv.m.id, v });
+  }
+  if (land.length >= 3) {
+    const N = (TAL[land.length] || String(land.length)).toUpperCase();
+    out.push({ typ: 'landskamp', poang: 0.36, t, framat: true, v: [
+      { kick: 'LANDSLAGSUPPEHÅLLET', rad: [[N], ['LANDSKAMPER'], ['PÅ TIPSET', 1]], under: 'Nations League på Stryktipset – och spelbolagens procent för alla' },
+      { kick: 'TIPSET', rad: [['LANDSLAGEN'], ['TAR ÖVER', 1]], under: `${N.charAt(0)}${N.slice(1).toLowerCase()} landskamper på kupongen. Ligorna får vänta` },
+    ] });
+  }
+  return out;
+}
+const TAL = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'];
+
 // Veckan i Stockholm (måndag till söndag) som frö: rubrikens variant och
 // klippet är desamma hela veckan. ?rum-vecka=<tal> ger en annan vecka.
 function veckaFro(t = Date.now()) {
@@ -411,6 +500,10 @@ function bakat(r, alla, short) {
 // Skrällen och krossen i en spelad match (res: '1', 'X' eller '2', model:
 // modellens chanser i procent före avspark).
 function matchRubriker(x, short) {
+  if (arLand(x)) return marknadens(matchRubrikerna(x, (n) => landKort(short(n))));
+  return matchRubrikerna(x, short);
+}
+function matchRubrikerna(x, short) {
   const out = [];
   const j = S.indexOf(x.res);
   const p = x.model && j >= 0 ? x.model[j] : null;
@@ -474,9 +567,12 @@ function kupongRubriker(c, short) {
 
 // Nästa omgång (rows: ingen match har startat): den jämnaste matchen, den
 // största favoriten och jakten på ledaren i Tipsligan.
-function framat(rows, alla, short) {
+function framat(rows, alla, kortNamn) {
   const out = [];
+  // (landslagen: Bosnien & Hercegovina blir Bosnien)
+  const short = (n) => landKort(kortNamn(n));
   const t = Math.min(...rows.map((x) => Date.parse(x.m.kickoff)));
+  out.push(...landskamper(rows, t));
   const med = rows.filter((x) => x.g && x.g.pr);
   if (med.length) {
     const jamn = med.reduce((a, x) => (Math.max(...x.g.pr) < Math.max(...a.g.pr) ? x : a));
@@ -509,7 +605,9 @@ function framat(rows, alla, short) {
       { kick: 'TIPSLIGAN', rad: [[N], ['OHOTAD?', 1]], under: `${d} poängs ledning efter ${alla.length} omgångar. Jakten har bara börjat` },
     ] });
   }
-  return out;
+  // den jämnaste matchen och spiken: är det en landskamp är procenten spelbolagens
+  const land = new Set(rows.filter((x) => arLand(x.m)).map((x) => x.m.id));
+  return out.map((k) => (k.typ !== 'sverige' && land.has(k.mid) ? marknadens([k])[0] : k));
 }
 
 // Utan något att skriva om: det som står i tidningen (notiserna, det
@@ -758,6 +856,8 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
       l.style.setProperty('--klipp', klipp(fro));
       l.style.setProperty('--vy', `${(46 + hash(fro + 6) * 7).toFixed(1)}%`);
       let r;
+      // (Nations Leagues grupper, för Sveriges match: ritas om när de har kommit)
+      landslaget(() => { ritad = null; api.data(senast.rows, senast.old); });
       try {
         r = rubrik({ rows, old, short, fro });
       } catch (err) {

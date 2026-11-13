@@ -82,7 +82,8 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   ...['ingen', 'enda', 'endaInte', 'alla', 'inga', 'en', 'fler'].map((k) => `domar.spik.${k}`),
   ...['ratt', 'alla', 'bra', 'mitten', 'daligt', 'leder', 'lika', 'haller', 'hallerLika', 'emot', 'emotLika', 'mal', 'malBra', 'malLugn', 'malFel'].map((k) => `stallning.${k}`),
   ...['italo', 'guld', 'rock', 'p1', 'p3', 'p4g', 'rix', 'sport', 'talksport', 'caroline', 'brus'].map((k) => `radio.${k}`),
-  ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`)];
+  ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`),
+  ...['oppning', 'ledig', 'ledigSverige', 'ledigGranne', 'val', 'sverige', 'granne'].map((k) => `land.${k}`)];
 // Knappar och ord, inte meningar.
 const INTE_MENINGAR = ['lar', 'tecken', 'tal', 'domord', 'felnamn'];
 
@@ -111,7 +112,7 @@ for (const [vag, t] of alla) {
 for (const vag of LISTOR) if (!Array.isArray(varde(vag))) fel.push(`${vag} måste vara en lista: sidan lottar bland raderna`);
 for (const [n, v] of Object.entries(repliker.antal || {})) if (!Array.isArray(v)) fel.push(`antal.${n} måste vara en lista`);
 // Raderna under en vald match ska få plats på en rad, annars flyttar sig knapparna under dem.
-for (const vag of ['val', 'valLasa', 'valVanta']) for (const t of varde(vag) || []) if (t.length > 31) fel.push(`${vag}: "${t}" är för lång: högst 31 tecken, annars flyttar sig knapparna`);
+for (const vag of ['val', 'valLasa', 'valVanta', 'land.val', 'land.sverige', 'land.granne']) for (const t of varde(vag) || []) if (t.length > 31) fel.push(`${vag}: "${t}" är för lång: högst 31 tecken, annars flyttar sig knapparna`);
 for (const vag of LISTOR) {
   const l = varde(vag);
   if (Array.isArray(l) && new Set(l).size !== l.length) fel.push(`${vag} har samma rad två gånger`);

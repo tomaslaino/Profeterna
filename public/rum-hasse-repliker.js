@@ -1127,6 +1127,59 @@
     'Jag tvekar aldrig, och det borde inte du heller.',
   ],
 
+  // Landskamperna (Nations League i landslagsuppehållet, se README, Landskamperna). Han ser på dem som den
+  // gamla klubbtränaren han är: organisation, några dagars samling och ett landslag som inte kan köpa
+  // spelare. Inget om division, tabellen i ligan eller supportrarnas poddar, och inga namn på riktiga
+  // förbundskaptener eller spelare. oppning när kupongen har minst tre landskamper, ibland i stället för de
+  // vanliga; ledig blandas med de vanliga, ledigSverige när Sverige spelar och ledigGranne när Norge eller
+  // Danmark gör det. val, sverige och granne när man har valt en landskamp (Sveriges, Norges eller Danmarks),
+  // ibland i stället för val och valLasa, och lika korta som dem: högst 31 tecken (landRader i rum-hasse.js).
+  land: {
+    oppning: [
+      'Det är landslagsuppehåll. Vilken match tar vi först?',
+      'Kupongen är full av landskamper. Vilken match tar vi först?',
+      'Nu är det landslagen som gäller. Vilken match vill du börja med?',
+      'Landslagsuppehållet är min favoritvecka. Vilken match tar vi?',
+      'Landskamper är min specialitet. Vilken match vill du ha svar på?',
+    ],
+    ledig: [
+      'I landslagsuppehållet gissar spelbolagen mer än vanligt.',
+      'En förbundskapten har spelarna några dagar. Då avgör organisationen.',
+      'Ett landslag kan inte köpa spelare. Man får spela med dem man har.',
+      'Nations League är ingen träningsmatch, vad folk än säger.',
+      'Folk tror att landskamper är lotteri. Jag ser organisation.',
+    ],
+    ledigSverige: [
+      'Sverige spelar, och halva landet tippar med hjärtat. Jag tippar med huvudet.',
+      'När Sverige spelar ska man hålla huvudet kallt.',
+    ],
+    ledigGranne: [
+      'Grannarna spelar också. Dem håller jag alltid ett öga på.',
+      'Grannarna har jag följt längre än de flesta.',
+    ],
+    val: [
+      'Landskamper kan jag utantill.',
+      'Där avgör organisationen.',
+      'Landslag är lättare än klubbar.',
+      'Nations League är mitt bord.',
+      'Landskamper tippar jag gärna.',
+      'Tre dagars samling syns i den.',
+      'Landskamper är min hemmaplan.',
+    ],
+    sverige: [
+      'Den tippar jag med huvudet.',
+      'Där är jag opartisk och säker.',
+      'Den har jag läst extra noga.',
+      'Där vet jag mer än förbundet.',
+      'Blågult har jag full koll på.',
+    ],
+    granne: [
+      'Grannarna har jag full koll på.',
+      'Grannlandet känner jag väl.',
+      'Grannarna har jag följt länge.',
+    ],
+  },
+
   // När man har valt en match: han svarar och frågar tillbaka. valLasa när analysen finns
   // och val när den inte finns. Han har alltid svaret, också när han inte har det.
   val: [
