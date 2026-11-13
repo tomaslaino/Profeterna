@@ -22,8 +22,8 @@
 //              och det sämre är svagt (SKILJER)
 //   TOPPLISTOR tavlans lappar som listor över hela omgången: styrkan (per
 //              division), kryss, tur och otur, mot oddsen och motståndet
-//   LAGEN      de fyra divisionerna, lagen i omgången ljusa med matchens
-//              nummer; ett lag öppnar lagkortet med truppen (speltid, mål, de
+//   LAGEN      de fyra divisionerna, lagen i omgången ljusa; ett lag
+//              öppnar lagkortet med truppen (speltid, mål, de
 //              skadade), och en spelare spelarkortet: läget, speltiden, mål
 //              och xG, och hur laget har gått med och utan honom i startelvan
 //              mot oddsen (mu i data/players/<division>.json)
@@ -548,7 +548,7 @@ window.RumRegister = (() => {
     }
     const divFlikar = (d, kort2) => rad(...DIVS.flatMap((x, k) => [[kort2 ? DIVK[x] : up(DIVNAME[x]), x === d ? 'i' : '', x === d ? null : `#div:${x}`], [k < DIVS.length - 1 ? '   ' : '', '']]));
     // en division: lagen i bokstavsordning (två spalter på datorn), lagen i
-    // omgången ljusa med matchens nummer
+    // omgången ljusa
     function lagen(div, R) {
       const d = DIVS.includes(div) ? div : standardDiv();
       const j = DIVS.indexOf(d);
@@ -566,9 +566,8 @@ window.RumRegister = (() => {
         for (let x = 0; x < k; x++) {
           const t = l[x * h + y];
           if (!t) continue;
-          const nr = iOmgangen(t.name) ? nrAv(iOmgangen(t.name).m) : 0;
-          const namn = up(t.name).slice(0, w - 6);
-          b.push([nr ? padL(nr, 2) : '  ', 'd'], ['  ', ''], [namn, nr ? 'v' : '', `#lag:${t.name}`], [pad('', w - 4 - namn.length), '']);
+          const namn = up(t.name).slice(0, w - 2);
+          b.push([namn, iOmgangen(t.name) ? 'v' : '', `#lag:${t.name}`], [pad('', w - namn.length), '']);
         }
         r.push(rad(...b));
       }

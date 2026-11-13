@@ -6273,7 +6273,7 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   de står vid matcherna.
 - **Lagen** – de fyra divisionerna (*PL*, *CH*, *L1* och *L2* i telefonen), med divisionen
   som har flest lag i omgången först. Lagen står i bokstavsordning (två spalter på datorn),
-  och lagen i omgången är ljusa med matchens nummer. Ett lag öppnar **lagkortet** med truppen,
+  och lagen i omgången är ljusa. Ett lag öppnar **lagkortet** med truppen,
   och en spelare i truppen **spelarkortet** (nedan).
 
 Sökraden söker i hela registret, också lag och spelare utanför omgången, och svarar medan man
