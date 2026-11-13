@@ -1016,8 +1016,19 @@
     },
   },
   // Ordet han slår i disken när han dömer någon i gänget, som domen över en match. Sägs inte. Det står
-  // också ensamt under namnet i listan och ska därför beskriva personen: Garderad, inte Garderat.
-  domord: { forsakring: 'Garderad', forst: 'Turlig', alla: 'Felfri', mitten: 'Osynlig', sist: 'Generös', sistLika: 'Snuvad', inget: 'Klok' },
+  // också ensamt under namnet i listan och ska därför beskriva personen: Garderad, inte Garderat. Han har
+  // många ord för varje läge och väljer ett efter omgången och personen (domOrd i rum-hasse.js), så att det
+  // är samma i disken och i listan och på alla enheter. Ett ord, och högst nio bokstäver, så att stämpeln
+  // under namnet ryms i den smalaste telefonen (npm run repliker säger till).
+  domord: {
+    forsakring: ['Garderad', 'Försiktig', 'Försäkrad', 'Ängslig', 'Feg', 'Listig', 'Klipsk', 'Köpstark', 'Nervös', 'Skyddad'],
+    forst: ['Turlig', 'Lyckosam', 'Gynnad', 'Utvald', 'Förvånad', 'Mallig', 'Kaxig', 'Lyrisk', 'Flyktig', 'Uppblåst'],
+    alla: ['Felfri', 'Prickfri', 'Ofelbar', 'Klarsynt', 'Synsk', 'Insatt', 'Godkänd', 'Profetisk', 'Skarp', 'Misstänkt'],
+    mitten: ['Osynlig', 'Anonym', 'Lagom', 'Grå', 'Ljummen', 'Blek', 'Diskret', 'Obemärkt', 'Halvbra', 'Ofarlig', 'Bortglömd'],
+    sist: ['Generös', 'Givmild', 'Frikostig', 'Osjälvisk', 'Hjälpsam', 'Tapper', 'Vilsen', 'Förvirrad', 'Ödmjuk', 'Blåögd'],
+    sistLika: ['Snuvad', 'Lurad', 'Blåst', 'Rånad', 'Bestulen', 'Avundsjuk', 'Bitter', 'Sur', 'Kränkt', 'Upprörd'],
+    inget: ['Klok', 'Vis', 'Sparsam', 'Snål', 'Ledig', 'Bortrest', 'Saknad', 'Glömsk', 'Upptagen', 'Lat'],
+  },
   // Namnen han nästan kan. Ibland säger han ett av dem i stället för det riktiga, i domen (aldrig om den som
   // vann) och när han hälsar på dig (kallar i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
   // Namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för Johansson); rösten får dem också (src/rost.js).

@@ -2624,6 +2624,9 @@ window.RumHasse = (() => {
     return lista[h % lista.length];
   }
   const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
+  // Ordet i guld: ett av många för läget (domord i rum-hasse-repliker.js), samma för samma omgång och person,
+  // så att det som slås i disken också står under namnet i listan.
+  const domOrd = (p, sum) => fast(REP().domord[p.lage] || [''], `${sum.id}:${p.id}:ord`) || '';
   // Namnen sitter inte riktigt: var chans:e gång säger han ett som nästan stämmer (felnamn i
   // rum-hasse-repliker.js), och samma nyckel ger samma namn. Han rättar sig aldrig.
   function kallar(namn, nyckel, chans = 3) {
@@ -2689,7 +2692,7 @@ window.RumHasse = (() => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = `k${p.hand}${p.none ? ' inget' : ''}`;
-      const ord = nu.vem.includes(p.id) ? r.domord[p.lage] || '' : '';
+      const ord = nu.vem.includes(p.id) ? domOrd(p, sum) : '';
       b.innerHTML = `${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span><em${ord && p.id === nu.sist ? ' class="ny"' : ''}>${esc(ord)}</em>`;
       b.setAttribute('aria-label', ord ? `${p.namn}, ${ord}` : p.namn);
       b.addEventListener('click', () => doma(p.id));
@@ -2759,7 +2762,7 @@ window.RumHasse = (() => {
     nu.sist = p.id;
     const i = folk.indexOf(p);
     const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !nu.vem.includes(q.id));
-    const d = REP().domord[p.lage] || '';
+    const d = domOrd(p, sum);
     s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span></div>` +
       `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
       `<div class="rh-rull"><div class="rh-text"></div>${RumBlock.lapp(sum, p.id, { sasong: sasong() })}</div>` +
