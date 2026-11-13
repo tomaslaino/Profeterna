@@ -10,10 +10,12 @@
 // det alltid Ombudet i tobaksaffären). Utseendet valdes bland tre skisser (1, Spalterna).
 //
 // 2026-11-13 ("Hasse krönika kan man korta ner med 1/4", "Kåseriet kan f ö också kortas ner med 1/4",
-// "Det räcker f ö med 3 st vid sidan av"): kortare krönika och kåseri, tre notiser, krönikan kring en
-// enda tanke och utan visdomsord, notiser om olika slags saker (och om ett landslag när kupongen har
-// landskamper), bättre källor och mått i meter. promptVersion står kvar med flit: veckans sida
-// rättades för hand, och en ny version hade fått jobbet att skriva om den. Det nya gäller från nästa omgång.
+// "Det räcker f ö med 3 st vid sidan av"): tre notiser, krönikan kring en enda tanke och utan visdomsord,
+// notiser om olika slags saker (och om ett landslag när kupongen har landskamper), bättre källor och
+// mått i meter. promptVersion står kvar med flit: veckans sida rättades för hand, och en ny version hade
+// fått jobbet att skriva om den. Det nya gäller från nästa omgång.
+// Krönikan och kåseriet kortades först med en fjärdedel, men samma kväll ville användaren ha tillbaka
+// längderna ("den var bra").
 //
 // Texten skrivs på iMacen med Claude Code (claude -p) på användarens Claude-konto, i
 // samma jobb som analyserna (scripts/analyser/skriv.mjs, src/analyser/sista-sidan.mjs),
@@ -33,8 +35,8 @@ module.exports = {
   sokningar: 8,
   sidor: 4,
   // I ord. Kontrollen godtar lite mer åt båda hållen.
-  kronika: [110, 165],
-  kaseri: [70, 110],
+  kronika: [150, 220],
+  kaseri: [90, 150],
   notis: [20, 45],
   // Vid sidan av: så många notiser, och minst så många måste gå igenom.
   notiser: 3,
@@ -50,11 +52,11 @@ module.exports = {
 
 Sista sidan har tre delar.
 
-1. Krönikan, av en fiktiv och lätt överdriven version av tränarveteranen Hasse Backe: {kronikaMin}–{kronikaMax} ord, en rubrik på högst {rubrikOrd} ord och tre till fem korta stycken. Han är orubbligt lugn, torr och självsäker, med lite självironi, och han tvivlar aldrig; det roliga är att han aldrig tvivlar, inte att han skämtar. Fotboll är organisation och orsak och verkan. Krönikan håller sig till en enda tanke, den som rubriken säger, om omgången, lördagen eller att tippa, och tar en eller två av matcherna som exempel på den. Han kommenterar aldrig sina egna skämt och förklarar dem inte. Inga retoriska frågor, inga poänger på ett ord, inget "det är inte X, det är Y" och inga visdomsord eller definitioner i stil med "gräs är en yta".
+1. Krönikan, av en fiktiv och lätt överdriven version av tränarveteranen Hasse Backe: {kronikaMin}–{kronikaMax} ord, en rubrik på högst {rubrikOrd} ord och tre till sex korta stycken. Han är orubbligt lugn, torr och självsäker, med lite självironi, och han tvivlar aldrig; det roliga är att han aldrig tvivlar, inte att han skämtar. Fotboll är organisation och orsak och verkan. Krönikan håller sig till en enda tanke, den som rubriken säger, om omgången, lördagen eller att tippa, och tar en eller två av matcherna som exempel på den. Han kommenterar aldrig sina egna skämt och förklarar dem inte. Inga retoriska frågor, inga poänger på ett ord, inget "det är inte X, det är Y" och inga visdomsord eller definitioner i stil med "gräs är en yta".
 
 2. Vid sidan av: {notiser} korta notiser om omgångens lag, {notisMin}–{notisMax} ord var, med det udda, roliga eller oväntade som läsarna inte visste: lagets historia, arenan, staden, supportrarna, en gammal match, en känd supporter, något som har hänt runt laget den här veckan. Notiserna handlar om olika lag och om olika slags saker, så att inte två handlar om lagnamn eller två om arenor, och har kupongen landskamper handlar minst en om ett av landslagen. Sök och läs på nätet efter det, med högst {sokningar} sökningar och högst {sidor} öppnade sidor. Inget om form, tabelläge, skador, avstängningar eller tränarens ord: det står redan i matchbladen, och inget får upprepa det som står i matchbladens rubriker och sammanfattningar. Varje notis ska bygga på en sida du har hittat i en sökning eller läst nu, inte på minnet: ange den sidan som källa. Välj helst klubbens eller förbundets egen sida, en lokaltidning eller Wikipedia, aldrig en annan klubbs eller dess supportrars sida och aldrig en förkortad länk (som bbc.in).
 
-3. Kåseriet, av en ny person varje vecka som du hittar på: en vanlig svensk med ett eget förhållande till tipset, lördagarna eller engelsk fotboll i de lägre divisionerna, med ett vanligt svenskt för- och efternamn som inte är en känd persons, och vem hen är i några ord (yrke eller sysselsättning och ort). Ingen av de senaste veckornas kåsörer, och inte någon som liknar dem. Personen skriver i jagform utifrån sitt eget liv: {kaseriMin}–{kaseriMax} ord, en rubrik på högst {rubrikOrd} ord och tre eller fyra korta stycken. Vardaglig, lågmäld och varm svensk humor, gärna med någon av veckans klubbar i bakgrunden. Underdrift om sådant en fotbollsvän redan vet, inga ordvitsar och ingen poäng som förklaras.
+3. Kåseriet, av en ny person varje vecka som du hittar på: en vanlig svensk med ett eget förhållande till tipset, lördagarna eller engelsk fotboll i de lägre divisionerna, med ett vanligt svenskt för- och efternamn som inte är en känd persons, och vem hen är i några ord (yrke eller sysselsättning och ort). Ingen av de senaste veckornas kåsörer, och inte någon som liknar dem. Personen skriver i jagform utifrån sitt eget liv: {kaseriMin}–{kaseriMax} ord, en rubrik på högst {rubrikOrd} ord och tre till fem korta stycken. Vardaglig, lågmäld och varm svensk humor, gärna med någon av veckans klubbar i bakgrunden. Underdrift om sådant en fotbollsvän redan vet, inga ordvitsar och ingen poäng som förklaras.
 
 Inga tips någonstans: skriv inte vem som vinner en match, vilka tecken man ska välja, vem som är favorit eller några odds.
 
