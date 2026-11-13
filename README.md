@@ -1346,6 +1346,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   syns mellan pulten och bardisken. Fönstren och bardisken är dragna 18 cm nedåt och rutorna bredare, så att
   glaspartiet är lika stort i bilden som förut och utsikten står kvar. Väggen är ombakad. Se
   [Hasse Backe](#hasse-backe), *Bilden*.
+- **Hasse Backe snyggare och lättare för grafikkortet (2026-11-13, användarens önskemål):** "förbättra
+  hasse-backegrafiken så att den blir snyggare/bättre och att den inte drar en massa extra grafik från
+  grafikkortet". Håret var urklippt som ett kantigt polygon med en platt topp och ett trappsteg, och såg ut att vara
+  klippt med sax; nu är konturen rundad och mjuk, med strån i kanten. Figuren bad webbläsaren om det kraftfulla
+  grafikkortet, som på datorer med två grafikkort slogs på när man vände sig mot honom; nu ritas han med det vanliga,
+  som rummet. Han ritas högst 60 gånger i sekunden (förut 120 på skärmar med 120 Hz), kornet som rörde sig över hela
+  bilden är borta (det syntes inte men kostade en fjärdedel av varje bild), och skuggorna på disken räknar mindre där
+  inget skuggar. Se [Hasse Backe](#hasse-backe), *Grafiken*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -6853,8 +6861,8 @@ och disken: varmt framifrån till vänster, ett varmt kantljus bakifrån från b
 neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`LJUS` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js); väggen är spårad med samma ljus). På dagen kommer
 dagsljuset genom affärens stora fönster till höger (nedan). Över hela
-bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
-och inte i telefonen. Händerna på pulten i rummet har samma ljus (se *Kaffet i rummet*).
+bilden mörknar hörnen (`.rh-ton`). Händerna på pulten i rummet har samma ljus (se *Kaffet i rummet*).
+(Förut rörde sig också ett lätt korn över hela bilden, `.rh-korn`; borttaget 2026-11-13, se *Grafiken*.)
 
 Baren har samma tid på dygnet som rummet (`ljuset` och `tand` i [public/rum-hasse.js](public/rum-hasse.js)).
 Lysröret i affärens tak är tänt och släckt som i rummet (`RumFolk.nattGrad`): från 23 dämpas det under en
@@ -7706,9 +7714,17 @@ någon pekar på kaffet eller klickar: bilden av väggen (61 kB, 33 kB på höjd
 ritas en gång med figurens grafik när han öppnas, och sedan när fönstret har slutat ändras; kameran
 väntar högst 1,5 s på den. Figurens duk är bara så stor som han och det han gör, och den ritas efter
 rummets steg (`Rum.kval`, se [När datorn inte hinner med](#när-datorn-inte-hinner-med)): högst täthet
-2, 1,5, 1,25 och 1, och när han bara sitter och andas 30, 30, 20 och 15 bilder i sekunden. På de två
-lägsta stegen och i telefonen utan kantutjämning. Figuren lämnas tillbaka 90 s efter att man har gått
-(20 s i telefonen).
+2, 1,5, 1,25 och 1, och när han bara sitter och andas 30, 30, 20 och 15 bilder i sekunden. När han rör
+sig högst 60 (på de två lägsta stegen 30): förut ritades han varje skärmbild, alltså 120 gånger i sekunden på
+en skärm med 120 Hz som i nyare MacBook Pro. Tiden mellan bilderna (`takt` i [public/rum-hasse.js](public/rum-hasse.js))
+är lite kortare än en hel skärmbilds, så att ett litet ryck i webbläsarens takt inte hoppar över en bild (förut
+33 ms, och 32,9 ms mellan två skärmbilder gav ibland 50 ms). På de två lägsta stegen och i telefonen utan
+kantutjämning. Figuren lämnas tillbaka 90 s efter att man har gått (20 s i telefonen). Han ritas med webbläsarens
+vanliga grafikkort, som rummet (`powerPreference`): förut bad figuren om det kraftfulla, och på datorer med två
+grafikkort (som äldre MacBook Pro) slogs det stora kortet och fläkten på så fort man vände sig mot honom.
+Skuggorna på disken räknas per bildpunkt över hela disken, och kapslar som ligger så långt bort att ingen av
+deras tre skuggor syns (mindre än en tusendels procent) hoppas över efter ett avstånd i stället för tre (`byggSkugga`
+i [public/rum-hasse-arm.js](public/rum-hasse-arm.js), också under handen på pulten i rummet); bilden blir densamma.
 
 Medan han syns ritas rummet inte, så det enda som ritas om är figurens duk. Mätt i headless Chrome
 med mjukvarugrafik (som en svag grafikkrets), 1440 × 900, med det steg rummet själv väljer där (3):
@@ -7716,9 +7732,21 @@ med mjukvarugrafik (som en svag grafikkrets), 1440 × 900, med det steg rummet s
 bredvid honom. Maskinen var långsam och siffrorna spretar mellan körningar, så de är bara en
 jämförelse; inte mätt på en riktig telefon eller i Safari.
 
+Kornet som rörde sig över hela hans bild (`.rh-korn`, till 2026-11-13) var ett lager dubbelt så stort som fönstret som
+blandades med allt under sig (`mix-blend-mode: overlay`) och flyttades åtta gånger i sekunden. Ett sådant lager tvingar
+webbläsaren att lägga ihop hela bilden i ett extra steg varje gång figuren ritas om, 30–60 gånger i sekunden. Det
+ändrade bilden med ungefär en nivå av 255 (mätt i väggen, disken och himlen), alltså inget som syntes, men stod för
+ungefär en fjärdedel av tiden för varje bild. Mätt 2026-11-13 i headless Chromium med mjukvarugrafik, 1440 × 900 på
+steg 0 och med minskad rörelse, så att han gjorde samma sak i båda: 2,2–2,4 bilder i sekunden före ändringarna och
+2,8–3,0 efter (kornet borta, skuggorna och den nya atlasen; grafikkortets val och taket på 60 påverkar inte mjukvarugrafik).
+Figuren ensam ritades på 210 ms före och 207 ms efter. Inte mätt på ett riktigt grafikkort, i Safari eller på en
+telefon.
+
 Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat; krediten står sist under
 Källor) ligger utan armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig
-fram. Ögon, bryn och mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med
+fram. Fotot var urklippt som ett kantigt polygon, och mot den mörka baren såg håret ut som om det var klippt med
+sax, med en platt topp och ett trappsteg till höger; konturen är rundad och mjuk, med strån i kanten, och resten
+av huvudet ovanför axlarna har en kantutjämnad kontur ([scripts/hasse/kant.py](scripts/hasse/kant.py), 2026-11-13). Ögon, bryn och mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med
 tänder och tunga, och hakan följer med ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ärmarna är
 kavajen ur fotot ([public/rum-hasse-arm.js](public/rum-hasse-arm.js)): fotots armar, uträtade till en
 remsa i atlasen, ligger på böjbara rör, så att tyget och färgen är desamma som på

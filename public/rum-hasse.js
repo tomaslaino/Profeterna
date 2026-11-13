@@ -49,8 +49,11 @@ window.RumHasse = (() => {
   // rummets steg (rum.js, KVAL): 0 allt, 3 det enklaste
   const steg = () => Math.max(0, Math.min(3, window.Rum && Rum.kval ? Rum.kval() : latt() ? 1 : 0));
   const pixlar = () => Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]);
-  // minsta tid mellan bilderna (ms) när han rör sig och när han bara andas
-  const takt = (ror) => (ror ? [0, 0, 33, 33] : [33, 33, 50, 66])[steg()];
+  // minsta tid mellan bilderna (ms) när han rör sig och när han bara andas: högst 60 bilder i sekunden (på en
+  // skärm med 120 Hz ritades han förut 120 gånger i sekunden när han rörde sig), och i vilan 30, 30, 20 och 15. Lite
+  // under en hel skärmbilds tid, så att ett ryck i webbläsarens takt inte hoppar över en bild (förut 33 ms, och
+  // 32,9 ms mellan två skärmbilder blev ibland 50 ms).
+  const takt = (ror) => (ror ? [12, 12, 31, 31] : [31, 31, 48, 64])[steg()];
 
   // Rummet är ledigt: ingen närbild, ingen kupong i handen.
   function ledigt() {
@@ -81,7 +84,7 @@ window.RumHasse = (() => {
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
     vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"></div><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
-      '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i><i class="rh-korn" aria-hidden="true"></i>' +
+      '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
     H.vy = vy;
@@ -702,7 +705,6 @@ window.RumHasse = (() => {
     }
     // cigarren som den var, eller slocknad om han har låtit den ligga sedan sist
     cigarrIgen();
-    H.vy.classList.toggle('enkel', steg() >= 1 || latt());
     // (disken hinner ritas innan kameran slår dit, men den väntar man inte länge på)
     await Promise.race([passa(), new Promise((ok) => setTimeout(ok, 1500))]);
     // (en ny figur ritas en gång redan här, utom synhåll: grafikprogrammen görs i ordning nu och inte när

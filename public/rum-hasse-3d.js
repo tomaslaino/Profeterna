@@ -809,7 +809,9 @@ function djup(x, y, drag = true) {
 }
 
 export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
-  const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: !latt, powerPreference: latt ? 'default' : 'high-performance' });
+  // (webbläsarens vanliga grafikkort: med 'high-performance' slog datorer med två grafikkort, som äldre MacBook Pro,
+  // på det stora kortet så fort man vände sig mot honom, och fläkten med det; rummet har alltid ritats med det vanliga)
+  const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: !latt, powerPreference: 'default' });
   r.setPixelRatio(pr);
   r.setClearColor(0, 0);
   const S = new THREE.Scene();
