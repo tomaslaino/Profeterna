@@ -40,7 +40,7 @@
 // På håll bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
-// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), zoom(on, rekt) → rutans mått, key(k) }
+// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), tittar(on), zoom(on, rekt) → rutans mått, key(k) }
 
 window.RumTv = (() => {
   const COLS = 40;
@@ -419,7 +419,7 @@ window.RumTv = (() => {
 
   function mount(root, o) {
     const T = {
-      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), typed: '', on: true, near: false,
+      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), typed: '', on: true, near: false, tittar: false,
       short: o.short, kort: o.kort || o.short, wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
     };
     const box = root.querySelector('#rum-tv3');
@@ -471,8 +471,13 @@ window.RumTv = (() => {
       return scorerPage(T, nr - SKY);
     }
 
+    // På håll är rutan dämpad (rum-tv.css), utom när gänget tittar på
+    // matcherna: medan någon pågår och tv:n står på 377 lyser den fullt.
+    const direkt = () => box.classList.toggle('direkt', T.tittar && T.nr === LIVE);
+
     // Sidan: ritas om bara när den har ändrats; ny = uppifrån och ner.
     function draw(ny) {
+      direkt();
       need(T.nr);
       T.sub = Math.min(T.sub, subsOf(T.nr) - 1);
       const h = page(T.nr, T.sub);
@@ -616,6 +621,11 @@ window.RumTv = (() => {
         }
         if (!T.roll) draw(false);
         tick();
+      },
+      // Pågår någon match (gänget tittar på tv:n, rum.js)?
+      tittar(on) {
+        T.tittar = Boolean(on);
+        direkt();
       },
       // Nära: tv:n vrids mot en och knapparna går att trycka på. Svarar med
       // frontens mått i det läge den vrids till (för kameran i rum.js), mätta
