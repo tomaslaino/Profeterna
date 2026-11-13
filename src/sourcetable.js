@@ -7,8 +7,12 @@
 // Statusen räknas här vid uppdateringen, men sidan räknar om den i
 // webbläsaren ur fetchedAt och staleAfterHours: stannar den schemalagda
 // hämtningen ska sidan visa "gammal", inte fortsätta visa "färsk".
+//
+// Landskamperna (Nations League, EM-kvalet och vänskapsmatcherna) står som
+// egna kolumner efter de engelska tävlingarna; det som bara finns för
+// klubbarna står som "finns inte för landslagen".
 
-const { COMPETITIONS } = require('../config/competitions');
+const { COMPETITIONS, INTERNATIONAL } = require('../config/competitions');
 const { SOURCES } = require('./sources');
 const { readCache, ageHours } = require('./store');
 const { unmappedNames } = require('./matches');
@@ -22,8 +26,8 @@ const PROVIDERS = [
     id: 'ESPN',
     name: 'ESPN',
     url: 'https://www.espn.com/soccer/',
-    gives: 'Spelprogram, resultat och tabeller i alla sex tävlingar, trupperna, matchrapporterna med startelvorna i ligorna och cuperna, Europacuperna, FA-cupens tidigare säsonger och lagsköldarna.',
-    used: 'Matcherna, tabellerna, spelarstatistiken, den beräknade startelvan, vilan inför matcherna och prognosens underlag i cuperna',
+    gives: 'Spelprogram, resultat och tabeller i alla sex tävlingar, trupperna, matchrapporterna med startelvorna i ligorna och cuperna, Europacuperna, FA-cupens tidigare säsonger och lagsköldarna. För landskamperna spelprogrammet och resultaten i Nations League, EM-kvalet och vänskapsmatcherna, Nations Leagues tabeller, landslagens matcher sedan hösten 2024 och flaggorna.',
+    used: 'Matcherna, tabellerna, spelarstatistiken, den beräknade startelvan, vilan inför matcherna och prognosens underlag i cuperna. Landskamperna på kupongen, Nations Leagues tabeller och landslagens form och statistik',
     live: 'Ställningen och matchhändelserna – mål, kort, byten och statistik – hämtas när kupongen eller matchrutan är öppen, varje minut medan matchen pågår.',
   },
   {
@@ -51,8 +55,8 @@ const PROVIDERS = [
     id: 'DraftKings',
     name: 'DraftKings',
     url: 'https://sportsbook.draftkings.com/',
-    gives: 'Odds för veckans matcher, även i cuperna – via ESPN.',
-    used: 'Oddsen i matchrutan och jämförelsen med spelbolagen i cuperna',
+    gives: 'Odds för veckans matcher, även i cuperna och landskamperna – via ESPN.',
+    used: 'Oddsen i matchrutan, jämförelsen med spelbolagen i cuperna och prognosen för landskamperna (oddsen utan marginal – modellen känner bara lagen i England)',
   },
   {
     id: '365Scores',
@@ -99,22 +103,29 @@ const KINDS = [
   { id: 'europe', label: 'Europaspel' },
   { id: 'history', label: 'Tidigare säsonger' },
   { id: 'video', label: 'Höjdpunkter' },
+  { id: 'crests', label: 'Sköldar och flaggor' },
 ];
+
+// Kolumnerna: de engelska tävlingarna, sedan landskamperna.
+const COLUMNS = [...COMPETITIONS, ...INTERNATIONAL];
 
 // Det som webbläsaren hämtar själv, per datatyp och tävling.
 const LIVE = [
   { provider: '365Scores', kinds: ['lineups', 'squad'], comps: COMPETITIONS.map((c) => c.id) },
 ];
 
-// Orsak när en cell saknar källa.
+// Orsak när en cell saknar källa: tävlingens id först, sedan typen.
+const LAND = 'finns inte för landslagen';
 const GAPS = {
-  table: { cup: 'cuperna har ingen tabell' },
-  stats: { cup: 'lagens ligadata används' },
-  xg: { cup: 'lagens ligadata används' },
-  referee: { cup: 'finns inte för cuperna' },
-  players: { cup: 'lagens ligadata används' },
+  table: { cup: 'cuperna har ingen tabell', emk: 'EM-kvalets grupper lottas inför mars 2027', vsk: 'vänskapsmatcher har ingen tabell' },
+  stats: { cup: 'lagens ligadata används', intl: LAND },
+  xg: { cup: 'lagens ligadata används', intl: LAND },
+  referee: { cup: 'finns inte för cuperna', intl: LAND },
+  squad: { intl: LAND },
+  lineups: { intl: LAND },
+  players: { cup: 'lagens ligadata används', intl: LAND },
   history: { cup: 'hämtas inte' },
-  europe: { default: 'inga lag i Europa' },
+  europe: { intl: 'gäller inte landslagen', default: 'inga lag i Europa' },
   video: { default: 'inga gratis sammandrag' },
 };
 
@@ -161,12 +172,12 @@ function coverage(rows) {
   return KINDS.map((k) => ({
     kind: k.id,
     label: k.label,
-    cells: COMPETITIONS.map((c) => {
+    cells: COLUMNS.map((c) => {
       const srcs = rows.filter((r) => r.kinds.includes(k.id) && r.comps.includes(c.id));
       const live = LIVE.filter((l) => l.kinds.includes(k.id) && l.comps.includes(c.id)).map((l) => l.provider);
       if (srcs.length || live.length) return { comp: c.id, sourceIds: srcs.map((r) => r.id), live };
       const gap = GAPS[k.id] || {};
-      return { comp: c.id, sourceIds: [], live: [], gap: gap[c.type] || gap.default || 'ingen fri källa' };
+      return { comp: c.id, sourceIds: [], live: [], gap: gap[c.id] || gap[c.type] || gap.default || 'ingen fri källa' };
     }),
   }));
 }
@@ -180,7 +191,7 @@ function sourceReport() {
     counts,
     providers: PROVIDERS,
     coverage: coverage(rows),
-    competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short })),
+    competitions: COLUMNS.map((c) => ({ id: c.id, name: c.name, short: c.short, intl: c.type === 'intl' || undefined })),
     unmapped: unmappedNames(),
   };
 }
