@@ -40,7 +40,9 @@
 // (lag och spelare i alla divisionerna, omgångens möten, flikarna och
 // divisionerna) står i utskriften, den mest sannolika överst och markerad och
 // sedan i fallande led, och Enter öppnar den markerade. Raden överst väljer
-// kategori (ALLA, LAG, SPELARE, MÖTEN, LISTOR; Tab byter). Felstavat går också
+// kategori (ALLA, LAG, SPELARE; Tab byter; MÖTEN och LISTOR togs bort
+// 2026-11-13, mötena och delarna står bara under ALLA). Ett lag ger också
+// dess spelare (aston villa → truppen under SPELARE). Felstavat går också
 // (MENADE DU), laget kan stå med (saka arsenal), och smeknamnen (spurs, wolves)
 // hittar lagen. En siffra och Enter väljer raden med det numret. Under den
 // står tangenterna: Esc tillbaka (och stänger överst),
@@ -886,7 +888,8 @@ window.RumRegister = (() => {
     // mest sannolika överst och sedan i fallande led, och Enter öppnar den
     // markerade (↑/↓ väljer en annan). Den hittar lag och spelare i alla fyra
     // divisionerna, omgångens möten (två lag), flikarna och divisionerna, och
-    // raden överst väljer kategori (Tab byter). Felstavat
+    // raden överst väljer kategori (Tab byter). Ett lag i frågan ger också
+    // lagets trupp, sist och i truppens ordning (LAGETS). Felstavat
     // går också: hittas inget står MENADE DU över det som ligger närmast.
     //
     // Hur sannolik en träff är (p, högre är troligare) är två delar lagda
@@ -929,6 +932,12 @@ window.RumRegister = (() => {
     // omgången också lite före.
     const TROLIGT = { mote: 0.6, del: 0.2, lag: 0, spelare: -0.6 };
     const DIVPLUS = { pl: 0.1, ch: 0.05, l1: 0.02, l2: 0, nl: 0.05 };
+    // Lagets spelare när frågan är laget: efter alla som passar på namn, och
+    // bara när laget passar nästan helt och frågan har minst tre bokstäver
+    // (högst fyra bokstäver fattas: burn → Burnleys trupp, men inte mans →
+    // Mansfields)
+    const LAGETS = -2;
+    const LAGETS_MIN = -0.3;
     // efternamnets ord (som efternamn(): van, de … hör till efternamnet)
     function efOrd(t) {
       let i = t.length - 1;
@@ -1000,6 +1009,7 @@ window.RumRegister = (() => {
       const q = qn.split(' ').filter(Boolean);
       if (!q.length) return [];
       const hits = [];
+      const lagTraff = [];
       // (klubbarna och landslagen; ett landslag heter också som på engelska och
       // har sin landskod: sverige, sweden, swe)
       const lag = [...(A.stats || new Map()).values(), ...(A.land ? A.land.lag.values() : [])];
@@ -1020,6 +1030,7 @@ window.RumRegister = (() => {
           if (v != null && (s == null || v > s)) s = v;
         }
         if (s != null) hits.push({ typ: 'lag', t, p: s + lagPlus(t) });
+        if (s != null && s >= LAGETS_MIN && qn.length >= 3 && !t.land) lagTraff.push({ t, p: s + lagPlus(t) });
       }
       // ett möte i omgången: båda lagen ur frågan
       for (const m of A.ms) {
@@ -1041,6 +1052,14 @@ window.RumRegister = (() => {
           if (rest.length && rest.length < q.length) { s = passar(rest, x.t, x.n, x.ef); if (s != null) s += 0.1; }
         }
         if (s != null) hits.push({ typ: 'spelare', x, p: s + spelPlus(x) });
+      }
+      // lagets trupp (de som har spelat eller är skadade), i truppens ordning
+      if (A.P && lagTraff.length) {
+        const har = new Set(hits.filter((h) => h.typ === 'spelare').map((h) => h.x));
+        const veil = slojan().veil;
+        for (const { t, p } of lagTraff) {
+          (trupp(t, veil) || []).forEach(({ x }, i) => { if (!har.has(x)) { har.add(x); hits.push({ typ: 'spelare', x, p: p + LAGETS - 0.0001 * i }); } });
+        }
       }
       // inget alls: det som ligger närmast (felstavat), mindre troligt ju längre bort
       const luddigt = !hits.length;
@@ -1072,7 +1091,7 @@ window.RumRegister = (() => {
     }
     // Kategorierna i sökningen: alla träffar eller ett slag (träffens typ).
     // Den valda gäller medan man skriver, och så länge den har träffar.
-    const KATEGORIER = [['alla', 'ALLA'], ['lag', 'LAG'], ['spelare', 'SPELARE'], ['mote', 'MÖTEN'], ['del', 'LISTOR']];
+    const KATEGORIER = [['alla', 'ALLA'], ['lag', 'LAG'], ['spelare', 'SPELARE']];
     const antal = (h, id) => (id === 'alla' ? h.length : h.filter((x) => x.typ === id).length);
     // kategorin som visas (alla när den valda är tom) och dess träffar, i samma ordning
     function iKat(h) {
