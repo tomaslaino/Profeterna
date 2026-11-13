@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-13T18:21:39.121Z",
+ "uppdaterad": "2026-11-13T18:23:15.540Z",
  "omgang": {
   "id": "2026-11-14-st4979",
   "matcher": [
@@ -1380,6 +1380,92 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-13T18:20:14.852Z",
     "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880744",
+   "match": "Wigan Athletic – Barnsley",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:22:38.938Z",
+   "text": "Fem gånger 1–1 och ingen har tröttnat än\n\nWigan och Barnsley möts i en tidig bottenmatch i League One. De två senaste säsongerna har lagen nästan bara spelat 1–1 mot varandra. Nu har ena laget ont om anfallare, och det andra kommer från en cupfest med sju gjorda mål.\n\nJag har sett många serier men sällan en som är så envis. Av lagens sju senaste möten har fem slutat 1–1, och det senaste kom redan i augusti på Oakwell. Nu möts två lag på plats 21 och 23 i tabellen, och The72 skriver att matchen ”could end up being a decisive one in the League One relegation fight” [1]. Det stämmer. I en sådan här match vinner det lag som står rätt på hörnorna.\n\nWigans problem syns i målprotokollet. Laget har inte gjort mål i 8 av 14 ligamatcher och har gjort drygt åtta mål färre än chanserna borde ha gett. Dessutom skadade sig Scott Hogan mot Mansfield. Enligt Sports Mole lär han missa matchen, och troligen gör Dara Costelloe och Luke Harris det också. Då får Christian Saydee bära anfallet ensam [2]. Gary Caldwell har dessutom kopplats ihop med det lediga jobbet i Aberdeen [1]. Det är ingen lugn vecka att leda en bottenklubb under.\n\nBarnsley har gått åtta ligamatcher utan seger, men mot Aldershot i FA-cupen vann de med 7–2. Makenzie Kirk gjorde två mål och lär leda anfallet, och Daniel Johnson väntas ta plats bredvid Luca Connell. Connor O'Riordan, Ben Hamed Toure och Fabio Jalo är skadade, och Patrick Kelly är borta med Nordirland [2]. Vimal Yoganathan har gjort tre mål på fyra matcher [1]. Det ser du redan på uppvärmningen, när en spelare har börjat träffa.\n\nTipset: 1X (krysset lockar mest)\n\nPrognosen ger Wigan en liten fördel och tror mer på oavgjort än marknaden gör. Det kan jag förstå, för fem av de sju senaste mötena har slutat 1–1. Utan Hogan och troligen utan Costelloe [1] blir Wigan ännu svårare att få att göra mål. Barnsley har inte vunnit på åtta ligamatcher och har bara en bortaseger den här säsongen [2]. Jag ringar därför in hemmaseger och oavgjort och låter bortasegern ligga.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Fem gånger 1–1 och ingen har tröttnat än",
+   "lead": "Wigan och Barnsley möts i en tidig bottenmatch i League One. De två senaste säsongerna har lagen nästan bara spelat 1–1 mot varandra. Nu har ena laget ont om anfallare, och det andra kommer från en cupfest med sju gjorda mål.",
+   "paragraphs": [
+    "Jag har sett många serier men sällan en som är så envis. Av lagens sju senaste möten har fem slutat 1–1, och det senaste kom redan i augusti på Oakwell. Nu möts två lag på plats 21 och 23 i tabellen, och The72 skriver att matchen ”could end up being a decisive one in the League One relegation fight” [1]. Det stämmer. I en sådan här match vinner det lag som står rätt på hörnorna.",
+    "Wigans problem syns i målprotokollet. Laget har inte gjort mål i 8 av 14 ligamatcher och har gjort drygt åtta mål färre än chanserna borde ha gett. Dessutom skadade sig Scott Hogan mot Mansfield. Enligt Sports Mole lär han missa matchen, och troligen gör Dara Costelloe och Luke Harris det också. Då får Christian Saydee bära anfallet ensam [2]. Gary Caldwell har dessutom kopplats ihop med det lediga jobbet i Aberdeen [1]. Det är ingen lugn vecka att leda en bottenklubb under.",
+    "Barnsley har gått åtta ligamatcher utan seger, men mot Aldershot i FA-cupen vann de med 7–2. Makenzie Kirk gjorde två mål och lär leda anfallet, och Daniel Johnson väntas ta plats bredvid Luca Connell. Connor O'Riordan, Ben Hamed Toure och Fabio Jalo är skadade, och Patrick Kelly är borta med Nordirland [2]. Vimal Yoganathan har gjort tre mål på fyra matcher [1]. Det ser du redan på uppvärmningen, när en spelare har börjat träffa."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The72",
+     "title": "Wigan Athletic vs Barnsley predictions as 'decisive' game awaits League One strugglers",
+     "url": "https://the72.co.uk/2026/11/12/wigan-athletic-vs-barnsley-predictions",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sports Mole",
+     "title": "Preview: Wigan Athletic vs Barnsley - prediction, team news, lineups",
+     "url": "https://sportsmole.co.uk/football/wigan-athletic/preview/wigan-vs-barnsley-prediction-team-news-lineups_609021.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Wigan en liten fördel och tror mer på oavgjort än marknaden gör. Det kan jag förstå, för fem av de sju senaste mötena har slutat 1–1. Utan Hogan och troligen utan Costelloe [1] blir Wigan ännu svårare att få att göra mål. Barnsley har inte vunnit på åtta ligamatcher och har bara en bortaseger den här säsongen [2]. Jag ringar därför in hemmaseger och oavgjort och låter bortasegern ligga.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "krysset lockar mest",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Mole",
+      "title": "Preview: Wigan Athletic vs Barnsley - prediction, team news, lineups",
+      "url": "https://sportsmole.co.uk/football/wigan-athletic/preview/wigan-vs-barnsley-prediction-team-news-lineups_609021.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The72",
+      "title": "Wigan Athletic vs Barnsley predictions as 'decisive' game awaits League One strugglers",
+      "url": "https://the72.co.uk/2026/11/12/wigan-athletic-vs-barnsley-predictions",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:22:38.938Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Fem av de sju senaste mötena mellan Wigan och Barnsley har slutat 1–1. Jag brukar inte tro på sådant, men här finns det en förklaring. Det är två lag som har jävligt svårt att vinna matcher.",
+     "Wigan har inte gjort mål i 8 av 14 ligamatcher, och nu saknas troligen Hogan, Costelloe och Harris. Då står Saydee ensam längst fram, och det räcker inte till två mål. Barnsley vann med 7–2 i cupen, men i ligan är de utan seger på åtta matcher och har bara vunnit en gång på bortaplan. Ett cupkalas säger ingenting om en ligamatch där båda lagen slåss för att hålla sig kvar.",
+     "Ingen av dem har ett anfall som kan avgöra matchen. Jag ringar in krysset och bara krysset."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "1–1",
+    "tips": "2026-11-13T18:22:38.938Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Glöm det"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:23:14.575Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
