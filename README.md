@@ -1437,6 +1437,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   nio andra småsaker som lottas: tittar mot gänget och längs baren, på notan och kaffet, nickar för sig
   själv, suckar, sträcker på nacken, höjer ett ögonbryn och skrockar. Se [Hasse Backe](#hasse-backe),
   *Vilan*.
+- **Hasse Backe nöjdare (2026-11-13, användarens önskemål):** "han får gärna se nöjdare ut. ordna det på
+  olika sätt". Leendet når nu hela ansiktet: munnen böjer sig uppåt, kinderna lyfts och blir lite varmare,
+  ögonen kisar med och skrattrynkor syns i ögonvrårna. Han ler lite mer när han pratar, skrattet har
+  kisande ögon i stället för en rak tandrad, och i vilan myser han ibland eller blinkar åt en. Se
+  [Hasse Backe](#hasse-backe), *Minen* och *Vilan*.
 - **Hasse Backe snyggare och mindre buggig (2026-11-06, användarens önskemål):** armarna såg ut som
   uppblåsta korvar, med en ballong till armbåge när han böjde dem; händerna var för små och orangea
   bredvid ansiktet, med grå smuts mellan fingrarna och naglar som laxrosa klistermärken; handen gick rakt
@@ -7013,6 +7018,15 @@ när han blir allvarlig före ett slag. Förut hade han ena brynet högt, huvude
 ett tunt leende, och det såg hånfullt ut; leendet i skuggaren var också så svagt att det knappt syntes
 (ändrat 2026-11-06).
 
+Leendet sitter i skuggaren som förvränger fotot, och det är byggt så att hela ansiktet är med, inte bara
+munnen: mungiporna dras upp mer än läpparnas mitt, så att munnen böjer sig uppåt; kinderna lyfts och rundas
+och trycker upp huden under ögonen; ögonen kisar med (halva leendet); skrattrynkor syns i ögonens yttre
+hörn när leendet är brett, och kinderna blir lite varmare i färgen. När han pratar ler han lite mer
+(`NOJD_TAL`), och läpparnas öppning följer leendets båge. I skrattet kisar han så att ögonen nästan går
+igen, och munnen är inte fullt så vidöppen. Förut låg munnen nästan rak med bara mungiporna lite uppåt,
+ögonen rörde sig knappt, och i skrattet blev munnen en bred, rak tandrad: det såg ansträngt ut snarare
+än nöjt (ändrat 2026-11-13).
+
 **Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
 aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
 sju och en halv sekund isär och ibland två gånger i rad (`blinkar`); blicken flyttar sig lite med en
@@ -7027,7 +7041,7 @@ Var 5–11:e sekund gör han något litet (`SMATT` i [public/rum-hasse.js](publi
 att samma sak kommer två gånger innan allt har varit med, och fingrarna dubbelt så ofta som det andra.
 Fingrarna trummar på ett av fyra sätt, oftast med höger hand och annars med vänster: två varv från
 lillfingret till pekfingret, tre fortare, ett långsamt, eller pekfingret som knackar fyra gånger
-(`TRUM`). Annars ett av nio klipp med händerna kvar på disken (gruppen `smatt`), där ögonen går först och
+(`TRUM`). Annars ett av elva klipp med händerna kvar på disken (gruppen `smatt`), där ögonen går först och
 huvudet efter, som man gör:
 
 - `affaren`: tittar bort mot gänget i affären, kisar, skakar lite på huvudet och ler åt dem.
@@ -7039,6 +7053,11 @@ huvudet efter, som man gör:
 - `brynet`: hakan lite upp, ena brynet högt och ett brett leende, och en långsam nick: visst är det så?
 - `skrocka`: skrockar åt något han kommer att tänka på, med axlarna som hoppar.
 - `smacka`: tittar på kaffet, smackar och säger mm.
+- `myser`: lutar sig lite bakåt med hakan upp, leendet växer tills ögonen är halvslutna, och han andas in
+  och ut med axlarna som sjunker och nickar lite för sig själv.
+- `blinka`: tittar på en, ler brett och blinkar med sitt högra öga (`vink`: brynet går ned och den
+  sidans mungipa och kind upp), med en liten nick: vi vet, du och jag. Det är också vad han gör när han
+  har sagt att det har gått bra för en (förut skrockade han, som han fortfarande gör när allt är rätt).
 
 Han spanar också på din kupong (gruppen `spana`). Ligger den på disken framför honom är det ungefär vart
 tredje tillfälle, med en lottad min. Har han sagt vad han tycker om den följer minen orden (`H.spana` i

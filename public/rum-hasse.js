@@ -2386,7 +2386,7 @@ window.RumHasse = (() => {
     return { lage, n, ok, plats: spelade ? hansPlats(lista) : null, exakt: sagtExakt(lista, tips) };
   }
   // Vad han gör när han har sagt sitt.
-  const EFTER_GEST = { alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck', inget: 'suck', pagar: 'smacka', dolt: 'brynet', ofragad: 'notan' };
+  const EFTER_GEST = { alla: 'skrocka', bra: 'blinka', mitten: 'brynet', daligt: 'suck', inget: 'suck', pagar: 'smacka', dolt: 'brynet', ofragad: 'notan' };
   function efterat(lista, tips) {
     const e = REP().efter;
     // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
@@ -2502,7 +2502,7 @@ window.RumHasse = (() => {
     if (l.av < 2) sagRader(enMatch(lista, tips));
     else {
       repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(S[lage]) }],
-        { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck' }[lage]) });
+        { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'blinka', mitten: 'brynet', daligt: 'suck' }[lage]) });
     }
     const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);
     const rader = [match, match, extra ? () => lott(extra) : match, match, match, match];
