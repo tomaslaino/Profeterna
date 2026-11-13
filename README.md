@@ -1621,6 +1621,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   – och säger vad han tycker om var och en, i var sitt stycke. Alla domrader är omskrivna med riktiga tipsord (*spiken
   sprack*, *halvgarderingen höll inte*) och hans torra självsäkerhet (*Sådant händer när favoriterna inte har läst på.*).
   Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
+- **Hasse lär sig aldrig era namn (2026-11-13, användarens önskemål):** "Jag vill att han ska uttala våra namn fel på
+  fler subtila sätt. Det ska vara som att han aldrig lär sig namnet och/eller inte bryr sig." Av sex förslag valde
+  användaren alla utom att han förväxlar er med varandra. Han har nya felnamn (*Laine*, *Lainen*, *Laiho*, *Tegnér*,
+  *Tajder*, *Tejdel*, *Mogge*, *Dagge*), säger ibland *Daniel*, som ni alla heter, och kallar Dogge *Jansson* eller
+  *Johnsson*. Den som kom sist säger han fel om oftare, i hälften av domarna med fel tappar han namnet efter första
+  meningen, och felet fastnar en omgång, samma när han hälsar och i domen. *Teider* är borta, eftersom det låter som
+  *Tejder* när rösten läser. Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -7367,9 +7374,15 @@ gänget* (ersatta av *Tillbaka* 2026-11-13). Med dolda resultat finns inget prot
 som förut.
 
 Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som använder sidan (`npm run repliker` säger till om
-ordet). Namnen sitter inte riktigt: ungefär var tredje dom säger han ett namn som nästan stämmer (*Tejler*, *Docke*;
-`felnamn` i rum-hasse-repliker.js, `kallar` i rum-hasse.js), samma i hela domen och på alla enheter, men aldrig om den som
-vann. Ungefär var fjärde gång han hälsar på dig händer samma sak. Han rättar sig aldrig och säger inget om det. Står man kvar
+ordet). Namnen sitter inte riktigt, som hos den som aldrig lär sig dem och inte bryr sig (`felnamn` i
+rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett namn som låter nästan likadant (*Tejler*,
+*Docke*), ett han kan bättre någon annanstans ifrån (*Laine*, *Tegnér*, *Mogge*), *Daniel*, som ni alla heter och som därför
+aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska höras
+när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
+tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
+mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
+samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
+Domen är densamma varje gång. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
