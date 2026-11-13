@@ -16,7 +16,7 @@
 //   Motståndet     anteckningsblock: de som har mött svårast och lättast
 //                  motstånd hittills (modellens styrka, som på Statistik)
 // Mötena och lagen ett och ett står i datorn på disken (rum-register.js), som också
-// har lapparnas siffror, ordnade efter match och lapp: ändras en lapp här ska datorn följa med.
+// har lapparnas siffror vid matcherna: ändras en lapp här ska datorn följa med.
 // Samma lappar (utom skadelistan och vilan) står som topplistor för hela
 // divisionen på Statistik → Lagen (divisioner.js): ändras en, följer den andra med.
 //

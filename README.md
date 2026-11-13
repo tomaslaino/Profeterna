@@ -6223,9 +6223,12 @@ tre flikar, två fönster med listan till vänster, och en DOS-sökväg utan fli
 användaren valde menyraden: *Lagen* och *Spelarna* blev en flik med alla divisionerna och
 lagens trupper, *Omgången* blev *Topplistor* utan formen, vilan och skadorna (de står vid
 matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man skriver.
+2026-11-13 togs *Topplistor* bort (användarens önskemål): tavlans tal står bara vid matcherna,
+och matchakten fick lagets plats i divisionen efter varje tal, så att det topplistan visade
+finns kvar där.
 
-Överst står menyraden, som alltid står still: *KUPONGEN*, *TOPPLISTOR* och *LAGEN*, med den
-valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
+Överst står menyraden, som alltid står still: *KUPONGEN* och *LAGEN*, med den valda fliken
+omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
 över hela bredden; det mellan dem rullar.
 
 - **Kupongen** – omgångens matcher numrerade, med båda lagens form bredvid namnen (de fem
@@ -6234,8 +6237,13 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   *Vilan* och *Nästa* (dagar till nästa match, med cupen när det inte är ligan), tavlans
   *Styrka*, *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*, och lagkortens *Mål* och *xG*
   per match (för–mot), *Favorit* och *Skytten*; sedan skadelistorna när de finns och de
-  senaste mötena med hemmalagets V–O–F. Etiketterna från tavlan leder till topplistan,
-  lagnamnen till lagkorten och skytten till spelarkortet. Det bättre talet i varje par lyser
+  senaste mötena med hemmalagets V–O–F. Efter vart och ett av tavlans tal står lagets
+  **plats i sin division** (*+0,94  1:A*, *−0,89 20:E*): högst först, lika tal delar plats,
+  ur alla divisionens lag i `data/teams/<division>.json` – i en cupmatch mellan två
+  divisioner var för sig. Platsen står alltid svagt och säger bara var laget ligger; för
+  *Styrka* och *Mot oddsen* är 1:a bäst, för *Kryssar*, *Tur* och *Motståndet* betyder den
+  flest kryss, mest tur och tuffast motstånd. Lagnamnen leder till lagkorten och skytten
+  till spelarkortet. Det bättre talet i varje par lyser
   och det sämre är svagt, så att man ser vem som har övertaget utan att jämföra siffrorna
   (2026-11-12, användarens val bland fyra skisser: *Arket*, *Skalan*, *Noterat* och *Lyser*).
   Det gäller *Formen* (minst två poäng på fem matcher), *Vilan* (minst två dagar, samma regel
@@ -6265,12 +6273,6 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   Saknar fler än en av de fem matcherna styrka visas ingen siffra. Med dolda resultat står
   ett frågetecken, som för tavlans tal. EFL Trophy hämtas inte och finns varken i formen
   eller i siffran.
-- **Topplistor** – tavlans lappar som listor över hela omgången, på en rad under menyraden:
-  *Styrka* per division (styrkan jämförs bara inom divisionen), *Kryss* från mest till minst,
-  och *Tur* (med staplar), *Oddsen* och *Motstånd* i två listor (tur och otur, slår oddsen och
-  sviker, tufft och lätt hittills). Hela omgångens lag står med, inte bara de översta som på
-  lapparna, och varje rad leder till matchakten. Formen, vilan och skadorna har ingen lista:
-  de står vid matcherna.
 - **Lagen** – de fyra divisionerna (*PL*, *CH*, *L1* och *L2* i telefonen), med divisionen
   som har flest lag i omgången först. Lagen står i bokstavsordning (två spalter på datorn),
   och lagen i omgången är ljusa. Ett lag öppnar **lagkortet** med truppen,
@@ -6298,8 +6300,8 @@ Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.
   säsongens) med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem. Två lag i
   frågan (*arsenal hull*) ger mötet.
 
-Sökningen hittar lag och spelare i alla fyra divisionerna, omgångens möten, topplistorna
-(*tur*, *styrka*), flikarna och divisionerna (*championship*). Laget kan stå med i frågan
+Sökningen hittar lag och spelare i alla fyra divisionerna, omgångens möten, flikarna och
+divisionerna (*championship*). Laget kan stå med i frågan
 (*saka arsenal*, *bowen west ham*), och smeknamnen *spurs*, *wolves*, *boro*, *utd*, *qpr*,
 *wba*, *pne*, *mk* och *bha* hittar lagen.
 
@@ -6311,13 +6313,13 @@ Sannolikheten är två delar lagda ihop (`passar`, `TROLIGT` och `DIVPLUS` i
 bäst, ett ord som bara börjar namnet sämre ju fler bokstäver som fattas, hela namnet lite
 bättre, och för en spelare lite sämre när frågan inte träffar efternamnet – och hur ofta man
 söker något sådant: ett möte (två lag i frågan) är nästan säkert det man menar, sedan en flik
-eller topplista när frågan är dess ord, sedan lagen och sist spelarna; lagen högre upp i
+eller division när frågan är dess ord, sedan lagen och sist spelarna; lagen högre upp i
 ligasystemet och spelarna med mest speltid lite före, och lag och spelare i omgången också.
 Så går *burn* → Burnley före Dan Burn, Burns och Burnett, *isak* → Isak före Isaksen och Isak
 Alemayehu, och *liv* → Liverpool före Livramento.
 
-Överst i träfflistan står **kategorierna**, som topplistornas rad: *Alla*, *Lag*, *Spelare*,
-*Möten* och *Listor* (flikarna, topplistorna och divisionerna), med antalet träffar när raden
+Överst i träfflistan står **kategorierna**, som divisionernas rad: *Alla*, *Lag*, *Spelare*,
+*Möten* och *Listor* (flikarna och divisionerna), med antalet träffar när raden
 ryms (inte i telefonen). Den valda är omvänd och de tomma svaga; ett tryck eller Tab (Skift-Tab
 bakåt) byter, och i varje kategori står träffarna i samma ordning, den troligaste överst.
 Kategorin gäller medan man skriver, så länge den har träffar, och en ny sökning börjar med
@@ -6328,7 +6330,7 @@ Haaland, *midlesbrough* Middlesbrough). Träffarna listas numrerade (högst 20).
 började skriva.
 
 Tangenterna: Esc går tillbaka dit man var (och stänger datorn när man är längst tillbaka),
-↑/↓ markerar en rad och Enter öppnar den, ←/→ bläddrar till förra och nästa match, lista,
+↑/↓ markerar en rad och Enter öppnar den, ←/→ bläddrar till förra och nästa match,
 division, lag eller spelare (och bland flikarna när det inte finns något att bläddra i), och
 Tab byter flik (i sökningen kategori).
 Raden längst ner säger det med tangenternas namn och går att trycka på; i telefonen står
@@ -6362,11 +6364,11 @@ kort, och närbilden ritas bara under svängen.
 Dolda resultat: lag- och spelarkorten och truppens speltid och mål visar ? när en match i
 lagens divisioner är dold (och truppen står då efter plats och namn, inte speltid), med
 *Visa ändå* under skärmen (i en stående telefon längst ner, med terminalen ovanför) – samma nyckel som anslagstavlan, så att det gäller båda – och
-dolda möten står som ?. Siffrorna från tavlan och lagkorten i matchakten och under
-*Topplistor* (styrkan, kryssen, turen, oddsen och motståndet) får ? på samma sätt, och formen och mötena har ? för de
+dolda möten står som ?. Siffrorna från tavlan och lagkorten i matchakten (styrkan, kryssen,
+turen, oddsen och motståndet, och platsen i divisionen) får ? på samma sätt, och formen och mötena har ? för de
 dolda matcherna. Utan WebGL står disken tom. `?rum-register` visar datorn framme i
 en fast bild, `?rum-register=<fråga>` med den sökningen och `?rum-register=%23mote:<id>`,
-`%23amne:tur`, `%23div:pl`, `%23flik:lagen` … med den vyn.
+`%23div:pl`, `%23flik:lagen` … med den vyn.
 
 #### Vad som står var
 
@@ -6378,7 +6380,7 @@ med flit (nedan):
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
 | **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror ordnade efter match och lista | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match, truppen), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten och under *Topplistor* |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match, truppen), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
