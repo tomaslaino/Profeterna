@@ -619,27 +619,13 @@ export function poddNyckel(fil) {
 // matcher är hela kupongen, också matcherna utan blad, för innehållet i Helgarderat (public/helgarderat.js).
 // → {omgang, uppdaterad, amnen, matcher: [{id, nr, match, avspark}], sidor: [{id, nr, match, lag, rubrik, ingress,
 //   summering, citat, delar}]} eller null
-// Poddkällorna får avsnittets ljudfil (ljud), till kassetterna i rummet (rum-radio.js): adressen ur poddens
-// flöde (fil.ljud, som poddjobbet sparar per podd och titel), annars den som redan står i det publicerade
-// numret (forut). Sidorna skrivs inte om för det.
-export function poddsidor(fil, round, forut = null) {
+export function poddsidor(fil, round) {
   if (!fil || !round || fil.omgang !== round.id || !fil.sidor) return null;
-  const ljudNyckel = (k) => `${k.podd}\n${k.avsnitt}`;
-  const tidigare = new Map();
-  for (const s of (forut && forut.sidor) || []) for (const d of s.delar || []) for (const k of d.kallor || []) if (k && k.ljud) tidigare.set(ljudNyckel(k), k.ljud);
-  const medLjud = (d) => {
-    if (!Array.isArray(d.kallor)) return d;
-    return { ...d, kallor: d.kallor.map((k) => {
-      if (!k || (k.typ && k.typ !== 'podd') || k.ljud) return k;
-      const ljud = (fil.ljud && fil.ljud[ljudNyckel(k)]) || tidigare.get(ljudNyckel(k)) || null;
-      return ljud ? { ...k, ljud } : k;
-    }) };
-  };
   const sidor = round.matcher.map((x, i) => {
     const s = fil.sidor[String(x.id)];
     if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => (d.grupper || []).length || (d.text || []).length)) return null;
     return { id: String(x.id), nr: i + 1, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null,
-      summering: s.summering || null, ...(s.citat ? { citat: s.citat } : {}), delar: s.delar.map(medLjud) };
+      summering: s.summering || null, ...(s.citat ? { citat: s.citat } : {}), delar: s.delar };
   }).filter(Boolean);
   const matcher = round.matcher.map((x, i) => ({ id: String(x.id), nr: i + 1, match: x.match || null, avspark: x.avspark || null }));
   return sidor.length ? { omgang: round.id, uppdaterad: fil.uppdaterad, amnen: pc.amnen, matcher, sidor } : null;

@@ -4172,41 +4172,9 @@ kassettens dukar ritas om större första gången (`radioFin`), och de små dela
 och `?rum-radio-lage=fm:90.4` hur den står inställd, utan ljud; `?rum-radio`
 sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
 
-**Kassetterna med poddarna** (2026-11-11, [public/rum-kassetter.js](public/rum-kassetter.js) för stället och
-kassetten som flyttas, `kassetterna` i rum-radio.js för bandet och ljudet): användaren ville ha "kassetter med de olika
-poddavsnitten för de olika lagen som ska spela nästa omgång som man har möjlighet att gå in och lyssna på", och valde
-bland fyra skisser (ställ, hylla på skivan, hög på radion, grossistkartong) ett kassettställ i svart plast med
-etiketter i blå kulspets. Det står till vänster om radion (`STALL_PLATS` i rum-3d.js), där bänken är fri hur de än
-sitter; DJ:s liggande tomflaska ligger 17 cm längre till vänster än förut (`tomma`), annars skymde den nedre halvan
-av stället nära. Ett fack per match på kupongen, numrerat som där (*1  Stockport – Reading*), med supporterpoddarnas
-senaste avsnitt inför omgången ur `data/poddsidor.json`: A-sidan är hemmalagets podd och B-sidan bortalagets. En
-match utan podd är ett oinspelat band utan text. Överst gängets egna band (*Dansband?*, *Italo 2*) och Blandbandet,
-som sitter i radion från början och är gängets italodisco (Italo Disco-strömmen; gänget dansar). Märkena är TDK D90,
-Maxell UR 90 och BASF LH 90 om vartannat.
-
-Ett klick på stället i rummet går fram till radion, och närbilden tar med stället. Där ligger knappar över ryggarna
-när de är minst 14 px höga; annars (telefonen) går ett tryck på stället fram till det (`SAKER.kassetter`), och en
-kassett där tar kameran tillbaka till radion först. En kassett i stället: den som sitter i radion åker tillbaka till
-sitt fodral, luckan fälls ut, den nya flyger in (fodralet står kvar, utdraget, så länge kassetten är i radion) och
-spelas. Tangenterna på locket är REC, PLAY, REW, FF, STOP/EJ och PAUS med tecken på framsidan, och de går ner och
-stannar som på en riktig bandspelare: FF och REW spolar trettio gånger så fort med ett vinande, STOP två gånger matar
-ut kassetten, PAUS går att trycka ner med PLAY, och REC går inte (fliken är utbruten). Ett tryck på luckan vänder
-kassetten, och den spelar vidare på andra sidan. Spolarna i fönstret snurrar och är olika stora efter hur långt
-bandet har gått. Bandet står kvar där man slutade (per avsnitt i webbläsaren, `rum-band`), och kassetten minns sin
-sida; en kassett vars ena lag saknar podd börjar på den andra sidan. Medan bandet går är radion tyst; PLAY slår på
-strömmen och STOP slår av den igen om det var bandet som slog på den, annars hörs radion igen. Ett oinspelat band
-susar.
-
-Ljudet hämtas från poddens egen server och läggs aldrig på sajten (adressen ur flödet). Genom Web Audio om servern
-tillåter det (acast, podbean, libsyn, substack och megaphone gjorde det 2026-11-11), och då följer lysdioderna talet;
-annars samma adress i ett vanligt ljudelement (Buzzsprout), med lysdioderna som tal. Poddarna börjar låta efter några
-sekunder, som inledningsbandet på en kassett. Adresserna kommer med nattjobbet: poddjobbet sparar ljudfilen per podd
-och titel (`fil.ljud` i omgångens fil, scripts/tidning/poddar.mjs), och `poddsidor` i src/analyser/poddar.mjs lägger
-den på poddkällorna (`ljud`) när analysjobbet lägger ut numret, utan att sidorna skrivs om. Adresser som redan står i
-det publicerade numret följer med (`forut`), så att en som har lagts in för hand inte försvinner. Stället kostar sex
-ritningar i rummet (av ungefär 600 med skuggorna) och under tusen trianglar; ryggarna är en enda duk som ritas om
-större nära (`rduk`). `?rum-sak=kassetter` visar stället nära, och `RumRadio.band` (i, ut, vand, tangent, lage)
-styr bandet för prov.
+**Kassetterna med poddarna** (2026-11-11) är borttagna igen (2026-11-13, användarens beslut: *de funkar inte
+ändå*): kassettstället bredvid radion, bandspelaren i radion och poddavsnittens ljudadresser i nattjobbet. Radion
+har kvar sin kassett bakom glaset som en del av utseendet, och DJ:s liggande tomflaska ligger där den låg före stället.
 
 **Fönsterbänken följer väggen** (2026-11-10). Rummet vrids kring planet -330, där gängets duk ligger. Där låg
 också fönsterbänken, medan fönstret, löpsedlarna och bladet med stationerna sitter på bakväggen i planet -600,
