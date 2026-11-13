@@ -865,3 +865,52 @@ button.dv-meter-row:hover { background: var(--hair); }
   .card.dv-card.dv-tablecard { padding-left: 10px; padding-right: 10px; }
   .dv-filters .dv-select { flex: 1 1 45%; }
 }
+
+/* ---------- landslagen (fliken Landslag) ----------
+   Nations Leagues grupper två och två (en i telefonen), lördagens grupper
+   först med matcherna under tabellen, och statistiken med lördagens
+   landskamper sida vid sida. Fliken har en egen färg (--dv-unl). */
+:root { --dv-unl: #2493a6; }
+@media (prefers-color-scheme: dark) { :root { --dv-unl: #2a9db0; } }
+.dv-lgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 430px), 1fr)); gap: 0 16px; }
+.dv-lgroup h4 { display: flex; align-items: center; gap: 8px; }
+.dv-ltag {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--bg, #0e0d0b); background: var(--dv-unl); border-radius: 999px; padding: 2px 8px;
+}
+.dv-lgroup.on { box-shadow: inset 3px 0 0 var(--dv-unl); }
+.dv-lgames { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.dv-lmatch {
+  display: flex; align-items: baseline; gap: 10px; padding: 4px 6px; border-radius: 6px;
+  color: var(--fg); text-decoration: none; font-size: 14px;
+}
+.dv-lmatch:hover { background: color-mix(in srgb, var(--dv-unl) 12%, transparent); }
+.dv-lm-when { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 6.5em; }
+.dv-lm-teams { flex: 1; min-width: 0; font-weight: 600; }
+.dv-lm-teams::after { content: " →"; color: var(--muted); font-weight: 400; }
+.dv-lm-res { font-variant-numeric: tabular-nums; }
+
+.dv-lgamelist { list-style: none; margin: 0; padding: 0; }
+.dv-lgamelist li + li { border-top: 1px solid var(--border); }
+.dv-lgame {
+  display: grid; grid-template-columns: 7.5em 1fr 1fr auto; align-items: center; gap: 14px;
+  padding: 10px 4px; color: var(--fg); text-decoration: none;
+}
+.dv-lgame:hover { background: color-mix(in srgb, var(--dv-unl) 8%, transparent); }
+.dv-lg-when { font-weight: 650; font-variant-numeric: tabular-nums; }
+.dv-lg-when small, .dv-lside small { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); }
+.dv-lside { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dv-lside .dv-tname { font-weight: 650; }
+.dv-lside-f { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.dv-lg-p { display: flex; gap: 10px; font-variant-numeric: tabular-nums; font-size: 14px; }
+.dv-lg-p span { display: flex; flex-direction: column; align-items: flex-end; min-width: 2.6em; }
+.dv-lg-p small { color: var(--muted); font-size: 11px; }
+table.dv-landtab tr.dv-lon td.team { box-shadow: inset 3px 0 0 var(--dv-unl); }
+.dv-lnext { color: var(--muted); font-size: 13px; }
+@media (max-width: 640px) {
+  .dv-lgame { grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+  .dv-lg-when { grid-column: 1 / -1; display: flex; gap: 8px; align-items: baseline; }
+  .dv-lg-when small { display: inline; }
+  .dv-lg-p { grid-column: 1 / -1; }
+  .dv-lm-when { min-width: 5.5em; }
+}

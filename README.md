@@ -2919,6 +2919,37 @@ inte ESPN): bygget gav matchsidor, prognoser och `landslag.json` utan fel, Svens
 med `linkDraw`, och i huvudlös Chromium visade matchlistan, matchrutan, Ny kupong och Välj matcher landskamperna utan
 fel i konsolen. Hämtningen och bygget mot riktig data prövas av GitHub Actions efter mergen.
 
+### Tabeller, Statistik, Källor och Modell för landslagen (2026-11-13)
+
+Användarens önskemål: "Uppdatera hela hemsidan utefter detta" – så att veckans landskamper också finns på
+sajtens tabeller, statistik och källor.
+
+- **Fliken Landslag** står efter League Two på både Tabeller och Statistik (`#unl/tabell`, `#unl/spelare`; landslagsdelen
+  sist i [public/divisioner.js](public/divisioner.js), ur `data/landslag.json`). Den har en egen färg (`--dv-unl`).
+- **Tabeller** visar Nations Leagues fjorton grupper (A1–D2) i samma tabell som de engelska, två i bredd. Grupperna som
+  spelar på Stryktipsets lördag står först under *Lördagens grupper*, märkta och med lördagens matcher under tabellen
+  (länk till matchrutan). Zonerna läses ur ESPN:s `note`, som ESPN skriver en gång per placering och för alla ligor på
+  en rad ("A: Qualifies for QFs; B-D: Promotion"): kvartsfinal, uppflyttning, kval till uppflyttning, kval mot
+  nedflyttning och nedflyttning efter gruppens liga. Ett lag öppnar lagkortet.
+- **Statistik** har *Lördagens landskamper* (lagen sida vid sida med formen, placeringen och marknadens chans) och
+  tabellen *Landslagen* (lördagens lag eller alla, sorterbar): gruppen, formen (V/O/F i färg), poängen i Nations
+  League, alla landskamper sedan hösten 2024 (V–O–F, gjorda–insläppta, nollor) och nästa match. Lagkortet har gruppen
+  och zonen, Nations League hittills, alla landskamper, nästa match och de tio senaste, med länk till matchrutan för
+  de matcher sajten har. Spelare, xG och skott visas inte – de finns inte för landslagen. Spoilerskyddet döljer
+  resultaten som för klubbarna.
+- **Källor**: täckningsmatrisen har kolumnerna UNL, EMK och VSK efter de engelska, med orsak där en datatyp saknas
+  ("finns inte för landslagen", EM-kvalets tabell "lottas inför mars 2027"), och en ny rad *Sköldar och flaggor*
+  ([src/sourcetable.js](src/sourcetable.js); sköldarnas källa gäller nu också landskamperna i src/sources.js). ESPN:s
+  och DraftKings texter nämner landskamperna.
+- **Modell**: en rad under stegen säger att landskampernas prognos är marknadens (DraftKings utan marginal) och att de
+  inte är med i utvärderingen.
+
+Provat 2026-11-13 med riktig ESPN-data (`node src/build.js`) i huvudlös Chromium i 1440 × 900 och 390 × 844: Tabeller
+och Statistik för Landslag, lagkortet, Källor och Modell utan fel i konsolen (utom tjänster som molnmiljön inte når),
+och de engelska tabellerna och statistiken som förut. Inte provat: flaggorna (ESPN:s bildserver nås inte härifrån, så
+de står som tomma sköldar tills GitHub Actions hämtar dem), och *Lördagens grupper* bygger på lördagens datum, inte på
+Stryktipset självt (Svenska Spel nås inte vid bygget) – en landskamp på lördagen som inte är på kupongen märks också.
+
 ## Kupongen
 
 Gängets gemensamma kupong för omgången: de utvalda matcherna med ett tecken var – `1`, `X`,
