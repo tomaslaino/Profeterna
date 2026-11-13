@@ -1,12 +1,14 @@
 <!doctype html><meta charset="utf-8"><body style="margin:0;background:#222"><canvas id="ut" style="width:900px"></canvas><script type="module">
 // Väggen bakom Hasse Backe: samma slitna affär som gänget sitter i (rum.js, rum-inredning.js), med ett stort
-// glasparti ut mot S:t Eriksbron ovanför bardisken (flaskorna och en barstol), spårat med riktigt ljus
+// glasparti ut mot S:t Eriksbron ovanför bardisken (flaskorna), spårat med riktigt ljus
 // (mjuka skuggor, ljus som studsar, blanka ytor, skärpedjup) från figurens kamera (public/rum-hasse-scen.js):
 // framför honom, där han sitter vid pultens hörn. Skarpt där han sitter. Han själv och pulten framför
 // honom syns inte men skuggar och kastar ljus (sidan ritar dem, rum-hasse-3d.js).
 // Där kameran ser ut genom glaset (SCEN.FONSTER) är bilden genomskinlig, och sidan lägger utsikten bakom
 // (rum-hasse-ute.js). Ljuset utifrån kommer in genom fönstren (HIMMEL nedan).
 // Bilden har måtten i BAK (rum-hasse-scen.js). ?lage=bred|hog &n=antal varv
+// &ruta=x0,y0,x1,y1: bara den rutan i bildens bildpunkter (y nedåt), resten genomskinligt, för att baka om en del av
+// en bild som redan är bakad (lappa.py lägger in den). Så togs barstolen bort 2026-11-13.
 import { SCEN, BAK, kamera } from '../../rum-hasse-scen.js';
 const q = new URLSearchParams(location.search);
 const LAGE = q.get('lage') || 'bred';
@@ -96,15 +98,8 @@ grupp(() => {
 grupp(() => {
   for (let x = -3300; x < 3400; x += 1800) box([x, T - TJ - 60, VAGG + FR + 90], [9, 50, 80], 0, RGB('#1d1611'));
 });
-// en barstol som gängets, längst till höger
-const stol = (x, z) => {
-  const Y = -1050;
-  cyl([x, Y, z], 262, 44, 16, RGB('#6e2320'));
-  ell([x, Y + 44, z], [262, 34, 262], 16, RGB('#6e2320'));
-  cyl([x, Y - 56, z], 175, 12, 13, [0.72, 0.72, 0.7]);
-  for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) cyl([x + a * 130, Y - 620, z + b * 130], 18, 560, 13, [0.72, 0.72, 0.7]);
-};
-grupp(() => { stol(2760, VAGG + 700); });
+// (en barstol som gängets stod längst till höger, vid x = 2760, till 2026-11-13: den trängdes med veckans löpsedel,
+// som hänger i kroken i fältet bredvid, SCEN.LOPSEDEL)
 
 // flaskor som gängets, i verklig storlek
 const flaska = (x, z, col, h = 1, etikett = '#e6dcc0') => {
@@ -418,6 +413,12 @@ LJ.forEach((l, i) => { gl.uniform4f(U(`uL[${i}]`), l.p[0], l.p[1], l.p[2], l.r);
 gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tP);
 gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tA);
 gl.viewport(0, 0, W, H);
+// (bara rutan: ?ruta)
+const RUTA = q.get('ruta') ? q.get('ruta').split(',').map(Number) : null;
+if (RUTA) {
+  gl.enable(gl.SCISSOR_TEST);
+  gl.scissor(RUTA[0], H - RUTA[3], RUTA[2] - RUTA[0], RUTA[3] - RUTA[1]);
+}
 let f = 0;
 const ett = new Float32Array(4);
 window.__tappad = () => gl.isContextLost();
@@ -429,7 +430,7 @@ window.__steg = () => new Promise((ok) => {
     gl.uniform1i(U('uF'), f);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     // (vänta in grafikkortet: annars köas alla varv, och det stannar för alla andra)
-    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, ett);
+    gl.readPixels(RUTA ? RUTA[0] : 0, RUTA ? H - RUTA[3] : 0, 1, 1, gl.RGBA, gl.FLOAT, ett);
     f++;
     window.__f = f;
     if (f < N) setTimeout(tick, 0); else ok(f);
@@ -438,6 +439,7 @@ window.__steg = () => new Promise((ok) => {
 });
 window.__visa = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.disable(gl.SCISSOR_TEST);
   gl.useProgram(p2);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, fb[f % 2].t);
   gl.uniform1i(gl.getUniformLocation(p2, 'uT'), 0); gl.uniform1f(gl.getUniformLocation(p2, 'uN'), f); gl.uniform1f(gl.getUniformLocation(p2, 'uRa'), 0);

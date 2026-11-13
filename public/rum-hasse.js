@@ -716,8 +716,11 @@ window.RumHasse = (() => {
     const knapp = $('.rh-lop');
     const sedel = window.Rum && Rum.lopsedel ? Rum.lopsedel() : null;
     // (utan sedel: rummets saker är inte ritade än; utan lopsedel: en äldre rum-hasse-3d.js i cachen)
+    clearTimeout(H.lopT);
     if (!knapp || !H.v || !H.m || !H.m.lopsedel || !sedel || !sedel.childElementCount) {
       if (knapp) knapp.hidden = true;
+      // (rummets saker ritas efter figurerna, och i telefonen hinner man hit först: igen strax, medan hans bild syns)
+      if (knapp && H.m && H.m.lopsedel) H.lopT = setTimeout(() => { if (!H.vy.hidden) lopsedel(); }, 2500);
       return;
     }
     // samma sedel som i rummets ritning, kopierad när den har ändrats (rubriken, numret, slitaget)
