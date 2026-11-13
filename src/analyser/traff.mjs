@@ -11,7 +11,8 @@ import { jsonOf } from './kontroller.mjs';
 import { claudeSvar, Stopp } from './claude.mjs';
 
 const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
-const ESPN_LIGA = Object.fromEntries(comp.COMPETITIONS.filter((c) => c.espn).map((c) => [c.id, c.espn]));
+// (också landskamperna: matchrapporten för Nations League ligger under uefa.nations)
+const ESPN_LIGA = Object.fromEntries([...comp.COMPETITIONS, ...(comp.INTERNATIONAL || [])].filter((c) => c.espn).map((c) => [c.id, c.espn]));
 const DOMAR = { 'rätt': 'ratt', ratt: 'ratt', fel: 'fel' };
 const SA = ['missar', 'med', 'startar', 'startar inte'];
 const ren = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
