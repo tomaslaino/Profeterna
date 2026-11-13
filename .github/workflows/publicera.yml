@@ -100,21 +100,6 @@ jobs:
             echo "Grenen tidning-bilder finns inte: sköldarna."
           fi
 
-      # Matchbladens bilder i Helgarderat (scripts/tidning/matchbilder.mjs): veckans bild av varje lag i
-      # data/poddsidor.json, hämtad här eftersom GitHub Actions når nyhetssajterna, med samma kod som
-      # tidningens bilder på iMacen. Bilderna sparas i källcachen, så att de hämtas en gång per omgång (ett
-      # lag utan bild prövas igen efter sex timmar), och bygget lägger dem i matchbladen. ImageMagick
-      # förminskar dem; finns det inte installeras det bara när något ska hämtas. Går något fel står
-      # matchbladen med lagens sköldar, och bygget går som vanligt.
-      - name: Hämta matchbladens bilder
-        continue-on-error: true
-        timeout-minutes: 10
-        run: |
-          if node scripts/tidning/matchbilder.mjs --behover; then
-            command -v magick >/dev/null || command -v convert >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends imagemagick >/dev/null; }
-          fi
-          node scripts/tidning/matchbilder.mjs
-
       # Hasse Backes röst (src/rost.js): nyckeln till Azures talsyntes på den fria
       # nivån, för det som inte finns med egen röst. Saknas hemligheten blir han tyst
       # där, och bygget går som förut.

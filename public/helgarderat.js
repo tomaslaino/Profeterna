@@ -28,7 +28,6 @@
       rot.innerHTML = RT.tidning(u);
       rot.removeAttribute('aria-busy');
       passa();
-      RT.bildfel(rot);
       addEventListener('resize', passa);
       tillLanken();
     })

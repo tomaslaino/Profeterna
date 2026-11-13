@@ -6,9 +6,6 @@ data/cache/
 data/egen-rost/
 # Tidningens bilder: grenen tidning-bilder, hämtad av workflowen (src/analyser/tidning-bilder.mjs)
 data/tidning-bilder/
-# Matchbladens bilder: hämtas av workflowen före bygget (scripts/tidning/matchbilder.mjs)
-data/matchbilder/
-data/matchbilder.json
 _site/
 _site.tmp/
 .DS_Store

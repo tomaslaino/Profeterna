@@ -28,18 +28,16 @@
 //
 // Numret är data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, och det ligger kvar tills nästa
 // kommer, också efter omgången. Utan det står provnumret (helgarderat/utkast.json, poddjobbets provomgång 2026-11-10).
-// Bilderna är matchbladets (bilder, som GitHub Actions hämtar före bygget, scripts/tidning/matchbilder.mjs), annars
-// veckans bilder av lagen ur data/tidning.json. Sista sidan skriver samma nattjobb (src/analyser/sista-sidan.mjs).
+// Tidningen har inga bilder sedan Affischen (2026-11-13). Sista sidan skriver samma nattjobb
+// (src/analyser/sista-sidan.mjs).
 // Inget här anropar någon språkmodell.
 //
 // RumTidning.hamta() → Promise: upplagan, eller null
-// RumTidning.upplaga(data, prov, tidning, sista) → upplagan (det som behövs för att rita tidningen), eller null
+// RumTidning.upplaga(data, prov, sista) → upplagan (det som behövs för att rita tidningen), eller null
 // RumTidning.tidning(upplaga) → html: omslaget, innehållet, matchbladen och sista sidan, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
 // RumTidning.overst(upplaga) → raden överst på omslaget (Nr 1 · Vecka 46), som också står på löpsedeln (rum-affischer.js)
 // RumTidning.passa(rot, bredd, hojd) ger tidningen dess storlek: omslaget så stort som ryms och alla sidor lika breda.
-// RumTidning.bildfel(rot): en bild i matchbladen som inte går att hämta byts mot det andra lagets, och annars tas den
-// bort.
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -239,65 +237,6 @@
     return { sagt: c.sagt, vem: stor([c.vem, c.podd ? TEXT.poddar.kalla(c) : '', kortDatum(iso(c.datum))].filter(Boolean).join(', ')), oversatt: c.oversatt !== false };
   }
 
-  // ---------- bilderna ----------
-
-  // → { en: {src, …} } (matchens egen bild), { tva: [hemma, borta] } (veckans bilder av lagen) eller null. Veckans
-  // bilder av lagen: matchbladets egna (data/matchbilder/), annars veckans tidnings (data/tidning.json, med bilderna i
-  // data/tidning-bilder/, som iMacen hämtar).
-  function bilderna(u, s) {
-    const b = s.bild;
-    if (b && (b.url || b.fil)) return { en: { ...b, src: b.url || `data/tidning-bilder/${b.fil}` } };
-    if (Array.isArray(s.bilder) && s.bilder.some((x) => x && x.fil)) {
-      const l = [0, 1].map((i) => (s.bilder[i] && s.bilder[i].fil ? { ...s.bilder[i], src: `data/matchbilder/${s.bilder[i].fil}`, lag: (s.lag || [])[i] } : null));
-      // Har bara det ena laget ett foto står det över hela bredden, med lagets namn.
-      return l.every(Boolean) ? { tva: l } : { en: l.find(Boolean) };
-    }
-    const n = (u.notiser || []).find((x) => x && String(x.id) === String(s.id));
-    const l = n && Array.isArray(n.bilder) ? [0, 1].map((i) => (n.bilder[i] && n.bilder[i].fil ? { ...n.bilder[i], src: `data/tidning-bilder/${n.bilder[i].fil}`, lag: (s.lag || [])[i] } : null)) : [];
-    return l.some(Boolean) ? { tva: l } : null;
-  }
-  // Fotografen och källan: Jane Doe, BBC Sport (8 nov).
-  const fotoAv = (b) => [b.foto, b.kalla].filter(Boolean).join(', ') + (b.datum && kortDatum(b.datum) ? ` (${kortDatum(b.datum)})` : '');
-  // Miniatyren till BBC:s videor har tv-grafiken över högra halvan; den tas hellre än inget, men förstorad mot vänstra
-  // kanten (.video i helgarderat.css) så att grafiken hamnar utanför.
-  const VIDEO = /bbc\.co\.uk\/sport\/.*\/videos\//;
-  // Bilden under rubriken på matchbladet: en enda över hela bredden (2026-11-11), matchens egen eller ett av
-  // lagens foton, helst inte en videominiatyr. Det andra lagets foto står i data-reserv och tas om den första inte går
-  // att hämta (bildfel). Utan bild står ingen: lagens sköldar står ändå mot varandra på tavlan överst.
-  function figur(u, s) {
-    const b = bilderna(u, s);
-    const l = (b ? (b.en ? [b.en] : b.tva.filter(Boolean)) : []).map((x) => ({ ...x, video: VIDEO.test(x.sida || '') }))
-      .sort((x, y) => x.video - y.video);
-    const x = l[0];
-    if (!x) return '';
-    const r = l[1];
-    const text = x.text ? `${esc(hel(x.text))} ` : '';
-    const av = fotoAv(x);
-    const kalla = av ? `<span>Foto: ${x.sida ? lank(x.sida, esc(av)) : esc(av)}</span>` : '';
-    return `<figure class="hg-bild"><div class="hg-foto${x.video ? ' video' : ''}"><img src="${esc(x.src)}" alt="${esc(x.text || x.lag || (s.lag || []).join('–'))}"` +
-      `${r ? ` data-reserv="${esc(r.src)}"${r.video ? ' data-reserv-video' : ''}` : ''} loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>` +
-      (text || kalla ? `<figcaption>${text}${kalla}</figcaption>` : '') + '</figure>';
-  }
-  // En bild i matchbladen som inte går att hämta: det andra lagets foto i stället, och går inte heller det tas bilden
-  // bort (sköldarna står ändå på tavlan överst).
-  function bildfel(rot) {
-    for (const img of rot.querySelectorAll('.hg-foto img')) {
-      const fel = () => {
-        const r = img.dataset.reserv;
-        if (r) {
-          delete img.dataset.reserv;
-          img.closest('.hg-foto').classList.toggle('video', 'reservVideo' in img.dataset);
-          img.addEventListener('error', fel, { once: true });
-          img.src = r;
-          return;
-        }
-        img.closest('figure').classList.add('fel');
-      };
-      if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) fel();
-      else img.addEventListener('error', fel, { once: true });
-    }
-  }
-
   // ---------- upplagan ----------
 
   // Sista sidan (data/sista-sidan.json) när den är skriven för samma omgång och har allt den ska.
@@ -306,13 +245,13 @@
     const text = (t) => t && t.rubrik && Array.isArray(t.stycken) && t.stycken.some(Boolean);
     return text(x.kronika) && text(x.kaseri) ? { kronika: x.kronika, kaseri: x.kaseri, sidan: (x.sidan || []).filter((n) => n && n.text) } : null;
   }
-  // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov), veckans tidning
-  // (data/tidning.json, för bilderna) och sista sidan (data/sista-sidan.json). Kupongen är omgångens alla matcher i
+  // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov) och sista sidan
+  // (data/sista-sidan.json). Kupongen är omgångens alla matcher i
   // kupongens ordning (data.matcher, också de utan matchblad), var och en med sitt matchblad om den har ett.
   // Matchbladen är uppslag med två sidor var, från sidan 2 (sida: vänstersidan, alltid jämn), och sista sidan kommer
   // efter dem (sistaNr).
   // → upplagan, eller null när numret inte har några matchblad
-  function upplaga(data, prov = false, tidning = null, sista = null) {
+  function upplaga(data, prov = false, sista = null) {
     const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
     if (!sidor.length) return null;
     const blad = new Map(sidor.map((s) => [String(s.id), s]));
@@ -332,7 +271,6 @@
       lordag: tider.length ? Math.min(...tider) : NaN,
       datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '',
       sida: new Map(sidor.map((s, i) => [s.nr, 2 * i + 2])),
-      notiser: tidning && Array.isArray(tidning.notiser) ? tidning.notiser : [],
       sista: sistaSidan(sista, String(data.omgang || '')),
       sistaNr: 2 * sidor.length + 2,
     };
@@ -341,8 +279,8 @@
   // Numret: veckans, och utan det provnumret. → Promise: upplagan, eller null
   const hamtaJson = (url) => fetch(url, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   function hamta() {
-    return Promise.all([hamtaJson('data/poddsidor.json'), hamtaJson('data/tidning.json'), hamtaJson('data/sista-sidan.json')])
-      .then(([veckans, t, sista]) => upplaga(veckans, false, t, sista) || hamtaJson('helgarderat/utkast.json').then((x) => upplaga(x, true, t)));
+    return Promise.all([hamtaJson('data/poddsidor.json'), hamtaJson('data/sista-sidan.json')])
+      .then(([veckans, sista]) => upplaga(veckans, false, sista) || hamtaJson('helgarderat/utkast.json').then((x) => upplaga(x, true)));
   }
 
   // ---------- omslaget ----------
@@ -516,9 +454,9 @@
   //
   // Uppslaget (2026-11-11, användarens val A bland tre skisser, när matchbladen var två–tre omslag långa): varje match
   // är två sidor, bredvid varandra när de ryms (passa), annars under varandra. Sedan Affischen (2026-11-13) är
-  // vänstersidan (jämn) matchens affisch och högersidan (udda) lagens text och källorna. Bilden står inte med i
-  // uppslaget sedan dess (skissen hade ingen); figur och bildfel finns kvar. Förut stod tavlan, rubriken och hemmalaget
-  // till vänster och bilden, bortalaget, sammanfattningen och källorna till höger.
+  // vänstersidan (jämn) matchens affisch och högersidan (udda) lagens text och källorna. Bilden är borta sedan dess
+  // (skissen hade ingen, och användaren valde samma dag att hämtningen skulle bort: "Ta bort hämtningen"). Förut stod
+  // tavlan, rubriken och hemmalaget till vänster och bilden, bortalaget, sammanfattningen och källorna till höger.
   //
   // Sedan 2026-11-12 (kortare text, "Vi har inte så mycket tid på oss när vi fattar de där besluten") skrivs bladen
   // utan introduktion. Ett äldre blad som har både en introduktion och en sammanfattning får introduktionen överst på
@@ -562,5 +500,5 @@
     return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') + (u.sista ? sista(u) : '') : omslag;
   }
 
-  return { hamta, upplaga, tidning, forsta, passa, bildfel, nummer, overst, TEXT };
+  return { hamta, upplaga, tidning, forsta, passa, nummer, overst, TEXT };
 });

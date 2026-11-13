@@ -136,20 +136,6 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 .hf-devis::before { content: ""; display: block; width: 11px; margin: 0 auto 3px; border-top: 0.4px solid var(--hf-tryck); }
 a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 0.6px; }
 
-/* ---------- bilden i matchbladet ---------- */
-
-/* En bild över hela bredden, svartvitt tryck på papperet. En videominiatyr (.video) förstoras mot vänstra kanten, så
-   att tv-grafiken hamnar utanför. Går den inte att hämta, och inte heller det andra lagets, tas den bort (.fel):
-   lagens sköldar står ändå mot varandra under introduktionen. */
-.hg-bild { position: relative; margin: 6px 0 16px; }
-.hg-bild.fel { display: none; }
-.hg-foto { position: relative; overflow: hidden; aspect-ratio: 21 / 9; background: #e2d6bd; }
-.hg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.08) brightness(0.97); mix-blend-mode: multiply; }
-.hg-foto.video img { transform: scale(1.8); transform-origin: 0 12%; }
-.hg-bild figcaption { margin-top: 5px; font: 400 13px/1.35 var(--tryck); color: var(--gra); }
-.hg-bild figcaption span { color: rgba(34, 31, 27, 0.86); font: 400 12.5px/1.35 var(--skriv); font-style: normal; }
-.hg-bild figcaption a { color: inherit; text-decoration-color: var(--streck); text-underline-offset: 2px; }
-
 /* ---------- innehållet ---------- */
 
 /* Förteckningen (val A bland fyra skisser, 2026-11-11: "en innehållssida för tidningen … snyggt och minimalistiskt"):
@@ -313,7 +299,6 @@ a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 
 /* Smal (telefonen): arket är lika brett som skärmen, och innanför marginalerna smalare än 460 px. Då står lagen och
    spalterna under varandra. */
 @container (max-width: 460px) {
-  .hg-foto { aspect-ratio: 16 / 9; }
   .hg-ingress { font-size: 18px; }
   .hg-lagtext p { line-height: 1.55; }
   .hg-affisch { gap: 22px; }

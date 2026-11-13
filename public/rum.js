@@ -3922,7 +3922,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.vilar = true;
     lager('tidningen', () => tidningen(false));
     passaTidning();
-    RumTidning.bildfel(el);
     // pilarna, mellanslag och Page Down bläddrar i tidningen
     el.focus({ preventScroll: true });
     return true;

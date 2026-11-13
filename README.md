@@ -418,6 +418,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   står kvar i matchakten, där de redan stod, och rubriken *FORMEN · MOTSTÅNDET* är borta. Avsparken står bara där den
   ändras, så att samma tid inte står tolv gånger, och telefonen, som förut bara hade formen, får avsparken (se *Datorn* under
   [Tobaksaffären](#tobaksaffären))
+- [x] **Helgarderats matchblad: Affischen (2026-11-13, användarens önskemål: "hur skulle du göra den här bättre? kanske
+  lite mer text/på något annorlunda sätt? annat med den grafiska designen? ge mig lite visuella alternativ"):**
+  vänstersidan i varje uppslag är matchens affisch: numret på kupongen överst, tavlan med lagen och avsparken,
+  rubriken stort, sammanfattningen under ett kort streck och arenan nertill, fördelat över hela sidan. Lagens text står
+  efter varandra på högersidan med sina citat, och källorna sist. Ingen bild, och GitHub Actions hämtar inga bilder
+  till matchbladen längre ("Ta bort hämtningen"). Valt i två omgångar bland skisser på veckans nummer: först A
+  *Tavlan över vecket*, B *Tre saker* och C *Mer att läsa* ("Jag är inte riktigt nöjd. Kan du komma på fler/bättre
+  varianter"), sedan D *Planen*, E *Veckan*, F *Affischen* och G *Rapporterna* (se [Helgarderat](#helgarderat))
 
 ## Publicering
 
@@ -8637,6 +8645,13 @@ där båda lagen har något (`storst` i [public/helgarderat.js](public/helgarder
 matchbladet har ett, citatet. Bredvid står *Lördagens matcher* med sidnumren, och under *Fler matcher*: tre matcher
 till med bild, rubrik och introduktionens första mening. Sedan kommer ett matchblad per match.
 
+**Affischen** (2026-11-13, se beslutet ovan): varje matchblad är ett uppslag, och vänstersidan är matchens affisch
+(`affisch` i [public/rum-tidning.js](public/rum-tidning.js)): numret på kupongen (och turneringen i en landskamp)
+mellan två streck överst, tavlan (hemmalagets sköld, avsparken och bortalagets sköld i omslagets rutor), rubriken
+stort, sammanfattningen under ett kort streck och arenan med orten nertill, fördelat jämnt över sidan. Högersidan har
+lagens text efter varandra, hemmalaget först, med lagets citat under, och sist källorna. Ett äldre blad med både
+introduktion och sammanfattning har introduktionen överst på högersidan. Matchbladen har ingen bild.
+
 **Matchbladet** (2026-11-10, användarens önskemål: "ett matchblad med information. Först en kort introduktion, sen
 diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för varje match).
 Sedan 2026-11-11 *Sköldarna möts* (valt bland skisser, se beslutet ovan): rubriken, en bild över hela bredden,
@@ -8651,38 +8666,11 @@ vad supportrarna ser i spelet, vem som har lyft sig, rykten och det som rör sig
 kort ("Det blir lite torrt här med enbart det essentiella - det går jag ju från statistik och andra API:er", "Det ska
 vara en njutning att läsa texten också"). `sidan.version` i config/poddar.js är bytt, så bladen skrivs om nästa natt.
 
-**Bilden** är en enda över hela bredden (sedan 2026-11-11), svartvit som tryck på papperet, med fotografen och källan
-under: matchens egen eller ett av lagens foton, helst inte en miniatyr till BBC:s videor (den har tv-grafik över högra
-halvan och förstoras annars mot vänstra kanten). Går den inte att hämta tas det andra lagets, och annars ingen.
-Den kommer i första hand ur matchbladet självt (`bilder` i sajtens `data/poddsidor.json`), annars ur tidningen inför omgången (`data/tidning.json`, se *Veckans bilder
-i tidningen* under [Analyserna](#analyserna)). En sida kan också ha en egen bild (`bild`: `url` eller `fil`, `kalla`,
-`foto`, `sida`, `datum`, `text`). Utan bild står ingen: lagens sköldar står ändå mot varandra under introduktionen.
-
-Matchbladets bilder hämtas av GitHub Actions före bygget (2026-11-10, användarens önskemål: "Fixa så att det kommer
-riktiga bilder nu"), eftersom molnmiljön där matchbladen skrevs inte når nyhetssajterna, men GitHub gör det:
-[scripts/tidning/matchbilder.mjs](scripts/tidning/matchbilder.mjs) tar lagen i `data/poddsidor.json` och hämtar en bild
-per lag med samma kod som tidningens bilder på iMacen (`veckansBilder` i src/analyser/tidning-bilder.mjs): BBC Sports
-flöde för laget (`feeds.bbci.co.uk/sport/football/teams/<lag>/rss.xml`, artiklar och matchrapporter med bild för alla
-ligalag; en artikel i lagets eget flöde får ett poäng till), de insatta mediernas artiklar om laget och Bing News, sidans delningsbild från de senaste åtta dagarna, liggande och
-minst 480 bildpunkter bred, inga loggor, ingen grafik och inte samma bild för två lag. Till skillnad från tidningen
-tas bara artiklar som handlar om laget självt (`MIN_POANG`): inte en där motståndaren eller en annan klubb står först i
-rubriken, en förhandstitt med odds, ett övergångsrykte eller en minnesartikel, eftersom bilden då oftast visar fel lag.
-Hellre lagets sköld än fel lag. Ett lag som blir utan får ett andra försök (2026-11-10, användarens önskemål: "Fixa
-bilder åt Wimbledon och Newport också"): då duger allt i lagets eget BBC-flöde utom rykten och minnesartiklar, också en
-matchrapport där motståndaren står först, och artiklar upp till två veckor gamla. Samma bild används aldrig för två
-lag, inte heller mellan försöken, och för ett lag som blir utan står de bästa kandidaterna i loggen. BBC:s bilder tas
-i 976 bildpunkters bredd i alla adressformat (`bbcBild`: …/ace/standard/240/…, …/news/240/… och
-…/images/ic/240x135/…; det sista gav Newport en för liten bild), och BBC Sounds och iPlayer läses inte (programmets
-bild, inte ett foto). Varje lag prövar upp till sex bilder. Bing News frågas också efter *<lag> boss* (tränaren är oftast i klubbens kläder, hos
-lokaltidningen), och det gäller tidningens bilder också. Har bara det ena laget en bild står den över hela bredden med
-lagets namn. Bilden förminskas till 800
-bildpunkter med ImageMagick (på iMacen med `sips` som förut); en jämn grafik känns igen på under 0,10 byte per
-bildpunkt i 320 bildpunkters bredd (foton låg på 0,15–0,31 och en enfärgad grafik med text på 0,04; `sips` behåller
-färgprofilen och har kvar gränsen 0,15). Bilderna sparas i källcachen (`data/cache/matchbilder/`), som workflowen
-behåller mellan körningarna, så att de hämtas en gång per omgång; ett lag utan bild prövas igen efter sex timmar. Ut
-kommer `data/matchbilder/` och `data/matchbilder.json`, och bygget lägger bilderna i matchbladen (`bilder: [hemma,
-borta]`). ImageMagick installeras i workflowen bara när något ska hämtas och det saknas, och steget får aldrig stoppa
-bygget. `node scripts/tidning/matchbilder.mjs --behover` säger om något ska hämtas.
+**Bilden** är borta sedan Affischen (2026-11-13): matchbladen har ingen bild, och GitHub Actions hämtar inga bilder
+till dem längre ("Ta bort hämtningen"). Förut stod en bild över hela bredden, hämtad före bygget av
+`scripts/tidning/matchbilder.mjs` med samma kod som tidningens bilder på iMacen (src/analyser/tidning-bilder.mjs,
+som Hasse Backes kvällstidning fortfarande använder); den finns i historiken, före *Helgarderat utan matchbladens
+bilder*. Tidningen hämtar inte heller `data/tidning.json` längre, som den bara läste för bilderna.
 
 Texterna och uppställningen av lagets text och källor (`poddText`, `poddKallor`, `poddKallText`, `poddCitat`) kommer
 från `RumTidning`, så att det står samma sak i båda tidningarna. Ett nummer från före matchbladen (provnumret) får
@@ -8759,10 +8747,9 @@ molnmiljön gick artiklarna inte att öppna, så kontrollen gjordes mot sökning
   till ur matchen och som de handskrivna bladen har själva). Ett handskrivet blad kan ha arenan själv, och då skriver
   bygget inte över den (ESPN kallar fortfarande Strawberry Arena för Friends Arena). Ett citat som redan var på svenska
   står utan *(översatt)* (`"oversatt": false`). Innehållet skriver *Sverige – Bosnien* (`KORT`).
-- **Bilderna:** scripts/tidning/matchbilder.mjs söker landslagen med deras engelska namn (ur config/landslag.js):
-  BBC:s lagflöde (`wales`, `northern-ireland`, `republic-of-ireland`; de andra länderna har inget) och Bing News
-  (*Sweden national team*, *Sweden football*, *Sweden Nations League*), och bladets egna källor först, som för
-  klubbarna (`landslag` i src/analyser/tidning-bilder.mjs). Utan bild står flaggorna mot varandra på tavlan.
+- **Bilderna:** matchbladen har inga bilder sedan Affischen (2026-11-13), och flaggorna står mot varandra på tavlan.
+  Till dess sökte scripts/tidning/matchbilder.mjs landslagen med deras engelska namn (`landslag` i
+  src/analyser/tidning-bilder.mjs, som står kvar tom).
 - **Nattjobbet:** landslagen har inga supporterpoddar, forum eller lokaltidningar, så poddjobbet hoppar över
   landskamperna (`omgangensLag` i scripts/tidning/poddar.mjs), och när bladen läggs ut står ett blad som redan ligger
   ute kvar för en match som jobbet inte har något eget blad till, i samma omgång (samma lördag; `poddsidor(fil,

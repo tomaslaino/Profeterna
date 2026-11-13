@@ -11,8 +11,8 @@
 // Bara bilder från de senaste DAGAR dagarna, liggande och minst MIN_BREDD bildpunkter breda, inga
 // loggor, inga spelbolag och inga sajter som är spärrade på datorn. Samma bild används inte för
 // två lag. Bilden förminskas till BREDD bildpunkter (eller bredd) och sparas som <lag>-<hash>.jpg i
-// mappen: med sips, som finns i macOS, på iMacen och med ImageMagick på GitHub Actions (matchbladens
-// bilder, scripts/tidning/matchbilder.mjs).
+// mappen: med sips, som finns i macOS, på iMacen och annars med ImageMagick (som matchbladens bilder
+// hade på GitHub Actions, till 2026-11-13).
 //
 // veckansBilder(lagen, { mapp, espnId, kallor, bredd }) → Map lag → { lag, fil, kalla, foto, sida, datum }
 
@@ -57,7 +57,7 @@ const avkoda = (s) => String(s || '').replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (
 export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 // Lagets namn i texter: söknamnen i config/news.js (Bradford City, Bradford, Bantams).
-// Landslagen (2026-11-13, scripts/tidning/matchbilder.mjs) heter på svenska på sajten men på engelska i BBC:s och
+// Landslagen (2026-11-13; fylldes av matchbladens bilder, som inte hämtas längre) heter på svenska på sajten men på engelska i BBC:s och
 // Bing News flöden: landslag[lag] = { namn: ['Sweden', 'Sverige'], bbc: 'sweden', fragor: ['Sweden national team'] }.
 export const landslag = {};
 export const namnen = (lag) => (landslag[lag] && landslag[lag].namn) || (newsCfg.names && newsCfg.names[lag]) || [lag];
@@ -173,7 +173,7 @@ async function espn(lag, id, { fetchImpl, now, rang, dagar = DAGAR }) {
 // BBC Sport: lagets eget flöde (feeds.bbci.co.uk/sport/football/teams/<lag>/rss.xml) har veckans artiklar och
 // matchrapporter med bild (ichef.bbci.co.uk), också för de lägre divisionerna. Bilden finns i flera bredder; 976
 // bildpunkter räcker (…/ace/standard/240/…, …/news/240/… och …/images/ic/240x135/…). En artikel i lagets eget flöde
-// handlar om laget: ett poäng till, och egen = true (matchbladens andra försök, veckansBilder med egnaBbc).
+// handlar om laget: ett poäng till, och egen = true (det andra försöket, veckansBilder med egnaBbc).
 export const bbcBild = (u) => avkoda(u)
   .replace(/\/ace\/([a-z]+)\/\d{2,4}\//, '/ace/$1/976/')
   .replace(/\/news\/\d{2,4}\//, '/news/976/')
