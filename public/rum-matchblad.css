@@ -80,6 +80,12 @@
 .rl-nar { display: grid; justify-items: center; white-space: nowrap; }
 .rl-nar b { font: 700 19px/1.05 var(--display); font-variant-numeric: tabular-nums; }
 .rl-nar small { font-size: 11px; color: var(--pp-faint); }
+/* en landskamp: tävlingen och gruppen under tiden, och ett lagnamn som inte ryms bredvid dem står kortare */
+.rl-nar .rl-grupp { font-size: 10px; letter-spacing: 0.02em; }
+.rl-landet .rl-spegel { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 8px; }
+.rl-landet .rl-spegel .mid { white-space: nowrap; }
+.rum-blad .rl-t b.trang .lang { display: none; }
+.rum-blad .rl-t b.trang .kort { display: inline; }
 
 /* flikarna: bladets sidor, tryckta ord på en linje och den valda med terrakotta under */
 .rb-flikar { flex: none; display: flex; justify-content: space-between; height: 26px; border-bottom: 1.5px solid var(--pp-print); }
