@@ -2718,6 +2718,25 @@ abonnemanget sin gräns pausar jobbet en timme. Går det inte att pusha ligger t
 körning. Spelade matcher faller bort ur filen efter 14 dagar. Loggen står i
 `~/Library/Logs/Matchfixarna/analyser.log`, och launchds egen i `launchd.log` bredvid.
 
+**Landskamperna** (2026-11-13, när Stryktipset tog in Nations League; användarens önskemål: "Stryktipset verkar
+innehålla en massa matcher nu som vi inte har lyckats lägga till än på olika ställen … Uppdatera hela hemsidan utefter
+detta"). En landskamps matchfil kommer ur `landDetail` (se [Landskamperna](#landskamperna)) och saknar modellens steg,
+baslinjer, xG, domare och skador; `payloadOf` kraschade på baslinjerna, så jobbet kunde inte skriva en enda analys av
+en landskamp. Nu har den ett eget underlag (`landPayloadOf` i [src/analyser/underlag.mjs](src/analyser/underlag.mjs)):
+matchen, *marknadens prognos* (spelbolagets odds utan marginal och målen ur oddsen, med orden *inte sajtens modell*),
+oddsen, tabellen och Nations League hittills, formen och de fem landskamperna före den, nästa landskamp och mötena
+sedan hösten 2024; skador, xG och domaren står som okända. Systemprompten får `landskamp` i
+[config/analyser.js](config/analyser.js) (läs på om trupperna i ländernas egna medier, kalla prognosen marknaden),
+och kontrollerna skickar tillbaka en artikel eller ett tips som säger *modell* eller *sajtens prognos* om en
+landskamp. Hasse Backe får marknadens odds utan ordet *sajtens prognos*, och omgångens namn ser *marknadens odds*
+för landskamperna och *Nations League* som tävling. Klubbmatchernas underlag och prompt är oförändrade. Provat utan
+Claude, mot bygget med riktig ESPN-data: underlaget, systemprompten, namnets och tidningens underlag och Hasses odds
+för hela veckans omgång (sju landskamper, sex engelska), och att kontrollerna stoppar *modellens*. Inte provat med
+`claude -p` på iMacen; första körningen är den första efter mergen. Veckans sju analyser av landskamperna (rad 1–7,
+vecka 46) skrevs för hand i molnet samma kväll, i jobbets form och prövade med jobbets kontroller (`problems`,
+`tipProblems` och Hasses `granska`), eftersom jobbet inte klarade dem; källorna är sökträffar, för molnmiljön kunde
+inte öppna sidorna.
+
 **Skripten** arbetar i en egen klon, `~/Library/Application Support/Matchfixarna/Profeterna`, som
 återställs till `origin/main` varje körning, så att en arbetskopia aldrig rörs. Kodändringar på
 `main` gäller alltså från körningen efter nästa.
