@@ -538,6 +538,10 @@ export const KLIPP = {
   skrocka: { fran: 331, till: 335.2, vila: 0, skynda: true, grupp: 'smatt' },
   // tittar på kaffet och smackar
   smacka: { fran: 337, till: 340.4, vila: 0, skynda: true, grupp: 'smatt' },
+  // myser: lutar sig bakåt med ett brett leende och halvslutna ögon, och andas ut, belåten
+  myser: { fran: 460, till: 464.4, vila: 0, skynda: true, grupp: 'smatt' },
+  // tittar på en, ler brett och blinkar med ena ögat: vi vet, du och jag
+  blinka: { fran: 466, till: 469.6, vila: 0, skynda: true, grupp: 'smatt' },
   // Medan han pratar, nöjd med det han säger (talet, lottas med armar):
   // handflatan upp mot en: där har du det
   oppna: { fran: 345, till: 348.4, vila: 5.5, start: 5.5, grupp: 'tal' },
@@ -909,7 +913,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   }
   const U = {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
-    blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() }, uLins: { value: new THREE.Vector2(0, 400) },
+    blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, vink: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() }, uLins: { value: new THREE.Vector2(0, 400) },
     uArm: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
     uBord: bord, uButik: bord.butik, uDag: DAG, uLys: LYS, uEld: bord.eld,
   };
@@ -932,7 +936,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       float dB = min(seg3(w.xyz, uArm[3], uArm[4]), seg3(w.xyz, uArm[4], uArm[5]));
       vAo = exp(-pow(max(0., dA - 80.) / 80., 2.)) * .3 + exp(-pow(max(0., dB - 80.) / 80., 2.)) * .3;
       gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick, uLins; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
+    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le, vink; uniform vec2 bryn, blick, uLins; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
     ${LJUS}
     ${BORD_GLSL}
     const vec2 O0 = vec2(${X0}., ${Y0}.), TS = vec2(${ATLAS.W}., ${ATLAS.H}.);
@@ -975,27 +979,36 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
           q = mix(q, c + (q - c) / (1. + .08 * uLins.x), inne);
         }
       }
-      // leendet: mungiporna ut och upp, kinderna följer med (förut ungefär två tredjedelar så mycket, och
-      // då syntes ett leende knappt)
-      q += le * vec2(10., 15.) * g(q, vec2(613., 505.), vec2(40.));
-      q += le * vec2(-10., 15.) * g(q, vec2(711., 505.), vec2(40.));
-      q.y += le * 9. * (g(q, vec2(585., 450.), vec2(42.)) + g(q, vec2(740., 450.), vec2(42.)));
+      // leendet: mungiporna ut och upp, mer i själva mungipan än mitt på läpparna, så att munnen böjer sig
+      // uppåt i stället för att hela munnen lyfts; kinderna lyfts och rundas, och de trycker upp huden under
+      // ögonen, så att leendet når dit (förut 10 ut och 15 upp med en bred kulle och kinderna 9 upp, och
+      // munnen låg nästan rak). vink: han blinkar med sitt högra öga (fotots vänstra), och den sidans
+      // mungipa och kind går upp mer.
+      q += le * vec2(11., 19.) * g(q, vec2(611., 506.), vec2(34., 30.)) + vink * vec2(4., 9.) * g(q, vec2(611., 506.), vec2(36.));
+      q += le * vec2(-11., 19.) * g(q, vec2(713., 506.), vec2(34., 30.));
+      for (int i = 0; i < 2; i++) {
+        vec2 kc = vec2(586. + float(i) * 152., 452.);
+        float gk = g(q, kc, vec2(44.));
+        q.y += (le * 12. + (i == 0 ? vink * 9. : 0.)) * gk;
+        q = mix(q, kc + (q - kc) * .9, le * gk);
+      }
+      q.y += le * 4. * (g(q, vec2(608., 411.), vec2(24., 9.)) + g(q, vec2(717., 412.), vec2(24., 9.)));
       // brynen: flyttar pannan men aldrig ögat
       float grind = 1. - smoothstep(361., 372., q.y);
       q.y += bryn.x * 10. * g(q, vec2(599., 356.), vec2(66., 24.)) * grind;
       q.y += bryn.y * 10. * g(q, vec2(727., 358.), vec2(66., 24.)) * grind;
-      q = oga(q, vec2(608.5, 391.), 24., blund, kis, blick, frans);
+      q = oga(q, vec2(608.5, 391.), 24., max(blund, vink), max(kis, vink * .6), blick, frans);
       q = oga(q, vec2(717., 392.), 24., blund, kis, blick, frans);
       // munnen: en lins mellan läpparna; underläppen och hakan följer med ned
       const vec2 MC = vec2(662., 508.5);
-      float W = 50. + le * 9. - rund * 16.;
+      float W = 50. + le * 12. - rund * 16.;
       dx = q.x - MC.x;
       xn = dx / W;
       float prm = max(0., 1. - xn * xn);
       A = munn * (31. + rund * 5.);
       float a = A * pow(prm, .78);
       uU = a * .27; uL = a * .73;
-      float y0 = MC.y - le * 6. * xn * xn;
+      float y0 = MC.y - le * (11. - 4. * munn) * xn * xn;
       float d = q.y - y0;
       inre = smoothstep(-1., .4, d + uU) * (1. - smoothstep(-.4, 1., d - uL)) * smoothstep(.2, .8, A) * (1. - smoothstep(.96, 1., abs(xn)));
       n01 = clamp((d + uU) / max(.1, uU + uL), 0., 1.);
@@ -1055,6 +1068,19 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       if (ansikte && le > .01) {
         float vk = min(seg2(q0, vec2(634., 462.), vec2(598., 522.)), seg2(q0, vec2(690., 462.), vec2(726., 522.)));
         c.rgb *= 1. - .2 * le * exp(-vk * vk / 28.);
+        // skrattrynkorna i ögonens yttre hörn, när leendet är brett
+        float rr = 1e3;
+        for (int i = 0; i < 2; i++) {
+          float sx = i == 0 ? -1. : 1.;
+          vec2 h = i == 0 ? vec2(583., 391.) : vec2(742., 392.);
+          rr = min(rr, seg2(q0, h + vec2(sx * 2., -3.), h + vec2(sx * 15., -10.)));
+          rr = min(rr, seg2(q0, h + vec2(sx * 3., 2.), h + vec2(sx * 17., 3.)));
+          rr = min(rr, seg2(q0, h + vec2(sx * 2., 6.), h + vec2(sx * 13., 14.)));
+        }
+        c.rgb *= 1. - .14 * smoothstep(.35, .9, le) * exp(-rr * rr / 4.5);
+        // och kinderna blir lite varmare: han trivs
+        float kr = g(q0, vec2(588., 466.), vec2(40., 30.)) + g(q0, vec2(736., 466.), vec2(40., 30.));
+        c.rgb *= mix(vec3(1.), vec3(1.05, .97, .95), le * kr);
       }
       // samma ljus som på armarna
       vec3 n = normalize(vN);
@@ -1571,8 +1597,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const KANAL = Object.keys(HUV);
   // ansiktet i klippen: läggs till som det största av det som rör sig (blicken läggs till: blickX åt hans
   // vänstra sida, blickY nedåt, i fotots bildpunkter; andas läggs till andningen)
-  // (stel: 0–1, tar bort leendet han alltid har, när han blir ertappad)
-  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY', 'andas', 'stel'];
+  // (stel: 0–1, tar bort leendet han alltid har, när han blir ertappad; vink: blinkar med sitt högra öga)
+  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY', 'andas', 'stel', 'vink'];
   const lage = (T) => Object.fromEntries(KANAL.map((x) => [x, spar(HUV[x], T)]));
   const S0 = lage(0);
 
@@ -2708,6 +2734,37 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         brynX: [[1.3, 0], [1.6, 0.5], [2.4, 0.4], [3.0, 0]],
         brynY: [[1.3, 0], [1.6, 0.4], [2.4, 0.3], [3.0, 0]],
         le: [[2.2, 0], [2.6, 0.2], [3.2, 0]],
+      },
+    },
+    // Han myser: lutar sig lite bakåt med hakan upp och huvudet på sned, leendet växer tills ögonen är
+    // halvslutna, han andas in så att bröstet häver sig och ut igen med axlarna som sjunker, och nickar
+    // lite för sig själv.
+    myser: {
+      k: {
+        lut: [[0.2, 0], [1.2, -0.035], [3.2, -0.03], [4.2, 0]],
+        pitch: [[0.2, 0], [1.2, -0.25], [2.6, -0.25], [3.0, 0.2], [3.4, -0.05], [4.2, 0]],
+        roll: [[0.3, 0], [1.2, 0.05], [3.2, 0.05], [4.2, 0]],
+        brynX: [[0.3, 0], [1.2, 0.3], [3.2, 0.3], [4.0, 0]],
+        brynY: [[0.3, 0], [1.2, 0.3], [3.2, 0.3], [4.0, 0]],
+        le: [[0.2, 0], [1.2, 0.88], [3.2, 0.85], [4.3, 0]],
+        kis: [[0.4, 0], [1.2, 0.55], [3.2, 0.5], [4.1, 0]],
+        blund: [[0.5, 0], [1.3, 0.38], [2.8, 0.38], [3.3, 0]],
+        andas: [[0.2, 0], [1.2, 10], [1.6, 10], [2.8, -4], [3.6, 0]],
+        axV: [[0.2, 0], [1.2, 8], [1.6, 8], [2.8, -3], [3.6, 0]],
+        axH: [[0.2, 0], [1.2, 8], [1.6, 8], [2.8, -3], [3.6, 0]],
+      },
+    },
+    // Han tittar på en, leendet växer och han blinkar med sitt högra öga (vink: brynet går ned, mungipan och
+    // kinden upp), med en liten nick och huvudet på sned: vi vet, du och jag.
+    blinka: {
+      k: {
+        yaw: [[0.2, 0], [0.7, 0.2], [2.8, 0.2], [3.5, 0]],
+        pitch: [[0.2, 0], [0.7, -0.15], [1.4, 0.3], [1.8, -0.05], [2.8, -0.1], [3.5, 0]],
+        roll: [[0.2, 0], [0.7, -0.05], [2.6, -0.05], [3.4, 0]],
+        brynY: [[0.8, 0], [1.1, 0.4], [1.8, 0.4], [2.4, 0]],
+        le: [[0.2, 0], [0.8, 0.8], [2.6, 0.8], [3.5, 0]],
+        kis: [[0.6, 0], [0.9, 0.4], [2.6, 0.4], [3.3, 0]],
+        vink: [[1.0, 0], [1.15, 1], [1.55, 1], [1.75, 0]],
       },
     },
   });
@@ -4857,9 +4914,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const YAW0 = SCEN.VRID * DEG + 0.04;
   // Leendet han alltid har, i vilan och när han pratar: nöjd och säker på sin sak, och lite överdrivet
   // (kisandet följer leendet, så att det når ögonen). Det viker undan när han drar ned brynen, som när
-  // han blir allvarlig före ett slag: man ler inte och rynkar pannan på en gång. Förut log han 0,14 i
-  // vilan och 0,24 när han pratade, med ett svagare leende i skuggaren (ändrat 2026-11-06).
-  const NOJD = 0.5;
+  // han blir allvarlig före ett slag: man ler inte och rynkar pannan på en gång. När han pratar ler han
+  // lite mer (NOJD_TAL), och i skrattet kisar han så att ögonen nästan går igen. Förut log han
+  // 0,14 i vilan och 0,24 när han pratade, med ett svagare leende i skuggaren (ändrat 2026-11-06), och
+  // sedan 0,5 både i vilan och när han pratade, med kisandet en tredjedel av leendet (ändrat 2026-11-13).
+  const NOJD = 0.62;
+  const NOJD_TAL = 0.12;
   let sistaT = 0;
   let sistaN = 0;
   // T: var i rörelserna (0–2,5 vilan, 2,5–5,5 fram till domen, 5,5–9,95 gesterna
@@ -4902,24 +4962,27 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     U.uAx.value.set(axV, axH);
     U.uAndas.value = andning(n) + d('andas') + skratt * 5 * Math.sin(n * 15);
     const lyft = talar * 0.38 * Math.max(0, Math.sin(n * 4.3));
-    U.bryn.value.set(kan('brynX') + lyft, kan('brynY') + lyft);
+    // (han blinkar med sitt högra öga, och det brynet går ned lite)
+    const vink = d('vink');
+    U.vink.value = vink;
+    U.bryn.value.set(kan('brynX') + lyft - vink * 0.5, kan('brynY') + lyft);
     // (nöjd, utom när brynen dras ned)
     const allvar = clamp(-(d('brynX') + d('brynY')) * 0.7);
-    U.le.value = Math.max(NOJD * (1 - allvar) * (1 - d('stel')), skratt, 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
+    U.le.value = Math.max((NOJD + NOJD_TAL * talar) * (1 - allvar) * (1 - d('stel')), skratt, 0.85 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
     // talet: stavelser med små pauser, ibland rundare läppar; läpparna skiljs åt hela tiden han pratar och
     // öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
     const stav = Math.abs(Math.sin(n * 7.3)) * (0.42 + 0.58 * ss(-0.35, 0.5, Math.sin(n * 2.3 + 0.7))) * (0.72 + 0.28 * Math.sin(n * 17.3));
     const talMun = (mun === null ? talar : mun) * (1 - dricker) * (1 - Math.max(iMun, blaser));
     // läpparna om cigarren, en pust mellan blossen och ett o när han blåser ut
     const puff = cc ? spar(cc.pust, t) : 0;
-    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.92 + 0.14 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
+    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.8 + 0.12 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
     U.rund.value = talMun * Math.max(0, Math.sin(n * 3.1 + 1.3)) * 0.8;
-    U.kis.value = Math.max(skratt * 0.75, U.le.value * 0.35, d('kis'));
+    U.kis.value = Math.max(skratt * 0.85, U.le.value * 0.5, d('kis'));
     // blinkningarna och blicken som flyttar sig lite (blinkar, sakkader)
     const bl = blinkar(n);
     const sk = sakkader(n);
     U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser, d('rund'));
-    U.blund.value = Math.max(dricker * 0.82, skratt * 0.42, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
+    U.blund.value = Math.max(dricker * 0.82, skratt * 0.5, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
     U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], d('blickY') + sk[1]);
     sa.copy(SA);
     sa.y += axV;
