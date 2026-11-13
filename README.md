@@ -1107,6 +1107,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   väljer bara den egna figuren, så att ett tryck för att hälsa på någon annan aldrig gör en
   till hen (och ens utkast till hens); att byta gör man med porträtten på kupongen. Se
   [Tobaksaffären](#tobaksaffären), *Gänget är ni*.
+- **Ingen är vald när tobaksaffären öppnas (2026-11-13, användarens önskemål):** "Jag vill att
+  default i skärmen ska vara att man inte har klickat i någon spelare öht. När man sedan klickar
+  på den är den markerad och då kan Hasse kommentera en eller man kan fylla i en kupong etc.
+  Annars kan man bara gå in och titta." Enheten minns fortfarande vem man var, men i rummet är
+  man ingen förrän man har klickat på sig själv, valt namnet på kupongen eller sagt det till
+  Hasse – och det gäller tills sidan laddas om. Tills dess går kupongen bara att titta på, de
+  dolda tipsen syns inte och Hasse vet inte vem man är. Den valda figuren har en lapp med
+  namnet ovanför huvudet. Under Kupong är det som förut. Se [Tobaksaffären](#tobaksaffären),
+  *Gänget är ni*.
 - **Statistiken i tobaksaffären står på ett ställe var (2026-11-02, användarens önskemål):**
   samma siffror stod på tv:n, anslagstavlan och kortregistret. Nu står formen bara på
   anslagstavlan, tabellen och hemma/borta bara på tv:n, styrkan, motståndet och poängen mot
@@ -4351,8 +4360,22 @@ vaknar i stället (se *Sömnen* nedan). Med minskad rörelse står tecknet som e
 I telefonen glider rummet så att den man tryckte på hamnar mitt i bild om hen stod långt ut
 (`visa` i rum.js), annars kunde handen hamna utanför.
 
+När rummet öppnas är ingen vald (2026-11-13): enheten minns vem du var
+(`profeterna.samtal.vem`), men i rummet – allt i `Samtal.pult` – är du ingen förrän du
+har sagt vem du är under besöket (`me` och `SM.rumVald` i samtal.js, `Samtal.pult.du()`).
+Tills dess går det bara att titta: kupongen i handen visar *Vem är du?* i stället för att
+kryssa (`vemForst` i rum.js), tips som inte visas för alla syns inte (`dolt`), Ta bort och
+Ändra matcherna finns inte, och Hasse säger *Du* i stället för namnet. Minnet avgör ändå
+vem du kan bli (`kanByta`, `bytTill`): den enheten minns kan alltid väljas igen, också när
+hen har lämnat in – då hämtas de andras tips (`Samtal.pult.vem`) –, men har du lämnat in
+här blir du ingen annan. Under Kupong är du den enheten minns, som förut.
+
 Går kupongen att fylla i och figuren inte har lämnat in blir du också hen – samma val som
-namnen på kupongen (`Samtal.pult.vem`), och utkastet följer med. Pennan på pulten skriver
+namnen på kupongen (`Samtal.pult.vem`), och utkastet följer med. Figuren får en lapp ovanför
+huvudet med namnet i hens handstil och bläck (`markera` och `duFlytta` i rum.js, `topp` i
+rum-3d.js: högsta punkten på huvudet med mössa och tofs, projicerad i duken varje gång
+gänget ritas), som faller ner och gungar till och följer med när hen rör sig. Kupongen tas
+inte längre i handen av sig själv; ett klick till på den du är tar den. Pennan på pulten skriver
 namnet på kupongen på pulten (`Rum.skriv`, `skrivNamn` i rum.js), i personens bläck och egen
 handstil: Laino i Cedarville Cursive, Tejder i Mr Dafoe och Johansson i Reenie Beanie. Det
 ersätter porträtten överst på kupongen här i rummet; på papperet under Kupong är de kvar.
