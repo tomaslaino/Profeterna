@@ -1024,3 +1024,9 @@ a.pp-row:focus-visible { outline: 2px solid var(--pp-pen); outline-offset: -2px;
 @media (prefers-reduced-motion: reduce) {
   .pb-new, .pb-count.pb-bump, .pb-peek-n.pb-bump, .pb.open .pp.pb-slip, .pb.open .pb-side::before { animation: none; }
 }
+
+/* Landskamperna (2026-11-13): oddsen under rutorna är marknadens, inte datorns
+   (f.mk) – i kursiv, och en rad under kupongen säger vad det betyder. */
+small.mk, .sm-lapp-odds.mk span { font-style: italic; }
+.mk-legend { margin: 10px 0 0; font-size: 11px; line-height: 1.4; color: var(--pp-ink-soft, var(--muted)); }
+.mk-legend i { font-style: italic; }
