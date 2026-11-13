@@ -4326,13 +4326,24 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const POL_G = V3(-0.55, -0.8, -0.25).normalize();
   const EXTRA_G = [0, 0.05, 0.4, 0.5];
   const extraG = [0, 0, 0, 0];
+  // Öronen i fotot, där örat möter huvudet ovanför det och skalmarna går över, strax utanför ytan: på näsan pekar
+  // skalmarna dit (byggGlasogon), i huvudets mått, så att de följer med när han vrider och böjer det.
+  const ORON = [W_(514, 383, djup(514, 383) + 3), W_(808, 384, djup(808, 384) + 3)];
+  const ORAT = { w: 0, mal: [v(), v()] };
+  const gInv = new THREE.Matrix4();
   // Glasögonen på sin plats vid t, och höger hand i dem när han håller dem (motA). → fingrarnas extra, eller null
   function glasArm(t, kl, Sk, a) {
     const G = kl && kl.glas;
     const iFickan = glasLage(t, G);
     const s = (x, d) => (G && G[x] ? spar(G[x], t) : d);
     const fall = s('fall', G ? 1 : 0);
-    glas.satt(gW, fall, clamp(fall * 1.15 - 0.15), 1 - iFickan);
+    // (glasLage har räknat huvudets matris HM och hur mycket de sitter på näsan, LINS.styrka)
+    ORAT.w = LINS.styrka;
+    if (ORAT.w > 0) {
+      gInv.copy(gW).invert();
+      for (let i = 0; i < 2; i++) ORAT.mal[i].copy(ORON[i]).applyMatrix4(HM).applyMatrix4(gInv);
+    }
+    glas.satt(gW, fall, clamp(fall * 1.15 - 0.15), 1 - iFickan, ORAT);
     const mot = s('motA', 0);
     if (mot <= 0) return null;
     if (s('finger', 0) > 0.5) {

@@ -8,9 +8,10 @@
 // Backe, pultPapper i rum-hasse.js). Utseendet står i helgarderat.css. Tidningen är fyra delar, inget mer (bestämt del
 // för del samma dag):
 //
-//   Omslaget     på kupongens papper, utan bild: numret och veckan, priset, namnet, lördagens datum, rutorna 1, X
-//                och 2 ikryssade med pennan (helgarderat) och den första matchen med sin rubrik. 100 × 140, förstorat
-//                med zoom: litet på pulten och så stort som ryms när tidningen läses (passa). Alla andra sidor är lika
+//   Omslaget     på kupongens papper, utan bild (Kalenderbladet, 2026-11-13): numret och veckan, priset, namnet,
+//                lördagens datum stort som ett kalenderblad (Inför Stryktipset, 14, november) och devisen nertill.
+//                100 × 140, förstorat med zoom: litet på pulten och så stort som ryms när tidningen läses (passa).
+//                Alla andra sidor är lika
 //                breda som omslaget och minst lika höga, på samma papper och i samma tryck (helgarderat.css).
 //   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
 //                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
@@ -45,7 +46,6 @@
   else root.RumTidning = factory();
 })(typeof self !== 'undefined' ? self : this, () => {
   const NAMN = 'Helgarderat';
-  const SIGNS = ['1', 'X', '2'];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const stor = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
   const lista = (l0) => {
@@ -58,6 +58,8 @@
   const TZ = 'Europe/Stockholm';
   const fDatum = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const fDagMan = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, day: 'numeric', month: 'long' });
+  const fDag = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, day: 'numeric' });
+  const fMan = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, month: 'long' });
   const fVdag = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short' });
   const fVdagLang = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'long' });
   const fTid = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
@@ -73,12 +75,16 @@
   // ---------- texterna ----------
   // Tidningens röst är torr och saklig. (npm run repliker kollar dem mot det som är underkänt.)
   const TEXT = {
-    // Omslaget: numret, veckan och priset (tre kronor, tre rader: helgarderat).
+    // Omslaget: numret, veckan och priset (tre kronor, tre rader: helgarderat), vad datumet gäller (Stryktipset när
+    // omgången är dess, annars omgången) och devisen (2026-11-13, användarens val bland ett tjugotal förslag: torr på
+    // ytan, och den som helgarderar har alltid rätt).
     forsta: {
       nr: (n) => `Nr ${n}`,
       vecka: (v) => `Vecka ${v}`,
       pris: '3 kr',
       prov: 'Provnummer',
+      infor: { stryktipset: 'Inför Stryktipset', omgangen: 'Inför omgången' },
+      devis: 'Sveriges säkraste tipstidning',
     },
     kupongen: {
       stryktipset: 'Stryktipset',
@@ -290,12 +296,6 @@
 
   // ---------- upplagan ----------
 
-  // Omslagets match: den med mest i, helst där båda lagen har något. Samma nummer ger samma omslag.
-  const vikt = (s) => s.delar.reduce((a, d) => a + poddText(d).join(' ').length, 0) + (s.delar.filter(harInnehall).length > 1 ? 400 : 0);
-  function ettan(u) {
-    const s = u.sidor.slice().sort((a, b) => vikt(b) - vikt(a) || a.nr - b.nr)[0];
-    return s ? { sida: s } : null;
-  }
   // Sista sidan (data/sista-sidan.json) när den är skriven för samma omgång och har allt den ska.
   function sistaSidan(x, omgang) {
     if (!x || String(x.omgang || '') !== omgang) return null;
@@ -332,7 +332,6 @@
       sista: sistaSidan(sista, String(data.omgang || '')),
       sistaNr: 2 * sidor.length + 2,
     };
-    u.ettan = ettan(u);
     return u;
   }
   // Numret: veckans, och utan det provnumret. → Promise: upplagan, eller null
@@ -344,45 +343,38 @@
 
   // ---------- omslaget ----------
 
-  // Rutorna 1, X och 2 som på kupongen, alla ikryssade med pennan: helgarderat. Kryssen är dragna med fart, lite
-  // olika, och går en bit utanför rutan.
-  const KRYSS = [
-    'M1.6 3.2 C9 11.5 19 21.6 30.5 31.8 C33.5 34.4 36.4 37 38.9 39.6 M37.4 1.4 C29.5 9.8 19.8 20.7 11.6 29.6 C8.4 33 5.2 36.4 2.4 39.9',
-    'M3.1 1.8 C10.6 10.4 20.4 22.2 29.8 31.4 C32.6 34.2 35.6 36.9 38.2 38.6 M39.6 4.1 C30.2 12.4 21.6 21 13.4 29.7 C10.1 33.1 6.4 36.4 1.4 38.2',
-    'M2.2 2.6 C11.4 10.8 21.2 20.4 30.9 30.2 C33.9 33.2 36.2 35.8 39.4 38.1 M36.1 2.2 C28.9 11.6 20.2 21.4 12.6 30.1 C9.2 33.9 5.9 37.2 3.4 40.4',
-  ];
-  const rutor = (kl = 'hf-rutor') => `<svg class="${kl}" viewBox="0 0 134 64" aria-hidden="true">${SIGNS.map((t, i) => `<g transform="translate(${i * 46.5 + 0.8} 0)">` +
-    `<text x="19.5" y="15" text-anchor="middle">${t}</text><g transform="translate(0 23.2)"><rect width="39" height="39" class="r"/><path d="${KRYSS[i]}" class="k"/></g></g>`).join('')}</svg>`;
-
-  // Omslaget, 100 × 140 (2026-11-11, användarens val bland fyra skisser: C, Helgarderingen, "Skippa den där extrainfon
-  // med '13 matcher'"): på kupongens papper och utan bild. Numret, veckan och priset maskinskrivna överst, namnet och
-  // lördagens datum tryckta, rutorna 1, X och 2 ikryssade med pennan i mitten, och nertill den första matchen med sin
-  // rubrik. I tidningen (lankar) går rutorna till kupongen och matchen till sitt matchblad; på pulten ligger omslaget i
-  // en länk och har inga egna. Utan upplaga står bara namnet och rutorna.
   // Raden överst till vänster, numret och veckan (Nr 1 · Vecka 46): också på löpsedeln (rum-affischer.js), som är
   // samma nummer som tidningen på pulten. Utan upplaga, eller utan tider, så mycket som går att säga.
   function overst(u) {
     const { nr, dag } = numret(u);
     return [nr != null ? TEXT.forsta.nr(nr) : '', dag ? TEXT.forsta.vecka(vecka(dag)) : ''].filter(Boolean).join(' · ');
   }
+  // Omslaget, 100 × 140: Kalenderbladet (2026-11-13, användarens val F, Lördagen, bland fyra minimalistiska skisser:
+  // "något mer minimalistiskt - kanske bara tidningsnumret eller något dylikt istället för de där ikryssade rutorna?",
+  // och sedan: "byta ut texten där nere … mot en devis" och "Inför stryktipset den 14 november - fast på ett snyggare
+  // sätt"). På kupongens papper och utan bild: numret, veckan och priset maskinskrivna överst, namnet tryckt i
+  // terrakotta över ett streck, och i mitten lördagens datum som ett kalenderblad, dagen stor mellan två etiketter
+  // (Inför Stryktipset ovanför, månaden under; Inför omgången när omgången inte är Stryktipsets). Nertill devisen,
+  // kursiv som tidningens citat. I tidningen (lankar) går kalenderbladet till innehållet; på pulten ligger omslaget i
+  // en länk och har inga egna. Utan upplaga, eller utan tider, står namnet och devisen.
+  // Förut (2026-11-11, C, Helgarderingen) rutorna 1, X och 2 ikryssade med pennan i mitten, lördagens datum under
+  // namnet och den första matchen med sin rubrik nertill. Skisserna som inte valdes: först A Kvällstidningen, B
+  // Tipsbladet, C Matchprogrammet och D Fanzinet, sedan E Numret (numret stort i mitten), G Rubriken och H Bara namnet.
   function forsta(u, lankar = false) {
     const G = TEXT.forsta;
     const { nr, dag } = numret(u);
     const over = overst(u);
-    const mitt = lankar && u ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(spelet(u))}">${rutor()}</a>` : `<div class="hf-mitt">${rutor()}</div>`;
-    let ettan = '';
-    if (u && u.ettan) {
-      const s = u.ettan.sida;
-      const lag = s.lag || [];
-      const inne = `<span class="hf-lagen">${esc(kort(lag[0]))} – ${esc(kort(lag[1]))}</span>` +
-        `<span class="hf-rub">${esc(hel(s.rubrik || TEXT.poddar.rubrik(lag[0], lag[1])))}</span>`;
-      ettan = lankar ? `<a class="hf-ettan" href="#hg-sida-${u.sida.get(s.nr)}">${inne}</a>` : `<div class="hf-ettan">${inne}</div>`;
+    let mitt = '<div class="hf-mitt"></div>';
+    if (dag) {
+      const infor = spelet(u) === TEXT.kupongen.stryktipset ? G.infor.stryktipset : G.infor.omgangen;
+      const inne = `<span class="hf-et">${esc(infor)}</span><span class="hf-dag">${esc(fDag.format(dag))}</span><span class="hf-et">${esc(fMan.format(dag))}</span>`;
+      mitt = lankar ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(`${infor} ${fVdagLang.format(dag)} ${fDagMan.format(dag)}: ${TEXT.innehall.titel}`)}">${inne}</a>`
+        : `<div class="hf-mitt">${inne}</div>`;
     }
     return `<div class="hf-forsta" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
       `<div class="hf-linje"><span>${esc(over)}</span>${u && u.prov ? `<em>${esc(G.prov)}</em>` : ''}<span>${esc(G.pris)}</span></div>` +
-      `<div class="hf-namn">${NAMN}</div>` +
-      `<div class="hf-dagen">${dag ? `<span>${esc(`${fVdagLang.format(dag)} ${fDagMan.format(dag)}`)}</span>` : ''}</div>` +
-      mitt + ettan + '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
+      `<div class="hf-namn">${NAMN}</div>` + mitt + `<p class="hf-devis">${esc(G.devis)}</p>` +
+      '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
   // Tidningens storlek (pulten i rum.js och sajten, helgarderat.js): omslaget förstorat k gånger, och alla andra ark
   // lika breda och minst lika höga (--hg-k i helgarderat.css; 2026-11-11, användarens önskemål: "sidorna ska vara
@@ -559,5 +551,5 @@
     return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') + (u.sista ? sista(u) : '') : omslag;
   }
 
-  return { hamta, upplaga, tidning, forsta, passa, bildfel, nummer, overst, rutor, TEXT };
+  return { hamta, upplaga, tidning, forsta, passa, bildfel, nummer, overst, TEXT };
 });
