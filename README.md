@@ -6648,6 +6648,42 @@ dolda matcherna. Utan WebGL står disken tom. `?rum-register` visar datorn framm
 en fast bild, `?rum-register=<fråga>` med den sökningen och `?rum-register=%23mote:<id>`,
 `%23div:pl`, `%23flik:lagen` … med den vyn.
 
+#### Statistiks tal på datorn
+
+Sedan 2026-11-13 har datorn all statistik som sajten visar om ett lag eller en spelare (användarens önskemål: "all
+statistik som finns på hemsidan men som inte finns i datorn ska kunna visualiseras där"). Tabellen och skytteligan
+står kvar bara på tv:n. Samma tal under samma namn och i samma ordning som kolumnerna på Statistik (`LAGTAL` och
+`SPTAL` i [public/rum-register.js](public/rum-register.js), efter `TCOLS` och `PCOLS` i
+[public/divisioner.js](public/divisioner.js)):
+
+- **Lagkortet**: omgångens match och nästa (för lagen utanför omgången den närmaste), *Formen* med poängen och de fem
+  matcherna en och en, och sedan avsnitten *Målen per match* (gjorda, insläppta, nollor), *xG per match* (skapar,
+  släpper till, skillnad), *Mot chanserna* (gjorda och insläppta mål mot xG, tur, kryssar), *Modellen* (styrka,
+  motståndet), *Spelet per match* (skott, skott mot, på mål, gula kort), *Oddsen* (favorit, väntat, tog, mot oddsen,
+  spel på seger) och *Truppen* (målen, skytten, beroendet). Spelarlistan har assisten och korten när raden ryms.
+- **Spelarkortet**: *Matcherna* (matcher, från start, inhopp, speltid, per match, betyg, bäst på plan), *Anfall* (mål,
+  assist, inblandad, andel av lagets mål, skott, på mål, mål per skott, per match eller per 90, xG, mål mot xG, xA,
+  xG och mål plus assist per 90), *Målen* för den som har gjort mål (segermål, poäng åt laget, första målet, sena mål,
+  straffar, som inhoppare), *I målet* för målvakterna (räddningar, räddade, skott på mål, insläppta, per match),
+  *Försvar* (tacklingar, rensningar, bollvinster, insatser per 90, nollor, självmål) och *Regelbrott* (fälld, fäller,
+  per 90, gula och röda kort). Rader som saknas i divisionen (xG och försvaret utanför Premier League) står inte med.
+- Efter varje tal står **platsen i divisionen**, svagt, som i matchakten: för lagen alltid, för spelarna bara bland de
+  20 främsta (Statistiks topplistor). Talen med `asc` (insläppta, skott mot, motståndarnas xG) räknar lägst först, och
+  osäkra siffror (för lite speltid, för få skott) får ingen plats, som de dämpade siffrorna på Statistik.
+- **Etiketten leder till listan** (`#lista:lag:pl:skapar`, `#lista:spelare:ch:assist`): divisionens lag eller spelare
+  ordnade efter talet, med numret bara på den första vid lika tal (som skytteligan på tv:n), registrets rad med
+  divisionerna överst (de ger samma lista där) och ←/→ till förra och nästa tal. Spelarlistan har dem som har spelat,
+  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna).
+- **Matchakten** har också matchsidans rader ur matchens fil: *Matcher 14 d* (med Europacuperna), *Hemma* och *Borta*
+  (V–O–F), *Nollor*, *Utan mål*, *På mål*, *Mål mot xG* och *Insl. mot xG*, lagens främsta i *Assist* och *Segermål*
+  (*Gula kort* där målens sort saknas) och *Domaren* med gula kort, frisparkar och hemmasegrar mot divisionens snitt.
+  Etiketterna leder till listorna i det första lagets division. Landslagen fick *Nollor* i lagkortet och matchakten.
+- **Sökningen** hittar listorna på etiketten eller rubriken (*assist*, *xg*, *tur*), hela ordet eller början från fem
+  bokstäver, så att de inte går före lag och spelare med liknande namn.
+
+Dolda resultat: talen står som ? och listorna som ett ?, med *Visa ändå* som förut. Inte med: matchrapporternas
+statistik för spelade matcher (bollinnehav, hörnor), modellens *Vad drog åt vilket håll* och Modell- och Källor-sidorna.
+
 #### Landslagen på datorn
 
 Sedan 2026-11-13 har datorn landskamperna (användarens önskemål: "Uppdatera sidan – inklusive
@@ -6704,7 +6740,7 @@ med flit (nedan):
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
 | **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match, truppen), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, Nations League, landskamperna och marknadens chans) |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom tabellen och skytteligan: laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en

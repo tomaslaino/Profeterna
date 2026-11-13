@@ -36,6 +36,14 @@
 // (data/landslag.json). Sökningen hittar dem på svenska och engelska.
 // (Fram till 2026-11-13 stod tavlans tal också som topplistor över omgången i
 // en egen flik, TOPPLISTOR; användaren ville ha dem bara vid matcherna.)
+// Statistiks tal (sedan 2026-11-13, användarens önskemål: all statistik på
+// sajten ska gå att se i datorn): lagkortet och spelarkortet har allt som
+// Statistik och matchsidan visar om ett lag eller en spelare – utom tabellen
+// och skytteligan, som står på tv:n – i avsnitt med platsen i divisionen
+// efter, och etiketten leder till listan: divisionen ordnad efter talet
+// (#lista:lag:pl:skapar), där ←/→ bläddrar till förra och nästa tal.
+// Matchakten har också matchsidans rader (hemma och borta, nollorna, skotten
+// på mål, målen mot xG, lagens främsta i assist och segermål) och domaren.
 // Längst ner står sökraden (SÖK >). Den svarar medan man skriver: alla träffar
 // (lag och spelare i alla divisionerna, omgångens möten, flikarna och
 // divisionerna) står i utskriften, den mest sannolika överst och markerad och
@@ -184,6 +192,8 @@ window.RumRegister = (() => {
   // poängen per match i Nations League och alla landskamper (V-O-F), målen
   // som för klubbarna och marknadens chans som favoritskapet.
   const SKILJER = { form: 2, vila: 2, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, favorit: 0.15, poang: 3, ppm: 0.5 };
+  // matchaktens etiketter (den längsta, INSL. MOT xG, är 12 tecken)
+  const AKTEN_L = 13;
 
   // ---------- raderna ----------
   //
@@ -273,9 +283,12 @@ window.RumRegister = (() => {
     function loadPlayers() {
       if (!A.Pp) {
         A.Pp = Promise.all(DIVS.map((d) => getJSON(`data/players/${d}.json`).catch(() => null))).then((files) => {
-          const P = { spelare: [], lag: new Map(), avail: new Map() };
+          // (th: gränserna för de dämpade siffrorna och pos: vem gör målen, per division)
+          const P = { spelare: [], lag: new Map(), avail: new Map(), th: {}, pos: {} };
           files.forEach((f, i) => {
             if (!f || f.unknown) return;
+            P.th[DIVS[i]] = f.thresholds || {};
+            P.pos[DIVS[i]] = (f.goalsByPos || []).filter((x) => x.goals > 0);
             for (const t of f.teams || []) P.lag.set(String(t.espnId), t);
             for (const [id, a] of Object.entries(f.availability || {})) if (a && !a.unknown) P.avail.set(String(id), a.players || []);
             for (const p of f.players || []) P.spelare.push({ p, div: DIVS[i], n: norm(p.name), t: norm(p.name).split(' ') });
@@ -463,7 +476,7 @@ window.RumRegister = (() => {
       const i = A.ms.indexOf(m);
       R.sido = i < 0 ? null : [i > 0 ? `#mote:${A.ms[i - 1].id}` : null, i < A.ms.length - 1 ? `#mote:${A.ms[i + 1].id}` : null];
       R.slojas = true;
-      const L = 12;
+      const L = AKTEN_L;
       const K = Math.min(20, Math.floor((A.bred - L) / 2));
       const lag = [m.home, m.away];
       const sid = ['home', 'away'];
@@ -478,8 +491,8 @@ window.RumRegister = (() => {
       const inom = (f, grans) => (samma ? bast(T.map(f), grans) : -1);
       // en rad: etiketten och lagens värden; b är laget med det bättre talet,
       // som lyser medan det andra är svagt, och efter står svagt efter värdet
-      // (platsen i divisionen)
-      const raden = (etikett, v, b = -1, efter = null) => rad([etikett, 'd'], [pad('', L - etikett.length)],
+      // (platsen i divisionen); q gör etiketten till en länk till listan
+      const raden = (etikett, v, b = -1, efter = null, q = null) => rad([etikett, 'd', q], [pad('', L - etikett.length)],
         ...v.flatMap((x, j) => {
           const q = Array.isArray(x) ? x : [x, ''];
           const bit = b < 0 ? q : [q[0], j === b ? 'v' : 'd', q[2]];
@@ -487,8 +500,11 @@ window.RumRegister = (() => {
           const n = bitar.reduce((s, y) => s + y[0].length, 0);
           return j ? bitar : [...bitar, [pad('', Math.max(1, K - n))]];
         }));
+      // etiketten leder till listan i det första lagets division (lag eller spelare)
+      const div0 = (T[0] || T[1] || {}).comp;
+      const lq = (k, slag = 'lag') => (div0 ? listQ(slag, div0, k) : null);
       // tavlans tal med lagets plats i sin division efter: '+0,94   1:A'
-      const tal = (etikett, f, fmt, grans) => {
+      const tal = (etikett, f, fmt, grans, k) => {
         const v = T.map((t) => (S.veil ? null : f(t)));
         const ok = (x) => x != null && Number.isFinite(x);
         return raden(etikett, v.map((x) => (S.veil ? '?' : ok(x) ? fmt(x) : '–')), grans ? inom(f, grans) : -1,
@@ -496,7 +512,7 @@ window.RumRegister = (() => {
             if (!ok(x)) return '';
             const p = placering(T[j], f);
             return p ? `${pad('', Math.max(0, 6 - fmt(x).length))}${padL(ordtal(p), 4)}` : '';
-          }));
+          }), lq(k));
       };
       const per = (f) => T.map((t) => (S.veil ? '?' : f(t) || '–'));
       // formen: poängen på fem matcher (inte när någon av dem är dold). Efter
@@ -514,27 +530,77 @@ window.RumRegister = (() => {
       const vila = sid.map((s) => vilaOf(m, s));
       r.push(raden('VILAN', vila.map((d) => (d == null ? '–' : `${d} D`)), bast(vila, SKILJER.vila)));
       r.push(raden('NÄSTA', sid.map((s) => nastaOf(m, s))));
+      // matcherna de senaste veckorna (matchsidans Schemat), med Europacuperna
+      const d = A.match.get(m.id);
+      const sch = sid.map((s) => (d && d.teams && d.teams[s] && d.teams[s].schedule) || null);
+      const dgr = (sch[0] || sch[1] || {}).windowDays;
+      if (dgr && sch.some((x) => x && x.recent != null)) r.push(raden(`MATCHER ${dgr} D`, sch.map((x) => (x && x.recent != null ? `${x.recent}${x.recentEurope ? ` (${x.recentEurope} EUROPA)` : ''}` : '–'))));
       if (isLand(m.comp)) return [...r, ...landRader(m, S, raden, bast), tom(), ...moten(m)];
       r.push(tom());
-      r.push(tal('STYRKA', TAL.styrka, (v) => signed(v, 2), SKILJER.styrka));
-      r.push(tal('KRYSSAR', TAL.kryss, pct));
-      r.push(tal('TUR', TAL.tur, (v) => signed(v)));
-      r.push(tal('MOT ODDSEN', TAL.odds, (v) => signed(v), SKILJER.odds));
-      r.push(tal('MOTSTÅNDET', TAL.motstand, (v) => signed(v, 2)));
+      r.push(tal('STYRKA', TAL.styrka, (v) => signed(v, 2), SKILJER.styrka, 'styrka'));
+      r.push(tal('KRYSSAR', TAL.kryss, pct, 0, 'kryss'));
+      r.push(tal('TUR', TAL.tur, (v) => signed(v), 0, 'tur'));
+      r.push(tal('MOT ODDSEN', TAL.odds, (v) => signed(v), SKILJER.odds, 'odds'));
+      r.push(tal('MOTSTÅNDET', TAL.motstand, (v) => signed(v, 2), 0, 'motstand'));
+      // matchsidans rader (Lagen sida vid sida i app.js) ur matchens fil, under
+      // målen och xG: hemma och borta, nollorna, skotten på mål och målen mot xG
+      const fil = (etikett) => { for (const g of (d && d.rows) || []) for (const x of g.rows || []) if (x.label === etikett) return x.values; return null; };
+      const ur = (etikett, rubrik, k) => {
+        const v = fil(etikett);
+        if (v && v.some((x) => x != null)) r.push(raden(rubrik, v.map((x) => (S.veil ? '?' : x == null ? '–' : up(x))), -1, null, k ? lq(k) : null));
+      };
       r.push(tom());
-      r.push(raden('MÅL', per((t) => (t && t.m ? `${num(t.gf / t.m)}–${num(t.ga / t.m)}` : null)), inom((t) => (t && t.m ? (t.gf - t.ga) / t.m : null), SKILJER.mal)));
-      r.push(raden('xG', per((t) => { const x = fdOf(t, 'xg'); return x && x.n ? `${num(x.f / x.n)}–${num(x.a / x.n)}` : null; }), inom((t) => { const x = fdOf(t, 'xg'); return x && x.n ? (x.f - x.a) / x.n : null; }, SKILJER.xg)));
-      r.push(raden('FAVORIT', per((t) => { const x = fdOf(t, 'mkt'); return x && x.n ? `${x.fav} AV ${x.n}` : null; }), inom((t) => { const x = fdOf(t, 'mkt'); return x && x.n ? x.fav / x.n : null; }, SKILJER.favorit)));
+      r.push(raden('MÅL', per((t) => (t && t.m ? `${num(t.gf / t.m)}–${num(t.ga / t.m)}` : null)), inom((t) => (t && t.m ? (t.gf - t.ga) / t.m : null), SKILJER.mal), null, lq('gjorda')));
+      ur('Hemma V–O–F', 'HEMMA');
+      ur('Borta V–O–F', 'BORTA');
+      ur('Hållit nollan', 'NOLLOR', 'nollor');
+      ur('Inte gjort mål', 'UTAN MÅL');
+      r.push(tom());
+      r.push(raden('xG', per((t) => { const x = fdOf(t, 'xg'); return x && x.n ? `${num(x.f / x.n)}–${num(x.a / x.n)}` : null; }), inom((t) => { const x = fdOf(t, 'xg'); return x && x.n ? (x.f - x.a) / x.n : null; }, SKILJER.xg), null, lq('skapar')));
+      ur('Skott på mål', 'PÅ MÅL', 'pamal');
+      ur('Gjorda mål mot xG', 'MÅL MOT xG', 'malxg');
+      ur('Insläppta mål mot xG', 'INSL. MOT xG', 'inslxg');
+      r.push(raden('FAVORIT', per((t) => { const x = fdOf(t, 'mkt'); return x && x.n ? `${x.fav} AV ${x.n}` : null; }), inom((t) => { const x = fdOf(t, 'mkt'); return x && x.n ? x.fav / x.n : null; }, SKILJER.favorit), null, lq('favorit')));
+      r.push(tom());
       r.push(raden('SKYTTEN', T.map((t) => {
         if (S.veil) return '?';
         const s = skytten(t);
         if (!s) return A.P ? '–' : '…';
         return [`${sistaNamn(s.ts.name).slice(0, K - 3 - String(s.ts.g).length)} ${s.ts.g}`, '', s.vem ? `#spelare:${s.vem.p.id}` : null];
-      })));
+      }), -1, null, lq('skytten')));
+      // lagens främsta i assist och segermål (gula kort där målens sort saknas),
+      // som Spelarna i ligan på matchsidan: vid lika den med färst matcher
+      const framst = (t, f) => {
+        const l = t && A.P ? A.P.spelare.filter((y) => String(y.p.teamId) === String(t.espnId) && f(y.p) > 0) : [];
+        if (!l.length) return null;
+        const top = Math.max(...l.map((y) => f(y.p)));
+        const y = l.filter((z) => f(z.p) === top).sort((a, b) => (a.p.app || 0) - (b.p.app || 0) || a.p.name.localeCompare(b.p.name, 'sv'))[0];
+        return [`${sistaNamn(y.p.name).slice(0, K - 3 - String(top).length)} ${top}`, '', `#spelare:${y.p.id}`];
+      };
+      const ledare = (etikett, f, k) => r.push(raden(etikett, T.map((t) => (S.veil ? '?' : framst(t, f) || (A.P ? '–' : '…'))), -1, null, lq(k, 'spelare')));
+      ledare('ASSIST', (p) => p.a, 'assist');
+      const segrar = !A.P || T.some((t) => t && A.P.spelare.some((y) => String(y.p.teamId) === String(t.espnId) && y.p.gw != null));
+      if (segrar) ledare('SEGERMÅL', (p) => p.gw, 'segermal');
+      else ledare('GULA KORT', (p) => p.yc, 'gula');
       const sk = sid.map((s) => skadorOf(m, s));
       if (sk.some(Boolean)) {
         r.push(tom(), rad(['SKADORNA', 'd']));
         sk.forEach((l, j) => r.push(rad([`${kort(lag[j])}: `, 'd'], l ? skadeNamn(l) : 'OKÄNT')));
+      }
+      // domaren (football-data.co.uk) som på matchsidan: hans eller hennes
+      // ligamatcher före matchdagen, med divisionens snitt efter
+      const dom = d && d.referee && !d.referee.unknown && d.referee.name ? d.referee : null;
+      if (dom) {
+        const s = dom.stats || {};
+        const a = dom.avg || {};
+        const fig = (etikett, v, w) => rad([pad(etikett, L), 'd'], pad(v, 8), [w != null ? `SNITT ${w}` : '', 'd']);
+        r.push(tom(), rad([pad('DOMAREN', L), 'd'], up(dom.name), [s.n ? `  ${s.n} LIGAMATCHER` : '', 'd']));
+        if (s.n) {
+          if (s.yellow != null) r.push(fig('GULA KORT', num(s.yellow, 1), a.yellow != null ? num(a.yellow, 1) : null));
+          if (s.fouls != null) r.push(fig('FRISPARKAR', num(s.fouls, 1), a.fouls != null ? num(a.fouls, 1) : null));
+          if (s.home != null) r.push(fig('HEMMASEGER', pct(s.home), a.home != null ? pct(a.home) : null));
+          if (dom.min && s.n < dom.min) r.push(rad([pad('', L)], ['FÖR FÅ MATCHER', 'd']));
+        }
       }
       r.push(tom(), ...moten(m));
       return r;
@@ -576,6 +642,7 @@ window.RumRegister = (() => {
         r.push(tom(), rad(['NATIONS LEAGUE', 'd']));
         par('V-O-F', (j) => vof(nl(j)), SKILJER.ppm);
         par('MÅL', (j) => mal(nl(j)), SKILJER.mal);
+        par('NOLLOR', (j) => { const x = LL[j] && LL[j].nationsLeague; return x && x.nollor != null ? [String(x.nollor), null] : null; });
       }
       if ([0, 1].some((j) => alla(j))) {
         const fran = [0, 1].map((j) => alla(j) && alla(j).fran).filter(Boolean).sort()[0];
@@ -584,6 +651,7 @@ window.RumRegister = (() => {
         par('MATCHER', (j) => { const x = alla(j); return x ? [String(x.n), null] : null; });
         par('V-O-F', (j) => vof(alla(j)), SKILJER.ppm);
         par('MÅL', (j) => mal(alla(j)), SKILJER.mal);
+        par('NOLLOR', (j) => { const x = LL[j] && LL[j].alla; return x && x.nollor != null ? [String(x.nollor), null] : null; });
       }
       // marknadens chans (f.p i matchlistan, mk: marknaden), med krysset under
       const p = m.f && m.f.p;
@@ -591,7 +659,7 @@ window.RumRegister = (() => {
         r.push(tom());
         r.push(raden('MARKNADEN', [`${p[0]} %`, `${p[2]} %`], bast([p[0] / 100, p[2] / 100], SKILJER.favorit)));
         const x = `X ${p[1]} % · UR ODDSEN`;
-        r.push(rad([pad('', 12)], [A.bred - 12 >= x.length + 15 ? `${x}, INTE MODELLEN` : x, 'd']));
+        r.push(rad([pad('', AKTEN_L)], [A.bred - AKTEN_L >= x.length + 15 ? `${x}, INTE MODELLEN` : x, 'd']));
       }
       return r;
     }
@@ -609,6 +677,235 @@ window.RumRegister = (() => {
     // 1:A, 2:A, 3:E … 11:E, 12:E … 21:A
     const ordtal = (n) => `${n}:${(n % 10 === 1 || n % 10 === 2) && n % 100 !== 11 && n % 100 !== 12 ? 'A' : 'E'}`;
 
+    // ---------- Statistiks tal: i korten och som listor ----------
+    //
+    // Sedan 2026-11-13 (användarens önskemål: "all statistik som finns på
+    // hemsidan men som inte finns i datorn ska kunna visualiseras där") har
+    // datorn allt som Statistik (divisioner.js) och matchsidan (app.js) visar
+    // om ett lag eller en spelare, utom tabellen och skytteligan, som står på
+    // tv:n. Samma tal under samma namn och i samma ordning som kolumnerna på
+    // Statistik (TCOLS och PCOLS): lagkortet och spelarkortet har dem i
+    // avsnitt med platsen i divisionen efter (för spelarna bara bland de 20
+    // främsta, som Statistiks topplistor), och etiketten leder till listan –
+    // divisionen ordnad efter talet, som en sorterad kolumn på Statistik. I
+    // listan bläddrar ←/→ till förra och nästa tal, och divisionerna står
+    // överst som i registret.
+    //
+    // Ett tal: k (i #lista:lag:pl:k), del (avsnittet i kortet), e (etiketten),
+    // n (listans rubrik), g (talet), f (som text), asc (lägst först, som på
+    // Statistik), ok (säkert nog för en plats, som Statistiks dämpade
+    // siffror), noll (nollor och minus räknas i listan; annars bara de över
+    // noll, som topplistorna), ute och mv (bara utespelarna eller
+    // målvakterna) och visa (raden står bara när den säger något).
+    const TOPP = 20;
+    // etiketternas bredd i korten (den längsta är 14) och talens
+    const ETK = 15;
+    const VAR = 11;
+    const fin = (v) => v != null && Number.isFinite(v);
+    const perN = (o, k) => (o && o.n ? o[k] / o.n : null);
+    const tal1 = (x) => num(x, 1);
+    const tal2 = (x) => num(x, 2);
+    const tecken = (d) => (x) => signed(x, d);
+    const tecknadPct = (x) => (Math.round(x * 100) === 0 ? '±0 %' : `${x > 0 ? '+' : '−'}${Math.round(Math.abs(x) * 100)} %`);
+    // lagets fem senaste i ligan och de engelska cuperna (data/matches.json,
+    // som på Statistik), senaste först: V, O, F eller ? när resultatet är dolt
+    const formLag = (n) => (A.byTeam.get(n) || []).filter((x) => x.completed).slice(0, 5)
+      .map((x) => ({ m: x, l: (window.Spoiler && Spoiler.hidden(x) ? '?' : letter(x, n)) || '?' }));
+    const formPoang = (f) => { const k = f.filter((x) => x.l && 'VOF'.includes(x.l)); return k.length ? k.reduce((s, x) => s + (x.l === 'V' ? 3 : x.l === 'O' ? 1 : 0), 0) : null; };
+    // laget i spelarfilen (målen, den bäste målskytten)
+    const sqLag = (t) => (t && A.P ? A.P.lag.get(String(t.espnId)) : null) || null;
+    const mkt = (t) => fdOf(t, 'mkt');
+    const xgOf = (t) => fdOf(t, 'xg');
+    const LAGTAL = [
+      { k: 'form', del: '', e: 'FORMEN', n: 'FORMEN: POÄNG PÅ FEM MATCHER', g: (t) => formPoang(formLag(t.name)),
+        f: (v, t) => `${formLag(t.name).map((x) => x.l).join('')} ${v} P` },
+      { k: 'gjorda', del: 'MÅLEN PER MATCH', e: 'GJORDA', n: 'GJORDA MÅL PER MATCH', g: (t) => (t.m ? t.gf / t.m : null), f: tal2 },
+      { k: 'inslappta', del: 'MÅLEN PER MATCH', e: 'INSLÄPPTA', n: 'INSLÄPPTA MÅL PER MATCH', g: (t) => (t.m ? t.ga / t.m : null), f: tal2, asc: true },
+      { k: 'nollor', del: 'MÅLEN PER MATCH', e: 'NOLLOR', n: 'HÅLLNA NOLLOR, ANDEL MATCHER', g: (t) => (fdOf(t, 'n') && fdOf(t, 'cs') != null ? fdOf(t, 'cs') / fdOf(t, 'n') : null), f: pct },
+      { k: 'skapar', del: 'xG PER MATCH', e: 'SKAPAR', n: 'SKAPADE CHANSER, xG PER MATCH', g: (t) => perN(xgOf(t), 'f'), f: tal2 },
+      { k: 'slapper', del: 'xG PER MATCH', e: 'SLÄPPER TILL', n: 'MOTSTÅNDARNAS xG PER MATCH', g: (t) => perN(xgOf(t), 'a'), f: tal2, asc: true },
+      { k: 'xgdiff', del: 'xG PER MATCH', e: 'SKILLNAD', n: 'xG-SKILLNAD PER MATCH', g: (t) => { const x = xgOf(t); return x && x.n ? (x.f - x.a) / x.n : null; }, f: tecken(2) },
+      { k: 'malxg', del: 'MOT CHANSERNA', e: 'GJORDA MÅL', n: 'GJORDA MÅL MOT xG', g: (t) => { const x = xgOf(t); return x ? x.gf - x.f : null; }, f: tecken(1) },
+      { k: 'inslxg', del: 'MOT CHANSERNA', e: 'INSLÄPPTA MÅL', n: 'INSLÄPPTA MÅL MOT xG', g: (t) => { const x = xgOf(t); return x ? x.ga - x.a : null; }, f: tecken(1), asc: true },
+      { k: 'tur', del: 'MOT CHANSERNA', e: 'TUR', n: 'TUR: POÄNG MOT CHANSERNA', g: TAL.tur, f: tecken(1) },
+      { k: 'kryss', del: 'MOT CHANSERNA', e: 'KRYSSAR', n: 'KRYSSAR: KRYSS ENLIGT CHANSERNA', g: TAL.kryss, f: pct },
+      { k: 'styrka', del: 'MODELLEN', e: 'STYRKA', n: 'STYRKA ENLIGT MODELLEN', g: TAL.styrka, f: tecken(2) },
+      { k: 'motstand', del: 'MODELLEN', e: 'MOTSTÅNDET', n: 'MOTSTÅNDET HITTILLS', g: TAL.motstand, f: tecken(2) },
+      { k: 'skott', del: 'SPELET PER MATCH', e: 'SKOTT', n: 'SKOTT PER MATCH', g: (t) => perN(fdOf(t, 'sh'), 'f'), f: tal1 },
+      { k: 'skottmot', del: 'SPELET PER MATCH', e: 'SKOTT MOT', n: 'MOTSTÅNDARNAS SKOTT PER MATCH', g: (t) => perN(fdOf(t, 'sh'), 'a'), f: tal1, asc: true },
+      { k: 'pamal', del: 'SPELET PER MATCH', e: 'PÅ MÅL', n: 'SKOTT PÅ MÅL PER MATCH', g: (t) => perN(fdOf(t, 'sh'), 'of'), f: tal1 },
+      { k: 'gula', del: 'SPELET PER MATCH', e: 'GULA KORT', n: 'GULA KORT PER MATCH', g: (t) => perN(fdOf(t, 'cards'), 'y'), f: tal2 },
+      { k: 'favorit', del: 'ODDSEN', e: 'FAVORIT', n: 'FAVORIT ENLIGT ODDSEN', g: (t) => { const x = mkt(t); return x && x.n ? x.fav / x.n : null; }, f: (v, t) => `${mkt(t).fav} AV ${mkt(t).n}` },
+      { k: 'vantat', del: 'ODDSEN', e: 'VÄNTAT', n: 'VÄNTADE POÄNG ENLIGT ODDSEN', g: (t) => { const x = mkt(t); return x && x.n ? x.xp : null; }, f: (v) => `${num(v, 1)} P` },
+      { k: 'tog', del: 'ODDSEN', e: 'TOG', n: 'TAGNA POÄNG I SAMMA MATCHER', g: (t) => { const x = mkt(t); return x && x.n ? x.pts : null; }, f: (v) => `${v} P` },
+      { k: 'odds', del: 'ODDSEN', e: 'MOT ODDSEN', n: 'POÄNG MOT ODDSEN', g: TAL.odds, f: tecken(1) },
+      { k: 'seger', del: 'ODDSEN', e: 'SPEL PÅ SEGER', n: 'SPEL PÅ SEGER: VINST PÅ INSATSEN', g: (t) => { const x = mkt(t); return x && x.n ? (x.ret - x.n) / x.n : null; }, f: tecknadPct },
+      { k: 'malspelare', del: 'TRUPPEN', e: 'MÅL', n: 'MÅL AV LAGETS SPELARE', g: (t) => { const s = sqLag(t); return s ? s.goals : null; }, f: String },
+      { k: 'skytten', del: 'TRUPPEN', e: 'SKYTTEN', n: 'BÄSTE MÅLSKYTTEN', g: (t) => { const s = sqLag(t); return s && s.topScorer && s.topScorer.g ? s.topScorer.g : null; },
+        f: (v, t) => `${sistaNamn(sqLag(t).topScorer.name).slice(0, VAR - 1 - String(v).length)} ${v}` },
+      { k: 'beroende', del: 'TRUPPEN', e: 'BEROENDE', n: 'BEROENDE AV BÄSTE MÅLSKYTTEN', g: (t) => { const s = sqLag(t); return s && s.topScorer && s.topScorer.g ? s.topScorerShare : null; }, f: pct },
+    ];
+
+    // Spelarnas tal (x är spelarens rad i registret, med divisionen):
+    // gränserna för de dämpade siffrorna ur spelarfilen (thresholds)
+    const grans = (x, k, d) => { const t = A.P && A.P.th[x.div]; return t && t[k] != null ? t[k] : d; };
+    const per90 = (v, min) => (v == null || !min ? null : (v / min) * 90);
+    // speltiden för ESPN:s siffror: i Premier League ur matchrapporterna (emin)
+    const espnMin = (p) => (p.emin !== undefined ? p.emin : p.min);
+    const helt = (p, x) => p.min >= grans(x, 'minMinutesP90', 270);
+    const heltE = (p, x) => espnMin(p) >= grans(x, 'minMinutesP90', 270);
+    // mål och assist per 90: FPL:s egna i Premier League (samma matcher som minuterna)
+    const mal90 = (p) => (p.fg !== undefined ? p.fg : p.g);
+    const lagetsMal = (p) => { const t = A.P && A.P.lag.get(String(p.teamId)); return t ? t.goals : null; };
+    const MV = (p, v) => (p.pos === 'MV' ? v : null);
+    const SPTAL = [
+      { k: 'matcher', del: 'MATCHERNA', e: 'MATCHER', n: 'LIGAMATCHER', g: (p) => p.app, f: String },
+      { k: 'start', del: 'MATCHERNA', e: 'FRÅN START', n: 'MATCHER FRÅN START', g: (p) => p.starts,
+        f: (v, p) => { const t = A.P && A.P.lag.get(String(p.teamId)); const av = t && t.coverage ? t.coverage.covered : null; return av ? `${v} AV ${av}` : String(v); } },
+      { k: 'inhopp', del: 'MATCHERNA', e: 'INHOPP', n: 'INHOPP', g: (p) => (p.app != null && p.starts != null ? p.app - p.starts : null), f: String },
+      { k: 'speltid', del: 'MATCHERNA', e: 'SPELTID', n: 'SPELTID', g: (p) => p.min, f: (v) => `${v} MIN` },
+      { k: 'permatch', del: 'MATCHERNA', e: 'PER MATCH', n: 'SPELTID PER MATCH', g: (p) => (p.min != null && p.app ? p.min / p.app : null), f: (v) => `${Math.round(v)} MIN` },
+      { k: 'betyg', del: 'MATCHERNA', e: 'BETYG', n: 'SNITTBETYG', g: (p) => p.rt, f: tal1,
+        ok: (p, x) => p.rn >= grans(x, 'minRated', 3) && p.rq >= grans(x, 'minShareRated', 0.5) },
+      { k: 'bast', del: 'MATCHERNA', e: 'BÄST PÅ PLAN', n: 'BÄST PÅ PLAN', g: (p) => (p.rt != null ? p.rb : null), f: String },
+      { k: 'mal', del: 'ANFALL', ute: true, e: 'MÅL', n: 'MÅL', g: (p) => p.g, f: String },
+      { k: 'assist', del: 'ANFALL', ute: true, e: 'ASSIST', n: 'ASSIST', g: (p) => p.a, f: String },
+      { k: 'inblandad', del: 'ANFALL', ute: true, e: 'INBLANDAD', n: 'INBLANDAD I LAGETS MÅL', g: (p) => { const m = lagetsMal(p); return p.noStats || !m ? null : ((p.g || 0) + (p.a || 0)) / m; }, f: pct, ok: (p) => lagetsMal(p) >= 5 },
+      { k: 'andel', del: 'ANFALL', ute: true, e: 'AV LAGETS MÅL', n: 'ANDEL AV LAGETS MÅL', g: (p) => { const m = lagetsMal(p); return p.noStats || !m || p.g == null ? null : p.g / m; }, f: pct, ok: (p) => lagetsMal(p) >= 5 },
+      { k: 'skott', del: 'ANFALL', ute: true, e: 'SKOTT', n: 'SKOTT', g: (p) => p.sh, f: String },
+      { k: 'pamal', del: 'ANFALL', ute: true, e: 'PÅ MÅL', n: 'SKOTT PÅ MÅL', g: (p) => p.sot, f: String },
+      { k: 'malskott', del: 'ANFALL', ute: true, e: 'MÅL/SKOTT', n: 'MÅL PER SKOTT', g: (p) => (p.sh ? p.g / p.sh : null), f: pct, ok: (p, x) => p.sh >= grans(x, 'minShotsConversion', 10) },
+      { k: 'malmatch', del: 'ANFALL', ute: true, e: 'MÅL/MATCH', n: 'MÅL PER MATCH', g: (p) => (p.min == null && p.app ? p.g / p.app : null), f: tal2 },
+      { k: 'mal90', del: 'ANFALL', ute: true, e: 'MÅL/90', n: 'MÅL PER 90 MINUTER', g: (p) => per90(mal90(p), p.min), f: tal2, ok: helt },
+      { k: 'xg', del: 'ANFALL', ute: true, e: 'xG', n: 'FÖRVÄNTADE MÅL (xG)', g: (p) => p.xg, f: tal1 },
+      { k: 'malmotxg', del: 'ANFALL', ute: true, e: 'MÅL MOT xG', n: 'MÅL MOT xG', g: (p) => (p.xg != null && p.fg != null ? p.fg - p.xg : null), f: tecken(1), noll: true },
+      { k: 'xa', del: 'ANFALL', ute: true, e: 'xA', n: 'FÖRVÄNTADE ASSIST (xA)', g: (p) => p.xa, f: tal1 },
+      { k: 'xg90', del: 'ANFALL', ute: true, e: 'xG/90', n: 'xG PER 90 MINUTER', g: (p) => per90(p.xg, p.min), f: tal2, ok: helt },
+      { k: 'ma90', del: 'ANFALL', ute: true, e: 'MÅL+ASSIST/90', n: 'MÅL OCH ASSIST PER 90 MINUTER', g: (p) => (mal90(p) == null ? null : per90(mal90(p) + ((p.fg !== undefined ? p.fa : p.a) || 0), p.min)), f: tal2, ok: helt },
+      { k: 'segermal', del: 'MÅLEN', ute: true, e: 'SEGERMÅL', n: 'SEGERMÅL', g: (p) => p.gw, f: String, visa: (p) => p.g > 0 },
+      { k: 'poangmal', del: 'MÅLEN', ute: true, e: 'POÄNG ÅT LAGET', n: 'POÄNG SOM MÅLEN GAV LAGET', g: (p) => p.gpts, f: String, visa: (p) => p.g > 0 },
+      { k: 'forsta', del: 'MÅLEN', ute: true, e: 'FÖRSTA MÅLET', n: 'MATCHENS FÖRSTA MÅL', g: (p) => p.g1, f: String, visa: (p) => p.g > 0 },
+      { k: 'sena', del: 'MÅLEN', ute: true, e: 'SENA MÅL', n: 'SENA MÅL, FRÅN 80:E MINUTEN', g: (p) => p.glate, f: String, visa: (p) => p.g > 0 },
+      { k: 'straffar', del: 'MÅLEN', ute: true, e: 'STRAFFAR', n: 'STRAFFMÅL', g: (p) => p.gpen, f: (v, p) => `${v} AV ${v + (p.pmiss || 0)}`, visa: (p) => (p.gpen || 0) + (p.pmiss || 0) > 0 },
+      { k: 'inhoppmal', del: 'MÅLEN', ute: true, e: 'SOM INHOPPARE', n: 'MÅL SOM INHOPPARE', g: (p) => p.gsub, f: String, visa: (p) => p.gsub > 0 },
+      { k: 'raddningar', del: 'I MÅLET', mv: true, e: 'RÄDDNINGAR', n: 'RÄDDNINGAR', g: (p) => MV(p, p.sv), f: String },
+      { k: 'raddade', del: 'I MÅLET', mv: true, e: 'RÄDDADE', n: 'RÄDDADE AV SKOTTEN PÅ MÅL', g: (p) => MV(p, p.savePct), f: pct, ok: (p) => (p.sv || 0) + (p.gc || 0) >= 10 },
+      { k: 'motskott', del: 'I MÅLET', mv: true, e: 'SKOTT PÅ MÅL', n: 'SKOTT PÅ MÅL MOT MÅLVAKTEN', g: (p) => (p.pos === 'MV' && p.sv != null && p.gc != null ? p.sv + p.gc : null), f: String },
+      { k: 'inslappta', del: 'I MÅLET', mv: true, e: 'INSLÄPPTA', n: 'INSLÄPPTA MÅL', g: (p) => MV(p, p.gc), f: String, asc: true, noll: true,
+        ok: (p) => (p.sv || 0) + (p.gc || 0) >= 10 },
+      { k: 'inslmatch', del: 'I MÅLET', mv: true, e: 'INSL./MATCH', n: 'INSLÄPPTA MÅL PER MATCH', g: (p) => (p.pos === 'MV' && p.gc != null && p.app ? p.gc / p.app : null), f: tal1, asc: true, noll: true,
+        ok: (p) => (p.sv || 0) + (p.gc || 0) >= 10 },
+      { k: 'tacklingar', del: 'FÖRSVAR', e: 'TACKLINGAR', n: 'TACKLINGAR', g: (p) => p.tk, f: String },
+      { k: 'rensningar', del: 'FÖRSVAR', e: 'RENSNINGAR', n: 'RENSNINGAR, TÄCKNINGAR, BRYTNINGAR', g: (p) => p.cbi, f: String },
+      { k: 'bollvinster', del: 'FÖRSVAR', e: 'BOLLVINSTER', n: 'BOLLVINSTER', g: (p) => p.rec, f: String },
+      { k: 'insatser90', del: 'FÖRSVAR', e: 'INSATSER/90', n: 'FÖRSVARSINSATSER PER 90 MINUTER', g: (p) => (p.tk == null || p.cbi == null ? null : per90(p.tk + p.cbi, p.min)), f: tal1, ok: helt },
+      { k: 'nollor', del: 'FÖRSVAR', e: 'NOLLOR', n: 'HÅLLNA NOLLOR', g: (p) => p.cs, f: String },
+      { k: 'sjalvmal', del: 'FÖRSVAR', e: 'SJÄLVMÅL', n: 'SJÄLVMÅL', g: (p) => p.og, f: String },
+      { k: 'falld', del: 'REGELBROTT', e: 'FÄLLD', n: 'FÄLLD', g: (p) => p.fs, f: String },
+      { k: 'falld90', del: 'REGELBROTT', e: 'FÄLLD/90', n: 'FÄLLD PER 90 MINUTER', g: (p) => per90(p.fs, espnMin(p)), f: tal1, ok: heltE },
+      { k: 'faller', del: 'REGELBROTT', e: 'FÄLLER', n: 'BEGÅNGNA REGELBROTT', g: (p) => p.fc, f: String },
+      { k: 'faller90', del: 'REGELBROTT', e: 'FÄLLER/90', n: 'BEGÅNGNA REGELBROTT PER 90 MIN', g: (p) => per90(p.fc, espnMin(p)), f: tal1, ok: heltE },
+      { k: 'gula', del: 'REGELBROTT', e: 'GULA KORT', n: 'GULA KORT', g: (p) => p.yc, f: String },
+      { k: 'roda', del: 'REGELBROTT', e: 'RÖDA KORT', n: 'RÖDA KORT', g: (p) => p.rc, f: String },
+    ];
+    const listQ = (slag, d, k) => `#lista:${slag}:${d}:${k}`;
+    // platsen bland talen (lika tal delar plats; asc = lägst först)
+    const platsAv = (v, alla, asc) => 1 + alla.filter((y) => (asc ? y < v - 1e-9 : y > v + 1e-9)).length;
+    // Divisionens lag med talet, i listans ordning
+    function lagLista(def, d) {
+      const l = lagIDiv(d).map((t) => ({ t, v: def.g(t) })).filter((y) => fin(y.v));
+      return l.sort((a, b) => (def.asc ? a.v - b.v : b.v - a.v) || (a.t.rank || 0) - (b.t.rank || 0) || a.t.name.localeCompare(b.t.name, 'sv'));
+    }
+    // Divisionens spelare med talet (de som har spelat, när talet är säkert
+    // nog), i listans ordning: lika tal med färst matcher först, som på Statistik
+    const spMed = (def, x, v) => fin(v) && (x.p.app || 0) > 0 && (def.noll || v > 0) && (!def.ok || def.ok(x.p, x));
+    function spLista(def, d) {
+      if (!A.P) return [];
+      const l = A.P.spelare.filter((x) => x.div === d).map((x) => ({ x, v: def.g(x.p, x) })).filter((y) => spMed(def, y.x, y.v));
+      return l.sort((a, b) => (def.asc ? a.v - b.v : b.v - a.v) || (a.x.p.app || 0) - (b.x.p.app || 0) || a.x.p.name.localeCompare(b.x.p.name, 'sv'));
+    }
+    // en rad i kortet: etiketten (leder till listan), talet och platsen svagt efter
+    const talRad = (def, q, text, plats) => rad([def.e, 'd', q], [pad('', ETK - def.e.length)], padL(String(text).slice(0, VAR), VAR), [plats ? padL(ordtal(plats), 6) : '', 'd']);
+    // Lagkortets tal i avsnitt (formen står överst i kortet)
+    function lagTal(t, S) {
+      const r = [];
+      let del = null;
+      for (const def of LAGTAL) {
+        if (!def.del) continue;
+        const v = def.g(t);
+        if (!fin(v)) continue;
+        if (def.del !== del) { r.push(tom(), rad([def.del, 'd'])); del = def.del; }
+        const q = listQ('lag', t.comp, def.k);
+        r.push(S.veil ? talRad(def, q, '?') : talRad(def, q, def.f(v, t), platsAv(v, lagLista(def, t.comp).map((y) => y.v), def.asc)));
+      }
+      return r;
+    }
+    // Spelarkortets tal i avsnitt: platsen bara bland de 20 främsta
+    function spelarTal(x, S) {
+      const p = x.p;
+      const mv = p.pos === 'MV';
+      const r = [];
+      let del = null;
+      // (divisionens spelare en gång; platsen räknas utan att listan sorteras)
+      const iDiv = S.veil ? [] : A.P.spelare.filter((y) => y.div === x.div);
+      for (const def of SPTAL) {
+        if ((def.ute && mv) || (def.mv && !mv) || (def.visa && !def.visa(p))) continue;
+        const v = def.g(p, x);
+        if (!fin(v)) continue;
+        if (def.del !== del) { r.push(tom(), rad([def.del, 'd'])); del = def.del; }
+        const q = listQ('spelare', x.div, def.k);
+        if (S.veil) { r.push(talRad(def, q, '?')); continue; }
+        const pl = spMed(def, x, v) ? platsAv(v, iDiv.map((y) => [y, def.g(y.p, y)]).filter(([y, w]) => spMed(def, y, w)).map(([, w]) => w), def.asc) : null;
+        r.push(talRad(def, q, def.f(v, p), pl && pl <= TOPP ? pl : null));
+      }
+      return r;
+    }
+    // Listan: divisionens lag eller spelare ordnade efter ett tal, med
+    // platsen (numret bara på den första vid lika tal, som skytteligan på
+    // tv:n) och talet. Raderna öppnar korten. Målen avslutas med vem som gör
+    // dem (anfallarna, mittfältarna …), som på Statistik.
+    function lista(vy, S, R) {
+      const lagv = vy.slag !== 'spelare';
+      const slag = lagv ? 'lag' : 'spelare';
+      const defs = lagv ? LAGTAL : SPTAL;
+      const s0 = standardDiv();
+      const d = DIVS.includes(vy.div) ? vy.div : DIVS.includes(s0) ? s0 : DIVS[0];
+      const def = defs.find((x) => x.k === vy.lista);
+      if (!def) return lagv ? lagen(d, R) : spelarna(d, S, R);
+      R.slojas = true;
+      const r = [regRad(slag, d, def.k), streck()];
+      if (!helaNamn()) r.push(rad([up(DIVNAME[d]), 'd']));
+      if (lagv ? !A.stats : !A.P) return [...r, prickar('HÄMTAR', '')];
+      // förra och nästa tal som finns i divisionen
+      const har = (y) => (lagv ? lagIDiv(d).some((t) => fin(y.g(t))) : A.P.spelare.some((x) => x.div === d && spMed(y, x, y.g(x.p, x))));
+      const finns = defs.filter((y) => y === def || har(y));
+      const i = finns.indexOf(def);
+      R.sido = [i > 0 ? listQ(slag, d, finns[i - 1].k) : null, i < finns.length - 1 ? listQ(slag, d, finns[i + 1].k) : null];
+      r.push(rad([def.n, 'v']), tom());
+      if (S.veil) return [...r, rad('?')];
+      const l = lagv ? lagLista(def, d) : spLista(def, d);
+      if (!l.length) return [...r, rad('OKÄNT')];
+      // namnet, laget (spelarna) och talet till höger
+      const V = lagv ? VAR : 8;
+      const T = lagv ? 0 : A.bred >= 60 ? 14 : 12;
+      const W = Math.min(28, A.bred - 5 - T - V);
+      let forra = null;
+      l.forEach((y, j) => {
+        const nr = forra != null && Math.abs(y.v - forra) < 1e-9 ? '' : String(j + 1);
+        forra = y.v;
+        const text = String(def.f(y.v, lagv ? y.t : y.x.p)).slice(0, V);
+        if (lagv) r.push(radQ(`#lag:${y.t.name}`, [`${padL(nr, 3)}  `, 'd'], pad(up(y.t.name).slice(0, W - 1), W), padL(text, V)));
+        else r.push(radQ(`#spelare:${y.x.p.id}`, [`${padL(nr, 3)}  `, 'd'], pad(namnPa(y.x.p.name, W - 1), W), [pad(kort(y.x.p.team).slice(0, T - 1), T), 'd'], padL(text, V)));
+      });
+      const pos = !lagv && def.k === 'mal' ? (A.P.pos[d] || []) : [];
+      if (pos.length) {
+        const POSN = { A: 'ANFALLARE', MF: 'MITTFÄLTARE', B: 'BACKAR', MV: 'MÅLVAKTER' };
+        r.push(tom(), rad(['VEM GÖR MÅLEN', 'd']));
+        for (const y of pos) r.push(rad([pad(POSN[y.pos] || 'OKÄND POSITION', ETK), 'd'], padL(pct(y.share), 5), [`  ${y.goals} MÅL`, 'd']));
+      }
+      return r;
+    }
+
     // ---------- lagen: divisionerna, lagkorten och truppen ----------
 
     const lagIDiv = (d) => [...(A.stats || new Map()).values()].filter((t) => t.comp === d).sort((a, b) => a.name.localeCompare(b.name, 'sv'));
@@ -625,13 +922,15 @@ window.RumRegister = (() => {
     // några spelare i registret: där är SPELARE svagt.
     const SLAG = [['lag', 'LAG', 'div'], ['spelare', 'SPELARE', 'spelarna']];
     const helaNamn = () => 20 + REG.reduce((n, x) => n + REGNAMN[x].length + 3, -3) <= A.bred;
-    function regRad(slag, d) {
+    // (i en lista med ett tal, k: divisionerna ger samma lista där, och LAG
+    // eller SPELARE leder tillbaka till divisionens lag eller spelare)
+    function regRad(slag, d, k) {
       const typ = SLAG.find(([id]) => id === slag)[2];
       const hela = helaNamn();
       return rad(
-        ...SLAG.flatMap(([id, namn, t]) => [[namn, id === slag ? 'i' : d === 'nl' ? 'd' : '', id === slag || d === 'nl' ? null : `#${t}:${d}`], ['   ', '']]),
+        ...SLAG.flatMap(([id, namn, t]) => [[namn, id === slag ? 'i' : d === 'nl' ? 'd' : '', (id === slag && !k) || d === 'nl' ? null : `#${t}:${d}`], ['   ', '']]),
         ['|', 'd'], ['   ', ''],
-        ...REG.flatMap((x, k) => [[hela ? up(REGNAMN[x]) : REGK[x], x === d ? 'i' : '', x === d ? null : `#${x === 'nl' ? 'div' : typ}:${x}`], [k < REG.length - 1 ? '   ' : '', '']]),
+        ...REG.flatMap((x, j) => [[hela ? up(REGNAMN[x]) : REGK[x], x === d ? 'i' : '', x === d ? null : k && x !== 'nl' ? `#lista:${slag}:${x}:${k}` : `#${x === 'nl' ? 'div' : typ}:${x}`], [j < REG.length - 1 ? '   ' : '', '']]),
       );
     }
     // en division: lagen i bokstavsordning (två spalter på datorn)
@@ -729,6 +1028,9 @@ window.RumRegister = (() => {
         r.push(falt('LANDSKAMPER', S.veil ? '?' : `${a.matcher} M · ${rec(a)}`));
         if (a.fran) r.push(rad([pad('', 12)], [`SEDAN ${up(dag(a.fran))}`, 'd']));
       }
+      // hållna nollor, som på Statistik (tabellen Landslagen)
+      const noll = [nlr && nlr.matcher && nlr.nollor != null ? `${nlr.nollor} I NATIONS L.` : null, a && a.matcher && a.nollor != null ? `${a.nollor} I ALLA` : null].filter(Boolean);
+      if (noll.length) r.push(falt('NOLLOR', S.veil ? '?' : noll.join(' · ')));
       const nx = t.nasta;
       if (nx && nx.datum) {
         const dagar = dayNo(Date.parse(nx.datum)) - dayNo(Date.now());
@@ -777,29 +1079,49 @@ window.RumRegister = (() => {
       const om = iOmgangen(t.name);
       const falt = (etikett, ...v) => rad([pad(etikett, 10), 'd'], ...v.map((x) => (Array.isArray(x) ? x : [x, ''])));
       if (om) r.push(falt('OMGÅNGEN', [`${nrAv(om.m)}  ${kort(om.m.home)} – ${kort(om.m.away)}`, '', `#mote:${om.m.id}`]));
-      const fd = t.fd;
-      const xg = fd && fd.xg && fd.xg.n ? fd.xg : null;
-      const mkt = fd && fd.mkt && fd.mkt.n ? fd.mkt : null;
-      if (S.veil) r.push(falt('MÅL', '?'), falt('xG', '?'), falt('FAVORIT', '?'));
-      else {
-        if (t.m) r.push(falt('MÅL', `${num(t.gf / t.m, 2)} FÖR · ${num(t.ga / t.m, 2)} MOT`));
-        if (xg) r.push(falt('xG', `${num(xg.f / xg.n, 2)} FÖR · ${num(xg.a / xg.n, 2)} MOT`));
-        if (mkt) r.push(falt('FAVORIT', `${mkt.fav} AV ${mkt.n} MATCHER`));
-      }
+      // nästa match: efter omgångens (matchens fil), och för de andra lagen den närmaste (matcherna)
       const d = om && A.match.get(om.m.id);
       const nx = d && d.teams && d.teams[om.side] && d.teams[om.side].schedule && d.teams[om.side].schedule.next;
       if (nx && nx.days != null) {
         r.push(falt('NÄSTA', [kort(nx.opponent), '', `#lag:${nx.opponent}`], ` ${nx.home ? 'HEMMA' : 'BORTA'} OM ${nx.days} D${nx.comp && nx.comp !== up(t.comp) ? ` (${up(TAV[nx.comp] || nx.comp)})` : ''}`));
+      } else if (!om) {
+        const snart = Date.now() - 3 * 3600000;
+        const n = (A.byTeam.get(t.name) || []).filter((x) => !x.completed && Date.parse(x.kickoff) > snart).pop();
+        if (n) {
+          const hemma = n.home === t.name;
+          const mot = hemma ? n.away : n.home;
+          const dagar = dayNo(Date.parse(n.kickoff)) - dayNo(Date.now());
+          r.push(falt('NÄSTA', [kort(mot), '', lagOf(mot) ? `#lag:${mot}` : null],
+            ` ${hemma ? 'HEMMA' : 'BORTA'} ${dagar > 0 ? `OM ${dagar} D` : 'I DAG'}${n.comp && n.comp !== t.comp ? ` (${up(TAV[up(n.comp)] || n.comp)})` : ''}`));
+        }
       }
+      // formen med poängen och platsen, och de fem matcherna under (som på Statistik)
+      const f = formLag(t.name);
+      const fv = LAGTAL[0].g(t);
+      if (f.length) {
+        r.push(tom(), talRad(LAGTAL[0], listQ('lag', t.comp, 'form'), fin(fv) ? LAGTAL[0].f(fv, t) : f.map((x) => x.l).join(''),
+          !S.veil && fin(fv) ? platsAv(fv, lagLista(LAGTAL[0], t.comp).map((y) => y.v)) : null));
+        for (const { m: x, l: u } of f) {
+          const hemma = x.home === t.name;
+          const mot = hemma ? x.away : x.home;
+          const s = x.score90 || x.score;
+          r.push(rad([`${pad(up(dag(x.kickoff)), 12)}${pad(up(x.comp || ''), 4)}${hemma ? 'H' : 'B'} `, 'd'],
+            [pad(kort(mot).slice(0, 11), 11), '', lagOf(mot) ? `#lag:${mot}` : null],
+            [`  ${u === '?' || !s ? '?' : hemma ? `${s.home}–${s.away}` : `${s.away}–${s.home}`}`, 'v'], [`  ${u === '?' ? '' : u}`, 'd']));
+        }
+      }
+      r.push(...lagTal(t, S));
+      // truppen: på datorn också assisten och korten
       const tr = trupp(t, S.veil);
       r.push(tom());
       if (!tr) return [...r, prickar('HÄMTAR TRUPPEN', '')];
-      const W = Math.min(26, A.bred - 24);
-      r.push(rad([`${pad('TRUPPEN', 4 + W)}${padL('MIN', 5)}${padL('MÅL', 5)}`, 'd']));
+      const fler = A.bred >= 56 ? [['ASS', 'a'], ['GUL', 'yc'], ['RÖD', 'rc']] : A.bred >= 46 ? [['ASS', 'a']] : [];
+      const W = Math.min(26, A.bred - 24 - 5 * fler.length);
+      r.push(rad([`${pad('SPELARNA', 4 + W)}${padL('MIN', 5)}${padL('MÅL', 5)}${fler.map(([n]) => padL(n, 5)).join('')}`, 'd']));
       for (const { x, l: lg } of tr) {
         const st = lg && lg[0] !== 'SPELKLAR' ? STATUS[lg[0]] || lg[0] : '';
         r.push(radQ(`#spelare:${x.p.id}`, [pad(x.p.pos || '', 4), 'd'], [pad(namnPa(x.p.name, W - 1), W), st ? 'd' : ''],
-          padL(S.veil ? '?' : x.p.min || 0, 5), padL(S.veil ? '?' : x.p.g || 0, 5), [st ? `  ${st}` : '', 'v']));
+          padL(S.veil ? '?' : x.p.min || 0, 5), padL(S.veil ? '?' : x.p.g || 0, 5), ...fler.map(([, k]) => padL(S.veil ? '?' : x.p[k] || 0, 5)), [st ? `  ${st}` : '', 'v']));
       }
       return r;
     }
@@ -862,11 +1184,10 @@ window.RumRegister = (() => {
         r.push(falt('LÄGET', [l[0], l[0] === 'SPELKLAR' ? '' : 'v']));
         for (const n of l.slice(1)) r.push(rad([pad('', 10)], [n]));
       }
-      if (S.veil) return [...r, falt('SPELTID', '?'), falt('MÅL', '?')];
-      const pt = A.P.lag.get(String(p.teamId));
-      const av = pt && pt.coverage ? pt.coverage.covered : t ? t.m : null;
-      if (p.min != null) r.push(falt('SPELTID', `${p.min} MIN · ${p.starts || 0}${av ? ` AV ${av}` : ''} FRÅN START`));
-      if (p.g != null) r.push(rad([pad('MÅL', 10), 'd'], [`${p.g}`], ...(p.xg != null ? [[' · ', ''], ['xG', ''], [` ${num(p.xg, 1)}`, '']] : [])));
+      // Statistiks tal i avsnitt (matcherna, anfallet eller målet, försvaret
+      // och regelbrotten), med platsen bland divisionens 20 främsta
+      r.push(...spelarTal(x, S));
+      if (S.veil) return r;
       const mu = p.mu;
       if (mu && mu.m && mu.u) {
         const raden = (namn, a) => {
@@ -1002,6 +1323,9 @@ window.RumRegister = (() => {
       { namn: 'SPELARE', typ: 'REGISTRET', q: '#spelarna:', ord: ['spelare', 'spelarna'] },
       ...DIVS.map((d) => ({ namn: up(DIVNAME[d]), typ: 'DIVISION', q: `#div:${d}`, ord: [norm(DIVNAME[d]), d, { pl: 'premier', ch: 'champ', l1: 'league 1', l2: 'league 2' }[d]] })),
       { namn: 'NATIONS LEAGUE', typ: 'LANDSLAG', q: '#div:nl', ord: ['nations league', 'nations', 'nl', 'landslag', 'landslagen', 'landskamper', 'landskamperna'] },
+      // Statistiks tal som listor (i divisionen med flest lag i omgången): på
+      // etiketten eller rubriken, hela ordet eller början från fem bokstäver
+      ...[['lag', LAGTAL], ['spelare', SPTAL]].flatMap(([slag, l]) => l.map((y) => ({ namn: y.n, typ: 'LISTA', q: `#lista:${slag}::${y.k}`, ord: [...new Set([norm(y.e), norm(y.n)])], lista: true }))),
     ];
     // Alla träffar på frågan, den mest sannolika först (p, se ovan)
     function sok(text) {
@@ -1020,7 +1344,7 @@ window.RumRegister = (() => {
       const spelPlus = (x) => TROLIGT.spelare + 0.2 * Math.min(1, (x.p.min || 0) / 1500) + (DIVPLUS[x.div] || 0) + (iOmg.has(x.p.team) ? 0.05 : 0);
       for (const d of DELAR) {
         // hela ordet, eller början av det från tre bokstäver
-        const rest = d.ord.includes(qn) ? -1 : qn.length >= 3 ? Math.min(...d.ord.filter((x) => x.startsWith(qn)).map((x) => x.length - qn.length)) : Infinity;
+        const rest = d.ord.includes(qn) ? -1 : qn.length >= (d.lista ? 5 : 3) ? Math.min(...d.ord.filter((x) => x.startsWith(qn)).map((x) => x.length - qn.length)) : Infinity;
         if (rest < Infinity) hits.push({ typ: 'del', d, p: TROLIGT.del + (rest < 0 ? 0.3 : -BORJAN(rest)) });
       }
       for (const t of lag) {
@@ -1086,7 +1410,7 @@ window.RumRegister = (() => {
       const W = Math.min(28, A.bred - 12);
       if (h.typ === 'lag') return radQ(q, nr, pad(up(h.t.name).slice(0, W - 1), W), [h.t.land ? `LANDSLAG${h.t.grupp ? ` ${h.t.grupp}` : ''}`.slice(0, A.bred - 4 - W) : `LAG ${DIVK[h.t.comp] || ''}`, 'd']);
       if (h.typ === 'mote') return radQ(q, nr, pad(`${kort(h.m.home)} – ${kort(h.m.away)}`, W), ['MÖTE', 'd']);
-      if (h.typ === 'del') return radQ(q, nr, pad(h.d.namn, W), [h.d.typ, 'd']);
+      if (h.typ === 'del') return radQ(q, nr, pad(h.d.namn.slice(0, W - 1), W), [h.d.typ, 'd']);
       return radQ(q, nr, pad(efternamn(h.x.p.name).slice(0, W - 1), W), [kort(h.x.p.team), 'd']);
     }
     // Kategorierna i sökningen: alla träffar eller ett slag (träffens typ).
@@ -1145,6 +1469,7 @@ window.RumRegister = (() => {
         const m = vy.mote && A.ms.find((x) => x.id === vy.mote);
         return m ? akten(m, S, R) : kupongen(R);
       }
+      if (vy.lista) return lista(vy, S, R);
       if (vy.spelare) {
         const x = A.P && A.P.spelare.find((y) => String(y.p.id) === vy.spelare);
         return x ? spelarkort(x, S, R) : [prickar('HÄMTAR', '')];
@@ -1263,6 +1588,8 @@ window.RumRegister = (() => {
       if (typ === 'spelarna') return { flik: 'lagen', div: id, slag: 'spelare' };
       if (typ === 'lag') return lagOf(id) || landOf(id) ? { flik: 'lagen', lag: id } : null;
       if (typ === 'spelare') return { flik: 'lagen', spelare: id };
+      // en lista: #lista:lag:pl:skapar (utan division: den med flest lag i omgången)
+      if (typ === 'lista') return rest.length === 3 ? { flik: 'lagen', slag: rest[0], div: rest[1], lista: rest[2] } : null;
       if (typ === 'flik') return { flik: GAMLA[id] || id };
       return null;
     }
@@ -1291,7 +1618,7 @@ window.RumRegister = (() => {
       if (q.startsWith('#flik:')) { A.bak = []; visa(vyAv(q), true); return null; }
       const vy = vyAv(q);
       if (iSok) A.vy = fore;
-      if (vy && (q.startsWith('#div:') || q.startsWith('#spelarna:')) && A.vy.flik === 'lagen' && !A.vy.lag && !A.vy.spelare) { visa(vy, true); return null; }
+      if (vy && (q.startsWith('#div:') || q.startsWith('#spelarna:') || (q.startsWith('#lista:') && A.vy.lista)) && A.vy.flik === 'lagen' && !A.vy.lag && !A.vy.spelare) { visa(vy, true); return null; }
       if (vy) {
         if (vy.mote) loadMatches();
         ga(vy, !iSok);
