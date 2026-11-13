@@ -600,7 +600,7 @@ window.RumHasse = (() => {
       sa.left = fo.left = `${vanster.toFixed(0)}px`;
       sa.width = fo.width = `${bredd.toFixed(0)}px`;
       s.setProperty('--mork', `${(hoger + 70).toFixed(0)}px`);
-      // (diskens kant, som gänget efter omgången står mitt ovanför: .rh-gang i rum-hasse.css)
+      // (diskens kant: efter omgången står gänget mitt emellan den och samtalets överkant, .rh-gang i rum-hasse.css)
       s.setProperty('--kant', `${v.kant.toFixed(0)}px`);
     }
     if (H.kupong) H.kupong.passa();
