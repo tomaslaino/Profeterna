@@ -4,8 +4,8 @@
 // varmt i Stockholm, en gulnad bordsfläkt som svänger fram och tillbaka och
 // blåser röken åt sidan när den pekar mot askkoppen. I skyltfönstret
 // sitter löpsedlarna IFK Göteborg 1982, Nacional 1988, VM 94 och Chelsea 1998
-// på skivan, och veckans löpsedel står i ett ställ utanför dörren; rum-affischer.js
-// ritar dem och den här filen sätter upp dem.
+// på skivan; rum-affischer.js ritar dem och den här filen sätter upp dem. Veckans
+// löpsedel ritas där också, men hänger hos Hasse Backe i baren (sedel nedan).
 //
 // Slitaget skiftar från dag till dag och följer tippningen: går det dåligt
 // (fler fel bland omgångens avgjorda matcher, annars i den senaste
@@ -25,7 +25,7 @@
 // tidningen bakom högen, med kupongerna på dess nedre del, och sakerna stod
 // där tidningen ligger nu).
 //
-// saker(el, { calm, short, namn }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }), rubrik() }
+// saker(el, { calm, short, namn }) → { draw(t, mx, my, rows, old, syns), kval({ pr, skugga }), rubrik(), numret(upplaga), sedel() }
 // (syns: pulten ritas, rum.js; kval: hur fint, KVAL i rum.js; short och namn: lagen och gänget på löpsedeln;
 // rubrik: rum-affischer.js)
 
@@ -105,7 +105,7 @@ export async function saker(el, opt = {}) {
   const planes = [...el.querySelectorAll('.rum-world > .rum-pl')];
   const back = planes[0];
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
-  // löpsedlarna på skivan och i stället utanför dörren (rum-affischer.js)
+  // löpsedlarna på skivan, och veckans löpsedel till Hasse Backe (rum-affischer.js)
   const aff = back ? affischer(back, { short: opt.short, namn: opt.namn }) : null;
 
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,
@@ -164,6 +164,8 @@ export async function saker(el, opt = {}) {
     rubrik: () => (aff ? aff.rubrik() : null),
     // tidningens nummer på pulten (rum.js): löpsedeln är samma nummer
     numret: (u) => { if (aff) aff.numret(u); },
+    // veckans löpsedel, färdigritad men inte uppsatt: den hänger hos Hasse Backe (Rum.lopsedel, rum-hasse.js)
+    sedel: () => (aff ? aff.sedel() : null),
     draw(t, mx, my, rows, old, syns = true) {
       if ((update(rows, old) || !sliten) && three) {
         sliten = true;

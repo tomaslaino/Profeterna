@@ -16,8 +16,8 @@
 //   datorn på disken kommer nära (R): terminalen med kupongen, omgången (tavlans
 //   siffror), lagen och spelarna (rum-register.js, datorn i three.js i rum-dator.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
-//   löpsedlarna (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på skivan i
-//   fönstret och veckans löpsedel i stället utanför dörren, rum-affischer.js) och dörren (med vilka vi
+//   löpsedlarna på skivan i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998,
+//   rum-affischer.js; veckans löpsedel hänger hos Hasse Backe, rum-hasse.js) och dörren (med vilka vi
 //   är under): kameran går fram till dem (närbilderna, sak)
 //   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
 //   fram till den på pulten.
@@ -51,7 +51,7 @@
 // sekunder), ?rum-lapp=dl:kinden:kolla@2 hur skylten
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
-// ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong|radio en närbild,
+// ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|dorr|kupong|radio en närbild,
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -3057,10 +3057,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const d = document.getElementById('rum-dagsljus');
     d.style.setProperty('--dagsljus', r1(L.dag * 0.9));
     d.style.setProperty('--dag-farg', L.sky[2]);
-    // löpsedelsstället står ute och har gatans ljus (.rum-lopstall i rum-affischer.css)
-    R.el.style.setProperty('--ute-dag', r1(L.dag));
-    R.el.classList.toggle('ute-lampor', L.lampor);
-    R.el.classList.toggle('ute-sno', Boolean(v.snotackt));
     if (R.dagFarg) dagDuk();
     ljusKlockan();
     ljusIhop();
@@ -4300,7 +4296,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ---------- närbilderna ----------
   //
   // Uret, skårtavlan, oraklet, visitkortet, pokalhyllan, korktavlan, löpsedlarna på
-  // skivan (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998), veckans löpsedel och dörren (data-sak) – och kupongen på pulten när den inte går
+  // skivan (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998) och dörren (data-sak) – och kupongen på pulten när den inte går
   // att ta i handen: kameran ställer sig rakt framför och går fram tills
   // saken fyller det mesta av fönstret, och det som är ritat i 3D
   // (rum-inredning.js) ritas om skarpare. Under pokalhyllan står hur många
@@ -4326,7 +4322,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     kort: { el: '#rum-kort', mal: '#rum-kort .vk', h: 0.72, duk: 'ram' },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
     ifk: { el: '#rum-ifk', h: 0.86, duk: 'skiva' },
-    lopsedel: { el: '#rum-lopsedel', h: 0.86 },
     chelsea: { el: '#rum-chelsea', h: 0.86, duk: 'skiva' },
     // (en hel tidningssida: hög, så att rubriken och fotot blir stora)
     nacional: { el: '#rum-nacional', h: 0.94, duk: 'skiva' },
@@ -4384,8 +4379,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (!radio(namn)) R.rDetalj = setTimeout(() => { if (!radio(R.sak) && R.fig) R.fig.radioDetalj(false); }, cls ? 700 : 0);
     }
     R.el.classList.toggle('radio-nara', radio(namn));
-    // (löpsedelsstället ute ljusnar i närbilden, så att rubriken går att läsa)
-    R.el.classList.toggle('lop-nara', namn === 'lopsedel');
     R.sak = namn || null;
     if (!namn) {
       lagerUt('sak');
@@ -6552,7 +6545,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return { matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
   }
   // summa: sammanställningen så länge protokollet ligger på pulten (Hasses domar i rum-hasse.js), annars null
-  return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+  // (lopsedel: veckans löpsedel, färdigritad, som hänger hos Hasse Backe, rum-hasse.js; null innan sakerna är ritade)
+  return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, lopsedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null), smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

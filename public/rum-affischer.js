@@ -1,5 +1,6 @@
 // Löpsedlarna i tobaksaffären (rum-saker.js lägger upp dem i bakväggens
-// plan, rum.js går fram till dem):
+// plan, rum.js går fram till dem), och veckans löpsedel, som hänger hos Hasse
+// Backe i baren (rum-hasse.js):
 //
 //   VM 94             Expressens löpsedel dagen efter bronsmatchen, solblekt
 //                     och vikt, med fotot från Rose Bowl (fotot fick vi av
@@ -23,19 +24,15 @@
 // följer med i sedlarnas lager. Skuggorna är bakade i skivan, inga filter.
 // Sedlarna sitter alltid på samma ställe, raka; slitaget (rum-saker.js) bleker
 // bara papperet.
-// Veckans löpsedel är den enda som byts. Den står i ett löpsedelsställ på
-// trottoaren utanför dörren, som utanför en riktig tobaksaffär, och syns genom
-// dörrens glas under handtaget (2026-11-13, användarens val: rummet skulle bli
-// lugnare). Förut satt den varannan vecka med tejp i fönstret och varannan med
-// häftstift på väggen under oraklet. Stället är svartlackerad plåt med sedeln
-// bakom plast, på två ben. Det står ute: i bakväggens plan direkt efter
-// utsikten (#rum-ute), alltså bakom väggens hål och dörrens smutsiga glas, och
-// har gatans ljus – mörkt när det är mörkt ute, varmt under lyktstolpen när den
-// lyser, kallt på dagen och med snö på ramen när det ligger snö (--ute-dag,
-// .ute-lampor och .ute-sno, som rum.js sätter med utsikten). I närbilden
-// (.lop-nara) ljusnar den, så att den går att läsa. I telefonen på höjden
-// ligger dörren utanför bilden från början: där syns stället när man drar.
-// Slitaget följer tippningen som sakerna på pulten; löpsedeln gulnar lite.
+// Veckans löpsedel är den enda som byts. Den ritas här men sätts inte upp i
+// rummet: den hänger i en svart ram i en av mässingskrokarna på bardiskens
+// front hos Hasse Backe, till höger om honom, och ett klick där visar den
+// inzoomad (rum-hasse.js, som kopierar den härifrån: sedel nedan). Så sedan
+// 2026-11-13 ("sätt den här löpsedeln nedanför till höger om hasse backe – där
+// nere på väggen – på ett snyggt sätt istället"). Samma dag, före det, stod den
+// i ett löpsedelsställ på trottoaren utanför dörren, och förut satt den
+// varannan vecka med tejp i fönstret och varannan med häftstift på väggen under
+// oraklet. Slitaget följer tippningen som sakerna på pulten; löpsedeln gulnar lite.
 //
 // Löpsedeln (rubrik): Helgarderats, tidningen på pulten (rum-tidning.js), på
 // samma papper och i samma tryck som dess omslag och med samma nummer, och
@@ -47,14 +44,14 @@
 // största nyheten. Förra omgångens nyheter väger tyngst de första dagarna och
 // nästa omgångs bara innan någon av dess matcher har startat. Omgångar och
 // kuponger som spoilerskyddet döljer räknas inte. Utan något att skriva om blir
-// det knepen i tidningen. Som de andra föremålen leder den inte ut ur rummet: ett klick
-// går fram till den (rum.js).
+// det knepen i tidningen.
 //
-// affischer(back, { short, namn }) → { slit(w, seed), data(rows, old), rubrik(), numret(upplaga) }
+// affischer(back, { short, namn }) → { slit(w, seed), data(rows, old), rubrik(), numret(upplaga), sedel() }
 //   short: kortare lagnamn, namn: namnet på skårtavlan (rum.js)
 //   rows: omgångens rader (roundRows i rum.js), old: de färdigspelade
 //   kupongerna (Historik.coupons()); säsongens omgångar läses ur TP.season
 //   (tippare.js). upplaga: tidningens nummer på pulten (hgNumret i rum.js).
+//   sedel(): veckans löpsedel, färdigritad (utanför sidan; Hasse Backe kopierar den).
 // För bilder: ?rum-vecka=<tal> en annan vecka (rubrikens variant och klippet),
 // ?rum-rubrik=<typ> en viss rubrik om den
 // finns (typ i bakat, matchRubriker, kupongRubriker och framat) och
@@ -75,11 +72,6 @@ export const SKIVA = {
     { id: 'rum-vm94', x: 771, y: 394, text: 'VM 1994' }, { id: 'rum-chelsea', x: 859, y: 394, text: 'CHELSEA 1998' },
   ],
 };
-// Löpsedelsstället: ramens övre vänstra hörn i scenens px. Dörrens glas är
-// x 50–222 och y 136–696 (DORR i rum.js) och handtaget y 420–436, och
-// lyktstolpen ute står i x 140 (rum-ute.js). Måtten på ramen, sedeln och
-// benen står i rum-affischer.css (.rum-lopstall).
-const STALL = { x: 72, y: 446 };
 // Platsen för skivan (rum-saker.js och rum-inredning.js startar i valfri
 // ordning): en enda färg, utan ritminne, tills rum-inredning.js har ritat
 // skivan i den, så att sedlarna inte hänger i luften under tiden.
@@ -602,12 +594,10 @@ function rader(text, font, px, bred) {
   return n;
 }
 
+// (papperet utan plats: Hasse Backe kopierar det till ramen hos sig, rum-hasse.js)
 function lopsedel() {
-  const el = document.createElement('button');
-  el.type = 'button';
-  el.className = 'rum-aff rum-lop rum-sak';
-  el.id = 'rum-lopsedel';
-  el.dataset.sak = 'lopsedel';
+  const el = document.createElement('span');
+  el.className = 'rum-aff rum-lop';
   return el;
 }
 
@@ -656,7 +646,7 @@ function bleks(el, w) {
   el.style.setProperty('--sat', (1 - 0.4 * w).toFixed(2));
   el.style.setProperty('--blek', (0.1 + 0.3 * w).toFixed(2));
 }
-// Löpsedeln gulnar lite: den sitter rak bakom plasten i stället.
+// Löpsedeln gulnar lite: den sitter rak bakom glaset i ramen.
 function slit(el, w) {
   el.style.setProperty('--sep', (0.05 + 0.15 * w).toFixed(2));
   el.style.setProperty('--sat', (1 - 0.15 * w).toFixed(2));
@@ -688,21 +678,6 @@ function klipp(fro) {
   return `polygon(${p.join(', ')})`;
 }
 
-// Löpsedelsstället kring sedeln: ramen, benen med tvärslån, skuggan på gatan,
-// plasten framför sedeln, ljuset ute över ramen och snön på den (rum-affischer.css).
-// Sedeln är knappen i ramen; resten tar inte emot klick.
-function stall(l) {
-  const st = document.createElement('div');
-  st.className = 'rum-lopstall';
-  st.id = 'rum-lopstall';
-  st.style.left = `${STALL.x}px`;
-  st.style.top = `${STALL.y}px`;
-  st.innerHTML = '<i class="skugga"></i><i class="ben a"></i><i class="ben b"></i><i class="sla"></i><i class="ram"></i>';
-  st.append(l);
-  st.insertAdjacentHTML('beforeend', '<i class="plast"></i><i class="ute kall"></i><i class="ute mork"></i><i class="ute lampa"></i><i class="sno"></i>');
-  return st;
-}
-
 export function affischer(back, { short = (x) => x, namn = null } = {}) {
   if (namn) namnAv = namn;
   if (!document.querySelector('link[href="rum-affischer.css"]')) {
@@ -717,12 +692,6 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const c = chelsea();
   const n = nacional();
   back.append(skivPlats(back), f, n, v, c);
-  // Löpsedelsstället står ute: direkt efter utsikten, så att väggen med dörrens
-  // karm, handtaget och smutsen på glaset (rum.js) ligger framför det.
-  const st = stall(l);
-  const ute = back.querySelector(':scope > #rum-ute');
-  if (ute) ute.after(st);
-  else back.prepend(st);
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
@@ -740,6 +709,8 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
     // Veckans rubrik (rubrik ovan): Veckans analys i tidningen (rum.js) handlar om matchen den gäller.
     // → { typ, tidning, datum, id … }, eller null
     rubrik: () => senastR,
+    // veckans löpsedel, färdigritad: Hasse Backe kopierar den till ramen hos sig (rum-hasse.js)
+    sedel: () => l,
     // tidningens nummer på pulten (upplagan, rum.js): löpsedeln är samma nummer
     numret(u) {
       const ny = overst(u);

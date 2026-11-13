@@ -282,6 +282,86 @@
 .rum.smal .rh-pa-kup { padding: 0 16px 0 36px; }
 .rh-pa-hg { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; }
 .rh-scen:has(> .rh-kupong) > .rh-pulten > .kup { visibility: hidden; }
+/* Veckans löpsedel (lopsedel i rum-hasse.js) i en smal svart ram bakom glas, som hänger i en tunn tråd i
+   mässingskroken på bardiskens front nedanför till höger om honom. Ramen är 108 × 148 i sina egna mått, med
+   sedeln (rum-affischer.css, 100 × 140) 4 in, och läggs i hans bild med en matrix3d genom hans kamera. Den är
+   lika oskarp som väggen (--oskarp, skärpedjupet) och har ljuset från fronten där den hänger, läst ur väggens
+   bild (--lop-ljus upptill och --lop-ljus2 nedtill, som multiplikation över ramen och sedeln). Utan väggens
+   bild: en dämpad, varm ton. Skuggan faller lite nedåt åt höger, bort från lamporna framför honom till vänster. */
+.rh-lop {
+  --lop-ljus: rgb(150, 136, 114);
+  --lop-ljus2: rgb(142, 128, 107);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 108px;
+  height: 148px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  transform-origin: 0 0;
+  filter: blur(var(--oskarp, 0.6px));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.rh-lop[hidden] { display: none; }
+/* (medan den är inzoomad står platsen tom på fronten) */
+.rh-lop.nara { visibility: hidden; }
+.rh-lop:focus { outline: none; }
+.rh-lop:focus-visible { filter: blur(var(--oskarp, 0.6px)) brightness(1.3) drop-shadow(0 0 6px rgba(240, 214, 153, 0.5)); }
+@media (hover: hover) { .rh-lop:hover { filter: blur(var(--oskarp, 0.6px)) brightness(1.22) drop-shadow(0 0 6px rgba(240, 214, 153, 0.32)); } }
+.rh-lop-trad { position: absolute; left: 0; bottom: 100%; width: 108px; height: 16.6px; overflow: visible; pointer-events: none; }
+.rh-lop-trad path { fill: none; stroke: #4a4640; stroke-width: 0.45; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
+/* ramen: svart aluminium, en ljus fas överst till vänster mot lamporna */
+.rh-lop-ram {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 0.9px;
+  background: linear-gradient(162deg, #2c2d31, #17181b 46%, #0e0f11);
+  box-shadow: inset 0 0 0 0.45px rgba(255, 255, 255, 0.09), inset 0.7px 0.7px 0 rgba(255, 255, 255, 0.1), inset -0.5px -0.5px 0 rgba(0, 0, 0, 0.6),
+    1.6px 3.2px 3px rgba(0, 0, 0, 0.55), 3px 6px 10px rgba(0, 0, 0, 0.32);
+}
+.rh-lop .rum-aff, .rh-lop-nara .rum-aff { left: 4px; top: 4px; transform: none; filter: none; }
+/* glaset framför sedeln: ramens kant skuggar papperet, och ett svagt blänk av lamporna snett över */
+.rh-lop-glas {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 100px;
+  height: 140px;
+  background: linear-gradient(118deg, rgba(255, 244, 222, 0.12), rgba(255, 244, 222, 0) 24%, rgba(255, 244, 222, 0) 66%, rgba(255, 244, 222, 0.05) 74%, rgba(255, 244, 222, 0) 82%);
+  box-shadow: inset 0 0 0 0.45px rgba(0, 0, 0, 0.5), inset 0.9px 1.4px 2px rgba(0, 0, 0, 0.32);
+  pointer-events: none;
+}
+.rh-lop-ljus {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.9px;
+  background: linear-gradient(var(--lop-ljus), var(--lop-ljus2));
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+/* Närbilden (lopNara): sedeln i sin ram, förstorad --k gånger mitt i bilden, skarp och i fullt ljus, över baren
+   som mörknar bakom. Ett klick, Esc eller Tillbaka lägger tillbaka den. */
+.rh-lop-nara { position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; cursor: zoom-out; outline: none; }
+.rh-lop-fond { position: absolute; inset: 0; background: radial-gradient(70% 70% at 50% 46%, rgba(26, 16, 9, 0.74), rgba(8, 5, 3, 0.9)); }
+.rh-lop-bild { position: relative; width: calc(108px * var(--k, 4)); height: calc(148px * var(--k, 4)); }
+.rh-lop-bild > .rh-lop-ram {
+  width: 108px;
+  height: 148px;
+  inset: auto;
+  left: 0;
+  top: 0;
+  transform: scale(var(--k, 4));
+  transform-origin: 0 0;
+  box-shadow: inset 0 0 0 0.3px rgba(255, 255, 255, 0.1), inset 0.5px 0.5px 0 rgba(255, 255, 255, 0.12), inset -0.4px -0.4px 0 rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.5), 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+/* (lampans sken över papperet: lite ljusare mitt på, som när man står framför den) */
+.rh-lop-bild .rh-lop-glas { background: radial-gradient(90% 70% at 42% 34%, rgba(255, 248, 232, 0.08), rgba(255, 248, 232, 0) 70%), linear-gradient(118deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 22%); box-shadow: inset 0 0 0 0.3px rgba(0, 0, 0, 0.45), inset 0.6px 0.9px 1.4px rgba(0, 0, 0, 0.28); }
 /* Hans kryss: samma blyerts med mer tryck, ut över rutans kanter (slarv i rum.js) */
 .rum-kup .kryss.hasse path { stroke-width: 2.8; opacity: 0.92; }
 /* Stort 1 X 2 i kupongens tryck */
