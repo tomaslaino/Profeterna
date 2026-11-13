@@ -2741,7 +2741,7 @@ window.RumHasse = (() => {
   }
 
   // Du väljer någon i gänget: domen slås i disken (som i svara), texten står direkt och går att läsa upp, och
-  // under den ligger lappen. Sedan nästa du inte har hört om den här gången, eller hela gänget.
+  // under den ligger lappen. Tillbaka leder till hela gänget.
   function doma(id) {
     const sum = summan();
     const folk = sum ? iOrdning(sum) : [];
@@ -2760,13 +2760,11 @@ window.RumHasse = (() => {
     const nu = nyss(sum.id);
     if (!nu.vem.includes(p.id)) nu.vem.push(p.id);
     nu.sist = p.id;
-    const i = folk.indexOf(p);
-    const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !nu.vem.includes(q.id));
     const d = domOrd(p, sum);
     s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span></div>` +
       `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
       `<div class="rh-rull"><div class="rh-text"></div>${RumBlock.lapp(sum, p.id, { sasong: sasong() })}</div>` +
-      `<div class="rh-slut">${nasta ? `<button type="button" class="rh-knapp huvud rh-gnasta">Nästa: ${esc(nasta.namn)}</button>` : ''}<button type="button" class="rh-knapp${nasta ? '' : ' huvud'} rh-galla">Hela gänget</button></div>`;
+      '<div class="rh-slut"><button type="button" class="rh-knapp huvud rh-tillbaka">Tillbaka</button></div>';
     const ruta = repliker(domText(p, sum).map((text, n) => ({ text, ny: n === 0 })), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
     s.querySelector('.rh-rull').scrollTop = 0;
     // säsongen kommer på lappen när den är hämtad
@@ -2786,8 +2784,7 @@ window.RumHasse = (() => {
     const sist = H.ko.length ? H.ko[H.ko.length - 1] : H.klipp;
     if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
     const slut = s.querySelector('.rh-slut');
-    if (nasta) slut.querySelector('.rh-gnasta').addEventListener('click', () => doma(nasta.id));
-    slut.querySelector('.rh-galla').addEventListener('click', () => fraga());
+    slut.querySelector('.rh-tillbaka').addEventListener('click', () => fraga());
     lasKnapp(slut, ruta);
     klick();
   }
