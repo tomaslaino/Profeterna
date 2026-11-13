@@ -104,6 +104,27 @@ const ALIAS = [
   [/\bmk\s+dons\b/g, 'milton keynes dons'],
   [/\bnott'?m\.?\s+forest\b/g, 'nottingham forest'],
   [/\bboro\b/g, 'middlesbrough'],
+  // Landslagen (sedan 2026-11-13): sajten skriver som Svenska Spel
+  // (config/landslag.js), men samma land kan stå på flera sätt – och på
+  // engelska. Gemener utan accenter, som namnet ser ut när reglerna körs.
+  [/\bbosni(?:en|a)\b(?:[\s-]*(?:&|och|o\.|and|-|\/)?[\s-]*her[cz]egovina\b)?/g, 'bosnien hercegovina'],
+  [/\b(?:n(?:ord|orra)?\.?[\s-]*irland|northern\s+ireland|n\.\s*ireland)\b/g, 'nordirland'],
+  [/\brep(?:ubliken)?\.?\s*irland\b|\birlandska\s+rep[a-z]*\.?|\beire\b|\b(?:rep(?:ublic)?\.?\s+of\s+)?ireland\b/g, 'irland'],
+  [/\btjeckiska\s+rep[a-z]*\.?|\bczech(?:ia|\s+republic)?\b/g, 'tjeckien'],
+  [/\bvitryssland\b/g, 'belarus'],
+  [/\b(?:n(?:ord|orra)?\.?[\s-]*)?makedonien\b|\b(?:north\s+)?macedonia\b/g, 'nordmakedonien'],
+  [/\bturkiye\b|\bturkey\b/g, 'turkiet'],
+  [/\bholland\b|\bnetherlands\b/g, 'nederlanderna'],
+  [/\bfaroerna\b|\bfaroe\s+islands\b/g, 'faroarna'],
+  [/\bsweden\b/g, 'sverige'],
+  [/\bnorway\b/g, 'norge'],
+  [/\bdenmark\b/g, 'danmark'],
+  [/\bromania\b/g, 'rumanien'],
+  [/\bpoland\b/g, 'polen'],
+  [/\bukraine\b/g, 'ukraina'],
+  [/\baustria\b/g, 'osterrike'],
+  [/\bgeorgia\b/g, 'georgien'],
+  [/\bhungary\b/g, 'ungern'],
 ];
 const fold = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const key = (s) => ALIAS.reduce((t, [re, to]) => t.replace(re, to), fold(s))

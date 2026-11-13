@@ -11,7 +11,8 @@
 // 2. Orden läggs ihop till rader efter höjden på bilden, och varje rad knyts
 //    till en av sajtens matcher: hemmalaget följt av bortalaget, där namnet
 //    på bilden får vara början av sajtens namn ("Sheffield U", "Queens Par…",
-//    "Hull") och ett par vanliga smeknamn översätts (Wolves, Spurs, QPR).
+//    "Hull") och ett par vanliga smeknamn översätts (Wolves, Spurs, QPR) – också
+//    landslagens andra namn (N. Irland, Rep. Irland, Vitryssland, Sweden).
 // 3. Rutorna till höger på raden letas upp i bildpunkterna – partier som
 //    skiljer sig från bakgrunden genom hela raden, till skillnad från
 //    bokstäver – och en färgad ruta är ifylld, en vit eller grå tom. Rutornas
@@ -66,8 +67,30 @@ window.Systembild = (() => {
     [/\bmk\s+dons\b/g, 'milton keynes dons'],
     [/\bnott'?m\.?\s+forest\b/g, 'nottingham forest'],
     [/\bboro\b/g, 'middlesbrough'],
+    // Landslagen (sedan 2026-11-13): sajten skriver som Svenska Spel
+    // (config/landslag.js), men samma land kan stå på flera sätt – och på
+    // engelska. Gemener utan accenter, som namnet ser ut när reglerna körs.
+    [/\bbosni(?:en|a)\b(?:[\s-]*(?:&|och|o\.|and|-|\/)?[\s-]*her[cz]egovina\b)?/g, 'bosnien hercegovina'],
+    [/\b(?:n(?:ord|orra)?\.?[\s-]*irland|northern\s+ireland|n\.\s*ireland)\b/g, 'nordirland'],
+    [/\brep(?:ubliken)?\.?\s*irland\b|\birlandska\s+rep[a-z]*\.?|\beire\b|\b(?:rep(?:ublic)?\.?\s+of\s+)?ireland\b/g, 'irland'],
+    [/\btjeckiska\s+rep[a-z]*\.?|\bczech(?:ia|\s+republic)?\b/g, 'tjeckien'],
+    [/\bvitryssland\b/g, 'belarus'],
+    [/\b(?:n(?:ord|orra)?\.?[\s-]*)?makedonien\b|\b(?:north\s+)?macedonia\b/g, 'nordmakedonien'],
+    [/\bturkiye\b|\bturkey\b/g, 'turkiet'],
+    [/\bholland\b|\bnetherlands\b/g, 'nederlanderna'],
+    [/\bfaroerna\b|\bfaroe\s+islands\b/g, 'faroarna'],
+    [/\bsweden\b/g, 'sverige'],
+    [/\bnorway\b/g, 'norge'],
+    [/\bdenmark\b/g, 'danmark'],
+    [/\bromania\b/g, 'rumanien'],
+    [/\bpoland\b/g, 'polen'],
+    [/\bukraine\b/g, 'ukraina'],
+    [/\baustria\b/g, 'osterrike'],
+    [/\bgeorgia\b/g, 'georgien'],
+    [/\bhungary\b/g, 'ungern'],
   ];
-  const alias = (s) => ALIAS.reduce((t, [re, to]) => t.replace(re, to), String(s).toLowerCase());
+  // (utan accenter först, så att landslagens regler gäller också "Türkiye" och "Färöerna")
+  const alias = (s) => ALIAS.reduce((t, [re, to]) => t.replace(re, to), String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
   // Sajtens namn: "AFC Bournemouth" heter "Bournemouth" på kupongen.
   const teamKey = (name) => shape(String(name).replace(/^(?:afc|fc)\s+/i, ''));
 
