@@ -6157,6 +6157,32 @@ föremålet (`data-to`). Filerna hämtas när sidan visas första gången.
 - **381–384 Skyttar:** skytteligorna ur `data/players/<division>.json` – de 19 med flest
   ligamål, delad placering med numret bara på den första.
 
+**Landskamperna (2026-11-13).** Användaren: "Uppdatera hela hemsidan utefter detta" – Stryktipset vecka 46 har sju
+landskamper i Nations League (se [Landskamperna](#landskamperna)), och tv:n visar dem som de andra matcherna.
+
+- **331 och 377** tar med dem i avsparksordning som förut. Landslag med för långa namn kortas där lagen inte ryms
+  (`LAND` i rum-tv.js: *Sverige-Bosnien-H.*); på matchens sida och i tabellen står hela namnet om det ryms.
+- **En landskamps sida** (`landPage`): lagen dubbelhöga, *Nations League*, gruppen och avsparken i bandet – gruppen
+  leder till sin tabell, och det gröna snabbvalet *Tabeller* gör det också på sidan. Oddsen och procenten heter
+  *Marknaden*, inte Prognos: de är DraftKings odds utan marginal, inte modellens. Stapeln är densamma. Lagen sida vid
+  sida: placering och poäng i gruppen, Nations League hittills (V-O-F), formen i de fem senaste landskamperna (senaste
+  först, V grön, O gul, F röd) och de senaste mötena så många som ryms. De engelska matchernas sidor är oförändrade.
+- **375 Nations League** (`nlPage`, ur `data/landslag.json`): fyra grupper per undersida, rubriken och lagen –
+  placering i färg efter zonen, lag, S, V, O, F, målskillnad och poäng. Omgångens grupper står först (*i omgången*;
+  vecka 46: A4, B2, B3, B4) och de andra som undersidor i bokstavsordning (1/4–4/4). ESPN skriver zonen (`note`) bara
+  på en grupp, men reglerna är desamma i alla och uppdelade efter liga (*A: Qualifies for QFs; B-D: Promotion*), så
+  tv:n tar placeringens not ur den grupp som har den och läser delen för gruppens liga: gruppvinnare och uppflyttning
+  grön, kval cyan, nedflyttning röd. Döljs Nations League-matcher (Dölj resultat) visar sidan bara det, som
+  tabellerna. *NL* står bland divisionerna i tabellernas band, och 300 Innehåll har sidan under Tabeller. 377 var
+  redan upptaget, så grupperna blev undersidor till en sida i stället för 375–378.
+- Inget föremål i rummet handlar om landslagen, så ingen ny `data-to`.
+
+Provat 2026-11-13 med riktig data (ESPN, bygget här) och omgången i Stryktipsets ordning inlagd i sidan (tjänsten
+nås inte härifrån), i huvudlös Chromium i 1440 × 900 och 390 × 844: rummet på håll med 377, tv:n nära på 300, 331,
+Sverige–Bosnien & Hercegovina, Österrike–Irland, Wimbledon–Blackpool, 375 med undersidorna och snabbvalet Tabeller
+från en landskamp till gruppens tabell. Inga fel i konsolen utöver filer som inte byggs här (data/tidning.json).
+Inte provat: en landskamp som pågår eller är slut, och telefonen i Safari.
+
 Har en division matcher som döljs just nu (Dölj resultat) visar tabellen och skytteligan bara
 hur många som är dolda och *Visa ändå* – samma nyckel som på Tabeller och Statistik, så att
 det gäller där också.

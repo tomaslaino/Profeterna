@@ -22,8 +22,13 @@
 //             hemma- och bortaraden), ur matchens fil (data/match/<id>.json).
 //             Formen, vilan och skadorna står på anslagstavlan (rum-anslag.js),
 //             xG och resten om lagen i kortregistret (rum-register.js).
+//             En landskamp har marknadens procent (inte modellens) och lagen
+//             sida vid sida med gruppen, Nations League, formen i
+//             landskamperna och de senaste mötena.
 //   371–374   tabellerna (data/teams/<division>.json): spelade, vunna,
 //             oavgjorda, förlorade, målskillnad och poäng; 24 lag = två undersidor
+//   375       Nations Leagues grupper (data/landslag.json), fyra per
+//             undersida: omgångens grupper först, sedan de andra
 //   377       Stryktipset matcher live: kupongens matcher med avspark eller
 //             ställning och tecknet, i Stryktipsets ordning när omgången är
 //             Stryktipset; tv:n står på den när man kommer in
@@ -47,6 +52,7 @@ window.RumTv = (() => {
   const INDEX = 300;
   const FIRST = 331;
   const TAB = 371;
+  const NL = 375;
   const LIVE = 377;
   const SKY = 381;
   // matcher per undersida på 331 (raderna 5–21), och högst så många
@@ -61,6 +67,12 @@ window.RumTv = (() => {
     { id: 'l1', short: 'L1', name: 'League One', size: 24 },
     { id: 'l2', short: 'L2', name: 'League Two', size: 24 },
   ];
+  // Landskamperna (INTERNATIONAL i config/competitions.js) och Nations Leagues
+  // grupper per undersida på 375: en rubrik och fyra lag var (raderna 4–23).
+  const INTL = new Set(['unl', 'emk', 'vsk']);
+  const GPER = 4;
+  // Landslag med för långa namn: högst elva tecken, som fällbladstavlans.
+  const LAND = { 'Bosnien & Hercegovina': 'Bosnien-H.', Nordmakedonien: 'N Makedon.', Azerbajdzjan: 'Azerbajdz.', Liechtenstein: 'Liechtenst.' };
   // lag per undersida: hela Premier League på en, 24 lag i två halvor
   const perTable = (n) => (n > 20 ? Math.ceil(n / 2) : 20);
   const TZ = 'Europe/Stockholm';
@@ -139,6 +151,8 @@ window.RumTv = (() => {
   }
   // Divisionerna i bandet: den som visas i gult, de andra leder dit.
   const chooser = (base, k) => DIVS.map((d, i) => [` ${d.short} `, i === k ? 'y' : 'w', i === k ? null : base + i]);
+  // Tabellsidorna har Nations League (375) som femte, k = 4.
+  const tabChooser = (k) => [...chooser(TAB, k), [' NL ', k === 4 ? 'y' : 'w', k === 4 ? null : NL]];
 
   const fHead = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
   const fWhen = new Intl.DateTimeFormat('sv-SE', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -155,11 +169,13 @@ window.RumTv = (() => {
   }
 
   // Snabbvalen längst ner, samma på alla sidor: fyra fält om tio tecken.
-  // data-to = föremålet i rummet som tänder snabbvalet (rum.js hot).
+  // data-to = föremålet i rummet som tänder snabbvalet (rum.js hot). På en
+  // landskamps sida leder Tabeller till gruppen i Nations League (tab, en
+  // sida som "375/1": sidan och undersidan).
   const KEYS = [['Matcher', 'r', FIRST, 'matcher'], ['Tabeller', 'g', TAB, 'tabeller'], ['Skyttar', 'y', SKY, 'statistik'], ['Innehåll', 'c', INDEX]];
-  function fast() {
+  function fast(tab) {
     return '<div class="tr fast">' + KEYS.map(([label, fg, to, nav]) =>
-      `<button type="button" class="${fg}" data-sida="${to}"${nav ? ` data-to="${nav}"` : ''}>${esc(pad(` ${label}`, 10))}</button>`).join('') + '</div>';
+      `<button type="button" class="${fg}" data-sida="${to === TAB && tab ? tab : to}"${nav ? ` data-to="${nav}"` : ''}>${esc(pad(` ${label}`, 10))}</button>`).join('') + '</div>';
   }
 
   // Raderna 4–23: en sträng per rad, null för en tom, eller { html } med
@@ -190,7 +206,7 @@ window.RumTv = (() => {
   const ord = (n) => `${n}:${/1[12]$/.test(n) || !/[12]$/.test(n) ? 'e' : 'a'}`;
   const dec = (x, d = 2) => (x == null || !Number.isFinite(x) ? '-' : x.toFixed(d).replace('.', ','));
   const signed = (n) => (n > 0 ? `+${n}` : String(n));
-  const COMP = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two', fac: 'FA-cupen', lc: 'Ligacupen' };
+  const COMP = { pl: 'Premier League', ch: 'Championship', l1: 'League One', l2: 'League Two', fac: 'FA-cupen', lc: 'Ligacupen', unl: 'Nations League', emk: 'EM-kvalet', vsk: 'Vänskapsmatch' };
   const LIGA = { pl: 'PL', ch: 'CH', l1: 'L1', l2: 'L2' };
 
   // Läget i en kort ruta (331) och i en mening (matchens sida).
@@ -233,6 +249,7 @@ window.RumTv = (() => {
     const item = (label, nr, indent = 1) => ({ sida: nr, html: line(' '.repeat(indent), pad(label, 36 - indent), [String(nr), 'y']) });
     const rows = [null, item('Omgångens matcher', FIRST), item('Stryktipset matcher live', LIVE), null, line(' ', ['Tabeller', 'c'])];
     DIVS.forEach((d, k) => rows.push(item(d.name, TAB + k, 3)));
+    rows.push(item('Nations League', NL, 3));
     rows.push(null, line(' ', ['Skytteligor', 'c']));
     DIVS.forEach((d, k) => rows.push(item(d.name, SKY + k, 3)));
     return band('INNEHÅLL') + body(rows) + fast();
@@ -294,6 +311,7 @@ window.RumTv = (() => {
 
   function matchPage(T, i) {
     const { m, g } = T.rows[i];
+    if (INTL.has(m.comp)) return landPage(T, i);
     const d = T.json.get(m.id) || null;
     const st = status(g, true);
     const p = partsOf(fWhen, new Date(m.kickoff));
@@ -318,6 +336,60 @@ window.RumTv = (() => {
         pair('Hemma/borta', (x, side) => { const r = x.record && x.record[side]; return [[r ? `${r.w}-${r.d}-${r.l}` : '-']]; }));
     }
     return band('FOTBOLL', (d && d.match && d.match.compName) || COMP[m.comp] || '', [when]) + body(rows) + fast();
+  }
+
+  // Formen som bokstäver i färg, senaste först: V grön, O gul, F röd.
+  const FORMF = { V: 'g', O: 'y', F: 'r' };
+  const formBits = (list) => (list && list.length ? list.slice(0, 5).map((x) => [x.result || '-', FORMF[x.result] || 'w']) : [['-']]);
+  // 2026-10-02 → 2/10 2026
+  const dag = (iso) => { const [y, mo, da] = String(iso).split('-'); return `${Number(da)}/${Number(mo)} ${y}`; };
+
+  // En landskamp: som en klubbmatch, men procenten är marknadens (oddsen utan
+  // spelbolagets marginal – modellen känner bara lagen i England), gruppen
+  // står i bandet och lagen sida vid sida har placeringen i gruppen, Nations
+  // League hittills (V-O-F), formen i de fem senaste landskamperna och de
+  // senaste mötena, så många som ryms.
+  function landPage(T, i) {
+    const { m, g } = T.rows[i];
+    const d = T.json.get(m.id) || null;
+    const st = status(g, true);
+    const p = partsOf(fWhen, new Date(m.kickoff));
+    const score = g.state === 'hidden' ? '?' : done(g) && g.score ? `${g.score.home}-${g.score.away}` : '';
+    const when = st ? [st[0], st[1] === 'g' ? 'g' : 'w'] : [`${p.weekday} ${p.day} ${p.month} ${p.hour}.${p.minute}`, 'w'];
+    const grp = (d && d.match && d.match.group) || (/^Grupp\s+(\S+)/.exec(m.round || '') || [])[1] || null;
+    // gruppens undersida på 375 (bandet och Tabeller leder dit)
+    const gsub = grp && m.comp === 'unl' ? groupSub(T, grp) : null;
+    const tab = gsub != null ? `${NL}/${gsub}` : null;
+    const rows = [null, { dh: true, href: `#match/${m.id}`, html: line(' ', pad(teams(T, m, 32), 32), [rpad(score, 6), 'y']) }, null];
+    const o = m.odds || [];
+    const pr = d && d.prediction && d.prediction.status === 'ok' && d.prediction.p && d.prediction.p.length === 3 ? d.prediction.p
+      : m.f && m.f.p && m.f.p.length === 3 ? m.f.p.map((x) => x / 100) : null;
+    if (o.length === 3 || pr) {
+      rows.push(line(' '.repeat(12), [rpad('1', 8), 'g'], [rpad('X', 8), 'y'], [rpad('2', 8), 'c']));
+      if (o.length === 3) rows.push(line(' Odds', ' '.repeat(7), [o.map((x) => rpad(dec(x), 8)).join(''), 'y']));
+      if (pr) rows.push(line(' Marknaden', ' '.repeat(2), pr.map((x) => rpad(`${Math.round(x * 100)} %`, 8)).join('')), bar(pr));
+      rows.push(null);
+    } else rows.push(line(' Inga odds ännu.'), null);
+    const t = d && d.teams;
+    if (t && t.home && t.away && g.state !== 'hidden') {
+      const pair = (label, f) => line(' ', pad(label, 12), ...cell(f(t.home)), ...cell(f(t.away)));
+      rows.push(line(' '.repeat(13), [rpad(T.kort(m.home), 13) + rpad(T.kort(m.away), 13), 'c']),
+        pair(grp ? `Grupp ${grp}` : 'Gruppen', (x) => [[x.table ? `${ord(x.table.rank)} ${x.table.points} p` : '-']]),
+        pair('Nations L.', (x) => { const r = x.record && x.record.all; return [[r && r.n ? `${r.w}-${r.d}-${r.l}` : '-']]; }),
+        pair('Form', (x) => formBits(x.form)));
+      // de senaste mötena, så många som ryms (raderna 4–23)
+      const mot = (d.pastMeetings && d.pastMeetings.list) || [];
+      const plats = 20 - rows.reduce((n, r) => n + (r && r.dh ? 2 : 1), 0) - 2;
+      if (mot.length && plats > 0) {
+        rows.push(null, line(' ', ['Senaste mötena', 'c']));
+        mot.slice(0, plats).forEach((x) => {
+          const s = x.score ? `${x.score.home}-${x.score.away}` : '';
+          rows.push(line(' ', pad(dag(x.date), 10), ' ', pad(x.compShort || '', 4), ' ',
+            pad(`${T.kort(x.home)}-${T.kort(x.away)}`, 18), [rpad(s, 5), 'y']));
+        });
+      }
+    }
+    return band('FOTBOLL', (d && d.match && d.match.compName) || COMP[m.comp] || '', grp ? [[`Grupp ${grp}`, 'y', tab]] : [when], grp ? [when] : '') + body(rows) + fast(tab);
   }
 
   // Färgen på placeringen: uppåt grön, kval och Europa cyan, nedflyttning röd.
@@ -348,8 +420,71 @@ window.RumTv = (() => {
       rows = list.slice(sub * per, sub * per + per).map((x) => line(' ', [rpad(x.rank, 2), zone(x.note)], ' ', pad(team(T, x.name, 15), 15),
         rpad(x.m, 3), rpad(x.w, 3), rpad(x.d, 3), rpad(x.l, 3), rpad(signed(x.gd), 4), [rpad(x.pts, 4), 'y']));
     }
-    return band('TABELL', chooser(TAB, k), `${dv.name}${subs > 1 ? `  ${sub + 1}/${subs}` : ''}`,
+    return band('TABELL', tabChooser(k), `${dv.name}${subs > 1 ? `  ${sub + 1}/${subs}` : ''}`,
       v || !list.length ? '' : cols([[21, 'S'], [24, 'V'], [27, 'O'], [30, 'F'], [32, '+/-'], [38, 'P']])) + body(rows) + fast();
+  }
+
+  // Nations Leagues grupper i den ordning 375 visar dem: omgångens grupper
+  // (landskamperna bland raderna) först, sedan de andra, i bokstavsordning.
+  function groupOrder(T) {
+    const d = T.land.get('nl');
+    const list = d && d.grupper ? d.grupper.filter((x) => x.id && x.lag && x.lag.length) : [];
+    const ids = list.map((x) => x.id).sort();
+    const vara = new Set(T.rows.filter((x) => x.m.comp === 'unl').map((x) => (/^Grupp\s+(\S+)/.exec(x.m.round || '') || [])[1]).filter(Boolean));
+    const by = new Map(list.map((x) => [x.id, x]));
+    return [...ids.filter((id) => vara.has(id)), ...ids.filter((id) => !vara.has(id))].map((id) => ({ ...by.get(id), vara: vara.has(id) }));
+  }
+  const groupSub = (T, id) => {
+    const ix = groupOrder(T).findIndex((x) => x.id === id);
+    // (innan filen har kommit: omgångens grupper står först, så undersidan
+    // är i regel 0)
+    return ix < 0 ? 0 : Math.floor(ix / GPER);
+  };
+  const NLDIV = { id: 'unl', name: 'Nations League' };
+  function nlSubs(T) {
+    return veil(T, NLDIV) ? 1 : Math.max(1, Math.ceil(groupOrder(T).length / GPER));
+  }
+
+  // Nations Leagues placering i färg efter zonen i ESPN:s not, den del som
+  // gäller ligan ("A: Qualifies for QFs; B-D: Promotion"): gruppvinnare och
+  // uppflyttning grön, kval cyan, nedflyttning röd.
+  function nlZone(note, liga) {
+    if (!note) return 'w';
+    const del = String(note).split(';').map((x) => x.trim()).find((x) => {
+      const [vem] = x.split(':');
+      return vem.split(',').some((v) => {
+        const [a, b] = v.trim().split('-');
+        return b ? liga >= a && liga <= b : liga === a;
+      });
+    });
+    if (!del) return 'w';
+    if (/playoff/i.test(del)) return 'c';
+    if (/relegation/i.test(del)) return 'r';
+    if (/qualif|promotion/i.test(del)) return 'g';
+    return 'w';
+  }
+
+  function nlPage(T, sub) {
+    const d = T.land.get('nl');
+    const v = veil(T, NLDIV);
+    const order = groupOrder(T);
+    const subs = v ? 1 : Math.max(1, Math.ceil(order.length / GPER));
+    // ESPN skriver noten bara på en grupp, men reglerna är desamma i alla
+    // (uppdelade efter liga i noten): placeringens not ur någon grupp som har den
+    const noter = new Map();
+    for (const gr of order) for (const x of gr.lag) if (x.note && !noter.has(x.rank)) noter.set(x.rank, x.note);
+    let rows = [];
+    if (v) rows = veilRows(v, NLDIV);
+    else if (d === false || (d && !order.length)) rows = [null, line(' Tabellerna saknas just nu.')];
+    else {
+      for (const gr of order.slice(sub * GPER, sub * GPER + GPER)) {
+        rows.push(line(' ', [pad(gr.namn || `Grupp ${gr.id}`, 20), 'y'], [gr.vara ? rpad('i omgången', 18) : '', 'c']));
+        gr.lag.slice().sort((a, b) => a.rank - b.rank).forEach((x) => rows.push(line(' ', [rpad(x.rank, 2), nlZone(x.note || noter.get(x.rank), gr.liga || gr.id[0])], ' ',
+          pad(LAND[x.lag] || x.lag, 15), rpad(x.played, 3), rpad(x.won, 3), rpad(x.drawn, 3), rpad(x.lost, 3), rpad(signed(x.gd), 4), [rpad(x.points, 4), 'y'])));
+      }
+    }
+    return band('TABELL', tabChooser(4), `Nations League${subs > 1 ? `  ${sub + 1}/${subs}` : ''}`,
+      v || !order.length ? '' : cols([[21, 'S'], [24, 'V'], [27, 'O'], [30, 'F'], [32, '+/-'], [38, 'P']])) + body(rows) + fast();
   }
 
   // För långa namn: förnamnets initial, eller bara efternamnet.
@@ -419,8 +554,9 @@ window.RumTv = (() => {
 
   function mount(root, o) {
     const T = {
-      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), typed: '', on: true, near: false, tittar: false,
-      short: o.short, kort: o.kort || o.short, wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
+      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), land: new Map(), typed: '', on: true, near: false, tittar: false,
+      // landslagen med för långa namn kortas (LAND) där lagen inte ryms
+      short: o.short, kort: (n) => LAND[n] || (o.kort || o.short)(n), wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
     };
     const box = root.querySelector('#rum-tv3');
     const pos = box.parentElement;
@@ -437,7 +573,7 @@ window.RumTv = (() => {
       const out = [INDEX, FIRST];
       for (let i = 0; i < Math.min(T.rows.length, MAXM); i++) out.push(FIRST + 1 + i);
       DIVS.forEach((d, k) => out.push(TAB + k));
-      out.push(LIVE);
+      out.push(NL, LIVE);
       DIVS.forEach((d, k) => out.push(SKY + k));
       return out;
     }
@@ -445,6 +581,7 @@ window.RumTv = (() => {
     function subsOf(nr) {
       if (nr === FIRST) return Math.max(1, Math.ceil(T.rows.length / PER));
       if (nr === LIVE) return Math.max(1, Math.ceil(T.rows.length / LPER));
+      if (nr === NL) return nlSubs(T);
       if (nr >= TAB && nr < TAB + DIVS.length) return tableSubs(T, DIVS[nr - TAB]);
       return 1;
     }
@@ -461,6 +598,8 @@ window.RumTv = (() => {
       const dv = DIVS[nr - TAB] || DIVS[nr - SKY];
       if (nr >= TAB && nr < TAB + DIVS.length) load(T.teams, dv.id, `data/teams/${dv.id}.json`);
       if (nr >= SKY && nr < SKY + DIVS.length) load(T.players, dv.id, `data/players/${dv.id}.json`);
+      // grupperna: på 375 och på en landskamps sida (gruppens undersida)
+      if (nr === NL || (nr > FIRST && nr < TAB && x && x.m.comp === 'unl')) load(T.land, 'nl', 'data/landslag.json');
     }
     function page(nr, sub) {
       if (nr === INDEX) return indexPage();
@@ -468,6 +607,7 @@ window.RumTv = (() => {
       if (nr > FIRST && nr < TAB) return matchPage(T, nr - FIRST - 1);
       if (nr >= TAB && nr < TAB + DIVS.length) return tablePage(T, nr - TAB, sub);
       if (nr === LIVE) return livePage(T, sub);
+      if (nr === NL) return nlPage(T, sub);
       return scorerPage(T, nr - SKY);
     }
 
@@ -608,7 +748,7 @@ window.RumTv = (() => {
       else if (/^[0-9]$/.test(b.dataset.tv)) digit(b.dataset.tv);
       else if (b.dataset.tv) step(b.dataset.tv === 'upp' ? 1 : -1);
       else if (b.dataset.visa) { if (window.Spoiler) Spoiler.show(b.dataset.visa.split(' ')); }
-      else go(Number(b.dataset.sida));
+      else go(...b.dataset.sida.split('/').map(Number));
     });
 
     return {
