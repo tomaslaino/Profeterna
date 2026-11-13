@@ -25,8 +25,6 @@
 //   handen därifrån när du har lämnat in, de andras när du ser deras tips.
 //   Helgarderat till höger om högen (L): veckans tidning, med namnet och rubriken
 //   ovanför kupongerna; den tas upp och läses (tidningen, rum-tidning.js).
-//   kupongstället på disken (N): en blank kupong för nästa omgång – veckans
-//   Stryktips – tas i handen, bara att titta på (openStall).
 //   kaffet och notan längst till vänster på pulten → Hasse Backe, som sitter
 //   i baren utanför bilden (H): man vänder sig dit (rum-hasse.js).
 // Det finns ingen meny: pekar man på ett föremål lyser det, och snabbvalet på
@@ -59,7 +57,7 @@
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
 // (RumTv, läses före den här), anslagstavlan i rum-anslag.js (RumAnslag,
 // också före), kortregistret i rum-register.js (RumRegister, också före) och sammanställningen efter omgången i rum-block.js (RumBlock, också före). rum-3d.js (gänget), rum-saker.js (med affischerna i rum-affischer.js) och rum-inredning.js (lysröret,
-// neonskylten, uret, orakelramen, paketen, kupongstället …) hämtas
+// neonskylten, uret, orakelramen, paketen …) hämtas
 // först när rummet visas, med three.js från jsdelivr (importmap i
 // index.html); utan WebGL står rummet kvar utan dem.
 
@@ -1381,8 +1379,7 @@ window.Rum = (() => {
 
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
   // bara med tangentbord och mus.
-  // (kupongstället kommer med inredningen, och tangenter körs igen då)
-  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Datorn', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-stall', 'Nästa omgång', 'N'], ['#rum-helgarderat', 'Helgarderat', 'L']];
+  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Datorn', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-helgarderat', 'Helgarderat', 'L']];
   function tangenter() {
     if (!matchMedia('(hover: hover)').matches) return;
     for (const [sel, namn, k] of TANGENT) {
@@ -1808,8 +1805,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (samma som på papperet under Kupong)
     const strid = new Set(slag === 'gang' && v.g ? v.g.strid : []);
     const klar = new Set(slag === 'gang' && v.g ? v.g.klar : []);
-    // (en match från Svenska Spel som inte finns på sajten har ingen tävling, openStall)
-    const list = !order.length && rd && rd.tomma ? tomma(rd.tomma) : order.map((x, i) => {
+    const list = order.map((x, i) => {
       const sign = signs[x.id];
       const comp = x.m.comp ? compOf(x.m.comp) : null;
       const started = !(Date.parse(x.m.kickoff) > now);
@@ -1870,10 +1866,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, top, slitage(nyckel, true)) : '') +
       `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`;
   }
-
-  // n blanka rader: numret och rutorna, utan match (kupongstället när ingen omgång är öppen)
-  const tomma = (n) => Array.from({ length: n }, (_, i) => `<div class="row tom"><span class="pp-nr">${i + 1}</span><span class="m"></span>` +
-    `${SIGNS.map((s) => `<span class="box"><i>${s}</i></span>`).join('')}</div>`).join('');
 
   // Pennan i ett fält: samma penna som på papperet under Kupong.
   const PEN = '<svg class="sm-pen" viewBox="0 0 16 16" aria-hidden="true"><path d="M10.6 2.9l2.5 2.5-7.6 7.6-3.2.7.7-3.2z"/><path d="M9 4.5l2.5 2.5"/></svg>';
@@ -2215,8 +2207,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       window.Historik ? Historik.coupons().then((l) => { R.old = l; }) : null,
     ]);
     fill();
-    // nästa omgång till kupongstället (openStall), när matcherna finns att knyta den till
-    stallHamta();
   }
 
   function fill() {
@@ -3174,7 +3164,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const andra = [];
     andra.push(tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; if (x.numret) x.numret(hgNumret); R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err)));
-    // lysröret, neonen, skyltarna, skivan, uret, ramarna, paketen och kupongstället (rum-inredning.js)
+    // lysröret, neonen, skyltarna, skivan, uret, ramarna och paketen (rum-inredning.js)
     andra.push(tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err)));
     try {
@@ -3342,8 +3332,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Ett föremål: tv:n, videon, anslagstavlan och kortregistret kommer fram,
   // kupongen tas i handen om den går att fylla i (annars går kameran fram
-  // till den), din i högen om den går att ändra eller visa, ur kupongstället
-  // en kupong för nästa omgång (openStall), och resten är närbilder (sak).
+  // till den), din i högen om den går att ändra eller visa, och resten är
+  // närbilder (sak).
   // Inget leder ut ur rummet, utom Hasses kaffe när animationen med honom
   // finns (tillHasse).
   function go(a, e) {
@@ -3357,7 +3347,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else if (a.dataset.nav === 'video') zoomVideo(!R.vnara);
     else if (a.id === 'rum-ans') board(true);
     else if (a.id === 'rum-reg') register(true);
-    else if (a.id === 'rum-stall') openStall();
     else if (a.id === 'rum-kupong') {
       if (a.querySelector('.rum-vand')) vandKupong(a);
       else if (!openCoupon()) sak('kupong');
@@ -4633,8 +4622,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     mattHand(k);
     const h = held();
     placeRow(h);
-    // (från pulten, eller ur kupongstället med sin egen väg)
-    if (k.anim && !k.slot) k.anim.effect.setKeyframes(k.frames ? k.frames(h) : handFrames(h));
+    if (k.anim && !k.slot) k.anim.effect.setKeyframes(handFrames(h));
     else {
       inHand(k.el, h);
       if (k.anim) k.anim.effect.setKeyframes(flipFrames(k.slot, h)[1]);
@@ -4647,7 +4635,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // tillbaka den för att se hur det går.
   function levande() {
     const k = R.kup;
-    // (kupongen ur kupongstället är nästa omgång: inget har startat, openStall)
     if (!k || k.closing || !k.rd) return;
     const rows = roundRows(k.rd);
     const p = k.slag === 'gang' ? pult() : null;
@@ -4888,123 +4875,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return true;
   }
 
-  // ---------- kupongstället: nästa omgång ----------
-  //
-  // Ett klick på kupongstället på disken (eller N) tar en blank kupong för
-  // nästa omgång i handen: Stryktipset som Svenska Spel har öppet för spel
-  // (Folket i folket.js, samma som Hämta Stryktipset), med sajtens matcher i
-  // Stryktipsets ordning – samma kupong och samma mått som kupongen på pulten.
-  // Den är bara att titta på: inga rutor att kryssa, ingen penna och inget
-  // matchblad. Den lyfts ur stället, vänds upp mot betraktaren och stannar i
-  // handen, och Lägg tillbaka, Esc, N, K eller ett klick utanför sätter tillbaka
-  // den samma väg (closeCoupon). Är ingen omgång öppen är kupongen blank, med
-  // tretton tomma rader. Omgången hämtas när rummet läser in sina data (load)
-  // och när kupongen tas, högst var femte minut.
-  const ST = { got: null, at: 0, p: null };
-  function stallHamta() {
-    if (!window.Folket || ST.p || (ST.at && Date.now() - ST.at < 5 * 60000)) return ST.p;
-    ST.p = Folket.open().catch(() => null).then((got) => {
-      ST.got = got;
-      ST.at = Date.now();
-      ST.p = null;
-      return got;
-    });
-    return ST.p;
-  }
-
-  // Kupongen ur stället: omgångens matcher – sajtens match där den finns,
-  // annars lagen och avsparken från Svenska Spel – eller tretton tomma rader.
-  // Streckkoden är omgångens på pulten när det är samma Stryktips, annars
-  // Stryktipsets nummer.
-  function stallHtml() {
-    const got = ST.got;
-    const o = got && got.omgang;
-    let rd = { ids: [], gang: [], name: null, tomma: 13 };
-    let rows = [];
-    if (o && o.lage === 'Open' && got.rows.length) {
-      rows = got.rows.map((r) => {
-        const m = r.m || { id: `stryktipset-${o.nr}-${r.nr}`, home: r.hemma || '', away: r.borta || '', kickoff: r.avspark, comp: null };
-        return { id: String(m.id), m, g: { res: null }, sign: '' };
-      });
-      const p = pult();
-      const samma = p && p.s.spel && p.s.spel.nr === o.nr;
-      rd = { id: samma ? p.s.id : `stryktipset-${o.nr}`, ids: rows.map((x) => x.id), gang: [], name: null, spel: true };
-    }
-    // (utan pennan: det finns inget att skriva)
-    return couponHtml(rd, rows).replace(/<span class="pencil[^>]*><i><\/i><\/span>$/, '');
-  }
-
-  // Vägen från stället till handen: kupongen är liten där den står, lutad bakåt
-  // och vriden som stället, lyfts upp ur det och kommer fram till mitten, där
-  // den svänger en aning förbi och stannar. a: var den står (stallFran).
-  function stallFrames(a, h) {
-    const f = (t) => [a.dx + (h.dx - a.dx) * t, a.dy + (h.dy - a.dy) * t];
-    return [
-      { offset: 0, opacity: 0, transform: T(a.dx, a.dy, 0, -10, 0, a.s, 34), boxShadow: glow(0, '0 6px 10px rgba(0, 0, 0, 0.45)'), easing: 'cubic-bezier(0.3, 0, 0.5, 1)' },
-      { offset: 0.1, opacity: 1 },
-      { offset: 0.28, transform: T(...f(0.12).map((x, i) => (i ? x - 60 : x)), 60, -18, -4, a.s + (h.z - a.s) * 0.22, 16), boxShadow: glow(0, '0 60px 60px rgba(0, 0, 0, 0.4)'), easing: 'cubic-bezier(0.25, 0.55, 0.3, 1)' },
-      { offset: 0.84, transform: T(h.dx, h.dy + 4, 0, -4, 1, h.z * 1.006), boxShadow: glow(0, '0 40px 90px rgba(0, 0, 0, 0.6)'), easing: 'ease-in-out' },
-      { offset: 1, transform: T(h.dx, h.dy, 0, 0, 0, h.z), boxShadow: glow(0, '0 34px 80px rgba(0, 0, 0, 0.6)') },
-    ];
-  }
-  // Var kupongerna i stället syns, i kupongens transform (T, från pulten): mitten
-  // av kupongerna i länken (under skylten) i scenens mått, och lika stor.
-  function stallFran(lank) {
-    const r = lank.getBoundingClientRect();
-    const k = R.k || 1;
-    const [w, h] = R.smal ? KUP.smal : KUP.bred;
-    return {
-      dx: (r.left + r.width * 0.42 - (R.ox || 0)) / k - kupX(),
-      dy: (r.top + r.height * 0.66 - (R.oy || 0)) / k - 853,
-      s: (r.height * 0.45) / (Math.max(w, h) * k),
-    };
-  }
-
-  function openStall() {
-    const lank = document.getElementById('rum-stall');
-    const desk = document.getElementById('rum-kupong');
-    if (R.kup || !R.el || !lank || !desk) return;
-    if (R.sak) sak(null, null);
-    zoomTv(false);
-    zoomVideo(false);
-    const fram = stallHtml();
-    desk.parentElement.insertAdjacentHTML('beforeend', '<div class="rum-dimma" id="rum-dimma"></div>' +
-      `<div class="rum-flat rum-kup rum-handen" id="rum-handen" role="dialog" aria-modal="true" aria-label="Nästa omgång" tabindex="-1">${fram}</div>`);
-    R.el.insertAdjacentHTML('beforeend', '<div class="rum-hand" id="rum-hand"><span class="vanster"><button type="button" class="bla" data-tillbaka>Lägg tillbaka</button></span>' +
-      '<p class="msg" role="status"></p><span class="hoger"></span></div>');
-    const el = document.getElementById('rum-handen');
-    const a = stallFran(lank);
-    const k = R.kup = { el, dim: document.getElementById('rum-dimma'), rad: document.getElementById('rum-hand'), pen: null, desk, slag: 'stall', fram,
-      tecken: {}, not: {}, efter: {}, matcher: [], frames: (h) => stallFrames(a, h) };
-    lager('kupong', () => closeCoupon());
-    R.el.classList.add('i-handen');
-    R.tx = 0;
-    R.ty = 0;
-    const h = held();
-    placeRow(h);
-    if (calm()) {
-      setCam(0, 0);
-      inHand(el, h);
-    } else {
-      k.anim = el.animate(k.frames(h), { duration: 950, fill: 'both' });
-      k.fade = k.dim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: 'ease', fill: 'both' });
-      k.show = k.rad.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 780, easing: 'ease-out', fill: 'both' });
-    }
-    el.focus({ preventScroll: true });
-    k.rad.addEventListener('click', (e) => {
-      if (e.target.closest('[data-tillbaka]') && !k.closing) closeCoupon();
-    });
-    // omgången kom (eller ändrades) efter att kupongen togs
-    const p = stallHamta();
-    if (p) {
-      p.then(() => {
-        if (R.kup !== k || k.closing) return;
-        const ny = stallHtml();
-        if (ny !== k.fram) el.innerHTML = k.fram = ny;
-      });
-    }
-  }
-
   // Orden under kupongen, som raden längst ner på papperet: till vänster
   // Lägg tillbaka och det mer sällsynta i finstil (Ändra matcherna, Ta bort,
   // Börja om), till höger det du gör med kupongen, guldordet längst ut.
@@ -5107,7 +4977,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       toPile(k, done);
       return;
     }
-    // (kupongen ur kupongstället har ingen penna)
     if (k.pen) penGo([{ ...PEN_VILA, l: 0.4, t: 240, e: 'ease-out' }, { ...PEN_PULT, l: 0.15, t: 380, e: 'cubic-bezier(0.4, 0, 0.6, 1)' }, { ...PEN_PULT, t: 200, e: 'ease-in' }]);
     k.anim.reverse();
     k.anim.updatePlaybackRate(-1.15);
@@ -6324,8 +6193,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
           R.kup.lapp.flik(pil);
         }
       } else if (R.kup) {
-        // (kupongen ur kupongstället sätts tillbaka också med N)
-        if (k === 'k' || k === 'escape' || (k === 'n' && R.kup.slag === 'stall')) closeCoupon();
+        if (k === 'k' || k === 'escape') closeCoupon();
       } else if (R.ans && R.ans.on()) {
         if (R.ans.key(e.key)) e.preventDefault();
         else if (k === 'a' || k === 'escape') board(false);
@@ -6340,7 +6208,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       else if (k === 't') zoomTv(!R.zoom);
       else if (k === 'a') board(true);
       else if (k === 'r') register(true);
-      else if (k === 'n') openStall();
       else if (k === 'v') zoomVideo(!R.vnara);
       else if (k === 'h' && !R.zoom && !R.vnara) tillHasse();
       else if (k === 'l' && !R.zoom && !R.vnara) oppnaTidning();

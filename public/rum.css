@@ -406,15 +406,6 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   border-radius: 50%;
   background: none;
 }
-/* Kupongstället på disken: länken ligger över stället (rum-inredning.js, före
-   kortregistrets länk där de möts), och duken i 3D lyser som saken när man
-   pekar på länken (.lyser sätts av rum-inredning.js: med :has() på planet
-   räknades stilen om för hela planet). Ett klick tar en kupong för nästa
-   omgång i handen. */
-.rum-stall { position: absolute; display: block; z-index: 2; }
-.rum-stall-duk.lyser { filter: brightness(1.18) drop-shadow(0 0 10px rgba(240, 214, 153, 0.35)); }
-.rum.sak-nara .rum-pl > .rum-stall-duk { filter: none; }
-.rum-stall-duk { transition: filter 0.25s ease; }
 /* rummet vrids rakt medan kameran går fram till en sak */
 .rum.sak-nara .rum-world { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
 /* och vrids med kameran fram till tv:n, videon, anslagstavlan och kortregistret (vrid) */
