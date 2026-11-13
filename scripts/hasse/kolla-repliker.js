@@ -63,7 +63,8 @@ const FALT = {
   resultat: ['res'],
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
   'efter.ratt': ['ratt', 'av'], 'efter.exakt': ['res'],
-  domar: ['namn', 'antal', 'Antal'],
+  // (i det som sticker ut också matchen, tecknen, datorns chans och resultatet: domText i rum-hasse.js)
+  domar: ['namn', 'antal', 'Antal', 'match', 'tecknet', 'Tecknet', 'den', 'tecknen', 'pct', 'res'],
   'stallning.ratt': ['ratt', 'av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
 };
 // Sidan lottar bland de här, så de måste vara listor.
@@ -76,7 +77,8 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'domar.fraga', 'domar.igen', 'domar.alla', 'domar.glomt', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
-  'domar.hel.en', 'domar.hel.fler', 'domar.ensam.ingen', 'domar.ensam.en', 'domar.ensam.fler',
+  ...['skrall.spik', 'skrall.halv', 'skrall.ensam', 'skrall.om', 'miss.spik', 'miss.halv', 'miss.om', 'ensam.en', 'ensam.fler', 'ensam.om',
+    'raddad.fakta', 'raddad.om', 'spikar.alla', 'spikar.sprack', 'datorn.fler', 'datorn.farre', 'datorn.omFler', 'datorn.omFarre'].map((k) => `domar.sak.${k}`),
   ...['ingen', 'enda', 'endaInte', 'alla', 'inga', 'en', 'fler'].map((k) => `domar.spik.${k}`),
   ...['ratt', 'alla', 'bra', 'mitten', 'daligt', 'leder', 'lika', 'haller', 'hallerLika', 'emot', 'emotLika', 'mal', 'malBra', 'malLugn', 'malFel'].map((k) => `stallning.${k}`),
   ...['italo', 'guld', 'rock', 'p1', 'p3', 'p4g', 'rix', 'sport', 'talksport', 'caroline', 'brus'].map((k) => `radio.${k}`),

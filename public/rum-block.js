@@ -9,7 +9,7 @@
 // svartare än det som inte satt, så att raderna går att läsa utan förklaring, också i svartvitt. Kupongens rätt står
 // överst med hans röda penna, så att det syns också på håll.
 // Han har rättat det, och raden Poäng förklarar han om man ropar till honom (protHasse i rum.js), men
-// domarna över gänget säger han i baren (gang här, doma i rum-hasse.js). Ett klick på blocket lyfter det och lägger fram det
+// domarna över gänget säger han i baren (gang och saker här, doma i rum-hasse.js). Ett klick på blocket lyfter det och lägger fram det
 // stort (protokollet i rum.js), och ett klick på Helgarderat på pulten öppnar tidningen
 // (tidningen i rum.js). Gänget håller upp sina lappar (lappar här och i rum-3d.js), och
 // modellens siffra står på videons blå ruta.
@@ -272,125 +272,58 @@
     return ut.sort((a, b) => (a.none - b.none) || (b.none ? 0 : Tippoang.key(b) - Tippoang.key(a)));
   }
 
-  // ---------- lappen under domen ----------
+  // ---------- det som sticker ut ----------
   //
-  // När Hasse dömer någon i gänget (doma i rum-hasse.js) lägger han fram en lapp ur protokollet om just den
-  // kupongen, på protokollets blankett: en spalt per match med kryssen i personens bläck i rutorna 1, X och 2, det
-  // som satt överstruket med märkpennan som i protokollet och facit maskinskrivet under. Rödpennans stjärna står vid matchnumret
-  // där ingen annan i gänget hade rätt. Under rutorna det som går att räkna ur kupongen: rätt, poäng (med
-  // ringen kring vinnarens, som i protokollet), platsen i gänget, spelkassan (10 kr per match till modellens
-  // odds, som i Olympen, kampKassa i kampen.js), spikarna och garderingarna, tipset med högst odds som satt
-  // och det med lägst odds som inte satt. Sist säsongen, när den är hämtad: poängen omgång för omgång, summan
-  // och platsen.
+  // När Hasse dömer någon i gänget (doma i rum-hasse.js) tar han upp det som sticker ut på just den kupongen, det
+  // viktigaste först, och säger vad han tycker om det. Kupongen visar han inte. Ett tips räknas med datorns chans
+  // före avspark, som poängen (prob, tippoang.js).
+  //   skrall  tipset med lägst chans som satt: en spik på högst 40 %, en halvgardering på högst 55 %
+  //           (ensam: ingen annan i gänget hade rätt där)
+  //   miss    tipset med högst chans som inte satt, minst 60 %
+  //   ensam   där ingen annan hade rätt, utom skrällen och helgarderingarna: en match, eller antal för flera
+  //   raddad  en helgardering där det kom ett utfall som datorn gav högst 20 % (chans: det utfallets)
+  //   spikar  alla spikar satt (minst tre; alla), ingen (minst två) eller bara en (minst tre)
+  //   datorn  rätt mot de rätt datorn väntade sig av kupongen (summan av chanserna), när poängen är minst ±1,5
+  //   spik    spikarna annars: det som alltid går att säga
+  // vikt: hur mycket det sticker ut. → [{ typ, vikt, r?, t?, prob?, chans?, spik?, ensam?, alla?, antal?,
+  // vantat?, fler? }], viktigast först, eller [] för den som inte lämnade in.
   const KASSA = 10;
   const kr = (x) => { const v = Math.round(x); return `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}`; };
-  // odds som på resten av sidan (fmtOdds i app.js): 1 / chansen med två decimaler
-  const odds = (prob) => { const o = 1 / prob; return o >= 100 ? String(Math.round(o)) : o.toFixed(2).replace('.', ','); };
-  const r1 = (x) => Math.round(x * 10) / 10;
-  function slump(nyckel) {
-    let a = [...String(nyckel)].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) | 0, 7);
-    return () => {
-      a = (a + 0x6d2b79f5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-  // Ett kryss med pennan i en ruta (24 × 16): två lite sneda och böjda streck, samma för samma ruta varje gång.
-  function kryss(nyckel) {
-    const R = slump(nyckel);
-    const j = (n) => (R() - 0.5) * 2 * n;
-    const d = [[5, 2.6, 19.4, 13.4], [19, 2.3, 5.2, 13.9]].map(([x1, y1, x2, y2]) => {
-      const a = [x1 + j(1.3), y1 + j(0.8)];
-      const b = [x2 + j(1.3), y2 + j(0.8)];
-      const c = [(a[0] + b[0]) / 2 + j(1.5), (a[1] + b[1]) / 2 + j(1.2)];
-      return `M${r1(a[0])} ${r1(a[1])}Q${r1(c[0])} ${r1(c[1])} ${r1(b[0])} ${r1(b[1])}`;
-    }).join('');
-    return `<svg class="rd-kryss" viewBox="0 0 24 16" aria-hidden="true"><path d="${d}"/></svg>`;
-  }
-  // rödpennans stjärna: tre streck i kors
-  const STJARNA = '<svg class="rd-stj" viewBox="0 0 12 12" aria-hidden="true"><path d="M6.2 1.1 5.8 10.9M1.5 3.7 10.4 8.4M10.2 3.4 1.8 8.7"/></svg>';
-
-  // Säsongen hittills för id: omgångarna i sasong och den här, om den inte har frysts in än. → html eller ''.
-  function sasongen(sum, id, folk, sasong) {
-    if (!Array.isArray(sasong) || typeof Tippoang.season !== 'function') return '';
-    const nu = { id: sum.id, people: folk.filter((q) => !q.none).map((q) => ({ id: q.id, n: q.n, ok: q.ok, pts: q.pts })) };
-    const forr = sasong.filter((r) => r && String(r.id) !== String(sum.id)).sort((a, b) => String(a.from).localeCompare(String(b.from)));
-    const rundor = [...forr, nu];
-    const s = Tippoang.season(rundor);
-    const jag = s.people.find((q) => q.id === id);
-    if (!jag || jag.rounds < 2) return '';
-    const plats = 1 + s.people.filter((q) => Tippoang.key(q) > Tippoang.key(jag)).length;
-    const mina = rundor.map((r) => {
-      const q = (r.people || []).find((x) => x.id === id);
-      return q && !q.none && q.n ? { pts: q.pts, nu: r === nu } : null;
-    });
-    // en stapel per omgång, uppåt för plus och nedåt för minus, den här omgången överstruken
-    const M = Math.max(1.5, ...mina.filter(Boolean).map((x) => Math.abs(x.pts)));
-    const B = 10;
-    const G = 4;
-    const H = 30;
-    const w = mina.length * (B + G) - G;
-    const staplar = mina.map((x, k) => {
-      if (!x) return '';
-      const h = Math.max(1.4, (Math.abs(x.pts) / M) * (H / 2 - 1));
-      return `${x.nu ? `<rect class="nu" x="${k * (B + G) - 2}" y="0" width="${B + 4}" height="${H}"/>` : ''}<rect x="${k * (B + G)}" y="${r1(x.pts >= 0 ? H / 2 - h : H / 2)}" width="${B}" height="${r1(h)}"/>`;
-    }).join('');
-    const svg = `<svg class="rd-staplar" style="--n:${mina.length}" viewBox="-2 0 ${w + 4} ${H}" preserveAspectRatio="none" aria-hidden="true">${staplar}<path d="M-2 ${H / 2}H${w + 2}"/></svg>`;
-    const label = `Säsongen: ${poang(jag.pts)} poäng på ${jag.rounds} omgångar, plats ${plats} av ${s.people.length}`;
-    return `<div class="rd-sas" role="img" aria-label="${esc(label)}"><small>Säsongen</small>${svg}` +
-      `<span class="rd-f"><span><b>${poang(jag.pts)}</b><em>poäng</em></span></span>${s.people.length > 1 ? `<span class="rd-f"><span><b>${plats}</b><em>av ${s.people.length}</em></span></span>` : ''}</div>`;
-  }
-
-  // sasong: de frysta omgångarna som i data/tippare.json ([{ id, from, people: [{ id, n, ok, pts }] }]) utan dem som
-  // spoilerskyddet döljer, eller null så länge de inte är hämtade. → html, eller '' för den som inte lämnade in.
-  function lapp(sum, id, { sasong = null } = {}) {
+  function saker(sum, id) {
     const folk = gang(sum);
     const p = folk.find((x) => x.id === id);
     const f = sum.folk.find((x) => x.id === id);
-    if (!p || p.none || !f) return '';
+    if (!p || p.none || !f) return [];
     const med = folk.filter((q) => !q.none);
     const ratt = (r, q) => Boolean(r.kol[q] && r.kol[q].ok);
-    const rader = sum.rader.map((r, i) => {
+    const mina = sum.rader.map((r, i) => {
       const c = r.kol[id] || {};
-      const row = f.rows[i] || null;
+      const row = f.rows[i];
+      if (!c.t || !row || row.pts == null) return null;
       const ok = Boolean(c.ok);
-      return { r, t: c.t || '', ok, ensam: ok && med.length > 1 && med.every((q) => q.id === id || !ratt(r, q.id)), prob: row && row.pts != null ? row.prob : null };
-    });
-    const spalt = ({ r, t, ok, ensam }) => {
-      const rutor = SIGNS.map((s) => {
-        const x = t.includes(s);
-        const key = `${sum.id}:${id}:${r.id}:${s}`;
-        return `<i${x ? ` class="x${s === r.tecken ? ' ratt' : ''}"` : ''}>${x && s === r.tecken ? strykning(key) : ''}${x ? kryss(key) : ''}</i>`;
-      }).join('');
-      const titel = `${r.nr}. ${r.h} – ${r.b}${r.mal ? ` ${r.mal}` : ''}${t ? ` · ${t}` : ''}`;
-      return `<span class="rd-kol${ok ? ' ok' : ''}" title="${esc(titel)}"><u>${ensam ? STJARNA : ''}${r.nr}</u>${rutor}<b>${r.tecken}</b></span>`;
-    };
-    const rutor = `<div class="rd-rutor" style="--n:${rader.length}" role="img" aria-label="${esc(`Kupongen: ${p.ok} rätt av ${p.n}`)}">` +
-      `<span class="rd-kol la"><u></u><i>1</i><i>X</i><i>2</i><b>Facit</b></span>${rader.map(spalt).join('')}</div>`;
-    // det som går att räkna
-    const avgjorda = rader.filter((x) => x.t && x.prob != null);
-    const kassa = avgjorda.reduce((a, x) => a + (x.ok ? KASSA / x.prob : 0), 0) - avgjorda.length * KASSA;
-    const falt = (la, v, av = '') => `<span class="rd-f"><small>${la}</small><span><b style="${hand(`${sum.id}:${id}:${la}`, 0.6)}">${v}</b>${av ? `<em>${av}</em>` : ''}</span></span>`;
-    const po = poang(p.pts);
-    const falten = [
-      falt('Rätt', p.ok, `av ${p.n}`),
-      falt('Poäng', p.bast ? `<span class="rb-vann">${po}${RING(70, 30)}</span>` : po),
-      p.av > 1 ? falt('Plats', p.plats, `av ${p.av}`) : '',
-      avgjorda.length ? falt('Spel&shy;kassan', kr(kassa), 'kr') : '',
-      p.spik ? falt('Spikar', p.spikRatt, `av ${p.spik}`) : '',
-      p.halv ? falt('Halv&shy;garderingar', p.halvRatt, `av ${p.halv}`) : '',
-      p.hel ? falt('Hel&shy;garderingar', p.helRatt, `av ${p.hel}`) : '',
-      med.length > 1 ? falt(`Ensam rätt${STJARNA}`, p.ensam) : '',
-    ].join('');
-    // tipset med högst odds som satt, och det med lägst odds som inte satt
-    const satt = avgjorda.filter((x) => x.ok);
-    const fel = avgjorda.filter((x) => !x.ok);
-    const bast = satt.length ? satt.reduce((a, b) => (b.prob < a.prob ? b : a)) : null;
-    const miss = fel.length ? fel.reduce((a, b) => (b.prob > a.prob ? b : a)) : null;
-    const rad = (la, x) => `<p class="rd-rad"><small>${la}</small><span>${esc(`${x.t} i ${x.r.h} – ${x.r.b}`)} <i>${esc(x.r.mal)}</i><em>odds ${odds(x.prob)}</em></span></p>`;
-    return `<div class="rd-lapp" style="--i:${f.ink}">${rutor}<div class="rd-falt">${falten}</div>` +
-      `${bast ? rad('Bästa träffen', bast) : ''}${miss ? rad('Största missen', miss) : ''}${sasongen(sum, id, folk, sasong)}</div>`;
+      return { r, t: c.t, ok, prob: row.prob, spik: c.t.length === 1, ensam: ok && med.length > 1 && med.every((q) => q.id === id || !ratt(r, q.id)) };
+    }).filter(Boolean);
+    const minst = (l, v) => (l.length ? l.reduce((a, b) => (v(b) < v(a) ? b : a)) : null);
+    const ut = [];
+    const skrall = minst(mina.filter((x) => x.ok && x.t.length < 3 && x.prob <= (x.spik ? 0.4 : 0.55)), (x) => x.prob);
+    if (skrall) ut.push({ ...skrall, typ: 'skrall', vikt: 1 - skrall.prob + (skrall.ensam ? 0.3 : 0) });
+    const miss = minst(mina.filter((x) => !x.ok && x.prob >= 0.6), (x) => -x.prob);
+    if (miss) ut.push({ ...miss, typ: 'miss', vikt: miss.prob + (miss.spik ? 0.1 : 0) });
+    const ensam = mina.filter((x) => x.ensam && x.t.length < 3 && x !== skrall);
+    if (ensam.length === 1) ut.push({ ...ensam[0], typ: 'ensam', vikt: 0.5 + (1 - ensam[0].prob) * 0.3 });
+    else if (ensam.length > 1) ut.push({ typ: 'ensam', vikt: 0.55 + 0.1 * ensam.length, antal: p.ensam });
+    const chans = (x) => (Array.isArray(x.r.pr) && x.r.res != null ? x.r.pr[x.r.res] / 100 : 1);
+    const raddad = minst(mina.filter((x) => x.t.length === 3 && chans(x) <= 0.2), chans);
+    if (raddad) ut.push({ ...raddad, typ: 'raddad', vikt: 0.75 - chans(raddad), chans: chans(raddad) });
+    const spikar = mina.filter((x) => x.spik);
+    const satt = spikar.filter((x) => x.ok).length;
+    if (spikar.length >= 3 && satt === spikar.length) ut.push({ typ: 'spikar', vikt: 0.85, alla: true });
+    else if (spikar.length >= 2 && !satt) ut.push({ typ: 'spikar', vikt: 0.85, alla: false });
+    else if (spikar.length >= 3 && satt === 1) ut.push({ typ: 'spikar', vikt: 0.65, alla: false });
+    else ut.push({ typ: 'spik', vikt: 0.3 });
+    const vantat = Math.round(p.ok - p.pts);
+    if (Math.abs(p.pts) >= 1.5 && vantat !== p.ok && vantat >= 2 && vantat < TAL.length) ut.push({ typ: 'datorn', vikt: 0.35 + 0.15 * Math.abs(p.pts), vantat, fler: p.ok > vantat });
+    return ut.sort((a, b) => b.vikt - a.vikt);
   }
 
   // ---------- blocket ----------
@@ -555,7 +488,7 @@
   // spalter i samma ordning – kupongen, var och en i gänget och Hasse – och sedan datorns tecken (det troligaste
   // före avspark, som Modellen i Olympen) och tipset i analysen när det finns. Varje tips med datorns chans för
   // tecknet före avspark, poängen (samma regel som raden Poäng, tippoang.js) och spelkassan (10 kr till datorns
-  // odds, som i Olympen och på lappen under domen). Ensam rätt: ingen annan i gänget hade rätt.
+  // odds, som i Olympen). Ensam rätt: ingen annan i gänget hade rätt.
   // i: radens nummer från 0. analysen: tecknen i analysens tips ('1X'), skrivna före avspark, eller ''.
   // → { r, pr, tips: [{ id, namn, t, ok, fel, prob, schablon, pts, kassa, ensam, jmf }], ratt, av } eller null.
   function match(sum, i, { analysen = '' } = {}) {
@@ -622,5 +555,5 @@
     return T.mest(bast.p.namn, bast.sign, bast.r.h, bast.r.b, Math.round((1 - bast.pts) * 100), poang(bast.pts).replace('+', ''));
   }
 
-  return { rakna, fryst, lappar, mandagEfter, bygg, gang, lapp, poang, kr, RING, strykning, html, match, portratt, exempel, betyg, TEXT };
+  return { rakna, fryst, lappar, mandagEfter, bygg, gang, saker, poang, kr, RING, strykning, html, match, portratt, exempel, betyg, TEXT };
 });

@@ -2315,6 +2315,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const kvar = rows.map((x) => Date.parse(x.m.kickoff)).filter((k) => k > t);
     const avspark = q.has('rum-stopp') ? h : kvar.length ? (Math.min(...kvar) - t) / 3600000 : null;
     R.lage = { tv, nag, avspark };
+    // och då lyser text-tv:n fullt på 377 också på håll (rum-tv.js)
+    if (R.tv) R.tv.tittar(tv);
     // uret visar dagarna och de sista tolv timmarna till spelstoppet
     // (rum-inredning.js); ?rum-stopp räknas från urets tid
     R.stopp = rd && !rd.next && first ? (q.has('rum-stopp') ? (window.Vader ? Vader.nu().t : t) + h * 3600000 : first) : null;
