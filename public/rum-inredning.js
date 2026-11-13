@@ -49,7 +49,7 @@ const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // som fönstret (i bakväggens bild)
 const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
 // bladet med radions stationer på väggen till höger om radion (radiolapp): i remsan mellan fönsterkarmen
-// (x 958) och veckans löpsedel (x 986, LOPPLATS i rum-affischer.js), så brett som remsan medger, och en bit
+// (x 958) och x 986, där veckans löpsedel satt till 2026-11-13, så brett som remsan medger, och en bit
 // ovanför fönsterbänken (y 554), så att det sitter på en enda yta och inte når ned till bänken. Bredden är
 // given, så bladet är högt: där får raderna plats med en handstil som syns nära radion (radiolapp)
 const LAPP = { x: 959.5, y: 503, w: 25.5, h: 45 };
@@ -146,7 +146,7 @@ export async function inredning(el, opt = {}) {
     const canvas = document.createElement('canvas');
     // neonen glappar som förut (rum-neon, .av i rum.css)
     canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}${BITAR[namn].cls ? ` ${BITAR[namn].cls}` : ''}`;
-    // (vilken sak: löpsedeln läggs under disken, rum-affischer.js)
+    // (vilken sak, för den som letar i sidan)
     canvas.dataset.bit = namn;
     // (neonens sken ritas i duken, utanför rören: medSken)
     const M = namn === 'neon' ? SKEN_M : 0;
@@ -852,8 +852,8 @@ export async function inredning(el, opt = {}) {
       x.rotation.x = 90 * DEG;
       x.position.y = y;
     };
-    // (den innersta är inskjuten ända in under skivan, så att sitsen går fri från
-    // löpsedeln på väggen, LOPPLATS i rum-affischer.js: den börjar vid x 1063 i bakväggens bild)
+    // (den innersta är inskjuten ända in under skivan, så att sitsen gick fri från
+    // löpsedeln som satt på väggen till 2026-11-13: den börjar vid x 1063 i bakväggens bild)
     for (const [z, vrid, inne] of [[120, 8, 24], [250, -14, 0], [380, 21, 0]]) {
       const stol = new THREE.Group();
       stol.position.set(D.kant - 18 + inne, SITS - 2 * k, z);
