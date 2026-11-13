@@ -1406,7 +1406,7 @@ window.Rum = (() => {
 ${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d rum-pl-vhs')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
-${plane(-330, `${sill()}${haze()}<div class="rum-du" id="rum-du" hidden aria-hidden="true"></div>`)}
+${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}`, 1.05)}
 ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div></div>
@@ -2242,7 +2242,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // videon: förra omgången och nästa ur rd och kupongerna som har spelats
     if (R.video) R.video.fill((state.all && state.all.matches) || [], { rd, old: [...(R.old || []), ...(typeof allCoupons === 'function' ? allCoupons() : [])] });
     const p = pult(rd);
-    markera();
     summera(rd, p, t);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
@@ -2716,10 +2715,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const gang = () => {
       const [vx, vy] = synlig();
-      if (R.fig && syns(R.gang)) {
-        R.fig.draw(t, vx, vy, on);
-        duFlytta();
-      }
+      if (R.fig && syns(R.gang)) R.fig.draw(t, vx, vy, on);
     };
     const saker = () => {
       const [vx, vy] = synlig();
@@ -5251,43 +5247,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   //
   // När rummet öppnas är ingen i gänget vald (Samtal.pult.du() i samtal.js): du kan gå omkring och titta, men inte
   // fylla i kupongen, och Hasse vet inte vem du är. Klickar du på någon vid bordet (rum-folk.js), väljer namnet
-  // på kupongen eller säger det till Hasse är du hen, tills sidan laddas om: figuren har en lapp ovanför huvudet
-  // med namnet i hens handstil och bläck, som på kupongen, och den följer med när hen rör sig (topp i rum-3d.js).
+  // på kupongen eller säger det till Hasse är du hen, tills sidan laddas om.
   const duNu = () => (window.Samtal && Samtal.pult && Samtal.pult.du ? Samtal.pult.du() : null);
-  function markera() {
-    const el = document.getElementById('rum-du');
-    if (!el) return;
-    const v = duNu();
-    if (v === R.du) return;
-    R.du = v;
-    const gang = (typeof KP !== 'undefined' && KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
-    const i = gang.findIndex((g) => g.id === v);
-    el.hidden = i < 0;
-    if (i < 0) return;
-    el.className = `rum-du sm-k${i}`;
-    el.innerHTML = `<span class="rum-du-in">${esc(Tippoang.kallas(gang[i]))}</span>`;
-    duFlytta();
-    // (lappen faller ner över huvudet och gungar till)
-    if (!calm()) {
-      el.firstElementChild.animate([
-        { offset: 0, opacity: 0, transform: 'translate(-50%, calc(-100% - 46px)) rotate(-14deg)' },
-        { offset: 0.55, opacity: 1, transform: 'translate(-50%, calc(-100% - 2px)) rotate(3deg)', easing: 'ease-out' },
-        { offset: 1, opacity: 1, transform: 'translate(-50%, calc(-100% - 8px)) rotate(-4deg)' },
-      ], { duration: 520, easing: 'cubic-bezier(0.3, 0, 0.6, 1)' });
-    }
-  }
-  // Lappen där huvudet är, när gänget just har ritats (frame), i dukens plan: den följer med när rummet vrids.
-  function duFlytta() {
-    const el = document.getElementById('rum-du');
-    const c = document.getElementById('rum-3d');
-    if (!el || el.hidden || !c || !R.fig || !R.fig.topp) return;
-    const pt = R.fig.topp(R.du);
-    const t = pt ? `translate(${r1(c.offsetLeft + pt[0] * c.offsetWidth)}px, ${r1(c.offsetTop + pt[1] * c.offsetHeight)}px)` : null;
-    if (t === el.var) return;
-    el.var = t;
-    el.style.visibility = t ? '' : 'hidden';
-    if (t) el.style.transform = t;
-  }
   // Ett kryss, en motivering eller gängets tecken innan du har sagt vem du är: namnen på kupongen lyser (Vem är
   // du?), eller – där de inte går att välja – raden säger var du väljer dig.
   function vemForst(k) {
@@ -5982,7 +5943,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return;
     }
     if (!Samtal.pult.vem(b.dataset.vem)) return;
-    markera();
     // (den du valde har redan lämnat in, här: kupongen att fylla i läggs ner, och hens ligger i högen)
     if (pult() && pult().inne) {
       k.msg.textContent = '';

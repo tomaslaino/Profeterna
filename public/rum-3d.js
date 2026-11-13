@@ -128,7 +128,7 @@
 // senast(lage), uttryck(),
 // prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t), spegel(vem | null, nx, ny, t),
 // hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappVand(vem, ner, t), lappProva(vem, hållning, gör, at), natt(på, t), somn(på, t),
-// vakna(vem, t, sätt), efter({ lage, krona }), under(nx, ny), huvud(vem), topp(vem) }: neon säger om
+// vakna(vem, t, sätt), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
@@ -151,8 +151,7 @@
 // krona = oraklen, 'dl' …), under vem i gänget (eller 'radio') som syns i punkten
 // och kval({ pr, skugga, detalj }) hur fint gänget ritas (KVAL i rum.js; detalj
 // också från början)
-// (nx, ny, −1…1 i duken) eller null, huvud var vems huvud är och topp var i duken
-// lappen ovanför vems huvud sitter (0–1).
+// (nx, ny, −1…1 i duken) eller null och huvud var vems huvud är.
 import * as THREE from 'three';
 import { utanSkuggor } from './rum-gpu.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -8020,36 +8019,6 @@ export async function figurer(canvas, opt = {}) {
     const o = figs.find((f) => f.F.key === String(vem).toLowerCase());
     return o ? headIn(o).toArray() : null;
   }
-  // Rakt ovanför huvudet på vem, där lappen sitter på den du har valt att vara (markera i rum.js): punkten i
-  // duken, 0–1 från vänster och uppifrån, som gänget just ritades. Huvudets höjd med det som sitter på det
-  // (håret, mössan och tofsen, högtidens bonad) räknas i huvudets egna axlar en gång, och igen när något läggs
-  // på eller tas av; lappen står sedan så högt över huvudets mitt, också när hen lutar sig eller sover på bordet.
-  // → [x, y], eller null om hen inte finns eller går iväg.
-  const toppV = new THREE.Vector3();
-  const toppBox = new THREE.Box3();
-  const toppInv = new THREE.Matrix4();
-  const toppM = new THREE.Matrix4();
-  function topp(vem) {
-    const o = figs.find((f) => f.F.key === String(vem).toLowerCase());
-    if (!o || (o.st && o.st.w > 0.2)) return null;
-    const n = o.hc.children.length;
-    if (!o.topp || o.topp.n !== n) {
-      o.hc.updateMatrixWorld(true);
-      toppInv.copy(o.hc.matrixWorld).invert();
-      let y = o.F.head.ry;
-      o.hc.traverse((x) => {
-        if (!x.isMesh || !x.geometry) return;
-        if (!x.geometry.boundingBox) x.geometry.computeBoundingBox();
-        toppBox.copy(x.geometry.boundingBox).applyMatrix4(toppM.multiplyMatrices(toppInv, x.matrixWorld));
-        y = Math.max(y, toppBox.max.y);
-      });
-      o.topp = { n, y };
-    }
-    toppV.setFromMatrixPosition(o.hc.matrixWorld);
-    toppV.y += o.topp.y;
-    toppV.project(cam);
-    return [(toppV.x + 1) / 2, (1 - toppV.y) / 2];
-  }
 
   if (opt.enkel) enkelMaterial(scene);
   // Grafikprogrammen byggs i bakgrunden innan gänget ritas första gången: annars
@@ -8059,5 +8028,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, topp, kval };
+  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }

@@ -29,8 +29,7 @@
 // hang loose, tummen upp och så vidare, ett nytt varje gång. När rummet öppnas är
 // ingen vald – du är ingen och kan bara titta (Samtal.pult.du()). Ett klick på
 // någon som inte har lämnat in gör dig till hen (valj, samma val som namnen på
-// kupongen, Samtal.pult.vem): figuren är markerad med en lapp med namnet
-// (markera i rum.js), namnet skrivs för hand på kupongen på pulten (Rum.skriv)
+// kupongen, Samtal.pult.vem): namnet skrivs för hand på kupongen på pulten (Rum.skriv)
 // och figuren skriver på sin kupong (vald i rum-3d.js). Sedan kan du fylla i
 // kupongen och Hasse vet vem du är. Det går också med den enheten minns, som
 // kanske redan har lämnat in, och med vem som helst när allas tips visas
