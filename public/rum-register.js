@@ -21,8 +21,9 @@
 //              sämre är svagt (SKILJER)
 //   REGISTRET  lagen och spelarna (fliken hette LAGEN till 2026-11-13; i
 //              koden heter den fortfarande lagen). Underraden säger vad och
-//              var: LAG eller SPELARE, och divisionen. LAG är divisionens lag,
-//              de i omgången ljusa; SPELARE är divisionens spelare från A
+//              var: LAG eller SPELARE, och divisionen. LAG är divisionens lag
+//              (inget lag markeras för att det står i kupongen, sedan
+//              2026-11-13); SPELARE är divisionens spelare från A
 //              till Ö med plats, lag, speltid och mål. Ett lag öppnar
 //              lagkortet med truppen (speltid, mål, de
 //              skadade), och en spelare spelarkortet: läget, speltiden, mål
@@ -631,8 +632,7 @@ window.RumRegister = (() => {
         ...REG.flatMap((x, k) => [[hela ? up(REGNAMN[x]) : REGK[x], x === d ? 'i' : '', x === d ? null : `#${x === 'nl' ? 'div' : typ}:${x}`], [k < REG.length - 1 ? '   ' : '', '']]),
       );
     }
-    // en division: lagen i bokstavsordning (två spalter på datorn), lagen i
-    // omgången ljusa
+    // en division: lagen i bokstavsordning (två spalter på datorn)
     function lagen(div, R) {
       const d = REG.includes(div) ? div : standardDiv();
       if (d === 'nl') return landslagen(R);
@@ -652,7 +652,7 @@ window.RumRegister = (() => {
           const t = l[x * h + y];
           if (!t) continue;
           const namn = up(t.name).slice(0, w - 2);
-          b.push([namn, iOmgangen(t.name) ? 'v' : '', `#lag:${t.name}`], [pad('', w - namn.length), '']);
+          b.push([namn, '', `#lag:${t.name}`], [pad('', w - namn.length), '']);
         }
         r.push(rad(...b));
       }
@@ -662,9 +662,9 @@ window.RumRegister = (() => {
     // ---------- landslagen ----------
 
     // Nations Leagues grupper med tabellen: plats, lag, spelade, V O F när
-    // raden ryms, målskillnad och poäng. Grupperna med lag i kupongen står
-    // först (I KUPONGEN, med lagen ljusa), sedan de andra (A1–D2). Två spalter
-    // när raden ryms, annars en. Ett lag öppnar lagkortet.
+    // raden ryms, målskillnad och poäng. Alla grupperna i ordning (A1–D2),
+    // utan någon särskild del eller markering för lagen i kupongen. Två
+    // spalter när raden ryms, annars en. Ett lag öppnar lagkortet.
     function landslagen(R) {
       R.sido = [`#div:${REG[REG.length - 2]}`, null];
       R.slojas = true;
@@ -674,7 +674,6 @@ window.RumRegister = (() => {
       if (!A.land) return [...r, prickar('HÄMTAR', '')];
       const G = A.land.grupper;
       if (!G.length) return [...r, rad('OKÄNT')];
-      const iOmg = new Set(omgLag());
       const k = A.bred >= 60 ? 2 : 1;
       const cw = k === 2 ? Math.floor((A.bred - 3) / 2) : A.bred;
       const vof = cw - 23 >= 12;
@@ -683,26 +682,19 @@ window.RumRegister = (() => {
       // ett block per grupp: rubriken och lagen, alla lika höga
       const H = Math.max(...G.map((g) => g.lag.length));
       const block = (g) => {
-        const lys = g.lag.some((t) => iOmg.has(t.lag));
-        const b = [[[pad(`GRUPP ${g.id}`, 2 + N + 1), lys ? 'v' : 'd'], [`${padL('S', 2)}${vof ? `${padL('V', 3)}${padL('O', 3)}${padL('F', 3)}` : ''}${padL('+/-', 5)}${padL('P', 4)}`, 'd']]];
+        const b = [[[pad(`GRUPP ${g.id}`, 2 + N + 1), 'd'],[`${padL('S', 2)}${vof ? `${padL('V', 3)}${padL('O', 3)}${padL('F', 3)}` : ''}${padL('+/-', 5)}${padL('P', 4)}`, 'd']]];
         for (const t of g.lag) {
           const namn = (up(t.lag).length > N && LANDKORT[t.lag] ? up(LANDKORT[t.lag]) : up(t.lag)).slice(0, N);
           const tal = `${padL(svar(t.played), 2)}${vof ? `${padL(svar(t.won), 3)}${padL(svar(t.drawn), 3)}${padL(svar(t.lost), 3)}` : ''}${padL(svar(S.veil ? '?' : t.gd > 0 ? `+${t.gd}` : t.gd < 0 ? `−${-t.gd}` : '0'), 5)}${padL(svar(t.points), 4)}`;
-          b.push([[`${svar(t.rank)} `, 'd'], [namn, iOmg.has(t.lag) ? 'v' : '', `#lag:${t.lag}`], [pad('', N + 1 - namn.length), ''], [tal, '']]);
+          b.push([[`${svar(t.rank)} `, 'd'], [namn, '', `#lag:${t.lag}`], [pad('', N + 1 - namn.length), ''], [tal, '']]);
         }
         while (b.length < H + 1) b.push([[pad('', cw), '']]);
         return b;
       };
-      const iKup = G.filter((g) => g.lag.some((t) => iOmg.has(t.lag)));
-      const andra = G.filter((g) => !iKup.includes(g));
-      for (const [rubrik, gs] of [['I KUPONGEN', iKup], [iKup.length ? 'DE ANDRA GRUPPERNA' : '', andra]]) {
-        if (!gs.length) continue;
-        if (rubrik) r.push(tom(), rad([rubrik, 'd']));
-        for (let i = 0; i < gs.length; i += k) {
-          const bl = gs.slice(i, i + k).map(block);
-          r.push(tom());
-          for (let y = 0; y < H + 1; y++) r.push(rad(...bl.flatMap((b, x) => (x ? [['   ', ''], ...b[y]] : b[y]))));
-        }
+      for (let i = 0; i < G.length; i += k) {
+        const bl = G.slice(i, i + k).map(block);
+        r.push(tom());
+        for (let y = 0; y < H + 1; y++) r.push(rad(...bl.flatMap((b, x) => (x ? [['   ', ''], ...b[y]] : b[y]))));
       }
       return r;
     }
