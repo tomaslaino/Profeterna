@@ -983,10 +983,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       // leendet: mungiporna ut och upp, mer i själva mungipan än mitt på läpparna, så att munnen böjer sig
       // uppåt i stället för att hela munnen lyfts; kinderna lyfts och rundas, och de trycker upp huden under
       // ögonen, så att leendet når dit (förut 10 ut och 15 upp med en bred kulle och kinderna 9 upp, och
-      // munnen låg nästan rak). vink: han blinkar med sitt högra öga (fotots vänstra), och den sidans
-      // mungipa och kind går upp mer.
-      q += le * vec2(11., 19.) * g(q, vec2(611., 506.), vec2(34., 30.)) + vink * vec2(4., 9.) * g(q, vec2(611., 506.), vec2(36.));
-      q += le * vec2(-11., 19.) * g(q, vec2(713., 506.), vec2(34., 30.));
+      // munnen låg nästan rak). Mungiporna går lika mycket ut som upp, i en bred kulle, och mindre upp när
+      // munnen öppnas: med 19 upp i en smal kulle fick mungiporna krokar och det öppna skrattet blev en
+      // uppåtböjd skåra, som i en skräckfilm (ändrat 2026-11-13). vink: han blinkar med sitt högra öga
+      // (fotots vänstra), och den sidans mungipa och kind går upp mer.
+      float upp = le * (13. - 5. * munn);
+      q += vec2(le * 12., upp) * g(q, vec2(609., 507.), vec2(46., 38.)) + vink * vec2(4., 9.) * g(q, vec2(611., 506.), vec2(36.));
+      q += vec2(le * -12., upp) * g(q, vec2(715., 507.), vec2(46., 38.));
       for (int i = 0; i < 2; i++) {
         vec2 kc = vec2(586. + float(i) * 152., 452.);
         float gk = g(q, kc, vec2(44.));
@@ -1000,25 +1003,30 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       q.y += bryn.y * 10. * g(q, vec2(727., 358.), vec2(66., 24.)) * grind;
       q = oga(q, vec2(608.5, 391.), 24., max(blund, vink), max(kis, vink * .6), blick, frans);
       q = oga(q, vec2(717., 392.), 24., blund, kis, blick, frans);
-      // munnen: en lins mellan läpparna; underläppen och hakan följer med ned
+      // munnen: en lins mellan läpparna; underläppen och hakan följer med ned. När munnen är öppen är
+      // överläppen nästan rak längs tänderna och underläppen rundad nedåt, så att öppningen inte blir en
+      // springa med spetsiga ändar; den slutar en bit innanför mungiporna.
       const vec2 MC = vec2(662., 508.5);
-      float W = 50. + le * 12. - rund * 16.;
+      float W = 47. + le * 8. - rund * 16.;
       dx = q.x - MC.x;
       xn = dx / W;
       float prm = max(0., 1. - xn * xn);
       A = munn * (31. + rund * 5.);
-      float a = A * pow(prm, .78);
-      uU = a * .27; uL = a * .73;
-      float y0 = MC.y - le * (11. - 4. * munn) * xn * xn;
+      float vid = smoothstep(.3, .7, munn);
+      uU = A * pow(prm, mix(.78, .45, vid)) * .29; uL = A * pow(prm, mix(.78, 1.1, vid)) * .71;
+      float y0 = MC.y - le * (6. - 4. * munn) * xn * xn;
       float d = q.y - y0;
-      inre = smoothstep(-1., .4, d + uU) * (1. - smoothstep(-.4, 1., d - uL)) * smoothstep(.2, .8, A) * (1. - smoothstep(.96, 1., abs(xn)));
+      inre = smoothstep(-1., .4, d + uU) * (1. - smoothstep(-.4, 1., d - uL)) * smoothstep(.2, .8, A) * (1. - smoothstep(.86, .99, abs(xn)));
       n01 = clamp((d + uU) / max(.1, uU + uL), 0., 1.);
       lipp = exp(-pow(min(abs(d + uU), abs(d - uL)) / 3., 2.)) * smoothstep(.5, 3., A) * (1. - smoothstep(.9, 1.2, abs(xn)));
-      if (d < -uU) { float t = clamp((-d - uU) / 26., 0., 1.); q.y += uU * (1. - t) * (1. - t); }
+      // (när munnen är öppen hoppar läpparna över fotots mörka skåra mellan dem, annars får öppningen en
+      // svart kant)
+      float kk = 2.5 * smoothstep(.5, 4., A) * (1. - smoothstep(.9, 1., abs(xn)));
+      if (d < -uU) { float t = clamp((-d - uU) / 26., 0., 1.); q.y += (uU - kk) * (1. - t) * (1. - t); }
       else if (d > uL) {
         float ty = d - uL;
         float J = A * .73 * (1. - smoothstep(58., 135., abs(dx)));
-        float sh = mix(uL, J, smoothstep(0., 26., ty)) * (1. - smoothstep(92., 170., ty));
+        float sh = mix(uL - kk, J, smoothstep(0., 26., ty)) * (1. - smoothstep(92., 170., ty));
         q.y -= sh;
       }
       }
@@ -1035,8 +1043,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       if (inre > .001) {
         float h = uU + uL;
         float ax = abs(dx);
-        vec3 m = mix(vec3(.25, .08, .07), vec3(.05, .012, .012), smoothstep(.12, .95, n01));
-        m *= mix(1., .55, pow(abs(xn), 2.2));
+        vec3 m = mix(vec3(.3, .1, .09), vec3(.16, .05, .045), smoothstep(.12, .95, n01));
+        m *= mix(1., .75, pow(abs(xn), 2.2));
         float tungan = exp(-pow(xn / .58, 2.) - pow((n01 - 1.) / .4, 2.)) * smoothstep(12., 26., h);
         m = mix(m, vec3(.48, .19, .18) * (.7 + .3 * smoothstep(.6, 1., n01)), tungan * .85);
         // tänderna: [0, 1) över varje tand, framtänderna 10 bildpunkter breda och smalare utåt
@@ -1045,12 +1053,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         float mitt = 1. - (2. * f - 1.) * (2. * f - 1.);
         float tb = min(15. / max(h, 1.), .6);
         float tk = .07 * le * smoothstep(10., 24., h);
-        float ny = n01 - .1 * xn * xn;
+        float ny = n01 - .03 * xn * xn;
         float egg = tk + tb * (1. - .07 * floor(tu)) + .035 * mitt;
-        float tand = smoothstep(tk - .03, tk + .02, ny) * (1. - smoothstep(egg - .035, egg + .02, ny)) * (1. - smoothstep(.8, .97, abs(xn)));
+        float tand = smoothstep(tk - .12, tk - .02, ny) * (1. - smoothstep(egg - .035, egg + .02, ny)) * (1. - smoothstep(.86, 1., abs(xn)));
         float glipa = min(f, 1. - f);
         vec3 tc = vec3(.9, .865, .78) * (.74 + .26 * smoothstep(0., .45, glipa)) * (1. - .22 * exp(-glipa * glipa / .003));
-        tc *= mix(1., .36, pow(abs(xn), 1.6));
+        tc *= mix(1., .55, pow(abs(xn), 1.6));
         tc *= .8 + .2 * smoothstep(tk, tk + .3, ny);
         tc = mix(tc, tc * vec3(.84, .87, .92), smoothstep(egg - .14, egg, ny) * .7);
         m = mix(m, tc, tand * smoothstep(3., 9., h));
@@ -1058,12 +1066,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         float tkott = (1. - smoothstep(tk - .03, tk + .01, ny)) * smoothstep(.002, .02, tk);
         m = mix(m, vec3(.58, .27, .26) * mix(1., .5, pow(abs(xn), 1.6)), tkott);
         // de nedre tänderna: bara kanten, bakom underläppen när munnen är vidöppen
-        float ned = smoothstep(.87, .93, n01 + .1 * xn * xn) * smoothstep(22., 34., h) * (1. - smoothstep(.25, .5, abs(xn)));
+        float ned = smoothstep(1. - 7. / max(h, 1.), 1. - 4. / max(h, 1.), n01 + .1 * xn * xn) * smoothstep(8., 18., h) * (1. - smoothstep(.45, .75, abs(xn)));
         m = mix(m, vec3(.66, .62, .55) * (.75 + .25 * smoothstep(0., .4, min(fract(ax / 7.5), 1. - fract(ax / 7.5)))), ned * .6);
         c.rgb = mix(c.rgb, m * c.a, inre);
       }
       // läpparna: rödare och skuggade närmast öppningen
-      c.rgb *= mix(vec3(1.), vec3(.74, .5, .47), lipp * (1. - inre));
+      c.rgb *= mix(vec3(1.), vec3(.9, .74, .7), lipp * (1. - inre));
       c.rgb *= 1. - .62 * frans;
       // vecken från näsan till mungiporna när han ler
       if (ansikte && le > .01) {
@@ -5172,21 +5180,21 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     U.bryn.value.set(kan('brynX') + lyft - vink * 0.5, kan('brynY') + lyft);
     // (nöjd, utom när brynen dras ned)
     const allvar = clamp(-(d('brynX') + d('brynY')) * 0.7);
-    U.le.value = Math.max((NOJD + NOJD_TAL * talar) * (1 - allvar) * (1 - d('stel')), skratt, 0.85 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
+    U.le.value = Math.max((NOJD + NOJD_TAL * talar) * (1 - allvar) * (1 - d('stel')), skratt * 0.85, 0.85 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
     // talet: stavelser med små pauser, ibland rundare läppar; läpparna skiljs åt hela tiden han pratar och
     // öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
     const stav = Math.abs(Math.sin(n * 7.3)) * (0.42 + 0.58 * ss(-0.35, 0.5, Math.sin(n * 2.3 + 0.7))) * (0.72 + 0.28 * Math.sin(n * 17.3));
     const talMun = (mun === null ? talar : mun) * (1 - dricker) * (1 - Math.max(iMun, blaser));
     // läpparna om cigarren, en pust mellan blossen och ett o när han blåser ut
     const puff = cc ? spar(cc.pust, t) : 0;
-    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.8 + 0.12 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
+    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.44 + 0.08 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
     U.rund.value = talMun * Math.max(0, Math.sin(n * 3.1 + 1.3)) * 0.8;
-    U.kis.value = Math.max(skratt * 0.85, U.le.value * 0.5, d('kis'));
+    U.kis.value = Math.max(skratt * 0.7, U.le.value * 0.5, d('kis'));
     // blinkningarna och blicken som flyttar sig lite (blinkar, sakkader)
     const bl = blinkar(n);
     const sk = sakkader(n);
     U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser, d('rund'));
-    U.blund.value = Math.max(dricker * 0.82, skratt * 0.5, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
+    U.blund.value = Math.max(dricker * 0.82, skratt * 0.3, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
     U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], d('blickY') + sk[1]);
     sa.copy(SA);
     sa.y += axV;

@@ -1458,6 +1458,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   nio andra småsaker som lottas: tittar mot gänget och längs baren, på notan och kaffet, nickar för sig
   själv, suckar, sträcker på nacken, höjer ett ögonbryn och skrockar. Se [Hasse Backe](#hasse-backe),
   *Vilan*.
+- **Hasse Backe utan skräckfilmsflin (2026-11-13, användarens önskemål):** "Han ser ut som någon i en
+  skräckfilm." I skrattet blev munnen en tunn, uppåtböjd skåra med krokar i mungiporna, tänderna ett band
+  med en svart glipa under och en svart kant runt om, och ögonen kisade snett. Nu går mungiporna lika
+  mycket ut som upp och mindre upp när munnen öppnas, öppningen är mindre och rundad nedtill,
+  läpparna hoppar över fotots mörka skåra (därifrån kom den svarta kanten), munhålan är mörkröd med de
+  nedre tändernas kant och skrattet kisar mindre. Se [Hasse Backe](#hasse-backe), *Minen*.
 - **Hasse Backe nöjdare (2026-11-13, användarens önskemål):** "han får gärna se nöjdare ut. ordna det på
   olika sätt". Leendet når nu hela ansiktet: munnen böjer sig uppåt, kinderna lyfts och blir lite varmare,
   ögonen kisar med och skrattrynkor syns i ögonvrårna. Han ler lite mer när han pratar, skrattet har
@@ -7332,6 +7338,15 @@ hörn när leendet är brett, och kinderna blir lite varmare i färgen. När han
 igen, och munnen är inte fullt så vidöppen. Förut låg munnen nästan rak med bara mungiporna lite uppåt,
 ögonen rörde sig knappt, och i skrattet blev munnen en bred, rak tandrad: det såg ansträngt ut snarare
 än nöjt (ändrat 2026-11-13).
+
+Samma dag blev skrattet ett skräckfilmsflin: mungiporna drogs 19 bildpunkter upp i en smal kulle, så
+att den öppna munnen blev en uppåtböjd skåra med krokar, och läpparna visade fotots mörka skåra mellan
+läpparna som en svart kant runt öppningen. Nu går mungiporna lika mycket ut som upp (och mindre när
+munnen öppnas), skrattet öppnar munnen ungefär halvt så mycket, öppningen är rak upptill och rundad
+nedtill och slutar innanför mungiporna, läpparna hoppar över skåran när munnen är öppen, munhålan är
+mörkröd i stället för nästan svart och de nedre tändernas kant syns. I skrattet kisar han mindre
+(0,7 och blund 0,3). Jämför alltid ansiktet i skrattet (T 3,5), skålen (T 155,8) och talet innan
+leendet ändras.
 
 **Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
 aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
