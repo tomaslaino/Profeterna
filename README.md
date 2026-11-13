@@ -1583,7 +1583,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   står i bläck (den som leder mörkare) i stället för i lagens färger, bytenas pilar är svarta, och analysens ringar är samma
   blå penna som raden i marginalen – de var röda, eftersom protokollets röda penna (`.rb-ring path` i rum-block.css) tog över
   också i matchbladet före matchen. Samma dag, på användarens önskemål: "ta bort den röda stjärnan också" – rödpennans
-  stjärna för ensam rätt står inte längre i *Rättningen* (på lappen under domen finns den kvar).
+  stjärna för ensam rätt står inte längre i *Rättningen* (den fanns kvar på lappen under domen, som togs bort 2026-11-13).
 - **Analysen i matchbladet går att läsa (2026-11-10, användarens önskemål):** "det blev av någon anledning lite svårt
   att läsa det här. Kan du ordna", och "Det handlar inte om svenskan/språket i sig utan om annat". Sedan allt papper kom på
   skrivmaskin (2026-11-08) stod analysen i samma typsnitt som lagen och tiderna, där varje bokstav hoppar, lutar och slår
@@ -1611,6 +1611,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ordning (inte bäst först, så att var och en står på samma plats varje omgång och listan inte avslöjar något), och under
   domen ligger en lapp ur protokollet med kupongen rad för rad och siffrorna. Se [Hasse Backe](#hasse-backe), *Domarna
   efter omgången*.
+- **Hasse säger vad som sticker ut, och lappen är borta (2026-11-13, användarens önskemål):** "kan du ordna så att han
+  bara kommenterar ens kupong och att man inte ser kupongen här. Han får gärna ta något/några saker som sticker ut från
+  kupongen och kommentera det. Ta bara det viktigaste så att det inte blir mycket och chatigt. Det ska alltså vara lite mer
+  text än vad han säger nu. Ordna det på ett snyggt sätt!", och sedan "Svenskan är ju inte precis toppen. Vet inte om du
+  kan ordna så att han får en bättre svenska - som är bra, undviker swenglish, är hassebacke-aktig och intressant!" Lappen
+  under domen är borta. Han tar i stället upp de två viktigaste sakerna på kupongen – en skräll som satt, en favorit som
+  sprack, en match där ingen annan hade rätt, spikarna, en helgardering som räddade en rätt eller datorns väntade antal rätt
+  – och säger vad han tycker om var och en, i var sitt stycke. Alla domrader är omskrivna med riktiga tipsord (*spiken
+  sprack*, *halvgarderingen höll inte*) och hans torra självsäkerhet (*Sådant händer när favoriterna inte har läst på.*).
+  Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -7311,32 +7321,33 @@ eller, om du hellre lyssnar på de andra, *Jag har synpunkter på din kupong ock
 tre rader, och de tre raderna finns från början, så att gänget inte flyttar sig när han säger något annat medan han
 väntar; i låga telefoner är porträtten mindre, så att allt ryms ovanför foten också i 375 × 667. Gänget står sida vid sida i sin ordning, som på kupongen: stora
 porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
-Den man väljer får sin dom slagen i disken i guld, som domen över en match, och under den några meningar: en inledning
-efter hur det gick i gänget, en eller två saker ur kupongen och ett slut (`doma`). Ordet i guld beskriver personen och
-läget, och han har ett tiotal för varje läge (*Osynlig*, *Lagom* och *Bortglömd* i mitten, *Turlig* och *Mallig* för den
-som vann, *Generös* och *Blåögd* för den som kom sist). Han väljer efter omgången och personen, så att det är samma ord i
-disken och i listan och på alla enheter (`domord` i rum-hasse-repliker.js, `domOrd` i rum-hasse.js; förut ett ord per läge,
-2026-11-13). Orden har högst nio bokstäver, så att stämpeln under namnet ryms i den smalaste telefonen, och inget ord står
-under två lägen (`npm run repliker` säger till). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
-många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
-i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
-på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
-Han talar till den som står vid disken, och det kan vara den han dömer: de övriga är *de andra* eller *resten*, och *vi* är
-han och den han talar med, aldrig gänget, där han inte är med (*Dogge var bäst av er, och det kommer resten att få höra*,
-inte *vi*; 2026-11-10, `npm run repliker` säger till).
+Den man väljer får sin dom slagen i disken i guld, som domen över en match, och under den några stycken (`doma` och
+`domText`): en inledning efter hur det gick i gänget, det som sticker ut på kupongen med vad han tycker om det, och ett
+slut. Kupongen själv visas inte (2026-11-13). Ordet i guld beskriver personen och läget, och han har ett tiotal för varje
+läge (*Osynlig*, *Lagom* och *Bortglömd* i mitten, *Turlig* och *Mallig* för den som vann, *Generös* och *Blåögd* för den
+som kom sist). Han väljer efter omgången och personen, så att det är samma ord i disken och i listan och på alla enheter
+(`domord` i rum-hasse-repliker.js, `domOrd` i rum-hasse.js; förut ett ord per läge, 2026-11-13). Orden har högst nio
+bokstäver, så att stämpeln under namnet ryms i den smalaste telefonen, och inget ord står under två lägen (`npm run
+repliker` säger till). Det som sticker ut väljs ur protokollet (`saker` i [public/rum-block.js](public/rum-block.js)), efter
+hur mycket det sticker ut, och han tar högst de två viktigaste (bara en för den som vann på helgarderingar, som först får
+sin rad om det): tipset med lägst chans som satt (*Ettan i QPR mot Swansea satt, fast datorn bara gav den 35 procent.*,
+eller att ingen av de andra hade rätt där), tipset med högst chans som inte satt (*Spiken på ettan i Chelsea mot Tottenham
+sprack, fast datorn gav den 62 procent.*), matcher där ingen av de andra hade rätt, en helgardering där det kom ett utfall
+som datorn knappt trodde på, spikar som satt allihop eller sprack, och hur många rätt datorn väntade sig av kupongen när
+det skiljer mycket. Chansen är datorns före avspark, som i poängen. Varje sak är två meningar: vad det är och vad han
+tycker om det (*Sådant händer när favoriterna inte har läst på.*). Spikarna i allmänhet tar han bara när inget annat
+sticker ut. Raderna står under `domar.sak` i rum-hasse-repliker.js och väljs efter omgången och personen, inte på lott,
+så att domen är densamma varje gång och på alla enheter; var och en i gänget får nästa rad i listan, så att samma sak i
+samma omgång låter olika. Varje rad är en mening, så att *Läs upp* kan läsa domen mening för mening. En mening med en match
+hörs inte (rösten kan inte alla lag), så kommentaren efter den ska gå att förstå för sig. Inledningen står lite fetare,
+sakerna indragna bakom ett tunt streck i domens guld, som anteckningar i marginalen, och slutet i kursiv (`.rh-domen` i
+[public/rum-hasse.css](public/rum-hasse.css)). Han talar till den som står vid disken, och det kan vara den han dömer: de
+övriga är *de andra* eller *resten*, och *vi* är han och den han talar med, aldrig gänget, där han inte är med (*Dogge var
+bäst av er, och det kommer resten att få höra*, inte *vi*; 2026-11-10, `npm run repliker` säger till).
 
-Under meningarna ligger *lappen*, en remsa av protokollets blankett om just den kupongen, med samma papper, band och tryck
-(`lapp` i [public/rum-block.js](public/rum-block.js), stilen i [public/rum-block.css](public/rum-block.css)). Överst en spalt
-per match med rutorna 1, X och 2: kryssen i personens bläck, rutan som satt överstruken med den gröna märkpennan som i
-protokollet och facit maskinskrivet under. Rödpennans stjärna vid matchnumret betyder att ingen annan i gänget hade rätt där, och matchen och
-resultatet står i spaltens title. Under rutorna siffrorna med tryckta rubriker: *Rätt* av antalet matcher, *Poäng* (med
-ringen kring vinnarens, som i protokollet), *Plats* i gänget, *Spelkassan* för omgången (10 kr per match till modellens odds,
-garderingar delade som i Olympens spelkassa), *Spikar*, *Halvgarderingar* och *Helgarderingar* som satt av hur många och
-*Ensam rätt*. Sedan *Bästa träffen*, tipset med högst odds som satt, och *Största missen*, tipset med lägst odds som inte
-satt. Sist *Säsongen* när den är hämtad (`data/tippare.json`, samma som Olympen och utan omgångar som spoilerskyddet döljer,
-plus den här omgången om bygget inte har frusit in den än): en stapel per omgång uppåt för plus och nedåt för minus, den här
-överstruken, och poängen och platsen hittills. Den visas från andra omgången. Texten och lappen rullar tillsammans, så att
-man i telefonen rullar ned till lappen.
+Förut låg *lappen* under meningarna, en remsa av protokollets blankett med kupongen rad för rad, siffrorna (rätt, poäng,
+plats, spelkassan, spikar och garderingar, ensam rätt), bästa träffen, största missen och säsongen (2026-11-09). Den togs
+bort 2026-11-13, när han i stället fick säga mer om det som sticker ut.
 
 *Nästa* tar den man inte har hört om än, i gängets ordning, och *Hela gänget* går tillbaka till listan, där ordet han slog i
 disken står som en stämpel i guld under namnet på dem man har hört om (på enheten för den omgången,
@@ -7876,7 +7887,7 @@ den ordning man vill veta hur det gick:
   skrivet före avspark (Sixten Bråvalls, `tip` i `data/analyser.json`). Tecknet står på skrivmaskin som i protokollet,
   överstruket med märkpennan när det satt och svagare när det inte satt (att ingen annan i gänget hade rätt står när man
   pekar på raden), och efter det datorns chans för tecknet före avspark, poängen (samma regel som raden Poäng: rätt minus
-  chansen) och spelkassan (10 kr till datorns odds, som i Olympen och på lappen under domen). Överst hur många som hade
+  chansen) och spelkassan (10 kr till datorns odds, som i Olympen). Överst hur många som hade
   rätt. Under tipsen datorn och spelbolagen före avspark sida vid sida (under varandra i telefonen) i kupongens rutor, med
   chansen på skrivmaskin under varje ruta och facit överstruket med märkpennan: hur troligt datorn tyckte att det var och vad
   det betalade. Bladet efter matchen har bara protokollets färger (papperet, skrivmaskinens svart, tryckets terrakotta, den
