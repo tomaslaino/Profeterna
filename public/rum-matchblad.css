@@ -82,8 +82,8 @@
 .rl-nar small { font-size: 11px; color: var(--pp-faint); }
 /* en landskamp: tävlingen och gruppen under tiden, och ett lagnamn som inte ryms bredvid dem står kortare */
 .rl-nar .rl-grupp { font-size: 10px; letter-spacing: 0.02em; }
-.rl-landet .rl-spegel { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 8px; }
-.rl-landet .rl-spegel .mid { white-space: nowrap; }
+.rum-blad .rl-del.rl-landet .rl-spegel { grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr); column-gap: 4px; }
+.rum-blad .rl-landet .rl-spegel .mid { white-space: nowrap; letter-spacing: 0.06em; }
 .rum-blad .rl-t b.trang .lang { display: none; }
 .rum-blad .rl-t b.trang .kort { display: inline; }
 
