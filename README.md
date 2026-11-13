@@ -6651,6 +6651,52 @@ dolda matcherna. Utan WebGL står disken tom. `?rum-register` visar datorn framm
 en fast bild, `?rum-register=<fråga>` med den sökningen och `?rum-register=%23mote:<id>`,
 `%23div:pl`, `%23flik:lagen` … med den vyn.
 
+#### Landslagen på datorn
+
+Sedan 2026-11-13 har datorn landskamperna (användarens önskemål: "Uppdatera sidan – inklusive
+statistik på datorn, text-tv, tidningen mm utefter de nya matcherna och lagen"), när Stryktipset
+vecka 46 tog in sju matcher i Nations League (se [Landskamperna](#landskamperna)). Tavlans tal
+och lagkortens finns bara för klubbarna (`data/teams/<division>.json`), så landslagen har det
+som finns för dem: matchens fil och [data/landslag.json](#landskamperna).
+
+- **Kupongen**: där divisionen står står gruppen, *NL B4* (EM-kvalet *EMK C2*, vänskap *VSK*),
+  och lagnamnen kortas till elva tecken som klubbarnas – rummets kortnamn går före, annars
+  `LANDKORT` i [public/rum-register.js](public/rum-register.js) (*Bosnien-H.*, *Nordmaked.*).
+- **Matchakten** för en landskamp: *Formen*, *Vilan* och *Nästa* som för klubbarna, och i
+  stället för tavlans och lagkortens tal gruppen (placeringen och poängen), *Nations League*
+  (V-O-F och mål per match), *Alla landskamper sedan sep 2024* (matcher, V-O-F och mål per match,
+  också VM, VM-kvalet och vänskapsmatcherna) och *Marknaden*: chansen för 1 och 2 ur oddsen utan
+  spelbolagets marginal, med krysset under och *ur oddsen, inte modellen* där raden ryms –
+  modellen känner bara lagen i England. Sist de senaste mötena (sedan hösten 2024). En rad som
+  saknas för båda lagen står inte med. Det bättre talet lyser som för klubbarna (`SKILJER`:
+  poängen i gruppen 3, poäng per match 0,5, målen 0,25 och marknadens chans 15
+  procentenheter); poängen jämförs bara inom samma grupp.
+- **Registret** har en post till efter divisionerna, *NL* (*Nations League*): grupperna med
+  tabellen (plats, spelade, V O F när raden ryms, målskillnad och poäng; två spalter på datorn).
+  Grupperna med lag i kupongen står först under *I kupongen*, med lagen ljusa, och sedan *De
+  andra grupperna* A1–D2. Registret öppnar där när landslagen är flest i omgången (som
+  divisionerna). *Spelare* är svagt där – landslagens trupper finns inte.
+- **Lagkortet** för ett landslag: omgångens match, gruppen och tabellraden, formen, Nations
+  League hittills (V-O-F och mål), alla landskamper sedan hösten 2024, nästa match och de tio
+  senaste landskamperna med tävling, hemma eller borta, resultat och utfall. ←/→ bläddrar
+  bland lagen i gruppen.
+- **Sökningen** hittar landslagen på svenska, på engelska och på landskoden (*sverige*,
+  *sweden*, *swe*, *bosnien*, *bosnia*), felstavat också (*bosnein*), och ett möte med båda
+  lagen på något av språken (*sverige bosnien*, *sweden bosnia*). *Nations league*,
+  *landslag* och *landskamper* öppnar registrets post.
+
+Dolda resultat räknar också landskamperna i omgångens tävlingar (samma kort och nyckel som
+för divisionerna), och lagkortets form och senaste matcher har ? för de dolda.
+
+Provat 2026-11-13 i huvudlös Chromium mot ett bygge med riktig data från ESPN (`node src/build.js
+--no-fetch` efter ESPN-källorna) och veckans tretton matcher som kupong i webbläsaren, i 1440 × 900
+och 390 × 844: datorn på disken och närbilden, kupongen, matchakten för Sverige–Bosnien &
+Hercegovina, Portugal–Danmark och Wigan–Barnsley (oförändrad), registrets grupper, Sveriges
+lagkort och sökningen (*sweden*, *bosnia*, *bosnein*, *sverige bosnien*), utan fel i konsolen.
+Inte provat: dolda resultat med en dold landskamp, EM-kvalet och vänskapsmatcherna (inga i
+omgången), och klubbarnas tavlans tal i matchakten (football-data.co.uk nåddes inte, så de stod
+som – här, som före ändringen).
+
 #### Vad som står var
 
 Statistiken om omgången är fördelad efter vad varje sak är bra på, och varje siffra står på
@@ -6661,7 +6707,7 @@ med flit (nedan):
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
 | **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match, truppen), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match, truppen), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
