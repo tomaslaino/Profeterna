@@ -76,6 +76,8 @@ function parseEvent(e) {
     statusText: st.shortDetail || st.detail || st.description || null,
     completed,
     round: e.season && e.season.slug ? e.season.slug : null,
+    // Gruppen i landskamperna (Nations League: "Group B4"), bara där den finns.
+    ...(c.group && c.group.name ? { group: c.group.name } : {}),
     neutral: !!c.neutralSite,
     venue: c.venue ? c.venue.fullName || null : null,
     // orten, till arenan överst på Helgarderats matchblad (Stadium MK, Milton Keynes)
@@ -100,7 +102,12 @@ function parseEvent(e) {
 }
 
 function team(t) {
-  return { espnId: t.team.id, name: t.team.displayName, abbr: t.team.abbreviation || null };
+  const out = { espnId: t.team.id, name: t.team.displayName, abbr: t.team.abbreviation || null };
+  // Landslagens flagga ligger i ESPN:s bildmapp för länder
+  // (…/teamlogos/countries/500/swe.png), inte bland klubbarnas sköldar.
+  const land = /\/teamlogos\/countries\/\d+\/([a-z0-9-]+)\.png/i.exec(t.team.logo || '');
+  if (land) out.land = land[1].toLowerCase();
+  return out;
 }
 
 function num(x) {
@@ -133,6 +140,52 @@ async function fetchStandings(slug) {
     };
   }).sort((a, b) => a.rank - b.rank);
   return { rows, sourceUrl: `https://www.espn.com/soccer/standings/_/league/${slug}` };
+}
+
+// Tabellen i en turnering med grupper (Nations League: 14 grupper, A1–D2).
+// Svaret har en grupp per `children`, med lagen i lag-id-ordning – sorteras på
+// placeringen (verifierat 2026-11-13).
+async function fetchGroupStandings(slug) {
+  const j = await getJson(`${STANDINGS}/${slug}/standings`);
+  const groups = (j.children || []).map((g) => ({
+    name: g.name || g.abbreviation || null,
+    rows: ((g.standings && g.standings.entries) || []).map((e) => {
+      const s = {};
+      for (const x of e.stats || []) s[x.name] = x.value;
+      return {
+        espnId: e.team.id,
+        name: e.team.displayName,
+        abbr: e.team.abbreviation || null,
+        rank: s.rank,
+        played: s.gamesPlayed,
+        won: s.wins,
+        drawn: s.ties,
+        lost: s.losses,
+        gf: s.pointsFor,
+        ga: s.pointsAgainst,
+        gd: s.pointDifferential,
+        points: s.points,
+        deductions: s.deductions || 0,
+        note: e.note ? e.note.description || null : null,
+      };
+    }).sort((a, b) => a.rank - b.rank),
+  })).filter((g) => g.name && g.rows.length);
+  if (!groups.length) throw new Error('inga grupper i svaret');
+  return { groups, sourceUrl: `https://www.espn.com/soccer/standings/_/league/${slug}` };
+}
+
+// Spelade matcher i några månader av en turnering (YYYY-MM), som de sparas i
+// spelprogrammet. En månad utan matcher är inget fel.
+async function fetchPlayed(slug, months) {
+  const byId = new Map();
+  await mapLimit(months.map((m) => m.replace('-', '')), 3, async (m) => {
+    const j = await getJson(`${SITE}/${slug}/scoreboard?dates=${m}&limit=1000`);
+    for (const e of j.events || []) {
+      const p = parseEvent(e);
+      if (p.completed && p.score) byId.set(p.id, p);
+    }
+  });
+  return [...byId.values()].sort((a, b) => a.kickoff.localeCompare(b.kickoff));
 }
 
 // Odds (DraftKings via ESPN) för kommande matcher. Finns bara i
@@ -188,6 +241,8 @@ function decimal(american) {
 // Verifierat 2026-10-21: alla 92 ligalag har sköld, de flesta i National
 // League också, lag längre ner oftast inte (HTTP 404).
 const CREST = (variant, id) => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/${variant}/${id}.png&h=96&w=96`;
+// Landslagens flaggor (t.land = landets kod i ESPN:s logo-adress, "swe").
+const FLAG = (code) => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/countries/500/${code}.png&h=96&w=96`;
 
 async function fetchCrests(teams) {
   const orNull = (p) => p.catch((err) => {
@@ -195,9 +250,10 @@ async function fetchCrests(teams) {
     throw err;
   });
   return mapLimit(teams, 6, async (t) => {
+    if (t.land) return { ...t, light: await orNull(getBytes(FLAG(t.land))), dark: null };
     const [light, dark] = await Promise.all([orNull(getBytes(CREST('500', t.espnId))), orNull(getBytes(CREST('500-dark', t.espnId)))]);
     return { ...t, light, dark: light && dark };
   });
 }
 
-module.exports = { fetchFixtures, fetchHistory, fetchStandings, fetchOdds, fetchCrests, seasonMonths, decimal };
+module.exports = { fetchFixtures, fetchHistory, fetchStandings, fetchGroupStandings, fetchPlayed, fetchOdds, fetchCrests, seasonMonths, decimal, parseEvent };
