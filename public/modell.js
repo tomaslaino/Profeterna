@@ -117,7 +117,12 @@ function howSection(x) {
   ];
   return '<h3>Så räknas en prognos</h3><ol class="ml-steps">' +
     steps.map(([t, p], i) => `<li class="card"><span class="ml-step-n" aria-hidden="true">${i + 1}</span><h4>${esc(t)}</h4><p>${p}</p></li>`).join('') +
-    '</ol><div id="model-example"></div>';
+    '</ol>' +
+    // Landskamperna (Stryktipset under landslagsuppehållen) räknas inte av
+    // modellen, som bara känner lagen i England.
+    '<p class="legend ml-land">Landskamperna har marknadens prognos, inte modellens: DraftKings odds utan spelbolagets marginal. ' +
+    'De är inte med i utvärderingen eller efterhandstestet.</p>' +
+    '<div id="model-example"></div>';
 }
 
 // Ett räknat exempel: nästa match i Premier League med prognos, steg för

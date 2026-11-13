@@ -2919,6 +2919,37 @@ inte ESPN): bygget gav matchsidor, prognoser och `landslag.json` utan fel, Svens
 med `linkDraw`, och i huvudlös Chromium visade matchlistan, matchrutan, Ny kupong och Välj matcher landskamperna utan
 fel i konsolen. Hämtningen och bygget mot riktig data prövas av GitHub Actions efter mergen.
 
+### Tabeller, Statistik, Källor och Modell för landslagen (2026-11-13)
+
+Användarens önskemål: "Uppdatera hela hemsidan utefter detta" – så att veckans landskamper också finns på
+sajtens tabeller, statistik och källor.
+
+- **Fliken Landslag** står efter League Two på både Tabeller och Statistik (`#unl/tabell`, `#unl/spelare`; landslagsdelen
+  sist i [public/divisioner.js](public/divisioner.js), ur `data/landslag.json`). Den har en egen färg (`--dv-unl`).
+- **Tabeller** visar Nations Leagues fjorton grupper (A1–D2) i samma tabell som de engelska, två i bredd. Grupperna som
+  spelar på Stryktipsets lördag står först under *Lördagens grupper*, märkta och med lördagens matcher under tabellen
+  (länk till matchrutan). Zonerna läses ur ESPN:s `note`, som ESPN skriver en gång per placering och för alla ligor på
+  en rad ("A: Qualifies for QFs; B-D: Promotion"): kvartsfinal, uppflyttning, kval till uppflyttning, kval mot
+  nedflyttning och nedflyttning efter gruppens liga. Ett lag öppnar lagkortet.
+- **Statistik** har *Lördagens landskamper* (lagen sida vid sida med formen, placeringen och marknadens chans) och
+  tabellen *Landslagen* (lördagens lag eller alla, sorterbar): gruppen, formen (V/O/F i färg), poängen i Nations
+  League, alla landskamper sedan hösten 2024 (V–O–F, gjorda–insläppta, nollor) och nästa match. Lagkortet har gruppen
+  och zonen, Nations League hittills, alla landskamper, nästa match och de tio senaste, med länk till matchrutan för
+  de matcher sajten har. Spelare, xG och skott visas inte – de finns inte för landslagen. Spoilerskyddet döljer
+  resultaten som för klubbarna.
+- **Källor**: täckningsmatrisen har kolumnerna UNL, EMK och VSK efter de engelska, med orsak där en datatyp saknas
+  ("finns inte för landslagen", EM-kvalets tabell "lottas inför mars 2027"), och en ny rad *Sköldar och flaggor*
+  ([src/sourcetable.js](src/sourcetable.js); sköldarnas källa gäller nu också landskamperna i src/sources.js). ESPN:s
+  och DraftKings texter nämner landskamperna.
+- **Modell**: en rad under stegen säger att landskampernas prognos är marknadens (DraftKings utan marginal) och att de
+  inte är med i utvärderingen.
+
+Provat 2026-11-13 med riktig ESPN-data (`node src/build.js`) i huvudlös Chromium i 1440 × 900 och 390 × 844: Tabeller
+och Statistik för Landslag, lagkortet, Källor och Modell utan fel i konsolen (utom tjänster som molnmiljön inte når),
+och de engelska tabellerna och statistiken som förut. Inte provat: flaggorna (ESPN:s bildserver nås inte härifrån, så
+de står som tomma sköldar tills GitHub Actions hämtar dem), och *Lördagens grupper* bygger på lördagens datum, inte på
+Stryktipset självt (Svenska Spel nås inte vid bygget) – en landskamp på lördagen som inte är på kupongen märks också.
+
 ## Kupongen
 
 Gängets gemensamma kupong för omgången: de utvalda matcherna med ett tecken var – `1`, `X`,
@@ -6197,6 +6228,32 @@ föremålet (`data-to`). Filerna hämtas när sidan visas första gången.
 - **381–384 Skyttar:** skytteligorna ur `data/players/<division>.json` – de 19 med flest
   ligamål, delad placering med numret bara på den första.
 
+**Landskamperna (2026-11-13).** Användaren: "Uppdatera hela hemsidan utefter detta" – Stryktipset vecka 46 har sju
+landskamper i Nations League (se [Landskamperna](#landskamperna)), och tv:n visar dem som de andra matcherna.
+
+- **331 och 377** tar med dem i avsparksordning som förut. Landslag med för långa namn kortas där lagen inte ryms
+  (`LAND` i rum-tv.js: *Sverige-Bosnien-H.*); på matchens sida och i tabellen står hela namnet om det ryms.
+- **En landskamps sida** (`landPage`): lagen dubbelhöga, *Nations League*, gruppen och avsparken i bandet – gruppen
+  leder till sin tabell, och det gröna snabbvalet *Tabeller* gör det också på sidan. Oddsen och procenten heter
+  *Marknaden*, inte Prognos: de är DraftKings odds utan marginal, inte modellens. Stapeln är densamma. Lagen sida vid
+  sida: placering och poäng i gruppen, Nations League hittills (V-O-F), formen i de fem senaste landskamperna (senaste
+  först, V grön, O gul, F röd) och de senaste mötena så många som ryms. De engelska matchernas sidor är oförändrade.
+- **375 Nations League** (`nlPage`, ur `data/landslag.json`): fyra grupper per undersida, rubriken och lagen –
+  placering i färg efter zonen, lag, S, V, O, F, målskillnad och poäng. Omgångens grupper står först (*i omgången*;
+  vecka 46: A4, B2, B3, B4) och de andra som undersidor i bokstavsordning (1/4–4/4). ESPN skriver zonen (`note`) bara
+  på en grupp, men reglerna är desamma i alla och uppdelade efter liga (*A: Qualifies for QFs; B-D: Promotion*), så
+  tv:n tar placeringens not ur den grupp som har den och läser delen för gruppens liga: gruppvinnare och uppflyttning
+  grön, kval cyan, nedflyttning röd. Döljs Nations League-matcher (Dölj resultat) visar sidan bara det, som
+  tabellerna. *NL* står bland divisionerna i tabellernas band, och 300 Innehåll har sidan under Tabeller. 377 var
+  redan upptaget, så grupperna blev undersidor till en sida i stället för 375–378.
+- Inget föremål i rummet handlar om landslagen, så ingen ny `data-to`.
+
+Provat 2026-11-13 med riktig data (ESPN, bygget här) och omgången i Stryktipsets ordning inlagd i sidan (tjänsten
+nås inte härifrån), i huvudlös Chromium i 1440 × 900 och 390 × 844: rummet på håll med 377, tv:n nära på 300, 331,
+Sverige–Bosnien & Hercegovina, Österrike–Irland, Wimbledon–Blackpool, 375 med undersidorna och snabbvalet Tabeller
+från en landskamp till gruppens tabell. Inga fel i konsolen utöver filer som inte byggs här (data/tidning.json).
+Inte provat: en landskamp som pågår eller är slut, och telefonen i Safari.
+
 Har en division matcher som döljs just nu (Dölj resultat) visar tabellen och skytteligan bara
 hur många som är dolda och *Visa ändå* – samma nyckel som på Tabeller och Statistik, så att
 det gäller där också.
@@ -8483,6 +8540,41 @@ Wimbledon (inget som klarade reglerna) och Newport (BBC-bilden i fel format) ble
 adressformaten provades med ett låtsasnät: Newport fick sin bild i första försöket och Wimbledon i det andra, ur
 cupförlusten mot Crewe. Workflowen gav sedan alla 24 lag en bild, men Newports var ett BBC Sounds-avsnitt, så de
 läses inte längre.
+
+**Landskamperna i Helgarderat** (2026-11-13, användarens önskemål: "be den producera en ny tidning av helgarderat
+utefter detta så att vi är redo imorgon!"): Nr 1 har kupongens riktiga tretton matcher, sju landskamper i Nations
+League och sex matcher ur League One och League Two. Matchbladen för MK Dons–Burton, Sheffield Wednesday–Plymouth,
+Stockport–Reading, Wimbledon–Blackpool och Wigan–Barnsley är kvar ur provomgången, och de andra sju är borttagna.
+Bladen för landskamperna och för Swindon–Grimsby är skrivna för hand, i samma form som nattjobbets: rubrik,
+lagen var för sig (högst 95 ord), sammanfattning, ett citat per lag när det gick att belägga och källorna med datum och
+länk (`"typ": "media"`, `"hand": true` i `data/poddsidor.json`). De bygger på veckans svenska och utländska press,
+sökt fram med WebSearch. Talen och namnen är kontrollerade mot källornas text, och tipsorden mot `TIPS_RE`. Ett citat
+som bara fanns i andra hand eller i ett referat togs bort (Georgien, Danmark, Nordirland och Swindon har inget). I
+molnmiljön gick artiklarna inte att öppna, så kontrollen gjordes mot sökningarnas utdrag, och några publiceringsdagar
+är räknade ur dem.
+
+- **Utseendet:** en landskamp har flaggan där klubben har skölden (`flagga` på `.hg-skold`, flaggan ur
+  `data/skoldar.json` under lagets svenska namn), och raden under tavlan säger tävlingen och gruppen där klubben inte
+  har något: *Match 1 · Nations League · Grupp B4 · Strawberry Arena, Solna* (`landskamp` på bladet, som bygget lägger
+  till ur matchen och som de handskrivna bladen har själva). Ett handskrivet blad kan ha arenan själv, och då skriver
+  bygget inte över den (ESPN kallar fortfarande Strawberry Arena för Friends Arena). Ett citat som redan var på svenska
+  står utan *(översatt)* (`"oversatt": false`). Innehållet skriver *Sverige – Bosnien* (`KORT`).
+- **Bilderna:** scripts/tidning/matchbilder.mjs söker landslagen med deras engelska namn (ur config/landslag.js):
+  BBC:s lagflöde (`wales`, `northern-ireland`, `republic-of-ireland`; de andra länderna har inget) och Bing News
+  (*Sweden national team*, *Sweden football*, *Sweden Nations League*), och bladets egna källor först, som för
+  klubbarna (`landslag` i src/analyser/tidning-bilder.mjs). Utan bild står flaggorna mot varandra på tavlan.
+- **Nattjobbet:** landslagen har inga supporterpoddar, forum eller lokaltidningar, så poddjobbet hoppar över
+  landskamperna (`omgangensLag` i scripts/tidning/poddar.mjs), och när bladen läggs ut står ett blad som redan ligger
+  ute kvar för en match som jobbet inte har något eget blad till, i samma omgång (samma lördag; `poddsidor(fil,
+  round, nu)` i src/analyser/poddar.mjs). Klubbmatcherna får nattjobbets blad när det har ett.
+
+Provat 2026-11-13 med riktig data från ESPN och bygget (`--no-fetch` efter hämtningen): Helgarderat på sajten och
+tidningen i rummet, på pulten och framme (L), i 1440 × 900 och 390 × 844, med tretton matchblad i kupongens ordning,
+innehållet och sista sidan, utan skriptfel (konsolen visar bara tjänsterna som molnmiljön inte når och den saknade
+`data/tidning.json`). Flaggorna provades med två ritade flaggor, eftersom ESPN:s bildtjänst inte nås härifrån.
+Sammanslagningen i nattjobbet med Node (ett eget blad ersätter, handskrivna står kvar, en annan omgång rörs inte).
+Bildhämtningen för landslagen bara med ett låtsasnät (rätt BBC-flöde och sökord); den riktiga hämtningen gör GitHub
+Actions. Notiserna (*Så mår tipslagen*, `data/tidning.json`) är inte skrivna för landskamperna.
 
 ### Närbilderna
 
