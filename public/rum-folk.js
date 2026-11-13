@@ -254,8 +254,10 @@ window.RumFolk = (() => {
   // Vem i gänget syns under punkten (x, y) i fönstret?
   function vemUnder(x, y, mal = null) {
     const f = fig();
-    // (pingklockan och det som ligger på pulten är framför gängets ben, som står bakom pulten)
-    if (mal && mal.closest && mal.closest('.rum-tag, #rum-kupong')) return null;
+    // (pingklockan och det som ligger på pulten är framför gängets ben, som står bakom pulten, och tidningen och
+    // protokollet ligger över hela rummet: klicket i dem gick annars till den i gänget som stod bakom, så att
+    // länkarna i tidningens innehåll inte ledde någonstans där någon stod)
+    if (mal && mal.closest && mal.closest('.rum-tag, #rum-kupong, .rum-tidningen, .rum-protokoll')) return null;
     const c = F.el && F.el.querySelector('#rum-3d');
     if (!f || !f.under || !c || F.o.nara()) return null;
     const r = c.getBoundingClientRect();
