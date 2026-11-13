@@ -7348,8 +7348,10 @@ där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga
 en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen (`upptagen` i rum-hasse.js) och
 trycks om när han tar upp den andra (`visa`).
 
-**Glasögonen** (2026-11-09). Han läser med läsglasögon i mörk sköldpadd (`byggGlasogon` i
-[public/rum-hasse-arm.js](public/rum-hasse-arm.js)), som annars sitter i bröstfickan med det översta hörnet uppstickande.
+**Glasögonen** (2026-11-09). Han läser med halvbågade läsglasögon (`byggGlasogon` i
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)): en tunn list av svart metall längs glasens överkant och rakt över
+näsan, och nedtill bara glasens kant, som de han har på ett foto Tomas skickade 2026-11-13 (förut helbågade i mörk
+sköldpadd). Annars sitter de i bröstfickan med det översta hörnet uppstickande.
 Före tidningen tar han fram dem med höger hand, håller upp dem framför hakan, fäller ut skalmarna med en knyck och sätter
 på sig dem framifrån, blinkar och rynkar näsan tills de sitter (biten `pa`); efter tidningen tar han av dem i hörnet,
 fäller ihop dem framför bröstet och stoppar dem i fickan (`av`). Medan han läser håller han tidningen med vänster hand

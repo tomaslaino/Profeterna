@@ -4215,11 +4215,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const FICKA = W_(752, 928, djup(752, 928));
   const GL = {
     // på näsan, lite lägre (glid) och längst ned, så att han ser över dem (nasa); framför ansiktet på väg på och av
-    pa: { h: true, m: paNasan(403, 0.14) },
-    glid: { h: true, m: paNasan(410, 0.16) },
+    // (de halvbågade sitter 4 högre än de förra, så att listen går ovanför ögonen som på fotot och inte över locken)
+    pa: { h: true, m: paNasan(399, 0.14) },
+    glid: { h: true, m: paNasan(406, 0.16) },
     nasa: { h: true, m: paNasan(426, 0.24) },
     // i fickan: hopfällda och på högkant med det högra hörnet uppåt, och resten nere i fickan bakom kavajen
-    ficka: { m: new THREE.Matrix4().makeBasis(V3(0, -1, -0.1).normalize(), V3(0.99, 0, -0.14).normalize(), V3(0.14, -0.1, 0.98).normalize()).setPosition(FICKA.x - 4, FICKA.y - 32, FICKA.z - 3) },
+    ficka: { m: new THREE.Matrix4().makeBasis(V3(0, -1, -0.1).normalize(), V3(0.99, 0, -0.14).normalize(), V3(0.14, -0.1, 0.98).normalize()).setPosition(FICKA.x - 12, FICKA.y - 19, FICKA.z + 1) },
     // uppdragna ur fickan
     ute: { m: new THREE.Matrix4().makeBasis(V3(0.15, -0.95, 0.25).normalize(), V3(0.98, 0.15, 0).normalize(), V3(-0.05, 0.25, 0.97).normalize()).setPosition(FICKA.x - 20, FICKA.y + 90, FICKA.z + 70) },
     // framför hakan, framsidan bort från honom (skalmarna mot honom): där fälls de ut och ihop
@@ -4242,13 +4243,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   }
   // greppet i bågens mått: tummen och pekfingret om det högra hörnet (punkten, riktningen genom bågen och
   // handflatan in mot ansiktet), och pekfingertoppen på bryggan med fingret uppåt och handflatan mot honom
-  const NYP = { p: V3(-(GLAS.C + GLAS.A - 6), 6, 0), A: V3(0, 0, 1), P: V3(1, 0, 0) };
+  const NYP = { p: V3(-(GLAS.C + GLAS.A - 6), 13, 0), A: V3(0, 0, 1), P: V3(1, 0, 0) };
   // (bakom tidningen: om gångjärnet från sidan, med fingrarna framåt och handen bakom och under, så att underarmen
   // går bakom tidningen; sido 1)
-  const SIDO = { p: V3(-(GLAS.C + GLAS.A - 1), 7, -4), F: V3(0.15, 0.8, 0.58).normalize(), P: V3(1, 0, 0) };
+  const SIDO = { p: V3(-(GLAS.GANG[0] - 2), GLAS.GANG[1] - 1, GLAS.GANG[2] + 1), F: V3(0.15, 0.8, 0.58).normalize(), P: V3(1, 0, 0) };
   SIDO.P.addScaledVector(SIDO.F, -SIDO.P.dot(SIDO.F)).normalize();
   SIDO.A = new THREE.Vector3().crossVectors(SIDO.P, SIDO.F);
-  const FINGER = { p: V3(0, 14, 3), F: V3(0.35, 0.8, -0.48).normalize(), P: V3(0, -0.5, -0.85), L: 250 * HAND.SK, U: 16 * HAND.SK };
+  const FINGER = { p: V3(0, 22, 2), F: V3(0.35, 0.8, -0.48).normalize(), P: V3(0, -0.5, -0.85), L: 250 * HAND.SK, U: 16 * HAND.SK };
   FINGER.P.addScaledVector(FINGER.F, -FINGER.P.dot(FINGER.F)).normalize();
   const HM = new THREE.Matrix4();
   const hm3 = new THREE.Matrix4();
