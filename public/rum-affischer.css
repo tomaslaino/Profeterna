@@ -85,17 +85,21 @@
 
 /* tryckt, solblekt och vikt redan i bilden (rum/expressen94.jpg), som Nacional nedan.
    Blekare 2026-11-13, med Chelsea ("inte lika stark/kontrastrik"): det röda
-   och fotot tog för mycket plats i rummet, så bilden är mattare och mindre
-   mättad här, med en ljus slöja ovanpå (se img nedan). */
-.rum-vm94 { --k: 0.8; }
+   och fotot tog för mycket plats i rummet, så bilden är mattare, mindre
+   mättad och varmare här, med solens slöja ovanpå (--sloja, se Chelsea).
+   Sedan lite mindre blek, som Chelsea ("lite mindre blekt på Expressen
+   också"): svagare slöja och mer färg och kontrast i bilden. */
+.rum-vm94 { --k: 0.8; --sol: 0.1; }
 .rum-vm94 .ark { width: 100px; height: 150px; background: #e9dfc6; }
 
 /* ---------- IFK Göteborg 1982: Göteborgs-Postens löpsedel, vikt och sliten ---------- */
 
-.rum-ifk { --k: 0.8696; }
+.rum-ifk { --k: 0.8696; --svart: #2f271f; --sol: 0.14; }
 /* gulnat tidningspapper, och en reva i underkanten till vänster (och hörnet
    som släpper till höger). Lite mer patina 2026-11-13, som Chelsea: gulare
-   papper, ett blekt blått band, ett blekare foto och djupare veck. */
+   papper, ett blekt blått band, ett blekare foto och djupare veck. Samma dag
+   lite solblekt, som Chelsea men svagare: brunsvart tryck (--svart), ett
+   rött som har mattats, ett mjukare foto och solens slöja (--sloja). */
 .rum-ifk .ark {
   display: flex;
   flex-direction: column;
@@ -104,7 +108,7 @@
   height: 138px;
   padding: 0 0 4px;
   background: linear-gradient(180deg, #e9dbb8, #dac79b);
-  color: #1b1814;
+  color: var(--svart);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--curl)), calc(100% - var(--curl)) 100%, 17px 100%, 14.5px calc(100% - 3.5px), 12px 100%, 0 100%);
 }
 .rum-ifk .huvud {
@@ -119,12 +123,12 @@
   font: italic 700 8.6px/1.3 Fraunces, Georgia, serif;
 }
 /* det blå har bleknat (en ton ovanpå, som Chelseas röda band) */
-.rum-ifk .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.14); pointer-events: none; }
+.rum-ifk .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.22); pointer-events: none; }
 .rum-ifk .datum {
   display: block;
   margin: 1.5px 5px 0;
   padding-bottom: 1px;
-  border-bottom: 0.6px solid #1b1814;
+  border-bottom: 0.6px solid var(--svart);
   text-align: center;
   font: 700 3.3px/1.2 "Helvetica Neue", Arial, sans-serif;
   letter-spacing: 0.35px;
@@ -133,14 +137,14 @@
   align-self: flex-start;
   margin: 3px 5px 0;
   padding: 1.4px 3px 1px;
-  background: #1b1814;
+  background: #40362c;
   color: #ede2c4;
   font: 400 5.4px/1 Anton, Impact, sans-serif;
   letter-spacing: 0.5px;
 }
 .rum-ifk .rub { display: flex; flex-direction: column; gap: 1.5px; padding: 2.5px 5px 0; }
 .rum-ifk .rub b { display: block; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.2px; }
-.rum-ifk .rub b.rod { color: #c41a1f; }
+.rum-ifk .rub b.rod { color: #b53b30; }
 /* fotot svartvitt, som i tidningen */
 .rum-ifk .foto { display: block; flex: 1; min-height: 0; margin: 3px 5px 0; overflow: hidden; }
 .rum-ifk img {
@@ -149,12 +153,12 @@
   height: 100%;
   object-fit: cover;
   object-position: 50% 20%;
-  filter: grayscale(1) sepia(calc(var(--sep, 0.2) + 0.3)) contrast(1.06) brightness(0.99);
+  filter: grayscale(1) sepia(calc(var(--sep, 0.2) + 0.36)) contrast(0.94) brightness(1.03);
 }
 .rum-ifk .under {
   margin: 2.5px 5px 0;
   padding-top: 2px;
-  border-top: 0.6px solid #1b1814;
+  border-top: 0.6px solid var(--svart);
   font: 700 4.2px/1.2 "Helvetica Neue", Arial, sans-serif;
 }
 .rum-ifk .tryck { inset: 0; }
@@ -167,7 +171,8 @@
   background:
     linear-gradient(90deg, rgba(0, 0, 0, 0) calc(50% - 1.3px), rgba(255, 250, 236, 0.38) calc(50% - 0.3px), rgba(50, 32, 12, 0.3) calc(50% + 0.5px), rgba(0, 0, 0, 0) calc(50% + 1.8px)),
     linear-gradient(180deg, rgba(0, 0, 0, 0) calc(47% - 1.3px), rgba(255, 250, 236, 0.34) calc(47% - 0.3px), rgba(50, 32, 12, 0.28) calc(47% + 0.5px), rgba(0, 0, 0, 0) calc(47% + 1.8px)),
-    radial-gradient(ellipse at 50% 47%, rgba(255, 250, 236, 0.18), rgba(255, 250, 236, 0) 9px);
+    radial-gradient(ellipse at 50% 47%, rgba(255, 250, 236, 0.18), rgba(255, 250, 236, 0) 9px),
+    var(--sloja);
   box-shadow: inset 0 0 6px rgba(112, 80, 32, 0.52);
 }
 
@@ -184,10 +189,17 @@
   object-fit: cover;
   filter: sepia(calc(var(--sep, 0.2) * 0.5)) saturate(var(--sat, 0.9)) brightness(0.97);
 }
-.rum-vm94 img { filter: sepia(calc(var(--sep, 0.2) * 0.5 + 0.12)) saturate(calc(var(--sat, 0.9) * 0.66)) contrast(0.86) brightness(1.04); }
-/* solens slöja, starkast uppe till vänster, som på Chelsea (.veck) */
-.rum-vm94 .ark::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(160deg, rgba(242, 232, 206, 0.24), rgba(242, 232, 206, 0.1) 55%, rgba(242, 232, 206, 0.05)); }
+.rum-vm94 img { filter: sepia(calc(var(--sep, 0.2) * 0.5 + 0.16)) saturate(calc(var(--sat, 0.9) * 0.86)) contrast(0.95) brightness(1); }
+.rum-vm94 .ark::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--sloja); }
 .rum-nac .tryck, .rum-vm94 .tryck { inset: 0; background: linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%); }
+/* Expressens papper var kallare och vitare än de andras: kanterna har gulnat
+   som på IFK och Chelsea, mest i hörnet nere till höger */
+.rum-vm94 .tryck {
+  background:
+    linear-gradient(118deg, rgba(255, 246, 222, var(--blek, 0.15)), rgba(255, 246, 222, 0) 62%),
+    radial-gradient(60% 40% at 100% 100%, rgba(176, 128, 48, 0.12), rgba(176, 128, 48, 0) 100%),
+    radial-gradient(130% 115% at 50% 46%, rgba(122, 86, 40, 0) 54%, rgba(122, 86, 40, calc(0.1 + var(--sep, 0.2) * 0.36)) 100%);
+}
 
 /* ---------- löpsedeln: numret, tidningens namn, vinjetten, rubriken och raden under ---------- */
 
@@ -196,7 +208,7 @@
    (helgarderat.css, .hf-forsta) i samma mått, 100 × 140: kupongens papper, den
    tunna tryckta ramen, numret, veckan och priset maskinskrivna över ett streck,
    namnet i terrakotta, vinjetten i röda versaler mellan två streck (där
-   omslaget har lördagens datum) och rubriken i samma typsnitt som tidningens
+   omslaget hade lördagens datum till 2026-11-13) och rubriken i samma typsnitt som tidningens
    rubriker, Fraunces, här som fetast och i versaler: en löpsedel ska gå att
    läsa från andra sidan rummet. Det som lyfts fram i rubriken står i
    terrakotta. Inget fyllt med färg, som i tidningen. Förut det gula
@@ -406,11 +418,17 @@
    mörkare kanter, mer nött färg och ett blekare foto. Samma dag solblekt
    ("tar för mkt fokus från animationssidan"): den var den starkaste fläcken
    i rummet. Solen har tagit det mörkaste och det mest mättade först: trycket
-   är brunsvart i stället för svart (--svart), det röda har gått mot laxrosa,
-   fotot är matt och blekt, och en ljus slöja ligger över allt, starkast
-   uppifrån där solen har stått på (.veck). Inga filter på texten (den blir
-   suddig i närbilden), bara andra färger. */
-.rum-chelsea { --k: 1.0256; --svart: #4a4036; }
+   är brunsvart i stället för svart (--svart), det röda har mattats mot
+   tegel, fotot är mjukare och varmare, och solens slöja ligger över allt
+   (--sloja, i .veck). Först blev den nästan för blek och lite grå ("nästan
+   för blekta"): nu varmare, med mer patina än blekhet. Sedan lite mindre
+   blek ("lite mindre blekt på Chelsea"): svagare slöja, mörkare tryck, ett
+   rödare rött och ett fylligare foto. Inga filter på texten (den blir
+   suddig i närbilden), bara andra färger.
+   Slöjan är gemensam för IFK, Chelsea och VM 94, i varmt gulnat papper,
+   starkast uppe till vänster där solen har stått på; --sol är hur stark. */
+.rum-ifk, .rum-chelsea, .rum-vm94 { --sloja: linear-gradient(160deg, rgba(238, 222, 184, var(--sol, 0.15)), rgba(238, 222, 184, calc(var(--sol, 0.15) * 0.45)) 55%, rgba(238, 222, 184, calc(var(--sol, 0.15) * 0.2))); }
+.rum-chelsea { --k: 1.0256; --svart: #33291f; --sol: 0.13; }
 .rum-chelsea .ark {
   display: flex;
   flex-direction: column;
@@ -426,12 +444,12 @@
   display: flex;
   align-items: flex-end;
   padding: 1.2px 3px 1.4px;
-  background: #c8564a;
+  background: #c4423a;
   color: #fbf4e6;
 }
 /* det röda har bleknat (en ton ovanpå, inte ett filter: text i filter ritas
    suddigt i närbilden) */
-.rum-chelsea .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.3); pointer-events: none; }
+.rum-chelsea .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.2); pointer-events: none; }
 .rum-chelsea .huvud .sun { display: flex; align-items: flex-start; white-space: nowrap; font: 900 11px/0.9 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.45px; }
 .rum-chelsea .huvud .sun i { margin: 0.6px 0.5px 0 0; font: 900 4.2px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.1px; font-style: normal; }
 .rum-chelsea .huvud small { flex: 1 0 auto; margin-left: 1.5px; text-align: right; font: 700 2.4px/1.15 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; opacity: 0.9; }
@@ -439,7 +457,7 @@
   align-self: flex-start;
   margin: 3px 1.5px 0;
   padding: 1.3px 2.4px 1px;
-  background: #574c40;
+  background: #3e342a;
   color: #eee4c9;
   font: 400 4.8px/1 Anton, Impact, sans-serif;
   letter-spacing: 0.4px;
@@ -451,9 +469,9 @@
   margin: 2.2px 1.5px 0;
 }
 .rum-chelsea .rub b { display: block; text-align: center; transform-origin: 50% 50%; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.15px; }
-.rum-chelsea .rub b.rod { color: #bb5c4f; }
-/* fotot i färg, men tryckt på tidningspapper och solblekt: matt, med
-   ljusa skuggor och nästan bara gult och brunt kvar av färgerna */
+.rum-chelsea .rub b.rod { color: #b23c31; }
+/* fotot i färg, men tryckt på tidningspapper och solblekt: mjukare, med
+   ljusare skuggor och färger som har gått mot gult och brunt */
 .rum-chelsea .foto { display: block; flex: 1; min-height: 0; margin: 2.4px 1.5px 0; overflow: hidden; }
 .rum-chelsea .foto img {
   display: block;
@@ -461,7 +479,7 @@
   height: 100%;
   object-fit: cover;
   object-position: 50% 40%;
-  filter: saturate(0.5) sepia(calc(var(--sep, 0.2) + 0.25)) contrast(0.78) brightness(1.1);
+  filter: saturate(0.68) sepia(calc(var(--sep, 0.2) + 0.25)) contrast(0.92) brightness(1.03);
 }
 .rum-chelsea .under {
   margin: 2px 1.5px 0;
@@ -478,7 +496,7 @@
   pointer-events: none;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0) calc(52% - 1.3px), rgba(255, 250, 236, 0.42) calc(52% - 0.3px), rgba(50, 32, 12, 0.36) calc(52% + 0.5px), rgba(0, 0, 0, 0) calc(52% + 1.8px)),
-    linear-gradient(160deg, rgba(242, 232, 206, 0.34), rgba(242, 232, 206, 0.16) 55%, rgba(242, 232, 206, 0.1));
+    var(--sloja);
   box-shadow: inset 0 0 6px rgba(118, 84, 32, 0.52);
 }
 /* ---------- IFK och Chelsea: papperet och slitaget ---------- */
