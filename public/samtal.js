@@ -704,7 +704,7 @@
     const i = spelInfo(s);
     if (!harSpel(i)) return '';
     return '<div class="sm-under" role="group" aria-label="Siffrorna under rutorna">' +
-      `<button type="button" data-spelflik="m" aria-pressed="${SM.under == null}" title="Modellens odds">Modellen</button>${Folket.flikar(i, SM.under)}</div>`;
+      `<button type="button" data-spelflik="m" aria-pressed="${SM.under == null}" title="Modellens odds – i landskamperna marknadens (kursiva)">Modellen</button>${Folket.flikar(i, SM.under)}</div>`;
   }
   function spelLapp(s, id) {
     const i = spelInfo(s);
@@ -730,7 +730,7 @@
       : nasta ? '<button type="button" class="kp-btn" id="sm-nasta">Nästa</button>' : '';
     return `<div class="sm-lapp${klubbad ? ' klubbad' : ''}" data-id="${esc(id)}"><button type="button" class="sm-lapp-x" id="sm-lapp-x" aria-label="Stäng">×</button>` +
       `<p class="sm-lapp-m"><b>${s.matcher.findIndex((x) => x.id === id) + 1}</b>${namn}</p><p class="sm-lapp-i">${when}` +
-      (r.g.pr ? `<span class="sm-lapp-odds">${SIGNS.map((sg, i) => `<span><i>${sg}</i>${pctOdds(r.g.pr[i])}</span>`).join('')}</span>` : '') + '</p>' + spelLapp(s, id) +
+      (r.g.pr ? `<span class="sm-lapp-odds${isMk(r.m) ? ' mk' : ''}"${isMk(r.m) ? ` title="${esc(MK_TITLE)}"` : ''}>${SIGNS.map((sg, i) => `<span><i>${sg}</i>${pctOdds(r.g.pr[i])}</span>`).join('')}</span>` : '') + '</p>' + spelLapp(s, id) +
       (fr || go ? `<div class="sm-lapp-g"><p class="sm-lapp-q">${fr}</p>${go}</div>` : '') +
       [...r.notes, ...afterOf(s, id, w)].map((o) => `<span class="sm-said sm-k${pnum(o.k)}">${face(o.k)}<span>${esc(o.text)}</span></span>`).join('') +
       (pen ? `<span class="sm-meta">${penField(pen, id, label)}</span>` : '') + '</div>';
@@ -969,6 +969,7 @@
         });
       }
     });
+    if (!tat && SM.under == null) html += mkLegend(rows.map((r) => r.m));
     SM.nyBock = null;
     const foot = '<div class="pb-foot sm-foot">' + fieldList(footFields(s, val, s.gang.length)) + '</div>';
     const act = boardActions(s, rows, val);
@@ -1122,7 +1123,8 @@
         const b = box(sg, who[i], ids, on ? `${id}${sg}` : null, g.res === i ? `${id}${sg}` : null, svar.filter(([, t]) => t.includes(sg)).map(([k]) => k), id);
         const spel = SM.under != null && spelInfo(SM.data);
         const rad = spel ? spel.rader[id] : null;
-        const odds = tat ? '' : `<small${on ? ' class="on"' : ''}>${rad ? esc(Folket.tal(rad, i, SM.under)) : g.pr ? pctOdds(g.pr[i]) : '–'}</small>`;
+        const odds = tat ? '' : rad ? `<small${on ? ' class="on"' : ''}>${esc(Folket.tal(rad, i, SM.under))}</small>`
+          : oddsSmall(m, g.pr ? pctOdds(g.pr[i]) : '–', on ? 'on' : '');
         if (!pick) return `<span class="sm-c" aria-hidden="true">${b}${odds}</span>`;
         // Gängets tecken väljs i matcher som går att fylla i – till en stund
         // efter avspark (fillable).
@@ -1169,7 +1171,7 @@
         after: afterOf(s, r.id, w), pen: penOf(s, r.id, w), ids, day: days, out: r.out,
       });
     });
-    return html + Papper.foot(c, g) + '</div></div>';
+    return html + (SM.under == null ? mkLegend(rows.map((r) => r.m)) : '') + Papper.foot(c, g) + '</div></div>';
   }
 
   // Rubriken över gängets kupong (steg 4): Kupong 1 med omgångens namn, som
@@ -1527,10 +1529,11 @@
           const who = cols.filter((c) => (c.t[x.id] || '').includes(sg)).map((c) => c.g.id);
           return own
             ? `<button type="button" class="sm-c sm-k${pnum(v)}" data-s="${sg}" aria-pressed="${sign.includes(sg)}" aria-label="${sg} för ${esc(label)}">` +
-              `${box(sg, who, ids)}<small>${p ? pctOdds(p[j]) : '–'}</small></button>`
+              `${box(sg, who, ids)}${oddsSmall(m, p ? pctOdds(p[j]) : '–')}</button>`
             : `<span class="sm-c" aria-hidden="true">${box(sg, who, ids)}</span>`;
         }).join('') + '</div>';
     });
+    html += mkLegend(s.matcher.map((x) => matchById(x.id)));
     keepFocus(() => { $('#sm-rows').innerHTML = html; });
     // Foten: hur långt du har kommit och knappen.
     const mine = d ? d.tecken : (cols.find((c) => c.g.id === v && c.st !== 'hidden') || {}).t;
@@ -1879,7 +1882,7 @@
     }
     SM.pick = { ids: new Set(edit ? s.matcher.map((x) => x.id) : []), spel: undefined };
     SM.allDays = false;
-    const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...state.comps.values()];
+    const comps = [{ id: 'all', short: 'Alla', name: 'Alla tävlingar' }, ...filterComps()];
     const tools = '<div class="toolbar kp-tools">' +
       `<input type="search" id="sm-q" class="kp-search" placeholder="Sök lag" autocomplete="off" value="${esc(SM.q)}">` +
       '<div class="chips" id="sm-comps" role="group" aria-label="Tävling">' + comps.map((c) =>
@@ -1977,7 +1980,7 @@
     // Valda matcher som hunnit starta faller bort.
     for (const id of [...ids]) if (!isOpen(matchById(id), now)) ids.delete(id);
     const all = pickable(now).filter((m) => {
-      if (SM.comp !== 'all' && m.comp !== SM.comp) return false;
+      if (!inComp(m, SM.comp)) return false;
       return !q || fold(`${m.home} ${m.away}`).includes(q);
     });
     // Först bara närmaste omgången (och det som redan är valt); sökningen

@@ -14,6 +14,8 @@ const REF_RE = /\[(\d+(?:\s*[,;]\s*\d+)*)\]/g;
 // Artikeln ger inga tips – ett tipsord i texten ger en omskrivning.
 const TIP_RE = /\b(spik\w*|\w*gardera\w*|\w*gardering\w*)\b/i;
 const NOTES = { 1: 'spik', 2: 'halvgardera', 3: 'helgardera' };
+// En landskamp har marknadens prognos, inte modellens (config/analyser.js, landskamp).
+const MODELL_RE = /\b(modell\w*|sajtens (egen )?prognos)\b/i;
 
 // Talen i texterna (utan hänvisningarna) som varken står i underlaget eller i
 // det Claude läste.
@@ -124,7 +126,8 @@ function tipOf(raw, note) {
 }
 
 // Det som är fel i artikeln. known: underlaget och det Claude läste.
-export function problems(parts, known) {
+// landskamp: matchen är en landskamp, så modellen får inte nämnas.
+export function problems(parts, known, { landskamp = false } = {}) {
   const why = [];
   const texts = [parts.title, parts.lead, ...parts.paragraphs];
   const words = parts.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
@@ -132,16 +135,20 @@ export function problems(parts, known) {
   if (parts.title.split(/\s+/).length > 12) why.push('en för lång rubrik');
   const tip = texts.join(' ').match(TIP_RE);
   if (tip) why.push(`tips ("${tip[0]}")`);
+  const modell = landskamp && texts.join(' ').match(MODELL_RE);
+  if (modell) why.push(`"${modell[0]}" – prognosen för en landskamp är marknadens, inte modellens`);
   const bad = unknownNumbers(texts, known);
   if (bad.length) why.push(`tal som varken står i underlaget eller på en läst sida (${bad.join(', ')})`);
   return why;
 }
 
 // Det som är fel i tipset.
-export function tipProblems(parts, known) {
+export function tipProblems(parts, known, { landskamp = false } = {}) {
   if (!parts) return ['inget tips i rätt form'];
   const why = [];
   if (!parts.tip) why.push('inga giltiga tecken');
+  const modell = landskamp && parts.text.match(MODELL_RE);
+  if (modell) why.push(`"${modell[0]}" i tipset – prognosen för en landskamp är marknadens, inte modellens`);
   const bad = unknownNumbers([parts.text], known);
   if (bad.length) why.push(`tal i tipset som varken står i underlaget eller på en läst sida (${bad.join(', ')})`);
   return why;

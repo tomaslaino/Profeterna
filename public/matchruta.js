@@ -24,8 +24,13 @@
 (function () {
   const S365 = 'https://webws.365scores.com/web';
   const P365 = 'appTypeId=5&langId=1&timezoneName=UTC&userCountryId=1';
-  // Tävlingarna hos 365Scores (verifierat 2026-10-19).
-  const COMP365 = { pl: 7, ch: 1, l1: 2, l2: 3, fac: 8, lc: 9 };
+  // Tävlingarna hos 365Scores (verifierat 2026-10-19; landskamperna
+  // 2026-11-13: UEFA Nations League 7016 och Friendly International 570 –
+  // EM-kvalet har inget id än, det börjar i mars 2027).
+  const COMP365 = { pl: 7, ch: 1, l1: 2, l2: 3, fac: 8, lc: 9, unl: 7016, vsk: 570 };
+  // Landslagen heter på engelska hos 365Scores ("Sweden"), på sajten som hos
+  // Svenska Spel ("Sverige"): ESPN:s namn (land.en) jämförs i stället.
+  const enNames = new Map(); // matchid → [hemma, borta]
   const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
   const LIVE_MS = 60000;
   const FRESH_MS = 120000;
@@ -88,7 +93,8 @@
           let bs = 0;
           for (const g of d.games || []) {
             if (g.competitionId !== c || Math.abs(Date.parse(g.startTime) - t) > 3 * 3600000) continue;
-            const s = teamSim(m.home, g.homeCompetitor || {}) + teamSim(m.away, g.awayCompetitor || {});
+            const [h, a] = enNames.get(m.id) || [m.home, m.away];
+            const s = teamSim(h, g.homeCompetitor || {}) + teamSim(a, g.awayCompetitor || {});
             if (s > bs) { bs = s; best = g; }
           }
           return best && bs >= 1 ? best.id : null;
@@ -324,7 +330,9 @@
   // Tävlingar där 365Scores har en trolig elva före den bekräftade: 2026-10-19
   // för 14 av 23 PL- och CH-matcher upp till fem dagar fram, ingen av 61 i L1,
   // L2 och EFL-cupen.
-  const PROBABLE = new Set(['pl', 'ch']);
+  // Landskamperna har en trolig elva några dagar före (Sverige–Bosnien &
+  // Hercegovina 2026-11-13, dagen före).
+  const PROBABLE = new Set(['pl', 'ch', 'unl', 'vsk']);
 
   const POS_SV = { Goalkeeper: 'målvakt', Defender: 'back', Midfielder: 'mittfältare', Attacker: 'anfallare' };
 
@@ -735,6 +743,8 @@
       const same = current && current.m.id === d.match.id;
       const sq = d.squads || {};
       plans.set(d.match.id, d.elva || null);
+      const land = (t) => t && t.land && t.land.en;
+      if (land(d.teams && d.teams.home) && land(d.teams.away)) enNames.set(d.match.id, [land(d.teams.home), land(d.teams.away)]);
       current = { root, m: d.match, espn, squads: { h: sq.home, a: sq.away } };
       if (!root.dataset.mrCards) {
         root.dataset.mrCards = '1';
