@@ -3,9 +3,9 @@
 // ett av spåren, en öppen snusdosa med locket bredvid och, bara när det är
 // varmt i Stockholm, en gulnad bordsfläkt som svänger fram och tillbaka och
 // blåser röken åt sidan när den pekar mot askkoppen. I skyltfönstret
-// sitter löpsedlarna – IFK Göteborg 1982, Nacional 1988, VM 94 och Chelsea 1998
-// på skivan, och veckans löpsedel – som rum-affischer.js ritar och den här
-// filen sätter upp.
+// sitter löpsedlarna IFK Göteborg 1982, Nacional 1988, VM 94 och Chelsea 1998
+// på skivan, och veckans löpsedel står i ett ställ utanför dörren; rum-affischer.js
+// ritar dem och den här filen sätter upp dem.
 //
 // Slitaget skiftar från dag till dag och följer tippningen: går det dåligt
 // (fler fel bland omgångens avgjorda matcher, annars i den senaste
@@ -105,7 +105,7 @@ export async function saker(el, opt = {}) {
   const planes = [...el.querySelectorAll('.rum-world > .rum-pl')];
   const back = planes[0];
   const pult = planes.find((p) => /translateZ\(-60px\)/.test(p.style.transform));
-  // löpsedlarna i fönstret (rum-affischer.js)
+  // löpsedlarna på skivan och i stället utanför dörren (rum-affischer.js)
   const aff = back ? affischer(back, { short: opt.short, namn: opt.namn }) : null;
 
   // Fläkten står där bara när det känns som VARMT grader eller mer i Stockholm,

@@ -1297,6 +1297,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hela sedeln och en affisch) valde användaren löpsedeln: *GRAZIE GIANFRANCO!* under *CUP
   WINNERS’ CUP FINAL* och Tomas foto av laget med pokalen och Zola i mitten, som på IFK:s
   sedel. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Veckans löpsedel i ett ställ utanför dörren (2026-11-13, användarens val):** rummet skulle bli
+  lugnare. Av sex renderade skisser (löpsedlarna vända mot gatan, historien i sepia, en löpsedel i
+  taget, minnesväggen, löpsedelsstället och en kombination) valde användaren bara
+  löpsedelsstället: "Kör bara löpsedelsstället – det är det bästa just nu. Inget annat." Veckans
+  löpsedel står nu i ett svart ställ på trottoaren och syns genom dörrens glas, med gatans ljus.
+  Väggen under oraklet och fönstrets nedre vänstra hörn är fria. Skivan och allt annat är som förut.
+  Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **IFK och Chelsea utan prickar (2026-11-11, användarens önskemål):** "både IFK och
   chelsea-löpsedlarna är ju prickiga. Kan du ordna så att de inte är det men att de får rimlig
   patina". Prickrastret (ett rutnät, 2 px) blev ett mönster i närbilden. Nu har de samma papper som
@@ -3727,8 +3734,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   *Omgångens orakel* och namnet (delat: *Laino & Dogge*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
 - **Visitkortet** (på väggen mellan stationsuret och orakelramen, till höger om palmetten,
-  fäst med ett mässingsstift och lite snett; under oraklet sitter veckans löpsedel varannan
-  vecka) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
+  fäst med ett mässingsstift och lite snett) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
   terrakotta, logon och MATCHFIXARNA i guldfolie överst, i mitten våra autografer – det vi kallas
   (*Laino*, *Tejder*, *Dogge*) i var och ens handstil och bläck, samma som på kupongen (`sm-k0`–`sm-k2`), med en släng under
   – över var sin linje med namnet tryckt under, och längst ner devisen från Om oss: *Vi tippar
@@ -4552,16 +4558,20 @@ att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enli
 *Är det Sveriges bästa tippare?* handlar om bäst i gänget. Namnen, resultaten och siffrorna
 stämmer; det påhittade är kvällstidningens fraser (*Nu krävs svar*, *Hela målfesten i bilder*),
 aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre varianter, och
-veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
-Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
-häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
-bardisken, där den är mindre (72 %, så att den ryms mellan fönsterbänkens ände, diskens kant och
-den innersta barstolen, som är inskjuten under skivan) och nästan rak. Den hänger bakom disken och
-barstolarna, som står framför väggen (löpsedeln ligger före diskens duk i bakväggens plan). I
-telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
-ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
-telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade
-kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+veckan väljer bland dem. Den är den enda som byts, och den står i ett **löpsedelsställ** på
+trottoaren utanför dörren, som utanför en riktig tobaksaffär, och syns genom dörrens glas under
+handtaget (2026-11-13, användarens val: rummet skulle bli lugnare). Stället är svartlackerad plåt
+med sedeln 62 % stor bakom plast, på två ben med en tvärslå (`.rum-lopstall` i rum-affischer.css,
+platsen `STALL` i rum-affischer.js). Det står ute: i bakväggens plan direkt efter utsikten, så att
+dörrens karm, handtaget och smutsen på glaset ligger framför det. Det har gatans ljus: ett kallt
+skimmer på dagen, mörker när det är mörkt ute, lyktstolpens varma sken ovanifrån när den lyser och
+snö på ramen när det ligger snö (rum.js sätter `--ute-dag`, `.ute-lampor` och `.ute-sno` med
+utsikten). Ljuset är lager ovanpå, inga filter, och i närbilden (`.lop-nara`) ljusnar det så att
+rubriken går att läsa. Sedeln sitter rak och gulnar lite med slitaget. I telefonen på höjden ligger
+dörren utanför bilden från början; där syns stället när man drar åt vänster. (Först satt den
+ibland under dörrens handtag, sedan i fönstrets högra hörn och till 2026-11-13 varannan vecka med
+tejp i fönstrets nedre vänstra hörn och varannan med häftstift på väggen under oraklet, i telefonen
+alltid på väggen. Till och med 2026-11-05 var den från den påhittade kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
@@ -4637,7 +4647,7 @@ sticker ut en dryg decimeter över den indragna fronten, så att man har plats f
 kanten bär konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält.
 Fronten har fyllningar i ramar, en halv meter isär. Framför står tre barstolar likadana som gängets (röd vinyl med söm, krom, fotring),
 med sitsen 75 cm över golvet och inskjutna under kanten – den innersta ända in under skivan, så
-att sitsen går fri från löpsedeln på väggen; den närmaste syns bara till hälften
+att sitsen gick fri från löpsedeln som satt på väggen till 2026-11-13; den närmaste syns bara till hälften
 över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
 det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
 lite uppifrån. Disken ritas en gång, som inredningen, i en duk från disken in i videons hörn
@@ -4656,7 +4666,7 @@ Rummet läser om datan varje minut medan det står öppet.
 står på samma tid, och Stockholms klocka – uret, text-tv:n och utsikten – står på `?rum-klocka`,
 annars på när sidan laddades), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 `?rum-slit=0…1` slitaget, `?rum-dag=<tal>` dagen för sakerna och affischerna,
-`?rum-vecka=<tal>` veckan för löpsedelns plats och `?rum-rubrik=<typ>` en viss rubrik om den
+`?rum-vecka=<tal>` veckan för löpsedelns rubrikvariant och klipp och `?rum-rubrik=<typ>` en viss rubrik om den
 finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysaren`, `spiken`,
 `jakten`),
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,

@@ -16,8 +16,8 @@
 //   datorn på disken kommer nära (R): terminalen med kupongen, omgången (tavlans
 //   siffror), lagen och spelarna (rum-register.js, datorn i three.js i rum-dator.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
-//   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på
-//   skivan och veckans löpsedel, rum-affischer.js) och dörren (med vilka vi
+//   löpsedlarna (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på skivan i
+//   fönstret och veckans löpsedel i stället utanför dörren, rum-affischer.js) och dörren (med vilka vi
 //   är under): kameran går fram till dem (närbilderna, sak)
 //   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
 //   fram till den på pulten.
@@ -3057,6 +3057,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const d = document.getElementById('rum-dagsljus');
     d.style.setProperty('--dagsljus', r1(L.dag * 0.9));
     d.style.setProperty('--dag-farg', L.sky[2]);
+    // löpsedelsstället står ute och har gatans ljus (.rum-lopstall i rum-affischer.css)
+    R.el.style.setProperty('--ute-dag', r1(L.dag));
+    R.el.classList.toggle('ute-lampor', L.lampor);
+    R.el.classList.toggle('ute-sno', Boolean(v.snotackt));
     if (R.dagFarg) dagDuk();
     ljusKlockan();
     ljusIhop();
@@ -4380,6 +4384,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (!radio(namn)) R.rDetalj = setTimeout(() => { if (!radio(R.sak) && R.fig) R.fig.radioDetalj(false); }, cls ? 700 : 0);
     }
     R.el.classList.toggle('radio-nara', radio(namn));
+    // (löpsedelsstället ute ljusnar i närbilden, så att rubriken går att läsa)
+    R.el.classList.toggle('lop-nara', namn === 'lopsedel');
     R.sak = namn || null;
     if (!namn) {
       lagerUt('sak');
