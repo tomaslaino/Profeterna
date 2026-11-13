@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-13T18:20:55.972Z",
+ "uppdaterad": "2026-11-13T18:21:39.121Z",
  "omgang": {
   "id": "2026-11-14-st4979",
   "matcher": [
@@ -1138,6 +1138,77 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-07T10:50:10.471Z",
     "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880754",
+   "match": "AFC Wimbledon – Blackpool",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:21:07.625Z",
+   "text": "Wimbledon har gott om chanser och ont om mål\n\nAFC Wimbledon tar emot Blackpool i ett möte mellan lag nummer 18 och 19 i League One. Hemmalaget skapar chanser men gör få mål, och förra säsongens två klara segrar mot Blackpool känns långt borta efter cupsorti i Crewe.\n\nJohnnie Jacksons Wimbledon har gjort 9 mål på 13 ligamatcher. Chanserna har ändå funnits, för lagets förväntade mål ligger 2,3 över de mål som faktiskt gått in. Det syntes igen i FA-cupen förra lördagen, när Crewe vann med 2–1. Enligt Yahoo Sports [1] menade Jackson att laget saknade ”quality in decisive moments” och sade: ”We need more to show for it than one goal.” Crewes första mål slogs från mittlinjen, och det kallade han ”Wholly avoidable from ours.” Ett sådant mål släpps in av en mittback som tittar på bollen i stället för att backa hem. Det löser man med en hink bollar.\n\nBlackpool har gjort 17 mål på 12 matcher och hittar alltså nätet, men de har släppt in 21. Borta har det blivit en enda seger. Senast i ligan blev det 1–1 mot Sheffield Wednesday, en vecka efter att Mansfield vunnit med 4–1 på Bloomfield Road. I cupen mot Hornchurch från lägre divisioner stod det 1–1 efter full tid, och det krävdes förlängning. Det var en tung vecka för benen inför en resa till London.\n\nFörra säsongen vann Wimbledon båda mötena, med 2–0 i Blackpool och 4–1 hemma i mars. Sedan dess har mycket hänt. Wimbledon har fått 1 poäng av 12 möjliga i sina fyra senaste ligamatcher och förlorade med 0–5 mot Sheffield Wednesday. Bollen har aldrig läst en tabell, och den har heller aldrig hört talas om förra säsongen.\n\nTipset: X2 (Blackpool, inte mer)\n\nPrognosen ger Blackpool störst chans med odds 2,50, och marknaden har lagen jämnare. Det jag har läst ger inget skäl att lyfta Wimbledon. Jackson beklagar själv att laget saknar kvalitet i de avgörande lägena [1], och hemmalaget har gjort minst mål i ligan av de två. Samtidigt har Blackpool en förlängning i benen och har bara vunnit en bortamatch. Prognosen ger oavgjort större chans än marknaden gör, och 1–1 är det troligaste resultatet. Jag ringar in X och 2.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Wimbledon har gott om chanser och ont om mål",
+   "lead": "AFC Wimbledon tar emot Blackpool i ett möte mellan lag nummer 18 och 19 i League One. Hemmalaget skapar chanser men gör få mål, och förra säsongens två klara segrar mot Blackpool känns långt borta efter cupsorti i Crewe.",
+   "paragraphs": [
+    "Johnnie Jacksons Wimbledon har gjort 9 mål på 13 ligamatcher. Chanserna har ändå funnits, för lagets förväntade mål ligger 2,3 över de mål som faktiskt gått in. Det syntes igen i FA-cupen förra lördagen, när Crewe vann med 2–1. Enligt Yahoo Sports [1] menade Jackson att laget saknade ”quality in decisive moments” och sade: ”We need more to show for it than one goal.” Crewes första mål slogs från mittlinjen, och det kallade han ”Wholly avoidable from ours.” Ett sådant mål släpps in av en mittback som tittar på bollen i stället för att backa hem. Det löser man med en hink bollar.",
+    "Blackpool har gjort 17 mål på 12 matcher och hittar alltså nätet, men de har släppt in 21. Borta har det blivit en enda seger. Senast i ligan blev det 1–1 mot Sheffield Wednesday, en vecka efter att Mansfield vunnit med 4–1 på Bloomfield Road. I cupen mot Hornchurch från lägre divisioner stod det 1–1 efter full tid, och det krävdes förlängning. Det var en tung vecka för benen inför en resa till London.",
+    "Förra säsongen vann Wimbledon båda mötena, med 2–0 i Blackpool och 4–1 hemma i mars. Sedan dess har mycket hänt. Wimbledon har fått 1 poäng av 12 möjliga i sina fyra senaste ligamatcher och förlorade med 0–5 mot Sheffield Wednesday. Bollen har aldrig läst en tabell, och den har heller aldrig hört talas om förra säsongen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Yahoo Sports",
+     "title": "Jackson frustrated as wasteful Dons exit FA Cup",
+     "url": "https://sports.yahoo.com/articles/jackson-frustrated-wasteful-dons-exit-145751522.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Blackpool störst chans med odds 2,50, och marknaden har lagen jämnare. Det jag har läst ger inget skäl att lyfta Wimbledon. Jackson beklagar själv att laget saknar kvalitet i de avgörande lägena [1], och hemmalaget har gjort minst mål i ligan av de två. Samtidigt har Blackpool en förlängning i benen och har bara vunnit en bortamatch. Prognosen ger oavgjort större chans än marknaden gör, och 1–1 är det troligaste resultatet. Jag ringar in X och 2.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Blackpool, inte mer",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Yahoo Sports",
+      "title": "Jackson frustrated as wasteful Dons exit FA Cup",
+      "url": "https://sports.yahoo.com/articles/jackson-frustrated-wasteful-dons-exit-145751522.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:21:07.625Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Wimbledon har gjort nio mål på tretton ligamatcher, fast chanserna har funnits där hela tiden. Tränaren säger själv att laget saknar kvalitet i de lägen som avgör. Jag har sett det förr, i Manchester. Det gick bra då också. Här har det blivit en poäng av tolv möjliga på de fyra senaste matcherna och en förlust med 0–5 mot Sheffield Wednesday.",
+     "Blackpool släpper in för mycket, och de har en förlängning i benen efter cupen. Men de gör mål, och det är precis det Wimbledon inte gör. Ett hemmalag som missar sina lägen blir nervöst när bortalaget tar ledningen, och då öppnar det sig. Förra säsongens två segrar betyder ingenting nu. Lugn nu, jag ringar in tvåan och bara tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
+    "tips": "2026-11-13T18:21:07.625Z",
+    "uppdrag": {
+     "fraser": [
+      "Lugn nu",
+      "Nej nej nej"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:21:31.939Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
