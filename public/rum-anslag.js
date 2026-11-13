@@ -114,17 +114,22 @@ window.RumAnslag = (() => {
 
   // Bladen i lapparna: ett per division i omgången, i den här ordningen, och
   // flikarnas färger (som på Tabeller).
+  // Landskamperna (Nations League, EM-kvalet och vänskapsmatcherna, type 'intl') har ett
+  // eget blad överst, som på kupongen: där står formen, skadelistan (okänd) och vilan,
+  // men inte lapparna som räknar med modellen och xG – den känner bara klubblagen.
   const ARK = {
+    land: { name: 'Landskamper', short: 'NL', col: '#c9a227' },
     pl: { name: 'Premier League', short: 'PL', col: '#2a78d6' },
     ch: { name: 'Championship', short: 'CH', col: '#eb6834' },
     l1: { name: 'League One', short: 'L1', col: '#1baf7a' },
     l2: { name: 'League Two', short: 'L2', col: '#eda100' },
     cup: { name: 'Cupen', short: 'Cup', col: '#b0475e' },
   };
-  const arkOf = (m) => (DIVS.includes(m.comp) ? m.comp : 'cup');
+  const LAND = new Set(['unl', 'emk', 'vsk']);
+  const arkOf = (m) => (DIVS.includes(m.comp) ? m.comp : LAND.has(m.comp) ? 'land' : 'cup');
   // bladen under det översta sticker fram: vridna kring nålen och lite
   // förskjutna, [grader, x, y] för det andra, tredje …
-  const FAN = [[0, 0, 0], [1.5, 1, 2], [-1.3, -1, 3], [2.2, 1.5, 4], [-2, -1.5, 5]];
+  const FAN = [[0, 0, 0], [1.5, 1, 2], [-1.3, -1, 3], [2.2, 1.5, 4], [-2, -1.5, 5], [1.8, 1, 6]];
   const FLIK = (i) => 14 + i * 24;
 
   // ---------- datan ----------
@@ -188,6 +193,8 @@ window.RumAnslag = (() => {
   const rowsOf = (items) => items.join('');
   const dolt = (h) => `<h4>${h}</h4><p class="dolt">?</p>`;
   const blank = (n, cls = 'tom') => Array.from({ length: n }, () => `<span class="${cls}"></span>`).join('');
+  // Landskampernas blad på lapparna som räknar med modellen och xG: de finns bara för klubblagen.
+  const klubb = (h) => `<h4>${h}</h4><p class="inget">Bara klubblagen</p><p class="ans-land">Modellen och xG finns inte för landslagen.</p>`;
 
   function noteForm(D) {
     if (!D.ms.length) return '<h4>Formen</h4><p class="inget">Ingen omgång</p>';
@@ -218,7 +225,10 @@ window.RumAnslag = (() => {
       }
     }
     if (wait && !lines.length) return `<h4>Skadelistan</h4>${blank(8)}`;
-    if (!lines.length) return `<h4>Skadelistan</h4><p class="inget">${any ? 'Inga skador' : 'Okänt'}</p>`;
+    if (!lines.length) {
+      return `<h4>Skadelistan</h4><p class="inget">${any ? 'Inga skador' : 'Okänt'}</p>` +
+        (D.land && !any ? '<p class="ans-land">Ingen fri källa för landslagens skador.</p>' : '');
+    }
     return `<h4>Skadelistan</h4>${lines.join('')}`;
   }
 
@@ -246,7 +256,7 @@ window.RumAnslag = (() => {
     }
     const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}${divs.length > 1 ? ` <small>${SHORT[x.t.comp]}</small>` : ''}</span>` +
       `<span>${signed(x.t.str, 2)}</span></span>`;
-    const back = D.veil ? dolt('Starkast') : best.length ? `<h4>Starkast</h4>${best.map(row).join('')}${worst.length ? `<h4>Svagast</h4>${worst.map(row).join('')}` : ''}` : '<h4>Starkast</h4><p class="inget">Okänt</p>';
+    const back = D.land ? klubb('Starkast') : D.veil ? dolt('Starkast') : best.length ? `<h4>Starkast</h4>${best.map(row).join('')}${worst.length ? `<h4>Svagast</h4>${worst.map(row).join('')}` : ''}` : '<h4>Starkast</h4><p class="inget">Okänt</p>';
     return `<span class="ans-vand"><span class="fram">${front}</span><span class="bak">${back}</span></span>`;
   }
 
@@ -260,6 +270,7 @@ window.RumAnslag = (() => {
   const vsOdds = (t) => { const m = fdOf(t, 'mkt'); return m ? m.pts - m.xp : null; };
 
   function noteKryss(D) {
+    if (D.land) return klubb('Kryssar gärna');
     if (D.veil) return dolt('Kryssar gärna');
     const l = teamList(D, xdraw, 7);
     return '<h4>Kryssar gärna</h4>' + (l.length
@@ -275,6 +286,7 @@ window.RumAnslag = (() => {
   // en lista som är tom i en liten division
   const rows = (l, row) => (l.length ? l.map(row).join('') : '<span class="r q">Ingen</span>');
   function noteTur(D) {
+    if (D.land) return klubb('Tur &amp; otur');
     if (D.veil) return dolt('Tur &amp; otur');
     const [up, down] = split(D, xpd, 4);
     const max = Math.max(1, ...up.map((x) => x.v), ...down.map((x) => -x.v));
@@ -284,6 +296,7 @@ window.RumAnslag = (() => {
     return `<h4>Tur &amp; otur</h4><b class="d">Tur</b>${rows(up, row)}<b class="d">Otur</b>${rows(down, row)}`;
   }
   function noteOdds(D) {
+    if (D.land) return klubb('Slår oddsen');
     if (D.veil) return dolt('Slår oddsen');
     const [up, down] = split(D, vsOdds, 4);
     const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><span>${signed(x.v)}</span></span>`;
@@ -309,6 +322,7 @@ window.RumAnslag = (() => {
   // i divisionen, minus = lättare (fd.opp, mål per match enligt modellen).
   const opp = (t) => fdOf(t, 'opp');
   function noteMotstand(D) {
+    if (D.land) return klubb('Motståndet');
     if (D.veil) return dolt('Motståndet');
     const [up, down] = split(D, opp, 4);
     const row = (x) => `<span class="r"><span>${esc(D.kort(x.name))}</span><span>${signed(x.v, 2)}</span></span>`;
@@ -627,7 +641,7 @@ window.RumAnslag = (() => {
       const ark = {};
       for (const s of A.sheets) {
         const ms = s === 'alla' ? A.ms : A.ms.filter((m) => arkOf(m) === s);
-        ark[s] = { ms, teams: A.byTeam, match: A.match, round: roundOf(ms), kort: o.kort, veil, key, n };
+        ark[s] = { ms, teams: A.byTeam, match: A.match, round: roundOf(ms), kort: o.kort, veil, key, n, land: s === 'land' };
       }
       return { ark, veil, key, n };
     }
@@ -1258,6 +1272,9 @@ window.RumAnslag = (() => {
         A.ms = (ms || []).slice();
         // bladen: divisionerna i omgången, och det valda överst så länge det finns
         const S = Object.keys(ARK).filter((s) => A.ms.some((m) => arkOf(m) === s));
+        // fliken för landskamperna: NL, EM eller LK (blandat)
+        const lk = new Set(A.ms.filter((m) => LAND.has(m.comp)).map((m) => m.comp));
+        ARK.land.short = lk.size === 1 && lk.has('unl') ? 'NL' : lk.size === 1 && lk.has('emk') ? 'EM' : 'LK';
         A.sheets = S.length ? S : ['alla'];
         if (!A.sheets.includes(A.top)) A.top = A.sheets[0];
         if (A.all !== all) {

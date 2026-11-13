@@ -6170,6 +6170,20 @@ sätt:
 | Tabellen | Matchrutans *Tabellen* (`leagueTable`): samma kolumner och rader, men bara utdraget runt lagen | `data/teams/<division>.json` |
 | Mötena | Kortregistrets kort om mötet (`motet` i rum-register.js) | `meetings`, `pastMeetings` |
 
+**Landskamperna i matchbladet** (2026-11-13, användarens önskemål: "Uppdatera hela hemsidan utefter detta"). För en
+landskamp står tiden och under den tävlingen och gruppen, *Nations League · Grupp B4*, mellan lagen; ett namn som då
+inte ryms (*Bosnien & Hercegovina*) står med det kortare (`trangt`). På Lagen heter delen *Nations League hittills*, med
+målen och V–O–F i stället för xG, som inte finns för landslagen; formen är alla landskamper. Prognos heter *Marknadens
+prognos* med spelbolaget till höger (*DraftKings utan marginal*) och en rad om att modellen bara räknar på klubblagen;
+Vad drog åt vilket håll finns inte. Tabellen är gruppen i Nations League ur `data/landslag.json`, hel, med lagen
+markerade (`gruppen`). Startelvor, Analys och Mötena är som för klubbarna. Kupongen i handen behövde inte ändras: de
+svenska namnen ryms på den breda kupongen, och på den smala står *Bosnien*.
+
+Provat 2026-11-13 med riktig data och omgångens tretton matcher (tjänsten på workers.dev nås inte från provmiljön, så
+dess svar spelades upp i webbläsaren) i huvudlös Chromium, 1440 × 900 och 390 × 844: kupongen i handen och
+bladet för Sverige–Bosnien & Hercegovina på Lagen, Prognos, Startelvor, Tabellen och Mötena, utan fel i konsolen.
+Att fylla i och lämna in mot den riktiga tjänsten är inte provat.
+
 **Nästa omgång ur kupongstället** (2026-11-09, användarens önskemål). Nästa kupong går alltid att
 titta på: ett klick på kupongstället på disken eller N tar en blank kupong för nästa omgång i
 handen. Det är veckans Stryktips som Svenska Spel har öppet för spel – samma som *Hämta
@@ -6398,6 +6412,22 @@ animering som grafikkortet sköter själv (`fly` i rum-anslag.js), så att den g
 när datorn har annat att göra (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
 Pekar man på tavlan i rummet tänds snabbvalet Statistik på
 text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
+
+**Landskamperna på tavlan** (2026-11-13, användarens önskemål: "Stryktipset verkar innehålla en massa matcher nu som
+vi inte har lyckats lägga till än på olika ställen … Uppdatera hela hemsidan utefter detta"). Landskamperna har ett eget
+blad överst i bunten, före Premier League, eftersom de står först på kupongen. Fliken är guldgul och heter *NL* när alla
+landskamper är Nations League (*EM* för EM-kvalet, annars *LK*); förut hamnade de på cupbladet. Formen och vilan kommer
+ur matchens fil som för klubbarna: de fem senaste i alla landskamper (VM, VM-kvalet, Nations League och vänskapsmatcher
+sedan hösten 2024) och dagarna sedan förra landskampen. Skadelistan står som *Okänt* med raden *Ingen fri källa för
+landslagens skador*, inte som tom. Starkast, Kryssar gärna, Tur & otur, Slår oddsen och Motståndet räknar med modellen
+och xG, som bara finns för klubblagen; på landskampernas blad står de som *Bara klubblagen* med en rad om varför, och
+polaroiden är ett tomt foto. Klubbarnas blad är som förut. Bladen kan nu vara sex (landskamper, fyra divisioner och cupen).
+*Bosnien & Hercegovina* heter *Bosnien* där raden är smal (`Papper.kort` i [public/papper.js](public/papper.js)).
+
+Provat 2026-11-13 med riktig data från ESPN och en kupongfil med veckans tretton matcher (som inte är committad) i
+huvudlös Chromium, 1440 × 900 och 390 × 844: tavlan på väggen och framme, formen i handen, utan fel i konsolen.
+Flaggorna (a.espncdn.com) och football-data.co.uk nåddes inte från provmiljön, så polaroidens flagga och klubbarnas
+siffror på de andra lapparna syntes inte i provet.
 
 **Ropa till Hasse** (2026-11-06, användarens önskemål): under lappen i handen står det man ropar
 till Hasse Backe (fiktiv), som sitter i baren till vänster utanför bilden – *Hasse, vad betyder

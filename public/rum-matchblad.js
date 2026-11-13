@@ -92,6 +92,20 @@ window.RumMatchblad = (() => {
     else flik = id;
   };
 
+  // Landskamperna (type 'intl'): gruppen i Nations League i stället för ligan, Nations League
+  // hittills utan xG (finns inte för landslagen), marknadens prognos märkt som marknadens och
+  // gruppens tabell ur data/landslag.json.
+  const LAND = new Set(['unl', 'emk', 'vsk']);
+  const arLand = (m, d) => Boolean((d && d.match && d.match.type === 'intl') || (m && LAND.has(m.comp)));
+  let landslag = null;
+  const loadLandslag = () => {
+    if (!landslag) {
+      landslag = fetch('data/landslag.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))));
+      landslag.catch(() => { landslag = null; });
+    }
+    return landslag;
+  };
+
   const cache = new Map();
   function load(id) {
     if (!cache.has(id)) {
@@ -166,6 +180,7 @@ window.RumMatchblad = (() => {
   // antalet matcher det gäller till höger om rubriken.
   function ligan(d, veil) {
     const T = [d.teams.home, d.teams.away];
+    const land = arLand(null, d);
     const rec = (t) => t.record && t.record.all;
     const mal = (t, i) => {
       const r = rec(t);
@@ -177,11 +192,17 @@ window.RumMatchblad = (() => {
       if (!x || !x.n) return '–';
       return veil[i] ? '?' : `${dec(x.f)}–${dec(x.a)}`;
     };
+    // (landslagen: vinster, oavgjorda och förluster i stället för xG)
+    const vof = (t, i) => {
+      const r = rec(t);
+      if (!r || !r.n) return '–';
+      return veil[i] ? '?' : `${r.w}–${r.d}–${r.l}`;
+    };
     const kort = T.map((t, i) => {
       const r = rec(t);
       return t.xg && t.xg.n && !veil[i] && r && r.n !== t.xg.n ? t.xg.n : null;
     });
-    const n = kort.filter(Boolean);
+    const n = land ? [] : kort.filter(Boolean);
     const efter = !n.length ? ''
       : n.length === 1 ? `xG för ${esc(kort[0] ? d.match.home : d.match.away)}: ${n[0]} matcher`
         : n[0] === n[1] ? `xG: ${n[0]} matcher` : `xG: ${n[0]} och ${n[1]} matcher`;
@@ -190,6 +211,7 @@ window.RumMatchblad = (() => {
     const liga = lg[0] !== lg[1] ? rad('Liga', (t) => esc(t.league ? t.league.name : 'okänd')) : '';
     const src = T.map((t) => t.xg && t.xg.source && t.xg.source.provider).filter(Boolean);
     const title = src.length ? ` title="${esc(`xG: ${[...new Set(src)].join(' och ')}`)}"` : '';
+    if (land) return del(rubrad('Nations League hittills') + liga + `<div class="rl-halvor">${rad('Mål', mal)}${rad('V–O–F', vof)}</div>`, 'rl-landet');
     return del(rubrad('Ligan hittills', efter) + liga + `<div class="rl-halvor">${rad('Mål', mal)}${rad(`<span${title}>xG</span>`, xg)}</div>`);
   }
 
@@ -242,6 +264,13 @@ window.RumMatchblad = (() => {
       `<div>${rubrad('Förväntade mål')}<b class="rl-tal">${goals}</b></div>` +
       (top.length ? `<div>${rubrad('Troligast')}<span class="rb-topp">${top.map((t) => `<span class="rl-m${blev(t) ? ' blev' : ''}"><b>${mp(t)}<span>${t.home}–${t.away}</span></b><small>${fmt(1 / t.p)}</small></span>`).join('')}</span></div>` : '') +
       '</div>';
+    // landskamperna: marknadens prognos (oddsen utan spelbolagets marginal), inte modellens
+    if (p.kind === 'marknaden') {
+      const bolag = d.odds && d.odds.espn && d.odds.espn.provider;
+      return del(rubrad('Marknadens prognos', esc(bolag ? `${bolag} utan marginal` : 'oddsen utan marginal')) + trio([m.home, 'Oavgjort', m.away], w.map(ur), w, res, `prog${m.id}`)) +
+        del(tva) + del('<p class="rb-inga">Modellen räknar bara på klubblagen i England. För landskamperna är prognosen marknadens: ' +
+          'oddsen utan spelbolagets marginal, och målen ur en Poissonmodell som stämmer med dem.</p>');
+    }
     return del(rubrad(fore ? 'Prognos före avspark' : 'Prognos efter 90 minuter') + trio([m.home, 'Oavgjort', m.away], w.map(ur), w, res, `prog${m.id}`)) +
       del(tva) + (fore ? '' : steg(d, m));
   }
@@ -381,7 +410,29 @@ window.RumMatchblad = (() => {
     return `<table class="rb-tabell"><thead><tr><th class="lag" colspan="2">${esc(T.name)}</th><th title="Spelade">S</th><th class="sm" title="Vunna">V</th>` +
       `<th class="sm" title="Oavgjorda">O</th><th class="sm" title="Förlorade">F</th><th class="sm">Mål</th><th title="Målskillnad">+/−</th><th title="Poäng">P</th></tr></thead><tbody>${body}</tbody></table>`;
   }
+  // Landskamperna: gruppen i Nations League (data/landslag.json), hela, med lagen markerade.
+  async function gruppen(d) {
+    const T = [d.teams.home, d.teams.away];
+    const keys = T.map((t) => t.key);
+    const ids = [...new Set(T.map((t) => (t.table && t.table.group) || (t.land && t.land.grupp)).filter(Boolean))];
+    if (!ids.length) return tom('Lagen har ingen grupp i Nations League.');
+    try {
+      const L = await loadLandslag();
+      const out = ids.map((id) => {
+        const G = (L.grupper || []).find((x) => x.id === id);
+        if (!G) return '';
+        return tabell({
+          name: `Nations League · ${G.namn}`,
+          teams: G.lag.map((x) => ({ key: `land:${x.espnId}`, rank: x.rank, name: x.lag, m: x.played, w: x.won, d: x.drawn, l: x.lost, gf: x.gf, ga: x.ga, gd: x.gd, pts: x.points })),
+        }, keys);
+      }).join('');
+      return out || tom('Gruppens tabell är okänd.');
+    } catch {
+      return tom('Tabellen går inte att hämta just nu.');
+    }
+  }
   async function tabellen(d) {
+    if (arLand(null, d)) return gruppen(d);
     const ids = g('tableDivs') ? tableDivs(d) : [];
     if (!ids.length) return tom('Lagen spelar inte i någon av ligorna som har en tabell här.');
     const keys = [d.teams.home.key, d.teams.away.key];
@@ -532,9 +583,24 @@ window.RumMatchblad = (() => {
     const comp = g('compOf') ? compOf(m.comp) : null;
     // (en match ur ett gammalt protokoll kan sakna avsparken)
     const t = Date.parse(m.kickoff);
-    const nar = [Number.isFinite(t) ? fNar.format(new Date(t)) : '', comp && comp.short ? comp.short : ''].filter(Boolean).join(' · ');
     const klart = m.completed && m.score && !(window.Spoiler && Spoiler.hidden(m));
+    // en landskamp: tävlingen och gruppen utskrivna (Nations League · Grupp B4) under tiden
+    if (arLand(m) && comp) {
+      const grupp = [comp.name, m.round || m.group || ''].filter(Boolean).join(' · ');
+      return `${klart ? `<b>${m.score.home}–${m.score.away}</b>` : `<small>${esc(Number.isFinite(t) ? fNar.format(new Date(t)) : '')}</small>`}` +
+        `<small class="rl-grupp">${esc(grupp)}</small>`;
+    }
+    const nar = [Number.isFinite(t) ? fNar.format(new Date(t)) : '', comp && comp.short ? comp.short : ''].filter(Boolean).join(' · ');
     return `${klart ? `<b>${m.score.home}–${m.score.away}</b>` : ''}<small>${esc(nar)}</small>`;
+  }
+
+  // Ett lagnamn som inte ryms överst (Bosnien & Hercegovina bredvid tävlingen och gruppen) står
+  // med det kortare namnet, som i telefonen.
+  function trangt(el) {
+    for (const b of el.querySelectorAll('.rl-t b')) {
+      b.classList.remove('trang');
+      if (b.scrollWidth > b.clientWidth + 1) b.classList.add('trang');
+    }
   }
 
   function topp(ctx) {
@@ -624,6 +690,8 @@ window.RumMatchblad = (() => {
       el.dataset.id = String(m.id);
       el.innerHTML = topp(ctx);
       host.appendChild(el);
+      trangt(el);
+      if (document.fonts) document.fonts.ready.then(() => { if (B.el === el) trangt(el); });
       Object.assign(B, { el, id: String(m.id), ctx });
       koppla(el, ctx);
       el.focus({ preventScroll: true });
