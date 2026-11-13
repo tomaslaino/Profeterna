@@ -734,6 +734,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Stryktipset, Svenska folket, odds och favoritskap | Svenska Spels öppna API (`api.spela.svenskaspel.se/draw/1/stryktipset/draws` och `…/draws/<nr>`), hämtas av tjänsten profeterna-kupong åt webbläsaren | omgångens kupong | när omgången startas eller man trycker på *Hämta Stryktipset* | Verifierat 2026-10-20: ingen nyckel, men inget `Access-Control-Allow-Origin` för andra sajter – därför via tjänsten, som sparar svaret en minut. Omgångens tretton matcher med nummer, lag (korta namn: *QPR*, *Wolves*, *Bristol C*), avspark och `svenskaFolket` i hela procent. Svenska Spel räknar om fördelningen ungefär varje minut och fryser den vid spelstoppet; `/draws/<nr>` ger den också efteråt. Inget matchid som ESPN:s – matchen hittas på lagen (början av namnet efter några smeknamn) och avspark inom 36 timmar: 13 av 13 i vecka 43. `odds` och `favouriteOdds` (verifierat 2026-11-08 på en öppen omgång av Europatipset, samma gränssnitt) finns medan omgången är öppen men är borta när den är färdigspelad (omgång 4978), medan `svenskaFolket` och `startOdds` ligger kvar; tjänsten sparar därför sista läget (se [Inför uppgörelsen](#inför-uppgörelsen)). Styr inte prognosen. |
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Höjdpunkter (sammandrag) | Viaplays öppna innehålls-API (`content.viaplay.se/pcdash-se/sport/fotboll/<tävling>`) | PL, CH, FA-cupen (sidorna för L1 och EFL-cupen svarar 404 sedan oktober 2026) | 30 min | Verifierat 2026-10-20: ingen nyckel, svarar även från USA (GitHub Actions). Viaplay har rättigheterna i Sverige och lägger ut sammandrag som spelas utloggad efter en kort reklamfilm. Listorna *Höjdpunkter* och *Utvalda klipp* per tävling, 40 klipp per sida; sammandragen känns igen på formatet (*Höjdpunkter från Premier League*, *Sporthöjdpunkter*). Premier Leagues femminutersklipp ligger ute en månad, övriga ett år; klipp som faller ur listorna behålls tills de går ut. Inget matchid – matchen hittas på tävling, båda lagen (alias eller ordens början, t.ex. *Bristol C*) och avspark 30 dagar före till 3 dagar efter att klippet lades ut: alla 212 sammandrag med två lag i titeln från säsongens start hittade exakt en match (170 matcher). League Two har inga. Länken går direkt till Viaplays spelare (`viaplay.se/player/default/sport/<guid>`, startar utan Börja titta) och öppnas i ett eget 16:9-fönster på datorn, i ny flik på telefonen – Viaplay tillåter inte att sidorna visas inuti andra sajter (`X-Frame-Options: DENY`, `frame-ancestors 'none'`), så klippen går inte att bädda in. Styr inte prognosen. |
+| Landskamperna: spelprogram, resultat och grupperna | ESPN:s öppna API (`uefa.nations`, `uefa.euroq`, `fifa.friendly`; tabellen i `standings` med en grupp per `children`) | Nations League, EM-kval, vänskapslandskamper | 30 min, tabellen 3 h | Verifierat 2026-11-13: Nations League 2026/27 har 52 matcher 12–17 november, gruppen i `competitions[0].group` ("Group B4") och tabellen i 14 grupper (A1–D2), lagen i id-ordning. Vänskapsmatcherna gäller hela världen – bara de med ett europeiskt landslag tas med. EM-kvalet är tomt till mars 2027. Se [Landskamperna](#landskamperna). |
+| Landskamperna: odds | ESPN matchsammanfattning (DraftKings) | landskamperna | 2 h, tre dagar bakåt till sju dagar fram, sparas | Verifierat 2026-11-13: odds för alla fem landskamperna på Stryktipset 14 november. Ger landskampernas prognos. |
+| Landslagens tidigare matcher | ESPN (`fifa.world` juni–juli 2026, `fifa.worldq.uefa` 2025–mars 2026, `uefa.nations` 2024/25, `fifa.friendly` 2025–2026) | landskamperna – formen och mötena | 7 d | Bara matcher med ett europeiskt landslag. |
+| Landslagens flaggor | ESPN:s bildtjänst (`…/teamlogos/countries/500/<kod>.png`, koden ur lagets logo-adress) | landskamperna | när ett nytt lag kommer | Landslagen ligger inte bland klubbarnas sköldar. Sparas som sköldarna, under det svenska namnet. |
 | Höjdpunkter (YouTube) | Kanalernas öppna flöden (`youtube.com/feeds/videos.xml?channel_id=<id>`, de 15 senaste klippen) och oEmbed (`youtube.com/oembed`) | alla sex | 30 min | Ingen nyckel. Kanalerna i [config/youtube.js](config/youtube.js): Premier League, Sky Sports Premier League, Sky Sports Football, EFL och FA-cupen, plus de 92 ligaklubbarnas egna kanaler (id ur Wikidata P2397 och länkarna på klubbarnas sajter, 2026-10-20). Bara klipp med *highlights* i titeln; damlag, ungdomslag, träningsmatcher, EFL Trophy och gamla matcher sorteras bort. oEmbed sorterar bort klipp som inte får bäddas in (401) eller är borta (404). Flödet har ingen landsspärr – spärrade klipp märks i spelaren, som tar nästa. Matchen hittas på lag och tid: utlagt 95 minuter till sex dygn efter avspark; i en klubbs kanal ska motståndaren stå i titeln, i en sändares båda lagen; ett resultat i titeln ska vara matchens. Spelas inbäddat från `youtube-nocookie.com`. Styr inte prognosen. |
 
 **Prövat och inte använt:**
@@ -2867,6 +2871,48 @@ noll. 2026-11-11 hade 1 112 spelare siffrorna (Premier League 280, Championship 
 267, League Two 226), ungefär hälften av årets ordinarie: den som nästan aldrig saknats har för
 få matcher utan. Tio matcher är fortfarande lite: skillnaden mellan med och utan är ofta inom vad slumpen
 ger, och sajten visar inga intervall.
+
+## Landskamperna
+
+Under landslagsuppehållen tar Stryktipset in landskamper (vecka 46 2026: Sverige–Bosnien & Hercegovina,
+Portugal–Danmark, Norge–Wales, Rumänien–Polen, Nordirland–Ukraina, Österrike–Irland och Georgien–Ungern i Nations
+League, och resten ur League One). Sedan 2026-11-13 finns de på sajten (användarens önskemål: "Stryktipset verkar
+innehålla en massa matcher nu som vi inte har lyckats lägga till än på olika ställen"), så att omgångens kupong,
+*Hämta Stryktipset*, Svenska folket och rummet tar med dem som andra matcher.
+
+- **Tävlingarna** (`INTERNATIONAL` i [config/competitions.js](config/competitions.js), `type: 'intl'`): Nations League
+  (`unl`, ESPN `uefa.nations`), EM-kval (`emk`, `uefa.euroq`, från mars 2027) och vänskapslandskamper (`vsk`,
+  `fifa.friendly`, bara där ett europeiskt landslag spelar – ett lag i Nations League). De står i `meta.json` efter de
+  engelska, så att matchlistan, kupongens tävlingsfilter och liveställningen tar med dem. Gruppen står som omgång
+  (*Grupp B4*).
+- **Lagnamnen** är svenska, som Svenska Spel skriver dem ([config/landslag.js](config/landslag.js): *Sverige*,
+  *Bosnien & Hercegovina*, *Nordirland*, *Irland*). Det är dem kupongen knyter Stryktipsets rader till (Svenska Spels
+  namn ska vara början av sajtens, `linkDraw` i worker/stryktipset.mjs och public/folket.js), så tjänsten behövde
+  inte ändras. ESPN:s namn finns kvar som `en`. Lagens nyckel är `land:<ESPN-id>`, så att ett landslag aldrig blandas
+  ihop med en klubb.
+- **Prognosen är marknadens**, inte modellens: modellen känner bara lagen i England. Den är DraftKings odds via ESPN
+  utan spelbolagets marginal (Shin, samma som baslinjen (c)), och målen – de troligaste resultaten, över 2,5 och båda
+  gör mål – är de förväntade mål i en Poissonmodell som stämmer bäst med oddsen för 1, X och 2 och över/under
+  (`predictLand` och `goalsFromMarket` i [src/forecast.js](src/forecast.js); prognosen har `kind: 'marknaden'`, och
+  i matchlistan `mk: 1`). Utan odds är den okänd. Oddsen sparas också efter matchen (`espn_odds_land`), så att
+  datorns chans finns kvar på kupongen och i historiken. Landskamperna går varken in i prognosjournalen, i
+  utvärderingen eller i modellens underlag – de ligger i en egen lista (`land` i src/matches.js) utanför `matches`.
+- **Underlaget** (`landDetail` i [src/matches.js](src/matches.js)) har samma form som för en klubbmatch: gruppen och
+  tabellen i Nations League, Nations League hittills, formen i alla landskamper (också VM, VM-kvalet och
+  vänskapsmatcherna sedan hösten 2024), schemat och de senaste mötena. Skott, xG, domaren och skadorna finns inte i
+  de fria källorna för landslagen och står som okända med orsak.
+- **data/landslag.json** ([src/landslag.js](src/landslag.js)): Nations Leagues grupper med tabellen, varje europeiskt
+  landslag med gruppen, Nations League hittills, alla landskamper sedan 2024, de tio senaste matcherna och nästa
+  match, och landskamperna från tre dagar bakåt till sju dagar fram med prognosen – för datorn, text-tv:n och
+  statistiken.
+- **Flaggorna** ligger i ESPN:s bildmapp för länder, inte bland sköldarna; de hämtas som sköldarna och sparas under
+  det svenska namnet, så att `Skoldar.src` hittar dem. Sköldarnas källa hämtar nu direkt när ett nytt lag dyker upp
+  (`due` i src/sources.js och src/refresh.js), i stället för att vänta en vecka.
+
+Provat 2026-11-13 med påhittad ESPN-data i samma form som spaningen mot ESPN gav (molnmiljön där grunden skrevs når
+inte ESPN): bygget gav matchsidor, prognoser och `landslag.json` utan fel, Svenska Spels namn knöts till rätt match
+med `linkDraw`, och i huvudlös Chromium visade matchlistan, matchrutan, Ny kupong och Välj matcher landskamperna utan
+fel i konsolen. Hämtningen och bygget mot riktig data prövas av GitHub Actions efter mergen.
 
 ## Kupongen
 

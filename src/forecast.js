@@ -674,6 +674,15 @@ function forecastAll({ now = new Date() } = {}) {
   for (const [day, list] of byDay) {
     intervals(ctx, day, list).forEach((r, i) => { out.get(list[i].id).range = r; });
   }
+  // Landskamperna: marknadens prognos (predictLand), utanför modellen.
+  const D = load();
+  for (const m of D.land) {
+    try {
+      out.set(m.id, predictLand(D, m));
+    } catch (err) {
+      console.error(`[forecast] landskamp ${m.id}: ${err.message || err}`);
+    }
+  }
   const latest = ctx.fits.size ? fitAt(ctx, Math.max(...ctx.fits.keys())) : null;
   // Styrkan för alla lag (motståndet i lagstatistiken). Beskrivande ur samma
   // skattning; fallerar den saknas bara den.
@@ -684,6 +693,84 @@ function forecastAll({ now = new Date() } = {}) {
     console.error('[forecast] styrkan:', err);
   }
   return { predictions: out, model: modelSummary(ctx, latest), strength, ms: Date.now() - t0 };
+}
+
+// ---------- landskamperna ----------
+
+// Modellen känner bara lagen i England, så prognosen för en landskamp är
+// marknadens: DraftKings odds via ESPN (src/sources.js, espn_odds_land) utan
+// spelbolagets marginal (Shin), samma metod som baslinjen (c). Målen – och med
+// dem resultaten, över 2,5 och båda gör mål – är de förväntade mål i en
+// Poissonmodell som stämmer bäst med oddsen för 1, X och 2 och, när de finns,
+// över/under. Utan odds är prognosen okänd. Går inte in i journalen eller
+// utvärderingen (src/build.js).
+function predictLand(D, m) {
+  const o = (D.landOdds.byEvent[m.id]) || D.odds.byEvent[m.id] || null;
+  const team = (t) => ({ name: t.name, tier: null, division: 'Landslag', basis: 'eget', matches: null, seasonMatches: null, since: null });
+  const out = {
+    rulesVersion: rules.version,
+    kind: 'marknaden',
+    retro: !!m.completed,
+    status: 'ok',
+    teams: { home: team(m.home), away: team(m.away) },
+  };
+  const market = o ? marketFrom([o.home, o.draw, o.away], { source: `${o.provider} via ESPN`, kind: 'senaste', fetchedAt: o.fetchedAt }) : null;
+  out.baselines = { naive: null, season: null, market, closing: null };
+  if (!market) {
+    out.status = 'okänt';
+    out.reasons = ['Landskamp: modellen räknar bara på lagen i England, och DraftKings (ESPN) har inga odds för matchen än.'];
+    return out;
+  }
+  let total = null;
+  if (o.totalLine != null && o.over > 1 && o.under > 1 && Math.abs(o.totalLine % 1) === 0.5) {
+    const sh = M.shin([o.over, o.under]);
+    if (sh) total = { line: o.totalLine, over: sh.p[0] };
+  }
+  const [lh, la] = goalsFromMarket(market.p, total);
+  const mx = M.scoreMatrix(lh, la, 0, rules.model.maxGoals);
+  const oc = M.outcomes(mx);
+  out.p = market.p;
+  out.goals = [lh, la];
+  out.over25 = oc.over25;
+  out.btts = oc.btts;
+  out.scores = topScores(mx);
+  out.steps = null;
+  out.notes = [
+    `Landskamp: modellen räknar bara på lagen i England. Prognosen är marknadens – ${market.source}, utan spelbolagets marginal (${market.method === 'shin' ? 'Shin' : 'normerad'}).`,
+    `Målen är de förväntade mål som stämmer bäst med oddsen för 1, X och 2${total ? ` och över/under ${String(total.line).replace('.', ',')}` : ''} (Poisson).`,
+  ];
+  return out;
+}
+
+// Förväntade mål [hemma, borta] i oberoende Poisson som ligger närmast
+// marknadens 1, X, 2 (och andelen över målgränsen, om den finns): grovt rutnät
+// och sedan finare runt det bästa.
+function goalsFromMarket(p, total) {
+  const err = (lh, la) => {
+    const mx = M.scoreMatrix(lh, la, 0, 10);
+    const [p1, px, p2] = M.outcomes(mx).x12;
+    let e = (p1 - p[0]) ** 2 + (px - p[1]) ** 2 + (p2 - p[2]) ** 2;
+    if (total) {
+      let under = 0;
+      for (let i = 0; i < mx.length; i++) for (let j = 0; j < mx[i].length; j++) if (i + j < total.line) under += mx[i][j];
+      e += ((1 - under) - total.over) ** 2;
+    }
+    return e;
+  };
+  let best = [1.3, 1.1];
+  let bestE = Infinity;
+  const search = (h0, h1, a0, a1, step) => {
+    for (let lh = h0; lh <= h1 + 1e-9; lh += step) {
+      for (let la = a0; la <= a1 + 1e-9; la += step) {
+        const e = err(lh, la);
+        if (e < bestE) { bestE = e; best = [lh, la]; }
+      }
+    }
+  };
+  search(0.15, 4.5, 0.15, 4.5, 0.1);
+  const [h, a] = best;
+  search(Math.max(0.05, h - 0.1), h + 0.1, Math.max(0.05, a - 0.1), a + 0.1, 0.01);
+  return best.map((x) => Math.round(x * 100) / 100);
 }
 
 // Det som visas under fliken Modell: regelversion och skattade storheter.
@@ -728,6 +815,8 @@ function round4(x) { return x == null ? null : Math.round(x * 10000) / 10000; }
 function round2(x) { return x == null ? null : Math.round(x * 100) / 100; }
 
 module.exports = {
+  predictLand,
+  goalsFromMarket,
   forecastAll, context, predict, fitAt, intervals, currentSpecs, marketFrom, fdTriple, fdTotal, cupRule, dayNum, isoOf,
   tableIndex, tableSignal, LOWER,
 };

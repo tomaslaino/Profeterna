@@ -26,6 +26,35 @@ const EUROPE = [
   { id: 'uecl', name: 'Conference League', short: 'ECL', espn: 'uefa.europa.conf', qual: 'uefa.europa.conf_qual', type: 'europe' },
 ];
 
+// Landskamperna (sedan 2026-11-13): Stryktipset tar in dem under
+// landslagsuppehållen, när Premier League och Championship vilar. Prognosen är
+// marknadens (oddsen utan spelbolagets marginal), inte modellens – den känner
+// bara lagen i England – och de går varken in i prognosjournalen eller i
+// modellens underlag (src/forecast.js). type 'intl'. Lagen heter som på
+// Stryktipset (config/landslag.js).
+//
+// ESPN (verifierat 2026-11-13): Nations League 2026/27 med ligafasen
+// september–november under `uefa.nations` (grupperna A1–D2 i
+// competitions[0].group och tabellen i 14 grupper). Vänskapsmatcherna under
+// `fifa.friendly` gäller hela världen – bara de där ett europeiskt landslag
+// (ett lag i Nations League) spelar tas med (`europa`). EM-kvalet till 2028
+// börjar i mars 2027 (`uefa.euroq`, tomt i november 2026).
+const INTERNATIONAL = [
+  { id: 'unl', name: 'Nations League', short: 'UNL', espn: 'uefa.nations', type: 'intl' },
+  { id: 'emk', name: 'EM-kval', short: 'EMK', espn: 'uefa.euroq', type: 'intl' },
+  { id: 'vsk', name: 'Vänskapslandskamp', short: 'VSK', espn: 'fifa.friendly', type: 'intl', europa: true },
+];
+
+// Landslagens tidigare matcher – formen, de senaste mötena och vilan inför
+// landskamperna. Avslutade turneringar, så de hämtas sällan. Bara matcher där
+// ett europeiskt landslag spelar används (samma regel som vänskapsmatcherna).
+const LANDSLAG_HISTORIK = [
+  { slug: 'uefa.nations', namn: 'Nations League', short: 'UNL', months: ['2024-09', '2024-10', '2024-11', '2025-03', '2025-06'] },
+  { slug: 'fifa.worldq.uefa', namn: 'VM-kval', short: 'VMK', months: ['2025-03', '2025-06', '2025-09', '2025-10', '2025-11', '2026-03'] },
+  { slug: 'fifa.world', namn: 'VM', short: 'VM', months: ['2026-06', '2026-07'] },
+  { slug: 'fifa.friendly', namn: 'Vänskapslandskamp', short: 'VSK', months: ['2025-03', '2025-06', '2025-09', '2025-10', '2025-11', '2026-03', '2026-05', '2026-06'] },
+];
+
 // Innevarande säsong. ESPN hämtas månad för månad (datumintervall ger
 // HTTP 400, månadsformatet YYYYMM fungerar – verifierat 2026-10-17).
 const SEASON = {
@@ -63,7 +92,12 @@ function fdSeasonCode(startYear) {
 
 function competition(id) {
   return COMPETITIONS.find((c) => c.id === id) || (id === NATIONAL_LEAGUE.id ? NATIONAL_LEAGUE : null)
-    || EUROPE.find((c) => c.id === id) || null;
+    || EUROPE.find((c) => c.id === id) || INTERNATIONAL.find((c) => c.id === id) || null;
 }
 
-module.exports = { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, SEASON, HISTORY, fdSeasonCode, competition };
+// Landskamp (Nations League, EM-kval, vänskapsmatch)?
+function isIntl(id) {
+  return INTERNATIONAL.some((c) => c.id === id);
+}
+
+module.exports = { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, LANDSLAG_HISTORIK, SEASON, HISTORY, fdSeasonCode, competition, isIntl };

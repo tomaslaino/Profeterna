@@ -11,9 +11,10 @@
 
 const fs = require('fs');
 const path = require('path');
-const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, competition } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, competition, isIntl } = require('../config/competitions');
 const { readCache, CACHE_DIR } = require('./store');
-const { SOURCES, ODDS_WINDOW_DAYS } = require('./sources');
+const { SOURCES, ODDS_WINDOW_DAYS, landEuropa } = require('./sources');
+const { svenskt } = require('../config/landslag');
 const { keyOf, espnKey } = require('./teams');
 const { newsSv } = require('./skadetext');
 const { strengthFromOdds } = require('./strength');
@@ -151,9 +152,12 @@ function build() {
   const eo = readCache('espn_odds_europa');
   const europeOdds = (eo && eo.data && eo.data.byEvent) || {};
 
+  const L = landData();
+
   return {
     matches,
-    byId: new Map(matches.map((m) => [m.id, m])),
+    byId: new Map([...matches, ...L.land].map((m) => [m.id, m])),
+    ...L,
     espnTeams,
     teamLeague,
     fixturesFetchedAt,
@@ -169,6 +173,74 @@ function build() {
     fpl,
     unmapped: [...unmapped.values()],
   };
+}
+
+// ---------- landskamperna ----------
+
+// Landskamperna (INTERNATIONAL i config/competitions.js) ligger i en egen
+// lista, `land`, utanför `matches`: de ska inte in i prognosmotorns underlag,
+// lagstatistiken eller domarna. Lagen heter som på Stryktipset
+// (config/landslag.js, `en` = ESPN:s namn) och har nyckeln `land:<ESPN-id>`, så
+// att de aldrig blandas ihop med en klubb. Vänskapsmatcherna bara med ett
+// europeiskt landslag.
+function landData() {
+  const europa = landEuropa() || new Set();
+  const keep = (m) => europa.has(m.home.espnId) || europa.has(m.away.espnId);
+  const land = [];
+  const landFetchedAt = {};
+  for (const c of INTERNATIONAL) {
+    const cache = readCache(`espn_fixtures_${c.id}`);
+    landFetchedAt[c.id] = cache ? cache.fetchedAt : null;
+    if (!cache || !cache.data) continue;
+    for (const m of cache.data.matches) if (!c.europa || keep(m)) land.push(landMatch(m, c.id));
+  }
+  land.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+
+  // Tidigare landskamper (VM, VM-kvalet, förra Nations League,
+  // vänskapsmatcherna): formen och mötena.
+  const hc = readCache('espn_land_historik');
+  const landHist = [];
+  for (const t of (hc && hc.data && hc.data.turneringar) || []) {
+    for (const m of t.matches) {
+      if (keep(m)) landHist.push({ ...landMatch(m, null), turnering: { namn: t.namn, short: t.short } });
+    }
+  }
+  landHist.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+
+  // Nations Leagues tabell, grupp för grupp ("Group B4" → "B4").
+  const tc = readCache('espn_tabell_unl');
+  const groups = ((tc && tc.data && tc.data.groups) || []).map((g) => {
+    const id = grupp(g.name);
+    return {
+      id, name: id ? `Grupp ${id}` : g.name,
+      rows: g.rows.map((r) => ({ ...r, key: `land:${r.espnId}`, name: svenskt(r.name), en: r.name })),
+    };
+  });
+  const byKey = new Map();
+  for (const g of groups) for (const r of g.rows) byKey.set(r.key, { group: g, row: r });
+  const oc = readCache('espn_odds_land');
+  return {
+    land,
+    landHist,
+    landFetchedAt,
+    landHistFetchedAt: hc ? hc.fetchedAt : null,
+    landTabell: { groups, byKey, fetchedAt: tc ? tc.fetchedAt : null },
+    landOdds: { byEvent: (oc && oc.data && oc.data.byEvent) || {}, fetchedAt: oc ? oc.fetchedAt : null },
+  };
+}
+
+function landMatch(m, comp) {
+  const lag = (t) => ({ ...t, name: svenskt(t.name), en: t.name });
+  return {
+    ...m, comp, home: lag(m.home), away: lag(m.away), score90: regulationScore(m),
+    hk: `land:${m.home.espnId}`, ak: `land:${m.away.espnId}`,
+  };
+}
+
+// "Group B4" → "B4"
+function grupp(name) {
+  const g = /\b([A-D]\d)\b/.exec(name || '');
+  return g ? g[1] : null;
 }
 
 // Domarna: alla ligamatcher nivå 1–5 med domare och kort de senaste
@@ -302,9 +374,9 @@ function allMatches() {
   const D = load();
   return {
     oddsFetchedAt: D.odds.fetchedAt,
-    matches: D.matches.map((m) => {
+    matches: [...D.matches, ...D.land].sort((a, b) => a.kickoff.localeCompare(b.kickoff)).map((m) => {
       const c = competition(m.comp);
-      const o = D.odds.byEvent[m.id];
+      const o = oddsOf(D, m);
       return {
         id: m.id,
         comp: m.comp,
@@ -324,12 +396,19 @@ function allMatches() {
 }
 
 function matchIds() {
-  return load().matches.map((m) => m.id);
+  const D = load();
+  return [...D.matches, ...D.land].map((m) => m.id);
+}
+
+// ESPN:s odds för en match (landskamperna har en egen hämtning, som sparar
+// oddsen också efter matchen).
+function oddsOf(D, m) {
+  return (isIntl(m.comp) ? D.landOdds.byEvent[m.id] : null) || D.odds.byEvent[m.id] || null;
 }
 
 function summary(D, m) {
   const c = competition(m.comp);
-  const o = D.odds.byEvent[m.id];
+  const o = oddsOf(D, m);
   return {
     id: m.id,
     comp: m.comp,
@@ -365,6 +444,8 @@ const ROUNDS = {
 };
 
 function roundLabel(m, c) {
+  // Landskamperna: gruppen (Nations League: "Grupp B4").
+  if (c.type === 'intl') return grupp(m.group) ? `Grupp ${grupp(m.group)}` : null;
   if (c.type !== 'cup' || !m.round) return null;
   return ROUNDS[m.round] || m.round.replace(/-/g, ' ');
 }
@@ -377,6 +458,7 @@ function matchDetail(id, { strength = null } = {}) {
   const D = load();
   const m = D.byId.get(String(id));
   if (!m) return null;
+  if (isIntl(m.comp)) return landDetail(D, m);
   const c = competition(m.comp);
   const hk = m.hk;
   const ak = m.ak;
@@ -762,7 +844,173 @@ function mean(xs) {
 
 // Rader för "lagen sida vid sida". Värden formateras här (en plats), null =
 // okänt. Varje grupp bär sin källa och sitt datum.
-function sideBySide(h, a) {
+// ---------- landskamperna: underlaget ----------
+
+// Samma form som matchDetail, så att matchrutan och rummet visar en landskamp
+// som en annan match. Det som bara finns för klubbarna (skott och xG, domaren,
+// skadorna, modellens prognos) står som okänt med orsak.
+function landDetail(D, m) {
+  const home = landProfile(D, m.hk, m.kickoff, m.home);
+  const away = landProfile(D, m.ak, m.kickoff, m.away);
+  const unknowns = ['Landskamp: modellen räknar bara på lagen i England. Prognosen är marknadens – DraftKings odds via ESPN utan spelbolagets marginal.'];
+  const odds = { espn: null, fdOpen: null, fdClose: null };
+  const o = oddsOf(D, m);
+  if (o) {
+    odds.espn = {
+      provider: o.provider, fetchedAt: o.fetchedAt,
+      x12: [o.home, o.draw, o.away],
+      total: o.totalLine != null ? { line: o.totalLine, over: o.over, under: o.under } : null,
+    };
+  } else if (!m.completed) {
+    const daysAway = (Date.parse(m.kickoff) - Date.now()) / 86400000;
+    odds.note = daysAway > ODDS_WINDOW_DAYS
+      ? `Odds hämtas när det är högst ${ODDS_WINDOW_DAYS} dagar kvar till avspark.`
+      : 'DraftKings (ESPN) har inga odds för matchen ännu.';
+    unknowns.push(odds.note);
+  } else {
+    odds.note = 'inga odds från före avspark finns sparade för matchen';
+  }
+  const ingen = { unknown: true, reason: 'Ingen fri källa för landslagens skador och avstängningar.' };
+  unknowns.push('Skador och avstängningar: ingen fri källa för landslagen.');
+  if (!m.completed) unknowns.push('Startelvor: publiceras först strax före avspark.');
+  return {
+    match: {
+      ...summary(D, m),
+      venue: m.venue,
+      neutral: m.neutral,
+      winner: m.winner,
+      type: 'intl',
+      tierNote: null,
+      group: grupp(m.group),
+    },
+    prediction: null,
+    odds,
+    teams: { home, away },
+    rows: sideBySide(home, away, { land: true }),
+    squad: { home: ingen, away: ingen },
+    referee: { unknown: true, reason: 'Domare finns bara för ligamatcherna i de fria källorna.' },
+    meetings: [],
+    pastMeetings: landMeetings(D, m),
+    unknowns,
+  };
+}
+
+// Ett landslag före avspark `before`: gruppen och tabellen i Nations League,
+// Nations League hittills, formen i alla landskamper (också VM, kvalet och
+// vänskapsmatcherna) och schemat. team = lagets post i matchen.
+function landProfile(D, k, before, team) {
+  const t = D.landTabell.byKey.get(k);
+  const p = {
+    key: k,
+    league: { id: 'unl', name: t && t.group.id ? `Nations League, grupp ${t.group.id}` : 'Landslag', tier: null },
+    land: { espnId: team.espnId, namn: team.name, en: team.en, kod: team.abbr || null, grupp: t ? t.group.id : null },
+  };
+  const cal = landCalendar(D, k);
+  const played = cal.filter((x) => x.completed && x.kickoff < before);
+  const res = (x) => {
+    const s = x.score90 || (x.status === 'STATUS_FULL_TIME' ? x.score : null);
+    return s ? { date: x.kickoff.slice(0, 10), home: x.home, gf: x.home ? s.home : s.away, ga: x.home ? s.away : s.home } : null;
+  };
+  const results = played.filter((x) => x.comp === 'unl').map(res).filter(Boolean);
+  p.record = {
+    all: record(results),
+    home: record(results.filter((r) => r.home)),
+    away: record(results.filter((r) => !r.home)),
+    through: results.length ? results[results.length - 1].date : null,
+    source: { provider: 'ESPN', fetchedAt: D.landFetchedAt.unl },
+  };
+  p.goalProfile = {
+    n: results.length,
+    cleanSheets: results.filter((r) => r.ga === 0).length,
+    blanks: results.filter((r) => r.gf === 0).length,
+  };
+  if (t) {
+    p.table = {
+      rank: t.row.rank, size: t.group.rows.length, points: t.row.points, played: t.row.played, gd: t.row.gd,
+      deductions: t.row.deductions || 0, group: t.group.id,
+      source: { provider: 'ESPN', fetchedAt: D.landTabell.fetchedAt },
+    };
+  }
+  const form = played.map((x) => {
+    const r = res(x);
+    return {
+      date: x.kickoff.slice(0, 10),
+      comp: x.short,
+      home: x.home,
+      opponent: x.opponent,
+      gf: r ? r.gf : null,
+      ga: r ? r.ga : null,
+      result: !r ? null : r.gf > r.ga ? 'V' : r.gf < r.ga ? 'F' : 'O',
+      decided: x.shootout ? 'straffar' : x.status === 'STATUS_FINAL_AET' ? 'förlängning' : null,
+      opp: null,
+    };
+  });
+  p.form = form.slice(-FORM_N).reverse();
+  p.senaste = form.slice(-SENASTE_N).reverse().map(({ opp, ...x }) => ({ ...x, xg: null }));
+  const brief = (x, days) => (x ? { date: x.kickoff.slice(0, 10), comp: x.short, compName: x.name, home: x.home, opponent: x.opponent, days, played: x.completed } : null);
+  const past = cal.filter((x) => x.kickoff < before && (x.completed || !INACTIVE.has(x.status)));
+  const last = past.length ? past[past.length - 1] : null;
+  const next = cal.find((x) => x.kickoff > before && !INACTIVE.has(x.status)) || null;
+  const from = Date.parse(before) - SCHEDULE_DAYS * 86400000;
+  p.schedule = {
+    last: brief(last, last ? dateDays(last.kickoff, before) : null),
+    next: brief(next, next ? dateDays(before, next.kickoff) : null),
+    nextUnknown: false,
+    recent: past.filter((x) => Date.parse(x.kickoff) >= from).length,
+    recentEurope: 0,
+    windowDays: SCHEDULE_DAYS,
+    source: { provider: 'ESPN, landskamperna', fetchedAt: D.landFetchedAt.unl },
+  };
+  return p;
+}
+
+// Ett landslags matcher, i tidsordning: årets landskamper och de tidigare.
+function landCalendar(D, k) {
+  if (!D.landCalendars) D.landCalendars = new Map();
+  if (D.landCalendars.has(k)) return D.landCalendars.get(k);
+  const out = [];
+  const add = (m, short, name) => {
+    if (m.hk !== k && m.ak !== k) return;
+    const home = m.hk === k;
+    out.push({
+      id: m.id, neutral: !!m.neutral, kickoff: m.kickoff, comp: m.comp, short, name, home,
+      opponent: home ? m.away.name : m.home.name, oppKey: home ? m.ak : m.hk,
+      completed: m.completed, status: m.status, score: m.score, score90: m.score90, shootout: m.shootout,
+    });
+  };
+  const seen = new Set();
+  for (const m of D.land) {
+    const c = competition(m.comp);
+    seen.add(m.id);
+    add(m, c.short, c.name);
+  }
+  for (const m of D.landHist) if (!seen.has(m.id)) add(m, m.turnering.short, m.turnering.namn);
+  out.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+  D.landCalendars.set(k, out);
+  return out;
+}
+
+// De senaste mötena mellan två landslag (i år och i de tidigare landskamperna
+// som sajten har, från 2024), senaste först, mål efter 90 minuter.
+function landMeetings(D, m) {
+  const list = landCalendar(D, m.hk)
+    .filter((x) => x.oppKey === m.ak && x.completed && x.kickoff < m.kickoff && x.id !== m.id)
+    .slice(-PAST_MEETINGS_N).reverse()
+    .map((x) => {
+      const s = x.score90 || x.score;
+      return {
+        date: x.kickoff.slice(0, 10),
+        season: x.kickoff.slice(0, 4),
+        compShort: x.short,
+        home: x.home ? m.home.name : m.away.name,
+        away: x.home ? m.away.name : m.home.name,
+        score: { home: s.home, away: s.away },
+      };
+    });
+  return { list, first: '2024', source: { provider: 'ESPN (landskamper från hösten 2024)', fetchedAt: D.landHistFetchedAt } };
+}
+
+function sideBySide(h, a, { land = false } = {}) {
   const groups = [];
   const both = (fn) => [fn(h), fn(a)];
   const src = (p, key) => (p[key] ? p[key].source : null);
@@ -802,7 +1050,7 @@ function sideBySide(h, a) {
   }
 
   groups.push({
-    title: 'Ligan hittills',
+    title: land ? 'Nations League hittills' : 'Ligan hittills',
     sources: [src(h, 'record'), src(a, 'record')],
     through: [h.record && h.record.through, a.record && a.record.through],
     rows: [
@@ -817,7 +1065,7 @@ function sideBySide(h, a) {
 
   const gp = (p, key) => (p.goalProfile && p.goalProfile.n ? `${p.goalProfile[key]} av ${p.goalProfile.n}` : null);
   groups.push({
-    title: 'Målprofil i ligan',
+    title: land ? 'Målprofil i Nations League' : 'Målprofil i ligan',
     sources: [src(h, 'record'), src(a, 'record')],
     through: [h.record && h.record.through, a.record && a.record.through],
     rows: [
@@ -825,6 +1073,9 @@ function sideBySide(h, a) {
       { label: 'Inte gjort mål', values: both((p) => gp(p, 'blanks')) },
     ],
   });
+
+  // Landslagen har inga skott eller xG i de fria källorna.
+  if (land) return groups;
 
   // Mål mot xG: Understat för PL (etablerad leverantör), annars
   // football-data.co.uk.
@@ -994,4 +1245,4 @@ function unmappedNames() {
   return load().unmapped;
 }
 
-module.exports = { allMatches, matchIds, matchDetail, unmappedNames, regulationScore, load };
+module.exports = { allMatches, matchIds, matchDetail, unmappedNames, regulationScore, load, landCalendar };
