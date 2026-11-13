@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-13T19:30:16.797Z",
+ "uppdaterad": "2026-11-13T19:31:42.776Z",
  "omgang": {
   "id": "2026-11-14-st4979",
   "matcher": [
@@ -1467,6 +1467,98 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-13T18:20:14.852Z",
     "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401881266",
+   "match": "Swindon Town – Grimsby Town",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T19:31:28.260Z",
+   "text": "Holloway tar emot klubben han lämnade före jul\n\nIan Holloway sade upp sig från Grimsby på morgonen dagen före julafton 2020. Nu kommer hans gamla klubb till The County Ground. Swindon har tappat poäng bara en gång på hemmaplan, och Grimsby reser med en lång skadelista och en målvakt som just tog tre straffar.\n\nHolloway blev Grimsbys tränare och styrelseledamot i december 2019 och lovade att köpa aktier för 100 000 pund. Investeringen blev aldrig av. Den 23 december 2020 lämnade han, några timmar efter en hemmaförlust med 1–2 mot Bradford, med laget på tjugonde plats och fem segrar på nitton matcher, enligt Wikipedia [1]. I Swindon har han kontrakt till juni 2028 [1]. Han bygger på två spelare. Aaron Drinan har gjort 8 av lagets 15 ligamål, och Connor Ripley har gjort 66 räddningar, flest i ligan, enligt Grimsbys egen förhandsartikel [2]. När ens målvakt har mest att göra i hela serien har man ett problem med hur man står på hörnorna, och det löser man med en hink bollar.\n\nDavid Artell berättar på sin presskonferens att han har ”an extensive injury list” och dessutom spelare borta på landslagsuppdrag. Han talar respektfullt om motståndarna: ”They've only lost once at home” [3]. Grimsby har vunnit en enda av sina åtta senaste bortamatcher i ligan, 4–1 i Gillingham [2]. I cupen mot Stafford Rangers, som spelar i åttonde divisionen, låg de under med 0–2 i halvtid och klarade sig först på straffar.\n\nDet finns ändå ett skäl att resa fyra och en halv timme. I april vann Grimsby med 4–0 på Blundell Park efter ett hattrick av Jaze Kabia, och en andra raka ligaseger mot Swindon vore klubbens första sedan december 2018 [2]. Bollen har aldrig läst en tabell.\n\nTipset: 1X (halvgardera)\n\nSajtens prognos tror mer på Swindon än spelbolagen gör, och det jag har läst drar åt samma håll. Prognosen räknar varken med Grimsbys långa skadelista eller med att spelare är borta på landslagsuppdrag [1]. Grimsby har dessutom vunnit bara en av sina åtta senaste bortamatcher i ligan [2]. Swindon släpper ändå till många chanser, och Ripley har fått rädda mer än någon annan målvakt i ligan [2]. Därför tar jag med krysset. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Holloway tar emot klubben han lämnade före jul",
+   "lead": "Ian Holloway sade upp sig från Grimsby på morgonen dagen före julafton 2020. Nu kommer hans gamla klubb till The County Ground. Swindon har tappat poäng bara en gång på hemmaplan, och Grimsby reser med en lång skadelista och en målvakt som just tog tre straffar.",
+   "paragraphs": [
+    "Holloway blev Grimsbys tränare och styrelseledamot i december 2019 och lovade att köpa aktier för 100 000 pund. Investeringen blev aldrig av. Den 23 december 2020 lämnade han, några timmar efter en hemmaförlust med 1–2 mot Bradford, med laget på tjugonde plats och fem segrar på nitton matcher, enligt Wikipedia [1]. I Swindon har han kontrakt till juni 2028 [1]. Han bygger på två spelare. Aaron Drinan har gjort 8 av lagets 15 ligamål, och Connor Ripley har gjort 66 räddningar, flest i ligan, enligt Grimsbys egen förhandsartikel [2]. När ens målvakt har mest att göra i hela serien har man ett problem med hur man står på hörnorna, och det löser man med en hink bollar.",
+    "David Artell berättar på sin presskonferens att han har ”an extensive injury list” och dessutom spelare borta på landslagsuppdrag. Han talar respektfullt om motståndarna: ”They've only lost once at home” [3]. Grimsby har vunnit en enda av sina åtta senaste bortamatcher i ligan, 4–1 i Gillingham [2]. I cupen mot Stafford Rangers, som spelar i åttonde divisionen, låg de under med 0–2 i halvtid och klarade sig först på straffar.",
+    "Det finns ändå ett skäl att resa fyra och en halv timme. I april vann Grimsby med 4–0 på Blundell Park efter ett hattrick av Jaze Kabia, och en andra raka ligaseger mot Swindon vore klubbens första sedan december 2018 [2]. Bollen har aldrig läst en tabell."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Wikipedia",
+     "title": "Ian Holloway",
+     "url": "https://en.wikipedia.org/wiki/Ian_Holloway",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Grimsby Town FC",
+     "title": "Match Preview: Swindon Town (A)",
+     "url": "https://gtfc.co.uk/match-preview-swindon-town-a",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Grimsby Town FC",
+     "title": "Every word: David Artell's pre-Swindon presser",
+     "url": "https://gtfc.co.uk/every-word-david-artells-pre-swindon-presser-2",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos tror mer på Swindon än spelbolagen gör, och det jag har läst drar åt samma håll. Prognosen räknar varken med Grimsbys långa skadelista eller med att spelare är borta på landslagsuppdrag [1]. Grimsby har dessutom vunnit bara en av sina åtta senaste bortamatcher i ligan [2]. Swindon släpper ändå till många chanser, och Ripley har fått rädda mer än någon annan målvakt i ligan [2]. Därför tar jag med krysset. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "halvgardera",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Grimsby Town FC",
+      "title": "Every word: David Artell's pre-Swindon presser",
+      "url": "https://gtfc.co.uk/every-word-david-artells-pre-swindon-presser-2",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Grimsby Town FC",
+      "title": "Match Preview: Swindon Town (A)",
+      "url": "https://gtfc.co.uk/match-preview-swindon-town-a",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T19:31:28.260Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Spelbolagen gör Grimsby till favoriter, och det förstår jag inte. Grimsby kommer med en lång skadelista, har spelare borta på landslagsuppdrag och har vunnit en enda av sina åtta senaste bortamatcher i ligan. Mot ett lag från åttonde divisionen låg de under med två mål i halvtid. Så ser inte ett lag ut som reser bort och tar tre poäng.",
+     "Swindon har bara förlorat en gång hemma. Visst släpper de till chanser, och målvakten Ripley har räddat mer än någon annan i ligan. Men han räddar ju, och framåt har de Drinan, som har gjort mer än hälften av lagets mål. Orsak och verkan. Jag tar bara ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-13T19:31:28.260Z",
+    "uppdrag": {
+     "fraser": [
+      "Orsak och verkan",
+      "Så är det bara"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T19:31:34.368Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
