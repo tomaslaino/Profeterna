@@ -6224,7 +6224,7 @@ användaren valde menyraden: *Lagen* och *Spelarna* blev en flik med alla divisi
 lagens trupper, *Omgången* blev *Topplistor* utan formen, vilan och skadorna (de står vid
 matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man skriver.
 
-Överst står menyraden, som alltid står still: *KUPONGEN*, *TOPPLISTOR* och *LAGEN*, med den
+Överst står menyraden, som alltid står still: *KUPONGEN*, *TOPPLISTOR* och *REGISTRET*, med den
 valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
 över hela bredden; det mellan dem rullar.
 
@@ -6271,12 +6271,15 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   sviker, tufft och lätt hittills). Hela omgångens lag står med, inte bara de översta som på
   lapparna, och varje rad leder till matchakten. Formen, vilan och skadorna har ingen lista:
   de står vid matcherna.
-- **Lagen** – de fyra divisionerna (*PL*, *CH*, *L1* och *L2* i telefonen), med divisionen
+- **Registret** – lagen och spelarna (fliken hette *Lagen* till 2026-11-13, då användaren ville ha
+  en rubrik som rymmer båda; en egen flik för spelarna valdes bort, eftersom spelarna nås genom
+  sina lag och en lista över alla blir för lång att bläddra i). De fyra divisionerna (*PL*, *CH*,
+  *L1* och *L2* i telefonen), med divisionen
   som har flest lag i omgången först. Lagen står i bokstavsordning (två spalter på datorn),
   och lagen i omgången är ljusa. Ett lag öppnar **lagkortet** med truppen,
   och en spelare i truppen **spelarkortet** (nedan).
 
-Sökraden söker i hela registret, också lag och spelare utanför omgången, och svarar medan man
+Sökraden söker i hela datorn, också lag och spelare utanför omgången, och svarar medan man
 skriver: träffarna står i stället för vyn, den mest sannolika överst och markerad och sedan i
 fallande led, Enter öppnar den markerade, ↑/↓ väljer en annan, och när sökraden töms (eller med
 Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.

@@ -22,7 +22,9 @@
 //              och det sämre är svagt (SKILJER)
 //   TOPPLISTOR tavlans lappar som listor över hela omgången: styrkan (per
 //              division), kryss, tur och otur, mot oddsen och motståndet
-//   LAGEN      de fyra divisionerna, lagen i omgången ljusa; ett lag
+//   REGISTRET  lagen och spelarna (fliken hette LAGEN till 2026-11-13; i
+//              koden heter den fortfarande lagen): de fyra divisionerna,
+//              lagen i omgången ljusa; ett lag
 //              öppnar lagkortet med truppen (speltid, mål, de
 //              skadade), och en spelare spelarkortet: läget, speltiden, mål
 //              och xG, och hur laget har gått med och utan honom i startelvan
@@ -82,7 +84,7 @@ window.RumRegister = (() => {
   // nederst och mellan raderna
   const TECKEN = 0.4;
   const LUFT_TEL = { sida: 0.6, topp: 0.7, fot: 0.6, rad: 1.25 };
-  const FLIKAR = [['kupongen', 'KUPONGEN'], ['listor', 'TOPPLISTOR'], ['lagen', 'LAGEN']];
+  const FLIKAR = [['kupongen', 'KUPONGEN'], ['listor', 'TOPPLISTOR'], ['lagen', 'REGISTRET']];
   // tavlans lappar med topplistor (formen, vilan och skadorna står på kupongen och i matchakten)
   const AMNEN = [['styrka', 'STYRKA'], ['kryss', 'KRYSS'], ['tur', 'TUR'], ['odds', 'ODDSEN'], ['motstand', 'MOTSTÅND']];
   const SKADA = { skadad: '', avstängd: ' (AVST.)', 'ej uttagbar': '', tveksam: '?' };
@@ -787,7 +789,7 @@ window.RumRegister = (() => {
     const DELAR = [
       { namn: 'KUPONGEN', typ: 'FLIK', q: '#flik:kupongen', ord: ['kupongen', 'kupong', 'matcherna', 'omgangen', 'formen'] },
       { namn: 'TOPPLISTOR', typ: 'FLIK', q: '#flik:listor', ord: ['topplistor', 'topplistorna', 'listor', 'listorna'] },
-      { namn: 'LAGEN', typ: 'FLIK', q: '#flik:lagen', ord: ['lagen', 'ligorna', 'divisionerna'] },
+      { namn: 'REGISTRET', typ: 'FLIK', q: '#flik:lagen', ord: ['registret', 'register', 'lagen', 'spelarna', 'trupperna', 'ligorna', 'divisionerna'] },
       { namn: 'STYRKA', typ: 'TOPPLISTA', q: '#amne:styrka', ord: ['styrka', 'styrkan', 'starkast', 'svagast'] },
       { namn: 'KRYSS', typ: 'TOPPLISTA', q: '#amne:kryss', ord: ['kryss', 'kryssar', 'oavgjort'] },
       { namn: 'TUR', typ: 'TOPPLISTA', q: '#amne:tur', ord: ['tur', 'turen', 'otur'] },
