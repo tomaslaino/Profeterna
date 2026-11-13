@@ -399,6 +399,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   papper, den tunna tryckta ramen, *Nr 1 · Vecka 46* och priset maskinskrivna överst, namnet i terrakotta, vinjetten
   mellan två streck och rubriken i tidningens typsnitt, så fet och stor som ryms. Det gula papperet, det röda bandet
   och den molniga svärtan är borta (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären))
+- [x] **Helgarderats omslag: Kalenderbladet (2026-11-13, användarens önskemål: "något mer minimalistiskt - kanske bara
+  tidningsnumret eller något dylikt istället för de där ikryssade rutorna?"):** de ikryssade rutorna 1, X och 2 och den
+  första matchen nertill är borta. I mitten står lördagens datum som ett kalenderblad, dagen stor och tryckt mellan
+  *Inför Stryktipset* och månaden (*Inför omgången* när omgången inte är Stryktipsets), och nertill devisen *Sveriges
+  säkraste tipstidning*, kursiv under ett kort streck som tidningens citat. Numret, veckan och priset står kvar överst.
+  Valt i två omgångar bland skisser på pulten i rummet: först A *Kvällstidningen*, B *Tipsbladet*, C
+  *Matchprogrammet* och D *Fanzinet*, sedan de minimalistiska E *Numret*, F *Lördagen* (vald), G *Rubriken* och H
+  *Bara namnet*; devisen bland ett tjugotal förslag. Löpsedeln har samma papper, ram, översta rad och namn som förut
+  (`forsta` i [public/rum-tidning.js](public/rum-tidning.js), se [Helgarderat](#helgarderat))
 - [x] **Spegeln: man ser vem av de tre man är (2026-11-13, användarens önskemål: "Kan du komma på något smart sätt som
   man kan se vem av de tre som man är inloggad som på animationssidan?", med kravet att det inte får dra mycket
   grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
@@ -8162,7 +8171,8 @@ rummet), och innehållet, matchbladen och sista sidan är lika breda och minst l
 Alla sidor har omslagets papper (fibrerna, buktorna och trycket som inte har täckt), den tunna tryckta ramen och
 omslagets översta rad som sidhuvud, och kupongens tre röster: tryck i terrakotta (namnet, rubrikerna, numren och
 strecken i Fraunces), skrivmaskin (sidhuvudet, tiderna, lagen i innehållet, bildtexterna och källorna) och den blå
-pennan (omslagets kryss). Brödtexten står i bläck. Sedan samma kväll (val A *Rutorna*) är omslaget förebild för
+pennan (omslagets kryss, till 2026-11-13: sedan dess är omslaget ett kalenderblad med lördagens datum och devisen
+*Sveriges säkraste tipstidning*). Brödtexten står i bläck. Sedan samma kväll (val A *Rutorna*) är omslaget förebild för
 resten: samma sidhuvud efter omslaget (*Nr 1 · lördag 14 november*), matchbladets tavla som omslagets rutor 1, X och 2,
 lagen i röda versaler och rubrikerna i svart kursiv överallt, bara konturer och inget fetstilt utom spelarnas namn.
 Sedan samma kväll (val A *Ett tryck*) är Fraunces det enda typsnittet, också i brödtexten, och skrivmaskinen står bara

@@ -276,7 +276,7 @@ function nacional() {
 // anpassa till helgarderat-tidningen"): kupongens papper, den tunna tryckta
 // ramen, numret, veckan och priset maskinskrivna överst (samma rad som på
 // omslaget, RumTidning.overst), namnet i terrakotta, vinjetten mellan två
-// streck där omslaget har lördagens datum, och rubriken i samma typsnitt,
+// streck där omslaget hade lördagens datum (till 2026-11-13), och rubriken i samma typsnitt,
 // Fraunces, så fet och stor som ryms, med det som lyfts fram i terrakotta.
 // Förut gick den i det gula matchprogrammet, som tidningen hade en kort tid
 // (gult papper, namnet i Alfa Slab One på ett rött band, rubriken i Anton), och
