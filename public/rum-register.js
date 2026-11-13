@@ -1280,6 +1280,26 @@ window.RumRegister = (() => {
       }
       Object.assign(term.style, { left: `${P.left}px`, top: `${P.top}px`, width: `${P.width}px`, height: `${Math.max(140, ner - P.top)}px` });
       radEl.style.top = `${Math.round(rad)}px`;
+      helaRader();
+    }
+    // Rutan med raderna rymmer ett helt antal rader (resten blir luft ovanför
+    // sökraden), och rullningen stannar på en rad (scroll-snap i
+    // rum-register.css). En rad som står halvt avklippt nertill tappar det som
+    // går under linjen: ett komma utan sin svans ser ut som en punkt (+0,21
+    // blev +0.21 längst ner i en lista).
+    function helaRader() {
+      if (!ov.classList.contains('framme')) return;
+      Object.assign(rull.style, { flex: '', height: '', marginBottom: '' });
+      const p = document.createElement('div');
+      p.className = 'tr';
+      p.textContent = 'M';
+      ut.appendChild(p);
+      const rad = p.getBoundingClientRect().height;
+      p.remove();
+      const h = rull.getBoundingClientRect().height;
+      if (!rad || !h) return;
+      const n = Math.max(1, Math.floor((h + 0.5) / rad));
+      Object.assign(rull.style, { flex: 'none', height: `${n * rad}px`, marginBottom: `${h - n * rad}px` });
     }
     if (window.visualViewport) for (const n of ['resize', 'scroll']) visualViewport.addEventListener(n, () => { if (A.on) lagg(); });
     inp.addEventListener('blur', () => { if (A.on) lagg(); });

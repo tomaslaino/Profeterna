@@ -158,10 +158,11 @@
 /* den som inte lämnade in */
 .rh-gang .inget .rh-ans { filter: grayscale(1) brightness(0.72); }
 .rh-gang .inget .rh-namn { color: rgba(246, 239, 220, 0.6); }
-/* Frågan och gänget på samma axel: frågan centrerad över porträtten och nederst i sina tre rader, så att den
-   slutar strax över dem. I bredden står de samlade mitt på väggen bredvid honom, lodrätt mitt emellan samtalets
-   överkant och diskens kant (--kant, passa i rum-hasse.js), inte uppe i hörnet med tom vägg under (ändrat
-   2026-11-13). Marginalerna i stället för justify-content: blir det trångt börjar frågan ändå överst. */
+/* Frågan står mitt över porträtten, längst ned i sina tre rader, så att den slutar strax ovanför dem. När samtalet
+   står bredvid honom (inte på höjden) samlas frågan och gänget mitt på väggen till vänster om honom, lika långt
+   från samtalets överkant som från diskens kant (--kant, passa i rum-hasse.js). Förut stod de uppe i hörnet med
+   tom vägg under sig (ändrat 2026-11-13). Automatiska marginaler i stället för justify-content: räcker platsen
+   inte till, börjar frågan ändå överst. */
 .rh-samtal:has(> .rh-gang) { text-align: center; }
 .rh-sagt:has(+ .rh-gang) { display: flex; flex-direction: column; justify-content: flex-end; }
 .rum-hasse-vy:not(.hog) .rh-samtal:has(> .rh-gang) { bottom: max(52px, calc(100% - var(--kant, 60%))); }

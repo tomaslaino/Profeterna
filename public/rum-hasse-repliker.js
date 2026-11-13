@@ -779,7 +779,7 @@
       'Rödpennan har gått över era kuponger. Vems vill du höra min dom över?',
       'Jag har en dom över var och en av era kuponger. Vems tar vi först?',
       'Era kuponger är rättade, och jag har synpunkter. Vems ska jag börja med?',
-      'Jag har tänkt igenom era kuponger. Vems vill du höra min bedömning av först?',
+      'Jag har gått igenom era kuponger. Vems vill du höra min bedömning av först?',
       'Kaffet är slut, och era kuponger är dömda. Vems tar vi först?',
       'Ingen av era kuponger slipper undan min dom. Vems tar vi först?',
     ],
@@ -800,7 +800,7 @@
       'Det var alla era kuponger. Mer än så finns det inte att säga.',
       'Nu har jag sagt mitt om varenda kupong.',
       'Varenda kupong har fått sin dom, och ingen slapp lindrigt undan.',
-      'Alla era kuponger är dömda. Nästa omgång gör ni bättre ifrån er.',
+      'Alla era kuponger är dömda. Nästa omgång får ni göra bättre ifrån er.',
       'Nu har ni hört vad jag tycker. Domarna står sig.',
     ],
     // När man kommer tillbaka och har hört alla förut: orden i guld står inte kvar i listan (de syns först när
@@ -811,7 +811,7 @@
       'Alla era kuponger är dömda. Den som har glömt sin dom får höra den igen.',
       'Domarna över era kuponger står fast. Jag läser gärna upp dem igen.',
       'Mina domar över era kuponger tål att höras två gånger. Vems tar jag igen?',
-      'Har någon glömt sin dom säger jag den igen. Era kuponger minns jag.',
+      'Har någon glömt sin dom, säger jag den igen. Era kuponger minns jag.',
       'Mina domar över era kuponger glömmer jag inte, men ni gör det tydligen.',
       'Jag kan döma era kuponger en gång till. Det blir samma dom.',
       'Era kuponger är dömda sedan länge. Vems dom vill du höra igen?',
@@ -820,7 +820,7 @@
     // (ingen dömd än), hort (din kupong är dömd) och inte (andras är dömda men inte din). {namn} är ditt.
     du: {
       forst: [
-        'Jag gissar att du vill veta vad jag tycker om din kupong, {namn}.',
+        'Jag antar att du vill veta vad jag tycker om din kupong, {namn}.',
         'Jag har synpunkter på varje kupong. Ska jag börja med din, {namn}?',
         'Jag kommenterar gärna era kuponger. Din först, {namn}, eller någon annans?',
         'Jag har dömt era kuponger. Vill du höra domen över din först, {namn}?',
@@ -829,7 +829,7 @@
         'Din kupong har jag synpunkter på, {namn}. Ska vi ta den först?',
         'Jag har bedömt din kupong, {namn}. Ska jag börja där?',
         'Du vill nog höra vad jag tycker om din kupong, {namn}.',
-        'Din kupong har fått min bedömning, {namn}. Är du redo att höra den?',
+        'Din kupong har fått min bedömning, {namn}. Tål du att höra den?',
       ],
       hort: [
         'Nu vet du vad jag tycker om din kupong. Ska jag ta någon annans?',
@@ -848,7 +848,7 @@
         'Domarna över de andra hör du gärna, {namn}. Din kupong har jag också dömt.',
         'Jag har inte sagt vad jag tycker om din kupong än, {namn}.',
         'Din kupong ligger kvar här, {namn}, och jag har en dom över den.',
-        'Jag har dömt andras kuponger, {namn}. Din har jag också en dom över.',
+        'Jag har dömt de andras kuponger, {namn}, och nu står din på tur.',
         'Ska jag döma din kupong nu, {namn}, eller vill du vänta?',
         'Min bedömning av din kupong väntar, {namn}.',
       ],
@@ -866,7 +866,7 @@
       'Jag har mer att säga om varje kupong.',
       'Domarna är skrivna med bläck, inte blyerts.',
       'Rödpennan ligger kvar på disken.',
-      'Ingen har överklagat en dom av mig och vunnit.',
+      'Ingen har överklagat någon av mina domar och vunnit.',
       'Den som vill veta sanningen om sin kupong vet var jag sitter.',
       'Jag har aldrig sett en kupong som inte gick att förbättra.',
       'Era kuponger säger mycket om er.',
@@ -883,9 +883,9 @@
       forst: [
         '{namn} var bäst av er, och det kommer resten att få höra.',
         '{namn} slog resten av er den här gången.',
-        '{namn} vann omgången, och ingen är mer förvånad än {namn}.',
+        '{namn} vann omgången, och mest förvånad av alla blev {namn}.',
         '{namn} vann den här omgången, och det ska vi inte göra någon sak av.',
-        '{namn} kom först, och det var ingen som såg det komma.',
+        '{namn} kom först, och det hade ingen väntat sig.',
       ],
       alla: [
         '{namn} hade alla rätt, och det ser man inte varje vecka.',
@@ -1017,7 +1017,7 @@
         'Att vinna ska {namn} inte vänja sig vid.',
         'Nästa omgång får vi se vad segern var värd.',
         'Segern ska {namn} njuta av, för den kommer inte varje vecka.',
-        'En bra omgång är ännu ingen säsong.',
+        'En svala gör ingen sommar, och en bra omgång ingen säsong.',
       ],
       alla: [
         'Den kupongen hade jag kunnat fylla i själv.',
@@ -1046,7 +1046,7 @@
       ],
       inget: [
         'Den som inte tippar kan inte ha fel.',
-        'Att inte lämna in är det säkraste jag har sett.',
+        'Att inte lämna in är det säkraste tipset av alla.',
         'Att stå över är också ett sätt att spara pengar.',
         'Den som står över förlorar aldrig, men vinner aldrig heller.',
         'Det är ett sätt att hålla protokollet rent.',
