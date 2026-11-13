@@ -40,7 +40,8 @@ export const SCEN = {
   // vid geringssnittet, som i rummet. Förut satt han vid x = 0, 27 cm längre in på benet (ändrat 2026-11-09).
   PLATS: 450,
   // Fönstren bakom honom (barens mått), som på baren Bron vid S:t Eriksbron: ett stort glasparti ut mot bron och
-  // Fridhemsplan, från bardiskens skiva och upp förbi bildens överkant. När väggen flyttades bakåt drogs de ned
+  // Fridhemsplan, från fönsterbänken och upp förbi bildens överkant; under bänken furupanel ned till bardisken, som
+  // under skyltfönstret i rummet (SOCKEL i scripts/hasse/bak.html, 2026-11-13). När väggen flyttades bakåt drogs de ned
   // (bardisken med dem) och blev bredare, så att de är lika stora i bilden som förut och utsikten står kvar. Rutorna (X: vänster och höger kant) sitter
   // kant i kant, och karmen (KARM bred, mörkgrå som skyltfönstret i rummet) går runt var och en, så att posterna
   // emellan blir dubbelt så breda. Ingen post står bakom hans huvud. Glaset sitter DJUP in i väggen. Väggen

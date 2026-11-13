@@ -70,7 +70,16 @@ grupp(() => {
     box([x1 - K / 2, (FO.Y0 + FO.Y1) / 2, z], [K / 2, (FO.Y1 - FO.Y0) / 2 - K, dz], 0, M);
   }
 });
-const T = FO.Y0 - 22; // bakdiskens ovansida, strax under fönstren, så som bardisken i rummet: skiva, fronten med fyllningar i ramar, mässingskrokar
+// Under glaset som under skyltfönstret i rummet (rum.js): en fönsterbänk och furupanel ned till bakdisken, så att
+// väggen är rummets furu och inte bara glas och mahogny. Bakdiskens ovansida står därför SOCKEL under fönstren
+// (ungefär 85 cm över golvet); fönstren och utsikten är desamma. Förut stod disken strax under fönstren och ingen
+// furu syntes (ändrat 2026-11-13).
+const SOCKEL = 320, BANK = { H: 30, UT: 150 };
+const T = FO.Y0 - SOCKEL; // bakdiskens ovansida, så som bardisken i rummet: skiva, fronten med fyllningar i ramar, mässingskrokar
+grupp(() => {
+  // fönsterbänken: mörkgrå som skyltfönstrets karm och bänk i rummet, ut över furun
+  box([0, FO.Y0 - BANK.H / 2, VAGG + BANK.UT / 2], [7000, BANK.H / 2, BANK.UT / 2], 0, RGB('#3e3a36'));
+});
 const TJ = 70, DJ = 560, FR = 340;
 // bardisken
 grupp(() => {
@@ -146,7 +155,7 @@ const LJ = q.get('dag') ? [
   { p: [4700, 760, 3100 + DZ], r: 1050, e: [1, 1, 1].map((v) => v * +(q.get('ds') || 30)) },
 ] : [
   // svagt från gatan och lamporna i affären (nyckeln i figurens riktning, rum-hasse-arm.js)
-  { p: [-700, 1450, 2100 + DZ], r: 460, e: [1.0, 0.9, 0.76].map((v) => v * 4.5) },
+  { p: [-700, 1450, 2100 + DZ], r: 460, e: [1.0, 0.9, 0.76].map((v) => v * 4.5 * +(q.get('ks') || 1)) },
   // neonskylten i affärens fönster till höger: rött
   { p: [2600, 650, 1500 + DZ], r: 260, e: [1.0, 0.16, 0.1].map((v) => v * 9) },
   // gatan genom fönstret till höger: kallt
@@ -164,6 +173,8 @@ const LJ = q.get('dag') ? [
 // dagen (?dag=1) himlens ljus, vitt som fönsterljuset till höger (sidan färgar det); annars stadens och
 // brons lampor, svagt och kallt.
 const HIMMEL = q.get('dag') ? [1, 1, 1].map((v) => v * +(q.get('hs') || 1.6)) : [0.05, 0.06, 0.085].map((v) => v * +(q.get('hn') || 1));
+// exponeringen före kurvan (FS2): så att furun och mahognyn är lika ljusa som i rummet (förut 0,7, ändrat 2026-11-13)
+const EXP = +(q.get('exp') || 1);
 console.log('primitiver', P.length, 'grupper', G.length);
 
 // ---------- webgl ----------
@@ -400,9 +411,11 @@ void main() {
 }`;
 const FS2 = `#version 300 es
 precision highp float; uniform sampler2D uT; uniform float uN, uRa; out vec4 ut;
-vec3 aces(vec3 x) { return clamp((x * (2.51 * x + .03)) / (x * (2.43 * x + .59) + .14), 0., 1.); }
+float aces(float x) { return clamp((x * (2.51 * x + .03)) / (x * (2.43 * x + .59) + .14), 0., 1.); }
+// Kurvan läggs på ljusheten och inte på varje färg för sig: annars blir mörkt trä mättat och rött (kurvans fot
+// trycker ned grönt och blått mer än rött), och furun och mahognyn får inte rummets bruna (ändrat 2026-11-13).
 // (genom fönstren genomskinligt: färgen räknas på det som väggen täcker, och duken vill ha den förmultiplicerad)
-void main() { vec4 s = texelFetch(uT, ivec2(gl_FragCoord.xy), 0) / uN; float a = clamp(s.a, 0., 1.); vec3 c = s.rgb / max(s.a, 1e-4); if (uRa < .5) { c = aces(c * .7); c = pow(c, vec3(1. / 2.2)); } ut = vec4(c * a, a); }`;
+void main() { vec4 s = texelFetch(uT, ivec2(gl_FragCoord.xy), 0) / uN; float a = clamp(s.a, 0., 1.); vec3 c = s.rgb / max(s.a, 1e-4); if (uRa < .5) { float l = max(dot(c, vec3(.2126, .7152, .0722)), 1e-6) * ${EXP.toFixed(3)}; c = clamp(c * ${EXP.toFixed(3)} * aces(l) / l, 0., 1.); c = pow(c, vec3(1. / 2.2)); } ut = vec4(c * a, a); }`;
 const prog = (v, f) => { const p = gl.createProgram(); for (const [t, s] of [[gl.VERTEX_SHADER, v], [gl.FRAGMENT_SHADER, f]]) { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(o)); gl.attachShader(p, o); } gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p)); return p; };
 const p1 = prog(VS, FS), p2 = prog(VS, FS2);
 const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);

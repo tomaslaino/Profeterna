@@ -1336,6 +1336,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   syns mellan pulten och bardisken. Fönstren och bardisken är dragna 18 cm nedåt och rutorna bredare, så att
   glaspartiet är lika stort i bilden som förut och utsikten står kvar. Väggen är ombakad. Se
   [Hasse Backe](#hasse-backe), *Bilden*.
+- **Bakgrunden hos Hasse Backe som rummet (2026-11-13, användarens önskemål):** "gör så att bakgrunden hos hasse
+  passar bättre in på animationssidan - jag tänker inte på utsikten då". Bardisken bakom honom var nästan svart
+  och rödbrun, mycket mörkare än samma mahogny i rummet, också mitt på dagen, och ingen furu syntes. Nu står en
+  mörkgrå fönsterbänk under glaset och furupanel under den ned till bardisken, som under skyltfönstret i rummet
+  (disken står 19 cm lägre), och väggen har rummets ljushet och bruna: bakningen exponeras mer, och kurvan läggs på
+  ljusheten, så att det mörka träet inte blir rött. Fönstren och utsikten är desamma. Väggen är ombakad. Se
+  [Hasse Backe](#hasse-backe), *Utsikten*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -6839,10 +6846,15 @@ ljuset på honom nästan var detsamma dag som kväll (ändrat 2026-11-06).
 Kungsholmen och Fridhemsplan: den gröna bron som kommer in från höger och går bort mot andra sidan, med räcket och
 lyktstolparna, slänten och träden ned mot spåren, vattnet, husraden längs stranden och de två tornhusen där bron
 slutar – det grå höghuset och tegelhuset med den ärgade kupolen, till höger om hans huvud. Glaset är tre stora
-rutor från bardiskens skiva och upp förbi bildens överkant, dragna nedåt och bredare när väggen flyttades bakåt så
+rutor från fönsterbänken och upp förbi bildens överkant, dragna nedåt och bredare när väggen flyttades bakåt så
 att de är lika stora i bilden (`FONSTER` i
 [public/rum-hasse-scen.js](public/rum-hasse-scen.js)), med karmar och poster i samma mörkgrå som skyltfönstret i
-rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna, och barstolen står kvar. Vädret och ljuset
+rummet och ingen post bakom hans huvud. Under glaset är väggen som under skyltfönstret i rummet: en mörkgrå
+fönsterbänk och furupanel ned till bardisken, vars skiva står 19 cm under fönstren, ungefär 85 cm över golvet
+(`SOCKEL` i [scripts/hasse/bak.html](scripts/hasse/bak.html)); på bardisken står bara flaskorna, och barstolen
+står kvar. Väggen har rummets ljushet och bruna: furun och mahognyn är lika ljusa som i rummet, och bakningens
+kurva läggs på ljusheten och inte på varje färg för sig, så att det mörka träet inte blir rött (förut var disken
+nästan svart och rödbrun bredvid rummets ljusa, bruna trä, och ingen furu syntes; ändrat 2026-11-13). Vädret och ljuset
 är rummets (`Vader.nu`, `RumUte.light` och färgerna i `RumUte.farg`, samma som gatan genom skyltfönstret): himlens
 färger efter klockan, molnen, den låga solens sken, den kalla dagen, tända fönster och lyktor när det skymmer, en
 grön skylt och en röd lampa på höghuset på kvällen, regn och snö som ett dis, dimma som tar andra sidan, snö på
