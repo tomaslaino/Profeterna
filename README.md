@@ -7302,9 +7302,13 @@ eller, om du hellre lyssnar på de andra, *Jag har synpunkter på din kupong ock
 tre rader, och de tre raderna finns från början, så att gänget inte flyttar sig när han säger något annat medan han
 väntar; i låga telefoner är porträtten mindre, så att allt ryms ovanför foten också i 375 × 667. Gänget står sida vid sida i sin ordning, som på kupongen: stora
 porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangLista` i [public/rum-hasse.js](public/rum-hasse.js)).
-Den man väljer får sin dom slagen i disken i guld, som domen över en match (*Garderad*, *Turlig*, *Felfri*, *Osynlig*,
-*Generös*, *Snuvad*, *Klok*: ordet beskriver personen), och under den några meningar: en inledning efter hur det gick i gänget, en eller två saker ur
-kupongen och ett slut (`doma`). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
+Den man väljer får sin dom slagen i disken i guld, som domen över en match, och under den några meningar: en inledning
+efter hur det gick i gänget, en eller två saker ur kupongen och ett slut (`doma`). Ordet i guld beskriver personen och
+läget, och han har ett tiotal för varje läge (*Osynlig*, *Lagom* och *Bortglömd* i mitten, *Turlig* och *Mallig* för den
+som vann, *Generös* och *Blåögd* för den som kom sist). Han väljer efter omgången och personen, så att det är samma ord i
+disken och i listan och på alla enheter (`domord` i rum-hasse-repliker.js, `domOrd` i rum-hasse.js; förut ett ord per läge,
+2026-11-13). Orden har högst nio bokstäver, så att stämpeln under namnet ryms i den smalaste telefonen, och inget ord står
+under två lägen (`npm run repliker` säger till). Sakerna är räknade ur protokollet: helgarderingarna, hur många spikar som satt och i hur
 många matcher ingen annan i gänget hade rätt (läget i `gang` i [public/rum-block.js](public/rum-block.js), raderna i `domar`
 i rum-hasse-repliker.js). Raderna väljs efter omgången och personen, inte på lott, så att domen är densamma varje gång och
 på alla enheter. Varje rad är en mening, så att domen står i ett stycke och *Läs upp* ändå kan läsa den mening för mening.
