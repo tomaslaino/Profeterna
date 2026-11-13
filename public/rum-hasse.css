@@ -428,4 +428,4 @@
   .rh-tecken + .rh-slut .rh-vag { min-height: 28px; }
 }
 /* vems kupong: efternamnen i rutornas ställe, lika höga */
-.rh-vem .rh-ruta, .rum-hasse-vy.hog .rh-vem .rh-ruta { max-width: none; font-size: clamp(17px, 2.7vh, 23px); }
+.rh-vems .rh-ruta, .rum-hasse-vy.hog .rh-vems .rh-ruta { max-width: none; font-size: clamp(17px, 2.7vh, 23px); }

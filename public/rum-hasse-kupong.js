@@ -84,7 +84,8 @@ window.RumHasseKupong = (ctx) => {
     if (!t || !p || p.vem || !p.val.length) { sen(); return; }
     utanVem();
     const v = document.createElement('div');
-    v.className = 'rh-tecken rh-vem';
+    // (rh-vems: rh-vem är spalthuvudena med porträtten i listan, och deras regler lade namnen ovanpå knapparna)
+    v.className = 'rh-tecken rh-vems';
     v.setAttribute('role', 'group');
     v.setAttribute('aria-label', REP().fyller.vem);
     v.innerHTML = p.s.gang.filter((g) => p.val.includes(g.id))
