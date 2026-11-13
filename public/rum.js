@@ -1581,10 +1581,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const signs = {};
     const c = rd.coupon || (typeof currentCoupon === 'function' ? currentCoupon() : null);
     if (c) for (const x of c.matches) signs[String(x.id)] = x.sign;
-    return rd.ids.map((id) => {
+    const rows = rd.ids.map((id) => {
       const g = gradeRow({ id, sign: signs[id] || '', label: '' }, t);
       return { id, m: g.m, g, sign: signs[id] || '' };
-    }).filter((x) => x.m).sort((a, b) => Date.parse(a.m.kickoff) - Date.parse(b.m.kickoff) || a.m.home.localeCompare(b.m.home));
+    }).filter((x) => x.m);
+    // En omgång ur Stryktipset står i Stryktipsets ordning (1–13 som hos Svenska Spel, se README
+    // under Kupongen); en omgång som valts för hand efter avsparken.
+    return rd.spel ? rows : rows.sort((a, b) => Date.parse(a.m.kickoff) - Date.parse(b.m.kickoff) || a.m.home.localeCompare(b.m.home));
   }
 
   // Kryssets två streck med blyerts i en ruta (40 × 19): lite sneda och
@@ -4760,7 +4763,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     zoomTv(false);
     zoomVideo(false);
     const desk = document.getElementById('rum-kupong');
-    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
+    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null, spel: Boolean(p.s.spel) };
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     const rows = roundRows(rd);
     const fram = couponHtml(rd, rows, v, true);
@@ -6581,7 +6584,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const v = !p ? null : p.fyll ? view(p, 'fyll') : p.andra ? view(p, 'din', p.vem) : null;
       if (!v) return null;
       if (v.slag === 'din') v.tecken = { ...v.tecken, ...hassesAndring(p) };
-      const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
+      const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null, spel: Boolean(p.s.spel) };
       return couponHtml(rd, roundRows(rd), v);
     },
     andring: (alla = false) => hassesAndring(pult(), alla),
@@ -6618,7 +6621,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function bladet() {
     const p = pult();
     if (!p) return null;
-    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)) };
+    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), spel: Boolean(p.s.spel) };
     const rows = roundRows(rd);
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     return { matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };

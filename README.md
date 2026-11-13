@@ -6184,6 +6184,12 @@ dess svar spelades upp i webbläsaren) i huvudlös Chromium, 1440 × 900 och 390
 bladet för Sverige–Bosnien & Hercegovina på Lagen, Prognos, Startelvor, Tabellen och Mötena, utan fel i konsolen.
 Att fylla i och lämna in mot den riktiga tjänsten är inte provat.
 
+**Stryktipsets ordning i rummet** (2026-11-13). Kupongen i handen och på pulten stod redan i omgångens ordning, men
+raderna som resten av rummet läser (`roundRows` i rum.js: anslagstavlan, datorn, tv:n) sorterades efter avsparken, så
+att vecka 46 började med League One klockan 16 och slutade med Sverige–Bosnien & Hercegovina. En omgång ur Stryktipset
+(`spel`) står nu i Stryktipsets ordning 1–13 överallt i rummet; en omgång som valts för hand sorteras efter avsparken
+som förut. Provat i huvudlös Chromium med omgången både med och utan `spel`.
+
 **Nästa omgång ur kupongstället** (2026-11-09, användarens önskemål). Nästa kupong går alltid att
 titta på: ett klick på kupongstället på disken eller N tar en blank kupong för nästa omgång i
 handen. Det är veckans Stryktips som Svenska Spel har öppet för spel – samma som *Hämta
