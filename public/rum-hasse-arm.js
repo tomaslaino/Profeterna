@@ -1089,15 +1089,29 @@ export function byggGlasogon(bord = ingenBord()) {
   geos.length = 0;
   geos.push(fram.geometry, lins.geometry);
   grupp.add(fram, lins);
-  // skalmarna: raka bakåt från gångjärnet och böjda nedåt bakom örat; vridna runt gångjärnet (y)
+  // Skalmarna: bakåt från gångjärnet till örat (armen, ORAT lång, lite utåtböjd mitt på så att den går utanför
+  // tinningen och inte genom den) och därifrån nedåt bakom örat (kroken); vridna runt gångjärnet (y). Ute i luften
+  // pekar de rakt bakåt. På näsan pekar armen i stället mot örat och är så lång som det är dit (satt: orat), för
+  // huvudet är ett foto på en grund form där öronen sitter mycket närmare ansiktet än på en riktig skalle: raka och
+  // fullånga stack de ut bakom huvudet, och när han böjde det och kameran såg honom uppifrån pekade de rakt upp över
+  // pannan som antenner (Tomas 2026-11-13). Kroken går då bakåt i bågens riktning bakom örat, där kroppen döljer den.
   // (kortare än en riktig: resten är bakom örat, och där är huvudet bara en platt yta som inte döljer den)
-  const skalmPts = [[0, 0, 0], [0, 0, -60], [0, -1, -112], [0, -6, -145], [0, -22, -166], [0, -42, -178]].map((p) => new THREE.Vector3(...p));
+  const ORAT = 128;
+  const BAK = new THREE.Vector3(0, 0, -1);
+  const Y_AXEL = new THREE.Vector3(0, 1, 0);
+  const armPts = (s) => [[0, 0, 0], [s * 2.6, 0, -32], [s * 3.6, -0.3, -64], [s * 2.6, -0.6, -96], [0, -1, -ORAT]].map((p) => new THREE.Vector3(...p));
+  const krokPts = [[0, 0, 0], [0, -4, -17], [0, -20, -38], [0, -40, -50]].map((p) => new THREE.Vector3(...p));
   const skalmar = [-1, 1].map((s) => {
     const p = new THREE.Group();
     p.position.set(s * GANG[0], GANG[1], GANG[2]);
-    p.add(del(tub(skalmPts, T * 0.85, false, 32)));
+    const arm = del(tub(armPts(s), T * 0.85, false, 24));
+    const krok = new THREE.Group();
+    krok.add(del(tub(krokPts, T * 0.85, false, 12)));
+    p.add(arm, krok);
     grupp.add(p);
-    return p;
+    // kroken bakåt och lite inåt mot huvudet i bågens mått, när armen pekar mot örat
+    const bak = new THREE.Quaternion().setFromAxisAngle(Y_AXEL, s * 0.25);
+    return { s, p, arm, krok, bak };
   });
   // vinkeln runt gångjärnet: utfälld lite utåt (UT), hopfälld in bakom glasen (den vänstra lite mer, så att de
   // inte går genom varandra)
@@ -1110,16 +1124,36 @@ export function byggGlasogon(bord = ingenBord()) {
   // den (genomskinliga; djupet börjar om efter kroppen, så de ritas över allt som är bakom dem)
   grupp.traverse((o) => { if (o.isMesh) o.renderOrder = o.material === lmat ? 1.5 : 0.9; });
   grupp.visible = false;
-  // skalmens ände (bakom örat) i bågens mått, med skalmen utfälld
-  const ande = (s, f, ut = new THREE.Vector3()) => ut.copy(skalmPts[skalmPts.length - 1]).applyAxisAngle(new THREE.Vector3(0, 1, 0), vinkel(s, f)).add(new THREE.Vector3(s * GANG[0], GANG[1], GANG[2]));
+  // skalmens ände (bakom örat) i bågens mått, med skalmen utfälld i luften
+  const ANDE = new THREE.Vector3(0, -1, -ORAT).add(krokPts[krokPts.length - 1]);
+  const ande = (s, f, ut = new THREE.Vector3()) => ut.copy(ANDE).applyAxisAngle(Y_AXEL, vinkel(s, f)).add(new THREE.Vector3(s * GANG[0], GANG[1], GANG[2]));
+  const qL = new THREE.Quaternion();
+  const qO = new THREE.Quaternion();
+  const dO = new THREE.Vector3();
   return {
     grupp, U, UL, ande,
-    // bågens läge (matris), skalmarna (höger s = −1, vänster s = 1) och hur mycket glasen syns
-    satt(m, fallH, fallV, syn = 1) {
+    // Bågens läge (matris), skalmarna (höger s = −1, vänster s = 1) och hur mycket glasen syns. orat: { w, mal }
+    // när de sitter på näsan (w: hur mycket, 0–1), med öronen i bågens mått (mal: höger, vänster), där skalmarna
+    // ska gå över dem.
+    satt(m, fallH, fallV, syn = 1, orat = null) {
       grupp.matrix.copy(m);
       grupp.matrixWorldNeedsUpdate = true;
-      skalmar[0].rotation.y = vinkel(-1, fallH);
-      skalmar[1].rotation.y = vinkel(1, fallV);
+      for (const k of skalmar) {
+        k.p.quaternion.setFromAxisAngle(Y_AXEL, vinkel(k.s, k.s < 0 ? fallH : fallV));
+        let lang = 1;
+        k.krok.quaternion.identity();
+        if (orat && orat.w > 0) {
+          dO.copy(orat.mal[k.s < 0 ? 0 : 1]).sub(k.p.position);
+          const L = dO.length();
+          qO.setFromUnitVectors(BAK, dO.divideScalar(L));
+          k.p.quaternion.slerp(qO, orat.w);
+          lang = 1 + (L / ORAT - 1) * orat.w;
+          qL.copy(k.p.quaternion).invert().multiply(k.bak);
+          k.krok.quaternion.slerp(qL, orat.w);
+        }
+        k.arm.scale.set(1, 1, lang);
+        k.krok.position.set(0, -1, -ORAT * lang);
+      }
       UL.uSyn.value = syn;
       lins.visible = syn > 0.01;
       grupp.visible = true;

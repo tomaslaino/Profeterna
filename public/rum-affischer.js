@@ -23,15 +23,19 @@
 // följer med i sedlarnas lager. Skuggorna är bakade i skivan, inga filter.
 // Sedlarna sitter alltid på samma ställe, raka; slitaget (rum-saker.js) bleker
 // bara papperet.
-// Veckans löpsedel är den enda som byts och är uppsatt för hand: varannan vecka
-// med tejp i fönstrets nedre vänstra hörn, där gänget inte skymmer den, och
-// varannan med häftstift på väggen till höger om fönstret, under oraklet och
-// till vänster om bardisken. I telefonen på höjden alltid på väggen, som syns
-// utan att man drar (vänstra hörnet ligger utanför bilden där). På väggen
-// sitter den fritt från disken och barstolarna och ligger under bardiskens duk
-// (rum-inredning.js), så att det som står framför väggen står framför sedeln.
-// Slitaget följer tippningen som sakerna på pulten; löpsedeln blir bara lite
-// böjd.
+// Veckans löpsedel är den enda som byts. Den står i ett löpsedelsställ på
+// trottoaren utanför dörren, som utanför en riktig tobaksaffär, och syns genom
+// dörrens glas under handtaget (2026-11-13, användarens val: rummet skulle bli
+// lugnare). Förut satt den varannan vecka med tejp i fönstret och varannan med
+// häftstift på väggen under oraklet. Stället är svartlackerad plåt med sedeln
+// bakom plast, på två ben. Det står ute: i bakväggens plan direkt efter
+// utsikten (#rum-ute), alltså bakom väggens hål och dörrens smutsiga glas, och
+// har gatans ljus – mörkt när det är mörkt ute, varmt under lyktstolpen när den
+// lyser, kallt på dagen och med snö på ramen när det ligger snö (--ute-dag,
+// .ute-lampor och .ute-sno, som rum.js sätter med utsikten). I närbilden
+// (.lop-nara) ljusnar den, så att den går att läsa. I telefonen på höjden
+// ligger dörren utanför bilden från början: där syns stället när man drar.
+// Slitaget följer tippningen som sakerna på pulten; löpsedeln gulnar lite.
 //
 // Löpsedeln (rubrik): Helgarderats, tidningen på pulten (rum-tidning.js), på
 // samma papper och i samma tryck som dess omslag och med samma nummer, och
@@ -51,14 +55,12 @@
 //   rows: omgångens rader (roundRows i rum.js), old: de färdigspelade
 //   kupongerna (Historik.coupons()); säsongens omgångar läses ur TP.season
 //   (tippare.js). upplaga: tidningens nummer på pulten (hgNumret i rum.js).
-// För bilder: ?rum-vecka=<tal> en annan vecka (löpsedelns plats),
+// För bilder: ?rum-vecka=<tal> en annan vecka (rubrikens variant och klippet),
 // ?rum-rubrik=<typ> en viss rubrik om den
 // finns (typ i bakat, matchRubriker, kupongRubriker och framat) och
 // ?rum-variant=<tal> en viss variant av den.
 
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-const sm = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const DAG = 86400000;
 const q = new URLSearchParams(location.search);
@@ -73,14 +75,11 @@ export const SKIVA = {
     { id: 'rum-vm94', x: 771, y: 394, text: 'VM 1994' }, { id: 'rum-chelsea', x: 859, y: 394, text: 'CHELSEA 1998' },
   ],
 };
-// Löpsedeln: med tejp i fönstrets nedre vänstra hörn, eller med häftstift på
-// väggen mellan fönsterkarmen (x 958; fönsterbänkens ände når x 984 i y 554–596)
-// och bardisken (x 1060; den innersta barstolens sits börjar vid x 1063 i y 570),
-// under oraklets skylt (y 483). På väggen är den 72 % stor (72 × 101, CSS:en
-// .pa-vagg) och sitter med två häftstift, så den hänger nästan rak.
-const LOPPLATS = [{ x: 286, y: 404, rot: 1.4 }, { x: 986, y: 488, rot: 0.3, vagg: true }];
-// på höjden (telefonen) syns bara mitten och högra delen av rummet från början
-const smal = () => innerWidth / innerHeight < 1.2;
+// Löpsedelsstället: ramens övre vänstra hörn i scenens px. Dörrens glas är
+// x 50–222 och y 136–696 (DORR i rum.js) och handtaget y 420–436, och
+// lyktstolpen ute står i x 140 (rum-ute.js). Måtten på ramen, sedeln och
+// benen står i rum-affischer.css (.rum-lopstall).
+const STALL = { x: 72, y: 446 };
 // Platsen för skivan (rum-saker.js och rum-inredning.js startar i valfri
 // ordning): en enda färg, utan ritminne, tills rum-inredning.js har ritat
 // skivan i den, så att sedlarna inte hänger i luften under tiden.
@@ -277,7 +276,7 @@ function nacional() {
 // anpassa till helgarderat-tidningen"): kupongens papper, den tunna tryckta
 // ramen, numret, veckan och priset maskinskrivna överst (samma rad som på
 // omslaget, RumTidning.overst), namnet i terrakotta, vinjetten mellan två
-// streck där omslaget har lördagens datum, och rubriken i samma typsnitt,
+// streck där omslaget hade lördagens datum (till 2026-11-13), och rubriken i samma typsnitt,
 // Fraunces, så fet och stor som ryms, med det som lyfts fram i terrakotta.
 // Förut gick den i det gula matchprogrammet, som tidningen hade en kort tid
 // (gult papper, namnet i Alfa Slab One på ett rött band, rubriken i Anton), och
@@ -309,8 +308,8 @@ let namnAv = (p) => Tippoang.kallas(p);
 const gen = (namn) => (/[sxz]$/i.test(namn) ? namn : `${namn}s`);
 const lag = (match) => String(match || '').split(/\s+[–-]\s+/);
 
-// Veckan i Stockholm (måndag till söndag) som frö: löpsedeln sitter på samma
-// ställe hela veckan. ?rum-vecka=<tal> ger en annan vecka.
+// Veckan i Stockholm (måndag till söndag) som frö: rubrikens variant och
+// klippet är desamma hela veckan. ?rum-vecka=<tal> ger en annan vecka.
 function veckaFro(t = Date.now()) {
   const v = q.get('rum-vecka');
   if (v != null && Number.isFinite(Number(v))) return Number(v);
@@ -612,7 +611,7 @@ function lopsedel() {
   return el;
 }
 
-function rita(el, r, vagg, over = '') {
+function rita(el, r, over = '') {
   const T = TIDNINGEN;
   const rad = r.rad.map(([t, s]) => [String(t).toUpperCase(), Number(s) || 0]);
   el.title = `${T.gen} löpsedel: ${radText(rad)} – ${r.under}${r.plus ? `. ${r.plus}` : ''}`;
@@ -629,8 +628,7 @@ function rita(el, r, vagg, over = '') {
     `<span class="rub">${rad.map(([t, s]) => `${s === 2 ? STRECK : ''}<b${stil(t, s)}>${esc(t)}</b>${s === 2 ? STRECK : ''}`).join('')}</span>` +
     `<span class="under">${esc(r.under)}</span>` +
     (r.plus ? `<span class="plus"><b>+</b>${esc(r.plus)}</span>` : '') +
-    '<span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>' +
-    `<span class="hund"></span>${vagg ? '<i class="nal a"></i><i class="nal b"></i>' : '<i class="tejp a"></i><i class="tejp b"></i>'}`;
+    '<span class="blad"></span><span class="veck"></span><span class="tryck"></span></span>';
   // vinjetten och den andra nyheten så stora som ryms, högst som i CSS:en (sp:
   // spärren mellan bokstäverna i em, som där; mer: det som står bredvid i em)
   const fyll = (sel, text, bred, max, sp = 0, mer = 0) => {
@@ -658,10 +656,8 @@ function bleks(el, w) {
   el.style.setProperty('--sat', (1 - 0.4 * w).toFixed(2));
   el.style.setProperty('--blek', (0.1 + 0.3 * w).toFixed(2));
 }
-// Löpsedeln böjs lite (och vrids efter platsen, --vrid).
-function slit(el, w, seed) {
-  el.style.setProperty('--rot', `${((hash(seed + 1.7) - 0.5) * 0.6 + w * 0.8).toFixed(2)}deg`);
-  el.style.setProperty('--curl', `${Math.round(0.3 * sm(0.45, 0.95, w) * 26)}px`);
+// Löpsedeln gulnar lite: den sitter rak bakom plasten i stället.
+function slit(el, w) {
   el.style.setProperty('--sep', (0.05 + 0.15 * w).toFixed(2));
   el.style.setProperty('--sat', (1 - 0.15 * w).toFixed(2));
   el.style.setProperty('--blek', (0.04 + 0.12 * w).toFixed(2));
@@ -692,6 +688,21 @@ function klipp(fro) {
   return `polygon(${p.join(', ')})`;
 }
 
+// Löpsedelsstället kring sedeln: ramen, benen med tvärslån, skuggan på gatan,
+// plasten framför sedeln, ljuset ute över ramen och snön på den (rum-affischer.css).
+// Sedeln är knappen i ramen; resten tar inte emot klick.
+function stall(l) {
+  const st = document.createElement('div');
+  st.className = 'rum-lopstall';
+  st.id = 'rum-lopstall';
+  st.style.left = `${STALL.x}px`;
+  st.style.top = `${STALL.y}px`;
+  st.innerHTML = '<i class="skugga"></i><i class="ben a"></i><i class="ben b"></i><i class="sla"></i><i class="ram"></i>';
+  st.append(l);
+  st.insertAdjacentHTML('beforeend', '<i class="plast"></i><i class="ute kall"></i><i class="ute mork"></i><i class="ute lampa"></i><i class="sno"></i>');
+  return st;
+}
+
 export function affischer(back, { short = (x) => x, namn = null } = {}) {
   if (namn) namnAv = namn;
   if (!document.querySelector('link[href="rum-affischer.css"]')) {
@@ -706,11 +717,12 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
   const c = chelsea();
   const n = nacional();
   back.append(skivPlats(back), f, n, v, c);
-  // Löpsedeln på väggen hänger bakom bardisken och barstolarna, som står
-  // framför väggen: före diskens duk (rum-inredning.js lägger den före
-  // tavlorna på högra väggen, .rum-hv, så den hamnar efter löpsedeln om den
-  // kommer sist).
-  back.insertBefore(l, back.querySelector(':scope > canvas[data-bit="disk"]') || back.querySelector(':scope > .rum-hv'));
+  // Löpsedelsstället står ute: direkt efter utsikten, så att väggen med dörrens
+  // karm, handtaget och smutsen på glaset (rum.js) ligger framför det.
+  const st = stall(l);
+  const ute = back.querySelector(':scope > #rum-ute');
+  if (ute) ute.after(st);
+  else back.prepend(st);
   let ritad = null;
   let fonter = false;
   let senast = { rows: null, old: null };
@@ -737,19 +749,12 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
     },
     slit(w, seed) {
       for (const el of [f, n, v, c]) bleks(el, w);
-      slit(l, w, seed + 5);
+      slit(l, w);
     },
     // rubriken räknas om när datan ändras (rum-saker.js frågar bara då)
     data(rows, old) {
       senast = { rows, old };
       const fro = veckaFro();
-      // varannan vecka i fönstret, varannan på väggen; på höjden alltid på väggen
-      const p = smal() ? LOPPLATS[1] : LOPPLATS[((fro % 2) + 2) % 2];
-      const vagg = Boolean(p.vagg);
-      l.classList.toggle('pa-vagg', vagg);
-      l.style.left = `${(p.x + (hash(fro + 3) - 0.5) * (vagg ? 1.6 : 10)).toFixed(1)}px`;
-      l.style.top = `${(p.y + (hash(fro + 4) - 0.5) * (vagg ? 2 : 8)).toFixed(1)}px`;
-      l.style.setProperty('--vrid', `${(p.rot + (hash(fro + 5) - 0.5) * (vagg ? 0.5 : 1.2)).toFixed(2)}deg`);
       l.style.setProperty('--klipp', klipp(fro));
       l.style.setProperty('--vy', `${(46 + hash(fro + 6) * 7).toFixed(1)}%`);
       let r;
@@ -760,10 +765,10 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
         r = { ...GUIDEN.v[0], typ: 'guide', plus: PLUS[0], datum: datum(Date.now()) };
       }
       senastR = r;
-      const k = JSON.stringify([r.kick, r.rad, r.under, r.plus, over, fonter, vagg]);
+      const k = JSON.stringify([r.kick, r.rad, r.under, r.plus, over, fonter]);
       if (k === ritad) return;
       ritad = k;
-      rita(l, r, vagg, over);
+      rita(l, r, over);
     },
   };
   return api;

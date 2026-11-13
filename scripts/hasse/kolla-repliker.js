@@ -115,9 +115,20 @@ for (const vag of LISTOR) {
   if (Array.isArray(l) && new Set(l).size !== l.length) fel.push(`${vag} har samma rad två gånger`);
 }
 // Domarna: ett ord i guld för varje läge, och varje rad en mening (de läses upp mening för mening).
+// Orden är många för varje läge (domOrd i rum-hasse.js väljer), och stämpeln med ordet under namnet i listan
+// ryms med högst nio bokstäver i den smalaste telefonen (uppmätt 2026-11-13: BORTGLÖMD är 104 av 109 bildpunkter).
+const ORDEN = Object.entries(repliker.domord || {}).flatMap(([k, l]) => (Array.isArray(l) ? l.map((o) => [k, o]) : []));
 for (const k of ['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget']) {
-  if (!(repliker.domord && repliker.domord[k])) fel.push(`domord.${k} saknas`);
+  const l = repliker.domord && repliker.domord[k];
+  if (!Array.isArray(l) || !l.length) fel.push(`domord.${k} måste vara en lista med ord: han väljer ett efter omgången och personen`);
+  else if (new Set(l).size !== l.length) fel.push(`domord.${k} har samma ord två gånger`);
   if (!(k === 'forsakring' || (repliker.domar && repliker.domar.in && repliker.domar.in[k]))) fel.push(`domar.in.${k} saknas`);
+}
+for (const [k, o] of ORDEN) {
+  if (!/^\p{Lu}\p{Ll}+$/u.test(o)) fel.push(`domord.${k}: "${o}" ska vara ett ord med stor bokstav, som beskriver personen`);
+  if (o.length > 9) fel.push(`domord.${k}: "${o}" är för långt: högst nio bokstäver, annars ryms inte stämpeln under namnet`);
+  const andra = [...new Set(ORDEN.filter(([k2, o2]) => o2 === o && k2 !== k).map(([k2]) => k2))];
+  if (andra.length) fel.push(`domord.${k}: "${o}" står också under ${andra.join(', ')}: ordet ska säga vilket läge det är`);
 }
 // Frågan över listan med gänget (gangLista i rum-hasse.js) sägs i ett svep och får vara två meningar. Den ska
 // säga vad han har att ge och att det gäller en kupong (Tomas 2026-11-10: "höra om din kupong" tar för givet att
