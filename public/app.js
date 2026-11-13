@@ -209,9 +209,34 @@ window.addEventListener('hashchange', route);
 
 // ---------- matchlista ----------
 
+// Landskamperna (Nations League, EM-kval och vänskapslandskamper, type
+// 'intl') står som en enda tävling i filtren – i matchlistan, Ny kupong och
+// Välj matcher – och bara när det finns landskamper i matcherna (2026-11-13).
+const INTL = { id: 'intl', name: 'Landskamper', short: 'Landskamper' };
+const isIntlComp = (id) => (state.comps.get(id) || {}).type === 'intl';
+function filterComps() {
+  const intl = !state.all || state.all.matches.some((m) => isIntlComp(m.comp));
+  return [...[...state.comps.values()].filter((c) => c.type !== 'intl'), ...(intl ? [INTL] : [])];
+}
+const inComp = (m, comp) => comp === 'all' || m.comp === comp || (comp === INTL.id && isIntlComp(m.comp));
+
+// Landskampernas prognos är marknadens, inte datorns (f.mk, src/forecast.js):
+// procenten står i kursiv med den här förklaringen när man pekar.
+const MK_TITLE = 'Marknadens chans: DraftKings odds utan spelbolagets marginal. Datorn räknar bara de engelska ligorna.';
+const isMk = (m) => Boolean(m && m.f && m.f.mk && !(m.j && m.j.p));
+// Oddset under en ruta på kupongerna, med marknadens i kursiv.
+function oddsSmall(m, text, cls = '') {
+  const mk = isMk(m);
+  const c = [cls, mk ? 'mk' : ''].filter(Boolean).join(' ');
+  return `<small${c ? ` class="${c}"` : ''}${mk ? ` title="${esc(MK_TITLE)}"` : ''}>${text}</small>`;
+}
+// En rad under kupongen som säger vad kursiven betyder, när någon match har den.
+const mkLegend = (ms) => (ms.some(isMk)
+  ? '<p class="mk-legend"><i>Kursiva odds</i> är marknadens: datorn räknar bara på de engelska ligorna, inte på landskamperna.</p>' : '');
+
 function renderChips() {
   // hela namnen, som divisionerna på Tabeller och Statistik
-  const all = [{ id: 'all', name: 'Alla' }, ...state.comps.values()];
+  const all = [{ id: 'all', name: 'Alla' }, ...filterComps()];
   $('#comp-chips').innerHTML = all.map((c) =>
     `<button type="button" data-comp="${c.id}" aria-pressed="${c.id === state.comp}">${esc(c.name)}</button>`).join('');
   for (const b of document.querySelectorAll('#comp-chips button')) {
@@ -226,6 +251,7 @@ async function loadMatches() {
     // Sköldarnas index hämtas samtidigt, så att listan ritas med dem.
     [state.all] = await Promise.all([getJSON('data/matches.json'), window.Skoldar && Skoldar.ready]);
     if (window.Spoiler) Spoiler.useMatches(state.all.matches);
+    renderChips(); // Landskamper bara när det finns landskamper
     renderMatchList();
   } catch (err) {
     el.innerHTML = `<p class="empty">Kunde inte läsa matcherna: ${esc(err.message)}</p>`;
@@ -240,11 +266,10 @@ async function loadMatches() {
 function selectMatches(comp, days) {
   const now = Date.now();
   const span = days * 86400000;
-  const inComp = (m) => comp === 'all' || m.comp === comp;
   const t = (m) => new Date(m.kickoff).getTime();
   return {
-    played: state.all.matches.filter((m) => inComp(m) && m.completed && t(m) >= now - span),
-    upcoming: state.all.matches.filter((m) => inComp(m) && !m.completed && t(m) >= now - 3 * 3600000 && t(m) <= now + span),
+    played: state.all.matches.filter((m) => inComp(m, comp) && m.completed && t(m) >= now - span),
+    upcoming: state.all.matches.filter((m) => inComp(m, comp) && !m.completed && t(m) >= now - 3 * 3600000 && t(m) <= now + span),
   };
 }
 
@@ -343,6 +368,7 @@ function tipTitle(m) {
     const hit = tipHit(m);
     return `Prognosen före avspark ${listOdds(m.j.p).join(' · ')}${hit == null ? '' : hit ? ' – slog in' : ' – slog inte in'}`;
   }
+  if (isMk(m)) return `Marknadens prognos ${listOdds(m.f.p).join(' · ')} (DraftKings utan marginal)`;
   return m.f ? `Prognosen i efterhand ${listOdds(m.f.p).join(' · ')}` : '';
 }
 
