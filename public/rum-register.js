@@ -25,10 +25,14 @@
 //              (inget lag markeras för att det står i kupongen, sedan
 //              2026-11-13); SPELARE är divisionens spelare från A
 //              till Ö med plats, lag, speltid och mål. Ett lag öppnar
-//              lagkortet med truppen (speltid, mål, de
-//              skadade), och en spelare spelarkortet: läget, speltiden, mål
-//              och xG, och hur laget har gått med och utan honom i startelvan
-//              mot oddsen (mu i data/players/<division>.json)
+//              lagkortet och en spelare spelarkortet, med namnet och
+//              flikarna stilla överst (sedan 2026-11-13; Tab byter):
+//              laget ÖVERSIKT (nästa match, formen, styrkan), xG, SPELET,
+//              ODDSEN och TRUPPEN (speltid, mål, de skadade); spelaren
+//              ÖVERSIKT (läget, matcherna och hur laget har gått med och
+//              utan honom i startelvan mot oddsen, mu i
+//              data/players/<division>.json), ANFALL, MÅLEN och FÖRSVAR
+//              (målvakten I MÅLET i stället för anfallet och målen)
 // Landslagen (sedan 2026-11-13): kupongen har gruppen (NL B4), matchakten
 // för en landskamp gruppen, Nations League, alla landskamper sedan 2024 och
 // marknadens chans i stället för tavlans tal, och registret en post för
@@ -770,8 +774,8 @@ window.RumRegister = (() => {
       { k: 'bast', del: 'MATCHERNA', e: 'BÄST PÅ PLAN', n: 'BÄST PÅ PLAN', g: (p) => (p.rt != null ? p.rb : null), f: String },
       { k: 'mal', del: 'ANFALL', ute: true, e: 'MÅL', n: 'MÅL', g: (p) => p.g, f: String },
       { k: 'assist', del: 'ANFALL', ute: true, e: 'ASSIST', n: 'ASSIST', g: (p) => p.a, f: String },
-      { k: 'inblandad', del: 'ANFALL', ute: true, e: 'INBLANDAD', n: 'INBLANDAD I LAGETS MÅL', g: (p) => { const m = lagetsMal(p); return p.noStats || !m ? null : ((p.g || 0) + (p.a || 0)) / m; }, f: pct, ok: (p) => lagetsMal(p) >= 5 },
-      { k: 'andel', del: 'ANFALL', ute: true, e: 'AV LAGETS MÅL', n: 'ANDEL AV LAGETS MÅL', g: (p) => { const m = lagetsMal(p); return p.noStats || !m || p.g == null ? null : p.g / m; }, f: pct, ok: (p) => lagetsMal(p) >= 5 },
+      { k: 'inblandad', del: 'MÅLEN', ute: true, e: 'INBLANDAD', n: 'INBLANDAD I LAGETS MÅL', g: (p) => { const m = lagetsMal(p); return p.noStats || !m ? null : ((p.g || 0) + (p.a || 0)) / m; }, f: pct, ok: (p) => lagetsMal(p) >= 5 },
+      { k: 'andel', del: 'MÅLEN', ute: true, e: 'AV LAGETS MÅL', n: 'ANDEL AV LAGETS MÅL', g: (p) => { const m = lagetsMal(p); return p.noStats || !m || p.g == null ? null : p.g / m; }, f: pct, ok: (p) => lagetsMal(p) >= 5 },
       { k: 'skott', del: 'ANFALL', ute: true, e: 'SKOTT', n: 'SKOTT', g: (p) => p.sh, f: String },
       { k: 'pamal', del: 'ANFALL', ute: true, e: 'PÅ MÅL', n: 'SKOTT PÅ MÅL', g: (p) => p.sot, f: String },
       { k: 'malskott', del: 'ANFALL', ute: true, e: 'MÅL/SKOTT', n: 'MÅL PER SKOTT', g: (p) => (p.sh ? p.g / p.sh : null), f: pct, ok: (p, x) => p.sh >= grans(x, 'minShotsConversion', 10) },
@@ -800,14 +804,56 @@ window.RumRegister = (() => {
       { k: 'bollvinster', del: 'FÖRSVAR', e: 'BOLLVINSTER', n: 'BOLLVINSTER', g: (p) => p.rec, f: String },
       { k: 'insatser90', del: 'FÖRSVAR', e: 'INSATSER/90', n: 'FÖRSVARSINSATSER PER 90 MINUTER', g: (p) => (p.tk == null || p.cbi == null ? null : per90(p.tk + p.cbi, p.min)), f: tal1, ok: helt },
       { k: 'nollor', del: 'FÖRSVAR', e: 'NOLLOR', n: 'HÅLLNA NOLLOR', g: (p) => p.cs, f: String },
-      { k: 'sjalvmal', del: 'FÖRSVAR', e: 'SJÄLVMÅL', n: 'SJÄLVMÅL', g: (p) => p.og, f: String },
+      { k: 'sjalvmal', del: 'FÖRSVAR', e: 'SJÄLVMÅL', n: 'SJÄLVMÅL', g: (p) => p.og, f: String, visa: (p) => p.og > 0 },
       { k: 'falld', del: 'REGELBROTT', e: 'FÄLLD', n: 'FÄLLD', g: (p) => p.fs, f: String },
       { k: 'falld90', del: 'REGELBROTT', e: 'FÄLLD/90', n: 'FÄLLD PER 90 MINUTER', g: (p) => per90(p.fs, espnMin(p)), f: tal1, ok: heltE },
       { k: 'faller', del: 'REGELBROTT', e: 'FÄLLER', n: 'BEGÅNGNA REGELBROTT', g: (p) => p.fc, f: String },
       { k: 'faller90', del: 'REGELBROTT', e: 'FÄLLER/90', n: 'BEGÅNGNA REGELBROTT PER 90 MIN', g: (p) => per90(p.fc, espnMin(p)), f: tal1, ok: heltE },
       { k: 'gula', del: 'REGELBROTT', e: 'GULA KORT', n: 'GULA KORT', g: (p) => p.yc, f: String },
-      { k: 'roda', del: 'REGELBROTT', e: 'RÖDA KORT', n: 'RÖDA KORT', g: (p) => p.rc, f: String },
+      { k: 'roda', del: 'REGELBROTT', e: 'RÖDA KORT', n: 'RÖDA KORT', g: (p) => p.rc, f: String, visa: (p) => p.rc > 0 },
     ];
+    // Kortens flikar (sedan 2026-11-13, användarens önskemål: "rimliga
+    // underkategorier" i stället för allt i ett kort). Samma grupper som
+    // Statistik (T_GROUPS och P_GROUPS i divisioner.js), utom tabellen, som
+    // står på tv:n, och så att varje flik ryms på datorns skärm: lagets
+    // översikt (omgångens och nästa match, formen och modellens styrka och
+    // motstånd), xG (chanserna), spelet (målen, skotten och korten per
+    // match), oddsen och truppen; för spelaren översikten (läget, matcherna
+    // och laget med och utan honom), anfallet, målen (vad målen betyder för
+    // laget), målet (målvakterna) och försvaret med regelbrotten.
+    // Avsnitten i talen (del) hör till flikarna så här:
+    const LAGDELAR = [['oversikt', 'ÖVERSIKT'], ['xg', 'xG'], ['spelet', 'SPELET'], ['oddsen', 'ODDSEN'], ['truppen', 'TRUPPEN']];
+    const LAGFLIK = { '': 'oversikt', 'MÅLEN PER MATCH': 'spelet', 'xG PER MATCH': 'xg', 'MOT CHANSERNA': 'xg', MODELLEN: 'oversikt', 'SPELET PER MATCH': 'spelet', ODDSEN: 'oddsen', TRUPPEN: 'truppen' };
+    const SPDELAR = [['oversikt', 'ÖVERSIKT'], ['anfall', 'ANFALL'], ['malen', 'MÅLEN'], ['malet', 'I MÅLET'], ['forsvar', 'FÖRSVAR']];
+    const SPFLIK = { MATCHERNA: 'oversikt', ANFALL: 'anfall', MÅLEN: 'malen', 'I MÅLET': 'malet', FÖRSVAR: 'forsvar', REGELBROTT: 'forsvar' };
+    // (utespelarna har inget mål att stå i, målvakterna inget anfall)
+    const spDelar = (p) => SPDELAR.filter(([id]) => (p.pos === 'MV' ? id !== 'anfall' && id !== 'malen' : id !== 'malet'));
+    // fliken för ett tal (när man kommer till kortet från talets lista)
+    const flikFor = (slag, k) => {
+      if (slag === 'spelare') { const d = SPTAL.find((y) => y.k === k); return (d && SPFLIK[d.del]) || 'oversikt'; }
+      const d = LAGTAL.find((y) => y.k === k);
+      return (d && LAGFLIK[d.del]) || 'oversikt';
+    };
+    // Flikraden under namnet (i det som står still överst, så att den inte
+    // flyttar sig när man rullar eller byter flik): den valda omvänd, en
+    // flik utan något att visa svag och inte tryckbar. Tre mellanslag
+    // emellan som i menyraden, två när raden annars inte ryms (telefonen).
+    function delRad(delar, val, har) {
+      const n = delar.reduce((s, [, namn]) => s + namn.length, 0);
+      const mellan = n + 3 * (delar.length - 1) <= A.bred ? '   ' : '  ';
+      return rad(...delar.flatMap(([id, namn], j) => [[namn, id === val ? 'i' : har(id) ? '' : 'd', id === val || !har(id) ? null : `#del:${id}`], [j < delar.length - 1 ? mellan : '', '']]));
+    }
+    // Avsnittets rubrik i en flik, med en tom rad före (inte överst) – utom
+    // när rubriken säger samma sak som fliken (ODDSEN under ODDSEN): då
+    // fortsätter raderna utan rubrik
+    const rubrik = (r, del, utan) => { if (del === utan) return; if (r.length) r.push(tom()); r.push(rad([del, 'd'])); };
+    // Kortets huvud: namnet och raden under (divisionen, eller laget och
+    // positionen) – på en rad på datorn när den ryms, så att flikarna under
+    // får plats på skärmen; sedan flikarna och ett streck
+    function huvud(namn, under, flikar) {
+      const n = [...namn, ...under].reduce((s, [t]) => s + t.length, 3);
+      return [...(A.bred >= 60 && n <= A.bred ? [rad(...namn, ['   ', ''], ...under)] : [rad(...namn), rad(...under)]), flikar, streck()];
+    }
     const listQ = (slag, d, k) => `#lista:${slag}:${d}:${k}`;
     // platsen bland talen (lika tal delar plats; asc = lägst först)
     const platsAv = (v, alla, asc) => 1 + alla.filter((y) => (asc ? y < v - 1e-9 : y > v + 1e-9)).length;
@@ -826,33 +872,39 @@ window.RumRegister = (() => {
     }
     // en rad i kortet: etiketten (leder till listan), talet och platsen svagt efter
     const talRad = (def, q, text, plats) => rad([def.e, 'd', q], [pad('', ETK - def.e.length)], padL(String(text).slice(0, VAR), VAR), [plats ? padL(ordtal(plats), 6) : '', 'd']);
-    // Lagkortets tal i avsnitt (formen står överst i kortet)
-    function lagTal(t, S) {
-      const r = [];
+    // Lagkortets tal i en flik, i avsnitt (formen står överst i översikten)
+    function lagTal(t, S, flik, r = []) {
+      const namn = (LAGDELAR.find(([id]) => id === flik) || [])[1];
       let del = null;
       for (const def of LAGTAL) {
-        if (!def.del) continue;
+        if (!def.del || LAGFLIK[def.del] !== flik) continue;
         const v = def.g(t);
         if (!fin(v)) continue;
-        if (def.del !== del) { r.push(tom(), rad([def.del, 'd'])); del = def.del; }
+        if (def.del !== del) { rubrik(r, def.del, namn); del = def.del; }
         const q = listQ('lag', t.comp, def.k);
         r.push(S.veil ? talRad(def, q, '?') : talRad(def, q, def.f(v, t), platsAv(v, lagLista(def, t.comp).map((y) => y.v), def.asc)));
       }
       return r;
     }
-    // Spelarkortets tal i avsnitt: platsen bara bland de 20 främsta
-    function spelarTal(x, S) {
+    // Spelarkortets tal: de som gäller spelaren (utespelare eller målvakt,
+    // målskytt) och finns
+    const spGaller = (def, x) => {
       const p = x.p;
       const mv = p.pos === 'MV';
-      const r = [];
+      return !((def.ute && mv) || (def.mv && !mv) || (def.visa && !def.visa(p))) && fin(def.g(p, x));
+    };
+    // Spelarkortets tal i en flik, i avsnitt: platsen bara bland de 20 främsta
+    // (utan: rubriken som inte skrivs ut, annars flikens namn)
+    function spelarTal(x, S, flik, r = [], utan = null) {
+      const p = x.p;
+      const namn = utan || (SPDELAR.find(([id]) => id === flik) || [])[1];
       let del = null;
       // (divisionens spelare en gång; platsen räknas utan att listan sorteras)
       const iDiv = S.veil ? [] : A.P.spelare.filter((y) => y.div === x.div);
       for (const def of SPTAL) {
-        if ((def.ute && mv) || (def.mv && !mv) || (def.visa && !def.visa(p))) continue;
+        if (SPFLIK[def.del] !== flik || !spGaller(def, x)) continue;
         const v = def.g(p, x);
-        if (!fin(v)) continue;
-        if (def.del !== del) { r.push(tom(), rad([def.del, 'd'])); del = def.del; }
+        if (def.del !== del) { rubrik(r, def.del, namn); del = def.del; }
         const q = listQ('spelare', x.div, def.k);
         if (S.veil) { r.push(talRad(def, q, '?')); continue; }
         const pl = spMed(def, x, v) ? platsAv(v, iDiv.map((y) => [y, def.g(y.p, y)]).filter(([y, w]) => spMed(def, y, w)).map(([, w]) => w), def.asc) : null;
@@ -1070,12 +1122,22 @@ window.RumRegister = (() => {
         .sort((a, b) => (veil ? (POSORD[a.x.p.pos] ?? 4) - (POSORD[b.x.p.pos] ?? 4) : (b.x.p.min || 0) - (a.x.p.min || 0)) || efternamn(a.x.p.name).localeCompare(efternamn(b.x.p.name), 'sv'));
     }
 
-    function lagkort(t, S, R) {
+    // Lagkortet: namnet, divisionen och flikarna står still överst (R.huvud),
+    // och under dem det som står i fliken (del; översikten när fliken inte
+    // har något). ←/→ går till förra och nästa lag i samma flik.
+    function lagkort(t, S, R, del) {
       const l = lagIDiv(t.comp);
       const i = l.findIndex((x) => x.name === t.name);
       if (i >= 0) R.sido = [i > 0 ? `#lag:${l[i - 1].name}` : null, i < l.length - 1 ? `#lag:${l[i + 1].name}` : null];
       R.slojas = true;
-      const r = [rad([up(t.name), 'v']), rad([up(DIVNAME[t.comp] || ''), 'd', `#div:${t.comp}`]), tom()];
+      const har = (id) => id === 'oversikt' || id === 'truppen' || LAGTAL.some((d) => d.del && LAGFLIK[d.del] === id && fin(d.g(t)));
+      const val = har(del) ? del : 'oversikt';
+      R.delar = LAGDELAR.map(([id]) => id).filter(har);
+      R.del = val;
+      R.huvud = huvud([[up(t.name), 'v']], [[up(DIVNAME[t.comp] || ''), 'd', `#div:${t.comp}`]], delRad(LAGDELAR, val, har));
+      if (val === 'truppen') return truppen(t, S, lagTal(t, S, 'truppen'));
+      if (val !== 'oversikt') return lagTal(t, S, val);
+      const r = [];
       const om = iOmgangen(t.name);
       const falt = (etikett, ...v) => rad([pad(etikett, 10), 'd'], ...v.map((x) => (Array.isArray(x) ? x : [x, ''])));
       if (om) r.push(falt('OMGÅNGEN', [`${nrAv(om.m)}  ${kort(om.m.home)} – ${kort(om.m.away)}`, '', `#mote:${om.m.id}`]));
@@ -1099,7 +1161,8 @@ window.RumRegister = (() => {
       const f = formLag(t.name);
       const fv = LAGTAL[0].g(t);
       if (f.length) {
-        r.push(tom(), talRad(LAGTAL[0], listQ('lag', t.comp, 'form'), fin(fv) ? LAGTAL[0].f(fv, t) : f.map((x) => x.l).join(''),
+        if (r.length) r.push(tom());
+        r.push(talRad(LAGTAL[0], listQ('lag', t.comp, 'form'), fin(fv) ? LAGTAL[0].f(fv, t) : f.map((x) => x.l).join(''),
           !S.veil && fin(fv) ? platsAv(fv, lagLista(LAGTAL[0], t.comp).map((y) => y.v)) : null));
         for (const { m: x, l: u } of f) {
           const hemma = x.home === t.name;
@@ -1110,10 +1173,13 @@ window.RumRegister = (() => {
             [`  ${u === '?' || !s ? '?' : hemma ? `${s.home}–${s.away}` : `${s.away}–${s.home}`}`, 'v'], [`  ${u === '?' ? '' : u}`, 'd']));
         }
       }
-      r.push(...lagTal(t, S));
-      // truppen: på datorn också assisten och korten
+      // (modellens styrka och motståndet hittills)
+      return lagTal(t, S, 'oversikt', r);
+    }
+    // Truppen under lagets tal om truppen (r): på datorn också assisten och korten
+    function truppen(t, S, r) {
       const tr = trupp(t, S.veil);
-      r.push(tom());
+      if (r.length) r.push(tom());
       if (!tr) return [...r, prickar('HÄMTAR TRUPPEN', '')];
       const fler = A.bred >= 56 ? [['ASS', 'a'], ['GUL', 'yc'], ['RÖD', 'rc']] : A.bred >= 46 ? [['ASS', 'a']] : [];
       const W = Math.min(26, A.bred - 24 - 5 * fler.length);
@@ -1169,7 +1235,9 @@ window.RumRegister = (() => {
       return r;
     }
 
-    function spelarkort(x, S, R) {
+    // Spelarkortet: namnet, laget och flikarna står still överst, som i
+    // lagkortet. ←/→ går till förra och nästa i truppen i samma flik.
+    function spelarkort(x, S, R, del) {
       R.slojas = true;
       const p = x.p;
       const t = A.byEspn.get(String(p.teamId));
@@ -1177,16 +1245,24 @@ window.RumRegister = (() => {
       const tr = trupp(t, S.veil);
       const k = tr ? tr.findIndex((y) => y.x === x) : -1;
       if (k >= 0) R.sido = [k > 0 ? `#spelare:${tr[k - 1].x.p.id}` : null, k < tr.length - 1 ? `#spelare:${tr[k + 1].x.p.id}` : null];
-      const falt = (etikett, ...v) => rad([pad(etikett, 10), 'd'], ...v.map((y) => (Array.isArray(y) ? y : [y, ''])));
-      const r = [rad([efternamn(p.name), 'v']), rad([up(p.team), '', t ? `#lag:${t.name}` : null], [`${p.jersey ? ` · NR ${p.jersey}` : ''}${POS[p.pos] ? ` · ${up(POS[p.pos])}` : ''}`]), tom()];
+      const delar = spDelar(p);
+      const har = (id) => id === 'oversikt' || SPTAL.some((d) => SPFLIK[d.del] === id && spGaller(d, x));
+      const val = delar.some(([id]) => id === del) && har(del) ? del : 'oversikt';
+      R.delar = delar.map(([id]) => id).filter(har);
+      R.del = val;
+      R.huvud = huvud([[efternamn(p.name), 'v']], [[up(p.team), '', t ? `#lag:${t.name}` : null], [`${p.jersey ? ` · NR ${p.jersey}` : ''}${POS[p.pos] ? ` · ${up(POS[p.pos])}` : ''}`, '']], delRad(delar, val, har));
+      // Statistiks tal i avsnitt (anfallet, målen, målet, försvaret och
+      // regelbrotten), med platsen bland divisionens 20 främsta
+      if (val !== 'oversikt') return spelarTal(x, S, val);
+      // Översikten: läget och matcherna i samma spalt (utan rubrik, så att
+      // laget med och utan honom ryms under), skadan under läget
+      const r = [];
       const l = laget(x);
       if (l) {
-        r.push(falt('LÄGET', [l[0], l[0] === 'SPELKLAR' ? '' : 'v']));
-        for (const n of l.slice(1)) r.push(rad([pad('', 10)], [n]));
+        r.push(rad(['LÄGET', 'd'], [pad('', ETK - 5)], [l[0], l[0] === 'SPELKLAR' ? '' : 'v']));
+        for (const n of l.slice(1)) r.push(rad([pad('', ETK)], [n]));
       }
-      // Statistiks tal i avsnitt (matcherna, anfallet eller målet, försvaret
-      // och regelbrotten), med platsen bland divisionens 20 främsta
-      r.push(...spelarTal(x, S));
+      spelarTal(x, S, 'oversikt', r, 'MATCHERNA');
       if (S.veil) return r;
       const mu = p.mu;
       if (mu && mu.m && mu.u) {
@@ -1472,22 +1548,24 @@ window.RumRegister = (() => {
       if (vy.lista) return lista(vy, S, R);
       if (vy.spelare) {
         const x = A.P && A.P.spelare.find((y) => String(y.p.id) === vy.spelare);
-        return x ? spelarkort(x, S, R) : [prickar('HÄMTAR', '')];
+        return x ? spelarkort(x, S, R, vy.del) : [prickar('HÄMTAR', '')];
       }
       const t = vy.lag && lagOf(vy.lag);
-      if (t) return lagkort(t, S, R);
+      if (t) return lagkort(t, S, R, vy.del);
       const tl = vy.lag && landOf(vy.lag);
       if (tl) return landkort(tl, S, R);
       return vy.slag === 'spelare' ? spelarna(vy.div, S, R) : lagen(vy.div, R);
     }
 
+    // (huvud: det som står still under menyraden i ett kort – namnet och
+    // flikarna; delar: kortets flikar som har något, del: den valda)
     function bygg(vy) {
       const S = slojan();
-      const R = { nr: {}, sido: null, slojas: false };
+      const R = { nr: {}, sido: null, slojas: false, huvud: null, delar: null, del: null };
       const aktiv = vy.flik === 'sok' ? (A.fore || {}).flik : vy.flik;
       const meny = rad(...FLIKAR.flatMap(([id, namn], j) => [[namn, aktiv === id ? 'i' : '', `#flik:${id}`], [j < FLIKAR.length - 1 ? '   ' : '', '']]));
-      R.topp = [meny, streck()];
       R.ut = vy.flik === 'sok' ? traffLista(vy, R) : vyRader(vy, S, R);
+      R.topp = [meny, streck(), ...(R.huvud || [])];
       R.veil = S;
       return R;
     }
@@ -1502,6 +1580,7 @@ window.RumRegister = (() => {
         b.push([k ? '← FÖRRA' : '◄ FÖRRA', R.sido[0] ? '#sido:-1' : null, !R.sido[0]]);
         b.push([k ? 'NÄSTA →' : 'NÄSTA ►', R.sido[1] ? '#sido:1' : null, !R.sido[1]]);
       } else if (k && rot) b.push(['←→ FLIKARNA', null]);
+      if (k && R.delar && R.delar.length > 1) b.push(['TAB FLIK', null]);
       if (k && A.vy.flik === 'sok' && KATEGORIER.filter(([id]) => antal(A.vy.hits || [], id)).length > 1) b.push(['TAB KATEGORI', null]);
       if (k && Object.keys(R.nr).length) b.push(['↑↓ VÄLJ   ↵ ÖPPNA', null]);
       return b.map(([t, q, av]) => `<span${q ? ` class="a" data-q="${esc(q)}"` : av ? ' class="av"' : ''}>${esc(t)}</span>`).join('');
@@ -1522,7 +1601,8 @@ window.RumRegister = (() => {
       A.R = R;
       const h = html(R.ut);
       A.ut = h;
-      topp.innerHTML = html(R.topp);
+      A.topp = html(R.topp);
+      topp.innerHTML = A.topp;
       fot.innerHTML = fotHtml(R);
       spoilerRad();
       if (!skriv || o.calm()) { ut.innerHTML = h; rull.scrollTop = 0; return; }
@@ -1564,11 +1644,14 @@ window.RumRegister = (() => {
       valj(v.sel, false);
     }
     // förra eller nästa (match, division, lag eller spelare); i flikarnas början flikarna
+    // (i ett kort: samma flik i nästa kort)
     function sido(d) {
       const R = A.R;
       if (R && R.sido) {
         const q = R.sido[d > 0 ? 1 : 0];
-        if (q) visa(vyAv(q), true);
+        const vy = q && vyAv(q);
+        if (vy && A.vy.del && (vy.lag || vy.spelare)) vy.del = A.vy.del;
+        if (vy) visa(vy, true);
         return;
       }
       if (A.bak.length) return;
@@ -1616,8 +1699,12 @@ window.RumRegister = (() => {
       if (q === '#stang') return o.close();
       if (q.startsWith('#sido:')) return sido(Number(q.slice(6)));
       if (q.startsWith('#flik:')) { A.bak = []; visa(vyAv(q), true); return null; }
+      // en flik i kortet: byts på plats (Esc går tillbaka dit man kom ifrån)
+      if (q.startsWith('#del:')) { if (A.vy.lag || A.vy.spelare) visa({ ...A.vy, del: q.slice(5) }, true); return null; }
       const vy = vyAv(q);
       if (iSok) A.vy = fore;
+      // från ett tals lista till kortet: fliken där talet står
+      if (vy && A.vy.lista && (vy.lag || vy.spelare)) vy.del = flikFor(A.vy.slag === 'spelare' ? 'spelare' : 'lag', A.vy.lista);
       if (vy && (q.startsWith('#div:') || q.startsWith('#spelarna:') || (q.startsWith('#lista:') && A.vy.lista)) && A.vy.flik === 'lagen' && !A.vy.lag && !A.vy.spelare) { visa(vy, true); return null; }
       if (vy) {
         if (vy.mote) loadMatches();
@@ -1668,13 +1755,16 @@ window.RumRegister = (() => {
     function draw() {
       const R = bygg(A.vy);
       const h = html(R.ut);
-      if (A.on && h !== A.ut) {
+      // (också när bara det som står still överst har ändrats: kortets flikar)
+      const ht = html(R.topp);
+      if (A.on && (h !== A.ut || ht !== A.topp)) {
         const y = rull.scrollTop;
         const sel = A.sel;
         A.sk++;
         A.ut = h;
+        A.topp = ht;
         ut.innerHTML = h;
-        topp.innerHTML = html(R.topp);
+        topp.innerHTML = ht;
         fot.innerHTML = fotHtml(R);
         rull.scrollTop = y;
         A.R = R;
@@ -1749,6 +1839,13 @@ window.RumRegister = (() => {
       if ((k === 'ArrowLeft' || k === 'ArrowRight') && tomt && !iSok) { sido(k === 'ArrowRight' ? 1 : -1); return true; }
       // i sökningen: kategorierna
       if (k === 'Tab' && iSok) { bytKat(e.shiftKey ? -1 : 1); return true; }
+      // i ett kort: kortets flikar
+      const dl = A.R && A.R.delar;
+      if (k === 'Tab' && dl && dl.length > 1) {
+        const i = dl.indexOf(A.R.del);
+        visa({ ...A.vy, del: dl[(i + (e.shiftKey ? -1 : 1) + dl.length) % dl.length] }, true);
+        return true;
+      }
       if (k === 'Tab') {
         const i = FLIKAR.findIndex(([id]) => id === (iSok ? (A.fore || {}).flik : A.vy.flik));
         inp.value = '';
