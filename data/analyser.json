@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-13T18:17:26.288Z",
+ "uppdaterad": "2026-11-13T18:20:22.041Z",
  "omgang": {
   "id": "2026-11-14-st4979",
   "matcher": [
@@ -1224,6 +1224,91 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-13T18:17:18.628Z",
     "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880745",
+   "match": "Stockport County – Reading",
+   "avspark": "2026-11-14T15:00Z",
+   "writtenAt": "2026-11-13T18:19:56.636Z",
+   "text": "Stockport letar målvakt, Reading letar mittbackar\n\nPå Edgeley Park möts tvåan och sexan i League One, och båda lagen saknar folk där det gör mest ont. Stockport har sin förstemålvakt avstängd, och Reading har en enda frisk mittback från A-truppen. Det blir en eftermiddag för reserver och akademipojkar.\n\nJimmy McNulty har ett problem som sällan dyker upp. Luca Ashby-Hammond är avstängd efter sitt röda kort i cupmatchen mot Cray Wanderers, och enligt The72 [1] kan klubben behöva värva en målvakt i all hast. Hans plan var att ringa Englands U20-förbundskapten Darren Moore om Ollie Whatmuff, 19 år och utlånad från Manchester City: ”My plan is to chat to Darren and beg him!” [1]. Whatmuff spelade under McNulty i Rochdale förra säsongen. ”I've never been in this situation before”, sa McNulty [1]. Jag har varit med om värre, och då hade vi ingen målvakt.\n\nI Reading ser det ännu tunnare ut. Reading Chronicle [2] skriver att Conor Masterson är den enda friska mittbacken från A-truppen. Paudie O'Connor är avstängd efter sitt femte gula kort, Jeriel Dorsett är uttagen av Montserrat och Benn Ward har en bäckenskada. På frågan om Ward hinner bli klar svarade Leam Richardson ”I don't think so” [2]. Josh Knight fick en smäll mot Peterborough, och anfallaren Jacob Brown har fortfarande ont i revbenen. Kaptenen Lewis Wing spelar enligt tränaren på sprutor [2]. Akademispelarna Boyd Beacroft och Philip Duah förbereds, och Udoka Godwin-Malife kan få flytta in från högerbacken [2].\n\nDet här är ett möte där fasta situationer kommer att avgöra mycket. Stockport sköt i snitt 17 skott per match i ligan men har gjort nästan tre mål färre än chanserna borde ge. Mot en ihopplockad backlinje får de nya chanser. Det där löser man med en hink bollar, och gärna på torsdagsträningen.\n\nTipset: 1X (Ettan, kryss bakom)\n\nPrognosen ger Stockport ungefär varannan seger, och spelbolagen tror ännu lite mer på hemmalaget. Det jag läste drar åt samma håll. Reading ställer upp med en enda mittback från A-truppen bredvid omskolade backar och akademispelare, och kaptenen spelar på sprutor [1]. Stockport skapar mycket och har gjort färre mål än chanserna säger, och det brukar jämna ut sig. Det som håller mig tillbaka är målvakten. Ashby-Hammond är avstängd, och det var oklart vem som står i stället [2]. Ett oavgjort resultat är dessutom det troligaste enskilda utfallet i prognosen. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Stockport letar målvakt, Reading letar mittbackar",
+   "lead": "På Edgeley Park möts tvåan och sexan i League One, och båda lagen saknar folk där det gör mest ont. Stockport har sin förstemålvakt avstängd, och Reading har en enda frisk mittback från A-truppen. Det blir en eftermiddag för reserver och akademipojkar.",
+   "paragraphs": [
+    "Jimmy McNulty har ett problem som sällan dyker upp. Luca Ashby-Hammond är avstängd efter sitt röda kort i cupmatchen mot Cray Wanderers, och enligt The72 [1] kan klubben behöva värva en målvakt i all hast. Hans plan var att ringa Englands U20-förbundskapten Darren Moore om Ollie Whatmuff, 19 år och utlånad från Manchester City: ”My plan is to chat to Darren and beg him!” [1]. Whatmuff spelade under McNulty i Rochdale förra säsongen. ”I've never been in this situation before”, sa McNulty [1]. Jag har varit med om värre, och då hade vi ingen målvakt.",
+    "I Reading ser det ännu tunnare ut. Reading Chronicle [2] skriver att Conor Masterson är den enda friska mittbacken från A-truppen. Paudie O'Connor är avstängd efter sitt femte gula kort, Jeriel Dorsett är uttagen av Montserrat och Benn Ward har en bäckenskada. På frågan om Ward hinner bli klar svarade Leam Richardson ”I don't think so” [2]. Josh Knight fick en smäll mot Peterborough, och anfallaren Jacob Brown har fortfarande ont i revbenen. Kaptenen Lewis Wing spelar enligt tränaren på sprutor [2]. Akademispelarna Boyd Beacroft och Philip Duah förbereds, och Udoka Godwin-Malife kan få flytta in från högerbacken [2].",
+    "Det här är ett möte där fasta situationer kommer att avgöra mycket. Stockport sköt i snitt 17 skott per match i ligan men har gjort nästan tre mål färre än chanserna borde ge. Mot en ihopplockad backlinje får de nya chanser. Det där löser man med en hink bollar, och gärna på torsdagsträningen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The72 via Yahoo Sports",
+     "title": "Stockport County may need to sign emergency goalkeeper for Reading clash",
+     "url": "https://uk.sports.yahoo.com/news/stockport-county-may-sign-emergency-100502697.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Reading Chronicle via Yahoo Sports",
+     "title": "Reading FC without key players in defence ahead of Stockport County",
+     "url": "https://uk.sports.yahoo.com/news/reading-fc-without-key-players-120643663.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Stockport ungefär varannan seger, och spelbolagen tror ännu lite mer på hemmalaget. Det jag läste drar åt samma håll. Reading ställer upp med en enda mittback från A-truppen bredvid omskolade backar och akademispelare, och kaptenen spelar på sprutor [1]. Stockport skapar mycket och har gjort färre mål än chanserna säger, och det brukar jämna ut sig. Det som håller mig tillbaka är målvakten. Ashby-Hammond är avstängd, och det var oklart vem som står i stället [2]. Ett oavgjort resultat är dessutom det troligaste enskilda utfallet i prognosen. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Ettan, kryss bakom",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Reading Chronicle via Yahoo Sports",
+      "title": "Reading FC without key players in defence ahead of Stockport County",
+      "url": "https://uk.sports.yahoo.com/news/reading-fc-without-key-players-120643663.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The72 via Yahoo Sports",
+      "title": "Stockport County may need to sign emergency goalkeeper for Reading clash",
+      "url": "https://uk.sports.yahoo.com/news/stockport-county-may-sign-emergency-100502697.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T18:19:56.636Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Stockport har sin förstemålvakt avstängd, och det skaver lite. Men det är en spelare. Reading har en enda frisk mittback från A-truppen, och bredvid honom står en högerback som fått flytta in och ett par akademipojkar. Kaptenen spelar på sprutor. Den backlinjen är ihopplockad på parkeringen, och den ska hålla mot tvåan i serien på bortaplan.",
+     "Stockport skjuter i snitt 17 skott per match och har gjort färre mål än chanserna borde ge. Mot en sån här backlinje får de skjuta ännu mer, och vid hörnorna blir det rent kaos i straffområdet hos Reading. Reservmålvakten släpper nog in ett, det tål jag. Så er det sagt, som vi sa i Köpenhamn. Etta, och bara etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-13T18:19:56.636Z",
+    "uppdrag": {
+     "fraser": [
+      "Glöm det",
+      "Så är det bara"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T18:20:14.852Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
