@@ -270,8 +270,10 @@ a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 
 /* ---------- sista sidan ---------- */
 
 /* Spalterna (val 1 bland tre skisser, 2026-11-11): Hasse Backes krönika i två spalter med porträttet vid namnet och
-   en tryckt anfang, kåseriet under krönikan med kåsörens namn och vem hen är sist, och Vid sidan av sist, också i två
-   spalter (arket är lika brett som omslaget, så den smala spalten bredvid fick inte plats). Smal: allt i en spalt.
+   en tryckt anfang, kåseriet under krönikan med kåsörens namn och vem hen är sist, och Vid sidan av sist (arket är lika
+   brett som omslaget, så den smala spalten bredvid fick inte plats). Smal: allt i en spalt.
+   Vid sidan av har tre notiser sedan 2026-11-13 och står i en spalt över hela bredden: i två spalter blev det två
+   notiser till vänster och en till höger. Raderna är långa nog att klara sig utan avstavning (Cle-ethorpes).
    Ett tryck: Krönika, Kåseri och Vid sidan av som etiketter, porträttet och namnet mitt på, rubrikerna som matchbladens.
    Krönikan har matchbladens 17 px där den står i en spalt (telefonen); i två spalter är raderna för korta för det. */
 .hs-grid { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 22px; margin-top: 22px; }
@@ -289,8 +291,8 @@ a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 
 .hs-sign::before { content: "– "; }
 .hs-sign span { display: block; margin-top: 3px; color: var(--gra); font: 400 11.5px/1.3 var(--skriv); font-style: normal; }
 .hg .hs-sido h4 { margin-bottom: 4px; }
-.hs-sido ul { margin: 0; padding: 0; list-style: none; column-count: 2; column-gap: 30px; }
-.hs-sido li { padding: 9px 0; border-bottom: 1px solid var(--streck); break-inside: avoid; font: 400 14.5px/1.55 var(--serif); hyphens: auto; -webkit-hyphens: auto; }
+.hs-sido ul { margin: 0; padding: 0; list-style: none; }
+.hs-sido li { padding: 9px 0; border-bottom: 1px solid var(--streck); font: 400 15.5px/1.55 var(--serif); text-wrap: pretty; }
 .hs-sido li b { color: var(--rod); font: 600 11px/1 var(--tryck); letter-spacing: 0.14em; text-transform: uppercase; }
 .hs-kalla { color: var(--gra); font: 400 11.5px/1 var(--skriv); white-space: nowrap; }
 .hs-kalla a { color: inherit; text-decoration-color: var(--streck); text-underline-offset: 2px; }
@@ -319,7 +321,7 @@ a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 
   .hg .hg-i-titel { font-size: 28px; }
   .hg-i-lag { font-size: 13px; letter-spacing: 0.05em; }
   .hg-i-rub { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
-  .hs-text, .hs-ktext, .hs-sido ul { column-count: 1; }
+  .hs-text, .hs-ktext { column-count: 1; }
 }
 
 @media print {

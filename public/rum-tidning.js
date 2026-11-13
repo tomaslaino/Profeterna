@@ -132,7 +132,7 @@
   // ---------- lagen ----------
 
   // Kortare lagnamn där raden är smal, som på kupongen (Papper.kort i papper.js).
-  const KORT = { 'AFC Wimbledon': 'Wimbledon', 'Crewe Alexandra': 'Crewe', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd', 'Milton Keynes Dons': 'MK Dons',
+  const KORT = { 'AFC Wimbledon': 'Wimbledon', 'Crewe Alexandra': 'Crewe', 'Sheffield Wednesday': 'Sheffield W', 'Sheffield United': 'Sheffield U', 'Milton Keynes Dons': 'MK Dons',
     'Preston North End': 'Preston', 'Accrington Stanley': 'Accrington', 'Queens Park Rangers': 'QPR', 'West Bromwich Albion': 'West Brom', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County',
     'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton', 'Wolverhampton Wanderers': 'Wolves',
     'Nottingham Forest': "Nott'm Forest", 'AFC Bournemouth': 'Bournemouth', 'Bosnien & Hercegovina': 'Bosnien' };

@@ -20,19 +20,19 @@
  "version": "2026-11-11.2",
  "kronika": {
   "av": "Hasse Backe",
-  "rubrik": "En kupong är ett taktiskt dokument",
+  "rubrik": "Kupongen är en taktiktavla",
   "stycken": [
-   "Lördagen börjar klockan fyra i Milton Keynes och slutar efter halv elva på kvällen. Jag har lagt upp den som en träningsvecka: kaffe, kupong och sedan tystnad i soffan. Min fru kallar det ett schema. Jag har aldrig sett något skäl att rätta henne.",
-   "I Oslo har det snöat på Ullevaal och norrmännen har tränat inomhus. Det oroar folk. Jag har haft lag som tränat i en idrottshall i tre veckor i sträck, och de lärde sig att passa på rätt fot. Gräs är en yta. Fotboll är var man står.",
-   "Mot Bosnien kan läktarna bli bosniska. Det rör mig inte. Spelarna på planen hör inte vilket språk det sjungs på, de vet vem de ska markera. Att Gyökeres tränade vid sidan har jag noterat, och det har säkert hans fysioterapeut också.",
-   "Enligt matchbladet spelar AFC Wimbledon fotboll i en timme. Det är en timme mer än många lag jag har mött. Resten är kondition, och kondition är organisation för benen.",
-   "Om tippandet vill jag bara säga att en kupong ska fyllas i med samma lugn som när man ritar upp ett zonförsvar. Jag har gjort det i fyrtio år och aldrig ångrat en rad. Resultaten har jag ibland haft synpunkter på."
+   "Lördagen börjar klockan fyra i Milton Keynes och slutar efter halv elva på kvällen. Jag har lagt upp den som ett träningspass: kaffe, kupong och tystnad i soffan.",
+   "I Oslo har det snöat på Ullevaal, och norrmännen har fått träna inomhus. Jag har haft lag som tränade i en idrottshall tre veckor i sträck, och de lärde sig att passa på rätt fot.",
+   "Mot Bosnien kan läktarna bli bosniska. Det bekommer mig inte. Spelarna hör inte vilket språk det sjungs på. De vet vem de ska markera. Att Gyökeres tränade vid sidan av har jag noterat, och det har säkert hans fysioterapeut också.",
+   "Enligt matchbladet spelar AFC Wimbledon fotboll i en timme. Det är en timme mer än många lag jag har mött.",
+   "En kupong ska fyllas i med samma lugn som när man ritar upp ett zonförsvar. Jag har tippat i fyrtio år och aldrig ångrat en rad. Resultaten har jag ibland haft synpunkter på."
   ]
  },
  "sidan": [
   {
    "lag": "Sheffield Wednesday",
-   "text": "Namnet kommer från en vanlig veckodag. Klubben växte fram ur The Wednesday Cricket Club, vars grundare var lediga på onsdagseftermiddagarna. Fotbollslaget bildades 1867 för att kricketspelarna skulle hålla sig i form över vintern, och först 1929 blev Sheffield officiellt en del av namnet.",
+   "text": "Namnet är en veckodag. Klubben växte fram ur The Wednesday Cricket Club, vars grundare var lediga på onsdagseftermiddagarna. Fotbollslaget bildades 1867 för att kricketspelarna skulle hålla sig i form över vintern, och först 1929 blev Sheffield officiellt en del av namnet.",
    "kalla": {
     "source": "Wikipedia",
     "title": "Sheffield Wednesday F.C.",
@@ -41,28 +41,8 @@
    }
   },
   {
-   "lag": "Plymouth Argyle",
-   "text": "Ingen vet säkert varifrån namnet Argyle kommer. En teori är att det kommer från regementet Argyll and Sutherland Highlanders, som hade ett starkt fotbollslag. Andra pekar på puben The Argyle Tavern, där grundarna kanske träffades, eller på gatan Argyle Terrace.",
-   "kalla": {
-    "source": "Bristol Rovers Supporters Club",
-    "title": "Plymouth Argyle: a history",
-    "url": "https://bristolroverssc.co.uk/plymouth-argyle-a-history/",
-    "publishedAt": null
-   }
-  },
-  {
-   "lag": "Stockport County",
-   "text": "Edgeley Park byggdes 1891 åt ett rugbylag, Stockport RFC, på mark som familjen Sykes hade skänkt till staden. Publikrekordet sattes när Liverpool kom på FA-cupbesök 1950. Sedan 2022 hyr klubben arenan av kommunen, på ett kontrakt som löper i 250 år.",
-   "kalla": {
-    "source": "Wikipedia",
-    "title": "Edgeley Park",
-    "url": "https://en.wikipedia.org/wiki/Edgeley_Park",
-    "publishedAt": null
-   }
-  },
-  {
    "lag": "AFC Wimbledon",
-   "text": "Supportrarna bildade AFC Wimbledon 2002 med två mål: att ta sig till The Football League och att komma hem till Merton. Arton år senare var klubben tillbaka på Plough Lane, men den första matchen 2020 spelades utan publik på grund av pandemin.",
+   "text": "När Wimbledon FC fick flytta till Milton Keynes 2002 bildade supportrarna en ny klubb med två föresatser: att ta sig upp i Football League och att komma hem till Merton. Arton år senare var AFC Wimbledon tillbaka på Plough Lane, men den första matchen spelades utan publik under pandemin.",
    "kalla": {
     "source": "BBC Sport",
     "title": "AFC Wimbledon finish Plough Lane odyssey 18 years after formation",
@@ -72,7 +52,7 @@
   },
   {
    "lag": "Grimsby Town",
-   "text": "Grimsby Town spelar inte i Grimsby. Blundell Park ligger i grannstaden Cleethorpes och beskrivs som Storbritanniens lägsta fotbollsarena, bara 2 fot över havet. Strålkastarna köptes begagnade från Wolverhampton 1958, och det var supporterklubben som samlade in pengarna till monteringen.",
+   "text": "Grimsby Town spelar inte i Grimsby. Blundell Park ligger i grannstaden Cleethorpes och beskrivs som Storbritanniens lägst belägna fotbollsarena, bara drygt en halvmeter över havet. Strålkastarna köptes begagnade från Wolverhampton 1958, och det var supporterklubben som samlade in pengarna till monteringen.",
    "kalla": {
     "source": "Wikipedia",
     "title": "Blundell Park",
@@ -86,9 +66,9 @@
   "om": "busschaufför, Ystad",
   "rubrik": "En uppblåsbar kolja på hatthyllan",
   "stycken": [
-   "Jag kör stadsbussen i Ystad på vardagarna och har lediga lördagar. Lika länge som jag har haft dem har jag hållit på Grimsby Town, av skäl som har med en färja och en regnig vecka att göra.",
-   "Min fru har vant sig. Hon frågar inte längre varför det ligger en uppblåsbar kolja på hatthyllan. Den kom med posten från en man i Cleethorpes som jag har brevväxlat med i många år. Vi har aldrig träffats, men han vet hur det gick med mina tomater i fjol.",
-   "Kupongen lämnar jag in på torsdagen, så att den hinner ligga till sig. Den här veckan står Grimsby på rad tretton, längst ner, där man ser den sist och tänker mest på den.",
+   "Jag kör stadsbussen i Ystad på vardagarna. Lördagarna tillhör Grimsby Town, av skäl som har med en färja och en regnig vecka att göra.",
+   "Min fru frågar inte längre varför det ligger en uppblåsbar kolja på hatthyllan. Den kom med posten från min brevvän i Cleethorpes. Vi har aldrig träffats, men han vet hur det gick med mina tomater i fjol.",
+   "Kupongen lämnar jag in på torsdagen, så att den hinner ligga till sig. Grimsby står på rad tretton. Den ser man sist och tänker mest på.",
    "Klockan fyra sätter jag på radion och blåser upp fisken. Den har varit med om mer än jag."
   ]
  },

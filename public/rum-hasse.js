@@ -2670,7 +2670,7 @@ window.RumHasse = (() => {
   // fel. Blir det mål i någon av hans matcher medan man sitter där säger han det så snart han har pratat
   // klart (malKo i pratSteg). Ställningen i ord står med korta lagnamn och sägs tyst (rösten kan inte ha alla
   // lag och ställningar); kommentaren efter hörs. Har du valt att dölja resultat säger han inget om det.
-  const SAGT_KORT = { "Nott'm Forest": 'Forest', 'Man City': 'City', 'Man Utd': 'United', 'Sheff Utd': 'Sheffield United', 'Sheff Wed': 'Sheffield Wednesday' };
+  const SAGT_KORT = { "Nott'm Forest": 'Forest', 'Man City': 'City', 'Man Utd': 'United', 'Sheffield U': 'Sheffield United', 'Sheffield W': 'Sheffield Wednesday' };
   const lagKort = (n) => {
     const k = window.Papper && Papper.kort ? Papper.kort(n) : String(n || '');
     return SAGT_KORT[k] || k;
