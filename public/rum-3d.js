@@ -26,6 +26,14 @@
 // handen går i en båge med handleden strax efter (bage); vilans gungning upprepar sig inte (gung);
 // och man blinkar när blicken flyttas (blickBlink). Allt är räkning i ställningarna: inga nya
 // bilder eller lager, och två ritanrop till (halsdukens ändar).
+// Inga slingor (2026-11-13): det som återkommer – klunken, blosset, en blick åt sidan, en nick, bort
+// från tv:n en stund – kom förut på exakt samma sekund i varje varv (t % 22), lika fort och lika länge,
+// och efter en stund såg man takten. Nu har varje varv sin egen stund för det, sin fart och ibland
+// inget alls (vana, ibland), en klunk kan vara snabb eller två, ett bloss kort eller långt, och den
+// som just har ett påhitt för sig tar klunken en annan stund (vanaNu). Påhitten börjar var som helst i
+// sin lucka och går olika fort och olika långt (egen); bålen börjar och slutar dem en aning före
+// armen och svänger förbi när den sätter sig (aktNu: wk och wh). DJ pratar med händerna i slag i
+// stället för i en jämn åtta (pratSlag).
 // Armarna går runt huvudena (2026-11-13): handen flyttas ut ur huvudet och armbågen vrids undan,
 // så att armen inte går igenom det egna huvudet eller grannens när handen är uppe, bakom huvudet,
 // vid ansiktet eller ute över bordet (huvudFri).
@@ -236,6 +244,23 @@ const fj = (a, b, x, an = 0.06, ov = 0.1) => {
 const gung = (x) => 0.62 * Math.sin(x) + 0.38 * Math.sin(x * 1.618 + 1.9);
 // mjuk gräns: x nära noll, aldrig över m
 const grans = (x, m) => m * Math.tanh(x / m);
+// Det som återkommer, i varv om per sekunder: förut på samma sekund i varje varv (bump(t % per, …)),
+// lika fort varje gång. Här har varje varv sin egen stund: var i varvet det börjar, hur fort det går
+// (s, 0,85–1,2 av len) och ibland (hoppa) inte alls – och ett tal v för hur just den gången är. Bara
+// ur klockan (hash per varv, fro skiljer vanorna åt), så samma t ger fortfarande samma bild.
+function vana(t, per, fro, len, hoppa = 0.12) {
+  const n = Math.floor(t / per);
+  const s = 0.85 + 0.35 * hash(n * 1.37 + fro);
+  const t0 = n * per + hash(n * 2.71 + fro + 0.5) * Math.max(0, per - len * s - 0.3);
+  const l = (t - t0) / s;
+  if (l < 0 || l >= len || hash(n * 4.13 + fro + 0.25) < hoppa) return null;
+  return { l, n, t0, s, v: hash(n * 5.93 + fro + 0.75) };
+}
+// som bump(t % per, a, b, c, d), fast i sin egen stund i varje varv och lite olika långt (amp)
+function ibland(t, per, fro, a, b, c, d, amp = 0.3, hoppa = 0.12) {
+  const x = vana(t, per, fro, d - a, hoppa);
+  return x ? bump(x.l + a, a, b, c, d) * (1 - amp * x.v) : 0;
+}
 
 // Blank vinyl (v2): hud, tyg, hår och skor.
 const P0 = {
@@ -3607,10 +3632,11 @@ export async function figurer(canvas, opt = {}) {
     let yaw = 0;
     // blickarna åt sidan mot bordet (inn, sitt)
     const inn = o.F.inn;
-    if (k === 'dl') yaw = inn * (0.18 * bump((t % 21), 12, 13.5, 17, 18.5) - 0.05);
+    if (k === 'dl') yaw = inn * (0.18 * ibland(t, 21, 0.13, 12, 13.5, 17, 18.5) - 0.05);
     // (DT nickar instämmande ibland, sakta)
-    if (k === 'dt') { pitch += 0.05 * Math.sin(t * 2.6) * bump(t % 26, 8.5, 9.3, 11.6, 12.6); yaw = inn * 0.12 * bump(t % 17, 2, 3, 6, 7); }
-    if (k === 'dj') { yaw = inn * (0.22 - 0.04 * gung(t * 0.45)); pitch += 0.03 * Math.sin(t * 1.6) * talkW(o, t); }
+    if (k === 'dt') { pitch += 0.05 * Math.sin(t * 2.6) * ibland(t, 26, 0.41, 8.5, 9.3, 11.6, 12.6); yaw = inn * 0.12 * ibland(t, 17, 0.67, 2, 3, 6, 7); }
+    // (DJ nickar med betoningarna när han pratar, pratSlag)
+    if (k === 'dj') { yaw = inn * (0.22 - 0.04 * gung(t * 0.45)); pitch += (0.012 * gung(t * 1.1) + 0.035 * pratSlag(t, DJ_PRAT).nick) * talkW(o, t); }
     // benen hänger lugnt och gungar bara lite (gung: i en takt som inte upprepar sig, som bålen ovan)
     const knee = [0, 1].map((i) => 0.07 + 0.06 * gung(t * (k === 'dj' ? 0.5 : 0.6) + o.phase + i * 2.4) * (k === 'dt' ? 0.6 : 1));
     const foot = [0.5, 0.5];
@@ -3680,7 +3706,7 @@ export async function figurer(canvas, opt = {}) {
     // påhitten (akt): lutningen, blicken, benen och andningen
     let lift = 0;
     if (kb) {
-      const w = ak.w;
+      const w = ak.wk;
       lean += (kb.lean || 0) * w;
       pitch += (kb.pitch || 0) * w;
       yaw += (kb.yaw || 0) * w;
@@ -3845,7 +3871,7 @@ export async function figurer(canvas, opt = {}) {
     const out = looks0(o, t);
     // på natten tittar DL på text-tv (och bort ibland)
     const n = nattW(t) * (1 - tvW(t));
-    if (n > 0 && o.F.key === 'dl') out.push([TV, n * (1 - bump((t + o.phase) % 31, 0, 1, 4, 5.2))]);
+    if (n > 0 && o.F.key === 'dl') out.push([TV, n * (1 - ibland(t + o.phase, 31, 0.29, 0, 1, 4, 5.2, 0))]);
     // din egen figur på markören (spegeln), före det man pekar på och hej, som går före
     const sp = spW(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t));
     if (sp > 0) out.push([SP[o.F.key].nu.clone(), sp]);
@@ -3876,14 +3902,16 @@ export async function figurer(canvas, opt = {}) {
   function looks0(o, t) {
     const out = [];
     const tv = tvW(t);
-    if (tv > 0) out.push([TV, tv * (1 - bump((t + o.phase * 1.7) % 26, 0, 0.8, 3.6, 4.4))]);
+    if (tv > 0) out.push([TV, tv * (1 - ibland(t + o.phase * 1.7, 26, 0.53 + FI(o) * 0.17, 0, 0.8, 3.6, 4.4))]);
     if (!S.nag) return out;
     const wait = figs.filter((x) => x.inneAt === Infinity);
     const by = figs.filter((x) => x.inneAt !== Infinity);
     if (!wait.length || !by.length) return out;
-    const both = S.nag >= 1 ? bump(t % 27, 0, 0.5, 3.8, 4.5) : 0;
+    // (båda samtidigt: samma stund för alla, vana)
+    const bv = S.nag >= 1 ? vana(t, 27, 0.87, 4.5, 0) : null;
+    const both = bv ? bump(bv.l, 0, 0.5, 3.8, 4.5) : 0;
     if (o.inneAt === Infinity) {
-      if (both > 0) out.push([headIn(nearest(o, by)), bump(t % 27, 1.4, 1.8, 2.9, 3.4)]);
+      if (both > 0) out.push([headIn(nearest(o, by)), bump(bv.l, 1.4, 1.8, 2.9, 3.4)]);
       return out;
     }
     const per = 34 - 20 * S.nag;
@@ -4295,19 +4323,95 @@ export async function figurer(canvas, opt = {}) {
     return grip(M, A.pen.matrix, new THREE.Vector3(A.s, -0.3, -0.5));
   }
 
-  // (ett bloss var 17:e sekund för DT och var 23:e för DJ: blosset, glöden och röken i samma takt)
-  const ROK_DT = 17;
-  const ROK_DJ = 23;
+  // Klunken och blosset: ungefär var 22:a sekund för DL och var 27:e för DJ en klunk, och ungefär var
+  // 17:e för DT och var 23:e för DJ ett bloss (blosset, glöden och röken i samma stund) – men i varje
+  // varv när det passar (som vana), och olika: en klunk är ibland snabb och ibland två, ett bloss kort
+  // eller långt (v). Och när inget påhitt pågår: förut tonades klunken bort mitt i när ett påhitt
+  // började och kom tillbaka efteråt, som två klipp på varandra. Nu tas den på en ledig stund i
+  // varvet (fyra försök, LEDIG), och finns ingen blir det ingen det varvet.
+  const VANOR = {
+    klunk: { dl: { per: 22, fro: 0.31 }, dj: { per: 27, fro: 0.77 }, len: 6.8 },
+    bloss: { dt: { per: 17, fro: 0.23 }, dj: { per: 23, fro: 0.61 }, len: 7 },
+  };
+  // (stunden räknas en gång per varv)
+  const LEDIG = new Map();
+  function vanaNu(o, namn, t) {
+    const V = VANOR[namn];
+    const K = V[o.F.key];
+    if (!K) return null;
+    const n = Math.floor(t / K.per);
+    const nyckel = `${o.F.key}${namn}${n}`;
+    let x = LEDIG.get(nyckel);
+    if (x === undefined) {
+      x = null;
+      if (hash(n * 4.13 + K.fro + 0.25) >= 0.08) {
+        const s = 0.85 + 0.35 * hash(n * 1.37 + K.fro);
+        const len = V.len * s;
+        const rum = Math.max(0, K.per - len - 0.3);
+        const h = hash(n * 2.71 + K.fro + 0.5);
+        for (let i = 0; i < 4 && !x; i++) {
+          const t0 = n * K.per + ((h + i * 0.382) % 1) * rum;
+          if ([0, 1 / 3, 2 / 3, 1].every((f) => !aktRa(o, t0 + len * f))) x = { t0, s, n, v: hash(n * 5.93 + K.fro + 0.75) };
+        }
+      }
+      LEDIG.set(nyckel, x);
+      if (LEDIG.size > 60) LEDIG.delete(LEDIG.keys().next().value);
+    }
+    if (!x) return null;
+    const l = (t - x.t0) / x.s;
+    return l >= 0 && l < V.len ? { ...x, l } : null;
+  }
+  function klunk(o, t) {
+    const x = vanaNu(o, 'klunk', t);
+    if (!x) return 0;
+    const l = x.l;
+    if (x.v < 0.22) return bump(l, 0, 1.4, 5.4, 6.8) - 0.45 * bump(l, 2.5, 3.1, 3.7, 4.4);
+    if (x.v > 0.75) return bump(l, 0, 1.15, 2.4, 3.6);
+    return bump(l, 0, 1.4, 3.6, 5);
+  }
+  // blosset ({ l, e }: e hur mycket längre eller kortare än vanligt, i sekunder)
+  function bloss(o, t) {
+    const x = vanaNu(o, 'bloss', t);
+    if (!x) return null;
+    return { l: x.l, e: x.v < 0.2 ? 0.8 : x.v > 0.8 ? -0.4 : 0 };
+  }
+  const blossW = (o, t) => { const b = bloss(o, t); return b ? bump(b.l, 0, 1.2, (o.F.key === 'dt' ? 2.4 : 2.2) + b.e, (o.F.key === 'dt' ? 3.6 : 3.4) + b.e) : 0; };
+  const blossGlod = (o, t) => { const b = bloss(o, t); return b ? (o.F.key === 'dt' ? bump(b.l, 1, 1.4, 2.2 + b.e, 2.8 + b.e) : bump(b.l, 1.1, 1.5, 2.0 + b.e, 2.6 + b.e)) : 0; };
+  const blossUt = (o, t) => { const b = bloss(o, t); return b ? (o.F.key === 'dt' ? bump(b.l, 3.0 + b.e, 3.3 + b.e, 4.4 + b.e, 5.6 + b.e) : bump(b.l, 3.4 + b.e, 3.7 + b.e, 4.8 + b.e, 6.0 + b.e)) : 0; };
   // när var och en dricker och drar ett bloss (0 → 1 → 0) – inte medan man
   // väntar, och strax efter inlämningen den första klunken eller blosset
   // (inte i sömnen eller medan man vaknar, och cigaretten har brunnit ner i sömnen)
   // (och inte medan man gör något annat, aktW)
-  const drinkW = (o, t) => Math.max(o.F.key === 'dt' ? 0 : gaKlunk(o, t), ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * (o.F.key === 'dl' ? bump(t % 22, 6, 7.4, 9.6, 11) : o.F.key === 'dj' ? bump((t + 4) % 27, 11, 12.4, 14.2, 15.6) : 0),
+  const drinkW = (o, t) => Math.max(o.F.key === 'dt' ? 0 : gaKlunk(o, t), ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * klunk(o, t),
     o.F.key === 'dl' ? after(o, t, 0, 1.0, 2.6, 3.6) : 0);
-  const dragW = (o, t) => Math.max(o.F.key === 'dt' ? gaKlunk(o, t) : 0, ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * (o.F.key === 'dt' ? bump(t % ROK_DT, 3, 4.2, 5.4, 6.6) : o.F.key === 'dj' ? bump((t + 5) % ROK_DJ, 1, 2.2, 3.2, 4.4) : 0),
+  const dragW = (o, t) => Math.max(o.F.key === 'dt' ? gaKlunk(o, t) : 0, ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * blossW(o, t),
     o.F.key === 'dl' ? 0 : after(o, t, 0, 1.0, 2.6, 3.6));
   const talkW = (o, t) => (o.F.key === 'dj' ? ready(o, t) * (1 - dragW(o, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - 0.6 * groggW(o, t)) * (1 - aktW(o, t)) : 0);
-  const glowAt = (o, t) => Math.max(ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * (o.F.key === 'dt' ? bump(t % ROK_DT, 4, 4.4, 5.2, 5.8) : bump((t + 5) % ROK_DJ, 2.1, 2.5, 3.0, 3.6)), after(o, t, 1.0, 1.4, 2.2, 2.8), aktGlod(o, t));
+  const glowAt = (o, t) => Math.max(ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * blossGlod(o, t), after(o, t, 1.0, 1.4, 2.2, 2.8), aktGlod(o, t));
+  // DJ pratar med händerna (talkW) – förut i en jämn åtta i luften, tre vågor som aldrig stannade.
+  // Nu i slag, som när man pratar: handen far till ett nytt ställe på en knapp halv sekund, lite förbi
+  // och tillbaka, och står där till nästa slag, efter ungefär en sekund; ungefär vart femte slag står
+  // den kvar, och ungefär vart femte är en betoning – större och med en nick (nick). x, y, z och vrid
+  // är −1,3…1,3.
+  const DJ_PRAT = 0.47;
+  function pratSlag(t, fro) {
+    const B = 0.95;
+    const st = (m) => m * B + 0.5 * hash(m * 1.31 + fro);
+    const paus = (m) => hash(m * 4.9 + fro + 0.3) < 0.2;
+    const tung = (m) => hash(m * 3.7 + fro + 0.1) < 0.2;
+    const mal = (m) => { const e = tung(m) ? 1.3 : 1; return [0, 1, 2, 3].map((c) => e * (2 * hash(m * 2.3 + c * 0.71 + fro) - 1)); };
+    // (det senaste slaget som inte var en paus, högst fyra bakåt)
+    const sist = (m) => { for (let i = 0; i < 4 && paus(m); i++) m--; return m; };
+    let m = Math.floor(t / B);
+    if (t < st(m)) m--;
+    const fran = mal(sist(m - 1));
+    if (paus(m)) return { x: fran[0], y: fran[1], z: fran[2], vrid: fran[3], nick: 0 };
+    const till = mal(m);
+    const d = 0.18 + 0.12 * hash(m * 5.3 + fro);
+    const k = fj(st(m), st(m) + d, t, 0, 0.14);
+    const v = fran.map((a, i) => a + (till[i] - a) * k);
+    return { x: v[0], y: v[1], z: v[2], vrid: v[3], nick: tung(m) ? bump(t - st(m), 0.08, 0.2, 0.3, 0.6) : 0 };
+  }
 
   const mouthIn = (o) => {
     o.fig.updateMatrix(); o.torso.updateMatrix(); o.hg.updateMatrix(); o.hc.updateMatrix();
@@ -4354,7 +4458,7 @@ export async function figurer(canvas, opt = {}) {
     // påhitten (akt): armen som påhittet använder
     const ak = aktNu(o, t);
     const ap = ak && ak.a.hand ? ak.a.hand(o, A, t, ak.l, ak) : null;
-    if (ap) base = bage(base, ap, ak.w);
+    if (ap) base = bage(base, ap, ak.wh);
     // målen, på tre sätt (malV): 0 som förut, 1 båda armarna upp (rätt) eller
     // båda händerna på huvudet (fel), 2 handen som dunkar i bordet av glädje
     // eller slår i det en gång
@@ -4420,7 +4524,7 @@ export async function figurer(canvas, opt = {}) {
   const SOVTAKT = { dl: 4.6, dt: 3.6, dj: 5.4 };
   const andas = (o, t) => Math.sin((t * 2 * Math.PI) / SOVTAKT[o.F.key] + o.phase);
   // (bord: när hen rättar till sig, 0–1, ungefär var 83:e sekund)
-  const sovRatt = (o, t) => bump((t + o.phase * 5) % 83, 0, 1.0, 2.2, 3.4);
+  const sovRatt = (o, t) => ibland(t + o.phase * 5, 83, 0.19, 0, 1.0, 2.2, 3.4, 0.4, 0);
   function sovKropp(o, t, stil) {
     const a = andas(o, t);
     const inn = o.F.inn;
@@ -4428,16 +4532,17 @@ export async function figurer(canvas, opt = {}) {
     const ut = o.F.turn * DEG * 1.5;
     if (stil === 'bord') {
       const r = sovRatt(o, t);
-      return { lean: SOV.lean + 0.012 * a - 0.05 * r, pitch: SOV.pitch, yaw: (SOV.yaw + 0.16 * r) * inn, roll: (SOV.roll + 0.14 * r) * inn, side: 0, breath: 1 + 0.045 * a, lift: 1.8 * r, knee: [0.1, 0.1 + 0.18 * bump((t + o.phase * 3) % 47, 0, 0.3, 0.6, 1.2)], foot: 0.5 };
+      return { lean: SOV.lean + 0.012 * a - 0.05 * r, pitch: SOV.pitch, yaw: (SOV.yaw + 0.16 * r) * inn, roll: (SOV.roll + 0.14 * r) * inn, side: 0, breath: 1 + 0.045 * a, lift: 1.8 * r, knee: [0.1, 0.1 + 0.18 * ibland(t + o.phase * 3, 47, 0.37, 0, 0.3, 0.6, 1.2)], foot: 0.5 };
     }
     if (stil === 'bak') {
       // (åt vartannat håll varje gång huvudet rullar åt sidan)
       const n = Math.floor((t + o.phase * 2) / 53);
       const rull = bump((t + o.phase * 2) - n * 53, 30, 36, 44, 49) * (n % 2 ? 1 : -1);
-      return { lean: -0.06 + 0.006 * a, pitch: -0.34 + 0.025 * a, yaw: 0.04 * Math.sin(t * 0.3 + o.phase) + 0.1 * rull, roll: 0.24 * rull, side: 0, breath: 1 + 0.035 * a, lift: 0, knee: [0.06, 0.06 + 0.15 * bump((t + o.phase * 3) % 61, 0, 0.3, 0.6, 1.2)], foot: 0.5 };
+      return { lean: -0.06 + 0.006 * a, pitch: -0.34 + 0.025 * a, yaw: 0.04 * Math.sin(t * 0.3 + o.phase) + 0.1 * rull, roll: 0.24 * rull, side: 0, breath: 1 + 0.035 * a, lift: 0, knee: [0.06, 0.06 + 0.15 * ibland(t + o.phase * 3, 61, 0.59, 0, 0.3, 0.6, 1.2)], foot: 0.5 };
     }
-    // nick: sjunker i 18 sekunder, rycker upp en bit och sjunker tillbaka
-    const x = (t + o.phase * 3) % 24;
+    // nick: sjunker i 18 sekunder (lite olika länge), rycker upp en bit och sjunker tillbaka
+    const nv = vana(t + o.phase * 3, 30, 0.71, 24, 0);
+    const x = nv ? nv.l : 23.9;
     const sjunk = sm(0, 18, x) * (1 - sm(18, 18.35, x));
     const ryck = bump(x, 18, 18.3, 18.8, 23.5);
     const vaj = Math.sin(t * 0.37 + o.phase);
@@ -4587,8 +4692,9 @@ export async function figurer(canvas, opt = {}) {
       const rest = grip(A.bench.matrix, A.thing.matrix, new THREE.Vector3(s, -0.6, -0.6));
       const w = drinkW(o, t);
       if (w <= 0) return rest;
+      // (i en båge, och flaskan lutas när den är framme, bage)
       const d = supAt(o, A, t, w);
-      return { p: rest.p.clone().lerp(d.p, w), y: rest.y.clone().lerp(d.y, w), z: rest.z.clone().lerp(d.z, w), pole: d.pole };
+      return { ...bage(rest, d, w), pole: d.pole };
     }
     if (A.kind === 'cigg' || A.kind === 'prat') {
       // vilar på bordet (DT, vid askkoppen) med glöden framåt, gestikulerar
@@ -4599,15 +4705,17 @@ export async function figurer(canvas, opt = {}) {
         : { p: new THREE.Vector3(s * Wd * 0.4, y0 + 13, th * 0.78), y: new THREE.Vector3(-s * 0.15, 0.25, 1), z: new THREE.Vector3(s * 0.4, 1, -0.1), pole: new THREE.Vector3(s, -0.5, -0.5) };
       if (A.kind === 'prat') {
         const k = talkW(o, t);
+        // (i slag, pratSlag, och lite rörelse också när handen står)
+        const g = pratSlag(t, DJ_PRAT);
         const a = t * 0.6;
-        rest.p.lerp(new THREE.Vector3(s * (Wd * 1.15 + 7 * Math.sin(a)), o.T * 0.42 + 6 * Math.sin(a * 1.7) + y0, th * 0.9 + 5 * Math.cos(a * 1.3)), k);
-        rest.y.lerp(new THREE.Vector3(s * 0.2 + 0.25 * Math.sin(a * 1.1), 1, 0.55), k);
+        rest.p.lerp(new THREE.Vector3(s * (Wd * 1.15 + 6 * g.x + gung(a)), o.T * 0.42 + 5 * g.y + 0.8 * gung(a * 1.3 + 2) + y0, th * 0.9 + 4 * g.z), k);
+        rest.y.lerp(new THREE.Vector3(s * 0.2 + 0.22 * g.vrid, 1, 0.55), k);
         rest.z.lerp(new THREE.Vector3(s * 0.3, -0.2, -1), k);
       }
       const w = dragW(o, t);
       if (w <= 0) return rest;
       const d = blossAt(o, A);
-      return { p: rest.p.clone().lerp(d.p, w), y: rest.y.clone().lerp(d.y, w), z: rest.z.clone().lerp(d.z, w), pole: d.pole };
+      return { ...bage(rest, d, w), pole: d.pole };
     }
     // vila: handflatan mot bordet bakom det, annars på knät
     const bv = o.F.plats.vila;
@@ -4697,26 +4805,34 @@ export async function figurer(canvas, opt = {}) {
     const len = AKTER[x.namn].len;
     return gaNu(x.t0) || gaNu(x.t0 + len / 2) || gaNu(x.t0 + len) ? null : x;
   }
-  // Var och ens eget påhitt i luckan där t är (inte samtidigt som gänget gör något).
+  // Var och ens eget påhitt i luckan där t är (inte samtidigt som gänget gör något). Det börjar var
+  // som helst i luckan där det får plats, och går olika fort (s: l är påhittets egen tid) och olika
+  // långt (amp, för bålen) – förut började det alltid en halv sekund in i luckan och var likadant.
   function egen(o, t) {
     const i = FI(o);
     const fas = 1.3 + i * 3.7;
     const n = Math.floor((t + fas) / AKT_SLOT);
-    const t0 = n * AKT_SLOT - fas + 0.5;
-    const l = t - t0;
-    const meny = MENY[humAt(t0) || 'lugn'];
-    const ks = hash(n * 2.93 + i * 7.7 + KORS_FRO) < korsChansAt(t0) ? korsaVal(o, n, i) : null;
+    const t1 = n * AKT_SLOT - fas + 0.5;
+    if (t < t1) return null;
+    const meny = MENY[humAt(t1) || 'lugn'];
+    const ks = hash(n * 2.93 + i * 7.7 + KORS_FRO) < korsChansAt(t1) ? korsaVal(o, n, i) : null;
     // (tiden på dygnet: utöver humörets påhitt, dygnVal)
-    const dv = ks ? null : dygnVal(o, n, i, t0);
-    if (l < 0 || (!ks && !dv && hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans)) return null;
+    const dv = ks ? null : dygnVal(o, n, i, t1);
+    if (!ks && !dv && hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans) return null;
     const val = meny[o.F.key].slice();
-    const r = rankAt(o.F.key, t0);
+    const r = rankAt(o.F.key, t1);
     if (r > 0) val.push('nacke', 'nacke');
     if (r < 0) val.push('kors', 'kors');
     const namn = ks || dv || val[Math.floor(hash(n * 3.17 + i * 5.3 + 0.25) * val.length)];
     const len = AKTER[namn].len;
-    if (l >= len || grupp(t0) || grupp(t0 + len / 2) || grupp(t0 + len)) return null;
-    return { namn, l, t0 };
+    // (farten och var i luckan: det ska hinna ta slut innan nästa lucka börjar)
+    const fs = 0.87 + 0.28 * hash(n * 1.93 + i * 4.1 + 0.6);
+    const fart = Math.min(fs, (AKT_SLOT - 0.8) / len);
+    const t0 = t1 + hash(n * 2.39 + i * 3.3 + 0.15) * Math.max(0, AKT_SLOT - 0.8 - len * fart);
+    const l = (t - t0) / fart;
+    const slut = t0 + len * fart;
+    if (l < 0 || l >= len || grupp(t0) || grupp((t0 + slut) / 2) || grupp(slut)) return null;
+    return { namn, l, t0, slut, amp: 0.86 + 0.22 * hash(n * 6.07 + i * 2.2 + 0.4) };
   }
   function aktRa(o, t) {
     const pv = PROV[o.F.key];
@@ -4725,7 +4841,7 @@ export async function figurer(canvas, opt = {}) {
       const f = tvingad(o, t);
       if (f) return f;
       const x = grupp(t) || egen(o, t);
-      const s = x && tvingStart(x.t0, x.t0 + AKTER[x.namn].len);
+      const s = x && tvingStart(x.t0, x.slut ?? x.t0 + AKTER[x.namn].len);
       return s == null ? x : s > x.t0 ? { ...x, av: s } : null;
     }
     const per = AKTER[pv.namn].len + 1.5;
@@ -4735,14 +4851,26 @@ export async function figurer(canvas, opt = {}) {
   // (den som just har vaknat kommer igång allt eftersom: dansen och påhitten växer fram)
   const vaken = (o, t) => ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - 0.85 * groggW(o, t))
     * (1 - Math.max(cheerW(o, t), sinkW(o, t), nodW(o, t))) * (1 - hejW(o, t)) * (1 - teckenW(o, t)) * (1 - gaHar(o, t));
-  // Påhittet som pågår vid t ({ namn, a, l, t0, w }) eller null.
+  // Påhittet som pågår vid t ({ namn, a, l, t0, w, wk, wh }) eller null. w är hur mycket av det som
+  // syns, wk för bålen och wh för armarna: bålen börjar en aning före armen och slutar en aning efter,
+  // tar lite sats och svänger förbi när den sätter sig (fj) – förut gick allt in och ut samtidigt och
+  // lika mjukt, som en övertoning mellan två ställningar.
   function aktNu(o, t) {
     const x = aktRa(o, t);
     if (!x) return null;
     const a = AKTER[x.namn];
     // (mellan två danser på radion tonar man inte bort: somIn, somUt)
-    const w = (x.somIn ? 1 : sm(0, a.in, x.l)) * (x.somUt ? 1 : 1 - sm(a.len - a.ut, a.len, x.l)) * vaken(o, t) * (x.av != null ? 1 - sm(x.av, x.av + 0.9, t) : 1);
-    return w > 0.001 ? { ...x, a, w } : null;
+    const f = vaken(o, t) * (x.av != null ? 1 - sm(x.av, x.av + 0.9, t) : 1);
+    const w = (x.somIn ? 1 : sm(0, a.in, x.l)) * (x.somUt ? 1 : 1 - sm(a.len - a.ut, a.len, x.l)) * f;
+    if (w <= 0.001) return null;
+    const di = Math.min(0.16, a.in * 0.25);
+    const du = Math.min(0.14, a.ut * 0.25);
+    const wh = (x.somIn ? 1 : sm(di, a.in + di * 0.5, x.l)) * (x.somUt ? 1 : 1 - sm(a.len - a.ut - du, a.len - du * 0.5, x.l)) * f;
+    const ai = Math.max(0.05, a.in);
+    const au = Math.max(0.05, a.ut);
+    const ut = a.len - au;
+    const wk = (x.somIn ? 1 : fj(0, ai / FJ, x.l, 0.04, 0.07)) * (x.somUt ? 1 : 1 - fj(ut, ut + au / FJ, x.l, 0.03, 0.07)) * f * (x.amp ?? 1);
+    return { ...x, a, w, wh, wk };
   }
   const aktW = (o, t) => { const x = aktNu(o, t); return x ? x.w : 0; };
   // utandningen efter blosset i skålen (DT)
@@ -4956,8 +5084,8 @@ export async function figurer(canvas, opt = {}) {
     // gungar i takt med ölen i luften (DT med handen)
     gung: {
       len: 7, in: 1, ut: 1,
-      hand: (o, A, t, l, x) => (A === sangArm(o) ? gungHand(o, A, t, x) : null),
-      kropp: (o, t, l, x) => gungKropp(t, x),
+      hand: (o, A, t, l) => (A === sangArm(o) ? gungHand(o, A, t, { t0: t - l }) : null),
+      kropp: (o, t, l) => gungKropp(t, { t0: t - l }),
     },
     // skålar över bordet och tar en klunk (DT ett bloss)
     skal: {
@@ -5516,7 +5644,7 @@ export async function figurer(canvas, opt = {}) {
   function aktFing(o, A, t) {
     const x = aktNu(o, t);
     const f = x && x.a.fing ? x.a.fing(o, A, x.l, x) : null;
-    return f ? { form: f.form, k: f.k * x.w } : null;
+    return f ? { form: f.form, k: f.k * x.wh } : null;
   }
   function aktFingrar(o, A, t) {
     const f = aktFing(o, A, t);
@@ -5526,7 +5654,7 @@ export async function figurer(canvas, opt = {}) {
   // Glöden i ett bloss i ett påhitt (AKTER[…].glod), för glowAt.
   function aktGlod(o, t) {
     const x = aktNu(o, t);
-    return x && x.a.glod ? x.a.glod(o, x.l, x) * x.w : 0;
+    return x && x.a.glod ? x.a.glod(o, x.l, x) * x.wh : 0;
   }
   // Var och ens plats i rollerna (a börjar, b och c följer efter).
   const rollNr = (R, i) => (i === R.a ? 0 : i === R.b ? 1 : 2);
@@ -5877,14 +6005,14 @@ export async function figurer(canvas, opt = {}) {
   function korsK(o, t) {
     const x = aktNu(o, t);
     const v = korsDel(o, x);
-    return v && !v.d.sak ? korsUpp(v.d, v.l) * x.w : 0;
+    return v && !v.d.sak ? korsUpp(v.d, v.l) * x.wh : 0;
   }
   // Handen med fingrar just nu, för pose.
   function korsFingrar(o, t) {
     const x = aktNu(o, t);
     const v = korsDel(o, x);
     if (!v || v.d.sak) return null;
-    const k = korsUpp(v.d, v.l) * x.w;
+    const k = korsUpp(v.d, v.l) * x.wh;
     return k > 0.02 ? { A: o.arms[0], form: blanda(LOS, v.d.hand(v.l), sm(0.1, 0.7, k)), stor: 1 + (KORS_STOR - 1) * sm(0, 0.6, k) } : null;
   }
   for (const namn of Object.keys(KORS)) {
@@ -6207,7 +6335,7 @@ export async function figurer(canvas, opt = {}) {
     if (!x || !x.a.dans) return null;
     const { L } = dansArmNu(o, A, x, x.a.dans);
     if (!L || (L.sak && (A.thing || A.cig))) return null;
-    const k = dansArm(L.upp) * x.w;
+    const k = dansArm(L.upp) * x.wh;
     return k > 0.02 ? { form: blanda(LOS, formen(L), sm(0.1, 0.7, k)), stor: 1 + (DANS_STOR - 1) * sm(0, 0.6, k) } : null;
   }
   // Hur högt armen är (glöden i cigaretten som ligger).
@@ -6215,7 +6343,7 @@ export async function figurer(canvas, opt = {}) {
     const x = dansKan(o, t) && aktNu(o, t);
     if (!x || !x.a.dans) return 0;
     const { L } = dansArmNu(o, A, x, x.a.dans);
-    return L && !L.sak ? dansArm(L.upp) * x.w : 0;
+    return L && !L.sak ? dansArm(L.upp) * x.wh : 0;
   }
   // Varvet på barstolen, i grader.
   function dansSnurr(o, t) {
@@ -6957,7 +7085,7 @@ export async function figurer(canvas, opt = {}) {
         else {
           // utandningen: strax efter blosset (och det första efter inlämningen)
           // (inget bloss när man gjorde något annat, aktW, och ett efter blosset i skålen)
-          const out = o.F.key === 'dt' ? bump(tb % ROK_DT, 6.0, 6.3, 7.4, 8.6) : bump((tb + 5) % ROK_DJ, 4.4, 4.7, 5.8, 7);
+          const out = blossUt(o, tb);
           alpha = 0.85 * Math.max(ready(o, tb) * out * (1 - aktW(o, tb - 2)), after(o, tb, 3.0, 3.3, 4.4, 5.6), blasW(o, tb));
         }
         if (alpha < 0.01 || age < 0 || age > SM.life) { P[j] = P[j + 1] = 0; continue; }
