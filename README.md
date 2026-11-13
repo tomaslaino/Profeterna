@@ -3025,6 +3025,34 @@ ställningen efter 90 minuter (samma utfall som prognosen).
    spara) öppnar GitHub med filen ifylld – tryck **Commit changes** (kräver inloggning med
    skrivrätt till repot).
 
+### Landskamperna på kupongen och i matchlistan
+
+2026-11-13 (användarens önskemål: "Stryktipset verkar innehålla en massa matcher nu som vi inte har lyckats lägga
+till än på olika ställen … Uppdatera hela hemsidan utefter detta"): veckans Stryktips har sju landskamper i Nations
+League, och de går nu hela vägen från Svenska Spel till rättningen.
+
+- **Namnen.** Svenska Spels namn ska vara början av sajtens (`linkDraw` i worker/stryktipset.mjs, `link` i
+  public/folket.js), och sajten skriver landslagen som Svenska Spel. Men samma land kan stå på flera sätt, så
+  `ALIAS` översätter också *Bosnien-Hercegovina*/*Bosnien och Hercegovina*, *N. Irland*/*Nord-Irland*, *Rep.
+  Irland*/*Eire*, *Tjeckiska rep.*, *Vitryssland*, *N. Makedonien*, *Türkiye*, *Holland*, *Färöerna* och de
+  engelska namnen (*Sweden*, *Northern Ireland*, *Republic of Ireland* …). Samma regler i Ladda upp system
+  (public/systembild.js), som nu tar bort accenterna innan reglerna körs. *Irland* blir aldrig *Nordirland*.
+- **Filtret Landskamper** ersätter Nations League, EM-kval och vänskapslandskamp i matchlistan, Ny kupong och Välj
+  matcher (`filterComps` och `inComp` i public/app.js) och står bara där när det finns landskamper bland matcherna.
+- **Datorns chans är marknadens** i landskamperna (`f.mk`): oddsen under rutorna står i kursiv med förklaringen när
+  man pekar (`oddsSmall`), och en rad under kupongen säger vad kursiven betyder (`mkLegend`) – på papperet där man
+  tippar, i uppgörelsen, på gängets kupong och på kupongerna i Olympen. På lappen i uppgörelsen likaså, och i
+  matchlistan heter tooltipen över resultatet *Marknadens prognos*.
+
+Provat 2026-11-13 med riktig data från ESPN (bygget med hämtning; Svenska Spel och workers.dev nås inte från
+molnmiljön): alla tretton matcher fanns på sajten (Swindon–Grimsby är League Two, id 401881266). Med ett påhittat
+svar från Svenska Spel i samma form som deras (namnen som *Bosnien-Hercegovina*, *MK Dons*, *Sheffield W*) och
+server.js-vägarna lokalt blev Stryktipset omgångens kupong av sig själv (`autoRound`), tre i gänget tippade och
+lämnade in i huvudlös Chromium, uppgörelsen visade Svenska folket, oddsen och favoritskapet, och inga fel i konsolen
+utom rummets websocket (workers.dev). Tjänsten (worker/) behöver driftsättas för att de nya namnvarianterna ska
+gälla när omgången startas av sig själv – utan driftsättning knyts ändå Svenska Spels vanliga stavning (*Bosnien &
+Hercegovina*, *Nordirland*, *Irland*) som förut.
+
 ### Ladda upp system
 
 I appen och på hemskärmen går det också att dela skärmbilden direkt från telefonens bilder eller
