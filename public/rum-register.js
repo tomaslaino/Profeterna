@@ -7,19 +7,18 @@
 // står på anslagstavlan (rum-anslag.js), ordnat efter match, lag och spelare.
 //
 // Överst står menyraden, som alltid står still:
-//   KUPONGEN   omgångens matcher med lagens form och, där raden ryms, formens
-//              motstånd: hur bra de fem motståndarna var i snitt, 0–100 från
-//              lagets egen divisions svagaste lag till dess starkaste (lag
-//              från utlandet och andra nivåer hamnar i ändarna; ur matchens
-//              fil); en match öppnar matchakten:
+//   KUPONGEN   omgångens matcher, med divisionen och avsparken där raden
+//              ryms; en match öppnar matchakten:
 //              allt om matchen på ett ställe – lagen sida vid sida med formen
-//              och dess motstånd,
-//              vilan, dagar till nästa match, tavlans tal (styrkan, kryssen,
-//              turen, mot oddsen och motståndet, med lagets plats i sin
-//              division) och lagkortens siffror (mål och xG per match, hur
-//              ofta laget har varit favorit, skytten), sedan skadorna och
-//              mötena. Det bättre talet i varje par lyser och det sämre är
-//              svagt (SKILJER)
+//              och dess motstånd (hur bra de fem motståndarna var i snitt,
+//              0–100 från lagets egen divisions svagaste lag till dess
+//              starkaste; lag från utlandet och andra nivåer hamnar i ändarna;
+//              ur matchens fil), vilan, dagar till nästa match, tavlans tal
+//              (styrkan, kryssen, turen, mot oddsen och motståndet, med lagets
+//              plats i sin division) och lagkortens siffror (mål och xG per
+//              match, hur ofta laget har varit favorit, skytten), sedan
+//              skadorna och mötena. Det bättre talet i varje par lyser och det
+//              sämre är svagt (SKILJER)
 //   LAGEN      de fyra divisionerna, lagen i omgången ljusa; ett lag
 //              öppnar lagkortet med truppen (speltid, mål, de
 //              skadade), och en spelare spelarkortet: läget, speltiden, mål
@@ -348,26 +347,28 @@ window.RumRegister = (() => {
     }
     const nrAv = (m) => A.ms.indexOf(m) + 1;
 
-    // Kupongen: matcherna med lagens form bredvid namnen (och på datorn
-    // divisionen och avsparken till höger). Där raden ryms står formens
-    // motstånd mellan formerna, närmast strecket (CARDIFF OFVOV 69 – 41 OOFFO
-    // BURNLEY); i telefonen, där raden är full, står det i matchakten.
-    function kupongen(S, R) {
+    // Kupongen: omgångens matcher, bara lagen, på datorn divisionen och
+    // avsparken. Avsparken står bara där den skiljer sig från raden ovanför,
+    // som i en tidtabell, och i telefonen, där divisionen inte ryms, står den
+    // ensam. Formen och dess motstånd står i matchakten (2026-11-13,
+    // användarens önskemål: "mindre rörig").
+    function kupongen(R) {
       if (!A.ms.length) return [rad('INGEN OMGÅNG')];
       const w = 11;
-      // 40 tecken utan motståndet, 46 med; divisionen och avsparken tar 20 till
-      const bred = A.bred >= 60;
-      const tal = bred ? A.bred >= 66 : A.bred >= 46;
-      if (tal) R.slojas = true;
-      const r = [rad([omgDatum(), 'd']), rad([tal ? `${pad('', 3 + w + 1)}FORMEN · MOTSTÅNDET` : `${pad('', 3 + w + 4)}FORMEN`, 'd'])];
+      // 35 tecken med avsparken (39 när omgången går flera dagar); divisionen
+      // står när den ryms, i en spalt så bred som omgångens längsta
+      const div = (m) => DIVK[m.comp] || up(m.comp || '');
+      const d0 = Math.max(...A.ms.map((m) => div(m).length));
+      const t0 = Math.max(...A.ms.map((m) => tid(m).length));
+      const bred = A.bred >= 3 + w + 3 + w + 3 + d0 + 3 + t0;
+      const r = [rad([omgDatum(), 'd']), tom()];
+      let forra = '';
       A.ms.forEach((m, i) => {
         R.nr[i + 1] = `#mote:${m.id}`;
-        const f = ['home', 'away'].map((s) => formOf(m, s).join('') || '–');
-        const t = ['home', 'away'].map((s) => { const v = S.veil ? '?' : mottOf(m, s); return v == null ? '' : String(v); });
-        const borta = kort(m.away).slice(0, w);
-        r.push(radQ(`#mote:${m.id}`, [`${padL(i + 1, 2)} `, 'd'], `${padL(kort(m.home).slice(0, w), w)} `, [pad(f[0], 5), 'v'],
-          ...(tal ? [[` ${padL(t[0], 2)}`, ''], [' – ', 'd'], [`${pad(t[1], 2)} `, '']] : [[' – ', 'd']]), [pad(f[1], 5), 'v'], ` ${borta}`,
-          ...(bred ? [[pad('', w - borta.length + 4)], [pad(DIVK[m.comp] || up(m.comp || ''), 11), 'd'], [tid(m), 'd']] : [])));
+        const t = tid(m);
+        r.push(radQ(`#mote:${m.id}`, [`${padL(i + 1, 2)} `, 'd'], padL(kort(m.home).slice(0, w), w), [' – ', 'd'], pad(kort(m.away).slice(0, w), w),
+          ...(bred ? [[`   ${pad(div(m), d0)}   `, 'd']] : [['  ']]), [t === forra ? '' : t, 'd']));
+        forra = t;
       });
       return r;
     }
@@ -456,8 +457,8 @@ window.RumRegister = (() => {
       };
       const per = (f) => T.map((t) => (S.veil ? '?' : f(t) || '–'));
       // formen: poängen på fem matcher (inte när någon av dem är dold). Efter
-      // den står formens motstånd, som på kupongen – det säger inte vem som är
-      // bättre och står som vanligt
+      // den står formens motstånd – det säger inte vem som är bättre och står
+      // som vanligt
       const form = sid.map((s) => formOf(m, s));
       const formP = form.map((f) => (f.length && f.every((c) => c && 'VOF'.includes(c)) ? (5 * f.reduce((p, c) => p + (c === 'V' ? 3 : c === 'O' ? 1 : 0), 0)) / f.length : null));
       const formB = bast(formP, SKILJER.form);
@@ -886,7 +887,7 @@ window.RumRegister = (() => {
     function vyRader(vy, S, R) {
       if (vy.flik === 'kupongen') {
         const m = vy.mote && A.ms.find((x) => x.id === vy.mote);
-        return m ? akten(m, S, R) : kupongen(S, R);
+        return m ? akten(m, S, R) : kupongen(R);
       }
       if (vy.spelare) {
         const x = A.P && A.P.spelare.find((y) => String(y.p.id) === vy.spelare);

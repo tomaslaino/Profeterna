@@ -404,6 +404,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
   den medan den rör sig; de andra två gör det inte. Den som rör sig när du rör dig är du. Inga nya saker eller ord i
   rummet, och inga fler bilder, ritanrop eller trianglar (se *Spegeln* under [Tobaksaffären](#tobaksaffären))
+- [x] **Kupongen i datorn utan formen (2026-11-13, användarens önskemål: "gör den här sidan mindre rörig … ta bort
+  överflödig info"):** kupongen i registret visar bara lagen, divisionen och avsparken. Formen och formens motstånd
+  står kvar i matchakten, där de redan stod, och rubriken *FORMEN · MOTSTÅNDET* är borta. Avsparken står bara där den
+  ändras, så att samma tid inte står tolv gånger, och telefonen, som förut bara hade formen, får avsparken (se *Datorn* under
+  [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -6231,8 +6236,11 @@ finns kvar där.
 omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
 över hela bredden; det mellan dem rullar.
 
-- **Kupongen** – omgångens matcher numrerade, med båda lagens form bredvid namnen (de fem
-  senaste, senaste först) och på datorn divisionen eller cupen och avsparken. En match öppnar
+- **Kupongen** – omgångens matcher numrerade, bara lagen, med divisionen eller cupen där
+  raden ryms och avsparken. Avsparken står bara där den skiljer sig från raden ovanför, som i
+  en tidtabell (*16.00* på första matchen och *18.30* på den sena), och i telefonen, där
+  divisionen inte ryms, står den ensam. Formen och dess motstånd stod förut också här men
+  står bara i matchakten sedan 2026-11-13 (användarens önskemål: "mindre rörig"). En match öppnar
   **matchakten**, där allt om matchen står på ett ställe: lagen sida vid sida med *Formen*,
   *Vilan* och *Nästa* (dagar till nästa match, med cupen när det inte är ligan), tavlans
   *Styrka*, *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*, och lagkortens *Mål* och *xG*
@@ -6254,14 +6262,11 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   och *Skytten* säger inte vem som är bättre och står alltid som vanligt. Talen som räknas
   inom divisionen jämförs bara när lagen spelar i samma, och inget lyser när resultaten är
   dolda.
-  Bredvid formen står **formens motstånd** (2026-11-12, användarens önskemål: "en siffra på
+  Efter formen i matchakten står **formens motstånd** (2026-11-12, användarens önskemål: "en siffra på
   hur svåra de här lagen har varit"): hur bra de fem motståndarna var i snitt, från 0 (den
   egna divisionens svagaste lag enligt modellen) till 100 (dess starkaste) – samma mått som
-  strecket under formens rutor på matchsidan (`opp.level` i matchens fil). På datorn står
-  siffran på kupongen mellan formerna, närmast strecket (*CARDIFF OFVOV 69 – 41 OOFFO
-  BURNLEY*, under rubriken *FORMEN · MOTSTÅNDET*); i telefonen är raden full, och siffran
-  står efter formen i matchakten, alltid som vanligt – den säger inte vem som är bättre och
-  lyser inte. Alla motståndare räknas (`opponentStrength` i
+  strecket under formens rutor på matchsidan (`opp.level` i matchens fil). Siffran står
+  alltid som vanligt – den säger inte vem som är bättre och lyser inte. Alla motståndare räknas (`opponentStrength` i
   [src/matches.js](src/matches.js)): lag i de fyra ligorna och National League har modellens
   styrka, lag under National League nivåns gemensamma styrka, och lag från utlandet får sin
   styrka ur matchens odds – oddsen ger matchens förväntade mål, och med det engelska lagets
