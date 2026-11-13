@@ -15,10 +15,10 @@
 //                breda som omslaget och minst lika höga, på samma papper och i samma tryck (helgarderat.css).
 //   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
 //                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
-//   Matchbladen  ett uppslag (två sidor) per match, från sidan 2 (Tavlan, B, i omslagets rutor, A): lagen mot
-//                varandra överst med sköldarna, dagen, avsparken och arenan, rubriken och hemmalaget
-//                till vänster, och bilden, bortalaget, sammanfattningen och källorna (med en länk till varje avsnitt,
-//                forumtråd och artikel) till höger. Lagen har ett citat var under texten.
+//   Matchbladen  ett uppslag (två sidor) per match, från sidan 2 (Affischen, 2026-11-13): till vänster matchens
+//                affisch med numret, tavlan (lagen mot varandra med sköldarna, dagen och avsparken i omslagets
+//                rutor), rubriken, sammanfattningen och arenan; till höger lagens text efter varandra, med ett citat
+//                var under, och källorna (med en länk till varje avsnitt, forumtråd och artikel).
 //   Sista sidan  Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, som inte står i matchbladen) och
 //                ett kåseri av en ny person varje vecka (Spalterna), ur data/sista-sidan.json. Utan den slutar tidningen med matchbladen.
 //
@@ -117,7 +117,6 @@
       hemma: 'Hemma',
       borta: 'Borta',
       ingen: 'Ingen supporterpodd, inget forum och inget från de insatta, klubben eller lokaltidningen att hämta något ur den här veckan.',
-      sammanfattning: 'Sammanfattning',
       kallorna: 'Källorna',
       // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan undertiteln,
       // motståndarens intervju med intervjun i framför och de insatta medierna, klubben och lokaltidningen med sitt
@@ -482,40 +481,48 @@
       return h;
     });
   }
-  // Lagen mot varandra överst på matchbladet (2026-11-11, användarens val B, Tavlan, bland fyra skisser: "kan du ha den
-  // här överst på sidan inklusive den tid och plats de möts"), sedan samma kväll som omslagets tre rutor (A, Rutorna,
-  // bland tre skisser: "mer kongruent mellan sidorna och snyggare"): hemmalagets sköld, avsparken och bortalagets sköld
-  // i var sin tryckt ruta, med lagen och dagen ovanför där omslaget har 1, X och 2. Under rutorna, mellan två streck som
-  // omslagets datum, numret på kupongen och arenan med orten (s.arena och s.ort, som bygget lägger till ur ESPN:s
-  // spelprogram); utan arena hela dagen. Förut stod lagen på ett tryckt block i terrakotta, det enda fyllda i tidningen.
-  function tavla(s, namn) {
+  // Matchbladets affisch, hela vänstersidan (2026-11-13, användarens val F, Affischen, bland sju skisser A–G: "hur
+  // skulle du göra den här bättre? … ge mig lite visuella alternativ", och efter A–C "Jag är inte riktigt nöjd. Kan du
+  // komma på fler/bättre varianter"): numret på kupongen (och turneringen i en landskamp) mellan två streck överst,
+  // tavlan, rubriken stort, sammanfattningen under ett kort streck och arenan med orten nertill. Det väsentliga om matchen
+  // ryms på en sida; lagens text står på högersidan. Tavlan är omslagets tre rutor (A, Rutorna, 2026-11-11):
+  // hemmalagets sköld, avsparken och bortalagets sköld i var sin tryckt ruta, med lagen och dagen ovanför där omslaget
+  // har 1, X och 2. Arenan och orten är s.arena och s.ort, som bygget lägger till ur ESPN:s spelprogram. Förut stod
+  // tavlan överst på vänstersidan med rubriken och hemmalagets text under (Tavlan, B, 2026-11-11), och före det på ett
+  // tryckt block i terrakotta.
+  function affisch(s, namn, rubrik) {
+    const T = TEXT.poddar;
     const kol = (over, inne, kl = '') => `<div class="hg-tavla-kol"><span class="hg-tavla-over">${esc(over)}</span><span class="hg-ruta${kl}">${inne}</span></div>`;
     const L = s.landskamp;
     const lagK = (i) => kol(namn(i), skold(namn(i), 'mot', Boolean(L)));
     const mitt = giltig(s.avspark) ? kol(dagen(s.avspark), esc(tid(s.avspark)), ' hg-ruta-tid') : '<div class="hg-tavla-kol"></div>';
+    const over = [s.nr ? T.match(s.nr) : '', L ? T.landskamp(L.turnering, L.grupp) : ''].filter(Boolean).join('\u00a0· ');
     const ort = s.ort && !String(s.arena || '').includes(s.ort) ? s.ort : '';
-    const plats = s.arena ? [s.arena, ort].filter(Boolean).join(', ') : giltig(s.avspark) ? `${fVdagLang.format(new Date(s.avspark))} ${fDagMan.format(new Date(s.avspark))}` : '';
-    return `<header class="hg-tavla"><div class="hg-tavla-rad">${lagK(0)}${mitt}${lagK(1)}</div>` +
-      `<p class="hg-plats"><span>${esc([s.nr ? TEXT.poddar.match(s.nr) : '', L ? TEXT.poddar.landskamp(L.turnering, L.grupp) : '', plats].filter(Boolean).join('\u00a0· '))}</span></p></header>`;
+    const plats = s.arena ? [s.arena, ort].filter(Boolean).join(', ') : '';
+    // Sammanfattningen under rubriken; ett äldre blad utan en har introduktionen där. Ord med bindestreck (A-divisionen)
+    // bryts inte, för i den centrerade texten blir ett avbrutet ord en ensam stavelse.
+    const dek = s.summering || s.ingress;
+    return '<div class="hg-affisch">' + (over ? `<p class="hg-etikett">${esc(over)}</p>` : '') +
+      `<div class="hg-tavla-rad">${lagK(0)}${mitt}${lagK(1)}</div><h2 class="hg-rub">${esc(hel(rubrik))}</h2>` +
+      (dek ? `<p class="hg-dek">${esc(hel(dek)).replace(/[^\s-]+(?:-[^\s-]+)+/g, '<span class="hg-hel">$&</span>')}</p>` : '') +
+      (plats ? `<p class="hg-plats"><span>${esc(plats)}</span></p>` : '') + '</div>';
   }
   // Matchbladet. Först 2026-11-10 (användarens önskemål: "ett matchblad med information. Först en kort introduktion,
   // sen diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för
-  // varje match). Sedan 2026-11-11 Tavlan (B, valt bland fyra skisser): tavlan med lagen, avsparken och arenan överst,
-  // rubriken, introduktionen och lagen efter varandra, hemmalaget först, var och en under sitt namn (sköldarna står i
-  // tavlan, sedan Rutorna inte två gånger), så att det inte blir ett tomt hål bredvid ett lag med lite text. Spelarnas
-  // namn i fetstil, lagets citat under dess text, sammanfattningen i en tryckt ruta sist och källorna per lag. Förut
-  // Sköldarna möts (C3): en vinjett med numret och avsparken överst, sköldarna mot varandra under introduktionen och
-  // lagen i två spalter bredvid varandra. Citatet är lagets (d.citat, ett per lag sedan 2026-11-11); ett äldre nummer
-  // har ett för sidan (s.citat), och det står under laget vars källa sa det.
+  // varje match), och sedan 2026-11-11 lagen efter varandra, hemmalaget först, var och en under sitt namn, så att det
+  // inte blir ett tomt hål bredvid ett lag med lite text. Spelarnas namn i fetstil, lagets citat under dess text och
+  // källorna per lag. Citatet är lagets (d.citat, ett per lag sedan 2026-11-11); ett äldre nummer har ett för sidan
+  // (s.citat), och det står under laget vars källa sa det.
   //
-  // Uppslaget (samma kväll, användarens val A bland tre skisser, när matchbladen var två–tre omslag långa): varje match
-  // är två sidor, vänstersidan (jämn) med tavlan, rubriken, introduktionen och hemmalaget och högersidan (udda) med
-  // bilden, bortalaget, sammanfattningen och källorna. Bilden står överst till höger, så att sidorna blir ungefär lika
-  // höga. Bredvid varandra när de ryms (passa), annars under varandra. Skisserna som inte valdes: B Fortsättningen
-  // (alla sidor exakt som omslaget, texten fortsätter på nästa sida) och C Vecken (ett ark vikt där omslaget slutar).
+  // Uppslaget (2026-11-11, användarens val A bland tre skisser, när matchbladen var två–tre omslag långa): varje match
+  // är två sidor, bredvid varandra när de ryms (passa), annars under varandra. Sedan Affischen (2026-11-13) är
+  // vänstersidan (jämn) matchens affisch och högersidan (udda) lagens text och källorna. Bilden står inte med i
+  // uppslaget sedan dess (skissen hade ingen); figur och bildfel finns kvar. Förut stod tavlan, rubriken och hemmalaget
+  // till vänster och bilden, bortalaget, sammanfattningen och källorna till höger.
   //
   // Sedan 2026-11-12 (kortare text, "Vi har inte så mycket tid på oss när vi fattar de där besluten") skrivs bladen
-  // utan introduktion: lagets text börjar direkt under rubriken. Ett äldre blad som har en får den tryckt.
+  // utan introduktion. Ett äldre blad som har både en introduktion och en sammanfattning får introduktionen överst på
+  // högersidan.
   function matchblad(u, s) {
     const T = TEXT.poddar;
     const nr = u.sida.get(s.nr);
@@ -540,13 +547,11 @@
     }).join('');
     const match = esc(lag.join('–'));
     return `<div class="hg-uppslag"><section class="hg-ark hg-sida hg-vanster" id="hg-sida-${nr}" aria-label="Sidan ${nr}: ${match}">${folio(u, nr)}` +
-      tavla(s, namn) + `<article class="hg-matchblad"><h2 class="hg-rub">${esc(hel(s.rubrik || T.rubrik(lag[0], lag[1])))}</h2>` +
-      (s.ingress ? `<p class="hg-ingress">${esc(hel(s.ingress))}</p>` : '') + `${lagen[0]}</article></section>` +
+      affisch(s, namn, s.rubrik || T.rubrik(lag[0], lag[1])) + '</section>' +
       `<section class="hg-ark hg-sida hg-hoger" id="hg-sida-${nr + 1}" aria-label="Sidan ${nr + 1}: ${match}">${folio(u, nr + 1)}` +
-      `<div class="hg-matchblad">${figur(u, s)}${lagen[1]}` +
+      '<article class="hg-matchblad">' + (s.summering && s.ingress ? `<p class="hg-ingress">${esc(hel(s.ingress))}</p>` : '') + lagen.join('') +
       (ensamt ? `<div class="hg-ensamt">${citat(ensamt)}</div>` : '') +
-      (s.summering ? `<section class="hg-summering"><h3>${esc(T.sammanfattning)}</h3><p>${esc(hel(s.summering))}</p></section>` : '') +
-      `<div class="hg-kallor"><h4>${esc(T.kallorna)}</h4><div>${kallor}</div></div></div></section></div>`;
+      `<div class="hg-kallor"><h4>${esc(T.kallorna)}</h4><div>${kallor}</div></div></article></section></div>`;
   }
 
   // ---------- tidningen ----------
