@@ -9,7 +9,9 @@
 // så att det faller bakåt ovanför händerna (uBuk), och en våg när han rycker i det (uVag). ytan() räknar
 // samma form i JavaScript, så att händerna kan hålla i kanterna. Samma ljus som på allt annat (LJUS).
 //
-// byggTidning(bord) → { mesh, U, tryck(dag), visa(namn), borta() }; dagens(now) → det tryck() vill ha
+// Ibland läser han Helgarderat i stället, det senaste numret (helgarderat(upplaga), se Helgarderat nedan).
+//
+// byggTidning(bord) → { mesh, U, tryck(dag), helgarderat(upplaga), har(namn), visa(namn), borta() }; dagens(now) → det tryck() vill ha
 // ytan(qx, qy, s, ut): punkten (qx −1–1 över uppslaget, qy 0–1 nedifrån) i papperets mått, s: { beta, buk, vag, fas }
 import * as THREE from 'three';
 import { LJUS, BORD_GLSL, DAG, LYS } from './rum-hasse-arm.js';
@@ -925,6 +927,369 @@ function insida(c, namn, d) {
   }
 }
 
+// ---------- Helgarderat ----------
+// Ibland läser han Helgarderat i stället (2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste
+// numret av helgarderat"): tobaksaffärens egen tidning, det senaste numret, samma som ligger på pulten (Rum.numret i
+// rum.js). Orden är rum-tidning.js (RumTidning.omslag) och måtten helgarderat.css: omslaget är 100 × 140 där och
+// förstoras HK gånger, och sidorna efter det är 600 breda där (HF). Omslaget är mot en, och baksidan är sista sidan
+// med hans egen krönika och veckans kåseri (utan den innehållet); insidan är ett matchblad. Gulnat papper med en tunn
+// tryckt ram, terrakotta och en blå penna, och på omslaget och innehållet har tryckfärgen inte täckt överallt (som
+// .hf-blad). Brödtexten är så stor som ryms, som notiserna på DN:s baksida.
+const HG = { p: '#f1e8d5', p2: '#e8dcc3', tryck: '#a9452b', svart: '#221f1b', penna: '#2146a6', ruta: '#fbf7ec', gra: 'rgba(34, 31, 27, .7)', streck: 'rgba(169, 69, 43, .3)' };
+const SKR = (px) => `400 ${px}px Skrivmaskin, "American Typewriter", "Courier New", monospace`;
+const HK = SB / 100;
+const HF = SB / 600;
+
+// Papperet: gulnat, med buktor från fukten, fibrer och mörkare kanter, och den tunna tryckta ramen innanför kanten.
+function hgPapper(x, x0, seed) {
+  x.fillStyle = grad(x, 0, SH, HG.p, HG.p2);
+  x.fillRect(x0, 0, SB, SH);
+  const r = rng(seed + 0.37);
+  x.save();
+  x.beginPath();
+  x.rect(x0, 0, SB, SH);
+  x.clip();
+  for (let i = 0; i < 10; i++) glod(x, x0 + r() * SB, r() * SH, 60 + r() * 150, 'rgba(150, 112, 60, A)', 0.04 + 0.05 * r());
+  x.fillStyle = 'rgba(95, 72, 40, .08)';
+  for (let i = 0; i < 900; i++) x.fillRect(x0 + r() * SB, r() * SH, 1 + r() * 5, 0.6);
+  for (const [ax, ay, bx, by] of [[x0, 0, x0 + 20, 0], [x0 + SB, 0, x0 + SB - 20, 0], [0, 0, 0, 20], [0, SH, 0, SH - 20]]) {
+    const g = x.createLinearGradient(ax, ay, bx, by);
+    g.addColorStop(0, 'rgba(150, 112, 50, .26)');
+    g.addColorStop(1, 'rgba(150, 112, 50, 0)');
+    x.fillStyle = g;
+    x.fillRect(x0, 0, SB, SH);
+  }
+  x.restore();
+  x.strokeStyle = HG.tryck;
+  x.lineWidth = 0.4 * HK;
+  x.strokeRect(x0 + 2.4 * HK, 2.4 * HK, SB - 4.8 * HK, SH - 4.8 * HK);
+}
+// där tryckfärgen inte har täckt: papperet lyser igenom i små prickar
+function prickar(x, x0, seed) {
+  const r = rng(seed + 0.71);
+  x.fillStyle = HG.p;
+  for (let i = 0; i < 1800; i++) {
+    x.globalAlpha = 0.35 + 0.5 * r();
+    x.beginPath();
+    x.arc(x0 + r() * SB, r() * SH, 0.4 + r() * 0.9, 0, 7);
+    x.fill();
+  }
+  x.globalAlpha = 1;
+}
+// Raderna jämnt fördelade (text-wrap: balance), högst n och med … sist om texten inte ryms.
+function balans(x, text, font, w, n) {
+  let rader = radbryt(x, text, font, w);
+  if (rader.length > 1 && rader.length <= n) {
+    let lo = 0.5 * w;
+    let hi = w;
+    for (let i = 0; i < 12; i++) {
+      const m = (lo + hi) / 2;
+      if (radbryt(x, text, font, m).length > rader.length) lo = m; else hi = m;
+    }
+    rader = radbryt(x, text, font, hi);
+  }
+  if (rader.length > n) {
+    rader = rader.slice(0, n);
+    rader[n - 1] = `${rader[n - 1].replace(/[\s,.;:–-]+$/, '')}…`;
+  }
+  return rader;
+}
+// Text mitt på mellan två tryckta streck (omslagets datum och etiketterna): toppen vid y, linjens höjd lh. → bredden
+function mellanStreck(x, L, W, y, text, font, sp, lh, luft) {
+  const p = px(font);
+  const w = Math.min(bredd(x, text, font, sp), W - 4 * luft);
+  const mitt = L + W / 2;
+  skriv(x, text, mitt, y + lh / 2 + 0.36 * p, font, { sp, farg: HG.tryck, lin: 'm', max: w });
+  const s = (W - w) / 2 - luft;
+  linje(x, L, y + lh / 2 - 0.2 * HK, s, 0.4 * HK, HG.tryck);
+  linje(x, mitt + w / 2 + luft, y + lh / 2 - 0.2 * HK, s, 0.4 * HK, HG.tryck);
+  return w;
+}
+// Sidhuvudet, som omslagets översta rad: maskinskrivet över ett tryckt streck. ytterst: sidnumret (på en vänstersida
+// till vänster), annars namnet till vänster och numret med lördagen till höger. → y under strecket
+function folio(x, L, W, o, ytterst = null) {
+  const fs = 2.9 * HK;
+  const y = 3.6 * HK + 1.1 * HK + fs * 0.8;
+  let at = L;
+  if (ytterst != null) at += skriv(x, String(ytterst), L, y, SKR(fs)) + 2 * HK;
+  skriv(x, o.namn, at, y, SKR(fs));
+  skriv(x, o.huvudet, L + W, y, SKR(fs), { lin: 'h', max: W * 0.55 });
+  const y1 = 3.6 * HK + 1.1 * HK + fs + 1.5 * HK;
+  linje(x, L, y1, W, 0.4 * HK, HG.tryck);
+  return y1 + 0.4 * HK;
+}
+
+// Omslaget (forsta i rum-tidning.js): numret, veckan och priset maskinskrivna överst, namnet och lördagens datum,
+// rutorna 1, X och 2 ikryssade med pennan i det som blir över, och nertill den första matchen med sin rubrik.
+function forstaHg(x, x0, o) {
+  const k = HK;
+  hgPapper(x, x0, 3);
+  const L = x0 + 6.4 * k;
+  const W = SB - 12.8 * k;
+  const mitt = x0 + SB / 2;
+  const fs = 2.9 * k;
+  let y = 3.6 * k + 1.1 * k;
+  skriv(x, o.over, L, y + fs * 0.8, SKR(fs));
+  if (o.prov) skriv(x, o.prov, mitt, y + fs * 0.8, SKR(fs), { farg: HG.tryck, lin: 'm' });
+  skriv(x, o.pris, L + W, y + fs * 0.8, SKR(fs), { lin: 'h' });
+  y += fs + 1.5 * k;
+  linje(x, L, y, W, 0.4 * k, HG.tryck);
+  y += 0.4 * k + 4.6 * k;
+  const nf = 14.2 * k;
+  skriv(x, o.namn, mitt, y + nf * 0.8, FRA(nf, 600), { sp: -0.2 / 14.2, farg: HG.tryck, lin: 'm', max: W + 4 * k });
+  y += nf + 2.6 * k;
+  const df = 3.1 * k;
+  if (o.dagen) mellanStreck(x, L, W, y, VERSAL(o.dagen), FRA(df, 600), 0.5 / 3.1, df, 2 * k);
+  y += df;
+  // den första matchen nertill
+  const rf = 5 * k;
+  const rub = o.ettan ? balans(x, o.ettan.rubrik, FRA(rf, 600), W, 3) : [];
+  const ey = SH - 5 * k - (o.ettan ? 7.8 * k + rub.length * rf * 1.2 : 0);
+  if (o.ettan) {
+    linje(x, L, ey, W, 0.4 * k, HG.tryck);
+    skriv(x, VERSAL(o.ettan.lagen), mitt, ey + 3.4 * k + 3 * k * 0.8, FRA(3 * k, 600), { sp: 0.5 / 3, farg: HG.tryck, lin: 'm', max: W });
+    stycke(x, rub, mitt, ey + 7.8 * k - 0.24 * rf, FRA(rf, 600), rf * 1.2, HG.svart, 'm');
+  }
+  // rutorna (RumTidning.rutor, 134 × 64 och 76 breda) mitt i det som blir över
+  const s = (76 * k) / 134;
+  const ry = y + (ey - y - 64 * s) / 2;
+  const rx = mitt - 67 * s;
+  for (let i = 0; i < 3; i++) {
+    const gx = rx + (i * 46.5 + 0.8) * s;
+    skriv(x, o.tecken[i], gx + 19.5 * s, ry + 15 * s, FRA(15 * s, 600), { farg: HG.tryck, lin: 'm' });
+    x.fillStyle = HG.ruta;
+    x.fillRect(gx, ry + 23.2 * s, 39 * s, 39 * s);
+    x.strokeStyle = HG.tryck;
+    x.lineWidth = 1.6 * s;
+    x.strokeRect(gx, ry + 23.2 * s, 39 * s, 39 * s);
+  }
+  prickar(x, x0, 3);
+  // kryssen med kulspetspennan, efter trycket
+  x.save();
+  x.strokeStyle = HG.penna;
+  x.globalAlpha = 0.9;
+  x.lineCap = 'round';
+  x.lineJoin = 'round';
+  for (let i = 0; i < 3; i++) {
+    x.save();
+    x.translate(rx + (i * 46.5 + 0.8) * s, ry + 23.2 * s);
+    x.scale(s, s);
+    x.lineWidth = 2.3;
+    x.stroke(new Path2D(o.kryss[i]));
+    x.restore();
+  }
+  x.restore();
+}
+
+// Stycken i två spalter (column-count: 2, som .hs-text): fonten font, radavståndet lh, luft mellan styckena och en
+// anfang i terrakotta över de två första raderna (anfang). Slutet (sign) är kåsörens namn till höger och vem hen är.
+// → { h, rita(x, x0, y, botten) }
+function spalter(x, stycken, cw, gap, font, lh, luft, { anfang = false, sign = null } = {}) {
+  const p = px(font);
+  const rader = [];
+  stycken.filter(Boolean).forEach((t0, i) => {
+    let t = String(t0).trim();
+    let cap = null;
+    let capW = 0;
+    if (anfang && i === 0 && t) {
+      cap = { text: t[0], font: FRA(p * 49 / 16, 600) };
+      capW = bredd(x, cap.text, cap.font) + p * 7 / 16;
+      t = t.slice(1);
+    }
+    x.font = font;
+    const forst = rader.length;
+    // (de två första raderna går bredvid anfangen)
+    const indrag = () => (cap && rader.length - forst < 2 ? capW : 0);
+    let r = '';
+    for (const o of t.split(/\s+/)) {
+      const n = r ? `${r} ${o}` : o;
+      if (r && x.measureText(n).width > cw - indrag()) { rader.push({ text: r, font, h: lh, dx: indrag() }); r = o; } else r = n;
+    }
+    if (r) rader.push({ text: r, font, h: lh, dx: indrag() });
+    if (cap) rader[forst].cap = { ...cap, dy: Math.min(2, rader.length - forst) * lh };
+    if (rader.length) rader[rader.length - 1].efter = luft;
+  });
+  if (sign) {
+    rader.push({ text: `– ${sign.av}`, font: SKR(p * 12 / 16), h: p * 1.3, lin: 'h' });
+    if (sign.om) rader.push({ text: sign.om, font: SKR(p * 11.5 / 16), h: p * 1.4, lin: 'h', farg: HG.gra });
+  }
+  // höjden och var den andra spalten börjar: så jämnt som möjligt, den första inte lägre
+  const hojd = (l) => l.reduce((a, q, i) => a + q.h + (i < l.length - 1 ? q.efter || 0 : 0), 0);
+  const tot = hojd(rader);
+  let delning = rader.length;
+  let acc = 0;
+  for (let i = 0; i < rader.length; i++) {
+    acc += rader[i].h + (rader[i].efter || 0);
+    if (acc >= tot / 2) { delning = i + 1; break; }
+  }
+  const sp = [rader.slice(0, delning), rader.slice(delning)];
+  return {
+    h: Math.max(hojd(sp[0]), hojd(sp[1])),
+    rita(x2, x0, y0, botten) {
+      sp.forEach((l, k) => {
+        let y = y0;
+        const sx = x0 + k * (cw + gap);
+        for (const q of l) {
+          if (y + q.h > botten + 0.5) return;
+          const bas = y + q.h * 0.72;
+          if (q.cap) skriv(x2, q.cap.text, sx, y + q.cap.dy - lh * 0.28, q.cap.font, { farg: HG.tryck });
+          x2.font = q.font;
+          x2.fillStyle = q.farg || HG.svart;
+          x2.textAlign = q.lin === 'h' ? 'right' : 'left';
+          x2.fillText(q.text, q.lin === 'h' ? sx + cw : sx + (q.dx || 0), bas);
+          x2.textAlign = 'left';
+          y += q.h + (q.efter || 0);
+        }
+      });
+    },
+  };
+}
+
+// Sista sidan (sista i rum-tidning.js): sidhuvudet, Krönika över hans porträtt och namn, rubriken och texten i två
+// spalter med en anfang, och under den Kåseri med rubriken, texten och kåsörens namn. Brödtexten krymper tills allt ryms.
+function sistaHg(x, x0, o, portratt) {
+  const k = HK;
+  const f = HF;
+  const S = o.sista;
+  hgPapper(x, x0, 5);
+  const L = x0 + 6.4 * k;
+  const W = SB - 12.8 * k;
+  const mitt = x0 + SB / 2;
+  const botten = SH - 5 * k;
+  let y = folio(x, L, W, o, S.nr) + 22 * f;
+  const ef = 12.5 * f;
+  const etikett = (text, yy) => { mellanStreck(x, L, W, yy, VERSAL(text), FRA(ef, 600), 0.16, ef * 1.2, 13 * f); return yy + ef * 1.2 + 16 * f; };
+  y = etikett(S.rubriker.kronika, y);
+  // porträttet, tryckt på papperet, med den tunna ramen
+  const pw = 64 * f;
+  x.fillStyle = '#d9d3c4';
+  x.fillRect(mitt - pw / 2, y, pw, pw);
+  if (portratt) {
+    x.save();
+    x.globalCompositeOperation = 'multiply';
+    x.filter = 'contrast(1.1)';
+    x.drawImage(portratt, mitt - pw / 2, y, pw, pw);
+    x.restore();
+  }
+  x.strokeStyle = HG.tryck;
+  x.lineWidth = 0.45 * 6 * f;
+  x.strokeRect(mitt - pw / 2 + x.lineWidth / 2, y + x.lineWidth / 2, pw - x.lineWidth, pw - x.lineWidth);
+  y += pw + 10 * f;
+  skriv(x, VERSAL(S.kronika.av), mitt, y + 14 * f * 0.95, FRA(14 * f, 600), { sp: 0.16, farg: HG.tryck, lin: 'm', max: W });
+  y += 14 * f * 1.2 + 14 * f;
+  // rubrikerna, som .hg-rub
+  const rf = 29.1 * f;
+  const rubrik = (text, yy) => {
+    const r = balans(x, text, FRA(rf, 600), W, 3);
+    stycke(x, r, mitt, yy - 0.2 * rf, FRA(rf, 600), rf * 1.14, HG.svart, 'm');
+    return yy + r.length * rf * 1.14 + 14 * f;
+  };
+  y = rubrik(S.kronika.rubrik, y);
+  // krönikan och kåseriet, så stora som ryms
+  const gap = 30 * f;
+  const cw = (W - gap) / 2;
+  const kasRub = balans(x, S.kaseri.rubrik, FRA(rf, 600), W, 3).length * rf * 1.14 + 14 * f;
+  let t = 1;
+  let kr;
+  let ks;
+  for (;;) {
+    const p = 16 * f * t;
+    kr = spalter(x, S.kronika.stycken, cw, gap, FRA(p, 400), p * 1.6, 10 * f * t, { anfang: true });
+    ks = spalter(x, S.kaseri.stycken, cw, gap, FRA(p * 15.5 / 16, 400), p * 1.55, 10 * f * t, { sign: { av: S.kaseri.av, om: S.kaseri.om ? S.kaseri.om[0].toUpperCase() + S.kaseri.om.slice(1) : '' } });
+    if (y + kr.h + 30 * f * t + ef * 1.2 + 16 * f + kasRub + ks.h <= botten || t < 0.36) break;
+    t -= 0.02;
+  }
+  kr.rita(x, L, y, botten);
+  y += kr.h + 30 * f * t;
+  if (y + ef * 1.2 + 16 * f + kasRub < botten) {
+    y = etikett(S.rubriker.kaseri, y);
+    y = rubrik(S.kaseri.rubrik, y);
+    ks.rita(x, L, y, botten);
+  }
+}
+
+// Innehållet (kupong i rum-tidning.js), där sista sidan saknas: namnet och numret överst, I detta nummer och en rad per
+// match med numret, lagen, prickar till sidnumret och matchbladets rubrik under.
+function innehallHg(x, x0, o) {
+  const k = HK;
+  const f = HF;
+  const I = o.innehall;
+  hgPapper(x, x0, 7);
+  const L = x0 + 6.4 * k;
+  const W = SB - 12.8 * k;
+  let y = folio(x, L, W, o) + 4.4 * k;
+  const tf = 34 * f;
+  skriv(x, I.titel, x0 + SB / 2, y + tf * 0.85, FRA(tf, 600), { lin: 'm', max: W });
+  y += tf * 1.1 + 2.6 * k;
+  linje(x, L, y, W, 0.4 * k, HG.tryck);
+  y += 0.4 * k;
+  const botten = SH - 5 * k;
+  const n = I.rader.length || 1;
+  const rh = (botten - y) / n;
+  const s = Math.min(1, rh / (44 * f));
+  const nrW = 26 * f;
+  const sW = 30 * f;
+  for (const [i, m] of I.rader.entries()) {
+    const ry = y + i * rh;
+    const mid = ry + rh / 2;
+    x.globalAlpha = m.sida ? 1 : 0.4;
+    const bas = mid - (m.rubrik ? 2 * f * s : -5 * f * s);
+    skriv(x, String(m.nr), L, bas, FRA(14 * f * s, 600), { farg: HG.tryck });
+    const lw = skriv(x, VERSAL(m.lagen), L + nrW + 8 * f, bas, FRA(14 * f * s, 600), { sp: 0.12, farg: HG.tryck, max: W - nrW - sW - 40 * f });
+    if (m.sida) {
+      skriv(x, String(m.sida), L + W, bas, FRA(18 * f * s, 600), { farg: HG.tryck, lin: 'h' });
+      x.fillStyle = HG.streck;
+      for (let px0 = L + nrW + 8 * f + lw + 8 * f; px0 < L + W - sW - 8 * f; px0 += 4 * f) x.fillRect(px0, bas - 2, 2 * f, 2 * f);
+    }
+    if (m.rubrik) skriv(x, m.rubrik, L + nrW + 8 * f, bas + 14 * f * s * 1.3 + 2 * f, FRA(14 * f * s, 400), { max: W - nrW - sW - 16 * f });
+    x.globalAlpha = 1;
+    linje(x, L, ry + rh - 1, W, 1, HG.streck);
+  }
+  prickar(x, x0, 7);
+}
+
+// Insidan (sett bakifrån, liten): ett matchblad, med sidhuvudet, tavlan med de tre rutorna, rubriken och lagets text
+// till vänster, och bilden, texten och sammanfattningen till höger.
+function insidaHg(c, seed) {
+  const x = c.getContext('2d');
+  const w = c.width / 2;
+  const h = c.height;
+  const k = w / 100;
+  for (const [i, x0] of [0, w].entries()) {
+    x.fillStyle = grad(x, 0, h, HG.p, HG.p2);
+    x.fillRect(x0, 0, w, h);
+    x.strokeStyle = HG.tryck;
+    x.lineWidth = 0.6;
+    x.strokeRect(x0 + 2.4 * k, 2.4 * k, w - 4.8 * k, h - 4.8 * k);
+    const L = x0 + 6.4 * k;
+    const W = w - 12.8 * k;
+    x.fillStyle = 'rgba(34, 31, 27, .5)';
+    x.fillRect(L, 5.4 * k, 10 * k, 1.6 * k);
+    linje(x, L, 9 * k, W, 0.6, HG.tryck);
+    if (i === 0) {
+      for (let j = 0; j < 3; j++) {
+        const rx = L + W / 6 + (j * W) / 3 - 8.5 * k;
+        x.fillStyle = HG.ruta;
+        x.fillRect(rx, 17 * k, 17 * k, 17 * k);
+        x.strokeStyle = HG.tryck;
+        x.strokeRect(rx, 17 * k, 17 * k, 17 * k);
+      }
+      linje(x, L, 40 * k, W, 0.6, HG.tryck);
+      x.fillStyle = HG.svart;
+      x.fillRect(L + 0.1 * W, 45 * k, 0.8 * W, 3.4 * k);
+      x.fillRect(L + 0.22 * W, 50.5 * k, 0.56 * W, 3.4 * k);
+      linje(x, L + 0.3 * W, 61 * k, 0.4 * W, 0.6, HG.tryck);
+      spalt(x, L, 65 * k, W, h - 5 * k, 3.2, seed + i);
+    } else {
+      bild(x, ['hav', 'stad', 'skog'][seed % 3], L, 13 * k, W, 0.62 * W, seed + 9);
+      linje(x, L + 0.3 * W, 13 * k + 0.62 * W + 6 * k, 0.4 * W, 0.6, HG.tryck);
+      spalt(x, L, 13 * k + 0.62 * W + 10 * k, W, h - 34 * k, 3.2, seed + i);
+      linje(x, L + 0.3 * W, h - 30 * k, 0.4 * W, 0.6, HG.tryck);
+      spalt(x, L, h - 26 * k, W, h - 5 * k, 3.2, seed + 3);
+    }
+  }
+}
+
 // ---------- papperet ----------
 export function byggTidning(bord) {
   const NX = 36;
@@ -968,14 +1333,25 @@ export function byggTidning(bord) {
   let dagNu = null;
   let visad = 'dn';
   let nr = 0;
-  // Trycker uppslaget (förstasidan, baksidan och insidan) för dagens tidning som visas. Typsnitten hämtas först;
-  // kommer de sent trycks det om.
+  // Helgarderats nummer (RumTidning.omslag), när typsnitten och porträttet har kommit
+  let hg = null;
+  let hgNr = 0;
+  // Trycker uppslaget (förstasidan, baksidan och insidan) för tidningen som visas: dagens DN eller SvD, eller
+  // Helgarderat. Typsnitten hämtas först; kommer de sent trycks det om.
   function rita() {
-    if (!dagNu) return;
     const x = ut.getContext('2d');
-    baksida(x, 0, dagNu, visad);
-    (visad === 'svd' ? forstaSvd : forstaDn)(x, SB, dagNu);
-    insida(inn, visad, dagNu);
+    if (visad === 'hg') {
+      if (!hg) return;
+      if (hg.o.sista) sistaHg(x, 0, hg.o, hg.portratt);
+      else innehallHg(x, 0, hg.o);
+      forstaHg(x, SB, hg.o);
+      insidaHg(inn, hg.seed);
+    } else {
+      if (!dagNu) return;
+      baksida(x, 0, dagNu, visad);
+      (visad === 'svd' ? forstaSvd : forstaDn)(x, SB, dagNu);
+      insida(inn, visad, dagNu);
+    }
     U.uUt.value.needsUpdate = true;
     U.uIn.value.needsUpdate = true;
   }
@@ -983,18 +1359,38 @@ export function byggTidning(bord) {
   async function tryck(dag) {
     const mitt = ++nr;
     dagNu = dag;
-    rita();
+    if (visad !== 'hg') rita();
     fonter = fonter || (document.fonts && document.fonts.load
       ? Promise.race([Promise.all([document.fonts.load(PLAY(30, 900)), document.fonts.load(PLAY(30, 700)), document.fonts.load(FRA(30, 600)), document.fonts.load(FRA(30, 700))]), new Promise((ok) => setTimeout(ok, 2500))])
       : Promise.resolve());
     await Promise.all([fonter, laddaNotiser().then(laddaBilder)]);
-    if (mitt === nr) rita();
+    if (mitt === nr && visad !== 'hg') rita();
+  }
+  let fonterHg = null;
+  let portratt = null;
+  // Helgarderats nummer (upplagan ur rum-tidning.js, eller null). Det går att visa först när typsnitten och hans
+  // porträtt till krönikan har kommit, så att det aldrig byts i hans händer.
+  async function helgarderat(u) {
+    const mitt = ++hgNr;
+    const RT = globalThis.RumTidning;
+    const o = u && RT && RT.omslag ? RT.omslag(u) : null;
+    if (!o) { hg = null; return; }
+    fonterHg = fonterHg || (document.fonts && document.fonts.load
+      ? Promise.race([Promise.all([document.fonts.load(FRA(30, 600)), document.fonts.load(FRA(30, 400)), document.fonts.load(SKR(30))]), new Promise((ok) => setTimeout(ok, 2500))]).catch(() => {})
+      : Promise.resolve());
+    portratt = portratt || ladda('helgarderat/hasse.webp');
+    const [, bild] = await Promise.all([fonterHg, portratt]);
+    if (mitt !== hgNr) return;
+    hg = { o, portratt: bild, seed: Math.abs(Number(String(o.over).replace(/\D+/g, '')) || 1) };
+    if (visad === 'hg') rita();
   }
   return {
-    mesh, U, tryck,
-    // vilken av tidningarna han har i händerna ('dn' eller 'svd'); trycks om när den byts
+    mesh, U, tryck, helgarderat,
+    // finns tidningen att visa ('dn', 'svd' eller 'hg')
+    har: (namn) => (namn === 'hg' ? Boolean(hg) : Boolean(TIDNINGAR[namn])),
+    // vilken av tidningarna han har i händerna ('dn', 'svd' eller 'hg'); trycks om när den byts
     visa(namn) {
-      if (!TIDNINGAR[namn] || namn === visad) return;
+      if (namn === visad || !(namn === 'hg' ? hg : TIDNINGAR[namn])) return;
       visad = namn;
       rita();
     },

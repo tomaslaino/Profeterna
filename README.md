@@ -399,6 +399,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   papper, den tunna tryckta ramen, *Nr 1 · Vecka 46* och priset maskinskrivna överst, namnet i terrakotta, vinjetten
   mellan två streck och rubriken i tidningens typsnitt, så fet och stor som ryms. Det gula papperet, det röda bandet
   och den molniga svärtan är borta (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären))
+- [x] **Hasse Backe läser Helgarderat (2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste
+  numret av helgarderat"):** en gång av tre när han tar upp tidningen är det Helgarderats senaste nummer, samma som
+  ligger på pulten, i stället för DN eller SvD. Omslaget är mot en, tryckt som på pulten, och på baksidan står sista
+  sidan med hans egen krönika och veckans kåseri (utan sista sidan innehållet). Finns inget nummer läser han DN eller
+  SvD som förut (se *Tidningen* under [Hasse Backe](#hasse-backe))
 
 ## Publicering
 
@@ -1656,6 +1661,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   dem, pekar på en med dem och biter tankfullt i skalmen. När han tog upp tidningen ur knät och lade tillbaka den stod
   armbågarna en stund ut som vingar i axelhöjd ("Rätta armbågarna också"): nu håller han den lågt tills den är framme,
   och i knät hänger armarna nedåt. Se [Hasse Backe](#hasse-backe), *Tidningen* och *Glasögonen*.
+- **Hasse läser ibland Helgarderat (2026-11-13, användarens önskemål):** "Jag tycker att hasse ibland ska läsa senaste
+  numret av helgarderat". En gång av tre (`HG_ANDEL` i rum-hasse.js) är tidningen han tar upp Helgarderats senaste
+  nummer, samma som på pulten, med omslaget mot en och hans egen krönika på baksidan. Se [Hasse Backe](#hasse-backe),
+  *Tidningen*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -7347,6 +7356,25 @@ riktiga personer och utan sport, och dagen väljer dem (`dagens`): samma hela da
 där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga vid en sjö, skärgården med färjan, hyreshus och
 en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen (`upptagen` i rum-hasse.js) och
 trycks om när han tar upp den andra (`visa`).
+
+**Helgarderat** (2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste numret av
+helgarderat"): en gång av tre när han tar upp tidningen (`HG_ANDEL` och `valjTidning` i rum-hasse.js, lottat varje
+gång) läser han Helgarderat i stället för klippets DN eller SvD, och klippet är detsamma. Det är det senaste numret,
+samma som ligger på pulten (`Rum.numret` i rum.js), och det trycks på hans papper när han blir upptagen och igen när
+ett nytt nummer har kommit (`helgarderat` i rum-hasse-tidning.js). Orden kommer från tidningen själv
+(`RumTidning.omslag` i rum-tidning.js) och måtten från helgarderat.css: omslaget mot en är 100 × 140 förstorat 5,12
+gånger, med numret, veckan och priset maskinskrivna, namnet och lördagens datum i terrakotta, rutorna 1, X och 2
+ikryssade med den blå pennan och den första matchen med sin rubrik, på gulnat papper med den tunna tryckta ramen och
+prickar där tryckfärgen inte har täckt. Baksidan är sista sidan: sidhuvudet, *Krönika* över hans porträtt och namn,
+rubriken och texten i två spalter med en röd anfang, och under den *Kåseri* med veckans kåsör, så stort som ryms
+(`sistaHg`). Utan sista sidan för numret står innehållet där, en rad per match med sidnumret (`innehallHg`), och
+insidan är ett matchblad med tavlans tre rutor, en bild och spalter (`insidaHg`). Numret visas först när typsnitten och
+porträttet har kommit, så att det aldrig byts i hans händer, och utan nummer läser han DN eller SvD som förut (`blad` i
+rum-hasse-3d.js).
+
+Provat 2026-11-13 i headless Chromium med numret i repot (Nr 1, lördagen den 14 november, med sista sidan): uppslaget
+ensamt, också utan sista sidan (innehållet), och i hela rummet hos Hasse Backe med läsklippet och Helgarderat valt.
+Inte provat i Safari eller i en riktig telefon.
 
 **Glasögonen** (2026-11-09). Han läser med läsglasögon i mörk sköldpadd (`byggGlasogon` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js)), som annars sitter i bröstfickan med det översta hörnet uppstickande.

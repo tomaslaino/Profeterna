@@ -6546,7 +6546,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return { matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
   }
   // summa: sammanställningen så länge protokollet ligger på pulten (Hasses domar i rum-hasse.js), annars null
-  return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+  return { fits, show, hide, kupong, bladet, summa: () => R.summa || null,
+    // Helgarderats senaste nummer, samma som på pulten (Hasse Backe läser det ibland, rum-hasse.js). → Promise: upplagan eller null
+    numret: hamtaTidning, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

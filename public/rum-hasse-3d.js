@@ -575,7 +575,7 @@ export const KLIPP = {
   spanaKis: { fran: 453, till: 457.4, vila: 0, skynda: true, grupp: 'spana' },
   // tidningen (LASA ovan): tar upp den, läser och lägger ned den. slag: där han kan sluta läsa, ner: där
   // han lägger ned den (båda i klippets tid)
-  // (han läser Dagens Nyheter eller Svenska Dagbladet, rum-hasse-tidning.js)
+  // (han läser Dagens Nyheter eller Svenska Dagbladet, rum-hasse-tidning.js, och ibland Helgarderat i stället: blad)
   lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa.slag, ner: LASA.lasa.ner },
   lasa2: { fran: 570, till: 570 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner },
   // (och där han låtsas att han inte hade fel; ljud: fnysningar, andetag och prassel)
@@ -4056,6 +4056,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // handen först bakåt och sedan ned (eller upp och sedan fram), så att den inte går genom disken.
   const tidning = byggTidning(bord);
   S.add(tidning.mesh);
+  // tidningen han tar upp nästa gång, i stället för klippets: 'hg' (Helgarderat) eller null
+  let blad = null;
   const TS = { beta: 0, buk: 0, vag: 0, fas: 0 };
   // greppet: handflatan så långt utanför kanten, handens origo så långt bakom papperet (längs fingrarna),
   // fingrarnas vinkel uppåt och deras krok
@@ -4730,9 +4732,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     cig.U.uTid.value = n;
     const kaffe = kl && kl.kaffe;
     const extraB = kaffe ? kaffeArm(t, b, kaffe) : null;
-    // tidningen: i hans händer under klippen lasa, annars borta
+    // tidningen: i hans händer under klippen lasa, annars borta. Klippets egen (DN eller SvD), eller Helgarderat när
+    // rum-hasse.js har valt den för den här gången (blad)
     if (kl && kl.las) {
-      tidning.visa(kl.tidning);
+      tidning.visa(blad && tidning.har(blad) ? blad : kl.tidning);
       tidningArm(t, n, kl, a, b);
     }
     else tidning.mesh.visible = false;
@@ -4884,6 +4887,14 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     },
     // Trycker dagens tidningar som han läser (dagens() i rum-hasse-tidning.js)
     tidning: (d) => tidning.tryck(d),
+    // och Helgarderats senaste nummer (upplagan ur rum-tidning.js, eller null)
+    helgarderat: (u) => tidning.helgarderat(u),
+    // Vilken tidning han tar upp nästa gång han läser: 'hg' för Helgarderat, null för klippets egen (DN eller SvD).
+    // → true om den finns att ta upp
+    blad(namn) {
+      blad = namn && tidning.har(namn) ? namn : null;
+      return Boolean(blad) === Boolean(namn);
+    },
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
     borta() {
