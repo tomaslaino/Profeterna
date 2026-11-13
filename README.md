@@ -7432,6 +7432,11 @@ framför ansiktet följer huvudet, fickan och handen kroppen), och handen räkna
 från sidan bakom tidningen, eller med pekfingertoppen på bryggan (`glasArm`). På näsan sitter de så nära ansiktet som
 formen tillåter (`paNasan`), och genom glasen ser ögonen lite större ut (`uLins` i ansiktets skuggare). Bågen ritas före
 kroppen, så att huvudet och kavajen döljer skalmarna och det som är nere i fickan.
+På näsan går skalmarna från gångjärnen till öronen (`ORON` i rum-hasse-3d.js, där örat möter huvudet i fotot) och är så
+långa som det är dit, och kroken går bakåt bakom örat, där huvudet döljer den (`satt` i `byggGlasogon`). Huvudet är ett
+foto på en grund form, där öronen sitter mycket närmare ansiktet än på en riktig skalle: med raka skalmar i full längd
+stack de ut bakom huvudet, och när han böjde det och kameran såg honom uppifrån pekade de rakt upp över pannan som
+antenner (användarens bild 2026-11-13). Ute i luften och i handen pekar de rakt bakåt som förut.
 
 **Sysslorna** (2026-11-09, användarens önskan: fler saker än tidningen, *ertappad men låtsas som att det inte har hänt
 och gå vidare*, som John Goodman i *The Big Lebowski*). Har det gått dåligt har han sex andra sätt att verka upptagen,
