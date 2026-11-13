@@ -57,7 +57,10 @@ const avkoda = (s) => String(s || '').replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (
 export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 // Lagets namn i texter: söknamnen i config/news.js (Bradford City, Bradford, Bantams).
-export const namnen = (lag) => (newsCfg.names && newsCfg.names[lag]) || [lag];
+// Landslagen (2026-11-13, scripts/tidning/matchbilder.mjs) heter på svenska på sajten men på engelska i BBC:s och
+// Bing News flöden: landslag[lag] = { namn: ['Sweden', 'Sverige'], bbc: 'sweden', fragor: ['Sweden national team'] }.
+export const landslag = {};
+export const namnen = (lag) => (landslag[lag] && landslag[lag].namn) || (newsCfg.names && newsCfg.names[lag]) || [lag];
 const ordRe = (n) => new RegExp(`[^a-z]${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^a-z]`);
 export function namner(text, lag) {
   const t = ` ${String(text || '').toLowerCase()} `;
@@ -176,7 +179,7 @@ export const bbcBild = (u) => avkoda(u)
   .replace(/\/news\/\d{2,4}\//, '/news/976/')
   .replace(/\/images\/ic\/(\d+)x(\d+|n)\//, (a, w, h) => `/images/ic/976x${h === 'n' ? 'n' : Math.round((976 * Number(h)) / Number(w))}/`);
 async function bbc(lag, { fetchImpl, now, rang, dagar = DAGAR }) {
-  const xml = await hamta(`https://feeds.bbci.co.uk/sport/football/teams/${slug(lag)}/rss.xml`, { fetchImpl });
+  const xml = await hamta(`https://feeds.bbci.co.uk/sport/football/teams/${(landslag[lag] && landslag[lag].bbc) || slug(lag)}/rss.xml`, { fetchImpl });
   const ut = [];
   for (const m of String(xml).matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/g)) {
     const x = m[1];
@@ -196,7 +199,7 @@ async function bbc(lag, { fetchImpl, now, rang, dagar = DAGAR }) {
 // Bing News: de senaste fotbollsartiklarna som nämner laget i rubriken (lokaltidningarna).
 async function bing(lag, { fetchImpl, now, rang, dagar = DAGAR }) {
   // och tränaren (bilden av honom är oftast i klubbens kläder, från lokaltidningen)
-  const fragor = [`${namnen(lag)[0]} FC`, `${lag} football`, `${namnen(lag)[0]} boss`];
+  const fragor = (landslag[lag] && landslag[lag].fragor) || [`${namnen(lag)[0]} FC`, `${lag} football`, `${namnen(lag)[0]} boss`];
   const sett = new Set();
   const ut = [];
   for (const q of fragor) {

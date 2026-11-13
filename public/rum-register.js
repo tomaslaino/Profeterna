@@ -21,13 +21,19 @@
 //              sämre är svagt (SKILJER)
 //   REGISTRET  lagen och spelarna (fliken hette LAGEN till 2026-11-13; i
 //              koden heter den fortfarande lagen). Underraden säger vad och
-//              var: LAG eller SPELARE, och divisionen. LAG är divisionens lag,
-//              de i omgången ljusa; SPELARE är divisionens spelare från A
+//              var: LAG eller SPELARE, och divisionen. LAG är divisionens lag
+//              (inget lag markeras för att det står i kupongen, sedan
+//              2026-11-13); SPELARE är divisionens spelare från A
 //              till Ö med plats, lag, speltid och mål. Ett lag öppnar
 //              lagkortet med truppen (speltid, mål, de
 //              skadade), och en spelare spelarkortet: läget, speltiden, mål
 //              och xG, och hur laget har gått med och utan honom i startelvan
 //              mot oddsen (mu i data/players/<division>.json)
+// Landslagen (sedan 2026-11-13): kupongen har gruppen (NL B4), matchakten
+// för en landskamp gruppen, Nations League, alla landskamper sedan 2024 och
+// marknadens chans i stället för tavlans tal, och registret en post för
+// landslagen (NL) med grupperna och ett lagkort per landslag
+// (data/landslag.json). Sökningen hittar dem på svenska och engelska.
 // (Fram till 2026-11-13 stod tavlans tal också som topplistor över omgången i
 // en egen flik, TOPPLISTOR; användaren ville ha dem bara vid matcherna.)
 // Längst ner står sökraden (SÖK >). Den svarar medan man skriver: alla träffar
@@ -90,6 +96,18 @@ window.RumRegister = (() => {
   const FLIKAR = [['kupongen', 'KUPONGEN'], ['lagen', 'REGISTRET']];
   const SKADA = { skadad: '', avstängd: ' (AVST.)', 'ej uttagbar': '', tveksam: '?' };
   const SOK = 'SÖK > ';
+  // Landskamperna (sedan 2026-11-13, när Stryktipset tog in Nations League):
+  // tävlingarna (type 'intl' i config/competitions.js) och registrets post för
+  // landslagen, nl, efter divisionerna. Datan står i data/landslag.json och i
+  // matchens fil; tavlans tal och lagkortens finns bara för klubbarna.
+  const LANDTAV = { unl: 'Nations League', emk: 'EM-kvalet', vsk: 'Vänskapslandskamp' };
+  const isLand = (c) => Object.prototype.hasOwnProperty.call(LANDTAV, c);
+  const REG = [...DIVS, 'nl'];
+  const REGNAMN = { ...DIVNAME, nl: 'Nations League' };
+  const REGK = { ...DIVK, nl: 'NL' };
+  // landslagen med för långa namn för kupongens elva tecken (resten av
+  // rummets kortnamn, Papper.kort och tavlans, går före)
+  const LANDKORT = { 'Bosnien & Hercegovina': 'Bosnien-H.', Nordmakedonien: 'Nordmaked.', Azerbajdzjan: 'Azerbajdz.', Liechtenstein: 'Liechtenst.', Nederländerna: 'Nederländ.' };
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const num = (x, d = 1) => Math.abs(x).toFixed(d).replace('.', ',');
@@ -139,7 +157,9 @@ window.RumRegister = (() => {
   }
   const sistaNamn = (n) => efternamn(n).split(',')[0];
   const off = (m) => /POSTPONED|CANCEL|ABANDON|SUSPEND/.test(m.status || '');
-  const tavNamn = (c) => up(DIVNAME[c] || TAV[up(c)] || c || '');
+  const tavNamn = (c) => up(DIVNAME[c] || LANDTAV[c] || TAV[up(c)] || c || '');
+  // kupongens beteckning för en landskamp: NL B4, EMK C2 eller VSK
+  const landDiv = (m) => { const g = (/grupp\s+(\S+)/i.exec(m.round || '') || [])[1]; return m.comp === 'vsk' ? 'VSK' : `${m.comp === 'emk' ? 'EMK' : 'NL'}${g ? ` ${up(g)}` : ''}`; };
 
   // Tavlans tal ur lagfilerna (som rum-anslag.js och Statistik → Lagen)
   const fdOf = (t, k) => (t && t.fd ? t.fd[k] : null);
@@ -158,7 +178,10 @@ window.RumRegister = (() => {
   // målskillnaden och xG-skillnaden per match och andelen matcher som favorit.
   // Kryssen, turen, motståndet, nästa match och skytten säger inte vem som är
   // bättre och står alltid som vanligt.
-  const SKILJER = { form: 2, vila: 2, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, favorit: 0.15 };
+  // För landslagen (som inte har tavlans tal): poängen i gruppen (en seger),
+  // poängen per match i Nations League och alla landskamper (V-O-F), målen
+  // som för klubbarna och marknadens chans som favoritskapet.
+  const SKILJER = { form: 2, vila: 2, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, favorit: 0.15, poang: 3, ppm: 0.5 };
 
   // ---------- raderna ----------
   //
@@ -198,7 +221,7 @@ window.RumRegister = (() => {
   // ---------- i rummet ----------
 
   function mount(root, o) {
-    const A = { on: false, ms: [], all: [], byTeam: new Map(), match: new Map(), stats: null, byEspn: new Map(), loaded: 0, L: null, P: null, vy: { flik: 'kupongen' }, kat: 'alla', bak: [], ut: '', lista: [], nr: 0, sk: 0, sel: -1, bred: BRED, R: null };
+    const A = { on: false, ms: [], all: [], byTeam: new Map(), match: new Map(), stats: null, byEspn: new Map(), land: null, loaded: 0, L: null, P: null, vy: { flik: 'kupongen' }, kat: 'alla', bak: [], ut: '', lista: [], nr: 0, sk: 0, sel: -1, bred: BRED, R: null };
     const small = root.querySelector('#rum-reg');
     const duk = root.querySelector('#reg-duk');
     const ov = root.querySelector('#rum-regn');
@@ -223,7 +246,10 @@ window.RumRegister = (() => {
     // lagfilerna (målen, xG, oddsen, styrkan) – om igen efter en kvart
     function loadTeams() {
       if (A.loading || Date.now() - A.loaded < 15 * 60000) return A.loading;
-      A.loading = Promise.all(DIVS.map((d) => getJSON(`data/teams/${d}.json`).catch(() => null))).then((files) => {
+      A.loading = Promise.all([...DIVS.map((d) => getJSON(`data/teams/${d}.json`).catch(() => null)), getJSON('data/landslag.json').catch(() => null)]).then((files) => {
+        // landslagen: grupperna och lagen under det svenska namnet (name, som klubbarnas)
+        const L = files.pop();
+        A.land = L && !L.unknown ? { grupper: L.grupper || [], lag: new Map((L.lag || []).map((t) => [t.lag, { ...t, name: t.lag, land: true }])) } : { grupper: [], lag: new Map() };
         const map = new Map();
         const by = new Map();
         files.forEach((f, i) => {
@@ -282,14 +308,15 @@ window.RumRegister = (() => {
       const stats = A.stats || new Map();
       if (!(window.Spoiler && Spoiler.on())) return { veil: false };
       const comps = new Set();
-      for (const m of A.ms) for (const n of [m.home, m.away]) { const t = stats.get(n); if (t) comps.add(t.comp); }
+      for (const m of A.ms) for (const n of [m.home, m.away]) { const t = stats.get(n); if (t) comps.add(t.comp); else if (isLand(m.comp)) comps.add(m.comp); }
       const recent = A.all.filter((m) => comps.has(m.comp) && Spoiler.hides(m.kickoff));
       const n = recent.filter(Spoiler.hidden).length;
       const key = `ans:${recent.map((m) => m.id).sort().join(',')}`;
       return { veil: n > 0 && !Spoiler.isShown(key), key, n };
     }
-    const kort = (n) => up(o.kort(n));
+    const kort = (n) => { const k = o.kort(n); return up(k === n && LANDKORT[n] ? LANDKORT[n] : k); };
     const lagOf = (n) => (A.stats ? A.stats.get(n) : null) || null;
+    const landOf = (n) => (A.land ? A.land.lag.get(n) : null) || null;
     // laget i omgången: matchen och sidan
     const iOmgangen = (name) => { for (const m of A.ms) { if (m.home === name) return { m, side: 'home' }; if (m.away === name) return { m, side: 'away' }; } return null; };
     const omgLag = () => A.ms.flatMap((m) => [m.home, m.away]);
@@ -363,7 +390,7 @@ window.RumRegister = (() => {
       const w = 11;
       // 35 tecken med avsparken (39 när omgången går flera dagar); divisionen
       // står när den ryms, i en spalt så bred som omgångens längsta
-      const div = (m) => DIVK[m.comp] || up(m.comp || '');
+      const div = (m) => (isLand(m.comp) ? landDiv(m) : DIVK[m.comp] || up(m.comp || ''));
       const d0 = Math.max(...A.ms.map((m) => div(m).length));
       const t0 = Math.max(...A.ms.map((m) => tid(m).length));
       const bred = A.bred >= 3 + w + 3 + w + 3 + d0 + 3 + t0;
@@ -403,7 +430,9 @@ window.RumRegister = (() => {
       const nx = d && d.teams && d.teams[side] && d.teams[side].schedule && d.teams[side].schedule.next;
       if (!nx || nx.days == null) return '–';
       const t = lagOf(m[side]);
-      return `${nx.days} D${nx.comp && (!t || nx.comp !== up(t.comp)) ? ` ${up(TAV[nx.comp] || nx.comp)}` : ''}`;
+      // (för ett landslag: tävlingen när den inte är matchens)
+      const egen = t ? up(t.comp) : isLand(m.comp) ? up(m.comp) : null;
+      return `${nx.days} D${nx.comp && nx.comp !== egen ? ` ${up(TAV[nx.comp] || nx.comp)}` : ''}`;
     }
     // lagets bäste skytt (spelarfilen) och hans rad i registret
     function skytten(t) {
@@ -422,6 +451,12 @@ window.RumRegister = (() => {
     // som räknas inom divisionen (styrkan, oddsen, målen, xG och
     // favoritskapet) jämförs bara när lagen spelar i samma, och inget lyser
     // när resultaten är dolda.
+    // tävlingen (för en landskamp med gruppen) och avsparken, på två rader när de inte ryms
+    function underrad(m) {
+      const t = `${tavNamn(m.comp)}${isLand(m.comp) && m.round ? ` · ${up(m.round)}` : ''}`;
+      const a = avspark(m.kickoff);
+      return 4 + t.length + 3 + a.length <= A.bred ? [rad([`    ${t} · ${a}`, 'd'])] : [rad([`    ${t}`, 'd']), rad([`    ${a}`, 'd'])];
+    }
     function akten(m, S, R) {
       const i = A.ms.indexOf(m);
       R.sido = i < 0 ? null : [i > 0 ? `#mote:${A.ms[i - 1].id}` : null, i < A.ms.length - 1 ? `#mote:${A.ms[i + 1].id}` : null];
@@ -431,7 +466,7 @@ window.RumRegister = (() => {
       const lag = [m.home, m.away];
       const sid = ['home', 'away'];
       const T = lag.map(lagOf);
-      const r = [rad([`${padL(i + 1, 2)}  `, 'd'], [`${kort(m.home)} – ${kort(m.away)}`, 'v']), rad([`    ${tavNamn(m.comp)} · ${avspark(m.kickoff)}`, 'd']), tom()];
+      const r = [rad([`${padL(i + 1, 2)}  `, 'd'], [`${kort(m.home)} – ${kort(m.away)}`, 'v']), ...underrad(m), tom()];
       r.push(rad([pad('', L)], ...lag.flatMap((n, j) => [[kort(n).slice(0, K - 1), '', `#lag:${n}`], [j ? '' : pad('', K - Math.min(kort(n).length, K - 1)), '']])));
       if (T[0] && T[1] && T[0].comp !== T[1].comp) r.push(rad([pad('', L)], [pad(DIVK[T[0].comp], K), 'd'], [DIVK[T[1].comp], 'd']));
       // laget med det bättre talet (0 eller 1), eller -1 när de är lika eller okända
@@ -477,6 +512,7 @@ window.RumRegister = (() => {
       const vila = sid.map((s) => vilaOf(m, s));
       r.push(raden('VILAN', vila.map((d) => (d == null ? '–' : `${d} D`)), bast(vila, SKILJER.vila)));
       r.push(raden('NÄSTA', sid.map((s) => nastaOf(m, s))));
+      if (isLand(m.comp)) return [...r, ...landRader(m, S, raden, bast), tom(), ...moten(m)];
       r.push(tom());
       r.push(tal('STYRKA', TAL.styrka, (v) => signed(v, 2), SKILJER.styrka));
       r.push(tal('KRYSSAR', TAL.kryss, pct));
@@ -502,6 +538,62 @@ window.RumRegister = (() => {
       return r;
     }
 
+    // Matchakten för en landskamp: i stället för tavlans tal och lagkortens
+    // (som bara finns för klubbarna) det som finns för landslagen – gruppen,
+    // Nations League hittills, alla landskamper sedan hösten 2024 och
+    // marknadens chans (spelbolagens odds utan marginal, inte modellens). En
+    // rad som saknas för båda lagen står inte med. Det bättre talet lyser som
+    // för klubbarna (SKILJER); placeringen och poängen jämförs bara i samma grupp.
+    function landRader(m, S, raden, bast) {
+      const d = A.match.get(m.id);
+      const D = ['home', 'away'].map((s) => (d && d.teams && d.teams[s]) || null);
+      const LL = [m.home, m.away].map(landOf);
+      const r = [];
+      const ok = (x) => x != null && Number.isFinite(x);
+      // en rad när något av lagen har ett värde; f ger [text, tal att jämföra]
+      const par = (etikett, f, grans) => {
+        const v = [0, 1].map((j) => f(j));
+        if (!v.some((x) => x && x[0] != null)) return;
+        if (S.veil) { r.push(raden(etikett, ['?', '?'])); return; }
+        r.push(raden(etikett, v.map((x) => (x && x[0] != null ? x[0] : '–')), grans ? bast(v.map((x) => (x ? x[1] : null)), grans) : -1));
+      };
+      const tab = (j) => (D[j] && D[j].table) || (LL[j] && LL[j].tabell && { ...LL[j].tabell, size: LL[j].tabell.av, group: LL[j].grupp }) || null;
+      const samma = tab(0) && tab(1) && tab(0).group && tab(0).group === tab(1).group;
+      const vof = (x) => (x && x.n ? [`${x.w}-${x.d}-${x.l}`, (3 * x.w + x.d) / x.n] : null);
+      const mal = (x) => (x && x.n ? [`${num(x.gf / x.n)}–${num(x.ga / x.n)}`, (x.gf - x.ga) / x.n] : null);
+      // Nations League hittills (matchens fil, annars landslag.json) och alla landskamper sedan 2024
+      const nl = (j) => { const a = D[j] && D[j].record && D[j].record.all; if (a) return a; const x = LL[j] && LL[j].nationsLeague; return x ? { n: x.matcher, w: x.v, d: x.o, l: x.f, gf: x.gjorda, ga: x.inslappta } : null; };
+      const alla = (j) => { const x = LL[j] && LL[j].alla; return x ? { n: x.matcher, w: x.v, d: x.o, l: x.f, gf: x.gjorda, ga: x.inslappta, fran: x.fran } : null; };
+      const grupp = (j) => { const t = tab(j); return t && t.rank ? [`${ordtal(t.rank)}${t.size ? ` AV ${t.size}` : ''}`, null] : null; };
+      const poang = (j) => { const t = tab(j); return t && t.points != null ? [`${t.points} PÅ ${t.played}`, samma ? t.points : null] : null; };
+      const g0 = [0, 1].map((j) => tab(j)).find((t) => t && t.group);
+      r.push(tom());
+      par(g0 && samma ? `GRUPP ${up(g0.group)}` : 'GRUPPEN', grupp);
+      par('POÄNG', poang, SKILJER.poang);
+      if ([0, 1].some((j) => nl(j))) {
+        r.push(tom(), rad(['NATIONS LEAGUE', 'd']));
+        par('V-O-F', (j) => vof(nl(j)), SKILJER.ppm);
+        par('MÅL', (j) => mal(nl(j)), SKILJER.mal);
+      }
+      if ([0, 1].some((j) => alla(j))) {
+        const fran = [0, 1].map((j) => alla(j) && alla(j).fran).filter(Boolean).sort()[0];
+        const [y, mn] = fran ? fran.split('-').map(Number) : [];
+        r.push(tom(), rad([`ALLA LANDSKAMPER${fran ? ` SEDAN ${up(MAN[mn - 1])} ${y}` : ''}`, 'd']));
+        par('MATCHER', (j) => { const x = alla(j); return x ? [String(x.n), null] : null; });
+        par('V-O-F', (j) => vof(alla(j)), SKILJER.ppm);
+        par('MÅL', (j) => mal(alla(j)), SKILJER.mal);
+      }
+      // marknadens chans (f.p i matchlistan, mk: marknaden), med krysset under
+      const p = m.f && m.f.p;
+      if (p && p.length === 3) {
+        r.push(tom());
+        r.push(raden('MARKNADEN', [`${p[0]} %`, `${p[2]} %`], bast([p[0] / 100, p[2] / 100], SKILJER.favorit)));
+        const x = `X ${p[1]} % · UR ODDSEN`;
+        r.push(rad([pad('', 12)], [A.bred - 12 >= x.length + 15 ? `${x}, INTE MODELLEN` : x, 'd']));
+      }
+      return r;
+    }
+
     // ---------- platsen i divisionen ----------
 
     // Lagets plats i sin division efter ett av tavlans tal, högst först, som
@@ -518,33 +610,34 @@ window.RumRegister = (() => {
     // ---------- lagen: divisionerna, lagkorten och truppen ----------
 
     const lagIDiv = (d) => [...(A.stats || new Map()).values()].filter((t) => t.comp === d).sort((a, b) => a.name.localeCompare(b.name, 'sv'));
-    // divisionen med flest lag i omgången
+    // divisionen med flest lag i omgången (landslagen räknas som nl)
     function standardDiv() {
       const n = {};
-      for (const x of omgLag()) { const t = lagOf(x); if (t) n[t.comp] = (n[t.comp] || 0) + 1; }
-      return DIVS.slice().sort((a, b) => (n[b] || 0) - (n[a] || 0))[0];
+      for (const x of omgLag()) { const t = lagOf(x) || landOf(x); if (t) { const c = t.land ? 'nl' : t.comp; n[c] = (n[c] || 0) + 1; } }
+      return REG.slice().sort((a, b) => (n[b] || 0) - (n[a] || 0))[0];
     }
     // Underraden i registret säger vad och var: LAG eller SPELARE till
     // vänster, divisionen till höger, de valda omvända. Divisionerna har
     // hela namnen när raden ryms (annars PL, CH, L1 och L2, och namnet står
-    // under strecket).
+    // under strecket). Sist står landslagen (NL, Nations League), som inte har
+    // några spelare i registret: där är SPELARE svagt.
     const SLAG = [['lag', 'LAG', 'div'], ['spelare', 'SPELARE', 'spelarna']];
-    const helaNamn = () => 20 + DIVS.reduce((n, x) => n + DIVNAME[x].length + 3, -3) <= A.bred;
+    const helaNamn = () => 20 + REG.reduce((n, x) => n + REGNAMN[x].length + 3, -3) <= A.bred;
     function regRad(slag, d) {
       const typ = SLAG.find(([id]) => id === slag)[2];
       const hela = helaNamn();
       return rad(
-        ...SLAG.flatMap(([id, namn, t]) => [[namn, id === slag ? 'i' : '', id === slag ? null : `#${t}:${d}`], ['   ', '']]),
+        ...SLAG.flatMap(([id, namn, t]) => [[namn, id === slag ? 'i' : d === 'nl' ? 'd' : '', id === slag || d === 'nl' ? null : `#${t}:${d}`], ['   ', '']]),
         ['|', 'd'], ['   ', ''],
-        ...DIVS.flatMap((x, k) => [[hela ? up(DIVNAME[x]) : DIVK[x], x === d ? 'i' : '', x === d ? null : `#${typ}:${x}`], [k < DIVS.length - 1 ? '   ' : '', '']]),
+        ...REG.flatMap((x, k) => [[hela ? up(REGNAMN[x]) : REGK[x], x === d ? 'i' : '', x === d ? null : `#${x === 'nl' ? 'div' : typ}:${x}`], [k < REG.length - 1 ? '   ' : '', '']]),
       );
     }
-    // en division: lagen i bokstavsordning (två spalter på datorn), lagen i
-    // omgången ljusa
+    // en division: lagen i bokstavsordning (två spalter på datorn)
     function lagen(div, R) {
-      const d = DIVS.includes(div) ? div : standardDiv();
-      const j = DIVS.indexOf(d);
-      R.sido = [j > 0 ? `#div:${DIVS[j - 1]}` : null, j < DIVS.length - 1 ? `#div:${DIVS[j + 1]}` : null];
+      const d = REG.includes(div) ? div : standardDiv();
+      if (d === 'nl') return landslagen(R);
+      const j = REG.indexOf(d);
+      R.sido = [j > 0 ? `#div:${REG[j - 1]}` : null, j < REG.length - 1 ? `#div:${REG[j + 1]}` : null];
       const smal = A.bred < 60;
       const r = [regRad('lag', d), streck()];
       if (!helaNamn()) r.push(rad([up(DIVNAME[d]), 'd']));
@@ -559,9 +652,94 @@ window.RumRegister = (() => {
           const t = l[x * h + y];
           if (!t) continue;
           const namn = up(t.name).slice(0, w - 2);
-          b.push([namn, iOmgangen(t.name) ? 'v' : '', `#lag:${t.name}`], [pad('', w - namn.length), '']);
+          b.push([namn, '', `#lag:${t.name}`], [pad('', w - namn.length), '']);
         }
         r.push(rad(...b));
+      }
+      return r;
+    }
+
+    // ---------- landslagen ----------
+
+    // Nations Leagues grupper med tabellen: plats, lag, spelade, V O F när
+    // raden ryms, målskillnad och poäng. Alla grupperna i ordning (A1–D2),
+    // utan någon särskild del eller markering för lagen i kupongen. Två
+    // spalter när raden ryms, annars en. Ett lag öppnar lagkortet.
+    function landslagen(R) {
+      R.sido = [`#div:${REG[REG.length - 2]}`, null];
+      R.slojas = true;
+      const S = slojan();
+      const r = [regRad('lag', 'nl'), streck()];
+      if (!helaNamn()) r.push(rad([up(REGNAMN.nl), 'd']));
+      if (!A.land) return [...r, prickar('HÄMTAR', '')];
+      const G = A.land.grupper;
+      if (!G.length) return [...r, rad('OKÄNT')];
+      const k = A.bred >= 60 ? 2 : 1;
+      const cw = k === 2 ? Math.floor((A.bred - 3) / 2) : A.bred;
+      const vof = cw - 23 >= 12;
+      const N = cw - (vof ? 23 : 14);
+      const svar = (x) => (S.veil ? '?' : x);
+      // ett block per grupp: rubriken och lagen, alla lika höga
+      const H = Math.max(...G.map((g) => g.lag.length));
+      const block = (g) => {
+        const b = [[[pad(`GRUPP ${g.id}`, 2 + N + 1), 'd'],[`${padL('S', 2)}${vof ? `${padL('V', 3)}${padL('O', 3)}${padL('F', 3)}` : ''}${padL('+/-', 5)}${padL('P', 4)}`, 'd']]];
+        for (const t of g.lag) {
+          const namn = (up(t.lag).length > N && LANDKORT[t.lag] ? up(LANDKORT[t.lag]) : up(t.lag)).slice(0, N);
+          const tal = `${padL(svar(t.played), 2)}${vof ? `${padL(svar(t.won), 3)}${padL(svar(t.drawn), 3)}${padL(svar(t.lost), 3)}` : ''}${padL(svar(S.veil ? '?' : t.gd > 0 ? `+${t.gd}` : t.gd < 0 ? `−${-t.gd}` : '0'), 5)}${padL(svar(t.points), 4)}`;
+          b.push([[`${svar(t.rank)} `, 'd'], [namn, '', `#lag:${t.lag}`], [pad('', N + 1 - namn.length), ''], [tal, '']]);
+        }
+        while (b.length < H + 1) b.push([[pad('', cw), '']]);
+        return b;
+      };
+      for (let i = 0; i < G.length; i += k) {
+        const bl = G.slice(i, i + k).map(block);
+        r.push(tom());
+        for (let y = 0; y < H + 1; y++) r.push(rad(...bl.flatMap((b, x) => (x ? [['   ', ''], ...b[y]] : b[y]))));
+      }
+      return r;
+    }
+
+    // Lagkortet för ett landslag (data/landslag.json): omgångens match,
+    // gruppen och tabellraden, formen, Nations League hittills, alla
+    // landskamper sedan hösten 2024 och nästa match, och sedan de tio senaste
+    // landskamperna. ←/→ bläddrar bland lagen i gruppen.
+    function landkort(t, S, R) {
+      const g = A.land.grupper.find((x) => x.id === t.grupp);
+      const l = g ? g.lag : [];
+      const i = l.findIndex((x) => x.lag === t.lag);
+      if (i >= 0) R.sido = [i > 0 ? `#lag:${l[i - 1].lag}` : null, i < l.length - 1 ? `#lag:${l[i + 1].lag}` : null];
+      R.slojas = true;
+      const falt = (etikett, ...v) => rad([pad(etikett, 12), 'd'], ...v.map((x) => (Array.isArray(x) ? x : [x, ''])));
+      const r = [rad([up(t.lag), 'v'], [t.en && t.en !== t.lag ? `  ${up(t.en)}` : '', 'd']),
+        rad([`LANDSLAG${t.grupp ? ` · NATIONS LEAGUE GRUPP ${t.grupp}` : ''}`, 'd', '#div:nl']), tom()];
+      const om = iOmgangen(t.lag);
+      if (om) r.push(falt('OMGÅNGEN', [`${nrAv(om.m)}  ${kort(om.m.home)} – ${kort(om.m.away)}`, '', `#mote:${om.m.id}`]));
+      const tb = t.tabell;
+      if (tb && tb.rank) r.push(falt(`GRUPP ${t.grupp || ''}`.trim(), S.veil ? '?' : `${ordtal(tb.rank)} AV ${tb.av} · ${tb.points} P PÅ ${tb.played} · ${tb.gd > 0 ? '+' : tb.gd < 0 ? '−' : ''}${Math.abs(tb.gd)}`));
+      const sen = t.senaste || [];
+      const dold = (x) => Boolean(window.Spoiler && Spoiler.hidesDay(x.datum) && (!Spoiler.hiddenId || Spoiler.hiddenId(x.id) !== false));
+      if (sen.length) r.push(falt('FORMEN', sen.slice(0, 5).map((x) => (dold(x) ? '?' : x.utfall || '?')).join('')));
+      const rec = (x) => (S.veil ? '?' : `${x.v}-${x.o}-${x.f} · MÅL ${x.gjorda}–${x.inslappta}`);
+      const nlr = t.nationsLeague;
+      if (nlr && nlr.matcher) r.push(falt('NATIONS L.', rec(nlr)));
+      const a = t.alla;
+      if (a && a.matcher) {
+        r.push(falt('LANDSKAMPER', S.veil ? '?' : `${a.matcher} M · ${rec(a)}`));
+        if (a.fran) r.push(rad([pad('', 12)], [`SEDAN ${up(dag(a.fran))}`, 'd']));
+      }
+      const nx = t.nasta;
+      if (nx && nx.datum) {
+        const dagar = dayNo(Date.parse(nx.datum)) - dayNo(Date.now());
+        r.push(falt('NÄSTA', [kort(nx.motstand), '', landOf(nx.motstand) ? `#lag:${nx.motstand}` : null],
+          ` ${nx.hemma ? 'HEMMA' : 'BORTA'} ${dagar > 0 ? `OM ${dagar} D` : dagar === 0 ? 'I DAG' : ''}${nx.turnering && nx.turnering !== 'UNL' ? ` (${nx.turnering})` : ''}`));
+      }
+      if (!sen.length) return r;
+      r.push(tom(), rad(['DE SENASTE LANDSKAMPERNA', 'd']));
+      for (const x of sen) {
+        const h = dold(x);
+        r.push(rad([`${pad(up(dag(x.datum)), 12)}${pad(x.turnering || '', 4)}${x.hemma ? 'H' : 'B'} `, 'd'],
+          [pad(kort(x.motstand).slice(0, 11), 11), '', landOf(x.motstand) ? `#lag:${x.motstand}` : null],
+          [`  ${h || !x.mal ? '?' : `${x.mal[0]}–${x.mal[1]}`}`, 'v'], [`  ${h ? '' : x.utfall || ''}`, 'd']));
       }
       return r;
     }
@@ -642,8 +820,9 @@ window.RumRegister = (() => {
     // speltiden och målen; ordningen avslöjar inget.
     function spelarna(div, S, R) {
       const d = DIVS.includes(div) ? div : standardDiv();
+      if (d === 'nl') return landslagen(R);
       const j = DIVS.indexOf(d);
-      R.sido = [j > 0 ? `#spelarna:${DIVS[j - 1]}` : null, j < DIVS.length - 1 ? `#spelarna:${DIVS[j + 1]}` : null];
+      R.sido = [j > 0 ? `#spelarna:${DIVS[j - 1]}` : null, j < DIVS.length - 1 ? `#spelarna:${DIVS[j + 1]}` : '#div:nl'];
       R.slojas = true;
       const r = [regRad('spelare', d), streck()];
       if (!A.P) return [...r, prickar('HÄMTAR', '')];
@@ -749,7 +928,7 @@ window.RumRegister = (() => {
     // spelarna efter speltid (full vid 1 500 minuter); lag och spelare i
     // omgången också lite före.
     const TROLIGT = { mote: 0.6, del: 0.2, lag: 0, spelare: -0.6 };
-    const DIVPLUS = { pl: 0.1, ch: 0.05, l1: 0.02, l2: 0 };
+    const DIVPLUS = { pl: 0.1, ch: 0.05, l1: 0.02, l2: 0, nl: 0.05 };
     // efternamnets ord (som efternamn(): van, de … hör till efternamnet)
     function efOrd(t) {
       let i = t.length - 1;
@@ -813,6 +992,7 @@ window.RumRegister = (() => {
       { namn: 'REGISTRET', typ: 'FLIK', q: '#flik:lagen', ord: ['registret', 'register', 'lagen', 'trupperna', 'ligorna', 'divisionerna'] },
       { namn: 'SPELARE', typ: 'REGISTRET', q: '#spelarna:', ord: ['spelare', 'spelarna'] },
       ...DIVS.map((d) => ({ namn: up(DIVNAME[d]), typ: 'DIVISION', q: `#div:${d}`, ord: [norm(DIVNAME[d]), d, { pl: 'premier', ch: 'champ', l1: 'league 1', l2: 'league 2' }[d]] })),
+      { namn: 'NATIONS LEAGUE', typ: 'LANDSLAG', q: '#div:nl', ord: ['nations league', 'nations', 'nl', 'landslag', 'landslagen', 'landskamper', 'landskamperna'] },
     ];
     // Alla träffar på frågan, den mest sannolika först (p, se ovan)
     function sok(text) {
@@ -820,11 +1000,13 @@ window.RumRegister = (() => {
       const q = qn.split(' ').filter(Boolean);
       if (!q.length) return [];
       const hits = [];
-      const lag = [...(A.stats || new Map()).values()];
+      // (klubbarna och landslagen; ett landslag heter också som på engelska och
+      // har sin landskod: sverige, sweden, swe)
+      const lag = [...(A.stats || new Map()).values(), ...(A.land ? A.land.lag.values() : [])];
       const iOmg = new Set(omgLag());
-      const namnen = (t) => { const a = norm(t.name); const b = norm(o.kort(t.name)); return a === b ? [a] : [a, b]; };
+      const namnen = (t) => [...new Set([t.name, o.kort(t.name), ...(t.land ? [t.en, t.kod, LANDKORT[t.name]] : [])].filter(Boolean).map(norm))];
       const lagTok = (t) => [...namnen(t).join(' ').split(' '), ...(ALIAS[t.name] ? [ALIAS[t.name]] : [])];
-      const lagPlus = (t) => TROLIGT.lag + (DIVPLUS[t.comp] || 0) + (iOmg.has(t.name) ? 0.1 : 0);
+      const lagPlus = (t) => TROLIGT.lag + (t.land ? DIVPLUS.nl : DIVPLUS[t.comp] || 0) + (iOmg.has(t.name) ? 0.1 : 0);
       const spelPlus = (x) => TROLIGT.spelare + 0.2 * Math.min(1, (x.p.min || 0) / 1500) + (DIVPLUS[x.div] || 0) + (iOmg.has(x.p.team) ? 0.05 : 0);
       for (const d of DELAR) {
         // hela ordet, eller början av det från tre bokstäver
@@ -841,8 +1023,10 @@ window.RumRegister = (() => {
       }
       // ett möte i omgången: båda lagen ur frågan
       for (const m of A.ms) {
-        const h = [m.home, o.kort(m.home)].map(norm).join(' ').split(' ');
-        const b = [m.away, o.kort(m.away)].map(norm).join(' ').split(' ');
+        // (ett landslag också på engelska: sweden bosnia)
+        const en = (n) => { const t = landOf(n); return t ? [t.en, t.kod] : []; };
+        const h = [m.home, o.kort(m.home), ...en(m.home)].map(norm).join(' ').split(' ');
+        const b = [m.away, o.kort(m.away), ...en(m.away)].map(norm).join(' ').split(' ');
         const iH = (w) => h.some((x) => x.startsWith(w));
         const iB = (w) => b.some((x) => x.startsWith(w));
         if (q.length > 1 && q.every((w) => iH(w) || iB(w)) && q.some((w) => iH(w) && !iB(w)) && q.some((w) => iB(w) && !iH(w))) hits.push({ typ: 'mote', m, p: TROLIGT.mote });
@@ -881,7 +1065,7 @@ window.RumRegister = (() => {
       const nr = [`${padL(i + 1, 2)}  `, 'd'];
       const q = `#${i + 1}`;
       const W = Math.min(28, A.bred - 12);
-      if (h.typ === 'lag') return radQ(q, nr, pad(up(h.t.name).slice(0, W - 1), W), [`LAG ${DIVK[h.t.comp] || ''}`, 'd']);
+      if (h.typ === 'lag') return radQ(q, nr, pad(up(h.t.name).slice(0, W - 1), W), [h.t.land ? `LANDSLAG${h.t.grupp ? ` ${h.t.grupp}` : ''}`.slice(0, A.bred - 4 - W) : `LAG ${DIVK[h.t.comp] || ''}`, 'd']);
       if (h.typ === 'mote') return radQ(q, nr, pad(`${kort(h.m.home)} – ${kort(h.m.away)}`, W), ['MÖTE', 'd']);
       if (h.typ === 'del') return radQ(q, nr, pad(h.d.namn, W), [h.d.typ, 'd']);
       return radQ(q, nr, pad(efternamn(h.x.p.name).slice(0, W - 1), W), [kort(h.x.p.team), 'd']);
@@ -948,6 +1132,8 @@ window.RumRegister = (() => {
       }
       const t = vy.lag && lagOf(vy.lag);
       if (t) return lagkort(t, S, R);
+      const tl = vy.lag && landOf(vy.lag);
+      if (tl) return landkort(tl, S, R);
       return vy.slag === 'spelare' ? spelarna(vy.div, S, R) : lagen(vy.div, R);
     }
 
@@ -1056,7 +1242,7 @@ window.RumRegister = (() => {
       if (typ === 'mote') return { flik: 'kupongen', mote: id };
       if (typ === 'div') return { flik: 'lagen', div: id };
       if (typ === 'spelarna') return { flik: 'lagen', div: id, slag: 'spelare' };
-      if (typ === 'lag') return lagOf(id) ? { flik: 'lagen', lag: id } : null;
+      if (typ === 'lag') return lagOf(id) || landOf(id) ? { flik: 'lagen', lag: id } : null;
       if (typ === 'spelare') return { flik: 'lagen', spelare: id };
       if (typ === 'flik') return { flik: GAMLA[id] || id };
       return null;

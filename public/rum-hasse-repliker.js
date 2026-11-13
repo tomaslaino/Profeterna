@@ -1127,6 +1127,59 @@
     'Jag tvekar aldrig, och det borde inte du heller.',
   ],
 
+  // Landskamperna (Nations League i landslagsuppehållet, se README, Landskamperna). Han ser på dem som den
+  // gamla klubbtränaren han är: organisation, några dagars samling och ett landslag som inte kan köpa
+  // spelare. Inget om division, tabellen i ligan eller supportrarnas poddar, och inga namn på riktiga
+  // förbundskaptener eller spelare. oppning när kupongen har minst tre landskamper, ibland i stället för de
+  // vanliga; ledig blandas med de vanliga, ledigSverige när Sverige spelar och ledigGranne när Norge eller
+  // Danmark gör det. val, sverige och granne när man har valt en landskamp (Sveriges, Norges eller Danmarks),
+  // ibland i stället för val och valLasa, och lika korta som dem: högst 31 tecken (landRader i rum-hasse.js).
+  land: {
+    oppning: [
+      'Det är landslagsuppehåll. Vilken match tar vi först?',
+      'Kupongen är full av landskamper. Vilken match tar vi först?',
+      'Nu är det landslagen som gäller. Vilken match vill du börja med?',
+      'Landslagsuppehållet är min favoritvecka. Vilken match tar vi?',
+      'Landskamper är min specialitet. Vilken match vill du ha svar på?',
+    ],
+    ledig: [
+      'I landslagsuppehållet gissar spelbolagen mer än vanligt.',
+      'En förbundskapten har spelarna några dagar. Då avgör organisationen.',
+      'Ett landslag kan inte köpa spelare. Man får spela med dem man har.',
+      'Nations League är ingen träningsmatch, vad folk än säger.',
+      'Folk tror att landskamper är lotteri. Jag ser organisation.',
+    ],
+    ledigSverige: [
+      'Sverige spelar, och halva landet tippar med hjärtat. Jag tippar med huvudet.',
+      'När Sverige spelar ska man hålla huvudet kallt.',
+    ],
+    ledigGranne: [
+      'Grannarna spelar också. Dem håller jag alltid ett öga på.',
+      'Grannarna har jag följt längre än de flesta.',
+    ],
+    val: [
+      'Landskamper kan jag utantill.',
+      'Där avgör organisationen.',
+      'Landslag är lättare än klubbar.',
+      'Nations League är mitt bord.',
+      'Landskamper tippar jag gärna.',
+      'Tre dagars samling syns i den.',
+      'Landskamper är min hemmaplan.',
+    ],
+    sverige: [
+      'Den tippar jag med huvudet.',
+      'Där är jag opartisk och säker.',
+      'Den har jag läst extra noga.',
+      'Där vet jag mer än förbundet.',
+      'Blågult har jag full koll på.',
+    ],
+    granne: [
+      'Grannarna har jag full koll på.',
+      'Grannlandet känner jag väl.',
+      'Grannarna har jag följt länge.',
+    ],
+  },
+
   // När man har valt en match: han svarar och frågar tillbaka. valLasa när analysen finns
   // och val när den inte finns. Han har alltid svaret, också när han inte har det.
   val: [
@@ -1188,22 +1241,34 @@
     'Den har jag sett igenom.',
     'Den rymmer inga överraskningar.',
   ],
+  // Matchen står ovanför frågan, så "den" syftar på den. Säg vad det är man gissar på (inte "hur det går").
   fragaTillbaka: [
-    'Vill du veta, eller ska du gissa?',
-    'Vill du ha svaret, eller gissar du?',
-    'Ska jag säga hur det går, eller gissar du?',
+    'Ska jag säga hur matchen slutar, eller vill du gissa själv?',
+    'Ska jag tala om hur den går, eller vill du gissa själv?',
+    'Vill du höra hur den slutar, eller gissar du hellre själv?',
+    'Ska jag ge dig resultatet, eller vill du gissa först?',
+    'Ska jag avslöja hur den slutar, eller vill du försöka själv?',
+    'Vill du ha facit direkt, eller vill du gissa själv först?',
+    'Ska jag säga hur den slutar, eller vill du gissa och ha fel?',
+    'Jag vet hur den slutar. Ska jag säga det, eller gissar du själv?',
+    'Ska jag spara dig besväret, eller vill du gissa själv?',
     'Vill du ha rätt, eller vill du gissa?',
     'Vill du veta hur den slutar, eller vill du bli överraskad?',
-    'Ska jag tala om hur den slutar, eller vill du ha fel?',
     'Vill du ha mitt svar, eller litar du på ditt eget?',
     'Ska du ha svaret, eller ska du chansa?',
     'Ska jag säga som det är, eller vill du ha kvar hoppet?',
     'Vill du ha svaret nu, eller ska du gissa först?',
-    'Ska jag säga det rakt ut, eller vill du gissa?',
+    'Ska jag säga rakt ut hur den slutar, eller vill du gissa?',
     'Vill du ha facit, eller vill du chansa?',
     'Ska du ha mitt svar, eller nöjer du dig med en gissning?',
-    'Vill du veta hur det går, eller ska du lita på turen?',
-    'Ska jag tala om det, eller lär du dig av dina misstag?',
+    'Vill du veta hur den slutar, eller litar du på turen?',
+    'Ska jag tala om resultatet, eller lär du dig hellre av dina misstag?',
+    'Ska jag berätta hur den slutar, eller vill du bli besviken själv?',
+    'Ska jag säga hur den slutar, eller vill du ha lite spänning kvar?',
+    'Ska jag läsa upp facit, eller vill du pröva lyckan först?',
+    'Vill du höra mitt tips, eller kör du på magkänslan?',
+    'Ska jag avgöra den åt dig, eller vill du gissa själv?',
+    'Ska jag ta den åt dig, eller vill du ha äran själv?',
   ],
   // Om man inte svarar på frågan. Högst en rad (cirka 30 tecken), annars flyttar sig knapparna, och raden får
   // inte syfta på frågan: i telefonen syns den inte alltid.

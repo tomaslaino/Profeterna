@@ -5,7 +5,7 @@
 // (staleAfterHours). Metadatan (leverantör, vad den ger, verifieringsdatum)
 // visas i källtabellen – samma uppgifter som README:ns källtabell.
 
-const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, SEASON, HISTORY, fdSeasonCode } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, LANDSLAG_HISTORIK, SEASON, HISTORY, fdSeasonCode } = require('../config/competitions');
 const espn = require('./fetchers/espn');
 const fdcouk = require('./fetchers/fdcouk');
 const understat = require('./fetchers/understat');
@@ -15,6 +15,7 @@ const youtube = require('./fetchers/youtube');
 const fs = require('fs');
 const path = require('path');
 const { readCache, CACHE_DIR } = require('./store');
+const { svenskt } = require('../config/landslag');
 
 const VERIFIED = '2026-10-17';
 const ODDS_WINDOW_DAYS = 7;
@@ -81,6 +82,74 @@ for (const c of EUROPE) {
   });
 }
 
+// Landskamperna (ESPN): spelprogram och resultat för Nations League, EM-kvalet
+// och vänskapsmatcherna, som tävlingarna ovan. Vänskapsmatcherna gäller hela
+// världen; sajten tar bara med dem där ett europeiskt landslag spelar
+// (src/matches.js).
+for (const c of INTERNATIONAL) {
+  SOURCES.push({
+    id: `espn_fixtures_${c.id}`,
+    provider: 'ESPN',
+    short: 'ESPN',
+    label: `Spelprogram och resultat – ${c.name}${c.europa ? ' (hela världen; sajten visar de europeiska)' : ''}`,
+    comps: [c.id],
+    kinds: ['fixtures'],
+    maxAgeHours: 0.4,
+    staleAfterHours: 6,
+    verified: '2026-11-13',
+    fetch: () => espn.fetchFixtures(c.espn, SEASON),
+    summarize: (d) => {
+      const played = d.matches.filter((m) => m.completed);
+      return {
+        n: d.matches.length,
+        detail: d.matches.length ? `${played.length} spelade av ${d.matches.length}` : 'inga matcher publicerade än',
+        latestData: played.length ? played[played.length - 1].kickoff.slice(0, 10) : null,
+      };
+    },
+  });
+}
+
+// Nations Leagues tabell: alla grupperna (A1–D2).
+SOURCES.push({
+  id: 'espn_tabell_unl',
+  provider: 'ESPN',
+  short: 'ESPN',
+  label: 'Tabell – Nations League, alla grupper',
+  comps: ['unl'],
+  kinds: ['table'],
+  maxAgeHours: 3,
+  staleAfterHours: 24,
+  verified: '2026-11-13',
+  fetch: () => espn.fetchGroupStandings('uefa.nations'),
+  summarize: (d) => ({ n: d.groups.length, detail: `${d.groups.length} grupper, ${d.groups.reduce((t, g) => t + g.rows.length, 0)} lag` }),
+});
+
+// Landslagens tidigare matcher (VM, VM-kvalet, förra Nations League och
+// vänskapsmatcherna): formen och mötena inför landskamperna. Avslutade
+// turneringar – en gång i veckan räcker.
+SOURCES.push({
+  id: 'espn_land_historik',
+  provider: 'ESPN',
+  short: 'ESPN',
+  label: 'Landslagens tidigare matcher (för form och möten)',
+  comps: INTERNATIONAL.map((c) => c.id),
+  kinds: ['history'],
+  maxAgeHours: 24 * 7,
+  staleAfterHours: 24 * 30,
+  verified: '2026-11-13',
+  fetch: async () => {
+    const turneringar = [];
+    for (const t of LANDSLAG_HISTORIK) {
+      turneringar.push({ slug: t.slug, namn: t.namn, short: t.short, matches: await espn.fetchPlayed(t.slug, t.months) });
+    }
+    return { turneringar, sourceUrl: 'https://www.espn.com/soccer/schedule/_/league/uefa.nations' };
+  },
+  summarize: (d) => {
+    const n = d.turneringar.reduce((t, x) => t + x.matches.length, 0);
+    return { n, detail: d.turneringar.map((x) => `${x.namn} ${x.matches.length}`).join(', ') };
+  },
+});
+
 for (const c of COMPETITIONS.filter((x) => x.type === 'league')) {
   SOURCES.push({
     id: `espn_standings_${c.id}`,
@@ -117,6 +186,47 @@ SOURCES.push({
   summarize: (d) => ({
     n: Object.keys(d.byEvent).length,
     detail: `${Object.keys(d.byEvent).length} av ${d.requested} matcher har odds`,
+  }),
+});
+
+// Odds för landskamperna (DraftKings via ESPN): prognosen för dem är
+// marknadens (src/forecast.js). Läser sin egen förra hämtning och behåller
+// oddsen för spelade matcher – de ligger kvar i sammanfattningen efter
+// matchen, så den sista hämtningen nära avspark står kvar. Frågar om alla
+// europeiska landskamper från tre dagar bakåt till sju dagar fram.
+SOURCES.push({
+  id: 'espn_odds_land',
+  provider: 'ESPN (DraftKings)',
+  short: 'DraftKings',
+  label: `Odds 1X2 och över/under, landskamperna inom ${ODDS_WINDOW_DAYS} dagar`,
+  comps: INTERNATIONAL.map((c) => c.id),
+  kinds: ['odds'],
+  maxAgeHours: 2,
+  staleAfterHours: 24,
+  verified: '2026-11-13',
+  stage: 2,
+  fetch: async () => {
+    const now = Date.now();
+    const europa = landEuropa();
+    if (!europa) throw new Error('inget spelprogram för Nations League i cachen än');
+    const events = [];
+    for (const c of INTERNATIONAL) {
+      const cache = readCache(`espn_fixtures_${c.id}`);
+      for (const m of (cache && cache.data && cache.data.matches) || []) {
+        const t = Date.parse(m.kickoff);
+        if (t < now - 3 * 86400000 || t > now + ODDS_WINDOW_DAYS * 86400000) continue;
+        if (c.europa && !europa.has(m.home.espnId) && !europa.has(m.away.espnId)) continue;
+        events.push({ slug: c.espn, id: m.id });
+      }
+    }
+    const prev = readCache('espn_odds_land');
+    const got = await espn.fetchOdds(events, { tolerant: true });
+    const byEvent = { ...((prev && prev.data && prev.data.byEvent) || {}), ...got.byEvent };
+    return { byEvent, requested: got.requested, missing: got.missing, failed: got.failed };
+  },
+  summarize: (d) => ({
+    n: Object.keys(d.byEvent).length,
+    detail: `${Object.keys(d.byEvent).length} landskamper med odds (senast ${d.requested - d.missing - (d.failed || []).length} av ${d.requested})`,
   }),
 });
 
@@ -385,39 +495,67 @@ SOURCES.push({
   id: 'espn_skoldar',
   provider: 'ESPN',
   short: 'ESPN',
-  label: 'Lagsköldar',
-  comps: COMPETITIONS.map((c) => c.id),
+  label: 'Lagsköldar och landslagens flaggor',
+  comps: [...COMPETITIONS, ...INTERNATIONAL].map((c) => c.id),
   kinds: ['crests'],
   maxAgeHours: 24 * 7,
   staleAfterHours: 24 * 30,
   verified: '2026-10-21',
   stage: 2,
   fetch: async () => {
-    const byId = new Map();
-    for (const c of COMPETITIONS) {
-      const cache = readCache(`espn_fixtures_${c.id}`);
-      for (const m of (cache && cache.data && cache.data.matches) || []) {
-        for (const t of [m.home, m.away]) if (t && t.espnId) byId.set(t.espnId, { espnId: t.espnId, name: t.name });
-      }
-    }
+    const byId = skoldarLag();
     if (!byId.size) throw new Error('inget spelprogram i cachen än');
-    const dir = path.join(CACHE_DIR, 'skoldar');
-    fs.mkdirSync(dir, { recursive: true });
-    const teams = {};
-    const missing = [];
-    for (const t of await espn.fetchCrests([...byId.values()])) {
-      if (!t.light) { missing.push(t.name); continue; }
-      fs.writeFileSync(path.join(dir, `${t.espnId}.png`), t.light);
-      if (t.dark) fs.writeFileSync(path.join(dir, `${t.espnId}-m.png`), t.dark);
-      teams[t.name] = [t.espnId, t.dark ? 1 : 0];
-    }
-    return { teams, missing: missing.sort(), sourceUrl: 'https://www.espn.com/soccer/teams/_/league/eng.1' };
+    return hamtaSkoldar(byId);
+  },
+  // Nya lag (landslagen när landskamperna kom in) hämtas direkt, inte först
+  // när veckan har gått.
+  due: (d) => {
+    const kanda = new Set([...Object.keys(d.teams || {}), ...(d.missing || [])]);
+    return [...skoldarLag().values()].some((t) => !kanda.has(t.name));
   },
   summarize: (d) => {
     const n = Object.keys(d.teams).length;
     return { n, detail: `${n} lag` + (d.missing.length ? `, ingen sköld för ${d.missing.join(', ')}` : '') };
   },
 });
+
+// Lagen som ska ha en sköld: alla i spelprogrammen, ESPN-id → {espnId, name}.
+// Landslagen får flaggan, under det svenska namnet som sajten visar
+// (config/landslag.js); vänskapsmatcherna bara med ett europeiskt lag.
+function skoldarLag() {
+  const byId = new Map();
+  for (const c of COMPETITIONS) {
+    const cache = readCache(`espn_fixtures_${c.id}`);
+    for (const m of (cache && cache.data && cache.data.matches) || []) {
+      for (const t of [m.home, m.away]) if (t && t.espnId) byId.set(t.espnId, { espnId: t.espnId, name: t.name });
+    }
+  }
+  const europa = landEuropa() || new Set();
+  for (const c of INTERNATIONAL) {
+    const cache = readCache(`espn_fixtures_${c.id}`);
+    for (const m of (cache && cache.data && cache.data.matches) || []) {
+      if (c.europa && !europa.has(m.home.espnId) && !europa.has(m.away.espnId)) continue;
+      for (const t of [m.home, m.away]) {
+        if (t && t.espnId) byId.set(t.espnId, { espnId: t.espnId, name: svenskt(t.name), land: t.land || (t.abbr ? t.abbr.toLowerCase() : null) });
+      }
+    }
+  }
+  return byId;
+}
+
+async function hamtaSkoldar(byId) {
+  const dir = path.join(CACHE_DIR, 'skoldar');
+  fs.mkdirSync(dir, { recursive: true });
+  const teams = {};
+  const missing = [];
+  for (const t of await espn.fetchCrests([...byId.values()])) {
+    if (!t.light) { missing.push(t.name); continue; }
+    fs.writeFileSync(path.join(dir, `${t.espnId}.png`), t.light);
+    if (t.dark) fs.writeFileSync(path.join(dir, `${t.espnId}-m.png`), t.dark);
+    teams[t.name] = [t.espnId, t.dark ? 1 : 0];
+  }
+  return { teams, missing: missing.sort(), sourceUrl: 'https://www.espn.com/soccer/teams/_/league/eng.1' };
+}
 
 // 2000 → "2000/01"
 function seasonLabel(y) {
@@ -467,7 +605,17 @@ function playedEurope() {
   return out;
 }
 
+// De europeiska landslagen: ESPN-id för alla lag i Nations League, ur
+// cachen. null = inget spelprogram cachat än.
+function landEuropa() {
+  const cache = readCache('espn_fixtures_unl');
+  if (!cache || !cache.data) return null;
+  const ids = new Set();
+  for (const m of cache.data.matches) for (const t of [m.home, m.away]) if (t && t.espnId) ids.add(t.espnId);
+  return ids.size ? ids : null;
+}
+
 // Trupper och spelarstatistik per liga (src/playersources.js).
 SOURCES.push(...require('./playersources').PLAYER_SOURCES);
 
-module.exports = { SOURCES, VERIFIED, ODDS_WINDOW_DAYS };
+module.exports = { SOURCES, VERIFIED, ODDS_WINDOW_DAYS, landEuropa };

@@ -102,7 +102,9 @@
   const KORT = { 'AFC Wimbledon': 'Wimbledon', 'Crewe Alexandra': 'Crewe', 'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton',
     'Wolverhampton Wanderers': 'Wolves', 'West Bromwich Albion': 'West Brom', 'Queens Park Rangers': 'QPR', 'Nottingham Forest': "Nott'm Forest",
     'AFC Bournemouth': 'Bournemouth', 'Preston North End': 'Preston', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd',
-    'Milton Keynes Dons': 'MK Dons', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County' };
+    'Milton Keynes Dons': 'MK Dons', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County',
+    // landslagen (svenska namn som hos Svenska Spel, config/landslag.js): de flesta är korta nog
+    'Bosnien & Hercegovina': 'Bosnien' };
   const kort = (name) => KORT[name] || String(name || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
 
   // Streckkoden längst ner, ur kupongens id.
@@ -165,7 +167,7 @@
       const odds = r.pr ? pctOdds(r.pr[i]) : '';
       return `<span class="pp-cell"><span class="pp-box${on ? ' on' : ''}${res ? ' res' : ''}"><i>${s}</i>` +
         (on ? cross(`${r.id}${s}`) : '') + (res ? ring(`${r.id}${s}`) : '') + '</span>' +
-        (r.pr ? `<small${r.tip === i ? ' class="fav"' : ''}>${odds}</small>` : '') + '</span>';
+        (r.pr ? oddsSmall(r.m, odds, r.tip === i ? 'fav' : '') : '') + '</span>';
     }).join('');
   }
 
@@ -218,7 +220,7 @@
       }
       html += row(r, i, !days);
     });
-    return html;
+    return html + mkLegend(g.rows.map((r) => r.m));
   }
 
   // ---------- foten ----------
@@ -380,7 +382,7 @@
       const p = m && m.f ? m.f.p : null;
       cells = '<span class="kp-tg">' + SIGNS.map((s, k) =>
         `<button type="button" data-s="${s}" aria-pressed="${sign.includes(s)}" aria-label="${s} för ${esc(label)}">` +
-        `${s}<small>${p ? pctOdds(p[k]) : '–'}</small></button>`).join('') + '</span>';
+        `${s}${oddsSmall(m, p ? pctOdds(p[k]) : '–')}</button>`).join('') + '</span>';
     } else {
       // Startad (står som den stod) eller omgången (fylls i av var och en).
       cells = '<span class="pp-signs" aria-hidden="true">' + SIGNS.map((s) =>

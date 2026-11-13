@@ -25,6 +25,8 @@
 //                          kommentar (sidan Historik, src/history.js)
 //   data/tippare.json      gängets egna tips, omgång för omgång (Säsongens
 //                          tippare på förstasidan, src/tippare.js)
+//   data/landslag.json     landskamperna: Nations Leagues grupper och varje
+//                          landslags form och schema (src/landslag.js)
 //   data/journal/*.jsonl   prognosjournalen som den ligger i repot
 //
 // Analyserna, omgångarnas namn och tidningen inför omgången skrivs inte i bygget utan
@@ -74,7 +76,8 @@ const { buntaSidan } = require('./bunta');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const kupongCfg = require('../config/kupong');
-const { COMPETITIONS, SEASON } = require('../config/competitions');
+const { COMPETITIONS, INTERNATIONAL, SEASON, isIntl } = require('../config/competitions');
+const { landslagFil } = require('./landslag');
 
 const ROOT = path.join(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
@@ -108,7 +111,8 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     season: SEASON.label,
     rulesVersion: rules.version,
     journalHorizonDays: HORIZON_DAYS,
-    competitions: COMPETITIONS.map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type, espn: c.espn })),
+    // Landskamperna (type 'intl') efter de engelska tävlingarna.
+    competitions: [...COMPETITIONS, ...INTERNATIONAL].map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type, espn: c.espn })),
   });
   // Analyserna, omgångarnas namn och tidningen (med Helgarderats sista sida), som de ligger i repot.
   for (const f of ['analyser.json', 'omgangsnamn.json', 'tidning.json', 'poddsidor.json', 'sista-sidan.json']) {
@@ -147,9 +151,16 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
       const { byId } = matchData();
       for (const s of ps.sidor) {
         const m = byId.get(String(s.id));
-        if (m && m.venue) {
+        // Ett handskrivet blad kan ha arenan själv (Strawberry Arena, som ESPN fortfarande kallar Friends Arena).
+        if (m && m.venue && !s.arena) {
           s.arena = m.venue;
           if (m.venueCity) s.ort = m.venueCity;
+        }
+        // En landskamp: tävlingen och gruppen där klubbarna inte har något (Nations League · Grupp B4), och flaggorna
+        // i lagens ställe (rum-tidning.js).
+        if (m && isIntl(m.comp)) {
+          const c = INTERNATIONAL.find((x) => x.id === m.comp);
+          s.landskamp = { turnering: c ? c.name : null, grupp: String(m.group || '').replace(/^Group\s+/i, '') || null };
         }
       }
       fs.writeFileSync(psFil, JSON.stringify(ps));
@@ -241,7 +252,19 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     console.error('[build] lagen:', err);
   }
 
+  // Landslagen (data/landslag.json): Nations Leagues grupper och varje
+  // landslags form och schema – för datorn, text-tv:n och statistiken.
+  // Beskrivande; fallerar det saknas bara filen.
+  try {
+    write('landslag.json', landslagFil({ predictions: forecast.predictions }));
+  } catch (err) {
+    console.error('[build] landslagen:', err);
+  }
+
   const list = allMatches();
+  // Prognosjournalen och utvärderingen gäller modellen, alltså bara de
+  // engelska matcherna – landskampernas prognos är marknadens.
+  const engelska = list.matches.filter((m) => !isIntl(m.comp));
 
   // Prognosjournalen: loggar kommande matcher vars prognos är ny (bara med
   // --journal), läser sedan hela journalen och rättar spelade matcher.
@@ -249,7 +272,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   let logged = [];
   if (journal && !forecast.error) {
     try {
-      logged = appendJournal(list.matches, forecast.predictions);
+      logged = appendJournal(engelska, forecast.predictions);
     } catch (err) {
       console.error('[build] journalen:', err);
     }
@@ -259,7 +282,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   try {
     const j = readJournal();
     journalFiles = j.files.map((f) => path.join(j.dir, f.name));
-    ev = evaluate(j, list.matches, forecast.predictions);
+    ev = evaluate(j, engelska, forecast.predictions);
   } catch (err) {
     console.error('[build] utvärderingen:', err);
     ev.error = String(err.message || err);
@@ -410,6 +433,8 @@ function compact(p) {
   if (!p || p.status !== 'ok') return null;
   const out = { p: wholePercent(p.p) };
   if (p.teams.home.basis !== 'eget' || p.teams.away.basis !== 'eget') out.lower = true;
+  // Landskamperna: marknadens prognos, inte modellens.
+  if (p.kind === 'marknaden') out.mk = 1;
   return out;
 }
 

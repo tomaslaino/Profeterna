@@ -1295,6 +1295,36 @@ window.RumHasse = (() => {
     if (c) return c.matches.map((x) => { const m = alla.find((y) => String(y.id) === String(x.id)); return m ? { id: String(x.id), namn: `${m.home} – ${m.away}`, avspark: m.kickoff } : null; }).filter(Boolean);
     return [];
   }
+  // Landskamperna (README, Landskamperna): matchen i matches.json när tävlingen är en landslagsturnering
+  // (type intl i meta.json), annars null. Lagen heter som hos Svenska Spel.
+  function landskamp(id) {
+    const alla = (typeof state !== 'undefined' && state.all && state.all.matches) || [];
+    const m = alla.find((y) => String(y.id) === String(id));
+    if (!m) return null;
+    const c = typeof state !== 'undefined' && state.comps ? state.comps.get(m.comp) : null;
+    return (c ? c.type === 'intl' : ['unl', 'emk', 'vsk'].includes(m.comp)) ? m : null;
+  }
+  const GRANNAR = ['Norge', 'Danmark'];
+  const spelar = (m, lag) => Boolean(m) && (lag.includes(m.home) || lag.includes(m.away));
+  // Det han säger om landskamperna (land i rum-hasse-repliker.js): för en vald match (id) hans rader om den,
+  // annars det han kan säga medan han väntar, med de vanliga raderna. Samma lista varje gång för samma
+  // kupong, så att lott inte upprepar sig. → en lista, eller null när det inte är en landskamp.
+  const landListor = new Map();
+  function landRader(lista, id) {
+    const l = REP().land;
+    if (!l) return null;
+    if (id != null) {
+      const m = landskamp(id);
+      return !m ? null : spelar(m, ['Sverige']) ? l.sverige : spelar(m, GRANNAR) ? l.granne : l.val;
+    }
+    const land = lista.map((x) => landskamp(x.id)).filter(Boolean);
+    if (!land.length) return null;
+    const sv = land.some((m) => spelar(m, ['Sverige']));
+    const gr = land.some((m) => spelar(m, GRANNAR));
+    const k = `${sv}${gr}`;
+    if (!landListor.has(k)) landListor.set(k, [...REP().ledig, ...l.ledig, ...(sv ? l.ledigSverige : []), ...(gr ? l.ledigGranne : [])]);
+    return landListor.get(k);
+  }
   // Den färdiga analysen (analysOf i app.js), eller null.
   const analysen = (id) => (typeof analysOf === 'function' ? analysOf(id) : Promise.resolve(null)).catch(() => null);
   // Modellens prognos för matchen, samma fil som matchbladet läser (data/match/<id>.json), eller null.
@@ -2343,7 +2373,8 @@ window.RumHasse = (() => {
     const forstaText = iSpel ? null : forstaRad(lista, fragat, forst);
     if (forstaText) rad(forstaText);
     const dag = igang ? '' : spelstopp(lista);
-    const ledigt = () => (lista.length && forsta ? vantar(REP().ledig, 8, 14000, dag) : null);
+    // (med landskamper på kupongen säger han ibland något om dem)
+    const ledigt = () => (lista.length && forsta ? vantar(landRader(lista) || REP().ledig, 8, 14000, dag) : null);
     H.prat = iSpel ? null : ledigt();
     // När omgången har börjat står alla hans tips på raderna (hansRader), och när alla matcher har börjat
     // säger han hur det gick. Öppnar man honom medan rummet laddas kan matcherna och säsongen komma
@@ -2540,6 +2571,8 @@ window.RumHasse = (() => {
       // (ibland säger han fel namn: omgångens, samma som i domen, se felNamn)
       const kallad = namn && Math.random() < 0.25 ? felNamn(namn, omgangNu()) : namn;
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
+      // (är kupongen full av landskamper säger han det ibland)
+      if (r.land && oppna.filter((m) => landskamp(m.id)).length >= 3 && Math.random() < 0.35) return lott(r.land.oppning);
       return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn: kallad });
     }
     if (!kvar) return enAv(hela || !r.allaKvar ? r.alla : r.allaKvar);
@@ -2603,7 +2636,7 @@ window.RumHasse = (() => {
     return { lage, n, ok, plats: spelade ? hansPlats(lista) : null, exakt: sagtExakt(lista, tips) };
   }
   // Vad han gör när han har sagt sitt.
-  const EFTER_GEST = { alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck', inget: 'suck', pagar: 'smacka', dolt: 'brynet', ofragad: 'notan' };
+  const EFTER_GEST = { alla: 'skrocka', bra: 'blinka', mitten: 'brynet', daligt: 'suck', inget: 'suck', pagar: 'smacka', dolt: 'brynet', ofragad: 'notan' };
   function efterat(lista, tips) {
     const e = REP().efter;
     // (en äldre rum-hasse-repliker.js i cachen har inga rader om det)
@@ -2719,7 +2752,7 @@ window.RumHasse = (() => {
     if (l.av < 2) sagRader(enMatch(lista, tips));
     else {
       repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(S[lage]) }],
-        { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'skrocka', mitten: 'brynet', daligt: 'suck' }[lage]) });
+        { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'blinka', mitten: 'brynet', daligt: 'suck' }[lage]) });
     }
     const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);
     const rader = [match, match, extra ? () => lott(extra) : match, match, match, match];
@@ -3094,7 +3127,9 @@ window.RumHasse = (() => {
     if (!klick.detail) ja.focus({ preventScroll: true });
     analysen(m.id).then((a) => {
       if (H.fraga !== vem) return;
-      rad(lott(a ? r.valLasa : r.val), () => {
+      // (en landskamp: ibland något om landslagen i stället)
+      const land = landRader([], m.id);
+      rad(lott(land && Math.random() < 0.5 ? land : a ? r.valLasa : r.val), () => {
         if (H.fraga !== vem) return;
         repliker([{ text: fragan }], { i: s.querySelector('.rh-fragan'), rad: true }).tid = performance.now() + 450;
       });

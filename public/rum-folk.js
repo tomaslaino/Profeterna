@@ -26,15 +26,16 @@
 // någon annans. Läget gäller på enheten för den omgången.
 //
 // Annars ger ett klick på någon i gänget ett tecken tillbaka (tecken i rum-3d.js):
-// hang loose, tummen upp och så vidare, ett nytt varje gång. Går kupongen att
-// fylla i och hen inte har lämnat in blir man också hen (valj, samma val som
-// namnen på kupongen, Samtal.pult.vem): namnet skrivs för hand på kupongen på
-// pulten (Rum.skriv), utkastet följer med, och figuren skriver på sin kupong
-// (vald i rum-3d.js). Det går också när enheten står på någon som har lämnat
-// in någon annanstans, och till vem som helst när allas tips visas
-// (Samtal.pult.state().byt). Är det du – nu eller sedan
-// förut – tas kupongen sedan i handen att fylla i eller ändra (ta i rum.js),
-// när namnet är skrivet eller tecknet syns.
+// hang loose, tummen upp och så vidare, ett nytt varje gång. När rummet öppnas är
+// ingen vald – du är ingen och kan bara titta (Samtal.pult.du()). Ett klick på
+// någon som inte har lämnat in gör dig till hen (valj, samma val som namnen på
+// kupongen, Samtal.pult.vem): figuren är markerad med en lapp med namnet
+// (markera i rum.js), namnet skrivs för hand på kupongen på pulten (Rum.skriv)
+// och figuren skriver på sin kupong (vald i rum-3d.js). Sedan kan du fylla i
+// kupongen och Hasse vet vem du är. Det går också med den enheten minns, som
+// kanske redan har lämnat in, och med vem som helst när allas tips visas
+// (Samtal.pult.state().byt). Ett klick på dig själv när du redan är vald tar
+// kupongen i handen att fylla i eller ändra (ta i rum.js), när tecknet syns.
 //
 // Natten: lysröret dämpas långsamt från elva på kvällen och är släckt från
 // midnatt (Stockholms tid, Vader.nu()) – rummet mörkt utom gatan, neonen och tv:n
@@ -102,11 +103,8 @@ window.RumFolk = (() => {
 
   // (KP i kupong.js är en global const, inte window.KP)
   const samtal = () => (typeof KP !== 'undefined' && KP.data && KP.data.samtal) || null;
-  function jag() {
-    const v = typeof kpLoad === 'function' ? kpLoad('profeterna.samtal.vem') : null;
-    const s = samtal();
-    return s && (s.gang || []).some((g) => g.id === v) ? v : null;
-  }
+  // vem du är i rummet: ingen förrän du har klickat på dig (samtal.js)
+  const jag = () => (window.Samtal && Samtal.pult && Samtal.pult.du ? Samtal.pult.du() : null);
   const adress = () => q.get('rum-folk') || (samtal() && samtal().rummet) || null;
 
   function koppla() {
@@ -266,8 +264,8 @@ window.RumFolk = (() => {
   }
   // Ett klick på någon i gänget (k: dl, dt, dj): du är den som fyller i
   // kupongen. Går medan omgången är öppen och hen inte har lämnat in – och
-  // du inte heller, utom från en annan enhet – och när allas tips visas
-  // (byt i Samtal.pult.state()).
+  // du inte heller, utom från en annan enhet –, med den enheten minns och när
+  // allas tips visas (byt i Samtal.pult.state()).
   // → hur länge namnet skrivs på kupongen (ms) om du blev någon annan, annars null.
   function valj(k) {
     const s = samtal();
@@ -397,11 +395,10 @@ window.RumFolk = (() => {
       // (skylten ner på bordet eller upp igen, och inget annat)
       if (F.o.lappKlick && F.o.lappKlick(k)) return;
       F.o.teckna(k);
-      // du, nu eller sedan förut: kupongen i handen när namnet är skrivet,
-      // annars när tecknet syns
-      const blev = valj(k);
-      if (blev != null) taSen(blev + 300);
-      else if ((jag() || '').toLowerCase() === k) taSen(900);
+      // första klicket väljer (och markerar) hen; ett klick på den du redan
+      // är tar kupongen i handen när tecknet syns
+      if ((jag() || '').toLowerCase() === k) taSen(900);
+      else valj(k);
       if (F.typ !== 'mouse') {
         const f = fig();
         const t = F.o.now();

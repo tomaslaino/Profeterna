@@ -3,7 +3,8 @@
 // högra. Kameran står framför honom, lite högre, och pulten går fram förbi dess högra sida (rum-hasse-scen.js).
 // Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons) ligger på en formad yta, så att huvudet vrids på riktigt runt nacken och kroppen lutar sig
 // fram. Ögon, bryn och mun rör sig i skuggaren. Armarna, händerna, koppen, askkoppen, cigarren, röken och
-// läsglasögonen finns i rum-hasse-arm.js.
+// läsglasögonen finns i rum-hasse-arm.js. Här väljs var armbågen ska vara (bekvam) och hur handen rör sig
+// mellan nycklarna (nyckel).
 //
 // Disken är pulten vid hörnet, geometri i hans värld, och ritas en gång på en egen duk under figuren
 // (diskBild): pultens trä som speglar väggen bakom honom svagt (bilden från scripts/hasse/bak.html), lister
@@ -538,6 +539,10 @@ export const KLIPP = {
   skrocka: { fran: 331, till: 335.2, vila: 0, skynda: true, grupp: 'smatt' },
   // tittar på kaffet och smackar
   smacka: { fran: 337, till: 340.4, vila: 0, skynda: true, grupp: 'smatt' },
+  // myser: lutar sig bakåt med ett brett leende och halvslutna ögon, och andas ut, belåten
+  myser: { fran: 460, till: 464.4, vila: 0, skynda: true, grupp: 'smatt' },
+  // tittar på en, ler brett och blinkar med ena ögat: vi vet, du och jag
+  blinka: { fran: 466, till: 469.6, vila: 0, skynda: true, grupp: 'smatt' },
   // Medan han pratar, nöjd med det han säger (talet, lottas med armar):
   // handflatan upp mot en: där har du det
   oppna: { fran: 345, till: 348.4, vila: 5.5, start: 5.5, grupp: 'tal' },
@@ -936,7 +941,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   }
   const U = {
     foto: { value: foto }, uHuvud: { value: new THREE.Matrix3() }, uPiv: { value: W_(650, 650, 40) }, uKropp: { value: new THREE.Matrix4() }, uAx: { value: new THREE.Vector2() }, uAndas: { value: 0 },
-    blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() }, uLins: { value: new THREE.Vector2(0, 400) },
+    blund: { value: 0 }, kis: { value: 0 }, munn: { value: 0 }, rund: { value: 0 }, le: { value: 0 }, vink: { value: 0 }, bryn: { value: new THREE.Vector2() }, blick: { value: new THREE.Vector2() }, uLins: { value: new THREE.Vector2(0, 400) },
     uArm: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
     uBord: bord, uButik: bord.butik, uDag: DAG, uLys: LYS, uEld: bord.eld,
   };
@@ -959,7 +964,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       float dB = min(seg3(w.xyz, uArm[3], uArm[4]), seg3(w.xyz, uArm[4], uArm[5]));
       vAo = exp(-pow(max(0., dA - 80.) / 80., 2.)) * .3 + exp(-pow(max(0., dB - 80.) / 80., 2.)) * .3;
       gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le; uniform vec2 bryn, blick, uLins; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
+    fragmentShader: `precision highp float; uniform sampler2D foto; uniform float blund, kis, munn, rund, le, vink; uniform vec2 bryn, blick, uLins; varying vec2 vQ; varying vec3 vN, vN0, vW; varying float vAo, vHuv;
     ${LJUS}
     ${BORD_GLSL}
     const vec2 O0 = vec2(${X0}., ${Y0}.), TS = vec2(${ATLAS.W}., ${ATLAS.H}.);
@@ -1002,36 +1007,53 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
           q = mix(q, c + (q - c) / (1. + .08 * uLins.x), inne);
         }
       }
-      // leendet: mungiporna ut och upp, kinderna följer med (förut ungefär två tredjedelar så mycket, och
-      // då syntes ett leende knappt)
-      q += le * vec2(10., 15.) * g(q, vec2(613., 505.), vec2(40.));
-      q += le * vec2(-10., 15.) * g(q, vec2(711., 505.), vec2(40.));
-      q.y += le * 9. * (g(q, vec2(585., 450.), vec2(42.)) + g(q, vec2(740., 450.), vec2(42.)));
+      // leendet: mungiporna ut och upp, mer i själva mungipan än mitt på läpparna, så att munnen böjer sig
+      // uppåt i stället för att hela munnen lyfts; kinderna lyfts och rundas, och de trycker upp huden under
+      // ögonen, så att leendet når dit (förut 10 ut och 15 upp med en bred kulle och kinderna 9 upp, och
+      // munnen låg nästan rak). Mungiporna går lika mycket ut som upp, i en bred kulle, och mindre upp när
+      // munnen öppnas: med 19 upp i en smal kulle fick mungiporna krokar och det öppna skrattet blev en
+      // uppåtböjd skåra, som i en skräckfilm (ändrat 2026-11-13). vink: han blinkar med sitt högra öga
+      // (fotots vänstra), och den sidans mungipa och kind går upp mer.
+      float upp = le * (13. - 5. * munn);
+      q += vec2(le * 12., upp) * g(q, vec2(609., 507.), vec2(46., 38.)) + vink * vec2(4., 9.) * g(q, vec2(611., 506.), vec2(36.));
+      q += vec2(le * -12., upp) * g(q, vec2(715., 507.), vec2(46., 38.));
+      for (int i = 0; i < 2; i++) {
+        vec2 kc = vec2(586. + float(i) * 152., 452.);
+        float gk = g(q, kc, vec2(44.));
+        q.y += (le * 12. + (i == 0 ? vink * 9. : 0.)) * gk;
+        q = mix(q, kc + (q - kc) * .9, le * gk);
+      }
+      q.y += le * 4. * (g(q, vec2(608., 411.), vec2(24., 9.)) + g(q, vec2(717., 412.), vec2(24., 9.)));
       // brynen: flyttar pannan men aldrig ögat
       float grind = 1. - smoothstep(361., 372., q.y);
       q.y += bryn.x * 10. * g(q, vec2(599., 356.), vec2(66., 24.)) * grind;
       q.y += bryn.y * 10. * g(q, vec2(727., 358.), vec2(66., 24.)) * grind;
-      q = oga(q, vec2(608.5, 391.), 24., blund, kis, blick, frans);
+      q = oga(q, vec2(608.5, 391.), 24., max(blund, vink), max(kis, vink * .6), blick, frans);
       q = oga(q, vec2(717., 392.), 24., blund, kis, blick, frans);
-      // munnen: en lins mellan läpparna; underläppen och hakan följer med ned
+      // munnen: en lins mellan läpparna; underläppen och hakan följer med ned. När munnen är öppen är
+      // överläppen nästan rak längs tänderna och underläppen rundad nedåt, så att öppningen inte blir en
+      // springa med spetsiga ändar; den slutar en bit innanför mungiporna.
       const vec2 MC = vec2(662., 508.5);
-      float W = 50. + le * 9. - rund * 16.;
+      float W = 47. + le * 8. - rund * 16.;
       dx = q.x - MC.x;
       xn = dx / W;
       float prm = max(0., 1. - xn * xn);
       A = munn * (31. + rund * 5.);
-      float a = A * pow(prm, .78);
-      uU = a * .27; uL = a * .73;
-      float y0 = MC.y - le * 6. * xn * xn;
+      float vid = smoothstep(.3, .7, munn);
+      uU = A * pow(prm, mix(.78, .45, vid)) * .29; uL = A * pow(prm, mix(.78, 1.1, vid)) * .71;
+      float y0 = MC.y - le * (6. - 4. * munn) * xn * xn;
       float d = q.y - y0;
-      inre = smoothstep(-1., .4, d + uU) * (1. - smoothstep(-.4, 1., d - uL)) * smoothstep(.2, .8, A) * (1. - smoothstep(.96, 1., abs(xn)));
+      inre = smoothstep(-1., .4, d + uU) * (1. - smoothstep(-.4, 1., d - uL)) * smoothstep(.2, .8, A) * (1. - smoothstep(.86, .99, abs(xn)));
       n01 = clamp((d + uU) / max(.1, uU + uL), 0., 1.);
       lipp = exp(-pow(min(abs(d + uU), abs(d - uL)) / 3., 2.)) * smoothstep(.5, 3., A) * (1. - smoothstep(.9, 1.2, abs(xn)));
-      if (d < -uU) { float t = clamp((-d - uU) / 26., 0., 1.); q.y += uU * (1. - t) * (1. - t); }
+      // (när munnen är öppen hoppar läpparna över fotots mörka skåra mellan dem, annars får öppningen en
+      // svart kant)
+      float kk = 2.5 * smoothstep(.5, 4., A) * (1. - smoothstep(.9, 1., abs(xn)));
+      if (d < -uU) { float t = clamp((-d - uU) / 26., 0., 1.); q.y += (uU - kk) * (1. - t) * (1. - t); }
       else if (d > uL) {
         float ty = d - uL;
         float J = A * .73 * (1. - smoothstep(58., 135., abs(dx)));
-        float sh = mix(uL, J, smoothstep(0., 26., ty)) * (1. - smoothstep(92., 170., ty));
+        float sh = mix(uL - kk, J, smoothstep(0., 26., ty)) * (1. - smoothstep(92., 170., ty));
         q.y -= sh;
       }
       }
@@ -1048,8 +1070,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       if (inre > .001) {
         float h = uU + uL;
         float ax = abs(dx);
-        vec3 m = mix(vec3(.25, .08, .07), vec3(.05, .012, .012), smoothstep(.12, .95, n01));
-        m *= mix(1., .55, pow(abs(xn), 2.2));
+        vec3 m = mix(vec3(.3, .1, .09), vec3(.16, .05, .045), smoothstep(.12, .95, n01));
+        m *= mix(1., .75, pow(abs(xn), 2.2));
         float tungan = exp(-pow(xn / .58, 2.) - pow((n01 - 1.) / .4, 2.)) * smoothstep(12., 26., h);
         m = mix(m, vec3(.48, .19, .18) * (.7 + .3 * smoothstep(.6, 1., n01)), tungan * .85);
         // tänderna: [0, 1) över varje tand, framtänderna 10 bildpunkter breda och smalare utåt
@@ -1058,12 +1080,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         float mitt = 1. - (2. * f - 1.) * (2. * f - 1.);
         float tb = min(15. / max(h, 1.), .6);
         float tk = .07 * le * smoothstep(10., 24., h);
-        float ny = n01 - .1 * xn * xn;
+        float ny = n01 - .03 * xn * xn;
         float egg = tk + tb * (1. - .07 * floor(tu)) + .035 * mitt;
-        float tand = smoothstep(tk - .03, tk + .02, ny) * (1. - smoothstep(egg - .035, egg + .02, ny)) * (1. - smoothstep(.8, .97, abs(xn)));
+        float tand = smoothstep(tk - .12, tk - .02, ny) * (1. - smoothstep(egg - .035, egg + .02, ny)) * (1. - smoothstep(.86, 1., abs(xn)));
         float glipa = min(f, 1. - f);
         vec3 tc = vec3(.9, .865, .78) * (.74 + .26 * smoothstep(0., .45, glipa)) * (1. - .22 * exp(-glipa * glipa / .003));
-        tc *= mix(1., .36, pow(abs(xn), 1.6));
+        tc *= mix(1., .55, pow(abs(xn), 1.6));
         tc *= .8 + .2 * smoothstep(tk, tk + .3, ny);
         tc = mix(tc, tc * vec3(.84, .87, .92), smoothstep(egg - .14, egg, ny) * .7);
         m = mix(m, tc, tand * smoothstep(3., 9., h));
@@ -1071,17 +1093,30 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         float tkott = (1. - smoothstep(tk - .03, tk + .01, ny)) * smoothstep(.002, .02, tk);
         m = mix(m, vec3(.58, .27, .26) * mix(1., .5, pow(abs(xn), 1.6)), tkott);
         // de nedre tänderna: bara kanten, bakom underläppen när munnen är vidöppen
-        float ned = smoothstep(.87, .93, n01 + .1 * xn * xn) * smoothstep(22., 34., h) * (1. - smoothstep(.25, .5, abs(xn)));
+        float ned = smoothstep(1. - 7. / max(h, 1.), 1. - 4. / max(h, 1.), n01 + .1 * xn * xn) * smoothstep(8., 18., h) * (1. - smoothstep(.45, .75, abs(xn)));
         m = mix(m, vec3(.66, .62, .55) * (.75 + .25 * smoothstep(0., .4, min(fract(ax / 7.5), 1. - fract(ax / 7.5)))), ned * .6);
         c.rgb = mix(c.rgb, m * c.a, inre);
       }
       // läpparna: rödare och skuggade närmast öppningen
-      c.rgb *= mix(vec3(1.), vec3(.74, .5, .47), lipp * (1. - inre));
+      c.rgb *= mix(vec3(1.), vec3(.9, .74, .7), lipp * (1. - inre));
       c.rgb *= 1. - .62 * frans;
       // vecken från näsan till mungiporna när han ler
       if (ansikte && le > .01) {
         float vk = min(seg2(q0, vec2(634., 462.), vec2(598., 522.)), seg2(q0, vec2(690., 462.), vec2(726., 522.)));
         c.rgb *= 1. - .2 * le * exp(-vk * vk / 28.);
+        // skrattrynkorna i ögonens yttre hörn, när leendet är brett
+        float rr = 1e3;
+        for (int i = 0; i < 2; i++) {
+          float sx = i == 0 ? -1. : 1.;
+          vec2 h = i == 0 ? vec2(583., 391.) : vec2(742., 392.);
+          rr = min(rr, seg2(q0, h + vec2(sx * 2., -3.), h + vec2(sx * 15., -10.)));
+          rr = min(rr, seg2(q0, h + vec2(sx * 3., 2.), h + vec2(sx * 17., 3.)));
+          rr = min(rr, seg2(q0, h + vec2(sx * 2., 6.), h + vec2(sx * 13., 14.)));
+        }
+        c.rgb *= 1. - .14 * smoothstep(.35, .9, le) * exp(-rr * rr / 4.5);
+        // och kinderna blir lite varmare: han trivs
+        float kr = g(q0, vec2(588., 466.), vec2(40., 30.)) + g(q0, vec2(736., 466.), vec2(40., 30.));
+        c.rgb *= mix(vec3(1.), vec3(1.05, .97, .95), le * kr);
       }
       // samma ljus som på armarna
       vec3 n = normalize(vN);
@@ -1598,8 +1633,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const KANAL = Object.keys(HUV);
   // ansiktet i klippen: läggs till som det största av det som rör sig (blicken läggs till: blickX åt hans
   // vänstra sida, blickY nedåt, i fotots bildpunkter; andas läggs till andningen)
-  // (stel: 0–1, tar bort leendet han alltid har, när han blir ertappad)
-  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY', 'andas', 'stel'];
+  // (stel: 0–1, tar bort leendet han alltid har, när han blir ertappad; vink: blinkar med sitt högra öga)
+  const ANSIKTE = ['le', 'kis', 'blund', 'munn', 'rund', 'dricker', 'blickX', 'blickY', 'andas', 'stel', 'vink'];
   const lage = (T) => Object.fromEntries(KANAL.map((x) => [x, spar(HUV[x], T)]));
   const S0 = lage(0);
 
@@ -1634,6 +1669,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const TUMME_VILA = { A: VILAN.A.tumme, B: VILAN.B.tumme };
   let bortA = 0;
   let bortB = 0;
+  // hur mycket något han håller styr armen (0–1): då räknar det armbågen själv (bekvam nedan)
+  let styrA = 0;
+  let styrB = 0;
   // kaffet: handen till koppens öra och tillbaka (mot) och fingrarna runt örat (krok), när koppen står
   // på fatet igen vid ned
   const grepp = (ned) => ({ mot: [0.1, 1.05, ned + 0.05, ned + 0.5], krok: [[0, 0.1], [1, 0.18], [1.2, 0.72], [ned, 0.72], [ned + 0.2, 0.18], [ned + 0.5, VILA_B[4]]] });
@@ -2737,6 +2775,37 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         le: [[2.2, 0], [2.6, 0.2], [3.2, 0]],
       },
     },
+    // Han myser: lutar sig lite bakåt med hakan upp och huvudet på sned, leendet växer tills ögonen är
+    // halvslutna, han andas in så att bröstet häver sig och ut igen med axlarna som sjunker, och nickar
+    // lite för sig själv.
+    myser: {
+      k: {
+        lut: [[0.2, 0], [1.2, -0.035], [3.2, -0.03], [4.2, 0]],
+        pitch: [[0.2, 0], [1.2, -0.25], [2.6, -0.25], [3.0, 0.2], [3.4, -0.05], [4.2, 0]],
+        roll: [[0.3, 0], [1.2, 0.05], [3.2, 0.05], [4.2, 0]],
+        brynX: [[0.3, 0], [1.2, 0.3], [3.2, 0.3], [4.0, 0]],
+        brynY: [[0.3, 0], [1.2, 0.3], [3.2, 0.3], [4.0, 0]],
+        le: [[0.2, 0], [1.2, 0.88], [3.2, 0.85], [4.3, 0]],
+        kis: [[0.4, 0], [1.2, 0.55], [3.2, 0.5], [4.1, 0]],
+        blund: [[0.5, 0], [1.3, 0.38], [2.8, 0.38], [3.3, 0]],
+        andas: [[0.2, 0], [1.2, 10], [1.6, 10], [2.8, -4], [3.6, 0]],
+        axV: [[0.2, 0], [1.2, 8], [1.6, 8], [2.8, -3], [3.6, 0]],
+        axH: [[0.2, 0], [1.2, 8], [1.6, 8], [2.8, -3], [3.6, 0]],
+      },
+    },
+    // Han tittar på en, leendet växer och han blinkar med sitt högra öga (vink: brynet går ned, mungipan och
+    // kinden upp), med en liten nick och huvudet på sned: vi vet, du och jag.
+    blinka: {
+      k: {
+        yaw: [[0.2, 0], [0.7, 0.2], [2.8, 0.2], [3.5, 0]],
+        pitch: [[0.2, 0], [0.7, -0.15], [1.4, 0.3], [1.8, -0.05], [2.8, -0.1], [3.5, 0]],
+        roll: [[0.2, 0], [0.7, -0.05], [2.6, -0.05], [3.4, 0]],
+        brynY: [[0.8, 0], [1.1, 0.4], [1.8, 0.4], [2.4, 0]],
+        le: [[0.2, 0], [0.8, 0.8], [2.6, 0.8], [3.5, 0]],
+        kis: [[0.6, 0], [0.9, 0.4], [2.6, 0.4], [3.3, 0]],
+        vink: [[1.0, 0], [1.15, 1], [1.55, 1], [1.75, 0]],
+      },
+    },
   });
   // Medan han pratar (talet): han är nöjd med det han säger, lugn och säker på sin sak, och händerna
   // hjälper till. Varje gest börjar och slutar med händerna på disken som när han pratar (5,5). Händernas
@@ -3433,18 +3502,53 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return HOPP;
   }
   const UTDRAG = 110;
+  // Mellan nycklarna (2026-11-13): handen går genom en nyckel utan att stanna, om den fortsätter åt samma
+  // håll efter den. Förut började och slutade varje sträcka stilla, så att handen stannade upp vid varje
+  // nyckel som en robot. Varje värde följer en mjuk kurva genom nycklarna (monoton, så att den aldrig går
+  // förbi en nyckel: inte ned i disken och inte längre ut än nycklarna säger), och står still där det vänder,
+  // där handen står kvar och före och efter ett slag. Med stillhet i båda ändar är det samma mjuka in och ut
+  // som förut. (n: fältet i nyckeln, 1–4 vektorerna och 5–6 talen, c: komponenten)
+  const nv = (k, n, c) => (n < 5 ? k[n][c] : k[n]);
+  function lutning(K, j, n, c) {
+    if (j <= 0 || j >= K.length - 1) return 0;
+    const p = K[j - 1];
+    const q = K[j];
+    const r = K[j + 1];
+    if (q[7] || r[7]) return 0;
+    const h0 = q[0] - p[0];
+    const h1 = r[0] - q[0];
+    if (h0 < 1e-6 || h1 < 1e-6) return 0;
+    const d0 = (nv(q, n, c) - nv(p, n, c)) / h0;
+    const d1 = (nv(r, n, c) - nv(q, n, c)) / h1;
+    if (d0 * d1 <= 0) return 0;
+    return (3 * (h0 + h1)) / ((2 * h1 + h0) / d0 + (h1 + 2 * h0) / d1);
+  }
   function nyckel(K, t, ut) {
     let i = 1;
     while (i < K.length - 1 && t > K[i][0]) i++;
     const a = K[i - 1];
     const b = K[i];
-    const x = clamp((t - a[0]) / (b[0] - a[0]));
+    const h = b[0] - a[0];
+    const x = clamp((t - a[0]) / h);
     // ett slag: allt fortare, och tvärt stopp
-    const f = b[7] ? x ** 2.2 : x * x * (3 - 2 * x);
-    const l3 = (o, x, y) => o.set(x[0] + (y[0] - x[0]) * f, x[1] + (y[1] - x[1]) * f, x[2] + (y[2] - x[2]) * f);
-    l3(ut.w, a[1], b[1]); l3(ut.pol, a[2], b[2]); l3(ut.F, a[3], b[3]); l3(ut.P, a[4], b[4]);
-    ut.krok = a[5] + (b[5] - a[5]) * f;
-    ut.peka = a[6] + (b[6] - a[6]) * f;
+    const slag = b[7];
+    const f = x ** 2.2;
+    const x2 = x * x;
+    const x3 = x2 * x;
+    const h00 = 2 * x3 - 3 * x2 + 1;
+    const h10 = (x3 - 2 * x2 + x) * h;
+    const h01 = 3 * x2 - 2 * x3;
+    const h11 = (x3 - x2) * h;
+    const kv = (n, c) => {
+      const p = nv(a, n, c);
+      const q = nv(b, n, c);
+      if (slag) return p + (q - p) * f;
+      return h00 * p + h01 * q + h10 * lutning(K, i - 1, n, c) + h11 * lutning(K, i, n, c);
+    };
+    const l3 = (o, n) => o.set(kv(n, 0), kv(n, 1), kv(n, 2));
+    l3(ut.w, 1); l3(ut.pol, 2); l3(ut.F, 3); l3(ut.P, 4);
+    ut.krok = kv(5);
+    ut.peka = kv(6);
     // Den högra handen ligger under den vänstra i vilan. När den lyfts dras den först ut bakåt längs sig
     // själv, och skjuts in på samma sätt när den kommer tillbaka, annars går fingrarna genom den andra handen.
     if (K === VA && a[1] !== b[1] && (a[1] === va.W || b[1] === va.W)) {
@@ -3814,6 +3918,164 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return cW.copy(H).addScaledVector(nU, -26);
   }
   const cU = v();
+  // Armbågen (2026-11-13). Nycklarna säger var handleden ska vara och åt vilket håll armbågen ska peka (pol),
+  // och den riktningen pekade mest utåt: när handen gick upp stod armbågen ute i axelhöjd som en vinge, också
+  // när han bara räknade på fingrarna, knöt näven eller lade handen på bröstet. Nu väljs armbågen på cirkeln
+  // där den kan ligga (som i naturlig, men med handleden given) där det är bekvämt för en som sitter vid en
+  // disk, och snyggt från kameran. Det som kostar:
+  // - handleden böjd (VRIST, som i naturlig, men med ett tak, VRIST_MAX: går den inte att räta vrids handen
+  //   i stället, se nedan, och då ska den inte ensam dra armbågen in framför magen eller upp i luften)
+  // - nyckelns pol (POL): bara en önskan, och svagare ju mer den pekar längs armen
+  // - armbågen högt (GRAV: armen hänger av sin tyngd, och HOJD från HOJD0 under axeln), men aldrig under
+  //   disken (GOLV, där den ligger i vilan)
+  // - armbågen ut som en vinge (UT, från UT0 utanför axeln och längre ut ju längre ut handen är, UT_W), in
+  //   framför magen (INN, från INN0 innanför axeln) eller bakom ryggen (BAK), och armen genom bålen (KROPP, BAL)
+  // - armens böj osynlig (SIL): när armbågen pekar mot kameran ligger överarmen och underarmen på varandra i
+  //   bilden, som en pelare
+  // Lägena vägs ihop mjukt (MJUK) och armbågen följer med en fjäder (FJADER), så att den glider i stället för
+  // att hoppa när det bekväma läget flyttar sig. Det som håller något (cigarren, koppen, pennan, tidningen,
+  // glasögonen, stickan) räknar armbågen själv, och här gäller det mindre ju mer handen styrs därifrån (styr).
+  // Nära vilan (VILA_R) ligger vilans armbåge kvar som den är.
+  // Handleden: böjer den sig ändå mer än en handled gör utan att det ser ansträngt ut (VRIST: mot handflatan,
+  // bakåt, mot tummen och mot lillfingret), vrids handen tillbaka mot underarmen, så lite som möjligt. Böjd åt
+  // sidan vrids den i handflatans plan, så att handflatan ligger kvar (på bröstet, uppåt, mot en).
+  const BEK = { VRIST: 0.7, VRIST_MAX: 1.5, POL: 1, GRAV: 0.4, HOJD: 8, HOJD0: 0.25, INN: 30, INN0: 0.15, GOLV: VILOHOJD.EH, GOLV_V: 80, UT: 8, UT0: 0.25, UT_W: 0.6, BAK: 10, BAK0: 0.05, KROPP: 150, SIL: 40, SIL0: Math.cos(40 * DEG), N: 72, MJUK: 0.2, FJADER: 14, VILA_R: [20, 110] };
+  // bålen (som i djup): en liggande ellips i x och z under axlarna, och armens tjocklek utanför den
+  const BAL = { X: 40, Z: -20, RX: 330, RZ: 170, R: 45 };
+  const bX = v();
+  // hur långt in i bålen punkten p är (0 utanför, 1 i mitten)
+  const iBalen = (p, Sk) => (p.y > Sk.y + 40 ? 0 : Math.max(0, 1 - Math.hypot((p.x - BAL.X) / (BAL.RX + BAL.R), (p.z - BAL.Z) / (BAL.RZ + BAL.R))));
+  const VRIST = { BOJ: 60 * DEG, BAKAT: 50 * DEG, TUM: 20 * DEG, LILL: 35 * DEG };
+  const bC = v();
+  const b1 = v();
+  const b2 = v();
+  const bE = v();
+  const bU = v();
+  const bF = v();
+  const bP = v();
+  const bT = v();
+  const bQ = new THREE.Quaternion();
+  const bQ0 = new THREE.Quaternion();
+  const bK = new Float64Array(72);
+  const bV = v();
+  const bA = v();
+  const bB = v();
+  // Armbågen följer läget den söker med en fjäder (BEK.FJADER, per sekund), så att den inte hoppar när det
+  // bekväma läget flyttar sig fort, som när handen far tillbaka till disken. Hoppar tiden (ett nytt klipp, en
+  // bild som dröjde) står den direkt där den ska. (minne: armbågens vinkel, fart och tid, en per arm)
+  const MINNE = { A: { T: null, th: 0, v: 0 }, B: { T: null, th: 0, v: 0 } };
+  function fjader(m, mal, T) {
+    const dt = m.T === null ? -1 : T - m.T;
+    if (dt === 0) return m.th;
+    m.T = T;
+    if (dt < 0 || dt > 0.25) { m.th = mal; m.v = 0; return mal; }
+    // (kortaste vägen runt)
+    const e = Math.atan2(Math.sin(m.th - mal), Math.cos(m.th - mal));
+    const w = BEK.FJADER;
+    const x = Math.exp(-w * dt);
+    const k = m.v + w * e;
+    m.th = mal + (e + k * dt) * x;
+    m.v = (m.v - w * k * dt) * x;
+    return m.th;
+  }
+  // h: nycklarnas läge (w, pol, F, P; F och P vrids om handleden måste rätas), sida: 1 höger (A), −1 vänster,
+  // vila: vilans handled, styr: 0–1 hur mycket något annat styr armen, T: tiden, m: armens minne (MINNE).
+  // → armbågen i Eut och handleden i Wut
+  function bekvam(Sk, h, sida, vila, styr, T, m, Eut, Wut) {
+    d_.subVectors(h.w, Sk);
+    const hel = d_.length();
+    const tj = Math.min(1.3, Math.max(1, hel / (0.97 * (LA + LB))));
+    const la = LA * tj;
+    const lb = LB * tj;
+    const len = Math.min(hel, la + lb - 4);
+    dir_.copy(d_).normalize();
+    const a = (la * la - lb * lb + len * len) / (2 * len);
+    const r = Math.sqrt(Math.max(0, la * la - a * a));
+    bC.copy(Sk).addScaledVector(dir_, a);
+    // vinklarna runt armen räknas från rakt ned (från rakt fram om armen pekar rakt ned eller upp), inte från
+    // nyckelns pol, som kan ligga nästan längs armen och då vända tvärt
+    b1.set(0, -1, 0).addScaledVector(dir_, dir_.y);
+    if (b1.lengthSq() < 0.01) b1.set(0, 0, 1).addScaledVector(dir_, -dir_.z);
+    b1.normalize();
+    b2.crossVectors(dir_, b1);
+    Wut.copy(Sk).addScaledVector(dir_, len);
+    // nyckelns armbåge (thp) och hur tydligt nyckeln pekar ut den (polq: 0 längs armen)
+    bX.copy(h.pol).addScaledVector(dir_, -h.pol.dot(dir_));
+    const polq = bX.length() / Math.max(1e-6, h.pol.length());
+    const thp = polq > 1e-6 ? Math.atan2(bX.dot(b2), bX.dot(b1)) : 0;
+    const vikt = (1 - styr) * ss(BEK.VILA_R[0], BEK.VILA_R[1], Math.hypot(h.w.x - vila[0], h.w.y - vila[1], h.w.z - vila[2]));
+    if (vikt <= 1e-3 || r < 10) {
+      const th = fjader(m, thp, T);
+      Eut.copy(bC).addScaledVector(b1, r * Math.cos(th)).addScaledVector(b2, r * Math.sin(th));
+      return;
+    }
+    bF.copy(h.F).normalize();
+    bP.copy(h.P).addScaledVector(bF, -h.P.dot(bF)).normalize();
+    bT.crossVectors(bF, bP).multiplyScalar(sida);
+    // (armbågen får gå längre ut ju längre ut handen är)
+    const utRef = BEK.UT0 + BEK.UT_W * Math.max(0, (sida * (Sk.x - Wut.x)) / LA);
+    const kost = (th) => {
+      bE.copy(bC).addScaledVector(b1, r * Math.cos(th)).addScaledVector(b2, r * Math.sin(th));
+      bU.subVectors(Wut, bE).normalize();
+      const fram = bU.dot(bF);
+      const boj = Math.atan2(-bU.dot(bP), fram) + NAT.BAK;
+      const tum = Math.atan2(-bU.dot(bT), fram) + NAT.ULNAR;
+      const y = (bE.y - Sk.y) / LA;
+      const hojd = Math.max(0, y + BEK.HOJD0);
+      const golv = Math.max(0, (BEK.GOLV - bE.y) / LA);
+      const ut = Math.max(0, (sida * (Sk.x - bE.x)) / LA - utRef);
+      const inn = Math.max(0, (sida * (bE.x - Sk.x)) / LA - BEK.INN0);
+      const bak = Math.max(0, (Sk.z - bE.z) / LA - BEK.BAK0);
+      // armbågen, överarmen och underarmen utanför bålen
+      let bal = iBalen(bE, Sk);
+      for (const f of [0.4, 0.75]) bal = Math.max(bal, iBalen(bX.copy(bE).lerp(Wut, f), Sk));
+      bal = Math.max(bal, iBalen(bX.copy(Sk).lerp(bE, 0.6), Sk));
+      // silhuetten: armens böj syns i bilden, så att överarmen och underarmen inte ligger på varandra när
+      // armbågen pekar mot kameran (vinkeln vid armbågen i bilden under SIL0 kostar)
+      bV.fromArray(KAM.pos).sub(bE).normalize();
+      bA.subVectors(Sk, bE);
+      bA.addScaledVector(bV, -bV.dot(bA));
+      bB.subVectors(Wut, bE);
+      bB.addScaledVector(bV, -bV.dot(bB));
+      const sil = Math.max(0, bA.dot(bB) / Math.max(1e-6, bA.length() * bB.length()) - BEK.SIL0);
+      const vr = (boj / (boj > 0 ? NAT.BOJ : NAT.BAKAT)) ** 2 + (tum / (tum > 0 ? NAT.TUM : NAT.LILL)) ** 2;
+      return (BEK.VRIST * vr) / (1 + vr / BEK.VRIST_MAX)
+        + BEK.POL * polq * (1 - Math.cos(th - thp)) + BEK.GRAV * y + BEK.HOJD * hojd * hojd + BEK.GOLV_V * golv * golv
+        + BEK.UT * ut * ut + BEK.INN * inn * inn + BEK.BAK * bak * bak + BEK.KROPP * bal * bal + BEK.SIL * sil * sil;
+    };
+    // Inte bara det bästa läget: medelvärdet av lägena, vägda efter hur bekväma de är (MJUK). När två lägen är
+    // nästan lika bra glider armbågen från det ena till det andra, i stället för att hoppa dit på en bild.
+    let kmin = Infinity;
+    for (let i = 0; i < BEK.N; i++) {
+      bK[i] = kost(((i / BEK.N) * 2 - 1) * Math.PI);
+      kmin = Math.min(kmin, bK[i]);
+    }
+    let sx = 0;
+    let sy = 0;
+    for (let i = 0; i < BEK.N; i++) {
+      const w = Math.exp((kmin - bK[i]) / BEK.MJUK);
+      const th = ((i / BEK.N) * 2 - 1) * Math.PI;
+      sx += w * Math.cos(th);
+      sy += w * Math.sin(th);
+    }
+    // (från nyckelns armbåge mot den bekväma, den kortaste vägen runt, så långt som vikt säger)
+    const thb = Math.atan2(sy, sx);
+    const th = fjader(m, thp + vikt * Math.atan2(Math.sin(thb - thp), Math.cos(thb - thp)), T);
+    Eut.copy(bC).addScaledVector(b1, r * Math.cos(th)).addScaledVector(b2, r * Math.sin(th));
+    // handleden: underarmen i handens mått, med böjningen inom VRIST, och handen vriden dit
+    bU.subVectors(Wut, Eut).normalize();
+    const x = bU.dot(bF);
+    const boj = Math.atan2(-bU.dot(bP), x);
+    const tum = Math.atan2(-bU.dot(bT), x);
+    const bojV = clamp(boj, -VRIST.BAKAT, VRIST.BOJ);
+    const tumV = clamp(tum, -VRIST.LILL, VRIST.TUM);
+    if (bojV === boj && tumV === tum) return;
+    b1.copy(bF).addScaledVector(bP, -Math.tan(bojV)).addScaledVector(bT, -Math.tan(tumV)).normalize();
+    bQ.setFromUnitVectors(b1, bU);
+    bQ.slerp(bQ0, 1 - vikt);
+    h.F.applyQuaternion(bQ);
+    h.P.applyQuaternion(bQ);
+  }
   // upp och ned igen (fyra tider), eller nycklar
   const bump = (x, t) => (Array.isArray(x[0]) ? spar(x, t) : ss(x[0], x[1], t) * (1 - ss(x[2], x[3], t)));
   const rq = new THREE.Quaternion();
@@ -3834,6 +4096,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // hög båge med raka, utspärrade fingrar och dök sedan ned på cigarren.)
     const mot = bump(c.mot, t);
     bortA = mot * 0.5;
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     const upp = bump(c.upp, t);
     // (vilans riktning är armbågens hela längd: båda som enhetsvektorer, annars tar den nya över först på slutet)
     cPol.fromArray(VILA_A[1]).normalize().lerp(POL_UPP, upp);
@@ -4154,6 +4417,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.krok += (spar(E.krok, t) - a.krok) * mot;
     a.peka *= 1 - mot;
     bortA = Math.max(bortA, mot);
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     for (let i = 0; i < 4; i++) extraE[i] = (ex0 ? ex0[i] : 0) * (1 - mot) + EXTRA_E[i] * mot;
     return extraE;
   }
@@ -4294,6 +4558,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     vristTill(Sk, pH, cPol, cU);
     const mot = ss(0.05, SKRIV.MOT, tau) * (1 - ss(T - SKRIV.HEM, T - 0.05, tau));
     bortA = mot;
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     a.w.lerp(cW, mot);
     a.w.y += 90 * mot * (1 - mot);
     a.pol.normalize().lerp(cPol, mot);
@@ -4411,6 +4676,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     bortA = Math.max(bortA, mot);
     bortB = Math.max(bortB, mot);
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
+    styrB = Math.max(styrB, ss(0, 0.35, mot));
     return mot;
   }
 
@@ -4615,6 +4882,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.krok += (s('krok', 0.55) - a.krok) * mot;
     a.peka += (s('peka', 0) - a.peka) * mot;
     bortA = Math.max(bortA, mot);
+    styrA = Math.max(styrA, ss(0, 0.35, mot));
     const g = mot * (1 - s('peka', 0));
     for (let i = 0; i < 4; i++) extraG[i] = EXTRA_G[i] * g;
     return extraG;
@@ -4727,6 +4995,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const [m0, m1, m2, m3] = c.mot;
     const mot = ss(m0, m1, t) * (1 - ss(m2, m3, t));
     bortB = mot;
+    styrB = Math.max(styrB, ss(0, 0.35, mot));
     // handen i örat, och armbågen där handleden ser naturlig ut (naturlig): nedåt och utåt, och ut åt
     // sidan (arm) så långt det behövs
     qG.setFromAxisAngle(UPP, GREPP_FAT * (1 - ss(0, GREPP_LYFT, kp.p.y - KUP.y)));
@@ -4884,9 +5153,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const YAW0 = SCEN.VRID * DEG + 0.04;
   // Leendet han alltid har, i vilan och när han pratar: nöjd och säker på sin sak, och lite överdrivet
   // (kisandet följer leendet, så att det når ögonen). Det viker undan när han drar ned brynen, som när
-  // han blir allvarlig före ett slag: man ler inte och rynkar pannan på en gång. Förut log han 0,14 i
-  // vilan och 0,24 när han pratade, med ett svagare leende i skuggaren (ändrat 2026-11-06).
-  const NOJD = 0.5;
+  // han blir allvarlig före ett slag: man ler inte och rynkar pannan på en gång. När han pratar ler han
+  // lite mer (NOJD_TAL), och i skrattet kisar han så att ögonen nästan går igen. Förut log han
+  // 0,14 i vilan och 0,24 när han pratade, med ett svagare leende i skuggaren (ändrat 2026-11-06), och
+  // sedan 0,5 både i vilan och när han pratade, med kisandet en tredjedel av leendet (ändrat 2026-11-13).
+  const NOJD = 0.62;
+  const NOJD_TAL = 0.12;
   let sistaT = 0;
   let sistaN = 0;
   // T: var i rörelserna (0–2,5 vilan, 2,5–5,5 fram till domen, 5,5–9,95 gesterna
@@ -4929,24 +5201,27 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     U.uAx.value.set(axV, axH);
     U.uAndas.value = andning(n) + d('andas') + skratt * 5 * Math.sin(n * 15);
     const lyft = talar * 0.38 * Math.max(0, Math.sin(n * 4.3));
-    U.bryn.value.set(kan('brynX') + lyft, kan('brynY') + lyft);
+    // (han blinkar med sitt högra öga, och det brynet går ned lite)
+    const vink = d('vink');
+    U.vink.value = vink;
+    U.bryn.value.set(kan('brynX') + lyft - vink * 0.5, kan('brynY') + lyft);
     // (nöjd, utom när brynen dras ned)
     const allvar = clamp(-(d('brynX') + d('brynY')) * 0.7);
-    U.le.value = Math.max(NOJD * (1 - allvar) * (1 - d('stel')), skratt, 0.6 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
+    U.le.value = Math.max((NOJD + NOJD_TAL * talar) * (1 - allvar) * (1 - d('stel')), skratt * 0.85, 0.85 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
     // talet: stavelser med små pauser, ibland rundare läppar; läpparna skiljs åt hela tiden han pratar och
     // öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
     const stav = Math.abs(Math.sin(n * 7.3)) * (0.42 + 0.58 * ss(-0.35, 0.5, Math.sin(n * 2.3 + 0.7))) * (0.72 + 0.28 * Math.sin(n * 17.3));
     const talMun = (mun === null ? talar : mun) * (1 - dricker) * (1 - Math.max(iMun, blaser));
     // läpparna om cigarren, en pust mellan blossen och ett o när han blåser ut
     const puff = cc ? spar(cc.pust, t) : 0;
-    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.92 + 0.14 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
+    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.44 + 0.08 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
     U.rund.value = talMun * Math.max(0, Math.sin(n * 3.1 + 1.3)) * 0.8;
-    U.kis.value = Math.max(skratt * 0.75, U.le.value * 0.35, d('kis'));
+    U.kis.value = Math.max(skratt * 0.7, U.le.value * 0.5, d('kis'));
     // blinkningarna och blicken som flyttar sig lite (blinkar, sakkader)
     const bl = blinkar(n);
     const sk = sakkader(n);
     U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser, d('rund'));
-    U.blund.value = Math.max(dricker * 0.82, skratt * 0.42, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
+    U.blund.value = Math.max(dricker * 0.82, skratt * 0.3, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
     U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], d('blickY') + sk[1]);
     sa.copy(SA);
     sa.y += axV;
@@ -4964,6 +5239,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     let extraA = null;
     bortA = 0;
     bortB = 0;
+    styrA = 0;
+    styrB = 0;
     const pc = kl && kl.pen;
     if (pc) extraA = pennArm(t, sa, a, { n: pc.n, fran: kl.fran });
     else if (KPG.synlig) {
@@ -5027,7 +5304,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const fB = kl && kl.fB;
     if (fA) svang(fA, t, a);
     if (fB) svang(fB, t, b);
-    ik(sa, a.w, a.pol, E_, Wr_);
+    bekvam(sa, a, 1, VILA_A[0], styrA, t, MINNE.A, E_, Wr_);
     // fingrarna trummar bara i vilan, med den ena eller den andra handen
     const iVila = t < 2.5 || (t > 9.95 && t < 20);
     const trumA = iVila && trumHand === 'A' ? trummar(n) : extraA;
@@ -5038,7 +5315,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     if (fA) A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, spar(fA.spar, t), spar(fA.tumme, t), handForm(fA, t, exA));
     else A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar + SAMLA.A * vA, TUMME + (TUMME_VILA.A - TUMME) * vA, trumA);
     U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
-    ik(sb, b.w, b.pol, E_, Wr_);
+    bekvam(sb, b, -1, VILA_B[0], styrB, t, MINNE.B, E_, Wr_);
     if (fB) B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, spar(fB.spar, t), spar(fB.tumme, t), handForm(fB, t, exB));
     else B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8 + SAMLA.B * vB, TUMME + (TUMME_VILA.B - TUMME) * vB, trumB);
     U.uArm.value[3].copy(sb); U.uArm.value[4].copy(E_); U.uArm.value[5].copy(Wr_);

@@ -38,11 +38,18 @@ function seasonOf(iso) {
 }
 
 function marketMissing(d) {
-  if (d.match.type === 'cup') return d.odds.note || 'DraftKings har inga odds för matchen';
+  if (d.match.type === 'cup' || d.match.type === 'intl') return d.odds.note || 'DraftKings har inga odds för matchen';
   return 'football-data.co.uk har inga odds för matchen ännu (läggs ut fre/tis)';
 }
 
+// En landskamp (match.type 'intl', prognosen kind 'marknaden', landDetail i
+// src/matches.js) har marknadens prognos i stället för modellens och varken xG,
+// domare eller skador. Den får ett eget underlag, så att Claude aldrig får
+// något som ser ut som modellens prognos.
+export const arLandskamp = (d) => Boolean(d && ((d.match && d.match.type === 'intl') || (d.prediction && d.prediction.kind === 'marknaden')));
+
 export function payloadOf(d) {
+  if (arLandskamp(d)) return landPayloadOf(d);
   const m = d.match;
   const p = d.prediction;
   const H = m.home;
@@ -150,6 +157,74 @@ export function payloadOf(d) {
   const src = [d.squad.home, d.squad.away].find((s) => s.source);
   if (src) out['skador och avstängningar'].källa = `${src.source.provider}${src.note ? `, ${src.note}` : ''}`;
   out.okänt = d.unknowns;
+  return out;
+}
+
+// Matchen i underlaget: samma fält för klubbmatcher och landskamper.
+function matchOf(m) {
+  const match = { tävling: m.compName, säsong: seasonOf(m.kickoff) };
+  if (m.round) match.omgång = m.round;
+  match.avspark = `${fKickoff.format(new Date(m.kickoff))} svensk tid`;
+  match.hemmalag = m.home;
+  match.bortalag = m.away;
+  if (m.venue) match.arena = m.venue;
+  if (m.neutral) match['neutral plan'] = 'ja';
+  return match;
+}
+
+// Landskampen: marknadens prognos (spelbolagets odds utan marginal, målen ur en
+// Poissonmodell som passar oddsen), tabellen och Nations League hittills, formen och
+// de tio senaste landskamperna, schemat och mötena sedan hösten 2024. Inga steg,
+// inga baslinjer och ingen modell – och skador, xG och domare står som okända.
+function landPayloadOf(d) {
+  const m = d.match;
+  const p = d.prediction;
+  const H = m.home;
+  const A = m.away;
+  const trio = (v) => ({ [H]: v[0], Oavgjort: v[1], [A]: v[2] });
+  const match = matchOf(m);
+  match.slag = 'landskamp';
+
+  let prognos;
+  if (p && p.status === 'ok' && Array.isArray(p.p)) {
+    const w = pct3(p.p);
+    const mk = p.baselines && p.baselines.market;
+    prognos = {
+      vems: 'marknadens, inte sajtens modell (modellen räknar bara på lagen i England)',
+      källa: `${(mk && mk.source) || 'DraftKings via ESPN'}, utan spelbolagets marginal; lägre odds betyder större chans`,
+      '1X2 efter 90 minuter, odds': trio(w.map(pctOdds)),
+    };
+    if (p.goals) prognos['förväntade mål, ur oddsen'] = { [H]: dec(p.goals[0]), [A]: dec(p.goals[1]) };
+    if (p.over25 != null) prognos['över 2,5 mål, odds'] = oddsP(p.over25);
+    if (p.btts != null) prognos['båda lagen gör mål, odds'] = oddsP(p.btts);
+    if (p.scores && Array.isArray(p.scores.top)) prognos['troligaste resultat, odds'] = p.scores.top.map((t) => `${t.home}–${t.away} (${fmtOdds(1 / t.p)})`);
+  } else {
+    prognos = `okänt – ${(p && p.reason) || marketMissing(d)}`;
+  }
+
+  const out = { match, 'marknadens prognos': prognos };
+  out.odds = oddsOf(d.odds || {});
+  out.lagen = teamsOf(d, H, A);
+  out.form = {
+    förklaring: 'senaste 5 landskamperna, nyast först; V/O/F avgjort på 90 minuter',
+    [H]: formOf(d.teams.home),
+    [A]: formOf(d.teams.away),
+  };
+  const senaste = (t) => (t.senaste || []).slice(5).map((x) => `${x.result || '?'} ${x.date} ${x.comp} ${x.home ? 'hemma' : 'borta'}${x.opponent ? ` mot ${x.opponent}` : ''} ${x.gf}–${x.ga}${x.decided ? ` (${x.decided})` : ''}`);
+  if ((d.teams.home.senaste || []).length > 5 || (d.teams.away.senaste || []).length > 5) {
+    out['landskamperna före dem'] = { förklaring: 'landskamp 6–10 bakåt, nyast först (VM = världsmästerskapet, VMK = VM-kvalet, VSK = vänskapsmatch)', [H]: senaste(d.teams.home), [A]: senaste(d.teams.away) };
+  }
+  const nasta = (t) => (t.schedule && t.schedule.next && t.schedule.next.opponent ? `${t.schedule.next.date} ${t.schedule.next.compName || t.schedule.next.comp} ${t.schedule.next.home ? 'hemma' : 'borta'} mot ${t.schedule.next.opponent}` : null);
+  if (nasta(d.teams.home) || nasta(d.teams.away)) out['nästa landskamp'] = { [H]: nasta(d.teams.home) || 'okänt', [A]: nasta(d.teams.away) || 'okänt' };
+  const pm = d.pastMeetings;
+  if (pm) {
+    out['tidigare möten'] = pm.list && pm.list.length
+      ? pm.list.map((x) => `${x.date} ${x.compShort}: ${x.home} ${x.score.home}–${x.score.away} ${x.away}`)
+      : `inga möten i landskamper sedan ${pm.first}`;
+  }
+  const okand = (s) => (s && !s.unknown ? squadOf(s) : `okänt – ${(s && s.reason) || 'ingen fri källa för landslagens skador och avstängningar'}`);
+  out['skador och avstängningar'] = { [H]: okand(d.squad && d.squad.home), [A]: okand(d.squad && d.squad.away) };
+  out.okänt = [...(d.unknowns || []), 'xG och skott: finns inte för landslagen i de fria källorna.', 'Domaren: okänd.'];
   return out;
 }
 

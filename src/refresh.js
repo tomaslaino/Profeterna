@@ -22,7 +22,10 @@ async function refreshOne(src, force) {
   const cached = readCache(src.id);
   const stale = !cached || !cached.fetchedAt || ageHours(cached.fetchedAt) > src.maxAgeHours;
   const errRetry = cached && cached.lastError && ageHours(cached.lastAttempt) > RETRY_AFTER_ERROR_HOURS;
-  if (!force && !stale && !errRetry) {
+  // due: källan kan själv säga att något nytt har kommit som inte hinner vänta
+  // på maxAge (lagsköldarna när nya lag dyker upp i spelprogrammen).
+  const due = !!(src.due && cached && cached.data && !cached.lastError && safeDue(src, cached.data));
+  if (!force && !stale && !errRetry && !due) {
     return { id: src.id, action: 'cache', fetchedAt: cached.fetchedAt };
   }
   try {
@@ -39,6 +42,14 @@ async function refreshOne(src, force) {
     });
     console.error(`[refresh] ${src.id}: ${msg}`);
     return { id: src.id, action: 'error', error: msg };
+  }
+}
+
+function safeDue(src, data) {
+  try {
+    return src.due(data);
+  } catch {
+    return false;
   }
 }
 

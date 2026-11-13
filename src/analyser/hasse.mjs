@@ -62,7 +62,8 @@ export function oddsen(d, article) {
     const mk = p && p.baselines && p.baselines.market;
     const bolag = mk && Array.isArray(mk.odds) ? mk.odds : d && d.odds && d.odds.espn && d.odds.espn.x12;
     if (m && Array.isArray(bolag) && bolag.length === 3) ut.push(`Spelbolagen: ${trio(bolag.map(odds2))}. Lägre odds, större chans.`);
-    if (m && p && Array.isArray(p.p)) ut.push(`Sajtens prognos, odds utan spelbolagens marginal: ${trio(pct3(p.p).map(pctOdds))}.`);
+    // En landskamp har marknadens prognos (spelbolagets odds utan marginal), inte sajtens modell.
+    if (m && p && Array.isArray(p.p)) ut.push(p.kind === 'marknaden' ? `Utan spelbolagets marginal: ${trio(pct3(p.p).map(pctOdds))}.` : `Sajtens prognos, odds utan spelbolagens marginal: ${trio(pct3(p.p).map(pctOdds))}.`);
   } catch { /* utan odds */ }
   const signs = (article.tip && article.tip.signs) || [];
   if (signs.length) ut.push(`Kollegan ringade in ${signs.map((n) => ORD[n]).join(' och ')}. Du bestämmer själv.`);
@@ -95,10 +96,11 @@ export function kallan(article) {
 }
 const texten = (k) => [k.rubrik, k.ingress, ...k.stycken, k.tips.text, k.tips.marginal].filter(Boolean).join('\n');
 
-export function uppdrag(id, article) {
+// land: en landskamp (kryddan ur kryddorLand).
+export function uppdrag(id, article, land = false) {
   const sl = lotter(`${id}:${hc.promptVersion}`);
   const fraser = ta(hc.fraser, 2, sl);
-  const krydda = sl() < hc.kryddaChans ? ta(hc.kryddor, 1, sl)[0] : null;
+  const krydda = sl() < hc.kryddaChans ? ta(land ? hc.kryddorLand : hc.kryddor, 1, sl)[0] : null;
   const bielsa = new RegExp(hc.bielsaNar, 'i').test(texten(kallan(article))) ? ta(hc.bielsaOrd, sl() < 0.5 ? 1 : 2, sl) : [];
   return { fraser, krydda, bielsa };
 }
@@ -192,7 +194,7 @@ export const hasseKlar = (h, article) => Boolean(h && article.tip && h.tips === 
 // ordning, och också om granskningen inte går att få: den får aldrig stoppa en text.
 export async function sprakfel(stycken, { claude = claudeSvar } = {}) {
   try {
-    const egna = [...hc.fraser, ...hc.kryddor, hc.bielsaCitat, hc.bielsaTillbaka].join(' · ');
+    const egna = [...hc.fraser, ...hc.kryddor, ...(hc.kryddorLand || []), hc.bielsaCitat, hc.bielsaTillbaka].join(' · ');
     const r = await claude({ system: `${hc.sprak.system}\n\nHans egna uttryck: ${egna}`, prompt: stycken.join('\n\n'), model: hc.model, effort: hc.sprak.effort, timeoutMs: hc.sprak.timeoutMs, tools: [] });
     const lista = jsonOf(r.content).fel;
     if (!Array.isArray(lista)) return [];
@@ -207,9 +209,12 @@ export async function sprakfel(stycken, { claude = claudeSvar } = {}) {
 // på sajten (data/match/<id>.json) för oddsen, eller null.
 // → {ok: true, hasse, meta} eller {ok: false, error}.
 export async function skrivHasse(id, article, { persona, match = null, now = () => new Date(), claude = claudeSvar }) {
-  const u = uppdrag(id, article);
+  // (en landskamp: landslagen, inte klubbarna, se config/hasse.js)
+  const land = Boolean(match && match.match && match.match.type === 'intl');
+  const u = uppdrag(id, article, land);
   const odds = oddsen(match, article);
   const rader = [
+    land && hc.landskamp,
     `Analysen:\n${JSON.stringify(kallan(article))}`,
     ...odds,
     `Uttryck du kan ta till där de passar, annars inte alls: ${u.fraser.join(' · ')}.`,

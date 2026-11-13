@@ -109,8 +109,10 @@
       // klubben och lokaltidningen) bara namnet.
       typord: { podd: 'podden', forum: 'forumet', media: '', lokal: '', motstand: 'intervjun i' },
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
-      // under tavlan, före arenan: numret på kupongen
+      // under tavlan, före arenan: numret på kupongen, och för en landskamp tävlingen och gruppen (Nations League ·
+      // Grupp B4) där klubbarna inte har något (2026-11-13)
       match: (n) => `Match ${n}`,
+      landskamp: (t, g) => [t, g ? `Grupp ${g}` : ''].filter(Boolean).map((x) => String(x).replace(/ /g, '\u00a0')).join('\u00a0· '),
       // över lagets text, som står efter varandra
       hemma: 'Hemma',
       borta: 'Borta',
@@ -133,14 +135,16 @@
   const KORT = { 'AFC Wimbledon': 'Wimbledon', 'Crewe Alexandra': 'Crewe', 'Sheffield Wednesday': 'Sheff Wed', 'Sheffield United': 'Sheff Utd', 'Milton Keynes Dons': 'MK Dons',
     'Preston North End': 'Preston', 'Accrington Stanley': 'Accrington', 'Queens Park Rangers': 'QPR', 'West Bromwich Albion': 'West Brom', 'Bristol City': 'Bristol City', 'Bristol Rovers': 'Bristol Rovers', 'Notts County': 'Notts County',
     'Manchester City': 'Man City', 'Manchester United': 'Man Utd', 'Tottenham Hotspur': 'Tottenham', 'Brighton & Hove Albion': 'Brighton', 'Wolverhampton Wanderers': 'Wolves',
-    'Nottingham Forest': "Nott'm Forest", 'AFC Bournemouth': 'Bournemouth' };
+    'Nottingham Forest': "Nott'm Forest", 'AFC Bournemouth': 'Bournemouth', 'Bosnien & Hercegovina': 'Bosnien' };
   const kort = (n) => KORT[n] || String(n || '').replace(/\s+(United|City|Town|Rovers|Athletic|County|Wanderers|Albion|Argyle|Hotspur)$/, '');
   // Adressen till lagets sköld (skoldar.js), eller ''.
   const skoldSrc = (lag) => (lag && typeof Skoldar !== 'undefined' && Skoldar.src ? Skoldar.src(lag) || '' : '');
-  // Lagets sköld, gråskalig som tryck på papperet.
-  const skold = (lag, kl = '') => {
+  // Lagets sköld, gråskalig som tryck på papperet. Ett landslag har flaggan i sköldens ställe (data/skoldar.json har
+  // den under lagets svenska namn), och den är bredare än hög (flagga, 2026-11-13).
+  const skold = (lag, kl = '', flagga = false) => {
     const src = skoldSrc(lag);
-    return src ? `<img class="hg-skold${kl ? ` ${kl}` : ''}" src="${esc(src)}" alt="" width="40" height="40" decoding="async">` : '';
+    const k = [kl, flagga ? 'flagga' : ''].filter(Boolean).join(' ');
+    return src ? `<img class="hg-skold${k ? ` ${k}` : ''}" src="${esc(src)}" alt="" width="40" height="40" decoding="async">` : '';
   };
 
   // ---------- numret ----------
@@ -230,9 +234,10 @@
   }
   // Sidans citat (redaktören väljer högst ett, och bara när det säger något): { sagt, vem, podd, typ, datum }
   // → { sagt, vem: "Stevie, The Wednesday Week, 9 nov" } eller null
+  // Ett citat som redan var på svenska (SVT, Aftonbladet) har oversatt: false och står utan (översatt).
   function poddCitat(c) {
     if (!c || !c.sagt) return null;
-    return { sagt: c.sagt, vem: stor([c.vem, c.podd ? TEXT.poddar.kalla(c) : '', kortDatum(iso(c.datum))].filter(Boolean).join(', ')) };
+    return { sagt: c.sagt, vem: stor([c.vem, c.podd ? TEXT.poddar.kalla(c) : '', kortDatum(iso(c.datum))].filter(Boolean).join(', ')), oversatt: c.oversatt !== false };
   }
 
   // ---------- bilderna ----------
@@ -454,7 +459,7 @@
   // Sidhuvudet som i en tidning: sidnumret ytterst, namnet (tillbaka till omslaget) och numret med lördagen (huvudet).
   const folio = (u, nr) => `<div class="hg-folio${nr % 2 ? ' h' : ''}"><b>${nr}</b><a href="#hg-forsta">${NAMN}</a><span>${esc(huvudet(u))}</span></div>`;
   // c: { sagt, vem } (poddCitat). Citaten är översatta från engelska, och det står efter namnet.
-  const citat = (c) => `<blockquote class="hg-citat"><p>”${esc(hel(c.sagt))}”</p><cite>${esc(c.vem)} (${esc(TEXT.poddar.oversatt)})</cite></blockquote>`;
+  const citat = (c) => `<blockquote class="hg-citat"><p>”${esc(hel(c.sagt))}”</p><cite>${esc(c.vem)}${c.oversatt === false ? '' : ` (${esc(TEXT.poddar.oversatt)})`}</cite></blockquote>`;
   // Lagets stycken som html, med personerna (namn: spelarna och tränaren som redaktören säger står i texten) i fetstil
   // första gången de nämns. De längsta namnen först, så att Max Lowe blir fet och inte bara Lowe.
   function fetaNamn(stycken, namn) {
@@ -485,12 +490,13 @@
   // spelprogram); utan arena hela dagen. Förut stod lagen på ett tryckt block i terrakotta, det enda fyllda i tidningen.
   function tavla(s, namn) {
     const kol = (over, inne, kl = '') => `<div class="hg-tavla-kol"><span class="hg-tavla-over">${esc(over)}</span><span class="hg-ruta${kl}">${inne}</span></div>`;
-    const lagK = (i) => kol(namn(i), skold(namn(i), 'mot'));
+    const L = s.landskamp;
+    const lagK = (i) => kol(namn(i), skold(namn(i), 'mot', Boolean(L)));
     const mitt = giltig(s.avspark) ? kol(dagen(s.avspark), esc(tid(s.avspark)), ' hg-ruta-tid') : '<div class="hg-tavla-kol"></div>';
     const ort = s.ort && !String(s.arena || '').includes(s.ort) ? s.ort : '';
     const plats = s.arena ? [s.arena, ort].filter(Boolean).join(', ') : giltig(s.avspark) ? `${fVdagLang.format(new Date(s.avspark))} ${fDagMan.format(new Date(s.avspark))}` : '';
     return `<header class="hg-tavla"><div class="hg-tavla-rad">${lagK(0)}${mitt}${lagK(1)}</div>` +
-      `<p class="hg-plats"><span>${esc([s.nr ? TEXT.poddar.match(s.nr) : '', plats].filter(Boolean).join(' · '))}</span></p></header>`;
+      `<p class="hg-plats"><span>${esc([s.nr ? TEXT.poddar.match(s.nr) : '', L ? TEXT.poddar.landskamp(L.turnering, L.grupp) : '', plats].filter(Boolean).join('\u00a0· '))}</span></p></header>`;
   }
   // Matchbladet. Först 2026-11-10 (användarens önskemål: "ett matchblad med information. Först en kort introduktion,
   // sen diskussion om ena laget, sen det andra och sist en sammanfattning", snygga artiklar och en aktuell bild för

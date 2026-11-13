@@ -1,0 +1,344 @@
+{
+ "omgang": "2026-11-14-st4979",
+ "matcher": [
+  "401861166",
+  "401861167",
+  "401861165",
+  "401861168",
+  "401861169",
+  "401861170",
+  "401861164",
+  "401880749",
+  "401880747",
+  "401880745",
+  "401880754",
+  "401880744",
+  "401881266"
+ ],
+ "skriven": "2026-11-13T18:26:21.188Z",
+ "model": "claude-opus-5-5",
+ "version": "2026-11-10.3",
+ "notiser": [
+  {
+   "nr": 1,
+   "id": "401861166",
+   "match": "Sverige – Bosnien & Hercegovina",
+   "avspark": "2026-11-14T19:45:00.000Z",
+   "rubrik": "Zeneli borta när Sverige kan säkra gruppen",
+   "text": "Besfort Zeneli har lämnat återbud på grund av en skada. Graham Potter kallar inte in någon ersättare, så truppen är 24 spelare. Lucas Bergvall, Isak Hien, Emil Holm och Carl Starfelt är också skadade, medan Dejan Kulusevski och Anthony Elanga är tillbaka. Sverige leder grupp B4 med 10 poäng, två före Bosnien & Hercegovina, och kan säkra uppflyttning till A-divisionen med en seger. I oktober slutade mötet i Bosnien 1–1.",
+   "kallor": [
+    {
+     "source": "HurBra.se",
+     "title": "HemSportBesfort Zeneli skadad – missar Sveriges Nations League-avgörande",
+     "url": "https://hurbra.se/besfort-zeneli-skadad-9-november-2026/",
+     "publishedAt": null
+    },
+    {
+     "source": "Fotbolldirekt",
+     "title": "Njie kallas in för första gången",
+     "url": "https://fotbolldirekt.se/?p=426241",
+     "publishedAt": null
+    }
+   ],
+   "lag": [
+    "Sverige",
+    "Bosnien & Hercegovina"
+   ],
+   "bilder": [
+    null,
+    null
+   ]
+  },
+  {
+   "nr": 2,
+   "id": "401861167",
+   "match": "Portugal – Danmark",
+   "avspark": "2026-11-14T19:45:00.000Z",
+   "rubrik": "Portugal har full pott i gruppen",
+   "text": "Portugal har vunnit alla fyra matcherna i grupp A4 och har 12 poäng, sex mer än tvåan Danmark. I oktober vann portugiserna med 4–2 i Danmark. Hemma har Portugal två segrar i år och bara ett insläppt mål. Danmark vann senast med 1–0 borta mot Wales men har förlorat en av sina två bortamatcher i år. Båda lagen spelar igen tre dagar senare, Portugal i Wales och Danmark hemma mot Norge.",
+   "kallor": [],
+   "lag": [
+    "Portugal",
+    "Danmark"
+   ],
+   "bilder": [
+    {
+     "fil": "portugal-7b713de2.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cwzd66r22j68o"
+    },
+    null
+   ]
+  },
+  {
+   "nr": 3,
+   "id": "401861165",
+   "match": "Norge – Wales",
+   "avspark": "2026-11-14T17:00:00.000Z",
+   "rubrik": "Norge och Wales längst ned i gruppen",
+   "text": "Norge och Wales har båda 3 poäng efter fyra matcher i grupp A4, och Norge ligger sist. Norge har förlorat tre raka matcher, alla med 1–2, och en av dem var mot Wales i oktober. Wales har inte gjort något mål på sina två bortamatcher i år och har släppt in 3. Båda lagen spelar igen tre dagar senare, Norge borta mot Danmark och Wales hemma mot Portugal.",
+   "kallor": [],
+   "lag": [
+    "Norge",
+    "Wales"
+   ],
+   "bilder": [
+    null,
+    {
+     "fil": "wales-c37f8748.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c623jl1kenvyo"
+    }
+   ]
+  },
+  {
+   "nr": 4,
+   "id": "401861168",
+   "match": "Rumänien – Polen",
+   "avspark": "2026-11-14T19:45:00.000Z",
+   "rubrik": "Poänglöst Rumänien möter Polen efter 0–6",
+   "text": "Rumänien har förlorat alla fyra matcherna i grupp B4 och är det enda laget utan poäng. I oktober förlorade rumänerna med 0–6 borta mot Polen. Hemma har Rumänien två förluster i år och 2–5 i målskillnad. Polen har 4 poäng men har förlorat båda sina bortamatcher i år och gjort ett enda mål. Senast förlorade polackerna med 0–1 i Bosnien. Tre dagar senare tar Polen emot gruppettan Sverige.",
+   "kallor": [],
+   "lag": [
+    "Rumänien",
+    "Polen"
+   ],
+   "bilder": [
+    null,
+    {
+     "fil": "polen-cc5b328f.jpg",
+     "kalla": "SPORT1",
+     "foto": null,
+     "sida": "https://www.sport1.de/news/transfermarkt/2026/11/fc-bayern-an-polen-talent-interessiert"
+    }
+   ]
+  },
+  {
+   "nr": 5,
+   "id": "401861169",
+   "match": "Nordirland – Ukraina",
+   "avspark": "2026-11-14T19:45:00.000Z",
+   "rubrik": "Nordirland leder utan att ha släppt in",
+   "text": "Nordirland toppar grupp B2 med 8 poäng och har inte släppt in något mål på sina fyra gruppmatcher. Båda hemmamatcherna har slutat 0–0. I oktober vann nordirländarna med 3–0 över Ukraina. Ukraina har 4 poäng och förlorade senast med 1–2 hemma mot Ungern. Borta har ukrainarna däremot inte släppt in något mål på sina två matcher i år.",
+   "kallor": [],
+   "lag": [
+    "Nordirland",
+    "Ukraina"
+   ],
+   "bilder": [
+    null,
+    null
+   ]
+  },
+  {
+   "nr": 6,
+   "id": "401861170",
+   "match": "Österrike – Irland",
+   "avspark": "2026-11-14T19:45:00.000Z",
+   "rubrik": "Österrike utan Alaba kan säkra uppflyttning",
+   "text": "Vinner Österrike hemma mot Irland i Linz är uppflyttningen till A-divisionen klar, skriver Salzburg24 med nyhetsbyrån APA som källa. Kaptenen David Alaba saknas fortfarande med en vadskada, medan Christoph Baumgartner är tillbaka efter en senskada. Österrike leder grupp B3 med 8 poäng och har inte förlorat någon match, men har spelat oavgjort två gånger i rad. Irland har 5 poäng och spelade 2–2 mot Österrike i oktober.",
+   "kallor": [
+    {
+     "source": "Salzburg24",
+     "title": "Letzter Kader des Jahres",
+     "url": "https://www.salzburg24.at/sport/fussball/showdown-um-nations-league-aufstieg-ralf-rangnick-nominiert-vier-salzburger-fuer-oefb-team-art-343276",
+     "publishedAt": null
+    }
+   ],
+   "lag": [
+    "Österrike",
+    "Irland"
+   ],
+   "bilder": [
+    null,
+    null
+   ]
+  },
+  {
+   "nr": 7,
+   "id": "401861164",
+   "match": "Georgien – Ungern",
+   "avspark": "2026-11-14T17:00:00.000Z",
+   "rubrik": "Georgien har inte gjort mål i gruppen",
+   "text": "Georgien ligger sist i grupp B2 med 2 poäng och har inte gjort något mål på sina fyra gruppmatcher. Två slutade 0–0 och två förlorades med 0–1. Ungern är tvåa med 7 poäng och vann senast med 2–1 borta mot Ukraina. I oktober vann ungrarna med 1–0 hemma mot Georgien. Tre dagar senare tar Ungern emot gruppettan Nordirland.",
+   "kallor": [],
+   "lag": [
+    "Georgien",
+    "Ungern"
+   ],
+   "bilder": [
+    {
+     "fil": "georgien-f71eab75.jpg",
+     "kalla": "Wochenblatt Reporter",
+     "foto": null,
+     "sida": "https://www.wochenblatt-reporter.de/c-sport/fc-heidenheim-zivzivadze-fuer-georgien-nominiert_a932531"
+    },
+    null
+   ]
+  },
+  {
+   "nr": 8,
+   "id": "401880749",
+   "match": "Milton Keynes Dons – Burton Albion",
+   "avspark": "2026-11-14T15:00:00.000Z",
+   "rubrik": "MK Dons har vunnit fyra raka",
+   "text": "Milton Keynes Dons har vunnit fyra matcher i rad: 1–0 mot Stevenage, 4–1 mot Bromley och 6–1 mot Doncaster i ligan och senast 2–1 mot Swindon i FA-cupen. Laget är tolva i League One med 18 poäng. Burton är femtonde med 17 poäng och har bara vunnit två av sju bortamatcher, med 6–11 i målskillnad. Burton har gjort 5,7 mål fler än lagets xG.",
+   "kallor": [],
+   "lag": [
+    "Milton Keynes Dons",
+    "Burton Albion"
+   ],
+   "bilder": [
+    {
+     "fil": "milton-keynes-dons-5bf48ac4.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c62l4l2k0lyro"
+    },
+    {
+     "fil": "burton-albion-d750ee4f.jpg",
+     "kalla": "The Non-League Football Paper",
+     "foto": null,
+     "sida": "https://www.thenonleaguefootballpaper.com/latest-news/631615/burton-albion-4-0-afc-rushden-diamonds-cup-dream-for-diamonds-crushed-by-the-brewers/"
+    }
+   ]
+  },
+  {
+   "nr": 9,
+   "id": "401880747",
+   "match": "Sheffield Wednesday – Plymouth Argyle",
+   "avspark": "2026-11-14T15:00:00.000Z",
+   "rubrik": "Wednesday utan seger på fem matcher",
+   "text": "Sheffield Wednesday har inte vunnit på fem matcher. Först kom två förluster med 0–2 och sedan tre raka 1–1, den senaste mot Oldham i FA-cupen. Laget är nia i League One med 20 poäng och har bara släppt in 5 mål på sju hemmamatcher. Plymouth är femma med 23 poäng och har vunnit fyra av sju bortamatcher. I det senaste mötet, i mars 2025, vann Wednesday med 3–0.",
+   "kallor": [],
+   "lag": [
+    "Sheffield Wednesday",
+    "Plymouth Argyle"
+   ],
+   "bilder": [
+    {
+     "fil": "sheffield-wednesday-22f7b411.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c68jzj9mww94o"
+    },
+    {
+     "fil": "plymouth-argyle-078fdeff.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/videos/cwp9gdzj705lo"
+    }
+   ]
+  },
+  {
+   "nr": 10,
+   "id": "401880745",
+   "match": "Stockport County – Reading",
+   "avspark": "2026-11-14T15:00:00.000Z",
+   "rubrik": "Starkt Stockport hemma tar emot Reading",
+   "text": "Stockport är tvåa i League One med 26 poäng och har vunnit fem av sju hemmamatcher. Senast blev det 2–2 borta mot Cray Wanderers i FA-cupen. Reading är sexa med 22 poäng och vann med 5–0 hos Peterborough i cupen, men har bara vunnit en av sju ligamatcher på bortaplan. I januari vann Reading med 1–0 hemma mot Stockport.",
+   "kallor": [],
+   "lag": [
+    "Stockport County",
+    "Reading"
+   ],
+   "bilder": [
+    {
+     "fil": "stockport-county-7cf5d560.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/videos/cqj9km408d38o"
+    },
+    {
+     "fil": "reading-ce8bb433.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/videos/cqx29ey1m9zpo"
+    }
+   ]
+  },
+  {
+   "nr": 11,
+   "id": "401880754",
+   "match": "AFC Wimbledon – Blackpool",
+   "avspark": "2026-11-14T15:00:00.000Z",
+   "rubrik": "Wimbledon har förlorat fyra av fem",
+   "text": "AFC Wimbledon har förlorat fyra av sina fem senaste matcher, bland dem 0–5 mot Sheffield Wednesday och 0–3 hemma mot Mansfield, och åkte senast ur FA-cupen mot Crewe. Laget är artonde med 13 poäng och har bara gjort 3 mål på sex hemmamatcher. Blackpool ligger en poäng efter och har vunnit en av sex bortamatcher. Wimbledon vann båda mötena förra säsongen.",
+   "kallor": [],
+   "lag": [
+    "AFC Wimbledon",
+    "Blackpool"
+   ],
+   "bilder": [
+    {
+     "fil": "afc-wimbledon-40fff443.jpg",
+     "kalla": "VAVEL",
+     "foto": null,
+     "sida": "https://www.vavel.com/en/data/afc-wimbledon/results/"
+    },
+    {
+     "fil": "blackpool-4ac32c8c.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/videos/cqm26j0x2xzlo"
+    }
+   ]
+  },
+  {
+   "nr": 12,
+   "id": "401880744",
+   "match": "Wigan Athletic – Barnsley",
+   "avspark": "2026-11-14T15:00:00.000Z",
+   "rubrik": "Bottenmöte mellan Wigan och Barnsley",
+   "text": "Wigan är 21:a i League One med 11 poäng och Barnsley näst sist med 9 poäng på två färre matcher. Wigan har gjort 8,3 mål färre än lagets xG. Barnsley har förlorat tre av sina fyra senaste ligamatcher, alla med 1–2, men vann med 7–2 mot Aldershot i FA-cupen. De tre senaste mötena har slutat 1–1.",
+   "kallor": [],
+   "lag": [
+    "Wigan Athletic",
+    "Barnsley"
+   ],
+   "bilder": [
+    {
+     "fil": "wigan-athletic-448edd3f.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/videos/cmkgekz29k2yo"
+    },
+    {
+     "fil": "barnsley-992b3389.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c65y1wrg8x2vo"
+    }
+   ]
+  },
+  {
+   "nr": 13,
+   "id": "401881266",
+   "match": "Swindon Town – Grimsby Town",
+   "avspark": "2026-11-14T15:00:00.000Z",
+   "rubrik": "Grimsby har gjort mål i mängd",
+   "text": "Grimsby har gjort nio mål på sina två senaste ligamatcher, 4–1 mot Gillingham och 5–2 mot York, och är sexa i League Two med 20 poäng. Senast blev det 2–2 mot Stafford Rangers i FA-cupen. Swindon är trettonde med 19 poäng och har bara förlorat en av sju hemmamatcher. Senast lagen möttes, i Grimsby i april, vann Grimsby med 4–0.",
+   "kallor": [],
+   "lag": [
+    "Swindon Town",
+    "Grimsby Town"
+   ],
+   "bilder": [
+    {
+     "fil": "swindon-town-7784b427.jpg",
+     "kalla": "The Wiltshire Gazette and Herald",
+     "foto": null,
+     "sida": "https://www.gazetteandherald.co.uk/sport/26725069.like-work-lee-power-swindon-town/"
+    },
+    {
+     "fil": "grimsby-town-34dcbc90.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/videos/cv5yn1w5j359o"
+    }
+   ]
+  }
+ ]
+}

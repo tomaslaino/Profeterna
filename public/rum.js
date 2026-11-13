@@ -1406,7 +1406,7 @@ window.Rum = (() => {
 ${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d rum-pl-vhs')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
-${plane(-330, `${sill()}${haze()}`)}
+${plane(-330, `${sill()}${haze()}<div class="rum-du" id="rum-du" hidden aria-hidden="true"></div>`)}
 ${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}`, 1.05)}
 ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div></div>
@@ -1581,10 +1581,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const signs = {};
     const c = rd.coupon || (typeof currentCoupon === 'function' ? currentCoupon() : null);
     if (c) for (const x of c.matches) signs[String(x.id)] = x.sign;
-    return rd.ids.map((id) => {
+    const rows = rd.ids.map((id) => {
       const g = gradeRow({ id, sign: signs[id] || '', label: '' }, t);
       return { id, m: g.m, g, sign: signs[id] || '' };
-    }).filter((x) => x.m).sort((a, b) => Date.parse(a.m.kickoff) - Date.parse(b.m.kickoff) || a.m.home.localeCompare(b.m.home));
+    }).filter((x) => x.m);
+    // En omgång ur Stryktipset står i Stryktipsets ordning (1–13 som hos Svenska Spel, se README
+    // under Kupongen); en omgång som valts för hand efter avsparken.
+    return rd.spel ? rows : rows.sort((a, b) => Date.parse(a.m.kickoff) - Date.parse(b.m.kickoff) || a.m.home.localeCompare(b.m.home));
   }
 
   // Kryssets två streck med blyerts i en ruta (40 × 19): lite sneda och
@@ -2239,6 +2242,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // videon: förra omgången och nästa ur rd och kupongerna som har spelats
     if (R.video) R.video.fill((state.all && state.all.matches) || [], { rd, old: [...(R.old || []), ...(typeof allCoupons === 'function' ? allCoupons() : [])] });
     const p = pult(rd);
+    markera();
     summera(rd, p, t);
     // har du lämnat in ligger din kupong i högen, och på pulten en ny – eller
     // gängets kupong, när du ser de andras tips (uppgörelsen)
@@ -2712,7 +2716,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     const gang = () => {
       const [vx, vy] = synlig();
-      if (R.fig && syns(R.gang)) R.fig.draw(t, vx, vy, on);
+      if (R.fig && syns(R.gang)) {
+        R.fig.draw(t, vx, vy, on);
+        duFlytta();
+      }
     };
     const saker = () => {
       const [vx, vy] = synlig();
@@ -4749,7 +4756,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     zoomTv(false);
     zoomVideo(false);
     const desk = document.getElementById('rum-kupong');
-    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
+    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null, spel: Boolean(p.s.spel) };
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     const rows = roundRows(rd);
     const fram = couponHtml(rd, rows, v, true);
@@ -4844,13 +4851,21 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         return;
       }
       const b = e.target.closest('button.box, button[data-vem]');
+      // (har du inte sagt vem du är går kupongen bara att titta på: vemForst)
+      if (b && b.dataset.vem) {
+        choose(b);
+        return;
+      }
+      if (!duNu()) {
+        if (b || (e.target.closest('.row') && !e.target.closest('a'))) vemForst(k);
+        return;
+      }
       // en omtvistad match som inte är klubbad: ett klick på raden – numret,
       // tiden eller förklaringen – klubbar den
       const row = !b && k.slag === 'gang' && !e.target.closest('input, label') && e.target.closest('.row.strid:not(.klubbad)');
       if (row && !row.querySelector('.pen:not(.gom) input.pen-in')) klubba(row, true);
       // tiden och det som står efter den: man skriver på raden (writeOn)
       else if (!b) writeOn(e.target);
-      else if (b.dataset.vem) choose(b);
       else if (k.slag === 'gang') tickGang(b);
       else tick(b);
     });
@@ -5230,6 +5245,54 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const p = pult();
     if (!R.on || nara() || R.vilar || !p || !p.hand) return false;
     return openCoupon();
+  }
+
+  // ---------- den du är ----------
+  //
+  // När rummet öppnas är ingen i gänget vald (Samtal.pult.du() i samtal.js): du kan gå omkring och titta, men inte
+  // fylla i kupongen, och Hasse vet inte vem du är. Klickar du på någon vid bordet (rum-folk.js), väljer namnet
+  // på kupongen eller säger det till Hasse är du hen, tills sidan laddas om: figuren har en lapp ovanför huvudet
+  // med namnet i hens handstil och bläck, som på kupongen, och den följer med när hen rör sig (topp i rum-3d.js).
+  const duNu = () => (window.Samtal && Samtal.pult && Samtal.pult.du ? Samtal.pult.du() : null);
+  function markera() {
+    const el = document.getElementById('rum-du');
+    if (!el) return;
+    const v = duNu();
+    if (v === R.du) return;
+    R.du = v;
+    const gang = (typeof KP !== 'undefined' && KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
+    const i = gang.findIndex((g) => g.id === v);
+    el.hidden = i < 0;
+    if (i < 0) return;
+    el.className = `rum-du sm-k${i}`;
+    el.innerHTML = `<span class="rum-du-in">${esc(Tippoang.kallas(gang[i]))}</span>`;
+    duFlytta();
+    // (lappen faller ner över huvudet och gungar till)
+    if (!calm()) {
+      el.firstElementChild.animate([
+        { offset: 0, opacity: 0, transform: 'translate(-50%, calc(-100% - 46px)) rotate(-14deg)' },
+        { offset: 0.55, opacity: 1, transform: 'translate(-50%, calc(-100% - 2px)) rotate(3deg)', easing: 'ease-out' },
+        { offset: 1, opacity: 1, transform: 'translate(-50%, calc(-100% - 8px)) rotate(-4deg)' },
+      ], { duration: 520, easing: 'cubic-bezier(0.3, 0, 0.6, 1)' });
+    }
+  }
+  // Lappen där huvudet är, när gänget just har ritats (frame), i dukens plan: den följer med när rummet vrids.
+  function duFlytta() {
+    const el = document.getElementById('rum-du');
+    const c = document.getElementById('rum-3d');
+    if (!el || el.hidden || !c || !R.fig || !R.fig.topp) return;
+    const pt = R.fig.topp(R.du);
+    const t = pt ? `translate(${r1(c.offsetLeft + pt[0] * c.offsetWidth)}px, ${r1(c.offsetTop + pt[1] * c.offsetHeight)}px)` : null;
+    if (t === el.var) return;
+    el.var = t;
+    el.style.visibility = t ? '' : 'hidden';
+    if (t) el.style.transform = t;
+  }
+  // Ett kryss, en motivering eller gängets tecken innan du har sagt vem du är: namnen på kupongen lyser (Vem är
+  // du?), eller – där de inte går att välja – raden säger var du väljer dig.
+  function vemForst(k) {
+    k.el.classList.add('need-vem');
+    k.msg.textContent = k.el.querySelector('button[data-vem]') ? 'Vem är du?' : 'Vem är du? Klicka på dig själv vid bordet.';
   }
 
   // Ett kryss eller en ring som tas bort suddas ut.
@@ -5799,7 +5862,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const field = (e) => (e.target.closest ? e.target.closest('input.pen-in') : null);
     el.addEventListener('focusin', (e) => {
       const f = field(e);
-      if (f) penTo(f, false);
+      if (f && !duNu()) {
+        f.blur();
+        vemForst(k);
+      } else if (f) penTo(f, false);
     });
     el.addEventListener('input', (e) => {
       const f = field(e);
@@ -5916,6 +5982,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return;
     }
     if (!Samtal.pult.vem(b.dataset.vem)) return;
+    markera();
+    // (den du valde har redan lämnat in, här: kupongen att fylla i läggs ner, och hens ligger i högen)
+    if (pult() && pult().inne) {
+      k.msg.textContent = '';
+      closeCoupon();
+      return;
+    }
     for (const o of k.el.querySelectorAll('button[data-vem][aria-pressed="true"]')) {
       o.setAttribute('aria-pressed', 'false');
       o.classList.remove('du');
@@ -6504,7 +6577,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const v = !p ? null : p.fyll ? view(p, 'fyll') : p.andra ? view(p, 'din', p.vem) : null;
       if (!v) return null;
       if (v.slag === 'din') v.tecken = { ...v.tecken, ...hassesAndring(p) };
-      const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null };
+      const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), gang: p.s.gang, name: (window.Samtal && Samtal.name()) || null, spel: Boolean(p.s.spel) };
       return couponHtml(rd, roundRows(rd), v);
     },
     andring: (alla = false) => hassesAndring(pult(), alla),
@@ -6541,7 +6614,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function bladet() {
     const p = pult();
     if (!p) return null;
-    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)) };
+    const rd = { id: p.s.id, ids: p.s.matcher.map((x) => String(x.id)), spel: Boolean(p.s.spel) };
     const rows = roundRows(rd);
     const nr = typeof couponNumber === 'function' ? couponNumber(rd.ids) : null;
     return { matcher: rd.ids.map((id) => rows.find((x) => x.id === id)).filter(Boolean).map((x) => x.m), kupong: nr ? `Kupong ${nr}` : 'Kupong' };
