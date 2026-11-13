@@ -484,8 +484,9 @@ export const KLIPP = {
   bada: { fran: 60, till: 64, vila: 5.5, fri: true, grupp: 'dom', dunk: [[1.22, 1.45, 'bada']] },
   // pekfingret i luften, och sedan handflatan i disken
   fingret: { fran: 65, till: 69.6, vila: 5.5, fri: true, grupp: 'dom', dunk: [[1.86, 1.05, 'hand']] },
-  // medan han pratar: handflatan i disken vid ett bestämt ord
-  dunka: { fran: 70, till: 71.9, vila: 5.5, start: 5.5, dunk: [[0.62, 0.75, 'hand']] },
+  // medan han pratar: handflatan i disken vid ett bestämt ord (grupp bestamt: de korta, bestämda gesterna
+  // medan han pratar, som rum-hasse.js lottar bland vid de bestämda orden)
+  dunka: { fran: 70, till: 71.9, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.62, 0.75, 'hand']] },
   // kaffet: blåser på det, smakar, bränner sig nästan, och en riktig klunk och ett långt ah
   blasa: { fran: 75, till: 84.1, vila: 0, grupp: 'kaffe', ned: [[8.5, 0.3]] },
   // kaffet: tittar ned i koppen, snurrar den, dricker ur den i ett svep och ställer ned den med en smäll
@@ -615,6 +616,26 @@ export const KLIPP = {
   // slår igen locket med en knyck, ställer ned tändaren med en smäll, och visar cigarren för en
   tandare2: { fran: 820, till: 834.0, vila: 0, skynda: true, grupp: 'tanda', tander: 'tandare',
     ljud: [[3.6, { typ: 'lock' }], [3.82, { typ: 'hjul', tar: true }], [5.0, { typ: 'puff' }], [5.6, { typ: 'puff' }], [6.4, { typ: 'lock', upp: false }]], dunk: [[7.0, 0.25, 'hand']] },
+  // Fler sätt att slå domen i disken (grupp dom):
+  // knogarna: två lätta knackningar, en blick på en, och näven högt upp och ned i disken med full kraft
+  knogar: { fran: 1050, till: 1054.8, vila: 5.5, fri: true, grupp: 'dom', dunk: [[0.72, 0.3, 'knoge'], [1.02, 0.35, 'knoge'], [2.1, 1.45, 'knoge']] },
+  // handkanten, som en yxa: ett hugg, och ett till högre upp ifrån
+  hugg: { fran: 1056, till: 1060.4, vila: 5.5, fri: true, grupp: 'dom', dunk: [[0.88, 0.6, 'nave'], [1.72, 1.15, 'nave']] },
+  // vänster hand: lyfter den högt och slår den i disken, vänd mot en
+  vanster: { fran: 1062, till: 1065.8, vila: 5.5, fri: true, grupp: 'dom', dunk: [[1.3, 1.2, 'hand']] },
+  // pekfingret i disken, tre gånger: här – och – nu
+  pekar: { fran: 1067, till: 1071.6, vila: 5.5, fri: true, grupp: 'dom', dunk: [[0.86, 0.22, 'finger'], [1.32, 0.26, 'finger'], [1.98, 0.45, 'finger']] },
+  // ett hårt slag med handflatan, och handen ligger kvar medan han lutar sig fram och ser en i ögonen
+  trycker: { fran: 1073, till: 1078.4, vila: 5.5, fri: true, grupp: 'dom', dunk: [[1.0, 1.3, 'hand']] },
+  // De korta, bestämda gesterna medan han pratar (grupp bestamt, med dunka ovan):
+  // knogarna i disken två gånger
+  knacka: { fran: 1080, till: 1081.9, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.52, 0.45, 'knoge'], [0.82, 0.8, 'knoge']] },
+  // ett hugg med handkanten
+  hugga: { fran: 1083, till: 1084.9, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.66, 0.7, 'nave']] },
+  // pekfingret i disken två gånger
+  peka: { fran: 1086, till: 1088, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.6, 0.22, 'finger'], [0.98, 0.3, 'finger']] },
+  // handflatan i disken med den vänstra handen
+  dunkaV: { fran: 1090, till: 1091.9, vila: 5.5, start: 5.5, grupp: 'bestamt', dunk: [[0.62, 0.75, 'hand']] },
 };
 for (const k of Object.values(KLIPP)) {
   if (k.dunk) k.dom = k.fran + k.dunk.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
@@ -809,7 +830,9 @@ function djup(x, y, drag = true) {
 }
 
 export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
-  const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: !latt, powerPreference: latt ? 'default' : 'high-performance' });
+  // (webbläsarens vanliga grafikkort: med 'high-performance' slog datorer med två grafikkort, som äldre MacBook Pro,
+  // på det stora kortet så fort man vände sig mot honom, och fläkten med det; rummet har alltid ritats med det vanliga)
+  const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: !latt, powerPreference: 'default' });
   r.setPixelRatio(pr);
   r.setClearColor(0, 0);
   const S = new THREE.Scene();
@@ -1587,6 +1610,15 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // kaffet: handen till koppens öra och tillbaka (mot) och fingrarna runt örat (krok), när koppen står
   // på fatet igen vid ned
   const grepp = (ned) => ({ mot: [0.1, 1.05, ned + 0.05, ned + 0.5], krok: [[0, 0.1], [1, 0.18], [1.2, 0.72], [ned, 0.72], [ned + 0.2, 0.18], [ned + 0.5, VILA_B[4]]] });
+  // Den högra handen när den slår i disken på andra sätt än med handflatan, [t, …] som nycklarna i A: i disken,
+  // eller h högre upp (och slag: på vägen dit). Knogarna (knogar, knacka): näven med knogarna nedåt och
+  // handflatan mot honom. Handkanten (hugg, hugga): handen rak och på högkant med lillfingersidan nedåt, som
+  // näven i naven. Pekfingret (pekar, peka): fingret snett ned och fram mot disken, de andra fingrarna krökta.
+  const knoge = (t, h = 0, slag = false) => [t, [-165, -120 + h, 600], PA, [0.25, -0.85, 0.45], [0.15, -0.45, -0.88], 1, 0, slag];
+  const hugget = (t, h = 0, slag = false) => [t, [-250, -240 + h, 570 - 0.25 * h], PA, [0.3, -0.05 + 0.002 * h, 0.95], [0.95, 0.05, -0.3], 0.06, 0, slag];
+  // (handkanten: fingrarna raka och tätt ihop, och tummen intill)
+  const HUGG_F = (a, b) => ({ spar: [[a, 1], [b, 1]], tumme: [[a, 0.1], [b, 0.1]] });
+  const pekfinger = (t, h = 0, slag = false) => [t, [-225, -120 + h, 600], PA, [0.2, -0.72, 0.66], [0.3, -0.62, -0.72], 0.62, 1, slag];
   const RORELSER = {
     // Näven: han blir tyst och allvarlig, knyter höger hand och lyfter den, håller den uppe en stund och
     // slår den i disken med lillfingersidan; tittar en rakt i ögonen och nickar.
@@ -1705,6 +1737,180 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       A: [
         [0.38, [-215, -60, 540], PA, [0.78, 0.32, 0.53], [0.2, -0.93, 0.3], 0.25, 0],
         slagA(0.62, true), studsA(0.7, 10), slagA(0.85), slagA(1.25),
+      ],
+    },
+    // Knogarna: han knyter handen löst och knackar två gånger lätt i disken medan han tittar ned, tittar
+    // upp på en med brynen nere, drar näven högt upp och bakåt, lutar sig bakåt och håller den där ett
+    // ögonblick, och slår den sedan i disken med hela kroppen, så att näven studsar. En nick, och sedan ett
+    // litet leende. (Förut lyfte han näven bara lite inför det tredje slaget, och det var för klent: Tomas
+    // 2026-11-13.)
+    knogar: {
+      k: {
+        yaw: [[0.4, 0.25], [2.6, 0.3]],
+        pitch: [[0.3, 0.5], [0.72, 0.7], [0.78, 0.95], [1.02, 0.8], [1.08, 1.0], [1.35, 0.1], [1.75, -0.35], [1.95, -0.4], [2.1, 0.1], [2.16, 1.3], [2.45, 0.45], [2.75, 0.95], [3.05, 0.45]],
+        blickY: [[0.3, 0], [0.55, 3.5], [1.15, 3.5], [1.4, 0]],
+        lut: [[0.4, 0.04], [1.1, 0.05], [1.45, 0.02], [1.75, -0.05], [1.95, -0.06], [2.12, 0.17], [2.45, 0.08], [2.9, 0.05]],
+        vrid: [[0.4, -0.03], [1.45, -0.04], [1.85, -0.1], [2.12, 0.06], [2.5, 0.01]],
+        sid: [[1.45, 0], [1.85, -0.01], [2.12, 0.012], [2.5, 0]],
+        axV: [[0.3, 8], [1.1, 10], [1.75, 40], [1.95, 44], [2.12, -6], [2.4, 4]],
+        axH: [[1.6, 0], [1.9, 8], [2.12, -2], [2.4, 0]],
+        brynX: [[0.3, 0.2], [1.2, 0.3], [1.4, 0.7], [1.6, -0.4], [1.95, -0.5], [2.16, -0.2], [2.7, 0.5]],
+        brynY: [[0.3, -0.2], [1.2, -0.2], [1.4, 0.3], [1.6, -0.9], [1.95, -1.0], [2.16, -1.1], [2.7, -0.45]],
+        kis: [[1.4, 0], [1.7, 0.5], [2.1, 0.55], [2.5, 0.1], [2.9, 0]],
+        blund: [[2.09, 0], [2.13, 0.9], [2.3, 0]],
+        munn: [[1.7, 0], [1.85, 0.06], [2.08, 0], [2.14, 0.14], [2.35, 0]],
+        le: [[2.85, 0], [3.25, 0.3], [3.9, 0.16]],
+      },
+      A: [
+        knoge(0.45, 55), knoge(0.72, 0, true), knoge(0.84, 32), knoge(1.02, 0, true), knoge(1.2, 40),
+        // (högt upp och bakåt, med handleden bakåtböjd så att knogarna pekar fram, och kvar där ett ögonblick)
+        [1.75, [-200, 200, 505], PA, [0.3, -0.45, 0.84], [0.12, -0.88, -0.45], 1, 0],
+        [1.95, [-204, 216, 495], PA, [0.3, -0.42, 0.86], [0.12, -0.9, -0.42], 1, 0],
+        knoge(2.1, 0, true), knoge(2.18, 30), knoge(2.3, 0), knoge(3.4, 0),
+      ],
+    },
+    // Hugget: han lyfter handen rak och på högkant och hugger med handkanten i disken, som med en yxa; lyfter
+    // den högre och hugger igen, hårdare, med en nick. Brynen nere, sedan ett nöjt leende.
+    hugg: {
+      k: {
+        yaw: [[0.4, 0.3], [2.4, 0.3]],
+        pitch: [[0.3, -0.1], [0.6, -0.2], [0.88, 0.1], [0.94, 0.9], [1.2, 0.0], [1.5, -0.3], [1.72, -0.2], [1.79, 1.35], [2.05, 0.4], [2.3, 0.8], [2.6, 0.45]],
+        lut: [[0.4, 0.0], [0.88, 0.07], [1.2, 0.03], [1.5, 0.0], [1.74, 0.13], [2.1, 0.06]],
+        vrid: [[0.4, -0.06], [0.88, 0.02], [1.45, -0.08], [1.74, 0.05], [2.2, 0.01]],
+        axV: [[0.4, 22], [0.88, 4], [1.2, 18], [1.5, 34], [1.74, 0], [2.0, 6]],
+        brynX: [[0.3, 0], [0.6, -0.5], [1.6, -0.6], [1.8, 0.4], [2.5, 0.45]],
+        brynY: [[0.3, 0], [0.6, -0.9], [1.6, -1.0], [1.8, -0.3], [2.5, -0.4]],
+        kis: [[0.4, 0], [0.8, 0.4], [1.75, 0.45], [2.2, 0]],
+        blund: [[0.86, 0], [0.91, 0.75], [1.04, 0], [1.7, 0], [1.75, 0.9], [1.92, 0]],
+        munn: [[1.7, 0], [1.77, 0.1], [1.95, 0]],
+        le: [[2.3, 0], [2.7, 0.3], [3.4, 0.16]],
+      },
+      A: [
+        hugget(0.6, 190), hugget(0.88, 0, true), hugget(0.98, 20), hugget(1.1, 0),
+        hugget(1.5, 260), hugget(1.72, 0, true), hugget(1.8, 16), hugget(1.92, 0), hugget(2.8, 0),
+      ],
+      fA: HUGG_F(0.45, 2.8),
+    },
+    // Vänster hand: han vänder sig lite mot den, lyfter den högt med handflatan nedåt och slår den i disken,
+    // vänder sig tillbaka mot en med brynen nere och nickar en gång.
+    vanster: {
+      k: {
+        yaw: [[0.4, -0.35], [1.1, -0.5], [1.32, -0.2], [1.8, 0.2], [2.6, 0.3]],
+        pitch: [[0.4, -0.2], [1.1, -0.35], [1.3, -0.1], [1.37, 1.3], [1.65, 0.35], [1.95, 0.85], [2.3, 0.45]],
+        roll: [[0.4, -0.04], [1.1, -0.06], [1.4, 0], [2.0, 0.03]],
+        lut: [[0.4, -0.02], [1.1, -0.04], [1.32, 0.12], [1.7, 0.06]],
+        vrid: [[0.4, 0.06], [1.1, 0.1], [1.32, -0.02], [1.8, -0.04]],
+        axH: [[0.4, 18], [1.1, 34], [1.32, -4], [1.7, 2]],
+        brynX: [[0.4, 0.3], [1.1, 0.4], [1.32, -0.3], [1.8, 0.5]],
+        brynY: [[0.4, -0.4], [1.1, -0.5], [1.32, -1.0], [1.8, -0.45]],
+        kis: [[1.0, 0], [1.32, 0.5], [1.9, 0.1], [2.4, 0]],
+        blund: [[1.28, 0], [1.33, 0.9], [1.48, 0]],
+        munn: [[1.28, 0], [1.35, 0.12], [1.55, 0]],
+        le: [[2.2, 0], [2.6, 0.3], [3.3, 0.15]],
+      },
+      B: [
+        [0.5, [250, -40, 620], PB, [-0.66, 0.3, 0.69], [-0.2, -0.92, 0.3], 0.2, 0],
+        [1.08, [275, 90, 590], PB, [-0.62, 0.45, 0.64], [-0.25, -0.88, 0.4], 0.15, 0],
+        slagB(1.3, true), studsB(1.38, 16), slagB(1.52), slagB(3.2),
+      ],
+    },
+    // Pekfingret: han lutar sig fram och sätter pekfingret i disken framför sig, tre gånger, en för varje ord
+    // (här – och – nu), den sista hårdast och med en nick. Sedan ser han upp på en.
+    pekar: {
+      k: {
+        yaw: [[0.4, 0.2], [2.2, 0.3]],
+        pitch: [[0.35, 0.4], [0.86, 0.6], [0.92, 0.9], [1.1, 0.55], [1.32, 0.6], [1.38, 0.95], [1.6, 0.5], [1.98, 0.55], [2.04, 1.25], [2.35, 0.3], [2.7, 0.6], [3.0, 0.35]],
+        blickY: [[0.35, 0], [0.6, 2.5], [1.7, 2.5], [2.1, 0]],
+        lut: [[0.35, 0.05], [0.86, 0.1], [1.32, 0.11], [2.0, 0.14], [2.4, 0.07]],
+        vrid: [[0.4, -0.02], [2.0, 0.03], [2.4, 0.01]],
+        axV: [[0.35, 14], [0.86, 8], [1.1, 14], [1.32, 8], [1.7, 16], [2.0, 4], [2.3, 6]],
+        brynX: [[0.35, -0.2], [1.8, -0.3], [2.1, 0.6], [2.8, 0.5]],
+        brynY: [[0.35, -0.7], [1.8, -0.8], [2.1, -0.2], [2.8, -0.4]],
+        kis: [[0.35, 0.2], [1.9, 0.3], [2.3, 0]],
+        blund: [[0.85, 0], [0.89, 0.6], [1.0, 0], [1.31, 0], [1.35, 0.6], [1.46, 0], [1.97, 0], [2.02, 0.85], [2.16, 0]],
+        munn: [[0.84, 0], [0.9, 0.1], [1.0, 0], [1.3, 0], [1.36, 0.08], [1.45, 0], [1.96, 0], [2.03, 0.12], [2.2, 0]],
+        le: [[2.6, 0], [3.0, 0.28], [3.8, 0.15]],
+      },
+      A: [
+        pekfinger(0.6, 70), pekfinger(0.86, 0, true), pekfinger(1.08, 45), pekfinger(1.32, 0, true),
+        pekfinger(1.75, 85), pekfinger(1.98, 0, true), pekfinger(2.12, 14), pekfinger(2.3, 0), pekfinger(3.3, 0),
+      ],
+    },
+    // Trycket: han lyfter handen högt och slår den i disken, hårt, och låter den ligga kvar medan han lutar sig
+    // fram över den och ser en rakt i ögonen, med brynen nere; en kort nick, och sedan sätter han sig tillbaka.
+    trycker: {
+      k: {
+        yaw: [[0.4, 0.3], [4.0, 0.3]],
+        pitch: [[0.4, -0.2], [0.82, -0.4], [1.0, -0.3], [1.07, 1.3], [1.35, 0.3], [2.1, 0.3], [2.6, 0.35], [2.75, 0.9], [3.0, 0.3], [3.6, 0.3]],
+        lut: [[0.4, -0.02], [0.82, -0.05], [1.02, 0.13], [1.4, 0.16], [3.2, 0.17], [3.8, 0.08]],
+        vrid: [[0.4, -0.04], [1.02, 0.03], [3.4, 0.03]],
+        axV: [[0.4, 20], [0.82, 32], [1.02, -4], [1.4, -6], [3.3, -6], [3.8, 2]],
+        axH: [[0.82, 6], [1.4, 4], [3.3, 4], [3.8, 0]],
+        brynX: [[0.4, 0.2], [0.82, 0.3], [1.05, -0.4], [3.0, -0.5], [3.6, 0.4]],
+        brynY: [[0.4, -0.4], [0.82, -0.5], [1.05, -1.0], [3.0, -1.0], [3.6, -0.4]],
+        kis: [[0.9, 0], [1.05, 0.5], [3.1, 0.55], [3.7, 0.05]],
+        blund: [[0.98, 0], [1.03, 0.9], [1.18, 0], [2.68, 0], [2.74, 0.6], [2.88, 0]],
+        munn: [[0.98, 0], [1.05, 0.12], [1.25, 0]],
+        stel: [[1.1, 0], [1.5, 0.7], [3.1, 0.7], [3.7, 0]],
+        le: [[3.5, 0], [3.9, 0.3], [4.6, 0.16]],
+      },
+      A: [
+        [0.45, [-215, -60, 535], PA, [0.78, 0.35, 0.52], [0.2, -0.93, 0.3], 0.2, 0],
+        [0.82, [-232, 95, 495], PA, [0.7, 0.5, 0.5], [0.25, -0.85, 0.45], 0.15, 0],
+        slagA(1.0, true), studsA(1.08, 8), slagA(1.2),
+        // (fingrarna sprids och trycker mot disken medan han ligger på den)
+        [1.6, slagAr.W, SLAG_A[1], SLAG_A[2], SLAG_A[3], 0.1, 0], [3.3, slagAr.W, SLAG_A[1], SLAG_A[2], SLAG_A[3], 0.1, 0],
+        slagA(3.8), slagA(4.4),
+      ],
+    },
+    // Medan han pratar, korta: knogarna i disken två gånger, och en nick.
+    knacka: {
+      k: {
+        pitch: [[0.3, 0.2], [0.52, 0.3], [0.57, 0.8], [0.82, 0.2], [0.87, 1.15], [1.1, 0.2], [1.4, 0]],
+        lut: [[0.3, 0.02], [0.82, 0.07], [1.2, 0]],
+        axV: [[0.3, 10], [0.82, 0], [1.2, 0]],
+        brynX: [[0.3, 0.1], [0.82, -0.3], [1.3, 0]],
+        blund: [[0.81, 0], [0.85, 0.7], [0.98, 0]],
+      },
+      A: [knoge(0.3, 70), knoge(0.52, 0, true), knoge(0.66, 95), knoge(0.82, 0, true), knoge(0.9, 22), knoge(1.0, 0), knoge(1.3, 0)],
+    },
+    // Medan han pratar: ett hugg med handkanten, och en nick.
+    hugga: {
+      k: {
+        pitch: [[0.4, -0.2], [0.66, -0.1], [0.72, 1.1], [1.0, 0.2], [1.35, 0]],
+        lut: [[0.4, -0.01], [0.68, 0.07], [1.1, 0]],
+        vrid: [[0.4, -0.05], [0.68, 0.03], [1.1, 0]],
+        axV: [[0.4, 22], [0.68, 0], [1.1, 0]],
+        brynX: [[0.4, 0.1], [0.7, -0.4], [1.3, 0]],
+        blund: [[0.64, 0], [0.69, 0.75], [0.84, 0]],
+      },
+      A: [hugget(0.42, 210), hugget(0.66, 0, true), hugget(0.75, 14), hugget(0.86, 0), hugget(1.25, 0)],
+      fA: HUGG_F(0.3, 1.25),
+    },
+    // Medan han pratar: pekfingret i disken två gånger.
+    peka: {
+      k: {
+        pitch: [[0.35, 0.3], [0.6, 0.45], [0.65, 0.85], [0.8, 0.4], [0.98, 0.45], [1.03, 0.95], [1.3, 0.2], [1.6, 0]],
+        lut: [[0.35, 0.04], [0.98, 0.09], [1.4, 0]],
+        axV: [[0.35, 10], [0.98, 6], [1.4, 0]],
+        brynX: [[0.35, -0.1], [1.0, -0.3], [1.5, 0]],
+        blund: [[0.97, 0], [1.01, 0.6], [1.12, 0]],
+      },
+      A: [pekfinger(0.38, 70), pekfinger(0.6, 0, true), pekfinger(0.78, 45), pekfinger(0.98, 0, true), pekfinger(1.12, 14), pekfinger(1.22, 0), pekfinger(1.55, 0)],
+    },
+    // Medan han pratar: den vänstra handflatan i disken, och en nick.
+    dunkaV: {
+      k: {
+        yaw: [[0.38, -0.25], [0.64, -0.1], [1.1, 0]],
+        pitch: [[0.38, -0.2], [0.62, -0.1], [0.68, 1.1], [0.95, 0.2], [1.3, 0]],
+        lut: [[0.38, -0.01], [0.64, 0.06], [1.0, 0]],
+        axH: [[0.38, 16], [0.64, -2], [1.0, 0]],
+        brynX: [[0.38, 0.2], [0.68, -0.3], [1.2, 0]],
+        blund: [[0.6, 0], [0.65, 0.7], [0.8, 0]],
+      },
+      B: [
+        [0.38, [255, -40, 620], PB, [-0.66, 0.32, 0.68], [-0.2, -0.92, 0.3], 0.25, 0],
+        slagB(0.62, true), studsB(0.7, 10), slagB(0.85), slagB(1.25),
       ],
     },
     // Kaffet (se kaffeArm): koppens lägen (kk), hur mycket han lutar den mot läppen (tipp), och

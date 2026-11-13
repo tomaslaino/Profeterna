@@ -49,8 +49,11 @@ window.RumHasse = (() => {
   // rummets steg (rum.js, KVAL): 0 allt, 3 det enklaste
   const steg = () => Math.max(0, Math.min(3, window.Rum && Rum.kval ? Rum.kval() : latt() ? 1 : 0));
   const pixlar = () => Math.min(devicePixelRatio || 1, [2, 1.5, 1.25, 1][steg()]);
-  // minsta tid mellan bilderna (ms) när han rör sig och när han bara andas
-  const takt = (ror) => (ror ? [0, 0, 33, 33] : [33, 33, 50, 66])[steg()];
+  // minsta tid mellan bilderna (ms) när han rör sig och när han bara andas: högst 60 bilder i sekunden (på en
+  // skärm med 120 Hz ritades han förut 120 gånger i sekunden när han rörde sig), och i vilan 30, 30, 20 och 15. Lite
+  // under en hel skärmbilds tid, så att ett ryck i webbläsarens takt inte hoppar över en bild (förut 33 ms, och
+  // 32,9 ms mellan två skärmbilder blev ibland 50 ms).
+  const takt = (ror) => (ror ? [12, 12, 31, 31] : [31, 31, 48, 64])[steg()];
 
   // Rummet är ledigt: ingen närbild, ingen kupong i handen.
   function ledigt() {
@@ -81,7 +84,7 @@ window.RumHasse = (() => {
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
     vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"></div><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
-      '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i><i class="rh-korn" aria-hidden="true"></i>' +
+      '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
     H.vy = vy;
@@ -600,6 +603,8 @@ window.RumHasse = (() => {
       sa.left = fo.left = `${vanster.toFixed(0)}px`;
       sa.width = fo.width = `${bredd.toFixed(0)}px`;
       s.setProperty('--mork', `${(hoger + 70).toFixed(0)}px`);
+      // (diskens kant: efter omgången står gänget mitt emellan den och samtalets överkant, .rh-gang i rum-hasse.css)
+      s.setProperty('--kant', `${v.kant.toFixed(0)}px`);
     }
     if (H.kupong) H.kupong.passa();
     pultPapper();
@@ -702,7 +707,6 @@ window.RumHasse = (() => {
     }
     // cigarren som den var, eller slocknad om han har låtit den ligga sedan sist
     cigarrIgen();
-    H.vy.classList.toggle('enkel', steg() >= 1 || latt());
     // (disken hinner ritas innan kameran slår dit, men den väntar man inte länge på)
     await Promise.race([passa(), new Promise((ok) => setTimeout(ok, 1500))]);
     // (en ny figur ritas en gång redan här, utom synhåll: grafikprogrammen görs i ordning nu och inte när
@@ -1162,6 +1166,11 @@ window.RumHasse = (() => {
   function duId() {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     return (p && p.vem) || null;
+  }
+  // Omgången på pulten (kupongens id, samma som protokollets), eller ''.
+  function omgangNu() {
+    const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
+    return (p && p.s && p.s.id) || '';
   }
   // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
   // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
@@ -1981,10 +1990,12 @@ window.RumHasse = (() => {
   // (rum-hasse-meningar.js: samma delning som när Macen tar fram ljudet)
   const meningar = (t) => window.HasseMeningar(t);
   // Styckena som repliker, med en gest där det passar: alltid vid de bestämda
-  // orden (fingret och armarna, handen i disken eller en annan gest), annars då och då vid en
-  // lång mening. Bielsa får honom att slå ut med armarna.
+  // orden (fingret och armarna, något i disken eller en annan gest), annars då och då vid en
+  // lång mening. Bielsa får honom att slå ut med armarna. I disken är det en av de korta, bestämda
+  // gesterna (gruppen bestamt i KLIPP: handflatan med höger eller vänster hand, knogarna, handkanten
+  // eller pekfingret), lottade så att det inte blir samma varje gång.
   const BIELSA = /rotasiones|intensid|verticalid|transisiones|presj[oó]n|ombre libre/i;
-  const BESTAMT = /nej nej nej|glöm det|äsch|aldrig|varningens finger|solklart|så är det bara|köper jag/i;
+  const BESTAMT = /nej nej nej|glöm det|äsch|aldrig|varningens finger|solklart|självklart|så är det|köper jag|skriv upp|punkt slut/i;
   const FINGRET = /nej nej nej|varningens finger/i;
   // Gesterna medan han pratar (gruppen tal i KLIPP) lottas, utom att vissa ord ibland har sin egen:
   // han räknar till två, lägger handen på bröstet när han själv tycker något och lugnar med händerna.
@@ -2006,7 +2017,7 @@ window.RumHasse = (() => {
     let sedan = 1;
     ut.forEach((r) => {
       sedan++;
-      if (BIELSA.test(r.text)) { r.gest = 'slag'; sedan = 0; } else if (sedan >= 2 && BESTAMT.test(r.text)) { r.gest = FINGRET.test(r.text) ? 'armar' : Math.random() < 0.4 ? 'dunka' : talGest(r.text); sedan = 0; } else if (sedan >= 3 && r.text.length > 50) { r.gest = talGest(r.text); sedan = 0; }
+      if (BIELSA.test(r.text)) { r.gest = 'slag'; sedan = 0; } else if (sedan >= 2 && BESTAMT.test(r.text)) { r.gest = FINGRET.test(r.text) ? 'armar' : Math.random() < 0.55 ? ettAv('bestamt', 'dunka') : talGest(r.text); sedan = 0; } else if (sedan >= 3 && r.text.length > 50) { r.gest = talGest(r.text); sedan = 0; }
     });
     return ut;
   }
@@ -2320,8 +2331,8 @@ window.RumHasse = (() => {
       // (vad klockan är: strax före spelstopp alltid, annars ibland)
       const tid = hela && tidNu(oppna);
       if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
-      // (ibland säger han ett namn som nästan stämmer)
-      const kallad = namn && Math.random() < 0.25 ? kallar(namn, String(Math.random()), 1) : namn;
+      // (ibland säger han fel namn: omgångens, samma som i domen, se felNamn)
+      const kallad = namn && Math.random() < 0.25 ? felNamn(namn, omgangNu()) : namn;
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
       return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn: kallad });
     }
@@ -2626,13 +2637,27 @@ window.RumHasse = (() => {
   // Ordet i guld: ett av många för läget (domord i rum-hasse-repliker.js), samma för samma omgång och person,
   // så att det som slås i disken också står under namnet i listan.
   const domOrd = (p, sum) => fast(REP().domord[p.lage] || [''], `${sum.id}:${p.id}:ord`) || '';
-  // Namnen sitter inte riktigt: var chans:e gång säger han ett som nästan stämmer (felnamn i
-  // rum-hasse-repliker.js), och samma nyckel ger samma namn. Han rättar sig aldrig.
-  function kallar(namn, nyckel, chans = 3) {
+  // Namnen sitter inte riktigt (felnamn i rum-hasse-repliker.js), och han rättar sig aldrig. Felet fastnar en
+  // omgång: när han säger fel är det samma fel namn hela omgången, när han hälsar och i domen, på alla enheter,
+  // och nästa omgång har han lärt sig ett annat. omgang: omgångens id (kupongens, som protokollets).
+  function felNamn(namn, omgang) {
     const ord = String(namn).trim().split(/\s+/);
-    const fel = (REP().felnamn || {})[ord[ord.length - 1]];
-    if (!fel || !fel.length || fast([...Array(chans).keys()], `${nyckel}:fel`) !== 0) return namn;
-    return [...ord.slice(0, -1), fast(fel, `${nyckel}:namn`)].join(' ');
+    const sist = ord[ord.length - 1];
+    const fel = (REP().felnamn || {})[sist];
+    if (!fel || !fel.length) return namn;
+    return [...ord.slice(0, -1), fast(fel, `${omgang}:${sist}:namn`)].join(' ');
+  }
+  // Vad han kallar någon i domen. Vinnaren kan han. Den som kom sist säger han fel om i ungefär två domar av tre,
+  // de andra i ungefär en av tre: han lär sig bara namnen på dem som lyckas. I hälften av domarna med fel börjar
+  // han rätt och tappar namnet efter första meningen med det, som om han slutade lyssna. Samma omgång och person
+  // ger samma svar, så att domen är densamma varje gång och på alla enheter.
+  // → { forst, sedan }: namnet i första meningen med namnet, och i resten.
+  function domNamn(p, sum) {
+    const nyckel = `${sum.id}:${p.id}`;
+    const chans = p.lage === 'sist' || p.lage === 'sistLika' ? 2 : 1;
+    if (p.bast || fast([0, 1, 2], `${nyckel}:fel`) >= chans) return { forst: p.namn, sedan: p.namn };
+    const fel = felNamn(p.namn, sum.id);
+    return { forst: fast([0, 1], `${nyckel}:tappar`) ? p.namn : fel, sedan: fel };
   }
   // Vilka i gänget du har hört domen över, på enheten för den omgången: han vet vem han har dömt, också nästa
   // gång du kommer.
@@ -2698,7 +2723,9 @@ window.RumHasse = (() => {
     // (har du hört alla förut men inte nu, erbjuder han sig att säga det igen)
     const lista = folk.every((p) => nu.vem.includes(p.id)) ? d.alla : n === folk.length && d.glomt ? d.glomt
       : du && d.du ? (!n ? d.du.forst : h.includes(du.id) ? d.du.hort : d.du.inte) : n ? d.igen : d.fraga;
-    rad(fyll(lott(lista), { namn: du ? (du.bast ? du.namn : kallar(du.namn, `${sum.id}:${du.id}`)) : '' }));
+    // (som i domen, och efter din dom har han tappat namnet om han tappar det där)
+    const ditt = du ? domNamn(du, sum) : null;
+    rad(fyll(lott(lista), { namn: ditt ? (h.includes(du.id) ? ditt.sedan : ditt.forst) : '' }));
     // (Revisorn och Semesterfiraren bara när det finns någon de kan vara)
     const extra = [folk.some((p) => p.lage === 'forsakring') && r.domar.revisorn, folk.some((p) => p.none) && r.domar.borta].filter(Boolean);
     const prat = extra.length ? (H.domPrat && H.domPrat.id === `${sum.id}:${extra.length}` ? H.domPrat.lista : [...r.domar.ledig, ...extra.flat()]) : r.domar.ledig;
@@ -2717,11 +2744,13 @@ window.RumHasse = (() => {
     const d = r.domar;
     const s = d.sak;
     const tal = (n) => r.tal[n] || String(n);
-    // (den som vann kan han; de andra kallar han ibland nästan rätt, samma i hela domen)
-    const namn = p.bast ? p.namn : kallar(p.namn, `${sum.id}:${p.id}`);
+    // (den som vann kan han; de andra kallar han ibland fel, se domNamn. Namnet sätts in sist, när meningarna står
+    // i ordning, så att det kan bytas efter den första meningen med namnet, men aldrig mitt i en mening)
+    const { forst, sedan } = domNamn(p, sum);
+    const NAMN = '\u0001';
     // (raden väljs efter omgången och delen, och var och en i gänget får nästa rad i listan: samma sak i samma
     // omgång låter olika för er)
-    const mening = (lista, del, o = {}) => fyll(lista[(lista.indexOf(fast(lista, `${sum.id}:${del}`)) + p.hand) % lista.length], { namn, ...o });
+    const mening = (lista, del, o = {}) => fyll(lista[(lista.indexOf(fast(lista, `${sum.id}:${del}`)) + p.hand) % lista.length], { namn: NAMN, ...o });
     const antal = (n) => ({ antal: tal(n), Antal: versal(tal(n)) });
     const spik = () => {
       const k = d.spik;
@@ -2754,11 +2783,16 @@ window.RumHasse = (() => {
     const alla = p.lage === 'inget' ? [] : RumBlock.saker(sum, p.id);
     const saker = alla.filter((x) => x.typ !== 'spik' || alla.length === 1).slice(0, forsakring ? 1 : 2).map(sak);
     const stycken = [[mening(d.in[forsakring ? 'forst' : p.lage], 'in'), forsakring && mening(d.forsakring, 'forsakring')].filter(Boolean), ...saker, [mening(d.ut[p.lage], 'ut')]];
-    return stycken.flatMap((st) => st.map((text, i) => ({ text, ny: i === 0 })));
+    let sagt = false;
+    return stycken.flatMap((st) => st.map((rad, i) => {
+      const text = rad.split(NAMN).join(sagt ? sedan : forst);
+      if (rad.includes(NAMN)) sagt = true;
+      return { text, ny: i === 0 };
+    }));
   }
 
   // Du väljer någon i gänget: domen slås i disken (som i svara), och texten står direkt och går att läsa upp.
-  // Sedan nästa du inte har hört om den här gången, eller hela gänget.
+  // Tillbaka leder till hela gänget.
   function doma(id) {
     const sum = summan();
     const folk = sum ? iOrdning(sum) : [];
@@ -2776,13 +2810,11 @@ window.RumHasse = (() => {
     const nu = nyss(sum.id);
     if (!nu.vem.includes(p.id)) nu.vem.push(p.id);
     nu.sist = p.id;
-    const i = folk.indexOf(p);
-    const nasta = [...folk.slice(i + 1), ...folk.slice(0, i)].find((q) => !nu.vem.includes(q.id));
     const d = domOrd(p, sum);
     s.innerHTML = `<div class="rh-match rh-gvem k${p.hand}">${ansikte(p)}<span class="rh-namn">${esc(p.namn)}</span></div>` +
       `<div class="rh-dom vantar${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
       '<div class="rh-text rh-domen"></div>' +
-      `<div class="rh-slut">${nasta ? `<button type="button" class="rh-knapp huvud rh-gnasta">Nästa: ${esc(nasta.namn)}</button>` : ''}<button type="button" class="rh-knapp${nasta ? '' : ' huvud'} rh-galla">Hela gänget</button></div>`;
+      '<div class="rh-slut"><button type="button" class="rh-knapp huvud rh-tillbaka">Tillbaka</button></div>';
     const ruta = repliker(domText(p, sum), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
     ruta.scrollTop = 0;
     const dom = s.querySelector('.rh-dom');
@@ -2794,8 +2826,7 @@ window.RumHasse = (() => {
     const sist = H.ko.length ? H.ko[H.ko.length - 1] : H.klipp;
     if (Math.abs((sist ? sist.vila : H.T) - GEST.hem.vila) > 0.01) spela('hem');
     const slut = s.querySelector('.rh-slut');
-    if (nasta) slut.querySelector('.rh-gnasta').addEventListener('click', () => doma(nasta.id));
-    slut.querySelector('.rh-galla').addEventListener('click', () => fraga());
+    slut.querySelector('.rh-tillbaka').addEventListener('click', () => fraga());
     lasKnapp(slut, ruta);
     klick();
   }

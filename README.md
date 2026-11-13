@@ -1371,6 +1371,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   syns mellan pulten och bardisken. Fönstren och bardisken är dragna 18 cm nedåt och rutorna bredare, så att
   glaspartiet är lika stort i bilden som förut och utsikten står kvar. Väggen är ombakad. Se
   [Hasse Backe](#hasse-backe), *Bilden*.
+- **Hasse Backe snyggare och lättare för grafikkortet (2026-11-13, användarens önskemål):** "förbättra
+  hasse-backegrafiken så att den blir snyggare/bättre och att den inte drar en massa extra grafik från
+  grafikkortet". Håret var urklippt som ett kantigt polygon med en platt topp och ett trappsteg, och såg ut att vara
+  klippt med sax; nu är konturen rundad och mjuk, med strån i kanten. Figuren bad webbläsaren om det kraftfulla
+  grafikkortet, som på datorer med två grafikkort slogs på när man vände sig mot honom; nu ritas han med det vanliga,
+  som rummet. Han ritas högst 60 gånger i sekunden (förut 120 på skärmar med 120 Hz), kornet som rörde sig över hela
+  bilden är borta (det syntes inte men kostade en fjärdedel av varje bild), och skuggorna på disken räknar mindre där
+  inget skuggar. Se [Hasse Backe](#hasse-backe), *Grafiken*.
 - **Svaren till Hasse Backe i kupongens tryck (2026-11-04, användarens önskemål):** guldpillren
   och de understrukna länkarna i samtalet var webbknappar som inte hörde hemma i tobaksaffären.
   Svaren är nu lappar i tipskupongens terrakotta och krämvita papper, och det som går härifrån
@@ -1630,6 +1638,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   – och säger vad han tycker om var och en, i var sitt stycke. Alla domrader är omskrivna med riktiga tipsord (*spiken
   sprack*, *halvgarderingen höll inte*) och hans torra självsäkerhet (*Sådant händer när favoriterna inte har läst på.*).
   Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
+- **Hasse lär sig aldrig era namn (2026-11-13, användarens önskemål):** "Jag vill att han ska uttala våra namn fel på
+  fler subtila sätt. Det ska vara som att han aldrig lär sig namnet och/eller inte bryr sig." Av sex förslag valde
+  användaren alla utom att han förväxlar er med varandra. Han har nya felnamn (*Laine*, *Lainen*, *Laiho*, *Tegnér*,
+  *Tajder*, *Tejdel*, *Mogge*, *Dagge*), säger ibland *Daniel*, som ni alla heter, och kallar Dogge *Jansson* eller
+  *Johnsson*. Den som kom sist säger han fel om oftare, i hälften av domarna med fel tappar han namnet efter första
+  meningen, och felet fastnar en omgång, samma när han hälsar och i domen. *Teider* är borta, eftersom det låter som
+  *Tejder* när rösten läser. Se [Hasse Backe](#hasse-backe), *Domarna efter omgången*.
 - **Bara protokollet på pulten, och nästa kupong måndag kl. 16 (2026-11-08, användarens önskemål):** "Ta bort
   kupong 3 där nu när allt är klart - ha bara protokollet", och "Den nya kupongen kan dyka upp från och med
   måndagen efter tippningsdagen", "Måndag kl 16". Kupongen låg kvar under protokollet och Stryktipset tog över redan
@@ -6284,7 +6299,7 @@ matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man 
 och matchakten fick lagets plats i divisionen efter varje tal, så att det topplistan visade
 finns kvar där.
 
-Överst står menyraden, som alltid står still: *KUPONGEN* och *LAGEN*, med den valda fliken
+Överst står menyraden, som alltid står still: *KUPONGEN* och *REGISTRET*, med den valda fliken
 omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
 över hela bredden; det mellan dem rullar.
 
@@ -6330,12 +6345,21 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   Saknar fler än en av de fem matcherna styrka visas ingen siffra. Med dolda resultat står
   ett frågetecken, som för tavlans tal. EFL Trophy hämtas inte och finns varken i formen
   eller i siffran.
-- **Lagen** – de fyra divisionerna (*PL*, *CH*, *L1* och *L2* i telefonen), med divisionen
-  som har flest lag i omgången först. Lagen står i bokstavsordning (två spalter på datorn),
-  och lagen i omgången är ljusa. Ett lag öppnar **lagkortet** med truppen,
-  och en spelare i truppen **spelarkortet** (nedan).
+- **Registret** – lagen och spelarna (fliken hette *Lagen* till 2026-11-13, då användaren ville ha
+  en rubrik som rymmer båda; en egen flik för spelarna valdes bort). Underraden säger vad och var:
+  *LAG* eller *SPELARE* till vänster och divisionen till höger, de valda omvända (*PL*, *CH*, *L1*
+  och *L2* när de hela namnen inte ryms, och då står namnet under strecket); ←/→ bläddrar mellan
+  divisionerna. Samma dag ville användaren att underkategorierna skulle vara logiska – med bara
+  divisionerna syntes spelarna först inne i ett lag – och valde det här upplägget före att
+  behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på divisionen
+  som har flest lag i omgången. *LAG* är divisionens lag i bokstavsordning (två spalter på
+  datorn), de i omgången ljusa, och ett lag öppnar **lagkortet** med truppen. *SPELARE* är
+  divisionens spelare från A till Ö (efternamnet) med plats, lag, speltid och mål, och läget
+  (skadad, avstängd) sist när raden ryms: samma spelare som i trupperna, de som har spelat och de
+  skadade. En spelare öppnar **spelarkortet** (nedan), och Esc går tillbaka till samma ställe i
+  listan. En lång lista skrivs rad för rad så långt skärmen räcker och resten på en gång.
 
-Sökraden söker i hela registret, också lag och spelare utanför omgången, och svarar medan man
+Sökraden söker i hela datorn, också lag och spelare utanför omgången, och svarar medan man
 skriver: träffarna står i stället för vyn, den mest sannolika överst och markerad och sedan i
 fallande led, Enter öppnar den markerade, ↑/↓ väljer en annan, och när sökraden töms (eller med
 Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.
@@ -6905,8 +6929,8 @@ och disken: varmt framifrån till vänster, ett varmt kantljus bakifrån från b
 neonskyltens röda sken och gatans kalla ljus från höger, där affären är (`LJUS` i
 [public/rum-hasse-arm.js](public/rum-hasse-arm.js); väggen är spårad med samma ljus). På dagen kommer
 dagsljuset genom affärens stora fönster till höger (nedan). Över hela
-bilden mörknar hörnen, och ett lätt korn rör sig (`.rh-ton`, `.rh-korn`), inte på rummets lägre steg
-och inte i telefonen. Händerna på pulten i rummet har samma ljus (se *Kaffet i rummet*).
+bilden mörknar hörnen (`.rh-ton`). Händerna på pulten i rummet har samma ljus (se *Kaffet i rummet*).
+(Förut rörde sig också ett lätt korn över hela bilden, `.rh-korn`; borttaget 2026-11-13, se *Grafiken*.)
 
 Baren har samma tid på dygnet som rummet (`ljuset` och `tand` i [public/rum-hasse.js](public/rum-hasse.js)).
 Lysröret i affärens tak är tänt och släckt som i rummet (`RumFolk.nattGrad`): från 23 dämpas det under en
@@ -7372,17 +7396,24 @@ Förut låg *lappen* under meningarna, en remsa av protokollets blankett med kup
 plats, spelkassan, spikar och garderingar, ensam rätt), bästa träffen, största missen och säsongen (2026-11-09). Den togs
 bort 2026-11-13, när han i stället fick säga mer om det som sticker ut.
 
-*Nästa* tar den man inte har hört om än, i gängets ordning, och *Hela gänget* går tillbaka till listan, där ordet han slog i
+Under domen finns bara knappen *Tillbaka*, som går tillbaka till listan, där ordet han slog i
 disken står som en stämpel i guld under namnet på dem man har hört om (på enheten för den omgången,
 `profeterna.hasse.domar`). Om sig själv säger han inget här: han står inte i listan och räknas inte när bäst och sämst i
 gänget avgörs, och efter omgången säger han inte heller hur det gick för honom. Förut hade listan rätt och poäng, bäst först,
-och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Med dolda resultat finns inget protokoll, och då är allt
+och länken *Matcherna* till hans rader och facit (borta 2026-11-09). Under domen stod förut *Nästa: <namn>* och *Hela
+gänget* (ersatta av *Tillbaka* 2026-11-13). Med dolda resultat finns inget protokoll, och då är allt
 som förut.
 
 Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som använder sidan (`npm run repliker` säger till om
-ordet). Namnen sitter inte riktigt: ungefär var tredje dom säger han ett namn som nästan stämmer (*Tejler*, *Docke*;
-`felnamn` i rum-hasse-repliker.js, `kallar` i rum-hasse.js), samma i hela domen och på alla enheter, men aldrig om den som
-vann. Ungefär var fjärde gång han hälsar på dig händer samma sak. Han rättar sig aldrig och säger inget om det. Står man kvar
+ordet). Namnen sitter inte riktigt, som hos den som aldrig lär sig dem och inte bryr sig (`felnamn` i
+rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett namn som låter nästan likadant (*Tejler*,
+*Docke*), ett han kan bättre någon annanstans ifrån (*Laine*, *Tegnér*, *Mogge*), *Daniel*, som ni alla heter och som därför
+aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska höras
+när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
+tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
+mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
+samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
+Domen är densamma varje gång. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
@@ -7768,9 +7799,17 @@ någon pekar på kaffet eller klickar: bilden av väggen (61 kB, 33 kB på höjd
 ritas en gång med figurens grafik när han öppnas, och sedan när fönstret har slutat ändras; kameran
 väntar högst 1,5 s på den. Figurens duk är bara så stor som han och det han gör, och den ritas efter
 rummets steg (`Rum.kval`, se [När datorn inte hinner med](#när-datorn-inte-hinner-med)): högst täthet
-2, 1,5, 1,25 och 1, och när han bara sitter och andas 30, 30, 20 och 15 bilder i sekunden. På de två
-lägsta stegen och i telefonen utan kantutjämning. Figuren lämnas tillbaka 90 s efter att man har gått
-(20 s i telefonen).
+2, 1,5, 1,25 och 1, och när han bara sitter och andas 30, 30, 20 och 15 bilder i sekunden. När han rör
+sig högst 60 (på de två lägsta stegen 30): förut ritades han varje skärmbild, alltså 120 gånger i sekunden på
+en skärm med 120 Hz som i nyare MacBook Pro. Tiden mellan bilderna (`takt` i [public/rum-hasse.js](public/rum-hasse.js))
+är lite kortare än en hel skärmbilds, så att ett litet ryck i webbläsarens takt inte hoppar över en bild (förut
+33 ms, och 32,9 ms mellan två skärmbilder gav ibland 50 ms). På de två lägsta stegen och i telefonen utan
+kantutjämning. Figuren lämnas tillbaka 90 s efter att man har gått (20 s i telefonen). Han ritas med webbläsarens
+vanliga grafikkort, som rummet (`powerPreference`): förut bad figuren om det kraftfulla, och på datorer med två
+grafikkort (som äldre MacBook Pro) slogs det stora kortet och fläkten på så fort man vände sig mot honom.
+Skuggorna på disken räknas per bildpunkt över hela disken, och kapslar som ligger så långt bort att ingen av
+deras tre skuggor syns (mindre än en tusendels procent) hoppas över efter ett avstånd i stället för tre (`byggSkugga`
+i [public/rum-hasse-arm.js](public/rum-hasse-arm.js), också under handen på pulten i rummet); bilden blir densamma.
 
 Medan han syns ritas rummet inte, så det enda som ritas om är figurens duk. Mätt i headless Chrome
 med mjukvarugrafik (som en svag grafikkrets), 1440 × 900, med det steg rummet själv väljer där (3):
@@ -7778,9 +7817,21 @@ med mjukvarugrafik (som en svag grafikkrets), 1440 × 900, med det steg rummet s
 bredvid honom. Maskinen var långsam och siffrorna spretar mellan körningar, så de är bara en
 jämförelse; inte mätt på en riktig telefon eller i Safari.
 
+Kornet som rörde sig över hela hans bild (`.rh-korn`, till 2026-11-13) var ett lager dubbelt så stort som fönstret som
+blandades med allt under sig (`mix-blend-mode: overlay`) och flyttades åtta gånger i sekunden. Ett sådant lager tvingar
+webbläsaren att lägga ihop hela bilden i ett extra steg varje gång figuren ritas om, 30–60 gånger i sekunden. Det
+ändrade bilden med ungefär en nivå av 255 (mätt i väggen, disken och himlen), alltså inget som syntes, men stod för
+ungefär en fjärdedel av tiden för varje bild. Mätt 2026-11-13 i headless Chromium med mjukvarugrafik, 1440 × 900 på
+steg 0 och med minskad rörelse, så att han gjorde samma sak i båda: 2,2–2,4 bilder i sekunden före ändringarna och
+2,8–3,0 efter (kornet borta, skuggorna och den nya atlasen; grafikkortets val och taket på 60 påverkar inte mjukvarugrafik).
+Figuren ensam ritades på 210 ms före och 207 ms efter. Inte mätt på ett riktigt grafikkort, i Safari eller på en
+telefon.
+
 Kostymfotot (C More Entertainment, CC BY 3.0, Wikimedia Commons, bearbetat; krediten står sist under
 Källor) ligger utan armar på en formad yta, så att huvudet vrids runt nacken och kroppen lutar sig
-fram. Ögon, bryn och mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med
+fram. Fotot var urklippt som ett kantigt polygon, och mot den mörka baren såg håret ut som om det var klippt med
+sax, med en platt topp och ett trappsteg till höger; konturen är rundad och mjuk, med strån i kanten, och resten
+av huvudet ovanför axlarna har en kantutjämnad kontur ([scripts/hasse/kant.py](scripts/hasse/kant.py), 2026-11-13). Ögon, bryn och mun rör sig i skuggaren: locken blinkar utan att ögat tänjs, munnen öppnas med
 tänder och tunga, och hakan följer med ([public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ärmarna är
 kavajen ur fotot ([public/rum-hasse-arm.js](public/rum-hasse-arm.js)): fotots armar, uträtade till en
 remsa i atlasen, ligger på böjbara rör, så att tyget och färgen är desamma som på

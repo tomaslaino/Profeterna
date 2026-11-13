@@ -3,8 +3,8 @@
 // det hörs, utan ljudfiler, och lite olika varje gång.
 //
 // spela(ctx, { typ: 'dunk' | 'klirr' | 'skrap' | 'vissla' | 'anda', styrka, sort, mjuk, ms, f, f1 }), från figurens händelser
-// (handelser i rum-hasse-3d.js) och pennan på din kupong (rum-hasse-kupong.js). sort: 'hand' (handflatan), 'nave' (lillfingersidan av näven) eller
-// 'bada' (båda händerna). mjuk: koppen ställs ned, inte tappas. vissla: en ton han visslar, f till f1 Hz under ms;
+// (handelser i rum-hasse-3d.js) och pennan på din kupong (rum-hasse-kupong.js). sort: 'hand' (handflatan), 'nave' (lillfingersidan av näven
+// eller handkanten), 'bada' (båda händerna), 'knoge' (knogarna) eller 'finger' (pekfingret). mjuk: koppen ställs ned, inte tappas. vissla: en ton han visslar, f till f1 Hz under ms;
 // anda: han andas på glasögonen (sort 'ha'), blåser på naglarna ('blas') eller andas ut länge ('pust');
 // fnys: han fnyser genom näsan; prassel: tidningen som rycks rak eller viks (mjuk: lugnare).
 // Elden (cigarren som tänds, rum-hasse-eld.js): fras (stickan mot plånen och lågan som tar), puff (ett bloss
@@ -86,30 +86,35 @@ function ton(ctx, t, f0, f1, glid, topp, tau, mal, len = 0.6) {
 }
 
 // Handen (eller näven) i en tjock bardisk av trä: en dov duns som sjunker, träets knack, handflatans
-// smäll och skivan som klingar kort. Allt på disken skramlar lite.
+// smäll och skivan som klingar kort. Allt på disken skramlar lite. Knogarna är ben mot trä: mindre duns och
+// ett torrare, högre knack. Pekfingret är bara ett litet, torrt knack, och disken klingar knappt.
 function dunk(ctx, mal, t, s, sort) {
   const nave = sort === 'nave';
   const bada = sort === 'bada';
+  const knoge = sort === 'knoge';
+  const finger = sort === 'finger';
   const o = ut(ctx, mal, bada ? 0 : -0.25);
   o.gain.value = Math.min(1, 0.6 + 0.3 * s);
   const k = Math.min(1.4, s);
+  const duns = finger ? 0.12 : knoge ? 0.8 : 1;
+  const klang = finger ? 0.35 : 1;
   // dunsen
-  ton(ctx, t, nave ? 88 : 105, nave ? 44 : 52, 0.12, 0.85 * k, bada ? 0.11 : 0.085, o, 0.7);
-  ton(ctx, t, nave ? 150 : 175, nave ? 92 : 110, 0.08, 0.32 * k, 0.05, o, 0.4);
+  ton(ctx, t, nave ? 88 : knoge ? 128 : 105, nave ? 44 : knoge ? 70 : 52, 0.12, 0.85 * k * duns, bada ? 0.11 : knoge ? 0.06 : 0.085, o, 0.7);
+  ton(ctx, t, nave ? 150 : knoge ? 210 : 175, nave ? 92 : knoge ? 130 : 110, 0.08, 0.32 * k * duns, 0.05, o, 0.4);
   // träet: knacket och skivan som klingar
-  bruston(ctx, t, 'bandpass', nave ? 210 : 280, 1.3, 0.9 * k, 0.045, o);
-  bruston(ctx, t, 'bandpass', nave ? 620 : 760, 2.2, 0.28 * k, 0.03, o);
-  ton(ctx, t, slump(205, 222), slump(198, 205), 0.2, 0.12 * k, 0.11, o);
-  ton(ctx, t, slump(338, 352), slump(330, 338), 0.2, 0.07 * k, 0.08, o);
-  // handflatan smäller (näven nästan inte), två händer strax efter varandra
+  bruston(ctx, t, 'bandpass', nave ? 210 : knoge ? 360 : finger ? 900 : 280, knoge || finger ? 2.4 : 1.3, (knoge ? 1.3 : finger ? 0.55 : 0.9) * k, finger ? 0.02 : knoge ? 0.035 : 0.045, o);
+  bruston(ctx, t, 'bandpass', nave ? 620 : knoge ? 1150 : finger ? 2300 : 760, 2.2, (knoge ? 0.5 : finger ? 0.3 : 0.28) * k, finger ? 0.012 : 0.03, o);
+  ton(ctx, t, slump(205, 222), slump(198, 205), 0.2, 0.12 * k * klang, 0.11, o);
+  ton(ctx, t, slump(338, 352), slump(330, 338), 0.2, 0.07 * k * klang, 0.08, o);
+  // handflatan smäller (näven, knogarna och fingret nästan inte), två händer strax efter varandra
   const small = (t2, a) => {
     bruston(ctx, t2, 'highpass', 1500, 0.7, a, 0.011, o, 0.1);
     bruston(ctx, t2, 'bandpass', 3200, 0.9, a * 0.5, 0.006, o, 0.08);
   };
-  small(t, (nave ? 0.06 : 0.42) * k);
+  small(t, (nave ? 0.06 : knoge ? 0.1 : finger ? 0.04 : 0.42) * k);
   if (bada) small(t + slump(0.006, 0.014), 0.38 * k);
   // askkoppen och fatet skramlar till
-  skrammel(ctx, mal, t + slump(0.004, 0.012), 0.22 * k);
+  skrammel(ctx, mal, t + slump(0.004, 0.012), 0.22 * k * (finger ? 0.3 : 1));
 }
 
 // Porslin mot porslin: några deltoner som inte är övertoner, de höga klingar av fortast, och ett
