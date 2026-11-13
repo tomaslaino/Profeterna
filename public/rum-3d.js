@@ -78,7 +78,7 @@
 // raden sitter med armarna i kors. På fönsterbänken står en kassettradio: ett klick går
 // fram till den (FM, AM och stationerna i rum-radio.js), och så länge den spelar musik
 // dansar de (DANSER i rum-dans.js) och sjunger om vartannat (radioSang, radioNamn),
-// med skyltarna på bordet.
+// med skyltarna på bordet; däremellan gungar var och en i takt på sitt sätt (radioGung).
 //
 // Inför matcherna korsar de sig ibland (KORS i rum-tecken.js, korsHand), oftare
 // ju närmare nästa avspark det är: på sju olika sätt med högerhanden, och någon
@@ -154,7 +154,7 @@ import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
 import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans, LAPP_HALL, LAPP_GOR, LAPP_MENY, LAPP_GREPP, lappBlanda, lappKropp } from './rum-tecken.js';
 import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
-import { DANSER, DANS_SLAG, DANS_IN, formen } from './rum-dans.js';
+import { DANSER, DANS_SLAG, DANS_IN, formen, dansLage, dansKropp, dansSjung, dansBlund, dansVarv, gung as dansGung, dansStil } from './rum-dans.js';
 import { vaxter } from './rum-vaxter.js';
 
 const DEG = Math.PI / 180;
@@ -3693,6 +3693,18 @@ export async function figurer(canvas, opt = {}) {
       // framåt lutar man sig utåt, inte in framför den bakom bordet (som sink)
       if (kb.lean > 0 && !kb.mitt) side += kb.lean * w * o.F.turn * DEG * 1.5;
     }
+    // takten så länge radion spelar och ingen dans eller sång pågår (radioGung)
+    if (dansKan(o, t)) {
+      const g = radioGung(o, t, ak);
+      if (g) {
+        pitch += g.pitch || 0;
+        lift += g.lift || 0;
+        roll += g.roll || 0;
+        side += g.side || 0;
+        twist += g.twist || 0;
+        if (g.knee) for (let i = 0; i < 2; i++) knee[i] += g.knee[i];
+      }
+    }
     // skålen: en nick när flaskan lyfts mot en
     const h = HEJ[k];
     if (h) pitch += 0.12 * skalW(o, t) * bump(t - h.at, 0.55, 0.75, 0.9, 1.25);
@@ -4728,7 +4740,8 @@ export async function figurer(canvas, opt = {}) {
     const x = aktRa(o, t);
     if (!x) return null;
     const a = AKTER[x.namn];
-    const w = bump(x.l, 0, a.in, a.len - a.ut, a.len) * vaken(o, t) * (x.av != null ? 1 - sm(x.av, x.av + 0.9, t) : 1);
+    // (mellan två danser på radion tonar man inte bort: somIn, somUt)
+    const w = (x.somIn ? 1 : sm(0, a.in, x.l)) * (x.somUt ? 1 : 1 - sm(a.len - a.ut, a.len, x.l)) * vaken(o, t) * (x.av != null ? 1 - sm(x.av, x.av + 0.9, t) : 1);
     return w > 0.001 ? { ...x, a, w } : null;
   }
   const aktW = (o, t) => { const x = aktNu(o, t); return x ? x.w : 0; };
@@ -5150,7 +5163,8 @@ export async function figurer(canvas, opt = {}) {
   // efter den andra (radioSang), en ny var RADIO_SLOT:e sekund i en ordning som
   // blandas om varje varv. Målets sång går före radions. Det som pågår när sången
   // börjar tonar bort (av i aktNu), och inget annat börjar så länge (tvingStart).
-  // Radions sånger är oftast danser (radioNamn, rum-dans.js).
+  // Radions sånger är oftast danser (radioNamn, rum-dans.js), och två danser i rad glider
+  // över i varandra (forra, nasta). Var och en kommer igång och byter i sin egen takt där.
   const SJUNG = { mal: null, radio: { pa: false, at: -1e9, fran: -1e9, till: -1e9 } };
   const MAL_SANG = 3.2;
   const RADIO_IN = 1.5;
@@ -5180,6 +5194,8 @@ export async function figurer(canvas, opt = {}) {
       const j = tre * 2 + k % 3;
       v = blandad(val, fro + 1.7 + Math.floor(j / val.length) * 3.1)[j % val.length];
       if (DANSER[v].alla && !allaUppe(t0)) v = 'italoPek';
+      // (den första dansen efter vilan ska gå att hänga på allt eftersom)
+      if (k % 3 === 0 && DANSER[v].igang) v = ['italoPek', 'italoAxlar', 'italoKlapp', 'italoJive'][Math.floor(hash(fro + k * 0.37) * 4)];
     } else {
       const val = tvW(t0) > 0.5 ? [...SANGER, 'allsangTv'] : SANGER;
       v = blandad(val, fro + Math.floor(tre / val.length) * 3.1)[tre % val.length];
@@ -5197,7 +5213,18 @@ export async function figurer(canvas, opt = {}) {
     const namn = radioNamn(k, t0);
     const l = t - t0;
     if (l >= AKTER[namn].len) return null;
-    return R.till < t0 + AKTER[namn].len ? { namn, l, t0, av: R.till } : { namn, l, t0 };
+    const x = { namn, l, t0, k, fro: R.fran };
+    // (två danser i rad: man glider över i nästa utan att vila emellan, rum-dans.js)
+    if (DANSER[namn] && k % 3 === 1) {
+      x.forra = radioNamn(k - 1, t0 - RADIO_SLOT);
+      x.somIn = true;
+    }
+    if (DANSER[namn] && k % 3 === 0 && t0 + RADIO_SLOT < R.till) {
+      x.nasta = radioNamn(k + 1, t0 + RADIO_SLOT);
+      x.somUt = true;
+    }
+    if (R.till < t0 + AKTER[namn].len) x.av = R.till;
+    return x;
   }
   // Sången som vem sjunger vid t, eller (efter ett mål som sänkte hen) armarna i kors.
   function tvingad(o, t) {
@@ -6078,18 +6105,29 @@ export async function figurer(canvas, opt = {}) {
   // korstecknet, och upp med händerna med fingrar. Den som håller upp sin skylt dansar med
   // den i handen (pose). Allt står i bildens axlar (bildAxlar), utom det som rör kroppen.
   const DANS_STOR = 1.12;
-  const dansUpp = (d, l) => bump(l, 0.45, DANS_IN, d.len - DANS_IN, d.len - 0.45);
   const dansB = (l) => (l - DANS_IN) / DANS_SLAG;
-  function dansV(o, A, x) {
+  // Det dansen behöver veta (rum-dans.js): rollerna, vem, radions lucka och armen – och dansen
+  // före och efter när två danser följer på varandra (granne).
+  function dansV(o, A, x, granne = true) {
     const R = roller(x);
     const i = FI(o);
-    return { rol: i === R.a ? 0 : i === R.b ? 1 : 2, a: R.a, sang: A && A === sangArm(o), t0: x.t0 };
+    const v = {
+      rol: i === R.a ? 0 : i === R.b ? 1 : 2, a: R.a, vem: [R.a, R.b, R.c], i, t0: x.t0, k: x.k, fro: x.fro ?? 0, per: RADIO_SLOT / DANS_SLAG,
+      sang: A && A === sangArm(o), skal: A && A === skalArm(o), ting: Boolean(A && A.bench), flaskan: o.arms.some((B) => B.thing),
+    };
+    if (granne && x.forra) v.forra = { d: DANSER[x.forra], v: dansV(o, A, { t0: x.t0 - RADIO_SLOT, k: x.k - 1, fro: x.fro }, false) };
+    if (granne && x.nasta) v.nasta = { d: DANSER[x.nasta], v: dansV(o, A, { t0: x.t0 + RADIO_SLOT, k: x.k + 1, fro: x.fro }, false) };
+    return v;
   }
   function dansPose(o, A, L, v) {
     if (L.till) return lerpPose(dansPose(o, A, L.fran, v), dansPose(o, A, L.till, v), L.k);
     const s = A.s;
     const n = o.F.a + o.F.b;
     const S = shoulder(o, A);
+    // det som är i handen ner på bordet (på väg mellan två danser)
+    if (L.bank && A.bench) return grip(A.bench.matrix, (A.thing || A.cig).matrix, new THREE.Vector3(A.s, -0.4, -0.6));
+    // handen platt på bordet, lyft en bit
+    if (L.bord) return paBordet(o, A, L.bord[0], L.bord[1], L.bord[2] || 0);
     // flaskan (eller näven) som mikrofon, framför munnen
     if (L.mik) {
       const h = huvudAxlar(o);
@@ -6098,7 +6136,12 @@ export async function figurer(canvas, opt = {}) {
       if (A.thing) return { p: m.addScaledVector(y, -A.thing.userData.top), y, z: new THREE.Vector3(-s * 0.55, -0.75, -0.3), pole: new THREE.Vector3(s, -0.6, -0.2) };
       return { p: m.addScaledVector(y, -o.F.arm * DANS_STOR * 2.4), y, z: new THREE.Vector3(s * 0.8, -0.2, 0.3), pole: new THREE.Vector3(s, -0.6, -0.2) };
     }
-    if (L.mot) return pekaPa(o, A, huvudPa(v.a), 0.82, 0);
+    // armen mot någons huvud (mot: 1, vem: figuren, annars sångaren), vriden och med rekyl
+    if (L.mot) {
+      const e = pekaPa(o, A, huvudPa(L.vem ?? v.a), 0.82, L.lyft || 0);
+      if (L.vrid) e.z.applyAxisAngle(e.y, L.vrid * s);
+      return e;
+    }
     const B = bildAxlar(o);
     const V = (a) => B.x.clone().multiplyScalar(s * a[0]).addScaledVector(B.y, a[1]).addScaledVector(B.z, a[2]);
     // handflatan mot kroppen eller huvudet
@@ -6115,7 +6158,12 @@ export async function figurer(canvas, opt = {}) {
     const y = V(L.y).normalize();
     const z = V(L.z);
     z.addScaledVector(y, -z.dot(y)).normalize();
-    const P = (L.m ? S.clone().lerp(shoulder(o, o.arms.find((b) => b !== A)), 0.5) : S.clone()).addScaledVector(V(L.p), n);
+    let P;
+    if (L.fram) {
+      // handleden en bit från munnen (instrumenten), i huvudets axlar
+      const h = huvudAxlar(o);
+      P = mouthIn(o).addScaledVector(h(1, 0, 0), s * L.fram[0]).addScaledVector(h(0, 1, 0), L.fram[1]).addScaledVector(h(0, 0, 1), L.fram[2]);
+    } else P = (L.m ? S.clone().lerp(shoulder(o, o.arms.find((b) => b !== A)), 0.5) : S.clone()).addScaledVector(V(L.p), n);
     if (L.mun > 0) P.lerp(mouthIn(o).add(new THREE.Vector3(0, -2, 3)).addScaledVector(y, -o.F.arm * DANS_STOR * 3.2), L.mun);
     // (armen töjs inte: dit den når)
     const ut = P.clone().sub(S);
@@ -6124,14 +6172,31 @@ export async function figurer(canvas, opt = {}) {
     if (L.vink) y.applyAxisAngle(z, L.vink * s);
     return { p: P, y, z, pole: V(L.pole || [1, -0.7, -0.3]) };
   }
+  // upp (rum-dans.js, 0–1): först ner med det som är i handen, sedan upp med armen
+  const dansNer = (u) => sm(0, 0.4, u);
+  const dansArm = (u) => sm(0.35, 1, u);
+  // (armens ställning frågas efter flera gånger i varje bild: en gång per arm och bild, dansM)
+  function dansArmNu(o, A, x, d) {
+    const m = A.dansM || (A.dansM = {});
+    if (m.l !== x.l || m.t0 !== x.t0 || m.d !== d) {
+      m.l = x.l; m.t0 = x.t0; m.d = d;
+      m.v = dansV(o, A, x);
+      m.L = dansLage(d, dansB(x.l), A.s, m.v);
+    }
+    return m;
+  }
+  // (och kroppens: dansV utan arm, en gång per figur och bild)
+  function dansVNu(o, x) {
+    const m = o.dansM || (o.dansM = {});
+    if (m.l !== x.l || m.t0 !== x.t0) { m.l = x.l; m.t0 = x.t0; m.v = dansV(o, null, x); }
+    return m.v;
+  }
   function dansHand(o, A, t, l, x, d) {
-    const v = dansV(o, A, x);
-    const L = d.lage(dansB(l), A.s, v);
+    const { v, L } = dansArmNu(o, A, x, d);
     if (!L) return null;
-    const k = dansUpp(d, l);
     let ner = handRest(o, A, t);
-    // (först ner med det som är i handen, och upp igen med det efteråt)
-    if (A.bench && !L.sak) ner = lerpPose(ner, grip(A.bench.matrix, (A.thing || A.cig).matrix, new THREE.Vector3(A.s, -0.4, -0.6)), bump(l, 0, 0.45, d.len - 0.45, d.len));
+    if (A.bench && !L.sak) ner = lerpPose(ner, grip(A.bench.matrix, (A.thing || A.cig).matrix, new THREE.Vector3(A.s, -0.4, -0.6)), dansNer(L.upp));
+    const k = dansArm(L.upp);
     return k > 0 ? lerpPose(ner, dansPose(o, A, L, v), k) : ner;
   }
   // (bara när radion spelar eller nyss har spelat: annars kostar det ingenting)
@@ -6140,42 +6205,51 @@ export async function figurer(canvas, opt = {}) {
   function dansFingrar(o, A, t) {
     const x = dansKan(o, t) && aktNu(o, t);
     if (!x || !x.a.dans) return null;
-    const d = x.a.dans;
-    const L = d.lage(dansB(x.l), A.s, dansV(o, A, x));
+    const { L } = dansArmNu(o, A, x, x.a.dans);
     if (!L || (L.sak && (A.thing || A.cig))) return null;
-    const k = dansUpp(d, x.l) * x.w;
+    const k = dansArm(L.upp) * x.w;
     return k > 0.02 ? { form: blanda(LOS, formen(L), sm(0.1, 0.7, k)), stor: 1 + (DANS_STOR - 1) * sm(0, 0.6, k) } : null;
   }
   // Hur högt armen är (glöden i cigaretten som ligger).
   function dansK(o, A, t) {
     const x = dansKan(o, t) && aktNu(o, t);
     if (!x || !x.a.dans) return 0;
-    const L = x.a.dans.lage(dansB(x.l), A.s, dansV(o, A, x));
-    return L && !L.sak ? dansUpp(x.a.dans, x.l) * x.w : 0;
+    const { L } = dansArmNu(o, A, x, x.a.dans);
+    return L && !L.sak ? dansArm(L.upp) * x.w : 0;
   }
   // Varvet på barstolen, i grader.
   function dansSnurr(o, t) {
     const x = dansKan(o, t) && aktNu(o, t);
-    if (!x || !x.a.dans || !x.a.dans.snurr) return 0;
-    return x.a.dans.snurr(dansB(x.l), dansV(o, null, x)) * x.w;
+    if (!x || !x.a.dans) return 0;
+    return dansVarv(x.a.dans, dansB(x.l), dansVNu(o, x)) * x.w;
   }
+  // Takten i kroppen så länge radion spelar och ingen dans eller sång pågår: var och en på
+  // sitt sätt (dansStil) och när hen hör den (efter en stund), också mellan sångerna.
+  function radioGung(o, t, ak) {
+    const R = SJUNG.radio;
+    const i = FI(o);
+    const d0 = R.fran + 0.3 + 1.6 * hash(R.fran * 0.37 + i * 5.1);
+    const w = sm(d0, d0 + 1.4, t) * (1 - sm(R.till, R.till + 1.2, t)) * (1 - (ak ? ak.w : 0));
+    if (w < 0.01) return null;
+    return dansGung((t - R.fran - RADIO_IN - DANS_IN) / DANS_SLAG - 0.02 - 0.1 * hash(R.fran * 0.77 + i * 3.9 + 0.3), dansStil(R.fran, i), w * vaken(o, t));
+  }
+  // (radions luckor är lika långa som dansen får vara: rum-dans.js räknar med dansens egen längd)
   for (const namn of Object.keys(DANSER)) {
     const d = DANSER[namn];
     AKTER[namn] = {
-      len: d.len, in: 0.3, ut: 0.3, per: DANS_SLAG,
+      len: RADIO_SLOT, in: 0.3, ut: 0.3, per: DANS_SLAG,
       dans: d,
       hand: (o, A, t, l, x) => dansHand(o, A, t, l, x, d),
       kropp: (o, t, l, x) => {
-        const v = dansV(o, null, x);
-        const b = d.kropp(dansB(l), v);
-        const k = dansUpp(d, l);
-        const ut = { mitt: true };
-        for (const y of Object.keys(b)) ut[y] = y === 'knee' ? b.knee.map((q) => q * k) : y === 'se' ? b.se : b[y] * k;
-        if (b.se === 'sangaren') { ut.se = huvudPa(v.a); ut.seW = b.seW * k; }
+        const v = dansVNu(o, x);
+        const b = dansKropp(d, dansB(l), v);
+        const ut = { mitt: true, ...b };
+        if (b.se === 'sangaren') ut.se = huvudPa(v.a);
+        else if (typeof b.se === 'number') ut.se = huvudPa(b.se);
         return ut;
       },
-      skratt: (o, t, l, x) => (d.sjung && d.sjung(dansB(l), dansV(o, null, x)) ? dansUpp(d, l) : 0),
-      blund: (o, x) => Boolean(d.blund && dansUpp(d, x.l) > 0.5 && d.blund(dansB(x.l), dansV(o, null, x))),
+      skratt: (o, t, l, x) => dansSjung(d, dansB(l), dansVNu(o, x)),
+      blund: (o, x) => dansBlund(d, dansB(x.l), dansVNu(o, x)),
     };
   }
 
