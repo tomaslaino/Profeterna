@@ -39,8 +39,10 @@
 // Omgången och tipsen ligger i tjänsten profeterna-kupong (worker/samtal.mjs,
 // GET/POST …/samtal; lokalt /api/samtal), som håller tipsen dolda. Den som
 // har lämnat in ser de andras tips, på alla sina enheter. Vem man är sparas bara
-// på enheten. Gängets tecken under uppgörelsen och vilka matcher som är klubbade
-// delas i realtid mellan alla som ser kupongen (se Gängets kupong i realtid nedan).
+// på enheten – och i tobaksaffären är ingen vald när sidan öppnas, förrän man
+// klickar på sig själv (se me nedan). Gängets tecken under uppgörelsen och
+// vilka matcher som är klubbade delas i realtid mellan alla som ser kupongen
+// (se Gängets kupong i realtid nedan).
 //
 // Läses efter app.js och kupong.js och använder deras hjälpare (KP, SIGNS,
 // matchById, isOpen, pickable, gradeRow, roundSteps …). kupong.js ritar vyerna
@@ -68,6 +70,8 @@
     lyft: null, // vems tips som lyfts fram på papperet (ett tryck på porträttet överst)
     nyBock: null, // den omtvistade match som just klubbades: bocken dras när papperet ritas om
     vald: undefined, // matchen vars lapp är framme i uppgörelsen; null = ingen, undefined = nästa omtvistade
+    rumVald: false, // du har sagt vem du är under besöket (bytVem): först då är du någon i tobaksaffären (me)
+    iRum: false, // tobaksaffären frågar (Samtal.pult)
   };
   const VEM = 'profeterna.samtal.vem';
   const TIPS = 'profeterna.samtal.tips';
@@ -77,10 +81,17 @@
 
   const info = () => (KP.data && KP.data.samtal) || null;
   const gang = () => (info() ? info().gang : []);
-  const me = () => {
+  // Vem enheten minns: den som valdes senast, här, i tobaksaffären eller hos Hasse.
+  const minne = () => {
     const v = kpLoad(VEM);
     return gang().some((g) => g.id === v) ? v : null;
   };
+  // Vem du är: den enheten minns – utom i tobaksaffären (allt i Samtal.pult), där ingen är vald när sidan
+  // öppnas. Där är du ingen förrän du har klickat på dig själv vid bordet (eller valt namnet på kupongen eller
+  // hos Hasse) under besöket, och tills dess går det bara att titta: ingen kupong att fylla i, inga dolda tips
+  // och inget Hasse vet om dig. Minnet avgör ändå vem du kan bli (kanByta, bytTill): har du lämnat in här kan
+  // du välja dig själv igen, men ingen annan.
+  const me = () => (SM.iRum && !SM.rumVald ? null : minne());
   const here = (sub) => Boolean(KP.view && KP.view.mode === 'samtal' && KP.view.sub === sub && !$('#coupon-section').hidden);
   // Var och en med sitt porträtt (bild i config/kupong.js) i en ring i sin
   // färg – alla heter D-något, så initialerna skiljer dåligt. Initialerna om
@@ -125,7 +136,7 @@
   // på den här enheten.
   const handedIn = (s) => {
     const d = kpLoad(TIPS);
-    return s && d && d.id === s.id && d.vem && d.vem === me() && d.inne ? d : null;
+    return s && d && d.id === s.id && d.vem && d.vem === minne() && d.inne ? d : null;
   };
   // Nyckeln från inlämningen skickas med om enheten har den: tjänsten
   // krävde den till 2026-10-22, och den driftsätts för hand.
@@ -141,16 +152,18 @@
   // har lämnat in – och när enheten står på någon som lämnade in någon
   // annanstans: hens tips sparades inte här vid inlämningen. (Tjänstens tips
   // räknas inte: dem får enheten så fort den står på någon som har lämnat in.)
-  const kanByta = (s) => !submitted(s, me()) || !handedIn(s);
+  const kanByta = (s) => !submitted(s, minne()) || !handedIn(s);
   // Vilka i gänget enheten kan bli: när allas tips visas vem som helst (det
-  // finns inget dolt att se), annars de som inte har lämnat in, när kanByta.
-  const bytTill = (s) => s.gang.filter((g) => s.visas || (kanByta(s) && !g.inne)).map((g) => g.id);
-  // Enheten blir id. Stod den på någon som har lämnat in glöms allas tips,
-  // som bara hen fick se (load), tills tjänsten svarar igen – utom när de
-  // visas för alla.
+  // finns inget dolt att se), annars de som inte har lämnat in, när kanByta –
+  // och alltid den enheten minns (i tobaksaffären väljer du dig själv igen).
+  const bytTill = (s) => s.gang.filter((g) => s.visas || g.id === minne() || (kanByta(s) && !g.inne)).map((g) => g.id);
+  // Enheten blir id, och du har sagt vem du är (SM.rumVald). Stod den på någon
+  // annan som har lämnat in glöms allas tips, som bara hen fick se (load),
+  // tills tjänsten svarar igen – utom när de visas för alla.
   const bytVem = (s, id) => {
-    if (s && !s.visas && submitted(s, me())) Object.assign(s, { tips: null, efter: null });
+    if (s && !s.visas && id !== minne() && submitted(s, minne())) Object.assign(s, { tips: null, efter: null });
     kpStore(VEM, id);
+    SM.rumVald = true;
     liveKoll();
   };
   // Dina inlämnade tips går att ändra tills matcherna startar, på vilken av
@@ -2217,10 +2230,15 @@
   // efter = dina kommentarer i efterhand ({matchens id: text}),
   // bort och matcher = Ta bort och Ändra matcherna går (finstilen här), och
   // klocka = pingklockan står bredvid kupongen i tobaksaffären (till uppgörelsen).
+  // Här är du ingen förrän du har valt dig (me): då är vem null, och det går
+  // bara att titta – inga dolda tips (se, gang, tips), inget att ta bort.
   const draftOf = (s, v) => {
     const d = kpLoad(TIPS);
     return d && d.id === s.id && !d.inne && (!d.vem || d.vem === v) ? d : null;
   };
+  // Tipsen som inte visas för alla syns inte för den som inte har sagt vem hen är – också
+  // om enheten har hämtat dem åt den den minns (load).
+  const dolt = (s) => !s.visas && !me();
   const pult = {
     // Omgången före den aktuella, med allas tips (gängets lappar i rummet), eller null.
     forra: () => SM.forra,
@@ -2237,19 +2255,20 @@
       const andra = canEdit(s);
       const hand = (open && !inne) || andra;
       const d = !inne && mine ? { tecken: mine.tecken, kommentarer: mine.kommentarer || {} } : null;
-      const se = s.gang.filter((g) => s.tips && s.tips[g.id]).map((g) => g.id);
+      const se = dolt(s) ? [] : s.gang.filter((g) => s.tips && s.tips[g.id]).map((g) => g.id);
       const gang = se.length >= (s.visas ? 1 : 2);
       return {
         s, vem: v, inne, open, fyll: open && !inne, andra, hand,
         tecken: { ...((mine && mine.tecken) || {}) }, kommentarer: { ...((mine && mine.kommentarer) || {}) },
-        val: inne ? [] : s.gang.filter((g) => !g.inne).map((g) => g.id),
+        // (innan du har valt: de du kan bli, också du själv om du har lämnat in här)
+        val: inne ? [] : v ? s.gang.filter((g) => !g.inne).map((g) => g.id) : bytTill(s),
         byt: open || s.visas ? bytTill(s) : [],
         sparad: Boolean(d && mine.sparad && mine.sparad === sig(s, d)),
         tom: !d || (!mine.sparad && !sig(s, d).replace(/[:|]/g, '')),
         se, skriv: writer(s), gang,
         efter: Object.fromEntries(Object.entries((v && s.efter && s.efter[v]) || {}).map(([m, x]) => [m, x.text])),
-        bort: !s.visas && !s.gang.some((g) => g.inne && g.id !== v),
-        matcher: !s.visas && !s.gang.some((g) => g.inne),
+        bort: Boolean(v) && !s.visas && !s.gang.some((g) => g.inne && g.id !== v),
+        matcher: Boolean(v) && !s.visas && !s.gang.some((g) => g.inne),
         klocka: !open ? Boolean(s.visas && before) : Boolean(inne && gang),
       };
     },
@@ -2257,14 +2276,19 @@
     // Går också när enheten står på någon som har lämnat in någon annanstans
     // (kanByta): man hade klickat på hen i tobaksaffären – och till vem som
     // helst när allas tips visas (bytTill).
+    // Har hen lämnat in hämtas de andras tips, som hen ser, och tobaksaffären
+    // ritas om när de har kommit.
     vem(id) {
       const s = SM.data;
       if (!s || !bytTill(s).includes(id)) return false;
       const d = draftOf(s, me());
       bytVem(s, id);
       if (d) kpStore(TIPS, { id: s.id, vem: id, tecken: d.tecken, kommentarer: d.kommentarer || {} });
+      if (!s.visas && submitted(s, id) && !s.tips) load().then(() => { if (window.Rum && Rum.redraw) Rum.redraw(); });
       return true;
     },
+    // Vem du är här (me), också utan omgång: null tills du har valt dig.
+    du: () => me(),
     // Det som står överst på papperet, till kupongen på pulten: stämpeln
     // (vem omgången väntar på) och namnen, skrivna för hand. Bara det egna
     // syns (du); vem: namnen för dem du kan vara är knappar (data-vem), som
@@ -2275,7 +2299,7 @@
       const s = SM.data;
       if (!s) return null;
       const v = me();
-      const choose = (g) => vem && !submitted(s, v) && !g.inne;
+      const choose = (g) => vem && !submitted(s, v) && (v ? !g.inne : bytTill(s).includes(g.id));
       return {
         stamp: stamp(s),
         namn: s.gang.map((g) => {
@@ -2299,7 +2323,7 @@
     // Ett tecken eller en gardering i en match ('' = inget).
     tippa(id, tecken) {
       const s = SM.data;
-      if (!s) return;
+      if (!s || !me()) return;
       const d = draftOf(s, me()) || { id: s.id, vem: me(), tecken: {}, kommentarer: {} };
       if (tecken) d.tecken[id] = tecken;
       else delete d.tecken[id];
@@ -2308,7 +2332,7 @@
     // Din motivering till en match ('' = ingen), som pennan på papperet här.
     motivera(id, text) {
       const s = SM.data;
-      if (!s) return;
+      if (!s || !me()) return;
       const d = draftOf(s, me()) || { id: s.id, vem: me(), tecken: {}, kommentarer: {} };
       d.kommentarer = { ...(d.kommentarer || {}) };
       const t = String(text || '').slice(0, NOTE_MAX);
@@ -2348,7 +2372,7 @@
     // eller null.
     tips(id) {
       const s = SM.data;
-      if (!s) return null;
+      if (!s || dolt(s)) return null;
       const t = id === me() && submitted(s, id) ? mineIn(s, id) : s.tips && s.tips[id];
       if (!t) return null;
       const e = (s.efter && s.efter[id]) || {};
@@ -2379,7 +2403,7 @@
     // kupong är sparad som den står (spela.js)}.
     gang() {
       const s = SM.data;
-      if (!s || !(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2))) return null;
+      if (!s || dolt(s) || !(s.tips && Object.keys(s.tips).length >= (s.visas ? 1 : 2))) return null;
       const rows = analyse(s);
       const val = decisions(s, rows);
       const made = existing(s);
@@ -2468,6 +2492,19 @@
       confirmRemove(done);
     },
   };
+  // Allt i pult frågas från tobaksaffären (SM.iRum, me). En asynkron metod är där
+  // fram till sin första await: den läser vem du är innan dess.
+  for (const [k, f] of Object.entries(pult)) {
+    pult[k] = (...a) => {
+      const was = SM.iRum;
+      SM.iRum = true;
+      try {
+        return f(...a);
+      } finally {
+        SM.iRum = was;
+      }
+    };
+  }
 
   // Omgångens matcher (liveställningen i kupong.js hämtar dem också), om
   // allas tips visas, gängets kupong ur omgången och bevakningen av

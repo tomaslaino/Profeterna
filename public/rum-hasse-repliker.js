@@ -1068,10 +1068,17 @@
     inget: ['Klok', 'Vis', 'Sparsam', 'Snål', 'Ledig', 'Bortrest', 'Saknad', 'Glömsk', 'Upptagen', 'Lat'],
   },
   // Namnen han nästan kan. Ibland säger han ett av dem i stället för det riktiga, i domen (aldrig om den som
-  // vann) och när han hälsar på dig (kallar i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
-  // Namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för Johansson); rösten får dem också (src/rost.js).
-  // Sägs inte som egna rader.
-  felnamn: { Laino: ['Lainio', 'Leino'], Tejder: ['Tejler', 'Teider'], Dogge: ['Docke', 'Dugge'] },
+  // vann) och när han hälsar på dig (felNamn och domNamn i rum-hasse.js). Han rättar sig aldrig och säger inget
+  // om det. Felen är sådana som den gör som inte bryr sig: ett namn som låter likadant, ett han kan bättre
+  // någon annanstans ifrån (Laine, Tegnér, Mogge), Daniel, som ni alla heter och som därför aldrig är fel, och
+  // för Dogge ett efternamn i stället för smeknamnet, och då fel efternamn. Varje fel ska höras när rösten läser
+  // (Teider låter som Tejder och är därför borta). Namnen vi kallas (Tippoang.kallas: efternamnen, Dogge för
+  // Johansson); rösten får dem också (src/rost.js). Sägs inte som egna rader.
+  felnamn: {
+    Laino: ['Lainio', 'Leino', 'Laine', 'Lainen', 'Laiho', 'Daniel'],
+    Tejder: ['Tejler', 'Tejdel', 'Tegnér', 'Tajder', 'Daniel'],
+    Dogge: ['Docke', 'Dugge', 'Mogge', 'Dagge', 'Jansson', 'Johnsson', 'Daniel'],
+  },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
   // att säga i vilken ordning som helst, och när det finns en match kvar att fråga om.
