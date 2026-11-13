@@ -399,6 +399,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   papper, den tunna tryckta ramen, *Nr 1 · Vecka 46* och priset maskinskrivna överst, namnet i terrakotta, vinjetten
   mellan två streck och rubriken i tidningens typsnitt, så fet och stor som ryms. Det gula papperet, det röda bandet
   och den molniga svärtan är borta (se *Löpsedeln* under [Tobaksaffären](#tobaksaffären))
+- [x] **Spegeln: man ser vem av de tre man är (2026-11-13, användarens önskemål: "Kan du komma på något smart sätt som
+  man kan se vem av de tre som man är inloggad som på animationssidan?", med kravet att det inte får dra mycket
+  grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
+  den medan den rör sig; de andra två gör det inte. Den som rör sig när du rör dig är du. Inga nya saker eller ord i
+  rummet, och inga fler bilder, ritanrop eller trianglar (se *Spegeln* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -4270,6 +4275,22 @@ och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck p�
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
 
+**Spegeln** (2026-11-13, `spegel` och `SPEGEL` i rum-3d.js, `spegla` i rum-folk.js): rummet har inga
+förklarande ord, så man känner igen sig själv på det som rör sig när man själv rör sig. Din egen figur
+tittar på markören var den än är i rummet, också där det inte finns någon sak, och följer den medan musen
+rör sig; i telefonen tittar den på fingret när du sätter ner det och drar. De andra två gör det inte (alla
+tre gungar fortfarande lite med huvudet när musen rör sig, `NICK`). Punkten är där strålen genom markören
+går genom planet z = 640 framför bordet, så att figuren tittar ut mot en och vrider huvudet efter markören:
+åt sidorna, upp och ner mot pulten. Blicken glider efter markören (0,12 s), tonar in på en tredjedels sekund
+och, när markören har stått still i tre sekunder, tillbaka på knappt en sekund till det figuren annars gör.
+Det man pekar på (en sak, någon i gänget) går före, liksom tecknet, valet och sömnen; nära något och med något
+framme släpps spegeln, och den är avstängd med minskad rörelse. Markören skickas till figuren högst var 60:e
+millisekund, men alltid med där den hamnade sist. Spegeln vrider bara huvudet i bilder som ändå ritas. Mätt
+2026-11-13 i Chromium med SwiftShader, i samma sida: samma 170 ritanrop och samma trianglar per bild med och
+utan spegeln, ingen ny geometri eller textur, och gängets egen kod tog lika lång tid per bild (median
+0,6–0,8 ms med och utan, inom bruset). Prova med `?rum-spegel=dl:0.8:-0.2` (som om DL:s markör hade stått där
+i duken, −1…1, länge; också med `?rum-t`).
+
 **Korstecknet** (2026-11-08, `KORS`, `KORS_MENY` och `korsChans` i rum-tecken.js, `korsHand`
 i rum-3d.js, `avspark` i `gangTv` i rum.js): inför matcherna korsar sig gänget ibland. Var och en
 kan alla sju sätten (`korsa`, `korsaKvickt`, `korsaKyss`, `korsaTre`, `korsaVilsen`, `korsaTumme`,
@@ -7366,8 +7387,10 @@ där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga
 en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen (`upptagen` i rum-hasse.js) och
 trycks om när han tar upp den andra (`visa`).
 
-**Glasögonen** (2026-11-09). Han läser med läsglasögon i mörk sköldpadd (`byggGlasogon` i
-[public/rum-hasse-arm.js](public/rum-hasse-arm.js)), som annars sitter i bröstfickan med det översta hörnet uppstickande.
+**Glasögonen** (2026-11-09). Han läser med halvbågade läsglasögon (`byggGlasogon` i
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)): en tunn list av svart metall längs glasens överkant och rakt över
+näsan, och nedtill bara glasens kant, som de han har på ett foto Tomas skickade 2026-11-13 (förut helbågade i mörk
+sköldpadd). Annars sitter de i bröstfickan med det översta hörnet uppstickande.
 Före tidningen tar han fram dem med höger hand, håller upp dem framför hakan, fäller ut skalmarna med en knyck och sätter
 på sig dem framifrån, blinkar och rynkar näsan tills de sitter (biten `pa`); efter tidningen tar han av dem i hörnet,
 fäller ihop dem framför bröstet och stoppar dem i fickan (`av`). Medan han läser håller han tidningen med vänster hand

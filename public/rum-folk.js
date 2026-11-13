@@ -12,6 +12,10 @@
 // data/kuponger.json). Utan tjänsten gör bara din egen figur det, och utan
 // vem du är bara de andras.
 //
+// Spegeln: din egen figur tittar också på markören, var den än är, och i
+// telefonen på fingret, och följer den medan den rör sig (spegla, spegel i
+// rum-3d.js) – så att man ser vem av de tre man är. De andra två gör det inte.
+//
 // Pekar man på någon i gänget tittar hen på en och skålar (hej); i
 // telefonen gör ett tryck på figuren samma sak en stund. Ett klick på en
 // figur går inte vidare till det som står bakom.
@@ -68,7 +72,8 @@
 // ?rum-ansikte=jublar|glad|nojd|sur|deppig|orolig (=inget),
 // ?rum-pekar=dt:tv,dl:dj (som om de pekade), ?rum-hej=dl (som om man
 // pekade på DL), ?rum-vald=dl (som om man just hade blivit DL; dl:3 tre
-// sekunder sedan) och ?rum-tecken=dl:hang:1 (DL gör hang loose sedan en sekund;
+// sekunder sedan), ?rum-spegel=dl:0.8:-0.2 (som om DL:s markör hade stått där
+// i duken, −1…1, länge; också med fryst tid) och ?rum-tecken=dl:hang:1 (DL gör hang loose sedan en sekund;
 // namnen står i rum-tecken.js).
 
 window.RumFolk = (() => {
@@ -89,6 +94,7 @@ window.RumFolk = (() => {
     el: null, o: null, on: false, ws: null, timer: 0, ping: 0, retry: 0, loop: 0,
     over: null, pa: null, mot: undefined, sent: undefined, sentAt: 0, sendT: 0, inne: {},
     natt: null, grad: null, somn: null, efter: undefined, pek: null, typ: 'mouse', hejAt: -1, rorAt: 0, vem: null,
+    spT: 0, spAt: 0, spXY: null,
   };
   const fig = () => (F.o && F.o.fig()) || null;
 
@@ -307,16 +313,53 @@ window.RumFolk = (() => {
     if (el) el.style.setProperty('cursor', 'default', 'important');
   }
 
+  // Spegeln: din egen figur tittar på markören, och i telefonen på fingret (spegel i
+  // rum-3d.js) – den som rör sig när du rör dig är du. Högst var 60:e millisekund, men
+  // alltid med där markören hamnade sist. Inte nära något (då syns gänget inte, eller
+  // bara en bit) och inte med något framme: då tittar din figur redan på det (egen).
+  function spegla() {
+    F.spT = 0;
+    F.spAt = performance.now();
+    const f = fig();
+    if (!f || !f.spegel || !F.o || !F.spXY) return;
+    const t = F.o.now();
+    const v = jag();
+    const c = F.el && F.el.querySelector('#rum-3d');
+    if (!v || !c || F.o.nara() || F.o.fokus()) {
+      f.spegel(null, 0, 0, t);
+      return;
+    }
+    const r = c.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const [x, y] = F.spXY;
+    f.spegel(v, ((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1), t);
+  }
+  function speglaSnart(e) {
+    F.spXY = [e.clientX, e.clientY];
+    if (!F.spT) F.spT = setTimeout(spegla, Math.max(0, 60 - (performance.now() - (F.spAt || 0))));
+  }
+  function speglaInte() {
+    clearTimeout(F.spT);
+    F.spT = 0;
+    F.spXY = null;
+    const f = fig();
+    if (f && f.spegel && F.o) f.spegel(null, 0, 0, F.o.now());
+  }
+
   function wire(el) {
     el.addEventListener('mouseover', (e) => {
       const a = e.target.closest('.rum-sak, .rum-tag');
       F.over = a ? nyckel(a) : null;
       egen();
     });
-    el.addEventListener('pointerdown', (e) => { F.typ = e.pointerType; });
+    el.addEventListener('pointerdown', (e) => {
+      F.typ = e.pointerType;
+      speglaSnart(e);
+    });
     // pekar man på gänget (musen), högst var 60:e millisekund
     el.addEventListener('pointermove', (e) => {
       F.typ = e.pointerType;
+      speglaSnart(e);
       if (e.pointerType !== 'mouse') return;
       const ms = performance.now();
       if (ms - F.rorAt < 60) return;
@@ -330,6 +373,7 @@ window.RumFolk = (() => {
       F.over = null;
       pa(null);
       markor(null);
+      speglaInte();
     });
     // ett klick (eller tryck) på en figur: ett tecken, namnet på kupongen
     // (valj) och i telefonen ett hej en stund – och inget annat; på radion på
@@ -498,6 +542,11 @@ window.RumFolk = (() => {
       if (q.has('rum-tecken') && f.tecken) {
         const [k, namn, sek] = q.get('rum-tecken').toLowerCase().split(':');
         f.tecken(k, o.now() - (sek ? parseFloat(sek) || 0 : 1), namn);
+      }
+      // ?rum-spegel=dl:0.8:-0.2: som om DL:s markör hade stått där i duken (−1…1) länge
+      if (q.has('rum-spegel') && f.spegel) {
+        const [k, nx, ny] = q.get('rum-spegel').toLowerCase().split(':');
+        f.spegel(k, parseFloat(nx), parseFloat(ny), o.now(), true);
       }
       if (q.has('rum-vald') && f.vald) {
         const [k, sek] = q.get('rum-vald').toLowerCase().split(':');
