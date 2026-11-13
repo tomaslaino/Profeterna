@@ -203,8 +203,10 @@
    lägger en hinna över glaset, så att färgerna blir blekare och svärtan
    grå. Då tar rutan inte blicken från resten av rummet; nära (.nara) lyser
    den fullt, och den tonar upp medan tv:n vrids fram. Sifferdisplayen
-   likaså, annars blir den tv:ns ljusaste punkt. */
-.rum-tv3:not(.nara) :is(.tv-glas, .tv-led) { filter: brightness(0.7) saturate(0.5) contrast(0.8); }
+   likaså, annars blir den tv:ns ljusaste punkt. Medan matcherna pågår och
+   tv:n står på 377 (.direkt, rum-tv.js) lyser den fullt också på håll: då
+   tittar alla på den. */
+.rum-tv3:not(.nara, .direkt) :is(.tv-glas, .tv-led) { filter: brightness(0.7) saturate(0.5) contrast(0.8); }
 .tv-scan {
   position: absolute;
   inset: 0;
