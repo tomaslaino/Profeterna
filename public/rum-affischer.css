@@ -419,12 +419,14 @@
    är brunsvart i stället för svart (--svart), det röda har mattats mot
    tegel, fotot är mjukare och varmare, och solens slöja ligger över allt
    (--sloja, i .veck). Först blev den nästan för blek och lite grå ("nästan
-   för blekta"): nu varmare, med mer patina än blekhet. Inga filter på
-   texten (den blir suddig i närbilden), bara andra färger.
+   för blekta"): nu varmare, med mer patina än blekhet. Sedan lite mindre
+   blek ("lite mindre blekt på Chelsea"): svagare slöja, mörkare tryck, ett
+   rödare rött och ett fylligare foto. Inga filter på texten (den blir
+   suddig i närbilden), bara andra färger.
    Slöjan är gemensam för IFK, Chelsea och VM 94, i varmt gulnat papper,
    starkast uppe till vänster där solen har stått på; --sol är hur stark. */
 .rum-ifk, .rum-chelsea, .rum-vm94 { --sloja: linear-gradient(160deg, rgba(238, 222, 184, var(--sol, 0.15)), rgba(238, 222, 184, calc(var(--sol, 0.15) * 0.45)) 55%, rgba(238, 222, 184, calc(var(--sol, 0.15) * 0.2))); }
-.rum-chelsea { --k: 1.0256; --svart: #3d3228; --sol: 0.2; }
+.rum-chelsea { --k: 1.0256; --svart: #33291f; --sol: 0.13; }
 .rum-chelsea .ark {
   display: flex;
   flex-direction: column;
@@ -440,12 +442,12 @@
   display: flex;
   align-items: flex-end;
   padding: 1.2px 3px 1.4px;
-  background: #c24c3e;
+  background: #c4423a;
   color: #fbf4e6;
 }
 /* det röda har bleknat (en ton ovanpå, inte ett filter: text i filter ritas
    suddigt i närbilden) */
-.rum-chelsea .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.26); pointer-events: none; }
+.rum-chelsea .huvud::after { content: ""; position: absolute; inset: 0; background: #d8b98a; mix-blend-mode: color; opacity: calc(var(--sep, 0.2) + 0.2); pointer-events: none; }
 .rum-chelsea .huvud .sun { display: flex; align-items: flex-start; white-space: nowrap; font: 900 11px/0.9 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.45px; }
 .rum-chelsea .huvud .sun i { margin: 0.6px 0.5px 0 0; font: 900 4.2px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.1px; font-style: normal; }
 .rum-chelsea .huvud small { flex: 1 0 auto; margin-left: 1.5px; text-align: right; font: 700 2.4px/1.15 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1px; opacity: 0.9; }
@@ -453,7 +455,7 @@
   align-self: flex-start;
   margin: 3px 1.5px 0;
   padding: 1.3px 2.4px 1px;
-  background: #483d32;
+  background: #3e342a;
   color: #eee4c9;
   font: 400 4.8px/1 Anton, Impact, sans-serif;
   letter-spacing: 0.4px;
@@ -465,7 +467,7 @@
   margin: 2.2px 1.5px 0;
 }
 .rum-chelsea .rub b { display: block; text-align: center; transform-origin: 50% 50%; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; line-height: 0.94; white-space: nowrap; letter-spacing: 0.15px; }
-.rum-chelsea .rub b.rod { color: #b4493b; }
+.rum-chelsea .rub b.rod { color: #b23c31; }
 /* fotot i färg, men tryckt på tidningspapper och solblekt: mjukare, med
    ljusare skuggor och färger som har gått mot gult och brunt */
 .rum-chelsea .foto { display: block; flex: 1; min-height: 0; margin: 2.4px 1.5px 0; overflow: hidden; }
@@ -475,7 +477,7 @@
   height: 100%;
   object-fit: cover;
   object-position: 50% 40%;
-  filter: saturate(0.6) sepia(calc(var(--sep, 0.2) + 0.3)) contrast(0.86) brightness(1.05);
+  filter: saturate(0.68) sepia(calc(var(--sep, 0.2) + 0.25)) contrast(0.92) brightness(1.03);
 }
 .rum-chelsea .under {
   margin: 2px 1.5px 0;
