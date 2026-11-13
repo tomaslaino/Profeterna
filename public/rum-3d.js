@@ -26,6 +26,8 @@
 // handen går i en båge med handleden strax efter (bage); vilans gungning upprepar sig inte (gung);
 // och man blinkar när blicken flyttas (blickBlink). Allt är räkning i ställningarna: inga nya
 // bilder eller lager, och två ritanrop till (halsdukens ändar).
+// Armarna går runt huvudet (2026-11-13): handen flyttas ut ur huvudet och armbågen vrids undan,
+// så att armen inte går igenom det när handen är uppe, bakom huvudet eller vid ansiktet (huvudFri).
 //
 // Den som inte har lämnat in en öppen omgång sitter med kupongen och pennan i
 // stället för flaskan och cigaretten, som står på bordet. Fem saker
@@ -1546,11 +1548,14 @@ export async function figurer(canvas, opt = {}) {
       }
       capsule([q * 0.9, q * 0.8, r0 + q * 0.2], [q * 0.4, q * 1.6, -r0 * 0.4], q * 0.42, skin, g);
       g.userData.wrist = new THREE.Vector3(0, -q * 0.3, r0 + q * 1.2);
+      // (handens mitt, som armarna runt huvudet prövar: huvudFri)
+      g.userData.mitt = new THREE.Vector3(0, 0, r0 + q * 0.45);
     } else {
       ellipsoid([0, q * 1.1, 0], [q * 0.62, q * 1.3, q * 1.05], skin, g);
       ellipsoid([-q * 0.12, q * 2.25, 0], [q * 0.55, q * 0.95, q * 0.98], skin, g, [0, 0, 0.25]);
       capsule([q * 0.15, q * 0.7, -q * 0.75], [q * 0.4, q * 1.7, -q * 1.02], q * 0.36, skin, g);
       g.userData.wrist = new THREE.Vector3(0, 0, 0);
+      g.userData.mitt = new THREE.Vector3(0, q * 1.4, 0);
     }
     return g;
   }
@@ -1577,7 +1582,7 @@ export async function figurer(canvas, opt = {}) {
     });
     const a = led(g, s * q * 0.94, q * 0.82, -q * 0.12, q * 0.86, q * 0.37);
     const tum = { a, b: led(a, 0, q * 0.86, 0, q * 0.72, q * 0.34) };
-    g.userData = { wrist: new THREE.Vector3(0, 0, 0), fing, tum, s };
+    g.userData = { wrist: new THREE.Vector3(0, 0, 0), mitt: new THREE.Vector3(0, q * 1.1, 0), fing, tum, s };
     g.visible = false;
     return g;
   }
@@ -3205,6 +3210,9 @@ export async function figurer(canvas, opt = {}) {
             : ring([0, 0, 0], [0, 1, 0], rL * 1.02, J ? 1.5 + 0.3 * tk : 1.9, J ? edgeMat(J) : tee2, fig),
       };
       if (sleeve === 'lang' || sleeve === 'jacka') A.loS = rod(Math.max(1, F.b * 0.84 - 2 * rL), rL, sm, fig);
+      // överarmens och underarmens tjocklek med ärmen (huvudFri)
+      A.rU = rU;
+      A.rL = A.loS ? rL : F.arm * 0.92;
       // dunjackans kanaler runt ärmarna
       if (J && J.tyg === 'dun' && sleeve !== 'kort') A.quilt = [[0, 0.38, rU], [0, 0.72, rU], ...(A.loS ? [[1, 0.32, rL], [1, 0.62, rL]] : [])].map(([seg, f, r]) => ({ seg, f, x: ring([0, 0, 0], [0, 1, 0], r * 0.98, 1.2 + 0.2 * tk, sm, fig) }));
       const q = F.arm;
@@ -3355,6 +3363,140 @@ export async function figurer(canvas, opt = {}) {
     const X = new THREE.Vector3().crossVectors(Y, Z);
     g.position.copy(pos);
     g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
+  }
+
+  // Armarna runt huvudet (2026-11-13). Huvudena är stora – bredare än axlarna – och påhitten säger
+  // bara var handen ska vara och åt vilket håll armbågen ska peka, så när handen gick upp, bakom
+  // huvudet eller fram till ansiktet kunde armen gå rakt igenom huvudet (allsången mot tv:n,
+  // dansen, händerna i nacken). Huvudet är här ellipsoiden i headGeo – smalare mot hakan och lite
+  // större upptill för håret eller mössan – i figurens axlar (huvudForm), och varje bild prövas
+  // handen och armen mot den med sin tjocklek runt om (huvudFri, i pose): handflatan och handleden
+  // flyttas ut till ytan om de har hamnat inne i huvudet (den som tar sig för pannan eller lägger
+  // handen i nacken rör fortfarande vid det), och armbågen vrids runt linjen från axeln till
+  // handleden, åt det håll där armen går fri först och inte längre än så (armbageFri). Går armen
+  // inte fri någonstans flyttas handen ut så mycket som fattas. Allt räknas ur ställningen i samma
+  // bild, så samma t ger samma bild, och utan krock kostar det bara några punkter per arm.
+  const HL = new THREE.Vector3();
+  const HR = new THREE.Vector3();
+  const HT = new THREE.Vector3();
+  const HD = new THREE.Vector3();
+  const NOLL = new THREE.Vector3();
+  function huvudForm(o) {
+    o.torso.updateMatrix(); o.hg.updateMatrix(); o.hc.updateMatrix();
+    const m = o.torso.matrix.clone().multiply(o.hg.matrix).multiply(o.hc.matrix);
+    // (håret står ut en tiondel upptill, mössan och högtidens huvudbonader lite mer)
+    return { m, inv: m.clone().invert(), mitt: new THREE.Vector3().setFromMatrixPosition(m), P: o.F.head, har: o.F.mossa || o.H ? 0.14 : 0.1 };
+  }
+  // huvudets radier i höjden y (huvudets axlar), med rad runt om
+  function huvudRadier(K, y, rad) {
+    const P = K.P;
+    const ny = y / P.ry;
+    const smal = ny < 0 ? 1 - P.taper * Math.min(1, -ny) ** 1.6 : 1;
+    const har = 1 + K.har * sm(-0.2, 0.7, ny);
+    return HR.set(P.rx * smal * har + rad, P.ry * har + rad, P.rz * har + rad);
+  }
+  // hur långt in i huvudet punkten p (figurens axlar) är med rad runt om (ungefär, i enheter; < 0: ute)
+  function iHuvudet(K, p, rad) {
+    HL.copy(p).applyMatrix4(K.inv);
+    const R = huvudRadier(K, HL.y, rad);
+    return (1 - Math.hypot(HL.x / R.x, HL.y / R.y, HL.z / R.z)) * (R.x + R.y + R.z) / 3;
+  }
+  // vägen ut till ytan från p, rakt ut från huvudets mitt (null: redan ute)
+  function urHuvudet(K, p, rad) {
+    HL.copy(p).applyMatrix4(K.inv);
+    let R = huvudRadier(K, HL.y, rad);
+    const d = Math.hypot(HL.x / R.x, HL.y / R.y, HL.z / R.z);
+    if (d >= 1) return null;
+    // (radierna beror på höjden: ett par varv till)
+    let k = 1 / Math.max(d, 0.05);
+    for (let i = 0; i < 3; i++) {
+      R = huvudRadier(K, HL.y * k, rad);
+      k /= Math.hypot(HL.x * k / R.x, HL.y * k / R.y, HL.z * k / R.z);
+    }
+    return HL.multiplyScalar(k).applyMatrix4(K.m).sub(p).clone();
+  }
+  // Hur djupt överarmen (S–E) och underarmen (E–Wr) går in i huvudet, utom närmast axeln och
+  // handleden, som armbågen inte rår på (HD: var det är djupast).
+  function armIHuvudet(K, A, S, E, Wr) {
+    let m = -Infinity;
+    for (let i = 0; i <= 6; i++) {
+      for (const [a, b, f, rad] of [[S, E, 0.3 + 0.7 * i / 6, A.rU], [E, Wr, 0.8 * i / 6, A.rL]]) {
+        const d = iHuvudet(K, HT.lerpVectors(a, b, f), rad);
+        if (d > m) { m = d; HD.copy(HT); }
+      }
+    }
+    return m;
+  }
+  // Armbågen (ik) vriden runt linjen från axeln till handleden tills armen går fri från huvudet,
+  // i steg om KR_STEG åt båda hållen och sedan fint till gränsen: { E, f }, f hur djupt armen ändå
+  // går in (≤ 0: fri). Går den inte fri, där den går minst in.
+  const KR_STEG = 10 * DEG;
+  function armbageFri(K, A, S, Wr, a, b, pole) {
+    const E = ik(S, Wr, a, b, pole);
+    const f0 = armIHuvudet(K, A, S, E, Wr);
+    if (f0 <= 0) return { E, f: f0 };
+    const ax = Wr.clone().sub(S).normalize();
+    const C = S.clone().addScaledVector(ax, E.clone().sub(S).dot(ax));
+    const e0 = E.clone().sub(C);
+    const h = e0.length();
+    if (h < 0.5) return { E, f: f0 };
+    e0.divideScalar(h);
+    const e1 = new THREE.Vector3().crossVectors(ax, e0);
+    const vid = (v) => C.clone().addScaledVector(e0, h * Math.cos(v)).addScaledVector(e1, h * Math.sin(v));
+    const fVid = (v) => armIHuvudet(K, A, S, vid(v), Wr);
+    let bast = 0;
+    let fb = f0;
+    for (let k = 1; k * KR_STEG <= Math.PI + 1e-6; k++) {
+      let sida = 0;
+      let fs = Infinity;
+      for (const s of [1, -1]) {
+        const f = fVid(s * k * KR_STEG);
+        if (f < fb) { fb = f; bast = s * k * KR_STEG; }
+        if (f <= 0 && f < fs) { fs = f; sida = s; }
+      }
+      if (sida) {
+        let lo = (k - 1) * KR_STEG;
+        let hi = k * KR_STEG;
+        for (let i = 0; i < 6; i++) { const v = (lo + hi) / 2; if (fVid(sida * v) <= 0) hi = v; else lo = v; }
+        return { E: vid(sida * hi), f: fVid(sida * hi) };
+      }
+    }
+    let lo = bast - KR_STEG;
+    let hi = bast + KR_STEG;
+    for (let i = 0; i < 8; i++) {
+      const v1 = lo + (hi - lo) / 3;
+      const v2 = hi - (hi - lo) / 3;
+      if (fVid(v1) < fVid(v2)) hi = v2; else lo = v1;
+    }
+    const v = (lo + hi) / 2;
+    return { E: vid(v), f: fVid(v) };
+  }
+  // Handen H i ställningen hp ut ur huvudet: handflatans mitt och handleden med sin tjocklek, och
+  // – går armen inte fri med armbågen – ut så mycket som fattas, rakt ut från huvudet där armen går
+  // djupast in. Ger hp, eller en ny med handen flyttad.
+  function huvudFri(o, K, A, H, hp) {
+    // handens axlar som i orient, och näven flyttas så att handleden är där hp säger (pose)
+    const Y = hp.y.clone().normalize();
+    const Z = hp.z.clone().sub(Y.clone().multiplyScalar(hp.z.dot(Y))).normalize();
+    const X = new THREE.Vector3().crossVectors(Y, Z);
+    const sc = H.scale.x;
+    const lok = (p, v) => p.clone().addScaledVector(X, v.x * sc).addScaledVector(Y, v.y * sc).addScaledVector(Z, v.z * sc);
+    const mitt = H === A.fist ? H.userData.mitt.clone().sub(H.userData.wrist) : H.userData.mitt;
+    const vrist = H === A.fist ? NOLL : H.userData.wrist;
+    const p = hp.p.clone();
+    let flytt = false;
+    for (const [v, rad] of [[mitt, o.F.arm * 0.8], [vrist, A.rL * 0.8]]) {
+      const d = urHuvudet(K, lok(p, v), rad);
+      if (d) { p.add(d); flytt = true; }
+    }
+    const S = shoulder(o, A);
+    for (let i = 0; i < 3; i++) {
+      const r = armbageFri(K, A, S, lok(p, vrist), o.F.a, o.F.b, hp.pole);
+      if (r.f <= 0) break;
+      p.addScaledVector(HD.sub(K.mitt).normalize(), r.f + 0.5);
+      flytt = true;
+    }
+    return flytt ? { ...hp, p } : hp;
   }
 
   // Eftersläpet. Allt i body0 händer i samma ögonblick, och då rör sig figuren som ett stycke. Här
@@ -6291,6 +6433,7 @@ export async function figurer(canvas, opt = {}) {
     gaFlytta(o, o.st);
     body(o, t);
     o.torso.updateMatrix();
+    const K = huvudForm(o);
     // pennan i handen eller bakom örat, kupongen i handen eller på bordet,
     // flaskan och cigaretten bredvid eller i handen
     const u = uOf(o, t);
@@ -6354,6 +6497,12 @@ export async function figurer(canvas, opt = {}) {
         if (A.bench) A.bench.visible = true;
         if (iLapp && A.cig) A.cig.visible = false;
       }
+      // handen ut ur huvudet, och armen runt det (huvudFri)
+      const fri = huvudFri(o, K, A, H, hp);
+      if (fri !== hp) {
+        hp = fri;
+        if (fg) orient(A.hand, hp.p, hp.y, hp.z);
+      }
       orient(H, hp.p, hp.y, hp.z);
       if (iLapp && lp.lyft > 0) { H.updateMatrix(); lappStall(o, lp, H, fg && (!tk || tk.A !== A)); }
       // näven: handleden där den öppna handens handled var
@@ -6361,7 +6510,7 @@ export async function figurer(canvas, opt = {}) {
       H.updateMatrix();
       const Wr = H.userData.wrist.clone().applyMatrix4(H.matrix);
       const S = shoulder(o, A);
-      const E = ik(S, Wr, o.F.a, o.F.b, hp.pole);
+      const { E } = armbageFri(K, A, S, Wr, o.F.a, o.F.b, hp.pole);
       const du = E.clone().sub(S).normalize();
       const sl = S.clone().add(du.clone().multiplyScalar(o.F.a * 0.48));
       place(A.up, S, E);
