@@ -57,9 +57,6 @@
 /* raden som Enter öppnar (↑/↓) */
 .reg-term .a.sel { background: rgba(65, 255, 110, 0.85); color: #010702; text-shadow: none; }
 .reg-term .a.sel span { color: inherit; text-shadow: none; }
-/* staplarna (tur och otur): mellanslag med bakgrund */
-.reg-term .st { background: linear-gradient(transparent 16%, var(--gron) 16% 84%, transparent 84%); }
-.reg-term .st.d { background: linear-gradient(transparent 16%, #1c9c3d 16% 84%, transparent 84%); }
 /* streck över hela bredden */
 .reg-term .tr.hr { position: relative; }
 .reg-term .tr.hr::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 0.09em solid #1c9c3d; }

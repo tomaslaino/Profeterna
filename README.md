@@ -408,6 +408,16 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   *Matchprogrammet* och D *Fanzinet*, sedan de minimalistiska E *Numret*, F *Lördagen* (vald), G *Rubriken* och H
   *Bara namnet*; devisen bland ett tjugotal förslag. Löpsedeln har samma papper, ram, översta rad och namn som förut
   (`forsta` i [public/rum-tidning.js](public/rum-tidning.js), se [Helgarderat](#helgarderat))
+- [x] **Spegeln: man ser vem av de tre man är (2026-11-13, användarens önskemål: "Kan du komma på något smart sätt som
+  man kan se vem av de tre som man är inloggad som på animationssidan?", med kravet att det inte får dra mycket
+  grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
+  den medan den rör sig; de andra två gör det inte. Den som rör sig när du rör dig är du. Inga nya saker eller ord i
+  rummet, och inga fler bilder, ritanrop eller trianglar (se *Spegeln* under [Tobaksaffären](#tobaksaffären))
+- [x] **Kupongen i datorn utan formen (2026-11-13, användarens önskemål: "gör den här sidan mindre rörig … ta bort
+  överflödig info"):** kupongen i registret visar bara lagen, divisionen och avsparken. Formen och formens motstånd
+  står kvar i matchakten, där de redan stod, och rubriken *FORMEN · MOTSTÅNDET* är borta. Avsparken står bara där den
+  ändras, så att samma tid inte står tolv gånger, och telefonen, som förut bara hade formen, får avsparken (se *Datorn* under
+  [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -1291,6 +1301,18 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   trovärdig" i stället för skissens svenska: The Suns löpsedel dagen efter Chelseas seger i
   cupvinnarcupen på Råsunda 1998, bara text som löpsedlarna var då. Fotot från 2021 är borttaget. Se
   [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Chelsea med Zola (2026-11-13, användarens val):** "jag ville ha något med zola", och fokus
+  ska vara Chelseas seger i cupvinnarcupen. Av fyra skisser (sportsidan, löpsedeln, fotot över
+  hela sedeln och en affisch) valde användaren löpsedeln: *GRAZIE GIANFRANCO!* under *CUP
+  WINNERS’ CUP FINAL* och Tomas foto av laget med pokalen och Zola i mitten, som på IFK:s
+  sedel. Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
+- **Veckans löpsedel i ett ställ utanför dörren (2026-11-13, användarens val):** rummet skulle bli
+  lugnare. Av sex renderade skisser (löpsedlarna vända mot gatan, historien i sepia, en löpsedel i
+  taget, minnesväggen, löpsedelsstället och en kombination) valde användaren bara
+  löpsedelsstället: "Kör bara löpsedelsstället – det är det bästa just nu. Inget annat." Veckans
+  löpsedel står nu i ett svart ställ på trottoaren och syns genom dörrens glas, med gatans ljus.
+  Väggen under oraklet och fönstrets nedre vänstra hörn är fria. Skivan och allt annat är som förut.
+  Se [Tobaksaffären](#tobaksaffären), *Affischerna*.
 - **IFK och Chelsea utan prickar (2026-11-11, användarens önskemål):** "både IFK och
   chelsea-löpsedlarna är ju prickiga. Kan du ordna så att de inte är det men att de får rimlig
   patina". Prickrastret (ett rutnät, 2 px) blev ett mönster i närbilden. Nu har de samma papper som
@@ -3721,8 +3743,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   *Omgångens orakel* och namnet (delat: *Laino & Dogge*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
 - **Visitkortet** (på väggen mellan stationsuret och orakelramen, till höger om palmetten,
-  fäst med ett mässingsstift och lite snett; under oraklet sitter veckans löpsedel varannan
-  vecka) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
+  fäst med ett mässingsstift och lite snett) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
   terrakotta, logon och MATCHFIXARNA i guldfolie överst, i mitten våra autografer – det vi kallas
   (*Laino*, *Tejder*, *Dogge*) i var och ens handstil och bläck, samma som på kupongen (`sm-k0`–`sm-k2`), med en släng under
   – över var sin linje med namnet tryckt under, och längst ner devisen från Om oss: *Vi tippar
@@ -4181,41 +4202,9 @@ kassettens dukar ritas om större första gången (`radioFin`), och de små dela
 och `?rum-radio-lage=fm:90.4` hur den står inställd, utan ljud; `?rum-radio`
 sätter på gänget och lysdioderna (`=4` sedan fyra sekunder, med `?rum-t`), också det utan ljud.
 
-**Kassetterna med poddarna** (2026-11-11, [public/rum-kassetter.js](public/rum-kassetter.js) för stället och
-kassetten som flyttas, `kassetterna` i rum-radio.js för bandet och ljudet): användaren ville ha "kassetter med de olika
-poddavsnitten för de olika lagen som ska spela nästa omgång som man har möjlighet att gå in och lyssna på", och valde
-bland fyra skisser (ställ, hylla på skivan, hög på radion, grossistkartong) ett kassettställ i svart plast med
-etiketter i blå kulspets. Det står till vänster om radion (`STALL_PLATS` i rum-3d.js), där bänken är fri hur de än
-sitter; DJ:s liggande tomflaska ligger 17 cm längre till vänster än förut (`tomma`), annars skymde den nedre halvan
-av stället nära. Ett fack per match på kupongen, numrerat som där (*1  Stockport – Reading*), med supporterpoddarnas
-senaste avsnitt inför omgången ur `data/poddsidor.json`: A-sidan är hemmalagets podd och B-sidan bortalagets. En
-match utan podd är ett oinspelat band utan text. Överst gängets egna band (*Dansband?*, *Italo 2*) och Blandbandet,
-som sitter i radion från början och är gängets italodisco (Italo Disco-strömmen; gänget dansar). Märkena är TDK D90,
-Maxell UR 90 och BASF LH 90 om vartannat.
-
-Ett klick på stället i rummet går fram till radion, och närbilden tar med stället. Där ligger knappar över ryggarna
-när de är minst 14 px höga; annars (telefonen) går ett tryck på stället fram till det (`SAKER.kassetter`), och en
-kassett där tar kameran tillbaka till radion först. En kassett i stället: den som sitter i radion åker tillbaka till
-sitt fodral, luckan fälls ut, den nya flyger in (fodralet står kvar, utdraget, så länge kassetten är i radion) och
-spelas. Tangenterna på locket är REC, PLAY, REW, FF, STOP/EJ och PAUS med tecken på framsidan, och de går ner och
-stannar som på en riktig bandspelare: FF och REW spolar trettio gånger så fort med ett vinande, STOP två gånger matar
-ut kassetten, PAUS går att trycka ner med PLAY, och REC går inte (fliken är utbruten). Ett tryck på luckan vänder
-kassetten, och den spelar vidare på andra sidan. Spolarna i fönstret snurrar och är olika stora efter hur långt
-bandet har gått. Bandet står kvar där man slutade (per avsnitt i webbläsaren, `rum-band`), och kassetten minns sin
-sida; en kassett vars ena lag saknar podd börjar på den andra sidan. Medan bandet går är radion tyst; PLAY slår på
-strömmen och STOP slår av den igen om det var bandet som slog på den, annars hörs radion igen. Ett oinspelat band
-susar.
-
-Ljudet hämtas från poddens egen server och läggs aldrig på sajten (adressen ur flödet). Genom Web Audio om servern
-tillåter det (acast, podbean, libsyn, substack och megaphone gjorde det 2026-11-11), och då följer lysdioderna talet;
-annars samma adress i ett vanligt ljudelement (Buzzsprout), med lysdioderna som tal. Poddarna börjar låta efter några
-sekunder, som inledningsbandet på en kassett. Adresserna kommer med nattjobbet: poddjobbet sparar ljudfilen per podd
-och titel (`fil.ljud` i omgångens fil, scripts/tidning/poddar.mjs), och `poddsidor` i src/analyser/poddar.mjs lägger
-den på poddkällorna (`ljud`) när analysjobbet lägger ut numret, utan att sidorna skrivs om. Adresser som redan står i
-det publicerade numret följer med (`forut`), så att en som har lagts in för hand inte försvinner. Stället kostar sex
-ritningar i rummet (av ungefär 600 med skuggorna) och under tusen trianglar; ryggarna är en enda duk som ritas om
-större nära (`rduk`). `?rum-sak=kassetter` visar stället nära, och `RumRadio.band` (i, ut, vand, tangent, lage)
-styr bandet för prov.
+**Kassetterna med poddarna** (2026-11-11) är borttagna igen (2026-11-13, användarens beslut: *de funkar inte
+ändå*): kassettstället bredvid radion, bandspelaren i radion och poddavsnittens ljudadresser i nattjobbet. Radion
+har kvar sin kassett bakom glaset som en del av utseendet, och DJ:s liggande tomflaska ligger där den låg före stället.
 
 **Fönsterbänken följer väggen** (2026-11-10). Rummet vrids kring planet -330, där gängets duk ligger. Där låg
 också fönsterbänken, medan fönstret, löpsedlarna och bladet med stationerna sitter på bakväggen i planet -600,
@@ -4305,6 +4294,22 @@ tittar hen på en och skålar: lyfter flaskan (DL, DJ) eller cigaretten (DT) mot
 och nickar, och tittar kvar tills man slutar peka. I telefonen gör ett tryck på figuren
 samma sak en stund. Den som väntar på kupongen tittar bara, och ett klick på en figur går
 inte vidare till det som står bakom.
+
+**Spegeln** (2026-11-13, `spegel` och `SPEGEL` i rum-3d.js, `spegla` i rum-folk.js): rummet har inga
+förklarande ord, så man känner igen sig själv på det som rör sig när man själv rör sig. Din egen figur
+tittar på markören var den än är i rummet, också där det inte finns någon sak, och följer den medan musen
+rör sig; i telefonen tittar den på fingret när du sätter ner det och drar. De andra två gör det inte (alla
+tre gungar fortfarande lite med huvudet när musen rör sig, `NICK`). Punkten är där strålen genom markören
+går genom planet z = 640 framför bordet, så att figuren tittar ut mot en och vrider huvudet efter markören:
+åt sidorna, upp och ner mot pulten. Blicken glider efter markören (0,12 s), tonar in på en tredjedels sekund
+och, när markören har stått still i tre sekunder, tillbaka på knappt en sekund till det figuren annars gör.
+Det man pekar på (en sak, någon i gänget) går före, liksom tecknet, valet och sömnen; nära något och med något
+framme släpps spegeln, och den är avstängd med minskad rörelse. Markören skickas till figuren högst var 60:e
+millisekund, men alltid med där den hamnade sist. Spegeln vrider bara huvudet i bilder som ändå ritas. Mätt
+2026-11-13 i Chromium med SwiftShader, i samma sida: samma 170 ritanrop och samma trianglar per bild med och
+utan spegeln, ingen ny geometri eller textur, och gängets egen kod tog lika lång tid per bild (median
+0,6–0,8 ms med och utan, inom bruset). Prova med `?rum-spegel=dl:0.8:-0.2` (som om DL:s markör hade stått där
+i duken, −1…1, länge; också med `?rum-t`).
 
 **Korstecknet** (2026-11-08, `KORS`, `KORS_MENY` och `korsChans` i rum-tecken.js, `korsHand`
 i rum-3d.js, `avspark` i `gangTv` i rum.js): inför matcherna korsar sig gänget ibland. Var och en
@@ -4509,20 +4514,27 @@ delar redan i bilden; rummet lägger bara solens blekning ovanpå. Närbilden ta
 **Chelsea 1998** (DT:s lag) är en
 brittisk löpsedel (news bill) från **The Sun**, torsdagen den 14 maj 1998, dagen efter
 finalen i cupvinnarcupen. Tidningen är riktig, men namnet är skrivet som text i det röda
-bandet (inte tidningens logga), och rubriken är vår: *CUP WINNERS’ CUP FINAL*, *BLUES’*,
-*EURO* och *GLORY!* så stora som ryms (som veckans löpsedel) och *Super-sub Zola sinks
-Stuttgart in Stockholm* under – bara text, som löpsedlarna var på 90-talet. Chelsea vann
-finalen mot VfB Stuttgart med 1–0 på Råsunda i Solna onsdagen den 13 maj 1998 (Gianfranco
-Zola, inbytt). Löpsedeln är gammal: papperet har gulnat, det röda har bleknat och den har
-legat vikt på mitten. Till 2026-11-11 satt The Sun on Sundays löpsedel från finalen i
-Champions League 2021 här, med foto, men den var det enda i rummet från efter 90-talet.
+bandet (inte tidningens logga), och rubriken är vår: *CUP WINNERS’ CUP FINAL*, *GRAZIE* och
+*GIANFRANCO!* så stora som ryms (som veckans löpsedel), fotot med pokalen i luften och Zola i
+mitten (`public/rum/chelsea98.jpg`, 550 × 346, som Tomas skickade; fotografen är okänd) och
+*Super-sub Zola wins Euro cup for Blues with his first touch* under, som på IFK:s sedel.
+Chelsea vann finalen mot VfB Stuttgart med 1–0 på Råsunda i Solna onsdagen den 13 maj 1998:
+Gianfranco Zola byttes in och gjorde målet med sin första bollberöring. Löpsedeln är gammal:
+papperet har gulnat, det röda har bleknat, fotot är lite blekt och den har legat vikt på
+mitten. Till 2026-11-13 var den bara text (*BLUES’ EURO GLORY!*), som löpsedlarna var på
+90-talet, och till 2026-11-11 satt The Sun on Sundays löpsedel från finalen i Champions League
+2021 här, med foto, men den var det enda i rummet från efter 90-talet.
 
 **Papperet på IFK och Chelsea** har inget prickraster: rutnätet (2 px) blev ett mönster av prickar i
 närbilden, och användaren ville ha dem utan prickar men med "rimlig patina" (2026-11-11). De har samma
 pappersstruktur som allt papper på sajten (`public/rum/papper.webp`, här i sedlarnas mått), lite ojämn
 gulning och mörkare kanter (mer med slitaget, `--sep`), och tryckfärgen är ojämn och lite nött där
 papperet lyser igenom (`.blad` med veckans löpsedels `--prickar` och `--flackar` som mask, till hälften),
-mest i en bruten rand längs vecken (`.veck::before`/`::after`). Allt i rum-affischer.css.
+mest i en bruten rand längs vecken (`.veck::before`/`::after`). Båda fick lite mer patina 2026-11-13
+(användarens önskemål: "liiite mer patina", först Chelsea och sedan "lite mer patina på IFK också"):
+gulare papper, mörkare fläckar och kanter, ett gulare hörn (uppe till höger på Chelsea, nere till vänster
+vid revan på IFK), något mer nött färg, djupare veck, ett blekare foto och ett blekt färgband. Allt i
+rum-affischer.css.
 
 **Löpsedeln** är veckans och är **Helgarderats**, samma tidning som ligger på pulten (2026-11-10, Tomas önskemål:
 "Döp om löpsedeln till Helgarderat också") och samma nummer, i omslagets utseende (2026-11-12: "Förbättra löpsedeln
@@ -4555,16 +4567,20 @@ att kommentera* när den har fel, *GARANTERAT!* står ovanför *(74 procent enli
 *Är det Sveriges bästa tippare?* handlar om bäst i gänget. Namnen, resultaten och siffrorna
 stämmer; det påhittade är kvällstidningens fraser (*Nu krävs svar*, *Hela målfesten i bilder*),
 aldrig vad en riktig person har sagt. Varje slags rubrik har två eller tre varianter, och
-veckan väljer bland dem. Den är den enda som byts och är uppsatt för hand: varannan vecka (veckan i
-Stockholm, måndag till söndag) med tejp i skyltfönstrets nedre vänstra hörn, varannan med två
-häftstift på furupanelen till höger om fönstret, under oraklets skylt och till vänster om
-bardisken, där den är mindre (72 %, så att den ryms mellan fönsterbänkens ände, diskens kant och
-den innersta barstolen, som är inskjuten under skivan) och nästan rak. Den hänger bakom disken och
-barstolarna, som står framför väggen (löpsedeln ligger före diskens duk i bakväggens plan). I
-telefonen på höjden sitter den alltid på väggen, som syns utan att man drar. (Först satt den
-ibland under dörrens handtag och sedan i fönstrets högra hörn: dörren hamnade utanför bilden i
-telefonen, och hörnet är nu skivans. Till och med 2026-11-05 var den från den påhittade
-kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
+veckan väljer bland dem. Den är den enda som byts, och den står i ett **löpsedelsställ** på
+trottoaren utanför dörren, som utanför en riktig tobaksaffär, och syns genom dörrens glas under
+handtaget (2026-11-13, användarens val: rummet skulle bli lugnare). Stället är svartlackerad plåt
+med sedeln 62 % stor bakom plast, på två ben med en tvärslå (`.rum-lopstall` i rum-affischer.css,
+platsen `STALL` i rum-affischer.js). Det står ute: i bakväggens plan direkt efter utsikten, så att
+dörrens karm, handtaget och smutsen på glaset ligger framför det. Det har gatans ljus: ett kallt
+skimmer på dagen, mörker när det är mörkt ute, lyktstolpens varma sken ovanifrån när den lyser och
+snö på ramen när det ligger snö (rum.js sätter `--ute-dag`, `.ute-lampor` och `.ute-sno` med
+utsikten). Ljuset är lager ovanpå, inga filter, och i närbilden (`.lop-nara`) ljusnar det så att
+rubriken går att läsa. Sedeln sitter rak och gulnar lite med slitaget. I telefonen på höjden ligger
+dörren utanför bilden från början; där syns stället när man drar åt vänster. (Först satt den
+ibland under dörrens handtag, sedan i fönstrets högra hörn och till 2026-11-13 varannan vecka med
+tejp i fönstrets nedre vänstra hörn och varannan med häftstift på väggen under oraklet, i telefonen
+alltid på väggen. Till och med 2026-11-05 var den från den påhittade kvällstidningen KVÄLLSPRESSEN.) Rubriken är det mest dramatiska som rummet vet om (`rubrik` i
 rum-affischer.js):
 
 - *förra omgången* (säsongens omgångar, `TP.season`): den som tippade bäst med minst 82 %
@@ -4640,7 +4656,7 @@ sticker ut en dryg decimeter över den indragna fronten, så att man har plats f
 kanten bär konsoler i järn upp skivan, och på fronten sitter en krok i mässing i varje fält.
 Fronten har fyllningar i ramar, en halv meter isär. Framför står tre barstolar likadana som gängets (röd vinyl med söm, krom, fotring),
 med sitsen 75 cm över golvet och inskjutna under kanten – den innersta ända in under skivan, så
-att sitsen går fri från löpsedeln på väggen; den närmaste syns bara till hälften
+att sitsen gick fri från löpsedeln som satt på väggen till 2026-11-13; den närmaste syns bara till hälften
 över pulten. Skivan skuggar fronten och stolarna skuggar fronten och bakväggen under skivan –
 det är skuggorna och stolarna som visar att det är tomt under skivan, eftersom man ser disken
 lite uppifrån. Disken ritas en gång, som inredningen, i en duk från disken in i videons hörn
@@ -4659,7 +4675,7 @@ Rummet läser om datan varje minut medan det står öppet.
 står på samma tid, och Stockholms klocka – uret, text-tv:n och utsikten – står på `?rum-klocka`,
 annars på när sidan laddades), `?rum-mx=&rum-my=` (−1…1) kamerans läge,
 `?rum-slit=0…1` slitaget, `?rum-dag=<tal>` dagen för sakerna och affischerna,
-`?rum-vecka=<tal>` veckan för löpsedelns plats och `?rum-rubrik=<typ>` en viss rubrik om den
+`?rum-vecka=<tal>` veckan för löpsedelns rubrikvariant och klipp och `?rum-rubrik=<typ>` en viss rubrik om den
 finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysaren`, `spiken`,
 `jakten`),
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
@@ -6231,19 +6247,30 @@ tre flikar, två fönster med listan till vänster, och en DOS-sökväg utan fli
 användaren valde menyraden: *Lagen* och *Spelarna* blev en flik med alla divisionerna och
 lagens trupper, *Omgången* blev *Topplistor* utan formen, vilan och skadorna (de står vid
 matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man skriver.
+2026-11-13 togs *Topplistor* bort (användarens önskemål): tavlans tal står bara vid matcherna,
+och matchakten fick lagets plats i divisionen efter varje tal, så att det topplistan visade
+finns kvar där.
 
-Överst står menyraden, som alltid står still: *KUPONGEN*, *TOPPLISTOR* och *LAGEN*, med den
-valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
+Överst står menyraden, som alltid står still: *KUPONGEN* och *LAGEN*, med den valda fliken
+omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
 över hela bredden; det mellan dem rullar.
 
-- **Kupongen** – omgångens matcher numrerade, med båda lagens form bredvid namnen (de fem
-  senaste, senaste först) och på datorn divisionen eller cupen och avsparken. En match öppnar
+- **Kupongen** – omgångens matcher numrerade, bara lagen, med divisionen eller cupen där
+  raden ryms och avsparken. Avsparken står bara där den skiljer sig från raden ovanför, som i
+  en tidtabell (*16.00* på första matchen och *18.30* på den sena), och i telefonen, där
+  divisionen inte ryms, står den ensam. Formen och dess motstånd stod förut också här men
+  står bara i matchakten sedan 2026-11-13 (användarens önskemål: "mindre rörig"). En match öppnar
   **matchakten**, där allt om matchen står på ett ställe: lagen sida vid sida med *Formen*,
   *Vilan* och *Nästa* (dagar till nästa match, med cupen när det inte är ligan), tavlans
   *Styrka*, *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*, och lagkortens *Mål* och *xG*
   per match (för–mot), *Favorit* och *Skytten*; sedan skadelistorna när de finns och de
-  senaste mötena med hemmalagets V–O–F. Etiketterna från tavlan leder till topplistan,
-  lagnamnen till lagkorten och skytten till spelarkortet. Det bättre talet i varje par lyser
+  senaste mötena med hemmalagets V–O–F. Efter vart och ett av tavlans tal står lagets
+  **plats i sin division** (*+0,94  1:A*, *−0,89 20:E*): högst först, lika tal delar plats,
+  ur alla divisionens lag i `data/teams/<division>.json` – i en cupmatch mellan två
+  divisioner var för sig. Platsen står alltid svagt och säger bara var laget ligger; för
+  *Styrka* och *Mot oddsen* är 1:a bäst, för *Kryssar*, *Tur* och *Motståndet* betyder den
+  flest kryss, mest tur och tuffast motstånd. Lagnamnen leder till lagkorten och skytten
+  till spelarkortet. Det bättre talet i varje par lyser
   och det sämre är svagt, så att man ser vem som har övertaget utan att jämföra siffrorna
   (2026-11-12, användarens val bland fyra skisser: *Arket*, *Skalan*, *Noterat* och *Lyser*).
   Det gäller *Formen* (minst två poäng på fem matcher), *Vilan* (minst två dagar, samma regel
@@ -6254,14 +6281,11 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   och *Skytten* säger inte vem som är bättre och står alltid som vanligt. Talen som räknas
   inom divisionen jämförs bara när lagen spelar i samma, och inget lyser när resultaten är
   dolda.
-  Bredvid formen står **formens motstånd** (2026-11-12, användarens önskemål: "en siffra på
+  Efter formen i matchakten står **formens motstånd** (2026-11-12, användarens önskemål: "en siffra på
   hur svåra de här lagen har varit"): hur bra de fem motståndarna var i snitt, från 0 (den
   egna divisionens svagaste lag enligt modellen) till 100 (dess starkaste) – samma mått som
-  strecket under formens rutor på matchsidan (`opp.level` i matchens fil). På datorn står
-  siffran på kupongen mellan formerna, närmast strecket (*CARDIFF OFVOV 69 – 41 OOFFO
-  BURNLEY*, under rubriken *FORMEN · MOTSTÅNDET*); i telefonen är raden full, och siffran
-  står efter formen i matchakten, alltid som vanligt – den säger inte vem som är bättre och
-  lyser inte. Alla motståndare räknas (`opponentStrength` i
+  strecket under formens rutor på matchsidan (`opp.level` i matchens fil). Siffran står
+  alltid som vanligt – den säger inte vem som är bättre och lyser inte. Alla motståndare räknas (`opponentStrength` i
   [src/matches.js](src/matches.js)): lag i de fyra ligorna och National League har modellens
   styrka, lag under National League nivåns gemensamma styrka, och lag från utlandet får sin
   styrka ur matchens odds – oddsen ger matchens förväntade mål, och med det engelska lagets
@@ -6273,21 +6297,15 @@ valda fliken omvänd. Längst ner står sökraden (*SÖK >*) och under den tange
   Saknar fler än en av de fem matcherna styrka visas ingen siffra. Med dolda resultat står
   ett frågetecken, som för tavlans tal. EFL Trophy hämtas inte och finns varken i formen
   eller i siffran.
-- **Topplistor** – tavlans lappar som listor över hela omgången, på en rad under menyraden:
-  *Styrka* per division (styrkan jämförs bara inom divisionen), *Kryss* från mest till minst,
-  och *Tur* (med staplar), *Oddsen* och *Motstånd* i två listor (tur och otur, slår oddsen och
-  sviker, tufft och lätt hittills). Hela omgångens lag står med, inte bara de översta som på
-  lapparna, och varje rad leder till matchakten. Formen, vilan och skadorna har ingen lista:
-  de står vid matcherna.
 - **Lagen** – de fyra divisionerna (*PL*, *CH*, *L1* och *L2* i telefonen), med divisionen
   som har flest lag i omgången först. Lagen står i bokstavsordning (två spalter på datorn),
-  och lagen i omgången är ljusa med matchens nummer. Ett lag öppnar **lagkortet** med truppen,
+  och lagen i omgången är ljusa. Ett lag öppnar **lagkortet** med truppen,
   och en spelare i truppen **spelarkortet** (nedan).
 
 Sökraden söker i hela registret, också lag och spelare utanför omgången, och svarar medan man
-skriver: träffarna står i stället för vyn med den bästa markerad, Enter öppnar den, ↑/↓ väljer
-en annan, och när sökraden töms (eller med Esc) kommer vyn tillbaka. En siffra och Enter väljer
-raden med det numret.
+skriver: träffarna står i stället för vyn, den mest sannolika överst och markerad och sedan i
+fallande led, Enter öppnar den markerade, ↑/↓ väljer en annan, och när sökraden töms (eller med
+Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.
 
 - **Spelaren** – efternamn och förnamn, laget, numret och platsen, *Läget* (skadad,
   tveksam eller avstängd med skadan, annars spelklar – bara när laget har en skadelista),
@@ -6306,21 +6324,39 @@ raden med det numret.
   säsongens) med datum, tävling, lagen och resultatet, och hemmalagets V–O–F i dem. Två lag i
   frågan (*arsenal hull*) ger mötet.
 
-Sökningen hittar lag och spelare i alla fyra divisionerna, omgångens möten, topplistorna
-(*tur*, *styrka*), flikarna och divisionerna (*championship*). Laget kan stå med i frågan
+Sökningen hittar lag och spelare i alla fyra divisionerna, omgångens möten, flikarna och
+divisionerna (*championship*). Laget kan stå med i frågan
 (*saka arsenal*, *bowen west ham*), och smeknamnen *spurs*, *wolves*, *boro*, *utd*, *qpr*,
-*wba*, *pne*, *mk* och *bha* hittar lagen. Bara den bästa nivån av träffar visas: ett helt
-efternamn går före ett förnamn och före namn som bara börjar så (*isak* ger Isak, inte Isak
-Alemayehu eller Isaksen), sedan den som spelar mest. Hittas inget alls letar den efter
-felstavat – ett eller två fel beroende på längden, med samma första bokstav och hela ord först
-– och skriver *MENADE DU:* över det (*haland* ger Haaland, *midlesbrough* Middlesbrough).
-Träffarna listas numrerade (högst 20). När en träff öppnas blinkar *ÅTKOMST BEVILJAD* en stund
-i sökraden, och Esc går tillbaka till vyn där man började skriva.
+*wba*, *pne*, *mk* och *bha* hittar lagen.
+
+Alla träffar visas, sorterade efter hur sannolikt det är att man menar dem (2026-11-13,
+användarens önskemål: "med det som är mest sannolikt överst alltid och sedan i fallande led").
+Förut visades bara den bästa nivån av träffar, så att *burn* gav Dan Burn men inte Burnley.
+Sannolikheten är två delar lagda ihop (`passar`, `TROLIGT` och `DIVPLUS` i
+[public/rum-register.js](public/rum-register.js)): hur väl frågan passar namnet – ett helt ord
+bäst, ett ord som bara börjar namnet sämre ju fler bokstäver som fattas, hela namnet lite
+bättre, och för en spelare lite sämre när frågan inte träffar efternamnet – och hur ofta man
+söker något sådant: ett möte (två lag i frågan) är nästan säkert det man menar, sedan en flik
+eller division när frågan är dess ord, sedan lagen och sist spelarna; lagen högre upp i
+ligasystemet och spelarna med mest speltid lite före, och lag och spelare i omgången också.
+Så går *burn* → Burnley före Dan Burn, Burns och Burnett, *isak* → Isak före Isaksen och Isak
+Alemayehu, och *liv* → Liverpool före Livramento.
+
+Överst i träfflistan står **kategorierna**, som divisionernas rad: *Alla*, *Lag*, *Spelare*,
+*Möten* och *Listor* (flikarna och divisionerna), med antalet träffar när raden
+ryms (inte i telefonen). Den valda är omvänd och de tomma svaga; ett tryck eller Tab (Skift-Tab
+bakåt) byter, och i varje kategori står träffarna i samma ordning, den troligaste överst.
+Kategorin gäller medan man skriver, så länge den har träffar, och en ny sökning börjar med
+*Alla*. Hittas inget alls letar den efter felstavat – ett eller två fel beroende på längden,
+med samma första bokstav och hela ord först – och skriver *MENADE DU:* över det (*haland* ger
+Haaland, *midlesbrough* Middlesbrough). Träffarna listas numrerade (högst 20). När en träff
+öppnas blinkar *ÅTKOMST BEVILJAD* en stund i sökraden, och Esc går tillbaka till vyn där man
+började skriva.
 
 Tangenterna: Esc går tillbaka dit man var (och stänger datorn när man är längst tillbaka),
-↑/↓ markerar en rad och Enter öppnar den, ←/→ bläddrar till förra och nästa match, lista,
+↑/↓ markerar en rad och Enter öppnar den, ←/→ bläddrar till förra och nästa match,
 division, lag eller spelare (och bland flikarna när det inte finns något att bläddra i), och
-Tab byter flik.
+Tab byter flik (i sökningen kategori).
 Raden längst ner säger det med tangenternas namn och går att trycka på; i telefonen står
 där *◄ Tillbaka*, *◄ Förra* och *Nästa ►* i stället. Allt i utskriften går att trycka på,
 så att telefonen klarar sig utan tangentbord; tangentbordet kommer fram först när man
@@ -6352,11 +6388,11 @@ kort, och närbilden ritas bara under svängen.
 Dolda resultat: lag- och spelarkorten och truppens speltid och mål visar ? när en match i
 lagens divisioner är dold (och truppen står då efter plats och namn, inte speltid), med
 *Visa ändå* under skärmen (i en stående telefon längst ner, med terminalen ovanför) – samma nyckel som anslagstavlan, så att det gäller båda – och
-dolda möten står som ?. Siffrorna från tavlan och lagkorten i matchakten och under
-*Topplistor* (styrkan, kryssen, turen, oddsen och motståndet) får ? på samma sätt, och formen och mötena har ? för de
+dolda möten står som ?. Siffrorna från tavlan och lagkorten i matchakten (styrkan, kryssen,
+turen, oddsen och motståndet, och platsen i divisionen) får ? på samma sätt, och formen och mötena har ? för de
 dolda matcherna. Utan WebGL står disken tom. `?rum-register` visar datorn framme i
 en fast bild, `?rum-register=<fråga>` med den sökningen och `?rum-register=%23mote:<id>`,
-`%23amne:tur`, `%23div:pl`, `%23flik:lagen` … med den vyn.
+`%23div:pl`, `%23flik:lagen` … med den vyn.
 
 #### Vad som står var
 
@@ -6368,7 +6404,7 @@ med flit (nedan):
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
 | **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror ordnade efter match och lista | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match, truppen), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten och under *Topplistor* |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | Laget (mål och xG per match, hur ofta laget har varit favorit, skytten, nästa match, truppen), spelaren (läget, speltiden, mål och xG, med och utan honom mot oddsen) och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
@@ -7377,8 +7413,10 @@ där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga
 en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen (`upptagen` i rum-hasse.js) och
 trycks om när han tar upp den andra (`visa`).
 
-**Glasögonen** (2026-11-09). Han läser med läsglasögon i mörk sköldpadd (`byggGlasogon` i
-[public/rum-hasse-arm.js](public/rum-hasse-arm.js)), som annars sitter i bröstfickan med det översta hörnet uppstickande.
+**Glasögonen** (2026-11-09). Han läser med halvbågade läsglasögon (`byggGlasogon` i
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)): en tunn list av svart metall längs glasens överkant och rakt över
+näsan, och nedtill bara glasens kant, som de han har på ett foto Tomas skickade 2026-11-13 (förut helbågade i mörk
+sköldpadd). Annars sitter de i bröstfickan med det översta hörnet uppstickande.
 Före tidningen tar han fram dem med höger hand, håller upp dem framför hakan, fäller ut skalmarna med en knyck och sätter
 på sig dem framifrån, blinkar och rynkar näsan tills de sitter (biten `pa`); efter tidningen tar han av dem i hörnet,
 fäller ihop dem framför bröstet och stoppar dem i fickan (`av`). Medan han läser håller han tidningen med vänster hand

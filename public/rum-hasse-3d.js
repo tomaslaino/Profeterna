@@ -756,6 +756,25 @@ const W_ = (x, y, z = 0) => new THREE.Vector3(x - 660, 900 - y, z);
 const P_ = (x, y, z) => [x - 660, 900 - y, z];
 const g2 = (x, y, cx, cy, sx, sy) => { const a = (x - cx) / sx; const b = (y - cy) / sy; return Math.exp(-(a * a + b * b)); };
 const smax = (a, b, k = 34) => { const h = clamp(0.5 + 0.5 * (a - b) / k); return b + (a - b) * h + k * h * (1 - h); };
+// en kulle som är 1 i mitten och planar ut till 0 vid radien 1
+const kulle = (a, b) => { const s = a * a + b * b; return s < 1 ? (1 - s) * (1 - s) : 0; };
+// Näsan, efter fotot: ryggen från näsroten mellan ögonen ned till spetsen (vid 455, där fotot har ljuset på
+// den) och bredare nedåt, den runda spetsen och näsvingarna (632 och 694) lika breda som i fotot, och en
+// undersida som går in mot överläppen och slutar strax under näsans nederkant i fotot (472). Förut var den
+// två smala klockor: smalare än näsan i fotot, högst lite längre ned (vid 464) och med en lång sluttning ned
+// över överläppen. När han böjde huvudet följde överläppen då med som en förlängning av näsan, och mitten
+// skildes från näsvingarna, så att näsan såg ut som en spetsig lösnäsa. Undersidan är inte brantare än att
+// den syns rakt framifrån och lite uppifrån; först när han böjer huvudet mycket skymmer spetsen läppen.
+function nasa(x, y) {
+  const u = x - 662;
+  if (y < 360 || y > 484 || Math.abs(u) > 50) return 0;
+  const t = clamp((y - 372) / 84);
+  const rygg = (12 + 28 * t ** 0.9) * ss(362, 385, y) * (1 - ss(450, 476, y)) * kulle(u / (18 + 22 * t), 0);
+  const spets = 38 * kulle(u / 30, (y - 455) / (y < 455 ? 19 : 28));
+  const vingar = 22 * Math.max(kulle((u + 30) / 17, (y - 456) / (y < 456 ? 14 : 20)), kulle((u - 32) / 17, (y - 455) / (y < 455 ? 14 : 20)));
+  // (den största av dem, mjukt där de möts)
+  return (rygg ** 4 + spets ** 4 + vingar ** 4) ** 0.25;
+}
 // formen: huvudet som en ellipsoid med ansiktets drag ur fotots mått (Vision), halsen och bålen
 function djup(x, y, drag = true) {
   const hx = (x - 660) / 182;
@@ -766,7 +785,7 @@ function djup(x, y, drag = true) {
     zh = 70 + 170 * Math.sqrt(1 - dh);
   }
   if (dh < 1 && drag) {
-    zh += 40 * g2(x, y, 662, 432, 17, 52) + 26 * g2(x, y, 662, 464, 24, 17) + 7 * g2(x, y, 632, 468, 14, 14) + 7 * g2(x, y, 692, 468, 14, 14);
+    zh += nasa(x, y);
     zh += -22 * g2(x, y, 608, 391, 34, 15) - 22 * g2(x, y, 716, 392, 34, 15);
     zh += 9 * g2(x, y, 603, 360, 50, 14) + 9 * g2(x, y, 727, 362, 50, 14);
     zh += 10 * g2(x, y, 570, 452, 48, 40) + 10 * g2(x, y, 752, 452, 48, 40);
@@ -803,11 +822,21 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // (eld: lågan när han tänder cigarren, eldsken i rum-hasse-arm.js)
   const bord = { value: new THREE.Vector4(DK.n[0], DK.n[1], DK.c, DK.Y), butik: { value: 1 }, eld: { value: new THREE.Vector4() } };
   const [foto, handModell] = await Promise.all([laddaFoto(), laddaHand()]);
-  // ytan: tätare kring huvudet, och bara ned till disken
-  const nx = latt ? 88 : 128;
-  const Xs = Array.from({ length: nx }, (_, i) => X0 + (i / (nx - 1)) * TW);
+  // ytan: tätare kring huvudet, och bara ned till disken. Kring näsan dubbelt så tätt: när han böjer huvudet
+  // skymmer nässpetsen överläppen, och med de vanliga rutorna blev kanten kantig.
+  const NASA = { x0: 600, x1: 724, y0: 426, y1: 492 };
+  const Xs = [];
+  {
+    const n = latt ? 88 : 128;
+    for (let i = 0; i < n; i++) {
+      const x = X0 + (i / (n - 1)) * TW;
+      if (i > 0 && x > NASA.x0 && x - TW / (n - 1) < NASA.x1) Xs.push(x - TW / (n - 1) / 2);
+      Xs.push(x);
+    }
+  }
+  const nx = Xs.length;
   const Ys = [];
-  for (let y = Y0; y < 720; y += latt ? 8 : 5.2) Ys.push(y);
+  for (let y = Y0; y < 720; y += (latt ? 8 : 5.2) / (y > NASA.y0 && y < NASA.y1 ? 2 : 1)) Ys.push(y);
   for (let y = 720; y <= 1350; y += latt ? 26 : 17) Ys.push(y);
   const ny = Ys.length;
   const pos = new Float32Array(nx * ny * 3);
@@ -4186,11 +4215,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const FICKA = W_(752, 928, djup(752, 928));
   const GL = {
     // på näsan, lite lägre (glid) och längst ned, så att han ser över dem (nasa); framför ansiktet på väg på och av
-    pa: { h: true, m: paNasan(403, 0.14) },
-    glid: { h: true, m: paNasan(410, 0.16) },
+    // (de halvbågade sitter 4 högre än de förra, så att listen går ovanför ögonen som på fotot och inte över locken)
+    pa: { h: true, m: paNasan(399, 0.14) },
+    glid: { h: true, m: paNasan(406, 0.16) },
     nasa: { h: true, m: paNasan(426, 0.24) },
     // i fickan: hopfällda och på högkant med det högra hörnet uppåt, och resten nere i fickan bakom kavajen
-    ficka: { m: new THREE.Matrix4().makeBasis(V3(0, -1, -0.1).normalize(), V3(0.99, 0, -0.14).normalize(), V3(0.14, -0.1, 0.98).normalize()).setPosition(FICKA.x - 4, FICKA.y - 32, FICKA.z - 3) },
+    ficka: { m: new THREE.Matrix4().makeBasis(V3(0, -1, -0.1).normalize(), V3(0.99, 0, -0.14).normalize(), V3(0.14, -0.1, 0.98).normalize()).setPosition(FICKA.x - 12, FICKA.y - 19, FICKA.z + 1) },
     // uppdragna ur fickan
     ute: { m: new THREE.Matrix4().makeBasis(V3(0.15, -0.95, 0.25).normalize(), V3(0.98, 0.15, 0).normalize(), V3(-0.05, 0.25, 0.97).normalize()).setPosition(FICKA.x - 20, FICKA.y + 90, FICKA.z + 70) },
     // framför hakan, framsidan bort från honom (skalmarna mot honom): där fälls de ut och ihop
@@ -4213,13 +4243,13 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   }
   // greppet i bågens mått: tummen och pekfingret om det högra hörnet (punkten, riktningen genom bågen och
   // handflatan in mot ansiktet), och pekfingertoppen på bryggan med fingret uppåt och handflatan mot honom
-  const NYP = { p: V3(-(GLAS.C + GLAS.A - 6), 6, 0), A: V3(0, 0, 1), P: V3(1, 0, 0) };
+  const NYP = { p: V3(-(GLAS.C + GLAS.A - 6), 13, 0), A: V3(0, 0, 1), P: V3(1, 0, 0) };
   // (bakom tidningen: om gångjärnet från sidan, med fingrarna framåt och handen bakom och under, så att underarmen
   // går bakom tidningen; sido 1)
-  const SIDO = { p: V3(-(GLAS.C + GLAS.A - 1), 7, -4), F: V3(0.15, 0.8, 0.58).normalize(), P: V3(1, 0, 0) };
+  const SIDO = { p: V3(-(GLAS.GANG[0] - 2), GLAS.GANG[1] - 1, GLAS.GANG[2] + 1), F: V3(0.15, 0.8, 0.58).normalize(), P: V3(1, 0, 0) };
   SIDO.P.addScaledVector(SIDO.F, -SIDO.P.dot(SIDO.F)).normalize();
   SIDO.A = new THREE.Vector3().crossVectors(SIDO.P, SIDO.F);
-  const FINGER = { p: V3(0, 14, 3), F: V3(0.35, 0.8, -0.48).normalize(), P: V3(0, -0.5, -0.85), L: 250 * HAND.SK, U: 16 * HAND.SK };
+  const FINGER = { p: V3(0, 22, 2), F: V3(0.35, 0.8, -0.48).normalize(), P: V3(0, -0.5, -0.85), L: 250 * HAND.SK, U: 16 * HAND.SK };
   FINGER.P.addScaledVector(FINGER.F, -FINGER.P.dot(FINGER.F)).normalize();
   const HM = new THREE.Matrix4();
   const hm3 = new THREE.Matrix4();

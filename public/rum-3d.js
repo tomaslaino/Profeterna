@@ -115,7 +115,7 @@
 // figurer(canvas, { calm, vader, detalj, spel, senast, rita }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), radio(på, t), radioPa(), spel({ lage, rank, ansikte }, t),
 // senast(lage), uttryck(),
-// prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t),
+// prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t), spegel(vem | null, nx, ny, t),
 // hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappVand(vem, ner, t), lappProva(vem, hållning, gör, at), natt(på, t), somn(på, t),
 // vakna(vem, t, sätt), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
 // neonskylten lyser (false när den glappar), ute klär om gänget
@@ -130,6 +130,8 @@
 // påhitt om och om igen för bilder (utan påhitt som vanligt), ga att vem går
 // iväg från t − l (för bilder),
 // pekar punkten i rummet som vem pekar på (världens koordinater, null = inget),
+// spegel att vem (din egen figur) tittar på markören i punkten (nx, ny, −1…1 i duken) en stund,
+// null släpper,
 // hej att man pekar på vem (ut = när man slutade, Infinity = pekar fortfarande),
 // vald att vem just valdes som den som fyller i kupongen, tecken att man
 // klickade på vem (namn: vilket tecken, annars nästa),
@@ -137,11 +139,6 @@
 // vid t (för bilder; sätt 'ryck' | 'strack' | 'bakis'), efter dagen efter (lage 'bra' | 'illa' | null,
 // krona = oraklen, 'dl' …), under vem i gänget (eller 'radio') som syns i punkten
 // och kval({ pr, skugga, detalj }) hur fint gänget ritas (KVAL i rum.js; detalj
-// också från början). Kassettstället bredvid radion (rum-kassetter.js): kassetter(lista, i) sätter
-// fodralen, kassettLage({ i, lage, paus, p }) bandet i radion, kassettFlytt(typ, id, et) flyttar en
-// kassett ('in', 'ut', 'vand') och säger hur länge det tar, kassettTryck(i) trycker på en tangent,
-// kassettDelar() och kassettRuta() är var delarna syns (som radioDelar och radioRuta)
-// (kval: detalj
 // också från början)
 // (nx, ny, −1…1 i duken) eller null, och huvud var vems huvud är.
 import * as THREE from 'three';
@@ -155,7 +152,6 @@ import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans, 
 import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
 import { DANSER, DANS_SLAG, DANS_IN, formen } from './rum-dans.js';
 import { vaxter } from './rum-vaxter.js';
-import { kassettstall, ritaKassett, ritaNav } from './rum-kassetter.js';
 
 const DEG = Math.PI / 180;
 const D = 1400;
@@ -191,17 +187,16 @@ const PILEA = { x: -62, z: 84 };
 // medan man väntar (cigg), kupongen när den är inne (lagg: x, z, vridning),
 // handen som vilar på bordet (vila) och DT:s extraflaska (flaska); tomma: DJ:s
 // tomflaskor på fönsterbänken (x och z i rummet och vinkeln, 0 = står) – bakom
-// honom på sidorna och längst till höger när han sitter bakom bordet, där de syns (den liggande så långt
-// till vänster att den inte skymmer kassettstället vid radion i närbilden).
+// honom på sidorna och längst till höger när han sitter bakom bordet, där de syns.
 // skylt: var skylten ligger på bordet när den är nere (lappar), i bordets axlar som
 // KOPP, och hur den är vriden i grader.
 const PLATSER = [
   { x: -338, z: 194, turn: 46, inre: 1, kupong: 1, sak: [47, 46], aska: [50, 62], cigg: [8, 58], lagg: [27.5, 52, 1.25], flaska: [80, 72],
     tomma: [[-412, 16, 0], [-442, 30, -1.45]], skylt: [-50, -2, 5] },
   { x: -186, z: 106, turn: 2, inre: 0, kupong: 1, sak: [-27, 47], aska: [-29.7, 45], cigg: [4, 58], vila: [24.3, 48.3], lagg: [28.4, 47.4, -0.25], flaska: [54.5, 56.1],
-    tomma: [[40, 16, 0], [53, 30, 1.45]], skylt: [2, -52, -4] },
+    tomma: [[40, 16, 0], [70, 30, 1.45]], skylt: [2, -52, -4] },
   { x: -38, z: 194, turn: -46, inre: 0, kupong: 0, sak: [-44.5, 43.2], aska: [-50, 62], cigg: [-2.1, 55.6], lagg: [-21, 52, 0.3], flaska: [-80, 72],
-    tomma: [[40, 16, 0], [53, 30, 1.45]], skylt: [52, -4, -6] },
+    tomma: [[40, 16, 0], [70, 30, 1.45]], skylt: [52, -4, -6] },
 ];
 // Vem som sitter var: FIGS[i] sitter på PLATSER[(i + n) % 3]. De byter var
 // tredje dag (dagen i Stockholm ur Vader.nu(), räknat från den 25 oktober
@@ -2146,10 +2141,48 @@ export async function figurer(canvas, opt = {}) {
   }
   const TEJPF = rduk(512, 29, (c, w, h) => ritaTejp('fm', c, w, h));
   const TEJPA = rduk(512, 29, (c, w, h) => ritaTejp('am', c, w, h));
-  // Kassetten bakom luckan (rum-kassetter.js, ritaKassett): Blandbandet från början, annars kassetten ur
-  // stället med sidan och poddens namn för hand (RL.kas). Spolarna är egna delar (rullar i kassettradio).
-  const KASSETT = rduk(128, 56, (c, w, h) => ritaKassett(c, w, h, RL.kas));
-  const NAV = rduk(32, 32, ritaNav);
+  // Kassetten bakom luckan: grå med handskriven etikett, två spolar och bandet som syns i fönstret.
+  const KASSETT = rduk(128, 56, (c, w, h) => {
+    c.fillStyle = '#34353a';
+    c.fillRect(0, 0, w, h);
+    c.fillStyle = '#ece4cf';
+    c.fillRect(w * 0.05, h * 0.07, w * 0.9, h * 0.62);
+    c.fillStyle = '#c7372e';
+    c.fillRect(w * 0.05, h * 0.07, w * 0.9, h * 0.07);
+    c.strokeStyle = 'rgba(40,50,110,0.28)';
+    c.lineWidth = Math.max(1, h * 0.008);
+    c.beginPath();
+    for (const y of [0.3, 0.4]) { c.moveTo(w * 0.09, h * y); c.lineTo(w * 0.91, h * y); }
+    c.stroke();
+    c.fillStyle = '#1b2a66';
+    c.textAlign = 'left';
+    c.textBaseline = 'alphabetic';
+    c.font = `700 ${Math.round(h * 0.17)}px Caveat, cursive`;
+    c.fillText('Blandband', w * 0.1, h * 0.285);
+    // fönstret med spolarna
+    c.fillStyle = '#17171a';
+    c.fillRect(w * 0.26, h * 0.43, w * 0.48, h * 0.22);
+    for (const [x, r] of [[0.33, 0.1], [0.67, 0.075]]) {
+      c.fillStyle = '#4a3320';
+      c.beginPath(); c.arc(w * x, h * 0.54, h * r * 1.15, 0, 7); c.fill();
+    }
+    for (const x of [0.33, 0.67]) {
+      c.fillStyle = '#e8e4da';
+      c.beginPath(); c.arc(w * x, h * 0.54, h * 0.065, 0, 7); c.fill();
+      c.fillStyle = '#17171a';
+      c.beginPath(); c.arc(w * x, h * 0.54, h * 0.03, 0, 7); c.fill();
+    }
+    // bandets väg nederst
+    c.fillStyle = '#26272b';
+    c.beginPath();
+    c.moveTo(w * 0.14, h);
+    c.lineTo(w * 0.2, h * 0.76);
+    c.lineTo(w * 0.8, h * 0.76);
+    c.lineTo(w * 0.86, h);
+    c.fill();
+    c.fillStyle = '#6a6a6e';
+    for (const x of [0.28, 0.5, 0.72]) { c.beginPath(); c.arc(w * x, h * 0.88, h * 0.022, 0, 7); c.fill(); }
+  });
   // Text i tryck på fronten: en liten duk per text (bredd efter texten).
   function tryck(parent, text, x, y, z, hojd, o = {}) {
     const px = 44;
@@ -2172,9 +2205,6 @@ export async function figurer(canvas, opt = {}) {
   }
   // En ratt: räfflad kant, borstad topp och ett märke, som vrids med .rotation.z.
   const RFINT = [];
-  // (det som bara syns på håll, och byts mot finare delar nära)
-  const RGROV = [];
-  const grov = (x) => { RGROV.push(x); return x; };
   function ratt(parent, x, y, r, skalaDuk) {
     const F = RM.F;
     if (skalaDuk) {
@@ -2320,24 +2350,10 @@ export async function figurer(canvas, opt = {}) {
     }
     // kassettluckan: ram, kassetten bakom glas och märket över
     del(RB3(20.4, 10, 0.9, 0.4), mat('#28292d', { roughness: 0.4, metalness: 0.5 })).position.set(0, 15.6, F + 0.05);
-    // (luckan fälls ut kring sin underkant när en kassett åker in eller ut: kassetten sitter i den)
-    const dorr = new THREE.Group();
-    dorr.position.set(0, 10.7, F + 0.6);
-    k.add(dorr);
-    const kas = del(new THREE.PlaneGeometry(16.6, 7.3), mat('#ffffff', { map: KASSETT, roughness: 0.7 }), dorr);
-    kas.position.set(0, 4, -0.08);
-    const lucka = fint(del(new THREE.PlaneGeometry(17.6, 8), mat('#a8b0bc', { transparent: true, opacity: 0.2, metalness: 0.9, roughness: 0.08, depthWrite: false, envMapIntensity: 1.2 }), dorr));
-    lucka.position.set(0, 4, 0);
-    // spolarna i kassettens fönster: bandet (brunt, växer och krymper) och navet som snurrar
-    const hjulM = mat('#4a3320', { roughness: 0.55 });
-    const navM = new THREE.MeshBasicMaterial({ map: NAV, transparent: true, depthWrite: false });
-    const rullar = [-2.82, 2.82].map((x) => {
-      const hjul = fint(del(new THREE.CircleGeometry(1, 28), hjulM, dorr));
-      hjul.position.set(x, 3.71, -0.06);
-      const nav = fint(del(new THREE.PlaneGeometry(0.95, 0.95), navM, dorr));
-      nav.position.set(x, 3.71, -0.04);
-      return { hjul, nav };
-    });
+    const kas = del(new THREE.PlaneGeometry(16.6, 7.3), mat('#ffffff', { map: KASSETT, roughness: 0.7 }));
+    kas.position.set(0, 14.7, F + 0.52);
+    const lucka = fint(del(new THREE.PlaneGeometry(17.6, 8), mat('#a8b0bc', { transparent: true, opacity: 0.2, metalness: 0.9, roughness: 0.08, depthWrite: false, envMapIntensity: 1.2 })));
+    lucka.position.set(0, 14.7, F + 0.6);
     fint(tryck(k, 'SHARP', -6.3, 19.55, F + 0.54, 1.25, { vikt: 800 }));
     fint(tryck(k, 'STEREO RADIO CASSETTE', 3.6, 19.55, F + 0.54, 0.72, { vikt: 600, farg: '#a8a59c' }));
     // lysdioderna i en svart ränna: gröna, sedan gula och en röd
@@ -2449,70 +2465,25 @@ export async function figurer(canvas, opt = {}) {
     remsa(TEJPF, RM.tf, 0.0016);
     remsa(TEJPA, RM.ta, -0.0012);
     // kassettdelens tangenter ovanpå, handtaget med sitt grepp och antennen
-    // (på håll två ritningar; nära en och en, så att de går ner: REC, PLAY, REW, FF, STOP/EJ och PAUS)
     const tangent = (i) => { const b = new THREE.BoxGeometry(2.6, 1.4, 3.2); b.translate(-7.6 + i * 3, H + 0.5, 1); return b; };
-    const rodT = mat('#c4232c');
-    grov(del(tangent(0), rodT));
-    grov(del(mergeGeometries([1, 2, 3, 4, 5].map(tangent)), svart));
-    const tknDuk = canvasTex(384, 64, (c, w, h) => {
-      c.clearRect(0, 0, w, h);
-      c.fillStyle = '#d9d6cc';
-      c.font = `bold ${Math.round(h * 0.62)}px Arial, Helvetica, sans-serif`;
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
-      ['●', '▶', '◀◀', '▶▶', '■', '❚❚'].forEach((x, i) => c.fillText(x, (i + 0.5) * (w / 6), h / 2 + 2));
-    });
-    const tecknM = new THREE.MeshBasicMaterial({ map: tknDuk, transparent: true, depthWrite: false });
-    const tangenter = [0, 1, 2, 3, 4, 5].map((i) => {
-      const m = fint(del(new THREE.BoxGeometry(2.6, 1.4, 3.2), i ? svart : rodT));
-      m.position.set(-7.6 + i * 3, H + 0.5, 1);
-      m.userData.y0 = H + 0.5;
-      // tecknet på tangentens framsida
-      const pg = new THREE.PlaneGeometry(2.2, 1.0);
-      const uv = pg.attributes.uv;
-      for (let n = 0; n < 4; n++) uv.setX(n, (i + uv.getX(n)) / 6);
-      const t = new THREE.Mesh(pg, tecknM);
-      t.position.set(0, 0, 1.61);
-      m.add(t);
-      return m;
-    });
+    del(tangent(0), mat('#c4232c'));
+    del(mergeGeometries([1, 2, 3, 4, 5].map(tangent)), svart);
     const stolpar = [-18, 18].map((x) => { const m = mesh(new THREE.CylinderGeometry(0.9, 0.9, 6, 8), krom, k); m.position.set(x, H + 3, -1.5); return m; });
     const handtag = vrid(mesh(new THREE.CylinderGeometry(1.3, 1.3, 37, 10), krom, k), 0, 0, Math.PI / 2);
     handtag.position.set(0, H + 6, -1.5);
     fint(vrid(del(new THREE.CylinderGeometry(1.62, 1.62, 21, 18), mat('#141417', { roughness: 0.82 })), 0, 0, Math.PI / 2)).position.set(0, H + 6, -1.5);
     antenn(k, [W / 2 - 4, H, -3], 32, -0.35, 0.1);
-    return { g, k, led, pump, vol, spak, bsp, fmT, amT, kraft, kraftText, kraftLed, nal, nalM, skalaM, sken, tuneLed, dorr, kas, tangenter, rullar, traff: [kropp, handtag, ...stolpar] };
+    return { g, k, led, pump, vol, spak, bsp, fmT, amT, kraft, kraftText, kraftLed, nal, nalM, skalaM, sken, tuneLed, traff: [kropp, handtag, ...stolpar] };
   }
   const RADIO = kassettradio();
   RADIO.g.position.set(RADIO_PLATS.x, SILL, RADIO_PLATS.z);
   RADIO.g.rotation.y = RADIO_PLATS.vrid;
   root.add(RADIO.g);
   for (const m of RADIO.pump) m.userData.z0 = m.position.z;
-  // Kassettstället till vänster om radion, bakom DJ:s liggande tomflaska (där är bänken fri hur de än
-  // sitter): ett fack per match med poddarna inför omgången (rum-kassetter.js, rum-radio.js)
-  const STALL_PLATS = { x: 87, z: 4, vrid: -0.3 };
-  function kassettBild(et) {
-    RL.kas = et || null;
-    KASSETT.userData.rita(KASSETT.image.getContext('2d'), KASSETT.image.width, KASSETT.image.height);
-    KASSETT.needsUpdate = true;
-  }
-  const KS = kassettstall({ THREE, mat, mesh, rduk, merge: mergeGeometries, scene, calm: Boolean(opt.calm), kassettBild,
-    radio: { kas: RADIO.kas, dorr: RADIO.dorr, tangenter: RADIO.tangenter, rullar: RADIO.rullar, kasMap: KASSETT, sk: RM.SK } });
-  KS.g.position.set(STALL_PLATS.x, SILL, STALL_PLATS.z);
-  KS.g.rotation.y = STALL_PLATS.vrid;
-  root.add(KS.g);
-  // (ett klick på stället går fram till radion, som ett klick på radion)
-  RADIO.traff.push(...KS.traff);
-  const ritaNu = () => { if (opt.calm && opt.rita) opt.rita(); };
-  function kassetter(lista, i) { KS.satt(lista, i); ritaNu(); }
-  function kassettLage(x) { KS.lage(x); ritaNu(); }
-  function kassettFlytt(typ, id, et) { const s = KS.flytt(typ, id, RL.sen ?? 0, et); ritaNu(); return s; }
-  function kassettTryck(i) { KS.tryck(i, RL.sen ?? 0); ritaNu(); }
   // (på väg fram till radion och nära)
   function radioDetalj(pa) {
     RL.nara = Boolean(pa);
     for (const x of RFINT) x.visible = Boolean(pa);
-    for (const x of RGROV) x.visible = !pa;
     if (opt.calm && opt.rita) opt.rita();
   }
   function radioLage(x) {
@@ -2583,7 +2554,6 @@ export async function figurer(canvas, opt = {}) {
   // hur mycket radion spelar vid t (0–1, en halv sekund att tändas och släckas)
   const radioW = (t) => { const R = SJUNG.radio; const k = sm(R.at, R.at + 0.5, t); return R.pa ? k : 1 - k; };
   function radioRita(t) {
-    KS.rita(t);
     const w = radioW(t);
     const R = SJUNG.radio;
     const dt = RL.sen == null ? 0 : Math.max(0, Math.min(0.25, t - RL.sen));
@@ -3678,6 +3648,9 @@ export async function figurer(canvas, opt = {}) {
     // på natten tittar DL på text-tv (och bort ibland)
     const n = nattW(t) * (1 - tvW(t));
     if (n > 0 && o.F.key === 'dl') out.push([TV, n * (1 - bump((t + o.phase) % 31, 0, 1, 4, 5.2))]);
+    // din egen figur på markören (spegeln), före det man pekar på och hej, som går före
+    const sp = spW(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t));
+    if (sp > 0) out.push([SP[o.F.key].nu.clone(), sp]);
     // dit man pekar, och på den som pekar på en
     const x = PK[o.F.key];
     const w = pekW(o, t);
@@ -3727,6 +3700,19 @@ export async function figurer(canvas, opt = {}) {
   const PK = {};
   const HEJ = {};
   const pekW = (o, t) => { const x = PK[o.F.key]; return x ? x.w0 + ((x.on ? 1 : 0) - x.w0) * sm(x.wAt, x.wAt + 0.5, t) : 0; };
+  // Spegeln (spegel): din egen figur tittar på markören, var den än är i rummet, och följer den
+  // medan musen eller fingret rör sig, som en spegelbild – så att man ser vem av de tre man är.
+  // Punkten är där strålen genom markören går genom planet z framför bordet: figuren tittar ut
+  // mot en och vrider huvudet efter markören. Blicken glider efter (tau, sekunder), tonar in på
+  // in och, när markören har stått still i kvar, tillbaka på ut till det figuren annars gör.
+  // SP: per figur { mal, nu, at, w0, wAt } – markörens punkt, blickens punkt på väg dit, när
+  // markören senast rörde sig, och vikten som tonar in från w0 vid wAt.
+  const SPEGEL = { z: 640, tau: 0.12, in: 0.35, kvar: 3, ut: 0.9 };
+  const SP = {};
+  const spW = (o, t) => {
+    const s = SP[o.F.key];
+    return s ? (s.w0 + (1 - s.w0) * sm(s.wAt, s.wAt + SPEGEL.in, t)) * (1 - sm(s.at + SPEGEL.kvar, s.at + SPEGEL.kvar + SPEGEL.ut, t)) : 0;
+  };
   // den som sover vaknar inte (och den som håller på att vakna gör det först)
   // (f: med överslag, fj – blicken far lite förbi en och tillbaka, och flaskan lite för långt fram)
   const hejW = (o, t, f) => { const h = HEJ[o.F.key]; return h ? (f ? fj(h.at, h.at + 0.35, t, 0, 0.1) : sm(h.at, h.at + 0.35, t)) * (1 - sm(h.ut, h.ut + 0.6, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) : 0; };
@@ -6999,6 +6985,9 @@ export async function figurer(canvas, opt = {}) {
     // ögat efter musen, som rummets vridning i rum.js (camT: 4,5 grader åt sidorna, 2,6 upp och ner)
     OGA.x = -Math.tan(mx * 4.5 * DEG) * (D - OGA_Z);
     OGA.y = Math.tan(my * 2.6 * DEG) * (D - OGA_Z);
+    // spegeln: blicken glider efter markören, lika fort hur glest gänget än ritas
+    const glid = dt > 0 ? 1 - Math.exp(-dt / SPEGEL.tau) : 1;
+    for (const s of Object.values(SP)) s.nu.lerp(s.mal, glid);
     // (röken först: den ställer figuren när blosset föddes, emitter)
     smoke(t);
     ringar(t);
@@ -7130,48 +7119,11 @@ export async function figurer(canvas, opt = {}) {
     scene.updateMatrixWorld(true);
     const fram = rProj([-RM.W / 2, -0.5, RM.W / 2, RM.H + 7.5]);
     const bak = rProj([-RM.W / 2, -0.5, RM.W / 2, RM.H + 7.5, -RM.F]);
-    // (och kassettstället bredvid)
-    const st = sProj(KS.stallRuta);
-    const [x0, y0, x1, y1] = [Math.min(fram[0], bak[0], st[0]), Math.min(fram[1], bak[1], st[1]), Math.max(fram[2], bak[2], st[2]), Math.max(fram[3], bak[3], st[3])];
+    const [x0, y0, x1, y1] = [Math.min(fram[0], bak[0]), Math.min(fram[1], bak[1]), Math.max(fram[2], bak[2]), Math.max(fram[3], bak[3])];
     OGA.x = ox;
     OGA.y = oy;
     sikta();
     return { x: x0 * W, y: y0 * H, w: (x1 - x0) * W, h: (y1 - y0) * H };
-  }
-  // Kassettstället: en ruta i ställets eget rum ([x0, y0, x1, y1, z]) sedd ur kameran, som rProj
-  function sProj(box, M = KS.g.matrixWorld) {
-    let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
-    for (const [x, y] of [[box[0], box[1]], [box[2], box[1]], [box[0], box[3]], [box[2], box[3]]]) {
-      rVek.set(x, y, box[4]).applyMatrix4(M).project(cam);
-      x0 = Math.min(x0, rVek.x); x1 = Math.max(x1, rVek.x);
-      y0 = Math.min(y0, rVek.y); y1 = Math.max(y1, rVek.y);
-    }
-    return [(x0 + 1) / 2, (1 - y1) / 2, (x1 + 1) / 2, (1 - y0) / 2];
-  }
-  // Stället i duken (som radioRuta): rutan som kameran går fram till när ryggarna är för små (SAKER.kassetter)
-  function kassettRuta() {
-    const [ox, oy] = [OGA.x, OGA.y];
-    OGA.x = OGA.y = 0;
-    sikta();
-    scene.updateMatrixWorld(true);
-    const [x0, y0, x1, y1] = sProj(KS.stallRuta);
-    OGA.x = ox;
-    OGA.y = oy;
-    sikta();
-    return { x: x0 * W, y: y0 * H, w: (x1 - x0) * W, h: (y1 - y0) * H };
-  }
-  // Ryggarna i stället, luckan och tangenterna på locket, som andelar av duken (som radioDelar)
-  function kassettDelar() {
-    scene.updateMatrixWorld(true);
-    cam.updateMatrixWorld();
-    const kas = [];
-    for (const id of KS.ider()) { const b = KS.ruta(id); if (b) kas.push({ id, r: sProj(b) }); }
-    return {
-      stall: sProj(KS.stallRuta),
-      kas,
-      lucka: rProj([-8.8, 10.7, 8.8, 18.7, RM.F + 0.6]),
-      tangent: [0, 1, 2, 3, 4, 5].map((i) => rProj([-7.6 + i * 3 - 1.3, RM.H - 0.2, -7.6 + i * 3 + 1.3, RM.H + 1.6, 2.6])),
-    };
   }
   function radioDelar() {
     scene.updateMatrixWorld(true);
@@ -7457,6 +7409,37 @@ export async function figurer(canvas, opt = {}) {
       x.on = false;
     }
   }
+  // Spegeln: vem tittar på markören i (nx, ny), −1…1 i duken (också utanför den);
+  // vem null släpper, och de andra släpps alltid. Inte med minskad rörelse, utom
+  // bild: som om markören hade stått där länge, och blicken står kvar (?rum-spegel).
+  const spRay = new THREE.Raycaster();
+  const spPlan = new THREE.Plane(new THREE.Vector3(0, 0, 1), -SPEGEL.z);
+  const spPt = new THREE.Vector3();
+  function spegel(vem, nx, ny, t, bild = false) {
+    const k = vem ? String(vem).toLowerCase() : null;
+    // (tillbaka från och med nu)
+    for (const [j, s] of Object.entries(SP)) if (j !== k) s.at = Math.min(s.at, t - SPEGEL.kvar);
+    const o = k && (!opt.calm || bild) ? figs.find((f) => f.F.key === k) : null;
+    if (!o || !Number.isFinite(nx) || !Number.isFinite(ny)) return;
+    spRay.setFromCamera(new THREE.Vector2(nx, ny), cam);
+    if (!spRay.ray.intersectPlane(spPlan, spPt)) return;
+    const s = SP[k] || (SP[k] = { mal: new THREE.Vector3(), nu: new THREE.Vector3(), at: -1e9, w0: 0, wAt: -1e9 });
+    if (bild) {
+      Object.assign(s, { w0: 1, wAt: -1e9, at: 1e9 });
+      s.nu.copy(spPt);
+      s.mal.copy(spPt);
+      return;
+    }
+    const w = spW(o, t);
+    // (stod markören still: tonar in igen därifrån, och från ingenting börjar blicken på markören)
+    if (t > s.at + SPEGEL.kvar) {
+      s.w0 = w;
+      s.wAt = t;
+    }
+    if (w < 0.02) s.nu.copy(spPt);
+    s.mal.copy(spPt);
+    s.at = t;
+  }
   // vem blev just den som fyller i kupongen (ett klick på sin figur,
   // rum-folk.js). Ett klick till medan det pågår gör ingenting.
   function vald(vem, t) {
@@ -7641,5 +7624,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, kassetter, kassettLage, kassettFlytt, kassettTryck, kassettDelar, kassettRuta, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }

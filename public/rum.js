@@ -16,8 +16,8 @@
 //   datorn på disken kommer nära (R): terminalen med kupongen, omgången (tavlans
 //   siffror), lagen och spelarna (rum-register.js, datorn i three.js i rum-dator.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
-//   löpsedlarna i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på
-//   skivan och veckans löpsedel, rum-affischer.js) och dörren (med vilka vi
+//   löpsedlarna (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998 på skivan i
+//   fönstret och veckans löpsedel i stället utanför dörren, rum-affischer.js) och dörren (med vilka vi
 //   är under): kameran går fram till dem (närbilderna, sak)
 //   kupongen tas i handen (K) – fylls i eller ändras –, annars går kameran
 //   fram till den på pulten.
@@ -1455,8 +1455,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const ute = syn(el.querySelector('#rum-ute'), DORR.x, WIN.y, WIN.x + WIN.w - DORR.x, DORR.y + DORR.h - WIN.y);
     R.gang = syn(el.querySelector('#rum-3d').parentElement, 160, 120, 860, 560);
     syn(el.querySelector('#rum-3d').parentElement, 0, 0, 1, 1).id = 'rum-radio';
-    // (kassettstället bredvid radion: kameran går fram dit när ryggarna är för små nära radion)
-    syn(el.querySelector('#rum-3d').parentElement, 0, 0, 1, 1).id = 'rum-kassetter';
     R.cTop = parseFloat(getComputedStyle(el.querySelector('#rum-3d')).top) || 120;
     for (const x of [ute, R.gang, el.querySelector('#rum-damm')]) sikt(x);
     // dörrens övre del, med Stängt-skylten och namnet: kameran går fram dit
@@ -2440,7 +2438,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ?rum-radio: radion på fönsterbänken är på (=4: sedan fyra sekunder, med ?rum-t; rum-3d.js).
   function provRadio() {
     if (R.q.has('rum-radio-lage') && window.RumRadio) RumRadio.prova(R.q.get('rum-radio-lage'));
-    if (['radio', 'radiolapp', 'kassetter'].includes(R.q.get('rum-sak'))) sak(R.q.get('rum-sak'), null);
+    if (['radio', 'radiolapp'].includes(R.q.get('rum-sak'))) sak(R.q.get('rum-sak'), null);
     if (!R.q.has('rum-radio') || !R.fig || !R.fig.radio) return;
     R.fig.radio(true, now() - (Number(R.q.get('rum-radio')) || 0));
   }
@@ -3059,6 +3057,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const d = document.getElementById('rum-dagsljus');
     d.style.setProperty('--dagsljus', r1(L.dag * 0.9));
     d.style.setProperty('--dag-farg', L.sky[2]);
+    // löpsedelsstället står ute och har gatans ljus (.rum-lopstall i rum-affischer.css)
+    R.el.style.setProperty('--ute-dag', r1(L.dag));
+    R.el.classList.toggle('ute-lampor', L.lampor);
+    R.el.classList.toggle('ute-sno', Boolean(v.snotackt));
     if (R.dagFarg) dagDuk();
     ljusKlockan();
     ljusIhop();
@@ -3186,7 +3188,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.spel) R.fig.spel(R.spel, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappKlick, visa, ta: taKupong, radio: () => sak('radio') });
-        if (window.RumRadio) RumRadio.mount({ el: R.el, fig: () => R.fig, now, inr: () => R.inr, sak: (n) => sak(n), sakNu: () => R.sak });
+        if (window.RumRadio) RumRadio.mount({ el: R.el, fig: () => R.fig, now, inr: () => R.inr, sak: (n) => sak(n) });
         radioRuta();
         provMal();
         provAkt();
@@ -4334,9 +4336,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // bladet (radiolapp i rum-inredning.js): som radion, men bara bladet när raderna blir för små att läsa
     // bredvid radion (i telefonen), och tillbaka till radion om man kom därifrån
     radiolapp: { el: '#rum-radio', h: 0.98, duk: ['skiva', 'radiolapp'], radio: true, bak: 'radio', med: '.rum-radiolapp', ram: (r, top, h, m) => (window.RumRadio ? RumRadio.ram(r, top, h, m, true) : null) },
-    // kassettstället bredvid radion (rum-kassetter.js, rum-radio.js): som bladet, när ryggarna blir för små
-    // bredvid radion (i telefonen), och tillbaka till radion
-    kassetter: { el: '#rum-kassetter', h: 0.9, duk: ['skiva'], radio: true, bak: 'radio' },
   };
   // Pokalerna per person (fill), flest först, i var och ens färg.
   function pokalFot() {
@@ -4385,6 +4384,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (!radio(namn)) R.rDetalj = setTimeout(() => { if (!radio(R.sak) && R.fig) R.fig.radioDetalj(false); }, cls ? 700 : 0);
     }
     R.el.classList.toggle('radio-nara', radio(namn));
+    // (löpsedelsstället ute ljusnar i närbilden, så att rubriken går att läsa)
+    R.el.classList.toggle('lop-nara', namn === 'lopsedel');
     R.sak = namn || null;
     if (!namn) {
       lagerUt('sak');
@@ -4456,11 +4457,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const q = R.fig.radioRuta();
     const c = R.el.querySelector('#rum-3d');
     Object.assign(e.style, { left: `${r1(c.offsetLeft + q.x)}px`, top: `${r1(R.cTop + q.y)}px`, width: `${r1(q.w)}px`, height: `${r1(q.h)}px` });
-    const k = R.el.querySelector('#rum-kassetter');
-    if (k && R.fig.kassettRuta) {
-      const s = R.fig.kassettRuta();
-      Object.assign(k.style, { left: `${r1(c.offsetLeft + s.x)}px`, top: `${r1(R.cTop + s.y)}px`, width: `${r1(s.w)}px`, height: `${r1(s.h)}px` });
-    }
     return e;
   }
   function radioNara(pa) {

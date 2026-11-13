@@ -51,24 +51,3 @@
 .rum-radio-reglage .r-st { overflow: hidden; color: transparent; font-size: 1px; white-space: nowrap; border-radius: 3px; }
 .rum-radio-reglage .r-st:focus, .rum-radio-reglage .r-lapp:focus { outline: none; }
 .rum-radio-reglage .r-st:focus-visible, .rum-radio-reglage .r-lapp:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }
-
-/* Kassettstället bredvid radion och radions kassettdel (kassetterna i rum-radio.js): knappar över ryggarna när de
-   är stora nog att träffa, annars går ett tryck på stället fram till det; luckan vänder kassetten och
-   tangenterna på locket är tangenter. */
-.rum-radio-reglage .r-stall,
-.rum-radio-reglage .r-kas {
-  position: absolute;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  pointer-events: auto;
-  -webkit-tap-highlight-color: transparent;
-}
-.rum-radio-reglage .r-stall { cursor: zoom-in; }
-.rum-radio-reglage .r-stall.las { cursor: default; }
-.rum-radio-reglage .r-kas { cursor: pointer; overflow: hidden; color: transparent; font-size: 1px; white-space: nowrap; border-radius: 2px; }
-.rum-radio-reglage .r-stall[hidden], .rum-radio-reglage .r-kassetter[hidden] { display: none; }
-.rum-radio-reglage .r-tan { touch-action: manipulation; }
-.rum-radio-reglage .r-kas:focus, .rum-radio-reglage .r-stall:focus { outline: none; }
-.rum-radio-reglage .r-kas:focus-visible, .rum-radio-reglage .r-stall:focus-visible { outline: 2px solid rgba(255, 214, 140, 0.7); }
