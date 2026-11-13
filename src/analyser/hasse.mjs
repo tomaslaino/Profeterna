@@ -62,7 +62,8 @@ export function oddsen(d, article) {
     const mk = p && p.baselines && p.baselines.market;
     const bolag = mk && Array.isArray(mk.odds) ? mk.odds : d && d.odds && d.odds.espn && d.odds.espn.x12;
     if (m && Array.isArray(bolag) && bolag.length === 3) ut.push(`Spelbolagen: ${trio(bolag.map(odds2))}. Lägre odds, större chans.`);
-    if (m && p && Array.isArray(p.p)) ut.push(`Sajtens prognos, odds utan spelbolagens marginal: ${trio(pct3(p.p).map(pctOdds))}.`);
+    // En landskamp har marknadens prognos (spelbolagets odds utan marginal), inte sajtens modell.
+    if (m && p && Array.isArray(p.p)) ut.push(p.kind === 'marknaden' ? `Utan spelbolagets marginal: ${trio(pct3(p.p).map(pctOdds))}.` : `Sajtens prognos, odds utan spelbolagens marginal: ${trio(pct3(p.p).map(pctOdds))}.`);
   } catch { /* utan odds */ }
   const signs = (article.tip && article.tip.signs) || [];
   if (signs.length) ut.push(`Kollegan ringade in ${signs.map((n) => ORD[n]).join(' och ')}. Du bestämmer själv.`);

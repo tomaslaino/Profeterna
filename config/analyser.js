@@ -66,6 +66,13 @@ module.exports = {
     egnaNamn: ['Sixten', 'Bråvall', 'Tjäderfors', 'Grusnäs', 'Mellanåker'],
   },
 
+  // Läggs till systemprompten för en landskamp (2026-11-13, när Stryktipset tog in
+  // Nations League): underlaget är ett annat, och prognosen är marknadens. Ordet
+  // modell stoppas av kontrollerna (src/analyser/kontroller.mjs).
+  landskamp: `Den här matchen är en landskamp, inte engelsk ligafotboll. Siffrorna är andra: tabellen i Nations League-gruppen, Nations League hittills, de senaste landskamperna (också VM, VM-kvalet och vänskapsmatcher), schemat och mötena sedan hösten 2024. Det finns ingen xG, ingen domare och ingen skadelista – läs på om förbundskaptenernas trupper, återbud och skador i stället, i båda ländernas egna medier.
+
+Prognosen i siffrorna är marknadens: spelbolagets odds utan marginal, med målen räknade ur oddsen. Sajtens modell räknar bara på lagen i England och har ingen prognos för landskamper. Kalla den därför marknaden eller spelbolagen, aldrig modellen, modellens eller sajtens prognos, och skriv inte att du jämför prognosen med marknaden.`,
+
   // Kort med flit: kontrollerna sköts av koden. Rösten läggs till sist.
   systemPrompt: `Matchfixarna är ett gäng svenska kompisar som tippar engelsk fotboll tillsammans. Inför en match läser du på åt dem och skriver en artikel med din röst, och sedan tipset under den.
 

@@ -1,21 +1,21 @@
 {
- "uppdaterad": "2026-11-07T12:32:37.335Z",
+ "uppdaterad": "2026-11-13T18:17:13.278Z",
  "omgang": {
-  "id": "2026-11-07-st4978",
+  "id": "2026-11-14-st4979",
   "matcher": [
-   "401878757",
-   "401878760",
-   "401879241",
-   "401880171",
-   "401880172",
-   "401880169",
-   "401880168",
-   "401880165",
-   "401880164",
-   "401880163",
-   "401880162",
-   "401931120",
-   "401931121"
+   "401861166",
+   "401861167",
+   "401861165",
+   "401861168",
+   "401861169",
+   "401861170",
+   "401861164",
+   "401880749",
+   "401880747",
+   "401880745",
+   "401880754",
+   "401880744",
+   "401881266"
   ]
  },
  "analyser": [
@@ -1138,6 +1138,674 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-07T10:50:10.471Z",
     "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861164",
+   "match": "Georgien – Ungern",
+   "avspark": "2026-11-14T17:00Z",
+   "writtenAt": "2026-11-13T21:00:00.000Z",
+   "text": "Georgien har inte gjort ett mål\n\nGeorgien har spelat fyra matcher i Nations League utan att göra mål och ligger sist i grupp B2. Ungern är tvåa med 7 poäng och vann det första mötet med 1–0 i Budapest. I Tbilisi blir det tidig avspark.\n\nSiffrorna för Georgien är nästan för tydliga. Fyra matcher, 0 gjorda mål och 2 insläppta, två förluster och två oavgjorda. Och det blir inte lättare: Khvicha Kvaratskhelia är borta med en allvarlig skada, och Giorgi Kochorashvili är avstängd, skriver Dailysports [1]. Ramaz Svanadze har kallat in 26 spelare med tre debutanter, och det är Georges Mikautadze och Zuriko Davitashvili som ska göra målen [2].\n\nUngern vann i Budapest i oktober när Kerkez gjorde matchens enda mål, enligt PSG:s egen rapport [3]. Marco Rossi har tagit ut 27 spelare, och Roland Sallai och Barnabás Varga är tillbaka efter sina skador [2]. Laget har två segrar på de två senaste matcherna och leder inte gruppen bara för att Nordirland inte släpper in mål.\n\nDet tar vi på torsdagsträningen: när ett lag inte gör mål är det sällan anfallarna det är fel på, utan bollarna som aldrig kommer fram till dem. Georgien har hållit nollan i hälften av matcherna, så det är inget lag som rasar. Men det står ett lag på planen som ska göra mål och inte vet hur, och ett lag som har Dominik Szoboszlai.\n\nTipset: X2 (Georgien gör inga mål)\n\nMarknaden ger Ungern oddset 2,63 och Georgien 3,23, samma som för krysset. Jag lutar åt gästerna. Georgien har inte gjort ett mål i gruppen och saknar både Kvaratskhelia och Kochorashvili [1], medan Ungern har fått tillbaka Sallai och Varga [2]. Men ett lag som har hållit nollan i hälften av matcherna förlorar inte stort, så jag tar krysset och tvåan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Georgien har inte gjort ett mål",
+   "lead": "Georgien har spelat fyra matcher i Nations League utan att göra mål och ligger sist i grupp B2. Ungern är tvåa med 7 poäng och vann det första mötet med 1–0 i Budapest. I Tbilisi blir det tidig avspark.",
+   "paragraphs": [
+    "Siffrorna för Georgien är nästan för tydliga. Fyra matcher, 0 gjorda mål och 2 insläppta, två förluster och två oavgjorda. Och det blir inte lättare: Khvicha Kvaratskhelia är borta med en allvarlig skada, och Giorgi Kochorashvili är avstängd, skriver Dailysports [1]. Ramaz Svanadze har kallat in 26 spelare med tre debutanter, och det är Georges Mikautadze och Zuriko Davitashvili som ska göra målen [2].",
+    "Ungern vann i Budapest i oktober när Kerkez gjorde matchens enda mål, enligt PSG:s egen rapport [3]. Marco Rossi har tagit ut 27 spelare, och Roland Sallai och Barnabás Varga är tillbaka efter sina skador [2]. Laget har två segrar på de två senaste matcherna och leder inte gruppen bara för att Nordirland inte släpper in mål.",
+    "Det tar vi på torsdagsträningen: när ett lag inte gör mål är det sällan anfallarna det är fel på, utan bollarna som aldrig kommer fram till dem. Georgien har hållit nollan i hälften av matcherna, så det är inget lag som rasar. Men det står ett lag på planen som ska göra mål och inte vet hur, och ett lag som har Dominik Szoboszlai."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Dailysports",
+     "title": "Georgia vs Hungary: hosts aim to take revenge and keep promotion hopes alive",
+     "url": "https://dailysports.net/predictions/georgia-hungary-hosts-aim-to-take-revenge-and-keep-promotion-hopes-alive/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "1TV",
+     "title": "Nations League: Hungary v Georgia match preview",
+     "url": "https://1tv.ge/lang/en/news/nations-league-hungary-v-georgia-match-preview-and-live-broadcast-on-gpb-first-channel-1tvsport/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "PSG",
+     "title": "Kvaratskhelia's Georgia narrowly beaten by Hungary",
+     "url": "https://www.psg.fr/en/content/kvaratskhelias-georgia-narrowly-beaten-by-hungary-psg-national-teams-kvaratskhelia-uefa-nations-league-2026-2027",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Ungern oddset 2,63 och Georgien 3,23, samma som för krysset. Jag lutar åt gästerna. Georgien har inte gjort ett mål i gruppen och saknar både Kvaratskhelia och Kochorashvili [1], medan Ungern har fått tillbaka Sallai och Varga [2]. Men ett lag som har hållit nollan i hälften av matcherna förlorar inte stort, så jag tar krysset och tvåan.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Georgien gör inga mål",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Dailysports",
+      "title": "Georgia vs Hungary: hosts aim to take revenge and keep promotion hopes alive",
+      "url": "https://dailysports.net/predictions/georgia-hungary-hosts-aim-to-take-revenge-and-keep-promotion-hopes-alive/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "1TV",
+      "title": "Nations League: Hungary v Georgia match preview",
+      "url": "https://1tv.ge/lang/en/news/nations-league-hungary-v-georgia-match-preview-and-live-broadcast-on-gpb-first-channel-1tvsport/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Georgien har inte gjort ett mål på fyra matcher, och nu är Kvaratskhelia borta. Att de plötsligt skulle hitta nätet, det köper jag aldrig.",
+     "Ungern har fått tillbaka Sallai och Varga och har Szoboszlai. Ett mål räcker, så är det bara. Tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–1",
+    "tips": "2026-11-13T21:00:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Det köper jag aldrig",
+      "Så är det bara"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861165",
+   "match": "Norge – Wales",
+   "avspark": "2026-11-14T17:00Z",
+   "writtenAt": "2026-11-13T21:00:00.000Z",
+   "text": "Norge har förlorat med uddamålet tre gånger\n\nNorge och Wales har 3 poäng var efter 4 matcher, och förloraren riskerar att åka ur högsta divisionen. Wales vann mötet i Cardiff med 2–1. Norge har förlorat tre raka gruppmatcher med just den siffran.\n\nDet märkliga med Norge är att laget inte förlorar stort. Tre raka förluster med 1–2, två mot Portugal och en i Cardiff, och ändå är det ett lag som slog Brasilien i somras och gick till förlängning mot England i VM. Erling Haaland och Martin Ødegaard missade ett träningspass i veckan men är tillbaka, enligt beIN Sports [1]. Ståle Solbakken förlorar däremot Jørgen Strand Larsen, och Alexander Sørloth klarar inte två hela matcher på kort tid [2].\n\nCraig Bellamy har tagit ut 26 spelare. Harry Wilson är tillbaka efter att inte ha spelat för Wales sedan mars, och Joe Rodon har inte spelat sedan augusti på grund av en baksida lår [3]. Jordan James lämnade truppen skadad och ersattes av Kai Andrews från U21 [3]. Wales har bara gjort 2 mål på fyra gruppmatcher, båda i segern mot Norge.\n\nJag har varit med om värre, och då hade vi ingen målvakt. Men det här är en match där det ena laget skjuter och det andra försvarar sig, och Wales har inte hållit nollan en enda gång i gruppen. På Ullevaal är det dessutom tidig avspark, 18.00 svensk tid, och sedan väntar Danmark för Norge och Portugal för Wales.\n\nTipset: 1 (Haaland är tillbaka)\n\nMarknaden ger Norge oddset 1,27 och Wales 12,50, och den här gången håller jag med utan att blinka. Haaland och Ødegaard är tillbaka i träning [1], Wales har gjort 2 mål på fyra matcher och har aldrig hållit nollan i gruppen. Rodon kommer in utan matcher sedan augusti [2]. Tre förluster med uddamålet är otur mer än något annat. Ettan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Norge har förlorat med uddamålet tre gånger",
+   "lead": "Norge och Wales har 3 poäng var efter 4 matcher, och förloraren riskerar att åka ur högsta divisionen. Wales vann mötet i Cardiff med 2–1. Norge har förlorat tre raka gruppmatcher med just den siffran.",
+   "paragraphs": [
+    "Det märkliga med Norge är att laget inte förlorar stort. Tre raka förluster med 1–2, två mot Portugal och en i Cardiff, och ändå är det ett lag som slog Brasilien i somras och gick till förlängning mot England i VM. Erling Haaland och Martin Ødegaard missade ett träningspass i veckan men är tillbaka, enligt beIN Sports [1]. Ståle Solbakken förlorar däremot Jørgen Strand Larsen, och Alexander Sørloth klarar inte två hela matcher på kort tid [2].",
+    "Craig Bellamy har tagit ut 26 spelare. Harry Wilson är tillbaka efter att inte ha spelat för Wales sedan mars, och Joe Rodon har inte spelat sedan augusti på grund av en baksida lår [3]. Jordan James lämnade truppen skadad och ersattes av Kai Andrews från U21 [3]. Wales har bara gjort 2 mål på fyra gruppmatcher, båda i segern mot Norge.",
+    "Jag har varit med om värre, och då hade vi ingen målvakt. Men det här är en match där det ena laget skjuter och det andra försvarar sig, och Wales har inte hållit nollan en enda gång i gruppen. På Ullevaal är det dessutom tidig avspark, 18.00 svensk tid, och sedan väntar Danmark för Norge och Portugal för Wales."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "beIN Sports",
+     "title": "Good News for Norway: Haaland and Ødegaard Return",
+     "url": "https://www.beinsports.com/en-us/soccer/uefa-nations-league/articles/good-news-for-norway-haaland-and-degaard-return-to-training-2026-11-11",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Goal",
+     "title": "Norway sweat on Erling Haaland and Martin Odegaard fitness as Staale Solbakken refuses to reveal key duo's training absence",
+     "url": "https://www.goal.com/en/news/norway-erling-haaland-martin-odegaard-staale-solbakken/blt22ae4006f2f80fd2",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Sky Sports",
+     "title": "Wales: Craig Bellamy announces 26-man squad for UEFA Nations League matches against Norway and Portugal",
+     "url": "https://www.skysports.com/football/news/13607854/wales-craig-bellamy-announces-26-man-squad-for-uefa-nations-league-matches-against-norway-and-portugal",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Norge oddset 1,27 och Wales 12,50, och den här gången håller jag med utan att blinka. Haaland och Ødegaard är tillbaka i träning [1], Wales har gjort 2 mål på fyra matcher och har aldrig hållit nollan i gruppen. Rodon kommer in utan matcher sedan augusti [2]. Tre förluster med uddamålet är otur mer än något annat. Ettan.",
+    "signs": [
+     0
+    ],
+    "note": "Haaland är tillbaka",
+    "sources": [
+     {
+      "n": 1,
+      "source": "beIN Sports",
+      "title": "Good News for Norway: Haaland and Ødegaard Return",
+      "url": "https://www.beinsports.com/en-us/soccer/uefa-nations-league/articles/good-news-for-norway-haaland-and-degaard-return-to-training-2026-11-11",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sky Sports",
+      "title": "Wales: Craig Bellamy announces 26-man squad for UEFA Nations League matches against Norway and Portugal",
+      "url": "https://www.skysports.com/football/news/13607854/wales-craig-bellamy-announces-26-man-squad-for-uefa-nations-league-matches-against-norway-and-portugal",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Tre förluster med uddamålet, och folk tror att Norge är i kris. Nej nej nej. Ett lag som slog Brasilien i somras rasar inte för att det har haft otur i några matcher.",
+     "Wales har gjort 2 mål på fyra matcher och har aldrig hållit nollan i gruppen. Haaland och Ødegaard är tillbaka i träning. Ettan, och jag tror att det blir tydligt."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–0",
+    "tips": "2026-11-13T21:00:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Nej nej nej",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861169",
+   "match": "Nordirland – Ukraina",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T21:00:00.000Z",
+   "text": "Nordirland har inte släppt in ett mål\n\nNordirland leder grupp B2 och har hållit nollan i alla fyra matcherna. Ukraina förlorade det första mötet med 0–3 och ligger trea med 4 poäng. På Windsor Park väntar en match där ett mål kan räcka långt.\n\nMichael O’Neills lag har gjort 4 mål och släppt in 0 på fyra matcher. Det är inte vackert, men det är effektivt, och segern i Ukrainas hemmamatch i oktober blev 3–0. Nu saknas Ceadach O’Neill, den 18-årige yttern från Arsenal, som har lämnat truppen med en skada, och varken Conor Bradley eller Daniel Ballard är med, skriver The False 9 [1]. I stället har förbundskaptenen gett målvakten Dermot Mee och anfallaren Eoin Kenny deras första uttagningar [2].\n\nUkraina har haft det tungt. Två raka hemmaförluster, mot Nordirland och Ungern, och bara 2 gjorda mål i gruppen. Oleksandr Zubkov har lämnat truppen skadad, och Mykola Shaparenko och Vladyslav Vanat har kallats in [3]. Laget har ändå spelare som Ilya Zabarnyi och Vitalii Mykolenko, och det vann 2–0 i Polen i våras.\n\nDet där löser man med en hink bollar, säger jag om lag som inte gör mål, men Nordirland har gått mållöst i två av fyra matcher och klarat sig ändå. Det är ett lag som har förstått att 0–0 också är en poäng. Hemma har laget två oavgjorda och ingen seger i gruppen, och tre dagar senare väntar Ungern borta.\n\nTipset: 1X (nollan håller)\n\nMarknaden ger Nordirland oddset 2,63, krysset 3,13 och Ukraina 3,33. Det är jämnt, och det stämmer med vad jag ser. Nordirland har inte släppt in ett mål i gruppen men har bara spelat oavgjort hemma. Ukraina saknar Zubkov [1], och Nordirland saknar Ceadach O’Neill, Bradley och Ballard [2]. Ett lag som har fyra nollor förlorar sällan, så jag tar ettan och krysset.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Nordirland har inte släppt in ett mål",
+   "lead": "Nordirland leder grupp B2 och har hållit nollan i alla fyra matcherna. Ukraina förlorade det första mötet med 0–3 och ligger trea med 4 poäng. På Windsor Park väntar en match där ett mål kan räcka långt.",
+   "paragraphs": [
+    "Michael O’Neills lag har gjort 4 mål och släppt in 0 på fyra matcher. Det är inte vackert, men det är effektivt, och segern i Ukrainas hemmamatch i oktober blev 3–0. Nu saknas Ceadach O’Neill, den 18-årige yttern från Arsenal, som har lämnat truppen med en skada, och varken Conor Bradley eller Daniel Ballard är med, skriver The False 9 [1]. I stället har förbundskaptenen gett målvakten Dermot Mee och anfallaren Eoin Kenny deras första uttagningar [2].",
+    "Ukraina har haft det tungt. Två raka hemmaförluster, mot Nordirland och Ungern, och bara 2 gjorda mål i gruppen. Oleksandr Zubkov har lämnat truppen skadad, och Mykola Shaparenko och Vladyslav Vanat har kallats in [3]. Laget har ändå spelare som Ilya Zabarnyi och Vitalii Mykolenko, och det vann 2–0 i Polen i våras.",
+    "Det där löser man med en hink bollar, säger jag om lag som inte gör mål, men Nordirland har gått mållöst i två av fyra matcher och klarat sig ändå. Det är ett lag som har förstått att 0–0 också är en poäng. Hemma har laget två oavgjorda och ingen seger i gruppen, och tre dagar senare väntar Ungern borta."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The False 9",
+     "title": "Northern Ireland vs Ukraine Predicted Lineup, Team News and TV (14 November)",
+     "url": "https://thefalse9.com/2026/11/northern-ireland-vs-ukraine-predicted-lineup-team-news.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "The Irish News",
+     "title": "Arsenal prospect Ceadach O’Neill confirmed in Northern Ireland squad",
+     "url": "https://www.irishnews.com/sport/soccer/arsenal-prospect-ceadach-oneill-confirmed-in-northern-ireland-squad-for-nations-league-quadruple-YG7XWHB4WRDPNKF3VRY2TVXA3Q/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Forebet",
+     "title": "Northern Ireland's steel meets Ukraine's control in a tight Group B2 rematch",
+     "url": "https://www.forebet.com/en/football-match-previews/32372-northern-irelands-steel-meets-ukraines-control-in-a-tight-group-b2-rematch",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Nordirland oddset 2,63, krysset 3,13 och Ukraina 3,33. Det är jämnt, och det stämmer med vad jag ser. Nordirland har inte släppt in ett mål i gruppen men har bara spelat oavgjort hemma. Ukraina saknar Zubkov [1], och Nordirland saknar Ceadach O’Neill, Bradley och Ballard [2]. Ett lag som har fyra nollor förlorar sällan, så jag tar ettan och krysset.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "nollan håller",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Forebet",
+      "title": "Northern Ireland's steel meets Ukraine's control in a tight Group B2 rematch",
+      "url": "https://www.forebet.com/en/football-match-previews/32372-northern-irelands-steel-meets-ukraines-control-in-a-tight-group-b2-rematch",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The False 9",
+      "title": "Northern Ireland vs Ukraine Predicted Lineup, Team News and TV (14 November)",
+      "url": "https://thefalse9.com/2026/11/northern-ireland-vs-ukraine-predicted-lineup-team-news.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Nordirland har inte släppt in ett enda mål i gruppen, men hemma har de bara spelat oavgjort. Det är ett lag som har bestämt sig för att inte förlora.",
+     "Ukraina har bara gjort 2 mål och tappar Zubkov. Nej nej nej, här blir det inga mål att tala om. Kryss."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "0–0",
+    "tips": "2026-11-13T21:00:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Äsch",
+      "Nej nej nej"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861170",
+   "match": "Österrike – Irland",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T21:00:00.000Z",
+   "text": "Österrike kan gå upp redan i Linz\n\nÖsterrike leder grupp B3 med 8 poäng och kan säkra återkomsten till Nations Leagues högsta division med en seger mot Irland. Mötet i Dublin i oktober slutade 2–2. Irland ligger trea med 5 poäng.\n\nRalf Rangnick har sagt att han ställer upp med den starkaste elvan han har, och han vet varför: en hemmaseger i Linz kan räcka för att Österrike ska gå upp, skriver ORF [1]. David Alaba saknas med en vadskada, men Christoph Baumgartner är tillbaka efter en lång skadeperiod, och den 17-årige Luca Weinhandl från Sturm Graz är ny i truppen [1, 2]. Österrike har gjort mål i alla gruppmatcher men inte hållit nollan en enda gång.\n\nHeimir Hallgrímsson har sin kapten Nathan Collins tillbaka efter en vadskada, men saknar målvakten Gavin Bazunu, och Evan Ferguson, Josh Cullen och Jaden Umeh är skadade, enligt The42 [3]. Mark Travers står i stället för Bazunu. Seamus Coleman har en roll mittemellan spelare och ledare och spelar inte i Linz, och fem irländare går på gult kort inför Kosovo [4].\n\nIrland har bara en seger på fyra gruppmatcher, men laget förlorar sällan: tre oavgjorda och en förlust på de fem senaste landskamperna. Bollen har aldrig läst en tabell. Senast lagen möttes, i Dublin, slutade det 2–2. Efter Linz väntar Israel borta i Debrecen, och för Irland Kosovo hemma på Aviva Stadium, så ingen av förbundskaptenerna kan spara på något.\n\nTipset: 1X (Linz bär hemmalaget)\n\nMarknaden ger Österrike oddset 1,64 och Irland 5,88. Österrike har allt att spela för och Rangnick ställer upp sitt bästa lag [1], men laget har inte hållit nollan i gruppen och spelade 2–2 i Dublin. Irland saknar Ferguson och Bazunu [2], och en irländare med gult kort tänker redan på Kosovo [3]. Jag tror på Österrike, men inte så mycket att jag släpper krysset. Ettan och krysset.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Österrike kan gå upp redan i Linz",
+   "lead": "Österrike leder grupp B3 med 8 poäng och kan säkra återkomsten till Nations Leagues högsta division med en seger mot Irland. Mötet i Dublin i oktober slutade 2–2. Irland ligger trea med 5 poäng.",
+   "paragraphs": [
+    "Ralf Rangnick har sagt att han ställer upp med den starkaste elvan han har, och han vet varför: en hemmaseger i Linz kan räcka för att Österrike ska gå upp, skriver ORF [1]. David Alaba saknas med en vadskada, men Christoph Baumgartner är tillbaka efter en lång skadeperiod, och den 17-årige Luca Weinhandl från Sturm Graz är ny i truppen [1, 2]. Österrike har gjort mål i alla gruppmatcher men inte hållit nollan en enda gång.",
+    "Heimir Hallgrímsson har sin kapten Nathan Collins tillbaka efter en vadskada, men saknar målvakten Gavin Bazunu, och Evan Ferguson, Josh Cullen och Jaden Umeh är skadade, enligt The42 [3]. Mark Travers står i stället för Bazunu. Seamus Coleman har en roll mittemellan spelare och ledare och spelar inte i Linz, och fem irländare går på gult kort inför Kosovo [4].",
+    "Irland har bara en seger på fyra gruppmatcher, men laget förlorar sällan: tre oavgjorda och en förlust på de fem senaste landskamperna. Bollen har aldrig läst en tabell. Senast lagen möttes, i Dublin, slutade det 2–2. Efter Linz väntar Israel borta i Debrecen, och för Irland Kosovo hemma på Aviva Stadium, så ingen av förbundskaptenerna kan spara på något."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "ORF",
+     "title": "Nations League: Ohne Alaba, mit Baumgartner und Neuling",
+     "url": "https://sport.orf.at/stories/3164385/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sky Sport Austria",
+     "title": "Ein Debütant: Das ist der ÖFB-Kader für die Nations League",
+     "url": "https://www.skysportaustria.at/ein-debuetant-das-ist-der-oefb-kader-fuer-die-nations-league/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "The42",
+     "title": "Collins returns, Bazunu out injured and Coleman set for 'hybrid role' in Ireland squad",
+     "url": "https://www.the42.ie/ireland-squad-20-7216434-Nov2026/",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "The Irish Times",
+     "title": "Séamus Coleman out for Ireland’s Nations League game against Austria",
+     "url": "https://www.irishtimes.com/sport/soccer/2026/11/13/seamus-coleman-out-for-irelands-nations-league-game-against-austria/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Österrike oddset 1,64 och Irland 5,88. Österrike har allt att spela för och Rangnick ställer upp sitt bästa lag [1], men laget har inte hållit nollan i gruppen och spelade 2–2 i Dublin. Irland saknar Ferguson och Bazunu [2], och en irländare med gult kort tänker redan på Kosovo [3]. Jag tror på Österrike, men inte så mycket att jag släpper krysset. Ettan och krysset.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Linz bär hemmalaget",
+    "sources": [
+     {
+      "n": 1,
+      "source": "ORF",
+      "title": "Nations League: Ohne Alaba, mit Baumgartner und Neuling",
+      "url": "https://sport.orf.at/stories/3164385/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The42",
+      "title": "Collins returns, Bazunu out injured and Coleman set for 'hybrid role' in Ireland squad",
+      "url": "https://www.the42.ie/ireland-squad-20-7216434-Nov2026/",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "The Irish Times",
+      "title": "Séamus Coleman out for Ireland’s Nations League game against Austria",
+      "url": "https://www.irishtimes.com/sport/soccer/2026/11/13/seamus-coleman-out-for-irelands-nations-league-game-against-austria/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Österrike kan gå upp med en seger hemma, och Rangnick ställer upp sitt bästa lag. Total kontroll, tycker man. Men de har inte hållit nollan en enda gång i gruppen.",
+     "Irland saknar Ferguson och Bazunu och har spelare på gult kort som redan tänker på Kosovo. Jag har sett det förr, i Manchester. Det gick bra då också. Ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-13T21:00:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Total kontroll",
+      "Lugn nu"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861167",
+   "match": "Portugal – Danmark",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T21:00:00.000Z",
+   "text": "Portugal börjar om utan Ronaldo\n\nPortugal har vunnit alla fyra gruppmatcherna och tar emot Danmark i Braga. Det är Jorge Jesus första samling sedan Cristiano Ronaldo lämnade landslaget. Danmark ligger tvåa med 6 poäng och har Norge hemma tre dagar senare.\n\nMatchen i Braga är den första där Portugal står utan Cristiano Ronaldo för gott. Jorge Jesus tog ut 28 spelare dagen efter att Ronaldo meddelat att han lämnar landslaget, skriver Jornal de Notícias, och även Nuno Mendes och Gonçalo Inácio saknas medan Gustavo Varela och Alberto Costa är nya [1]. Det ser inte ut att ha bekymrat laget hittills: fyra segrar på fyra matcher, 9 gjorda mål, och 4–2 borta i Köpenhamn i oktober.\n\nDanmark har det knepigare. Brian Riemer saknar fortfarande Andreas Christensen [2], och Jesper Lindstrøm är tillbaka i truppen trots att han inte spelat för landslaget på över ett och ett halvt år [3]. Riemer har dessutom spelare som riskerar avstängning: ett gult kort i Braga betyder att man missar Norge [3]. Det är en sådan detalj som avgör en grupp. Det tar vi på torsdagsträningen, säger jag, men landslag har ingen torsdagsträning.\n\nSiffrorna säger att Danmark har både gjort och släppt in 7 mål i gruppen, och att laget håller nollan ibland men aldrig går mållöst. Mötena sedan våren 2025 är jämnare än tabellen: Danmark vann 1–0 hemma i kvartsfinalen, och Portugal vann returen med 3–2 efter full tid. Bollen har aldrig läst en tabell.\n\nTipset: 1 (Portugal utan krångel)\n\nMarknaden ger Portugal oddset 1,59 och Danmark 5,88. Jag ser ingen anledning att gå emot det. Portugal har vunnit alla gruppmatcher och vann i Köpenhamn utan Ronaldo, så hans avsked [1] ändrar mindre än rubrikerna. Danmark saknar Christensen [2], och spelare som riskerar avstängning inför Norge [3] går inte in i närkamperna som de borde. Ettan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Portugal börjar om utan Ronaldo",
+   "lead": "Portugal har vunnit alla fyra gruppmatcherna och tar emot Danmark i Braga. Det är Jorge Jesus första samling sedan Cristiano Ronaldo lämnade landslaget. Danmark ligger tvåa med 6 poäng och har Norge hemma tre dagar senare.",
+   "paragraphs": [
+    "Matchen i Braga är den första där Portugal står utan Cristiano Ronaldo för gott. Jorge Jesus tog ut 28 spelare dagen efter att Ronaldo meddelat att han lämnar landslaget, skriver Jornal de Notícias, och även Nuno Mendes och Gonçalo Inácio saknas medan Gustavo Varela och Alberto Costa är nya [1]. Det ser inte ut att ha bekymrat laget hittills: fyra segrar på fyra matcher, 9 gjorda mål, och 4–2 borta i Köpenhamn i oktober.",
+    "Danmark har det knepigare. Brian Riemer saknar fortfarande Andreas Christensen [2], och Jesper Lindstrøm är tillbaka i truppen trots att han inte spelat för landslaget på över ett och ett halvt år [3]. Riemer har dessutom spelare som riskerar avstängning: ett gult kort i Braga betyder att man missar Norge [3]. Det är en sådan detalj som avgör en grupp. Det tar vi på torsdagsträningen, säger jag, men landslag har ingen torsdagsträning.",
+    "Siffrorna säger att Danmark har både gjort och släppt in 7 mål i gruppen, och att laget håller nollan ibland men aldrig går mållöst. Mötena sedan våren 2025 är jämnare än tabellen: Danmark vann 1–0 hemma i kvartsfinalen, och Portugal vann returen med 3–2 efter full tid. Bollen har aldrig läst en tabell."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Jornal de Notícias",
+     "title": "Convocados de Jorge Jesus para Dinamarca e País de Gales",
+     "url": "https://www.jn.pt/desporto/artigo/a-primeira-convocatoria-de-jorge-jesus-apos-o-adeus-de-cristiano-ronaldo/18145295",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Goal",
+     "title": "Denmark boss Brian Riemer opens up on Andreas Christensen injury absence as Barcelona star misses Nations League squad",
+     "url": "https://www.goal.com/en-us/news/denmark-brian-riemer-andreas-christensen-barcelona-nations-league/blt071c74a6b9d6a6bc",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Tipsbladet PLbold",
+     "title": "Hemmeligt våben i truppen: Riemer afslører stor fordel før de altafgørende kampe",
+     "url": "https://www.plbold.dk/nyhed/hemmeligt-vaaben-i-truppen-riemer-afsloerer-stor-fordel-foer-de-altafgoerende-kampe/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Portugal oddset 1,59 och Danmark 5,88. Jag ser ingen anledning att gå emot det. Portugal har vunnit alla gruppmatcher och vann i Köpenhamn utan Ronaldo, så hans avsked [1] ändrar mindre än rubrikerna. Danmark saknar Christensen [2], och spelare som riskerar avstängning inför Norge [3] går inte in i närkamperna som de borde. Ettan.",
+    "signs": [
+     0
+    ],
+    "note": "Portugal utan krångel",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Jornal de Notícias",
+      "title": "Convocados de Jorge Jesus para Dinamarca e País de Gales",
+      "url": "https://www.jn.pt/desporto/artigo/a-primeira-convocatoria-de-jorge-jesus-apos-o-adeus-de-cristiano-ronaldo/18145295",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Goal",
+      "title": "Denmark boss Brian Riemer opens up on Andreas Christensen injury absence as Barcelona star misses Nations League squad",
+      "url": "https://www.goal.com/en-us/news/denmark-brian-riemer-andreas-christensen-barcelona-nations-league/blt071c74a6b9d6a6bc",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "Tipsbladet PLbold",
+      "title": "Hemmeligt våben i truppen: Riemer afslører stor fordel før de altafgørende kampe",
+      "url": "https://www.plbold.dk/nyhed/hemmeligt-vaaben-i-truppen-riemer-afsloerer-stor-fordel-foer-de-altafgoerende-kampe/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Äsch, Ronaldo hit eller dit. Portugal vann alla fyra gruppmatcherna och vann 4–2 i Köpenhamn utan honom, så avskedet ändrar mindre än folk tror.",
+     "Danmark saknar Christensen och har spelare som riskerar avstängning inför Norge. Sådana spelare går inte in i närkamperna fullt ut. Så er det sagt, som vi sa i Köpenhamn. Ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-13T21:00:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Då är jag jävligt snäll",
+      "Äsch"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861168",
+   "match": "Rumänien – Polen",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T21:00:00.000Z",
+   "text": "Hagi behöver en poäng och har sagt det själv\n\nRumänien har förlorat alla fyra matcherna i gruppen och släppt in 13 mål. När lagen möttes i Polen i oktober vann Polen med 6–0. Nu kommer Robert Lewandowskis lag till Bukarest och behöver vinna för att hänga med i toppen.\n\nGheorghe Hagi har inte haft det lätt sedan han kom tillbaka. Fyra raka förluster i Nations League, och förbundskaptenen har sagt offentligt att om han inte får laget att spela går han hem, skriver G4Media [1]. Han har kallat in 26 spelare, varav bara 8 spelar i hemmaligan, och målvakten Ionuț Radu saknas med en gammal axelskada [2]. Ianis Hagi och Dennis Man är med [2].\n\nPolen är inte heller utan bekymmer. Jan Urban har tagit ut 25 spelare med Robert Lewandowski som kapten, men Jan Bednarek är avstängd och målvakterna Marcin Bułka och Kamil Grabara är skadade [3]. Piotr Zieliński är vicekapten och den som ska hålla ihop mittfältet. Laget vann 6–0 mot Rumänien, men förlorade sedan 0–1 i Bosnien och har gått mållöst i hälften av gruppmatcherna. Tre dagar senare väntar Sverige i Wrocław.\n\nDet är en match mellan ett lag som har tappat tron och ett som har tappat stadgan. Så gjorde vi i Tjäderfors, och där regnade det in. Rumänien vann ändå sin senaste hemmamatch före hösten, 2–1 mot Wales i juni, och Arena Națională är ingen plats där man vinner av farten.\n\nTipset: 2 (Lewandowski räcker)\n\nMarknaden ger Polen oddset 1,92 och Rumänien 4,17, samma odds som för krysset. Rumänien har släppt in 13 mål på fyra matcher och saknar sin bäste målvakt [1]. Polen saknar Bednarek och två målvakter [2], men har Lewandowski och vann med sex mål senast. Ett lag som står på noll poäng och har en förbundskapten som pratar om att gå hem [3] brukar inte vända det på en kväll. Tvåan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Hagi behöver en poäng och har sagt det själv",
+   "lead": "Rumänien har förlorat alla fyra matcherna i gruppen och släppt in 13 mål. När lagen möttes i Polen i oktober vann Polen med 6–0. Nu kommer Robert Lewandowskis lag till Bukarest och behöver vinna för att hänga med i toppen.",
+   "paragraphs": [
+    "Gheorghe Hagi har inte haft det lätt sedan han kom tillbaka. Fyra raka förluster i Nations League, och förbundskaptenen har sagt offentligt att om han inte får laget att spela går han hem, skriver G4Media [1]. Han har kallat in 26 spelare, varav bara 8 spelar i hemmaligan, och målvakten Ionuț Radu saknas med en gammal axelskada [2]. Ianis Hagi och Dennis Man är med [2].",
+    "Polen är inte heller utan bekymmer. Jan Urban har tagit ut 25 spelare med Robert Lewandowski som kapten, men Jan Bednarek är avstängd och målvakterna Marcin Bułka och Kamil Grabara är skadade [3]. Piotr Zieliński är vicekapten och den som ska hålla ihop mittfältet. Laget vann 6–0 mot Rumänien, men förlorade sedan 0–1 i Bosnien och har gått mållöst i hälften av gruppmatcherna. Tre dagar senare väntar Sverige i Wrocław.",
+    "Det är en match mellan ett lag som har tappat tron och ett som har tappat stadgan. Så gjorde vi i Tjäderfors, och där regnade det in. Rumänien vann ändå sin senaste hemmamatch före hösten, 2–1 mot Wales i juni, och Arena Națională är ingen plats där man vinner av farten."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "G4Media",
+     "title": "Lotul României pentru meciurile cu Polonia și Bosnia",
+     "url": "https://www.g4media.ro/lotul-romaniei-pentru-meciurile-cu-polonia-si-bosnia-din-aceasta-luna-ce-schimbari-a-facut-hagi.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Știrile ProTV",
+     "title": "Gheorghe Hagi a anunțat lotul României pentru meciurile din Liga Națiunilor, cu Polonia și Bosnia",
+     "url": "https://stirileprotv.ro/stiri/sport/gheorghe-hagi-a-anuntat-lotul-romaniei-pentru-meciurile-din-liga-natiunilor-cu-polonia-si-bosnia-surprizele-selectionerului.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Wikipedia",
+     "title": "Poland national football team",
+     "url": "https://en.wikipedia.org/wiki/Poland_national_football_team",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Polen oddset 1,92 och Rumänien 4,17, samma odds som för krysset. Rumänien har släppt in 13 mål på fyra matcher och saknar sin bäste målvakt [1]. Polen saknar Bednarek och två målvakter [2], men har Lewandowski och vann med sex mål senast. Ett lag som står på noll poäng och har en förbundskapten som pratar om att gå hem [3] brukar inte vända det på en kväll. Tvåan.",
+    "signs": [
+     2
+    ],
+    "note": "Lewandowski räcker",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Știrile ProTV",
+      "title": "Gheorghe Hagi a anunțat lotul României pentru meciurile din Liga Națiunilor, cu Polonia și Bosnia",
+      "url": "https://stirileprotv.ro/stiri/sport/gheorghe-hagi-a-anuntat-lotul-romaniei-pentru-meciurile-din-liga-natiunilor-cu-polonia-si-bosnia-surprizele-selectionerului.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Wikipedia",
+      "title": "Poland national football team",
+      "url": "https://en.wikipedia.org/wiki/Poland_national_football_team",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "G4Media",
+      "title": "Lotul României pentru meciurile cu Polonia și Bosnia",
+      "url": "https://www.g4media.ro/lotul-romaniei-pentru-meciurile-cu-polonia-si-bosnia-din-aceasta-luna-ce-schimbari-a-facut-hagi.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Rumänien har förlorat alla fyra matcherna och släppt in 13 mål, och förbundskaptenen pratar om att gå hem. Det är ingen organisation, det är ett lag som letar efter en ursäkt.",
+     "Polen saknar Bednarek och två målvakter, men det är lugnt. De har Lewandowski, och de vann med sex mål senast lagen möttes. Tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–2",
+    "tips": "2026-11-13T21:00:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861166",
+   "match": "Sverige – Bosnien & Hercegovina",
+   "avspark": "2026-11-14T19:45Z",
+   "writtenAt": "2026-11-13T21:00:00.000Z",
+   "text": "Bosnien har redan visat att de håller\n\nSverige toppar gruppen med 10 poäng på 4 matcher, och Bosnien & Hercegovina ligger tvåa med 8 utan en enda förlust. När lagen möttes i Zenica i oktober slutade det 1–1. Tre dagar efter matchen i Solna väntar Polen borta.\n\nDet intressanta med kvällen är att Bosnien redan vet hur man står emot Sverige. I Zenica blev det 1–1, och laget har två segrar och två oavgjorda i gruppen. Förbundskaptenen Sergej Barbarez har tagit ut 26 spelare, och Amar Dedić är tillbaka efter sin skada [1]. Barbarez har sagt att andraplatsen var det minsta målet från början, och att en seger på någon av de två sista matcherna räcker för den [2].\n\nGraham Potter har tagit tillbaka Dejan Kulusevski, och Alieu Njie, 21, och Genesis Antwi, 19, är uttagna till A-landslaget för första gången, enligt SVT [3]. Det tycker jag om. I Tjäderfors tog vi en gång upp en pojke från juniorerna dagen före derbyt, och han höll bollen lugnare än alla de gamla, mest för att ingen hade sagt åt honom att vara nervös.\n\nHemma har Sverige vunnit båda sina gruppmatcher, och laget har gjort mål i alla fyra. Sommaren slutade däremot med 0–3 mot Frankrike i VM. Bosnien har hållit nollan i hälften av gruppmatcherna och spelade 0–0 borta mot Polen. Det ser du redan på uppvärmningen: ett lag som inte har förlorat på fyra matcher kommer inte till Strawberry Arena för att titta på taket.\n\nTipset: 1 (hemmaplan avgör)\n\nMarknaden ger Sverige oddset 1,59 och Bosnien 6,67, och det är snålt mot ett lag som inte har förlorat i gruppen och fick 1–1 i oktober. Men Sverige har vunnit båda hemmamatcherna, Kulusevski är tillbaka [1], och Bosnien har mest att förlora på att öppna upp: en seger mot Rumänien hemma tre dagar senare räcker för andraplatsen [2]. Jag tror att gästerna står lågt och väntar, och då vinner det lag som har bollen. Ettan, men jag sover inte gott.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Bosnien har redan visat att de håller",
+   "lead": "Sverige toppar gruppen med 10 poäng på 4 matcher, och Bosnien & Hercegovina ligger tvåa med 8 utan en enda förlust. När lagen möttes i Zenica i oktober slutade det 1–1. Tre dagar efter matchen i Solna väntar Polen borta.",
+   "paragraphs": [
+    "Det intressanta med kvällen är att Bosnien redan vet hur man står emot Sverige. I Zenica blev det 1–1, och laget har två segrar och två oavgjorda i gruppen. Förbundskaptenen Sergej Barbarez har tagit ut 26 spelare, och Amar Dedić är tillbaka efter sin skada [1]. Barbarez har sagt att andraplatsen var det minsta målet från början, och att en seger på någon av de två sista matcherna räcker för den [2].",
+    "Graham Potter har tagit tillbaka Dejan Kulusevski, och Alieu Njie, 21, och Genesis Antwi, 19, är uttagna till A-landslaget för första gången, enligt SVT [3]. Det tycker jag om. I Tjäderfors tog vi en gång upp en pojke från juniorerna dagen före derbyt, och han höll bollen lugnare än alla de gamla, mest för att ingen hade sagt åt honom att vara nervös.",
+    "Hemma har Sverige vunnit båda sina gruppmatcher, och laget har gjort mål i alla fyra. Sommaren slutade däremot med 0–3 mot Frankrike i VM. Bosnien har hållit nollan i hälften av gruppmatcherna och spelade 0–0 borta mot Polen. Det ser du redan på uppvärmningen: ett lag som inte har förlorat på fyra matcher kommer inte till Strawberry Arena för att titta på taket."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sarajevo Times",
+     "title": "Barbarez announces Squad for Matches against Sweden and Romania",
+     "url": "https://sarajevotimes.com/barbarez-announces-squad-for-matches-against-sweden-and-romania/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sarajevo Times",
+     "title": "Barbarez satisfied with players' Form, aims for a win in Sweden",
+     "url": "https://sarajevotimes.com/barbarez-satisfied-with-players-form-aims-for-a-win-in-sweden/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "SVT",
+     "title": "Här är Sveriges Nations League-trupp",
+     "url": "https://www.svt.se/sport/fotboll/har-ar-sveriges-nations-league-trupp-dejan-kulusevski-med-igen",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Marknaden ger Sverige oddset 1,59 och Bosnien 6,67, och det är snålt mot ett lag som inte har förlorat i gruppen och fick 1–1 i oktober. Men Sverige har vunnit båda hemmamatcherna, Kulusevski är tillbaka [1], och Bosnien har mest att förlora på att öppna upp: en seger mot Rumänien hemma tre dagar senare räcker för andraplatsen [2]. Jag tror att gästerna står lågt och väntar, och då vinner det lag som har bollen. Ettan, men jag sover inte gott.",
+    "signs": [
+     0
+    ],
+    "note": "hemmaplan avgör",
+    "sources": [
+     {
+      "n": 1,
+      "source": "SVT",
+      "title": "Här är Sveriges Nations League-trupp",
+      "url": "https://www.svt.se/sport/fotboll/har-ar-sveriges-nations-league-trupp-dejan-kulusevski-med-igen",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sarajevo Times",
+      "title": "Barbarez satisfied with players' Form, aims for a win in Sweden",
+      "url": "https://sarajevotimes.com/barbarez-satisfied-with-players-form-aims-for-a-win-in-sweden/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Bosnien har inte förlorat i gruppen och tog 1–1 mot Sverige i Zenica. Det respekterar jag. Men de vet att en seger mot Rumänien hemma räcker för andraplatsen, och då står de lågt och väntar på misstag.",
+     "Sverige har vunnit båda hemmamatcherna och gjort mål i alla fyra, och Kulusevski är tillbaka. Lugn nu, det här är ett lag som vet vad det ska göra med bollen. Ettan, och då är jag jävligt snäll mot Bosnien."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-13T21:00:00.000Z",
+    "uppdrag": {
+     "fraser": [
+      "Då är jag jävligt snäll",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-13T21:00:00.000Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
