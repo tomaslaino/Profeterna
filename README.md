@@ -1321,8 +1321,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   mässingskroken i fältet på bardiskens front nedanför till höger om honom: fältet är nästan lika
   stort som en löpsedel, och kroken fanns redan. Den är lika oskarp som väggen, och ljuset läses ur
   väggens bild men är dämpat, så att den inte tar uppmärksamheten. Ett klick visar den inzoomad och
-  skarp. Väggen behövde inte bakas om: barstolen står längre till höger, framför fältet bredvid, och
-  är kvar. Se [Hasse Backe](#hasse-backe), *Veckans löpsedel*.
+  skarp. Barstolen längst till höger är borta ("ta bort barstolen vb"): i breda fönster, som en
+  telefon på bredden, stod den precis bredvid ramen. Bara rutan kring den bakades om, i alla sex
+  väggbilder (`RUTA` i scripts/hasse/baka.mjs, `lappa.py`). Se [Hasse Backe](#hasse-backe), *Veckans löpsedel*.
 - **IFK och Chelsea utan prickar (2026-11-11, användarens önskemål):** "både IFK och
   chelsea-löpsedlarna är ju prickiga. Kan du ordna så att de inte är det men att de får rimlig
   patina". Prickrastret (ett rutnät, 2 px) blev ett mönster i närbilden. Nu har de samma papper som
@@ -6882,7 +6883,9 @@ natten som väggen. Papperet reflekterar ungefär tio gånger så mycket som den
 sedeln det ljusaste på väggen; den är därför dämpad och lite gulnad, som glaset i en bar där det röks cigarr (`DAMPA`),
 så att den inte tar uppmärksamheten från honom. Med musen ljusnar den lite. Sedeln är samma som rummet ritar
 (`Rum.lopsedel`), kopierad när rubriken, numret eller slitaget har ändrats. I telefonen på höjden syns bara dess
-vänstra kant vid bildens högra kant, som dörren i rummet.
+vänstra kant vid bildens högra kant, som dörren i rummet. Barstolen som stod framför fältet bredvid, längst till
+höger, är borta: i breda fönster stod den precis intill ramen. Bara rutan kring den bakades om, i alla sex bilder,
+och lades in i de färdiga (se [scripts/hasse/README.md](scripts/hasse/README.md)).
 
 Ett klick på den, eller Enter, förstorar den från fronten till mitt i bilden (`lopNara`), skarp och i fullt ljus i
 sin ram, över baren som mörknar bakom, och namnet uppe i hörnet går undan. Ett klick, Esc, *Tillbaka* i foten eller
@@ -6971,7 +6974,8 @@ slutar – det grå höghuset och tegelhuset med den ärgade kupolen, till höge
 rutor från bardiskens skiva och upp förbi bildens överkant, dragna nedåt och bredare när väggen flyttades bakåt så
 att de är lika stora i bilden (`FONSTER` i
 [public/rum-hasse-scen.js](public/rum-hasse-scen.js)), med karmar och poster i samma mörkgrå som skyltfönstret i
-rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna, och barstolen står kvar. Vädret och ljuset
+rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna (barstolen till höger togs bort 2026-11-13, se
+*Veckans löpsedel*). Vädret och ljuset
 är rummets (`Vader.nu`, `RumUte.light` och färgerna i `RumUte.farg`, samma som gatan genom skyltfönstret): himlens
 färger efter klockan, molnen, den låga solens sken, den kalla dagen, tända fönster och lyktor när det skymmer, en
 grön skylt och en röd lampa på höghuset på kvällen, regn och snö som ett dis, dimma som tar andra sidan, snö på
