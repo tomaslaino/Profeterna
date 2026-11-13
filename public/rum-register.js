@@ -27,12 +27,14 @@
 //              skadade), och en spelare spelarkortet: läget, speltiden, mål
 //              och xG, och hur laget har gått med och utan honom i startelvan
 //              mot oddsen (mu i data/players/<division>.json)
-// Längst ner står sökraden (SÖK >). Den svarar medan man skriver: träffarna
+// Längst ner står sökraden (SÖK >). Den svarar medan man skriver: alla träffar
 // (lag och spelare i alla divisionerna, omgångens möten, topplistorna och
-// flikarna) står i utskriften med den bästa markerad, och Enter öppnar den.
-// Felstavat går också (MENADE DU), laget kan stå med (saka arsenal), och
-// smeknamnen (spurs, wolves) hittar lagen. En siffra och Enter väljer raden med
-// det numret. Under den står tangenterna: Esc tillbaka (och stänger överst),
+// flikarna) står i utskriften, den mest sannolika överst och markerad och
+// sedan i fallande led, och Enter öppnar den markerade. Raden överst väljer
+// kategori (ALLA, LAG, SPELARE, MÖTEN, LISTOR; Tab byter). Felstavat går också
+// (MENADE DU), laget kan stå med (saka arsenal), och smeknamnen (spurs, wolves)
+// hittar lagen. En siffra och Enter väljer raden med det numret. Under den
+// står tangenterna: Esc tillbaka (och stänger överst),
 // ↑/↓ och Enter väljer en rad, ←/→ bläddrar till förra och nästa match, lista,
 // division, lag eller spelare i truppen, och bland flikarna överst. I telefonen
 // räcker det att trycka: allt går att trycka på, och raden längst ner har
@@ -173,7 +175,7 @@ window.RumRegister = (() => {
 
   function html(rader) {
     return rader.map((r) => (r.length === 1 && r[0][1] === 'hr' ? '<div class="tr hr"></div>'
-      : `<div class="tr${r.q ? ' a' : ''}"${r.q ? ` data-q="${esc(r.q)}"` : ''}>${r.map(bit).join('')}</div>`)).join('');
+      : `<div class="tr${r.q ? ' a' : ''}${r.kat ? ' kat' : ''}"${r.q ? ` data-q="${esc(r.q)}"` : ''}>${r.map(bit).join('')}</div>`)).join('');
   }
 
   // ---------- duken och närbilden ----------
@@ -193,7 +195,7 @@ window.RumRegister = (() => {
   // ---------- i rummet ----------
 
   function mount(root, o) {
-    const A = { on: false, ms: [], all: [], byTeam: new Map(), match: new Map(), stats: null, byEspn: new Map(), loaded: 0, L: null, P: null, vy: { flik: 'kupongen' }, bak: [], ut: '', lista: [], nr: 0, sk: 0, sel: -1, bred: BRED, R: null };
+    const A = { on: false, ms: [], all: [], byTeam: new Map(), match: new Map(), stats: null, byEspn: new Map(), loaded: 0, L: null, P: null, vy: { flik: 'kupongen' }, kat: 'alla', bak: [], ut: '', lista: [], nr: 0, sk: 0, sel: -1, bred: BRED, R: null };
     const small = root.querySelector('#rum-reg');
     const duk = root.querySelector('#reg-duk');
     const ov = root.querySelector('#rum-regn');
@@ -678,24 +680,58 @@ window.RumRegister = (() => {
 
     // ---------- sökningen ----------
     //
-    // Sökningen svarar medan man skriver: träffarna står i utskriften med den
-    // bästa markerad, och Enter öppnar den (↑/↓ väljer en annan). Den hittar
-    // lag och spelare i alla fyra divisionerna, omgångens möten (två lag),
-    // topplistorna, flikarna och divisionerna. Felstavat går också: hittas
-    // inget står MENADE DU över det som ligger närmast.
+    // Sökningen svarar medan man skriver: alla träffar står i utskriften, den
+    // mest sannolika överst och sedan i fallande led, och Enter öppnar den
+    // markerade (↑/↓ väljer en annan). Den hittar lag och spelare i alla fyra
+    // divisionerna, omgångens möten (två lag), topplistorna, flikarna och
+    // divisionerna, och raden överst väljer kategori (Tab byter). Felstavat
+    // går också: hittas inget står MENADE DU över det som ligger närmast.
+    //
+    // Hur sannolik en träff är (p, högre är troligare) är två delar lagda
+    // ihop: hur väl frågan passar namnet (passar) och hur ofta man söker
+    // något sådant (TROLIGT och DIVPLUS). Så går burn → Burnley före Dan Burn
+    // (ett lag före en spelare, fast bara början av namnet), och isak → Isak
+    // före Isaksen och Isak Alemayehu.
 
-    // Varje ord i frågan ska vara ett ord i namnet (nivå 0) eller börja ett
-    // (nivå 1); annars namnet hopskrivet (mac allister = macallister, nivå 2).
-    // Bara den bästa nivån visas, så att isak ger Isak och inte Isaksen.
-    function poang(q, t, hel) {
+    // Ett ord som bara börjar ett ord i namnet: mindre ju fler bokstäver som fattas
+    const BORJAN = (rest) => 0.1 + 0.05 * Math.min(rest, 8);
+    // Hur väl frågans ord passar namnets: 0 när varje ord är ett ord i namnet,
+    // minus BORJAN för ett ord som bara börjar ett, -0,8 när namnet är
+    // hopskrivet (mac allister = macallister), och null när det inte passar.
+    // Hela namnet ger 0,3 till. ef är en spelares efternamn: träffar frågan
+    // inte det dras 0,25 av (isak = Isak, inte Isak Alemayehu i första hand).
+    function passar(q, t, hel, ef) {
       let s = 0;
+      let iEf = !ef;
       for (const w of q) {
-        if (t.includes(w)) continue;
-        if (t.some((x) => x.startsWith(w))) { s = 1; continue; }
-        const ihop = q.join('');
-        return ihop.length > 3 && (hel.replace(/ /g, '').startsWith(ihop) || t.some((x) => x.startsWith(ihop))) ? 2 : null;
+        let minus = null;
+        let ord = null;
+        for (const x of t) {
+          if (!x.startsWith(w)) continue;
+          const m = x === w ? 0 : BORJAN(x.length - w.length);
+          if (minus == null || m < minus || (m === minus && ef && ef.includes(x))) { minus = m; ord = x; }
+        }
+        if (minus == null) {
+          const ihop = q.join('');
+          return ihop.length > 3 && (hel.replace(/ /g, '').startsWith(ihop) || t.some((x) => x.startsWith(ihop))) ? -0.8 : null;
+        }
+        s -= minus;
+        if (ef && ef.includes(ord)) iEf = true;
       }
-      return s;
+      return s - (iEf ? 0 : 0.25) + (q.join(' ') === hel ? 0.3 : 0);
+    }
+    // Hur ofta man söker något av slaget: ett möte (två lag i frågan) är nästan
+    // säkert det man menar, en flik eller topplista när frågan är dess ord, och
+    // lag söks oftare än spelare. Lagen högre upp i ligasystemet lite före, och
+    // spelarna efter speltid (full vid 1 500 minuter); lag och spelare i
+    // omgången också lite före.
+    const TROLIGT = { mote: 0.6, del: 0.2, lag: 0, spelare: -0.6 };
+    const DIVPLUS = { pl: 0.1, ch: 0.05, l1: 0.02, l2: 0 };
+    // efternamnets ord (som efternamn(): van, de … hör till efternamnet)
+    function efOrd(t) {
+      let i = t.length - 1;
+      while (i > 1 && /^(van|von|de|der|den|da|das|do|dos|di|del|la|le|mac|bin|ter|ten)$/.test(t[i - 1])) i--;
+      return t.slice(i);
     }
     // Avståndet mellan två ord (byten, tillägg, struckna och omkastade
     // bokstäver), eller null när det är större än k
@@ -760,23 +796,30 @@ window.RumRegister = (() => {
       { namn: 'MOTSTÅND', typ: 'TOPPLISTA', q: '#amne:motstand', ord: ['motstand', 'motstandet'] },
       ...DIVS.map((d) => ({ namn: up(DIVNAME[d]), typ: 'DIVISION', q: `#div:${d}`, ord: [norm(DIVNAME[d]), d, { pl: 'premier', ch: 'champ', l1: 'league 1', l2: 'league 2' }[d]] })),
     ];
+    // Alla träffar på frågan, den mest sannolika först (p, se ovan)
     function sok(text) {
       const qn = norm(text);
       const q = qn.split(' ').filter(Boolean);
       if (!q.length) return [];
       const hits = [];
       const lag = [...(A.stats || new Map()).values()];
+      const iOmg = new Set(omgLag());
       const namnen = (t) => { const a = norm(t.name); const b = norm(o.kort(t.name)); return a === b ? [a] : [a, b]; };
       const lagTok = (t) => [...namnen(t).join(' ').split(' '), ...(ALIAS[t.name] ? [ALIAS[t.name]] : [])];
+      const lagPlus = (t) => TROLIGT.lag + (DIVPLUS[t.comp] || 0) + (iOmg.has(t.name) ? 0.1 : 0);
+      const spelPlus = (x) => TROLIGT.spelare + 0.2 * Math.min(1, (x.p.min || 0) / 1500) + (DIVPLUS[x.div] || 0) + (iOmg.has(x.p.team) ? 0.05 : 0);
       for (const d of DELAR) {
-        const s = d.ord.includes(qn) ? 0 : qn.length >= 3 && d.ord.some((x) => x.startsWith(qn)) ? 1 : null;
-        if (s != null) hits.push({ typ: 'del', d, niva: s, s: -1 });
+        // hela ordet, eller början av det från tre bokstäver
+        const rest = d.ord.includes(qn) ? -1 : qn.length >= 3 ? Math.min(...d.ord.filter((x) => x.startsWith(qn)).map((x) => x.length - qn.length)) : Infinity;
+        if (rest < Infinity) hits.push({ typ: 'del', d, p: TROLIGT.del + (rest < 0 ? 0.3 : -BORJAN(rest)) });
       }
       for (const t of lag) {
-        let best = null;
-        for (const n of namnen(t)) { const s = poang(q, n.split(' '), n); if (s != null && (best == null || s < best)) best = s; }
-        if (best == null && ALIAS[t.name] && q.length === 1 && ALIAS[t.name].startsWith(q[0])) best = ALIAS[t.name] === q[0] ? 0 : 1;
-        if (best != null) hits.push({ typ: 'lag', t, niva: best, s: -(namnen(t).includes(qn) ? 3 : 0) - 0.5 - (iOmgangen(t.name) ? 0.2 : 0) });
+        let s = null;
+        for (const n of [...namnen(t), ...(ALIAS[t.name] ? [ALIAS[t.name]] : [])]) {
+          const v = passar(q, n.split(' '), n);
+          if (v != null && (s == null || v > s)) s = v;
+        }
+        if (s != null) hits.push({ typ: 'lag', t, p: s + lagPlus(t) });
       }
       // ett möte i omgången: båda lagen ur frågan
       for (const m of A.ms) {
@@ -784,37 +827,36 @@ window.RumRegister = (() => {
         const b = [m.away, o.kort(m.away)].map(norm).join(' ').split(' ');
         const iH = (w) => h.some((x) => x.startsWith(w));
         const iB = (w) => b.some((x) => x.startsWith(w));
-        if (q.length > 1 && q.every((w) => iH(w) || iB(w)) && q.some((w) => iH(w) && !iB(w)) && q.some((w) => iB(w) && !iH(w))) hits.push({ typ: 'mote', m, niva: 0, s: -5 });
+        if (q.length > 1 && q.every((w) => iH(w) || iB(w)) && q.some((w) => iH(w) && !iB(w)) && q.some((w) => iB(w) && !iH(w))) hits.push({ typ: 'mote', m, p: TROLIGT.mote });
       }
       if (A.P) for (const x of A.P.spelare) {
-        let s = poang(q, x.t, x.n);
-        // med laget i frågan (saka arsenal, bowen west ham)
+        if (!x.ef) x.ef = efOrd(x.t);
+        let s = passar(q, x.t, x.n, x.ef);
+        // med laget i frågan (saka arsenal, bowen west ham): laget gör det troligare
         if (s == null && q.length > 1) {
           if (!x.lt) x.lt = [norm(x.p.team), norm(o.kort(x.p.team))].join(' ').split(' ');
           const rest = q.filter((w) => !x.lt.some((y) => y.startsWith(w)));
-          if (rest.length && rest.length < q.length) s = poang(rest, x.t, x.n);
+          if (rest.length && rest.length < q.length) { s = passar(rest, x.t, x.n, x.ef); if (s != null) s += 0.1; }
         }
-        if (s == null) continue;
-        // efternamnet först (isak = Isak, inte Isak Alemayehu), och den som spelar mest
-        const sist = x.t[x.t.length - 1];
-        hits.push({ typ: 'spelare', x, niva: s === 0 && q.length === 1 && q[0] !== sist ? 0.5 : s, s: -(x.n === qn ? 3 : 0) - (q.includes(sist) ? 0.6 : 0) - Math.min(0.4, (x.p.min || 0) / 3000) - (iOmgangen(x.p.team) ? 0.1 : 0) });
+        if (s != null) hits.push({ typ: 'spelare', x, p: s + spelPlus(x) });
       }
-      // inget alls: det som ligger närmast (felstavat)
-      if (!hits.length) {
+      // inget alls: det som ligger närmast (felstavat), mindre troligt ju längre bort
+      const luddigt = !hits.length;
+      if (luddigt) {
         for (const t of lag) {
           const d = luddig(q, lagTok(t));
-          if (d != null) hits.push({ typ: 'lag', t, niva: 3, s: d - 0.5 });
+          if (d != null) hits.push({ typ: 'lag', t, p: lagPlus(t) - 1.2 - 0.4 * d });
         }
         if (A.P) for (const x of A.P.spelare) {
           const d = luddig(q, x.t);
-          if (d != null) hits.push({ typ: 'spelare', x, niva: 3, s: d - Math.min(0.4, (x.p.min || 0) / 3000) });
+          if (d != null) hits.push({ typ: 'spelare', x, p: spelPlus(x) - 1.2 - 0.4 * d });
         }
       }
-      const bast = Math.min(...hits.map((h) => h.niva));
-      const ut = hits.filter((h) => h.niva === bast).sort((a, b) => a.s - b.s);
-      ut.luddig = bast === 3;
+      const ut = hits.sort((a, b) => b.p - a.p || traffNamn(a).localeCompare(traffNamn(b), 'sv'));
+      ut.luddig = luddigt && ut.length > 0;
       return ut;
     }
+    const traffNamn = (h) => (h.typ === 'lag' ? h.t.name : h.typ === 'spelare' ? efternamn(h.x.p.name) : h.typ === 'mote' ? h.m.home : h.d.namn);
     // träffen som en vy (i sin flik)
     const vyFor = (h) => (h.typ === 'lag' ? { flik: 'lagen', lag: h.t.name } : h.typ === 'mote' ? { flik: 'kupongen', mote: h.m.id } : h.typ === 'del' ? vyAv(h.d.q) : { flik: 'lagen', spelare: String(h.x.p.id) });
     function listrad(h, i) {
@@ -826,13 +868,47 @@ window.RumRegister = (() => {
       if (h.typ === 'del') return radQ(q, nr, pad(h.d.namn, W), [h.d.typ, 'd']);
       return radQ(q, nr, pad(efternamn(h.x.p.name).slice(0, W - 1), W), [kort(h.x.p.team), 'd']);
     }
+    // Kategorierna i sökningen: alla träffar eller ett slag (träffens typ).
+    // Den valda gäller medan man skriver, och så länge den har träffar.
+    const KATEGORIER = [['alla', 'ALLA'], ['lag', 'LAG'], ['spelare', 'SPELARE'], ['mote', 'MÖTEN'], ['del', 'LISTOR']];
+    const antal = (h, id) => (id === 'alla' ? h.length : h.filter((x) => x.typ === id).length);
+    // kategorin som visas (alla när den valda är tom) och dess träffar, i samma ordning
+    function iKat(h) {
+      const k = A.kat !== 'alla' && antal(h, A.kat) ? A.kat : 'alla';
+      return { k, l: k === 'alla' ? h : h.filter((x) => x.typ === k) };
+    }
+    // Raden med kategorierna, som topplistornas: den valda omvänd och de
+    // tomma svaga, med antalet träffar när raden ryms. Den är inte med när
+    // ↑/↓ väljer (.kat), så att den markerade träffen är den troligaste.
+    function katRad(h, k) {
+      const med = KATEGORIER.reduce((s, [id, namn]) => s + namn.length + 1 + String(antal(h, id)).length + 3, -3) <= A.bred;
+      const r = rad(...KATEGORIER.flatMap(([id, namn], j) => {
+        const n = antal(h, id);
+        return [[med ? `${namn} ${n}` : namn, id === k ? 'i' : n ? '' : 'd', id === k || !n ? null : `#kat:${id}`], [j < KATEGORIER.length - 1 ? '   ' : '', '']];
+      }));
+      r.kat = true;
+      return r;
+    }
+    // byt kategori (Tab, Skift-Tab), bland dem som har träffar
+    function bytKat(d) {
+      const h = A.vy.hits || [];
+      const ids = KATEGORIER.map(([id]) => id).filter((id) => antal(h, id));
+      if (ids.length < 2) return;
+      const i = ids.indexOf(iKat(h).k);
+      A.kat = ids[(i + d + ids.length) % ids.length];
+      visa(A.vy, false);
+      valj(0, false);
+    }
     function traffLista(vy, R) {
       const h = vy.hits || [];
-      const r = [h.luddig ? rad([`INGET PÅ ${up(vy.eko)}. MENADE DU:`.slice(0, A.bred), 'd']) : prickar('SÖKER I REGISTRET', traffar(h.length), A.bred)];
-      if (!h.length) return r;
+      const { k, l } = iKat(h);
+      // (de numrerade raderna: en siffra och Enter, och #1 … i vyAv)
+      A.lista = l.slice(0, LISTA);
+      const r = [katRad(h, k), streck(), h.luddig ? rad([`INGET PÅ ${up(vy.eko)}. MENADE DU:`.slice(0, A.bred), 'd']) : prickar('SÖKER I REGISTRET', traffar(l.length), A.bred)];
+      if (!l.length) return r;
       r.push(tom());
-      h.slice(0, LISTA).forEach((x, i) => { R.nr[i + 1] = `#${i + 1}`; r.push(listrad(x, i)); });
-      if (h.length > LISTA) r.push(rad([`    OCH ${h.length - LISTA} TILL`, 'd']));
+      A.lista.forEach((x, i) => { R.nr[i + 1] = `#${i + 1}`; r.push(listrad(x, i)); });
+      if (l.length > LISTA) r.push(rad([`    OCH ${l.length - LISTA} TILL`, 'd']));
       return r;
     }
 
@@ -878,6 +954,7 @@ window.RumRegister = (() => {
         b.push([k ? '← FÖRRA' : '◄ FÖRRA', R.sido[0] ? '#sido:-1' : null, !R.sido[0]]);
         b.push([k ? 'NÄSTA →' : 'NÄSTA ►', R.sido[1] ? '#sido:1' : null, !R.sido[1]]);
       } else if (k && rot) b.push(['←→ FLIKARNA', null]);
+      if (k && A.vy.flik === 'sok' && KATEGORIER.filter(([id]) => antal(A.vy.hits || [], id)).length > 1) b.push(['TAB KATEGORI', null]);
       if (k && Object.keys(R.nr).length) b.push(['↑↓ VÄLJ   ↵ ÖPPNA', null]);
       return b.map(([t, q, av]) => `<span${q ? ` class="a" data-q="${esc(q)}"` : av ? ' class="av"' : ''}>${esc(t)}</span>`).join('');
     }
@@ -889,6 +966,8 @@ window.RumRegister = (() => {
     function visa(vy, skriv) {
       A.vy = vy;
       A.sel = -1;
+      // (en ny sökning börjar med alla träffar)
+      if (vy.flik !== 'sok') A.kat = 'alla';
       A.nr++;
       const sk = ++A.sk;
       const R = bygg(vy);
@@ -968,6 +1047,11 @@ window.RumRegister = (() => {
     function tryck(q) {
       const iSok = A.vy.flik === 'sok';
       const fore = A.fore || { flik: 'kupongen' };
+      // en kategori i sökningen: frågan står kvar
+      if (q.startsWith('#kat:')) {
+        if (iSok) { A.kat = q.slice(5); visa(A.vy, false); valj(0, false); }
+        return null;
+      }
       if (iSok) { inp.value = ''; markor(); }
       if (q === '#bak') { if (iSok) { visa(fore, true); return null; } return tillbaka(); }
       if (q === '#stang') return o.close();
@@ -998,7 +1082,6 @@ window.RumRegister = (() => {
       if (A.vy.flik !== 'sok') A.fore = A.vy;
       if (!A.P) loadPlayers().then(() => { if (A.on && inp.value.trim() === v) levande(); });
       const hits = sok(v);
-      A.lista = hits.slice(0, LISTA);
       visa({ flik: 'sok', eko: v, hits }, false);
       valj(0, false);
     }
@@ -1015,6 +1098,7 @@ window.RumRegister = (() => {
       await loadPlayers();
       const hits = sok(eko.replace(/^(sök|sok)\s+/i, ''));
       if (A.vy.flik !== 'sok') A.fore = A.vy;
+      A.kat = 'alla';
       A.lista = hits.slice(0, LISTA);
       if (hits.length === 1) { A.vy = { flik: 'sok' }; tryck('#1'); return; }
       visa({ flik: 'sok', eko, hits }, true);
@@ -1057,7 +1141,7 @@ window.RumRegister = (() => {
     inp.addEventListener('input', levande);
 
     // ↑/↓: raden som Enter öppnar (de tryckbara raderna och namnen i ordning)
-    const valbara = () => [...ut.querySelectorAll('[data-q]')];
+    const valbara = () => [...ut.querySelectorAll('[data-q]')].filter((el) => !el.closest('.kat'));
     function valj(i, rulla = true) {
       const l = valbara();
       for (const el of ut.querySelectorAll('.sel')) el.classList.remove('sel');
@@ -1104,6 +1188,8 @@ window.RumRegister = (() => {
       }
       if (k === 'ArrowUp' || k === 'ArrowDown') { valj(A.sel + (k === 'ArrowDown' ? 1 : -1)); return true; }
       if ((k === 'ArrowLeft' || k === 'ArrowRight') && tomt && !iSok) { sido(k === 'ArrowRight' ? 1 : -1); return true; }
+      // i sökningen: kategorierna
+      if (k === 'Tab' && iSok) { bytKat(e.shiftKey ? -1 : 1); return true; }
       if (k === 'Tab') {
         const i = FLIKAR.findIndex(([id]) => id === (iSok ? (A.fore || {}).flik : A.vy.flik));
         inp.value = '';
