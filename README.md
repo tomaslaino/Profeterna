@@ -3075,6 +3075,18 @@ utom rummets websocket (workers.dev). Tjänsten (worker/) behöver driftsättas 
 gälla när omgången startas av sig själv – utan driftsättning knyts ändå Svenska Spels vanliga stavning (*Bosnien &
 Hercegovina*, *Nordirland*, *Irland*) som förut.
 
+**Matchrutan för en landskamp** (2026-11-13, samma önskemål): Prognos-fliken heter *Marknadens prognos efter 90
+minuter* (`kind: 'marknaden'`), med DraftKings odds under rutorna och förklaringen under; stegen finns inte. Form
+visar formen, de inbördes mötena och – nytt – *Senaste landskamperna* för båda lagen sida vid sida (`landSenaste`,
+de tio i `senaste`, @ = borta). Fliken *Tabellen* visar gruppen i Nations League ur data/landslag.json
+(`groupFill`, med matchens lag markerade; båda grupperna när lagen spelar i olika). Spoilerskyddet döljer
+resultaten i de senaste landskamperna men inte gruppens tabell. Startelvorna och frånvaron hämtas från 365Scores som
+för klubbarna: `COMP365` har UEFA Nations League (7016) och Friendly International (570) – EM-kvalet saknar id tills
+det börjar i mars 2027 – och lagen jämförs med ESPN:s engelska namn (`land.en`), eftersom 365Scores skriver
+*Sweden*. Landskamperna har en trolig elva några dagar före (`PROBABLE`). Provat 2026-11-13 i huvudlös Chromium:
+trolig elva och frånvaro för alla sju landskamper på Stryktipset, i 1440 och 390 bredd. Flaggorna i rubriken och
+matchlistan kommer från sköldarnas källa, som inte nås från molnmiljön – de är inte provade här.
+
 ### Ladda upp system
 
 I appen och på hemskärmen går det också att dela skärmbilden direkt från telefonens bilder eller

@@ -405,3 +405,23 @@ button.mr-pl:focus-visible, .mr-card:focus-visible { outline: 2px solid var(--ac
 @media (prefers-reduced-motion: reduce) {
   .mr-live i { animation: none; }
 }
+
+/* Senaste landskamperna (Form, en landskamp, 2026-11-13): båda lagen sida vid
+   sida, datum och turnering, motståndaren (@ = borta) och resultatet i
+   formens färger. */
+dialog.mr-modal .mf-land h5 { margin: 0 0 6px; }
+dialog.mr-modal .land-sen { margin: 0; padding: 0; list-style: none; }
+dialog.mr-modal .land-sen li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--hair);
+}
+dialog.mr-modal .land-sen li:last-child { border-bottom: 0; }
+dialog.mr-modal .land-sen .w { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+dialog.mr-modal .land-sen .h { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+dialog.mr-modal .land-sen b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+dialog.mr-modal .land-sen b.V { color: var(--win, #2e7d4f); }
+dialog.mr-modal .land-sen b.F { color: var(--loss, #b3412e); }
