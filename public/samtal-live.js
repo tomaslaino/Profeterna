@@ -40,6 +40,8 @@ window.SamtalLive = (() => {
       }
       for (const id of op.klubba || []) if (!l.klar.includes(id)) l.klar.push(id);
       if (op.sparad) l.sparad = op.sparad;
+      // matchen på lappen, tills tjänsten har räknat upp sin valdV
+      if ('vald' in op) Object.assign(l, { vald: op.vald, valdAv: L.vem, valdV: `n${op.n}` });
     }
     return l;
   }

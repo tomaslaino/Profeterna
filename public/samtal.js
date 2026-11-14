@@ -70,6 +70,8 @@
     lyft: null, // vems tips som lyfts fram på papperet (ett tryck på porträttet överst)
     nyBock: null, // den omtvistade match som just klubbades: bocken dras när papperet ritas om
     vald: undefined, // matchen vars lapp är framme i uppgörelsen; null = ingen, undefined = nästa omtvistade
+    valdAv: null, // vem som tog fram matchen på lappen, hos alla (null = du, eller ingen)
+    valdV: null, // den senaste matchen på lappen från tjänsten (omgång:valdV), så att den bara följs en gång
     rumVald: false, // du har sagt vem du är under besöket (bytVem): först då är du någon i tobaksaffären (me)
     iRum: false, // tobaksaffären frågar (Samtal.pult)
   };
@@ -726,10 +728,13 @@
     const pen = penOf(s, id, w);
     const klubbad = r.strid && done.has(id);
     const nasta = nastaRad(rows, done, id);
+    // någon annan tog fram matchen, hos alla (valj)
+    const av = SM.valdAv && SM.vald === id ? SM.valdAv : null;
+    const tagen = av ? `<span class="sm-lapp-av sm-k${pnum(av)}">${face(av, false)}<span><b>${esc(Tippoang.kallas(person(av)))}</b> tog fram den</span></span>` : '';
     const go = r.strid && !klubbad ? '<button type="button" class="kp-btn primary" id="sm-klubba">Klubba</button>'
       : nasta ? '<button type="button" class="kp-btn" id="sm-nasta">Nästa</button>' : '';
     return `<div class="sm-lapp${klubbad ? ' klubbad' : ''}" data-id="${esc(id)}"><button type="button" class="sm-lapp-x" id="sm-lapp-x" aria-label="Stäng">×</button>` +
-      `<p class="sm-lapp-m"><b>${s.matcher.findIndex((x) => x.id === id) + 1}</b>${namn}</p><p class="sm-lapp-i">${when}` +
+      `<p class="sm-lapp-m"><b>${s.matcher.findIndex((x) => x.id === id) + 1}</b>${namn}</p><p class="sm-lapp-i">${when}${tagen}` +
       (r.g.pr ? `<span class="sm-lapp-odds${isMk(r.m) ? ' mk' : ''}"${isMk(r.m) ? ` title="${esc(MK_TITLE)}"` : ''}>${SIGNS.map((sg, i) => `<span><i>${sg}</i>${pctOdds(r.g.pr[i])}</span>`).join('')}</span>` : '') + '</p>' + spelLapp(s, id) +
       (fr || go ? `<div class="sm-lapp-g"><p class="sm-lapp-q">${fr}</p>${go}</div>` : '') +
       [...r.notes, ...afterOf(s, id, w)].map((o) => `<span class="sm-said sm-k${pnum(o.k)}">${face(o.k)}<span>${esc(o.text)}</span></span>`).join('') +
@@ -827,6 +832,15 @@
     const rows = analyse(s);
     SamtalLive.skicka({ ...op, bas: { val: decisions(s, rows), klar: [...klar(s, rows)] } });
   }
+  // Matchen på lappen kommer fram hos alla som ser kupongen – i telefon pratar ni
+  // om samma match. Den senaste som tar fram en match bestämmer, som med kryssen.
+  // Att stänga lappen (krysset) gör man bara hos sig själv. op: mer i samma
+  // meddelande, till exempel tecknet i matchen.
+  function valj(s, id, op = {}) {
+    SM.vald = id;
+    SM.valdAv = null;
+    dela(s, { ...op, vald: id });
+  }
   // Läget i tjänsten ändrades: någon har kryssat, eller du, när svaret skiljer
   // sig från det du ser.
   function tagEmot(lage, egen) {
@@ -839,6 +853,19 @@
       return;
     }
     if (lage.id !== s.id) return;
+    // Någon tog fram en match (valj): lappen följer med, en gång per gång – utom
+    // medan du skriver på lappen.
+    let lappNy = false;
+    const vv = lage.valdV != null ? `${lage.id}:${lage.valdV}` : null;
+    if (vv && vv !== SM.valdV) {
+      SM.valdV = vv;
+      const skriver = document.activeElement && document.activeElement.closest && document.activeElement.closest('#sm-lapp input');
+      if (lage.vald !== SM.vald && !skriver) {
+        SM.vald = lage.vald;
+        SM.valdAv = lage.valdAv && lage.valdAv !== me() ? lage.valdAv : null;
+        lappNy = true;
+      }
+    }
     const rows = analyse(s);
     const forr = decisions(s, rows);
     const forrK = klar(s, rows);
@@ -849,14 +876,15 @@
     const nuK = klar(s, rows);
     const andrat = rows.filter((r) => (forr[r.x.id] || '') !== (nu[r.x.id] || '')).map((r) => r.x.id);
     const klubbat = rows.filter((r) => forrK.has(r.x.id) !== nuK.has(r.x.id)).map((r) => r.x.id);
-    if (!andrat.length && !klubbat.length && !sparad) return;
+    const kupong = andrat.length || klubbat.length || sparad;
+    if (!kupong && !lappNy) return;
     const av = egen ? null : lage.av;
-    SM.again = false;
+    if (kupong) SM.again = false;
     if (here('')) ritaLive(s, rows, av, andrat);
     else if (onHome() && (klubbat.length || sparad)) redraw();
     else if (sparad && KP.view && KP.view.mode === 'show') redraw();
     // kupongen på pulten och i handen i tobaksaffären (rum.js)
-    dispatchEvent(new CustomEvent('gangets-kupong', { detail: { andrat, av: av && pnum(av) } }));
+    if (kupong) dispatchEvent(new CustomEvent('gangets-kupong', { detail: { andrat, av: av && pnum(av) } }));
   }
   // Papperet i uppgörelsen ritas om där något har ändrats: rutorna, bocken och
   // foten. Porträtten blinkar inte, och det du skriver eller läser står kvar.
@@ -1344,13 +1372,13 @@
           rad.classList.add('klubbad');
           rad.querySelector('.pp-nr').insertAdjacentHTML('beforeend', bock(id, true));
         }
-        SM.vald = nastaRad(rows, klar(s, rows), id);
+        valj(s, nastaRad(rows, klar(s, rows), id));
         visaLapp(s);
         return;
       }
       if (e.target.closest('#sm-nasta')) {
         const rows = analyse(s);
-        SM.vald = nastaRad(rows, klar(s, rows), el.querySelector('.sm-lapp').dataset.id);
+        valj(s, nastaRad(rows, klar(s, rows), el.querySelector('.sm-lapp').dataset.id));
         visaLapp(s);
         return;
       }
@@ -1380,13 +1408,16 @@
       const rad = val ? val.closest('.sm-r') : !b && !e.target.closest('a, button, input, label') && e.target.closest('.sm-hog .sm-r:not(.sm-hd)');
       if (rad) {
         const rows = analyse(s);
-        SM.vald = valdRad(rows, klar(s, rows)) === rad.dataset.id ? null : rad.dataset.id;
+        // en ny match kommer fram hos alla; samma match igen stänger lappen här
+        if (valdRad(rows, klar(s, rows)) === rad.dataset.id) SM.vald = null;
+        else valj(s, rad.dataset.id);
         visaLapp(s);
         return;
       }
       if (!b || b.disabled) return;
       const id = b.closest('[data-id]').dataset.id;
-      SM.vald = id; // lappen följer med dit pennan är
+      SM.vald = id; // lappen följer med dit pennan är, hos alla (vald i dela nedan)
+      SM.valdAv = null;
       // en omtvistad match är klubbad när gängets tecken i den ändras
       if (b.closest('.sm-r.strid:not(.klubbad)')) {
         klubba(s, id);
@@ -1398,7 +1429,7 @@
       if (next) saved.val[id] = next;
       else delete saved.val[id];
       kpStore(DECIDE, saved);
-      dela(s, { match: id, tecken: next });
+      dela(s, { match: id, tecken: next, vald: id });
       SM.again = false;
       renderRound();
     });
@@ -2449,7 +2480,10 @@
       if (tecken) saved.val[id] = tecken;
       else delete saved.val[id];
       kpStore(DECIDE, saved);
-      dela(s, { match: id, tecken });
+      // lappen på papperet följer med dit pennan är, också hos de andra
+      SM.vald = id;
+      SM.valdAv = null;
+      dela(s, { match: id, tecken, vald: id });
     },
     // En omtvistad match är klubbad, som ett klick på raden här (klubba).
     klubba(id) {

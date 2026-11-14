@@ -562,6 +562,12 @@ button.sm-svar-p[aria-pressed="true"] { background: color-mix(in srgb, var(--ink
 .sm-lapp-m a.pp-t:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .sm-lapp-i { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 14px; margin: 0 34px 0 0; }
 .sm-lapp-i .pp-small { margin: 0; }
+/* Någon annan tog fram matchen på lappen (valj i samtal.js): porträttet och namnet i hens bläck */
+.sm-lapp-av { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--pp-ink-soft); animation: sm-tagen 1.8s ease-out; }
+.sm-lapp-av b { font-weight: 600; color: var(--ink); }
+.sm-lapp-av .sm-fc { --fc: 16px; box-shadow: 0 0 0 1.5px var(--ink); }
+@keyframes sm-tagen { from { opacity: 0; transform: translateY(2px); } 25% { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sm-lapp-av { animation: none; } }
 .sm-lapp-g { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 6px; }
 .sm-lapp-q { flex: 1 1 auto; min-width: 0; margin: 0; font-family: var(--pp-hand); font-size: 23px; font-weight: 600; line-height: 1.08; color: var(--pp-pencil); }
 .sm-lapp-q b { display: block; font-weight: 700; color: var(--ink); }

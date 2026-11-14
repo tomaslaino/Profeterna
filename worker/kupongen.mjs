@@ -13,13 +13,17 @@
 //   → {n, sparad: {coupon, older}}   gängets kupong är sparad (valfritt ihop med
 //                                    satt), så att allas knapp blir Sparad utan
 //                                    att vänta på bygget
+//   → {n, vald: id | null}           matchen på lappen, samma hos alla (null =
+//                                    ingen); kan följa med ett tecken
 //   → {bas: {val, klar}}             kan följa med vad som helst: det sidan utgår
 //                                    från, och gäller bara när läget saknas (den
 //                                    första som kryssar utgår från förslaget)
 //   ← {lage, kvitto} till den som skickade (n), {lage} till de andra
 //   "ping" → "pong" (svaras utan att tjänsten väcks)
 //
-// lage = {id, val: {matchens id: tecken}, klar: [matchens id], v, av, t, sparad}.
+// lage = {id, val: {matchens id: tecken}, klar: [matchens id], v, av, t, sparad,
+//         vald, valdAv, valdV}: vald = matchen på lappen, valdAv = vem som tog fram
+//         den, valdV = räknas upp varje gång någon tar fram en match.
 // Samma trovärdighet som tipsen i worker/samtal.mjs: vem man är väljer man själv,
 // och sidan kopplar upp sig först när den får se de andras tips, så att ingen ser
 // kryssen av misstag innan hen har lämnat in.
@@ -78,11 +82,18 @@ export function giltigSparad(x) {
 
 // Det som är sant efter en ändring. Ett tecken gäller per match (den senaste
 // vinner), så två som kryssar i olika matcher skriver inte över varandra.
-export function andra(lage, op) {
+export function andra(lage, op, vem = null) {
   const bas = op.bas && typeof op.bas === 'object' ? op.bas : {};
   const l = lage
-    ? { val: { ...lage.val }, klar: [...lage.klar], ...(lage.sparad ? { sparad: lage.sparad } : {}) }
+    ? { val: { ...lage.val }, klar: [...lage.klar], ...(lage.sparad ? { sparad: lage.sparad } : {}),
+      ...(lage.valdV ? { vald: lage.vald, valdAv: lage.valdAv, valdV: lage.valdV } : {}) }
     : { val: tecknen(bas.val), klar: matcher(bas.klar) };
+  // Matchen på lappen: den som tog fram en match senast bestämmer, hos alla.
+  if ('vald' in op && (op.vald === null || (typeof op.vald === 'string' && MATCH_ID.test(op.vald)))) {
+    l.vald = op.vald;
+    l.valdAv = GANG.has(vem) ? vem : null;
+    l.valdV = ((lage && lage.valdV) || 0) + 1;
+  }
   if (op.satt && typeof op.satt === 'object') {
     l.val = tecknen(op.satt.val);
     l.klar = matcher(op.satt.klar);
@@ -125,7 +136,7 @@ export class Kupongen {
     if (!a.id || !op || typeof op !== 'object') return;
     const key = `omg:${a.id}`;
     const old = await this.state.storage.get(key);
-    const lage = { ...andra(old, op), id: a.id, v: ((old && old.v) || 0) + 1, av: a.vem || null, t: Date.now() };
+    const lage = { ...andra(old, op, a.vem), id: a.id, v: ((old && old.v) || 0) + 1, av: a.vem || null, t: Date.now() };
     await this.state.storage.put(key, lage);
     if (!old) await this.rensa(key);
     const ut = JSON.stringify({ lage });
