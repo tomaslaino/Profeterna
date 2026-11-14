@@ -193,7 +193,10 @@ SOURCES.push({
 // marknadens (src/forecast.js). Läser sin egen förra hämtning och behåller
 // oddsen för spelade matcher – de ligger kvar i sammanfattningen efter
 // matchen, så den sista hämtningen nära avspark står kvar. Frågar om alla
-// europeiska landskamper från tre dagar bakåt till sju dagar fram.
+// europeiska landskamper från tre dagar bakåt till sju dagar fram, och en
+// gång om varje tidigare spelad match i Nations League och EM-kvalet som
+// saknar odds (lagens siffror mot oddsen, teams/unl.json; sedan 2026-11-14).
+// En sådan match utan odds hos ESPN frågas inte om (utan).
 SOURCES.push({
   id: 'espn_odds_land',
   provider: 'ESPN (DraftKings)',
@@ -209,20 +212,25 @@ SOURCES.push({
     const now = Date.now();
     const europa = landEuropa();
     if (!europa) throw new Error('inget spelprogram för Nations League i cachen än');
+    const prev = readCache('espn_odds_land');
+    const have = (prev && prev.data && prev.data.byEvent) || {};
+    const utan = new Set((prev && prev.data && prev.data.utan) || []);
     const events = [];
     for (const c of INTERNATIONAL) {
       const cache = readCache(`espn_fixtures_${c.id}`);
       for (const m of (cache && cache.data && cache.data.matches) || []) {
         const t = Date.parse(m.kickoff);
-        if (t < now - 3 * 86400000 || t > now + ODDS_WINDOW_DAYS * 86400000) continue;
+        const nara = t >= now - 3 * 86400000 && t <= now + ODDS_WINDOW_DAYS * 86400000;
+        const efter = !c.europa && m.completed && !have[m.id] && !utan.has(m.id);
+        if (!nara && !efter) continue;
         if (c.europa && !europa.has(m.home.espnId) && !europa.has(m.away.espnId)) continue;
-        events.push({ slug: c.espn, id: m.id });
+        events.push({ slug: c.espn, id: m.id, efter: !nara });
       }
     }
-    const prev = readCache('espn_odds_land');
     const got = await espn.fetchOdds(events, { tolerant: true });
-    const byEvent = { ...((prev && prev.data && prev.data.byEvent) || {}), ...got.byEvent };
-    return { byEvent, requested: got.requested, missing: got.missing, failed: got.failed };
+    const byEvent = { ...have, ...got.byEvent };
+    for (const e of events) if (e.efter && !byEvent[e.id] && !got.failed.includes(e.id)) utan.add(e.id);
+    return { byEvent, utan: [...utan], requested: got.requested, missing: got.missing, failed: got.failed };
   },
   summarize: (d) => ({
     n: Object.keys(d.byEvent).length,

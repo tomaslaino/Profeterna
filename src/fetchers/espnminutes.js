@@ -40,6 +40,12 @@
 // före 2026-10-20 som saknar målen eller d, och före 2026-11-07 som saknar
 // elvorna (e). En match som inte gick att hämta eller saknar startelvor
 // prövas igen vid nästa hämtning.
+//
+// Med { players: true } (Nations League, sedan 2026-11-14) sparas också varje
+// spelares siffror i matchen (p, se playersOf) – ESPN:s säsongssiffror i
+// landslagens trupper stämmer inte (2026-11-14: Norge hade spelat 4 matcher
+// men spelarna stod på 6), och truppen är bara den senast uttagna (214 av
+// 1 326 som spelat saknades). Sparade matcher utan p hämtas om.
 
 const { getJson, mapLimit } = require('./http');
 
@@ -52,7 +58,7 @@ const GIVE_UP_AFTER = 5;
 
 // events: spelade matcher [{ id, kickoff, status }]; previous: förra
 // hämtningens data (eller null).
-async function fetchMinutes(slug, events, previous) {
+async function fetchMinutes(slug, events, previous, { players = false } = {}) {
   const old = (previous && previous.matches) || {};
   const matches = {};
   const todo = [];
@@ -60,7 +66,7 @@ async function fetchMinutes(slug, events, previous) {
   for (const e of events) {
     if (old[e.id]) matches[e.id] = old[e.id];
     if (!old[e.id]) todo.push(e);
-    else if (!('d' in old[e.id]) || !('e' in old[e.id])) upgrade.push(e);
+    else if (!('d' in old[e.id]) || !('e' in old[e.id]) || (players && !('p' in old[e.id]))) upgrade.push(e);
   }
   const batch = todo.concat(upgrade).slice(0, MAX_NEW);
   let ok = 0;
@@ -69,7 +75,7 @@ async function fetchMinutes(slug, events, previous) {
   await mapLimit(batch, CONCURRENCY, async (e) => {
     if (failed >= GIVE_UP_AFTER && ok === 0) { failed++; return; }
     try {
-      const m = parseMatch(await getJson(`${SITE}/${slug}/summary?event=${e.id}`), e);
+      const m = parseMatch(await getJson(`${SITE}/${slug}/summary?event=${e.id}`), e, { players });
       if (!m) throw new Error(`match ${e.id}: rapporten saknar startelvor`);
       matches[e.id] = m;
       ok++;
@@ -89,7 +95,7 @@ async function fetchMinutes(slug, events, previous) {
   };
 }
 
-function parseMatch(j, e) {
+function parseMatch(j, e, { players = false } = {}) {
   if (!j || !Array.isArray(j.rosters) || j.rosters.length !== 2) return null;
   const comp = j.header && j.header.competitions && j.header.competitions[0];
   const status = (comp && comp.status && comp.status.type && comp.status.type.name) || e.status || '';
@@ -109,7 +115,27 @@ function parseMatch(j, e) {
     t[String(side.team.id)] = mins;
     lineups[String(side.team.id)] = lineupOf(side, list);
   }
-  return { k: e.kickoff, t, e: lineups, ...goalsOf(j, subIns, comp) };
+  return { k: e.kickoff, t, e: lineups, ...goalsOf(j, subIns, comp), ...(players ? { p: playersOf(j) } : {}) };
+}
+
+// Spelarnas siffror i matchen, för dem som spelade: { lag-id: { spelar-id:
+// [namn, position, tröja, startade (1/0), ...PSTATS] } }. Positionen är
+// ESPN:s i matchen ("G", "CD-L", "AM-R", "F"), tröjan en sträng.
+const PSTATS = ['totalGoals', 'goalAssists', 'totalShots', 'shotsOnTarget', 'yellowCards', 'redCards',
+  'foulsCommitted', 'foulsSuffered', 'offsides', 'ownGoals', 'saves', 'goalsConceded'];
+function playersOf(j) {
+  const out = {};
+  for (const side of j.rosters) {
+    const ps = {};
+    for (const p of Array.isArray(side.roster) ? side.roster : []) {
+      if (!p.athlete || !(p.starter || p.subbedIn)) continue;
+      const st = new Map((p.stats || []).map((x) => [x.name, x.value]));
+      ps[String(p.athlete.id)] = [p.athlete.displayName || '', (p.position && p.position.abbreviation) || null, p.jersey || null, p.starter ? 1 : 0,
+        ...PSTATS.map((k) => (Number.isFinite(st.get(k)) ? st.get(k) : null))];
+    }
+    out[String(side.team.id)] = ps;
+  }
+  return out;
 }
 
 // Elvan på sina platser och avbytarna. null om formationen saknas eller
@@ -190,4 +216,4 @@ function clock(c) {
   return m ? Number(m[1]) : NaN;
 }
 
-module.exports = { fetchMinutes, parseMatch };
+module.exports = { fetchMinutes, parseMatch, PSTATS };

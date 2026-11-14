@@ -15,8 +15,15 @@
 // lördagens matcher fanns i tabellen men inte i trupperna). Det redovisas per
 // lag som "omfattar minst X av Y matcher" i stället för att döljas. X är det
 // högsta antalet matcher någon i truppen spelat – en undre gräns.
+//
+// Nations League (players/unl.json, sedan 2026-11-14) räknas som en division:
+// landslagens trupper med siffrorna i Nations League, speltiden och målen ur
+// matchrapporterna, betygen och bilderna. Lagen heter som på resten av sajten
+// (svenska, config/landslag.js), tabellen är gruppernas (platsen i gruppen)
+// och skadelistan är okänd.
 
-const { COMPETITIONS, SEASON } = require('../config/competitions');
+const { COMPETITIONS, INTERNATIONAL, SEASON } = require('../config/competitions');
+const { svenskt } = require('../config/landslag');
 const fs = require('fs');
 const path = require('path');
 const { CACHE_DIR } = require('./store');
@@ -25,6 +32,9 @@ const { newsSv } = require('./skadetext');
 const { medUtan } = require('./medochutan');
 
 const LEAGUES = COMPETITIONS.filter((c) => c.type === 'league');
+// Divisionerna med spelare: ligorna och Nations League.
+const UNL = INTERNATIONAL.find((c) => c.id === 'unl');
+const DIVISIONS = [...LEAGUES, UNL];
 const SEASON_YEAR = Number(SEASON.label.slice(0, 4));
 
 const TOP = 20;
@@ -49,12 +59,82 @@ function readCache(id) {
   return entry;
 }
 
+// Trupperna ur cachen. Landslagen (Nations League) under sina svenska namn
+// och med siffrorna ur matchrapporterna (landTeams).
+const landMemo = new Map();
 function cacheFor(compId) {
   const c = readCache(`espn_players_${compId}`);
-  return c && c.data ? c : null;
+  if (!c || !c.data) return null;
+  if (compId !== 'unl') return c;
+  const r = readCache(`espn_minutes_${compId}`);
+  const hit = landMemo.get(compId);
+  if (hit && hit.c === c && hit.r === r) return hit.v;
+  const v = { ...c, data: { ...c.data, teams: landTeams(c.data.teams, r && r.data && r.data.matches) } };
+  landMemo.set(compId, { c, r, v });
+  return v;
 }
 
+// Landslagens trupper: ESPN:s säsongssiffror i landslagens trupper stämmer
+// inte med matcherna (src/fetchers/espnminutes.js), och truppen är bara den
+// senast uttagna. Siffrorna räknas därför ur matchrapporterna (p: spelarnas
+// siffror per match), och den som har spelat i Nations League men inte är
+// uttagen nu läggs till med det rapporten vet (namn, position, tröja). Den
+// uttagna som inte har spelat står med noll matcher. Utan rapporter står
+// trupperna utan siffror (okänt).
+const MATCH_POS = [[/^G$/, 'MV'], [/^(CD|LB|RB|SW|LWB|RWB|D)\b/, 'B'], [/^(CM|DM|AM|LM|RM|M)\b/, 'MF'], [/^(F|CF|LF|RF|RCF|LCF|ST|LW|RW)\b/, 'A']];
+const matchPos = (x) => { const m = MATCH_POS.find(([re]) => re.test(String(x || ''))); return m ? m[1] : null; };
+function landTeams(teams, matches) {
+  const { PSTATS } = require('./fetchers/espnminutes');
+  const KEYS = ['g', 'a', 'sh', 'sot', 'yc', 'rc', 'fc', 'fs', 'off', 'og', 'sv', 'gc'];
+  const reports = Object.values(matches || {}).filter((m) => m.p).sort((a, b) => a.k.localeCompare(b.k));
+  const byTeam = new Map(); // lag-id → spelar-id → { name, jersey, pos: {MV: n, …}, stats }
+  const count = new Map(); // lag-id → rapporterade matcher
+  for (const m of reports) {
+    for (const [teamId, ps] of Object.entries(m.p)) {
+      count.set(teamId, (count.get(teamId) || 0) + 1);
+      if (!byTeam.has(teamId)) byTeam.set(teamId, new Map());
+      const pool = byTeam.get(teamId);
+      for (const [id, row] of Object.entries(ps)) {
+        const [name, pos, jersey, start, ...vals] = row;
+        const e = pool.get(id) || { name, jersey, pos: {}, stats: Object.fromEntries([['app', 0], ['sub', 0], ...KEYS.map((k) => [k, 0])]) };
+        e.name = name || e.name;
+        e.jersey = jersey || e.jersey;
+        if (start && matchPos(pos)) e.pos[matchPos(pos)] = (e.pos[matchPos(pos)] || 0) + 1;
+        e.stats.app++;
+        if (!start) e.stats.sub++;
+        PSTATS.forEach((_, i) => { if (vals[i] != null) e.stats[KEYS[i]] += vals[i]; });
+        pool.set(id, e);
+      }
+    }
+  }
+  const zero = () => Object.fromEntries([['app', 0], ['sub', 0], ...KEYS.map((k) => [k, 0])]);
+  return teams.map((t) => {
+    const pool = byTeam.get(t.espnId) || new Map();
+    const known = reports.length > 0;
+    const players = t.players.map((p) => {
+      const e = pool.get(p.id);
+      const stats = !known ? null : e ? { ...e.stats } : zero();
+      if (stats && p.pos !== 'MV') { delete stats.sv; delete stats.gc; }
+      return { ...p, stats };
+    });
+    const have = new Set(t.players.map((p) => p.id));
+    for (const [id, e] of pool) {
+      if (have.has(id)) continue;
+      const pos = Object.entries(e.pos).sort((a, b) => b[1] - a[1])[0];
+      const stats = { ...e.stats };
+      if (!pos || pos[0] !== 'MV') { delete stats.sv; delete stats.gc; }
+      players.push({ id, name: e.name, pos: pos ? pos[0] : null, age: null, dob: null, nat: null, jersey: e.jersey, stats, utanfor: true });
+    }
+    return { ...t, en: t.name, name: svenskt(t.name), players, ...(known ? { reports: count.get(t.espnId) || 0 } : {}) };
+  });
+}
+
+// Tabellen per lag-id: ligans, eller för Nations League alla gruppernas rader.
 function standingsFor(compId) {
+  if (compId === 'unl') {
+    const c = readCache('espn_tabell_unl');
+    return new Map(c && c.data ? c.data.groups.flatMap((g) => g.rows).map((r) => [String(r.espnId), r]) : []);
+  }
   const c = readCache(`espn_standings_${compId}`);
   return new Map(c && c.data ? c.data.rows.map((r) => [String(r.espnId), r]) : []);
 }
@@ -105,7 +185,8 @@ function top(list, value, { min = 1, n = TOP, tiebreak } = {}) {
 // Lagets matcher enligt tabellen och hur många av dem spelarstatistiken
 // minst omfattar.
 function coverageOf(t, standing) {
-  const covered = Math.max(0, ...t.players.map((p) => (p.stats && p.stats.app) || 0));
+  // (landslagen: siffrorna kommer ur rapporterna, så de omfattar alla rapporterade matcher)
+  const covered = t.reports != null ? t.reports : Math.max(0, ...t.players.map((p) => (p.stats && p.stats.app) || 0));
   const matches = standing ? standing.played : null;
   return { matches, covered, behind: matches != null ? Math.max(0, matches - covered) : null };
 }
@@ -217,7 +298,7 @@ function fplIndex(compId, teams) {
 // I Premier League är FPL:s speltid den som visas; rapporternas (emin) delar
 // bara ESPN:s siffror per 90 minuter, eftersom FPL kan ligga en omgång före.
 function minutesIndex(compId, teams) {
-  if (!LEAGUES.some((c) => c.id === compId)) return null;
+  if (!DIVISIONS.some((c) => c.id === compId)) return null;
   const c = readCache(`espn_minutes_${compId}`);
   if (!c || !c.data || !c.data.matches) return null;
   const apps = new Map(); // "lag|spelare" → minuter per match i tidsordning
@@ -484,7 +565,7 @@ function goalTypesFor(compId) {
 const overXg = (r) => (r.xg != null && r.fg != null ? Math.round((r.fg - r.xg) * 100) / 100 : null);
 
 function divisionPlayers(compId) {
-  const comp = LEAGUES.find((c) => c.id === compId);
+  const comp = DIVISIONS.find((c) => c.id === compId);
   const cache = cacheFor(compId);
   if (!comp || !cache) {
     return { comp: compId, unknown: true, reason: 'Ingen spelardata hämtad än för divisionen.' };
@@ -566,7 +647,7 @@ function divisionPlayers(compId) {
     // Skador och avstängningar per lag (bara Premier League, via FPL).
     availability: compId === 'pl'
       ? Object.fromEntries(d.teams.map((t) => [t.espnId, availability(compId, t.name)]))
-      : { unknown: true, reason: 'Ingen fri källa för skador och avstängningar utanför Premier League.' },
+      : { unknown: true, reason: compId === 'unl' ? 'Ingen fri källa för skador och avstängningar i landslagen.' : 'Ingen fri källa för skador och avstängningar utanför Premier League.' },
     // Hela truppen i ligan – spelartabellen på sidan filtrerar och sorterar själv.
     players: all.sort((a, b) => (b.g || 0) - (a.g || 0) || (b.a || 0) - (a.a || 0) || a.name.localeCompare(b.name)),
     // Speltid, xG och pris per spelare (bara Premier League).
@@ -619,10 +700,11 @@ function bare(p, t) {
 }
 
 // Trupp för ett lag i matchvyn, efter ESPN-namnet (samma källa som
-// spelprogrammet). Cuplag utanför de fyra ligorna har ingen spelardata.
+// spelprogrammet; ett landslag under sitt svenska namn, som i matchlistan).
+// Cuplag utanför de fyra ligorna har ingen spelardata.
 function teamSquad(teamName) {
   const k = espnKey(teamName);
-  for (const c of LEAGUES) {
+  for (const c of DIVISIONS) {
     const cache = cacheFor(c.id);
     const t = cache && cache.data.teams.find((x) => espnKey(x.name) === k);
     if (!t) continue;
@@ -648,7 +730,7 @@ function teamSquad(teamName) {
       availability: availability(c.id, t.name),
     };
   }
-  return { unknown: true, reason: 'Ingen fri spelardata för lag utanför de fyra ligorna.' };
+  return { unknown: true, reason: 'Ingen fri spelardata för lag utanför de fyra ligorna och Nations League.' };
 }
 
 function gk(p) {
@@ -670,10 +752,10 @@ function byPosThenApps(a, b) {
     || a.name.localeCompare(b.name);
 }
 
-// Skador och avstängningar: bara FPL (Premier League). Övriga ligor: okänt.
+// Skador och avstängningar: bara FPL (Premier League). Övriga ligor och landslagen: okänt.
 function availability(compId, teamName) {
   if (compId !== 'pl') {
-    return { unknown: true, reason: 'Ingen fri källa för skador och avstängningar utanför Premier League.' };
+    return { unknown: true, reason: compId === 'unl' ? 'Ingen fri källa för skador och avstängningar i landslagen.' : 'Ingen fri källa för skador och avstängningar utanför Premier League.' };
   }
   const fc = readCache('fpl');
   if (!fc || !fc.data) return { unknown: true, reason: 'FPL-data saknas.' };
@@ -691,10 +773,11 @@ function availability(compId, teamName) {
   };
 }
 
-// Filerna bygget skriver: players/<liga>.json per division. Trupperna i
-// matchvyn läggs i matchfilen (teamSquad) och skrivs inte separat.
+// Filerna bygget skriver: players/<liga>.json per division och
+// players/unl.json för Nations League. Trupperna i matchvyn läggs i
+// matchfilen (teamSquad) och skrivs inte separat.
 function playerFiles() {
-  return LEAGUES.map((c) => ({ path: `players/${c.id}.json`, data: divisionPlayers(c.id) }));
+  return DIVISIONS.map((c) => ({ path: `players/${c.id}.json`, data: divisionPlayers(c.id) }));
 }
 
 module.exports = { divisionPlayers, teamSquad, playerFiles, linkIndexes, LEAGUES };

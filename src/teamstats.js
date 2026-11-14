@@ -13,8 +13,15 @@
 // eller som skillnad inom samma matcher – aldrig blandat med tabellen.
 // Saknas ESPN:s tabell räknas den ur football-data.co.uk (utan poängavdrag).
 // Sidorna visar nivå 1–4, som prognosmotorn; National League är inte med.
+//
+// Nations League (teams/unl.json, sedan 2026-11-14) har samma fält: matcherna
+// och tabellen ur ESPN (alla grupperna; rank är platsen i gruppen), lagens
+// siffror per match ur 365Scores (s365_stats_unl) och oddsen ur DraftKings via
+// ESPN (espn_odds_land) i stället för football-data.co.uk. Styrkan och
+// motståndet saknas: prognosmotorn känner bara lagen i England.
 
-const { COMPETITIONS, SEASON } = require('../config/competitions');
+const { COMPETITIONS, INTERNATIONAL, SEASON } = require('../config/competitions');
+const { svenskt } = require('../config/landslag');
 const { readCache } = require('./store');
 const { keyOf, espnKey } = require('./teams');
 const { scoreMatrix, outcomes } = require('./model');
@@ -219,9 +226,108 @@ function divisionTeams(div, strengthAll) {
   };
 }
 
-// Filerna bygget skriver: teams/<division>.json för nivå 1–4.
-function teamFiles(strength) {
-  return DIVS.map((d) => ({ path: `teams/${d.id}.json`, data: divisionTeams(d, strength) }));
+// Nations League: en rad per spelad match i football-data.co.uks form (mål,
+// xG, skott, hörnor, frisparkar, kort och stängningsoddsen), så att lagen räknas
+// precis som divisionernas. Siffror som saknas lämnas tomma (okänt).
+const UNL = INTERNATIONAL.find((c) => c.id === 'unl');
+const STAT_COLS = [['HxG', 'AxG'], ['HS', 'AS'], ['HST', 'AST'], ['HC', 'AC'], ['HF', 'AF'], ['HY', 'AY'], ['HR', 'AR']];
+
+function landTeams() {
+  const fx = readCache('espn_fixtures_unl');
+  const tab = readCache('espn_tabell_unl');
+  if (!fx || !fx.data || !tab || !tab.data || !tab.data.groups.length) {
+    return { comp: UNL.id, unknown: true, reason: 'Ingen matchdata hämtad än för Nations League.' };
+  }
+  const st = readCache('s365_stats_unl');
+  const stats = (st && st.data && st.data.matches) || {};
+  const od = readCache('espn_odds_land');
+  const odds = (od && od.data && od.data.byEvent) || {};
+
+  const byId = new Map();
+  const get = (t) => {
+    if (!byId.has(t.espnId)) byId.set(t.espnId, blank(svenskt(t.name)));
+    return byId.get(t.espnId);
+  };
+  const none = () => null;
+  const played = fx.data.matches.filter((m) => m.completed && (m.score90 || m.score));
+  let withStats = 0;
+  let withOdds = 0;
+  let last = null;
+  for (const m of played) {
+    const sc = m.score90 || m.score;
+    const r = { FTHG: sc.home, FTAG: sc.away };
+    const x = stats[m.id] && stats[m.id].t;
+    const h = x && x[m.home.espnId];
+    const a = x && x[m.away.espnId];
+    if (h && a) {
+      withStats++;
+      STAT_COLS.forEach(([hk, ak], i) => { r[hk] = h[i]; r[ak] = a[i]; });
+    }
+    const o = odds[m.id];
+    if (o && o.home && o.draw && o.away) {
+      withOdds++;
+      Object.assign(r, { AvgCH: o.home, AvgCD: o.draw, AvgCA: o.away });
+    }
+    if (!last || m.kickoff > last) last = m.kickoff;
+    add(get(m.home), r, 'H', none, null);
+    add(get(m.away), r, 'A', none, null);
+  }
+
+  // Grupperna i ordning (A1–D2), lagen i tabellens ordning.
+  const teams = [];
+  for (const g of tab.data.groups) {
+    const grupp = (g.id || String(g.name || '').replace(/^Group\s+/i, '')) || null;
+    for (const x of g.rows) {
+      const e = byId.get(String(x.espnId)) || null;
+      teams.push({
+        key: espnKey(x.name),
+        name: svenskt(x.name),
+        en: x.name,
+        espnId: String(x.espnId),
+        grupp,
+        liga: grupp ? grupp[0] : null,
+        rank: x.rank, m: x.played, w: x.won, d: x.drawn, l: x.lost, gf: x.gf, ga: x.ga, gd: x.gd, pts: x.points, ded: x.deductions || 0, note: x.note || null,
+        str: null,
+        fd: e ? {
+          n: e.n, w: e.w, d: e.d, l: e.l, gf: e.gf, ga: e.ga,
+          cs: e.cs, fts: e.fts, o25: e.o25, btts: e.btts,
+          xg: e.xg.n ? { n: e.xg.n, f: r2(e.xg.f), a: r2(e.xg.a), gf: e.xg.gf, ga: e.xg.ga, xp: r2(e.xg.xp), pts: e.xg.pts, xd: r2(e.xg.xd), d: e.xg.d } : null,
+          sh: e.sh.n ? e.sh : null,
+          cor: e.cor.n ? e.cor : null,
+          fouls: e.fouls.n ? e.fouls : null,
+          cards: e.cards.n ? e.cards : null,
+          mkt: e.mkt.n ? { n: e.mkt.n, xp: r2(e.mkt.xp), pts: e.mkt.pts, ret: r2(e.mkt.ret), fav: e.mkt.fav } : null,
+          opp: null,
+        } : null,
+      });
+    }
+  }
+  const named = new Set(teams.map((t) => t.espnId));
+
+  return {
+    comp: UNL.id,
+    name: UNL.name,
+    season: SEASON.label,
+    unknown: false,
+    hasXg: teams.some((t) => t.fd && t.fd.xg),
+    source: {
+      table: { provider: 'ESPN', fetchedAt: tab.fetchedAt },
+      stats: { provider: '365Scores', fetchedAt: st ? st.fetchedAt : null, last: last ? last.slice(0, 10) : null, matches: withStats, url: 'https://www.365scores.com/football' },
+      odds: { provider: 'DraftKings via ESPN', fetchedAt: od ? od.fetchedAt : null, matches: withOdds },
+      strength: null,
+    },
+    unmapped: [...byId.entries()].filter(([id]) => !named.has(String(id))).map(([, e]) => e.name),
+    teams,
+  };
 }
 
-module.exports = { teamFiles, divisionTeams, market };
+// Filerna bygget skriver: teams/<division>.json för nivå 1–4 och
+// teams/unl.json för Nations League.
+function teamFiles(strength) {
+  return [
+    ...DIVS.map((d) => ({ path: `teams/${d.id}.json`, data: divisionTeams(d, strength) })),
+    { path: `teams/${UNL.id}.json`, data: landTeams() },
+  ];
+}
+
+module.exports = { teamFiles, divisionTeams, landTeams, market };

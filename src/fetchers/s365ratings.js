@@ -100,8 +100,8 @@ async function seasonGames(compId365) {
 }
 
 // Lagnamnen som i matchrutan: utan FC/AFC och skiljetecken, MK Dons heter
-// så hos 365Scores.
-const ALIAS = { 'milton keynes dons': 'mk dons' };
+// så hos 365Scores, och Irland heter bara Ireland (ESPN: Republic of Ireland).
+const ALIAS = { 'milton keynes dons': 'mk dons', 'republic of ireland': 'ireland' };
 function norm(s) {
   const n = String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/&/g, ' and ').replace(/\b(a ?f ?c|f ?c)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -151,4 +151,4 @@ function parseGame(g, e, id) {
   return rated ? { k: e.kickoff, g: id, t } : null;
 }
 
-module.exports = { fetchRatings, teamSim };
+module.exports = { fetchRatings, teamSim, seasonGames, findGame };

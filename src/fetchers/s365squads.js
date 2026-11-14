@@ -34,9 +34,10 @@ const unabbr = (s) => LONG.reduce((x, [re, to]) => x.replace(re, to), String(s |
 // espnTeams: [{ espnId, name }] ur ESPN-trupperna.
 async function fetchSquads(compId365, espnTeams) {
   const st = await getJson(`${WEB}/web/standings/?${PARAMS}&competitions=${compId365}`);
-  const rows = (st.standings && st.standings[0] && st.standings[0].rows) || [];
+  // Ligorna har en tabell, Nations League en per grupp (verifierat 2026-11-14).
+  const rows = (st.standings || []).flatMap((x) => x.rows || []);
   if (!rows.length) throw new Error(`365Scores tävling ${compId365}: oväntat svar (ingen tabell)`);
-  const free = rows.map((r) => r.competitor).filter(Boolean);
+  const free = [...new Map(rows.map((r) => r.competitor).filter(Boolean).map((c) => [c.id, c])).values()];
 
   // Bäst matchande par först, så att ett tydligt namn inte tar ett annat lags plats.
   const pairs = [];
