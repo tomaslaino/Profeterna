@@ -1,0 +1,20 @@
+{
+  "namn": "Wednesday börjar på lördag",
+  "spel": "Stryktipset",
+  "skapad": "2026-11-14T14:46:14.196Z",
+  "matcher": [
+    { "id": "401861166", "match": "Sverige – Bosnien & Hercegovina", "tecken": "1X" },
+    { "id": "401861167", "match": "Portugal – Danmark", "tecken": "1X" },
+    { "id": "401861165", "match": "Norge – Wales", "tecken": "12" },
+    { "id": "401861168", "match": "Rumänien – Polen", "tecken": "2" },
+    { "id": "401861169", "match": "Nordirland – Ukraina", "tecken": "12" },
+    { "id": "401861170", "match": "Österrike – Irland", "tecken": "1X" },
+    { "id": "401861164", "match": "Georgien – Ungern", "tecken": "X2" },
+    { "id": "401880749", "match": "Milton Keynes Dons – Burton Albion", "tecken": "1" },
+    { "id": "401880747", "match": "Sheffield Wednesday – Plymouth Argyle", "tecken": "12" },
+    { "id": "401880745", "match": "Stockport County – Reading", "tecken": "12" },
+    { "id": "401880754", "match": "AFC Wimbledon – Blackpool", "tecken": "1X2" },
+    { "id": "401880744", "match": "Wigan Athletic – Barnsley", "tecken": "1" },
+    { "id": "401881266", "match": "Swindon Town – Grimsby Town", "tecken": "1X2" }
+  ]
+}
