@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Hasse Backes röst med Tomas egen, klonade röst: läser upp allt han säger med
 // Chatterbox Multilingual på den här datorn och lägger ljudet i grenen rost, som
-// bygget föredrar framför Azure (src/rost.js). Startas av launchd var 15:e minut
+// bygget tar med på sajten (src/rost.js). Startas av launchd var 15:e minut
 // (installera.sh, se README, Hasse Backe, Ljudet); launchd kör aldrig två samtidigt.
 //
 //   - Vad han säger: texter() i src/rost.js, kommande matchers meningar först och

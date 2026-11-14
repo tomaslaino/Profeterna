@@ -71,10 +71,9 @@ jobs:
           key: kallcache-${{ github.run_id }}
           restore-keys: kallcache-
 
-      # Hasse Backes egna röst (src/rost.js, scripts/rost/): iMacen lägger ljudet i
-      # grenen rost, en enda commit som skrivs över, så att main inte växer. Bygget
-      # tar den filen där den finns och Azure där den saknas. Finns inte grenen är
-      # det Azure-rösten som förut.
+      # Hasse Backes röst (src/rost.js, scripts/rost/): iMacen lägger ljudet med Tomas
+      # egen röst i grenen rost, en enda commit som skrivs över, så att main inte växer.
+      # Det som saknas där sägs tyst. Finns inte grenen är han tyst.
       - name: Hämta Hasse Backes egen röst
         run: |
           rm -rf data/egen-rost
@@ -83,7 +82,7 @@ jobs:
             git archive refs/remotes/origin/rost | tar -x -C data/egen-rost
             echo "Grenen rost: $(find data/egen-rost -name '*.mp3' | wc -l | tr -d ' ') ljudfiler."
           else
-            echo "Grenen rost finns inte: Azure-rösten."
+            echo "Grenen rost finns inte: Hasse Backe är tyst."
           fi
 
       # Bilderna i tidningen inför omgången (src/analyser/tidning-bilder.mjs): iMacen
@@ -100,15 +99,9 @@ jobs:
             echo "Grenen tidning-bilder finns inte: sköldarna."
           fi
 
-      # Hasse Backes röst (src/rost.js): nyckeln till Azures talsyntes på den fria
-      # nivån, för det som inte finns med egen röst. Saknas hemligheten blir han tyst
-      # där, och bygget går som förut.
       # --minify: JavaScript och CSS i mindre form (src/minify.js, README: Mindre filer).
       - name: Hämta källor, logga prognoser och bygg sajten
         run: npm run build -- --journal --minify
-        env:
-          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
-          AZURE_SPEECH_REGION: ${{ vars.AZURE_SPEECH_REGION }}
 
       - name: Spara källcachen
         if: always()

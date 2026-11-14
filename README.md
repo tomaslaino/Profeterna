@@ -489,11 +489,10 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
 - **Analyserna** ingår inte i bygget: datorn committar `data/analyser.json` och
   `data/omgangsnamn.json` till `main`, och den pushen bygger om sajten som vilken annan push
   som helst. Bygget kopierar filerna till sajten. Se [Analyserna](#analyserna).
-- **Hasse Backes röst** är i första hand Tomas egen: iMacen läser upp allt han säger och
+- **Hasse Backes röst** är Tomas egen: iMacen läser upp allt han säger och
   force-pushar ljudet till grenen `rost`, en enda föräldralös commit med `rost.json` och de
   mp3-filer som behövs nu. Steget *Hämta Hasse Backes egen röst* hämtar grenen (djup 1) till
-  `data/egen-rost/`, som inte committas. Det som saknas där hämtas i bygget från Azures
-  talsyntes med hemligheten `AZURE_SPEECH_KEY` och sparas i källcachen (`data/cache/rost/`).
+  `data/egen-rost/`, som inte committas. Det som saknas där sägs tyst.
   Allt laddas upp med sajten (`data/rost/`, `data/rost.json`). Inget av det hamnar på main,
   och en push till `rost` startar inget bygge: nästa schemalagda körning tar med det nya. Se
   [Ljudet](#hasse-backe).
@@ -1454,6 +1453,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   trettiotal meningar per körning, och lägger ljudet i grenen `rost`, som skrivs över varje
   gång så att main inte växer. Bygget tar det egna ljudet där det finns och Azure där det
   saknas, så han blir aldrig tyst. Ljudet är av tills besökaren slår på det. Se
+  [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Hasse Backe utan Azure (2026-11-14, användarens beslut):** "Du kan ta bort azurerösten från
+  hemsidan". Bygget frågar inte längre Azures talsyntes, och sajten har bara Tomas egen röst. Det som
+  iMacen ännu inte har läst upp sägs tyst, och kommer med i bygget efter att den har gjort det. Azures
+  ljud i källcachen (`data/cache/rost/`) tas bort i nästa bygge. Provat med `npm run build -- --no-fetch` och
+  grenen `rost` som den låg då: 3 227 av 6 698 meningar fick ljud, alla med egen röst, och en gammal
+  `data/cache/rost/` togs bort. Sidan är inte ändrad (den slår upp meningen i registret som förut). Se
   [Hasse Backe](#hasse-backe), *Ljudet*.
 - **Hasse Backe slår domen i disken på fler sätt, och det hörs (2026-11-05, användarens
   önskemål):** han är en bestämd och tydlig herre, så domen slås i disken på ett av fem sätt
@@ -8230,27 +8236,18 @@ prova Bielsa-utbrottet.
 **Ljudet.** Det han säger hörs, när besökaren har slagit på ljudet. Rösten är Tomas egen,
 klonad med Chatterbox Multilingual på iMacen (se *Den egna rösten* nedan). Hasse Backe är en
 påhittad figur i en verklig persons anda, och rösten är Tomas, inte en kopia av den verklige
-Hasse Backes. Där den egna rösten ännu saknas tar bygget fram ljudet med Azures talsyntes på den
-fria nivån (F0: 500 000 tecken i månaden; när de är slut stryps tjänsten, och den debiterar
-aldrig), med den svenska mansrösten Mattias lite långsammare och mörkare än vanligt (`rost` i
-[config/hasse.js](config/hasse.js)). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
+Hasse Backes. Där den egna rösten ännu saknas säger han meningen tyst (fram till 2026-11-14 tog
+bygget fram ljudet med Azures talsyntes där). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
 replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
 alla sätt som sidan kan fylla dem (gängets namn, `Tippoang.kallas`, dagarna, tecknen i ord och resultaten 0–0
 till 4–4 – 183 repliker, 6 000 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
 ([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
 ungefär 10 000 tecken.
 
-Azures ljud tas fram en gång per mening och sparas i källcachen, `data/cache/rost/<avtryck>.mp3`, där
-avtrycket räknas på rösten, takten, tonen och meningen (ändras något av dem tas allt fram på
-nytt). Kommande matcher först, sedan replikerna; högst 80 anrop per bygge och ett var 3,2 s,
-eftersom den fria nivån tar 20 anrop i minuten. Första gången tar replikerna alltså ett par
-byggen, och en ny omgångs text kommer i bygget efter att iMacen har pushat den. Bygget lägger det
-som finns i `_site/data/rost/` med registret `data/rost.json` (mening → fil), och ljud som inte har
-använts på 30 dagar tas bort ur cachen. Inget av det committas, så repot växer inte (allt ljud
-till en omgång är 3–4 MB). Utan nyckeln, eller när Azure inte svarar, blir han tyst där ljudet
-saknas, och bygget går som förut. Meningar som redan har egen röst frågas Azure aldrig om, så
-den fria kvoten räcker längre. Bygget skriver hur många meningar som har ljud och hur många av
-dem med egen röst.
+Bygget ([src/rost.js](src/rost.js), `publicera()`) lägger det som finns i grenen `rost` i
+`_site/data/rost/` med registret `data/rost.json` (mening → fil). Inget av det committas på main, så
+repot växer inte. Utan grenen är han tyst, och bygget går som förut. Bygget skriver hur många
+meningar som har ljud.
 
 **Den egna rösten** ([scripts/rost/](scripts/rost/)). Launchd-jobbet `se.matchfixarna.rost`
 på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt) i en egen klon som
@@ -8270,7 +8267,7 @@ för långt. Därför mäts talet utan tystnad mot den väntade längden (14 tec
 `token_repetition`, görs meningen om med nytt slumpfrö, högst fyra gånger. `token_repetition`
 räknas inte: den slog till i 3 av 4 uppläsningar i provet, redan när samma ljudtoken kom två
 gånger, och Tomas lyssnade på de klippen 2026-11-05 och slutet var helt. Klarar den sig inte prövas den igen efter ett dygn, och
-till dess är det Azures röst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
+till dess sägs den tyst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
 repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
 inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
 
@@ -8291,8 +8288,7 @@ körningen står i `rost-chatterbox.log` bredvid.
    med ljudet.
 
 Stoppa med `launchctl bootout gui/$(id -u)/se.matchfixarna.rost`; grenen ligger kvar, och
-bygget fortsätter att ta ljudet ur den. Ta bort grenen på GitHub för att gå tillbaka helt till
-Azure.
+bygget fortsätter att ta ljudet ur den. Utan grenen är han tyst.
 
 I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
 hämtas medan han gör annat – hans text när den står, om ljudet är på – och orden kommer i takt med
@@ -8316,18 +8312,6 @@ porslin, några deltoner som inte är övertoner och där de höga klingar av fo
 oftast två gånger. Allt går genom en mjuk begränsare, så att ett hårt slag inte spräcker ljudet, och
 slaget är ungefär lika starkt som rösten. Slaget hörs från hans högra hand till vänster i bilden och
 koppen från höger.
-
-**Slå på rösten** (ett gratis konto hos Microsoft Azure; kortet som Azure frågar efter när kontot
-skapas debiteras inte på F0):
-
-1. Skapa en resurs av typen *Speech* (Azure AI services) med prisnivån **Free F0** i regionen
-   Sweden Central. Väljs en annan region: lägg den som variabeln `AZURE_SPEECH_REGION` under
-   *Settings → Secrets and variables → Actions → Variables* (t.ex. `westeurope`).
-2. Kopiera *KEY 1* under *Keys and Endpoint*.
-3. Lägg den som hemligheten `AZURE_SPEECH_KEY` under *Settings → Secrets and variables →
-   Actions → Secrets* i repot på GitHub (eller `gh secret set AZURE_SPEECH_KEY`).
-4. Kör workflowen *Hämta data och publicera* (eller vänta på nästa körning). Loggen säger hur
-   många meningar som har ljud.
 
 Provat: [src/rost.js](src/rost.js) i Node med låtsad Azure (ordningen, taket per bygge, stopp vid
 429, registret och städningen av cachen); sidan i headless Chrome 1440 × 900 med låtsat tal i
@@ -8477,7 +8461,7 @@ påhittad omgång från kupongtjänsten och tre matcher i `data/matches.json` (b
 i 1440 × 900 och 412 × 915, med och utan minskad rörelse: frågan och guldet efter analysen (också efter *Ja, ja*),
 att kupongen ligger orörd fem sekunder efteråt, *Fyll i den* med och utan att kupongen vet vem man är, ett eget
 tecken mot hans och guldet när man kommer tillbaka till matchen. Inte provat i Safari eller i en riktig telefon,
-och de nya raderna har Tomas röst först när iMacen har läst upp dem (till dess Azures).
+och de nya raderna har Tomas röst först när iMacen har läst upp dem (till dess Azures; sedan 2026-11-14 är de tysta).
 
 ### Sammanställningen efter omgången
 

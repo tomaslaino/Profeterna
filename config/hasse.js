@@ -23,30 +23,16 @@ module.exports = {
   // koden släpper igenom lite mer.
   maxOrd: 135,
 
-  // Rösten (src/rost.js): bygget tar fram ljudet till allt han säger – hans text och
-  // de färdiga replikerna i public/rum-hasse-repliker.js – med Azures talsyntes på den
-  // fria nivån (F0), som ger 500 000 tecken i månaden och sedan stryps; den debiterar
-  // aldrig. Nyckeln är hemligheten AZURE_SPEECH_KEY i GitHub. Ljudet sparas i
-  // källcachen (data/cache/rost/) och tas fram en gång per mening. Mattias är den enda
-  // svenska mansrösten, här lite långsammare och mörkare, för lugnet. Ändras rösten,
-  // takten eller tonen tas allt ljud fram på nytt (det ingår i filnamnen). Finns
-  // meningen med Tomas egen röst (egen nedan) tas den i stället, och Azure tillfrågas inte.
+  // Rösten (src/rost.js): allt han säger – hans text och de färdiga replikerna i
+  // public/rum-hasse-repliker.js – med Tomas egen röst (egen nedan). Det som ännu inte
+  // är uppläst sägs tyst.
   rost: {
-    region: 'swedencentral',
-    voice: 'sv-SE-MattiasNeural',
-    rate: '-8%',
-    pitch: '-6%',
-    format: 'audio-24khz-48kbitrate-mono-mp3',
-    // Den fria nivån tar 20 anrop i minuten: ett var 3,2 s, högst så många per bygge.
-    mellanrumMs: 3200,
-    perBygge: 80,
-    timeoutMs: 30000,
-    // Ljud som inte har använts på så länge tas bort ur cachen.
+    // Ljud som inte har använts på så länge tas bort ur iMacens ljudbank (scripts/rost/las.mjs).
     sparasDagar: 30,
 
     // Tomas egen röst, klonad med Chatterbox Multilingual på iMacen (scripts/rost/):
     // jobbet läser upp allt han säger och lägger ljudet i grenen rost, som bygget
-    // föredrar framför Azure. Ändras något här (utom perKorning och sökvägarna) tas
+    // tar med på sajten. Ändras något här (utom perKorning och sökvägarna) tas
     // allt ljud fram på nytt, eftersom det ingår i avtrycket. Det gör referensen också.
     egen: {
       // ~ är hemkatalogen på iMacen.
@@ -72,7 +58,7 @@ module.exports = {
       minstaSek: 0.5,
       forsok: 4,
       // En mening som inte klarar kontrollen prövas igen efter så många timmar; tills
-      // dess tas Azure-rösten.
+      // dess sägs den tyst.
       omIgenTimmar: 24,
     },
   },

@@ -36,9 +36,8 @@
 // data/tidning-bilder/) till data/tidning-bilder/.
 //
 // Hasse Backes röst (src/rost.js): Tomas egen röst ur grenen rost (som workflowen
-// hämtar till data/egen-rost/) där den finns, annars tar bygget fram ljudet som
-// saknas med Azure (AZURE_SPEECH_KEY) och sparar det i källcachen. Allt läggs i
-// data/rost/ med registret data/rost.json.
+// hämtar till data/egen-rost/) läggs i data/rost/ med registret data/rost.json. Det
+// som inte finns där sägs tyst.
 //
 // Den genererade datan committas inte (den skulle svälla repot med varje
 // körning) – den laddas upp som Pages-artefakt. Källcachen i data/cache/
@@ -149,7 +148,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     fs.mkdirSync(path.join(dataDir, 'tidning-bilder'), { recursive: true });
     for (const f of fs.readdirSync(bilder)) if (/\.jpg$/.test(f)) fs.copyFileSync(path.join(bilder, f), path.join(dataDir, 'tidning-bilder', f));
   }
-  // Hasse Backes röst: den egna där den finns, annars Azures ur cachen (build() tar fram det som saknas).
+  // Hasse Backes röst: Tomas egen, där den finns.
   const rosten = rost.publicera(dataDir, { gang: kupongCfg.gang || [] });
   const sources = sourceReport();
   write('sources.json', sources);
@@ -419,14 +418,11 @@ function roundNumbers(key, v) {
 
 async function build({ force = false, fetch = true, journal = false, couponEndpoint, minify = false } = {}) {
   const results = fetch ? await refreshAll({ force }) : [];
-  // Hasse Backes röst: det ljud som saknas, innan sajten skrivs. Går det inte blir han
-  // tystare, men bygget fortsätter.
-  const rostNu = fetch ? await rost.fyll({ gang: kupongCfg.gang || [] }).catch((err) => ({ gjorda: 0, saknas: null, fel: err.message })) : null;
   // Gängets egna tips hämtas bara när de ska frysas in (src/tippare.js).
   const s = journal ? samtalInfo(couponEndpoint) : null;
   const samtal = s ? await fetchSamtal(s.endpoint) : null;
   const site = writeSite(OUT, { journal, couponEndpoint, samtal, minify });
-  return { results, site, rost: rostNu };
+  return { results, site };
 }
 
 if (require.main === module) {
@@ -435,7 +431,7 @@ if (require.main === module) {
   const journal = process.argv.includes('--journal');
   const minify = process.argv.includes('--minify');
   build({ force, fetch, journal, minify })
-    .then(({ results, site, rost: r }) => {
+    .then(({ results, site }) => {
       for (const r of results) console.log(r.action.padEnd(8), r.id, r.error || '');
       const counts = Object.entries(site.counts).map(([k, v]) => `${v} ${k}`).join(', ');
       console.log(`Sajten byggd i _site/: ${site.pages} matchsidor, ${site.failed.length} fel, prognoser på ${site.forecastMs} ms. Källor: ${counts}.`);
@@ -446,7 +442,7 @@ if (require.main === module) {
       if (m) console.log(`Koden i mindre form: ${m.filer} filer, ${Math.round(m.fore / 1024)} → ${Math.round(m.efter / 1024)} kB${m.fel.length ? `, ${m.fel.length} kvar som de var` : ''}.`);
       const b = site.buntat;
       if (b) console.log(`Förstasidan i buntar: ${['stil', 'skript', 'moduler'].map((k) => (b[k] ? `${k} ${b[k].filer} → ${b[k].buntar}` : `${k} som förut`)).join(', ')}.`);
-      console.log(`Hasse Backes röst: ${site.rosten.filer} av ${site.rosten.av} meningar har ljud, ${site.rosten.egna} med egen röst${r ? `, ${r.gjorda} nya från Azure${r.saknas ? `, ${r.saknas} saknas` : ''}${r.fel ? ` (${r.fel})` : ''}` : ''}.`);
+      console.log(`Hasse Backes röst: ${site.rosten.filer} av ${site.rosten.av} meningar har ljud.`);
     })
     .catch((err) => {
       console.error(err);
