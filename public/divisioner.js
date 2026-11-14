@@ -390,94 +390,94 @@ const PCOLS = [
   { key: 'team', label: 'Lag', get: (p) => p.team, text: true, cls: 'pteam hide-sm', in: PA, show: (p) => esc(p.team) },
   { key: 'pos', label: 'Pos', name: 'Position', title: 'MV = målvakt, B = back, MF = mittfältare, A = anfallare.',
     get: (p) => POS_ORDER[p.pos], show: (p) => esc(p.pos || '–'), cls: 'c', in: PA },
-  { key: 'app', label: 'M', name: 'Matcher', title: 'Ligamatcher i år – både från start och som inhoppare.', get: (p) => p.app, cls: 'num', in: PA },
-  { key: 'starts', label: 'Start', name: 'Från start', title: 'Ligamatcher där spelaren fanns med i startelvan.', get: (p) => p.starts, cls: 'num hide-md hide-sm', in: ['oversikt'] },
-  { key: 'min', label: 'Min', name: 'Speltid', title: 'Spelade minuter i ligan i år.', get: (p) => p.min, cls: 'num hide-xs', mins: true, in: MIN_IN },
-  { key: 'g', label: 'Mål', title: 'Ligamål i år. Självmål räknas inte.', get: (p) => p.g, cls: 'num', strong: true, in: ['oversikt', 'avslut', 'malen'] },
+  { key: 'app', label: 'M', name: 'Matcher', title: 'Ligamatcher den här säsongen, både från start och som inhoppare.', get: (p) => p.app, cls: 'num', in: PA },
+  { key: 'starts', label: 'Start', name: 'Från start', title: 'Ligamatcher där spelaren var med i startelvan.', get: (p) => p.starts, cls: 'num hide-md hide-sm', in: ['oversikt'] },
+  { key: 'min', label: 'Min', name: 'Speltid', title: 'Spelade minuter i ligan den här säsongen.', get: (p) => p.min, cls: 'num hide-xs', mins: true, in: MIN_IN },
+  { key: 'g', label: 'Mål', title: 'Ligamål den här säsongen. Självmål räknas inte.', get: (p) => p.g, cls: 'num', strong: true, in: ['oversikt', 'avslut', 'malen'] },
 
   // Målen: ur ESPN:s matchrapporter. kinds = målens sort, som bara finns där
   // rapporterna beskriver målen (inte League One och League Two).
   { key: 'gshare', label: 'Inblandad', sub: 'i lagets mål', name: 'Inblandad i lagets mål',
-    title: 'Mål och assist delat med lagets mål: hur stor del av lagets mål spelaren har gjort eller lagt sista passningen till. Dämpade siffror: laget har gjort färre än fem mål.',
+    title: 'Hur stor del av lagets mål spelaren har gjort själv eller slagit den sista passningen till: mål och assist delade med lagets mål. Dämpade siffror: laget har gjort färre än fem mål.',
     get: goalShare, pct: true, cls: 'num hide-xs', in: ['malen'],
     ok: (p) => teamGoals.get(p.teamId) >= 5, okWhy: 'Osäker siffra: laget har gjort färre än fem mål' },
-  { key: 'gw', label: 'Segermål', title: 'Mål som avgjorde en vunnen match: målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.',
+  { key: 'gw', label: 'Segermål', title: 'Mål som avgjorde matcher som laget vann, alltså målet som gav en ledning som laget sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.',
     get: (p) => p.gw, cls: 'num', strong: true, in: ['malen'] },
   { key: 'gpts', label: 'Poäng', sub: 'åt laget', name: 'Poäng som målen gav',
-    title: 'Poängen laget hade tappat utan spelarens mål. Ett mål i en match som vanns med ett mål är värt två poäng (seger i stället för oavgjort), ett mål i en oavgjord match en poäng. Mål i matcher som vanns stort eller förlorades ger inga.',
+    title: 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort, och ett mål i en oavgjord match en poäng. Mål i matcher som vanns stort eller förlorades ger inga poäng.',
     get: (p) => p.gpts, cls: 'num', in: ['malen'] },
-  { key: 'g1', label: 'Första', sub: 'målet i matchen', name: 'Matchens första mål', title: 'Mål som var matchens första – det som gav laget ledningen med 1–0.',
+  { key: 'g1', label: 'Första', sub: 'målet i matchen', name: 'Matchens första mål', title: 'Matchens första mål, alltså mål som gav laget ledningen med 1–0.',
     get: (p) => p.g1, cls: 'num hide-sm', in: ['malen'] },
-  { key: 'gpen', label: 'Straff', name: 'Straffar', title: 'Straffmål av slagna straffar i ligan – räddade, missade och i ramen räknas som slagna. Straffläggningar räknas inte.',
+  { key: 'gpen', label: 'Straff', name: 'Straffar', title: 'Hur många av sina straffar i ligan spelaren har satt. Räddade straffar och straffar utanför eller i ramen räknas som slagna, men inte straffläggningar.',
     get: (p) => p.gpen, cls: 'num', kinds: true, in: ['malen'],
     show: (p) => (p.gpen == null ? cell(null) : p.gpen + (p.pmiss || 0) ? `${p.gpen} <span class="muted">av ${p.gpen + (p.pmiss || 0)}</span>` : cell(0)) },
-  { key: 'glate', label: 'Sena', sub: 'från 80:e min', name: 'Sena mål', title: 'Mål från den 80:e minuten och framåt, tilläggstiden inräknad.',
+  { key: 'glate', label: 'Sena', sub: 'från 80:e min', name: 'Sena mål', title: 'Mål från och med den 80:e minuten, tilläggstiden inräknad.',
     get: (p) => p.glate, cls: 'num hide-sm', in: ['malen'] },
-  { key: 'gsub', label: 'Inhopp', sub: 'mål', name: 'Mål som inhoppare', title: 'Mål gjorda efter att spelaren bytts in.', get: (p) => p.gsub, cls: 'num hide-sm', in: ['malen'] },
-  { key: 'a', label: 'Ass', name: 'Assist', title: 'Sista passningen före ett mål – eller ett skott som räddas och slås in av en lagkamrat. Enligt ESPN.',
+  { key: 'gsub', label: 'Inhopp', sub: 'mål', name: 'Mål som inhoppare', title: 'Mål som spelaren har gjort efter att ha bytts in.', get: (p) => p.gsub, cls: 'num hide-sm', in: ['malen'] },
+  { key: 'a', label: 'Ass', name: 'Assist', title: 'Den sista passningen före ett mål, eller ett skott som målvakten räddar och en lagkamrat sätter in på returen. Siffrorna kommer från ESPN.',
     get: (p) => p.a, cls: 'num', in: ['oversikt'] },
   { key: 'rt', label: 'Betyg', name: 'Snittbetyg',
-    title: 'Snittet av spelarens betyg från 365Scores, 1–10, i ligans matcher i år. En vanlig insats ger runt 6,7. Dämpade siffror: betyg i färre än tre matcher eller i färre än hälften av lagets.',
+    title: 'Spelarens genomsnittliga betyg i ligan den här säsongen enligt 365Scores, på en skala från 1 till 10. En vanlig insats ger ungefär 6,7. Dämpade siffror: betyg i färre än tre matcher eller i färre än hälften av lagets.',
     get: (p) => p.rt, d: 1, cls: 'num', rt: true, in: ['oversikt'],
     ok: (p) => p.rn >= TH.rated && p.rq >= TH.shareRated, okWhy: 'Osäker siffra: betyg i färre än tre matcher eller i färre än hälften av lagets' },
-  { key: 'fs', label: 'Fälld', name: 'Fälld', title: 'Gånger spelaren har blivit fälld eller utsatt för en annan förseelse som domaren blåst för.',
+  { key: 'fs', label: 'Fälld', name: 'Fälld', title: 'Hur många gånger spelaren har blivit fälld eller utsatt för ett annat regelbrott som domaren har blåst för.',
     get: (p) => p.fs, cls: 'num', strong: true, in: ['regelbrott'] },
-  { key: 'fs90', label: 'Fälld', sub: 'per 90 min', name: 'Fälld per 90 minuter', title: 'Gånger spelaren har blivit fälld per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
+  { key: 'fs90', label: 'Fälld', sub: 'per 90 min', name: 'Fälld per 90 minuter', title: 'Hur många gånger spelaren blir fälld per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
     get: (p) => per90e(p.fs, p), d: 1, cls: 'num hide-xs', mins: true, in: ['regelbrott'], ...qMinE },
-  { key: 'fc', label: 'Fäller', name: 'Begångna regelbrott', title: 'Regelbrott spelaren har begått som domaren blåst frispark eller straff för.',
+  { key: 'fc', label: 'Fäller', name: 'Begångna regelbrott', title: 'Regelbrott som spelaren har begått och som domaren har blåst frispark eller straff för.',
     get: (p) => p.fc, cls: 'num', in: ['regelbrott'] },
   { key: 'fc90', label: 'Fäller', sub: 'per 90 min', name: 'Begångna regelbrott per 90 minuter', title: 'Begångna regelbrott per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
     get: (p) => per90e(p.fc, p), d: 1, cls: 'num hide-xs', mins: true, in: ['regelbrott'], ...qMinE },
-  { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan i år.', get: (p) => p.yc, cls: 'num', in: ['regelbrott'] },
-  { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan i år.', get: (p) => p.rc, cls: 'num', in: ['regelbrott'] },
-  { key: 'sh', label: 'Skott', title: 'Alla avslut – även de som går utanför eller blockeras.', get: (p) => p.sh, cls: 'num', in: ['avslut'] },
-  { key: 'sot', label: 'På mål', name: 'Skott på mål', title: 'Skott som hade gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.',
+  { key: 'yc', label: 'Gul', name: 'Gula kort', title: 'Gula kort i ligan den här säsongen.', get: (p) => p.yc, cls: 'num', in: ['regelbrott'] },
+  { key: 'rc', label: 'Röd', name: 'Röda kort', title: 'Röda kort i ligan den här säsongen.', get: (p) => p.rc, cls: 'num', in: ['regelbrott'] },
+  { key: 'sh', label: 'Skott', title: 'Alla avslut, även de som går utanför eller täcks.', get: (p) => p.sh, cls: 'num', in: ['avslut'] },
+  { key: 'sot', label: 'På mål', name: 'Skott på mål', title: 'Skott på mål, alltså mål och skott som målvakten räddar. Skott utanför eller i stolpen räknas inte.',
     get: (p) => p.sot, cls: 'num', in: ['avslut'] },
   { key: 'conv', label: 'Mål/skott', name: 'Mål per skott',
-    title: 'Hur stor andel av skotten som blivit mål. 20 % = vart femte skott går in. Spelare med färre än tio skott visas dämpade – där är siffran osäker.',
+    title: 'Hur stor andel av skotten som har blivit mål. 20 % betyder att vart femte skott går in. Spelare med färre än tio skott visas dämpade, eftersom siffran då är osäker.',
     get: (p) => (p.sh ? p.g / p.sh : null), pct: true, cls: 'num hide-xs', in: ['avslut'],
     ok: (p) => p.sh >= TH.shots, okWhy: 'Osäker siffra: färre än tio skott' },
-  { key: 'gpm', label: 'Mål', sub: 'per match', name: 'Mål per match', title: 'Mål delat med antalet matcher. Inhopp räknas som hela matcher.',
+  { key: 'gpm', label: 'Mål', sub: 'per match', name: 'Mål per match', title: 'Mål per match, där ett inhopp räknas som en hel match.',
     get: (p) => (p.app ? p.g / p.app : null), d: 2, cls: 'num', nomins: true, in: ['avslut'] },
   { key: 'xg', label: 'xG', name: 'Förväntade mål (xG)',
-    title: 'Hur många mål spelarens chanser brukar ge. Varje skott får ett värde efter hur ofta ett sådant skott blir mål – en straff runt 0,8, ett långskott några hundradelar. Från Fantasy Premier League.',
+    title: 'Hur många mål spelarens chanser är värda. Varje skott får ett värde efter hur ofta ett sådant skott blir mål. En straff är värd ungefär 0,8 och ett långskott några hundradelar. Siffrorna kommer från Fantasy Premier League.',
     get: (p) => p.xg, d: 1, cls: 'num', fpl: true, in: ['avslut'] },
   { key: 'dxg', label: 'Mål mot xG',
-    title: 'Gjorda mål minus xG. Plus (grönt) = fler mål än chanserna brukar ge – en skicklig avslutare eller tur. Stora avvikelser brukar jämna ut sig med tiden.',
+    title: 'Gjorda mål minus xG. Plus (grönt) betyder fler mål än chanserna var värda, alltså en skicklig avslutare eller tur. Stora skillnader brukar jämna ut sig med tiden.',
     get: dxgOf, cls: 'num', fpl: true, in: ['avslut'], show: (p) => delta(dxgOf(p), { d: 1, dead: 0.05 }) },
   { key: 'xa', label: 'xA', name: 'Förväntade assist (xA)',
-    title: 'Hur många mål spelarens passningar före lagkamraternas skott brukar ge, oavsett om skotten gick in. Från Fantasy Premier League.',
+    title: 'Hur många mål spelarens passningar till lagkamraternas avslut är värda, oavsett om skotten går in. Siffrorna kommer från Fantasy Premier League.',
     get: (p) => p.xa, d: 1, cls: 'num hide-xs', fpl: true, in: ['avslut'] },
   { key: 'g90', label: 'Mål', sub: 'per 90 min', name: 'Mål per 90 minuter',
-    title: 'Mål per 90 minuters speltid – rättvisare än per match för spelare som ofta byts in eller ut. Dämpade siffror: mindre än tre hela matchers speltid.',
+    title: 'Mål per 90 minuters speltid. Talet är rättvisare än mål per match för spelare som ofta byts in eller ut. Dämpade siffror: mindre än tre hela matchers speltid.',
     get: (p) => per90(goals90(p), p), d: 2, cls: 'num', mins: true, in: ['avslut'], ...qMin },
   { key: 'xg90', label: 'xG', sub: 'per 90 min', name: 'xG per 90 minuter',
-    title: 'Förväntade mål per 90 minuters speltid: hur ofta spelaren kommer till lägen, oavsett om de blir mål.',
+    title: 'Förväntade mål per 90 minuters speltid: hur ofta och hur bra lägen spelaren kommer till, oavsett om de blir mål.',
     get: (p) => per90(p.xg, p), d: 2, cls: 'num hide-sm', fpl: true, in: ['avslut'], ...qMin },
   { key: 'ga90', label: 'M+A', sub: 'per 90 min', name: 'Mål plus assist per 90 minuter', title: 'Mål och assist tillsammans per 90 minuters speltid.',
     get: (p) => per90(ga90Of(p), p), d: 2, cls: 'num hide-xs', mins: true, in: ['avslut'], ...qMin },
 
   // Försvar: närkamperna från Fantasy Premier League, målvakterna från ESPN.
-  { key: 'tk', label: 'Tacklingar', title: 'Gånger spelaren har tagit bollen från en motståndare i en närkamp. Från Fantasy Premier League.',
+  { key: 'tk', label: 'Tacklingar', title: 'Hur många gånger spelaren har tagit bollen från en motståndare i en närkamp. Siffrorna kommer från Fantasy Premier League.',
     get: (p) => p.tk, cls: 'num', fpl: true, in: ['forsvar'] },
-  { key: 'rec', label: 'Bollvinster', title: 'Gånger spelaren har tagit hand om en lös boll åt laget. Målvakter får många när de plockar inlägg och långbollar. Från Fantasy Premier League.',
+  { key: 'rec', label: 'Bollvinster', title: 'Hur många gånger spelaren har tagit hand om en lös boll åt laget. Målvakter får många, eftersom de plockar ner inlägg och långa bollar. Siffrorna kommer från Fantasy Premier League.',
     get: (p) => p.rec, cls: 'num hide-xs', fpl: true, in: ['forsvar'] },
   { key: 'cbi', label: 'Rensningar', sub: 'täckningar, brytningar', name: 'Rensningar, täckningar och brytningar',
-    title: 'Bollar spelaren har rensat bort, skott och passningar spelaren har täckt och passningar spelaren har brutit. Från Fantasy Premier League.',
+    title: 'Hur många gånger spelaren har rensat bort bollen, täckt ett skott eller en passning eller brutit en passning. Siffrorna kommer från Fantasy Premier League.',
     get: (p) => p.cbi, cls: 'num', fpl: true, in: ['forsvar'] },
   { key: 'def90', label: 'Insatser', sub: 'per 90 min', name: 'Försvarsinsatser per 90 minuter',
     title: 'Tacklingar, rensningar, täckningar och brytningar per 90 minuters speltid. Dämpade siffror: mindre än tre hela matchers speltid.',
     get: (p) => (p.tk == null || p.cbi == null ? null : per90(p.tk + p.cbi, p)), d: 1, cls: 'num', strong: true, fpl: true, in: ['forsvar'], ...qMin },
-  { key: 'cs', label: 'Nollor', name: 'Hållna nollor', title: 'Matcher där laget inte släppte in något mål medan spelaren var på planen, minst 60 minuter. Från Fantasy Premier League.',
+  { key: 'cs', label: 'Nollor', name: 'Hållna nollor', title: 'Matcher där spelaren var med i minst 60 minuter och laget inte släppte in något mål medan spelaren var på planen. Siffrorna kommer från Fantasy Premier League.',
     get: (p) => p.cs, cls: 'num hide-xs', fpl: true, in: ['forsvar'] },
-  { key: 'sv', label: 'Räddningar', title: 'Målvaktens räddningar i ligan i år.', get: (p) => onlyMv(p, p.sv), cls: 'num', in: ['forsvar'],
+  { key: 'sv', label: 'Räddningar', title: 'Målvaktens räddningar i ligan den här säsongen.', get: (p) => onlyMv(p, p.sv), cls: 'num', in: ['forsvar'],
     show: (p) => (p.pos === 'MV' ? cell(p.sv) : '') },
   { key: 'svp', label: 'Räddade', sub: 'av skotten på mål', name: 'Räddningsprocent',
-    title: 'Räddningar delat med skotten på mål som målvakten mött. Dämpade siffror: färre än tio skott på mål.',
+    title: 'Hur stor andel av skotten på mål som målvakten har räddat. Dämpade siffror: färre än tio skott på mål.',
     get: (p) => onlyMv(p, p.savePct), cls: 'num', in: ['forsvar'],
     show: (p) => (p.pos !== 'MV' ? '' : p.savePct == null ? cell(null) : pct(p.savePct)),
     ok: (p) => (p.sv || 0) + (p.gc || 0) >= 10, okWhy: 'Osäker siffra: färre än tio skott på mål' },
-  { key: 'og', label: 'Självmål', title: 'Självmål i ligan i år.', get: (p) => p.og, cls: 'num hide-xs', in: ['forsvar'] },
+  { key: 'og', label: 'Självmål', title: 'Självmål i ligan den här säsongen.', get: (p) => p.og, cls: 'num hide-xs', in: ['forsvar'] },
 ];
 
 // fpl = xG och försvarsspel (bara Premier League), mins = speltiden
@@ -696,8 +696,8 @@ const signedInt = (x) => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '0');
 // matcherna, nyast först, V, O eller F efter 90 minuter. Ur data/matches.json,
 // alltså ligan och de engelska cuperna (Europacuperna finns bara i matchens
 // fil). Ett dolt resultat står som ? och räknas inte.
-const FORM_TIP = 'De fem senaste matcherna i ligan och de engelska cuperna, nyast till vänster: V = vinst, O = oavgjort, F = förlust. ' +
-  'Det är ställningen efter 90 minuter som gäller. Peka på en ruta för att se vilken match det var.';
+const FORM_TIP = 'De fem senaste matcherna i ligan och de engelska cuperna, den senaste till vänster. V betyder vinst, O oavgjort och F förlust, ' +
+  'och det är ställningen efter 90 minuter som gäller. Peka på en ruta för att se vilken match det var.';
 const FORM_RESULT = { V: 'Vinst', O: 'Oavgjort', F: 'Förlust' };
 const FORM_PTS = { V: 3, O: 1, F: 0 };
 // cuperna på svenska, som i kortregistret
@@ -822,7 +822,7 @@ const TCOLS = [
   { key: 'name', label: 'Lag', get: (t) => t.name, text: true, cls: 'team dv-stick', in: TA, show: (t) => teamName(t.name) },
   // (bara landslagen: gruppen i Nations League)
   { key: 'grupp', label: 'Grupp', name: 'Gruppen', title: 'Gruppen i Nations League: ligan (A–D) och gruppens nummer.', get: (t) => (t.grupp ? grpOrd(t.grupp) * 100 + t.rank : null), cls: 'c', asc: true, in: ['tabell'], land: true, show: (t) => esc(t.grupp || '–') },
-  { key: 'm', label: 'S', name: 'Spelade matcher', title: 'Antal spelade ligamatcher.', get: (t) => t.m, cls: 'num', in: ['tabell'] },
+  { key: 'm', label: 'S', name: 'Spelade matcher', title: 'Antalet spelade ligamatcher.', get: (t) => t.m, cls: 'num', in: ['tabell'] },
   { key: 'w', label: 'V', name: 'Vunna', title: 'Vunna matcher – ger 3 poäng var.', get: (t) => t.w, cls: 'num', in: ['tabell'] },
   { key: 'd', label: 'O', name: 'Oavgjorda', title: 'Oavgjorda matcher – ger 1 poäng var.', get: (t) => t.d, cls: 'num', in: ['tabell'] },
   { key: 'l', label: 'F', name: 'Förlorade', title: 'Förlorade matcher – ger inga poäng.', get: (t) => t.l, cls: 'num', in: ['tabell'] },
@@ -830,87 +830,87 @@ const TCOLS = [
   { key: 'ga', label: 'IM', name: 'Insläppta mål', title: 'Mål laget har släppt in i ligan.', get: (t) => t.ga, cls: 'num hide-xs', asc: true, in: ['tabell'] },
   { key: 'gd', label: '+/−', name: 'Målskillnad', title: 'Gjorda minus insläppta mål. Skiljer lag som har lika många poäng.',
     get: (t) => t.gd, cls: 'num', in: ['tabell'], show: (t) => signedInt(t.gd) },
-  { key: 'pts', label: 'P', name: 'Poäng', title: '3 poäng för vinst, 1 för oavgjort. En stjärna betyder att laget fått poängavdrag.', get: (t) => t.pts, cls: 'num pts', in: ['tabell'],
+  { key: 'pts', label: 'P', name: 'Poäng', title: '3 poäng för vinst och 1 för oavgjort. En stjärna betyder att laget har fått poängavdrag.', get: (t) => t.pts, cls: 'num pts', in: ['tabell'],
     show: (t) => `<b>${t.pts}</b>${t.ded ? `<sup title="${t.ded} poängs avdrag">*</sup>` : ''}` },
   { key: 'form', label: 'Form', sub: 'nyast först', name: 'Formen', title: `${FORM_TIP} Sorteras på poängen i de fem matcherna.`,
     get: (t) => formPts(teamForm(t.name)), cls: 'c dv-fcol hide-xs', in: ['tabell'], show: (t) => formChips(teamForm(t.name), t.name) },
   { key: 'gpm', label: 'Mål', sub: 'per match', name: 'Gjorda mål per match',
-    title: 'Gjorda mål delat med antalet matcher – går att jämföra även när lagen har spelat olika många matcher.',
+    title: 'Gjorda mål delat med antalet matcher. Då går lagen att jämföra även om de har spelat olika många matcher.',
     get: (t) => (t.m ? t.gf / t.m : null), d: 2, cls: 'num hide-sm', in: ['tabell'] },
-  { key: 'gapm', label: 'Insläppta', sub: 'per match', name: 'Insläppta mål per match', title: 'Insläppta mål delat med antalet matcher. Lägre är bättre.',
+  { key: 'gapm', label: 'Insläppta', sub: 'per match', name: 'Insläppta mål per match', title: 'Insläppta mål delat med antalet matcher. Ju lägre, desto bättre.',
     get: (t) => (t.m ? t.ga / t.m : null), d: 2, cls: 'num hide-sm', asc: true, in: ['tabell'] },
-  { key: 'cs', label: 'Nollor', sub: 'andel matcher', name: 'Hållna nollor', title: 'Hur stor andel av matcherna laget har klarat utan att släppa in något mål.',
+  { key: 'cs', label: 'Nollor', sub: 'andel matcher', name: 'Hållna nollor', title: 'Hur stor andel av matcherna laget har hållit nollan i, alltså inte släppt in något mål.',
     get: (t) => share(t, 'cs'), pct: true, cls: 'num hide-xs', in: ['tabell'] },
 
   // xG-fliken läses från vänster: chanserna laget skapar och släpper till,
   // skillnaden, hur målen och poängen stämt med chanserna, hur ofta matcherna
   // legat nära kryss, hur svårt programmet varit och vad modellen gör av allt.
   { key: 'xgf', label: 'Skapar', sub: 'xG per match', name: 'Skapade chanser',
-    title: 'Förväntade mål (xG) per match: hur många mål lagets chanser brukar ge. Varje skott får ett värde efter hur ofta ett sådant skott blir mål – en straff runt 0,8, ett långskott några hundradelar. Högre är bättre.',
+    title: 'Förväntade mål (xG) per match: hur många mål lagets chanser är värda. Varje skott får ett värde efter hur ofta ett sådant skott blir mål. En straff är värd ungefär 0,8 och ett långskott några hundradelar. Ju högre, desto bättre.',
     get: (t) => per(fdOf(t, 'xg'), 'f'), d: 2, cls: 'num', in: ['xg'] },
   { key: 'xga', label: 'Släpper till', sub: 'xG per match', name: 'Motståndarnas chanser',
-    title: 'Motståndarnas förväntade mål (xG) per match: hur bra chanser laget släpper till. Lägre är bättre.',
+    title: 'Motståndarnas förväntade mål (xG) per match: hur bra chanser laget släpper till. Ju lägre, desto bättre.',
     get: (t) => per(fdOf(t, 'xg'), 'a'), d: 2, cls: 'num', asc: true, in: ['xg'] },
   { key: 'xgd', label: 'Skillnad', sub: 'xG per match', name: 'xG-skillnad',
-    title: 'Lagets xG minus motståndarnas, per match. Plus (grönt) = laget skapar bättre chanser än det släpper till. Visar lagets styrka säkrare än målskillnaden, eftersom slumpen i avsluten spelar mindre roll.',
+    title: 'Lagets xG minus motståndarnas, per match. Plus (grönt) betyder att laget skapar bättre chanser än det släpper till. Talet säger mer om lagets styrka än målskillnaden, eftersom slumpen i avsluten spelar mindre roll.',
     get: xgd, cls: 'num', in: ['xg'], show: (t) => delta(xgd(t), { d: 2, dead: 0.005 }) },
   { key: 'dxg', label: 'Gjorda', sub: 'mål mot xG', name: 'Gjorda mål mot xG',
-    title: 'Gjorda mål minus xG under säsongen. Plus (grönt) = fler mål än chanserna brukar ge – bra avslut eller tur. Stora avvikelser brukar jämna ut sig.',
+    title: 'Gjorda mål minus xG under säsongen. Plus (grönt) betyder fler mål än chanserna var värda, alltså bra avslut eller tur. Stora skillnader brukar jämna ut sig.',
     get: (t) => { const x = fdOf(t, 'xg'); return x ? x.gf - x.f : null; }, cls: 'num', in: ['xg'],
     show: (t) => { const x = fdOf(t, 'xg'); return delta(x ? x.gf - x.f : null, { d: 1 }); } },
   { key: 'dxga', label: 'Insläppta', sub: 'mål mot xG', name: 'Insläppta mål mot xG',
-    title: 'Insläppta mål minus motståndarnas xG under säsongen. Minus (grönt) = färre insläppta än chanserna brukar ge – bra målvakt eller tur. Plus (rött) = fler än väntat.',
+    title: 'Insläppta mål minus motståndarnas xG under säsongen. Minus (grönt) betyder färre insläppta mål än motståndarnas chanser var värda, alltså en bra målvakt eller tur. Plus (rött) betyder fler.',
     get: (t) => { const x = fdOf(t, 'xg'); return x ? x.ga - x.a : null; }, cls: 'num', asc: true, in: ['xg'],
     show: (t) => { const x = fdOf(t, 'xg'); return delta(x ? x.ga - x.a : null, { d: 1, invert: true }); } },
   { key: 'xpd', label: 'Poäng', sub: 'mot chanserna', name: 'Poäng mot chanserna',
-    title: 'Tagna poäng minus de poäng lagets chanser brukar ge. Varje match räknas om till chanser att vinna och spela oavgjort ur båda lagens xG, och ger 3 × vinstchansen + oavgjortchansen. Plus (grönt) = fler poäng än chanserna var värda – oftast tur, som brukar jämna ut sig. Minus (rött) = färre.',
+    title: 'Tagna poäng minus de poäng som lagets chanser var värda. Ur båda lagens xG räknas varje match om till en chans att vinna och en chans att spela oavgjort, och matchen blir värd 3 × vinstchansen + chansen till oavgjort. Plus (grönt) betyder fler poäng än chanserna var värda, oftast tur som inte brukar hålla i sig. Minus (rött) betyder färre.',
     get: xpd, cls: 'num', in: ['xg'], show: (t) => delta(xpd(t), { d: 1 }) },
   { key: 'xdr', label: 'Kryss', sub: 'enligt chanserna', name: 'Krysschans',
-    title: 'Chansen att lagets matcher skulle sluta oavgjort, i snitt, räknat ur båda lagens xG. Högt = jämna matcher med få chanser, där krysset ligger nära.',
+    title: 'Hur stor chans lagets matcher har haft att sluta oavgjort, i genomsnitt, räknat ur båda lagens xG. Ett högt tal betyder jämna matcher med få chanser, där krysset ligger nära till hands.',
     get: xdraw, pct: true, cls: 'num hide-xs', in: ['xg'] },
   { key: 'opp', label: 'Motstånd', sub: 'hittills', name: 'Motståndets styrka hittills',
-    title: 'Hur starka motståndarna har varit jämfört med ett normalt spelschema i divisionen, i mål per match enligt prognosmodellen. Plus = svårare motstånd än snittet, minus = lättare. Bra att ha med när xG-siffrorna jämförs.',
+    title: 'Hur starka motståndarna har varit jämfört med ett genomsnittligt spelschema i divisionen, mätt i mål per match med prognosmodellen. Plus betyder svårare motstånd än genomsnittet och minus lättare. Bra att ha med när man jämför xG-siffrorna.',
     get: (t) => fdOf(t, 'opp'), cls: 'num hide-xs', in: ['xg'],
     show: (t) => (fdOf(t, 'opp') == null ? cell(null) : `<span class="dv-even">${signed(fdOf(t, 'opp'), 2)}</span>`) },
   { key: 'str', label: 'Styrka', sub: 'enligt modellen', name: 'Modellens styrka',
-    title: 'Prognosmodellens bedömning: väntad målskillnad per match mot ett snittlag i divisionen på neutral plan. Tar hänsyn till motståndet och till tidigare säsonger med mindre vikt, och är samma styrka som ger prognoserna.',
+    title: 'Prognosmodellens bedömning av laget: väntad målskillnad per match mot ett genomsnittligt lag i divisionen, på neutral plan. Modellen tar hänsyn till motståndet och i mindre grad till tidigare säsonger. Prognoserna bygger på samma tal.',
     get: (t) => t.str, cls: 'num', in: ['xg'], show: (t) => delta(t.str, { d: 2, dead: 0.005 }) },
 
-  { key: 'shf', label: 'Skott', sub: 'per match', name: 'Skott per match', title: 'Lagets avslut per match – även de som går utanför eller blockeras.',
+  { key: 'shf', label: 'Skott', sub: 'per match', name: 'Skott per match', title: 'Lagets avslut per match, även de som går utanför eller täcks.',
     get: (t) => per(fdOf(t, 'sh'), 'f'), d: 1, cls: 'num', in: ['spelet'] },
-  { key: 'sha', label: 'Skott mot', sub: 'per match', name: 'Skott mot per match', title: 'Motståndarnas avslut per match. Lägre är bättre.',
+  { key: 'sha', label: 'Skott mot', sub: 'per match', name: 'Skott mot per match', title: 'Motståndarnas avslut per match. Ju färre, desto bättre.',
     get: (t) => per(fdOf(t, 'sh'), 'a'), d: 1, cls: 'num', asc: true, in: ['spelet'] },
-  { key: 'sotf', label: 'På mål', sub: 'per match', name: 'Skott på mål per match', title: 'Lagets skott per match som hade gått in om målvakten inte räddat.',
+  { key: 'sotf', label: 'På mål', sub: 'per match', name: 'Skott på mål per match', title: 'Lagets skott på mål per match, alltså mål och skott som målvakten räddar.',
     get: (t) => per(fdOf(t, 'sh'), 'of'), d: 1, cls: 'num hide-xs', in: ['spelet'] },
-  { key: 'ycm', label: 'Gula', sub: 'per match', name: 'Gula kort per match', title: 'Lagets gula kort per match. Den som visas ut efter två gula kort har fått två gula och ett rött.',
+  { key: 'ycm', label: 'Gula', sub: 'per match', name: 'Gula kort per match', title: 'Lagets gula kort per match. En spelare som visas ut efter två varningar räknas med två gula kort och ett rött.',
     get: (t) => per(fdOf(t, 'cards'), 'y'), d: 2, cls: 'num', in: ['spelet'] },
 
   // Oddsen läses från vänster: hur ofta laget var favorit, vad oddsen
   // väntade sig, vad laget tog, skillnaden och vad ett spel på laget gav.
   { key: 'fav', label: 'Favorit', sub: 'andel matcher', name: 'Favorit enligt oddsen',
-    title: 'Hur ofta laget hade större chans än motståndaren att vinna, enligt spelbolagens odds före avspark. 100 % = favorit i varje match, 0 % = aldrig favorit.',
+    title: 'Hur ofta laget har haft större chans än motståndaren att vinna, enligt spelbolagens odds vid avspark. 100 % betyder favorit i varje match och 0 % aldrig favorit.',
     get: (t) => { const m = fdOf(t, 'mkt'); return m ? m.fav / m.n : null; }, pct: true, cls: 'num hide-xs', in: ['marknaden'] },
   { key: 'mxp', label: 'Väntat', sub: 'poäng enligt oddsen', name: 'Väntade poäng',
-    title: 'Så många poäng oddsen räknade med att laget skulle ta. Före varje match görs oddsen om till chanser (utan spelbolagens påslag), och matchen ger 3 × vinstchansen + oavgjortchansen. Exempel: 60 % vinst och 25 % oavgjort = 2,05 poäng.',
+    title: 'Så många poäng oddsen räknade med att laget skulle ta. Oddsen vid avspark görs om till chanser, utan spelbolagens påslag, och varje match blir värd 3 × vinstchansen + chansen till oavgjort. En match med 60 % chans att vinna och 25 % chans till oavgjort är alltså värd 2,05 poäng.',
     get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').xp : null), d: 1, cls: 'num', in: ['marknaden'] },
   { key: 'mpts', label: 'Tog', sub: 'poäng', name: 'Tagna poäng',
-    title: 'Poängen laget faktiskt tog i samma matcher. Kan vara färre än i tabellen – oddsen kommer ibland en omgång efter.',
+    title: 'Poängen laget tog i samma matcher. De kan vara färre än i tabellen, eftersom oddsen ibland ligger en omgång efter.',
     get: (t) => (fdOf(t, 'mkt') ? fdOf(t, 'mkt').pts : null), cls: 'num', in: ['marknaden'] },
   { key: 'vso', label: 'Mot oddsen', sub: 'poäng över/under', name: 'Poäng mot oddsen',
-    title: 'Tagna minus väntade poäng. Plus (grönt) = laget har tagit fler poäng än oddsen trodde. Minus (rött) = färre än väntat.',
+    title: 'Tagna minus väntade poäng. Plus (grönt) betyder att laget har tagit fler poäng än oddsen trodde, och minus (rött) färre.',
     get: vsOdds, cls: 'num', in: ['marknaden'], show: (t) => delta(vsOdds(t), { d: 1 }) },
   { key: 'roi', label: 'Spel på seger', sub: 'vinst på insatsen', name: 'Om man spelat på laget',
-    title: 'Om man satsat lika mycket på att laget vinner varje match, till oddset före avspark: så mycket hade man vunnit (+) eller förlorat (−) av det man satsat. +50 % = varje hundralapp hade blivit 150 kr. Spelbolagens påslag är inräknat.',
+    title: 'Vinsten (+) eller förlusten (−), i procent av insatserna, för den som hade spelat lika mycket på seger för laget i varje match, till oddset vid avspark. +50 % betyder att varje hundralapp hade blivit 150 kr. Spelbolagens påslag är inräknat.',
     get: roi, cls: 'num', in: ['marknaden'], show: (t) => delta(roi(t), { dead: 0.005, fmt: signedPct }) },
 
   { key: 'goals', label: 'Mål', name: 'Mål av lagets spelare',
-    title: 'Mål som ESPN har skrivit på lagets spelare. Självmål räknas inte, så summan kan vara lägre än i tabellen.',
+    title: 'Mål av lagets spelare enligt ESPN. Motståndarnas självmål räknas inte, så summan kan vara lägre än i tabellen.',
     get: (t) => sqOf(t, 'goals'), cls: 'num', in: ['truppen'] },
-  { key: 'scorer', label: 'Bäste målskytt', title: 'Spelaren med flest ligamål i laget, och antalet mål.',
+  { key: 'scorer', label: 'Bäste målskytt', title: 'Lagets bästa målskytt i ligan och antalet mål.',
     get: (t) => (t.sq && t.sq.topScorer ? t.sq.topScorer.g : null), cls: 'hide-sm', in: ['truppen'],
     show: (t) => (t.sq && t.sq.topScorer && t.sq.topScorer.g ? `${esc(t.sq.topScorer.name)} <b>${t.sq.topScorer.g}</b>` : '–') },
   { key: 'topScorerShare', label: 'Beroende', sub: 'andel av målen', name: 'Beroende av bäste målskytten',
-    title: 'Hur stor del av lagets mål den bäste målskytten har gjort. Högt värde = laget hänger mycket på en enda spelare.',
+    title: 'Hur stor del av lagets mål den bästa målskytten har gjort. Ett högt tal betyder att laget är beroende av en enda spelare.',
     get: (t) => sqOf(t, 'topScorerShare'), cls: 'num', pct: true, in: ['truppen'] },
 ];
 
@@ -1010,22 +1010,22 @@ function teamsView(dv, P, T) {
       tip: 'xG-skillnaden per match i Nations League: lagets chanser minus motståndarnas. Ligorna A–D är olika starka.' })
       : twoWay('styrka', 'Starkast & svagast', all, (t) => t.str, {
         up: 'Starkast', down: 'Svagast', value: (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`,
-        tip: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat.' })) +
+        tip: 'Modellens väntade målskillnad per match mot ett genomsnittligt lag i divisionen, med motståndet inräknat.' })) +
     teamTop('kryss', 'Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
-      { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG.' }) +
+      { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i genomsnitt, räknat ur båda lagens xG.' }) +
     twoWay('tur', 'Tur & otur', all, xpd, {
       up: 'Tur', down: 'Otur', value: (t) => `<b>${delta(xpd(t), { d: 1 })}</b>`,
-      tip: 'Poäng mot chanserna: tagna poäng minus de poäng lagets chanser (xG) brukar ge. Tur = fler poäng än chanserna var värda, otur = färre. Brukar jämna ut sig.' }) +
+      tip: 'Poäng mot chanserna: tagna poäng minus de poäng som lagets chanser (xG) var värda. Tur betyder fler poäng än chanserna var värda och otur färre, och båda brukar jämna ut sig.' }) +
     twoWay('odds', 'Mot oddsen', all, vsOdds, {
       up: 'Slår oddsen', down: 'Sviker', value: (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b>`,
-      tip: 'Tagna poäng minus de poäng oddsen vid avspark väntade sig. Slår oddsen = fler poäng än väntat, sviker = färre.' }) +
+      tip: 'Tagna poäng minus de poäng som oddsen vid avspark räknade med. Slår oddsen betyder fler poäng än väntat och sviker färre.' }) +
     // (landslagen: hur ofta laget har varit favorit i stället för motståndet)
     (land ? teamTop('favorit', 'Favorit oftast', all, (t) => `<b>${pct(fdOf(t, 'mkt').fav / fdOf(t, 'mkt').n)}</b>`, {
       get: (t) => { const m = fdOf(t, 'mkt'); return m && m.n ? m.fav / m.n : null; },
-      tip: 'Andelen matcher där laget hade större chans än motståndaren att vinna, enligt oddsen före avspark.' })
+      tip: 'Andelen matcher där laget hade större chans än motståndaren att vinna, enligt oddsen vid avspark.' })
       : twoWay('motstand', 'Motståndet', all, opp, {
         up: 'Tufft hittills', down: 'Lätt hittills', tone: 'even', value: (t) => `<b class="dv-even">${signed(opp(t), 2)}</b>`,
-        tip: 'Motståndarnas styrka hittills mot ett normalt spelschema i divisionen, i mål per match enligt prognosmodellen. Tufft = svårare motstånd än snittet, lätt = lättare.' }));
+        tip: 'Motståndarnas styrka hittills jämfört med ett genomsnittligt spelschema i divisionen, mätt i mål per match med prognosmodellen. Tufft betyder svårare motstånd än genomsnittet och lätt lättare.' }));
 
   return '<div class="dv-leaders">' + leaders + '</div>' +
     card('Alla lag', {
@@ -1282,9 +1282,9 @@ function openPlayer(id) {
       }
       if (p.xg != null) {
         att += msec('Chanserna', facts([
-          [num(p.xg, 1), 'xG', 'Förväntade mål: hur många mål spelarens skott brukar ge'],
-          [delta(dxgOf(p), { d: 1 }), 'Mål mot xG', 'Gjorda mål minus xG – plus är fler mål än chanserna brukar ge'],
-          [num(p.xa, 1), 'xA', 'Förväntade assist: hur många mål passningarna före lagkamraternas skott brukar ge'],
+          [num(p.xg, 1), 'xG', 'Förväntade mål: hur många mål spelarens skott är värda'],
+          [delta(dxgOf(p), { d: 1 }), 'Mål mot xG', 'Gjorda mål minus xG. Plus betyder fler mål än chanserna var värda'],
+          [num(p.xa, 1), 'xA', 'Förväntade assist: hur många mål spelarens passningar till lagkamraternas avslut är värda'],
           full ? [num(per90(p.xg, p), 2), 'xG per 90 min'] : null,
         ]));
       }
@@ -1383,14 +1383,14 @@ async function openTeam(id, pick) {
       x ? [delta(x.pts - x.xp, { d: 1 }), 'Poäng mot chanserna', `Tur & otur: ${x.pts} poäng, ${num(x.xp, 1)} enligt chanserna (xG)`] : null,
       x ? [pct(x.xd / x.n), 'Kryss enligt chanserna', `Kryssar gärna: ${x.d} kryss på ${x.n} matcher`] : null,
       m ? [delta(m.pts - m.xp, { d: 1 }), 'Poäng mot oddsen', `Mot oddsen: ${m.pts} poäng, ${num(m.xp, 1)} väntade enligt oddsen vid avspark`] : null,
-      m ? [`${m.fav}<small>av ${m.n}</small>`, 'Favorit', 'Matcher där laget hade större chans än motståndaren att vinna, enligt oddsen före avspark'] : null,
+      m ? [`${m.fav}<small>av ${m.n}</small>`, 'Favorit', 'Matcher där laget hade större chans än motståndaren att vinna, enligt oddsen vid avspark'] : null,
     ]));
   }
   const op = tt && tt.fd ? tt.fd.opp : null;
   if (tt && (tt.str != null || op != null)) {
     game += msec('Modellen', facts([
-      tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat'] : null,
-      op != null ? [`<span class="dv-even">${signed(op, 2)}</span>`, 'Motstånd hittills', 'Motståndarnas styrka mot ett normalt spelschema i divisionen, i mål per match. Plus = tuffare än snittet'] : null,
+      tt.str != null ? [delta(tt.str, { d: 2, dead: 0.005 }), 'Styrka enligt modellen', 'Väntad målskillnad per match mot ett genomsnittligt lag i divisionen, med motståndet inräknat'] : null,
+      op != null ? [`<span class="dv-even">${signed(op, 2)}</span>`, 'Motstånd hittills', 'Motståndarnas styrka jämfört med ett genomsnittligt spelschema i divisionen, i mål per match. Plus betyder tuffare än genomsnittet'] : null,
     ]));
   }
 
@@ -1560,7 +1560,7 @@ function landChips(list, { title = false } = {}) {
     return `<span class="${hid ? 'sp-form' : l}"${attr}>${esc(l)}</span>`;
   }).join('')}</span>`;
 }
-const LAND_FORM_TIP = 'De fem senaste landskamperna – Nations League, VM, VM-kvalet och vänskapsmatcherna – nyast till vänster: V = vinst, O = oavgjort, F = förlust. Ställningen efter 90 minuter gäller.';
+const LAND_FORM_TIP = 'De fem senaste landskamperna i Nations League, VM, VM-kvalet och vänskapsmatcherna, den senaste till vänster. V betyder vinst, O oavgjort och F förlust, och det är ställningen efter 90 minuter som gäller.';
 
 // Ett landslags rad i tabellen Alla landslag.
 const LAND_COLS = [
@@ -1626,7 +1626,7 @@ function landStatsView(L) {
     };
     html += card('Lördagens landskamper', {
       hint: 'Stryktipsets dag',
-      tip: 'Formen är de fem senaste landskamperna, nyast till vänster. Chansen är marknadens – DraftKings odds utan spelbolagets marginal – inte modellens.',
+      tip: 'Formen är de fem senaste landskamperna, den senaste till vänster. Chansen är marknadens, alltså DraftKings odds utan spelbolagets marginal, och inte modellens.',
       body: `<ul class="dv-lgamelist">${lor.map((m) => {
         const p = m.prognos;
         const res = m.resultat && m.status !== 'STATUS_SCHEDULED' && !(window.Spoiler && landHidden(m.id));
@@ -1742,40 +1742,40 @@ async function loadLandMatches() {
 // [term, förklaring, sidan den hör till – utan sida på båda]
 const GLOSSARY = [
   ['S V O F P', 'Tabellen: spelade, vunna, oavgjorda, förlorade och poäng (3 för vinst, 1 för oavgjort). Lika poäng skiljs åt på målskillnad (+/−) och sedan gjorda mål.', 'tabeller'],
-  ['Zonerna', 'De färgade raderna och strecken i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN – uppflyttning, kval (playoff), Europa eller nedflyttning.', 'tabeller'],
+  ['Zonerna', 'De färgade raderna och strecken i tabellen: vad placeringen ger i slutet av säsongen enligt ESPN, alltså uppflyttning, kval, Europaspel eller nedflyttning.', 'tabeller'],
   ['M, Start, Min, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, spelade minuter, assist och mål plus assist.', 'statistik'],
-  ['– och grå 0', 'Streck = okänt (ESPN har ingen statistik för spelaren), grå 0 = noll.'],
-  ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
-  ['Per 90', 'Per 90 spelade minuter – som om spelaren spelat hela matcher. Visas för spelare med minst tre hela matchers speltid; dämpade siffror har för litet underlag.', 'statistik'],
-  ['Formen', 'De fem senaste matcherna i ligan och de engelska cuperna (inte Europacuperna), nyast till vänster: V = vinst, O = oavgjort, F = förlust. Ställningen efter 90 minuter gäller, så en match som avgjorts i förlängning eller på straffar räknas som oavgjord. Topplistan Formen räknar 3 poäng för vinst och 1 för oavgjort i de fem.', 'statistik'],
+  ['– och grå 0', 'Ett streck betyder okänt (ESPN har ingen statistik för spelaren) och en grå 0 betyder noll.'],
+  ['Spelarstatistiken', 'Bara ligamatcher den här säsongen, ur ESPN:s trupper. Den ligger ofta en omgång efter tabellen, och självmål och spelare som har lämnat klubben saknas. I Premier League kommer speltiden, xG och försvarsspelet från Fantasy Premier League. I övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
+  ['Per 90', 'Per 90 spelade minuter, som om spelaren hade spelat hela matcher. Visas för spelare med minst tre hela matchers speltid. Dämpade siffror har för litet underlag.', 'statistik'],
+  ['Formen', 'De fem senaste matcherna i ligan och de engelska cuperna (inte Europacuperna), den senaste till vänster. V betyder vinst, O oavgjort och F förlust. Det är ställningen efter 90 minuter som gäller, så en match som avgjordes i förlängningen eller på straffar räknas som oavgjord. Topplistan Formen räknar 3 poäng för vinst och 1 för oavgjort i de fem.', 'statistik'],
   ['Topplistorna under Lagen', 'Samma tal som i datorn i tobaksaffären: Formen, Starkast & svagast, Kryssar gärna, Tur & otur, Mot oddsen och Motståndet. Listorna åt två håll visar de tre högsta och de tre lägsta, med en stapel från mitten (längst för divisionens största tal); Alla lag visar hela divisionen.', 'statistik'],
   ['Delad placering', 'Har två lika tal i en topplista delar de plats, och numret står bara på den första – som skytteligan på text-tv:n.', 'statistik'],
   ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
-  ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.', 'statistik'],
+  ['Beroende', 'Hur stor del av lagets mål den bästa målskytten har gjort.', 'statistik'],
   ['Effektivast', 'Mål per skott, bland spelare med minst tio skott.', 'statistik'],
   ['Segermål', 'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet, vid 1–0 det enda.', 'statistik'],
-  ['Poäng åt laget', 'Poängen laget hade tappat utan spelarens mål. Ett mål i en match som vanns med ett mål är värt två poäng (seger i stället för oavgjort), ett mål i en oavgjord match en poäng (oavgjort i stället för förlust). Mål i matcher som vanns stort eller förlorades ger inga poäng.', 'statistik'],
-  ['Inblandad i lagets mål', 'Mål och assist delat med lagets mål: hur stor del av lagets mål spelaren har gjort eller lagt sista passningen till.', 'statistik'],
+  ['Poäng åt laget', 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort. Ett mål i en oavgjord match är värt en poäng, eftersom laget annars hade förlorat. Mål i matcher som vanns stort eller förlorades ger inga poäng.', 'statistik'],
+  ['Inblandad i lagets mål', 'Hur stor del av lagets mål spelaren har gjort själv eller slagit den sista passningen till: mål och assist delade med lagets mål.', 'statistik'],
   ['Målen', 'Segermål, poäng åt laget, matchens första mål, sena mål (från 80:e minuten, tilläggstiden inräknad) och mål som inhoppare finns för alla fyra ligor. Straffarna bara för Premier League och Championship – i League One och League Two anger matchrapporterna bara minut och målskytt.', 'statistik'],
-  ['Fälld, Fäller', 'Gånger spelaren har blivit fälld, och gånger spelaren själv har begått ett regelbrott som domaren blåst för.', 'statistik'],
-  ['Försvarsinsatser', 'Tacklingar, rensningar, täckningar och brytningar. Bara Premier League, från Fantasy Premier League.', 'statistik'],
-  ['Assist', 'Passningen (eller skottet som räddas och slås in) som leder direkt till ett mål, enligt ESPN.', 'statistik'],
-  ['Skott på mål', 'Skott som skulle ha gått in om målvakten inte räddat. Skott utanför och i stolpen räknas inte.', 'statistik'],
-  ['Räddningsprocent', 'Räddningar delat med skotten på mål som målvakten mött (räddningar + insläppta).', 'statistik'],
-  ['Betyg', 'Snittet av spelarens betyg i ligans matcher, från 365Scores. Betyget sätts efter varje match, från 1 till 10, ur spelarens statistik i matchen. En vanlig insats ger runt 6,7 och bara vart tionde betyg är över 7,5. Inhoppare som bara spelat några minuter får inget betyg.', 'statistik'],
-  ['xG', 'Förväntade mål: varje skott får ett värde efter hur ofta ett sådant skott brukar bli mål – en straff runt 0,8, ett långskott några hundradelar. Summan visar hur många mål chanserna brukar ge, oavsett om de gick in.', 'statistik'],
-  ['xG mot, xA', 'xG mot: motståndarnas förväntade mål, alltså hur bra chanser laget släpper till. xA: förväntade assist, ur passningarna före lagkamraternas skott.', 'statistik'],
-  ['Mål mot xG', 'Gjorda mål minus xG (och insläppta mål minus xG mot). Stora avvikelser är ofta tur eller otur och brukar jämna ut sig under en säsong.', 'statistik'],
-  ['Motstånd', 'Motståndets styrka hittills enligt prognosmodellen, i mål per match, mot vad ett lag i divisionen möter i snitt. Plus = svårare program än snittet (Tufft hittills i topplistan Motståndet), minus = lättare (Lätt hittills).', 'statistik'],
-  ['Poäng och kryss mot chanserna', 'Varje match räknas om till chanser att vinna, spela oavgjort och förlora ur båda lagens xG. Poäng mot chanserna: tagna poäng minus 3 × vinstchansen plus oavgjortchansen, match för match – plus är oftast tur, som brukar jämna ut sig (Tur & otur). Kryss enligt chanserna: oavgjortchansen i snitt (Kryssar gärna).', 'statistik'],
-  ['Styrka', 'Prognosmodellens bedömning av laget: väntad målskillnad per match mot ett snittlag i divisionen på neutral plan, med motståndet inräknat och tidigare säsonger med mindre vikt.', 'statistik'],
+  ['Fälld, Fäller', 'Hur många gånger spelaren har blivit fälld, och hur många regelbrott spelaren själv har begått som domaren har blåst för.', 'statistik'],
+  ['Försvarsinsatser', 'Tacklingar, rensningar, täckningar och brytningar. Finns bara för Premier League och kommer från Fantasy Premier League.', 'statistik'],
+  ['Assist', 'Den sista passningen före ett mål, eller ett skott som målvakten räddar och en lagkamrat sätter in på returen. Siffrorna kommer från ESPN.', 'statistik'],
+  ['Skott på mål', 'Mål och skott som målvakten räddar. Skott utanför eller i stolpen räknas inte.', 'statistik'],
+  ['Räddningsprocent', 'Hur stor andel av skotten på mål som målvakten har räddat. Skotten på mål är räddningarna plus de insläppta målen.', 'statistik'],
+  ['Betyg', 'Spelarens genomsnittliga betyg i ligans matcher enligt 365Scores. Betyget sätts efter varje match, på en skala från 1 till 10, utifrån spelarens statistik i matchen. En vanlig insats ger ungefär 6,7, och bara vart tionde betyg är över 7,5. Inhoppare som bara har spelat några minuter får inget betyg.', 'statistik'],
+  ['xG', 'Förväntade mål. Varje skott får ett värde efter hur ofta ett sådant skott blir mål. En straff är värd ungefär 0,8 och ett långskott några hundradelar. Summan visar hur många mål chanserna är värda, oavsett om skotten gick in.', 'statistik'],
+  ['xG mot, xA', 'xG mot är motståndarnas förväntade mål, alltså hur bra chanser laget släpper till. xA är förväntade assist, räknat på spelarens passningar till lagkamraternas avslut.', 'statistik'],
+  ['Mål mot xG', 'Gjorda mål minus xG (och insläppta mål minus xG mot). Stora skillnader är ofta tur eller otur och brukar jämna ut sig under en säsong.', 'statistik'],
+  ['Motstånd', 'Motståndets styrka hittills enligt prognosmodellen, i mål per match, jämfört med vad ett lag i divisionen möter i genomsnitt. Plus betyder svårare program än genomsnittet (Tufft hittills i topplistan Motståndet) och minus lättare (Lätt hittills).', 'statistik'],
+  ['Poäng och kryss mot chanserna', 'Ur båda lagens xG räknas varje match om till en chans att vinna, en chans att spela oavgjort och en chans att förlora. Poäng mot chanserna är tagna poäng minus 3 × vinstchansen + chansen till oavgjort, match för match. Plus är oftast tur, som inte brukar hålla i sig (Tur & otur). Kryss enligt chanserna är chansen till oavgjort i genomsnitt (Kryssar gärna).', 'statistik'],
+  ['Styrka', 'Prognosmodellens bedömning av laget: väntad målskillnad per match mot ett genomsnittligt lag i divisionen, på neutral plan. Modellen tar hänsyn till motståndet och i mindre grad till tidigare säsonger.', 'statistik'],
   ['Nollor', 'Andel av lagets matcher utan insläppt mål.', 'statistik'],
-  ['Väntat, Tog, Mot oddsen', 'Poängen oddsen vid avspark väntade sig – 3 × vinstchansen plus oavgjortchansen, match för match – poängen laget tog i samma matcher, och skillnaden. Plus = bättre än oddsen trodde (Slår oddsen), minus = sämre (Sviker).', 'statistik'],
-  ['Favorit', 'Matcher där laget hade större chans än motståndaren att vinna, enligt oddsen före avspark.', 'statistik'],
-  ['Med och utan', 'Hur laget har gått i ligan när spelaren startat och när han inte startat (borta eller på bänken), sedan 2021/22 och bara under hans tid i laget: säsonger i följd då han spelat, och för den som står i truppen fram till i dag. Mot oddsen = poäng per match minus vad oddsen vid avspark räknade med, så att det inte ser ut som att laget klarar sig bättre utan stjärnan för att han vilat mot de svaga lagen. Visas när båda sidorna har minst tio matcher. I matchbladet: poängen per match mot oddsen utan honom minus med honom, minus = laget har tappat utan honom.', 'statistik'],
-  ['Spel på seger', 'Vinst eller förlust i procent av insatserna om man satsat lika mycket på att laget vinner varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
+  ['Väntat, Tog, Mot oddsen', 'Väntat är poängen som oddsen vid avspark räknade med: 3 × vinstchansen + chansen till oavgjort, match för match. Tog är poängen laget tog i samma matcher, och Mot oddsen skillnaden. Plus betyder bättre än oddsen trodde (Slår oddsen) och minus sämre (Sviker).', 'statistik'],
+  ['Favorit', 'Matcher där laget hade större chans än motståndaren att vinna, enligt oddsen vid avspark.', 'statistik'],
+  ['Med och utan', 'Hur laget har gått i ligan när spelaren startat och när han inte startat (borta eller på bänken), sedan 2021/22 och bara under hans tid i laget: säsonger i följd då han spelat, och för den som står i truppen fram till i dag. Mot oddsen är poäng per match minus vad oddsen vid avspark räknade med, så att det inte ser ut som att laget klarar sig bättre utan stjärnan bara för att han har vilat mot de svaga lagen. Visas när båda sidorna har minst tio matcher. I matchbladet står poängen per match mot oddsen utan honom minus med honom. Minus betyder att laget har tappat utan honom.', 'statistik'],
+  ['Spel på seger', 'Vinsten eller förlusten, i procent av insatserna, för den som hade spelat lika mycket på seger för laget i varje match, till oddset vid avspark. Spelbolagens marginal är inräknad.', 'statistik'],
   ['Marginal', 'Spelbolagens påslag: hur mycket summan av 1/odds överstiger 100 %.', 'statistik'],
-  ['Grundserien', 'Ligans ordinarie matcher, utan kvalspel (playoff) och cuper.'],
+  ['Grundserien', 'Ligans ordinarie matcher, utan kval och cuper.'],
 ];
 
 function glossary() {

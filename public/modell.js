@@ -502,7 +502,7 @@ function renderEvaluation(d) {
   more += '<h4 class="sub-h">Så räknas det</h4>' + defs([
     ['Journalen', 'Ny rad när prognosen ändrats så mycket att det syns på sidan, eller när spelbolagens odds ändrats.'],
     ['Facit', 'Den sista raden före avspark räknas, mot ställningen efter 90 minuter.'],
-    ['Log-poäng', 'Hur väl sannolikheterna träffade. Lägre är bättre.'],
+    ['Log-poäng', 'Hur väl sannolikheterna träffade. Ju lägre, desto bättre.'],
     ['Skillnad', 'Modellen − måttstocken i log-poäng; under noll = modellen bättre. Varje rad jämför på de matcher där båda fanns.'],
     ['Minsta underlag', `Snitt och skillnader visas från ${min} matcher – före dess är underlaget för litet för att säga något.`],
     ['Stämmer procenten?', 'Varje match ger tre prognoser – hemmaseger, oavgjort och bortaseger – som sorteras i korgar om tio procentenheter. ' +
