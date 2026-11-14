@@ -41,6 +41,8 @@ window.RumHasse = (() => {
   // och dess ändring är noll i båda ändar, så att inget rycker. (Förut ett ryck i början på 0,42 s, med nästan
   // dubbla farten mitt i.)
   const glid = (t) => { const x = t ** 0.8; return x * x * x * (x * (x * 6 - 15) + 10); };
+  // slipsknuten (världens mått, som MATT i rum-hasse-3d.js): dit går samtalet i telefonen när texten är lång (tillKragen)
+  const KRAGE = [0, 200, 120];
   const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0, vanaT: 0, vanaNasta: null, senast: {}, vill: null };
   const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hog = () => innerWidth / innerHeight < 1.15;
@@ -97,6 +99,13 @@ window.RumHasse = (() => {
     }
     // det som händer i samtalet stannar där (knapparna byter ut sig själva)
     vy.querySelector('.rh-samtal').addEventListener('click', (e) => e.stopPropagation());
+    // (byts samtalet ut går det ned under honom igen, om inte den nya texten också behöver kragen: tillKragen)
+    new MutationObserver(() => {
+      if (vy.classList.contains('kragen') && !vy.querySelector('.rh-samtal > .rh-text.kragen')) {
+        vy.classList.remove('kragen');
+        samtalet();
+      }
+    }).observe(vy.querySelector('.rh-samtal'), { childList: true });
     // Matchbladet: samma blad som på kupongen i rummet läggs fram över baren (bladet)
     vy.querySelector('.rh-samtal').addEventListener('click', (e) => {
       const a = e.target.closest('a.rh-vag[href^="#match/"]');
@@ -647,14 +656,30 @@ window.RumHasse = (() => {
         else disk = rita();
       }
     }
-    // samtalet: på höjden under honom, annars i en spalt till vänster om honom
+    samtalet(v);
+    if (H.vy.classList.contains('kragen')) tillKragen();
+    if (H.kupong) H.kupong.passa();
+    pultPapper();
+    lopsedel();
+    passaSpalter();
+    return disk;
+  }
+
+  // Samtalet: på höjden under honom, annars i en spalt till vänster om honom. På höjden går det upp till
+  // kragen när hans text inte får plats under honom (tillKragen).
+  function samtalet(v = H.v) {
+    if (!v) return;
+    const s = H.vy.style;
     const sa = $('.rh-samtal').style;
     const fo = $('.rh-fot').style;
     if (H.hog) {
       const topp = Math.min(v.hand + 10, v.H * 0.6);
-      sa.top = `${topp.toFixed(0)}px`;
+      // (vid kragen, eller så mycket lägre som texten inte behöver: H.krage)
+      const krage = Math.min(topp, H.m.iBild(v, ...KRAGE)[1] + 22 + (H.krage || 0));
+      sa.top = `${(H.vy.classList.contains('kragen') ? krage : topp).toFixed(0)}px`;
       sa.left = sa.width = fo.left = fo.width = '';
       s.setProperty('--mork', `${(topp - 46).toFixed(0)}px`);
+      s.setProperty('--mork-krage', `${(krage - 112).toFixed(0)}px`);
     } else {
       const hoger = v.vanster - 28;
       const bredd = Math.min(hoger - 28, Math.max(340, v.W * 0.3), 620);
@@ -666,11 +691,36 @@ window.RumHasse = (() => {
       // (diskens kant: efter omgången står gänget mitt emellan den och samtalets överkant, .rh-gang i rum-hasse.css)
       s.setProperty('--kant', `${v.kant.toFixed(0)}px`);
     }
-    if (H.kupong) H.kupong.passa();
-    pultPapper();
-    lopsedel();
-    passaSpalter();
-    return disk;
+  }
+  // I telefonen på höjden fick hans text om matchen en och en halv rad under domen, rutorna och svaren. Får den
+  // inte plats går samtalet nu upp mot kragen och mörkret med det, så att den går att läsa i ett svep; ansiktet
+  // syns kvar. Inte högre än texten behöver (H.krage), och raden över rutorna, där han frågar om kupongen, har
+  // sin plats från början (rum-hasse.css), så att inget flyttar sig när han säger det. Prövas när texten har
+  // skrivits (svara, tidigare) och när fönstret ändras, och släpps när samtalet byts ut (mount).
+  function tillKragen() {
+    const tx = $('.rh-samtal > .rh-text');
+    H.vy.classList.remove('kragen');
+    H.krage = 0;
+    if (tx) tx.classList.remove('kragen');
+    samtalet();
+    if (!H.hog || !tx || tx.scrollHeight <= tx.clientHeight + 4) return;
+    tx.classList.add('kragen');
+    H.vy.classList.add('kragen');
+    samtalet();
+    // (texten själv: scrollHeight blir aldrig mindre än rutan)
+    const r = document.createRange();
+    r.selectNodeContents(tx);
+    H.krage = Math.max(0, Math.floor(tx.clientHeight - r.getBoundingClientRect().height - 2));
+    if (H.krage) samtalet();
+    tx.scrollTop = 0;
+    // (står det mer under kanten, i en liten telefon, tonas den sista raden ut i stället för att skäras av mitt i)
+    const mer = () => tx.classList.toggle('mer', tx.scrollTop + tx.clientHeight < tx.scrollHeight - 4);
+    if (!tx.dataset.mer) {
+      tx.dataset.mer = '1';
+      tx.addEventListener('scroll', mer, { passive: true });
+      if (window.ResizeObserver) new ResizeObserver(mer).observe(tx);
+    }
+    mer();
   }
 
   // ---------- det som ligger på pulten ----------
@@ -3267,6 +3317,8 @@ window.RumHasse = (() => {
       setTimeout(ok, 4500);
     });
     slutet(m, lista, signs, slaget);
+    // (när svaren står under rutorna: de tar plats)
+    tillKragen();
   }
 
   // En match du redan har frågat om: det han sa står direkt, under domen, som han sa det (också
@@ -3309,6 +3361,7 @@ window.RumHasse = (() => {
     // (texten läses från början, också när den inte får plats: i telefonen)
     const ruta = repliker([...st, om].filter(Boolean).map((text) => ({ text })), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
     ruta.scrollTop = 0;
+    tillKragen();
     const slut = s.querySelector('.rh-slut');
     kopplaKnappar(slut, m, lista);
     lasKnapp(slut, ruta);

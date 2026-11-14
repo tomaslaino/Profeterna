@@ -48,6 +48,9 @@
 /* väggen och disken mörknar bakom samtalet, så att texten går att läsa */
 .rh-mork { position: absolute; top: 0; bottom: 0; left: 0; width: var(--mork, 40%); background: linear-gradient(to right, rgba(14, 8, 4, 0.8) 72%, rgba(14, 8, 4, 0)); pointer-events: none; transition: opacity 0.32s ease-out; }
 .rum-hasse-vy.hog .rh-mork { z-index: 1; width: auto; right: 0; top: var(--mork, 46%); bottom: 0; background: linear-gradient(to bottom, rgba(18, 12, 7, 0), rgba(18, 12, 7, 0.72) 90px, rgba(18, 12, 7, 0.9) 40%, #120c07 86%); }
+/* hans text om matchen upp till kragen (tillKragen i rum-hasse.js): mörkret därifrån tonas fram över kroppen och disken */
+.rum-hasse-vy.hog .rh-mork::before { content: ''; position: absolute; left: 0; right: 0; top: calc(var(--mork-krage, 0px) - var(--mork, 0px)); bottom: 0; background: linear-gradient(to bottom, rgba(18, 12, 7, 0), rgba(18, 12, 7, 0.8) 80px, rgba(18, 12, 7, 0.93) 150px, #120c07 70%); opacity: 0; transition: opacity 0.35s ease-out; }
+.rum-hasse-vy.hog.kragen .rh-mork::before { opacity: 1; }
 /* Samma ton över hela bilden: hörnen mörknar, varmt bakom honom och lite kallt från affären till
    höger. (Förut rörde sig också ett korn över hela bilden, ett lager dubbelt så stort som fönstret som
    blandades med allt under sig 30–60 gånger i sekunden: det ändrade bilden med en nivå av 255 men kostade
@@ -260,6 +263,16 @@
 .rum-hasse-vy.hog .rh-samtal { left: 5%; right: 5%; bottom: 54px; width: auto; font-size: 15px; }
 .rum-hasse-vy.hog .rh-fot { left: 5%; right: 5%; }
 .rum-hasse-vy.hog .rh-text, .rum-hasse-vy.hog .rh-fragan { font-size: 1em; }
+.rum-hasse-vy.hog.kragen .rh-text { font-size: 16px; line-height: 1.5; }
+.rum-hasse-vy.hog.kragen .rh-text p { margin-bottom: 0.7em; }
+.rum-hasse-vy.hog.kragen .rh-text p:last-child { margin-bottom: 0; }
+/* (två rader för det han säger om kupongen, också innan han har sagt det, nertill mot rutorna) */
+.rum-hasse-vy.hog.kragen .rh-fragan { min-height: 2.84em; align-content: end; }
+/* (och svaren i två rader, knapparna och under dem Läs upp och Matchbladet, så att höjden är densamma
+   innan Läs upp syns) */
+.rum-hasse-vy.hog.kragen .rh-slut::before { content: ''; flex-basis: 100%; order: 1; }
+.rum-hasse-vy.hog.kragen .rh-slut > .rh-vag { order: 2; }
+.rum-hasse-vy.hog.kragen .rh-text.mer { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); }
 .rum-hasse-vy.hog .rh-domen { font-size: 1em; }
 .rum-hasse-vy.hog .rh-sagt { font-size: 1.4em; margin-bottom: 0.2em; }
 .rum-hasse-vy.hog .rh-dom { font-size: 46px; }
@@ -418,8 +431,9 @@
   .rh-svar .rh-vag { min-height: 28px; }
 }
 /* telefonen: rutorna och svaren ryms under en match du redan har frågat om, med erbjudandet att titta
-   igen i knappen i stället för på en egen rad (det han säger om kupongen står då sist i texten) */
-.rum-hasse-vy.hog .rh-fragan:has(+ .rh-tecken) { display: none; }
+   igen i knappen i stället för på en egen rad (det han säger om kupongen står då sist i texten); uppe vid
+   kragen finns platsen */
+.rum-hasse-vy.hog:not(.kragen) .rh-fragan:has(+ .rh-tecken) { display: none; }
 .rum-hasse-vy.hog .rh-tecken + .rh-slut { gap: 6px 12px; }
 .rum-hasse-vy.hog .rh-tecken + .rh-slut .rh-vag { min-height: 28px; }
 @media (max-height: 500px) {
