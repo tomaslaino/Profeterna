@@ -47,7 +47,10 @@
 // (översikten är landslagets: gruppen, formen, Nations League och alla
 // landskamper), spelarkort och listor per tal, ur data/teams/unl.json och
 // data/players/unl.json. En spelare som också spelar i en engelsk klubb har
-// två kort, ett för klubben och ett för landslaget (#spelare:nl-<id>).
+// två kort, ett för klubben och ett för landslaget (#spelare:nl-<id>). Sedan
+// 2026-11-14 (användarens önskemål: landet underordnat klubblaget) står han en
+// gång i sökningen, som klubbens, och korten leder till varandra: klubbens
+// kort har landet sist på raden under namnet, landslagets klubben.
 // (Fram till 2026-11-13 stod tavlans tal också som topplistor över omgången i
 // en egen flik, TOPPLISTOR; användaren ville ha dem bara vid matcherna.)
 // Statistiks tal (sedan 2026-11-13, användarens önskemål: all statistik på
@@ -319,6 +322,10 @@ window.RumRegister = (() => {
             for (const [id, a] of Object.entries(f.availability || {})) if (a && !a.unknown) P.avail.set(String(id), a.players || []);
             for (const p of f.players || []) P.spelare.push({ p, div: REG[i], n: norm(p.name), t: norm(p.name).split(' ') });
           });
+          // samma spelare i en klubb och i ett landslag (samma ESPN-id)
+          P.klubb = new Map();
+          P.land = new Map();
+          for (const x of P.spelare) (x.div === 'nl' ? P.land : P.klubb).set(String(x.p.id), x);
           A.P = P;
           draw();
           return P;
@@ -363,6 +370,8 @@ window.RumRegister = (() => {
     // spelarkortets nyckel: landslagets kort har nl- före, så att den som också
     // spelar i en engelsk klubb har ett kort för var (#spelare:nl-<id>)
     const spId = (x) => (x.div === 'nl' ? `nl-${x.p.id}` : String(x.p.id));
+    // samma spelare i det andra laget: landslaget för en klubbspelare och tvärtom
+    const tvilling = (x) => (A.P && A.P.land ? (x.div === 'nl' ? A.P.klubb : A.P.land).get(String(x.p.id)) : null) || null;
     // laget i omgången: matchen och sidan
     const iOmgangen = (name) => { for (const m of A.ms) { if (m.home === name) return { m, side: 'home' }; if (m.away === name) return { m, side: 'away' }; } return null; };
     const omgLag = () => A.ms.flatMap((m) => [m.home, m.away]);
@@ -1520,7 +1529,29 @@ window.RumRegister = (() => {
       const val = delar.some(([id]) => id === del) && har(del) ? del : 'oversikt';
       R.delar = delar.map(([id]) => id).filter(har);
       R.del = val;
-      R.huvud = huvud([[efternamn(p.name), 'v']], [[up(p.team), '', t ? `#lag:${t.name}` : null], [`${p.jersey ? ` · NR ${p.jersey}` : ''}${POS[p.pos] ? ` · ${up(POS[p.pos])}` : ''}`, '']], delRad(delar, val, har));
+      // Raden under namnet: kortets lag (leder till lagkortet), numret och
+      // positionen. När spelaren har två kort står det andra laget också där
+      // – landet i klubbens kort, klubben i landslagets – och leder till det
+      // kortet: på datorn sist på raden (som står på samma rad som namnet),
+      // i telefonen längst ut på namnets rad. De korta namnen (MAN CITY) när
+      // raden annars inte ryms.
+      const tv = tvilling(x);
+      const lagNamn = (n, lang) => (lang ? up(n) : kort(n));
+      const andra = (lang) => [lagNamn(tv.p.team, lang), '', `#spelare:${spId(tv)}`];
+      const under = (lang, med) => [[lagNamn(p.team, lang), '', t ? `#lag:${t.name}` : null], [`${p.jersey ? ` · NR ${p.jersey}` : ''}${POS[p.pos] ? ` · ${up(POS[p.pos])}` : ''}`, ''],
+        ...(med ? [[' · ', ''], andra(lang)] : [])];
+      const langd = (l) => l.reduce((s, [z]) => s + z.length, 0);
+      let namn = [[efternamn(p.name), 'v']];
+      let u;
+      if (A.bred >= 60) {
+        u = [true, false].map((l) => under(l, Boolean(tv))).find((v) => langd(namn) + 3 + langd(v) <= A.bred) || under(true, Boolean(tv));
+      } else {
+        u = [true, false].map((l) => under(l, false)).find((v) => langd(v) <= A.bred) || under(false, false);
+        const a = tv && [true, false].map((l) => andra(l)).find((v) => langd(namn) + 3 + v[0].length <= A.bred);
+        if (a) namn = [...namn, [' '.repeat(A.bred - langd(namn) - a[0].length), ''], a];
+        else if (tv) u = [...u, [' · ', ''], andra(false)];
+      }
+      R.huvud = huvud(namn, u, delRad(delar, val, har));
       // Statistiks tal i avsnitt (anfallet, målen, målet, försvaret och
       // regelbrotten), med platsen bland divisionens 20 främsta
       if (val !== 'oversikt') return spelarTal(x, S, val);
@@ -1743,9 +1774,20 @@ window.RumRegister = (() => {
           if (d != null) hits.push({ typ: 'spelare', x, p: spelPlus(x) - 1.2 - 0.4 * d });
         }
       }
-      const ut = hits.sort((a, b) => b.p - a.p || traffNamn(a).localeCompare(traffNamn(b), 'sv'));
+      const ut = utanLandet(hits).sort((a, b) => b.p - a.p || traffNamn(a).localeCompare(traffNamn(b), 'sv'));
       ut.luddig = luddigt && ut.length > 0;
       return ut;
+    }
+    // En spelare som träffas både i klubben och i landslaget står en gång,
+    // som klubbens, på den högre platsen av de två (landet står i kortet)
+    function utanLandet(hits) {
+      const klubb = new Map();
+      for (const h of hits) if (h.typ === 'spelare' && h.x.div !== 'nl') klubb.set(String(h.x.p.id), h);
+      return hits.filter((h) => {
+        const k = h.typ === 'spelare' && h.x.div === 'nl' ? klubb.get(String(h.x.p.id)) : null;
+        if (k && h.p > k.p) k.p = h.p;
+        return !k;
+      });
     }
     const traffNamn = (h) => (h.typ === 'lag' ? h.t.name : h.typ === 'spelare' ? efternamn(h.x.p.name) : h.typ === 'mote' ? h.m.home : h.d.namn);
     // träffen som en vy (i sin flik)
