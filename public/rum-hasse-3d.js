@@ -3810,11 +3810,14 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     PV.knack = pose(nyPose(), glod.clone().addScaledVector(A, -(CIGARR.L + 1 - SG)), A, P);
     PV.knackN = pose(nyPose(), PV.knack.p.clone().add(V3(0, -14, 0)), A, P);
   }
-  // Vid munnen räknas läget i huvudets mått: huvudet en bit in mellan läpparna, cigarren ut åt
-  // hans högra sida och lite nedåt. Handen sitter under greppet och lite ut åt sidan (d), vid käken,
-  // med fingrarna uppåt i underarmens förlängning: armbågen nere och handleden nästan rak. (Förut satt
-  // den ut åt sidan vid kinden, och då gick handleden inte att räta: antingen knäcktes den åt sidan eller
-  // så for armbågen upp över huvudet.)
+  // Vid munnen räknas läget i huvudets mått: huvudet en bit in mellan läpparna, cigarren snett fram mot
+  // en, lite ut åt hans högra sida och lite nedåt. Handen sitter nedanför greppet, utanför och bakom det
+  // (d), så att fingrarna går runt cigarren utifrån med handryggen utåt, och underarmen går snett ned
+  // och ut till en armbåge framför bröstet och strax utanför axeln: som man håller en cigarr. (Förut,
+  // till 2026-11-14, satt handen rakt under greppet med handflatan mot en, som en ed, och då hamnade
+  // armbågen rakt under den framför magen: underarmen stod lodrätt framför bröstet som en pelare, och
+  // han såg obekväm ut. Ännu tidigare satt den ut åt sidan vid kinden, och då gick handleden inte att
+  // räta: antingen knäcktes den åt sidan eller så for armbågen upp över huvudet.)
   const MUND = W_(662, 509, 0);
   MUND.z = djup(662, 509) - 6;
   // handflatan när cigarren pekar åt A och handen sitter åt d från greppet (tummen mot cigarrens huvud)
@@ -3824,19 +3827,20 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const e2 = new THREE.Vector3().crossVectors(T, e);
     return e2.multiplyScalar(GREPP.y).addScaledVector(e, GREPP.z).normalize();
   };
-  const A_MUN = new THREE.Vector3(-0.7, -0.2, 0.68).normalize();
-  const P_MUN = flata(A_MUN, V3(-0.6, -0.8, -0.1));
+  const A_MUN = new THREE.Vector3(-0.45, -0.2, 0.87).normalize();
+  const P_MUN = flata(A_MUN, V3(-0.64, -0.6, -0.47));
   // utdragen: rakt ut längs sig själv och lite ned, fri från käken
   const BORT = A_MUN.clone().multiplyScalar(55).add(V3(0, -30, 35));
   // Lägen i huvudets mått: [cigarrens huvud, dess riktning, handflatan]. Fast i mungipan (tand): han
-  // biter om den och släpper den, och den pekar ut och ned.
+  // biter om den och släpper den, och den pekar ut och ned. Handen sitter som vid munnen, så att den inte
+  // vrids om när han flyttar cigarren dit.
   const MUNHORN_H = W_(622, 509, 0);
   MUNHORN_H.z = djup(622, 509) - 10;
   const A_TAND = V3(-0.62, -0.42, 0.66).normalize();
   const HL = {
     mun: [MUND, A_MUN, P_MUN],
     bort: [MUND.clone().add(BORT), A_MUN, P_MUN],
-    tand: [MUNHORN_H, A_TAND, flata(A_TAND, V3(-0.6, -0.8, -0.1))],
+    tand: [MUNHORN_H, A_TAND, flata(A_TAND, V3(-0.4, -0.56, -0.73))],
   };
   const PIV = U.uPiv.value;
   const iHuvud = (p, ut) => ut.copy(p).sub(PIV).applyMatrix3(U.uHuvud.value).add(PIV).applyMatrix4(mk);
