@@ -250,7 +250,7 @@ function munnen(a, p) {
 export function uttryck(svg, vem, lage) {
   const a = ANS[vem];
   if (!a) return svg;
-  const p = a.egen && lage in a.egen ? a.egen[lage] : LAGE[lage];
+  const p = lage && typeof lage === 'object' ? lage : a.egen && lage in a.egen ? a.egen[lage] : LAGE[lage];
   if (!p) return svg;
   const doc = las(svg);
   // DT: öppna ögon i stället för de hopknipna (skrattrynkorna kvar när han är glad)
@@ -273,7 +273,7 @@ export function uttryck(svg, vem, lage) {
 // DJ:s mun i skägget (rum/skagg-dj.svg) efter läget: läpparna under mustaschen.
 const SKAGG = { lapp: '#a8584a', mork: '#3e1512', tand: '#efe8dc', mustasch: 'M-24 42' };
 export function skaggUttryck(svg, lage) {
-  const p = LAGE[lage];
+  const p = lage && typeof lage === 'object' ? lage : LAGE[lage];
   if (!p) return svg;
   const doc = las(svg);
   const mus = [...doc.querySelectorAll('path')].find((x) => (x.getAttribute('d') || '').startsWith(SKAGG.mustasch));
@@ -285,6 +285,11 @@ export function skaggUttryck(svg, lage) {
     const f = 'M-17 38 Q0 42 17 38 Q14 53 0 56 Q-14 53 -17 38 Z';
     s = `<path d="M-19 37.5 Q0 42 19 37.5 Q15 56 0 59 Q-15 56 -19 37.5 Z" fill="${SKAGG.lapp}"/><path d="${f}" fill="${SKAGG.mork}"/><clipPath id="mdj"><path d="${f}"/></clipPath>`
       + `<g clip-path="url(#mdj)"><path d="M-18 37 Q0 41 18 37 L18 44 Q0 48 -18 44 Z" fill="${SKAGG.tand}"/><ellipse cx="0" cy="52" rx="7" ry="3.5" fill="#9c4038"/></g>`;
+  } else if (p.mun === 'tander') {
+    // halvöppen: mindre, och utan tungan
+    const f = 'M-15 39 Q0 42.5 15 39 Q12 49 0 51 Q-12 49 -15 39 Z';
+    s = `<path d="M-17 38.5 Q0 42.5 17 38.5 Q13 52 0 54 Q-13 52 -17 38.5 Z" fill="${SKAGG.lapp}"/><path d="${f}" fill="${SKAGG.mork}"/><clipPath id="mdj"><path d="${f}"/></clipPath>`
+      + `<g clip-path="url(#mdj)"><path d="M-16 38.5 Q0 42 16 38.5 L16 44 Q0 47.5 -16 44 Z" fill="${SKAGG.tand}"/></g>`;
   } else {
     const c = p.mun;
     const h = 16 * (p.tight ? 0.8 : 1);
@@ -296,4 +301,13 @@ export function skaggUttryck(svg, lage) {
   }
   mus.insertAdjacentHTML('beforebegin', s);
   return new XMLSerializer().serializeToString(doc);
+}
+
+// Munnen när man pratar i telefon (rum-telefon.js, rum-3d.js): ansiktet i läget (LAGEN, eller null som
+// bilderna är ritade) men med munnen mun – 'tander' halvöppen, 'skratt' öppen eller ett tal (stängd, som i
+// LAGE). Ges till uttryck och skaggUttryck i stället för läget.
+export function medMun(vem, lage, mun) {
+  const a = ANS[vem];
+  const bas = (lage && (a && a.egen && lage in a.egen ? a.egen[lage] : LAGE[lage])) || {};
+  return { ...bas, mun };
 }

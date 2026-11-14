@@ -118,6 +118,8 @@ window.RumFolk = (() => {
     F.sent = undefined;
     ws.onopen = () => {
       F.retry = 0;
+      // telefonerna (rum-telefon.js) går genom samma websocket: vem som är med och uppkopplingen
+      if (window.RumTelefon) RumTelefon.koppla((x) => { if (ws.readyState === 1) ws.send(JSON.stringify(x)); });
       skicka();
       clearInterval(F.ping);
       F.ping = setInterval(() => { if (ws.readyState === 1) ws.send('ping'); }, 30000);
@@ -126,6 +128,7 @@ window.RumFolk = (() => {
       if (e.data === 'pong') return;
       try {
         const d = JSON.parse(e.data);
+        if (window.RumTelefon) RumTelefon.fran(d);
         if (d && d.inne && typeof d.inne === 'object') {
           F.inne = d.inne;
           andra();
@@ -135,6 +138,7 @@ window.RumFolk = (() => {
     ws.onclose = () => {
       clearInterval(F.ping);
       if (F.ws !== ws) return;
+      if (window.RumTelefon) RumTelefon.koppla(null);
       F.ws = null;
       F.inne = {};
       andra();
@@ -150,6 +154,7 @@ window.RumFolk = (() => {
     clearInterval(F.ping);
     const ws = F.ws;
     F.ws = null;
+    if (window.RumTelefon) RumTelefon.koppla(null);
     if (ws) try { ws.close(1000); } catch { /* inget */ }
     F.inne = {};
     andra();
@@ -168,13 +173,17 @@ window.RumFolk = (() => {
     F.sentAt = performance.now();
     ws.send(JSON.stringify({ mot: F.mot || null }));
   }
+  // (medan du pratar i telefonen står websocketen kvar också när fliken döljs, så att samtalet går vidare
+  // när telefonen låses eller du byter app)
   addEventListener('visibilitychange', () => {
-    if (document.hidden) kopplaNer();
+    if (document.hidden) { if (!(window.RumTelefon && RumTelefon.med())) kopplaNer(); }
     else koppla();
   });
   // Har du sagt vem du är (en figur eller namnen på kupongen) kopplar
   // sidan upp sig på nytt, så att tjänsten vet det (?vem=).
   function vemKoll() {
+    // (byter du vem du är lägger telefonen på)
+    if (window.RumTelefon) RumTelefon.du(jag());
     if (F.ws && jag() !== F.vem) {
       kopplaNer();
       koppla();
@@ -251,7 +260,8 @@ window.RumFolk = (() => {
   }
 
   // Vem i gänget syns under punkten (x, y) i fönstret?
-  function vemUnder(x, y, mal = null) {
+  // (med tel: telefonen på bordet framför hen ger 'tel:dl' i stället för 'dl')
+  function vemUnder(x, y, mal = null, tel = false) {
     const f = fig();
     // (pingklockan och det som ligger på pulten är framför gängets ben, som står bakom pulten, och tidningen och
     // protokollet ligger över hela rummet: klicket i dem gick annars till den i gänget som stod bakom, så att
@@ -261,7 +271,8 @@ window.RumFolk = (() => {
     if (!f || !f.under || !c || F.o.nara()) return null;
     const r = c.getBoundingClientRect();
     if (x < r.left || x > r.right || y < r.top || y > r.bottom) return null;
-    return f.under(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1));
+    const k = f.under(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1));
+    return !tel && k && k.startsWith('tel:') ? k.slice(4) : k;
   }
   // Ett klick på någon i gänget (k: dl, dt, dj): du är den som fyller i
   // kupongen. Går medan omgången är öppen och hen inte har lämnat in – och
@@ -382,12 +393,22 @@ window.RumFolk = (() => {
       // Hasses vy, som står framför gänget)
       if (e.defaultPrevented || e.target.closest('.rum-hasse-vy')) return;
       // (radion: hela rutan runt den räknas, också där strålen går mellan handtaget och lådan)
-      const k = e.target.id === 'rum-radio' ? 'radio' : vemUnder(e.clientX, e.clientY, e.target);
+      let k = e.target.id === 'rum-radio' ? 'radio' : vemUnder(e.clientX, e.clientY, e.target, true);
       // (ett klick på något annat: kupongen tas inte i handen)
       clearTimeout(F.taT);
       if (!k) return;
       e.preventDefault();
       e.stopPropagation();
+      // din telefon på bordet: du svarar eller lägger på (rum-telefon.js); någon annans är som ett klick på hen
+      if (k.startsWith('tel:')) {
+        k = k.slice(4);
+        if (window.RumTelefon && (jag() || '').toLowerCase() === k) {
+          RumTelefon.du(jag());
+          if (RumTelefon.med()) RumTelefon.lagg();
+          else RumTelefon.svara();
+          return;
+        }
+      }
       // radion på fönsterbänken: kameran går fram till den (rum-radio.js)
       if (k === 'radio') {
         if (F.o.radio) F.o.radio();
@@ -569,6 +590,8 @@ window.RumFolk = (() => {
     F.on = Boolean(x);
     clearInterval(F.loop);
     if (!F.on || !F.o) {
+      // (går du ut ur rummet lägger du på)
+      if (window.RumTelefon && RumTelefon.med()) RumTelefon.lagg();
       kopplaNer();
       // (radion stängs av när man lämnar rummet)
       if (window.RumRadio) RumRadio.av();

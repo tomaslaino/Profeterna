@@ -1162,6 +1162,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   användaren C, den rekommenderade: *KUPONGEN* (matchakten från B), *OMGÅNGEN* (tavlans åtta lappar),
   *LAGEN* och *SPELARNA*. Tavlan är kvar, så dess siffror står med flit på två ställen, med samma namn och ur
   samma källa. Se [Datorn](#datorn).
+- **Telefonerna: gänget pratar med varandra i rummet (2026-11-15, användarens val):** "Går det att ordna
+  på något sätt att vi pratar och diskuterar ihop oss om matcherna via animations-hemsidan – alltså som nån
+  form av teamsmöte i videoform där?" Av två skisser i rummet (A tv:n sänder mötet med kamerorna, den som
+  pratar tar bilden; B gänget pratar: ingen video, rösten kommer ur ens figur, munnen följer rösten och de
+  andra vänder sig mot den som pratar) valde användaren B. Pingklockan föreslogs för att gå in i samtalet;
+  användaren föreslog i stället "en fast telefon nånstans" eller "en gammal Nokia 3310 eller Ericsson", och
+  av skisserna (en Dialog vid kassan eller var sin mobil) valdes var sin mobil ("Kör"). I skissen låg den
+  egna på pulten, men där syns den inte i telefonen (pultens högra del är utanför bilden), så den egna är
+  den på bordet framför ens figur. Se *Telefonerna* under [Tobaksaffären](#tobaksaffären).
 - **Datorn i hörnet i stället för anslagstavlan (2026-11-14, användarens önskemål):** "Jag tänkte att jag
   skulle flytta in datorn i hörnet på ett snyggt och bra sätt" och "Istället för anslagstavlan – ordna det
   och mergea!" Tavlan med lapparna är borta (lapparnas tal står i datorns matchakt och under Statistik →
@@ -4640,6 +4649,53 @@ millisekund, men alltid med där den hamnade sist. Spegeln vrider bara huvudet i
 utan spegeln, ingen ny geometri eller textur, och gängets egen kod tog lika lång tid per bild (median
 0,6–0,8 ms med och utan, inom bruset). Prova med `?rum-spegel=dl:0.8:-0.2` (som om DL:s markör hade stått där
 i duken, −1…1, länge; också med `?rum-t`).
+
+**Telefonerna** (2026-11-15, [public/rum-telefon.js](public/rum-telefon.js), [public/rum-mobiler.js](public/rum-mobiler.js),
+`telefonen`, `LUR`, `TAL`, `PRATEN` och `telefonNu` i rum-3d.js, `medMun` i rum-uttryck.js): var och en i
+gänget har en mobil från 90-talets slut i en laddare på bordet framför sig, med skärmen mot den som tittar:
+DL en Nokia 3310, DT en Ericsson GA628 med antennstumpen och DJ en Ericsson T28 (`PLATSER[].tel`, i stolens
+axlar, på den sida där flaskan inte står; de följer med när gänget byter plats). Ett klick eller tryck på
+din egen (den framför figuren du är) och du är med i samtalet; ett till och du lägger på. Den första gången
+frågar webbläsaren om mikrofonen. Är du ingen än är klicket som ett klick på figuren, och någon annans
+telefon likaså.
+
+Den som är med tar telefonen ur laddaren med den fria handen (DJ:s cigarett ligger i askkoppen så länge)
+och håller den mot örat, lite framåt längs kinden så att den syns också hos den som sitter bakom bordet
+(`lurBord`, `lurOra`, `lurStall`); i handen är den större än i laddaren, som allt annat de håller. En skylt
+i den handen läggs på bordet så länge, och ingen går iväg medan någon är med i samtalet (`kanGa`). När
+någon svarar ringer de andras telefoner en stund: de surrar i laddaren och skärmen lyser grönt med vem som
+ringer (*Johansson* / *ringer*), och har du rummet öppet hörs en ringsignal (egna korta toner, inte någon
+känd melodi). Skärmen på den som är med visar *Samtal* och hur länge; annars står *Matchfix* på den släckta
+skärmen. Går mikrofonen inte att få står *Ingen mikrofon* på din en stund.
+
+Medan du själv är med följer munnarna rösterna: var och ens röst blir en nivå (0–1, `nivaer`), och munnen
+är stängd, halvöppen eller öppen efter den (`pratMun`, med lite tröghet så att den inte fladdrar; DJ:s i
+skägget). Ansiktena med öppen mun byggs ur samma bilder som humöret (`medMun`: läget med munnen utbytt;
+DT, som är ritad skrattande, får också en stängd) när du svarar och släpps en minut efter (`PRATEN`, som
+gäspningarna). De andra som är med vänder sig mot den som pratar (`TAL`, `talW` i `looks`, före spegeln,
+det man pekar på och hej). Den som inte är med hör inget och ser bara vilka som har telefonen mot örat.
+
+Ljudet går direkt mellan telefonerna och datorerna (WebRTC, med eko- och brusdämpning; ingen video).
+Tjänsten profeterna-rummet ([worker/rummet.mjs](worker/rummet.mjs)) håller reda på vilka som är med
+(`{"luren": true}`, till alla som `"luren": ["DJ", "DL"]` bredvid `inne`) och för bara fram
+uppkopplingen mellan dem (`{"till": "DT", "rtc": …}` → `{"fran": "DL", "rtc": …}`, högst 16 kB, till det
+fönster där hen svarade sist; svarar man i ett annat fönster lägger det första på). Vägen genom nätet tas
+med STUN hos Cloudflare och Google; något relä (TURN) finns inte, så ett mobilnät som inte släpper fram
+ljudet direkt ger tyst samtal. Allt går genom samma websocket som *Gänget är ni*, och medan du är med står
+den kvar när fliken döljs (telefonen låst, en annan app), så att samtalet går vidare; går du ut ur rummet
+lägger du på. Inget spelas in eller sparas.
+
+Kostar lite: tre telefoner med tre till fyra ritanrop var (kroppen, framsidan som en målad bild, skärmen
+och antennen), bara kroppen kastar skugga, och lådan som gör dem lätta att träffa ritas inte (`under`).
+Skärmarna ritas om bara när texten ändras. Munnarna kostar två eller tre ansiktsbilder per person som är
+med, bara medan du själv är med.
+
+Prova med `?rum-luren=dl,dt` (som om DL och DT var med) och `?rum-prat=dl` (som om DL pratade, och de
+andra tittar på hen), också med `?rum-plats=0|1|2`. Samtalet på riktigt provades med två headless Chrome mot
+`wrangler dev --config worker/rummet.toml` och en provserver som skriver om `samtal.rummet` (som i *Gängets
+kupong i realtid*), med en påhittad mikrofon (en ton som går av och på), eftersom headless Chrome på Macen
+väntar för evigt på den riktiga: den andra ringde, båda kopplades upp och hörde varandra (nivån kom fram åt
+båda hållen), och läggandet syntes hos den andra.
 
 **Korstecknet** (2026-11-08, `KORS`, `KORS_MENY` och `korsChans` i rum-tecken.js, `korsHand`
 i rum-3d.js, `avspark` i `gangTv` i rum.js): inför matcherna korsar sig gänget ibland. Var och en

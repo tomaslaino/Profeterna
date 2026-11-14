@@ -148,7 +148,7 @@
 // klickade på vem (namn: vilket tecken, annars nästa),
 // natt hur släckt lysröret är (0–1), somn om gänget sover (22.30–07), vakna att vem väcktes
 // vid t (för bilder; sätt 'ryck' | 'strack' | 'bakis'), efter dagen efter (lage 'bra' | 'illa' | null,
-// krona = oraklen, 'dl' …), under vem i gänget (eller 'radio') som syns i punkten
+// krona = oraklen, 'dl' …), under vem i gänget (eller 'radio', eller 'tel:dl' för telefonen framför hen) som syns i punkten
 // och kval({ pr, skugga, detalj }) hur fint gänget ritas (KVAL i rum.js; detalj
 // också från början)
 // (nx, ny, −1…1 i duken) eller null och huvud var vems huvud är.
@@ -160,7 +160,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ol } from './rum-fika.js';
 import { festen, drakt, festklader } from './rum-fest.js';
 import { TECKEN, LOS, blanda, nasta as nastaTecken, KORS, KORS_MENY, korsChans, LAPP_HALL, LAPP_GOR, LAPP_MENY, LAPP_GREPP, lappBlanda, lappKropp } from './rum-tecken.js';
-import { uttryck, skaggUttryck, ansiktsLage } from './rum-uttryck.js';
+import { uttryck, skaggUttryck, ansiktsLage, medMun } from './rum-uttryck.js';
+import { mobil } from './rum-mobiler.js';
 import { DANSER, DANS_SLAG, DANS_IN, formen, dansLage, dansKropp, dansSjung, dansBlund, dansVarv, gung as dansGung, dansStil } from './rum-dans.js';
 import { vaxter } from './rum-vaxter.js';
 
@@ -188,6 +189,11 @@ const KOPP = { x: -88, z: 30, r: 11 };
 // bordet, händerna, skyltarna eller tårtan kommer närmare växten än 13 (uppmätt
 // i alla tre placeringarna).
 const LILJA = { x: -535, z: -60 };
+// Telefonerna (telefonen nedan): millimeter till rummets enheter, och hur mycket de lutar bakåt i laddaren.
+const TEL_SKALA = 0.3;
+const TEL_LUT = 0.3;
+// (i handen större, som allt annat de håller: annars syns den inte mot de stora huvudena)
+const TEL_HAND = 0.44;
 const PILEA = { x: -62, z: 84 };
 // Platserna runt bordet – till vänster, bakom och till höger: var barstolen
 // står (x, z) och hur den är vriden in mot bordet (turn), armen mot bordet
@@ -200,13 +206,14 @@ const PILEA = { x: -62, z: 84 };
 // tomflaskor på fönsterbänken (x och z i rummet och vinkeln, 0 = står) – bakom
 // honom på sidorna och längst till höger när han sitter bakom bordet, där de syns.
 // skylt: var skylten ligger på bordet när den är nere (lappar), i bordets axlar som
-// KOPP, och hur den är vriden i grader.
+// KOPP, och hur den är vriden i grader. tel: var telefonen står i sin laddare (rum-telefon.js), i
+// stolens axlar, på den sida som flaskan inte står och fri från cigaretten och pennkoppen.
 const PLATSER = [
-  { x: -338, z: 194, turn: 46, inre: 1, kupong: 1, sak: [47, 46], aska: [50, 62], cigg: [8, 58], lagg: [27.5, 52, 1.25], flaska: [80, 72],
+  { x: -338, z: 194, turn: 46, inre: 1, kupong: 1, sak: [47, 46], aska: [50, 62], cigg: [8, 58], lagg: [27.5, 52, 1.25], flaska: [80, 72], tel: [-20, 77],
     tomma: [[-412, 16, 0], [-442, 30, -1.45]], skylt: [-50, -2, 5] },
-  { x: -186, z: 106, turn: 2, inre: 0, kupong: 1, sak: [-27, 47], aska: [-29.7, 45], cigg: [4, 58], vila: [24.3, 48.3], lagg: [28.4, 47.4, -0.25], flaska: [54.5, 56.1],
+  { x: -186, z: 106, turn: 2, inre: 0, kupong: 1, sak: [-27, 47], aska: [-29.7, 45], cigg: [4, 58], vila: [24.3, 48.3], lagg: [28.4, 47.4, -0.25], flaska: [54.5, 56.1], tel: [-10, 75],
     tomma: [[40, 16, 0], [70, 30, 1.45]], skylt: [2, -52, -4] },
-  { x: -38, z: 194, turn: -46, inre: 0, kupong: 0, sak: [-44.5, 43.2], aska: [-50, 62], cigg: [-2.1, 55.6], lagg: [-21, 52, 0.3], flaska: [-80, 72],
+  { x: -38, z: 194, turn: -46, inre: 0, kupong: 0, sak: [-44.5, 43.2], aska: [-50, 62], cigg: [-2.1, 55.6], lagg: [-21, 52, 0.3], flaska: [-80, 72], tel: [10, 72],
     tomma: [[40, 16, 0], [70, 30, 1.45]], skylt: [52, -4, -6] },
 ];
 // Vem som sitter var: FIGS[i] sitter på PLATSER[(i + n) % 3]. De byter var
@@ -3424,11 +3431,232 @@ export async function figurer(canvas, opt = {}) {
     frameOf(kupBench, new THREE.Vector3(lx, BORD.y + 0.3, lz), new THREE.Vector3(Math.cos(lr), 0, -Math.sin(lr)), new THREE.Vector3(Math.sin(lr), 0, Math.cos(lr)));
     earPen.updateMatrix();
     kupBench.updateMatrix();
+    const tel = telefonen(F, fig, Pl);
 
-    const o = { F, fig, hud: skin, torso, chest, hg, hc, face: fm, knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest,
+    const o = { F, fig, tel, hud: skin, torso, chest, hg, hc, face: fm, knees, feet, arms, mouth, thigh, hipY, T, phase: hash(F.x) * 20, pen, kp, earPen, kupBench, extra, aska, inneAt: -1e9, key: JSON.stringify(D), H, kront, fest: D.fest,
       skratt: tex[`${F.key}_skratt`], skagg, turnNu: F.turn, tofs: hc.userData.tofs || null, duk: chest.userData.duk || null };
     efterFig(o);
     return o;
+  }
+
+  // ---------- telefonen ----------
+  //
+  // Var och en har sin mobil (rum-mobiler.js: DL en Nokia 3310, DT en Ericsson GA628 och DJ en
+  // Ericsson T28) i en laddare på bordet framför sig, med skärmen mot den som tittar (PLATSER[].tel).
+  // Den som är med i samtalet (rum-telefon.js, LUR) tar den och håller den mot örat med den fria
+  // handen (lurArm) så länge; munnen går efter rösten (pratMun) och de andra som är med tittar på den
+  // som pratar (TAL). När någon svarar ringer telefonerna hos de andra en stund (SIGNAL).
+  function telefonen(F, fig, Pl) {
+    const [x, z] = Pl.tel;
+    const vrid = -F.turn * DEG;
+    const m = mobil(F.key.toUpperCase(), THREE, RoundedBoxGeometry);
+    m.scale.setScalar(TEL_SKALA);
+    const L = m.userData.mal;
+    // (bara kroppen kastar skugga)
+    m.children[0].castShadow = true;
+    const lad = new THREE.Mesh(new RoundedBoxGeometry(L.bredd * TEL_SKALA + 5, 7, 13, 2, 2), mat('#1b1c1f', { roughness: 0.55 }));
+    lad.position.set(x, BORD.y + 3.5, z);
+    lad.rotation.y = vrid;
+    lad.castShadow = lad.receiveShadow = true;
+    lad.userData.fast = true;
+    lad.userData.tel = true;
+    fig.add(lad);
+    const hl = (L.langd * TEL_SKALA) / 2;
+    const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(-TEL_LUT, vrid, 0, 'YXZ'));
+    const p = new THREE.Vector3(x, BORD.y + 5 + Math.cos(TEL_LUT) * hl, z).add(new THREE.Vector3(0, 0, -Math.sin(TEL_LUT) * hl + 2).applyAxisAngle(UP, vrid));
+    m.position.copy(p);
+    m.quaternion.copy(q);
+    m.userData.fast = true;
+    fig.add(m);
+    // en osynlig låda runt laddaren och telefonen i den, större än de: lättare att träffa med fingret, också
+    // när telefonen är vid örat (under; ritas inte)
+    const traff = new THREE.Mesh(new THREE.BoxGeometry(L.bredd * TEL_SKALA * 2.6, L.langd * TEL_SKALA * 1.8, L.djup * TEL_SKALA * 4), new THREE.MeshBasicMaterial());
+    traff.visible = false;
+    traff.position.copy(p);
+    traff.quaternion.copy(q);
+    traff.userData.fast = true;
+    fig.add(traff);
+    return { m, lad, p, q, L, traff, tjock: L.djup * TEL_SKALA, iHand: false };
+  }
+  // LUR: per figur { pa, at, vakAt } – med i samtalet sedan at, eller lade på vid at.
+  const LUR = {};
+  const LUR_TA = 0.5;
+  const LUR_ORA = 1.25;
+  const LUR_NER = 0.7;
+  const LUR_TILL = 1.2;
+  const iSamtal = (o) => Boolean(LUR[o.F.key] && LUR[o.F.key].pa);
+  // hur långt handen har kommit: till telefonen (till) och därifrån till örat (ora), och om telefonen är i handen
+  function lurNu(o, t) {
+    const L = LUR[o.F.key];
+    if (!L || !o.tel) return null;
+    const d = t - L.at;
+    if (L.pa) return { till: sm(0, LUR_TA, d), ora: sm(LUR_TA, LUR_ORA, d), hand: d >= LUR_TA * 0.92 };
+    if (d >= LUR_TILL) return null;
+    return { till: 1 - sm(LUR_NER, LUR_TILL, d), ora: 1 - sm(0, LUR_NER, d), hand: d < LUR_NER };
+  }
+  // telefonen tas med den fria handen (DJ:s cigarett ligger i askkoppen så länge)
+  const lurArm = (o) => fri(o) || o.arms[0];
+  // handflatan mot telefonens baksida i laddaren, fingrarna uppåt längs den
+  function lurBord(o, A) {
+    const T = o.tel;
+    const fram = new THREE.Vector3(0, 0, 1).applyQuaternion(T.q);
+    const upp = new THREE.Vector3(0, 1, 0).applyQuaternion(T.q);
+    return handflata(o, T.p.clone().addScaledVector(fram, -(T.tjock / 2 + 0.6)), upp, fram.negate(), new THREE.Vector3(A.s * 0.8, -0.6, 0));
+  }
+  // telefonen mot örat och handen utanpå: fingrarna uppåt och lite bakåt, handryggen utåt
+  function lurOra(o, A) {
+    const s = A.s;
+    const P = o.F.head;
+    const d = huvudAxlar(o);
+    // (lite framåt, längs kinden: rakt ut från örat syns den bara från kanten hos den som sitter bakom bordet)
+    const ut = d(s, 0, 0.5).normalize();
+    const ora = inHead(o, new THREE.Vector3(s * P.rx * 0.92, -P.ry * 0.08, P.rz * 0.16));
+    return handflata(o, ora.addScaledVector(ut, o.tel.L.djup * TEL_HAND + 1.2), d(-s * 0.05, 0.86, -0.5), ut, new THREE.Vector3(s, -0.8, 0.1));
+  }
+  // telefonen i handen H: på handflatans sida, skärmen in mot huvudet, längs fingrarna
+  const lurY = new THREE.Vector3();
+  const lurZ = new THREE.Vector3();
+  const lurX = new THREE.Vector3();
+  function lurStall(o, H, k) {
+    const T = o.tel;
+    lurY.set(0, 1, 0).applyQuaternion(H.quaternion);
+    lurZ.set(0, 0, 1).applyQuaternion(H.quaternion);
+    const q = o.F.arm * H.scale.x;
+    const s = TEL_SKALA + (TEL_HAND - TEL_SKALA) * k;
+    const c = H.position.clone().addScaledVector(lurY, q * 1.15).addScaledVector(lurZ, -q * 0.9 - ((T.L.djup * s) / 2 + 0.6));
+    lurX.crossVectors(lurY, lurZ).negate();
+    frameOf(T.m, c, lurX, lurY);
+    T.m.scale.setScalar(s);
+    T.iHand = true;
+  }
+  function lurTillbaka(o) {
+    const T = o.tel;
+    if (!T || !T.iHand) return;
+    T.m.position.copy(T.p);
+    T.m.quaternion.copy(T.q);
+    T.m.scale.setScalar(TEL_SKALA);
+    T.iHand = false;
+  }
+  // SIGNAL: när någon senast svarade – då ringer telefonerna en stund hos de andra (skakar i laddaren och lyser)
+  const SIGNAL = { at: -1e9, vem: null };
+  const SIGNAL_LANGD = 9;
+  // TAL: den som pratar (rum-telefon.js), den förra och när det byttes
+  const TAL = { k: null, fran: null, at: -1e9 };
+  const talW = (o, t) => {
+    if (!iSamtal(o)) return 0;
+    const pa = (k) => (k && k !== o.F.key ? 1 : 0);
+    return (pa(TAL.fran) + (pa(TAL.k) - pa(TAL.fran)) * sm(TAL.at, TAL.at + 0.5, t)) * 0.9 * (1 - sovW(o, t));
+  };
+  function talPunkt(o, t) {
+    const vid = (k) => { const x = k && k !== o.F.key && figs.find((f) => f.F.key === k); return x ? huvudVid(x, t) : null; };
+    const a = vid(TAL.fran);
+    const b = vid(TAL.k);
+    if (!a || !b) return b || a || OGA;
+    return a.lerp(b, sm(TAL.at, TAL.at + 0.45, t));
+  }
+  // ?rum-luren=dl,dt: som om de var med i samtalet (för bilder), ?rum-prat=dl: som om DL pratade
+  const PROVQ = new URLSearchParams(location.search);
+  const PROV_LUR = PROVQ.has('rum-luren') ? PROVQ.get('rum-luren').toLowerCase().split(',').filter(Boolean) : null;
+  const PROV_PRAT = PROVQ.has('rum-prat') ? PROVQ.get('rum-prat').toLowerCase().split(',').filter(Boolean) : null;
+  const tvaSiffror = (n) => String(n).padStart(2, '0');
+  // Vilka som är med (LUR), deras röster (o.niva), den som pratar (TAL), ringningen och skärmarna.
+  function telefonNu(t) {
+    const RT = window.RumTelefon;
+    const lur = PROV_LUR || (RT ? RT.luren().map((v) => v.toLowerCase()) : []);
+    for (const o of figs) {
+      const k = o.F.key;
+      const pa = lur.includes(k);
+      const L = LUR[k];
+      if (!L) {
+        LUR[k] = { pa, at: pa && PROV_LUR ? t - 10 : pa ? t : -1e9, vakAt: -1e9 };
+        continue;
+      }
+      if (L.pa !== pa) {
+        LUR[k] = { pa, at: t, vakAt: -1e9 };
+        if (pa) { SIGNAL.at = t; SIGNAL.vem = k; }
+      }
+      // (den som är med i samtalet är vaken)
+      if (pa && t - LUR[k].vakAt > 8) { vakna(o, t); LUR[k].vakAt = t; }
+    }
+    const med = PROV_PRAT || (RT && RT.med());
+    const niv = RT && RT.med() ? RT.nivaer() : {};
+    for (const o of figs) {
+      const k = o.F.key;
+      o.niva = PROV_PRAT && PROV_PRAT.includes(k) ? Math.max(0, Math.sin(t * 13.7) * Math.sin(t * 4.1 + 1) * 1.3) : (niv[k.toUpperCase()] || 0);
+    }
+    const tal = PROV_PRAT ? PROV_PRAT[0] : med && RT ? (RT.talar() || '').toLowerCase() || null : null;
+    if (tal !== TAL.k) { TAL.fran = TAL.k; TAL.k = tal; TAL.at = t; }
+    // munnarna byggs för dem som är med medan du själv hör dem
+    const vem = med ? figs.filter(iSamtal).map((o) => o.F.key).sort().join(',') : '';
+    if (vem) { PRATEN.sist = t; pratBygg(vem); } else if (PRATEN.p && t - PRATEN.sist > 60) pratSlapp();
+    // skärmarna och ringningen
+    const fel = RT && RT.fel ? Date.now() - RT.fel() < 4000 : false;
+    const du = RT ? (RT.du() || '').toLowerCase() : '';
+    const ringer = t - SIGNAL.at < SIGNAL_LANGD;
+    for (const o of figs) {
+      const T = o.tel;
+      if (!T) continue;
+      const L = LUR[o.F.key];
+      let s;
+      if (fel && o.F.key === du) s = ['Ingen', 'mikrofon', true];
+      else if (L && L.pa) { const d = Math.max(0, Math.floor(t - L.at)); s = ['Samtal', `${tvaSiffror(Math.floor(d / 60) % 100)}:${tvaSiffror(d % 60)}`, true]; }
+      else if (ringer && SIGNAL.vem !== o.F.key) s = [{ dl: 'Laino', dt: 'Tejder', dj: 'Johansson' }[SIGNAL.vem] || '', 'ringer', true];
+      else s = ['Matchfix', '', false];
+      T.m.userData.skarm(s[0], s[1], s[2]);
+      // (det surrar i laddaren när den ringer: korta stötar)
+      const surr = ringer && !(L && L.pa) && SIGNAL.vem !== o.F.key && !opt.calm && ((t - SIGNAL.at) % 1.4) < 0.6 ? 1 : 0;
+      if (!T.iHand) {
+        T.m.position.copy(T.p);
+        if (surr) T.m.position.x += Math.sin(t * 95) * 0.45;
+      }
+    }
+  }
+  // Munnarna medan man pratar (PRATEN: tex.prat1_dl … prat2_skagg, och DT:s stängda prat0_dt):
+  // byggs när du är med i samtalet och släpps en minut efter, som gäspningarna.
+  const PRATEN = { p: null, nr: 0, sist: -1e9, vem: '', lage: undefined };
+  function pratBygg(vem) {
+    if (PRATEN.p && PRATEN.vem === vem && PRATEN.lage === ANS.mal) return;
+    const nr = ++PRATEN.nr;
+    PRATEN.vem = vem;
+    PRATEN.lage = ANS.mal;
+    PRATEN.p = (async () => {
+      const ny = {};
+      const jobb = [];
+      const bygg = (k, s) => { if (s) jobb.push(svgTex(s).then((x) => { ny[k] = x; }, () => {})); };
+      try {
+        for (const k of vem.split(',')) {
+          if (k === 'dj') {
+            if (ANS.svg.skagg) for (const [n, mun] of [[1, 'tander'], [2, 'skratt']]) bygg(`prat${n}_skagg`, skaggUttryck(ANS.svg.skagg, medMun('dj', ANS.mal, mun)));
+            continue;
+          }
+          if (!ANS.svg[k]) continue;
+          for (const [n, mun] of k === 'dt' ? [[0, 0.4], [1, 'tander'], [2, 'skratt']] : [[1, 'tander'], [2, 'skratt']]) bygg(`prat${n}_${k}`, uttryck(ANS.svg[k], k, medMun(k, ANS.mal, mun)));
+        }
+      } catch (err) {
+        console.warn('Rummet: munnarna kunde inte ritas', err);
+      }
+      await Promise.all(jobb);
+      if (nr !== PRATEN.nr) {
+        for (const x of Object.values(ny)) x.dispose();
+        return;
+      }
+      for (const k of Object.keys(tex)) if (k.startsWith('prat') && !ny[k]) { tex[k].dispose(); delete tex[k]; }
+      Object.assign(tex, ny);
+    })();
+  }
+  function pratSlapp() {
+    PRATEN.nr++;
+    PRATEN.p = null;
+    PRATEN.vem = '';
+    for (const k of Object.keys(tex)) if (k.startsWith('prat')) { tex[k].dispose(); delete tex[k]; }
+  }
+  // munnen efter rösten: 0 stängd, 1 halvöppen, 2 öppen (lite tröghet, så att den inte fladdrar)
+  function pratMun(o) {
+    const v = o.niva || 0;
+    const m = o.mun || 0;
+    const ny = v > 0.62 ? 2 : v > 0.24 ? (m === 2 && v > 0.48 ? 2 : 1) : v < 0.14 ? 0 : m;
+    o.mun = ny;
+    return ny;
   }
 
   // Ett föremåls matris i c med x-axeln X och y-axeln Y (rätas upp).
@@ -3950,6 +4178,9 @@ export async function figurer(canvas, opt = {}) {
     // på natten tittar DL på text-tv (och bort ibland)
     const n = nattW(t) * (1 - tvW(t));
     if (n > 0 && o.F.key === 'dl') out.push([TV, n * (1 - ibland(t + o.phase, 31, 0.29, 0, 1, 4, 5.2, 0))]);
+    // i telefonen: de som är med tittar på den som pratar (före spegeln, det man pekar på och hej)
+    const tw = talW(o, t);
+    if (tw > 0) out.push([talPunkt(o, t), tw]);
     // din egen figur på markören (spegeln), före det man pekar på och hej, som går före
     const sp = spW(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t));
     if (sp > 0) out.push([SP[o.F.key].nu.clone(), sp]);
@@ -6520,7 +6751,7 @@ export async function figurer(canvas, opt = {}) {
   }
   // GAX: en promenad för bilder (ga, ?rum-ga)
   const GAX = { i: -1, t0: -1e9, bort: 4 };
-  const kanGa = (t) => !Object.keys(PROV).length && allaVakna(t) && !grupp0(t) && tvingStart(t, t + 30) == null;
+  const kanGa = (t) => !Object.keys(PROV).length && allaVakna(t) && !grupp0(t) && tvingStart(t, t + 30) == null && !figs.some(iSamtal);
   // Den som går iväg vid t: { o, i, t0, l, bort: sekunder utanför bilden, T:
   // tiderna – nere (a), utanför bilden (b), på väg tillbaka (c), nere vid
   // stolen (d) och uppe (e) } – och klunken efteråt.
@@ -6789,6 +7020,12 @@ export async function figurer(canvas, opt = {}) {
     const ks = korsFingrar(o, t);
     const lp = lappNu(o, t);
     if (o.lapp && !lp) o.lapp.visible = false;
+    const ln = lurNu(o, t);
+    const lA = ln && ln.till > 0 ? lurArm(o) : null;
+    if (!ln || !ln.hand) lurTillbaka(o);
+    // (skylten i handen som tar telefonen läggs på bordet så länge)
+    const lurLapp = Boolean(lp && lA && (lp.A === lA || lp.B === lA));
+    if (lurLapp && lp.A === lA) lappStall(o, lp);
     if (lp && lp.lyft <= 0) lappStall(o, lp);
     // (den som sover med huvudet på armarna har ställt flaskan på bordet)
     const lagt = sovStil(o) === 'bord' && sovW(o, t) > 0.2;
@@ -6809,14 +7046,21 @@ export async function figurer(canvas, opt = {}) {
       A.hand.visible = !useW;
       let H = useW ? A.wHand : A.hand;
       let hp = handPose(o, A, t);
-      const iLapp = lp && lp.A === A && lp.w > 0 && !(ks && ks.A === A);
-      const iAndra = lp && lp.B === A && lp.L.tva > 0 && lp.lyft > 0 && lp.kort && !(ks && ks.A === A);
+      const iLapp = lp && lp.A === A && lp.w > 0 && !(ks && ks.A === A) && !(lurLapp && lp.A === lA);
+      const iAndra = lp && lp.B === A && lp.L.tva > 0 && lp.lyft > 0 && lp.kort && !(ks && ks.A === A) && !lurLapp;
       if (iLapp) {
         const upp = lp.lyft > 0 ? lappLage(o, A, lp) : null;
         if (lp.lyft < 1) lp.bord = lappBord(o, A);
         hp = lerpPose(hp, !upp ? lp.bord : lp.lyft < 1 ? lappBage(o, lerpPose(lp.bord, upp, lp.lyft), lp.lyft) : upp, lp.w);
       } else if (iAndra) hp = lerpPose(hp, lappAndra(o, A, lp), lp.L.tva * sm(0.25, 0.9, lp.lyft));
       const grepp = iLapp ? lp.w : iAndra ? lp.L.tva * sm(0.25, 0.9, lp.lyft) : 0;
+      // telefonen: handen till laddaren och därifrån till örat (och tillbaka när hen lägger på)
+      const iLur = lA === A;
+      if (iLur && ln.till > 0) {
+        hp = bage(hp, lurBord(o, A), ln.till);
+        if (ln.ora > 0) hp = bage(hp, lurOra(o, A), ln.ora);
+        if (ln.hand && A.cig) { A.cig.visible = false; if (A.bench) A.bench.visible = true; }
+      }
       if (tk && tk.A === A) hp = bage(hp, teckenPose(o, A, tk), tk.w);
       if (o.st.w > 0) hp = lerpPose(hp, gaHand(o, A, t, o.st), o.st.w);
       if (A.fist) {
@@ -6852,6 +7096,7 @@ export async function figurer(canvas, opt = {}) {
       }
       orient(H, hp.p, hp.y, hp.z);
       if (iLapp && lp.lyft > 0) { H.updateMatrix(); lappStall(o, lp, H, fg && (!tk || tk.A !== A)); }
+      if (iLur && ln.hand) lurStall(o, H, ln.ora);
       // näven: handleden där den öppna handens handled var
       if (H === A.fist) H.position.sub(H.userData.wrist.clone().applyQuaternion(H.quaternion));
       H.updateMatrix();
@@ -7463,15 +7708,21 @@ export async function figurer(canvas, opt = {}) {
     const G = gasp ? tex[`gasp_${k}`] : null;
     // (ögonlocken blir tunga redan medan hen somnar)
     const trott = sov > 0.15 || vk || gr > 0.3;
+    // munnen efter rösten i telefonen (DJ:s i skägget)
+    const pm = iSamtal(o) && o.niva !== undefined && PRATEN.vem.includes(k) ? pratMun(o) : -1;
+    const P0 = pm === 0 && k === 'dt' ? tex.prat0_dt : null;
+    const PM = pm > 0 && k !== 'dj' ? tex[`prat${pm}_${k}`] : null;
     let bild;
     if (G) bild = G;
     else if ((skrattW(o, t) > 0.3 || gasp) && skratt) bild = skratt;
+    else if (PM || P0) bild = PM || P0;
     else if (sov > 0.5 || gasp || (V && V.blund && V.blund(vk.l))) bild = T.blund || a.blund || a.bas;
     // (med ett ryck: ögonen vidöppna en stund)
     else if (vk && vk.satt === 'ryck' && vk.l < 2.9 && a.blund) bild = a.bas;
     else if (trott && T.bas) bild = !opt.calm && trottBlink(o, t, gr) && T.blund ? T.blund : T.bas;
     else bild = a.blund && ((!opt.calm && blinkar(o, t)) || korsBlund(o, t)) ? a.blund : a.bas;
-    return { bild, skagg: gasp && tex.gasp_skagg ? tex.gasp_skagg : (skrattW(o, t) > 0.3 || gasp) && tex.dj_skagg_skratt ? tex.dj_skagg_skratt : trott && tex.trott_skagg ? tex.trott_skagg : tex.ans_skagg || tex.dj_skagg };
+    const PS = pm > 0 && k === 'dj' ? tex[`prat${pm}_skagg`] : null;
+    return { bild, skagg: gasp && tex.gasp_skagg ? tex.gasp_skagg : PS && !(skrattW(o, t) > 0.3) ? PS : (skrattW(o, t) > 0.3 || gasp) && tex.dj_skagg_skratt ? tex.dj_skagg_skratt : trott && tex.trott_skagg ? tex.trott_skagg : tex.ans_skagg || tex.dj_skagg };
   }
   // Z:ana som stiger från den som sover, ett per utandning i hens takt (SOVTAKT): DT snarkar
   // (större och tätare), DJ andas djupt och DL lätt. De driver uppåt och utåt och bleknar, och
@@ -7561,6 +7812,8 @@ export async function figurer(canvas, opt = {}) {
     // spegeln: blicken glider efter markören, lika fort hur glest gänget än ritas
     const glid = dt > 0 ? 1 - Math.exp(-dt / SPEGEL.tau) : 1;
     for (const s of Object.values(SP)) s.nu.lerp(s.mal, glid);
+    // telefonerna: vilka som är med, rösterna och ringningen (före armarna, som tar dem)
+    telefonNu(t);
     // (röken först: den kan ställa figuren när blosset föddes, emitter)
     smoke(t);
     ringar(t);
@@ -8161,6 +8414,8 @@ export async function figurer(canvas, opt = {}) {
   function under(nx, ny) {
     ray.setFromCamera(new THREE.Vector2(nx, ny), cam);
     let best = null;
+    // (telefonerna går före gängets delar, vars lådor är stora: en arm på väg till örat skymde laddaren)
+    let tel = null;
     for (const o of figs) {
       // (den som går iväg klickar man igenom)
       if (o.st && o.st.w > 0.2) continue;
@@ -8173,6 +8428,14 @@ export async function figurer(canvas, opt = {}) {
         const d = delPt.applyMatrix4(x.matrixWorld).distanceTo(ray.ray.origin);
         if (!best || d < best.d) best = { k: o.F.key, d };
       });
+      // telefonen framför hen: lådan runt laddaren, och telefonen själv var den än är (vid örat)
+      if (o.tel) for (const tr of [o.tel.traff, o.tel.m.children[0]]) {
+        if (!tr.geometry.boundingBox) tr.geometry.computeBoundingBox();
+        delRay.copy(ray.ray).applyMatrix4(delInv.copy(tr.matrixWorld).invert());
+        if (!delRay.intersectBox(tr.geometry.boundingBox, delPt)) continue;
+        const d = delPt.applyMatrix4(tr.matrixWorld).distanceTo(ray.ray.origin);
+        if (!tel || d < tel.d) tel = { k: `tel:${o.F.key}`, d };
+      }
     }
     // (radion: klicket går fram till den, rum-folk.js)
     RADIO.traff.forEach((x) => {
@@ -8183,6 +8446,7 @@ export async function figurer(canvas, opt = {}) {
       const d = delPt.applyMatrix4(x.matrixWorld).distanceTo(ray.ray.origin);
       if (!best || d < best.d) best = { k: 'radio', d };
     });
+    if (tel) return tel.k;
     return best && best.k;
   }
 
