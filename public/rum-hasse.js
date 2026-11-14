@@ -2560,28 +2560,24 @@ window.RumHasse = (() => {
     }));
     return ut;
   }
-  // Raderna och spalthuvudet, med Facit så snart någon match har slutat. tips: det som står på raderna
-  // (hansRader), annars det du har frågat om. → nästa match du inte har frågat om.
+  // Raderna och spalthuvudet. tips: det som står på raderna (hansRader), annars det du har frågat om.
+  // → nästa match du inte har frågat om.
   function listan(lista, fragat, tips = fragat) {
     const s = $('.rh-samtal');
     const l = s.querySelector('.rh-lista');
     const nu = Date.now();
-    // (i matcher som pågår står ställningen i samma spalt, och spalten heter Ställning så länge)
+    // (hur matchen slutade, eller ställningen i en match som pågår)
     const facit = new Map(lista.map((m) => [m.id, slutade(m, nu) || star(m, nu)]));
-    const medFacit = [...facit.values()].some((f) => f && f.star) ? 'star' : [...facit.values()].some(Boolean);
-    // (med din spalt också blir det trångt: då står spalterna tätare)
-    s.classList.toggle('tre', medFacit && K().kan());
     const kol = s.querySelector('.rh-kol');
     if (kol) kol.remove();
-    l.insertAdjacentHTML('beforebegin', spalter(lista, tips, medFacit));
+    l.insertAdjacentHTML('beforebegin', spalter(lista, tips, facit));
     l.textContent = '';
     let forsta = null;
-    lista.forEach((m, i) => {
+    lista.forEach((m) => {
       const b = document.createElement('button');
       b.type = 'button';
       const f = facit.get(m.id);
-      // (det du har på raden står för hand längst ut, i en egen spalt)
-      b.innerHTML = `<i>${i + 1}</i><span>${esc(m.namn)}</span>${hansTips(tips[m.id], f && !f.star ? f : null)}${medFacit ? facitRuta(f) : ''}${K().kan() ? `<u>${esc(K().din(m.id))}</u>` : ''}`;
+      b.innerHTML = raden(m, tips[m.id], f);
       b.disabled = Date.parse(m.avspark) <= nu;
       // (en match som har börjat går inte att fråga om, men hans tips ska gå att läsa)
       b.classList.toggle('spelad', Boolean(f) || b.disabled);
@@ -2596,29 +2592,37 @@ window.RumHasse = (() => {
       if (!forsta && !b.disabled && !fragat[m.id]) forsta = b;
     });
     passaSpalter();
-    // (handstilen kan komma efter: då mäts namnen igen)
+    // (typsnitten kan komma efter: då mäts namnen igen)
     if (document.fonts) document.fonts.ready.then(passaSpalter);
     // nästa match man inte har frågat om syns utan att man rullar
     if (forsta) l.scrollTop = Math.max(0, forsta.offsetTop - l.offsetTop - 40);
     return forsta;
   }
-  // Det han sa om matchen, på dess rad: rutorna 1 X 2 som på kupongen med hans tecken ifyllda,
-  // och resultatet. Rutorna och resultatet har fast bredd och strecket i resultatet står mitt i
-  // sin spalt (siffrorna är olika breda i Fraunces), så att allt står i raka spalter. När matchen har
-  // slutat (f, slutade) lyser tecknet som kom in: i guld om han hade det, annars med vit ram (kom).
-  // Det han hade i onödan tonas ned (av), och resultatet står i guld om han sa det exakta.
-  function hansTips(minne, f = null) {
-    const [tecken, res] = String(minne || '').split(' ');
-    if (!tecken) return '';
-    const rutor = KORT.map((k, n) => {
-      const pa = tecken.includes(k);
-      const klass = [pa && 'pa', f && pa && n !== f.utfall && 'av', f && !pa && n === f.utfall && 'kom'].filter(Boolean).join(' ');
-      return `<em${klass ? ` class="${klass}"` : ''}>${k}</em>`;
-    }).join('');
-    const [h, b] = String(res || '').split('–');
-    const mal = b === undefined ? '' : `<i>${esc(h)}</i>–<i>${esc(b)}</i>`;
-    const exakt = f && res === `${f.h}–${f.b}`;
-    return `<b class="rh-tips"><span class="rh-vh">${esc(tecken)}</span><span class="rh-rutor" aria-hidden="true">${rutor}</span><small${exakt ? ' class="exakt"' : ''}>${mal}</small></b>`;
+  // En rad som tavlan i matchlistan: hans tecken längst till vänster i guld, hemmalaget, resultatet i mitten,
+  // bortalaget och det du har längst till höger i din handstil. Ytterspalterna är lika breda, så att mitten
+  // står mitt i listan. I mitten står hans resultat (guld, kursivt) tills matchen börjar, sedan ställningen
+  // (kursivt) och när den har slutat resultatet, i guld om han sa precis det. När matchen har slutat lyser
+  // tecknet som kom in och resten tonas ned (av); satt inget av tecknen stryks de (fel). f: slutade eller star.
+  function raden(m, minne, f) {
+    const [tecken = '', res = ''] = String(minne || '').split(' ');
+    const slut = f && !f.star ? f : null;
+    const lag = String(m.namn || '').split(/\s+[–-]\s+/);
+    const [hemma, borta] = lag.length === 2 ? lag.map(namnKort) : [m.namn, ''];
+    const du = K().kan() ? K().din(m.id) : '';
+    let mitt = '<b class="rh-mitt tom"><i></i>–<i></i></b>';
+    if (f) mitt = resultat(f.h, f.b, f.star ? 'star' : res === `${f.h}–${f.b}` ? 'exakt' : '', f.star ? 'Står ' : 'Slutade ');
+    else if (res.includes('–')) mitt = resultat(...res.split('–'), 'gissat', 'Hasse tror ');
+    return `${tecknen(tecken, slut, 'b')}<span class="rh-lag hemma">${esc(hemma)}</span>${mitt}<span class="rh-lag borta">${esc(borta)}</span>${tecknen(du, slut, 'u')}`;
+  }
+  const namnKort = (n) => (window.Papper && Papper.kort ? Papper.kort(n) : n);
+  const resultat = (h, b, klass, vh) => `<b class="rh-mitt${klass ? ` ${klass}` : ''}"><span class="rh-vh">${vh}</span><i>${esc(h)}</i>–<i>${esc(b)}</i></b>`;
+  // Hans tecken (b, rh-hans) eller ditt (u), rättade när matchen har slutat.
+  function tecknen(t, slut, tag) {
+    const kom = slut ? KORT[slut.utfall] : null;
+    const fel = Boolean(kom && t && !t.includes(kom));
+    const em = [...t].map((k) => `<em${kom && !fel && k !== kom ? ' class="av"' : ''}>${esc(k)}</em>`).join('');
+    const klass = [tag === 'b' && 'rh-hans', fel && 'fel'].filter(Boolean).join(' ');
+    return `<${tag}${klass ? ` class="${klass}"` : ''}>${em}</${tag}>`;
   }
   // Hur matchen slutade efter 90 minuter, som tipsen rättas: { h, b, utfall: 0–2 }. null om den inte har
   // slutat, eller om du har valt att dölja den (gradeRow i kupong.js).
@@ -2634,51 +2638,52 @@ window.RumHasse = (() => {
     const r = gradeRow({ id: m.id, sign: '1X2', label: m.namn }, nu);
     return r.state === 'live' && r.score ? { h: r.score.home, b: r.score.away, star: true } : null;
   }
-  // Rutan i spalten Facit, med strecket mitt i spalten som i hans resultat. Tom på rader som inte har slutat.
-  // En match som pågår har sin ställning där, i kursiv (star).
-  const facitRuta = (f) => `<b class="rh-facit${f && f.star ? ' star' : ''}">${f ? `<span class="rh-vh">${f.star ? 'Står ' : 'Slutade '}</span><i>${esc(f.h)}</i>–<i>${esc(f.b)}</i>` : ''}</b>`;
-  // Vem som säger vad, överst i listan: Hasse (porträtt och namn i guld) över hans rutor och
-  // resultat, du (porträtt i din färg och namnet i din handstil, som på kupongen) över det du har.
-  // Huvudet är byggt som en rad, med osynliga rutor som håller bredden, så att det står mitt över
-  // spalterna i alla storlekar. Mellan dem står Facit, när någon match har slutat. Spalterna som inte syns
-  // på någon rad får inget huvud: ditt porträtt kommer först när du har tippat något (annars stod det över
-  // en tom spalt, och hans resultat såg ut att vara ditt), men spalten står kvar, så att inget flyttar sig.
-  function spalter(lista, tips, medFacit = false) {
-    const han = lista.some((m) => tips[m.id]);
-    const du = K().kan();
-    if (!han && !du && !medFacit) return '';
-    const hans = han ? `<b class="rh-tips"><span class="rh-rutor">${KORT.map((k) => `<em>${k}</em>`).join('')}</span><small></small><span class="rh-vem hasse"><span class="rh-ans"></span><span class="rh-namn">Hasse</span></span></b>` : '';
-    let din = du ? '<u></u>' : '';
-    if (du && lista.some((m) => K().din(m.id))) {
+  // Vem som säger vad, överst i listan: Hasse (porträtt och namn i guld) längst till vänster över hans
+  // tecken, du (porträtt i din färg och namnet i din handstil, som på kupongen) längst till höger över
+  // ditt, och under namnen hur många rätt ni har när någon match har slutat. Ditt huvud kommer först när
+  // du har tippat något (annars stod det över en tom spalt), men spalten står kvar, så att inget flyttar sig.
+  function spalter(lista, tips, facit) {
+    const hans = (m) => String(tips[m.id] || '').split(' ')[0];
+    const din = (m) => (K().kan() ? K().din(m.id) : '');
+    const han = lista.some(hans);
+    const du = lista.some(din);
+    if (!han && !du) return '';
+    // (rätt räknas bara på matcher som har slutat och där det finns ett tecken; Dölj resultat följer med)
+    const ratt = (t) => {
+      const spelade = lista.filter((m) => { const f = facit.get(m.id); return f && !f.star && t(m); });
+      if (!spelade.length) return '';
+      const n = spelade.filter((m) => t(m).includes(KORT[facit.get(m.id).utfall])).length;
+      return `<span class="rh-ratt">${n} rätt</span>`;
+    };
+    const vanster = han ? `<span class="rh-vem hasse"><span class="rh-ans"></span><span><span class="rh-namn">Hasse</span>${ratt(hans)}</span></span>` : '<span></span>';
+    let hoger = '';
+    if (du) {
       // (porträtten står i gängets uppgifter i kuponger.json, KP i kupong.js, som rum.js läser dem)
       const p = Samtal.pult.state();
       const gang = (typeof KP !== 'undefined' && KP.data && KP.data.samtal && KP.data.samtal.gang) || p.s.gang || [];
       const i = p.vem ? gang.findIndex((g) => g.id === p.vem) : -1;
       const g = i >= 0 ? gang[i] : null;
       const namn = dittNamn();
-      din = g && namn
-        ? `<u><span class="rh-vem du k${i}"><span class="rh-ans"${g.bild ? ` style="background-image: url('${esc(g.bild)}')"` : ''}></span><span class="rh-namn">${esc(namn)}</span></span></u>`
-        : '<u><span class="rh-vem du"><span class="rh-namn">Du</span></span></u>';
+      hoger = g && namn
+        ? `<span class="rh-vem du k${i}"><span class="rh-ans"${g.bild ? ` style="background-image: url('${esc(g.bild)}')"` : ''}></span><span><span class="rh-namn">${esc(namn)}</span>${ratt(din)}</span></span>`
+        : `<span class="rh-vem du"><span><span class="rh-namn">Du</span>${ratt(din)}</span></span>`;
     }
-    const slut = medFacit ? `<b class="rh-facit"><span class="rh-vem facit">${medFacit === 'star' ? 'Ställning' : 'Facit'}</span></b>` : '';
-    return `<div class="rh-kol" aria-hidden="true">${hans}${slut}${din}</div>`;
+    return `<div class="rh-kol" aria-hidden="true">${vanster}${hoger}</div>`;
   }
-  // Huvudet lika brett som raderna (en rullningslist tar plats i listan), och namnen bara när de
-  // får plats bredvid varandra: först går ditt (du vet hur du ser ut), sedan hans. Ditt namn är bredare
-  // än din spalt, och hänger det ut över spalten före (hans resultat eller Facit) står bara porträttet.
+  // Huvudet lika brett som raderna (en rullningslist tar plats i listan), och lagnamn som inte ryms krymper,
+  // båda på raden lika mycket, så att tavlan står symmetrisk. (Först nollställs alla, sedan mäts alla och sist
+  // sätts storlekarna, så att sidan bara räknas om en gång.)
   function passaSpalter() {
     const k = $('.rh-kol');
     const l = $('.rh-lista');
-    if (!k || !l || !k.offsetWidth) return;
-    k.style.paddingRight = `${l.offsetWidth - l.clientWidth}px`;
-    k.classList.remove('trangt', 'trangare');
-    const v = [...k.querySelectorAll('.rh-vem')];
-    const krock = () => v.some((x, i) => i && v[i - 1].getBoundingClientRect().right + 14 > x.getBoundingClientRect().left);
-    const du = k.querySelector('.rh-vem.du');
-    const fore = du && du.parentElement.previousElementSibling;
-    const over = () => Boolean(fore) && du.getBoundingClientRect().left < fore.getBoundingClientRect().right + 8;
-    if (krock() || over()) k.classList.add('trangt');
-    if (krock()) k.classList.add('trangare');
+    if (!l || !l.offsetWidth) return;
+    if (k) k.style.paddingRight = `${l.offsetWidth - l.clientWidth}px`;
+    const rader = [...l.children].map((b) => [...b.querySelectorAll('.rh-lag')]);
+    for (const lag of rader) for (const x of lag) x.style.fontSize = '';
+    const skala = rader.map((lag) => Math.min(1, ...lag.map((x) => (x.scrollWidth > x.clientWidth ? x.clientWidth / x.scrollWidth : 1))));
+    rader.forEach((lag, i) => {
+      if (skala[i] < 1) for (const x of lag) x.style.fontSize = `${Math.max(0.7, skala[i] - 0.01).toFixed(3)}em`;
+    });
   }
   function forstaRad(lista, fragat, forst) {
     const r = REP();

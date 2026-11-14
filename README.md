@@ -1863,6 +1863,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   din handstil över din, som spalthuvuden. Av tre skisser i den riktiga vyn (två spalter, samma
   rutor med ditt kryss över hans guld, din kupong med hans ringar i guld) valde användaren två
   spalter. Se [Hasse Backe](#hasse-backe), *Samtalet*.
+- **Hasse Backes matchlista som tavlan (2026-11-14, användarens önskemål):** listan efter omgången såg rörig ut, med
+  lagnamn på två eller tre rader och hans resultat bredvid facit. Nu är varje match en rad som tavlan i matchlistan: hans
+  tecken till vänster, hemma – resultatet – borta i mitten och ditt till höger, med antal rätt under namnen. Se
+  [Hasse Backe](#hasse-backe), *Samtalet*.
 - **Bakåt lägger bort det översta (2026-11-08):** Androids bakåtgest och webbläsarens bakåtknapp lämnade
   sajten också med matchbladet, kupongen i handen eller en närbild framme, eftersom rummet inte låg i
   historiken. Nu tar bakåt bort ett lager i taget och lämnar sajten först när inget är framme. Namnet
@@ -7744,14 +7748,25 @@ i skrift när hans text saknas, tar i stället det troligaste resultatet i model
 ingen prognos säger han inget resultat (`resultatet` i [public/rum-hasse.js](public/rum-hasse.js)). Sist säger han vad han tycker om det du själv har på
 kupongen (*På din kupong har du bara etta. Det var kaxigt.*); har du inget på matchen föreslår han i stället att
 fylla i den (se *Din kupong*). Han minns på enheten vad du har
-frågat om: på matchens rad står hans tecken ifyllda i guld i rutorna 1 X 2, som på kupongen, med
-resultatet bredvid i en rak spalt. *Alla matcher* tar en tillbaka till listan, och där räknar han
+frågat om: på matchens rad står hans tecken i guld längst till vänster och hans resultat i guld och
+kursivt i mitten. *Alla matcher* tar en tillbaka till listan, och där räknar han
 (*Nu är halva kupongen klar*). Före omgångens första avspark syns bara tecken du själv har bett om, så
 att listan inte blir ett automatiskt tips. När omgången har börjat, och var och ens egna tips har
 stängt, står alla hans rader ifyllda, också matcher som inte har startat än, som 18:30-matchen
 (`hansRader` i [public/rum-hasse.js](public/rum-hasse.js)): hans kupong i tävlingen om han spelar den,
 annars tecknen i hans text, med hans resultat.
-Överst i listan står vem som säger vad, utan förklarande text: Hasses porträtt och namn i guld mitt över hans rutor och resultat, och ditt porträtt i din färg med namnet i din handstil (som på kupongen) över din spalt. Får namnen inte plats bredvid varandra, som i telefonen, går ditt namn först och sedan hans, så att porträtten står kvar. En spalt som inte syns på någon rad får inget huvud.
+Listan är byggd som tavlan i matchlistan (2026-11-14, `raden` i [public/rum-hasse.js](public/rum-hasse.js)): en rad
+per match med hans tecken längst till vänster, hemmalaget, resultatet i mitten, bortalaget och det du har på kupongen längst
+till höger i din handstil. Ytterspalterna är lika breda, så att mitten står mitt i listan, lagen står med sina korta namn
+(`Papper.kort`), och namn som inte ryms krymper, båda på raden lika mycket (`passaSpalter`). I mitten står hans resultat i
+guld och kursivt tills matchen börjar, sedan ställningen i kursiv, och när den har slutat resultatet, i guld om han sa precis
+det; har han inget sagt står bara strecket. När matchen har slutat lyser tecknet som kom in, både hans och ditt, och resten
+tonas ned; satt inget av tecknen stryks de över. Överst står vem som säger vad, utan förklarande text: Hasses porträtt och
+namn i guld längst till vänster och ditt porträtt i din färg med namnet i din handstil (som på kupongen) längst till höger,
+och under namnen hur många rätt ni har när någon match har slutat. Ditt huvud kommer först när du har tippat något, men
+spalten står kvar, så att inget flyttar sig. Förut hade raden numret, hela lagnamnet (ofta på två eller tre rader), rutorna
+1 X 2, hans resultat och en egen spalt *Facit*, och användaren tyckte att det såg rörigt ut; av tre skisser (två rader per
+match, tavlan, en rad utan hans resultat) valde hen tavlan.
 När alla matcher har börjat säger han hur det gick för honom (`efterat`), tills omgången är spelad.
 
 **Landskamperna** (2026-11-13, när Stryktipset tog in Nations League; användarens önskemål: "Uppdatera hela hemsidan
@@ -7775,8 +7790,8 @@ de engelska matcherna, och konsolen hade inga fel utom förbindelserna till work
 text till en landskamp är prövad med ett låtsat svar (kontrollerna godkänner den nya kryddan), inte mot Claude, och
 ljudet är inte prövat här (ingen Azure-nyckel i molnmiljön).
 
-**Ställningen** (2026-11-09). Medan matcherna pågår står ställningen i spalten där facit står efteråt, i kursiv och lite
-svagare, och spalten heter *Ställning* så länge någon match pågår (`star` och `facitRuta` i
+**Ställningen** (2026-11-09). Medan matcherna pågår står ställningen mitt på raden, där resultatet står efteråt, i kursiv
+och lite svagare (`star` och `raden` i
 [public/rum-hasse.js](public/rum-hasse.js), liveställningen ur `KP.live` i [public/kupong.js](public/kupong.js), som hämtas
 varje minut). Han ber en inte längre välja match när omgången har börjat (spelstoppet har ju varit), utan säger hur många av
 hans tecken som sitter just nu och vad han tycker om det (*Just nu har jag fyra rätt av sju.* *Fotboll spelas i nittio

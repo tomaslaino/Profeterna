@@ -75,44 +75,40 @@
 .rh-o { visibility: hidden; }
 .rh-o.s { visibility: visible; }
 .rh-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
-.rh-lista button { display: flex; align-items: baseline; width: 100%; padding: 0.3em 0; border: 0; border-bottom: 1px solid rgba(244, 236, 216, 0.22); background: none; color: inherit; font: inherit; text-align: left; text-shadow: inherit; cursor: pointer; }
-.rh-lista button > i { flex: none; width: 1.7em; font-style: normal; opacity: 0.62; font-variant-numeric: tabular-nums; }
-.rh-lista button > span { flex: 1; min-width: 0; }
-/* Det han sa (hansTips i rum-hasse.js): rutorna 1 X 2 som på kupongen, hans tecken ifyllda i guld,
-   och resultatet. Båda har fast bredd och står längst till höger, så att de bildar raka spalter. */
-.rh-tips { flex: none; align-self: center; display: flex; align-items: center; gap: 0.75em; margin-left: 0.9em; }
-.rh-rutor { display: flex; gap: 3px; }
-.rh-rutor em { display: grid; place-items: center; box-sizing: border-box; width: 2.05em; height: 1.65em; border: 1px solid rgba(246, 239, 220, 0.26); border-radius: 3px; font: normal 700 0.76em/1 Fraunces, Georgia, serif; color: rgba(246, 239, 220, 0.42); text-shadow: none; }
-.rh-rutor em.pa { border-color: #ffd86b; background: #ffd86b; color: #2a1c08; box-shadow: 0 1px 0 #6b4a10; }
-.rh-tips small { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; font-size: inherit; font-weight: 700; color: #f6efdc; white-space: nowrap; }
-.rh-tips small i { font-style: normal; text-align: right; }
-.rh-tips small i + i { text-align: left; }
-/* Hur matchen slutade (facitRuta och hansTips i rum-hasse.js): en spalt längst ut, lika bred som hans
-   resultat. På en spelad rad lyser resultatet och tecknet som kom in, resten är nedtonat. */
-.rh-facit { flex: none; align-self: center; display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; width: 2.4em; margin-left: 0.75em; font-weight: 700; color: #f6efdc; white-space: nowrap; }
-.rh-facit i { font-style: normal; text-align: right; }
-.rh-facit i + i { text-align: left; }
-/* ställningen i en match som pågår: kursiv och lite svagare, för den är inte facit än */
-.rh-facit.star { font-weight: 500; color: rgba(246, 239, 220, 0.74); }
-.rh-facit.star i { font-style: italic; }
-.rh-lista button.spelad > i, .rh-lista button.spelad > span { color: rgba(246, 239, 220, 0.62); }
-.rh-lista button.spelad .rh-tips small { color: rgba(246, 239, 220, 0.62); }
-.rh-lista button.spelad .rh-tips small.exakt { color: #ffd86b; }
-.rh-rutor em.pa.av { border-color: rgba(255, 216, 107, 0.34); background: rgba(255, 216, 107, 0.16); color: rgba(255, 216, 107, 0.62); box-shadow: none; }
-.rh-rutor em.kom { border: 1.5px solid #f6efdc; color: #f6efdc; }
-/* Vem som säger vad (spalter i rum-hasse.js): porträtt och namn mitt över hans spalt och över din.
-   Raden har osynliga rutor som håller samma bredd som på raderna under. */
-.rh-kol { flex: none; display: flex; justify-content: flex-end; height: 30px; margin-bottom: 0.3em; }
-.rh-kol .rh-tips { position: relative; align-self: stretch; }
-.rh-kol .rh-rutor, .rh-kol small { visibility: hidden; }
-.rh-kol u { position: relative; }
-.rh-vem { --a: 26px; position: absolute; top: 50%; translate: 0 -50%; display: flex; align-items: center; gap: 7px; font: 700 11px/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; color: rgba(246, 239, 220, 0.82); white-space: nowrap; }
-.rh-vem.hasse { left: 50%; translate: -50% -50%; color: #ffd86b; }
-.rh-vem.du { right: 0; }
-.rh-kol .rh-facit { position: relative; align-self: stretch; }
-/* (ordet är bredare än spalten: längst ut slutar det där strecken slutar, och mellan två spalter står det mitt över) */
-.rh-vem.facit { right: 0; }
-.rh-samtal.tre .rh-vem.facit { right: auto; left: 50%; translate: -50% -50%; }
+/* En rad per match, som tavlan i matchlistan (raden i rum-hasse.js): hans tecken längst till vänster,
+   hemmalaget mot mitten, resultatet i mitten, bortalaget och ditt längst till höger. Ytterspalterna är
+   lika breda, så att mitten står mitt i listan, och namn som inte ryms krymper (passaSpalter). */
+.rh-lista button { display: grid; grid-template-columns: 2.7em 1fr 3.1em 1fr 2.7em; align-items: center; column-gap: 0.4em; width: 100%; padding: 0.42em 0; border: 0; border-bottom: 1px solid rgba(244, 236, 216, 0.22); background: none; color: inherit; font: inherit; text-align: left; text-shadow: inherit; cursor: pointer; }
+.rh-lag { min-width: 0; overflow: hidden; white-space: nowrap; }
+.rh-lag.hemma { text-align: right; }
+.rh-lista button.spelad > .rh-lag { color: rgba(246, 239, 220, 0.62); }
+/* Resultatet, med strecket mitt i spalten (siffrorna är olika breda i Fraunces): hans i guld och kursivt
+   innan matchen har börjat, ställningen kursiv och svagare medan den pågår (den är inte facit än), och
+   när den har slutat resultatet, i guld om han sa precis det. */
+.rh-mitt { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.12em; font-weight: 700; color: #f6efdc; white-space: nowrap; }
+.rh-mitt i { font-style: normal; text-align: right; }
+.rh-mitt i + i { text-align: left; }
+.rh-mitt.tom { font-weight: 400; color: rgba(246, 239, 220, 0.4); }
+.rh-mitt.gissat { font-weight: 500; color: #ffd86b; }
+.rh-mitt.star { font-weight: 500; color: rgba(246, 239, 220, 0.74); }
+.rh-mitt.gissat i, .rh-mitt.star i { font-style: italic; }
+.rh-mitt.exakt { color: #ffd86b; }
+/* Hans tecken i guld och ditt i din handstil. När matchen har slutat lyser tecknet som kom in och resten
+   tonas ned, och satt inget av dem stryks det över. */
+.rh-hans, .rh-lista button u { white-space: nowrap; }
+.rh-hans { font: 700 0.95em/1 Fraunces, Georgia, serif; letter-spacing: 0.05em; color: #ffd86b; }
+.rh-lista button u { text-align: right; color: #f6efdc; font: 600 1.3em/1 Caveat, cursive; text-decoration: none; opacity: 0.92; }
+.rh-hans em, .rh-lista button u em { font-style: normal; }
+.rh-hans em.av, .rh-lista button u em.av { opacity: 0.28; }
+.rh-hans.fel, .rh-lista button u.fel { text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.6; }
+/* Vem som säger vad (spalter i rum-hasse.js): Hasse längst till vänster över hans tecken och du längst till
+   höger över ditt, med porträtt, namn och under namnet hur många rätt när någon match har slutat. */
+.rh-kol { flex: none; display: flex; justify-content: space-between; align-items: center; height: 32px; margin-bottom: 0.25em; }
+.rh-vem { --a: 26px; display: flex; align-items: center; gap: 7px; font: 700 11px/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; color: rgba(246, 239, 220, 0.82); white-space: nowrap; }
+.rh-vem.hasse { color: #ffd86b; }
+.rh-vem.du { flex-direction: row-reverse; text-align: right; }
+.rh-vem .rh-namn { display: block; }
+.rh-ratt { display: block; margin-top: 4px; font: 500 11px/1 Fraunces, Georgia, serif; letter-spacing: 0.04em; text-transform: none; color: rgba(246, 239, 220, 0.7); }
 .rh-ans { flex: none; width: var(--a); height: var(--a); border-radius: 50%; background: #3a2c20 no-repeat center / cover; box-shadow: 0 0 0 1.5px var(--ring, rgba(246, 239, 220, 0.6)), 0 2px 6px rgba(0, 0, 0, 0.6); }
 .rh-vem.hasse .rh-ans { --ring: #ffd86b; background-image: url(rum/hasse-atlas.webp); background-size: calc(var(--a) * 4.15) auto; background-position: calc(var(--a) * -0.65) calc(var(--a) * -0.23); }
 /* ditt namn i din handstil och porträttet i din färg, som på kupongen (rum.css .sm-k0–2) */
@@ -123,7 +119,6 @@
 .rh-vem.k0 .rh-namn { font: 400 15px/1 "Cedarville Cursive", Caveat, cursive; }
 .rh-vem.k1 .rh-namn { font: 400 16px/1 "Mr Dafoe", Caveat, cursive; }
 .rh-vem.k2 .rh-namn { font: 400 20px/1 "Reenie Beanie", Caveat, cursive; }
-.rh-kol.trangt .du .rh-ans + .rh-namn, .rh-kol.trangare .rh-ans + .rh-namn { display: none; }
 .rh-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (hover: hover) { .rh-lista button:hover:not(:disabled) { color: #ffd86b; border-bottom-color: #ffd86b; } }
 /* Gänget efter omgången (gangLista i rum-hasse.js): var och ens porträtt i sin färg och namnet i sin handstil,
@@ -278,10 +273,6 @@
 .rum-hasse-vy.hog .rh-dom { font-size: 46px; }
 .rum-hasse-vy.hog .rh-dom.lang { font-size: 34px; }
 .rum-hasse-vy.hog .rh-match { font-size: 0.86em; }
-.rum-hasse-vy.hog .rh-tips { gap: 0.5em; margin-left: 0.6em; }
-.rum-hasse-vy.hog .rh-facit { margin-left: 0.5em; }
-.rum-hasse-vy.hog .rh-rutor em { width: 1.8em; }
-.rum-hasse-vy.hog .rh-kol { height: 26px; margin-bottom: 0.2em; }
 .rum-hasse-vy.hog .rh-vem { --a: 24px; }
 .rum-hasse-vy.hog .rh-slut { padding-top: 0.3em; }
 @media (prefers-reduced-motion: reduce) { .rh-dom, .rh-slag, .rh-svar, .rh-gang em.ny { animation: none; } }
@@ -413,13 +404,6 @@
 @keyframes rh-hans { from { box-shadow: 0 0 0 9px rgba(255, 216, 107, 0), 0 0 40px rgba(255, 216, 107, 0.65), 0 2px 0 rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.42); } }
 @media (hover: hover) { .rh-ruta.hans:hover { border-color: #ffd86b; color: #7a5009; } }
 @media (prefers-reduced-motion: reduce) { .rh-ruta.hans { animation: none; } }
-/* det du själv har på raden, i listan */
-.rh-lista button u, .rh-kol u { flex: none; width: 2em; margin-left: 0.6em; text-align: right; color: #f6efdc; font: 600 1.3em/1 Caveat, cursive; text-decoration: none; }
-.rh-lista button u { align-self: center; opacity: 0.92; }
-/* hans spalt, Facit och din: tätare, så att lagnamnen får plats */
-.rh-samtal.tre .rh-tips { gap: 0.45em; margin-left: 0.55em; }
-.rh-samtal.tre .rh-facit { margin-left: 0.4em; }
-.rh-samtal.tre .rh-lista button u, .rh-samtal.tre .rh-kol u { width: 1.6em; margin-left: 0.25em; }
 .rum-hasse-vy.hog .rh-ruta { height: 52px; font-size: 28px; max-width: none; }
 .rum-hasse-vy.hog .rh-tecken { margin-top: 0.5em; }
 /* lågt fönster (telefonen på bredden): rutorna och svaren lite mindre, så att allt ryms ovanför foten */
