@@ -5746,6 +5746,53 @@ grafikkortet i `Animation`-händelsens `compositeFailed` när animeringarna star
 inte). Vädret hämtas inte med både `?rum-vader` och `?rum-grader` i adressen, så att mätningen inte beror på
 vädertjänsten.
 
+### Mindre arbete i varje bild av gänget och Hasse Backe (2026-11-14)
+
+Användarens önskemål: "göra grafiken på animations- och hasse-grafiken mer flytande – även på sämre datorer och
+mobiler". Mätt först, som telefon i Chrome (412 punkter bred, täthet 2,625) med processorn fyra gånger långsammare.
+Det mesta av tiden för en bild av gänget gick till three.js (ungefär 270 ritningar), men en stor del var vår egen
+JavaScript, och den räknade samma sak många gånger:
+
+- **Röken ur cigaretterna** stod för en fjärdedel av tiden för en bild av gänget. För var och en av ungefär 60 puffar
+  per glöd och mun räknades i varje bild om hur tät puffen var när den föddes, och varje ny puff ställde hela figuren
+  så som den satt när puffen föddes (`emitter`), för att veta var glöden var då. Nu räknas tätheten en gång, när puffen
+  föds (`puffA`), och de puffar som har fötts sedan förra bilden läggs på en båge genom där glöden var i de tre senaste
+  bilderna (`smokeEfter` i rum-3d.js). Figuren ställs som förut bara vid den första bilden, efter ett uppehåll och när
+  glöden har flyttat sig mer än 3 enheter sedan förra bilden (handen på väg till munnen). Mätt mot den exakta platsen
+  hamnar puffarna i median exakt rätt och som mest 1–2 enheter fel (en puff är 3–30 enheter stor). Skylten i handen
+  släcker glödens rök direkt som förut.
+- **Vad var och en gör vid en viss tid** (`aktRa`, `aktNu`) frågas många gånger i varje bild, av bålen, armarna,
+  ansiktet, röken och grannarna, och varje fråga gick igenom gängets och var och ens påhitt, dygnet och humöret på nytt.
+  Under en bild av gänget räknas svaret nu en gång per figur och tid (`AKT_MINNE`); utanför bilden som förut, eftersom
+  datan kan ha ändrats sedan.
+- **Hasses fingrar på disken** (`golv` i rum-hasse-arm.js) letade efter det minsta lyft som håller fingret ovanför
+  diskens yta med tio försök per finger, båda händerna, i varje bild, och varje försök vägde benens matriser för varje
+  punkt i fingret: hälften av tiden för en bild av honom. Nu börjar sökningen där fingret låg förra bilden (oftast två
+  försök) och ger samma steg som förut, och punkterna förs genom benens matriser i stället för att matriserna vägs.
+- **Hasses ärmar**, som byggs om punkt för punkt i varje bild, räknar varvet runt ärmen ur färdiga tabeller (`VARV`) i
+  stället för fem sinusvärden per punkt.
+- `matchMedia` frågades flera gånger i varje bild (minskad rörelse, och telefonen hos Hasse): frågan ställs nu en gång
+  och svaret läses av.
+
+Mätt med samma tidsföljd i gammal och ny kod om vartannat, tre varv (gänget 200 bilder i 20 bilder i sekunden, Hasse
+900 bilder genom skrattet, armarna och de bestämda slagen i disken, 30 i sekunden), medianer per bild med processorn
+fyra gånger långsammare:
+
+| | Före | Efter |
+|---|---|---|
+| Gänget: hela bilden | 18,6 ms | 15,4 ms |
+| Gänget: vår egen JavaScript (utom three.js) | 6,2 ms | 2,4 ms |
+| Hasse: hela bilden | 7,1 ms | 4,3 ms |
+| Hasse: vår egen JavaScript | 4,5 ms | 2,0 ms |
+
+Bilderna är desamma: gänget med fryst tid (`?rum-t`) bildpunkt för bildpunkt (108–110 dB), och Hasse i tolv lägen ur
+klippen, där bara cigarrens rök i askkoppen skiljer (den följer klockan). Inte mätt i Safari eller i en riktig
+telefon, och inte grafikkortets del: datorn hade ett spel igång som tog grafikkortet, så bildtakter gick inte att lita
+på, och mjukvarugrafiken hann inte ladda rummet. `matchfixarna.se/?rum-mat` ger siffrorna i en telefon.
+
+Kvar: three.js genomgång av scenen och ritningarna (ungefär 11 ms per bild av gänget med den långsamma processorn), och
+Hasses ärmar (en tredjedel av hans JavaScript).
+
 ### När något går fel i rummet
 
 - **Matcherna går inte att hämta:** `whenMatches` väntar inte förgäves, och `load` försöker igen

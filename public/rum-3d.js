@@ -2883,6 +2883,8 @@ export async function figurer(canvas, opt = {}) {
   }
 
   const figs = [];
+  // (vad var och en gör vid t, en gång per bild: aktRa och aktNu)
+  const AKT_MINNE = { pa: false, ra: new Map(), nu: new Map() };
   const n = placering(opt.vader || (window.Vader && window.Vader.nu()));
   // I telefonen kastar de små delarna (fingrarna, knapparna, smycket …) ingen
   // skugga: deras skuggor syns inte där, och varje del är ett eget ritanrop
@@ -3454,7 +3456,11 @@ export async function figurer(canvas, opt = {}) {
   function iHuvudet(K, p, rad) {
     HL.copy(p).applyMatrix4(K.inv);
     const R = huvudRadier(K, HL.y, rad);
-    return (1 - Math.hypot(HL.x / R.x, HL.y / R.y, HL.z / R.z)) * (R.x + R.y + R.z) / 3;
+    // (Math.sqrt: Math.hypot är flera gånger långsammare, och det här frågas hundratals gånger per bild)
+    const x = HL.x / R.x;
+    const y = HL.y / R.y;
+    const z = HL.z / R.z;
+    return (1 - Math.sqrt(x * x + y * y + z * z)) * (R.x + R.y + R.z) / 3;
   }
   // vägen ut till ytan från p, rakt ut från huvudets mitt (null: redan ute)
   function urHuvudet(K, p, rad) {
@@ -4833,7 +4839,21 @@ export async function figurer(canvas, opt = {}) {
     if (l < 0 || l >= len || grupp(t0) || grupp((t0 + slut) / 2) || grupp(slut)) return null;
     return { namn, l, t0, slut, amp: 0.86 + 0.22 * hash(n * 6.07 + i * 2.2 + 0.4) };
   }
-  function aktRa(o, t) {
+  // Inom en bild av gänget (draw) frågas samma sak många gånger – vad var och en gör vid t, för
+  // bålen, armarna, ansiktet, röken och grannarna – och varje fråga gick igenom gängets och var och ens
+  // påhitt, dygnet och humöret på nytt. Under draw räknas det en gång per figur och tid (AKT_MINNE);
+  // utanför som förut, eftersom datan kan ha ändrats sedan. (AKT_MINNE står vid figs.)
+  function minns(karta, o, t, f) {
+    if (!AKT_MINNE.pa) return f(o, t);
+    let m = karta.get(o);
+    if (!m) karta.set(o, (m = new Map()));
+    if (m.has(t)) return m.get(t);
+    const x = f(o, t);
+    m.set(t, x);
+    return x;
+  }
+  function aktRa(o, t) { return minns(AKT_MINNE.ra, o, t, aktRa0); }
+  function aktRa0(o, t) {
     const pv = PROV[o.F.key];
     if (!pv) {
       // sången efter ett mål och från radion går före, och det som pågår när den börjar tonar bort (av)
@@ -4854,7 +4874,8 @@ export async function figurer(canvas, opt = {}) {
   // syns, wk för bålen och wh för armarna: bålen börjar en aning före armen och slutar en aning efter,
   // tar lite sats och svänger förbi när den sätter sig (fj) – förut gick allt in och ut samtidigt och
   // lika mjukt, som en övertoning mellan två ställningar.
-  function aktNu(o, t) {
+  function aktNu(o, t) { return minns(AKT_MINNE.nu, o, t, aktNu0); }
+  function aktNu0(o, t) {
     const x = aktRa(o, t);
     if (!x) return null;
     const a = AKTER[x.namn];
@@ -7052,63 +7073,130 @@ export async function figurer(canvas, opt = {}) {
     return { mesh, mitt: g.attributes.mitt, puff: g.attributes.puff };
   })();
   const fp = new THREE.Vector3();
-  function emitter(sk, src, t) {
-    pose(sk.o, t);
+  // var glöden (munnen) är i den ställning figuren har nu
+  function emitterNu(sk, src) {
     sk.o.fig.updateMatrix();
     if (src === 'mun') return mouthIn(sk.o).applyMatrix4(sk.o.fig.matrix);
     sk.A.hand.updateMatrix();
     sk.A.cig.updateMatrix();
     return sk.A.cig.userData.end.clone().applyMatrix4(sk.A.cig.matrix).applyMatrix4(sk.A.hand.matrix).applyMatrix4(sk.o.fig.matrix);
   }
-  function smoke(t) {
+  // och var den var vid t (ställer figuren så som den var då)
+  function emitter(sk, src, t) {
+    pose(sk.o, t);
+    return emitterNu(sk, src);
+  }
+  // Hur tät puffen är när den föds vid tb (skylten i handen, nedan, gäller däremot just nu).
+  // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
+  function puffA(sk, src, o, tb) {
+    if (src === 'glod') {
+      const tk = teckenNu(o, tb);
+      return 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - sovW(o, tb)) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (1 - dansK(o, sk.A, tb)) * (1 - aktFingK(o, sk.A, tb));
+    }
+    // utandningen: strax efter blosset (och det första efter inlämningen)
+    // (inget bloss när man gjorde något annat, aktW, och ett efter blosset i skålen)
+    const out = blossUt(o, tb);
+    return 0.85 * Math.max(ready(o, tb) * out * (1 - aktW(o, tb - 2)), after(o, tb, 3.0, 3.3, 4.4, 5.6), blasW(o, tb));
+  }
+  // en puff född vid tb (som är k), age sekunder gammal, från e
+  function puffLagg(j, k, e, src, o, tb, age, alpha) {
     const M = ROK.mitt.array;
     const P = ROK.puff.array;
-    let syns = false;
-    for (const { sk, src, i0, born } of puffs) {
+    const seed = k * 7.13 + o.F.x;
+    const life = age / SM.life;
+    const rise = src === 'glod' ? 11 + 2 * hash(seed) : 5;
+    fp.copy(e);
+    // ett tunt band närmast glöden som slingrar sig och löses upp högre upp
+    const curl = Math.sin(age * 1.7 + tb * 0.8) * (1.2 + age * 3.2) + Math.sin(age * 0.6 + hash(seed + 1) * 6) * age * 2.5;
+    fp.y += rise * age + 0.9 * age * age;
+    fp.x += curl + age * 3.6;
+    fp.z += (src === 'mun' ? 18 * (1 - Math.exp(-age * 1.6)) : 0) + Math.cos(age * 0.9 + tb) * age * 1.5;
+    M[j] = fp.x;
+    M[j + 1] = fp.y;
+    M[j + 2] = fp.z;
+    P[j] = src === 'glod' ? 3.2 + age * 5.5 + age * age * 0.7 : 9 + age * 14;
+    P[j + 1] = alpha * Math.min(1, age * 4) * (1 - life) ** (src === 'glod' ? 1.8 : 1.3);
+    P[j + 2] = hash(seed + 2) * 6 + age * 0.3;
+  }
+  // Röken i två steg runt gängets ställningar (draw). Var puff räknas en gång när den föds: hur tät den
+  // är (puffA) och var (born). Förut räknades tätheten om för alla ungefär 60 puffar per glöd i varje
+  // bild, och varje ny puff ställde hela figuren så som den var när puffen föddes (emitter) – tillsammans
+  // en fjärdedel av tiden för en bild av gänget. Nu läggs de puffar som har fötts sedan förra bilden på
+  // vägen mellan där glöden (munnen) var då och där den är nu (smokeEfter), i en båge genom de tre
+  // senaste bilderna (en rak linje skar av handens båge, med upp till 7 enheter när gänget ritades
+  // glest). Bara när förra bilden är för gammal, vid den första och när glöden har flyttat sig mer än
+  // PUFF_FLYTT sedan förra bilden (handen på väg till munnen) ställs figuren som förut.
+  const PUFF_GLAPP = 0.35;
+  const PUFF_FLYTT = 3;
+  const puffVantar = [];
+  let puffSyns = false;
+  function smoke(t) {
+    const P = ROK.puff.array;
+    puffSyns = false;
+    puffVantar.length = 0;
+    for (const pf of puffs) {
+      const { sk, src, i0, born } = pf;
       const o = sk.o;
       const base = Math.floor(t / SM.every);
       // var glöden (munnen) var när varje bloss föddes räknas en gång
       for (const k of born.keys()) if (k < base - SM.n || k > base) born.delete(k);
+      // (förra bilden, att lägga nya puffar efter: bara om den var nyss)
+      const fore = pf.fore && t > pf.fore.t && t - pf.fore.t < PUFF_GLAPP ? pf.fore : null;
+      // skylten i handen med cigaretten
+      const lp = LP[o.F.key];
+      const lpAv = src === 'glod' && lp && o.arms[lp.i] === sk.A && lp.ut == null && !lp.ner;
       for (let i = 0; i < SM.n; i++) {
         const j = (i0 + i) * 3;
         const k = base - i;
         const tb = k * SM.every;
         const age = t - tb;
-        const seed = k * 7.13 + o.F.x;
-        let alpha = 0;
-        // ingen rök medan cigaretten ligger släckt och man väntar på kupongen
-        if (src === 'glod') {
-          const tk = teckenNu(o, tb);
-          alpha = 0.8 * (1 - dragW(o, tb) * 0.7) * sm(0.55, 0.62, uOf(o, tb)) * (1 - sovW(o, tb)) * (tk && tk.A === sk.A ? 1 - tk.w : 1) * (sk.A === o.arms[0] ? 1 - korsK(o, tb) : 1) * (1 - dansK(o, sk.A, tb)) * (1 - aktFingK(o, sk.A, tb)) * (LP[o.F.key] && o.arms[LP[o.F.key].i] === sk.A && LP[o.F.key].ut == null && !LP[o.F.key].ner ? 0 : 1);
+        if (age < 0 || age > SM.life) { P[j] = P[j + 1] = 0; continue; }
+        let b = born.get(k);
+        if (!b) { b = { a: puffA(sk, src, o, tb), e: null }; born.set(k, b); }
+        const alpha = lpAv ? 0 : b.a;
+        if (alpha < 0.01) { P[j] = P[j + 1] = 0; continue; }
+        if (!b.e) {
+          if (fore && tb > fore.t) { P[j] = P[j + 1] = 0; puffVantar.push({ pf, b, j, k, tb, age, alpha }); continue; }
+          b.e = emitter(sk, src, tb);
         }
-        else {
-          // utandningen: strax efter blosset (och det första efter inlämningen)
-          // (inget bloss när man gjorde något annat, aktW, och ett efter blosset i skålen)
-          const out = blossUt(o, tb);
-          alpha = 0.85 * Math.max(ready(o, tb) * out * (1 - aktW(o, tb - 2)), after(o, tb, 3.0, 3.3, 4.4, 5.6), blasW(o, tb));
-        }
-        if (alpha < 0.01 || age < 0 || age > SM.life) { P[j] = P[j + 1] = 0; continue; }
-        let e = born.get(k);
-        if (!e) { e = emitter(sk, src, tb); born.set(k, e); }
-        const life = age / SM.life;
-        const rise = src === 'glod' ? 11 + 2 * hash(seed) : 5;
-        fp.copy(e);
-        // ett tunt band närmast glöden som slingrar sig och löses upp högre upp
-        const curl = Math.sin(age * 1.7 + tb * 0.8) * (1.2 + age * 3.2) + Math.sin(age * 0.6 + hash(seed + 1) * 6) * age * 2.5;
-        fp.y += rise * age + 0.9 * age * age;
-        fp.x += curl + age * 3.6;
-        fp.z += (src === 'mun' ? 18 * (1 - Math.exp(-age * 1.6)) : 0) + Math.cos(age * 0.9 + tb) * age * 1.5;
-        M[j] = fp.x;
-        M[j + 1] = fp.y;
-        M[j + 2] = fp.z;
-        P[j] = src === 'glod' ? 3.2 + age * 5.5 + age * age * 0.7 : 9 + age * 14;
-        P[j + 1] = alpha * Math.min(1, age * 4) * (1 - life) ** (src === 'glod' ? 1.8 : 1.3);
-        P[j + 2] = hash(seed + 2) * 6 + age * 0.3;
-        syns = true;
+        puffLagg(j, k, b.e, src, o, tb, age, alpha);
+        puffSyns = true;
       }
     }
+  }
+  // (efter ställningarna: var glöden och munnen är nu, och de nya puffarna på vägen dit)
+  function smokeEfter(t) {
+    const omStall = new Set();
+    // (alla glöder och munnar först: en puff som räknas som förut ställer om figuren)
+    const nu = puffs.map((pf) => emitterNu(pf.sk, pf.src));
+    puffs.forEach((pf, ip) => {
+      const e = nu[ip];
+      const f1 = pf.fore;
+      const f2 = pf.fore2 && f1 && pf.fore2.t < f1.t && f1.t - pf.fore2.t < PUFF_GLAPP ? pf.fore2 : null;
+      const snabb = f1 && f1.e.distanceTo(e) > PUFF_FLYTT;
+      for (const v of puffVantar) {
+        if (v.pf !== pf) continue;
+        const x = v.tb;
+        if (snabb) {
+          v.b.e = emitter(pf.sk, pf.src, x);
+          omStall.add(pf.sk.o);
+        } else if (f2) {
+          // (bågen genom bilden före förra, förra och den här)
+          const [a, b, c] = [f2.t, f1.t, t];
+          v.b.e = f2.e.clone().multiplyScalar(((x - b) * (x - c)) / ((a - b) * (a - c)))
+            .addScaledVector(f1.e, ((x - a) * (x - c)) / ((b - a) * (b - c)))
+            .addScaledVector(e, ((x - a) * (x - b)) / ((c - a) * (c - b)));
+        } else v.b.e = f1.e.clone().lerp(e, (x - f1.t) / (t - f1.t));
+        puffLagg(v.j, v.k, v.b.e, pf.src, pf.sk.o, v.tb, v.age, v.alpha);
+        puffSyns = true;
+      }
+      if (!f1 || t > f1.t) { pf.fore2 = f1; pf.fore = { t, e }; }
+    });
+    // (den som ställdes som då ställs som nu igen)
+    for (const o of omStall) pose(o, t);
+    puffVantar.length = 0;
     // (ingen som röker just nu: inget att rita)
-    ROK.mesh.visible = syns;
+    ROK.mesh.visible = puffSyns;
     ROK.mitt.needsUpdate = ROK.puff.needsUpdate = true;
   }
 
@@ -7368,6 +7456,16 @@ export async function figurer(canvas, opt = {}) {
   let lastMx = 0;
   let lastT = null;
   function draw(t, mx, my, neonPa) {
+    AKT_MINNE.ra.clear();
+    AKT_MINNE.nu.clear();
+    AKT_MINNE.pa = true;
+    try {
+      ritaGang(t, mx, my, neonPa);
+    } finally {
+      AKT_MINNE.pa = false;
+    }
+  }
+  function ritaGang(t, mx, my, neonPa) {
     GA_T.clear();
     const dt = lastT === null ? 0 : Math.min(0.1, t - lastT);
     lastT = t;
@@ -7390,12 +7488,13 @@ export async function figurer(canvas, opt = {}) {
     // spegeln: blicken glider efter markören, lika fort hur glest gänget än ritas
     const glid = dt > 0 ? 1 - Math.exp(-dt / SPEGEL.tau) : 1;
     for (const s of Object.values(SP)) s.nu.lerp(s.mal, glid);
-    // (röken först: den ställer figuren när blosset föddes, emitter)
+    // (röken först: den kan ställa figuren när blosset föddes, emitter)
     smoke(t);
     ringar(t);
     // (bålarna och huvudena först: armarna går runt grannarnas huvuden, allaHuvuden)
     for (const o of figs) stallKropp(o, t);
     for (const o of figs) pose(o, t, true);
+    smokeEfter(t);
     radioRita(t);
     zRita(t);
     // högtidens huvudbonad: lågorna i luciakronan fladdrar, och en hög bonad
@@ -7678,7 +7777,7 @@ export async function figurer(canvas, opt = {}) {
       sk.A = o.arms[sk.o.arms.indexOf(sk.A)];
       sk.o = o;
     }
-    for (const p of puffs) p.born.clear();
+    for (const p of puffs) { p.born.clear(); p.fore = p.fore2 = null; }
   }
   ute(opt.vader);
 

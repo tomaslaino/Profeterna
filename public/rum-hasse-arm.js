@@ -389,40 +389,79 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
   // punkten ligger på ytan. Utan disk (handen på pulten i rummet) gör det ingenting.
   const MP = modell.g.attributes.position.array;
   const MB = modell.g.attributes.aBen.array;
-  const pv = new THREE.Vector3();
-  const mm = new THREE.Matrix4();
+  // De ben som fingrets punkter hänger i, och deras matriser i världen (handens gånger benets): punkten
+  // i den vägda matrisen är detsamma som de två punkterna vägda, eftersom matriserna är affina. Förut
+  // vägdes matriserna för varje punkt och punkten fördes genom två matriser till.
+  const FB = FL.map((ix) => [...new Set(ix.flatMap((i) => [MB[i * 4], MB[i * 4 + 1]]))]);
+  const VB = ben.map(() => new THREE.Matrix4());
   function lagst(fi) {
     const Y = bord.value.w;
+    const bx = bord.value.x;
+    const bz = bord.value.y;
+    const bk = bord.value.z;
+    for (const b of FB[fi]) VB[b].multiplyMatrices(mesh.matrix, ut[b]);
     let min = Infinity;
     for (const i of FL[fi]) {
       const w = MB[i * 4 + 2] / 255;
-      const a = ut[MB[i * 4]].elements;
-      const b = ut[MB[i * 4 + 1]].elements;
-      const e = mm.elements;
-      for (let k = 0; k < 16; k++) e[k] = a[k] * w + b[k] * (1 - w);
-      pv.set(MP[i * 3], MP[i * 3 + 1], MP[i * 3 + 2]).applyMatrix4(mm).applyMatrix4(mesh.matrix);
-      if (bord.value.x * pv.x + bord.value.y * pv.z < bord.value.z) continue;
-      min = Math.min(min, pv.y - Y);
+      const v = 1 - w;
+      const a = VB[MB[i * 4]].elements;
+      const c = VB[MB[i * 4 + 1]].elements;
+      const x0 = MP[i * 3];
+      const y0 = MP[i * 3 + 1];
+      const z0 = MP[i * 3 + 2];
+      const x = w * (a[0] * x0 + a[4] * y0 + a[8] * z0 + a[12]) + v * (c[0] * x0 + c[4] * y0 + c[8] * z0 + c[12]);
+      const z = w * (a[2] * x0 + a[6] * y0 + a[10] * z0 + a[14]) + v * (c[2] * x0 + c[6] * y0 + c[10] * z0 + c[14]);
+      if (bx * x + bz * z < bk) continue;
+      const y = w * (a[1] * x0 + a[5] * y0 + a[9] * z0 + a[13]) + v * (c[1] * x0 + c[5] * y0 + c[9] * z0 + c[13]);
+      if (y - Y < min) min = y - Y;
     }
     return min;
   }
   const GOLV = 1.2;
+  // Lyftet går i steg om LYFT_STEG upp till 1,6, och det minsta som räcker letas upp. Förut med
+  // halveringar från hela vägen, tio försök per finger och hand i varje bild (hälften av tiden det tog att
+  // rita honom). Handen rör sig lite mellan bilderna, så nu börjar sökningen där fingret låg förra gången
+  // (forra) och går utåt tills gränsen är inringad – oftast två försök – och blir samma steg som förut.
+  const LYFT_N = 128;
+  const LYFT_STEG = 1.6 / LYFT_N;
+  const forra = [0, 0, 0, 0];
   function golv(krok, peka, spar, tumme, extra) {
     if (bord.value.w < -1e8) return;
     for (let fi = 0; fi < 4; fi++) {
       lyft[fi] = 0;
-      if (lagst(fi) >= GOLV) continue;
-      let lo = 0;
-      let hi = 1.6;
-      lyft[fi] = hi;
-      bojFingrar(krok, peka, spar, tumme, extra, fi);
-      if (lagst(fi) < GOLV) continue;
-      for (let k = 0; k < 7; k++) {
-        lyft[fi] = (lo + hi) / 2;
+      if (lagst(fi) >= GOLV) { forra[fi] = 0; continue; }
+      // (fingret böjt med g steg lyft: ligger det ovanpå disken?)
+      const ovan = (g) => {
+        lyft[fi] = g * LYFT_STEG;
         bojFingrar(krok, peka, spar, tumme, extra, fi);
-        if (lagst(fi) < GOLV) lo = lyft[fi]; else hi = lyft[fi];
+        return lagst(fi) >= GOLV;
+      };
+      // lo räcker inte, hi räcker
+      let lo = 0;
+      let hi = 0;
+      const p = Math.min(LYFT_N, Math.max(1, forra[fi]));
+      if (ovan(p)) {
+        hi = p;
+        for (let d = 1; p - d > 0; d *= 2) {
+          if (!ovan(p - d)) { lo = p - d; break; }
+          hi = p - d;
+        }
+      } else {
+        lo = p;
+        for (let d = 1; lo < LYFT_N; d *= 2) {
+          const g = Math.min(LYFT_N, p + d);
+          if (ovan(g)) { hi = g; break; }
+          lo = g;
+        }
+        // (inte ens rakt: så rakt det går, som det står nu)
+        if (!hi) { forra[fi] = LYFT_N; continue; }
       }
-      lyft[fi] = hi;
+      while (hi - lo > 1) {
+        const g = (lo + hi) >> 1;
+        if (ovan(g)) hi = g; else lo = g;
+      }
+      forra[fi] = hi;
+      lyft[fi] = hi * LYFT_STEG;
       bojFingrar(krok, peka, spar, tumme, extra, fi);
     }
   }
@@ -454,6 +493,11 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
 export const ARM = { LA: 466, LB: 431, TOPP: 88 };
 const RINGAR = 48;
 const SEG = 24;
+// ett varv runt ärmen (j av SEG): sin och cos för vinkeln th, för 3·th och för 2·th
+const VARV = Array.from({ length: SEG + 1 }, (_, j) => {
+  const th = ((j % SEG) / SEG) * 6.28318;
+  return [Math.sin(th), Math.cos(th), Math.sin(th * 3), Math.cos(th * 3), Math.sin(th * 2), Math.cos(th * 2)];
+});
 // Ärmens halva bredd längs armen (s = 0 överst på ärmhuvudet, 0,5 armbågen, 1 ärmslutet). Överarmen har
 // fotots mått, så att den möter kavajen där armarna satt; från armbågen smalnar ärmen av mot ärmslutet,
 // som en kavajärm gör. (Förut hade underarmen överarmens bredd nästan ända ut, och armen såg ut som en
@@ -682,19 +726,27 @@ export function byggArm(scen, sida, foto, modell, vidd = 1, bord = ingenBord()) 
       const wv = kb * Math.exp(-((e / 170) ** 2));
       // ärmen hopar sig lite ovanför ärmslutet när armen är böjd
       const wh = (0.4 + 0.6 * kb) * Math.min(1, Math.max(0, (s - 0.8) / 0.12)) * (1 - Math.min(1, Math.max(0, (s - 0.97) / 0.03)));
+      // (sinus för ringen: sin(a + b) = sin a cos b + cos a sin b, med b ur VARV för varvet runt)
+      const sa = Math.sin(dist * 0.021);
+      const ca = Math.cos(dist * 0.021);
+      const sb = Math.sin(dist * 0.07 + sida * 1.3);
+      const cb = Math.cos(dist * 0.07 + sida * 1.3);
       for (let j = 0; j <= SEG; j++) {
-        const th = ((j % SEG) / SEG) * 6.28318;
-        const si = Math.sin(th);
-        const cs = Math.cos(th);
+        const V = VARV[j];
+        const si = V[0];
+        const cs = V[1];
         const rx = N_.x * cs + B_.x * si;
         const ry = N_.y * cs + B_.y * si;
         const rz = N_.z * cs + B_.z * si;
         const ob = oL > 1e-4 ? rx * O_.x + ry * O_.y + rz * O_.z : 0;
         const inn = Math.max(0, -ob);
+        const ut = Math.max(0, ob);
         // vecken: valv som går runt insidan av armbågen och planar ut mot sidorna
-        const vf = Math.sin(e * 0.085 - 1.9 * ob + sida);
-        const veck = wv * (0.5 - 0.5 * ob) ** 1.5 * (0.5 + 0.5 * vf);
-        let rd = r0 * (1 - 0.3 * we * inn ** 1.3 + 0.07 * wv * (0.5 - 0.5 * ob) ** 1.5 * vf + 0.03 * we * Math.max(0, ob) ** 3 + 0.012 * Math.sin(dist * 0.021 + th * 3) + 0.022 * wh * Math.sin(dist * 0.07 + th * 2 + sida * 1.3));
+        // (utan böj, kb = 0, finns varken armbåge eller veck: we och wv är 0)
+        const vf = kb > 0 ? Math.sin(e * 0.085 - 1.9 * ob + sida) : 0;
+        const ih = kb > 0 ? (0.5 - 0.5 * ob) ** 1.5 : 0;
+        const veck = wv * ih * (0.5 + 0.5 * vf);
+        let rd = r0 * (1 - (kb > 0 ? 0.3 * we * inn ** 1.3 : 0) + 0.07 * wv * ih * vf + 0.03 * we * ut * ut * ut + 0.012 * (sa * V[3] + ca * V[2]) + (wh > 0 ? 0.022 * wh * (sb * V[5] + cb * V[4]) : 0));
         if (sista) rd *= 0.9;
         // (radien, och den platta sidan in mot mitten)
         const fl = (rx * FL.x + ry * FL.y + rz * FL.z) * rd * (1 - platt);

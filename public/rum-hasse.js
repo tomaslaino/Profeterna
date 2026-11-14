@@ -44,9 +44,12 @@ window.RumHasse = (() => {
   // slipsknuten (världens mått, som MATT i rum-hasse-3d.js): dit går samtalet i telefonen när texten är lång (tillKragen)
   const KRAGE = [0, 200, 120];
   const H = { on: false, rum: null, fig: null, last: null, t0: 0, T: 0, raf: 0, tal: 0, talMal: 0, mun: 0, munMal: null, ko: [], klipp: null, trum: 0, vanaT: 0, vanaNasta: null, senast: {}, vill: null };
-  const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // (frågorna ställs en gång och svaret läses av: de frågas i varje bild, och varje matchMedia är en ny fråga)
+  const RORELSE_AV = matchMedia('(prefers-reduced-motion: reduce)');
+  const LATT_MQ = matchMedia('(max-width: 700px), (max-height: 500px)');
+  const calm = () => RORELSE_AV.matches;
   const hog = () => innerWidth / innerHeight < 1.15;
-  const latt = () => matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+  const latt = () => LATT_MQ.matches;
   const $ = (s) => H.rum.querySelector(s);
   // rummets steg (rum.js, KVAL): 0 allt, 3 det enklaste
   const steg = () => Math.max(0, Math.min(3, window.Rum && Rum.kval ? Rum.kval() : latt() ? 1 : 0));

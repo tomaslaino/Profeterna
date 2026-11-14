@@ -80,7 +80,9 @@ window.Rum = (() => {
     mx: 0.5, my: -0.25, tx: 0.5, ty: -0.25, raf: 0, fig: null, zoom: null, last: 0, px: 0.5, py: 0.5, pek: 'mouse', dold: new Set() };
   const still = () => R.frozen != null;
   // (RumBak.snabbt: bakåt med svepet i telefonen, då läggs det översta bort utan rörelse, rum-bak.js)
-  const calm = () => still() || Boolean(window.RumBak && RumBak.snabbt) || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // (frågan ställs en gång: calm frågas flera gånger i varje bild, och varje matchMedia är en ny fråga)
+  const RORELSE_AV = matchMedia('(prefers-reduced-motion: reduce)');
+  const calm = () => still() || Boolean(window.RumBak && RumBak.snabbt) || RORELSE_AV.matches;
   // det som läggs fram är ett lager för bakåt
   const lager = (namn, ut) => { if (window.RumBak) RumBak.fram(namn, ut); };
   const lagerUt = (namn) => { if (window.RumBak) RumBak.bort(namn); };
