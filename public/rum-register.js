@@ -986,7 +986,8 @@ window.RumRegister = (() => {
     // Ett tryck på ett tals etikett i lagkortet, spelarkortet eller
     // matchakten öppnar en ruta över talen (sedan 2026-11-14, användarens val
     // bland fyra skisser): vad talet är och hur det räknas, och ett exempel
-    // med lagets eller spelarens egna siffror (orden i rum-register-ord.js).
+    // med lagets eller spelarens egna siffror (orden i rum-register-ord.js;
+    // enkla tal har bara en kort mening, sedan samma dag).
     // Rutan lägger sig över raderna ovanför etiketten (under den när de inte
     // räcker), med titeln i ramen, och täcker hela rader så att inga halva
     // rader syns. Esc stänger, ↑/↓ bläddrar till förra och nästa tal och
@@ -1014,59 +1015,35 @@ window.RumRegister = (() => {
     // klubbarnas, AFC Rushden & Diamonds)
     const heltNamn = (n) => { const s = String(n || ''); return landOf(s) ? s.replace(' & ', ' och ') : s; };
     const prosa = (n) => { const k = (window.Papper && Papper.kort && Papper.kort(n)) || n; return heltNamn(/'|\s[A-ZÅÄÖ]$/.test(k) ? n : k); };
-    const hLag = (t) => ({ t, namn: prosa(t.name), div: DIVNAME[t.comp], form: formLag(t.name).map((x) => x.l), sq: sqLag(t) });
-    const hSpelare = (x) => {
-      const l = A.P && A.P.lag.get(String(x.p.teamId));
-      return { p: x.p, namn: x.p.name, lag: prosa(x.p.team), lagM: lagetsMal(x.p), lagN: l && l.coverage ? l.coverage.covered : null };
-    };
+    const hLag = (t) => ({ t, namn: prosa(t.name), div: DIVNAME[t.comp] });
+    const hSpelare = (x) => ({ p: x.p, namn: x.p.name, lag: prosa(x.p.team), lagM: lagetsMal(x.p) });
     // h till matchaktens exempel: laget i matchen (j: 0 hemma, 1 borta) med
-    // kortets siffror (hLag) och det matchens fil vet – förra och nästa
-    // match, matcherna de senaste dagarna, formen med motståndarnas styrka
-    // (0–100), hemma och borta, gruppen – och lagets främsta
+    // kortets siffror (hLag), formen med motståndarnas styrka (0–100) och det
+    // matchsidans rader visar. (De enkla talen har inga exempel sedan
+    // 2026-11-14, bara de som räknas på ett sätt som inte syns direkt.)
     const TAVORD = { FAC: 'FA-cupen', EFL: 'Ligacupen', LC: 'Ligacupen', CL: 'Champions League', UCL: 'Champions League', EL: 'Europa League', UEL: 'Europa League', ECL: 'Conference League', UECL: 'Conference League', UNL: 'Nations League', EMK: 'EM-kvalet', VSK: 'en vänskapslandskamp', PL: 'Premier League', CH: 'Championship', L1: 'League One', L2: 'League Two' };
-    const dagMan = (s) => { const [, mo, dd] = String(s).slice(0, 10).split('-').map(Number); return `${dd} ${MANAD[mo - 1]}`; };
     function hAkt(m, j) {
       const side = j ? 'away' : 'home';
       const land = isLand(m.comp);
       const t = land ? landOf(m[side]) : lagOf(m[side]);
       const d = A.match.get(m.id);
       const T = (d && d.teams && d.teams[side]) || null;
-      const sc = (T && T.schedule) || null;
       // tävlingen på svenska, utom när det är lagets egen (ligan, eller landskampens)
       const egen = up(land ? m.comp : (t && t.comp) || '');
-      const tav = (c, namn) => (!c || up(c) === egen ? null : TAVORD[up(c)] || namn || null);
-      const match = (x) => (x && x.days != null ? { mot: heltNamn(x.opponent), hemma: x.home, tav: tav(x.comp, x.compName), datum: dagMan(x.date), dagar: x.days } : null);
-      // matcherna i Schemats fönster (de senaste windowDays dagarna före
-      // avspark), äldst först – bara när de är lika många som Schemat räknar
-      const fran = sc && sc.windowDays ? fDay.format(new Date(Date.parse(m.kickoff) - sc.windowDays * DAY)) : null;
-      const inom = fran && T.form ? T.form.filter((x) => x.date >= fran && x.date < m.kickoff.slice(0, 10)) : null;
-      const fram = (f) => { const x = framst(t, f); return x ? { namn: x.y.p.name, v: x.top, app: x.y.p.app } : null; };
+      const tav = (c) => (!c || up(c) === egen ? null : TAVORD[up(c)] || null);
       return {
-        ...(t ? hLag(t) : {}), t, namn: prosa(m[side]), land, hemma: !j, T,
-        forra: match(sc && sc.last), nasta: match(sc && sc.next),
-        fonster: inom && inom.length === sc.recent ? inom.slice().reverse().map((x) => ({ mot: heltNamn(x.opponent), tav: tav(x.comp), datum: dagMan(x.date) })) : null,
-        form5: T && T.form ? T.form.slice(0, 5).map((x) => ({ mot: heltNamn(x.opponent), tav: tav(x.comp), niva: x.opp && x.opp.level != null ? Math.round(100 * x.opp.level) : null, gf: x.gf, ga: x.ga, res: x.result })) : null,
+        ...(t ? hLag(t) : {}), t, namn: prosa(m[side]),
+        form5: T && T.form ? T.form.slice(0, 5).map((x) => ({ mot: heltNamn(x.opponent), tav: tav(x.comp), niva: x.opp && x.opp.level != null ? Math.round(100 * x.opp.level) : null })) : null,
         mott: mottOf(m, side),
-        rec: (T && T.record) || null,
-        tab: (T && T.table) || null,
-        nl: (t && t.nationsLeague) || null,
-        alla: (t && t.alla) || null,
         // det matchsidans rad visar för laget ('5,5–4,2')
         visar: (etikett) => { for (const g of (d && d.rows) || []) for (const x of g.rows || []) if (x.label === etikett) return x.values[j]; return null; },
-        // (landslagens skytt som i matchakten; klubbarnas står i spelarfilen, sq)
-        skytt: fram((p) => p.g),
-        assist: fram((p) => p.a),
-        segermal: fram((p) => p.gw),
       };
     }
-    // h till ett exempel om hela matchen: lagen, marknadens chans, Schemats dagar och domaren
+    // h till ett exempel om hela matchen: lagen, marknadens chans och domaren
     const hMatch = (m) => {
-      const hem = hAkt(m, 0);
-      const bort = hAkt(m, 1);
-      const sc = (hem.T && hem.T.schedule) || (bort.T && bort.T.schedule) || {};
       const d = A.match.get(m.id);
       const dom = d && d.referee && !d.referee.unknown && d.referee.name ? d.referee : null;
-      return { m, hem, bort, p: m.f && m.f.mk && m.f.p && m.f.p.length === 3 ? m.f.p : null, dagar: sc.windowDays || 14, dom };
+      return { m, hem: hAkt(m, 0), bort: hAkt(m, 1), p: m.f && m.f.mk && m.f.p && m.f.p.length === 3 ? m.f.p : null, dom };
     };
     function fkInnehall(f) {
       const O = ORD();
@@ -1103,7 +1080,7 @@ window.RumRegister = (() => {
           if (t) pr(exf, hLag(t));
         }
       }
-      // (orden kan bero på matchen: hur många dagar Schemat räknar)
+      // (orden kan bero på matchen: sedan när domaren räknas)
       const t = (akt && akt.t) || (ord && ord.t) || '';
       return { e, n, t: typeof t === 'function' ? t(hm || {}) : t, ex };
     }
