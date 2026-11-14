@@ -1107,17 +1107,17 @@
   // när han hälsar på dig (felNamn och domNamn i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
   // Felen är sådana som den gör som inte bryr sig: ett namn som låter likadant, ett han kan bättre någon
   // annanstans ifrån (Laine, Tegnér, Mogge, Snejder), ett smeknamn som om ni var gamla bekanta (Teddy, Dodde),
-  // Daniel, som ni alla heter och som därför aldrig är fel, och för Dogge ett efternamn i stället för
-  // smeknamnet, och då fel efternamn. Felet ska likna det riktiga namnet, inte bara börja likadant (Larsson,
-  // Lahti, Litmanen, Tegnell, Tobbe och Diego låg för långt bort och är borta). Varje fel ska höras när rösten
+  // och för Dogge ett efternamn i stället för smeknamnet, och då fel efternamn. Felet ska likna det riktiga
+  // namnet, inte bara börja likadant (Larsson, Lahti, Litmanen, Tegnell, Tobbe och Diego låg för långt bort och
+  // är borta, och Daniel, som ni alla heter, också). Varje fel ska höras när rösten
   // läser (Teider låter som Tejder och är därför borta), och inget får vara längre än åtta bokstäver, så att
   // raderna med namnet inte blir längre. Varje namn ger rösten ungefär 90 meningar till. Namnen vi kallas
   // (Tippoang.kallas: efternamnen, Dogge för Johansson); rösten får dem också (src/rost.js). Sägs inte som
   // egna rader.
   felnamn: {
-    Laino: ['Lainio', 'Leino', 'Laine', 'Lainen', 'Laiho', 'Laitinen', 'Leinonen', 'Daniel'],
-    Tejder: ['Tejler', 'Tejdel', 'Tegnér', 'Tajder', 'Snejder', 'Theander', 'Teddy', 'Daniel'],
-    Dogge: ['Docke', 'Dugge', 'Mogge', 'Dagge', 'Dodde', 'Jansson', 'Johnsson', 'Jönsson', 'Daniel'],
+    Laino: ['Lainio', 'Leino', 'Laine', 'Lainen', 'Laiho', 'Laitinen', 'Leinonen'],
+    Tejder: ['Tejler', 'Tejdel', 'Tegnér', 'Tajder', 'Snejder', 'Theander', 'Teddy'],
+    Dogge: ['Docke', 'Dugge', 'Mogge', 'Dagge', 'Dodde', 'Jansson', 'Johnsson', 'Jönsson'],
   },
 
   // Om man bara står där och inte frågar: han lottar bland raderna och säger en då och då, så de ska gå
