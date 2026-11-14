@@ -1825,6 +1825,7 @@ window.RumHasse = (() => {
       H.T = H.klipp.fran;
       H.klipp.fart = FART.has(H.klipp.grupp) ? 0.9 + 0.22 * Math.random() : 1;
       H.klipp.styrka = STYRKA.has(H.klipp.grupp) ? 0.85 + 0.27 * Math.random() : 1;
+      valjTidning(H.klipp);
     }
     const k = H.klipp;
     const T0 = H.T;
@@ -2933,13 +2934,18 @@ window.RumHasse = (() => {
   //
   // När det har gått dåligt för honom gömmer han sig bakom tidningen, skyldig men nöjd med sig själv: han
   // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
-  // just kommit läser han redan. Tidningen är dagens DN eller SvD (dagens i rum-hasse-tidning.js), med glasögonen
-  // på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den direkt.
+  // just kommit läser han redan. Tidningen är dagens DN eller SvD (dagens i rum-hasse-tidning.js), ibland Helgarderat
+  // (HG_ANDEL), med glasögonen på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna
+  // lägger han ned den direkt.
   // Han har fler sätt att verka upptagen (samma grupp lasa: raknar, tomKopp, slocknad, putsa, vissla, naglar),
   // och i dem blir han ertappad och låtsas som ingenting; har man just kommit håller han redan på (fram).
   // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
   // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
   const LAS_PAUS = [4000, 10000];
+  // Ibland (HG_ANDEL av gångerna) läser han Helgarderat i stället, det senaste numret, samma som på pulten (Rum.numret
+  // i rum.js; 2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste numret av helgarderat").
+  // Omslaget är mot en, och på baksidan står hans egen krönika (rum-hasse-tidning.js). Utan nummer DN eller SvD.
+  const HG_ANDEL = 1 / 3;
   function upptagen(lage) {
     H.upptagen = Boolean(lage) && !calm() && Boolean(H.fig && H.m && H.m.dagens);
     if (!H.upptagen) return;
@@ -2950,7 +2956,21 @@ window.RumHasse = (() => {
       H.lasFig = H.fig;
       H.fig.tidning(d);
     }
+    // (Helgarderat när ett nytt nummer har kommit, och igen i en ny figur)
+    const fig = H.fig;
+    if (fig.helgarderat && window.Rum && Rum.numret) {
+      Rum.numret().then((u) => {
+        if (!u || H.fig !== fig || (H.hgNummer === u && H.hgFig === fig)) return;
+        H.hgNummer = u;
+        H.hgFig = fig;
+        fig.helgarderat(u);
+      }).catch(() => {});
+    }
     H.lasT = performance.now() + (H.on ? 1500 : 0);
+  }
+  // Tidningen han tar upp den här gången: klippets egen (DN eller SvD), eller ibland Helgarderat (HG_ANDEL).
+  function valjTidning(k) {
+    if (k && k.tidning && H.fig && H.fig.blad) H.fig.blad(Math.random() < HG_ANDEL ? 'hg' : null);
   }
   // han läser redan (efter upp), eller håller redan på med något annat, strax innan man ertappar honom (fram)
   function lasNu() {
@@ -2958,6 +2978,7 @@ window.RumHasse = (() => {
     if (!k || calm()) return;
     H.klipp = { ...k };
     H.T = k.fran + (k.fram ?? H.m.LAS_START);
+    valjTidning(H.klipp);
   }
   // Hans omgång i sammanställningen: tävlingskupongen om han spelade, annars det han sa. → { lage, ok, n }
   // (lage null när det inte gick dåligt), eller null.

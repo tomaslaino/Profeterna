@@ -37,6 +37,7 @@
 // RumTidning.tidning(upplaga) → html: omslaget, innehållet, matchbladen och sista sidan, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
 // RumTidning.overst(upplaga) → raden överst på omslaget (Nr 1 · Vecka 46), som också står på löpsedeln (rum-affischer.js)
+// RumTidning.omslag(upplaga) → omslagets och sista sidans ord som text, för Hasse Backes tidning (rum-hasse-tidning.js)
 // RumTidning.passa(rot, bredd, hojd) ger tidningen dess storlek: omslaget så stort som ryms och alla sidor lika breda.
 
 (function (root, factory) {
@@ -322,6 +323,31 @@
       `<div class="hf-namn">${NAMN}</div>` + mitt + `<p class="hf-devis">${esc(G.devis)}</p>` +
       '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
+  // Omslaget och sista sidan som text, för Hasse Backes tidning, som trycker dem själv på sitt papper (rum-hasse-tidning.js):
+  // samma ord som forsta och sista här. Omslaget är Kalenderbladet (blad: vad datumet gäller, dagen och månaden; null
+  // utan tider) med devisen nertill. Utan sista sidan står innehållet där (Hasse läser dem från baksidan). Utan upplaga
+  // null.
+  function omslag(u) {
+    if (!u) return null;
+    const G = TEXT.forsta;
+    const { dag } = numret(u);
+    const S = u.sista;
+    return {
+      namn: NAMN,
+      over: overst(u),
+      prov: u.prov ? G.prov : '',
+      pris: G.pris,
+      blad: dag ? { infor: spelet(u) === TEXT.kupongen.stryktipset ? G.infor.stryktipset : G.infor.omgangen, dag: fDag.format(dag), manad: fMan.format(dag) } : null,
+      devis: G.devis,
+      huvudet: huvudet(u),
+      sista: S ? { nr: u.sistaNr, kronika: S.kronika, kaseri: S.kaseri, rubriker: TEXT.sista } : null,
+      innehall: {
+        titel: TEXT.innehall.titel,
+        rader: u.kupongen.map((m) => ({ nr: m.nr, lagen: `${kort((m.lag || [])[0])} – ${kort((m.lag || [])[1])}`,
+          rubrik: m.sida ? m.sida.rubrik || TEXT.poddar.rubrik(m.lag[0], m.lag[1]) : '', sida: m.sida ? u.sida.get(m.sida.nr) : null })),
+      },
+    };
+  }
   // Tidningens storlek (pulten i rum.js och sajten, helgarderat.js): omslaget förstorat k gånger, och alla andra ark
   // lika breda och minst lika höga (--hg-k i helgarderat.css; 2026-11-11, användarens önskemål: "sidorna ska vara
   // konkordanta med varandra"). Så stort som ryms: högst bredden, och så högt att det mesta av omslaget syns på
@@ -504,5 +530,5 @@
     return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') + (u.sista ? sista(u) : '') : omslag;
   }
 
-  return { hamta, upplaga, tidning, forsta, passa, nummer, overst, TEXT };
+  return { hamta, upplaga, tidning, forsta, omslag, passa, nummer, overst, TEXT };
 });

@@ -9,7 +9,9 @@
 // så att det faller bakåt ovanför händerna (uBuk), och en våg när han rycker i det (uVag). ytan() räknar
 // samma form i JavaScript, så att händerna kan hålla i kanterna. Samma ljus som på allt annat (LJUS).
 //
-// byggTidning(bord) → { mesh, U, tryck(dag), visa(namn), borta() }; dagens(now) → det tryck() vill ha
+// Ibland läser han Helgarderat i stället, det senaste numret (helgarderat(upplaga), se Helgarderat nedan).
+//
+// byggTidning(bord) → { mesh, U, tryck(dag), helgarderat(upplaga), har(namn), visa(namn), borta() }; dagens(now) → det tryck() vill ha
 // ytan(qx, qy, s, ut): punkten (qx −1–1 över uppslaget, qy 0–1 nedifrån) i papperets mått, s: { beta, buk, vag, fas }
 import * as THREE from 'three';
 import { LJUS, BORD_GLSL, DAG, LYS } from './rum-hasse-arm.js';
@@ -925,6 +927,436 @@ function insida(c, namn, d) {
   }
 }
 
+// ---------- Helgarderat ----------
+// Ibland läser han Helgarderat i stället (2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste
+// numret av helgarderat"): tobaksaffärens egen tidning, det senaste numret, samma som ligger på pulten (Rum.numret i
+// rum.js). Orden är rum-tidning.js (RumTidning.omslag) och måtten helgarderat.css: omslaget är 100 × 140 där och
+// förstoras HK gånger, och sidorna efter det är 600 breda där (HF). Omslaget är mot en (Kalenderbladet), och baksidan
+// är sista sidan med hans egen krönika och veckans kåseri (utan den innehållet); insidan är ett uppslag ur matchbladen
+// (Affischen). Gulnat papper med en tunn tryckt ram och terrakotta; på omslaget och innehållet har tryckfärgen inte
+// täckt överallt (som .hf-blad), och sista sidan har rent papper under texten (som .hg-sida). Brödtexten är så stor
+// som ryms, som notiserna på DN:s baksida.
+const HG = { p: '#f1e8d5', p2: '#e8dcc3', tryck: '#a9452b', svart: '#221f1b', ruta: '#fbf7ec', gra: 'rgba(34, 31, 27, .7)', streck: 'rgba(169, 69, 43, .3)' };
+const SKR = (px) => `400 ${px}px Skrivmaskin, "American Typewriter", "Courier New", monospace`;
+// tidningens kursiv (devisen och citaten)
+const FRA_K = (px) => `italic 400 ${px}px Fraunces, Georgia, "Times New Roman", serif`;
+const HK = SB / 100;
+const HF = SB / 600;
+
+// Papperet: gulnat, med buktor från fukten, fibrer och mörkare kanter, och den tunna tryckta ramen innanför kanten.
+// rent: utan buktorna, som sidorna med löpande text (.hg-sida i helgarderat.css).
+function hgPapper(x, x0, seed, rent = false) {
+  x.fillStyle = grad(x, 0, SH, HG.p, HG.p2);
+  x.fillRect(x0, 0, SB, SH);
+  const r = rng(seed + 0.37);
+  x.save();
+  x.beginPath();
+  x.rect(x0, 0, SB, SH);
+  x.clip();
+  for (let i = 0; i < 10; i++) {
+    const [gx, gy, gr, ga] = [r(), r(), r(), r()];
+    if (!rent) glod(x, x0 + gx * SB, gy * SH, 60 + gr * 150, 'rgba(150, 112, 60, A)', 0.04 + 0.05 * ga);
+  }
+  x.fillStyle = 'rgba(95, 72, 40, .08)';
+  for (let i = 0; i < 900; i++) x.fillRect(x0 + r() * SB, r() * SH, 1 + r() * 5, 0.6);
+  for (const [ax, ay, bx, by] of [[x0, 0, x0 + 20, 0], [x0 + SB, 0, x0 + SB - 20, 0], [0, 0, 0, 20], [0, SH, 0, SH - 20]]) {
+    const g = x.createLinearGradient(ax, ay, bx, by);
+    g.addColorStop(0, 'rgba(150, 112, 50, .26)');
+    g.addColorStop(1, 'rgba(150, 112, 50, 0)');
+    x.fillStyle = g;
+    x.fillRect(x0, 0, SB, SH);
+  }
+  x.restore();
+  x.strokeStyle = HG.tryck;
+  x.lineWidth = 0.4 * HK;
+  x.strokeRect(x0 + 2.4 * HK, 2.4 * HK, SB - 4.8 * HK, SH - 4.8 * HK);
+}
+// där tryckfärgen inte har täckt: papperet lyser igenom i små prickar
+function prickar(x, x0, seed) {
+  const r = rng(seed + 0.71);
+  x.fillStyle = HG.p;
+  for (let i = 0; i < 1800; i++) {
+    x.globalAlpha = 0.35 + 0.5 * r();
+    x.beginPath();
+    x.arc(x0 + r() * SB, r() * SH, 0.4 + r() * 0.9, 0, 7);
+    x.fill();
+  }
+  x.globalAlpha = 1;
+}
+// Raderna jämnt fördelade (text-wrap: balance), högst n och med … sist om texten inte ryms.
+function balans(x, text, font, w, n) {
+  let rader = radbryt(x, text, font, w);
+  if (rader.length > 1 && rader.length <= n) {
+    let lo = 0.5 * w;
+    let hi = w;
+    for (let i = 0; i < 12; i++) {
+      const m = (lo + hi) / 2;
+      if (radbryt(x, text, font, m).length > rader.length) lo = m; else hi = m;
+    }
+    rader = radbryt(x, text, font, hi);
+  }
+  if (rader.length > n) {
+    rader = rader.slice(0, n);
+    rader[n - 1] = `${rader[n - 1].replace(/[\s,.;:–-]+$/, '')}…`;
+  }
+  return rader;
+}
+// Text mitt på mellan två tryckta streck (omslagets datum och etiketterna): toppen vid y, linjens höjd lh. → bredden
+function mellanStreck(x, L, W, y, text, font, sp, lh, luft) {
+  const p = px(font);
+  const w = Math.min(bredd(x, text, font, sp), W - 4 * luft);
+  const mitt = L + W / 2;
+  skriv(x, text, mitt, y + lh / 2 + 0.36 * p, font, { sp, farg: HG.tryck, lin: 'm', max: w });
+  const s = (W - w) / 2 - luft;
+  linje(x, L, y + lh / 2 - 0.2 * HK, s, 0.4 * HK, HG.tryck);
+  linje(x, mitt + w / 2 + luft, y + lh / 2 - 0.2 * HK, s, 0.4 * HK, HG.tryck);
+  return w;
+}
+// Sidhuvudet, som omslagets översta rad: maskinskrivet över ett tryckt streck. ytterst: sidnumret (på en vänstersida
+// till vänster), annars namnet till vänster och numret med lördagen till höger. → y under strecket
+function folio(x, L, W, o, ytterst = null) {
+  const fs = 2.9 * HK;
+  const y = 3.6 * HK + 1.1 * HK + fs * 0.8;
+  let at = L;
+  if (ytterst != null) at += skriv(x, String(ytterst), L, y, SKR(fs)) + 2 * HK;
+  skriv(x, o.namn, at, y, SKR(fs));
+  skriv(x, o.huvudet, L + W, y, SKR(fs), { lin: 'h', max: W * 0.55 });
+  const y1 = 3.6 * HK + 1.1 * HK + fs + 1.5 * HK;
+  linje(x, L, y1, W, 0.4 * HK, HG.tryck);
+  return y1 + 0.4 * HK;
+}
+
+// Omslaget (forsta i rum-tidning.js), Kalenderbladet: numret, veckan och priset maskinskrivna överst, namnet i
+// terrakotta, och under ett tryckt streck lördagens datum som ett kalenderblad, dagen stor mellan vad den gäller (Inför
+// Stryktipset) och månaden i två lika breda etiketter. Nertill devisen, kursiv under ett kort streck. Måtten är .hf-* i
+// helgarderat.css. Utan tider står bara namnet och devisen.
+// Det ritas i omslagets egna mått (100 bred, i CSS-bildpunkter) och förstoras HK gånger, med typsnitten i sin storlek
+// där: Fraunces väljer formen efter storleken (opsz), och ritad direkt i 276 bildpunkter blev datumet tunt och skarpt,
+// med en droppe på fyran, i stället för pultens kraftiga siffror.
+function forstaHg(x, x0, o) {
+  hgPapper(x, x0, 3);
+  x.save();
+  x.translate(x0, 0);
+  x.scale(HK, HK);
+  const H = SH / HK;
+  const L = 6.4;
+  const W = 100 - 12.8;
+  const mitt = 50;
+  // .hf-et: 64 bred, röda versaler mellan två streck med 2 luft; toppen vid y
+  const etikett = (y, text) => {
+    const f = FRA(3.1, 600);
+    const t = VERSAL(text);
+    const w = Math.min(bredd(x, t, f, 0.5 / 3.1), 56);
+    skriv(x, t, mitt, y + 1.55 + 0.36 * 3.1, f, { sp: 0.5 / 3.1, farg: HG.tryck, lin: 'm', max: w });
+    const s = (64 - w) / 2 - 2;
+    linje(x, mitt - 32, y + 1.35, s, 0.4, HG.tryck);
+    linje(x, mitt + w / 2 + 2, y + 1.35, s, 0.4, HG.tryck);
+  };
+  let y = 3.6 + 1.1;
+  skriv(x, o.over, L, y + 2.9 * 0.8, SKR(2.9));
+  if (o.prov) skriv(x, o.prov, mitt, y + 2.9 * 0.8, SKR(2.9), { farg: HG.tryck, lin: 'm' });
+  skriv(x, o.pris, L + W, y + 2.9 * 0.8, SKR(2.9), { lin: 'h' });
+  y += 2.9 + 1.5;
+  linje(x, L, y, W, 0.4, HG.tryck);
+  y += 0.4 + 4.6;
+  skriv(x, o.namn, mitt, y + 14.2 * 0.86, FRA(14.2, 600), { sp: -0.2 / 14.2, farg: HG.tryck, lin: 'm', max: W + 4 });
+  y += 14.2 + 2.8;
+  // kalenderbladet i det som blir över, under ett tryckt streck (.hf-mitt)
+  linje(x, L, y, W, 0.4, HG.tryck);
+  const topp = y + 0.4;
+  // devisen nertill (.hf-devis): kursiv i bläck, under ett kort tryckt streck
+  const df = 5.6;
+  const dev = balans(x, o.devis, FRA_K(df), W, 2);
+  const dy = H - 5 - 2.2 - dev.length * df * 1.2;
+  stycke(x, dev, mitt, dy - 0.24 * df, FRA_K(df), df * 1.2, HG.svart, 'm');
+  linje(x, mitt - 5.5, dy - 3.4, 11, 0.4, HG.tryck);
+  const botten = dy - 3.4;
+  if (o.blad) {
+    const h = 3.1 + 0.5 + 54 * 0.98 + 3.1;
+    let cy = topp + (botten - topp - h) / 2;
+    etikett(cy, o.blad.infor);
+    cy += 3.1 + 0.5;
+    skriv(x, o.blad.dag, mitt, cy + 0.85 * 54, FRA(54, 600), { sp: 1.6 / 54, farg: HG.tryck, lin: 'm' });
+    cy += 54 * 0.98;
+    etikett(cy, o.blad.manad);
+  }
+  x.restore();
+  prickar(x, x0, 3);
+}
+
+// Stycken i två spalter (column-count: 2, som .hs-text): fonten font, radavståndet lh, luft mellan styckena och en
+// anfang i terrakotta över de två första raderna (anfang). Slutet (sign) är kåsörens namn till höger och vem hen är.
+// → { h, rita(x, x0, y, botten) }
+function spalter(x, stycken, cw, gap, font, lh, luft, { anfang = false, sign = null } = {}) {
+  const p = px(font);
+  const rader = [];
+  stycken.filter(Boolean).forEach((t0, i) => {
+    let t = String(t0).trim();
+    let cap = null;
+    let capW = 0;
+    if (anfang && i === 0 && t) {
+      cap = { text: t[0], font: FRA(p * 49 / 16, 600) };
+      capW = bredd(x, cap.text, cap.font) + p * 7 / 16;
+      t = t.slice(1);
+    }
+    x.font = font;
+    const forst = rader.length;
+    // (de två första raderna går bredvid anfangen)
+    const indrag = () => (cap && rader.length - forst < 2 ? capW : 0);
+    let r = '';
+    for (const o of t.split(/\s+/)) {
+      const n = r ? `${r} ${o}` : o;
+      if (r && x.measureText(n).width > cw - indrag()) { rader.push({ text: r, font, h: lh, dx: indrag() }); r = o; } else r = n;
+    }
+    if (r) rader.push({ text: r, font, h: lh, dx: indrag() });
+    if (cap) rader[forst].cap = { ...cap, dy: Math.min(2, rader.length - forst) * lh };
+    if (rader.length) rader[rader.length - 1].efter = luft;
+  });
+  if (sign) {
+    rader.push({ text: `– ${sign.av}`, font: SKR(p * 12 / 16), h: p * 1.3, lin: 'h' });
+    if (sign.om) rader.push({ text: sign.om, font: SKR(p * 11.5 / 16), h: p * 1.4, lin: 'h', farg: HG.gra });
+  }
+  // höjden och var den andra spalten börjar: så jämnt som möjligt, den första inte lägre
+  const hojd = (l) => l.reduce((a, q, i) => a + q.h + (i < l.length - 1 ? q.efter || 0 : 0), 0);
+  const tot = hojd(rader);
+  let delning = rader.length;
+  let acc = 0;
+  for (let i = 0; i < rader.length; i++) {
+    acc += rader[i].h + (rader[i].efter || 0);
+    if (acc >= tot / 2) { delning = i + 1; break; }
+  }
+  const sp = [rader.slice(0, delning), rader.slice(delning)];
+  return {
+    h: Math.max(hojd(sp[0]), hojd(sp[1])),
+    rita(x2, x0, y0, botten) {
+      sp.forEach((l, k) => {
+        let y = y0;
+        const sx = x0 + k * (cw + gap);
+        for (const q of l) {
+          if (y + q.h > botten + 0.5) return;
+          const bas = y + q.h * 0.72;
+          if (q.cap) skriv(x2, q.cap.text, sx, y + q.cap.dy - lh * 0.28, q.cap.font, { farg: HG.tryck });
+          x2.font = q.font;
+          x2.fillStyle = q.farg || HG.svart;
+          x2.textAlign = q.lin === 'h' ? 'right' : 'left';
+          x2.fillText(q.text, q.lin === 'h' ? sx + cw : sx + (q.dx || 0), bas);
+          x2.textAlign = 'left';
+          y += q.h + (q.efter || 0);
+        }
+      });
+    },
+  };
+}
+
+// Sista sidan (sista i rum-tidning.js): sidhuvudet, Krönika över hans porträtt och namn, rubriken och texten i två
+// spalter med en anfang, och under den Kåseri med rubriken, texten och kåsörens namn. Brödtexten krymper tills allt ryms.
+function sistaHg(x, x0, o, portratt) {
+  const k = HK;
+  const f = HF;
+  const S = o.sista;
+  hgPapper(x, x0, 5, true);
+  const L = x0 + 6.4 * k;
+  const W = SB - 12.8 * k;
+  const mitt = x0 + SB / 2;
+  const botten = SH - 5 * k;
+  let y = folio(x, L, W, o, S.nr) + 22 * f;
+  const ef = 12.5 * f;
+  const etikett = (text, yy) => { mellanStreck(x, L, W, yy, VERSAL(text), FRA(ef, 600), 0.16, ef * 1.2, 13 * f); return yy + ef * 1.2 + 16 * f; };
+  y = etikett(S.rubriker.kronika, y);
+  // porträttet, tryckt på papperet, med den tunna ramen
+  const pw = 64 * f;
+  x.fillStyle = '#d9d3c4';
+  x.fillRect(mitt - pw / 2, y, pw, pw);
+  if (portratt) {
+    x.save();
+    x.globalCompositeOperation = 'multiply';
+    x.filter = 'contrast(1.1)';
+    x.drawImage(portratt, mitt - pw / 2, y, pw, pw);
+    x.restore();
+  }
+  x.strokeStyle = HG.tryck;
+  x.lineWidth = 0.45 * 6 * f;
+  x.strokeRect(mitt - pw / 2 + x.lineWidth / 2, y + x.lineWidth / 2, pw - x.lineWidth, pw - x.lineWidth);
+  y += pw + 10 * f;
+  skriv(x, VERSAL(S.kronika.av), mitt, y + 14 * f * 0.95, FRA(14 * f, 600), { sp: 0.16, farg: HG.tryck, lin: 'm', max: W });
+  y += 14 * f * 1.2 + 14 * f;
+  // rubrikerna, som .hg-rub
+  const rf = 29.1 * f;
+  const rubrik = (text, yy) => {
+    const r = balans(x, text, FRA(rf, 600), W, 3);
+    stycke(x, r, mitt, yy - 0.2 * rf, FRA(rf, 600), rf * 1.14, HG.svart, 'm');
+    return yy + r.length * rf * 1.14 + 14 * f;
+  };
+  y = rubrik(S.kronika.rubrik, y);
+  // krönikan och kåseriet, så stora som ryms
+  const gap = 30 * f;
+  const cw = (W - gap) / 2;
+  const kasRub = balans(x, S.kaseri.rubrik, FRA(rf, 600), W, 3).length * rf * 1.14 + 14 * f;
+  let t = 1;
+  let kr;
+  let ks;
+  for (;;) {
+    const p = 16 * f * t;
+    kr = spalter(x, S.kronika.stycken, cw, gap, FRA(p, 400), p * 1.6, 10 * f * t, { anfang: true });
+    ks = spalter(x, S.kaseri.stycken, cw, gap, FRA(p * 15.5 / 16, 400), p * 1.55, 10 * f * t, { sign: { av: S.kaseri.av, om: S.kaseri.om ? S.kaseri.om[0].toUpperCase() + S.kaseri.om.slice(1) : '' } });
+    if (y + kr.h + 30 * f * t + ef * 1.2 + 16 * f + kasRub + ks.h <= botten || t < 0.36) break;
+    t -= 0.02;
+  }
+  kr.rita(x, L, y, botten);
+  y += kr.h + 30 * f * t;
+  if (y + ef * 1.2 + 16 * f + kasRub < botten) {
+    y = etikett(S.rubriker.kaseri, y);
+    y = rubrik(S.kaseri.rubrik, y);
+    ks.rita(x, L, y, botten);
+  }
+}
+
+// Innehållet (kupong i rum-tidning.js), där sista sidan saknas: namnet och numret överst, I detta nummer och en rad per
+// match med numret, lagen, prickar till sidnumret och matchbladets rubrik under.
+function innehallHg(x, x0, o) {
+  const k = HK;
+  const f = HF;
+  const I = o.innehall;
+  hgPapper(x, x0, 7);
+  const L = x0 + 6.4 * k;
+  const W = SB - 12.8 * k;
+  let y = folio(x, L, W, o) + 4.4 * k;
+  const tf = 34 * f;
+  skriv(x, I.titel, x0 + SB / 2, y + tf * 0.85, FRA(tf, 600), { lin: 'm', max: W });
+  y += tf * 1.1 + 2.6 * k;
+  linje(x, L, y, W, 0.4 * k, HG.tryck);
+  y += 0.4 * k;
+  const botten = SH - 5 * k;
+  const n = I.rader.length || 1;
+  const rh = (botten - y) / n;
+  const s = Math.min(1, rh / (44 * f));
+  const nrW = 26 * f;
+  const sW = 30 * f;
+  for (const [i, m] of I.rader.entries()) {
+    const ry = y + i * rh;
+    const mid = ry + rh / 2;
+    x.globalAlpha = m.sida ? 1 : 0.4;
+    const bas = mid - (m.rubrik ? 2 * f * s : -5 * f * s);
+    skriv(x, String(m.nr), L, bas, FRA(14 * f * s, 600), { farg: HG.tryck });
+    const lw = skriv(x, VERSAL(m.lagen), L + nrW + 8 * f, bas, FRA(14 * f * s, 600), { sp: 0.12, farg: HG.tryck, max: W - nrW - sW - 40 * f });
+    if (m.sida) {
+      skriv(x, String(m.sida), L + W, bas, FRA(18 * f * s, 600), { farg: HG.tryck, lin: 'h' });
+      x.fillStyle = HG.streck;
+      for (let px0 = L + nrW + 8 * f + lw + 8 * f; px0 < L + W - sW - 8 * f; px0 += 4 * f) x.fillRect(px0, bas - 2, 2 * f, 2 * f);
+    }
+    if (m.rubrik) skriv(x, m.rubrik, L + nrW + 8 * f, bas + 14 * f * s * 1.3 + 2 * f, FRA(14 * f * s, 400), { max: W - nrW - sW - 16 * f });
+    x.globalAlpha = 1;
+    linje(x, L, ry + rh - 1, W, 1, HG.streck);
+  }
+  prickar(x, x0, 7);
+}
+
+// Insidan (sett bakifrån, liten): ett uppslag ur matchbladen (Affischen, matchblad i rum-tidning.js). Till vänster
+// matchens affisch, jämnt fördelad över sidan: etiketten, tavlans tre rutor med lagen ovanför, rubriken stort,
+// sammanfattningen under ett kort streck och arenan nertill. Till höger lagen efter varandra under sina etiketter, med
+// anfang och citat, och källorna sist. Ingen bild.
+function insidaHg(c, seed) {
+  const x = c.getContext('2d');
+  const w = c.width / 2;
+  const h = c.height;
+  const k = w / 100;
+  const r = rng(seed + 0.19);
+  // röda versaler mellan två tryckta streck, mitt på (etiketterna), b: textens andel av bredden
+  const etikett = (L, W, y, b) => {
+    const tw = W * b;
+    const s = (W - tw) / 2 - 1.6 * k;
+    linje(x, L, y - 0.25, s, 0.5, HG.tryck);
+    linje(x, L + W - s, y - 0.25, s, 0.5, HG.tryck);
+    x.globalAlpha = 0.75;
+    linje(x, L + (W - tw) / 2, y - 0.8 * k, tw, 1.6 * k, HG.tryck);
+    x.globalAlpha = 1;
+  };
+  // centrerade rader: n stycken, radhöjd lh, tjocklek t, bredden b0–b0 + db av W, den sista kortare (kort)
+  const rader = (L, W, y, n, lh, t, farg, b0 = 0.82, db = 0.16, kort = true) => {
+    for (let i = 0; i < n; i++) {
+      const b = W * (kort && i === n - 1 ? 0.45 + 0.3 * r() : b0 + db * r());
+      linje(x, L + (W - b) / 2, y + i * lh, b, t, farg);
+    }
+    return y + n * lh;
+  };
+  for (const [i, x0] of [0, w].entries()) {
+    x.fillStyle = grad(x, 0, h, HG.p, HG.p2);
+    x.fillRect(x0, 0, w, h);
+    x.strokeStyle = HG.tryck;
+    x.lineWidth = 0.5;
+    x.strokeRect(x0 + 2.4 * k, 2.4 * k, w - 4.8 * k, h - 4.8 * k);
+    const L = x0 + 6.4 * k;
+    const W = w - 12.8 * k;
+    // sidhuvudet: sidnumret ytterst och namnet, och numret med lördagen på andra sidan
+    x.fillStyle = 'rgba(34, 31, 27, .55)';
+    x.fillRect(i ? L + W - 16 * k : L, 5.6 * k, 16 * k, 1.3 * k);
+    x.fillRect(i ? L : L + W - 24 * k, 5.6 * k, 24 * k, 1.3 * k);
+    linje(x, L, 9.1 * k, W, 0.5, HG.tryck);
+    if (i === 0) {
+      // affischen, med lika mycket luft mellan delarna (space-evenly)
+      const nRub = 2 + (seed % 2);
+      const H = [2, 22.8, nRub * 10.8, 25, 2].map((v) => v * k);
+      const luft = (h - 5 * k - 11.3 * k - H.reduce((a, b) => a + b, 0)) / 6;
+      let y = 11.3 * k + luft;
+      etikett(L, W, y + 1 * k, 0.22);
+      y += H[0] + luft;
+      for (let j = 0; j < 3; j++) {
+        const cx = L + ((j + 0.5) * W) / 3;
+        linje(x, cx - 7 * k, y + 0.4 * k, 14 * k, 1.6 * k, HG.tryck);
+        const ry = y + 3.8 * k;
+        x.fillStyle = HG.ruta;
+        x.fillRect(cx - 9.5 * k, ry, 19 * k, 19 * k);
+        x.strokeStyle = HG.tryck;
+        x.strokeRect(cx - 9.5 * k, ry, 19 * k, 19 * k);
+        if (j === 1) linje(x, cx - 6 * k, ry + 8.6 * k, 12 * k, 1.8 * k, 'rgba(34, 31, 27, .7)');
+        else {
+          x.fillStyle = ['#7a1f2b', '#1d3f78', '#c8a12a', '#2b5d34'][(seed + j) % 4];
+          x.beginPath();
+          x.moveTo(cx - 5 * k, ry + 4 * k);
+          x.lineTo(cx + 5 * k, ry + 4 * k);
+          x.lineTo(cx + 5 * k, ry + 10 * k);
+          x.quadraticCurveTo(cx + 5 * k, ry + 14 * k, cx, ry + 15.5 * k);
+          x.quadraticCurveTo(cx - 5 * k, ry + 14 * k, cx - 5 * k, ry + 10 * k);
+          x.fill();
+        }
+      }
+      y += H[1] + luft;
+      rader(L, W, y + 3 * k, nRub, 10.8 * k, 4.6 * k, 'rgba(34, 31, 27, .88)', 0.44, 0.2, false);
+      y += H[2] + luft;
+      linje(x, L + W / 2 - 5.3 * k, y, 10.6 * k, 0.5, HG.tryck);
+      rader(L + 0.08 * W, 0.84 * W, y + 6 * k, 4, 4.8 * k, 1.6 * k, 'rgba(34, 31, 27, .5)');
+      y += H[3] + luft;
+      etikett(L, W, y + 1 * k, 0.5);
+    } else {
+      // lagen efter varandra, och källorna sist
+      let y = 14 * k;
+      const lag = (y1) => {
+        etikett(L, W, y + 1 * k, 0.4);
+        x.globalAlpha = 0.85;
+        linje(x, L, y + 5 * k, 4.2 * k, 4.2 * k, HG.tryck);
+        x.globalAlpha = 1;
+        spalt(x, L + 5.4 * k, y + 5 * k, W - 5.4 * k, y + 10 * k, 2.6 * k, seed + y);
+        spalt(x, L, y + 10.2 * k, W, y1 - 14 * k, 2.6 * k, seed + y + 1);
+        // citatet: ett kort streck, kursiven och vem som sa det
+        linje(x, L + W / 2 - 4 * k, y1 - 13.4 * k, 8 * k, 0.5, HG.tryck);
+        rader(L + 0.15 * W, 0.7 * W, y1 - 10.4 * k, 2, 3.2 * k, 1.4 * k, 'rgba(34, 31, 27, .62)');
+        linje(x, L + W / 2 - 9 * k, y1 - 3.2 * k, 18 * k, 0.9 * k, 'rgba(34, 31, 27, .4)');
+        y = y1 + 3 * k;
+      };
+      lag(64 * k);
+      lag(h - 24 * k);
+      // källorna, ett lag i var sin spalt
+      etikett(L, W, y + 1 * k, 0.28);
+      for (let j = 0; j < 2; j++) {
+        const sx = L + j * (W / 2 + 1.5 * k);
+        const sw = W / 2 - 1.5 * k;
+        linje(x, sx + sw * 0.3, y + 4.6 * k, sw * 0.4, 1 * k, HG.tryck);
+        for (let q = 0; q < 3; q++) linje(x, sx + sw * 0.04, y + 7 * k + q * 2.4 * k, sw * (q === 2 ? 0.4 : 0.92), 0.9 * k, 'rgba(34, 31, 27, .45)');
+      }
+    }
+  }
+}
+
 // ---------- papperet ----------
 export function byggTidning(bord) {
   const NX = 36;
@@ -968,14 +1400,25 @@ export function byggTidning(bord) {
   let dagNu = null;
   let visad = 'dn';
   let nr = 0;
-  // Trycker uppslaget (förstasidan, baksidan och insidan) för dagens tidning som visas. Typsnitten hämtas först;
-  // kommer de sent trycks det om.
+  // Helgarderats nummer (RumTidning.omslag), när typsnitten och porträttet har kommit
+  let hg = null;
+  let hgNr = 0;
+  // Trycker uppslaget (förstasidan, baksidan och insidan) för tidningen som visas: dagens DN eller SvD, eller
+  // Helgarderat. Typsnitten hämtas först; kommer de sent trycks det om.
   function rita() {
-    if (!dagNu) return;
     const x = ut.getContext('2d');
-    baksida(x, 0, dagNu, visad);
-    (visad === 'svd' ? forstaSvd : forstaDn)(x, SB, dagNu);
-    insida(inn, visad, dagNu);
+    if (visad === 'hg') {
+      if (!hg) return;
+      if (hg.o.sista) sistaHg(x, 0, hg.o, hg.portratt);
+      else innehallHg(x, 0, hg.o);
+      forstaHg(x, SB, hg.o);
+      insidaHg(inn, hg.seed);
+    } else {
+      if (!dagNu) return;
+      baksida(x, 0, dagNu, visad);
+      (visad === 'svd' ? forstaSvd : forstaDn)(x, SB, dagNu);
+      insida(inn, visad, dagNu);
+    }
     U.uUt.value.needsUpdate = true;
     U.uIn.value.needsUpdate = true;
   }
@@ -983,18 +1426,38 @@ export function byggTidning(bord) {
   async function tryck(dag) {
     const mitt = ++nr;
     dagNu = dag;
-    rita();
+    if (visad !== 'hg') rita();
     fonter = fonter || (document.fonts && document.fonts.load
       ? Promise.race([Promise.all([document.fonts.load(PLAY(30, 900)), document.fonts.load(PLAY(30, 700)), document.fonts.load(FRA(30, 600)), document.fonts.load(FRA(30, 700))]), new Promise((ok) => setTimeout(ok, 2500))])
       : Promise.resolve());
     await Promise.all([fonter, laddaNotiser().then(laddaBilder)]);
-    if (mitt === nr) rita();
+    if (mitt === nr && visad !== 'hg') rita();
+  }
+  let fonterHg = null;
+  let portratt = null;
+  // Helgarderats nummer (upplagan ur rum-tidning.js, eller null). Det går att visa först när typsnitten och hans
+  // porträtt till krönikan har kommit, så att det aldrig byts i hans händer.
+  async function helgarderat(u) {
+    const mitt = ++hgNr;
+    const RT = globalThis.RumTidning;
+    const o = u && RT && RT.omslag ? RT.omslag(u) : null;
+    if (!o) { hg = null; return; }
+    fonterHg = fonterHg || (document.fonts && document.fonts.load
+      ? Promise.race([Promise.all([document.fonts.load(FRA(30, 600)), document.fonts.load(FRA(30, 400)), document.fonts.load(FRA_K(30)), document.fonts.load(SKR(30))]), new Promise((ok) => setTimeout(ok, 2500))]).catch(() => {})
+      : Promise.resolve());
+    portratt = portratt || ladda('helgarderat/hasse.webp');
+    const [, bild] = await Promise.all([fonterHg, portratt]);
+    if (mitt !== hgNr) return;
+    hg = { o, portratt: bild, seed: Math.abs(Number(String(o.over).replace(/\D+/g, '')) || 1) };
+    if (visad === 'hg') rita();
   }
   return {
-    mesh, U, tryck,
-    // vilken av tidningarna han har i händerna ('dn' eller 'svd'); trycks om när den byts
+    mesh, U, tryck, helgarderat,
+    // finns tidningen att visa ('dn', 'svd' eller 'hg')
+    har: (namn) => (namn === 'hg' ? Boolean(hg) : Boolean(TIDNINGAR[namn])),
+    // vilken av tidningarna han har i händerna ('dn', 'svd' eller 'hg'); trycks om när den byts
     visa(namn) {
-      if (!TIDNINGAR[namn] || namn === visad) return;
+      if (namn === visad || !(namn === 'hg' ? hg : TIDNINGAR[namn])) return;
       visad = namn;
       rita();
     },

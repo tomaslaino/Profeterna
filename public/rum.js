@@ -6493,7 +6493,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
   // summa: sammanställningen så länge protokollet ligger på pulten (Hasses domar i rum-hasse.js), annars null
   // (lopsedel: veckans löpsedel, färdigritad, som hänger hos Hasse Backe, rum-hasse.js; null innan sakerna är ritade)
-  return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, lopsedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null), smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+  return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, lopsedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null),
+    // Helgarderats senaste nummer, samma som på pulten (Hasse Backe läser det ibland, rum-hasse.js). → Promise: upplagan eller null
+    numret: hamtaTidning, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }
