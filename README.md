@@ -7922,8 +7922,7 @@ som datorn knappt trodde på, spikar som satt allihop eller sprack, och hur mån
 det skiljer mycket. Chansen är datorns före avspark, som i poängen. Varje sak är två meningar: vad det är och vad han
 tycker om det (*Sådant händer när favoriterna inte har läst på.*). Spikarna i allmänhet tar han bara när inget annat
 sticker ut. Raderna står under `domar.sak` i rum-hasse-repliker.js och väljs efter omgången och personen, inte på lott,
-och ett frö som byts varje gång man öppnar domen, så att han säger något nytt varje gång (2026-11-14: förut var domen
-densamma varje gång och på alla enheter, och det blev tjatigt); var och en i gänget får nästa rad i listan, så att samma sak i
+så att domen är densamma varje gång och på alla enheter; var och en i gänget får nästa rad i listan, så att samma sak i
 samma omgång låter olika. Varje rad är en mening, så att *Läs upp* kan läsa domen mening för mening. En mening med en match
 hörs inte (rösten kan inte alla lag), så kommentaren efter den ska gå att förstå för sig. Inledningen står lite fetare,
 sakerna indragna bakom ett tunt streck i domens guld, som anteckningar i marginalen, och slutet i kursiv (`.rh-domen` i
@@ -7955,7 +7954,7 @@ när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i unge
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
 mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
 samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
-Domen byts varje gång man öppnar den, men namnet han säger fel är detsamma hela omgången. Han rättar sig aldrig och säger inget om det. Står man kvar
+Domen är densamma varje gång. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 

@@ -3085,13 +3085,9 @@ window.RumHasse = (() => {
     return lista[h % lista.length];
   }
   const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
-  // Varje gång man öppnar en dom säger han något nytt: ett frö per person, som byts när man trycker på
-  // personen (doma). Förut var domen densamma varje gång och på alla enheter, och då blev det tjatigt
-  // (Tomas 2026-11-14). Namnen han säger fel byts inte: de fastnar en omgång (felNamn).
-  const domFro = (p) => (H.domFro && H.domFro[p.id]) || '';
-  // Ordet i guld: ett av många för läget (domord i rum-hasse-repliker.js), samma som i den senaste domen över
-  // personen, så att det som slås i disken också står under namnet i listan.
-  const domOrd = (p, sum) => fast(REP().domord[p.lage] || [''], `${sum.id}:${p.id}:${domFro(p)}:ord`) || '';
+  // Ordet i guld: ett av många för läget (domord i rum-hasse-repliker.js), samma för samma omgång och person,
+  // så att det som slås i disken också står under namnet i listan.
+  const domOrd = (p, sum) => fast(REP().domord[p.lage] || [''], `${sum.id}:${p.id}:ord`) || '';
   // Namnen sitter inte riktigt (felnamn i rum-hasse-repliker.js), och han rättar sig aldrig. Felet fastnar en
   // omgång: när han säger fel är det samma fel namn hela omgången, när han hälsar och i domen, på alla enheter,
   // och nästa omgång har han lärt sig ett annat. omgang: omgångens id (kupongens, som protokollets).
@@ -3104,7 +3100,7 @@ window.RumHasse = (() => {
   }
   // Vad han kallar någon i domen. Han säger fel om var och en i nio domar av tio, också om den som vann. I var
   // nionde dom med fel börjar han rätt och tappar namnet efter första meningen
-  // med det, som om han slutade lyssna. Samma omgång och person ger samma svar, så att namnet är detsamma varje
+  // med det, som om han slutade lyssna. Samma omgång och person ger samma svar, så att domen är densamma varje
   // gång och på alla enheter.
   // → { forst, sedan }: namnet i första meningen med namnet, och i resten.
   function domNamn(p, sum) {
@@ -3204,7 +3200,7 @@ window.RumHasse = (() => {
     const NAMN = '\u0001';
     // (raden väljs efter omgången och delen, och var och en i gänget får nästa rad i listan: samma sak i samma
     // omgång låter olika för er)
-    const mening = (lista, del, o = {}) => fyll(lista[(lista.indexOf(fast(lista, `${sum.id}:${domFro(p)}:${del}`)) + p.hand) % lista.length], { namn: NAMN, ...o });
+    const mening = (lista, del, o = {}) => fyll(lista[(lista.indexOf(fast(lista, `${sum.id}:${del}`)) + p.hand) % lista.length], { namn: NAMN, ...o });
     const antal = (n) => ({ antal: tal(n), Antal: versal(tal(n)) });
     const spik = () => {
       const k = d.spik;
@@ -3261,7 +3257,6 @@ window.RumHasse = (() => {
     H.sagt = null;
     H.talMal = 0;
     hora(sum.id, p.id);
-    H.domFro = { ...(H.domFro || {}), [p.id]: Math.random().toString(36).slice(2, 8) };
     const nu = nyss(sum.id);
     if (!nu.vem.includes(p.id)) nu.vem.push(p.id);
     nu.sist = p.id;
