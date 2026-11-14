@@ -90,7 +90,12 @@
         { "match": "AFC Wimbledon – Blackpool", "tecken": "1X2", "resultat": "1–0", "modell": [32, 28, 40], "id": "401880754" },
         { "match": "Wigan Athletic – Barnsley", "tecken": "1", "resultat": "2–1", "modell": [40, 27, 33], "id": "401880744" },
         { "match": "Swindon Town – Grimsby Town", "tecken": "1X2", "resultat": "1–4", "modell": [43, 24, 33], "id": "401881266" }
-      ]
+      ],
+      "ai": {
+        "text": "Elva rätt av 13 är klart över de väntade 9,7, och ni slog modellens tips som bara fick 8 av 13 rätt. Spikarna på Wigan Athletic till odds 2,50 och Milton Keynes Dons till odds 2,13 satt båda. Helgarderingarna behövdes, eftersom modellens tips föll i både AFC Wimbledon – Blackpool och Swindon Town – Grimsby Town. Missarna kom i Portugal – Danmark, där 1X till odds 1,25 inte höll, och i Rumänien – Polen.",
+        "modell": "claude-opus-5-5",
+        "skriven": "2026-11-14T22:31:32.599Z"
+      }
     }
   ]
 }
