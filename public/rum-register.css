@@ -71,6 +71,20 @@
 .reg-term .tr.rub { display: flex; align-items: center; gap: 1ch; }
 .reg-term .tr.rub::after { content: ''; flex: 1; border-top: 0.09em solid var(--svag); opacity: 0.75; }
 /* tangenterna längst ner, omvänt över hela bredden */
+/* Rutan med förklaringen till ett tal (fkRita i rum-register.js): dubbel
+   ram med talets namn omvänt i ramen och vad det är svagt bredvid. Den
+   täcker hela rader; det svarta fältet ovanför ramen (::before) döljer resten
+   av raden som titeln står i, så att inga halva rader syns. */
+.reg-fk { position: absolute; box-sizing: border-box; padding: 0.55em 1.5ch 0.45em; background: #020a04; border: 0.2em double var(--gron); box-shadow: 0 0 1.2em rgba(65, 255, 110, 0.25); cursor: default; }
+.reg-fk[hidden] { display: none; }
+.reg-fk::before { content: ''; position: absolute; left: -0.3em; right: -0.3em; top: calc(-1 * var(--fk-o, 0.6em) - 0.2em); height: var(--fk-o, 0.6em); background: #020a04; }
+.reg-fk .fk-titel { position: absolute; top: -0.62em; left: 1.5ch; padding: 0 0.5ch; background: var(--gron); color: #010702; text-shadow: none; }
+.reg-fk .fk-under { position: absolute; top: -0.62em; padding: 0 1ch; background: #020a04; white-space: nowrap; }
+.reg-fk .fk-in { height: 100%; overflow: hidden; }
+.reg-fk.rull .fk-in { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.reg-fk.rull .fk-in::-webkit-scrollbar { display: none; }
+.reg-fk .fk-txt { max-width: 74ch; white-space: normal; }
+.reg-fk .fk-ex, .reg-fk .fk-ga { margin-top: 0.45em; }
 .reg-fot { flex: none; display: flex; gap: 3ch; margin-top: 0.2em; padding: 0 1ch; overflow: hidden; white-space: pre; background: var(--gron); color: #010702; text-shadow: none; line-height: 1.12; }
 .reg-fot .a:hover { background: rgba(1, 7, 2, 0.16); }
 .reg-fot .av { opacity: 0.4; }

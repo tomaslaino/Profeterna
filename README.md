@@ -6758,14 +6758,22 @@ står kvar bara på tv:n. Samma tal under samma namn och i samma ordning som kol
 - Efter varje tal står **platsen i divisionen**, svagt, som i matchakten: för lagen alltid, för spelarna bara bland de
   20 främsta (Statistiks topplistor). Talen med `asc` (insläppta, skott mot, motståndarnas xG) räknar lägst först, och
   osäkra siffror (för lite speltid, för få skott) får ingen plats, som de dämpade siffrorna på Statistik.
-- **Etiketten leder till listan** (`#lista:lag:pl:skapar`, `#lista:spelare:ch:assist`): divisionens lag eller spelare
+- **Etiketten förklarar talet** (2026-11-14, användarens val bland fyra skisser: rutan, med orden och ett konkret
+  exempel): ett tryck på etiketten (eller ↑/↓ och Enter) öppnar en ruta med dubbel ram över raderna ovanför, med talets
+  namn i ramen, två–tre meningar om vad talet är och hur det räknas och ett exempel med lagets eller spelarens egna
+  siffror (*City har tagit 21 poäng på 10 matcher, där chanserna var värda 18,8: 21 − 18,8 = +2,2.*). I matchakten står
+  ett exempel per lag. Esc eller ett tryck utanför stänger, ↑/↓ bläddrar till förra och nästa tal och Enter (*Hela
+  listan* i telefonen) går till talets lista. Med dolda resultat står bara orden, och landslagens etiketter leder
+  till listorna som förut. Texterna står i
+  `public/rum-register-ord.js` och följer förklaringarna på Statistik.
+- **Talets lista** (`#lista:lag:pl:skapar`, `#lista:spelare:ch:assist`): divisionens lag eller spelare
   ordnade efter talet, med numret bara på den första vid lika tal (som skytteligan på tv:n), registrets rad med
   divisionerna överst (de ger samma lista där) och ←/→ till förra och nästa tal. Spelarlistan har dem som har spelat,
   över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna).
 - **Matchakten** har också matchsidans rader ur matchens fil: *Matcher 14 d* (med Europacuperna), *Hemma* och *Borta*
   (V–O–F), *Nollor*, *Utan mål*, *På mål*, *Mål mot xG* och *Insl. mot xG*, lagens främsta i *Assist* och *Segermål*
   (*Gula kort* där målens sort saknas) och *Domaren* med gula kort, frisparkar och hemmasegrar mot divisionens snitt.
-  Etiketterna leder till listorna i det första lagets division. Landslagen fick *Nollor* i lagkortet och matchakten.
+  Etiketterna förklarar talen, och listorna gäller det första lagets division. Landslagen fick *Nollor* i lagkortet och matchakten.
 - **Sökningen** hittar listorna på etiketten eller rubriken (*assist*, *xg*, *tur*), hela ordet eller början från fem
   bokstäver, så att de inte går före lag och spelare med liknande namn.
 

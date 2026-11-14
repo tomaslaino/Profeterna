@@ -242,7 +242,7 @@ window.RumRegister = (() => {
     return '<div class="rum-regn" id="rum-regn" role="dialog" aria-label="Datorn" tabindex="-1"><div class="reg-bak"></div><div class="reg-3d" id="reg-3d"></div>' +
       '<div class="reg-term" id="reg-term"><div class="reg-topp" id="reg-topp"></div><div class="reg-rull" id="reg-rull"><div id="reg-ut"></div></div>' +
       `<label class="tr reg-in"><span>${esc(SOK)}</span><input id="reg-fraga" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Sök spelare, lag eller möte"><i class="reg-mark"></i></label>` +
-      '<div class="reg-fot" id="reg-fot"></div><div class="reg-lin"></div></div>' +
+      '<div class="reg-fot" id="reg-fot"></div><div class="reg-fk" id="reg-fk" hidden></div><div class="reg-lin"></div></div>' +
       '<div class="reg-rad" id="reg-rad"><span id="reg-sp"></span></div></div>';
   }
 
@@ -262,6 +262,7 @@ window.RumRegister = (() => {
     const mark = root.querySelector('.reg-mark');
     const sp = root.querySelector('#reg-sp');
     const radEl = root.querySelector('#reg-rad');
+    const fkEl = root.querySelector('#reg-fk');
     if (!small || !ov || !term) return null;
     const mus = matchMedia('(hover: hover) and (pointer: fine)');
 
@@ -891,6 +892,158 @@ window.RumRegister = (() => {
       const d = LAGTAL.find((y) => y.k === k);
       return (d && LAGFLIK[d.del]) || 'oversikt';
     };
+    // ---------- förklaringarna ----------
+    //
+    // Ett tryck på ett tals etikett i lagkortet, spelarkortet eller
+    // matchakten öppnar en ruta över talen (sedan 2026-11-14, användarens val
+    // bland fyra skisser): vad talet är och hur det räknas, och ett exempel
+    // med lagets eller spelarens egna siffror (orden i rum-register-ord.js).
+    // Rutan lägger sig över raderna ovanför etiketten (under den när de inte
+    // räcker), med titeln i ramen, och täcker hela rader så att inga halva
+    // rader syns. Esc stänger, ↑/↓ bläddrar till förra och nästa tal och
+    // Enter (eller HELA LISTAN i telefonen) går till talets lista, dit
+    // etiketten ledde förut. Med dolda resultat står bara orden.
+    const ORD = () => window.RumRegisterOrd || null;
+    // talet bakom en etikett (#lista:lag:pl:tur), om det har en förklaring
+    function fkTal(q) {
+      const [typ, slag, , k] = String(q || '').slice(1).split(':');
+      const O = ORD();
+      return typ === 'lista' && O && O[slag] && O[slag][k] ? { q, slag, k } : null;
+    }
+    const fkSaker = () => valbara().filter((el) => fkTal(el.dataset.q));
+    // h till exemplen (rum-register-ord.js)
+    const hLag = (t) => ({ t, namn: o.kort(t.name), div: DIVNAME[t.comp], form: formLag(t.name).map((x) => x.l), sq: sqLag(t) });
+    const hSpelare = (x) => {
+      const l = A.P && A.P.lag.get(String(x.p.teamId));
+      return { p: x.p, namn: x.p.name, lag: o.kort(x.p.team), lagM: lagetsMal(x.p), lagN: l && l.coverage ? l.coverage.covered : null };
+    };
+    function fkInnehall(f) {
+      const O = ORD();
+      const ord = O[f.slag][f.k];
+      const def = (f.slag === 'spelare' ? SPTAL : LAGTAL).find((d) => d.k === f.k);
+      if (!def) return null;
+      const vy = A.vy;
+      // matchaktens rader som visar något annat än kortet (MÅL, xG)
+      const akt = vy.mote && f.slag === 'lag' ? O.akten[f.k] : null;
+      let e = (akt && akt.e) || def.e;
+      let n = (akt && akt.n) || def.n;
+      if (n.startsWith(`${e}: `)) n = n.slice(e.length + 2);
+      // (INSLÄPPTA MÅL MOT xG: hela namnet i ramen i stället för etiketten två gånger)
+      else if (n.startsWith(`${e} `)) { e = n; n = ''; }
+      if (n === e) n = '';
+      const exf = akt && 'ex' in akt ? akt.ex : ord.ex;
+      const S = A.R && A.R.veil;
+      const ex = [];
+      const pr = (h) => { try { const v = exf(h); if (v) ex.push(v); } catch (err) { /* ett exempel som inte går att räkna står inte */ } };
+      if (exf && !(S && S.veil)) {
+        if (vy.spelare) {
+          const x = A.P && A.P.spelare.find((y) => spId(y) === vy.spelare);
+          if (x) pr(hSpelare(x));
+        } else if (vy.lag) {
+          const t = lagOf(vy.lag);
+          if (t) pr(hLag(t));
+        } else if (vy.mote) {
+          const m = A.ms.find((x) => x.id === vy.mote);
+          for (const nm of m ? [m.home, m.away] : []) { const t = lagOf(nm); if (t) pr(hLag(t)); }
+        }
+      }
+      return { e, n, t: (akt && akt.t) || ord.t, ex };
+    }
+    // Tangenterna längst ner medan rutan står framme (tryckbara)
+    function fkFot() {
+      const l = fkSaker();
+      const i = l.findIndex((el) => el.dataset.q === A.fk.q);
+      const k = mus.matches;
+      const b = [
+        [k ? 'ESC STÄNG' : '◄ STÄNG', '#fk:0'],
+        [k ? '↑ FÖRRA TALET' : '▲ FÖRRA', i > 0 ? '#fk:-1' : null, i <= 0],
+        [k ? 'NÄSTA TALET ↓' : 'NÄSTA ▼', i >= 0 && i < l.length - 1 ? '#fk:1' : null, i < 0 || i >= l.length - 1],
+      ];
+      if (k) b.push(['↵ HELA LISTAN', `#ga:${A.fk.q}`]);
+      return b.map(([t, q, av]) => `<span${q ? ` class="a" data-q="${esc(q)}"` : av ? ' class="av"' : ''}>${esc(t)}</span>`).join('');
+    }
+    function fkRita() {
+      const f = A.fk;
+      const I = f && fkInnehall(f);
+      if (!I) { fkStang(); return; }
+      // undertiteln i ramen när den ryms där, annars överst i rutan
+      const iRamen = I.n && I.e.length + I.n.length + 8 <= A.bred;
+      fkEl.innerHTML = `<span class="fk-titel">${esc(I.e)}</span>${iRamen ? `<span class="fk-under d" style="left:${I.e.length + 3}ch">${esc(I.n)}</span>` : ''}` +
+        `<div class="fk-in">${I.n && !iRamen ? `<div class="d">${esc(I.n)}</div>` : ''}<div class="fk-txt">${esc(I.t)}</div>` +
+        I.ex.map((x) => `<div class="fk-txt fk-ex">${esc(x)}</div>`).join('') +
+        (mus.matches ? '' : `<div class="fk-ga"><span class="a" data-q="${esc(`#ga:${f.q}`)}">HELA LISTAN ►</span></div>`) + '</div>';
+      fot.innerHTML = fkFot();
+      fkPlats();
+    }
+    // Rutan över raderna ovanför etiketten, annars under; räcker inte raderna
+    // i kortet får den gå upp över kortets huvud (namnet och flikarna, inte
+    // menyraden). Räcker inte det heller (telefonen) börjar den under
+    // menyraden och täcker också raden den förklarar, och är den ändå för
+    // lång rullar den
+    function fkPlats() {
+      if (!A.fk) return;
+      const el = fkSaker().find((x) => x.dataset.q === A.fk.q);
+      const rad = el ? el.closest('.tr') || el : null;
+      const T = term.getBoundingClientRect();
+      const U = rull.getBoundingClientRect();
+      const rr = rad ? rad.getBoundingClientRect() : { top: U.top, bottom: U.top, height: 0 };
+      const h = rr.height || parseFloat(getComputedStyle(term).fontSize) * 1.12;
+      fkEl.hidden = false;
+      Object.assign(fkEl.style, { left: `${U.left - T.left}px`, width: `${U.width}px`, height: '', top: '0px' });
+      fkEl.classList.remove('rull');
+      const O = 0.62 * h;
+      const G = 0.12 * h;
+      fkEl.style.setProperty('--fk-o', `${O}px`);
+      let n = Math.ceil((fkEl.getBoundingClientRect().height + O + G) / h);
+      // raderna ovanför (i kortet och med huvudet) och under
+      const hr = topp.querySelector('.tr.hr');
+      const ovanKort = Math.floor((rr.top - U.top + 1) / h);
+      const ovan = Math.max(ovanKort, Math.floor((rr.top - (hr ? hr.getBoundingClientRect().bottom : U.top) + 1) / h));
+      const under = Math.floor((U.bottom - rr.bottom + 1) / h);
+      let top;
+      if (n <= ovanKort || (n > under && n <= ovan)) top = rr.top - n * h + O;
+      else if (n <= under) top = rr.bottom + O;
+      else {
+        top = rr.top - ovan * h + O;
+        if (n > ovan + 1 + under) { n = ovan + 1 + under; fkEl.classList.add('rull'); }
+      }
+      Object.assign(fkEl.style, { top: `${top - T.top}px`, height: `${n * h - O - G}px` });
+    }
+    // Kort och matchakter med förklaringar: klubbarnas (orden talar om ligan;
+    // landslagens etiketter leder till listorna som förut)
+    function fkHar() {
+      const vy = A.vy;
+      if (vy.mote) { const m = A.ms.find((x) => x.id === vy.mote); return Boolean(m && !isLand(m.comp)); }
+      if (vy.lag) return Boolean(lagOf(vy.lag));
+      if (vy.spelare) return !String(vy.spelare).startsWith('nl-');
+      return false;
+    }
+    // öppnar rutan för talet bakom etiketten q (false: talet har ingen förklaring)
+    function fkOppna(q) {
+      const f = fkTal(q);
+      if (!f || !fkHar()) return false;
+      A.fk = f;
+      const i = valbara().findIndex((el) => el.dataset.q === q);
+      if (i >= 0) valj(i);
+      fkRita();
+      return Boolean(A.fk);
+    }
+    function fkStang() {
+      if (!A.fk && fkEl.hidden) return;
+      A.fk = null;
+      fkEl.hidden = true;
+      fkEl.innerHTML = '';
+      if (A.R) fot.innerHTML = fotHtml(A.R);
+    }
+    // förra eller nästa tal i vyn, med rutan framme
+    function fkFlytta(d) {
+      if (!A.fk) return;
+      const l = fkSaker();
+      const i = l.findIndex((el) => el.dataset.q === A.fk.q);
+      const n = l[i + d];
+      if (i >= 0 && n) fkOppna(n.dataset.q);
+    }
+
     // Flikraden under namnet (i det som står still överst, så att den inte
     // flyttar sig när man rullar eller byter flik): den valda omvänd, en
     // flik utan något att visa svag och inte tryckbar. Tre mellanslag
@@ -1668,6 +1821,7 @@ window.RumRegister = (() => {
     // Skriver vyn: rad för rad som en terminal (utan när rummet ska vara
     // stilla), annars på en gång (när datan kommer in).
     function visa(vy, skriv) {
+      fkStang();
       A.vy = vy;
       A.sel = -1;
       // (en ny sökning börjar med alla träffar)
@@ -1771,6 +1925,10 @@ window.RumRegister = (() => {
         if (iSok) { A.kat = q.slice(5); visa(A.vy, false); valj(0, false); }
         return null;
       }
+      // förklaringarna: rutans tangenter, HELA LISTAN (#ga:#lista:…) och ett
+      // tals etikett i ett kort eller i matchakten
+      if (q.startsWith('#fk:')) { const d = Number(q.slice(4)); if (d) fkFlytta(d); else fkStang(); return null; }
+      if (q.startsWith('#ga:')) { fkStang(); q = q.slice(4); } else if (!iSok && fkOppna(q)) return null;
       if (iSok) { inp.value = ''; markor(); }
       if (q === '#bak') { if (iSok) { visa(fore, true); return null; } return tillbaka(); }
       if (q === '#stang') return o.close();
@@ -1847,6 +2005,7 @@ window.RumRegister = (() => {
         A.R = R;
         valj(sel, false);
         spoilerRad();
+        if (A.fk) fkRita();
       }
       if (!A.on) { A.R = R; A.ut = h; }
       // skärmen i rummet: menyraden och det som står i terminalen
@@ -1865,6 +2024,7 @@ window.RumRegister = (() => {
     }
     for (const ev of ['input', 'keyup', 'click', 'select', 'focus']) inp.addEventListener(ev, markor);
     inp.addEventListener('input', levande);
+    rull.addEventListener('scroll', () => { if (A.fk) fkPlats(); }, { passive: true });
 
     // ↑/↓: raden som Enter öppnar (de tryckbara raderna och namnen i ordning)
     const valbara = () => [...ut.querySelectorAll('[data-q]')].filter((el) => !el.closest('.kat'));
@@ -1888,6 +2048,14 @@ window.RumRegister = (() => {
       const k = e.key;
       const tomt = !inp.value;
       const iSok = A.vy.flik === 'sok';
+      // rutan med förklaringen: Esc stänger, ↑/↓ bläddrar, Enter går till
+      // listan; en annan tangent stänger den och gör som vanligt
+      if (A.fk) {
+        if (k === 'Escape') { fkStang(); return true; }
+        if (k === 'ArrowUp' || k === 'ArrowDown') { fkFlytta(k === 'ArrowDown' ? 1 : -1); return true; }
+        if (k === 'Enter' && !inp.value.trim()) { tryck(`#ga:${A.fk.q}`); return true; }
+        if (!['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(k)) fkStang();
+      }
       if (k === 'Enter') {
         const v = inp.value.trim();
         // i sökningen: den markerade träffen
@@ -2039,6 +2207,7 @@ window.RumRegister = (() => {
     function open(on, from) {
       if (on === A.on || !A.L) return Promise.resolve();
       A.on = on;
+      fkStang();
       if (on) {
         loadMatches();
         loadPlayers();
@@ -2104,6 +2273,7 @@ window.RumRegister = (() => {
     ov.addEventListener('click', (e) => {
       if (!A.on || !ov.classList.contains('framme')) return;
       if (e.target.closest('a[href], .sp-show')) return;
+      if (A.fk && !e.target.closest('.reg-fk, [data-q]')) { fkStang(); if (mus.matches) inp.focus({ preventScroll: true }); return; }
       const q = e.target.closest('[data-q]');
       if (q) { tryck(q.dataset.q); if (mus.matches) inp.focus({ preventScroll: true }); return; }
       if (e.target.closest('.reg-term')) {
