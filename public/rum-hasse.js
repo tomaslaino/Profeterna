@@ -2942,14 +2942,14 @@ window.RumHasse = (() => {
     if (!fel || !fel.length) return namn;
     return [...ord.slice(0, -1), fast(fel, `${omgang}:${sist}:namn`)].join(' ');
   }
-  // Vad han kallar någon i domen. Vinnaren kan han: han lär sig bara namnen på dem som lyckas. De andra säger han
-  // fel om i nio domar av tio. I var nionde dom med fel börjar han rätt och tappar namnet efter första meningen
+  // Vad han kallar någon i domen. Han säger fel om var och en i nio domar av tio, också om den som vann. I var
+  // nionde dom med fel börjar han rätt och tappar namnet efter första meningen
   // med det, som om han slutade lyssna. Samma omgång och person ger samma svar, så att domen är densamma varje
   // gång och på alla enheter.
   // → { forst, sedan }: namnet i första meningen med namnet, och i resten.
   function domNamn(p, sum) {
     const nyckel = `${sum.id}:${p.id}`;
-    if (p.bast || fast([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], `${nyckel}:fel`) === 0) return { forst: p.namn, sedan: p.namn };
+    if (fast([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], `${nyckel}:fel`) === 0) return { forst: p.namn, sedan: p.namn };
     const fel = felNamn(p.namn, sum.id);
     return { forst: fast([0, 1, 2, 3, 4, 5, 6, 7, 8], `${nyckel}:tappar`) ? fel : p.namn, sedan: fel };
   }
@@ -3038,7 +3038,7 @@ window.RumHasse = (() => {
     const d = r.domar;
     const s = d.sak;
     const tal = (n) => r.tal[n] || String(n);
-    // (den som vann kan han; de andra kallar han ibland fel, se domNamn. Namnet sätts in sist, när meningarna står
+    // (nästan alltid kallar han er fel, se domNamn. Namnet sätts in sist, när meningarna står
     // i ordning, så att det kan bytas efter den första meningen med namnet, men aldrig mitt i en mening)
     const { forst, sedan } = domNamn(p, sum);
     const NAMN = '\u0001';

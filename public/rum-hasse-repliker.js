@@ -1103,7 +1103,7 @@
     sistLika: ['Snuvad', 'Lurad', 'Blåst', 'Rånad', 'Bestulen', 'Avundsjuk', 'Bitter', 'Sur', 'Kränkt', 'Upprörd'],
     inget: ['Klok', 'Vis', 'Sparsam', 'Snål', 'Ledig', 'Bortrest', 'Saknad', 'Glömsk', 'Upptagen', 'Lat'],
   },
-  // Namnen han nästan kan. I nio fall av tio säger han ett av dem, i domen (aldrig om den som vann) och
+  // Namnen han nästan kan. I nio fall av tio säger han ett av dem, i domen (också om den som vann) och
   // när han hälsar på dig (felNamn och domNamn i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
   // Felen är sådana som den gör som inte bryr sig: ett namn som låter likadant, ett han kan bättre någon
   // annanstans ifrån (Laine, Tegnér, Tegnell, Mogge, och fotbollens Litmanen, Snejder och Diego), det
