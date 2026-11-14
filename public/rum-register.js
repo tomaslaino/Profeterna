@@ -7,8 +7,9 @@
 // står på anslagstavlan (rum-anslag.js), ordnat efter match, lag och spelare.
 //
 // Överst står menyraden, som alltid står still:
-//   KUPONGEN   omgångens matcher, med divisionen och avsparken där raden
-//              ryms; en match öppnar matchakten:
+//   KUPONGEN   omgångens matcher i avdelningar efter tävlingen (namnet en
+//              gång, till vänster eller som rubrik), med avsparken på varje
+//              rad; en match öppnar matchakten:
 //              allt om matchen på ett ställe – lagen sida vid sida med formen
 //              och dess motstånd (hur bra de fem motståndarna var i snitt,
 //              0–100 från lagets egen divisions svagaste lag till dess
@@ -203,7 +204,9 @@ window.RumRegister = (() => {
   //
   // En rad är en lista av bitar [text, klass, fråga]: klass '' (grönt), d
   // (svagt), v (ljust) eller i (omvänt); fråga gör biten tryckbar. En rad med
-  // .q är tryckbar i sin helhet, och [['', 'hr']] är ett streck.
+  // .q är tryckbar i sin helhet, och [['', 'hr']] är ett streck. En rad med
+  // .kl får klassen (ny: ett tunt streck ovanför, rub: en rubrik med streck
+  // efter, rum-register.css).
 
   const tom = () => [];
   const rad = (...b) => b.map((x) => (Array.isArray(x) ? x : [x, '']));
@@ -217,7 +220,7 @@ window.RumRegister = (() => {
 
   function html(rader) {
     return rader.map((r) => (r.length === 1 && r[0][1] === 'hr' ? '<div class="tr hr"></div>'
-      : `<div class="tr${r.q ? ' a' : ''}${r.kat ? ' kat' : ''}"${r.q ? ` data-q="${esc(r.q)}"` : ''}>${r.map(bit).join('')}</div>`)).join('');
+      : `<div class="tr${r.q ? ' a' : ''}${r.kat ? ' kat' : ''}${r.kl ? ` ${r.kl}` : ''}"${r.q ? ` data-q="${esc(r.q)}"` : ''}>${r.map(bit).join('')}</div>`)).join('');
   }
 
   // ---------- duken och närbilden ----------
@@ -399,28 +402,46 @@ window.RumRegister = (() => {
     }
     const nrAv = (m) => A.ms.indexOf(m) + 1;
 
-    // Kupongen: omgångens matcher, bara lagen, på datorn divisionen och
-    // avsparken. Avsparken står bara där den skiljer sig från raden ovanför,
-    // som i en tidtabell, och i telefonen, där divisionen inte ryms, står den
-    // ensam. Formen och dess motstånd står i matchakten (2026-11-13,
-    // användarens önskemål: "mindre rörig").
+    // Kupongen: omgångens matcher i kupongens ordning, i avdelningar efter
+    // tävlingen (2026-11-14, användarens val bland fem skisser): tävlingens
+    // namn står en gång – på datorn i en spalt till vänster med ett tunt
+    // streck mellan avdelningarna, i telefonen (där spalten inte ryms) som en
+    // rubrik med streck efter. Raden har numret, lagen, gruppen för en
+    // landskamp (B4) och avsparken, på varje rad. Tävlingarna står i den
+    // ordning de först kommer i kupongen och matcherna i kupongens ordning
+    // inom dem, så att en omgång i avsparkens ordning (mellan omgångarna,
+    // en kupong som valts för hand) inte delas i flera avdelningar med samma
+    // tävling – numren hoppar då. Formen och dess motstånd står i matchakten
+    // (2026-11-13, användarens önskemål: "mindre rörig").
     function kupongen(R) {
       if (!A.ms.length) return [rad('INGEN OMGÅNG')];
       const w = 11;
-      // 35 tecken med avsparken (39 när omgången går flera dagar); divisionen
-      // står när den ryms, i en spalt så bred som omgångens längsta
-      const div = (m) => (isLand(m.comp) ? landDiv(m) : DIVK[m.comp] || up(m.comp || ''));
-      const d0 = Math.max(...A.ms.map((m) => div(m).length));
+      const grupp = (m) => (isLand(m.comp) ? landDiv(m).replace(/^\S+\s*/, '') : '');
+      const g0 = Math.max(...A.ms.map((m) => grupp(m).length));
       const t0 = Math.max(...A.ms.map((m) => tid(m).length));
-      const bred = A.bred >= 3 + w + 3 + w + 3 + d0 + 3 + t0;
+      const avd = [];
+      for (const m of A.ms) {
+        const a = avd.find((x) => x.comp === m.comp);
+        if (a) a.ms.push(m);
+        else avd.push({ comp: m.comp, ms: [m] });
+      }
+      const L = Math.max(...avd.map((a) => tavNamn(a.comp).length)) + 4;
+      // numret och lagen är 28 tecken; tävlingen i en spalt när den ryms, och
+      // gruppen när den ryms (inte i telefonen när omgången går flera dagar)
+      const spalt = L + 28 + (g0 ? 3 + g0 : 0) + 3 + t0 <= A.bred;
+      const mellan = spalt ? '   ' : '  ';
+      const medGrupp = g0 > 0 && (spalt || 28 + 2 + g0 + 2 + t0 <= A.bred);
       const r = [rad([omgDatum(), 'd']), tom()];
-      let forra = '';
-      A.ms.forEach((m, i) => {
-        R.nr[i + 1] = `#mote:${m.id}`;
-        const t = tid(m);
-        r.push(radQ(`#mote:${m.id}`, [`${padL(i + 1, 2)} `, 'd'], padL(kort(m.home).slice(0, w), w), [' – ', 'd'], pad(kort(m.away).slice(0, w), w),
-          ...(bred ? [[`   ${pad(div(m), d0)}   `, 'd']] : [['  ']]), [t === forra ? '' : t, 'd']));
-        forra = t;
+      avd.forEach((a, j) => {
+        if (!spalt) r.push(Object.assign(rad([tavNamn(a.comp), 'd']), { kl: 'rub' }));
+        a.ms.forEach((m, i) => {
+          const nr = nrAv(m);
+          R.nr[nr] = `#mote:${m.id}`;
+          const x = radQ(`#mote:${m.id}`, ...(spalt ? [[pad(i ? '' : tavNamn(a.comp), L), 'd']] : []),
+            [`${padL(nr, 2)} `, 'd'], padL(kort(m.home).slice(0, w), w), [' – ', 'd'], pad(kort(m.away).slice(0, w), w),
+            [`${mellan}${medGrupp ? `${pad(grupp(m), g0)}${mellan}` : ''}`, 'd'], [tid(m), 'd']);
+          r.push(spalt && j && !i ? Object.assign(x, { kl: 'ny' }) : x);
+        });
       });
       return r;
     }
