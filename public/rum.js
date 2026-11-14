@@ -658,25 +658,26 @@ window.Rum = (() => {
     if (window.RumHasse) RumHasse.oppna();
   }
 
-  // Röken som har lagt sig i skikt under taket, och dammet som syns i ljuset.
+  // Röken som har lagt sig under taket, och dammet som syns i ljuset.
   function haze() {
     return `<div class="rum-rok"><canvas width="${ROK.b * ROK.k}" height="${ROK.h * ROK.k}"></canvas></div>` +
       '<canvas class="rum-damm" id="rum-damm" width="800" height="500"></canvas>';
   }
   // Röken står still: den målas en gång, i en fjärdedels upplösning, och inget i
   // den rör sig (det som glider ritas om i varje bildruta). Ett tunt dis, tätast
-  // under taket, tunna skikt ovanför huvudena och lite ljus från lysröret och
-  // neonen. Lagret ligger i gängets plan (−330), framför fönstret, tv:n och
+  // under taket, ett tunt skikt där och lite ljus från lysröret (samma dis
+  // ligger på väggen bakom Hasse Backe, rok i rum-hasse.js). Lagret ligger i
+  // gängets plan (−330), framför fönstret, tv:n och
   // väggen men bakom pulten, i planets mått x −400…2000 och y −60…300
   // (.rum-rok i rum.css), och tonar ut mot kanterna: uppåt vid taket och nedåt
-  // strax under skikten, så att det täcker så lite av bilden som möjligt.
+  // en bit ned på väggen, så att det täcker så lite av bilden som möjligt.
   const ROK = { x: -400, y: -60, b: 2400, h: 360, k: 0.25 };
   function rok(c) {
     const g = c && c.getContext('2d');
     if (!g) return;
     const { x: x0, y: y0, b, h, k } = ROK;
     g.setTransform(k, 0, 0, k, -x0 * k, -y0 * k);
-    let fro = 11;
+    let fro = 7;
     const slump = () => (fro = (fro * 1664525 + 1013904223) >>> 0) / 4294967296;
     // ett mjukt moln: en utsträckt radiell gradient
     const moln = (x, y, rx, ry, a, f = '198, 202, 208', vrid = 0) => {
@@ -701,23 +702,19 @@ window.Rum = (() => {
       }
     };
     // disets gradient (kanterna tonas nedan)
-    const dis = g.createLinearGradient(0, 0, 0, 600);
-    dis.addColorStop(0, 'rgba(190, 196, 206, 0.07)');
-    dis.addColorStop(0.45, 'rgba(190, 196, 206, 0.03)');
+    const dis = g.createLinearGradient(0, 0, 0, 300);
+    dis.addColorStop(0, 'rgba(190, 196, 206, 0.11)');
+    dis.addColorStop(0.6, 'rgba(190, 196, 206, 0.055)');
     dis.addColorStop(1, 'rgba(190, 196, 206, 0)');
     g.fillStyle = dis;
     g.fillRect(x0, y0, b, h);
     for (const [x, y, rx, ry, a] of [[570, 50, 420, 70, 1], [980, 70, 380, 60, 0.8], [260, 90, 300, 55, 0.7], [1350, 50, 360, 70, 0.8], [760, 120, 340, 40, 0.6], [-60, 60, 300, 70, 0.6], [1650, 90, 260, 60, 0.5]]) {
-      moln(x + (slump() - 0.5) * 40, y, rx, ry, 0.12 * a);
+      moln(x + (slump() - 0.5) * 40, y, rx, ry, 0.14 * a);
     }
-    skikt(95, -300, 1900, 0.17, 11);
-    skikt(108, -200, 1700, 0.09, 7);
-    skikt(185, -250, 1850, 0.14, 9);
-    skikt(270, 50, 1550, 0.1, 8);
-    // lysröret (x 345–935) och neonen (x 345–510, y 145–205) lyser upp röken
-    moln(640, 70, 400, 70, 0.09, '245, 242, 228');
-    moln(640, 110, 330, 110, 0.045, '245, 242, 228');
-    moln(425, 175, 150, 70, 0.05, '255, 80, 60');
+    skikt(70, -300, 1900, 0.06, 18);
+    // lysröret (x 345–935) lyser upp röken
+    moln(640, 70, 400, 70, 0.08, '245, 242, 228');
+    moln(640, 110, 330, 110, 0.04, '245, 242, 228');
     // kanterna
     g.globalCompositeOperation = 'destination-in';
     const sida = g.createLinearGradient(x0, 0, x0 + b, 0);

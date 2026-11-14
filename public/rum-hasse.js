@@ -478,9 +478,58 @@ window.RumHasse = (() => {
     }
     x.globalAlpha = 1;
     x.globalCompositeOperation = 'source-over';
+    rok(x, W, Hh, l);
     H.vy.classList.add('vagg');
     H.vaggNr = (H.vaggNr || 0) + 1;
     return c;
+  }
+  // Röken som i rummet (rok i rum.js): ett tunt dis som är tätast upptill, moln och ett tunt skikt där och lite
+  // ljus från lysröret, på väggens duk bakom honom när den ritas, så att inget nytt lager behövs och inget ritas
+  // om. Diset målas en gång i en fjärdedels upplösning (det är mjukt ändå) och läggs sedan på som en bild.
+  // Molnen är lika stora i bild som rummets (bilden på höjden visas större), och på natten, när lysröret är
+  // släckt, är röken lika mörk som allt annat här (natten() i rum-hasse-arm.js).
+  function rok(x, W, Hh, l) {
+    let d = H.rokDuk;
+    if (!d || d.som !== `${W}x${Hh}`) {
+      const k = 0.25;
+      d = H.rokDuk = document.createElement('canvas');
+      d.som = `${W}x${Hh}`;
+      d.width = Math.ceil(W * k);
+      d.height = Math.ceil(Hh * k);
+      const r = d.getContext('2d');
+      r.scale(k, k);
+      const u = H.hog ? 1.6 : 1;
+      let fro = 7;
+      const slump = () => (fro = (fro * 1664525 + 1013904223) >>> 0) / 4294967296;
+      const moln = (cx, cy, rx, ry, a, f = '198, 202, 208') => {
+        r.save();
+        r.translate(cx, cy);
+        r.scale(rx, ry);
+        const g = r.createRadialGradient(0, 0, 0, 0, 0, 1);
+        g.addColorStop(0, `rgba(${f}, ${a})`);
+        g.addColorStop(0.5, `rgba(${f}, ${a * 0.45})`);
+        g.addColorStop(1, `rgba(${f}, 0)`);
+        r.fillStyle = g;
+        r.fillRect(-1, -1, 2, 2);
+        r.restore();
+      };
+      const dis = r.createLinearGradient(0, 0, 0, Hh * 0.55);
+      dis.addColorStop(0, 'rgba(190, 196, 206, 0.11)');
+      dis.addColorStop(0.6, 'rgba(190, 196, 206, 0.055)');
+      dis.addColorStop(1, 'rgba(190, 196, 206, 0)');
+      r.fillStyle = dis;
+      r.fillRect(0, 0, W, Hh * 0.55);
+      for (let i = 0; i < 7; i++) moln(W * (i + 0.5) / 7 + (slump() - 0.5) * 0.05 * W, Hh * (0.04 + 0.08 * slump()), (140 + 60 * slump()) * u, (26 + 14 * slump()) * u, 0.14 * (0.6 + 0.4 * slump()));
+      const y = Hh * 0.1;
+      const fas = slump() * 6;
+      for (let cx = -60 * u; cx < W + 60 * u; cx += (12 + 14 * slump()) * u) {
+        moln(cx, y + Math.sin(cx / (78 * u) + fas) * 5 * u + (slump() - 0.5) * 4 * u, (32 + 50 * slump()) * u, 8 * u * (0.6 + 0.8 * slump()), 0.06 * (0.5 + 0.7 * slump()));
+      }
+      moln(W * 0.55, 0, 260 * u, 45 * u, 0.08, '245, 242, 228');
+    }
+    x.globalAlpha = 1 - 0.58 * (1 - l.k) * (1 - l.dag);
+    x.drawImage(d, 0, 0, W, Hh);
+    x.globalAlpha = 1;
   }
   // Väggen står som den ska: samma fönster (på bredden eller höjden), ljus och väder som när den ritades.
   const vaggSom = (l) => { const f = H.vaggLjus; return Boolean(f && H.vaggBild && f.hog === H.hog && Math.abs(l.k - f.k) < 0.004 && Math.abs(l.f - f.f) < 0.01 && Math.abs(l.dag - f.dag) < 0.01 && uteSig() === H.uteSig); };

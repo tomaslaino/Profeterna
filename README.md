@@ -4857,10 +4857,12 @@ sekunder blinkar det igång (1,2 s). En gång per sidvisning, och inte med
 **Rummet rör sig också:** utanför rutan och dörren är det Stockholms tid och väder (se
 nedan), neonen glappar ibland, damm syns i ljuset och stationsurets
 sekundvisare hoppar fram. Röken har däremot lagt sig och står still (`rok` i rum.js): ett
-tunt dis som är tätast under taket, tunna skikt ovanför huvudena och lite ljus från lysröret och
-neonen, målat en gång i gängets plan. Det som rör sig ritas om i varje bildruta, och förut
-gled fyra rökmoln där hela tiden. Lagret slutar strax under skikten och täcker så lite av
-bilden som möjligt, och nära tv:n och videon tonas röken bort så att det som står där går att läsa.
+tunt dis som är tätast under taket, ett tunt skikt där och lite ljus från lysröret, målat en gång
+i gängets plan. Det som rör sig ritas om i varje bildruta, och förut gled fyra rökmoln där hela
+tiden. Lagret slutar en bit ned på väggen och täcker så lite av bilden som möjligt, och nära tv:n
+och videon tonas röken bort så att det som står där går att läsa. Samma dis ligger på väggen bakom
+Hasse Backe (`rok` i rum-hasse.js), målat på väggens duk när den ritas, och är lika mörkt som allt
+annat där när lysröret är släckt.
 Bakväggen är klädd med lackad furupanel (`furu` i rum.js):
 bräder med kvistar och ådring, mörka av röken upptill och ljusare under lysröret och där en
 tavla har hängt runt ramen. Disken längs högra väggen är en bardisk som i en pub, i three.js
