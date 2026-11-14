@@ -1662,7 +1662,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const studsA = (t, h) => [t, [slagAr.W[0], slagAr.W[1] + h, slagAr.W[2]], ...SLAG_A.slice(1)];
   const studsB = (t, h) => [t, [slagBr.W[0], slagBr.W[1] + h, slagBr.W[2]], ...SLAG_B.slice(1)];
   // fingrarnas krok när han håller cigarren (ring- och lillfingret böjs mer, EXTRA_C)
-  const KG = 0.3;
+  const KG = 0.345;
   // tummen (0 mot handen, 1 ut)
   const TUMME = 0.45;
   // I vilan ligger fingrarna lite samlade (SAMLA: 0 som när han gestikulerar, 1 raka bredvid varandra) och
@@ -3751,11 +3751,16 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // Greppet (handens mått, skalad som handen): löst i fingertopparna, tummen under och pek- och
   // långfingret ovanpå, ring- och lillfingret böjda in mot handflatan. I cigarrens läge är x fingrarnas
   // riktning, y från huvudet mot glöden och z ut ur handflatan. (Förut låg den djupt i den krökta handen,
-  // och fingrarna såg ut att hänga i den som i en stång.)
-  const GREPP = new THREE.Vector3(52, 178, 82).multiplyScalar(HAND.SK);
+  // och fingrarna såg ut att hänga i den som i en stång.) Tummen och pek- och långfingrets yttersta
+  // leder ligger an mot cigarren, tummen mitt emot pekfingret. EXTRA_C: mer böjning per finger, hur
+  // mycket mer de spretar (grader: pek- och långfingret ihop, ring- och lillfingret in mot dem) och
+  // tummen lite mer böjd (e8 negativ), så att den når cigarren; se bojFingrar i rum-hasse-arm.js.
+  // (Till 2026-11-14 nådde tummen den inte alls, tio enheter ifrån, och pek- och långfingrets toppar
+  // gick in i den: den hängde i fingertopparna, och fingrarna spretade som en klo.)
+  const GREPP = new THREE.Vector3(56, 163, 83.5).multiplyScalar(HAND.SK);
   const SG = 60;
-  const EXTRA_C = [0, 0.03, 0.45, 0.55];
-  const extraC = [0, 0, 0, 0];
+  const EXTRA_C = [0, 0.03, 0.65, 0.8, -5, -0.9, 3.4, 8.7, -0.116];
+  const extraC = new Array(9).fill(0);
   const mq = new THREE.Matrix4();
   const nyPose = () => ({ p: v(), q: new THREE.Quaternion() });
   const pA_ = v();
@@ -3789,17 +3794,24 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     fA.crossVectors(F, P).negate().normalize();
     return pose(ut, H.clone().addScaledVector(fA, -GREPP.x).addScaledVector(F, GREPP.y).addScaledVector(P, GREPP.z), fA, P);
   }
+  // handen vriden runt cigarrens längd (grader), med cigarren kvar där den är
+  const vridQ = new THREE.Quaternion();
+  const vrid = (ut, grad) => { ut.q.multiply(vridQ.setFromAxisAngle(V3(0, 1, 0), grad * DEG)); return ut; };
+  // (hall vriden 22° så att knogarna och fingrarnas ryggar vetter mot en och fingrarna ligger över
+  // cigarren, se bara 10°, annars for armbågen fort därifrån till munnen, och vift 25° åt andra hållet
+  // så att han håller den från sidan: förut såg man in i handflatan, och fingrarna krokade över
+  // cigarren bakifrån med naglarna mot en, som en klo)
   const PV = {
     vila: pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, P_VILA),
     // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt och lite uppåt
-    hall: fraHand(nyPose(), V3(-310, 165, 540), V3(0.4, 0.82, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()),
+    hall: vrid(fraHand(nyPose(), V3(-310, 165, 540), V3(0.4, 0.82, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()), -22),
     // lite högre och vriden, glöden uppåt: han tittar på den
-    se: fraHand(nyPose(), V3(-290, 215, 560), V3(0.3, 0.85, 0.43).normalize(), V3(0.1, -0.48, 0.87).normalize()),
+    se: vrid(fraHand(nyPose(), V3(-290, 215, 560), V3(0.3, 0.85, 0.43).normalize(), V3(0.1, -0.48, 0.87).normalize()), -10),
     // framför bröstet under hakan, snett uppåt, så att han ser ringen när han beundrar den
     visa: pose(nyPose(), V3(10, 310, 790), V3(-0.6, 0.6, 0.5).normalize(), V3(0.2, -0.5, 0.85)),
     // fram mot en, glöden mot en (vift2 lite högre: knycken)
-    vift: pose(nyPose(), V3(-160, 180, 800), V3(-0.55, 0.25, 0.8).normalize(), V3(0.3, -0.9, 0.2)),
-    vift2: pose(nyPose(), V3(-150, 215, 830), V3(-0.5, 0.4, 0.77).normalize(), V3(0.3, -0.85, 0.3)),
+    vift: vrid(pose(nyPose(), V3(-160, 180, 800), V3(-0.55, 0.25, 0.8).normalize(), V3(0.3, -0.9, 0.2)), 25),
+    vift2: vrid(pose(nyPose(), V3(-150, 215, 830), V3(-0.5, 0.4, 0.77).normalize(), V3(0.3, -0.85, 0.3)), 25),
   };
   // Över askkoppen, med glöden över skålen och cigarren snett nedåt ut från handen; han knackar av
   // askan med ett kort ryck nedåt (knackN).
@@ -4174,7 +4186,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.krok = spar(c.krok, t);
     a.peka = 0;
     const g = bump(c.grepp, t);
-    for (let i = 0; i < 4; i++) extraC[i] = EXTRA_C[i] * g;
+    for (let i = 0; i < 9; i++) extraC[i] = EXTRA_C[i] * g;
     return extraC;
   }
   // ---------- elden ----------
@@ -4194,7 +4206,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const GS = new THREE.Vector3(34, 166, 62).multiplyScalar(HAND.SK / 0.92);
   const VS = 37 * DEG;
   const EXTRA_E = [0, 0.06, 0.5, 0.62];
-  const extraE = [0, 0, 0, 0];
+  const extraE = new Array(9).fill(0);
   const E_UPP = new THREE.Vector3(0, 1, 0);
   const eM = new THREE.Matrix4();
   const eV = Array.from({ length: 8 }, () => new THREE.Vector3());
@@ -4483,7 +4495,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.peka *= 1 - mot;
     bortA = Math.max(bortA, mot);
     styrA = Math.max(styrA, ss(0, 0.35, mot));
-    for (let i = 0; i < 4; i++) extraE[i] = (ex0 ? ex0[i] : 0) * (1 - mot) + EXTRA_E[i] * mot;
+    for (let i = 0; i < 9; i++) extraE[i] = (ex0 ? ex0[i] || 0 : 0) * (1 - mot) + (EXTRA_E[i] || 0) * mot;
     return extraE;
   }
   // ---------- pennan ----------
@@ -4635,7 +4647,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         : 0.1 + (VILA_A[4] - 0.1) * ss(lg + 0.2, T - 0.1, tau);
     a.peka = 0;
     const g = ss(SKRIV.MOT - 0.2, SKRIV.MOT, tau) * (1 - ss(lg - 0.1, lg + 0.1, tau));
-    for (let i = 0; i < 4; i++) extraC[i] = [0, 0.04, 0.16, 0.26][i] * g;
+    for (let i = 0; i < 9; i++) extraC[i] = i < 4 ? [0, 0.04, 0.16, 0.26][i] * g : 0;
     void E;
     return extraC;
   }
