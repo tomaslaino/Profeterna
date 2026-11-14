@@ -1603,6 +1603,10 @@
     'Jag vågar inte',
     'Jag vill inte veta',
     'Jag är inte värdig',
+    'Jag är ovärdig',
+    // (Ni som man sa förr i en tobaksaffär)
+    'Ni är för vänlig',
+    'Ni är för generös',
   ],
   // Trycker man på knappen bredvid (angra).
   gissar: [
