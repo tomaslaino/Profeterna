@@ -2304,7 +2304,12 @@ window.RumHasse = (() => {
       return;
     }
     if (!v || ms < v.nasta) return;
-    if (v.i >= v.rader.length) { H.prat = null; return; }
+    if (v.i >= v.rader.length) {
+      // (mitt i omgången fortsätter han, glesare, så länge någon av hans matcher pågår: igen i lagetNu)
+      const mer = v.igen && v.igen();
+      if (!mer) { H.prat = null; return; }
+      Object.assign(v, mer, { i: 0 });
+    }
     // (går radion i rummet säger han något om den, en gång per station, i stället för nästa rad)
     const radio = omRadion();
     if (radio) {
@@ -2836,6 +2841,41 @@ window.RumHasse = (() => {
     const z = spridning ? (l.ratt - p.reduce((a, q) => a + q, 0)) / spridning : 0;
     return z >= BRA && l.ratt * 2 > l.av ? 'bra' : z <= -BRA ? 'daligt' : 'mitten';
   }
+  // Matchminuten ur liveställningen (ESPN skriver 67', 45'+2' och HT). → { min, paus } eller null
+  function matchTid(r) {
+    const c = String((r && r.clock) || '');
+    if (/^HT\b|half/i.test(c)) return { min: 45, paus: true };
+    const m = /^(\d+)'/.exec(c);
+    return m ? { min: Number(m[1]), paus: false } : null;
+  }
+  // (haller och hallerLika ihop, samma lista varje gång så att lott inte upprepar sig)
+  const IHOP = new WeakMap();
+  function ihop(a, b) {
+    const l = IHOP.get(a);
+    if (l && l.b === b) return l.lista;
+    const lista = [...a, ...b];
+    IHOP.set(a, { b, lista });
+    return lista;
+  }
+  // Vad han säger om ställningen: haller eller emot, eller ibland en lista för var i matchen man är. Slut,
+  // halvtid och slutminuterna har alltid sin egen lista (där passar inte "Matchen är inte slut än"), de
+  // andra lägena bara ibland, så att de vanliga raderna också hörs. → en lista ur stallning
+  function kommentar(x, lika) {
+    const S = REP().stallning;
+    const s = x.r.score;
+    const bas = x.pa ? (lika && x.r.sign.length === 1 ? ihop(S.haller, S.hallerLika) : S.haller) : lika ? S.emotLika : S.emot;
+    const egen = (k) => (Array.isArray(S[k]) && S[k].length ? S[k] : bas);
+    const t = matchTid(x.r);
+    if (!x.live) return egen(x.pa ? 'slutRatt' : 'slutFel');
+    if (t && t.paus) return egen(x.pa ? 'halvtidHaller' : 'halvtidEmot');
+    if (t && t.min >= 80) return egen(x.pa ? 'sentHaller' : 'sentEmot');
+    if (Math.random() < 0.3) return bas;
+    if (t && t.min <= 20) return egen(x.pa ? 'tidigtHaller' : 'tidigtEmot');
+    // (spelbolagen gav hans ensamma tecken under 30 procent; ett kryss är ingen skräll förrän i andra halvlek)
+    if (x.pa && x.r.sign.length === 1 && x.r.p != null && x.r.p < 30 && (!lika || (t && t.min >= 60))) return egen('skrall');
+    if (!lika && Math.abs(s.home - s.away) >= 2) return egen(x.pa ? 'storHaller' : 'storEmot');
+    return bas;
+  }
   // Ställningen i en match och hans kommentar. → { lista, gest }
   function omMatchen(x) {
     const S = REP().stallning;
@@ -2848,8 +2888,9 @@ window.RumHasse = (() => {
       // (den som leder först: Burnley leder med 2–0)
       res: lika ? `${s.home}–${s.away}` : `${Math.max(s.home, s.away)}–${Math.min(s.home, s.away)}`,
     };
-    const dom = x.pa ? (lika && x.r.sign.length === 1 ? [...S.haller, ...S.hallerLika] : S.haller) : lika ? S.emotLika : S.emot;
-    return { lista: [{ text: fyll(lott(lika ? S.lika : S.leder), o), paus: 1400 }, { text: lott(dom) }] };
+    // (är matchen slut säger han hur den slutade: Burnley vann med 2–0 mot Leeds)
+    const stand = !x.live && S.vann && S.slutLika ? (lika ? S.slutLika : S.vann) : lika ? S.lika : S.leder;
+    return { lista: [{ text: fyll(lott(stand), o), paus: 1400 }, { text: lott(kommentar(x, lika)) }] };
   }
   // En match i taget, helst en som pågår och som han inte har tagit nyss. → { lista } eller null
   function enMatch(lista, tips) {
@@ -2875,15 +2916,23 @@ window.RumHasse = (() => {
     if (!l || l.dolt || !l.av) return false;
     const lage = stallningsLage(l);
     const tal = REP().tal;
+    // (är det bara några minuter kvar, eller pågår ingen av hans matcher just nu, passar inget om andra
+    // halvlek eller gott om tid: mittenSent och daligtSent)
+    const sent = l.live.every((x) => { const t = matchTid(x.r); return t && !t.paus && t.min >= 75; });
+    const omLaget = (sent && S[`${lage}Sent`]) || S[lage];
     // (med en enda match att räkna blir det "en rätt av en": då tar han den matchen direkt)
     if (l.av < 2) sagRader(enMatch(lista, tips));
     else {
-      repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(S[lage]) }],
+      repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(omLaget) }],
         { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'blinka', mitten: 'brynet', daligt: 'suck' }[lage]) });
     }
     const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);
     const rader = [match, match, extra ? () => lott(extra) : match, match, match, match];
-    H.prat = { rader, i: 0, nasta: performance.now() + 20000, gang: 20000 };
+    // När de är sagda fortsätter han med en match i taget var 40:e sekund, så länge någon av hans matcher
+    // pågår (pratSteg). Mål och slutsignaler säger han ändå direkt (malKo).
+    const igen = [match, match, extra ? () => lott(extra) : match];
+    const pagar = () => { const n = levande(lista, tips); return Boolean(n && !n.dolt && n.live.length); };
+    H.prat = { rader, i: 0, nasta: performance.now() + 20000, gang: 20000, igen: () => (pagar() ? { rader: igen, gang: 40000 } : null) };
     return true;
   }
   // Var femte sekund medan listan syns mitt i omgången: har något ändrats ritas listan om, och har det blivit
@@ -2899,12 +2948,14 @@ window.RumHasse = (() => {
     if (!forut) return;
     let andrat = ny.size !== forut.size;
     let mal = null;
+    let slut = null;
     for (const x of l.rader) {
       const a = forut.get(x.m.id);
       const b = ny.get(x.m.id);
       if (!a || a.h !== b.h || a.b !== b.b || a.live !== b.live) andrat = true;
       // (mål i en match som har hunnit sluta säger han inget om: då säger han hur det gick)
       if (a && b.live && b.h + b.b > a.h + a.b) mal = { x, a, b };
+      if (a && a.live && !b.live) slut = { x, b };
     }
     if (!andrat) return;
     const lst = $('.rh-lista');
@@ -2924,6 +2975,13 @@ window.RumHasse = (() => {
       const hur = fattas(b, true) < fattas(a, true) || (!fattas(b, true) && fattas(b, false) > fattas(a, false)) ? 'malBra' : !fattas(b, true) ? 'malLugn' : 'malFel';
       const match = matchNamn(lagKort(x.r.m.home), lagKort(x.r.m.away));
       H.malKo = [{ lista: [{ text: fyll(lott(S.mal), { match, res: `${b.h}–${b.b}` }), paus: 1400 }, { text: lott(S[hur]) }], gest: { malBra: 'skrocka', malLugn: 'smacka', malFel: 'brynet' }[hur] }];
+    }
+    // En match har slutat medan andra pågår: slutsignalen och vad han tycker om resultatet, efter ett mål.
+    const S = REP().stallning;
+    if (slut && S.slutsignal && S.slutRatt && S.slutFel) {
+      const { x, b } = slut;
+      const match = matchNamn(lagKort(x.r.m.home), lagKort(x.r.m.away));
+      H.malKo = [...(mal ? H.malKo : []), { lista: [{ text: fyll(lott(S.slutsignal), { match, res: `${b.h}–${b.b}` }), paus: 1400 }, { text: lott(x.pa ? S.slutRatt : S.slutFel) }], gest: x.pa ? 'skrocka' : 'brynet' }];
     }
     // den sista matchen har slutat: hur det gick (efterat), en gång
     const pagade = [...forut.values()].some((x) => x.live);
