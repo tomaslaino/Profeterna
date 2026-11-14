@@ -437,9 +437,16 @@
 .rum-hasse-vy.hog .rh-tecken + .rh-slut { gap: 6px 12px; }
 .rum-hasse-vy.hog .rh-tecken + .rh-slut .rh-vag { min-height: 28px; }
 @media (max-height: 500px) {
-  .rh-fragan:has(+ .rh-tecken) { display: none; }
+  .rum-hasse-vy:not(.kragen) .rh-fragan:has(+ .rh-tecken) { display: none; }
   .rh-tecken + .rh-slut { gap: 6px 12px; }
   .rh-tecken + .rh-slut .rh-vag { min-height: 28px; }
+  /* telefonen på bredden med hans text om matchen (tillKragen i rum-hasse.js): hela samtalet rullar, med
+     texten hel och rutorna och svaren under den; står det mer nedanför tonas kanten ut */
+  .rum-hasse-vy:not(.hog).kragen .rh-samtal { overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none; }
+  .rum-hasse-vy:not(.hog).kragen .rh-samtal::-webkit-scrollbar { display: none; }
+  .rum-hasse-vy:not(.hog).kragen .rh-samtal > * { flex-shrink: 0; }
+  .rum-hasse-vy:not(.hog).kragen .rh-text { flex: none; overflow: visible; }
+  .rum-hasse-vy:not(.hog).kragen .rh-samtal.mer { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); }
 }
 /* vems kupong: efternamnen i rutornas ställe, lika höga */
 .rh-vems .rh-ruta, .rum-hasse-vy.hog .rh-vems .rh-ruta { max-width: none; font-size: clamp(17px, 2.7vh, 23px); }

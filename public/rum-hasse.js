@@ -103,6 +103,7 @@ window.RumHasse = (() => {
     new MutationObserver(() => {
       if (vy.classList.contains('kragen') && !vy.querySelector('.rh-samtal > .rh-text.kragen')) {
         vy.classList.remove('kragen');
+        vy.querySelector('.rh-samtal').scrollTop = 0;
         samtalet();
       }
     }).observe(vy.querySelector('.rh-samtal'), { childList: true });
@@ -695,30 +696,37 @@ window.RumHasse = (() => {
   // I telefonen på höjden fick hans text om matchen en och en halv rad under domen, rutorna och svaren. Får den
   // inte plats går samtalet nu upp mot kragen och mörkret med det, så att den går att läsa i ett svep; ansiktet
   // syns kvar. Inte högre än texten behöver (H.krage), och raden över rutorna, där han frågar om kupongen, har
-  // sin plats från början (rum-hasse.css), så att inget flyttar sig när han säger det. Prövas när texten har
-  // skrivits (svara, tidigare) och när fönstret ändras, och släpps när samtalet byts ut (mount).
+  // sin plats från början (rum-hasse.css), så att inget flyttar sig när han säger det. I telefonen på bredden
+  // (lågt fönster) räcker höjden inte ens till texten, och där fick den en rad: där rullar hela samtalet i
+  // stället, med texten hel och rutorna och svaren under den. Prövas när texten har skrivits (svara, tidigare)
+  // och när fönstret ändras, och släpps när samtalet byts ut (mount).
+  const lagt = () => matchMedia('(max-height: 500px)').matches;
   function tillKragen() {
-    const tx = $('.rh-samtal > .rh-text');
+    const s = $('.rh-samtal');
+    const tx = s.querySelector(':scope > .rh-text');
     H.vy.classList.remove('kragen');
     H.krage = 0;
     if (tx) tx.classList.remove('kragen');
     samtalet();
-    if (!H.hog || !tx || tx.scrollHeight <= tx.clientHeight + 4) return;
+    if (!(H.hog || lagt()) || !tx || tx.scrollHeight <= tx.clientHeight + 4) return;
     tx.classList.add('kragen');
     H.vy.classList.add('kragen');
-    samtalet();
-    // (texten själv: scrollHeight blir aldrig mindre än rutan)
-    const r = document.createRange();
-    r.selectNodeContents(tx);
-    H.krage = Math.max(0, Math.floor(tx.clientHeight - r.getBoundingClientRect().height - 2));
-    if (H.krage) samtalet();
-    tx.scrollTop = 0;
-    // (står det mer under kanten, i en liten telefon, tonas den sista raden ut i stället för att skäras av mitt i)
-    const mer = () => tx.classList.toggle('mer', tx.scrollTop + tx.clientHeight < tx.scrollHeight - 4);
-    if (!tx.dataset.mer) {
-      tx.dataset.mer = '1';
-      tx.addEventListener('scroll', mer, { passive: true });
-      if (window.ResizeObserver) new ResizeObserver(mer).observe(tx);
+    const rull = H.hog ? tx : s;
+    if (H.hog) {
+      samtalet();
+      // (texten själv: scrollHeight blir aldrig mindre än rutan)
+      const r = document.createRange();
+      r.selectNodeContents(tx);
+      H.krage = Math.max(0, Math.floor(tx.clientHeight - r.getBoundingClientRect().height - 2));
+      if (H.krage) samtalet();
+    }
+    tx.scrollTop = s.scrollTop = 0;
+    // (står det mer under kanten tonas den sista raden ut i stället för att skäras av mitt i)
+    const mer = () => rull.classList.toggle('mer', rull.scrollTop + rull.clientHeight < rull.scrollHeight - 4);
+    if (!rull.dataset.mer) {
+      rull.dataset.mer = '1';
+      rull.addEventListener('scroll', mer, { passive: true });
+      if (window.ResizeObserver) new ResizeObserver(mer).observe(rull);
     }
     mer();
   }
