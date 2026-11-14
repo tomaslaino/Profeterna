@@ -2575,8 +2575,8 @@ window.RumHasse = (() => {
       // (vad klockan är: strax före spelstopp alltid, annars ibland)
       const tid = hela && tidNu(oppna);
       if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
-      // (ibland säger han fel namn: omgångens, samma som i domen, se felNamn)
-      const kallad = namn && Math.random() < 0.25 ? felNamn(namn, omgangNu()) : namn;
+      // (oftast säger han fel namn: omgångens, samma som i domen, se felNamn)
+      const kallad = namn && Math.random() < 0.6 ? felNamn(namn, omgangNu()) : namn;
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
       // (är kupongen full av landskamper säger han det ibland)
       if (r.land && oppna.filter((m) => landskamp(m.id)).length >= 3 && Math.random() < 0.35) return lott(r.land.oppning);
@@ -2893,17 +2893,18 @@ window.RumHasse = (() => {
     if (!fel || !fel.length) return namn;
     return [...ord.slice(0, -1), fast(fel, `${omgang}:${sist}:namn`)].join(' ');
   }
-  // Vad han kallar någon i domen. Vinnaren kan han. Den som kom sist säger han fel om i ungefär två domar av tre,
-  // de andra i ungefär en av tre: han lär sig bara namnen på dem som lyckas. I hälften av domarna med fel börjar
-  // han rätt och tappar namnet efter första meningen med det, som om han slutade lyssna. Samma omgång och person
-  // ger samma svar, så att domen är densamma varje gång och på alla enheter.
+  // Vad han kallar någon i domen. Vinnaren kan han. Den som kom sist säger han fel om i ungefär fem domar av sex,
+  // de andra i ungefär två av tre: han lär sig bara namnen på dem som lyckas. I en tredjedel av domarna med fel
+  // börjar han rätt och tappar namnet efter första meningen med det, som om han slutade lyssna. Samma omgång och
+  // person ger samma svar, så att domen är densamma varje gång och på alla enheter.
   // → { forst, sedan }: namnet i första meningen med namnet, och i resten.
   function domNamn(p, sum) {
     const nyckel = `${sum.id}:${p.id}`;
-    const chans = p.lage === 'sist' || p.lage === 'sistLika' ? 2 : 1;
-    if (p.bast || fast([0, 1, 2], `${nyckel}:fel`) >= chans) return { forst: p.namn, sedan: p.namn };
+    // (i hur många av sex domar han kan namnet)
+    const ratt = p.lage === 'sist' || p.lage === 'sistLika' ? 1 : 2;
+    if (p.bast || fast([0, 1, 2, 3, 4, 5], `${nyckel}:fel`) < ratt) return { forst: p.namn, sedan: p.namn };
     const fel = felNamn(p.namn, sum.id);
-    return { forst: fast([0, 1], `${nyckel}:tappar`) ? p.namn : fel, sedan: fel };
+    return { forst: fast([0, 1, 2], `${nyckel}:tappar`) ? fel : p.namn, sedan: fel };
   }
   // Vilka i gänget du har hört domen över, på enheten för den omgången: han vet vem han har dömt, också nästa
   // gång du kommer.
