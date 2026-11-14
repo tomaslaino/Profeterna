@@ -1,0 +1,43 @@
+{
+ "omgang": "2026-11-14-st4979",
+ "matcher": [
+  "401861166",
+  "401861167",
+  "401861165",
+  "401861168",
+  "401861169",
+  "401861170",
+  "401861164",
+  "401880749",
+  "401880747",
+  "401880745",
+  "401880754",
+  "401880744",
+  "401881266"
+ ],
+ "skriven": "2026-11-14T10:20:00.000Z",
+ "model": "claude-opus-5-5",
+ "version": "2026-11-14.1",
+ "underlag": "2026-11-14T08:10:38.950Z",
+ "rubrik": {
+  "id": "401861166",
+  "kick": "NATIONS LEAGUE",
+  "rad": [
+   [
+    "BORTAMATCH",
+    0
+   ],
+   [
+    "PÅ",
+    0
+   ],
+   [
+    "HEMMAPLAN",
+    1
+   ]
+  ],
+  "under": "Upp till 40 000 bosnier väntas på Strawberry Arena. Potter: ”Det är något som vi måste hantera”",
+  "plus": "HAALAND TIGER OM DOMEN",
+  "plusId": "401861165"
+ }
+}

@@ -18,6 +18,9 @@
 //   - Helgarderats sista sida (Hasse Backes krönika, Vid sidan av och Ombudets
 //     kåseri) i data/sista-sidan.json: en gång per omgång, när matchbladen har kommit
 //     (src/analyser/sista-sidan.mjs).
+//   - Veckans löpsedel (det mest uppseendeväckande ur matchbladen och notiserna) i
+//     data/lopsedel.json: när matchbladen har kommit och igen när de har uppdaterats,
+//     fram till första avsparken (src/analyser/lopsedel.mjs).
 //   - Kommentarerna till färdiga kuponger: i data/kupong-historik.json.
 //
 // Publicering: varje färdig text sparas först i vantande.json utanför repot, sedan
@@ -36,6 +39,7 @@
 //   node scripts/analyser/skriv.mjs --tidning-bilder     bara veckans bilder till tidningen
 //                                                        som finns, utan Claude
 //   node scripts/analyser/skriv.mjs --sista-sidan        bara Helgarderats sista sida, oavsett tid
+//   node scripts/analyser/skriv.mjs --lopsedel           bara veckans löpsedel, oavsett tid
 
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
@@ -53,6 +57,7 @@ import { skrivNamn, namnNyckel } from '../../src/analyser/namn.mjs';
 import { skrivKommentar } from '../../src/analyser/kommentar.mjs';
 import { skrivTidning, attSkrivaTidning } from '../../src/analyser/tidning.mjs';
 import { skrivSista, attSkrivaSista } from '../../src/analyser/sista-sidan.mjs';
+import { skrivLopsedel, attSkrivaLopsedel } from '../../src/analyser/lopsedel.mjs';
 import { poddsidor } from '../../src/analyser/poddar.mjs';
 import { veckansBilder, lagenI } from '../../src/analyser/tidning-bilder.mjs';
 import { attSkriva } from '../../src/analyser/tider.mjs';
@@ -72,6 +77,7 @@ const EN_MATCH = varde('--en-match');
 const BARA_TIDNING = flagga('--tidning');
 const BARA_BILDER = flagga('--tidning-bilder');
 const BARA_SISTA = flagga('--sista-sidan');
+const BARA_LOPSEDEL = flagga('--lopsedel');
 const UT = varde('--ut');
 
 const HEM = os.homedir();
@@ -90,6 +96,7 @@ const FIL = {
   tidning: path.join(dataDir, 'tidning.json'),
   poddsidor: path.join(dataDir, 'poddsidor.json'),
   sista: path.join(dataDir, 'sista-sidan.json'),
+  lopsedel: path.join(dataDir, 'lopsedel.json'),
 };
 
 const H = 3600000;
@@ -200,10 +207,10 @@ const fardata = (p) => hamta(`${site}/data/${p}?t=${Date.now()}`);
 
 // ---------- det som väntar på att sparas ----------
 
-const tomtVantande = () => ({ analyser: {}, hasse: {}, namn: {}, kommentarer: {}, omgang: null, tidning: null, poddsidor: null, sista: null });
+const tomtVantande = () => ({ analyser: {}, hasse: {}, namn: {}, kommentarer: {}, omgang: null, tidning: null, poddsidor: null, sista: null, lopsedel: null });
 let vantande = { ...tomtVantande(), ...lasJson(VANTANDE, {}) };
 const sparaVantande = () => skrivJson(VANTANDE, vantande);
-const finnsVantande = () => Boolean(vantande.omgang || vantande.tidning || vantande.poddsidor || vantande.sista) || ['analyser', 'hasse', 'namn', 'kommentarer'].some((k) => Object.keys(vantande[k]).length);
+const finnsVantande = () => Boolean(vantande.omgang || vantande.tidning || vantande.poddsidor || vantande.sista || vantande.lopsedel) || ['analyser', 'hasse', 'namn', 'kommentarer'].some((k) => Object.keys(vantande[k]).length);
 
 function lasAnalyser() {
   const d = lasJson(FIL.analyser, null) || {};
@@ -240,6 +247,7 @@ function laggIn() {
   if (vantande.tidning) skrivJson(FIL.tidning, vantande.tidning);
   if (vantande.poddsidor) skrivJson(FIL.poddsidor, vantande.poddsidor);
   if (vantande.sista) skrivJson(FIL.sista, vantande.sista);
+  if (vantande.lopsedel) skrivJson(FIL.lopsedel, vantande.lopsedel);
 
   const ids = Object.keys(vantande.kommentarer);
   if (ids.length) {
@@ -279,7 +287,7 @@ function spara(vad) {
       tillMain();
       laggIn();
       // (tidning.json finns inte förrän den första tidningen är skriven)
-      git('add', '--', ...['analyser.json', 'omgangsnamn.json', 'kupong-historik.json', 'tidning.json', 'poddsidor.json', 'sista-sidan.json'].map((f) => `data/${f}`).filter((f) => fs.existsSync(path.join(ROOT, f))));
+      git('add', '--', ...['analyser.json', 'omgangsnamn.json', 'kupong-historik.json', 'tidning.json', 'poddsidor.json', 'sista-sidan.json', 'lopsedel.json'].map((f) => `data/${f}`).filter((f) => fs.existsSync(path.join(ROOT, f))));
       if (git('status', '--porcelain', '--', 'data').trim()) {
         git('commit', '-q', '-m', vad);
         git('push', '-q', 'origin', 'HEAD:main');
@@ -472,6 +480,30 @@ async function sistaSidan(round) {
     spara(`Helgarderats sista sida inför omgången ${round.id}`);
   } catch (err) {
     hanteraFel(err, nyckel, `sista sidan för ${round.id}`);
+  }
+}
+
+// Veckans löpsedel: när omgångens matchblad har kommit och igen när de har uppdaterats, fram till
+// första avsparken. Utan verktyg, så ett anrop kostar lite.
+async function lopsedeln(round) {
+  const blad = vantande.poddsidor || lasJson(FIL.poddsidor, null);
+  const nu = vantande.lopsedel || lasJson(FIL.lopsedel, null);
+  const v = attSkrivaLopsedel(round, nu, blad, { now: Date.now(), tvinga: BARA_LOPSEDEL });
+  // (nya matchblad ger nya försök)
+  const nyckel = `lopsedel:${round.id}:${(blad && blad.uppdaterad) || ''}`;
+  if (!v.skriv || !(BARA_LOPSEDEL || far(nyckel))) return;
+  if (TORRT) { logg(`skulle skriva löpsedeln för ${round.id} (${v.varfor})`); return; }
+  try {
+    const tidning = vantande.tidning || lasJson(FIL.tidning, null);
+    const r = await skrivLopsedel(round, blad, { tidning });
+    if (!r.ok) throw new Error(r.error);
+    vantande.lopsedel = r.sedel;
+    lyckat(nyckel);
+    const rb = r.sedel.rubrik;
+    logg(`löpsedeln: ${round.id}, ${rb.rad.map(([t]) => t).join(' ')} (${metaText(r.meta)}; ${v.varfor})`);
+    spara(`Veckans löpsedel inför omgången ${round.id}`);
+  } catch (err) {
+    hanteraFel(err, nyckel, `löpsedeln för ${round.id}`);
   }
 }
 
@@ -693,12 +725,26 @@ async function main() {
     return;
   }
 
+  if (BARA_LOPSEDEL) {
+    if (!round) { logg('ingen omgång just nu, så ingen löpsedel'); return; }
+    poddsidorna(round);
+    await lopsedeln(round);
+    if (lage.stoppad) process.exit(1);
+    const s = vantande.lopsedel || lasJson(FIL.lopsedel, null);
+    if (s && s.omgang === round.id) {
+      const rb = s.rubrik;
+      console.log(`\n${rb.kick}\n${rb.rad.map(([t, st]) => (st ? `*${t}*` : t)).join('\n')}\n${rb.under}\n+ ${rb.plus}`);
+    }
+    return;
+  }
+
   if (round) {
     poddsidorna(round);
     await namnet(round);
     if (!lage.stoppad) await analyserna(round, roster);
     if (!lage.stoppad) await tidningen(round);
     if (!lage.stoppad) await sistaSidan(round);
+    if (!lage.stoppad) await lopsedeln(round);
   } else {
     logg('kontroll: ingen omgång just nu');
   }

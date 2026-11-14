@@ -39,10 +39,11 @@
 // rubriker i kvällstidningens tonläge, torrt
 // ironiska, om det mest dramatiska som har hänt eller ska hända – i förra
 // omgången den som tippade bäst eller sämst, en ny ledare i Tipsligan, modellen
-// mot gänget, skrällen, krossen och gängets kupong; i nästa omgång den jämnaste
-// matchen, den största favoriten och jakten på ledaren, och när Stryktipset har
-// landskamper Sveriges match och landskamperna (landskamp). Längst ner den näst
-// största nyheten. Förra omgångens nyheter väger tyngst de första dagarna och
+// mot gänget, skrällen, krossen och gängets kupong; i nästa omgång veckans
+// största nyhet ur matchbladen, som Claude väljer och skriver (skriven nedan),
+// och utan den den jämnaste matchen, den största favoriten och jakten på
+// ledaren, och när Stryktipset har landskamper Sveriges match och landskamperna
+// (landskamp). Längst ner den näst största nyheten. Förra omgångens nyheter väger tyngst de första dagarna och
 // nästa omgångs bara innan någon av dess matcher har startat. Omgångar och
 // kuponger som spoilerskyddet döljer räknas inte. Utan något att skriva om blir
 // det knepen i tidningen.
@@ -387,6 +388,34 @@ function landskamper(rows, t) {
   }
   return out;
 }
+// ---------- veckans nyhet ur matchbladen ----------
+//
+// Inför omgången väljer Claude det mest uppseendeväckande i det som har samlats in (matchbladen
+// ur forum, poddar och lokaltidningar, och tidningens notiser) och skriver rubriken, raden under
+// och den andra nyheten (data/lopsedel.json, src/analyser/lopsedel.mjs, config/lopsedel.js).
+// Så sedan 2026-11-14 ("den där statistikinformationen nedanför är lite trist. Leta bland all
+// information som inhämtas till omgången och ta det som verkar mest juicy"). Läses en gång;
+// när den har kommit ritas löpsedeln om (affischer nedan).
+let LOPSEDEL = null;
+let lopsedelHamtas = false;
+function lopsedelSkriven(klar) {
+  if (LOPSEDEL || lopsedelHamtas || typeof getJSON !== 'function') return LOPSEDEL;
+  lopsedelHamtas = true;
+  getJSON('data/lopsedel.json').then((d) => { LOPSEDEL = d || {}; klar(); }, () => { LOPSEDEL = {}; });
+  return null;
+}
+// Rubriken när den är skriven för omgången på kupongen (rows): väger tyngst inför omgången,
+// och dess andra nyhet står längst ner. Medan matcherna spelas står den kvar, svagare (poang),
+// tills alla är slut eller gängets tips har något större att säga.
+function skriven(rows, t, poang = 1) {
+  const s = LOPSEDEL;
+  const r = s && s.rubrik;
+  if (!r || !Array.isArray(r.rad) || !r.rad.length || !Array.isArray(s.matcher)) return [];
+  const ids = new Set(s.matcher.map(String));
+  if (rows.filter((x) => ids.has(String(x.m.id))).length * 2 < rows.length) return [];
+  return [{ typ: 'lopsedel', poang, t, framat: true, mid: r.id || null, v: [{ kick: String(r.kick || ''), rad: r.rad, under: String(r.under || ''), plus: r.plus || null }] }];
+}
+
 const TAL = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'];
 
 // Veckan i Stockholm (måndag till söndag) som frö: rubrikens variant och
@@ -564,6 +593,7 @@ function framat(rows, alla, kortNamn) {
   // (landslagen: Bosnien & Hercegovina blir Bosnien)
   const short = (n) => landKort(kortNamn(n));
   const t = Math.min(...rows.map((x) => Date.parse(x.m.kickoff)));
+  out.push(...skriven(rows, t));
   out.push(...landskamper(rows, t));
   const med = rows.filter((x) => x.g && x.g.pr);
   if (med.length) {
@@ -599,7 +629,7 @@ function framat(rows, alla, kortNamn) {
   }
   // den jämnaste matchen och spiken: är det en landskamp är procenten spelbolagens
   const land = new Set(rows.filter((x) => arLand(x.m)).map((x) => x.m.id));
-  return out.map((k) => (k.typ !== 'sverige' && land.has(k.mid) ? marknadens([k])[0] : k));
+  return out.map((k) => (k.typ !== 'sverige' && k.typ !== 'lopsedel' && land.has(k.mid) ? marknadens([k])[0] : k));
 }
 
 // Utan något att skriva om: det som står i tidningen (notiserna, det
@@ -630,6 +660,7 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
   if (c) kand.push(...kupongRubriker(c, short));
   const upp = (rows || []).filter((x) => x.m && x.g);
   if (upp.length >= 3 && upp.every((x) => x.g.state === 'upcoming')) kand.push(...framat(upp, alla, short));
+  else if (upp.length >= 3 && upp.some((x) => x.g.state !== 'final')) kand.push(...skriven(upp, Math.min(...upp.map((x) => Date.parse(x.m.kickoff))), 0.45));
   // samma match ur omgången och kupongen räknas en gång
   const sett = new Set();
   const forsta = (x) => {
@@ -655,11 +686,13 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
     const v = x.v[((i % x.v.length) + x.v.length) % x.v.length];
     return { ...v, kick: v.kick.replace('{T}', T.T) };
   };
+  const vald = valj(val, 0);
+  // (veckans nyhet ur matchbladen har sin egen andra nyhet)
   const andra = lista.find((x) => x !== val && x.typ !== val.typ) || lista.find((x) => x !== val);
-  const plus = andra ? radText(valj(andra, 1).rad) : PLUS[Math.floor(hash(fro + 9.3) * PLUS.length) % PLUS.length];
+  const plus = vald.plus || (andra ? radText(valj(andra, 1).rad) : PLUS[Math.floor(hash(fro + 9.3) * PLUS.length) % PLUS.length]);
   // tidningen är från dagen det hände (en sen match: dagen efter), eller idag
   const t = val === GUIDEN || val.framat ? now : Math.min(now, val.t + 3 * 3600e3);
-  return { typ: val.typ, ...valj(val, 0), plus, datum: datum(t), id: val.id || val.mid || null };
+  return { typ: val.typ, ...vald, plus, datum: datum(t), id: val.id || val.mid || null };
 }
 
 // ---------- löpsedeln: papperet ----------
@@ -685,7 +718,8 @@ function rader(text, font, px, bred) {
   const mellan = bredd(' ', font) * px;
   let n = 1;
   let x = 0;
-  for (const ord of String(text).split(/\s+/).filter(Boolean)) {
+  // (hårt mellanslag binder ihop, som i 40 000)
+  for (const ord of String(text).split(/[ \t\n]+/).filter(Boolean)) {
     const w = bredd(ord, font) * px;
     if (x && x + mellan + w > bred) { n++; x = w; } else x += (x ? mellan : 0) + w;
   }
@@ -829,6 +863,8 @@ export function affischer(back, { short = (x) => x, namn = null } = {}) {
       let r;
       // (Nations Leagues grupper, för Sveriges match: ritas om när de har kommit)
       landslaget(() => { ritad = null; api.data(senast.rows, senast.old); });
+      // (veckans nyhet ur matchbladen: ritas om när den har kommit)
+      lopsedelSkriven(() => { ritad = null; api.data(senast.rows, senast.old); });
       try {
         r = rubrik({ rows, old, short, fro });
       } catch (err) {

@@ -2308,7 +2308,7 @@ och anropar aldrig någon språkmodell. (Fram till 2026-11-04 skrevs texterna vi
 launchd               →  scripts/analyser/skriv.mjs  →  claude -p (en gång per match)
                                      ↓
        data/analyser.json, data/omgangsnamn.json, data/kupong-historik.json, data/tidning.json,
-                              data/sista-sidan.json
+                      data/sista-sidan.json, data/lopsedel.json
                                      ↓
           commit och push till main  →  GitHub Actions  →  matchfixarna.se
 ```
@@ -2394,6 +2394,32 @@ pågår, oavsett tid. `data/sista-sidan.json`, som bygget kopierar till sajten:
   "kaseri": { "av": "…", "om": "pensionerad lokförare, Hallsberg", "rubrik": "…", "stycken": ["…"] },
   "kasorer": [ { "av": "…", "om": "…" } ] }
 ```
+
+**Veckans löpsedel** (2026-11-14, användarens önskemål: *"Kan du ha lite mer intressanta tidningsrubriker inför
+omgångarna - den där statistikinformationen nedanför är lite trist. Leta bland all information som inhämtas till
+omgången och ta det som verkar mest juicy/uppseendeväckande/intressanta"*): Claude får omgångens matchblad ur
+`data/poddsidor.json` (rubrik, sammanfattning, det som står om varje lag och citatet) och tidningens notiser och väljer
+det mest uppseendeväckande: en stjärna som saknas eller tiger, en tränare som gungar, ett svidande citat, en hemmamatch
+som inte är någon hemmamatch. Rubriken är två till fyra rader i versaler (högst sex ord, tolv tecken per rad, en rad i
+rött), vinjetten ett till tre ord, raden under högst 100 tecken och den näst största nyheten, ur en annan match, högst
+28 tecken. Inga verktyg och inga sökningar: allt står i underlaget, så ett anrop tar runt 12 sekunder. Det skrivs när
+omgångens matchblad har kommit och igen när de har uppdaterats (poddarnas tider, tre gånger i veckan), fram till första
+avsparken ([src/analyser/lopsedel.mjs](src/analyser/lopsedel.mjs), prompten och gränserna i
+[config/lopsedel.js](config/lopsedel.js)); en ny `promptVersion` skriver om den. Kontrollen: gränserna ovan, varje tal
+ska stå i underlaget och inget får vara tips eller procent; annars skrivs den om en gång. I provet 2026-11-14 valde
+Claude båda gångerna Sverige–Bosnien (*BOSNISK HEMMAMATCH I SOLNA*, *BORTAMATCH I SOLNA*); veckans sedel valdes för
+hand bland förslag. `node scripts/analyser/skriv.mjs --lopsedel --ut /tmp/prov` skriver den för omgången som pågår,
+oavsett tid. `data/lopsedel.json`, som bygget kopierar till sajten och löpsedeln i rummet ritar (`skriven` i
+[public/rum-affischer.js](public/rum-affischer.js)):
+
+```json
+{ "omgang": "2026-11-14-st4979", "matcher": ["401861166"], "skriven": "…", "model": "…", "version": "…",
+  "underlag": "2026-11-14T08:10:38.950Z",
+  "rubrik": { "id": "401861166", "kick": "NATIONS LEAGUE", "rad": [["BORTAMATCH", 0], ["PÅ", 0], ["HEMMAPLAN", 1]],
+    "under": "…", "plus": "HAALAND TIGER OM DOMEN", "plusId": "401861165" } }
+```
+
+`underlag` är matchbladens `uppdaterad`: nya matchblad ger en ny löpsedel. I `rad` är 1 raden i rött.
 
 **Veckans bilder i tidningen** (2026-11-09, användarens önskan: *bilder från veckan i tipsguiden, för de olika
 lagen*): när tidningen är skriven hämtar samma jobb en bild från den senaste veckan per lag, med vanliga hämtningar på
@@ -4831,6 +4857,15 @@ rum-affischer.js):
   eller mer (*FÖRNEDRINGEN: QPR KÖRDE ÖVER SWANSEA*, med sju mål eller fler *MÅLFESTEN*);
 - *gängets kupong* (Historik): betyg 1 (*KUPONGEN I SPILLROR*, *KUPONGHAVERIET*) eller 5
   (*DRÖMKUPONGEN*, *SÅ KNÄCKTE GÄNGET KODEN*);
+- *veckans nyhet ur matchbladen* (2026-11-14, användarens önskemål: "den där statistikinformationen nedanför är lite
+  trist. Leta bland all information som inhämtas till omgången och ta det som verkar mest juicy/uppseendeväckande"):
+  Claude läser matchbladen (det supportrarna säger i forum och poddar, lokaltidningarna, tränarna och citaten) och
+  tidningens notiser och skriver rubriken, raden under och den andra nyheten längst ner (*NATIONS LEAGUE: BORTAMATCH
+  PÅ HEMMAPLAN* – *Upp till 40 000 bosnier väntas på Strawberry Arena. Potter: ”Det är något som vi måste hantera”* –
+  *+ HAALAND TIGER OM DOMEN*). Inga procent, odds eller avsparkstider. Den väger 1 före avspark och slår därför allt
+  som räknas fram ur siffror nedan, och medan matcherna spelas står den kvar med vikten 0,45 tills alla är slut eller
+  gängets tips har något större att säga. Läses ur `data/lopsedel.json` (se *Veckans löpsedel* under
+  [Analyserna](#analyserna)); utan den, eller när den gäller en annan omgång, blir det som förut;
 - *nästa omgång*, så länge ingen av dess matcher har startat: den jämnaste matchen när
   ingen utgång har över 42 % (*DATORN GER UPP*, *RYSAREN*), den största favoriten med minst 68 %
   (*ARSENAL KAN INTE FÖRLORA* – *Vad kan gå fel?*, *GARANTERAT! ARSENAL VINNER*, *SPIKA
