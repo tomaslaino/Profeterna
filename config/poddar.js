@@ -103,10 +103,11 @@ module.exports = {
     // Ett citat trycks bara när det är kort.
     citatOrd: 22,
     effort: 'medium',
-    // Bara källor från kupongens vecka (måndag till matchen): helst så, men inte medan vi
-    // provar (användarens beslut 2026-11-10: "gör ett undantag nu när vi bara testar").
-    // Sätt till true när provperioden är slut; bladen skrivs då om nästa natt.
-    baraVeckan: false,
+    // Bara källor från de senaste så här många dagarna före matchen (användarens beslut
+    // 2026-11-14: "Det ska vara fräsch information i tidningen - helst från senaste dagarna.
+    // I värsta fall 1 vecka gammalt"). Ersatte baraVeckan (måndag till matchen), som var
+    // avstängd under provperioden (2026-11-10). Ändras den skrivs bladen om nästa natt.
+    dagarFore: 7,
   },
   // Ämnena som uppgifterna grupperas i, i den ordning de står på sidan.
   amnen: {
@@ -277,7 +278,7 @@ Svara bara med JSON, utan något före eller efter:
 
   sidaPrompt: `Du skriver ett matchblad i en svensk tipstidning: en kort text inför en match, byggd på det som supportrarna och de som följer lagen varje vecka säger i sina poddar, forum och insatta medier, och på det klubben och lokaltidningen säger. Läsarna är ett gäng som tippar Stryktipset tillsammans, och de läser bladet medan de bestämmer sig. De har ont om tid. Varje mening ska ge dem något de inte redan vet.
 
-Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut den här veckan ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar), ur klubbens egen sajt och lokaltidningen (tränarens presskonferens, klubbens skadebesked, lokaltidningens reporter) och ur motståndarlagets intervju med en av lagets supportrar inför matchen. Har laget en ny tränare eller en ny spelare som spelar mycket kan det också finnas det som supportrarna i hans förra klubb har skrivit om honom, ofta från när han kom eller gick: de har sett honom i flera år. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift eller ett rykte, o = supportrarnas eller skribentens åsikt), en vikt 1–5, källans namn (podd, forum, insatta, lokalt = klubben eller lokaltidningen, intervju = motståndarens intervju med en av lagets supportrar, eller förra_klubben = supportrarna i den nyes förra klubb), dagen då det sades och ibland ett citat.
+Du får matchen och, för varje lag, uppgifter som tidningen har tagit ut den här veckan ur lagets supporterpoddar, supporterforum och insatta medier (artiklar i fansajter, fanzines, klubbnära nyhetsbrev och hos oberoende lokala reportrar), ur klubbens egen sajt och lokaltidningen (tränarens presskonferens, klubbens skadebesked, lokaltidningens reporter) och ur motståndarlagets intervju med en av lagets supportrar inför matchen. Har laget en ny tränare eller en ny spelare som spelar mycket kan det också finnas det som supportrarna i hans förra klubb har skrivit om honom den senaste veckan: de har sett honom i flera år. Varje uppgift har ett id, ett ämne, ett slag (b = bekräftat, h = källans egen uppgift eller ett rykte, o = supportrarnas eller skribentens åsikt), en vikt 1–5, källans namn (podd, forum, insatta, lokalt = klubben eller lokaltidningen, intervju = motståndarens intervju med en av lagets supportrar, eller förra_klubben = supportrarna i den nyes förra klubb), dagen då det sades och ibland ett citat.
 
 Välj först, skriv sedan. Läsaren har redan tabellen, formen, resultaten, målen, skadelistan, avstängningarna, den väntade elvan och oddsen på andra ställen på sajten, så sådant ska inte stå här. Här ska det stå som bara de som följer laget varje vecka vet och som inte syns i siffrorna: vad de ser i spelet, vem som bär laget och vem som har tappat, stämningen kring laget och tränaren, vad de fruktar eller hoppas inför just den här matchen, rykten och det som rör sig i klubben. En skada, en avstängning eller ett resultat nämns bara i förbigående, när det behövs för att man ska förstå vad supportrarna säger, aldrig som en egen upplysning. Av det som då återstår väljer du det mest intressanta för vart lag, två eller högst tre saker, och stryker resten, också sådant som är sant och hyggligt intressant. Hellre två saker som fastnar än fem som går förbi.
 

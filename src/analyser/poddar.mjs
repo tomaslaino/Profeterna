@@ -360,27 +360,24 @@ const LOKALA = ['lokal', 'motstand'];
 // Källans slag som redaktören får det (skrivSida, pc.sidaPrompt).
 const KALLNYCKEL = { forum: 'forum', media: 'insatta', lokal: 'lokalt', motstand: 'intervju', forra: 'förra_klubben' };
 
-// Måndagen i veckan då matchen spelas (svensk tid), som 'YYYY-MM-DD': kupongens vecka börjar då.
+// Dagen så många dagar före matchens dag (svensk tid), som 'YYYY-MM-DD': det äldsta som får stå i matchbladet.
 const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' });
-export function veckansMandag(avspark) {
+export function dagarFore(avspark, dagar) {
   const t = Date.parse(avspark);
   if (!Number.isFinite(t)) return null;
   const [y, m, d] = ymd.format(new Date(t)).split('-').map(Number);
-  const dag = new Date(Date.UTC(y, m - 1, d));
-  dag.setUTCDate(d - ((dag.getUTCDay() + 6) % 7));
-  return dag.toISOString().slice(0, 10);
+  return new Date(Date.UTC(y, m - 1, d - dagar)).toISOString().slice(0, 10);
 }
 
-// avspark: matchens avspark. Med pc.sidan.baraVeckan tas bara avsnitt, artiklar och foruminlägg från kupongens
-// vecka (måndag till matchen) med; utan står det som förut (provperioden, användarens beslut 2026-11-10). Förra
-// klubben gäller alltid: det supportrarna där sa om honom är oftast från när han kom eller gick.
+// avspark: matchens avspark. Bara avsnitt, artiklar och foruminlägg från de senaste pc.sidan.dagarFore dagarna
+// före matchen tas med (användarens beslut 2026-11-14: "helst från senaste dagarna. I värsta fall 1 vecka gammalt").
 export function sidansUnderlag(fil, lagen, { avspark = null } = {}) {
   const ut = { lag: {}, kallor: {} };
-  const fran = pc.sidan.baraVeckan ? veckansMandag(avspark) : null;
+  const fran = pc.sidan.dagarFore ? dagarFore(avspark, pc.sidan.dagarFore) : null;
   const dagAv = (x, a) => String(x.tid || a.datum).slice(0, 10);
   for (const lag of lagen) {
     const post = fil && fil.lag && fil.lag[lag];
-    const med = (x, a) => x.id && x.vikt >= pc.minstVikt && (!fran || a.typ === 'forra' || dagAv(x, a) >= fran);
+    const med = (x, a) => x.id && x.vikt >= pc.minstVikt && (!fran || dagAv(x, a) >= fran);
     const alla = ((post && post.avsnitt) || []).filter((a) => (a.uppgifter || []).some((x) => med(x, a)))
       .sort((a, b) => b.datum.localeCompare(a.datum));
     // Forumen och medierna läses vid varje genomgång: de räknas för sig, så att poddarna står kvar,

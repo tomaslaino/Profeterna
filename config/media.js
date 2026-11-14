@@ -55,8 +55,8 @@ module.exports = {
   // Så många sökningar per lag, och högst så många artiklar som läses per lag och natt.
   sokningar: 6,
   artiklar: 4,
-  // Bara artiklar från de senaste så här många dagarna.
-  dagar: 8,
+  // Bara artiklar från de senaste så här många dagarna (högst en vecka, användaren 2026-11-14).
+  dagar: 7,
   // En artikel med kortare text än så är en puff eller står bakom en betalvägg.
   minstTecken: 500,
   // En artikel kortas efter så här många tecken, och allt Claude får efter så många.

@@ -11,8 +11,8 @@
 // Allt sparas utanför repot, i ~/Library/Application Support/Matchfixarna/Tidning/:
 //   register.json   lagens poddar (namn och flöde), så att de bara letas upp en gång
 //   forum.json      lagens forum (namn och tavla), likaså
-//   forra.json      lagens nya tränare och spelare och vad förra klubbens supportrar sa om dem; görs om
-//                   efter några veckor (config/forra.js, giltigDagar)
+//   forra.json      lagens nya tränare och spelare (tas fram igen efter några veckor, config/forra.js,
+//                   giltigDagar) och vad förra klubbens supportrar har skrivit om dem den senaste veckan
 //   omgang.json     omgångens avsnitt, forumläsningar, artiklar och uppgifter; tidningen läser den (scripts/analyser/skriv.mjs)
 //   traff.json      källornas träffsäkerhet: det de sa om truppen, prövat mot matchtruppen efter
 //                   matcherna (config/traff.js, src/analyser/traff.mjs); redaktören läser den
@@ -34,7 +34,7 @@
 //   node scripts/tidning/poddar.mjs --utan-media         utan de insatta medierna
 //   node scripts/tidning/poddar.mjs --bara-lokal         bara klubben, lokaltidningen och motståndarens intervju
 //   node scripts/tidning/poddar.mjs --utan-lokal         utan dem
-//   node scripts/tidning/poddar.mjs --bara-forra         bara förra klubben (läser om lag vars läsning är gammal)
+//   node scripts/tidning/poddar.mjs --bara-forra         bara förra klubben (söker för lag vars sökning är äldre än två dagar)
 //   node scripts/tidning/poddar.mjs --utan-forra         utan förra klubben
 //   node scripts/tidning/poddar.mjs --traff              prövar bara omgångens spelade matcher och visar källornas
 //                                                        träffsäkerhet (med --fil en annan omgångsfil)
@@ -55,7 +55,7 @@ import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
 import { lasForum, taUtForum, lasningsNyckel, forumPoster, forumenAv, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
 import { letaArtiklar, lasArtikel, nyaArtiklar, lastaAvAndra, renAdress, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
-import { letaForra, lasForraSida, forraSkaLetas } from '../../src/analyser/forra.mjs';
+import { letaForra, lasForraSida, forraSkaLetas, kandaNya } from '../../src/analyser/forra.mjs';
 import { senasteTid, nastaTid } from '../../src/analyser/tider.mjs';
 import { provaOmgangen, kallornasTraff, traffText } from '../../src/analyser/traff.mjs';
 import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, lokalUnderlag, forraUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
@@ -351,18 +351,23 @@ async function lasMedierna(fil, lagen, { cfg = mc, vad = 'de insatta medierna' }
   return nya;
 }
 
-// Förra klubben (config/forra.js): för lag som inte är lästa de senaste fr.giltigDagar dagarna tar Claude reda
-// på vem som är ny och söker fram vad hans förra klubbs supportrar har skrivit, jobbet läser sidorna och Claude
-// tar ut det de säger om honom. Läsningen sparas per lag i forra.json, och lagets poster i omgångens fil byts
-// mot registrets, så att en ny omgång får dem utan att något läses om. → antal nya uppgifter
+// Förra klubben (config/forra.js): Claude tar reda på vem som är ny i laget (eller får de nya ur registret,
+// om de är framtagna de senaste fr.giltigDagar dagarna) och söker fram vad hans förra klubbs supportrar har
+// skrivit den senaste veckan; jobbet läser sidorna och Claude tar ut det de säger om honom. Ett lag utan
+// någon ny söks inte, och ett lag som söktes de senaste fr.sokIgenDagar dagarna inte igen. Registret
+// (forra.json) har lagets poster från veckan, och lagets poster i omgångens fil byts mot dem: det som är
+// äldre än fr.dagar dagar faller bort. → antal nya uppgifter
 async function lasForra(fil, reg, lagen) {
   let nya = 0;
+  const farsk = (p) => Date.now() - Date.parse(p.datum) <= fr.dagar * DAG;
   for (const l of lagen) {
     let r = reg[l.lag];
     if (forraSkaLetas(r)) {
       if (TORRT) { logg(`skulle leta upp förra klubben för ${l.lag}`); continue; }
+      const kanda = kandaNya(r);
       try {
-        const hittat = await letaForra({ lag: l.lag });
+        const hittat = await letaForra({ lag: l.lag, nya: kanda });
+        const tidigare = ((r && r.poster) || []).filter(farsk);
         const lasta = [];
         for (const a of hittat.artiklar) {
           try {
@@ -371,20 +376,24 @@ async function lasForra(fil, reg, lagen) {
             logg(`${err instanceof MediaSparrad ? 'SPÄRRAT' : 'hoppar över'} ${l.lag}: förra klubben ${a.kalla || a.adress} – ${err.message}`);
           }
         }
-        const u = lasta.length ? await taUtMedia(lasta, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare, cfg: fr }) : null;
-        const poster = u ? mediaPoster(u.artiklar, u, { cfg: fr }).filter((p) => p.uppgifter.length).slice(0, fr.behall) : [];
-        r = reg[l.lag] = { kollad: new Date().toISOString(), version: fr.promptVersion, nya: hittat.nya, poster };
+        // En sida som redan är läst med samma inlägg tas inte ut igen.
+        const nyaSidor = nyaArtiklar(lasta, { avsnitt: tidigare }, { cfg: fr });
+        const u = nyaSidor.length ? await taUtMedia(nyaSidor, { lag: l.lag, mot: l.mot, avspark: l.avspark, spelare: l.spelare, cfg: fr }) : null;
+        const poster = u ? mediaPoster(u.artiklar, u, { cfg: fr }).filter((p) => p.uppgifter.length) : [];
+        const behall = laggTill({ avsnitt: tidigare }, poster, { cfg: fr }).avsnitt;
+        r = reg[l.lag] = { kollad: kanda ? r.kollad : new Date().toISOString(), version: fr.promptVersion, nya: hittat.nya, sokt: new Date().toISOString(), poster: behall };
         skrivJson(FORRAREG, reg);
-        nya += poster.reduce((n, p) => n + p.uppgifter.length, 0);
+        const antal = poster.reduce((n, p) => n + p.uppgifter.length, 0);
+        nya += antal;
         const vem = hittat.nya.length ? hittat.nya.map((p) => `${p.namn} (förut i ${p.fran})`).join(', ') : 'ingen ny';
-        logg(`${l.lag}: förra klubben – ${vem}; ${lasta.length} av ${hittat.artiklar.length} sidor lästa, ${poster.reduce((n, p) => n + p.uppgifter.length, 0)} uppgifter${u && u.strukna ? `, ${u.strukna} strukna` : ''}${u ? ` (${u.sekunder} s)` : ''}`);
+        logg(`${l.lag}: förra klubben – ${vem}; ${lasta.length} av ${hittat.artiklar.length} sidor från veckan, ${antal} uppgifter${u && u.strukna ? `, ${u.strukna} strukna` : ''}${u ? ` (${u.sekunder} s)` : ''}`);
       } catch (err) {
         if (err instanceof Stopp) throw err;
         logg(`FEL ${l.lag}: förra klubben: ${err.message}`);
         continue;
       }
     }
-    const poster = (r && r.poster) || [];
+    const poster = ((r && r.poster) || []).filter(farsk);
     const post = fil.lag[l.lag] || (poster.length ? (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] }) : null);
     if (!post) continue;
     const forut = post.avsnitt.filter((a) => a.typ === 'forra').map((a) => a.id).sort().join(',');
