@@ -36,9 +36,9 @@
 //              (målvakten I MÅLET i stället för anfallet och målen).
 //              Korten har talen i ett rutnät: etiketten, talet, en mätare och
 //              platsen i divisionen (sedan 2026-11-14, se ETK nedan)
-// Landslagen (sedan 2026-11-13): kupongen har gruppen (NL B4), matchakten
-// för en landskamp gruppen, Nations League, alla landskamper sedan 2024 och
-// marknadens chans i stället för tavlans tal, och registret en post för
+// Landslagen (sedan 2026-11-13): matchakten har för en landskamp gruppen
+// (NL B4; kupongen inte sedan 2026-11-14), Nations League, alla
+// landskamper sedan 2024 och marknadens chans i stället för tavlans tal, och registret en post för
 // landslagen (NL) med grupperna och ett lagkort per landslag
 // (data/landslag.json). Sökningen hittar dem på svenska och engelska.
 // Sedan 2026-11-14 (användarens önskemål: "spelare och statistik som de
@@ -430,8 +430,9 @@ window.RumRegister = (() => {
     // tävlingen (2026-11-14, användarens val bland fem skisser): tävlingens
     // namn står en gång – på datorn i en spalt till vänster med ett tunt
     // streck mellan avdelningarna, i telefonen (där spalten inte ryms) som en
-    // rubrik med streck efter. Raden har numret, lagen, gruppen för en
-    // landskamp (B4) och avsparken, på varje rad. Tävlingarna står i den
+    // rubrik med streck efter. Raden har numret, lagen och avsparken, på
+    // varje rad; landskampernas grupp står bara i matchakten (2026-11-14,
+    // användarens önskemål: den bröt symmetrin). Tävlingarna står i den
     // ordning de först kommer i kupongen och matcherna i kupongens ordning
     // inom dem, så att en omgång i avsparkens ordning (mellan omgångarna,
     // en kupong som valts för hand) inte delas i flera avdelningar med samma
@@ -440,8 +441,6 @@ window.RumRegister = (() => {
     function kupongen(R) {
       if (!A.ms.length) return [rad('INGEN OMGÅNG')];
       const w = 11;
-      const grupp = (m) => (isLand(m.comp) ? landDiv(m).replace(/^\S+\s*/, '') : '');
-      const g0 = Math.max(...A.ms.map((m) => grupp(m).length));
       const t0 = Math.max(...A.ms.map((m) => tid(m).length));
       const avd = [];
       for (const m of A.ms) {
@@ -450,11 +449,9 @@ window.RumRegister = (() => {
         else avd.push({ comp: m.comp, ms: [m] });
       }
       const L = Math.max(...avd.map((a) => tavNamn(a.comp).length)) + 4;
-      // numret och lagen är 28 tecken; tävlingen i en spalt när den ryms, och
-      // gruppen när den ryms (inte i telefonen när omgången går flera dagar)
-      const spalt = L + 28 + (g0 ? 3 + g0 : 0) + 3 + t0 <= A.bred;
+      // numret och lagen är 28 tecken; tävlingen i en spalt när den ryms
+      const spalt = L + 28 + 3 + t0 <= A.bred;
       const mellan = spalt ? '   ' : '  ';
-      const medGrupp = g0 > 0 && (spalt || 28 + 2 + g0 + 2 + t0 <= A.bred);
       const r = [rad([omgDatum(), 'd']), tom()];
       avd.forEach((a, j) => {
         if (!spalt) r.push(Object.assign(rad([tavNamn(a.comp), 'd']), { kl: 'rub' }));
@@ -463,7 +460,7 @@ window.RumRegister = (() => {
           R.nr[nr] = `#mote:${m.id}`;
           const x = radQ(`#mote:${m.id}`, ...(spalt ? [[pad(i ? '' : tavNamn(a.comp), L), 'd']] : []),
             [`${padL(nr, 2)} `, 'd'], padL(kort(m.home).slice(0, w), w), [' – ', 'd'], pad(kort(m.away).slice(0, w), w),
-            [`${mellan}${medGrupp ? `${pad(grupp(m), g0)}${mellan}` : ''}`, 'd'], [tid(m), 'd']);
+            [mellan, 'd'], [tid(m), 'd']);
           r.push(spalt && j && !i ? Object.assign(x, { kl: 'ny' }) : x);
         });
       });
