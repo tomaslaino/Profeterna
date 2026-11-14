@@ -2,7 +2,9 @@
 // rutan, med ord och ett konkret exempel). Ett tryck på ett tals etikett i
 // lagkortet, spelarkortet eller matchakten öppnar en ruta över talen med vad
 // talet är och hur det räknas (t), och ett exempel med lagets eller
-// spelarens egna siffror (ex). Rutan ritas i rum-register.js; här står bara
+// spelarens egna siffror (ex). Matchakten har egna ord för sina rader
+// (akten, och land för en landskamp; sedan 2026-11-14 har varje rad där en
+// förklaring). Rutan ritas i rum-register.js; här står bara
 // orden. Texterna följer förklaringarna på Statistik (title i TCOLS och PCOLS
 // i divisioner.js), skrivna om till hela meningar.
 //
@@ -18,7 +20,7 @@
 //   spelare: { p (spelarens rad), namn, lag (lagets namn), lagM (lagets mål),
 //              lagN (lagets ligamatcher) }
 // och ger en mening, eller null när siffrorna saknas. I matchakten står ett
-// exempel per lag (akten: rader som visar något annat än kortet).
+// exempel per lag (se matchakten nedan).
 (function () {
   const ok = (x) => x != null && Number.isFinite(x);
   // talen som i datorn: decimalkomma och riktigt minustecken
@@ -167,24 +169,257 @@
     },
   };
 
-  // Matchaktens rader som visar något annat än kortets: MÅL och xG står som
-  // gjorda–insläppta (en decimal), och raderna ur matchens fil (nollorna,
-  // skotten på mål och målen mot xG) får inget exempel, eftersom de räknas där.
+  // ---------- matchakten ----------
+  //
+  // Matchaktens egna ord (sedan 2026-11-14, användarens önskemål: "pedagogiska
+  // förklaringar på bra svenska … så kort som möjligt", med ett konkret
+  // exempel där det behövs): raderna som visar något annat än kortet (MÅL och
+  // xG som gjorda–insläppta, raderna ur matchens fil) och raderna som bara
+  // finns i matchakten (vilan, nästa match, hemma och borta, skadorna,
+  // domaren, mötena). Nyckeln är talets k (#lista:…) eller radens (#ord:…);
+  // spelarnas tal heter spelare:k. Ett tal som saknas här har kortets ord
+  // (lag ovan). ex får h för ett av lagen (hAkt i rum-register.js: lagets h
+  // som ovan, och hemma, forra och nasta { mot, hemma, tav, datum, dagar },
+  // fonster [{ mot, tav, datum }], form5 [{ mot, tav, niva, gf, ga }], mott,
+  // rec, tab, nl, alla, visar(etikett), skytt, assist och segermal { namn, v }) och
+  // ger en mening per lag. exm får h för matchen ({ hem, bort, p, dagar, dom })
+  // och ger en mening om hela matchen. t kan vara en funktion av matchens h.
+  const ochLista = (l) => (l.length > 1 ? `${l.slice(0, -1).join(', ')} och ${l[l.length - 1]}` : l[0] || '');
+  const MANAD = ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'];
+  // '2024-09-05' → '5 september 2024', eller med bara månaden: 'september 2024'
+  const datumAr = (s, dag = true) => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return `${dag ? `${d} ` : ''}${MANAD[m - 1]} ${y}`; };
+  // landslag.json skriver V-O-F som { matcher, v, o, f }
+  const rek = (x) => (x && x.matcher ? { n: x.matcher, w: x.v, d: x.o, l: x.f } : null);
+  // "Leicester har 3 vinster, 1 oavgjord och 3 förluster på 7 hemmamatcher",
+  // "Sverige har vunnit alla sina 4 matcher i Nations League"
+  const vofOrd = (namn, x, [en, fler, efter = '']) => {
+    if (!x || !x.n) return null;
+    const d = [[x.w, 'vinst', 'vinster', 'vunnit'], [x.d, 'oavgjord', 'oavgjorda', 'spelat oavgjort i'], [x.l, 'förlust', 'förluster', 'förlorat']].filter((y) => y[0]);
+    if (d.length === 1) return `${namn} har ${d[0][3]} ${x.n === 1 ? `sin enda ${en}` : x.n === 2 ? `båda sina ${fler}` : `alla sina ${x.n} ${fler}`}${efter}.`;
+    return `${namn} har ${ochLista(d.map(([k, a, b]) => st(k, a, b)))} på ${st(x.n, en, fler)}${efter}.`;
+  };
+  // ett exempel ur lagfilen bara när det ger samma tal som matchsidans rad
+  const somRaden = (h, etikett, v) => { const r = h.visar ? h.visar(etikett) : null; return r == null || String(r).replace(/-/g, '−') === String(v).replace(/-/g, '−'); };
+  const motVem = (f) => `${f.hemma ? 'hemma' : 'borta'} mot ${f.mot}${f.tav ? ` i ${f.tav}` : ''} den ${f.datum}`;
+  const pamalEx = (h, kolla) => {
+    const s = h.t && h.t.fd && h.t.fd.sh;
+    if (!s || !s.n || !ok(s.of) || !ok(s.oa)) return null;
+    const v = `${dec(s.of / s.n)}–${dec(s.oa / s.n)}`;
+    return !kolla || somRaden(h, 'Skott på mål', v) ? `${h.namn} har haft ${st(s.of, 'skott', 'skott')} på mål på ${st(s.n, 'match', 'matcher')} och motståndarna ${s.oa}: ${v}.` : null;
+  };
+  const malxgEx = (h) => { const x = xgOf(h.t); if (!x) return null; const f = rund(x.f, 1); return somRaden(h, 'Gjorda mål mot xG', tk(x.gf - f)) ? lag.malxg.ex(h) : null; };
+  const inslxgEx = (h) => { const x = xgOf(h.t); if (!x) return null; const a = rund(x.a, 1); return somRaden(h, 'Insläppta mål mot xG', tk(x.ga - a)) ? lag.inslxg.ex(h) : null; };
+  const SNITT = 'SNITT är genomsnittet i divisionen under samma tid.';
+
   const akten = {
+    form: {
+      e: 'FORMEN', n: 'DE FEM SENASTE MATCHERNA',
+      t: 'De fem senaste matcherna i alla tävlingar, den senaste först: V betyder vinst, O oavgjort och F förlust, efter 90 minuter. Talet efter bokstäverna visar hur starka motståndarna var i genomsnitt, på en skala där divisionens sämsta lag är 0 och dess bästa 100. Lag från andra divisioner och länder mäts på samma skala, men aldrig under 0 eller över 100.',
+      ex: ({ namn, form5, mott }) => {
+        const l = (form5 || []).filter((x) => ok(x.niva));
+        if (!ok(mott) || l.length < 2) return null;
+        const max = l.reduce((a, b) => (b.niva > a.niva ? b : a));
+        const min = l.reduce((a, b) => (b.niva < a.niva ? b : a));
+        const vem = (x) => `${x.mot}${x.tav ? ` i ${x.tav}` : ''} (${x.niva})`;
+        return max.niva === min.niva ? `Alla ${gen(namn)} motståndare låg på ${max.niva}.` : `${gen(namn)} motståndare låg i genomsnitt på ${mott}. Starkast var ${vem(max)} och svagast ${vem(min)}.`;
+      },
+    },
+    vila: {
+      e: 'VILAN', n: 'DAGAR SEDAN FÖRRA MATCHEN',
+      t: 'Dagar sedan lagets förra match, i alla tävlingar och räknat mellan matchdagarna. Ett lag som spelade för tre dagar sedan har haft mindre tid att återhämta sig än ett som har vilat en vecka.',
+      ex: ({ namn, forra: f }) => (f ? `${namn} spelade senast ${motVem(f)}, ${st(f.dagar, 'dag', 'dagar')} före den här matchen.` : null),
+    },
+    nasta: {
+      e: 'NÄSTA', n: 'DAGAR TILL NÄSTA MATCH',
+      t: 'Dagar från den här matchen till lagets nästa, med tävlingen efter när det inte är ligan. Väntar en viktig match strax efter kan tränaren låta några spelare vila.',
+      ex: ({ namn, nasta: f }) => (f ? `${namn} spelar nästa gång ${motVem(f)}, ${st(f.dagar, 'dag', 'dagar')} efter den här matchen.` : null),
+    },
+    matcher: {
+      n: 'MATCHER DE SENASTE DAGARNA',
+      t: ({ dagar }) => `Lagets matcher i alla tävlingar de senaste ${dagar} dagarna före avspark. Inom parentes står hur många av dem som var i Europacuperna, ofta med långa resor. Många matcher på kort tid kan ge trötta ben.`,
+      ex: ({ namn, fonster }) => (fonster && fonster.length ? `${namn} har spelat mot ${ochLista(fonster.map((x) => `${x.mot}${x.tav ? ` i ${x.tav}` : ''} den ${x.datum}`))}.` : null),
+    },
     gjorda: {
       e: 'MÅL', n: 'GJORDA–INSLÄPPTA PER MATCH',
       t: 'Gjorda och insläppta mål per ligamatch, de gjorda först.',
       ex: ({ t, namn }) => (t.m ? `${namn} har gjort ${t.gf} och släppt in ${t.ga} på ${st(t.m, 'match', 'matcher')}: ${dec(t.gf / t.m)}–${dec(t.ga / t.m)}.` : null),
     },
+    // (exemplet bara för laget som siffrorna gäller i matchen: hemmalaget hemma, bortalaget borta)
+    hemma: {
+      e: 'HEMMA', n: 'HEMMAMATCHERNA I LIGAN',
+      t: 'Vinster, oavgjorda och förluster i ligans hemmamatcher den här säsongen. Inför matchen säger hemmalagets hemmasiffror och bortalagets bortasiffror mest.',
+      ex: ({ namn, hemma, rec }) => (hemma && rec ? vofOrd(namn, rec.home, ['hemmamatch', 'hemmamatcher']) : null),
+    },
+    borta: {
+      e: 'BORTA', n: 'BORTAMATCHERNA I LIGAN',
+      t: 'Vinster, oavgjorda och förluster i ligans bortamatcher den här säsongen. Inför matchen säger hemmalagets hemmasiffror och bortalagets bortasiffror mest.',
+      ex: ({ namn, hemma, rec }) => (!hemma && rec ? vofOrd(namn, rec.away, ['bortamatch', 'bortamatcher']) : null),
+    },
+    nollor: { e: 'NOLLOR', n: 'HÅLLNA NOLLOR I LIGAN', t: 'Ligamatcher där laget inte har släppt in något mål.', ex: null },
+    utanmal: { e: 'UTAN MÅL', n: 'MATCHER UTAN EGET MÅL', t: 'Ligamatcher där laget inte har gjort något mål.', ex: null },
     skapar: {
       e: 'xG', n: 'LAGETS–MOTSTÅNDARNAS xG PER MATCH',
-      t: `Förväntade mål (xG) per match, först lagets egna chanser och sedan motståndarnas. ${xgOrd}`,
+      t: `Förväntade mål (xG) per ligamatch, först lagets egna chanser och sedan motståndarnas. ${xgOrd}`,
       ex: ({ t, namn }) => { const x = xgOf(t); return x ? `${gen(namn)} chanser på ${st(x.n, 'match', 'matcher')} var värda ${dec(x.f)} mål och motståndarnas ${dec(x.a)}: ${dec(x.f / x.n)}–${dec(x.a / x.n)} per match.` : null; },
     },
-    nollor: { ex: null },
-    pamal: { ex: null },
-    malxg: { ex: null },
-    inslxg: { ex: null },
+    pamal: {
+      e: 'PÅ MÅL', n: 'LAGETS–MOTSTÅNDARNAS SKOTT PÅ MÅL PER MATCH',
+      t: 'Skott på mål per ligamatch, först lagets och sedan motståndarnas. Skott på mål är mål och skott som målvakten räddar. Skott utanför eller i stolpen räknas inte.',
+      ex: (h) => pamalEx(h, true),
+    },
+    malxg: {
+      e: 'MÅL MOT xG', n: 'GJORDA MÅL MINUS xG',
+      t: 'Gjorda mål minus xG den här säsongen. Plus betyder fler mål än chanserna var värda, alltså bra avslut eller tur. Stora skillnader brukar jämna ut sig.',
+      ex: malxgEx,
+    },
+    inslxg: {
+      e: 'INSLÄPPTA MÅL MOT xG', n: '',
+      t: 'Insläppta mål minus motståndarnas xG den här säsongen. Minus betyder färre insläppta mål än motståndarnas chanser var värda, alltså en bra målvakt eller tur. Plus betyder fler.',
+      ex: inslxgEx,
+    },
+    'spelare:assist': {
+      e: 'ASSIST', n: 'FLEST ASSIST I LAGET',
+      t: 'Spelaren i laget med flest assist i ligan. En assist är den sista passningen före ett mål. Vid lika många står den som har spelat färst matcher.',
+      ex: ({ namn, t, assist: a }) => (a && t && t.gf ? `${a.namn} har slagit den sista passningen till ${a.v} av ${gen(namn)} ${st(t.gf, 'mål', 'mål')}.` : null),
+    },
+    'spelare:segermal': {
+      e: 'SEGERMÅL', n: 'FLEST SEGERMÅL I LAGET',
+      t: 'Spelaren i laget med flest segermål i ligan. Segermålet gav en ledning som laget sedan aldrig tappade: vid 3–1 är lagets andra mål segermålet.',
+      ex: ({ namn, t, segermal: s }) => (s && t && t.w ? `${s.namn} har gjort segermålet i ${t.w === 1 ? `${gen(namn)} enda vinst` : s.v === t.w ? `alla ${gen(namn)} ${t.w} vinster` : `${s.v} av ${gen(namn)} ${t.w} vinster`}.` : null),
+    },
+    'spelare:gula': {
+      e: 'GULA KORT', n: 'FLEST GULA KORT I LAGET',
+      t: 'Spelaren i laget med flest gula kort i ligan. Den som samlar på sig gula kort riskerar att bli avstängd.',
+      ex: null,
+    },
+    skador: {
+      e: 'SKADORNA', n: 'SKADADE OCH AVSTÄNGDA',
+      t: 'Spelare som är skadade eller avstängda enligt Fantasy Premier League, de som har spelat mest först. (AVST.) betyder avstängd och ? att det är osäkert om spelaren kan spela. Listan finns bara för Premier League.',
+      ex: null,
+    },
+    domaren: {
+      e: 'DOMAREN', n: 'DOMARENS LIGAMATCHER',
+      t: 'Domaren som ska döma matchen och hur många ligamatcher domaren har dömt de senaste säsongerna. Raderna under gäller de matcherna, och SNITT är genomsnittet i divisionen under samma tid. Med färre än 10 matcher säger siffrorna för lite.',
+      exm: ({ dom }) => (dom && dom.stats && dom.stats.n && dom.since ? `${dom.name} har dömt ${st(dom.stats.n, 'ligamatch', 'ligamatcher')} sedan ${datumAr(dom.since, false)}.` : null),
+    },
+    'dom-gula': { e: 'GULA KORT', n: 'I DOMARENS MATCHER', t: `Gula kort per match i domarens ligamatcher, båda lagen tillsammans. ${SNITT}`, ex: null },
+    'dom-frisparkar': { e: 'FRISPARKAR', n: 'I DOMARENS MATCHER', t: `Frisparkar per match i domarens ligamatcher, båda lagen tillsammans. ${SNITT}`, ex: null },
+    'dom-hemmaseger': { e: 'HEMMASEGER', n: 'I DOMARENS MATCHER', t: `Hur stor andel av domarens ligamatcher som hemmalaget har vunnit. ${SNITT} Med få matcher beror skillnaden mest på slumpen.`, ex: null },
+    moten: {
+      e: 'DE SENASTE MÖTENA',
+      t: 'Lagens senaste matcher mot varandra, högst elva och den senaste först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen. Möten från tidigare säsonger säger lite om lagen i dag.',
+      ex: null,
+    },
+  };
+
+  // En landskamp: samma rader med landslagens siffror – Nations League
+  // hittills, alla landskamper sedan hösten 2024 och marknadens chans (och
+  // ingen styrka, eftersom modellen inte räknar på landslagen).
+  const landet = {
+    form: {
+      e: 'FORMEN', n: 'DE FEM SENASTE LANDSKAMPERNA',
+      t: 'De fem senaste landskamperna, den senaste först: V betyder vinst, O oavgjort och F förlust, efter 90 minuter.',
+      ex: ({ namn, form5 }) => { const l = (form5 || []).filter((x) => ok(x.gf) && ok(x.ga)); return l.length ? `${gen(namn)} senaste landskamper: ${ochLista(l.map((x) => `${x.gf}–${x.ga} mot ${x.mot}`))}.` : null; },
+    },
+    vila: {
+      e: 'VILAN', n: 'DAGAR SEDAN FÖRRA LANDSKAMPEN',
+      t: 'Dagar sedan lagets förra landskamp. Spelarna har spelat för sina klubbar under tiden, så vilan säger mindre om tröttheten än för ett klubblag.',
+      ex: akten.vila.ex,
+    },
+    nasta: {
+      e: 'NÄSTA', n: 'DAGAR TILL NÄSTA LANDSKAMP',
+      t: 'Dagar från den här matchen till lagets nästa landskamp, med tävlingen efter när den är en annan. Med två landskamper på några dagar kan förbundskaptenen låta några spelare vila.',
+      ex: akten.nasta.ex,
+    },
+    matcher: {
+      n: 'LANDSKAMPER DE SENASTE DAGARNA',
+      t: ({ dagar }) => `Lagets landskamper de senaste ${dagar} dagarna före avspark.`,
+      ex: akten.matcher.ex,
+    },
+    grupp: { n: 'PLATSEN I GRUPPEN', t: 'Lagets plats i sin grupp i Nations League och hur många lag gruppen har.', ex: null },
+    poang: {
+      e: 'POÄNG', n: 'POÄNG PÅ SPELADE MATCHER',
+      t: 'Poängen i gruppen och antalet spelade matcher. En vinst ger 3 poäng och en oavgjord match 1.',
+      ex: ({ namn, tab, nl }) => {
+        if (!tab || !nl || !ok(tab.points) || 3 * nl.v + nl.o !== tab.points) return null;
+        if (!tab.points) return `${namn} har inte tagit någon poäng.`;
+        const d = [[nl.v, 'vinst', 'vinster', `${nl.v} × 3`], [nl.o, 'oavgjord match', 'oavgjorda matcher', String(nl.o)]].filter((x) => x[0]);
+        // (bara oavgjorda: "2 oavgjorda matcher ger 2 poäng", utan uträkning)
+        return `För ${namn} ger ${ochLista(d.map(([k, a, b]) => st(k, a, b)))} ${nl.v ? `${d.map((x) => x[3]).join(' + ')} = ` : ''}${tab.points} poäng.`;
+      },
+    },
+    favorit: {
+      e: 'FAVORIT', n: 'FAVORIT ENLIGT ODDSEN',
+      t: 'Hur ofta laget har haft större chans än motståndaren att vinna i Nations League, enligt spelbolagens odds vid avspark.',
+      ex: lag.favorit.ex,
+    },
+    odds: {
+      e: 'MOT ODDSEN', n: 'POÄNG MOT ODDSEN',
+      t: 'Tagna poäng i Nations League minus de poäng som oddsen räknade med. Plus betyder att laget har tagit fler poäng än spelbolagen trodde, och minus färre.',
+      ex: lag.odds.ex,
+    },
+    marknaden: {
+      e: 'MARKNADEN', n: 'CHANSEN ENLIGT ODDSEN',
+      t: 'Chansen att hemmalaget vinner (till vänster) och att bortalaget vinner (till höger), räknad ur spelbolagens odds för matchen. Chansen till oavgjort står under. Spelbolagens påslag är borträknat, så att de tre chanserna tillsammans blir 100 %. Det är spelbolagens bedömning, inte prognosmodellens.',
+      exm: ({ hem, bort, p }) => (p ? `Enligt oddsen skulle ${hem.namn} vinna ${p[0]} av 100 sådana matcher och ${bort.namn} ${p[2]}, medan ${p[1]} skulle sluta oavgjort.` : null),
+    },
+    'nl-vof': {
+      e: 'V-O-F', n: 'I NATIONS LEAGUE',
+      t: 'Vinster, oavgjorda och förluster i Nations League hittills.',
+      ex: ({ namn, nl }) => vofOrd(namn, rek(nl), ['match', 'matcher', ' i Nations League']),
+    },
+    'nl-mal': {
+      e: 'MÅL', n: 'GJORDA–INSLÄPPTA PER MATCH',
+      t: 'Gjorda och insläppta mål per match i Nations League, de gjorda först.',
+      ex: ({ namn, nl }) => (nl && nl.matcher ? `${namn} har gjort ${nl.gjorda} och släppt in ${nl.inslappta} på ${st(nl.matcher, 'match', 'matcher')}: ${dec(nl.gjorda / nl.matcher)}–${dec(nl.inslappta / nl.matcher)}.` : null),
+    },
+    'nl-nollor': { e: 'NOLLOR', n: 'HÅLLNA NOLLOR', t: 'Matcher i Nations League där laget inte har släppt in något mål.', ex: null },
+    skytten: {
+      e: 'SKYTTEN', n: 'BÄSTE MÅLSKYTTEN',
+      t: 'Lagets bästa målskytt i Nations League och antalet mål. Vid lika många står den som har spelat färst matcher.',
+      ex: ({ namn, nl, skytt: s }) => (s && nl && nl.gjorda ? `${s.namn} har gjort ${s.v === nl.gjorda ? (s.v === 1 ? `${gen(namn)} enda mål` : `alla ${gen(namn)} ${s.v} mål`) : `${s.v} av ${gen(namn)} ${st(nl.gjorda, 'mål', 'mål')}`}.` : null),
+    },
+    'spelare:assist': {
+      e: 'ASSIST', n: 'FLEST ASSIST I LAGET',
+      t: 'Spelaren i laget med flest assist i Nations League. En assist är den sista passningen före ett mål. Vid lika många står den som har spelat färst matcher.',
+      ex: ({ namn, nl, assist: a }) => (a && nl && nl.gjorda ? `${a.namn} har slagit den sista passningen till ${a.v} av ${gen(namn)} ${st(nl.gjorda, 'mål', 'mål')}.` : null),
+    },
+    'alla-vof': {
+      e: 'V-O-F', n: 'ALLA LANDSKAMPER',
+      t: 'Vinster, oavgjorda och förluster i alla landskamper sedan hösten 2024, vänskapsmatcherna inräknade.',
+      ex: ({ namn, alla }) => vofOrd(namn, rek(alla), ['landskamp', 'landskamper', alla && alla.fran ? ` sedan ${datumAr(alla.fran)}` : '']),
+    },
+    'alla-mal': {
+      e: 'MÅL', n: 'GJORDA–INSLÄPPTA PER MATCH',
+      t: 'Gjorda och insläppta mål per match i alla landskamper sedan hösten 2024, de gjorda först.',
+      ex: ({ namn, alla }) => (alla && alla.matcher ? `${namn} har gjort ${alla.gjorda} och släppt in ${alla.inslappta} på ${st(alla.matcher, 'landskamp', 'landskamper')}: ${dec(alla.gjorda / alla.matcher)}–${dec(alla.inslappta / alla.matcher)}.` : null),
+    },
+    'alla-nollor': { e: 'NOLLOR', n: 'HÅLLNA NOLLOR', t: 'Landskamper sedan hösten 2024 där laget inte har släppt in något mål.', ex: null },
+    skapar: {
+      e: 'xG', n: 'LAGETS–MOTSTÅNDARNAS xG PER MATCH',
+      t: `Förväntade mål (xG) per match i Nations League, först lagets egna chanser och sedan motståndarnas. ${xgOrd}`,
+      ex: akten.skapar.ex,
+    },
+    pamal: {
+      e: 'PÅ MÅL', n: 'LAGETS–MOTSTÅNDARNAS SKOTT PÅ MÅL PER MATCH',
+      t: 'Skott på mål per match i Nations League, först lagets och sedan motståndarnas. Skott på mål är mål och skott som målvakten räddar. Skott utanför eller i stolpen räknas inte.',
+      ex: (h) => pamalEx(h, false),
+    },
+    malxg: {
+      e: 'MÅL MOT xG', n: 'GJORDA MÅL MINUS xG',
+      t: 'Gjorda mål minus xG i Nations League. Plus betyder fler mål än chanserna var värda, alltså bra avslut eller tur. Stora skillnader brukar jämna ut sig.',
+      ex: lag.malxg.ex,
+    },
+    inslxg: {
+      e: 'INSLÄPPTA MÅL MOT xG', n: '',
+      t: 'Insläppta mål minus motståndarnas xG i Nations League. Minus betyder färre insläppta mål än motståndarnas chanser var värda, alltså en bra målvakt eller tur. Plus betyder fler.',
+      ex: lag.inslxg.ex,
+    },
+    moten: {
+      e: 'DE SENASTE MÖTENA',
+      t: 'Landskamperna mellan lagen sedan hösten 2024, den senaste först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
+      ex: null,
+    },
   };
 
   // ---------- spelarna ----------
@@ -398,5 +633,5 @@
     },
   };
 
-  window.RumRegisterOrd = { lag, akten, spelare };
+  window.RumRegisterOrd = { lag, akten, land: landet, spelare };
 })();
