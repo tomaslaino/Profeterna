@@ -6284,6 +6284,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       m.onload = () => window.RumMat(R);
       document.head.append(m);
     }
+    // ?rum-fel: felrutan i den riktiga telefonen (rum-fel.js)
+    if (R.q.has('rum-fel') && !R.fel) {
+      R.fel = true;
+      const f = document.createElement('script');
+      f.src = 'rum-fel.js';
+      f.onload = () => window.RumFel(R);
+      document.head.append(f);
+    }
     forhamta();
     if (!R.built) build();
     const q = R.q;

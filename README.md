@@ -6037,6 +6037,16 @@ igenom sig självt på ungefär en minut – står still, dras med ett låtsasfi
 gatan och fram och tillbaka till närbilderna – och visar bildrutorna i en tabell att ta en
 skärmbild av, med hur lång tid gängets kod och grafik tar per bild.
 
+**Felrutan i den riktiga telefonen (2026-11-14):** i iPhonen saknades inredningen, sakerna och datorn (lysröret,
+skyltarna, uret, skivan med löpsedlarna, barstolarna, askkoppen …) medan gänget stod där, och det gick inte att
+framkalla i Chrome som telefon eller i WKWebView, inte heller när sidan öppnades igen eller med WebKits
+`_processWillSuspendImminentlyForTesting` (som när Safari läggs i bakgrunden). Med `?rum-fel`
+(matchfixarna.se/?rum-fel, [public/rum-fel.js](public/rum-fel.js), laddas bara då) står en ruta överst med när
+var och en av 3D-delarna kom upp (eller *SAKNAS*), kön (`R.turStart`, `R.turGar`), steget, `R.ej3d`, tappad grafik,
+varningarna och felen i konsolen, när sidan låg i bakgrunden, `getContext` som gav null, och om inredningens,
+datorns och gatans dukar är ritade eller tomma. Ritade dukar som har blivit tomma betyder att telefonen har tömt
+dem; en del som saknas med en varning betyder att den aldrig byggdes.
+
 ### Ljuset efter klockan
 
 Rummet var lika upplyst överallt. Nu faller eftermiddagssolen in genom skyltfönstret över pulten, och på kvällen
