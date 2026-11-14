@@ -572,6 +572,14 @@ export async function dator(o) {
           } else if (k && k.startsWith('st')) {
             g.fillStyle = FARG[k === 'st' ? '' : 'd'];
             g.fillRect(x, y + lh * 0.12, w, lh * 0.66);
+          } else if (k === 'mt1' || k === 'mt0') {
+            // korten i rum-register.js: mätarens streck, ett per tecken
+            g.fillStyle = k === 'mt1' ? FARG[''] : 'rgba(65,255,110,.17)';
+            for (let j = 0; j < t.length; j++) g.fillRect(x + j * cw, y + lh * 0.25, cw * 0.72, lh * 0.5);
+          } else if (k === 'ln') {
+            // rubrikens streck
+            g.fillStyle = FARG.d;
+            g.fillRect(x, y + lh / 2 - 1, w, 2);
           }
           g.fillStyle = FARG[k || ''];
           g.shadowColor = k === 'i' ? 'transparent' : 'rgba(65,255,110,.55)';

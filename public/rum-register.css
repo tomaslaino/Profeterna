@@ -70,6 +70,12 @@
 .reg-term .tr.ny::before { content: ''; position: absolute; left: 0; right: 0; top: 0; border-top: 0.07em solid var(--svag); opacity: 0.75; pointer-events: none; }
 .reg-term .tr.rub { display: flex; align-items: center; gap: 1ch; }
 .reg-term .tr.rub::after { content: ''; flex: 1; border-top: 0.09em solid var(--svag); opacity: 0.75; }
+/* korten (rum-register.js, ETK): avsnittens rubrik med ett streck efter, och
+   mätaren – ett streck per tecken, fyllda (mt1) och tomma (mt0) */
+.reg-term .ln { background: linear-gradient(var(--svag), var(--svag)) left center / 100% 0.09em no-repeat; opacity: 0.8; }
+.reg-term .mt1, .reg-term .mt0 { background-position: left center; background-size: 1ch 0.5em; background-repeat: repeat-x; }
+.reg-term .mt1 { background-image: linear-gradient(90deg, var(--gron) 0 72%, transparent 72%); }
+.reg-term .mt0 { background-image: linear-gradient(90deg, rgba(65, 255, 110, 0.17) 0 72%, transparent 72%); }
 /* tangenterna längst ner, omvänt över hela bredden */
 /* Rutan med förklaringen till ett tal (fkRita i rum-register.js): dubbel
    ram med talets namn omvänt i ramen och vad det är svagt bredvid. Den

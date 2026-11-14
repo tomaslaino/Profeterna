@@ -36,7 +36,7 @@
   const mkt = (t) => (t && t.fd && t.fd.mkt && t.fd.mkt.n ? t.fd.mkt : null);
   const lag = {
     form: {
-      t: 'De fem senaste matcherna i ligan och de engelska cuperna, den senaste längst till vänster: V är vinst, O oavgjort och F förlust. Ställningen efter 90 minuter gäller. Talet är poängen som matcherna gav, 3 för vinst och 1 för oavgjort, högst 15.',
+      t: 'De fem senaste matcherna i ligan och de engelska cuperna, den senaste först: V är vinst, O oavgjort och F förlust. Ställningen efter 90 minuter gäller. Talet är poängen som matcherna gav, 3 för vinst och 1 för oavgjort, högst 15.',
       ex: ({ namn, form }) => {
         if (!form || form.length !== 5 || !form.every((c) => 'VOF'.includes(c))) return null;
         const n = (c) => form.filter((x) => x === c).length;
