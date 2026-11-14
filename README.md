@@ -7908,7 +7908,10 @@ så att domen är densamma varje gång och på alla enheter; var och en i gänge
 samma omgång låter olika. Varje rad är en mening, så att *Läs upp* kan läsa domen mening för mening. En mening med en match
 hörs inte (rösten kan inte alla lag), så kommentaren efter den ska gå att förstå för sig. Inledningen står lite fetare,
 sakerna indragna bakom ett tunt streck i domens guld, som anteckningar i marginalen, och slutet i kursiv (`.rh-domen` i
-[public/rum-hasse.css](public/rum-hasse.css)). Han talar till den som står vid disken, och det kan vara den han dömer: de
+[public/rum-hasse.css](public/rum-hasse.css)). I telefonen går domen upp mot hans krage när den inte ryms under händerna, som
+hans text om en match, med mörkret bakom sig och Tillbaka och *Läs upp* på samma rad (`tillKragen`); förut fick den ett par
+rader ovanpå den ljusa kupongen på pulten, där mörkret bara hade börjat, och var svår att läsa (2026-11-14, användarens
+önskemål). Han talar till den som står vid disken, och det kan vara den han dömer: de
 övriga är *de andra* eller *resten*, och *vi* är han och den han talar med, aldrig gänget, där han inte är med (*Dogge var
 bäst av er, och det kommer resten att få höra*, inte *vi*; 2026-11-10, `npm run repliker` säger till).
 

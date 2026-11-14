@@ -267,6 +267,8 @@
    innan Läs upp syns) */
 .rum-hasse-vy.hog.kragen .rh-slut::before { content: ''; flex-basis: 100%; order: 1; }
 .rum-hasse-vy.hog.kragen .rh-slut > .rh-vag { order: 2; }
+/* (under domen över en kupong finns bara Tillbaka och Läs upp, och de står på samma rad) */
+.rum-hasse-vy.hog.kragen .rh-domen ~ .rh-slut::before { content: none; }
 .rum-hasse-vy.hog.kragen .rh-text.mer { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); }
 .rum-hasse-vy.hog .rh-domen { font-size: 1em; }
 .rum-hasse-vy.hog .rh-sagt { font-size: 1.4em; margin-bottom: 0.2em; }

@@ -3267,6 +3267,9 @@ window.RumHasse = (() => {
       '<div class="rh-slut"><button type="button" class="rh-knapp huvud rh-tillbaka">Tillbaka</button></div>';
     const ruta = repliker(domText(p, sum), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
     ruta.scrollTop = 0;
+    // (i telefonen går domen upp mot kragen när den inte får plats under honom, som hans text om en match:
+    // förut fick den ett par rader ovanpå den ljusa kupongen på pulten, där mörkret bara hade börjat)
+    tillKragen();
     const dom = s.querySelector('.rh-dom');
     const visa = () => dom.classList.remove('vantar');
     const slag = ettAv('dom', 'slag');
