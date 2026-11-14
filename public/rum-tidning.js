@@ -67,6 +67,8 @@
   const tid = (t) => fTid.format(new Date(t)).replace(':', '.');
   const iso = (d) => (typeof d === 'string' && /^\d{4}-\d\d-\d\d/.test(d) ? d.slice(0, 10) : '');
   const kortDatum = (d) => (giltig(d) ? fKort.format(new Date(d)).replace('.', '') : '');
+  // 14 nov, och för ett datum från ett annat år 4 juni 2025 (förra klubbens supportrar: tråden när han gick)
+  const medAr = (d) => (iso(d) && iso(d).slice(0, 4) !== fYmd.format(new Date()).slice(0, 4) ? `${kortDatum(d)} ${iso(d).slice(0, 4)}` : kortDatum(d));
   // lör 14 nov (över avsparken på matchbladets tavla)
   const dagen = (t) => (giltig(t) ? `${fVdag.format(new Date(t)).replace('.', '')} ${kortDatum(t)}` : '');
 
@@ -105,7 +107,7 @@
     poddar: {
       // Källans slag framför namnet: podden …, forumet …, intervjun i … (motståndarens medier) och (de insatta,
       // klubben och lokaltidningen) bara namnet.
-      typord: { podd: 'podden', forum: 'forumet', media: '', lokal: '', motstand: 'intervjun i' },
+      typord: { podd: 'podden', forum: 'forumet', media: '', lokal: '', motstand: 'intervjun i', forra: '' },
       rubrik: (h, b) => `${h}–${b}: det supportrarna vet`,
       // under tavlan, före arenan: numret på kupongen, och för en landskamp tävlingen och gruppen (Nations League ·
       // Grupp B4) där klubbarna inte har något (2026-11-13)
@@ -117,10 +119,10 @@
       ingen: 'Ingen supporterpodd, inget forum och inget från de insatta, klubben eller lokaltidningen att hämta något ur den här veckan.',
       kallorna: 'Källorna',
       // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan undertiteln,
-      // motståndarens intervju med intervjun i framför och de insatta medierna, klubben och lokaltidningen med sitt
-      // eget namn.
-      kalla: (k) => (k.typ === 'forum' ? `forumet ${k.podd}` : k.typ === 'motstand' ? `intervjun i ${k.podd}`
-        : ['media', 'lokal'].includes(k.typ) ? String(k.podd || '') : poddNamn(k.podd)),
+      // motståndarens intervju med intervjun i framför, förra klubbens supportrar med vem de skrev om (Owlstalk om
+      // Murphy Cooper) och de insatta medierna, klubben och lokaltidningen med sitt eget namn.
+      kalla: (k) => (k.typ === 'forum' ? `forumet ${k.podd}` : k.typ === 'motstand' ? `intervjun i ${k.podd}` : k.typ === 'forra' && k.om ? `${k.podd} om ${k.om}`
+        : ['media', 'lokal', 'forra'].includes(k.typ) ? String(k.podd || '') : poddNamn(k.podd)),
       // efter citatet: det är översatt från engelska
       oversatt: 'översatt',
     },
@@ -180,7 +182,7 @@
 
   // "The Tilehurst End - A Reading FC Podcast" → "The Tilehurst End"
   const poddNamn = (n) => String(n || '').split(/\s+[-–|:]\s+/)[0].trim() || String(n || '');
-  const kallansNamn = (k) => (k.typ === 'podd' ? poddNamn(k.podd) : String(k.podd || ''));
+  const kallansNamn = (k) => (k.typ === 'podd' ? poddNamn(k.podd) : k.typ === 'forra' && k.om ? `${k.podd} om ${k.om}` : String(k.podd || ''));
   // Lagets text: artikelns stycken (text), och för ett äldre nummer uppgifterna som löptext, ett stycke per ämne.
   function poddText(d) {
     if (d && Array.isArray(d.text) && d.text.some((x) => x && String(x).trim())) return d.text.map((x) => String(x || '').trim()).filter(Boolean);
@@ -193,9 +195,10 @@
   function poddKallor(d) {
     const kallor = [];
     for (const k of ((d && d.kallor) || []).filter((y) => y && y.podd)) {
-      const typ = ['forum', 'media', 'lokal', 'motstand'].includes(k.typ) ? k.typ : 'podd';
-      let x = kallor.find((y) => y.typ === typ && y.podd === k.podd);
-      if (!x) kallor.push((x = { podd: k.podd, typ, adress: null, datum: [], lankar: {}, senast: '' }));
+      const typ = ['forum', 'media', 'lokal', 'motstand', 'forra'].includes(k.typ) ? k.typ : 'podd';
+      const om = typ === 'forra' && k.om ? String(k.om) : null;
+      let x = kallor.find((y) => y.typ === typ && y.podd === k.podd && y.om === om);
+      if (!x) kallor.push((x = { podd: k.podd, typ, om, adress: null, datum: [], lankar: {}, senast: '' }));
       const dt = iso(k.datum);
       if (dt && !x.datum.includes(dt)) x.datum = [...x.datum, dt].sort();
       if (dt && k.adress && !x.lankar[dt]) x.lankar[dt] = k.adress;
@@ -205,12 +208,13 @@
     return kallor;
   }
   const lank = (adress, html) => `<a href="${esc(adress)}" target="_blank" rel="noopener">${html}</a>`;
-  // ['2026-11-02', '2026-11-09'] → "2 och 9 nov", ['2026-10-28', '2026-11-03'] → "28 okt och 3 nov". Med lankar
-  // går varje datum till sitt avsnitt, sin tråd eller artikel. → html
+  // ['2026-11-02', '2026-11-09'] → "2 och 9 nov", ['2026-10-28', '2026-11-03'] → "28 okt och 3 nov". Ett datum från
+  // ett annat år får året (förra klubbens supportrar: tråden när han gick, "12 maj 2025"). Med lankar går varje
+  // datum till sitt avsnitt, sin tråd eller artikel. → html
   function datumen(l0, lankar = null) {
     const l = [...new Set([].concat(l0).map(iso).filter(Boolean))].sort();
-    const d = l.map(kortDatum);
-    const man = d.map((x) => x.split(' ')[1]);
+    const d = l.map(medAr);
+    const man = d.map((x) => x.split(' ').slice(1).join(' '));
     const samma = man.every((m) => m === man[0]);
     return lista(d.map((x, i) => {
       const t = esc(samma && i < d.length - 1 ? x.split(' ')[0] : x);
@@ -234,7 +238,7 @@
   // Ett citat som redan var på svenska (SVT, Aftonbladet) har oversatt: false och står utan (översatt).
   function poddCitat(c) {
     if (!c || !c.sagt) return null;
-    return { sagt: c.sagt, vem: stor([c.vem, c.podd ? TEXT.poddar.kalla(c) : '', kortDatum(iso(c.datum))].filter(Boolean).join(', ')), oversatt: c.oversatt !== false };
+    return { sagt: c.sagt, vem: stor([c.vem, c.podd ? TEXT.poddar.kalla(c) : '', medAr(iso(c.datum))].filter(Boolean).join(', ')), oversatt: c.oversatt !== false };
   }
 
   // ---------- upplagan ----------

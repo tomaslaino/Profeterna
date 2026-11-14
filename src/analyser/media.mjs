@@ -4,7 +4,8 @@
 // som supporterpoddarna och forumen, och uppgifterna hamnar på samma informationssidor.
 //
 // Samma kod läser klubben, lokaltidningen och motståndarens intervju med en supporter
-// (config/lokal.js): varje funktion tar då den konfigurationen som cfg. Utan cfg gäller de
+// (config/lokal.js) och förra klubbens supportrar om lagets nya tränare eller spelare (config/forra.js,
+// src/analyser/forra.mjs): varje funktion tar då den konfigurationen som cfg. Utan cfg gäller de
 // insattas (config/media.js).
 //
 //   1. Claude Code söker fram artiklarna (bara sökningen, inga sidor). En adress räknas bara om den
@@ -60,7 +61,8 @@ export function utesluten(url, lista = mc.utesluten) {
 
 // Claudes svar på sökningen → artiklarna som håller: adressen kom upp i en sökning (found) och hör
 // inte till en utesluten sajt. Samma artikel tas en gång. Har konfigurationen slag (config/lokal.js)
-// följer artikelns slag med, och en artikel med ett okänt slag stryks. → [{kalla, titel, adress, datum, varfor, slag?}]
+// följer artikelns slag med, och en artikel med ett okänt slag stryks. Personen som artikeln handlar om (om,
+// förra klubben) följer med när svaret har den. → [{kalla, titel, adress, datum, varfor, slag?, om?}]
 export function artiklarAv(content, found = [], { cfg = mc, flest = cfg.artiklar } = {}) {
   let j;
   try { j = jsonOf(content); } catch { return null; }
@@ -78,7 +80,8 @@ export function artiklarAv(content, found = [], { cfg = mc, flest = cfg.artiklar
     const datum = x && typeof x.datum === 'string' && /^\d{4}-\d\d-\d\d$/.test(x.datum) ? x.datum : null;
     // Källans namn utan en förklaring inom parentes sist ("Plymouth Live (Plymouth Herald)"): datumet står inom parentes på sidan.
     const kalla = typeof x.kalla === 'string' ? x.kalla.trim().replace(/\s*\([^()]*\)$/, '').trim() : '';
-    ut.push({ kalla: kalla ? kalla.slice(0, 80) : null, titel: typeof x.titel === 'string' ? x.titel.trim().slice(0, 200) : null, adress, datum, varfor: typeof x.varfor === 'string' ? x.varfor.trim().slice(0, 300) : null, ...(slag ? { slag } : {}) });
+    const om = x && typeof x.om === 'string' && x.om.trim() ? x.om.trim().slice(0, 80) : null;
+    ut.push({ kalla: kalla ? kalla.slice(0, 80) : null, titel: typeof x.titel === 'string' ? x.titel.trim().slice(0, 200) : null, adress, datum, varfor: typeof x.varfor === 'string' ? x.varfor.trim().slice(0, 300) : null, ...(slag ? { slag } : {}), ...(om ? { om } : {}) });
     if (ut.length >= flest) break;
   }
   return ut;
@@ -225,7 +228,7 @@ export function artikelAv(html) {
   return { titel: avkoda(titel0).replace(/\s+/g, ' ').trim().slice(0, 200) || null, datum, forfattare: forfattare ? avkoda(forfattare).trim() : null, sajt: sajt ? avkoda(sajt).trim().slice(0, 80) : null, text };
 }
 
-const kortad = (text, flest) => (text.length > flest ? `${text.slice(0, flest).replace(/\s+\S*$/, '')} …` : text);
+export const kortad = (text, flest) => (text.length > flest ? `${text.slice(0, flest).replace(/\s+\S*$/, '')} …` : text);
 
 // Läser en artikel som sökningen gav. → {kalla, titel, adress, datum, forfattare, text, nyckel, slag?} eller kastar
 // (Sparrad när sidan inte får eller kan läsas, Error när den är för gammal eller för kort).
@@ -251,7 +254,8 @@ export const typerAv = (cfg = mc) => [...new Set([cfg.typ || 'media', ...Object.
 // ---------- urvalet ----------
 
 // Artiklarna som de ges till Claude: numrerade, med källan (och vad det är för källa, cfg.slagText),
-// rubriken, datumet och skribenten. → {text, artiklar: [{nr, …}]}
+// personen den handlar om och hans förra klubb (om, fran: config/forra.js), rubriken, datumet och skribenten.
+// → {text, artiklar: [{nr, …}]}
 export function mediaText(artiklar, { cfg = mc, flestTecken = cfg.flestTecken } = {}) {
   const ut = [];
   const delar = [];
@@ -259,7 +263,8 @@ export function mediaText(artiklar, { cfg = mc, flestTecken = cfg.flestTecken } 
   for (const a of artiklar) {
     const nr = ut.length + 1;
     const slag = cfg.slagText && a.slag && cfg.slagText[a.slag] ? ` (${cfg.slagText[a.slag]})` : '';
-    const huvud = `[${nr}] ${a.kalla}${slag}: "${a.titel || 'utan rubrik'}"${a.datum ? `, ${dagFmt.format(new Date(a.datum))}` : ''}${a.forfattare ? `, av ${a.forfattare}` : ''}`;
+    const om = a.om ? ` (om ${a.om}${a.fran ? `, förut i ${a.fran}` : ''})` : '';
+    const huvud = `[${nr}] ${a.kalla}${slag}${om}: "${a.titel || 'utan rubrik'}"${a.datum ? `, ${dagFmt.format(new Date(a.datum))}` : ''}${a.forfattare ? `, av ${a.forfattare}` : ''}`;
     const rest = flestTecken - langd - huvud.length;
     if (rest < 400) break;
     const text = kortad(a.text, rest);
@@ -331,6 +336,8 @@ export function mediaPoster(artiklar, u, { cfg = mc, version = cfg.promptVersion
       datum: a.datum || now.toISOString(),
       sida: a.adress,
       forfattare: a.forfattare || null,
+      ...(a.om ? { om: a.om } : {}),
+      ...(a.fran ? { fran: a.fran } : {}),
       nyckel: a.nyckel,
       version,
       uttaget: now.toISOString(),

@@ -2732,6 +2732,40 @@ inte rör varandras poster, sidans och tidningens underlag och redaktörens nyck
 blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
 inget som sticker ut åt sidan. Inte provat på iMacen eller med en riktig intervju i motståndarens medier.
 
+**Förra klubben** (2026-11-14, användarens val bland förslagen till nya källor): när ett lag har en ny tränare eller en
+ny spelare som spelar mycket, vad har supportrarna i hans förra klubb skrivit om honom? De har sett honom i flera år.
+Samma nattjobb, efter klubben och lokaltidningen ([config/forra.js](config/forra.js),
+[src/analyser/forra.mjs](src/analyser/forra.mjs), urvalet och posterna ur src/analyser/media.mjs):
+- **Sökningen** (ett anrop med WebSearch, högst tio sökningar) tar reda på vem som är ny (tränaren de senaste 365
+  dagarna, högst två spelare som kom de senaste 200 och spelar mycket, lån räknas) och klubben där supportrarna såg
+  honom senast, och söker fram förra klubbens forumtrådar när han kom eller gick, fansajternas och fanzinens domar och
+  intervjuer med en supporter till den klubben. Nyheten om övergången och klubbens, ägarnas och hans egna avskedsord
+  räknas inte. Svaret har `nya` (namn, roll, kom, fran) och `artiklar` med `om`; en sida om någon som inte står bland
+  de nya stryks. Forumvärden proboards.com är tillåten här, annars samma uteslutna sajter som för lokaltidningen.
+- **Läsningen:** en forumtråd läses med forumläsarens tolkning (`inlaggen` i forum.mjs) som inlägg med namn och dag,
+  de första 40 (reaktionerna när han kom eller gick), annat som en artikel. Sidorna får vara upp till 550 dagar gamla.
+- **Urvalet** tar ut det som säger något om hur han är: spelet, styrkor och brister, hur han tar motgångar och hur det
+  slutade, med ämnet `spel` eller `klubb` och vem och var i texten (*Wigans supportrar minns Caldwell som …*).
+- **Registret:** förra klubbens syn ändras inte från vecka till vecka, så läsningen sparas per lag i forra.json i
+  jobbets mapp och görs om först efter 28 dagar (`giltigDagar`) eller när `promptVersion` byts. Lagets poster i
+  omgångens fil byts mot registrets, så att en ny omgång får dem utan att något läses om.
+- **Sidan och tidningen:** sidan tar lagets två senaste (`typ: 'forra'`, id på `f`), också när `sidan.baraVeckan` är
+  på, och redaktören får dem som `förra_klubben`. I källspalten står de med sitt eget namn, och ett datum från ett
+  annat år får året (`datumen` i rum-tidning.js). Hasses notiser får dem inte.
+
+```
+node scripts/tidning/poddar.mjs --bara-forra                          bara förra klubben (lag vars läsning är gammal)
+node scripts/tidning/poddar.mjs --utan-forra                          utan den
+node scripts/tidning/poddar.mjs --prov 401880747,401880745 --bara-forra   två matcher på prov (prov.json)
+```
+
+Provat 2026-11-14 på den bärbara datorn med riktiga sökningar (`ANALYSER_CLAUDE`, egen `PODDAR_MAPP`) för Sheffield
+Wednesday–Plymouth och Stockport–Reading, fyra lag på sex minuter. Plymouth fick Owlstalk om målvakten Murphy Cooper
+(förut i Wednesday: briljanta räddningar men tappade bollar, supportrarna oense), Stockport Rochdales supportrar om
+tränaren Jimmy McNulty (byggde truppen med små resurser och vann över skeptikerna), Wednesday en Millwallskribent om
+Barry Bannan, och Reading inget (Jacob Brown från Portsmouth, inga sidor). Den första versionen av prompterna tog mest
+klubbens och tränarens avskedsord; de stryks nu. Inte provat på iMacen.
+
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att
 finslipa för sig; ändringar på `main` gäller från nästa körning. Ska redan skrivna analyser av
