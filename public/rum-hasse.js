@@ -3229,16 +3229,16 @@ window.RumHasse = (() => {
     tystna();
     H.sagt = null;
     H.talMal = 0;
-    const fylla = K().kan();
+    // (1 X 2 kommer först när du har bett honom om hjälp, i svara)
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><p class="rh-fragan"><span class="rh-o">${esc(fragan)}</span></p>` +
-      `<div class="rh-svar">${fylla ? K().rutor(m.id) : ''}<div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa"></button></div>` +
+      `<div class="rh-svar"><div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa"></button></div>` +
       `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
     const svar = s.querySelector('.rh-svar');
     const ja = svar.querySelector('.huvud');
-    // Knappen bredvid lottas bland dem som får plats på samma rad, annars flyttar sig Matchbladet när
-    // den byts mot Alla matcher (i en smal telefon står de på var sin rad ändå).
+    // Knappen bredvid (tillbaka till alla matcher) lottas bland dem som får plats på samma rad, annars
+    // flyttar sig Matchbladet (i en smal telefon står de på var sin rad ändå).
     const egen = svar.querySelector('.rh-gissa');
-    egen.textContent = lott(fylla ? r.sjalv : r.sjalvGissar, (t) => {
+    egen.textContent = lott(r.angra, (t) => {
       egen.textContent = t;
       return egen.offsetTop === ja.offsetTop;
     });
@@ -3251,29 +3251,6 @@ window.RumHasse = (() => {
     }, true);
     ja.addEventListener('click', () => svara(m, lista));
     svar.querySelector('.rh-gissa').addEventListener('click', (e) => gissa(m, e));
-    if (fylla) {
-      const t = svar.querySelector('.rh-tecken');
-      K().kopplaRutor(t, m, (sign) => {
-        // han är inte längre i färd med frågan
-        H.fraga = {};
-        H.prat = null;
-        tystna();
-        H.sagt = null;
-        H.talMal = 0;
-        const fr = s.querySelector('.rh-fragan');
-        if (fr) fr.style.opacity = 0;
-        K().vems(t, () => fyllIn(m, lista, sign, () => {
-          // Lär mig står kvar där den stod, och bredvid den Alla matcher
-          const g = svar.querySelector('.rh-gissa');
-          if (!g || g.dataset.alla) return;
-          g.dataset.alla = '1';
-          const ny = g.cloneNode(false);
-          ny.textContent = 'Alla matcher';
-          g.replaceWith(ny);
-          ny.addEventListener('click', fraga);
-        }));
-      });
-    }
     if (!klick.detail) ja.focus({ preventScroll: true });
     analysen(m.id).then((a) => {
       if (H.fraga !== vem) return;
@@ -3287,7 +3264,7 @@ window.RumHasse = (() => {
       H.prat = vantar(r.valVanta, 3, 18000);
     });
   }
-  // Du gissar själv: tillbaka till listan, där du var.
+  // Du ångrar dig: tillbaka till listan, där du var.
   function gissa(m, e) {
     if (H.kupong && H.kupong.paDisken) H.kupong.borta();
     fraga();

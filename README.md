@@ -431,6 +431,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   Helgarderats senaste nummer, samma som ligger på pulten, i stället för DN eller SvD. Omslaget är mot en, tryckt som på
   pulten (Kalenderbladet), och på baksidan står sista sidan med hans egen krönika och veckans kåseri (utan sista sidan
   innehållet). Finns inget nummer läser han DN eller SvD som förut (se *Tidningen* under [Hasse Backe](#hasse-backe))
+- [x] **Hasses fråga utan 1 X 2 (2026-11-14, användarens önskemål: "Ta bort 1X2 här - det tänker jag får komma först
+  efter att man har bett Hasse om hjälp", och i stället för *Jag tänker själv* "Jag ångrar mig" eller "Tillbaka"):**
+  när man har valt en match frågar han tillbaka, och under frågan står bara de två svaren och *Matchbladet →*. Rutorna
+  1 X 2 kommer först med analysen. Knappen bredvid går tillbaka till alla matcher och lottas ödmjukt ur `angra`
+  (*Jag ångrar mig*, *Tack, inte nu*, *Jag är inte redo*, *Jag vågar inte* …), men aldrig *Tillbaka*, som redan står
+  i hörnet och går ut ur samtalet; *Jag har koll* och *Jag vet redan* är borta (se *Samtalet* under [Hasse Backe](#hasse-backe))
 
 ## Publicering
 
@@ -7766,15 +7772,15 @@ rakt in i kameran och syntes inte, så det sättet är borttaget.
 
 **Samtalet.** Det är han som frågar, *Vilken match ska jag hjälpa dig med?*, och när du kommer tillbaka *Har du kört fast igen, Laino?*, med det du kallas (efternamnet, *Dogge* för Johansson) om kupongen
 vet vem du är. Han talar i hela meningar som går att förstå för sig: han säger vad det gäller (*Vilken match vill du ha hjälp med nu då?*, inte *Vilken match är det nu då?*), och "den" syftar bara på matchen du har valt. Över matchlistan finns alltid plats för två rader, så att listan står still vad han än säger. Man svarar genom att välja en match. Då frågar han tillbaka (*Den är solklar. Vill du
-veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag gissar* går tillbaka till listan och
+veta, eller ska du gissa?*), och först *Jag är idel öra* ger analysen (knappen lottas som hans repliker: också *Tala om det för mig*), så att ett felklick inte visar ett tips. *Jag ångrar mig* går tillbaka till listan och
 *Matchbladet* lägger fram matchbladet över baren – samma blad som när man klickar på lagen på kupongen i
 rummet (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)), lika stort som kupongen i handen och
 med baren mörk bakom; *← Hasse* längst ner, Esc eller ett klick utanför lägger bort det, och man är kvar hos
 honom (`bladet` i [public/rum-hasse.js](public/rum-hasse.js)). Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
-som ligger på disken: stort 1 X 2 överst (se *Din kupong*), *Jag är idel öra* i terrakotta som kupongens band, *Jag fyller i själv* i krämvitt papper
-bredvid (*Jag gissar* när kupongen inte går att fylla i; båda texterna lottas, ur `lar` respektive `sjalv`
-och `sjalvGissar` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
-versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
+som ligger på disken: *Jag är idel öra* i terrakotta som kupongens band, *Jag ångrar mig* i krämvitt papper
+bredvid (båda texterna lottas, ur `lar` respektive `angra` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js);
+den bredvid är ödmjuk, som *Tack, inte nu* och *Jag är inte redo*), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
+versaler som texten i bandet. Rutorna 1 X 2 står inte här: de kommer först när man har bett honom om hjälp (se *Din kupong*). Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
 lapp i terrakotta, med *Alla matcher* i krämvitt bredvid (*Fyll i den* i stället för *Titta igen* medan han
@@ -8080,9 +8086,9 @@ replik är `{ text, gest?, vid?, ny?, skrift? }` och gesten ett namn i `RumHasse
 figurens tidslinje. Munnen följer texten också under gesterna (fjärde argumentet till `rita`).
 
 **Din kupong.** Han fyller i din kupong åt dig
-([public/rum-hasse-kupong.js](public/rum-hasse-kupong.js)). När du har valt en match står 1, X och 2 stort,
-i kupongens tryck och med samma kryss som på kupongen, och du kan välja direkt eller trycka på *Jag är idel öra*
-först för att höra analysen. Väljer du ett tecken säger han *Ge hit kupongen* och får den: det är samma kupong som på
+([public/rum-hasse-kupong.js](public/rum-hasse-kupong.js)). När du har bett honom om hjälp med en match (*Jag är idel öra*)
+står 1, X och 2 stort under analysen, i kupongens tryck och med samma kryss som på kupongen (före det, under hans
+fråga, står de inte; ändrat 2026-11-14). Väljer du ett tecken säger han *Ge hit kupongen* och får den: det är samma kupong som på
 pulten, ritad av samma kod (`Rum.kupong`, `couponHtml` i [public/rum.js](public/rum.js)) med samma kryss,
 slitage, stämpel, namn och fält, och det han skriver hamnar i samma utkast (`Samtal.pult.tippa`).
 

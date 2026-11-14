@@ -1559,7 +1559,7 @@
     'Jag dricker kaffe så länge.',
     'Jag har sett folk tänka längre.',
   ],
-  // Knappen som tar fram analysen: ditt svar, bredvid sjalv (sjalvGissar om kupongen inte går att fylla i).
+  // Knappen som tar fram analysen: ditt svar, bredvid angra.
   lar: [
     'Jag är idel öra',
     'Tala om det för mig',
@@ -1588,36 +1588,23 @@
     'Jag lyssnar noga',
     'Visa hur man gör',
   ],
-  // Knappen bredvid: du gör det själv och går tillbaka till listan. sjalv när kupongen går att fylla i
-  // (rutorna 1 X 2 står ovanför), sjalvGissar när den inte går det. Högst 18 tecken, som Jag fyller i själv,
+  // Knappen bredvid: du ångrar dig och går tillbaka till alla matcher. Ödmjukt: han kan sin sak, det är
+  // du som inte är redo. Inte Tillbaka: det står redan i hörnet och går ut ur samtalet. Högst 18 tecken,
   // och vänster knapp högst 19, som Tala om det för mig: i telefonen på bredden står de på samma rad.
-  sjalv: [
-    'Jag fyller i själv',
-    'Jag tippar själv',
-    'Jag gissar själv',
-    'Jag gissar',
-    'Jag chansar',
-    'Jag går på känsla',
-    'Jag har på känn',
-    'Jag litar på turen',
-    'Jag gör ett försök',
-    'Jag behöver öva',
-    'Jag gör mitt bästa',
-    'Jag prövar lyckan',
+  angra: [
+    'Jag ångrar mig',
+    'Till alla matcher',
+    'Tack, inte nu',
+    'Inte just nu',
+    'Jag återkommer',
+    'Låt mig fundera',
+    'Den tar vi sen',
+    'Jag är inte redo',
+    'Jag vågar inte',
+    'Jag vill inte veta',
+    'Jag är inte värdig',
   ],
-  sjalvGissar: [
-    'Jag gissar',
-    'Jag gissar själv',
-    'Jag chansar',
-    'Jag går på känsla',
-    'Jag har på känn',
-    'Jag litar på turen',
-    'Jag gör ett försök',
-    'Jag behöver öva',
-    'Jag gör mitt bästa',
-    'Jag prövar lyckan',
-  ],
-  // Trycker man på knappen bredvid (sjalv eller sjalvGissar).
+  // Trycker man på knappen bredvid (angra).
   gissar: [
     'Då får du skylla dig själv.',
     'Gissa du, det har gått förr.',
