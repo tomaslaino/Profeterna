@@ -1192,7 +1192,7 @@
   // en i gänget, en i taget (gangLista och doma i rum-hasse.js, läget i RumBlock.gang). Om sig själv säger
   // han inget här. En dom är en inledning med namnet, det som sticker ut på kupongen (högst två saker, var och
   // en med vad han tycker om den) och ett slut, i var sitt stycke. Kupongen visar han inte. Raderna väljs efter
-  // omgången och personen, så att domen är densamma varje gång och på alla enheter. Varje rad är en mening, så
+  // omgången, personen och ett frö som byts varje gång man öppnar domen, så att han säger något nytt. Varje rad är en mening, så
   // att domen går att läsa upp mening för mening. Inget han eller hon: skriv namnet, eller om kupongen.
   // Till gruppen säger han ni och er, aldrig gänget: det är
   // bara ni som använder sidan. Han talar till den som står vid disken, och det kan vara den han dömer, så
