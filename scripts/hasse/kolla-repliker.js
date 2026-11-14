@@ -69,7 +69,7 @@ const FALT = {
 };
 // Sidan lottar bland de här, så de måste vara listor.
 const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
-  'fragaTillbaka', 'lar', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'ropSvar',
+  'fragaTillbaka', 'lar', 'sjalv', 'sjalvGissar', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'ropSvar',
   'fyller.foreslar', 'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
@@ -85,7 +85,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`),
   ...['oppning', 'ledig', 'ledigSverige', 'ledigGranne', 'val', 'sverige', 'granne'].map((k) => `land.${k}`)];
 // Knappar och ord, inte meningar.
-const INTE_MENINGAR = ['lar', 'tecken', 'tal', 'domord', 'felnamn'];
+const INTE_MENINGAR = ['lar', 'sjalv', 'sjalvGissar', 'tecken', 'tal', 'domord', 'felnamn'];
 
 const fel = [];
 const varde = (vag) => vag.split('.').reduce((o, k) => (o == null ? o : o[k]), repliker);
@@ -113,6 +113,9 @@ for (const vag of LISTOR) if (!Array.isArray(varde(vag))) fel.push(`${vag} måst
 for (const [n, v] of Object.entries(repliker.antal || {})) if (!Array.isArray(v)) fel.push(`antal.${n} måste vara en lista`);
 // Raderna under en vald match ska få plats på en rad, annars flyttar sig knapparna under dem.
 for (const vag of ['val', 'valLasa', 'valVanta', 'land.val', 'land.sverige', 'land.granne']) for (const t of varde(vag) || []) if (t.length > 31) fel.push(`${vag}: "${t}" är för lång: högst 31 tecken, annars flyttar sig knapparna`);
+// Knapparna under en vald match står på samma rad i telefonen på bredden: inte bredare än förut
+// (Skrivmaskin har en bredd för alla tecken).
+for (const [vag, max] of [['lar', 19], ['sjalv', 18], ['sjalvGissar', 18]]) for (const t of varde(vag) || []) if (t.length > max) fel.push(`${vag}: "${t}" är för lång: högst ${max} tecken, annars blir knappen bredare än förut`);
 for (const vag of LISTOR) {
   const l = varde(vag);
   if (Array.isArray(l) && new Set(l).size !== l.length) fel.push(`${vag} har samma rad två gånger`);

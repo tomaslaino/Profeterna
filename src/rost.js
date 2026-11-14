@@ -62,9 +62,9 @@ const RESULTAT = [0, 1, 2, 3, 4].flatMap((h) => [0, 1, 2, 3, 4].map((b) => `${h}
 const RATT = repliker.tal.slice(1).flatMap((av, i) => repliker.tal.slice(0, i + 2).map((ratt) => [ratt, av]));
 // Talen i domarna över gänget: två till tretton i ord (doma i rum-hasse.js; en och noll har egna rader).
 const ANTAL = repliker.tal.slice(2);
-// Knapparna (lar), tecknen, talen i ord och ordet i guld i domarna sägs inte, och inte heller att han har
+// Knapparna (lar, sjalv, sjalvGissar), tecknen, talen i ord och ordet i guld i domarna sägs inte, och inte heller att han har
 // tappat rösten.
-const TYSTA = new Set(['lar', 'tecken', 'tal', 'domord', 'felnamn', 'utanRost']);
+const TYSTA = new Set(['lar', 'sjalv', 'sjalvGissar', 'tecken', 'tal', 'domord', 'felnamn', 'utanRost']);
 
 function mallar(o, ut = [], nyckel = '') {
   if (TYSTA.has(nyckel)) return ut;

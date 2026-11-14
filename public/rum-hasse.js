@@ -1377,17 +1377,21 @@ window.RumHasse = (() => {
   const REP = () => window.HasseRepliker;
   const fyll = (t, o = {}) => t.replace(/\{(\w+)\}/g, (_, k) => (o[k] == null ? '' : o[k]));
   // Lottar utan att samma rad kommer två gånger innan alla har varit med, och inte heller två gånger i
-  // rad när alla har varit med och det börjar om.
+  // rad när alla har varit med och det börjar om. Med duger: den första av de kvarvarande som duger, och
+  // duger ingen av dem en annan ur listan som duger (annars den kortaste).
   const pasar = new WeakMap();
   const sist = new WeakMap();
-  function lott(lista) {
+  function lott(lista, duger) {
     let p = pasar.get(lista);
     if (!p || !p.length) {
       p = [...lista].sort(() => Math.random() - 0.5);
       if (p.length > 1 && p[p.length - 1] === sist.get(lista)) [p[0], p[p.length - 1]] = [p[p.length - 1], p[0]];
       pasar.set(lista, p);
     }
-    const x = p.pop();
+    let i = p.length - 1;
+    if (duger) while (i >= 0 && !duger(p[i])) i--;
+    if (duger && i < 0) return [...lista].sort(() => Math.random() - 0.5).find(duger) || lista.reduce((a, b) => (b.length < a.length ? b : a));
+    const [x] = p.splice(i, 1);
     sist.set(lista, x);
     return x;
   }
@@ -3206,10 +3210,17 @@ window.RumHasse = (() => {
     H.talMal = 0;
     const fylla = K().kan();
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><p class="rh-fragan"><span class="rh-o">${esc(fragan)}</span></p>` +
-      `<div class="rh-svar">${fylla ? K().rutor(m.id) : ''}<div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa">${fylla ? 'Jag fyller i själv' : 'Jag gissar'}</button></div>` +
+      `<div class="rh-svar">${fylla ? K().rutor(m.id) : ''}<div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa"></button></div>` +
       `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
     const svar = s.querySelector('.rh-svar');
     const ja = svar.querySelector('.huvud');
+    // Knappen bredvid lottas bland dem som får plats på samma rad, annars flyttar sig Matchbladet när
+    // den byts mot Alla matcher (i en smal telefon står de på var sin rad ändå).
+    const egen = svar.querySelector('.rh-gissa');
+    egen.textContent = lott(fylla ? r.sjalv : r.sjalvGissar, (t) => {
+      egen.textContent = t;
+      return egen.offsetTop === ja.offsetTop;
+    });
     // ett dubbelklick på raden får inte landa på knappen som nu ligger under pekaren
     const t0 = performance.now();
     svar.addEventListener('click', (e) => {

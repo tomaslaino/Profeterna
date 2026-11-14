@@ -7754,7 +7754,8 @@ rummet (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)), lika st
 med baren mörk bakom; *← Hasse* längst ner, Esc eller ett klick utanför lägger bort det, och man är kvar hos
 honom (`bladet` i [public/rum-hasse.js](public/rum-hasse.js)). Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
 som ligger på disken: stort 1 X 2 överst (se *Din kupong*), *Jag är idel öra* i terrakotta som kupongens band, *Jag fyller i själv* i krämvitt papper
-bredvid (*Jag gissar* när kupongen inte går att fylla i), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
+bredvid (*Jag gissar* när kupongen inte går att fylla i; båda texterna lottas, ur `lar` respektive `sjalv`
+och `sjalvGissar` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js)), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
 versaler som texten i bandet. Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
