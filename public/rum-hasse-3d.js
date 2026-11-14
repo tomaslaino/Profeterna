@@ -1661,8 +1661,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const slagB = (t, slag = false) => [t, ...SLAG_B, slag];
   const studsA = (t, h) => [t, [slagAr.W[0], slagAr.W[1] + h, slagAr.W[2]], ...SLAG_A.slice(1)];
   const studsB = (t, h) => [t, [slagBr.W[0], slagBr.W[1] + h, slagBr.W[2]], ...SLAG_B.slice(1)];
-  // fingrarnas krok när han håller cigarren (ring- och lillfingret böjs mer, EXTRA_C)
-  const KG = 0.3;
+  // fingrarnas krok när han håller cigarren (lång-, ring- och lillfingret böjs mer, EXTRA_C)
+  const KG = 0.45;
   // tummen (0 mot handen, 1 ut)
   const TUMME = 0.45;
   // I vilan ligger fingrarna lite samlade (SAMLA: 0 som när han gestikulerar, 1 raka bredvid varandra) och
@@ -2372,7 +2372,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       mot: [[0.05, 0], [0.85, 1], [3.4, 1], [4.3, 0], [11.3, 0], [12.1, 1], [15.05, 1], [15.9, 0]],
       upp: [[1.0, 0], [1.9, 1], [3.4, 1], [4.3, 0], [11.3, 0], [12.0, 1], [14.25, 1], [14.95, 0]],
       grepp: [[0.8, 0], [1.0, 1], [3.35, 1], [3.55, 0], [11.95, 0], [12.1, 1], [14.95, 1], [15.15, 0]],
-      krok: [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [3.35, KG], [3.6, 0.15], [4.3, VILA_A[4]], [11.3, VILA_A[4]], [11.6, 0.12], [11.95, 0.12], [12.1, KG], [14.95, KG], [15.15, 0.14], [15.65, 0.2], [16.15, VILA_A[4]]],
+      // (fingrarna lite krökta när den släpper och tar den vid munnen: helt öppen såg handen ut att vinka)
+      krok: [[0, VILA_A[4]], [0.5, 0.3], [0.8, 0.2], [1.0, KG], [3.35, KG], [3.6, 0.3], [4.3, VILA_A[4]], [11.3, VILA_A[4]], [11.6, 0.28], [11.95, 0.28], [12.1, KG], [14.95, KG], [15.15, 0.14], [15.65, 0.2], [16.15, VILA_A[4]]],
       glod: [[2.2, 0], [2.5, 1], [2.95, 0.2], [3.4, 0.12], [5.3, 0.12], [5.6, 0.9], [6.0, 0.15], [7.6, 0.15], [7.9, 0.9], [8.3, 0.15], [9.7, 0.15], [10.0, 0.85], [10.4, 0.12], [12.0, 0.1], [12.5, 0]],
       iMun: [[1.95, 0], [2.15, 1], [3.0, 1], [3.3, 0]],
       blaser: [[12.65, 0], [12.85, 0.6], [13.9, 0.5], [14.2, 0]],
@@ -3748,13 +3749,26 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // sitter kvar i fingrarna hela vägen. Klippets cig: lägena (ck), fingrarna (krok), när armen går
   // fram och tillbaka (mot) och upp mot ansiktet (upp), när fingrarna har den (grepp), glöden, läpparna
   // om den (iMun), munnen när han blåser ut (blaser) och pustar (pust), och röken.
-  // Greppet (handens mått, skalad som handen): löst i fingertopparna, tummen under och pek- och
-  // långfingret ovanpå, ring- och lillfingret böjda in mot handflatan. I cigarrens läge är x fingrarnas
-  // riktning, y från huvudet mot glöden och z ut ur handflatan. (Förut låg den djupt i den krökta handen,
-  // och fingrarna såg ut att hänga i den som i en stång.)
+  // Nypet (handens mått, skalad som handen): löst i fingertopparna, tummen under och pek- och långfingret
+  // ovanpå, med det nypta tvärs över fingrarna. Glasögonen tas så; cigarren togs så till 2026-11-14.
   const GREPP = new THREE.Vector3(52, 178, 82).multiplyScalar(HAND.SK);
-  const SG = 60;
-  const EXTRA_C = [0, 0.03, 0.45, 0.55];
+  // Cigarren hålls som på ett foto av en gammal kubansk cigarrökare (2026-11-14): den ligger längs
+  // pekfingret och ut över tumvecket, pekfingret kröks över den och tummen stöder bakifrån, och lång-,
+  // ring- och lillfingret hänger löst krökta under den. Handryggen vetter utåt, handleden ligger åt
+  // glöden till och han håller den en bit från huvudet (SG). I handens mått (x mot tummen, y mot
+  // fingrarna, z ut ur handflatan): cigarrens riktning från huvudet mot glöden (GR_A) och greppets punkt
+  // (GREPP_C, skalad som handen). Lägenas P är handflatan, så nära vinkelrät mot cigarren den kommer (GR_R).
+  // (Förut låg den tvärs över fingertopparna med alla fyra fingrarna krökta över den, utspärrade som en
+  // klo, och han såg ut att hålla den obekvämt.)
+  const GR_A = new THREE.Vector3(0.57, -0.82, 0.054).normalize();
+  const GREPP_C = new THREE.Vector3(60, 160, 45).multiplyScalar(HAND.SK);
+  const SG = 100;
+  const GR_R = new THREE.Vector3(0, 0, 1).addScaledVector(GR_A, -GR_A.z).normalize();
+  const GR_S = new THREE.Vector3().crossVectors(GR_A, GR_R);
+  // handens vridning i lägets ram (x = A × P, y = A, z = P): handens axlar (x, F, P) där
+  const handI = (u) => new THREE.Vector3(u.dot(GR_S), u.dot(GR_A), u.dot(GR_R));
+  const Q_FOTO = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(handI(V3(1, 0, 0)), handI(V3(0, 1, 0)), handI(V3(0, 0, 1))));
+  const EXTRA_C = [0, 0.25, 0.35, 0.4];
   const extraC = [0, 0, 0, 0];
   const mq = new THREE.Matrix4();
   const nyPose = () => ({ p: v(), q: new THREE.Quaternion() });
@@ -3774,7 +3788,23 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // I askkoppen: huvudet på disken, cigarren över urtagets yttre kant och glöden över mitten.
   // Han nyper den med handflatan nedåt och lite framåt (P_VILA: vriden 30° runt cigarren), så att handen
   // ligger lågt och flackt och handleden är rak. (Förut tog han den rakt ovanifrån, med handleden högt och
-  // fingrarna rakt ned som en klo.)
+  // fingrarna rakt ned som en klo.) I askkoppen och när han knackar av askan nyper han den med det gamla
+  // nypet (GREPP, SG_NYP från huvudet: lägets w 0), för med fotots grepp hamnar handleden över askan, och
+  // på vägen upp glider den in i greppet (w 1).
+  const SG_NYP = 60;
+  const KG_NYP = 0.3;
+  const EXTRA_NYP = [0, 0.03, 0.45, 0.55];
+  // nypet i lägets ram: tummen mot huvudet (−y), fingrarna x och handflatan z; och greppets punkt i handens
+  // mått (från lägets punkt, SG från huvudet)
+  const Q_NYP = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(V3(0, -1, 0), V3(1, 0, 0), V3(0, 0, 1)));
+  const G_NYP = new THREE.Vector3(SG_NYP - SG + GREPP.x, GREPP.y, GREPP.z);
+  // greppet w (0 nypet, 1 fotots) som handens vridning i lägets ram (ut) och greppets punkt i handens mått (g)
+  function greppW(w, ut, g) {
+    if (w >= 1) { g.copy(GREPP_C); return ut.copy(Q_FOTO); }
+    if (w <= 0) { g.copy(G_NYP); return ut.copy(Q_NYP); }
+    g.lerpVectors(G_NYP, GREPP_C, w);
+    return ut.slerpQuaternions(Q_NYP, Q_FOTO, w);
+  }
   const CU = new THREE.Vector3(Math.cos(ASKV), 0, Math.sin(ASKV));
   const SN = 105;
   const sinA = (ASKKOPP.URTAG + 0.2) / SN;
@@ -3783,23 +3813,29 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const HUV_C = new THREE.Vector3(...ASK).addScaledVector(CU, ASKKOPP.R + SN * Math.sqrt(1 - sinA * sinA));
   HUV_C.y += CIGARR.R + 0.4;
   const P_VILA = new THREE.Vector3(0, -1, 0).applyAxisAngle(A_VILA.clone().normalize(), 0.52);
-  // läget ur handen: handens origo H, fingrarnas riktning F och handflatans P
-  const fA = v();
-  function fraHand(ut, H, F, P) {
-    fA.crossVectors(F, P).negate().normalize();
-    return pose(ut, H.clone().addScaledVector(fA, -GREPP.x).addScaledVector(F, GREPP.y).addScaledVector(P, GREPP.z), fA, P);
-  }
+  // cigarrens riktning och handflatan [A, P] när handens fingrar pekar åt F och tummen åt X
+  const iHand = (F, X) => {
+    const f = F.clone().normalize();
+    const x = X.clone().addScaledVector(f, -X.dot(f)).normalize();
+    const p = new THREE.Vector3().crossVectors(x, f);
+    const ur = (u) => new THREE.Vector3().addScaledVector(x, u.x).addScaledVector(f, u.y).addScaledVector(p, u.z);
+    return [ur(GR_A), ur(GR_R)];
+  };
+  const nyp = (ps) => Object.assign(ps, { w: 0 });
   const PV = {
-    vila: pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, P_VILA),
-    // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt och lite uppåt
-    hall: fraHand(nyPose(), V3(-310, 165, 540), V3(0.4, 0.82, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()),
+    vila: nyp(pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, P_VILA)),
+    // armbågen på disken och handen uppe vid axeln, fingrarna snett in mot honom och cigarren ut åt sidan.
+    // (Med fingrarna rakt upp såg långfingret bakom cigarren ut att sträckas upp i luften.)
+    hall: pose(nyPose(), V3(-310, 165, 540), ...iHand(V3(0.6, 0.55, 0.55), V3(-0.6, 0.75, 0.2))),
     // lite högre och vriden, glöden uppåt: han tittar på den
-    se: fraHand(nyPose(), V3(-290, 215, 560), V3(0.3, 0.85, 0.43).normalize(), V3(0.1, -0.48, 0.87).normalize()),
-    // framför bröstet under hakan, snett uppåt, så att han ser ringen när han beundrar den
-    visa: pose(nyPose(), V3(10, 310, 790), V3(-0.6, 0.6, 0.5).normalize(), V3(0.2, -0.5, 0.85)),
-    // fram mot en, glöden mot en (vift2 lite högre: knycken)
-    vift: pose(nyPose(), V3(-160, 180, 800), V3(-0.55, 0.25, 0.8).normalize(), V3(0.3, -0.9, 0.2)),
-    vift2: pose(nyPose(), V3(-150, 215, 830), V3(-0.5, 0.4, 0.77).normalize(), V3(0.3, -0.85, 0.3)),
+    se: pose(nyPose(), V3(-290, 215, 560), ...iHand(V3(0.5, 0.62, 0.6), V3(-0.65, 0.72, 0.25))),
+    // framför bröstet, handen upprätt och cigarren snett uppåt mot ansiktet, så att han ser ringen när han
+    // beundrar den
+    visa: pose(nyPose(), V3(0, 300, 780), ...iHand(V3(0.3, 0.9, 0), V3(-0.9, 0.3, 0.3))),
+    // fram mot en med handflatan uppåt, cigarren tvärs över fingrarna: det här (vift2 lite högre: knycken).
+    // (Med handen upprätt såg det ut som ett finger i luften.)
+    vift: pose(nyPose(), V3(-160, 180, 800), ...iHand(V3(0.1, 0.5, 0.85), V3(-0.95, 0.3, 0))),
+    vift2: pose(nyPose(), V3(-150, 215, 830), ...iHand(V3(0.1, 0.65, 0.75), V3(-0.95, 0.3, 0))),
   };
   // Över askkoppen, med glöden över skålen och cigarren snett nedåt ut från handen; han knackar av
   // askan med ett kort ryck nedåt (knackN).
@@ -3807,40 +3843,31 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const A = V3(-0.82, -0.42, 0.38).normalize();
     const glod = V3(ASK[0] + 10, BORD.Y + 55, ASK[2] - 10);
     const P = V3(0.25, -0.92, 0.3);
-    PV.knack = pose(nyPose(), glod.clone().addScaledVector(A, -(CIGARR.L + 1 - SG)), A, P);
-    PV.knackN = pose(nyPose(), PV.knack.p.clone().add(V3(0, -14, 0)), A, P);
+    PV.knack = nyp(pose(nyPose(), glod.clone().addScaledVector(A, -(CIGARR.L + 1 - SG)), A, P));
+    PV.knackN = nyp(pose(nyPose(), PV.knack.p.clone().add(V3(0, -14, 0)), A, P));
   }
-  // Vid munnen räknas läget i huvudets mått: huvudet en bit in mellan läpparna, cigarren snett fram mot
-  // en, lite ut åt hans högra sida och lite nedåt. Handen sitter nedanför greppet, utanför och bakom det
-  // (d), så att fingrarna går runt cigarren utifrån med handryggen utåt, och underarmen går snett ned
-  // och ut till en armbåge framför bröstet och strax utanför axeln: som man håller en cigarr. (Förut,
-  // till 2026-11-14, satt handen rakt under greppet med handflatan mot en, som en ed, och då hamnade
-  // armbågen rakt under den framför magen: underarmen stod lodrätt framför bröstet som en pelare, och
-  // han såg obekväm ut. Ännu tidigare satt den ut åt sidan vid kinden, och då gick handleden inte att
+  // Vid munnen räknas läget i huvudets mått: huvudet en bit in mellan läpparna, och cigarren ut åt hans
+  // högra sida, lite fram mot en och lite nedåt. Handen sitter under den med handryggen utåt och fingrarna
+  // snett upp mot munnen, så att underarmen kommer snett underifrån från en armbåge nere vid sidan, som
+  // på fotot. (Med det förra greppet satt handen till 2026-11-14 rakt under greppet med handflatan mot
+  // en, som en ed, och då hamnade armbågen rakt under den framför magen: underarmen stod lodrätt framför
+  // bröstet som en pelare. Ännu tidigare satt den ut åt sidan vid kinden, och då gick handleden inte att
   // räta: antingen knäcktes den åt sidan eller så for armbågen upp över huvudet.)
   const MUND = W_(662, 509, 0);
   MUND.z = djup(662, 509) - 6;
-  // handflatan när cigarren pekar åt A och handen sitter åt d från greppet (tummen mot cigarrens huvud)
-  const flata = (A, d) => {
-    const T = A.clone().negate();
-    const e = d.clone().addScaledVector(T, -d.dot(T)).normalize().negate();
-    const e2 = new THREE.Vector3().crossVectors(T, e);
-    return e2.multiplyScalar(GREPP.y).addScaledVector(e, GREPP.z).normalize();
-  };
-  const A_MUN = new THREE.Vector3(-0.45, -0.2, 0.87).normalize();
-  const P_MUN = flata(A_MUN, V3(-0.64, -0.6, -0.47));
+  const [A_MUN, P_MUN] = iHand(V3(0.45, 0.75, -0.5), V3(-0.8, 0.45, 0.2));
   // utdragen: rakt ut längs sig själv och lite ned, fri från käken
   const BORT = A_MUN.clone().multiplyScalar(55).add(V3(0, -30, 35));
   // Lägen i huvudets mått: [cigarrens huvud, dess riktning, handflatan]. Fast i mungipan (tand): han
-  // biter om den och släpper den, och den pekar ut och ned. Handen sitter som vid munnen, så att den inte
-  // vrids om när han flyttar cigarren dit.
+  // biter om den och släpper den, och den pekar ut och ned. Handen är vriden som vid munnen (så lite som
+  // möjligt), så att den inte vrids om när han flyttar cigarren dit.
   const MUNHORN_H = W_(622, 509, 0);
   MUNHORN_H.z = djup(622, 509) - 10;
   const A_TAND = V3(-0.62, -0.42, 0.66).normalize();
   const HL = {
     mun: [MUND, A_MUN, P_MUN],
     bort: [MUND.clone().add(BORT), A_MUN, P_MUN],
-    tand: [MUNHORN_H, A_TAND, flata(A_TAND, V3(-0.4, -0.56, -0.73))],
+    tand: [MUNHORN_H, A_TAND, P_MUN.clone().applyQuaternion(new THREE.Quaternion().setFromUnitVectors(A_MUN, A_TAND))],
   };
   const PIV = U.uPiv.value;
   const iHuvud = (p, ut) => ut.copy(p).sub(PIV).applyMatrix3(U.uHuvud.value).add(PIV).applyMatrix4(mk);
@@ -3861,16 +3888,50 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const posen = (namn) => PM[namn] || PV[namn];
   function cigarrLage(t, ut, c) {
     const CK = c && c.ck;
-    if (!CK || t <= CK[0][0] || t >= CK[CK.length - 1][0]) return pose(ut, PV.vila.p, A_VILA, P_VILA);
+    if (!CK || t <= CK[0][0] || t >= CK[CK.length - 1][0]) {
+      ut.w = 0;
+      return pose(ut, PV.vila.p, A_VILA, P_VILA);
+    }
     let i = 1;
     while (t > CK[i][0]) i++;
     const f = ss(CK[i - 1][0], CK[i][0], t);
     const a = posen(CK[i - 1][1]);
     const b = posen(CK[i][1]);
+    const wa = a.w ?? 1;
+    const wb = b.w ?? 1;
+    if (wa !== wb) {
+      // Greppet byts (nypet i askkoppen, fotots annars): då är det handen som går rakt från det ena läget
+      // till det andra, och cigarren som glider in i greppet. (När cigarren gick sin väg och handen vreds runt
+      // den på vägen for armbågen upp som en vinge, och handen vreds om framför bröstet.)
+      handLage(a, wa, lqA, loA);
+      handLage(b, wb, lqB, loB);
+      ut.w = wa + (wb - wa) * f;
+      greppW(ut.w, lqG, lgG);
+      lqA.slerp(lqB, f);
+      loA.lerp(loB, f);
+      loA.y += (CK[i][2] || 0) * Math.sin(f * Math.PI);
+      ut.p.copy(lgG).applyQuaternion(lqA).add(loA);
+      ut.q.copy(lqA).multiply(lqG.invert());
+      return ut;
+    }
     ut.p.lerpVectors(a.p, b.p, f);
     ut.p.y += (CK[i][2] || 0) * Math.sin(f * Math.PI);
     ut.q.slerpQuaternions(a.q, b.q, f);
+    ut.w = wa;
     return ut;
+  }
+  // handens vridning (q) och origo (o) när den håller cigarren i läget ps med greppet w
+  const lqA = new THREE.Quaternion();
+  const lqB = new THREE.Quaternion();
+  const lqG = new THREE.Quaternion();
+  const loA = v();
+  const loB = v();
+  const lgG = v();
+  const lg2 = v();
+  function handLage(ps, w, q, o) {
+    greppW(w, q, lg2);
+    q.premultiply(ps.q);
+    o.copy(lg2).applyQuaternion(q).negate().add(ps.p);
   }
   const cp = nyPose();
   const fot = v();
@@ -3884,16 +3945,17 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const cWr = v();
   const POL_UPP = new THREE.Vector3(-0.62, -0.78, 0.1).normalize();
   const cPol = v();
+  const qH = new THREE.Quaternion();
   // cigarren på sin plats, och var handen ska vara för att hålla den
   function cigarrSatt(cp) {
     cA.set(0, 1, 0).applyQuaternion(cp.q);
-    cF.set(1, 0, 0).applyQuaternion(cp.q);
-    cP.set(0, 0, 1).applyQuaternion(cp.q);
     cig.mesh.matrix.makeRotationFromQuaternion(cp.q).setPosition(cX.copy(cp.p).addScaledVector(cA, -SG));
     cig.mesh.matrixWorldNeedsUpdate = true;
     fot.copy(cig.FOT).applyMatrix4(cig.mesh.matrix);
-    // handens origo: tummen (handens x) pekar mot huvudet
-    cH.copy(cp.p).addScaledVector(cA, GREPP.x).addScaledVector(cF, -GREPP.y).addScaledVector(cP, -GREPP.z);
+    // handen ur greppet: cF och cP är handens fingrar och handflata, cH dess origo
+    handLage(cp, cp.w ?? 1, qH, cH);
+    cF.set(0, 1, 0).applyQuaternion(qH);
+    cP.set(0, 0, 1).applyQuaternion(qH);
   }
   // handleden för handen i H: handen sitter 26 bortom handleden längs underarmen
   function vristTill(Sk, H, pol, ut) {
@@ -4171,10 +4233,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     a.pol.normalize().lerp(cPol, mot);
     a.F.lerp(cF, mot);
     a.P.lerp(cP, mot);
-    a.krok = spar(c.krok, t);
-    a.peka = 0;
+    // (fingrarna efter greppet: nypets när han nyper den i askkoppen)
     const g = bump(c.grepp, t);
-    for (let i = 0; i < 4; i++) extraC[i] = EXTRA_C[i] * g;
+    const wn = 1 - (cp.w ?? 1);
+    a.krok = spar(c.krok, t) + (KG_NYP - KG) * wn * g;
+    a.peka = 0;
+    for (let i = 0; i < 4; i++) extraC[i] = (EXTRA_C[i] + (EXTRA_NYP[i] - EXTRA_C[i]) * wn) * g;
     return extraC;
   }
   // ---------- elden ----------
