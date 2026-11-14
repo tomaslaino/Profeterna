@@ -635,10 +635,95 @@ export async function figurer(canvas, opt = {}) {
   // ritade ansikte. När de nya är klara ritas rummet om (opt.rita, när gänget
   // finns: ute), och ANS.p är klart då.
   const ANS = { svg: {}, mal: null, nr: 0, spel: opt.spel ? opt.spel.ansikte || opt.spel.lage : null, senast: opt.senast || null, p: Promise.resolve(), ute: false };
-  const svgTex = async (s) => {
-    const u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
-    try { return await imgTex(u); } finally { URL.revokeObjectURL(u); }
+  // De ritade ansiktena sparas i webbläsaren mellan besöken (Cache Storage), som de bakade bilderna i
+  // rum.js (BAKAT). DT:s ansikte har 5 400 cirklar och DJ:s skägg 5 700 delar, och att läsa och rita
+  // dem som SVG – tio till sjutton bilder med blinkningarna, skratten och uttrycken – var det tyngsta
+  // när gänget startade: i en telefon ungefär en halv sekund av huvudtrådens tid, medan rummet var
+  // mörkt och väntade på gänget (tand i rum.js). Nu hämtas bilden och packas upp vid sidan av
+  // huvudtråden. Nyckeln är bildens text och storlek, så ett ändrat ansikte ritas om. Nya bilder
+  // packas och sparas när rummet har startat, och det som inte har använts under besöket tas bort
+  // då. Utan lagring (privat läge) eller med ?rum-baka ritas de som förut.
+  const ANS_LADA = 'rum-ansikten-1';
+  let ansLadaP = null;
+  const ansLada = () => ansLadaP || (ansLadaP = (window.caches && window.createImageBitmap && !new URLSearchParams(location.search).has('rum-baka')
+    ? Promise.race([caches.open(ANS_LADA), new Promise((r) => setTimeout(r, 1500, null))]).catch(() => null)
+    : Promise.resolve(null)));
+  // (cyrb53, som kondens i rum.js)
+  const ansNyckel = (str) => {
+    let a = 0xdeadbeef;
+    let b = 0x41c6ce57;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      a = Math.imul(a ^ c, 2654435761);
+      b = Math.imul(b ^ c, 1597334677);
+    }
+    a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909);
+    b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909);
+    return (4294967296 * (2097151 & b) + (a >>> 0)).toString(36);
   };
+  const ansAnvanda = new Set();
+  const ansSpara = [];
+  function ansSparaSen(lada, adr, c) {
+    ansSpara.push([lada, adr, c]);
+    if (ansSpara.length > 1) return;
+    // (en i taget när det är lugnt, och sedan bort med det som inte användes)
+    const nasta = () => {
+      const x = ansSpara.shift();
+      if (!x) {
+        lada.keys().then((ks) => Promise.all(ks.filter((q) => !ansAnvanda.has(q.url)).map((q) => lada.delete(q)))).catch(() => {});
+        return;
+      }
+      const vila = () => (window.requestIdleCallback ? requestIdleCallback(nasta, { timeout: 3000 }) : setTimeout(nasta, 200));
+      try {
+        x[2].toBlob((blob) => {
+          if (blob) x[0].put(x[1], new Response(blob, { headers: { 'content-type': 'image/png' } })).catch(() => {});
+          vila();
+        }, 'image/png');
+      } catch (err) { vila(); }
+    };
+    setTimeout(nasta, 6000);
+  }
+  // i telefonen räcker hälften (ansiktena är små där)
+  const ANS_W = LATT ? 512 : 1024;
+  const ANS_H = LATT ? 576 : 1152;
+  const ansTex = (c) => {
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 8;
+    return t;
+  };
+  const svgTex = async (s) => {
+    const adr = new URL(`rum-ansikten/${ansNyckel(s)}-${ANS_W}.png`, location.href).href;
+    ansAnvanda.add(adr);
+    const lada = await ansLada();
+    if (lada) {
+      try {
+        const r = await lada.match(adr);
+        const blob = r && (await r.blob());
+        if (blob && blob.size) {
+          const bild = await createImageBitmap(blob);
+          const c = document.createElement('canvas');
+          c.width = ANS_W;
+          c.height = ANS_H;
+          c.getContext('2d').drawImage(bild, 0, 0, ANS_W, ANS_H);
+          if (bild.close) bild.close();
+          return ansTex(c);
+        }
+      } catch (err) { /* då ritas den som förut */ }
+    }
+    const u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
+    try {
+      const t = await imgTex(u);
+      if (lada) ansSparaSen(lada, adr, t.image);
+      return t;
+    } finally { URL.revokeObjectURL(u); }
+  };
+  // bildernas text, en gång per fil
+  const SVG_FIL = {};
+  const svgFil = (f) => SVG_FIL[f] || (SVG_FIL[f] = fetch(f).then((x) => {
+    if (!x.ok) throw new Error(`${f}: ${x.status}`);
+    return x.text();
+  }));
   function ansikten(lage) {
     if (lage !== ANS.mal) {
       ANS.mal = lage;
@@ -686,14 +771,10 @@ export async function figurer(canvas, opt = {}) {
     const img = new Image();
     img.onload = () => {
       const c = document.createElement('canvas');
-      // i telefonen räcker hälften (ansiktena är små där)
-      c.width = LATT ? 512 : 1024;
-      c.height = LATT ? 576 : 1152;
+      c.width = ANS_W;
+      c.height = ANS_H;
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      const t = new THREE.CanvasTexture(c);
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.anisotropy = 8;
-      res(t);
+      res(ansTex(c));
     };
     img.onerror = rej;
     img.src = src;
@@ -1796,30 +1877,22 @@ export async function figurer(canvas, opt = {}) {
   await document.fonts.ready;
   await Promise.all([
     document.fonts.load('800 42px Fraunces').catch(() => {}),
-    ...['dl', 'dt', 'dj'].map(async (k) => { tex[k] = await imgTex(`rum/ansikte-${k}.svg`); }),
-    // ansiktena med ögonen stängda (blinkar, och DJ när han sover), som en
-    // blob-adress som släpps när bilden är ritad
-    ...(opt.calm ? ['dj'] : ['dl', 'dt', 'dj']).map((k) => fetch(`rum/ansikte-${k}.svg`).then((x) => x.text()).then(async (svg) => {
+    ...['dl', 'dt', 'dj'].map(async (k) => { tex[k] = await svgTex(await svgFil(`rum/ansikte-${k}.svg`)); }),
+    // ansiktena med ögonen stängda (blinkar, och DJ när han sover)
+    ...(opt.calm ? ['dj'] : ['dl', 'dt', 'dj']).map((k) => svgFil(`rum/ansikte-${k}.svg`).then(async (svg) => {
       const s = blundar(svg);
-      if (!s) return;
-      const u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
-      try { tex[`${k}_blund`] = await imgTex(u); } finally { URL.revokeObjectURL(u); }
+      if (s) tex[`${k}_blund`] = await svgTex(s);
     }).catch(() => {})),
     // ansiktena när de skrattar (skrattar), och DJ:s skägg med munnen öppen
-    ...['dl', 'dj'].map((k) => fetch(`rum/ansikte-${k}.svg`).then((x) => x.text()).then(async (svg) => {
+    ...['dl', 'dj'].map((k) => svgFil(`rum/ansikte-${k}.svg`).then(async (svg) => {
       const s = skrattar(svg, SKRATT_MUN[k]);
-      if (!s) return;
-      const u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
-      try { tex[`${k}_skratt`] = await imgTex(u); } finally { URL.revokeObjectURL(u); }
+      if (s) tex[`${k}_skratt`] = await svgTex(s);
     }).catch(() => {})),
-    fetch('rum/skagg-dj.svg').then((x) => x.text()).then(async (svg) => {
-      const u = URL.createObjectURL(new Blob([skaggSkratt(svg)], { type: 'image/svg+xml' }));
-      try { tex.dj_skagg_skratt = await imgTex(u); } finally { URL.revokeObjectURL(u); }
-    }).catch(() => {}),
-    imgTex('rum/skagg-dj.svg').then((t) => { tex.dj_skagg = t; }),
+    svgFil('rum/skagg-dj.svg').then(async (svg) => { tex.dj_skagg_skratt = await svgTex(skaggSkratt(svg)); }).catch(() => {}),
+    svgFil('rum/skagg-dj.svg').then(svgTex).then((t) => { tex.dj_skagg = t; }),
     // bilderna som text, för ansiktsuttrycken (ansikten)
-    ...['dl', 'dt', 'dj'].map((k) => fetch(`rum/ansikte-${k}.svg`).then((x) => x.text()).then((s) => { ANS.svg[k] = s; }).catch(() => {})),
-    fetch('rum/skagg-dj.svg').then((x) => x.text()).then((s) => { ANS.svg.skagg = s; }).catch(() => {}),
+    ...['dl', 'dt', 'dj'].map((k) => svgFil(`rum/ansikte-${k}.svg`).then((s) => { ANS.svg[k] = s; }).catch(() => {})),
+    svgFil('rum/skagg-dj.svg').then((s) => { ANS.svg.skagg = s; }).catch(() => {}),
     ...Object.entries(LAG).filter(([, c]) => c.skold).map(([k, c]) => loadImg(c.skold).then((i) => { skold[k] = trim(i); }, () => {})),
   ]);
   // ansiktena efter hur det gick senast, redan från början (opt.senast, opt.spel)

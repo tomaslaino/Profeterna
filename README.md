@@ -437,6 +437,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   1 X 2 kommer först med analysen. Knappen bredvid går tillbaka till alla matcher och lottas ödmjukt ur `angra`
   (*Jag ångrar mig*, *Tack, inte nu*, *Jag är inte redo*, *Jag vågar inte* …), men aldrig *Tillbaka*, som redan står
   i hörnet och går ut ur samtalet; *Jag har koll* och *Jag vet redan* är borta (se *Samtalet* under [Hasse Backe](#hasse-backe))
+- [x] **Snabbare och jämnare start i tobaksaffären (2026-11-14, användarens önskemål: "Går det att ordna så att
+  animationen på hemsidan startar snabbare/smidigare med mindre hack och buggar?"):** lysröret tänds när gänget,
+  inredningen och sakerna står där. Förut tändes det i telefonen innan lysröret självt, skyltarna, neonen och
+  löpsedlarna fanns, och de dök upp en efter en med ett hack för var och en; på datorn ritades hälften av inredningen
+  efter att ljuset hade tänts. Nu är rummet färdigt 1,2 sekunder tidigare i telefonen, med två korta hack efter att
+  ljuset har tänts i stället för fem, men ljuset tänds en kvarts sekund senare. Datorn på disken tonas in i stället för
+  att dyka upp tvärt efter ljuset. Gängets ansikten sparas mellan besöken,
+  och gänget väntar inte på vädret när det finns sparat från de senaste tre timmarna (se *Snabbare och jämnare start*
+  under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -4985,9 +4994,9 @@ men inte sakerna på pulten.
 
 **Lysröret tänds när man kommer in** (`tand` i rum.js, `.rum-mork` i rum.css; inte medan det är dämpat eller släckt): medan
 gänget laddas är rummet mörkt, utom gatan genom skyltfönstret och dörren och tv:n som
-lyser igenom, och startarna glöder rosa i rörets ändar. Efter minst 0,7 och högst 2,6
-sekunder blinkar det igång (1,2 s). En gång per sidvisning, och inte med
-`prefers-reduced-motion` eller `?rum-t`.
+lyser igenom, och startarna glöder rosa i rörets ändar. När gänget, inredningen och sakerna står där, efter minst 0,7
+sekunder (och högst 2,6 i Safari, 3 på datorn och 4,5 i telefonen; i Safari väntar det bara på gänget), blinkar det
+igång (1,2 s). En gång per sidvisning, och inte med `prefers-reduced-motion` eller `?rum-t`.
 
 **Rummet rör sig också:** utanför rutan och dörren är det Stockholms tid och väder (se
 nedan), neonen glappar ibland, damm syns i ljuset och stationsurets
@@ -5156,9 +5165,9 @@ Därför:
   buffertar en stund.
 - **3D-delarna startar en i taget** i telefonen (`tur` i rum.js): gänget, inredningen,
   sakerna och sist datorn (`o.tur` i rum-register.js), var och en när den förra är klar
-  och rummet syns, med en paus på 0,8 sekunder före den första och mellan dem (Safari släpper
-  buffertar som inte används efter ungefär en sekund; i Chrome 0,4 sekunder sedan 2026-11-12,
-  `TUR_PAUS`). Var och en tar några hundra MB medan
+  och rummet syns, med en paus på 0,8 sekunder före den första och mellan dem i Safari, som släpper
+  buffertar som inte används efter ungefär en sekund (i Chrome 0,4 sekunder 2026-11-12 och två bildrutor
+  sedan 2026-11-14, `turPaus`). Var och en tar några hundra MB medan
   den startar (shaders, texturer, ljuset). En fast bild (`?rum-t`) väntar på alla.
   Hjälpbufferten till miljöljuset (PMREMGenerator) släpps när ljuset är klart, i alla fyra,
   och i telefonen räknas ljuset i 128 i stället för 256 (`_setSize`; glansen ser likadan ut).
@@ -5796,6 +5805,56 @@ på, och mjukvarugrafiken hann inte ladda rummet. `matchfixarna.se/?rum-mat` ger
 
 Kvar: three.js genomgång av scenen och ritningarna (ungefär 11 ms per bild av gänget med den långsamma processorn), och
 Hasses ärmar (en tredjedel av hans JavaScript).
+
+### Snabbare och jämnare start (2026-11-14)
+
+Användarens önskemål: "Går det att ordna så att animationen på hemsidan startar snabbare/smidigare med mindre hack och
+buggar?" Mätt först, som telefon i Chrome (412 punkter bred, täthet 2,625, processorn fyra gånger långsammare) och som
+dator, med bilder av starten var 60:e millisekund. Felet syntes direkt: i telefonen tändes lysröret när gänget stod
+där, men inredningen och sakerna kom efter, en i taget med 0,4 sekunders paus emellan. Rummet lyste alltså utan
+lysröret, skylten STRYKTIPSET, neonen och löpsedlarna, som dök upp en efter en under två sekunder, och varje del som
+startade stoppade bilden en tiondels sekund. Därefter kom datorn och Hasses hand, med ett stopp var. På datorn, där
+delarna startar samtidigt, ritades ungefär hälften av inredningen (`rum-inredning.js` ritar sina saker en i taget)
+efter att ljuset hade tänts.
+
+- **Lysröret väntar på inredningen och sakerna** (`three` och `tand` i rum.js), utom i Safari, där pausen mellan
+  delarna är 0,8 sekunder och rummet annars skulle stå mörkt två sekunder längre. Datorn på disken och Hasses hand
+  kommer fortfarande efter ljuset, men båda tonas nu in: datorn dök förut upp tvärt (`.reg-duk.tonas` i
+  rum-register.css, som handen i rum-hasse.css; i en fast bild står den bara där).
+- **Kortare väntan i mörkret i Chrome:** gänget väntade 0,4 sekunder efter att rummet hade ritats innan det började
+  byggas, och 0,4 sekunder mellan delarna. Nu är det två bildrutor (`turPaus`), så att rummet och startarna i
+  lysröret hinner ritas. Safari har kvar 0,8 sekunder.
+- **Gängets ansikten sparas mellan besöken** (Cache Storage, `rum-ansikten-1`, `svgTex` i rum-3d.js). DT:s ansikte
+  har 5 400 cirklar och DJ:s skägg 5 700 delar, och de ritades från SVG tio till sjutton gånger vid varje besök (med
+  blinkningarna, skratten och uttrycken): den största delen av gängets start, ungefär 0,4 sekunder med den långsamma
+  processorn. Nu hämtas den färdiga bilden och packas upp vid sidan av huvudtråden. Nyckeln är bildens text och
+  storlek, så ett ändrat ansikte ritas om. Nya bilder packas och sparas sex sekunder efter starten, när det är lugnt,
+  och det som inte användes under besöket tas bort då. Utan lagring (privat läge) och med `?rum-baka` ritas de som
+  förut. Bilderna är desamma: med fryst tid (`?rum-t`) 82–107 dB mellan ritade och sparade ansikten.
+- **Vädret:** gänget klär sig efter vädret och väntade på Open-Meteo upp till 1,5 sekunder vid varje besök när det
+  sparade vädret var äldre än en kvart (60–960 ms i mätningen). Är det sparade vädret yngre än tre timmar
+  (`Vader.alder` i vader.js) väntar det nu högst en kvarts sekund, och det nya vädret byter bara kläder om det
+  kräver andra (`fig.ute`).
+
+Mätt i headless Chrome (Apple M5, riktigt grafikkort) mot en lokal server med den publicerade sajtens data, koden
+förminskad och buntad som på sajten, gammal och ny kod om vartannat, medianer av fem varv efter fyra uppvärmningsvarv
+(i telefonen med de sparade ansiktena, alltså från andra besöket):
+
+| | Före | Efter |
+|---|---|---|
+| Telefon: gänget börjar ritas | 1,21 s | 0,84 s |
+| Telefon: lysröret tänds | 2,35 s | 2,61 s |
+| Telefon: allt på plats, också datorn och Hasses hand | 4,76 s | 3,57 s |
+| Telefon: delar som kommer efter att ljuset har tänts | inredningen, sakerna och datorn tvärt, handen intonad | datorn och handen, intonade |
+| Telefon: stopp över 50 ms de första 5 s efter ljuset | 5 (0,45 s) | 2 (0,15 s) |
+| Dator: lysröret tänds | 0,83 s | 1,00 s |
+| Dator: inredningens ritningar efter ljuset | 8 | 1 (uret) |
+
+Första besöket, innan ansiktena är sparade, tänds lysröret efter ungefär 3,0 sekunder i telefonen. Lysröret tänds
+alltså lite senare än förut, men i ett färdigt rum. Inte mätt i Safari eller i en riktig telefon (`?rum-mat`).
+
+Provat och inte infört: att låta gänget börja byggas innan väggarna är bakade och datan ifylld gav 0,1 sekunder
+tidigare ljus i telefonen, men väggarna blev klara 0,6 sekunder senare.
 
 ### När något går fel i rummet
 

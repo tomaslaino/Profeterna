@@ -11,6 +11,7 @@
 //   Vader.hamta() → Promise, klar när vädret är hämtat (eller gissat)
 //   Vader.nu(ms)  → läget just nu, se nu() nedan
 //   Vader.tid()   → klockan i ms (samma som Vader.nu().t, utan vädret)
+//   Vader.alder() → hur gammalt det sparade vädret är i ms (Infinity utan)
 //
 // För bilder och prov: ?rum-klocka=2026-12-13T16:00 (eller bara 16:00),
 // ?rum-vader=klart|halvklart|mulet|dimma|dugg|regn|skurar|snoblandat|sno|aska,
@@ -193,5 +194,8 @@ window.Vader = (() => {
     };
   }
 
-  return { hamta, nu, sol, tid: () => clock() };
+  // (för rummet, som inte väntar på nätet när vädret är någorlunda färskt)
+  const alder = () => (data ? Date.now() - at : Infinity);
+
+  return { hamta, nu, sol, alder, tid: () => clock() };
 })();

@@ -274,9 +274,17 @@ window.RumRegister = (() => {
     const mus = matchMedia('(hover: hover) and (pointer: fine)');
 
     // datorn i three.js (hämtas med rummet; utan WebGL står disken tom)
-    // (i telefonen när det blir dess tur, o.tur i rum.js)
+    // (i telefonen när det blir dess tur, o.tur i rum.js; den tonas in när den är ritad, rum-register.css)
+    if (!o.calm()) duk.classList.add('tonas');
     A.Lp = (o.tur || ((f) => f()))(() => import('./rum-dator.js').then((m) => m.dator({ duk, nara: root.querySelector('#reg-3d'), calm: o.calm, box: BOX }))
-      .then((L) => { A.L = L; A.skarm = ''; draw(); }))
+      .then((L) => {
+        A.L = L;
+        A.skarm = '';
+        draw();
+        // (en fast bild, ?rum-t, sätts först efter att rummet har byggts: då står den bara där)
+        if (o.calm()) duk.classList.remove('tonas');
+        else requestAnimationFrame(() => duk.classList.add('klar'));
+      }))
       .catch((err) => console.warn('Rummet: datorn kunde inte ritas', err));
 
     // lagfilerna (målen, xG, oddsen, styrkan) – om igen efter en kvart

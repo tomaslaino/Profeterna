@@ -3126,8 +3126,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       nasta();
     });
   }
-  // stunden före den första och mellan dem (WEBKIT står längre ner)
-  const TUR_PAUS = () => (WEBKIT ? 800 : 400);
+  // Stunden mellan dem (WEBKIT står längre ner): i Safari 800 ms, i Chrome två bildrutor, så att
+  // rummet och startarna i lysröret hinner ritas (högst 150 ms, om bildrutorna står still i en
+  // flik i bakgrunden).
+  const turPaus = () => new Promise((r) => {
+    if (WEBKIT) return setTimeout(r, 800);
+    setTimeout(r, 150);
+    requestAnimationFrame(() => requestAnimationFrame(r));
+  });
   // → när alla har startat (för en fast bild)
   const TOM = [];
   const turTom = () => (LATT ? (R.turGar || TUR.length ? new Promise((r) => TOM.push(r)) : Promise.resolve()) : Promise.all(SENA));
@@ -3146,8 +3152,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     // en stund emellan, så att det som startade hinner städa efter sig
     // (Safari släpper buffertar som inte används efter ungefär en sekund; i Chrome
-    // räcker en kortare stund, och rummet står färdigt över en sekund tidigare)
-    await new Promise((r) => setTimeout(r, TUR_PAUS()));
+    // räcker ett par bildrutor: där stod rummet förut färdigt över en sekund senare
+    // med 800 ms, och med 400 tändes lysröret innan inredningen och sakerna fanns)
+    await turPaus();
     R.turGar = false;
     nasta();
   }
@@ -3196,7 +3203,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       await tur(async () => {
         const mod = await import('./rum-3d.js');
         // (ansiktena efter hur det går och gick för kupongen redan från början: spel, senast)
-        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader: R.vader, detalj: KVAL[R.kval].detalj, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame() });
+        const vader = R.vader;
+        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader, detalj: KVAL[R.kval].detalj, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame() });
+        // (kom det nya vädret medan gänget byggdes: paintUte såg inget gäng att klä om)
+        if (R.vader !== vader && R.fig.ute) R.fig.ute(R.vader);
         lappa();
         kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
@@ -3218,8 +3228,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       console.warn('Rummet: figurerna kunde inte ritas', err);
     }
     // nu datorn (tur): gänget står där, eller kommer inte, och de andra två är klara
-    Promise.all(andra).then(R.gangKlart);
+    const synligt = Promise.all(andra);
+    synligt.then(R.gangKlart);
     turTom().then(() => setTimeout(slappBilder, still() ? 0 : 1000));
+    // Lysröret (tand) väntar också på inredningen och sakerna: i telefonen kom de efter gänget,
+    // en i taget, och lysröret, skyltarna, neonen och löpsedlarna dök upp en efter en efter att
+    // ljuset hade tänts, med ett hack för var och en. Inte i Safari, där delarna har en längre
+    // paus emellan (turPaus) och rummet skulle stå mörkt två sekunder längre.
+    if (!WEBKIT) await synligt;
   }
 
   // Det du har framme i rummet, för din figur (rum-folk.js): kupongen i
@@ -6238,8 +6254,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ---------- in och ut ----------
 
   // Lysröret tänds när man kommer in (en gång per sidvisning, inte utan
-  // rörelser): mörkt medan gänget laddas, minst 0,7 och högst 2,6 sekunder,
-  // och sedan blinkar det igång (.rum-mork i rum.css).
+  // rörelser): mörkt medan gänget, inredningen och sakerna laddas (three), minst
+  // 0,7 och högst 2,6 sekunder i Safari, 3 på datorn och 4,5 i telefonen, där de
+  // startar en i taget (tur), och sedan blinkar det igång (.rum-mork i rum.css).
   function tand(ready) {
     const m = document.getElementById('rum-mork');
     if (!m || R.tant || calm() || (window.RumFolk && RumFolk.nattGrad && RumFolk.nattGrad() > 0)) return;
@@ -6248,7 +6265,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     m.classList.add('start');
     const tands = () => { m.classList.remove('start'); m.classList.add('tands'); };
     // (också om något gick fel i datan: annars förblev rummet mörkt)
-    Promise.race([ready, new Promise((r) => setTimeout(r, 2600))])
+    Promise.race([ready, new Promise((r) => setTimeout(r, WEBKIT ? 2600 : LATT ? 4500 : 3000))])
       .catch((err) => console.warn('Rummet: datan kunde inte visas', err))
       .then(() => setTimeout(tands, Math.max(0, 700 - (performance.now() - t0))));
     m.addEventListener('animationend', (e) => { if (e.animationName === 'rum-tands') m.classList.remove('tands'); });
@@ -6295,18 +6312,23 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         .then(() => new Promise((r) => requestAnimationFrame(r)))
         .then(() => {
           R.el.classList.remove('laddar');
-          // 3D-delarna när rummet har ritats (och städat efter sig)
-          setTimeout(() => {
+          // 3D-delarna när rummet har ritats (och i Safari städat efter sig; i Chrome
+          // väntade gänget förut 400 ms i mörkret)
+          turPaus().then(() => {
             R.turStart = true;
             nasta();
-          }, TUR_PAUS());
+          });
         });
     } else if (!R.turStart) {
       R.turStart = true;
       nasta();
     }
-    // gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat)
-    const ready = Promise.all([data, Promise.race([ute(), new Promise((r) => setTimeout(r, still() ? 9000 : 1500))]).then(three), R.bakat]);
+    // Gänget klär sig efter vädret: vänta lite på det (i en fast bild tills det är hämtat). Finns
+    // vädret sparat från de senaste tre timmarna (Vader.alder) klär de sig efter det, och byter
+    // bara om det nya vädret kräver andra kläder (fig.ute): förut väntade gänget på Open-Meteo
+    // vid varje besök efter en kvart, på datorn en halv sekund eller mer i mörkret.
+    const vantaVader = still() ? 9000 : window.Vader && Vader.alder && Vader.alder() < 3 * 36e5 ? 250 : 1500;
+    const ready = Promise.all([data, Promise.race([ute(), new Promise((r) => setTimeout(r, vantaVader))]).then(three), R.bakat]);
     tand(ready);
     if (still()) {
       // en fast bild: allt på samma tid, och klar när datan och gänget är
