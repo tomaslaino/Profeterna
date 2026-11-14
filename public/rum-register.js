@@ -300,6 +300,8 @@ window.RumRegister = (() => {
         const land = (t) => { const u = ul.get(t.lag); return [t.lag, { ...(u || {}), ...t, name: t.lag, land: true, ...(u ? { comp: 'nl', espnId: String(u.espnId) } : {}) }]; };
         A.land = L && !L.unknown ? { grupper: L.grupper || [], lag: new Map((L.lag || []).map(land)) } : { grupper: [], lag: new Map() };
         A.landByEspn = new Map([...A.land.lag.values()].filter((t) => t.espnId).map((t) => [String(t.espnId), t]));
+        // (filens tabell kan vara äldre än ESPN:s: hämta den direkt igen)
+        A.tabellAt = 0;
         const map = new Map();
         const by = new Map();
         files.forEach((f, i) => {
@@ -316,6 +318,160 @@ window.RumRegister = (() => {
         draw();
       });
       return A.loading;
+    }
+    // Nations Leagues tabell direkt från ESPN (sedan 2026-11-14), så att den
+    // följer matcherna i stället för bygget (landslag.json hämtar tabellen
+    // högst en gång per körning, var 30:e minut). Så länge grupperna eller ett
+    // lagkort visas hämtas den om varje minut, var 30:e sekund medan en match
+    // pågår. Två källor:
+    //   tabellen   ESPN:s tabell – den officiella ordningen, men ändras först
+    //              när matchen är slut (och ibland en stund efter)
+    //   matcherna  ligafasens matcher (september–november) med resultaten och
+    //              liveställningen; ur dem räknas en egen tabell (raknaGrupp)
+    // Per grupp: pågår en match visas den egna tabellen med ställningen just
+    // nu (GRUPP A4 LIVE). Annars ESPN:s tabell när den har räknat in alla
+    // matcher, och den egna medan ESPN släpar efter slutsignalen. Ingen grupp
+    // får färre spelade matcher än i filen; svarar inte ESPN gäller filen.
+    const ESPN_NL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.nations';
+    const ESPN_TABELL = 'https://site.api.espn.com/apis/v2/sports/soccer/uefa.nations/standings';
+    // ligafasens månader hittills, YYYYMM: september–november det år säsongen började
+    function nlManader(now = new Date()) {
+      const y = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+      const nu = now.getFullYear() * 100 + now.getMonth() + 1;
+      return [9, 10, 11].map((m) => y * 100 + m).filter((m) => m <= nu).map(String);
+    }
+    // ligafasens matcher: de färdiga månaderna en gång, den pågående varje gång
+    function nlMatcher() {
+      const man = nlManader();
+      A.nlMan = A.nlMan || new Map();
+      return Promise.all(man.map((m, i) => (i < man.length - 1 && A.nlMan.has(m) ? A.nlMan.get(m)
+        : fetch(`${ESPN_NL}/scoreboard?dates=${m}&limit=1000`, { cache: 'no-store' })
+          .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+          .then((j) => {
+            const ms = (j.events || []).map((e) => {
+              const c = e.competitions && e.competitions[0];
+              const st = (e.status && e.status.type) || {};
+              const h = c && c.competitors.find((t) => t.homeAway === 'home');
+              const a = c && c.competitors.find((t) => t.homeAway === 'away');
+              if (!h || !a) return null;
+              const live = st.state === 'in';
+              return {
+                h: String(h.team.id), a: String(a.team.id), live, klar: !!st.completed,
+                hs: Number(h.score), as: Number(a.score),
+              };
+            }).filter((m) => m && (m.klar || m.live) && fin(m.hs) && fin(m.as));
+            A.nlMan.set(m, ms);
+            return ms;
+          })))).then((l) => l.flat());
+    }
+    // En grupps tabell ur matcherna (de pågående med ställningen just nu).
+    // Ordningen som i Nations League: poäng, sedan inbördes möten (poäng,
+    // målskillnad, gjorda mål), målskillnad, gjorda mål, gjorda mål borta och
+    // vinster; därefter tabellens ordning hittills. (UEFA prövar de inbördes
+    // mötena om igen bland de lag som fortfarande står lika – det görs inte här.)
+    function raknaGrupp(g, M) {
+      const ids = g.lag.map((t) => String(t.espnId));
+      const ms = M.filter((m) => ids.includes(m.h) && ids.includes(m.a));
+      const S = new Map(ids.map((id, i) => [id, { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0, borta: 0, live: false, forra: i }]));
+      const spela = (s, f, a, borta, live) => {
+        s.played++; s.gf += f; s.ga += a; s.gd = s.gf - s.ga;
+        if (borta) s.borta += f;
+        if (f > a) { s.won++; s.points += 3; } else if (f === a) { s.drawn++; s.points++; } else s.lost++;
+        if (live) s.live = true;
+      };
+      for (const m of ms) {
+        spela(S.get(m.h), m.hs, m.as, false, m.live);
+        spela(S.get(m.a), m.as, m.hs, true, m.live);
+      }
+      const inbordes = (lag) => {
+        const T = new Map(lag.map((id) => [id, { p: 0, gd: 0, gf: 0 }]));
+        for (const m of ms) {
+          if (!T.has(m.h) || !T.has(m.a)) continue;
+          const h = T.get(m.h);
+          const a = T.get(m.a);
+          h.gf += m.hs; a.gf += m.as; h.gd += m.hs - m.as; a.gd += m.as - m.hs;
+          if (m.hs > m.as) h.p += 3; else if (m.hs < m.as) a.p += 3; else { h.p++; a.p++; }
+        }
+        return T;
+      };
+      const ordning = [...ids].sort((x, y) => S.get(y).points - S.get(x).points || S.get(x).forra - S.get(y).forra);
+      for (let i = 0; i < ordning.length;) {
+        let j = i + 1;
+        while (j < ordning.length && S.get(ordning[j]).points === S.get(ordning[i]).points) j++;
+        if (j - i > 1) {
+          const blk = ordning.slice(i, j);
+          const T = inbordes(blk);
+          blk.sort((x, y) => {
+            const [a, b, s, t] = [T.get(x), T.get(y), S.get(x), S.get(y)];
+            return b.p - a.p || b.gd - a.gd || b.gf - a.gf || t.gd - s.gd || t.gf - s.gf || t.borta - s.borta || t.won - s.won || s.forra - t.forra;
+          });
+          ordning.splice(i, j - i, ...blk);
+        }
+        i = j;
+      }
+      const rad = new Map(ordning.map((id, i) => {
+        const { played, won, drawn, lost, gf, ga, gd, points, live } = S.get(id);
+        return [id, { rank: i + 1, played, won, drawn, lost, gf, ga, gd, points, live }];
+      }));
+      return { rader: ids.map((id) => rad.get(id)), live: ms.some((m) => m.live), spelade: ms.length };
+    }
+    function loadTabell() {
+      if (!A.land || !A.land.grupper.length || A.tabellLaddar || Date.now() - (A.tabellAt || 0) < (A.tabellVanta || 60000)) return;
+      const tabell = fetch(ESPN_TABELL, { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+        .catch((err) => { console.warn('Registret: ESPN:s tabell kunde inte hämtas', err); return null; });
+      const matcher = nlMatcher().catch((err) => { console.warn('Registret: ESPN:s matcher kunde inte hämtas', err); return null; });
+      A.tabellLaddar = Promise.all([tabell, matcher]).then(([j, M]) => {
+        const espn = new Map();
+        for (const g of (j && j.children) || []) {
+          for (const e of (g.standings && g.standings.entries) || []) {
+            const s = {};
+            for (const x of e.stats || []) s[x.name] = x.value;
+            if (e.team && fin(s.gamesPlayed)) {
+              espn.set(String(e.team.id), {
+                rank: s.rank, played: s.gamesPlayed, won: s.wins, drawn: s.ties, lost: s.losses,
+                gf: s.pointsFor, ga: s.pointsAgainst, gd: s.pointDifferential, points: s.points, live: false,
+              });
+            }
+          }
+        }
+        const summa = (l) => l.reduce((n, x) => n + x.played, 0);
+        let andrat = false;
+        let live = false;
+        for (const g of A.land.grupper) {
+          const fore = JSON.stringify([g.live, g.lag]);
+          const fil = summa(g.lag);
+          const ny = g.lag.map((t) => espn.get(String(t.espnId)));
+          const espnOk = !ny.some((x, i) => !x || x.played < g.lag[i].played);
+          let R = M ? raknaGrupp(g, M) : null;
+          if (R && summa(R.rader) < fil) R = null; // (matcherna saknas delvis)
+          let val = null;
+          if (R && R.live) val = R.rader;
+          else if (espnOk && summa(ny) >= (R ? summa(R.rader) : fil)) val = ny;
+          else if (R && summa(R.rader) > fil) val = R.rader;
+          g.live = !!(R && R.live);
+          live = live || g.live;
+          if (val) {
+            g.lag.forEach((t, i) => {
+              Object.assign(t, val[i]);
+              const kort = A.land.lag.get(t.lag);
+              if (kort && kort.tabell) Object.assign(kort.tabell, { rank: t.rank, played: t.played, points: t.points, gd: t.gd });
+            });
+            g.lag.sort((a, b) => a.rank - b.rank);
+          }
+          if (JSON.stringify([g.live, g.lag]) !== fore) andrat = true;
+        }
+        A.tabellVanta = live ? 30000 : 60000;
+        if (andrat) draw();
+      })
+        .catch((err) => console.warn('Registret: tabellen kunde inte räknas', err))
+        .finally(() => {
+          A.tabellLaddar = null;
+          A.tabellAt = Date.now();
+          // om igen, om grupperna eller ett lagkort fortfarande visas
+          clearTimeout(A.tabellT);
+          A.tabellT = setTimeout(() => { if (A.on) draw(); }, (A.tabellVanta || 60000) + 1000);
+        });
     }
     // spelarfilerna, när datorn startas första gången
     function loadPlayers() {
@@ -1402,6 +1558,7 @@ window.RumRegister = (() => {
       const r = [regRad('lag', 'nl'), streck()];
       if (!helaNamn()) r.push(rad([up(REGNAMN.nl), 'd']));
       if (!A.land) return [...r, prickar('HÄMTAR', '')];
+      loadTabell();
       const G = A.land.grupper;
       if (!G.length) return [...r, rad('OKÄNT')];
       const k = A.bred >= 60 ? 2 : 1;
@@ -1412,11 +1569,13 @@ window.RumRegister = (() => {
       // ett block per grupp: rubriken och lagen, alla lika höga
       const H = Math.max(...G.map((g) => g.lag.length));
       const block = (g) => {
-        const b = [[[pad(`GRUPP ${g.id}`, 2 + N + 1), 'd'],[`${padL('S', 2)}${vof ? `${padL('V', 3)}${padL('O', 3)}${padL('F', 3)}` : ''}${padL('+/-', 5)}${padL('P', 4)}`, 'd']]];
+        // (en grupp där en match pågår: LIVE i rubriken, lagen i matchen ljusare)
+        const rub = `GRUPP ${g.id}`;
+        const b = [[[rub, 'd'], ...(g.live ? [[' LIVE', 'live']] : []), [pad('', 2 + N + 1 - rub.length - (g.live ? 5 : 0)), 'd'],[`${padL('S', 2)}${vof ? `${padL('V', 3)}${padL('O', 3)}${padL('F', 3)}` : ''}${padL('+/-', 5)}${padL('P', 4)}`, 'd']]];
         for (const t of g.lag) {
           const namn = (up(t.lag).length > N && LANDKORT[t.lag] ? up(LANDKORT[t.lag]) : up(t.lag)).slice(0, N);
           const tal = `${padL(svar(t.played), 2)}${vof ? `${padL(svar(t.won), 3)}${padL(svar(t.drawn), 3)}${padL(svar(t.lost), 3)}` : ''}${padL(svar(S.veil ? '?' : t.gd > 0 ? `+${t.gd}` : t.gd < 0 ? `−${-t.gd}` : '0'), 5)}${padL(svar(t.points), 4)}`;
-          b.push([[`${svar(t.rank)} `, 'd'], [namn, '', `#lag:${t.lag}`], [pad('', N + 1 - namn.length), ''], [tal, '']]);
+          b.push([[`${svar(t.rank)} `, 'd'], [namn, t.live ? 'v' : '', `#lag:${t.lag}`], [pad('', N + 1 - namn.length), ''], [tal, t.live ? 'v' : '']]);
         }
         while (b.length < H + 1) b.push([[pad('', cw), '']]);
         return b;
@@ -1437,6 +1596,7 @@ window.RumRegister = (() => {
     // hittills, alla landskamper sedan hösten 2024 och nästa match, och sedan
     // de tio senaste landskamperna. ←/→ bläddrar bland lagen i gruppen.
     function landkort(t, S, R, del) {
+      loadTabell();
       const g = A.land.grupper.find((x) => x.id === t.grupp);
       const l = g ? g.lag : [];
       const i = l.findIndex((x) => x.lag === t.lag);

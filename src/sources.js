@@ -109,7 +109,11 @@ for (const c of INTERNATIONAL) {
   });
 }
 
-// Nations Leagues tabell: alla grupperna (A1–D2).
+// Nations Leagues tabell: alla grupperna (A1–D2). Utan matcher räcker var
+// tredje timme. Har ett lag fler färdigspelade matcher i spelprogrammet än i
+// tabellen hämtas tabellen om vid varje körning tills ESPN har räknat in dem –
+// så kommer den med inom en körning efter slutsignalen. stage 2: läser
+// spelprogrammet efter att det har hämtats i samma körning.
 SOURCES.push({
   id: 'espn_tabell_unl',
   provider: 'ESPN',
@@ -117,9 +121,11 @@ SOURCES.push({
   label: 'Tabell – Nations League, alla grupper',
   comps: ['unl'],
   kinds: ['table'],
+  stage: 2,
   maxAgeHours: 3,
   staleAfterHours: 24,
   verified: '2026-11-13',
+  due: (d) => tabellenSlapar(d),
   fetch: () => espn.fetchGroupStandings('uefa.nations'),
   summarize: (d) => ({ n: d.groups.length, detail: `${d.groups.length} grupper, ${d.groups.reduce((t, g) => t + g.rows.length, 0)} lag` }),
 });
@@ -621,6 +627,20 @@ function landEuropa() {
   const ids = new Set();
   for (const m of cache.data.matches) for (const t of [m.home, m.away]) if (t && t.espnId) ids.add(t.espnId);
   return ids.size ? ids : null;
+}
+
+// Släpar Nations Leagues tabell efter spelprogrammet? Sant om något lag har
+// fler färdigspelade gruppmatcher (med resultat) i spelprogrammet än i tabellen.
+function tabellenSlapar(tabell) {
+  const cache = readCache('espn_fixtures_unl');
+  if (!cache || !cache.data || !tabell || !tabell.groups) return false;
+  const spelade = new Map();
+  for (const m of cache.data.matches) {
+    // Bara gruppspelet: playoff och slutspel räknas inte i grupptabellen.
+    if (!m.completed || !m.score || !m.group) continue;
+    for (const t of [m.home, m.away]) if (t && t.espnId) spelade.set(t.espnId, (spelade.get(t.espnId) || 0) + 1);
+  }
+  return tabell.groups.some((g) => g.rows.some((r) => (spelade.get(r.espnId) || 0) > (r.played || 0)));
 }
 
 // Trupper och spelarstatistik per liga (src/playersources.js).

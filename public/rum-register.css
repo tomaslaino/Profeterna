@@ -56,6 +56,8 @@
 .reg-term .tr { min-height: 1.12em; white-space: pre-wrap; overflow-wrap: anywhere; }
 .reg-term .d { color: var(--svag); text-shadow: none; }
 .reg-term .v { color: #c9ffd7; }
+/* LIVE i Nations Leagues grupper medan en match pågår: blinkar som markören */
+.reg-term .live { color: #c9ffd7; animation: reg-blink 1.06s steps(1) infinite; }
 /* omvänt: lite luft på sidorna, utan att något bredvid flyttar sig */
 .reg-term .i { margin: 0 -0.5ch; padding: 0 0.5ch; background: var(--gron); color: #010702; text-shadow: none; }
 .reg-term .a { cursor: pointer; }
@@ -131,4 +133,5 @@
 @media (prefers-reduced-motion: reduce) {
   .reg-bak { transition: none; }
   .reg-mark { animation: none; }
+  .reg-term .live { animation: none; }
 }
