@@ -1154,6 +1154,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   användaren C, den rekommenderade: *KUPONGEN* (matchakten från B), *OMGÅNGEN* (tavlans åtta lappar),
   *LAGEN* och *SPELARNA*. Tavlan är kvar, så dess siffror står med flit på två ställen, med samma namn och ur
   samma källa. Se [Datorn](#datorn).
+- **Datorn i hörnet i stället för anslagstavlan (2026-11-14, användarens önskemål):** "Jag tänkte att jag
+  skulle flytta in datorn i hörnet på ett snyggt och bra sätt" och "Istället för anslagstavlan – ordna det
+  och mergea!" Tavlan med lapparna är borta (lapparnas tal står i datorns matchakt och under Statistik →
+  Lagen), och datorn står på disken i hörnet under tv:n, mitt i fältet där tavlan hängde. Disken under
+  Tipsligan är fri. Se [Datorn](#datorn).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4031,14 +4036,13 @@ Så fort något ligger framme (en närbild, tv:n, tavlan, registret, videon, Has
 stället, samma ord på samma ställe för alla saker, och lägger bort det översta som bakåtknappen (se
 [Bakåt](#bakåt)). Förut var *Vanlig sida* det enda ord som syntes nära något, och det leder bort från rummet.
 Tangenterna (K kupongen, T tv:n,
-A anslagstavlan, R datorn, V videon, H Hasse och L
+R datorn, V videon, H Hasse och L
 tidningen Helgarderat) står inte i foten – där låg de över kupongen i
 mindre fönster – utan när man pekar på saken (*Tv:n · T*, `tangenter` i rum.js), och bara
 med mus. [public/rum.js](public/rum.js)
 ritar rummet och fyller det med sajtens data, [public/rum.css](public/rum.css) ger det utseendet och
 rörelserna, [public/rum-tv.js](public/rum-tv.js) och [public/rum-tv.css](public/rum-tv.css)
-bygger tv:n (se [Tv:n](#tvn)), [public/rum-anslag.js](public/rum-anslag.js) och
-[public/rum-anslag.css](public/rum-anslag.css) anslagstavlan (se [Anslagstavlan](#anslagstavlan)),
+bygger tv:n (se [Tv:n](#tvn)),
 [public/rum-register.js](public/rum-register.js), [public/rum-register.css](public/rum-register.css)
 och [public/rum-dator.js](public/rum-dator.js) datorn (se [Datorn](#datorn)),
 [public/rum-video.js](public/rum-video.js) och [public/rum-video.css](public/rum-video.css) videon
@@ -4085,9 +4089,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n, som annars skär in
   överst i bilden, bort del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
   under hyllan står hur många pokaler var och en har, flest först.
-- **Anslagstavlan** (under tv:n, i hörnet) → lapparna om omgångens lag (se
-  [Anslagstavlan](#anslagstavlan)).
-- **Datorn** (på disken under Tipsligan) → terminalen där man söker spelare, lag och
+- **Datorn** (på disken i hörnet under tv:n) → terminalen där man söker spelare, lag och
   möten (se [Datorn](#datorn)).
 - **Skårtavlan** (mitt på högra väggen, under pokalhyllan) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
@@ -4160,12 +4162,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
 
-Högra väggen är delad i tre fält som inte går in i varandra (`VAGG` i rum.js, som också ger
-ramarna i 3D sina mått): anslagstavlan i hörnet under tv:n, i mitten pokalhyllan med
-Tipsligan under – säsongen i gänget, pokalerna och ställningen – och längst ut korktavlan,
-med samma överkant och underkant som anslagstavlan. Disken under följer fälten:
-kortregistret står under Tipsligan, fritt från anslagstavlans nederkant, och videon och
-lådan med kassetter under korktavlan. Tv:ns sladd går i en kort båge till ett uttag strax
+Högra väggen (`VAGG` i rum.js, som också ger ramarna i 3D sina mått): hörnet under tv:n är
+fritt ovanför datorn på disken (där hängde anslagstavlan till 2026-11-14), i mitten pokalhyllan
+med Tipsligan under – säsongen i gänget, pokalerna och ställningen – och längst ut korktavlan,
+med videon och lådan med kassetter på disken under. Tv:ns sladd går i en kort båge till ett uttag strax
 under väggplattan, ovanför korktavlan.
 
 **Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
@@ -4195,7 +4195,7 @@ tunnas ut till en linje och seriferna tas bort. Den hänger i kedjor från föns
 en svart list och transformatorn under, och glappar som förut. Stängt-skylten hänger lite
 snett i ett snöre från en sugpropp på dörrens glas. Sakerna har framsidan där de platta
 satt och kroppen tillbaka till väggen, så att sidorna syns och skuggorna faller på väggen
-(inte på glaset och inte över anslagstavlan). Allt ritas med en och samma WebGL-duk, som
+(inte på glaset). Allt ritas med en och samma WebGL-duk, som
 kopieras till en vanlig duk per sak i det plan där saken står (orakelramen i länken, så
 att den lyser med); bara uret ritas om, en gång i sekunden.
 
@@ -6485,137 +6485,16 @@ siffror och pilar dit när den är nära.
 
 ### Anslagstavlan
 
-Under tv:n, i hörnet på högra väggen där pärmarna stod, hänger en anslagstavla: juteväv i
-en ram av lackad ek, byggd i CSS 3D på väggen bredvid skårtavlan
-([public/rum-anslag.js](public/rum-anslag.js), [public/rum-anslag.css](public/rum-anslag.css)).
-I en stående telefon står tavlan framme på höjden, två spalter och fyra rader (`HW`, `HH`, `HOG`, `hogW`): lapparna blir
-ungefär 1,6 gånger så stora och går att läsa utan att lyftas. Tavlan på väggen ser ut som förut.
-Lapparna har det på sajten som rummet annars inte visar, om lagen i omgången (samma omgång
-som kupongen och fällbladstavlan):
-
-- **Formen** – ett registerkort, maskinskrivet: de fem senaste matcherna för båda lagen före
-  avspark (alla tävlingar, den senaste först), V, O eller F. De kommer ur matchens fil, med
-  Europacuperna, och ur `data/matches.json` tills filen har hämtats.
-- **Skadelistan** – ett genomslag: de skadade, avstängda och osäkra (?) per lag ur matchens
-  fil (Fantasy Premier League) – de tre som har spelat mest, och resten som +n.
-- **Starkast** – en polaroid med skölden för divisionens starkaste lag i omgången; på
-  baksidan modellens starkaste och svagaste lag i omgången (styrkan ur
-  `data/teams/<division>.json`, som på Statistik; cupbladet per division).
-- **Kryssar gärna** – en gul lapp: chansen till oavgjort i lagets matcher, ur xG.
-- **Tur & otur** – rutat papper ur ett spiralblock: poäng mot chanserna (xG), med staplar i
-  blyerts.
-- **Slår oddsen** – ett tidningsurklipp: poäng mot vad oddsen väntade sig, och *Sviker*.
-- **Vilan** – ett almanacksblad med omgångens första dag: dagar sedan förra matchen för båda
-  lagen i alla tävlingar; skiljer det två dagar eller mer ringas det tröttare lagets siffra in.
-  Som formen kommer de ur matchens fil, med Europacuperna.
-- **Motståndet** – ett anteckningsblock: *Tufft hittills* och *Lätt hittills*, de lag i
-  omgången som har mött svårast och lättast motstånd jämfört med ett normalt spelschema i
-  divisionen (mål per match enligt modellen, som Motstånd på Statistik).
-
-Mötena, som tidigare stod här som Inbördes, står i kortregistret med resultaten.
-
-Varje lapp är en bunt blad på samma nål, ett per division i omgången – Premier League
-överst, sedan Championship, League One, League Two och sist cupmatcherna – och bladen under
-sticker fram lite i kanten, vridna kring nålen. På bladens högerkant sitter indexflikar av
-genomskinlig plast i divisionens färg (som på Tabeller), med förkortningen i tusch: *PL*,
-*CH*, *L1*, *L2* och *Cup*, i samma ordning uppifrån och med lika långt mellan sig. Ett
-klick på en flik, ↑/↓ eller ett svep uppåt/neråt i telefonen bläddrar alla lappar till den
-divisionen: bladen ovanpå lyfts från nålen ett i taget och läggs under bunten (bakåt tas de
-nedersta fram och läggs överst), lapp för lapp över tavlan från vänster. Listorna räknas då
-bara på divisionens lag, så att styrkan och motståndet jämförs inom divisionen; en lista
-som blir tom står som *Ingen*. Det valda bladet ligger kvar överst tills sidan laddas om.
-
-Ryms inte det längsta bladet på lappens plats är bunten vikt (2026-11-03, användarens
-önskemål – förut klipptes det som inte fick plats bort): resten är vikt bakom, och i
-underkanten syns vecket, där texten försvinner runt böjen och skuggan är tjockare. I handen
-vecklas lappen ut, ett veck i taget och i dragspel när den är mer än dubbelt så lång, och
-viks ihop igen på vägen tillbaka; vecken syns som linjer i papperet. Längden mäts i
-närbilden när lapparna ritas och igen när typsnitten har laddats (`measure` och `panels` i
-rum-anslag.js). Den utvikta lappen blir aldrig mindre än att den går att läsa (`MINS`); ryms
-den inte i fönstret då, som en lång skadelista i telefonen, flyttas den med hjulet, fingret
-eller Page Up/Page Down, och då bläddrar ett svep uppåt eller neråt inte bladen. Det är
-framför allt skadelistan som viks: med sju matcher i Premier League rymdes förut ungefär
-hälften av lagen och med tio en tredjedel. Övriga lappar ryms med en hel omgång i en division
-(tolv matcher): kryssar gärna och slår oddsen är lite högre, så att deras sista rad kommer
-med, almanacksbladet är bredare, så att långa namn (Bournemouth, Southampton) står hela, och
-polaroidens text blir mindre när lagnamnet är långt.
-
-Ett klick eller A: tavlan lossnar från väggen och flyger fram – en projektiv avbildning
-(`matrix3d`) från hörnen på väggen till rakt fram, så att den vrids ut ur väggens vinkel –
-medan kameran går lite mot hörnet och rummet mörknar bakom; där den hängde är väggen
-ljusare. Framme lutar den lite efter musen, så att ramens djup syns, och lapparna lyfter i
-nederkanten när man pekar på dem. Ett klick på en lapp tar den från nålen och fram i läsbar
-storlek (polaroiden vänds på vägen) med bunten och flikarna, ←/→ bläddrar mellan lapparna
-och ↑/↓ mellan bladen. Esc, ett klick
-utanför eller *Häng tillbaka* sätter tillbaka lappen; Esc, A eller ett klick utanför tavlan
-hänger tillbaka tavlan – den flyger till hörnen där den hänger när kameran har gått
-tillbaka och rummet har vridits mot musen (rum.js mäter dem med kameran och rummet där en
-kort stund). Flygturen räknas ut i förväg, en avbildning var 20:e ms, och flygs som en
-animering som grafikkortet sköter själv (`fly` i rum-anslag.js), så att den går jämnt också
-när datorn har annat att göra (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
-Pekar man på tavlan i rummet tänds snabbvalet Statistik på
-text-tv:n. Med `prefers-reduced-motion` står tavlan framme direkt.
-
-**Landskamperna på tavlan** (2026-11-13, användarens önskemål: "Stryktipset verkar innehålla en massa matcher nu som
-vi inte har lyckats lägga till än på olika ställen … Uppdatera hela hemsidan utefter detta"). Landskamperna har ett eget
-blad överst i bunten, före Premier League, eftersom de står först på kupongen. Fliken är guldgul och heter *NL* när alla
-landskamper är Nations League (*EM* för EM-kvalet, annars *LK*); förut hamnade de på cupbladet. Formen och vilan kommer
-ur matchens fil som för klubbarna: de fem senaste i alla landskamper (VM, VM-kvalet, Nations League och vänskapsmatcher
-sedan hösten 2024) och dagarna sedan förra landskampen. Skadelistan står som *Okänt* med raden *Ingen fri källa för
-landslagens skador*, inte som tom. Starkast, Kryssar gärna, Tur & otur, Slår oddsen och Motståndet räknar med modellen
-och xG, som bara finns för klubblagen; på landskampernas blad står de som *Bara klubblagen* med en rad om varför, och
-polaroiden är ett tomt foto. Klubbarnas blad är som förut. Bladen kan nu vara sex (landskamper, fyra divisioner och cupen).
-*Bosnien & Hercegovina* heter *Bosnien* där raden är smal (`Papper.kort` i [public/papper.js](public/papper.js)).
-
-Provat 2026-11-13 med riktig data från ESPN och en kupongfil med veckans tretton matcher (som inte är committad) i
-huvudlös Chromium, 1440 × 900 och 390 × 844: tavlan på väggen och framme, formen i handen, utan fel i konsolen.
-Flaggorna (a.espncdn.com) och football-data.co.uk nåddes inte från provmiljön, så polaroidens flagga och klubbarnas
-siffror på de andra lapparna syntes inte i provet.
-
-**Ropa till Hasse** (2026-11-06, användarens önskemål): under lappen i handen står det man ropar
-till Hasse Backe (fiktiv), som sitter i baren till vänster utanför bilden – *Hasse, vad betyder
-procenten?*, *Hasse, vad är tur och otur?* och så vidare, en fråga per lapp – och ett klick eller
-H, så lutar han sig in från baren nere till vänster (överkroppen ur kostymfotot,
-`rum/hasse-atlas.webp`) och svarar i en mörk pratbubbla med guldkant, vars spets pekar mot hans
-mun. Det var för otydligt att det var han som talade när svaret stod som vanlig text (användaren,
-2026-11-06; av tre skisser valde hen den där han lutar sig in, framför en ljus serietidningsbubbla
-med porträtt och en diskret rad med namn och talstreck). Man står kvar vid tavlan med lappen i
-handen, och svaret kommer ord för ord, en mening i taget: bredvid lappen, åt baren till, med
-lappen flyttad åt höger, eller över lappen när de inte ryms bredvid varandra (i telefonen och i
-smala fönster). Bubblan täcker aldrig hans ansikte (håret får den): står den ovanför honom slutar
-den ovanför pannan och rullar om svaret inte ryms, och spetsen går ner till höger om ansiktet. I
-telefonen står knapparna under bubblan till höger om spetsen, och i en hög telefon står bubblan
-nära honom så att spetsen inte blir lång (`hkPlats` i rum-anslag.js; figuren, bubblan, spetsen och talet i
-[public/rum-hasse-svar.js](public/rum-hasse-svar.js), som protokollet också använder). Han lutar sig
-in på knappa halvsekunden, och med minskad rörelse står allt direkt. Med ljudet på (knappen i baren) hörs han från
-vänster och lite dovt, som från andra sidan affären, och orden kommer i takt med rösten
-(`fjarran` i [public/rum-hasse.js](public/rum-hasse.js)). Han säger vad talen är och hur de räknas
-(samma innehåll som förklaringarna under Statistik → Lagen), ett exempel ur bladet man har framme
-(*Nottingham står överst med 27 %. Det är lite mer än vanligt.*) och vad han själv gör med det, i
-sin egen röst ([prompts/hasse-backe.md](prompts/hasse-backe.md)). Meningarna står under `anslag` i
-[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js), så att de får hans röst som de andra
-replikerna (src/rost.js tar med dem av sig själv); exemplet räknas i sidan ur samma tal som lappen,
-ändras med datan och sägs därför tyst, och när bladet räknar med dolda resultat eller saknar data
-hoppar han över det. Ett klick på svaret visar resten direkt, och med minskad rörelse står allt
-direkt utan ljud, som i baren. *Tack, Hasse*, Esc eller ett klick utanför tystar honom (Esc och ett
-klick utanför sätter sedan tillbaka lappen), och han tystnar också när lappen sätts tillbaka eller
-man går till nästa lapp. Ändras vad en lapp visar ska hans svar följa med. Förut (samma dag)
-förklarade han på ett kort som gled in från baren; användaren ville hellre att han svarade.
-
-Dolda resultat: formen får ? för de dolda matcherna, och lapparna som räknar med
-resultaten (styrkan, krysset, turen, oddsen och motståndet) visar bara rubriken och ett
-frågetecken när en match i lagens divisioner är dold – den lyfta lappen har då *Visa ändå*.
-Lagfilerna hämtas med rummet (om igen efter en kvart), och matchernas filer också, så att
-formen och vilan på väggen räknar med Europacuperna redan innan tavlan tas fram.
-Slitaget skiftar med dagen: lapparnas och bladens vinklar, nålhålen och hörnen av rivna
-lappar.
-`?rum-anslag` visar tavlan framme i en fast bild, och `?rum-anslag=<lapp>` (form, skador,
-styrka, kryss, tur, odds, vila, motstand) med den lappen i handen, och med
-`&rum-anslag-hasse` också Hasses svar om den.
+Anslagstavlan med lapparna om omgångens lag (formen, skadorna, vilan, starkast och svagast,
+kryssar gärna, tur och otur, mot oddsen och motståndet) hängde i hörnet under tv:n till
+2026-11-14. Då ville användaren ha datorn där i stället ("Istället för anslagstavlan"), och
+tavlan togs bort med sina filer (rum-anslag.js och rum-anslag.css; de finns i historiken) och
+Hasses svar om lapparna. Lapparnas tal står kvar i datorns matchakt och som topplistor under
+Statistik → Lagen. Se [Datorn](#datorn).
 
 ### Datorn
 
-På disken under Tipsligan står en IBM Personal System/2 Model 25 från 1990 – allt i ett med
+På disken i hörnet under tv:n står en IBM Personal System/2 Model 25 från 1990 – allt i ett med
 grå skärmram, den ovala IBM-skylten och 25 i blått, två diskettstationer med blå knappar, ett
 Model M-tangentbord med gråa tangenter och tre lampor, en grå mus – och en diskett
 (*REGISTER säk.kopia*), byggd i three.js som inredningen
@@ -6628,7 +6507,10 @@ spelare och lag, och valde bland skisser en terminal som i spion- och actionfilm
 använda och fick anslagstavlans siffror: användaren valde en menyrad bland tre skisser.
 2026-11-12 skulle datorn se äkta ut, "med märken och allting": tre riktiga datorer från tiden
 skissades på disken efter foton på Wikimedia Commons (Macintosh Color Classic, IBM PS/2
-Model 25 och Compaq Presario 425), och användaren valde IBM:en. Skyltar och symboler ritas i
+Model 25 och Compaq Presario 425), och användaren valde IBM:en. 2026-11-14 flyttade den från
+disken under Tipsligan till hörnet under tv:n, där anslagstavlan hängde (`POS` i rum-dator.js
+och duken `BOX` i rum-register.js): användaren ville ha datorn där "på ett snyggt och bra sätt"
+i stället för tavlan. Den står mitt i det fria fältet mellan hörnet och Tipsligan, vänd som förut. Skyltar och symboler ritas i
 dukar (IBM i åtta streck med Alfa Slab One), plasten har ett fint korn, och skärmen sitter i
 en sluttande ram med bildrörets svarta kant runt bilden. Datorn ritas med 41 ritanrop, bara
 när skärmen ändras och medan kameran svänger fram. Samma dag skulle operativsystemet bli
@@ -6893,18 +6775,18 @@ med flit (nedan):
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Anslagstavlan** | Hela omgången jämförd: vem som sticker ut | Formen, skadorna, vilan, starkast och svagast, kryssar gärna, tur och otur, mot oddsen och motståndet |
 | **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom tabellen och skytteligan: laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
 match på ett ställe, så dess tal står också på andra ställen – men alltid samma tal under samma
 namn, ur samma källa (konkordansen under *Matchbladet*). Datorn är det andra (2026-11-11,
-användarens önskemål): den har tavlans siffror också, ordnade efter match och lista, och ändras en
-lapp på tavlan ska datorn följa med (`TAL` i rum-register.js räknar som rum-anslag.js).
+användarens önskemål): den har anslagstavlans siffror också, ordnade efter match och lista, och
+sedan tavlan togs bort 2026-11-14 står de bara där och under Statistik → Lagen (`TAL` i
+rum-register.js).
 
 Ny statistik placeras efter samma roller: det som gäller en match eller en liga nu på tv:n,
-det som jämför lagen i omgången på tavlan och det som beskriver ett lag eller en spelare i datorn.
+och det som jämför lagen i omgången eller beskriver ett lag eller en spelare i datorn.
 En sak liknar en annan med flit: lagets bäste skytt kan stå med samma målantal i
 skytteligan, men kortet visar hur mycket laget hänger på en spelare och skytteligan vem som
 leder. Skårtavlan på väggen visar inte längre tabellen utan gängets egen ställning

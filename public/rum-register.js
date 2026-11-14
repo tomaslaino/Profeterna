@@ -1,10 +1,11 @@
 'use strict';
 
-// Registret i tobaksaffären (rum.js): en 90-talsdator på disken under
-// Tipsligan, i three.js (rum-dator.js), med en terminal som i spionfilmerna
+// Registret i tobaksaffären (rum.js): en 90-talsdator på disken i hörnet under
+// tv:n, i three.js (rum-dator.js), med en terminal som i spionfilmerna
 // runt 2000 – grön text på svart, MATCHFIXARNA REGISTER. Datorn har det om
 // lagen och spelarna som tv:n inte visar, och sedan 2026-11-11 också allt som
-// står på anslagstavlan (rum-anslag.js), ordnat efter match, lag och spelare.
+// stod på anslagstavlan, ordnat efter match, lag och spelare (tavlan togs bort
+// 2026-11-14, och datorn flyttade till hennes plats).
 //
 // Överst står menyraden, som alltid står still:
 //   KUPONGEN   omgångens matcher i avdelningar efter tävlingen (namnet en
@@ -87,8 +88,7 @@
 // Dolda resultat (Spoiler): det som räknar med resultaten (formens motstånd,
 // styrkan, kryssen, turen, oddsen, motståndet, lagkortens siffror, truppens speltid och mål och
 // spelarkorten) visar ? när en match i
-// lagens divisioner är dold – samma nyckel som anslagstavlan, så att Visa ändå
-// gäller båda – och formen och mötena har ? för de dolda matcherna.
+// lagens divisioner är dold – samma nyckel (ans:) som anslagstavlan hade – och formen och mötena har ? för de dolda matcherna.
 //
 // RumRegister.html() → länken på disken med duken (i planet -600 i rum.js)
 // RumRegister.nara() → närbilden
@@ -112,7 +112,7 @@ window.RumRegister = (() => {
   // så många rader skrivs en och en; resten av en lång lista kommer på en gång
   const SKRIV = 50;
   // duken på disken (scenens px), där datorn syns med sin skugga
-  const BOX = { x: 1200, y: 425, w: 250, h: 150 };
+  const BOX = { x: 1136, y: 426, w: 132, h: 112 };
   // terminalen: minst så här breda rader (telefonen), och så många rader ryms på höjden (dator)
   const BRED = 40;
   const RADER = 20;
@@ -191,7 +191,7 @@ window.RumRegister = (() => {
   // kupongens beteckning för en landskamp: NL B4, EMK C2 eller VSK
   const landDiv = (m) => { const g = (/grupp\s+(\S+)/i.exec(m.round || '') || [])[1]; return m.comp === 'vsk' ? 'VSK' : `${m.comp === 'emk' ? 'EMK' : 'NL'}${g ? ` ${up(g)}` : ''}`; };
 
-  // Tavlans tal ur lagfilerna (som rum-anslag.js och Statistik → Lagen)
+  // Tavlans tal ur lagfilerna (som Statistik → Lagen)
   const fdOf = (t, k) => (t && t.fd ? t.fd[k] : null);
   const TAL = {
     styrka: (t) => (t && t.str != null ? t.str : null),
@@ -203,8 +203,7 @@ window.RumRegister = (() => {
 
   // Matchakten: det bättre talet i varje par lyser och det sämre är svagt, när
   // talen skiljer sig minst så här mycket (annars står båda som vanligt):
-  // formens poäng på fem matcher, vilans dagar (som ringen på tavlans
-  // almanacksblad, noteVila i rum-anslag.js), styrkan, poängen mot oddsen,
+  // formens poäng på fem matcher, vilans dagar (i alla tävlingar), styrkan, poängen mot oddsen,
   // målskillnaden och xG-skillnaden per match och andelen matcher som favorit.
   // Kryssen, turen, motståndet, nästa match och skytten säger inte vem som är
   // bättre och står alltid som vanligt.
@@ -352,7 +351,7 @@ window.RumRegister = (() => {
       }
     }
 
-    // dolda resultat i lagens divisioner: samma nyckel som anslagstavlan
+    // dolda resultat i lagens divisioner (nyckeln ans: är anslagstavlans, som den hade)
     function slojan() {
       const stats = A.stats || new Map();
       if (!(window.Spoiler && Spoiler.on())) return { veil: false };

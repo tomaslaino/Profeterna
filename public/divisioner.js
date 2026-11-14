@@ -6,8 +6,8 @@
 // (src/divisions.js), data/players/<liga>.json (src/players.js),
 // data/teams/<liga>.json (src/teamstats.js) och data/matches.json (formen
 // och nästa match). Lagens topplistor och lagkortet har samma tal under
-// samma namn som anslagstavlan och kortregistret i tobaksaffären
-// (rum-anslag.js, rum-register.js).
+// samma namn som datorn i tobaksaffären (rum-register.js; förut också
+// anslagstavlan, borttagen 2026-11-14).
 // Fristående från app.js – egna hjälpare, en fast färg per division ur
 // theme.css.
 //
@@ -991,7 +991,7 @@ function teamsView(dv, P, T) {
     truppen: P && !P.unknown ? `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}` : '',
   }[f.cols];
 
-  // Topplistorna är anslagstavlans lappar i tobaksaffären (rum-anslag.js),
+  // Topplistorna är anslagstavlans lappar i tobaksaffären (borttagen 2026-11-14),
   // med samma namn, i samma ordning och ur samma tal: Formen, Starkast,
   // Kryssar gärna, Tur & otur, Slår oddsen och Motståndet. Skadelistan står
   // i lagkortet (Frånvaro), och vilan hör till omgången.
@@ -1748,7 +1748,7 @@ const GLOSSARY = [
   ['Spelarstatistiken', 'Bara ligamatcher i år, ur ESPN:s trupper. Den släpar ofta en omgång efter tabellen; självmål och spelare som lämnat klubben saknas. I Premier League kommer speltid, xG, försvarsspel från Fantasy Premier League, i övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
   ['Per 90', 'Per 90 spelade minuter – som om spelaren spelat hela matcher. Visas för spelare med minst tre hela matchers speltid; dämpade siffror har för litet underlag.', 'statistik'],
   ['Formen', 'De fem senaste matcherna i ligan och de engelska cuperna (inte Europacuperna), nyast till vänster: V = vinst, O = oavgjort, F = förlust. Ställningen efter 90 minuter gäller, så en match som avgjorts i förlängning eller på straffar räknas som oavgjord. Topplistan Formen räknar 3 poäng för vinst och 1 för oavgjort i de fem.', 'statistik'],
-  ['Topplistorna under Lagen', 'Samma som lapparna på anslagstavlan i tobaksaffären: Formen, Starkast & svagast, Kryssar gärna, Tur & otur, Mot oddsen och Motståndet. Listorna åt två håll visar de tre högsta och de tre lägsta, med en stapel från mitten (längst för divisionens största tal); Alla lag visar hela divisionen.', 'statistik'],
+  ['Topplistorna under Lagen', 'Samma tal som i datorn i tobaksaffären: Formen, Starkast & svagast, Kryssar gärna, Tur & otur, Mot oddsen och Motståndet. Listorna åt två håll visar de tre högsta och de tre lägsta, med en stapel från mitten (längst för divisionens största tal); Alla lag visar hela divisionen.', 'statistik'],
   ['Delad placering', 'Har två lika tal i en topplista delar de plats, och numret står bara på den första – som skytteligan på text-tv:n.', 'statistik'],
   ['Lagstatistiken', 'Tabellen är ESPN:s. xG, skott, kort och odds kommer från football-data.co.uk, som ofta ligger en omgång efter – därför visas de per match eller som skillnad inom samma matcher.', 'statistik'],
   ['Beroende', 'Hur stor del av lagets mål den bäste målskytten gjort.', 'statistik'],

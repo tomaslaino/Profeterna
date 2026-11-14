@@ -5,7 +5,7 @@
    (sidan → stilmall → Googles stilmall → typsnitt) som höll tillbaka dem. En
    fil hämtas först när en bokstav i dess unicode-range syns i det typsnittet.
    Länkas först i varje sidas <head>; förut låg de som @import i stilmallarna:
-     Fraunces (theme.css), Caveat (papper.css), Skrivmaskin (papper.css, rum-anslag.css,
+     Fraunces (theme.css), Caveat (papper.css), Skrivmaskin (papper.css,
      rum-register.css), VT323, Anton och Alfa Slab One samt handstilarna
      Cedarville Cursive, Mr Dafoe och Reenie Beanie (rum.css), och Playfair Display (rum-hasse-tidning.js).
    Licens: SIL Open Font License 1.1 för alla utom Skrivmaskin, som är Special

@@ -4,8 +4,8 @@
 // Personal System/2 Model 25 från 1990, som på fotona från tiden: allt i ett
 // med grå skärmram, IBM-skylten, två diskettstationer och ett Model
 // M-tangentbord, en grå mus och en diskett bredvid (säkerhetskopian). Den står
-// där kortlådan stod: på disken under Tipsligan, vänd mellan gänget och den
-// som tittar.
+// på disken i hörnet under tv:n, där anslagstavlan hängde till 2026-11-14 (förut
+// under Tipsligan, där kortlådan stod), vänd mellan gänget och den som tittar.
 //
 // I rummet ritas datorn när skärmen ändras, med samma kamera som högra
 // väggen, och kopieras till duken i länken på disken, så att den lyser när
@@ -35,7 +35,7 @@ const E = 1000;
 const FW = 2 * Math.max(EYE[0], 1600 - EYE[0]);
 const FH = 2 * Math.max(EYE[1], 1000 - EYE[1]);
 // datorns mitt i botten, på disken, och hur den är vänd (mellan gänget och ögat)
-const POS = { x: 1104, y: -490, z: 377 };
+const POS = { x: 1104, y: -490, z: 235 };
 const YAW = -38 * DEG;
 // skärmen (4:3) och dess mitt över disken
 const SK = { w: 32, h: 24, y: 39.5 };

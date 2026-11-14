@@ -2039,7 +2039,7 @@ window.RumHasse = (() => {
     }
   }
 
-  // Rösten från baren när man ropar till honom vid anslagstavlan (rum-anslag.js). Han syns
+  // Rösten från baren när man ropar till honom vid protokollet (rum-hasse-svar.js). Han syns
   // inte, så ljudet kommer från vänster och lite dovt, som från andra sidan affären. Samma
   // register och samma ljud som här. vakna() vid klicket, ljud(text) → Promise<klipp | null>
   // eller null (som ljudTill), spela(klipp) → { t0, fran, till, slut, stop() } i ljudets klocka

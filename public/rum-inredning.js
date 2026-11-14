@@ -259,8 +259,8 @@ export async function inredning(el, opt = {}) {
     b.scene.add(m);
   }
   const backWall = (b) => catcher(b, new THREE.PlaneGeometry(1300, 800), [0, 0, 0], [570, -420, WZ]);
-  // (högra väggen inte heller över anslagstavlan, rum-anslag.js)
-  const rightWall = (b) => catcher(b, new THREE.PlaneGeometry(600, 440), [0, -90 * DEG, 0], [WX, -270, 620]);
+  // (högra väggen från hörnet, där anslagstavlan hängde till 2026-11-14)
+  const rightWall = (b) => catcher(b, new THREE.PlaneGeometry(920, 440), [0, -90 * DEG, 0], [WX, -270, 460]);
 
   // ---------- taket, fönstret och dörren ----------
 

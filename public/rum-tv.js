@@ -20,8 +20,8 @@
 //   332–369   en sida per match: avsparken eller ställningen, oddsen,
 //             prognosen som en stapel och lagen sida vid sida (tabelläget,
 //             hemma- och bortaraden), ur matchens fil (data/match/<id>.json).
-//             Formen, vilan och skadorna står på anslagstavlan (rum-anslag.js),
-//             xG och resten om lagen i kortregistret (rum-register.js).
+//             Formen, vilan, skadorna, xG och resten om lagen står i
+//             datorn (rum-register.js).
 //             En landskamp har marknadens procent (inte modellens) och lagen
 //             sida vid sida med gruppen, Nations League, formen i
 //             landskamperna och de senaste mötena.

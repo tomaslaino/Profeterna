@@ -12,9 +12,8 @@
 //   live på 377 (rum-tv.js)
 //   videon på disken zoomas in (V): repriserna på VHS, på tv:n och i lådan
 //   bredvid, som spelas i rutan (rum-video.js)
-//   anslagstavlan lyfts ner (A): lapparna (rum-anslag.js)
-//   datorn på disken kommer nära (R): terminalen med kupongen, omgången (tavlans
-//   siffror), lagen och spelarna (rum-register.js, datorn i three.js i rum-dator.js)
+//   datorn på disken i hörnet kommer nära (R): terminalen med kupongen, omgången,
+//   lagen och spelarna (rum-register.js, datorn i three.js i rum-dator.js)
 //   uret, skårtavlan (Tipsligan), oraklet, pokalhyllan, korktavlan,
 //   löpsedlarna på skivan i fönstret (IFK 1982, Nacional 1988, VM 94 och Chelsea 1998,
 //   rum-affischer.js; veckans löpsedel hänger hos Hasse Backe, rum-hasse.js) och dörren (med vilka vi
@@ -39,9 +38,7 @@
 // För bilder: ?rum-t=<sekunder> fryser
 // klockan, ?rum-mx=&rum-my= kamerans läge (−1…1), ?rum-vantar=DL,DT låter
 // dem sitta med kupongen som om de inte hade lämnat in, ?rum-plats=0|1|2 var
-// gänget sitter vid bordet (de byter var tredje dag). ?rum-anslag visar anslagstavlan
-// framme (=form, =skador … med den lappen i handen, och &rum-anslag-hasse
-// med Hasses svar om den), ?rum-register
+// gänget sitter vid bordet (de byter var tredje dag). ?rum-register
 // datorn (=isak … med den sökningen). ?rum-stopp=<timmar> som
 // om det var så långt kvar till spelstoppet, ?rum-tittar som om matcherna
 // pågick och ?rum-mal=dl:1,dt:-1,dj:0 som om det blev mål (rätt, fel, ingen
@@ -55,8 +52,7 @@
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
 // deras hjälpare (state, KP, TP, gradeRow, couponNumber, currentCoupon,
 // Kronan.holders, Kronan.scene, Historik.coupons …) och tv:n i rum-tv.js
-// (RumTv, läses före den här), anslagstavlan i rum-anslag.js (RumAnslag,
-// också före), kortregistret i rum-register.js (RumRegister, också före) och sammanställningen efter omgången i rum-block.js (RumBlock, också före). rum-3d.js (gänget), rum-saker.js (med affischerna i rum-affischer.js) och rum-inredning.js (lysröret,
+// (RumTv, läses före den här), kortregistret i rum-register.js (RumRegister, också före) och sammanställningen efter omgången i rum-block.js (RumBlock, också före). rum-3d.js (gänget), rum-saker.js (med affischerna i rum-affischer.js) och rum-inredning.js (lysröret,
 // neonskylten, uret, orakelramen, paketen …) hämtas
 // först när rummet visas, med three.js från jsdelivr (importmap i
 // index.html); utan WebGL står rummet kvar utan dem.
@@ -89,8 +85,8 @@ window.Rum = (() => {
   const lager = (namn, ut) => { if (window.RumBak) RumBak.fram(namn, ut); };
   const lagerUt = (namn) => { if (window.RumBak) RumBak.bort(namn); };
   const now = () => (still() ? R.frozen : (performance.now() - R.t0) / 1000);
-  // kupongen i handen, tv:n, videon, en närbild (sak), anslagstavlan eller kortregistret nära
-  const nara = () => Boolean(R.kup || R.zoom || R.vnara || R.sak || (R.ans && R.ans.on()) || (R.reg && R.reg.on()));
+  // kupongen i handen, tv:n, videon, en närbild (sak) eller datorn nära
+  const nara = () => Boolean(R.kup || R.zoom || R.vnara || R.sak || (R.reg && R.reg.on()));
   // punkten (fx, fy) i fönstret – mitten om inget annat sägs – i scenens mått
   const mid = (fx = 0.5, fy = 0.5) => [(innerWidth * fx - R.ox) / R.k, (innerHeight * fy - R.oy) / R.k];
   // i telefonen (som i rum-3d.js och de andra): rummet sparar på minnet
@@ -428,14 +424,12 @@ window.Rum = (() => {
     return `<a class="${cls} rum-sak" ${attrs} style="top:${yb0}px; height:${yb1 - yb0}px; width:${r1(wz(x1) - z0)}px; transform: rotateY(-90deg) translateX(${r1(z0)}px)">${inner}</a>`;
   }
 
-  // Högra väggen i tre fält, som inte går in i varandra: anslagstavlan i
-  // hörnet under tv:n, i mitten pokalhyllan med Tipsligan under (säsongen i
-  // gänget: pokalerna och ställningen) och längst ut korktavlan, hela i bild. Disken under dem:
-  // kortregistret under Tipsligan (rum-register.js), lådan och videon under
-  // korktavlan. Måtten är [x0, x1, y0, y1] som i onWall; ramarna i 3D
-  // (rum-inredning.js) får dem härifrån.
+  // Högra väggen: hörnet under tv:n är fritt ovanför datorn på disken (rum-register.js,
+  // rum-dator.js; där hängde anslagstavlan till 2026-11-14), i mitten pokalhyllan med
+  // Tipsligan under (säsongen i gänget: pokalerna och ställningen) och längst ut
+  // korktavlan, hela i bild, med lådan och videon på disken under. Måtten är
+  // [x0, x1, y0, y1] som i onWall; ramarna i 3D (rum-inredning.js) får dem härifrån.
   const VAGG = {
-    ans: [1144, 1296, 318, 478],
     skar: [1316, 1422, 371, 439],
     kork: [1444, 1584, 318, 478],
   };
@@ -443,11 +437,9 @@ window.Rum = (() => {
   // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
   // 6. Skårtavlan med Tipsligan – säsongens ställning i gänget – i vita
   //    plastbokstäver.
-  // 7. Anslagstavlan under tv:n (rum-anslag.js), fri från tv:ns hylla och disken.
   function rightWall() {
-    const [ans, skar, kork] = [VAGG.ans, VAGG.skar, VAGG.kork];
+    const [skar, kork] = [VAGG.skar, VAGG.kork];
     return '<div class="rum-hv">' +
-      (window.RumAnslag ? onWall(...ans, 'rum-ans', RumAnslag.wall(), `${KNAPP} data-nav="statistik" aria-label="Anslagstavlan" id="rum-ans"`) : '') +
       onWall(...skar, 'rum-skar', '<span class="rum-skar-in" id="rum-skar"></span>', `${KNAPP} data-nav="olympen" data-sak="skar" aria-label="Tipsligan"`) +
       onWall(...kork, 'rum-kork', '<span class="rum-kork-in" id="rum-kork"></span>', `${KNAPP} data-nav="olympen" data-sak="kork" aria-label="Korktavlan"`) +
       '</div>';
@@ -1178,18 +1170,6 @@ window.Rum = (() => {
       el.append(c);
     }
     dagDuk();
-    // anslagstavlans skugga på väggen (mjuk och stilla)
-    const sk = R.el.querySelector('.ans-skugga');
-    if (sk) {
-      const [w, h, m, k] = [sk.offsetWidth, sk.offsetHeight, 16, 0.25];
-      const c = duk((w + 2 * m) * k, (h + 2 * m) * k);
-      const g = c.getContext('2d');
-      g.filter = `blur(${5 * k}px)`;
-      g.fillStyle = 'rgba(8, 5, 2, 0.55)';
-      g.fillRect(m * k, m * k, w * k, h * k);
-      c.style.cssText = `position:absolute;left:${-m}px;top:${-m}px;width:${w + 2 * m}px;height:${h + 2 * m}px`;
-      sk.replaceChildren(c);
-    }
   }
 
   // Dagsljuset genom fönstret på en duk, som ljuset ovan. Färgen följer himlen
@@ -1424,7 +1404,7 @@ window.Rum = (() => {
 
   // Tangenterna står inte i foten utan när man pekar på saken (title), och
   // bara med tangentbord och mus.
-  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-ans', 'Anslagstavlan', 'A'], ['#rum-reg', 'Datorn', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-helgarderat', 'Helgarderat', 'L']];
+  const TANGENT = [['#rum-kupong', 'Kupongen', 'K'], ['#rum-tv', 'Tv:n', 'T'], ['#rum-reg', 'Datorn', 'R'], ['.vhs-hit', 'Videon', 'V'], ['#rum-hasse', 'Hasse Backe', 'H'], ['#rum-helgarderat', 'Helgarderat', 'L']];
   function tangenter() {
     if (!matchMedia('(hover: hover)').matches) return;
     for (const [sel, namn, k] of TANGENT) {
@@ -1455,7 +1435,6 @@ ${plane(0, tidningHtml() + paper() + hasseHtml())}
 <div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div><i class="rum-mork-ut"></i>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
-${window.RumAnslag ? RumAnslag.nara() : ''}
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
 <div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
@@ -1467,7 +1446,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     wire();
     // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
-    R.ans = window.RumAnslag ? RumAnslag.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => board(false) }) : null;
     tangenter();
     // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet
     // som syntes nära något var annars Vanlig sida, som leder ut ur rummet.
@@ -1486,7 +1464,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     R.video = window.RumVideo ? RumVideo.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), aim: (f) => { R.vf = f; aimVideo(calm() ? null : 'glid'); }, latt: () => { if (R.vnara) lattVideo(R.vniva); } }) : null;
     R.reg = window.RumRegister ? RumRegister.mount(el, { calm, kort: (n) => BOARD[n] || short(n), close: () => register(false), tur: (fn) => tur(fn, 3) }) : null;
-    if (LATT) for (const e of el.querySelectorAll('.ans-bak, .reg-bak')) tonaDuk(e);
+    if (LATT) for (const e of el.querySelectorAll('.reg-bak')) tonaDuk(e);
     rok(el.querySelector('.rum-rok canvas'));
     paintUte();
     R.bakat = baka().then(ljusDukar).catch((err) => console.warn('Rummet: ljuset kunde inte bakas', err)).then(() => {
@@ -1524,7 +1502,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     e.append(c);
   }
 
-  // Toningen bakom anslagstavlan och kortregistret som en liten duk i telefonen,
+  // Toningen bakom datorn som en liten duk i telefonen,
   // med samma övergång från mitten mot kanterna. Som CSS-bakgrund tar den 10 MB av
   // ritminnet (och med svagt minne saknades en del av den, så att rummet var mörkt
   // upptill och ljust nedtill): en duk ligger utanför ritminnet och ritas aldrig om.
@@ -1544,9 +1522,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Gängets kuponger på pulten är tre lager på 10 MB var. I telefonen tas de bort
-  // medan kameran står vid anslagstavlan eller kortregistret, där de bara skymtar i
-  // hörnet under toningen: annars räcker inte ritminnet till det man tittar på, och
-  // bitar av tavlan försvinner och kommer tillbaka.
+  // medan kameran står vid datorn, där de bara skymtar i hörnet under toningen:
+  // annars räcker inte ritminnet till det man tittar på, och bitar av det
+  // försvinner och kommer tillbaka.
   // (Tillbaka först när kameran har kommit hem, där de ligger utanför bilden i telefonen: annars ska
   // de ritas medan kameran är på väg, och då saknas bitar av annat i stället.)
   function hogenBort(borta) {
@@ -2273,7 +2251,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // tv:n: Stryktipsets ordning (spel) om omgången är Stryktipset, och next
     // mellan omgångarna, när raderna bara är de närmaste matcherna
     if (R.tv) R.tv.fill(rows, { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
-    if (R.ans) R.ans.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
     if (R.reg) R.reg.fill(rows.map((x) => x.m), (state.all && state.all.matches) || []);
     // videon: förra omgången och nästa ur rd och kupongerna som har spelats
     if (R.video) R.video.fill((state.all && state.all.matches) || [], { rd, old: [...(R.old || []), ...(typeof allCoupons === 'function' ? allCoupons() : [])] });
@@ -2614,7 +2591,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     return [f.a[0] + (f.b[0] - f.a[0]) * p, f.a[1] + (f.b[1] - f.a[1]) * p];
   }
 
-  // Kameran går fram till tv:n, videon, anslagstavlan eller kortregistret,
+  // Kameran går fram till tv:n, videon eller datorn,
   // eller tillbaka: i Chrome vrids världen dit på samma tid och med samma
   // kurva som kameran glider (.vrider i rum.css, som .glid) i stället för en
   // bit i varje bildruta. Varje ny vinkel räknade om alla rummets lager, och
@@ -2666,7 +2643,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
   // Tillbaka hem: världen vrids mot musen medan kameran glider, i stället för
   // en bit i varje bildruta när musen rör sig. hemVrid är dit (i Chrome), så
-  // att anslagstavlan och kortregistret kan mäta var de ska landa.
+  // att datorn kan mäta var den ska landa.
   const hemVrid = () => (vrids() && R.pek === 'mouse' && R.mus ? R.mus : null);
   function vridHem(fran) {
     const m = hemVrid();
@@ -3244,12 +3221,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   }
 
   // Det du har framme i rummet, för din figur (rum-folk.js): kupongen i
-  // handen, tv:n, videon, anslagstavlan, kortregistret eller närbilden.
+  // handen, tv:n, videon, datorn eller närbilden.
   function fokus() {
     if (R.kup || R.protokoll) return 'kupong';
     if (R.zoom) return 'tv';
     if (R.vnara) return 'video';
-    if (R.ans && R.ans.on()) return 'anslag';
     if (R.reg && R.reg.on()) return 'register';
     if (R.tidning) return 'helgarderat';
     return R.sak || null;
@@ -3364,8 +3340,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       return;
     }
     if (!R.kvar) return;
-    // när kameran är hemma (och inte har gått iväg igen: anslagstavlan och
-    // kortregistret ställer den hemma en stund för att mäta innan den glider)
+    // när kameran är hemma (och inte har gått iväg igen: datorn ställer den
+    // hemma en stund för att mäta innan den glider)
     const hemma = () => {
       if (R.kvarN !== n || !R.kvar) return;
       R.kvar.cancel();
@@ -3376,7 +3352,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else queueMicrotask(hemma);
   }
 
-  // Ett föremål: tv:n, videon, anslagstavlan och kortregistret kommer fram,
+  // Ett föremål: tv:n, videon och datorn kommer fram,
   // kupongen tas i handen om den går att fylla i (annars går kameran fram
   // till den), din i högen om den går att ändra eller visa, och resten är
   // närbilder (sak).
@@ -3391,7 +3367,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else if (a.dataset.sak) sak(a.dataset.sak);
     else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
     else if (a.dataset.nav === 'video') zoomVideo(!R.vnara);
-    else if (a.id === 'rum-ans') board(true);
     else if (a.id === 'rum-reg') register(true);
     else if (a.id === 'rum-kupong') {
       if (a.querySelector('.rum-vand')) vandKupong(a);
@@ -3642,7 +3617,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // ---------- Hasse om poängen ----------
   //
   // Under protokollet ropar man till Hasse om raden Poäng (Hasse, hur räknas poängen?, eller H), och han
-  // lutar sig in från baren nere till vänster och svarar, som vid anslagstavlan (rum-hasse-svar.js): vad
+  // lutar sig in från baren nere till vänster och svarar (rum-hasse-svar.js): vad
   // rätt och poäng är, ett exempel ur omgången (RumBlock.exempel, sägs tyst) och vad han själv gör med det.
   // Svaret står till vänster om bladet, som då glider åt höger så långt som behövs, eller över bladet när
   // det inte ryms bredvid (i telefonen och i smala fönster), med raden under svaret. Tack, Hasse, Esc eller
@@ -3692,7 +3667,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     p.rad.classList.toggle('fast', fast);
     if (!fast) p.rad.style.cssText = '';
   }
-  // Svarets plats, som vid anslagstavlan (hkPlats i rum-anslag.js): bredvid bladet med överkanten vid
+  // Svarets plats: bredvid bladet med överkanten vid
   // bladets, eller mitt över det. Bubblan täcker aldrig hans ansikte: står den ovanför honom slutar den
   // ovanför hans hår, och ryms svaret inte rullar det.
   function protHassePlats(anim = false) {
@@ -4114,7 +4089,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!R.video || (!on && !R.vnara)) return;
     if (!on) lattVideo(0);
     if (on && R.zoom) zoomTv(false);
-    if (on && R.ans && R.ans.on()) board(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.vnara = on;
     if (on) lager('video', () => zoomVideo(false));
@@ -4260,46 +4234,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.lattT = setTimeout(framme, 700);
   }
 
-  // A: anslagstavlan lossnar från väggen och flyger fram (rum-anslag.js),
-  // och kameran går lite mot hörnet medan den flyger. Tillbaka flyger den
-  // till hörnen där den hänger när kameran har gått tillbaka – de mäts med
-  // kameran där en kort stund, innan den glider dit.
-  function board(on) {
-    if (!R.ans || on === R.ans.on()) return;
-    if (on) lager('tavlan', () => board(false));
-    else lagerUt('tavlan');
-    if (on) {
-      if (R.zoom) zoomTv(false);
-      if (R.vnara) zoomVideo(false);
-      if (R.reg && R.reg.on()) register(false);
-      R.ans.open(true, R.ans.quad());
-      hogenBort(true);
-      vrid(R.tx, R.ty);
-      const p = centerOf(document.getElementById('rum-ans'));
-      const c = mid();
-      aim(p, 1.25, [p[0] + (c[0] - p[0]) * 0.5, p[1] + (c[1] - p[1]) * 0.5], calm() ? null : 'glid');
-      return;
-    }
-    hogenBort(false);
-    const w = document.getElementById('rum-kamera');
-    const cam = w.style.cssText;
-    // (med världen vriden dit den vrids, vridHem)
-    const fran = synlig();
-    const hem = hemVrid();
-    aim([800, 500], 1, [800, 500]);
-    if (hem) setCam(...hem);
-    const q = R.ans.quad();
-    w.style.cssText = cam;
-    void w.offsetWidth;
-    if (hem) vridHem(fran);
-    aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
-    R.ans.open(false, q);
-  }
-
   // R: kameran svänger fram till datorn på disken och ställer sig framför
   // skärmen (rum-register.js, datorn i rum-dator.js), och rummet går lite mot
   // disken under tiden. Tillbaka svänger den till datorns plats med rummet
-  // där det står när det har gått tillbaka, som anslagstavlan.
+  // där det står när det har gått tillbaka – den mäts med kameran där en
+  // kort stund, innan den glider dit (med världen vriden dit den vrids, vridHem).
   function register(on) {
     if (!R.reg || !R.reg.ready() || on === R.reg.on()) return;
     if (on) lager('registret', () => register(false));
@@ -4307,7 +4246,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on) {
       if (R.zoom) zoomTv(false);
       if (R.vnara) zoomVideo(false);
-      if (R.ans && R.ans.on()) board(false);
       const r = R.reg.at();
       R.reg.open(true, r);
       hogenBort(true);
@@ -4438,7 +4376,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     lager('sak', () => sak(bak));
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
-    board(false);
     // saken mätt med kameran i vila och rummet rakt
     const w = document.getElementById('rum-kamera');
     const cam = w.style.cssText;
@@ -5953,8 +5890,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // Med fingret (eller musen nedtryckt) ser man sig omkring: scenen följer
   // med där den är större än fönstret, och släpper man den i farten glider
-  // den vidare en bit. Nära tv:n, videon och med en lapp ur anslagstavlan
-  // eller ett kort ur kortregistret i handen bläddrar ett svep i sidled i
+  // den vidare en bit. Nära tv:n, videon och med ett kort ur datorn
+  // i handen bläddrar ett svep i sidled i
   // stället, som pilarna. Klicket efter
   // ett drag öppnar ingenting.
   function swipe(el) {
@@ -5997,18 +5934,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const dx = e.clientX - P.x;
       const dy = e.clientY - P.y;
       if (nara()) {
-        // anslagstavlan: ett svep uppåt eller neråt bläddrar bladen i lapparna
-        // (utom när fingret flyttade en lång lapp i handen)
-        if (R.ans && R.ans.on() && R.ans.drog()) return;
-        if (R.ans && R.ans.on() && Math.abs(dy) >= 40 && Math.abs(dy) > Math.abs(dx) * 1.5) {
-          R.ans.key(dy < 0 ? 'ArrowDown' : 'ArrowUp');
-          return;
-        }
         if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
         const k = dx < 0 ? 'ArrowRight' : 'ArrowLeft';
         if (R.zoom && R.tv) R.tv.key(k);
         else if (R.vnara && R.video) R.video.key(k);
-        else if (R.ans && R.ans.on() && el.querySelector('.rum-ansn.lyft')) R.ans.key(k);
         else if (R.reg && R.reg.on() && el.querySelector('.rum-regn.lyft')) R.reg.key(k);
         return;
       }
@@ -6132,8 +6061,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         else closeCoupon();
         return;
       }
-      // anslagstavlan sköter sina lappar själv (rum-anslag.js)
-      if (R.ans && R.ans.on()) return;
       // kortregistret sköter sina kort själv (rum-register.js)
       if (R.reg && R.reg.on()) return;
       // nära tv:n sköter den sina knappar och länkar själv (rum-tv.js), utom matchens rad på
@@ -6239,9 +6166,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         }
       } else if (R.kup) {
         if (k === 'k' || k === 'escape') closeCoupon();
-      } else if (R.ans && R.ans.on()) {
-        if (R.ans.key(e.key)) e.preventDefault();
-        else if (k === 'a' || k === 'escape') board(false);
       } else if (R.reg && R.reg.on()) {
         if (R.reg.key(e.key)) e.preventDefault();
         else if (k === 'r' || k === 'escape') register(false);
@@ -6251,7 +6175,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       } else if (R.zoom && R.tv && R.tv.key(e.key)) e.preventDefault();
       else if (R.vnara && R.video.key(e.key, e.repeat)) e.preventDefault();
       else if (k === 't') zoomTv(!R.zoom);
-      else if (k === 'a') board(true);
       else if (k === 'r') register(true);
       else if (k === 'v') zoomVideo(!R.vnara);
       else if (k === 'h' && !R.zoom && !R.vnara) tillHasse();
@@ -6388,11 +6311,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // ritade (och i telefonen resten av 3D-delarna, tur)
       ready.then(turTom).then(() => R.fig && R.fig.uttryck && R.fig.uttryck()).then(() => {
         freezeCss(R.frozen);
-        if (q.has('rum-anslag')) {
-          board(true);
-          if (q.get('rum-anslag')) setTimeout(() => R.ans && R.ans.lift(q.get('rum-anslag')), 50);
-          if (q.get('rum-anslag') && q.has('rum-anslag-hasse')) setTimeout(() => R.ans && R.ans.hasse(), 100);
-        }
         if (q.has('rum-video')) zoomVideo(true);
         if (q.has('rum-sak')) sak(q.get('rum-sak'), null);
         if (q.has('rum-register') && R.reg) {
@@ -6420,7 +6338,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.blad) R.blad.ut(true);
     closeCoupon(true);
     protokollet(false, true);
-    board(false);
     register(false);
     if (R.video) R.video.stop();
     zoomVideo(false);

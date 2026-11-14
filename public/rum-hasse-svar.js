@@ -2,7 +2,7 @@
 
 // ---------- Hasse svarar från baren ----------
 //
-// Vid anslagstavlan (rum-anslag.js) och vid protokollet (rum.js) kan man ropa till Hasse Backe
+// Vid protokollet (rum.js) kan man ropa till Hasse Backe
 // (fiktiv), som sitter i baren till vänster utanför bilden. Han lutar sig in nere till vänster
 // (överkroppen ur kostymfotot, rum/hasse-atlas.webp, samma som i baren) och svarar i en mörk
 // pratbubbla med guldkant, vars spets pekar mot hans mun. Svaret kommer ord för ord, en mening i
