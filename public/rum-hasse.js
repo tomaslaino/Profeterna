@@ -2928,7 +2928,9 @@ window.RumHasse = (() => {
     // (med en enda match att räkna blir det "en rätt av en": då tar han den matchen direkt)
     if (l.av < 2) sagRader(enMatch(lista, tips));
     else {
-      repliker([{ text: fyll(lott(S.ratt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(omLaget) }],
+      // (alla rätt och inga rätt har egna rader, rattAlla och rattNoll; en äldre replikfil har bara ratt)
+      const omRatt = (l.ratt === l.av && S.rattAlla) || (l.ratt === 0 && S.rattNoll) || S.ratt;
+      repliker([{ text: fyll(lott(omRatt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(omLaget) }],
         { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'blinka', mitten: 'brynet', daligt: 'suck' }[lage]) });
     }
     const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);

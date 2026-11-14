@@ -60,17 +60,25 @@ const DAGAR = ['i dag', 'i morgon', ...['måndag', 'tisdag', 'onsdag', 'torsdag'
 const RESULTAT = [0, 1, 2, 3, 4].flatMap((h) => [0, 1, 2, 3, 4].map((b) => `${h}–${b}`));
 // Hur många rätt han kan ha haft av hur många: en till tretton matcher (efterat i rum-hasse.js).
 const RATT = repliker.tal.slice(1).flatMap((av, i) => repliker.tal.slice(0, i + 2).map((ratt) => [ratt, av]));
+// Medan matcherna pågår (lagetNu) räknar han från två matcher, och alla rätt och inga rätt har egna rader.
+const NOLL = repliker.tal[0];
+const RATT_VAG = {
+  'stallning.ratt': RATT.filter(([ratt, av]) => ratt !== NOLL && ratt !== av),
+  'stallning.rattAlla': RATT.filter(([ratt, av]) => ratt === av && av !== repliker.tal[1]),
+  'stallning.rattNoll': RATT.filter(([ratt, av]) => ratt === NOLL && av !== repliker.tal[1]),
+};
 // Talen i domarna över gänget: två till tretton i ord (doma i rum-hasse.js; en och noll har egna rader).
 const ANTAL = repliker.tal.slice(2);
 // Knapparna (lar, angra), tecknen, talen i ord och ordet i guld i domarna sägs inte, och inte heller att han har
 // tappat rösten.
 const TYSTA = new Set(['lar', 'angra', 'tecken', 'tal', 'domord', 'felnamn', 'utanRost']);
 
-function mallar(o, ut = [], nyckel = '') {
+// Repliken med sin plats i filen: [stallning.ratt, 'Just nu har jag …'].
+function mallar(o, ut = [], nyckel = '', vag = '') {
   if (TYSTA.has(nyckel)) return ut;
-  if (typeof o === 'string') ut.push(o);
-  else if (Array.isArray(o)) for (const v of o) mallar(v, ut);
-  else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) mallar(v, ut, k);
+  if (typeof o === 'string') ut.push([vag, o]);
+  else if (Array.isArray(o)) for (const v of o) mallar(v, ut, '', vag);
+  else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) mallar(v, ut, k, vag ? `${vag}.${k}` : k);
   return ut;
 }
 
@@ -80,14 +88,15 @@ function repliktexter(gang = []) {
   const namn = [...new Set(gang.map((g) => Tippoang.kallas(g)).filter(Boolean)
     .flatMap((n) => [n, ...((repliker.felnamn || {})[n] || [])]))];
   const ut = new Set();
-  for (const mall of mallar(repliker)) {
+  for (const [vag, mall] of mallar(repliker)) {
     const falt = new Set([...mall.matchAll(/\{(\w+)\}/g)].map((m) => m[1]));
     let fyllningar = [{}];
     const med = (lista, f) => { fyllningar = fyllningar.flatMap((o) => lista.map((v) => f(o, v))); };
     if (falt.has('namn')) med(namn, (o, v) => ({ ...o, namn: v }));
     if (falt.has('dag')) med(DAGAR, (o, v) => ({ ...o, dag: v }));
     if (falt.has('res')) med(RESULTAT, (o, v) => ({ ...o, res: v }));
-    if (falt.has('ratt')) med(RATT, (o, [ratt, av]) => ({ ...o, ratt, av }));
+    // (rattAlla och rattNoll har bara {av}; Set:en tar bort dubbletterna)
+    if (falt.has('ratt') || falt.has('av')) med(RATT_VAG[vag] || RATT, (o, [ratt, av]) => ({ ...o, ratt, av }));
     if (falt.has('antal')) med(ANTAL, (o, v) => ({ ...o, antal: v }));
     if (falt.has('Antal')) med(ANTAL, (o, v) => ({ ...o, Antal: stor(v) }));
     if (falt.has('Bada')) {

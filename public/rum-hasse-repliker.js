@@ -709,8 +709,10 @@
   },
 
   // Medan matcherna pågår och ställningen syns (stallning i rum-hasse.js): först ratt, hur många av hans tecken
-  // som sitter just nu, och sedan en rad för läget (alla, bra, mitten, daligt), som ska kunna följa efter
-  // "Just nu har jag fyra rätt av sju." Sedan, då och då, ställningen i en match (leder eller lika) och en
+  // som sitter just nu (rattAlla när alla sitter och rattNoll när inget gör det; där är {av} det enda talet, och
+  // ett tal i början av meningen skulle stå med liten bokstav), och sedan en rad för läget (alla, bra, mitten,
+  // daligt), som ska kunna följa efter "Just nu har jag fyra rätt av sju." Han räknar först från två matcher, och
+  // "alla två" låter fel: skriv inte alla {av}. Sedan, då och då, ställningen i en match (leder eller lika) och en
   // kommentar: haller när hans tecken sitter (hallerLika också när det är hans kryss), emot och emotLika när
   // det inte gör det. Han tvivlar aldrig: står det fel är det matchen som har fel. Blir det mål medan man
   // sitter där säger han mal och sedan malBra (för honom, också när det fattas ett mål till), malLugn (emot, men
@@ -724,7 +726,41 @@
   // slutsignal medan man sitter där säger han slutsignal och sedan slutRatt eller slutFel. mittenSent och
   // daligtSent är läget när det bara är några minuter kvar, eller när ingen av hans matcher pågår just då.
   stallning: {
-    ratt: ['Just nu har jag {ratt} rätt av {av}.'],
+    ratt: [
+      'Just nu har jag {ratt} rätt av {av}.',
+      'Jag har {ratt} rätt av {av} så här långt.',
+      'Som ställningarna ser ut har jag {ratt} rätt av {av}.',
+      'Jag ligger på {ratt} rätt av {av}.',
+      'Jag sitter på {ratt} rätt av {av}.',
+      'Blåser domarna av nu har jag {ratt} rätt av {av}.',
+      'Hittills går {ratt} av {av} matcher som jag har sagt.',
+      'Min kupong står på {ratt} rätt av {av}.',
+      'Medan kaffet svalnar står jag på {ratt} rätt av {av}.',
+      'Mellan blossen står jag på {ratt} rätt av {av}.',
+    ],
+    rattAlla: [
+      'Jag har {av} av {av} just nu.',
+      'Jag har inte ett enda fel på {av} matcher.',
+      'Jag har fullt hus så här långt.',
+      'Hittills har jag rätt i samtliga matcher.',
+      'Hittills står varje match som jag har tippat.',
+      'Min kupong är felfri än så länge.',
+      'Blåser domarna av nu har jag inte ett enda fel.',
+      'Du får leta länge efter ett fel på min kupong.',
+      'Hittar du ett fel på min kupong bjuder jag på kaffe.',
+    ],
+    rattNoll: [
+      'Inget av mina {av} tecken sitter just nu.',
+      'Just nu har jag inte en enda rätt.',
+      'Som ställningarna ser ut har jag inte en enda rätt.',
+      'Jag har noll rätt av {av} i det här läget.',
+      'Inte en enda match står som den ska just nu.',
+      'Ingen av matcherna har hittat rätt ställning än.',
+      'Medan kaffet svalnar står jag på noll rätt.',
+      'Matcherna ligger efter min kupong.',
+      'Inte en enda ställning stämmer med min kupong.',
+      'Ställningarna har inte hunnit ikapp min kupong.',
+    ],
     alla: [
       'Allt går som jag har sagt.',
       'Lagen har läst min analys.',

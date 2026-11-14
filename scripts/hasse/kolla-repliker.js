@@ -65,7 +65,7 @@ const FALT = {
   'efter.ratt': ['ratt', 'av'], 'efter.exakt': ['res'],
   // (i det som sticker ut också matchen, tecknen, datorns chans och resultatet: domText i rum-hasse.js)
   domar: ['namn', 'antal', 'Antal', 'match', 'tecknet', 'Tecknet', 'den', 'tecknen', 'pct', 'res'],
-  'stallning.ratt': ['ratt', 'av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
+  'stallning.ratt': ['ratt', 'av'], 'stallning.rattAlla': ['av'], 'stallning.rattNoll': ['av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
   'stallning.vann': ['lag', 'mot', 'res'], 'stallning.slutLika': ['match', 'res'], 'stallning.slutsignal': ['match', 'res'],
 };
 // Sidan lottar bland de här, så de måste vara listor.
@@ -81,7 +81,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   ...['skrall.spik', 'skrall.halv', 'skrall.ensam', 'skrall.om', 'miss.spik', 'miss.halv', 'miss.om', 'ensam.en', 'ensam.fler', 'ensam.om',
     'raddad.fakta', 'raddad.om', 'spikar.alla', 'spikar.sprack', 'datorn.fler', 'datorn.farre', 'datorn.omFler', 'datorn.omFarre'].map((k) => `domar.sak.${k}`),
   ...['ingen', 'enda', 'endaInte', 'alla', 'inga', 'en', 'fler'].map((k) => `domar.spik.${k}`),
-  ...['ratt', 'alla', 'bra', 'mitten', 'mittenSent', 'daligt', 'daligtSent', 'leder', 'lika', 'vann', 'slutLika', 'haller', 'hallerLika', 'emot', 'emotLika',
+  ...['ratt', 'rattAlla', 'rattNoll', 'alla', 'bra', 'mitten', 'mittenSent', 'daligt', 'daligtSent', 'leder', 'lika', 'vann', 'slutLika', 'haller', 'hallerLika', 'emot', 'emotLika',
     'tidigtHaller', 'tidigtEmot', 'halvtidHaller', 'halvtidEmot', 'sentHaller', 'sentEmot', 'storHaller', 'storEmot', 'skrall',
     'slutsignal', 'slutRatt', 'slutFel', 'mal', 'malBra', 'malLugn', 'malFel'].map((k) => `stallning.${k}`),
   ...['italo', 'guld', 'rock', 'p1', 'p3', 'p4g', 'rix', 'sport', 'talksport', 'caroline', 'brus'].map((k) => `radio.${k}`),
