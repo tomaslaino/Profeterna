@@ -4778,16 +4778,30 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     }
     return lagM(W_(662.75, fy, z), tilt);
   }
-  // bröstfickan: på hans vänstra sida, öppningen vid (752, 928) i fotot
+  // bröstfickan: på hans vänstra sida, öppningen vid (752, 928) i fotot (fickans överkant går från 699 till 835
+  // där). Kavajen går fram och tillbaka där när han andas (uAndas i kroppens skuggare: z och halva det i y), så
+  // glasögonen i fickan och planet vid öppningen följer med. Det som är under öppningen och nära kavajen är nere i
+  // fickan och ritas inte (FICKA_N: lika mycket uppåt som utåt, så att det som har kommit upp ur fickan och ut från
+  // kavajen syns).
   const FICKA = W_(752, 928, djup(752, 928));
+  const FICKA_N = V3(0, 1, 1).normalize();
+  const fickPlan = new THREE.Vector4();
+  const fO = v();
+  const fN = v();
+  const fickan = (andas) => {
+    fO.set(FICKA.x, FICKA.y + andas * 0.5, FICKA.z + andas).applyMatrix4(mk);
+    fN.copy(FICKA_N).transformDirection(mk);
+    return fickPlan.set(fN.x, fN.y, fN.z, -fN.dot(fO));
+  };
   const GL = {
     // på näsan, lite lägre (glid) och längst ned, så att han ser över dem (nasa); framför ansiktet på väg på och av
     // (de halvbågade sitter 4 högre än de förra, så att listen går ovanför ögonen som på fotot och inte över locken)
     pa: { h: true, m: paNasan(399, 0.14) },
     glid: { h: true, m: paNasan(406, 0.16) },
     nasa: { h: true, m: paNasan(426, 0.24) },
-    // i fickan: hopfällda och på högkant med det högra hörnet uppåt, och resten nere i fickan bakom kavajen
-    ficka: { m: new THREE.Matrix4().makeBasis(V3(0, -1, -0.1).normalize(), V3(0.99, 0, -0.14).normalize(), V3(0.14, -0.1, 0.98).normalize()).setPosition(FICKA.x - 12, FICKA.y - 19, FICKA.z + 1) },
+    // i fickan: hopfällda och på högkant med det högra hörnet uppåt, där han tar dem, och resten nere i fickan
+    // bakom kavajen (de syns bara medan han tar upp dem eller stoppar ned dem, och följer kavajen när han andas)
+    ficka: { andas: true, m: new THREE.Matrix4().makeBasis(V3(0, -1, -0.1).normalize(), V3(0.99, 0, -0.14).normalize(), V3(0.14, -0.1, 0.98).normalize()).setPosition(FICKA.x - 12, FICKA.y - 19, FICKA.z + 3) },
     // uppdragna ur fickan
     ute: { m: new THREE.Matrix4().makeBasis(V3(0.15, -0.95, 0.25).normalize(), V3(0.98, 0.15, 0).normalize(), V3(-0.05, 0.25, 0.97).normalize()).setPosition(FICKA.x - 20, FICKA.y + 90, FICKA.z + 70) },
     // framför hakan, framsidan bort från honom (skalmarna mot honom): där fälls de ut och ihop
@@ -4845,6 +4859,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const gU = new THREE.Matrix4();
   const iVarld = (namn, ut) => {
     if (GL[namn].h) gM.copy(HM).multiply(gU.makeTranslation(0, upp(namn), 0)).multiply(GL[namn].m);
+    else if (GL[namn].andas) gM.copy(mk).multiply(gU.makeTranslation(0, U.uAndas.value * 0.5, U.uAndas.value)).multiply(GL[namn].m);
     else gM.multiplyMatrices(mk, GL[namn].m);
     gM.decompose(ut.p, ut.q, ut.s);
   };
@@ -4910,7 +4925,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       gInv.copy(gW).invert();
       for (let i = 0; i < 2; i++) ORAT.mal[i].copy(ORON[i]).applyMatrix4(HM).applyMatrix4(gInv);
     }
-    glas.satt(gW, fall, clamp(fall * 1.15 - 0.15), 1 - iFickan, ORAT);
+    // (nere i fickan syns de inte; på väg upp ur den eller ned i den ritas bara det som är ovanför öppningen)
+    if (iFickan > 0.999) glas.iFickan();
+    else glas.satt(gW, fall, clamp(fall * 1.15 - 0.15), 1 - iFickan, ORAT, iFickan > 0 ? fickan(U.uAndas.value) : null);
     const mot = s('motA', 0);
     if (mot <= 0) return null;
     if (s('finger', 0) > 0.5) {

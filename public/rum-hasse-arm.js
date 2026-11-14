@@ -972,12 +972,14 @@ function glasKontur(s, n = 64) {
   }
   return pts;
 }
+// (uFicka: planet vid bröstfickans öppning, där det som är nere i fickan bakom kavajen inte ritas)
 const GLAS_F = `precision highp float;
+uniform vec4 uFicka;
 varying vec3 vN, vP, vL;
 ${LJUS}
 ${BORD_GLSL}
 void main() {
-  if (underBord(vP)) discard;
+  if (underBord(vP) || dot(uFicka.xyz, vP) + uFicka.w < 0.) discard;
   vec3 n = normalize(vN);
   // svartlackerad metall: nästan svart, med baren svagt speglad och en skarp, smal glans längs listen
   vec3 ut = vec3(.022, .021, .024) * ljus(n);
@@ -994,11 +996,12 @@ void main() {
 // glasen: nästan osynliga, utom en svag spegling av baren och ljuset som blänker i dem
 const LINS_F = `precision highp float;
 uniform float uSyn;
+uniform vec4 uFicka;
 varying vec3 vN, vP, vL;
 ${LJUS}
 ${BORD_GLSL}
 void main() {
-  if (underBord(vP)) discard;
+  if (underBord(vP) || dot(uFicka.xyz, vP) + uFicka.w < 0.) discard;
   vec3 n = normalize(vN);
   vec3 e = normalize(cameraPosition - vP);
   if (dot(n, e) < 0.) n = -n;
@@ -1034,11 +1037,13 @@ function slaIhop(lista) {
   ut.setIndex(new THREE.BufferAttribute(idx, 1));
   return ut;
 }
-// → { grupp, U, satt(matris, fallH, fallV, syn), ande(s, fall), borta() }; fall: skalmarna (0 hopfällda, 1 utfällda)
+// → { grupp, U, satt(matris, fallH, fallV, syn, orat, ficka), iFickan(), ande(s, fall), borta() }; fall: skalmarna
+// (0 hopfällda, 1 utfällda)
 export function byggGlasogon(bord = ingenBord()) {
   const { C, T, GANG, UT } = GLAS;
   const P = (x, y, z = 0) => new THREE.Vector3(x, y, z);
-  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS };
+  const INGEN_FICKA = new THREE.Vector4(0, 0, 0, 1);
+  const U = { uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uFicka: { value: INGEN_FICKA.clone() } };
   const mat = new THREE.ShaderMaterial({ uniforms: U, vertexShader: CIG_V, fragmentShader: GLAS_F });
   const UL = { ...U, uSyn: { value: 1 } };
   const lmat = new THREE.ShaderMaterial({ uniforms: UL, vertexShader: CIG_V, fragmentShader: LINS_F, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor });
@@ -1134,8 +1139,9 @@ export function byggGlasogon(bord = ingenBord()) {
     grupp, U, UL, ande,
     // Bågens läge (matris), skalmarna (höger s = −1, vänster s = 1) och hur mycket glasen syns. orat: { w, mal }
     // när de sitter på näsan (w: hur mycket, 0–1), med öronen i bågens mått (mal: höger, vänster), där skalmarna
-    // ska gå över dem.
-    satt(m, fallH, fallV, syn = 1, orat = null) {
+    // ska gå över dem. ficka: planet vid fickans öppning (normal, avstånd) medan han tar upp dem eller stoppar
+    // ned dem; det som är på baksidan av det, nere i fickan, ritas inte.
+    satt(m, fallH, fallV, syn = 1, orat = null, ficka = null) {
       grupp.matrix.copy(m);
       grupp.matrixWorldNeedsUpdate = true;
       for (const k of skalmar) {
@@ -1155,9 +1161,14 @@ export function byggGlasogon(bord = ingenBord()) {
         k.krok.position.set(0, -1, -ORAT * lang);
       }
       UL.uSyn.value = syn;
+      U.uFicka.value.copy(ficka || INGEN_FICKA);
       lins.visible = syn > 0.01;
       grupp.visible = true;
     },
+    // Nere i fickan: syns inte alls. (Förut stack det högra hörnet upp ur den, en enda enhet framför kavajen,
+    // och när han andades gick kavajen fram och tillbaka åtta enheter, så att bitar av bågen och skalmarna
+    // ständigt dök upp och försvann som ett klotter på bröstet; Tomas 2026-11-14.)
+    iFickan() { grupp.visible = false; },
     borta() { for (const g of geos) g.dispose(); mat.dispose(); lmat.dispose(); },
   };
 }
