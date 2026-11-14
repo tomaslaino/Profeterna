@@ -2628,14 +2628,15 @@ window.RumHasse = (() => {
   // resultat, du (porträtt i din färg och namnet i din handstil, som på kupongen) över det du har.
   // Huvudet är byggt som en rad, med osynliga rutor som håller bredden, så att det står mitt över
   // spalterna i alla storlekar. Mellan dem står Facit, när någon match har slutat. Spalterna som inte syns
-  // på någon rad får inget huvud.
+  // på någon rad får inget huvud: ditt porträtt kommer först när du har tippat något (annars stod det över
+  // en tom spalt, och hans resultat såg ut att vara ditt), men spalten står kvar, så att inget flyttar sig.
   function spalter(lista, tips, medFacit = false) {
     const han = lista.some((m) => tips[m.id]);
     const du = K().kan();
     if (!han && !du && !medFacit) return '';
     const hans = han ? `<b class="rh-tips"><span class="rh-rutor">${KORT.map((k) => `<em>${k}</em>`).join('')}</span><small></small><span class="rh-vem hasse"><span class="rh-ans"></span><span class="rh-namn">Hasse</span></span></b>` : '';
-    let din = '';
-    if (du) {
+    let din = du ? '<u></u>' : '';
+    if (du && lista.some((m) => K().din(m.id))) {
       // (porträtten står i gängets uppgifter i kuponger.json, KP i kupong.js, som rum.js läser dem)
       const p = Samtal.pult.state();
       const gang = (typeof KP !== 'undefined' && KP.data && KP.data.samtal && KP.data.samtal.gang) || p.s.gang || [];
@@ -2650,7 +2651,8 @@ window.RumHasse = (() => {
     return `<div class="rh-kol" aria-hidden="true">${hans}${slut}${din}</div>`;
   }
   // Huvudet lika brett som raderna (en rullningslist tar plats i listan), och namnen bara när de
-  // får plats bredvid varandra: först går ditt (du vet hur du ser ut), sedan hans.
+  // får plats bredvid varandra: först går ditt (du vet hur du ser ut), sedan hans. Ditt namn är bredare
+  // än din spalt, och hänger det ut över spalten före (hans resultat eller Facit) står bara porträttet.
   function passaSpalter() {
     const k = $('.rh-kol');
     const l = $('.rh-lista');
@@ -2659,7 +2661,10 @@ window.RumHasse = (() => {
     k.classList.remove('trangt', 'trangare');
     const v = [...k.querySelectorAll('.rh-vem')];
     const krock = () => v.some((x, i) => i && v[i - 1].getBoundingClientRect().right + 14 > x.getBoundingClientRect().left);
-    if (krock()) k.classList.add('trangt');
+    const du = k.querySelector('.rh-vem.du');
+    const fore = du && du.parentElement.previousElementSibling;
+    const over = () => Boolean(fore) && du.getBoundingClientRect().left < fore.getBoundingClientRect().right + 8;
+    if (krock() || over()) k.classList.add('trangt');
     if (krock()) k.classList.add('trangare');
   }
   function forstaRad(lista, fragat, forst) {
