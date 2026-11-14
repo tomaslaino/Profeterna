@@ -96,8 +96,11 @@
     });
     for (const p of folk) p.ensam = rader.filter((r) => r.kol[p.id].ensam);
     const kup = rader.filter((r) => r.kol.K.t);
+    // sista: den sista avsparken i omgången (ms), eller null. Hasse dömer gänget en gång när omgången är spelad
+    // och en gång till morgonen efter kl. 8 (domFro i rum-hasse.js).
+    const avspark = round.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite);
     const sum = {
-      id: round.id, nr, namn: namn || null, n: score.n, folk,
+      id: round.id, nr, namn: namn || null, n: score.n, folk, sista: avspark.length ? Math.max(...avspark) : null,
       kupong: { ok: kup.filter((r) => r.kol.K.ok).length, n: kup.length },
       dator: { ok: (score.model && score.model.ok) || 0, pts: (score.model && score.model.pts) || 0, n: (score.model && score.model.n) || 0 },
       backe: backeRader ? Tippoang.tally(backeRader) : null,

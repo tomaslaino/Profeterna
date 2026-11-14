@@ -7954,7 +7954,9 @@ när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i unge
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
 mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
 samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
-Domen är densamma varje gång. Han rättar sig aldrig och säger inget om det. Står man kvar
+Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8 (`domFro` i
+rum-hasse.js, 2026-11-15). Däremellan är domen densamma varje gång och på alla enheter, och namnet han säger fel är
+detsamma hela omgången. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 

@@ -3085,9 +3085,19 @@ window.RumHasse = (() => {
     return lista[h % lista.length];
   }
   const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
-  // Ordet i guld: ett av många för läget (domord i rum-hasse-repliker.js), samma för samma omgång och person,
-  // så att det som slås i disken också står under namnet i listan.
-  const domOrd = (p, sum) => fast(REP().domord[p.lage] || [''], `${sum.id}:${p.id}:ord`) || '';
+  // Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8, när
+  // han har sovit på saken (Tomas 2026-11-15). Däremellan står domen sig, varje gång och på alla enheter. Namnen
+  // han säger fel byts inte: de fastnar hela omgången (felNamn).
+  function domFro(sum) {
+    if (!sum.sista) return '';
+    const morgon = new Date(sum.sista);
+    morgon.setDate(morgon.getDate() + 1);
+    morgon.setHours(8, 0, 0, 0);
+    return Date.now() >= morgon.getTime() ? ':morgon' : '';
+  }
+  // Ordet i guld: ett av många för läget (domord i rum-hasse-repliker.js), samma för samma omgång, person och
+  // dom, så att det som slås i disken också står under namnet i listan.
+  const domOrd = (p, sum) => fast(REP().domord[p.lage] || [''], `${sum.id}${domFro(sum)}:${p.id}:ord`) || '';
   // Namnen sitter inte riktigt (felnamn i rum-hasse-repliker.js), och han rättar sig aldrig. Felet fastnar en
   // omgång: när han säger fel är det samma fel namn hela omgången, när han hälsar och i domen, på alla enheter,
   // och nästa omgång har han lärt sig ett annat. omgang: omgångens id (kupongens, som protokollets).
@@ -3200,7 +3210,7 @@ window.RumHasse = (() => {
     const NAMN = '\u0001';
     // (raden väljs efter omgången och delen, och var och en i gänget får nästa rad i listan: samma sak i samma
     // omgång låter olika för er)
-    const mening = (lista, del, o = {}) => fyll(lista[(lista.indexOf(fast(lista, `${sum.id}:${del}`)) + p.hand) % lista.length], { namn: NAMN, ...o });
+    const mening = (lista, del, o = {}) => fyll(lista[(lista.indexOf(fast(lista, `${sum.id}${domFro(sum)}:${del}`)) + p.hand) % lista.length], { namn: NAMN, ...o });
     const antal = (n) => ({ antal: tal(n), Antal: versal(tal(n)) });
     const spik = () => {
       const k = d.spik;
