@@ -7950,9 +7950,10 @@ ordet). Namnen sitter inte riktigt, som hos den som aldrig lär sig dem och inte
 rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett namn som låter nästan likadant (*Tejler*,
 *Docke*), ett han kan bättre någon annanstans ifrån (*Laine*, *Tegnér*, *Mogge*), *Daniel*, som ni alla heter och som därför
 aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska höras
-när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
-tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
-mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
+när rösten läser. I domen säger han alltid fel, också om den
+som vann (2026-11-14: förut sa han rätt i var tionde dom, och omgången 2026-11-14 fick två av tre rätt namn, så att
+felet inte märktes). I var nionde dom börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i
+en mening. I nio fall av tio när han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
 samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
 Domen är densamma varje gång. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,

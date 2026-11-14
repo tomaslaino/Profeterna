@@ -3098,14 +3098,14 @@ window.RumHasse = (() => {
     if (!fel || !fel.length) return namn;
     return [...ord.slice(0, -1), fast(fel, `${omgang}:${sist}:namn`)].join(' ');
   }
-  // Vad han kallar någon i domen. Han säger fel om var och en i nio domar av tio, också om den som vann. I var
-  // nionde dom med fel börjar han rätt och tappar namnet efter första meningen
+  // Vad han kallar någon i domen. Han säger alltid fel, också om den som vann. Förut sa han rätt i var tionde dom,
+  // men omgången 2026-11-14 fick två av tre rätt namn, och då märktes felet inte alls (Tomas 2026-11-14). I var
+  // nionde dom börjar han rätt och tappar namnet efter första meningen
   // med det, som om han slutade lyssna. Samma omgång och person ger samma svar, så att domen är densamma varje
   // gång och på alla enheter.
   // → { forst, sedan }: namnet i första meningen med namnet, och i resten.
   function domNamn(p, sum) {
     const nyckel = `${sum.id}:${p.id}`;
-    if (fast([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], `${nyckel}:fel`) === 0) return { forst: p.namn, sedan: p.namn };
     const fel = felNamn(p.namn, sum.id);
     return { forst: fast([0, 1, 2, 3, 4, 5, 6, 7, 8], `${nyckel}:tappar`) ? fel : p.namn, sedan: fel };
   }
