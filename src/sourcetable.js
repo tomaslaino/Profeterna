@@ -10,7 +10,8 @@
 //
 // Landskamperna (Nations League, EM-kvalet och vänskapsmatcherna) står som
 // egna kolumner efter de engelska tävlingarna; det som bara finns för
-// klubbarna står som "finns inte för landslagen".
+// klubbarna står som "finns inte för landslagen". Nations League har sedan
+// 2026-11-14 trupperna, matchrapporterna, xG, skotten och korten.
 
 const { COMPETITIONS, INTERNATIONAL } = require('../config/competitions');
 const { SOURCES } = require('./sources');
@@ -26,7 +27,7 @@ const PROVIDERS = [
     id: 'ESPN',
     name: 'ESPN',
     url: 'https://www.espn.com/soccer/',
-    gives: 'Spelprogram, resultat och tabeller i alla sex tävlingar, trupperna, matchrapporterna med startelvorna i ligorna och cuperna, Europacuperna, FA-cupens tidigare säsonger och lagsköldarna. För landskamperna spelprogrammet och resultaten i Nations League, EM-kvalet och vänskapsmatcherna, Nations Leagues tabeller, landslagens matcher sedan hösten 2024 och flaggorna.',
+    gives: 'Spelprogram, resultat och tabeller i alla sex tävlingar, trupperna, matchrapporterna med startelvorna i ligorna och cuperna, Europacuperna, FA-cupens tidigare säsonger och lagsköldarna. För landskamperna spelprogrammet och resultaten i Nations League, EM-kvalet och vänskapsmatcherna, Nations Leagues tabeller, landslagens trupper och matchrapporter i Nations League, landslagens matcher sedan hösten 2024 och flaggorna.',
     used: 'Matcherna, tabellerna, spelarstatistiken, den beräknade startelvan, vilan inför matcherna och prognosens underlag i cuperna. Landskamperna på kupongen, Nations Leagues tabeller och landslagens form och statistik',
     live: 'Ställningen och matchhändelserna – mål, kort, byten och statistik – hämtas när kupongen eller matchrutan är öppen, varje minut medan matchen pågår.',
   },
@@ -62,8 +63,8 @@ const PROVIDERS = [
     id: '365Scores',
     name: '365Scores',
     url: 'https://www.365scores.com/football/england',
-    gives: 'Spelarnas betyg efter varje match, 1–10, och startelvorna.',
-    used: 'Betygen i statistiken och matchrutan',
+    gives: 'Spelarnas betyg efter varje match, 1–10, och startelvorna. För Nations League också xG, skott, hörnor och kort per match.',
+    used: 'Betygen i statistiken och matchrutan, och landslagens xG och skott',
     live: 'Startelvorna och vilka som saknas hämtas när matchrutan öppnas.',
   },
   {

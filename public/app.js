@@ -901,6 +901,7 @@ const SIDE_TIPS = {
     (n && n.length === 2 ? ` ”${n[0]}–${n[1]}” betyder att lagets chanser i snitt är värda ${n[0]} mål per match och motståndarnas ${n[1]}.` : ''),
   'Gjorda mål mot xG': tipXg('Lagets mål minus dess xG, summerat över säsongen. Plus betyder fler mål än chanserna brukar ge – vassa avslut eller tur. Sådant brukar jämna ut sig, så ett stort plus kan betyda att målen tryter framöver.', (x, d) => `${x} mål ${d} än väntat`),
   'Spelarna i ligan': 'Lagets spelare i ligamatcherna den här säsongen, enligt ESPN. Cuper och Europaspel räknas inte, och siffrorna släpar ibland en omgång efter tabellen.',
+  'Spelarna i Nations League': 'Landslagets spelare i årets Nations League, ur ESPN:s matchrapporter. Vänskapsmatcher och tidigare turneringar räknas inte.',
   'Flest mål': 'Lagets bästa målskytt i ligan.',
   'Flest assist': 'Flest framspelningar till mål i ligan.',
   'Flest segermål': 'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.',
@@ -1071,7 +1072,9 @@ function squadRows(d) {
   const each = (fn) => t.map((x) => (x ? fn(x) : val(null)));
   const row = (label, [h, a]) => `<tr${sideTip(label)}><td class="h">${h}</td><td class="mid">${esc(label)}</td><td class="a">${a}</td></tr>`;
   const winners = t.some((x) => x && x.key.winners);
-  return `<tr class="group"${sideTip('Spelarna i ligan')}><td colspan="3">Spelarna i ligan</td></tr>` +
+  // (landslagen: spelarna i Nations League)
+  const rubrik = t.some((x) => x && x.comp === 'unl') ? 'Spelarna i Nations League' : 'Spelarna i ligan';
+  return `<tr class="group"${sideTip(rubrik)}><td colspan="3">${rubrik}</td></tr>` +
     row('Flest mål', each((x) => leader(x.players, (p) => p.g))) +
     row('Flest assist', each((x) => leader(x.players, (p) => p.a))) +
     (winners

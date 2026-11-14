@@ -544,7 +544,7 @@ function playerTableHtml(P) {
 // placeringen i tabellen under – lika höga rader under Spelarna och Lagen.
 const playerRow = (p) => ({ attr: `data-pid="${esc(p.id)}"`, name: p.name, sub: p.team });
 // Laget har sin sköld framför namnet, som i Tabeller.
-const teamRow = (t) => ({ attr: t.espnId ? `data-team="${esc(t.espnId)}"` : 'disabled', name: t.name, sub: `${ordinal(t.rank)} plats`, crest: true });
+const teamRow = (t) => ({ attr: t.espnId ? `data-team="${esc(t.espnId)}"` : 'disabled', name: t.name, sub: t.grupp ? `${ordinal(t.rank)} i grupp ${t.grupp}` : `${ordinal(t.rank)} plats`, crest: true });
 // rank = placeringen som text ('' när den delas med raden ovanför), bar =
 // en stapel mellan namnet och talet (dbar).
 const leaderLi = (x, rank, value, who, bar = '') => {
@@ -818,8 +818,10 @@ const T_GROUPS = [
 ];
 const TA = T_GROUPS.map((g) => g.id);
 const TCOLS = [
-  { key: 'rank', label: '#', name: 'Placering', title: 'Lagets placering i tabellen just nu.', get: (t) => t.rank, cls: 'c rank', asc: true, in: ['tabell'], show: (t) => t.rank },
+  { key: 'rank', label: '#', name: 'Placering', title: 'Lagets placering i tabellen just nu (landslagen: i gruppen).', get: (t) => (t.grupp ? grpOrd(t.grupp) * 100 + t.rank : t.rank), cls: 'c rank', asc: true, in: ['tabell'], show: (t) => t.rank },
   { key: 'name', label: 'Lag', get: (t) => t.name, text: true, cls: 'team dv-stick', in: TA, show: (t) => teamName(t.name) },
+  // (bara landslagen: gruppen i Nations League)
+  { key: 'grupp', label: 'Grupp', name: 'Gruppen', title: 'Gruppen i Nations League: ligan (A–D) och gruppens nummer.', get: (t) => (t.grupp ? grpOrd(t.grupp) * 100 + t.rank : null), cls: 'c', asc: true, in: ['tabell'], land: true, show: (t) => esc(t.grupp || '–') },
   { key: 'm', label: 'S', name: 'Spelade matcher', title: 'Antal spelade ligamatcher.', get: (t) => t.m, cls: 'num', in: ['tabell'] },
   { key: 'w', label: 'V', name: 'Vunna', title: 'Vunna matcher – ger 3 poäng var.', get: (t) => t.w, cls: 'num', in: ['tabell'] },
   { key: 'd', label: 'O', name: 'Oavgjorda', title: 'Oavgjorda matcher – ger 1 poäng var.', get: (t) => t.d, cls: 'num', in: ['tabell'] },
@@ -912,6 +914,9 @@ const TCOLS = [
     get: (t) => sqOf(t, 'topScorerShare'), cls: 'num', pct: true, in: ['truppen'] },
 ];
 
+// A1 → 1, A2 → 2 … D2 → 32: grupperna i Nations Leagues ordning
+const grpOrd = (g) => (String(g).charCodeAt(0) - 64) * 10 + (Number(String(g).slice(1)) || 0);
+
 const teamsLoad = new Map(); // division → löfte om lagfilen
 function loadTeams(div) {
   if (!teamsLoad.has(div)) {
@@ -962,24 +967,27 @@ function twoWay(key, title, list, get, { up, down, value, tip, tone = 'signed' }
 
 function teamsView(dv, P, T) {
   if (!T || T.unknown) return `<p class="empty">${unknown(`okänt – ${T ? T.reason : 'ingen lagstatistik'}`)}</p>`;
+  const land = isLand(dv.id);
   const groups = teamGroups(T, P);
   const f = state.tf;
   if (!groups.some((g) => g.id === f.cols)) Object.assign(f, { cols: 'tabell', sort: 'rank', dir: 1 });
   const all = teamRows(T, P);
-  const cols = TCOLS.filter((c) => c.in.includes(f.cols));
+  const cols = TCOLS.filter((c) => c.in.includes(f.cols) && (!c.land || land));
   const col = cols.find((c) => c.key === f.sort) || cols[0];
   const list = sortBy([...all], col, f.dir, (a, b) => a.rank - b.rank);
   const head = sortHead(cols, f, 'data-tsort');
-  const body = list.map((t) => `<tr class="${t.espnId && P && !P.unknown ? 'dv-trow' : ''} ${zoneOf(t.note) ? zoneOf(t.note).cls : ''}"` +
+  // (landslagens zoner gäller gruppen och står på Tabeller)
+  const body = list.map((t) => `<tr class="${t.espnId && P && !P.unknown ? 'dv-trow' : ''} ${!land && zoneOf(t.note) ? zoneOf(t.note).cls : ''}"` +
     `${t.espnId && P && !P.unknown ? ` data-team="${esc(t.espnId)}" tabindex="0"` : ''}>${cols.map((c) => colCell(c, t)).join('')}</tr>`).join('');
 
   const S = T.source.stats;
-  const fd = `football-data.co.uk, ${int(S.matches)} matcher t.o.m. ${S.last ? esc(dateLabel(S.last)) : 'okänt'}`;
+  // (landslagen: siffrorna från 365Scores och oddsen från DraftKings)
+  const fd = `${esc(S.provider || 'football-data.co.uk')}, ${int(S.matches)} matcher t.o.m. ${S.last ? esc(dateLabel(S.last)) : 'okänt'}`;
   const src = {
     tabell: `Tabell: ${esc(T.source.table.provider)}, hämtat ${when(T.source.table.fetchedAt)} · nollor: ${fd}`,
     xg: `xG: ${fd}${T.source.strength ? ` · motståndet: prognosmotorns styrka t.o.m. ${esc(dateLabel(T.source.strength.fitThrough))}` : ''}`,
     spelet: fd,
-    marknaden: `Odds vid avspark, snittet hos spelbolagen: ${fd}`,
+    marknaden: T.source.odds ? `Odds vid avspark: ${esc(T.source.odds.provider)}, ${int(T.source.odds.matches)} matcher` : `Odds vid avspark, snittet hos spelbolagen: ${fd}`,
     truppen: P && !P.unknown ? `ESPN-trupperna, hämtat ${when(P.source.fetchedAt)}` : '',
   }[f.cols];
 
@@ -995,9 +1003,14 @@ function teamsView(dv, P, T) {
     teamTop('form', 'Formen', all, (t) => `<b>${formPts(teamForm(t.name))} p</b>`, {
       get: (t) => formPts(teamForm(t.name)), who: (t) => ({ ...teamRow(t), subHtml: formChips(teamForm(t.name), t.name) }),
       tip: `${FORM_TIP} Flest poäng i de fem överst (3 för vinst, 1 för oavgjort).` }) +
-    twoWay('styrka', 'Starkast & svagast', all, (t) => t.str, {
-      up: 'Starkast', down: 'Svagast', value: (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`,
-      tip: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat.' }) +
+    // (landslagen har ingen styrka i modellen, som bara känner lagen i
+    // England: där är det xG-skillnaden per match, som inte väger in ligan)
+    (land ? twoWay('styrka', 'xG-skillnad', all, xgd, {
+      up: 'Bäst', down: 'Sämst', value: (t) => `<b>${delta(xgd(t), { d: 2, dead: 0.005 })}</b>`,
+      tip: 'xG-skillnaden per match i Nations League: lagets chanser minus motståndarnas. Ligorna A–D är olika starka.' })
+      : twoWay('styrka', 'Starkast & svagast', all, (t) => t.str, {
+        up: 'Starkast', down: 'Svagast', value: (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`,
+        tip: 'Modellens väntade målskillnad per match mot ett snittlag i divisionen, med motståndet inräknat.' })) +
     teamTop('kryss', 'Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
       { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i snitt, räknat ur båda lagens xG.' }) +
     twoWay('tur', 'Tur & otur', all, xpd, {
@@ -1006,9 +1019,13 @@ function teamsView(dv, P, T) {
     twoWay('odds', 'Mot oddsen', all, vsOdds, {
       up: 'Slår oddsen', down: 'Sviker', value: (t) => `<b>${delta(vsOdds(t), { d: 1 })}</b>`,
       tip: 'Tagna poäng minus de poäng oddsen vid avspark väntade sig. Slår oddsen = fler poäng än väntat, sviker = färre.' }) +
-    twoWay('motstand', 'Motståndet', all, opp, {
-      up: 'Tufft hittills', down: 'Lätt hittills', tone: 'even', value: (t) => `<b class="dv-even">${signed(opp(t), 2)}</b>`,
-      tip: 'Motståndarnas styrka hittills mot ett normalt spelschema i divisionen, i mål per match enligt prognosmodellen. Tufft = svårare motstånd än snittet, lätt = lättare.' });
+    // (landslagen: hur ofta laget har varit favorit i stället för motståndet)
+    (land ? teamTop('favorit', 'Favorit oftast', all, (t) => `<b>${pct(fdOf(t, 'mkt').fav / fdOf(t, 'mkt').n)}</b>`, {
+      get: (t) => { const m = fdOf(t, 'mkt'); return m && m.n ? m.fav / m.n : null; },
+      tip: 'Andelen matcher där laget hade större chans än motståndaren att vinna, enligt oddsen före avspark.' })
+      : twoWay('motstand', 'Motståndet', all, opp, {
+        up: 'Tufft hittills', down: 'Lätt hittills', tone: 'even', value: (t) => `<b class="dv-even">${signed(opp(t), 2)}</b>`,
+        tip: 'Motståndarnas styrka hittills mot ett normalt spelschema i divisionen, i mål per match enligt prognosmodellen. Tufft = svårare motstånd än snittet, lätt = lättare.' }));
 
   return '<div class="dv-leaders">' + leaders + '</div>' +
     card('Alla lag', {
@@ -1115,7 +1132,7 @@ function selectMtab(id, focus) {
   if (past) box.scrollTop = top;
 }
 
-const divName = () => state.data.divisions.find((x) => x.id === state.div).name;
+const divName = () => (isLand(state.div) ? 'Nations League' : state.data.divisions.find((x) => x.id === state.div).name);
 
 // Huvudet: märket (tröjnummer eller lagets två första bokstäver), namnet och
 // underrader som redan är escapade. Med photo står spelarens bild i ringen och
@@ -1318,16 +1335,20 @@ function allMatches() {
 async function openTeam(id, pick) {
   const P = state.players.get(state.div);
   if (!P || P.unknown) return;
-  const [T, all] = await Promise.all([loadTeams(state.div), allMatches(), window.Skoldar && Skoldar.ready, loadForm()]);
+  const land = isLand(state.div);
+  const [T, all, , , L] = await Promise.all([loadTeams(state.div), allMatches(), window.Skoldar && Skoldar.ready, loadForm(), land ? loadLand() : null, land ? loadLandMatches() : null]);
   const t = P.teams.find((x) => x.espnId === id);
   if (!t) return;
-  const r = P.table ? P.table.rows.find((x) => x.espnId === id) : null;
+  // Ett landslag: tabellraden ur lagfilen (platsen i gruppen) och zonen som på Tabeller
+  const tl = land && T && !T.unknown ? T.teams.find((x) => x.espnId === id) : null;
+  const lt = land && L && !L.unknown ? L.lag.find((x) => x.espnId === id) : null;
+  const r = tl ? { rank: tl.rank, points: tl.pts, gf: tl.gf, ga: tl.ga, played: tl.m, note: null } : P.table ? P.table.rows.find((x) => x.espnId === id) : null;
   const squad = P.players.filter((p) => p.teamId === id)
     .sort((a, b) => (POS_ORDER[a.pos] ?? 9) - (POS_ORDER[b.pos] ?? 9) || (b.app || 0) - (a.app || 0) || a.name.localeCompare(b.name, 'sv'));
-  const z = r && zoneOf(r.note);
+  const z = land ? (tl && tl.liga ? landZone(landLegend(L), tl.liga, tl.rank) : null) : r && zoneOf(r.note);
   // skölden som i tabellen, initialerna bara när laget saknar sköld
   let html = mhead(t.name.slice(0, 2).toUpperCase(), t.name,
-    [[divName(), r ? `${ordinal(r.rank)} plats` : null, z ? z.label : null].filter(Boolean).map(esc).join(' · ')], ' team',
+    [[land && tl && tl.grupp ? `Nations League, grupp ${tl.grupp}` : divName(), r ? `${ordinal(r.rank)} plats` : null, z ? z.label : null].filter(Boolean).map(esc).join(' · ')], ' team',
     '', window.Skoldar && Skoldar.has(t.name) ? teamCrest(t.name) : '');
   const f = teamForm(t.name);
   html += kpis([
@@ -1399,6 +1420,8 @@ async function openTeam(id, pick) {
   html += mtabs('team', 'Om laget', [
     ['spelet', 'Spelet', game, 'Spelet hittills'],
     ['trupp', 'Truppen', squadHtml],
+    // (landslagen: alla landskamper sedan hösten 2024, som på openLand)
+    ...(lt ? [['landskamper', 'Landskamper', landBody(L, lt), 'Landskamperna sedan 2024']] : []),
     ['franvaro', `Frånvaro${away && av.players.length ? ` <small>${av.players.length}</small>` : ''}`, away, 'Skador och avstängningar'],
     ['hojdpunkter', `Höjdpunkter${hl && hl.n ? ` <small>${hl.n}</small>` : ''}`, hl && hl.html, 'Höjdpunkter'],
   ], pick);
@@ -1408,10 +1431,13 @@ async function openTeam(id, pick) {
 // ---------- landslagen ----------
 //
 // Fliken Landslag efter de fyra divisionerna, på båda sidorna. Tabeller har
-// Nations Leagues fjorton grupper (A1–D2), Statistik formen och siffrorna för
-// alla europeiska landslag. Data: data/landslag.json (src/landslag.js) och
-// matchlistan (data/matches.json) för länkarna till matchrutan. Bara det som
-// finns för landslagen visas – inga spelare, inget xG, inga skott.
+// Nations Leagues fjorton grupper (A1–D2). Statistik har sedan 2026-11-14
+// Spelarna och Lagen som divisionerna, ur data/players/unl.json och
+// data/teams/unl.json (spelarna, xG, skotten och oddsen i Nations League), och
+// under Lagen formen och siffrorna för alla europeiska landslag sedan 2024.
+// Data: data/landslag.json (src/landslag.js) och matchlistan
+// (data/matches.json) för länkarna till matchrutan. Ett lag i Nations League
+// öppnar samma lagruta som klubbarna, med landskamperna i en egen flik.
 // Stryktipsets landskamper spelas på lördagen: grupperna och lagen som spelar
 // då står först och är märkta.
 
@@ -1663,7 +1689,19 @@ async function openLand(espnId) {
       `<small>${n.hemma ? 'Hemma' : 'Borta'} · ${esc(fKick.format(new Date(n.datum)))}${n.turnering === 'UNL' ? ' · Nations League' : ''}</small></span></span>` +
       `<b class="dv-next-when">${whenTxt}</b></div>`);
   }
-  html += msec('Siffrorna', facts([
+  html += landBody(L, t);
+  html += mfoot([`Matcherna och tabellen: ESPN, hämtat ${when(L.kalla && L.kalla.matcher)}.`]);
+  showModal(html);
+}
+
+// Landslagets siffror sedan hösten 2024 och de senaste landskamperna (i
+// landslagets kort och på lagrutans flik Landskamper).
+function landBody(L, t) {
+  const nl = t.nationsLeague;
+  const a = t.alla;
+  const have = state.landById || new Map();
+  const link = (id, txt) => (have.has(String(id)) ? `<a href="index.html#match/${esc(id)}">${txt}</a>` : txt);
+  let html = msec('Siffrorna', facts([
     [`${nl.v}–${nl.o}–${nl.f}`, 'V–O–F i gruppen', `${nl.matcher} matcher i årets Nations League`],
     [`${nl.gjorda}–${nl.inslappta}`, 'Mål i gruppen', 'Gjorda–insläppta mål i årets Nations League'],
     [`${a.v}–${a.o}–${a.f}`, 'V–O–F sedan 2024', `${a.matcher} landskamper sedan ${a.fran ? dateLabel(a.fran) : 'hösten'} ${a.fran ? a.fran.slice(0, 4) : '2024'}`],
@@ -1680,8 +1718,15 @@ async function openLand(espnId) {
         `<b>${hid ? '?' : `${r.mal[0]}–${r.mal[1]}${r.avgjord ? '*' : ''}`}</b></li>`;
     }).join('')}</ul>` + (t.senaste.some((r) => r.avgjord) ? '<p class="dv-note">* Ställningen efter 90 minuter; avgjord i förlängning eller på straffar.</p>' : ''));
   }
-  html += mfoot([`Matcherna och tabellen: ESPN, hämtat ${when(L.kalla && L.kalla.matcher)}. Skott, xG och trupperna finns inte för landslagen i de fria källorna.`]);
-  showModal(html);
+  return html;
+}
+
+// Ett landslag i Nations League öppnar lagrutan (spelarna, xG och oddsen),
+// de andra landslagets kort.
+function openLandTeam(espnId) {
+  const P = state.players.get(LAND);
+  if (P && !P.unknown && P.teams.some((t) => t.espnId === espnId)) openTeam(espnId);
+  else openLand(espnId);
 }
 
 // Matchlistans landskamper efter id (länkarna och spoilerskyddet).
@@ -1775,7 +1820,7 @@ function setShowSources(on) {
 
 async function loadPlayers(div) {
   if (state.players.has(div)) return state.players.get(div);
-  const dv = state.data.divisions.find((x) => x.id === div);
+  const dv = isLand(div) ? LAND_DIV : state.data.divisions.find((x) => x.id === div);
   let P;
   if (!dv) {
     P = { unknown: true, reason: 'okänd division' };
@@ -1808,13 +1853,13 @@ async function renderView() {
     else a.removeAttribute('aria-current');
   }
   const el = $('#dv-view');
-  const vt = $('#dv-views');
-  if (vt) vt.style.display = isLand(dv.id) ? 'none' : '';
-  if (isLand(dv.id)) {
-    const [L] = await Promise.all([loadLand(), loadLandMatches(), window.Spoiler && Spoiler.on() && Spoiler.matches()]);
+  // Tabeller: landslagens grupper (ett lag i Nations League öppnar lagrutan,
+  // som behöver spelarfilen)
+  if (isLand(dv.id) && PAGE === 'tabeller') {
+    const [L] = await Promise.all([loadLand(), loadLandMatches(), loadPlayers(LAND), window.Spoiler && Spoiler.on() && Spoiler.matches()]);
     if (!isLand(state.div)) return;
     el.classList.remove('sp-veiled');
-    const draw = () => { el.innerHTML = PAGE === 'tabeller' ? landTablesView(L) : landStatsView(L); };
+    const draw = () => { el.innerHTML = landTablesView(L); };
     if (el.dataset.drawn === LAND) keepScroll(el, draw);
     else draw();
     el.dataset.drawn = LAND;
@@ -1823,6 +1868,8 @@ async function renderView() {
   }
   const P = await loadPlayers(dv.id);
   const [T] = state.view === 'lag' ? await Promise.all([loadTeams(dv.id), loadForm()]) : [null];
+  // (landslagen: under Lagen också lördagens landskamper och alla landslag sedan 2024)
+  const [L] = isLand(dv.id) && state.view === 'lag' ? await Promise.all([loadLand(), loadLandMatches()]) : [null];
   // Spoilerskyddet behöver matcherna innan något ritas, annars hinner det dolda synas.
   if (window.Spoiler && Spoiler.on()) await Spoiler.matches();
   // Användaren kan ha bytt vy medan spelarfilen laddades.
@@ -1830,7 +1877,7 @@ async function renderView() {
   el.classList.remove('sp-veiled');
   const draw = () => {
     if (state.view === 'tabell') el.innerHTML = tableView(P);
-    else if (state.view === 'lag') el.innerHTML = teamsView(dv, P, T);
+    else if (state.view === 'lag') el.innerHTML = teamsView(dv, P, T) + (L ? landStatsView(L) : '');
     else el.innerHTML = playersView(dv, P);
   };
   // Samma vy igen (sorteringen i Lag): rullningen i sidled står kvar.
@@ -1926,7 +1973,7 @@ function wire() {
     const lw = e.target.closest('[data-lwho]');
     if (lw) { state.lf.who = lw.dataset.lwho; renderView(); return; }
     const ld = e.target.closest('[data-land]');
-    if (ld) { openLand(ld.dataset.land); return; }
+    if (ld) { openLandTeam(ld.dataset.land); return; }
     const top = e.target.closest('[data-top]');
     if (top) { openTop(top.dataset.top); return; }
     if (e.target.closest('[data-more]')) {
@@ -1946,7 +1993,7 @@ function wire() {
     const t = e.target.closest('tr[data-team]');
     if (t) { openTeam(t.dataset.team); return; }
     const ld = e.target.closest('tr[data-land]');
-    if (ld) openLand(ld.dataset.land);
+    if (ld) openLandTeam(ld.dataset.land);
   });
   root.addEventListener('input', (e) => {
     if (e.target.id === 'pf-q') { state.pf.q = e.target.value; state.pf.limit = 60; updatePlayerTable(); }
@@ -2027,7 +2074,7 @@ async function cardDiv(div) {
     return true;
   }
   await pageReady;
-  if (!state.data || state.data.error || !state.data.divisions.some((x) => x.id === div)) return false;
+  if (!state.data || state.data.error || !(isLand(div) || state.data.divisions.some((x) => x.id === div))) return false;
   if (state.div !== div) {
     const h = `#${div}/${state.view}`;
     if (location.hash === h) apply();

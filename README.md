@@ -743,9 +743,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Liveställning | ESPN scoreboard (`site.api.espn.com/…/<liga>/scoreboard?dates=YYYYMMDD`), hämtas **i webbläsaren** | kupongens matcher | 1 min medan en kupongmatch pågår | Verifierat 2026-10-18: svarar med `Access-Control-Allow-Origin: *`, så sidan kan hämta direkt. Samma matchid som spelprogrammet. Status, matchminut och ställning; används bara av kupongen, inte av prognosen eller bygget. |
 | Höjdpunkter (sammandrag) | Viaplays öppna innehålls-API (`content.viaplay.se/pcdash-se/sport/fotboll/<tävling>`) | PL, CH, FA-cupen (sidorna för L1 och EFL-cupen svarar 404 sedan oktober 2026) | 30 min | Verifierat 2026-10-20: ingen nyckel, svarar även från USA (GitHub Actions). Viaplay har rättigheterna i Sverige och lägger ut sammandrag som spelas utloggad efter en kort reklamfilm. Listorna *Höjdpunkter* och *Utvalda klipp* per tävling, 40 klipp per sida; sammandragen känns igen på formatet (*Höjdpunkter från Premier League*, *Sporthöjdpunkter*). Premier Leagues femminutersklipp ligger ute en månad, övriga ett år; klipp som faller ur listorna behålls tills de går ut. Inget matchid – matchen hittas på tävling, båda lagen (alias eller ordens början, t.ex. *Bristol C*) och avspark 30 dagar före till 3 dagar efter att klippet lades ut: alla 212 sammandrag med två lag i titeln från säsongens start hittade exakt en match (170 matcher). League Two har inga. Länken går direkt till Viaplays spelare (`viaplay.se/player/default/sport/<guid>`, startar utan Börja titta) och öppnas i ett eget 16:9-fönster på datorn, i ny flik på telefonen – Viaplay tillåter inte att sidorna visas inuti andra sajter (`X-Frame-Options: DENY`, `frame-ancestors 'none'`), så klippen går inte att bädda in. Styr inte prognosen. |
 | Landskamperna: spelprogram, resultat och grupperna | ESPN:s öppna API (`uefa.nations`, `uefa.euroq`, `fifa.friendly`; tabellen i `standings` med en grupp per `children`) | Nations League, EM-kval, vänskapslandskamper | 30 min, tabellen 3 h | Verifierat 2026-11-13: Nations League 2026/27 har 52 matcher 12–17 november, gruppen i `competitions[0].group` ("Group B4") och tabellen i 14 grupper (A1–D2), lagen i id-ordning. Vänskapsmatcherna gäller hela världen – bara de med ett europeiskt landslag tas med. EM-kvalet är tomt till mars 2027. Se [Landskamperna](#landskamperna). |
-| Landskamperna: odds | ESPN matchsammanfattning (DraftKings) | landskamperna | 2 h, tre dagar bakåt till sju dagar fram, sparas | Verifierat 2026-11-13: odds för alla fem landskamperna på Stryktipset 14 november. Ger landskampernas prognos. |
+| Landskamperna: odds | ESPN matchsammanfattning (DraftKings) | landskamperna | 2 h, tre dagar bakåt till sju dagar fram, sparas; tidigare spelade matcher i Nations League och EM-kvalet frågas en gång | Verifierat 2026-11-13: odds för alla fem landskamperna på Stryktipset 14 november. Ger landskampernas prognos. Oddsen ligger kvar i sammanfattningen efter matchen: 2026-11-14 hade 117 av 122 spelade matcher i Nations League odds (de utan står i `utan` och frågas inte om). Ger också landslagens siffror mot oddsen. |
 | Landslagens tidigare matcher | ESPN (`fifa.world` juni–juli 2026, `fifa.worldq.uefa` 2025–mars 2026, `uefa.nations` 2024/25, `fifa.friendly` 2025–2026) | landskamperna – formen och mötena | 7 d | Bara matcher med ett europeiskt landslag. |
 | Landslagens flaggor | ESPN:s bildtjänst (`…/teamlogos/countries/500/<kod>.png`, koden ur lagets logo-adress) | landskamperna | när ett nytt lag kommer | Landslagen ligger inte bland klubbarnas sköldar. Sparas som sköldarna, under det svenska namnet. |
+| Landslagens spelare | ESPN:s öppna API (`uefa.nations/teams/<id>/roster` för de uttagna, `summary?event=<id>` för varje spelad match) | Nations League | trupperna 12 h, rapporterna 6 h, bara nya matcher | Verifierat 2026-11-14: 54 landslag. ESPN:s säsongssiffror i landslagens trupper stämmer inte med matcherna (Norge hade spelat 4 matcher men spelarna stod på 6) och truppen är bara den senast uttagna (214 av 1 326 som spelat saknades), så spelarnas siffror räknas ur matchrapporterna (`p` i `espn_minutes_unl`: mål, assist, skott, kort, regelbrott, räddningar och insläppta per spelare och match). Målen stämde med tabellen utom självmålen (299 av 307). Se [Spelare och statistik för landslagen](#spelare-och-statistik-för-landslagen-2026-11-14). |
+| Landslagens xG, skott och kort | 365Scores öppna webb-API (`/web/game/stats/?games=<id>`, matcherna som för betygen) | Nations League | 6 h, bara nya matcher | Verifierat 2026-11-14: tävling 7016, alla 122 spelade matcher hittades och hade xG, skott, skott på mål, hörnor, frisparkar och kort för båda lagen. Skotten och hörnorna stämde med ESPN:s i stickprovet (Turkiet–Belgien). Det som ligorna har ur football-data.co.uk. Betygen och spelarbilderna hämtas som för ligorna (Republic of Ireland heter Ireland där). |
 | Höjdpunkter (YouTube) | Kanalernas öppna flöden (`youtube.com/feeds/videos.xml?channel_id=<id>`, de 15 senaste klippen) och oEmbed (`youtube.com/oembed`) | alla sex | 30 min | Ingen nyckel. Kanalerna i [config/youtube.js](config/youtube.js): Premier League, Sky Sports Premier League, Sky Sports Football, EFL och FA-cupen, UEFA (för landskamperna, 2026-11-13), plus de 92 ligaklubbarnas egna kanaler (id ur Wikidata P2397 och länkarna på klubbarnas sajter, 2026-10-20). Bara klipp med *highlights* i titeln; damlag, ungdomslag, träningsmatcher, EFL Trophy och gamla matcher sorteras bort. oEmbed sorterar bort klipp som inte får bäddas in (401) eller är borta (404). Flödet har ingen landsspärr – spärrade klipp märks i spelaren, som tar nästa. Matchen hittas på lag och tid: utlagt 95 minuter till sex dygn efter avspark; i en klubbs kanal ska motståndaren stå i titeln, i en sändares båda lagen; ett resultat i titeln ska vara matchens. Spelas inbäddat från `youtube-nocookie.com`. Styr inte prognosen. |
 
 **Prövat och inte använt:**
@@ -2955,8 +2957,9 @@ innehålla en massa matcher nu som vi inte har lyckats lägga till än på olika
   utvärderingen eller i modellens underlag – de ligger i en egen lista (`land` i src/matches.js) utanför `matches`.
 - **Underlaget** (`landDetail` i [src/matches.js](src/matches.js)) har samma form som för en klubbmatch: gruppen och
   tabellen i Nations League, Nations League hittills, formen i alla landskamper (också VM, VM-kvalet och
-  vänskapsmatcherna sedan hösten 2024), schemat och de senaste mötena. Skott, xG, domaren och skadorna finns inte i
-  de fria källorna för landslagen och står som okända med orsak.
+  vänskapsmatcherna sedan hösten 2024), schemat och de senaste mötena. Domaren och skadorna finns inte i de fria
+  källorna för landslagen och står som okända med orsak; spelarna, xG och skotten i Nations League finns sedan
+  2026-11-14 (nedan).
 - **data/landslag.json** ([src/landslag.js](src/landslag.js)): Nations Leagues grupper med tabellen, varje europeiskt
   landslag med gruppen, Nations League hittills, alla landskamper sedan 2024, de tio senaste matcherna och nästa
   match, och landskamperna från tre dagar bakåt till sju dagar fram med prognosen – för datorn, text-tv:n och
@@ -2986,8 +2989,8 @@ sajtens tabeller, statistik och källor.
   tabellen *Landslagen* (lördagens lag eller alla, sorterbar): gruppen, formen (V/O/F i färg), poängen i Nations
   League, alla landskamper sedan hösten 2024 (V–O–F, gjorda–insläppta, nollor) och nästa match. Lagkortet har gruppen
   och zonen, Nations League hittills, alla landskamper, nästa match och de tio senaste, med länk till matchrutan för
-  de matcher sajten har. Spelare, xG och skott visas inte – de finns inte för landslagen. Spoilerskyddet döljer
-  resultaten som för klubbarna.
+  de matcher sajten har. Spoilerskyddet döljer resultaten som för klubbarna. (Sedan 2026-11-14 har Statistik också
+  Spelarna och Lagen för landslagen, se nedan.)
 - **Källor**: täckningsmatrisen har kolumnerna UNL, EMK och VSK efter de engelska, med orsak där en datatyp saknas
   ("finns inte för landslagen", EM-kvalets tabell "lottas inför mars 2027"), och en ny rad *Sköldar och flaggor*
   ([src/sourcetable.js](src/sourcetable.js); sköldarnas källa gäller nu också landskamperna i src/sources.js). ESPN:s
@@ -3000,6 +3003,41 @@ och Statistik för Landslag, lagkortet, Källor och Modell utan fel i konsolen (
 och de engelska tabellerna och statistiken som förut. Inte provat: flaggorna (ESPN:s bildserver nås inte härifrån, så
 de står som tomma sköldar tills GitHub Actions hämtar dem), och *Lördagens grupper* bygger på lördagens datum, inte på
 Stryktipset självt (Svenska Spel nås inte vid bygget) – en landskamp på lördagen som inte är på kupongen märks också.
+
+### Spelare och statistik för landslagen (2026-11-14)
+
+Användarens önskemål: "Kan du ordna så att lagen i nations league får spelare och statistik som de andra ligorna".
+Nations League räknas nu som en division: bygget skriver `data/players/unl.json` och `data/teams/unl.json` i samma
+form som divisionernas, och datorn, Statistik och matchsidan använder dem som ligornas.
+
+- **Spelarna** ([src/players.js](src/players.js), `landTeams`): de uttagna ur ESPN:s trupper (position, ålder,
+  nationalitet, tröja) och alla som har spelat i Nations League ur matchrapporterna, med siffrorna räknade ur
+  rapporterna (matcher, från start, mål, assist, skott, kort, regelbrott, räddningar och insläppta), speltiden och
+  målens sort och betydelse som i ligorna, betygen och bilderna från 365Scores. Lagen heter som på resten av sajten
+  (svenska). Den som har spelat men inte är uttagen nu står med det rapporten vet (namn, tröja, positionen där han
+  startat oftast; okänd för den som bara hoppat in). Skadorna är okända.
+- **Lagen** ([src/teamstats.js](src/teamstats.js), `landTeams`): varje spelad match som en rad i football-data.co.uks
+  form – målen ur ESPN, xG, skott, skott på mål, hörnor, frisparkar och kort ur 365Scores (`s365_stats_unl`,
+  [src/fetchers/s365stats.js](src/fetchers/s365stats.js)), stängningsoddsen ur DraftKings (`espn_odds_land`) – så att
+  xG per match, tur, kryss, mot oddsen, favorit och spel på seger räknas precis som för klubbarna. Tabellen är
+  gruppernas (`rank` = platsen i gruppen, `grupp`, `liga`). Styrkan och motståndet saknas: modellen känner bara lagen i
+  England.
+- **Datorn** ([public/rum-register.js](public/rum-register.js)): NL i registret har LAG (grupperna) och SPELARE,
+  landslagets lagkort har samma flikar som klubbarnas (översikten är landslagets), spelarkorten och talens listor
+  finns, sökningen på ett landslag ger truppen, och landskampens matchakt har xG, skott på mål, favorit, skytten och
+  assisten. En spelare i en engelsk klubb har två kort (`#spelare:<id>` för klubben, `#spelare:nl-<id>` för landslaget).
+- **Statistik** ([public/divisioner.js](public/divisioner.js)): fliken Landslag har Spelarna och Lagen som
+  divisionerna. Lagen har en kolumn *Grupp* och sorteras grupp för grupp; topplistorna *Starkast & svagast* och
+  *Motståndet* är *xG-skillnad* och *Favorit oftast* (ingen modellstyrka), och under dem står *Lördagens landskamper*
+  och *Landslagen* som förut. Ett lag i Nations League öppnar samma lagruta som klubbarna, med en flik *Landskamper*
+  (alla sedan hösten 2024); också från Tabeller.
+- **Matchsidan**: landskampernas matchfiler har trupperna (`teamSquad`), så *Spelarna i Nations League* och *Hela
+  truppen* fungerar som för klubbarna.
+
+Provat 2026-11-14 med riktig data (`node src/build.js --no-fetch` efter hämtningen) i huvudlös Chrome: datorn i
+1470 × 833 och 412 × 915 (registret, Sveriges kort i alla flikar, Gyökeres i Sverige och i Arsenal, listorna,
+sökningen, matchakten för Sverige–Bosnien), Statistik (Spelarna, Lagen, lagrutan, spelarkortet), Tabeller och
+matchsidan utan fel i konsolen.
 
 ## Kupongen
 
