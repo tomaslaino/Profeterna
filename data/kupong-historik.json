@@ -69,6 +69,28 @@
         "modell": "claude-opus-5-5",
         "skriven": "2026-11-07T19:33:29.759Z"
       }
+    },
+    {
+      "id": "2026-11-14",
+      "namn": "Wednesday börjar på lördag",
+      "spel": "Stryktipset",
+      "datum": "2026-11-14",
+      "källa": "sidan",
+      "matcher": [
+        { "match": "Sverige – Bosnien & Hercegovina", "tecken": "1X", "resultat": "3–2", "modell": [66, 20, 14], "id": "401861166" },
+        { "match": "Portugal – Danmark", "tecken": "1X", "resultat": "1–4", "modell": [57, 23, 20], "id": "401861167" },
+        { "match": "Norge – Wales", "tecken": "12", "resultat": "3–1", "modell": [76, 15, 9], "id": "401861165" },
+        { "match": "Rumänien – Polen", "tecken": "2", "resultat": "2–1", "modell": [17, 22, 61], "id": "401861168" },
+        { "match": "Nordirland – Ukraina", "tecken": "12", "resultat": "1–0", "modell": [37, 32, 31], "id": "401861169" },
+        { "match": "Österrike – Irland", "tecken": "1X", "resultat": "1–0", "modell": [56, 26, 18], "id": "401861170" },
+        { "match": "Georgien – Ungern", "tecken": "X2", "resultat": "0–2", "modell": [27, 29, 44], "id": "401861164" },
+        { "match": "Milton Keynes Dons – Burton Albion", "tecken": "1", "resultat": "6–2", "modell": [47, 25, 28], "id": "401880749" },
+        { "match": "Sheffield Wednesday – Plymouth Argyle", "tecken": "12", "resultat": "3–0", "modell": [36, 26, 38], "id": "401880747" },
+        { "match": "Stockport County – Reading", "tecken": "12", "resultat": "3–1", "modell": [49, 24, 27], "id": "401880745" },
+        { "match": "AFC Wimbledon – Blackpool", "tecken": "1X2", "resultat": "1–0", "modell": [32, 28, 40], "id": "401880754" },
+        { "match": "Wigan Athletic – Barnsley", "tecken": "1", "resultat": "2–1", "modell": [40, 27, 33], "id": "401880744" },
+        { "match": "Swindon Town – Grimsby Town", "tecken": "1X2", "resultat": "1–4", "modell": [43, 24, 33], "id": "401881266" }
+      ]
     }
   ]
 }
