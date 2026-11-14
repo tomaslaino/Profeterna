@@ -80,6 +80,33 @@
         { "id": "401931121", "match": "Oxford United – Stevenage", "avspark": "2026-11-07T15:00:00.000Z", "tips": { "DL": "1X", "DT": "1X", "DJ": "1X2" }, "resultat": "0–1", "modell": [48, 30, 22] },
         { "id": "401878757", "match": "Nottingham Forest – Manchester City", "avspark": "2026-11-07T17:30:00.000Z", "tips": { "DL": "2", "DT": "2", "DJ": "1X2" }, "resultat": "3–1", "modell": [15, 21, 64] }
       ]
+    },
+    {
+      "id": "2026-11-14-st4979",
+      "namn": "Wednesday börjar på lördag",
+      "syftar": "Sheffield Wednesday spelar sin första ligamatch under nye tränaren Dave Challinor – och den spelas på en lördag.",
+      "datum": "2026-11-14",
+      "gang": [
+        { "id": "DL", "namn": "Daniel Laino" },
+        { "id": "DT", "namn": "Daniel Tejder" },
+        { "id": "DJ", "namn": "Daniel Johansson" },
+        { "id": "HB", "namn": "Hasse Backe" }
+      ],
+      "matcher": [
+        { "id": "401880749", "match": "Milton Keynes Dons – Burton Albion", "avspark": "2026-11-14T15:00:00.000Z", "tips": { "DL": "1", "DT": "1X2", "DJ": "1X", "HB": "12" } },
+        { "id": "401880747", "match": "Sheffield Wednesday – Plymouth Argyle", "avspark": "2026-11-14T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "X2", "DJ": "1", "HB": "1X2" } },
+        { "id": "401880745", "match": "Stockport County – Reading", "avspark": "2026-11-14T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X", "DJ": "12", "HB": "12" } },
+        { "id": "401880754", "match": "AFC Wimbledon – Blackpool", "avspark": "2026-11-14T15:00:00.000Z", "tips": { "DL": "1", "DT": "1X2", "DJ": "1X2", "HB": "1X2" } },
+        { "id": "401880744", "match": "Wigan Athletic – Barnsley", "avspark": "2026-11-14T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1", "DJ": "1X2", "HB": "1X2" } },
+        { "id": "401881266", "match": "Swindon Town – Grimsby Town", "avspark": "2026-11-14T15:00:00.000Z", "tips": { "DL": "1X", "DT": "1X2", "DJ": "1X2", "HB": "12" } },
+        { "id": "401861165", "match": "Norge – Wales", "avspark": "2026-11-14T17:00:00.000Z", "tips": { "DL": "1X", "DT": "1", "DJ": "1", "HB": "1" } },
+        { "id": "401861164", "match": "Georgien – Ungern", "avspark": "2026-11-14T17:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "X2", "HB": "X2" } },
+        { "id": "401861166", "match": "Sverige – Bosnien & Hercegovina", "avspark": "2026-11-14T19:45:00.000Z", "tips": { "DL": "1X", "DT": "1", "DJ": "1", "HB": "1" } },
+        { "id": "401861167", "match": "Portugal – Danmark", "avspark": "2026-11-14T19:45:00.000Z", "tips": { "DL": "12", "DT": "1", "DJ": "1X2", "HB": "1" } },
+        { "id": "401861168", "match": "Rumänien – Polen", "avspark": "2026-11-14T19:45:00.000Z", "tips": { "DL": "2", "DT": "X2", "DJ": "2", "HB": "2" } },
+        { "id": "401861169", "match": "Nordirland – Ukraina", "avspark": "2026-11-14T19:45:00.000Z", "tips": { "DL": "1X", "DT": "X2", "DJ": "12", "HB": "1X2" } },
+        { "id": "401861170", "match": "Österrike – Irland", "avspark": "2026-11-14T19:45:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "1X", "HB": "1X" } }
+      ]
     }
   ]
 }
