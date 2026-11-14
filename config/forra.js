@@ -29,6 +29,11 @@
 const lc = require('./lokal.js');
 
 module.exports = {
+  // Avstängd sedan 2026-11-14 (användaren: "du kan skippa det"): med veckans gräns hittade den inget
+  // på fyra lag, inte ens när den nye mötte sin förra klubb samma dag, och varje lag kostade en minut.
+  // Nattjobbet hoppar över den; --bara-forra kör den ändå (för prov). true slår på den igen.
+  pa: false,
+
   model: 'claude-opus-5-5',
   letaEffort: 'medium',
   effort: 'medium',

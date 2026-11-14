@@ -2741,7 +2741,7 @@ inte rör varandras poster, sidans och tidningens underlag och redaktörens nyck
 blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
 inget som sticker ut åt sidan. Inte provat på iMacen eller med en riktig intervju i motståndarens medier.
 
-**Förra klubben** (2026-11-14, användarens val bland förslagen till nya källor): när ett lag har en ny tränare eller en
+**Förra klubben** (2026-11-14, användarens val bland förslagen till nya källor; **avstängd** samma dag, se nedan): när ett lag har en ny tränare eller en
 ny spelare som spelar mycket, vad har supportrarna i hans förra klubb skrivit om honom den senaste veckan? De har sett
 honom i flera år och följer ofta hur det går för honom. Bara det som är skrivet de senaste sju dagarna (användaren samma
 dag: "Det ska vara fräsch information i tidningen - helst från senaste dagarna. I värsta fall 1 vecka gammalt"; den
@@ -2780,7 +2780,9 @@ Wednesday–Plymouth och Stockport–Reading. Den första versionen (sidor upp t
 Murphy Cooper, Rochdales supportrar om Jimmy McNulty och en Millwallskribent om Barry Bannan, mest från januari och juni.
 Med veckans gräns fick inget av de fyra lagen något (ungefär en minut per lag): för Plymouth hittades Owlstalks tråd
 inför matchen mot Wednesday samma dag, men inget inlägg om honom (de om "Cooper" gällde Wednesdays egen spelare med
-samma efternamn). Förra klubbens supportrar skriver sällan om en gammal spelare en vanlig vecka. Inte provat på iMacen.
+samma efternamn). Förra klubbens supportrar skriver sällan om en gammal spelare en vanlig vecka. Därför är källan
+avstängd sedan samma dag (`pa: false` i config/forra.js, användaren: "du kan skippa det"): nattjobbet hoppar över den,
+`--bara-forra` kör den ändå, och `pa: true` slår på den igen. Den kördes aldrig på iMacen.
 
 **Rösten** står i [prompts/analys-rost.md](prompts/analys-rost.md): Sixten Bråvall, en påhittad
 tränare med egen bakgrund i klubbar som inte finns och egna stående uttryck. Filen går att

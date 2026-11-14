@@ -34,7 +34,7 @@
 //   node scripts/tidning/poddar.mjs --utan-media         utan de insatta medierna
 //   node scripts/tidning/poddar.mjs --bara-lokal         bara klubben, lokaltidningen och motståndarens intervju
 //   node scripts/tidning/poddar.mjs --utan-lokal         utan dem
-//   node scripts/tidning/poddar.mjs --bara-forra         bara förra klubben (söker för lag vars sökning är äldre än två dagar)
+//   node scripts/tidning/poddar.mjs --bara-forra         bara förra klubben, också när den är avstängd (fr.pa)
 //   node scripts/tidning/poddar.mjs --utan-forra         utan förra klubben
 //   node scripts/tidning/poddar.mjs --traff              prövar bara omgångens spelade matcher och visar källornas
 //                                                        träffsäkerhet (med --fil en annan omgångsfil)
@@ -88,7 +88,8 @@ const BARA = BARA_SIDOR || BARA_FORUM || BARA_MEDIA || BARA_LOKAL || BARA_FORRA 
 const MED_FORUM = !UTAN_FORUM && (!BARA || BARA_FORUM);
 const MED_MEDIA = !UTAN_MEDIA && (!BARA || BARA_MEDIA);
 const MED_LOKAL = !UTAN_LOKAL && (!BARA || BARA_LOKAL);
-const MED_FORRA = !UTAN_FORRA && (!BARA || BARA_FORRA);
+// Förra klubben är avstängd (fr.pa i config/forra.js); --bara-forra kör den ändå.
+const MED_FORRA = BARA_FORRA || (fr.pa && !UTAN_FORRA && !BARA);
 const MED_PODDAR = !BARA;
 // Källans slag som det står i loggen och i --visa.
 const TYPORD = { forum: 'forumet ', media: 'insatta ', lokal: 'lokalt ', motstand: 'intervjun i ', forra: 'förra klubben ' };
