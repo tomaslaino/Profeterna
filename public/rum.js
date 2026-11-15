@@ -4291,9 +4291,23 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // med tangenterna.
   function zoomVideo(on) {
     if (!R.video || (!on && !R.vnara)) return;
-    if (!on) lattVideo(0);
     if (on && R.zoom) zoomTv(false);
     if (on && R.reg && R.reg.on()) register(false);
+    // Världen vrids och planen får sin form först, medan stilen bara är
+    // ändrad där: vrid och svingForm läser av den direkt. Klassen vid-nara
+    // räknar om stilen för hela rummet, och satt före dem gjordes det inne i
+    // klicket och en gång till i nästa bildruta – kameran stod still en stund
+    // innan den gick, fram och hem (en tiondels sekund i en svag telefon).
+    // Nu sätts den sist och räknas om en gång, i bildrutan.
+    if (on) {
+      R.tx = 0;
+      R.ty = 0;
+      if (calm()) R.mx = R.my = 0;
+      vrid(0, 0);
+      // (en gammal rum-video.js i webbläsarens minne har inte mitt: då som förut, i sving)
+      if (R.video.mitt != null) svingForm(R.video.mitt);
+    } else vridHem();
+    if (!on) lattVideo(0);
     R.vnara = on;
     if (on) lager('video', () => zoomVideo(false));
     else lagerUt('video');
@@ -4302,20 +4316,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     clearTimeout(R.vskarp);
     if (on) R.video.skarp(false);
     else R.vskarp = setTimeout(() => { if (!R.vnara) R.video.skarp(false); }, 900);
-    R.el.classList.toggle('vid-nara', on);
-    if (on) {
-      R.tx = 0;
-      R.ty = 0;
-      if (calm()) R.mx = R.my = 0;
-      vrid(0, 0);
-    }
     R.vf = R.video.zoom(on);
     if (on) aimVideo(calm() ? null : 'glid');
     else {
       sving(R.vf, 0, calm() ? null : 'glid');
-      vridHem();
       aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
     }
+    R.el.classList.toggle('vid-nara', on);
   }
   // Kameran svänger runt videon: rummets plan vrids sv grader i 3D kring tv:n,
   // som står i planet -598 där f.mitt ligger (scenens x), medan rum-video.js
@@ -4328,24 +4335,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // bakom kanten räckte inte, och väggen skar av lådans vänstra del. Första gången får
   // planen samma form utan övergång, så att de vrids kring tv:n hela vägen.
   const KV = ((PERSP + 598) / PERSP) * 1.035;
-  function sving(f, sv, cls, kant = f.kant) {
+  function svingSatt(pl, mitt, v, z) {
+    const dx = r1((mitt - 800) * KV);
+    for (const p of pl) {
+      p.style.transform = p.querySelector('#rum-vhs')
+        ? `translate3d(0px, 0px, ${r1(z)}px) scale(${((PERSP + 598 - z) / (PERSP + 598)).toFixed(4)}) ${p.dataset.bas}`
+        : `translate3d(${dx}px, 0px, -598px) rotateY(${v}deg) translate3d(${-dx}px, 0px, 598px) ${p.dataset.bas}`;
+    }
+  }
+  // (planen i svängens form, utan övergång: samma bild)
+  function svingForm(mitt) {
     const pl = [...R.el.querySelectorAll('.rum-world > .rum-pl')];
-    const dx = r1((f.mitt - 800) * KV);
+    if (!pl[0].dataset.bas) {
+      for (const p of pl) p.dataset.bas = p.style.transform;
+      svingSatt(pl, mitt, 0, 0);
+      void pl[0].offsetWidth;
+    }
+    return pl;
+  }
+  function sving(f, sv, cls, kant = f.kant) {
+    const pl = svingForm(f.mitt);
     const tan = Math.tan((sv * Math.PI) / 180);
     // (högst till 20 bakom planet -330, så att ordningen mot det är som förut)
     const dz = sv ? Math.min(((f.mitt - kant) * KV * tan) / (1 - ((kant - 800) * 1.035 * tan) / PERSP) + 8, 598 - 350) : 0;
-    const satt = (v, z) => {
-      for (const p of pl) {
-        p.style.transform = p.querySelector('#rum-vhs')
-          ? `translate3d(0px, 0px, ${r1(z)}px) scale(${((PERSP + 598 - z) / (PERSP + 598)).toFixed(4)}) ${p.dataset.bas}`
-          : `translate3d(${dx}px, 0px, -598px) rotateY(${v}deg) translate3d(${-dx}px, 0px, 598px) ${p.dataset.bas}`;
-      }
-    };
-    if (!pl[0].dataset.bas) {
-      for (const p of pl) p.dataset.bas = p.style.transform;
-      satt(0, 0);
-      void pl[0].offsetWidth;
-    }
+    const satt = (v, z) => svingSatt(pl, f.mitt, v, z);
     // Det tunga i Safari började först när planen började röra sig, så de
     // får en osynlig rörelse direkt (en hundradels bildpunkt), och svängen
     // börjar två bildrutor senare (som kameran, sedan)
@@ -6531,7 +6544,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     // tv:n och videon nära: de ryms i det nya fönstret
     if (R.zoom && R.tvMatt) aimTv(null);
-    if (R.vnara) aimVideo(null);
+    if (R.vnara) {
+      // (vriden telefon: på höjden lådan, på bredden tv:n och lådan, R.video.fonster)
+      const f = R.video.fonster && R.video.fonster();
+      if (f) R.vf = f;
+      aimVideo(null);
+    }
     // närbilden: saken ryms i det nya fönstret
     if (R.sak) sak(R.sak, null);
     // kupongen i handen står kvar mitt i fönstret

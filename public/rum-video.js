@@ -139,6 +139,20 @@ window.RumVideo = (() => {
   // etiketterna står mer framifrån och går att läsa. Lådans bortre ände kommer
   // då mot en, så hörnet flyttas upp (lyft) tills lådan står på disken igen.
   const SVANG = { nara: { rum: 34, horn: 46, lyft: 12 }, tat: { rum: 34, horn: VRID, oga: [GLAS.x + GLAS.w / 2 + PLATS[0], GLAS.y + GLAS.h / 2] } };
+  // Kameran runt tv:n som en enda transform på .vhs-kam (s ur SVANG, null på
+  // håll): perspektivet med ögat (förut perspective och perspective-origin på
+  // .vhs-in), lyftet och vridningen kring tv:ns mitt (KO). Ögat glider då på
+  // grafikkortet med resten: perspective-origin gled på huvudtråden, och i en
+  // svag telefon kom det efter kameran när den gick fram till rutan och
+  // tillbaka. Övergången blandar funktion för funktion, så ögat glider rakt
+  // som förut.
+  const KO = [MITT[0] + PLATS[0], MITT[1], MITT[2] + PLATS[1]];
+  function kamT(s) {
+    const e = (s && s.oga) || VP;
+    const lyft = s && s.lyft ? s.lyft : 0;
+    const p = (x, y, z) => `translate3d(${r2(x * S)}px, ${r2(y * S)}px, ${r2(z * S)}px)`;
+    return `${p(e[0], e[1], 0)} perspective(${1000 * S}px) ${p(-e[0], -e[1], 0)} ${p(KO[0], KO[1] - lyft, KO[2])} rotateY(${s ? s.horn : 0}deg) ${p(-KO[0], -KO[1], -KO[2])}`;
+  }
   // Var en punkt på tv:n eller lådan (i tv:ns mått, z framåt från tv:ns
   // front) syns i hörnet: vriden kring MITT, flyttad till PLATS och i
   // rummets perspektiv, med kameran där s säger (SVANG). ruta: det minsta i
@@ -252,7 +266,6 @@ window.RumVideo = (() => {
     <path d="M${x + 1.2} ${sk + 0.3}H${x + w - 1.2}" stroke="#77787c" stroke-width=".2" opacity=".6"/>
     <rect x="${f.x - 0.7}" y="${f.y - 0.7}" width="${f.w + 1.4}" height="${f.h + 1.4}" rx="1.1" fill="url(#vhs-krom)"/>
     <rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".7" fill="#030303"/>
-    <rect class="vhs-lucka" x="${f.x + 0.5}" y="${f.y + 0.45}" width="${f.w - 1}" height="${f.h - 0.9}" rx=".4" fill="url(#vhs-lucka)"/>
     <rect x="${f.x + 0.2}" y="${f.y + f.h + 1.45}" width="3.5" height="1.85" rx=".35" fill="none" stroke="#a9aaad" stroke-width=".2"/>
     <rect x="${VFD.x - 0.6}" y="${VFD.y - 0.6}" width="${VFD.w + 1.2}" height="${VFD.h + 1.2}" rx="1" fill="url(#vhs-krom)" opacity=".7"/>
     <rect x="${VFD.x}" y="${VFD.y}" width="${VFD.w}" height="${VFD.h}" rx=".5" fill="url(#vhs-rok)"/>
@@ -343,11 +356,21 @@ window.RumVideo = (() => {
     <linearGradient id="vhs-fas" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d0d0f"/><stop offset=".55" stop-color="#1b1c1e"/><stop offset="1" stop-color="#36373a"/></linearGradient>
     <linearGradient id="vhs-silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f1ef"/><stop offset=".55" stop-color="#c9c9c6"/><stop offset="1" stop-color="#9c9c99"/></linearGradient>
     <linearGradient id="vhs-krom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a4a5a9"/><stop offset=".45" stop-color="#5f6064"/><stop offset="1" stop-color="#2e2f32"/></linearGradient>
-    <linearGradient id="vhs-lucka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c4d51"/><stop offset=".16" stop-color="#2b2c2f"/><stop offset=".22" stop-color="#26272a"/><stop offset=".22" stop-color="#0f1011"/><stop offset=".27" stop-color="#0f1011"/><stop offset=".27" stop-color="#3b3c40"/><stop offset=".34" stop-color="#232427"/><stop offset="1" stop-color="#151618"/></linearGradient>
     <linearGradient id="vhs-rok" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1416"/><stop offset="1" stop-color="#030809"/></linearGradient>
     <filter id="vhs-korn" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="3" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .52  0 0 0 -2.2 1.25"/></filter>
   </defs>
-  ${tvSvg()}`) + ritning(b, tvText());
+  ${tvSvg()}`) + ritning(b, tvText()) + luckaRitning();
+  }
+  // Luckan för kassettfacket i en egen liten ritning ovanpå: den fälls upp när
+  // en kassett åker in eller ut (.matar), och i tv:ns ritning målades då hela
+  // framsidan med kornet om i varje bildruta. Nu är det bara ett lager som
+  // vrids, på grafikkortet.
+  function luckaRitning() {
+    const f = FACK;
+    const b = { x: f.x + 0.5, y: f.y + 0.45, w: f.w - 1, h: f.h - 0.9 };
+    return `<svg class="vhs-ritning vhs-lucka" viewBox="${b.x} ${b.y} ${b.w} ${b.h}" width="${r2(b.w * S)}" height="${r2(b.h * S)}" style="left:${px(b.x)}; top:${px(b.y)}" aria-hidden="true">` +
+      '<defs><linearGradient id="vhs-lucka" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c4d51"/><stop offset=".16" stop-color="#2b2c2f"/><stop offset=".22" stop-color="#26272a"/><stop offset=".22" stop-color="#0f1011"/><stop offset=".27" stop-color="#0f1011"/><stop offset=".27" stop-color="#3b3c40"/><stop offset=".34" stop-color="#232427"/><stop offset="1" stop-color="#151618"/></linearGradient></defs>' +
+      `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx=".4" fill="url(#vhs-lucka)"/></svg>`;
   }
   function ladaRitning() {
     const b = { x: LADA.x - 0.5, y: LADA.y - 1, w: LADA.w + 1, h: LADA.h + 1 };
@@ -477,10 +500,10 @@ window.RumVideo = (() => {
       `<button type="button" class="vhs-kas" data-i="${a + i}"><span class="lapp"><i></i><b></b><u></u></span></button>` +
       '<i class="kas-topp"></i><i class="kas-v"></i><i class="kas-h"></i></div>').join('');
     return `<div class="rum-vhs${WEBKIT ? ' webkit' : ''}" id="rum-vhs" data-lage="tom" style="left:${O[0]}px; top:${O[1]}px">` +
-      `<div class="vhs-in" style="perspective:${1000 * S}px; perspective-origin:${px(VP[0])} ${px(VP[1])}">` +
+      '<div class="vhs-in">' +
       '<i class="vhs-sken"></i>' +
-      // kameran runt tv:ns mitt (SVANG)
-      `<div class="vhs-kam" style="transform-origin:${px(MITT[0] + PLATS[0])} ${px(MITT[1])} ${px(MITT[2] + PLATS[1])}">${rumYtor()}` +
+      // kameran runt tv:ns mitt, i rummets perspektiv (SVANG, kamT)
+      `<div class="vhs-kam" style="transform:${kamT(null)}">${rumYtor()}` +
       `<div class="vhs-tv" style="transform:translate3d(${px(PLATS[0])}, 0px, ${px(PLATS[1])}) rotateY(${-VRID}deg); transform-origin:${px(MITT[0])} ${px(MITT[1])} ${px(MITT[2])}">${ytor()}` +
       `<div class="vhs-front">${tvRitning()}<div class="vhs-styr" inert>` +
       `<div class="vhs-skarm" style="${at(GLAS)}">` +
@@ -839,8 +862,11 @@ window.RumVideo = (() => {
 
     // Kassetterna nerifrån och upp i varje fack; den som är i videon lämnar
     // en lucka som de ovanför sjunker ner i, men har kvar sin plats att
-    // komma tillbaka till.
+    // komma tillbaka till. De som flyttas glider dit med translate, på
+    // grafikkortet: med en övergång på top lades hela hörnet ut i varje
+    // bildruta medan kassetten lyftes ur lådan.
     function layout() {
+      const flytt = [];
       for (const c of COLS) {
         let yAll = c.y;
         let yNow = c.y;
@@ -854,13 +880,17 @@ window.RumVideo = (() => {
           const r = r2((hash(`r${i}`) - 0.5) * 2 * c.r);
           // lite innanför öppningen och lutade
           const t = `translateZ(${-S}px) rotate(${r}deg)`;
+          const fore = parseFloat(el.style.top);
           el.style.left = px(x);
           el.style.top = px(top);
           el.style.setProperty('--t', t);
           el.dataset.t = t;
+          const d = fore - top * S;
+          if (Math.abs(d) > 0.5 && i !== V.cur) flytt.push([el, d]);
         }
       }
       kas.forEach((el, i) => el.classList.toggle('inne', i === V.cur));
+      if (!o.calm()) for (const [el, d] of flytt) el.animate([{ translate: `0px ${r2(d)}px` }, { translate: '0px 0px' }], { duration: 350, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' });
     }
 
     const VARIANTS = 5;
@@ -895,17 +925,24 @@ window.RumVideo = (() => {
       duk.font = `400 ${f}px ${fam}`;
       return duk.measureText(t).width - 0.4 * t.length;
     };
+    // (Alla mäts först och storlekarna sätts sedan: att sätta en storlek och
+    // mäta nästa lade ut hörnet en gång per kassett, 26 gånger när skärpan byttes.)
     function passa() {
+      const matt = [];
+      let fam = null;
       for (const el of kas) {
         if (el.hidden || el.dataset.passa == null) continue;
         const lapp = el.querySelector('.lapp');
-        if (!lapp.clientWidth) continue;
+        const w = lapp.clientWidth;
+        if (!w) continue;
         const [b, u] = [lapp.querySelector('b'), lapp.querySelector('u')];
-        const fam = getComputedStyle(b).fontFamily;
-        const ledigt = lapp.clientWidth - 14 - (el.classList.contains('har-nr') ? 25 : 0) - (u.textContent ? 5 : 0) - 2;
+        if (fam == null) fam = getComputedStyle(b).fontFamily;
+        matt.push([el, w - 14 - (el.classList.contains('har-nr') ? 25 : 0) - (u.textContent ? 5 : 0) - 2, b.textContent, u.textContent]);
+      }
+      for (const [el, ledigt, b, u] of matt) {
         let f = FS;
-        while (f > 11 && bredd(b.textContent, f, fam) + bredd(u.textContent, f, fam) > ledigt) f--;
-        el.style.setProperty('--fs', `${f}px`);
+        while (f > 11 && bredd(b, f, fam) + bredd(u, f, fam) > ledigt) f--;
+        if (el.style.getPropertyValue('--fs') !== `${f}px`) el.style.setProperty('--fs', `${f}px`);
         delete el.dataset.passa;
       }
     }
@@ -1456,6 +1493,10 @@ window.RumVideo = (() => {
       if (st === 3 && V.lage === 'spelar' && !box.classList.contains('vhs-dolj')) P.vantaT = setTimeout(dolj, 400);
       else if (st === 1 && box.classList.contains('vhs-dolj')) doljKlar();
       if (st === 0 && (V.lage === 'spelar' || V.lage === 'laddar')) bandSlut();
+      // Hörnet skulle tillbaka till den vanliga storleken medan klippet syntes
+      // (man gick därifrån och videon pausade strax efter): nu. Förut stod det
+      // kvar i dubbla storleken hemma, och tog grafikminne från rummet.
+      if (st !== 1 && V.skarp === false && inn.classList.contains('skarp')) skarp(false);
       tick();
     }
 
@@ -1638,8 +1679,10 @@ window.RumVideo = (() => {
     // övergångarna, så det byts med övergångarna avstängda, när inget rör sig,
     // och etiketterna mäts om.
     function skarp(on) {
+      V.skarp = on;
       if (inn.classList.contains('skarp') === on) return;
-      // (byter den storlek medan klippet syns kommer YouTubes rubrik och logga fram)
+      // (byter den storlek medan klippet syns kommer YouTubes rubrik och logga
+      // fram: då byts den när klippet står, i state)
       if (!on && P.frame && P.st === 1 && !P.dold) return;
       inn.classList.add('byt');
       inn.classList.toggle('skarp', on);
@@ -1652,12 +1695,10 @@ window.RumVideo = (() => {
     // Kameran runt tv:n (SVANG s, null på håll), samtidigt som rummet vrids,
     // och ögat dit kameran går.
     function sving(s) {
-      const oga = (s && s.oga) || VP;
       // (samtidigt som kameran och rummet, när det nya har ritats: sedan i rum.js)
       (o.sedan || ((k, f) => f()))('hornet', () => {
-        for (const e of [kam, inn]) e.classList.toggle('glid', !o.calm());
-        kam.style.transform = `translate3d(0px, ${px(s && s.lyft ? -s.lyft : 0)}, 0px) rotateY(${s ? s.horn : 0}deg)`;
-        inn.style.perspectiveOrigin = `${px(oga[0])} ${px(oga[1])}`;
+        kam.classList.toggle('glid', !o.calm());
+        kam.style.transform = kamT(s);
       }, !o.calm());
     }
 
@@ -1818,6 +1859,8 @@ window.RumVideo = (() => {
         passa();
       },
       skarp,
+      // tv:ns mitt i scenen (x), som rummet svängs kring (sving i rum.js)
+      mitt: HORN.mitt,
       spelare: () => Boolean(P.frame || P.ledig),
       // Nära: kassetterna och knapparna går att trycka på, och videon spelar
       // vidare om den gjorde det när man gick. Svarar med hörnet i scenen.
@@ -1861,9 +1904,22 @@ window.RumVideo = (() => {
         // (på höjden i telefonen skarpt när kameran har stannat vid lådan: hörnet
         // ritades annars om samtidigt som allt annat, och minnet tog slut)
         clearTimeout(V.skarpT);
-        if (on && smal()) V.skarpT = setTimeout(() => { if (V.near && smal()) skarp(true); }, 800);
+        V.smal = on && smal();
+        if (V.smal) V.skarpT = setTimeout(() => { if (V.near && smal()) skarp(true); }, 800);
         else if (on) passa();
         return nara();
+      },
+      // Fönstret har ändrats medan man står nära (telefonen vreds): dit kameran
+      // ska nu. Förut stod den kvar där den gick fram i det gamla fönstret – på
+      // höjden vid lådan, och vriden på bredden såg man bara lådan.
+      fonster() {
+        if (!V.near) return null;
+        if (!V.tat && smal() !== V.smal) {
+          V.smal = smal();
+          clearTimeout(V.skarpT);
+          skarp(V.smal);
+        }
+        return V.tat ? TAT : nara();
       },
       // När man är framme: ←/→ (och ett svep i telefonen) som ◀◀ och ▶▶ – utan
       // kassett byter de sida i listan – mellanslaget pausar när den spelar

@@ -7443,8 +7443,7 @@ håll, 46 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i rum-video.js). De tol
 extra ställer etiketterna mer framifrån, så att de går att läsa; mer än så går inte rummet
 att vrida utan att gänget och radion kommer in i bild. Lådans bortre ände kommer då mot en,
 så hörnet flyttas också lite uppåt (`lyft`), annars skulle lådan hänga utanför disken. När bilden fyller fönstret ritas hörnet 112 grader runt (`VRID`), så att rutan
-står parallellt med bilden, och ögat (perspektivets mitt i hörnet, `perspective-origin` på
-`.vhs-in`) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
+står parallellt med bilden, och ögat (perspektivets mitt i hörnet) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
 så vänd mot det vanliga ögat blev rutan sned som i kanten av ett vidvinkelfoto, och därifrån
 skymde lådan rutans vänstra kant. Planen vrids som de är, och väggen, skårtavlan, korktavlan och
 disken följer med; tv:n och lådan ses från det nya hållet. Hörnets eget plan vrids inte: det
@@ -7495,6 +7494,30 @@ rutan och förminskas, så att klippet är skarpt nära. Väggen, disken och pul
 höger om bilden (`vagg` och `pult` i rum-video.js, i samma plan och med samma toner som i
 rum.js), så att bilden inte tar slut när kameran går fram. `?rum-video` visar videon nära i
 en fast bild.
+
+**Flytet fram och tillbaka** (2026-11-15, "flyter bättre … även på sämre telefoner och datorer").
+Allt som rör sig när kameran går fram, in i rutan, tillbaka och hem glider på grafikkortet, så att
+en upptagen huvudtråd inte hindrar det:
+- Hörnets perspektiv, ögat, lyftet och vridningen är en enda transform på `.vhs-kam` (`kamT`:
+  `perspective()` kring ögat och `rotateY` kring tv:ns mitt). Förut låg perspektivet på `.vhs-in`
+  och ögat gled med `perspective-origin`, som bara går på huvudtråden: i en svag telefon kom det
+  efter kameran in i rutan och tillbaka. Bilden är densamma (jämfört bild för bild, också mitt i
+  svängen, i Chrome och WebKit), och Chrome ritar dessutom rutan skarpt vid första närbilden – förut
+  var listan i rutan gröt där tills man gick närmare – utan mer grafikminne.
+- Luckan för kassettfacket är en egen liten ritning ovanpå framsidan (`luckaRitning`): när den fälls
+  upp målades förut hela tv:ns framsida med kornet om i varje bildruta.
+- Kassetterna som sjunker ner i luckan (eller stiger när en kommer tillbaka) glider med `translate`
+  (`layout`); en övergång på `top` lade ut hela hörnet i varje bildruta medan kassetten lyftes.
+- Klassen `vid-nara` räknar om stilen för hela rummet. Den sätts sist i `zoomVideo`, efter `vrid` och
+  `svingForm` som läser av stilen: förut gjordes omräkningen inne i klicket och en gång till i nästa
+  bildruta, och kameran stod still en stund innan den gick.
+- Etiketterna mäts alla först och får sin storlek sedan (`passa`): förut lades hörnet ut en gång per
+  kassett, 26 gånger, när skärpan byttes.
+
+Två fel rättade samtidigt: har en kassett spelat stod hörnet kvar i dubbla storleken hemma om videon
+pausade först strax efter att man gick (det tog grafikminne från rummet) – nu byts storleken när
+klippet står (`state`); och vreds telefonen medan kameran stod nära stod den kvar där den gick fram
+i det gamla fönstret (på höjden vid lådan) – nu går den dit den ska i det nya (`fonster`).
 
 ### Hasse Backe
 
