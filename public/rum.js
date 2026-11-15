@@ -1267,6 +1267,18 @@ window.Rum = (() => {
     g.setTransform(c.width / bredd, 0, 0, c.height / hojd, -x0 * c.width / bredd, -y0 * c.height / hojd);
     rita(g);
   }
+  // Ljuset kommer någonstans ifrån: lysröret lyser på gängets bord och på pulten med kupongen
+  // ([cx, cy, rx, ry, styrka] i scenens mått), och runt dem sjunker rummet in i dunkel, mest ute i
+  // kanterna, så att blicken går dit ljuset är (förut var rummet lika upplyst överallt). Dunklet är
+  // en del av .rum-vign och värmen i käglorna av .rum-warm (ljusKlockan): inga nya lager, och inget
+  // ritas i bildrutorna.
+  const KAGLOR = [
+    [575, 470, 470, 300, 0.85],
+    [805, 870, 560, 230, 0.85],
+  ];
+  // dunklet i mitten, halvvägs ut och i kanterna (täckning)
+  const DUNKEL = [0.1, 0.2, 0.42];
+
   // Solens fläck på pulten, i en fjärdedels upplösning (kanterna är mjuka): y 650–1338 i scenens mått.
   function solBild(vpx, slut, guld) {
     const c = document.createElement('canvas');
@@ -1296,6 +1308,30 @@ window.Rum = (() => {
     for (const [x, r] of [[380, 70], [560, 76], [730, 72]]) form(x - r, x + r, 690, 860, 0.9);
     return c.toDataURL();
   }
+  // Pultens lack speglar det som lyser bakom den, mjukt och utdraget mot betraktaren: lysröret dag som
+  // kväll, neonen mer på kvällen och stadens ljus genom fönstret på natten. I samma mått och upplösning som
+  // solens fläck, och blandas in i pultens bild på samma sätt (.rum-sol): inget nytt lager. Tv:ns sken är inte
+  // med, eftersom det släcks med tv:n och spegelbilden ritas bara när ljuset ändras.
+  function spegelBild(kvall) {
+    const c = document.createElement('canvas');
+    c.width = 405;
+    c.height = 172;
+    const g = c.getContext('2d');
+    g.scale(0.25, 0.25);
+    g.translate(10, -650);
+    // (bara på pulten, som börjar vid bakkanten)
+    g.beginPath();
+    g.rect(-10, 652, 1620, 700);
+    g.clip();
+    rad(g, 628, 690, 340, 170, '255, 236, 200', r1(0.14 + 0.08 * kvall));
+    // neonen i strimmor, som i lackat trä
+    const n = 0.15 + 0.45 * kvall;
+    rad(g, 400, 670, 110, 200, '255, 60, 45', r1(n));
+    for (const x of [348, 380, 414, 448]) rad(g, x, 690, 13, 240, '255, 90, 70', r1(n));
+    if (kvall > 0.02) rad(g, 560, 664, 380, 50, '255, 190, 120', r1(0.2 * kvall));
+    return c.toDataURL();
+  }
+
   function ljusKlockan() {
     const v = R.vader;
     if (!v || !window.RumUte || !R.el || !R.ljusKlar) return;
@@ -1307,18 +1343,46 @@ window.Rum = (() => {
     const slut = Math.round((1338 - 686 * sm(18, 44, v.sol)) / 20) * 20;
     const kvall = Math.round((1 - sm(0.12, 0.45, L.dag)) * 20) / 20;
     const guld = Math.round(L.guld * 2) / 2;
-    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal].join('|');
+    // Lysrörets värme i käglorna (KAGLOR) lyser upp med blandningsläget (screen). Utan det, i telefonen och
+    // från steg 1 (.enkel), blev den en ljus hinna över gänget: där är käglorna bara hålen i dunklet.
+    const skarm = !LATT && !R.el.classList.contains('enkel');
+    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal, skarm].join('|');
     if (nyckel === R.ljusNyckel) return;
     R.ljusNyckel = nyckel;
     R.solNu = { s, vpx };
     dagDuk();
     // på pulten: i pultens egen bild, så att träet syns i ljuset och inget nytt lager behövs
     const url = s > 0.02 ? solBild(vpx, slut, guld) : '';
-    const bild = (blend, a) => `<image href="${url}" x="-10" y="650" width="1620" height="688" preserveAspectRatio="none" opacity="${a}" style="mix-blend-mode:${blend}"/>`;
-    for (const g of R.el.querySelectorAll('.rum-sol')) g.innerHTML = url ? bild('overlay', r1(s)) + bild('soft-light', r1(s)) : '';
+    const bild = (href, blend, a) => `<image href="${href}" x="-10" y="650" width="1620" height="688" preserveAspectRatio="none" opacity="${a}" style="mix-blend-mode:${blend}"/>`;
+    // (och det som lyser speglas i lacken, spegelBild)
+    const spegel = bild(spegelBild(kvall), 'screen', 1);
+    for (const g of R.el.querySelectorAll('.rum-sol')) g.innerHTML = (url ? bild(url, 'overlay', r1(s)) + bild(url, 'soft-light', r1(s)) : '') + spegel;
     const [y0v, hv] = R.smal ? [-300, 1800] : [0, H];
     // rummet lite mörkare runt solen, och på kvällen överallt: lamporna syns bättre då
     ljusPa(R.el.querySelector('.rum-vign'), y0v, hv, 0, W, (g) => {
+      // dunklet runt ljuskäglorna (KAGLOR), och på kvällen mörkret: det går runt käglorna och
+      // lamporna, neonen, tv:n och spotarna, som lyser igenom
+      const m = document.createElement('canvas');
+      m.width = 200;
+      m.height = 125;
+      const q = m.getContext('2d');
+      q.setTransform(200 / W, 0, 0, 125 / hv, 0, -y0v * 125 / hv);
+      const kant = q.createRadialGradient(800, 560, 0, 800, 560, 1000);
+      for (const [i, a] of DUNKEL.entries()) kant.addColorStop(i / (DUNKEL.length - 1), `rgba(20, 11, 5, ${a})`);
+      q.fillStyle = kant;
+      q.fillRect(-100, y0v - 100, W + 200, hv + 200);
+      if (kvall > 0.02) {
+        // (natten på riktigt: rummet lever av sina lampor, och kupongen i käglan är det ljusaste)
+        q.fillStyle = `rgba(14, 8, 10, ${r1(0.5 * kvall)})`;
+        q.fillRect(-100, y0v - 100, W + 200, hv + 200);
+      }
+      q.globalCompositeOperation = 'destination-out';
+      for (const [x, y, rx, ry, a] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a);
+      rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
+      // (och runt neonens spegelbild i pulten, spegelBild)
+      rad(q, 400, 690, 140, 110, '0, 0, 0', 0.7);
+      rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
+      for (const [x, y, rx, ry] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.7);
       if (s > 0.02) {
         const gr = g.createLinearGradient(0, 0, 0, H);
         const a = (x) => `rgba(25, 12, 4, ${r1(x * s)})`;
@@ -1329,25 +1393,13 @@ window.Rum = (() => {
         g.fillStyle = gr;
         g.fillRect(0, y0v, W, hv);
       }
-      if (kvall > 0.02) {
-        // (mörkret går runt lamporna: neonen, tv:n och spotarna ska lysa)
-        const m = document.createElement('canvas');
-        m.width = 200;
-        m.height = 125;
-        const q = m.getContext('2d');
-        q.fillStyle = `rgba(14, 8, 10, ${r1(0.34 * kvall)})`;
-        q.fillRect(0, 0, 200, 125);
-        q.globalCompositeOperation = 'destination-out';
-        q.setTransform(200 / W, 0, 0, 125 / hv, 0, -y0v * 125 / hv);
-        rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
-        rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
-        for (const [x, y, rx, ry] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.7);
-        g.drawImage(m, 0, y0v, W, hv);
-      }
+      g.drawImage(m, 0, y0v, W, hv);
     });
     // lampornas färger (i telefonen läggs ljuset ovanpå utan blandningsläge: svagare)
     const f = kvall * (LATT ? 0.55 : 1);
     ljusPa(R.el.querySelector('.rum-warm'), R.smal ? -300 : 0, R.smal ? 1800 : H, 0, W, (g) => {
+      // lysrörets varma ljus i käglorna, dag som kväll (skarm ovan)
+      if (skarm) for (const [x, y, rx, ry, a] of KAGLOR) rad(g, x, y, rx, ry, '255, 218, 165', r1(0.15 * a));
       rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
       rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
       rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));
@@ -1355,7 +1407,7 @@ window.Rum = (() => {
     });
     // tv:ns sken är ett eget lager som släcks med tv:n: starkare på kvällen
     ljusPa(R.el.querySelector('#rum-tvsken'), -60, 480, 1000, 620, (g) => {
-      rad(g, 1310, 180, 310, 240, '70, 120, 255', r1(0.42 * f));
+      rad(g, 1310, 180, 310, 240, '70, 120, 255', r1(0.55 * f));
     });
     for (const [sel, dag, kv] of [['canvas.rum-neonglow', 0.08, 0.24], ['canvas.rum-neonhalo', 0.28, 0.34]]) {
       const n = R.el.querySelector(sel);
@@ -1476,6 +1528,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // gatan syns genom fönstret och dörren, och gänget och röken står i
     // dukens vänstra del (utsikten och duken är större än det de visar)
     const ute = syn(el.querySelector('#rum-ute'), DORR.x, WIN.y, WIN.x + WIN.w - DORR.x, DORR.y + DORR.h - WIN.y);
+    R.uteSyn = ute;
     R.gang = syn(el.querySelector('#rum-3d').parentElement, 160, 120, 860, 560);
     syn(el.querySelector('#rum-3d').parentElement, 0, 0, 1, 1).id = 'rum-radio';
     R.cTop = parseFloat(getComputedStyle(el.querySelector('#rum-3d')).top) || 120;
@@ -2719,8 +2772,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function frame(dt = 1000 / 30) {
     const t = now();
     kamera(dt);
-    // (nära videon i telefonen syns inget av det här, lattVideo)
-    if (R.vlatt) return;
+    // (nära videon i telefonen syns inget av det här, lattVideo; och rummet ur skärpan står still, urFokus)
+    if (R.vlatt || R.stilla) return;
     const on = neonOn(t);
     if (on !== R.neon) {
       R.neon = on;
@@ -2962,6 +3015,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (som i telefonen: ljuset utan blandningslägen och i ett lager, inget korn, rum.css)
     if (R.el && k >= 1 && !R.el.classList.contains('enkel')) {
       R.el.classList.add('enkel');
+      // (lysrörets värme i käglorna försvinner utan blandningsläget, ljusKlockan, som lägger ihop ljuset)
+      ljusKlockan();
       ljusIhop();
     }
     // (och gatan i en enda duk, rum-ute.js)
@@ -3476,6 +3531,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // Hasse tystnar och matchbladet går: bladet står där det står utan dem innan det läggs tillbaka
       if (p.hk) protHasse(false, true);
       p.ut = true;
+      urFokus(false, nu);
       if (p.blad) p.blad.ut(true);
       lagerUt('protokollet');
       if (p.vand) p.vand.cancel();
@@ -3573,6 +3629,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     passaProtokoll();
     R.vilar = true;
+    urFokus(true);
     lager('protokollet', (ut) => protokollet(false, ut));
     const bilder = !calm() && lyftBilder(q);
     // det som tas fram är borta där det låg: bladet på pulten, eller kupongen på nålen
@@ -4345,6 +4402,58 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const anims = [...delar].map((d) => d.animate(bort ? [{ opacity: 0 }] : [{ opacity: 0, offset: 0 }], { duration: ms, fill: bort ? 'forwards' : 'none' }));
     if (bort) R.tvBort = anims;
   }
+
+  // ---------- skärpedjupet ----------
+  //
+  // Det man håller i (kupongen i handen, protokollet) ligger nära, och rummet bakom glider ur skärpan, mer ju
+  // längre bort det är: [plan i .rum-world, oskärpan i scenens px]. Ett filter på ett plan plattar till det
+  // som står i 3D i det, så tv:n får oskärpan del för del (som i tvBort) och videohörnet på sin ritning, som har
+  // ett eget perspektiv (.vhs-in). När rummet bakom har glidit ur skärpan står det still (R.stilla: gänget,
+  // sakerna, dammet och gatan), så att oskärpan inte räknas om i varje bildruta. Inte på steg 2 och 3 (KVAL):
+  // där är varje pass på grafikkortet för mycket.
+  const FOKUS = { plan: [[0, 6], [3, 4], [4, 2]], tv: 5, vhs: 6, in: 800, ut: 500 };
+  function urFokus(ur, nu = false) {
+    if (Boolean(ur) === Boolean(R.urFokus) || !R.el) return;
+    clearTimeout(R.stillaT);
+    const ms = nu || calm() ? 0 : ur ? FOKUS.in : FOKUS.ut;
+    if (!ur) {
+      stillaBakom(false);
+      for (const a of R.urFokus) {
+        if (!ms) a.cancel();
+        else {
+          // tillbaka därifrån den är, fortare (filtret tas sedan bort helt: också utan oskärpa
+          // plattar det till och är ett eget pass på grafikkortet)
+          a.playbackRate = -FOKUS.in / FOKUS.ut;
+          a.play();
+          a.finished.then(() => a.cancel(), () => {});
+        }
+      }
+      R.urFokus = null;
+      return;
+    }
+    if (R.kval >= 2) return;
+    // oskärpan i det lokala måttet: tv:n och videohörnet ritas större och förminskas
+    const S = R.el.querySelector('#rum-stage').getBoundingClientRect().width / W || 1;
+    const lokal = (e, r) => {
+      const k = e.offsetWidth ? e.getBoundingClientRect().width / e.offsetWidth / S : 1;
+      return r / (k > 0.01 ? k : 1);
+    };
+    const plan = R.el.querySelectorAll('.rum-world > .rum-pl');
+    const mal = [
+      ...FOKUS.plan.filter(([i]) => plan[i]).map(([i, r]) => [plan[i], r]),
+      ...[...R.el.querySelectorAll('.tv-fot > *, .rum-tv3 > *')].filter((e) => e.offsetWidth).map((e) => [e, lokal(e, FOKUS.tv)]),
+      ...[...R.el.querySelectorAll('.rum-pl-vhs .vhs-in')].map((e) => [e, lokal(e, FOKUS.vhs)]),
+    ];
+    R.urFokus = mal.map(([e, r]) => e.animate([{ filter: 'blur(0px)' }, { filter: `blur(${r1(r)}px)` }], { duration: ms, easing: 'ease', fill: 'forwards' }));
+    R.stillaT = setTimeout(() => stillaBakom(true), ms + 100);
+  }
+  // Rummet bakom står still (frame ritar inte gänget och sakerna, och gatan vilar som när den inte syns, sikt).
+  function stillaBakom(pa) {
+    if (Boolean(pa) === Boolean(R.stilla)) return;
+    R.stilla = pa;
+    const ute = document.getElementById('rum-ute');
+    if (ute) ute.classList.toggle('vila', pa || (R.dold.has(R.uteSyn) && !still()));
+  }
   function sakFot() {
     let f = document.getElementById('rum-sakfot');
     if (!f) {
@@ -4769,6 +4878,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       el.style.transform = restAt(k.slot);
     } else desk.style.visibility = 'hidden';
     R.el.classList.add('i-handen');
+    urFokus(true);
     // kameran ställer sig rakt framför, så att kupongen står rakt i handen
     R.tx = 0;
     R.ty = 0;
@@ -4949,6 +5059,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     k.closing = true;
     clearTimeout(k.idle);
     R.el.classList.remove('i-handen');
+    urFokus(false, now);
     const done = () => {
       if (R.kup !== k) return;
       R.kup = null;
@@ -5592,6 +5703,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       k.busy = true;
       R.el.classList.remove('i-handen');
+      urFokus(false);
       k.fade.reverse();
       k.show.reverse();
       if (k.pen) k.pen.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' });
