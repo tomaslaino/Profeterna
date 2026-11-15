@@ -5415,8 +5415,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   //
   // När rummet öppnas är ingen i gänget vald (Samtal.pult.du() i samtal.js): du kan gå omkring och titta, men inte
   // fylla i kupongen, och Hasse vet inte vem du är. Klickar du på någon vid bordet (rum-folk.js), väljer namnet
-  // på kupongen eller säger det till Hasse är du hen, tills sidan laddas om.
+  // på kupongen eller säger det till Hasse är du hen, tills du klickar där inget går att klicka (glomDu) eller
+  // sidan laddas om.
   const duNu = () => (window.Samtal && Samtal.pult && Samtal.pult.du ? Samtal.pult.du() : null);
+  // Gick det att klicka där klicket hamnade? Det som går att klicka visar en hand (cursor: pointer) eller är en
+  // knapp, en länk eller ett fält, och namnet, foten och Hasse Backe sköter sina klick själva. (Bara när inget
+  // annat är framme: då har klicket redan lagt tillbaka eller gått från det.)
+  function tomt(e) {
+    const t = e.target;
+    if (e.defaultPrevented || nara() || R.vilar || R.protokoll || !(t instanceof Element)) return false;
+    if (t.closest('a, button, input, select, textarea, label, summary, [role="button"], [data-vem], .rum-hdr, .rum-ft, .rum-blad, .rum-hasse-vy, .rum-hasse-knapp')) return false;
+    return getComputedStyle(t).cursor !== 'pointer';
+  }
+  // Ett klick där inget går att klicka (wire): du är ingen igen, som när rummet öppnades. Namnet suddas ut från
+  // kupongen på pulten, och din figur slutar följa markören (RumFolk.ingen). Enheten minns ändå vem du var, så ett
+  // klick på dig själv vid bordet gör dig till hen igen.
+  function glomDu() {
+    if (!duNu() || !window.RumFolk || !RumFolk.ingen) return;
+    const desk = document.getElementById('rum-kupong');
+    const namn = desk && desk.querySelector('.sm-namn.du');
+    if (!RumFolk.ingen()) return;
+    const rita = () => { if (R.on && !duNu()) fill(); };
+    if (!namn || calm()) rita();
+    else namn.animate([{ opacity: 1 }, { opacity: 0, filter: 'blur(1.5px)' }], { duration: 240, easing: 'ease-out', fill: 'forwards' }).finished.then(rita, () => {});
+  }
   // Ett kryss, en motivering eller gängets tecken innan du har sagt vem du är: namnen på kupongen lyser (Vem är
   // du?), eller – där de inte går att välja – raden säger var du väljer dig.
   function vemForst(k) {
@@ -6417,6 +6439,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const a = e.target.closest('.rum-sak');
       if (a && el.contains(a)) go(a, e);
       else if (R.zoom && !e.target.closest('.rum-hdr, .rum-ft')) zoomTv(false);
+      // där inget går att klicka: du är ingen igen
+      else if (tomt(e)) glomDu();
     });
     document.addEventListener('keydown', (e) => {
       if (!R.on || e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName) || document.querySelector('dialog[open]')) return;

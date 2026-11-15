@@ -1215,7 +1215,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   på den är den markerad och då kan Hasse kommentera en eller man kan fylla i en kupong etc.
   Annars kan man bara gå in och titta." Enheten minns fortfarande vem man var, men i rummet är
   man ingen förrän man har klickat på sig själv, valt namnet på kupongen eller sagt det till
-  Hasse – och det gäller tills sidan laddas om. Tills dess går kupongen bara att titta på, de
+  Hasse – och det gäller tills man klickar där inget går att klicka (2026-11-15: "ett klick på
+  något ställe på bilden där det inte finns något att klicka på gör så att man blir avmarkerad")
+  eller sidan laddas om. Tills dess går kupongen bara att titta på, de
   dolda tipsen syns inte och Hasse vet inte vem man är. Den valda figuren har en lapp med
   namnet ovanför huvudet. Under Kupong är det som förut. Se [Tobaksaffären](#tobaksaffären),
   *Gänget är ni*.
@@ -4812,6 +4814,14 @@ kryssa (`vemForst` i rum.js), tips som inte visas för alla syns inte (`dolt`), 
 vem du kan bli (`kanByta`, `bytTill`): den enheten minns kan alltid väljas igen, också när
 hen har lämnat in – då hämtas de andras tips (`Samtal.pult.vem`) –, men har du lämnat in
 här blir du ingen annan. Under Kupong är du den enheten minns, som förut.
+
+Ett klick där inget går att klicka gör dig till ingen igen (2026-11-15; `tomt` och `glomDu` i
+rum.js, `RumFolk.ingen`, `Samtal.pult.ingen`): inte på en knapp, en länk, ett fält eller något
+som visar en hand, och bara när inget är framme – med kupongen i handen eller nära en sak lägger
+klicket tillbaka eller går från det, som förut, och det som följer på ett drag gör ingenting.
+Namnet suddas ut från kupongen på pulten, din figur slutar följa markören och sidan kopplar upp
+sig utan namn (`vemKoll`). Enheten minns hen ändå, så ett klick på dig själv vid bordet gör dig
+till hen igen.
 
 Går kupongen att fylla i och figuren inte har lämnat in blir du också hen – samma val som
 namnen på kupongen (`Samtal.pult.vem`), och utkastet följer med. Figuren får en lapp ovanför

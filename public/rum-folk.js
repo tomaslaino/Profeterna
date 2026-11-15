@@ -34,7 +34,8 @@
 // kupongen och Hasse vet vem du är. Det går också med den enheten minns, som
 // kanske redan har lämnat in, och med vem som helst när allas tips visas
 // (Samtal.pult.state().byt). Ett klick på dig själv när du redan är vald tar
-// kupongen i handen att fylla i eller ändra (ta i rum.js), när tecknet syns.
+// kupongen i handen att fylla i eller ändra (ta i rum.js), när tecknet syns. Ett
+// klick där inget går att klicka gör dig till ingen igen (ingen, glomDu i rum.js).
 //
 // Natten: lysröret dämpas långsamt från elva på kvällen och är släckt från
 // midnatt (Stockholms tid, Vader.nu()) – rummet mörkt utom gatan, neonen och tv:n
@@ -282,6 +283,19 @@ window.RumFolk = (() => {
     vemKoll();
     egen();
     return ms || 0;
+  }
+  // Ett klick där inget går att klicka (glomDu i rum.js): du är ingen igen, som när
+  // rummet öppnades (Samtal.pult.ingen). Din figur slutar följa markören och de
+  // andra ser inte längre vad du pekar på (vemKoll). → om du var någon.
+  function ingen() {
+    if (!window.Samtal || !Samtal.pult || !Samtal.pult.ingen || !Samtal.pult.ingen()) return false;
+    clearTimeout(F.taT);
+    const f = fig();
+    if (f && f.spegel && F.o) f.spegel(null, 0, 0, F.o.now());
+    vemKoll();
+    egen();
+    andra();
+    return true;
   }
   // Du klickade på dig själv: kupongen i handen om en stund (ms).
   function taSen(ms) {
@@ -583,5 +597,5 @@ window.RumFolk = (() => {
     }, 250);
   }
 
-  return { mount, on, ute, fyll, natt: () => Boolean(F.natt), nattGrad: () => F.grad || 0, somn: () => Boolean(F.somn), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
+  return { mount, on, ute, fyll, ingen, natt: () => Boolean(F.natt), nattGrad: () => F.grad || 0, somn: () => Boolean(F.somn), senast: () => (F.senast !== undefined ? F.senast : senastAv(null)), ansikte: ansikteAv };
 })();

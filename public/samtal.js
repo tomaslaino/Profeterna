@@ -2323,6 +2323,14 @@
     },
     // Vem du är här (me), också utan omgång: null tills du har valt dig.
     du: () => me(),
+    // Du är ingen igen, som när tobaksaffären öppnades (ett klick där inget går att
+    // klicka, rum.js). Enheten minns ändå hen, så att du kan välja dig igen.
+    // → om du var någon.
+    ingen() {
+      if (!SM.rumVald) return false;
+      SM.rumVald = false;
+      return true;
+    },
     // Det som står överst på papperet, till kupongen på pulten: stämpeln
     // (vem omgången väntar på) och namnen, skrivna för hand. Bara det egna
     // syns (du); vem: namnen för dem du kan vara är knappar (data-vem), som
