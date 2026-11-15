@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T13:51:40.428Z",
+ "uppdaterad": "2026-11-15T13:55:21.446Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2310,6 +2310,97 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-13T18:05:00.000Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861177",
+   "match": "Frankrike – Turkiet",
+   "avspark": "2026-11-15T19:45Z",
+   "writtenAt": "2026-11-15T13:54:51.850Z",
+   "text": "Zidane kommer hem till Bordeaux, Turkiet utan poäng\n\nZinédine Zidane spelade fyra säsonger i Bordeaux innan han gick till Juventus. Nu tar han med sig landslaget till en slutsåld Stade Atlantique, och det gäller en plats i kvartsfinalen. Turkiet kommer dit med noll poäng och ingenting kvar att förlora.\n\nEnligt France 3 [1] blir det Zidanes första officiella match i Bordeaux på över 30 år, och 42 000 åskådare väntas på läktarna. Han låter som en man som har kommit hem. \"C'est plutôt sympa de revenir à Bordeaux\", sa han, och han passade på att önska att Girondins ska tillbaka \"tout en haut\". Torsdagens förlust i Milano var hans första sedan han tog över efter Didier Deschamps. Han säger ändå att laget har kommit för att vinna, trots att France 3 skriver att det räcker med oavgjort för att gå vidare [1]. En tränare som vill vinna fast det räcker med en poäng ser man redan på uppvärmningen.\n\nTruppen har stora hål. Enligt Univers du Sport [2] saknas Ousmane Dembélé, William Saliba, Jules Koundé, Manu Koné och tre spelare till på grund av skador. Kylian Mbappé är tillbaka och ska spela längst fram, \"en pointe\", som Zidane sa. Pablo Pagis från Paris FC kallades in för första gången när Maghnes Akliouche fick ont i vaden. Robin Risser står i mål, för \"j'avais envie de voir Robin\".\n\nTurkiet förlorade det första mötet i Kocaeli med 1–0, och där fick målvakten Uğurcan Çakır rött kort i den 87:e minuten, enligt Fanatik [3]. Inför den matchen sa Vincenzo Montella själv att han \"kunde ha blivit avskedad\" [3]. Zidane säger att Turkiet är ett lag som \"sait poser des difficultés\" [1]. Det får man ta som artighet mot ett lag som har förlorat alla fem matcherna i gruppen.\n\nTipset: 1 (Hemmaplan räcker gott)\n\nSpelbolagen sätter oddset 1,22 på Frankrike, och då är resten av kupongen mest pynt. Det jag har läst pekar åt samma håll. Mbappé är tillbaka på sin bästa plats [1], och Zidane vill vinna inför 42 000 i sin gamla stad trots att det räcker med oavgjort [2]. Skadelistan är lång med Saliba, Koundé och Dembélé borta [1], men Turkiet har förlorat varenda match i gruppen. Det enda som talar för kryss är att Frankrike bara behöver en poäng. Det där löser man med en hink bollar, så jag ringar in en etta.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Zidane kommer hem till Bordeaux, Turkiet utan poäng",
+   "lead": "Zinédine Zidane spelade fyra säsonger i Bordeaux innan han gick till Juventus. Nu tar han med sig landslaget till en slutsåld Stade Atlantique, och det gäller en plats i kvartsfinalen. Turkiet kommer dit med noll poäng och ingenting kvar att förlora.",
+   "paragraphs": [
+    "Enligt France 3 [1] blir det Zidanes första officiella match i Bordeaux på över 30 år, och 42 000 åskådare väntas på läktarna. Han låter som en man som har kommit hem. \"C'est plutôt sympa de revenir à Bordeaux\", sa han, och han passade på att önska att Girondins ska tillbaka \"tout en haut\". Torsdagens förlust i Milano var hans första sedan han tog över efter Didier Deschamps. Han säger ändå att laget har kommit för att vinna, trots att France 3 skriver att det räcker med oavgjort för att gå vidare [1]. En tränare som vill vinna fast det räcker med en poäng ser man redan på uppvärmningen.",
+    "Truppen har stora hål. Enligt Univers du Sport [2] saknas Ousmane Dembélé, William Saliba, Jules Koundé, Manu Koné och tre spelare till på grund av skador. Kylian Mbappé är tillbaka och ska spela längst fram, \"en pointe\", som Zidane sa. Pablo Pagis från Paris FC kallades in för första gången när Maghnes Akliouche fick ont i vaden. Robin Risser står i mål, för \"j'avais envie de voir Robin\".",
+    "Turkiet förlorade det första mötet i Kocaeli med 1–0, och där fick målvakten Uğurcan Çakır rött kort i den 87:e minuten, enligt Fanatik [3]. Inför den matchen sa Vincenzo Montella själv att han \"kunde ha blivit avskedad\" [3]. Zidane säger att Turkiet är ett lag som \"sait poser des difficultés\" [1]. Det får man ta som artighet mot ett lag som har förlorat alla fem matcherna i gruppen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "France 3 Nouvelle-Aquitaine",
+     "title": "France - Turquie : 30 ans après, le retour de Zinedine Zidane devant 42 000 personnes à Bordeaux",
+     "url": "https://france3-regions.franceinfo.fr/nouvelle-aquitaine/gironde/bordeaux/france-turquie-30-ans-apres-le-retour-de-zinedine-zidane-devant-42-000-personnes-a-bordeaux-3449967.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Univers du Sport",
+     "title": "Liste de Zidane : Pagis, Mbappé en pointe, ses réponses",
+     "url": "https://www.universdusport.fr/liste-zidane-equipe-de-france-novembre-2026-conference-presse/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Fanatik",
+     "title": "🚨ÖZET",
+     "url": "https://www.fanatik.com.tr/turkiye/live-turkiye-fransa-maci-ne-zaman-saat-kacta-hangi-kanalda-muhtemel-11ler-2638878",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen sätter oddset 1,22 på Frankrike, och då är resten av kupongen mest pynt. Det jag har läst pekar åt samma håll. Mbappé är tillbaka på sin bästa plats [1], och Zidane vill vinna inför 42 000 i sin gamla stad trots att det räcker med oavgjort [2]. Skadelistan är lång med Saliba, Koundé och Dembélé borta [1], men Turkiet har förlorat varenda match i gruppen. Det enda som talar för kryss är att Frankrike bara behöver en poäng. Det där löser man med en hink bollar, så jag ringar in en etta.",
+    "signs": [
+     0
+    ],
+    "note": "Hemmaplan räcker gott",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Univers du Sport",
+      "title": "Liste de Zidane : Pagis, Mbappé en pointe, ses réponses",
+      "url": "https://www.universdusport.fr/liste-zidane-equipe-de-france-novembre-2026-conference-presse/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "France 3 Nouvelle-Aquitaine",
+      "title": "France - Turquie : 30 ans après, le retour de Zinedine Zidane devant 42 000 personnes à Bordeaux",
+      "url": "https://france3-regions.franceinfo.fr/nouvelle-aquitaine/gironde/bordeaux/france-turquie-30-ans-apres-le-retour-de-zinedine-zidane-devant-42-000-personnes-a-bordeaux-3449967.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T13:54:51.850Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Frankrike behöver bara en poäng för att gå vidare till kvartsfinalen, men förbundskaptenen säger att de har kommit för att vinna. Det er helt i orden, som danskarna säger. Mbappé är tillbaka och spelar längst fram, och Turkiet har förlorat alla fem matcherna i gruppen.",
+     "Det som skaver är att Saliba och Koundé saknas i backlinjen. Därför tror jag att Turkiet får in ett mål när matchen är avgjord och de inte har något kvar att förlora. Det ändrar ingenting i stort. Ett lag som har noll poäng åker inte till en slutsåld arena och vänder på det där. Orsak och verkan. Jag ringar in en etta och inget annat."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-15T13:54:51.850Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Orsak och verkan"
+     ],
+     "krydda": "Det er helt i orden, som danskarna säger.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T13:55:01.578Z",
     "attempts": 1
    },
    "model": "claude-opus-5-5",
