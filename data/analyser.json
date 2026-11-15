@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T13:57:27.866Z",
+ "uppdaterad": "2026-11-15T14:06:29.920Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2311,6 +2311,84 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-13T18:05:00.000Z",
     "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861172",
+   "match": "Cypern – Montenegro",
+   "avspark": "2026-11-15T14:00Z",
+   "writtenAt": "2026-11-15T14:05:36.271Z",
+   "text": "Montenegro har redan vunnit, Cypern spelar ändå\n\nGruppen är avgjord innan bollen ens rullar i Kolossi. Montenegro har 13 poäng och kan inte nås. Cypern har 8 och siktar mot kvalspelet. Kvar finns en avslutning där Mirko Vucinic och Akis Mantzios får visa vad de har byggt under hösten.\n\nRäknar man ser man att Montenegro inte kan bli upphunnet. Laget har 13 poäng på fem matcher och Cypern har 8, så den sista omgången avgör ingenting i toppen. Det här är laget som åkte ur League B förra gången, enligt Sports Mole [1]. Under Vucinic har det sedan gått obesegrat genom hösten med fyra segrar och en oavgjord. Enligt samma förhandsartikel bär 36-årige Stevan Jovetic fortfarande anfallet, med 37 mål på 91 landskamper [1]. En spelare i den åldern värmer upp längre än de andra, och det ser du redan på uppvärmningen.\n\nCypern har en annan historia att berätta. Inför höstens första match tog Mantzios ut Burnleys Marcus Edwards, som får spela för landet genom sin mamma, och han var en av tre nya namn i truppen [1]. Samtidigt lämnades Iasonas Pikis utanför trots fyra mål och tre målgivande passningar på sju matcher för Pyunik [1]. Hemma i Nations League har Cypern vunnit båda sina matcher. Enligt förbundet går en andraplats vidare till kvalspel mot en trea från League B [2], och det är just den platsen laget slåss om.\n\nLagen har mötts fem gånger enligt Sports Mole, och Montenegro vann 2–0 i Nicosia och 4–0 hemma 2020 [1]. I september vann Montenegro med 2–1. Cypern har med andra ord något att bevisa mot just det här laget, även om tabellen inte bryr sig. Bollen har aldrig läst en tabell.\n\nTipset: X2 (Knapp, men ändå)\n\nSpelbolagen tror lite mer på Montenegro, men inte mycket. Ett lag som redan har vunnit gruppen kan tänkas ta det lugnt, och Cypern har vunnit båda sina hemmamatcher i turneringen. Å andra sidan har Montenegro inte förlorat i höst, och Sports Mole räknar upp ett anfall med Jovetic, Osmajic och Krstovic [1]. Det oavgjorda resultatet ligger nära till hands när det ena laget har något att spela för och det andra inte har det. Jag ringar in X och 2 och lämnar Cypern utanför, men med viss tvekan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Montenegro har redan vunnit, Cypern spelar ändå",
+   "lead": "Gruppen är avgjord innan bollen ens rullar i Kolossi. Montenegro har 13 poäng och kan inte nås. Cypern har 8 och siktar mot kvalspelet. Kvar finns en avslutning där Mirko Vucinic och Akis Mantzios får visa vad de har byggt under hösten.",
+   "paragraphs": [
+    "Räknar man ser man att Montenegro inte kan bli upphunnet. Laget har 13 poäng på fem matcher och Cypern har 8, så den sista omgången avgör ingenting i toppen. Det här är laget som åkte ur League B förra gången, enligt Sports Mole [1]. Under Vucinic har det sedan gått obesegrat genom hösten med fyra segrar och en oavgjord. Enligt samma förhandsartikel bär 36-årige Stevan Jovetic fortfarande anfallet, med 37 mål på 91 landskamper [1]. En spelare i den åldern värmer upp längre än de andra, och det ser du redan på uppvärmningen.",
+    "Cypern har en annan historia att berätta. Inför höstens första match tog Mantzios ut Burnleys Marcus Edwards, som får spela för landet genom sin mamma, och han var en av tre nya namn i truppen [1]. Samtidigt lämnades Iasonas Pikis utanför trots fyra mål och tre målgivande passningar på sju matcher för Pyunik [1]. Hemma i Nations League har Cypern vunnit båda sina matcher. Enligt förbundet går en andraplats vidare till kvalspel mot en trea från League B [2], och det är just den platsen laget slåss om.",
+    "Lagen har mötts fem gånger enligt Sports Mole, och Montenegro vann 2–0 i Nicosia och 4–0 hemma 2020 [1]. I september vann Montenegro med 2–1. Cypern har med andra ord något att bevisa mot just det här laget, även om tabellen inte bryr sig. Bollen har aldrig läst en tabell."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sports Mole",
+     "title": "Preview: Montenegro vs. Cyprus",
+     "url": "https://www.sportsmole.co.uk/football/cyprus/uefa-nations-league/preview/montenegro-vs-cyprus-prediction-team-news-lineups_605653.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Cyprus Football Association",
+     "title": "Nations League 2026/2027: The opponents of Cyprus",
+     "url": "https://cfa.com.cy/En/news/52715",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen tror lite mer på Montenegro, men inte mycket. Ett lag som redan har vunnit gruppen kan tänkas ta det lugnt, och Cypern har vunnit båda sina hemmamatcher i turneringen. Å andra sidan har Montenegro inte förlorat i höst, och Sports Mole räknar upp ett anfall med Jovetic, Osmajic och Krstovic [1]. Det oavgjorda resultatet ligger nära till hands när det ena laget har något att spela för och det andra inte har det. Jag ringar in X och 2 och lämnar Cypern utanför, men med viss tvekan.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Knapp, men ändå",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Mole",
+      "title": "Preview: Montenegro vs. Cyprus",
+      "url": "https://www.sportsmole.co.uk/football/cyprus/uefa-nations-league/preview/montenegro-vs-cyprus-prediction-team-news-lineups_605653.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T14:05:36.271Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Montenegro har redan vunnit gruppen med 13 poäng och kan inte nås. Förbundskaptenen Vucinic har inte förlorat en match med laget i höst, och Jovetic gör fortfarande mål som 36-åring. Det är fint, men ett lag som redan är klart åker inte till Cypern för att slita ihjäl sig.",
+     "Cypern har 8 poäng och slåss om andraplatsen, som ger kvalspel. Mantzios lag har vunnit båda sina hemmamatcher i Nations League, och de har dessutom förlusten med 2–1 i september att ta igen. Ett lag som har något att spela för och dessutom spelar hemma ska vinna det här. Äsch, jag ringar in en etta och står för den."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-15T14:05:36.271Z",
+    "uppdrag": {
+     "fraser": [
+      "Äsch",
+      "Det är lugnt"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T14:06:29.280Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
