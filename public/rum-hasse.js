@@ -3078,11 +3078,16 @@ window.RumHasse = (() => {
   // visar han inte. Om sig själv säger han inget här. Raderna väljs efter omgången och personen, så att domen
   // är densamma varje gång och på alla enheter.
   const summan = () => (window.Rum && Rum.summa && window.RumBlock && RumBlock.gang && REP().domar ? Rum.summa() : null);
-  // Samma rad för samma nyckel: ett tal ur nyckeln, inte slumpen.
+  // Samma rad för samma nyckel: ett tal ur nyckeln, inte slumpen. Talet blandas om ordentligt (FNV-1a och
+  // murmurs slutblandning): förut var det h·31 + tecknet, och eftersom 31 ger rest 1 vid delning med 2, 3, 5,
+  // 6, 10 och 30 blev valet i stort sett teckensumman. DT och DJ (T och J ligger tio steg isär) fick då alltid
+  // samma lott, så att Tejder och Dogge båda hörde sina riktiga namn i omgången 2026-11-14.
   function fast(lista, nyckel) {
-    let h = 7;
-    for (const c of nyckel) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-    return lista[h % lista.length];
+    let h = 2166136261;
+    for (const c of nyckel) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+    h = Math.imul(h ^ (h >>> 16), 0x85ebca6b);
+    h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+    return lista[((h ^ (h >>> 16)) >>> 0) % lista.length];
   }
   const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
   // Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8, när
