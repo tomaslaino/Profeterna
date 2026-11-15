@@ -10,6 +10,25 @@
        redan nu, så att den inte blinkar till innan rummet har byggts
        (rum-vantar i rum.css, tas bort av showTab i app.js) -->
   <script>if (!location.hash && (/[?&]rum-t\b/.test(location.search) || matchMedia('(min-width: 280px) and (min-height: 260px)').matches)) document.documentElement.classList.add('rum-vantar');</script>
+  <!-- three.js till gänget i rummet (rum-3d.js), hämtas först när rummet visas -->
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+  <!-- Står tobaksaffären (rum-vantar ovan) börjar rummets 3D-delar hämtas redan
+       här, samtidigt som sidans övriga filer – förut först när rum.js hade
+       kört (forhamta i rum.js), i telefonen nästan en sekund senare. Sidan
+       visas inte förrän gänget står där, så de ligger på vägen dit. Efter
+       importmapen, så att three hämtas därifrån. Listan (RUM_FORHAMTA) läser
+       också rum.js, och bygget med --minify byter den mot buntarna
+       (src/bunta.js) – första raden ska stå som den står.
+       Före stilmallarna: ett skript efter en stilmall väntar tills stilmallen
+       är hämtad, och 3D-delarna började förut hämtas först då (0,8 s senare
+       i telefonen på 4G). Typsnitten i rummet likaså: de hittades först när
+       rum.js hade byggt rummet, och i telefonen väntar gänget på dem. -->
+  <script id="rum-forhamta">window.RUM_FORHAMTA = (function () { var im = JSON.parse(document.querySelector('script[type="importmap"]').textContent).imports; return ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', 'rum-vaxter.js', 'rum-saker.js', 'rum-inredning.js', 'rum-affischer.js', 'rum-neon.js', 'rum-dator.js', im.three, im['three/addons/'] + 'environments/RoomEnvironment.js', im['three/addons/'] + 'geometries/RoundedBoxGeometry.js', im['three/addons/'] + 'utils/BufferGeometryUtils.js']; })();</script>
+  <script>if (performance.setResourceTimingBufferSize) performance.setResourceTimingBufferSize(1000); // (listan till sw.js, sist i sidan)
+  if (document.documentElement.classList.contains('rum-vantar')) {
+    window.RUM_FORHAMTA.forEach(function (href) { var l = document.createElement('link'); l.rel = 'modulepreload'; l.href = href; document.head.appendChild(l); });
+    ['fraunces-latin', 'fraunces-kursiv-latin', 'skrivmaskin-latin', 'caveat-latin', 'vt323-latin', 'anton-latin', 'cedarville-cursive-latin', 'mr-dafoe-latin', 'reenie-beanie-latin', 'alfa-slab-one-latin'].forEach(function (f) { var l = document.createElement('link'); l.rel = 'preload'; l.as = 'font'; l.type = 'font/woff2'; l.crossOrigin = 'anonymous'; l.href = 'typsnitt/' + f + '.woff2'; document.head.appendChild(l); });
+  }</script>
   <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -53,17 +72,6 @@
   <link rel="stylesheet" href="rum-ute.css">
   <link rel="stylesheet" href="rum-folk.css">
   <link rel="stylesheet" href="rum-radio.css">
-  <!-- three.js till gänget i rummet (rum-3d.js), hämtas först när rummet visas -->
-  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-  <!-- Står tobaksaffären (rum-vantar ovan) börjar rummets 3D-delar hämtas redan
-       här, samtidigt som sidans övriga filer – förut först när rum.js hade
-       kört (forhamta i rum.js), i telefonen nästan en sekund senare. Sidan
-       visas inte förrän gänget står där, så de ligger på vägen dit. Efter
-       importmapen, så att three hämtas därifrån. Listan (RUM_FORHAMTA) läser
-       också rum.js, och bygget med --minify byter den mot buntarna
-       (src/bunta.js) – första raden ska stå som den står. -->
-  <script id="rum-forhamta">window.RUM_FORHAMTA = (function () { var im = JSON.parse(document.querySelector('script[type="importmap"]').textContent).imports; return ['rum-3d.js', 'rum-gpu.js', 'rum-fika.js', 'rum-fest.js', 'rum-tecken.js', 'rum-dans.js', 'rum-uttryck.js', 'rum-vaxter.js', 'rum-saker.js', 'rum-inredning.js', 'rum-affischer.js', 'rum-neon.js', 'rum-dator.js', im.three, im['three/addons/'] + 'environments/RoomEnvironment.js', im['three/addons/'] + 'geometries/RoundedBoxGeometry.js', im['three/addons/'] + 'utils/BufferGeometryUtils.js']; })();</script>
-  <script>if (document.documentElement.classList.contains('rum-vantar')) window.RUM_FORHAMTA.forEach(function (href) { var l = document.createElement('link'); l.rel = 'modulepreload'; l.href = href; document.head.appendChild(l); });</script>
 </head>
 <body>
   <header class="topbar">
@@ -200,5 +208,22 @@
   <script src="rum-hasse-meningar.js"></script>
   <script src="rum-hasse-kupong.js"></script>
   <script src="rum-hasse.js"></script>
+  <!-- Sajtens filer sparas i webbläsaren mellan publiceringarna (sw.js), en
+       stund efter att sidan har laddats. Listan över filerna och deras
+       kontrollsummor (rum-filer) skriver bygget in sist i sidan
+       (src/filer.js); utan den (sidan som den står här) ingen sw.js. Första
+       gången skickas listan och det som sidan hämtade till sw.js, som sparar
+       det ur webbläsarens vanliga cache, så att redan nästa besök har nytta
+       av det. -->
+  <script>if ('serviceWorker' in navigator && window.isSecureContext) addEventListener('load', function () {
+    var lista = document.getElementById('rum-filer');
+    if (!lista) return;
+    setTimeout(function () {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function () { return navigator.serviceWorker.ready; }).then(function (reg) {
+        if (navigator.serviceWorker.controller || !reg.active) return;
+        reg.active.postMessage({ filer: JSON.parse(lista.textContent), laddat: performance.getEntriesByType('resource').map(function (r) { return r.name; }) });
+      }).catch(function () {});
+    }, 5000);
+  });</script>
 </body>
 </html>

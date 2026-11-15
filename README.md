@@ -621,8 +621,78 @@ jämförda bildpunkt för bildpunkt: inom bruset).
 `ikon-192.png`, `ikon-512.png` och `ikon-maskbar-512.png` (logon, den maskbara med terrakotta ut till
 kanten för Androids runda och rundade ikoner), länkat från alla sidor utom de två som bara leder vidare.
 I Chrome i Android: menyn → *Lägg till på startskärmen* (*Installera app*). Sidan öppnas då utan
-adressfält och flikar. Sajten har bara en service worker, och den gäller bara `/dela/` (delade skärmbilder,
-se [Appen](#appen)): sidan fungerar inte utan nät och hämtas som förut.
+adressfält och flikar. Sajten fungerar inte utan nät: `/dela/` har en egen service worker (delade
+skärmbilder, se [Appen](#appen)), och den för hela sajten (nedan) sparar bara filer, aldrig sidorna eller
+datan.
+
+### Filerna sparas mellan besöken (2026-11-15)
+
+Användarens önskemål: "ordna så att animationssidan laddas fortare – utan att grafiken påverkas – och att
+det även ska funka på en sämre dator/mobil på ett bättre sätt".
+
+**Felet:** sajten publiceras om flera gånger i timmen (datan var 30:e minut, och varje ändring i koden), och
+GitHub Pages ger då *varje* fil ett nytt datum och en ny etag, också de som inte har ändrats (kontrollerat:
+typsnitten, bilderna och three.js fick samma `last-modified` som bygget). Webbläsaren sparar filerna i tio
+minuter (`max-age=600`) och frågar sedan om de är desamma – men med ny etag får den hela filen igen. Nästan
+varje besök hämtade alltså om allt: JavaScript, stilmallen, typsnitten och rummets bilder, 2–4 MB, och
+tolkade koden från början.
+
+- **[public/sw.js](public/sw.js)** (en service worker för hela sajten, registreras från index.html fem
+  sekunder efter `load`) sparar JavaScript, CSS, typsnitt och bilder i webbläsarens Cache Storage
+  (`filer-1`), var och en med sin kontrollsumma. Bygget skriver in listan över filerna och deras
+  kontrollsummor sist i index.html (`rum-filer`, [src/filer.js](src/filer.js), med `--minify`; 346 filer,
+  6 kB med gzip). Vid varje besök läser sw.js listan i sidan den hämtar, och för varje fil sidan ber om:
+  står den sparad med samma kontrollsumma tas den därifrån, annars hämtas den som vanligt och sparas –
+  men bara om innehållet har kontrollsumman i listan. Sidan får alltså exakt de versioner den hade fått
+  utan sw.js, också mitt i en publicering. Sidorna, `data/`, ljudet, filer med `?` och andra adresser
+  rörs inte. Det som inte längre står i listan tas bort 20 sekunder efter besöket.
+- **Redan andra besöket:** första besöket går inte genom sw.js (den registreras efteråt). Sidan skickar
+  då sin lista och adresserna den hämtade, och sw.js sparar dem ur webbläsarens vanliga cache (samma
+  kontroll), så att nästa besök har nytta av det.
+- **Andra sidor** (Statistik, Tabeller …) har ingen lista och hämtar sina filer som förut. Lokalt (sidan
+  som den står i public/) finns ingen lista och ingen sw.js.
+- **Om något går fel:** byt `LADA` i sw.js (den gamla lådan tas bort), eller lägg ut en sw.js som bara
+  kör `self.registration.unregister()`.
+
+**Rummets filer hämtas tidigare** ([public/index.html](public/index.html)): skriptet som börjar hämta
+3D-delarna (`RUM_FORHAMTA`) stod efter stilmallen, och ett skript efter en stilmall väntar tills stilmallen
+är hämtad – i telefonen på 4G började 3D-delarna hämtas 0,8 sekunder senare än de kunde. Nu står det före
+stilmallarna. Rummets tio typsnitt (Fraunces, Skrivmaskin, Caveat, VT323 …) hittades förut först när
+rum.js hade byggt rummet, fyra sekunder in i telefonen på 4G, och där väntar gänget på dem
+(`document.fonts.ready`); nu förhämtas de samtidigt (bara när rummet visas, `rum-vantar`).
+
+**Mätt** i headless Chrome mot en lokal HTTP/2-server med sajten förminskad och buntad som på GitHub
+Pages (gzip, `max-age=600`) och den publicerade sajtens data, gammal och ny kod om vartannat, medianer.
+Nätet bromsades i servern (9 Mbit/s delat, 70 ms per förfrågan, som 4G): Chromes egen nätbroms bromsar
+också svaren ur sw.js, och då i opackad storlek. "Efter en publicering" är andra besöket med
+webbläsarens vanliga cache tömd (det är vad nya etaggar gör); Cache Storage står kvar.
+
+| | Före | Efter |
+|---|---|---|
+| Telefon, efter en publicering: hämtat från nätet | 4,1 MB | 175 kB (datan) |
+| Telefon, efter en publicering: sidans skript klara | 1,33 s | 0,26 s |
+| Telefon, efter en publicering: lysröret tänds | 5,0 s | 4,2 s |
+| Telefon, efter en publicering: allt på plats (också datorn) | 5,5 s | 4,8 s |
+| Dator, efter en publicering: lysröret tänds / allt på plats | 3,8 s | 1,3 s |
+| Telefon, första besöket: allt på plats | 5,9 s | 5,7 s |
+| Dator, första besöket: allt på plats | 3,4 s | 2,7 s |
+
+(Telefon: 412 × 780 punkter, täthet 2,625, processorn fyra gånger långsammare, fem varv var; dator:
+1440 × 900, tre varv var.) Utan nätbroms kommer filerna ur sw.js på 10–45 ms. Vid första besöket blir
+sidans skript klara 0,3 sekunder senare än förut, eftersom typsnitten nu hämtas samtidigt, men rummet blir
+inte senare klart: i telefonen väntar gänget ändå på typsnitten. I telefonen är det sedan processorn som
+bromsar (gänget byggs på ungefär 1,3 sekunder med den långsamma processorn, inredningen och sakerna efter).
+Den riktiga sajten som telefon på 4G före ändringen: typsnitten började hämtas efter 4,1 sekunder och var
+klara efter 6,6, och lysröret tändes på tak (4,5 sekunder efter att rummet byggts) innan inredningen var
+klar.
+
+**Samma bild:** rummet med fryst tid (`?rum-t=4`) som dator och telefon, gammal kod mot ny kod genom
+sw.js (andra besöket, filerna ur Cache Storage), jämfört bildpunkt för bildpunkt. I telefonen är bilderna
+exakt lika. I datorn skiljer det som går efter den riktiga klockan (uret, röken) och om Hasses hand hunnit
+tonas in när bilden tas – lika mycket som två laddningar av den gamla koden skiljer sig åt (35–53 dB).
+sw.js ger sidan samma byte som nätet: en fil sparas bara när dess kontrollsumma stämmer med listan.
+Provat också: efter en ny publicering där `bunt.css` ändrats fick sidan den nya filen, och den sparades
+med sin nya kontrollsumma.
 
 ## Appen
 

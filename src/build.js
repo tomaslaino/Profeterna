@@ -70,6 +70,7 @@ const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
 const rost = require('./rost');
 const { minifySite, packaBinart } = require('./minify');
 const { buntaSidan } = require('./bunta');
+const { filerSidan } = require('./filer');
 const { wholePercent } = require('./model');
 const rules = require('../config/forecast-rules');
 const kupongCfg = require('../config/kupong');
@@ -359,11 +360,20 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   const minified = minify ? minifySite(tmp) : null;
   // (efter minify: buntarna sätts ihop av de redan förminskade filerna, src/bunta.js)
   const buntat = minify ? buntaSidan(tmp) : null;
+  // (sist, när filerna är färdiga: deras kontrollsummor till sw.js, src/filer.js)
+  let filer = null;
+  if (minify) {
+    try {
+      filer = filerSidan(tmp);
+    } catch (err) {
+      console.error('[filer]', err.message || err);
+    }
+  }
 
   // Byt hela katalogen på en gång, så att en halvfärdig sajt aldrig serveras.
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
-  return { generatedAt, minified, buntat, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
+  return { generatedAt, minified, buntat, filer, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
 }
 
 function elva(id) {
@@ -442,6 +452,7 @@ if (require.main === module) {
       if (m) console.log(`Koden i mindre form: ${m.filer} filer, ${Math.round(m.fore / 1024)} → ${Math.round(m.efter / 1024)} kB${m.fel.length ? `, ${m.fel.length} kvar som de var` : ''}.`);
       const b = site.buntat;
       if (b) console.log(`Förstasidan i buntar: ${['stil', 'skript', 'moduler'].map((k) => (b[k] ? `${k} ${b[k].filer} → ${b[k].buntar}` : `${k} som förut`)).join(', ')}.`);
+      if (site.filer) console.log(`Filerna som sparas mellan besöken (sw.js): ${site.filer.filer}, listan ${Math.round(site.filer.tecken / 1024)} kB.`);
       console.log(`Hasse Backes röst: ${site.rosten.filer} av ${site.rosten.av} meningar har ljud.`);
     })
     .catch((err) => {
