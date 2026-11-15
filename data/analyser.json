@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T19:48:34.736Z",
+ "uppdaterad": "2026-11-15T19:51:50.791Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2862,6 +2862,90 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 2
+  },
+  {
+   "id": "401861186",
+   "match": "Schweiz – Skottland",
+   "avspark": "2026-11-16T19:45Z",
+   "writtenAt": "2026-11-15T19:51:18.230Z",
+   "text": "Robertson kan slå rekordet på besvärlig mark\n\nAndy Robertson har lika många landskamper som Kenny Dalglish, och i St. Gallen kan han gå förbi honom. Där väntar samma schweiziska lag som vann med 3–0 i Glasgow i september, sedan Skottland hade spelat med en man mindre i över åttio minuter.\n\nSkottlands kapten har gjort 102 landskamper, precis som Kenny Dalglish. Spelar han mot Schweiz går han ensam upp i toppen som landets mest landslagsmeriterade man genom tiderna, skriver Skotska fotbollsförbundet [1]. Förbundet påpekar också att Skottland bara har ett sätt att hålla hoppet om en kvalplats till uppflyttning vid liv. Laget måste ta tre poäng och samtidigt hoppas att Slovenien tappar poäng i Nordmakedonien [1]. Sébastien Pocognoli tar med sig 26 spelare till årets sista landskamp, och efter en tids frånvaro är både Scott McTominay och Ché Adams tillbaka i truppen [1]. Hans första hemmaseger på Hampden kom i fredags, 2–1 mot Nordmakedonien, och John McGinn gjorde båda målen [1].\n\nDet förra mötet glömmer ingen skotte i första taget. Enligt Südostschweiz blev Jack Hendry utvisad efter knappt tio minuter. Domaren hade först dömt straff, men efter en granskning av videodomaren flyttades förseelsen till strax utanför straffområdet [2]. Ricardo Rodriguez skruvade in frisparken i hörnet i tolfte minuten. Sedan gjorde Nico Elvedi och Zeki Amdouni varsitt mål, och Dan Ndoye låg bakom båda [2]. Den sortens frispark går att förebygga på torsdagsträningen. Man ställer upp muren på rätt ställe och får en mittback som inte drar i tröjor på fel sida om linjen. Hendrys röda kort är den enda avstängning som förbundet tar upp inför returen [1].\n\nHistoriskt sett är det jämnare än septembermatchen ger sken av. Lagen har mötts 18 gånger, och Skottland har vunnit åtta och Schweiz sex. Senast innan i höstas blev det 1–1 i EM 2024 [1].\n\nTipset: 1 (ett mål räcker)\n\nSpelbolagen ger Schweiz drygt hälften av chansen och räknar med ungefär dubbelt så många schweiziska mål som skotska. Det är svårt att argumentera emot. Schweiz har hållit nollan i fyra av fem gruppmatcher, och i Glasgow avgjordes matchen på en fast situation [1]. Skottland måste vinna för att ha en chans till uppflyttning [2], och ett lag som måste anfalla lämnar ytor bakom sig. Det talar snarare för Schweiz än för ett oavgjort resultat. Med McTominay och Adams tillbaka [2] har Skottland ändå mer i anfallet än i september. Bollen har aldrig läst en tabell, men jag ringar ändå bara in hemmalaget.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Robertson kan slå rekordet på besvärlig mark",
+   "lead": "Andy Robertson har lika många landskamper som Kenny Dalglish, och i St. Gallen kan han gå förbi honom. Där väntar samma schweiziska lag som vann med 3–0 i Glasgow i september, sedan Skottland hade spelat med en man mindre i över åttio minuter.",
+   "paragraphs": [
+    "Skottlands kapten har gjort 102 landskamper, precis som Kenny Dalglish. Spelar han mot Schweiz går han ensam upp i toppen som landets mest landslagsmeriterade man genom tiderna, skriver Skotska fotbollsförbundet [1]. Förbundet påpekar också att Skottland bara har ett sätt att hålla hoppet om en kvalplats till uppflyttning vid liv. Laget måste ta tre poäng och samtidigt hoppas att Slovenien tappar poäng i Nordmakedonien [1]. Sébastien Pocognoli tar med sig 26 spelare till årets sista landskamp, och efter en tids frånvaro är både Scott McTominay och Ché Adams tillbaka i truppen [1]. Hans första hemmaseger på Hampden kom i fredags, 2–1 mot Nordmakedonien, och John McGinn gjorde båda målen [1].",
+    "Det förra mötet glömmer ingen skotte i första taget. Enligt Südostschweiz blev Jack Hendry utvisad efter knappt tio minuter. Domaren hade först dömt straff, men efter en granskning av videodomaren flyttades förseelsen till strax utanför straffområdet [2]. Ricardo Rodriguez skruvade in frisparken i hörnet i tolfte minuten. Sedan gjorde Nico Elvedi och Zeki Amdouni varsitt mål, och Dan Ndoye låg bakom båda [2]. Den sortens frispark går att förebygga på torsdagsträningen. Man ställer upp muren på rätt ställe och får en mittback som inte drar i tröjor på fel sida om linjen. Hendrys röda kort är den enda avstängning som förbundet tar upp inför returen [1].",
+    "Historiskt sett är det jämnare än septembermatchen ger sken av. Lagen har mötts 18 gånger, och Skottland har vunnit åtta och Schweiz sex. Senast innan i höstas blev det 1–1 i EM 2024 [1]."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Scottish FA",
+     "title": "Scotland round off UEFA Nations League campaign with Swiss test in St Gallen",
+     "url": "https://www.scottishfa.co.uk/en/news/scotland-round-off-uefa-nations-league-campaign-with-swiss-test-in-st-gallen",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Südostschweiz",
+     "title": "Reife Schweizer schlagen auch Schottland",
+     "url": "https://www.suedostschweiz.ch/schweiz-und-welt/reife-schweizer-schlagen-auch-schottland-2179775",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger Schweiz drygt hälften av chansen och räknar med ungefär dubbelt så många schweiziska mål som skotska. Det är svårt att argumentera emot. Schweiz har hållit nollan i fyra av fem gruppmatcher, och i Glasgow avgjordes matchen på en fast situation [1]. Skottland måste vinna för att ha en chans till uppflyttning [2], och ett lag som måste anfalla lämnar ytor bakom sig. Det talar snarare för Schweiz än för ett oavgjort resultat. Med McTominay och Adams tillbaka [2] har Skottland ändå mer i anfallet än i september. Bollen har aldrig läst en tabell, men jag ringar ändå bara in hemmalaget.",
+    "signs": [
+     0
+    ],
+    "note": "ett mål räcker",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Südostschweiz",
+      "title": "Reife Schweizer schlagen auch Schottland",
+      "url": "https://www.suedostschweiz.ch/schweiz-und-welt/reife-schweizer-schlagen-auch-schottland-2179775",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Scottish FA",
+      "title": "Scotland round off UEFA Nations League campaign with Swiss test in St Gallen",
+      "url": "https://www.scottishfa.co.uk/en/news/scotland-round-off-uefa-nations-league-campaign-with-swiss-test-in-st-gallen",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T19:51:18.230Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Schweiz har hållit nollan i fyra av fem gruppmatcher, och då har man en backlinje som vet var den ska stå. Skottland måste vinna och samtidigt hoppas att Slovenien tappar poäng på annat håll. Ett lag som måste anfalla på bortaplan lämnar ytor bakom sig, och det är precis vad Schweiz vill ha.",
+     "Förbundskaptenen har fått tillbaka McTominay och Adams till samlingen, och det ger Skottland mer spets framåt än i höstas. Men i det förra mötet straffade Schweiz varje lucka och vann med 3–0. Skottland spelade visserligen med en man mindre större delen av matchen, men det gjorde inte Schweiz sämre. Det er helt i orden, som danskarna säger. Jag sover gott och ringar bara in ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-15T19:51:18.230Z",
+    "uppdrag": {
+     "fraser": [
+      "Lugn nu",
+      "Äsch"
+     ],
+     "krydda": "Det er helt i orden, som danskarna säger.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T19:51:44.879Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
   },
   {
    "id": "401861185",
