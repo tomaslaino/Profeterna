@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T19:53:06.199Z",
+ "uppdaterad": "2026-11-15T20:54:34.448Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2858,6 +2858,91 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-15T15:16:26.704Z",
     "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
+  },
+  {
+   "id": "401861188",
+   "match": "Grekland – Serbien",
+   "avspark": "2026-11-16T19:45Z",
+   "writtenAt": "2026-11-15T20:54:15.551Z",
+   "text": "Grekland får tänka bort en kväll i Nederländerna\n\nGrekland kommer hem till Volos efter 0–7 i Nederländerna. Där väntar Serbien, som har förlorat alla fem matcherna i gruppen och fortfarande minns septemberkvällen i Belgrad då Douvikas avgjorde på tilläggstid efter ett inlägg från Tsimikas.\n\nDet första mötet säger mer om Grekland än tabellen gör. Enligt Greek City Times [1] ledde Serbien redan i 4:e minuten, när Dusan Tadic drog tillbaka bollen till en omarkerad Andrija Zivkovic. Karetsas träffade stolpen strax efter, och Vanja Milinkovic-Savic räddade från Tzolis i 39:e minuten. I 68:e minuten gick Tzolis skott in via insidan av stolpen, och på tilläggstid hittade Tsimikas inlägg Douvikas. Ett lag som hämtar upp ett underläge på bortaplan har något i sig, och det ser du redan på uppvärmningen.\n\nSedan dess har Grekland vunnit med 1–0 i Tyskland och spelat oavgjort hemma mot både Tyskland och Nederländerna. I fredags blev det ändå 0–7 i Nederländerna, och efter en sådan kväll vet ingen säkert hur ett lag svarar. I Grusnäs förlorade vi en gång så stort att materialförvaltaren slutade räkna, och veckan efter sprang vi som aldrig förr. Hur grekerna bär det får vi se i Volos.\n\nSerbiens bekymmer sitter bakåt. Enligt Africa Soccer [2] har laget inte hållit nollan på 12 matcher och inte vunnit på fyra landskamper, och matchen i Volos är Greklands sista för året [2]. Med ett försvar som släpper in i varje match blir hörnorna och de fasta situationerna viktiga för båda lagen. Det tar vi på torsdagsträningen.\n\nTipset: 1X (Ettan, krysset bredvid)\n\nSpelbolagen har Grekland som klar favorit och tror helst på 2–0. Det jag har läst talar åt samma håll. Serbien har inte hållit nollan på 12 matcher [1], och Grekland vann redan i Belgrad, även om det kom på tilläggstid [2]. Det som stör bilden är 0–7 mot Nederländerna och att Grekland har spelat oavgjort i båda sina hemmamatcher i gruppen. Bollen har aldrig läst en tabell, men Serbien har förlorat fem raka gruppmatcher. Jag ringar in ettan och lägger krysset bredvid för säkerhets skull.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Grekland får tänka bort en kväll i Nederländerna",
+   "lead": "Grekland kommer hem till Volos efter 0–7 i Nederländerna. Där väntar Serbien, som har förlorat alla fem matcherna i gruppen och fortfarande minns septemberkvällen i Belgrad då Douvikas avgjorde på tilläggstid efter ett inlägg från Tsimikas.",
+   "paragraphs": [
+    "Det första mötet säger mer om Grekland än tabellen gör. Enligt Greek City Times [1] ledde Serbien redan i 4:e minuten, när Dusan Tadic drog tillbaka bollen till en omarkerad Andrija Zivkovic. Karetsas träffade stolpen strax efter, och Vanja Milinkovic-Savic räddade från Tzolis i 39:e minuten. I 68:e minuten gick Tzolis skott in via insidan av stolpen, och på tilläggstid hittade Tsimikas inlägg Douvikas. Ett lag som hämtar upp ett underläge på bortaplan har något i sig, och det ser du redan på uppvärmningen.",
+    "Sedan dess har Grekland vunnit med 1–0 i Tyskland och spelat oavgjort hemma mot både Tyskland och Nederländerna. I fredags blev det ändå 0–7 i Nederländerna, och efter en sådan kväll vet ingen säkert hur ett lag svarar. I Grusnäs förlorade vi en gång så stort att materialförvaltaren slutade räkna, och veckan efter sprang vi som aldrig förr. Hur grekerna bär det får vi se i Volos.",
+    "Serbiens bekymmer sitter bakåt. Enligt Africa Soccer [2] har laget inte hållit nollan på 12 matcher och inte vunnit på fyra landskamper, och matchen i Volos är Greklands sista för året [2]. Med ett försvar som släpper in i varje match blir hörnorna och de fasta situationerna viktiga för båda lagen. Det tar vi på torsdagsträningen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Greek City Times",
+     "title": "Greece stun Serbia with late Douvikas winner in Nations League comeback",
+     "url": "https://greekcitytimes.com/2026/09/25/greece-serbia-2-1-douvikas-tzolis/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Africa Soccer",
+     "title": "Greece v Serbia: How to get Nations League tickets, prices and late availability",
+     "url": "https://africasoccer.com/greece-v-serbia-how-to-get-nations-league-tickets-prices-and-late-availability/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen har Grekland som klar favorit och tror helst på 2–0. Det jag har läst talar åt samma håll. Serbien har inte hållit nollan på 12 matcher [1], och Grekland vann redan i Belgrad, även om det kom på tilläggstid [2]. Det som stör bilden är 0–7 mot Nederländerna och att Grekland har spelat oavgjort i båda sina hemmamatcher i gruppen. Bollen har aldrig läst en tabell, men Serbien har förlorat fem raka gruppmatcher. Jag ringar in ettan och lägger krysset bredvid för säkerhets skull.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Ettan, krysset bredvid",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Africa Soccer",
+      "title": "Greece v Serbia: How to get Nations League tickets, prices and late availability",
+      "url": "https://africasoccer.com/greece-v-serbia-how-to-get-nations-league-tickets-prices-and-late-availability/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Greek City Times",
+      "title": "Greece stun Serbia with late Douvikas winner in Nations League comeback",
+      "url": "https://greekcitytimes.com/2026/09/25/greece-serbia-2-1-douvikas-tzolis/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T20:54:15.551Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Grekland fick sju mål på sig i Nederländerna, och en sådan kväll sitter i kroppen ett tag. Men samma lag har vunnit borta mot Tyskland och spelat oavgjort hemma mot både Tyskland och Nederländerna. Ett 0–7 ändrar inte organisationen i en samling, och i Volos har de sin publik och sin sista match för året.",
+     "Serbien har förlorat alla fem matcherna i gruppen och har inte hållit nollan på tolv matcher. Ett lag som släpper in i varje match åker inte till Grekland och spelar hem en poäng. De gjorde mål tidigt senast lagen möttes, så en boll lär de få in, men bakåt håller det inte. Orsak och verkan. Det er helt i orden, som danskarna säger. Jag ringar in en etta, och bara ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-15T20:54:15.551Z",
+    "uppdrag": {
+     "fraser": [
+      "Orsak och verkan",
+      "Nej nej nej"
+     ],
+     "krydda": "Det er helt i orden, som danskarna säger.",
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T20:54:25.312Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
