@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-13T19:31:42.776Z",
+ "uppdaterad": "2026-11-15T13:51:40.428Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2311,6 +2311,107 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-13T18:05:00.000Z",
     "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861175",
+   "match": "Spanien – England",
+   "avspark": "2026-11-15T19:45Z",
+   "writtenAt": "2026-11-15T13:50:50.559Z",
+   "text": "Spanien tar emot England med Yamal på knät\n\nVärldsmästarna Spanien har vunnit allt i gruppen och tar emot England på Metropolitano i Madrid. Där får Thomas Tuchel chansen att visa att avståndet har krympt. I september var England nära på Wembley, och Lamine Yamals knä har ingen riktigt kunnat bedöma.\n\nSpanien är redan klart för kvartsfinal, men inför sista gruppmatchen har Luis de la Fuente mer att tänka på än tabellen. Lamine Yamal fick enligt det spanska förbundet ”ont i högra knät” efter Barcelonas 2–1-seger borta mot Atlético, och Mikel Oyarzabal höll på att bli frisk från en influensa. Båda missade matchen i Prag men skulle ansluta så att de kan spela mot England, skriver New Straits Times [1]. Truppen har 27 spelare och tre nya namn: Jacobo Ramón, Álvaro Vallés och Marc Roca, enligt Comuniate. Där står det också att eventuell rotation ”bara är en hypotes” [2]. Det ser du redan på uppvärmningen, om han haltar eller inte.\n\nFör England handlar det om något annat. När Tuchel tog ut truppen i september talade han fortfarande om VM-semifinalen mot Argentina, som rann ut i sanden med två insläppta mål på slutet. ”Vi känner att avståndet krymper, att vi är nära, och vi vill bevisa något”, sa han enligt The Citizen [3]. Sedan förlorade England med 2–3 hemma mot Spanien, och därefter har laget vunnit fyra raka matcher med 14–1 i mål. Spanien har inte förlorat en tävlingsmatch på ordinarie tid på ungefär tre och ett halvt år [3]. Om det stämmer har ingen hittat nyckeln, och jag skulle börja leta vid hörnflaggan.\n\nTipset: 12 (England jagar)\n\nSpelbolagen ger Spanien ungefär varannan chans och räknar med att det blir mål åt båda hållen. Spanien är redan klart för kvartsfinal, och Comuniate skriver att rotation inte är bekräftad [1]. Yamal och Oyarzabal ska ansluta men har haft knäbesvär respektive influensa [2]. England behöver vinna för att komma ikapp i tabellen och har Tuchels vilja att bevisa något [3]. Därför tror jag inte riktigt på hemmasegern. Jag ringar in etta och tvåa och lämnar krysset åt sitt öde, eftersom ett lag som jagar segern sällan nöjer sig med en poäng.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Spanien tar emot England med Yamal på knät",
+   "lead": "Världsmästarna Spanien har vunnit allt i gruppen och tar emot England på Metropolitano i Madrid. Där får Thomas Tuchel chansen att visa att avståndet har krympt. I september var England nära på Wembley, och Lamine Yamals knä har ingen riktigt kunnat bedöma.",
+   "paragraphs": [
+    "Spanien är redan klart för kvartsfinal, men inför sista gruppmatchen har Luis de la Fuente mer att tänka på än tabellen. Lamine Yamal fick enligt det spanska förbundet ”ont i högra knät” efter Barcelonas 2–1-seger borta mot Atlético, och Mikel Oyarzabal höll på att bli frisk från en influensa. Båda missade matchen i Prag men skulle ansluta så att de kan spela mot England, skriver New Straits Times [1]. Truppen har 27 spelare och tre nya namn: Jacobo Ramón, Álvaro Vallés och Marc Roca, enligt Comuniate. Där står det också att eventuell rotation ”bara är en hypotes” [2]. Det ser du redan på uppvärmningen, om han haltar eller inte.",
+    "För England handlar det om något annat. När Tuchel tog ut truppen i september talade han fortfarande om VM-semifinalen mot Argentina, som rann ut i sanden med två insläppta mål på slutet. ”Vi känner att avståndet krymper, att vi är nära, och vi vill bevisa något”, sa han enligt The Citizen [3]. Sedan förlorade England med 2–3 hemma mot Spanien, och därefter har laget vunnit fyra raka matcher med 14–1 i mål. Spanien har inte förlorat en tävlingsmatch på ordinarie tid på ungefär tre och ett halvt år [3]. Om det stämmer har ingen hittat nyckeln, och jag skulle börja leta vid hörnflaggan."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "New Straits Times",
+     "title": "Spain's Yamal, Oyarzabal out for Czech Nations League clash",
+     "url": "https://www.nst.com.my/amp/sports/football/2026/11/1574295/spains-yamal-oyarzabal-out-czech-nations-league-clash",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Comuniate",
+     "title": "Luis de la Fuente names squad for group-stage finale",
+     "url": "https://www.comuniate.com/en/noticias/38889/luis-de-la-fuente-names-squad-for-group-stage-finale",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "The Citizen",
+     "title": "Tuchel seeks tonic to England World Cup 'scar' in Spain showdown",
+     "url": "https://citizen.digital/article/tuchel-seeks-tonic-to-england-world-cup-scar-in-spain-showdown-n390770",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger Spanien ungefär varannan chans och räknar med att det blir mål åt båda hållen. Spanien är redan klart för kvartsfinal, och Comuniate skriver att rotation inte är bekräftad [1]. Yamal och Oyarzabal ska ansluta men har haft knäbesvär respektive influensa [2]. England behöver vinna för att komma ikapp i tabellen och har Tuchels vilja att bevisa något [3]. Därför tror jag inte riktigt på hemmasegern. Jag ringar in etta och tvåa och lämnar krysset åt sitt öde, eftersom ett lag som jagar segern sällan nöjer sig med en poäng.",
+    "signs": [
+     0,
+     2
+    ],
+    "note": "England jagar",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Comuniate",
+      "title": "Luis de la Fuente names squad for group-stage finale",
+      "url": "https://www.comuniate.com/en/noticias/38889/luis-de-la-fuente-names-squad-for-group-stage-finale",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "New Straits Times",
+      "title": "Spain's Yamal, Oyarzabal out for Czech Nations League clash",
+      "url": "https://www.nst.com.my/amp/sports/football/2026/11/1574295/spains-yamal-oyarzabal-out-czech-nations-league-clash",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "The Citizen",
+      "title": "Tuchel seeks tonic to England World Cup 'scar' in Spain showdown",
+      "url": "https://citizen.digital/article/tuchel-seeks-tonic-to-england-world-cup-scar-in-spain-showdown-n390770",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T13:50:50.559Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "England har vunnit fyra raka landskamper med 14–1 i mål, och förbundskaptenen säger att avståndet har krympt. Spanien har dock inte förlorat en tävlingsmatch på ordinarie tid på ungefär tre och ett halvt år, och i september vann de med 3–2 på Wembley. Så är det bara.",
+     "England måste vinna och kommer att flytta upp hela laget, och då blir det transisiones, Spanien springer i ytorna bakom backlinjen, det är … Ursäkta. Back to basis. Spanien är redan klart för kvartsfinal. Även om Yamal blir kvar på bänken med sitt knä och förbundskaptenen roterar har Spanien en trupp som klarar en kväll utan honom. Ett lag som jagar lämnar luckor bakåt, och Spanien straffar det. Jag ringar in en etta och står för den."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-15T13:50:50.559Z",
+    "uppdrag": {
+     "fraser": [
+      "Det köper jag aldrig",
+      "Så är det bara"
+     ],
+     "krydda": null,
+     "bielsa": [
+      "ombre libre",
+      "transisiones"
+     ]
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T13:51:22.106Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
