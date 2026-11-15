@@ -1174,7 +1174,9 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Tipsligan längst ut över videon, störst och lättast att läsa. Tavlorna har samma mitt på höjden, korktavlan
   går fri från tv:ns underkant och Tipsligan från lådan, och kupongerna hänger två och två utan att skymma
   varandra. Videohörnets förlängning av väggen går nu ända upp till taket, så att närbilden längst ut inte ser
-  ett hål bortom bildens kant. Se [Tobaksaffären](#tobaksaffären).
+  ett hål bortom bildens kant. Samma dag, "Ja, gör plats": hyllan rymde bara fyra pokaler (den femte syntes
+  inte, så var det också på den gamla platsen). Nu kommer en hylla till upp ovanför, och sedan står pokalerna
+  tätare, i två led och till sist mindre, så att en hel säsong ryms. Se [Tobaksaffären](#tobaksaffären).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4127,7 +4129,9 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   texten ritas skarpt nära; länken är lite större än kortet, så att det går att träffa med
   fingret.
 - **Pokalhyllan** (i hörnet på högra väggen, mellan tv:n och datorn) → närbild: en liten pokal per
-  vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n, som annars skär in
+  vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Fyra ryms på hyllan; den femte får
+  en hylla till ovanför, och sedan står de tätare (12), i två led med det bakre på en pall (22) och till sist
+  mindre, så att alla syns (50 ryms; `pokalLage` i rum.js). Nära tonar tv:n, som annars skär in
   överst i bilden, bort del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
   under hyllan står hur många pokaler var och en har, flest först.
 - **Datorn** (på disken i hörnet under tv:n) → terminalen där man söker spelare, lag och

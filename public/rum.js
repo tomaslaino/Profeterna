@@ -451,10 +451,14 @@ window.Rum = (() => {
 
   // 4. Pokalhyllan: ritas på väggen (shelves()) i hörnet, z 50–215, mitt mellan tv:ns underkant och
   //    datorn. Pokalerna är runda och ser likadana ut hur snett väggen än syns; en platt tavla
-  //    trycks ihop här. Lagret med hyllan (rum-hyllor) är en ruta kring den.
-  const POKAL = { yb: 395, x0: 1160, x1: 1244 };
-  function trophy(x, yb, col, i) {
-    const k = sc(x) * 0.95;
+  //    trycks ihop här. Hyllan rymmer fyra pokaler; den femte får en hylla till ovanför (yb2), och när
+  //    båda är fulla står pokalerna tätare, i två led och till sist mindre (pokalLage), så att hela
+  //    säsongen får plats. bak: hur mycket högre det bakre ledet står, på en pall. Lagret med hyllorna
+  //    (rum-hyllor) är en ruta kring dem.
+  const POKAL = { yb: 395, yb2: 351, x0: 1160, x1: 1244, bak: 8 };
+  // en pokal med foten i x på hyllan yb, k gånger sin vanliga storlek
+  function trophy(x, yb, col, i, k0 = 1) {
+    const k = sc(x) * 0.95 * k0;
     const y = at(x, yb);
     const id = `rum-pk${i}`;
     return `<g transform="translate(${r1(x)} ${r1(y)}) scale(${k.toFixed(3)})">` +
@@ -466,25 +470,54 @@ window.Rum = (() => {
       `<path d="M-7 -28 q-5 0 -5 5 q0 4 6 5" fill="none" stroke="${col}" stroke-width="1.6"/><path d="M7 -28 q5 0 5 5 q0 4 -6 5" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="1.6"/>` +
       '<rect x="-7" y="-31" width="14" height="1" fill="#e8e2d2" opacity=".35"/></g>';
   }
+  // Platserna längs en hylla när pokalerna står f gånger så tätt som från början (1) → [x, …]
+  function pokalPlatser(f) {
+    const xs = [];
+    for (let x = POKAL.x0 + 10 * f; x <= POKAL.x1 - 8; x += 17 * sc(x) * f) xs.push(x);
+    return xs;
+  }
+  // Var n pokaler står: hyllorna, leden och platserna i den ordning de fylls (nedre hyllans främre led,
+  // den övres, sedan de bakre leden), och hur stora pokalerna är (k). Fyra ryms på den nedre hyllan; med
+  // två hyllor står de tätare (f) ned till 0,7, sedan i två led (det bakre mellan de främre), och först
+  // därefter blir de mindre igen: 4 → 8 → 12 i ett led, 22 i två led, 30 vid f 0,5 och 50 vid 0,3.
+  function pokalLage(n) {
+    const hyllor = n > pokalPlatser(1).length ? [POKAL.yb, POKAL.yb2] : [POKAL.yb];
+    const ryms = (f, led) => hyllor.length * (led === 2 ? 2 * pokalPlatser(f).length - 1 : pokalPlatser(f).length);
+    let f = 1;
+    let led = 1;
+    while (f > 0.7 && ryms(f, 1) < n) f -= 0.02;
+    if (ryms(f, 1) < n) {
+      led = 2;
+      while (f > 0.1 && ryms(f, 2) < n) f -= 0.02;
+    }
+    const xs = pokalPlatser(f);
+    const mitt = xs.slice(1).map((x, i) => (x + xs[i]) / 2);
+    const platser = [];
+    for (const yb of hyllor) for (const x of xs) platser.push({ x, yb });
+    if (led === 2) for (const yb of hyllor) for (const x of mitt) platser.push({ x, yb: yb - POKAL.bak, bak: true });
+    return { hyllor, led, platser, k: Math.min(1, f + 0.15) };
+  }
   function shelves(trophies) {
-    // en pokal per vunnen omgång, i vinnarens färg; ett dammfritt märke där
-    // nästa ska stå
-    let cups = '';
-    let x = POKAL.x0 + 10;
-    trophies.forEach((col, i) => {
-      if (x > POKAL.x1 - 8) return;
-      cups += trophy(x, POKAL.yb, col, i);
-      x += 17 * sc(x);
-    });
-    if (x < POKAL.x1 - 8) cups += `<ellipse cx="${r1(x)}" cy="${r1(at(x, POKAL.yb) - 1)}" rx="${r1(6 * sc(x))}" ry="${r1(1.6 * sc(x))}" fill="#000" opacity=".25"/>`;
+    // en pokal per vunnen omgång, i vinnarens färg, och ett dammfritt märke där nästa ska stå; det
+    // bakre ledet ritas först, så att det främre står framför
+    const n = trophies.length;
+    const { hyllor, led, platser, k } = pokalLage(n);
+    const st = trophies.map((col, i) => (platser[i] ? { ...platser[i], col, i } : null)).filter(Boolean);
+    let cups = st.filter((p) => p.bak).concat(st.filter((p) => !p.bak)).map((p) => trophy(p.x, p.yb, p.col, p.i, k)).join('');
+    const nasta = platser[n];
+    if (nasta) cups += `<ellipse cx="${r1(nasta.x)}" cy="${r1(at(nasta.x, nasta.yb) - 1)}" rx="${r1(6 * sc(nasta.x) * k)}" ry="${r1(1.6 * sc(nasta.x) * k)}" fill="#000" opacity=".25"/>`;
     // pokalerna ligger i knappen, med ytan man klickar på, så att de lyser
     // som de andra föremålen när man pekar på dem
     const hit = (x0, x1, y0, y1, inner) => `<a ${KNAPP} data-nav="olympen" data-sak="pokal" class="rum-sak rum-pokal" aria-label="Pokalhyllan">${inner}` +
       `<polygon points="${x0},${r1(at(x0, y1))} ${x1},${r1(at(x1, y1))} ${x1},${r1(at(x1, y0))} ${x0},${r1(at(x0, y0))}" fill="#fff" opacity="0"/></a>`;
-    return shelf(POKAL.yb, POKAL.x0, POKAL.x1) +
-      // damm på hyllkanterna
-      `<polygon points="${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) - 0.6)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) - 0.8)} ${POKAL.x1},${r1(at(POKAL.x1, POKAL.yb) + 0.6)} ${POKAL.x0},${r1(at(POKAL.x0, POKAL.yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
-      hit(POKAL.x0, POKAL.x1, POKAL.yb - 36, POKAL.yb + 6, cups);
+    const { x0, x1, bak } = POKAL;
+    const yta = (yb0, yb1) => `${x0},${r1(at(x0, yb0))} ${x1},${r1(at(x1, yb0))} ${x1},${r1(at(x1, yb1))} ${x0},${r1(at(x0, yb1))}`;
+    return hyllor.map((yb) => shelf(yb, x0, x1) +
+      // damm på hyllkanten
+      `<polygon points="${x0},${r1(at(x0, yb) - 0.6)} ${x1},${r1(at(x1, yb) - 0.8)} ${x1},${r1(at(x1, yb) + 0.6)} ${x0},${r1(at(x0, yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
+      // pallen som det bakre ledet står på, med damm på kanten
+      (led === 2 ? `<polygon points="${yta(yb - bak, yb)}" fill="#2d231a"/><polygon points="${yta(yb - bak, yb - bak + 0.8)}" fill="#d9d2c0" opacity=".22"/>` : '')).join('') +
+      hit(x0, x1, Math.min(...hyllor) - (led === 2 ? bak : 0) - 36, POKAL.yb + 6, cups);
   }
 
   // ---------- lagren ----------
@@ -1483,7 +1516,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1150, 345, 110, 70])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1150, 295, 110, 120])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d rum-pl-vhs')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
