@@ -1879,28 +1879,27 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   //         i rutorna porträtten för dem som har med tecknet, som på papperet,
   //         och allas namn överst
   // Motiveringen står för hand med blyerts efter tiden, kommentaren i
-  // efterhand i bläck efter den (som pennan på papperet). Utfallet ringas in:
-  // grönt när kupongen hade det, annars rött, streckat medan matchen pågår.
+  // efterhand i bläck efter den (som pennan på papperet). Utfallet ringas in
+  // när matchen är slut: grönt när kupongen hade det, annars rött.
   // hand: kupongen i handen, där rutorna, namnen för dem du kan vara och
   // pennorna är knappar och fält – på din kupong och gängets så länge de går
   // att ändra.
-  // Minut och ställning på raden när matchen är igång: grön märkpenna bakom
-  // ställningen när kupongen har det tecknet just nu, annars röd (.lv i rum.css).
+  // Slutresultatet på raden när matchen är spelad: grön märkpenna bakom
+  // ställningen när kupongen har det tecknet, annars röd (.lv i rum.css). Medan
+  // matchen pågår står inget på kupongen – minuten och ställningen hör till tv:n.
   // Inget när resultaten är dolda (spoilerskyddet: läget är då hidden), och ingen
   // färg när ställningen inte är den som rättas (förlängning, res saknas).
-  function liveRad(g, sign) {
+  function slutRad(g, sign) {
     if (!g) return '';
     if (g.state === 'off') return `<span class="min">${esc(g.off || '')}</span>`;
-    if ((g.state !== 'live' && g.state !== 'final') || !g.score) return '';
-    const tid = g.state === 'live' ? (g.clock === 'HT' ? 'Paus' : g.clock || 'pågår') : g.extra || 'Slut';
+    if (g.state !== 'final' || !g.score) return '';
     const cls = g.res == null || !sign ? '' : sign.includes(SIGNS[g.res]) ? ' ok' : ' no';
-    return `<span class="min">${esc(tid)}</span><b class="res${cls}">${g.score.home}–${g.score.away}</b>`;
+    return `<span class="min">${esc(g.extra || 'Slut')}</span><b class="res${cls}">${g.score.home}–${g.score.away}</b>`;
   }
-  // Ringen runt utfallet: grön eller röd, streckad medan matchen pågår.
-  function ringKlass(g, sign, res) {
-    const hit = sign.includes(SIGNS[res]) ? ' ok' : ' no';
-    return g.state === 'live' ? ` live${sign ? hit : ''}` : hit;
-  }
+  // Utfallet som ringas in: bara när matchen är slut.
+  const utfall = (g) => (g && g.state === 'final' && g.res != null ? g.res : null);
+  // Ringen runt utfallet: grön eller röd.
+  const ringKlass = (sign, res) => (sign.includes(SIGNS[res]) ? ' ok' : ' no');
 
   function couponHtml(rd, rows, v = null, hand = false) {
     // omgången är spelad: bara Hasse Backes protokoll ligger på pulten (rum-block.js), tills nästa
@@ -1916,6 +1915,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const gang = (KP.data && KP.data.samtal && KP.data.samtal.gang) || [];
     const ink = v && v.vem ? Math.max(0, gang.findIndex((g) => g.id === v.vem)) : 0;
     const now = Date.now();
+    const p = v ? pult(rd) : null;
+    // spelstoppet har passerat och du har inte lämnat in: kupongen är stängd – stämpeln
+    // Spelstopp över rutorna, rutorna bleka och ingen penna
+    const stangd = Boolean(slag === 'fyll' && p && !p.open && !p.inne);
     const hans = v && (slag === 'fyll' || slag === 'din') && rd && rd.id ? hassesKryss(rd.id) : {};
     // uppgörelsen: de omtvistade matcherna, och vilka av dem som är klubbade
     // (samma som på papperet under Kupong)
@@ -1929,10 +1932,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // gängets tecken går att fylla i till en stund efter avspark (fillable)
       const edit = hand && (slag === 'gang' ? fillable(x.m, now) : !started && (slag === 'fyll' || slag === 'din'));
       const locked = hand && started && (slag === 'fyll' || slag === 'din');
-      const res = x.g && x.g.res != null ? x.g.res : null;
-      const ring = res == null ? '' : ringKlass(x.g, sign, res);
+      const res = utfall(x.g);
+      const ring = res == null ? '' : ringKlass(sign, res);
       const label = `${x.m.home} – ${x.m.away}`;
-      const lv = liveRad(x.g, sign);
+      const lv = slutRad(x.g, sign);
       // gängets kupong i handen: Svenska Spels siffror under rutorna (rader, Folket)
       const tal = hand && slag === 'gang' && v.spel;
       const talRad = tal ? v.spel.rader[x.id] : null;
@@ -1948,7 +1951,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // i handen är lagen en knapp: matchbladet läggs på kupongen (lagen, rum-matchblad.js)
       const tm = hand ? 'button' : 'span';
       const st = strid.has(x.id);
-      return `<div class="row${sign ? '' : ' tom'}${locked ? ' locked' : ''}${st ? ' strid' : ''}${st && klar.has(x.id) ? ' klubbad' : ''}${lv ? ' startad' : ''}${tal && Object.keys(v.spel.rader).length ? ' talrad' : ''}" data-id="${esc(x.id)}">` +
+      return `<div class="row${sign ? '' : ' tom'}${stangd && !lv ? ' stangd' : ''}${locked ? ' locked' : ''}${st ? ' strid' : ''}${st && klar.has(x.id) ? ' klubbad' : ''}${lv ? ' startad' : ''}${tal && Object.keys(v.spel.rader).length ? ' talrad' : ''}" data-id="${esc(x.id)}">` +
         `<span class="pp-nr">${i + 1}${st ? nrRing(x.id, klar.has(x.id)) : ''}</span>` +
         // på den smala kupongen (telefonen) de kortare namnen (short, .kort i rum.css)
         `<span class="m"><${tm} class="pp-tm"${hand ? ` type="button" data-lagen aria-label="${esc(`${label}: lagen`)}"` : ''}>` +
@@ -1960,7 +1963,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         // gängets kupong i handen: vad var och en har skrivit, under raden
         (hand && slag === 'gang' ? `<div class="kom" data-id="${esc(x.id)}">${komHtml(v, x.id)}</div>` : '');
     }).join('');
-    const p = v ? pult(rd) : null;
     const top = p ? Samtal.pult.top(hand && slag === 'fyll' && p.fyll, slag === 'las' ? v.vem : null) : null;
     const id = rd && !rd.next ? rd.id || (rd.coupon && rd.coupon.id) : null;
     // slitaget: samma papper för samma omgång och person – ditt utkast och din
@@ -1977,10 +1979,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       hd + list +
       `<span class="fot">${v ? Samtal.pult.fields(signs, slag === 'gang') : ''}${id ? Papper.code(id) : ''}</span>` +
       slitage(nyckel) +
+      (stangd && first ? `<span class="stopp">Spelstopp<small>${esc(fWeekdayTime.format(new Date(first)))}</small></span>` : '') +
       (slag === 'din' || slag === 'las' ? '<span class="stampel">Inlämnad</span>' : '') +
       // gängets kupong på pulten ligger med baksidan upp tills den vänds
       (slag === 'gang' && !hand && p && !vand(p) ? vandHtml(band + hd + list, top, slitage(nyckel, true)) : '') +
-      `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`;
+      (stangd ? '' : `<span class="pencil${slag === 'gang' || (!v && order.some((x) => x.sign)) ? ' kula' : ''}" style="${penStyle(PEN_PULT)}"><i></i></span>`);
   }
 
   // Pennan i ett fält: samma penna som på papperet under Kupong.
@@ -4835,10 +4838,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
   }
 
-  // Minuten, ställningen och ringarna, de andras kommentarer och Svenska Spels
+  // Slutresultaten och ringarna, de andras kommentarer och Svenska Spels
   // siffror byts rad för rad medan kupongen ligger i handen. Kupongen skrivs inte
   // om – kryssen, pennan och det du skriver står kvar – så man behöver inte lägga
-  // tillbaka den för att se hur det går.
+  // tillbaka den för att se hur det gick.
   function levande() {
     const k = R.kup;
     if (!k || k.closing || !k.rd) return;
@@ -4856,25 +4859,17 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (!x) continue;
       const boxes = [...row.querySelectorAll('.box')];
       const sign = SIGNS.filter((s, j) => boxes[j] && boxes[j].classList.contains('x')).join('');
-      const html = liveRad(x.g, sign);
-      const res = x.g.res != null ? x.g.res : null;
+      const html = slutRad(x.g, sign);
+      const res = utfall(x.g);
       const sig = `${html}|${res}|${sign}`;
       if (row.dataset.lv !== sig) {
-        const fore = lv.querySelector('.res');
-        const nu = fore && fore.textContent;
         lv.innerHTML = html;
         row.classList.toggle('startad', Boolean(html));
         for (const b of boxes) {
           const g = b.querySelector(':scope > .rum-ring');
           if (g) g.remove();
         }
-        if (res != null) boxes[res].querySelector('i').insertAdjacentHTML('afterend', Papper.ring(`${id}${SIGNS[res]}`, `rum-ring${ringKlass(x.g, sign, res)}`, 25));
-        const efter = lv.querySelector('.res');
-        if (nu && efter && efter.textContent !== nu && !calm()) {
-          row.classList.remove('mal');
-          void row.offsetWidth;
-          row.classList.add('mal');
-        }
+        if (res != null) boxes[res].querySelector('i').insertAdjacentHTML('afterend', Papper.ring(`${id}${SIGNS[res]}`, `rum-ring${ringKlass(sign, res)}`, 25));
         row.dataset.lv = sig;
       }
       if (!v) continue;

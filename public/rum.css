@@ -519,9 +519,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* lagnamnen i två längder (couponHtml i rum.js): de korta på den smala kupongen */
 .rum-kup .pp-tm .kort { display: none; }
 .rum-kup .row .pp-small { flex: none; margin: 0; font-size: 10px; }
-/* minut och ställning när matchen är igång (liveRad i rum.js), i stället för
-   tiden: en märkpenna bakom ställningen, grön när kupongen har tecknet just nu
-   och annars röd */
+/* slutresultatet när matchen är spelad (slutRad i rum.js), i stället för
+   tiden: en märkpenna bakom ställningen, grön när kupongen har tecknet och
+   annars röd. Medan matchen pågår står inget här */
 .rum-kup .row.startad .pp-small { display: none; }
 .rum-kup .lv { flex: none; margin-left: auto; align-self: center; display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
 .rum-kup .lv:empty { display: none; }
@@ -530,8 +530,6 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-kup .lv .res::before { content: ""; position: absolute; z-index: -1; inset: 1px -3px 0 -3px; transform: rotate(-1.6deg) skewX(-9deg); border-radius: 2px 7px 3px 8px; background: rgba(90, 70, 40, 0.16); }
 .rum-kup .lv .res.ok::before { background: linear-gradient(90deg, rgba(92, 214, 120, 0.45), rgba(88, 214, 116, 0.85) 10%, rgba(88, 214, 116, 0.72) 88%, rgba(92, 214, 120, 0.4)); }
 .rum-kup .lv .res.no::before { background: linear-gradient(90deg, rgba(255, 112, 92, 0.45), rgba(255, 106, 88, 0.85) 10%, rgba(255, 106, 88, 0.72) 88%, rgba(255, 112, 92, 0.4)); }
-.rum-kup .row.mal .lv .res { animation: rum-mal 2.2s ease-out; }
-@keyframes rum-mal { 0%, 30% { transform: scale(1.25); } 100% { transform: none; } }
 /* gängets kupong i handen: Svenska folket, oddsen eller favoritskapet under
    rutorna, en sort åt gången (flikarna överst, Folket i folket.js) */
 .rum-handen.hog { height: auto; min-height: 470px; padding-bottom: 74px; }
@@ -585,6 +583,19 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 0 0 0 1.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 0 0 0 1.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+/* spelstoppet har passerat och du har inte lämnat in (couponHtml i rum.js): en stor
+   datumstämpel över rutorna, och rutorna bleka i matcherna som inte är spelade */
+.rum-kup .row.stangd .box { opacity: 0.5; }
+.rum-kup .stopp {
+  position: absolute; right: 34px; top: 262px; padding: 9px 18px 6px; text-align: center;
+  font: 400 31px/1 var(--skriv); letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--pp-no); border: 4px solid var(--pp-no); border-radius: 10px;
+  box-shadow: inset 0 0 0 2px var(--pp-paper), inset 0 0 0 4px var(--pp-no);
+  transform: rotate(-8deg); opacity: 0.84; mix-blend-mode: multiply; pointer-events: none;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 0 0 0 1.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 0 0 0 1.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.rum-kup .stopp small { display: block; margin-top: 5px; padding-top: 4px; border-top: 2px solid var(--pp-no); font-size: 15px; letter-spacing: 0.24em; }
 /* pennan: elementet står i spetsen (rum.js, penAt) */
 .rum-kup .pencil { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-origin: 0 0; pointer-events: none; }
 .rum-kup .pencil i { position: absolute; left: 24px; top: -6px; width: 104px; height: 12px; background: linear-gradient(180deg, #f0f0ec 0 30%, #d9d7d0 30% 70%, #b8b5ac 70%); }
@@ -684,9 +695,6 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
    streckad i blyerts medan matchen pågår */
 .rum-kup .rum-ring { position: absolute; left: -7px; top: -5px; width: calc(100% + 14px); height: calc(100% + 10px); overflow: visible; fill: none; stroke: var(--pp-no); stroke-width: 2; stroke-linecap: round; pointer-events: none; }
 .rum-kup .rum-ring.ok { stroke: var(--pp-ok); }
-.rum-kup .rum-ring.live { stroke: #6f6c69; stroke-dasharray: 4 3; }
-.rum-kup .rum-ring.live.ok { stroke: var(--pp-ok); }
-.rum-kup .rum-ring.live.no { stroke: var(--pp-no); }
 
 /* ---------- kupongen i handen (rum.js, openCoupon) ---------- */
 
@@ -1074,6 +1082,7 @@ canvas.rum-svag { opacity: 0.05; }
 .rum.smal .rum-kup .fot .pp-fields { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
 .rum.smal .rum-kup .fot .pp-code { display: none; }
 .rum.smal .rum-kup .stampel { left: 180px; }
+.rum.smal .rum-kup .stopp { right: 56px; top: 474px; }
 /* baksidan i högen */
 .rum.smal .rum-bak .foto { left: 40px; top: 70px; }
 .rum.smal .rum-bak .gem { left: 94px; top: 36px; }
