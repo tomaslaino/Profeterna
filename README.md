@@ -4394,6 +4394,32 @@ kupongen, i sömnen och medan man vaknar, vid ett mål eller när man skålar me
 pågår när humöret ändras gör färdigt sitt. Samma tid ger samma bild: luckorna och valen
 räknas ur klockan, och humöret minns när det ändrades.
 
+**Mellan påhitten** (2026-11-15, "vardagen" i rum-3d.js; användarens önskemål: "fler rörelser och få
+oss att verka mer naturliga … utan att det kostar en massa grafik", också på sämre telefoner och
+datorer) sitter de som folk vid ett bord och inte som statyer som andas:
+
+- **Hållningen** (`hallning`): var och en sitter på ett sätt i 10–70 sekunder – bakåtlutad, rak
+  eller lite framåt (glad oftare bakåt, nervös och deppig framåt), ibland på ena skinkan, vriden
+  mot bordet eller med ett ben längre ut – och rättar till sig med ett litet lyft från stolen.
+  Den lediga handen flyttar med.
+- **Blickarna i samtalet** (`samtalNu`): i stunder om 2–10 sekunder tittar var och en på något:
+  medan DJ pratar oftast på honom, och han på den han pratar med; annars på varandra, ner på
+  ölen eller på radion när den spelar och står framför en. Huvudet vänds på knappt en halv
+  sekund, i vinklar, och man blinkar när blicken flyttas. Den som tittar på DJ har huvudet lite
+  på sned och nickar ibland med i hans betoningar. Med flaskan eller cigaretten vid munnen och
+  under påhitten tittar man som förut, och medan matcherna pågår mest på tv:n.
+- **Ett djupt andetag** (`suck`) ungefär varje minut, **DT knackar av askan** (`askan`) och **DL
+  och DJ snurrar ölen** på bordet (`virvel`).
+
+Bara bålen, huvudet och händerna som redan finns rör sig – inga nya delar och inga fingrar – så
+grafikkortet gör exakt samma sak som förut: 597 ritanrop och 996 404 trianglar per bild före och
+efter, med samma slump. Uträkningen tar ungefär 5 % längre (0,03–0,05 ms per bild med processorn
+fyra gånger långsammare). Inget av det i en fast bild eller med rörelserna avstängda (`calm`).
+Samtidigt vänds huvudet på knappt en halv sekund i stället för på en bild i skämtet, grälet och
+när någon pekar på tv:n (`vandBlick`, `turBlick`), och en blick rakt bakom en tonas bort i stället
+för att slå om (huvudet knyckte ett halvt varv när den som gick iväg passerade bakom en). Största
+vridningen av ett huvud mellan två bilder under tio minuter: 1,86 → 0,81 radianer.
+
 **Ansiktena följer kupongen** (2026-11-08, [public/rum-uttryck.js](public/rum-uttryck.js),
 `ansikten` i rum-3d.js och `senastAv` i rum-folk.js). Hur glada de ser ut beror på hur gängets
 senaste kupong gick, ända tills nästa är spelad. Blev det vinst (tio rätt av tretton på
