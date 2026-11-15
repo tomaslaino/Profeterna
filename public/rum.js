@@ -1476,7 +1476,10 @@ window.Rum = (() => {
       c.style.cssText = kv.style.cssText;
       kv.style.display = 'none';
       v.append(c);
+      // (värmens toning nära tv:n och med kupongen i handen syns inte, och den gick inte på grafikkortet
+      // när lagret var dolt: Chrome räknade då om alla rummets lager i varje bildruta medan kameran gled)
       a.style.visibility = 'hidden';
+      a.style.transition = 'none';
       if (d) d.style.visibility = 'hidden';
     }
     const [y0, h] = R.smal ? [-300, 1800] : [0, H];
@@ -3390,6 +3393,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // kameran började gå fram eller tillbaka. Det ritades om medan kameran
   // gick, minnet tog slut och rutor fattades (flimmer). I Chromium har
   // transformen ett perspektiv som inte syns (.chromium i rum.css).
+  // Med cls 'zoom' (tv:n) går kameran i stället vägen zoomVag.
+  const kamT = (dx, dy, z) => `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
   function aim(p, z, to, cls) {
     const w = document.getElementById('rum-kamera');
     const dx = r1(to[0] - 800 - z * (p[0] - 800));
@@ -3398,12 +3403,29 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.kamMal = { dx, dy, z };
     const borta = Boolean(dx || dy || z !== 1);
     const satt = () => {
-      // (genast: en glidning som pågår slutar också – en övergång glider vidare när det nya värdet är
-      // dess slut, och då mättes uret mitt i vägen tillbaka och kameran stannade halvvägs, sak)
-      if (!cls) for (const a of w.getAnimations()) if (a.transitionProperty === 'transform') a.cancel();
+      // (där kameran är just nu, också mitt i en glidning)
+      const vag = R.kamVag;
+      const fran = cls === 'zoom' || (cls && vag) ? kamLage(w) : null;
+      R.kamVag = null;
+      if (vag) vag.cancel();
+      // (genast, och på vägen till eller från tv:n: en glidning som pågår slutar också – en övergång glider
+      // vidare när det nya värdet är dess slut, och då mättes uret mitt i vägen tillbaka och kameran
+      // stannade halvvägs, sak)
+      if (!cls || cls === 'zoom') for (const a of w.getAnimations()) if (a.transitionProperty === 'transform') a.cancel();
       w.classList.remove('glid');
-      if (cls) w.classList.add(cls);
-      w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
+      if (cls === 'zoom') {
+        w.style.transform = kamT(dx, dy, z);
+        const a = (R.kamVag = w.animate(zoomVag(fran, { dx, dy, z }), { duration: GLID.ms, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' }));
+        a.finished.then(() => { if (R.kamVag === a) R.kamVag = null; }, () => {});
+      } else {
+        // en annan närbild medan kameran går vägen till eller från tv:n: övergången börjar där kameran är
+        if (vag && cls) {
+          w.style.transform = kamT(fran.dx, fran.dy, fran.z);
+          void getComputedStyle(w).transform;
+        }
+        if (cls) w.classList.add(cls);
+        w.style.transform = kamT(dx, dy, z);
+      }
       R.aimT = performance.now();
       kvar(borta);
     };
@@ -3412,6 +3434,37 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (cls && WEBKIT && !calm()) kvar(true);
     R.aimT = Infinity;
     sedan('kamera', satt, Boolean(cls));
+  }
+  // Kamerans förflyttning och förstoring där den är just nu (också mitt i en glidning).
+  function kamLage(w) {
+    const m = getComputedStyle(w).transform;
+    const n = /matrix(3d)?\(([^)]+)\)/.exec(m);
+    if (!n) return { dx: 0, dy: 0, z: 1 };
+    const v = n[2].split(',').map(Number);
+    return n[1] ? { dx: v[12], dy: v[13], z: v[0] } : { dx: v[4], dy: v[5], z: v[0] };
+  }
+  // Vägen till och från tv:n. Med en vanlig övergång ändras förstoringen lika
+  // mycket i varje steg: 1 → 2 är då lika långt som 4 → 5, fast bilden blir
+  // dubbelt så stor i det första och bara en fjärdedel större i det sista. Så
+  // var två tredjedelar av förstoringen fram till tv:n gjord på den första
+  // tredjedelen av tiden – gänget for förbi i förgrunden – och resten kröp fram.
+  // Här ändras förstoringen lika många procent i varje steg, och kameran går
+  // rakt mot den punkt i bilden som står still (där rummet hemma och nära
+  // sammanfaller), som när man går fram till något. Tjugofyra nyckelbilder med
+  // samma tid och kurva som förut, så att det går på grafikkortet.
+  function zoomVag(a, b) {
+    const N = 24;
+    const lz = Math.log(b.z / a.z);
+    const rak = Math.abs(a.z - b.z) < 1e-3;
+    const k = [];
+    for (let i = 0; i <= N; i++) {
+      const s = i / N;
+      const z = i === N ? b.z : a.z * Math.exp(lz * s);
+      // hur långt förflyttningen har kommit: den punkt som står still gör det hela vägen
+      const u = rak ? s : (a.z - z) / (a.z - b.z);
+      k.push({ offset: s, transform: kamT(r1(a.dx + (b.dx - a.dx) * u), r1(a.dy + (b.dy - a.dy) * u), +z.toFixed(5)) });
+    }
+    return k;
   }
 
   // En rörelse som börjar samtidigt som något nytt ska ritas: i WebKit när
@@ -3466,7 +3519,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.kvar.cancel();
       R.kvar = null;
     };
-    const g = w.getAnimations().find((a) => a.transitionProperty === 'transform');
+    const g = R.kamVag || w.getAnimations().find((a) => a.transitionProperty === 'transform');
     if (g) g.finished.then(hemma, () => {});
     else queueMicrotask(hemma);
   }
@@ -4125,6 +4178,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (var den inte nära ska inget röra sig: tv:n svängde annars runt när
     // kupongen togs i handen, och kameran väntade in vridningen)
     if (!on && R.zoom === false) return;
+    // Var fronten hamnar när tv:n har vridits fram mäts en gång, med kameran
+    // hemma och rummet rakt (matTv), innan något börjar röra sig. Förut mättes
+    // den vid varje tryck – tv:n vreds fram och tillbaka och rummet lades ut
+    // två gånger extra – och med kameran där den var: stod den inte hemma
+    // (trycket kom innan den var tillbaka från tv:n eller datorn) hamnade tv:n
+    // för liten eller snett i bilden, och från videon utanför bilden.
+    if (on && R.tv && !R.tvMatt) R.tvMatt = matTv();
     if (on && R.vnara) zoomVideo(false);
     if (on && R.reg && R.reg.on()) register(false);
     R.zoom = on;
@@ -4136,16 +4196,39 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.tx = 0;
       R.ty = 0;
       if (calm()) R.mx = R.my = 0;
-      setCam(0, 0);
     }
-    const r = R.tv && R.tv.zoom(on, rekt);
-    setCam(R.mx, R.my);
+    if (R.tv) R.tv.zoom(on);
     if (on) vrid(0, 0);
     else vridHem();
-    if (on && r) {
-      R.tvMatt = { c: centerOf(r), b: r.width / R.k, h: r.height / R.k };
-      aimTv(calm() ? null : 'glid');
-    } else aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
+    if (on && R.tvMatt) aimTv(calm() ? null : 'zoom');
+    else aim([800, 500], 1, [800, 500], calm() ? null : 'zoom');
+  }
+  // Frontens mitt och mått i scenen när tv:n är vriden fram: mätta med rummet
+  // rakt – och står planen vridna mot videon (och borta, lattVideo), raka och
+  // framme medan det mäts – och räknat utan kamerans förflyttning och förstoring.
+  function matTv() {
+    const pl = R.vnara ? [...R.el.querySelectorAll('.rum-world > .rum-pl')].filter((p) => p.dataset.bas) : [];
+    const fore = pl.map((p) => [p.style.transform, p.style.transition, p.classList.contains('bort')]);
+    for (const p of pl) {
+      p.style.transition = 'none';
+      p.style.transform = p.dataset.bas;
+      p.classList.remove('bort');
+    }
+    setCam(0, 0);
+    const r = R.tv.matt(rekt);
+    const k = kamLage(document.getElementById('rum-kamera'));
+    const [x, y] = centerOf(r);
+    setCam(R.mx, R.my);
+    if (pl.length) {
+      pl.forEach((p, i) => {
+        p.style.transform = fore[i][0];
+        p.classList.toggle('bort', fore[i][2]);
+      });
+      void getComputedStyle(pl[0]).opacity;
+      pl.forEach((p, i) => { p.style.transition = fore[i][1]; });
+    }
+    if (!r.width) return null;
+    return { c: [800 + (x - 800 - k.dx) / k.z, 500 + (y - 500 - k.dy) / k.z], b: r.width / R.k / k.z, h: r.height / R.k / k.z };
   }
   // Så nära som ryms i fönstret. I telefonen går kameran fram till bilden och
   // inte till hela lådan: med hela tv:n i bild blev en rad text-tv sju
@@ -4554,7 +4637,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // rummet efter musen, stod den annars först vid målet för den glidningen och hoppade
     const w = document.getElementById('rum-kamera');
     const cam = w.style.cssText;
-    const kamNu = w.getAnimations().some((x) => x.transitionProperty === 'transform') ? getComputedStyle(w).transform : null;
+    const kamNu = w.getAnimations().some((x) => x.transitionProperty === 'transform' || x === R.kamVag) ? getComputedStyle(w).transform : null;
     const vridNu = synlig();
     aim([800, 500], 1, [800, 500]);
     setCam(0, 0);

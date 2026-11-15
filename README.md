@@ -5994,6 +5994,54 @@ alltså lite senare än förut, men i ett färdigt rum. Inte mätt i Safari elle
 Provat och inte infört: att låta gänget börja byggas innan väggarna är bakade och datan ifylld gav 0,1 sekunder
 tidigare ljus i telefonen, men väggarna blev klara 0,6 sekunder senare.
 
+### In och ut ur tv:n (2026-11-15)
+
+Användarens önskemål: "Kan du förbättra in- och utzoomningen av TV:n så att det blir bättre, flyter bättre och bli mer
+buggfritt. Det ska funka även på sämre telefoner och datorer." Mätt först, som dator (1440 × 900, täthet 2), som svag
+dator (steg 1, `.enkel`, processorn fyra gånger långsammare) och som telefon i Chrome (412 punkter bred, täthet 2,625,
+processorn fyra gånger långsammare), med bilder mitt i glidningen och spårning av varje bildruta, och i WebKit
+(WKWebView 390 × 664, täthet 3). Det som hittades:
+
+- **Tv:n hamnade fel i bilden.** Var fronten hamnar när tv:n har vridits fram mättes vid varje tryck, med kameran där
+  den var. Stod den inte hemma blev måtten fel: T, Esc och T igen innan kameran var hemma gav tv:n för liten, ibland en
+  tredjedel av storleken ute till höger, T strax efter datorn halvt utanför bilden, och T nära videon riktade kameran långt
+  nedanför rummet (bara mörker). Nu mäts fronten en gång, med kameran hemma och rummet rakt – står planen vridna mot
+  videon rätas de medan det mäts – och måtten räknas utan kamerans förflyttning och förstoring (`matTv` i rum.js,
+  `matt` i rum-tv.js). Alla vägar dit ger samma bild, på bildpunkten.
+- **Nästan hela förstoringen i början.** Kameran gled med en vanlig övergång, där förstoringen ändras lika mycket i
+  varje steg: 1 → 2 är lika långt som 4 → 5, fast bilden blir dubbelt så stor i det första och en fjärdedel större i
+  det sista. Fram till tv:n var två tredjedelar av förstoringen gjord på den första tredjedelen av tiden – gänget for
+  förbi i förgrunden – och resten kröp fram. Nu ändras förstoringen lika många procent i varje steg, och kameran går
+  rakt mot den punkt som står still i bilden (där rummet hemma och nära sammanfaller), som när man går fram till något
+  (`zoomVag`, med samma 0,6 sekunder och kurva som förut). Vägen är en animering med tjugofyra nyckelbilder, så att den
+  går på grafikkortet, och byter man till en annan närbild mitt i går kameran vidare därifrån (`kamLage`).
+- **Alla lager omräknade i varje bildruta.** I telefonen, och i datorn från steg 1 (`.enkel`), är ljusets lager
+  ihopslagna till en bild och värmen (`.rum-warm`) dold (`ljusIhop`). Värmens toning nära tv:n gick ändå, och eftersom
+  lagret var dolt kunde den inte gå på grafikkortet: Chrome räknade om alla rummets lager i varje bildruta medan
+  kameran gled (också nära videon och med kupongen i handen). Nu tonar den inte, den syns ju inte.
+- **Arbete vid trycket.** Tv:n vreds fram och tillbaka och rummet lades ut tre gånger innan kameran började gå, också
+  på vägen tillbaka, där måtten inte behövdes. Nu räknas bara stilen om (rummet läggs ut i nästa bildruta), och tv:n
+  byter tillbaka till sin egen storlek (`.skarp` bort) först när kameran har stannat hemma och huvudtråden har en
+  stund över. Trycker man T igen innan dess är den redan skarp, och vridningen fortsätter därifrån i stället för att
+  hoppa.
+
+Mätt i headless Chrome (Apple M5), gammal och ny kod om vartannat, under glidningens 0,7 sekunder. Tappade bildrutor
+är räknade bara i körningar där datorn var lugn (andra sessioner gav ibland load 150–280):
+
+| | Före | Efter |
+|---|---|---|
+| Omräkningar av alla rummets lager per glidning, telefon | 37–38 | 2–3 |
+| Samma, svag dator | 38–39 | 3–4 |
+| Tappade bildrutor i telefonen, snitt fram / tillbaka | 0,8 / 2,3 | 0,6 / 1,4 |
+| Samma, första gången under ett besök | 10 / 16 | 12 / 10 |
+| Tv:n efter T, Esc och T igen (1440 × 813) | 402 × 270, ute till höger | 1114 × 748, som vanligt |
+| Tv:n efter T nära videon | utanför bilden | som vanligt |
+
+Omräkningarna tog 3–16 ms vardera på huvudtråden med den långsamma processorn, tid som gänget och gatan nu har.
+Tappade bildrutor är få i båda; den första gången under ett besök, när rummet ritas i närbildens skala första gången,
+kostar lika mycket som förut. I WebKit lika eller bättre (längsta bildrutan per glidning 53–129 ms mot 50–263 ms, med
+stor spridning i båda), och kameran hamnar rätt också där. Inte provat i en riktig telefon.
+
 ### När något går fel i rummet
 
 - **Matcherna går inte att hämta:** `whenMatches` väntar inte förgäves, och `load` försöker igen
@@ -6689,7 +6737,7 @@ syns och följer musen, bildrörets kåpa med luftspringor bakom och kaninörone
 en bit folie på det ena. Armen går från leden mitt bak till en väggplatta, och sladden
 hänger i en båge från armen till ett uttag under plattan; armen står still när tv:n vrids
 kring leden. Allt är förminskat mot väggen, så att tv:n inte sticker ut så långt i rummet,
-och nära går kameran fram tills fronten fyller fönstret (nedan). Rutan är lite buktig med rundade hörn, svepljus
+och nära går kameran fram tills fronten fyller fönstret (nedan; vägen dit i [In och ut ur tv:n](#in-och-ut-ur-tvn-2026-11-15)). Rutan är lite buktig med rundade hörn, svepljus
 och ett svagt ljusband som rullar nedför glaset, i en svart ram med en silverlist, och den
 lyser blått på väggen. Skenet ligger på väggen bakom tv:n (z -127 i planet, väggen är -130),
 förstorat kring scenens mitt så att det syns på samma ställe som förut; i planet låg det framför

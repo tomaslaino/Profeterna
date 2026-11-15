@@ -45,7 +45,7 @@
 // På håll bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
-// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), tittar(on), zoom(on, rekt) → rutans mått, key(k) }
+// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), tittar(on), matt(rekt) → frontens mått, zoom(on), key(k) }
 
 window.RumTv = (() => {
   const COLS = 40;
@@ -767,10 +767,23 @@ window.RumTv = (() => {
         T.tittar = Boolean(on);
         direkt();
       },
-      // Nära: tv:n vrids mot en och knapparna går att trycka på. Svarar med
-      // frontens mått i det läge den vrids till (för kameran i rum.js), mätta
-      // med rekt (rum.js rättar Safaris mått i zoom).
-      zoom(on, rekt = (e) => e.getBoundingClientRect()) {
+      // Frontens mått när tv:n är vriden fram, mätta med rekt (för kameran i
+      // rum.js, som rättar Safaris mått i zoom). Mätningen lägger ut rummet,
+      // så rum.js mäter en gång och minns måtten – precis innan tv:n tas fram,
+      // så den får sin storlek nära (.skarp) i samma utläggning.
+      matt(rekt) {
+        const nara = box.classList.contains('nara');
+        clearTimeout(T.skarp);
+        box.classList.add('mat', 'nara');
+        pos.classList.add('skarp');
+        const r = rekt(front);
+        box.classList.toggle('nara', nara);
+        void getComputedStyle(box).opacity;
+        box.classList.remove('mat');
+        return r;
+      },
+      // Nära: tv:n vrids mot en och knapparna går att trycka på.
+      zoom(on) {
         T.near = on;
         front.inert = !on;
         if (!on && T.typed) {
@@ -780,28 +793,33 @@ window.RumTv = (() => {
         // Nära ritas tv:n i tre gånger storleken (.skarp, rum-tv.css) och på
         // håll i sin egen. zoom ändrar också måtten i vridningen, så den byts
         // med övergången avstängd: innan tv:n vrids fram, och när den har
-        // vridits tillbaka.
+        // vridits tillbaka. (Stilen räknas om utan att rummet läggs ut: det
+        // görs i nästa bildruta.)
         clearTimeout(T.skarp);
-        box.classList.add('mat');
-        if (on) pos.classList.add('skarp');
-        box.classList.toggle('nara', on);
-        const r = rekt(front);
-        box.classList.toggle('nara', !on);
-        void box.offsetWidth;
-        box.classList.remove('mat');
-        void box.offsetWidth;
+        if (T.skarpVila) (window.cancelIdleCallback || clearTimeout)(T.skarpVila);
+        if (on && !pos.classList.contains('skarp')) {
+          box.classList.add('mat');
+          pos.classList.add('skarp');
+          void getComputedStyle(box).opacity;
+          box.classList.remove('mat');
+        }
         // (vrids när det nya har ritats, som kameran: sedan i rum.js)
         (o.sedan || ((k, f) => f()))('tv', () => box.classList.toggle('nara', on));
+        // Tillbaka i sin egen storlek när kameran har stannat hemma och
+        // huvudtråden har en stund över: nästa gång tv:n tas fram inom den tiden
+        // är den redan skarp, och omritningen kommer inte mitt i glidningen.
         if (!on) {
           T.skarp = setTimeout(() => {
-            if (T.near) return;
-            box.classList.add('mat');
-            pos.classList.remove('skarp');
-            void box.offsetWidth;
-            box.classList.remove('mat');
+            T.skarpVila = (window.requestIdleCallback || ((f) => setTimeout(f, 1)))(() => {
+              T.skarpVila = 0;
+              if (T.near) return;
+              box.classList.add('mat');
+              pos.classList.remove('skarp');
+              void getComputedStyle(box).opacity;
+              box.classList.remove('mat');
+            }, { timeout: 1200 });
           }, 900);
         }
-        return r;
       },
       // Tangenterna när tv:n är nära: pilarna bläddrar, tre siffror väljer sida.
       key(k) {
