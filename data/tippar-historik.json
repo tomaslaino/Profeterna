@@ -108,6 +108,32 @@
         { "id": "401861169", "match": "Nordirland – Ukraina", "avspark": "2026-11-14T19:45:00.000Z", "tips": { "DL": "1X", "DT": "X2", "DJ": "12", "HB": "1X2" }, "resultat": "1–0", "modell": [37, 32, 31] },
         { "id": "401861170", "match": "Österrike – Irland", "avspark": "2026-11-14T19:45:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "1X", "HB": "1X" }, "resultat": "1–0", "modell": [56, 26, 18] }
       ]
+    },
+    {
+      "id": "2026-11-15-v65ft4",
+      "namn": "Fotbollen har flyttat hemifrån",
+      "syftar": "Engelsmännen sjunger att fotbollen kommer hem, men nu bor den hos världs- och Europamästarna Spanien, och England får åka till Madrid och hälsa på.",
+      "datum": "2026-11-15",
+      "till": "2026-11-16",
+      "gang": [
+        { "id": "DL", "namn": "Daniel Laino" },
+        { "id": "DT", "namn": "Daniel Tejder" },
+        { "id": "DJ", "namn": "Daniel Johansson" },
+        { "id": "HB", "namn": "Hasse Backe" }
+      ],
+      "matcher": [
+        { "id": "401861171", "match": "Lettland – Armenien", "avspark": "2026-11-15T14:00:00.000Z", "tips": { "HB": "2" } },
+        { "id": "401861172", "match": "Cypern – Montenegro", "avspark": "2026-11-15T14:00:00.000Z", "tips": { "HB": "2" } },
+        { "id": "401861175", "match": "Spanien – England", "avspark": "2026-11-15T19:45:00.000Z", "tips": { "HB": "1" } },
+        { "id": "401861177", "match": "Frankrike – Turkiet", "avspark": "2026-11-15T19:45:00.000Z", "tips": { "HB": "1" } },
+        { "id": "401861178", "match": "Kroatien – Tjeckien", "avspark": "2026-11-15T19:45:00.000Z", "tips": { "HB": "1" } },
+        { "id": "401861176", "match": "Belgien – Italien", "avspark": "2026-11-15T19:45:00.000Z", "tips": { "HB": "1" } },
+        { "id": "401861181", "match": "Kazakstan – Slovakien", "avspark": "2026-11-16T15:00:00.000Z", "tips": { "HB": "2" } },
+        { "id": "401861185", "match": "Tyskland – Nederländerna", "avspark": "2026-11-16T19:45:00.000Z", "tips": { "HB": "1" } },
+        { "id": "401861188", "match": "Grekland – Serbien", "avspark": "2026-11-16T19:45:00.000Z", "tips": { "HB": "1" } },
+        { "id": "401861186", "match": "Schweiz – Skottland", "avspark": "2026-11-16T19:45:00.000Z", "tips": { "HB": "1" } },
+        { "id": "401861187", "match": "Nordmakedonien – Slovenien", "avspark": "2026-11-16T19:45:00.000Z", "tips": { "HB": "2" } }
+      ]
     }
   ]
 }
