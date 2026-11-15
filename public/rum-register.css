@@ -78,14 +78,18 @@
 .reg-term .tr.rub::after { content: ''; flex: 1; border-top: 0.09em solid var(--svag); opacity: 0.75; }
 /* korten (rum-register.js, ETK): avsnittens rubrik med ett streck efter, och
    mätaren – ett streck per tecken, fyllda (mt1) och tomma (mt0); mtv och mtd
-   är förra mötets dragkamp (ljus och svag) */
+   är förra mötets dragkamp (ljus och svag), och mtd också den sämre vilan i
+   matchaktens LÄGET, där mtm är en match (en högre ruta) */
 .reg-term .ln { background: linear-gradient(var(--svag), var(--svag)) left center / 100% 0.09em no-repeat; opacity: 0.8; }
-.reg-term .mt1, .reg-term .mt0, .reg-term .mtv, .reg-term .mtd { background-position: left center; background-size: 1ch 0.5em; background-repeat: repeat-x; }
+/* (round: ett tecken i VT323 är en bråkdel bredare än 1ch, och med repeat-x
+   skymtade en ruta till fram som ett tunt streck efter mätaren) */
+.reg-term .mt1, .reg-term .mt0, .reg-term .mtv, .reg-term .mtd, .reg-term .mtm { background-position: left center; background-size: 1ch 0.5em; background-repeat: round no-repeat; }
 .reg-term .mt1 { background-image: linear-gradient(90deg, var(--gron) 0 72%, transparent 72%); }
 .reg-term .mt0 { background-image: linear-gradient(90deg, rgba(65, 255, 110, 0.17) 0 72%, transparent 72%); }
 /* förra mötets dragkamp: det bättre lagets del ljus (mtv), det andras svag (mtd) */
 .reg-term .mtv { background-image: linear-gradient(90deg, #c9ffd7 0 72%, transparent 72%); }
 .reg-term .mtd { background-image: linear-gradient(90deg, var(--svag) 0 72%, transparent 72%); }
+.reg-term .mtm { background-image: linear-gradient(90deg, var(--gron) 0 72%, transparent 72%); background-size: 1ch 0.72em; }
 /* tangenterna längst ner, omvänt över hela bredden */
 /* Rutan med förklaringen till ett tal (fkRita i rum-register.js): dubbel
    ram med talets namn omvänt i ramen och vad det är svagt bredvid. Den

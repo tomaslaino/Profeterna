@@ -114,6 +114,8 @@ window.RumRegister = (() => {
   const MOTEN = 11;
   // cuperna i schemat (matchens fil) som på sajten; Europacuperna heter CL, EL och ECL
   const TAV = { EFL: 'Ligacupen', FAC: 'FA-cupen' };
+  // (och kortare, när namnet inte ryms i matchaktens spalt; annars förkortningen)
+  const TAVK = { VSK: 'Vänskap', ECL: 'Conference' };
   // flest träffar i en lista
   const LISTA = 20;
   // så många rader skrivs en och en; resten av en lång lista kommer på en gång
@@ -856,15 +858,17 @@ window.RumRegister = (() => {
       return { liga: g.liga, grupp: g.id, lag: [lagI(m.home), lagI(m.away)], andra };
     }
 
-    // dagar till lagets nästa match efter den här, med cupen när det inte är ligan
-    function nastaOf(m, side) {
-      const d = A.match.get(m.id);
-      const nx = d && d.teams && d.teams[side] && d.teams[side].schedule && d.teams[side].schedule.next;
-      if (!nx || nx.days == null) return '–';
+    // tävlingen för lagets förra eller nästa match (x, ur schemat i matchens
+    // fil) när den inte är lagets egen – för ett landslag när den inte är
+    // matchens: 'CHAMPIONS LEAGUE', 'FA-CUPEN', 'VÄNSKAPSLANDSKAMP', och
+    // förkortad när den inte ryms på bred tecken ('CL', 'VÄNSKAP')
+    function tavlingOf(m, side, x, bred) {
+      if (!x || !x.comp) return '';
       const t = lagOf(m[side]);
-      // (för ett landslag: tävlingen när den inte är matchens)
       const egen = t ? up(t.comp) : isLand(m.comp) ? up(m.comp) : null;
-      return `${nx.days} D${nx.comp && nx.comp !== egen ? ` ${up(TAV[nx.comp] || nx.comp)}` : ''}`;
+      if (x.comp === egen) return '';
+      const hel = up(TAV[x.comp] || x.compName || x.comp);
+      return hel.length <= bred ? hel : up(TAVK[x.comp] || TAV[x.comp] || x.comp);
     }
     // lagets bäste skytt (spelarfilen) och hans rad i registret
     function skytten(t) {
@@ -1150,15 +1154,44 @@ window.RumRegister = (() => {
       ];
 
       // LÄGET: vilan, nästa match och matcherna de senaste veckorna
-      // (matchsidans Schemat, med Europacuperna), skadorna och domaren
+      // (matchsidans Schemat, med Europacuperna), skadorna och domaren.
+      // Sedan 2026-11-15 (användarens val bland fyra skisser: Klartext,
+      // Tidslinjen, Mätarna och Stora siffror) med en mätare efter talet,
+      // som i lagkorten: VILAN och NÄSTA i samma skala, full vid två veckor
+      // (en ruta per dag, i telefonen per två dagar), och MATCHER en ruta per
+      // match. Den bättre vilan lyser med sin mätare och den sämre är svag.
+      // Under VILAN och NÄSTA står tävlingen svagt när den inte är lagets
+      // egen (Europacuperna, de engelska cuperna, en vänskapslandskamp), och
+      // under MATCHER hur många dagar det gäller.
       const vila = sid.map((s) => vilaOf(m, s));
       const sch = sid.map((s) => (d && d.teams && d.teams[s] && d.teams[s].schedule) || null);
       const dgr = (sch[0] || sch[1] || {}).windowDays;
+      const MATN = Math.min(14, K - 6);
+      // talet (högerställt), mätaren och luft fram till nästa lag; b är laget med den bättre vilan
+      const matRad = (etikett, v, b, q) => rad([etikett, 'd', q], [pad('', L - etikett.length)], ...v.flatMap((x, j) => {
+        const t = x == null ? '–' : `${x} D`;
+        const f = x == null ? 0 : Math.min(MATN, Math.round((x * MATN) / 14));
+        const sv = b >= 0 && j !== b;
+        const bitar = [[padL(t, 4), b < 0 ? '' : sv ? 'd' : 'v'], [' ', ''], [' '.repeat(f), sv ? 'mtd' : 'mt1'], [' '.repeat(MATN - f), 'mt0']];
+        return j ? bitar : [...bitar, [pad('', Math.max(1, K - Math.max(4, t.length) - 1 - MATN))]];
+      }));
+      // en svag rad under lagens tal (bara när något av lagen har en text)
+      const under = (v) => (v.some(Boolean) ? rad([pad('', L)], ...v.flatMap((x, j) => [[x, 'd'], ...(j ? [] : [[pad('', Math.max(1, K - x.length))]])])) : null);
+      const tav = (k) => under(sid.map((s, j) => tavlingOf(m, s, sch[j] && sch[j][k], K - 1)));
       const laget = [
-        raden('VILAN', vila.map((x) => (x == null ? '–' : `${x} D`)), bast(vila, SKILJER.vila), null, ordQ('vila')),
-        raden('NÄSTA', sid.map((s) => nastaOf(m, s)), -1, null, ordQ('nasta')),
-        dgr && sch.some((x) => x && x.recent != null) ? raden(`MATCHER ${dgr} D`, sch.map((x) => (x && x.recent != null ? `${x.recent}${x.recentEurope ? ` (${x.recentEurope} EUROPA)` : ''}` : '–')), -1, null, ordQ('matcher')) : null,
+        matRad('VILAN', vila, bast(vila, SKILJER.vila), ordQ('vila')),
+        tav('last'),
+        matRad('NÄSTA', sch.map((x) => (x && x.next && x.next.days != null ? x.next.days : null)), -1, ordQ('nasta')),
+        tav('next'),
       ];
+      if (dgr && sch.some((x) => x && x.recent != null)) {
+        laget.push(rad(['MATCHER', 'd', ordQ('matcher')], [pad('', L - 7)], ...sch.flatMap((x, j) => {
+          const n = x && x.recent != null ? x.recent : null;
+          const bitar = [[padL(n == null ? '–' : String(n), 4), ''], [' ', ''], [' '.repeat(n || 0), 'mtm']];
+          return j ? bitar : [...bitar, [pad('', Math.max(1, K - 5 - (n || 0)))]];
+        })));
+        laget.push(under([0, 1].map(() => `SENASTE ${dgr} D`)));
+      }
       const sk = sid.map((s) => skadorOf(m, s));
       if (sk.some(Boolean)) {
         laget.push(tom(), rad(['SKADORNA', 'd', ordQ('skador')]));

@@ -7200,6 +7200,23 @@ och Nations League (`s365_stats_<division>`, [src/fetchers/s365stats.js](src/fet
 en match som sparades innan de kom med hämtas om en gång. Gula kort och bollinnehav hjälper
 inte direkt att välja 1, X eller 2, men gänget bad om dem till förra mötet.
 
+#### Läget med mätare
+
+2026-11-15 frågade användaren hur fliken LÄGET i matchakten kunde visas bättre och valde *Mätarna*
+bland fyra skisser i den riktiga närbilden (*Klartext*, *Tidslinjen*, *Mätarna* och *Stora
+siffror*, på Spanien–England och Brighton–Newcastle, på datorn och i telefonen). Efter VILAN och
+NÄSTA står en mätare som i lagkorten, i samma skala: full vid två veckor, en ruta per dag (i
+telefonen per två dagar). MATCHER har en ruta per match och *SENASTE 14 D* svagt under – förut
+stod dagarna i etiketten, *MATCHER 14 D*, som gick ihop med talet. Den bättre vilan lyser med sin
+mätare och den sämre är svag (`SKILJER.vila`, som förut). Under VILAN och NÄSTA står tävlingen
+svagt när den inte är lagets egen (*CONFERENCE LEAGUE*, *VÄNSKAPSLANDSKAMP*; i telefonen
+*CONFERENCE* och *VÄNSKAP*, `tavlingOf` och `TAVK`) i stället för förkortningen efter dagarna
+(*13 D VSK*). Europacupen räknas inte längre för sig efter matcherna (*2 (1 EUROPA)*): att förra
+matchen var i Europa står under VILAN. Mätarnas rutor går nu jämnt upp i bredden
+(`background-repeat: round` i [public/rum-register.css](public/rum-register.css)): ett tecken i
+VT323 är en bråkdel bredare än `1ch`, och en ruta till skymtade fram som ett tunt streck efter
+mätarna, också i lagkorten.
+
 #### Vad som står var
 
 Statistiken om omgången är fördelad efter vad varje sak är bra på, och varje siffra står på
