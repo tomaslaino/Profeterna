@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T15:16:27.300Z",
+ "uppdaterad": "2026-11-15T19:48:34.736Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2862,6 +2862,99 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 2
+  },
+  {
+   "id": "401861185",
+   "match": "Tyskland – Nederländerna",
+   "avspark": "2026-11-16T19:45Z",
+   "writtenAt": "2026-11-15T19:48:02.983Z",
+   "text": "Klopp tar emot Xavi med degradering i bakhuvudet\n\nJürgen Klopp och Xavi möts som förbundskaptener i Berlin på måndag kväll. Nederländerna toppar gruppen och klarar sig på en poäng utan Frenkie de Jong och Virgil van Dijk. Tyskland ligger trea, och trean riskerar kval om att hålla sig kvar.\n\nTvå tränare som var kändare i klubblag än i landslag står på var sin sida i Olympiastadion. Klopp tränar Tyskland och har redan delat ut poängen mot Xavi en gång. Det slutade 1–1 i Amsterdam i slutet av september, enligt Mee met Oranje [1]. Xavi är artig inför returen och kallar sin motståndare ”en av de bästa tränarna de senaste åren” [1]. Klopp säger torrt att holländarna vill ”spela Xavi-fotboll” [2]. Det ser du redan på uppvärmningen, där de passar i trianglar tills någon blir yr.\n\nLäget är enkelt. Nederländerna har 11 poäng och Tyskland och Grekland har 8 var. Bara de två bästa går till kvartsfinal, och trean hamnar i kval mot nedflyttning, enligt ran [2]. Klopp vill inte ägna sig åt dystra tankar och säger att vägen betyder mer än resultatet [2]. Alla hans spelare är friska. Han vet redan om Gruda ska starta men säger det inte, och Kai Havertz bär kaptensbindeln och tar diskussionen om sin roll som nia med ro [2].\n\nHos holländarna är frånvarolistan längre. De Jong stannade hemma av försiktighet efter 7–0 mot Grekland, och Xavi säger att skadan är ”mycket liten, men han kan inte spela i morgon” [1]. Teun Koopmeiners väntas ta hans plats. Van Dijk och Brian Brobbey saknas också, och ingen ersättare har kallats in, så truppen består av 23 spelare [1, 3]. Cody Gakpo flyttas ut till vänsterkanten [1]. Så gjorde vi i Tjäderfors också, och där regnade det in.\n\nTipset: 1X (tvåan strykes lugnt)\n\nSpelbolagen ger Tyskland ungefär varannan chans till seger och lägger oavgjort och bortaseger ungefär jämnt. Det jag har läst talar för hemmalaget. Klopp har hela truppen frisk [1], medan Nederländerna saknar De Jong, Van Dijk och Brobbey [2]. Samtidigt räcker en poäng för holländarna [2], och ett lag som nöjer sig med en poäng ställer sig gärna lågt. Jag ringar in etta och kryss och stryker tvåan. Bollen har aldrig läst en tabell, men den brukar märka när mittlåset saknas.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Klopp tar emot Xavi med degradering i bakhuvudet",
+   "lead": "Jürgen Klopp och Xavi möts som förbundskaptener i Berlin på måndag kväll. Nederländerna toppar gruppen och klarar sig på en poäng utan Frenkie de Jong och Virgil van Dijk. Tyskland ligger trea, och trean riskerar kval om att hålla sig kvar.",
+   "paragraphs": [
+    "Två tränare som var kändare i klubblag än i landslag står på var sin sida i Olympiastadion. Klopp tränar Tyskland och har redan delat ut poängen mot Xavi en gång. Det slutade 1–1 i Amsterdam i slutet av september, enligt Mee met Oranje [1]. Xavi är artig inför returen och kallar sin motståndare ”en av de bästa tränarna de senaste åren” [1]. Klopp säger torrt att holländarna vill ”spela Xavi-fotboll” [2]. Det ser du redan på uppvärmningen, där de passar i trianglar tills någon blir yr.",
+    "Läget är enkelt. Nederländerna har 11 poäng och Tyskland och Grekland har 8 var. Bara de två bästa går till kvartsfinal, och trean hamnar i kval mot nedflyttning, enligt ran [2]. Klopp vill inte ägna sig åt dystra tankar och säger att vägen betyder mer än resultatet [2]. Alla hans spelare är friska. Han vet redan om Gruda ska starta men säger det inte, och Kai Havertz bär kaptensbindeln och tar diskussionen om sin roll som nia med ro [2].",
+    "Hos holländarna är frånvarolistan längre. De Jong stannade hemma av försiktighet efter 7–0 mot Grekland, och Xavi säger att skadan är ”mycket liten, men han kan inte spela i morgon” [1]. Teun Koopmeiners väntas ta hans plats. Van Dijk och Brian Brobbey saknas också, och ingen ersättare har kallats in, så truppen består av 23 spelare [1, 3]. Cody Gakpo flyttas ut till vänsterkanten [1]. Så gjorde vi i Tjäderfors också, och där regnade det in."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Mee met Oranje",
+     "title": "Xavi onthult band met Barcelona rond Frenkie: 'Een van mijn beste vrienden'",
+     "url": "https://www.meemetoranje.nl/nederlands-elftal/nieuws/frenkie-de-jong-blessure-oranje-xavi-barcelona-duitsland/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "ran",
+     "title": "DFB-Team: Jürgen Klopp spricht über Grudas Einsatzchancen und lobt Havertz - Pressekonferenz vor Niederlande-Spiel zum Nachlesen",
+     "url": "https://ran.joyn.de/sports/fussball/nations-league-a/dfb-team-juergen-klopp-spricht-ueber-grudas-einsatzchancen-und-lobt-havertz-pressekonferenz-vor-niederlande-spiel-zum-nachlesen-217295",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "NOS",
+     "title": "Niet-fitte De Jong mist Nations League-duel Oranje met Duitsland",
+     "url": "https://nos.nl/artikel/2639482-niet-fitte-de-jong-mist-nations-league-duel-oranje-met-duitsland",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger Tyskland ungefär varannan chans till seger och lägger oavgjort och bortaseger ungefär jämnt. Det jag har läst talar för hemmalaget. Klopp har hela truppen frisk [1], medan Nederländerna saknar De Jong, Van Dijk och Brobbey [2]. Samtidigt räcker en poäng för holländarna [2], och ett lag som nöjer sig med en poäng ställer sig gärna lågt. Jag ringar in etta och kryss och stryker tvåan. Bollen har aldrig läst en tabell, men den brukar märka när mittlåset saknas.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "tvåan strykes lugnt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "ran",
+      "title": "DFB-Team: Jürgen Klopp spricht über Grudas Einsatzchancen und lobt Havertz - Pressekonferenz vor Niederlande-Spiel zum Nachlesen",
+      "url": "https://ran.joyn.de/sports/fussball/nations-league-a/dfb-team-juergen-klopp-spricht-ueber-grudas-einsatzchancen-und-lobt-havertz-pressekonferenz-vor-niederlande-spiel-zum-nachlesen-217295",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Mee met Oranje",
+      "title": "Xavi onthult band met Barcelona rond Frenkie: 'Een van mijn beste vrienden'",
+      "url": "https://www.meemetoranje.nl/nederlands-elftal/nieuws/frenkie-de-jong-blessure-oranje-xavi-barcelona-duitsland/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T19:48:02.983Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Xavi har bara 23 man i samlingen. Han saknar både Frenkie de Jong på mittfältet och Virgil van Dijk i mittförsvaret, och han har inte kallat in någon ersättare. Klopp har däremot alla spelare friska, och det är ren orsak och verkan.",
+     "Holländarna toppar gruppen och klarar sig på en poäng. Ett lag som räknar på det backar hem och försöker hålla undan. Utan Van Dijk i mitten håller det inte i nittio minuter mot ett tyskt landslag som inte vill hamna i nedflyttningskval.",
+     "Jag stryker både krysset och tvåan och ringar bara in ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-15T19:48:02.983Z",
+    "uppdrag": {
+     "fraser": [
+      "Äsch",
+      "Orsak och verkan"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T19:48:27.995Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
   }
  ]
 }
