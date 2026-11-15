@@ -354,27 +354,32 @@ window.RumHasse = (() => {
     H.vaggNr = (H.vaggNr || 0) + 1;
     passa();
   }
-  // Trafiken på S:t Eriksbron (gangare och fordon i rum-hasse-ute.js): de som går på gångbanan närmast, bilarna i
-  // båda filerna och bussarna, blåa 4:an och röda 3:an eller 77:an, lika mycket som på gatan i rummet vid samma tid
-  // (RumUte.trafik: rusning vardagsmorgnar och -eftermiddagar, lugnare på kvällen och helgmorgnar, lite på natten)
-  // och bussarna ungefär så ofta som de går (broTakt). Var och en ritas en gång till en egen bild, och sedan läggs
-  // de alla i en duk som bara täcker bandet där bron går (.rh-trafik i .rh-bron, broRita), i hans takt när han ritas
-  // (loop): som allt i rummet som rör sig hela tiden ritas i gängets takt. Som animeringar på grafikkortet (prövat
-  // först) räknades de om var för sig i varje skärmbild, och skärmen ritades om 60 gånger i sekunden fast han
-  // bara ritas 15–30 gånger när han sitter still. Duken klipps efter rutorna, så att trafiken syns bara genom
+  // Trafiken på S:t Eriksbron (gangare, cyklist och fordon i rum-hasse-ute.js): de som går på gångbanan närmast, de
+  // som cyklar i cykelbanorna på båda sidor, bilarna i båda filerna och bussarna, blåa 4:an och röda 3:an eller
+  // 77:an, lika mycket som på gatan i rummet vid samma tid (RumUte.trafik: rusning vardagsmorgnar och
+  // -eftermiddagar, lugnare på kvällen och helgmorgnar, lite på natten, cyklisterna inte i snön eller i ösregn och
+  // flest på sommaren) och bussarna ungefär så ofta som de går (broTakt). Var och en ritas en gång till en egen
+  // bild, och sedan läggs de alla i en duk som bara täcker bandet där bron går (.rh-trafik i .rh-bron, broRita), i
+  // hans takt när han ritas (loop): som allt i rummet som rör sig hela tiden ritas i gängets takt. Som animeringar
+  // på grafikkortet (prövat först) räknades de om var för sig i varje skärmbild, och skärmen ritades om 60 gånger i
+  // sekunden fast han bara ritas 15–30 gånger när han sitter still. Duken klipps efter rutorna, så att trafiken syns bara genom
   // glaset och går bakom posterna och honom. När man kommer är trafiken redan i gång: det som har hunnit en bit ut
   // på bron står där det har hunnit (bronGa räknar fram från en minut tillbaka). Alla i en fil åker lika fort och
   // håller avstånd, så att ingen kör igenom någon annan, och högst BRO_MAX är ute på en gång (färre på rummets
   // lägre steg). Ingen trafik när man har bett om minskad rörelse eller i en fast bild (?rum-t).
-  const BRO_MAX = { ga: [4, 4, 3, 2], fil: [5, 4, 3, 2] };
-  const STROMMAR = ['ga', 'b0', 'b1', 'f0', 'f1', 't0', 't1'];
-  // hur ofta något kommer: de som går och bilarna (s, i medeltal), bussarna i var riktning (min mellan turerna)
+  const BRO_MAX = { ga: [4, 4, 3, 2], fil: [5, 4, 3, 2], cykel: [4, 3, 3, 2] };
+  const STROMMAR = ['ga', 'b0', 'b1', 'f0', 'f1', 't0', 't1', 'c2', 'c3'];
+  // hur ofta något kommer: de som går, bilarna och cyklisterna (s, i medeltal), bussarna i var riktning (min mellan
+  // turerna)
   function broTakt(T) {
     const h = T.h;
     return {
       // (hälften så många som på gatan, där var och en går fram och tillbaka på ungefär 90 s)
       ga: 180 / Math.max(1, T.gaende),
       bil: (T.varv[0] + T.varv[1]) / 2 / T.bilar,
+      // (i var riktning: flest när man cyklar till och från jobbet, då en var tionde sekund på sommaren, färre på
+      // helgen, ännu färre på kvällen och tidigt på morgonen, och färre på vintern)
+      cykel: !T.cyklar ? 0 : (T.rusning ? 30 : T.dag ? (T.helg ? 60 : 75) : 150) / T.cyklar,
       // (4:an är stombussen med flest resenärer: var 5:e minut i rusningen, var 6:e på dagen)
       fyra: !T.bussar ? 0 : T.helg ? (h < 9 || h >= 20 ? 12 : 8) : T.rusning ? 5 : h < 19 ? 6 : 10,
       tre: !T.bussar ? 0 : T.helg ? 15 : T.rusning ? 8 : h < 19 ? 10 : 15,
@@ -384,19 +389,23 @@ window.RumHasse = (() => {
     const u = uteNu();
     if (!u) return null;
     const T = RumUte.trafik ? RumUte.trafik.nu(u.v)
-      : { h: u.v.timme, helg: false, rusning: false, natt: u.v.timme < 5, bilar: 1, varv: [42, 52], gaende: 4, bussar: u.v.timme > 5 };
+      : { h: u.v.timme, helg: false, rusning: false, natt: u.v.timme < 5, bilar: 1, varv: [42, 52], gaende: 4, cyklar: 0, bussar: u.v.timme > 5 };
     return { ...u, T, takt: broTakt(T) };
   }
-  // tills nästa (s): de som går och bilarna när som helst (i medeltal takt), bussarna ungefär efter tidtabellen
+  // tills nästa (s): de som går, bilarna och cyklisterna när som helst (i medeltal takt), bussarna ungefär efter
+  // tidtabellen
   function broIntervall(k, takt) {
     const ex = (m) => -Math.log(1 - Math.random()) * m;
     if (k === 'ga') return Math.max(4, ex(takt.ga));
     if (k[0] === 'b') return Math.max(1.6, ex(takt.bil));
+    if (k[0] === 'c') return takt.cykel ? Math.max(2.5, ex(takt.cykel)) : 120;
     const m = (k[0] === 'f' ? takt.fyra : takt.tre) * 60;
     return m ? m * (0.75 + Math.random() * 0.5) : 300;
   }
   // filens fart (m/s): lugnare i rusningen, fortare på natten
   const broFart = (T) => (T.natt ? 47 : T.rusning ? 33 : 41) / 3.6 * (0.93 + Math.random() * 0.14);
+  // cykelbanans: 17–24 km/h
+  const broCykelFart = () => (17 + Math.random() * 7) / 3.6;
   function bronSnart(forst = false) {
     clearTimeout(H.bronT);
     if (!H.on || calm() || /[?&]rum-t\b/.test(location.search)) return;
@@ -409,8 +418,8 @@ window.RumHasse = (() => {
       const t0 = nu - 60000;
       B.nasta = {};
       for (const k of STROMMAR) B.nasta[k] = t0 + broIntervall(k, n.takt) * (k[0] === 'f' || k[0] === 't' ? Math.random() : 1) * 1000;
-      B.fri = [0, 0];
-      B.fart = [broFart(n.T), broFart(n.T)];
+      B.fri = [0, 0, 0, 0];
+      B.fart = [broFart(n.T), broFart(n.T), broCykelFart(), broCykelFart()];
       B.geo = null;
     }
     bronGa();
@@ -434,12 +443,12 @@ window.RumHasse = (() => {
       const fil = k === 'ga' ? -1 : +k[1];
       // (i filen håller man avstånd till den framför)
       if (fil >= 0 && t < B.fri[fil]) { B.nasta[k] = B.fri[fil] + 100; continue; }
-      const tom = (k[0] === 'f' && !n.takt.fyra) || (k[0] === 't' && !n.takt.tre);
+      const tom = (k[0] === 'f' && !n.takt.fyra) || (k[0] === 't' && !n.takt.tre) || (k[0] === 'c' && !n.takt.cykel);
       if (!tom) {
         const kom = broKom(k, n, (nu - t) / 1000);
         // (fullt: försök igen om en stund)
         if (!kom) { B.nasta[k] = t + 2000; continue; }
-        if (fil >= 0) B.fri[fil] = t + ((kom.meter + 8) / B.fart[fil]) * 1000;
+        if (fil >= 0) B.fri[fil] = t + ((kom.meter + (k[0] === 'c' ? 3 : 8)) / B.fart[fil]) * 1000;
       }
       B.nasta[k] = t + broIntervall(k, n.takt) * 1000;
     }
@@ -463,15 +472,20 @@ window.RumHasse = (() => {
       return { meter: 0 };
     }
     const fil = +k[1];
-    const buss = k[0] !== 'b';
-    const meter = k[0] === 'f' ? 18.1 : k[0] === 't' ? 12.1 : 4.8;
-    if (forbi > 40 || !H.ute.fordon || !RumUte.trafik) return { meter };
+    const cykel = k[0] === 'c';
+    const buss = k[0] === 'f' || k[0] === 't';
+    const meter = k[0] === 'f' ? 18.1 : k[0] === 't' ? 12.1 : cykel ? 1.75 : 4.8;
+    if (forbi > (cykel ? 60 : 40) || !(cykel ? H.ute.cyklist : H.ute.fordon) || !RumUte.trafik) return { meter };
     const ifil = aktiva.filter((x) => x.fil === fil);
-    if (ifil.length >= BRO_MAX.fil[steg()]) return null;
+    if (ifil.length >= (cykel ? BRO_MAX.cykel : BRO_MAX.fil)[steg()]) return null;
     // (en tom fil får nytt tempo efter klockan)
-    if (!ifil.length) B.fart[fil] = broFart(n.T);
-    const a = !buss ? RumUte.trafik.bil(Math.random, n.T.natt) : k[0] === 'f' ? { kind: 'ledbuss', c: '#2468b8', nr: '4' } : { kind: 'buss', c: '#c0262a', nr: Math.random() < 0.5 ? '3' : '77' };
-    const g = H.ute.fordon(n.v, n.L, lage, a, fil);
+    if (!ifil.length) B.fart[fil] = cykel ? broCykelFart() : broFart(n.T);
+    let g;
+    if (cykel) g = H.ute.cyklist(n.v, n.L, lage, fil);
+    else {
+      const a = !buss ? RumUte.trafik.bil(Math.random, n.T.natt) : k[0] === 'f' ? { kind: 'ledbuss', c: '#2468b8', nr: '4' } : { kind: 'buss', c: '#c0262a', nr: Math.random() < 0.5 ? '3' : '77' };
+      g = H.ute.fordon(n.v, n.L, lage, a, fil);
+    }
     const sek = g.vag / B.fart[fil];
     if (forbi < sek) B.aktiva.push({ k, fil, g, lage, t0: nu - forbi * 1000, sek });
     return { meter: g.meter };
@@ -510,7 +524,8 @@ window.RumHasse = (() => {
     }
     H.broDuk = { el, x: el.getContext('2d'), res, X0, Y0, tx, ty, f, klipp, tom: false };
   }
-  // Trafiken som den står vid ms: de bortre först, och i varje fil det som är längst bort först
+  // Trafiken som den står vid ms: de bortre filerna först (FIL: lag), och i varje fil det som är längst bort först.
+  // Cyklisterna trampar (två bilder om vartannat), och deras bilder står i kors, så att den tvärs över ritas först.
   function broRita(ms) {
     const D = H.broDuk;
     if (!D) return;
@@ -534,20 +549,23 @@ window.RumHasse = (() => {
     const ordning = [];
     for (const y of levande) {
       const p = Math.min(1, Math.max(0, (ms - y.t0) / (y.sek * 1000)));
-      if (y.k === 'ga') ordning.push({ y, p, z: 3e6 });
+      if (y.k === 'ga') ordning.push({ y, p, z: 9e6 });
       else {
         const q = y.g.vid(p);
-        ordning.push({ y, p, q, z: (H.ute.FIL[y.fil].bort ? 1e6 : 2e6) + (H.ute.FIL[y.fil].bort ? 1 - p : p) * 1e5 });
+        const fil = H.ute.FIL[y.fil];
+        ordning.push({ y, p, q, z: (fil.lag + 1) * 1e6 + (fil.bort ? 1 - p : p) * 1e5 });
       }
     }
     ordning.sort((a, b2) => a.z - b2.z);
     for (const { y, p, q } of ordning) {
       if (q) {
+        const g = y.g;
+        const andra = g.tramp && Math.floor((ms - y.t0) / g.tramp) % 2;
         x.globalAlpha = q.op;
+        if (g.kors) { lagg(q.ande); x.drawImage(andra ? g.ande2 : g.ande, 0, 0); }
         lagg(q.sida);
-        x.drawImage(y.g.sida, 0, 0);
-        lagg(q.ande);
-        x.drawImage(y.g.ande, 0, 0);
+        x.drawImage(andra ? g.sida2 : g.sida, 0, 0);
+        if (!g.kors) { lagg(q.ande); x.drawImage(g.ande, 0, 0); }
         continue;
       }
       // den som går: vägen i 20 steg, de två stegen i figuren om vartannat, tonas fram och bort i första och sista steget

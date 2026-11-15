@@ -269,7 +269,9 @@ window.RumUte = (() => {
     let gaende = h < 1 ? 3 : h < 5 ? (ut ? 3 : 1) : h < 7 ? (helg ? 1 : 3) : helg && h < 9.5 ? 4 : h < 22 ? 7 : 4;
     if (v.fall && v.mangd > 0.75) gaende = Math.max(1, gaende - 3);
     if (v.kanns < -12) gaende = Math.max(1, gaende - 2);
-    return { h, helg, rusning, natt, bilar, varv, gaende, bussar: h > 5.5 };
+    // på cykel: inte i snön eller i ösregn, fler på sommaren (1–3, 0 = ingen)
+    const cyklar = !v.snotackt && !(v.fall && v.mangd > 0.6) && h > 6 && h < 23.5 ? (v.arstid === 'vinter' ? 1 : v.arstid === 'sommar' ? 3 : 2) : 0;
+    return { h, helg, rusning, natt, dag, bilar, varv, gaende, cyklar, bussar: h > 5.5 };
   }
 
   // Ett fönster (w × h) i hörnhuset: glaset speglar himlen på dagen och är tänt efter klockan
@@ -699,10 +701,9 @@ window.RumUte = (() => {
       walk(inner, { y: 405 + R() * 6, dir: R() < 0.5 ? 1 : -1, speed, pause: 15 + R() * 70, steg: r1(0.75 + R() * 0.25), cls: kind, w: kind === "pulka" ? 42 : 30 });
     }
 
-    // på cykel (inte i snön eller i ösregn)
-    if (!v.snotackt && !(v.fall && v.mangd > 0.6) && h > 6 && h < 23.5) {
-      const nc = v.arstid === 'vinter' ? 1 : v.arstid === 'sommar' ? 3 : 2;
-      for (let i = 0; i < nc; i++) {
+    // på cykel (trafik: inte i snön eller i ösregn)
+    if (T.cyklar) {
+      for (let i = 0; i < T.cyklar; i++) {
         const c = pick(R, cs);
         const sk = pick(R, skins);
         const bike = `${wheel(-9, -6, 6, L)}${wheel(10, -6, 6, L)}<path d="M-9 -6 L-1 -6 L-4 -16 M-1 -6 L7 -16 L-4 -16 M7 -16 L10 -6 M7 -16 L8 -20" fill="none" stroke="${tone('#3a3a3a', L)}" stroke-width="1.2"/>`;
