@@ -2915,7 +2915,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     KVAL[1].skugga = 3;
     KVAL[1].damm = false;
   }
-  const KVAL_NYCKEL = 'rum-kval2';
+  // (3: 2026-11-15 gjorde gatans oskärpa bildrutan så dyr i datorn att rummet kunde gå ner ett steg i onödan,
+  // och steget sparades i tre dagar; med en ny nyckel börjar alla om)
+  const KVAL_NYCKEL = 'rum-kval3';
   // Där rummet börjar, efter vad enheten säger om sig själv: kommer rummet upp på
   // ett för högt steg byggs gänget om för varje steg ner, och det är det som hackar
   // mest. (Safari säger ingenting, där får kanna känna efter.)

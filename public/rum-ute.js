@@ -1025,16 +1025,18 @@ window.RumUte = (() => {
     return N;
   }
 
-  // en delad duk där figuren ritas skarp innan oskärpan läggs på
-  let KLADD = null;
-  function kladd(w, h) {
-    if (!KLADD) KLADD = document.createElement('canvas').getContext('2d');
-    const c = KLADD.canvas;
+  // en delad duk där figuren ritas skarp innan oskärpan läggs på (cpu: för figurerna i gatans duk, vars
+  // ark är i processorn: en kladd på grafikkortet hade lästs tillbaka därifrån för varje figur)
+  const KLADD = [null, null];
+  function kladd(w, h, cpu = false) {
+    const i = cpu ? 1 : 0;
+    if (!KLADD[i]) KLADD[i] = document.createElement('canvas').getContext('2d', cpu ? { willReadFrequently: true } : undefined);
+    const c = KLADD[i].canvas;
     if (c.width < w || c.height < h) {
       c.width = Math.max(c.width, w);
       c.height = Math.max(c.height, h);
     }
-    return KLADD;
+    return KLADD[i];
   }
 
   // figurens delar i duken g, med figurens läge och skala i bas
@@ -1077,7 +1079,7 @@ window.RumUte = (() => {
   // (i gatans duk är figurens bild en ruta i ett gemensamt ark, med hörnet i ax, ay; en
   // suddig figur ritas skarp i kladden och läggs sedan i sin ruta med oskärpan)
   function rita(f, t) {
-    const g = f.bakad ? kladd(f.bw, f.bh) : f.x;
+    const g = f.bakad ? kladd(f.bw, f.bh, f.delad) : f.x;
     const ax = f.bakad ? 0 : f.ax || 0;
     const ay = f.bakad ? 0 : f.ay || 0;
     g.setTransform(1, 0, 0, 1, 0, 0);
@@ -1287,6 +1289,11 @@ window.RumUte = (() => {
       img.src = url;
       await img.decode();
       if (x._gen !== gen || !x.isConnected) return;
+      // (i datorn låg duken i sidan; i gatans duk, från steg 1, ritas den där i stället)
+      if (klar && x._duk && x._duk.isConnected) {
+        x._duk.remove();
+        x._duk = null;
+      }
       const c = x._duk || document.createElement('canvas');
       c.className = 'rum-layer';
       c.style.cssText = 'width:1600px; height:1000px';
@@ -1627,8 +1634,11 @@ window.RumUte = (() => {
       x.innerHTML = KALL[k] ? kall(draw[k](), L, KALL[k]) : draw[k]();
       if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s, Boolean(el._gat));
       const G = el._gat;
-      if (k === 'gata' && SAMLA) bakaGata(x, G && ((d) => { G.gata = d; ritaGatan(el); }));
-      if (k === 'himmel' && SAMLA) bakaHimmel(x, G && ((d) => { G.himmel = d; ritaGatan(el); }));
+      // (gatan och himlen bakas till dukar med oskärpan, också i datorn: som filter i CSS lade grafikkortet
+      // på oskärpan i varje bildruta, rum-ute.css)
+      const baka = SAMLA || FILTER;
+      if (k === 'gata' && baka) bakaGata(x, G && ((d) => { G.gata = d; ritaGatan(el); }));
+      if (k === 'himmel' && baka) bakaHimmel(x, G && ((d) => { G.himmel = d; ritaGatan(el); }));
       if (k === 'fall' && G) bakaFall(x, el);
       // (i datorn står de kvar i full skärpa: gatans duk har en halv bildpunkt per px)
       if (k === 'glas' && G && LATT) bakaGlas(x, el);

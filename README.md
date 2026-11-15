@@ -6114,12 +6114,12 @@ ingenting ledde blicken.
   utan det, i telefonen och från steg 1, blev den en ljus hinna över gänget, och där är käglorna bara hålen i dunklet
   (`skarm` i `ljusKlockan`, som ritar om ljuset när rummet går ner till steg 1). Inga nya lager, och inget ritas i
   bildrutorna.
-- **Gatan ur skärpa:** gatan, himlen och de som går förbi är mjukare (`.rum-ute-himmel` och `.rum-ute-gata`
-  1,3 → 3,4 px, figurerna 0,7–1,4 → 1,8–3 px och molnen 7 → 9 px i rum-ute.css). I gatans duk (telefonen, och datorn
-  från steg 1) läggs oskärpan in när gatan och himlen bakas (`DJUP` i rum-ute.js, utöver det den grova duken ger), och
-  de som går förbi har nu oskärpan också där: de ritas skarpa i kladden och läggs i sin ruta i arket med `ctx.filter`
-  (`rita` och `ark`; förut var de skarpa i gatans duk). Det som är så suddigt ritas i datorn med en bildpunkt per px
-  (från 2,5 px oskärpa, förut 3).
+- **Gatan ur skärpa:** gatan, himlen och de som går förbi är mjukare (`.rum-ute-himmel` och `.rum-ute-gata > svg`
+  1,3 → 3,4 px, figurerna 0,7–1,4 → 1,8–3 px och molnen 7 → 9 px i rum-ute.css). Oskärpan läggs in när gatan och
+  himlen bakas till dukar (`bakaGata`, `bakaHimmel` och `DJUP` i rum-ute.js), i datorn som i telefonen, så att inget
+  filter ligger på utsikten i bildrutorna (se *Hacket* nedan). De som går förbi har oskärpan också i gatans duk: de
+  ritas skarpa i en kladd i processorn, som arket, och läggs i sin ruta med `ctx.filter` (`rita` och `ark`; förut var
+  de skarpa där). Det som är så suddigt ritas i datorn med en bildpunkt per px (från 2,5 px oskärpa, förut 3).
 - **Skärpedjupet:** med kupongen i handen och protokollet framme glider rummet bakom ur skärpan, mer ju längre bort
   det är: bakväggen med gatan 6 px, videohörnet 6, tv:n 5, gänget 4 och pulten 2 (`urFokus` och `FOKUS` i rum.js),
   in på 0,8 sekunder och tillbaka på 0,5. Det är ett filter på planen, som tonas med Web Animations. Ett filter plattar
@@ -6135,6 +6135,15 @@ mot 10 förut. Protokollet från korktavlan är provat fram och tillbaka: rummet
 efteråt är filtren borta och gatan vilar bara om den inte syns. Kupongen i handen är inte provad, eftersom den kräver
 kupongtjänsten (`Samtal.pult`) som inte finns i en lokal statisk sajt; den går genom samma `urFokus`. Flytet är inte
 mätt i en riktig telefon: `?rum-mat` ger siffrorna där.
+
+**Hacket (rättat samma dag):** först låg gatans större oskärpa kvar som filter i CSS på steg 0 i datorn
+(`.rum-ute-himmel` och `.rum-ute-gata`). Ett sådant filter lägger grafikkortet på i varje bildruta, eftersom gänget
+framför fönstret ritas om hela tiden, och med 3,4 px i stället för 1,3 blev utsiktens pass dyrare: i en spårning av
+viz (headless Chrome, mjukvarugrafik, 1440 × 900 täthet 2) gick bildrutans ritning från 4,1 till 6,0 ms i median, så
+att rummet kunde gå ner ett steg (`kanna`), med glesare skuggor. Nu bakas oskärpan också där, och inga filter ligger
+kvar på utsikten (före ändringarna två, på 1,3 px). Tiderna med mjukvarugrafik svänger mycket mellan körningar, så
+det säkra måttet är att filtren är borta; i telefonen var passen desamma före och efter (sex per bildruta). Steget
+sparas nu under en ny nyckel (`rum-kval3`), så att den som gick ner ett steg i onödan börjar om.
 
 **Att ta bilder av rummet:** i headless Chrome med mjukvarugrafik tar det 25–40 sekunder innan ljuset är bakat
 (`R.ljusKlar`), och bilder tagna innan dess saknar rummets ljus helt (vinjetten, kvällens mörker, neonens färg).
