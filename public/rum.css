@@ -418,8 +418,12 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum.sak-nara .rum-pl.forbi, .rum.sak-nara .rum-pl3d > .rum-inr { opacity: 0; transition-duration: 0.25s; }
 /* rummet vrids kring videon när kameran svänger runt den (sving i rum.js) */
 .rum-pl.glid { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.5s; }
-/* nära en sak lyser ingenting när man pekar på det */
-.rum.sak-nara .rum-sak:hover, .rum.sak-nara .rum-sak:focus-visible { filter: none; }
+/* nära en sak lyser ingenting när man pekar på det, och inte heller på vägen tillbaka förrän musen
+   rör sig (sak-hem, hemUtanSken i rum.js): det man tryckte på slocknar på en gång, i stället för att
+   ljuset (ett filter) räknas om på den växande saken i varje bildruta */
+.rum.sak-nara .rum-sak:hover, .rum.sak-nara .rum-sak:focus-visible,
+.rum.sak-hem .rum-sak:hover, .rum.sak-hem .rum-sak:focus-visible { filter: none; }
+.rum.sak-nara .rum-sak, .rum.sak-hem .rum-sak { transition: none; }
 .rum.sak-nara .rum-aff.rum-sak { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5)); }
 /* under saken: pokalerna per person */
 .rum-sakfot {
@@ -953,10 +957,12 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* ---------- namnet och foten ---------- */
 
-.rum-hdr { position: absolute; left: 44px; right: 44px; top: 26px; display: flex; justify-content: space-between; align-items: baseline; z-index: 2; }
+/* (raden är bara så bred som namnet, och tar inga klick där namnet inte syns: över hela bredden tog
+   den klicken på urets övre halva) */
+.rum-hdr { position: absolute; left: 44px; top: 26px; display: flex; justify-content: space-between; align-items: baseline; z-index: 2; }
 .rum-brand { font-family: Fraunces, Georgia, serif; font-size: 31px; font-weight: 600; letter-spacing: -0.3px; color: #f3ede3; text-decoration: none; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85); }
 /* i breda fönster syns hela dörren, och där står namnet i guld på glaset */
-@media (min-aspect-ratio: 8/5) { .rum-brand { visibility: hidden; } }
+@media (min-aspect-ratio: 8/5) { .rum-brand { visibility: hidden; } .rum-hdr { pointer-events: none; } }
 /* pekar man på ett föremål tänds snabbvalet på text-tv:n som det leder till:
    rutan i snabbvalets färg och texten svart */
 .rum [data-to].hot { background: currentColor; -webkit-text-fill-color: #050505; text-shadow: none; }
@@ -973,7 +979,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum a, .rum img { -webkit-user-drag: none; -webkit-touch-callout: none; }
 /* utan tangentbord: inga tangenter i foten */
 @media (max-width: 600px), (max-height: 500px) {
-  .rum-hdr { left: 20px; right: 20px; top: 16px; }
+  .rum-hdr { left: 20px; top: 16px; }
   .rum-brand { font-size: 24px; }
   .rum-ft { right: 20px; bottom: 14px; }
 }

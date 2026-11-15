@@ -3395,6 +3395,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.kamMal = { dx, dy, z };
     const borta = Boolean(dx || dy || z !== 1);
     const satt = () => {
+      // (genast: en glidning som pågår slutar också – en övergång glider vidare när det nya värdet är
+      // dess slut, och då mättes uret mitt i vägen tillbaka och kameran stannade halvvägs, sak)
+      if (!cls) for (const a of w.getAnimations()) if (a.transitionProperty === 'transform') a.cancel();
       w.classList.remove('glid');
       if (cls) w.classList.add(cls);
       w.style.transform = `translate(${dx}px, ${dy}px) scale(${z})${R.el.classList.contains('chromium') ? ' perspective(100000px)' : ''}`;
@@ -4511,9 +4514,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const fot = sakFot();
     fot.classList.remove('on');
     clearTimeout(R.skarp);
-    // den förra saken ritas som vanligt igen
+    // den förra saken ritas som vanligt igen, när kameran har gått därifrån (oskarp)
     const duk = was && SAKER[was] && SAKER[was].duk;
-    if (duk && was !== namn && R.inr) R.inr.skarp(duk, 0);
+    if (duk && was !== namn) oskarp(duk, cls);
     // (radion och bladet bredvid den)
     const radio = (n) => Boolean(n && SAKER[n] && SAKER[n].radio);
     if (radio(was)) {
@@ -4526,7 +4529,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.sak = namn || null;
     if (!namn) {
       lagerUt('sak');
-      R.el.classList.remove('sak-nara');
+      hemUtanSken(cls);
       tvBort(false, cls);
       vridHem();
       aim([800, 500], 1, [800, 500], cls);
@@ -4543,20 +4546,28 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     lager('sak', () => sak(bak));
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
-    // saken mätt med kameran i vila och rummet rakt
+    // saken mätt med kameran i vila och rummet rakt – och sedan går kameran dit från där den syns:
+    // var den på väg tillbaka från en närbild (ett nytt klick på saken medan den krymper) eller vreds
+    // rummet efter musen, stod den annars först vid målet för den glidningen och hoppade
     const w = document.getElementById('rum-kamera');
     const cam = w.style.cssText;
+    const kamNu = w.getAnimations().some((x) => x.transitionProperty === 'transform') ? getComputedStyle(w).transform : null;
+    const vridNu = synlig();
     aim([800, 500], 1, [800, 500]);
     setCam(0, 0);
     const r = mal.getBoundingClientRect();
     const p = centerOf(r);
     const med = S.med && R.el.querySelector(S.med);
     const m = med ? med.getBoundingClientRect() : null;
-    setCam(R.mx, R.my);
+    setCam(...vridNu);
     w.style.cssText = cam;
+    if (cls && kamNu && kamNu !== 'none') w.style.transform = kamNu;
     void w.offsetWidth;
     // Rummet vrids rakt medan kameran går fram (.sak-nara i rum.css) och står
     // sedan still: så länge det rör sig ritar webbläsaren det suddigt.
+    clearTimeout(R.hemT);
+    if (R.hemAv) R.hemAv();
+    R.el.classList.remove('sak-hem');
     R.el.classList.add('sak-nara');
     R.tx = R.ty = R.mx = R.my = 0;
     setCam(0, 0);
@@ -4579,8 +4590,54 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (html) fot.classList.add('on');
     aim(p, zoom, [(ram.x - R.ox) / R.k, (ram.y - R.oy) / R.k], cls);
     // duken i 3D ritas skarpare när kameran är framme
-    if (S.duk) R.skarp = setTimeout(() => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, zoom * R.k * 1.035 * (devicePixelRatio || 1)); }, cls ? 620 : 0);
+    if (S.duk) efterGlid('skarp', () => { if (R.sak === namn && R.inr) R.inr.skarp(S.duk, zoom * R.k * 1.035 * (devicePixelRatio || 1)); }, cls);
     if (S.radio) R.rSkarp = setTimeout(() => { if (R.sak === namn) radioNara(true); }, cls ? 640 : 0);
+  }
+
+  // fn() när kameran har glidit klart dit aim satte den, och genast utan glidning. Efter en fast tid
+  // kom den för tidigt i Safari, där glidningen börjar först när en bildruta har gått fort (sedan):
+  // då ritades saken skarp medan kameran ännu gled. Den första frågan kommer efter det som anropar
+  // (som kan sätta kameran efteråt, sak). Det som väntar i samma fack (R[fack]) ersätts.
+  function efterGlid(fack, fn, glid, extra = 20) {
+    clearTimeout(R[fack]);
+    if (!glid) return fn();
+    const vanta = () => {
+      const kvar = R.aimT === Infinity ? 50 : R.aimT + GLID.ms + extra - performance.now();
+      if (kvar > 0) R[fack] = setTimeout(vanta, kvar);
+      else fn();
+    };
+    R[fack] = setTimeout(vanta, 0);
+  }
+  // Den förra sakens duk i 3D ritas som vanligt igen först när kameran har gått tillbaka: i början av
+  // vägen är saken nästan lika stor som nära, och i den vanliga skärpan blev den suddig på en gång
+  // (uret, ramen, skivan). En duk som det man då står vid också har står kvar (kortet och ramen,
+  // radion och bladet).
+  function oskarp(duk, glid) {
+    for (const d of [].concat(duk)) {
+      efterGlid(`oskarp-${d}`, () => {
+        const nu = R.sak && SAKER[R.sak] && SAKER[R.sak].duk;
+        if (R.inr && ![].concat(nu || []).includes(d)) R.inr.skarp(d, 0);
+      }, glid, 120);
+    }
+  }
+  // På vägen tillbaka från en närbild lyser inget av det man pekar på (.sak-hem i rum.css): saken
+  // under musen tändes annars medan den krympte, och ljuset (ett filter) räknades om på den stora
+  // saken i varje bildruta. Det lyser igen när kameran är hemma och musen eller tangenterna används.
+  function hemUtanSken(glid) {
+    R.el.classList.remove('sak-nara');
+    if (!glid || !matchMedia('(hover: hover)').matches) return;
+    R.el.classList.add('sak-hem');
+    efterGlid('hemT', () => {
+      const av = () => {
+        removeEventListener('pointermove', av, true);
+        removeEventListener('keydown', av, true);
+        R.hemAv = null;
+        if (!R.sak) R.el.classList.remove('sak-hem');
+      };
+      R.hemAv = av;
+      addEventListener('pointermove', av, true);
+      addEventListener('keydown', av, true);
+    }, glid, 60);
   }
 
   // Kassettradion står i gängets duk, som är ritad för hela rummet. Rutan runt den (#rum-radio) är det

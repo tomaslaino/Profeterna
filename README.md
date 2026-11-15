@@ -9142,14 +9142,23 @@ vid barbordet och pulten – tonar bort medan kameran går förbi (inte när sak
 pulten), och vid pokalhyllan tv:n. Dörren siktar kameran på en osynlig ruta över dörrens övre
 del (`#rum-dorrglas`), så att Stängt-skylten och namnet kommer med. Uret,
 orakelramen och ramarna kring skårtavlan och korktavlan är ritade i 3D och ritas om i närbildens skala när
-kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet);
-uret går som vanligt, med sekundvisaren.
+kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet), och
+de står kvar i den skalan tills kameran är tillbaka (`oskarp` i rum.js): i början av vägen tillbaka är
+saken nästan lika stor, och i den vanliga skalan blev den suddig på en gång. Att kameran har kommit fram
+räknas från när glidningen började (`efterGlid`), som i Safari är först när en bildruta har gått fort
+(`sedan`).
+Uret går som vanligt, med sekundvisaren. Ett nytt klick på saken medan kameran är på väg tillbaka går
+fram igen från där kameran är: förut gled den gamla glidningen vidare medan saken mättes (en övergång
+står kvar när det nya värdet är dess slut), och kameran stannade halvvägs. Namnets rad överst är bara
+så bred som namnet och tar inga klick där namnet är dolt; förut tog den klicken på urets övre halva.
 
 Ingen närbild leder ut ur rummet. Under pokalhyllan står hur många pokaler var och en har.
 Esc eller ett klick (också på saken) går tillbaka,
 och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistret och videon
 (K nära kupongen på pulten går tillbaka). Föremålen lyser inte när man
-pekar på dem på nära håll. Med `prefers-reduced-motion` går kameran direkt.
+pekar på dem på nära håll, och inte heller på vägen tillbaka förrän musen eller tangenterna används
+(`.sak-hem`, `hemUtanSken`): ljuset är ett filter, som räknades om på den växande eller krympande saken i
+varje bildruta, och saken under musen tändes medan den krympte. Med `prefers-reduced-motion` går kameran direkt.
 `?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong|radio` visar en närbild i en fast bild (med `?rum-t`).
 
 ### Bakåt
