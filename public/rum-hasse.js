@@ -562,6 +562,8 @@ window.RumHasse = (() => {
         const g = y.g;
         const andra = g.tramp && Math.floor((ms - y.t0) / g.tramp) % 2;
         x.globalAlpha = q.op;
+        // (fordonen: sidan, änden och ovansidans bitar i den ordning de ska ritas)
+        if (q.lista) { for (const [c, m] of q.lista) { lagg(m); x.drawImage(c, 0, 0); } continue; }
         if (g.kors) { lagg(q.ande); x.drawImage(andra ? g.ande2 : g.ande, 0, 0); }
         lagg(q.sida);
         x.drawImage(andra ? g.sida2 : g.sida, 0, 0);

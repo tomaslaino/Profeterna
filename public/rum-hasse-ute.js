@@ -336,6 +336,8 @@ function rita(v, L, lage, gammal) {
 
   // S:t Eriksbron: den gröna balken, räcket och lyktstolparna, från bortre änden vid tegelhuset fram till höger
   const lampor = [];
+  // (lyktorna på andra sidan, i dukens bildpunkter)
+  const lampor2 = [];
   {
     const { a0, a1 } = BRO;
     const top = (a) => bro(a, BRO.top);
@@ -370,6 +372,61 @@ function rita(v, L, lage, gammal) {
     // kantbalken överst, och snö på den
     yta([[a0, top(a0)], [a1, top(a1)], [a1, top(a1) - 0.55], [a0, top(a0) - 0.05]], F.mix(gron, T('#c9d2c8'), 0.18));
     if (v.snotackt) linje([[a0, top(a0) + 0.02], [a1, top(a1) + 0.05]], dis(sno, 0.3), 4);
+    // körbanan bakom räcket, där trafiken går (TVAR, i samma mått som den, broPunkt): gångbanan, cykelbanorna,
+    // filerna med mittlinjen och räcket på andra sidan, torr, blöt eller snöig som gatan i rummet
+    {
+      const bp = (u, sid, z = 0) => { const [px, py] = broPunkt(P, u, sid * METER, z); return [px * s, py * s]; };
+      const US = [];
+      for (let u = 0; u <= LINJE.L + 4; u += 0.5) US.push(u);
+      // ett band längs bron, från sid0 till sid1 (meter innanför räcket) och z0 till z1 (räckeshöjder upp)
+      const band = (sid0, sid1, fill, alfa = 1, z0 = 0, z1 = z0, us = US) => {
+        x.beginPath();
+        us.forEach((u, i) => { const [px, py] = bp(u, sid0, z0); if (i) x.lineTo(px, py); else x.moveTo(px, py); });
+        for (let i = us.length - 1; i >= 0; i--) x.lineTo(...bp(us[i], sid1, z1));
+        x.closePath();
+        x.globalAlpha = alfa;
+        x.fillStyle = fill;
+        x.fill();
+        x.globalAlpha = 1;
+      };
+      const blot = L.wet || v.blott;
+      let gang = fas(blot ? '#7c7e82' : '#a19f99', blot ? '#2a2b30' : '#25262b', 0.3);
+      let gata = fas(blot ? '#4e5054' : '#5b5d61', '#121318', 0.3);
+      if (v.snotackt) { gang = dis(sno, 0.3); gata = F.mix(fas('#a3a9b0', '#262b36', 0.3), sno, 0.3); }
+      const kant = F.mix(gang, '#000000', 0.3);
+      const linjer = F.mix(gata, T('#e2e0da'), v.snotackt ? 0.15 : 0.35 + 0.25 * L.dag);
+      band(0, TVAR.gang, gang);
+      band(TVAR.gang, TVAR.gang2, gata);
+      band(TVAR.gang2, TVAR.kant, gang);
+      band(TVAR.gang - 0.15, TVAR.gang, kant, 0.8);
+      band(TVAR.gang2, TVAR.gang2 + 0.15, kant, 0.8);
+      // (cykelbanorna avskilda med en heldragen linje, mittlinjen streckad: 3 m streck och 9 m mellanrum)
+      for (const sid of [TVAR.cykel, TVAR.cykel2]) band(sid - 0.08, sid + 0.08, linjer, 0.8);
+      for (let m = 0; m < LINJE.L / METER; m += 12) band(TVAR.mitt - 0.08, TVAR.mitt + 0.08, linjer, 0.8, 0, 0, [m * METER, (m + 3) * METER]);
+      if (blot && L.dag > 0.2) band(TVAR.gang, TVAR.gang2, F.kall(L.sky[1], L, KH), 0.18 * L.dag);
+      // räcket på andra sidan: tätt på håll, så ett halvgenomskinligt band med handledaren överst
+      const rack2 = fas('#2f6243', '#080b0a', 0.35);
+      band(TVAR.kant, TVAR.kant, rack2, 0.45, 0, 1);
+      band(TVAR.kant, TVAR.kant, rack2, 0.9, 0.92, 1);
+      band(TVAR.kant, TVAR.kant, rack2, 0.7, 0.08, 0.14);
+      if (v.snotackt) band(TVAR.kant, TVAR.kant, dis(sno, 0.3), 0.9, 1, 1.05);
+      // lyktstolparna på andra sidan, mitt emot dem på den här (6 m höga, med armen ut över körbanan)
+      const stolp2 = fas('#3c4741', '#0a0c0b', 0.35);
+      for (const a of [23.6, 28.8, 35.2, 43.5]) {
+        const u = langs(a);
+        const fot = bp(u, TVAR.kant - 0.3);
+        const topp = bp(u, TVAR.kant - 0.3, 4);
+        const arm = bp(u, TVAR.kant - 1.8, 4.05);
+        const m = Math.hypot(topp[0] - fot[0], topp[1] - fot[1]) / 4;
+        x.strokeStyle = stolp2;
+        x.lineCap = 'round';
+        x.lineWidth = Math.max(0.6, m * 0.09);
+        x.beginPath(); x.moveTo(...fot); x.lineTo(...topp); x.lineTo(...arm); x.stroke();
+        // (oskarpa som lyktorna på den här sidan, lite mindre)
+        lampor2.push([arm[0], arm[1] + m * 0.04, 0.5 + (a - BRO.a0) * 0.03]);
+      }
+      x.lineCap = 'butt';
+    }
     // räcket: spjälor som blir ett glest galler på håll, och handledaren överst
     const rack = fas('#2f6243', '#080b0a', 0.3);
     const rh = (a) => bro(a, BRO.racke);
@@ -414,8 +471,8 @@ function rita(v, L, lage, gammal) {
 
   // ljusen på kvällen: lyktorna på bron, gatlyktorna på andra sidan och lampan på höghusets tak, som skivor
   // (så ser en lampa ut när den är oskarp)
-  const skiva = (az, el, r, farg, alfa) => {
-    const [cx, cy] = upt(az, el);
+  const skiva = (az, el, r, farg, alfa, px) => {
+    const [cx, cy] = px || upt(az, el);
     const g = u.createRadialGradient(cx, cy, 0, cx, cy, r);
     g.addColorStop(0, farg);
     g.addColorStop(0.7, farg);
@@ -431,6 +488,7 @@ function rita(v, L, lage, gammal) {
   if (L.lampor) {
     const k = Math.min(1, (0.6 - L.dag) * 3) * (1 - 0.5 * L.dimma);
     for (const [a, e, st] of lampor) skiva(a, e, r0 * st, '#ffe4b8', 0.8 * k);
+    for (const [px, py, st] of lampor2) skiva(0, 0, r0 * st, '#ffe4b8', 0.6 * k, [px, py]);
     for (let a = -44; a < 20; a += 3.4) skiva(a, E.strand - 0.1, r0 * 0.55, '#ffd29a', 0.55 * k);
     for (let a = 26; a < 48; a += 3.8) skiva(a, E.strand + 0.1, r0 * 0.5, '#ffd29a', 0.5 * k);
   }
@@ -578,16 +636,7 @@ export function gangare(v, L, lage, R = Math.random) {
   const KH = F.KALL ? F.KALL.himmel : 0.4;
   const kv = Math.max(0, 1 - L.dag / 0.6) * 0.2;
   const ton = (dag, natt) => F.mix(F.mix(F.kall(F.facade(dag, natt, L), L, KG), '#000000', 0.15), '#5c3c22', kv);
-  const steg = [];
-  for (let i = 0; i <= 20; i++) {
-    const u = i / 20;
-    const a = BRO.a0 + 0.8 + (42 - 0.8 - BRO.a0) * u ** 1.5;
-    const rh = bro(a, BRO.racke);
-    const fot = bro(a, BRO.top) + 0.04 + GANG.inne * rh;
-    const [x, y] = P(a, fot + E.ned);
-    const [, y2] = P(a, fot + GANG.hojd * rh + E.ned);
-    steg.push([x, y, y - y2]);
-  }
+  const steg = gangVag(P);
   // figuren: U bildpunkter hög, med plats för paraplyet ovanför och oskärpan runt om. Oskärpan är knappt hälften
   // av utsiktens (rita: ofokus / 2 i väggbildens bildpunkter) där figuren syns som störst i fönstren: lika oskarp
   // som bron blir den en fläck som man inte ser är en människa.
@@ -682,10 +731,13 @@ export function gangare(v, L, lage, R = Math.random) {
 // Bron som en rak linje på marken, uträknad ur räcket som utsikten ritar det (BRO.racke: räckets höjd i grader
 // ger avståndet dit, i räckeshöjder): från bortre änden A vid tegelhuset fram till bildens högra kant. En punkt
 // s räckeshöjder från A, sid innanför räcket och z upp från körbanan hamnar där broPunkt säger, med samma kant och
-// samma räcke som i utsikten. Det som ligger längre in på bron syns uppifrån och hamnar högre (LUTA, som
-// gångbanan för den som går, GANG.inne). En meter är METER räckeshöjder (den som går är 1,75 m).
+// samma räcke som i utsikten. Det som ligger längre in på bron syns uppifrån och hamnar högre (LUTA): så mycket
+// att körbanan syns som en yta bakom räcket och det som kör där står på den, bakom dem som går närmast. En meter
+// är METER räckeshöjder (den som går är 1,75 m).
 const METER = GANG.hojd / 1.75;
-const LUTA = 0.19;
+const LUTA = 0.28;
+// (fordonen själva, från sida till sida: så lite som man ser dem uppifrån när man tittar längs bron)
+const FLUTA = 0.1;
 const LINJE = (() => {
   const g = (az) => { const d = 1 / Math.tan(bro(az, BRO.racke) * DEG); return [d * Math.sin(az * DEG), d * Math.cos(az * DEG)]; };
   const A = g(BRO.a0);
@@ -703,6 +755,31 @@ function broPunkt(P, s, sid, z) {
   const r = Math.atan(1 / Math.hypot(q[0], q[1])) / DEG;
   return P(az, bro(az, BRO.top) + 0.04 + (LUTA * sid + z) * r + E.ned);
 }
+
+// Fötternas väg för den som går (gangare): 21 steg från bortre änden till förbi bildens högra kant, på gångbanan
+// GANG.inne räckeshöjder upp från brons kant, i samma mått som trafiken (broPunkt), så att den som går står på
+// gångbanan bredvid cyklisterna och bilarna och inte i deras väg. → [x, y, figurens höjd] i väggbildens bildpunkter
+// hur långt ut på bron räcket står i riktningen az (grader)
+function langs(az) {
+  const { A, ax } = LINJE;
+  const d = [Math.sin(az * DEG), Math.cos(az * DEG)];
+  return -(A[0] * d[1] - A[1] * d[0]) / (ax[0] * d[1] - ax[1] * d[0]);
+}
+function gangVag(P) {
+  const sid = GANG.inne / LUTA;
+  const ut = [];
+  for (let i = 0; i <= 20; i++) {
+    const u = langs(BRO.a0 + 0.8 + (42 - 0.8 - BRO.a0) * (i / 20) ** 1.5);
+    const [x, y] = broPunkt(P, u, sid, 0);
+    const [, y2] = broPunkt(P, u, sid, GANG.hojd);
+    ut.push([x, y, y - y2]);
+  }
+  return ut;
+}
+
+// Brons tvärsnitt (meter innanför räcket): gångbanan till gang, cykelbanan till cykel, filerna med mittlinjen
+// vid mitt, cykelbanan från cykel2 och gångbanan från gang2 bort till räcket på andra sidan vid kant
+const TVAR = { gang: 2.4, cykel: 3.5, mitt: 6.2, cykel2: 8.9, gang2: 10.3, kant: 12.6 };
 
 // Körfälten (mitten, meter innanför räcket). Man sitter på brons östra sida och ser söderut mot Kungsholmen:
 // i den närmaste filen kommer bilarna mot en, i den bortre åker de bort (högertrafik). Cykelbanorna ligger
@@ -803,12 +880,60 @@ function framfor(x, C, v, L, yr, k, sudd) {
   if (FILTER) x.filter = `blur(${sudd.toFixed(2)}px)`;
 }
 
+// Fordonets ovansida från bakre till främre änden (rummets former, FORM i rum-ute.js): höjden över marken längs
+// karossens överkant, i raka bitar som var och en är plåt eller glas (vindrutan och bakrutan, som lutar och sitter
+// ovanför listen under sidorutorna). Bussarna har ett platt tak. → [[x0, h0, x1, h1, glas], ...] i rummets enheter
+const TOPP = {};
+function forenkla(p, tol) {
+  if (p.length < 3) return p;
+  const a = p[0];
+  const b = p[p.length - 1];
+  const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  let i0 = 0;
+  let d0 = 0;
+  for (let i = 1; i < p.length - 1; i++) {
+    const d = Math.abs((b[0] - a[0]) * (a[1] - p[i][1]) - (a[0] - p[i][0]) * (b[1] - a[1])) / l;
+    if (d > d0) { d0 = d; i0 = i; }
+  }
+  return d0 > tol ? [...forenkla(p.slice(0, i0 + 1), tol).slice(0, -1), ...forenkla(p.slice(i0), tol)] : [a, b];
+}
+function topp(kind, F2) {
+  if (TOPP[kind]) return TOPP[kind];
+  if (!F2.kaross) return (TOPP[kind] = [[F2.b, 51, F2.f, 51, false]]);
+  const c = document.createElement('canvas').getContext('2d');
+  const P2 = new Path2D(F2.kaross);
+  const pts = [];
+  for (let i = 0, n = Math.ceil(F2.f - F2.b); i <= n; i++) {
+    const X = F2.b + 0.3 + ((F2.f - F2.b - 0.6) * i) / n;
+    // (överkanten: ovanför är utanför, nere vid tröskeln innanför)
+    let lo = -60;
+    let hi = -8;
+    for (let j = 0; j < 12; j++) { const m = (lo + hi) / 2; if (c.isPointInPath(P2, X, m)) hi = m; else lo = m; }
+    pts.push([X, -hi]);
+  }
+  const belt = -F2.lin[0];
+  const runs = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [p, q] = [pts[i], pts[i + 1]];
+    const g = (p[1] + q[1]) / 2 > belt + 0.3 && Math.abs((q[1] - p[1]) / (q[0] - p[0])) > 0.22;
+    const r = runs[runs.length - 1];
+    if (r && r.g === g) r.p.push(q); else runs.push({ g, p: [p, q] });
+  }
+  const ut = [];
+  for (const r of runs) {
+    const q = forenkla(r.p, 0.8);
+    for (let i = 0; i < q.length - 1; i++) ut.push([q[i][0], q[i][1], q[i + 1][0], q[i + 1][1], r.g]);
+  }
+  return (TOPP[kind] = ut);
+}
+
 // Ett fordon a (en bil ur RumUte.trafik.bil, eller { kind: 'buss' | 'ledbuss', c, nr }) i filen fil, i utsiktens
-// ljus och väder. Det syns från sidan och, i den ände som är närmast en, framifrån (de som kommer mot en, med
-// strålkastarna) eller bakifrån (de som åker bort, med baklyktorna): två dukar som ritas en gång och var och en
-// läggs längs bron med en affin avbildning (vid). Räcket står framför det nedersta, som framför den som går, och
-// allt är lika oskarpt och i samma dis. vag: vägen i meter, från bortre änden till förbi bildens högra kant, och meter:
-// fordonets längd.
+// ljus och väder. Det syns från sidan, i den ände som är närmast en framifrån (de som kommer mot en, med
+// strålkastarna) eller bakifrån (de som åker bort, med baklyktorna), och lite uppifrån: taket, rutorna och
+// motorhuven eller bagageluckan. Var och en är en duk som ritas en gång och läggs längs bron med en affin
+// avbildning (vid), så att de möts som på en riktig kaross. Räcket står framför det nedersta, som framför den som
+// går, och allt är lika oskarpt och i samma dis. vag: vägen i meter, från bortre änden till förbi bildens högra
+// kant, och meter: fordonets längd.
 export function fordon(v, L, lage, a, fil) {
   const C = ljus(v, L);
   const { F, KG, KH, ton, lampor, rack } = C;
@@ -861,12 +986,16 @@ export function fordon(v, L, lage, a, fil) {
 
   // räcket framför, dimman och det som faller över, sedan lyktorna ovanpå
   const efter = (x) => framfor(x, C, v, L, y1 + TOP * k * racket, k, sudd);
+  // (fogarna mellan bitarna: var bit fortsätter en bit in under den som ritas efter, så att oskärpan på båda inte
+  // lämnar en ljus springa mellan dem och de ser ut som kort; i rummets enheter och i dukens bildpunkter)
+  const fog = (2.5 * sudd) / k;
+  const fogK = 2.5 * sudd;
 
   // från sidan, vänd åt det håll det åker (rummets former)
   {
     const x = sida.getContext('2d');
     const ox = pad - B0 * k;
-    if (bort) x.setTransform(-k, 0, 0, k, sida.width - ox, y1); else x.setTransform(k, 0, 0, k, ox, y1);
+    if (bort) x.setTransform(-k, 0, 0, k, pad + F0 * k, y1); else x.setTransform(k, 0, 0, k, ox, y1);
     if (FILTER) x.filter = `blur(${sudd.toFixed(2)}px)`;
     const F2 = M.F;
     // skuggan på körbanan, som under fordonen på gatan
@@ -919,7 +1048,7 @@ export function fordon(v, L, lage, a, fil) {
     }
     x.setTransform(1, 0, 0, 1, 0, 0);
     efter(x);
-    if (bort) x.setTransform(-k, 0, 0, k, sida.width - ox, y1); else x.setTransform(k, 0, 0, k, ox, y1);
+    if (bort) x.setTransform(-k, 0, 0, k, pad + F0 * k, y1); else x.setTransform(k, 0, 0, k, ox, y1);
     const [fy, by] = M.F.ly;
     ruta(x, F0 - 2.2, fy - 1.4, 2.4, 2.8, '#fbf8ec');
     if (lampor) { sken(x, F0, fy, 9, 'rgba(255, 242, 204, 0.9)', 0.5); sken(x, B0 + 1, by, 7, 'rgba(255, 59, 48, 0.9)', 0.45); ruta(x, B0 - 0.2, by - 1.8, 2, 3.6, '#ff4a3a'); }
@@ -927,7 +1056,10 @@ export function fordon(v, L, lage, a, fil) {
     x.filter = 'none';
   }
 
-  // framifrån (kommer mot en) eller bakifrån (åker bort): rakt framifrån, med den närmaste sidan till vänster
+  // framifrån (kommer mot en) eller bakifrån (åker bort), med den närmaste sidan till vänster: bussarna hela vägen
+  // upp, bilarna bara upp till där ovansidan tar vid (nosen fram, bagageluckan eller bakluckan bak)
+  const ovan = topp(a.kind, M.F);
+  const he = buss ? 51 : bort ? ovan[0][1] : ovan[ovan.length - 1][3];
   {
     const x = ande.getContext('2d');
     x.setTransform(k, 0, 0, k, pad, y1);
@@ -943,7 +1075,8 @@ export function fordon(v, L, lage, a, fil) {
     if (buss) {
       x.fillStyle = kropp;
       x.beginPath(); rund4(x, 0, -51, ws, 46, [4, 4, 1.5, 1.5]); x.fill();
-      ruta(x, 0, -11, ws, 6, F.mix(kropp, '#000000', 0.45));
+      ruta(x, -fog, -49, fog + 2, 38, kropp);
+      ruta(x, -fog, -11, ws + fog, 6, F.mix(kropp, '#000000', 0.45));
       ruta(x, 3, -54, ws - 6, 3, ton('#b9bdc2'));
       if (fram) {
         ruta(x, 1.5, -44, ws - 3, 30, glas);
@@ -964,34 +1097,25 @@ export function fordon(v, L, lage, a, fil) {
     } else {
       const F2 = M.F;
       const belt = F2.lin[0];
-      const skap = a.kind === 'skap';
       ruta(x, 1, -5, ws - 2, 4, svart);
       for (const hx of [3.5, ws - 3.5]) ruta(x, hx - 2.2, -F2.r * 1.4, 4.4, F2.r * 1.4, hjul);
       x.fillStyle = kropp;
-      x.beginPath(); rund4(x, 0, belt - 0.5, ws, -belt - 3.5, 2.5); x.fill();
-      x.beginPath();
-      const inn = skap ? 1 : 3.5;
-      x.moveTo(1, belt);
-      x.lineTo(1 + inn, F2.tak + 1.2);
-      x.quadraticCurveTo(ws / 2, F2.tak - 0.6, ws - 1 - inn, F2.tak + 1.2);
-      x.lineTo(ws - 1, belt);
-      x.closePath();
-      x.fill();
-      x.fillStyle = glas;
-      x.beginPath();
-      x.moveTo(2.6, belt - 0.6);
-      x.lineTo(2.6 + inn, F2.tak + 2.6);
-      x.lineTo(ws - 2.6 - inn, F2.tak + 2.6);
-      x.lineTo(ws - 2.6, belt - 0.6);
-      x.closePath();
-      x.fill();
-      ruta(x, 1, -8, ws - 2, 3, F.mix(kropp, '#000000', 0.45));
+      x.beginPath(); rund4(x, 0, -he, ws, he - 4, [2.5, 2.5, 1.5, 1.5]); x.fill();
+      ruta(x, -fog, -he + 2, fog + 2, he - 10, kropp);
+      // (bakrutan, där bakänden är hög: kombin, suven, halvkombin och skåpbilen)
+      if (bort && belt + he - 1 > 2) ruta(x, 3, -he + 2, ws - 6, belt + he - 1, glas);
+      ruta(x, 1 - fog, -8, ws - 2 + fog, 3, F.mix(kropp, '#000000', 0.45));
       ruta(x, ws / 2 - 4, -10.5, 8, 2.2, ton('#e8e6dc'));
-      if (fram) { ruta(x, ws * 0.3, F2.ly[0] - 1, ws * 0.4, 3.4, svart); lyk.push([3.2, F2.ly[0], 'v'], [ws - 3.2, F2.ly[0], 'v']); }
-      else lyk.push([2.2, F2.ly[1], 'r'], [ws - 2.2, F2.ly[1], 'r']);
-      if (a.taxi) ruta(x, ws / 2 - 5.5, F2.tak - 4.2, 11, 4.2, lampor ? '#ffe88a' : ton('#e8c43a'));
+      const ly = Math.max(F2.ly[fram ? 0 : 1], -he + 2.2);
+      if (fram) { ruta(x, ws * 0.3, ly - 1, ws * 0.4, 3.4, svart); lyk.push([3.2, ly, 'v'], [ws - 3.2, ly, 'v']); }
+      else lyk.push([2.2, ly, 'r'], [ws - 2.2, ly, 'r']);
     }
     x.setTransform(1, 0, 0, 1, 0, 0);
+    // (änden lite mörkare än sidan, så att hörnet mellan dem syns)
+    x.filter = 'none';
+    x.globalCompositeOperation = 'source-atop';
+    ruta(x, 0, 0, ande.width, ande.height, '#000000', 0.12);
+    x.globalCompositeOperation = 'source-over';
     efter(x);
     x.setTransform(k, 0, 0, k, pad, y1);
     for (const [lx, ly, s] of lyk) {
@@ -1007,17 +1131,78 @@ export function fordon(v, L, lage, a, fil) {
     x.filter = 'none';
   }
 
+  // ovansidan i raka bitar (topp): plåten och rutorna, i samma oskärpa och dis, en duk för varje bit; den bortre
+  // kanten smalare där rutorna sitter, och kanterna mot sidan, fronten och de andra bitarna en bit in under dem
+  const plat = buss ? F.mix(kropp, ton('#c9ccd0'), 0.55) : F.mix(kropp, F.kall(L.sky[1], L, KH), 0.3 * L.dag);
+  const glasT = F.mix(glas, F.kall(L.sky[1], L, KH), 0.25 * L.dag);
+  const qpad = Math.ceil(3 * sudd + fogK + 2);
+  const ytor = ovan.map(([x0, h0, x1, h1, g], i) => {
+    const lang = Math.hypot(x1 - x0, h1 - h0) * k;
+    const z1 = ws - (g || (!buss && Math.min(h0, h1) > -M.F.lin[0] + 0.5) ? (a.kind === 'skap' ? 1 : 3.5) : 0);
+    const c = document.createElement('canvas');
+    c.width = Math.ceil(lang + 2 * qpad);
+    c.height = Math.ceil(z1 * k + 2 * qpad);
+    const x = c.getContext('2d');
+    if (FILTER) x.filter = `blur(${sudd.toFixed(2)}px)`;
+    // (fogen bara mot bitarna bredvid och sidan, inte ut förbi fordonets ändar)
+    const f0 = i ? fogK : 0;
+    const f1 = i < ovan.length - 1 ? fogK : 0;
+    ruta(x, qpad - f0, qpad, lang + f0 + f1, z1 * k + fogK, g ? glasT : plat);
+    x.filter = 'none';
+    framfor(x, C, v, L, c.height + 20, k, sudd);
+    x.filter = 'none';
+    // (det som är plant syns uppifrån, det som lutar bara när det lutar bort från en: vindrutan och motorhuven på
+    // den som kommer mot en, bakrutan och bagageluckan på den som åker bort –
+    // och inte det som skyms av något högre som är närmare en, som bagageluckan bakom kupén)
+    const nara = ovan.filter((q) => (bort ? q[2] <= x0 : q[0] >= x1));
+    const skyms = nara.some((q) => Math.max(q[1], q[3]) > Math.min(h0, h1) + 1);
+    const syns = !skyms && (Math.abs(h1 - h0) < 0.15 * Math.abs(x1 - x0) || (bort ? h1 > h0 : h1 < h0));
+    return { c, x0, h0, x1, h1, z1, syns, X1: qpad + lang, Y1: qpad + z1 * k };
+  });
+
   // var det är när en andel p av vägen har gått (0–1, lika fort hela vägen): dukarnas avbildningar i
-  // väggbildens bildpunkter, och synligheten (det tonas fram eller bort de första sex räckeshöjderna vid bortre änden)
-  const sx1 = sida.width - pad;
-  const ax1 = ande.width - pad;
+  // väggbildens bildpunkter, i den ordning de ritas, och synligheten (det tonas fram eller bort de första sex
+  // räckeshöjderna vid bortre änden). Fordonets punkter (x längs det, h upp och z in från den närmaste sidan, i
+  // rummets enheter) läggs med en och samma avbildning, så att bitarna möts. Av ovansidan ritas det som vetter
+  // uppåt eller mot en (som taket, inte bakrutan på den som kommer mot en), bortifrån och hitåt; sedan fronten
+  // eller baken och sist sidan.
+  const e = METER / 16;
+  const Xc = (B0 + F0) / 2;
+  const pr = (s, X, H, Z) => {
+    const q = vid(vag, s + (bort ? -1 : 1) * (X - Xc) * e);
+    const z = (Z - ws / 2) * e;
+    return [q[0] + q[2] * H * e + q[4] * z, q[1] + q[3] * H * e + q[5] * z];
+  };
+  const Xf = bort ? F0 : B0;
+  const Xn = bort ? B0 : F0;
+  const ordning = bort ? [...ytor].reverse() : ytor;
   const vid2 = (p) => {
     const s = (bort ? 1 - p : p) * sEnd;
-    const g = lage4(s);
-    const f1 = [g.r1[0] + g.in[0], g.r1[1] + g.in[1]];
-    return { sida: affin(pad, sx1, pad, y1, g.r0, g.r1, g.up), ande: affin(pad, ax1, pad, y1, g.r1, f1, g.up), op: Math.min(1, s / 6) };
+    // (en avbildning för hela fordonet: den närmaste änden där den är, uppåt och inåt som där, och längs fordonet
+    // bort till där den bortre änden är, så att sidan, änden och ovansidan möts precis)
+    const n0 = pr(s, Xn, 0, 0);
+    const f0 = pr(s, Xf, 0, 0);
+    const nU = pr(s, Xn, 1, 0);
+    const nI = pr(s, Xn, 0, 1);
+    const U = [nU[0] - n0[0], nU[1] - n0[1]];
+    // (inåt lyfter bron allt med LUTA, men fordonet självt lutar bara FLUTA: annars ser fronten sned ut och taket
+    // som ett tak över det)
+    const I = [nI[0] - n0[0] - (LUTA - FLUTA) * U[0], nI[1] - n0[1] - (LUTA - FLUTA) * U[1]];
+    const A = [(n0[0] - f0[0]) / (Xn - Xf), (n0[1] - f0[1]) / (Xn - Xf)];
+    const M = (X, H, Z) => [n0[0] + A[0] * (X - Xn) + U[0] * H + I[0] * Z, n0[1] + A[1] * (X - Xn) + U[1] * H + I[1] * Z];
+    const upp = [-U[0] * TOP, -U[1] * TOP];
+    const lista = [];
+    for (const y of ordning) {
+      if (!y.syns) continue;
+      const A0 = M(y.x0, y.h0, 0);
+      const A1 = M(y.x0, y.h0, y.z1);
+      lista.push([y.c, affin(qpad, y.X1, qpad, y.Y1, A0, M(y.x1, y.h1, 0), [A1[0] - A0[0], A1[1] - A0[1]])]);
+    }
+    lista.push([ande, affin(pad, pad + ws * k, pad, y1, n0, M(Xn, 0, ws), upp)]);
+    lista.push([sida, affin(pad, pad + (F0 - B0) * k, pad, y1, f0, n0, upp)]);
+    return { lista, op: Math.min(1, s / 6) };
   };
-  return { sida, ande, vid: vid2, vag: sEnd / METER, meter: (F0 - B0) / 16 };
+  return { vid: vid2, vag: sEnd / METER, meter: (F0 - B0) / 16 };
 }
 
 // ---------- de som cyklar ----------
@@ -1271,15 +1456,10 @@ export function broRam(lage) {
     }
   }
   // de som går (gangare): fötterna och paraplyet
-  for (let i = 0; i <= 20; i++) {
-    const a = BRO.a0 + 0.8 + (42 - 0.8 - BRO.a0) * (i / 20) ** 1.5;
-    const rh = bro(a, BRO.racke);
-    const fot = bro(a, BRO.top) + 0.04 + GANG.inne * rh;
-    const [x, y] = P(a, fot + E.ned);
-    const [, y2] = P(a, fot + 1.3 * GANG.hojd * rh + E.ned);
-    x0 = Math.min(x0, x - (y - y2));
-    y0 = Math.min(y0, y2);
-    y1 = Math.max(y1, y + 0.2 * (y - y2));
+  for (const [x, y, h] of gangVag(P)) {
+    x0 = Math.min(x0, x - h);
+    y0 = Math.min(y0, y - 1.3 * h);
+    y1 = Math.max(y1, y + 0.2 * h);
   }
   return [x0 - 24, y0 - 16, W + 60, y1 + 16];
 }

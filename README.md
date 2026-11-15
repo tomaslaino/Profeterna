@@ -1441,6 +1441,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   årstiden och vädret: i rusningen på sommaren en var tionde sekund åt vart håll, färre på dagen och helgen och
   ännu färre på kvällen, inga i snön, i ösregn eller på natten (`cyklar` i `trafik` i rum-ute.js, som gatan också
   läser). Hjälm eller mössa, ofta reflexväst, och lyse när det är mörkt. Se [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Bilarna på S:t Eriksbron står på bron (2026-11-15, användarens önskemål):** "Det ser lite konstigt ut. Bilarna
+  flyger, ligger till höger om gångarna/kör igenom gångarna? och ser annorlunda ut jämfört med utanför det
+  animerade fönstret med grabbarna". Bron hade ingen körbana, så under hjulen syntes husen på andra sidan; de som
+  gick lades för sig, rakt ovanför räcket, medan filerna låg längre in, så att bilarna hamnade bredvid och genom
+  dem; och varje fordon var två platta kort, sidan och fronten, med en springa emellan. Nu har bron en körbana i
+  utsikten (gångbanan, cykelbanorna, filerna med mittlinjen, räcket och lyktstolparna på andra sidan), allt på
+  bron ligger i samma mått, så att de som går är närmast och bilarna längre in och högre upp, och fordonen har
+  också tak, vindruta, motorhuv och bagagelucka, så att de syns som hela bilar och bussar. Se
+  [Hasse Backe](#hasse-backe), *Utsikten*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -7612,9 +7621,18 @@ trafiken redan i gång (allt från en minut tillbaka räknas fram, och det som f
 det har hunnit). Högst fem fordon per fil, fyra cyklister per bana och fyra människor är ute på en gång, färre på rummets lägre steg
 (`BRO_MAX`). Bron räknas som en rak linje ur räcket som utsikten ritar det (`LINJE`, räckets höjd ger avståndet),
 så att fordonen krymper och saktar in mot bortre änden som i verkligheten: där syns de nästan rakt framifrån
-eller bakifrån, närmast mer från sidan. Varje fordon är två bilder som ritas en gång, sidan (rummets former, `FORM`) och
-fronten eller baken, som läggs längs bron med var sin affin avbildning; i mörker lyser strålkastarna hitåt,
-baklyktorna bortåt och bussarnas rutor. Allt på bron ritas i en enda duk som bara täcker bandet där bron går
+eller bakifrån, närmast mer från sidan. Bron har en körbana bakom räcket (sedan 2026-11-15, `TVAR`: gångbanan,
+cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på andra sidan, räcket och lyktstolparna där,
+torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
+står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, mer än bron egentligen skulle säga,
+så att körbanan syns som en yta och filerna inte hamnar i höjd med gångbanan), och de som går ligger i samma mått
+(`gangVag`), närmast räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
+fronten eller baken upp till där ovansidan tar vid, och ovansidan i raka bitar ur karossens överkant (`topp`:
+motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
+plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
+avbildning för fordonet, så att de möts, och var bit fortsätter en bit in under den som ritas efter, så att
+oskärpan inte lämnar springor; fordonet självt lutar mindre än bron (`FLUTA`), annars ser fronten sned ut. I
+mörker lyser strålkastarna hitåt, baklyktorna bortåt och bussarnas rutor. Allt på bron ritas i en enda duk som bara täcker bandet där bron går
 och klipps efter rutornas glas (`broDuk`, `broRita`, `broRam`), i hans takt när han ritas: som det som rör sig
 hela tiden i rummet ritas i gängets takt. Först var var och en en egen animering på grafikkortet, men då
 räknades alla om i varje skärmbild och skärmen ritades om 60 gånger i sekunden fast han bara ritas 15–30 gånger
