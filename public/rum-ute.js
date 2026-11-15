@@ -219,15 +219,19 @@ window.RumUte = (() => {
     : (v.manad === 9 && v.dag >= 20) || v.manad === 10 || (v.manad === 11 && v.dag <= 25) ? 'host'
       : v.manad === 9 ? 'gron' : 'kal');
 
+  // påskdagen år Y (ms, UTC)
+  function paskdag(Y) {
+    const a = Y % 19; const b = Math.floor(Y / 100); const c = Y % 100; const d = Math.floor(b / 4); const e = b % 4;
+    const f = Math.floor((b + 8) / 25); const g = Math.floor((b - f + 1) / 3); const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4); const k = c % 4; const l = (32 + 2 * e + 2 * i - h - k) % 7; const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    return Date.UTC(Y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1);
+  }
   // allmänna flaggdagar (påsk, pingst, midsommar och valdagen räknas ut)
   function flaggdag(v) {
     const md = `${v.manad}-${v.dag}`;
     if (['1-1', '1-28', '3-12', '4-30', '5-1', '6-6', '7-14', '8-8', '10-24', '11-6', '12-10', '12-23', '12-25'].includes(md)) return true;
     const Y = v.ar;
-    const a = Y % 19; const b = Math.floor(Y / 100); const c = Y % 100; const d = Math.floor(b / 4); const e = b % 4;
-    const f = Math.floor((b + 8) / 25); const g = Math.floor((b - f + 1) / 3); const h = (19 * a + b - d - g + 15) % 30;
-    const i = Math.floor(c / 4); const k = c % 4; const l = (32 + 2 * e + 2 * i - h - k) % 7; const m = Math.floor((a + 11 * h + 22 * l) / 451);
-    const pask = Date.UTC(Y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1);
+    const pask = paskdag(Y);
     const today = Date.UTC(Y, v.manad - 1, v.dag);
     if (today === pask || today === pask + 49 * 864e5) return true;
     if (v.manad === 6 && v.dag >= 20 && v.dag <= 26 && new Date(today).getUTCDay() === 6) return true;
@@ -236,6 +240,37 @@ window.RumUte = (() => {
   }
   // hissad från klockan 8 (9 på vintern) till solnedgången, senast 21
   const flagga = (v) => flaggdag(v) && v.timme >= (v.manad >= 11 || v.manad <= 2 ? 9 : 8) && v.timme < 21 && v.sol > -1;
+
+  // Lediga dagar då trafiken går som en söndag: helgerna, de röda dagarna och aftnarna (midsommar-, jul- och
+  // nyårsafton), långfredagen, annandag påsk och Kristi himmelsfärd.
+  function ledig(v) {
+    if (v.veckodag === 'lör' || v.veckodag === 'sön') return true;
+    if (['1-1', '1-6', '5-1', '6-6', '12-24', '12-25', '12-26', '12-31'].includes(`${v.manad}-${v.dag}`)) return true;
+    const today = Date.UTC(v.ar, v.manad - 1, v.dag);
+    const p = paskdag(v.ar);
+    if ([-2, 1, 39].some((d) => today === p + d * 864e5)) return true;
+    return v.manad === 6 && v.dag >= 19 && v.dag <= 25 && new Date(today).getUTCDay() === 5;
+  }
+
+  // Trafiken på S:t Eriksgatan efter klockan och dagen, för gatan här (gatliv) och S:t Eriksbron genom Hasse
+  // Backes fönster (rum-hasse.js): rusning vardagar 7–9.30 och 15.30–18.30, mer trafik på dagen än på kvällen
+  // och lite på natten. På lediga dagar ingen rusning och lugnt till halv tio, men fler ute efter midnatt
+  // natten mot lördag och söndag. bilar: bilar per varv och fil, varv: varvets längd (s), gaende: hur många som
+  // går (färre i ösregn, snöstorm och sträng kyla), bussar: bussarna går.
+  function trafik(v) {
+    const h = v.timme + v.minut / 60;
+    const helg = ledig(v);
+    const rusning = !helg && ((h > 7 && h < 9.5) || (h > 15.5 && h < 18.5));
+    const natt = h < 5 || h >= 23.5;
+    const dag = h > (helg ? 9.5 : 6.5) && h < 21;
+    const bilar = rusning ? 3 : dag ? 2 : 1;
+    const varv = natt ? [60, 85] : rusning ? [26, 32] : bilar === 2 ? [32, 40] : [42, 52];
+    const ut = (v.veckodag === 'lör' || v.veckodag === 'sön') && h < 4;
+    let gaende = h < 1 ? 3 : h < 5 ? (ut ? 3 : 1) : h < 7 ? (helg ? 1 : 3) : helg && h < 9.5 ? 4 : h < 22 ? 7 : 4;
+    if (v.fall && v.mangd > 0.75) gaende = Math.max(1, gaende - 3);
+    if (v.kanns < -12) gaende = Math.max(1, gaende - 2);
+    return { h, helg, rusning, natt, bilar, varv, gaende, bussar: h > 5.5 };
+  }
 
   // Ett fönster (w × h) i hörnhuset: glaset speglar himlen på dagen och är tänt efter klockan
   // på kvällen, med karmen (mittpost och tvärpost), ibland gardiner, i advent en stjärna eller
@@ -592,6 +627,19 @@ window.RumUte = (() => {
     return s;
   }
 
+  // En bil på gatan (och på S:t Eriksbron, rum-hasse-ute.js): modellen, färgen (de äldre modellerna i äldre
+  // färger), taxi (oftare på natten) och fälgarna.
+  const MODELL = ['sedan', 'sedan', 'halv', 'halv', 'suv', 'suv', 'kombi', 'kombi', 'saab', 'skap'];
+  const NY = ['#16181d', '#e9e8e4', '#9da3aa', '#5a6068', '#1d2b45', '#7a1d1f', '#3b4a3f', '#c9ccd0', '#2a2c30'];
+  const GAMMAL = ['#8a1e1e', '#d8cbb0', '#22335a', '#2f4a3a', '#e6e2d8', '#5a4632', '#1a1c22', '#6e7f8c'];
+  function nyBil(R, natt) {
+    const taxi = R() < (natt ? 0.45 : 0.14);
+    const kind = taxi ? (R() < 0.7 ? 'sedan' : 'kombi') : pick(R, MODELL);
+    const c = taxi ? pick(R, ['#16181d', '#26282c', '#e9e8e4']) : kind === 'skap' ? pick(R, ['#eceae4', '#d8dadc', '#2a3f66', '#e4c02a'])
+      : pick(R, kind === 'kombi' || kind === 'saab' ? GAMMAL : NY);
+    return { kind, c, taxi, falg: pick(R, ['#a9adb2', '#5a5e64', '#c8ccd0', '#2a2c30']) };
+  }
+
   const coats = (v) => (v.kanns < 3 ? ['#1c1f26', '#2b2f38', '#3a3226', '#4a4238', '#20283a', '#5a2a2a', '#6b6458', '#2e3a2e']
     : v.kanns < 15 ? ['#3d4a5c', '#6b5a44', '#7a7a70', '#2f3d36', '#8a5a3a', '#2a3550', '#c8b89a', '#4a4a50']
       : ['#e8e4dc', '#c8d8e8', '#d84a3a', '#3a6ab0', '#f0c040', '#2e2e30', '#7ab07a', '#f3ead9']);
@@ -621,9 +669,8 @@ window.RumUte = (() => {
     };
 
     // de som går på trottoaren mittemot
-    let n = h < 1 ? 3 : h < 5 ? 1 : h < 7 ? 3 : h < 22 ? 7 : 4;
-    if (v.fall && v.mangd > 0.75) n = Math.max(1, n - 3);
-    if (v.kanns < -12) n = Math.max(1, n - 2);
+    const T = trafik(v);
+    const n = T.gaende;
     const cs = coats(v);
     const skins = ['#e9c2a2', '#d8a27c', '#b27a52', '#8a5636', '#f0cfb4'];
     const hairs = ['#2a1d14', '#5a3e24', '#c9a56a', '#1a1a1a', '#8a6a4a', '#d8d0c0'];
@@ -679,26 +726,16 @@ window.RumUte = (() => {
     // Eriksbron (blåa 4:an, röda 3:an och 77:an) och plogbilen har varsin lucka i bandet och
     // kommer var m:e varv; resten av varven står luckan tom. Fordonen gungar inte: de ritas en
     // gång och glider bara (ingen ställning att rita om i gängets takt).
-    const rusning = (h > 7 && h < 9.5) || (h > 15.5 && h < 18.5);
-    const natt = h < 5 || h >= 23.5;
-    const nBil = rusning ? 3 : h > 6.5 && h < 21 ? 2 : 1;
-    const varv = natt ? 60 + R() * 25 : rusning ? 26 + R() * 6 : nBil === 2 ? 32 + R() * 8 : 42 + R() * 10;
-    const MODELL = ['sedan', 'sedan', 'halv', 'halv', 'suv', 'suv', 'kombi', 'kombi', 'saab', 'skap'];
-    const NY = ['#16181d', '#e9e8e4', '#9da3aa', '#5a6068', '#1d2b45', '#7a1d1f', '#3b4a3f', '#c9ccd0', '#2a2c30'];
-    const GAMMAL = ['#8a1e1e', '#d8cbb0', '#22335a', '#2f4a3a', '#e6e2d8', '#5a4632', '#1a1c22', '#6e7f8c'];
-    const bil = () => {
-      const taxi = R() < (natt ? 0.45 : 0.14);
-      const kind = taxi ? (R() < 0.7 ? 'sedan' : 'kombi') : pick(R, MODELL);
-      const c = taxi ? pick(R, ['#16181d', '#26282c', '#e9e8e4']) : kind === 'skap' ? pick(R, ['#eceae4', '#d8dadc', '#2a3f66', '#e4c02a'])
-        : pick(R, kind === 'kombi' || kind === 'saab' ? GAMMAL : NY);
-      return { kind, c, taxi, falg: pick(R, ['#a9adb2', '#5a5e64', '#c8ccd0', '#2a2c30']) };
-    };
+    const natt = T.natt;
+    const nBil = T.bilar;
+    const varv = T.varv[0] + R() * (T.varv[1] - T.varv[0]);
+    const bil = () => nyBil(R, natt);
     // (halva bredden w framåt räcker för strålkastarnas ljus, ht högst upp, före skalan)
     const MATT = { buss: [170, 56], ledbuss: [218, 56], plog: [130, 56], skap: [112, 46] };
     for (const [y, dir, k, nara] of [[532, 1, 1.45, true], [500, -1, 1.25, false]]) {
       const lista = [];
       for (let i = 0; i < nBil; i++) lista.push(bil());
-      if (h > 5.5) {
+      if (T.bussar) {
         lista.push({ kind: 'buss', c: '#c0262a', nr: pick(R, ['3', '77']), m: 5 });
         lista.push({ kind: 'ledbuss', c: '#2468b8', nr: '4', m: 7 });
       }
@@ -1653,5 +1690,5 @@ window.RumUte = (() => {
   }
 
   // (färgerna, för utsikten bakom Hasse Backe: samma ljus och samma kalla dag som här)
-  return { paint, light, takt, glid, farg: { mix, facade, kall: kallFarg, sno: snowC, KALL } };
+  return { paint, light, takt, glid, farg: { mix, facade, kall: kallFarg, sno: snowC, KALL }, trafik: { nu: trafik, FORM, bil: nyBil } };
 })();

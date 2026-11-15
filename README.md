@@ -1418,6 +1418,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   så hög som räcket, ungefär en och en halv våning vid tegelhuset, och stod med fötterna på brons kant, skarpare och
   mörkare än allt annat i utsikten. Nu är den drygt hälften så stor, går på gångbanan bakom räcket med benen
   skymda, och har samma dis som bron och mer oskärpa än förut (knappt hälften av utsiktens; lika oskarp blir den en fläck). Se [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Trafik på S:t Eriksbron bakom Hasse Backe (2026-11-15, användarens önskemål):** "kan du öka trafiken över
+  St Eriksbron här utan att det påverkar att det flyter – alltför mkt", "Tänker med gående, bussar och bilar. Det
+  ska vara anpassat till hur det är tidsmässigt i verkligheten" och "Det ska vara liknande som på
+  animationsbilden". Förut gick en enda människa åt gången, var 15–60:e sekund. Nu går bilar i båda filerna,
+  blåa 4:an och röda 3:an eller 77:an och flera människor samtidigt, med rummets bilar och bussar och lika mycket
+  trafik som på gatan i rummet vid samma tid: rusning vardagsmorgnar och -eftermiddagar, lugnt på natten, och
+  sedan samma dag ingen rusning på helger och röda dagar (`trafik` i rum-ute.js, som gatan också läser). Bron
+  är redan i gång när man vänder sig om. Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -6209,7 +6217,8 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)).
   nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
   snö. Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
-  fler bilar i rusningen och färre på natten (fler taxi då). Bilarna är olika sorter
+  fler bilar i rusningen och färre på natten (fler taxi då), och på helger och röda dagar ingen
+  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna är olika sorter
   (sedan, kombi som en gammal Volvo, halvkombi, stadsjeep, Saab, skåpbil och taxi med
   taklampa) och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
   Eriksbron kommer i båda riktningarna med några minuters mellanrum: röda 3:an eller 77:an
@@ -7523,17 +7532,38 @@ rum-hasse.js) med väggen ovanpå, som är genomskinlig i fönstren, så den kos
 (omkring 25 ms att rita, och högst en gång i minuten), och disken speglar den med väggen. Kameran ser 14° nedåt, så
 genom fönstren skulle man egentligen mest se spåren under bron; utsikten är lyft, så att himlen, tornen och bron
 syns; sedan 2026-11-11 står den ytterligare 1,3° lägre (`E.ned`), så att höghusets topp syns hela med himmel
-ovanför också där skärmens överkant skär väggens bild (y ≈ 37 i den breda bilden, 21 på höjden). Då och då går
-någon på bron (`gangare` i rum-hasse-ute.js, `bron` i rum-hasse.js): var 15–60:e sekund, glesare mitt i natten,
-från tegelhuset hitåt eller bort, i promenadtakt (42–60 s). Figuren ritas en gång, från sidan i två steg, i
+ovanför också där skärmens överkant skär väggens bild (y ≈ 37 i den breda bilden, 21 på höjden). På bron går
+trafiken (sedan 2026-11-15; förut gick bara någon då och då): människor på gångbanan närmast, bilar i båda
+filerna och bussarna (`gangare` och `fordon` i rum-hasse-ute.js, `bronSnart`, `bronGa` och `broKom` i
+rum-hasse.js). Hur mycket följer klockan och dagen som på gatan i rummet (`RumUte.trafik`: rusning vardagar
+7–9.30 och 15.30–18.30, mer på dagen än på kvällen, lite på natten, lugnt till halv tio på helger och röda dagar
+men fler ute natten mot lördag och söndag, färre i ösregn och sträng kyla): bilarna kommer i medeltal lika tätt
+som på gatan (i rusningen var tionde sekund i varje fil), hälften så många går, och bussarna går ungefär som de
+gör: 4:an var 5:e minut i rusningen och var 6:e på dagen, 3:an och 77:an var 8–10:e, glesare på kvällen och
+helgen och inte alls efter midnatt (`broTakt`). Man sitter på brons östra sida: i den närmaste filen kommer
+bilarna mot en, i den bortre åker de bort (högertrafik). Alla i en fil åker lika fort, 33 km/h i rusningen, 41 på
+dagen och 47 på natten, och håller avstånd, så att ingen kör igenom någon annan. När man vänder sig om är
+trafiken redan i gång (allt från en minut tillbaka räknas fram, och det som fortfarande är på bron står där
+det har hunnit). Högst fem fordon per fil och fyra människor är ute på en gång, färre på rummets lägre steg
+(`BRO_MAX`). Bron räknas som en rak linje ur räcket som utsikten ritar det (`LINJE`, räckets höjd ger avståndet),
+så att fordonen krymper och saktar in mot bortre änden som i verkligheten: där syns de nästan rakt framifrån
+eller bakifrån, närmast mer från sidan. Varje fordon är två bilder som ritas en gång, sidan (rummets former, `FORM`) och
+fronten eller baken, som läggs längs bron med var sin affin avbildning; i mörker lyser strålkastarna hitåt,
+baklyktorna bortåt och bussarnas rutor. Allt på bron ritas i en enda duk som bara täcker bandet där bron går
+och klipps efter rutornas glas (`broDuk`, `broRita`, `broRam`), i hans takt när han ritas: som det som rör sig
+hela tiden i rummet ritas i gängets takt. Först var var och en en egen animering på grafikkortet, men då
+räknades alla om i varje skärmbild och skärmen ritades om 60 gånger i sekunden fast han bara ritas 15–30 gånger
+när han sitter still; mätt i rusningen (headless Chrome, 1628 × 786) tog animeringarna omkring 45 ms/s mer i
+sidans trådar än den ensamma gående förut, medan duken tar ungefär 2 ms/s i huvudtråden och kompositorn har
+mindre att göra än förut. Människorna går som förut, från tegelhuset hitåt eller bort, i promenadtakt (42–60 s). Figuren ritas en gång, från sidan i två steg, i
 utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt, lite sken från lyktorna i mörkret), och
-glider sedan längs bron med en transform på grafikkortet; benen byter steg med en stegvis förflyttning i samma duk.
+läggs sedan längs bron i trafikens duk; benen byter steg var 0,55:e sekund.
 Den går på gångbanan innanför räcket, lite högre i bilden än brons kant eftersom man ser bron uppifrån, med
 räcket framför upp till höften så att benen bara anas, och den är 1,15 gånger räckets höjd (`GANG`): räcket och
 lyktstolparna är ritade större än husen på andra sidan skulle säga (en våning är en halv grad vid tegelhuset, där
 räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och knappt hälften av utsiktens oskärpa, så att
-man ser att det är en människa (ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (rutorna som clip-path) och går bakom
-honom. Inget ritas om medan den går, och ingen går med minskad rörelse eller i en fast bild (`?rum-t`). Förut var
+man ser att det är en människa (ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
+honom. Ingen trafik går med minskad rörelse eller i en fast bild (`?rum-t`). Förut var
 väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
 kaffebryggaren och kassan (ändrat 2026-11-10).
 

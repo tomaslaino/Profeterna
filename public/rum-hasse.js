@@ -88,7 +88,7 @@ window.RumHasse = (() => {
     vy.id = 'rum-hasse-vy';
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
-    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"></div><button type="button" class="rh-lop" hidden></button><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
+    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"><canvas class="rh-trafik"></canvas></div><button type="button" class="rh-lop" hidden></button><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
       '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
@@ -354,55 +354,218 @@ window.RumHasse = (() => {
     H.vaggNr = (H.vaggNr || 0) + 1;
     passa();
   }
-  // Någon som går på bron då och då (gangare i rum-hasse-ute.js), oftare på dagen och kvällen än mitt i natten.
-  // Figuren ritas en gång och glider sedan längs bron med en transform på grafikkortet (Web Animations), bakom
-  // glaset och posterna (.rh-bron, med rutorna som clip-path i passa) och bakom honom. Ingen går när man har bett
-  // om minskad rörelse eller i en fast bild (?rum-t).
+  // Trafiken på S:t Eriksbron (gangare och fordon i rum-hasse-ute.js): de som går på gångbanan närmast, bilarna i
+  // båda filerna och bussarna, blåa 4:an och röda 3:an eller 77:an, lika mycket som på gatan i rummet vid samma tid
+  // (RumUte.trafik: rusning vardagsmorgnar och -eftermiddagar, lugnare på kvällen och helgmorgnar, lite på natten)
+  // och bussarna ungefär så ofta som de går (broTakt). Var och en ritas en gång till en egen bild, och sedan läggs
+  // de alla i en duk som bara täcker bandet där bron går (.rh-trafik i .rh-bron, broRita), i hans takt när han ritas
+  // (loop): som allt i rummet som rör sig hela tiden ritas i gängets takt. Som animeringar på grafikkortet (prövat
+  // först) räknades de om var för sig i varje skärmbild, och skärmen ritades om 60 gånger i sekunden fast han
+  // bara ritas 15–30 gånger när han sitter still. Duken klipps efter rutorna, så att trafiken syns bara genom
+  // glaset och går bakom posterna och honom. När man kommer är trafiken redan i gång: det som har hunnit en bit ut
+  // på bron står där det har hunnit (bronGa räknar fram från en minut tillbaka). Alla i en fil åker lika fort och
+  // håller avstånd, så att ingen kör igenom någon annan, och högst BRO_MAX är ute på en gång (färre på rummets
+  // lägre steg). Ingen trafik när man har bett om minskad rörelse eller i en fast bild (?rum-t).
+  const BRO_MAX = { ga: [4, 4, 3, 2], fil: [5, 4, 3, 2] };
+  const STROMMAR = ['ga', 'b0', 'b1', 'f0', 'f1', 't0', 't1'];
+  // hur ofta något kommer: de som går och bilarna (s, i medeltal), bussarna i var riktning (min mellan turerna)
+  function broTakt(T) {
+    const h = T.h;
+    return {
+      // (hälften så många som på gatan, där var och en går fram och tillbaka på ungefär 90 s)
+      ga: 180 / Math.max(1, T.gaende),
+      bil: (T.varv[0] + T.varv[1]) / 2 / T.bilar,
+      // (4:an är stombussen med flest resenärer: var 5:e minut i rusningen, var 6:e på dagen)
+      fyra: !T.bussar ? 0 : T.helg ? (h < 9 || h >= 20 ? 12 : 8) : T.rusning ? 5 : h < 19 ? 6 : 10,
+      tre: !T.bussar ? 0 : T.helg ? 15 : T.rusning ? 8 : h < 19 ? 10 : 15,
+    };
+  }
+  function broNu() {
+    const u = uteNu();
+    if (!u) return null;
+    const T = RumUte.trafik ? RumUte.trafik.nu(u.v)
+      : { h: u.v.timme, helg: false, rusning: false, natt: u.v.timme < 5, bilar: 1, varv: [42, 52], gaende: 4, bussar: u.v.timme > 5 };
+    return { ...u, T, takt: broTakt(T) };
+  }
+  // tills nästa (s): de som går och bilarna när som helst (i medeltal takt), bussarna ungefär efter tidtabellen
+  function broIntervall(k, takt) {
+    const ex = (m) => -Math.log(1 - Math.random()) * m;
+    if (k === 'ga') return Math.max(4, ex(takt.ga));
+    if (k[0] === 'b') return Math.max(1.6, ex(takt.bil));
+    const m = (k[0] === 'f' ? takt.fyra : takt.tre) * 60;
+    return m ? m * (0.75 + Math.random() * 0.5) : 300;
+  }
+  // filens fart (m/s): lugnare i rusningen, fortare på natten
+  const broFart = (T) => (T.natt ? 47 : T.rusning ? 33 : 41) / 3.6 * (0.93 + Math.random() * 0.14);
   function bronSnart(forst = false) {
     clearTimeout(H.bronT);
     if (!H.on || calm() || /[?&]rum-t\b/.test(location.search)) return;
-    const u = uteNu();
-    const natt = u && u.v.timme >= 1 && u.v.timme < 6 ? 3 : 1;
-    H.bronT = setTimeout(bronGa, (forst ? 3000 + Math.random() * 9000 : 15000 + Math.random() * 45000) * natt);
+    const n = broNu();
+    if (!n) return;
+    const nu = performance.now();
+    const B = H.bro || (H.bro = { aktiva: [] });
+    // (första gången, och efter en lång stund i en annan flik: från en minut tillbaka)
+    if (forst || !B.nasta || nu - Math.min(...STROMMAR.map((k) => B.nasta[k])) > 120000) {
+      const t0 = nu - 60000;
+      B.nasta = {};
+      for (const k of STROMMAR) B.nasta[k] = t0 + broIntervall(k, n.takt) * (k[0] === 'f' || k[0] === 't' ? Math.random() : 1) * 1000;
+      B.fri = [0, 0];
+      B.fart = [broFart(n.T), broFart(n.T)];
+      B.geo = null;
+    }
+    bronGa();
   }
   function bronGa() {
-    const u = uteNu();
-    if (!H.on || H.svanger || !H.ute || !H.ute.gangare || !H.v || !u || document.hidden || H.gar) { bronSnart(); return; }
-    const g = H.ute.gangare(u.v, u.L, uteLage());
-    const b = H.m.BAK[uteLage()];
-    const v = H.v;
-    const f = v.s / b.S;
-    const el = document.createElement('div');
-    el.className = 'rh-gar';
-    Object.assign(el.style, { width: `${g.B}px`, height: `${g.H}px`, transformOrigin: `${g.fot[0]}px ${g.fot[1]}px` });
-    const inre = document.createElement('div');
-    inre.className = 'rh-gar-in';
-    inre.append(g.duk);
-    // (vänd mot där den går: bort mot andra sidan åt vänster, hitåt åt höger)
-    if (!g.mot) inre.style.transform = 'scaleX(-1)';
-    el.append(inre);
-    $('.rh-bron').append(el);
-    const steg = g.mot ? g.steg : [...g.steg].reverse();
-    const n = steg.length - 1;
-    const ram = steg.map(([x, y, h], i) => ({
-      transform: `translate(${(v.cx + (x - b.px) * f - g.fot[0]).toFixed(1)}px, ${(v.ey + (y - b.py) * f - g.fot[1]).toFixed(1)}px) scale(${((h * f) / g.U).toFixed(3)})`,
-      opacity: i === 0 || i === n ? 0 : 1,
-      offset: i / n,
-    }));
-    const sek = 42 + Math.random() * 18;
-    const gang = el.animate(ram, { duration: sek * 1000, easing: 'linear', fill: 'both' });
-    g.duk.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${-g.B}px)` }], { duration: 1100, iterations: Infinity, easing: 'steps(2, jump-none)' });
-    H.gar = { el, gang, geo: [v.cx, v.ey, v.s].join() };
-    gang.onfinish = () => { if (H.gar && H.gar.el === el) bronBort(true); };
-  }
-  function bronBort(nasta = false) {
-    if (H.gar) {
-      H.gar.gang.cancel();
-      H.gar.el.remove();
-      H.gar = null;
-    }
     clearTimeout(H.bronT);
-    if (nasta) bronSnart();
+    const n = broNu();
+    if (!H.on || !n || !H.bro || !H.bro.nasta) return;
+    if (H.svanger || !H.ute || !H.ute.gangare || !H.v || document.hidden) { H.bronT = setTimeout(bronGa, 1500); return; }
+    const B = H.bro;
+    const nu = performance.now();
+    if (!B.geo) B.geo = [H.v.cx, H.v.ey, H.v.s, uteLage()].join();
+    // (duken, om utsikten kom efter att bilden lades)
+    if (!H.broDuk) { const b = H.m.BAK[uteLage()]; broDuk(H.v, b, H.v.s / b.S, uteLage()); }
+    // allt som skulle ha kommit fram till nu, i tur och ordning
+    for (let i = 0; i < 400; i++) {
+      let k = null;
+      for (const s of STROMMAR) if (B.nasta[s] <= nu && (!k || B.nasta[s] < B.nasta[k])) k = s;
+      if (!k) break;
+      const t = B.nasta[k];
+      const fil = k === 'ga' ? -1 : +k[1];
+      // (i filen håller man avstånd till den framför)
+      if (fil >= 0 && t < B.fri[fil]) { B.nasta[k] = B.fri[fil] + 100; continue; }
+      const tom = (k[0] === 'f' && !n.takt.fyra) || (k[0] === 't' && !n.takt.tre);
+      if (!tom) {
+        const kom = broKom(k, n, (nu - t) / 1000);
+        // (fullt: försök igen om en stund)
+        if (!kom) { B.nasta[k] = t + 2000; continue; }
+        if (fil >= 0) B.fri[fil] = t + ((kom.meter + 8) / B.fart[fil]) * 1000;
+      }
+      B.nasta[k] = t + broIntervall(k, n.takt) * 1000;
+    }
+    // (också när han inte ritas, som medan kameran svänger: då står trafiken där den står så länge)
+    broRita(nu);
+    H.bronT = setTimeout(bronGa, Math.max(100, Math.min(...STROMMAR.map((s) => B.nasta[s])) - nu));
+  }
+  // någon eller något kommer ut på bron, forbi s in på vägen; → { meter } (också när det redan har hunnit förbi),
+  // eller null när det är fullt
+  function broKom(k, n, forbi) {
+    const B = H.bro;
+    const lage = uteLage();
+    const nu = performance.now();
+    const aktiva = B.aktiva.filter((x) => nu - x.t0 < x.sek * 1000);
+    if (k === 'ga') {
+      if (forbi > 60) return { meter: 0 };
+      if (aktiva.filter((x) => x.k === 'ga').length >= BRO_MAX.ga[steg()]) return null;
+      const sek = 42 + Math.random() * 18;
+      if (forbi >= sek) return { meter: 0 };
+      B.aktiva.push({ k, g: H.ute.gangare(n.v, n.L, lage), lage, t0: nu - forbi * 1000, sek });
+      return { meter: 0 };
+    }
+    const fil = +k[1];
+    const buss = k[0] !== 'b';
+    const meter = k[0] === 'f' ? 18.1 : k[0] === 't' ? 12.1 : 4.8;
+    if (forbi > 40 || !H.ute.fordon || !RumUte.trafik) return { meter };
+    const ifil = aktiva.filter((x) => x.fil === fil);
+    if (ifil.length >= BRO_MAX.fil[steg()]) return null;
+    // (en tom fil får nytt tempo efter klockan)
+    if (!ifil.length) B.fart[fil] = broFart(n.T);
+    const a = !buss ? RumUte.trafik.bil(Math.random, n.T.natt) : k[0] === 'f' ? { kind: 'ledbuss', c: '#2468b8', nr: '4' } : { kind: 'buss', c: '#c0262a', nr: Math.random() < 0.5 ? '3' : '77' };
+    const g = H.ute.fordon(n.v, n.L, lage, a, fil);
+    const sek = g.vag / B.fart[fil];
+    if (forbi < sek) B.aktiva.push({ k, fil, g, lage, t0: nu - forbi * 1000, sek });
+    return { meter: g.meter };
+  }
+  function bronBort() {
+    clearTimeout(H.bronT);
+    if (!H.bro) return;
+    H.bro.aktiva = [];
+    H.bro.nasta = null;
+    broRita(0);
+  }
+  // Duken över bandet där trafiken går (H.ute.broRam), i skärmens bildpunkter men högst 1,5 per punkt (allt är
+  // oskarpt), och rutornas glas som klippning: sätts när bilden ändras (passa).
+  function broDuk(v, b, f, lage) {
+    const el = $('.rh-trafik');
+    if (!el || !H.ute || !H.ute.broRam) return;
+    const tx = v.cx - b.px * f;
+    const ty = v.ey - b.py * f;
+    const [x0, y0, x1, y1] = H.ute.broRam(lage);
+    const rutor = H.ute.rutor(lage).map((q) => q.map(([x, y]) => [tx + x * f, ty + y * f]));
+    const allt = rutor.flat();
+    const X0 = Math.floor(Math.max(0, tx + x0 * f, Math.min(...allt.map((p) => p[0]))));
+    const X1 = Math.ceil(Math.min(innerWidth, tx + x1 * f, Math.max(...allt.map((p) => p[0]))));
+    const Y0 = Math.floor(Math.max(0, ty + y0 * f, Math.min(...allt.map((p) => p[1]))));
+    const Y1 = Math.ceil(Math.min(innerHeight, ty + y1 * f, Math.max(...allt.map((p) => p[1]))));
+    const res = Math.min(devicePixelRatio || 1, 1.5) * (steg() >= 2 ? 0.75 : 1);
+    const w = Math.max(1, X1 - X0);
+    const h = Math.max(1, Y1 - Y0);
+    el.width = Math.ceil(w * res);
+    el.height = Math.ceil(h * res);
+    Object.assign(el.style, { left: `${X0}px`, top: `${Y0}px`, width: `${w}px`, height: `${h}px` });
+    const klipp = new Path2D();
+    for (const q of rutor) {
+      q.forEach(([x, y], i) => (i ? klipp.lineTo(x - X0, y - Y0) : klipp.moveTo(x - X0, y - Y0)));
+      klipp.closePath();
+    }
+    H.broDuk = { el, x: el.getContext('2d'), res, X0, Y0, tx, ty, f, klipp, tom: false };
+  }
+  // Trafiken som den står vid ms: de bortre först, och i varje fil det som är längst bort först
+  function broRita(ms) {
+    const D = H.broDuk;
+    if (!D) return;
+    const x = D.x;
+    const B = H.bro;
+    const levande = B && B.aktiva.length ? B.aktiva.filter((y) => ms - y.t0 < y.sek * 1000 && y.lage === uteLage()) : [];
+    if (B) B.aktiva = B.aktiva.filter((y) => ms - y.t0 < y.sek * 1000);
+    if (!levande.length && D.tom) return;
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.clearRect(0, 0, D.el.width, D.el.height);
+    D.tom = !levande.length;
+    if (D.tom) return;
+    x.save();
+    x.setTransform(D.res, 0, 0, D.res, 0, 0);
+    x.clip(D.klipp);
+    const r = D.res;
+    const f = D.f;
+    const ox = D.tx - D.X0;
+    const oy = D.ty - D.Y0;
+    const lagg = (m) => x.setTransform(r * f * m[0], r * f * m[1], r * f * m[2], r * f * m[3], r * (f * m[4] + ox), r * (f * m[5] + oy));
+    const ordning = [];
+    for (const y of levande) {
+      const p = Math.min(1, Math.max(0, (ms - y.t0) / (y.sek * 1000)));
+      if (y.k === 'ga') ordning.push({ y, p, z: 3e6 });
+      else {
+        const q = y.g.vid(p);
+        ordning.push({ y, p, q, z: (H.ute.FIL[y.fil].bort ? 1e6 : 2e6) + (H.ute.FIL[y.fil].bort ? 1 - p : p) * 1e5 });
+      }
+    }
+    ordning.sort((a, b2) => a.z - b2.z);
+    for (const { y, p, q } of ordning) {
+      if (q) {
+        x.globalAlpha = q.op;
+        lagg(q.sida);
+        x.drawImage(y.g.sida, 0, 0);
+        lagg(q.ande);
+        x.drawImage(y.g.ande, 0, 0);
+        continue;
+      }
+      // den som går: vägen i 20 steg, de två stegen i figuren om vartannat, tonas fram och bort i första och sista steget
+      const g = y.g;
+      const st = g.mot ? g.steg : [...g.steg].reverse();
+      const n = st.length - 1;
+      const i = Math.min(n - 1, Math.floor(p * n));
+      const t = p * n - i;
+      const [ax, ay, ah] = st[i];
+      const [bx, by, bh] = st[i + 1];
+      const sc = (r * f * (ah + (bh - ah) * t)) / g.U;
+      x.globalAlpha = Math.min(1, p * n, (1 - p) * n);
+      x.setTransform(g.mot ? sc : -sc, 0, 0, sc, r * (f * (ax + (bx - ax) * t) + ox), r * (f * (ay + (by - ay) * t) + oy));
+      const k = Math.floor((ms - y.t0) / 550) % 2;
+      x.drawImage(g.duk, k * g.B, 0, g.B, g.H, -g.fot[0], -g.fot[1], g.B, g.H);
+    }
+    x.restore();
+    x.globalAlpha = 1;
   }
   // Utsikten genom fönstren, underst på väggens duk: ritad en gång per väder och ljus (rum-hasse-ute.js), förstorad
   // till bildens mått, och glaset med dropparna, snön och frosten. Utan den: himlen i rummets färger.
@@ -632,12 +795,12 @@ window.RumHasse = (() => {
     const b = H.m.BAK[H.hog ? 'hog' : 'bred'];
     const f = v.s / b.S;
     for (const i of H.vy.querySelectorAll('.rh-bak')) Object.assign(i.style, { left: `${(v.cx - b.px * f).toFixed(1)}px`, top: `${(v.ey - b.py * f).toFixed(1)}px`, width: `${(b.W * f).toFixed(1)}px`, height: `${(b.H * f).toFixed(1)}px` });
-    // den som går på bron syns bara genom glaset (rutorna, bron nedan); går någon när fönstret ändras får den gå klart utanför bild
+    // trafiken på bron syns bara genom glaset (rutorna, broDuk ovan); när fönstret ändras börjar den om där den var
     if (H.ute && H.ute.rutor) {
-      const d = H.ute.rutor(H.hog ? 'hog' : 'bred').map((q) => `M${q.map(([x, y]) => `${(v.cx + (x - b.px) * f).toFixed(1)} ${(v.ey + (y - b.py) * f).toFixed(1)}`).join(' L')} Z`).join(' ');
-      $('.rh-bron').style.clipPath = `path('${d}')`;
+      broDuk(v, b, f, H.hog ? 'hog' : 'bred');
+      broRita(performance.now());
     }
-    if (H.gar && H.gar.geo !== [v.cx, v.ey, v.s].join()) bronBort(true);
+    if (H.bro && H.bro.geo && H.bro.geo !== [v.cx, v.ey, v.s, uteLage()].join()) { bronBort(); bronSnart(true); }
     // pulten: ritas en gång, med väggen i träets glans (medan fönstret ändras först när det har stannat)
     let disk = Promise.resolve();
     if (H.fig) {
@@ -1282,6 +1445,8 @@ window.RumHasse = (() => {
       // munnen: ljudstyrkan när han hörs, annars följer den talet
       H.mun += ((H.munMal == null ? H.tal : H.munMal) - H.mun) * Math.min(1, dt * 30);
       H.fig.rita(H.T, ms / 1000, H.tal, H.mun, H.klipp);
+      // (trafiken på bron i samma takt)
+      if (H.bro && H.bro.aktiva.length) broRita(ms);
     };
     H.raf = requestAnimationFrame(tick);
   }
