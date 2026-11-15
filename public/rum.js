@@ -1308,6 +1308,30 @@ window.Rum = (() => {
     for (const [x, r] of [[380, 70], [560, 76], [730, 72]]) form(x - r, x + r, 690, 860, 0.9);
     return c.toDataURL();
   }
+  // Pultens lack speglar det som lyser bakom den, mjukt och utdraget mot betraktaren: lysröret dag som
+  // kväll, neonen mer på kvällen och stadens ljus genom fönstret på natten. I samma mått och upplösning som
+  // solens fläck, och blandas in i pultens bild på samma sätt (.rum-sol): inget nytt lager. Tv:ns sken är inte
+  // med, eftersom det släcks med tv:n och spegelbilden ritas bara när ljuset ändras.
+  function spegelBild(kvall) {
+    const c = document.createElement('canvas');
+    c.width = 405;
+    c.height = 172;
+    const g = c.getContext('2d');
+    g.scale(0.25, 0.25);
+    g.translate(10, -650);
+    // (bara på pulten, som börjar vid bakkanten)
+    g.beginPath();
+    g.rect(-10, 652, 1620, 700);
+    g.clip();
+    rad(g, 628, 690, 340, 170, '255, 236, 200', r1(0.14 + 0.08 * kvall));
+    // neonen i strimmor, som i lackat trä
+    const n = 0.15 + 0.45 * kvall;
+    rad(g, 400, 670, 110, 200, '255, 60, 45', r1(n));
+    for (const x of [348, 380, 414, 448]) rad(g, x, 690, 13, 240, '255, 90, 70', r1(n));
+    if (kvall > 0.02) rad(g, 560, 664, 380, 50, '255, 190, 120', r1(0.2 * kvall));
+    return c.toDataURL();
+  }
+
   function ljusKlockan() {
     const v = R.vader;
     if (!v || !window.RumUte || !R.el || !R.ljusKlar) return;
@@ -1329,8 +1353,10 @@ window.Rum = (() => {
     dagDuk();
     // på pulten: i pultens egen bild, så att träet syns i ljuset och inget nytt lager behövs
     const url = s > 0.02 ? solBild(vpx, slut, guld) : '';
-    const bild = (blend, a) => `<image href="${url}" x="-10" y="650" width="1620" height="688" preserveAspectRatio="none" opacity="${a}" style="mix-blend-mode:${blend}"/>`;
-    for (const g of R.el.querySelectorAll('.rum-sol')) g.innerHTML = url ? bild('overlay', r1(s)) + bild('soft-light', r1(s)) : '';
+    const bild = (href, blend, a) => `<image href="${href}" x="-10" y="650" width="1620" height="688" preserveAspectRatio="none" opacity="${a}" style="mix-blend-mode:${blend}"/>`;
+    // (och det som lyser speglas i lacken, spegelBild)
+    const spegel = bild(spegelBild(kvall), 'screen', 1);
+    for (const g of R.el.querySelectorAll('.rum-sol')) g.innerHTML = (url ? bild(url, 'overlay', r1(s)) + bild(url, 'soft-light', r1(s)) : '') + spegel;
     const [y0v, hv] = R.smal ? [-300, 1800] : [0, H];
     // rummet lite mörkare runt solen, och på kvällen överallt: lamporna syns bättre då
     ljusPa(R.el.querySelector('.rum-vign'), y0v, hv, 0, W, (g) => {
@@ -1346,12 +1372,15 @@ window.Rum = (() => {
       q.fillStyle = kant;
       q.fillRect(-100, y0v - 100, W + 200, hv + 200);
       if (kvall > 0.02) {
-        q.fillStyle = `rgba(14, 8, 10, ${r1(0.34 * kvall)})`;
+        // (natten på riktigt: rummet lever av sina lampor, och kupongen i käglan är det ljusaste)
+        q.fillStyle = `rgba(14, 8, 10, ${r1(0.5 * kvall)})`;
         q.fillRect(-100, y0v - 100, W + 200, hv + 200);
       }
       q.globalCompositeOperation = 'destination-out';
       for (const [x, y, rx, ry, a] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a);
       rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
+      // (och runt neonens spegelbild i pulten, spegelBild)
+      rad(q, 400, 690, 140, 110, '0, 0, 0', 0.7);
       rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
       for (const [x, y, rx, ry] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.7);
       if (s > 0.02) {
@@ -1378,7 +1407,7 @@ window.Rum = (() => {
     });
     // tv:ns sken är ett eget lager som släcks med tv:n: starkare på kvällen
     ljusPa(R.el.querySelector('#rum-tvsken'), -60, 480, 1000, 620, (g) => {
-      rad(g, 1310, 180, 310, 240, '70, 120, 255', r1(0.42 * f));
+      rad(g, 1310, 180, 310, 240, '70, 120, 255', r1(0.55 * f));
     });
     for (const [sel, dag, kv] of [['canvas.rum-neonglow', 0.08, 0.24], ['canvas.rum-neonhalo', 0.28, 0.34]]) {
       const n = R.el.querySelector(sel);

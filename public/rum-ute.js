@@ -291,6 +291,11 @@ window.RumUte = (() => {
     const RS = rng(53);
     let morka = '';
     const tanda = ['', ''];
+    // Stadens ljus är ur skärpa (skärpedjupet, rum-ute.css): några av de tända fönstren blir runda
+    // fläckar, som ljus ser ut genom ett objektiv som har skärpan i rummet. Ett urval av de ljusaste (r
+    // nedan), så att fläckarna inte flyter ihop; i en enda form med en båge per fläck.
+    let flackar = '';
+    const FLACK = 5;
     const roof = sno || dis(mix('#0a0c12', mix('#3a3d44', L.sky[2], 0.25), L.dag), 0.2);
     for (const b of STAD) {
       const f = dis(facade(b.dag, '#0d1017', L), 0.16);
@@ -302,11 +307,13 @@ window.RumUte = (() => {
           morka += w;
           const r = RS();
           if (r < L.tand * 0.8) tanda[r < L.tand * 0.3 ? 0 : 1] += w;
+          if (r < L.tand * 0.14) flackar += `M${r1(x + 1.3 - FLACK)} ${r1(y + 1.7)}a${FLACK} ${FLACK} 0 1 0 ${2 * FLACK} 0a${FLACK} ${FLACK} 0 1 0 ${-2 * FLACK} 0z`;
         }
       }
     }
     if (L.dag > 0.05) s += `<path d="${morka}" fill="${dis(mix('#1e2228', L.sky[2], 0.15), 0.1)}" opacity="${r1(0.5 * L.dag)}"/>`;
     if (L.dag < 0.7) tanda.forEach((d, i) => { if (d) s += `<path d="${d}" fill="${WARM[i]}" opacity="${r1((i ? 0.5 : 0.9) * (1 - 0.9 * L.dag))}"/>`; });
+    if (L.dag < 0.7 && flackar) s += `<path d="${flackar}" fill="${WARM[0]}" opacity="${r1(0.45 * (1 - L.dag / 0.7))}"/>`;
 
     // kontaktledningarna över järnvägen, mellan träden
     s += `<g stroke="${dis(mix('#0c0e12', '#59606a', L.dag), 0.2)}" fill="none"><path d="M34 400 V352 M78 400 V352 M30 356 H82 M228 400 V354 M272 400 V354 M224 358 H276" stroke-width="2"/><path d="M-80 364 H320" stroke-width=".8" opacity=".6"/></g>`;

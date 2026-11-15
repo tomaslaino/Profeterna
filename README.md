@@ -6139,6 +6139,25 @@ mätt i en riktig telefon: `?rum-mat` ger siffrorna där.
 **Att ta bilder av rummet:** i headless Chrome med mjukvarugrafik tar det 25–40 sekunder innan ljuset är bakat
 (`R.ljusKlar`), och bilder tagna innan dess saknar rummets ljus helt (vinjetten, kvällens mörker, neonens färg).
 
+### Natten på riktigt (2026-11-15)
+
+Användarens önskemål: förslaget *Natten på riktigt*. Rummet mörknade redan på kvällen (se [Ljuset efter
+klockan](#ljuset-efter-klockan)); nu lever det mer av sina egna lampor.
+
+- **Mörkare runt lamporna:** kvällens mörker i `.rum-vign` är 0,5 i stället för 0,34 (gånger `kvall`), och det går
+  runt ljuskäglorna över bordet och pulten (`KAGLOR`), så att kupongen i käglan är det ljusaste i bilden, och runt
+  neonen, tv:n, spotarna och neonens spegelbild i pulten. Tv:ns blå sken på väggen är starkare (0,42 → 0,55).
+- **Pultens lack speglar ljuset** (`spegelBild` i rum.js): lysröret dag som kväll, neonen i röda strimmor (svagt på
+  dagen, starkare på kvällen) och stadens ljus genom fönstret på natten. Den ritas i samma mått och upplösning som
+  solens fläck och blandas in i pultens bild med `screen` (`.rum-sol`), när ljuset ändras: inget nytt lager. Tv:ns
+  sken är inte med, eftersom det släcks med tv:n.
+- **Stadens ljus blir runda fläckar:** några av de tända fönstren i stan på andra sidan (de ljusaste, ungefär en
+  sjundedel av de tända) får en rund fläck med radien 5 px (`flackar` i `gata`, rum-ute.js), som med gatans oskärpa
+  ser ut som ljus genom ett objektiv som har skärpan i rummet. Alla i en enda form, så att gatans SVG inte växer.
+
+Mätt som ovan klockan 21.30 i klart väder, mot versionen med ljuskäglorna: hörnen 15–18 % mörkare, korktavlan längst
+ut 25 %, gängets bord 7 % och kupongen 6 %. Närbilden av Tipsligan på kvällen går att läsa som förut.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
