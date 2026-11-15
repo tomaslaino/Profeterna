@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T19:51:50.791Z",
+ "uppdaterad": "2026-11-15T19:53:06.199Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2862,6 +2862,78 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 2
+  },
+  {
+   "id": "401861187",
+   "match": "Nordmakedonien – Slovenien",
+   "avspark": "2026-11-16T19:45Z",
+   "writtenAt": "2026-11-15T19:52:35.056Z",
+   "text": "Nordmakedonien har ett mål att gå på\n\nNordmakedonien har noll poäng och ett gjort mål på fem matcher i Nations League och tar emot Slovenien i Skopje. I september vann Slovenien med 2–0 i Ljubljana, och den segern betydde mer för slovenerna än resultatet visar.\n\nSlovenien har inte vunnit tävlingsmatcher särskilt ofta på sistone. När laget slog Nordmakedonien med 2–0 i Ljubljana den 29 september var det landslagets första seger på över ett och ett halvt år om man inte räknar vänskapsmatcher, enligt RTV Slovenija [1]. Den förra hade kommit mot Slovakien i mars 2025. Det var också bara Sloveniens andra seger på åtta möten med Nordmakedonien. Sedan dess har laget vunnit med 2–1 i Skottland och spelat 0–0 hemma mot Schweiz. Slovenien har hållit nollan i tre av fem matcher i gruppen.\n\nMatchen i september avgjordes efter paus. Sandi Lovrić gjorde 1–0 i 55:e minuten och Aljoša Matko 2–0 i 82:a, och det var hans första mål i landslagströjan, skriver RTV Slovenija [1]. Redan före paus hade Slovenien vunnit hörnorna med 5–1 [1]. Sådant ser man redan på uppvärmningen, eftersom det laget som trycker på fasta situationer också är det laget som tror på sig själv.\n\nNordmakedonien har bara gjort ett mål på hela hösten. Det kom vid förlusten med 1–2 i Skottland i fredags. Laget har släppt in tolv mål på fem matcher och förlorat alla. Det här är sista matchen i gruppen och den enda chansen att lämna hösten med något i handen. Bollen har aldrig läst en tabell, men den har sett Nordmakedoniens anfall.\n\nTipset: X2 (Tvåan väger tyngst)\n\nSpelbolagen ger Slovenien klart störst chans, och jag har inte läst något som talar emot det. Nordmakedonien har gjort ett enda mål på fem matcher, och i september fick de inget att fungera i Ljubljana när Slovenien vann med 2–0 [1]. Det som håller mig från att ringa in en ensam tvåa är Sloveniens egen målbrist. Laget har spelat 0–0 två gånger i gruppen och gjort fem mål på fem matcher, och det vann sin första tävlingsmatch på ett och ett halvt år först i september [1]. En mållös match på en nervös höstkväll i Skopje är fullt möjlig. Därför ringar jag in tvåan och krysset.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Nordmakedonien har ett mål att gå på",
+   "lead": "Nordmakedonien har noll poäng och ett gjort mål på fem matcher i Nations League och tar emot Slovenien i Skopje. I september vann Slovenien med 2–0 i Ljubljana, och den segern betydde mer för slovenerna än resultatet visar.",
+   "paragraphs": [
+    "Slovenien har inte vunnit tävlingsmatcher särskilt ofta på sistone. När laget slog Nordmakedonien med 2–0 i Ljubljana den 29 september var det landslagets första seger på över ett och ett halvt år om man inte räknar vänskapsmatcher, enligt RTV Slovenija [1]. Den förra hade kommit mot Slovakien i mars 2025. Det var också bara Sloveniens andra seger på åtta möten med Nordmakedonien. Sedan dess har laget vunnit med 2–1 i Skottland och spelat 0–0 hemma mot Schweiz. Slovenien har hållit nollan i tre av fem matcher i gruppen.",
+    "Matchen i september avgjordes efter paus. Sandi Lovrić gjorde 1–0 i 55:e minuten och Aljoša Matko 2–0 i 82:a, och det var hans första mål i landslagströjan, skriver RTV Slovenija [1]. Redan före paus hade Slovenien vunnit hörnorna med 5–1 [1]. Sådant ser man redan på uppvärmningen, eftersom det laget som trycker på fasta situationer också är det laget som tror på sig själv.",
+    "Nordmakedonien har bara gjort ett mål på hela hösten. Det kom vid förlusten med 1–2 i Skottland i fredags. Laget har släppt in tolv mål på fem matcher och förlorat alla. Det här är sista matchen i gruppen och den enda chansen att lämna hösten med något i handen. Bollen har aldrig läst en tabell, men den har sett Nordmakedoniens anfall."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "RTV Slovenija",
+     "title": "Veselje slovenske izbrane vrste po drugem zadetku. Foto: www.alesfevzer.com",
+     "url": "https://www.rtvslo.si/n/795217",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger Slovenien klart störst chans, och jag har inte läst något som talar emot det. Nordmakedonien har gjort ett enda mål på fem matcher, och i september fick de inget att fungera i Ljubljana när Slovenien vann med 2–0 [1]. Det som håller mig från att ringa in en ensam tvåa är Sloveniens egen målbrist. Laget har spelat 0–0 två gånger i gruppen och gjort fem mål på fem matcher, och det vann sin första tävlingsmatch på ett och ett halvt år först i september [1]. En mållös match på en nervös höstkväll i Skopje är fullt möjlig. Därför ringar jag in tvåan och krysset.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Tvåan väger tyngst",
+    "sources": [
+     {
+      "n": 1,
+      "source": "RTV Slovenija",
+      "title": "Veselje slovenske izbrane vrste po drugem zadetku. Foto: www.alesfevzer.com",
+      "url": "https://www.rtvslo.si/n/795217",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T19:52:35.056Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Nordmakedonien har gjort ett enda mål på fem matcher i gruppen och släppt in tolv. De har förlorat alla matcherna. Ett landslag som har det så inför sista matchen på hösten har samma spelare och samma problem som förut, och det rättar ingen förbundskapten till på en samling.",
+     "Slovenien gör inte många mål själva, fem på fem matcher, men de har hållit nollan i tre av dem. Det räcker gott mot ett lag som aldrig hittar fram. I september vann de med 2–0 och tog över matchen efter paus. Jag ser inget som säger att det blir annorlunda i Skopje.",
+     "Den som garderar med kryss här gör det för att han är rädd. Jag är inte rädd, jag har sett deras anfall, så det blir en jävligt säker ensam tvåa."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–2",
+    "tips": "2026-11-15T19:52:35.056Z",
+    "uppdrag": {
+     "fraser": [
+      "Nej nej nej",
+      "Det köper jag aldrig"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T19:53:00.140Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
   },
   {
    "id": "401861186",
