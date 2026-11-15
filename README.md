@@ -7146,9 +7146,14 @@ bland tre skisser i den riktiga närbilden:
 
 - **Förra mötet** ("var det en chansrik affär, vem hade mest bollinnehav, blev det många kort";
   *Matchrapporten*): har lagen mötts det senaste halvåret står det mötet överst i MÖTENA –
-  *FÖRRA MÖTET · 28 SEP · I SVERIGE* – med lagens mål, xG, skott, skott på mål, stora chanser,
-  bollinnehav och gula kort (röda bara när något lag fick ett) i två spalter. Målen, xG,
-  skotten och chanserna lyser för det bättre laget; bollinnehavet och korten står som de är.
+  *FÖRRA MÖTET · 28 SEP · I SVERIGE* – med lagens mål, xG, stora chanser, skott, skott på mål,
+  bollinnehav och gula kort (röda bara när något lag fick ett). Samma kväll, efter "mer
+  pedagogiskt och överblickbart", valde användaren *A Dragkampen* bland fyra skisser (Spegeln,
+  Övertaget och I listan var de andra): varje tal har en delad stapel mellan lagens tal, lika lång
+  på alla rader och delad där lagens andelar möts, så att man ser hur stor del vart lag hade utan
+  att läsa talen. Det bättre lagets del och tal lyser och det andras är svagt (målen, xG,
+  chanserna och skotten); bollinnehavet och korten är gröna på båda sidor. Dolt resultat ger ?
+  och en tom stapel, och skärmen i rummet ritar samma streck (`mtv`/`mtd` i rum-dator.js).
   Under står de senaste mötena som förut. Datan är `lastMeeting` i matchens fil
   (`lastMeeting` i [src/matches.js](src/matches.js)): det senaste mötet i någon tävling högst
   183 dagar före avspark, med lagens siffror ur 365Scores och, för ligorna, ur

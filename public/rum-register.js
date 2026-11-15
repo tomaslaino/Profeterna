@@ -651,14 +651,21 @@ window.RumRegister = (() => {
     // chansrik affär, vem hade mest bollinnehav, blev det många kort";
     // användarens val bland tre skisser: Matchrapporten). När lagen har mötts
     // det senaste halvåret (lastMeeting i matchens fil) står lagens siffror
-    // från det mötet överst i MÖTENA, i två spalter som i resten av
-    // matchakten: det bättre talet lyser (målen, xG, skotten och chanserna;
-    // bollinnehavet och korten står som de är). Röda kort bara när något lag
-    // fick ett. Sedan listan med de senaste mötena.
+    // från det mötet överst i MÖTENA. Samma kväll, efter "mer pedagogiskt och
+    // överblickbart", användarens val A Dragkampen bland fyra skisser: varje
+    // tal har en delad stapel mellan lagens tal – lika lång på alla rader,
+    // delad där lagens andelar möts, med ett tomt tecken i skarven – så att
+    // man ser hur stor del vart lag hade utan att läsa talen. Det bättre
+    // lagets del och tal lyser och det andras är svagt (målen, xG, chanserna
+    // och skotten); bollinnehavet och korten är gröna på båda sidor. Talen i
+    // den ordning de säger mest om matchen: målen, xG och de stora chanserna
+    // först, bollinnehavet och korten sist. Röda kort bara när något lag fick
+    // ett. Dolt resultat: ? och en tom stapel. Sedan listan med de senaste mötena.
     const FORRA_L = 15;
+    const FORRA_V = 5;
     const FORRA = [
-      ['MÅL', 'mal', String, true], ['xG', 'xg', (x) => num(x, 2), true], ['SKOTT', 'sh', String, true], ['PÅ MÅL', 'sot', String, true],
-      ['STORA CHANSER', 'bc', String, true], ['BOLLINNEHAV', 'poss', (x) => `${Math.round(x)} %`, false],
+      ['MÅL', 'mal', String, true], ['xG', 'xg', (x) => num(x, 2), true], ['STORA CHANSER', 'bc', String, true],
+      ['SKOTT', 'sh', String, true], ['PÅ MÅL', 'sot', String, true], ['BOLLINNEHAV', 'poss', (x) => `${Math.round(x)} %`, false],
       ['GULA KORT', 'yc', String, false], ['RÖDA KORT', 'rc', String, false],
     ];
     function forraMotet(m, d) {
@@ -670,22 +677,32 @@ window.RumRegister = (() => {
       const mal = lag.map((n) => (x.home === n ? x.score.home : x.score.away));
       const dolj = Boolean(window.Spoiler && Spoiler.hidesDay(x.kickoff));
       const L = FORRA_L;
-      const K = Math.min(20, Math.floor((A.bred - L) / 2));
+      const V = FORRA_V;
+      // stapelns längd (36 på datorn, 13 i telefonen) och radens hela bredd
+      const n = Math.max(8, Math.min(36, A.bred - L - 2 * V - 2));
+      const w = L + V + 1 + n + 1 + V;
       const plats = x.neutral ? 'PÅ NEUTRAL PLAN' : `${isLand(x.comp) ? 'I' : 'HOS'} ${kort(x.home)}`;
       const titel = `FÖRRA MÖTET · ${up(dag(x.kickoff)).replace(/ \d{4}$/, '')} · ${plats}`;
-      const w = Math.min(A.bred, L + 2 * K) - 1;
-      const r = [rad([titel, 'd', ordQ('forra')], ...(w > titel.length + 2 ? [[' ', ''], [' '.repeat(w - titel.length - 1), 'ln']] : [])),
-        rad([pad('', L)], ...lag.flatMap((n, j) => [[kort(n).slice(0, K - 1), '', `#lag:${n}`], [j ? '' : pad('', K - Math.min(kort(n).length, K - 1)), '']]))];
+      const namn = lag.map((y) => kort(y));
+      const h0 = V + 1 + Math.ceil(n / 2);
+      const h1 = Math.floor(n / 2) + 1 + V;
+      const r = [rad([titel, 'd', ordQ('forra')], ...(w - 1 > titel.length + 2 ? [[' ', ''], [' '.repeat(w - titel.length - 2), 'ln']] : [])),
+        rad([pad('', L)], [namn[0].slice(0, h0 - 1), '', `#lag:${lag[0]}`], [pad('', h0 - Math.min(namn[0].length, h0 - 1) + Math.max(0, h1 - namn[1].length)), ''],
+          [namn[1].slice(0, h1), '', `#lag:${lag[1]}`])];
       const ok = (y) => y != null && Number.isFinite(y);
+      const streck = (k, kl) => (k > 0 ? [[' '.repeat(k), kl]] : []);
       for (const [e, k, fmt, battre] of FORRA) {
         const v = k === 'mal' ? mal : st.map((y) => y[k]);
         if (!v.some(ok) || (k === 'rc' && !v.some((y) => y > 0))) continue;
         const b = !dolj && battre && v.every(ok) && v[0] !== v[1] ? (v[0] > v[1] ? 0 : 1) : -1;
         const txt = v.map((y) => (dolj ? '?' : ok(y) ? fmt(y) : '–'));
-        r.push(rad([e, 'd', ordQ(`forra-${k}`)], [pad('', L - e.length)], ...txt.flatMap((t, j) => {
-          const bit = [t, b < 0 ? '' : j === b ? 'v' : 'd'];
-          return j ? [bit] : [bit, [pad('', Math.max(1, K - t.length))]];
-        })));
+        const nk = (j) => (b < 0 ? '' : j === b ? 'v' : 'd');
+        const kl = (j) => (b < 0 ? 'mt1' : j === b ? 'mtv' : 'mtd');
+        const sum = v.every(ok) ? v[0] + v[1] : 0;
+        // vänstra lagets del av n - 1 tecken (det sista är skarven)
+        const f0 = sum > 0 ? Math.round(((n - 1) * v[0]) / sum) : 0;
+        const stapel = dolj || !(sum > 0) ? streck(n, 'mt0') : [...streck(f0, kl(0)), [' ', ''], ...streck(n - 1 - f0, kl(1))];
+        r.push(rad([e, 'd', ordQ(`forra-${k}`)], [pad('', L - e.length)], [padL(txt[0], V), nk(0)], [' ', ''], ...stapel, [' ', ''], [txt[1], nk(1)]));
       }
       return [...r, tom()];
     }
