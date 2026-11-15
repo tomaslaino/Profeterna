@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T15:14:01.682Z",
+ "uppdaterad": "2026-11-15T15:16:27.300Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2778,6 +2778,90 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
+  },
+  {
+   "id": "401861181",
+   "match": "Kazakstan – Slovakien",
+   "avspark": "2026-11-16T15:00Z",
+   "writtenAt": "2026-11-15T15:15:59.439Z",
+   "text": "Slovakien vilar sju och reser ändå österut\n\nSlovakien har redan säkrat uppflyttningen och lämnar halva startelvan hemma inför avslutningen i Astana. Kazakstan står utan seger på sju landskamper och har en förbundskapten som talar om besvikelse. Det blir en kväll för reserver och för hederns skull.\n\nVladimír Weiss har gjort det man gör när jobbet redan är klart. Lagkaptenen Milan Škriniar, Dominik Greif, Martin Valjent, Dávid Hancko, Ondrej Duda, Matúš Bero och Albert Rusnák är vilade, och förbundskaptenen säger att de spelare som har väntat på sin chans ska få den, enligt TN Live [1]. Han var inte nöjd med 2–2 mot Färöarna och vill se mer löpning den här gången. ”Určite nás tu nečaká nič jednoduché”, säger han, och menar att Kazakstan är ett arbetsamt lag och att matchen avgörs i närkamperna [1]. Det håller jag med om. Ett lag med sju nya namn vet sällan var de ska stå på motståndarnas hörnor, och det ser du redan på uppvärmningen. Slovakien kan dessutom avsluta hela gruppspelet obesegrat [1].\n\nHos Kazakstan låter det tyngre. Förbundskaptenen Michel van 't Schip kallar de fem första matcherna en besvikelse för ledarstaben, för honom själv och för spelarna, berättar Sportarena [2]. ”Понимаем, что, возможно, не были фаворитами группы, но ставили перед собой более высокие цели”, säger han. Två spelare är skadade, en är avstängd efter ett rött kort och några med småkrämpor ska testas efter sista träningen, så minst tre platser i laget byts ut [2]. Han vill avsluta värdigt, ”особенно ради болельщиков Казахстана”, och lovar att ställa upp det starkaste laget han har [2]. I Tjäderfors hade vi en gång en hel höst att spela för hedern och ingenting annat, och det var den bästa fotboll vi spelade.\n\nTipset: X2 (reserverna drar ner)\n\nSpelbolagen ger Slovakien drygt hälften av chansen, och det är räknat på ett lag som brukar ställa upp med Škriniar, Hancko och Duda. Alla tre är vilade, liksom fyra till [1]. Kazakstan saknar visserligen tre spelare [2], men de spelar hemma och för publiken, och de har gjort mål i varje match i gruppen. Mot ett hopplock av slovakiska reserver som inte har spelat ihop tror jag mer på oavgjort än marknaden gör. Jag ringar in 2 och X och låter hemmasegern gå. Bollen har aldrig läst en tabell.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Slovakien vilar sju och reser ändå österut",
+   "lead": "Slovakien har redan säkrat uppflyttningen och lämnar halva startelvan hemma inför avslutningen i Astana. Kazakstan står utan seger på sju landskamper och har en förbundskapten som talar om besvikelse. Det blir en kväll för reserver och för hederns skull.",
+   "paragraphs": [
+    "Vladimír Weiss har gjort det man gör när jobbet redan är klart. Lagkaptenen Milan Škriniar, Dominik Greif, Martin Valjent, Dávid Hancko, Ondrej Duda, Matúš Bero och Albert Rusnák är vilade, och förbundskaptenen säger att de spelare som har väntat på sin chans ska få den, enligt TN Live [1]. Han var inte nöjd med 2–2 mot Färöarna och vill se mer löpning den här gången. ”Určite nás tu nečaká nič jednoduché”, säger han, och menar att Kazakstan är ett arbetsamt lag och att matchen avgörs i närkamperna [1]. Det håller jag med om. Ett lag med sju nya namn vet sällan var de ska stå på motståndarnas hörnor, och det ser du redan på uppvärmningen. Slovakien kan dessutom avsluta hela gruppspelet obesegrat [1].",
+    "Hos Kazakstan låter det tyngre. Förbundskaptenen Michel van 't Schip kallar de fem första matcherna en besvikelse för ledarstaben, för honom själv och för spelarna, berättar Sportarena [2]. ”Понимаем, что, возможно, не были фаворитами группы, но ставили перед собой более высокие цели”, säger han. Två spelare är skadade, en är avstängd efter ett rött kort och några med småkrämpor ska testas efter sista träningen, så minst tre platser i laget byts ut [2]. Han vill avsluta värdigt, ”особенно ради болельщиков Казахстана”, och lovar att ställa upp det starkaste laget han har [2]. I Tjäderfors hade vi en gång en hel höst att spela för hedern och ingenting annat, och det var den bästa fotboll vi spelade."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "TN Live",
+     "title": "V Kazachstane Slovensko nečaká nič jednoduché, uvedomuje si Weiss. Od tímu má jasné očakávania",
+     "url": "https://tnlive.sk/sport/clanok/1063066-v-kazachstane-slovensko-necaka-nic-jednoduche-uvedomuje-si-weiss-od-timu-ma-jasne-ocakavania",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sportarena.kz",
+     "title": "Ван ’т Шкип рассказал о готовности сборной Казахстана к игре со Словакией в Лиге наций",
+     "url": "https://sportarena.kz/football/1066001-van-t-shkip-rasskazal-o-gotovnosti-sbornoy-kazakhstana-k-igre-so-slovakiey-v-lige-natsiy.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger Slovakien drygt hälften av chansen, och det är räknat på ett lag som brukar ställa upp med Škriniar, Hancko och Duda. Alla tre är vilade, liksom fyra till [1]. Kazakstan saknar visserligen tre spelare [2], men de spelar hemma och för publiken, och de har gjort mål i varje match i gruppen. Mot ett hopplock av slovakiska reserver som inte har spelat ihop tror jag mer på oavgjort än marknaden gör. Jag ringar in 2 och X och låter hemmasegern gå. Bollen har aldrig läst en tabell.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "reserverna drar ner",
+    "sources": [
+     {
+      "n": 1,
+      "source": "TN Live",
+      "title": "V Kazachstane Slovensko nečaká nič jednoduché, uvedomuje si Weiss. Od tímu má jasné očakávania",
+      "url": "https://tnlive.sk/sport/clanok/1063066-v-kazachstane-slovensko-necaka-nic-jednoduche-uvedomuje-si-weiss-od-timu-ma-jasne-ocakavania",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sportarena.kz",
+      "title": "Ван ’т Шкип рассказал о готовности сборной Казахстана к игре со Словакией в Лиге наций",
+      "url": "https://sportarena.kz/football/1066001-van-t-shkip-rasskazal-o-gotovnosti-sbornoy-kazakhstana-k-igre-so-slovakiey-v-lige-natsiy.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T15:15:59.439Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Slovakien är redan klart för uppflyttning, och förbundskaptenen Weiss har lämnat sju ordinarie hemma, bland dem Škriniar, Hancko och Duda. Det blir ett nästan nytt lag som reser till Astana, och han var dessutom missnöjd med 2–2 mot Färöarna. Spelare som inte har spelat ihop vet inte var de ska stå på motståndarnas hörnor. Så är det bara.",
+     "Kazakstan har inte vunnit på sju landskamper och saknar tre spelare. Men de spelar hemma, förbundskaptenen lovar att ställa upp det starkaste laget han har för publikens skull, och de har gjort mål i varje match i gruppen. Spelbolagen räknar som om Slovakien har sina bästa spelare med, och det har de inte. Jag tror på oavgjort, och jag spikar krysset."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "1–1",
+    "tips": "2026-11-15T15:15:59.439Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Så är det bara"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T15:16:26.704Z",
+    "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
   }
  ]
 }
