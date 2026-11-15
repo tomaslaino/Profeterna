@@ -186,21 +186,24 @@ for (const c of LEAGUES) {
   });
 }
 
-// Lagens siffror per match i Nations League från 365Scores (xG, skott,
-// hörnor, frisparkar och kort) – det som ligorna har ur football-data.co.uk.
-// Läser spelprogrammet ur cachen och hämtar bara matcher som inte är sparade.
-for (const c of LEAGUES.filter((x) => x.type === 'intl')) {
+// Lagens siffror per match från 365Scores (xG, skott, hörnor, frisparkar,
+// kort, bollinnehav och stora chanser): för Nations League det som ligorna
+// har ur football-data.co.uk, och sedan 2026-11-15 också för de fyra ligorna
+// för bollinnehavet och de stora chanserna (förra mötet och hemma/borta i
+// datorn). Läser spelprogrammet ur cachen och hämtar bara matcher som inte är
+// sparade.
+for (const c of LEAGUES) {
   const id = `s365_stats_${c.id}`;
   PLAYER_SOURCES.push({
     id,
     provider: '365Scores',
     short: '365Scores',
-    label: `xG, skott, hörnor och kort per match – ${c.name}`,
+    label: `xG, skott, bollinnehav och kort per match – ${c.name}`,
     comps: [c.id],
     kinds: ['stats', 'xg'],
     maxAgeHours: 6,
     staleAfterHours: 72,
-    verified: '2026-11-14',
+    verified: c.type === 'intl' ? '2026-11-14' : '2026-11-15',
     stage: 2,
     fetch: () => {
       const fx = readCache(`espn_fixtures_${c.id}`);

@@ -16,10 +16,15 @@
 //              bra de fem motståndarna var i snitt, 0–100 från lagets egen
 //              divisions svagaste lag till dess starkaste, ur matchens fil –
 //              styrkan, motståndet, favoritskapet och mot oddsen, med lagets
-//              plats i sin division), MÅLEN (målen, hemma och borta, nollorna,
+//              plats i sin division; under formen en rad per match med
+//              motståndaren och dess plats i tabellen, och för en landskamp i
+//              Nations Leagues sista omgångar SPELAR FÖR), MÅLEN (hemmalaget
+//              hemma mot bortalaget borta, sedan alla matcher: målen, nollorna,
 //              skytten och de främsta i assist och segermål), xG (chanserna,
 //              turen och kryssen), LÄGET (vilan, nästa match, skadorna och
-//              domaren) och MÖTENA. Det bättre talet i varje par lyser och
+//              domaren) och MÖTENA (förra mötet med lagens siffror, när det
+//              var högst ett halvår sedan, och de senaste mötena). Det
+//              bättre talet i varje par lyser och
 //              det sämre är svagt (SKILJER), och varje etikett öppnar en
 //              förklaring
 //   REGISTRET  lagen och spelarna (fliken hette LAGEN till 2026-11-13; i
@@ -642,10 +647,54 @@ window.RumRegister = (() => {
       return r;
     }
 
+    // Förra mötet (sedan 2026-11-15, önskemål från gänget: "var det en
+    // chansrik affär, vem hade mest bollinnehav, blev det många kort";
+    // användarens val bland tre skisser: Matchrapporten). När lagen har mötts
+    // det senaste halvåret (lastMeeting i matchens fil) står lagens siffror
+    // från det mötet överst i MÖTENA, i två spalter som i resten av
+    // matchakten: det bättre talet lyser (målen, xG, skotten och chanserna;
+    // bollinnehavet och korten står som de är). Röda kort bara när något lag
+    // fick ett. Sedan listan med de senaste mötena.
+    const FORRA_L = 15;
+    const FORRA = [
+      ['MÅL', 'mal', String, true], ['xG', 'xg', (x) => num(x, 2), true], ['SKOTT', 'sh', String, true], ['PÅ MÅL', 'sot', String, true],
+      ['STORA CHANSER', 'bc', String, true], ['BOLLINNEHAV', 'poss', (x) => `${Math.round(x)} %`, false],
+      ['GULA KORT', 'yc', String, false], ['RÖDA KORT', 'rc', String, false],
+    ];
+    function forraMotet(m, d) {
+      const x = d && d.lastMeeting;
+      if (!x || !x.stats || !x.score) return [];
+      const lag = [m.home, m.away];
+      const st = lag.map((n) => (x.home === n ? x.stats.home : x.away === n ? x.stats.away : null));
+      if (!st[0] || !st[1]) return [];
+      const mal = lag.map((n) => (x.home === n ? x.score.home : x.score.away));
+      const dolj = Boolean(window.Spoiler && Spoiler.hidesDay(x.kickoff));
+      const L = FORRA_L;
+      const K = Math.min(20, Math.floor((A.bred - L) / 2));
+      const plats = x.neutral ? 'PÅ NEUTRAL PLAN' : `${isLand(x.comp) ? 'I' : 'HOS'} ${kort(x.home)}`;
+      const titel = `FÖRRA MÖTET · ${up(dag(x.kickoff)).replace(/ \d{4}$/, '')} · ${plats}`;
+      const w = Math.min(A.bred, L + 2 * K) - 1;
+      const r = [rad([titel, 'd', ordQ('forra')], ...(w > titel.length + 2 ? [[' ', ''], [' '.repeat(w - titel.length - 1), 'ln']] : [])),
+        rad([pad('', L)], ...lag.flatMap((n, j) => [[kort(n).slice(0, K - 1), '', `#lag:${n}`], [j ? '' : pad('', K - Math.min(kort(n).length, K - 1)), '']]))];
+      const ok = (y) => y != null && Number.isFinite(y);
+      for (const [e, k, fmt, battre] of FORRA) {
+        const v = k === 'mal' ? mal : st.map((y) => y[k]);
+        if (!v.some(ok) || (k === 'rc' && !v.some((y) => y > 0))) continue;
+        const b = !dolj && battre && v.every(ok) && v[0] !== v[1] ? (v[0] > v[1] ? 0 : 1) : -1;
+        const txt = v.map((y) => (dolj ? '?' : ok(y) ? fmt(y) : '–'));
+        r.push(rad([e, 'd', ordQ(`forra-${k}`)], [pad('', L - e.length)], ...txt.flatMap((t, j) => {
+          const bit = [t, b < 0 ? '' : j === b ? 'v' : 'd'];
+          return j ? [bit] : [bit, [pad('', Math.max(1, K - t.length))]];
+        })));
+      }
+      return [...r, tom()];
+    }
+
     function moten(m) {
       const r = [rad(['DE SENASTE MÖTENA', 'd', ordQ('moten')])];
       const d = A.match.get(m.id);
       if (d === undefined) return [...r, prickar('HÄMTAR', '')];
+      r.unshift(...forraMotet(m, d));
       const list = !d ? [] : [
         ...(d.meetings || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.kickoff), x, when: x.kickoff, comp: x.compShort, hide: window.Spoiler && Spoiler.hidesDay(x.kickoff) })),
         ...((d.pastMeetings && d.pastMeetings.list) || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.date), x, when: x.date, comp: x.compShort, hide: false })),
@@ -658,6 +707,136 @@ window.RumRegister = (() => {
       }
       r.push(rad([`${kort(m.home)}: `, 'd'], `${n.V} V · ${n.O} O · ${n.F} F`));
       return r;
+    }
+
+    // Formens matcher (sedan 2026-11-15, önskemål från gänget: "namn på
+    // motståndare för varje resultatruta inkl. deras placering i tabellen";
+    // användarens val bland tre skisser: Listan): resultatet, hemma eller
+    // borta, motståndaren och dess plats i tabellen just nu – ligans, för ett
+    // landslag gruppens. Står motståndaren i en annan division eller grupp än
+    // laget står den efter platsen (3:E CH, 2:A A3); utan tabell (cuplag
+    // utanför ligorna, landslag utanför Nations League) bara namnet.
+    function formMatcher(m, side, t, land) {
+      const namn = m[side];
+      const d = A.match.get(m.id);
+      const T = d && d.teams && d.teams[side];
+      const before = Date.parse(m.kickoff);
+      const l = T && T.form
+        ? T.form.slice(0, 5).map((y) => ({ res: window.Spoiler && Spoiler.hidesDay(y.date) ? '?' : y.result || '?', h: y.home, mot: y.opponent }))
+        : (A.byTeam.get(namn) || []).filter((x) => x.completed && Date.parse(x.kickoff) < before).slice(0, 5)
+          .map((x) => ({ res: window.Spoiler && Spoiler.hidden(x) ? '?' : letter(x, namn), h: x.home === namn, mot: x.home === namn ? x.away : x.home }));
+      return l.map((y) => ({ ...y, plats: platsNu(y.mot, t, land) }));
+    }
+    function platsNu(mot, t, land) {
+      if (land) {
+        const o = landOf(mot);
+        const rk = o && o.tabell && o.tabell.rank;
+        return rk ? `${ordtal(rk)}${t && t.grupp && o.grupp && o.grupp !== t.grupp ? ` ${o.grupp}` : ''}` : '';
+      }
+      const o = lagOf(mot);
+      return o && o.rank ? `${ordtal(o.rank)}${t && t.comp && o.comp !== t.comp ? ` ${DIVK[o.comp] || ''}` : ''}`.trim() : '';
+    }
+    // ett lags rader i spalten, w tecken breda: platserna högerställda, och
+    // namnet får det som platsen lämnar (BOURNEMOUTH 7:E men SOUTHAMPTO 13:E)
+    function formCeller(l, w) {
+      return l.map((y) => {
+        const nw = Math.max(4, w - 4 - (y.plats ? y.plats.length + 1 : 0));
+        const namn = kort(y.mot).slice(0, nw);
+        return [[y.res, y.res === 'V' ? 'v' : ''], [` ${y.h ? 'H' : 'B'} `, 'd'], [namn, '', lagOf(y.mot) || landOf(y.mot) ? `#lag:${y.mot}` : null],
+          [`${pad('', nw - namn.length)}${y.plats ? ` ${y.plats}` : ''}`, 'd']];
+      });
+    }
+
+    // Vad lagen spelar för i Nations Leagues sista omgångar (sedan
+    // 2026-11-15, önskemål från gänget; användarens val bland tre skisser:
+    // Raden, med rutan). Gruppens återstående matcher prövas med 1, X och 2
+    // (högst fyra, alltså 81 fall), och lagen ordnas som i raknaGrupp: poäng,
+    // sedan poängen i de inbördes mötena bland de lika (om igen bland dem som
+    // fortfarande står lika), sedan de inbördes mötenas målskillnad och mål
+    // när alla de mötena är spelade. Avgör målen i en match som återstår
+    // räknas alla platser laget kan hamna på. FOLJD är vad platsen ger i
+    // ligan 2026–27 (A: ettan och tvåan till kvartsfinal, treorna och fyrorna
+    // jämförs med de andra gruppernas; B: upp, kval om A, kvar, kval om att
+    // stanna; C: upp, kval om B, kvar, kvar; D läggs ner och alla går upp).
+    // Per lag: det bästa laget kan nå (mal) och vad som räcker (villkor) –
+    // eller klart när alla utfall ger samma sak. null när matchen inte är en
+    // gruppmatch som återstår.
+    const FOLJD = {
+      A: ['KVARTSFINAL', 'KVARTSFINAL', 'TREA', 'FYRA'],
+      B: ['UPP I A', 'KVAL OM A', 'KVAR I B', 'KVAL OM B'],
+      C: ['UPP I B', 'KVAL OM B', 'KVAR I C', 'KVAR I C'],
+      D: ['UPP I C', 'UPP I C', 'UPP I C'],
+    };
+    function insatsen(m) {
+      if (m.comp !== 'unl' || m.completed || !A.land || !A.all) return null;
+      const g = A.land.grupper.find((x) => `Grupp ${x.id}` === m.round);
+      const F = g && FOLJD[g.liga];
+      if (!F) return null;
+      const lag = g.lag.map((t) => t.lag);
+      const ms = A.all.filter((x) => x.comp === 'unl' && x.round === m.round && lag.includes(x.home) && lag.includes(x.away));
+      const spelade = ms.filter((x) => x.completed && x.score).map((x) => ({ h: x.home, a: x.away, hs: x.score.home, as: x.score.away }));
+      const kvar = ms.filter((x) => !x.completed);
+      if (!kvar.some((x) => x.id === m.id) || kvar.length > 4) return null;
+      const om = new Map(lag.map((n) => [n, { V: new Set(), O: new Set(), F: new Set() }]));
+      // (per lag och eget resultat: platserna i varje fall, för att se om målen eller de andra matcherna avgör)
+      const fall = new Map(lag.map((n) => [n, { V: new Set(), O: new Set(), F: new Set() }]));
+      for (let c = 0; c < 3 ** kvar.length; c++) {
+        const val = kvar.map((x, i) => '1X2'[Math.floor(c / 3 ** i) % 3]);
+        const res = [...spelade.map((x) => ({ ...x, t: x.hs > x.as ? '1' : x.hs < x.as ? '2' : 'X', fast: true })), ...kvar.map((x, i) => ({ h: x.home, a: x.away, t: val[i], fast: false }))];
+        const poang = (l) => {
+          const p = new Map(l.map((n) => [n, 0]));
+          for (const x of res) {
+            if (!p.has(x.h) || !p.has(x.a)) continue;
+            if (x.t === '1') p.set(x.h, p.get(x.h) + 3); else if (x.t === '2') p.set(x.a, p.get(x.a) + 3); else { p.set(x.h, p.get(x.h) + 1); p.set(x.a, p.get(x.a) + 1); }
+          }
+          return p;
+        };
+        // (lika också i de inbördes mötena: målen avgör, om de är kända)
+        const malen = (blk, pos) => {
+          const inb = res.filter((x) => blk.includes(x.h) && blk.includes(x.a));
+          if (inb.every((x) => x.fast)) {
+            const g2 = new Map(blk.map((n) => [n, [0, 0]]));
+            for (const x of inb) { g2.get(x.h)[0] += x.hs - x.as; g2.get(x.a)[0] += x.as - x.hs; g2.get(x.h)[1] += x.hs; g2.get(x.a)[1] += x.as; }
+            if (new Set(blk.map((n) => g2.get(n).join('|'))).size === blk.length) {
+              return [...blk].sort((a, b) => g2.get(b)[0] - g2.get(a)[0] || g2.get(b)[1] - g2.get(a)[1]).map((n, i) => ({ n, fran: pos + i, till: pos + i }));
+            }
+          }
+          return blk.map((n) => ({ n, fran: pos, till: pos + blk.length - 1 }));
+        };
+        const ordna = (l, pos) => {
+          const p = poang(l);
+          const ut = [];
+          for (const v of [...new Set(l.map((n) => p.get(n)))].sort((a, b) => b - a)) {
+            const blk = l.filter((n) => p.get(n) === v);
+            if (blk.length === 1) ut.push({ n: blk[0], fran: pos, till: pos });
+            else ut.push(...(blk.length < l.length ? ordna(blk, pos) : malen(blk, pos)));
+            pos += blk.length;
+          }
+          return ut;
+        };
+        for (const o of ordna(lag, 1)) {
+          const i = kvar.findIndex((x) => x.home === o.n || x.away === o.n);
+          const egen = i < 0 ? ['V', 'O', 'F'] : [val[i] === 'X' ? 'O' : (val[i] === '1') === (kvar[i].home === o.n) ? 'V' : 'F'];
+          for (const r of egen) { for (let q = o.fran; q <= o.till; q++) om.get(o.n)[r].add(q); fall.get(o.n)[r].add(`${o.fran}-${o.till}`); }
+        }
+      }
+      const lagI = (n) => {
+        const x = om.get(n);
+        const alla = [...new Set([...x.V, ...x.O, ...x.F])].sort((a, b) => a - b);
+        const ger = (l) => [...new Set([...l].map((q) => F[q - 1]))];
+        if (ger(alla).length === 1) return { n, mal: F[alla[0] - 1], klart: true, etta: alla.length === 1 && alla[0] === 1 };
+        const mal = F[alla[0] - 1];
+        const sakert = (r) => x[r].size > 0 && [...x[r]].every((q) => F[q - 1] === mal);
+        const kan = (r) => [...x[r]].some((q) => F[q - 1] === mal);
+        // inte säkert med något resultat: målen avgör när alla fall ger samma
+        // platser men lika poäng (lika också inbördes); annars de andra matcherna
+        const minst = kan('O') ? 'O' : 'V';
+        const malen = [...fall.get(n)[minst]].every((x) => x === [...fall.get(n)[minst]][0]) && [...fall.get(n)[minst]][0].split('-')[0] !== [...fall.get(n)[minst]][0].split('-')[1];
+        const villkor = sakert('O') ? 'POÄNG RÄCKER' : sakert('V') ? 'VINST RÄCKER' : malen ? 'MÅLEN AVGÖR' : minst === 'O' ? 'BEHÖVER HJÄLP' : 'VINST + HJÄLP';
+        return { n, mal, villkor, minst, klart: false, annars: sakert('V') && (kan('O') || kan('F')) };
+      };
+      const andra = kvar.filter((x) => x.id !== m.id).map((x) => `${heltNamn(x.home)}–${heltNamn(x.away)}`);
+      return { liga: g.liga, grupp: g.id, lag: [lagI(m.home), lagI(m.away)], andra };
     }
 
     // dagar till lagets nästa match efter den här, med cupen när det inte är ligan
@@ -806,12 +985,30 @@ window.RumRegister = (() => {
         const bitar = [[txt, formB < 0 ? '' : j === formB ? 'v' : 'd'], [mott[j], '']];
         return j ? bitar : [...bitar, [pad('', Math.max(1, K - txt.length - mott[j].length))]];
       }));
+      // formens matcher under FORMEN: på datorn lagen sida vid sida, i
+      // telefonen (spalten för smal) under varandra med lagets namn
+      const formL = sid.map((s, j) => (S.veil ? [] : formMatcher(m, s, T[j], land)));
+      const formRader = [];
+      if (formL.some((l) => l.length)) {
+        if (K >= 19) {
+          const c = formL.map((l) => formCeller(l, K - 1));
+          for (let i = 0; i < Math.max(c[0].length, c[1].length); i++) {
+            formRader.push(rad([pad('', L)], ...(c[0][i] || [[pad('', K - 1), '']]), [pad('', 1), ''], ...(c[1][i] || [])));
+          }
+        } else {
+          formL.forEach((l, j) => {
+            if (!l.length) return;
+            formRader.push(rad([pad('', L)], [kort(lag[j]), 'd']));
+            for (const c of formCeller(l, Math.min(19, A.bred - L))) formRader.push(rad([pad('', L)], ...c));
+          });
+        }
+      }
       const mkt0 = (j) => { const x = mkt(T[j]); return x && x.n ? [`${x.fav} AV ${x.n}`, x.fav / x.n] : null; };
       const favorit = par('FAVORIT', mkt0, SKILJER.favorit, lq('favorit'));
       const odds = tal('MOT ODDSEN', TAL.odds, (v) => signed(v), SKILJER.odds, 'odds');
       let oversikt;
       if (!land) {
-        oversikt = [formRad, tal('STYRKA', TAL.styrka, (v) => signed(v, 2), SKILJER.styrka, 'styrka'),
+        oversikt = [formRad, ...formRader, tal('STYRKA', TAL.styrka, (v) => signed(v, 2), SKILJER.styrka, 'styrka'),
           tal('MOTSTÅNDET', TAL.motstand, (v) => signed(v, 2), 0, 'motstand'), favorit, odds];
       } else {
         // gruppen (matchens fil, annars landslag.json): placeringen och
@@ -821,9 +1018,19 @@ window.RumRegister = (() => {
         const tab = (j) => (D[j] && D[j].table) || (T[j] && T[j].tabell && { ...T[j].tabell, size: T[j].tabell.av, group: T[j].grupp }) || null;
         const sammaGrupp = tab(0) && tab(1) && tab(0).group && tab(0).group === tab(1).group;
         const g0 = [0, 1].map(tab).find((t) => t && t.group);
-        oversikt = [formRad,
+        // vad lagen spelar för (insatsen): målet och vad som räcker, eller
+        // INGET när gruppen redan är avgjord för laget
+        const ins = insatsen(m);
+        // (KLART: framför målet när det ryms: i den vänstra spalten före den högra)
+        const kl = (x, j) => (`KLART: ${x.mal}`.length < (j ? A.bred - L - K + 1 : K) ? `KLART: ${x.mal}` : x.mal);
+        const spelarFor = !ins ? [] : S.veil ? [raden('SPELAR FÖR', ['?', '?'], -1, null, ordQ('spelarfor'))] : [
+          raden('SPELAR FÖR', ins.lag.map((x) => (x.klart ? ['INGET', 'd'] : [x.mal, ''])), -1, null, ordQ('spelarfor')),
+          raden('', ins.lag.map((x, j) => [x.klart ? kl(x, j) : x.villkor, 'd'])),
+        ];
+        oversikt = [formRad, ...formRader,
           par(g0 && sammaGrupp ? `GRUPP ${up(g0.group)}` : 'GRUPPEN', (j) => { const t = tab(j); return t && t.rank ? [`${ordtal(t.rank)}${t.size ? ` AV ${t.size}` : ''}`, null] : null; }, 0, ordQ('grupp')),
           par('POÄNG', (j) => { const t = tab(j); return t && t.points != null ? [`${t.points} PÅ ${t.played}`, sammaGrupp ? t.points : null] : null; }, SKILJER.poang, ordQ('poang')),
+          ...spelarFor,
           favorit, odds];
         const p = m.f && m.f.p;
         if (p && p.length === 3) {
@@ -840,10 +1047,36 @@ window.RumRegister = (() => {
       if (!land) {
         // (gula kort där målens sort saknas)
         const segrar = !A.P || T.some((t) => t && A.P.spelare.some((y) => String(y.p.teamId) === String(t.espnId) && y.p.gw != null));
+        // Hemma och borta (sedan 2026-11-15, önskemål från gänget; användarens
+        // val bland tre skisser: Avsnittet): hemmalagets ligamatcher hemma mot
+        // bortalagets borta (hb i lagfilen) överst, med bollinnehavet och
+        // poängen mot lagen över och under i tabellen; sedan alla matcher.
+        // Utan hemma/borta för båda lagen står HEMMA och BORTA som förut.
+        const hb = [T[0] && T[0].hb && T[0].hb.h, T[1] && T[1].hb && T[1].hb.b];
+        const hbRad = (etikett, f, grans, k) => {
+          const v = hb.map((x) => (x && x.n ? f(x) : null));
+          if (S.veil) return raden(etikett, ['?', '?'], -1, null, ordQ(k));
+          return raden(etikett, v.map((x) => (x && x[0] != null ? x[0] : '–')), grans && samma ? bast(v.map((x) => (x ? x[1] : null)), grans) : -1, null, ordQ(k));
+        };
+        const ppm = (x) => (3 * x.w + x.d) / x.n;
+        const motTab = (o) => (o && o.n ? [`${o.p} P PÅ ${o.n}`, o.p / o.n] : null);
+        const hbNamn = `${kort(m.home)} HEMMA · ${kort(m.away)} BORTA`;
+        const hbRader = hb[0] && hb[1] && hb[0].n && hb[1].n ? [
+          rub(hbNamn.length + 2 < Math.min(A.bred, L + 2 * K) - 1 ? hbNamn : 'HEMMA OCH BORTA'),
+          hbRad('V-O-F', (x) => [`${x.w}-${x.d}-${x.l}`, null], 0, 'hb-vof'),
+          hbRad('POÄNG/MATCH', (x) => [num(ppm(x), 2), ppm(x)], SKILJER.ppm, 'hb-ppm'),
+          hbRad('MÅL', (x) => [`${num(x.gf / x.n)}–${num(x.ga / x.n)}`, (x.gf - x.ga) / x.n], SKILJER.mal, 'hb-mal'),
+          hbRad('xG', (x) => (x.xg && x.xg.n ? [`${num(x.xg.f / x.xg.n)}–${num(x.xg.a / x.xg.n)}`, (x.xg.f - x.xg.a) / x.xg.n] : null), SKILJER.xg, 'hb-xg'),
+          hbRad('BOLLINNEHAV', (x) => (x.poss ? [`${Math.round(x.poss.v)} %`, null] : null), 0, 'hb-boll'),
+          hbRad('LAG OVANFÖR', (x) => motTab(x.ovan), SKILJER.ppm, 'hb-ovan'),
+          hbRad('LAG NEDANFÖR', (x) => motTab(x.under), SKILJER.ppm, 'hb-under'),
+          tom(), rub('ALLA MATCHER'),
+        ] : null;
         malen = [
+          ...(hbRader || []),
           par('MÅL', (j) => { const t = T[j]; return t && t.m ? [`${num(t.gf / t.m)}–${num(t.ga / t.m)}`, (t.gf - t.ga) / t.m] : null; }, SKILJER.mal, lq('gjorda')),
-          ur('Hemma V–O–F', 'HEMMA', ordQ('hemma')),
-          ur('Borta V–O–F', 'BORTA', ordQ('borta')),
+          hbRader ? null : ur('Hemma V–O–F', 'HEMMA', ordQ('hemma')),
+          hbRader ? null : ur('Borta V–O–F', 'BORTA', ordQ('borta')),
           ur('Hållit nollan', 'NOLLOR', lq('nollor')),
           ur('Inte gjort mål', 'UTAN MÅL', ordQ('utanmal')),
           tom(),
@@ -1207,7 +1440,7 @@ window.RumRegister = (() => {
     const hMatch = (m) => {
       const d = A.match.get(m.id);
       const dom = d && d.referee && !d.referee.unknown && d.referee.name ? d.referee : null;
-      return { m, hem: hAkt(m, 0), bort: hAkt(m, 1), p: m.f && m.f.mk && m.f.p && m.f.p.length === 3 ? m.f.p : null, dom };
+      return { m, hem: hAkt(m, 0), bort: hAkt(m, 1), p: m.f && m.f.mk && m.f.p && m.f.p.length === 3 ? m.f.p : null, dom, ins: insatsen(m) };
     };
     function fkInnehall(f) {
       const O = ORD();

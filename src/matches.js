@@ -509,6 +509,7 @@ function matchDetail(id, { strength = null } = {}) {
     referee: refereeInfo(D, m, c, hk, ak),
     meetings: seasonMeetings(D, hk, ak, m),
     pastMeetings: pastMeetings(m),
+    lastMeeting: lastMeeting(D, m, D.matches),
     unknowns,
   };
 }
@@ -891,6 +892,7 @@ function landDetail(D, m) {
     referee: { unknown: true, reason: 'Domare finns bara för ligamatcherna i de fria källorna.' },
     meetings: [],
     pastMeetings: landMeetings(D, m),
+    lastMeeting: lastMeeting(D, m, D.land),
     unknowns,
   };
 }
@@ -1208,6 +1210,67 @@ function seasonMeetings(D, hk, ak, current) {
       && ((m.hk === hk && m.ak === ak)
         || (m.hk === ak && m.ak === hk)))
     .map((m) => summary(D, m));
+}
+
+// Förra mötet (sedan 2026-11-15, önskemål från gänget: "var det en chansrik
+// affär, vem hade mest bollinnehav, blev det många kort"): det senaste mötet
+// mellan lagen i någon tävling högst FORRA_DAGAR före avspark, med lagens
+// siffror ur 365Scores (s365_stats_<tävling>: xG, skott, skott på mål, stora
+// chanser, bollinnehav och kort) och, för ligorna, ur football-data.co.uk när
+// 365Scores saknar matchen (då utan bollinnehavet och chanserna). Lagens
+// siffror står under matchens hemma- och bortalag; null = okänt. null när
+// lagen inte har mötts det senaste halvåret.
+const FORRA_DAGAR = 183;
+const S365_COLS = { xg: 0, sh: 1, sot: 2, yc: 5, rc: 6, poss: 7, bc: 8 };
+const FD_COLS = { xg: ['HxG', 'AxG'], sh: ['HS', 'AS'], sot: ['HST', 'AST'], yc: ['HY', 'AY'], rc: ['HR', 'AR'] };
+
+function lastMeeting(D, m, pool) {
+  const fran = Date.parse(m.kickoff) - FORRA_DAGAR * 86400000;
+  const x = (pool || []).filter((y) => y.id !== m.id && y.completed && y.score && y.kickoff < m.kickoff
+    && Date.parse(y.kickoff) >= fran
+    && ((y.hk === m.hk && y.ak === m.ak) || (y.hk === m.ak && y.ak === m.hk))).pop();
+  if (!x) return null;
+  const s = x.score90 || x.score;
+  return {
+    id: x.id,
+    comp: x.comp,
+    compShort: competition(x.comp).short,
+    kickoff: x.kickoff,
+    home: x.home.name,
+    away: x.away.name,
+    neutral: !!x.neutral,
+    venue: x.venue || null,
+    ort: x.venueCity || null,
+    score: { home: s.home, away: s.away },
+    stats: meetingStats(D, x),
+  };
+}
+
+// { home: {xg, sh, sot, bc, poss, yc, rc}, away: …, source } eller null
+function meetingStats(D, x) {
+  if (!D.s365) D.s365 = {};
+  if (!(x.comp in D.s365)) {
+    const c = readCache(`s365_stats_${x.comp}`);
+    D.s365[x.comp] = c && c.data ? c.data.matches : null;
+  }
+  const e = D.s365[x.comp] && D.s365[x.comp][x.id];
+  const tal = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  if (e && e.t) {
+    const sida = (t) => {
+      const r = e.t[String(t.espnId)];
+      return r ? Object.fromEntries(Object.entries(S365_COLS).map(([k, i]) => [k, tal(r[i])])) : null;
+    };
+    const home = sida(x.home);
+    const away = sida(x.away);
+    if (home && away) return { home, away, source: '365Scores' };
+  }
+  const fd = D.fd[x.comp];
+  const r = fd && fd.byPair.get(`${x.hk}|${x.ak}`);
+  if (r && r.date && Math.abs(Date.parse(r.date) - Date.parse(x.kickoff)) < 3 * 86400000) {
+    const sida = (j) => ({ ...Object.fromEntries(Object.entries(FD_COLS).map(([k, c]) => [k, tal(r[c[j]])])), bc: null, poss: null });
+    return { home: sida(0), away: sida(1), source: 'football-data.co.uk' };
+  }
+  return null;
 }
 
 // Inbördes möten från tidigare säsonger (football-data.co.uk:s ligor och

@@ -14,6 +14,13 @@
 // Saknas ESPN:s tabell räknas den ur football-data.co.uk (utan poängavdrag).
 // Sidorna visar nivå 1–4, som prognosmotorn; National League är inte med.
 //
+// Hemma och borta (hb, sedan 2026-11-15, önskemål från gänget: "Tottenham
+// hemma har 64 % bollinnehav i snitt, xG 2,2 och har tagit poäng mot lag som
+// ligger över dem"): ligamatcherna hemma och borta för sig ur ESPN:s
+// spelprogram (V-O-F och målen), xG ur football-data.co.uk, bollinnehavet
+// ur 365Scores (s365_stats_<division>), och poängen mot lagen som står över
+// respektive under laget i tabellen just nu.
+//
 // Nations League (teams/unl.json, sedan 2026-11-14) har samma fält: matcherna
 // och tabellen ur ESPN (alla grupperna; rank är platsen i gruppen), lagens
 // siffror per match ur 365Scores (s365_stats_unl) och oddsen ur DraftKings via
@@ -24,6 +31,7 @@ const { COMPETITIONS, INTERNATIONAL, SEASON } = require('../config/competitions'
 const { svenskt } = require('../config/landslag');
 const { readCache } = require('./store');
 const { keyOf, espnKey } = require('./teams');
+const r1 = (x) => Math.round(x * 10) / 10;
 const { scoreMatrix, outcomes } = require('./model');
 
 const DIVS = COMPETITIONS.filter((c) => c.fdcouk);
@@ -186,6 +194,7 @@ function divisionTeams(div, strengthAll) {
   const known = ratings.filter((x) => x != null);
   const total = known.reduce((s, x) => s + x, 0);
 
+  const hb = hemmaBorta(div, teams, rows);
   const out = teams.map((t, i) => {
     const e = t.e;
     const own = ratings[i];
@@ -207,6 +216,7 @@ function divisionTeams(div, strengthAll) {
         mkt: e.mkt.n ? { n: e.mkt.n, xp: r2(e.mkt.xp), pts: e.mkt.pts, ret: r2(e.mkt.ret), fav: e.mkt.fav } : null,
         opp: e.opp.n && expOpp != null ? r3(e.opp.sum / e.opp.n - expOpp) : null,
       } : null,
+      hb: hb.get(t.key) || null,
     };
   });
 
@@ -224,6 +234,51 @@ function divisionTeams(div, strengthAll) {
     unmapped,
     teams: out,
   };
+}
+
+// Hemma och borta per lag (nyckel → { h, b } eller saknas): n matcher,
+// w-d-l, gf/ga, xg { n, f, a } (summor), poss { n, snitt i procent }, ovan
+// och under { n, p } (poäng mot lag över respektive under i tabellen nu).
+function hemmaBorta(div, teams, fdRows) {
+  const fx = readCache(`espn_fixtures_${div.id}`);
+  const st = readCache(`s365_stats_${div.id}`);
+  const s365 = (st && st.data && st.data.matches) || {};
+  const rank = new Map(teams.map((t) => [t.key, t.table.rank]));
+  const fdBy = new Map(fdRows.map((r) => [`${keyOf(r.HomeTeam)}|${keyOf(r.AwayTeam)}`, r]));
+  const tom = () => ({ n: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, xg: { n: 0, f: 0, a: 0 }, poss: { n: 0, s: 0 }, ovan: { n: 0, p: 0 }, under: { n: 0, p: 0 } });
+  const acc = new Map();
+  for (const m of (fx && fx.data ? fx.data.matches : [])) {
+    if (!m.completed || !m.score || !fin(m.score.home) || !fin(m.score.away)) continue;
+    const hk = espnKey(m.home.name);
+    const ak = espnKey(m.away.name);
+    if (!rank.has(hk) || !rank.has(ak)) continue;
+    const r = fdBy.get(`${hk}|${ak}`);
+    const s = s365[m.id] && s365[m.id].t;
+    for (const [k, mot, H, lag] of [[hk, ak, true, m.home], [ak, hk, false, m.away]]) {
+      if (!acc.has(k)) acc.set(k, { h: tom(), b: tom() });
+      const e = acc.get(k)[H ? 'h' : 'b'];
+      const gf = H ? m.score.home : m.score.away;
+      const ga = H ? m.score.away : m.score.home;
+      const p = gf > ga ? 3 : gf === ga ? 1 : 0;
+      e.n++;
+      if (gf > ga) e.w++; else if (gf === ga) e.d++; else e.l++;
+      e.gf += gf;
+      e.ga += ga;
+      if (r && fin(r.HxG) && fin(r.AxG)) { e.xg.n++; e.xg.f += H ? r.HxG : r.AxG; e.xg.a += H ? r.AxG : r.HxG; }
+      const rad = s && s[String(lag.espnId)];
+      if (rad && fin(rad[7])) { e.poss.n++; e.poss.s += rad[7]; }
+      const b = rank.get(mot) < rank.get(k) ? e.ovan : e.under;
+      b.n++;
+      b.p += p;
+    }
+  }
+  const ut = (e) => ({
+    n: e.n, w: e.w, d: e.d, l: e.l, gf: e.gf, ga: e.ga,
+    xg: e.xg.n ? { n: e.xg.n, f: r2(e.xg.f), a: r2(e.xg.a) } : null,
+    poss: e.poss.n ? { n: e.poss.n, v: r1(e.poss.s / e.poss.n) } : null,
+    ovan: e.ovan, under: e.under,
+  });
+  return new Map([...acc].map(([k, x]) => [k, { h: ut(x.h), b: ut(x.b) }]));
 }
 
 // Nations League: en rad per spelad match i football-data.co.uks form (mål,

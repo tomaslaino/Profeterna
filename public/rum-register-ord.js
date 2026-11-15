@@ -206,12 +206,72 @@
       t: 'Det senaste mötet står först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
       ex: null,
     },
+    // förra mötet överst i MÖTENA (sedan 2026-11-15)
+    forra: { e: 'FÖRRA MÖTET', n: 'HÖGST ETT HALVÅR SEDAN', t: 'Lagens siffror från förra gången de möttes, när det var högst ett halvår sedan. Siffrorna kommer från 365Scores.', ex: null },
+    'forra-mal': { e: 'MÅL', n: 'I FÖRRA MÖTET', t: 'Målen i förra mötet efter 90 minuter.', ex: null },
+    'forra-xg': { e: 'xG', n: 'I FÖRRA MÖTET', t: 'Hur många mål lagets chanser i förra mötet brukar ge. Ett högt tal betyder att laget skapade bra lägen, oavsett om bollen gick in.', ex: null },
+    'forra-sh': { e: 'SKOTT', n: 'I FÖRRA MÖTET', t: 'Alla lagets skott i förra mötet, också de som gick utanför eller täcktes.', ex: null },
+    'forra-sot': { e: 'PÅ MÅL', n: 'I FÖRRA MÖTET', t: 'Lagets skott i förra mötet som hade gått in om målvakten inte hade räddat.', ex: null },
+    'forra-bc': { e: 'STORA CHANSER', n: 'I FÖRRA MÖTET', t: 'Lägen i förra mötet där ett mål var att vänta, till exempel ensam med målvakten.', ex: null },
+    'forra-poss': { e: 'BOLLINNEHAV', n: 'I FÖRRA MÖTET', t: 'Hur stor del av förra mötet laget hade bollen.', ex: null },
+    'forra-yc': { e: 'GULA KORT', n: 'I FÖRRA MÖTET', t: 'Lagets gula kort i förra mötet.', ex: null },
+    'forra-rc': { e: 'RÖDA KORT', n: 'I FÖRRA MÖTET', t: 'Lagets röda kort i förra mötet.', ex: null },
+    // hemmalaget hemma mot bortalaget borta överst i MÅLEN (sedan 2026-11-15)
+    'hb-vof': { e: 'V-O-F', n: 'HEMMALAGET HEMMA, BORTALAGET BORTA', t: 'Vinster, oavgjorda och förluster i ligan den här säsongen: hemmalagets hemmamatcher och bortalagets bortamatcher.', ex: null },
+    'hb-ppm': { e: 'POÄNG/MATCH', n: 'HEMMALAGET HEMMA, BORTALAGET BORTA', t: 'Poäng per ligamatch: hemmalagets på hemmaplan och bortalagets på bortaplan.', ex: null },
+    'hb-mal': { e: 'MÅL', n: 'HEMMALAGET HEMMA, BORTALAGET BORTA', t: 'Gjorda och insläppta mål per ligamatch: hemmalagets på hemmaplan och bortalagets på bortaplan.', ex: null },
+    'hb-xg': { e: 'xG', n: 'HEMMALAGET HEMMA, BORTALAGET BORTA', t: 'Skapade och insläppta chanser per ligamatch, räknade i mål de brukar ge: hemmalagets på hemmaplan och bortalagets på bortaplan.', ex: null },
+    'hb-boll': { e: 'BOLLINNEHAV', n: 'HEMMALAGET HEMMA, BORTALAGET BORTA', t: 'Hur stor del av ligamatcherna laget har haft bollen i snitt: hemmalaget på hemmaplan och bortalaget på bortaplan. Siffrorna kommer från 365Scores.', ex: null },
+    'hb-ovan': { e: 'LAG OVANFÖR', n: 'HEMMALAGET HEMMA, BORTALAGET BORTA', t: 'Poäng mot lag som står över laget i tabellen just nu: hemmalaget på hemmaplan och bortalaget på bortaplan.', ex: null },
+    'hb-under': { e: 'LAG NEDANFÖR', n: 'HEMMALAGET HEMMA, BORTALAGET BORTA', t: 'Poäng mot lag som står under laget i tabellen just nu: hemmalaget på hemmaplan och bortalaget på bortaplan.', ex: null },
   };
+
+  // Vad lagen spelar för i Nations Leagues sista omgångar (sedan 2026-11-15):
+  // reglerna för gruppens liga i Nations League 2026–27 och ett exempel per
+  // lag ur insatsen (rum-register.js: h.ins = { liga, lag: [{ n, mal,
+  // villkor, minst, klart, etta, annars }], andra: de andra matcherna i
+  // gruppen }).
+  const EM = ' Ettorna i A, B och C får dessutom en reservplats till EM: ett sista kval i mars 2028 för de ettor som inte tar sig dit den vanliga vägen.';
+  const REGLER = {
+    A: `Ettan och tvåan i en A-grupp går till kvartsfinal i mars. Av de fyra treorna stannar de två bästa i A, och de två andra spelar kval mot en tvåa ur B. Av fyrorna spelar de två bästa samma kval och de två andra åker ur.${EM}`,
+    B: `Ettan i en B-grupp går upp i A. Tvåan spelar kval i mars mot ett av de sämsta lagen i A om en plats där. Trean stannar i B, och fyran spelar kval mot en tvåa ur C om att få stanna.${EM}`,
+    C: `Ettan i en C-grupp går upp i B, och tvåan spelar kval i mars mot en fyra ur B om en plats där. Trean och fyran stannar i C.${EM}`,
+    D: 'Alla lag i D går upp i C, eftersom D läggs ner efter den här säsongen.',
+  };
+  // målet som [presens, infinitiv]
+  const MALORD = (mal, liga) => ({
+    KVARTSFINAL: ['går till kvartsfinal', 'gå till kvartsfinal'],
+    TREA: ['blir trea', 'bli trea'],
+    FYRA: ['blir fyra', 'bli fyra'],
+    'UPP I A': ['går upp i A', 'gå upp i A'],
+    'UPP I B': ['går upp i B', 'gå upp i B'],
+    'UPP I C': ['går upp i C', 'gå upp i C'],
+    'KVAL OM A': ['spelar kval om en plats i A', 'spela kval om en plats i A'],
+    'KVAL OM B': liga === 'B' ? ['spelar kval om att få stanna i B', 'spela kval om att få stanna i B'] : ['spelar kval om en plats i B', 'spela kval om en plats i B'],
+    'KVAR I B': ['stannar i B', 'stanna i B'],
+    'KVAR I C': ['stannar i C', 'stanna i C'],
+  })[mal] || [mal.toLowerCase(), mal.toLowerCase()];
+  function insatsEx(h) {
+    const I = h.ins;
+    if (!I) return null;
+    const andra = I.andra.length ? I.andra.join(' och ') : null;
+    return I.lag.map((x, j) => {
+      const namn = (j ? h.bort : h.hem).namn;
+      const [pres, inf] = MALORD(x.mal, I.liga);
+      if (x.klart) return x.etta ? `${namn} är klart som etta och ${pres}${I.liga !== 'D' ? ', med en reservplats till EM' : ''}.` : `${namn} är klart och ${pres}.`;
+      if (x.villkor === 'POÄNG RÄCKER') return `${namn} ${pres} med minst en poäng.`;
+      if (x.villkor === 'VINST RÄCKER') return `${namn} ${pres} med en vinst.${x.annars && andra ? ` Annars avgörs det av ${andra}.` : ''}`;
+      if (x.villkor === 'MÅLEN AVGÖR') return x.minst === 'V' ? `${namn} måste vinna för att ${inf}, och då avgör målen.` : `${namn} kan ${inf} med minst en poäng, men då avgör målen.`;
+      if (x.villkor === 'VINST + HJÄLP') return `${namn} måste vinna och få hjälp${andra ? ` av ${andra}` : ''} för att ${inf}.`;
+      return `${namn} kan ${inf}, men det avgörs också av ${andra || 'de andra resultaten'}.`;
+    }).join(' ');
+  }
 
   // En landskamp: samma rader med landslagens siffror – Nations League
   // hittills, alla landskamper sedan hösten 2024 och marknadens chans (och
   // ingen styrka, eftersom modellen inte räknar på landslagen).
   const landet = {
+    spelarfor: { e: 'SPELAR FÖR', n: 'NATIONS LEAGUE', t: (h) => REGLER[(h.ins && h.ins.liga) || 'B'], exm: insatsEx },
     form: { e: 'FORMEN', n: 'DE FEM SENASTE LANDSKAMPERNA', t: 'Den senaste landskampen står först, och det är resultatet efter 90 minuter som gäller.', ex: null },
     vila: { e: 'VILAN', n: 'DAGAR SEDAN FÖRRA LANDSKAMPEN', t: 'Spelarna har spelat för sina klubbar under tiden, så vilan säger lite om hur trötta de är.', ex: null },
     nasta: { e: 'NÄSTA', n: 'DAGAR TILL NÄSTA LANDSKAMP', t: 'Efter dagarna står tävlingen när den är en annan än i den här matchen.', ex: null },

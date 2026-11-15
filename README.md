@@ -3138,7 +3138,8 @@ form som divisionernas, och datorn, Statistik och matchsidan använder dem som l
   (svenska). Den som har spelat men inte är uttagen nu står med det rapporten vet (namn, tröja, positionen där han
   startat oftast; okänd för den som bara hoppat in). Skadorna är okända.
 - **Lagen** ([src/teamstats.js](src/teamstats.js), `landTeams`): varje spelad match som en rad i football-data.co.uks
-  form – målen ur ESPN, xG, skott, skott på mål, hörnor, frisparkar och kort ur 365Scores (`s365_stats_unl`,
+  form – målen ur ESPN, xG, skott, skott på mål, hörnor, frisparkar och kort ur 365Scores (`s365_stats_unl`, som
+  sedan 2026-11-15 också har bollinnehavet och de stora chanserna och finns för de fyra ligorna,
   [src/fetchers/s365stats.js](src/fetchers/s365stats.js)), stängningsoddsen ur DraftKings (`espn_odds_land`) – så att
   xG per match, tur, kryss, mot oddsen, favorit och spel på seger räknas precis som för klubbarna. Tabellen är
   gruppernas (`rank` = platsen i gruppen, `grupp`, `liga`). Styrkan och motståndet saknas: modellen känner bara lagen i
@@ -6972,6 +6973,52 @@ Inte provat: dolda resultat med en dold landskamp, EM-kvalet och vänskapsmatche
 omgången), och klubbarnas tavlans tal i matchakten (football-data.co.uk nåddes inte, så de stod
 som – här, som före ändringen).
 
+#### Gängets önskemål i matchakten
+
+2026-11-15 kom fyra önskemål från gänget, och användaren valde ett utseende för vart och ett
+bland tre skisser i den riktiga närbilden:
+
+- **Förra mötet** ("var det en chansrik affär, vem hade mest bollinnehav, blev det många kort";
+  *Matchrapporten*): har lagen mötts det senaste halvåret står det mötet överst i MÖTENA –
+  *FÖRRA MÖTET · 28 SEP · I SVERIGE* – med lagens mål, xG, skott, skott på mål, stora chanser,
+  bollinnehav och gula kort (röda bara när något lag fick ett) i två spalter. Målen, xG,
+  skotten och chanserna lyser för det bättre laget; bollinnehavet och korten står som de är.
+  Under står de senaste mötena som förut. Datan är `lastMeeting` i matchens fil
+  (`lastMeeting` i [src/matches.js](src/matches.js)): det senaste mötet i någon tävling högst
+  183 dagar före avspark, med lagens siffror ur 365Scores och, för ligorna, ur
+  football-data.co.uk när 365Scores saknar matchen (då utan bollinnehavet och chanserna).
+- **Hemma och borta** ("Tottenham hemma har 64 % bollinnehav i snitt, xG 2,2 och har tagit poäng
+  mot lag som ligger över dem"; *Avsnittet*): överst i MÅLEN står hemmalagets ligamatcher
+  hemma mot bortalagets borta – *V-O-F*, *Poäng/match*, *Mål*, *xG*, *Bollinnehav*, *Lag
+  ovanför* och *Lag nedanför* (poängen mot lagen som står över respektive under laget i
+  tabellen just nu) – och sedan *ALLA MATCHER* med målen, nollorna och skyttarna. Det ersätter
+  raderna HEMMA och BORTA, som står kvar när något av lagen saknar siffrorna (ett cuplag
+  utanför ligorna). Datan är `hb` i `data/teams/<division>.json` (`hemmaBorta` i
+  [src/teamstats.js](src/teamstats.js)): resultaten ur ESPN:s spelprogram, xG ur
+  football-data.co.uk och bollinnehavet ur 365Scores.
+- **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
+  tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
+  motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
+  motståndaren i en annan division eller grupp står den efter platsen (*3:E CH*, *2:A A3*).
+  Datorn har lagen sida vid sida, telefonen under varandra.
+- **Vad landslagen spelar för** (frågor om playoff, placeringarna i de andra ligorna och vägen
+  till EM; *Raden*, med rutan): i Nations Leagues sista omgångar står *SPELAR FÖR* under
+  POÄNG – målet laget kan nå och vad som räcker (*KVAR I B · VINST RÄCKER*, *KVARTSFINAL ·
+  POÄNG RÄCKER*, *MÅLEN AVGÖR*, *VINST + HJÄLP*, *BEHÖVER HJÄLP*), eller *INGET · KLART: UPP I A*.
+  Gruppens återstående matcher prövas med 1, X och 2 och lagen ordnas efter poäng och inbördes
+  möten (`insatsen` i [public/rum-register.js](public/rum-register.js)). Etiketten öppnar rutan
+  med reglerna för ligan 2026–27 (A: ettan och tvåan till kvartsfinal, de två sämsta treorna och
+  två bästa fyrorna till kval mot B:s tvåor, de två andra fyrorna ur; B: ettan upp, tvåan kval om
+  A, trean kvar, fyran kval mot C:s tvåor; C: ettan upp, tvåan kval om B, trean och fyran kvar;
+  D läggs ner och alla går upp; ettorna i A–C får en reservplats till EM-kvalets sista omgång i
+  mars 2028) och vad det betyder för matchens två lag (*Polen stannar i B med en vinst. Annars
+  avgörs det av Bosnien och Hercegovina–Rumänien.*).
+
+Bollinnehavet och de stora chanserna hämtas sedan samma dag ur 365Scores för alla fyra ligorna
+och Nations League (`s365_stats_<division>`, [src/fetchers/s365stats.js](src/fetchers/s365stats.js));
+en match som sparades innan de kom med hämtas om en gång. Gula kort och bollinnehav hjälper
+inte direkt att välja 1, X eller 2, men gänget bad om dem till förra mötet.
+
 #### Vad som står var
 
 Statistiken om omgången är fördelad efter vad varje sak är bra på, och varje siffra står på
@@ -6981,7 +7028,7 @@ med flit (nedan):
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom tabellen och skytteligan: laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten; anslagstavlans siffror i matchakten, med lagets plats i divisionen; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, Nations League, landskamperna och marknadens chans) |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom tabellen och skytteligan: laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
