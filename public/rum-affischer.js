@@ -301,6 +301,25 @@ const S = ['1', 'X', '2'];
 let namnAv = (p) => Tippoang.kallas(p);
 const gen = (namn) => (/[sxz]$/i.test(namn) ? namn : `${namn}s`);
 const lag = (match) => String(match || '').split(/\s+[–-]\s+/);
+const stor = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+// "Tejder", "Tejder och Laino", "Tejder, Laino och Dogge"
+const lista = (ns) => (ns.length > 1 ? `${ns.slice(0, -1).join(', ')} och ${ns[ns.length - 1]}` : ns[0] || '');
+
+// Vad tidningen kallar oss: gänget ibland, men inte varje gång (2026-11-15: "Kalla oss
+// gärna andra saker än Gänget … Du kan kalla oss gänget också men det är alltid Gänget").
+// Veckan väljer (rubrik nedan). i: efter bäst/sämst, gen: vems kupong.
+const OSS = [
+  { vi: 'gänget', i: 'i gänget', gen: 'gängets' },
+  { vi: 'laget', i: 'i laget', gen: 'lagets' },
+  { vi: 'kompisarna', i: 'av kompisarna', gen: 'kompisarnas' },
+  { vi: 'stamgästerna', i: 'bland stamgästerna', gen: 'stamgästernas' },
+  { vi: 'Matchfixarna', i: 'av Matchfixarna', gen: 'Matchfixarnas' },
+  { vi: 'sällskapet', i: 'i sällskapet', gen: 'sällskapets' },
+];
+let G = OSS[0];
+
+// Tecknen som ord: ettan, krysset, tvåan.
+const TECKEN = { 1: 'ettan', X: 'krysset', 2: 'tvåan' };
 
 // ---------- landskamperna ----------
 //
@@ -452,10 +471,51 @@ function stallning(rs) {
   return Object.values(o).sort((a, b) => nyckel(b) - nyckel(a));
 }
 
+// Vem av oss som tippade vad (rubrik nedan fyller i): matchens id → { tips: { id: tecken },
+// namn: { id: namnet vi kallas } } ur omgångarna, och id → resultatet ur kupongerna (en
+// omgång som nyss spelats färdigt har inga resultat i sina matcher).
+let VEM = new Map();
+let MAL = new Map();
+const tecknet = (t) => (typeof Tippoang !== 'undefined' ? Tippoang.sign(t) : String(t || '').toUpperCase());
+
+// Hur det gick för oss på matchen id med utfallet res: { ratt, rena (rätt utan helgardering),
+// gard (rätt med), fel, tecken: { namn: tecknet } }, eller null om ingen tippade den.
+function vemHade(id, res) {
+  const v = id != null && VEM.get(String(id));
+  if (!v || !res) return null;
+  const ut = { ratt: [], rena: [], gard: [], fel: [], tecken: {} };
+  for (const [pid, t] of Object.entries(v.tips || {})) {
+    const s = tecknet(t);
+    if (!s) continue;
+    const n = v.namn[pid] || pid;
+    ut.tecken[n] = s;
+    if (s.includes(res)) {
+      ut.ratt.push(n);
+      (s.length === 3 ? ut.gard : ut.rena).push(n);
+    } else ut.fel.push(n);
+  }
+  return ut.ratt.length + ut.fel.length ? ut : null;
+}
+
+// Vem som såg skrällen komma, som en mening (tom utan tips).
+function trodde(v) {
+  if (!v) return '';
+  if (!v.ratt.length) return 'Ingen i tobaksaffären såg det komma';
+  if (!v.rena.length) return `Bara ${lista(v.gard)} hade det – med helgardering`;
+  if (!v.fel.length && !v.gard.length) return `Alla ${TAL[v.rena.length] || v.rena.length} hade det på kupongen`;
+  return `${v.fel.length ? 'Bara ' : ''}${lista(v.rena)} trodde på det`;
+}
+
+// Tecknet som ord: ettan, krysset eller tvåan.
+const tecknetOrd = (s) => [...s].map((c) => TECKEN[c]).join(' eller ');
+
 // Rubrikerna ur en färdigspelad omgång (säsongens): var och en
 // { typ, poang, t (när det hände), id (matchen), v: varianterna }, och varje
 // variant { kick, rad: [[text, stil]], under } (stil 1 röd, 2 vit på rött;
 // {T} i kick blir tidningens namn). Veckan väljer variant (vald i rubrik).
+// Raden under berättar vem av oss som gjorde vad (2026-11-15: "skippa att
+// kommentera om Datorn … Gör det mer intressant!"): datorn står inte längre på
+// löpsedeln, och vi heter inte alltid gänget (OSS).
 function bakat(r, alla, short) {
   const out = [];
   const t = Date.parse(r.to || r.from);
@@ -463,45 +523,117 @@ function bakat(r, alla, short) {
   if (!folk.length) return out;
   const bast = folk.reduce((a, p) => (p.ok > a.ok ? p : a));
   const samst = folk.reduce((a, p) => (p.ok < a.ok ? p : a));
-  const m = r.model || null;
   const ensam = (p, f) => folk.filter((x) => f(x) === f(p)).length === 1;
+  const i = alla.indexOf(r);
+  const namn = {};
+  for (const p of r.people) namn[p.id] = namnAv(p);
+  const andra = (p) => folk.filter((x) => x !== p);
+  // bäst/sämst var: Hasse Backe tävlar med oss (Tippoang.HASSE) men är inte en av oss
+  const hasse = typeof Tippoang !== 'undefined' && Tippoang.HASSE ? Tippoang.HASSE.id : 'HB';
+  const bland = folk.some((p) => p.id === hasse) ? 'i tobaksaffären' : G.i;
+  // "Tejder och Laino fick 9", "Tejder fick 10, Laino 8" (hårt mellanslag före talet: det bryts inte bort från namnet)
+  const fick = (ps) => {
+    const ok = [...new Set(ps.map((p) => p.ok))].sort((a, b) => b - a);
+    return ok.map((k, j) => `${lista(ps.filter((p) => p.ok === k).map((p) => namn[p.id]))}${j ? '' : ' fick'}\u00a0${k}`).join(', ');
+  };
+  const spelade = (r.matches || []).filter((m) => m.res);
+  const tecken = (m, p) => tecknet(m.tips && m.tips[p.id]);
+  const lagen = (m) => lag(m.match).map((n) => landKort(short(n)));
+  const resultat = (m) => m.score || MAL.get(String(m.id)) || '';
+  // "att tro på Forest mot City", "krysset i Watford–Boro"
+  const utfall = (m) => {
+    const [h, a] = lagen(m);
+    return m.res === 'X' ? `krysset i ${h}–${a}` : m.res === '1' ? `att tro på ${h} mot ${a}` : `att tro på ${a} mot ${h}`;
+  };
+  // matcherna där p var ensam om rätt (eller ensam om fel), den mest oväntade först
+  const oddsen = (m) => (m.model ? m.model[S.indexOf(m.res)] : 50);
+  const ensamOm = (p, ratt) => spelade.filter((m) => {
+    const s = tecken(m, p);
+    const ovr = andra(p).map((x) => tecken(m, x)).filter(Boolean);
+    return s && ovr.length && s.includes(m.res) === ratt && ovr.every((o) => o.includes(m.res) !== ratt);
+  }).sort((a, b) => (ratt ? oddsen(a) - oddsen(b) : oddsen(b) - oddsen(a)))[0] || null;
+  // omgångens ensamma bästa och sämsta, k omgångar bakåt
+  const etta = (rr, f) => {
+    const fs = (rr && rr.people || []).filter((p) => p.n);
+    if (fs.length < 2) return null;
+    const b = fs.reduce((a, p) => (f(p) > f(a) ? p : a));
+    return fs.filter((p) => f(p) === f(b)).length === 1 ? b.id : null;
+  };
+  const iRad = (p) => {
+    let k = 0;
+    while (i - k >= 0 && etta(alla[i - k], (x) => x.ok) === p.id) k++;
+    return k;
+  };
   if (bast.ok === bast.n && bast.n >= 8) {
     const N = namnAv(bast);
+    const ovr = andra(bast).map((p) => namn[p.id]);
     out.push({ typ: 'bast', poang: 1, t, v: [
-      { kick: 'HISTORISKT', rad: [[N], ['ALLA RÄTT!', 1]], under: `${bast.n} av ${bast.n}. Datorn: ”Statistiskt osannolikt”` },
-      { kick: 'TIPSGENIET', rad: [[N], ['ALLA'], ['RÄTT!', 1]], under: `${bast.n} av ${bast.n} – bäst i gänget. Är det Sveriges bästa tippare?` },
+      { kick: 'HISTORISKT', rad: [[N], ['ALLA RÄTT!', 1]], under: ovr.length ? `${bast.n} av ${bast.n}. ${lista(ovr)}: ”Ren tur”` : `${bast.n} av ${bast.n}. Inte en enda miss` },
+      { kick: 'TIPSGENIET', rad: [[N], ['ALLA'], ['RÄTT!', 1]], under: `${bast.n} av ${bast.n}${ovr.length ? ` – ${fick(andra(bast))}` : ''}. Är det Sveriges bästa tippare?` },
     ] });
   } else if (bast.ok / bast.n >= 0.82 && ensam(bast, (x) => x.ok)) {
     const N = namnAv(bast);
-    const jmf = m && m.ok < bast.ok ? `datorn fick ${m.ok}` : `${bast.ok} av ${bast.n}`;
-    out.push({ typ: 'bast', poang: 0.6 + (bast.ok / bast.n - 0.82) * 2, t, v: [
-      { kick: 'TIPSGENIET', rad: [[N], [`${bast.ok} RÄTT!`, 1]], under: `Bäst i gänget – ${jmf}. Är det Sveriges bästa tippare?` },
-      { kick: 'TIPSET', rad: [[N], ['SLOG'], ['ALLA', 1]], under: `${bast.ok} rätt av ${bast.n}. Nu talar ${N} ut – hela berättelsen` },
-    ] });
+    const ovr = andra(bast).map((p) => namn[p.id]);
+    const em = ensamOm(bast, true);
+    const svit = iRad(bast);
+    const fran = i >= 1 && etta(alla[i - 1], (x) => -x.ok) === bast.id;
+    // en enda match fattades
+    const miss = bast.ok === bast.n - 1 ? spelade.find((m) => tecken(m, bast) && !tecken(m, bast).includes(m.res)) : null;
+    // det som är mest värt att berätta först; veckan väljer bland de två första
+    const v = [
+      svit >= 2 && { kick: 'SVITEN', rad: [[N], ['IGEN!', 1]], under: `Bäst för ${ORDNING[svit] || `${svit}:e`} omgången i rad. ${lista(ovr)} börjar tröttna` },
+      fran && { kick: 'TIPSET', rad: [[gen(N)], ['REVANSCH', 1]], under: `Sämst förra omgången – nu ${bast.ok} rätt och bäst ${bland}` },
+      miss && TAL[bast.n] && { kick: 'SÅ NÄRA', om: miss.id, rad: [[N], [`${bast.ok} RÄTT!`, 1]], under: `En match från ${TAL[bast.n]} rätt – ${lagen(miss).join('–')} förstörde allt` },
+      { kick: 'TIPSGENIET', rad: [[N], [`${bast.ok} RÄTT!`, 1]], under: `${fick(andra(bast))}. Är det Sveriges bästa tippare?` },
+      em
+        ? { kick: 'TIPSET', rad: [[N], ['SLOG'], ['ALLA', 1]], under: `${bast.ok} rätt – och ensam om ${utfall(em)}` }
+        : { kick: 'TIPSET', rad: [[N], ['SLOG'], ['ALLA', 1]], under: `${bast.ok} rätt av ${bast.n}, bäst ${bland}. Nu talar ${N} ut` },
+    ].filter(Boolean).slice(0, 2);
+    out.push({ typ: 'bast', poang: 0.6 + (bast.ok / bast.n - 0.82) * 2 + (svit >= 2 || fran ? 0.1 : 0), t, v });
   }
   if (samst.ok / samst.n <= 0.5 && ensam(samst, (x) => x.ok)) {
     const N = namnAv(samst);
+    const helg = spelade.filter((m) => tecken(m, samst).length === 3).length;
+    const spik = spelade.filter((m) => tecken(m, samst).length === 1);
+    const satt = spik.filter((m) => tecken(m, samst) === m.res).length;
+    const ef = ensamOm(samst, false);
+    const hA = (m) => lagen(m).join('–');
     out.push({ typ: 'samst', poang: 0.55 + (0.5 - samst.ok / samst.n), t, v: [
-      { kick: 'KRISEN', rad: [[gen(N)], ['MARDRÖM', 1]], under: `Bara ${samst.ok} rätt av ${samst.n} – sämst i gänget. Nu krävs svar` },
-      { kick: 'TIPSKRASCHEN', rad: [[N], ['I FRITT'], ['FALL', 1]], under: `${samst.ok} av ${samst.n} rätt. Så gick allt fel – match för match` },
-      { kick: '{T} AVSLÖJAR', rad: [['SANNINGEN'], [`OM ${gen(N)}`], ['TIPS', 1]], under: `Bara ${samst.ok} rätt av ${samst.n} – sämst i gänget` },
+      { kick: 'KRISEN', rad: [[gen(N)], ['MARDRÖM', 1]], under: helg >= 3 ? `Helgarderade ${TAL[helg]} matcher – och fick ändå bara ${samst.ok} rätt` : `Bara ${samst.ok} rätt av ${samst.n} – sämst ${bland}. Nu krävs svar` },
+      { kick: 'TIPSKRASCHEN', rad: [[N], ['I FRITT'], ['FALL', 1]], under: ef ? `${samst.ok} rätt – och ensam fel på ${hA(ef)}. Så gick allt fel` : `${samst.ok} av ${samst.n} rätt. Så gick allt fel – match för match` },
+      { kick: '{T} AVSLÖJAR', rad: [['SANNINGEN'], [`OM ${gen(N)}`], ['TIPS', 1]], under: spik.length >= 3 ? `${stor(TAL[spik.length])} spikar – ${satt ? `${TAL[satt]} satt` : 'ingen satt'}. ${N} avböjer att kommentera` : `Bara ${samst.ok} rätt – ${namn[bast.id]} fick ${bast.ok}` },
     ] });
   }
-  if (m && m.n && folk.length >= 2) {
-    if (folk.every((p) => p.ok < m.ok)) {
-      out.push({ typ: 'datorn', poang: 0.5 + (m.ok - bast.ok) * 0.05, t, v: [
-        { kick: 'AI-CHOCKEN', rad: [['DATORN'], ['KROSSADE'], ['GÄNGET', 1]], under: `Datorn ${m.ok} rätt – gängets bästa ${bast.ok}. Är människan överspelad?` },
-        { kick: 'AI-CHOCKEN', rad: [['MASKINEN'], ['VANN', 1]], under: `${m.ok} rätt mot gängets ${bast.ok}. Experterna: ”Vi har varnat för det här”` },
-      ] });
-    } else if (folk.every((p) => p.ok > m.ok)) {
-      out.push({ typ: 'datorn', poang: 0.5 + (samst.ok - m.ok) * 0.05, t, v: [
-        { kick: 'MÄNNISKAN SLÅR TILLBAKA', rad: [['GÄNGET'], ['SLOG'], ['DATORN', 1]], under: `Alla fick fler rätt än datorns ${m.ok}. Datorn avböjer att kommentera` },
-        { kick: 'TIPSET', rad: [['FIASKO'], ['FÖR'], ['DATORN', 1]], under: `Bara ${m.ok} rätt – sämst av alla. Datorn avböjer att kommentera` },
-      ] });
-    }
+  // alla lika många rätt: poängen avgör
+  if (folk.length >= 2 && folk.every((p) => p.ok === bast.ok) && TAL[bast.ok]) {
+    const forst = folk.reduce((a, p) => (p.pts > a.pts ? p : a));
+    const N = namn[forst.id];
+    out.push({ typ: 'lika', poang: 0.55, t, v: [
+      { kick: 'DÖDLÄGET', rad: [['OAV-'], ['GJORT!', 1]], under: `${stor(TAL[bast.ok])} rätt var för ${lista(folk.map((p) => namn[p.id]))}. ${N} vinner på poäng` },
+      { kick: 'TIPSET', rad: [['INGEN'], ['GAV SIG', 1]], under: `${stor(TAL[bast.ok])} rätt var – poängen fick avgöra. ${N} vann` },
+    ] });
+  }
+  // ensam om rätt på en match som inte borde ha gått
+  for (const m of spelade) {
+    const med = folk.filter((p) => tecken(m, p));
+    const ratt = med.filter((p) => tecken(m, p).includes(m.res));
+    if (med.length < 2 || ratt.length !== 1 || tecken(m, ratt[0]).length === 3 || oddsen(m) > 35) continue;
+    const p = ratt[0];
+    const N = namn[p.id];
+    const [h, a] = lagen(m);
+    const ovr = med.filter((x) => x !== p);
+    const deras = [...new Set(ovr.map((x) => tecken(m, x)))];
+    const sa = deras.length === 1 ? `${lista(ovr.map((x) => namn[x.id]))} hade ${tecknetOrd(deras[0])}` : `${lista(ovr.map((x) => namn[x.id]))}: ”Ren tur”`;
+    const res = resultat(m);
+    const [v, f] = m.res === '2' ? [a, h] : [h, a];
+    const vad = m.res === 'X' ? `${h}–${a}${res ? ` ${res}` : ''}` : `${res ? `${res} ` : 'Seger '}mot ${f}`;
+    const rad = m.res === 'X' ? [[N], ['TIPPADE'], ['KRYSSET', 1]] : [[N], ['TRODDE PÅ'], [v, 1]];
+    out.push({ typ: 'ensam', poang: 0.5 + (35 - oddsen(m)) / 70, t, id: m.id, v: [
+      { kick: 'TIPSET', rad, under: `${vad}. ${sa}` },
+      { kick: 'BARA I {T}', rad, under: `${vad}. Nu berättar ${N} hur det gick till` },
+    ] });
   }
   // en ny ledare i Tipsligan efter omgången (ensam etta, före ensam etta)
-  const i = alla.indexOf(r);
   if (i >= 1) {
     const fore = stallning(alla.slice(0, i));
     const nu = stallning(alla.slice(0, i + 1));
@@ -517,9 +649,11 @@ function bakat(r, alla, short) {
   for (const x of r.matches) out.push(...matchRubriker({ id: x.id, match: x.match, res: x.res, score: x.score, model: x.model, t }, short));
   return out;
 }
+const ORDNING = ['', 'första', 'andra', 'tredje', 'fjärde', 'femte', 'sjätte', 'sjunde', 'åttonde', 'nionde', 'tionde'];
 
 // Skrällen och krossen i en spelad match (res: '1', 'X' eller '2', model:
-// modellens chanser i procent före avspark).
+// modellens chanser i procent före avspark: väljer vad som är en skräll, men
+// står inte på sedeln).
 function matchRubriker(x, short) {
   if (arLand(x)) return marknadens(matchRubrikerna(x, (n) => landKort(short(n))));
   return matchRubrikerna(x, short);
@@ -531,52 +665,53 @@ function matchRubrikerna(x, short) {
   const [h, a] = lag(x.match);
   if (!h || !a || !x.score) return out;
   const mal = String(x.score).split(/[–-]/).map(Number);
+  const vem = vemHade(x.id, x.res);
   if (p != null && p <= 22 && x.res !== 'X') {
     const [v, f] = (x.res === '1' ? [h, a] : [a, h]).map(short);
     const verb = x.res === '1' ? 'FÄLLDE' : 'SÄNKTE';
+    const sa = trodde(vem);
     out.push({ typ: 'skrall', poang: 0.5 + ((22 - p) / 22) * 0.45, t: x.t, id: x.id, v: [
-      { kick: 'SKRÄLLEN', rad: [[v], [verb, 1], [f]], under: `${x.score} – datorn gav det ${Math.round(p)} %. Datorn avböjer att kommentera` },
-      { kick: 'CHOCKEN', rad: [[v], [verb, 1], [f]], under: `${x.score}. Bara ${Math.round(p)} % enligt datorn – nu ifrågasätts allt` },
+      { kick: 'SKRÄLLEN', rad: [[v], [verb, 1], [f]], under: `${x.score}. ${sa || 'Ingen tror att det är sant'}` },
+      { kick: 'CHOCKEN', rad: [[v], [verb, 1], [f]], under: sa ? `${x.score}. ${sa}` : `${x.score}. Nu ifrågasätts allt` },
     ] });
   } else if (x.res === 'X' && x.model && Math.max(x.model[0], x.model[2]) >= 58) {
     const fav = x.model[0] >= x.model[2] ? 0 : 2;
     const [v, f] = (fav === 0 ? [h, a] : [a, h]).map(short);
-    const pf = Math.round(x.model[fav]);
+    const spik = vem ? Object.keys(vem.tecken).filter((n) => vem.tecken[n] === S[fav]) : [];
     out.push({ typ: 'skrall', poang: 0.45 + (x.model[fav] - 58) / 80, t: x.t, id: x.id, v: [
-      { kick: 'FIASKOT', rad: [[v], ['SNUBBLADE', 1]], under: `${x.score} mot ${f} – trots ${pf} % enligt datorn. Hur är det möjligt?` },
-      { kick: 'PINSAMT', rad: [[v], ['TAPPADE'], ['POÄNG', 1]], under: `${x.score} mot ${f}. ${pf} % för seger enligt datorn – och ändå` },
+      { kick: 'FIASKOT', rad: [[v], ['SNUBBLADE', 1]], under: spik.length ? `${x.score} mot ${f}. ${lista(spik)} hade spikat ${v}` : `${x.score} mot ${f}. Hur är det möjligt?` },
+      { kick: 'PINSAMT', rad: [[v], ['TAPPADE'], ['POÄNG', 1]], under: spik.length ? `${x.score} mot ${f}. ${lista(spik)} vill ha pengarna tillbaka` : `${x.score} mot ${f}. Favoriten fick nöja sig med en poäng` },
     ] });
   }
   const skillnad = Math.abs(mal[0] - mal[1]);
   if (mal.length === 2 && skillnad >= 4) {
     const [v, f] = (mal[0] > mal[1] ? [h, a] : [a, h]).map(short);
     const tot = mal[0] + mal[1];
-    const pr = p != null ? ` – datorn gav det ${Math.round(p)} %` : '';
     out.push({ typ: 'kross', poang: 0.45 + (skillnad - 4) * 0.1, t: x.t, id: x.id, v: tot >= 7 ? [
       { kick: 'MÅLFESTEN', rad: [[v], ['KÖRDE ÖVER', 1], [f]], under: `${x.score} – ${tot} mål. Hela målfesten i bilder` },
       { kick: 'MÅLREGNET', rad: [[`${tot} MÅL!`, 1], [short(h)], [`– ${short(a)}`]], under: `${x.score}. Försvararna saknas fortfarande` },
     ] : [
-      { kick: 'FÖRNEDRINGEN', rad: [[v], ['KÖRDE ÖVER', 1], [f]], under: `${x.score}${pr}. Siffrorna talar sitt tydliga språk` },
+      { kick: 'FÖRNEDRINGEN', rad: [[v], ['KÖRDE ÖVER', 1], [f]], under: `${x.score}. Siffrorna talar sitt tydliga språk` },
       { kick: 'MASSAKERN', rad: [[v], ['KROSSADE', 1], [f]], under: `${x.score} – hela målfesten i bilder` },
     ] });
   }
   return out;
 }
 
-// Gängets kupong (Historik.coupons(): ok, n, exp, grade 1–5).
+// Vår gemensamma kupong (Historik.coupons(): ok, n, exp, grade 1–5).
 function kupongRubriker(c, short) {
   const out = [];
   const t = Date.parse(`${c.till || c.date}T17:00:00Z`);
-  const facit = `${c.ok} rätt av ${c.n} – datorn väntade ${tal(c.exp)}`;
+  const facit = `${c.ok} rätt av ${c.n}`;
   if (c.n >= 6 && c.grade === 1) {
     out.push({ typ: 'kupong', poang: 0.65, t, v: [
       { kick: 'FIASKOT', rad: [['KUPONGEN'], ['I SPILLROR', 1]], under: `${facit}. Nu letas syndabockar` },
-      { kick: 'TIPSKRASCHEN', rad: [['KUPONG-'], ['HAVERIET', 1]], under: `Gängets kupong: ${c.ok} rätt av ${c.n}. Ingen tar på sig skulden` },
+      { kick: 'TIPSKRASCHEN', rad: [['KUPONG-'], ['HAVERIET', 1]], under: `${stor(G.gen)} kupong: ${facit}. Ingen tar på sig skulden` },
     ] });
   } else if (c.n >= 6 && c.grade === 5) {
     out.push({ typ: 'kupong', poang: 0.65, t, v: [
-      { kick: 'JUBLET', rad: [['DRÖM-'], ['KUPONGEN', 1]], under: `${facit}. Gänget firar – med måtta` },
-      { kick: 'BARA I {T}', rad: [['SÅ KNÄCKTE'], ['GÄNGET'], ['KODEN', 1]], under: `${facit}. Hela kupongen` },
+      { kick: 'JUBLET', rad: [['DRÖM-'], ['KUPONGEN', 1]], under: `${facit}. ${stor(G.vi)} firar – med måtta` },
+      { kick: 'BARA I {T}', rad: [['SÅ KNÄCKTE'], [G.vi.toUpperCase()], ['KODEN', 1]], under: `${facit}. Hela kupongen` },
     ] });
   }
   for (const r of c.rows || []) {
@@ -602,8 +737,8 @@ function framat(rows, alla, kortNamn) {
     if (Math.max(...pj) <= 42) {
       const [h, a] = [short(jamn.m.home), short(jamn.m.away)];
       out.push({ typ: 'rysaren', poang: 0.42 + (42 - Math.max(...pj)) / 40, t, framat: true, mid: jamn.m.id, v: [
-        { kick: 'RYSAREN', rad: [['DATORN'], ['GER UPP', 1]], under: `${h}–${a}: ${pj.join('–')} %. Nu får du välja själv` },
-        { kick: 'NERVKRIGET', rad: [['RYSAREN', 1], [h], [`– ${a}`]], under: `Datorn kan inte välja: ${pj.join('–')} %. Avspark ${nar(jamn.m.kickoff)}` },
+        { kick: 'RYSAREN', rad: [['VEM'], ['VÅGAR'], ['SPIKA?', 1]], under: `${h}–${a}. Här hjälper bara en helgardering` },
+        { kick: 'NERVKRIGET', rad: [['RYSAREN', 1], [h], [`– ${a}`]], under: `Jämnare än så blir det inte. Avspark ${nar(jamn.m.kickoff)}` },
       ] });
     }
     const fav = med.reduce((a, x) => (Math.max(x.g.pr[0], x.g.pr[2]) > Math.max(a.g.pr[0], a.g.pr[2]) ? x : a));
@@ -611,10 +746,11 @@ function framat(rows, alla, kortNamn) {
     const pf = Math.round(fav.g.pr[k]);
     if (pf >= 68) {
       const [v, f] = (k === 0 ? [fav.m.home, fav.m.away] : [fav.m.away, fav.m.home]).map(short);
+      const plats = k === 0 ? 'Hemma' : 'Borta';
       out.push({ typ: 'spiken', poang: 0.4 + (pf - 68) / 60, t, framat: true, mid: fav.m.id, v: [
-        { kick: 'SPIKEN', rad: [[v], ['KAN INTE'], ['FÖRLORA', 1]], under: `${pf} % mot ${f} enligt datorn. Vad kan gå fel?` },
-        { kick: 'OMGÅNGENS SPIK', rad: [['GARANTERAT!', 2], [v], ['VINNER']], under: `Mot ${f}. (${pf} procent enligt datorn)` },
-        { kick: 'SÄKRA PENGAR', rad: [['SPIKA'], [`${v}!`, 1]], under: `${pf} % mot ${f} enligt datorn. Vi lovar ingenting` },
+        { kick: 'SPIKEN', rad: [[v], ['KAN INTE'], ['FÖRLORA', 1]], under: `${plats} mot ${f}. Vad kan gå fel?` },
+        { kick: 'OMGÅNGENS SPIK', rad: [['GARANTERAT!', 2], [v], ['VINNER']], under: `${plats} mot ${f}. Med reservation för tryckfel` },
+        { kick: 'SÄKRA PENGAR', rad: [['SPIKA'], [`${v}!`, 1]], under: `${plats} mot ${f}. Vi lovar ingenting` },
       ] });
     }
   }
@@ -622,9 +758,10 @@ function framat(rows, alla, kortNamn) {
   if (alla.length >= 2 && st.length >= 2 && st[0].pts - st[1].pts >= 0.5) {
     const N = namnAv(st[0]);
     const d = tal(st[0].pts - st[1].pts);
+    const tva = namnAv(st[1]);
     out.push({ typ: 'jakten', poang: 0.38, t, framat: true, v: [
-      { kick: 'TIPSLIGAN', rad: [['JAKTEN'], [`PÅ ${N}`, 1]], under: `Leder med ${d} poäng efter ${alla.length} omgångar. Kan någon stoppa ${N}?` },
-      { kick: 'TIPSLIGAN', rad: [[N], ['OHOTAD?', 1]], under: `${d} poängs ledning efter ${alla.length} omgångar. Jakten har bara börjat` },
+      { kick: 'TIPSLIGAN', rad: [['JAKTEN'], [`PÅ ${N}`, 1]], under: `${d} poäng före ${tva} efter ${alla.length} omgångar. Kan någon stoppa ${N}?` },
+      { kick: 'TIPSLIGAN', rad: [[N], ['OHOTAD?', 1]], under: `${d} poängs ledning efter ${alla.length} omgångar. ${tva} har inte gett upp` },
     ] });
   }
   // den jämnaste matchen och spiken: är det en landskamp är procenten spelbolagens
@@ -637,7 +774,7 @@ function framat(rows, alla, kortNamn) {
 const GUIDEN = { typ: 'guide', poang: 0, v: [
   { kick: 'EXTRA', rad: [['SÅ MÅR'], ['TIPSLAGEN', 1]], under: 'Skador, sviter och vad tränarna säger' },
   { kick: 'SUPPORTRARNA', rad: [['DET'], ['SUPPORTRARNA', 1], ['VET']], under: 'Poddarna och forumen inför helgen' },
-  { kick: 'TIPSET', rad: [['ALLA'], ['MATCHERNA', 1]], under: 'Datorns procent och Sixtens tecken' },
+  { kick: 'TIPSET', rad: [['ALLA'], ['MATCHERNA', 1]], under: 'Formen, skadorna och Sixtens tecken' },
 ] };
 const PLUS = ['HOROSKOPET: TIPPA X', 'BÄST I TEST: TIPSPENNOR', '13 RÄTT – SÅ DELAR DU VINSTEN', 'LÄKAREN: SÅ PÅVERKAR TIPSET SÖMNEN'];
 
@@ -654,9 +791,19 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
   const alla = omgangar();
   const kand = [];
   const senast = alla[alla.length - 1];
-  if (senast) kand.push(...bakat(senast, alla, short));
   const c = (old || []).filter((x) => x.n && x.rows && !(window.Historik && Historik.hidden(x)))
     .sort((a, b) => String(b.till || b.date).localeCompare(String(a.till || a.date)))[0];
+  // veckans namn på oss, vem som tippade vad och resultaten (OSS, vemHade ovan)
+  G = OSS[Math.floor(hash(fro * 2.17 + 4.4) * OSS.length) % OSS.length];
+  VEM = new Map();
+  for (const r of alla) {
+    const namn = {};
+    for (const p of r.people || []) namn[p.id] = namnAv(p);
+    for (const m of r.matches || []) if (m.id != null && m.tips) VEM.set(String(m.id), { tips: m.tips, namn });
+  }
+  MAL = new Map();
+  for (const x of old || []) for (const r of x.rows || []) if (r.id && r.score) MAL.set(String(r.id), r.score);
+  if (senast) kand.push(...bakat(senast, alla, short));
   if (c) kand.push(...kupongRubriker(c, short));
   const upp = (rows || []).filter((x) => x.m && x.g);
   if (upp.length >= 3 && upp.every((x) => x.g.state === 'upcoming')) kand.push(...framat(upp, alla, short));
@@ -688,7 +835,10 @@ export function rubrik({ rows, old, short = (x) => x, namn = null, now = Date.no
   };
   const vald = valj(val, 0);
   // (veckans nyhet ur matchbladen har sin egen andra nyhet)
-  const andra = lista.find((x) => x !== val && x.typ !== val.typ) || lista.find((x) => x !== val);
+  // (helst om en annan match: inte skrällen under den som ensam trodde på den)
+  const annan = (x) => x !== val && x.typ !== val.typ;
+  const om = (x) => x.id != null && [val.id, vald.om].some((y) => y != null && String(y) === String(x.id));
+  const andra = lista.find((x) => annan(x) && !om(x)) || lista.find(annan) || lista.find((x) => x !== val);
   const plus = vald.plus || (andra ? radText(valj(andra, 1).rad) : PLUS[Math.floor(hash(fro + 9.3) * PLUS.length) % PLUS.length]);
   // tidningen är från dagen det hände (en sen match: dagen efter), eller idag
   const t = val === GUIDEN || val.framat ? now : Math.min(now, val.t + 3 * 3600e3);
