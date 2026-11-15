@@ -640,8 +640,8 @@ tolkade koden från början.
 - **[public/sw.js](public/sw.js)** (en service worker för hela sajten, registreras från index.html fem
   sekunder efter `load`) sparar JavaScript, CSS, typsnitt och bilder i webbläsarens Cache Storage
   (`filer-1`), var och en med sin kontrollsumma. Bygget skriver in listan över filerna och deras
-  kontrollsummor sist i index.html (`rum-filer`, [src/filer.js](src/filer.js), med `--minify`; 346 filer,
-  6 kB med gzip). Vid varje besök läser sw.js listan i sidan den hämtar, och för varje fil sidan ber om:
+  kontrollsummor sist i index.html (`rum-filer`, [src/filer.js](src/filer.js), med `--minify`; 445 filer på sajten,
+  7 kB med gzip). Vid varje besök läser sw.js listan i sidan den hämtar, och för varje fil sidan ber om:
   står den sparad med samma kontrollsumma tas den därifrån, annars hämtas den som vanligt och sparas –
   men bara om innehållet har kontrollsumman i listan. Sidan får alltså exakt de versioner den hade fått
   utan sw.js, också mitt i en publicering. Sidorna, `data/`, ljudet, filer med `?` och andra adresser
