@@ -55,6 +55,8 @@ const UNDERKANT = [
   [/\bså här långt\b/i, 'än så länge eller hittills: så här långt är engelskans so far'],
   [/\bi min bok\b/i, 'enligt mig: i min bok är engelska'],
   [/\brättar sig\b(?! efter)/i, 'rättar till sig: rättar sig betyder lyder'],
+  // "Det heter ett rätt och inte en rätt" (Tomas 2026-11-15).
+  [/\b(en|någon|ingen)( enda)? rätt( till| av|[.,!?]|$)/i, 'ett rätt, inte ett enda rätt: det heter ett rätt'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
@@ -107,6 +109,8 @@ function rader(o = repliker, vag = '', ut = []) {
 }
 
 const alla = rader();
+// {ratt} är talet i ord för hur många rätt (ett, två …), och det heter ett rätt: framför matcher blir det fel.
+for (const [vag, t] of alla) if (/\{ratt\}(?! rätt)/.test(t)) fel.push(`${vag}: "${t}" har {ratt} utan rätt efter. Det blir ett, så skriv {ratt} rätt`);
 for (const [vag, t] of alla) {
   if (INTE_MENINGAR.includes(vag.split('.')[0])) continue;
   for (const [re, istallet] of UNDERKANT) if (re.test(t)) fel.push(`${vag}: "${t}" är underkänt. Skriv: ${istallet}`);

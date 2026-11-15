@@ -545,7 +545,7 @@
       const v = g.map((p) => Tippoang.runda(p.pts));
       const topp = Math.max(...v);
       if (v.filter((x) => x === topp).length !== 1) continue;
-      return T.lika(lista(g.map((p) => p.namn)), ordet(g[0].ok), g[v.indexOf(topp)].namn);
+      return T.lika(lista(g.map((p) => p.namn)), g[0].ok === 1 ? 'ett' : ordet(g[0].ok), g[v.indexOf(topp)].namn);
     }
     let bast = null;
     for (const r of sum.rader) {

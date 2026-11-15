@@ -3110,7 +3110,7 @@ window.RumHasse = (() => {
     // halvlek eller gott om tid: mittenSent och daligtSent)
     const sent = l.live.every((x) => { const t = matchTid(x.r); return t && !t.paus && t.min >= 75; });
     const omLaget = (sent && S[`${lage}Sent`]) || S[lage];
-    // (med en enda match att räkna blir det "en rätt av en": då tar han den matchen direkt)
+    // (med en enda match att räkna blir det "ett rätt av ett": då tar han den matchen direkt)
     if (l.av < 2) sagRader(enMatch(lista, tips));
     else {
       // (alla rätt och inga rätt har egna rader, rattAlla och rattNoll; en äldre replikfil har bara ratt)

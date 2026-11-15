@@ -436,6 +436,8 @@ function skriven(rows, t, poang = 1) {
 }
 
 const TAL = ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'];
+// framför rätt: det heter ett rätt
+const rattTal = (n) => (n === 1 ? 'ett' : TAL[n]);
 
 // Veckan i Stockholm (måndag till söndag) som frö: rubrikens variant och
 // klippet är desamma hela veckan. ?rum-vecka=<tal> ger en annan vecka.
@@ -583,7 +585,7 @@ function bakat(r, alla, short) {
     const v = [
       svit >= 2 && { kick: 'SVITEN', rad: [[N], ['IGEN!', 1]], under: `Bäst för ${ORDNING[svit] || `${svit}:e`} omgången i rad. ${lista(ovr)} börjar tröttna` },
       fran && { kick: 'TIPSET', rad: [[gen(N)], ['REVANSCH', 1]], under: `Sämst förra omgången – nu ${bast.ok} rätt och bäst ${bland}` },
-      miss && TAL[bast.n] && { kick: 'SÅ NÄRA', om: miss.id, rad: [[N], [`${bast.ok} RÄTT!`, 1]], under: `En match från ${TAL[bast.n]} rätt – ${lagen(miss).join('–')} förstörde allt` },
+      miss && TAL[bast.n] && { kick: 'SÅ NÄRA', om: miss.id, rad: [[N], [`${bast.ok} RÄTT!`, 1]], under: `En match från ${rattTal(bast.n)} rätt – ${lagen(miss).join('–')} förstörde allt` },
       { kick: 'TIPSGENIET', rad: [[N], [`${bast.ok} RÄTT!`, 1]], under: `${fick(andra(bast))}. Är det Sveriges bästa tippare?` },
       em
         ? { kick: 'TIPSET', rad: [[N], ['SLOG'], ['ALLA', 1]], under: `${bast.ok} rätt – och ensam om ${utfall(em)}` }
@@ -609,8 +611,8 @@ function bakat(r, alla, short) {
     const forst = folk.reduce((a, p) => (p.pts > a.pts ? p : a));
     const N = namn[forst.id];
     out.push({ typ: 'lika', poang: 0.55, t, v: [
-      { kick: 'DÖDLÄGET', rad: [['OAV-'], ['GJORT!', 1]], under: `${stor(TAL[bast.ok])} rätt var för ${lista(folk.map((p) => namn[p.id]))}. ${N} vinner på poäng` },
-      { kick: 'TIPSET', rad: [['INGEN'], ['GAV SIG', 1]], under: `${stor(TAL[bast.ok])} rätt var – poängen fick avgöra. ${N} vann` },
+      { kick: 'DÖDLÄGET', rad: [['OAV-'], ['GJORT!', 1]], under: `${stor(rattTal(bast.ok))} rätt var för ${lista(folk.map((p) => namn[p.id]))}. ${N} vinner på poäng` },
+      { kick: 'TIPSET', rad: [['INGEN'], ['GAV SIG', 1]], under: `${stor(rattTal(bast.ok))} rätt var – poängen fick avgöra. ${N} vann` },
     ] });
   }
   // ensam om rätt på en match som inte borde ha gått

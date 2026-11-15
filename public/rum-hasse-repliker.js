@@ -14,7 +14,7 @@
 //
 // {namn} det du kallas (efternamnet, Dogge för Johansson), {dag} när spelstoppet är (på lördag, i morgon, i dag),
 // {du} dina tecken (etta och kryss), {Bada} tecknet ni båda har (Ettan), {res} resultatet (2–1),
-// {ratt} och {av} hur många rätt han hade av hur många, i ord (två, sex), {antal} och {Antal} ett tal
+// {ratt} och {av} hur många rätt han hade av hur många, i ord (ett, två, sex; {ratt} bara framför rätt), {antal} och {Antal} ett tal
 // från två till tretton i ord (i domarna), och i domarna {match}, {tipset}, {Tipset} och {pct} (se domar.sak).
 //
 // Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
@@ -26,8 +26,9 @@
 })({
   // Tecknen i ord, för sidan och rösten: du som i "etta och kryss", bestamd som i "Ettan kan du behålla".
   tecken: { 1: { du: 'etta', bestamd: 'ettan' }, X: { du: 'kryss', bestamd: 'krysset' }, 2: { du: 'tvåa', bestamd: 'tvåan' } },
-  // Talen i ord, för {ratt} och {av}.
-  tal: ['noll', 'en', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'],
+  // Talen i ord, för {ratt} och {av}. Det heter ett rätt (Tomas 2026-11-15), så {ratt} står bara framför rätt,
+  // och {av} blir ett bara i "rätt av ett". {antal} är från två och uppåt.
+  tal: ['noll', 'ett', 'två', 'tre', 'fyra', 'fem', 'sex', 'sju', 'åtta', 'nio', 'tio', 'elva', 'tolv', 'tretton'],
 
   // När man kommer till honom.
   oppning: [
@@ -323,7 +324,7 @@
     'Jag kan fortsätta så här till spelstoppet.',
     'Ge mig nästa match, så får du nästa svar.',
     'Det satt som en smäck. Vilken match tar vi nu?',
-    'Där fick du en rätt till. Vilken match tar vi nu?',
+    'Där fick du ett rätt till. Vilken match tar vi nu?',
   ],
   // ... när man har frågat om just så många matcher.
   antal: {
@@ -733,7 +734,7 @@
       'Jag ligger på {ratt} rätt av {av}.',
       'Jag sitter med {ratt} rätt av {av}.',
       'Blåser domarna av nu har jag {ratt} rätt av {av}.',
-      'Hittills har {ratt} av {av} matcher rätt ställning.',
+      'Hittills har jag {ratt} rätt av {av} möjliga.',
       'I det här läget har jag {ratt} rätt av {av}.',
       'Medan kaffet svalnar har jag {ratt} rätt av {av}.',
       'Mellan blossen räknar jag till {ratt} rätt av {av}.',
@@ -751,8 +752,8 @@
     ],
     rattNoll: [
       'Inget av mina {av} tecken sitter just nu.',
-      'Just nu har jag inte en enda rätt.',
-      'Som ställningarna ser ut har jag inte en enda rätt.',
+      'Just nu har jag inte ett enda rätt.',
+      'Som ställningarna ser ut har jag inte ett enda rätt.',
       'Jag har noll rätt av {av} i det här läget.',
       'Inte en enda match står som den ska just nu.',
       'Ingen av matcherna har hittat rätt ställning än.',
@@ -1024,7 +1025,7 @@
     slutsignal: ['Slutsignal i {match}. Det slutade {res}.'],
     slutRatt: [
       'Där satt tecknet ända till slutsignalen.',
-      'Där har jag en rätt till.',
+      'Där har jag ett rätt till.',
       'Domaren blåste av vid rätt ställning.',
       'Det resultatet hade jag skrivit under på före avspark.',
       'Den matchen lägger jag till handlingarna.',
