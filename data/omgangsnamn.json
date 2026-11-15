@@ -32,6 +32,21 @@
    ],
    "model": "claude-opus-5-5",
    "generatedAt": "2026-11-13T18:16:18.774Z"
+  },
+  {
+   "key": "2026-11-15-v65ft4:401861171,401861172,401861175,401861176,401861177,401861178,401861181,401861185,401861186,401861187,401861188",
+   "id": "2026-11-15-v65ft4",
+   "namn": "Fotbollen har flyttat hemifrån",
+   "syftar": "Engelsmännen sjunger att fotbollen kommer hem, men nu bor den hos världs- och Europamästarna Spanien, och England får åka till Madrid och hälsa på.",
+   "forslag": [
+    "Fotbollen har flyttat hemifrån",
+    "Spanien har mött England förut",
+    "Bronset hälsar på hos guldet",
+    "England trivs bäst på bortaplan",
+    "Turkiet sparar poängen till våren"
+   ],
+   "model": "claude-opus-5-5",
+   "generatedAt": "2026-11-15T13:49:16.405Z"
   }
  ]
 }
