@@ -50,6 +50,11 @@ const UNDERKANT = [
   [/\b(ni|er) andra\b/i, 'de andra: den han talar med kan vara den han dömer'],
   [/\bandras domar\b/i, 'domarna över de andra: domarna är hans'],
   [/\bVems vill du höra (först|nu)\?/i, 'Vilken vill du höra först? eller Vems kupong tar vi nu?: det är hans bedömning man hör'],
+  // "Min kupong står på en rätt av två." (Tomas 2026-11-15: inte bra svenska.)
+  [/\bstår( jag)? på \S+ rätt\b/i, 'har jag fyra rätt, ligger på fyra rätt eller sitter med fyra rätt'],
+  [/\bså här långt\b/i, 'än så länge eller hittills: så här långt är engelskans so far'],
+  [/\bi min bok\b/i, 'enligt mig: i min bok är engelska'],
+  [/\brättar sig\b(?! efter)/i, 'rättar till sig: rättar sig betyder lyder'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
