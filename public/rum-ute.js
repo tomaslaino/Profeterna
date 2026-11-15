@@ -1067,11 +1067,12 @@ window.RumUte = (() => {
   }
 
   // figuren f i ställningen efter t ms
-  // (i gatans duk är figurens bild en ruta i ett gemensamt ark, med hörnet i ax, ay)
+  // (i gatans duk är figurens bild en ruta i ett gemensamt ark, med hörnet i ax, ay; en
+  // suddig figur ritas skarp i kladden och läggs sedan i sin ruta med oskärpan)
   function rita(f, t) {
     const g = f.bakad ? kladd(f.bw, f.bh) : f.x;
-    const ax = f.ax || 0;
-    const ay = f.ay || 0;
+    const ax = f.bakad ? 0 : f.ax || 0;
+    const ay = f.bakad ? 0 : f.ay || 0;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.globalAlpha = 1;
     g.clearRect(ax, ay, f.bw, f.bh);
@@ -1082,8 +1083,12 @@ window.RumUte = (() => {
     delarna(g, f, t, f.B);
     g.restore();
     if (f.bakad) {
-      f.x.clearRect(0, 0, f.bw, f.bh);
-      f.x.drawImage(g.canvas, 0, 0, f.bw, f.bh, 0, 0, f.bw, f.bh);
+      const [ux, uy] = [f.ax || 0, f.ay || 0];
+      f.x.clearRect(ux, uy, f.bw, f.bh);
+      // (arket delas av alla figurerna: oskärpan sätts för den här och tas bort efteråt)
+      if (f.delad) f.x.filter = f.fl;
+      f.x.drawImage(g.canvas, 0, 0, f.bw, f.bh, ux, uy, f.bw, f.bh);
+      if (f.delad) f.x.filter = 'none';
     }
   }
 
@@ -1107,10 +1112,10 @@ window.RumUte = (() => {
       if (vb.length !== 4 || !(w > 0) || !(h > 0)) continue;
       const st = svg.style;
       const steg = (parseFloat(st.getPropertyValue('--steg')) || 0.9) * 1000;
-      // molnen är så suddiga att det räcker med en bildpunkt per px; i gatans
-      // duk är figuren en bild i dukens upplösning (GAT_S), utan oskärpa
-      const sk = samla && ror ? GAT_S : LATT ? (blur >= 3 ? 0.2 : 0.5) : blur >= 3 ? Math.min(1, s) : s;
-      const bakad = FILTER && blur > 0 && !(samla && ror);
+      // det som är så suddigt behöver inte mer än en bildpunkt per px; i gatans
+      // duk är figuren en bild i dukens upplösning (GAT_S), med oskärpan i samma mått
+      const sk = samla && ror ? GAT_S : LATT ? (blur >= 3 ? 0.2 : 0.5) : blur >= 2.5 ? Math.min(1, s) : s;
+      const bakad = FILTER && blur > 0;
       const P = bakad ? Math.ceil(blur * 3) : 0;
       const c = document.createElement('canvas');
       c.setAttribute('class', `${svg.getAttribute('class')} duk${bakad ? ' bakad' : ''}`);
@@ -1124,13 +1129,14 @@ window.RumUte = (() => {
         c.width = bw;
         c.height = bh;
       }
-      if (bakad) x.filter = `blur(${r1(blur * sk * 10) / 10}px)`;
+      const fl = bakad ? `blur(${r1(blur * sk * 10) / 10}px)` : '';
+      if (x && fl) x.filter = fl;
       const N = delar(svg, steg);
       const sx = (w / vb[2]) * sk;
       const sy = (h / vb[3]) * sk;
       const f = {
         c, x, N, W: new Float64Array(N.length * 6), A: new Float64Array(N.length), B: [sx, 0, 0, sy, (P - vb[0] * w / vb[2]) * sk, (P - vb[1] * h / vb[3]) * sk],
-        w, h, P, s: sk, bw, bh, bakad, ror: Boolean(ror), t0: document.timeline.currentTime || 0,
+        w, h, P, s: sk, bw, bh, bakad, fl, ror: Boolean(ror), t0: document.timeline.currentTime || 0,
         // var den är på gatan: left + translateX från fran till till (löven från −40 till --x1)
         x0: parseFloat(st.left) || 0,
         fran: svg.classList.contains('rum-lov') ? -40 : parseFloat(st.getPropertyValue('--fran')) || 0,
@@ -1193,8 +1199,12 @@ window.RumUte = (() => {
     for (const f of lista) {
       f.c = c;
       f.x = g;
-      f.B[4] += f.ax;
-      f.B[5] += f.ay;
+      f.delad = true;
+      // (en suddig figur ritas först för sig i kladden, rita)
+      if (!f.bakad) {
+        f.B[4] += f.ax;
+        f.B[5] += f.ay;
+      }
       rita(f, 0);
     }
   }
@@ -1206,6 +1216,11 @@ window.RumUte = (() => {
   // det som är utanför bilden medan kameran står nära och ritar om gatan, med
   // filtret, varje gång. En duk ritas inte om.
   const GATA = 0.4;
+  // Skärpedjupet (rum-ute.css): gatan är ur skärpa. Den grova duken är mjuk i sig, ungefär som 1,3 px
+  // oskärpa i datorn; DJUP läggs till (i scenens px) när gatan och himlen bakas, så att de blir lika
+  // mjuka som där (3,4 px). Utan ctx.filter (äldre Safari) blir de som förut.
+  const DJUP = 3.1;
+  const djup = (g) => { if (FILTER) g.filter = `blur(${r1(DJUP * GATA * 10) / 10}px)`; return g; };
   async function bakaGata(x, klar) {
     const gen = (x._gen = (x._gen || 0) + 1);
     const xs = new XMLSerializer();
@@ -1232,7 +1247,7 @@ window.RumUte = (() => {
         c.style.cssText = 'width:1600px; height:1000px';
         c.width = 1600 * GATA;
         c.height = 1000 * GATA;
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        djup(c.getContext('2d')).drawImage(img, 0, 0, c.width, c.height);
         img.src = '';
         if (klar) dukar.push(c);
         else svg.replaceWith(c);
@@ -1270,7 +1285,7 @@ window.RumUte = (() => {
       c.style.cssText = 'width:1600px; height:1000px';
       c.width = 1600 * GATA;
       c.height = 1000 * GATA;
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      djup(c.getContext('2d')).drawImage(img, 0, 0, c.width, c.height);
       img.src = '';
       if (klar) klar(c);
       else if (!x._duk) x.after(c);

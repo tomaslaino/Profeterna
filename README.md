@@ -6101,6 +6101,44 @@ rum-inredning.js).
 Prövat i Chrome med mjukvarugrafik som dator (1440 × 900) på dagen och kvällen och som telefon: rummet byggs utan fel
 och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt ritas i dem.
 
+### Ljuskäglorna och skärpedjupet (2026-11-15)
+
+Användarens önskemål: förslagen *Ljus som kommer någonstans ifrån* och *Skärpedjup som styr blicken*. Rummet var
+jämnt upplyst och lika skarpt överallt, från kupongen en halvmeter bort till husen på andra sidan bron, så att
+ingenting ledde blicken.
+
+- **Ljuskäglorna:** lysröret lyser på gängets bord och på pulten med kupongen (`KAGLOR` i rum.js), och runt dem
+  sjunker rummet in i dunkel, mest ute i kanterna (`DUNKEL`). Dunklet ritas i `.rum-vign` och går runt käglorna och
+  lamporna (neonen, tv:n och spotarna), som kvällens mörker redan gjorde; nu dag som kväll, med kvällens mörker
+  ovanpå. Värmen i käglorna ligger i `.rum-warm`, men bara där den läggs på med blandningsläget (steg 0 i datorn):
+  utan det, i telefonen och från steg 1, blev den en ljus hinna över gänget, och där är käglorna bara hålen i dunklet
+  (`skarm` i `ljusKlockan`, som ritar om ljuset när rummet går ner till steg 1). Inga nya lager, och inget ritas i
+  bildrutorna.
+- **Gatan ur skärpa:** gatan, himlen och de som går förbi är mjukare (`.rum-ute-himmel` och `.rum-ute-gata`
+  1,3 → 3,4 px, figurerna 0,7–1,4 → 1,8–3 px och molnen 7 → 9 px i rum-ute.css). I gatans duk (telefonen, och datorn
+  från steg 1) läggs oskärpan in när gatan och himlen bakas (`DJUP` i rum-ute.js, utöver det den grova duken ger), och
+  de som går förbi har nu oskärpan också där: de ritas skarpa i kladden och läggs i sin ruta i arket med `ctx.filter`
+  (`rita` och `ark`; förut var de skarpa i gatans duk). Det som är så suddigt ritas i datorn med en bildpunkt per px
+  (från 2,5 px oskärpa, förut 3).
+- **Skärpedjupet:** med kupongen i handen och protokollet framme glider rummet bakom ur skärpan, mer ju längre bort
+  det är: bakväggen med gatan 6 px, videohörnet 6, tv:n 5, gänget 4 och pulten 2 (`urFokus` och `FOKUS` i rum.js),
+  in på 0,8 sekunder och tillbaka på 0,5. Det är ett filter på planen, som tonas med Web Animations. Ett filter plattar
+  till det som står i 3D, så tv:n får det del för del (som i `tvBort`) och videohörnet på `.vhs-in`, som har ett eget
+  perspektiv; filtret tas bort helt när skärpan är tillbaka. När rummet har glidit ur skärpan står det still
+  (`stillaBakom`: gänget, sakerna och dammet ritas inte, och gatan vilar som när den inte syns), så att oskärpan inte
+  räknas om i varje bildruta. Inte på steg 2 och 3, där varje pass på grafikkortet är för mycket.
+
+Mätt i headless Chrome med mjukvarugrafik (1440 × 900, steg 1, klockan 14 i mulet väder och fast tid), gammal och ny
+kod: kanterna och taket 21–28 % mörkare, korktavlan längst ut 28 %, gängets bord som förut och kupongen 5 % mörkare.
+Närbilderna av tv:n och Tipsligan är som förut. I telefonen (412 × 870) ritas alla 29 figurer på gatan med oskärpa,
+mot 10 förut. Protokollet från korktavlan är provat fram och tillbaka: rummet glider ur skärpan och står still, och
+efteråt är filtren borta och gatan vilar bara om den inte syns. Kupongen i handen är inte provad, eftersom den kräver
+kupongtjänsten (`Samtal.pult`) som inte finns i en lokal statisk sajt; den går genom samma `urFokus`. Flytet är inte
+mätt i en riktig telefon: `?rum-mat` ger siffrorna där.
+
+**Att ta bilder av rummet:** i headless Chrome med mjukvarugrafik tar det 25–40 sekunder innan ljuset är bakat
+(`R.ljusKlar`), och bilder tagna innan dess saknar rummets ljus helt (vinjetten, kvällens mörker, neonens färg).
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
@@ -6189,7 +6227,7 @@ matcherna och ta bort omgången – med samma kod och samma tjänst som papperet
 ett klick på den eller K. Den lossnar från pulten,
 lyfter, vänds upp mot betraktaren och förstoras till mitten av fönstret (så stor som får
 plats mellan namnet och orden under den), svänger en aning förbi och stannar; rummet mörknar
-bakom, kameran ställer sig rakt framför, och pennan följer med och rullar undan till
+bakom och glider ur skärpan (se [Ljuskäglorna och skärpedjupet](#ljuskäglorna-och-skärpedjupet-2026-11-15)), kameran ställer sig rakt framför, och pennan följer med och rullar undan till
 foten, mellan fälten och streckkoden. Samma kupong som på pulten, men rutorna är knappar: ett tryck kryssar i eller
 ur (två eller tre tecken = gardering), och pennan går dit, drar det ena strecket, lyfter
 och drar det andra – ett kryss med blyerts som ser likadant ut varje gång (samma

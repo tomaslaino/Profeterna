@@ -7,21 +7,24 @@
    inte hinner med ritas i stället allt i en enda duk (.samlad, gatduk). */
 
 .rum-ute { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; pointer-events: none; }
-.rum-ute-himmel, .rum-ute-gata { filter: blur(1.3px); }
+/* Skärpedjupet: gatan ligger trettio meter bort och är ur skärpa, mjukare än
+   rummet (förut 1,3 px, nästan skarp). Samma oskärpa i gatans duk i telefonen
+   (DJUP i rum-ute.js), och de som går förbi har den inbakad i sina dukar. */
+.rum-ute-himmel, .rum-ute-gata { filter: blur(3.4px); }
 /* när fönstret och dörren inte syns står gatan still (sikt i rum.js) */
 .rum-ute.vila *, .rum-ute.vila *::before, .rum-ute.vila *::after { animation-play-state: paused; }
 
 /* de som går, cyklar och åker förbi: gatans x i --fran … --till (benen,
    armarna och hjulen ritas i duken: rorelse i rum-ute.js) */
 .rum-gar, .rum-moln, .rum-fagel { position: absolute; left: 0; animation: rum-gar linear infinite; will-change: transform; }
-.rum-gar { filter: blur(1.1px); }
-.rum-gar.fordon { filter: blur(1.4px); }
-.rum-moln { filter: blur(7px); }
-.rum-fagel { filter: blur(0.7px); }
+.rum-gar { filter: blur(2.6px); }
+.rum-gar.fordon { filter: blur(3px); }
+.rum-moln { filter: blur(9px); }
+.rum-fagel { filter: blur(1.8px); }
 @keyframes rum-gar { from { transform: translateX(var(--fran)); } to { transform: translateX(var(--till)); } }
 
 /* löven som blåser förbi (och snurrar i duken) */
-.rum-lov { position: absolute; left: 0; top: 0; animation: rum-lov linear infinite; filter: blur(0.8px); will-change: transform; }
+.rum-lov { position: absolute; left: 0; top: 0; animation: rum-lov linear infinite; filter: blur(2px); will-change: transform; }
 @keyframes rum-lov { from { transform: translate(-40px, var(--y0)); } to { transform: translate(var(--x1), var(--y1)); } }
 
 /* fåglarna (vingarna i duken), tornseglarna och fyrverkerierna */
@@ -44,7 +47,7 @@
 
 /* flaggan vajar (i duken), i ett eget lager: annars ritas hela utsikten om
    hela tiden, och ett lager som ritas om hålls i två buffertar i Safari */
-.rum-flagga { position: absolute; filter: blur(1.1px); will-change: transform; }
+.rum-flagga { position: absolute; filter: blur(2.6px); will-change: transform; }
 
 /* oskärpan är redan i duken */
 .rum-ute canvas.bakad { filter: none; }
