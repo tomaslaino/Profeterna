@@ -8,7 +8,7 @@
 //   POST /kupong {"bort", "bas"}                       ta bort en kupong
 //   GET  /samtal · POST /samtal {"gor", …}             (se worker/samtal.mjs; GET startar
 //                                                      veckans Stryktips som omgång)
-//   GET  /stryktipset[?nr=…]                           veckans Stryktips, Svenska folket,
+//   GET  /stryktipset[?nr=…][&spel=europatipset]       veckans Stryktips, Svenska folket,
 //                                                      oddsen och favoritskapet (se
 //                                                      worker/stryktipset.mjs)
 //
@@ -25,7 +25,7 @@
 import kupongCfg from '../config/kupong.js';
 import { saveCoupon, githubWriter } from './kupong.mjs';
 import { getRound, postRound, kvStore } from './samtal.mjs';
-import { getStryktipset, sparaSista } from './stryktipset.mjs';
+import { getStryktipset, sparaSista, oppnaOmgangar } from './stryktipset.mjs';
 
 // Frågeparametern går förbi CDN-cachen, så att det senaste bygget läses.
 async function siteMatches(site) {
@@ -54,7 +54,7 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     const url = new URL(request.url);
     if (url.pathname === '/stryktipset' && request.method === 'GET') {
-      const r = await getStryktipset(url.searchParams.get('nr'), { store: env.KUPONG ? kvStore(env.KUPONG) : null });
+      const r = await getStryktipset(url.searchParams.get('nr'), { spel: url.searchParams.get('spel'), store: env.KUPONG ? kvStore(env.KUPONG) : null });
       return json(r.status, r.body);
     }
     const samtal = url.pathname === '/samtal';
@@ -62,8 +62,8 @@ export default {
     const site = String(env.SITE || kupongCfg.site).replace(/\/+$/, '');
     if (samtal && request.method === 'GET') {
       try {
-        // Pågår ingen omgång startar veckans Stryktips av sig själv.
-        const auto = { draw: async () => (await getStryktipset()).body.omgang || null, loadMatches: () => siteMatches(site) };
+        // Pågår ingen omgång startar veckans Stryktips (eller Europatipset) av sig själv.
+        const auto = { draws: () => oppnaOmgangar(), loadMatches: () => siteMatches(site) };
         const r = await getRound({ store, gang: kupongCfg.gang, auto });
         return json(r.status, r.body);
       } catch (err) {

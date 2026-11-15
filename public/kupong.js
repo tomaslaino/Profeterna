@@ -187,7 +187,7 @@ function fromStored(k) {
   const sign = (s) => { const t = String(s || '').toUpperCase(); return SIGNS.filter((x) => t.includes(x)).join(''); };
   const matches = k.matcher.filter((r) => r && r.id != null && sign(r.tecken))
     .map((r) => ({ id: String(r.id), sign: sign(r.tecken), label: r.match ? String(r.match) : null, ...(r.kommentar ? { note: String(r.kommentar) } : {}) }));
-  return matches.length ? { id: String(k.id), name: k.namn || null, created: k.skapad || null, sha: k.sha || null, ...(k.spel === 'Stryktipset' ? { spel: k.spel } : {}), matches } : null;
+  return matches.length ? { id: String(k.id), name: k.namn || null, created: k.skapad || null, sha: k.sha || null, ...(k.spel === 'Stryktipset' || k.spel === 'Europatipset' ? { spel: k.spel } : {}), matches } : null;
 }
 
 // ---------- rättning ----------

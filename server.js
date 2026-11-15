@@ -84,14 +84,14 @@ function samtalFileStore(dir = process.env.SAMTAL_DIR || path.join(CACHE_DIR, 's
 }
 
 // GET och POST /api/samtal – samma getRound()/postRound() som tjänsten, och
-// som där startar veckans Stryktips som omgång när ingen pågår.
+// som där startar veckans Stryktips (eller Europatipset) som omgång när ingen pågår.
 function samtalRoute(store = samtalFileStore(), loadMatches = siteMatches()) {
   return async (req, res) => {
     try {
       const { getRound, postRound } = await import('./worker/samtal.mjs');
-      const { getStryktipset } = await import('./worker/stryktipset.mjs');
+      const { oppnaOmgangar } = await import('./worker/stryktipset.mjs');
       const { gang } = require('./config/kupong');
-      const auto = { draw: async () => (await getStryktipset()).body.omgang || null, loadMatches };
+      const auto = { draws: () => oppnaOmgangar(), loadMatches };
       const r = req.method === 'GET'
         ? await getRound({ store, gang, auto })
         : await postRound(req.body, { store, gang, loadMatches });
@@ -103,12 +103,12 @@ function samtalRoute(store = samtalFileStore(), loadMatches = siteMatches()) {
   };
 }
 
-// GET /api/stryktipset[?nr=…] – samma getStryktipset() som tjänsten.
+// GET /api/stryktipset[?nr=…][&spel=europatipset] – samma getStryktipset() som tjänsten.
 function stryktipsetRoute() {
   return async (req, res) => {
     try {
       const { getStryktipset } = await import('./worker/stryktipset.mjs');
-      const r = await getStryktipset(req.query.nr);
+      const r = await getStryktipset(req.query.nr, { spel: req.query.spel });
       res.status(r.status).json(r.body);
     } catch (err) {
       console.error('[stryktipset]', err);

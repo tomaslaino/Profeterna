@@ -2078,8 +2078,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (slag === 'fyll') return { slag, vem: p.vem, tecken: p.tecken, not: p.kommentarer, efter: {} };
     if (slag === 'gang') {
       const g = Samtal.pult.gang();
-      // (spel: Stryktipset – Svenska folket, oddsen och favoritskapet, när de har kommit, Folket i folket.js)
-      const spel = window.Folket && p.s.spel && p.s.spel.nr ? Folket.info(p.s.spel.nr) || { rader: {} } : null;
+      // (spel: Stryktipset eller Europatipset – Svenska folket, oddsen och favoritskapet, när de har kommit, Folket i folket.js)
+      const spel = window.Folket && p.s.spel && p.s.spel.nr ? Folket.info(p.s.spel) || { rader: {} } : null;
       return g && { slag, vem: p.vem, tecken: g.val, who: g.who, notes: g.notes, after: g.efter, efter: p.efter, skriv: Boolean(p.skriv), g, spel };
     }
     const t = Samtal.pult.tips(vem);
@@ -2318,7 +2318,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (Helgarderats nummer, högst var femte minut: omslaget står i det)
     hamtaTidning();
     levande();
-    if (p && p.gang && p.s.spel && window.Folket) Folket.hamta(p.s.spel.nr).then((ny) => { if (ny && R.on) levande(); });
+    if (p && p.gang && p.s.spel && window.Folket) Folket.hamta(p.s.spel).then((ny) => { if (ny && R.on) levande(); });
     const pa = document.getElementById('rum-kupong');
     if (pa) {
       pa.setAttribute('aria-label', R.summa ? 'Protokollet' : 'Kupong');

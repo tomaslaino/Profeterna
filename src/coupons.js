@@ -65,7 +65,7 @@ function parseCoupon(id, raw) {
   return {
     // Med spel ("Stryktipset") står matcherna i spelets ordning, som i
     // filen – annars efter avsparken.
-    coupon: matches.length ? { id, name: raw.namn ? String(raw.namn).slice(0, 60) : null, created, ...(raw.spel === 'Stryktipset' ? { spel: raw.spel } : {}), matches } : null,
+    coupon: matches.length ? { id, name: raw.namn ? String(raw.namn).slice(0, 60) : null, created, ...(raw.spel === 'Stryktipset' || raw.spel === 'Europatipset' ? { spel: raw.spel } : {}), matches } : null,
     errors,
   };
 }

@@ -7,7 +7,7 @@
 //   POST /kupong {"andra": "<kupong-id>" | null, "bas": "<sha>" | null,
 //                 "ändå": true (valfritt),
 //                 "kupong": {"id", "namn", "skapad", "spel", "matcher": [{"id", "match", "tecken", "kommentar"}]}}
-//          spel = "Stryktipset": matcherna står i Stryktipsets ordning, som
+//          spel = "Stryktipset" (eller "Europatipset"): matcherna står i spelets ordning, som
 //          de skickades (annars efter avsparken). Utan spel behåller en
 //          ändring filens.
 //   → 200 {ok: true, id, skapad, sha, commit}   id får ett tillägg (-2 …) om
@@ -87,7 +87,7 @@ export function validateCoupon(k) {
 }
 
 // Spelet som kupongen gjordes för – då står matcherna i dess ordning.
-const gameOf = (s) => (s === 'Stryktipset' ? s : null);
+const gameOf = (s) => (s === 'Stryktipset' || s === 'Europatipset' ? s : null);
 
 const isoOrNull = (s) => (s && !Number.isNaN(Date.parse(s)) ? new Date(s).toISOString() : null);
 

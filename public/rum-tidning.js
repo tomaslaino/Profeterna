@@ -84,11 +84,12 @@
       vecka: (v) => `Vecka ${v}`,
       pris: '3 kr',
       prov: 'Provnummer',
-      infor: { stryktipset: 'Inför Stryktipset', omgangen: 'Inför omgången' },
+      infor: { stryktipset: 'Inför Stryktipset', europatipset: 'Inför Europatipset', omgangen: 'Inför omgången' },
       devis: 'Sveriges säkraste tipstidning',
     },
     kupongen: {
       stryktipset: 'Stryktipset',
+      europatipset: 'Europatipset',
       kupongen: 'Kupongen',
       utan: 'inget matchblad',
     },
@@ -313,7 +314,7 @@
     const over = overst(u);
     let mitt = '<div class="hf-mitt"></div>';
     if (dag) {
-      const infor = spelet(u) === TEXT.kupongen.stryktipset ? G.infor.stryktipset : G.infor.omgangen;
+      const infor = inforSpel(u);
       const inne = `<span class="hf-et">${esc(infor)}</span><span class="hf-dag">${esc(fDag.format(dag))}</span><span class="hf-et">${esc(fMan.format(dag))}</span>`;
       mitt = lankar ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(`${infor} ${fVdagLang.format(dag)} ${fDagMan.format(dag)}: ${TEXT.innehall.titel}`)}">${inne}</a>`
         : `<div class="hf-mitt">${inne}</div>`;
@@ -337,7 +338,7 @@
       over: overst(u),
       prov: u.prov ? G.prov : '',
       pris: G.pris,
-      blad: dag ? { infor: spelet(u) === TEXT.kupongen.stryktipset ? G.infor.stryktipset : G.infor.omgangen, dag: fDag.format(dag), manad: fMan.format(dag) } : null,
+      blad: dag ? { infor: inforSpel(u), dag: fDag.format(dag), manad: fMan.format(dag) } : null,
       devis: G.devis,
       huvudet: huvudet(u),
       sista: S ? { nr: u.sistaNr, kronika: S.kronika, kaseri: S.kaseri, rubriker: TEXT.sista } : null,
@@ -371,8 +372,15 @@
 
   // ---------- kupongen ----------
 
-  // Gängets omgång är Stryktipsets när den har ett nummer därifrån (2026-11-07-st4978) eller tretton matcher.
-  const spelet = (u) => (/-st\d+$/.test(u.omgang) || u.kupongen.length === 13 ? TEXT.kupongen.stryktipset : TEXT.kupongen.kupongen);
+  // Gängets omgång är Stryktipsets när den har ett nummer därifrån (2026-11-07-st4978) eller tretton matcher,
+  // Europatipsets när numret är därifrån (2026-11-15-et2625).
+  const spelet = (u) => (/-et\d+$/.test(u.omgang) ? TEXT.kupongen.europatipset
+    : /-st\d+$/.test(u.omgang) || u.kupongen.length === 13 ? TEXT.kupongen.stryktipset : TEXT.kupongen.kupongen);
+  const inforSpel = (u) => {
+    const sp = spelet(u);
+    return sp === TEXT.kupongen.stryktipset ? TEXT.forsta.infor.stryktipset
+      : sp === TEXT.kupongen.europatipset ? TEXT.forsta.infor.europatipset : TEXT.forsta.infor.omgangen;
+  };
   // Innehållet (2026-11-11, användarens val A, Förteckningen, bland fyra skisser: "Stryktipssidan ska ju egentligen
   // vara en innehållssida för tidningen … snyggt och minimalistiskt"): tidningens namn och numret överst, rubriken och
   // en rad per match med numret, lagen, prickar till sidnumret och matchbladets rubrik under, och sist sista sidan med

@@ -8,13 +8,14 @@
 //                 eller null; forra = omgången före den, om dess tips visades
 //                 när den ersattes (så att bygget hinner spara den i
 //                 tipparhistoriken, src/tippare.js). Pågår ingen omgång
-//                 och Svenska Spel har öppnat veckans Stryktips startar det
+//                 och Svenska Spel har öppnat veckans Stryktips (eller
+//                 Europatipset) startar det
 //                 som omgång av sig själv (autoRound)
 //   POST /samtal {gor: "starta", matcher: [id], ersatt: <id> | null, spel}
 //                 ny omgång. Pågår en omgång (någon match har inte startat)
 //                 krävs ersatt = dess id. Matcherna står i den ordning de
 //                 valdes – numren på kupongen, som på Stryktipset. spel =
-//                 {namn: "Stryktipset", nr} när matcherna hämtades från
+//                 {namn: "Stryktipset" | "Europatipset", nr} när matcherna hämtades från
 //                 Svenska Spel (worker/stryktipset.mjs), så att sidan visar
 //                 Svenska folket för just den omgången (valfritt)
 //   POST /samtal {gor: "matcher", id, matcher: [id], spel}   ändra omgångens
@@ -77,6 +78,7 @@
 //   samtal:auto                      Stryktipsomgången som senast startades av sig
 //                                    själv {nr, startad, id} – eller prövades
 //                                    utan att alla matcherna fanns {nr, provad}
+//   samtal:auto:europatipset         samma sak för Europatipset
 
 import { normSign } from './kupong.mjs';
 import { linkDraw } from './stryktipset.mjs';
@@ -103,6 +105,15 @@ const NY_KUPONG_NARA_MS = 3 * 24 * 3600000;
 // Fanns inte alla Stryktipsets matcher på sajten prövas det igen efter en
 // timme (spelprogrammet byggs om under dagen).
 const AUTO_RETRY_MS = 3600000;
+// Europatipset (sedan 2026-11-15) har ofta matcher från ligor som sajten inte
+// har. Saknas högst så här många blir det ändå omgång, med de andra matcherna
+// i Europatipsets ordning.
+const EURO_SAKNAS_MAX = 3;
+// Europatipset blir omgång bara om det är färdigspelat minst ett dygn innan
+// en öppen Stryktipsomgång stänger – Stryktipset går före.
+const STRYK_FORE_MS = 24 * 3600000;
+// Senast startade omgång per spel (samtal:auto är Stryktipsets, som förut).
+const autoKey = (namn) => (namn === 'Stryktipset' ? AUTO : `${AUTO}:${String(namn).toLowerCase()}`);
 const tipsKey = (id, vem) => `samtal:${id}:tips:${vem}`;
 const draftKey = (id, vem) => `samtal:${id}:utkast:${vem}`;
 const afterKey = (id, vem) => `samtal:${id}:efter:${vem}`;
@@ -113,11 +124,13 @@ const fail = (status, error, extra = {}) => ({ status, body: { ok: false, error,
 // Datumet för omgångens första match i svensk tid, som kupongernas id.
 const swedishDate = (iso) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(iso));
 
-// Stryktipsomgången som matcherna hämtades från, eller null.
+// Omgången hos Svenska Spel som matcherna hämtades från – Stryktipset eller
+// Europatipset – eller null.
+const SPELEN = ['Stryktipset', 'Europatipset'];
 function gameOf(x) {
   if (!x || typeof x !== 'object') return null;
   const nr = Number(x.nr);
-  return x.namn === 'Stryktipset' && Number.isInteger(nr) && nr > 0 && nr < 1e6 ? { namn: 'Stryktipset', nr } : null;
+  return SPELEN.includes(x.namn) && Number.isInteger(nr) && nr > 0 && nr < 1e6 ? { namn: x.namn, nr } : null;
 }
 
 // Första avsparken – senast då visas tipsen.
@@ -240,44 +253,68 @@ async function replaceRound(store, round, tips, gang, ms, next) {
   return prev;
 }
 
-// Veckans Stryktips blir omgångens kupong av sig själv, i Stryktipsets
-// ordning, när ingen omgång pågår: den förra har spelats färdigt (sista
-// avsparken för AUTO_AFTER_MS sedan, och måndagen efter kl. 16 har kommit,
-// nyKupongFran) eller tagits bort, och Svenska Spel har öppnat en ny omgång
-// (senast måndag kl. 07). Matcherna går att ändra som vanligt
-// tills någon har lämnat in. Varje Stryktipsomgång startas bara en gång
-// (samtal:auto), så en som tas bort eller ersätts kommer inte tillbaka. Finns
-// inte alla matcherna på sajten (andra ligor) eller har någon startat blir
-// det ingen omgång – då väljer någon matcherna, med Stryktipset ifyllt.
-// Omgångens id slutar på Svenska Spels nummer, så två som frågar samtidigt
-// startar samma omgång.
-// auto: {draw() → den öppna omgången (worker/stryktipset.mjs) | null,
-//        loadMatches()} → {round, prev}: den nya omgången och den förra
-//        (som replaceRound), eller null.
+// Veckans Stryktips – eller Europatipset – blir omgångens kupong av sig själv,
+// i spelets ordning, när ingen omgång pågår: den förra har spelats färdigt
+// (sista avsparken för AUTO_AFTER_MS sedan) eller tagits bort, och Svenska
+// Spel har öppnat en ny omgång (Stryktipset senast måndag kl. 07). Efter en
+// omgång nära helgen ligger protokollet kvar till måndagen kl. 16
+// (nyKupongFran) – bara ett spel som stänger före dess tar över tidigare.
+// Är båda spelen öppna blir det som stänger först omgång, men Europatipset
+// bara om det hinner spelas färdigt i god tid före Stryktipset
+// (STRYK_FORE_MS). Matcherna går att ändra som vanligt tills någon har lämnat
+// in. Varje omgång hos Svenska Spel startas bara en gång (autoKey), så en som
+// tas bort eller ersätts kommer inte tillbaka. Finns inte Stryktipsets alla
+// matcher på sajten (andra ligor) eller har någon startat blir det ingen
+// omgång – då väljer någon matcherna, med Stryktipset ifyllt. Europatipset
+// får sakna högst EURO_SAKNAS_MAX. Omgångens id slutar på spelet och Svenska
+// Spels nummer (-st4979, -et2625), så två som frågar samtidigt startar samma
+// omgång.
+// auto: {draws() → de öppna omgångarna (oppnaOmgangar i
+//        worker/stryktipset.mjs) – eller draw() → en –, loadMatches()}
+//        → {round, prev}: den nya omgången och den förra (som replaceRound),
+//        eller null.
 async function autoRound(round, { store, gang, auto, t }) {
   const ms = t.getTime();
-  if (round && ms < Math.max(lastKick(round) + AUTO_AFTER_MS, nyKupongFran(round))) return null;
-  const draw = await auto.draw();
-  if (!draw || !Number.isInteger(draw.nr) || !(Date.parse(draw.stang) > ms)) return null;
-  if (round && round.spel && round.spel.nr === draw.nr) return null;
-  const mark = await store.get(AUTO);
-  if (mark && mark.nr === draw.nr && (mark.startad || ms - Date.parse(mark.provad) < AUTO_RETRY_MS)) return null;
-  const matches = await auto.loadMatches();
-  const want = linkDraw(draw, matches).filter((x) => !x.struken);
-  const v = want.length && want.every((x) => x.m) ? roundMatches(want.map((x) => x.m.id), matches, ms) : null;
-  if (!v || v.errors.length || v.rows.length !== want.length) {
-    await store.put(AUTO, { nr: draw.nr, provad: t.toISOString() });
-    return null;
+  if (round && ms < lastKick(round) + AUTO_AFTER_MS) return null;
+  const fran = round ? nyKupongFran(round) : 0;
+  const lista = auto.draws ? await auto.draws() : [await auto.draw()];
+  const oppna = lista
+    .filter((d) => d && Number.isInteger(d.nr) && Date.parse(d.stang) > ms && SPELEN.includes(d.spel || 'Stryktipset'))
+    .map((d) => ({ ...d, spel: d.spel || 'Stryktipset' }))
+    .sort((a, b) => Date.parse(a.stang) - Date.parse(b.stang));
+  const stryk = oppna.find((d) => d.spel === 'Stryktipset');
+  let matches = null;
+  for (const draw of oppna) {
+    if (ms < fran && !(Date.parse(draw.stang) < fran)) continue;
+    if (round && round.spel && (round.spel.namn || 'Stryktipset') === draw.spel && round.spel.nr === draw.nr) continue;
+    const euro = draw.spel !== 'Stryktipset';
+    if (euro && stryk) {
+      const sist = Math.max(...draw.matcher.map((x) => Date.parse(x.avspark)).filter(Number.isFinite));
+      if (!(sist + AUTO_AFTER_MS + STRYK_FORE_MS <= Date.parse(stryk.stang))) continue;
+    }
+    const key = autoKey(draw.spel);
+    const mark = await store.get(key);
+    if (mark && mark.nr === draw.nr && (mark.startad || ms - Date.parse(mark.provad) < AUTO_RETRY_MS)) continue;
+    if (!matches) matches = await auto.loadMatches();
+    const alla = linkDraw(draw, matches).filter((x) => !x.struken);
+    const want = euro ? alla.filter((x) => x.m) : alla;
+    const ok = want.length && want.every((x) => x.m) && alla.length - want.length <= (euro ? EURO_SAKNAS_MAX : 0);
+    const v = ok ? roundMatches(want.map((x) => x.m.id), matches, ms) : null;
+    if (!v || v.errors.length || v.rows.length !== want.length) {
+      await store.put(key, { nr: draw.nr, provad: t.toISOString() });
+      continue;
+    }
+    const next = {
+      id: `${swedishDate(v.rows.map((m) => m.avspark).sort()[0])}-${euro ? 'et' : 'st'}${draw.nr}`,
+      skapad: t.toISOString(),
+      matcher: v.rows,
+      spel: { namn: draw.spel, nr: draw.nr },
+    };
+    const prev = await replaceRound(store, round, round ? await loadTips(store, round, gang) : {}, gang, ms, next);
+    await store.put(key, { nr: draw.nr, startad: next.skapad, id: next.id });
+    return { round: next, prev };
   }
-  const next = {
-    id: `${swedishDate(v.rows.map((m) => m.avspark).sort()[0])}-st${draw.nr}`,
-    skapad: t.toISOString(),
-    matcher: v.rows,
-    spel: { namn: 'Stryktipset', nr: draw.nr },
-  };
-  const prev = await replaceRound(store, round, round ? await loadTips(store, round, gang) : {}, gang, ms, next);
-  await store.put(AUTO, { nr: draw.nr, startad: next.skapad, id: next.id });
-  return { round: next, prev };
+  return null;
 }
 
 // store: {get(key) → objekt | null, put(key, objekt)}

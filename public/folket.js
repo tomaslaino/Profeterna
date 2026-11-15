@@ -24,11 +24,16 @@ window.Folket = (() => {
     return s && s.endpoint ? s.endpoint.replace(/\/samtal$/, '/stryktipset') : null;
   };
 
-  async function fetchDraw() {
+  // Spelet hos Svenska Spel ("Stryktipset", "Europatipset") → frågan till
+  // tjänsten (Stryktipset utan, som förut).
+  const spelFraga = (namn) => (namn && namn !== 'Stryktipset' ? `spel=${encodeURIComponent(String(namn).toLowerCase())}` : '');
+
+  async function fetchDraw(namn) {
     const url = endpoint();
     if (!url) return null;
+    const q = spelFraga(namn);
     try {
-      const res = await fetch(url, { cache: 'no-store' });
+      const res = await fetch(q ? `${url}?${q}` : url, { cache: 'no-store' });
       const body = await res.json().catch(() => ({}));
       return res.ok && body.ok ? body.omgang : null;
     } catch {
@@ -102,8 +107,8 @@ window.Folket = (() => {
   // Välj matcher → Hämta Stryktipset: veckans omgång med sajtens matcher.
   // → {omgang, rows: [{nr, hemma, borta, m}]} eller null (ingen kontakt
   // eller ingen omgång öppen).
-  async function open() {
-    const omgang = await fetchDraw();
+  async function open(namn) {
+    const omgang = await fetchDraw(namn);
     return omgang ? { omgang, rows: link(omgang) } : null;
   }
 
@@ -111,37 +116,42 @@ window.Folket = (() => {
 
   const SORT = ['folket', 'odds', 'fav'];
   const FLIK = 'profeterna.spelflik';
-  const INFO = new Map(); // omgångens nr → {at, stang, tid, slag, rader: {matchens id: {folket, odds, fav}}}
+  const INFO = new Map(); // "Spelet:nr" → {at, stang, tid, slag, rader: {matchens id: {folket, odds, fav}}}
 
   let valdFlik = null;
 
-  const info = (nr) => INFO.get(Number(nr)) || null;
+  // spel: omgångens spel {namn, nr} – eller bara nr för Stryktipset.
+  const spelet = (spel) => (spel && typeof spel === 'object' ? { namn: spel.namn || 'Stryktipset', nr: Number(spel.nr) } : { namn: 'Stryktipset', nr: Number(spel) });
+  const nyckel = (spel) => { const s = spelet(spel); return `${s.namn}:${s.nr}`; };
+  const info = (spel) => INFO.get(nyckel(spel)) || null;
 
-  // Hämtar omgången nr, högst en gång i minuten och var kvart efter spelstoppet,
+  // Hämtar omgången, högst en gång i minuten och var kvart efter spelstoppet,
   // när siffrorna står still. → true om siffrorna har ändrats.
-  async function hamta(nr) {
-    const n = Number(nr);
+  async function hamta(spel) {
+    const { namn, nr: n } = spelet(spel);
+    const k = nyckel(spel);
+    const q = spelFraga(namn);
     const url = endpoint();
-    const had = INFO.get(n);
+    const had = INFO.get(k);
     const t = Date.now();
     if (!url || !n || (had && t - had.at < (had.stang && Date.parse(had.stang) < t ? 900000 : 60000))) return false;
     if (had) had.at = t;
     let om = null;
     try {
-      const res = await fetch(`${url}?nr=${n}`, { cache: 'no-store' });
+      const res = await fetch(`${url}?nr=${n}${q ? `&${q}` : ''}`, { cache: 'no-store' });
       const body = await res.json().catch(() => ({}));
       om = res.ok && body.ok ? body.omgang : null;
     } catch {
       om = null;
     }
     if (!om) {
-      if (!had) INFO.set(n, { at: t, rader: {} });
+      if (!had) INFO.set(k, { at: t, rader: {} });
       return false;
     }
     const rader = {};
     for (const x of link(om)) if (x.m && (x.folket || x.odds)) rader[String(x.m.id)] = { folket: x.folket || null, odds: x.odds || null, fav: x.fav || null, slag: x.oddsSlag || null };
     const ny = !had || JSON.stringify(had.rader) !== JSON.stringify(rader);
-    INFO.set(n, { at: t, stang: om.stang || null, tid: om.folketTid || null, oddsTid: om.oddsTid || null, rader });
+    INFO.set(k, { at: t, stang: om.stang || null, tid: om.folketTid || null, oddsTid: om.oddsTid || null, rader });
     return ny;
   }
 

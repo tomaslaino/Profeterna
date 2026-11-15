@@ -10,6 +10,9 @@
 //   GET /stryktipset          omgången som är öppen för spel just nu
 //   GET /stryktipset?nr=4976  en viss omgång – också efter spelstoppet,
 //                             med Svenska folket som det stod då
+//   GET /stryktipset?spel=europatipset[&nr=2625]   samma sak för Europatipset
+//                             (sedan 2026-11-15 blir också det omgångens kupong,
+//                             worker/samtal.mjs)
 //   → 200 {ok, omgang: {spel, nr, vecka, stang, lage, folketTid, oddsTid,
 //          matcher: [{nr, hemma, borta, avspark, liga, folket, odds, fav,
 //          startodds (alla [1, X, 2] | null), oddsSlag}]}}
@@ -32,7 +35,14 @@
 // Pågår ingen omgång blir den öppna Stryktipsomgången omgångens kupong av
 // sig själv (worker/samtal.mjs, linkDraw här).
 
-const API = 'https://api.spela.svenskaspel.se/draw/1/stryktipset/draws';
+// Spelen hos Svenska Spel som kan bli omgångens kupong: tretton matcher, en
+// rad för en krona. kort: slutet på omgångens id (2026-11-14-st4979).
+export const SPEL = {
+  stryktipset: { namn: 'Stryktipset', api: 'https://api.spela.svenskaspel.se/draw/1/stryktipset/draws', kort: 'st' },
+  europatipset: { namn: 'Europatipset', api: 'https://api.spela.svenskaspel.se/draw/1/europatipset/draws', kort: 'et' },
+};
+// "europatipset", "Europatipset" eller ingenting (Stryktipset) → spelet, eller null.
+export const spelAv = (s) => SPEL[String(s || 'stryktipset').toLowerCase()] || null;
 const TTL_MS = 60000;
 const memo = new Map(); // adress → {at, body}
 
@@ -54,11 +64,11 @@ const favUr = (odds) => {
 };
 
 // Svenska Spels omgång → det sidan behöver.
-export function trimDraw(d) {
+export function trimDraw(d, namn = 'Stryktipset') {
   if (!d || !Array.isArray(d.drawEvents)) return null;
   const week = /(\d{4})-(\d{1,2})\b/.exec(d.drawComment || '') || /\bv\.?\s*(\d{1,2})\b/i.exec(d.regCloseDescription || '');
   return {
-    spel: 'Stryktipset',
+    spel: namn,
     nr: d.drawNumber,
     vecka: week ? Number(week[week.length - 1]) : null,
     stang: iso(d.regCloseTime),
@@ -153,7 +163,7 @@ export function linkDraw(omgang, matches) {
 
 // ---------- oddsen efter spelstoppet ----------
 
-const sistaKey = (nr) => `stryktipset:sista:${nr}`;
+const sistaKey = (nr, spel = SPEL.stryktipset) => `${spel.namn.toLowerCase()}:sista:${nr}`;
 
 // Omgången med odds och favoritskap i varje match där det går (se ovan).
 // sista: det som sparades i KV, eller null.
@@ -172,26 +182,44 @@ export function medOdds(omgang, sista = null) {
 
 // Sparar oddsen för den öppna omgången i KV, så att de finns kvar efter
 // spelstoppet: var tionde minut de sista två timmarna (då schemat körs), annars
-// en gång i timmen, så att KV inte får onödigt många skrivningar.
-// → det som sparades, eller null.
+// en gång i timmen, så att KV inte får onödigt många skrivningar. Både
+// Stryktipset och Europatipset (opts.spel: bara det ena).
+// → det som sparades [{tid, nr, matcher}] (tomt om inget behövde sparas).
 export async function sparaSista(store, opts = {}) {
   const now = opts.now || Date.now;
-  const om = (await getStryktipset(undefined, opts)).body.omgang;
-  const rader = om ? om.matcher.filter((x) => x.oddsSlag === 'nu') : [];
-  if (!rader.length) return null;
-  const t = now();
-  const sparad = await store.get(sistaKey(om.nr));
-  const alder = sparad && sparad.tid ? t - Date.parse(sparad.tid) : Infinity;
-  if (alder < (Date.parse(om.stang) - t <= 2 * 3600000 ? 9 * 60000 : 3600000)) return null;
-  const ny = { tid: new Date(t).toISOString(), nr: om.nr, matcher: rader.map(({ nr, odds, fav }) => ({ nr, odds, fav })) };
-  await store.put(sistaKey(om.nr), ny);
-  return ny;
+  const spelen = opts.spel ? [opts.spel] : Object.keys(SPEL);
+  const sparat = [];
+  for (const namn of spelen) {
+    const sp = spelAv(namn);
+    const om = (await getStryktipset(undefined, { ...opts, spel: namn })).body.omgang;
+    const rader = om ? om.matcher.filter((x) => x.oddsSlag === 'nu') : [];
+    if (!rader.length) continue;
+    const t = now();
+    const sparad = await store.get(sistaKey(om.nr, sp));
+    const alder = sparad && sparad.tid ? t - Date.parse(sparad.tid) : Infinity;
+    if (alder < (Date.parse(om.stang) - t <= 2 * 3600000 ? 9 * 60000 : 3600000)) continue;
+    const ny = { tid: new Date(t).toISOString(), nr: om.nr, matcher: rader.map(({ nr, odds, fav }) => ({ nr, odds, fav })) };
+    await store.put(sistaKey(om.nr, sp), ny);
+    sparat.push(ny);
+  }
+  return sparat;
+}
+
+// De omgångar som är öppna för spel just nu, ett per spel (Stryktipset och
+// Europatipset) – det som kan bli omgångens kupong (worker/samtal.mjs).
+// Svarar inte Svenska Spel för det ena spelet kommer det andra ändå.
+export async function oppnaOmgangar(opts = {}) {
+  const svar = await Promise.all(Object.keys(SPEL).map((spel) => getStryktipset(undefined, { ...opts, spel })));
+  return svar.map((r) => (r.status === 200 && r.body.omgang) || null).filter(Boolean);
 }
 
 // fetchImpl och now går att byta i provet. store: KV med sista läget för oddsen.
-export async function getStryktipset(nr, { fetchImpl = fetch, now = () => Date.now(), store = null } = {}) {
+// spel: "stryktipset" (om inget anges) eller "europatipset".
+export async function getStryktipset(nr, { fetchImpl = fetch, now = () => Date.now(), store = null, spel = null } = {}) {
+  const sp = spelAv(spel);
+  if (!sp) return { status: 400, body: { ok: false, error: 'Okänt spel.' } };
   if (nr != null && !/^\d{1,6}$/.test(String(nr))) return { status: 400, body: { ok: false, error: 'Ogiltigt nummer på omgången.' } };
-  const url = nr != null ? `${API}/${nr}` : API;
+  const url = nr != null ? `${sp.api}/${nr}` : sp.api;
   const hit = memo.get(url);
   if (hit && now() - hit.at < TTL_MS) return { status: 200, body: hit.body };
   let raw;
@@ -208,12 +236,12 @@ export async function getStryktipset(nr, { fetchImpl = fetch, now = () => Date.n
   // Den öppna omgången: den som stänger först, om flera är öppna.
   const draw = nr != null ? raw.draw
     : (raw.draws || []).slice().sort((a, b) => String(a.regCloseTime).localeCompare(String(b.regCloseTime)))[0];
-  const om = trimDraw(draw);
+  const om = trimDraw(draw, sp.namn);
   let sista = null;
   // (bara när oddsen saknas: en KV-läsning i minuten, efter spelstoppet)
   if (store && om && om.matcher.some((x) => !x.odds)) {
     try {
-      sista = await store.get(sistaKey(om.nr));
+      sista = await store.get(sistaKey(om.nr, sp));
     } catch (err) {
       console.error('[stryktipset]', err);
     }

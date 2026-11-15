@@ -695,12 +695,12 @@
   // Svenska folket, oddsen och favoritskapet från Svenska Spel (Folket i
   // folket.js), bara på gängets kupong: under rutorna med flikarna (SM.under:
   // null = modellens odds, som förut) och på lappen.
-  const spelInfo = (s) => (window.Folket && s && s.spel && s.spel.nr ? Folket.info(s.spel.nr) : null);
+  const spelInfo = (s) => (window.Folket && s && s.spel && s.spel.nr ? Folket.info(s.spel) : null);
   const harSpel = (i) => Boolean(i && Object.keys(i.rader).length);
   function hamtaSpel(s) {
     if (!window.Folket || !s || !s.spel || !s.spel.nr) return;
     const forut = harSpel(spelInfo(s));
-    Folket.hamta(s.spel.nr).then((ny) => { if (ny && (!forut || SM.under != null)) redraw(); });
+    Folket.hamta(s.spel).then((ny) => { if (ny && (!forut || SM.under != null)) redraw(); });
   }
   function underFlikar(s) {
     const i = spelInfo(s);
@@ -1241,10 +1241,10 @@
     const d = newDraft(c ? c.id : null);
     // Gängets kupong får omgångens namn, om den inte redan har ett.
     if (!d.name) d.name = nameOf(s) || '';
-    // Är omgången Stryktipset står gängets kupong i dess ordning – matcher
-    // som bara finns på gängets kupong sist.
+    // Är omgången Stryktipset (eller Europatipset) står gängets kupong i dess
+    // ordning – matcher som bara finns på gängets kupong sist.
     if (s.spel) {
-      d.spel = 'Stryktipset';
+      d.spel = s.spel.namn || 'Stryktipset';
       d.order = [...new Set([...s.matcher.map((x) => x.id), ...(d.order || [])])];
     }
     for (const r of open) {
