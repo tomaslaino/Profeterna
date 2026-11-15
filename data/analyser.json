@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T14:06:29.920Z",
+ "uppdaterad": "2026-11-15T15:14:01.682Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2393,6 +2393,107 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
+  },
+  {
+   "id": "401861176",
+   "match": "Belgien – Italien",
+   "avspark": "2026-11-15T19:45Z",
+   "writtenAt": "2026-11-15T15:12:50.065Z",
+   "text": "Två bröder Esposito och en straff till övers\n\nBelgien måste vinna. Det räcker inte med kryss på King Baudouin Stadium i kväll, för Italien leder gruppen med en poäng. Mark van Bommel kallar matchen något slags utslagsmatch. Roberto Mancini kommer till Bryssel med en ung trupp och två bröder som delar på straffarna.\n\nDet som skiljer den här matchen från andra hände i torsdags. Mot Frankrike i Milano slog Sebastiano Esposito en straff i 61:a minuten och missade. I 76:e minuten fick lillebror Pio den andra straffen, och han höll sig kall från elva meter den här gången, skriver Sporza [1]. Pio hade redan kvitterat i 27:e minuten, och Frattesi gjorde 2–1 i 64:e innan straffen avgjorde till 3–1. Frattesi har sedan lämnat samlingen med en skada, och Cambiaghi hinner inte bli frisk till Belgien, enligt Pazzidifanta [2]. Jag har sett bröder dela på en straffpunkt förr. Vem som skjuter bestämmer man redan på uppvärmningen, och sedan håller man sig till det.\n\nBåda bänkarna är nya. Mancini är tillbaka för andra gången efter ännu ett VM utan Italien, och Belgien fick den förre nederländske mittfältaren van Bommel efter Rudi Garcia. Det är van Bommels första jobb för ett landslag, enligt Sports Illustrated [3]. Han har pekat ut Esposito som den farligaste spelaren och vill inte göra större sak av kvällen än den är: ”Det här är ingen final för mig. Då handlar det om en pokal”, säger han till Voetbalfocus [4]. Han medger också att det är svårt att få in en spelidé i ett landslag, där man knappt hinner träna ihop.\n\nLäget är enkelt. Italien har 10 poäng, Frankrike 10 och Belgien 9. Fransmännen har vunnit båda mötena med Belgien, och därför måste belgarna vinna för att ta sig vidare till kvartsfinalen [1].\n\nTipset: 1X (Italien nöjer sig)\n\nSpelbolagen tror mest på Belgien, men övervikten är liten, och oavgjort är det minst troliga av de tre tecknen enligt marknaden. Ändå passar krysset Italien, som klarar sig med en poäng [1]. Belgien måste anfalla, och ett lag som har råd att stå tillbaka brukar få sina lägen på omställningar. Hos Italien är Frattesi borta och Cambiaghi saknas, enligt Pazzidifanta [2]. Det tunnar ut mittfältet en aning, men Pio Esposito gjorde båda sina mål mot Frankrike med lugn [1]. Jag ringar in etta och kryss. Belgien har hemmapubliken och måste vinna, och Italien kan nöja sig med ett kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Två bröder Esposito och en straff till övers",
+   "lead": "Belgien måste vinna. Det räcker inte med kryss på King Baudouin Stadium i kväll, för Italien leder gruppen med en poäng. Mark van Bommel kallar matchen något slags utslagsmatch. Roberto Mancini kommer till Bryssel med en ung trupp och två bröder som delar på straffarna.",
+   "paragraphs": [
+    "Det som skiljer den här matchen från andra hände i torsdags. Mot Frankrike i Milano slog Sebastiano Esposito en straff i 61:a minuten och missade. I 76:e minuten fick lillebror Pio den andra straffen, och han höll sig kall från elva meter den här gången, skriver Sporza [1]. Pio hade redan kvitterat i 27:e minuten, och Frattesi gjorde 2–1 i 64:e innan straffen avgjorde till 3–1. Frattesi har sedan lämnat samlingen med en skada, och Cambiaghi hinner inte bli frisk till Belgien, enligt Pazzidifanta [2]. Jag har sett bröder dela på en straffpunkt förr. Vem som skjuter bestämmer man redan på uppvärmningen, och sedan håller man sig till det.",
+    "Båda bänkarna är nya. Mancini är tillbaka för andra gången efter ännu ett VM utan Italien, och Belgien fick den förre nederländske mittfältaren van Bommel efter Rudi Garcia. Det är van Bommels första jobb för ett landslag, enligt Sports Illustrated [3]. Han har pekat ut Esposito som den farligaste spelaren och vill inte göra större sak av kvällen än den är: ”Det här är ingen final för mig. Då handlar det om en pokal”, säger han till Voetbalfocus [4]. Han medger också att det är svårt att få in en spelidé i ett landslag, där man knappt hinner träna ihop.",
+    "Läget är enkelt. Italien har 10 poäng, Frankrike 10 och Belgien 9. Fransmännen har vunnit båda mötena med Belgien, och därför måste belgarna vinna för att ta sig vidare till kvartsfinalen [1]."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sporza",
+     "title": "Slecht nieuws voor de Rode Duivels: ondanks penaltyheisa pakt Italië uit met verrassende comeback tegen Frankrijk",
+     "url": "https://sporza.be/nl/matches/voetbal/eur/uefa-nations-league/2026-2027/groep-1/05/italie-frankrijk-slecht-nieuws-voor-de-rode-duivels-ondanks-penaltyheisa-pakt-italie-uit-met-verrassende-comeback-tegen-frankrijk~1770981781044/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Pazzidifanta",
+     "title": "italia convocati mancini francia belgio nations league novembre 2026 460472",
+     "url": "https://www.pazzidifanta.com/news/italia-convocati-mancini-francia-belgio-nations-league-novembre-2026-460472",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Sports Illustrated",
+     "title": "italy vs belgium nations league preview predictions lineups 9 25 26",
+     "url": "https://www.si.com/soccer/italy-vs-belgium-nations-league-preview-predictions-lineups-9-25-26",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "Voetbalfocus",
+     "title": "Van Bommel waarschuwt Rode Duivels voor Italië: “Een soort van knock-outmatch”",
+     "url": "https://voetbalfocus.be/van-bommel-waarschuwt-rode-duivels-italie-knock-outmatch/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen tror mest på Belgien, men övervikten är liten, och oavgjort är det minst troliga av de tre tecknen enligt marknaden. Ändå passar krysset Italien, som klarar sig med en poäng [1]. Belgien måste anfalla, och ett lag som har råd att stå tillbaka brukar få sina lägen på omställningar. Hos Italien är Frattesi borta och Cambiaghi saknas, enligt Pazzidifanta [2]. Det tunnar ut mittfältet en aning, men Pio Esposito gjorde båda sina mål mot Frankrike med lugn [1]. Jag ringar in etta och kryss. Belgien har hemmapubliken och måste vinna, och Italien kan nöja sig med ett kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Italien nöjer sig",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sporza",
+      "title": "Slecht nieuws voor de Rode Duivels: ondanks penaltyheisa pakt Italië uit met verrassende comeback tegen Frankrijk",
+      "url": "https://sporza.be/nl/matches/voetbal/eur/uefa-nations-league/2026-2027/groep-1/05/italie-frankrijk-slecht-nieuws-voor-de-rode-duivels-ondanks-penaltyheisa-pakt-italie-uit-met-verrassende-comeback-tegen-frankrijk~1770981781044/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Pazzidifanta",
+      "title": "italia convocati mancini francia belgio nations league novembre 2026 460472",
+      "url": "https://www.pazzidifanta.com/news/italia-convocati-mancini-francia-belgio-nations-league-novembre-2026-460472",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T15:12:50.065Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Belgien måste vinna. Italien och Frankrike har tio poäng var och belgarna nio, och fransmännen har vunnit båda mötena med Belgien. Då blir det intensidá på hemmaplan, högt tryck och folk i straffområdet, och det finns 28 sätt att bryta ner en backlinje, och … Ursäkta. Back to basis.",
+     "Italien har tappat Frattesi ur samlingen, och Cambiaghi hinner inte bli frisk. Mittfältet blir tunnare, och det märks när man får stå och ta emot anfall i en hel match. Pio Esposito kommer att få ett par lägen på omställningar, för han är farlig och belgarna lämnar ytor bakom sig. Men ett lag som måste vinna mot ett uttunnat mittfält brukar få hål på det till slut. Jag ringar in ettan och ingenting annat."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-15T15:12:50.065Z",
+    "uppdrag": {
+     "fraser": [
+      "Äsch",
+      "Då är jag jävligt snäll"
+     ],
+     "krydda": null,
+     "bielsa": [
+      "intensidá"
+     ]
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T15:13:25.031Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
   },
   {
    "id": "401861177",
