@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-15T13:55:21.446Z",
+ "uppdaterad": "2026-11-15T13:57:27.866Z",
  "omgang": {
   "id": "2026-11-15-v65ft4",
   "matcher": [
@@ -2402,6 +2402,98 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-15T13:55:01.578Z",
     "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401861178",
+   "match": "Kroatien – Tjeckien",
+   "avspark": "2026-11-15T19:45Z",
+   "writtenAt": "2026-11-15T13:56:44.363Z",
+   "text": "Bilić och Denia möts i botten av gruppen\n\nI höstas började två nya förbundskaptener i Prag. Slaven Bilić vann sin återkomst på Kroatiens bänk och Santi Denia förlorade sin första match med Tjeckien. Nu möts de igen i Osijek, och sedan dess har ingen av dem haft så mycket att glädja sig åt.\n\nDen 26 september var det ny tid för båda länderna. Bilić var tillbaka på Kroatiens bänk efter 14 år och tog över efter Zlatko Dalić, som Total Croatia News kallar ”trophy-laden” [1]. Kroatien vann med 2–1. Luka Modrić, 41 år, gjorde sitt 30:e landslagsmål direkt efter paus, och inhopparen Marco Pašalić nickade in segermålet i 77:e minuten på inlägg från Ivan Perišić [1, 2]. Tjeckerna fick ett sent mål bortdömt för offside på Jan Hložek efter VAR [2]. Den segern har varit Kroatiens enda poäng sedan dess, och på vägen kom en förlust med 0–7 hemma mot England.\n\nDenia hade det värre redan från början. Sex spelare lämnade återbud till hans första samling, fem av dem från Slavia, däribland David Zima, Lukáš Provod och Tomáš Chorý, enligt ČTK [3]. Assisterande förbundskaptenen Radek Bejbl sa att det var ”Komplikace to samozřejmě je, protože počet (změn) je velký. Hledáme řešení.” [3]. Sedan dess har Tjeckien gjort två mål på fem matcher. Så gjorde vi i Tjäderfors också, och där regnade det in.\n\nOpus Arena är ingen trevlig plats för tjeckerna att komma tillbaka till. Där förlorade de med 1–5 i VM-kvalet i juni 2025. Bilić har alltså en publik som vill se honom bevisa att Prag inte var en slump, och Denia behöver få något att stå på inför nästa år.\n\nTipset: 1 (Ensam etta räcker)\n\nSpelbolagen ger Kroatien klart störst chans och räknar med ungefär två mål mot ett. Kroatiens försvar har släppt in 16 mål på fem matcher, så tjeckerna kommer att få lägen. Men de har gjort bara två mål i gruppen och har haft problem med truppen sedan Denias första samling [1]. Kroatien vann redan i Prag, där Modrić och Pašalić avgjorde [2]. Hemma i Osijek, där det slutade 5–1 senast, ringar jag bara in etta. Bollen har aldrig läst en tabell, men den har sett tjeckernas anfall.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Bilić och Denia möts i botten av gruppen",
+   "lead": "I höstas började två nya förbundskaptener i Prag. Slaven Bilić vann sin återkomst på Kroatiens bänk och Santi Denia förlorade sin första match med Tjeckien. Nu möts de igen i Osijek, och sedan dess har ingen av dem haft så mycket att glädja sig åt.",
+   "paragraphs": [
+    "Den 26 september var det ny tid för båda länderna. Bilić var tillbaka på Kroatiens bänk efter 14 år och tog över efter Zlatko Dalić, som Total Croatia News kallar ”trophy-laden” [1]. Kroatien vann med 2–1. Luka Modrić, 41 år, gjorde sitt 30:e landslagsmål direkt efter paus, och inhopparen Marco Pašalić nickade in segermålet i 77:e minuten på inlägg från Ivan Perišić [1, 2]. Tjeckerna fick ett sent mål bortdömt för offside på Jan Hložek efter VAR [2]. Den segern har varit Kroatiens enda poäng sedan dess, och på vägen kom en förlust med 0–7 hemma mot England.",
+    "Denia hade det värre redan från början. Sex spelare lämnade återbud till hans första samling, fem av dem från Slavia, däribland David Zima, Lukáš Provod och Tomáš Chorý, enligt ČTK [3]. Assisterande förbundskaptenen Radek Bejbl sa att det var ”Komplikace to samozřejmě je, protože počet (změn) je velký. Hledáme řešení.” [3]. Sedan dess har Tjeckien gjort två mål på fem matcher. Så gjorde vi i Tjäderfors också, och där regnade det in.",
+    "Opus Arena är ingen trevlig plats för tjeckerna att komma tillbaka till. Där förlorade de med 1–5 i VM-kvalet i juni 2025. Bilić har alltså en publik som vill se honom bevisa att Prag inte var en slump, och Denia behöver få något att stå på inför nästa år."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Total Croatia News",
+     "title": "Nations League: Croatia celebrate in Prague, Slaven Bilić kicks off with a win",
+     "url": "https://total-croatia-news.com/news/sport/nations-league-croatia-2/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Croatia Week",
+     "title": "modric croatia nations league win czechia",
+     "url": "https://www.croatiaweek.com/modric-croatia-nations-league-win-czechia/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "České noviny (ČTK)",
+     "title": "www.ceskenoviny.cz",
+     "url": "https://www.ceskenoviny.cz/zpravy/z-ceske-reprezentace-vypadlo-sest-zranenych-hracu/2877310",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Spelbolagen ger Kroatien klart störst chans och räknar med ungefär två mål mot ett. Kroatiens försvar har släppt in 16 mål på fem matcher, så tjeckerna kommer att få lägen. Men de har gjort bara två mål i gruppen och har haft problem med truppen sedan Denias första samling [1]. Kroatien vann redan i Prag, där Modrić och Pašalić avgjorde [2]. Hemma i Osijek, där det slutade 5–1 senast, ringar jag bara in etta. Bollen har aldrig läst en tabell, men den har sett tjeckernas anfall.",
+    "signs": [
+     0
+    ],
+    "note": "Ensam etta räcker",
+    "sources": [
+     {
+      "n": 1,
+      "source": "České noviny (ČTK)",
+      "title": "www.ceskenoviny.cz",
+      "url": "https://www.ceskenoviny.cz/zpravy/z-ceske-reprezentace-vypadlo-sest-zranenych-hracu/2877310",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Total Croatia News",
+      "title": "Nations League: Croatia celebrate in Prague, Slaven Bilić kicks off with a win",
+      "url": "https://total-croatia-news.com/news/sport/nations-league-croatia-2/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-15T13:56:44.363Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Kroatien har släppt in 16 mål på fem matcher, och det är ingen backlinje jag skulle visa upp på en tränarkurs. Men det gör inget här, för Tjeckien har gjort två mål på samma fem matcher. Ett lag som inte gör mål kan inte straffa någon, hur öppet det än står.",
+     "Tjeckiens förbundskapten Denia har dessutom dragits med truppbekymmer ända sedan första samlingen, när sex spelare lämnade återbud. Kroatien vann redan i Prag, och i Osijek slog de tjeckerna med 5–1 i VM-kvalet sommaren 2025. Kroatiens förbundskapten Bilić har publiken med sig och vet var tjeckerna är svaga.",
+     "Jag går inte och letar efter något krångligt. Det är lugnt. Etta, solklart."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-15T13:56:44.363Z",
+    "uppdrag": {
+     "fraser": [
+      "Solklart",
+      "Det är lugnt"
+     ],
+     "krydda": null,
+     "bielsa": []
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-07.1",
+    "writtenAt": "2026-11-15T13:57:17.627Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
