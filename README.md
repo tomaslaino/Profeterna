@@ -1167,6 +1167,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och mergea!" Tavlan med lapparna är borta (lapparnas tal står i datorns matchakt och under Statistik →
   Lagen), och datorn står på disken i hörnet under tv:n, mitt i fältet där tavlan hängde. Disken under
   Tipsligan är fri. Se [Datorn](#datorn).
+- **Högra väggen möbleras om (2026-11-15, användarens önskemål):** "Hur hade du möblerat om det här så att
+  det blev bättre/snyggare" (bild på hörnet: tomt över datorn, tavlorna på tre höjder, lådan och videon framför
+  korktavlan, kupongerna över varandra). Av tre skisser i rummet (A pokalerna i hörnet, B Tipsligan närmast,
+  C samma linjer) valde användaren B: pokalhyllan står i hörnet mellan tv:n och datorn, korktavlan i mitten och
+  Tipsligan längst ut över videon, störst och lättast att läsa. Tavlorna har samma mitt på höjden, korktavlan
+  går fri från tv:ns underkant och Tipsligan från lådan, och kupongerna hänger två och två utan att skymma
+  varandra. Videohörnets förlängning av väggen går nu ända upp till taket, så att närbilden längst ut inte ser
+  ett hål bortom bildens kant. Se [Tobaksaffären](#tobaksaffären).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4118,13 +4126,13 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   (440 × 285, ungefär 85 × 55 mm) och förminskas kring stiftet till 44 × 28,5 i scenen, så att
   texten ritas skarpt nära; länken är lite större än kortet, så att det går att träffa med
   fingret.
-- **Pokalhyllan** (mitt på högra väggen, över Tipsligan) → närbild: en liten pokal per
+- **Pokalhyllan** (i hörnet på högra väggen, mellan tv:n och datorn) → närbild: en liten pokal per
   vunnen omgång i vinnarens färg (delat = en var), ur `data/tippare.json`. Nära tonar tv:n, som annars skär in
   överst i bilden, bort del för del (`tvBort` i rum.js; opacitet på lådan själv skulle platta till den i 3D), och
   under hyllan står hur många pokaler var och en har, flest först.
 - **Datorn** (på disken i hörnet under tv:n) → terminalen där man söker spelare, lag och
   möten (se [Datorn](#datorn)).
-- **Skårtavlan** (mitt på högra väggen, under pokalhyllan) → närbild: *Tipsligan*, säsongens ställning i gänget
+- **Skårtavlan** (längst ut på högra väggen, över videon) → närbild: *Tipsligan*, säsongens ställning i gänget
   – samma poäng och placering som ställningen i Olympen (`kampRounds`, med omgången som
   pågår), lika placering vid lika poäng och antal rätt. Namnen står där som överallt
   (`Tippoang.kallas`: efternamnet, *Dogge* för Johansson); före första omgången bara namnen, i mitten. Vita
@@ -4132,7 +4140,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   med placering, namn och poäng i var sin spalt och lika mycket filt över och under – i en
   smal aluminiumram (3D). Varje bokstav sitter lite snett för sig (samma frö varje gång, så
   att inget flyttar sig), och lådan har bara fyra O – sedan blir det nollor.
-- **Korktavlan** (längst ut på högra väggen, hel i bild, i en träram i 3D) → närbild: de
+- **Korktavlan** (mitt på högra väggen, i en träram i 3D) → närbild: de
   färdigspelade kupongerna (`Historik.coupons`, de fyra senaste) rättade med röd penna, en med kaffering.
   Tom tills den första är färdigspelad. Nära lyfter en kupong från tavlan när man pekar på den, och ett
   klick tar den från nålen och fram som omgångens protokoll, där pilarna bläddrar till omgången före och efter –
@@ -4195,11 +4203,12 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
 
-Högra väggen (`VAGG` i rum.js, som också ger ramarna i 3D sina mått): hörnet under tv:n är
-fritt ovanför datorn på disken (där hängde anslagstavlan till 2026-11-14), i mitten pokalhyllan
-med Tipsligan under – säsongen i gänget, pokalerna och ställningen – och längst ut korktavlan,
-med videon och lådan med kassetter på disken under. Tv:ns sladd går i en kort båge till ett uttag strax
-under väggplattan, ovanför korktavlan.
+Högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
+pokalhyllan mellan tv:n och datorn på disken (där hängde anslagstavlan till 2026-11-14), i mitten
+korktavlan och längst ut Tipsligan, med videon och lådan med kassetter på disken under. Tavlorna har
+samma mitt på höjden. Pokalerna är runda och ser likadana ut hur snett väggen än syns; en platt tavla
+skulle tryckas ihop i hörnet. Tv:ns sladd går i en kort båge till ett uttag strax under väggplattan,
+ovanför Tipsligan.
 
 **Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med

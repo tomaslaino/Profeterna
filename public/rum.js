@@ -161,13 +161,13 @@ window.Rum = (() => {
       `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 1.4 * sc(x1))} ${x0},${r1(at(x0, yb) + 1.4 * sc(x0))}" fill="#c9bfa5" opacity=".18"/>`;
   }
 
-  // Spotarna i taket: mjukt ljus på orakelramen och på pokalhyllan med Tipsligan ([cx, cy, rx, ry, styrka] i
+  // Spotarna i taket: mjukt ljus på orakelramen och på Tipsligan ([cx, cy, rx, ry, styrka] i
   // scenens mått). Ljuset är målat i väggens bild, som ritas en gång och följer väggen när kameran rör sig, och
   // ramarna, paketen och disken får samma ljus i 3D (SPOTAR i rum-inredning.js). Färgskiftningen (color-dodge)
   // gör väggen ljusare i sin egen färg, som ljus gör, i stället för att lägga en ljus hinna över den.
   const SPOT = {
     ram: [1050, 372, 150, 190, 1],
-    pokal: [1370, 350, 104, 150, 0.9],
+    liga: [1492, 369, 104, 150, 0.9],
   };
   function spotYta([cx, cy, rx, ry, a], klipp = '') {
     return `<ellipse ${klipp}cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#rum-spot)" opacity="${a.toFixed(2)}" style="mix-blend-mode:color-dodge"/>`;
@@ -336,7 +336,7 @@ window.Rum = (() => {
   <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" filter="url(#rum-flack)" opacity=".55"/>
   <line x1="1140" y1="90" x2="1140" y2="730" stroke="#000" stroke-opacity=".35" stroke-width="3"/>
   <polygon points="1140,90 1600,0 1600,1000 1140,730" fill="#000" opacity=".2"/>
-  ${spotYta(SPOT.pokal, 'clip-path="url(#rum-hogerklipp)" ')}
+  ${spotYta(SPOT.liga, 'clip-path="url(#rum-hogerklipp)" ')}
 
   <rect x="36" y="122" width="200" height="610" fill="#3b3b3d" mask="url(#rum-hal)"/>
   <g clip-path="url(#rum-doorglass)"><rect x="50" y="136" width="172" height="560" filter="url(#rum-grime)" opacity=".5"/></g>
@@ -426,14 +426,16 @@ window.Rum = (() => {
     return `<a class="${cls} rum-sak" ${attrs} style="top:${yb0}px; height:${yb1 - yb0}px; width:${r1(wz(x1) - z0)}px; transform: rotateY(-90deg) translateX(${r1(z0)}px)">${inner}</a>`;
   }
 
-  // Högra väggen: hörnet under tv:n är fritt ovanför datorn på disken (rum-register.js,
-  // rum-dator.js; där hängde anslagstavlan till 2026-11-14), i mitten pokalhyllan med
-  // Tipsligan under (säsongen i gänget: pokalerna och ställningen) och längst ut
-  // korktavlan, hela i bild, med lådan och videon på disken under. Måtten är
-  // [x0, x1, y0, y1] som i onWall; ramarna i 3D (rum-inredning.js) får dem härifrån.
+  // Högra väggen (2026-11-15, B av tre skisser): i hörnet pokalhyllan (POKAL) mellan tv:n och
+  // datorn på disken (rum-register.js, rum-dator.js), i mitten korktavlan och längst ut
+  // Tipsligan, störst och lättast att läsa, över lådan och videon på disken. Tavlorna har
+  // samma mitt på höjden, korktavlan går fri från tv:ns underkant och Tipsligan från lådan.
+  // Måtten är [x0, x1, y0, y1] som i onWall (x där väggen är z = 1000 · (1 − 380 / (x − 760))
+  // djupt: korktavlan z 270–400, Tipsligan 420–530, lika bred som förut); ramarna i 3D
+  // (rum-inredning.js) och kopiorna i videohörnet (tavlor i rum-video.js) får dem härifrån.
   const VAGG = {
-    skar: [1316, 1422, 371, 439],
-    kork: [1444, 1584, 318, 478],
+    skar: [1415.2, 1568.5, 355, 423],
+    kork: [1280.5, 1393.3, 338, 440],
   };
 
   // 3. Korktavlan med gängets gamla kuponger, rättade med röd penna.
@@ -447,8 +449,10 @@ window.Rum = (() => {
       '</div>';
   }
 
-  // 4. Pokalhyllan: ritas på väggen (shelves()), över Tipsligan.
-  const POKAL = { yb: VAGG.skar[2] - 14, x0: VAGG.skar[0], x1: VAGG.skar[1] };
+  // 4. Pokalhyllan: ritas på väggen (shelves()) i hörnet, z 50–215, mitt mellan tv:ns underkant och
+  //    datorn. Pokalerna är runda och ser likadana ut hur snett väggen än syns; en platt tavla
+  //    trycks ihop här. Lagret med hyllan (rum-hyllor) är en ruta kring den.
+  const POKAL = { yb: 395, x0: 1160, x1: 1244 };
   function trophy(x, yb, col, i) {
     const k = sc(x) * 0.95;
     const y = at(x, yb);
@@ -1479,7 +1483,7 @@ window.Rum = (() => {
     el.hidden = true;
     el.setAttribute('aria-label', 'Tobaksaffären');
     el.innerHTML = `<div class="rum-stage" id="rum-stage"><div class="rum-kamera" id="rum-kamera"><div class="rum-world" id="rum-world">
-${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1300, 250, 150, 120])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
+${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vagg')}${rightWall()}${window.RumRegister ? RumRegister.html() : ''}${svg('<g id="rum-hyllor"></g>', '', [1150, 345, 110, 70])}${neon()}${frameHtml()}${kortHtml()}${bank()}`, 1.035)}
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d rum-pl-vhs')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
@@ -2201,7 +2205,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         `<span class="lapp" style="left:12%; top:46%; transform: rotate(-4deg)">${pin('#3d7bd9')}<span class="kv">Dartkväll<br>tor 19.00</span></span>`;
     }
     return list.slice(0, 4).map((c, i) => {
-      const pos = [[6, 6, -5], [46, 12, 4], [10, 52, 3], [52, 56, -3]][i];
+      // två och två, utan att en kupong skymmer en annans namn eller rätt
+      const pos = [[3, 4, -3], [51, 7, 2.5], [4, 51, 2], [51, 53, -2.5]][i];
       const ticks = (c.rows || []).slice(0, 13).map((r) => `<i class="${r.hit ? 'ok' : 'no'}"></i>`).join('');
       // (en kupong vars omgång finns tar fram omgångens protokoll i närbilden: korkProtokoll)
       const kup = korkOmgang(c) ? ` data-kup="${esc(c.id)}"` : '';

@@ -206,12 +206,12 @@ export async function inredning(el, opt = {}) {
     cam.updateMatrixWorld();
     return cam;
   }
-  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot pokalhyllan med
-  // Tipsligan, som också lyser på disken under. De finns i alla sakers ljus, så att alla delar samma
+  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot Tipsligan
+  // längst ut på högra väggen, som också lyser på disken under. De finns i alla sakers ljus, så att alla delar samma
   // grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i bildrutorna.
   const SPOTAR = [
     { fran: [1050, 30, 330], mot: [1050, -372, WZ], styrka: 1.6, vinkel: 0.34 },
-    { fran: [880, 30, 470], mot: [WX, -366, 377], styrka: 0.8, vinkel: 0.36 },
+    { fran: [880, 30, 470], mot: [WX, -366, 475], styrka: 0.8, vinkel: 0.36 },
   ];
   // ljuset som i rummet: lysröret ovanför och framför till vänster, neonen
   // från fönstret, tv:n från hörnet och spotarna

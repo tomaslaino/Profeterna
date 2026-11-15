@@ -48,7 +48,7 @@
 .rum.vid-nara .vhs-ritning .massiv { pointer-events: auto; }
 
 /* väggen, disken och pulten till höger om bilden (planen -600 och -60) */
-.vhs-vagg { position: absolute; left: 1599.5px; top: 300px; width: 500.5px; height: 720px; }
+.vhs-vagg { position: absolute; left: 1599.5px; top: 0; width: 500.5px; height: 1020px; }
 .vhs-pult { position: absolute; left: 1599.5px; top: 640px; width: 540.5px; height: 380px; }
 
 /* ---------- lådan i 3D ---------- */

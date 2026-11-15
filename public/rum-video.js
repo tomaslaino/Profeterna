@@ -383,11 +383,13 @@ window.RumVideo = (() => {
   // Högra väggen som den är ritad i rum.js (bg), förlängd åt höger: samma
   // toner och fläckar, och bardisken med samma ritning (disk i rum.js, som
   // skickas hit). Ligger direkt efter bg() i planet -600, under det som
-  // hänger på väggen.
+  // hänger på väggen. Den går ända upp till taket (y 0; ovanför fortsätter
+  // väggen i tak() i rum.js), så att närbilden av Tipsligan längst ut inte
+  // ser ett hål bortom bildens kant.
   function vaggSvg(disk) {
     const [a, z] = [1599.5, 2100];
-    const r = `x="${a}" y="300" width="${z - a}" height="720"`;
-    return `<svg class="vhs-vagg" viewBox="${a} 300 ${z - a} 720" aria-hidden="true">
+    const r = `x="${a}" y="0" width="${z - a}" height="1020"`;
+    return `<svg class="vhs-vagg" viewBox="${a} 0 ${z - a} 1020" aria-hidden="true">
     <rect ${r} fill="url(#rum-rwall)"/><rect ${r} filter="url(#rum-flack)" opacity=".55"/><rect ${r} fill="#000" opacity=".2"/>
     ${disk ? disk(a, z) : ''}
   </svg>`;
@@ -405,7 +407,7 @@ window.RumVideo = (() => {
 
   // ---------- rummet runt tv:n ----------
 
-  // Väggen bakom tv:n med korktavlan, och bardisken som den står på, i 3D i
+  // Väggen bakom tv:n med Tipsligan, och bardisken som den står på, i 3D i
   // hörnets perspektiv (.vhs-rum i .vhs-kam), så att de svänger med tv:n när
   // kameran går fram till rutan (tat). Rutan står rakt först när kameran har
   // gått VRID grader runt tv:n, och rummets målade plan går inte att vrida
