@@ -453,6 +453,8 @@ export async function figurer(canvas, opt = {}) {
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(H / 2 / D) / DEG, FW / H, 50, 5000);
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
+  // (kameran ute på trottoaren, utifran nedan)
+  const UTE = { kam: null, neon: 1, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
   // Ögat, där betraktaren står (OGA: gänget tittar dit, looks), flyttas efter musen (draw), och bilden
   // förskjuts så att djupet OGA_Z står kvar (en bit av en större bild, som när duken inte är mitt i).
   // Ljuset står kvar, som när man själv rör sig: förut vreds gänget och skuggorna mot lamporna. NARA är
@@ -7844,7 +7846,7 @@ export async function figurer(canvas, opt = {}) {
     }
     // neonen bakom dem slocknar när skylten glappar, och tv:n lyser i
     // ansiktena när de tittar på matcherna (svagt, och fladdrar som rutan)
-    neon.intensity = neonPa === false ? 0 : NEON;
+    neon.intensity = neonPa === false ? 0 : NEON * UTE.neon;
     // på natten är lysröret släckt och text-tv:n lyser svagt på dem
     const natt = nattW(t);
     key.intensity = KEY * (1 - 0.86 * natt);
@@ -7852,10 +7854,65 @@ export async function figurer(canvas, opt = {}) {
     hemi.intensity = hemiDag * (Q.enkel ? HEMI_ENKEL : 1) * (1 - 0.55 * natt);
     const tv = Math.max(tvW(t), 0.55 * natt);
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
-    sikta();
-    r.render(scene, cam);
+    if (UTE.kam) r.render(scene, UTE.kam);
+    else {
+      sikta();
+      r.render(scene, cam);
+    }
     if (Q.skugga > 1 && Q.n++ % Q.skugga === 0) skuggaSen();
     if (ombyggda.length) slappOmbyggda();
+  }
+
+  // Gänget utifrån, genom skyltfönstret (fasaden i rum-fasad.js): samma scen och samma ställning, men med en
+  // kamera ute på trottoaren som ser rakt in, så att man ser dem bakifrån. Glaset (FONSTER: x, y och z i
+  // världen, från fönsterbänken upp) är rutan som kopieras till fasadens duk: kameran står i ögonhöjd framför
+  // fönstret (oga) och ser vinkelrätt mot glaset, så att glaset blir en rätvinklig ruta i bilden, och den rutan
+  // tas ur duken i samma uppgift som den ritas (innan webbläsaren hinner visa eller tömma den). Skuggfångaren
+  // (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre på ryggarna än på ansiktena inifrån.
+  // Rummet står still under tiden (Rum.vila) och ritas som vanligt igen när man går in.
+  //   utifran(duk, t, neonPa, hem) → true om något ritades (hem: duken ritas sedan inifrån igen, medan rummet syns)
+  const FONSTER = { x0: -615, x1: 185, y0: SILL - 4, y1: SILL + 509, z: -150, oga: [-110, 140, -2300] };
+  function utifran(duk, t, neonPa, hem = false) {
+    const g = duk && duk.getContext('2d');
+    if (!g || !canvas.width || !canvas.height) return false;
+    const K = UTE.K;
+    const F = FONSTER;
+    const [ex, ey, ez] = F.oga;
+    const d = F.z - ez;
+    // (ut åt sidorna och uppåt från ögat, som tangens; världens +x är till vänster sett utifrån)
+    const tx = Math.max(ex - F.x0, F.x1 - ex) / d;
+    const ty = Math.max(F.y1 - ey, ey - F.y0) / d;
+    K.aspect = canvas.width / canvas.height;
+    const tv = Math.max(ty, tx / K.aspect) * 1.02;
+    K.fov = 2 * Math.atan(tv) / DEG;
+    K.position.set(ex, ey, ez);
+    K.lookAt(ex, ey, ez + 1000);
+    K.updateProjectionMatrix();
+    K.updateMatrixWorld();
+    const fang = catcher.visible;
+    catcher.visible = false;
+    UTE.kam = K;
+    UTE.neon = 0.3;
+    try {
+      draw(t, 0, 0, neonPa);
+    } finally {
+      UTE.kam = null;
+      UTE.neon = 1;
+      catcher.visible = fang;
+    }
+    // glaset i dukens bildpunkter
+    const th = tv * K.aspect;
+    const px = (x) => (1 - (x - ex) / (d * th)) / 2 * canvas.width;
+    const py = (y) => (1 - (y - ey) / (d * tv)) / 2 * canvas.height;
+    const sx = px(F.x1);
+    const sy = py(F.y1);
+    g.clearRect(0, 0, duk.width, duk.height);
+    g.drawImage(canvas, sx, sy, px(F.x0) - sx, py(F.y0) - sy, 0, 0, duk.width, duk.height);
+    if (hem) {
+      sikta();
+      r.render(scene, cam);
+    }
+    return true;
   }
 
   // Skuggorna för sig, när de räknas om mer sällan än gänget ritas (skugga i KVAL
@@ -8447,5 +8504,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, utifran, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }

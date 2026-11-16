@@ -46,7 +46,8 @@
 // sekunder), ?rum-lapp=dl:kinden:kolla@2 hur skylten
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
-// ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|dorr|kupong|radio en närbild,
+// ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|kupong|radio en närbild,
+// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr),
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -1573,9 +1574,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     syn(el.querySelector('#rum-3d').parentElement, 0, 0, 1, 1).id = 'rum-radio';
     R.cTop = parseFloat(getComputedStyle(el.querySelector('#rum-3d')).top) || 120;
     for (const x of [ute, R.gang, el.querySelector('#rum-damm')]) sikt(x);
-    // dörrens övre del, med Stängt-skylten och namnet: kameran går fram dit
-    // när man klickar på namnet (närbilderna, sak)
-    syn(el.querySelector('#rum-ute').parentElement, DORR.x, DORR.y, DORR.w, 200).id = 'rum-dorrglas';
   }
 
   // Taket ovanför scenen i telefonen på höjden (.rum.smal i rum.css) som en duk en bildpunkt bred, med
@@ -3535,6 +3533,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // ett nytt klick medan tidningen väntar på notiserna gäller i stället (vantaPaTidning)
     R.tidningVantar = false;
     if (a.id === 'rum-hasse') tillHasse(a);
+    else if (a.id === 'rum-dorrnamn') fasad(true);
     else if (a.id === 'rum-helgarderat') oppnaTidning();
     else if (a.dataset.sak) sak(a.dataset.sak);
     else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
@@ -4048,6 +4047,61 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     });
   }
 
+  // ---------- fasaden ----------
+  //
+  // Ett klick på namnet på dörren och man står ute på trottoaren och ser affären utifrån (rum-fasad.js): huset vid
+  // S:t Eriksbron i samma ljus och väder som utsikten, och genom skyltfönstret gänget bakifrån, ritat av samma
+  // 3D-scen (utifran). Fasaden tonar fram medan man tar ett steg bakåt från dörren, och ett klick var som helst,
+  // Esc eller Tillbaka går in genom dörren igen. Rummet står still bakom så länge (R.vilar, som hos Hasse Backe)
+  // och ritas som vanligt innan det syns igen: gängets duk har bilden utifrån.
+  //   glid: med rörelse in och ut (annars genast)
+  function fasad(pa = true, glid = !calm()) {
+    if (!pa) {
+      const f = R.fasad;
+      if (!f) return false;
+      R.fasad = null;
+      clearTimeout(R.fasadT);
+      lagerUt('fasaden');
+      R.vilar = false;
+      if (R.fig && R.on) {
+        const t = now();
+        const [vx, vy] = synlig();
+        R.fig.draw(t, vx, vy, neonOn(t));
+      }
+      if (glid && !(window.RumBak && RumBak.snabbt)) {
+        f.el.classList.remove('in');
+        f.el.classList.add('ut');
+        setTimeout(() => f.ut(), 520);
+      } else f.ut();
+      return false;
+    }
+    if (R.fasad || !window.RumFasad || !R.on) return Boolean(R.fasad);
+    if (R.sak) sak(null, null);
+    if (R.zoom) zoomTv(false);
+    if (R.vnara) zoomVideo(false);
+    const f = RumFasad.bygg(R.el, {
+      // (medan rummet syns, i övergången, ritas gänget tillbaka inifrån direkt efter)
+      gang: (duk) => R.fig && R.fig.utifran ? R.fig.utifran(duk, now(), neonOn(now()), !R.vilar) : false,
+      neon: () => neonOn(now()),
+      natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
+      calm: () => RORELSE_AV.matches,
+      // (en fast bild, ?rum-t: allt står på samma tid)
+      still: still() ? R.frozen : null,
+    });
+    for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) f.el.addEventListener(n, (e) => e.stopPropagation());
+    f.el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fasad(false);
+    });
+    if (glid) f.el.classList.add('in');
+    R.fasad = f;
+    lager('fasaden', (nu) => fasad(false, !nu));
+    // rummet står still när fasaden täcker det
+    clearTimeout(R.fasadT);
+    R.fasadT = setTimeout(() => { if (R.fasad === f) R.vilar = true; }, glid ? 420 : 0);
+    return true;
+  }
+
   // Tidningen lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka. (UPPE: samma
   // funktioner i samma ordning som --vila i rum-tidning.css, så att den glider dit)
   const UPPE = 'perspective(1100px) translate3d(-434px, -60px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.3)';
@@ -4511,7 +4565,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     pokal: { el: '.rum-pokal', h: 0.72, duk: 'hogra', fot: () => pokalFot(), tv: true },
     kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },
     vm94: { el: '#rum-vm94', h: 0.94, duk: 'skiva' },
-    dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92 },
     // (kortet fyller inte hela höjden: det är litet, och uret och ramen kommer med i kanten)
     kort: { el: '#rum-kort', mal: '#rum-kort .vk', h: 0.72, duk: 'ram' },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
@@ -6452,6 +6505,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const k = e.key.toLowerCase();
       const fore = R.sak;
+      // ute på trottoaren (fasad): Esc går in igen, och inget annat i rummet går att nå därifrån
+      if (R.fasad) {
+        if (k === 'escape') fasad(false);
+        return;
+      }
       if (R.tidning) {
         if (k === 'escape') tidningen(false);
         return;
@@ -6674,6 +6732,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         freezeCss(R.frozen);
         if (q.has('rum-video')) zoomVideo(true);
         if (q.has('rum-sak')) sak(q.get('rum-sak'), null);
+        if (q.has('rum-fasad') || q.get('rum-sak') === 'dorr') fasad(true, false);
         if (q.has('rum-register') && R.reg) {
           R.reg.wait().then(() => {
             register(true);
@@ -6688,6 +6747,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // (inte then(frame): frame tar emot dt, och kameran blev NaN så att gänget inte syntes)
       ready.then(() => frame());
     } else loop();
+    if (!still() && (q.has('rum-fasad') || q.get('rum-sak') === 'dorr')) ready.then(() => { if (R.on) fasad(true, false); });
     clearInterval(R.poll);
     // omgången och liveställningen kan ändras medan rummet står öppet
     // (inte i en dold flik: varje gång är en fråga till tjänsten, samtal.js)
@@ -6703,6 +6763,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.video) R.video.stop();
     zoomVideo(false);
     sak(null, null);
+    fasad(false, false);
     if (window.RumBak) RumBak.rensa();
     R.on = false;
     document.documentElement.classList.remove('rum-pa');
