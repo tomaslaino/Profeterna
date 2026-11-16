@@ -249,8 +249,8 @@
     'dom-frisparkar': { e: 'FRISPARKAR', n: 'I DOMARENS MATCHER', t: `Frisparkar per match i domarens ligamatcher, båda lagen tillsammans. ${SNITT}`, ex: null },
     'dom-hemmaseger': { e: 'HEMMASEGER', n: 'I DOMARENS MATCHER', t: `Hur stor andel av domarens ligamatcher som hemmalaget har vunnit. ${SNITT} Med få matcher beror skillnaden mest på slumpen.`, ex: null },
     moten: {
-      e: 'DE SENASTE MÖTENA',
-      t: 'Det senaste mötet står först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
+      e: 'MÖTENA', n: 'DE SENASTE FEM ÅREN',
+      t: 'Matcherna mellan lagen de senaste fem åren, det senaste mötet först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
       ex: null,
     },
     // förra mötet överst i MÖTENA (sedan 2026-11-15)
@@ -371,8 +371,8 @@
       ex: lag.inslxg.ex,
     },
     moten: {
-      e: 'DE SENASTE MÖTENA',
-      t: 'Landskamperna mellan lagen sedan hösten 2024, den senaste först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
+      e: 'MÖTENA', n: 'DE SENASTE FEM ÅREN',
+      t: 'Alla landskamper mellan lagen de senaste fem åren, också vänskapsmatcherna, den senaste först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
       ex: null,
     },
   };

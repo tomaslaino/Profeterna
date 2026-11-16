@@ -11,7 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, competition, isIntl } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, MOTEN_AR, competition, isIntl } = require('../config/competitions');
 const { readCache, CACHE_DIR } = require('./store');
 const { SOURCES, ODDS_WINDOW_DAYS, landEuropa } = require('./sources');
 const { svenskt } = require('../config/landslag');
@@ -207,6 +207,15 @@ function landData() {
   }
   landHist.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
 
+  // Äldre landskamper (november 2021 – hösten 2024): bara för mötena.
+  const mc = readCache('espn_land_moten');
+  const landMoten = [];
+  for (const t of (mc && mc.data && mc.data.turneringar) || []) {
+    for (const m of t.matches) {
+      if (keep(m)) landMoten.push({ ...landMatch(m, null), turnering: { namn: t.namn, short: t.short } });
+    }
+  }
+
   // Nations Leagues tabell, grupp för grupp ("Group B4" → "B4").
   const tc = readCache('espn_tabell_unl');
   const groups = ((tc && tc.data && tc.data.groups) || []).map((g) => {
@@ -224,6 +233,8 @@ function landData() {
     landHist,
     landFetchedAt,
     landHistFetchedAt: hc ? hc.fetchedAt : null,
+    landMoten,
+    landMotenFetchedAt: mc ? mc.fetchedAt : null,
     landTabell: { groups, byKey, fetchedAt: tc ? tc.fetchedAt : null },
     landOdds: { byEvent: (oc && oc.data && oc.data.byEvent) || {}, fetchedAt: oc ? oc.fetchedAt : null },
   };
@@ -992,24 +1003,36 @@ function landCalendar(D, k) {
   return out;
 }
 
-// De senaste mötena mellan två landslag (i år och i de tidigare landskamperna
-// som sajten har, från 2024), senaste först, mål efter 90 minuter.
+// Mötena mellan två landslag de senaste MOTEN_AR åren före avspark (i år, i
+// de tidigare landskamperna från hösten 2024 och i de äldre från november
+// 2021, espn_land_moten), senaste först, mål efter 90 minuter.
 function landMeetings(D, m) {
-  const list = landCalendar(D, m.hk)
-    .filter((x) => x.oppKey === m.ak && x.completed && x.kickoff < m.kickoff && x.id !== m.id)
-    .slice(-PAST_MEETINGS_N).reverse()
-    .map((x) => {
-      const s = x.score90 || x.score;
-      return {
-        date: x.kickoff.slice(0, 10),
-        season: x.kickoff.slice(0, 4),
-        compShort: x.short,
-        home: x.home ? m.home.name : m.away.name,
-        away: x.home ? m.away.name : m.home.name,
-        score: { home: s.home, away: s.away },
-      };
-    });
-  return { list, first: '2024', source: { provider: 'ESPN (landskamper från hösten 2024)', fetchedAt: D.landHistFetchedAt } };
+  const fran = motenFran(m.kickoff);
+  const seen = new Set();
+  const par = (x) => (x.hk === m.hk && x.ak === m.ak) || (x.hk === m.ak && x.ak === m.hk);
+  const list = [
+    ...landCalendar(D, m.hk).filter((x) => x.oppKey === m.ak).map((x) => ({ id: x.id, kickoff: x.kickoff, short: x.short, home: x.home, completed: x.completed, s: x.score90 || x.score })),
+    ...(D.landMoten || []).filter(par).map((x) => ({ id: x.id, kickoff: x.kickoff, short: x.turnering.short, home: x.hk === m.hk, completed: x.completed, s: x.score90 || x.score })),
+  ]
+    .filter((x) => x.completed && x.s && x.kickoff < m.kickoff && x.kickoff.slice(0, 10) >= fran && x.id !== m.id && !seen.has(x.id) && seen.add(x.id))
+    .sort((a, b) => b.kickoff.localeCompare(a.kickoff))
+    .map((x) => ({
+      date: x.kickoff.slice(0, 10),
+      season: x.kickoff.slice(0, 4),
+      compShort: x.short,
+      home: x.home ? m.home.name : m.away.name,
+      away: x.home ? m.away.name : m.home.name,
+      score: { home: x.s.home, away: x.s.away },
+    }));
+  const fetchedAt = [D.landHistFetchedAt, D.landMotenFetchedAt].filter(Boolean).sort()[0] || null;
+  return { list, first: fran, years: MOTEN_AR, source: { provider: 'ESPN (landskamper från november 2021)', fetchedAt } };
+}
+
+// Första dagen i mötenas fönster: MOTEN_AR år före avspark.
+function motenFran(kickoff) {
+  const d = new Date(kickoff);
+  d.setUTCFullYear(d.getUTCFullYear() - MOTEN_AR);
+  return d.toISOString().slice(0, 10);
 }
 
 function sideBySide(h, a, { land = false } = {}) {
@@ -1274,9 +1297,9 @@ function meetingStats(D, x) {
 }
 
 // Inbördes möten från tidigare säsonger (football-data.co.uk:s ligor och
-// ESPN:s FA-cuphistorik, mål efter 90 minuter), senaste först. Indexeras en
-// gång per inläst historik.
-const PAST_MEETINGS_N = 6;
+// ESPN:s FA-cuphistorik, mål efter 90 minuter) de senaste MOTEN_AR åren före
+// avspark, senaste först (till 2026-11-16 de sex senaste, hur gamla de än
+// var). Indexeras en gång per inläst historik.
 let pastIndex = null;
 
 function pastMeetings(m) {
@@ -1292,7 +1315,8 @@ function pastMeetings(m) {
     pastIndex = { H, byPair };
   }
   const names = new Map([[m.hk, m.home.name], [m.ak, m.away.name]]);
-  const list = (pastIndex.byPair.get([m.hk, m.ak].sort().join('|')) || []).slice(-PAST_MEETINGS_N).reverse().map((g) => ({
+  const fran = motenFran(m.kickoff);
+  const list = (pastIndex.byPair.get([m.hk, m.ak].sort().join('|')) || []).filter((g) => g.date >= fran && g.date < m.kickoff.slice(0, 10)).reverse().map((g) => ({
     date: g.date,
     season: `20${g.season.slice(0, 2)}/${g.season.slice(2)}`,
     compShort: competition(g.comp).short,
@@ -1301,7 +1325,7 @@ function pastMeetings(m) {
     score: { home: g.hg, away: g.ag },
   }));
   const fetchedAt = [H.fetchedAt.pl, H.fetchedAt.fac].filter(Boolean).sort()[0] || null;
-  return { list, first: '2000/01', source: { provider: 'football-data.co.uk och ESPN (FA-cupen från 2021/22)', fetchedAt } };
+  return { list, first: fran, years: MOTEN_AR, source: { provider: 'football-data.co.uk och ESPN (FA-cupen från 2021/22)', fetchedAt } };
 }
 
 function unmappedNames() {

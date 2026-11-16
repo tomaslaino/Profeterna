@@ -80,8 +80,6 @@ window.RumMatchblad = (() => {
   const SIDOR = [['lagen', 'Lagen'], ['prognos', 'Prognos'], ['analys', 'Analys'], ['elvor', 'Startelvor'], ['tabellen', 'Tabellen'], ['moten', 'Mötena']];
   // efter matchen, från protokollet: hur det gick först
   const EFTER = [['rattning', 'Rättningen'], ['matchen', 'Matchen'], ['prognos', 'Prognos'], ['analys', 'Analys'], ['elvor', 'Startelvor'], ['tabellen', 'Tabellen']];
-  // möten på sidan, som kortet i kortregistret (MOTEN i rum-register.js)
-  const MOTEN = 11;
   let flik = 'lagen';
   let flikEfter = 'rattning';
   // bladets sidor och den som är framme, före eller efter matchen
@@ -460,13 +458,13 @@ window.RumMatchblad = (() => {
   // ---------- Mötena ----------
 
   // Samma möten som kortet i kortregistret (motet i rum-register.js): säsongens och
-  // de tidigare, de senaste först, och hemmalagets V–O–F i dem.
+  // de tidigare de senaste fem åren, de senaste först, och hemmalagets V–O–F i dem.
   function moten(d, m) {
     const list = [
       ...(d.meetings || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.kickoff), x, when: x.kickoff.slice(0, 10), comp: x.compShort, hide: hides(x.kickoff.slice(0, 10)) })),
       ...((d.pastMeetings && d.pastMeetings.list) || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.date), x, when: x.date, comp: x.compShort, hide: false })),
-    ].sort((a, b) => b.t - a.t).slice(0, MOTEN);
-    if (!list.length) return tom('Lagen har inte mötts.');
+    ].sort((a, b) => b.t - a.t);
+    if (!list.length) return tom('Lagen har inte mötts de senaste fem åren.');
     const n = { V: 0, O: 0, F: 0 };
     const letter = (x) => {
       const s = x.score90 || x.score;

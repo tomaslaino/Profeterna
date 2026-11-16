@@ -23,7 +23,7 @@
 //              skytten och de främsta i assist och segermål), xG (chanserna,
 //              turen och kryssen), LÄGET (vilan, nästa match, skadorna och
 //              domaren) och MÖTENA (förra mötet med lagens siffror, när det
-//              var högst ett halvår sedan, och de senaste mötena). Det
+//              var högst ett halvår sedan, och mötena de senaste fem åren). Det
 //              bättre talet i varje par lyser och
 //              det sämre är svagt (SKILJER), och varje etikett öppnar en
 //              förklaring. Sedan 2026-11-16 är talen som säger vem som är
@@ -118,8 +118,6 @@ window.RumRegister = (() => {
   const MAN = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   const MANAD = ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'];
   const POS = { MV: 'målvakt', B: 'back', MF: 'mittfältare', A: 'anfallare' };
-  // mötena: så många som sajten har (de sex senaste från tidigare säsonger och säsongens)
-  const MOTEN = 11;
   // cuperna i schemat (matchens fil) som på sajten; Europacuperna heter CL, EL och ECL
   const TAV = { EFL: 'Ligacupen', FAC: 'FA-cupen' };
   // (och kortare, när namnet inte ryms i matchaktens spalt; annars förkortningen)
@@ -883,16 +881,20 @@ window.RumRegister = (() => {
       return [...r, tom()];
     }
 
+    // Mötena de senaste fem åren (sedan 2026-11-16, användarens fråga "kan man
+    // ha mötena de senaste 5 åren?"; till dess de elva senaste, och för
+    // landslagen bara från hösten 2024): säsongens och de tidigare, alla som
+    // sajten har inom fem år före avspark (pastMeetings i matchens fil).
     function moten(m) {
-      const r = [rad(['DE SENASTE MÖTENA', 'd', ordQ('moten')])];
+      const r = [rad(['MÖTENA DE SENASTE FEM ÅREN', 'd', ordQ('moten')])];
       const d = A.match.get(m.id);
       if (d === undefined) return [...r, prickar('HÄMTAR', '')];
       r.unshift(...forraMotet(m, d));
       const list = !d ? [] : [
         ...(d.meetings || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.kickoff), x, when: x.kickoff, comp: x.compShort, hide: window.Spoiler && Spoiler.hidesDay(x.kickoff) })),
         ...((d.pastMeetings && d.pastMeetings.list) || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.date), x, when: x.date, comp: x.compShort, hide: false })),
-      ].sort((a, b) => b.t - a.t).slice(0, MOTEN);
-      if (!list.length) return [...r, rad('HAR INTE MÖTTS')];
+      ].sort((a, b) => b.t - a.t);
+      if (!list.length) return [...r, rad('HAR INTE MÖTTS PÅ FEM ÅR')];
       const n = { V: 0, O: 0, F: 0 };
       for (const { x, when, comp, hide } of list) {
         if (!hide) n[letter(x, m.home)]++;
@@ -1078,7 +1080,7 @@ window.RumRegister = (() => {
     //   xG        chanserna: xG, skotten på mål, målen mot xG, turen och kryssen
     //   LÄGET     vilan, nästa match, matcherna de senaste dagarna, skadorna
     //             och domaren
-    //   MÖTENA    de senaste mötena
+    //   MÖTENA    mötena de senaste fem åren
     // Samma flikar för alla matcher, så att ←/→ stannar i fliken; en flik
     // utan något att visa är svag. Lagen leder till lagkorten och skyttarna
     // till spelarkorten. Efter tavlans tal står lagets plats i sin division
