@@ -8130,14 +8130,18 @@ export async function figurer(canvas, opt = {}) {
   // fönstret (oga) och ser vinkelrätt mot glaset, så att glaset blir en rätvinklig ruta i bilden, och den rutan
   // tas ur duken i samma uppgift som den ritas (innan webbläsaren hinner visa eller tömma den). Skuggfångaren
   // (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre på ryggarna än på ansiktena inifrån.
-  // Rummet står still under tiden (Rum.vila) och ritas som vanligt igen när man går in.
+  // Rummet står still under tiden (Rum.vila) och ritas som vanligt igen när man går in. Rutan som kopieras är
+  // STORRE gånger glaset (samma mitt och nederkant), så att gänget blir lika stort som de som går förbi ute.
   //   utifran(duk, t, neonPa, hem) → true om något ritades (hem: duken ritas sedan inifrån igen, medan rummet syns)
   const FONSTER = { x0: -615, x1: 185, y0: SILL - 4, y1: SILL + 509, z: -150, oga: [-110, 140, -2300] };
+  const STORRE = 1.25;
   function utifran(duk, t, neonPa, hem = false) {
     const g = duk && duk.getContext('2d');
     if (!g || !canvas.width || !canvas.height) return false;
     const K = UTE.K;
-    const F = FONSTER;
+    const F0 = FONSTER;
+    const mx = (F0.x0 + F0.x1) / 2;
+    const F = { x0: mx - (mx - F0.x0) * STORRE, x1: mx + (F0.x1 - mx) * STORRE, y0: F0.y0, y1: F0.y0 + (F0.y1 - F0.y0) * STORRE, z: F0.z, oga: F0.oga };
     const [ex, ey, ez] = F.oga;
     const d = F.z - ez;
     // (ut åt sidorna och uppåt från ögat, som tangens; världens +x är till vänster sett utifrån)

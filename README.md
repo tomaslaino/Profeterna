@@ -1277,6 +1277,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   lite mer än på den bilden". Närbilden av dörren är borta; namnet tar en ut på trottoaren, framför det laxrosa huset med
   skylten MATCHFIXARNA, och genom skyltfönstret syns gänget bakifrån, ritat av samma 3D-scen som inne, i samma ljus,
   väder och trafik som utsikten. Se [Fasaden](#fasaden).
+- **Fasaden snyggare, också i svaga telefoner (2026-11-16, användarens önskemål):** "Hur skulle du göra den här
+  snyggare/bättre. Tänk på att grafiken måste passa för sämre datorer och mobiltelefoner också!" Fyra förslag
+  skissades i den riktiga scenen och användaren valde alla: A ljuset (mörkare runt omkring, ljuskäglor över skylten,
+  ränder av ljus i den våta stenen, skuggor på dagen), B skyltfönstret (glaset djupt i karmen, imma, droppar som rinner,
+  hyllan syns, gänget i rätt storlek), C de som går förbi (formade figurer, siluetter med ljus i kanten, speglade i
+  stenen, ibland någon som stannar och tittar in) och D allt som rör sig i dukar i stället för ett trettiotal
+  CSS-animeringar. Se [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6635,12 +6642,16 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
 - **Gänget i fönstret:** genom skyltfönstret syns vi vagt, bakifrån, vid barbordet – inte en ritning utan samma 3D-scen
   som inne (`utifran` i rum-3d.js): en kamera ute på trottoaren i ögonhöjd ser vinkelrätt in genom glaset (`FONSTER`, en
   ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och rutan kopieras till fasadens duk i
-  samma uppgift som den ritas. Därför är det samma kläder, frisyrer, mössor, flaskor, radion och ampelliljan som inne, och
+  samma uppgift som den ritas. Rutan som kopieras är `STORRE` (1,25) gånger glaset med samma mitt och nederkant, så att
+  gänget blir lika stort som de som går förbi på trottoaren (förut var huvudena dubbelt så stora). Därför är det samma kläder, frisyrer, mössor, flaskor, radion och ampelliljan som inne, och
   de rör sig: duken ritas om några gånger i sekunden (ungefär 9 i datorn, 4 i telefonen, en gång i en fast bild). De sover
   på natten och festar i julkläder som inne. Neonen bakom dem lyser mindre på ryggarna än inifrån på ansiktena. Bakom
-  dem rummet, mjukt och ur skärpa: lysröret i taket, hyllan med cigarettpaketen, bardisken, tv:ns blå sken och Tipsligan
-  på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren. Framför dem neonskylten *Tobak*,
+  dem rummet, lite ur skärpa: lysröret i taket, hyllan med cigarettpaketen (paketen går att se), bardisken, tv:ns blå
+  sken och Tipsligan på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren, vagare. Framför dem neonskylten *Tobak*,
   som läses rätt härifrån och glappar samtidigt som inne (`neonOn`), och skivan med löpsedlarna med baksidan ut.
+- **Glaset:** det sitter djupt i karmen (skugga upptill och till vänster), med imma nertill när det är kallt ute och
+  varmt inne, droppar efter regn som små linser (mörk kant, en ljusprick nertill och en glans) och några som har runnit
+  och lämnat ett spår ned mot blecket.
 - **Dörren:** guldet på glaset står rättvänt (*Matchfixarna*, TOBAK & SPEL, *Öppet till spelstoppet*), och skylten på
   sugproppen säger ÖPPET på den här sidan – STÄNGT är sidan inåt.
 - **Samma ljus och väder som inifrån:** himlen, solen, månen, stjärnorna och molnen, putsen och stenen i dagsljus,
@@ -6650,10 +6661,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   höstlöv och trädens färger efter årstiden, måsar, kråkor och fyrverkerier på nyår. På dagen speglar glaset himlen och
   rummet syns svagare; på kvällen lyser fönstret ut på trottoaren, lamporna tänds på skylten, vid porten och på bron,
   och när lysröret är släckt på natten (`RumFolk.nattGrad`) är rummet mörkt utom neonen och tv:n.
+- **Ljuset (`kvallsljus`):** på dagen skuggor under gesimsen, skylten och svanhalsarna och i portens valv, så att
+  fasaden får djup. På kvällen är bottenvåningen och trottoaren mörkare (en mask med mjuka hål där något lyser) och
+  uppåt mörknar det, så att blicken stannar vid affären; ljuset är skarpt: käglor från svanhalsarna ned över skylten,
+  vars bokstäver lyser i deras sken med en skugga under, en liten gloria kring lyktan vid porten och gatlyktan på bron,
+  rummets sken på väggen och trottoaren, och när stenen är våt ränder av ljus under fönstret, dörren, lamporna och
+  neonen (röda). Inga filter: mjuka kanter med toningar och käglor i tre allt bredare lager.
 - **Det som händer ute:** de som går förbi på trottoaren framför affären, lika många som på gatan inifrån
-  (`RumUte.trafik`), klädda efter vädret, med paraply i regn, mössa och halsduk i kyla, väska och ibland hund. Bilarna
-  och bussarna på gatan bakom en syns som speglingar som far förbi i glaset: mörka skuggor på dagen, strålkastare och
-  baklyktor i mörkret.
+  (`RumUte.trafik`), klädda efter vädret, med paraply (med spröt och droppar) i regn, mössa, keps eller hatt och halsduk
+  i kyla, väska och ibland hund. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
+  och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
+  framför fönstret (`randLjus`), och speglas svagt i den våta stenen. Ibland (i ungefär sex av tio varv om 170 s, inte
+  mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
+  13 s, och går vidare (`stannar`, `bakDelar`) – där skivan med löpsedlarna hänger, så att gänget syns, och utan
+  paraply, som skulle skymma skylten. Bilarna och bussarna på gatan bakom en syns som speglingar som far förbi i glaset
+  och dörren: mörka skuggor på dagen, strålkastare och baklyktor i mörkret.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -6662,8 +6684,17 @@ och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden
 övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
 bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
-ritas om när ljuset eller vädret ändras (en gång i minuten prövas det), och det som rör sig har bara transform och
-opacity. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt (för bilder).
+ritas om när ljuset eller vädret ändras (en gång i minuten prövas det). Det som rör sig ritas i tre dukar: `rf-fram`
+överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, regnet, snön och blixten; i
+dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
+fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
+sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
+bildpunkter. Förut var det 27 CSS-animeringar i egna lager (benen och armarna på SVG-barn, regnet i två band över hela
+bilden, bilarna, molnen): fasaden hade 35–38 lager, ungefär tio skärmytor som lades ihop 60 gånger i sekunden. Nu är
+det 5 lager i telefonen och 8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
+arbete från ~300 till ~65–120 ms/s (headless Chrome, `?rum-kval=1`, regn på kvällen); på datorn är grafikprocessens tid
+ungefär som förut. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt
+(för bilder, med `?rum-t` står allt det som rör sig på den tiden).
 
 ### Kupongen i handen
 

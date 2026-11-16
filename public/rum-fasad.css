@@ -1,6 +1,6 @@
 /* Fasaden: tobaksaffären utifrån (rum-fasad.js), framme över rummet med ett klick på namnet på dörren.
    Scenen ritas i världens mått (.rf-scen, lika stor som den del som syns) och förstoras så att den täcker
-   fönstret. Allt som rör sig har bara transform och opacity, och står still med prefers-reduced-motion.
+   fönstret. Det som rör sig ritas i dukar, och står still med prefers-reduced-motion.
    Namnet och foten (Tillbaka) i rummet ligger över fasaden. */
 
 .rum-fasad { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #0b0a09; cursor: pointer; contain: strict; }
@@ -24,70 +24,12 @@
 .rum-fasad.neon-av .rf-neon { opacity: 0; }
 .rum-fasad.neon-av .rf-neon-av { opacity: 1; }
 
-/* det som far förbi: --fran … --till i scenens mått */
-.rf-glid { position: absolute; left: 0; animation: rf-glid linear infinite; will-change: transform; }
-@keyframes rf-glid { from { transform: translateX(var(--fran)); } to { transform: translateX(var(--till)); } }
-.rf-moln { filter: blur(14px); }
-.rf-vinge { animation: rf-vinge 0.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
-@keyframes rf-vinge { from { transform: scaleY(1); } to { transform: scaleY(-0.6); } }
-.rf-pang { position: absolute; opacity: 0; animation: rf-pang ease-out infinite; }
-@keyframes rf-pang {
-  0% { opacity: 0; transform: scale(0.15); }
-  3% { opacity: 1; }
-  28% { opacity: 0.9; transform: scale(1); }
-  48% { opacity: 0; transform: scale(1.08) translateY(8px); }
-  100% { opacity: 0; transform: scale(1.08) translateY(8px); }
-}
+/* det som rör sig ritas i dukar (rum-fasad.js): fram överst, bak bakom huset där himlen syns, och
+   barberarens stång på väggen */
+.rf-fram, .rf-bak, .rf-barber { position: absolute; pointer-events: none; }
 
-/* de som går förbi: benen och armarna svänger i takt (--steg), och hunden fortare */
-.rf-gar { width: 0; height: 0; }
-.rf-gar > svg { position: absolute; left: 0; top: 0; transform-origin: 60px 270px; overflow: visible; }
-.rf-ben, .rf-arm { transform-box: fill-box; transform-origin: 50% 0; animation: rf-steg var(--steg, 1s) ease-in-out infinite alternate; }
-.rf-ben.b2 { animation-delay: calc(var(--steg, 1s) * -1); }
-.rf-arm { animation-name: rf-arm; }
-.rf-arm.b2 { animation-delay: calc(var(--steg, 1s) * -1); }
-.rf-ben.fort { animation-duration: calc(var(--steg, 1s) * 0.5); }
-@keyframes rf-steg { from { transform: rotate(-21deg); } to { transform: rotate(21deg); } }
-@keyframes rf-arm { from { transform: rotate(18deg); } to { transform: rotate(-18deg); } }
-
-/* bilarna bakom en, speglade i glaset */
-.rf-spegel { position: absolute; overflow: hidden; pointer-events: none; }
-.rf-bil { top: 0; height: 100%; }
-.rf-kropp { position: absolute; left: 0; top: 54%; height: 30%; border-radius: 40% 40% 12% 12% / 60% 60% 20% 20%; opacity: 0.28; filter: blur(10px); }
-.rf-ljus { position: absolute; top: 64%; width: 170px; height: 46px; margin: -23px 0 0 -85px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 250, 232, 0.6), rgba(255, 236, 190, 0.18) 50%, rgba(255, 236, 190, 0)); }
-.rf-ljus.rod { width: 110px; height: 34px; margin: -17px 0 0 -55px; background: radial-gradient(closest-side, rgba(255, 70, 50, 0.45), rgba(255, 60, 40, 0)); }
-
-/* barberarens stång snurrar */
-.rf-barber { position: absolute; width: 34px; height: 150px; border-radius: 17px; overflow: hidden; background: #e9e4da; box-shadow: inset -6px 0 8px rgba(0, 0, 0, 0.35), inset 6px 0 6px rgba(255, 255, 255, 0.4); }
-.rf-barber::before, .rf-barber::after { content: ""; position: absolute; left: -6px; width: 46px; height: 14px; background: #222; border-radius: 6px; z-index: 1; }
-.rf-barber::before { top: 0; }
-.rf-barber::after { bottom: 0; }
-.rf-barber i { position: absolute; left: 0; top: -60px; width: 34px; height: 270px; background: repeating-linear-gradient(-35deg, #c8322a 0 12px, #f3eee4 12px 24px, #2a4a9a 24px 36px, #f3eee4 36px 48px); animation: rf-barber 3s linear infinite; }
-@keyframes rf-barber { from { transform: translateY(0); } to { transform: translateY(58.6px); } }
-
-/* regnet och snön, över allt */
-.rf-fall { overflow: hidden; }
-.rf-fall-b { position: absolute; left: -200px; top: 0; animation: rf-fall 0.7s linear infinite; }
-.rf-fall-b svg { display: block; }
-.rf-fall-b.fjarr { opacity: 0.8; }
-@keyframes rf-fall { from { transform: translateY(calc(var(--h) * -1)); } to { transform: translateY(0); } }
-.rf-sno-v { position: absolute; inset: 0; animation: rf-sway ease-in-out infinite alternate; }
-@keyframes rf-sway { from { transform: translateX(calc(var(--sway, 20px) * -0.5)); } to { transform: translateX(calc(var(--sway, 20px) * 0.5)); } }
-
-/* blixten vid åska */
-.rf-blixt i { position: absolute; inset: 0; background: #eef3ff; opacity: 0; animation: rf-blixt 17s linear infinite; }
-.rf-blixt i.b2 { animation-duration: 29s; animation-delay: -11s; }
-@keyframes rf-blixt {
-  0%, 90% { opacity: 0; }
-  90.6% { opacity: 0.7; }
-  91.2% { opacity: 0.06; }
-  92% { opacity: 0.5; }
-  94%, 100% { opacity: 0; }
-}
-
-/* I telefonen ingen oskärpa på det som rör sig: den blev ett eget pass på grafikkortet för varje figur */
+/* I telefonen ingen oskärpa på gänget: den blev ett eget pass på grafikkortet */
 @media (max-width: 700px), (max-height: 500px) {
-  .rf-moln, .rf-kropp { filter: none; opacity: 0.2; }
   .rf-gang { filter: none; }
 }
 
