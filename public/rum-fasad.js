@@ -81,16 +81,22 @@ window.RumFasad = (() => {
 
   // Den del av världen som syns i ett fönster med formen a (bredd / höjd).
   function vy(a) {
-    let h = 940;
-    let w = h * a;
     const minW = FOKUS.x1 - FOKUS.x0 + 70;
-    if (w < minW) { w = minW; h = w / a; }
+    let h = Math.max(940, minW / a);
+    // (mer höjd: två tredjedelar uppåt, fler våningar, och resten trottoar)
+    const extra = h - 940;
+    let y = Math.max(VARLD.y0, 40 - extra * 0.66);
+    // (och gatan ut till den närmre filen, rum-fasad-gatan.js: det som fattas nertill i ett brett fönster tas hälften
+    // genom att visa mer och hälften från överkanten)
+    const brist = GATA() ? markY(GATA().SYNS) - (y + h) : 0;
+    if (brist > 0) {
+      h += brist / 2;
+      y += brist / 2;
+    }
+    const w = h * a;
     let x = 860 - w / 2;
     x = Math.max(FOKUS.x1 + 35 - w, Math.min(FOKUS.x0 - 35, x));
     x = Math.max(VARLD.x0, Math.min(VARLD.x1 - w, x));
-    // (mer höjd: två tredjedelar uppåt, fler våningar, och resten trottoar)
-    const extra = Math.max(0, h - 940);
-    const y = Math.max(VARLD.y0, 40 - extra * 0.66);
     return { x: r1(x), y: r1(y), w: r1(w), h: r1(h) };
   }
 

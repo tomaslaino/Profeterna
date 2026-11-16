@@ -13,12 +13,15 @@
 // rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in och står med bromsljusen tända, och kör sedan
 // iväg en efter en.
 //
-// Enkelriktat: allt kommer från höger, från bron, i två filer, och kör två–tre gånger så fort som de som går (så att
-// man hinner se vad det är). Allt räknas ur tiden: den delas i luckor om LUCKA sekunder per fil och i varje lucka
+// Enkelriktat: allt kommer från höger, från bron, i två filer en bit ut på gatan (lägre i bilden än de som går), och
+// kör två–tre gånger så fort som de som går, så att man hinner se vad det är. De kör som bilar: var och en har sin
+// färd (D), där den ibland släpper gasen, bromsar in med bromsljusen tända och tar fart igen, eller stannar en stund;
+// den som kör efter en annan gör som den, en stund senare (Newells modell), och karossen niger när de bromsar och
+// gungar tillbaka när de stannar. Allt räknas ur tiden: den delas i luckor om LUCKA sekunder per fil och i varje lucka
 // kommer ett fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, så att bilden är densamma hur
-// ofta den än ritas och en stillbild (?rum-t) visar det som kör just då. Ett fordon kommer bara när de i luckorna före
-// är ute ur världen, så ingen kör igenom någon annan; köerna har egna, längre luckor (KO), och medan en kö står kör
-// ingen annan i den filen.
+// ofta den än ritas och en stillbild (?rum-t) visar det som kör just då. Ett fordon kommer bara om det aldrig hamnar för
+// nära något som kör före, så ingen kör igenom någon annan; köerna har egna, längre luckor (KO), och medan en kö står
+// kör ingen annan i den filen.
 //
 // Fordonen ritas i fasadens främre duk (rf-fram), efter dem som går och före regnet, med vektorer (inga bilder, för
 // minnets skull i telefonen) i två eller tre toner som resten av fasaden: kaross, rutor med himlen i, list, stötfångare,
@@ -28,7 +31,8 @@
 //
 //   RumFasadGatan.mark(V, v, L, G) → gatan som SVG (står still, med marken)
 //   RumFasadGatan.trafik(v, L, G) → trafiken S; .syns(S, t, V) det som syns vid tiden t (null: inget);
-//   .rita(c, S, lista, t) ritar det i duken (världens enheter; lista: [{ b, f, x, fart, broms }])
+//   .rita(c, S, lista, t) ritar det i duken (världens enheter; lista: [{ b, f, x, fart, broms, nig }])
+//   .SYNS hur långt ut (m) marken ska synas i ett brett fönster (vy i rum-fasad.js)
 //   .FORM fordonens former; .fordon.nytt(S, R, typ, T, f) ett fordon, .fordon.valj(S, R, T, f, I) vilket slag
 //   G: måtten och hjälparna ur rum-fasad.js (markY, skala, tone, mix, rng …)
 
@@ -36,14 +40,18 @@ window.RumFasadGatan = (() => {
   const TAU = 2 * Math.PI;
 
   // ---------- måtten (meter ut från fasaden) ----------
-  // Trottoaren är smal (de som går håller sig innanför 0,85 m), och gatan är tecknad snarare än uppmätt: fordonen står
-  // nära kanten, så att de syns med hjulen i ett vanligt brett fönster (där syns marken ungefär 1,3 m ut).
+  // Trottoaren är smal (de som går håller sig innanför 0,85 m), och gatan är tecknad snarare än uppmätt. Filerna ligger
+  // en bit ut på gatan, så att fordonen kör tydligt lägre i bilden än de som går (förut nästan i deras höjd, som om de
+  // körde på trottoaren); i ett brett fönster syns marken ut till SYNS (vy i rum-fasad.js), med hjulen i den närmre
+  // filen och lite gata under dem.
   const KANT = 0.88;
   const RANN = 1.0;
-  const LINJE = 1.13;
-  const MOT = 1.48;
-  const FILER = [{ d: 1.02, dir: -1 }, { d: 1.24, dir: -1 }];
+  const LINJE = 1.51;
+  const MOT = 2.02;
+  const FILER = [{ d: 1.3, dir: -1 }, { d: 1.72, dir: -1 }];
+  const SYNS = 1.95;
   const LUCKA = 12;
+  const LIV = 5 * LUCKA - 2;
   const KO = 234;
   // världens kanter i sidled, där fordonen kommer in och försvinner (så långt ut att strålkastarnas ljus på gatan
   // inte når in i bilden när de kommer)
@@ -665,9 +673,10 @@ window.RumFasadGatan = (() => {
 
   // ---------- trafiken ----------
 
-  // Hur ofta det kommer något per fil (s), ur RumUte.trafik: rusning, dag, kväll och natt.
+  // Hur ofta det kommer något per fil (s), ur RumUte.trafik: rusning, dag, kväll och natt. (Glesare än förr, när de
+  // körde fortare: varje fordon syns längre, och skyltfönstret ska inte skymmas mer än det gjorde.)
   function intervall(T, v) {
-    const s = T.rusning ? 16 : T.natt ? 170 : T.dag ? 32 : 60;
+    const s = T.rusning ? 21 : T.natt ? 210 : T.dag ? 41 : 75;
     return s * (v.snotackt || (v.fall === 'sno' && v.mangd > 0.5) ? 1.3 : 1);
   }
 
@@ -680,6 +689,7 @@ window.RumFasadGatan = (() => {
       }),
       fro: v.ar * 7919 + v.manad * 613 + v.dag * 31,
       luckor: new Map(),
+      fria: new Map(),
       koer: new Map(),
       T: null, tT: -1e9,
       lamps: L.lampor || L.dag < 0.35 || L.dimma > 0.4,
@@ -720,11 +730,11 @@ window.RumFasadGatan = (() => {
       b.lack = typ === 'ledbuss' ? '#2468b8' : '#b8262a';
       b.mal = typ === 'ledbuss' ? (f.dir > 0 ? 'RADIOHUSET' : 'GULLMARSPLAN') : '';
       b.folk = b.F.rutor.map(() => (R() < 0.55 ? 0.25 + R() * 0.5 : -1));
-      b.fart = (3.1 + R() * 0.8) * halt;
+      b.fart = (1.8 + R() * 0.4) * halt;
     } else if (typ === 'plog') {
       b.F = PLOG;
       b.lack = '#e07a1a';
-      b.fart = 2.8 + R() * 0.6;
+      b.fart = 1.5 + R() * 0.3;
     } else {
       b.taxi = typ === 'taxi';
       const modell = b.taxi ? lotta(R, TAXIBILAR) : typ;
@@ -742,8 +752,9 @@ window.RumFasadGatan = (() => {
         b.har = [pick(R, HAR), pick(R, HAR)];
         b.passagerare = R() < 0.6;
       }
-      // (i m/s: 12–18 km/h på dagen, lugnare i rusningen och lite fortare på natten)
-      b.fart = (T.natt ? 4.6 + R() * 1.4 : T.rusning ? 3.2 + R() * 0.9 : 3.6 + R() * 1.2) * halt;
+      // (i m/s i den tecknade gatan: 2,1–2,7 på dagen, lugnare i rusningen och lite fortare på natten, så att de på
+      // skärmen kör två–tre gånger så fort som de som går och hinner synas i fyra–fem sekunder)
+      b.fart = (T.natt ? 2.5 + R() * 0.7 : T.rusning ? 1.9 + R() * 0.5 : 2.1 + R() * 0.6) * halt;
     }
     b.L = b.F.L;
     b.c = S.ton(b.lack);
@@ -770,12 +781,130 @@ window.RumFasadGatan = (() => {
     return lotta(R, varmt(S, 15) ? MODELLER : MODELLER_KALLT);
   }
 
-  // Luckan n i filen f: fordonen i den (oftast inget), var och när de kommer in (t0) och när de är ute (slut). Är
-  // ett fordon i de två luckorna före inte ute ur världen när det här kommer in, kommer det inte (då kör ingen igenom
-  // någon). Allt är ute två luckor efter sin egen.
+  // ---------- hur de kör ----------
+  //
+  // Ett fordons färd är en följd av delar med jämn acceleration (D: [{ t, p, v, a }]: från tiden t (s) är fronten p m
+  // in i filen, farten v m/s och accelerationen a m/s²), så att det kör som en bil: i jämn fart, bromsar in, står, tar
+  // fart igen. Var det är och hur fort det går vid tiden t räknas ur delen (lage), och när det når en plats ur den
+  // (nar). Nigningen (nosen ner när det bromsar, upp när det tar fart, och en gungning tillbaka när det stannar) är
+  // accelerationen genom fjädringen: en dämpad svängning efter varje ändring (fjader).
+  function fard(t0, v) {
+    return [{ t: t0, p: 0, v, a: 0 }];
+  }
+  // från tiden t accelerationen a (0: jämn fart, eller stilla när farten har nått noll)
+  function byt(D, t, a) {
+    const d = D[D.length - 1];
+    const u = t - d.t;
+    const v = d.v + d.a * u;
+    D.push({ t, p: d.p + d.v * u + (d.a * u * u) / 2, v: v < 1e-6 ? 0 : v, a });
+  }
+  function lage(D, t) {
+    let i = D.length - 1;
+    while (i > 0 && D[i].t > t) i--;
+    const d = D[i];
+    const u = t - d.t;
+    // (före den första delen: i dess fart, utanför världen)
+    if (u < 0) return { p: d.p + d.v * u, v: d.v, a: 0, i };
+    return { p: d.p + d.v * u + (d.a * u * u) / 2, v: Math.max(0, d.v + d.a * u), a: d.a, i };
+  }
+  // när fronten når s m in i filen (den sista delen är jämn fart)
+  function nar(D, s) {
+    for (let i = 0; i < D.length; i++) {
+      const d = D[i];
+      if (D[i + 1] && D[i + 1].p < s) continue;
+      const r = s - d.p;
+      if (!d.a) return d.t + (d.v ? r / d.v : 0);
+      return d.t + (Math.sqrt(Math.max(0, d.v * d.v + 2 * d.a * r)) - d.v) / d.a;
+    }
+    return Infinity;
+  }
+  // accelerationen som karossen känner den: ett steg i accelerationen ger en dämpad svängning (1,3 gånger i sekunden)
+  const FJ = { w: TAU * 1.3, z: 0.45 };
+  function fjader(D, t) {
+    const { w, z } = FJ;
+    const wd = w * Math.sqrt(1 - z * z);
+    let s = 0;
+    for (let i = 1; i < D.length && D[i].t < t; i++) {
+      const u = t - D[i].t;
+      const da = D[i].a - D[i - 1].a;
+      s += u > 8 ? da : da * (1 - Math.exp(-z * w * u) * (Math.cos(wd * u) + ((z * w) / wd) * Math.sin(wd * u)));
+    }
+    return s;
+  }
+  // bromsljuset: när det bromsar (inte när föraren bara släpper gasen), när det står, och strax när det tar fart
+  function bromsar(D, l, t) {
+    if (l.a < -0.45 || l.v < 0.05) return true;
+    const d = D[l.i];
+    return d.a > 0 && d.v === 0 && t - d.t < 0.35;
+  }
+
+  // Vad föraren gör framför affären: oftast kör den förbi i jämn fart, men ibland släpper den gasen en stund, bromsar
+  // in (för något längre fram: någon som går över, en som svänger) och tar fart igen, eller stannar och står en stund.
+  // Var: fronten någonstans framför affären när det börjar, så att det syns i alla fönster. Bussarna stannar inte och
+  // plogbilen kör jämnt.
+  function kor(R, b, T, f, t0) {
+    const v = b.fart;
+    const D = fard(t0, v);
+    const typ = b.typ;
+    if (typ === 'plog') return D;
+    const buss = typ === 'buss' || typ === 'ledbuss';
+    const stopp = buss ? 0 : T.natt ? 0.02 : T.rusning ? 0.1 : 0.06;
+    const broms = (T.natt ? 0.08 : T.rusning ? 0.24 : 0.16) * (buss ? 0.5 : 1);
+    const slapp = T.natt ? 0.1 : 0.14;
+    const r = R();
+    let v2;
+    let a;
+    let a2;
+    let sta;
+    if (r < stopp) {
+      v2 = 0; a = 1.0 + R() * 0.5; a2 = 0.9 + R() * 0.4; sta = 1 + R() * 2.5;
+    } else if (r < stopp + broms) {
+      v2 = v * (0.3 + R() * 0.35); a = 0.7 + R() * 0.6; a2 = 0.6 + R() * 0.4; sta = R() * 1.2;
+    } else if (r < stopp + broms + slapp) {
+      v2 = v * (0.65 + R() * 0.2); a = 0.25 + R() * 0.15; a2 = 0.3 + R() * 0.2; sta = 0.5 + R() * 1.5;
+    } else return D;
+    const xs = 250 + R() * 1200;
+    const tb = t0 + (f.dir > 0 ? xs - XL : XR - xs) / f.um / v;
+    const t1 = tb + (v - v2) / a;
+    const t2 = t1 + sta;
+    byt(D, tb, -a);
+    byt(D, t1, 0);
+    byt(D, t2, a2);
+    byt(D, t2 + (v - v2) / a2, 0);
+    return D;
+  }
+  // Den som kör efter ett annat gör som det, en stund senare och på samma ställe (som i Newells modell: tau s efter,
+  // med fronten d m bakom dess): bromsar där det bromsade, och står bakom när det står.
+  function efter(D, tau, d) {
+    return D.map((x) => ({ t: x.t + tau, p: x.p - d, v: x.v, a: x.a }));
+  }
+  // Kommer b aldrig närmare a, som kör före i samma fil, än en dryg meter och en bit till för farten?
+  function haller(a, b) {
+    const t2 = Math.min(a.slut, b.slut);
+    for (let t = Math.max(a.t0, b.t0); t <= t2; t += 0.25) {
+      const l = lage(b.D, t);
+      if (lage(a.D, t).p - a.L / 100 - l.p < 1.2 + 0.5 * l.v) return false;
+    }
+    return true;
+  }
+
+  // Luckan n i filen f: fordonen i den (oftast inget), deras färd (D), när de kommer in (t0) och när de är ute
+  // (slut). Ett fordon som skulle komma närmare något i de fyra luckorna före än det går att hålla (haller) kommer
+  // inte, och inte det som skulle följa efter det heller, så att ingen kör igenom någon; inte heller när det står en
+  // kö i filen. Allt är ute ur världen fem luckor efter sin egen (LIV).
   function lucka(S, f, n) {
-    const fore = [...luckaRa(S, f, n - 2), ...luckaRa(S, f, n - 1)].reduce((m, a) => Math.max(m, a.slut), -1e9);
-    return luckaRa(S, f, n).filter((a) => a.t0 > fore + 0.3);
+    const key = f.i * 1e7 + n;
+    if (S.fria.has(key)) return S.fria.get(key);
+    const fore = [1, 2, 3, 4].flatMap((k) => luckaRa(S, f, n - k));
+    const ut = [];
+    for (const b of luckaRa(S, f, n)) {
+      if (b.efter && !ut.includes(b.efter)) continue;
+      if (b.slut - n * LUCKA > LIV || koar(S, f, b)) continue;
+      if (fore.every((a) => haller(a, b))) ut.push(b);
+    }
+    S.fria.set(key, ut);
+    if (S.fria.size > 40) S.fria.delete(S.fria.keys().next().value);
+    return ut;
   }
   function luckaRa(S, f, n) {
     const key = f.i * 1e7 + n;
@@ -787,32 +916,36 @@ window.RumFasadGatan = (() => {
     if (R() < LUCKA / I) {
       const t0 = n * LUCKA + f.i * 2.1 + R() * 0.8;
       const a = nyttFordon(S, R, valjTyp(S, R, T, f, I), T, f);
-      a.t0 = t0;
-      a.slut = t0 + (XR - XL + a.L / 100 * f.um) / (a.fart * f.um);
+      a.D = kor(R, a, T, f, t0);
       ut.push(a);
-      // ibland en till efter, i samma fart
+      // ibland en till efter, som följer den
       if (a.L < 600 && R() < (T.rusning ? 0.4 : 0.2)) {
         const b = nyttFordon(S, R, valjTyp(S, R, T, f, 0), T, f);
         if (b.L < 600) {
           b.fart = a.fart;
-          b.t0 = t0 + (a.L / 100 + 4 + R() * 9) / a.fart;
-          b.slut = b.t0 + (XR - XL + b.L / 100 * f.um) / (b.fart * f.um);
-          if (b.slut < (n + 2) * LUCKA + f.i * 2.1 - 0.2) ut.push(b);
+          b.D = efter(a.D, (T.rusning ? 0.9 : 1.2) + R() * 1.2, a.L / 100 + 1.6 + R() * 0.9);
+          b.efter = a;
+          ut.push(b);
         }
       }
     }
-    for (const a of ut) a.f = f;
+    for (const b of ut) {
+      b.f = f;
+      b.t0 = nar(b.D, 0);
+      b.slut = nar(b.D, (XR - XL) / f.um + b.L / 100);
+    }
     S.luckor.set(key, ut);
-    if (S.luckor.size > 60) S.luckor.delete(S.luckor.keys().next().value);
+    if (S.luckor.size > 80) S.luckor.delete(S.luckor.keys().next().value);
     return ut;
   }
 
   // ---------- kön ----------
   //
-  // I den närmre filen: några bilar kommer i följd, bromsar in och ställer sig bakom varandra med den första en bit
-  // till vänster om affären; de står med bromsljusen tända tills det slår om, och kör sedan iväg en efter en med en
-  // dryg sekund emellan. Rörelsen ur tiden: fram (v0) – broms (a) – står – start (a2 upp till v1).
-  const KOF = { v0: 4.2, a: 1.6, a2: 1.2, v1: 5, glapp: 1.2 };
+  // I den närmre filen (förarnas vänstra, där de som ska svänga vänster ställer sig): några bilar kommer i följd,
+  // bromsar in och ställer sig bakom varandra med den första en bit till vänster om affären; de står med bromsljusen
+  // tända tills det slår om, och kör sedan iväg en efter en med en dryg sekund emellan. Var och en kommer i v0,
+  // bromsar med a, står, tar fart med a2 upp till v1.
+  const KOF = { v0: 2.2, a: 1.2, a2: 1.0, v1: 2.5, glapp: 1.2 };
   function ko(S, f, q) {
     const key = f.i * 1e7 + q;
     if (S.koer.has(key)) return S.koer.get(key);
@@ -840,66 +973,56 @@ window.RumFasadGatan = (() => {
         ts += 1.8 + R() * 1.6;
       }
       const tGa = ts + 5 + R() * 9;
-      bilar.forEach((b, j) => { b.tGa = tGa + j * 1.1 + R() * 0.4; });
       const { v0, a, a2, v1 } = KOF;
-      const b0 = bilar[0];
-      const tIn = b0.tStopp - v0 / a - (b0.s - (v0 * v0) / (2 * a)) / v0;
-      const sist = bilar[n - 1];
-      const D = (XR - XL) / f.um + sist.L / 100 - sist.s;
-      const tUt = sist.tGa + (D <= (v1 * v1) / (2 * a2) ? Math.sqrt((2 * D) / a2) : v1 / a2 + (D - (v1 * v1) / (2 * a2)) / v1);
-      k = { bilar, tIn, tUt };
+      const ut = (XR - XL) / f.um;
+      bilar.forEach((b, j) => {
+        const ga = tGa + j * 1.1 + R() * 0.4;
+        const tb = b.tStopp - v0 / a;
+        b.D = fard(tb - (b.s - (v0 * v0) / (2 * a)) / v0, v0);
+        byt(b.D, tb, -a);
+        byt(b.D, b.tStopp, 0);
+        byt(b.D, ga, a2);
+        byt(b.D, ga + v1 / a2, 0);
+        b.t0 = b.D[0].t;
+        b.slut = nar(b.D, ut + b.L / 100);
+      });
+      k = { bilar, tIn: bilar[0].t0, tUt: Math.max(...bilar.map((b) => b.slut)) };
     }
     S.koer.set(key, k);
     if (S.koer.size > 12) S.koer.delete(S.koer.keys().next().value);
     return k;
   }
-  // var fordonets front är (m från världens kant), hur fort det går och om det bromsar
-  function iKo(b, t) {
-    const { v0, a, a2, v1 } = KOF;
-    const tb = b.tStopp - v0 / a;
-    if (t < tb) return { p: b.s - (v0 * v0) / (2 * a) - v0 * (tb - t), fart: v0, broms: false };
-    if (t < b.tStopp) { const tau = b.tStopp - t; return { p: b.s - (a * tau * tau) / 2, fart: a * tau, broms: true }; }
-    if (t < b.tGa) return { p: b.s, fart: 0, broms: true };
-    const tau = t - b.tGa;
-    if (tau < v1 / a2) return { p: b.s + (a2 * tau * tau) / 2, fart: a2 * tau, broms: tau < 0.3 };
-    return { p: b.s + (v1 * v1) / (2 * a2) + v1 * (tau - v1 / a2), fart: v1, broms: false };
+  // står en kö i filen medan b är i världen?
+  function koar(S, f, b) {
+    const q = Math.floor(b.t0 / KO);
+    return [ko(S, f, q - 1), ko(S, f, q), ko(S, f, q + 1)].some((k) => k && b.slut > k.tIn - 1 && b.t0 < k.tUt + 1);
   }
 
-  // Det som syns vid tiden t i bilden V: den bortre filen först (den ritas bakom).
+  // Det som syns vid tiden t i bilden V: den bortre filen först (den ritas bakom). nig: hur mycket karossen lutar
+  // (radianer, nosen ner när det bromsar; bussarna och plogbilen mindre).
   function syns(S, t, V) {
     if (!window.RumUte || !RumUte.trafik) return null;
     const ut = [];
     const marg = S.lamps ? 1400 : 120;
-    const fram = (b, f, xf, fart, broms) => {
+    const fram = (b, f) => {
+      if (t < b.t0 || t > b.slut) return;
+      const l = lage(b.D, t);
       const w = (b.L / 100) * f.um;
+      const xf = f.dir > 0 ? XL + l.p * f.um : XR - l.p * f.um;
       const xa = f.dir > 0 ? xf - w : xf;
       if (xa > V.x + V.w + marg || xa + w < V.x - marg) return;
-      ut.push({ b, f, x: xa + w / 2, fart, broms });
+      const tung = b.typ === 'buss' || b.typ === 'ledbuss' || b.typ === 'plog' ? 0.4 : 1;
+      const nig = Math.max(-0.016, Math.min(0.016, -0.008 * fjader(b.D, t))) * tung;
+      ut.push({ b, f, x: xa + w / 2, fart: l.v, broms: bromsar(b.D, l, t), nig });
     };
     for (const f of S.filer) {
-      // köerna, och de vanliga fordonen när ingen kö står i vägen
-      const q = Math.floor(t / KO);
-      const koer = [ko(S, f, q - 1), ko(S, f, q)].filter(Boolean);
       const n = Math.floor((t - f.i * 2.1) / LUCKA);
-      for (const m of [n - 2, n - 1, n]) {
-        for (const b of lucka(S, f, m)) {
-          if (t < b.t0 || t > b.slut) continue;
-          const qb = Math.floor(b.t0 / KO);
-          const krock = [ko(S, f, qb - 1), ko(S, f, qb), ko(S, f, qb + 1)].some((k) => k && b.slut > k.tIn - 1 && b.t0 < k.tUt + 1);
-          if (krock) continue;
-          const xf = f.dir > 0 ? XL + (t - b.t0) * b.fart * f.um : XR - (t - b.t0) * b.fart * f.um;
-          fram(b, f, xf, b.fart, false);
-        }
-      }
-      for (const k of koer) {
-        if (t < k.tIn || t > k.tUt) continue;
+      for (let m = n - 4; m <= n; m++) for (const b of lucka(S, f, m)) fram(b, f);
+      const q = Math.floor(t / KO);
+      for (const k of [ko(S, f, q - 1), ko(S, f, q)]) {
+        if (!k || t < k.tIn || t > k.tUt) continue;
         // (de bakre först, så att den framför ritas ovanpå om de nuddar)
-        for (let j = k.bilar.length - 1; j >= 0; j--) {
-          const b = k.bilar[j];
-          const l = iKo(b, t);
-          if (l.p < 0 || l.p > (XR - XL) / f.um + b.L / 100) continue;
-          fram(b, f, f.dir > 0 ? XL + l.p * f.um : XR - l.p * f.um, l.fart, l.broms);
-        }
+        for (let j = k.bilar.length - 1; j >= 0; j--) fram(k.bilar[j], f);
       }
     }
     return ut.length ? ut : null;
@@ -907,7 +1030,25 @@ window.RumFasadGatan = (() => {
 
   // ---------- att rita ----------
 
+  // Nigningen: karossen lutar kring hjulens mitt (niga, efter skuggan under), men hjulen och hjulhusen står kvar på
+  // gatan (ritaHjul vrider tillbaka). NIG sätts av rita för fordonet som ritas.
+  let NIG = 0;
+  function niga(c, F) {
+    if (!NIG) return;
+    c.translate(0, -F.r);
+    c.rotate(NIG);
+    c.translate(0, F.r);
+  }
   function ritaHjul(c, x, r, nav, falg, botten, S, vrid = 0) {
+    if (!NIG) return hjulet(c, x, r, nav, falg, botten, S, vrid);
+    c.save();
+    c.translate(0, -r);
+    c.rotate(-NIG);
+    c.translate(0, r);
+    hjulet(c, x, r, nav, falg, botten, S, vrid);
+    c.restore();
+  }
+  function hjulet(c, x, r, nav, falg, botten, S, vrid) {
     // hjulhuset
     c.fillStyle = '#09090a';
     c.beginPath();
@@ -1048,9 +1189,9 @@ window.RumFasadGatan = (() => {
   // Stänk om hjulen i regnet, och avgaser i kylan när fordonet står still eller kryper.
   function stank(c, b, S, fart, t, botten) {
     const v = S.vNu || S.v;
-    if (S.vat && fart > 2 && (S.regn || v.blott)) {
+    if (S.vat && fart > 0.8 && (S.regn || v.blott)) {
       // (en mjuk dimma av vatten bakom hjulen, låg och utdragen)
-      const a = Math.min(1, fart / 7) * (S.lamps ? 0.1 : 0.2);
+      const a = Math.min(1, fart / 4) * (S.lamps ? 0.1 : 0.2);
       const rgb = S.lamps ? '140,142,146' : '226,230,236';
       for (const x of b.F.hj) {
         const r = b.F.r;
@@ -1062,7 +1203,7 @@ window.RumFasadGatan = (() => {
         c.restore();
       }
     }
-    if (S.kallt && fart < 1.5) {
+    if (S.kallt && fart < 0.6) {
       // (mjuka moln ur avgasröret som växer, stiger och bleknar)
       const x0 = -b.L / 2 + 6;
       for (let i = 0; i < 3; i++) {
@@ -1133,6 +1274,7 @@ window.RumFasadGatan = (() => {
     const P = vag(F.kaross);
     const h = F.L / 2;
     under(c, b, S, [[F.fram[0], '255,240,210', 0.32], [F.bak[0], '255,60,40', 0.28]]);
+    niga(c, F);
     if (F.oppen) {
       // de som åker i den öppna bilen (före karossen, som täcker dem nedanför axlarna)
       const fo = [F.forare];
@@ -1306,6 +1448,7 @@ window.RumFasadGatan = (() => {
     const tak = S.ton('#c9ccd0');
     const ruta = S.lamps ? '#e6d6a6' : S.glas;
     under(c, b, S, [[F.L / 2 - 4, '255,240,210', 0.32], [-F.L / 2 + 2, '255,60,40', 0.28]]);
+    niga(c, F);
     for (const [x0, x1, fram, bak] of F.delar) {
       const p = new Path2D();
       p.moveTo(x0, -30);
@@ -1403,6 +1546,7 @@ window.RumFasadGatan = (() => {
   function ritaPlog(c, b, dir, S, fart, broms, t) {
     const F = b.F;
     under(c, b, S, [[440, '255,240,210', 0.3], [-430, '255,60,40', 0.25]]);
+    niga(c, F);
     const or = b.c;
     const orM = S.G.mix(or, '#000000', 0.25);
     c.fillStyle = S.ton('#18191c');
@@ -1453,17 +1597,19 @@ window.RumFasadGatan = (() => {
   }
 
   function rita(c, S, lista, t) {
-    for (const { b, f, x, fart, broms } of lista) {
+    for (const { b, f, x, fart, broms, nig } of lista) {
       c.save();
       c.translate(x, f.y);
       c.scale(f.dir * f.k, f.k);
+      NIG = nig || 0;
       if (b.typ === 'buss' || b.typ === 'ledbuss') ritaBuss(c, b, f.dir, S, fart, broms, t);
       else if (b.typ === 'plog') ritaPlog(c, b, f.dir, S, fart, broms, t);
       else ritaBil(c, b, f.dir, S, fart, broms, t, (f.dir * x) / f.k);
       c.restore();
     }
+    NIG = 0;
     c.globalAlpha = 1;
   }
 
-  return { mark, trafik, syns, rita, KANT, FILER, FORM, fordon: { nytt: nyttFordon, valj: valjTyp, BUSS, PLOG } };
+  return { mark, trafik, syns, rita, KANT, FILER, SYNS, FORM, fordon: { nytt: nyttFordon, valj: valjTyp, BUSS, PLOG } };
 })();

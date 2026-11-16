@@ -1340,6 +1340,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   lyktornas och fönstrens sken i stället för att alla är svarta siluetter. Gatan är glesare efter halv sju (`RumUte.trafik`:
   sju gående på dagen, fem till åtta, tre till tio och två sent, en till på fredag och lördag): en regnig måndagskväll
   20.30 syns i snitt en i taget i stället för nästan tre, och halva tiden är trottoaren tom.
+- **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
+  som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
+  långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
+  fönster, bilarna kör ungefär 60 % så fort (de syns i fyra–fem sekunder), och var och en kör som en bil: släpper
+  gasen, bromsar in med bromsljusen tända och tar fart igen, stannar ibland en stund, följer den framför och niger när
+  den bromsar. Se *Bilarna kör ute på gatan, och som bilar* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7062,19 +7068,36 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke,
   skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
-  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
-  gånger så fort som de som går på skärmen, så att en bil syns i ungefär tre sekunder (förut knappt två).
-  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 14 % på dagen och 31 % i
-  rusningen), och i rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in, står med bromsljusen tända (och
-  avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
+  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
+  som de som går på skärmen, så att en bil syns i fyra–fem sekunder (se *Bilarna kör ute på gatan, och som bilar*
+  nedan). Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 18 % på dagen och
+  40 % i rusningen), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
+  bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
   regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
   när det har snöat. Allt räknas ur tiden: den delas i luckor om tolv sekunder per fil och i varje lucka kommer ett
   fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon kommer
-  bara när de i de två luckorna före är ute ur världen, så ingen kör igenom någon. Andra vyer som vill rita samma
+  bara om det aldrig hamnar för nära något som kör före, så ingen kör igenom någon. Andra vyer som vill rita samma
   fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
   efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
   sekunden (30 i telefonen), så att de inte hoppar fram.
+- **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "bilarna verkar åka på samma höjd som
+  gångarna", "åker något långsammare … svårt att se dem" och "de ska bete sig som vanliga bilar". Filerna ligger nu
+  1,3 och 1,72 m ut (förut 1,02 och 1,24, alldeles innanför trottoarkanten, så att hjulen stod i höjd med fötterna på
+  dem som går), med mittlinjen 1,51 m och kanten mittemot 2,02 m ut, och i ett brett fönster syns marken ut till
+  1,95 m (`SYNS`; `vy` i rum-fasad.js tar hälften av det som fattades nertill genom att visa mer och hälften från
+  överkanten). Farten är ungefär 60 % av förut (2,1–2,7 m/s på dagen i den tecknade gatan, 1,9–2,4 i rusningen,
+  2,5–3,2 på natten, bussarna 1,8–2,2), så att en bil syns i fyra–fem sekunder i stället för två–tre, och det kommer
+  ungefär en fjärdedel färre, så att skyltfönstret inte skyms mycket mer än förut. Var och en har sin färd (`D` i
+  rum-fasad-gatan.js: delar med jämn acceleration, `kor`): de flesta kör förbi i jämn fart, men framför affären
+  släpper ibland föraren gasen (utan bromsljus), bromsar in med bromsljusen tända och tar fart igen, eller stannar och
+  står en stund (bussarna stannar inte, plogbilen kör jämnt); oftare i rusningen, sällan på natten. Den som kör efter en
+  annan gör som den, en stund senare och på samma ställe (`efter`, som i Newells modell), så att bromsljusen tänds
+  efter varandra, och ett fordon kommer bara om det aldrig hamnar för nära något framför (`haller`). Karossen niger när
+  de bromsar och reser sig när de tar fart, genom fjädringen: en dämpad svängning efter varje ändring av
+  accelerationen, så att den gungar tillbaka när bilen stannar (`fjader`, `niga`; hjulen står kvar). Provat i en
+  simulering av en timme i varje tid på dygnet (inga fordon i varandra) och i bilder från datorn och telefonen, dag,
+  regnig kväll och snö.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -7082,7 +7105,7 @@ som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som
 och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden utifrån; medan rummet syns i
 övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
-bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
+bron och himlen och gatan ut till den närmre filen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
 ritas om när ljuset eller vädret ändras (en gång i minuten prövas det). Det som rör sig ritas i tre dukar: `rf-fram`
 överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
