@@ -627,7 +627,8 @@ export function poddNyckel(fil) {
 // matcher är hela kupongen, också matcherna utan blad, för innehållet i Helgarderat (public/helgarderat.js).
 // nu är numret som ligger ute: ett blad där för en match som jobbet inte har något eget blad till står kvar
 // (2026-11-13, landskamperna: lagen har inga supporterpoddar eller forum, och deras blad är handskrivna i
-// data/poddsidor.json, "hand": true). Det gäller bara samma omgång (samma lördag; numret kan vara lagt innan
+// data/poddsidor.json, "hand": true; sedan 2026-11-16 skriver jobbet dem ur förbundet och landets sportpress,
+// config/utland.js, men ett handskrivet blad går före jobbets). Det gäller bara samma omgång (samma lördag; numret kan vara lagt innan
 // omgångens id fanns).
 // Ett handskrivet nummer kan ha hela kupongen, också matcher som sajten inte har (2026-11-16, Europatipset 2625:
 // "Självklart ska det vara med alla matcher", med två matcher i spanska andraligan som sajten saknar). Har numret
@@ -652,6 +653,10 @@ export function poddsidor(fil, round, nu = null) {
     : round.matcher.map((x, i) => ({ id: String(x.id), nr: i + 1, match: x.match || null, avspark: x.avspark || null }));
   const sidor = matcher.map((x) => {
     const s = egen[x.id];
+    // Ett blad som skrevs för hand för samma omgång står kvar, också när jobbet har skrivit ett eget (sedan
+    // 2026-11-16 skriver jobbet blad för landskamperna också, config/utland.js).
+    const hand = forra.get(x.id);
+    if (hand && hand.hand) return { ...hand, nr: x.nr, avspark: x.avspark || hand.avspark || null };
     if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => (d.grupper || []).length || (d.text || []).length)) {
       const kvar = forra.get(x.id);
       return kvar ? { ...kvar, nr: x.nr, avspark: x.avspark || kvar.avspark || null } : null;

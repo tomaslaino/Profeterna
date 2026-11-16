@@ -148,7 +148,7 @@ export async function letaArtiklar({ lag, mot = null, avspark = null, now = () =
   const r = await claude({
     system: cfg.letaPrompt.replace('{dagar}', cfg.dagar).replace('{sokningar}', cfg.sokningar).replace('{artiklar}', cfg.artiklar),
     prompt: [
-      `Idag är det ${nowFmt.format(now())}.`, `Klubben: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
+      `Idag är det ${nowFmt.format(now())}.`, `${cfg.lagOrd || 'Klubben'}: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
       bing.length ? `\nVeckans nyheter om klubben i Bing News (de räknas som träffar i dina sökningar):\n${bing.map((b) => `- ${b.datum.slice(0, 10)} ${b.kalla}: "${b.titel}" ${b.adress}`).join('\n')}` : '',
     ].filter(Boolean).join('\n'),
     tools: ['WebSearch'], model: cfg.model, effort: cfg.letaEffort, timeoutMs: cfg.timeoutMs,

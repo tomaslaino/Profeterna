@@ -4,7 +4,8 @@
 // src/analyser/poddar.mjs, forum.mjs och media.mjs). Körs på iMacen av launchd (se.matchfixarna.poddar) på
 // tiderna i config/poddar.js: läser lagens forum, letar upp och läser veckans artiklar i de insatta medierna,
 // hos klubben och i lokaltidningen, det supportrarna i förra klubben har skrivit om lagets nya tränare eller
-// spelare (config/forra.js, src/analyser/forra.mjs), hittar poddarna för lagen i gängets
+// spelare (config/forra.js, src/analyser/forra.mjs), för landslagen och klubbarna utanför England bara förbundets,
+// klubbens och landets sportpress artiklar (config/utland.js), hittar poddarna för lagen i gängets
 // omgång, skriver ut veckans avsnitt med whisper.cpp och låter Claude Code (claude -p på
 // Claude-kontot) ta ut det mest intressanta inför matcherna.
 //
@@ -34,6 +35,8 @@
 //   node scripts/tidning/poddar.mjs --utan-media         utan de insatta medierna
 //   node scripts/tidning/poddar.mjs --bara-lokal         bara klubben, lokaltidningen och motståndarens intervju
 //   node scripts/tidning/poddar.mjs --utan-lokal         utan dem
+//   node scripts/tidning/poddar.mjs --bara-utland        bara landslagen och klubbarna utanför England
+//   node scripts/tidning/poddar.mjs --utan-utland        utan dem
 //   node scripts/tidning/poddar.mjs --bara-forra         bara förra klubben, också när den är avstängd (fr.pa)
 //   node scripts/tidning/poddar.mjs --utan-forra         utan förra klubben
 //   node scripts/tidning/poddar.mjs --traff              prövar bara omgångens spelade matcher och visar källornas
@@ -50,13 +53,14 @@ import pc from '../../config/poddar.js';
 import fc from '../../config/forum.js';
 import mc from '../../config/media.js';
 import lc from '../../config/lokal.js';
+import uc from '../../config/utland.js';
 import fr from '../../config/forra.js';
 import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
 import { lasForum, taUtForum, lasningsNyckel, forumPoster, forumenAv, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
 import { letaArtiklar, lasArtikel, nyaArtiklar, lastaAvAndra, renAdress, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
 import { letaForra, lasForraSida, forraSkaLetas, kandaNya } from '../../src/analyser/forra.mjs';
-import { senasteTid, nastaTid } from '../../src/analyser/tider.mjs';
+import { senasteTid, nastaTid, egenTid } from '../../src/analyser/tider.mjs';
 import { provaOmgangen, kallornasTraff, traffText } from '../../src/analyser/traff.mjs';
 import { appleKandidater, fragaEfterPoddar, levandePoddar, skaLetas, hamtaFlode, valjAvsnitt, skrivUt, taUt, whisperLedtrad, poddUnderlag, forumUnderlag, mediaUnderlag, lokalUnderlag, forraUnderlag, sidansUnderlag, sidNyckel, skrivSida } from '../../src/analyser/poddar.mjs';
 
@@ -76,6 +80,8 @@ const BARA_MEDIA = flagga('--bara-media');
 const UTAN_MEDIA = flagga('--utan-media');
 const BARA_LOKAL = flagga('--bara-lokal');
 const UTAN_LOKAL = flagga('--utan-lokal');
+const BARA_UTLAND = flagga('--bara-utland');
+const UTAN_UTLAND = flagga('--utan-utland');
 const BARA_FORRA = flagga('--bara-forra');
 const UTAN_FORRA = flagga('--utan-forra');
 const BARA_TRAFF = flagga('--traff');
@@ -84,10 +90,11 @@ const BARA_TRAFF = flagga('--traff');
 const PA_TID = !ARGV.length;
 // Vad som körs: forumen, de insatta medierna, klubben och lokaltidningen, och poddarna (informationssidorna
 // skrivs alltid).
-const BARA = BARA_SIDOR || BARA_FORUM || BARA_MEDIA || BARA_LOKAL || BARA_FORRA || BARA_TRAFF;
+const BARA = BARA_SIDOR || BARA_FORUM || BARA_MEDIA || BARA_LOKAL || BARA_UTLAND || BARA_FORRA || BARA_TRAFF;
 const MED_FORUM = !UTAN_FORUM && (!BARA || BARA_FORUM);
 const MED_MEDIA = !UTAN_MEDIA && (!BARA || BARA_MEDIA);
 const MED_LOKAL = !UTAN_LOKAL && (!BARA || BARA_LOKAL);
+const MED_UTLAND = !UTAN_UTLAND && (!BARA || BARA_UTLAND);
 // Förra klubben är avstängd (fr.pa i config/forra.js); --bara-forra kör den ändå.
 const MED_FORRA = BARA_FORRA || (fr.pa && !UTAN_FORRA && !BARA);
 const MED_PODDAR = !BARA;
@@ -96,7 +103,8 @@ const TYPORD = { forum: 'forumet ', media: 'insatta ', lokal: 'lokalt ', motstan
 
 const HEM = os.homedir();
 const MAPP = process.env.PODDAR_MAPP || path.join(HEM, 'Library', 'Application Support', 'Matchfixarna', pc.mapp);
-const LOGG = path.join(HEM, 'Library', 'Logs', 'Matchfixarna', 'poddar.log');
+// (PODDAR_MAPP och PODDAR_LOGG: en annan mapp och logg, för prov som inte ska röra nattjobbets filer)
+const LOGG = process.env.PODDAR_LOGG || path.join(HEM, 'Library', 'Logs', 'Matchfixarna', 'poddar.log');
 const REGISTER = path.join(MAPP, 'register.json');
 const FORUMREG = path.join(MAPP, 'forum.json');
 const FORRAREG = path.join(MAPP, 'forra.json');
@@ -155,29 +163,39 @@ function annanUtskrift() {
 // tiden). En tid som missas medan datorn sover körs när den vaknar, och en körning som stoppas
 // försöks igen vid nästa start. Saknas filen räknas den senaste tiden som körd, så att ett nytt
 // schema inte ger en extra körning. → {dags, tid, nasta}
-function schemat(now = Date.now()) {
+// Europatipset har egna tider (egenTid i src/analyser/tider.mjs): när omgången är ny och det sista dygnet före
+// första avsparken. round: gängets omgång, eller null.
+function schemat(now = Date.now(), round = null) {
   const tid = senasteTid(now, pc.tider || []);
   const nasta = nastaTid(now, pc.tider || []);
   const fil = lasJson(TIDER, null);
   if (!fil) { skrivJson(TIDER, { senast: new Date(tid).toISOString() }); return { dags: false, tid, nasta }; }
-  return { dags: tid > (Date.parse(fil.senast) || 0), tid, nasta };
+  if (tid > (Date.parse(fil.senast) || 0)) return { dags: true, tid, nasta };
+  const varfor = egenTid(round, fil, { now, foreTimmar: pc.foreAvspark });
+  return varfor ? { dags: true, tid: now, nasta, varfor } : { dags: false, tid, nasta };
 }
 const klockan = (ms) => (ms ? new Date(ms).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm', weekday: 'long', hour: '2-digit', minute: '2-digit' }) : '–');
 
-// Lagen som har en match kvar i omgången. → [{lag, mot, avspark, spelare}]
+// Ligorna där lagen är engelska: deras lag läses i poddarna, forumen, de insatta medierna och lokaltidningen.
+const ENGELSKA = new Set(['pl', 'ch', 'l1', 'l2', 'nl']);
+
+// Lagen som har en match kvar i omgången. utland: ett landslag eller en klubb utanför England (laget har ingen
+// engelsk liga i sajtens data), som bara läses i config/utland.js. → [{lag, mot, avspark, spelare, match, utland}]
 async function omgangensLag(round) {
   const ut = [];
   for (const x of round.matcher) {
     if (Date.parse(x.avspark) <= Date.now()) continue;
     const d = await hamta(`${site}/data/match/${x.id}.json?t=${Date.now()}`).catch(() => null);
-    // Landslagen har inga supporterpoddar, forum eller lokaltidningar att läsa: deras matchblad skrivs för hand
-    // (2026-11-13), och de står kvar när bladen läggs ut (poddsidor i src/analyser/poddar.mjs).
-    if (d && d.match && d.match.type === 'intl') continue;
+    // Landslagen har inga supporterpoddar, forum eller lokaltidningar att läsa. Deras matchblad skrevs för hand
+    // (2026-11-13) och bygger sedan 2026-11-16 på förbundet och landets sportpress (config/utland.js).
+    const intl = Boolean(d && d.match && d.match.type === 'intl');
+    const utland = (s) => intl || Boolean(d && d.teams && d.teams[s] && !(d.teams[s].league && ENGELSKA.has(d.teams[s].league.id)));
     const par = d && d.match && d.match.home ? [d.match.home, d.match.away] : String(x.match || '').split(/\s+[–-]\s+/);
     if (par.length !== 2) continue;
     const trupp = (s) => (d && d.squads && d.squads[s] && Array.isArray(d.squads[s].players) ? d.squads[s].players.map((p) => p && p.name).filter(Boolean) : []);
     const spelare = [...trupp('home'), ...trupp('away')];
-    ut.push({ lag: par[0], mot: par[1], avspark: x.avspark, spelare, match: String(x.id) }, { lag: par[1], mot: par[0], avspark: x.avspark, spelare, match: String(x.id) });
+    ut.push({ lag: par[0], mot: par[1], avspark: x.avspark, spelare, match: String(x.id), utland: utland('home') },
+      { lag: par[1], mot: par[0], avspark: x.avspark, spelare, match: String(x.id), utland: utland('away') });
   }
   return ut;
 }
@@ -330,6 +348,8 @@ async function lasMedierna(fil, lagen, { cfg = mc, vad = 'de insatta medierna' }
       if (!hittade.length) { logg(`${l.lag}: inga artiklar i ${vad}`); continue; }
       const lasta = [];
       for (const a of hittade) {
+        // (config/utland.js: Claude föreslår fler än som läses, eftersom många tidningar är spärrade här)
+        if (cfg.lasHogst && lasta.length >= cfg.lasHogst) break;
         try {
           lasta.push(await lasArtikel(a, { cfg }));
         } catch (err) {
@@ -490,8 +510,12 @@ async function sidorna(fil, matcher) {
 
 async function main() {
   if (VISA) { visa(lasJson(OMGANG, {})); return; }
-  const schema = PA_TID ? schemat() : null;
+  // Gängets omgång före schemat: Europatipset har egna tider (egenTid). Går den inte att hämta gäller tiderna.
+  const fran = !ETT_LAG && !PROV && !VISA ? await hamta(`${samtalUrl}?t=${Date.now()}`).catch(() => null) : null;
+  const aktuell = fran && fran.ok && fran.samtal && Array.isArray(fran.samtal.matcher) && fran.samtal.matcher.length ? fran.samtal : null;
+  const schema = PA_TID ? schemat(Date.now(), aktuell) : null;
   if (schema && !schema.dags) { logg(`inte dags, nästa gång ${klockan(schema.nasta)}`); return; }
+  if (schema && schema.varfor) logg(`${aktuell.id}: ${schema.varfor} (${aktuell.spel && aktuell.spel.namn ? aktuell.spel.namn : 'inte Stryktipset'})`);
   const fel = betalvagar();
   if (fel.length) { logg(`STOPP: ${fel.join(', ')} är satt. Då skulle Claude Code kunna debiteras som API. Ta bort variabeln.`); process.exit(1); }
   if (!tagLas()) { logg('en körning pågår redan'); return; }
@@ -531,8 +555,7 @@ async function main() {
     round = { id: `prov:${ids.join(',')}`, matcher };
     lagen = await omgangensLag(round);
   } else {
-    const j = await hamta(`${samtalUrl}?t=${Date.now()}`);
-    round = j && j.ok && j.samtal && Array.isArray(j.samtal.matcher) && j.samtal.matcher.length ? j.samtal : null;
+    round = aktuell;
     if (!round) { logg('ingen omgång just nu'); return; }
     lagen = await omgangensLag(round);
     if (!lagen.length) { logg(`${round.id}: alla matcher har börjat`); return; }
@@ -541,9 +564,13 @@ async function main() {
   const register = lasJson(REGISTER, {});
   const forumreg = lasJson(FORUMREG, {});
   const forrareg = lasJson(FORRAREG, {});
+  // De engelska lagen läses i poddarna, forumen, de insatta medierna, lokaltidningen och förra klubben;
+  // landslagen och klubbarna utanför England bara i config/utland.js.
+  const engelska = lagen.filter((l) => !l.utland);
+  const utlandet = lagen.filter((l) => l.utland);
   try {
-    if (MED_FORUM) await fyllForum(forumreg, lagen.map((l) => l.lag));
-    if (MED_PODDAR) await fyllRegistret(register, lagen.map((l) => l.lag));
+    if (MED_FORUM && engelska.length) await fyllForum(forumreg, engelska.map((l) => l.lag));
+    if (MED_PODDAR && engelska.length) await fyllRegistret(register, engelska.map((l) => l.lag));
   } catch (err) {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
@@ -565,16 +592,18 @@ async function main() {
   let nyaMedia = 0;
   let nyaLokal = 0;
   let nyaForra = 0;
+  let nyaUtland = 0;
   try {
-    if (MED_FORUM) nyaForum = await lasForumen(fil, forumreg, lagen);
-    if (MED_MEDIA) nyaMedia = await lasMedierna(fil, lagen);
-    if (MED_LOKAL) nyaLokal = await lasMedierna(fil, lagen, { cfg: lc, vad: 'klubben och lokaltidningen' });
-    if (MED_FORRA) nyaForra = await lasForra(fil, forrareg, lagen);
+    if (MED_FORUM) nyaForum = await lasForumen(fil, forumreg, engelska);
+    if (MED_MEDIA) nyaMedia = await lasMedierna(fil, engelska);
+    if (MED_LOKAL) nyaLokal = await lasMedierna(fil, engelska, { cfg: lc, vad: 'klubben och lokaltidningen' });
+    if (MED_UTLAND) nyaUtland = await lasMedierna(fil, utlandet, { cfg: uc, vad: 'förbundet, klubben och landets sportpress' });
+    if (MED_FORRA) nyaForra = await lasForra(fil, forrareg, engelska);
   } catch (err) {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
   }
-  for (const l of MED_PODDAR ? lagen : []) {
+  for (const l of MED_PODDAR ? engelska : []) {
     const poddar = (register[l.lag] && register[l.lag].poddar) || [];
     if (!poddar.length) continue;
     const post = fil.lag[l.lag] || (fil.lag[l.lag] = { mot: l.mot, avsnitt: [] });
@@ -625,8 +654,8 @@ async function main() {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
   }
-  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${nyaMedia} ur de insatta medierna, ${nyaLokal} ur klubben och lokaltidningen, ${nyaForra} ur förra klubben, ${sidor} sidor`);
-  if (schema) skrivJson(TIDER, { senast: new Date(schema.tid).toISOString() });
+  if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${nyaMedia} ur de insatta medierna, ${nyaLokal} ur klubben och lokaltidningen, ${nyaUtland} ur förbundet och landets press, ${nyaForra} ur förra klubben, ${sidor} sidor`);
+  if (schema) skrivJson(TIDER, { senast: new Date(schema.tid).toISOString(), ...(round ? { omgang: round.id } : {}) });
   if ((ETT_LAG || PROV) && !TORRT) visa(fil);
 }
 

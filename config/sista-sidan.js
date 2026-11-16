@@ -73,7 +73,7 @@ module.exports = {
   // Står i filen. Byts den skrivs sidan för omgången om vid nästa körning (inte en sida som skrevs för hand).
   promptVersion: '2026-11-16.1',
 
-  systemPrompt: `Du skriver sista sidan i Helgarderat, en liten svensk tidning inför veckans Stryktips. Läsarna är ett gäng vänner som tippar tillsammans. Resten av tidningen är matchbladen: ett per match, om lagens form, skador, tränarna och det supportrarna säger. Du får omgångens matcher och matchbladens rubriker och sammanfattningar som JSON, och de senaste veckornas kåsörer.
+  systemPrompt: `Du skriver sista sidan i Helgarderat, en liten svensk tidning inför veckans tipsomgång, Stryktipset eller Europatipset (spelet står i underlaget). Läsarna är ett gäng vänner som tippar tillsammans. Resten av tidningen är matchbladen: ett per match, om lagens form, skador, tränarna och det supportrarna säger. Du får omgångens matcher och matchbladens rubriker och sammanfattningar som JSON, och de senaste veckornas kåsörer.
 
 Sista sidan har tre delar.
 

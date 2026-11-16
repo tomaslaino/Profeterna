@@ -3007,6 +3007,29 @@ inte rör varandras poster, sidans och tidningens underlag och redaktörens nyck
 blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
 inget som sticker ut åt sidan. Inte provat på iMacen eller med en riktig intervju i motståndarens medier.
 
+**Landslagen och klubbarna utanför England** (2026-11-16, användarens val: nattjobbet ska göra tidningen för varje
+Europatipset av sig självt, *"som för Stryktipset, så att inget behöver skrivas för hand"*): förut hoppade nattjobbet
+över landskamperna, och deras matchblad skrevs för hand (se *Landskamperna i Helgarderat* under
+[Tidningen](#tidningen)). Nu läses ett landslag eller en klubb utanför England (ett lag som inte har någon engelsk
+liga i sajtens matchdata, `ENGELSKA` i scripts/tidning/poddar.mjs) med samma kod som klubben och lokaltidningen men
+med [config/utland.js](config/utland.js) som `cfg`, och bara där: inga poddar, forum, insatta medier eller förra
+klubben, som alla är engelska källor. Claude söker (utan Bing, som söker på engelska i Storbritannien) efter
+förbundets eller klubbens egen sajt (`forbundet`, `klubben`) och landets sportpress (`pressen`), på lagets eget
+språk. Många utländska tidningar är spärrade på iMacen, så Claude föreslår upp till åtta artiklar och jobbet läser de
+fyra första som går att läsa (`lasHogst`). Citatet står på artikelns språk och prövas mot texten som förut, och
+översättningen trycks. Artiklarna sparas som klubbens och lokaltidningens (`typ: 'lokal'`, id på `u`), så att
+matchbladet och tidningen tar dem som de tar lokaltidningens. Ett blad som har skrivits för hand för samma omgång går
+före jobbets (`poddsidor` i src/analyser/poddar.mjs).
+
+Europatipset har inga fasta dagar, så för en omgång i ett annat spel än Stryktipset går poddjobbet också första
+natten efter att omgången har startats och igen när det är mindre än 30 timmar kvar till första avsparken
+(`foreAvspark` i config/poddar.js, `egenTid` i src/analyser/tider.mjs, med den senast genomgångna omgången i
+tider.json). Stryktipset går som förut på tiderna. När matchbladen har kommit skriver det andra nattjobbet sista sidan
+och löpsedeln, som för Stryktipset. Prompterna för matchbladet, sista sidan och löpsedeln säger nu Stryktipset eller
+Europatipset. Matcher som sajten inte har (andra ligor, damernas Champions League) kommer inte med i gängets omgång
+och får därför inget blad. `node scripts/tidning/poddar.mjs --prov 401861195 --bara-utland` provar läsningen på en
+landskamp; `PODDAR_MAPP` och `PODDAR_LOGG` lägger provet utanför nattjobbets filer.
+
 **Förra klubben** (2026-11-14, användarens val bland förslagen till nya källor; **avstängd** samma dag, se nedan): när ett lag har en ny tränare eller en
 ny spelare som spelar mycket, vad har supportrarna i hans förra klubb skrivit om honom den senaste veckan? De har sett
 honom i flera år och följer ofta hur det går för honom. Bara det som är skrivet de senaste sju dagarna (användaren samma
