@@ -7652,22 +7652,20 @@ rubriken byter sida, och ett klick på en rad, mellanslaget eller ▶ spelar den
 bildens 16:9, så att den syns hel när rutan fyller fönstret. När kassetten matas ut kommer
 listan tillbaka på samma sida, med den markerad.
 
-**Nära** (klick eller V) går kameran fram tills tv:ns och lådans framsidor fyller bilden över
-raden med tangenterna, så att etiketterna på kassetterna går att läsa (tv:ns sida får skäras
-bort), och svänger samtidigt runt tv:n in mot rummet, så att man ser rutan snett framifrån i
-stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
-de står kvar längs disken – utan det är kameran som rör sig (se *Kamerans sväng* och
-*Rummet runt tv:n* nedan).
+**Nära** (klick eller V) lyfts tv:n och lådan ur rummet, som mörknar bakom, och kommer fram mot
+en medan de vänder sig, tills deras framsidor står rakt framifrån och fyller bilden över raden med
+tangenterna, så att etiketterna på kassetterna går att läsa – som datorn (se *Fram ur rummet*
+nedan).
 Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
 fram till lådan (`LADAN`), så att etiketterna går att läsa; där tar en kassett (eller ett
 tryck på kanten av tv:n bredvid lådan) kameran vidare till rutan. I telefonen, på höjden och på bredden, spelas en kassett alltid med rutan i hela fönstret. Ett klick på rutan (eller hjulet framåt)
 går ännu närmare, så att bilden i rutan och spalten med knapparna nästan fyller fönstret (med en smal kant
-runt om, så att bildens gräns syns; knapparna står inom bildens höjd och går att trycka på också här), och kameran
-svänger och går rakt framför tv:n, så att rutan syns rakt framifrån. Texten i rutan (*STOPP*,
+runt om, så att bildens gräns syns; knapparna står inom bildens höjd och går att trycka på också här): tv:n
+kommer ännu närmare, rakt framför rutan. Texten i rutan (*STOPP*,
 *▶ SPELA*) står inne i bilden, så att den syns där. Ett klick till, hjulet bakåt eller Esc går
 tillbaka till tv:n och lådan, och V,
-Esc eller ett klick utanför hörnet tillbaka till rummet, där kameran svänger tillbaka till
-där den stod. Ett klick på en kassett: den
+Esc eller ett klick utanför hörnet tillbaka till rummet, där tv:n och lådan vänder sig tillbaka
+och landar på disken. Ett klick på en kassett: den
 lyfts (ur lådan dras den först ut genom öppningen), ställs framför facket och skjuts in,
 luckan fälls upp, och de ovanför sjunker ner i
 luckan i facket. Rutan är blå med *▶ SPELA* tills bilden kommer, och klippet spelas i
@@ -7810,50 +7808,35 @@ av etiketterna syntes. Där ritas det innanför öppningen på ett enda plan pre
 samma färger som det syns snett från höger (`.platt`, `ladaYtor`), och kassetternas tak och ändar finns
 bara med när de lyfts eller när man pekar på dem.
 
-**Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
-riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
-förstoringen: rummets plan vrids 34 grader i 3D kring tv:n (`sving` i rum.js), och hörnet –
-tv:n, högen och lådan, som är lådor i 3D i rummets eget perspektiv – ritas från samma
-håll, 34 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i rum-video.js), så att tv:n och lådan står kvar
-parallellt med väggen; mer än så går inte rummet att vrida utan att gänget och radion kommer in i bild.
-Till 2026-11-16, då tv:n stod snett mot gänget, ritades hörnet 46 grader runt, tolv mer än rummet, för att
-etiketterna skulle stå mer framifrån; parallellt med disken står de nu ännu mer framifrån. Lådans bortre ände kommer då mot en,
-så hörnet flyttas också lite uppåt (`lyft`), annars skulle lådan hänga utanför disken. När bilden fyller fönstret ritas hörnet 90 grader runt (`VRID`), så att rutan
-står parallellt med bilden, och ögat (perspektivets mitt i hörnet) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
-så vänd mot det vanliga ögat blev rutan sned som i kanten av ett vidvinkelfoto, och därifrån
-skymde lådan rutans vänstra kant. Planen vrids som de är, och väggen, skårtavlan, korktavlan och
-disken följer med; tv:n och lådan ses från det nya hållet. Hörnets eget plan vrids inte: det
-står där rummet vrids kring, och Chrome ritar allt som lutar i perspektiv suddigt nära. Det
-flyttas i stället fram lika långt som väggen vrids fram och görs lika mycket mindre, så att det
-syns där det syntes – räknat längs synlinjen genom bildens vänstra kant (eller lådans, om den
-står längre ut), där den möter den vridna väggen, och vid rutan från där kameran kom (`kant` i
-`sving` och `vkant` i rum.js). Förut räknades bara till lådans kant, och Chrome lät då väggen
-skära av lådan och halva tv:n nära (provat i Chrome 153 utan synligt fönster). Hörnet går
-högst till 20 enheter bakom planet -330. Större vinklar på rummet går inte: vid ungefär 40
-grader glider fönsterbänken in över lådan och lådan ser ut att sväva över disken. Nära tar bara
-hörnet emot klick – med kameran svängd räknade Chrome annars kortregistret på disken bakom
-lådan som närmast, och kassetterna i lådan gick inte att klicka på. Med `prefers-reduced-motion`
-och i fasta bilder står kameran direkt i vinkeln.
+**Fram ur rummet** (2026-11-16, "som att TV:n närmar sig skärmen och inte tvärtom", som datorn).
+När man går till videon står rummet nästan still: det går en fjärdedel närmare och halvvägs mot
+hörnet, som mot datorn, och mörknar bakom ett draperi (`#rum-vmork`, ljusast mitt i fönstret som
+`.reg-bak` vid datorn). Tv:n och lådan lyfts i stället ur rummet och kommer fram mot en på 0,6
+sekunder, medan de vänder sig 90 grader (`VRID`) tills man ser deras framsidor rakt framifrån
+(`SVANG.nara`, med ögat – perspektivets mitt i hörnet – rakt framför dem); närmare rutan kommer tv:n
+ännu närmare, rakt framför rutan (`SVANG.tat`), tills bilden fyller fönstret. Förstoringen ändras lika
+många procent i varje steg, som vägen till tv:n (`zoomVag`). Skuggorna och skenet på disken tonar
+bort så länge de är lyfta och tillbaka när de har landat. Till 2026-11-16 var det tvärtom: hela rummet
+gick fram till hörnet och svängde 34 grader runt tv:n (rummets plan vreds i 3D och väggen och disken
+runt tv:n ritades i hörnet), och gänget for förbi i förgrunden.
 
-**Rummet runt tv:n.** Mellan lådan och rutan går kameran 82 grader till runt tv:n, men rummets
-plan bara 4: med bara dem såg det ut som att tv:n vände sig mot en på disken medan väggen bakom
-stod still, i stället för att kameran gick runt den. Därför finns väggen bakom tv:n – med
-Tipsligan och korktavlan – och bardisken som den står på också i 3D i hörnets eget perspektiv
-(`rumYtor` och `.vhs-rum` i rum-video.js), i `.vhs-kam`, så att de svänger med tv:n och lådan:
-tv:n står kvar på disken mot väggen, och väggen vrids fram bakom den tills den står nästan rakt
-framför kameran när rutan fyller bilden. Måtten är rummets (bg, `disk` och `VAGG` i rum.js);
-hörnet är rummet förstorat 2⅓ gånger kring ögat (`SK`), så att disken hamnar under tv:ns fot och
-väggen där tv:n tar i den. Väggen och disken har rummets toner (`toning`), fronten fyllningarna
-och krokarna och skivan strimmorna och fogarna; Tipsligan och korktavlan är kopior av tavlorna i
-rum.js när man går fram (`tavlor`), utan ramarna i 3D. Diskens front står 9 enheter längre ut än
-i rummet, under skivans kant: ett plan som går genom tv:n eller lådan delar Chrome dem längs, och
-då syntes ett svart streck genom rutan. Rummet runt tv:n finns bara på vägen till rutan, vid den
-och på vägen tillbaka (`.vhs-tat`, `.vhs-runt`): det tonar in över de målade planen på 0,2
-sekunder när kameran börjar, och ut de sista 0,25 sekunderna tillbaka (hela vägen hem till rummet
-tidigare, `.vhs-hem`, innan dess kanter syns). I telefonen och Safari tonar det bort när kameran
-har stannat vid rutan med en kassett i, som väggen i rum.js gör där, och tas bort med lådan
-(`utanLada`). Ytorna ritas i rummets mått och förstoras (väggen och fronten i halva, kopiorna i
-dubbla), så att lagren är små. Med `prefers-reduced-motion` syns det direkt vid rutan.
+Rummets värld är därför tre lager i djupets ordning (`build` i rum.js): bakväggen (planet -600),
+videohörnet (-598, i `#rum-lyft`) och resten (-470 till 0). De ligger i var sin 3D-värld som ritas
+i den ordningen, så hemma ser det ut som förut, och musens vridning sätts på alla tre samtidigt
+(`varldar` och `stil` i `setCam`, `folj` och `vrid`; `H.world` i rum-hasse.js). Planen räknas i
+samma ordning som förut (`.rum-world > .rum-pl`). När man går till videon läggs `#rum-lyft` och
+draperiet över resten (`.vid-lyft`), och `#rum-lyft` får en egen förstoring inne i kameran (`lyft`):
+kameran gör rummets lilla förflyttning och `#rum-lyft` resten. Inget i hörnet flyttas i sidan –
+YouTubes spelare laddas om när den flyttas, och ett pausat klipp ska spela vidare när man kommer
+tillbaka. `.vid-lyft` tas bort först när hörnet har landat. Hörnets läge läses inte av med
+`getComputedStyle` utom mitt på vägen (`R.lyftNu`): det räknade om stilen inne i klicket, och som
+svag telefon (processorn ×4) gav det en bildruta på 50 ms när man gick hem. Mätt med
+`requestAnimationFrame` under V och Esc som svag telefon och svag dator: inga fler långa bildrutor
+än förut. Draperiet ritas i en åttondel av storleken och förstoras (`VMORK`): Safari ritar ett lager i
+sin egen storlek gånger pixeltätheten. I telefonen och Safari tonar det som syns mörkt bakom
+draperiet bort när kameran har stannat (`lattVideo`) i stället för att försvinna på en gång.
+Inte provat i Safari eller iPhone. Nära tar bara hörnet emot klick, och ett klick utanför går
+tillbaka. Med `prefers-reduced-motion` och i fasta bilder står det direkt framme.
 
 Hörnet ritas i sex gånger storleken och förminskas, som tv:n, och dubbelt till (`zoom: 2`)
 när rutan fyller bilden (det andra klicket), så att det är skarpt också där; ritningarna är
@@ -7884,8 +7867,8 @@ en upptagen huvudtråd inte hindrar det:
   upp målades förut hela tv:ns framsida med kornet om i varje bildruta.
 - Kassetterna som sjunker ner i luckan (eller stiger när en kommer tillbaka) glider med `translate`
   (`layout`); en övergång på `top` lade ut hela hörnet i varje bildruta medan kassetten lyftes.
-- Klassen `vid-nara` räknar om stilen för hela rummet. Den sätts sist i `zoomVideo`, efter `vrid` och
-  `svingForm` som läser av stilen: förut gjordes omräkningen inne i klicket och en gång till i nästa
+- Klassen `vid-nara` räknar om stilen för hela rummet. Den sätts sist i `zoomVideo`, efter `vrid`
+  som läser av stilen: förut gjordes omräkningen inne i klicket och en gång till i nästa
   bildruta, och kameran stod still en stund innan den gick.
 - Etiketterna mäts alla först och får sin storlek sedan (`passa`): förut lades hörnet ut en gång per
   kassett, 26 gånger, när skärpan byttes.

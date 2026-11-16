@@ -68,6 +68,45 @@ html.rum-vantar body > footer { visibility: hidden; animation: rum-vantar 0s 5s 
    still, nära och på håll (ett lager med will-change: transform behåller sin
    skärpa). */
 .rum.chromium .rum-kamera { transform: translate(0px, 0px) scale(1) perspective(100000px); }
+/* Videohörnet i ett eget lager (#rum-lyft, build i rum.js) med samma
+   perspektiv som kameran ger världen: hemma mellan bakväggen och resten, som
+   om det låg i samma värld, och nära videon ovanpå allt och det mörka
+   draperiet, medan det kommer fram mot en (zoomVideo). */
+.rum-lyft {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1600px;
+  height: 1000px;
+  perspective: 1400px;
+  perspective-origin: 800px 500px;
+  transform-origin: 800px 500px;
+  transform: translate(0px, 0px) scale(1);
+  pointer-events: none;
+}
+.rum.chromium .rum-lyft { transform: translate(0px, 0px) scale(1) perspective(100000px); }
+/* rummet mörknar bakom videon, som bakom datorn (.reg-bak i
+   rum-register.css): ljusast mitt i fönstret (aimVideo lägger det över det
+   som syns och toningen dit). Det ritas i en åttondel av storleken och
+   förstoras (VMORK i rum.js), så att det tar lite minne i Safari. */
+.rum-vmork {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 125px;
+  transform-origin: 0 0;
+  transform: scale(8);
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  background: rgba(10, 8, 6, 0.8);
+  transition: opacity 0.5s ease, visibility 0s 0.5s;
+}
+.rum.vid-lyft .rum-vmork { z-index: 1; }
+.rum.vid-lyft .rum-lyft { z-index: 2; }
+.rum.vid-nara .rum-vmork { opacity: 1; visibility: visible; transition: opacity 0.45s ease; }
 .rum-world {
   position: absolute;
   left: 0;
@@ -441,7 +480,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-sakfot.on { opacity: 1; pointer-events: auto; transition: opacity 0.4s 0.4s; }
 .rum-sakfot .pokaler { display: inline-flex; gap: 26px; font: 600 21px/1.4 Fraunces, Georgia, serif; color: #e9dfc8; text-shadow: 0 1px 8px #000; }
 .rum-sakfot .pokaler b { font-weight: 700; letter-spacing: 0.04em; }
-@media (prefers-reduced-motion: reduce) { .rum-sakfot, .rum-sakfot.on, .rum.sak-nara .rum-world, .rum-pl.forbi, .rum-pl.glid, .rum-pl3d > .rum-inr { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .rum-vmork, .rum.vid-nara .rum-vmork, .rum-sakfot, .rum-sakfot.on, .rum.sak-nara .rum-world, .rum-pl.forbi, .rum-pl.glid, .rum-pl3d > .rum-inr { transition: none; } }
 
 /* ---------- tv:n: rum-tv.css ---------- */
 

@@ -82,7 +82,8 @@ window.RumHasse = (() => {
     H.glipa = sving.querySelector('.rh-glipa');
     H.front.append(stage);
     H.sving = sving;
-    H.world = stage.querySelector('.rum-world');
+    // (rummets värld i tre lager, build i rum.js: de vrids lika)
+    H.world = [...stage.querySelectorAll('.rum-world')];
     const vy = document.createElement('div');
     vy.className = 'rum-hasse-vy';
     vy.id = 'rum-hasse-vy';
@@ -1423,7 +1424,7 @@ window.RumHasse = (() => {
     if (H.upptagen) lasNu();
     // rummet står still medan man tittar åt hans håll, och rätar upp sig efter musen på vägen
     if (window.Rum && Rum.vila) Rum.vila(true);
-    Object.assign(H.world.style, { transition: 'transform 0.2s ease-out, translate 0.2s ease-out, rotate 0.2s ease-out', translate: 'none', rotate: 'none', transform: 'translateZ(-330px) rotateX(0deg) rotateY(0deg) translateZ(330px)' });
+    for (const w of H.world) Object.assign(w.style, { transition: 'transform 0.2s ease-out, translate 0.2s ease-out, rotate 0.2s ease-out', translate: 'none', rotate: 'none', transform: 'translateZ(-330px) rotateX(0deg) rotateY(0deg) translateZ(330px)' });
     H.fig.rita(H.T, performance.now() / 1000);
     H.svanger = true;
     if (calm()) { tona(1, framme); return; }
@@ -1547,7 +1548,7 @@ window.RumHasse = (() => {
   function hemma() {
     H.svanger = false;
     if (window.Rum && Rum.vila) Rum.vila(false);
-    H.world.style.transition = '';
+    for (const w of H.world) w.style.transition = '';
     H.rum.classList.remove('hasse-pan', 'hasse-framme');
     // hans bild står kvar utom synhåll en stund (parkera), så att man kan vända sig tillbaka direkt
     parkera();
