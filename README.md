@@ -7199,7 +7199,8 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   (2026-11-12, användarens val bland fyra skisser: *Arket*, *Skalan*, *Noterat* och *Lyser*).
   Det gäller *Formen* (minst två poäng på fem matcher), *Vilan* (minst två dagar, samma regel
   som ringen på tavlans almanacksblad; förut stod det tröttare lagets dagar omvänt),
-  *Styrka* (0,15), *Mot oddsen* (1,5 poäng), *Mål* (0,25 mål per match), *xG* (0,2) och
+  *Styrka* (0,15), *Mot oddsen* (1,5 poäng), *Mål* (0,25 mål per match), *xG* (0,2), xG-flikens
+  *Skapar* och *Släpper till* (0,15 per match) och skotten på mål (0,5 per match) och
   *Favorit* (15 procentenheter) – gränserna står i `SKILJER` i
   [public/rum-register.js](public/rum-register.js). *Kryssar*, *Tur*, *Motståndet*, *Nästa*
   och *Skytten* säger inte vem som är bättre och står alltid som vanligt. Talen som räknas
@@ -7493,6 +7494,15 @@ bland tre skisser i den riktiga närbilden:
   står still när man byter flik; MÖTENA har förra mötet kvar som dragkamp. Staplarna är klasserna
   `sv`, `so` och `sf` i [public/rum-register.css](public/rum-register.css), och skärmen i rummet
   ritar dem själv ([public/rum-dator.js](public/rum-dator.js)).
+- **xG-fliken med en rad per tal** (2026-11-16, användarens val *A Raderna* bland tre skisser –
+  *Raderna*, *Raderna och tallinjen* och *Spalterna* – och rubriken med lagkortets ord för talen
+  mot chanserna): paren *1,5–0,2* såg ut som resultat och tvingade fram fyra tal i kors. Nu har
+  varje tal en egen rad där det bättre lyser, under rubrikerna *xG PER MATCH* (*Skapar*,
+  *Släpper till*) och *SKOTT PÅ MÅL PER MATCH* (*Skjuter*, *Släpper till*). Under *MOT
+  CHANSERNA* står *Gjorda mål* och *Insläppta mål* mot xG, *Tur* och *Kryssar* med lagkortets
+  ord, så att tecknen läses som en mening (*Insläppta mål −0,2*: färre än chanserna var
+  värda). Talen är desamma som förut; klubbarnas skott och mål mot xG kommer som förut ur
+  matchens fil, landslagens ur Nations Leagues lagfil. Ett avsnitt utan tal står inte.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
