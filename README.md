@@ -7153,12 +7153,12 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   en tidtabell (*16.00* på första matchen och *18.30* på den sena), och i telefonen, där
   divisionen inte ryms, står den ensam. Formen och dess motstånd stod förut också här men
   står bara i matchakten sedan 2026-11-13 (användarens önskemål: "mindre rörig"). En match öppnar
-  **matchakten**, där allt om matchen står på ett ställe: lagen sida vid sida med *Formen*,
+  **matchakten**, där allt om matchen står på ett ställe: lagen speglade runt etiketterna (se *Spegeln i matchakten* nedan) med *Formen*,
   *Vilan* och *Nästa* (dagar till nästa match, med cupen när det inte är ligan), tavlans
   *Styrka*, *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*, och lagkortens *Mål* och *xG*
   per match (för–mot), *Favorit* och *Skytten*; sedan skadelistorna när de finns och de
   senaste mötena med hemmalagets V–O–F. Efter vart och ett av tavlans tal står lagets
-  **plats i sin division** (*+0,94  1:A*, *−0,89 20:E*): högst först, lika tal delar plats,
+  **plats i sin division** (utanför talet: *1:A  +0,94* för hemmalaget, *−0,89  20:E* för bortalaget): högst först, lika tal delar plats,
   ur alla divisionens lag i `data/teams/<division>.json` – i en cupmatch mellan två
   divisioner var för sig. Platsen står alltid svagt och säger bara var laget ligger; för
   *Styrka* och *Mot oddsen* är 1:a bäst, för *Kryssar*, *Tur* och *Motståndet* betyder den
@@ -7427,7 +7427,7 @@ bland tre skisser i den riktiga närbilden:
   football-data.co.uk och bollinnehavet ur 365Scores.
 - **Dragkampen i hela matchakten** (2026-11-16, efter "hur skulle du förbättra visualiseringen";
   användarens val *B Dragkampen* bland tre skisser – *Mittlinjen* och *Lamporna och mätarna* var
-  de andra): förra mötets dragkamp gäller nu alla flikar. Varje tal som säger vem som är bättre
+  de andra): förra mötets dragkamp gällde en dag alla flikar. Varje tal som säger vem som är bättre
   har en delad stapel mellan lagens tal – formen, styrkan, favoritskapet, mot oddsen och
   marknaden i ÖVERSIKT, poängen i gruppen, V-O-F, poäng per match, målen, xG, bollinnehavet och
   poängen mot lagen över och under i MÅLEN och xG. Tal som inte kan vara negativa delas efter
@@ -7442,7 +7442,26 @@ bland tre skisser i den riktiga närbilden:
   talen och namnen står still när man byter flik. Formens rader har fått resultatet (*V 2–0 B
   TJECKIEN 4:E*), och det högra lagets rader står längst ut till höger. I telefonen står
   etiketten på en egen rad i mitten och raden under går från kant till kant (också i förra
-  mötet). Dolt resultat ger ? och en tom stapel.
+  mötet). Dolt resultat ger ? och en tom stapel. Samma kväll bytte användaren till spegeln
+  (nästa punkt), och dragkampen står kvar bara i förra mötet.
+- **Spegeln i matchakten** (2026-11-16, användarens val *B Staplarna* bland fyra skisser –
+  *Spegeln*, *Staplarna*, *Mätarna* och *Övertaget* – "men skippa staplar där det egentligen
+  kanske inte behövs", och sedan "byt till spegeln" i stället för dragkampen): ÖVERSIKT, MÅLEN, xG
+  och LÄGET står i mitten av skärmen med etiketten i mitten och lagen speglade runt den –
+  hemmalagets tal högerställda mot etiketten och bortalagets vänsterställda, som tavlan i
+  matchlistan – och rubrikerna står i mitten med ett streck på båda sidor. Platsen i divisionen
+  och formens motstånd står utanför talet (*13:E −0,14 · STYRKA · +0,94 1:A*, *41 FOFFF · FORMEN ·
+  VFOFV 49*). Bara *V-O-F* (landslagen, klubbarnas hemma och borta) har en stapel utanför talen:
+  vinsterna fyllda, de oavgjorda svagare och förlusterna tomma, inifrån och ut – den visar hur
+  ofta laget kryssar, vilket siffrorna inte säger direkt. *Mål*, *Nollor* och resten har inga
+  staplar, där räcker siffrorna. LÄGET:s mätare står utanför dagarna på samma sätt, med
+  tävlingen och elvan svagt under talen; skadorna står i lagens halvor och domaren med sina tal
+  till vänster och divisionens snitt till höger. Formens matcher står på var sin sida om
+  etiketternas spalt (i telefonen under varandra, det högra lagets högerställda). Samma mått i
+  alla fyra flikarna (`spegel` i [public/rum-register.js](public/rum-register.js)), så att lagen
+  står still när man byter flik; MÖTENA har förra mötet kvar som dragkamp. Staplarna är klasserna
+  `sv`, `so` och `sf` i [public/rum-register.css](public/rum-register.css), och skärmen i rummet
+  ritar dem själv ([public/rum-dator.js](public/rum-dator.js)).
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står

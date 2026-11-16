@@ -235,10 +235,11 @@ window.RumRegister = (() => {
   // tecken) och lagens tal på var sida om dragkampens stapel (24:E −0,89)
   const AKTEN_L = 15;
   const DRAG_V = 10;
-  // Dragkampen för tal som kan vara negativa: så stor skillnad drar stapeln
-  // hela vägen till det ena laget (ungefär avståndet mellan divisionens
-  // bästa och sämsta lag)
-  const DRAG_SKALA = { styrka: 1.5, odds: 15, mal: 2.5, xg: 1.8 };
+  // spegelns etikettspalt i matchakten (den längsta, TRUPPENS VILA, är 13
+  // tecken; på datorn ett tecken luft till på var sida) och ett lags halva
+  // som längst
+  const SPEGEL_L = 13;
+  const SPEGEL_S = 22;
 
   // ---------- raderna ----------
   //
@@ -695,10 +696,10 @@ window.RumRegister = (() => {
     // först, bollinnehavet och korten sist. Röda kort bara när något lag fick
     // ett. Dolt resultat: ? och en tom stapel. Sedan listan med de senaste mötena.
     //
-    // Dragkampen i hela matchakten (sedan 2026-11-16, användarens val B
-    // Dragkampen bland tre skisser för matchakten: Mittlinjen, Dragkampen och
-    // Lamporna och mätarna): samma rader i alla flikar, med samma mått, så att
-    // inget flyttar sig när man byter flik. En dragkampsrad har etiketten,
+    // Dragkampen gällde hela matchakten en dag (2026-11-16, användarens val B
+    // Dragkampen bland tre skisser: Mittlinjen, Dragkampen och Lamporna och
+    // mätarna); samma kväll valde användaren spegeln för matchakten i stället
+    // (spegel() nedan), och dragkampen står kvar i förra mötet. En dragkampsrad har etiketten,
     // det vänstra lagets tal högerställt mot stapeln, stapeln och det högra
     // lagets tal; platsen i divisionen står utanför talet (1:A +0,94 … +0,12
     // 14:E). En textrad (namn, V-O-F, tal som inte säger vem som är bättre)
@@ -758,14 +759,6 @@ window.RumRegister = (() => {
       const h = sida(1);
       return [...E.over, rad(...E.fore, ...v, [pad('', Math.max(1, G.w - G.L - dragLen(v) - dragLen(h))), ''], ...h)];
     }
-    // dragkampens andel för två tal som inte kan vara negativa (poäng, andelar,
-    // antal): det vänstra lagets del av summan
-    const dragAndel = (a, b) => (a != null && b != null && Number.isFinite(a) && Number.isFinite(b) && a >= 0 && b >= 0
-      ? (a + b > 0 ? a / (a + b) : 0.5) : null);
-    // för tal som kan vara negativa: mitten plus skillnaden i skalan, och
-    // båda lagen har alltid något av stapeln
-    const dragSkillnad = (a, b, skala) => (a != null && b != null && Number.isFinite(a) && Number.isFinite(b)
-      ? Math.min(0.97, Math.max(0.03, 0.5 + (a - b) / (2 * skala))) : null);
     // lagens namn överst (leder till lagkorten): det vänstra där talen börjar,
     // det högra längst ut till höger
     function dragNamn(G, lag) {
@@ -776,6 +769,89 @@ window.RumRegister = (() => {
     // ett avsnitts rubrik med ett streck efter, lika långt som raderna
     function dragRubrik(G, namn, q = null) {
       return rad([namn, 'd', q], ...(G.w - 1 > namn.length + 2 ? [[' ', ''], [' '.repeat(G.w - namn.length - 2), 'ln']] : []));
+    }
+
+    // Spegeln (sedan 2026-11-16, användarens val B Staplarna bland fyra
+    // skisser – Spegeln, Staplarna, Mätarna och Övertaget – "men skippa
+    // staplar där det egentligen kanske inte behövs", och sedan "byt till
+    // spegeln" i stället för dragkampen): matchakten står i mitten av
+    // skärmen med etiketten i mitten och lagen speglade runt den –
+    // hemmalagets tal högerställda mot etiketten och bortalagets
+    // vänsterställda, som tavlan i matchlistan – och rubrikerna står i mitten
+    // med ett streck på båda sidor. Platsen i divisionen står utanför talet
+    // (1:A  +0,94 … +0,12  14:E). Bara V-O-F har en stapel (vinsterna
+    // fyllda, de oavgjorda svagare och förlusterna tomma, inifrån och ut):
+    // där säger stapeln något som siffrorna inte säger direkt, hur ofta laget
+    // kryssar. LÄGET:s mätare står utanför dagarna på samma sätt. Samma mått
+    // i ÖVERSIKT, MÅLEN, xG och LÄGET, så att lagen står still när man byter
+    // flik; förra mötet i MÖTENA är kvar som dragkamp.
+    // spegel(): Lc etikettens spalt, S ett lags halva (med mellanrummet mot
+    // etiketten), B hela blocket och M luften till vänster om det
+    function spegel() {
+      const tel = A.bred < 56;
+      const Lc = tel ? SPEGEL_L : SPEGEL_L + 2;
+      const S = Math.min(SPEGEL_S, Math.floor((A.bred - Lc) / 2));
+      const B = 2 * S + Lc;
+      return { tel, Lc, S, B, M: Math.max(0, Math.floor((A.bred - B) / 2)) };
+    }
+    // en rad: hemmalagets bitar högerställda mot etiketten, etiketten i mitten (q: förklaringen) och bortalagets bitar
+    function spRad(G, vanster, etikett, q, hoger) {
+      const e = etikett || '';
+      const v = Math.max(0, Math.floor((G.Lc - e.length) / 2));
+      return rad([pad('', Math.max(0, G.M + G.S - 1 - dragLen(vanster))), ''], ...vanster, [pad('', 1 + v), ''],
+        ...(e ? [[e, 'd', q]] : []), [pad('', 1 + Math.max(0, G.Lc - e.length - v)), ''], ...hoger);
+    }
+    // En rad med lagens tal: b är laget med det bättre talet (ljust, det andra
+    // svagt), ytter en bit utanför talet (platsen i divisionen, formens
+    // motstånd) och vof lagens { w, d, l } för V-O-F-stapeln utanför talet
+    function spTal(G, etikett, t, b, q, ytter, vof) {
+      const v = [0, 1].map((j) => dragBit(t[j], j, b));
+      const y = (j) => (ytter && ytter[j] && ytter[j][0] ? ytter[j] : null);
+      const harY = y(0) || y(1);
+      if (!harY && !vof) return spRad(G, [v[0]], etikett, q, [v[1]]);
+      // (talen lika breda, så att platserna och staplarna står i rad)
+      const vw = Math.max(vof ? 6 : 4, ...v.map((x) => String(x[0]).length));
+      const tal = (j) => [j ? pad(v[j][0], vw) : padL(v[j][0], vw), v[j][1], v[j][2]];
+      const sida = (j) => {
+        if (vof) {
+          const st = vof[j] ? vofStapel(vof[j], G.S - 2 - vw, j === 1) : [];
+          if (!st.length) return [tal(j)];
+          return j ? [tal(j), [' ', ''], ...st] : [...st, [' ', ''], tal(j)];
+        }
+        const yt = y(j) ? [y(j)] : [];
+        const luft = [pad('', 4 - (y(j) ? y(j)[0].length : 0)), ''];
+        return j ? [tal(j), ['  ', ''], ...yt, luft] : [luft, ...yt, ['  ', ''], tal(j)];
+      };
+      return spRad(G, sida(0), etikett, q, sida(1));
+    }
+    // ett avsnitts rubrik i mitten med ett streck på båda sidor, över hela blocket
+    function spRub(G, bitar) {
+      const n = dragLen(bitar) + 2;
+      if (n + 4 > G.B) return rad([pad('', G.M), ''], ...bitar);
+      const v = Math.floor((G.B - n) / 2);
+      return rad([pad('', G.M), ''], [' '.repeat(v), 'ln'], [' ', ''], ...bitar, [' ', ''], [' '.repeat(G.B - n - v), 'ln']);
+    }
+    // en rad i mitten av blocket
+    const spMitt = (G, bitar) => rad([pad('', G.M + Math.max(0, Math.floor((G.B - dragLen(bitar)) / 2))), ''], ...bitar);
+    // lagens namn (till lagkorten) över spalterna
+    const spLag = (G, lag) => spRad(G, [[kort(lag[0]).slice(0, G.S - 1), '', `#lag:${lag[0]}`]], '', null, [[kort(lag[1]).slice(0, G.S - 1), '', `#lag:${lag[1]}`]]);
+    // V-O-F ({ w, d, l }) som en stapel av w tecken, inifrån och ut: vinsterna
+    // (sv), de oavgjorda (so) och förlusterna (sf). Delarna avrundas så att
+    // de blir w tecken (de största resterna uppåt), och en del som finns får
+    // minst ett tecken.
+    function vofStapel(x, w, hoger) {
+      const n = x.w + x.d + x.l;
+      if (!n || w < 3) return [];
+      const t = [x.w, x.d, x.l];
+      const r = t.map((y) => (y * w) / n);
+      const h = r.map(Math.floor);
+      let kvar = w - h.reduce((a, y) => a + y, 0);
+      for (const [, i] of r.map((y, j) => [y - h[j], j]).sort((a, b) => b[0] - a[0])) if (kvar > 0) { h[i]++; kvar--; }
+      for (let i = 0; i < 3; i++) {
+        if (t[i] > 0 && !h[i]) { const st = h.indexOf(Math.max(...h)); if (h[st] > 1) { h[st]--; h[i] = 1; } }
+      }
+      const bitar = [['sv', h[0]], ['so', h[1]], ['sf', h[2]]].filter(([, c]) => c > 0).map(([k, c]) => [' '.repeat(c), k]);
+      return hoger ? bitar : bitar.reverse();
     }
     const FORRA = [
       ['MÅL', 'mal', String, true], ['xG', 'xg', (x) => num(x, 2), true], ['STORA CHANSER', 'bc', String, true],
@@ -989,7 +1065,7 @@ window.RumRegister = (() => {
       return { ts, vem: A.P.spelare.find((x) => x.p.name === ts.name && String(x.p.teamId) === String(t.espnId)) };
     }
 
-    // Matchakten: allt om matchen på ett ställe, lagen sida vid sida – i
+    // Matchakten: allt om matchen på ett ställe, lagen i spegeln (spegel()) – i
     // flikar sedan 2026-11-14 (användarens önskemål: "underkategorier", allt
     // i en lång lista såg rörigt ut). Titeln, tävlingen och flikarna står
     // still överst (R.huvud) och lagens namn överst i varje flik:
@@ -1035,10 +1111,9 @@ window.RumRegister = (() => {
       R.sido = i < 0 ? null : [i > 0 ? `#mote:${A.ms[i - 1].id}` : null, i < A.ms.length - 1 ? `#mote:${A.ms[i + 1].id}` : null];
       R.slojas = true;
       const land = isLand(m.comp);
-      const L = AKTEN_L;
-      // dragkampens mått (samma i alla flikar) och en halv rad för lagens texter
-      const G = dragMatt();
-      const H = Math.max(4, Math.floor((G.w - G.L - 1) / 2));
+      // spegelns mått (samma i alla flikar) och ett lags halva för texterna
+      const G = spegel();
+      const H = G.S - 1;
       const lag = [m.home, m.away];
       const sid = ['home', 'away'];
       // (för en landskamp landslagen, med Nations Leagues siffror för lagen som spelar där)
@@ -1053,18 +1128,11 @@ window.RumRegister = (() => {
       const samma = sammaDiv && !S.veil;
       const inom = (f, grans) => (samma ? bast(T.map(f), grans) : -1);
       const jmf = (v, grans) => (land || samma ? bast(v, grans) : -1);
-      // En rad med lagens värden (dragRad och dragText ovanför forraMotet): b
-      // är laget med det bättre talet, som lyser medan det andra är svagt, och
-      // andel det vänstra lagets del av dragkampens stapel (null: ingen
-      // stapel, textrad); ytter står svagt utanför värdet (platsen i
-      // divisionen); q är etikettens förklaring. Ger en lista med rader (i
-      // telefonen etiketten på en egen rad först).
-      const raden = (etikett, v, b = -1, q = null, andel = null, ytter = null) => dragRad(G, etikett, v, andel, b, q, ytter);
-      // dragkampens andel ur lagens tal i en skala: 'andel' för tal som inte
-      // kan vara negativa, annars skillnaden i DRAG_SKALA; bara när talen får
-      // jämföras (kan)
-      const andelAv = (v, skala, kan) => (!skala || !kan || !v.every(ok) ? null
-        : skala === 'andel' ? dragAndel(v[0], v[1]) : dragSkillnad(v[0], v[1], DRAG_SKALA[skala]));
+      // En rad med lagens värden (spTal ovanför forraMotet): b är laget med
+      // det bättre talet, som lyser medan det andra är svagt; ytter står svagt
+      // utanför värdet (platsen i divisionen); vof ger V-O-F-stapeln; q är
+      // etikettens förklaring
+      const raden = (etikett, v, b = -1, q = null, ytter = null, vof = null) => spTal(G, etikett, v, b, q, ytter, vof);
       // etiketten: talets lista i det första lagets division (lag eller
       // spelare), annars bara förklaringen
       const div0 = (T.find((t) => t && t.comp) || {}).comp;
@@ -1072,9 +1140,8 @@ window.RumRegister = (() => {
       // tavlans tal med lagets plats i sin division utanför: '1:A +0,94' och
       // '+0,12 14:E' (för landslagen utan platsen, och raden bara när något
       // av lagen har talet). Platsen leder till rankningen i lagets division,
-      // med laget och motståndaren markerade (sedan 2026-11-16). Med skala
-      // en dragkamp när lagen spelar i samma division
-      const tal = (etikett, f, fmt, grans, k, skala) => {
+      // med laget och motståndaren markerade (sedan 2026-11-16)
+      const tal = (etikett, f, fmt, grans, k) => {
         const v0 = T.map((t) => (t ? f(t) : null));
         if (land && !v0.some(ok)) return null;
         const v = v0.map((x) => (S.veil ? null : x));
@@ -1084,29 +1151,30 @@ window.RumRegister = (() => {
           const vem = [T[j], T[1 - j]].filter(Boolean).map((t) => t.name).join('|');
           return p ? [ordtal(p), 'd', platsQ('lag', T[j].comp, k, vem)] : null;
         });
-        // (talen lika breda, så att platserna står i rad)
-        const txt = v.map((x, j) => { const t = S.veil ? '?' : ok(x) ? fmt(x) : '–'; return ytter.some(Boolean) ? (j ? pad(t, 5) : padL(t, 5)) : t; });
-        return raden(etikett, txt, grans ? inom(f, grans) : -1, lq(k),
-          S.veil && skala && sammaDiv ? 'tom' : andelAv(v, skala, samma), ytter);
+        return raden(etikett, v.map((x) => (S.veil ? '?' : ok(x) ? fmt(x) : '–')), grans ? inom(f, grans) : -1, lq(k), ytter);
       };
       // en rad ur lagens värden f(j) = [text, tal att jämföra] (eller null);
-      // för landslagen bara när något av lagen har ett värde. Med skala en
-      // dragkamp när talen får jämföras (kan, annars landslagen eller samma division)
-      const par = (etikett, f, grans, q, skala, kan = land || samma) => {
+      // för landslagen bara när något av lagen har ett värde. Talen jämförs
+      // när de får det (kan: landslagen eller samma division); vof(j) ger
+      // lagets { w, d, l } till V-O-F-stapeln
+      const par = (etikett, f, grans, q, vof = null, kan = land || samma) => {
         const v = [0, 1].map(f);
         if (!v.some((x) => x && x[0] != null)) return land ? null : raden(etikett, ['–', '–'], -1, q);
-        if (S.veil) return raden(etikett, ['?', '?'], -1, q, skala ? 'tom' : null);
+        if (S.veil) return raden(etikett, ['?', '?'], -1, q);
         const tal2 = v.map((x) => (x ? x[1] : null));
-        return raden(etikett, v.map((x) => (x && x[0] != null ? x[0] : '–')), grans && kan ? bast(tal2, grans) : -1, q, andelAv(tal2, skala, kan));
+        return raden(etikett, v.map((x) => (x && x[0] != null ? x[0] : '–')), grans && kan ? bast(tal2, grans) : -1, q, null,
+          vof ? [0, 1].map((j) => (v[j] && v[j][0] != null ? vof(j) : null)) : null);
       };
       // matchsidans rader (Lagen sida vid sida i app.js) ur matchens fil
       const fil = (etikett) => { for (const g of (d && d.rows) || []) for (const x of g.rows || []) if (x.label === etikett) return x.values; return null; };
-      const ur = (etikett, rubrik, q) => {
+      // (vof: talen är V–O–F, och raden får stapeln)
+      const ur = (etikett, rubrik, q, vof = false) => {
         const v = fil(etikett);
-        return v && v.some((x) => x != null) ? raden(rubrik, v.map((x) => (S.veil ? '?' : x == null ? '–' : up(x))), -1, q) : null;
+        const vofAv = (x) => { const t = !S.veil && x != null && String(x).match(/^(\d+)\D+(\d+)\D+(\d+)$/); return t ? { w: +t[1], d: +t[2], l: +t[3] } : null; };
+        return v && v.some((x) => x != null) ? raden(rubrik, v.map((x) => (S.veil ? '?' : x == null ? '–' : up(x))), -1, q, null, vof ? v.map(vofAv) : null) : null;
       };
-      // ett avsnitts rubrik med ett streck efter, lika långt som raderna
-      const rub = (namn) => dragRubrik(G, namn);
+      // ett avsnitts rubrik i mitten med ett streck på båda sidor
+      const rub = (namn) => spRub(G, [[namn, 'd']]);
       // lagets främste i ett tal, med namnet som länk till spelarkortet
       const ledare = (etikett, f, k) => raden(etikett, T.map((t) => {
         if (S.veil) return '?';
@@ -1126,34 +1194,31 @@ window.RumRegister = (() => {
       const formB = bast(formP, SKILJER.form);
       // (formens motstånd utanför bokstäverna: 62 VVVVV … VVVVF 48)
       const mott = sid.map((s) => { const t = S.veil ? '?' : mottOf(m, s); return t == null ? null : [String(t), '']; });
-      const formAndel = S.veil || form.some((f) => f.includes('?')) ? 'tom' : dragAndel(formP[0], formP[1]);
-      const formRad = raden('FORMEN', form.map((f) => f.join('') || '–'), formB, lq('form'), formAndel, mott);
-      // formens matcher under FORMEN: på datorn lagen sida vid sida, det
-      // vänstra där talen börjar och det högra längst ut till höger; i
+      const formRad = raden('FORMEN', form.map((f) => f.join('') || '–'), formB, lq('form'), mott);
+      // formens matcher under FORMEN: på datorn lagen sida vid sida på var
+      // sin sida om etiketternas spalt (och ut i luften utanför blocket); i
       // telefonen under varandra, det högra lagets högerställda
       const formL = sid.map((s, j) => (S.veil ? [] : formMatcher(m, s, T[j], land)));
       const rm = Math.max(0, ...formL.flat().map((y) => (y.mal || '').length));
       const formRader = [];
       if (formL.some((l) => l.length)) {
         if (!G.tel) {
-          const cw = Math.min(28, Math.floor((G.w - G.L - 2) / 2));
+          const cw = Math.min(28, G.S - 1 + G.M);
           const c = formL.map((l) => formCeller(l, cw, rm));
-          for (let i = 0; i < Math.max(c[0].length, c[1].length); i++) {
-            formRader.push(rad([pad('', G.L)], ...(c[0][i] || [[pad('', cw), '']]), [pad('', G.w - G.L - 2 * cw), ''], ...(c[1][i] || [])));
-          }
+          for (let i = 0; i < Math.max(c[0].length, c[1].length); i++) formRader.push(spRad(G, c[0][i] || [], '', null, c[1][i] || []));
         } else {
-          const cw = Math.min(28, G.w);
+          const cw = Math.min(28, G.B);
           formL.forEach((l, j) => {
-            for (const c of formCeller(l, cw, rm)) formRader.push(rad([pad('', j ? G.w - cw : 0)], ...c));
+            for (const c of formCeller(l, cw, rm)) formRader.push(rad([pad('', G.M + (j ? G.B - cw : 0))], ...c));
           });
         }
       }
       const mkt0 = (j) => { const x = mkt(T[j]); return x && x.n ? [`${x.fav} AV ${x.n}`, x.fav / x.n] : null; };
-      const favorit = par('FAVORIT', mkt0, SKILJER.favorit, lq('favorit'), 'andel');
-      const odds = tal('MOT ODDSEN', TAL.odds, (v) => signed(v), SKILJER.odds, 'odds', 'odds');
+      const favorit = par('FAVORIT', mkt0, SKILJER.favorit, lq('favorit'));
+      const odds = tal('MOT ODDSEN', TAL.odds, (v) => signed(v), SKILJER.odds, 'odds');
       let oversikt;
       if (!land) {
-        oversikt = [formRad, ...formRader, tal('STYRKA', TAL.styrka, (v) => signed(v, 2), SKILJER.styrka, 'styrka', 'styrka'),
+        oversikt = [formRad, ...formRader, tal('STYRKA', TAL.styrka, (v) => signed(v, 2), SKILJER.styrka, 'styrka'),
           tal('MOTSTÅNDET', TAL.motstand, (v) => signed(v, 2), 0, 'motstand'), favorit, odds];
       } else {
         // gruppen (matchens fil, annars landslag.json): placeringen och
@@ -1174,14 +1239,14 @@ window.RumRegister = (() => {
         ];
         oversikt = [formRad, ...formRader,
           par(g0 && sammaGrupp ? `GRUPP ${up(g0.group)}` : 'GRUPPEN', (j) => { const t = tab(j); return t && t.rank ? [`${ordtal(t.rank)}${t.size ? ` AV ${t.size}` : ''}`, null] : null; }, 0, ordQ('grupp')),
-          par('POÄNG', (j) => { const t = tab(j); return t && t.points != null ? [`${t.points} PÅ ${t.played}`, sammaGrupp ? t.points : null] : null; }, SKILJER.poang, ordQ('poang'), 'andel'),
+          par('POÄNG', (j) => { const t = tab(j); return t && t.points != null ? [`${t.points} PÅ ${t.played}`, sammaGrupp ? t.points : null] : null; }, SKILJER.poang, ordQ('poang')),
           ...spelarFor,
           favorit, odds];
         const p = m.f && m.f.p;
         if (p && p.length === 3) {
           const x = `X ${p[1]} % · UR ODDSEN`;
-          oversikt.push(raden('MARKNADEN', [`${p[0]} %`, `${p[2]} %`], bast([p[0] / 100, p[2] / 100], SKILJER.favorit), ordQ('marknaden'), dragAndel(p[0], p[2])),
-            rad([pad('', G.L)], [G.w - G.L >= x.length + 15 ? `${x}, INTE MODELLEN` : x, 'd']));
+          oversikt.push(raden('MARKNADEN', [`${p[0]} %`, `${p[2]} %`], bast([p[0] / 100, p[2] / 100], SKILJER.favorit), ordQ('marknaden')),
+            spMitt(G, [[G.B >= x.length + 17 ? `${x}, INTE MODELLEN` : x, 'd']]));
         }
       }
 
@@ -1198,27 +1263,26 @@ window.RumRegister = (() => {
         // poängen mot lagen över och under i tabellen; sedan alla matcher.
         // Utan hemma/borta för båda lagen står HEMMA och BORTA som förut.
         const hb = [T[0] && T[0].hb && T[0].hb.h, T[1] && T[1].hb && T[1].hb.b];
-        // (bollinnehavet en dragkamp utan bättre lag, som i förra mötet)
-        const hbRad = (etikett, f, grans, k, skala) => par(etikett, (j) => (hb[j] && hb[j].n ? f(hb[j]) : null), grans, ordQ(k), skala, samma);
+        const hbRad = (etikett, f, grans, k, vof = null) => par(etikett, (j) => (hb[j] && hb[j].n ? f(hb[j]) : null), grans, ordQ(k), vof && ((j) => vof(hb[j])), samma);
         const ppm = (x) => (3 * x.w + x.d) / x.n;
         const motTab = (o) => (o && o.n ? [`${o.p} P PÅ ${o.n}`, o.p / o.n] : null);
         const hbNamn = `${kort(m.home)} HEMMA · ${kort(m.away)} BORTA`;
         const hbRader = hb[0] && hb[1] && hb[0].n && hb[1].n ? [
-          rub(hbNamn.length + 2 < G.w - 1 ? hbNamn : 'HEMMA OCH BORTA'),
-          hbRad('V-O-F', (x) => [`${x.w}-${x.d}-${x.l}`, null], 0, 'hb-vof'),
-          hbRad('POÄNG/MATCH', (x) => [num(ppm(x), 2), ppm(x)], SKILJER.ppm, 'hb-ppm', 'andel'),
-          hbRad('MÅL', (x) => [`${num(x.gf / x.n)}–${num(x.ga / x.n)}`, (x.gf - x.ga) / x.n], SKILJER.mal, 'hb-mal', 'mal'),
-          hbRad('xG', (x) => (x.xg && x.xg.n ? [`${num(x.xg.f / x.xg.n)}–${num(x.xg.a / x.xg.n)}`, (x.xg.f - x.xg.a) / x.xg.n] : null), SKILJER.xg, 'hb-xg', 'xg'),
-          hbRad('BOLLINNEHAV', (x) => (x.poss ? [`${Math.round(x.poss.v)} %`, x.poss.v] : null), 0, 'hb-boll', 'andel'),
-          hbRad('LAG OVANFÖR', (x) => motTab(x.ovan), SKILJER.ppm, 'hb-ovan', 'andel'),
-          hbRad('LAG NEDANFÖR', (x) => motTab(x.under), SKILJER.ppm, 'hb-under', 'andel'),
+          rub(hbNamn.length + 6 <= G.B ? hbNamn : 'HEMMA OCH BORTA'),
+          hbRad('V-O-F', (x) => [`${x.w}-${x.d}-${x.l}`, null], 0, 'hb-vof', (x) => ({ w: x.w, d: x.d, l: x.l })),
+          hbRad('POÄNG/MATCH', (x) => [num(ppm(x), 2), ppm(x)], SKILJER.ppm, 'hb-ppm'),
+          hbRad('MÅL', (x) => [`${num(x.gf / x.n)}–${num(x.ga / x.n)}`, (x.gf - x.ga) / x.n], SKILJER.mal, 'hb-mal'),
+          hbRad('xG', (x) => (x.xg && x.xg.n ? [`${num(x.xg.f / x.xg.n)}–${num(x.xg.a / x.xg.n)}`, (x.xg.f - x.xg.a) / x.xg.n] : null), SKILJER.xg, 'hb-xg'),
+          hbRad('BOLLINNEHAV', (x) => (x.poss ? [`${Math.round(x.poss.v)} %`, x.poss.v] : null), 0, 'hb-boll'),
+          hbRad('LAG OVANFÖR', (x) => motTab(x.ovan), SKILJER.ppm, 'hb-ovan'),
+          hbRad('LAG NEDANFÖR', (x) => motTab(x.under), SKILJER.ppm, 'hb-under'),
           tom(), rub('ALLA MATCHER'),
         ] : null;
         malen = [
           ...(hbRader || []),
-          par('MÅL', (j) => { const t = T[j]; return t && t.m ? [`${num(t.gf / t.m)}–${num(t.ga / t.m)}`, (t.gf - t.ga) / t.m] : null; }, SKILJER.mal, lq('gjorda'), 'mal'),
-          hbRader ? null : ur('Hemma V–O–F', 'HEMMA', ordQ('hemma')),
-          hbRader ? null : ur('Borta V–O–F', 'BORTA', ordQ('borta')),
+          par('MÅL', (j) => { const t = T[j]; return t && t.m ? [`${num(t.gf / t.m)}–${num(t.ga / t.m)}`, (t.gf - t.ga) / t.m] : null; }, SKILJER.mal, lq('gjorda')),
+          hbRader ? null : ur('Hemma V–O–F', 'HEMMA', ordQ('hemma'), true),
+          hbRader ? null : ur('Borta V–O–F', 'BORTA', ordQ('borta'), true),
           ur('Hållit nollan', 'NOLLOR', lq('nollor')),
           ur('Inte gjort mål', 'UTAN MÅL', ordQ('utanmal')),
           tom(),
@@ -1238,16 +1302,16 @@ window.RumRegister = (() => {
         const mal = (x) => (x && x.n ? [`${num(x.gf / x.n)}–${num(x.ga / x.n)}`, (x.gf - x.ga) / x.n] : null);
         const nollor = (j, k) => { const x = T[j] && T[j][k]; return x && x.matcher && x.nollor != null ? [String(x.nollor), null] : null; };
         const nlR = [
-          par('V-O-F', (j) => vof(nl(j)), SKILJER.ppm, ordQ('nl-vof'), 'andel'),
-          par('MÅL', (j) => mal(nl(j)), SKILJER.mal, ordQ('nl-mal'), 'mal'),
+          par('V-O-F', (j) => vof(nl(j)), SKILJER.ppm, ordQ('nl-vof'), nl),
+          par('MÅL', (j) => mal(nl(j)), SKILJER.mal, ordQ('nl-mal')),
           par('NOLLOR', (j) => nollor(j, 'nationsLeague'), 0, ordQ('nl-nollor')),
           ledareLand('SKYTTEN', (p) => p.g, lq('skytten')),
           ledareLand('ASSIST', (p) => p.a, lq('assist', 'spelare')),
         ].filter(Boolean);
         // (antalet landskamper står i förklaringen: det är V-O-F tillsammans)
         const allaR = [
-          par('V-O-F', (j) => vof(alla(j)), SKILJER.ppm, ordQ('alla-vof'), 'andel'),
-          par('MÅL', (j) => mal(alla(j)), SKILJER.mal, ordQ('alla-mal'), 'mal'),
+          par('V-O-F', (j) => vof(alla(j)), SKILJER.ppm, ordQ('alla-vof'), alla),
+          par('MÅL', (j) => mal(alla(j)), SKILJER.mal, ordQ('alla-mal')),
           par('NOLLOR', (j) => nollor(j, 'alla'), 0, ordQ('alla-nollor')),
         ].filter(Boolean);
         const fran = [0, 1].map((j) => alla(j) && alla(j).fran).filter(Boolean).sort()[0];
@@ -1263,7 +1327,7 @@ window.RumRegister = (() => {
       // landslagen ur Nations Leagues lagfil)
       const xgp = (j) => { const x = xgOf(T[j]); return x && x.n ? x : null; };
       const xg = [
-        par('xG', (j) => { const x = xgp(j); return x ? [`${num(x.f / x.n)}–${num(x.a / x.n)}`, (x.f - x.a) / x.n] : null; }, SKILJER.xg, lq('skapar'), 'xg'),
+        par('xG', (j) => { const x = xgp(j); return x ? [`${num(x.f / x.n)}–${num(x.a / x.n)}`, (x.f - x.a) / x.n] : null; }, SKILJER.xg, lq('skapar')),
         land ? par('PÅ MÅL', (j) => { const x = fdOf(T[j], 'sh'); return x && x.n && x.of != null ? [`${num(x.of / x.n)}–${num(x.oa / x.n)}`, null] : null; }, 0, lq('pamal'))
           : ur('Skott på mål', 'PÅ MÅL', lq('pamal')),
         land ? par('MÅL MOT xG', (j) => { const x = xgp(j); return x ? [signed(x.gf - x.f), null] : null; }, 0, lq('malxg'))
@@ -1279,7 +1343,7 @@ window.RumRegister = (() => {
       // Sedan 2026-11-15 (användarens val bland fyra skisser: Klartext,
       // Tidslinjen, Mätarna och Stora siffror) med en mätare efter talet,
       // som i lagkorten: VILAN och NÄSTA i samma skala, full vid två veckor
-      // (en ruta per dag, i telefonen per två dagar), och MATCHER en ruta per
+      // (en ruta per dag på datorn, i telefonen färre i samma skala), och MATCHER en ruta per
       // match. Den bättre vilan lyser med sin mätare och den sämre är svag.
       // Under VILAN och NÄSTA står tävlingen svagt när den inte är lagets
       // egen (Europacuperna, de engelska cuperna, en vänskapslandskamp), och
@@ -1287,22 +1351,18 @@ window.RumRegister = (() => {
       const vila = sid.map((s) => vilaOf(m, s));
       const sch = sid.map((s) => (d && d.teams && d.teams[s] && d.teams[s].schedule) || null);
       const dgr = (sch[0] || sch[1] || {}).windowDays;
-      // (sedan 2026-11-16 i dragkampens mått: lagets mätare står i dess halva
-      // av stapeln, från talet in mot mitten, så att talen står där de står i
-      // de andra flikarna)
-      const halv = Math.floor((G.n - 1) / 2);
-      const MATN = Math.min(14, halv);
-      const mitt = G.n - 2 * halv;
+      // (sedan 2026-11-16 i spegeln: talen mot etiketten och lagets mätare
+      // utanför talet, fyllt inifrån och ut, som V-O-F-stapeln i MÅLEN)
+      const MATV = 6;
+      const MATN = Math.max(4, Math.min(14, G.S - 2 - MATV));
       // en rad med lagens tal och var sin mätare: bitar(j) ger lagets mätare
       // inifrån och ut (fyllt först), b är laget med det bättre talet
       const matRad = (etikett, t, bitar, b, q) => {
-        const E = dragEtikett(G, etikett, q);
         const v = [0, 1].map((j) => dragBit(t[j], j, b));
-        const m0 = bitar(0);
-        const m1 = bitar(1).slice().reverse();
-        const luft = (x) => [pad('', Math.max(0, halv - dragLen(x))), ''];
-        return [...E.over, rad(...E.fore, [pad('', Math.max(0, G.V - v[0][0].length)), ''], v[0], [' ', ''], ...m0, luft(m0),
-          [pad('', mitt), ''], luft(m1), ...m1, [' ', ''], v[1])];
+        const m0 = bitar(0).slice().reverse();
+        const m1 = bitar(1);
+        return spRad(G, [...m0, [' ', ''], [padL(v[0][0], MATV), v[0][1], v[0][2]]], etikett, q,
+          [[pad(v[1][0], MATV), v[1][1], v[1][2]], [' ', ''], ...m1]);
       };
       // dagarna: full mätare vid två veckor; b är laget med den bättre vilan
       const dagRad = (etikett, v, b, q, fmt = (x) => `${x} D`) => matRad(etikett, v.map((x) => (x == null ? '–' : fmt(x))), (j) => {
@@ -1310,7 +1370,7 @@ window.RumRegister = (() => {
         return [...dragStreck(f, b >= 0 && j !== b ? 'mtd' : 'mt1'), ...dragStreck(MATN - f, 'mt0')];
       }, b, q);
       // en svag rad under lagens tal (bara när något av lagen har en text)
-      const under = (v) => (v.some(Boolean) ? dragText(G, '', v.map((x) => [x, 'd'])) : null);
+      const under = (v) => (v.some(Boolean) ? spRad(G, [[v[0] || '', 'd']], '', null, [[v[1] || '', 'd']]) : null);
       const tav = (k) => under(sid.map((s, j) => tavlingOf(m, s, sch[j] && sch[j][k], H)));
       // Spelarnas egen vila (sedan 2026-11-16, användarens önskemål: lagets
       // VILAN säger lite inför en landskamp, när spelarna har spelat för sina
@@ -1337,13 +1397,26 @@ window.RumRegister = (() => {
       ];
       if (dgr && sch.some((x) => x && x.recent != null)) {
         const nr = sch.map((x) => (x && x.recent != null ? x.recent : null));
-        laget.push(matRad('MATCHER', nr.map((n) => (n == null ? '–' : String(n))), (j) => dragStreck(Math.min(halv, nr[j] || 0), 'mtm'), -1, ordQ('matcher')));
+        laget.push(matRad('MATCHER', nr.map((n) => (n == null ? '–' : String(n))), (j) => dragStreck(Math.min(MATN, nr[j] || 0), 'mtm'), -1, ordQ('matcher')));
         laget.push(under([0, 1].map(() => `SENASTE ${dgr} D`)));
       }
+      // skadorna: lagens namn i halvorna, så många per rad som ryms
       const sk = sid.map((s) => skadorOf(m, s));
       if (sk.some(Boolean)) {
-        laget.push(tom(), rad(['SKADORNA', 'd', ordQ('skador')]));
-        sk.forEach((l, j) => laget.push(rad([`${kort(lag[j])}: `, 'd'], l ? skadeNamn(l) : 'OKÄNT')));
+        const rader = sk.map((l) => {
+          const n = !l ? ['OKÄNT'] : l.length ? l.map((p) => `${sistaNamn(p.name)}${SKADA[p.status] || ''}`.slice(0, H - 1)) : ['INGA'];
+          const ut = [];
+          n.forEach((x, i) => {
+            const t = i < n.length - 1 ? `${x},` : x;
+            if (ut.length && ut[ut.length - 1].length + 1 + t.length <= H) ut[ut.length - 1] += ` ${t}`;
+            else ut.push(t);
+          });
+          return ut;
+        });
+        laget.push(tom());
+        for (let i = 0; i < Math.max(rader[0].length, rader[1].length); i++) {
+          laget.push(spRad(G, rader[0][i] ? [[rader[0][i], '']] : [], i ? '' : 'SKADORNA', ordQ('skador'), rader[1][i] ? [[rader[1][i], '']] : []));
+        }
       }
       // domaren (football-data.co.uk) som på matchsidan: hans eller hennes
       // ligamatcher före matchdagen, med divisionens snitt efter
@@ -1351,13 +1424,15 @@ window.RumRegister = (() => {
       if (dom) {
         const s = dom.stats || {};
         const a = dom.avg || {};
-        const fig = (etikett, k, v, w) => rad([etikett, 'd', ordQ(k)], [pad('', L - etikett.length)], pad(v, 8), [w != null ? `SNITT ${w}` : '', 'd']);
-        laget.push(tom(), rad(['DOMAREN', 'd', ordQ('domaren')], [pad('', L - 7)], up(dom.name), [s.n ? `  ${s.n} LIGAMATCHER` : '', 'd']));
+        // (domarens tal till vänster och divisionens snitt till höger)
+        const fig = (etikett, k, v, w) => spRad(G, [[v, '']], etikett, ordQ(k), w != null ? [[`SNITT ${w}`, 'd']] : []);
+        laget.push(tom(), spRub(G, [['DOMAREN', 'd', ordQ('domaren')], [` ${up(dom.name)}`, '']]));
+        if (s.n) laget.push(spRad(G, [[String(s.n), '']], 'LIGAMATCHER', ordQ('domaren'), []));
         if (s.n) {
           if (s.yellow != null) laget.push(fig('GULA KORT', 'dom-gula', num(s.yellow, 1), a.yellow != null ? num(a.yellow, 1) : null));
           if (s.fouls != null) laget.push(fig('FRISPARKAR', 'dom-frisparkar', num(s.fouls, 1), a.fouls != null ? num(a.fouls, 1) : null));
           if (s.home != null) laget.push(fig('HEMMASEGER', 'dom-hemmaseger', pct(s.home), a.home != null ? pct(a.home) : null));
-          if (dom.min && s.n < dom.min) laget.push(rad([pad('', L)], ['FÖR FÅ MATCHER', 'd']));
+          if (dom.min && s.n < dom.min) laget.push(spMitt(G, [['FÖR FÅ MATCHER', 'd']]));
         }
       }
 
@@ -1373,8 +1448,8 @@ window.RumRegister = (() => {
       R.huvud = [rad([`${padL(i + 1, 2)}  `, 'd'], [`${kort(m.home)} – ${kort(m.away)}`, 'v']), ...underrad(m), delRad(AKTDELAR, val, har), streck()];
       if (val === 'moten') return rader('moten');
       // lagen överst i fliken (leder till lagkorten), med divisionen när den skiljer
-      const kol = [dragNamn(G, lag)];
-      if (!land && T[0] && T[1] && T[0].comp !== T[1].comp) kol.push(...dragText(G, '', [[DIVK[T[0].comp], 'd'], [DIVK[T[1].comp], 'd']]));
+      const kol = [spLag(G, lag)];
+      if (!land && T[0] && T[1] && T[0].comp !== T[1].comp) kol.push(spRad(G, [[DIVK[T[0].comp] || '', 'd']], '', null, [[DIVK[T[1].comp] || '', 'd']]));
       return [...kol, ...rader(val)];
     }
 

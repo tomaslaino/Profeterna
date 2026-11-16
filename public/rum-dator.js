@@ -601,6 +601,10 @@ export async function dator(o) {
             // (mtv och mtd: förra mötets dragkamp, ljus och svag)
             g.fillStyle = k === 'mt1' ? FARG[''] : k === 'mtv' ? FARG.v : k === 'mtd' ? FARG.d : 'rgba(65,255,110,.17)';
             for (let j = 0; j < t.length; j++) g.fillRect(x + j * cw, y + lh * 0.25, cw * 0.72, lh * 0.5);
+          } else if (k === 'sv' || k === 'so' || k === 'sf') {
+            // matchaktens V-O-F-stapel: vinsterna, de oavgjorda och förlusterna
+            g.fillStyle = k === 'sv' ? FARG[''] : k === 'so' ? FARG.d : 'rgba(65,255,110,.13)';
+            g.fillRect(x, y + lh * 0.25, w, lh * 0.5);
           } else if (k === 'ln') {
             // rubrikens streck
             g.fillStyle = FARG.d;
