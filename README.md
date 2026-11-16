@@ -4492,6 +4492,42 @@ när någon pekar på tv:n (`vandBlick`, `turBlick`), och en blick rakt bakom en
 för att slå om (huvudet knyckte ett halvt varv när den som gick iväg passerade bakom en). Största
 vridningen av ett huvud mellan två bilder under tio minuter: 1,86 → 0,81 radianer.
 
+**Ordet går runt, och fler påhitt** (2026-11-16, rum-3d.js; användarens önskemål: "ännu fler moves och
+få oss att se ännu mer naturliga ut i våra rörelser", och "det ska inte kosta mer grafikmässigt"):
+
+- **Ordet vid bordet** (`ORDET`, `ordW`, `pratW`): förut pratade bara DJ, hela tiden. Nu går ordet
+  runt i stunder om några sekunder – DJ har det ungefär hälften av tiden, DL och DT var sin femtedel,
+  och ibland är det tyst. Den som har ordet pratar med händerna i slag (`pratSlag`, var och en i sin
+  takt och storlek, `PRAT`): DJ som förut, DL med den lediga handen framför bröstet och DT med
+  cigaretten, som han lyfter från askkoppen. Hen nickar med betoningarna och lutar sig lite fram.
+- **Lyssnarna** (`samtalSeg`): när någon tar ordet vänder sig de andra oftast mot hen en kvarts till
+  knappt en sekund efter, var och en för sig (förut tittade man kvar tills ens egen blick bytte).
+  De nickar med i betoningarna och ibland "mm", två korta nickar. Någon gång tittar man en sekund
+  bort mot disken (`OGA`).
+- **Huvudet står aldrig helt still** (`smaRor`): var och varannan sekund en justering på en grad
+  eller två, fort och med lite överslag. **Benen under stolen** (`fotter`): ibland vippar en fot i en
+  takt (fort när man är nervös) eller dinglar ett ben (oftare när man är glad).
+- **Nya påhitt** i menyerna (`MENY`): `funderar` (stryker sig om hakan med blicken snett uppåt),
+  `nasan` (kliar sig på näsan), `axlar` (rycker på axlarna med handflatan upp), `tittarUt` (vänder
+  sig om och följer något utanför fönstret med blicken) och `hosta` (handen för munnen, oftast DT).
+  Gängets nya är `skalTva` (`GRUPP`): DL och DJ skålar med varandra medan DT tittar på. Handen genom
+  håret gick inte att göra: huvudena är större än armarna når. Lugnt läge har lite fler påhitt än
+  förut (chansen per lucka 0,3 → 0,38, glad 0,55 → 0,58).
+- **Efter klunken** torkar DL och DJ sig ibland om munnen med handryggen (`torka`).
+
+Prova med `?rum-akt=dl:funderar,dt:hosta,dj:axlar` och `?rum-akt=dl:skalTva,dt:skalTva,dj:skalTva`.
+
+Bara bålen, huvudet, händerna, knäna och fötterna som redan finns rör sig: inga nya delar, material
+eller bilder och inga fingrar. Grafikkortet gör därför exakt samma sak som förut. Mätt med gänget
+ensamt i en duk på 1440 × 560 (ritanropen räknade i WebGL), 40 bilder vid samma tider: 560,3
+ritanrop och 942 085 trianglar per bild i snitt, och lika i varje bild, både lugnt och nervöst.
+Processorn räknar lite mer. Rummets egen uträkning gick från 0,29–0,32 till 0,32–0,34 ms per bild,
+ungefär 1 % av bildens hela arbete, och med processorn fyra gånger långsammare från 1,7–1,9 till
+2,0–2,1 ms. Det mesta av det som tillkom räknas en gång per figur och tid i en bild (`AKT_MINNE`:
+`prat`, `sa`, `ordet`). De nya påhitten för handen lika fort som de gamla eller långsammare: som mest
+8–13 enheter mellan två bilder, mot 14–20 i de gamla. Största hoppet mellan två bilder under tio
+minuter är detsamma som förut, och det kommer från de gamla påhitten.
+
 **Ansiktena följer kupongen** (2026-11-08, [public/rum-uttryck.js](public/rum-uttryck.js),
 `ansikten` i rum-3d.js och `senastAv` i rum-folk.js). Hur glada de ser ut beror på hur gängets
 senaste kupong gick, ända tills nästa är spelad. Blev det vinst (tio rätt av tretton på
