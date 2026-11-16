@@ -5053,6 +5053,40 @@ bra omgång bär papperskronan i stället för högtidens (figuren byggs om när
 och DJ tar av sig struten, kronan och partyhatten när han somnar med huvudet på bordet. Blad,
 blommor, bär, ljus och konfetti är sammanslagna till ett nät per sak, så att det blir få ritanrop.
 
+**Högtidspyntet** (2026-11-16, [public/rum-pynt.js](public/rum-pynt.js), `pyntet` och `pyntSaker`; användarens
+önskemål: "inredningen på animationssidan (och hasse-sidan) påverkas av högtiderna som vi befinner oss i … Dra
+gärna ut högtiderna lite grann (rimligt) så att det inte bara är en dag"): runt högtiderna pyntar affären, och
+pyntet sitter uppe längre än gängets kläder, som i en affär – från några dagar före till en bit efter. Dagen är
+Stockholms, som kläderna. Pyntet hänger i fönstret, i luckorna kring neonen och skivan med löpsedlarna, och står
+längst in i hörnet på bardisken, mellan orakelramen och datorn (som står framför det) och under pokalhyllan, långt
+från gullrankan mitt på disken, lite mindre än i verkligheten och vridet mot affären (`pyntSakerna` i
+[public/rum-inredning.js](public/rum-inredning.js)):
+
+- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian och
+  nyåret ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
+  bunden girlang, varmvita små lampor i en slinga runt den, en röd sammetsrosett vid varje krok och röda och
+  guldfärgade kulor i bågarna – en adventsstjärna i rött papper i den högra rutan, som lyser inifrån, starkast mot
+  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken.
+- **Påsk** (lördagen före palmsöndagen till tisdagen efter annandag påsk): målade ägg – ränder, sicksack, prickar
+  och stjärnor i pastell – i band från karmen, och påskris i en vit glaserad kanna med en blå rand, med fjädrar i
+  klara färger och några små ägg bland kvistarna.
+- **Midsommar** (måndagen i midsommarveckan till söndagen efter midsommarafton): vimplar i blått och gult längs
+  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar.
+- **Kräftskivan** (kräftpremiären, andra onsdagen i augusti som på nittiotalet, till sista augusti):
+  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant.
+- **Halloween** (veckan före alla helgons dag och dagen själv): en urholkad pumpa med ett lysande ansikte på
+  bardisken och ett spindelnät med en spindel i fönstrets övre vänstra hörn.
+
+Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på två egna dukar i väggens plan: fönstrets
+under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
+(`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
+målas på väggen och glaset, och på kvällen går rummets mörker runt dem som runt neonen och spotarna och lysrörets
+värme ligger kring dem (`pyntLjus`, `ljusKlockan` i [public/rum.js](public/rum.js)); det andra mörknar med
+lysröret (`pyntNatt`). Girlangens barr är kort med en ritad grankvist och fjädrarna kort med en ritad fjäder, så
+att de blir yviga utan många trianglar. Utan högtid hämtas bara kalendern, och inget ritas. Kommer en högtid eller
+går medan sidan står öppen byts pyntet (var tionde minut). Samma pynt finns bakom Hasse Backe (se *Högtidspyntet
+bakom honom* under [Hasse Backe](#hasse-backe)).
+
 **Askkoppen, snusdosan och fläkten** står på pulten bakom högen, mellan kupongen och tidningen, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
 askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
@@ -5305,7 +5339,8 @@ finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysare
 `jakten`),
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
 `chokladbollar`) fikat, `?rum-ol=jul` (`pask`) ölen och `?rum-fest=jul` (`lucia`, `nyar`,
-`pask`, `midsommar`, `inget`) högtidskläderna. Gänget: `?rum-plats=0` (`1`, `2`)
+`pask`, `midsommar`, `inget`) högtidskläderna och `?rum-pynt=jul` (`pask`, `midsommar`, `kraftor`,
+`halloween`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
 om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
@@ -7970,6 +8005,16 @@ Ett klick på den, eller Enter, förstorar den från fronten till mitt i bilden 
 sin ram, över baren som mörknar bakom, och namnet uppe i hörnet går undan. Ett klick, Esc, *Tillbaka* i foten eller
 bakåt lägger tillbaka den (`lopUt`, ett eget lager i rum-bak.js), och man är kvar hos honom. Med minskad rörelse
 tonar den in och ut. `?rum-hasse&rum-lop` visar den inzoomad (för bilder).
+
+**Högtidspyntet bakom honom** (2026-11-16, `pyntBild` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js) och
+`pynt` i [public/rum-hasse.js](public/rum-hasse.js)): runt högtiderna står samma pynt som i affären (se
+*Högtidspyntet* under [Tobaksaffären](#tobaksaffären)) också i baren, till höger om honom, där samtalet inte står:
+adventsstjärnan, påskäggen, vimplarna eller kräftlyktorna hänger i glaspartiet bredvid hans huvud, och
+adventsljusstaken, påskriset, blommorna eller pumporna står på bardisken till höger om hans arm, ovanför veckans
+löpsedel. Det ritas en gång genom hans kamera på en egen duk mellan väggen och honom (`.rh-pynt`), när bilden passas
+in och när ljuset ändras, och är lika oskarpt som väggen på det djupet, som löpsedeln. Ljuset är barens: lysröret,
+dagsljuset bakifrån genom glaset och mörkret, som på honom; det som lyser lyser ändå. På höjden står det närmare
+honom, så att det ryms i den smalare bilden.
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på en halv sekund, som när kameran vrids åt vänster: den kommer
