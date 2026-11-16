@@ -4,7 +4,7 @@
 // skyltfönstret, Stängt-skylten på dörrens glas, skivan med löpsedlarna i
 // fönstret, stationsuret och orakelramen med mässingsskylten på bakväggen,
 // cigarettpaketen uppe på högra väggen, ramarna kring skårtavlan och
-// korktavlan, bardisken med barstolarna och bladet
+// korktavlan, bardisken med barstolarna och gullrankan (rum-vaxter.js) och bladet
 // med radions stationer på väggen bredvid radion.
 //
 // Allt ritas med en och samma WebGL-duk utanför sidan och kopieras till en
@@ -36,6 +36,7 @@
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
 import { ROR as NEON_ROR } from './rum-neon.js';
+import { gullranka } from './rum-vaxter.js';
 
 const DEG = Math.PI / 180;
 const WZ = -26;
@@ -766,6 +767,12 @@ export async function inredning(el, opt = {}) {
   // fronten X = 1115, golvet Y = −730 och ramarna 128,57 isär från bakväggen
   // (Z = 0) mot betraktaren.
   const DISK = { top: -490, kant: 1060, vagg: 1140, front: 1115, under: -501, golv: -730, ram: 128.57, fram: 850 };
+  // Gullrankan (rum-vaxter.js): mitt på disken, på det tomma stycket mellan datorn (z 235) och
+  // fruktlådan med kassetterna (från z 486), under korktavlan. Tuvan når 35 upp, så att den går fri
+  // från tavlans underkant (y 462 där, och tavlorna ligger över diskens duk) och dukens överkant
+  // (y 470). Revorna hänger över kanten bortom den tredje barstolen (z 343–417) och kryper längs
+  // skivan mot datorn och lådan utan att nå dem.
+  const RANKA = { x: 1098, z: 430 };
   function bardisk(b) {
     const { mesh } = b;
     const D = DISK;
@@ -837,6 +844,10 @@ export async function inredning(el, opt = {}) {
       mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(V(D.front - 2, -533, z), V(D.front - 11, -539, z), V(D.front - 10.5, -529, z)), 12, 0.9, 8), massing, b.scene);
       mesh(new THREE.SphereGeometry(1.25, 12, 8), massing, b.scene).position.set(D.front - 10.5, -529, z);
     }
+
+    // gullrankan: glaserad kruka och blanka blad, med färgen i hörnen
+    mesh(gullranka({ kant: RANKA.x - D.kant, rund: r, oga: { x: 760 - RANKA.x, y: -400 - D.top, z: 1000 - RANKA.z } }), mat('#ffffff', { vertexColors: true, roughness: 0.55, clearcoat: 0.2, clearcoatRoughness: 0.45, side: THREE.DoubleSide }), b.scene)
+      .position.set(RANKA.x, D.top, RANKA.z);
 
     // barstolarna: röd vinyl med söm på en krom ställning, som gängets, i
     // verklig storlek (sitsen 75 cm över golvet), inskjutna under kanten
