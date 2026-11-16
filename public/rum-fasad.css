@@ -24,7 +24,7 @@
 .rum.fasad-tackt > .rum-sving * { visibility: hidden !important; }
 
 /* gänget i fönstret: lite mjukt, som genom glas på några meters håll */
-.rf-gang { position: absolute; filter: blur(0.7px) saturate(0.9); }
+.rf-gang { position: absolute; filter: blur(0.6px) saturate(0.9); }
 
 /* neonen glappar som inne (neonOn i rum.js) */
 .rf-neon-av { opacity: 0; }
