@@ -71,9 +71,10 @@
 .reg-term .tr.hr::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 0.09em solid #1c9c3d; }
 /* kupongens avdelningar: ett tunt streck ovanför den första raden (utan en
    egen rad, så att allt ryms på skärmen), och i telefonen tävlingen som
-   rubrik med ett streck efter */
+   rubrik med ett streck efter; registrets tabeller har strecket där zonen
+   byts, lika brett som tabellen (--ny) */
 .reg-term .tr.ny { position: relative; }
-.reg-term .tr.ny::before { content: ''; position: absolute; left: 0; right: 0; top: 0; border-top: 0.07em solid var(--svag); opacity: 0.75; pointer-events: none; }
+.reg-term .tr.ny::before { content: ''; position: absolute; left: 0; right: 0; width: var(--ny, auto); top: 0; border-top: 0.07em solid var(--svag); opacity: 0.75; pointer-events: none; }
 .reg-term .tr.rub { display: flex; align-items: center; gap: 1ch; }
 .reg-term .tr.rub::after { content: ''; flex: 1; border-top: 0.09em solid var(--svag); opacity: 0.75; }
 /* korten (rum-register.js, ETK): avsnittens rubrik med ett streck efter, och
