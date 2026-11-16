@@ -295,7 +295,10 @@ export async function inredning(el, opt = {}) {
   // står still (den ritas en gång, som allt annat här). Mitt över bordet (FLAKT, i världen) och så högt att
   // kuporna slutar ovanför Stryktipset-bandet: bladen närmast en går upp ur bilden på datorn, och i telefonen
   // på höjden syns hela fläkten.
-  const FLAKT = { X: 623, Z: 260 };
+  // Samma kväll mindre framträdande (FLAKT.S): fyra femtedelar så stor kring fästet i taket, mörkare blad
+  // med mindre glans och kupor i varmt, dämpat glas med ett svagare sken, så att den lyser på bordet utan
+  // att dra blicken till sig.
+  const FLAKT = { X: 623, Z: 260, S: 0.8 };
   const TAK = -90;
   // det som lyser (glod: glaskuporna, ljus: ljuset kring dem i fläktens scen), för natten
   const LAMP = { glod: [], ljus: [], lyser: [] };
@@ -303,8 +306,9 @@ export async function inredning(el, opt = {}) {
   let morkt = 0;
   const MASSING = () => mat('#b8893a', { metalness: 0.85, roughness: 0.32, envMapIntensity: 1.2 });
   const SEG = LATT ? 36 : 64;
-  // frostat glas som lyser: ljusare där man ser rakt in, varmare i kanten (av: släckt)
-  const GLAS = { pa: ['#fff7ea', '#e7bf8e'], av: ['#a69d90', '#7c7368'] };
+  // frostat glas som lyser: ljusare där man ser rakt in, varmare i kanten (av: släckt). Inte vitt: kuporna
+  // var det ljusaste i rummets överkant och drog blicken (2026-11-16)
+  const GLAS = { pa: ['#ecd4ad', '#a5774a'], av: ['#a69d90', '#7c7368'] };
   function glodMat(p = 0.6) {
     const m = new THREE.ShaderMaterial({
       side: THREE.DoubleSide,
@@ -344,7 +348,7 @@ export async function inredning(el, opt = {}) {
         const px = ((v.x + 1) / 2) * c.width;
         const py = ((1 - v.y) / 2) * c.height;
         const rr = r * (1000 / (1000 - z)) * k;
-        for (const [dy, R, f, al] of [[0.5, 3.2, '255, 212, 156', 0.34], [0, 1.6, '255, 242, 222', 0.42]]) {
+        for (const [dy, R, f, al] of [[0.5, 2.6, '255, 212, 156', 0.17], [0, 1.4, '255, 236, 210', 0.2]]) {
           const gr = g.createRadialGradient(px, py + dy * rr, 0, px, py + dy * rr, R * rr);
           gr.addColorStop(0, `rgba(${f}, ${(al * a).toFixed(3)})`);
           gr.addColorStop(0.45, `rgba(${f}, ${(al * a * 0.4).toFixed(3)})`);
@@ -361,7 +365,11 @@ export async function inredning(el, opt = {}) {
     medSkenet(b);
     const g = new THREE.Group();
     b.scene.add(g);
-    const { X, Z } = FLAKT;
+    const { X, Z, S } = FLAKT;
+    // fläkten byggs i full storlek och krymps kring fästet i taket (S); det som lyser följer med (iS)
+    g.scale.setScalar(S);
+    g.position.set(X * (1 - S), TAK * (1 - S), Z * (1 - S));
+    const iS = (x, y, z) => [X + (x - X) * S, TAK + (y - TAK) * S, Z + (z - Z) * S];
     const M = MASSING();
     const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); g.add(o); return o; };
     add(new THREE.CylinderGeometry(14, 20, 9, 40), M, X, TAK - 4.5, Z);
@@ -375,9 +383,9 @@ export async function inredning(el, opt = {}) {
     const Yb = TAK - 24;
     const bladTex = tex(512, 144, (c, w, h) => {
       const gr = c.createLinearGradient(0, 0, 0, h);
-      gr.addColorStop(0, '#5a2a14');
-      gr.addColorStop(0.5, '#73381b');
-      gr.addColorStop(1, '#4f2410');
+      gr.addColorStop(0, '#4a2210');
+      gr.addColorStop(0.5, '#5c2c15');
+      gr.addColorStop(1, '#3f1c0c');
       c.fillStyle = gr;
       c.fillRect(0, 0, w, h);
       for (let i = 0; i < 40; i++) {
@@ -394,7 +402,7 @@ export async function inredning(el, opt = {}) {
       c.beginPath();
       c.rect(x0, y0, x1 - x0, y1 - y0);
       c.clip();
-      c.fillStyle = '#d6b277';
+      c.fillStyle = '#9c7a4c';
       c.fillRect(x0, y0, x1 - x0, y1 - y0);
       c.strokeStyle = 'rgba(120, 78, 30, .6)';
       c.lineWidth = 2;
@@ -409,7 +417,7 @@ export async function inredning(el, opt = {}) {
       c.lineWidth = 4;
       c.strokeRect(x0, y0, x1 - x0, y1 - y0);
     });
-    const bladM = mat('#ffffff', { map: bladTex, roughness: 0.42, clearcoat: 0.6, clearcoatRoughness: 0.3 });
+    const bladM = mat('#ffffff', { map: bladTex, roughness: 0.55, clearcoat: 0.3, clearcoatRoughness: 0.45 });
     for (let i = 0; i < 5; i++) {
       const piv = new THREE.Group();
       piv.position.set(X, Yb, Z);
@@ -440,17 +448,17 @@ export async function inredning(el, opt = {}) {
       add(new THREE.CylinderGeometry(4.5, 4.5, 6, 16), M, p2.x, p2.y - 2, p2.z);
       add(tulpan, glas, p2.x, p2.y - 4, p2.z);
       add(new THREE.TorusGeometry(16.3, 0.7, 8, 48), kantM, p2.x, p2.y - 23, p2.z).rotation.x = 90 * DEG;
-      LAMP.lyser.push([p2.x, p2.y - 14, p2.z, 12, 'kupa']);
+      LAMP.lyser.push([...iS(p2.x, p2.y - 14, p2.z), 12 * S, 'kupa']);
     }
     // dragkedjan med en kula
     for (let j = 0; j < 9; j++) add(new THREE.SphereGeometry(0.8, 8, 6), M, X + 3, Yb - 14 - j * 2.2, Z + 6);
     add(new THREE.SphereGeometry(2.2, 12, 8), M, X + 3, Yb - 35, Z + 6);
     // ljuset från kuporna på bladens och armarnas undersidor
-    const pl = new THREE.PointLight('#ffd8a8', 5000, 0, 2);
+    const pl = new THREE.PointLight('#ffd8a8', 2400, 0, 2);
     pl.position.set(X, Yb - 32, Z);
     g.add(pl);
-    LAMP.ljus.push([pl, 5000]);
-    LAMP.lyser.push([X, TAK - 60, Z, 0, 'flakt']);
+    LAMP.ljus.push([pl, 2400]);
+    LAMP.lyser.push([...iS(X, TAK - 60, Z), 0, 'flakt']);
   }
 
   // Undertaket (2026-11-16, "tydligare att det finns ett tak"): plattor på 60 × 60 cm (PLATTA enheter) i

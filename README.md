@@ -6690,6 +6690,24 @@ planet) och 4,7 MB i telefonen (1560 × 334, upp till rubriken i telefonen på h
 bildrutorna. Provat på datorn (1280 × 800, 1500 × 722), i telefonen (360 × 800, 390 × 844, 430 × 932), på natten och
 utan 3D-taket, och med närbilden av uret och kupongen på bred skärm.
 
+### Takfläkten i bakgrunden (2026-11-16)
+
+Användarens önskemål: "Kan du ordna så att fläktlampan i taket på animationssidan blir mindre prominent. Just nu tar
+den mkt fokus." Takfläkten (`flakt` i rum-inredning.js, i stället för lysröret) hade kupor i nästan vitt glas med ett
+starkt sken kring sig – det ljusaste i rummets överkant, mitt ovanför gänget – och i telefonen på höjden syntes stora
+blad med ljusa rottingfält. Nu lyser den på bordet utan att dra blicken till sig:
+
+- **Mindre:** fyra femtedelar så stor, krympt kring fästet i taket (`FLAKT.S`), så att kuporna hänger högre över
+  Stryktipset-bandet. Det som lyser (`LAMP.lyser`) följer med.
+- **Dämpat glas:** kuporna i varmt, beigt glas i stället för vitt (`GLAS.pa`) och skenet kring dem i deras duk
+  (`medSkenet`) ungefär hälften så starkt.
+- **Mörkare blad:** mahognyn mörkare, rottingfälten mörkare och mindre lack, och ljuset under fläkten svagare.
+- **Mindre ljus i taket:** hålet i dunklet kring fläkten (`ljusKlockan` i rum.js) och den varma tonen på taket runt
+  den är svagare.
+
+Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som dator (1440 × 900) klockan
+14 och 21.30 och som telefon (412 × 870).
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret

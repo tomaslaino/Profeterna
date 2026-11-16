@@ -1560,7 +1560,7 @@ window.Rum = (() => {
       rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
       // (taklamporna lyser upp taket och väggen överst, och lampan över pulten lyser: förut låg dunklet
       // också över dem, så att lysröret, som hängde där fläkten hänger, såg grått ut)
-      for (const [x, y, , sort] of lampL) if (sort === 'flakt') rad(q, x, y, 380, 170, '0, 0, 0', 0.85);
+      for (const [x, y, , sort] of lampL) if (sort === 'flakt') rad(q, x, y, 330, 145, '0, 0, 0', 0.7);
       // (löpsedlarna i spotens ljus)
       rad(q, 855, 360, 140, 210, '0, 0, 0', 0.95);
       rad(q, LAMPA_I[0], LAMPA_I[1], 170, 125, '0, 0, 0', 0.9);
@@ -1592,8 +1592,8 @@ window.Rum = (() => {
       const ml = (0.45 + 0.55 * kvall) * (1 - ng);
       for (const [x, y, , sort] of lampL) {
         if (sort !== 'flakt') continue;
-        rad(g, x, y - 40, 420, 120, '255, 205, 150', r1(0.2 * ml));
-        rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.16 * ml));
+        rad(g, x, y - 40, 420, 120, '255, 205, 150', r1(0.12 * ml));
+        rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.1 * ml));
       }
       if (skarm) {
         rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.2 * ml));
