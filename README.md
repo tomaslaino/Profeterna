@@ -5188,23 +5188,39 @@ längst in i hörnet på bardisken, mellan orakelramen och datorn (som står fra
 från gullrankan mitt på disken, lite mindre än i verkligheten och vridet mot affären (`pyntSakerna` i
 [public/rum-inredning.js](public/rum-inredning.js)):
 
-- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian och
-  nyåret ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
+- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian
+  ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
   bunden girlang, varmvita små lampor i en slinga runt den, en röd sammetsrosett vid varje krok och röda och
   guldfärgade kulor i bågarna – en adventsstjärna i rött papper i den högra rutan, som lyser inifrån, starkast mot
-  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken.
+  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken. Dessutom tre
+  halmstjärnor med rött garn i trådar ovanför gänget och en julkrans av granris med lingon och en röd rosett på
+  dörrens glas, i ett band från en sugpropp under namnet.
+- **Nyår** (29 december – 2 januari): julpyntet sitter kvar, och serpentiner i lockar hänger från girlangen.
 - **Påsk** (lördagen före palmsöndagen till tisdagen efter annandag påsk): målade ägg – ränder, sicksack, prickar
   och stjärnor i pastell – i band från karmen, och påskris i en vit glaserad kanna med en blå rand, med fjädrar i
-  klara färger och några små ägg bland kvistarna.
+  klara färger och några små ägg bland kvistarna. Tre påskkycklingar av garn vid kannan, och en påskkrans av björkris
+  med fjädrar, små ägg och en gul rosett på dörrens glas.
 - **Midsommar** (måndagen i midsommarveckan till söndagen efter midsommarafton): vimplar i blått och gult längs
-  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar.
+  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar. Lövruskor av
+  björk är bundna vid dörrposterna, med grenarna utåt.
 - **Kräftskivan** (kräftpremiären, andra onsdagen i augusti som på nittiotalet, till sista augusti):
-  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant.
+  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant,
+  och två till på dörrens glas. I hörnet på bardisken ett fat med kräftor och dillkronor, och en flaska brännvin
+  med två snapsglas.
 - **Halloween** (veckan före alla helgons dag och dagen själv): en urholkad pumpa med ett lysande ansikte på
-  bardisken och ett spindelnät med en spindel i fönstrets övre vänstra hörn.
+  bardisken (och en liten bredvid), ett spindelnät med en spindel i fönstrets övre vänstra hörn och fladdermöss i
+  svart papper i trådar i fönstret och på dörrens glas.
 
-Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på två egna dukar i väggens plan: fönstrets
-under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
+Fler saker kom samma dag (användarens önskemål: "fler föremål … De ska inte vara grafikkrävande"). De är byggda så
+att de inte kostar något medan rummet går: var sak är ett eller några få sammanslagna nät med färgen i hörnen och
+samma material som det andra pyntet (inga nya grafikprogram), och den ritas en gång till sin duk som allt pynt.
+Uppmätt i Chromium: halmstjärnan 630 trianglar, fladdermössen 44 styck, kycklingarna 700 styck, ballongerna 2 600,
+julbocken 2 800, serpentinerna 2 800, midsommarstången 4 800, lövruskan 6 500, kransarna 5 700–8 900 och kräftfatet
+med flaskan 8 700, högst åtta nät per sak, var och en byggd på 1–30 ms en gång; gänget har flera hundra tusen
+trianglar och ritas i varje bildruta.
+
+Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på tre egna dukar i väggens plan: fönstrets
+och dörrens under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
 (`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
 målas på väggen och glaset, och på kvällen går rummets mörker runt dem som runt neonen och spotarna och lysrörets
 värme ligger kring dem (`pyntLjus`, `ljusKlockan` i [public/rum.js](public/rum.js)); det andra mörknar med
@@ -5466,7 +5482,7 @@ finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysare
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
 `chokladbollar`) fikat, `?rum-ol=jul` (`pask`) ölen och `?rum-fest=jul` (`lucia`, `nyar`,
 `pask`, `midsommar`, `inget`) högtidskläderna och `?rum-pynt=jul` (`pask`, `midsommar`, `kraftor`,
-`halloween`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
+`halloween`, `nyar`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
 om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
@@ -8472,7 +8488,9 @@ adventsljusstaken, påskriset, blommorna eller pumporna står på bardisken till
 löpsedel. Det ritas en gång genom hans kamera på en egen duk mellan väggen och honom (`.rh-pynt`), när bilden passas
 in och när ljuset ändras, och är lika oskarpt som väggen på det djupet, som löpsedeln. Ljuset är barens: lysröret,
 dagsljuset bakifrån genom glaset och mörkret, som på honom; det som lyser lyser ändå. På höjden står det närmare
-honom, så att det ryms i den smalare bilden.
+honom, så att det ryms i den smalare bilden. Bredvid, längre åt höger, står fler saker där bilden är bred: en julbock i halm med röda band och två halmstjärnor
+till jul, ballonger i guld, silver och svart till nyår, påskkycklingar vid påskriset, en liten midsommarstång lindad
+med löv och blommor, kräftfatet med brännvinet (i stället för något annat på disken) och fladdermöss i glaspartiet.
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på en halv sekund, som när kameran vrids åt vänster: den kommer
