@@ -17,14 +17,13 @@
 // {ratt} och {av} hur många rätt han hade av hur många, i ord (ett, två, sex; {ratt} bara framför rätt), {antal} och {Antal} ett tal
 // från två till tretton i ord (i domarna), och i domarna {match}, {tipset}, {Tipset} och {pct} (se domar.sak).
 //
-// Raderna hörs: Macen tar fram ljudet till dem med fälten ifyllda
-// (src/rost.js), så filen är både ett skript i sidan
-// (window.HasseRepliker) och en modul för Node. lar är knappar och sägs inte.
+// Filen är både ett skript i sidan (window.HasseRepliker) och en modul för Node
+// (npm run repliker). lar är knappar och sägs inte.
 (function (repliker) {
   if (typeof module === 'object' && module.exports) module.exports = repliker;
   else window.HasseRepliker = repliker;
 })({
-  // Tecknen i ord, för sidan och rösten: du som i "etta och kryss", bestamd som i "Ettan kan du behålla".
+  // Tecknen i ord: du som i "etta och kryss", bestamd som i "Ettan kan du behålla".
   tecken: { 1: { du: 'etta', bestamd: 'ettan' }, X: { du: 'kryss', bestamd: 'krysset' }, 2: { du: 'tvåa', bestamd: 'tvåan' } },
   // Talen i ord, för {ratt} och {av}. Det heter ett rätt (Tomas 2026-11-15), så {ratt} står bara framför rätt,
   // och {av} blir ett bara i "rätt av ett". {antal} är från två och uppåt.
@@ -467,7 +466,7 @@
   // Raden om hur många rätt han hade lottas (Tomas 2026-11-16: "Han säger det här varje gång"), torrt som en
   // tränare på presskonferens: den ska passa lika bra efter en bra som en dålig omgång, och alla rätt och inga rätt
   // har egna rader (rattAlla och rattNoll, med {av} som enda tal; gäller från två matcher). Varje rad ryms på två
-  // rader ovanför listan med de längsta talen, och blir ett åttiotal meningar till rösten.
+  // rader ovanför listan med de längsta talen.
   efter: {
     ratt: [
       'Jag hade {ratt} rätt av {av}.',
@@ -759,7 +758,7 @@
     // Han säger det på olika sätt: först, sist eller mitt i meningen, kort och torrt, som en lärare (unge, gamle,
     // käre) eller med ironisk artighet (herr, och då i tredje person, som en gammal kypare). Varje rad ska gå att
     // säga efter "Jag hade åtta rätt av tio." och ensam, rymmas på två rader med det längsta namnet (npm run
-    // repliker säger till), och har {namn} en gång. Varje rad blir ett tjugotal meningar till rösten, en per namn.
+    // repliker säger till), och har {namn} en gång.
     namn: {
       alla: [
         'Ta en ordentlig titt på min kupong, {namn}.',
@@ -829,7 +828,7 @@
   // sitter där säger han mal och sedan malBra (för honom, också när det fattas ett mål till), malLugn (emot, men
   // tecknet sitter ändå) eller malFel (tecknet sitter inte, och det fattas mer än förut). Kommentarerna sägs alltid efter ställningen.
   // {lag} är laget som leder, {mot} det andra, och {res} ställningen med ledarens mål först; i lika och mal
-  // är {match} matchen med korta lagnamn och {res} som på kupongen. Ställningen sägs tyst.
+  // är {match} matchen med korta lagnamn och {res} som på kupongen.
   // Var i matchen man är (kommentar i rum-hasse.js) väljer ibland en annan lista än haller och emot: tidigt
   // (de första tjugo minuterna), halvtid, sent (från den åttionde minuten, där inget om att det är gott om tid
   // passar), stor (två mål eller mer), skrall (hans tecken sitter fast spelbolagen inte trodde på det) och
@@ -1553,8 +1552,7 @@
     // sedan vad han tycker om det (om), en mening var. {match} är matchen (Cardiff mot Burnley), {tecknet} och
     // {Tecknet} en spik i bestämd form (krysset) och {den} det eller den efter tecknet, {tecknen} en halvgardering
     // (etta och kryss), {pct} datorns chans
-    // för tipset i procent och {res} hur matchen slutade. En rad med matchen hörs inte (rösten kan inte alla lag),
-    // så kommentaren efter ska gå att förstå för sig. Allt ska vara sant om det som RumBlock.saker har valt.
+    // för tipset i procent och {res} hur matchen slutade. Kommentaren efter ska gå att förstå för sig. Allt ska vara sant om det som RumBlock.saker har valt.
     sak: {
       // tipset med lägst chans som satt; ensam när ingen av de andra hade rätt där
       skrall: {
@@ -1696,11 +1694,9 @@
   // annanstans ifrån (Laine, Tegnér, Mogge, Snejder), ett smeknamn som om ni var gamla bekanta (Teddy, Dodde),
   // och för Dogge ett efternamn i stället för smeknamnet, och då fel efternamn. Felet ska likna det riktiga
   // namnet, inte bara börja likadant (Larsson, Lahti, Litmanen, Tegnell, Tobbe och Diego låg för långt bort och
-  // är borta, och Daniel, som ni alla heter, också). Varje fel ska höras när rösten
-  // läser (Teider låter som Tejder och är därför borta), och inget får vara längre än åtta bokstäver, så att
-  // raderna med namnet inte blir längre. Varje namn ger rösten ungefär 90 meningar till. Namnen vi kallas
-  // (Tippoang.kallas: efternamnen, Dogge för Johansson); rösten får dem också (src/rost.js). Sägs inte som
-  // egna rader.
+  // är borta, och Daniel, som ni alla heter, också). Felet ska synas (Teider ser ut som Tejder och är därför
+  // borta), och inget får vara längre än åtta bokstäver, så att raderna med namnet inte blir längre. Namnen vi
+  // kallas (Tippoang.kallas: efternamnen, Dogge för Johansson). Sägs inte som egna rader.
   felnamn: {
     Laino: ['Lainio', 'Leino', 'Laine', 'Lainen', 'Laiho', 'Laitinen', 'Leinonen'],
     Tejder: ['Tejler', 'Tejdel', 'Tegnér', 'Tajder', 'Snejder', 'Theander', 'Teddy'],
@@ -2355,9 +2351,9 @@
 
   // Protokollet (rum.js): med protokollet framme ropar man till honom (Hasse, hur räknas
   // poängen?), och han svarar från baren, utanför bilden (rum-hasse-svar.js). Först en rad ur
-  // ropSvar, sedan förklaringen i stycken med en mening i taget, så att varje mening får sitt ljud.
+  // ropSvar, sedan förklaringen i stycken med en mening i taget.
   // Mellan förklaringen och rad (vad han själv gör med det) kommer ett exempel som sidan räknar
-  // fram; det ändras med datan och har därför inget ljud. Poängen förklaras som i tippoang.js:
+  // fram ur omgången. Poängen förklaras som i tippoang.js:
   // ändras den ska hans svar följa med. (Anslagstavlan, där han också svarade, togs bort 2026-11-14.)
   ropSvar: [
     'Det ska jag tala om för dig.',

@@ -508,13 +508,8 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
 - **Analyserna** ingår inte i bygget: datorn committar `data/analyser.json` och
   `data/omgangsnamn.json` till `main`, och den pushen bygger om sajten som vilken annan push
   som helst. Bygget kopierar filerna till sajten. Se [Analyserna](#analyserna).
-- **Hasse Backes röst** är Tomas egen: iMacen läser upp allt han säger och
-  force-pushar ljudet till grenen `rost`, en enda föräldralös commit med `rost.json` och de
-  mp3-filer som behövs nu. Steget *Hämta Hasse Backes egen röst* hämtar grenen (djup 1) till
-  `data/egen-rost/`, som inte committas. Det som saknas där sägs tyst.
-  Allt laddas upp med sajten (`data/rost/`, `data/rost.json`). Inget av det hamnar på main,
-  och en push till `rost` startar inget bygge: nästa schemalagda körning tar med det nya. Se
-  [Ljudet](#hasse-backe).
+- **Hasse Backes röst** är borttagen (2026-11-17): bygget hämtar inte längre grenen `rost`, och
+  sajten har inget ljud av honom när han pratar. Se [Ljudet](#hasse-backe).
 - **Mindre filer** (se [Mindre filer](#mindre-filer)): bygget körs med `--minify`, som gör
   JavaScript och CSS i `_site/` mindre. Lokala byggen gör det inte, så att koden går att läsa i
   webbläsaren; `npm run build -- --minify` bygger som på GitHub Actions.
@@ -1692,6 +1687,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   grenen `rost` som den låg då: 3 227 av 6 698 meningar fick ljud, alla med egen röst, och en gammal
   `data/cache/rost/` togs bort. Sidan är inte ändrad (den slår upp meningen i registret som förut). Se
   [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Hasse Backe utan röst (2026-11-17, användarens beslut):** "Hasse pratar inte längre. Du kan ta bort
+  det". Han pratar inte högt: det han säger står i skriftens takt, som det alltid har gjort när ljudet var av.
+  Bygget hämtar inte grenen `rost` (`src/rost.js` och steget i workflowen är borta), *Läs upp* under hans text
+  och svaret från baren är borta, och iMacens jobb stänger av sig självt nästa gång det körs. *Ljud på* står
+  kvar, för slagen i disken, koppen och de andra ljuden på disken. Se [Hasse Backe](#hasse-backe), *Ljudet*.
 - **Hasse Backe slår domen i disken på fler sätt, och det hörs (2026-11-05, användarens
   önskemål):** han är en bestämd och tydlig herre, så domen slås i disken på ett av fem sätt
   (skrattet, näven, tre slag, båda händerna, fingret och handflatan), och vid ett bestämt ord
@@ -2147,7 +2147,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   [public/tippoang.js](public/tippoang.js): efternamnet – alla i gänget heter Daniel – men *Dogge* för
   Johansson. Allt som skriver ut ett namn i gänget använder den: Olympen (ställningen, kurvan, duellerna,
   utmärkelserna, betygen och kröningen), Omgångens tippare, samtalet och raden på förstasidan, namnen på
-  kupongen, Tipsligan, löpsedeln, tidningen, protokollet och Hasse Backe, vars röst (`src/rost.js`) får
+  kupongen, Tipsligan, löpsedeln, tidningen, protokollet och Hasse Backe, vars röst (då `src/rost.js`) fick
   samma namn. Han kallar honom ibland nästan rätt, *Docke* eller *Dugge* (`felnamn`). Där sidan förut skrev
   hela namn i löptext (Omgångens tippare, *Tippade inte:* och *Ta bort kupongen?*) står nu samma korta namn
   för alla, så att inte bara en heter något annat. Hela namnet står kvar där det måste: Om oss, tryckt
@@ -2742,7 +2742,7 @@ liggande, minst 480 bildpunkter bred och inte en logga (adressen) eller en grafi
 Insider, Football League World m.fl.) och sajterna som är spärrade på datorn läses inte. Samma bild används inte för två
 lag. `sips` förminskar den till 320 bildpunkter (15–35 kB). Provat på omgången 2026-11-07: 25 av 26 lag fick en bild på
 15–20 sekunder, och de flesta visar rätt lag. Bilderna läggs i grenen `tidning-bilder`, en enda commit som skrivs över
-(som rösten i `rost`), så att main inte växer och förra veckans bilder försvinner; workflowen hämtar den till
+så att main inte växer och förra veckans bilder försvinner; workflowen hämtar den till
 `data/tidning-bilder/` och bygget kopierar den till sajten. Går grenen inte att pusha blir det inga bilder och sidan
 visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiserna (se [Tidningen](#tidningen)). `node scripts/analyser/skriv.mjs --tidning-bilder` hämtar bilderna på nytt till tidningen som
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
@@ -9113,8 +9113,7 @@ versaler som texten i bandet. Rutorna 1 X 2 står inte här: de kommer först n�
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
 lapp i terrakotta, med *Alla matcher* i krämvitt bredvid (*Fyll i den* i stället för *Titta igen* medan han
-föreslår att fylla i kupongen, se *Din kupong*), och *Läs upp* står bredvid dem med samma versaler som *Matchbladet →* men
-utan pil. Han har alltid svaret (*Den knäckte jag i morse*). Är analysen inte skriven än
+föreslår att fylla i kupongen, se *Din kupong*). Han har alltid svaret (*Den knäckte jag i morse*). Är analysen inte skriven än
 säger han det (*Den tar jag sen*). En match du redan har frågat om står direkt, som han sa
 den: domen i guld, hans text och resultatet, och sist vad han tycker om det du har på kupongen nu.
 Det han sa sparas på enheten, så att det står kvar också när analysen har skrivits om sedan dess
@@ -9128,16 +9127,9 @@ sparades (före 2026-11-06) får dagens analys om tecknen är desamma, annars ba
 resultatet. När du har bett om analysen står hela hans text direkt (`svara` i [public/rum-hasse.js](public/rum-hasse.js)).
 Medan man läser slår han domen i disken (se *Slaget*), och domen står i guld när handen träffar; dess plats är hållen
 från början, så att texten står still, och har han något annat i händerna står domen där ändå efter tre sekunder.
-*Läs upp* under texten låter honom läsa den med sin röst (`lasUpp`, och det hörs, se *Ljudet*): en mening i taget med
-munnen efter ljudet, och meningen han läser står ljus medan resten är dämpad. Det blir en paus mellan meningarna och en
-längre före en kort mening, och gesterna kommer vid de bestämda orden (*Nej nej nej* och *varningens finger* ger
-fingret, annars handflatan i disken eller en av gesterna i *Händerna när han pratar*) eller vid ungefär var tredje lång
-mening, när han sitter så att han kan göra dem. Han läser det som står i rutan: ett stycke som har ljud för sig (en
-färdig replik, som resultatet) i ett svep, annars mening för mening, och det som saknar ljud hoppar han över. Knappen
-syns när minst hälften av det har ljud, och den slår på ljudet om det är av, som *Ljud på*. Medan han läser heter den
-*Ja, ja »* och tystar honom, ett klick i samtalet går till nästa mening, och säger han något annat (om kupongen) slutar
-han läsa. Förut låtsades han läsa på i 15–25 sekunder och sa sedan texten ord för ord, och det orkade ingen lyssna på
-(ändrat 2026-11-07). Efter texten säger han vad matchen slutar (*Det slutar 3–1.*): resultatet han
+Förut låtsades han läsa på i 15–25 sekunder och sa sedan texten ord för ord, och det orkade ingen lyssna på
+(ändrat 2026-11-07); sedan fanns *Läs upp* under texten, som lät honom läsa den med sin röst (borta 2026-11-17, se
+*Ljudet*). Efter texten säger han vad matchen slutar (*Det slutar 3–1.*): resultatet han
 valde när texten skrevs (`hasse.resultat`, se *Rösten*). Texter från före 2026-11-07, och analysen
 i skrift när hans text saknas, tar i stället det troligaste resultatet i modellens prognos
 (resultatmatrisen i `data/match/<id>.json`) bland utfallen han har ringat in, och har modellen
@@ -9175,8 +9167,7 @@ Danmarks något om grannarna (*Grannlandet känner jag väl.*), lika korta som d
 repliker` säger till). Medan man står där blandas raderna om landslagsuppehållet med de vanliga (*Ett landslag kan
 inte köpa spelare. Man får spela med dem man har.*), och när kupongen har minst tre landskamper börjar han ibland med
 dem (*Det är landslagsuppehåll. Vilken match tar vi först?*). Vad som är en landskamp tar han ur tävlingens typ i
-`meta.json` (`landskamp` och `landRader` i [public/rum-hasse.js](public/rum-hasse.js)). Raderna har inga fält, så
-bygget tar fram deras ljud som för de andra replikerna (src/rost.js). Hans text till analysen av en landskamp får
+`meta.json` (`landskamp` och `landRader` i [public/rum-hasse.js](public/rum-hasse.js)). Hans text till analysen av en landskamp får
 samma persona, men med en rad om att det är en landskamp (landslagen, förbundskaptenen och samlingen, inte klubbar,
 division eller ligatabell, och att prognosen är spelbolagens) och kryddan ur `kryddorLand` i
 [config/hasse.js](config/hasse.js) (*Landslagsfotboll är klubbfotboll med tre dagars försäsong.*); de engelska
@@ -9197,8 +9188,7 @@ inte förstått matchen.*). Var femte sekund ser han efter om något har ändrat
 har det blivit mål i en av hans matcher säger han det så snart han har pratat klart, med en kommentar efter om målet var för
 honom, emot men tecknet sitter ändå, eller emot så att det inte gör det (räknat i hur många mål som fattas till hans tecken
 och till något annat, före och efter målet). När den sista matchen har slutat säger han hur det gick, som när man öppnar
-honom efteråt. Ställningen i ord står med korta lagnamn och sägs tyst, eftersom rösten inte kan ha alla lag och
-ställningar; raden om hur många rätt han har och kommentarerna hörs när iMacen har läst in dem. Raderna står under
+honom efteråt. Ställningen i ord står med korta lagnamn. Raderna står under
 `stallning` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Har du valt att dölja resultat står ingen
 ställning i listan och han säger inget om den.
 
@@ -9214,8 +9204,7 @@ går det när man läser på.*, *Gamle Jönsson*, *Käre Tejler*) och med ironis
 (*Herr Lainio får klaga hos spelarna, inte hos mig.*). Raden om var han kom i tävlingen, som han säger till er alla, och
 kommentaren till en match som har slutat säger han utan namn. Raderna står under `efter.namn` och `stallning.namn` i
 [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js), en lista för varje läge, och `npm run repliker` säger till om en
-rad saknar namnet eller inte ryms på två rader ovanför listan med det längsta namnet. Varje rad blir 25 meningar till rösten,
-en för varje namn och felnamn, i allt 1 900, som iMacen läser in under ungefär ett dygn; till dess sägs de tyst. Provat med
+rad saknar namnet eller inte ryms på två rader ovanför listan med det längsta namnet. Provat med
 funktionerna ur rum-hasse.js och påhittade data (hur ofta namnet kommer, felnamnen, spärren på två minuter och att inget
 namn sägs när kupongen inte vet vem du är) och att sidan laddar utan fel i headless Chromium; inte i hela rummet med en
 riktig omgång.
@@ -9230,8 +9219,7 @@ dåligt har fått några tränarfraser till (*Strukturen höll hela vägen.*, *N
 Raderna står under `efter.ratt`, `efter.rattAlla` och `efter.rattNoll` i
 [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) (valet i `efterat` i [public/rum-hasse.js](public/rum-hasse.js)),
 och `npm run repliker` säger till om en rad inte ryms på två rader ovanför listan med de längsta talen (56 tecken med
-*tretton rätt av tretton*). Rösten får ungefär 1 200 nya meningar, eftersom varje rad sägs med alla tal från en till
-tretton matcher; iMacen läser in dem under ungefär tio timmar, och till dess sägs de nya raderna tyst.
+*tretton rätt av tretton*).
 
 **Radion och klockan** (2026-11-09). Radion på fönsterbänken hörs också hos honom, och står den på en station säger han
 något om den en gång (per station och besök på sidan) i stället för nästa rad han säger medan han väntar, och nickar med
@@ -9275,11 +9263,10 @@ det skiljer mycket. Chansen är datorns före avspark, som i poängen. Varje sak
 tycker om det (*Sådant händer när favoriterna inte har läst på.*). Spikarna i allmänhet tar han bara när inget annat
 sticker ut. Raderna står under `domar.sak` i rum-hasse-repliker.js och väljs efter omgången och personen, inte på lott,
 så att domen är densamma varje gång och på alla enheter; var och en i gänget får nästa rad i listan, så att samma sak i
-samma omgång låter olika. Varje rad är en mening, så att *Läs upp* kan läsa domen mening för mening. En mening med en match
-hörs inte (rösten kan inte alla lag), så kommentaren efter den ska gå att förstå för sig. Inledningen står lite fetare,
+samma omgång låter olika. Varje rad är en mening, och kommentaren efter en mening med en match ska gå att förstå för sig. Inledningen står lite fetare,
 sakerna indragna bakom ett tunt streck i domens guld, som anteckningar i marginalen, och slutet i kursiv (`.rh-domen` i
 [public/rum-hasse.css](public/rum-hasse.css)). I telefonen går domen upp mot hans krage när den inte ryms under händerna, som
-hans text om en match, med mörkret bakom sig och Tillbaka och *Läs upp* på samma rad (`tillKragen`); förut fick den ett par
+hans text om en match, med mörkret bakom sig och Tillbaka under (`tillKragen`); förut fick den ett par
 rader ovanpå den ljusa kupongen på pulten, där mörkret bara hade börjat, och var svår att läsa (2026-11-14, användarens
 önskemål). Han talar till den som står vid disken, och det kan vara den han dömer: de
 övriga är *de andra* eller *resten*, och *vi* är han och den han talar med, aldrig gänget, där han inte är med (*Dogge var
@@ -9301,8 +9288,8 @@ Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som anvä
 ordet). Namnen sitter inte riktigt, som hos den som aldrig lär sig dem och inte bryr sig (`felnamn` i
 rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett namn som låter nästan likadant (*Tejler*,
 *Docke*), ett han kan bättre någon annanstans ifrån (*Laine*, *Tegnér*, *Mogge*), *Daniel*, som ni alla heter och som därför
-aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska höras
-när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
+aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska synas.
+Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
 mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
 samma fel namn hela omgången, när han hälsar, i domen och när han talar till dig om hur det går (se *Ditt namn efter och
@@ -9456,7 +9443,7 @@ lottas när de sägs (`vantar` i rum-hasse.js), så att han inte upprepar sig f�
 när filen ändras (ett kryss på ändringen, publiceringen stoppas inte): uttryck som redan har underkänts,
 avhuggna meningar på ett eller två ord, rader om kupongen som börjar med ett Det som låter som resultatet,
 fält som inte går att fylla, listor som blivit strängar, rader under en vald match som inte får plats på en rad
-(högst 31 tecken) och att rösten får samma meningar som sidan. Vad
+(högst 31 tecken). Vad
 som är bra svenska kan koden inte avgöra, så de underkända uttrycken läggs till där när det händer. Med minskad
 rörelse i systemet står allt direkt, utan gester.
 
@@ -9591,7 +9578,7 @@ ett ensamt tecken och störst målskillnad blir skrällen gärna en spik på han
 
 **Kontrollerna** (`granska`): inga tal, citat eller namn utanför analysen och oddsen, högst 135
 ord, inga källor ("enligt …"), ingen kollega och inget "i morgon", tecknen som "1", "X", "2" och i
-ord i sista stycket, resultatet med högst 4 mål per lag (rösten har ljud för 0–0 till 4–4) och inom
+ord i sista stycket, resultatet med högst 4 mål per lag och inom
 tecknen men inte i texten, skrällens tecken med och favoritens inte när skrällen är lottad, och
 inget ur den påhittade tränarens värld.
 Klarar svaret inte det får Claude skriva om en gång, och annars visas analysen som den är. Koden ser
@@ -9612,75 +9599,13 @@ kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 5
 1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
 prova Bielsa-utbrottet.
 
-**Ljudet.** Det han säger hörs, när besökaren har slagit på ljudet. Rösten är Tomas egen,
-klonad med Chatterbox Multilingual på iMacen (se *Den egna rösten* nedan). Hasse Backe är en
-påhittad figur i en verklig persons anda, och rösten är Tomas, inte en kopia av den verklige
-Hasse Backes. Där den egna rösten ännu saknas säger han meningen tyst (fram till 2026-11-14 tog
-bygget fram ljudet med Azures talsyntes där). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
-replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
-alla sätt som sidan kan fylla dem (gängets namn, `Tippoang.kallas`, dagarna, tecknen i ord och resultaten 0–0
-till 4–4 – 183 repliker, 6 000 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
-([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
-ungefär 10 000 tecken.
+**Ljudet.** Han pratar inte högt (2026-11-17, användarens beslut: "Hasse pratar inte längre. Du kan ta bort det"):
+det han säger står ord för ord i skriftens takt, med munnen efter orden, och med minskad rörelse står allt direkt.
+*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*, väcker ljudet i webbläsaren, och valet
+minns enheten; sedan heter knappen *Ljud av* (`vakna`, `vaxla` och `ljudknapp` i [public/rum-hasse.js](public/rum-hasse.js)).
+Ljudet är av tills besökaren slår på det.
 
-Bygget ([src/rost.js](src/rost.js), `publicera()`) lägger det som finns i grenen `rost` i
-`_site/data/rost/` med registret `data/rost.json` (mening → fil). Inget av det committas på main, så
-repot växer inte. Utan grenen är han tyst, och bygget går som förut. Bygget skriver hur många
-meningar som har ljud.
-
-**Den egna rösten** ([scripts/rost/](scripts/rost/)). Launchd-jobbet `se.matchfixarna.rost`
-på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt) i en egen klon som
-återställs till origin/main varje gång, som analysernas jobb. Det tar listan över allt han
-säger ur `texter()` i [src/rost.js](src/rost.js), kommande matchers meningar först och sedan
-replikerna (ca 350 meningar), och läser upp högst 30 som saknas per körning med
-[chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py), som laddar modellen en gång (ca 30 s) och räknar
-ungefär 5 s per sekund tal. Inställningarna står i `rost.egen` i
-[config/hasse.js](config/hasse.js): exaggeration 0,7, cfg_weight 0,5, temperature 0,8 och
-referensen `~/Kod/chatterbox-rost/min_rost.wav`. Talen läses som ord ("2–1" blir "två–ett", 0
-"noll"), eftersom det är oprövat hur Chatterbox läser siffror; meningen i registret är densamma
-som på sidan.
-
-Chatterbox avbryter ibland själv med "forcing EOS token", och ibland blir talet för kort eller
-för långt. Därför mäts talet utan tystnad mot den väntade längden (14 tecken i sekunden): under
-0,55 eller över 2,2 gånger den, eller med "forcing EOS" av någon annan orsak än
-`token_repetition`, görs meningen om med nytt slumpfrö, högst fyra gånger. `token_repetition`
-räknas inte: den slog till i 3 av 4 uppläsningar i provet, redan när samma ljudtoken kom två
-gånger, och Tomas lyssnade på de klippen 2026-11-05 och slutet var helt. Klarar den sig inte prövas den igen efter ett dygn, och
-till dess sägs den tyst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
-repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
-inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
-
-Efter varje körning byggs grenen `rost` med git:s egna verktyg: en enda commit utan förälder,
-med registret `rost.json` (mening → avtryck) och de mp3-filer som behövs nu. Den force-pushas
-bara när innehållet har ändrats, så git-historiken växer inte, varken på main eller i grenen.
-Loggen är `~/Library/Logs/Matchfixarna/rost.log`, och Chatterbox egen utskrift från senaste
-körningen står i `rost-chatterbox.log` bredvid.
-
-**Sätt upp den egna rösten** på iMacen (Chatterbox ska redan fungera i `~/Kod/chatterbox-rost`):
-
-1. `bash scripts/rost/installera.sh` i repot. Den klonar repot till
-   `~/Library/Application Support/Matchfixarna/Rost/Profeterna`, skriver jobbets fil i
-   `~/Library/LaunchAgents` och säger till om Python-miljön, referensen eller ffmpeg saknas.
-2. Starta jobbet med `launchctl bootstrap` som skriptet skriver ut. Första körningen börjar
-   direkt.
-3. Följ `rost.log`. Efter första körningen finns grenen `rost` på GitHub, och nästa bygge tar
-   med ljudet.
-
-Stoppa med `launchctl bootout gui/$(id -u)/se.matchfixarna.rost`; grenen ligger kvar, och
-bygget fortsätter att ta ljudet ur den. Utan grenen är han tyst.
-
-I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
-hämtas medan han gör annat – hans text när den står, om ljudet är på – och orden kommer i takt med
-ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
-eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut, och när han läser upp sin text
-hoppar han över den. Ett klick i samtalet visar hela repliken och tystar den, *Ja, ja* tystar
-uppläsningen, och han tystnar när man går därifrån. Hans text läses bara upp när man trycker på *Läs
-upp* (se *Samtalet*); de korta replikerna runt omkring hörs när ljudet är på. Ljudet är av tills besökaren trycker på
-*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*, eller på *Läs upp*; klicket väcker
-ljudet i webbläsaren, och valet minns enheten. Sedan heter knappen *Ljud av*. Med minskad
-rörelse står allt direkt och inget hörs utom det man ber honom läsa upp. *Jag har tappat rösten* sägs tyst.
-
-När ljudet är på hörs också det som händer på disken
+När ljudet är på hörs det som händer på disken
 ([public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), hämtas när ljudet slås på): handen i
 disken, och koppen som klirrar på fatet. Figuren säger när det händer (`handelser` i
 rum-hasse-3d.js: slagen, när koppen landar efter dem och när han ställer ned den), och ljudet
@@ -9688,29 +9613,19 @@ räknas fram med Web Audio, utan ljudfiler och lite olika varje gång. Slaget ä
 sjunker, träets knack, handflatans smäll (näven nästan ingen, båda händerna två strax efter
 varandra) och skivan som klingar kort, och allt på disken skramlar till. Klirret är porslin mot
 porslin, några deltoner som inte är övertoner och där de höga klingar av fortast; koppens fot slår
-oftast två gånger. Allt går genom en mjuk begränsare, så att ett hårt slag inte spräcker ljudet, och
-slaget är ungefär lika starkt som rösten. Slaget hörs från hans högra hand till vänster i bilden och
+oftast två gånger. Allt går genom en mjuk begränsare, så att ett hårt slag inte spräcker ljudet. Slaget hörs från hans högra hand till vänster i bilden och
 koppen från höger.
 
-Provat: [src/rost.js](src/rost.js) i Node med låtsad Azure (ordningen, taket per bygge, stopp vid
-429, registret och städningen av cachen); sidan i headless Chrome 1440 × 900 med låtsat tal i
-cachen (en tonstöt per ord, mp3) publicerat med `publicera()` som i bygget: replikerna och
-analysen hördes mening för mening med orden i takt, och *Ljud av* mitt i en mening och ett tomt
-register fungerade utan fel i sidan. Inte provat mot Azure på riktigt (ingen nyckel där provet
-gjordes), och inte i Safari eller en riktig telefon.
-
-Den egna rösten provades 2026-11-04 utan Chatterbox: [las.mjs](scripts/rost/las.mjs) med låtsad
-modell (`--latsas`, tonstötar) mot en låtsad GitHub (ett lokalt repo), som läste upp fem
-meningar och pushade grenen `rost`, inte pushade igen när inget hade ändrats och inte
-markerade något som misslyckat när modellen kraschade; [chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py)
-med låtsad modell, som gjorde om en mening efter "forcing EOS" och gav upp en för kort efter
-fyra försök; workflowens steg mot den låtsade grenen; och `npm run build -- --no-fetch`, som
-tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna.
-
-Med den riktiga modellen provades den 2026-11-05 på iMacen: [las.mjs](scripts/rost/las.mjs) utan
-`--publicera` läste upp fyra meningar på 145 s, alla i första försöket. Det provet visade också
-varför skriptet inte får heta `chatterbox.py` (det skuggar paketet med samma namn), vilket den
-låtsade modellen inte kunde visa.
+Förut talade han med Tomas egen röst, klonad med Chatterbox Multilingual på iMacen (2026-11-04 till 2026-11-17; före
+2026-11-14 med Azures talsyntes där den egna saknades). Launchd-jobbet `se.matchfixarna.rost` läste upp allt han sa,
+de färdiga replikerna med fälten ifyllda och hans text till analyserna, och lade ljudet i grenen `rost`, som bygget
+lade på sajten med ett register (mening → fil); *Läs upp* lät honom läsa sin text, och svaret från baren hördes från
+vänster. Allt det är borttaget: `src/rost.js`, steget i workflowen, röstinställningarna i `config/hasse.js`, ljudet i
+sidan och jobbets filer i `scripts/rost/`. Kvar är [scripts/rost/las.mjs](scripts/rost/las.mjs), som launchd fortfarande
+startar på iMacen: inom en halvtimme tar den bort jobbets fil i `~/Library/LaunchAgents` och jobbet ur launchd (den
+första körningen efter ändringen avbryts, eftersom den gamla koden inte hittar `src/rost.js`), och sedan kan filen tas
+bort. Ljudbanken och jobbets klon i `~/Library/Application Support/Matchfixarna/Rost/` och grenen `rost` på
+GitHub rörs inte; de kan tas bort för hand.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
 klart, med handens modell (228 kB, 150 kB packad) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna
