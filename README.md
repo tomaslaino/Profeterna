@@ -1296,6 +1296,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   grafik för sämre datorer/mobiler". Foten i marken står still mot stenen, höften gungar, knät och fotleden böjs och
   armarna pendlar; allt i samma duk som förut, ungefär 4 µs mer per figur och bild. Se *Det som händer ute* under
   [Fasaden](#fasaden).
+- **Fasaden: regnet i ljuset, putsen som har levt och grannarna (2026-11-16, användarens önskemål):** "Hur hade du
+  förbättrat visualiseringen på den här sidan. ge mig några förslag", och sedan "JAg vill samtidigt inte att det ska
+  belastas med för mkt grafikgrejor - alltså det ska funka på sämre datorer och mobiltelefoner". Fem förslag skissades i
+  den riktiga scenen, och användaren valde de lätta: regnet syns i ljuset (med stänk och droppar), putsen med fläckar,
+  rinnmärken och fukt nertill, stupröret, källarfönstret, öppettiderna och klistermärkena, grannen och katten i de tända
+  fönstren ovanför, och småfelen (den som gick i mörkret såg ut som ett spöke, gatuskylten gick inte att läsa på kvällen,
+  och korta färger som `#222` blev ogiltiga). Inte valt: pölar som speglar fönstret och gänget (det dyraste), någon som
+  går in genom den öppna dörren och stamkunden som röker under lyktan. Inga nya lager. Se [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6645,7 +6653,8 @@ Med `prefers-reduced-motion` står gatan still och ingen går förbi.
 dörren och ser tobaksaffären från trottoaren, där baren Bron ligger vid S:t Eriksbron ([public/rum-fasad.js](public/rum-fasad.js),
 [public/rum-fasad.css](public/rum-fasad.css)). Efter användarens foto av Bron utifrån, men närmare: det laxrosa huset med
 ljusa fönsteromfattningar och franska balkonger, den ljusa bottenvåningen med fogar, gesimsen emellan och kedjestenarna på
-hörnet, porten med överljusfönster, en vägglykta och barberarens stång längst till vänster. Över skyltfönstret och dörren
+hörnet, porten med överljusfönster, en vägglykta och barberarens stång längst till vänster, och ett stuprör mellan
+fönstren (`STUPROR`), bakom gatuskylten. Över skyltfönstret och dörren
 skylten MATCHFIXARNA i benvitt på mörkt med en tunn guldlinje (sajtens färger och Fraunces) under två lampor på
 svanhalsar, och gatuskylten *S:t Eriksgatan* på hörnet. Till höger om huset börjar bron: stenpelaren, det gröna räcket
 med en cykel mot det, parkeringsförbudet och en gatlykta, och bortom räcket slänten ned mot spåren, trädtopparna,
@@ -6664,8 +6673,17 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
 - **Glaset:** det sitter djupt i karmen (skugga upptill och till vänster), med imma nertill när det är kallt ute och
   varmt inne, droppar efter regn som små linser (mörk kant, en ljusprick nertill och en glans) och några som har runnit
   och lämnat ett spår ned mot blecket.
-- **Dörren:** guldet på glaset står rättvänt (*Matchfixarna*, TOBAK & SPEL, *Öppet till spelstoppet*), och skylten på
-  sugproppen säger ÖPPET på den här sidan – STÄNGT är sidan inåt.
+- **Dörren:** guldet på glaset står rättvänt (*Matchfixarna*, TOBAK & SPEL, *Öppet till spelstoppet*, och nertill
+  öppettiderna), och skylten på sugproppen säger ÖPPET på den här sidan – STÄNGT är sidan inåt. I fönstrets nedre hörn
+  sitter klistermärkena för korten, tipset och travet, lite blekta (`texten`).
+- **Putsen har levt (2026-11-16):** stora mjuka fläckar i putsen, mörkare och ljusare, rinnmärken under blecken på
+  våningarna, under gesimsen och från fönsterbänken ned över bröstningen, fukt nertill på väggen där regnet stänker upp
+  (mörkare när stenen är våt) och en glans i sockelns överkant. Stupröret har fästen och en böj nertill; när det regnar
+  forsar vatten ut och en bäck rinner över trottoaren mot gatan (en blötare rand med glitter här och där). Nere i
+  bröstningen ett källarfönster med galler. Allt står still och ritas med resten av huset, utan bilder och utan filter.
+- **Grannarna:** i några av de tända fönstren ovanför sitter någon vid fönstret, eller så sitter en katt bakom räcket,
+  som siluetter mot ljuset inne (på kvällen, en ny följd varje dag och per fönster, så att det inte ändrar vilka
+  fönster som är tända).
 - **Samma ljus och väder som inifrån:** himlen, solen, månen, stjärnorna och molnen, putsen och stenen i dagsljus,
   skymning och mörker (`RumUte.light` och `RumUte.farg.facade`), tända fönster efter klockan och adventsljusstakar och
   stjärnor i advent, regn, duggregn, snö, dimma och blixtar, droppar på glaset, frost i hörnen när det är kallare än
@@ -6678,12 +6696,22 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   uppåt mörknar det, så att blicken stannar vid affären; ljuset är skarpt: käglor från svanhalsarna ned över skylten,
   vars bokstäver lyser i deras sken med en skugga under, en liten gloria kring lyktan vid porten och gatlyktan på bron,
   rummets sken på väggen och trottoaren, och när stenen är våt ränder av ljus under fönstret, dörren, lamporna och
-  neonen (röda). Inga filter: mjuka kanter med toningar och käglor i tre allt bredare lager.
+  neonen (röda). Inga filter: mjuka kanter med toningar och käglor i tre allt bredare lager. Gatuskylten lyser upp i
+  lampans sken (emaljen ljusare och ett hål i mörkret där den sitter), så att *S:t Eriksgatan* går att läsa på kvällen.
+- **Regnet i ljuset (2026-11-16):** på kvällen syns regnet där något lyser – i svanhalsarnas käglor, framför fönstret
+  och dörren, kring lyktan vid porten och under gatlyktan – och där är det varmt, medan det knappt syns i mörkret. Ljuset
+  räknas ut en gång när scenen ritas, i rutor om 24 enheter (`ljusKarta`, `ljusVid`), och varje streck tar sitt ur
+  rutan där det är; strecken delas i fyra steg efter ljuset, så att de är få anrop (12 per lager i stället för 3). Där
+  regnet slår ned blir det stänk – en ring som vidgas och en liten krona – på stenen, fönsterbänkens bleck och skyltens
+  tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
+  inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
 - **Det som händer ute:** de som går förbi på trottoaren framför affären, lika många som på gatan inifrån
   (`RumUte.trafik`), klädda efter vädret, med paraply (med spröt och droppar) i regn, mössa, keps eller hatt och halsduk
   i kyla, väska och ibland hund. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
-  framför fönstret (`randLjus`), och speglas svagt i den våta stenen. De går som folk (`gangen`, `stalln`): foten som
+  framför fönstret (`randLjus`), och speglas svagt i den våta stenen. Där det är mörkt är de lika mörka som mörkret
+  omkring (`morkSteg`: fyra steg av samma färger, `MORK`, som räknas ut en gång per figur i `morkna`); förut var en ljus
+  rock i mörkret ljusare än väggen bakom, som kvällens mask mörkar, och såg genomskinlig ut, som ett spöke. De går som folk (`gangen`, `stalln`): foten som
   står på marken står still mot stenen medan kroppen går fram – hälen slår i, foten rullar över till tån och lyfts – och
   höften gungar ungefär 4 cm en gång per steg, knät böjs upp till 55° när benet förs fram, armarna pendlar emot benen
   med armbågen lite böjd, paraplyet gungar med i stegen och hunden travar fyra steg på ett, med kopplet i en stilla

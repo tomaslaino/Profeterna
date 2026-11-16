@@ -502,8 +502,8 @@ window.RumFasad = (() => {
     // (på kvällen i sken av lampan bredvid: emaljen lyser upp, så att namnet går att läsa)
     const lyst = L.lampor ? 1 - L.dag : 0;
     const bla = mix(mix('#0a1020', '#1f4a8a', 0.2 + 0.8 * L.dag), '#2c4a7e', 0.6 * lyst);
-    const vit = mix(mix('#3a3e48', '#f2f2ee', L.dag), '#e8e0cc', 0.8 * lyst);
-    s += `<rect x="1040" y="250" width="186" height="38" rx="3" fill="${bla}"/><rect x="1044" y="254" width="178" height="30" rx="2" fill="none" stroke="${vit}" stroke-opacity="${r1(1 - 0.25 * lyst)}" stroke-width="1.6"/><text x="1133" y="277" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="19" fill="${vit}">S:t Eriksgatan</text>`;
+    const vit = mix(mix('#3a3e48', '#f2f2ee', L.dag), '#d8d0bc', 0.7 * lyst);
+    s += `<rect x="1040" y="250" width="186" height="38" rx="3" fill="${bla}"/><rect x="1044" y="254" width="178" height="30" rx="2" fill="none" stroke="${vit}" stroke-opacity="${r1(1 - 0.4 * lyst)}" stroke-width="1.6"/><text x="1133" y="277" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="19" fill="${vit}">S:t Eriksgatan</text>`;
 
     // ---------- butiken ----------
     const ram = mix('#08090a', '#25292a', 0.2 + 0.8 * L.dag);
@@ -748,7 +748,8 @@ window.RumFasad = (() => {
         const xw = STUPROR + 22 + Math.sin(i * 0.7) * 10 + i * 4;
         b += `${i ? 'L' : 'M'}${r1(OGA_X + (xw - OGA_X) * skala(dd))} ${r1(markY(dd))}`;
       }
-      s += `<path d="${b}" stroke="#1a1c20" stroke-width="10" fill="none" opacity=".4" stroke-linecap="round"/><path d="${b}" stroke="${L.dag > 0.5 ? '#ffffff' : '#ffe6c0'}" stroke-width="2.2" fill="none" opacity="${r1(0.2 + 0.15 * (1 - L.dag))}" stroke-linecap="round"/>`;
+      // (en bred mörkare rand där stenen är blötare, och glitter här och där där vattnet rinner)
+      s += `<path d="${b}" stroke="#000" stroke-width="22" fill="none" opacity=".1" stroke-linecap="round"/><path d="${b}" stroke="#000" stroke-width="9" fill="none" opacity=".1" stroke-linecap="round"/><path d="${b}" stroke="${L.dag > 0.5 ? '#ffffff' : '#ffe6c0'}" stroke-width="1.6" stroke-dasharray="10 14 4 22 7 18" fill="none" opacity="${r1(0.18 + 0.16 * (1 - L.dag))}" stroke-linecap="round"/>`;
     }
     // höstlöven
     if (lovet(v) === 'host' && !sno) {
@@ -1821,7 +1822,7 @@ window.RumFasad = (() => {
         bilar: lugn ? [] : bilarna(v, L, px),
         N: lugn ? null : nederbord(V, v),
         // (ljuset där regnet faller, på kvällen: ljusKarta)
-        K: !lugn && v.fall && L.dag < 0.95 ? ljusKarta(V, L, inne(o)) : null,
+        K: !lugn && (v.fall === 'regn' || v.fall === 'blandat') && L.dag < 0.95 ? ljusKarta(V, L, inne(o)) : null,
         vat: (L.wet || v.blott) && !v.snotackt,
         A: 1,
         dimma: L.dimma > 0.05 ? { c: mix('#2a2622', '#aeb3b6', L.dag), a: 0.32 * L.dimma } : null,
