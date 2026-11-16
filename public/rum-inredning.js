@@ -86,6 +86,8 @@ const BITAR = {
 const PYNT_BITAR = {
   pyntF: { plan: 0, box: { x: 222, y: 96, w: 770, h: 214 }, fore: 'canvas.rum-neon' },
   pyntD: { plan: 0, box: { x: 1040, y: 330, w: 230, h: 220 }, fore: '.rum-hv + *' },
+  // dörrens glas: kransen, lövruskorna vid posterna, lyktorna och fladdermössen
+  pyntP: { plan: 0, box: { x: 20, y: 128, w: 236, h: 530 }, fore: 'canvas.rum-neon' },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -1711,7 +1713,10 @@ export async function inredning(el, opt = {}) {
     const S = P.pyntSaker(mat);
     const F = [];
     const D = [];
-    if (namn === 'jul') {
+    const DR = [];
+    // det som hänger i trådar och band från karmen i fönstret (y: där saken hänger, mitten för stjärnorna)
+    const halm = (x, y, R) => { const h = S.halmstjarna({ R, band: (y - R * K - KARM) / K }); h.position.copy(PK(x, y, -13)); return h; };
+    if (namn === 'jul' || namn === 'nyar') {
       // (ingen kula i bågen ovanför stjärnan)
       F.push(S.girlang(KROKAR, { s: 7, utan: [2] }));
       // stjärnan i den högra rutan, mellan neonen och skivan, ovanför gänget
@@ -1721,25 +1726,62 @@ export async function inredning(el, opt = {}) {
       st.rotation.y = -8 * DEG;
       F.push(st);
       D.push(S.ljusstake());
+      // halmstjärnor i luckorna ovanför gänget, och julkransen på dörrens glas under namnet, i ett band
+      // från en sugpropp
+      F.push(halm(498, 238, 7), halm(574, 224, 8), halm(744, 244, 6));
+      const kr = S.krans({ typ: 'gran', R: 16, band: 7 });
+      kr.position.copy(PK(136, 366, -18));
+      DR.push(kr);
+      if (namn === 'nyar') {
+        // serpentiner som hänger från girlangen, utom i bågen med stjärnan
+        const ut = [];
+        [[0, 0.2, 18], [0, 0.48, 24], [0, 0.78, 20], [1, 0.2, 22], [1, 0.5, 16], [1, 0.82, 26], [3, 0.3, 22], [3, 0.6, 17], [3, 0.88, 24]].forEach(([i, t, l]) => {
+          const a = KROKAR[i];
+          const b = KROKAR[i + 1];
+          ut.push([a.clone().lerp(b, t).add(new THREE.Vector3(0, -4 * 7 * t * (1 - t) - 1.5, 2.5)), l]);
+        });
+        F.push(S.serpentiner(ut));
+      }
     } else if (namn === 'pask') {
       // äggen i band från karmen, ovanför gänget och kring mittposten
       F.push(S.agg([[492, 226, 1.7], [548, 200, 1.5], [598, 238, 1.6], [646, 176, 1.8], [690, 222, 1.6], [728, 168, 1.7], [750, 214, 1.4]]
         .map(([x, y, k]) => ({ ...PK(x, KARM, -13), ned: (y - KARM) / K, k }))));
       D.push(S.paskris({ hojd: 21 }));
+      D.push(S.kycklingar([[-10, 4, 1.45, 0.6], [9.5, 2.5, 1.3, -0.5], [1.5, 10, 1.2, 0.2]]));
+      const kr = S.krans({ typ: 'pask', R: 15, band: 8 });
+      kr.position.copy(PK(136, 366, -18));
+      DR.push(kr);
     } else if (namn === 'midsommar') {
       F.push(S.vimplar(KROKAR, { s: 4.5 }));
       D.push(S.blommor());
+      // lövruskor vid dörrposterna, bundna nedtill och med grenarna utåt
+      const v = S.bjorkris({ hojd: 200, vanster: true, fro: 3 });
+      v.position.copy(PK(44, 640, -10));
+      const h = S.bjorkris({ hojd: 196, fro: 7 });
+      h.position.copy(PK(229, 640, -10));
+      DR.push(v, h);
     } else if (namn === 'kraftor') {
       const krok = [244, 596, 760].map((x) => PK(x, KARM));
       // lyktorna där neonen och skivan inte skymmer dem: längst till vänster, mellan neonen och mittposten
       // och två i den högra rutan
       F.push(S.lyktor(krok, [[0.075, 8.5, 0], [0.64, 8, 1], [0.79, 9, 0], [0.93, 8, 2]], { s: 2.5 }));
+      // fatet med kräftorna och brännvinet i hörnet, och två lyktor till på dörrens glas under namnet
+      D.push(S.kraftfat());
+      DR.push(S.lyktor([PK(54, 304), PK(218, 304)], [[0.28, 7, 1], [0.72, 7.5, 0]], { s: 2 }));
     } else if (namn === 'halloween') {
       const v = S.vav({ b: 30, spindel: 26 });
       // (i fönstrets övre vänstra hörn, i scenens mått: glaset börjar vid x 262 och y 125)
       v.position.copy(PK(263, 125, -17));
       F.push(v);
       D.push(S.pumpa());
+      const liten = S.pumpa({ R: 6 });
+      liten.position.set(15, 0, 7);
+      liten.rotation.y = 0.5;
+      D.push(liten);
+      // fladdermöss i trådar från karmen och från dörrens överkant
+      const fl = (x, y, k, z = -13, topp = KARM) => ({ ...PK(x, topp, z), ned: (y - topp) / K, k, vrid: ((x * 7) % 5 - 2) * 0.12 });
+      F.push(S.fladdermoss([fl(492, 238, 1.6), fl(566, 216, 1.9), fl(628, 170, 1.7), fl(704, 196, 2), fl(746, 238, 1.5)]));
+      DR.push(S.fladdermoss([fl(96, 340, 1.9, -18, 140), fl(178, 372, 1.6, -18, 140)]));
     }
     const grupp = (lista) => {
       if (!lista.length) return null;
@@ -1755,7 +1797,9 @@ export async function inredning(el, opt = {}) {
       d.position.set(DISK_PLATS.x, DISK.top, DISK_PLATS.z);
       d.rotation.y = DISK_PLATS.vrid * DEG;
     }
-    return { pyntF: f, pyntD: d };
+    const p = grupp(DR);
+    if (p) p.scale.setScalar(K);
+    return { pyntF: f, pyntD: d, pyntP: p };
   }
   const PY = { namn: undefined, B: {}, P: null, n: 0 };
   async function pynt(namn) {
