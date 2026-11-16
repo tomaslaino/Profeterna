@@ -1,5 +1,10 @@
 {
  "omgang": "2026-11-15-v65ft4",
+ "nummer": 2,
+ "spel": {
+  "namn": "Europatipset",
+  "nr": 2625
+ },
  "uppdaterad": "2026-11-16T19:14:48.408Z",
  "amnen": {
   "trupp": "Skador och trupp",
@@ -46,32 +51,44 @@
    "avspark": "2026-11-15T14:00:00.000Z"
   },
   {
-   "id": "401861185",
+   "id": "401883117",
    "nr": 7,
+   "match": "Eibar – Cádiz",
+   "avspark": "2026-11-15T17:30:00.000Z"
+  },
+  {
+   "id": "401883116",
+   "nr": 8,
+   "match": "Granada – Las Palmas",
+   "avspark": "2026-11-15T15:15:00.000Z"
+  },
+  {
+   "id": "401861185",
+   "nr": 9,
    "match": "Tyskland – Nederländerna",
    "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
    "id": "401861188",
-   "nr": 8,
+   "nr": 10,
    "match": "Grekland – Serbien",
    "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
    "id": "401861186",
-   "nr": 9,
+   "nr": 11,
    "match": "Schweiz – Skottland",
    "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
    "id": "401861187",
-   "nr": 10,
+   "nr": 12,
    "match": "Nordmakedonien – Slovenien",
    "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
    "id": "401861181",
-   "nr": 11,
+   "nr": 13,
    "match": "Kazakstan – Slovakien",
    "avspark": "2026-11-16T15:00:00.000Z"
   }
@@ -803,8 +820,266 @@
    ]
   },
   {
-   "id": "401861185",
+   "id": "401883117",
    "nr": 7,
+   "match": "Eibar – Cádiz",
+   "lag": [
+    "Eibar",
+    "Cádiz"
+   ],
+   "avspark": "2026-11-15T17:30:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Gorostiza tackar för sig, Cádiz tiger om målvakten",
+   "ingress": null,
+   "summering": "Eibar tar farväl av ordföranden Amaia Gorostiza men har gått fyra omgångar utan seger och saknar Juan Bernat och Elijah Gift. Cádiz ligger under strecket med ett hoplappat försvar och en tränare som håller målvaktsvalet hemligt.",
+   "arena": "Ipurua",
+   "ort": "Eibar",
+   "delar": [
+    {
+     "lag": "Eibar",
+     "kallor": [
+      {
+       "podd": "Naiz",
+       "avsnitt": "Amaia Gorostiza deja la presidencia del Eibar tras una década al frente del club",
+       "datum": "2026-11-09",
+       "adress": "https://www.naiz.eus/info/noticia/20261109/amaia-gorosrtiza-deja-la-presidencia-del-eibar-tras-una-decada-al-frente-del-club",
+       "typ": "media"
+      },
+      {
+       "podd": "SD Eibar",
+       "avsnitt": "Jokin Aranbarri: «Tenemos que estar preparados para sus cambios de estructura»",
+       "datum": "2026-11-13",
+       "adress": "https://www.sdeibar.com/noticias/jokin-aranbarri-tenemos-que-estar-preparados-para-sus-cambios-de-estructura",
+       "typ": "media"
+      },
+      {
+       "podd": "El Gol Digital",
+       "avsnitt": "Amaia Gorostiza se despide del palco de Ipurua con el Eibar ante el Cádiz",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/eibar/eibar-cadiz-previa-amaia-gorostiza-despedida-aranbarri",
+       "typ": "media"
+      },
+      {
+       "podd": "Canal Sur",
+       "avsnitt": "La victoria, pasaporte a la salida del descenso para el Cádiz",
+       "datum": "2026-11-15",
+       "adress": "https://www.canalsur.es/noticias/deportes/futbol/victoria-billete-salida-descenso-cadiz_1_1452896.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Ipurua tar farväl av Amaia Gorostiza. Efter tio år som ordförande sitter hon i hederslogen för sista gången, och Jon Ander Ulazia, 39, tar över. Jokin Aranbarri säger att han möter beslutet med respekt och är tacksam för hur hon behandlat honom.",
+      "Laget har gått fyra omgångar utan seger men har 23 poäng och en match till godo. Aranbarri kallar Cádiz ett bra och farligt lag som kan spela med en eller två anfallare.",
+      "Juan Bernat och Elijah Gift är skadade och Anaitz Arbilla osäker efter en smäll. Sergio Álvarez är tillbaka efter lång skada."
+     ],
+     "citat": {
+      "sagt": "Det har varit en ära att leda Eibar, en klubb som är liten till storleken men enorm i känslan.",
+      "vem": "Amaia Gorostiza, om sina år som ordförande",
+      "podd": "Naiz",
+      "typ": "media",
+      "datum": "2026-11-09"
+     },
+     "namn": [
+      "Amaia Gorostiza",
+      "Jon Ander Ulazia",
+      "Jokin Aranbarri",
+      "Juan Bernat",
+      "Elijah Gift",
+      "Anaitz Arbilla",
+      "Sergio Álvarez"
+     ]
+    },
+    {
+     "lag": "Cádiz",
+     "kallor": [
+      {
+       "podd": "La Gaceta de Cádiz",
+       "avsnitt": "El rompecabezas de Borja Jiménez en defensa para enfrentarse al Eibar",
+       "datum": "2026-11-12",
+       "adress": "https://lagacetadecadiz.es/el-rompecabezas-de-borja-jimenez-en-defensa-para-enfrentarse-al-eibar/",
+       "typ": "media"
+      },
+      {
+       "podd": "La Gaceta de Cádiz",
+       "avsnitt": "Borja Jiménez mantiene la incógnita en la portería del Cádiz: «Habrá momentos para los dos»",
+       "datum": "2026-11-13",
+       "adress": "https://lagacetadecadiz.es/borja-jimenez-mantiene-la-incognita-en-la-porteria-del-cadiz-habra-momentos-para-los-dos/",
+       "typ": "media"
+      },
+      {
+       "podd": "Portal Cadista",
+       "avsnitt": "Ipurua, una puerta para coger aire fuera de la zona roja",
+       "datum": "2026-11-14",
+       "adress": "https://www.portalcadista.com/cadizcf-equipo/57616-ipurua-una-puerta-para-coger-aire-fuera-de-la-zona-roja",
+       "typ": "media"
+      },
+      {
+       "podd": "El Gol Digital",
+       "avsnitt": "Amaia Gorostiza se despide del palco de Ipurua con el Eibar ante el Cádiz",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/eibar/eibar-cadiz-previa-amaia-gorostiza-despedida-aranbarri",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Cádiz ligger under nedflyttningsstrecket med 10 poäng efter två raka förluster, mot Mallorca och Oviedo. Borja Jiménez, säsongens tredje tränare, började med 3–1 mot Ceuta och vill att laget försvarar högre upp i planen.",
+      "Försvaret är ett pussel. Javi Castro är borta i tre till fyra veckor, Bojan Kovacevic är med Serbiens U21-lag och Kenan Toibibou med Komorerna. Gonzalo Petit och Vladys är tillbaka.",
+      "Målvakten är en hemlighet. Portal Cadista undrar om Jokin Ezkieta får stå kvar efter sina misstag eller om David Gil tar över. ”Jag tänker inte säga det”, säger Jiménez."
+     ],
+     "citat": {
+      "sagt": "Vi skapar inte tillräckligt mycket framåt för att vinna.",
+      "vem": "Borja Jiménez, om lagets anfallsspel",
+      "podd": "La Gaceta de Cádiz",
+      "typ": "media",
+      "datum": "2026-11-13"
+     },
+     "namn": [
+      "Borja Jiménez",
+      "Javi Castro",
+      "Bojan Kovacevic",
+      "Kenan Toibibou",
+      "Gonzalo Petit",
+      "Vladys",
+      "Jokin Ezkieta",
+      "David Gil"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401883116",
+   "nr": 8,
+   "match": "Granada – Las Palmas",
+   "lag": [
+    "Granada",
+    "Las Palmas"
+   ],
+   "avspark": "2026-11-15T15:15:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Fem raka för Granada, Las Palmas väntar sedan 1985",
+   "ingress": null,
+   "summering": "Granada har vunnit fem raka ligamatcher men saknar Owen Emeka, som är med U17-landslaget. Las Palmas har vunnit fyra raka matcher, men försvaret är hoplappat och laget har inte vunnit i Granada sedan 1985.",
+   "arena": "Nuevo Los Cármenes",
+   "ort": "Granada",
+   "delar": [
+    {
+     "lag": "Granada",
+     "kallor": [
+      {
+       "podd": "101TV",
+       "avsnitt": "El Granada CF se enfrenta al juicio del caso Líbero contra los exdirigentes Pina y Pozzo por lucrarse con el traspaso de jugadores",
+       "datum": "2026-11-09",
+       "adress": "https://www.101tv.es/granada/el-granada-cf-se-enfrenta-al-juicio-del-caso-libero-contra-los-exdirigentes-pina-y-pozzo-por-lucrarse-con-el-traspaso-de-jugadores/",
+       "typ": "media"
+      },
+      {
+       "podd": "101TV",
+       "avsnitt": "El Granada CF pone a prueba su racha ganadora ante la UD Las Palmas",
+       "datum": "2026-11-14",
+       "adress": "https://www.101tv.es/granadacf/el-granada-cf-pone-a-prueba-su-racha-ganadora-ante-la-ud-las-palmas/",
+       "typ": "media"
+      },
+      {
+       "podd": "VAVEL España",
+       "avsnitt": "Granada CF - Las Palmas: nuevo reto en Los Cármenes para seguir la dinámica positiva",
+       "datum": "2026-11-14",
+       "adress": "https://www.vavel.com/es/futbol/2026/11/14/granada-cf/1279150-previa-granada-cf-ud-las-palmas-un-nuevo-reto-en-los-carmenes-para-seguir-con-la-dinamica-positiva.html",
+       "typ": "media"
+      },
+      {
+       "podd": "El Gol Digital",
+       "avsnitt": "Pacheta persigue la sexta victoria seguida del Granada ante Las Palmas",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/granada-cf/granada-las-palmas-previa-pacheta-albert-sanchez-racha/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Granada har vunnit fem raka ligamatcher, sex med cupen, och senast laget inte vann var 2–3 mot Andorra den 26 september. Laget har 23 poäng och en match till godo. ”Vi behöver att ögonblicken i matcherna fortsätter att le mot oss”, säger Pacheta.",
+      "Att Owen Emeka kan missa upp till sju matcher med U17-landslaget stör honom: ”Jag förstår inte att det spelas ett U17-VM i november.” José Arnaiz, Baïla Diallo och Pau Casadesús är skadade.",
+      "Samtidigt står klubben åtalad i Líbero-målet, där förre ägaren Gino Pozzo och förre ordföranden Enrique Pina anklagas för skattebrott."
+     ],
+     "citat": {
+      "sagt": "Vi är inne i en period av självförtroende som vi inte får tappa, även om vi fortfarande måste bli bättre både med och utan boll.",
+      "vem": "Pacheta, om segersviten",
+      "podd": "VAVEL España",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Pacheta",
+      "Owen Emeka",
+      "José Arnaiz",
+      "Baïla Diallo",
+      "Pau Casadesús",
+      "Gino Pozzo",
+      "Enrique Pina"
+     ]
+    },
+    {
+     "lag": "Las Palmas",
+     "kallor": [
+      {
+       "podd": "Canarias7",
+       "avsnitt": "Iván Jaime reconoce que ha explotado en la UD: «Me encuentro en el mejor momento de mi carrera»",
+       "datum": "2026-11-12",
+       "adress": "https://www.canarias7.es/deportes/ud-las-palmas/ivan-jaime-reconoce-explotado-encuentro-mejor-momento-20261112101853-nt.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Canarias7",
+       "avsnitt": "Sánchez recupera a Marvin e Iñaki para Granada: «El reto es romper la racha del rival»",
+       "datum": "2026-11-13",
+       "adress": "https://www.canarias7.es/deportes/ud-las-palmas/palmas-directo-albert-sanchez-analiza-encuentro-conjunto-20261113092244-nt.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Canarias7",
+       "avsnitt": "La UD Las Palmas, a romper un maleficio de 41 años en Granada",
+       "datum": "2026-11-14",
+       "adress": "https://www.canarias7.es/deportes/ud-las-palmas/palmas-romper-maleficio-anos-granada-20261114140820-nt.html",
+       "typ": "media"
+      },
+      {
+       "podd": "El Gol Digital",
+       "avsnitt": "Pacheta persigue la sexta victoria seguida del Granada ante Las Palmas",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/granada-cf/granada-las-palmas-previa-pacheta-albert-sanchez-racha/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Las Palmas har inte vunnit i Granada sedan den 17 februari 1985, då Benito Morales gjorde matchens enda mål. Nu kommer laget med fyra raka segrar, och Albert Sánchez har vunnit båda sina ligamatcher. Han ser ett bra läge att bryta Granadas svit.",
+      "Försvaret är hoplappat. Valentín Pezzolesi och Juanma Herzog är med U21-landslaget, Viti Rozada och Enrique Clemente skadade. Sandro Ramírez har en ny liten bristning i vaden, men Marvin Park och Iñaki González är tillbaka.",
+      "Iván Jaime har flyttats till högerkanten och säger att han är i karriärens bästa form."
+     ],
+     "citat": {
+      "sagt": "Jag känner en mycket bra energi i truppen.",
+      "vem": "Albert Sánchez, efter 15 dagar som tränare",
+      "podd": "Canarias7",
+      "typ": "media",
+      "datum": "2026-11-13"
+     },
+     "namn": [
+      "Benito Morales",
+      "Albert Sánchez",
+      "Valentín Pezzolesi",
+      "Juanma Herzog",
+      "Viti Rozada",
+      "Enrique Clemente",
+      "Sandro Ramírez",
+      "Marvin Park",
+      "Iñaki González",
+      "Iván Jaime"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401861185",
+   "nr": 9,
    "match": "Tyskland – Nederländerna",
    "lag": [
     "Tyskland",
@@ -925,7 +1200,7 @@
   },
   {
    "id": "401861188",
-   "nr": 8,
+   "nr": 10,
    "match": "Grekland – Serbien",
    "lag": [
     "Grekland",
@@ -1047,7 +1322,7 @@
   },
   {
    "id": "401861186",
-   "nr": 9,
+   "nr": 11,
    "match": "Schweiz – Skottland",
    "lag": [
     "Schweiz",
@@ -1173,7 +1448,7 @@
   },
   {
    "id": "401861187",
-   "nr": 10,
+   "nr": 12,
    "match": "Nordmakedonien – Slovenien",
    "lag": [
     "Nordmakedonien",
@@ -1294,7 +1569,7 @@
   },
   {
    "id": "401861181",
-   "nr": 11,
+   "nr": 13,
    "match": "Kazakstan – Slovakien",
    "lag": [
     "Kazakstan",
