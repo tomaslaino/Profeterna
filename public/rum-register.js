@@ -68,6 +68,10 @@
 // och skytteligan, som står på tv:n – i avsnitt med platsen i divisionen
 // efter, och etiketten leder till listan: divisionen ordnad efter talet
 // (#lista:lag:pl:skapar), där ←/→ bläddrar till förra och nästa tal.
+// Sedan 2026-11-16 är listan en rankning med en stapel per rad, och platsen
+// efter ett tal (i korten mätaren och platsen, i matchakten platsen) leder
+// dit med laget eller spelaren markerad (#plats:lag:pl:skapar:Arsenal);
+// Esc går tillbaka till kortet.
 // Matchakten har också matchsidans rader (hemma och borta, nollorna, skotten
 // på mål, målen mot xG, lagens främsta i assist och segermål) och domaren.
 // Längst ner står sökraden (SÖK >). Den svarar medan man skriver: alla träffar
@@ -240,10 +244,24 @@ window.RumRegister = (() => {
   const bit = ([t, k, q]) => (q
     ? `<span class="a${k ? ` ${k}` : ''}" data-q="${esc(q)}">${esc(t)}</span>`
     : k ? `<span class="${k}">${esc(t)}</span>` : esc(t));
+  // Bitar i följd med samma fråga blir en tryckbar bit (mätaren och platsen
+  // i korten, som leder till rankningen): ett ställe att trycka på och en
+  // rad för ↑/↓. Skärmen i rummet (rum-dator.js) läser bitarna en och en.
+  function bitar(r) {
+    let s = '';
+    for (let i = 0; i < r.length;) {
+      const q = r[i][2];
+      let j = i + 1;
+      while (q && j < r.length && r[j][2] === q) j++;
+      s += j - i > 1 ? `<span class="a" data-q="${esc(q)}">${r.slice(i, j).map(([t, k]) => bit([t, k])).join('')}</span>` : bit(r[i]);
+      i = j;
+    }
+    return s;
+  }
 
   function html(rader) {
     return rader.map((r) => (r.length === 1 && r[0][1] === 'hr' ? '<div class="tr hr"></div>'
-      : `<div class="tr${r.q ? ' a' : ''}${r.kat ? ' kat' : ''}${r.kl ? ` ${r.kl}` : ''}"${r.q ? ` data-q="${esc(r.q)}"` : ''}${r.st ? ` style="${esc(r.st)}"` : ''}>${r.map(bit).join('')}</div>`)).join('');
+      : `<div class="tr${r.q ? ' a' : ''}${r.kat ? ' kat' : ''}${r.kl ? ` ${r.kl}` : ''}"${r.q ? ` data-q="${esc(r.q)}"` : ''}${r.st ? ` style="${esc(r.st)}"` : ''}>${bitar(r)}</div>`)).join('');
   }
 
   // ---------- duken och närbilden ----------
@@ -941,12 +959,13 @@ window.RumRegister = (() => {
       const jmf = (v, grans) => (land || samma ? bast(v, grans) : -1);
       // en rad: etiketten och lagens värden; b är laget med det bättre talet,
       // som lyser medan det andra är svagt, och efter står svagt efter värdet
-      // (platsen i divisionen); q är etikettens förklaring
+      // (platsen i divisionen, som text eller som bitar); q är etikettens förklaring
       const raden = (etikett, v, b = -1, efter = null, q = null) => rad([etikett, 'd', q], [pad('', L - etikett.length)],
         ...v.flatMap((x, j) => {
           const p = Array.isArray(x) ? x : [x, ''];
           const bit = b < 0 ? p : [p[0], j === b ? 'v' : 'd', p[2]];
-          const bitar = efter && efter[j] ? [bit, [efter[j], 'd']] : [bit];
+          const e = efter && efter[j];
+          const bitar = e ? [bit, ...(Array.isArray(e) ? e : [[e, 'd']])] : [bit];
           const n = bitar.reduce((s, y) => s + y[0].length, 0);
           return j ? bitar : [...bitar, [pad('', Math.max(1, K - n))]];
         }));
@@ -955,7 +974,9 @@ window.RumRegister = (() => {
       const div0 = (T.find((t) => t && t.comp) || {}).comp;
       const lq = (k, slag = 'lag') => (div0 ? listQ(slag, div0, k) : ordQ(slag === 'spelare' ? `spelare:${k}` : k));
       // tavlans tal med lagets plats i sin division efter: '+0,94   1:A' (för
-      // landslagen utan platsen, och raden bara när något av lagen har talet)
+      // landslagen utan platsen, och raden bara när något av lagen har talet).
+      // Platsen leder till rankningen i lagets division, med laget och
+      // motståndaren markerade (sedan 2026-11-16)
       const tal = (etikett, f, fmt, grans, k) => {
         const v0 = T.map((t) => (t ? f(t) : null));
         if (land && !v0.some(ok)) return null;
@@ -964,7 +985,8 @@ window.RumRegister = (() => {
           v.map((x, j) => {
             if (!ok(x) || land) return '';
             const p = placering(T[j], f);
-            return p ? `${pad('', Math.max(0, 6 - fmt(x).length))}${padL(ordtal(p), 4)}` : '';
+            const vem = [T[j], T[1 - j]].filter(Boolean).map((t) => t.name).join('|');
+            return p ? [[pad('', Math.max(0, 6 - fmt(x).length)), ''], [padL(ordtal(p), 4), 'd', platsQ('lag', T[j].comp, k, vem)]] : '';
           }), lq(k));
       };
       // en rad ur lagens värden f(j) = [text, tal att jämföra] (eller null);
@@ -1656,6 +1678,9 @@ window.RumRegister = (() => {
       return [...(A.bred >= 60 && n <= A.bred ? [rad(...namn, ['   ', ''], ...under)] : [rad(...namn), rad(...under)]), flikar, streck()];
     }
     const listQ = (slag, d, k) => `#lista:${slag}:${d}:${k}`;
+    // platsen efter ett tal: rankningen, med vem markerad (lagets namn eller
+    // spelarens nyckel, flera med |) – inte förklaringen, som etiketten öppnar
+    const platsQ = (slag, d, k, vem) => `#plats:${slag}:${d}:${k}:${vem}`;
     // platsen bland talen (lika tal delar plats; asc = lägst först)
     const platsAv = (v, alla, asc) => 1 + alla.filter((y) => (asc ? y < v - 1e-9 : y > v + 1e-9)).length;
     // Divisionens lag med talet, i listans ordning
@@ -1671,11 +1696,14 @@ window.RumRegister = (() => {
       const l = A.P.spelare.filter((x) => x.div === d).map((x) => ({ x, v: def.g(x.p, x) })).filter((y) => spMed(def, y.x, y.v));
       return l.sort((a, b) => (def.asc ? a.v - b.v : b.v - a.v) || (a.x.p.app || 0) - (b.x.p.app || 0) || a.x.p.name.localeCompare(b.x.p.name, 'sv'));
     }
-    // en rad i kortet: etiketten (leder till listan), talet, mätaren (plats
-    // bland k i en mätare för n) och platsen svagt efter – eller bara
-    // etiketten och talet, när talet står utan mätare (mat: false)
-    const talRad = (def, q, text, plats, k, n) => rad([def.e, 'd', q], [pad('', ETK - def.e.length)], padL(String(text).slice(0, kortVar()), kortVar()),
-      ...(def.mat === false ? [] : [[' '.repeat(matMellan()), ''], ...matare(plats, k, n), [plats ? padL(ordtal(plats), PLATS + 1) : '', 'd']]));
+    // en rad i kortet: etiketten (leder till förklaringen), talet, mätaren
+    // (plats bland k i en mätare för n) och platsen svagt efter – eller bara
+    // etiketten och talet, när talet står utan mätare (mat: false). Mätaren
+    // och platsen är en tryckbar bit som leder till rankningen (pq, sedan
+    // 2026-11-16), när platsen står där
+    const talRad = (def, q, text, plats, k, n, pq = null) => rad([def.e, 'd', q], [pad('', ETK - def.e.length)], padL(String(text).slice(0, kortVar()), kortVar()),
+      ...(def.mat === false ? [] : [[' '.repeat(matMellan()), ''],
+        ...[...matare(plats, k, n), [plats ? padL(ordtal(plats), PLATS + 1) : '', 'd']].map((b) => (plats && pq ? [...b, pq] : b))]));
     // Lagkortets tal i en flik, i avsnitt (formen står överst i översikten)
     function lagTal(t, S, flik, r = []) {
       const namn = (LAGDELAR.find(([id]) => id === flik) || [])[1];
@@ -1689,7 +1717,7 @@ window.RumRegister = (() => {
         const q = listQ('lag', t.comp, def.k);
         if (S.veil || def.mat === false) { r.push(talRad(def, q, S.veil ? '?' : def.f(v, t, kortVar()), null, 0, n)); continue; }
         const alla = lagLista(def, t.comp).map((y) => y.v);
-        r.push(talRad(def, q, def.f(v, t, kortVar()), platsAv(v, alla, def.asc), alla.length, n));
+        r.push(talRad(def, q, def.f(v, t, kortVar()), platsAv(v, alla, def.asc), alla.length, n, platsQ('lag', t.comp, def.k, t.name)));
       }
       return r;
     }
@@ -1715,14 +1743,27 @@ window.RumRegister = (() => {
         const q = listQ('spelare', x.div, def.k);
         if (S.veil) { r.push(talRad(def, q, '?', null, 0, TOPP)); continue; }
         const pl = def.mat !== false && spMed(def, x, v) ? platsAv(v, iDiv.map((y) => [y, def.g(y.p, y)]).filter(([y, w]) => spMed(def, y, w)).map(([, w]) => w), def.asc) : null;
-        r.push(talRad(def, q, def.f(v, p), pl && pl <= TOPP ? pl : null, TOPP, TOPP));
+        r.push(talRad(def, q, def.f(v, p), pl && pl <= TOPP ? pl : null, TOPP, TOPP, platsQ('spelare', x.div, def.k, spId(x))));
       }
       return r;
     }
-    // Listan: divisionens lag eller spelare ordnade efter ett tal, med
+    // Rankningen: divisionens lag eller spelare ordnade efter ett tal, med
     // platsen (numret bara på den första vid lika tal, som skytteligan på
-    // tv:n) och talet. Raderna öppnar korten. Målen avslutas med vem som gör
-    // dem (anfallarna, mittfältarna …), som på Statistik.
+    // tv:n), talet och en stapel. Raderna öppnar korten. Målen avslutas med
+    // vem som gör dem (anfallarna, mittfältarna …), som på Statistik.
+    // Sedan 2026-11-16 (användarens önskemål: platsen efter ett tal ska leda
+    // till "en sida med rankingen … snyggt visualiserade som man sen lätt kan
+    // ta sig tillbaka ifrån") leder platsen i korten och i matchakten hit,
+    // med laget eller spelaren markerad (vy.vem; från matchakten båda lagen,
+    // flera med |): namnet omvänt, platsen, talet och stapeln ljusa och de
+    // andras staplar svaga, raden en tredjedel ner i rutan och PLATS AV
+    // ANTAL under rubriken. Förklaringens HELA LISTAN markerar kortets lag
+    // eller spelare på samma sätt. Rubriken står still överst (R.huvud)
+    // medan listan rullar, ←/→ går till förra och nästa tal med samma
+    // markering, och Esc går tillbaka till kortet.
+    // Stapeln är talet: från noll till listans högsta, och när någon har
+    // minus från en mittlinje åt båda hållen (tur, styrka, mot oddsen). De
+    // tomma rutorna efter den (mt0) är skalan, som mätarna i korten.
     function lista(vy, S, R) {
       const lagv = vy.slag !== 'spelare';
       const slag = lagv ? 'lag' : 'spelare';
@@ -1732,30 +1773,75 @@ window.RumRegister = (() => {
       const def = defs.find((x) => x.k === vy.lista);
       if (!def) return lagv ? lagen(d, R) : spelarna(d, S, R);
       R.slojas = true;
-      const r = [regRad(slag, d, def.k), streck()];
-      if (!helaNamn()) r.push(rad([up(REGNAMN[d]), 'd']));
-      if (lagv ? !A.stats : !A.P) return [...r, prickar('HÄMTAR', '')];
-      // förra och nästa tal som finns i divisionen
+      // (landslagen spelar inga ligamatcher)
+      const titel = d === 'nl' && def.k === 'matcher' ? 'MATCHER I NATIONS LEAGUE' : def.n;
+      // det som står still: divisionerna, rubriken och raden under den – den
+      // markerades plats och, när divisionerna har de korta namnen, divisionen
+      const stilla = (om) => {
+        const div = helaNamn() ? null : up(REGNAMN[d]);
+        const h = [regRad(slag, d, def.k), streck(), rad([titel, 'v'])];
+        const n = om ? om.reduce((s, [t]) => s + t.length, 0) : 0;
+        if (om && div && n + 3 + div.length <= A.bred) h.push(rad(...om, [` · ${div}`, 'd']));
+        else h.push(...[om && rad(...om), div && rad([div, 'd'])].filter(Boolean));
+        R.huvud = [...h, streck()];
+      };
+      if (lagv ? !A.stats : !A.P) { stilla(null); return [prickar('HÄMTAR', '')]; }
+      // förra och nästa tal som finns i divisionen (med samma markering)
       const har = (y) => (lagv ? lagIDiv(d).some((t) => fin(y.g(t))) : A.P.spelare.some((x) => x.div === d && spMed(y, x, y.g(x.p, x))));
       const finns = defs.filter((y) => y === def || har(y));
       const i = finns.indexOf(def);
-      R.sido = [i > 0 ? listQ(slag, d, finns[i - 1].k) : null, i < finns.length - 1 ? listQ(slag, d, finns[i + 1].k) : null];
-      // (landslagen spelar inga ligamatcher)
-      r.push(rad([d === 'nl' && def.k === 'matcher' ? 'MATCHER I NATIONS LEAGUE' : def.n, 'v']), tom());
-      if (S.veil) return [...r, rad('?')];
+      const till = (y) => (vy.vem ? platsQ(slag, d, y.k, vy.vem) : listQ(slag, d, y.k));
+      R.sido = [i > 0 ? till(finns[i - 1]) : null, i < finns.length - 1 ? till(finns[i + 1]) : null];
+      if (S.veil) { stilla(null); return [rad('?')]; }
       const l = lagv ? lagLista(def, d) : spLista(def, d);
-      if (!l.length) return [...r, rad('OKÄNT')];
-      // namnet, laget (spelarna) och talet till höger
-      const V = lagv ? VAR : 8;
-      const T = lagv ? 0 : A.bred >= 60 ? 14 : 12;
-      const W = Math.min(28, A.bred - 5 - T - V);
-      let forra = null;
+      if (!l.length) { stilla(null); return [rad('OKÄNT')]; }
+
+      // platserna (lika tal delar plats) och de markerade, i vems ordning
+      const nr = [];
+      l.forEach((y, j) => nr.push(j && Math.abs(y.v - l[j - 1].v) < 1e-9 ? nr[j - 1] : j + 1));
+      const id = (y) => (lagv ? y.t.name : spId(y.x));
+      const ix = String(vy.vem || '').split('|').filter(Boolean).map((v) => l.findIndex((y) => id(y) === v)).filter((j) => j >= 0);
+      stilla(ix.length ? [...ix.flatMap((j, k) => [...(k ? [[' · ', 'd']] : []), [lagv ? kort(l[j].t.name) : sistaNamn(l[j].x.p.name), 'v'], [` ${ordtal(nr[j])}`, 'v']]), [` AV ${l.length}`, 'd']] : null);
+
+      // spalterna: platsen (5), namnet (W), laget för spelarna (T: hela det
+      // korta namnet, när stapeln ändå får minst sex rutor), talet (V, så
+      // brett som det bredaste) och stapeln (B, högst 40)
+      const text = l.map((y) => String(def.f(y.v, lagv ? y.t : y.x.p)).slice(0, lagv ? VAR : 9));
+      const V = Math.max(...text.map((t) => t.length));
+      const bred = A.bred >= 56;
+      const W = lagv ? (bred ? 24 : 12) : (bred ? 20 : 12);
+      const rest = A.bred - 5 - W - V - 2;
+      const T = lagv ? 0 : bred && rest - 14 >= 10 ? 14 : rest - 11 >= 6 ? 11 : 0;
+      const B = Math.max(4, Math.min(40, rest - T));
+      const namn = (y) => {
+        if (!lagv) return namnPa(y.x.p.name, W - 1);
+        const n = up(y.t.name);
+        return n.length < W ? n : kort(y.t.name).slice(0, W - 1);
+      };
+      // stapeln: från noll, eller från mittlinjen när någon har minus (en
+      // verklig skillnad som syns som en strimma, noll som ingenting)
+      const lo = Math.min(0, ...l.map((y) => y.v));
+      const skala = Math.max(0, ...l.map((y) => Math.abs(y.v))) || 1;
+      const rutor = (v, n) => Math.min(n, Math.round((n * Math.abs(v)) / skala) || (Math.abs(v) / skala >= 0.02 ? 1 : 0));
+      const stapel = (v, fyll) => {
+        if (lo >= 0) { const f = rutor(v, B); return [[' '.repeat(f), fyll], [' '.repeat(B - f), 'mt0']]; }
+        const h = Math.floor((B - 1) / 2);
+        const f = rutor(v, h);
+        return v < 0
+          ? [[' '.repeat(h - f), 'mt0'], [' '.repeat(f), fyll], ['|', 'd'], [' '.repeat(h), 'mt0']]
+          : [[' '.repeat(h), 'mt0'], ['|', 'd'], [' '.repeat(f), fyll], [' '.repeat(h - f), 'mt0']];
+      };
+      const r = [];
       l.forEach((y, j) => {
-        const nr = forra != null && Math.abs(y.v - forra) < 1e-9 ? '' : String(j + 1);
-        forra = y.v;
-        const text = String(def.f(y.v, lagv ? y.t : y.x.p)).slice(0, V);
-        if (lagv) r.push(radQ(`#lag:${y.t.name}`, [`${padL(nr, 3)}  `, 'd'], pad(up(y.t.name).slice(0, W - 1), W), padL(text, V)));
-        else r.push(radQ(`#spelare:${spId(y.x)}`, [`${padL(nr, 3)}  `, 'd'], pad(namnPa(y.x.p.name, W - 1), W), [pad(kort(y.x.p.team).slice(0, T - 1), T), 'd'], padL(text, V)));
+        const mig = ix.includes(j);
+        const nn = namn(y);
+        // (numret på den första vid lika tal – och alltid på den markerade)
+        const b = [[`${padL(j && nr[j] === nr[j - 1] && !mig ? '' : nr[j], 3)}  `, mig ? 'v' : 'd'], [nn, mig ? 'i' : ''], [pad('', W - nn.length), '']];
+        if (T) b.push([pad(kort(y.x.p.team).slice(0, T - 1), T), 'd']);
+        b.push([padL(text[j], V), mig ? 'v' : ''], ['  ', ''], ...stapel(y.v, mig ? 'mtv' : ix.length ? 'mtd' : 'mt1'));
+        // (den första markerade: dit rutan rullar, tillMig)
+        if (j === ix[0]) R.mig = r.length;
+        r.push(Object.assign(radQ(lagv ? `#lag:${y.t.name}` : `#spelare:${spId(y.x)}`, ...b), mig ? { kl: 'mig' } : {}));
       });
       const pos = !lagv && def.k === 'mal' ? (A.P.pos[d] || []) : [];
       if (pos.length) {
@@ -2005,7 +2091,7 @@ window.RumRegister = (() => {
             [padL(u === '?' || !s ? '?' : hemma ? `${s.home}–${s.away}` : `${s.away}–${s.home}`, 3), 'v'], [`  ${u === '?' ? '' : u}`, 'd']));
         }
         const alla = lagLista(LAGTAL[0], t.comp).map((y) => y.v);
-        const summa = talRad({ e: 'POÄNG' }, listQ('lag', t.comp, 'form'), fin(fv) && f.every((x) => x.l !== '?') ? `${fv} P` : '?', !S.veil && fin(fv) ? platsAv(fv, alla) : null, alla.length, n);
+        const summa = talRad({ e: 'POÄNG' }, listQ('lag', t.comp, 'form'), fin(fv) && f.every((x) => x.l !== '?') ? `${fv} P` : '?', !S.veil && fin(fv) ? platsAv(fv, alla) : null, alla.length, n, platsQ('lag', t.comp, 'form', t.name));
         r.push(Object.assign(summa, { kl: 'ny', st: `width: ${w + 1}ch` }));
       }
       // (modellens styrka och motståndet hittills)
@@ -2473,7 +2559,8 @@ window.RumRegister = (() => {
       topp.innerHTML = A.topp;
       fot.innerHTML = fotHtml(R);
       spoilerRad();
-      if (!skriv || o.calm()) { ut.innerHTML = h; rull.scrollTop = 0; return; }
+      // (rankningen med en markerad rad: på en gång, och rullad dit)
+      if (!skriv || o.calm() || R.mig != null) { ut.innerHTML = h; rull.scrollTop = 0; tillMig(R); return; }
       ut.innerHTML = '';
       rull.scrollTop = 0;
       const delar = h.match(/<div class="tr[^"]*"[^>]*>.*?<\/div>(?=<div class="tr|$)/g) || [];
@@ -2486,6 +2573,11 @@ window.RumRegister = (() => {
         if (i < delar.length) setTimeout(steg, 9);
       };
       steg();
+    }
+    // den markerade raden i rankningen (R.mig) en tredjedel ner i rutan
+    function tillMig(R) {
+      const el = R && R.mig != null ? ut.children[R.mig] : null;
+      if (el) rull.scrollTop = Math.max(0, el.offsetTop - Math.floor(rull.clientHeight / 3));
     }
     function spoilerRad() {
       const R = A.R;
@@ -2541,8 +2633,21 @@ window.RumRegister = (() => {
       if (typ === 'spelare') return { flik: 'lagen', spelare: id };
       // en lista: #lista:lag:pl:skapar (utan division: Premier League, standardDiv)
       if (typ === 'lista') return rest.length === 3 ? { flik: 'lagen', slag: rest[0], div: rest[1], lista: rest[2] } : null;
+      // rankningen från platsen efter ett tal: #plats:lag:pl:skapar:Arsenal (vem markerad)
+      if (typ === 'plats') return rest.length >= 4 ? { flik: 'lagen', slag: rest[0], div: rest[1], lista: rest[2], vem: rest.slice(3).join(':') } : null;
       if (typ === 'flik') return { flik: GAMLA[id] || id };
       return null;
+    }
+    // vem som markeras i ett tals lista (vy) när man kommer dit från vyn som
+    // står nu: kortets lag eller spelare, matchens lag, eller samma som i
+    // listan man var i (en annan division); annars ingen
+    function migAv(vy) {
+      const v = A.vy;
+      if (v.lista) return v.vem || null;
+      if (vy.slag === 'spelare') return v.spelare || null;
+      if (v.lag) return v.lag;
+      const m = v.mote && A.ms.find((x) => x.id === v.mote);
+      return m ? `${m.home}|${m.away}` : null;
     }
     // ÅTKOMST BEVILJAD i sökraden en stund, när en träff öppnas
     function beviljad() {
@@ -2577,6 +2682,9 @@ window.RumRegister = (() => {
       if (q.startsWith('#del:')) { if (A.vy.lag || A.vy.spelare || A.vy.mote) visa({ ...A.vy, del: q.slice(5) }, true); return null; }
       const vy = vyAv(q);
       if (iSok) A.vy = fore;
+      // till ett tals lista från ett kort eller en matchakt (HELA LISTAN):
+      // kortets lag eller spelare, eller matchens lag, markeras där
+      if (vy && vy.lista && !vy.vem && !iSok) vy.vem = migAv(vy);
       // från ett tals lista till kortet: fliken där talet står
       if (vy && A.vy.lista && (vy.lag || vy.spelare)) vy.del = flikFor(A.vy.slag === 'spelare' ? 'spelare' : 'lag', A.vy.lista);
       if (vy && (q.startsWith('#div:') || q.startsWith('#spelarna:') || (q.startsWith('#lista:') && A.vy.lista)) && A.vy.flik === 'lagen' && !A.vy.lag && !A.vy.spelare) { visa(vy, true); return null; }
@@ -2634,6 +2742,7 @@ window.RumRegister = (() => {
       if (A.on && (h !== A.ut || ht !== A.topp)) {
         const y = rull.scrollTop;
         const sel = A.sel;
+        const forra = A.R;
         A.sk++;
         A.ut = h;
         A.topp = ht;
@@ -2641,6 +2750,8 @@ window.RumRegister = (() => {
         topp.innerHTML = ht;
         fot.innerHTML = fotHtml(R);
         rull.scrollTop = y;
+        // (rankningen som väntade på datan: till den markerade raden när den kommer)
+        if (R.mig != null && !(forra && forra.mig != null)) tillMig(R);
         A.R = R;
         valj(sel, false);
         spoilerRad();

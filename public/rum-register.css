@@ -90,6 +90,12 @@
 .reg-term .mtv { background-image: linear-gradient(90deg, #c9ffd7 0 72%, transparent 72%); }
 .reg-term .mtd { background-image: linear-gradient(90deg, var(--svag) 0 72%, transparent 72%); }
 .reg-term .mtm { background-image: linear-gradient(90deg, var(--gron) 0 72%, transparent 72%); background-size: 1ch 0.72em; }
+/* mätaren och platsen i korten är en tryckbar bit (till rankningen): med
+   ↑/↓ markerad blir rutorna mörka på det ljusa */
+.reg-term .a.sel .mt1, .reg-term .a.sel .mtv { background-image: linear-gradient(90deg, #010702 0 72%, transparent 72%); }
+.reg-term .a.sel .mt0, .reg-term .a.sel .mtd { background-image: linear-gradient(90deg, rgba(1, 7, 2, 0.3) 0 72%, transparent 72%); }
+/* rankningen: den markerade raden (laget eller spelaren man kom ifrån) i ett svagt band */
+.reg-term .tr.mig { background: rgba(65, 255, 110, 0.1); }
 /* tangenterna längst ner, omvänt över hela bredden */
 /* Rutan med förklaringen till ett tal (fkRita i rum-register.js): dubbel
    ram med talets namn omvänt i ramen och vad det är svagt bredvid. Den
