@@ -3253,6 +3253,9 @@ window.RumFasad = (() => {
         (L.dimma > 0.05 ? `<div class="rf-lager rf-dimma" style="background:${mix('#2a2622', '#aeb3b6', L.dag)}; opacity:${r1(0.32 * L.dimma)}"></div>` : '') +
         duk('rf-fram', V, px);
       F.duk = scen.querySelector('.rf-gang');
+      // (getContext ger null när telefonen inte har mer minne till dukar: då står det som skulle ha ritats
+      // där still och resten rör sig ändå – förut kastade det ett fel, och fasaden stod som en fast bild eller
+      // gick inte att klicka bort)
       R.fram = scen.querySelector('.rf-fram').getContext('2d');
       R.bak = himlen ? scen.querySelector('.rf-bak').getContext('2d') : null;
       R.barber = barberR ? scen.querySelector('.rf-barber').getContext('2d') : null;
@@ -3261,7 +3264,8 @@ window.RumFasad = (() => {
       // (en fast bild: allt som rör sig står på samma tid)
       if (o.still != null) for (const an of el.getAnimations({ subtree: true })) { an.pause(); an.currentTime = o.still * 1000; }
       // (gänget från förra gången tills det ritas på nytt)
-      if (gammal && gammal.width) F.duk.getContext('2d').drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
+      const g = gammal && gammal.width ? F.duk.getContext('2d') : null;
+      if (g) g.drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
       slapp(gammal);
       for (const c of gamla) slapp(c);
       F.neon = null;
@@ -3284,7 +3288,11 @@ window.RumFasad = (() => {
     function pynt(bilder) {
       const dukar = scen.querySelectorAll('.rf-pynt');
       let j = 0;
-      for (const bild of bilder) if (bild && dukar[j]) dukar[j++].getContext('2d').drawImage(bild, 0, 0);
+      for (const bild of bilder) {
+        if (!bild || !dukar[j]) continue;
+        const g = dukar[j++].getContext('2d');
+        if (g) g.drawImage(bild, 0, 0);
+      }
     }
     // Scenen täcker fönstret: den byggs i fönstrets storlek (F.k), och när storleken ändras skalas den om så
     // länge, tills den byggs om (storlek). Och dörrens mitt i fönstret, dit man går in och ut.
@@ -3333,7 +3341,7 @@ window.RumFasad = (() => {
       const ms = performance.now();
       const t = o.still != null ? o.still : ms / 1000;
       const dags = (sist, fps) => nu || ms - (sist || 0) >= 1000 / fps - 4;
-      if (dags(R.sFram, R.fortGata ? TAKT_GATA : TAKT)) {
+      if (R.fram && dags(R.sFram, R.fortGata ? TAKT_GATA : TAKT)) {
         R.sFram = ms;
         ritaFram(R, t);
       }
@@ -3357,6 +3365,8 @@ window.RumFasad = (() => {
       if (calm() || o.still != null) return;
       const tick = (ms) => {
         if (!el.isConnected) return;
+        // (nästa bildruta först: ett fel i en bild får inte stoppa allt som rör sig för gott)
+        F.raf = requestAnimationFrame(tick);
         // (F.sist: bildrutan som gänget ritades efter)
         if (!F.vantar && gangDags(ms)) {
           F.sist = ms;
@@ -3364,7 +3374,6 @@ window.RumFasad = (() => {
           efter.port2.postMessage(0);
         }
         rorelse();
-        F.raf = requestAnimationFrame(tick);
       };
       F.raf = requestAnimationFrame(tick);
     }
@@ -3382,7 +3391,13 @@ window.RumFasad = (() => {
       storlekT = setTimeout(() => { if (el.isConnected) rita(); }, 300);
     };
     addEventListener('resize', storlek);
-    rita();
+    // (ett fel när scenen byggs får inte lämna kvar en fasad som inte går att klicka bort: rum.js sätter
+    // klicket och Esc först när bygg har kommit tillbaka)
+    try {
+      rita();
+    } catch (err) {
+      console.error(err);
+    }
     loop();
     return {
       el,
