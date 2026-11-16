@@ -5505,7 +5505,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const sak = (g, x, y, z, vrid = 0) => { g.scale.setScalar(PCM); g.position.set(x, y, z); g.rotation.y = vrid * DEG; baren.add(g); return g; };
     const V3 = (x, y, z) => new THREE.Vector3(x / PCM, y / PCM, z / PCM);
     if (namn === 'jul') {
-      sak(S.stjarna({ R: 13, snore: 40 }), fx, 100, GZ, -6);
+      // (på höjden lite lägre, under sidans namn och Tillbaka)
+      sak(S.stjarna({ R: 13, snore: hog ? 50 : 40 }), fx, hog ? -40 : 100, GZ, -6);
       sak(S.ljusstake(), dx, T, DZ, -18);
     } else if (namn === 'pask') {
       sak(S.agg([[-160, 360, 1.5], [0, 200, 1.7], [170, 300, 1.5], [330, 140, 1.6], [470, 280, 1.4]]
@@ -5515,7 +5516,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       sak(S.vimplar([V3(-200, 520, GZ), V3(850, 520, GZ), V3(1866, 520, GZ)], { s: 6, b: 9, h: 12, mellan: 11 }), 0, 0, 0);
       sak(S.blommor(), dx, T, DZ, -10);
     } else if (namn === 'kraftor') {
-      sak(S.lyktor([V3(150, 560, GZ), V3(1000, 560, GZ), V3(1866, 560, GZ)], [[0.5, 9, 0], [0.66, 8, 1], [0.82, 9.5, 2], [0.96, 8, 0]], { s: 4 }), 0, 0, 0);
+      sak(S.lyktor([V3(150, 470, GZ), V3(1000, 470, GZ), V3(1866, 470, GZ)], [[0.4, 9, 0], [0.59, 8, 1], [0.77, 9.5, 2], [0.94, 8, 0]], { s: 4 }), 0, 0, 0);
     } else if (namn === 'halloween') {
       sak(S.pumpa({ R: 12 }), dx, T, DZ, -12);
       sak(S.pumpa({ R: 7 }), dx + 330, T, DZ + 60, 20);
