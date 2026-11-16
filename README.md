@@ -408,6 +408,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   *Matchprogrammet* och D *Fanzinet*, sedan de minimalistiska E *Numret*, F *Lördagen* (vald), G *Rubriken* och H
   *Bara namnet*; devisen bland ett tjugotal förslag. Löpsedeln har samma papper, ram, översta rad och namn som förut
   (`forsta` i [public/rum-tidning.js](public/rum-tidning.js), se [Helgarderat](#helgarderat))
+- [x] **Kalenderbladet med omgångens alla dagar (2026-11-16, användarens önskemål: "Förstasidan på helgarderat står 15
+  när det spelades 15+16 … borde alltså ha 15 + 16 på ett passande grafiskt designsätt"):** en omgång på två dagar har
+  dem under varandra på omslaget, lite mindre, med ett kursivt *&* mellan två korta streck (*15 & 16*), och en på fler
+  den första och den sista med *till* mellan. Sidhuvudet säger detsamma (*Nr 2 · 15 och 16 november*), och Hasse Backes
+  tidning ritar samma omslag. Dagarna räknas på avsparkarna i Stockholmstid
 - [x] **Spegeln: man ser vem av de tre man är (2026-11-13, användarens önskemål: "Kan du komma på något smart sätt som
   man kan se vem av de tre som man är inloggad som på animationssidan?", med kravet att det inte får dra mycket
   grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
