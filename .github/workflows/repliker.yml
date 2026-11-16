@@ -8,13 +8,11 @@ on:
     paths:
       - "public/rum-hasse-repliker.js"
       - "public/rum-hasse.js"
-      - "src/rost.js"
       - "scripts/hasse/kolla-repliker.js"
   pull_request:
     paths:
       - "public/rum-hasse-repliker.js"
       - "public/rum-hasse.js"
-      - "src/rost.js"
       - "scripts/hasse/kolla-repliker.js"
 
 jobs:

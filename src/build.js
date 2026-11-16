@@ -36,10 +36,6 @@
 // till sajten, och tidningens bilder ur grenen tidning-bilder (som workflowen hämtar till
 // data/tidning-bilder/) till data/tidning-bilder/.
 //
-// Hasse Backes röst (src/rost.js): Tomas egen röst ur grenen rost (som workflowen
-// hämtar till data/egen-rost/) läggs i data/rost/ med registret data/rost.json. Det
-// som inte finns där sägs tyst.
-//
 // Den genererade datan committas inte (den skulle svälla repot med varje
 // körning) – den laddas upp som Pages-artefakt. Källcachen i data/cache/
 // sparas mellan körningarna med actions/cache. Det enda som committas är
@@ -68,7 +64,6 @@ const { readCoupons, REPO, BRANCH } = require('./coupons');
 const { buildHistory } = require('./history');
 const { buildTippare, fetchSamtal, roundNames, roundNotes } = require('./tippare');
 const { highlightsByMatch, youtubeByMatch } = require('./hojdpunkter');
-const rost = require('./rost');
 const { minifySite, packaBinart } = require('./minify');
 const { buntaSidan } = require('./bunta');
 const { filerSidan } = require('./filer');
@@ -150,8 +145,6 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     fs.mkdirSync(path.join(dataDir, 'tidning-bilder'), { recursive: true });
     for (const f of fs.readdirSync(bilder)) if (/\.jpg$/.test(f)) fs.copyFileSync(path.join(bilder, f), path.join(dataDir, 'tidning-bilder', f));
   }
-  // Hasse Backes röst: Tomas egen, där den finns.
-  const rosten = rost.publicera(dataDir, { gang: kupongCfg.gang || [] });
   const sources = sourceReport();
   write('sources.json', sources);
 
@@ -377,7 +370,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   // Byt hela katalogen på en gång, så att en halvfärdig sajt aldrig serveras.
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.renameSync(tmp, outDir);
-  return { generatedAt, minified, buntat, filer, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare, rosten };
+  return { generatedAt, minified, buntat, filer, pages, failed, counts: sources.counts, forecastMs: forecast.ms, logged: logged.length, frozen: history.frozen.length, tippare };
 }
 
 function elva(id) {
@@ -457,7 +450,6 @@ if (require.main === module) {
       const b = site.buntat;
       if (b) console.log(`Förstasidan i buntar: ${['stil', 'skript', 'moduler'].map((k) => (b[k] ? `${k} ${b[k].filer} → ${b[k].buntar}` : `${k} som förut`)).join(', ')}.`);
       if (site.filer) console.log(`Filerna som sparas mellan besöken (sw.js): ${site.filer.filer}, listan ${Math.round(site.filer.tecken / 1024)} kB.`);
-      console.log(`Hasse Backes röst: ${site.rosten.filer} av ${site.rosten.av} meningar har ljud.`);
     })
     .catch((err) => {
       console.error(err);

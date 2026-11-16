@@ -357,8 +357,8 @@ async function namnet(round) {
 
 // ---------- tidningens bilder ----------
 
-// Grenen med bilderna: en enda commit med filerna, som skrivs över varje gång (som rösten i
-// grenen rost), så att main inte växer och förra veckans bilder inte ligger kvar. Workflowen
+// Grenen med bilderna: en enda commit med filerna, som skrivs över varje gång, så att main inte
+// växer och förra veckans bilder inte ligger kvar. Workflowen
 // hämtar den till data/tidning-bilder/. → commitens id
 const BILDGREN = 'tidning-bilder';
 function bildGrenen(mapp, filer, vad) {
