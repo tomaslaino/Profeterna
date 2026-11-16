@@ -2627,7 +2627,12 @@ intressant/alternativ spännande information som du finner inför omgången och 
 nåt kort kåseri av någon person"*): Hasse Backes krönika (150–220 ord), *Vid sidan av* (fem korta notiser om det udda
 med omgångens lag: historien, arenan, staden, supportrarna, aldrig form, skador eller tränarens ord) och ett kåseri av
 en påhittad person, en ny varje vecka (90–150 ord, användarens val samma kväll; Claude ser de tolv senaste kåsörerna i
-`kasorer` och får inte ta någon av dem). Ett anrop per omgång, när omgångens matchblad har
+`kasorer` och får inte ta någon av dem). Kåseriet har också en ny form och röst varje vecka (2026-11-16: *"de är lite
+enformiga i sitt sätt … gör så att de får olika profil"*; de fyra första började alla med yrke och ort och slutade med
+en kort torr mening): en av femton i `kaseriFormer`, till exempel en insändare, en dagbok, ett brev, ett protokoll från
+tipsklubben, ett samtal i repliker, ett barn som tippar med morfar eller två grannar som turas om. Formen väljs efter
+omgångens id bland dem som inte har använts de tio senaste veckorna (`kaseriForm`) och sparas i `kaseri.form` och
+`kasorer`. En sida som skrevs för hand (`"hand": true`) skrivs inte om för en ny prompt. Ett anrop per omgång, när omgångens matchblad har
 kommit i `data/poddsidor.json`, så att Claude får matchbladens rubriker och sammanfattningar och inte upprepar dem
 ([src/analyser/sista-sidan.mjs](src/analyser/sista-sidan.mjs), prompten och gränserna i
 [config/sista-sidan.js](config/sista-sidan.js)); en ny `promptVersion` skriver om den. Claude får högst 8 sökningar och 4
@@ -2642,8 +2647,8 @@ pågår, oavsett tid. `data/sista-sidan.json`, som bygget kopierar till sajten:
 { "omgang": "2026-11-14", "matcher": ["401880745"], "skriven": "…", "model": "…", "version": "…",
   "kronika": { "av": "Hasse Backe", "rubrik": "…", "stycken": ["…"] },
   "sidan": [ { "lag": "Exeter City", "text": "…", "kalla": { "source": "…", "title": "…", "url": "…", "publishedAt": null } } ],
-  "kaseri": { "av": "…", "om": "pensionerad lokförare, Hallsberg", "rubrik": "…", "stycken": ["…"] },
-  "kasorer": [ { "av": "…", "om": "…" } ] }
+  "kaseri": { "av": "…", "om": "pensionerad lokförare, Hallsberg", "rubrik": "…", "stycken": ["…"], "form": "dagbok" },
+  "kasorer": [ { "av": "…", "om": "…", "form": "dagbok" } ] }
 ```
 
 **Veckans löpsedel** (2026-11-14, användarens önskemål: *"Kan du ha lite mer intressanta tidningsrubriker inför

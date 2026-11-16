@@ -4,6 +4,9 @@
 // Prompten och gränserna står i config/sista-sidan.js och sidan sparas i data/sista-sidan.json,
 // som tidningen ritar (public/rum-tidning.js).
 //
+// Kåseriet får en ny form och röst varje vecka (config/sista-sidan.js, kaseriFormer), så att kåserierna
+// inte liknar varandra: kaseriForm väljer en som inte har använts på ett tag.
+//
 // Kontrollerna: en notis i Vid sidan av följer bara med om dess källa kom upp i en sökning eller
 // på en läst sida och varje tal i den står i underlaget eller i det Claude läste; krönikan och
 // kåseriet är fiktion i personernas röst, men årtal och resultat i dem ska också gå att hitta där.
@@ -26,11 +29,24 @@ const ord = (s) => String(s || '').split(/\s+/).filter(Boolean).length;
 const str = (v) => (typeof v === 'string' && v.trim() ? v.trim() : null);
 const lagI = (round) => round.matcher.flatMap((x) => String(x.match || '').split(/\s+[–-]\s+/)).map((s) => s.trim()).filter(Boolean);
 
-export const systemPrompt = () => sc.systemPrompt
+export const systemPrompt = (form = sc.kaseriFormer[0]) => sc.systemPrompt
+  .replace('{kaseriForm}', form.text)
   .replace('{sokningar}', sc.sokningar).replace('{sidor}', sc.sidor).replaceAll('{rubrikOrd}', sc.rubrikOrd)
   .replace('{kronikaMin}', sc.kronika[0]).replace('{kronikaMax}', sc.kronika[1])
   .replace('{kaseriMin}', sc.kaseri[0]).replace('{kaseriMax}', sc.kaseri[1])
   .replace('{notisMin}', sc.notis[0]).replace('{notisMax}', sc.notis[1]).replace('{notiser}', sc.notiser);
+
+// Veckans form för kåseriet: en ur sc.kaseriFormer som inte har använts de senaste sc.formVila veckorna,
+// vald efter omgångens id, så att samma omgång får samma form om sidan skrivs om. tidigare: [{av, om, form}],
+// den senaste först.
+export function kaseriForm(omgang, tidigare = []) {
+  const nyss = new Set(tidigare.slice(0, sc.formVila).map((k) => k && k.form).filter(Boolean));
+  const kvar = sc.kaseriFormer.filter((f) => !nyss.has(f.id));
+  const val = kvar.length ? kvar : sc.kaseriFormer;
+  let h = 0;
+  for (const c of String(omgang)) h = (h * 31 + c.codePointAt(0)) >>> 0;
+  return val[h % val.length];
+}
 
 // Ska sidan skrivas nu? nu: data/sista-sidan.json som den ligger, blad: data/poddsidor.json. En gång
 // per omgång, när omgångens matchblad finns (då vet sidan vad som redan står i tidningen), och igen
@@ -40,6 +56,8 @@ export function attSkrivaSista(round, nu, blad, { now = Date.now(), tvinga = fal
   if (!blad || blad.omgang !== round.id || !(blad.sidor || []).length) return { skriv: false, varfor: 'inga matchblad än' };
   if (tvinga) return { skriv: true, varfor: 'tvingad' };
   if (!nu || nu.omgang !== round.id) return { skriv: true, varfor: 'ny omgång' };
+  // En sida som skrevs för hand (som Nr 2, Europatipset) skrivs inte om för en ny prompt.
+  if (nu.hand) return { skriv: false, varfor: 'skriven för hand' };
   if (nu.version !== sc.promptVersion) return { skriv: true, varfor: 'ny prompt' };
   return { skriv: false, varfor: 'aktuell' };
 }
@@ -93,11 +111,12 @@ export function textFel(t, granser, known) {
   return why;
 }
 
-// Det som är fel i kåsören: namnet, vem hen är, och att hen inte har skrivit förut. tidigare: [{av, om}].
+// Det som är fel i kåsören: namnet, vem hen är, och att hen inte har skrivit förut. tidigare: [{av, om, form}].
 export function kasorFel(k, tidigare = []) {
   if (!k) return [];
   const why = [];
-  if (!k.av || ord(k.av) > 4) why.push('inget namn på kåsören, eller ett för långt');
+  // (två kåsörer heter "Kjell och Marianne Ek")
+  if (!k.av || ord(k.av) > 6) why.push('inget namn på kåsören, eller ett för långt');
   if (!k.om || ord(k.om) > 10) why.push('inte vem kåsören är, eller för mycket om det');
   const enkelt = (s) => String(s || '').toLowerCase().replace(/[^\p{L} ]/gu, '').trim();
   if (k.av && tidigare.some((x) => x && enkelt(x.av) === enkelt(k.av))) why.push(`${k.av} har redan skrivit ett kåseri`);
@@ -133,11 +152,12 @@ export async function skrivSista(round, blad, { forra = null, now = () => new Da
   // De senaste kåsörerna, utom den som skrev en tidigare version av den här omgångens sida.
   const tidigare = ((forra && forra.kasorer) || []).filter((k) => !(forra.omgang === round.id && forra.kaseri && k.av === forra.kaseri.av)).slice(0, sc.kasorer);
   const underlag = sistaUnderlag(round, blad, tidigare);
+  const form = kaseriForm(round.id, tidigare);
   const lagen = lagI(round);
   const seen = new Map();
   const read = [];
   const meta = { searches: 0, fetches: 0, seconds: 0, dollars: 0 };
-  const opts = { system: systemPrompt(), model: sc.model, effort: sc.effort, timeoutMs: sc.timeoutMs };
+  const opts = { system: systemPrompt(form), model: sc.model, effort: sc.effort, timeoutMs: sc.timeoutMs };
   const fraga = `Nu är det ${nowFmt.format(now())} svensk tid.\n\nOmgångens matcher och matchbladen (JSON):\n${JSON.stringify(underlag)}`;
   let model = sc.model;
   let kronika = null;
@@ -192,9 +212,9 @@ export async function skrivSista(round, blad, { forra = null, now = () => new Da
     version: sc.promptVersion,
     kronika: { av: 'Hasse Backe', ...kronika },
     sidan: notiser.sort((a, b) => ordning(a.lag) - ordning(b.lag)),
-    kaseri,
+    kaseri: { ...kaseri, form: form.id },
     // De senaste veckornas kåsörer, den här först, så att nästa vecka får en ny.
-    kasorer: [{ av: kaseri.av, om: kaseri.om }, ...tidigare].slice(0, sc.kasorer),
+    kasorer: [{ av: kaseri.av, om: kaseri.om, form: form.id }, ...tidigare].slice(0, sc.kasorer),
   };
   return { ok: true, sida, meta };
 }
