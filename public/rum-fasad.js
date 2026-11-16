@@ -7,7 +7,8 @@
 // MATCHFIXARNA över skyltfönstret och dörren, och till höger brons gröna räcke med stan på andra sidan.
 // Det är samma klocka, ljus och väder som genom fönstret inifrån (Vader.nu, RumUte.light och
 // RumUte.farg i rum-ute.js) och samma trafik (RumUte.trafik): himlen, molnen, regnet och snön, de som går
-// förbi, lyktorna som tänds och bilarna på gatan bakom en, som syns som speglingar i glaset.
+// förbi, lyktorna som tänds och bilarna och bussarna som kör förbi på gatan mellan en själv och affären
+// (rum-fasad-gatan.js) och syns som speglingar i glaset.
 //
 // Genom skyltfönstret syns rummet, vagt: gänget vid barbordet bakifrån, ritat i 3D av samma scen som
 // inne (Rum.utifran, utifran i rum-3d.js), med neonskylten Tobak, som läses rätt härifrån, skivan med
@@ -745,7 +746,8 @@ window.RumFasad = (() => {
     if (vat && !sno && (v.fall === 'regn' || v.fall === 'blandat')) {
       let b = '';
       for (let i = 0; i <= 30; i++) {
-        const dd = 0.06 + (i / 30) * 4;
+        // (ned i rännstenen vid trottoarkanten, rum-fasad-gatan.js)
+        const dd = 0.06 + (i / 30) * (GATA() ? GATA().KANT + 0.06 : 4);
         const xw = STUPROR + 22 + Math.sin(i * 0.7) * 10 + i * 4;
         b += `${i ? 'L' : 'M'}${r1(OGA_X + (xw - OGA_X) * skala(dd))} ${r1(markY(dd))}`;
       }
@@ -776,6 +778,8 @@ window.RumFasad = (() => {
   // det ett trettiotal CSS-animeringar, var och en i ett eget lager, och ett tiotal skärmytor lades ihop 60
   // gånger i sekunden.
   const TAKT = LATT ? 24 : 30;
+  // (medan en bil eller buss syns: de kör fort, och i 30 bilder i sekunden hoppar de på en stor skärm)
+  const TAKT_GATA = LATT ? 30 : 60;
   const DEG = Math.PI / 180;
   // fram och tillbaka med mjuka vändningar (som ease-in-out alternate): 0 … 1 … 0 på 2·p sekunder
   const pendel = (t, p) => {
@@ -2519,10 +2523,13 @@ window.RumFasad = (() => {
     const st = R.stanna && R.stanna(t);
     if (st) lista.unshift([{ k: st.f.k, dir: st.sta ? 1 : st.f.dir, sta: st.sta, stil: st.f.stil }, st.sta ? st.f.B : st.f.D, st.x, markY(STANNA.dm)]);
     const bilar = R.bilar.some((b) => { const x = glidX(b.g, t); return x < DORR.x + DORR.w + 100 && x + b.w > FON.x - 100; });
-    if (!lista.length && !bilar && !R.N && R.tom) return;
+    // (bilarna och bussarna på gatan framför, rum-fasad-gatan.js)
+    const gata = R.gata ? GATA().syns(R.gata, t, V) : null;
+    R.fortGata = Boolean(gata);
+    if (!lista.length && !bilar && !gata && !R.N && R.tom) return;
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.clearRect(0, 0, c.canvas.width, c.canvas.height);
-    R.tom = !lista.length && !bilar && !R.N;
+    R.tom = !lista.length && !bilar && !gata && !R.N;
     if (R.tom) return;
     c.setTransform(R.px, 0, 0, R.px, -V.x * R.px, -V.y * R.px);
     if (R.vat && lista.length) {
@@ -2538,6 +2545,11 @@ window.RumFasad = (() => {
     }
     if (bilar) ritaBilar(c, R.bilar, t);
     for (const [f, D, x, y] of lista) ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L), z: morkSteg(x, L) });
+    // (stänken på stenen bakom dem som kör förbi, och fordonen framför dem som går)
+    if (gata) {
+      ritaStank(c, R.N, R.K, t, L.dag);
+      GATA().rita(c, R.gata, gata, t);
+    }
     // (i dimma: samma dis över dem som över allt bakom, bara där något är ritat)
     if (R.dimma) {
       c.save();
@@ -2548,10 +2560,15 @@ window.RumFasad = (() => {
       c.restore();
     }
     ritaNederbord(c, R.N, V, t, R.K, L.dag);
-    ritaStank(c, R.N, R.K, t, L.dag);
+    if (!gata) ritaStank(c, R.N, R.K, t, L.dag);
   }
 
   // ---------- att bygga och rita ----------
+
+  // Gatan och trafiken framför affären (rum-fasad-gatan.js) får fasadens mått och hjälpare.
+  const GATA = () => window.RumFasadGatan || null;
+  let gataG = null;
+  const gataMatt = () => gataG || (gataG = { M, MARK, HOR, AVST, OGA_X, VARLD, FON, DORR, markY, skala, tone, mix, rng, pick, r1, sm, snoC, lovet, LATT });
 
   const bucket = (x, n) => Math.round(x * n) / n;
   function sig(V, v, L, o) {
@@ -2615,6 +2632,7 @@ window.RumFasad = (() => {
         folk: lugn ? [] : folket(V, v, L),
         stanna: lugn ? null : stannar(V, v, L),
         bilar: lugn ? [] : bilarna(v, L, px),
+        gata: lugn || !GATA() ? null : GATA().trafik(v, L, gataMatt()),
         N: lugn ? null : nederbord(V, v),
         // (ljuset där regnet faller, på kvällen: ljusKarta)
         K: !lugn && (v.fall === 'regn' || v.fall === 'blandat') && L.dag < 0.95 ? ljusKarta(V, L, inne(o)) : null,
@@ -2635,7 +2653,7 @@ window.RumFasad = (() => {
         svg(V, defs + iFonstret(v, L, o)) +
         svg(V, defs + neonSkylt(), 'rf-neonlager') +
         svg(V, defs + glaset(v, L, o)) +
-        svg(V, `${defs}<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}`) +
+        svg(V, `${defs}<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}`) +
         svg(V, texten(v, L), 'rf-text') +
         (barberR ? duk('rf-barber', barberR, px) : '') +
         svg(V, kvallsljus(V, v, L, o), 'rf-kvall') +
@@ -2700,7 +2718,7 @@ window.RumFasad = (() => {
       const ms = performance.now();
       const t = o.still != null ? o.still : ms / 1000;
       const dags = (sist, fps) => nu || ms - (sist || 0) >= 1000 / fps - 4;
-      if (dags(R.sFram, TAKT)) {
+      if (dags(R.sFram, R.fortGata ? TAKT_GATA : TAKT)) {
         R.sFram = ms;
         ritaFram(R, t);
       }
