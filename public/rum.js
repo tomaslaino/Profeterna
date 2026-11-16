@@ -4447,7 +4447,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on) aimVideo(calm() ? null : 'glid');
     else {
       aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
-      lyft([800, 500], 1, [800, 500], calm() ? null : 'glid');
+      lyftHornet([800, 500], 1, [800, 500], calm() ? null : 'glid');
     }
     // (ovanpå rummet tills det har kommit hem igen)
     if (on) R.el.classList.add('vid-lyft');
@@ -4457,8 +4457,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // hamnar på to med förstoringen z, samma väg som kameran går till tv:n
   // (zoomVag), på samma tid som kameran och tv:n och lådan svänger (.vhs-kam).
   // När det är hemma igen ligger det i rummet igen, under det som står
-  // framför (vid-lyft).
-  function lyft(p, z, to, cls) {
+  // framför (vid-lyft). (Hette först lyft, som tidningens funktion ovan: den
+  // senare tog över namnet, och tidningen gick inte att öppna, 2026-11-16.)
+  function lyftHornet(p, z, to, cls) {
     const w = document.getElementById('rum-lyft');
     if (!w) return;
     const dx = r1(to[0] - 800 - z * (p[0] - 800));
@@ -4504,7 +4505,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!f.fyll || !R.vrum) R.vrum = { p, z: Math.min(VID_RUM, z), to: [p[0] + (to[0] - p[0]) / 2, p[1] + (to[1] - p[1]) / 2] };
     const r = R.vrum;
     aim(r.p, r.z, r.to, cls);
-    lyft(p, z / r.z, [r.p[0] + (to[0] - r.to[0]) / r.z, r.p[1] + (to[1] - r.to[1]) / r.z], cls);
+    lyftHornet(p, z / r.z, [r.p[0] + (to[0] - r.to[0]) / r.z, r.p[1] + (to[1] - r.to[1]) / r.z], cls);
     // Draperiet: över det som syns av scenen hemma och när kameran är framme,
     // ljusast mitt i fönstret där. Det ritas i en åttondel av storleken och
     // förstoras (VMORK): Safari ritar ett lager i sin egen storlek gånger
