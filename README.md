@@ -1291,6 +1291,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hyllan syns, gänget i rätt storlek), C de som går förbi (formade figurer, siluetter med ljus i kanten, speglade i
   stenen, ibland någon som stannar och tittar in) och D allt som rör sig i dukar i stället för ett trettiotal
   CSS-animeringar. Se [Fasaden](#fasaden).
+- **Gänget i fönstret hackar inte (2026-11-16, användarens önskemål):** "de här gubbarna hackar en massa när man
+  tittar på dem i den där vyn utanför tobaksaffären. Kan du justera det - så att det även inte hackar på äldre mobiler
+  och på äldre datorer." Gänget utifrån ritades bara 9 gånger i sekunden i datorn och 4 i telefonen; nu lika ofta
+  som inne, och bara glaset. Se [Fasaden](#fasaden).
 - **De som går förbi går som folk (2026-11-16, användarens önskemål):** "kan du ordna så att det ser naturligt ut när
   de här personerna går förbi - just nu flyter de liksom fram. Gör det på ett snyggt sätt - utan att det kostar så mkt
   grafik för sämre datorer/mobiler". Foten i marken står still mot stenen, höften gungar, knät och fotleden böjs och
@@ -6656,7 +6660,7 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och rutan kopieras till fasadens duk i
   samma uppgift som den ritas. Rutan som kopieras är `STORRE` (1,25) gånger glaset med samma mitt och nederkant, så att
   gänget blir lika stort som de som går förbi på trottoaren (förut var huvudena dubbelt så stora). Därför är det samma kläder, frisyrer, mössor, flaskor, radion och ampelliljan som inne, och
-  de rör sig: duken ritas om några gånger i sekunden (ungefär 9 i datorn, 4 i telefonen, en gång i en fast bild). De sover
+  de rör sig lika jämnt som inne (se *Gänget i fönstret hackar inte* nedan; en gång i en fast bild). De sover
   på natten och festar i julkläder som inne. Neonen bakom dem lyser mindre på ryggarna än inifrån på ansiktena. Bakom
   dem rummet, lite ur skärpa: lysröret i taket, hyllan med cigarettpaketen (paketen går att se), bardisken, tv:ns blå
   sken och Tipsligan på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren, vagare. Framför dem neonskylten *Tobak*,
@@ -6713,6 +6717,28 @@ det 5 lager i telefonen och 8 på datorn, inga animeringar, och i telefonstorlek
 arbete från ~300 till ~65–120 ms/s (headless Chrome, `?rum-kval=1`, regn på kvällen); på datorn är grafikprocessens tid
 ungefär som förut. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt
 (för bilder, med `?rum-t` står allt det som rör sig på den tiden).
+
+**Gänget i fönstret hackar inte (2026-11-16, användarens önskemål):** gänget utifrån ritades bara var 110:e ms i datorn
+och var 240:e i telefonen (9 och 4 bilder i sekunden, medan regnet och de som går förbi rörde sig 24–30 gånger), och
+varje gång hela gängets duk, två till tre gånger fler bildpunkter än det som kopierades. Nu:
+
+- **Bara glaset** (`utifran` i rum-3d.js): kameran ser glaset och inget annat (ett snett synfält med
+  `makePerspective`, eftersom ögat inte står mitt för fönstret), med fasadens dukens bildpunkter och högst så många som
+  glaset fick förut (`H` gånger `prNu`), så att skärpan är densamma. Medan rummet står still krymper gängets duk till
+  just det (`UTE.krympt`); `draw` ger den rummets storlek igen när gänget ritas inifrån (`inneStorlek`), och `narbild`
+  och `kval` vet om det. I övergången, medan rummet syns, ritas glaset i dukens nedre hörn utan att duken krymper.
+- **Skuggorna var fjärde gång** utifrån, i samma bild (på steg 0 var de en fjärdedel av arbetet).
+- **I rummets takt, efter bildrutan** (`gang`, `gangDags` i rum-fasad.js): lika ofta som gänget ritas inne
+  (`o.takt`, `KVAL` i rum.js: 30, 20 eller 15), direkt efter bildrutan genom en `MessageChannel` som `efterBild` inne,
+  men aldrig så ofta att gänget tar mer än en fjärdedel av tiden (`GANG_ANDEL`, mitten av de nio senaste ritningarnas
+  tid). En svag telefon eller dator får då färre men jämna bilder av gänget, och resten hackar inte för dess skull.
+
+Mätt i headless Chrome (`?rum-fasad`, regn på kvällen, gammal och ny om vartannat; trådtid, eftersom andra sessioner
+gav load 15–45): i datorn (`?rum-kval=0`) 8,5 → 30 bilder av gänget i sekunden, varje bild 8,3 → 5,0 ms skript och
+inga fler långa bildrutor; som telefon 4 → 20 i sekunden. Med processorn ×4 (en gammal telefon eller dator) blir det
+7–13 bilder av gänget i stället för 4–8,5, och resten jämnare än förut (som dator 50 → 58 bilder i sekunden, långa
+bildrutor 88 → 13 i bästa paret). Tiden går nästan helt till three.js egna ritanrop (~220 utifrån i telefonen, ~300 på
+steg 0), inte till bildpunkterna; delar som blir under två bildpunkter stora utifrån är bara 30 av 223, så de står kvar.
 
 ### Kupongen i handen
 
