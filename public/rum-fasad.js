@@ -2151,8 +2151,8 @@ window.RumFasad = (() => {
   }
 
   // Bilarna på gatan bakom en syns i glaset: på dagen som mörka skuggor som far förbi, på kvällen
-  // strålkastarna (och baklyktorna åt andra hållet). Bussarna lika, men längre. Samma bil far över fönstret
-  // och dörren (glasen sitter i samma plan).
+  // baklyktorna. Alla åt vänster, som på gatan (den är enkelriktad, rum-fasad-gatan.js). Bussarna lika, men
+  // längre. Samma bil far över fönstret och dörren (glasen sitter i samma plan).
   function bilarna(v, L, px) {
     const T = U().trafik.nu(v);
     const R = rng(v.ar * 131 + v.manad * 17 + v.dag + (v.timme >> 1) + 5);
@@ -2162,7 +2162,7 @@ window.RumFasad = (() => {
     const hk = FON.h * 0.3;
     const ut = [];
     for (let i = 0; i < n; i++) {
-      const dir = i % 2 ? -1 : 1;
+      const dir = -1;
       const buss = T.bussar && R() < 0.25;
       const w = buss ? 900 : 360;
       const varv = (T.varv[0] + R() * (T.varv[1] - T.varv[0])) * (0.5 + R() * 0.4);

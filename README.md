@@ -6834,23 +6834,30 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
   13 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
   gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna syns också som speglingar som far förbi i glaset
-  och dörren: mörka skuggor på dagen, strålkastare och baklyktor i mörkret.
+  och dörren: mörka skuggor på dagen, baklyktor i mörkret, alla åt vänster som på gatan.
 - **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
   ([public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), `RumFasadGatan`): trottoarkanten i granit 0,88 m ut,
   rännstenen med gatsten och en brunn (bäcken från stupröret slutar där), asfalten med mittlinjen, höstlöv i
   rännstenen, slask med hjulspår och en plogvall längs kanten när det har snöat och, i en telefon på höjden, kanten
   mittemot och trottoaren där man själv står. Då och då kör det förbi, och då täcker de affären – bussarna nästan
-  helt: nittiotalsbilar (Volvo 240 kombi med takräcke och stänkskydd, 740, Saab 900, Golf, en skåpbil och taxi med
-  skylten på taket), de röda bussarna (trean och 77:an) och den blåa ledbussen fyran med slutstationen på skylten, och
-  plogbilen med blinkljus när det har snöat. Högertrafik: den bortre filen kör åt vänster, den närmre åt höger.
-  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 1 % av tiden mitt i natten, 9 % på dagen och 25 % i
-  rusningen), och i rusningen ibland en kö mot ljuset vid bron: bilarna bromsar in, står med bromsljusen tända (och
+  helt: Stockholms bilar i mitten av nittiotalet, ungefär i bilregistrets blandning (`MODELLER`: en tredjedel Volvo –
+  240 sedan och kombi med stänkskydd, 740/940 sedan och kombi, 850 sedan och kombi med baklyktorna högt längs
+  bakstolpen, 340 – Saab 900 och 9000, Golf, Mercedes W124 med kromlister och grå paneler, Sierra, Kadett, Corolla,
+  BMW E30 och Peugeot 205), ritade efter de riktiga måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller
+  lättmetallfälgar som snurrar och ibland takräcke, skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller
+  med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
+  blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
+  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
+  gånger så fort som de som går på skärmen, så att en bil syns i ungefär tre sekunder (förut knappt två).
+  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 14 % på dagen och 31 % i
+  rusningen), och i rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in, står med bromsljusen tända (och
   avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
   regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
-  när det har snöat. Allt räknas ur tiden: den delas i luckor om nio sekunder per fil och i varje lucka kommer ett
-  fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon är
-  ute ur världen innan nästa kommer, så ingen kör igenom någon. Fordonen ritas med vektorer (inga bilder) i `rf-fram`
+  när det har snöat. Allt räknas ur tiden: den delas i luckor om tolv sekunder per fil och i varje lucka kommer ett
+  fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon kommer
+  bara när de i de två luckorna före är ute ur världen, så ingen kör igenom någon. Andra vyer som vill rita samma
+  fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
   efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
   sekunden (30 i telefonen), så att de inte hoppar fram.
 
