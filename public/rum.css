@@ -456,8 +456,10 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 }
 /* rummet vrids rakt medan kameran går fram till en sak */
 .rum.sak-nara .rum-world { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
-/* och vrids med kameran fram till tv:n, videon, anslagstavlan och kortregistret (vrid) */
+/* och vrids med kameran fram till tv:n, anslagstavlan och kortregistret (vrid) */
 .rum.chromium .rum-world.vrider { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
+/* till videon vrids bara tv:n och lådan rakt, och rummet står kvar (rakHorn i rum.js) */
+.rum-lyft > .rum-world.rak { transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1); }
 /* gänget och pulten går kameran förbi på vägen fram */
 .rum-pl.forbi, .rum-pl3d > .rum-inr { transition: opacity 0.5s; }
 /* nära videon i telefonen (lattVideo i rum.js) */

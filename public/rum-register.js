@@ -20,8 +20,9 @@
 //              motståndaren och dess plats i tabellen, och för en landskamp i
 //              Nations Leagues sista omgångar SPELAR FÖR), MÅLEN (hemmalaget
 //              hemma mot bortalaget borta, sedan alla matcher: målen, nollorna,
-//              skytten och de främsta i assist och segermål), xG (chanserna,
-//              turen och kryssen), LÄGET (vilan, nästa match, skadorna och
+//              skytten och de främsta i assist och segermål), xG (de tio
+//              senaste matcherna med motståndets styrka, sedan 2026-11-16,
+//              och chanserna, turen och kryssen), LÄGET (vilan, nästa match, skadorna och
 //              domaren) och MÖTENA (förra mötet med lagens siffror, när det
 //              var högst ett halvår sedan, och mötena de senaste fem åren). Det
 //              bättre talet i varje par lyser och
@@ -956,6 +957,61 @@ window.RumRegister = (() => {
       });
     }
 
+    // De tio senaste (sedan 2026-11-16, xG-fliken): lagets tio senaste
+    // matcher i alla tävlingar före matchen, senaste först, med motståndets
+    // styrka 0–1 (niva) – ur matchens fil (senaste), och till dess den har
+    // hämtats ur matcherna, då utan styrkan. f och a är lagets mål och
+    // motståndarnas efter 90 minuter, null när resultatet är dolt.
+    function tioMatcher(m, side) {
+      const namn = m[side];
+      const d = A.match.get(m.id);
+      const T = d && d.teams && d.teams[side];
+      if (T && T.senaste) {
+        return T.senaste.slice(0, 10).map((y) => {
+          const dolt = Boolean(window.Spoiler && Spoiler.hidesDay(y.date));
+          return { res: dolt ? '?' : y.result || '?', f: dolt ? null : y.gf, a: dolt ? null : y.ga, h: y.home, mot: y.opponent, tav: y.comp, niva: y.opp && y.opp.level != null ? y.opp.level : null };
+        });
+      }
+      const before = Date.parse(m.kickoff);
+      return (A.byTeam.get(namn) || []).filter((x) => x.completed && Date.parse(x.kickoff) < before).slice(0, 10).map((x) => {
+        const dolt = Boolean(window.Spoiler && Spoiler.hidden(x));
+        const s = x.score90 || x.score;
+        const h = x.home === namn;
+        return { res: dolt ? '?' : letter(x, namn) || '?', f: dolt || !s ? null : h ? s.home : s.away, a: dolt || !s ? null : h ? s.away : s.home, h, mot: h ? x.away : x.home, tav: null, niva: null };
+      });
+    }
+    // de tio senaste i snitt: poängen per match och målen (null när något
+    // resultat är dolt eller saknas, som formens poäng) och motståndet 0–99
+    // (när högst två av matcherna saknar styrka)
+    function tioSnitt(l) {
+      if (!l.length) return null;
+      const alla = l.every((y) => y.res && 'VOF'.includes(y.res) && y.f != null && y.a != null);
+      const nv = l.filter((y) => y.niva != null);
+      return {
+        n: l.length,
+        ppm: alla ? l.reduce((t, y) => t + (y.res === 'V' ? 3 : y.res === 'O' ? 1 : 0), 0) / l.length : null,
+        f: alla ? l.reduce((t, y) => t + y.f, 0) : null,
+        a: alla ? l.reduce((t, y) => t + y.a, 0) : null,
+        mott: nv.length && nv.length >= l.length - 2 ? Math.min(99, Math.round((100 * nv.reduce((t, y) => t + y.niva, 0)) / nv.length)) : null,
+      };
+    }
+    // ett lags rader i listan, w tecken breda: utfallet, resultatet (rm
+    // tecken, lika för båda lagen), H eller B, motståndaren, styrkan och en
+    // mätare för styrkan (fylld till styrkan, tom när den är okänd)
+    function tioCeller(l, w, rm) {
+      const fast = 9 + rm;
+      const mw = Math.max(3, Math.min(6, w - fast - 9));
+      const nw = Math.max(4, w - fast - mw);
+      return l.map((y) => {
+        const namn = kort(y.mot).slice(0, nw);
+        const st = y.niva == null ? null : Math.min(99, Math.round(100 * y.niva));
+        const fy = st == null ? 0 : Math.round(mw * y.niva);
+        return [[y.res, y.res === 'V' ? 'v' : ''], [` ${pad(y.f != null && y.a != null ? `${y.f}–${y.a}` : '', rm)}`, ''], [` ${y.h ? 'H' : 'B'} `, 'd'],
+          [namn, '', lagOf(y.mot) || landOf(y.mot) ? `#lag:${y.mot}` : null], [pad('', nw - namn.length), ''],
+          [` ${padL(st == null ? '–' : String(st), 2)} `, st == null ? 'd' : ''], ...dragStreck(fy, 'mt1'), ...dragStreck(mw - fy, 'mt0')];
+      });
+    }
+
     // Vad lagen spelar för i Nations Leagues sista omgångar (sedan
     // 2026-11-15, önskemål från gänget; användarens val bland tre skisser:
     // Raden, med rutan). Gruppens återstående matcher prövas med 1, X och 2
@@ -1077,7 +1133,8 @@ window.RumRegister = (() => {
     //             poängen och marknadens chans i stället för styrkan)
     //   MÅLEN     målen per match, hemma och borta, nollorna och vem som gör
     //             målen (en landskamp: Nations League och alla landskamper)
-    //   xG        chanserna: xG, skotten på mål, målen mot xG, turen och kryssen
+    //   xG        de tio senaste och deras motstånd, chanserna: xG, skotten på
+    //             mål, målen mot xG, turen och kryssen
     //   LÄGET     vilan, nästa match, matcherna de senaste dagarna, skadorna
     //             och domaren
     //   MÖTENA    mötena de senaste fem åren
@@ -1351,7 +1408,55 @@ window.RumRegister = (() => {
       };
       // ett avsnitt med rubriken, bara när något av lagen har talen
       const avsnitt = (namn, r) => (r.some(Boolean) ? [rub(namn), ...r] : []);
+      // DE TIO SENASTE överst (sedan 2026-11-16, användarens önskemål: "ha
+      // med de senaste 10 matcherna … och hur svårt motståndet för de lagen
+      // som de har mött har varit – för att få en känsla för hur bra de har
+      // varit"; användarens val A Listan bland tre skisser – Listan, Mot
+      // starka och svaga, Staplarna): poängen per match, målen och
+      // motståndet i snitt över lagets tio senaste matcher i alla
+      // tävlingar, och under MATCH FÖR MATCH en rad per match med utfallet,
+      // resultatet, H eller B, motståndaren och dess styrka med en mätare –
+      // 0 för det svagaste laget i lagets division och 100 för det
+      // starkaste, som formens motstånd (landslagen: ligan i Nations
+      // League, efter Elo-talen). På datorn lagen sida vid sida, i
+      // telefonen under varandra, som formens matcher i ÖVERSIKT. Poängen
+      // och målen jämförs som formen (det bättre lyser); motståndet säger
+      // inte vem som är bättre och står som vanligt. xG-raderna under gäller
+      // som förut säsongen (ligan, för landslagen Nations League).
+      const tioL = sid.map((s) => (S.veil ? [] : tioMatcher(m, s)));
+      const tioS = tioL.map(tioSnitt);
+      const tio = [];
+      if (tioL.some((l) => l.length)) {
+        const vis = (f) => tioS.map((x) => (S.veil ? '?' : x && f(x) != null ? f(x) : '–'));
+        const ppm = tioS.map((x) => (x ? x.ppm : null));
+        const md = tioS.map((x) => (x && x.f != null ? (x.f - x.a) / x.n : null));
+        tio.push(rub('DE TIO SENASTE'),
+          raden('POÄNG/MATCH', vis((x) => (x.ppm == null ? null : num(x.ppm, 1))), bast(ppm, SKILJER.ppm), ordQ('tio-poang')),
+          raden('MÅLEN', vis((x) => (x.f == null ? null : `${x.f}–${x.a}`)), bast(md, SKILJER.mal), ordQ('tio-malen')),
+          raden('MOTSTÅNDET', vis((x) => (x.mott == null ? null : String(x.mott))), -1, ordQ('tio-motstand')),
+          spRub(G, [['MATCH FÖR MATCH', 'd', ordQ('tio-matcher')]]));
+        const rm = Math.max(3, ...tioL.flat().map((y) => (y.f != null && y.a != null ? `${y.f}–${y.a}`.length : 0)));
+        if (!G.tel) {
+          const cw = Math.min(28, G.S - 1 + G.M);
+          const c = tioL.map((l) => tioCeller(l, cw, rm));
+          for (let i = 0; i < Math.max(c[0].length, c[1].length); i++) tio.push(spRad(G, c[0][i] || [], '', null, c[1][i] || []));
+        } else {
+          const cw = Math.min(28, G.B);
+          // (tio rader per lag under varandra: lagets namn över dess lista,
+          // det högra lagets högerställt som raderna)
+          tioL.forEach((l, j) => {
+            if (!l.length) return;
+            if (j) tio.push(tom());
+            const namn = kort(lag[j]).slice(0, cw);
+            tio.push(rad([pad('', G.M + (j ? G.B - namn.length : 0))], [namn, 'd', `#lag:${lag[j]}`]));
+            for (const c of tioCeller(l, cw, rm)) tio.push(rad([pad('', G.M + (j ? G.B - cw : 0))], ...c));
+          });
+        }
+      } else if (S.veil) {
+        tio.push(rub('DE TIO SENASTE'), raden('POÄNG/MATCH', ['?', '?'], -1, ordQ('tio-poang')));
+      }
       const xg = [
+        ...tio,
         ...avsnitt('xG PER MATCH', [
           enRad('SKAPAR', (j) => (xgp(j) ? xgp(j).f / xgp(j).n : null), SKILJER.xgMatch, lq('skapar')),
           enRad('SLÄPPER TILL', (j) => (xgp(j) ? xgp(j).a / xgp(j).n : null), SKILJER.xgMatch, lq('slapper'), true),
@@ -1739,6 +1844,11 @@ window.RumRegister = (() => {
         ...(t ? hLag(t) : {}), t, namn: prosa(m[side]),
         form5: T && T.form ? T.form.slice(0, 5).map((x) => ({ mot: heltNamn(x.opponent), tav: tav(x.comp), niva: x.opp && x.opp.level != null ? Math.round(100 * x.opp.level) : null })) : null,
         mott: mottOf(m, side),
+        // de tio senaste med motståndets styrka (xG-fliken)
+        tio: (() => {
+          const l = tioMatcher(m, side);
+          return { snitt: tioSnitt(l), mot: l.filter((x) => x.niva != null).map((x) => ({ mot: heltNamn(x.mot), tav: tav(x.tav), niva: Math.min(99, Math.round(100 * x.niva)) })) };
+        })(),
         // spelarnas vila före matchen { elva: { d, n, k, p }, trupp: { d, n } }
         sv: (d && d.spelarvila && d.spelarvila[side]) || null,
         // det matchsidans rad visar för laget ('5,5–4,2')

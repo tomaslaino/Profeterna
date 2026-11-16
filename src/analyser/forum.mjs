@@ -117,11 +117,18 @@ export async function lasSida(url, opts = {}) {
 
 // ---------- html ----------
 
-const ENTITETER = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', hellip: '…', ndash: '–', mdash: '—', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', pound: '£', euro: '€', eacute: 'é', copy: '©' };
+const ENTITETER = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', hellip: '…', ndash: '–', mdash: '—', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', pound: '£', euro: '€', eacute: 'é', copy: '©',
+  // (2026-11-16: förbundens och de utländska tidningarnas sidor, config/utland.js, skriver å, ä, ö och ł som entiteter)
+  szlig: 'ß', aelig: 'æ', AElig: 'Æ', oslash: 'ø', Oslash: 'Ø', lstrok: 'ł', Lstrok: 'Ł', eth: 'ð', ETH: 'Ð', thorn: 'þ', THORN: 'Þ',
+  laquo: '«', raquo: '»', bdquo: '„', sbquo: '‚', lsaquo: '‹', rsaquo: '›', shy: '', middot: '·', bull: '•', deg: '°', times: '×',
+  minus: '−', iexcl: '¡', iquest: '¿', ordm: 'º', ordf: 'ª', sect: '§', reg: '®', trade: '™', cent: '¢', yen: '¥', thinsp: ' ', ensp: ' ', emsp: ' ' };
+// Bokstäver med accent, prickar och ringar (&ouml; &Aring; &oacute; &zdot; &aogon; &scaron;): bokstaven med tecknet ovanpå.
+const DIAKRITER = { acute: '\u0301', grave: '\u0300', circ: '\u0302', uml: '\u0308', tilde: '\u0303', ring: '\u030A', cedil: '\u0327', caron: '\u030C', ogon: '\u0328', breve: '\u0306', macr: '\u0304', dot: '\u0307', dblac: '\u030B' };
 export const avkoda = (s) => String(s || '')
   .replace(/&#(\d+);/g, (m, n) => { try { return String.fromCodePoint(+n); } catch { return ' '; } })
   .replace(/&#x([0-9a-f]+);/gi, (m, n) => { try { return String.fromCodePoint(parseInt(n, 16)); } catch { return ' '; } })
-  .replace(/&([a-z]+);/gi, (m, n) => (ENTITETER[n.toLowerCase()] != null ? ENTITETER[n.toLowerCase()] : m));
+  .replace(/&([A-Za-z])(acute|grave|circ|uml|tilde|ring|cedil|caron|ogon|breve|macr|dot|dblac);/g, (m, b, t) => `${b}${DIAKRITER[t]}`.normalize('NFC'))
+  .replace(/&([a-z]+);/gi, (m, n) => (ENTITETER[n] != null ? ENTITETER[n] : ENTITETER[n.toLowerCase()] != null ? ENTITETER[n.toLowerCase()] : m));
 
 const TOMMA = new Set(['br', 'img', 'hr', 'input', 'meta', 'link', 'source', 'wbr', 'area', 'base', 'col', 'embed', 'param', 'track']);
 

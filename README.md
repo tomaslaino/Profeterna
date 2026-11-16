@@ -848,6 +848,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Landskamperna: spelprogram, resultat och grupperna | ESPN:s öppna API (`uefa.nations`, `uefa.euroq`, `fifa.friendly`; tabellen i `standings` med en grupp per `children`) | Nations League, EM-kval, vänskapslandskamper | 30 min, tabellen 3 h | Verifierat 2026-11-13: Nations League 2026/27 har 52 matcher 12–17 november, gruppen i `competitions[0].group` ("Group B4") och tabellen i 14 grupper (A1–D2), lagen i id-ordning. Vänskapsmatcherna gäller hela världen – bara de med ett europeiskt landslag tas med. EM-kvalet är tomt till mars 2027. Se [Landskamperna](#landskamperna). |
 | Landskamperna: odds | ESPN matchsammanfattning (DraftKings) | landskamperna | 2 h, tre dagar bakåt till sju dagar fram, sparas; tidigare spelade matcher i Nations League och EM-kvalet frågas en gång | Verifierat 2026-11-13: odds för alla fem landskamperna på Stryktipset 14 november. Ger landskampernas prognos. Oddsen ligger kvar i sammanfattningen efter matchen: 2026-11-14 hade 117 av 122 spelade matcher i Nations League odds (de utan står i `utan` och frågas inte om). Ger också landslagens siffror mot oddsen. |
 | Landslagens tidigare matcher | ESPN (`fifa.world` juni–juli 2026, `fifa.worldq.uefa` 2025–mars 2026, `uefa.nations` 2024/25, `fifa.friendly` 2025–2026) | landskamperna – formen och mötena | 7 d | Bara matcher med ett europeiskt landslag. |
+| Landslagens Elo-tal (motståndets styrka) | World Football Elo Ratings (`eloratings.net/World.tsv` och `en.teams.tsv`) | landskamperna – formen och de tio senaste i datorn | 24 h | Verifierat 2026-11-16: 243 landslag med plats i världen och Elo-tal (Spanien 1:a på 2258), namnen på engelska med andra stavningar i en egen fil; ingen nyckel. Filerna skrivs om efter varje landskamp. Ett ögonblick, ingen historik – styrkan är den just nu, som modellens för klubbarna. Styr inte prognosen. |
 | Landslagens flaggor | ESPN:s bildtjänst (`…/teamlogos/countries/500/<kod>.png`, koden ur lagets logo-adress) | landskamperna | när ett nytt lag kommer | Landslagen ligger inte bland klubbarnas sköldar. Sparas som sköldarna, under det svenska namnet. |
 | Landslagens spelare | ESPN:s öppna API (`uefa.nations/teams/<id>/roster` för de uttagna, `summary?event=<id>` för varje spelad match) | Nations League | trupperna 12 h, rapporterna 6 h, bara nya matcher | Verifierat 2026-11-14: 54 landslag. ESPN:s säsongssiffror i landslagens trupper stämmer inte med matcherna (Norge hade spelat 4 matcher men spelarna stod på 6) och truppen är bara den senast uttagna (214 av 1 326 som spelat saknades), så spelarnas siffror räknas ur matchrapporterna (`p` i `espn_minutes_unl`: mål, assist, skott, kort, regelbrott, räddningar och insläppta per spelare och match). Målen stämde med tabellen utom självmålen (299 av 307). Se [Spelare och statistik för landslagen](#spelare-och-statistik-för-landslagen-2026-11-14). |
 | Landslagens xG, skott och kort | 365Scores öppna webb-API (`/web/game/stats/?games=<id>`, matcherna som för betygen) | Nations League | 6 h, bara nya matcher | Verifierat 2026-11-14: tävling 7016, alla 122 spelade matcher hittades och hade xG, skott, skott på mål, hörnor, frisparkar och kort för båda lagen. Skotten och hörnorna stämde med ESPN:s i stickprovet (Turkiet–Belgien). Det som ligorna har ur football-data.co.uk. Betygen och spelarbilderna hämtas som för ligorna (Republic of Ireland heter Ireland där). |
@@ -3013,6 +3014,39 @@ rubriken, uteslutna sajter), att de står i frågan och räknas som träffar, po
 inte rör varandras poster, sidans och tidningens underlag och redaktörens nycklar. Helgarderat med ett av provets
 blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
 inget som sticker ut åt sidan. Inte provat på iMacen eller med en riktig intervju i motståndarens medier.
+
+**Landslagen och klubbarna utanför England** (2026-11-16, användarens val: nattjobbet ska göra tidningen för varje
+Europatipset av sig självt, *"som för Stryktipset, så att inget behöver skrivas för hand"*): förut hoppade nattjobbet
+över landskamperna, och deras matchblad skrevs för hand (se *Landskamperna i Helgarderat* under
+[Tidningen](#tidningen)). Nu läses ett landslag eller en klubb utanför England (ett lag som inte har någon engelsk
+liga i sajtens matchdata, `ENGELSKA` i scripts/tidning/poddar.mjs) med samma kod som klubben och lokaltidningen men
+med [config/utland.js](config/utland.js) som `cfg`, och bara där: inga poddar, forum, insatta medier eller förra
+klubben, som alla är engelska källor. Claude söker efter förbundets eller klubbens egen sajt (`forbundet`,
+`klubben`) och landets sportpress (`pressen`), på lagets eget språk. WebSearch hittade i provet 2026-11-16 en enda
+artikel om Sverige inför Polen och gav inga datum, så jobbet ger Claude veckans nyheter ur Bing News på lagets språk,
+som för de engelska lagen: ett kort anrop utan verktyg (`sokordPrompt`, `bingSokord` i src/analyser/media.mjs) tar fram
+landet, språket och tre sökfrågor (*reprezentacja Polski*, *Polska Szwecja* …), som sparas i lagets post för
+motståndaren. Sajter som är spärrade på iMacen (/etc/hosts, `sparrad`: namnet pekar på 0.0.0.0) erbjuds inte, eftersom
+de ändå inte går att läsa; spärren rundas inte. Claude föreslår upp till åtta artiklar och jobbet läser de fyra första
+som går att läsa (`lasHogst`). Läsaren avkodar nu alla bokstäver med accent, prickar och ringar (`avkoda` i
+src/analyser/forum.mjs): förbundets sajt och de polska tidningarna skriver å, ä, ö och ó som `&ouml;` och `&oacute;`,
+och citaten gick inte att pröva mot texten. Provet 2026-11-16 med Polen–Sverige (modellen spelad av fristående
+agenter med samma prompter, eftersom inloggningen bara nås av nattjobbet; resten jobbets egen kod): Bing gav tjugo
+nyheter om Polen och sex om Sverige (Expressen, Aftonbladet, SVT och TV4 är spärrade, SvenskaFans svarar 403), fyra
+respektive två artiklar lästes, alla tretton uppgifternas citat stod i texten, och matchbladet gick igenom
+redaktörens kontroll. Citatet står på artikelns språk och prövas mot texten som förut, och
+översättningen trycks. Artiklarna sparas som klubbens och lokaltidningens (`typ: 'lokal'`, id på `u`), så att
+matchbladet och tidningen tar dem som de tar lokaltidningens. Ett blad som har skrivits för hand för samma omgång går
+före jobbets (`poddsidor` i src/analyser/poddar.mjs).
+
+Europatipset har inga fasta dagar, så för en omgång i ett annat spel än Stryktipset går poddjobbet också första
+natten efter att omgången har startats och igen när det är mindre än 30 timmar kvar till första avsparken
+(`foreAvspark` i config/poddar.js, `egenTid` i src/analyser/tider.mjs, med den senast genomgångna omgången i
+tider.json). Stryktipset går som förut på tiderna. När matchbladen har kommit skriver det andra nattjobbet sista sidan
+och löpsedeln, som för Stryktipset. Prompterna för matchbladet, sista sidan och löpsedeln säger nu Stryktipset eller
+Europatipset. Matcher som sajten inte har (andra ligor, damernas Champions League) kommer inte med i gängets omgång
+och får därför inget blad. `node scripts/tidning/poddar.mjs --prov 401861195 --bara-utland` provar läsningen på en
+landskamp; `PODDAR_MAPP` och `PODDAR_LOGG` lägger provet utanför nattjobbets filer.
 
 **Förra klubben** (2026-11-14, användarens val bland förslagen till nya källor; **avstängd** samma dag, se nedan): när ett lag har en ny tränare eller en
 ny spelare som spelar mycket, vad har supportrarna i hans förra klubb skrivit om honom den senaste veckan? De har sett
@@ -7679,6 +7713,32 @@ bland tre skisser i den riktiga närbilden:
   ord, så att tecknen läses som en mening (*Insläppta mål −0,2*: färre än chanserna var
   värda). Talen är desamma som förut; klubbarnas skott och mål mot xG kommer som förut ur
   matchens fil, landslagens ur Nations Leagues lagfil. Ett avsnitt utan tal står inte.
+- **De tio senaste i xG-fliken** (2026-11-16, användarens önskemål: "ha med de senaste 10
+  matcherna … och hur svårt motståndet för de lagen som de har mött har varit – för att få en
+  känsla för hur bra de har varit"; användarens val *A Listan* bland tre skisser – *Listan*,
+  *Mot starka och svaga* och *Staplarna*): överst i xG står *DE TIO SENASTE* med *Poäng/match*,
+  *Målen* (gjorda–insläppta tillsammans) och *Motståndet* (motståndarnas styrka i snitt) över
+  lagets tio senaste matcher i alla tävlingar, efter 90 minuter. Under *MATCH FÖR MATCH* står
+  en rad per match – utfallet, resultatet, H eller B, motståndaren och dess styrka 0–100 med en
+  mätare (*V 3–2 B ENGLAND 88 ▮▮▮▮▮*). Poängen och målen jämförs som formen och det bättre
+  lyser; motståndet säger inte vem som är bättre och står som vanligt. Skalan är formens
+  motstånd: 0 för det svagaste laget i lagets division och 100 för det starkaste, ur matchens
+  fil (`senaste[].opp`, som bygget nu sparar för alla tio och inte bara formens fem). Datorn har
+  lagen sida vid sida, telefonen under varandra med lagets namn över listan. Saknar fler än två
+  av matcherna styrka står inget snitt; med dolda resultat står ?. xG-raderna under gäller som
+  förut säsongen.
+- **Landslagens styrka ur Elo-talen** (2026-11-16, för de tio senaste): modellen räknar bara på
+  lagen i England, så landslagens motståndare hade ingen styrka – formens motstånd stod tomt
+  för landskamperna. Nu kommer den ur World Football Elo Ratings (`elo_landslag`,
+  [src/fetchers/elo.js](src/fetchers/elo.js), en gång om dagen): Elo-talet just nu för varje
+  landslag, på skalan från det svagaste till det starkaste laget i lagets egen liga i Nations
+  League (A–D), som divisionen för klubbarna (`landOpponentStrength` i
+  [src/matches.js](src/matches.js)); lag utanför den skalan hamnar i ändarna (Argentina 83 och
+  Tjeckien 0 för Spanien i liga A). Lagen hittas på ESPN:s engelska namn bland Elo-listans namn
+  och stavningar; ESPN:s egna former (*Czech Republic*, *Republic of Ireland*, *Korea Republic*
+  …) står i `ELO_NAMN`. Prövat 2026-11-16: alla 157 namn i
+  [config/landslag.js](config/landslag.js) hittades. Samma styrka ger nu också formens motstånd
+  i ÖVERSIKT för en landskamp.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
@@ -8035,9 +8095,10 @@ samma färger som det syns snett från höger (`.platt`, `ladaYtor`), och kasset
 bara med när de lyfts eller när man pekar på dem.
 
 **Fram ur rummet** (2026-11-16, "som att TV:n närmar sig skärmen och inte tvärtom", som datorn).
-När man går till videon står rummet nästan still: det går en fjärdedel närmare och halvvägs mot
-hörnet, som mot datorn, och mörknar bakom ett draperi (`#rum-vmork`, ljusast mitt i fönstret som
-`.reg-bak` vid datorn). Tv:n och lådan lyfts i stället ur rummet och kommer fram mot en på 0,6
+När man går till videon står rummet still och mörknar bakom ett draperi (`#rum-vmork`, ljusast
+mitt i fönstret som `.reg-bak` vid datorn); till kvällen 2026-11-16 gick det också en fjärdedel
+närmare och halvvägs mot hörnet, som mot datorn, och vreds rakt (se *Rummet bakom står still*).
+Tv:n och lådan lyfts i stället ur rummet och kommer fram mot en på 0,6
 sekunder, medan de vänder sig 90 grader (`VRID`) tills man ser deras framsidor rakt framifrån
 (`SVANG.nara`, med ögat – perspektivets mitt i hörnet – rakt framför dem); närmare rutan kommer tv:n
 ännu närmare, rakt framför rutan (`SVANG.tat`), tills bilden fyller fönstret. Förstoringen ändras lika
@@ -8049,10 +8110,11 @@ runt tv:n ritades i hörnet), och gänget for förbi i förgrunden.
 Rummets värld är därför tre lager i djupets ordning (`build` i rum.js): bakväggen (planet -600),
 videohörnet (-598, i `#rum-lyft`) och resten (-470 till 0). De ligger i var sin 3D-värld som ritas
 i den ordningen, så hemma ser det ut som förut, och musens vridning sätts på alla tre samtidigt
-(`varldar` och `stil` i `setCam`, `folj` och `vrid`; `H.world` i rum-hasse.js). Planen räknas i
+(`varldar` och `stil` i `setCam`, `folj` och `vrid`; `H.world` i rum-hasse.js) – utom medan hörnet
+är lyft (`R.lyftRak`, `rakHorn`): då vrids bara dess värld rakt och tillbaka. Planen räknas i
 samma ordning som förut (`.rum-world > .rum-pl`). När man går till videon läggs `#rum-lyft` och
 draperiet över resten (`.vid-lyft`), och `#rum-lyft` får en egen förstoring inne i kameran (`lyftHornet`; förut `lyft`, som tog över tidningens funktion med samma namn så att Helgarderat inte gick att öppna, rättat 2026-11-16):
-kameran gör rummets lilla förflyttning och `#rum-lyft` resten. Inget i hörnet flyttas i sidan –
+kameran står kvar hemma och `#rum-lyft` gör hela vägen. Inget i hörnet flyttas i sidan –
 YouTubes spelare laddas om när den flyttas, och ett pausat klipp ska spela vidare när man kommer
 tillbaka. `.vid-lyft` tas bort först när hörnet har landat. Hörnets läge läses inte av med
 `getComputedStyle` utom mitt på vägen (`R.lyftNu`): det räknade om stilen inne i klicket, och som
@@ -8064,24 +8126,33 @@ draperiet bort när kameran har stannat (`lattVideo`) i stället för att försv
 Inte provat i Safari eller iPhone. Nära tar bara hörnet emot klick, och ett klick utanför går
 tillbaka. Med `prefers-reduced-motion` och i fasta bilder står det direkt framme.
 
-**Rummet bakom står still** (2026-11-16, "när man zoomar ut så hackar det"). Eftersom hela rummet
-nu syns bakom draperiet och rör sig med (en fjärdedel närmare, och rakt), ritar grafikkortet om allt i
-varje bildruta på vägen fram och tillbaka – ungefär 34 miljoner bildpunkter per bildruta i 1440 × 820
-mot 18 när kameran förut gick in i hörnet och rummet låg utanför bilden – och på en M1 föll
-bildrutor bort just där hörnet krymper fortast. Nära ritades dessutom gänget, sakerna i 3D, dammet och
-gatan bakom draperiet hela tiden. Nu står de still medan videon är framme (`R.vbak`: `frame` ritar
-dem inte), som bakom kupongen i handen (`urFokus`) och i telefonen (`lattVideo`), och på vägen hem
-kommer de igång medan draperiet ännu är mörkt (så att ingen hoppar i bild) men ritas bara tio gånger
-i sekunden (`VBAK_TAKT`) tills hörnet har landat; kvalitetsvakten (`kanna`) räknar inte de glesa
-bilderna. Mätt med låst kvalitet (`?rum-kval=0`): i headless Chrome 1440 × 677 gick det nära från
-70–90 ms grafikarbete för 3D per sekund till inget, och på vägen hem ungefär 30 % mindre; i ett
-riktigt Chrome-fönster 1440 × 820 (med 3D:n stilla hela vägen) 4–12 → 0–4 tappade bildrutor på vägen
-fram och 0–2 → 0 på vägen hem, med andra sessioner igång. Provat och förkastat: att låta rummet stå
-helt still och bara vrida hörnet rakt (`varldar` utan hörnet) – det sparade en tredjedel av
-bildpunkterna, men gänget kom då i bild och ritades hela tiden, så det tappade fler bildrutor än förut.
-Att stänga av blandningslägena i ljuset under tiden gav inget mätbart. Mätfällor: ett Chrome-fönster
-som till största delen ligger utanför skärmen, eller en låst skärm, ritas inte – alla bildrutor
-räknas då som tappade; mät varianter om vartannat i samma flik (två flikar gav skeva siffror).
+**Rummet bakom står still** (2026-11-16, "när man zoomar ut så hackar det"). När hela rummet syntes
+bakom draperiet och rörde sig med (en fjärdedel närmare, och vridet rakt och tillbaka mot musen),
+ritade grafikkortet om allt i varje bildruta på vägen fram och tillbaka – ungefär 34 miljoner
+bildpunkter per bildruta i 1440 × 820, mot 18 när kameran förut gick in i hörnet och rummet låg
+utanför bilden – och på en M1 föll bildrutor bort just där hörnet krymper fortast. Nära ritades
+dessutom gänget, sakerna i 3D, dammet och gatan bakom draperiet hela tiden. Nu:
+- **Rummet står kvar** som det står (`rakHorn`): det går inte närmare, vrids inte rakt och följer inte
+  musen (`kamera`) förrän hörnet har landat. Bara hörnets värld (`R.varldar[1]`) vrids rakt mot en med
+  `.rak` och tillbaka till rummets vinkel, och när den har landat vrids den med rummet igen
+  (`rakKlar`; en annan närbild under tiden flyttar landningen dit, `rakMal`). Bildutsnittet nära och
+  vid rutan är detsamma som förut.
+- **3D:n står still** medan videon är framme (`R.vbak`: `frame` ritar den inte), som bakom kupongen i
+  handen (`urFokus`) och i telefonen (`lattVideo`). På vägen hem kommer den igång medan draperiet ännu
+  är mörkt (så att ingen hoppar till en ny pose i bild) men ritas bara tio gånger i sekunden
+  (`VBAK_TAKT`) tills hörnet har landat; kvalitetsvakten (`kanna`) räknar inte de glesa bilderna.
+
+Mätt med låst kvalitet (`?rum-kval=0`). 3D:n stilla: i headless Chrome 1440 × 677 gick 3D-arbetet nära
+från 70–90 ms per sekund till inget och på vägen hem ungefär 30 % ned; i ett riktigt Chrome-fönster
+1440 × 820 (med 3D:n stilla hela vägen) 4–12 → 0–4 tappade bildrutor fram och 0–2 → 0 hem, med andra
+sessioner igång. Rummet stilla: 34 → 24 miljoner bildpunkter per bildruta på vägen hem, och utan
+den stilla 3D:n tappade det ändå fler bildrutor än förut (gänget kom i bild och ritades hela tiden) –
+därför båda. Nära ritade Chrome (headless) 3 bildrutor på 0,9 s mot 53. Båda tillsammans är inte
+mätta i ett riktigt fönster (skärmen var låst). Att stänga av blandningslägena i ljuset under tiden
+gav inget mätbart. Mätfällor: ett Chrome-fönster som till största delen ligger utanför skärmen, eller
+en låst skärm, ritas inte – alla bildrutor räknas då som tappade, också i vila; headless ritar bara när
+något ändras och duger inte till tappade bildrutor; mät varianter om vartannat i samma flik (två
+flikar gav skeva siffror).
 
 Hörnet ritas i sex gånger storleken och förminskas, som tv:n, och dubbelt till (`zoom: 2`)
 när rutan fyller bilden (det andra klicket), så att det är skarpt också där; ritningarna är

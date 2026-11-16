@@ -2757,8 +2757,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // och pulten blinkade svart.
   const camT = (mx, my) => `translateZ(-330px) rotateX(${(-my * 2.6).toFixed(3)}deg) rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
   // Världens tre lager (build) vrids alltid lika: samma stil på alla tre, i
-  // samma ögonblick, så att övergångarna går i takt.
-  const varldar = () => R.varldar || [];
+  // samma ögonblick, så att övergångarna går i takt – utom videohörnet medan
+  // det är lyft ur rummet (R.lyftRak, rakHorn): då står det rakt mot en och
+  // vrids för sig.
+  const varldar = () => (R.lyftRak ? (R.varldar || []).filter((w, i) => i !== 1) : R.varldar || []);
   const stil = (s) => { for (const w of varldar()) Object.assign(w.style, s); };
   function setCam(mx, my) {
     const ws = varldar();
@@ -2898,6 +2900,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const f = (R.folj = { t: nu, a: fran, b: [mx, my], ...GLID });
     for (const v of varldar()) v.classList.add('vrider');
     stil({ transform: (R.cam = camT(mx, my)) });
+    // (är videohörnet på väg hem, landar det i den nya vinkeln)
+    rakMal();
     R.camVis = [mx, my];
     setTimeout(() => {
       if (R.folj !== f) return;
@@ -2963,7 +2967,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.bildVis = false;
       return;
     }
-    if (!still()) {
+    // (medan videohörnet är lyft ur rummet står rummet still, rakHorn)
+    if (!still() && !R.lyftRak) {
       // lika fort som när den gick 6 % av vägen (12 med kupongen i handen) 30 gånger i sekunden
       const f = 1 - (1 - (R.kup ? 0.12 : 0.06)) ** (dt / (1000 / 30));
       R.mx += (R.tx - R.mx) * f;
@@ -2971,7 +2976,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     // (inte förrän kameran har glidit hem från en närbild: medan världen
     // glider behåller Chrome lagrens upplösning, och den ska bli hemmets)
-    const hemma = R.el.classList.contains('chromium') && !calm() && !nara() && !R.el.classList.contains('sak-nara');
+    const hemma = R.el.classList.contains('chromium') && !calm() && !nara() && !R.lyftRak && !R.el.classList.contains('sak-nara');
     if (!hemma) R.borta = performance.now();
     R.bildVis = !(hemma && performance.now() - (R.borta || 0) > 1000);
     if (R.bildVis) setCam(R.mx, R.my);
@@ -4512,40 +4517,31 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     aim([c[0] + (allt ? 0 : T.dx * m), c[1] + T.dy * m], s / (m * R.k), [mid(0.5)[0], (y - R.oy) / R.k], cls);
   }
 
-  // V: videon nära. Som datorn (register): rummet går bara lite mot hörnet
-  // på disken och mörknar, medan tv:n och lådan bredvid lyfts ur det
-  // (#rum-lyft, ovanpå resten av rummet och draperiet #rum-vmork) och kommer
-  // fram mot en, så att de står rakt framför och så stora som ryms över raden
-  // med tangenterna. Förut gick hela rummet fram till dem och svängde runt
-  // dem, och gänget for förbi i förgrunden.
+  // V: videon nära. Rummet står kvar som det står och mörknar, medan tv:n och
+  // lådan bredvid lyfts ur det (#rum-lyft, ovanpå resten av rummet och
+  // draperiet #rum-vmork) och kommer fram mot en, så att de står rakt framför
+  // och så stora som ryms över raden med tangenterna. Förut gick hela rummet
+  // fram till dem och svängde runt dem, och gänget for förbi i förgrunden.
   function zoomVideo(on) {
     if (!R.video || (!on && !R.vnara)) return;
     if (on && R.zoom) zoomTv(false);
     if (on && R.reg && R.reg.on()) register(false);
-    // Världen vrids först, medan stilen bara är ändrad där: vrid läser av
+    // Hörnet vrids först, medan stilen bara är ändrad där: rakHorn läser av
     // den direkt. Klassen vid-nara räknar om stilen för hela rummet, och satt
     // före gjordes det inne i klicket och en gång till i nästa bildruta –
     // kameran stod still en stund innan den gick, fram och hem (en tiondels
     // sekund i en svag telefon). Nu sätts den sist och räknas om en gång, i
     // bildrutan.
-    if (on) {
-      R.tx = 0;
-      R.ty = 0;
-      if (calm()) R.mx = R.my = 0;
-      vrid(0, 0);
-    } else vridHem();
+    rakHorn(on);
     if (!on) lattVideo(0);
     R.vnara = on;
     // Rummet bakom draperiet står still medan videon är framme: gänget,
     // sakerna i 3D, dammet och gatan ritas inte (frame), som bakom kupongen i
     // handen (urFokus) och i telefonen (lattVideo). På vägen hem kommer det
     // igång medan draperiet fortfarande är mörkt (så att ingen hoppar i bild),
-    // men glesare (VBAK_TAKT) tills hörnet har landat (lyftHornet). Utan det
-    // ritade grafikkortet hela rummet om i varje bildruta också bakom
-    // draperiet: i nästan hela skärmen (2240 × 1063) på en M1 föll 10–50 av
-    // 66 bildrutor bort när kameran stod still vid videon, 20–60 på vägen
-    // fram och 15–35 på vägen tillbaka; så här 0 nära och ungefär hälften så
-    // många på vägen.
+    // men glesare (VBAK_TAKT) tills hörnet har landat (lyftHornet). Med rummet
+    // stilla (rakHorn) ritar grafikkortet då nästan bara det som rör sig:
+    // hörnet och draperiet. Se Rummet bakom står still i README.
     // (en fast bild, ?rum-t, ritas som vanligt)
     R.vbak = still() ? null : on ? 'still' : 'gles';
     clearTimeout(R.vbakT);
@@ -4558,7 +4554,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on) R.video.skarp(false);
     else R.vskarp = setTimeout(() => { if (!R.vnara) R.video.skarp(false); }, 900);
     R.vf = R.video.zoom(on);
-    R.vrum = null;
     if (on) aimVideo(calm() ? null : 'glid');
     else {
       aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
@@ -4567,6 +4562,61 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (ovanpå rummet tills det har kommit hem igen)
     if (on) R.el.classList.add('vid-lyft');
     R.el.classList.toggle('vid-nara', on);
+  }
+  // Rummet står still medan tv:n och lådan är lyfta ur det: det vrids inte
+  // rakt och följer inte musen (kamera), och bara världen med hörnet
+  // (R.varldar[1], i #rum-lyft) vrids rakt mot en – och tillbaka till
+  // rummets vinkel, där det landar (rakKlar). Vreds hela rummet rakt och
+  // tillbaka mot musen (vrid, vridHem) och gick en fjärdedel närmare, som
+  // förut, ritade Chrome om allt i rummet i varje bildruta på vägen fram och
+  // tillbaka, och det hackade (se aimVideo).
+  function rakHorn(on) {
+    const lw = (R.varldar || [])[1];
+    if (!lw) return;
+    if (on && !R.lyftRak) {
+      // (rummet stannar där det syns: en vridning efter musen slutar)
+      const s = synlig();
+      setCam(...s);
+      [R.mx, R.my] = s;
+      [R.tx, R.ty] = s;
+      R.lyftRak = true;
+      void getComputedStyle(lw).transform;
+    }
+    if (!R.lyftRak) return;
+    const glid = !calm();
+    if (!on && glid) {
+      // Tillbaka börjar det där det syns – och står det rakt, en tusendel
+      // snett, som i vrid: rakt behåller Chrome närbildens skärpa på vägen hem.
+      const fran = lw.getAnimations().some((a) => a.playState === 'running') ? getComputedStyle(lw).transform : camT(0.001, 0.001);
+      lw.classList.remove('rak');
+      lw.style.transform = fran;
+      void getComputedStyle(lw).transform;
+    }
+    const t = on ? camT(0, 0) : R.cam || camT(R.mx, R.my);
+    sedan('rak', () => {
+      lw.classList.toggle('rak', glid);
+      lw.style.transform = t;
+    }, glid);
+  }
+  // (vrids rummet medan hörnet är på väg hem – en annan närbild – landar det i den nya vinkeln)
+  function rakMal() {
+    const lw = (R.varldar || [])[1];
+    if (R.lyftRak && !R.vnara && lw && R.cam) lw.style.transform = R.cam;
+  }
+  // Hemma: hörnet vrids med rummet igen, när det har vridits klart.
+  function rakKlar() {
+    const lw = (R.varldar || [])[1];
+    if (!lw || !R.lyftRak || R.vnara) return;
+    const pa = lw.getAnimations().filter((a) => a.playState === 'running');
+    if (pa.length) {
+      Promise.all(pa.map((a) => a.finished.catch(() => {}))).then(rakKlar);
+      return;
+    }
+    R.lyftRak = false;
+    lw.classList.remove('rak');
+    const w = R.varldar[0];
+    for (const k of ['transition', 'translate', 'rotate', 'transform']) lw.style[k] = w.style[k];
+    lw.classList.toggle('vrider', w.classList.contains('vrider'));
   }
   // Videohörnet en bit framför rummet (#rum-lyft, inne i kameran): punkten p
   // hamnar på to med förstoringen z, samma väg som kameran går till tv:n
@@ -4595,6 +4645,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         // (rummet bakom ritas som vanligt igen, R.vbak i zoomVideo)
         clearTimeout(R.vbakT);
         R.vbak = null;
+        rakKlar();
       };
       if (!cls) return landat();
       const a = (R.lyftVag = w.animate(zoomVag(fran, { dx, dy, z }), { duration: GLID.ms, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' }));
@@ -4620,36 +4671,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const z = Math.min(f.z || 6, ((vx1 - vx0) * m) / (x1 - x0), ((vy1 - vy0) * m) / (y1 - y0));
     const p = [(x0 + x1) / 2, (y0 + y1) / 2];
     const to = [(vx0 + vx1) / 2, (vy0 + vy1) / 2];
-    // Rummet går en fjärdedel närmare och halvvägs mot mitten (som mot
-    // datorn), mätt mot tv:n och lådan: när rutan sedan fyller bilden står
-    // det kvar, och hörnet går resten av vägen.
-    if (!f.fyll || !R.vrum) R.vrum = { p, z: Math.min(VID_RUM, z), to: [p[0] + (to[0] - p[0]) / 2, p[1] + (to[1] - p[1]) / 2] };
-    const r = R.vrum;
-    aim(r.p, r.z, r.to, cls);
-    lyftHornet(p, z / r.z, [r.p[0] + (to[0] - r.to[0]) / r.z, r.p[1] + (to[1] - r.to[1]) / r.z], cls);
-    // Draperiet: över det som syns av scenen hemma och när kameran är framme,
-    // ljusast mitt i fönstret där. Det ritas i en åttondel av storleken och
-    // förstoras (VMORK): Safari ritar ett lager i sin egen storlek gånger
-    // pixeltätheten, och i scenens mått hade det tagit 50–60 MB i en iPhone.
+    // Rummet står kvar där det står och mörknar bara, och hörnet går hela
+    // vägen. (Till 2026-11-16 gick rummet en fjärdedel närmare och halvvägs
+    // mot hörnet, som mot datorn, och vreds rakt: då ritade Chrome om hela
+    // rummet i varje bildruta på vägen fram och tillbaka, ungefär dubbelt så
+    // mycket som när kameran förut gick in i hörnet och rummet låg utanför
+    // bilden, och bildrutor föll bort där hörnet krymper fortast.)
+    aim([800, 500], 1, [800, 500], cls);
+    lyftHornet(p, z, to, cls);
+    // Draperiet: över scenen, ljusast mitt i fönstret. Det ritas i en
+    // åttondel av storleken och förstoras (VMORK): Safari ritar ett lager i
+    // sin egen storlek gånger pixeltätheten, och i scenens mått hade det
+    // tagit 50–60 MB i en iPhone.
     const vm = document.getElementById('rum-vmork');
     if (vm) {
-      const ut = (x, y) => [r.p[0] + (x - r.to[0]) / r.z, r.p[1] + (y - r.to[1]) / r.z];
-      const [a, b] = [ut(vx0, vy0), ut(vx1, vy1)];
-      const [s0, s1] = [ut(0, 0), ut(W, H)];
-      const L = Math.floor(Math.min(0, s0[0]));
-      const T = Math.floor(Math.min(0, s0[1]));
       const k = (v) => `${r1(v / VMORK)}px`;
       Object.assign(vm.style, {
-        left: `${L}px`, top: `${T}px`, width: k(Math.ceil(Math.max(W, s1[0])) - L), height: k(Math.ceil(Math.max(H, s1[1])) - T),
-        background: `radial-gradient(ellipse ${k((b[0] - a[0]) * 0.75)} ${k((b[1] - a[1]) * 0.75)} at ${k((a[0] + b[0]) / 2 - L)} ${k(a[1] + (b[1] - a[1]) * 0.48 - T)}, rgba(10, 8, 6, 0.55), rgba(10, 8, 6, 0.88))`,
+        left: '0px', top: '0px', width: k(W), height: k(H),
+        background: `radial-gradient(ellipse ${k((vx1 - vx0) * 0.75)} ${k((vy1 - vy0) * 0.75)} at ${k((vx0 + vx1) / 2)} ${k(vy0 + (vy1 - vy0) * 0.48)}, rgba(10, 8, 6, 0.55), rgba(10, 8, 6, 0.88))`,
       });
     }
     lattVideo(f.fyll ? 2 : 1);
   }
-  // hur mycket närmare rummet går när videon kommer fram, hur många
-  // gånger draperiet förstoras (.rum-vmork i rum.css), och hur många bilder
+  // hur många gånger draperiet förstoras (.rum-vmork i rum.css), och hur många bilder
   // i sekunden gänget och sakerna ritas på vägen hem från videon (R.vbak)
-  const VID_RUM = 1.25;
   const VMORK = 8;
   const VBAK_TAKT = 10;
 

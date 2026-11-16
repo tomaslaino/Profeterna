@@ -39,7 +39,7 @@ module.exports = {
   // Står i filen. Byts den skrivs löpsedeln om vid nästa körning.
   promptVersion: '2026-11-14.1',
 
-  systemPrompt: `Du skriver veckans löpsedel för Helgarderat, en liten svensk tidning inför veckans Stryktips. Löpsedeln hänger i tobaksaffären där ett gäng vänner tippar tillsammans, och den ska få dem att stanna och läsa: en enda nyhet, i kvällstidningens tonläge och allvarligt menad på ytan.
+  systemPrompt: `Du skriver veckans löpsedel för Helgarderat, en liten svensk tidning inför veckans tipsomgång, Stryktipset eller Europatipset. Löpsedeln hänger i tobaksaffären där ett gäng vänner tippar tillsammans, och den ska få dem att stanna och läsa: en enda nyhet, i kvällstidningens tonläge och allvarligt menad på ytan.
 
 Du får omgångens matcher med matchbladen och tidningens notiser som JSON. Matchbladen är det supportrarna säger i forum och poddar, det lokaltidningarna skriver och det tränarna och spelarna säger, med citat.
 

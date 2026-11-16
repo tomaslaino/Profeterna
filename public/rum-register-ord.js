@@ -155,7 +155,33 @@
   const inslxgEx = (h) => { const x = xgOf(h.t); if (!x) return null; const a = rund(x.a, 1); return somRaden(h, 'Insläppta mål mot xG', tk(x.ga - a)) ? lag.inslxg.ex(h) : null; };
   const SNITT = 'SNITT är genomsnittet i divisionen under samma tid.';
 
+  // De tio senaste i xG-fliken (sedan 2026-11-16): motståndet med den
+  // starkaste och den svagaste motståndaren som exempel, som formens
+  // (h.tio: { snitt, mot: [{ mot, tav, niva }] })
+  const tioMotEx = ({ namn, tio }) => {
+    const l = (tio && tio.mot) || [];
+    const snitt = tio && tio.snitt ? tio.snitt.mott : null;
+    if (!ok(snitt) || l.length < 2) return null;
+    const max = l.reduce((a, b) => (b.niva > a.niva ? b : a));
+    const min = l.reduce((a, b) => (b.niva < a.niva ? b : a));
+    const vem = (x) => `${x.mot}${x.tav ? ` i ${x.tav}` : ''} (${x.niva})`;
+    return max.niva === min.niva ? `Alla ${gen(namn)} motståndare låg på ${max.niva}.` : `${gen(namn)} tio senaste motståndare låg i genomsnitt på ${snitt}. Starkast var ${vem(max)} och svagast ${vem(min)}.`;
+  };
+  const TIO = 'Lagets tio senaste matcher i alla tävlingar räknas, efter 90 minuter.';
+
   const akten = {
+    'tio-poang': { e: 'POÄNG/MATCH', n: 'DE TIO SENASTE MATCHERNA', t: `${TIO} En vinst ger 3 poäng och en oavgjord match 1.`, ex: null },
+    'tio-malen': { e: 'MÅLEN', n: 'GJORDA–INSLÄPPTA, DE TIO SENASTE', t: `Alla mål tillsammans. ${TIO}`, ex: null },
+    'tio-motstand': {
+      e: 'MOTSTÅNDET', n: 'MOTSTÅNDARNAS STYRKA I SNITT',
+      t: 'Hur starka lagets tio senaste motståndare är i genomsnitt, enligt modellens styrka just nu: divisionens sämsta lag är 0 och dess bästa 100. Ett lag från en högre division eller ett bra lag i Europa kan ligga på 100, ett lag från en lägre division på 0. Ett högt tal betyder att resultaten har kommit mot svårt motstånd.',
+      ex: tioMotEx,
+    },
+    'tio-matcher': {
+      e: 'MATCH FÖR MATCH', n: 'DE TIO SENASTE MATCHERNA',
+      t: 'Den senaste matchen står först: utfallet, resultatet efter 90 minuter, H för hemma och B för borta, motståndaren och dess styrka från 0 till 100 med en mätare – samma skala som MOTSTÅNDET.',
+      ex: null,
+    },
     form: {
       e: 'FORMEN', n: 'DE FEM SENASTE MATCHERNA',
       t: 'Matcher i alla tävlingar, den senaste först och efter 90 minuter. Talet efter bokstäverna är motståndarnas styrka i genomsnitt: divisionens sämsta lag är 0 och dess bästa 100.',
@@ -316,10 +342,27 @@
 
   // En landskamp: samma rader med landslagens siffror – Nations League
   // hittills, alla landskamper sedan hösten 2024 och marknadens chans (och
-  // ingen styrka, eftersom modellen inte räknar på landslagen).
+  // ingen styrka, eftersom modellen inte räknar på landslagen; motståndets
+  // styrka i formen och de tio senaste är sedan 2026-11-16 Elo-talen).
   const landet = {
+    'tio-poang': akten['tio-poang'],
+    'tio-malen': akten['tio-malen'],
+    'tio-motstand': {
+      e: 'MOTSTÅNDET', n: 'MOTSTÅNDARNAS STYRKA I SNITT',
+      t: 'Hur starka lagets tio senaste motståndare är i genomsnitt, enligt landslagens Elo-tal just nu (eloratings.net): det svagaste laget i lagets liga i Nations League är 0 och det starkaste 100. Ett starkare lag, som ett av de bästa utanför Europa, ligger på 100. Ett högt tal betyder att resultaten har kommit mot svårt motstånd.',
+      ex: tioMotEx,
+    },
+    'tio-matcher': {
+      e: 'MATCH FÖR MATCH', n: 'DE TIO SENASTE LANDSKAMPERNA',
+      t: 'Den senaste landskampen står först: utfallet, resultatet efter 90 minuter, H för hemma och B för borta, motståndaren och dess styrka från 0 till 100 enligt Elo-talen, med en mätare – samma skala som MOTSTÅNDET.',
+      ex: null,
+    },
     spelarfor: { e: 'SPELAR FÖR', n: 'NATIONS LEAGUE', t: (h) => REGLER[(h.ins && h.ins.liga) || 'B'], exm: insatsEx },
-    form: { e: 'FORMEN', n: 'DE FEM SENASTE LANDSKAMPERNA', t: 'Den senaste landskampen står först, och det är resultatet efter 90 minuter som gäller.', ex: null },
+    form: {
+      e: 'FORMEN', n: 'DE FEM SENASTE LANDSKAMPERNA',
+      t: 'Den senaste landskampen står först, och det är resultatet efter 90 minuter som gäller. Talet efter bokstäverna är motståndarnas styrka i genomsnitt enligt landslagens Elo-tal: det svagaste laget i lagets liga i Nations League är 0 och det starkaste 100.',
+      ex: akten.form.ex,
+    },
     vila: { e: 'VILAN', n: 'DAGAR SEDAN FÖRRA LANDSKAMPEN', t: 'Spelarna har spelat för sina klubbar under tiden, så vilan säger lite om hur trötta de är.', ex: null },
     nasta: { e: 'NÄSTA', n: 'DAGAR TILL NÄSTA LANDSKAMP', t: 'Under dagarna står tävlingen när den är en annan än i den här matchen.', ex: null },
     matcher: { n: 'LANDSKAMPER DE SENASTE DAGARNA', t: 'Bara landskamperna räknas, inte spelarnas matcher i klubblagen.', ex: null },
