@@ -1249,6 +1249,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ett hål bortom bildens kant. Samma dag, "Ja, gör plats": hyllan rymde bara fyra pokaler (den femte syntes
   inte, så var det också på den gamla platsen). Nu kommer en hylla till upp ovanför, och sedan står pokalerna
   tätare, i två led och till sist mindre, så att en hel säsong ryms. Se [Tobaksaffären](#tobaksaffären).
+- **Bättre ljus och en lampa som hänger ned (2026-11-16, användarens önskemål):** "Kan du ordna med den
+  allmänna belysningen på hemsidan så att den blir bättre och inte drar mer grafik. Det får gärna vara någon
+  lampa som hänger ner på något ställe eller dylikt – så länge som det inte hänger över något som är
+  betydelsefullt. Ordna med det och mergea!" En skomakarlampa i grön emalj hänger ned i vänstra hörnet över
+  notan och kaffet (där finns bara taket och dörrens överkant), och mörkret i överkanten ligger inte längre
+  över lysröret och taket. Se [Lampan över pulten och ljuset i taket](#lampan-över-pulten-och-ljuset-i-taket-2026-11-16).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4847,7 +4853,7 @@ från midnatt till sex, Stockholms tid, och tänds sedan lika långsamt tills de
 igång klockan sex). Hur släckt det är (`nattGrad` i rum-folk.js, 0–1) räknas om varje minut: mörkret
 (`--natt-grad` på `.rum-mork`), ljuset på gänget (`nattW` i rum-3d.js, som glider dit på 2,5 sekunder) och
 rören, reflektorn, det målade bandet och bardisken (rum-inredning.js) följer det. Rummet är mörkt utom där gatan lyser in genom fönstret och dörren, från
-tv:n och lite över pulten (samma lager som när lysröret tänds, med en annan mask), och
+tv:n, från lampan över pulten (sedan 2026-11-16, se [Lampan över pulten och ljuset i taket](#lampan-över-pulten-och-ljuset-i-taket-2026-11-16)) och lite över pulten (samma lager som när lysröret tänds, med en annan mask), och
 rören och reflektorn i taket är grå, och text-tv:n lyser svagt blått på gänget (som sover, se
 nedan; den som är vaken tittar på den). Nära tv:n, videon,
 en sak och med kupongen i handen är mörkret borta. Den som kommer in medan lysröret är dämpat eller
@@ -6356,6 +6362,36 @@ klockan](#ljuset-efter-klockan)); nu lever det mer av sina egna lampor.
 
 Mätt som ovan klockan 21.30 i klart väder, mot versionen med ljuskäglorna: hörnen 15–18 % mörkare, korktavlan längst
 ut 25 %, gängets bord 7 % och kupongen 6 %. Närbilden av Tipsligan på kvällen går att läsa som förut.
+
+### Lampan över pulten och ljuset i taket (2026-11-16)
+
+Användarens önskemål: bättre ljus i rummet utan mer grafik, gärna en lampa som hänger ned där den inte skymmer något
+som betyder något. Rummet var grumligt upptill: mörkret i överkanten låg i tre lager över taket och lysröret –
+vinjettens överkant i CSS (0,55 svart), den bruna tonen ovanpå (0,2) och dunklet (`DUNKEL`) – så att lysröret såg
+grått ut i stället för att lysa.
+
+- **Lampan** (`lampa` och `LAMPA` i rum.js): en skomakarlampa i grön emalj med kåpa i mässing hänger ned i vänstra
+  hörnet, över notan och kaffet. Där finns bara taket och dörrens överkant; Stängt-skylten hänger under och syns hela,
+  också när rummet vrids så långt det går (musen nere till höger). Vi ser den underifrån: öppningen är en smal ljus
+  ellips med glödlampan, ett mjukt sken ligger runt den och faller ned under kanten. Öppningen är smal så att
+  skärmen syns också i en skärm på 16:9, där överkanten av scenen hamnar utanför. Den ligger i pultens plan (−60), så
+  att den står framför rummet när kameran vrids, tonar bort med pulten vid närbilderna och blir oskarp med pulten när
+  kupongen tas i handen. Sladden upp till taket syns bara i telefonen på höjden, där taket syns (`.rum-lampsladd`).
+- **Lampans ljus:** en ljuskägla bland de andra (`KAGLOR`) över notan och kaffet, med hål i dunklet och värme där
+  blandningsläget finns; en varm strimma i pultens lack under den (`spegelBild`); och på natten, när lysröret är
+  släckt, går mörkret runt den och dess kägla (rum-folk.css), så att den lyser över notan medan gänget sover. Medan
+  lysröret tänds när man kommer in lyser den redan (masken i `.rum-mork`).
+- **Taket och lysröret:** vinjettens överkant är 0,3 i stället för 0,55 och den bruna tonen 0,15 i stället för 0,2
+  (rum.css), och dunklet har hål vid lysröret, som lyser upp taket och väggen överst, och vid lampan
+  (`ljusKlockan`). Spotarnas ljus på disken under Tipsligan har också ett hål i dunklet, med pallarna.
+
+Ingenting ritas i bildrutorna: lampan är en SVG som ritas en gång, och ljuset är fler gradienter i de dukar som redan
+ritas när ljuset ändras. Mätt i Chrome med mjukvarugrafik (1440 × 900, täthet 2, klockan 14 i mulet väder), gammal och
+ny kod: lagren som ritar 93 → 94 (lampan) och deras sammanlagda yta 15,60 → 15,68 miljoner px² (+0,5 %). Ljusare
+i medel (gråskala 0–255, samma bild): klockan 14 taket 58 → 81, lysröret 95 → 140, vänstra hörnet 76 → 92 och pultens
+vänstra del 82 → 95; klockan 21.30 taket 37 → 62, lysröret 55 → 114 och pultens vänstra del 54 → 81. Gänget, kupongen
+och högra väggen är som förut. Provat också som 1920 × 1080 och 1024 × 768, med musen i ytterlägena, på natten
+(klockan 2) och i telefonen (412 × 870) dragen åt vänster; bygget med `--minify` ger samma bild.
 
 ### Utsikten och vädret
 
