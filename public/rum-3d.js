@@ -3883,7 +3883,7 @@ export async function figurer(canvas, opt = {}) {
       for (let i = 0; i < 2; i++) knee[i] += (0.08 - knee[i]) * 0.7 * gr;
     }
     // humöret (humW): glad bakåtlutad med benen och huvudet som gungar lite,
-    // nervös bara lite framåt (de är trygga: nerverna syns i ansiktet), deppig ihopsjunken med
+    // nervös lite framåt (nerverna syns i påhitten, blickarna och benen), deppig ihopsjunken med
     // blicken ner och benen stilla – inte i sömnen eller när man just har vaknat
     const hv = ready(o, t) * (1 - sov) * (1 - gr) * (1 - vaknaW(o, t));
     if (hv > 0) {
@@ -4145,12 +4145,15 @@ export async function figurer(canvas, opt = {}) {
 
   // Blinkningarna (ansiktet, de med ögonvitor): en gång i varje period
   // om BLINK sekunder, på ett ställe i den som klockan ger, och var femte gång
-  // två i rad – ögonen stängda en dryg tiondels sekund.
+  // två i rad – ögonen stängda en dryg tiondels sekund. När det står och väger
+  // blinkar man oftare (BLINK_NERV).
   const BLINK = 4.2;
+  const BLINK_NERV = 2.7;
   function blinkar(o, t) {
+    const per = humAt(t) === 'nerv' ? BLINK_NERV : BLINK;
     const x = t + o.phase * 3.1;
-    const n = Math.floor(x / BLINK);
-    const d = x - n * BLINK - hash(n * 7.3 + o.phase) * (BLINK - 0.6);
+    const n = Math.floor(x / per);
+    const d = x - n * per - hash(n * 7.3 + o.phase) * (per - 0.6);
     return (d >= 0 && d < 0.13) || (hash(n * 3.7 + o.phase) < 0.2 && d >= 0.34 && d < 0.47) || blickBlink(o, t);
   }
   // Och när blicken flyttas: man blinkar i början av en vridning, och utan det ser huvudet ut att vridas
@@ -4691,9 +4694,11 @@ export async function figurer(canvas, opt = {}) {
       const tal = ordetHar(at);
       const andra = figs.filter((x) => x !== o).map((x) => x.F.key);
       const radio = SJUNG.radio.pa ? 1 : 0;
-      const val = tal === o.F.key ? [[andra[0], 0.4], [andra[1], 0.4], ['bord', 0.1]]
-        : tal ? [[tal, 0.42], [andra.find((k) => k !== tal), 0.1], ['bord', 0.16], ['radio', 0.08 * radio], ['oga', 0.03]]
-          : [[andra[0], 0.19], [andra[1], 0.19], ['bord', 0.2], ['radio', 0.12 * radio], ['oga', 0.05]];
+      // (när det står och väger dras blicken till tv:n hela tiden, en stund i taget)
+      const tv = humAt(at) === 'nerv' ? 0.24 : 0;
+      const val = tal === o.F.key ? [['tv', tv * 0.5], [andra[0], 0.4], [andra[1], 0.4], ['bord', 0.1]]
+        : tal ? [['tv', tv], [tal, 0.42], [andra.find((k) => k !== tal), 0.1], ['bord', 0.16], ['radio', 0.08 * radio], ['oga', 0.03]]
+          : [['tv', tv * 1.3], [andra[0], 0.19], [andra[1], 0.19], ['bord', 0.2], ['radio', 0.12 * radio], ['oga', 0.05]];
       let mal = null;
       let acc = 0;
       for (const [m, p] of val) if (!mal && r < (acc += p)) mal = m;
@@ -4722,11 +4727,12 @@ export async function figurer(canvas, opt = {}) {
       return new THREE.Vector3(s[0], BORD.y + 12, s[1]).applyAxisAngle(UP, o.turnNu * DEG).add(o.fig.position);
     }
     if (mal === 'radio') return new THREE.Vector3(RADIO_PLATS.x, SILL + 28, RADIO_PLATS.z);
+    if (mal === 'tv') return TV;
     if (mal === 'oga') return OGA;
     const p = figur(mal);
     return p ? headIn(p) : null;
   }
-  const SAMTAL_W = (x) => (!x.mal ? 0 : x.mal === 'bord' ? 0.6 : x.mal === 'oga' ? 0.7 : 0.82);
+  const SAMTAL_W = (x) => (!x.mal ? 0 : x.mal === 'bord' ? 0.6 : x.mal === 'oga' ? 0.7 : x.mal === 'tv' ? 0.85 : 0.82);
   // { P, w, tal, ser, rull, nick, mm, byt, at }: punkten och hur mycket, vem som pratar (om det är någon
   // annan) och hur mycket man tittar på hen, och om blicken flyttades när stunden började (at). Från det
   // ena till det andra vänds huvudet i vinklar (vridningen och lutningen, var och en efter hur mycket den
@@ -5194,9 +5200,9 @@ export async function figurer(canvas, opt = {}) {
   // taget, i luckor om AKT_SLOT sekunder (förskjutna, så att de inte börjar
   // samtidigt). Vilket påhitt och hur ofta beror på humöret (MENY): utan
   // läge då och då något lugnt (oftast bakåtlutad med handen i nacken), glad
-  // ölen i luften, nervös – men trygg – hakan i handen, händerna knäppta
-  // framför munnen och fingrarna som trummar sakta (naglarna och kliandet finns
-  // kvar för ?rum-akt men väljs inte), deppig hakan i handen, huvudet som
+  // ölen i luften, nervös naglarna, blicken bort från tv:n, näven eller handen för
+  // munnen, etiketten på flaskan, hårda bloss, händerna knäppta, fingrarna som
+  // trummar och kliandet i bakhuvudet (nerverna nedan), deppig hakan i handen, huvudet som
   // skakas, armarna i kors och blicken ner i flaskan – och i alla lägen ibland de små sakerna (fler
   // påhitt nedan): handen om hakan, näsan, axlarna, en blick ut genom fönstret och hostan. Den som leder
   // omgången lutar sig oftare bakåt med händerna i nacken, och den som ligger sist sitter oftare med
@@ -5211,7 +5217,7 @@ export async function figurer(canvas, opt = {}) {
   const MENY = {
     lugn: { chans: 0.38, dl: ['nacke', 'strack', 'hakan', 'stirrar', 'funderar', 'tittarUt', 'nasan'], dt: ['nacke', 'strack', 'hakan', 'nacke', 'hosta', 'tittarUt', 'nasan'], dj: ['nacke', 'strack', 'hakan', 'stirrar', 'funderar', 'axlar', 'tittarUt'] },
     glad: { chans: 0.58, dl: ['gung', 'nacke', 'strack', 'nacke', 'tittarUt'], dt: ['nacke', 'gung', 'strack', 'nacke', 'hosta'], dj: ['gung', 'nacke', 'trumma', 'nacke', 'axlar'] },
-    nerv: { chans: 0.5, dl: ['hakan', 'knappt', 'nacke', 'trumma', 'funderar', 'nasan'], dt: ['knappt', 'hakan', 'nacke', 'trumma', 'hosta', 'nasan'], dj: ['hakan', 'knappt', 'nacke', 'trumma', 'funderar', 'axlar'] },
+    nerv: { chans: 0.62, dl: ['naglar', 'bortvand', 'etikett', 'knogen', 'ansiktet', 'naglar', 'knappt', 'trumma', 'klia', 'hakan'], dt: ['naglar', 'drar', 'bortvand', 'knogen', 'ansiktet', 'drar', 'knappt', 'trumma', 'klia', 'hosta'], dj: ['drar', 'naglar', 'bortvand', 'knogen', 'ansiktet', 'drar', 'knappt', 'trumma', 'klia', 'funderar'] },
     deppig: { chans: 0.6, dl: ['hakan', 'skakar', 'kors', 'stirrar', 'axlar'], dt: ['hakan', 'skakar', 'kors', 'hakan', 'hosta'], dj: ['dunk', 'hakan', 'skakar', 'stirrar', 'kors', 'axlar'] },
   };
   const FI = (o) => FIGS.findIndex((F) => F.key === o.F.key);
@@ -5225,11 +5231,14 @@ export async function figurer(canvas, opt = {}) {
   const GRUPP = {
     lugn: [['skamt', 0.16], ['gral', 0.05], ['titta', 0.08], ['skal', 0.08], ['zen', 0.3], ['skalTva', 0.07]],
     glad: [['skal', 0.33], ['allsang', 0.25], ['skamt', 0.2], ['zen', 0.12], ['skalTva', 0.07]],
-    nerv: [['gral', 0.04], ['titta', 0.06], ['zen', 0.3], ['skalTva', 0.05]],
+    nerv: [['andan', 0.14], ['tra', 0.1], ['gral', 0.04], ['titta', 0.06], ['zen', 0.2], ['skalTva', 0.04]],
     deppig: [['skamt', 0.07]],
   };
   const ALLA = new Set(['skamt', 'gral', 'titta', 'korsaSmitta', 'gaspSmitta', 'zenAndas', 'zenDrom', 'zenRingar', 'zenVaggar', 'zenTyst']);
-  const allaVakna = (t) => tvW(t) < 0.01 && figs.every((o) => ready(o, t) > 0.99 && sovW(o, t) < 0.01 && groggW(o, t) < 0.05 && !vaknaNu(o, t));
+  // (andan och ta i trä också medan matcherna pågår: då står det och väger på riktigt)
+  const ALLA_TV = new Set(['andan', 'tra']);
+  const allaHar = (t) => figs.every((o) => ready(o, t) > 0.99 && sovW(o, t) < 0.01 && groggW(o, t) < 0.05 && !vaknaNu(o, t));
+  const allaVakna = (t) => tvW(t) < 0.01 && allaHar(t);
   // (utan hänsyn till den som går iväg, gaNu)
   function grupp0(t) {
     const n = Math.floor((t - 4) / GRUPP_SLOT);
@@ -5245,7 +5254,7 @@ export async function figurer(canvas, opt = {}) {
     if (namn === 'allsang') namn = sangVal(n, t0);
     // (och zen-stunderna på sina)
     if (namn === 'zen') namn = zenVal(n, t0);
-    if (!namn || (ALLA.has(namn) && !allaVakna(t0))) return null;
+    if (!namn || (ALLA.has(namn) && !allaVakna(t0)) || (ALLA_TV.has(namn) && !allaHar(t0))) return null;
     const l = t - t0;
     return l < AKTER[namn].len ? { namn, l, t0, n } : null;
   }
@@ -5471,18 +5480,6 @@ export async function figurer(canvas, opt = {}) {
       },
       kropp: (o, t) => ({ lean: 0.03, pitch: 0.05, knee: [0.05 * Math.sin(t * 1.4 + o.phase), 0.05 * Math.sin(t * 1.4 + o.phase + 2)] }),
     },
-    // biter på naglarna
-    naglar: {
-      len: 5, in: 0.8, ut: 0.9,
-      hand: (o, A, t) => {
-        if (A !== fri(o)) return null;
-        const s = A.s;
-        const y = new THREE.Vector3(s * 0.2, 0.85, -0.45).normalize();
-        const m = mouthIn(o).add(new THREE.Vector3(0.7 * Math.sin(t * 23), 0.5 * Math.sin(t * 17) - 1, 2));
-        return { p: m.addScaledVector(y, -o.F.arm * 3), y, z: new THREE.Vector3(0, 0.3, 1), pole: new THREE.Vector3(s, -0.8, 0.1) };
-      },
-      kropp: (o, t) => ({ lean: 0.12, pitch: 0.02, knee: [0.26 * Math.sin(t * 3.6 + o.phase), 0.26 * Math.sin(t * 3.6 + o.phase + 2.2)] }),
-    },
     // händerna knäppta framför munnen (om flaskan eller cigaretten),
     // och gungar fram och tillbaka
     knappt: {
@@ -5680,6 +5677,452 @@ export async function figurer(canvas, opt = {}) {
     const P = mouthIn(o).addScaledVector(d(1, 0, 0), s * (5 - 9 * dra)).addScaledVector(d(0, 0, 1), q * 0.9).addScaledVector(Y, -q * 1.15);
     return { p: P, y: Y, z: d(0, 0.1, -1), pole: new THREE.Vector3(s, -0.8, 0) };
   }
+
+  // ---------- nerverna: naglarna, blicken bort, näven, ansiktet, etiketten och blossen ----------
+  // Fler nervösa påhitt (2026-11-16, användarens önskemål: "fler lite nervösa uttryck … bita på naglarna
+  // eller dylikt … naturligt, så de inte ser ut som robotar … snyggt och äkta, även emotionellt"). Förut
+  // var de trygga också när det stod och vägde (hakan, händerna knäppta, fingrarna som trummar), och
+  // nerverna syntes mest i ansiktet. Nu syns de i händerna, i blicken och i benen, men utan att det blir
+  // teater: det som folk gör när det står och väger och de inte tänker på att någon ser dem.
+  //
+  // Det som gör det levande och inte mekaniskt: ingen takt går jämnt (nypen i naglarna, knackningarna
+  // och blossen kommer med olika mellanrum varje gång, ur påhittets start), blicken går före handen och
+  // dras hela tiden tillbaka till tv:n, handen stannar och gör något annat mitt i (synar nageln, kikar),
+  // och efteråt släpper spänningen i en utandning med axlarna som sjunker. Den som har cigaretten i den
+  // lediga handen (DJ) lägger den på bordet först, som i zen-stunderna (zenHand), och tar den igen sist.
+  //
+  // Handen med fingrar (fingerHand, som i tecknen och zen-stunderna) ställs med en viss fingertopp mot
+  // munnen eller ansiktet (toppMot): fingerTopp räknar ut var toppen är i handens axlar ur formen.
+  const TOPP_LED = [[0.8, 0.84, 0.74, 0.32], [0.27, 0.92, 0.8, 0.33], [-0.27, 0.86, 0.74, 0.32], [-0.79, 0.68, 0.6, 0.29]];
+  const TOPP_Q = new THREE.Quaternion();
+  const TOPP_X = new THREE.Vector3(1, 0, 0);
+  function fingerTopp(q, s, f, i) {
+    if (i < 4) {
+      const [x, l1, l2, r] = TOPP_LED[i];
+      const a = f.f[i] * 1.62;
+      const b = a + f.f[i] * 1.95;
+      const l = l2 + r * 0.95;
+      return new THREE.Vector3(s * x * q, q * (2 + l1 * Math.cos(a) + l * Math.cos(b)), -q * (l1 * Math.sin(a) + l * Math.sin(b)));
+    }
+    const d = new THREE.Vector3(s * f.tu[0], f.tu[1], f.tu[2]).normalize();
+    TOPP_Q.setFromUnitVectors(UP, d);
+    const b = new THREE.Vector3(0, 1, 0).applyAxisAngle(TOPP_X, -f.tb).applyQuaternion(TOPP_Q);
+    return new THREE.Vector3(s * q * 0.94, q * 0.82, -q * 0.12).addScaledVector(d, q * 0.86).addScaledVector(b, q * 1.06);
+  }
+  // Handen med fingrar i formen form med toppen i (0–3 pekfingret till lillfingret, 4 tummen) i P,
+  // fingrarna åt y och handryggen åt z (figurens axlar).
+  const toppMot = (o, A, P, y, z, form, i, pole) => lokalMot(o, A, P, y, z, fingerTopp(o.F.arm, A.s, form, i), pole);
+  // (och med punkten v, i handens axlar före skalan, i P)
+  function lokalMot(o, A, P, y, z, v, pole) {
+    const Y = y.clone().normalize();
+    const Z = z.clone().addScaledVector(Y, -z.dot(Y)).normalize();
+    const X = new THREE.Vector3().crossVectors(Y, Z);
+    const w = v.clone().multiplyScalar(ZEN_STOR);
+    return { p: P.clone().addScaledVector(X, -w.x).addScaledVector(Y, -w.y).addScaledVector(Z, -w.z), y: Y, z: Z, pole };
+  }
+  // Påhitten med handen vid ansiktet tar SAK sekunder i början och slutet åt att lägga ifrån sig det som är
+  // i handen och ta det igen (DJ:s cigarett; de andra har den lediga handen tom och väntar i stället, så
+  // att påhittet går lika fort för alla). u är tiden därefter, och handen går upp på UPP sekunder.
+  const SAK = 0.8;
+  const UPP = 0.6;
+  // Handen som går upp till ansiktet: på de yttre platserna, där huvudet är vänt mot bordet, armen på
+  // den sidan (inn) – den andra måste annars runt huvudet och hamnar bredvid det. Har den flaskan
+  // ställs den på bordet först, som cigaretten. I mitten den lediga.
+  const nervArm = (o) => (Math.abs(o.F.turn) > 20 && o.arms.find((A) => A.s === o.F.inn)) || fri(o);
+  // den lediga handen till mal (bara i påhittets kärna, kl: kärnans längd), med det den hade i handen på bordet
+  function nervHand(o, A, t, l, kl, mal) {
+    const u = l - SAK;
+    const ner = A.bench ? bump(l, 0.12, SAK - 0.05, SAK + kl + 0.05, 2 * SAK + kl - 0.12) : 0;
+    return zenHand(o, A, t, ner, mal, bump(u, 0, UPP, kl - UPP, kl));
+  }
+  const nervK = (l, kl) => bump(l - SAK, 0, UPP, kl - UPP, kl);
+  // Blicken mot tv:n (som se i påhittet: utanför matcherna dras den dit ändå, när det står och väger)
+  // och vridningen bort från den (+ åt tv:n).
+  const motTv = (o) => Math.sign(aim(o, TV).yaw) || 1;
+  // Ryck i en ojämn takt: n tider från a med mellanrum mellan min och max (ur fro), och hur mycket av
+  // ett ryck som pågår vid u (snabbt fram, lite långsammare tillbaka).
+  function ryckTider(fro, a, n, min, max) {
+    const ut = [];
+    let x = a;
+    for (let i = 0; i < n; i++) { ut.push(x); x += min + (max - min) * hash(fro * 7.13 + i * 1.91); }
+    return ut;
+  }
+  function ryck(u, tider, upp = 0.05, ner = 0.16) {
+    let r = 0;
+    for (const a of tider) r = Math.max(r, bump(u, a, a + upp, a + upp + 0.03, a + upp + 0.03 + ner));
+    return r;
+  }
+
+  // Naglarna: handen upp till munnen och små snabba nyp i ojämn takt, med huvudet som rycker en aning med
+  // och handen som vrids lite mellan nypen, som för att komma åt ett nytt ställe. Mitt i tar hen ut
+  // handen och synar nageln (huvudet ner mot handen, tummen som petar på den), tittar upp på tv:n – och
+  // fortsätter, ibland med tumnageln. Benet studsar under bordet.
+  const NAGEL = { f: [0.36, 0.8, 0.9, 0.95], sp: [0.06, 0, -0.04, -0.08], tu: [-0.4, 0.72, -0.58], tb: 0.5 };
+  const NAGEL_SYN = { f: [0.42, 0.8, 0.9, 0.95], sp: [0.06, 0, -0.04, -0.08], tu: [-0.2, 0.95, -0.25], tb: 0.2 };
+  const TUMNAGEL = { f: [0.88, 0.92, 0.95, 0.97], sp: [0, 0, 0, 0], tu: [0.12, 1, 0.2], tb: 0.1 };
+  const NAGLAR = { k: 6.8 };
+  function nagelPlan(x) {
+    const fro = hash(x.t0 * 0.371 + 0.13);
+    const syn = 2.5 + 0.5 * hash(fro + 0.3);
+    return {
+      bett: [...ryckTider(fro, 0.72, 4 + Math.floor(3 * hash(fro + 0.1)), 0.24, 0.5).filter((a) => a < syn - 0.15),
+        ...ryckTider(fro + 0.5, syn + 1.75, 5, 0.22, 0.55).filter((a) => a < NAGLAR.k - 0.9)],
+      syn,
+      tumme: hash(fro + 0.7) < 0.5,
+      sida: hash(fro + 0.9) < 0.5 ? -1 : 1,
+    };
+  }
+  AKTER.naglar = {
+    len: NAGLAR.k + 2 * SAK, in: 0.3, ut: 0.3,
+    hand: (o, A, t, l, x) => {
+      if (A !== nervArm(o)) return null;
+      const s = A.s;
+      const u = l - SAK;
+      const N = nagelPlan(x);
+      const d = huvudAxlar(o);
+      const tum = N.tumme ? sm(N.syn + 0.95, N.syn + 1.4, u) : 0;
+      const b = ryck(u, N.bett);
+      const syn = bump(u, N.syn, N.syn + 0.4, N.syn + 1.0, N.syn + 1.45);
+      // (mellan nypen vrids handen en aning, åt olika håll)
+      const nr = N.bett.filter((a) => a <= u).length;
+      const vr = 0.14 * (hash(nr * 3.3 + N.syn) - 0.5) * (1 - syn);
+      const M = mouthIn(o).addScaledVector(d(0, 0, 1), 0.4 - 1.1 * b).addScaledVector(d(0, 1, 0), -0.8 + 0.35 * b);
+      const pol = new THREE.Vector3(s, -0.8, 0.1);
+      let vid = toppMot(o, A, M, d(-s * (0.28 + vr), 0.78, -0.55), d(s * (0.12 + vr), 0.6, 0.78), NAGEL, 0, pol);
+      if (tum > 0) vid = lerpPose(vid, toppMot(o, A, M.clone().addScaledVector(d(1, 0, 0), -s * 1.5), d(-s * 0.15, 0.9, -0.4), d(s * 0.7, 0.15, 0.7), TUMNAGEL, 4, pol), tum);
+      // (synar nageln: handen en bit ut och ner, handryggen mot ögonen)
+      const ut = toppMot(o, A, M.clone().addScaledVector(d(0, 0, 1), 9).addScaledVector(d(0, 1, 0), -10).addScaledVector(d(1, 0, 0), s * 6), d(-s * 0.45, 0.55, 0.35), d(s * 0.1, 0.6, -0.8), NAGEL_SYN, 0, new THREE.Vector3(s, -0.8, 0.1));
+      return nervHand(o, A, t, l, NAGLAR.k, bage(vid, ut, syn));
+    },
+    fing: (o, A, l, x) => {
+      if (A !== nervArm(o)) return null;
+      const u = l - SAK;
+      const N = nagelPlan(x);
+      const syn = bump(u, N.syn, N.syn + 0.4, N.syn + 1.0, N.syn + 1.45);
+      // (tummen petar på nageln två gånger medan hen synar den)
+      const pet = syn * Math.max(0, Math.sin((u - N.syn - 0.45) * 13)) * bump(u, N.syn + 0.45, N.syn + 0.5, N.syn + 0.95, N.syn + 1.0);
+      const form = blanda(blanda(NAGEL, NAGEL_SYN, syn), TUMNAGEL, N.tumme ? sm(N.syn + 0.95, N.syn + 1.4, u) : 0);
+      return { form: pet > 0 ? { ...form, tu: [form.tu[0] - 0.25 * pet, form.tu[1] + 0.15 * pet, form.tu[2] - 0.3 * pet] } : form, k: nervK(l, NAGLAR.k) };
+    },
+    kropp: (o, t, l, x) => {
+      const u = l - SAK;
+      const N = nagelPlan(x);
+      const k = nervK(l, NAGLAR.k);
+      const s = nervArm(o).s;
+      const b = ryck(u, N.bett);
+      const syn = bump(u, N.syn + 0.1, N.syn + 0.5, N.syn + 0.95, N.syn + 1.35);
+      const tv = bump(u, N.syn + 1.2, N.syn + 1.5, N.syn + 2.1, N.syn + 2.6);
+      const nr = N.bett.filter((a) => a <= u).length;
+      return {
+        lean: 0.1 * k + 0.02 * syn, pitch: (0.05 + 0.035 * b + 0.2 * syn - 0.04 * tv) * k,
+        yaw: (s * 0.2 * syn + 0.03 * b * (nr % 2 ? 1 : -1) + 0.05 * N.sida * (1 - syn)) * k, roll: -s * 0.04 * k,
+        knee: [0.05 * Math.max(0, Math.sin(t * 19 + o.phase)) * k, 0],
+        se: TV, seW: 0.55 * (1 - syn) * k,
+      };
+    },
+  };
+
+  // Orkar inte titta: hen vänder bort ansiktet från tv:n med ögonen hårt stängda, axlarna uppdragna och
+  // (den som har handen fri) handen för munnen – kikar tillbaka, halvvägs och bara en kort stund, vänder
+  // bort sig igen och tittar till sist dit på riktigt, med en utandning. (Fingrarna för ögonen gick inte:
+  // armarna når inte upp till ögonen på de stora huvudena, och handen framför ansiktet såg ut som en
+  // vinkning.)
+  const BORT = { len: 6.6 };
+  function bortPlan(x) {
+    const fro = hash(x.t0 * 0.533 + 0.41);
+    const kik = 2.0 + 0.5 * hash(fro);
+    return { kik: [kik, kik + 0.55 + 0.35 * hash(fro + 0.3)], tillbaka: 4.1 + 0.4 * hash(fro + 0.6) };
+  }
+  // hur bortvänd hen är vid l (0–1), och hur mycket hen kikar
+  function bortNu(N, l) {
+    const kik = bump(l, N.kik[0], N.kik[0] + 0.2, N.kik[1], N.kik[1] + 0.25);
+    return { bort: fj(0.55, 0.9, l, 0.05, 0.08) * (1 - sm(N.tillbaka, N.tillbaka + 0.45, l)) * (1 - 0.6 * kik), kik };
+  }
+  AKTER.bortvand = {
+    len: BORT.len, in: 0.4, ut: 0.8,
+    hand: (o, A, t, l, x) => {
+      if (A !== nervArm(o) || A.bench) return null;
+      const N = bortPlan(x);
+      const k = bump(l, 0.5, 1.0, N.tillbaka + 0.2, N.tillbaka + 0.9);
+      return k > 0 ? bage(handRest(o, A, t), gaspHand(o, A), k) : null;
+    },
+    kropp: (o, t, l, x) => {
+      const N = bortPlan(x);
+      const { bort, kik } = bortNu(N, l);
+      const h = motTv(o);
+      const puh = bump(l, N.tillbaka + 0.3, N.tillbaka + 0.8, BORT.len - 0.9, BORT.len - 0.2);
+      const fore = bump(l, 0, 0.25, 0.4, 0.65);
+      return {
+        yaw: -h * 0.66 * bort, twist: -h * 0.16 * bort, pitch: 0.16 * bort - 0.03 * kik - 0.04 * fore + 0.04 * puh, lean: 0.05 * fore + 0.04 * bort - 0.04 * puh,
+        lift: 2.2 * bort - 1.5 * puh, breath: 0.03 * bort - 0.07 * puh, roll: -h * 0.05 * bort,
+        knee: [0.05 * Math.max(0, Math.sin(t * 18 + o.phase)) * bort, 0],
+        se: TV, seW: 0.7,
+      };
+    },
+    blund: (o, x) => bortNu(bortPlan(x), x.l).bort > 0.45,
+  };
+
+  // Näven mot munnen: knogarna mot läpparna och blicken stint på tv:n, sakta gungande fram och tillbaka.
+  // Hen trycker näven mot munnen några gånger i ojämn takt, och släpper den till sist ner i bordet,
+  // två lätta slag.
+  const NAVE = { f: [1, 1, 1, 1], sp: [0, 0, 0, 0], tu: [-0.2, 0.62, -0.75], tb: 0.55 };
+  const KNOGE = { k: 6.4, ner: 4.5 };
+  function knogPlan(x) {
+    const fro = hash(x.t0 * 0.677 + 0.27);
+    return { tryck: ryckTider(fro, 0.9 + 0.4 * hash(fro), 4, 0.5, 1.0).filter((a) => a < KNOGE.ner - 0.5), slag: [KNOGE.ner + 0.55, KNOGE.ner + 0.95 + 0.15 * hash(fro + 0.5)] };
+  }
+  // knogarna (de böjda fingrarnas framsida) i handens axlar
+  const knogarna = (o, A) => new THREE.Vector3(A.s * 0.3 * o.F.arm, 1.95 * o.F.arm, -1.35 * o.F.arm);
+  AKTER.knogen = {
+    len: KNOGE.k + 2 * SAK, in: 0.3, ut: 0.3,
+    hand: (o, A, t, l, x) => {
+      if (A !== nervArm(o)) return null;
+      const s = A.s;
+      const u = l - SAK;
+      const N = knogPlan(x);
+      const d = huvudAxlar(o);
+      const tr = ryck(u, N.tryck, 0.12, 0.3);
+      const vid = lokalMot(o, A, mouthIn(o).addScaledVector(d(0, 0, 1), 1.2 - 1.3 * tr).addScaledVector(d(0, 1, 0), -1.5), d(-s * 0.55, 0.8, 0.05), d(s * 0.25, 0.05, 1), knogarna(o, A), new THREE.Vector3(s, -0.85, 0.2));
+      // (ner i bordet: näven med knogarna nedåt, två slag)
+      const bord = paBordet(o, A, 15, 12, 1.5 * o.F.arm * ZEN_STOR - 3 + 4.5 * (1 - ryck(u, N.slag, 0.07, 0.22)));
+      return nervHand(o, A, t, l, KNOGE.k, bage(vid, bord, sm(KNOGE.ner, KNOGE.ner + 0.45, u)));
+    },
+    fing: (o, A, l) => (A === nervArm(o) ? { form: NAVE, k: nervK(l, KNOGE.k) } : null),
+    kropp: (o, t, l, x) => {
+      const u = l - SAK;
+      const N = knogPlan(x);
+      const k = nervK(l, KNOGE.k);
+      const tr = ryck(u, N.tryck, 0.12, 0.3);
+      const slag = ryck(u, N.slag, 0.07, 0.22);
+      const fast = bump(u, 0.5, 1.2, KNOGE.ner - 0.2, KNOGE.ner + 0.3);
+      return {
+        lean: (0.11 + 0.035 * Math.sin((u - 0.6) * 2.9) * fast) * k + 0.03 * slag, pitch: (0.03 + 0.03 * tr) * k + 0.06 * slag,
+        roll: -nervArm(o).s * 0.03 * k, breath: 0.02 * fast - 0.04 * bump(u, KNOGE.ner, KNOGE.ner + 0.4, KNOGE.ner + 0.9, KNOGE.ner + 1.6),
+        knee: [0.05 * Math.max(0, Math.sin(t * 18 + o.phase)) * k, 0.03 * Math.max(0, Math.sin(t * 18 + o.phase + 1.4)) * k],
+        se: TV, seW: 0.65 * k,
+      };
+    },
+  };
+
+  // Handen över ansiktet: hen lägger handen över ögonen med huvudet lite framåt, drar den sakta nedåt
+  // över ansiktet medan huvudet lyfts, och håller den en stund för munnen med blicken på tv:n – och
+  // släpper med en utandning, axlarna ner.
+  const SLAPP = { f: [0.2, 0.17, 0.2, 0.26], sp: [-0.06, -0.02, 0.02, 0.07], tu: [0.7, 0.6, -0.25], tb: 0.15 };
+  const ANSIKTE = { k: 5.4, dra: [0.95, 2.5], ner: 4.4 };
+  AKTER.ansiktet = {
+    len: ANSIKTE.k + 2 * SAK, in: 0.3, ut: 0.3,
+    hand: (o, A, t, l) => {
+      if (A !== nervArm(o)) return null;
+      const s = A.s;
+      const P = o.F.head;
+      const d = huvudAxlar(o);
+      const u = l - SAK;
+      const dr = sm(ANSIKTE.dra[0], ANSIKTE.dra[1], u);
+      // (mellanfingret från ögonen ner till läpparna, handen tvärs över ansiktet)
+      const T = inHead(o, new THREE.Vector3(-s * P.rx * 0.05, P.ry * (0.24 - 0.5 * dr), P.rz * 0.98)).addScaledVector(d(0, 0, 1), o.F.arm * (0.75 + 0.15 * dr));
+      return nervHand(o, A, t, l, ANSIKTE.k, toppMot(o, A, T, d(-s * (0.4 - 0.15 * dr), 0.9, 0.05), d(s * 0.05, 0.05, 1), SLAPP, 1, new THREE.Vector3(s, -0.85, 0.15)));
+    },
+    fing: (o, A, l) => (A === nervArm(o) ? { form: SLAPP, k: nervK(l, ANSIKTE.k) } : null),
+    kropp: (o, t, l) => {
+      const u = l - SAK;
+      const k = nervK(l, ANSIKTE.k);
+      const dr = sm(ANSIKTE.dra[0], ANSIKTE.dra[1], u);
+      const puh = bump(u, ANSIKTE.ner - 0.2, ANSIKTE.ner + 0.4, ANSIKTE.k + 0.2, ANSIKTE.k + 0.9);
+      return {
+        lean: (0.12 - 0.08 * dr) * k - 0.04 * puh, pitch: (0.2 - 0.27 * dr) * k + 0.05 * puh, roll: nervArm(o).s * 0.04 * (1 - dr) * k,
+        breath: 0.04 * bump(u, 0, 0.6, ANSIKTE.dra[0], ANSIKTE.dra[1]) - 0.07 * puh, lift: 1.2 * bump(u, 0, 0.6, ANSIKTE.dra[0], ANSIKTE.dra[1]) - 1.6 * puh,
+        se: TV, seW: 0.6 * sm(ANSIKTE.dra[1] - 0.6, ANSIKTE.dra[1], u) * k,
+      };
+    },
+    blund: (o, x) => x.l - SAK > 0.4 && x.l - SAK < ANSIKTE.dra[0] + 0.7,
+  };
+
+  // Etiketten (DL, som har flaskan i ena handen och den andra fri): flaskan står kvar på bordet i handen,
+  // och den lediga handen pillar på etiketten med tumnageln, i små ryck med blicken ner på den – och
+  // upp på tv:n emellanåt, utan att sluta pilla.
+  const PILL = { f: [0.55, 0.62, 0.7, 0.78], sp: [0.04, 0, -0.03, -0.06], tu: [0.25, 0.95, 0.05], tb: 0.25 };
+  const ETIKETT = { k: 7.6 };
+  function etikettPlan(x) {
+    const fro = hash(x.t0 * 0.811 + 0.63);
+    const a = 2.0 + 0.8 * hash(fro);
+    return { upp: [[a, a + 1.0], [a + 2.6 + 0.6 * hash(fro + 0.4), a + 3.3 + 0.6 * hash(fro + 0.4)]], pill: ryckTider(fro, 0.85, 22, 0.13, 0.32) };
+  }
+  // var etiketten är mot den lediga handen (figurens axlar)
+  function etikettPa(o, A) {
+    const F = o.arms.find((B) => B.thing);
+    if (!F) return null;
+    const C = F.bench.position.clone().add(new THREE.Vector3(0, -4, 0));
+    const mot = shoulder(o, A).sub(C);
+    mot.y = 0;
+    mot.normalize();
+    return { C, P: C.clone().addScaledVector(mot, 8.6), mot };
+  }
+  AKTER.etikett = {
+    len: ETIKETT.k + 2 * SAK, in: 0.3, ut: 0.3,
+    hand: (o, A, t, l, x) => {
+      if (A !== fri(o)) return null;
+      const E = etikettPa(o, A);
+      if (!E) return null;
+      const u = l - SAK;
+      const pl = ryck(u, etikettPlan(x).pill, 0.06, 0.12);
+      // (tummen mot etiketten, fingrarna runt flaskan på andra sidan och handryggen utåt)
+      const P = E.P.clone().add(new THREE.Vector3(0, 1.4 * pl - 0.7, 0));
+      const y = E.mot.clone().negate().add(new THREE.Vector3(0, -0.25, 0));
+      const z = E.mot.clone().add(new THREE.Vector3(0, 0.55, 0));
+      return nervHand(o, A, t, l, ETIKETT.k, toppMot(o, A, P, y, z, PILL, 4, new THREE.Vector3(A.s, -0.6, -0.4)));
+    },
+    fing: (o, A, l, x) => {
+      if (A !== fri(o)) return null;
+      const pl = ryck(l - SAK, etikettPlan(x).pill, 0.06, 0.12);
+      return { form: { ...PILL, tb: PILL.tb + 0.35 * pl }, k: nervK(l, ETIKETT.k) };
+    },
+    kropp: (o, t, l, x) => {
+      const u = l - SAK;
+      const k = nervK(l, ETIKETT.k);
+      const N = etikettPlan(x);
+      const upp = Math.max(...N.upp.map(([a, b]) => bump(u, a, a + 0.3, b, b + 0.35)));
+      const E = etikettPa(o, fri(o));
+      return {
+        lean: 0.09 * k, pitch: 0.05 * k * (1 - upp), roll: 0.03 * k,
+        knee: [0.04 * Math.max(0, Math.sin(t * 16 + o.phase)) * k, 0],
+        se: upp > 0.5 || !E ? TV : E.C.clone().applyAxisAngle(UP, o.turnNu * DEG).add(o.fig.position), seW: (0.75 - 0.15 * upp) * k,
+      };
+    },
+  };
+
+  // Blossen (DT och DJ, med cigaretten): två korta, hårda bloss tätt efter varandra med cigaretten kvar
+  // framför hakan och röken ut i mungipan emellan, en stund med blicken på tv:n – och sedan en lång
+  // utandning med huvudet bakåt, och askan av: DT knackar den i askkoppen, DJ knäpper av den.
+  const DRAR = { len: 7.6, in: [0.3, 0.75], b1: [0.75, 1.25], b2: [2.3, 3.35], ut: [4.35, 5.6], aska: 5.7 };
+  function drarPlan(x) {
+    const fro = hash(x.t0 * 0.397 + 0.19);
+    const d = 0.25 * (hash(fro) - 0.5);
+    return { d, aska: ryckTider(fro + 0.3, DRAR.aska + 0.45, 2 + Math.floor(2 * hash(fro + 0.8)), 0.22, 0.38) };
+  }
+  AKTER.drar = {
+    len: DRAR.len, in: 0.3, ut: 0.6,
+    hand: (o, A, t, l, x) => {
+      if (A !== rokArm(o)) return null;
+      const N = drarPlan(x);
+      const s = A.s;
+      const b = blossAt(o, A);
+      const d = huvudAxlar(o);
+      // (mellan blossen: cigaretten kvar framför hakan)
+      const kvar = { ...b, p: b.p.clone().addScaledVector(d(0, 1, 0), -9).addScaledVector(d(0, 0, 1), 6).addScaledVector(d(1, 0, 0), s * 4) };
+      const vid = bump(l, DRAR.b1[0] - 0.4, DRAR.b1[0], DRAR.b1[1], DRAR.b1[1] + 0.25) + bump(l, DRAR.b2[0] - 0.3 + N.d, DRAR.b2[0] + N.d, DRAR.b2[1] + N.d, DRAR.b2[1] + N.d + 0.35);
+      const uppe = bump(l, DRAR.in[0], DRAR.in[1], DRAR.ut[1] - 0.2, DRAR.aska - 0.1);
+      let h = bage(handRest(o, A, t), lerpPose(kvar, b, Math.min(1, vid)), uppe);
+      // (askan: ner i askkoppen och knackar – DJ knäpper av den i luften, ett litet ryck)
+      const ka = ryck(l, N.aska, 0.05, 0.12);
+      if (ka > 0) h = { ...h, p: h.p.clone().add(new THREE.Vector3(0, A.kind === 'cigg' ? -1.2 * ka : 1.0 * ka, A.kind === 'cigg' ? 0 : 0.8 * ka)) };
+      return h;
+    },
+    glod: (o, l, x) => {
+      const N = drarPlan(x);
+      return Math.max(bump(l, DRAR.b1[0] + 0.05, DRAR.b1[0] + 0.15, DRAR.b1[1] - 0.05, DRAR.b1[1] + 0.1), bump(l, DRAR.b2[0] + N.d + 0.05, DRAR.b2[0] + N.d + 0.2, DRAR.b2[1] + N.d - 0.05, DRAR.b2[1] + N.d + 0.15));
+    },
+    blas: (o, l, x) => {
+      const N = drarPlan(x);
+      return Math.max(0.55 * bump(l, DRAR.b1[1] + 0.2, DRAR.b1[1] + 0.35, DRAR.b2[0] + N.d - 0.5, DRAR.b2[0] + N.d - 0.25), bump(l, DRAR.ut[0], DRAR.ut[0] + 0.3, DRAR.ut[1] - 0.3, DRAR.ut[1]));
+    },
+    kropp: (o, t, l, x) => {
+      const N = drarPlan(x);
+      const s = rokArm(o).s;
+      const e = bump(l, 0.1, 0.6, DRAR.ut[0], DRAR.ut[1]);
+      const sida = bump(l, DRAR.b1[1] + 0.1, DRAR.b1[1] + 0.3, DRAR.b2[0] + N.d - 0.5, DRAR.b2[0] + N.d - 0.2);
+      const ut = bump(l, DRAR.ut[0] - 0.2, DRAR.ut[0] + 0.35, DRAR.ut[1] - 0.2, DRAR.ut[1] + 0.4);
+      const hard = bump(l, DRAR.b2[0] + N.d, DRAR.b2[0] + N.d + 0.3, DRAR.b2[1] + N.d - 0.1, DRAR.b2[1] + N.d + 0.3);
+      return {
+        lean: 0.09 * e - 0.05 * ut, pitch: 0.04 * e - 0.2 * ut - 0.02 * hard, yaw: -s * 0.2 * sida, lift: 1.0 * hard - 1.2 * ut,
+        breath: 0.05 * hard - 0.06 * ut, knee: [0.05 * Math.max(0, Math.sin(t * 18 + o.phase)) * e, 0],
+        se: TV, seW: 0.55 * e * (1 - sida),
+      };
+    },
+  };
+
+  // Peppar, peppar, ta i trä (gänget): a lutar sig bakåt och säger något hoppfullt med handen ute och en
+  // nick – b vänder sig mot hen och knackar genast tre gånger i bordet, c hänger på med två, och a, som
+  // först nu hör vad hen sa, knackar hastigt själv. Sedan tittar alla upp på tv:n. Knackningarna med
+  // knogarna (näven med fingrar; DJ med cigaretten kvar i handen), i var och ens takt.
+  const TRA = { sagt: [0.4, 2.1], len: 7.4, b: 2.15, c: 2.9, a: 3.6, tv: 4.6 };
+  function traPlan(x) {
+    const fro = x.n != null ? x.n * 0.773 + 0.3 : x.t0 * 0.291;
+    return [TRA.a, TRA.b, TRA.c].map((s, j) => ryckTider(fro + j * 2.3, s + 0.35, j === 1 ? 3 : 2, 0.2, 0.32));
+  }
+  // vems tur (0 a, 1 b, 2 c) och när ens knackningar börjar
+  const traVem = (o, x) => rollNr(roller(x), FI(o));
+  const traStart = (j) => [TRA.a, TRA.b, TRA.c][j];
+  function knackPose(o, A, r) {
+    const naven = !A.bench;
+    return paBordet(o, A, 15, 10, (naven ? 1.5 * o.F.arm * ZEN_STOR - 3 : 0.5) + 8 * (1 - r));
+  }
+  AKTER.tra = {
+    len: TRA.len, in: 0.5, ut: 0.9,
+    hand: (o, A, t, l, x) => {
+      if (A !== fri(o)) return null;
+      const j = traVem(o, x);
+      const st = traStart(j);
+      const kn = knackPose(o, A, ryck(l, traPlan(x)[j], 0.06, 0.18));
+      const ner = bump(l, st - 0.35, st + 0.1, st + 1.0, st + 1.5);
+      if (j !== 0) return ner > 0 ? bage(handRest(o, A, t), kn, ner) : null;
+      // (a: handen ute medan hen säger det, sedan ner i bordet)
+      const ute = framfor(o, A, 0.22, -0.18 + 0.025 * Math.sin(l * 6), 0.4);
+      const sag = bump(l, TRA.sagt[0], TRA.sagt[0] + 0.5, TRA.sagt[1] - 0.2, st);
+      return bage(bage(handRest(o, A, t), ute, sag), kn, ner);
+    },
+    fing: (o, A, l, x) => {
+      if (A !== fri(o) || A.bench) return null;
+      const st = traStart(traVem(o, x));
+      return { form: NAVE, k: bump(l, st - 0.35, st + 0.05, st + 1.0, st + 1.45) };
+    },
+    kropp: (o, t, l, x) => {
+      const R = roller(x);
+      const j = traVem(o, x);
+      const st = traStart(j);
+      const kn = bump(l, st - 0.2, st + 0.2, st + 0.9, st + 1.3);
+      const tv = bump(l, TRA.tv + 0.15 * j, TRA.tv + 0.5 + 0.15 * j, TRA.len - 1.2, TRA.len - 0.4);
+      const slag = ryck(l, traPlan(x)[j], 0.06, 0.18);
+      const ut = { lean: 0.12 * kn, pitch: 0.14 * kn + 0.05 * slag, lift: -0.8 * slag };
+      if (j === 0) {
+        const sag = bump(l, TRA.sagt[0], TRA.sagt[0] + 0.5, TRA.sagt[1], TRA.sagt[1] + 0.4);
+        // (hen tittar på de andra medan hen säger det, och på b när b knackar)
+        const se = l < TRA.b + 0.3 ? turBlick(l, TRA.sagt[0], 0.9, (n) => (n % 2 ? R.c : R.b)) : huvudPa(R.b);
+        return { ...ut, lean: ut.lean - 0.06 * sag, pitch: ut.pitch - 0.04 * sag + 0.06 * bump(l, 1.2, 1.35, 1.45, 1.7), se: tv > 0.5 ? TV : se, seW: 0.8 * (1 - kn * 0.5), mitt: true };
+      }
+      // (b och c: på a när hen säger det, på bordet när de knackar, och en blick på a efteråt)
+      const efter = bump(l, st + 1.0, st + 1.3, TRA.tv - 0.2, TRA.tv + 0.1);
+      return { ...ut, yaw: j === 1 ? 0.08 * Math.sin((l - st) * 9) * bump(l, st - 0.6, st - 0.4, st - 0.1, st) : 0, se: tv > 0.5 ? TV : huvudPa(R.a), seW: (0.8 - 0.6 * kn + 0.2 * efter) * (l > TRA.sagt[0] + 0.3 + 0.3 * j ? 1 : 0.3), mitt: true };
+    },
+  };
+
+  // Andan (gänget, oftast när det står och väger på tv:n): alla vänder sig mot tv:n och lutar sig fram,
+  // med händerna knäppta framför munnen (en med handen för munnen) – och håller andan, med axlarna uppe och stilla. Sedan släpper det: en lång utandning, bakåt i
+  // stolen, och de tittar på varandra; en skakar på huvudet.
+  const ANDAN = { fram: [0.3, 1.8], haller: 5.0, slapp: [5.0, 5.9], len: 8.6 };
+  AKTER.andan = {
+    len: ANDAN.len, in: 0.6, ut: 1.0,
+    hand: (o, A, t, l, x) => {
+      const j = rollNr(roller(x), FI(o));
+      const k = bump(l, ANDAN.fram[0] + 0.2 * j, ANDAN.fram[1] + 0.2 * j, ANDAN.slapp[0] + 0.15 * j, ANDAN.slapp[1] + 0.15 * j);
+      if (k <= 0) return null;
+      const m = j !== 1 || fri(o).bench ? AKTER.knappt.hand(o, A, t) : A === fri(o) ? gaspHand(o, A) : null;
+      return m ? bage(handRest(o, A, t), m, k) : null;
+    },
+    kropp: (o, t, l, x) => {
+      const R = roller(x);
+      const j = rollNr(R, FI(o));
+      const fram = bump(l, ANDAN.fram[0] + 0.2 * j, ANDAN.fram[1] + 0.2 * j, ANDAN.slapp[0] + 0.15 * j, ANDAN.slapp[1] + 0.15 * j);
+      const hall = bump(l, ANDAN.fram[1], ANDAN.fram[1] + 0.6, ANDAN.slapp[0] - 0.1, ANDAN.slapp[0] + 0.25);
+      const puh = bump(l, ANDAN.slapp[0] + 0.1 * j, ANDAN.slapp[0] + 0.6 + 0.1 * j, ANDAN.len - 1.6, ANDAN.len - 0.4);
+      const se = bump(l, ANDAN.slapp[1], ANDAN.slapp[1] + 0.4, ANDAN.len - 1.4, ANDAN.len - 0.6);
+      const skak = j === 2 ? bump(l, ANDAN.slapp[1] + 0.5, ANDAN.slapp[1] + 0.7, ANDAN.slapp[1] + 1.7, ANDAN.slapp[1] + 2.0) : 0;
+      return {
+        lean: 0.14 * fram - 0.09 * puh, pitch: -0.02 * fram + 0.08 * puh * (1 - se), yaw: 0.22 * Math.sin((l - ANDAN.slapp[1]) * 7.5) * skak,
+        breath: 0.06 * hall - 0.08 * puh, lift: 1.8 * hall - 1.6 * puh, knee: [-0.06 * hall, -0.04 * hall],
+        se: se > 0.5 ? huvudPa(j === 0 ? R.b : R.a) : TV, seW: 0.85 * Math.max(fram, se), mitt: true,
+      };
+    },
+  };
 
   // ---------- gänget tillsammans: skämtet, grälet och tv:n ----------
   // Rollerna i ett gemensamt påhitt (x: { n, t0 }, samma för alla tre): a
@@ -8071,6 +8514,10 @@ export async function figurer(canvas, opt = {}) {
   // (en blick ut genom fönstret, upp på tv:n, axlarna …) gör man i den stämning man är.
   const AKT_ANSIKTE = {
     stirrar: 'uttrakad', funderar: 'fundersam', nacke: 'nojd', kors: 'sur', dunk: 'deppig', knappt: 'orolig', naglar: 'orolig',
+    bortvand: 'orolig', knogen: 'orolig', etikett: 'orolig', drar: 'orolig', andan: (s, o, x) => (x.l < ANDAN.slapp[1] ? 'orolig' : null),
+    ansiktet: (s, o, x) => (x.l - SAK < ANSIKTE.ner ? 'orolig' : null),
+    // (den som säger det hoppfulla är nöjd tills de andra knackar)
+    tra: (s, o, x) => (traVem(o, x) === 0 && x.l < TRA.b + 0.4 ? 'nojd' : 'orolig'),
     skakar: (s) => (s === 'deppig' ? 'deppig' : 'sur'),
     hakan: (s) => (['orolig', 'deppig', 'sur', 'fundersam'].includes(s) ? s : 'uttrakad'),
     trumma: (s) => (s === 'orolig' || s === 'glad' ? s : 'uttrakad'),

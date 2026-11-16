@@ -1142,6 +1142,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   slutna ögon, och tittar ut i fjärran med en gemensam suck och en klunk var. Samma sätt kommer inte
   tillbaka förrän tre andra har varit. Se [Tobaksaffären](#tobaksaffären), *Gänget gör saker
   tillsammans*.
+- **Gänget nervöst på riktigt (2026-11-16, användarens önskemål):** "Kan du lägga till fler lite nervösa
+  uttryck hos oss tre … bita på naglarna eller ja, dylikt … Försök också att få det att se naturligt ut så de
+  inte ser ut som robotar … naturligt, snyggt och äkta, även emotionellt." Förut var gänget tryggt också när
+  det stod och vägde, och nerverna syntes mest i ansiktet. Nu biter de på naglarna, vänder bort ansiktet från
+  tv:n och kikar tillbaka, trycker näven mot munnen, drar handen över ansiktet, pillar på etiketten och drar
+  hårda bloss – och tillsammans håller de andan mot tv:n och knackar i bordet när någon tar ut segern i
+  förskott. Fingrarna för ögonen provades och ströks: armarna når inte upp till ögonen på de stora huvudena,
+  och handen framför ansiktet såg ut som en vinkning. Se [Tobaksaffären](#tobaksaffären), *Nerverna*.
 - **Gänget dansar italodisco när radion spelar (2026-11-08, användarens önskemål):** "Kan du ge dem
   fler dansmoves när man drar igång radion … Det får gärna ha med italiensk discodance att göra." Nio
   danser i tv-programmens anda runt 1980: härmleken, fingret, armrullen, synten, robotten, axlarna,
@@ -4667,8 +4675,10 @@ påhitt och hur ofta beror på humöret (`MENY`):
   vilar hakan i handen.
 - **Glad** (tre av fyra luckor): lutar sig bakåt med handen i nacken, gungar i takt med
   ölen i luften, sträcker på sig.
-- **Nervös:** biter på naglarna, knäpper händerna framför munnen (om flaskan)
-  och gungar fram och tillbaka, trummar med fingrarna, kliar sig i bakhuvudet.
+- **Nervös** (sex luckor av tio): biter på naglarna, vänder bort ansiktet från tv:n, trycker näven mot munnen,
+  drar handen över ansiktet, pillar på etiketten (DL), drar hårda bloss (DT och DJ), knäpper händerna framför
+  munnen (om flaskan) och gungar fram och tillbaka, trummar med fingrarna, kliar sig i bakhuvudet (se
+  *Nerverna* nedan).
 - **Deppig:** hakan i handen, skakar på huvudet och suckar, armarna i kors med blicken bort
   från bordet, tittar ner i flaskan – och DJ lägger pannan i bordet några gånger.
 
@@ -4741,6 +4751,45 @@ ungefär 1 % av bildens hela arbete, och med processorn fyra gånger långsammar
 8–13 enheter mellan två bilder, mot 14–20 i de gamla. Största hoppet mellan två bilder under tio
 minuter är detsamma som förut, och det kommer från de gamla påhitten.
 
+**Nerverna** (2026-11-16, rum-3d.js; användarens önskemål: "fler lite nervösa uttryck hos oss tre … bita på
+naglarna eller ja, dylikt … så de inte ser ut som robotar … naturligt, snyggt och äkta, även emotionellt"). Förut
+var gänget tryggt också när det stod och vägde (hakan i handen, händerna knäppta, fingrarna som trummar), och
+nerverna syntes mest i ansiktet. Nu syns de i händerna, blicken och benen, men utan teater: det folk gör när
+det står och väger och de inte tänker på att någon ser dem. Det som gör det levande och inte mekaniskt är att
+ingen takt går jämnt – nypen i naglarna, knackningarna och blossen kommer med olika mellanrum varje gång, ur
+påhittets start (`ryckTider`) – att blicken hela tiden dras tillbaka till tv:n, att handen stannar och gör
+något annat mitt i, och att spänningen släpper i en utandning med axlarna som sjunker.
+
+- **Naglarna** (`naglar`): handen upp till munnen med pekfingret krokat mot tänderna, små snabba nyp i ojämn
+  takt med huvudet som rycker en aning med och handen som vrids lite mellan nypen. Mitt i synar hen nageln
+  (handen ut, huvudet ner mot den, tummen som petar på den), tittar upp på tv:n och fortsätter, ibland med
+  tumnageln. Ena benet studsar under bordet.
+- **Orkar inte titta** (`bortvand`): ansiktet vänds bort från tv:n med ögonen hårt stängda och axlarna
+  uppdragna (den som har handen fri håller den för munnen), en kort titt tillbaka halvvägs, bort igen – och
+  till sist dit på riktigt, med en utandning.
+- **Näven mot munnen** (`knogen`): knogarna mot läpparna och blicken stint på tv:n, sakta gungande fram och
+  tillbaka, näven som trycks mot munnen några gånger – och till sist ner i bordet, två lätta slag.
+- **Handen över ansiktet** (`ansiktet`): handen över ögonen med huvudet framåt, dras sakta ner över ansiktet
+  medan huvudet lyfts, och hålls en stund för munnen med blicken på tv:n – sedan en utandning, axlarna ner.
+- **Etiketten** (`etikett`, DL, som har ena handen fri och flaskan i den andra): flaskan står kvar i handen
+  på bordet, och den lediga handen pillar på etiketten med tumnageln, med blicken ner och upp på tv:n emellanåt.
+- **Blossen** (`drar`, DT och DJ): två korta, hårda bloss tätt efter varandra med cigaretten kvar framför
+  hakan och röken ut i mungipan emellan, en lång utandning med huvudet bakåt, och askan av (DT knackar den i
+  askkoppen, DJ knäpper av den).
+
+Handen till ansiktet är handen med fingrar (som i tecknen och zen-stunderna), ställd med en viss fingertopp
+eller knogarna mot munnen (`fingerTopp`, `toppMot`, `lokalMot`). På de yttre platserna, där huvudet är vänt
+mot bordet, tar man armen på den sidan (`nervArm`): den andra måste runt huvudet och hamnade bredvid det. Har
+den handen flaskan eller cigaretten ställs den på bordet först och tas igen sist (`nervHand`, som `zenHand`).
+Fingrarna för ögonen provades och ströks: armarna når inte upp till ögonen på de stora huvudena, och handen
+framför ansiktet såg ut som en vinkning. Under de sekunder ett sådant påhitt pågår ritas handens fingrar (tio
+delar) i stället för den vanliga handen, som i zen-stunderna; annars är det samma delar som förut.
+
+Mellan påhitten blinkar man oftare när det står och väger (var 2,7:e sekund i stället för var 4,2:e,
+`BLINK_NERV`), och i samtalet dras blicken till tv:n en stund i taget (`samtalMal`). Ansiktet är oroligt
+under påhitten (`AKT_ANSIKTE`). Prova med `?rum-humor=nerv&rum-akt=dl:naglar,dt:drar,dj:bortvand` eller
+`dl:knogen,dt:ansiktet,dj:naglar`.
+
 **Ansiktena följer kupongen** (2026-11-08, [public/rum-uttryck.js](public/rum-uttryck.js),
 `ansikten` i rum-3d.js och `senastAv` i rum-folk.js). Hur glada de ser ut beror på hur gängets
 senaste kupong gick, ända tills nästa är spelad. Blev det vinst (tio rätt av tretton på
@@ -4773,7 +4822,7 @@ skägget) och de förra släpps; skrattar de åt ett skämt är det de vanliga s
 
 **Gänget gör saker tillsammans** (2026-11-06, `GRUPP` och `roller` i rum-3d.js): var 31:a
 sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär två gånger av tre
-som vanligt, nästan nio av tio när det går bra, tre av tio när det är nervöst och sällan när
+som vanligt, nästan nio av tio när det går bra, sex av tio när det är nervöst och sällan när
 kupongen är död. Vem som börjar, vem som svarar och hur var och en skrattar räknas ur luckan:
 
 - **Skämtet** (alla lägen): en lutar sig in och berättar med handen och blicken på de andra,
@@ -4790,6 +4839,13 @@ kupongen är död. Vem som börjar, vem som svarar och hur var och en skrattar r
   kors och tittar bort, och den tredje skrattar eller skakar på huvudet.
 - **Tv:n** (som vanligt och nervös): en pekar upp på tv:n, de andra vänder sig dit en efter en
   och tittar en stund; sedan nickar den ena och den andra rycker på axlarna.
+- **Andan** (nervös, också medan matcherna pågår; 2026-11-16, `andan`): alla vänder sig mot tv:n och lutar
+  sig fram en efter en, med händerna knäppta framför munnen (en med handen för munnen), och håller andan med
+  axlarna uppe och stilla. Sedan släpper det: en lång utandning, bakåt i stolen, och de tittar på varandra; en
+  skakar på huvudet.
+- **Peppar, peppar** (nervös, också medan matcherna pågår; 2026-11-16, `tra`): en lutar sig bakåt och säger
+  något hoppfullt med handen ute – den andra vänder sig mot hen och knackar genast tre gånger i bordet med
+  knogarna, den tredje hänger på, och den som sa det knackar hastigt själv. Sedan tittar alla upp på tv:n.
 - **Skålen** (som vanligt och glad) som förut.
 - **Allsången** (glad, 2026-11-08, `SANGER`, `sangVal` och `AKTER.allsang…` i rum-3d.js): de
   sjunger för full hals med munnen öppen och ögonen hopknipna (skrattbilderna), en fras per
