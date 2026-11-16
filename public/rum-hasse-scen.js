@@ -59,12 +59,14 @@ export const SCEN = {
   // upptill och nedtill (UT): tråden drar ut överkanten mot kroken, och nederkanten vilar mot fyllningen.
   LOPSEDEL: { X: 1650, B: 600, NED: 92, UT: [50, 22] },
   // Nacionals flagga (DL:s lag), gammal och blekt, 2026-11-16: den hänger i märlorna i de övre hörnen (IN in från
-  // kanterna) i mässingskrokarna i de två fälten till höger om löpsedelns (KROKAR, x), över stolpen emellan, och går
-  // ut ur bilden till höger. B × H: tyget (58 × 38 cm), UT: hur långt ut från fyllningen det hänger, SAG: hur mycket
+  // kanterna) i mässingskrokarna i fältet till höger om löpsedelns och två fält längre bort (KROKAR, x), över två
+  // stolpar, och går ut ur bilden till höger. B × H: tyget, 112 × 74 cm, så stor som en flagga på en läktare och så
+  // lång att den räcker nästan ned till golvet (förut 58 × 38 cm i krokarna i två fält bredvid varandra, som såg ut
+  // som en vimpel: "otroligt liten", 2026-11-16). UT: hur långt ut från fyllningen den hänger, SAG: hur mycket
   // överkanten sviktar mellan krokarna. Bilden (public/rum/hasse-flagga.webp, scripts/hasse/flagga.mjs) täcker
   // flaggan, krokarna och skuggan, KANT runt om (flaggRuta); sidan lägger den på väggens duk (flagga i rum-hasse.js).
-  // (Den andra kroken, vid x = 3450, finns inte i bakningen; den hänger utanför bilden och ritas med flaggan.)
-  FLAGGA: { KROKAR: [2550, 3450], IN: 30, B: 960, H: 640, UT: 26, SAG: 46, KANT: 70 },
+  // (Den andra kroken, vid x = 4350, finns inte i bakningen; den hänger utanför bilden och ritas med flaggan.)
+  FLAGGA: { KROKAR: [2550, 4350], IN: 30, B: 1860, H: 1240, UT: 26, SAG: 80, KANT: 70 },
 };
 
 // Flaggans bild i barens mått: övre vänstra hörnet (x0, y0), bredden och höjden, och topp: tygets överkant vid
