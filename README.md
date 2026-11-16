@@ -1621,6 +1621,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   oskarp som utsikten, och bilarna i den bortre filen hamnade högt ovanför räcket. Nu är trafiken lika oskarp
   längs hela bron, 0,8 av utsiktens, och körbanan lutar mindre, så att båda filerna står på bron bakom räcket. Se
   [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som gatan i rummet*.
+- **Bilarna i rummet och bakom Hasse Backe som framför affären (2026-11-16, användarens önskemål):** "Kan du på något
+  sätt ordna så att bilarna som kör förbi utanför animationsbilden och bilden med hasse - liknar de som kör förbi vid
+  ytterbilden. Tänk på att det inte ska dra för mkt grafik!" På gatan genom fönstret och på S:t Eriksbron bakom
+  honom kör nu fasadens fordon: samma nittiotalsbilar (Volvo 240, 740 och 850, Saab, Golf, Mercedes, Kadett, Amazon,
+  Bubblan …), skåpbilar, taxi, bussar och plogbil, i samma lack och lottade och ritade med samma kod som framför
+  affären (`RumFasadGatan.fordon` och `rita` i rum-fasad-gatan.js), i gatans respektive utsiktens ljus. Förut var det
+  egna, nyare bilar (stadsjeepar, halvkombi i dagens färger). Varje fordon ritas en gång i sin bild, som förut, och
+  sedan läggs bara bilden ut: gatans lager ritas om på 3,4 ms i stället för 4,7, och på bron är det färre bilder per
+  fordon (4,8 i stället för 5,9) att lägga ut i varje bildruta. Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -6719,14 +6728,15 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
   snö. Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
   fler bilar i rusningen och färre på natten (fler taxi då), och på helger och röda dagar ingen
-  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna är olika sorter
-  (sedan, kombi som en gammal Volvo, halvkombi, stadsjeep, Saab, skåpbil och taxi med
-  taklampa) och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
+  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna, bussarna och plogbilen är
+  fasadens (sedan 2026-11-16, rum-fasad-gatan.js: nittiotalets bilar i Stockholm, skåpbilar och taxi med
+  taklampa), i gatans ljus, och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
   Eriksbron kommer i båda riktningarna med några minuters mellanrum: röda 3:an eller 77:an
   och blåa ledbussen 4:an. I en fil åker alla lika fort på ett band med luckor, så att ingen
   kör igenom någon annan (bussarna och plogbilen har varsin lucka och kommer var m:e varv),
   och fordonen ritas en gång och glider bara: de kostar mindre än förut, då de gungade och
-  ritades om i gängets takt (`FORM`, `fordon` och trafiken i `gatliv` i rum-ute.js).
+  ritades om i gängets takt (trafiken i `gatliv` i rum-ute.js). I SVG:n står bara en tom grupp per fordon, som ritas med
+  fasadens kod när figuren görs till en bild (`fordonsFigur`, `delar`).
 - **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och
   orange på hösten och kala annars; löv blåser förbi och ligger på trottoaren på hösten, plogbilen när
   det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till
@@ -8519,8 +8529,8 @@ cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på and
 torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
 står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, ungefär som man ser bron härifrån,
 så att körbanan syns som en smal yta bakom räcket; sedan 2026-11-16 0,16 i stället för 0,28, se *Trafiken som
-gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
-fronten eller baken upp till där ovansidan tar vid, och ovansidan i raka bitar ur karossens överkant (`topp`:
+gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är fasadens (sedan 2026-11-16, rum-fasad-gatan.js) och några bilder som ritas en gång: sidan (ritad med fasadens kod, `scen`),
+fronten eller baken upp till där ovansidan tar vid (nittiotalets svarta stötfångare med skylten, strålkastarna med grillen emellan eller baklyktorna, i fasadens mått, `matt`), och ovansidan i raka bitar ur karossens överkant (`topp`:
 motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
 plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
 avbildning för fordonet, så att de möts, och var bit fortsätter en bit in under den som ritas efter, så att

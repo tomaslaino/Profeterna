@@ -477,17 +477,16 @@ window.RumHasse = (() => {
     const cykel = k[0] === 'c';
     const buss = k[0] === 'f' || k[0] === 't';
     const meter = k[0] === 'f' ? 18.1 : k[0] === 't' ? 12.1 : cykel ? 1.75 : 4.8;
-    if (forbi > (cykel ? 60 : 40) || !(cykel ? H.ute.cyklist : H.ute.fordon) || !RumUte.trafik) return { meter };
+    if (forbi > (cykel ? 60 : 40) || !(cykel ? H.ute.cyklist : H.ute.fordon) || !RumUte.trafik || (!cykel && !window.RumFasadGatan)) return { meter };
     const ifil = aktiva.filter((x) => x.fil === fil);
     if (ifil.length >= (cykel ? BRO_MAX.cykel : BRO_MAX.fil)[steg()]) return null;
     // (en tom fil får nytt tempo efter klockan)
     if (!ifil.length) B.fart[fil] = cykel ? broCykelFart() : broFart(n.T);
     let g;
     if (cykel) g = H.ute.cyklist(n.v, n.L, lage, fil);
-    else {
-      const a = !buss ? RumUte.trafik.bil(Math.random, n.T.natt) : k[0] === 'f' ? { kind: 'ledbuss', c: '#2468b8', nr: '4' } : { kind: 'buss', c: '#c0262a', nr: Math.random() < 0.5 ? '3' : '77' };
-      g = H.ute.fordon(n.v, n.L, lage, a, fil);
-    }
+    // (fasadens fordon, rum-fasad-gatan.js: fyran är ledbussen, trean och 77:an de röda)
+    else g = H.ute.fordon(n.v, n.L, lage, !buss ? null : k[0] === 'f' ? 'ledbuss' : 'buss', fil, n.T);
+    if (!g) return { meter };
     const sek = g.vag / B.fart[fil];
     if (forbi < sek) B.aktiva.push({ k, fil, g, lage, t0: nu - forbi * 1000, sek });
     return { meter: g.meter };
