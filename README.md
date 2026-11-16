@@ -1362,6 +1362,22 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   december, och bland de andra landslagströjan i värmen, magväskan och julklappar i en kasse före jul. Lika många
   syns samtidigt som förut, och de nya kostar lika mycket per figur som de gamla. Se *Det som händer ute* under
   [Fasaden](#fasaden).
+- **Fler sätt att gå, och naturligare (2026-11-16, användarens önskemål):** "Kan du få karaktärerna som går utanför
+  tobaksbutiken att gå på fler olika sätt och att det ser naturligt ut? Ja, om de kan variera och få det att se
+  naturligt ut så vore det super." Fem nya sätt som skiljer sig i själva rörelsen, inte bara i steglängd och takt:
+  springer (i luften mellan stegen, landar på mitten av foten, knät högt fram och armarna böjda; joggare morgon och
+  kväll, någon som springer i regnet eller till bussen i rusningen), med käpp (en del äldre: käppen går med det bortre
+  benet och står still mot stenen medan kroppen går förbi), halkar (på snö kring nollan eller blött i minusgrader går
+  sex av tio försiktigt: korta steg med hela foten, böjda knän och armarna ute), trippar (korta, snabba steg, en del
+  med kjol) och släntrar (långa, sega steg, bakåtlutad, armarna svänger löst, axlarna rullar och huvudet nickar). Var
+  och en svänger dessutom armarna på sitt sätt (hur böjda, hur långt fram och i vilken takt), och ibland är bara den ena
+  handen i fickan, också när den andra bär påsen eller paraplyet. Se *Det som händer ute* under [Fasaden](#fasaden).
+- **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
+  som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
+  långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
+  fönster, bilarna kör ungefär 60 % så fort (de syns i fyra–fem sekunder), och var och en kör som en bil: släpper
+  gasen, bromsar in med bromsljusen tända och tar fart igen, stannar ibland en stund, följer den framför och niger när
+  den bromsar. Se *Bilarna kör ute på gatan, och som bilar* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7019,7 +7035,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
   (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
   barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
-  tidningen i regnet och hundar (labrador, schäfer, tax, terrier och pudel, `HUNDAR`; de små i täcke när det regnar).
+  tidningen i regnet, någon som joggar morgon och kväll (`joggare`: myskläder i färgblock eller shorts och t-shirt,
+  gympadojor, pannband och ibland en gul sportfreestyle) och hundar (labrador, schäfer, tax, terrier och pudel,
+  `HUNDAR`; de små i täcke när det regnar).
   Det är 90-tal och kläderna är efter vädret (`klad`, `F90`, `vadret`): vindjackor och myskläder i färgblock, dunjackor
   med stickningar, skinnjackor, bomberjackor, jeansjackor, fältjackor, trenchcoats, kappor och kavajer, vida jeans,
   kjolar, bakvända kepsar, fiskarhattar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar, portföljer
@@ -7045,11 +7063,12 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   ärmkant), och magväskan och julklappar i en papperskasse (före jul) finns bland de andra. De ritas med samma sorts
   delar som de andra: i en bromsad provmiljö (headless Chrome, processorn ×4) 650–940 µs per figur och bild mot
   610–1350 för de gamla sorterna, och lika många syns samtidigt som förut. `?rum-fasad-vem=inlines` (eller `rullator`,
-  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `hund`, `cykel` …) låter alla som går förbi vara sådana,
+  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `cykel` …) låter alla som går förbi vara sådana,
   för bilder och prov. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
-  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och bara
-  den som har båda händerna lediga kan ha dem i fickorna. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
+  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
+  käppen är i den närmre. En ledig hand kan vara i fickan, ibland bara den ena (`st.ficka`: F, B eller båda), också
+  när den andra bär påsen eller paraplyet. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
   framför fönstret (`randLjus`), och speglas svagt i den våta stenen; kläderna behåller en fjärdedel av sin färg
   (`NATTF`, `klarL`), så att en röd dunjacka går att skilja från en svart kappa. Där det är mörkt är de lika mörka som mörkret
@@ -7065,10 +7084,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   efter hur långt den har gått, diagonala ben i par och tassen stilla mot stenen, med kopplet i en stilla hand; hjulen
   på barnvagnen, cykeln och dragkärran rullar på samma sätt. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
   (långa steg, snabbt, framåtlutad, stora armsvingar), strosar (korta steg, långsamt, ofta händerna i fickorna),
-  studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram) och rak (upprätt, raka
-  knän), och var och en lite olika inom sitt sätt (steglängd, takt, lutning, armsving); farten är steglängden gånger
-  takten, 0,9–1,6 m/s. Sättet passar den som går (den äldre strosar, barnet studsar, den som blir blöt skyndar sig) och
-  ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
+  studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram), rak (upprätt, raka
+  knän), trippar (korta, snabba steg och små armrörelser) och släntrar (långa, sega steg, bakåtlutad, armarna svänger
+  löst och axlarna rullar med dem, `rull`, och huvudet nickar en gång per steg, `nick`). Tre skiljer sig mer: på halkan
+  sätts hela foten i på en gång (`hal`), stegen är korta och knäna böjda, foten går lågt och armarna hålls ute framför
+  kroppen (`armar: 'balans'`); med käpp går den äldre framåtböjd med korta steg, och käppen i den närmre handen går med
+  det bortre benet (`kappen`): spetsen sätts i en bit framför där den bortre hälen sätts i, står still mot stenen medan
+  kroppen går förbi och förs fram i en låg båge, och armen böjs i armbågen så att handen håller handtaget; och den som
+  springer är i luften mellan stegen (`lop`: höften lägst mitt i steget, när knät tar emot), landar på mitten av foten,
+  för låret långt fram och drar tillbaka det innan foten tar i (`drive`) och pumpar med böjda armar (utom den som bär
+  något i handen). Var och en är lite olika inom sitt sätt (steglängd, takt, lutning, armsving, och hur böjda armarna
+  är, hur långt fram de svänger och i vilken takt); farten är steglängden gånger takten, 0,7–1,6 m/s, och 2,8–3,3 m/s
+  för den som springer. Sättet passar den som går (den äldre strosar och ibland med käpp, barnet studsar, den unga
+  släntrar ibland, med kjol trippar en del, den som blir blöt skyndar sig och ibland springer, och i rusningen
+  springer någon till bussen), på halkan (`vadret`: snö på marken kring nollan, eller blött i minusgrader) går de
+  flesta i ett sällskap försiktigt, utom barnen, och ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
   fyra gånger så långsam processor kostar fler figurer 0,2 ms mer per bild på dagen och 0,5 ms mer i kvällsregn som
   telefon, och ungefär 3 ms mer i kvällsregn i datorn (2026-11-16).
   Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
@@ -7100,19 +7130,36 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke,
   skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
-  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
-  gånger så fort som de som går på skärmen, så att en bil syns i ungefär tre sekunder (förut knappt två).
-  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 14 % på dagen och 31 % i
-  rusningen), och i rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in, står med bromsljusen tända (och
-  avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
+  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
+  som de som går på skärmen, så att en bil syns i fyra–fem sekunder (se *Bilarna kör ute på gatan, och som bilar*
+  nedan). Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 18 % på dagen och
+  40 % i rusningen), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
+  bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
   regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
   när det har snöat. Allt räknas ur tiden: den delas i luckor om tolv sekunder per fil och i varje lucka kommer ett
   fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon kommer
-  bara när de i de två luckorna före är ute ur världen, så ingen kör igenom någon. Andra vyer som vill rita samma
+  bara om det aldrig hamnar för nära något som kör före, så ingen kör igenom någon. Andra vyer som vill rita samma
   fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
   efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
   sekunden (30 i telefonen), så att de inte hoppar fram.
+- **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "bilarna verkar åka på samma höjd som
+  gångarna", "åker något långsammare … svårt att se dem" och "de ska bete sig som vanliga bilar". Filerna ligger nu
+  1,3 och 1,72 m ut (förut 1,02 och 1,24, alldeles innanför trottoarkanten, så att hjulen stod i höjd med fötterna på
+  dem som går), med mittlinjen 1,51 m och kanten mittemot 2,02 m ut, och i ett brett fönster syns marken ut till
+  1,95 m (`SYNS`; `vy` i rum-fasad.js tar hälften av det som fattades nertill genom att visa mer och hälften från
+  överkanten). Farten är ungefär 60 % av förut (2,1–2,7 m/s på dagen i den tecknade gatan, 1,9–2,4 i rusningen,
+  2,5–3,2 på natten, bussarna 1,8–2,2), så att en bil syns i fyra–fem sekunder i stället för två–tre, och det kommer
+  ungefär en fjärdedel färre, så att skyltfönstret inte skyms mycket mer än förut. Var och en har sin färd (`D` i
+  rum-fasad-gatan.js: delar med jämn acceleration, `kor`): de flesta kör förbi i jämn fart, men framför affären
+  släpper ibland föraren gasen (utan bromsljus), bromsar in med bromsljusen tända och tar fart igen, eller stannar och
+  står en stund (bussarna stannar inte, plogbilen kör jämnt); oftare i rusningen, sällan på natten. Den som kör efter en
+  annan gör som den, en stund senare och på samma ställe (`efter`, som i Newells modell), så att bromsljusen tänds
+  efter varandra, och ett fordon kommer bara om det aldrig hamnar för nära något framför (`haller`). Karossen niger när
+  de bromsar och reser sig när de tar fart, genom fjädringen: en dämpad svängning efter varje ändring av
+  accelerationen, så att den gungar tillbaka när bilen stannar (`fjader`, `niga`; hjulen står kvar). Provat i en
+  simulering av en timme i varje tid på dygnet (inga fordon i varandra) och i bilder från datorn och telefonen, dag,
+  regnig kväll och snö.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -7120,7 +7167,7 @@ som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som
 duk står då i skyltfönstret och tonar fram där när rummet har dolts (0,42 s in). När man går in står den kvar i
 0,15 s, medan fasaden ännu täcker rummet, och ritas sedan inifrån innan rummet syns. Scenen ritas i meter-skala på fasaden och
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
-bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är fyra SVG:er, en
+bron och himlen och gatan ut till den närmre filen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är fyra SVG:er, en
 mellan varje duk (himlen; bortom bron och rummet; fönstret, neonen, glaset, huset, bron, marken, gatan och texten;
 kvällens ljus), som ritas om när ljuset eller vädret ändras (en gång i minuten prövas det); när det finns högtidspynt
 delas den tredje vid pyntets dukar, mellan neonen och glaset (`pyntBilder` tar fram pyntet innan scenen byggs). Scenen är i fönstrets
