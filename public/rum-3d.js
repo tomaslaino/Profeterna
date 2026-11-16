@@ -455,7 +455,7 @@ export async function figurer(canvas, opt = {}) {
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
   // (kameran ute på trottoaren, utifran nedan)
-  const UTE = { kam: null, neon: 1, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
+  const UTE = { kam: null, neon: 1, n: 0, krympt: false, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
   // Ögat, där betraktaren står (OGA: gänget tittar dit, looks), flyttas efter musen (draw), och bilden
   // förskjuts så att djupet OGA_Z står kvar (en bit av en större bild, som när duken inte är mitt i).
   // Ljuset står kvar, som när man själv rör sig: förut vreds gänget och skuggorna mot lamporna. NARA är
@@ -8478,10 +8478,11 @@ export async function figurer(canvas, opt = {}) {
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
     if (UTE.kam) r.render(scene, UTE.kam);
     else {
+      inneStorlek();
       sikta();
       r.render(scene, cam);
     }
-    if (Q.skugga > 1 && Q.n++ % Q.skugga === 0) skuggaSen();
+    if (!UTE.kam && Q.skugga > 1 && Q.n++ % Q.skugga === 0) skuggaSen();
     if (ombyggda.length) slappOmbyggda();
   }
 
@@ -8493,9 +8494,16 @@ export async function figurer(canvas, opt = {}) {
   // (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre på ryggarna än på ansiktena inifrån.
   // Rummet står still under tiden (Rum.vila) och ritas som vanligt igen när man går in. Rutan som kopieras är
   // STORRE gånger glaset (samma mitt och nederkant), så att gänget blir lika stort som de som går förbi ute.
+  // Bara glaset ritas, med fasadens dukens bildpunkter (högst så många som förut, kval): kameran ser glaset
+  // och inget annat (ett snett synfält, eftersom ögat inte står mitt för det), i dukens nedre hörn. Medan
+  // rummet står still krymper duken till just det (UTE.krympt), så att inget annat i den kostar något, och
+  // draw ger den rummets storlek igen när gänget ritas inifrån (inneStorlek). Förut ritades hela duken, två
+  // till tre gånger fler bildpunkter än glaset, och därför bara några gånger i sekunden: gänget hackade fram.
   //   utifran(duk, t, neonPa, hem) → true om något ritades (hem: duken ritas sedan inifrån igen, medan rummet syns)
   const FONSTER = { x0: -615, x1: 185, y0: SILL - 4, y1: SILL + 509, z: -150, oga: [-110, 140, -2300] };
   const STORRE = 1.25;
+  const UTE_VP = new THREE.Vector4();
+  const UTE_SZ = new THREE.Vector2();
   function utifran(duk, t, neonPa, hem = false) {
     const g = duk && duk.getContext('2d');
     if (!g || !canvas.width || !canvas.height) return false;
@@ -8504,41 +8512,67 @@ export async function figurer(canvas, opt = {}) {
     const mx = (F0.x0 + F0.x1) / 2;
     const F = { x0: mx - (mx - F0.x0) * STORRE, x1: mx + (F0.x1 - mx) * STORRE, y0: F0.y0, y1: F0.y0 + (F0.y1 - F0.y0) * STORRE, z: F0.z, oga: F0.oga };
     const [ex, ey, ez] = F.oga;
-    const d = F.z - ez;
-    // (ut åt sidorna och uppåt från ögat, som tangens; världens +x är till vänster sett utifrån)
-    const tx = Math.max(ex - F.x0, F.x1 - ex) / d;
-    const ty = Math.max(F.y1 - ey, ey - F.y0) / d;
-    K.aspect = canvas.width / canvas.height;
-    const tv = Math.max(ty, tx / K.aspect) * 1.02;
-    K.fov = 2 * Math.atan(tv) / DEG;
+    // (glasets kanter sedda från ögat, på närplanet; världens +x är till vänster sett utifrån)
+    const n = K.near / (F.z - ez);
     K.position.set(ex, ey, ez);
     K.lookAt(ex, ey, ez + 1000);
-    K.updateProjectionMatrix();
     K.updateMatrixWorld();
+    K.projectionMatrix.makePerspective((ex - F.x1) * n, (ex - F.x0) * n, (F.y1 - ey) * n, (F.y0 - ey) * n, K.near, K.far);
+    K.projectionMatrixInverse.copy(K.projectionMatrix).invert();
+    // bildpunkterna: dukens, men inte fler än glaset fick när hela duken ritades (H gånger prNu, efter kval)
+    const q = Math.min(1, H * prNu / duk.height);
+    let vw = Math.max(1, Math.round(duk.width * q));
+    let vh = Math.max(1, Math.round(duk.height * q));
+    if (hem || NARA) {
+      inneStorlek();
+      const k = Math.min(1, canvas.width / vw, canvas.height / vh);
+      vw = Math.max(1, Math.floor(vw * k));
+      vh = Math.max(1, Math.floor(vh * k));
+    } else if (canvas.width !== vw || canvas.height !== vh) {
+      UTE.krympt = true;
+      r.setPixelRatio(1);
+      r.setSize(vw, vh, false);
+    }
+    const pr = r.getPixelRatio();
+    r.setViewport(0, 0, vw / pr, vh / pr);
+    r.getCurrentViewport(UTE_VP);
     const fang = catcher.visible;
     catcher.visible = false;
     UTE.kam = K;
     UTE.neon = 0.3;
+    // (skuggorna räknas om var fjärde gång, i samma bild: härifrån syns de knappt, och på steg 0 var
+    // de en fjärdedel av arbetet)
+    const au = r.shadowMap.autoUpdate;
+    r.shadowMap.autoUpdate = false;
+    if (UTE.n++ % 4 === 0) r.shadowMap.needsUpdate = true;
     try {
       draw(t, 0, 0, neonPa);
     } finally {
       UTE.kam = null;
       UTE.neon = 1;
       catcher.visible = fang;
+      r.shadowMap.autoUpdate = au;
     }
-    // glaset i dukens bildpunkter
-    const th = tv * K.aspect;
-    const px = (x) => (1 - (x - ex) / (d * th)) / 2 * canvas.width;
-    const py = (y) => (1 - (y - ey) / (d * tv)) / 2 * canvas.height;
-    const sx = px(F.x1);
-    const sy = py(F.y1);
+    // (glaset ligger i dukens nedre vänstra hörn: WebGL räknar nerifrån)
     g.clearRect(0, 0, duk.width, duk.height);
-    g.drawImage(canvas, sx, sy, px(F.x0) - sx, py(F.y0) - sy, 0, 0, duk.width, duk.height);
+    g.drawImage(canvas, UTE_VP.x, canvas.height - UTE_VP.y - UTE_VP.w, UTE_VP.z, UTE_VP.w, 0, 0, duk.width, duk.height);
+    if (hem || NARA) {
+      r.getSize(UTE_SZ);
+      r.setViewport(0, 0, UTE_SZ.x, UTE_SZ.y);
+    }
     if (hem) {
       sikta();
       r.render(scene, cam);
     }
     return true;
+  }
+  // gängets duk i rummets storlek igen (eller närbildens, narbild), efter att ha varit krympt till glaset
+  function inneStorlek() {
+    if (!UTE.krympt) return;
+    UTE.krympt = false;
+    r.setPixelRatio(NARA ? NARA.pr : prNu);
+    if (NARA) r.setSize(NARA.w, NARA.h, false);
+    else r.setSize(W, H, false);
   }
 
   // Skuggorna för sig, när de räknas om mer sällan än gänget ritas (skugga i KVAL
@@ -8585,6 +8619,8 @@ export async function figurer(canvas, opt = {}) {
   const T0 = parseFloat(getComputedStyle(canvas).top) || 0;
   function narbild(ruta) {
     if (!ruta && !NARA) return;
+    // (duken får sin storlek här, också om den var krympt till glaset, utifran)
+    UTE.krympt = false;
     if (ruta) {
       // (längsta sidan högst 2880 bildpunkter)
       const pr = Math.min(ruta.pr, 2880 / Math.max(ruta.w, ruta.h));
@@ -8700,7 +8736,8 @@ export async function figurer(canvas, opt = {}) {
     const p = Math.max(0.75, Math.min(PR, PR * pr));
     if (p !== prNu) {
       prNu = p;
-      if (!NARA) {
+      // (krympt till glaset, utifran: storleken inne kommer med inneStorlek)
+      if (!NARA && !UTE.krympt) {
         r.setPixelRatio(p);
         r.setSize(W, H, false);
         // (en duk som får ny storlek är tom: annars blinkar gänget bort till nästa bild)
