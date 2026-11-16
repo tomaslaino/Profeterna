@@ -55,6 +55,33 @@ const LANDSLAG_HISTORIK = [
   { slug: 'fifa.friendly', namn: 'Vänskapslandskamp', short: 'VSK', months: ['2025-03', '2025-06', '2025-09', '2025-10', '2025-11', '2026-03', '2026-05', '2026-06'] },
 ];
 
+// Månaderna från och med fran till och med till ('2021-11', '2024-12').
+function manader(fran, till) {
+  const ut = [];
+  let [y, m] = fran.split('-').map(Number);
+  for (; `${y}-${String(m).padStart(2, '0')}` <= till; m === 12 ? (y++, m = 1) : m++) ut.push(`${y}-${String(m).padStart(2, '0')}`);
+  return ut;
+}
+
+// Äldre landskamper, bara för mötena (sedan 2026-11-16, användarens fråga
+// "kan man ha mötena de senaste fem åren?"): från november 2021 fram till där
+// LANDSLAG_HISTORIK börjar. De står utanför formen och lagens siffror, som
+// börjar hösten 2024. ESPN har dem under samma slugs, och EM 2024 under
+// `uefa.euro` (verifierat 2026-11-16). Vänskapsmatcherna alla månader fram
+// till säsongen – de spelas också i januari och december, som
+// LANDSLAG_HISTORIK hoppar över (samma match två gånger räknas en gång).
+const LANDSLAG_MOTEN = [
+  { slug: 'fifa.worldq.uefa', namn: 'VM-kval', short: 'VMK', months: ['2021-11', '2022-03', '2022-06'] },
+  { slug: 'uefa.nations', namn: 'Nations League', short: 'UNL', months: ['2022-06', '2022-09', '2023-06', '2024-03'] },
+  { slug: 'fifa.world', namn: 'VM', short: 'VM', months: ['2022-11', '2022-12'] },
+  { slug: 'uefa.euroq', namn: 'EM-kval', short: 'EMK', months: ['2023-03', '2023-06', '2023-09', '2023-10', '2023-11', '2024-03'] },
+  { slug: 'uefa.euro', namn: 'EM', short: 'EM', months: ['2024-06', '2024-07'] },
+  { slug: 'fifa.friendly', namn: 'Vänskapslandskamp', short: 'VSK', months: manader('2021-11', '2026-06') },
+];
+
+// Mötena: alla möten mellan lagen de senaste MOTEN_AR åren före avspark.
+const MOTEN_AR = 5;
+
 // Innevarande säsong. ESPN hämtas månad för månad (datumintervall ger
 // HTTP 400, månadsformatet YYYYMM fungerar – verifierat 2026-10-17).
 const SEASON = {
@@ -100,4 +127,4 @@ function isIntl(id) {
   return INTERNATIONAL.some((c) => c.id === id);
 }
 
-module.exports = { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, LANDSLAG_HISTORIK, SEASON, HISTORY, fdSeasonCode, competition, isIntl };
+module.exports = { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, LANDSLAG_HISTORIK, LANDSLAG_MOTEN, MOTEN_AR, SEASON, HISTORY, fdSeasonCode, competition, isIntl };

@@ -1291,6 +1291,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   hyllan syns, gänget i rätt storlek), C de som går förbi (formade figurer, siluetter med ljus i kanten, speglade i
   stenen, ibland någon som stannar och tittar in) och D allt som rör sig i dukar i stället för ett trettiotal
   CSS-animeringar. Se [Fasaden](#fasaden).
+- **De som går förbi går som folk (2026-11-16, användarens önskemål):** "kan du ordna så att det ser naturligt ut när
+  de här personerna går förbi - just nu flyter de liksom fram. Gör det på ett snyggt sätt - utan att det kostar så mkt
+  grafik för sämre datorer/mobiler". Foten i marken står still mot stenen, höften gungar, knät och fotleden böjs och
+  armarna pendlar; allt i samma duk som förut, ungefär 4 µs mer per figur och bild. Se *Det som händer ute* under
+  [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6678,7 +6683,13 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   (`RumUte.trafik`), klädda efter vädret, med paraply (med spröt och droppar) i regn, mössa, keps eller hatt och halsduk
   i kyla, väska och ibland hund. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
-  framför fönstret (`randLjus`), och speglas svagt i den våta stenen. Ibland (i ungefär sex av tio varv om 170 s, inte
+  framför fönstret (`randLjus`), och speglas svagt i den våta stenen. De går som folk (`gangen`, `stalln`): foten som
+  står på marken står still mot stenen medan kroppen går fram – hälen slår i, foten rullar över till tån och lyfts – och
+  höften gungar ungefär 4 cm en gång per steg, knät böjs upp till 55° när benet förs fram, armarna pendlar emot benen
+  med armbågen lite böjd, paraplyet gungar med i stegen och hunden travar fyra steg på ett, med kopplet i en stilla
+  hand. Gångcykeln räknas ut en gång (var foten är, och vinklarna i höften, knät och fotleden därifrån) och var i den en
+  figur är tas av hur långt den har gått, så att fötterna står still hur ofta duken än ritas om (förut svängde benen i
+  halva takten och fötterna gled fram, "de flyter liksom fram", 2026-11-16). Ibland (i ungefär sex av tio varv om 170 s, inte
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
   13 s, och går vidare (`stannar`, `bakDelar`) – där skivan med löpsedlarna hänger, så att gänget syns, och utan
   paraply, som skulle skymma skylten. Bilarna och bussarna på gatan bakom en syns som speglingar som far förbi i glaset
@@ -7206,7 +7217,8 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   (2026-11-12, användarens val bland fyra skisser: *Arket*, *Skalan*, *Noterat* och *Lyser*).
   Det gäller *Formen* (minst två poäng på fem matcher), *Vilan* (minst två dagar, samma regel
   som ringen på tavlans almanacksblad; förut stod det tröttare lagets dagar omvänt),
-  *Styrka* (0,15), *Mot oddsen* (1,5 poäng), *Mål* (0,25 mål per match), *xG* (0,2) och
+  *Styrka* (0,15), *Mot oddsen* (1,5 poäng), *Mål* (0,25 mål per match), *xG* (0,2), xG-flikens
+  *Skapar* och *Släpper till* (0,15 per match) och skotten på mål (0,5 per match) och
   *Favorit* (15 procentenheter) – gränserna står i `SKILJER` i
   [public/rum-register.js](public/rum-register.js). *Kryssar*, *Tur*, *Motståndet*, *Nästa*
   och *Skytten* säger inte vem som är bättre och står alltid som vanligt. Talen som räknas
@@ -7405,7 +7417,7 @@ som finns för dem: matchens fil och [data/landslag.json](#landskamperna).
   (V-O-F och mål per match), *Alla landskamper sedan sep 2024* (matcher, V-O-F och mål per match,
   också VM, VM-kvalet och vänskapsmatcherna) och *Marknaden*: chansen för 1 och 2 ur oddsen utan
   spelbolagets marginal, med krysset under och *ur oddsen, inte modellen* där raden ryms –
-  modellen känner bara lagen i England. Sist de senaste mötena (sedan hösten 2024). En rad som
+  modellen känner bara lagen i England. Sist mötena de senaste fem åren. En rad som
   saknas för båda lagen står inte med. Det bättre talet lyser som för klubbarna (`SKILJER`:
   poängen i gruppen 3, poäng per match 0,5, målen 0,25 och marknadens chans 15
   procentenheter); poängen jämförs bara inom samma grupp.
@@ -7454,6 +7466,17 @@ bland tre skisser i den riktiga närbilden:
   (`lastMeeting` i [src/matches.js](src/matches.js)): det senaste mötet i någon tävling högst
   183 dagar före avspark, med lagens siffror ur 365Scores och, för ligorna, ur
   football-data.co.uk när 365Scores saknar matchen (då utan bollinnehavet och chanserna).
+- **Mötena de senaste fem åren** (sedan 2026-11-16, "kan man ha mötena de senaste 5 åren?"):
+  listan under förra mötet i MÖTENA, och *Tidigare möten* på matchbladet, har alla möten mellan
+  lagen de fem åren före avspark i stället för de elva senaste. `pastMeetings` i matchens fil
+  (`pastMeetings` och `landMeetings` i [src/matches.js](src/matches.js), `MOTEN_AR` i
+  [config/competitions.js](config/competitions.js)) har dem: för klubbarna ligorna och FA-cupen
+  ur historiken (tidigare de sex senaste, hur gamla de än var), för landslagen också de äldre
+  landskamperna från november 2021 – VM-kvalet, Nations League 2022/23, VM 2022, EM-kvalet,
+  EM 2024 och vänskapsmatcherna – ur den nya källan `espn_land_moten` (`LANDSLAG_MOTEN`, en
+  hämtning i månaden). De står bara i mötena; formen och lagens siffror börjar som förut
+  hösten 2024. Tjeckien–Spanien får så sina två möten i Nations League 2022 och Polen–Sverige
+  VM-kvalfinalen 2022.
 - **Hemma och borta** ("Tottenham hemma har 64 % bollinnehav i snitt, xG 2,2 och har tagit poäng
   mot lag som ligger över dem"; *Avsnittet*): överst i MÅLEN står hemmalagets ligamatcher
   hemma mot bortalagets borta – *V-O-F*, *Poäng/match*, *Mål*, *xG*, *Bollinnehav*, *Lag
@@ -7500,6 +7523,15 @@ bland tre skisser i den riktiga närbilden:
   står still när man byter flik; MÖTENA har förra mötet kvar som dragkamp. Staplarna är klasserna
   `sv`, `so` och `sf` i [public/rum-register.css](public/rum-register.css), och skärmen i rummet
   ritar dem själv ([public/rum-dator.js](public/rum-dator.js)).
+- **xG-fliken med en rad per tal** (2026-11-16, användarens val *A Raderna* bland tre skisser –
+  *Raderna*, *Raderna och tallinjen* och *Spalterna* – och rubriken med lagkortets ord för talen
+  mot chanserna): paren *1,5–0,2* såg ut som resultat och tvingade fram fyra tal i kors. Nu har
+  varje tal en egen rad där det bättre lyser, under rubrikerna *xG PER MATCH* (*Skapar*,
+  *Släpper till*) och *SKOTT PÅ MÅL PER MATCH* (*Skjuter*, *Släpper till*). Under *MOT
+  CHANSERNA* står *Gjorda mål* och *Insläppta mål* mot xG, *Tur* och *Kryssar* med lagkortets
+  ord, så att tecknen läses som en mening (*Insläppta mål −0,2*: färre än chanserna var
+  värda). Talen är desamma som förut; klubbarnas skott och mål mot xG kommer som förut ur
+  matchens fil, landslagens ur Nations Leagues lagfil. Ett avsnitt utan tal står inte.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står

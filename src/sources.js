@@ -5,7 +5,7 @@
 // (staleAfterHours). Metadatan (leverantör, vad den ger, verifieringsdatum)
 // visas i källtabellen – samma uppgifter som README:ns källtabell.
 
-const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, LANDSLAG_HISTORIK, SEASON, HISTORY, fdSeasonCode } = require('../config/competitions');
+const { COMPETITIONS, NATIONAL_LEAGUE, EUROPE, INTERNATIONAL, LANDSLAG_HISTORIK, LANDSLAG_MOTEN, SEASON, HISTORY, fdSeasonCode } = require('../config/competitions');
 const espn = require('./fetchers/espn');
 const fdcouk = require('./fetchers/fdcouk');
 const understat = require('./fetchers/understat');
@@ -146,6 +146,32 @@ SOURCES.push({
   fetch: async () => {
     const turneringar = [];
     for (const t of LANDSLAG_HISTORIK) {
+      turneringar.push({ slug: t.slug, namn: t.namn, short: t.short, matches: await espn.fetchPlayed(t.slug, t.months) });
+    }
+    return { turneringar, sourceUrl: 'https://www.espn.com/soccer/schedule/_/league/uefa.nations' };
+  },
+  summarize: (d) => {
+    const n = d.turneringar.reduce((t, x) => t + x.matches.length, 0);
+    return { n, detail: d.turneringar.map((x) => `${x.namn} ${x.matches.length}`).join(', ') };
+  },
+});
+
+// Äldre landskamper, november 2021 – hösten 2024 (sedan 2026-11-16): bara
+// för mötena, de senaste fem åren. Spelade turneringar som inte ändras – en
+// gång i månaden räcker.
+SOURCES.push({
+  id: 'espn_land_moten',
+  provider: 'ESPN',
+  short: 'ESPN',
+  label: 'Landslagens äldre matcher (för mötena de senaste fem åren)',
+  comps: INTERNATIONAL.map((c) => c.id),
+  kinds: ['history'],
+  maxAgeHours: 24 * 30,
+  staleAfterHours: 24 * 90,
+  verified: '2026-11-16',
+  fetch: async () => {
+    const turneringar = [];
+    for (const t of LANDSLAG_MOTEN) {
       turneringar.push({ slug: t.slug, namn: t.namn, short: t.short, matches: await espn.fetchPlayed(t.slug, t.months) });
     }
     return { turneringar, sourceUrl: 'https://www.espn.com/soccer/schedule/_/league/uefa.nations' };

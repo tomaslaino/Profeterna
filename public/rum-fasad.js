@@ -716,8 +716,120 @@ window.RumFasad = (() => {
     return p;
   };
 
-  // En som går (fötterna i 0, vänd åt höger, i centimeter), som delar i den ordning de fylls i: benen svänger
-  // kring höften, armarna kring axeln och hundens ben fortare. Lår och knän, kappa med krage, huvudet i profil
+  // ---------- gången ----------
+  //
+  // De som går förbi går som folk: foten som står på marken står still mot trottoaren medan kroppen går fram
+  // (hälen slår i, foten rullar över till tån och lyfts), höften gungar upp och ner en gång per steg, knät böjs
+  // när benet förs fram och armarna pendlar emot benen med armbågen lite böjd. Gångcykeln (två steg, GANG.S cm
+  // långa tillsammans) räknas ut en gång (gangen): var foten är i varje del av varvet, och därifrån höften och
+  // vinklarna i höften, knät och fotleden. Var i varvet en figur är tas av hur långt den har gått (stalln), så
+  // att fötterna står still mot stenen hur ofta duken än ritas om.
+  const GANG = { S: 136, B: 0.62, LAR: 45, SMA: 38, HOFT: 90, N: 64, PM: 0.31 };
+  let gangTab = null;
+  function gangen() {
+    if (gangTab) return gangTab;
+    const { S, B, LAR: L1, SMA: L2, N, PM } = GANG;
+    // foten från fotleden (x framåt, y nedåt): hälen och tån; vinkeln positiv när hälen lyfts
+    const HAL = [-6.5, 7];
+    const TA = [16.5, 7];
+    const PSI0 = -12 * DEG;
+    const PSI1 = 55 * DEG;
+    const rot = (q, a) => [q[0] * Math.cos(a) - q[1] * Math.sin(a), q[0] * Math.sin(a) + q[1] * Math.cos(a)];
+    const ss = (x) => { const q = Math.min(1, Math.max(0, x)); return q * q * (3 - 2 * q); };
+    // Stödfasen (0 … B): hälen slår i X0 framför höften och foten fälls ner (till 0,08), står platt (till
+    // 0,36) och rullar över tån (till B). Fotleden och fotens vinkel på marken (y 0), där höften var i 0 vid
+    // hälisättningen och går S per varv.
+    const X0 = 24;
+    function stod(p) {
+      if (p < 0.08) { const psi = PSI0 * (1 - ss(p / 0.08)); const h = rot(HAL, psi); return [X0 - h[0], -h[1], psi]; }
+      if (p < 0.36) return [X0 - HAL[0], -HAL[1], 0];
+      const psi = PSI1 * Math.pow((p - 0.36) / (B - 0.36), 1.5);
+      const q = rot(TA, psi);
+      return [X0 - HAL[0] + TA[0] - q[0], -q[1], psi];
+    }
+    // Svingfasen (B … 1): fotleden förs fram till nästa hälisättning (S längre fram) i en mjuk båge som börjar
+    // i samma fart som foten lämnade marken (hermite), och tårna lyfts.
+    const e = 1e-4;
+    const sw = 1 - B;
+    const a0 = stod(B - e);
+    const a0b = stod(B - 2 * e);
+    const a1 = stod(0);
+    const a1b = stod(e);
+    const v0 = [(a0[0] - a0b[0]) / e * sw, (a0[1] - a0b[1]) / e * sw * 0.5];
+    const v1 = [(a1b[0] - a1[0]) / e * sw * 0.6, (a1b[1] - a1[1]) / e * sw * 0.6];
+    const herm = (p0, p1, m0, m1, x) => {
+      const x2 = x * x; const x3 = x2 * x;
+      return (2 * x3 - 3 * x2 + 1) * p0 + (x3 - 2 * x2 + x) * m0 + (3 * x2 - 2 * x3) * p1 + (x3 - x2) * m1;
+    };
+    function fot(p) {
+      if (p < B) return stod(p);
+      const x = (p - B) / sw;
+      return [herm(a0[0], a1[0] + S, v0[0], v1[0], x), herm(a0[1], a1[1], v0[1], v1[1], x) - Math.sin(Math.PI * Math.pow(x, 0.8)) * (1 - 0.3 * x),
+        PSI1 + (PSI0 - PSI1) * ss(x / 0.75)];
+    }
+    // fotleden mätt från höften, för benet som är q in i sitt varv
+    const rel = (q) => { const f = fot(q); return [f[0] - S * q, f[1], f[2]]; };
+    // Höften: högst mitt i steget (PM) och lägst när båda fötterna är i marken, och lite långsammare där uppe;
+    // aldrig högre än att benen som står når marken med knät lite böjt (minst 5°).
+    const ps = [...Array(N)].map((_, i) => i / N);
+    const fram = (p) => -0.7 * Math.sin(4 * Math.PI * (p - PM));
+    const NA = Math.sqrt(L1 * L1 + L2 * L2 + 2 * L1 * L2 * Math.cos(5 * DEG));
+    const tak = ps.map((p) => Math.min(...[p, (p + 0.5) % 1].map((q) => {
+      const r = rel(q);
+      const dx = r[0] - fram(p);
+      return Math.sqrt(Math.max(0, NA * NA - dx * dx)) - r[1];
+    })));
+    let H = ps.map((p) => 88.6 + 1.7 * Math.cos(4 * Math.PI * (p - PM)));
+    for (let k = 0; k < 6; k++) {
+      H = H.map((h, i) => Math.min(h, tak[i]));
+      H = H.map((h, i) => (H[(i + N - 1) % N] + 2 * h + H[(i + 1) % N]) / 4);
+    }
+    H = H.map((h, i) => Math.min(h, tak[i]));
+    // per del av varvet: höftens förskjutning (x, y) och benets vinklar (lår, smalben, fot; radianer, medurs
+    // som i duken), knät framåt (IK)
+    gangTab = ps.map((p, i) => {
+      const r = rel(p);
+      const dx = r[0] - fram(p);
+      const dy = r[1] + H[i];
+      const d = Math.min(Math.hypot(dx, dy), L1 + L2 - 1e-6);
+      const f1 = Math.atan2(dx, dy) + Math.acos((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d));
+      const f2 = Math.atan2(dx - L1 * Math.sin(f1), dy - L1 * Math.cos(f1));
+      return [fram(p), GANG.HOFT - H[i], -f1, f1 - f2, r[2] + f2];
+    });
+    return gangTab;
+  }
+  // Ställningen p in i varvet (0 … 1; det bortre benet och armen ett halvt varv efter): höften (bx, by), benen
+  // (F, B: lår, smalben, fot), armarna (aF, aB: axel, armbåge), paraplyet (par) och hundens fyra ben (rotate,
+  // scaleY: hunden travar fyra varv på ett, tassen står still halva varvet och lyfts fram i den andra, från
+  // benets topp 20 cm upp). sta: står still.
+  const STAR = { bx: 0, by: 0, F: [0, 0, 0], B: [0, 0, 0], aF: [0, -6 * DEG], aB: [0, -6 * DEG], par: 0, hund: [[0, 1], [0, 1], [0, 1], [0, 1]] };
+  function stalln(p) {
+    const T = gangen();
+    const N = T.length;
+    const tab = (q) => {
+      const x = ((q % 1) + 1) % 1 * N;
+      const i = Math.floor(x);
+      const a = T[i]; const b = T[(i + 1) % N]; const w = x - i;
+      return a.map((v, j) => v + (b[j] - v) * w);
+    };
+    const f = tab(p);
+    const b = tab(p + 0.5);
+    const arm = (q) => { const c = Math.cos(2 * Math.PI * (q - 0.04)); return [15 * c * DEG, (-8 - 11 * (1 - c)) * DEG]; };
+    const E = GANG.S / 32;
+    const tass = (q) => {
+      q = ((q % 1) + 1) % 1;
+      const s = (q - 0.5) / 0.5;
+      const x = q < 0.5 ? E * (1 - 4 * q) : -E + 2 * E * s * s * (3 - 2 * s);
+      const y = 20 - (q < 0.5 ? 0 : 5 * Math.sin(Math.PI * s));
+      return [-Math.atan2(x, y), Math.hypot(x, y) / 20];
+    };
+    const h = 4 * p + 0.3;
+    return { bx: f[0], by: f[1], F: f.slice(2), B: b.slice(2), aF: arm(p), aB: arm(p + 0.5), par: 1.2 * DEG * Math.sin(4 * Math.PI * (p - GANG.PM)),
+      hund: [tass(h), tass(h + 0.5), tass(h + 0.5), tass(h)] };
+  }
+
+  // En som går (fötterna i 0, vänd åt höger, i centimeter), som delar i den ordning de fylls i: benen i höften,
+  // knät och fotleden, armarna i axeln och armbågen, och hundens ben. Lår och knän, kappa med krage, huvudet i profil
   // med näsa och haka, mössa, keps eller hatt, och paraply med spröt. På kvällen mörka mot fönstret.
   function figurDelar(o, L) {
     const t = (c) => mix(mix('#07080b', c, 0.08 + 0.92 * L.dag), '#ffb060', 0.03 * (1 - L.dag));
@@ -725,11 +837,14 @@ window.RumFasad = (() => {
     const D = [];
     const del = (d, f, g = '', x = {}) => D.push({ d: typeof d === 'string' ? new Path2D(d) : d, f, g, ...x });
     const drag = (d, s, w, x = {}) => D.push({ d: new Path2D(d), s, w, g: '', ...x });
-    const BEN = 'M-7.5 0 H7.5 Q8 24 5.8 46 L4.4 80 H-3.6 L-5.6 46 Q-8 24 -7.5 0 Z';
-    const SKO = 'M-4.6 79 H4.6 Q15 79.5 16.5 86 V90 H-6.5 Q-7 84 -4.6 79 Z';
-    const ARM = 'M-6 0 H6 Q6.5 30 4.6 56 H-4.4 Q-6.5 30 -6 0 Z';
-    const ben = (g, f) => { del(BEN, f(o.byxa), g); del(SKO, f(o.sko), g); };
-    const arm = (g, f) => { del(ARM, f(o.arm), g); del(ell(0.4, 60, 4.4, 5.6), f(o.hud), g); };
+    // (låret från höften, smalbenet från knät och skon från fotleden; överarmen från axeln, underarmen från armbågen)
+    const LAR = `M-7.5 -6 H7.5 Q8 22 5.8 ${GANG.LAR} Q0 ${GANG.LAR + 5} -5.6 ${GANG.LAR} Q-8 22 -7.5 -6 Z`;
+    const SMA = `M-5.6 -2 Q0 -5 5.8 -2 L4.4 ${GANG.SMA - 3} H-3.6 Z`;
+    const SKO = 'M-4.6 -4 H4.6 Q15 -3.5 16.5 3 V7 H-6.5 Q-7 1 -4.6 -4 Z';
+    const OVER = 'M-6 0 H6 Q6.4 16 5.4 29 Q0 33.5 -5.2 29 Q-6.4 16 -6 0 Z';
+    const UNDER = 'M-5.2 -2.5 Q0 -5 5.4 -2.5 L4.6 27 H-4.4 Z';
+    const ben = (g, f) => { del(LAR, f(o.byxa), g); del(SMA, f(o.byxa), g, { led: 1 }); del(SKO, f(o.sko), g, { led: 2 }); };
+    const arm = (g, f) => { del(OVER, f(o.arm), g); del(UNDER, f(o.arm), g, { led: 1 }); del(ell(0.4, 31, 4.4, 5.6), f(o.hud), g, { led: 1 }); };
     ben('benB', bak);
     if (!o.paraply) arm('armB', bak);
     ben('benF', t);
@@ -758,19 +873,26 @@ window.RumFasad = (() => {
       const p = t(o.paraply);
       del('M-6 0 H6 Q6.5 20 4.6 36 H-4.4 Q-6.5 20 -6 0 Z', t(o.arm), 'fast', { px: 3, py: -140, rot: -38 });
       del(ell(0, 39, 4.4, 5.4), t(o.hud), 'fast', { px: 3, py: -140, rot: -38 });
-      drag('M24 -110 V-243', '#141414', 2);
-      drag('M24 -110 q0 8 -6 8', '#141414', 2.4);
-      del('M-42 -206 C-38 -229 -8 -243 24 -243 C56 -243 86 -229 90 -206 Q82 -212 74 -206 Q66 -213 57 -206 Q49 -213 41 -206 Q32 -213 24 -206 Q16 -213 7 -206 Q-1 -213 -9 -206 Q-17 -213 -26 -206 Q-34 -212 -42 -206 Z', p);
-      drag('M24 -243 L-42 -206 M24 -243 L-9 -206 M24 -243 L24 -206 M24 -243 L57 -206 M24 -243 L90 -206', '#000', 1.4, { a: 0.25, inre: true });
-      drag('M24 -243 V-251', '#141414', 2);
-      drag('M-30 -226 C-14 -238 6 -241 24 -241', '#ffffff', 2.4, { a: 0.06 + 0.16 * L.dag, inre: true });
-      if (o.droppar) drag('M-42 -204 v6 M7 -204 v9 M57 -204 v5 M90 -204 v8', '#cfdcf0', 1.2, { a: 0.35, inre: true });
+      const par = { g: 'par' };
+      drag('M24 -110 V-243', '#141414', 2, par);
+      drag('M24 -110 q0 8 -6 8', '#141414', 2.4, par);
+      del('M-42 -206 C-38 -229 -8 -243 24 -243 C56 -243 86 -229 90 -206 Q82 -212 74 -206 Q66 -213 57 -206 Q49 -213 41 -206 Q32 -213 24 -206 Q16 -213 7 -206 Q-1 -213 -9 -206 Q-17 -213 -26 -206 Q-34 -212 -42 -206 Z', p, 'par');
+      drag('M24 -243 L-42 -206 M24 -243 L-9 -206 M24 -243 L24 -206 M24 -243 L57 -206 M24 -243 L90 -206', '#000', 1.4, { a: 0.25, inre: true, g: 'par' });
+      drag('M24 -243 V-251', '#141414', 2, par);
+      drag('M-30 -226 C-14 -238 6 -241 24 -241', '#ffffff', 2.4, { a: 0.06 + 0.16 * L.dag, inre: true, g: 'par' });
+      if (o.droppar) drag('M-42 -204 v6 M7 -204 v9 M57 -204 v5 M90 -204 v8', '#cfdcf0', 1.2, { a: 0.35, inre: true, g: 'par' });
+    } else if (o.hund) {
+      // (kopplet i handen: armen lite framåt och stilla)
+      del(OVER, t(o.arm), 'fast', { px: 1, py: -142, rot: -12 });
+      del(UNDER, t(o.arm), 'fast', { px: 1, py: -142, rot: -12, led: 1, rot2: -35 });
+      del(ell(0.4, 31, 4.4, 5.6), t(o.hud), 'fast', { px: 1, py: -142, rot: -12, led: 1, rot2: -35 });
     } else arm('armF', t);
     if (o.hund) {
       const h = t(o.hund);
       const hb = bak(o.hund);
-      drag('M14 -82 Q50 -60 64 -30', '#1a1a1a', 1.6);
-      for (const [px, g, c] of [[54, 'hundB', hb], [84, 'hundB', hb], [60, 'hundF', h], [90, 'hundF', h]]) del('M-2.5 0 H2.5 V20 H-2.5 Z', c, g, { px, py: -20 });
+      drag('M30 -92 Q52 -52 86 -38', '#1a1a1a', 1.6);
+      // (benen i diagonala par: bortre bak med närmre fram, och tvärtom)
+      [[54, hb, 1], [84, hb, 2], [60, h, 3], [90, h, 0]].forEach(([px, c, ben]) => del('M-2.5 0 H2.5 V20 H-2.5 Z', c, 'hund', { px, py: -20, ben }));
       del(ell(70, -26, 24, 10), h);
       del(ell(94, -34, 9, 9), h);
       del('M100 -32 l8 3 l-8 3 Z M88 -42 l4 -8 l4 7 Z', h);
@@ -798,19 +920,36 @@ window.RumFasad = (() => {
     return D;
   }
 
-  // Delarna i ställningen för benen (vinkeln i grader; armarna i otakt), hundens ben och det som sitter fast.
+  // Delarna i ställningen P (stalln): allt utom hunden gungar med höften, benen vrids i höften, knät och
+  // fotleden (led 0, 1, 2), armarna i axeln och armbågen, och det som sitter fast har sina egna vinklar.
   // rand: bara konturen, lineWidth rand (ljuset i kanten), annars fyllt med alfa A (kontur: bara det som syns
   // i siluetten, för speglingen).
-  function ritaDelar(c, D, ben, hund, A, rand, kontur = false) {
-    const arm = (-ben * 18) / 21;
+  function ritaDelar(c, D, P, A, rand, kontur = false) {
     for (const p of D) {
       if ((rand || kontur) && p.inre) continue;
       if (kontur && p.s) continue;
       c.save();
-      if (p.g === 'benF' || p.g === 'benB') { c.translate(0, -90); c.rotate((p.g === 'benF' ? ben : -ben) * DEG); }
-      else if (p.g === 'armF' || p.g === 'armB') { c.translate(1, -142); c.rotate((p.g === 'armF' ? arm : -arm) * DEG); }
-      else if (p.g === 'hundF' || p.g === 'hundB') { c.translate(p.px, p.py); c.rotate((p.g === 'hundF' ? hund : -hund) * DEG); }
-      else if (p.g === 'fast') { c.translate(p.px, p.py); c.rotate(p.rot * DEG); }
+      const g = p.g;
+      if (g === 'hund') { const h = P.hund[p.ben]; c.translate(p.px, p.py); c.rotate(h[0]); c.scale(1, h[1]); }
+      else {
+        c.translate(P.bx, P.by);
+        if (g === 'benF' || g === 'benB') {
+          const b = g === 'benF' ? P.F : P.B;
+          c.translate(0, -GANG.HOFT);
+          c.rotate(b[0]);
+          if (p.led) { c.translate(0, GANG.LAR); c.rotate(b[1]); }
+          if (p.led > 1) { c.translate(0, GANG.SMA); c.rotate(b[2]); }
+        } else if (g === 'armF' || g === 'armB') {
+          const a = g === 'armF' ? P.aF : P.aB;
+          c.translate(1, -142);
+          c.rotate(a[0]);
+          if (p.led) { c.translate(0, 29); c.rotate(a[1]); }
+        } else if (g === 'fast') {
+          c.translate(p.px, p.py);
+          c.rotate(p.rot * DEG);
+          if (p.led) { c.translate(0, 29); c.rotate(p.rot2 * DEG); }
+        } else if (g === 'par') { c.translate(24, -110); c.rotate(P.par); c.translate(-24, 110); }
+      }
       if (rand) {
         c.lineWidth = (p.s ? p.w : 0) + rand;
         c.stroke(p.d);
@@ -838,16 +977,16 @@ window.RumFasad = (() => {
     return (1 - L.dag / 0.6) * (0.04 + 0.96 * n);
   }
 
-  // En figur i världen: fötterna i (x, y), k gånger centimetrarna, dir 1 åt höger och −1 åt vänster.
-  // spegel: upp och ned i den våta stenen, svagt.
+  // En figur i världen: fötterna i (x, y), k gånger centimetrarna, dir 1 åt höger och −1 åt vänster; var
+  // i gångens varv av hur långt den har gått (x), så att foten i marken står still. spegel: upp och ned i den
+  // våta stenen, svagt.
   function ritaFigur(c, f, D, x, y, t, L, ut) {
-    const ben = f.sta ? 0 : -21 + 42 * pendel(t, f.steg);
-    const hund = -14 + 28 * pendel(t, f.steg * 0.5);
+    const P = f.sta ? STAR : stalln((f.dir * x) / (GANG.S * f.k) + (f.gfas || 0));
     c.save();
     c.translate(x, y);
     if (ut.spegel) {
       c.scale(f.dir * f.k, -f.k * 0.85);
-      ritaDelar(c, D, ben, hund, ut.spegel, 0, true);
+      ritaDelar(c, D, P, ut.spegel, 0, true);
       c.restore();
       return;
     }
@@ -865,10 +1004,10 @@ window.RumFasad = (() => {
       c.save();
       c.translate(0, -1.4);
       c.globalAlpha = 0.34 * r * ut.A;
-      ritaDelar(c, D, ben, hund, 1, 2.4);
+      ritaDelar(c, D, P, 1, 2.4);
       c.restore();
     }
-    ritaDelar(c, D, ben, hund, ut.A, 0);
+    ritaDelar(c, D, P, ut.A, 0);
     c.restore();
   }
 
@@ -913,8 +1052,8 @@ window.RumFasad = (() => {
       const extra = varv * fart - vag;
       const a = V.x - 300;
       const b = V.x + V.w + 300 + extra;
-      const steg = 0.95 + R() * 0.25;
-      ut.push({ D: figurDelar(o, L), k, dir, steg, dm, y: markY(dm), g: { fran: dir > 0 ? a : b, till: dir > 0 ? b : a, dur: varv, fas: R() * varv } });
+      R();
+      ut.push({ D: figurDelar(o, L), k, dir, gfas: (i * 0.618) % 1, dm, y: markY(dm), g: { fran: dir > 0 ? a : b, till: dir > 0 ? b : a, dur: varv, fas: R() * varv } });
     }
     return ut.sort((p, q) => p.dm - q.dm);
   }
@@ -941,7 +1080,7 @@ window.RumFasad = (() => {
       const dir = n % 2 ? -1 : 1;
       const xa = dir > 0 ? V.x - 200 : V.x + V.w + 200;
       const xb = dir > 0 ? V.x + V.w + 200 : V.x - 200;
-      return { o, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(o, L), k, steg: 1.05, dm: STANNA.dm, sta: false };
+      return { o, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(o, L), k, dm: STANNA.dm, sta: false };
     };
     const minne = new Map();
     return (t) => {
@@ -1348,7 +1487,7 @@ window.RumFasad = (() => {
       if (x > V.x - 220 && x < V.x + V.w + 220) lista.push([f, f.D, x, f.y]);
     }
     const st = R.stanna && R.stanna(t);
-    if (st) lista.unshift([{ k: st.f.k, steg: st.f.steg, dir: st.sta ? 1 : st.f.dir, sta: st.sta }, st.sta ? st.f.B : st.f.D, st.x, markY(STANNA.dm)]);
+    if (st) lista.unshift([{ k: st.f.k, dir: st.sta ? 1 : st.f.dir, sta: st.sta }, st.sta ? st.f.B : st.f.D, st.x, markY(STANNA.dm)]);
     const bilar = R.bilar.some((b) => { const x = glidX(b.g, t); return x < DORR.x + DORR.w + 100 && x + b.w > FON.x - 100; });
     if (!lista.length && !bilar && !R.N && R.tom) return;
     c.setTransform(1, 0, 0, 1, 0, 0);

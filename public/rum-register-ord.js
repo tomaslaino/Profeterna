@@ -207,13 +207,19 @@
     nollor: { e: 'NOLLOR', n: 'HÅLLNA NOLLOR I LIGAN', t: 'Ligamatcher där laget inte har släppt in något mål.', ex: null },
     utanmal: { e: 'UTAN MÅL', n: 'MATCHER UTAN EGET MÅL', t: 'Ligamatcher där laget inte har gjort något mål.', ex: null },
     skapar: {
-      e: 'xG', n: 'LAGETS–MOTSTÅNDARNAS xG PER MATCH',
-      t: `Förväntade mål (xG) per ligamatch, först lagets egna chanser och sedan motståndarnas. ${xgOrd}`,
-      ex: ({ t, namn }) => { const x = xgOf(t); return x ? `${gen(namn)} chanser på ${st(x.n, 'match', 'matcher')} var värda ${dec(x.f)} mål och motståndarnas ${dec(x.a)}: ${dec(x.f / x.n)}–${dec(x.a / x.n)} per match.` : null; },
+      e: 'SKAPAR', n: 'LAGETS xG PER MATCH',
+      t: `Förväntade mål (xG) per ligamatch: vad lagets chanser är värda. ${xgOrd}`,
+      ex: lag.skapar.ex,
     },
-    pamal: { e: 'PÅ MÅL', n: 'LAGETS–MOTSTÅNDARNAS SKOTT PÅ MÅL PER MATCH', t: 'Skott på mål är mål och skott som målvakten räddar. Bara ligamatcherna räknas.', ex: null },
+    slapper: {
+      e: 'SLÄPPER TILL', n: 'MOTSTÅNDARNAS xG PER MATCH',
+      t: 'Motståndarnas förväntade mål (xG) per ligamatch: hur bra chanser laget släpper till. Ju lägre, desto bättre.',
+      ex: lag.slapper.ex,
+    },
+    pamal: { e: 'SKJUTER', n: 'LAGETS SKOTT PÅ MÅL PER MATCH', t: 'Skott på mål är mål och skott som målvakten räddar. Bara ligamatcherna räknas.', ex: null },
+    'pamal-mot': { e: 'SLÄPPER TILL', n: 'MOTSTÅNDARNAS SKOTT PÅ MÅL PER MATCH', t: 'Skott på mål är mål och skott som målvakten räddar. Ju färre, desto bättre. Bara ligamatcherna räknas.', ex: null },
     malxg: {
-      e: 'MÅL MOT xG', n: 'GJORDA MÅL MINUS xG',
+      e: 'GJORDA MÅL', n: 'GJORDA MÅL MOT xG',
       t: 'Gjorda mål minus xG den här säsongen. Plus betyder fler mål än chanserna var värda, alltså bra avslut eller tur. Stora skillnader brukar jämna ut sig.',
       ex: malxgEx,
     },
@@ -243,8 +249,8 @@
     'dom-frisparkar': { e: 'FRISPARKAR', n: 'I DOMARENS MATCHER', t: `Frisparkar per match i domarens ligamatcher, båda lagen tillsammans. ${SNITT}`, ex: null },
     'dom-hemmaseger': { e: 'HEMMASEGER', n: 'I DOMARENS MATCHER', t: `Hur stor andel av domarens ligamatcher som hemmalaget har vunnit. ${SNITT} Med få matcher beror skillnaden mest på slumpen.`, ex: null },
     moten: {
-      e: 'DE SENASTE MÖTENA',
-      t: 'Det senaste mötet står först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
+      e: 'MÖTENA', n: 'DE SENASTE FEM ÅREN',
+      t: 'Matcherna mellan lagen de senaste fem åren, det senaste mötet först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
       ex: null,
     },
     // förra mötet överst i MÖTENA (sedan 2026-11-15)
@@ -343,13 +349,19 @@
     'alla-mal': { e: 'MÅL', n: 'GJORDA–INSLÄPPTA PER MATCH', t: 'Alla landskamper sedan hösten 2024 räknas, också vänskapsmatcherna.', ex: null },
     'alla-nollor': { e: 'NOLLOR', n: 'HÅLLNA NOLLOR', t: 'Landskamper sedan hösten 2024 där laget inte har släppt in något mål.', ex: null },
     skapar: {
-      e: 'xG', n: 'LAGETS–MOTSTÅNDARNAS xG PER MATCH',
-      t: `Förväntade mål (xG) per match i Nations League, först lagets egna chanser och sedan motståndarnas. ${xgOrd}`,
-      ex: akten.skapar.ex,
+      e: 'SKAPAR', n: 'LAGETS xG PER MATCH',
+      t: `Förväntade mål (xG) per match i Nations League: vad lagets chanser är värda. ${xgOrd}`,
+      ex: lag.skapar.ex,
     },
-    pamal: { e: 'PÅ MÅL', n: 'LAGETS–MOTSTÅNDARNAS SKOTT PÅ MÅL PER MATCH', t: 'Skott på mål är mål och skott som målvakten räddar. Bara Nations League räknas.', ex: null },
+    slapper: {
+      e: 'SLÄPPER TILL', n: 'MOTSTÅNDARNAS xG PER MATCH',
+      t: 'Motståndarnas förväntade mål (xG) per match i Nations League: hur bra chanser laget släpper till. Ju lägre, desto bättre.',
+      ex: lag.slapper.ex,
+    },
+    pamal: { e: 'SKJUTER', n: 'LAGETS SKOTT PÅ MÅL PER MATCH', t: 'Skott på mål är mål och skott som målvakten räddar. Bara Nations League räknas.', ex: null },
+    'pamal-mot': { e: 'SLÄPPER TILL', n: 'MOTSTÅNDARNAS SKOTT PÅ MÅL PER MATCH', t: 'Skott på mål är mål och skott som målvakten räddar. Ju färre, desto bättre. Bara Nations League räknas.', ex: null },
     malxg: {
-      e: 'MÅL MOT xG', n: 'GJORDA MÅL MINUS xG',
+      e: 'GJORDA MÅL', n: 'GJORDA MÅL MOT xG',
       t: 'Gjorda mål minus xG i Nations League. Plus betyder fler mål än chanserna var värda, alltså bra avslut eller tur. Stora skillnader brukar jämna ut sig.',
       ex: lag.malxg.ex,
     },
@@ -359,8 +371,8 @@
       ex: lag.inslxg.ex,
     },
     moten: {
-      e: 'DE SENASTE MÖTENA',
-      t: 'Landskamperna mellan lagen sedan hösten 2024, den senaste först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
+      e: 'MÖTENA', n: 'DE SENASTE FEM ÅREN',
+      t: 'Alla landskamper mellan lagen de senaste fem åren, också vänskapsmatcherna, den senaste först. Raden under räknar vinster, oavgjorda och förluster för hemmalaget i den här matchen.',
       ex: null,
     },
   };

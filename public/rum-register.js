@@ -23,7 +23,7 @@
 //              skytten och de främsta i assist och segermål), xG (chanserna,
 //              turen och kryssen), LÄGET (vilan, nästa match, skadorna och
 //              domaren) och MÖTENA (förra mötet med lagens siffror, när det
-//              var högst ett halvår sedan, och de senaste mötena). Det
+//              var högst ett halvår sedan, och mötena de senaste fem åren). Det
 //              bättre talet i varje par lyser och
 //              det sämre är svagt (SKILJER), och varje etikett öppnar en
 //              förklaring. Sedan 2026-11-16 är talen som säger vem som är
@@ -118,8 +118,6 @@ window.RumRegister = (() => {
   const MAN = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   const MANAD = ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'];
   const POS = { MV: 'målvakt', B: 'back', MF: 'mittfältare', A: 'anfallare' };
-  // mötena: så många som sajten har (de sex senaste från tidigare säsonger och säsongens)
-  const MOTEN = 11;
   // cuperna i schemat (matchens fil) som på sajten; Europacuperna heter CL, EL och ECL
   const TAV = { EFL: 'Ligacupen', FAC: 'FA-cupen' };
   // (och kortare, när namnet inte ryms i matchaktens spalt; annars förkortningen)
@@ -222,13 +220,14 @@ window.RumRegister = (() => {
   // Matchakten: det bättre talet i varje par lyser och det sämre är svagt, när
   // talen skiljer sig minst så här mycket (annars står båda som vanligt):
   // formens poäng på fem matcher, vilans dagar (i alla tävlingar), styrkan, poängen mot oddsen,
-  // målskillnaden och xG-skillnaden per match och andelen matcher som favorit.
+  // målskillnaden och xG-skillnaden per match, xG och skotten på mål per match
+  // (lagets egna och motståndarnas, var för sig) och andelen matcher som favorit.
   // Kryssen, turen, motståndet, nästa match och skytten säger inte vem som är
   // bättre och står alltid som vanligt.
   // För landslagen (som inte har tavlans tal): poängen i gruppen (en seger),
   // poängen per match i Nations League och alla landskamper (V-O-F), målen
   // som för klubbarna och marknadens chans som favoritskapet.
-  const SKILJER = { form: 2, vila: 2, vilaSnitt: 1, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, favorit: 0.15, poang: 3, ppm: 0.5 };
+  const SKILJER = { form: 2, vila: 2, vilaSnitt: 1, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, xgMatch: 0.15, skott: 0.5, favorit: 0.15, poang: 3, ppm: 0.5 };
   // vilken elva spelarnas vila gäller (src/fetchers/s365vila.js), svagt under dagarna
   const ELVA_SORT = { uttagen: 'UTTAGEN ELVA', trolig: 'TROLIG ELVA', beräknad: 'BERÄKNAD ELVA', förra: 'FÖRRA ELVAN' };
   // matchaktens etiketter (den längsta, STORA CHANSER i förra mötet, är 13
@@ -882,16 +881,20 @@ window.RumRegister = (() => {
       return [...r, tom()];
     }
 
+    // Mötena de senaste fem åren (sedan 2026-11-16, användarens fråga "kan man
+    // ha mötena de senaste 5 åren?"; till dess de elva senaste, och för
+    // landslagen bara från hösten 2024): säsongens och de tidigare, alla som
+    // sajten har inom fem år före avspark (pastMeetings i matchens fil).
     function moten(m) {
-      const r = [rad(['DE SENASTE MÖTENA', 'd', ordQ('moten')])];
+      const r = [rad(['MÖTENA DE SENASTE FEM ÅREN', 'd', ordQ('moten')])];
       const d = A.match.get(m.id);
       if (d === undefined) return [...r, prickar('HÄMTAR', '')];
       r.unshift(...forraMotet(m, d));
       const list = !d ? [] : [
         ...(d.meetings || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.kickoff), x, when: x.kickoff, comp: x.compShort, hide: window.Spoiler && Spoiler.hidesDay(x.kickoff) })),
         ...((d.pastMeetings && d.pastMeetings.list) || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.date), x, when: x.date, comp: x.compShort, hide: false })),
-      ].sort((a, b) => b.t - a.t).slice(0, MOTEN);
-      if (!list.length) return [...r, rad('HAR INTE MÖTTS')];
+      ].sort((a, b) => b.t - a.t);
+      if (!list.length) return [...r, rad('HAR INTE MÖTTS PÅ FEM ÅR')];
       const n = { V: 0, O: 0, F: 0 };
       for (const { x, when, comp, hide } of list) {
         if (!hide) n[letter(x, m.home)]++;
@@ -1077,7 +1080,7 @@ window.RumRegister = (() => {
     //   xG        chanserna: xG, skotten på mål, målen mot xG, turen och kryssen
     //   LÄGET     vilan, nästa match, matcherna de senaste dagarna, skadorna
     //             och domaren
-    //   MÖTENA    de senaste mötena
+    //   MÖTENA    mötena de senaste fem åren
     // Samma flikar för alla matcher, så att ←/→ stannar i fliken; en flik
     // utan något att visa är svag. Lagen leder till lagkorten och skyttarna
     // till spelarkorten. Efter tavlans tal står lagets plats i sin division
@@ -1324,18 +1327,47 @@ window.RumRegister = (() => {
 
       // xG: chanserna per match, skotten på mål, målen mot chanserna, turen
       // och kryssen (klubbarna: skotten och målen mot xG ur matchens fil;
-      // landslagen ur Nations Leagues lagfil)
+      // landslagen ur Nations Leagues lagfil). Sedan 2026-11-16 (användarens
+      // val A Raderna bland tre skisser – Raderna, Raderna och tallinjen,
+      // Spalterna – och rubriken med lagkortets ord): paren (1,5–0,2) såg ut
+      // som resultat, så varje tal har en egen rad där det bättre lyser, under
+      // rubrikerna xG PER MATCH och SKOTT PÅ MÅL PER MATCH, och talen mot
+      // chanserna står under MOT CHANSERNA med lagkortets ord (GJORDA MÅL +3,7,
+      // INSLÄPPTA MÅL −0,2), så att tecknen läses som en mening
       const xgp = (j) => { const x = xgOf(T[j]); return x && x.n ? x : null; };
+      // ('7,2–1,0' ur matchens fil som två tal)
+      const tvaTal = (s) => { const p = s == null ? [] : String(s).split(/\s*[–-]\s*/).map((y) => parseFloat(y.replace(',', '.'))); return p.length === 2 && p.every(Number.isFinite) ? p : null; };
+      const skottFil = fil('Skott på mål');
+      const skott = (j) => {
+        if (!land) return tvaTal(skottFil && skottFil[j]);
+        const x = fdOf(T[j], 'sh');
+        return x && x.n && x.of != null && x.oa != null ? [x.of / x.n, x.oa / x.n] : null;
+      };
+      // en rad med ett tal per lag, det högsta ljust (lagre: det lägsta);
+      // ingen rad när inget av lagen har talet
+      const enRad = (etikett, f, grans, q, lagre = false) => {
+        const v = [0, 1].map(f);
+        return v.some(ok) ? par(etikett, (j) => (ok(v[j]) ? [num(v[j]), lagre ? -v[j] : v[j]] : null), grans, q) : null;
+      };
+      // ett avsnitt med rubriken, bara när något av lagen har talen
+      const avsnitt = (namn, r) => (r.some(Boolean) ? [rub(namn), ...r] : []);
       const xg = [
-        par('xG', (j) => { const x = xgp(j); return x ? [`${num(x.f / x.n)}–${num(x.a / x.n)}`, (x.f - x.a) / x.n] : null; }, SKILJER.xg, lq('skapar')),
-        land ? par('PÅ MÅL', (j) => { const x = fdOf(T[j], 'sh'); return x && x.n && x.of != null ? [`${num(x.of / x.n)}–${num(x.oa / x.n)}`, null] : null; }, 0, lq('pamal'))
-          : ur('Skott på mål', 'PÅ MÅL', lq('pamal')),
-        land ? par('MÅL MOT xG', (j) => { const x = xgp(j); return x ? [signed(x.gf - x.f), null] : null; }, 0, lq('malxg'))
-          : ur('Gjorda mål mot xG', 'MÅL MOT xG', lq('malxg')),
-        land ? par('INSL. MOT xG', (j) => { const x = xgp(j); return x ? [signed(x.ga - x.a), null] : null; }, 0, lq('inslxg'))
-          : ur('Insläppta mål mot xG', 'INSL. MOT xG', lq('inslxg')),
-        tal('TUR', TAL.tur, (v) => signed(v), 0, 'tur'),
-        tal('KRYSSAR', TAL.kryss, pct, 0, 'kryss'),
+        ...avsnitt('xG PER MATCH', [
+          enRad('SKAPAR', (j) => (xgp(j) ? xgp(j).f / xgp(j).n : null), SKILJER.xgMatch, lq('skapar')),
+          enRad('SLÄPPER TILL', (j) => (xgp(j) ? xgp(j).a / xgp(j).n : null), SKILJER.xgMatch, lq('slapper'), true),
+        ]),
+        ...avsnitt('SKOTT PÅ MÅL PER MATCH', [
+          enRad('SKJUTER', (j) => (skott(j) ? skott(j)[0] : null), SKILJER.skott, lq('pamal')),
+          enRad('SLÄPPER TILL', (j) => (skott(j) ? skott(j)[1] : null), SKILJER.skott, ordQ('pamal-mot'), true),
+        ]),
+        ...avsnitt('MOT CHANSERNA', [
+          land ? par('GJORDA MÅL', (j) => { const x = xgp(j); return x ? [signed(x.gf - x.f), null] : null; }, 0, lq('malxg'))
+            : ur('Gjorda mål mot xG', 'GJORDA MÅL', lq('malxg')),
+          land ? par('INSLÄPPTA MÅL', (j) => { const x = xgp(j); return x ? [signed(x.ga - x.a), null] : null; }, 0, lq('inslxg'))
+            : ur('Insläppta mål mot xG', 'INSLÄPPTA MÅL', lq('inslxg')),
+          tal('TUR', TAL.tur, (v) => signed(v), 0, 'tur'),
+          tal('KRYSSAR', TAL.kryss, pct, 0, 'kryss'),
+        ]),
       ];
 
       // LÄGET: vilan, nästa match och matcherna de senaste veckorna
