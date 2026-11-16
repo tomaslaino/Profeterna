@@ -64,8 +64,11 @@ window.RumFasad = (() => {
   const KARM = 12;
   const SKYLT = { x: 398, y: 296, w: 748, h: 84 };
   const HORN = 1250;
-  // stupröret: mellan fönstren på våningarna och bakom gatuskylten, så att det syns också i en telefon
+  // stupröret: mellan fönstren på våningarna, så att det syns också i en telefon
   const STUPROR = 1180;
+  // gatuskylten: på väggen mellan gesimsen och skyltens tak, mellan den högra svanhalsen (och dess skugga) och
+  // stupröret (inte bakom röret), högerkanten i linje med skyltens tak, så att den syns hel också i en telefon
+  const GATSKYLT = { x: 1012, y: 252, w: 144, h: 30, fs: 17 };
   const RACKE = MARK - 1.1 * M;
   // det som alltid ska synas, och världens kanter
   const FOKUS = { x0: 380, x1: 1180, y0: 270, y1: 960 };
@@ -478,7 +481,7 @@ window.RumFasad = (() => {
     // sockeln, med en glans i överkanten när den är våt
     s += `<rect x="${VARLD.x0}" y="${MARK - 34}" width="${HORN - VARLD.x0}" height="34" fill="${granit}"/>`;
     if (vat) s += `<rect x="${VARLD.x0}" y="${MARK - 34}" width="${HORN - VARLD.x0}" height="2" fill="${mix('#ffffff', '#ffe2b0', 1 - L.dag)}" opacity="${r1(0.12 + 0.08 * (1 - L.dag))}"/>`;
-    // Stupröret mellan fönstren, bakom gatuskylten: fästen, en böj nertill och vatten som forsar ut när det
+    // Stupröret mellan fönstren, bredvid gatuskylten: fästen, en böj nertill och vatten som forsar ut när det
     // regnar (bäcken över trottoaren står i marken)
     const ror = mix('#0e0f0f', '#5b605c', L.dag);
     const rx = STUPROR;
@@ -500,12 +503,15 @@ window.RumFasad = (() => {
     s += `<path d="M${px + pw / 2} ${pt + 100} V${MARK}" stroke="#000" stroke-opacity=".45" stroke-width="3"/><circle cx="${px + pw / 2 - 14}" cy="${pt + 290}" r="5" fill="${mix('#2a2010', '#c9a24c', L.dag)}"/><circle cx="${px + pw / 2 + 14}" cy="${pt + 290}" r="5" fill="${mix('#2a2010', '#c9a24c', L.dag)}"/>`;
 
     // (barberarens stång längst till vänster snurrar, och är en egen ruta: .rf-barber i rita)
-    // gatuskylten på hörnet
+    // gatuskylten vid hörnet, fastskruvad på väggen bredvid stupröret
     // (på kvällen i sken av lampan bredvid: emaljen lyser upp, så att namnet går att läsa)
     const lyst = L.lampor ? 1 - L.dag : 0;
     const bla = mix(mix('#0a1020', '#1f4a8a', 0.2 + 0.8 * L.dag), '#2c4a7e', 0.6 * lyst);
     const vit = mix(mix('#3a3e48', '#f2f2ee', L.dag), '#d8d0bc', 0.7 * lyst);
-    s += `<rect x="1040" y="250" width="186" height="38" rx="3" fill="${bla}"/><rect x="1044" y="254" width="178" height="30" rx="2" fill="none" stroke="${vit}" stroke-opacity="${r1(1 - 0.4 * lyst)}" stroke-width="1.6"/><text x="1133" y="277" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="19" fill="${vit}">S:t Eriksgatan</text>`;
+    const gs = GATSKYLT;
+    const gsMitt = gs.y + gs.h / 2;
+    s += `<rect x="${gs.x}" y="${gs.y}" width="${gs.w}" height="${gs.h}" rx="3" fill="${bla}"/><rect x="${gs.x + 4}" y="${gs.y + 4}" width="${gs.w - 8}" height="${gs.h - 8}" rx="2" fill="none" stroke="${vit}" stroke-opacity="${r1(1 - 0.4 * lyst)}" stroke-width="1.6"/><text x="${gs.x + gs.w / 2}" y="${r1(gsMitt + 0.42 * gs.fs)}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="${gs.fs}" fill="${vit}">S:t Eriksgatan</text>`;
+    s += `<g fill="${mix(bla, vit, 0.55)}">${[gs.x + 8.5, gs.x + gs.w - 8.5].map((x) => `<circle cx="${x}" cy="${gsMitt}" r="1.5"/>`).join('')}</g>`;
 
     // ---------- butiken ----------
     const ram = mix('#08090a', '#25292a', 0.2 + 0.8 * L.dag);
@@ -609,6 +615,10 @@ window.RumFasad = (() => {
       const valv = (dx, dy) => `M${px + dx} ${MARK} V${pt + 90 + dy} Q${px + dx} ${pt + dy} ${px + pw / 2 + dx} ${pt + dy} Q${px + pw + dx} ${pt + dy} ${px + pw + dx} ${pt + 90 + dy} V${MARK} Z`;
       d += `<clipPath id="rf-s-port"><path d="${valv(0, 0)}"/></clipPath>`;
       let sh = `<rect x="${VARLD.x0}" y="236" width="${HORN - VARLD.x0}" height="34" fill="url(#rf-s-ned)"/>`;
+      // stupröret står ut från väggen och kastar en smal skugga; gatuskylten ligger an och kastar nästan ingen
+      const gs = GATSKYLT;
+      sh += `<rect x="${STUPROR + 7}" y="${VARLD.y0}" width="5" height="${MARK - 54 - VARLD.y0}" fill="#000" opacity=".4"/>`;
+      sh += `<path fill-rule="evenodd" d="M${gs.x + 2} ${gs.y + 3} h${gs.w} v${gs.h} h${-gs.w} Z M${gs.x} ${gs.y} h${gs.w} v${gs.h} h${-gs.w} Z" fill="#000" opacity=".5"/>`;
       sh += `<rect x="${sk.x + 16}" y="${sk.y + sk.h}" width="${sk.w}" height="40" fill="url(#rf-s-ned)"/><rect x="${sk.x + sk.w}" y="${sk.y + 10}" width="18" height="${sk.h}" fill="url(#rf-s-hog)"/>`;
       sh += `<rect x="${sk.x + 6}" y="${MARK - 34}" width="${HORN - sk.x}" height="10" fill="#000" opacity=".35"/>`;
       for (const [lx, m] of [[sk.x + sk.w * 0.2, 1], [sk.x + sk.w * 0.8, -1]]) sh += `<g transform="translate(${r1(lx + 10)} 16) scale(${m} 1)" opacity=".38"><path d="M0 ${sk.y - 4} V${sk.y - 70} q0 -24 26 -24 q30 0 30 36" fill="none" stroke="#000" stroke-width="5"/><path d="M38 ${sk.y - 64} l18 0 l10 22 l-38 0 Z" fill="#000"/></g>`;
@@ -620,7 +630,7 @@ window.RumFasad = (() => {
     // ---- kvällen: mörkret över bottenvåningen och trottoaren, utom där något lyser
     const hal = [[FON.x + FON.w / 2, FON.y + FON.h / 2, FON.w * 0.78, FON.h * 0.95], [DORR.x + DORR.w / 2, DORR.y + DORR.h / 2, DORR.w * 1.2, DORR.h * 0.7]];
     for (const lx of lampX) hal.push([lx, sk.y + 30, 230, 130]);
-    if (L.lampor) hal.push([1133, 269, 150, 60]);
+    if (L.lampor) hal.push([GATSKYLT.x + GATSKYLT.w / 2, GATSKYLT.y + GATSKYLT.h / 2, 120, 48]);
     if (L.lampor) hal.push([341, 380, 150, 160], [1720, MARK + 30, 330, 120]);
     hal.push([FON.x + FON.w / 2 + 40, MARK + 50, 520, 120]);
     d += `<mask id="rf-mork-m" maskUnits="userSpaceOnUse" x="${VARLD.x0}" y="${VARLD.y0}" width="${VARLD.x1 - VARLD.x0}" height="${VARLD.y1 - VARLD.y0}"><rect x="${VARLD.x0}" y="${VARLD.y0}" width="${VARLD.x1 - VARLD.x0}" height="${VARLD.y1 - VARLD.y0}" fill="#fff"/>` +

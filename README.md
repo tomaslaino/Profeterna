@@ -6678,7 +6678,8 @@ dörren och ser tobaksaffären från trottoaren, där baren Bron ligger vid S:t 
 [public/rum-fasad.css](public/rum-fasad.css)). Efter användarens foto av Bron utifrån, men närmare: det laxrosa huset med
 ljusa fönsteromfattningar och franska balkonger, den ljusa bottenvåningen med fogar, gesimsen emellan och kedjestenarna på
 hörnet, porten med överljusfönster, en vägglykta och barberarens stång längst till vänster, och ett stuprör mellan
-fönstren (`STUPROR`), bakom gatuskylten. Över skyltfönstret och dörren
+fönstren (`STUPROR`), med gatuskylten (`GATSKYLT`) på väggen bredvid, mellan röret och den högra svanhalsen och
+i linje med skyltens tak (inte bakom röret, och hel också i telefonen). Över skyltfönstret och dörren
 skylten MATCHFIXARNA i benvitt på mörkt med en tunn guldlinje (sajtens färger och Fraunces) under två lampor på
 svanhalsar, och gatuskylten *S:t Eriksgatan* på hörnet. Till höger om huset börjar bron: stenpelaren, det gröna räcket
 med en cykel mot det, parkeringsförbudet och en gatlykta, och bortom räcket slänten ned mot spåren, trädtopparna,
