@@ -136,6 +136,17 @@
   // ger en mening om hela matchen. t kan vara en funktion av matchens h.
   // ex: null betyder inget exempel (och inte kortets).
   const MANAD = ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'];
+  // efternamnet med "van", "de" och liknande som hör till (som startelvan i src/startelvor.js)
+  const PARTIKLAR = new Set(['van', 'von', 'de', 'der', 'den', 'da', 'das', 'do', 'dos', 'di', 'del', 'della', 'du', 'le', 'la', 'ter', 'ten', 'mac', 'al', 'el', 'bin', 'ben']);
+  // ett litet tal först i en mening: 'Sex', annars siffrorna
+  const ORDTAL = ['Ingen', 'En', 'Två', 'Tre', 'Fyra', 'Fem', 'Sex', 'Sju', 'Åtta', 'Nio', 'Tio', 'Elva', 'Tolv'];
+  const forst = (n) => ORDTAL[n] || hel(n);
+  const efternamn = (s) => {
+    const d = String(s || '').trim().split(/\s+/).filter(Boolean);
+    if (d.length < 2) return d[0] || '';
+    const i = d.findIndex((w, j) => j > 0 && j < d.length - 1 && PARTIKLAR.has(w.toLowerCase()));
+    return d.slice(i > 0 ? i : d.length - 1).join(' ');
+  };
   // '2024-09-05' → '5 september 2024', eller med bara månaden: 'september 2024'
   const datumAr = (s, dag = true) => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return `${dag ? `${d} ` : ''}${MANAD[m - 1]} ${y}`; };
   // ett exempel ur lagfilen bara när det ger samma tal som matchsidans rad
@@ -163,7 +174,7 @@
     // spelarnas egen vila (sedan 2026-11-16), också för landskamperna
     'vila-elvan': {
       e: 'ELVANS VILA', n: 'DAGAR SEDAN SPELARNAS SENASTE MATCH',
-      t: 'Snittet för startelvan. Varje spelares senaste match räknas, för klubben eller landslaget, och ett inhopp räknas också. Mer än två veckor räknas som två veckor. Elvan under dagarna är den uttagna, 365Scores troliga, sajtens beräknade eller den i förra matchen.',
+      t: 'Snittet för startelvan. Varje spelares senaste match räknas, för klubben eller landslaget, och ett inhopp räknas också. En landskamp som inte är spelad än räknas när spelaren står i landslagets troliga elva eller redan har spelat under uppehållet. Mer än två veckor räknas som två veckor. Elvan under dagarna är den uttagna, 365Scores troliga, sajtens beräknade eller den i förra matchen.',
       ex: ({ namn, sv }) => {
         const x = sv && sv.elva;
         if (!x || !x.p || x.p.length < 2) return null;
@@ -172,17 +183,23 @@
         for (const [, d] of x.p) per.set(tak(d), (per.get(tak(d)) || 0) + 1);
         const g = [...per].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
         const vem = { uttagen: 'uttagna elva', trolig: 'troliga elva', 'beräknad': 'beräknade elva', 'förra': 'elva i förra matchen' }[x.k] || 'elva';
-        const nar = (d) => (d >= 14 ? 'två veckor sedan eller tidigare' : d === 1 ? '1 dag sedan' : `${d} dagar sedan`);
-        if (g.length === 1) return `Alla i ${gen(namn)} ${vem} spelade sin senaste match för ${nar(g[0][0])}.`;
-        const delar = g.map(([d, n], i) => `${hel(n)}${i ? '' : ' sin senaste match'} för ${nar(d)}`);
+        const hur = (d) => (d >= 14 ? 'två veckor eller mer' : d === 1 ? '1 dag' : `${d} dagar`);
+        // de som räknas från en landskamp som inte är spelad än (namnen när de är få)
+        const land = x.p.filter((y) => y[2]);
+        const namnen = land.map((y) => efternamn(y[0]));
+        const efter = !land.length ? ''
+          : land.length <= 3 ? ` ${namnen.length > 1 ? `${namnen.slice(0, -1).join(', ')} och ${namnen[namnen.length - 1]}` : namnen[0]} räknas från en landskamp som inte är spelad än.`
+            : ` ${forst(land.length)} av dem räknas från en landskamp som inte är spelad än.`;
+        if (g.length === 1) return `Alla i ${gen(namn)} ${vem} har vilat ${hur(g[0][0])} när matchen börjar.${efter}`;
+        const delar = g.map(([d, n]) => `${hel(n)} vilat ${hur(d)}`);
         const summa = x.p.reduce((s, [, d]) => s + tak(d), 0);
-        return `I ${gen(namn)} ${vem} spelade ${delar.slice(0, -1).join(', ')} och ${delar[delar.length - 1]}: (${g.map(([d, n]) => `${n} × ${d}`).join(' + ')}) / ${x.p.length} = ${dec(summa / x.p.length)}.`;
+        return `I ${gen(namn)} ${vem} har ${delar.slice(0, -1).join(', ')} och ${delar[delar.length - 1]} när matchen börjar: (${g.map(([d, n]) => `${n} × ${d}`).join(' + ')}) / ${x.p.length} = ${dec(summa / x.p.length)}.${efter}`;
       },
     },
     'vila-truppen': {
       e: 'TRUPPENS VILA', n: 'DAGAR SEDAN SPELARNAS SENASTE MATCH',
-      t: 'Snittet för alla i truppen som har spelat den senaste månaden, i alla tävlingar och för landslaget också. Mer än två veckor räknas som två veckor.',
-      ex: ({ namn, sv }) => (sv && sv.trupp ? `${st(sv.trupp.n, 'spelare', 'spelare')} i ${gen(namn)} trupp har spelat den senaste månaden.` : null),
+      t: 'Snittet för alla i truppen som har spelat den senaste månaden, i alla tävlingar och för landslaget också. En landskamp som inte är spelad än räknas som för elvan. Mer än två veckor räknas som två veckor.',
+      ex: ({ namn, sv }) => (sv && sv.trupp ? `${st(sv.trupp.n, 'spelare', 'spelare')} i ${gen(namn)} trupp har spelat den senaste månaden.${sv.trupp.l ? ` ${forst(sv.trupp.l)} av dem räknas från en landskamp som inte är spelad än.` : ''}` : null),
     },
     gjorda: { e: 'MÅL', n: 'GJORDA–INSLÄPPTA PER MATCH', t: 'Bara ligamatcherna räknas.', ex: null },
     hemma: { e: 'HEMMA', n: 'HEMMAMATCHERNA I LIGAN', t: 'Vinster, oavgjorda och förluster den här säsongen.', ex: null },

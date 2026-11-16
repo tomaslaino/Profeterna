@@ -38,9 +38,11 @@
 // snittet räknas mer än två veckor som två veckor, som mätaren i datorn: den
 // som kommer tillbaka efter en skada ska inte dra upp hela elvans snitt.
 //
-// Har laget en annan match före den här (en match i veckan före helgens)
-// räknas inget förrän den är spelad: spelarnas vila hänger då på den. En
-// spelad match står kvar som den var vid avspark.
+// Under ett landslagsuppehåll räknas en klubbspelare från landskampen han
+// väntas spela före klubbmatchen (steg 4b nedan). Har laget en annan
+// klubbmatch före den här (en match i veckan före helgens) räknas inget
+// förrän den är spelad: spelarnas vila hänger då på den. En spelad match
+// står kvar som den var vid avspark.
 
 const { getJson, mapLimit } = require('./http');
 const { teamSim } = require('./s365ratings');
@@ -65,6 +67,14 @@ const KICKOFF_SLACK = 3 * HOUR;
 const PER_CALL = 45;
 const CONCURRENCY = 3;
 const MINUTES = 229;
+
+// Landskamperna under ett uppehåll: listan hämtas om efter NAT_TTL, med
+// NAT_PER_CALL landslag per anrop; "under uppehållet" = de senaste
+// UPPEHALL_DAYS dagarna.
+const NAT_TTL = 3 * HOUR;
+const NAT_PER_CALL = 50;
+const UPPEHALL_DAYS = 10;
+const INTL = new Set(['unl', 'vsk', 'emk']);
 
 // Tävlingarna hos 365Scores (som i public/matchruta.js).
 const COMP365 = { pl: 7, ch: 1, l1: 2, l2: 3, fac: 8, lc: 9, unl: 7016, vsk: 570 };
@@ -194,9 +204,10 @@ async function fetchVila({ events, squads, planFor, previous, now = Date.now() }
       if (xi) add(sq.c, xi.aids);
     }
   }
+  // (en spelare utan tredje fältet, landslaget, sparades före 2026-11-16 kväll)
   const teamJobs = [...need].filter(([c, set]) => {
     const T = teams[c];
-    return !T || now - T.at > TEAM_TTL || [...set].some((a) => !T.ath[a]);
+    return !T || now - T.at > TEAM_TTL || [...set].some((a) => !T.ath[a]) || Object.values(T.ath).some((x) => x.length < 3);
   });
   await mapLimit(teamJobs, CONCURRENCY, async ([c, set]) => {
     const all = [...set];
@@ -210,7 +221,7 @@ async function fetchVila({ events, squads, planFor, previous, now = Date.now() }
           ath[a.id] = [a.name || '', gs.filter((x) => x.played && x.game && x.game.startTime).map((x) => {
             const min = (x.athleteStats || []).find((y) => y && y.type === MINUTES);
             return [x.game.startTime, min ? Number(min.value) || 0 : null, x.game.competitionId, x.relatedCompetitor || null];
-          })];
+          }), a.nationalTeamId > 0 && a.nationalTeamId !== Number(c) ? a.nationalTeamId : null];
           for (const x of gs) {
             if (x.relatedCompetitor === Number(c) && x.game && x.game.statusGroup === 4) tgames.set(x.game.id, x.game.startTime);
           }
@@ -247,13 +258,97 @@ async function fetchVila({ events, squads, planFor, previous, now = Date.now() }
     }
   });
 
-  // 5. Snitten per lag och match.
-  const vila = (T, aid, kickoff) => {
+  // 4b. Landskamperna under ett uppehåll (sedan 2026-11-16, användaren: "Kan
+  // landskamperna under uppehållet räknas in också?"). En klubbspelare som
+  // väntas spela för sitt landslag före klubbmatchen räknas från den
+  // landskampen, inte från sin förra match. Väntas spela gör han när han står
+  // i landslagets elva hos 365Scores (uttagen eller trolig), eller – när
+  // landskampen ännu inte har någon elva – när han redan har spelat för
+  // landslaget under uppehållet. Landslaget är spelarens nationalTeamId,
+  // landskamperna hämtas för alla landslagen i ett par anrop
+  // (/web/games/fixtures/?competitors=<id,…>, verifierat 2026-11-16 med 54
+  // lag i ett anrop). Bara när det finns landskamper före klubbmatcherna.
+  const klubb = todo.filter((e) => !INTL.has(e.comp));
+  const sistKlubb = klubb.length ? Math.max(...klubb.map((e) => Date.parse(e.kickoff))) : 0;
+  const uppehall = klubb.length > 0 && events.some((x) => INTL.has(x.comp)
+    && Date.parse(x.kickoff) > now - KICKOFF_SLACK && Date.parse(x.kickoff) < sistKlubb);
+  let nat = null;
+  if (uppehall) {
+    const natIds = new Set();
+    for (const e of klubb) {
+      for (const sideKey of ['home', 'away']) {
+        const sq = squads.get(e[sideKey].espnId);
+        const T = sq && teams[sq.c];
+        if (T) for (const x of Object.values(T.ath)) if (x[2]) natIds.add(x[2]);
+      }
+    }
+    const gammal = old.nat && old.nat.g ? old.nat : null;
+    if (gammal && now - gammal.at < NAT_TTL && [...natIds].every((id) => gammal.ids.includes(id))) nat = gammal;
+    else {
+      const lista = new Map();
+      let ok = true;
+      const allaIds = [...natIds];
+      for (let i = 0; i < allaIds.length; i += NAT_PER_CALL) {
+        let url = `${WEB}/web/games/fixtures/?${PARAMS}&competitors=${allaIds.slice(i, i + NAT_PER_CALL).join(',')}`;
+        try {
+          for (let sida = 0; sida < 4 && url; sida++) {
+            const j = await get(url);
+            const gs = j.games || [];
+            for (const g of gs) {
+              if (!g.homeCompetitor || !g.awayCompetitor || g.statusGroup === 4) continue;
+              lista.set(g.id, [g.id, g.startTime, g.homeCompetitor.id, g.awayCompetitor.id, g.hasLineups ? 1 : 0]);
+            }
+            const sist = gs.length ? Math.max(...gs.map((g) => Date.parse(g.startTime))) : Infinity;
+            url = sist < sistKlubb && j.paging && j.paging.nextPage ? WEB + j.paging.nextPage : null;
+          }
+        } catch (err) {
+          ok = false;
+          console.error(`[s365_vila] landskamperna: ${err.message || err}`);
+        }
+      }
+      nat = ok || !gammal ? { at: now, ids: allaIds, g: [...lista.values()] } : gammal;
+    }
+  }
+  const natList = nat ? nat.g.filter(([, st]) => Date.parse(st) > now - KICKOFF_SLACK && Date.parse(st) < sistKlubb) : [];
+  const natJobs = natList.filter(([gid, st, , , harElva]) => {
+    const have = games[gid];
+    return harElva && (!have || now - have.at > gameTtl(Date.parse(st) - now));
+  }).map(([gid]) => gid);
+  await mapLimit(natJobs, CONCURRENCY, async (gid) => {
+    try {
+      const j = await get(`${WEB}/web/game/?${PARAMS}&gameId=${gid}`);
+      if (j && j.game) games[gid] = parseGame(j.game);
+    } catch (err) {
+      console.error(`[s365_vila] landskamp ${gid}: ${err.message || err}`);
+    }
+  });
+  // landskampen (avsparken) som spelaren väntas spela sist före klubbmatchen, eller null
+  const vantad = (x, aid, e) => {
+    const land = x[2];
+    if (!land || INTL.has(e.comp)) return null;
+    const t1 = Date.parse(e.kickoff) - HOUR;
+    const kom = natList.filter(([, st, h, a]) => (h === land || a === land) && Date.parse(st) < t1)
+      .sort((p, q) => q[1].localeCompare(p[1]));
+    if (!kom.length) return null;
+    const spelat = x[1].some(([s, min, , rc]) => rc === land && min !== 0 && Date.parse(s) > now - UPPEHALL_DAYS * DAY);
+    for (const [gid, st] of kom) {
+      const s = games[gid] && games[gid].s && games[gid].s[land];
+      if (s && s.xi.length >= 11 ? s.xi.includes(Number(aid)) : spelat) return st;
+    }
+    return null;
+  };
+
+  // 5. Snitten per lag och match. { d: dagar, l: räknad från en landskamp
+  // som inte är spelad än } eller null (inte spelat i de listade matcherna);
+  // undefined när spelaren inte är hämtad.
+  const vila = (T, aid, e) => {
     const x = T.ath[aid];
     if (!x) return undefined;
-    const t = Date.parse(kickoff) - HOUR;
-    const prev = x[1].filter(([s, min]) => Date.parse(s) < t && min !== 0).map(([s]) => s).sort().pop();
-    return prev ? dateDays(prev, kickoff) : null;
+    const t = Date.parse(e.kickoff) - HOUR;
+    const prev = x[1].filter(([s, min]) => Date.parse(s) < t && min !== 0).map(([s]) => s).sort().pop() || null;
+    const ny = vantad(x, aid, e);
+    const sist = ny && (!prev || ny > prev) ? ny : prev;
+    return sist ? { d: dateDays(sist, e.kickoff), l: sist === ny } : null;
   };
   const snitt = (ds) => r1(ds.reduce((s, d) => s + (d == null ? MAX_DAYS : Math.min(MAX_DAYS, d)), 0) / ds.length);
   let computed = 0;
@@ -264,8 +359,8 @@ async function fetchVila({ events, squads, planFor, previous, now = Date.now() }
       const sq = squads.get(tid);
       const T = sq && teams[sq.c];
       if (!T || earlier(tid, e)) { out[sideKey] = null; continue; }
-      const act = sq.a.map(([aid]) => vila(T, aid, e.kickoff)).filter((d) => d != null && d <= ACTIVE_DAYS);
-      const trupp = act.length >= 5 ? { d: snitt(act), n: act.length } : null;
+      const act = sq.a.map(([aid]) => vila(T, aid, e)).filter((v) => v && v.d <= ACTIVE_DAYS);
+      const trupp = act.length >= 5 ? { d: snitt(act.map((v) => v.d)), n: act.length, l: act.filter((v) => v.l).length } : null;
       let xi = elvaOf(e, sideKey, sq.c);
       if (!xi) {
         const gid = forra(e, sq.c);
@@ -276,8 +371,15 @@ async function fetchVila({ events, squads, planFor, previous, now = Date.now() }
       }
       let elva = null;
       if (xi) {
-        const p = xi.aids.map((a) => [a, vila(T, a, e.kickoff)]).filter(([, d]) => d !== undefined);
-        if (p.length >= 8) elva = { d: snitt(p.map(([, d]) => d)), n: p.length, k: xi.k, p: p.map(([a, d]) => [T.ath[a][0], d]) };
+        const p = xi.aids.map((a) => [a, vila(T, a, e)]).filter(([, v]) => v !== undefined);
+        if (p.length >= 8) {
+          elva = {
+            d: snitt(p.map(([, v]) => (v ? v.d : null))), n: p.length, k: xi.k,
+            l: p.filter(([, v]) => v && v.l).length,
+            // [namn, dagar (null: inte spelat i de listade matcherna), 1 = från en kommande landskamp]
+            p: p.map(([a, v]) => [T.ath[a][0], v ? v.d : null, v && v.l ? 1 : 0]),
+          };
+        }
       }
       out[sideKey] = elva || trupp ? { elva, trupp } : null;
     }
@@ -292,7 +394,7 @@ async function fetchVila({ events, squads, planFor, previous, now = Date.now() }
   for (const id of Object.keys(ids)) if (!live.has(id) && !matches[id]) delete ids[id];
 
   return {
-    matches, teams, games, ids, lists,
+    matches, teams, games, ids, lists, nat,
     upcoming: todo.length, computed, calls,
     sourceUrl: 'https://www.365scores.com/football',
   };
