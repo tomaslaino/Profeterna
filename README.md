@@ -1314,6 +1314,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   fönstren ovanför, och småfelen (den som gick i mörkret såg ut som ett spöke, gatuskylten gick inte att läsa på kvällen,
   och korta färger som `#222` blev ogiltiga). Inte valt: pölar som speglar fönstret och gänget (det dyraste), någon som
   går in genom den öppna dörren och stamkunden som röker under lyktan. Inga nya lager. Se [Fasaden](#fasaden).
+- **Fler som går förbi, och det är 90-tal (2026-11-16, användarens önskemål):** "Ha betydligt fler personer/alternativ
+  med människor (eller djur/hundar?) som går utanför butiken. Tänk på att det är 90-talet! De ska självklart vara
+  anpassade klädesmässigt till vädret!" Två till fyra gånger så många syns samtidigt (färre i regn och på natten),
+  ensamma eller i sällskap: par under samma paraply, gäng, en förälder med ett barn i handen, barnvagn, pulka i snön, en
+  äldre med dragkärra, någon som leder cykeln, någon med tidningen över huvudet i regnet, och fem sorters hundar. Kläderna
+  är 90-tal och efter vädret: vindjackor i färgblock, dunjackor, skinn- och bomberjackor, myskläder, vida jeans, bakvända
+  kepsar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar och mobiltelefon med antenn; regnrock,
+  sydväst, gummistövlar, regnskydd på barnvagnen och paraplyer som vinden vänder i regnet; mössa, halsduk och
+  lovikkavantar i kylan; shorts, solglasögon och glass i värmen. Se *Det som händer ute* under [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6669,7 +6678,8 @@ dörren och ser tobaksaffären från trottoaren, där baren Bron ligger vid S:t 
 [public/rum-fasad.css](public/rum-fasad.css)). Efter användarens foto av Bron utifrån, men närmare: det laxrosa huset med
 ljusa fönsteromfattningar och franska balkonger, den ljusa bottenvåningen med fogar, gesimsen emellan och kedjestenarna på
 hörnet, porten med överljusfönster, en vägglykta och barberarens stång längst till vänster, och ett stuprör mellan
-fönstren (`STUPROR`), bakom gatuskylten. Över skyltfönstret och dörren
+fönstren (`STUPROR`), med gatuskylten (`GATSKYLT`) på väggen bredvid, mellan röret och den högra svanhalsen och
+i linje med skyltens tak (inte bakom röret, och hel också i telefonen). Över skyltfönstret och dörren
 skylten MATCHFIXARNA i benvitt på mörkt med en tunn guldlinje (sajtens färger och Fraunces) under två lampor på
 svanhalsar, och gatuskylten *S:t Eriksgatan* på hörnet. Till höger om huset börjar bron: stenpelaren, det gröna räcket
 med en cykel mot det, parkeringsförbudet och en gatlykta, och bortom räcket slänten ned mot spåren, trädtopparna,
@@ -6720,9 +6730,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   regnet slår ned blir det stänk – en ring som vidgas och en liten krona – på stenen, fönsterbänkens bleck och skyltens
   tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
   inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
-- **Det som händer ute:** de som går förbi på trottoaren framför affären, lika många som på gatan inifrån
-  (`RumUte.trafik`), klädda efter vädret, med paraply (med spröt och droppar) i regn, mössa, keps eller hatt och halsduk
-  i kyla, väska och ibland hund. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
+- **Det som händer ute:** de som går förbi på trottoaren framför affären, ungefär lika många som på gatan inifrån
+  (`RumUte.trafik`; färre i regn och snöyra, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
+  (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
+  barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
+  tidningen i regnet och hundar (labrador, schäfer, tax, terrier och pudel, `HUNDAR`; de små i täcke när det regnar).
+  Det är 90-tal och kläderna är efter vädret (`klad`, `F90`, `vadret`): vindjackor och myskläder i färgblock, dunjackor
+  med stickningar, skinnjackor, bomberjackor, jeansjackor, fältjackor, trenchcoats, kappor och kavajer, vida jeans,
+  kjolar, bakvända kepsar, fiskarhattar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar, portföljer
+  och mobiltelefon med antenn; i regn paraply (som vinden ibland vänder ut och in), regnrock med luva eller sydväst,
+  gummistövlar och regnskydd på barnvagnen, i kyla mössa (ibland med tofs eller öronlappar), sjalett, halsduk, vantar
+  (ibland lovikka) och kängor, och i värme t-shirt, shorts med vita sockor, solglasögon, keps och glass. Barnen har större
+  huvud, och i regnet galonställ och stövlar. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
+  kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
+  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och bara
+  den som har båda händerna lediga kan ha dem i fickorna. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
   framför fönstret (`randLjus`), och speglas svagt i den våta stenen. Där det är mörkt är de lika mörka som mörkret
   omkring (`morkSteg`: fyra steg av samma färger, `MORK`, som räknas ut en gång per figur i `morkna`); förut var en ljus
@@ -6734,19 +6756,41 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   den sedan står (`landa`); foten går minst 1,5 cm över stenen mitt i svingen. Överkroppen lutar kring höften (armarna
   hänger ändå lodrätt), en lång kappas skört ritas två gånger, med det främre och det bakre låret, så att det vidgas när
   benen går isär, armarna pendlar emot benen med armbågen lite böjd, paraplyet gungar med i stegen och hunden travar
-  fyra steg på ett, med kopplet i en stilla hand. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
+  efter hur långt den har gått, diagonala ben i par och tassen stilla mot stenen, med kopplet i en stilla hand; hjulen
+  på barnvagnen, cykeln och dragkärran rullar på samma sätt. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
   (långa steg, snabbt, framåtlutad, stora armsvingar), strosar (korta steg, långsamt, ofta händerna i fickorna),
   studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram) och rak (upprätt, raka
   knän), och var och en lite olika inom sitt sätt (steglängd, takt, lutning, armsving); farten är steglängden gånger
-  takten, 0,9–1,6 m/s. Sättet lottas ur en egen följd per figur och dag, så att kläderna och var de går är som förut.
+  takten, 0,9–1,6 m/s. Sättet passar den som går (den äldre strosar, barnet studsar, den som blir blöt skyndar sig) och
+  ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
+  fyra gånger så långsam processor kostar fler figurer 0,2 ms mer per bild på dagen och 0,5 ms mer i kvällsregn som
+  telefon, och ungefär 3 ms mer i kvällsregn i datorn (2026-11-16).
   Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
   still hur ofta duken än ritas om (förut svängde benen i halva takten och fötterna gled fram, "de flyter liksom fram",
   2026-11-16; sedan gick alla likadant, med en stel kappa och benet som släpade efter, "inte så naturligt", samma dag).
   Ibland (i ungefär sex av tio varv om 170 s, inte
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
   13 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
-  gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna på gatan bakom en syns som speglingar som far förbi i glaset
+  gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna syns också som speglingar som far förbi i glaset
   och dörren: mörka skuggor på dagen, strålkastare och baklyktor i mörkret.
+- **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
+  ([public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), `RumFasadGatan`): trottoarkanten i granit 0,88 m ut,
+  rännstenen med gatsten och en brunn (bäcken från stupröret slutar där), asfalten med mittlinjen, höstlöv i
+  rännstenen, slask med hjulspår och en plogvall längs kanten när det har snöat och, i en telefon på höjden, kanten
+  mittemot och trottoaren där man själv står. Då och då kör det förbi, och då täcker de affären – bussarna nästan
+  helt: nittiotalsbilar (Volvo 240 kombi med takräcke och stänkskydd, 740, Saab 900, Golf, en skåpbil och taxi med
+  skylten på taket), de röda bussarna (trean och 77:an) och den blåa ledbussen fyran med slutstationen på skylten, och
+  plogbilen med blinkljus när det har snöat. Högertrafik: den bortre filen kör åt vänster, den närmre åt höger.
+  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 1 % av tiden mitt i natten, 9 % på dagen och 25 % i
+  rusningen), och i rusningen ibland en kö mot ljuset vid bron: bilarna bromsar in, står med bromsljusen tända (och
+  avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
+  baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
+  regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
+  när det har snöat. Allt räknas ur tiden: den delas i luckor om nio sekunder per fil och i varje lucka kommer ett
+  fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon är
+  ute ur världen innan nästa kommer, så ingen kör igenom någon. Fordonen ritas med vektorer (inga bilder) i `rf-fram`
+  efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
+  sekunden (30 i telefonen), så att de inte hoppar fram.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -6756,7 +6800,7 @@ och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
 bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
 ritas om när ljuset eller vädret ändras (en gång i minuten prövas det). Det som rör sig ritas i tre dukar: `rf-fram`
-överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, regnet, snön och blixten; i
+överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
