@@ -453,6 +453,8 @@ export async function figurer(canvas, opt = {}) {
   const cam = new THREE.PerspectiveCamera(2 * Math.atan(H / 2 / D) / DEG, FW / H, 50, 5000);
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
+  // (kameran ute på trottoaren, utifran nedan)
+  const UTE = { kam: null, neon: 1, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
   // Ögat, där betraktaren står (OGA: gänget tittar dit, looks), flyttas efter musen (draw), och bilden
   // förskjuts så att djupet OGA_Z står kvar (en bit av en större bild, som när duken inte är mitt i).
   // Ljuset står kvar, som när man själv rör sig: förut vreds gänget och skuggorna mot lamporna. NARA är
@@ -2957,7 +2959,7 @@ export async function figurer(canvas, opt = {}) {
 
   const figs = [];
   // (vad var och en gör vid t, en gång per bild: aktRa och aktNu)
-  const AKT_MINNE = { pa: false, ra: new Map(), nu: new Map() };
+  const AKT_MINNE = { pa: false, ra: new Map(), nu: new Map(), prat: new Map(), sa: new Map(), ordet: new Map() };
   const n = placering(opt.vader || (window.Vader && window.Vader.nu()));
   // I telefonen kastar de små delarna (fingrarna, knapparna, smycket …) ingen
   // skugga: deras skuggor syns inte där, och varje del är ett eget ritanrop
@@ -3713,8 +3715,10 @@ export async function figurer(canvas, opt = {}) {
     if (k === 'dl') yaw = inn * (0.18 * ibland(t, 21, 0.13, 12, 13.5, 17, 18.5) - 0.05);
     // (DT nickar instämmande ibland, sakta)
     if (k === 'dt') { pitch += 0.05 * Math.sin(t * 2.6) * ibland(t, 26, 0.41, 8.5, 9.3, 11.6, 12.6); yaw = inn * 0.12 * ibland(t, 17, 0.67, 2, 3, 6, 7); }
-    // (DJ nickar med betoningarna när han pratar, pratSlag)
-    if (k === 'dj') { yaw = inn * (0.22 - 0.04 * gung(t * 0.45)); pitch += (0.012 * gung(t * 1.1) + 0.035 * pratSlag(t, DJ_PRAT).nick) * talkW(o, t); }
+    if (k === 'dj') yaw = inn * (0.22 - 0.04 * gung(t * 0.45));
+    // (den som har ordet nickar med betoningarna, pratSlag, och lutar sig lite fram)
+    const pw = pratW(o, t);
+    if (pw > 0) { pitch += (0.012 * gung(t * 1.1) + 0.035 * pratSlag(t, PRAT[k].fro).nick) * pw; lean += 0.02 * pw; }
     // benen hänger lugnt och gungar bara lite (gung: i en takt som inte upprepar sig, som bålen ovan)
     const knee = [0, 1].map((i) => 0.07 + 0.06 * gung(t * (k === 'dj' ? 0.5 : 0.6) + o.phase + i * 2.4) * (k === 'dt' ? 0.6 : 1));
     const foot = [0.5, 0.5];
@@ -3788,11 +3792,18 @@ export async function figurer(canvas, opt = {}) {
       pitch += (1.3 * L.pitch - lean * Math.cos(hy) - pitch) * w;
       roll += (-lean * Math.sin(hy) - roll) * w;
     }
-    // den som tittar på DJ har huvudet lite på sned, och nickar ibland med i hans betoningar
-    // (pratSlag), en aning efter honom
-    if (sa && sa.dj > 0) {
-      roll += 0.04 * sa.rull * sa.dj;
-      if (sa.nick) pitch += 0.05 * pratSlag(t - 0.3 - 0.08 * FI(o), DJ_PRAT).nick * talkW(figur('dj'), t) * sa.dj;
+    // (och huvudet står aldrig helt still, smaRor)
+    const sr = smaRor(o, t);
+    if (sr) { yaw += sr.yaw; pitch += sr.pitch; roll += sr.roll; }
+    // den som tittar på den som pratar har huvudet lite på sned, och nickar ibland med i hens
+    // betoningar (pratSlag), en aning efter – och ibland "mm", två korta nickar (mm)
+    if (sa && sa.ser > 0) {
+      roll += 0.04 * sa.rull * sa.ser;
+      if (sa.nick) pitch += 0.05 * pratSlag(t - 0.3 - 0.08 * FI(o), PRAT[sa.tal].fro).nick * pratW(figur(sa.tal), t) * sa.ser;
+      if (sa.mm != null) {
+        const l = t - sa.at - sa.mm;
+        if (l > 0 && l < 0.8) pitch += 0.075 * (bump(l, 0, 0.11, 0.18, 0.34) + 0.65 * bump(l, 0.34, 0.45, 0.52, 0.72)) * sa.ser;
+      }
     }
     // målen: bakåt med huvudet upp och lite studs, ihopsjunken, en nick –
     // eller med händerna på huvudet bakåt och upp i taket (malV 1) och
@@ -3827,9 +3838,11 @@ export async function figurer(canvas, opt = {}) {
       if (kb.lean > 0 && !kb.mitt) side += kb.lean * w * o.F.turn * DEG * 1.5;
     }
     // takten så länge radion spelar och ingen dans eller sång pågår (radioGung)
+    let gungar = false;
     if (dansKan(o, t)) {
       const g = radioGung(o, t, ak);
       if (g) {
+        gungar = true;
         pitch += g.pitch || 0;
         lift += g.lift || 0;
         roll += g.roll || 0;
@@ -3894,6 +3907,13 @@ export async function figurer(canvas, opt = {}) {
         knee[i] += ne * 0.06 * Math.sin(t * 1.4 + o.phase + i * 2.1) + gl * 0.05 * Math.sin(t * 1.2 + o.phase + i * 2.4);
         knee[i] += (0.06 - knee[i]) * 0.6 * de;
       }
+    }
+    // benen under stolen (fotter): inte medan man väntar, gör något annat eller gungar med i radion
+    const fo = hv > 0 && vw < 1 && !gungar ? fotter(o, t) : null;
+    if (fo) {
+      const w = hv * (1 - vw) * (1 - (ak ? ak.w : 0)) * (o.st ? 1 - o.st.w : 1);
+      knee[fo.ben] += fo.knee * w;
+      foot[fo.ben] += fo.foot * w;
     }
     // tecknet (rum-tecken.js): huvudet på sned åt handen och lite till, också
     // om man redan tittar på en
@@ -4496,14 +4516,24 @@ export async function figurer(canvas, opt = {}) {
     o.F.key === 'dl' ? after(o, t, 0, 1.0, 2.6, 3.6) : 0);
   const dragW = (o, t) => Math.max(o.F.key === 'dt' ? gaKlunk(o, t) : 0, ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * blossW(o, t),
     o.F.key === 'dl' ? 0 : after(o, t, 0, 1.0, 2.6, 3.6));
-  const talkW = (o, t) => (o.F.key === 'dj' ? ready(o, t) * (1 - dragW(o, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - 0.6 * groggW(o, t)) * (1 - aktW(o, t)) : 0);
+  // hur mycket o pratar (med händerna) vid t: den som har ordet (ordW) – DL och DT inte medan de
+  // dricker, och ingen medan hen drar ett bloss
+  // (en gång per figur och tid i en bild, minns: bålen, händerna och blickarna frågar många gånger)
+  const pratW = (o, t) => minns(AKT_MINNE.prat, o, t, pratW0);
+  const pratW0 = (o, t) => {
+    const w = ordW(o, t);
+    if (w <= 0) return 0;
+    return w * ready(o, t) * (1 - dragW(o, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - 0.6 * groggW(o, t)) * (1 - aktW(o, t)) * (o.F.key === 'dj' ? 1 : 1 - drinkW(o, t));
+  };
   const glowAt = (o, t) => Math.max(ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - aktW(o, t)) * blossGlod(o, t), after(o, t, 1.0, 1.4, 2.2, 2.8), aktGlod(o, t));
-  // DJ pratar med händerna (talkW) – förut i en jämn åtta i luften, tre vågor som aldrig stannade.
+  // Den som pratar gör det med händerna (pratW) – förut i en jämn åtta i luften, tre vågor som aldrig stannade.
   // Nu i slag, som när man pratar: handen far till ett nytt ställe på en knapp halv sekund, lite förbi
   // och tillbaka, och står där till nästa slag, efter ungefär en sekund; ungefär vart femte slag står
   // den kvar, och ungefär vart femte är en betoning – större och med en nick (nick). x, y, z och vrid
-  // är −1,3…1,3.
+  // är −1,3…1,3. Var och en i sin takt (fro) och med sin storlek på gesterna (amp): DJ stort, DL lite
+  // mindre och DT smått, med cigaretten.
   const DJ_PRAT = 0.47;
+  const PRAT = { dj: { fro: DJ_PRAT, amp: 1 }, dl: { fro: 0.13, amp: 0.85 }, dt: { fro: 0.81, amp: 0.7 } };
   function pratSlag(t, fro) {
     const B = 0.95;
     const st = (m) => m * B + 0.5 * hash(m * 1.31 + fro);
@@ -4616,30 +4646,84 @@ export async function figurer(canvas, opt = {}) {
     return { breath: 0.05 * andas, lift: 1.3 * andas - 0.5 * ner, pitch: -0.05 * andas + 0.035 * ner, lean: -0.015 * andas + 0.02 * ner };
   }
 
-  // Blickarna i samtalet: i stunder om 2–10 sekunder tittar var och en på något – medan DJ pratar
-  // (talkW) oftast på honom, och han på den han pratar med; annars på varandra, ner i bordet (ölen, DT
-  // askkoppen) eller på radion när den spelar – eller som vanligt. Huvudet vänds fort, som när man
-  // tittar på något (en knapp halv sekund, lite förbi), och man blinkar när blicken flyttas
-  // (blickBlink). Allt annat man tittar på går före (tv:n, den som pekar …), och påhittens blickar;
-  // med flaskan eller cigaretten vid munnen tittar man rakt fram.
+  // Ordet vid bordet: förut pratade bara DJ, hela tiden, och DL och DT lyssnade. Nu går ordet runt, i
+  // stunder om några sekunder som ibland fortsätter (ORDET, stund): DJ har det oftast, DL och DT
+  // ibland, och ibland är det tyst en stund. Den som har ordet pratar med händerna (pratW, pratSlag:
+  // DJ som förut, DL med den lediga handen och DT med cigaretten) och nickar med betoningarna, och de
+  // andra vänder sig mot hen en stund efter att hen har börjat (samtalSeg). Bara ur klockan.
+  const ORDET = { per: 3.8, kvar: 0.4, fro: 0.57, val: [['dj', 0.5], ['dl', 0.22], ['dt', 0.2]] };
+  const ORDET_MINNE = new Map();
+  const ordetNr = (id) => iMinnet(ORDET_MINNE, id, () => {
+    const r = hash(id * 0.731 + ORDET.fro);
+    let acc = 0;
+    for (const [k, p] of ORDET.val) if (r < (acc += p)) return k;
+    return null;
+  });
+  // { k, at, id, fore }: vem som har ordet vid t (null: tyst), sedan när, och vem som hade det före
+  function ordet(t) {
+    const m = AKT_MINNE.pa ? AKT_MINNE.ordet.get(t) : undefined;
+    if (m) return m;
+    const s = stund(t, ORDET.per, ORDET.fro, ORDET.kvar);
+    const x = { k: ordetNr(s.id), at: s.at, id: s.id, fore: ordetNr(s.fore) };
+    if (AKT_MINNE.pa) AKT_MINNE.ordet.set(t, x);
+    return x;
+  }
+  // hur mycket o har ordet (0–1): den som tar det börjar en aning efter att den förra har slutat
+  // (utan rörelser pratar DJ som förut)
+  function ordW(o, t) {
+    if (opt.calm) return o.F.key === 'dj' ? 1 : 0;
+    const x = ordet(t);
+    const k = o.F.key;
+    return (x.k === k ? sm(x.at + 0.15, x.at + 0.65, t) : 0) + (x.fore === k ? 1 - sm(x.at, x.at + 0.45, t) : 0);
+  }
+  // vem som pratar vid t (nyckeln), om någon gör det
+  const ordetHar = (t) => {
+    const x = ordet(t);
+    const o = x.k && figur(x.k);
+    return o && pratW(o, t) > 0.5 ? x.k : null;
+  };
+
+  // Blickarna i samtalet: i stunder om 2–10 sekunder tittar var och en på något – medan någon pratar
+  // (ordetHar) oftast på hen, och den som pratar på dem hen pratar med; annars på varandra, ner i bordet
+  // (ölen, DT askkoppen), på radion när den spelar eller en sekund bort mot disken (OGA) – eller som
+  // vanligt. Huvudet vänds fort, som när man tittar på något (en knapp halv sekund, lite förbi), och man
+  // blinkar när blicken flyttas (blickBlink). Allt annat man tittar på går före (tv:n, den som pekar …),
+  // och påhittens blickar; med flaskan eller cigaretten vid munnen tittar man rakt fram.
   const SAMTAL = { per: 3.4, kvar: 0.45, fro: { dl: 0.21, dt: 0.47, dj: 0.73 } };
   const SAMTAL_MINNE = new Map();
+  const SAMTAL_FORE = new Map();
+  // (mm: när i stunden man nickar "mm" två gånger åt den som pratar, eller null)
   function samtalMal(o, id, at) {
     return iMinnet(SAMTAL_MINNE, `${o.F.key}${id}`, () => {
       const f = id * 0.37 + SAMTAL.fro[o.F.key] * 5.1;
       const r = hash(f + 0.3);
-      const dj = figur('dj');
-      const pratar = Boolean(dj) && talkW(dj, at) > 0.5;
+      const tal = ordetHar(at);
       const andra = figs.filter((x) => x !== o).map((x) => x.F.key);
       const radio = SJUNG.radio.pa ? 1 : 0;
-      const val = o.F.key === 'dj' && pratar ? [[andra[0], 0.4], [andra[1], 0.4], ['bord', 0.1]]
-        : pratar ? [['dj', 0.42], [andra.find((k) => k !== 'dj'), 0.1], ['bord', 0.16], ['radio', 0.08 * radio]]
-          : [[andra[0], 0.19], [andra[1], 0.19], ['bord', 0.2], ['radio', 0.12 * radio]];
+      const val = tal === o.F.key ? [[andra[0], 0.4], [andra[1], 0.4], ['bord', 0.1]]
+        : tal ? [[tal, 0.42], [andra.find((k) => k !== tal), 0.1], ['bord', 0.16], ['radio', 0.08 * radio], ['oga', 0.03]]
+          : [[andra[0], 0.19], [andra[1], 0.19], ['bord', 0.2], ['radio', 0.12 * radio], ['oga', 0.05]];
       let mal = null;
       let acc = 0;
       for (const [m, p] of val) if (!mal && r < (acc += p)) mal = m;
-      return { mal, rull: hash(f + 0.9) < 0.5 ? -1 : 1, nick: hash(f + 0.55) < 0.6 };
+      return { mal, rull: hash(f + 0.9) < 0.5 ? -1 : 1, nick: hash(f + 0.55) < 0.6, mm: hash(f + 0.77) < 0.35 ? 0.7 + 1.6 * hash(f + 0.13) : null };
     });
+  }
+  // Stunden i samtalet vid t ({ mal, at, rull, nick, mm }): en ny när blicken flyttas (stund) – och när
+  // någon annan tar ordet vänder man sig oftast mot hen en kvarts till knappt en sekund efter att hen
+  // har börjat, var och en efter sig. Förut tittade man kvar dit man tittade tills ens nästa stund.
+  function samtalSeg(o, t) {
+    const s = stund(t, SAMTAL.per, SAMTAL.fro[o.F.key], SAMTAL.kvar);
+    const x = ordet(t);
+    if (x.k && x.k !== o.F.key && x.k !== x.fore) {
+      const f = x.id * 0.53 + SAMTAL.fro[o.F.key] * 3.7;
+      const vand = x.at + 0.25 + 0.6 * hash(f);
+      if (vand > s.at && t >= vand && hash(f + 0.4) < 0.85 && ordetHar(vand) === x.k) {
+        return { mal: x.k, at: vand, rull: hash(f + 0.9) < 0.5 ? -1 : 1, nick: hash(f + 0.55) < 0.6, mm: hash(f + 0.2) < 0.4 ? 1 + 1.5 * hash(f + 0.66) : null };
+      }
+    }
+    const B = samtalMal(o, s.id, s.at);
+    return { mal: B.mal, at: s.at, rull: B.rull, nick: B.nick, mm: B.mm };
   }
   function samtalPunkt(o, mal) {
     if (mal === 'bord') {
@@ -4647,24 +4731,27 @@ export async function figurer(canvas, opt = {}) {
       return new THREE.Vector3(s[0], BORD.y + 12, s[1]).applyAxisAngle(UP, o.turnNu * DEG).add(o.fig.position);
     }
     if (mal === 'radio') return new THREE.Vector3(RADIO_PLATS.x, SILL + 28, RADIO_PLATS.z);
+    if (mal === 'oga') return OGA;
     const p = figur(mal);
     return p ? headIn(p) : null;
   }
-  const SAMTAL_W = (x) => (!x.mal ? 0 : x.mal === 'bord' ? 0.6 : 0.82);
-  // { P, w, dj, rull, nick, byt, at }: punkten och hur mycket, hur mycket det är DJ man tittar på, och om
-  // blicken flyttades när stunden började (at). Från det ena till det andra vänds huvudet i vinklar
-  // (vridningen och lutningen, var och en efter hur mycket den syns) på knappt en halv sekund: en rak
-  // linje mellan punkterna svepte förbi på en bild när den ena var långt bort, som den som går ut. Inte
-  // bakom sig (där slår vinkeln om), och inte för den som själv är på väg (gaKropp).
-  function samtalNu(o, t) {
+  const SAMTAL_W = (x) => (!x.mal ? 0 : x.mal === 'bord' ? 0.6 : x.mal === 'oga' ? 0.7 : 0.82);
+  // { P, w, tal, ser, rull, nick, mm, byt, at }: punkten och hur mycket, vem som pratar (om det är någon
+  // annan) och hur mycket man tittar på hen, och om blicken flyttades när stunden började (at). Från det
+  // ena till det andra vänds huvudet i vinklar (vridningen och lutningen, var och en efter hur mycket den
+  // syns) på knappt en halv sekund: en rak linje mellan punkterna svepte förbi på en bild när den ena
+  // var långt bort, som den som går ut. Inte bakom sig (där slår vinkeln om), och inte för den som själv
+  // är på väg (gaKropp).
+  function samtalNu(o, t) { return minns(AKT_MINNE.sa, o, t, samtalNu0); }
+  function samtalNu0(o, t) {
     if (opt.calm) return null;
     const g = ready(o, t) * (1 - aktW(o, t)) * (1 - 0.65 * tvW(t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - Math.max(drinkW(o, t), dragW(o, t))) * (o.st ? 1 - o.st.w : 1);
     if (g <= 0.01) return null;
-    const s = stund(t, SAMTAL.per, SAMTAL.fro[o.F.key], SAMTAL.kvar);
-    const A = samtalMal(o, s.fore, s.foreAt);
-    const B = samtalMal(o, s.id, s.at);
+    const B = samtalSeg(o, t);
+    // (stunden före ändras inte: en gång per stund, SAMTAL_FORE)
+    const A = iMinnet(SAMTAL_FORE, `${o.F.key}${B.at}`, () => samtalSeg(o, B.at - 1e-3));
     const byt = A.mal !== B.mal;
-    const k = byt ? sm(s.at, s.at + 0.45, t) : 1;
+    const k = byt ? sm(B.at, B.at + 0.45, t) : 1;
     const mot = (x) => {
       const P = x.mal && samtalPunkt(o, x.mal);
       if (!P) return null;
@@ -4683,8 +4770,10 @@ export async function figurer(canvas, opt = {}) {
     // (punkten åt det hållet, som aim läser tillbaka)
     const P = new THREE.Vector3(Math.sin(yaw) * Math.cos(pitch), -Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch))
       .multiplyScalar(300).add(headAt(o)).applyAxisAngle(UP, o.turnNu * DEG).add(o.fig.position);
-    const dj = ((A.mal === 'dj' && a ? a.f * (1 - k) : 0) + (B.mal === 'dj' && b ? b.f * k : 0)) * g;
-    return { P, w: w * g, dj, rull: B.rull, nick: B.nick, byt: byt && w * g > 0.2, at: s.at };
+    const tal = ordetHar(t);
+    const ann = tal && tal !== o.F.key ? tal : null;
+    const ser = ann ? ((A.mal === ann && a ? a.f * (1 - k) : 0) + (B.mal === ann && b ? b.f * k : 0)) * g : 0;
+    return { P, w: w * g, tal: ann, ser, rull: B.rull, nick: B.nick, mm: B.mm, byt: byt && w * g > 0.2, at: B.at };
   }
 
   // DT knackar av askan i askkoppen då och då, två–tre gånger (0–1, handRest)
@@ -4704,6 +4793,40 @@ export async function figurer(canvas, opt = {}) {
     const w = bump(x.l, 0, 0.4, 1.9, 2.4);
     const a = x.l * Math.PI * 2 * 0.95 * (x.v < 0.5 ? 1 : -1);
     return { x: Math.cos(a) * w, z: Math.sin(a) * w, w };
+  }
+
+  // Huvudet står aldrig helt still: var och varannan sekund en liten justering, en grad eller två åt
+  // något håll, fort och med lite överslag (fj) – som när blicken flyttas lite i det man tittar på.
+  // Förut gled huvudet bara i andningens långsamma vågor mellan blickarna.
+  const SMA = { per: 1.7, kvar: 0.25, fro: { dl: 0.33, dt: 0.66, dj: 0.99 } };
+  const SMA_MINNE = new Map();
+  function smaRor(o, t) {
+    if (opt.calm) return null;
+    const fro = SMA.fro[o.F.key];
+    const s = stund(t, SMA.per, fro, SMA.kvar);
+    const v = (id) => iMinnet(SMA_MINNE, `${o.F.key}${id}`, () => [0, 1, 2].map((i) => 2 * hash(id * 0.913 + fro * 4.1 + i * 1.37) - 1));
+    const a = v(s.fore);
+    const b = v(s.id);
+    const k = fj(s.at, s.at + 0.22, t, 0.03, 0.12);
+    return { yaw: 0.035 * (a[0] + (b[0] - a[0]) * k), pitch: 0.025 * (a[1] + (b[1] - a[1]) * k), roll: 0.02 * (a[2] + (b[2] - a[2]) * k) };
+  }
+  // Benen under stolen: en stund då och då vippar den ena foten i en takt – fort när man är nervös –
+  // eller dinglar ena benet fram och tillbaka (oftare den som är glad). Bara knäna och fötterna.
+  const FOT = { len: 6, dl: { per: 17, fro: 0.12 }, dt: { per: 21, fro: 0.52 }, dj: { per: 15, fro: 0.86 } };
+  function fotter(o, t) {
+    if (opt.calm) return null;
+    const F0 = FOT[o.F.key];
+    const x = vana(t, F0.per, F0.fro, FOT.len, 0.3);
+    if (!x) return null;
+    const hum = humAt(x.t0);
+    const ben = hash(x.n * 3.3 + F0.fro) < 0.5 ? 0 : 1;
+    const w = bump(x.l, 0, 0.6, FOT.len - 1.2, FOT.len);
+    if (x.v < (hum === 'glad' ? 0.6 : hum === 'nerv' ? 0.1 : 0.35)) {
+      const a = 0.17 * Math.sin(x.l * 3.3) * w;
+      return { ben, knee: a, foot: -0.5 * a };
+    }
+    const f = Math.max(0, Math.sin(x.l * (hum === 'nerv' ? 11 : 5.2))) ** 2 * w;
+    return { ben, knee: 0.03 * f, foot: -0.24 * f };
   }
 
   // Handens läge (figurens axlar): position, y- och z-axel och armbågens
@@ -4970,6 +5093,11 @@ export async function figurer(canvas, opt = {}) {
     return { p: at, y, z, pole: new THREE.Vector3(s, -0.7, 0.1) };
   }
   function handRest(o, A, t) {
+    const h = handRest0(o, A, t);
+    const w = A === fri(o) ? torka(o, t) : 0;
+    return w > 0 ? bage(h, torkPose(o, A, t), w) : h;
+  }
+  function handRest0(o, A, t) {
     const { s } = A;
     const Wd = o.F.w;
     const th = o.thigh;
@@ -5011,14 +5139,21 @@ export async function figurer(canvas, opt = {}) {
         rest.p.y -= 1.1 * ka;
         rest.y.y -= 0.3 * ka;
       }
-      if (A.kind === 'prat') {
-        const k = talkW(o, t);
+      const k = pratW(o, t);
+      if (k > 0) {
         // (i slag, pratSlag, och lite rörelse också när handen står)
-        const g = pratSlag(t, DJ_PRAT);
+        const g = pratSlag(t, PRAT[o.F.key].fro);
         const a = t * 0.6;
-        rest.p.lerp(new THREE.Vector3(s * (Wd * 1.15 + 6 * g.x + gung(a)), o.T * 0.42 + 5 * g.y + 0.8 * gung(a * 1.3 + 2) + y0, th * 0.9 + 4 * g.z), k);
-        rest.y.lerp(new THREE.Vector3(s * 0.2 + 0.22 * g.vrid, 1, 0.55), k);
-        rest.z.lerp(new THREE.Vector3(s * 0.3, -0.2, -1), k);
+        if (A.kind === 'prat') {
+          rest.p.lerp(new THREE.Vector3(s * (Wd * 1.15 + 6 * g.x + gung(a)), o.T * 0.42 + 5 * g.y + 0.8 * gung(a * 1.3 + 2) + y0, th * 0.9 + 4 * g.z), k);
+          rest.y.lerp(new THREE.Vector3(s * 0.2 + 0.22 * g.vrid, 1, 0.55), k);
+          rest.z.lerp(new THREE.Vector3(s * 0.3, -0.2, -1), k);
+        } else {
+          // DT pratar med cigaretten: handen upp från askkoppen och lite in mot sig, och slagen små
+          const m = PRAT.dt.amp;
+          rest.p.lerp(new THREE.Vector3(ak[0] - s * (10 - 4 * m * g.x) + 0.6 * gung(a), BORD.y + 15 + 3.5 * m * g.y + 0.6 * gung(a * 1.3 + 2), ak[1] - 4 + 3 * m * g.z), k);
+          rest.y.lerp(new THREE.Vector3(s * 0.25 + 0.2 * g.vrid, 1, 0.75), k);
+        }
       }
       const w = dragW(o, t);
       if (w <= 0) return rest;
@@ -5032,8 +5167,19 @@ export async function figurer(canvas, opt = {}) {
     const hx = hl ? hl.hx : 0;
     const hz = hl ? hl.hz : 0;
     const hy = hl ? hl.hl : 0;
-    if (bv) return { p: new THREE.Vector3(bv[0] + s * hx, BORD.y + 3 + hy, bv[1] + hz), y: new THREE.Vector3(-s * 0.1, -0.05, 1), z: new THREE.Vector3(0, 1, 0.05), pole: new THREE.Vector3(s, -0.3, -0.6) };
-    return { p: new THREE.Vector3(s * (Wd * 0.36 + 0.3 * hx), y0 + 9 + hy, th * 0.92 + 0.3 * hz), y: new THREE.Vector3(-s * 0.1, -0.15, 1), z: new THREE.Vector3(0, 1, 0.1), pole: new THREE.Vector3(s, -0.3, -0.6) };
+    const vila = bv
+      ? { p: new THREE.Vector3(bv[0] + s * hx, BORD.y + 3 + hy, bv[1] + hz), y: new THREE.Vector3(-s * 0.1, -0.05, 1), z: new THREE.Vector3(0, 1, 0.05), pole: new THREE.Vector3(s, -0.3, -0.6) }
+      : { p: new THREE.Vector3(s * (Wd * 0.36 + 0.3 * hx), y0 + 9 + hy, th * 0.92 + 0.3 * hz), y: new THREE.Vector3(-s * 0.1, -0.15, 1), z: new THREE.Vector3(0, 1, 0.1), pole: new THREE.Vector3(s, -0.3, -0.6) };
+    // DL pratar med den lediga handen, i slag (pratSlag) och lite mindre än DJ (DT med cigaretten ovan)
+    const k = o.F.key === 'dl' ? pratW(o, t) : 0;
+    if (k > 0) {
+      const g = pratSlag(t, PRAT.dl.fro);
+      const m = PRAT.dl.amp;
+      const a = t * 0.55;
+      const ut = { p: new THREE.Vector3(s * (Wd * 0.72 + 7 * m * g.x + gung(a)), o.T * 0.58 + 6 * m * g.y + 0.8 * gung(a * 1.3 + 2) + y0, th * 1.1 + 5 * m * g.z), y: new THREE.Vector3(s * 0.1 + 0.25 * g.vrid, 0.85, 0.8), z: new THREE.Vector3(s * 0.55, -0.5, -0.35), pole: new THREE.Vector3(s, -0.6, -0.4) };
+      return bage(vila, ut, k);
+    }
+    return vila;
   }
 
   // ---------- humöret och påhitten ----------
@@ -5060,21 +5206,22 @@ export async function figurer(canvas, opt = {}) {
   // ölen i luften, nervös – men trygg – hakan i handen, händerna knäppta
   // framför munnen och fingrarna som trummar sakta (naglarna och kliandet finns
   // kvar för ?rum-akt men väljs inte), deppig hakan i handen, huvudet som
-  // skakas, armarna i kors och blicken ner i flaskan. Den som leder omgången lutar sig oftare bakåt med
-  // händerna i nacken, och den som ligger sist sitter oftare med armarna i
-  // kors. Gänget gör också saker tillsammans (grupp, GRUPP), oftast när det går
+  // skakas, armarna i kors och blicken ner i flaskan – och i alla lägen ibland de små sakerna (fler
+  // påhitt nedan): handen om hakan, näsan, axlarna, en blick ut genom fönstret och hostan. Den som leder
+  // omgången lutar sig oftare bakåt med händerna i nacken, och den som ligger sist sitter oftare med
+  // armarna i kors. Gänget gör också saker tillsammans (grupp, GRUPP), oftast när det går
   // bra: skålar över bordet och tar en klunk (DT ett bloss), sjunger allsång
   // som på läktaren (allsången nedan), skrattar åt ett skämt (skamt), grälar om
-  // något medan den tredje tittar på (gral) eller tittar upp på tv:n när någon
-  // pekar (titta). Inget påhitt medan man väntar på kupongen,
+  // något medan den tredje tittar på (gral), tittar upp på tv:n när någon
+  // pekar (titta) eller skålar två och två (skalTva). Inget påhitt medan man väntar på kupongen,
   // sover, reagerar på ett mål eller skålar med den som pekar på en (vaken).
   const AKT_SLOT = 11;
   const GRUPP_SLOT = 31;
   const MENY = {
-    lugn: { chans: 0.3, dl: ['nacke', 'strack', 'hakan', 'stirrar'], dt: ['nacke', 'strack', 'hakan', 'nacke'], dj: ['nacke', 'strack', 'hakan', 'stirrar'] },
-    glad: { chans: 0.55, dl: ['gung', 'nacke', 'strack', 'nacke'], dt: ['nacke', 'gung', 'strack', 'nacke'], dj: ['gung', 'nacke', 'trumma', 'nacke'] },
-    nerv: { chans: 0.5, dl: ['hakan', 'knappt', 'nacke', 'trumma'], dt: ['knappt', 'hakan', 'nacke', 'trumma'], dj: ['hakan', 'knappt', 'nacke', 'trumma'] },
-    deppig: { chans: 0.6, dl: ['hakan', 'skakar', 'kors', 'stirrar'], dt: ['hakan', 'skakar', 'kors', 'hakan'], dj: ['dunk', 'hakan', 'skakar', 'stirrar', 'kors'] },
+    lugn: { chans: 0.38, dl: ['nacke', 'strack', 'hakan', 'stirrar', 'funderar', 'tittarUt', 'nasan'], dt: ['nacke', 'strack', 'hakan', 'nacke', 'hosta', 'tittarUt', 'nasan'], dj: ['nacke', 'strack', 'hakan', 'stirrar', 'funderar', 'axlar', 'tittarUt'] },
+    glad: { chans: 0.58, dl: ['gung', 'nacke', 'strack', 'nacke', 'tittarUt'], dt: ['nacke', 'gung', 'strack', 'nacke', 'hosta'], dj: ['gung', 'nacke', 'trumma', 'nacke', 'axlar'] },
+    nerv: { chans: 0.5, dl: ['hakan', 'knappt', 'nacke', 'trumma', 'funderar', 'nasan'], dt: ['knappt', 'hakan', 'nacke', 'trumma', 'hosta', 'nasan'], dj: ['hakan', 'knappt', 'nacke', 'trumma', 'funderar', 'axlar'] },
+    deppig: { chans: 0.6, dl: ['hakan', 'skakar', 'kors', 'stirrar', 'axlar'], dt: ['hakan', 'skakar', 'kors', 'hakan', 'hosta'], dj: ['dunk', 'hakan', 'skakar', 'stirrar', 'kors', 'axlar'] },
   };
   const FI = (o) => FIGS.findIndex((F) => F.key === o.F.key);
   // PROV: ett påhitt som var och en gör om och om igen från at (prova, ?rum-akt)
@@ -5085,9 +5232,9 @@ export async function figurer(canvas, opt = {}) {
   // zen-stunderna kräver att alla tre är vakna och har lämnat in, och att matcherna
   // inte pågår (ALLA).
   const GRUPP = {
-    lugn: [['skamt', 0.16], ['gral', 0.05], ['titta', 0.08], ['skal', 0.08], ['zen', 0.3]],
-    glad: [['skal', 0.33], ['allsang', 0.25], ['skamt', 0.2], ['zen', 0.12]],
-    nerv: [['gral', 0.04], ['titta', 0.06], ['zen', 0.3]],
+    lugn: [['skamt', 0.16], ['gral', 0.05], ['titta', 0.08], ['skal', 0.08], ['zen', 0.3], ['skalTva', 0.07]],
+    glad: [['skal', 0.33], ['allsang', 0.25], ['skamt', 0.2], ['zen', 0.12], ['skalTva', 0.07]],
+    nerv: [['gral', 0.04], ['titta', 0.06], ['zen', 0.3], ['skalTva', 0.05]],
     deppig: [['skamt', 0.07]],
   };
   const ALLA = new Set(['skamt', 'gral', 'titta', 'korsaSmitta', 'gaspSmitta', 'zenAndas', 'zenDrom', 'zenRingar', 'zenVaggar', 'zenTyst']);
@@ -5430,6 +5577,119 @@ export async function figurer(canvas, opt = {}) {
       },
     },
   };
+  // ---------- fler påhitt: hakan, näsan, axlarna, fönstret och hostan ----------
+  // Små saker som folk gör vid ett bord (2026-11-16): stryker sig om hakan och funderar med blicken
+  // snett uppåt (funderar), kliar sig på näsan (nasan), rycker på axlarna med handflatan upp (axlar),
+  // vänder sig om och tittar ut genom fönstret efter något som går förbi (tittarUt) och hostar till med
+  // handen för munnen (hosta, oftast DT). Och två och två: DL och DJ skålar med varandra medan DT
+  // tittar på (skalTva). Bara bålen, huvudet och händerna utan fingrar, som de andra påhitten.
+  // (Handen genom håret går inte: huvudena är större än armarna når.)
+
+  // näsans spets i huvudets axlar (som i build)
+  function nasTopp(o) {
+    const P = o.F.head;
+    const ny = -(P.noseY - P.cy) / P.hh;
+    return new THREE.Vector3(0, ny * P.ry, Math.sqrt(Math.max(0, 1 - ny * ny)) * P.rz * 0.9 + P.nose[2]);
+  }
+  AKTER.funderar = {
+    len: 6.5, in: 1.1, ut: 1.1,
+    hand: (o, A, t, l) => {
+      if (A !== fri(o)) return null;
+      const s = A.s;
+      const P = o.F.head;
+      const d = huvudAxlar(o);
+      // (stryker nedåt längs hakan, sakta, två–tre gånger)
+      const dra = 2 * Math.max(0, Math.sin((l - 1.1) * 3.4)) * bump(l, 1.1, 1.4, 4.8, 5.3);
+      const at = inHead(o, new THREE.Vector3(s * P.rx * 0.1, -P.ry * 0.72 - dra, P.rz * 0.55));
+      return handflata(o, at, d(-s * 0.2, 1, 0.25), d(s * 0.35, -0.15, 1), new THREE.Vector3(s * 0.4, -1, 0.3));
+    },
+    kropp: (o, t, l) => {
+      const s = fri(o).s;
+      const k = bump(l, 0.9, 1.6, 4.9, 5.8);
+      return { lean: -0.03, pitch: -0.13 * k, yaw: (-s * 0.22 + 0.06 * Math.sin(l * 0.9)) * k, roll: s * 0.05 * k };
+    },
+  };
+  AKTER.nasan = {
+    len: 3.4, in: 0.85, ut: 0.8,
+    hand: (o, A, t, l) => {
+      if (A !== fri(o)) return null;
+      const s = A.s;
+      const d = huvudAxlar(o);
+      const gn = Math.sin(l * 26) * bump(l, 1.0, 1.1, 2.1, 2.3);
+      const at = inHead(o, nasTopp(o).add(new THREE.Vector3(s * 3 + 1.2 * gn, -2, 1)));
+      return handflata(o, at, d(-s * 0.7, 0.7, 0.1), d(s * 0.3, 0, 1), new THREE.Vector3(s, -0.8, 0.1));
+    },
+    kropp: (o, t, l) => {
+      const s = fri(o).s;
+      const k = bump(l, 0.5, 1.0, 2.2, 2.9);
+      return { pitch: 0.06 * k, yaw: s * 0.12 * k, roll: -s * 0.04 * k };
+    },
+  };
+  AKTER.axlar = {
+    len: 3.4, in: 0.5, ut: 0.9,
+    hand: (o, A, t, l) => {
+      if (A !== fri(o)) return null;
+      const s = A.s;
+      const k = bump(l, 0.3, 0.8, 1.9, 2.6);
+      // (handflatan upp, ut åt sidan i midjehöjd)
+      return { p: new THREE.Vector3(s * (o.F.w * 0.95 + 6 * k), o.hipY + o.T * 0.32 + 4 * k, o.thigh * 0.9), y: new THREE.Vector3(s * 0.55, 0.15, 1), z: new THREE.Vector3(s * 0.1, -1, 0.15), pole: new THREE.Vector3(s, -0.6, -0.4) };
+    },
+    kropp: (o, t, l) => {
+      const k = bump(l, 0.3, 0.75, 1.7, 2.4);
+      return { lift: 3.2 * k, pitch: 0.06 * k, roll: fri(o).s * 0.1 * k, lean: -0.02 * k, breath: 0.03 * k };
+    },
+  };
+  // (utåt, från bordet: inn är åt bordet; huvudet följer det som går förbi en bit)
+  AKTER.tittarUt = {
+    len: 5.6, in: 1.0, ut: 1.1,
+    kropp: (o, t, l) => {
+      const h = -o.F.inn;
+      const k = bump(l, 0.6, 1.3, 3.8, 4.8);
+      const folj = sm(1.3, 3.8, l);
+      return { twist: h * 0.36 * k, yaw: h * (0.95 + 0.25 * folj) * k, pitch: -0.06 * k, side: -h * 0.02 * k };
+    },
+  };
+  // (handen för munnen som i gäspningen, gaspHand, och tre–fyra stötar framåt)
+  AKTER.hosta = {
+    len: 3.9, in: 0.95, ut: 0.9,
+    hand: (o, A) => (A === fri(o) ? gaspHand(o, A) : null),
+    kropp: (o, t, l) => {
+      let r = 0;
+      for (const a of [1.1, 1.5, 1.85, 2.4]) r += bump(l, a, a + 0.05, a + 0.1, a + 0.3);
+      return { lean: 0.06 + 0.07 * r, pitch: 0.08 + 0.12 * r, lift: -1.2 * r, breath: -0.03 * r, yaw: 0.2 * fri(o).s };
+    },
+  };
+  // DL och DJ skålar (skal) med flaskorna, och DT tittar på det och nickar när det klirrar (i ögonhöjd och
+  // utan att luta sig: ner mot bordets mitt gick hans huvud in i grannens)
+  const KLIRR = () => new THREE.Vector3(BORD.x, SILL + BORD.y + 62, BORD.z);
+  AKTER.skalTva = {
+    len: 7.5, in: 0.9, ut: 1.1,
+    hand: (o, A, t, l, x) => (o.F.key === 'dt' ? null : AKTER.skal.hand(o, A, t, l, x)),
+    kropp: (o, t, l, x) => (o.F.key === 'dt'
+      ? { se: KLIRR().add(new THREE.Vector3(0, 45, 0)), seW: 0.7 * bump(l, 0.5, 1.0, 3.0, 3.8), pitch: 0.08 * bump(l, 1.6, 1.8, 2.0, 2.4), mitt: true }
+      : AKTER.skal.kropp(o, t, l, x)),
+  };
+  // Efter en klunk torkar DL och DJ sig ibland om munnen med handryggen på den lediga handen, ett
+  // drag åt sidan medan flaskan går ner (klunk; inte efter den långa klunken, då flaskan stannar uppe).
+  function torka(o, t) {
+    if (opt.calm || o.F.key === 'dt') return 0;
+    const x = vanaNu(o, 'klunk', t);
+    if (!x || x.v < 0.22 || hash(x.n * 7.7 + 0.31) > 0.45) return 0;
+    const ner = x.v > 0.75 ? 2.4 : 3.6;
+    return bump(x.l, ner, ner + 0.8, ner + 1.5, ner + 2.3) * ready(o, t) * (1 - aktW(o, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t));
+  }
+  function torkPose(o, A, t) {
+    const s = A.s;
+    const d = huvudAxlar(o);
+    const x = vanaNu(o, 'klunk', t);
+    const ner = x && x.v > 0.75 ? 2.4 : 3.6;
+    const dra = x ? sm(ner + 0.8, ner + 1.5, x.l) : 0;
+    const q = o.F.arm;
+    const Y = d(-s * 0.9, 0.35, 0.1);
+    const P = mouthIn(o).addScaledVector(d(1, 0, 0), s * (5 - 9 * dra)).addScaledVector(d(0, 0, 1), q * 0.9).addScaledVector(Y, -q * 1.15);
+    return { p: P, y: Y, z: d(0, 0.1, -1), pole: new THREE.Vector3(s, -0.8, 0) };
+  }
+
   // ---------- gänget tillsammans: skämtet, grälet och tv:n ----------
   // Rollerna i ett gemensamt påhitt (x: { n, t0 }, samma för alla tre): a
   // börjar (berättar skämtet, grälar, pekar på tv:n), b svarar och c tittar
@@ -7778,6 +8038,9 @@ export async function figurer(canvas, opt = {}) {
   function draw(t, mx, my, neonPa) {
     AKT_MINNE.ra.clear();
     AKT_MINNE.nu.clear();
+    AKT_MINNE.prat.clear();
+    AKT_MINNE.sa.clear();
+    AKT_MINNE.ordet.clear();
     AKT_MINNE.pa = true;
     try {
       ritaGang(t, mx, my, neonPa);
@@ -7844,7 +8107,7 @@ export async function figurer(canvas, opt = {}) {
     }
     // neonen bakom dem slocknar när skylten glappar, och tv:n lyser i
     // ansiktena när de tittar på matcherna (svagt, och fladdrar som rutan)
-    neon.intensity = neonPa === false ? 0 : NEON;
+    neon.intensity = neonPa === false ? 0 : NEON * UTE.neon;
     // på natten är lysröret släckt och text-tv:n lyser svagt på dem
     const natt = nattW(t);
     key.intensity = KEY * (1 - 0.86 * natt);
@@ -7852,10 +8115,65 @@ export async function figurer(canvas, opt = {}) {
     hemi.intensity = hemiDag * (Q.enkel ? HEMI_ENKEL : 1) * (1 - 0.55 * natt);
     const tv = Math.max(tvW(t), 0.55 * natt);
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
-    sikta();
-    r.render(scene, cam);
+    if (UTE.kam) r.render(scene, UTE.kam);
+    else {
+      sikta();
+      r.render(scene, cam);
+    }
     if (Q.skugga > 1 && Q.n++ % Q.skugga === 0) skuggaSen();
     if (ombyggda.length) slappOmbyggda();
+  }
+
+  // Gänget utifrån, genom skyltfönstret (fasaden i rum-fasad.js): samma scen och samma ställning, men med en
+  // kamera ute på trottoaren som ser rakt in, så att man ser dem bakifrån. Glaset (FONSTER: x, y och z i
+  // världen, från fönsterbänken upp) är rutan som kopieras till fasadens duk: kameran står i ögonhöjd framför
+  // fönstret (oga) och ser vinkelrätt mot glaset, så att glaset blir en rätvinklig ruta i bilden, och den rutan
+  // tas ur duken i samma uppgift som den ritas (innan webbläsaren hinner visa eller tömma den). Skuggfångaren
+  // (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre på ryggarna än på ansiktena inifrån.
+  // Rummet står still under tiden (Rum.vila) och ritas som vanligt igen när man går in.
+  //   utifran(duk, t, neonPa, hem) → true om något ritades (hem: duken ritas sedan inifrån igen, medan rummet syns)
+  const FONSTER = { x0: -615, x1: 185, y0: SILL - 4, y1: SILL + 509, z: -150, oga: [-110, 140, -2300] };
+  function utifran(duk, t, neonPa, hem = false) {
+    const g = duk && duk.getContext('2d');
+    if (!g || !canvas.width || !canvas.height) return false;
+    const K = UTE.K;
+    const F = FONSTER;
+    const [ex, ey, ez] = F.oga;
+    const d = F.z - ez;
+    // (ut åt sidorna och uppåt från ögat, som tangens; världens +x är till vänster sett utifrån)
+    const tx = Math.max(ex - F.x0, F.x1 - ex) / d;
+    const ty = Math.max(F.y1 - ey, ey - F.y0) / d;
+    K.aspect = canvas.width / canvas.height;
+    const tv = Math.max(ty, tx / K.aspect) * 1.02;
+    K.fov = 2 * Math.atan(tv) / DEG;
+    K.position.set(ex, ey, ez);
+    K.lookAt(ex, ey, ez + 1000);
+    K.updateProjectionMatrix();
+    K.updateMatrixWorld();
+    const fang = catcher.visible;
+    catcher.visible = false;
+    UTE.kam = K;
+    UTE.neon = 0.3;
+    try {
+      draw(t, 0, 0, neonPa);
+    } finally {
+      UTE.kam = null;
+      UTE.neon = 1;
+      catcher.visible = fang;
+    }
+    // glaset i dukens bildpunkter
+    const th = tv * K.aspect;
+    const px = (x) => (1 - (x - ex) / (d * th)) / 2 * canvas.width;
+    const py = (y) => (1 - (y - ey) / (d * tv)) / 2 * canvas.height;
+    const sx = px(F.x1);
+    const sy = py(F.y1);
+    g.clearRect(0, 0, duk.width, duk.height);
+    g.drawImage(canvas, sx, sy, px(F.x0) - sx, py(F.y0) - sy, 0, 0, duk.width, duk.height);
+    if (hem) {
+      sikta();
+      r.render(scene, cam);
+    }
+    return true;
   }
 
   // Skuggorna för sig, när de räknas om mer sällan än gänget ritas (skugga i KVAL
@@ -8447,5 +8765,5 @@ export async function figurer(canvas, opt = {}) {
     await r.compileAsync(scene, cam);
   } catch (err) { /* då byggs de när gänget ritas, som förut */ }
   ANS.ute = true;
-  return { draw, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, utifran, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: () => ANS.p, prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }

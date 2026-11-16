@@ -5,7 +5,15 @@
 // med grå skärmram, IBM-skylten, två diskettstationer och ett Model
 // M-tangentbord, en grå mus och en diskett bredvid (säkerhetskopian). Den står
 // på disken i hörnet under tv:n, där anslagstavlan hängde till 2026-11-14 (förut
-// under Tipsligan, där kortlådan stod), vänd mellan gänget och den som tittar.
+// under Tipsligan, där kortlådan stod), med ryggen mot väggen och skärmen ut i
+// rummet: parallellt med disken, som tavlorna på väggen och videon
+// (rum-video.js). Till 2026-11-16 var den vänd mellan gänget och den som
+// tittar, och stod då snett mot disken.
+//
+// Ljuset är rummets (som i rum-inredning.js), så att datorn ser ut att stå
+// på disken. I närbilden vrids det med kameran, så att skärmen och ramen får
+// ljuset som när datorn stod vänd mellan gänget och ögat (LJUS_YAW): framifrån
+// i rummet faller det annars snett längs skärmen.
 //
 // I rummet ritas datorn när skärmen ändras, med samma kamera som högra
 // väggen, och kopieras till duken i länken på disken, så att den lyser när
@@ -34,9 +42,12 @@ const EYE = [760, 400];
 const E = 1000;
 const FW = 2 * Math.max(EYE[0], 1600 - EYE[0]);
 const FH = 2 * Math.max(EYE[1], 1000 - EYE[1]);
-// datorns mitt i botten, på disken, och hur den är vänd (mellan gänget och ögat)
-const POS = { x: 1104, y: -490, z: 235 };
-const YAW = -38 * DEG;
+// datorns mitt i botten, på disken, och hur den är vänd (skärmen ut i rummet,
+// ryggen 2,5 enheter från väggen och tangentbordet på disken framför)
+const POS = { x: 1114, y: -490, z: 235 };
+const YAW = -90 * DEG;
+// hur den stod vänd när ljuset sattes (närbilden får ljuset som då)
+const LJUS_YAW = -38 * DEG;
 // skärmen (4:3) och dess mitt över disken
 const SK = { w: 32, h: 24, y: 39.5 };
 // närbilden: hur stor del av fönstret skärmen tar och var dess mitt står,
@@ -112,27 +123,39 @@ export async function dator(o) {
 
   // ---------- ljuset, som på väggarna i rum-inredning.js ----------
 
+  // Ljusen (utom himlens, som är lika runt om) står i en grupp kring datorns
+  // fot, som vrids med kameran i närbilden (ljusVrid): i rummet 0, framför
+  // skärmen som datorn har vridits sedan LJUS_YAW.
   scene.add(new THREE.HemisphereLight('#eadcc0', '#3a2a1a', 0.55));
+  const ljus = new THREE.Group();
+  ljus.position.set(POS.x, POS.y, POS.z);
+  scene.add(ljus);
+  // (en punkt i rummet i gruppens mått)
+  const iLjus = (x, y, z) => [x - POS.x, y - POS.y, z - POS.z];
   const key = new THREE.DirectionalLight('#fff2dc', 1.9);
-  key.position.set(POS.x - 340, POS.y + 680, POS.z + 900);
-  key.target.position.set(POS.x, POS.y, POS.z);
+  key.position.set(-340, 680, 900);
   key.castShadow = true;
   key.shadow.mapSize.set(SKUGGA, SKUGGA);
   key.shadow.radius = 5;
   key.shadow.bias = -0.0004;
   key.shadow.normalBias = 0.2;
   Object.assign(key.shadow.camera, { left: -150, right: 150, top: 150, bottom: -150, near: 10, far: 3000 });
-  scene.add(key, key.target);
+  ljus.add(key, key.target);
   const neon = new THREE.DirectionalLight('#ff3a26', 0.24);
-  neon.position.set(300, -170, 260);
-  neon.target.position.set(900, -330, 0);
-  scene.add(neon, neon.target);
+  neon.position.set(...iLjus(300, -170, 260));
+  neon.target.position.set(...iLjus(900, -330, 0));
+  ljus.add(neon, neon.target);
   const tv = new THREE.PointLight('#7fb0ff', 0.4 * 90000, 0, 2);
-  tv.position.set(1300, -250, 380);
-  scene.add(tv);
+  tv.position.set(...iLjus(1300, -250, 380));
+  ljus.add(tv);
   const fram = new THREE.DirectionalLight('#ffd9b0', 0.35);
-  fram.position.set(760, -400, 1000);
-  scene.add(fram);
+  fram.position.set(...iLjus(760, -400, 1000));
+  fram.target.position.set(...iLjus(0, 0, 0));
+  ljus.add(fram, fram.target);
+  const ljusVrid = (t) => {
+    ljus.rotation.y = t * (YAW - LJUS_YAW);
+    ljus.updateMatrixWorld(true);
+  };
   // skuggorna på disken och på väggen bakom
   for (const [g, rot, pos] of [
     [new THREE.PlaneGeometry(84, 360), [-90 * DEG, 0, 0], [1100, POS.y + 0.05, POS.z]],
@@ -435,12 +458,13 @@ export async function dator(o) {
   })();
 
   // tangentbordet, musen och disketten: på lite olika ställen varje dag
+  // (tangentbordet tätt framför foten, så att det står på disken ända ut)
   const dag = Math.floor(Date.now() / DAY);
   const r = (i) => hash(dag * 7.3 + i);
   const tw = TB.w * TB.u + TB.kant[0] + TB.kant[1];
   const td = TB.h * TB.u + TB.kant[2] + TB.kant[3];
   const tb = new THREE.Group();
-  tb.position.set((r(1) - 0.5) * 4 + 1, 0, F + 3.5 + td / 2 + r(2) * 2.5);
+  tb.position.set((r(1) - 0.5) * 4 + 1, 0, F + 2 + td / 2 + r(2) * 2.5);
   tb.rotation.set(0, (r(3) - 0.5) * 9 * DEG, 0);
   pc.add(tb);
   {
@@ -609,6 +633,7 @@ export async function dator(o) {
   function paint() {
     if (S.open || S.fly) return;
     hemma();
+    ljusVrid(0);
     view(BOX);
     gl.setPixelRatio(DPR);
     gl.setSize(BOX.w, BOX.h, false);
@@ -670,11 +695,47 @@ export async function dator(o) {
     const cy = lerp(a.y + a.h / 2, b.y + b.h / 2, t);
     return { x: cx - w / 2, y: cy - h / 2, w, h };
   }
-  // kameran en bit på väg (t = 0 i rummet, 1 framför skärmen)
+  // Kameran en bit på väg (t = 0 i rummet, 1 framför skärmen): i en båge runt
+  // skärmens mitt (MITT), där avståndet till den minskar jämnt som förut på
+  // den raka vägen, och vänd så att skärmens mitt glider rakt från där den
+  // syns i rummet till där den står framme, i bildens rektangel just då.
+  // Rakt fram med en jämn vridning (som till 2026-11-16) for kameran förbi
+  // datorns sida, och skärmen gled ut ur bilden på vägen, när datorn stod
+  // vänd ut i rummet, 90 grader från ögat.
+  const V0 = OGA.clone().sub(MITT);
+  // (där skärmens mitt syns från ögat i rummet, i scenens px)
+  const MITT0 = [EYE[0] - (E * V0.x) / V0.z, EYE[1] + (E * V0.y) / V0.z];
+  const vinkel = (v) => Math.atan2(v.x, v.z);
+  const V1 = new THREE.Vector3();
+  const RIKT = new THREE.Vector3();
+  const MOT = new THREE.Vector3();
+  const EUL = new THREE.Euler(0, 0, 0, 'YXZ');
   function stall(t, F, R0) {
-    cam.position.lerpVectors(OGA, F.pos, t);
-    cam.quaternion.slerpQuaternions(RAKT, F.q, t);
-    view(mixRect(R0, F.r, t));
+    const r = mixRect(R0, F.r, t);
+    if (t <= 0 || t >= 1) {
+      cam.position.copy(t <= 0 ? OGA : F.pos);
+      cam.quaternion.copy(t <= 0 ? RAKT : F.q);
+    } else {
+      V1.copy(F.pos).sub(MITT);
+      const a0 = vinkel(V0);
+      // (kortaste vägen runt)
+      const da = Math.atan2(Math.sin(vinkel(V1) - a0), Math.cos(vinkel(V1) - a0));
+      const a = a0 + da * t;
+      const rr = lerp(Math.hypot(V0.x, V0.z), Math.hypot(V1.x, V1.z), t);
+      cam.position.set(MITT.x + rr * Math.sin(a), MITT.y + lerp(V0.y, V1.y, t), MITT.z + rr * Math.cos(a));
+      // skärmens mitt i rektangeln, från rummet till framme, som riktning i
+      // kameran (RIKT); kameran lutas (th) och vrids (sedan) så att den pekar
+      // mot MITT, utan att luta åt sidan
+      const u = r.x + lerp((MITT0[0] - R0.x) / R0.w, (EYE[0] - F.r.x) / F.r.w, t) * r.w;
+      const v = r.y + lerp((MITT0[1] - R0.y) / R0.h, (EYE[1] - F.r.y) / F.r.h, t) * r.h;
+      const c = RIKT.set((u - EYE[0]) / E, (EYE[1] - v) / E, -1).normalize();
+      const w = MOT.copy(MITT).sub(cam.position).normalize();
+      const th = Math.atan2(-c.z, c.y) - Math.acos(Math.max(-1, Math.min(1, w.y / Math.hypot(c.y, c.z))));
+      const z2 = c.y * Math.sin(th) + c.z * Math.cos(th);
+      cam.quaternion.setFromEuler(EUL.set(th, vinkel(w) - Math.atan2(c.x, z2), 0));
+    }
+    ljusVrid(t);
+    view(r);
   }
   // skärmens rektangel i fönstret när kameran står framför
   function ruta() {

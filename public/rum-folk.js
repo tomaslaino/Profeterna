@@ -393,8 +393,8 @@ window.RumFolk = (() => {
     // fönsterbänken: kameran går fram till den
     el.addEventListener('click', (e) => {
       // (inte klicket efter ett drag, som rum.js redan har stoppat, och inte i
-      // Hasses vy, som står framför gänget)
-      if (e.defaultPrevented || e.target.closest('.rum-hasse-vy')) return;
+      // Hasses vy eller ute på trottoaren (fasaden), som står framför gänget)
+      if (e.defaultPrevented || e.target.closest('.rum-hasse-vy, .rum-fasad')) return;
       // (radion: hela rutan runt den räknas, också där strålen går mellan handtaget och lådan)
       const k = e.target.id === 'rum-radio' ? 'radio' : vemUnder(e.clientX, e.clientY, e.target);
       // (ett klick på något annat: kupongen tas inte i handen)

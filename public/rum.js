@@ -46,7 +46,8 @@
 // sekunder), ?rum-lapp=dl:kinden:kolla@2 hur skylten
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
-// ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|dorr|kupong|radio en närbild,
+// ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|kupong|radio en närbild,
+// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr),
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -545,6 +546,50 @@ window.Rum = (() => {
   <g class="rum-ringar"></g>${spar}
   <image class="pult-kant" href="rum/pult-kant.webp" x="-10" y="940" width="1620" height="70" preserveAspectRatio="none"/>`, '', [0, 510, W, H - 510], 2 / 3);
   }
+  // Lampan över pulten: en skomakarlampa i grön emalj med kåpa i mässing, som hänger ned i vänstra
+  // hörnet över notan och kaffet (2026-11-16, användarens önskemål: en lampa som hänger ned, men inte över
+  // något som betyder något). Där finns bara taket och dörrens överkant; Stängt-skylten hänger under.
+  // Den ligger i pultens plan (−60), så att den står framför rummet när kameran vrids och tonar bort med
+  // pulten vid närbilderna. Den ritas en gång: inget i den rör sig. Vi ser den underifrån, så öppningen
+  // är en ljus ellips med glödlampan i, och ett mjukt sken ligger runt den och faller ned under kanten.
+  // Ljuset den ger på pulten är en ljuskägla bland de andra (KAGLOR), dess spegelbild ligger i pultens
+  // lack (spegelBild) och på natten går mörkret runt den (rum-folk.css). Mått i planets enheter
+  // (LAMPA: mitten, öppningens mitt och radier); i scenen står den 1,05 gånger från mitten.
+  const LAMPA = { x: 150, y: 112, rx: 80, ry: 15 };
+  function lampa() {
+    const { x, y, rx, ry } = LAMPA;
+    // halsen, där skärmen möter kåpan i mässing
+    const n = y - 62;
+    // skärmens profil, från halsen ut till kanten, som svänger ut nertill
+    const sida = `M${x - 15} ${n} C${x - 18} ${n + 24} ${x - 54} ${y - 16} ${x - rx} ${y} A${rx} ${ry} 0 0 1 ${x + rx} ${y} C${x + 54} ${y - 16} ${x + 18} ${n + 24} ${x + 15} ${n} Z`;
+    return svg(`<defs>
+    <radialGradient id="rum-lp-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(${x} ${y - 10}) scale(128 86)"><stop offset="0" stop-color="#ffe2aa" stop-opacity=".5"/><stop offset=".35" stop-color="#ffd896" stop-opacity=".2"/><stop offset="1" stop-color="#ffd896" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-lp-ned" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" fx="0" fy="-0.9" gradientTransform="translate(${x} ${y}) scale(132 150)"><stop offset="0" stop-color="#ffe0a8" stop-opacity=".36"/><stop offset=".5" stop-color="#ffe0a8" stop-opacity=".1"/><stop offset="1" stop-color="#ffe0a8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rum-lp-emalj" gradientUnits="userSpaceOnUse" x1="${x - rx}" y1="0" x2="${x + rx}" y2="0"><stop offset="0" stop-color="#0d2219"/><stop offset=".3" stop-color="#1a3e2d"/><stop offset=".6" stop-color="#2a5a42"/><stop offset=".8" stop-color="#3c7658"/><stop offset=".93" stop-color="#21493a"/><stop offset="1" stop-color="#112a1f"/></linearGradient>
+    <linearGradient id="rum-lp-topp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".4"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset=".9" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
+    <radialGradient id="rum-lp-inne" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(${x} ${y - 5}) scale(${rx} ${ry + 5})"><stop offset="0" stop-color="#fffef8"/><stop offset=".24" stop-color="#fff5d8"/><stop offset=".52" stop-color="#ffe6b0"/><stop offset=".8" stop-color="#e2bb7c"/><stop offset="1" stop-color="#9c7643"/></radialGradient>
+    <radialGradient id="rum-lp-glod" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fffef6" stop-opacity=".95"/><stop offset=".3" stop-color="#fff6dc" stop-opacity=".55"/><stop offset="1" stop-color="#ffe8b8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rum-lp-massing" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a3210"/><stop offset=".35" stop-color="#b48a3c"/><stop offset=".55" stop-color="#f0d38c"/><stop offset=".75" stop-color="#9a7128"/><stop offset="1" stop-color="#3a2708"/></linearGradient>
+    <clipPath id="rum-lp-under"><rect x="${x - 140}" y="${y}" width="280" height="160"/></clipPath>
+  </defs>
+  <ellipse cx="${x}" cy="${y - 10}" rx="128" ry="86" fill="url(#rum-lp-sken)"/>
+  <ellipse cx="${x}" cy="${y}" rx="132" ry="150" fill="url(#rum-lp-ned)" clip-path="url(#rum-lp-under)"/>
+  <path d="M${x} -40 V${n - 22}" stroke="#1a120b" stroke-width="3.2"/><path d="M${x - 0.7} -40 V${n - 22}" stroke="#7a6650" stroke-opacity=".45" stroke-width=".9" stroke-dasharray="2.2 1.6"/>
+  <rect x="${x - 5}" y="${n - 26}" width="10" height="14" rx="2" fill="url(#rum-lp-massing)"/>
+  <path d="M${x - 15} ${n + 2} L${x - 12} ${n - 10} Q${x} ${n - 18} ${x + 12} ${n - 10} L${x + 15} ${n + 2} Z" fill="url(#rum-lp-massing)"/>
+  <path d="${sida}" fill="url(#rum-lp-emalj)"/>
+  <path d="${sida}" fill="url(#rum-lp-topp)"/>
+  <path d="M${x + 17} ${n + 6} C${x + 24} ${n + 28} ${x + 48} ${y - 20} ${x + 66} ${y - 8}" fill="none" stroke="#e6f2e8" stroke-opacity=".22" stroke-width="3" stroke-linecap="round"/>
+  <path d="M${x - 15} ${n} H${x + 15}" stroke="#2a1c08" stroke-opacity=".6" stroke-width="1.4"/>
+  <ellipse cx="${x}" cy="${y}" rx="${rx - 1.5}" ry="${ry - 1.5}" fill="url(#rum-lp-inne)"/>
+  <ellipse cx="${x}" cy="${y + 1}" rx="15" ry="9" fill="#fffef8"/>
+  <ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="#efe6cc" stroke-width="2.2"/>
+  <path d="M${x - rx} ${y} A${rx} ${ry} 0 0 0 ${x + rx} ${y}" fill="none" stroke="#5d4a2a" stroke-opacity=".35" stroke-width="1.2"/>
+  <ellipse cx="${x}" cy="${y + 2}" rx="58" ry="22" fill="url(#rum-lp-glod)"/>`, 'rum-lampa', [x - 140, -40, 280, 300], 2 / 3) +
+      // (sladden upp till taket syns bara i telefonen på höjden, där taket syns: .rum-tak i rum.css)
+      svg(`<path d="M${x} -520 V-38" stroke="#1a120b" stroke-width="3.2"/>`, 'rum-lampsladd', [x - 3, -520, 6, 484]);
+  }
+
   // Ringarna efter glas på pulten: samma som i Hasse Backes bild (rum-pult.js), genom rummets kamera.
   function ringar(el) {
     import('./rum-pult.js').then(({ ringar: lista, iRum, L }) => {
@@ -1309,9 +1354,13 @@ window.Rum = (() => {
   // kanterna, så att blicken går dit ljuset är (förut var rummet lika upplyst överallt). Dunklet är
   // en del av .rum-vign och värmen i käglorna av .rum-warm (ljusKlockan): inga nya lager, och inget
   // ritas i bildrutorna.
+  // Lampan över pulten (lampa, i pultens plan, som står 1,05 gånger från mitten): där den hänger i scenen,
+  // och dess kägla över notan och kaffet.
+  const LAMPA_I = [r1(800 + (LAMPA.x - 800) * 1.05), r1(500 + (LAMPA.y - 500) * 1.05)];
   const KAGLOR = [
     [575, 470, 470, 300, 0.85],
     [805, 870, 560, 230, 0.85],
+    [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
   ];
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
   const DUNKEL = [0.1, 0.2, 0.42];
@@ -1361,6 +1410,8 @@ window.Rum = (() => {
     g.rect(-10, 652, 1620, 700);
     g.clip();
     rad(g, 628, 690, 340, 170, '255, 236, 200', r1(0.14 + 0.08 * kvall));
+    // (lampan över pulten: en varm strimma under den, där den speglas)
+    rad(g, LAMPA_I[0] + 10, 700, 70, 190, '255, 222, 168', r1(0.2 + 0.1 * kvall));
     // neonen i strimmor, som i lackat trä
     const n = 0.15 + 0.45 * kvall;
     rad(g, 400, 670, 110, 200, '255, 60, 45', r1(n));
@@ -1418,6 +1469,12 @@ window.Rum = (() => {
       q.globalCompositeOperation = 'destination-out';
       for (const [x, y, rx, ry, a] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a);
       rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
+      // (lysröret lyser upp taket och väggen överst, och lampan över pulten lyser, 2026-11-16: förut låg
+      // dunklet också över dem, så att lysröret såg grått ut)
+      rad(q, 640, 40, 480, 130, '0, 0, 0', 0.7);
+      rad(q, LAMPA_I[0], LAMPA_I[1], 170, 125, '0, 0, 0', 0.9);
+      // (spotarnas ljus faller på disken under Tipsligan, med pallarna)
+      rad(q, 1320, 560, 290, 120, '0, 0, 0', 0.45);
       // (och runt neonens spegelbild i pulten, spegelBild)
       rad(q, 400, 690, 140, 110, '0, 0, 0', 0.7);
       rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
@@ -1527,7 +1584,7 @@ ${plane(-600, `<div class="rum-ute" id="rum-ute"></div>${tak()}${bg()}${vid('vag
 ${plane(-598, vid('horn'), 1.035, 'rum-pl3d rum-pl-vhs')}
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
-${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}`, 1.05)}
+${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}${lampa()}`, 1.05)}
 ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div></div>
 <div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div><i class="rum-mork-ut"></i>
@@ -1577,9 +1634,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     syn(el.querySelector('#rum-3d').parentElement, 0, 0, 1, 1).id = 'rum-radio';
     R.cTop = parseFloat(getComputedStyle(el.querySelector('#rum-3d')).top) || 120;
     for (const x of [ute, R.gang, el.querySelector('#rum-damm')]) sikt(x);
-    // dörrens övre del, med Stängt-skylten och namnet: kameran går fram dit
-    // när man klickar på namnet (närbilderna, sak)
-    syn(el.querySelector('#rum-ute').parentElement, DORR.x, DORR.y, DORR.w, 200).id = 'rum-dorrglas';
   }
 
   // Taket ovanför scenen i telefonen på höjden (.rum.smal i rum.css) som en duk en bildpunkt bred, med
@@ -3539,6 +3593,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // ett nytt klick medan tidningen väntar på notiserna gäller i stället (vantaPaTidning)
     R.tidningVantar = false;
     if (a.id === 'rum-hasse') tillHasse(a);
+    else if (a.id === 'rum-dorrnamn') fasad(true);
     else if (a.id === 'rum-helgarderat') oppnaTidning();
     else if (a.dataset.sak) sak(a.dataset.sak);
     else if (a.dataset.nav === 'tv') zoomTv(!R.zoom);
@@ -4052,6 +4107,61 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     });
   }
 
+  // ---------- fasaden ----------
+  //
+  // Ett klick på namnet på dörren och man står ute på trottoaren och ser affären utifrån (rum-fasad.js): huset vid
+  // S:t Eriksbron i samma ljus och väder som utsikten, och genom skyltfönstret gänget bakifrån, ritat av samma
+  // 3D-scen (utifran). Fasaden tonar fram medan man tar ett steg bakåt från dörren, och ett klick var som helst,
+  // Esc eller Tillbaka går in genom dörren igen. Rummet står still bakom så länge (R.vilar, som hos Hasse Backe)
+  // och ritas som vanligt innan det syns igen: gängets duk har bilden utifrån.
+  //   glid: med rörelse in och ut (annars genast)
+  function fasad(pa = true, glid = !calm()) {
+    if (!pa) {
+      const f = R.fasad;
+      if (!f) return false;
+      R.fasad = null;
+      clearTimeout(R.fasadT);
+      lagerUt('fasaden');
+      R.vilar = false;
+      if (R.fig && R.on) {
+        const t = now();
+        const [vx, vy] = synlig();
+        R.fig.draw(t, vx, vy, neonOn(t));
+      }
+      if (glid && !(window.RumBak && RumBak.snabbt)) {
+        f.el.classList.remove('in');
+        f.el.classList.add('ut');
+        setTimeout(() => f.ut(), 520);
+      } else f.ut();
+      return false;
+    }
+    if (R.fasad || !window.RumFasad || !R.on) return Boolean(R.fasad);
+    if (R.sak) sak(null, null);
+    if (R.zoom) zoomTv(false);
+    if (R.vnara) zoomVideo(false);
+    const f = RumFasad.bygg(R.el, {
+      // (medan rummet syns, i övergången, ritas gänget tillbaka inifrån direkt efter)
+      gang: (duk) => R.fig && R.fig.utifran ? R.fig.utifran(duk, now(), neonOn(now()), !R.vilar) : false,
+      neon: () => neonOn(now()),
+      natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
+      calm: () => RORELSE_AV.matches,
+      // (en fast bild, ?rum-t: allt står på samma tid)
+      still: still() ? R.frozen : null,
+    });
+    for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) f.el.addEventListener(n, (e) => e.stopPropagation());
+    f.el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fasad(false);
+    });
+    if (glid) f.el.classList.add('in');
+    R.fasad = f;
+    lager('fasaden', (nu) => fasad(false, !nu));
+    // rummet står still när fasaden täcker det
+    clearTimeout(R.fasadT);
+    R.fasadT = setTimeout(() => { if (R.fasad === f) R.vilar = true; }, glid ? 420 : 0);
+    return true;
+  }
+
   // Tidningen lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka. (UPPE: samma
   // funktioner i samma ordning som --vila i rum-tidning.css, så att den glider dit)
   const UPPE = 'perspective(1100px) translate3d(-434px, -60px, 260px) rotateX(4deg) rotateZ(0deg) scale(1.3)';
@@ -4515,7 +4625,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     pokal: { el: '.rum-pokal', h: 0.72, duk: 'hogra', fot: () => pokalFot(), tv: true },
     kork: { el: '.rum-kork', h: 0.86, duk: 'hogra' },
     vm94: { el: '#rum-vm94', h: 0.94, duk: 'skiva' },
-    dorr: { el: '#rum-dorrnamn', mal: '#rum-dorrglas', h: 0.92 },
     // (kortet fyller inte hela höjden: det är litet, och uret och ramen kommer med i kanten)
     kort: { el: '#rum-kort', mal: '#rum-kort .vk', h: 0.72, duk: 'ram' },
     kupong: { el: '#rum-kupong', h: 0.94, pult: true },
@@ -6456,6 +6565,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const k = e.key.toLowerCase();
       const fore = R.sak;
+      // ute på trottoaren (fasad): Esc går in igen, och inget annat i rummet går att nå därifrån
+      if (R.fasad) {
+        if (k === 'escape') fasad(false);
+        return;
+      }
       if (R.tidning) {
         if (k === 'escape') tidningen(false);
         return;
@@ -6678,6 +6792,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         freezeCss(R.frozen);
         if (q.has('rum-video')) zoomVideo(true);
         if (q.has('rum-sak')) sak(q.get('rum-sak'), null);
+        if (q.has('rum-fasad') || q.get('rum-sak') === 'dorr') fasad(true, false);
         if (q.has('rum-register') && R.reg) {
           R.reg.wait().then(() => {
             register(true);
@@ -6692,6 +6807,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // (inte then(frame): frame tar emot dt, och kameran blev NaN så att gänget inte syntes)
       ready.then(() => frame());
     } else loop();
+    if (!still() && (q.has('rum-fasad') || q.get('rum-sak') === 'dorr')) ready.then(() => { if (R.on) fasad(true, false); });
     clearInterval(R.poll);
     // omgången och liveställningen kan ändras medan rummet står öppet
     // (inte i en dold flik: varje gång är en fråga till tjänsten, samtal.js)
@@ -6707,6 +6823,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (R.video) R.video.stop();
     zoomVideo(false);
     sak(null, null);
+    fasad(false, false);
     if (window.RumBak) RumBak.rensa();
     R.on = false;
     document.documentElement.classList.remove('rum-pa');

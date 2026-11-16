@@ -350,7 +350,7 @@ window.RumHasse = (() => {
     const v = await vagg();
     if (!H.on || H.svanger) return;
     H.vaggBild = v;
-    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag };
+    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag, somn: somn() };
     // (disken speglar väggen: ritas om med den nya)
     H.vaggNr = (H.vaggNr || 0) + 1;
     passa();
@@ -499,7 +499,10 @@ window.RumHasse = (() => {
     broRita(0);
   }
   // Duken över bandet där trafiken går (H.ute.broRam), i skärmens bildpunkter men högst 1,5 per punkt (allt är
-  // oskarpt), och rutornas glas som klippning: sätts när bilden ändras (passa).
+  // oskarpt), och rutornas glas som klippning: sätts när bilden ändras (passa). Oskärpan (H.ute.oskarpa, nästan som
+  // utsiktens) ligger på hela duken, så att den är lika stor längs hela bron; glaset klipper då ramen runt duken
+  // (.rh-bron), så att det oskarpa inte breder ut sig över posterna. Utan path() i clip-path klipps duken som förut.
+  const KLIPP_CSS = (() => { try { return CSS.supports('clip-path', 'path("M0 0 L1 0 L1 1 Z")'); } catch { return false; } })();
   function broDuk(v, b, f, lage) {
     const el = $('.rh-trafik');
     if (!el || !H.ute || !H.ute.broRam) return;
@@ -518,10 +521,18 @@ window.RumHasse = (() => {
     el.width = Math.ceil(w * res);
     el.height = Math.ceil(h * res);
     Object.assign(el.style, { left: `${X0}px`, top: `${Y0}px`, width: `${w}px`, height: `${h}px` });
-    const klipp = new Path2D();
-    for (const q of rutor) {
-      q.forEach(([x, y], i) => (i ? klipp.lineTo(x - X0, y - Y0) : klipp.moveTo(x - X0, y - Y0)));
-      klipp.closePath();
+    const sudd = H.ute.oskarpa ? H.ute.oskarpa(lage) * f : 0;
+    el.style.filter = sudd >= 0.3 ? `blur(${sudd.toFixed(2)}px)` : '';
+    let klipp = null;
+    if (KLIPP_CSS) {
+      const d = rutor.map((q) => `${q.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')} Z`).join(' ');
+      el.parentElement.style.clipPath = `path('${d}')`;
+    } else {
+      klipp = new Path2D();
+      for (const q of rutor) {
+        q.forEach(([x, y], i) => (i ? klipp.lineTo(x - X0, y - Y0) : klipp.moveTo(x - X0, y - Y0)));
+        klipp.closePath();
+      }
     }
     H.broDuk = { el, x: el.getContext('2d'), res, X0, Y0, tx, ty, f, klipp, tom: false };
   }
@@ -541,7 +552,7 @@ window.RumHasse = (() => {
     if (D.tom) return;
     x.save();
     x.setTransform(D.res, 0, 0, D.res, 0, 0);
-    x.clip(D.klipp);
+    if (D.klipp) x.clip(D.klipp);
     const r = D.res;
     const f = D.f;
     const ox = D.tx - D.X0;
@@ -589,7 +600,9 @@ window.RumHasse = (() => {
     x.globalAlpha = 1;
   }
   // Utsikten genom fönstren, underst på väggens duk: ritad en gång per väder och ljus (rum-hasse-ute.js), förstorad
-  // till bildens mått, och glaset med dropparna, snön och frosten. Utan den: himlen i rummets färger.
+  // till bildens mått, glaset med dropparna, snön och frosten, och affären som speglas i glaset när det är mörkare
+  // ute än inne (affaren: lysröret, furan och gänget vid bordet, efter hur tänt röret är och om gänget sover).
+  // Utan den: himlen i rummets färger.
   const uteLage = () => (H.hog ? 'hog' : 'bred');
   const uteNu = () => {
     const v = window.Vader ? Vader.nu() : null;
@@ -599,7 +612,8 @@ window.RumHasse = (() => {
     const u = H.ute && uteNu();
     return u ? H.ute.sig(u.v, u.L) : H.uteSig;
   }
-  function ute(x, W, Hh) {
+  const somn = () => Boolean(window.RumFolk && RumFolk.somn && RumFolk.somn());
+  function ute(x, W, Hh, l) {
     const u = uteNu();
     if (H.ute && u) {
       try {
@@ -608,6 +622,11 @@ window.RumHasse = (() => {
         x.drawImage(d, 0, 0, W, Hh);
         H.ute.glas(x, u.v, u.L, uteLage(), W, Hh);
         H.uteSig = H.ute.sig(u.v, u.L);
+        try {
+          if (H.ute.affaren) H.ute.affaren(x, u.L, l, somn(), uteLage(), W, Hh);
+        } catch (e) {
+          // utsikten står kvar utan spegelbilden
+        }
         return;
       } catch (e) {
         // som utan utsikten
@@ -661,7 +680,7 @@ window.RumHasse = (() => {
     c.width = W;
     c.height = Hh;
     const x = c.getContext('2d');
-    ute(x, W, Hh);
+    ute(x, W, Hh, l);
     if (blanda) {
       x.drawImage(mork, 0, 0, W, Hh);
       x.globalAlpha = l.k;
@@ -729,10 +748,10 @@ window.RumHasse = (() => {
     x.globalAlpha = 1;
   }
   // Väggen står som den ska: samma fönster (på bredden eller höjden), ljus och väder som när den ritades.
-  const vaggSom = (l) => { const f = H.vaggLjus; return Boolean(f && H.vaggBild && f.hog === H.hog && Math.abs(l.k - f.k) < 0.004 && Math.abs(l.f - f.f) < 0.01 && Math.abs(l.dag - f.dag) < 0.01 && uteSig() === H.uteSig); };
+  const vaggSom = (l) => { const f = H.vaggLjus; return Boolean(f && H.vaggBild && f.hog === H.hog && Math.abs(l.k - f.k) < 0.004 && Math.abs(l.f - f.f) < 0.01 && Math.abs(l.dag - f.dag) < 0.01 && f.somn === somn() && uteSig() === H.uteSig); };
   async function vaggNu(l) {
     H.vaggBild = await vagg();
-    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag };
+    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag, somn: somn() };
   }
   // En stund efter att rummet har kommit i gång hämtas hans bilder och kod till webbläsarens cache, utan att
   // något byggs eller packas upp: då väntar det första klicket inte på nätet. (I telefonen pekar man inte på
