@@ -47,6 +47,21 @@
    ],
    "model": "claude-opus-5-5",
    "generatedAt": "2026-11-15T13:49:16.405Z"
+  },
+  {
+   "key": "2026-11-21-st4980:401878754,401878756,401879232,401879235,401879236,401879238,401880149,401880151,401880152,401880154,401880157,401880158,401880160",
+   "id": "2026-11-21-st4980",
+   "namn": "Pengarna ligger redan i Stoke",
+   "syftar": "Toppmatchen mellan Stoke och Birmingham spelas på bet365 Stadium, och familjen som äger spelbolaget äger också Stoke – så tippares pengar har alltid hamnat i Stoke.",
+   "forslag": [
+    "Vinsten hämtas ut i Stoke",
+    "Spelbolaget har hemmamatch på lördag",
+    "Vi löser in kvittot i Stoke",
+    "Rikast är inte alltid bäst",
+    "Pengarna ligger redan i Stoke"
+   ],
+   "model": "claude-opus-5-5",
+   "generatedAt": "2026-11-16T22:53:13.814Z"
   }
  ]
 }
