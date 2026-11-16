@@ -3013,10 +3013,14 @@ Europatipset av sig självt, *"som för Stryktipset, så att inget behöver skri
 [Tidningen](#tidningen)). Nu läses ett landslag eller en klubb utanför England (ett lag som inte har någon engelsk
 liga i sajtens matchdata, `ENGELSKA` i scripts/tidning/poddar.mjs) med samma kod som klubben och lokaltidningen men
 med [config/utland.js](config/utland.js) som `cfg`, och bara där: inga poddar, forum, insatta medier eller förra
-klubben, som alla är engelska källor. Claude söker (utan Bing, som söker på engelska i Storbritannien) efter
-förbundets eller klubbens egen sajt (`forbundet`, `klubben`) och landets sportpress (`pressen`), på lagets eget
-språk. Många utländska tidningar är spärrade på iMacen, så Claude föreslår upp till åtta artiklar och jobbet läser de
-fyra första som går att läsa (`lasHogst`). Citatet står på artikelns språk och prövas mot texten som förut, och
+klubben, som alla är engelska källor. Claude söker efter förbundets eller klubbens egen sajt (`forbundet`,
+`klubben`) och landets sportpress (`pressen`), på lagets eget språk. WebSearch hittade i provet 2026-11-16 en enda
+artikel om Sverige inför Polen och gav inga datum, så jobbet ger Claude veckans nyheter ur Bing News på lagets språk,
+som för de engelska lagen: ett kort anrop utan verktyg (`sokordPrompt`, `bingSokord` i src/analyser/media.mjs) tar fram
+landet, språket och tre sökfrågor (*reprezentacja Polski*, *Polska Szwecja* …), som sparas i lagets post för
+motståndaren. Sajter som är spärrade på iMacen (/etc/hosts, `sparrad`: namnet pekar på 0.0.0.0) erbjuds inte, eftersom
+de ändå inte går att läsa; spärren rundas inte. Claude föreslår upp till åtta artiklar och jobbet läser de fyra första
+som går att läsa (`lasHogst`). Citatet står på artikelns språk och prövas mot texten som förut, och
 översättningen trycks. Artiklarna sparas som klubbens och lokaltidningens (`typ: 'lokal'`, id på `u`), så att
 matchbladet och tidningen tar dem som de tar lokaltidningens. Ett blad som har skrivits för hand för samma omgång går
 före jobbets (`poddsidor` i src/analyser/poddar.mjs).
