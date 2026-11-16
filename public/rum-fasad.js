@@ -2750,6 +2750,13 @@ window.RumFasad = (() => {
       const H = el.clientHeight || innerHeight;
       return Math.max(W / V.w, H / V.h) * Math.min(2, devicePixelRatio || 1, Math.sqrt(2e6 / (W * H)));
     };
+    // En duk som inte behövs längre lämnar tillbaka sitt minne genast när den blir noll stor (slapp): annars
+    // ligger bildpunkterna kvar tills skräpsamlingen hinner dit, och i en telefon hann de bli många – vid
+    // varje ombygge av scenen (rita) och varje gång man gick ut och in igen (ut). Scenens dukar, bilarnas och
+    // molnens (dukarna).
+    const slapp = (c) => { if (c && c.width) { c.width = 0; c.height = 0; } };
+    const dukarna = (R) => (R ? [R.fram && R.fram.canvas, R.bak && R.bak.canvas, R.barber && R.barber.canvas,
+      ...(R.bilar || []).map((b) => b.bild), ...((R.himlen && R.himlen.moln) || []).map((m) => m.bild)] : []);
     const duk = (cls, r, px) => `<canvas class="${cls}" width="${Math.max(1, Math.round(r.w * px))}" height="${Math.max(1, Math.round(r.h * px))}" style="left:${r1(r.x - F.V.x)}px; top:${r1(r.y - F.V.y)}px; width:${r1(r.w)}px; height:${r1(r.h)}px"></canvas>`;
 
     function rita() {
@@ -2758,7 +2765,9 @@ window.RumFasad = (() => {
       const v = window.Vader ? Vader.nu() : null;
       if (!v || !U()) return;
       const L = U().light(v);
-      const s = sig(V, v, L, o);
+      // (och dukarnas bildpunkter, i steg om en åttondel: storleken på skärmen, tathet)
+      const px = tathet(V);
+      const s = `${sig(V, v, L, o)},${Math.round(px * 8)}`;
       if (s === F.sig) return;
       F.sig = s;
       F.V = V;
@@ -2773,8 +2782,8 @@ window.RumFasad = (() => {
       const dw = Math.round(Math.min(1400, FON.w * k * pr));
       const dh = Math.round(dw * FON.h / FON.w);
       const gammal = F.duk;
+      const gamla = dukarna(F.ro);
       // det som rör sig: vad, var och hur (inget med prefers-reduced-motion, utom stången som står still)
-      const px = tathet(V);
       const lugn = calm();
       const bakX = Math.max(V.x, HORN - 520);
       const bakR = { x: bakX, y: V.y, w: V.x + V.w - bakX, h: HOR + 60 - V.y };
@@ -2821,6 +2830,8 @@ window.RumFasad = (() => {
       if (o.still != null) for (const an of el.getAnimations({ subtree: true })) { an.pause(); an.currentTime = o.still * 1000; }
       // (gänget från förra gången tills det ritas på nytt)
       if (gammal && gammal.width) F.duk.getContext('2d').drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
+      slapp(gammal);
+      for (const c of gamla) slapp(c);
       F.neon = null;
       passa();
       gang();
@@ -2908,7 +2919,17 @@ window.RumFasad = (() => {
     }
     // vädret och ljuset ändras: ritas om när de har ändrats (sig), en gång i minuten
     const T = setInterval(() => { if (el.isConnected) rita(); }, 60e3);
-    const storlek = () => { F.sig = ''; rita(); };
+    // Storleken ändras (telefonen vrids, adressfältet glider in eller ut): scenen skalas om genast så att
+    // den täcker fönstret (passa), och byggs om först när storleken har stått still en stund, och bara om
+    // vyn eller dukarnas bildpunkter har ändrats (sig). Förut byggdes allt om – alla lager och dukar – vid
+    // varje resize, och i en telefon kommer de en per bildruta medan adressfältet glider: 60 i rad tog
+    // ungefär 600 MB mer minne (som iPhone i Chromium), och sidan kraschade.
+    let storlekT = 0;
+    const storlek = () => {
+      passa();
+      clearTimeout(storlekT);
+      storlekT = setTimeout(() => { if (el.isConnected) rita(); }, 300);
+    };
     addEventListener('resize', storlek);
     rita();
     loop();
@@ -2918,8 +2939,13 @@ window.RumFasad = (() => {
       ut() {
         cancelAnimationFrame(F.raf);
         clearInterval(T);
+        clearTimeout(storlekT);
         removeEventListener('resize', storlek);
         el.remove();
+        for (const c of dukarna(F.ro)) slapp(c);
+        slapp(F.duk);
+        F.ro = null;
+        F.duk = null;
       },
     };
   }

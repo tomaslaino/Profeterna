@@ -6906,6 +6906,28 @@ inga fler långa bildrutor; som telefon 4 → 20 i sekunden. Med processorn ×4 
 bildrutor 88 → 13 i bästa paret). Tiden går nästan helt till three.js egna ritanrop (~220 utifrån i telefonen, ~300 på
 steg 0), inte till bildpunkterna; delar som blir under två bildpunkter stora utifrån är bara 30 av 223, så de står kvar.
 
+**Fasaden kraschade i telefonen (2026-11-16, användarens rapport: "sidan kraschar ständigt när jag ser butiken
+utifrån och är inne i mobilen"):** sidan tog för mycket minne ute, och telefonen stängde den. Tre orsaker,
+mätta i Chromium som iPhone 13 och Pixel 7 (gammal och ny kod i samma körning, minnet för alla webbläsarens processer):
+
+- **Rummet låg kvar under fasaden.** Det stod still (`R.vilar`) men ritades fortfarande: 155 lager, varav
+  rummets 29 megapixel på skärmen, under en fasad som täcker allt. Nu döljs det när fasaden har tonat fram
+  (`.fasad-tackt` på `.rum`, satt i `fasad` i rum.js samtidigt som `R.vilar`, och borttagen innan man går in):
+  `content-visibility: hidden` och `visibility: hidden` på `.rum-sving` (i rum-fasad.css), och på allt i det, så att
+  inte heller det som visas med `visibility: visible` (radion, pratbubblorna, videon) syns. Gängets duk ritar ändå
+  glaset (`utifran`). Ute nu 11 lager och 12 megapixel på skärmen, i stället för 155 och 29.
+- **Dukarna släpptes inte.** Varje gång man gick ut och in blev cirka 25 MB kvar (dukarnas bildpunkter väntade på
+  skräpsamlingen, medan JS-minnet låg still): 1 204 → 1 808 MB efter 24 varv. Nu sätts fasadens dukar till noll
+  storlek när de byts ut eller fasaden tas bort (`slapp`, `dukarna` i rum-fasad.js: scenens, gängets glas,
+  bilarnas och molnens). Efter 24 varv 1 224 → cirka 1 470 MB, stilla från det fjärde varvet.
+- **Allt byggdes om vid varje resize.** I en telefon kommer de en per bildruta när adressfältet glider in eller ut,
+  och 60 i rad byggde om fasaden 59 gånger: 1 288 → 1 845 MB. Nu skalas scenen om genast (`passa`) och byggs om
+  300 ms efter att storleken har stannat, bara om vyn eller dukarnas bildpunkter har ändrats (`sig`, med
+  bildpunkterna i steg om en åttondel): 13 ombyggen och högst 1 500 MB i samma prov (i emuleringen tar varje
+  resize så lång tid att de inte hinner slås ihop helt; i en telefon blir det ett).
+
+Det som syns är detsamma: gänget i fönstret, övergångarna in och ut och rummet när man kommer tillbaka.
+
 ### Kupongen i handen
 
 Allt man gör med kupongen på papperet under Kupong görs också i rummet, med kupongen i
