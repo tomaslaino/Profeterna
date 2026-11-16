@@ -3794,24 +3794,44 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     fA.crossVectors(F, P).negate().normalize();
     return pose(ut, H.clone().addScaledVector(fA, -GREPP.x).addScaledVector(F, GREPP.y).addScaledVector(P, GREPP.z), fA, P);
   }
-  // handen vriden runt cigarrens längd (grader), med cigarren kvar där den är
-  const vridQ = new THREE.Quaternion();
-  const vrid = (ut, grad) => { ut.q.multiply(vridQ.setFromAxisAngle(V3(0, 1, 0), grad * DEG)); return ut; };
-  // (hall vriden 22° så att knogarna och fingrarnas ryggar vetter mot en och fingrarna ligger över
-  // cigarren, se bara 10°, annars for armbågen fort därifrån till munnen, och vift 25° åt andra hållet
-  // så att han håller den från sidan: förut såg man in i handflatan, och fingrarna krokade över
-  // cigarren bakifrån med naglarna mot en, som en klo)
+  // handledens vila: lite bakåtböjd (BAK) och lite mot lillfingret (ULNAR); naturlig nedan räknar från den
+  const VRIST_VILA = { BAK: 12 * DEG, ULNAR: 6 * DEG };
+  // Lägen där armen vilar (2026-11-16): armbågen E (på disken), underarmen U därifrån, och handleden i sin vila
+  // (VRIST_VILA), så att armbågen hamnar där. Handen vrids runt underarmen tills cigarren pekar så nära Ad som
+  // det går: cigarren ligger tvärs över fingrarna, längs tummen, så den del av Ad som går längs underarmen kan
+  // den inte peka, utan att handleden knäcks åt sidan. (Förut gavs handen och cigarren och armbågen fick hamna
+  // där handleden blev rak: i hall och se låg handen platt ovanpå cigarren, med handryggen mot en, och det går
+  // bara med underarmen vågrät, så armbågen stod ute i brösthöjd som en vinge. I visa och vift likadant.)
+  const aA = v();
+  const aP = v();
+  const aT = v();
+  function iArmen(E, U, Ad) {
+    U = U.clone().normalize();
+    const H = E.clone().addScaledVector(U, LB + 26);
+    const F = U.clone();
+    for (let i = 0; i < 4; i++) {
+      aA.copy(Ad).addScaledVector(F, -Ad.dot(F)).normalize();
+      aP.crossVectors(F, aA);
+      aT.crossVectors(F, aP);
+      F.copy(U).addScaledVector(aP, -Math.sin(VRIST_VILA.BAK)).addScaledVector(aT, -Math.sin(VRIST_VILA.ULNAR)).normalize();
+    }
+    aA.copy(Ad).addScaledVector(F, -Ad.dot(F)).normalize();
+    return fraHand(nyPose(), H, F, aP.crossVectors(F, aA));
+  }
+  // (armbågen på disken till höger om axeln, där han vilar armen med cigarren uppe)
+  const E_HALL = V3(-407, -200, 227);
   const PV = {
     vila: pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, P_VILA),
     // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt och lite uppåt
-    hall: vrid(fraHand(nyPose(), V3(-310, 165, 540), V3(0.4, 0.82, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()), -22),
-    // lite högre och vriden, glöden uppåt: han tittar på den
-    se: vrid(fraHand(nyPose(), V3(-290, 215, 560), V3(0.3, 0.85, 0.43).normalize(), V3(0.1, -0.48, 0.87).normalize()), -10),
-    // framför bröstet under hakan, snett uppåt, så att han ser ringen när han beundrar den
-    visa: pose(nyPose(), V3(10, 310, 790), V3(-0.6, 0.6, 0.5).normalize(), V3(0.2, -0.5, 0.85)),
-    // fram mot en, glöden mot en (vift2 lite högre: knycken)
-    vift: vrid(pose(nyPose(), V3(-160, 180, 800), V3(-0.55, 0.25, 0.8).normalize(), V3(0.3, -0.9, 0.2)), 25),
-    vift2: vrid(pose(nyPose(), V3(-150, 215, 830), V3(-0.5, 0.4, 0.77).normalize(), V3(0.3, -0.85, 0.3)), 25),
+    hall: iArmen(E_HALL, V3(0.12, 0.8, 0.59), V3(-0.9, 0.3, -0.3)),
+    // lite högre, glöden uppåt: han tittar på den
+    se: iArmen(E_HALL, V3(0.15, 0.88, 0.45), V3(-0.55, 0.6, -0.6)),
+    // framför bröstet under hakan, snett uppåt och utåt, så att han ser ringen när han beundrar den; armbågen
+    // på disken framför axeln
+    visa: iArmen(V3(-231, -200, 254), V3(0.29, 0.76, 0.58), V3(-0.7, 0.6, -0.2)),
+    // underarmen upp från disken och glöden mot en (vift2 lite högre: knycken)
+    vift: iArmen(V3(-340, -200, 260), V3(0.1, 0.8, 0.59), V3(-0.35, -0.45, 0.82)),
+    vift2: iArmen(V3(-340, -200, 260), V3(0.1, 0.86, 0.5), V3(-0.3, -0.3, 0.9)),
   };
   // Över askkoppen, med glöden över skålen och cigarren snett nedåt ut från handen; han knackar av
   // askan med ett kort ryck nedåt (knackN).
@@ -3928,7 +3948,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // TUM mot tummen och LILL mot lillfingret. POL: hur gärna armbågen ligger åt pol, HOJD: hur ogärna den
   // går upp mot axelns höjd, från HOJD0 under den, och INN: hur ogärna den går in framför magen, från
   // INN0 innanför axeln, båda i överarmens längder)
-  const NAT = { BAK: 12 * DEG, BOJ: 34 * DEG, BAKAT: 40 * DEG, ULNAR: 6 * DEG, TUM: 14 * DEG, LILL: 26 * DEG, POL: 0.5, HOJD: 14, HOJD0: 0.3, INN: 10, INN0: 0.35, N: 36 };
+  const NAT = { BAK: VRIST_VILA.BAK, BOJ: 34 * DEG, BAKAT: 40 * DEG, ULNAR: VRIST_VILA.ULNAR, TUM: 14 * DEG, LILL: 26 * DEG, POL: 0.5, HOJD: 14, HOJD0: 0.3, INN: 10, INN0: 0.35, N: 36 };
   const nD = v();
   const nC = v();
   const n1 = v();

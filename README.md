@@ -1708,6 +1708,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   den med underarmen rakt fram från armbågen. Handen går lågt över disken, nyper cigarren med flack hand och
   rak handled, och pek- och långfingret ligger lite samlade. Handen går fri från cigarren när han slår i
   disken, och askkoppen syns hel i telefonen. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Hasse håller cigarren bekvämt (2026-11-16, användarens önskemål):** "Kan du ordna så att hasse backe ser mer
+  bekväm ut i alla cigarrörelser - det finns vissa som det ser ut som att det är konstigt hur han håller
+  högerarmen/armbågen." Mellan blossen, när han tittade på cigarren, beundrade den och visade den mot en stod
+  högerarmbågen ute åt sidan i brösthöjd med underarmen vågrät framför bröstet: handen låg platt ovanpå cigarren,
+  och det gick bara med vågrät underarm. Nu vilar armbågen på disken och underarmen står snett upp med handleden i
+  vila, och handen vrids runt underarmen så att cigarren pekar utåt, uppåt eller mot en. Det gäller alla elva sätt
+  att njuta av cigarren, de fyra sätten att tända den och när den har slocknat. Se [Hasse Backe](#hasse-backe), *Cigarren*.
 - **Klicka på Hasses kaffe, askkopp och de andra sakerna (2026-11-10, användarens önskemål):** "kan du ordna så att
   man kan klicka på kaffet, askkoppen osv och så gör Hasse de rörelserna - men att han annars gör dem så som han
   känner för det". Ett klick var som helst i hans bild gick förut tillbaka till rummet. Nu går kaffet, askkoppen med
@@ -8051,7 +8058,11 @@ handflatan nedåt och lite framåt (`P_VILA`); förut sträckte han ut armen åt
 dök ned på den ovanifrån med raka, utspärrade fingrar (ändrat 2026-11-09). Han håller den löst i
 fingertopparna, tummen under och pek- och långfingret ovanpå, med ring- och lillfingret böjda in mot
 handflatan; vid munnen sitter handen under den vid käken, med fingrarna uppåt i underarmens förlängning
-och armbågen nere (förut satt den vid kinden, och då knäcktes handleden åt sidan). Det är cigarren som
+och armbågen nere (förut satt den vid kinden, och då knäcktes handleden åt sidan). Mellan blossen, när han
+tittar på den, beundrar den och visar den mot en vilar armbågen på disken och underarmen står snett upp, med
+handleden i vila; handen är vriden runt underarmen så att cigarren pekar så nära det tänkta hållet som det
+går (`iArmen`). Förut låg handen där platt ovanpå cigarren, och det gick bara med underarmen vågrät, så
+armbågen stod ute i brösthöjd som en vinge (ändrat 2026-11-16). Det är cigarren som
 styr: dess läge räknas fram (i askkoppen, vid munnen eller i mungipan i huvudets mått så att den följer
 när han rör huvudet, vid axeln, framför bröstet) och handen räknas ur greppet, så att den sitter kvar i
 fingrarna hela vägen. Handen kan också släppa den: då sitter den kvar i munnen och handen vilar på
