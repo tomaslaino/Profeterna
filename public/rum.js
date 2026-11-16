@@ -518,7 +518,8 @@ window.Rum = (() => {
       `<polygon points="${x0},${r1(at(x0, yb) - 0.6)} ${x1},${r1(at(x1, yb) - 0.8)} ${x1},${r1(at(x1, yb) + 0.6)} ${x0},${r1(at(x0, yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
       // pallen som det bakre ledet står på, med damm på kanten
       (led === 2 ? `<polygon points="${yta(yb - bak, yb)}" fill="#2d231a"/><polygon points="${yta(yb - bak, yb - bak + 0.8)}" fill="#d9d2c0" opacity=".22"/>` : '')).join('') +
-      hit(x0, x1, Math.min(...hyllor) - (led === 2 ? bak : 0) - 36, POKAL.yb + 6, cups);
+      // (ytan går ner över hela hyllkanten, 8 under hyllan i shelf)
+      hit(x0, x1, Math.min(...hyllor) - (led === 2 ? bak : 0) - 36, POKAL.yb + 9, cups);
   }
 
   // ---------- lagren ----------
@@ -6504,11 +6505,20 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.tecknaT = setTimeout(() => { if (R.on) frame(); }, 2300);
   }
 
+  // Saken under t: länken (sel), eller den saken som t är en del av (.rum-del, bredvid länken i
+  // samma låda: tv:ns sidor, kåpa och hylla i rum-tv.js). Också i rum-folk.js.
+  function sakVid(t, sel) {
+    const a = t.closest(sel);
+    if (a) return a;
+    const d = t.closest('.rum-del');
+    return d && d.parentElement.querySelector(`:scope > :is(${sel})`);
+  }
+
   function wire() {
     const el = R.el;
     swipe(el);
     el.addEventListener('mouseover', (e) => {
-      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag');
+      const a = !R.kup && sakVid(e.target, '.rum-sak, .rum-tag');
       hot(a ? a.dataset.nav : null);
       if (a && a.id === 'rum-helgarderat') forberedTidning();
     });
@@ -6571,7 +6581,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (!openCoupon()) sak('kupong');
         return;
       }
-      const a = e.target.closest('.rum-sak');
+      const a = sakVid(e.target, '.rum-sak');
       if (a && el.contains(a)) go(a, e);
       else if (R.zoom && !e.target.closest('.rum-hdr, .rum-ft')) zoomTv(false);
       // där inget går att klicka: du är ingen igen

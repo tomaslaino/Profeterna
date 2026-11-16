@@ -383,14 +383,16 @@
 
 /* ---------- klicket ---------- */
 
-/* på avstånd går ett klick var som helst på tv:n fram till den (rum.js) */
+/* på avstånd går ett klick var som helst på tv:n fram till den (rum.js): på fronten (länken) och
+   på lådans sidor, kåpan och hyllan (.rum-del), som annars var luckor man inte kunde klicka i */
 .rum-tv { position: absolute; left: 0; top: 0; width: 292px; height: 196px; display: block; border-radius: 5px; transform: translateZ(2px); }
+.rum-tv3 > .rum-del { pointer-events: auto; cursor: pointer; }
 .rum-tv:hover, .rum-tv:focus-visible { filter: none; }
 .rum-tv:focus-visible { outline: 2px solid rgba(240, 214, 153, 0.8); outline-offset: 3px; }
-.rum.tv-nara .rum-tv { pointer-events: none; }
+.rum.tv-nara .rum-tv, .rum.tv-nara .rum-tv3 > .rum-del { pointer-events: none; }
 .rum-tv3.nara .tv-front button, .rum-tv3.nara .tv-front a { pointer-events: auto; }
 /* under pekaren lyser rutan upp till full styrka, som en inbjudan att gå fram */
-.rum-tv3:has(> .rum-tv:hover) .tv-glas { filter: brightness(1.05); transition-duration: 0.25s; }
+.rum-tv3:has(> :is(.rum-tv, .rum-del):hover) .tv-glas { filter: brightness(1.05); transition-duration: 0.25s; }
 
 @media (prefers-reduced-motion: reduce) {
   .rum-tv3, .tv-scan, .tv-glas, .tv-led { transition: none; }

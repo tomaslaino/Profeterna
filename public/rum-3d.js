@@ -9120,37 +9120,98 @@ export async function figurer(canvas, opt = {}) {
     if (o) vakna(o, t, satt, true);
   }
   // Vem i gänget syns i punkten (nx, ny) i duken (−1…1, y uppåt)?
-  // (mot varje dels låda, inte dess trianglar: det är bara för att veta vem man
-  // pekar på, och trianglarna tog 12–17 ms av huvudtråden var 60:e ms när musen
-  // rörde sig över gänget)
+  // Mot varje dels låda: det räcker för att veta vem man pekar på. Men lådorna är
+  // större än delarna – runt huvudet, håret och armarna – och med en sak bakom
+  // (exakt: löpsedlarna bakom DJ, radion …) tog de klicket från den, så att det
+  // inte gick att klicka där och handen inte syntes, fast man pekade på saken. Då
+  // prövas trianglarna i de delar vars låda strålen går igenom, närmast först och
+  // bara tills ingen låda ligger närmare än träffen. (Trianglarna i alla delar tog
+  // 12–17 ms av huvudtråden var 60:e ms när musen rörde sig över gänget.)
   const ray = new THREE.Raycaster();
   const delRay = new THREE.Ray();
   const delInv = new THREE.Matrix4();
   const delPt = new THREE.Vector3();
-  function under(nx, ny) {
+  const delTraff = [];
+  // hur långt strålen har till delens låda, eller -1 om den går förbi
+  function tillLadan(x) {
+    const g = x.geometry;
+    if (!g.boundingBox) g.computeBoundingBox();
+    delRay.copy(ray.ray).applyMatrix4(delInv.copy(x.matrixWorld).invert());
+    if (!delRay.intersectBox(g.boundingBox, delPt)) return -1;
+    return delPt.applyMatrix4(x.matrixWorld).distanceTo(ray.ray.origin);
+  }
+  // Trianglarna i en form i bitar om DEL_BIT i ritordningen, var och en med sin låda (en gång per form, när
+  // den behövs första gången; formerna ändras inte): hår och huvuden har 13 000–14 000 trianglar, och en
+  // stråle förbi huvudet prövades mot alla – i snitt 1 ms och ibland 15 ms. Trianglarna som ritas efter
+  // varandra sitter ihop, så bitarnas lådor är små, och strålen prövas bara mot dem i de bitar den går igenom.
+  const DEL_BIT = 64;
+  const delBitar = new WeakMap();
+  function bitarAv(g) {
+    let b = delBitar.get(g);
+    if (b) return b;
+    b = [];
+    const pos = g.attributes.position;
+    const idx = g.index;
+    const n = idx ? idx.count : pos.count;
+    for (let s = 0; s < n; s += DEL_BIT * 3) {
+      const e = Math.min(n, s + DEL_BIT * 3);
+      const box = new THREE.Box3();
+      for (let i = s; i < e; i++) box.expandByPoint(delPt.fromBufferAttribute(pos, idx ? idx.getX(i) : i));
+      b.push({ s, e, box });
+    }
+    delBitar.set(g, b);
+    return b;
+  }
+  // strålens träffar i delen x (i ut), som x.raycast men bara i de bitar strålen går igenom: three.js prövar
+  // trianglarna inom formens drawRange, som sätts till biten en stund
+  function traffarI(x, ut) {
+    const g = x.geometry;
+    const b = bitarAv(g);
+    delRay.copy(ray.ray).applyMatrix4(delInv.copy(x.matrixWorld).invert());
+    const { start, count } = g.drawRange;
+    try {
+      for (const bit of b) {
+        const s = Math.max(start, bit.s);
+        const e = Math.min(start + count, bit.e);
+        if (s >= e || !delRay.intersectsBox(bit.box)) continue;
+        g.drawRange.start = s;
+        g.drawRange.count = e - s;
+        x.raycast(ray, ut);
+      }
+    } finally {
+      g.drawRange.start = start;
+      g.drawRange.count = count;
+    }
+  }
+  function under(nx, ny, exakt = false) {
     ray.setFromCamera(new THREE.Vector2(nx, ny), cam);
-    let best = null;
+    const lador = [];
     for (const o of figs) {
       // (den som går iväg klickar man igenom)
       if (o.st && o.st.w > 0.2) continue;
       o.fig.traverseVisible((x) => {
         if (!x.isMesh || !x.material || (x.material.transparent && !x.userData.lapp)) return;
-        const g = x.geometry;
-        if (!g.boundingBox) g.computeBoundingBox();
-        delRay.copy(ray.ray).applyMatrix4(delInv.copy(x.matrixWorld).invert());
-        if (!delRay.intersectBox(g.boundingBox, delPt)) return;
-        const d = delPt.applyMatrix4(x.matrixWorld).distanceTo(ray.ray.origin);
-        if (!best || d < best.d) best = { k: o.F.key, d };
+        const d = tillLadan(x);
+        if (d >= 0) lador.push({ x, k: o.F.key, d });
       });
     }
-    // (radion: klicket går fram till den, rum-folk.js)
+    let best = null;
+    if (!exakt) {
+      for (const l of lador) if (!best || l.d < best.d) best = l;
+    } else {
+      lador.sort((a, b) => a.d - b.d);
+      for (const l of lador) {
+        if (best && l.d >= best.d) break;
+        delTraff.length = 0;
+        traffarI(l.x, delTraff);
+        for (const h of delTraff) if (!best || h.distance < best.d) best = { k: l.k, d: h.distance };
+      }
+    }
+    // (radion: klicket går fram till den, rum-folk.js; där räknas hela lådan, också där strålen går
+    // mellan handtaget och lådan)
     RADIO.traff.forEach((x) => {
-      const g = x.geometry;
-      if (!g.boundingBox) g.computeBoundingBox();
-      delRay.copy(ray.ray).applyMatrix4(delInv.copy(x.matrixWorld).invert());
-      if (!delRay.intersectBox(g.boundingBox, delPt)) return;
-      const d = delPt.applyMatrix4(x.matrixWorld).distanceTo(ray.ray.origin);
-      if (!best || d < best.d) best = { k: 'radio', d };
+      const d = tillLadan(x);
+      if (d >= 0 && (!best || d < best.d)) best = { k: 'radio', d };
     });
     return best && best.k;
   }
