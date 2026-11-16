@@ -855,6 +855,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Landskamperna: spelprogram, resultat och grupperna | ESPN:s öppna API (`uefa.nations`, `uefa.euroq`, `fifa.friendly`; tabellen i `standings` med en grupp per `children`) | Nations League, EM-kval, vänskapslandskamper | 30 min, tabellen 3 h | Verifierat 2026-11-13: Nations League 2026/27 har 52 matcher 12–17 november, gruppen i `competitions[0].group` ("Group B4") och tabellen i 14 grupper (A1–D2), lagen i id-ordning. Vänskapsmatcherna gäller hela världen – bara de med ett europeiskt landslag tas med. EM-kvalet är tomt till mars 2027. Se [Landskamperna](#landskamperna). |
 | Landskamperna: odds | ESPN matchsammanfattning (DraftKings) | landskamperna | 2 h, tre dagar bakåt till sju dagar fram, sparas; tidigare spelade matcher i Nations League och EM-kvalet frågas en gång | Verifierat 2026-11-13: odds för alla fem landskamperna på Stryktipset 14 november. Ger landskampernas prognos. Oddsen ligger kvar i sammanfattningen efter matchen: 2026-11-14 hade 117 av 122 spelade matcher i Nations League odds (de utan står i `utan` och frågas inte om). Ger också landslagens siffror mot oddsen. |
 | Landslagens tidigare matcher | ESPN (`fifa.world` juni–juli 2026, `fifa.worldq.uefa` 2025–mars 2026, `uefa.nations` 2024/25, `fifa.friendly` 2025–2026) | landskamperna – formen och mötena | 7 d | Bara matcher med ett europeiskt landslag. |
+| Landslagens Elo-tal (motståndets styrka) | World Football Elo Ratings (`eloratings.net/World.tsv` och `en.teams.tsv`) | landskamperna – formen och de tio senaste i datorn | 24 h | Verifierat 2026-11-16: 243 landslag med plats i världen och Elo-tal (Spanien 1:a på 2258), namnen på engelska med andra stavningar i en egen fil; ingen nyckel. Filerna skrivs om efter varje landskamp. Ett ögonblick, ingen historik – styrkan är den just nu, som modellens för klubbarna. Styr inte prognosen. |
 | Landslagens flaggor | ESPN:s bildtjänst (`…/teamlogos/countries/500/<kod>.png`, koden ur lagets logo-adress) | landskamperna | när ett nytt lag kommer | Landslagen ligger inte bland klubbarnas sköldar. Sparas som sköldarna, under det svenska namnet. |
 | Landslagens spelare | ESPN:s öppna API (`uefa.nations/teams/<id>/roster` för de uttagna, `summary?event=<id>` för varje spelad match) | Nations League | trupperna 12 h, rapporterna 6 h, bara nya matcher | Verifierat 2026-11-14: 54 landslag. ESPN:s säsongssiffror i landslagens trupper stämmer inte med matcherna (Norge hade spelat 4 matcher men spelarna stod på 6) och truppen är bara den senast uttagna (214 av 1 326 som spelat saknades), så spelarnas siffror räknas ur matchrapporterna (`p` i `espn_minutes_unl`: mål, assist, skott, kort, regelbrott, räddningar och insläppta per spelare och match). Målen stämde med tabellen utom självmålen (299 av 307). Se [Spelare och statistik för landslagen](#spelare-och-statistik-för-landslagen-2026-11-14). |
 | Landslagens xG, skott och kort | 365Scores öppna webb-API (`/web/game/stats/?games=<id>`, matcherna som för betygen) | Nations League | 6 h, bara nya matcher | Verifierat 2026-11-14: tävling 7016, alla 122 spelade matcher hittades och hade xG, skott, skott på mål, hörnor, frisparkar och kort för båda lagen. Skotten och hörnorna stämde med ESPN:s i stickprovet (Turkiet–Belgien). Det som ligorna har ur football-data.co.uk. Betygen och spelarbilderna hämtas som för ligorna (Republic of Ireland heter Ireland där). |
@@ -1339,6 +1340,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   lyktornas och fönstrens sken i stället för att alla är svarta siluetter. Gatan är glesare efter halv sju (`RumUte.trafik`:
   sju gående på dagen, fem till åtta, tre till tio och två sent, en till på fredag och lördag): en regnig måndagskväll
   20.30 syns i snitt en i taget i stället för nästan tre, och halva tiden är trottoaren tom.
+- **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
+  i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
+  (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
+  där på väggen rakt fram och kör bröstpanel av samma trä på sidoväggen". Furun på bakväggen är som förut. Den
+  nikotingula högra väggen har fått ljus konfettitapet (turkos, lila, cerise, gult och blått), en marinblå bård med
+  harlekintrianglar mellan guldkanter precis under Tipsligan och en bröstpanel i bakväggens furu med en list
+  överst, som syns mellan bården och bardisken. Tapeten fortsätter upp i taket i telefonen och i videohörnet. Se
+  [Tobaksaffären](#tobaksaffären).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -3013,6 +3022,39 @@ inte rör varandras poster, sidans och tidningens underlag och redaktörens nyck
 blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
 inget som sticker ut åt sidan. Inte provat på iMacen eller med en riktig intervju i motståndarens medier.
 
+**Landslagen och klubbarna utanför England** (2026-11-16, användarens val: nattjobbet ska göra tidningen för varje
+Europatipset av sig självt, *"som för Stryktipset, så att inget behöver skrivas för hand"*): förut hoppade nattjobbet
+över landskamperna, och deras matchblad skrevs för hand (se *Landskamperna i Helgarderat* under
+[Tidningen](#tidningen)). Nu läses ett landslag eller en klubb utanför England (ett lag som inte har någon engelsk
+liga i sajtens matchdata, `ENGELSKA` i scripts/tidning/poddar.mjs) med samma kod som klubben och lokaltidningen men
+med [config/utland.js](config/utland.js) som `cfg`, och bara där: inga poddar, forum, insatta medier eller förra
+klubben, som alla är engelska källor. Claude söker efter förbundets eller klubbens egen sajt (`forbundet`,
+`klubben`) och landets sportpress (`pressen`), på lagets eget språk. WebSearch hittade i provet 2026-11-16 en enda
+artikel om Sverige inför Polen och gav inga datum, så jobbet ger Claude veckans nyheter ur Bing News på lagets språk,
+som för de engelska lagen: ett kort anrop utan verktyg (`sokordPrompt`, `bingSokord` i src/analyser/media.mjs) tar fram
+landet, språket och tre sökfrågor (*reprezentacja Polski*, *Polska Szwecja* …), som sparas i lagets post för
+motståndaren. Sajter som är spärrade på iMacen (/etc/hosts, `sparrad`: namnet pekar på 0.0.0.0) erbjuds inte, eftersom
+de ändå inte går att läsa; spärren rundas inte. Claude föreslår upp till åtta artiklar och jobbet läser de fyra första
+som går att läsa (`lasHogst`). Läsaren avkodar nu alla bokstäver med accent, prickar och ringar (`avkoda` i
+src/analyser/forum.mjs): förbundets sajt och de polska tidningarna skriver å, ä, ö och ó som `&ouml;` och `&oacute;`,
+och citaten gick inte att pröva mot texten. Provet 2026-11-16 med Polen–Sverige (modellen spelad av fristående
+agenter med samma prompter, eftersom inloggningen bara nås av nattjobbet; resten jobbets egen kod): Bing gav tjugo
+nyheter om Polen och sex om Sverige (Expressen, Aftonbladet, SVT och TV4 är spärrade, SvenskaFans svarar 403), fyra
+respektive två artiklar lästes, alla tretton uppgifternas citat stod i texten, och matchbladet gick igenom
+redaktörens kontroll. Citatet står på artikelns språk och prövas mot texten som förut, och
+översättningen trycks. Artiklarna sparas som klubbens och lokaltidningens (`typ: 'lokal'`, id på `u`), så att
+matchbladet och tidningen tar dem som de tar lokaltidningens. Ett blad som har skrivits för hand för samma omgång går
+före jobbets (`poddsidor` i src/analyser/poddar.mjs).
+
+Europatipset har inga fasta dagar, så för en omgång i ett annat spel än Stryktipset går poddjobbet också första
+natten efter att omgången har startats och igen när det är mindre än 30 timmar kvar till första avsparken
+(`foreAvspark` i config/poddar.js, `egenTid` i src/analyser/tider.mjs, med den senast genomgångna omgången i
+tider.json). Stryktipset går som förut på tiderna. När matchbladen har kommit skriver det andra nattjobbet sista sidan
+och löpsedeln, som för Stryktipset. Prompterna för matchbladet, sista sidan och löpsedeln säger nu Stryktipset eller
+Europatipset. Matcher som sajten inte har (andra ligor, damernas Champions League) kommer inte med i gängets omgång
+och får därför inget blad. `node scripts/tidning/poddar.mjs --prov 401861195 --bara-utland` provar läsningen på en
+landskamp; `PODDAR_MAPP` och `PODDAR_LOGG` lägger provet utanför nattjobbets filer.
+
 **Förra klubben** (2026-11-14, användarens val bland förslagen till nya källor; **avstängd** samma dag, se nedan): när ett lag har en ny tränare eller en
 ny spelare som spelar mycket, vad har supportrarna i hans förra klubb skrivit om honom den senaste veckan? De har sett
 honom i flera år och följer ofta hur det går för honom. Bara det som är skrivet de senaste sju dagarna (användaren samma
@@ -4426,7 +4468,12 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet. Ett klick
   → ut genom dörren, och affären utifrån med gänget i fönstret (se [Fasaden](#fasaden)).
 
-Högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
+Högra väggen är tapetserad (`hogerVagg` och `TAPET` i rum.js, sedan 2026-11-16): konfettitapet, en
+bård med harlekintrianglar på brösthöjd och under den en bröstpanel i samma furu som bakväggen, ritade i
+väggens plan så att bräderna och trianglarna står tätare in mot hörnet. Samma vägg ritas i taket
+(telefonen) och i videohörnet (`vaggSvg` i rum-video.js får den från rum.js).
+
+Sakerna på högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
 pokalhyllan mellan tv:n och datorn på disken (där hängde anslagstavlan till 2026-11-14), i mitten
 korktavlan och längst ut Tipsligan, med videon och lådan med kassetter på disken under. Tavlorna har
 samma mitt på höjden. Pokalerna är runda och ser likadana ut hur snett väggen än syns; en platt tavla
@@ -6794,23 +6841,34 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
   13 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
   gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna syns också som speglingar som far förbi i glaset
-  och dörren: mörka skuggor på dagen, strålkastare och baklyktor i mörkret.
+  och dörren: mörka skuggor på dagen, baklyktor i mörkret, alla åt vänster som på gatan.
 - **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
   ([public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), `RumFasadGatan`): trottoarkanten i granit 0,88 m ut,
   rännstenen med gatsten och en brunn (bäcken från stupröret slutar där), asfalten med mittlinjen, höstlöv i
   rännstenen, slask med hjulspår och en plogvall längs kanten när det har snöat och, i en telefon på höjden, kanten
   mittemot och trottoaren där man själv står. Då och då kör det förbi, och då täcker de affären – bussarna nästan
-  helt: nittiotalsbilar (Volvo 240 kombi med takräcke och stänkskydd, 740, Saab 900, Golf, en skåpbil och taxi med
-  skylten på taket), de röda bussarna (trean och 77:an) och den blåa ledbussen fyran med slutstationen på skylten, och
-  plogbilen med blinkljus när det har snöat. Högertrafik: den bortre filen kör åt vänster, den närmre åt höger.
-  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 1 % av tiden mitt i natten, 9 % på dagen och 25 % i
-  rusningen), och i rusningen ibland en kö mot ljuset vid bron: bilarna bromsar in, står med bromsljusen tända (och
+  helt: Stockholms bilar i mitten av nittiotalet, ungefär i bilregistrets blandning (`MODELLER`: en tredjedel Volvo –
+  240 sedan och kombi med stänkskydd, 740/940 sedan och kombi, 850 sedan och kombi med baklyktorna högt längs
+  bakstolpen, 340 – Saab 900 och 9000, Golf, Mercedes W124 med kromlister och grå paneler, Sierra, Kadett, Corolla,
+  BMW E30 och Peugeot 205 – och de äldre som fanns kvar på gatorna, ungefär en femtedel av bilarna (önskemål
+  2026-11-16: bilar som fanns på nittiotalet, inte bara de som tillverkades då): Volvo Amazon med kromlisten från
+  strålkastaren, PV:n med puckelryggen, 144:an, Saab 96 och 99, Bubblan och Ankan med skärmarna för sig (Ankan med
+  tygtak, räfflad huv och kjol över bakhjulet), Mercedes 123 (ibland taxi), Lada Niva och Minin, ibland med vitt tak,
+  de flesta med kromade stötfångare och i sin tids färger), ritade efter de riktiga måtten (längd, hjulbas, höjd) med
+  backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke, skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller
+  med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
+  blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
+  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
+  gånger så fort som de som går på skärmen, så att en bil syns i ungefär tre sekunder (förut knappt två).
+  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 14 % på dagen och 31 % i
+  rusningen), och i rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in, står med bromsljusen tända (och
   avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
   regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
-  när det har snöat. Allt räknas ur tiden: den delas i luckor om nio sekunder per fil och i varje lucka kommer ett
-  fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon är
-  ute ur världen innan nästa kommer, så ingen kör igenom någon. Fordonen ritas med vektorer (inga bilder) i `rf-fram`
+  när det har snöat. Allt räknas ur tiden: den delas i luckor om tolv sekunder per fil och i varje lucka kommer ett
+  fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon kommer
+  bara när de i de två luckorna före är ute ur världen, så ingen kör igenom någon. Andra vyer som vill rita samma
+  fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
   efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
   sekunden (30 i telefonen), så att de inte hoppar fram.
 
@@ -7729,6 +7787,32 @@ bland tre skisser i den riktiga närbilden:
   ord, så att tecknen läses som en mening (*Insläppta mål −0,2*: färre än chanserna var
   värda). Talen är desamma som förut; klubbarnas skott och mål mot xG kommer som förut ur
   matchens fil, landslagens ur Nations Leagues lagfil. Ett avsnitt utan tal står inte.
+- **De tio senaste i xG-fliken** (2026-11-16, användarens önskemål: "ha med de senaste 10
+  matcherna … och hur svårt motståndet för de lagen som de har mött har varit – för att få en
+  känsla för hur bra de har varit"; användarens val *A Listan* bland tre skisser – *Listan*,
+  *Mot starka och svaga* och *Staplarna*): överst i xG står *DE TIO SENASTE* med *Poäng/match*,
+  *Målen* (gjorda–insläppta tillsammans) och *Motståndet* (motståndarnas styrka i snitt) över
+  lagets tio senaste matcher i alla tävlingar, efter 90 minuter. Under *MATCH FÖR MATCH* står
+  en rad per match – utfallet, resultatet, H eller B, motståndaren och dess styrka 0–100 med en
+  mätare (*V 3–2 B ENGLAND 88 ▮▮▮▮▮*). Poängen och målen jämförs som formen och det bättre
+  lyser; motståndet säger inte vem som är bättre och står som vanligt. Skalan är formens
+  motstånd: 0 för det svagaste laget i lagets division och 100 för det starkaste, ur matchens
+  fil (`senaste[].opp`, som bygget nu sparar för alla tio och inte bara formens fem). Datorn har
+  lagen sida vid sida, telefonen under varandra med lagets namn över listan. Saknar fler än två
+  av matcherna styrka står inget snitt; med dolda resultat står ?. xG-raderna under gäller som
+  förut säsongen.
+- **Landslagens styrka ur Elo-talen** (2026-11-16, för de tio senaste): modellen räknar bara på
+  lagen i England, så landslagens motståndare hade ingen styrka – formens motstånd stod tomt
+  för landskamperna. Nu kommer den ur World Football Elo Ratings (`elo_landslag`,
+  [src/fetchers/elo.js](src/fetchers/elo.js), en gång om dagen): Elo-talet just nu för varje
+  landslag, på skalan från det svagaste till det starkaste laget i lagets egen liga i Nations
+  League (A–D), som divisionen för klubbarna (`landOpponentStrength` i
+  [src/matches.js](src/matches.js)); lag utanför den skalan hamnar i ändarna (Argentina 83 och
+  Tjeckien 0 för Spanien i liga A). Lagen hittas på ESPN:s engelska namn bland Elo-listans namn
+  och stavningar; ESPN:s egna former (*Czech Republic*, *Republic of Ireland*, *Korea Republic*
+  …) står i `ELO_NAMN`. Prövat 2026-11-16: alla 157 namn i
+  [config/landslag.js](config/landslag.js) hittades. Samma styrka ger nu också formens motstånd
+  i ÖVERSIKT för en landskamp.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står

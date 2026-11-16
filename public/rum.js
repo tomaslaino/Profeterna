@@ -126,7 +126,7 @@ window.Rum = (() => {
     <linearGradient id="rum-furu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1804" stop-opacity=".62"/><stop offset=".22" stop-color="#2e1804" stop-opacity=".12"/>
       <stop offset=".5" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
     <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#ffe6c0" stop-opacity=".1"/><stop offset="1" stop-color="#ffe6c0" stop-opacity="0"/></radialGradient>
-    <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#6b5733"/><stop offset="1" stop-color="#382d1c"/></linearGradient>
+    <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".06"/><stop offset="1" stop-color="#0a0704" stop-opacity=".44"/></linearGradient>
     <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
     <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
@@ -199,6 +199,76 @@ window.Rum = (() => {
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-flack)" opacity=".3"/>
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-prick)" opacity=".35"/>
   <rect x="0" y="90" width="1140" height="7" fill="#000" opacity=".35"/>`;
+  }
+
+  // Högra väggen (2026-11-16) tapetserades på 90-talet, medan furun på bakväggen fick vara kvar: ljus
+  // tapet med konfetti i turkos, lila, cerise, gult och blått, en marinblå bård med harlekintrianglar
+  // mellan guldkanter och under den en bröstpanel i samma lackade furu som bakväggen, med en list
+  // överst. Panelen syns mellan bardisken (yb 490) och listen; bården går precis under Tipsligan och
+  // bakom korktavlans nederkant (VAGG). Allt ritas i väggens plan – z in från hörnet mot betraktaren
+  // och yb mätt som i hörnet – och förs ut i bilden med vp, så att bräderna och trianglarna står
+  // tätare in mot hörnet. Röken har gulnat tapeten och mörkt den upptill, och ljuset klingar av ut
+  // mot betraktaren (rum-rwall), som på den nikotingula väggen som var där förut. Ritas mellan x0 och
+  // x1 i bilden: i bg, i taket (tak) där väggen fortsätter upp och i videons hörn (vaggSvg i
+  // rum-video.js, som får den härifrån).
+  const TAPET = { bard: 423, list: 451, panel: 458, bas: '#e2d6bc', konf: ['#1aa3a0', '#7b4fb0', '#d6337a', '#f2b632', '#2f6fb8'] };
+  function hogerVagg(x0 = 1140, x1 = W) {
+    const vp = (z, yb) => { const q = 1000 / (1000 - z); return [VP[0] + 380 * q, VP[1] + (yb - VP[1]) * q]; };
+    const zx = (x) => 1000 * (1 - 380 / (x - VP[0]));
+    const [z0, z1] = [Math.max(0, zx(x0) - 40), Math.min(900, zx(x1) + 40)];
+    const pts = (l) => l.map(([z, yb]) => vp(z, yb)).map(([x, y]) => `${r1(x)},${r1(y)}`).join(' ');
+    const d = (l) => `M${pts(l).replace(/ /g, 'L')}Z`;
+    const quad = (za, zb, ya, yb, fill, extra = '') => `<polygon points="${pts([[za, ya], [zb, ya], [zb, yb], [za, yb]])}" fill="${fill}"${extra}/>`;
+    const { bard: B, list: L, panel: P } = TAPET;
+    // tapeten, med konfettin i en bana per färg (ett streck är en smal fyrhörning i väggens plan)
+    let s = quad(z0, z1, 0, B, TAPET.bas);
+    const R0 = rng(16);
+    const banor = TAPET.konf.map(() => []);
+    for (let z = 0; z < z1; z += 26) {
+      for (let y = 90; y < B; y += 26) {
+        const [u, v, a, l, f, prick] = [z + R0() * 26, y + R0() * 26, R0() * Math.PI, 3 + R0() * 3.5, (R0() * banor.length) | 0, R0() < 0.25];
+        if (u < z0 || u > z1 || v > B - 4) continue;
+        const [c, n] = [[Math.cos(a), Math.sin(a)], [-Math.sin(a), Math.cos(a)]];
+        const [h, b] = prick ? [1.6, 1.6] : [l, 1.1];
+        banor[f].push(d([[u - c[0] * h - n[0] * b, v - c[1] * h - n[1] * b], [u + c[0] * h - n[0] * b, v + c[1] * h - n[1] * b],
+          [u + c[0] * h + n[0] * b, v + c[1] * h + n[1] * b], [u - c[0] * h + n[0] * b, v - c[1] * h + n[1] * b]]));
+      }
+    }
+    s += banor.map((b, i) => `<path d="${b.join('')}" fill="${TAPET.konf[i]}" fill-opacity=".85"/>`).join('');
+    // bården: trianglar upp i cerise och ned i turkos, en gul prick i varje, guldkanter
+    s += quad(z0, z1, B, L, '#22305e');
+    let upp = '';
+    let ned = '';
+    let prickar = '';
+    for (let z = Math.floor(z0 / 30) * 30 - 30; z < z1; z += 30) {
+      upp += d([[z, 447], [z + 15, 427], [z + 30, 447]]);
+      ned += d([[z + 15, 427], [z + 30, 447], [z + 45, 427]]);
+      prickar += d([[z + 15, 440], [z + 16.4, 441.6], [z + 15, 443.2], [z + 13.6, 441.6]]);
+    }
+    s += `<path d="${upp}" fill="#d6337a"/><path d="${ned}" fill="#1aa3a0"/><path d="${prickar}" fill="#f2b632"/>` +
+      quad(z0, z1, B, B + 2.4, '#e9c46a') + quad(z0, z1, L - 2.4, L, '#e9c46a');
+    // bröstpanelen: furubräder som på bakväggen (34 breda), med fogar, ådring och några kvistar
+    const toner = ['#b47c43', '#a9713a', '#bb874c', '#a46c36', '#b78046', '#ad763e'];
+    const R1 = rng(23);
+    for (let z = 0; z < z1; z += 34) {
+      const ton = toner[(R1() * toner.length) | 0];
+      const kvist = R1() < 0.4 ? [z + 6 + R1() * 22, 462 + R1() * 24] : null;
+      if (z + 34 < z0) continue;
+      s += quad(z, z + 34, P, 730, ton) + quad(z, z + 1.8, P, 730, '#26150a', ' opacity=".75"') + quad(z + 1.8, z + 3, P, 730, '#f0c48a', ' opacity=".3"');
+      if (kvist) {
+        const [u, v] = kvist;
+        s += `<path d="${d([0, 1, 2, 3, 4, 5, 6, 7].map((k) => [u + 2.6 * Math.cos(k * 0.785), v + 1.8 * Math.sin(k * 0.785)]))}" fill="#5a3010" opacity=".85"/>`;
+      }
+    }
+    const panel = `<polygon points="${pts([[z0, P], [z1, P], [z1, 730], [z0, 730]])}"`;
+    s += `${panel} filter="url(#rum-ved)" opacity=".55"/>${panel} fill="#1c1006" opacity=".3"/>`;
+    // listen: samma furu, lite utanför panelen, ljus överkant och skugga under
+    s += quad(z0, z1, L, P, '#a46c36') + quad(z0, z1, L, L + 1.4, '#e0b27a', ' opacity=".7"') + quad(z0, z1, P - 1.2, P, '#26150a', ' opacity=".5"') +
+      quad(z0, z1, P, P + 4, '#000', ' opacity=".32"') + quad(z0, z1, P + 4, P + 9, '#000', ' opacity=".12"');
+    // röken upptill och ljuset som klingar av mot betraktaren
+    for (let i = 0; i < 6; i++) s += quad(z0, z1, 90 + i * 22, 112 + i * 22, '#2e1804', ` opacity="${(0.3 - i * 0.05).toFixed(2)}"`);
+    const yta = `<polygon points="${pts([[z0, 0], [z1, 0], [z1, 730], [z0, 730]])}"`;
+    return `${s}${yta} fill="url(#rum-rwall)"/>${yta} filter="url(#rum-flack)" opacity=".45"/>`;
   }
 
   // Bardisken längs högra väggen, som i en pub: en skiva i mörk lackad
@@ -274,8 +344,8 @@ window.Rum = (() => {
       band(ky, 501, 502.6, 'rgba(0,0,0,.55)', a, z);
   }
 
-  // Bakgrunden: taket, väggarna (furupanelen och den nikotingula högra
-  // väggen), dörren, skyltfönstret och disken. Lysröret, skyltarna och
+  // Bakgrunden: taket, väggarna (furupanelen och den tapetserade högra
+  // väggen, hogerVagg), dörren, skyltfönstret och disken. Lysröret, skyltarna och
   // paketen är i 3D (rum-inredning.js).
   // Taket närmare betraktaren, i telefonen på höjden där scenen står långt ner i fönstret (pan): i
   // bakväggens plan, så att det sitter ihop med bg() när kameran vrids. Plattorna går mot flyktpunkten
@@ -295,12 +365,13 @@ window.Rum = (() => {
     <radialGradient id="rum-tak-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(575 -30) scale(420 170)"><stop offset="0" stop-color="#b48c5c" stop-opacity=".34"/><stop offset="1" stop-color="#b48c5c" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-tak-vagg" gradientUnits="userSpaceOnUse" x1="0" y1="${Y0}" x2="0" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".62"/><stop offset="1" stop-color="#0a0704" stop-opacity="0"/></linearGradient>
     <radialGradient id="rum-tak-flack"><stop offset="0" stop-color="#140c04" stop-opacity=".34"/><stop offset=".7" stop-color="#140c04" stop-opacity=".14"/><stop offset="1" stop-color="#140c04" stop-opacity="0"/></radialGradient>
+    <clipPath id="rum-tak-hoger"><polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4"/></clipPath>
   </defs>
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-yta)"/>
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-sken)"/>
   <ellipse cx="318" cy="-96" rx="118" ry="30" fill="url(#rum-tak-flack)"/><ellipse cx="846" cy="-188" rx="150" ry="44" fill="url(#rum-tak-flack)"/>
   <g stroke="#000" stroke-opacity=".2" stroke-width="1.2">${fog}${tvars}</g>
-  <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-rwall)"/>
+  <g clip-path="url(#rum-tak-hoger)">${hogerVagg(1250, X1)}</g>
   <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-tak-vagg)"/>
   <polygon points="1250,4 1265,-12 ${X1},-12 ${X1},4" fill="#160e08" fill-opacity=".8"/>
   <line x1="1265" y1="-12" x2="${X1}" y2="-12" stroke="#b09a74" stroke-opacity=".22" stroke-width="1.4"/>`, 'rum-tak', [X0, Y0, X1 - X0, 4 - Y0], 0.25);
@@ -335,8 +406,7 @@ window.Rum = (() => {
   <g fill="#cbbf9e" opacity=".5"><rect x="512" y="114" width="5" height="3" rx="1"/><rect x="420" y="117" width="5" height="3" rx="1"/></g>
   <path d="M0 470 q30 -10 60 4 l-4 18 q-30 -8 -56 2 z" fill="#2a1e0c" opacity=".14" filter="url(#rum-b4)"/>
 
-  <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" fill="url(#rum-rwall)"/>
-  <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" filter="url(#rum-flack)" opacity=".55"/>
+  <g clip-path="url(#rum-hogerklipp)">${hogerVagg()}</g>
   <line x1="1140" y1="90" x2="1140" y2="730" stroke="#000" stroke-opacity=".35" stroke-width="3"/>
   <polygon points="1140,90 1600,0 1600,1000 1140,730" fill="#000" opacity=".2"/>
   ${spotYta(SPOT.liga, 'clip-path="url(#rum-hogerklipp)" ')}
@@ -650,7 +720,7 @@ window.Rum = (() => {
   const tv = () => (window.RumTv ? RumTv.html() : '');
   // Videon på disken, och väggen, disken och pulten till höger om bilden (rum-video.js,
   // som ritar disken där med disk).
-  const vid = (part) => (window.RumVideo ? RumVideo.html(part, { disk }) : '');
+  const vid = (part) => (window.RumVideo ? RumVideo.html(part, { disk, vagg: hogerVagg }) : '');
 
   // Pingklockan på pulten bredvid kupongen: till uppgörelsen ringer
   // man in gänget. Kupan i mässing speglar lysröret och lite av neonskylten.

@@ -89,6 +89,13 @@ const PROVIDERS = [
     gives: 'Gratis sammandrag med reklam.',
     used: 'Höjdpunkterna, när YouTube saknar klipp',
   },
+  {
+    id: 'World Football Elo Ratings',
+    name: 'World Football Elo Ratings',
+    url: 'https://www.eloratings.net/',
+    gives: 'Alla landslags Elo-tal: en styrka som växer med vinster mot starka lag och krymper med förluster mot svaga, och platsen i världen.',
+    used: 'Motståndets styrka i landslagens form och tio senaste matcher i datorn',
+  },
 ];
 
 const KINDS = [
@@ -105,6 +112,7 @@ const KINDS = [
   { id: 'history', label: 'Tidigare säsonger' },
   { id: 'video', label: 'Höjdpunkter' },
   { id: 'crests', label: 'Sköldar och flaggor' },
+  { id: 'strength', label: 'Motståndets styrka' },
 ];
 
 // Kolumnerna: de engelska tävlingarna, sedan landskamperna.
@@ -128,6 +136,7 @@ const GAPS = {
   history: { cup: 'hämtas inte' },
   europe: { intl: 'gäller inte landslagen', default: 'inga lag i Europa' },
   video: { default: 'inga gratis sammandrag' },
+  strength: { default: 'modellen räknar den själv' },
 };
 
 function sourceRows() {

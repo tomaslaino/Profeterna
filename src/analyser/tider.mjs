@@ -65,3 +65,20 @@ export function attSkriva(round, per, { now, tider, forhandTimmar, version, tvin
   }
   return { kvar, klara, att, tid, nasta: nastaTid(now, tider) };
 }
+
+// Europatipset och andra spel än Stryktipset har inga fasta dagar: omgången kan börja vilken dag som helst, ofta
+// något dygn efter att den startades (2026-11-16: Europatipset 2625 började på söndagen, och poddjobbet väntade
+// på sin tid på tisdagen, så matchbladen fick skrivas för hand). För en sådan omgång är det också dags när
+// omgången är ny (fil: tider.json, med den senast genomgångna omgången) och igen det sista dygnet före första
+// avsparken (foreTimmar), om jobbet inte har gått sedan dess. round: gängets omgång {id, matcher, spel} eller null.
+// → 'ny omgång', 'inför avsparken' eller null
+export function egenTid(round, fil, { now = Date.now(), foreTimmar = 30 } = {}) {
+  if (!round || !Array.isArray(round.matcher)) return null;
+  const spel = (round.spel && round.spel.namn) || (/-et\d+$/.test(String(round.id)) ? 'Europatipset' : 'Stryktipset');
+  if (spel === 'Stryktipset') return null;
+  const kvar = round.matcher.map((x) => Date.parse(x.avspark)).filter((t) => Number.isFinite(t) && t > now);
+  if (!kvar.length) return null;
+  if (!fil || fil.omgang !== round.id) return 'ny omgång';
+  const fore = Math.min(...kvar) - foreTimmar * H;
+  return now >= fore && (Date.parse(fil.senast) || 0) < fore ? 'inför avsparken' : null;
+}
