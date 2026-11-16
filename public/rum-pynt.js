@@ -14,12 +14,19 @@
 //   halloween   veckan före alla helgons dag och dagen själv: en urholkad pumpa som lyser på bardisken och
 //               ett spindelnät med en spindel i fönstrets hörn
 //
-// Dagen är Stockholms (Vader.nu(), som ölen, fikat och högtidskläderna). Nyåret och lucian ligger inom
-// julpyntet, som i en vanlig affär.
+//   nyar        29 december – 2 januari: julpyntet sitter kvar, och serpentiner hänger från girlangen
 //
-// pyntet(v) → 'jul' | 'pask' | 'midsommar' | 'kraftor' | 'halloween' | null (v = Vader.nu());
+// Fler saker (2026-11-16): en julkrans och halmstjärnor (en julbock och ballonger till nyår hos Hasse),
+// en påskkrans och påskkycklingar, lövruskor av björk vid dörren (en liten midsommarstång hos Hasse), ett
+// fat med kräftor och en flaska brännvin med snapsglas, och fladdermöss i papper.
+//
+// Dagen är Stockholms (Vader.nu(), som ölen, fikat och högtidskläderna). Lucian ligger inom julpyntet, som
+// i en vanlig affär.
+//
+// pyntet(v) → 'jul' | 'nyar' | 'pask' | 'midsommar' | 'kraftor' | 'halloween' | null (v = Vader.nu());
 //   ?rum-pynt=<namn> för bilder (?rum-pynt=inget: inget)
-// pyntSaker(mat) → { stjarna, ljusstake, girlang, agg, paskris, vimplar, blommor, lyktor, pumpa, vav }
+// pyntSaker(mat) → { stjarna, ljusstake, girlang, agg, paskris, vimplar, blommor, lyktor, pumpa, vav, krans,
+//   halmstjarna, julbock, serpentiner, ballonger, kycklingar, bjorkris, stang, kraftfat, fladdermoss }
 // pyntNatt(grupp, g) → pyntet i mörkret g (0–1)
 //
 // Sakerna byggs i centimeter med y uppåt och z mot betraktaren; den som ställer dem skalar gruppen.
@@ -30,7 +37,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { fromPask } from './rum-fika.js';
 
-export const PYNT = ['jul', 'pask', 'midsommar', 'kraftor', 'halloween'];
+export const PYNT = ['jul', 'nyar', 'pask', 'midsommar', 'kraftor', 'halloween'];
 
 // ---------- kalendern ----------
 
@@ -51,6 +58,7 @@ export function pyntet(v) {
   if (!v || !v.ar) return null;
   const { ar: Y, manad: m, dag: d } = v;
   const nu = dagNr(Y, m, d);
+  if ((m === 12 && d >= 29) || (m === 1 && d <= 2)) return 'nyar';
   if (m === 1 && d <= 13) return 'jul';
   if (m >= 11 && nu >= forstaAdvent(Y) - 2) return 'jul';
   const p = fromPask(v);
@@ -372,13 +380,12 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     t.anisotropy = 8;
     return t;
   });
-  function girlang(krokar, { s = 6, tjock = 5.5, utan = [] } = {}) {
-    const g = new THREE.Group();
-    const q = rnd(23);
-    const bana = new THREE.CatmullRomCurve3(bagar(krokar, s));
+  // Barr längs en kurva (bana, sluten för en krans): kvistar av gran (kort med granris) som pekar utåt och
+  // framåt längs kurvan, som i en bunden girlang, kring en mörkgrön kärna. → { fr (kurvans ramar), n }
+  function barr(g, bana, { tjock, q, slutet = false, steg = 0.7, per = 4 }) {
     const L = bana.getLength();
-    const n = Math.round(L / 0.7);
-    const fr = bana.computeFrenetFrames(n, false);
+    const n = Math.round(L / steg);
+    const fr = bana.computeFrenetFrames(n, slutet);
     const pos = [];
     const uv = [];
     const col = [];
@@ -393,12 +400,11 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       for (const k of [0, 1, 2, 0, 2, 3]) { pos.push(v[k].x, v[k].y, v[k].z); uv.push(...u[k]); col.push(c.r, c.g, c.b); }
     };
     for (let i = 0; i <= n; i++) {
-      const p = bana.getPointAt(i / n);
-      const T = fr.tangents[i];
-      for (let k = 0; k < 4; k++) {
+      const p = bana.getPointAt((i % (n + (slutet ? 0 : 1))) / n);
+      const T = fr.tangents[i % fr.tangents.length];
+      for (let k = 0; k < per; k++) {
         const a = q() * 2 * Math.PI;
-        N1.copy(fr.normals[i]).multiplyScalar(Math.cos(a)).addScaledVector(fr.binormals[i], Math.sin(a));
-        // kvistarna pekar utåt och framåt längs girlangen
+        N1.copy(fr.normals[i % fr.normals.length]).multiplyScalar(Math.cos(a)).addScaledVector(fr.binormals[i % fr.binormals.length], Math.sin(a));
         dir.copy(N1).multiplyScalar(0.62).addScaledVector(T, 0.78 + (q() - 0.5) * 0.4).normalize();
         sid.crossVectors(dir, N1).normalize().applyAxisAngle(dir, (q() - 0.5) * 1.2);
         const l = tjock * (1.05 + q() * 0.45);
@@ -406,13 +412,20 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
         kort(p.clone().addScaledVector(N1, 0.6), dir, sid, l, l * 0.6, new THREE.Color(ljus, ljus * (0.95 + q() * 0.1), ljus));
       }
     }
-    const barr = new THREE.BufferGeometry();
-    barr.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    barr.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    barr.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-    barr.computeVertexNormals();
-    mesh(barr, m('#ffffff', { map: granris(), vertexColors: true, alphaTest: 0.45, roughness: 0.8, side: THREE.DoubleSide }), g);
-    mesh(ror(bana.getPoints(120), tjock * 0.32, tjock * 0.32, '#17351f', 6), m('#ffffff', { vertexColors: true, roughness: 0.9 }), g);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    geo.computeVertexNormals();
+    mesh(geo, m('#ffffff', { map: granris(), vertexColors: true, alphaTest: 0.45, roughness: 0.8, side: THREE.DoubleSide }), g);
+    mesh(ror(bana.getPoints(slutet ? 80 : 120), tjock * 0.32, tjock * 0.32, '#17351f', 6), m('#ffffff', { vertexColors: true, roughness: 0.9 }), g);
+    return { fr, n, L };
+  }
+  function girlang(krokar, { s = 6, tjock = 5.5, utan = [] } = {}) {
+    const g = new THREE.Group();
+    const q = rnd(23);
+    const bana = new THREE.CatmullRomCurve3(bagar(krokar, s));
+    const { fr, n, L } = barr(g, bana, { tjock, q });
     // lamporna i en slinga runt girlangen
     const lampor = [];
     const sk = [];
@@ -1014,7 +1027,342 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     return g;
   }
 
-  return { stjarna, ljusstake, girlang, agg, paskris, vimplar, blommor, lyktor, pumpa, vav };
+  // ---------- fler saker (2026-11-16) ----------
+  // Alla är några få sammanslagna nät med färgen i hörnen och samma material som det andra pyntet, så att
+  // inga nya grafikprogram behöver byggas, och de ritas en gång som det andra.
+
+  // Ett litet blad (fem hörn, fyra trianglar), byggt längs y och lite vikt längs mittnerven.
+  function blad(l, b) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, -b / 2, l * 0.4, 0, 0, l * 0.45, b * 0.18, b / 2, l * 0.4, 0, 0, l, 0], 3));
+    g.setIndex([0, 2, 1, 0, 3, 2, 1, 2, 4, 2, 3, 4]);
+    g.computeVertexNormals();
+    return g;
+  }
+  // ett band som hänger från p upp till en sugpropp på glaset (längden l cm)
+  function upphang(p, l, farg) {
+    return [ror([p, p.clone().add(V(0.15, l * 0.5, -0.4)), p.clone().add(V(0, l, -0.8))], 0.16, 0.16, farg, 4),
+      farga(new THREE.CylinderGeometry(0.9, 1.5, 0.6, 14).rotateX(90 * DEG).translate(p.x, p.y + l + 0.4, p.z - 1.2), '#dfe7e6')];
+  }
+
+  // Kransen på dörrens glas, med mitten i origo: av granris med lingon i klasar och en röd rosett överst
+  // (gran), eller av björkris med fjädrar och små ägg (pask). Den hänger i ett band från en sugpropp.
+  function krans({ R = 16, typ = 'gran', band = 6 } = {}) {
+    const g = new THREE.Group();
+    const q = rnd(97);
+    const ring = (n, r = R, z = 0) => Array.from({ length: n }, (x, i) => V(Math.cos((i / n) * 2 * Math.PI) * r, Math.sin((i / n) * 2 * Math.PI) * r, z));
+    const delar = [];
+    if (typ === 'gran') {
+      barr(g, new THREE.CatmullRomCurve3(ring(28), true), { tjock: 4.6, q, slutet: true, steg: 0.55 });
+      // lingonen: klasar framtill på den nedre halvan
+      for (let k = 0; k < 6; k++) {
+        const a = Math.PI * (1.12 + (k / 5) * 0.76);
+        const c = V(Math.cos(a) * R, Math.sin(a) * R, 2.6);
+        for (let j = 0; j < 6; j++) delar.push(farga(new THREE.SphereGeometry(0.55 + q() * 0.2, 8, 6).translate(c.x + (q() - 0.5) * 2.4, c.y + (q() - 0.5) * 2.4, c.z + q()), q() > 0.4 ? '#b5121c' : '#8a0b13'));
+      }
+      const r = new THREE.Mesh(rosett('#8c0c16', 1.9), m('#ffffff', { vertexColors: true, roughness: 0.8, sheen: 0.6, sheenColor: '#d42a2a', sheenRoughness: 0.5 }));
+      r.position.set(0, R + 0.5, 3.2);
+      r.castShadow = true;
+      g.add(r);
+      delar.push(...upphang(V(0, R + 1.5, 2.2), band, '#8c0c16'));
+    } else {
+      // björkris vridet i en ring
+      for (let k = 0; k < 22; k++) {
+        const a0 = q() * 2 * Math.PI;
+        const pts = [];
+        for (let j = 0; j <= 8; j++) {
+          const a = a0 + (j / 8) * 2.2;
+          const r = R + Math.sin(j * 1.3 + k) * 1.2;
+          pts.push(V(Math.cos(a) * r, Math.sin(a) * r, Math.cos(j * 0.9 + k) * 1.4));
+        }
+        delar.push(ror(pts, 0.42, 0.2, q() > 0.5 ? '#4a2c22' : '#5e3b2b', 4));
+      }
+      const lista = [];
+      for (let k = 0; k < 34; k++) {
+        const a = (k / 34) * 2 * Math.PI + q() * 0.2;
+        const p = V(Math.cos(a) * R, Math.sin(a) * R, 1.5);
+        const d = V(-Math.sin(a), Math.cos(a), 0).multiplyScalar(0.7).add(V(Math.cos(a), Math.sin(a), 0.5).multiplyScalar(k % 2 ? 1 : -0.6)).normalize();
+        lista.push([p, d, 5.5 + q() * 2, FJADER[k % FJADER.length]]);
+      }
+      g.add(fjadrar(lista, q));
+      g.add(agg([[-0.35, 1], [0, 1.2], [0.35, 1]].map(([x, k]) => ({ ...V(Math.sin(x) * R * 0.98, -Math.cos(x) * R * 0.98, 2.2), ned: 0.8, k: 1.05 * k }))));
+      const r = new THREE.Mesh(rosett('#f2c21c', 1.6), m('#ffffff', { vertexColors: true, roughness: 0.6 }));
+      r.position.set(0, R + 0.5, 2.5);
+      g.add(r);
+      delar.push(...upphang(V(0, R + 1.5, 1.8), band, '#f2c21c'));
+    }
+    mesh(ihop(delar), m('#ffffff', { vertexColors: true, roughness: 0.45, clearcoat: 0.5 }), g);
+    return g;
+  }
+
+  // En halmstjärna: åtta strån i kors, fyra långa och fyra korta emellan, med rött garn om mitten och om
+  // varje arm, i ett rött snöre (band cm). Mitten i origo.
+  function halmstjarna({ R = 8, band = 12 } = {}) {
+    const g = new THREE.Group();
+    const delar = [];
+    const HALM = ['#d8b35c', '#c9a24b', '#e3c375', '#cfa955'];
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI) / 4 + (i % 2 ? Math.PI / 8 : 0);
+      const l = i % 2 ? R * 1.25 : R * 2;
+      // (två strån sida vid sida i varje led)
+      for (const dz of [-0.11, 0.11]) delar.push(farga(new THREE.BoxGeometry(l, 0.45, 0.16).translate(0, dz * 2, (i % 2 ? 0.2 : -0.2) + dz).rotateZ(a), HALM[(i + (dz > 0 ? 1 : 0)) % HALM.length]));
+      const r = (i % 2 ? R * 0.5 : R * 0.62);
+      delar.push(farga(new THREE.BoxGeometry(0.3, 0.75, 0.55).translate(r, 0, 0).rotateZ(a), '#b5121c'));
+      delar.push(farga(new THREE.BoxGeometry(0.3, 0.75, 0.55).translate(-r, 0, 0).rotateZ(a), '#b5121c'));
+    }
+    delar.push(farga(new THREE.TorusGeometry(0.9, 0.3, 6, 16), '#b5121c'));
+    delar.push(ror([V(0, R, 0), V(0.2, R + band / 2, -0.2), V(0, R + band, 0)], 0.1, 0.1, '#b5121c', 3));
+    mesh(ihop(delar), m('#ffffff', { vertexColors: true, roughness: 0.5, clearcoat: 0.4 }), g);
+    return g;
+  }
+
+  // Julbocken i halm med röda band, stående på hovarna i origo, nosen åt +x.
+  function julbock() {
+    const g = new THREE.Group();
+    const H = '#d5ae55';
+    const H2 = '#c49a42';
+    const d = [];
+    d.push(ror([V(-8, 13, 0), V(0, 14, 0), V(7, 14.5, 0)], 3.1, 2.8, H, 10));
+    d.push(ror([V(6.5, 15, 0), V(9, 20, 0), V(10.5, 23.5, 0)], 1.8, 1.4, H2, 8));
+    d.push(ror([V(10, 23.5, 0), V(12.5, 22.5, 0), V(14.6, 20.6, 0)], 1.6, 0.9, H, 8));
+    for (const z of [-1, 1]) {
+      d.push(ror([V(10, 24.5, z * 0.9), V(8.5, 28, z * 1.6), V(5.8, 28.2, z * 2.2), V(5.2, 25.8, z * 2.4)], 0.6, 0.35, H2, 6));
+      d.push(ror([V(11, 23.8, z * 1.3), V(10.5, 23, z * 3)], 0.5, 0.3, H, 5));
+      for (const x of [-6.5, 5]) d.push(ror([V(x, 12, z * 1.9), V(x + 0.5, 6, z * 2.2), V(x, 0, z * 2.3)], 1.1, 0.9, H, 7));
+    }
+    d.push(ror([V(-8.5, 14, 0), V(-10.5, 16, 0)], 0.9, 0.4, H2, 5));
+    // de röda banden: om halsen, två om kroppen och om benen
+    const band = (x, y, r, axel = 'x') => d.push(farga(new THREE.TorusGeometry(r, 0.38, 6, 20).rotateY(axel === 'x' ? Math.PI / 2 : 0).rotateX(axel === 'y' ? Math.PI / 2 : 0).translate(x, y, 0), '#b5121c'));
+    band(-4, 13.4, 3.3);
+    band(3, 14.2, 3.2);
+    band(7.6, 16.6, 2);
+    band(13.2, 21.8, 1.3);
+    for (const z of [-1, 1]) for (const x of [-6.2, 5.3]) d.push(farga(new THREE.TorusGeometry(1.2, 0.3, 6, 14).rotateX(Math.PI / 2).translate(x, 8.5, z * 2.1), '#b5121c'));
+    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.75 }), g);
+    return g;
+  }
+
+  // Serpentiner som hänger i lockar från punkterna (lista: [punkt, längd cm]) och ballonger i folie med
+  // snören ned till en punkt (ballonger: [x, y, z, färg] över snörets fäste i origo).
+  const SERP = ['#ff3d7f', '#ffd21f', '#3d9bff', '#4fd65a', '#f2f2f2', '#ff8a2a'];
+  function serpentiner(lista) {
+    const g = new THREE.Group();
+    const d = lista.map(([p, l], i) => {
+      const pts = [];
+      const n = Math.round(l * 2.2);
+      for (let k = 0; k <= n; k++) {
+        const t = k / n;
+        const a = t * l * 1.9 + i;
+        pts.push(p.clone().add(V(Math.cos(a) * 1.4 * (0.4 + t), -t * l, Math.sin(a) * 1.4 * (0.4 + t))));
+      }
+      return ror(pts, 0.34, 0.3, SERP[i % SERP.length], 4);
+    });
+    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.35, clearcoat: 0.6 }), g);
+    return g;
+  }
+  function ballonger(lista = [[-6, 52, 0, '#d4a838'], [5, 58, 2, '#c8ccd2'], [0, 46, -4, '#1c1c22']]) {
+    const g = new THREE.Group();
+    const d = [];
+    const snoren = [];
+    lista.forEach(([x, y, z, f], i) => {
+      const b = new THREE.SphereGeometry(1, 22, 16);
+      b.scale(9, 10.5, 9);
+      b.translate(x, y, z);
+      d.push(farga(b, f));
+      d.push(farga(new THREE.ConeGeometry(1.1, 1.6, 10).rotateX(Math.PI).translate(x, y - 10.9, z), f));
+      snoren.push(ror([V(x, y - 11.5, z), V(x * 0.6 + Math.sin(i) * 2, (y - 11.5) * 0.55, z * 0.6), V(0, 0, 0)], 0.08, 0.08, '#efeae0', 3));
+    });
+    mesh(ihop(d), m('#ffffff', { vertexColors: true, metalness: 0.6, roughness: 0.22, clearcoat: 1 }), g);
+    mesh(ihop(snoren), m('#ffffff', { vertexColors: true, roughness: 0.6 }), g);
+    return g;
+  }
+
+  // Påskkycklingar av garn (lista: [x, z, storlek, vridning]) som står på det de står på.
+  function kycklingar(lista) {
+    const g = new THREE.Group();
+    const q = rnd(13);
+    const d = [];
+    const ludd = (geo, k) => {
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) p.setXYZ(i, p.getX(i) * (1 + (q() - 0.5) * k), p.getY(i) * (1 + (q() - 0.5) * k), p.getZ(i) * (1 + (q() - 0.5) * k));
+      geo.computeVertexNormals();
+      return geo;
+    };
+    for (const [x, z, k, v] of lista) {
+      const del = [];
+      del.push(farga(ludd(new THREE.SphereGeometry(1.7, 14, 10).scale(1.05, 0.95, 1), 0.08).translate(0, 1.6, 0), '#f6d32e'));
+      del.push(farga(ludd(new THREE.SphereGeometry(1.1, 12, 8), 0.07).translate(0, 3.6, 0.35), '#f8da3a'));
+      del.push(farga(new THREE.ConeGeometry(0.32, 0.8, 6).rotateX(Math.PI / 2).translate(0, 3.5, 1.65), '#f08a1d'));
+      for (const s of [-1, 1]) {
+        del.push(farga(new THREE.SphereGeometry(0.16, 6, 4).translate(s * 0.42, 3.85, 1.25), '#141012'));
+        del.push(farga(new THREE.SphereGeometry(0.75, 8, 6).scale(0.4, 0.8, 1.1).translate(s * 1.65, 1.8, -0.1), '#efc624'));
+        del.push(farga(new THREE.BoxGeometry(0.25, 0.12, 0.9).translate(s * 0.55, 0.06, 0.6), '#f08a1d'));
+      }
+      const geo = ihop(del).scale(k, k, k).rotateY(v).translate(x, 0, z);
+      d.push(geo);
+    }
+    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.95, sheen: 1, sheenColor: '#fff3b0' }), g);
+    return g;
+  }
+
+  // Björkris (lövruskor) som binds vid dörrposten: en kvist från origo upp till hojd cm, med grenar som
+  // hänger och tätt med ljusgröna blad. vanster: grenarna åt vänster (−x).
+  function bjorkris({ hojd = 150, vanster = false, fro = 3 } = {}) {
+    const g = new THREE.Group();
+    const q = rnd(fro);
+    const s = vanster ? -1 : 1;
+    const kvist = [];
+    const lov = [];
+    const stam = [V(0, 0, 0), V(s * 2, hojd * 0.35, 1), V(s * 1, hojd * 0.7, 2), V(s * -1, hojd, 2)];
+    kvist.push(ror(stam, 0.9, 0.35, '#e9e2d4', 6));
+    const kurva = new THREE.CatmullRomCurve3(stam);
+    for (let k = 0; k < 24; k++) {
+      const t = 0.1 + (k / 24) * 0.88;
+      const p0 = kurva.getPointAt(t);
+      const ut = (k % 2 ? s : -s) * (0.5 + q() * 0.5);
+      const l = 14 + q() * 16 * (1 - t * 0.4);
+      const pts = [p0, p0.clone().add(V(ut * l * 0.45, l * 0.08, 1 + q() * 2)), p0.clone().add(V(ut * l * 0.75, -l * 0.25, 2 + q() * 2)), p0.clone().add(V(ut * l * 0.9, -l * 0.7, 2.5 + q() * 3))];
+      kvist.push(ror(pts, 0.32, 0.08, '#5b3a2b', 4));
+      const c = new THREE.CatmullRomCurve3(pts);
+      for (let j = 0; j < 26; j++) {
+        const p = c.getPointAt(0.08 + (j / 26) * 0.92).add(V((q() - 0.5) * 3, (q() - 0.5) * 3, (q() - 0.5) * 3));
+        const d = V((q() - 0.5) * 2, -0.4 - q(), 0.4 + q() * 0.8).normalize();
+        lov.push(farga(rikta(blad(4.4 + q() * 1.2, 3.4), p, d, q() * 3), q() > 0.5 ? '#7fbf3f' : q() > 0.5 ? '#94cf4a' : '#5f9a2f'));
+      }
+    }
+    mesh(ihop(kvist), m('#ffffff', { vertexColors: true, roughness: 0.7 }), g);
+    mesh(ihop(lov), m('#ffffff', { vertexColors: true, roughness: 0.6, side: THREE.DoubleSide }), g);
+    return g;
+  }
+
+  // En liten midsommarstång att ställa på bordet: stången och tvärslån lindade med blad, två kransar som
+  // hänger i slån, blommor i bladen och en fot.
+  function stang({ hojd = 42 } = {}) {
+    const g = new THREE.Group();
+    const q = rnd(29);
+    const tra = [];
+    const lov = [];
+    const blom = [];
+    tra.push(farga(new THREE.CylinderGeometry(4, 4.6, 1.4, 20).translate(0, 0.7, 0), '#7a5a3a'));
+    tra.push(ror([V(0, 0, 0), V(0, hojd, 0)], 0.7, 0.6, '#8a6a46', 6));
+    const sla = hojd * 0.72;
+    tra.push(ror([V(-8, sla, 0), V(8, sla, 0)], 0.35, 0.35, '#8a6a46', 6));
+    const kurvor = [new THREE.CatmullRomCurve3([V(0, 1.5, 0), V(0, hojd, 0)]), new THREE.CatmullRomCurve3([V(-8, sla, 0), V(8, sla, 0)])];
+    for (const x of [-8, 8]) {
+      const ring = Array.from({ length: 18 }, (y, i) => V(x, sla - 3.6 + Math.cos((i / 18) * 2 * Math.PI) * 3.4, Math.sin((i / 18) * 2 * Math.PI) * 3.4));
+      kurvor.push(new THREE.CatmullRomCurve3(ring, true));
+    }
+    const FARG = ['#fbfaf3', '#f2c21c', '#3f78ec', '#e8336d'];
+    kurvor.forEach((c, ci) => {
+      const n = Math.round(c.getLength() * 3.4);
+      for (let j = 0; j < n; j++) {
+        const p = c.getPointAt(j / n);
+        const d = V(q() - 0.5, q() - 0.3, q() - 0.2).normalize();
+        lov.push(farga(rikta(blad(3.2, 2.4), p, d, q() * 3), q() > 0.5 ? '#6fae35' : '#88c444'));
+        if (q() < 0.22) blom.push(farga(new THREE.SphereGeometry(0.85, 6, 4).scale(1, 0.5, 1).translate(p.x + d.x * 1.5, p.y + d.y * 1.5, p.z + d.z * 1.5 + 0.8), FARG[Math.floor(q() * FARG.length)]));
+      }
+    });
+    tra.push(farga(new THREE.SphereGeometry(0.9, 8, 6).translate(0, hojd + 0.6, 0), '#2f5fd1'));
+    mesh(ihop(tra), m('#ffffff', { vertexColors: true, roughness: 0.7 }), g);
+    mesh(ihop([...lov, ...blom]), m('#ffffff', { vertexColors: true, roughness: 0.6, side: THREE.DoubleSide }), g);
+    return g;
+  }
+
+  // Ett fat med kräftor och dill, och en flaska brännvin med två snapsglas (snaps: [x, z] för flaskan).
+  function kraftfat({ snaps = [-15, -6] } = {}) {
+    const g = new THREE.Group();
+    const q = rnd(61);
+    const fat = [];
+    fat.push(farga(new THREE.LatheGeometry([[0, 0], [8.5, 0], [10.5, 0.6], [12.8, 1.7], [13.2, 1.9], [12.9, 2], [10.4, 1], [0, 0.8]].map(([x, y]) => new THREE.Vector2(x, y)), 36), '#f4f1ea'));
+    fat.push(farga(new THREE.TorusGeometry(12.9, 0.22, 4, 48).rotateX(Math.PI / 2).translate(0, 1.95, 0), '#2a57a8'));
+    const kraftor = [];
+    const R1 = '#c8321e';
+    const R2 = '#a8240f';
+    const kraft = (x, z, a) => {
+      const d = [];
+      const sf = (r, sx, sy, sz, px, py, pz, f) => d.push(farga(new THREE.SphereGeometry(r, 7, 5).scale(sx, sy, sz).translate(px, py, pz), f));
+      sf(1, 1.25, 0.95, 2.4, 0, 1.25, 1.9, R2);
+      for (let k = 0; k < 5; k++) sf(1, 1.15 - k * 0.1, 0.75, 0.85, 0, 1.0 - k * 0.12, -0.7 - k * 1.25, k % 2 ? R1 : R2);
+      sf(1, 1.6, 0.25, 0.9, 0, 0.55, -7.2, R1);
+      for (const s of [-1, 1]) {
+        d.push(ror([V(s * 0.8, 1.1, 3.4), V(s * 2.1, 1.2, 4.6), V(s * 2.6, 1.0, 6.2)], 0.45, 0.4, R1, 5));
+        sf(1, 0.85, 0.5, 1.9, s * 2.9, 1.0, 8, R2);
+        d.push(farga(new THREE.ConeGeometry(0.35, 2, 5).rotateX(Math.PI / 2).translate(s * 2.45, 1.0, 10.3), R1));
+        d.push(ror([V(s * 0.3, 1.6, 4.2), V(s * 1.2, 1.9, 7), V(s * 3.5, 1.4, 10.5)], 0.08, 0.05, R1, 3));
+        for (let k = 0; k < 3; k++) d.push(ror([V(s * 1, 0.8, 1.2 + k * 0.9), V(s * 2.2, 0.6, 1.4 + k * 0.9), V(s * 2.8, 0.1, 1.2 + k * 0.9)], 0.12, 0.08, R1, 3));
+      }
+      kraftor.push(ihop(d).scale(0.95, 0.95, 0.95).rotateY(a).translate(x, 1.4, z));
+    };
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * 2 * Math.PI + 0.3;
+      kraft(Math.sin(a) * 6.8, Math.cos(a) * 6.8, a + Math.PI + (q() - 0.5) * 0.3);
+    }
+    kraft(0, -0.5, 0.9);
+    // dillkronor
+    const dill = [];
+    for (let k = 0; k < 4; k++) {
+      const a = (k / 4) * 2 * Math.PI;
+      const p0 = V(Math.cos(a) * 9.5, 2.4, Math.sin(a) * 9.5);
+      const top = p0.clone().add(V(Math.cos(a + 1.2) * 5, 1.2, Math.sin(a + 1.2) * 5));
+      dill.push(ror([p0, p0.clone().lerp(top, 0.5).add(V(0, 0.8, 0)), top], 0.14, 0.08, '#6c8f3a', 3));
+      for (let j = 0; j < 7; j++) {
+        const b = (j / 7) * 2 * Math.PI;
+        const u = top.clone().add(V(Math.cos(b) * 1.8, 0.4, Math.sin(b) * 1.8));
+        dill.push(ror([top, u], 0.05, 0.05, '#8fae46', 3));
+        dill.push(farga(new THREE.SphereGeometry(0.32, 4, 3).translate(u.x, u.y, u.z), '#c9c23a'));
+      }
+    }
+    mesh(ihop(fat), m('#ffffff', { vertexColors: true, roughness: 0.2, clearcoat: 0.8 }), g);
+    mesh(ihop([...kraftor, ...dill]), m('#ffffff', { vertexColors: true, roughness: 0.4, clearcoat: 0.5 }), g);
+    if (snaps) {
+      const [sx, sz] = snaps;
+      const glasMat = new THREE.MeshPhysicalMaterial({ color: '#e8f0ec', transparent: true, opacity: 0.32, roughness: 0.05, clearcoat: 1, depthWrite: false });
+      const flaska = new THREE.LatheGeometry([[0, 0], [3.3, 0], [3.5, 0.4], [3.5, 16.5], [3.2, 18.5], [1.4, 21], [1.2, 24.6], [1.4, 25], [0, 25]].map(([x, y]) => new THREE.Vector2(x, y)), 28);
+      const f = mesh(flaska, glasMat, g);
+      f.position.set(sx, 0, sz);
+      f.renderOrder = 3;
+      const inne = [];
+      inne.push(farga(new THREE.CylinderGeometry(3.2, 3.2, 13, 24).translate(sx, 6.8, sz), '#e9dca6'));
+      inne.push(farga(new THREE.CylinderGeometry(3.56, 3.56, 7, 28, 1, true).translate(sx, 9.5, sz), '#efe6cf'));
+      inne.push(farga(new THREE.CylinderGeometry(3.57, 3.57, 1.6, 28, 1, true).translate(sx, 9.5, sz), '#b5121c'));
+      inne.push(farga(new THREE.CylinderGeometry(1.5, 1.5, 1.8, 16).translate(sx, 25.4, sz), '#b5121c'));
+      mesh(ihop(inne), m('#ffffff', { vertexColors: true, roughness: 0.5 }), g);
+      for (const [gx, gz] of [[sx + 6, sz + 3], [sx + 4.5, sz + 7.5]]) {
+        const gl = mesh(new THREE.LatheGeometry([[0, 0], [1.5, 0], [1.5, 0.25], [0.25, 0.5], [0.25, 2.3], [1.2, 3.3], [1.4, 5.2], [1.25, 5.2], [1.1, 3.4]].map(([x, y]) => new THREE.Vector2(x, y)), 18), glasMat, g);
+        gl.position.set(gx, 0, gz);
+        gl.renderOrder = 3;
+        mesh(new THREE.CylinderGeometry(1.3, 0.9, 1.6, 14).translate(gx, 4.1, gz), m('#e9dca6', { roughness: 0.2, transparent: true, opacity: 0.7 }), g);
+      }
+    }
+    return g;
+  }
+
+  // Fladdermöss i svart papper i trådar (lista: { x, y, z, ned, k, vrid }), med vingarna lite uppvikta.
+  function fladdermoss(lista) {
+    const g = new THREE.Group();
+    const H = [[0, 0.9], [0.32, 1.5], [0.5, 0.95], [0.8, 0.85], [2, 1.5], [3.4, 1.85], [4.6, 1.35], [3.9, 0.55], [3.3, 0.85], [2.7, 0.2], [2, 0.6], [1.3, -0.1], [0.8, 0.2], [0.45, -0.9], [0, -1.3]];
+    const s = new THREE.Shape();
+    s.moveTo(...H[0]);
+    for (const p of H.slice(1)) s.lineTo(...p);
+    for (const [x, y] of H.slice(0, -1).reverse()) s.lineTo(-x, y);
+    const d = [];
+    const tradar = [];
+    lista.forEach((e, i) => {
+      const geo = new THREE.ShapeGeometry(s);
+      const p = geo.attributes.position;
+      for (let k = 0; k < p.count; k++) p.setZ(k, Math.abs(p.getX(k)) * 0.35);
+      geo.computeVertexNormals();
+      const k = e.k || 1;
+      geo.scale(k, k, k).rotateY(e.vrid || 0).rotateZ(((i % 3) - 1) * 0.12).translate(e.x, e.y - e.ned - 1.3 * k, e.z);
+      d.push(farga(geo, '#151214'));
+      tradar.push(ror([V(e.x, e.y, e.z), V(e.x, e.y - e.ned + 0.2, e.z)], 0.06, 0.06, '#d8d8d8', 3));
+    });
+    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.6, side: THREE.DoubleSide }), g);
+    mesh(ihop(tradar), m('#ffffff', { vertexColors: true, roughness: 0.6 }), g);
+    return g;
+  }
+
+  return { stjarna, ljusstake, girlang, agg, paskris, vimplar, blommor, lyktor, pumpa, vav, krans, halmstjarna, julbock, serpentiner, ballonger, kycklingar, bjorkris, stang, kraftfat, fladdermoss };
 }
 
 // Mörkret (0–1, lysröret släckt) på pyntet: det som inte lyser mörknar som väggen, och skenet kring det

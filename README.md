@@ -4158,7 +4158,15 @@ inbördes möten, spelkassan och Tipsligan i tobaksaffären, med guld som färg.
 finns inte i `gang` i [config/kupong.js](config/kupong.js) och syns inte när tipsen jämförs inför
 gängets kupong, så att spelet går som förut: inlämningen, när tipsen visas, *Alla inne*, förslaget och
 gängets kupong. *Lagkänsla* och *Den oumbärlige* gäller inte honom, och *Närvaro* räknas från hans
-första omgång.
+första omgång och bara i omgångarna han kunde vara med i.
+
+**Bara när hela gänget spelar (2026-11-16, Tomas beslut):** han tävlar bara i en omgång som alla i
+gänget har tippat (`Tippoang.hasseMed`). Annars får omgången ingen kupong av honom, varken i
+`data/tippar-historik.json` eller i omgången som pågår (`tpScore`), så att en omgång som bara han
+spelar inte ger honom något försprång. Ingen kan lämna in när tipsen väl visas, så det står fast när
+omgången skrivs in. En fryst omgång från innan regeln, där han tippade utan hela gänget (landskamperna
+15–16 november), står kvar i filen men hans tips räknas bort när sidan byggs (`utanHasse`), och en
+omgång som ingen i gänget tippade visas inte alls.
 
 Han spelar under samma regel som alla (`regel` i [config/kupong.js](config/kupong.js), 4 spikar,
 5 halvgarderingar och 4 helgarderingar). Kupongen byggs vid bygget (`hasseKupong` i
@@ -4197,7 +4205,8 @@ Säsongen står i Olympen ([public/kampen.js](public/kampen.js)): ställningen s
 prispall med summan av omgångarnas poäng, antal rätt av de spelade matcherna och antal
 gånger som *Omgångens orakel* (bäst) och *Omgångens Ikaros* (sämst), som märken under
 namnet, och modellen som jämförelse, utan placering. Placering efter summan med en
-decimal, sedan antal rätt. En omgång räknas för den som tippade i den. Tabellen
+decimal, sedan antal rätt. En omgång räknas för den som tippade i den – Hasse Backe bara när
+hela gänget tippade (se [Hasse Backe tävlar](#hasse-backe-tävlar)). Tabellen
 *Omgångarna* visar varje omgång med orakel och Ikaros inramade i guld och rött. Döljer
 spoilerskyddet någon match i en omgång räknas hela omgången bort, med *Visa ändå*. (Fram
 till 2026-10-22 stod samma topplista också under omgångens ruta på förstasidan.)
@@ -5184,23 +5193,39 @@ längst in i hörnet på bardisken, mellan orakelramen och datorn (som står fra
 från gullrankan mitt på disken, lite mindre än i verkligheten och vridet mot affären (`pyntSakerna` i
 [public/rum-inredning.js](public/rum-inredning.js)):
 
-- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian och
-  nyåret ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
+- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian
+  ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
   bunden girlang, varmvita små lampor i en slinga runt den, en röd sammetsrosett vid varje krok och röda och
   guldfärgade kulor i bågarna – en adventsstjärna i rött papper i den högra rutan, som lyser inifrån, starkast mot
-  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken.
+  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken. Dessutom tre
+  halmstjärnor med rött garn i trådar ovanför gänget och en julkrans av granris med lingon och en röd rosett på
+  dörrens glas, i ett band från en sugpropp under namnet.
+- **Nyår** (29 december – 2 januari): julpyntet sitter kvar, och serpentiner i lockar hänger från girlangen.
 - **Påsk** (lördagen före palmsöndagen till tisdagen efter annandag påsk): målade ägg – ränder, sicksack, prickar
   och stjärnor i pastell – i band från karmen, och påskris i en vit glaserad kanna med en blå rand, med fjädrar i
-  klara färger och några små ägg bland kvistarna.
+  klara färger och några små ägg bland kvistarna. Tre påskkycklingar av garn vid kannan, och en påskkrans av björkris
+  med fjädrar, små ägg och en gul rosett på dörrens glas.
 - **Midsommar** (måndagen i midsommarveckan till söndagen efter midsommarafton): vimplar i blått och gult längs
-  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar.
+  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar. Lövruskor av
+  björk är bundna vid dörrposterna, med grenarna utåt.
 - **Kräftskivan** (kräftpremiären, andra onsdagen i augusti som på nittiotalet, till sista augusti):
-  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant.
+  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant,
+  och två till på dörrens glas. I hörnet på bardisken ett fat med kräftor och dillkronor, och en flaska brännvin
+  med två snapsglas.
 - **Halloween** (veckan före alla helgons dag och dagen själv): en urholkad pumpa med ett lysande ansikte på
-  bardisken och ett spindelnät med en spindel i fönstrets övre vänstra hörn.
+  bardisken (och en liten bredvid), ett spindelnät med en spindel i fönstrets övre vänstra hörn och fladdermöss i
+  svart papper i trådar i fönstret och på dörrens glas.
 
-Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på två egna dukar i väggens plan: fönstrets
-under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
+Fler saker kom samma dag (användarens önskemål: "fler föremål … De ska inte vara grafikkrävande"). De är byggda så
+att de inte kostar något medan rummet går: var sak är ett eller några få sammanslagna nät med färgen i hörnen och
+samma material som det andra pyntet (inga nya grafikprogram), och den ritas en gång till sin duk som allt pynt.
+Uppmätt i Chromium: halmstjärnan 630 trianglar, fladdermössen 44 styck, kycklingarna 700 styck, ballongerna 2 600,
+julbocken 2 800, serpentinerna 2 800, midsommarstången 4 800, lövruskan 6 500, kransarna 5 700–8 900 och kräftfatet
+med flaskan 8 700, högst åtta nät per sak, var och en byggd på 1–30 ms en gång; gänget har flera hundra tusen
+trianglar och ritas i varje bildruta.
+
+Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på tre egna dukar i väggens plan: fönstrets
+och dörrens under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
 (`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
 målas på väggen och glaset, och på kvällen går rummets mörker runt dem som runt neonen och spotarna och lysrörets
 värme ligger kring dem (`pyntLjus`, `ljusKlockan` i [public/rum.js](public/rum.js)); det andra mörknar med
@@ -5462,7 +5487,7 @@ finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysare
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
 `chokladbollar`) fikat, `?rum-ol=jul` (`pask`) ölen och `?rum-fest=jul` (`lucia`, `nyar`,
 `pask`, `midsommar`, `inget`) högtidskläderna och `?rum-pynt=jul` (`pask`, `midsommar`, `kraftor`,
-`halloween`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
+`halloween`, `nyar`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
 om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
@@ -6675,7 +6700,8 @@ skärm syntes det inte alls: scenen skars lika mycket uppe som nere, och hela ta
 
 - **Undertaket** (`innertak` i [public/rum-inredning.js](public/rum-inredning.js), en egen duk under allt annat i
   bakväggens plan): ett 90-tals undertak i three.js med plattor på 60 × 60 cm (120 enheter) i ett bärverk av
-  vitlackerad plåt och en vinkellist mot väggarna, sett med samma kamera som takfläkten. Fläkten sitter mitt i en
+  vitlackerad plåt (gulnad av röken, se *Taket i bakgrunden* nedan) och en vinkellist mot väggarna, sett med samma
+  kamera som takfläkten. Fläkten sitter mitt i en
   platta, och ljuset från glaskuporna faller upp i taket med skuggan av bladen (en osynlig kopia av fläkten som bara
   kastar skugga; glaset och hållarna precis över lamporna är borttagna, annars låg en mörk fläck över halva taket).
   Spotskenan, som också satt i plattorna, är borttagen (se *Spotskenan togs bort* ovan). Plattorna är gulnade av röken och brunast över
@@ -6712,6 +6738,24 @@ blad med ljusa rottingfält. Nu lyser den på bordet utan att dra blicken till s
 
 Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som dator (1440 × 900) klockan
 14 och 21.30 och som telefon (412 × 870).
+
+### Taket i bakgrunden (2026-11-16)
+
+Användarens önskemål: "Kan du göra taket ngt mindre prominent. Det tar en del fokus här. Behåll 90-talsstuket o ge det
+lite patina/rökpåverkan." I telefonen på höjden, där taket fyller bilden ovanför Stryktipset-bandet, var undertaket
+(`innertak` i rum-inredning.js) ett ljust rutnät: bärverket i nästan vit plåt över gulnade plattor, och ett
+frånluftsdon med skarpa svarta springor. Nu är det samma 90-talstak, men så som det ser ut efter många år av rök:
+
+- **Bärverket gulnat** (`plat`): nästan i plattornas ton och mattare, så att rutnätet syns utan att lysa.
+- **Plattorna mörkare och ojämna:** mer nikotin överallt (`GUL`, `BRUN`, `brun`), stråk där röken drog fram, en mörk
+  sotring kring fläktens fäste, mjuka fläckar på varje platta och sot längs kanterna mot bärverket.
+- **Frånluftsdonet smutsigt:** gallret i plattornas gulnade ton och springorna mindre svarta.
+- **Mindre ljus underifrån** (`HemisphereLight` och kupornas ljus i takets scen), så att taket klingar av i dunkel
+  mot betraktaren och ljuset ligger kring fläkten.
+
+Takets ljusstyrka i telefonen (430 × 932, medel i gråskala över taket): klockan 14 65 → 50, klockan 22.50 39 → 31.
+Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som telefon (430 × 932) klockan
+14 och 22.50 och som dator (1440 × 900).
 
 ### Utsikten och vädret
 
@@ -8449,7 +8493,9 @@ adventsljusstaken, påskriset, blommorna eller pumporna står på bardisken till
 löpsedel. Det ritas en gång genom hans kamera på en egen duk mellan väggen och honom (`.rh-pynt`), när bilden passas
 in och när ljuset ändras, och är lika oskarpt som väggen på det djupet, som löpsedeln. Ljuset är barens: lysröret,
 dagsljuset bakifrån genom glaset och mörkret, som på honom; det som lyser lyser ändå. På höjden står det närmare
-honom, så att det ryms i den smalare bilden.
+honom, så att det ryms i den smalare bilden. Bredvid, längre åt höger, står fler saker där bilden är bred: en julbock i halm med röda band och två halmstjärnor
+till jul, ballonger i guld, silver och svart till nyår, påskkycklingar vid påskriset, en liten midsommarstång lindad
+med löv och blommor, kräftfatet med brännvinet (i stället för något annat på disken) och fladdermöss i glaspartiet.
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på en halv sekund, som när kameran vrids åt vänster: den kommer
