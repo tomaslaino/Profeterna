@@ -29,10 +29,11 @@
 //              förklaring
 //   REGISTRET  lagen och spelarna (fliken hette LAGEN till 2026-11-13; i
 //              koden heter den fortfarande lagen). Underraden säger vad och
-//              var: LAG eller SPELARE, och divisionen. LAG är divisionens lag
-//              (inget lag markeras för att det står i kupongen, sedan
-//              2026-11-13); SPELARE är divisionens spelare från A
-//              till Ö med plats, lag, speltid och mål. Ett lag öppnar
+//              var: LAG eller SPELARE, och divisionen. LAG är divisionens
+//              tabell (sedan 2026-11-16; till dess lagen i bokstavsordning,
+//              se lagen nedan; inget lag markeras för att det står i
+//              kupongen, sedan 2026-11-13); SPELARE är divisionens spelare
+//              från A till Ö med plats, lag, speltid och mål. Ett lag öppnar
 //              lagkortet och en spelare spelarkortet, med namnet och
 //              flikarna stilla överst (sedan 2026-11-13; Tab byter):
 //              laget ÖVERSIKT (nästa match, formen, styrkan), xG, SPELET,
@@ -64,8 +65,9 @@
 // en egen flik, TOPPLISTOR; användaren ville ha dem bara vid matcherna.)
 // Statistiks tal (sedan 2026-11-13, användarens önskemål: all statistik på
 // sajten ska gå att se i datorn): lagkortet och spelarkortet har allt som
-// Statistik och matchsidan visar om ett lag eller en spelare – utom tabellen
-// och skytteligan, som står på tv:n – i avsnitt med platsen i divisionen
+// Statistik och matchsidan visar om ett lag eller en spelare – utom
+// skytteligan, som står på tv:n (tabellen står sedan 2026-11-16 också under
+// LAG) – i avsnitt med platsen i divisionen
 // efter, och etiketten leder till listan: divisionen ordnad efter talet
 // (#lista:lag:pl:skapar), där ←/→ bläddrar till förra och nästa tal.
 // Matchakten har också matchsidans rader (hemma och borta, nollorna, skotten
@@ -1730,7 +1732,7 @@ window.RumRegister = (() => {
       const s0 = standardDiv();
       const d = REG.includes(vy.div) ? vy.div : REG.includes(s0) ? s0 : REG[0];
       const def = defs.find((x) => x.k === vy.lista);
-      if (!def) return lagv ? lagen(d, R) : spelarna(d, S, R);
+      if (!def) return lagv ? lagen(d, S, R) : spelarna(d, S, R);
       R.slojas = true;
       const r = [regRad(slag, d, def.k), streck()];
       if (!helaNamn()) r.push(rad([up(REGNAMN[d]), 'd']));
@@ -1801,30 +1803,98 @@ window.RumRegister = (() => {
         ...REG.flatMap((x, j) => [[hela ? up(REGNAMN[x]) : REGK[x], x === d ? 'i' : '', x === d ? null : k && harTal(slag, x, k) ? `#lista:${slag}:${x}:${k}` : `#${typ}:${x}`], [j < REG.length - 1 ? '   ' : '', '']]),
       );
     }
-    // en division: lagen i bokstavsordning (två spalter på datorn)
-    function lagen(div, R) {
+    // En division: tabellen (sedan 2026-11-16, användarens önskemål: "ordna så
+    // att tabellerna dyker upp snyggt när man klickar i PL, CH osv."; till dess
+    // stod lagen i bokstavsordning). Som på Tabeller och tv:ns 371–374:
+    // platsen, laget, spelade, V O F, målen, målskillnaden och poängen, och
+    // sist formen i ligan (de fem senaste, senaste först, som i lagkortet).
+    // V O F, målen och formen står när raden ryms, i den ordningen; namnet
+    // som rummets korta när det hela inte ryms. Divisionens namn står till
+    // vänster på raden med rubrikerna, och de står still överst med
+    // underraden medan lagen rullar. Ett tunt streck där zonen byts
+    // (ESPN:s note, samma zoner som på Tabeller) och zonerna med sina platser
+    // under tabellen; ett poängavdrag har * efter poängen. Hela raden öppnar
+    // lagkortet. Med dolda resultat står lagen i bokstavsordning (ordningen
+    // skulle avslöja resultaten) och ? i stället för talen.
+    const ZONER = [
+      [/relegation/i, 'NEDFLYTTNING'],
+      [/playoff/i, 'KVAL TILL UPPFLYTTNING'],
+      [/champions league/i, 'CHAMPIONS LEAGUE'],
+      [/europa|conference/i, 'EUROPA- ELLER CONFERENCE LEAGUE'],
+      [/promotion/i, 'DIREKT UPPFLYTTNING'],
+    ];
+    const zonAv = (note) => (note && (ZONER.find(([re]) => re.test(note)) || [])[1]) || null;
+    // namnet minst så brett och högst så brett som det längsta (Wolverhampton
+    // Wanderers); formen är två mellanrum och fem bokstäver
+    const TAB_N = [15, 24];
+    const FORMK = { V: 'v', O: '', F: 'd' };
+    function lagen(div, S, R) {
       const d = REG.includes(div) ? div : standardDiv();
       if (d === 'nl') return landslagen(R);
       const j = REG.indexOf(d);
       R.sido = [j > 0 ? `#div:${REG[j - 1]}` : null, j < REG.length - 1 ? `#div:${REG[j + 1]}` : null];
-      const smal = A.bred < 60;
+      R.slojas = true;
       const r = [regRad('lag', d), streck()];
-      if (!helaNamn()) r.push(rad([up(DIVNAME[d]), 'd']));
-      if (!A.stats) return [...r, prickar('HÄMTAR', '')];
-      const l = lagIDiv(d);
-      const k = smal ? 1 : 2;
-      const w = Math.floor(A.bred / k);
-      const h = Math.ceil(l.length / k);
-      for (let y = 0; y < h; y++) {
-        const b = [];
-        for (let x = 0; x < k; x++) {
-          const t = l[x * h + y];
-          if (!t) continue;
-          const namn = up(t.name).slice(0, w - 2);
-          b.push([namn, '', `#lag:${t.name}`], [pad('', w - namn.length), '']);
-        }
-        r.push(rad(...b));
+      const divNamn = helaNamn() ? '' : up(DIVNAME[d]);
+      const l = A.stats ? lagIDiv(d) : [];
+      if (!l.length) return [...r, ...(divNamn ? [rad([divNamn, 'd'])] : []), A.stats ? rad('OKÄNT') : prickar('HÄMTAR', '')];
+      const veil = S.veil;
+      if (!veil) l.sort((a, b) => (a.rank || 99) - (b.rank || 99) || a.name.localeCompare(b.name, 'sv'));
+      const tal = (x) => (veil ? '?' : x == null ? '–' : String(x));
+      const avdrag = !veil && l.some((t) => t.ded > 0);
+      const KOL = [
+        { h: 'S', w: 3, g: (t) => tal(t.m) },
+        { h: 'V', w: 3, g: (t) => tal(t.w), val: 'vof' },
+        { h: 'O', w: 3, g: (t) => tal(t.d), val: 'vof' },
+        { h: 'F', w: 3, g: (t) => tal(t.l), val: 'vof' },
+        { h: 'MÅL', w: 7, g: (t) => (veil ? '?' : `${t.gf}–${t.ga}`), val: 'mal' },
+        { h: '+/-', w: 5, g: (t) => (veil ? '?' : t.gd > 0 ? `+${t.gd}` : t.gd < 0 ? `−${-t.gd}` : '0') },
+        { h: 'P', w: 4, g: (t) => tal(t.pts), k: 'v' },
+      ];
+      // platsen (3), spalterna som alltid står och * för avdraget; sedan de
+      // som ryms med namnet minst TAB_N[0] brett
+      let fast = 3 + KOL.filter((k) => !k.val).reduce((s, k) => s + k.w, 0) + (avdrag ? 1 : 0);
+      const med = new Set();
+      for (const [id, w] of [['vof', 9], ['mal', 7], ['form', 7]]) if (A.bred - fast - w >= TAB_N[0]) { med.add(id); fast += w; }
+      const N = Math.max(TAB_N[0], Math.min(TAB_N[1], A.bred - fast));
+      const kol = KOL.filter((k) => !k.val || med.has(k.val));
+      const form = med.has('form');
+      // (på datorn, där raden räcker till, ett tecken till mellan spalterna)
+      const lu = A.bred - fast - N >= kol.length + (form ? 1 : 0) ? 1 : 0;
+      const bredd = 3 + N + kol.reduce((s, k) => s + k.w + lu, 0) + (avdrag ? 1 : 0) + (form ? 7 + lu : 0);
+      // (underraden och rubrikerna står still överst, R.huvud, och lagen rullar under dem)
+      R.huvud = [...r, rad([`${pad(divNamn.slice(0, 3 + N), 3 + N)}${kol.map((k) => padL(k.h, k.w + lu)).join('')}${avdrag ? ' ' : ''}${form ? `${' '.repeat(2 + lu)}FORM` : ''}`, 'd'])];
+      r.length = 0;
+      const formen = (t) => (A.byTeam.get(t.name) || []).filter((x) => x.completed && x.comp === t.comp).slice(0, 5)
+        .map((x) => (veil || (window.Spoiler && Spoiler.hidden(x)) ? '?' : letter(x, t.name) || '?'));
+      let forra = null;
+      l.forEach((t, i) => {
+        const z = veil ? null : zonAv(t.note);
+        const namn = up(t.name).length < N ? up(t.name) : kort(t.name).slice(0, N - 1);
+        const x = radQ(`#lag:${t.name}`, [`${padL(veil ? '' : t.rank || '', 2)} `, 'd'], pad(namn, N),
+          ...kol.map((k) => [padL(k.g(t), k.w + lu), k.k || '']),
+          ...(avdrag ? [[t.ded > 0 ? '*' : ' ', 'd']] : []),
+          ...(form ? [[' '.repeat(2 + lu), ''], ...formen(t).map((f) => [f, FORMK[f] == null ? 'd' : FORMK[f]])] : []));
+        // (ett tunt streck där zonen byts, lika brett som tabellen: --ny i
+        // rum-register.css; raden själv får ingen bredd, för ett tecken i
+        // VT323 är en bråkdel bredare än 1ch och då bröts raden)
+        if (i && z !== forra) Object.assign(x, { kl: 'ny', st: `--ny: ${bredd}ch` });
+        forra = z;
+        r.push(x);
+      });
+      if (veil) return r;
+      // zonerna med sina platser, och avdragen
+      const zoner = [];
+      for (const t of l) {
+        const z = zonAv(t.note);
+        const s = zoner[zoner.length - 1];
+        if (!z || !t.rank) continue;
+        if (s && s.z === z && s.b === t.rank - 1) s.b = t.rank;
+        else zoner.push({ z, a: t.rank, b: t.rank });
       }
+      if (zoner.length) r.push(tom(), ...zoner.map((s) => rad([`${padL(s.a === s.b ? s.a : `${s.a}–${s.b}`, 5)}  ${s.z}`, 'd'])));
+      const ded = l.filter((t) => t.ded > 0);
+      if (ded.length) r.push(tom(), ...ded.map((t) => rad([`*  POÄNGAVDRAG: ${up(t.name)} −${t.ded}`, 'd'])));
       return r;
     }
 
@@ -2253,7 +2323,7 @@ window.RumRegister = (() => {
     // delarna av registret
     const DELAR = [
       { namn: 'KUPONGEN', typ: 'FLIK', q: '#flik:kupongen', ord: ['kupongen', 'kupong', 'matcherna', 'omgangen', 'formen'] },
-      { namn: 'REGISTRET', typ: 'FLIK', q: '#flik:lagen', ord: ['registret', 'register', 'lagen', 'trupperna', 'ligorna', 'divisionerna'] },
+      { namn: 'REGISTRET', typ: 'FLIK', q: '#flik:lagen', ord: ['registret', 'register', 'lagen', 'trupperna', 'ligorna', 'divisionerna', 'tabell', 'tabellen', 'tabeller', 'tabellerna'] },
       { namn: 'SPELARE', typ: 'REGISTRET', q: '#spelarna:', ord: ['spelare', 'spelarna'] },
       ...DIVS.map((d) => ({ namn: up(DIVNAME[d]), typ: 'DIVISION', q: `#div:${d}`, ord: [norm(DIVNAME[d]), d, { pl: 'premier', ch: 'champ', l1: 'league 1', l2: 'league 2' }[d]] })),
       { namn: 'NATIONS LEAGUE', typ: 'LANDSLAG', q: '#div:nl', ord: ['nations league', 'nations', 'nl', 'landslag', 'landslagen', 'landskamper', 'landskamperna'] },
@@ -2423,7 +2493,7 @@ window.RumRegister = (() => {
       if (t) return lagkort(t, S, R, vy.del);
       const tl = vy.lag && landOf(vy.lag);
       if (tl) return landkort(tl, S, R, vy.del);
-      return vy.slag === 'spelare' ? spelarna(vy.div, S, R) : lagen(vy.div, R);
+      return vy.slag === 'spelare' ? spelarna(vy.div, S, R) : lagen(vy.div, S, R);
     }
 
     // (huvud: det som står still under menyraden i ett kort – namnet och

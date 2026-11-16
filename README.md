@@ -6960,8 +6960,16 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   divisionerna. Samma dag ville användaren att underkategorierna skulle vara logiska – med bara
   divisionerna syntes spelarna först inne i ett lag – och valde det här upplägget före att
   behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på divisionen
-  som har flest lag i omgången. *LAG* är divisionens lag i bokstavsordning (två spalter på
-  datorn), de i omgången ljusa, och ett lag öppnar **lagkortet** med truppen. *SPELARE* är
+  som har flest lag i omgången. *LAG* är divisionens tabell (sedan 2026-11-16, användarens
+  önskemål: "ordna så att tabellerna dyker upp snyggt när man klickar i PL, CH osv."; till dess
+  stod lagen i bokstavsordning): platsen, laget, spelade, V O F, målen, målskillnaden och
+  poängen, och sist formen i ligan (de fem senaste, senaste först) – V O F, målen och formen när
+  raden ryms, så i telefonen plats, lag, S V O F, +/- och poäng, och rummets korta namn när det
+  hela inte ryms. Underraden och rubrikerna står still medan lagen rullar. Ett tunt streck går
+  där zonen byts (ESPN:s `note`, samma zoner som på Tabeller), zonerna står med sina platser
+  under tabellen, och ett poängavdrag har * efter poängen. Hela raden öppnar **lagkortet** med
+  truppen (↑/↓ och Enter också). Med dolda resultat står lagen i bokstavsordning – ordningen
+  skulle avslöja resultaten – med ? i stället för talen och *Visa ändå* under skärmen. *SPELARE* är
   divisionens spelare från A till Ö (efternamnet) med plats, lag, speltid och mål, och läget
   (skadad, avstängd) sist när raden ryms: samma spelare som i trupperna, de som har spelat och de
   skadade. En spelare öppnar **spelarkortet** (nedan), och Esc går tillbaka till samma ställe i
@@ -7226,7 +7234,7 @@ med flit (nedan):
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom tabellen och skytteligan: laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom skytteligan (tabellerna sedan 2026-11-16, under *LAG*): laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
