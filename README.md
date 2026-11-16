@@ -1340,6 +1340,33 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   lyktornas och fönstrens sken i stället för att alla är svarta siluetter. Gatan är glesare efter halv sju (`RumUte.trafik`:
   sju gående på dagen, fem till åtta, tre till tio och två sent, en till på fredag och lördag): en regnig måndagskväll
   20.30 syns i snitt en i taget i stället för nästan tre, och halva tiden är trottoaren tom.
+- **Fasaden lättare för telefonen (2026-11-16, användarens önskemål):** "just nu så kraschar ju den där sidan, så det
+  är viktigt att grafiken, att till exempel en gammal mobil klarar av det där". Samtidigt gjordes *Fasaden kraschade i
+  telefonen* (under [Fasaden](#fasaden): rummet döljs under fasaden, dukarna släpps och inget byggs om vid varje
+  resize). Här dessutom lagren: fasadens stilla lager ritades i världens mått och förminskades (i en telefon på höjden
+  till 0,45), och Safari ritar ett lager i dess egen storlek gånger pixeltätheten, så att vart och ett av nio lager tog
+  ungefär 50 MB i en iPhone i stället för 10. Nu är scenen i fönstrets storlek och de stilla lagren fyra i stället
+  för nio (fem med högtidspyntet). Inte provat i en riktig telefon. Se [Fasaden](#fasaden).
+- **Fler karaktärer som går förbi, och de passar 90-talet (2026-11-16, användarens önskemål):** "Kan du göra de här
+  människorna eller personer som går förbi utanför något mer intressanta eller passande utan att de drar speciellt
+  mycket mer grafik? Tänk som sagt på att det ska vara 90-tal och försök att få till fler karaktärer än vad som redan
+  finns." Nya: inlinesåkare med knä- och handledsskydd som skär fram, en äldre med rullator, supportrar i gäng med
+  halsduken i lagets färger, någon med bergsprängaren på axeln, punkare med tuppkam och nitar och hårdrockare med
+  långt hår, tidningsbudet med reflexväst och kärran full av morgonens tidningar i gryningen, turister med karta och
+  kamera på sommaren, skidåkare med skidorna på axeln när det har snöat en ledig dag och julgranen under armen i
+  december, och bland de andra landslagströjan i värmen, magväskan och julklappar i en kasse före jul. Lika många
+  syns samtidigt som förut, och de nya kostar lika mycket per figur som de gamla. Se *Det som händer ute* under
+  [Fasaden](#fasaden).
+- **Fler sätt att gå, och naturligare (2026-11-16, användarens önskemål):** "Kan du få karaktärerna som går utanför
+  tobaksbutiken att gå på fler olika sätt och att det ser naturligt ut? Ja, om de kan variera och få det att se
+  naturligt ut så vore det super." Fem nya sätt som skiljer sig i själva rörelsen, inte bara i steglängd och takt:
+  springer (i luften mellan stegen, landar på mitten av foten, knät högt fram och armarna böjda; joggare morgon och
+  kväll, någon som springer i regnet eller till bussen i rusningen), med käpp (en del äldre: käppen går med det bortre
+  benet och står still mot stenen medan kroppen går förbi), halkar (på snö kring nollan eller blött i minusgrader går
+  sex av tio försiktigt: korta steg med hela foten, böjda knän och armarna ute), trippar (korta, snabba steg, en del
+  med kjol) och släntrar (långa, sega steg, bakåtlutad, armarna svänger löst, axlarna rullar och huvudet nickar). Var
+  och en svänger dessutom armarna på sitt sätt (hur böjda, hur långt fram och i vilken takt), och ibland är bara den ena
+  handen i fickan, också när den andra bär påsen eller paraplyet. Se *Det som händer ute* under [Fasaden](#fasaden).
 - **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
   som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
   långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
@@ -7002,7 +7029,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
   (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
   barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
-  tidningen i regnet och hundar (labrador, schäfer, tax, terrier och pudel, `HUNDAR`; de små i täcke när det regnar).
+  tidningen i regnet, någon som joggar morgon och kväll (`joggare`: myskläder i färgblock eller shorts och t-shirt,
+  gympadojor, pannband och ibland en gul sportfreestyle) och hundar (labrador, schäfer, tax, terrier och pudel,
+  `HUNDAR`; de små i täcke när det regnar).
   Det är 90-tal och kläderna är efter vädret (`klad`, `F90`, `vadret`): vindjackor och myskläder i färgblock, dunjackor
   med stickningar, skinnjackor, bomberjackor, jeansjackor, fältjackor, trenchcoats, kappor och kavajer, vida jeans,
   kjolar, bakvända kepsar, fiskarhattar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar, portföljer
@@ -7014,10 +7043,26 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   del äldre går framåtböjda, och fler frisyrer (knut, afro) och hattar (sixpence, basker). Paraplyerna är vanliga,
   golfparaplyer i två färger, små hopfällbara eller genomskinliga bubblor ner över huvudet (`PARAPLY`, `parForm`: en
   kupol sedd från sidan med kilar och spröt), och en del bär gitarr på ryggen, bandybag med innebandyklubbor,
-  pizzakartong (på kvällen) eller blommor. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
+  pizzakartong (på kvällen) eller blommor. Sedan 2026-11-16 också (`vemGar`, `sallskap`): inlinesåkare (`skrinna`,
+  `skridTab`: varje ben skjuter ifrån bakåt med hjulen mot stenen i halva varvet och förs fram böjt och lite lyft i den
+  andra, höften lägre och överkroppen framåtlutad, fötterna glider med kroppen; kängor med fyra hjul i neon, ofta knä-
+  och handledsskydd; när det är torrt och minst 7 grader på dagen, fler på sommaren), en äldre med rullator (handtagen,
+  fyra hjul, sitsen och korgen med en kasse i, på dagen), supportrar i gäng med halsduken i lagets två färger
+  (`LAGEN`: Stockholmslagen och engelska lag som många höll på; lediga dagar 11–19.30 och vardagskvällar), någon med
+  bergsprängaren på den bortre axeln bakom huvudet och handen på handtaget, tidningsbudet med reflexväst (ränderna
+  lyser i ljuset i mörkret) och dragkärran med tidningsbuntar mellan 4.30 och 7, turister med karta, kamera på magen
+  och magväska på sommaren, skidåkare med skidorna på den bortre axeln och stavarna i handen när det har snöat en
+  ledig dag, och julgranen i nät under armen 7–23 december. Bland de unga finns punkare med tuppkam i neon, nitar och
+  Dr. Martens och hårdrockare med långt hår i skinnjacka, i värmen ibland landslagströjan (gul med blå krage och
+  ärmkant), och magväskan och julklappar i en papperskasse (före jul) finns bland de andra. De ritas med samma sorts
+  delar som de andra: i en bromsad provmiljö (headless Chrome, processorn ×4) 650–940 µs per figur och bild mot
+  610–1350 för de gamla sorterna, och lika många syns samtidigt som förut. `?rum-fasad-vem=inlines` (eller `rullator`,
+  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `cykel` …) låter alla som går förbi vara sådana,
+  för bilder och prov. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
-  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och bara
-  den som har båda händerna lediga kan ha dem i fickorna. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
+  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
+  käppen är i den närmre. En ledig hand kan vara i fickan, ibland bara den ena (`st.ficka`: F, B eller båda), också
+  när den andra bär påsen eller paraplyet. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
   framför fönstret (`randLjus`), och speglas svagt i den våta stenen; kläderna behåller en fjärdedel av sin färg
   (`NATTF`, `klarL`), så att en röd dunjacka går att skilja från en svart kappa. Där det är mörkt är de lika mörka som mörkret
@@ -7033,10 +7078,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   efter hur långt den har gått, diagonala ben i par och tassen stilla mot stenen, med kopplet i en stilla hand; hjulen
   på barnvagnen, cykeln och dragkärran rullar på samma sätt. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
   (långa steg, snabbt, framåtlutad, stora armsvingar), strosar (korta steg, långsamt, ofta händerna i fickorna),
-  studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram) och rak (upprätt, raka
-  knän), och var och en lite olika inom sitt sätt (steglängd, takt, lutning, armsving); farten är steglängden gånger
-  takten, 0,9–1,6 m/s. Sättet passar den som går (den äldre strosar, barnet studsar, den som blir blöt skyndar sig) och
-  ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
+  studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram), rak (upprätt, raka
+  knän), trippar (korta, snabba steg och små armrörelser) och släntrar (långa, sega steg, bakåtlutad, armarna svänger
+  löst och axlarna rullar med dem, `rull`, och huvudet nickar en gång per steg, `nick`). Tre skiljer sig mer: på halkan
+  sätts hela foten i på en gång (`hal`), stegen är korta och knäna böjda, foten går lågt och armarna hålls ute framför
+  kroppen (`armar: 'balans'`); med käpp går den äldre framåtböjd med korta steg, och käppen i den närmre handen går med
+  det bortre benet (`kappen`): spetsen sätts i en bit framför där den bortre hälen sätts i, står still mot stenen medan
+  kroppen går förbi och förs fram i en låg båge, och armen böjs i armbågen så att handen håller handtaget; och den som
+  springer är i luften mellan stegen (`lop`: höften lägst mitt i steget, när knät tar emot), landar på mitten av foten,
+  för låret långt fram och drar tillbaka det innan foten tar i (`drive`) och pumpar med böjda armar (utom den som bär
+  något i handen). Var och en är lite olika inom sitt sätt (steglängd, takt, lutning, armsving, och hur böjda armarna
+  är, hur långt fram de svänger och i vilken takt); farten är steglängden gånger takten, 0,7–1,6 m/s, och 2,8–3,3 m/s
+  för den som springer. Sättet passar den som går (den äldre strosar och ibland med käpp, barnet studsar, den unga
+  släntrar ibland, med kjol trippar en del, den som blir blöt skyndar sig och ibland springer, och i rusningen
+  springer någon till bussen), på halkan (`vadret`: snö på marken kring nollan, eller blött i minusgrader) går de
+  flesta i ett sällskap försiktigt, utom barnen, och ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
   fyra gånger så långsam processor kostar fler figurer 0,2 ms mer per bild på dagen och 0,5 ms mer i kvällsregn som
   telefon, och ungefär 3 ms mer i kvällsregn i datorn (2026-11-16).
   Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
@@ -7105,15 +7161,21 @@ som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som
 och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden utifrån; medan rummet syns i
 övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
-bron och himlen och gatan ut till den närmre filen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
-ritas om när ljuset eller vädret ändras (en gång i minuten prövas det). Det som rör sig ritas i tre dukar: `rf-fram`
+bron och himlen och gatan ut till den närmre filen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är fyra SVG:er, en
+mellan varje duk (himlen; bortom bron och rummet; fönstret, neonen, glaset, huset, bron, marken, gatan och texten;
+kvällens ljus), som ritas om när ljuset eller vädret ändras (en gång i minuten prövas det); när det finns högtidspynt
+delas den tredje vid pyntets dukar, mellan neonen och glaset (`pyntBilder` tar fram pyntet innan scenen byggs). Scenen är i fönstrets
+punkter (`F.k` per enhet i världen) och förminskas inte: Safari ritar ett lager i dess egen storlek gånger
+pixeltätheten, och förut, i världens mått, tog vart och ett av nio lager ungefär fem gånger så mycket minne som det
+syns i en telefon på höjden (2026-11-16). När storleken ändras skalas scenen om så länge (`passa`), tills den byggs
+om. Toningen in har inget eget lager när den är klar. Det som rör sig ritas i tre dukar: `rf-fram`
 överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
 bildpunkter. Förut var det 27 CSS-animeringar i egna lager (benen och armarna på SVG-barn, regnet i två band över hela
 bilden, bilarna, molnen): fasaden hade 35–38 lager, ungefär tio skärmytor som lades ihop 60 gånger i sekunden. Nu är
-det 5 lager i telefonen och 8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
+det 4–5 lager i telefonen och 6–8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
 arbete från ~300 till ~65–120 ms/s (headless Chrome, `?rum-kval=1`, regn på kvällen); på datorn är grafikprocessens tid
 ungefär som förut. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt
 (för bilder, med `?rum-t` står allt det som rör sig på den tiden).
