@@ -4,7 +4,7 @@
 // skyltfönstret, Stängt-skylten på dörrens glas, skivan med löpsedlarna i
 // fönstret, stationsuret och orakelramen med mässingsskylten på bakväggen,
 // cigarettpaketen uppe på högra väggen, ramarna kring skårtavlan och
-// korktavlan, bardisken med barstolarna och bladet
+// korktavlan, bardisken med barstolarna och gullrankan (rum-vaxter.js) och bladet
 // med radions stationer på väggen bredvid radion.
 //
 // Allt ritas med en och samma WebGL-duk utanför sidan och kopieras till en
@@ -36,6 +36,7 @@
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
 import { ROR as NEON_ROR } from './rum-neon.js';
+import { gullranka } from './rum-vaxter.js';
 
 const DEG = Math.PI / 180;
 const WZ = -26;
@@ -43,7 +44,10 @@ const WX = 1156;
 // djupet in längs högra väggen där x (i hörnets plan) ligger, som onWall i rum.js
 const wz = (x) => 1000 * (1 - 380 / (x - 760));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-const UR = { x: 1050, y: 152, r: 46 };
+// stationsuret: taket är y 90 och palmetten på ramen börjar vid y 287, så uret hänger med ungefär
+// lika mycket luft över sig som under (till 2026-11-16 y 152, med höljet bara 4 cm under taket); visitkortet
+// (.rum-kort i rum.css) sitter i luckan under det, till höger
+const UR = { x: 1050, y: 184, r: 46 };
 const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // det målade bandet på bakväggen, mellan taket och fönsterkarmen och lika brett
 // som fönstret (i bakväggens bild)
@@ -58,7 +62,7 @@ const LAPP = { x: 959.5, y: 503, w: 25.5, h: 45 };
 const BITAR = {
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
-  ur: { plan: 0, box: { x: 992, y: 94, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
+  ur: { plan: 0, box: { x: UR.x - 58, y: UR.y - 58, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
   ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
   hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 580 } },
   // skivan med löpsedlarna, kedjorna upp till karmen och skuggan på glaset;
@@ -763,6 +767,12 @@ export async function inredning(el, opt = {}) {
   // fronten X = 1115, golvet Y = −730 och ramarna 128,57 isär från bakväggen
   // (Z = 0) mot betraktaren.
   const DISK = { top: -490, kant: 1060, vagg: 1140, front: 1115, under: -501, golv: -730, ram: 128.57, fram: 850 };
+  // Gullrankan (rum-vaxter.js): mitt på disken, på det tomma stycket mellan datorn (z 235) och
+  // fruktlådan med kassetterna (från z 486), under korktavlan. Tuvan når 35 upp, så att den går fri
+  // från tavlans underkant (y 462 där, och tavlorna ligger över diskens duk) och dukens överkant
+  // (y 470). Revorna hänger över kanten bortom den tredje barstolen (z 343–417) och kryper längs
+  // skivan mot datorn och lådan utan att nå dem.
+  const RANKA = { x: 1098, z: 430 };
   function bardisk(b) {
     const { mesh } = b;
     const D = DISK;
@@ -834,6 +844,10 @@ export async function inredning(el, opt = {}) {
       mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(V(D.front - 2, -533, z), V(D.front - 11, -539, z), V(D.front - 10.5, -529, z)), 12, 0.9, 8), massing, b.scene);
       mesh(new THREE.SphereGeometry(1.25, 12, 8), massing, b.scene).position.set(D.front - 10.5, -529, z);
     }
+
+    // gullrankan: glaserad kruka och blanka blad, med färgen i hörnen
+    mesh(gullranka({ kant: RANKA.x - D.kant, rund: r, oga: { x: 760 - RANKA.x, y: -400 - D.top, z: 1000 - RANKA.z } }), mat('#ffffff', { vertexColors: true, roughness: 0.55, clearcoat: 0.2, clearcoatRoughness: 0.45, side: THREE.DoubleSide }), b.scene)
+      .position.set(RANKA.x, D.top, RANKA.z);
 
     // barstolarna: röd vinyl med söm på en krom ställning, som gängets, i
     // verklig storlek (sitsen 75 cm över golvet), inskjutna under kanten
