@@ -498,7 +498,10 @@ window.RumHasse = (() => {
     broRita(0);
   }
   // Duken över bandet där trafiken går (H.ute.broRam), i skärmens bildpunkter men högst 1,5 per punkt (allt är
-  // oskarpt), och rutornas glas som klippning: sätts när bilden ändras (passa).
+  // oskarpt), och rutornas glas som klippning: sätts när bilden ändras (passa). Oskärpan (H.ute.oskarpa, nästan som
+  // utsiktens) ligger på hela duken, så att den är lika stor längs hela bron; glaset klipper då ramen runt duken
+  // (.rh-bron), så att det oskarpa inte breder ut sig över posterna. Utan path() i clip-path klipps duken som förut.
+  const KLIPP_CSS = (() => { try { return CSS.supports('clip-path', 'path("M0 0 L1 0 L1 1 Z")'); } catch { return false; } })();
   function broDuk(v, b, f, lage) {
     const el = $('.rh-trafik');
     if (!el || !H.ute || !H.ute.broRam) return;
@@ -517,10 +520,18 @@ window.RumHasse = (() => {
     el.width = Math.ceil(w * res);
     el.height = Math.ceil(h * res);
     Object.assign(el.style, { left: `${X0}px`, top: `${Y0}px`, width: `${w}px`, height: `${h}px` });
-    const klipp = new Path2D();
-    for (const q of rutor) {
-      q.forEach(([x, y], i) => (i ? klipp.lineTo(x - X0, y - Y0) : klipp.moveTo(x - X0, y - Y0)));
-      klipp.closePath();
+    const sudd = H.ute.oskarpa ? H.ute.oskarpa(lage) * f : 0;
+    el.style.filter = sudd >= 0.3 ? `blur(${sudd.toFixed(2)}px)` : '';
+    let klipp = null;
+    if (KLIPP_CSS) {
+      const d = rutor.map((q) => `${q.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')} Z`).join(' ');
+      el.parentElement.style.clipPath = `path('${d}')`;
+    } else {
+      klipp = new Path2D();
+      for (const q of rutor) {
+        q.forEach(([x, y], i) => (i ? klipp.lineTo(x - X0, y - Y0) : klipp.moveTo(x - X0, y - Y0)));
+        klipp.closePath();
+      }
     }
     H.broDuk = { el, x: el.getContext('2d'), res, X0, Y0, tx, ty, f, klipp, tom: false };
   }
@@ -540,7 +551,7 @@ window.RumHasse = (() => {
     if (D.tom) return;
     x.save();
     x.setTransform(D.res, 0, 0, D.res, 0, 0);
-    x.clip(D.klipp);
+    if (D.klipp) x.clip(D.klipp);
     const r = D.res;
     const f = D.f;
     const ox = D.tx - D.X0;
