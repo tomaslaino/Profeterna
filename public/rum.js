@@ -2883,8 +2883,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function frame(dt = 1000 / 30) {
     const t = now();
     kamera(dt);
-    // (nära videon i telefonen syns inget av det här, lattVideo; och rummet ur skärpan står still, urFokus)
-    if (R.vlatt || R.stilla) return;
+    // (nära videon i telefonen syns inget av det här, lattVideo; rummet ur skärpan står still, urFokus;
+    // och bakom draperiet när videon är framme, R.vbak i zoomVideo)
+    if (R.vlatt || R.stilla || R.vbak === 'still') return;
     const on = neonOn(t);
     if (on !== R.neon) {
       R.neon = on;
@@ -2964,7 +2965,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // kameran i varje bildruta, utom när Chrome inte hinner med (i Safari
       // alltid: där kostar vridningen lite, och i gängets takt ryckte
       // rummet efter fingret och när kameran gled på plats efter en närbild)
-      const K = KVAL[R.kval];
+      // (glesare när videon är på väg hem, R.vbak i zoomVideo)
+      const K = R.vbak === 'gles' ? { ...KVAL[R.kval], takt: Math.min(KVAL[R.kval].takt, VBAK_TAKT) } : KVAL[R.kval];
       const bild = ms - R.last > 1000 / K.takt - 4;
       if (bild) {
         R.last = ms;
@@ -2976,8 +2978,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       gatan(ms);
       // (i Chrome räknas gängets bilder: huvudtråden väcks bara till dem, och till
-      // gatan medan något far förbi)
-      if (!TOMMA) {
+      // gatan medan något far förbi – men inte när de med flit är glesare)
+      if (R.vbak === 'gles') R.kannaSist = 0;
+      else if (!TOMMA) {
         if (raw) kanna(ms, raw);
       } else if (bild) {
         if (R.kannaSist) kanna(ms, ms - R.kannaSist);
@@ -4435,6 +4438,20 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     } else vridHem();
     if (!on) lattVideo(0);
     R.vnara = on;
+    // Rummet bakom draperiet står still medan videon är framme: gänget,
+    // sakerna i 3D, dammet och gatan ritas inte (frame), som bakom kupongen i
+    // handen (urFokus) och i telefonen (lattVideo). På vägen hem kommer det
+    // igång medan draperiet fortfarande är mörkt (så att ingen hoppar i bild),
+    // men glesare (VBAK_TAKT) tills hörnet har landat (lyftHornet). Utan det
+    // ritade grafikkortet hela rummet om i varje bildruta också bakom
+    // draperiet: i nästan hela skärmen (2240 × 1063) på en M1 föll 10–50 av
+    // 66 bildrutor bort när kameran stod still vid videon, 20–60 på vägen
+    // fram och 15–35 på vägen tillbaka; så här 0 nära och ungefär hälften så
+    // många på vägen.
+    // (en fast bild, ?rum-t, ritas som vanligt)
+    R.vbak = still() ? null : on ? 'still' : 'gles';
+    clearTimeout(R.vbakT);
+    if (!on) R.vbakT = setTimeout(() => { if (!R.vnara) R.vbak = null; }, GLID.ms + 900);
     if (on) lager('video', () => zoomVideo(false));
     else lagerUt('video');
     // hörnet ritas skarpt bara när rutan fyller bilden (tat i rum-video.js),
@@ -4474,7 +4491,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.lyftVag = null;
       R.lyftNu = { dx, dy, z };
       w.style.transform = kamT(dx, dy, z);
-      const landat = () => { if (hem && !R.vnara) R.el.classList.remove('vid-lyft'); };
+      const landat = () => {
+        if (!hem || R.vnara) return;
+        R.el.classList.remove('vid-lyft');
+        // (rummet bakom ritas som vanligt igen, R.vbak i zoomVideo)
+        clearTimeout(R.vbakT);
+        R.vbak = null;
+      };
       if (!cls) return landat();
       const a = (R.lyftVag = w.animate(zoomVag(fran, { dx, dy, z }), { duration: GLID.ms, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' }));
       a.finished.then(() => {
@@ -4525,10 +4548,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     lattVideo(f.fyll ? 2 : 1);
   }
-  // hur mycket närmare rummet går när videon kommer fram, och hur många
-  // gånger draperiet förstoras (.rum-vmork i rum.css)
+  // hur mycket närmare rummet går när videon kommer fram, hur många
+  // gånger draperiet förstoras (.rum-vmork i rum.css), och hur många bilder
+  // i sekunden gänget och sakerna ritas på vägen hem från videon (R.vbak)
   const VID_RUM = 1.25;
   const VMORK = 8;
+  const VBAK_TAKT = 10;
 
   // Nära videon med WebKit (i iPhone slut på minne annars): över 1 GB frigör
   // WebKit minne var trettionde sekund och ritar då om allt som syns, med

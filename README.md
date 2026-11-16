@@ -7992,6 +7992,25 @@ draperiet bort när kameran har stannat (`lattVideo`) i stället för att försv
 Inte provat i Safari eller iPhone. Nära tar bara hörnet emot klick, och ett klick utanför går
 tillbaka. Med `prefers-reduced-motion` och i fasta bilder står det direkt framme.
 
+**Rummet bakom står still** (2026-11-16, "när man zoomar ut så hackar det"). Eftersom hela rummet
+nu syns bakom draperiet och rör sig med (en fjärdedel närmare, och rakt), ritar grafikkortet om allt i
+varje bildruta på vägen fram och tillbaka – ungefär 34 miljoner bildpunkter per bildruta i 1440 × 820
+mot 18 när kameran förut gick in i hörnet och rummet låg utanför bilden – och på en M1 föll
+bildrutor bort just där hörnet krymper fortast. Nära ritades dessutom gänget, sakerna i 3D, dammet och
+gatan bakom draperiet hela tiden. Nu står de still medan videon är framme (`R.vbak`: `frame` ritar
+dem inte), som bakom kupongen i handen (`urFokus`) och i telefonen (`lattVideo`), och på vägen hem
+kommer de igång medan draperiet ännu är mörkt (så att ingen hoppar i bild) men ritas bara tio gånger
+i sekunden (`VBAK_TAKT`) tills hörnet har landat; kvalitetsvakten (`kanna`) räknar inte de glesa
+bilderna. Mätt med låst kvalitet (`?rum-kval=0`): i headless Chrome 1440 × 677 gick det nära från
+70–90 ms grafikarbete för 3D per sekund till inget, och på vägen hem ungefär 30 % mindre; i ett
+riktigt Chrome-fönster 1440 × 820 (med 3D:n stilla hela vägen) 4–12 → 0–4 tappade bildrutor på vägen
+fram och 0–2 → 0 på vägen hem, med andra sessioner igång. Provat och förkastat: att låta rummet stå
+helt still och bara vrida hörnet rakt (`varldar` utan hörnet) – det sparade en tredjedel av
+bildpunkterna, men gänget kom då i bild och ritades hela tiden, så det tappade fler bildrutor än förut.
+Att stänga av blandningslägena i ljuset under tiden gav inget mätbart. Mätfällor: ett Chrome-fönster
+som till största delen ligger utanför skärmen, eller en låst skärm, ritas inte – alla bildrutor
+räknas då som tappade; mät varianter om vartannat i samma flik (två flikar gav skeva siffror).
+
 Hörnet ritas i sex gånger storleken och förminskas, som tv:n, och dubbelt till (`zoom: 2`)
 när rutan fyller bilden (det andra klicket), så att det är skarpt också där; ritningarna är
 bara så stora som tv:n och lådan, så att lagren inte blir större än de behöver. På håll och
