@@ -8007,9 +8007,10 @@ samma färger som det syns snett från höger (`.platt`, `ladaYtor`), och kasset
 bara med när de lyfts eller när man pekar på dem.
 
 **Fram ur rummet** (2026-11-16, "som att TV:n närmar sig skärmen och inte tvärtom", som datorn).
-När man går till videon står rummet nästan still: det går en fjärdedel närmare och halvvägs mot
-hörnet, som mot datorn, och mörknar bakom ett draperi (`#rum-vmork`, ljusast mitt i fönstret som
-`.reg-bak` vid datorn). Tv:n och lådan lyfts i stället ur rummet och kommer fram mot en på 0,6
+När man går till videon står rummet still och mörknar bakom ett draperi (`#rum-vmork`, ljusast
+mitt i fönstret som `.reg-bak` vid datorn); till kvällen 2026-11-16 gick det också en fjärdedel
+närmare och halvvägs mot hörnet, som mot datorn, och vreds rakt (se *Rummet bakom står still*).
+Tv:n och lådan lyfts i stället ur rummet och kommer fram mot en på 0,6
 sekunder, medan de vänder sig 90 grader (`VRID`) tills man ser deras framsidor rakt framifrån
 (`SVANG.nara`, med ögat – perspektivets mitt i hörnet – rakt framför dem); närmare rutan kommer tv:n
 ännu närmare, rakt framför rutan (`SVANG.tat`), tills bilden fyller fönstret. Förstoringen ändras lika
@@ -8021,10 +8022,11 @@ runt tv:n ritades i hörnet), och gänget for förbi i förgrunden.
 Rummets värld är därför tre lager i djupets ordning (`build` i rum.js): bakväggen (planet -600),
 videohörnet (-598, i `#rum-lyft`) och resten (-470 till 0). De ligger i var sin 3D-värld som ritas
 i den ordningen, så hemma ser det ut som förut, och musens vridning sätts på alla tre samtidigt
-(`varldar` och `stil` i `setCam`, `folj` och `vrid`; `H.world` i rum-hasse.js). Planen räknas i
+(`varldar` och `stil` i `setCam`, `folj` och `vrid`; `H.world` i rum-hasse.js) – utom medan hörnet
+är lyft (`R.lyftRak`, `rakHorn`): då vrids bara dess värld rakt och tillbaka. Planen räknas i
 samma ordning som förut (`.rum-world > .rum-pl`). När man går till videon läggs `#rum-lyft` och
 draperiet över resten (`.vid-lyft`), och `#rum-lyft` får en egen förstoring inne i kameran (`lyftHornet`; förut `lyft`, som tog över tidningens funktion med samma namn så att Helgarderat inte gick att öppna, rättat 2026-11-16):
-kameran gör rummets lilla förflyttning och `#rum-lyft` resten. Inget i hörnet flyttas i sidan –
+kameran står kvar hemma och `#rum-lyft` gör hela vägen. Inget i hörnet flyttas i sidan –
 YouTubes spelare laddas om när den flyttas, och ett pausat klipp ska spela vidare när man kommer
 tillbaka. `.vid-lyft` tas bort först när hörnet har landat. Hörnets läge läses inte av med
 `getComputedStyle` utom mitt på vägen (`R.lyftNu`): det räknade om stilen inne i klicket, och som
@@ -8036,24 +8038,33 @@ draperiet bort när kameran har stannat (`lattVideo`) i stället för att försv
 Inte provat i Safari eller iPhone. Nära tar bara hörnet emot klick, och ett klick utanför går
 tillbaka. Med `prefers-reduced-motion` och i fasta bilder står det direkt framme.
 
-**Rummet bakom står still** (2026-11-16, "när man zoomar ut så hackar det"). Eftersom hela rummet
-nu syns bakom draperiet och rör sig med (en fjärdedel närmare, och rakt), ritar grafikkortet om allt i
-varje bildruta på vägen fram och tillbaka – ungefär 34 miljoner bildpunkter per bildruta i 1440 × 820
-mot 18 när kameran förut gick in i hörnet och rummet låg utanför bilden – och på en M1 föll
-bildrutor bort just där hörnet krymper fortast. Nära ritades dessutom gänget, sakerna i 3D, dammet och
-gatan bakom draperiet hela tiden. Nu står de still medan videon är framme (`R.vbak`: `frame` ritar
-dem inte), som bakom kupongen i handen (`urFokus`) och i telefonen (`lattVideo`), och på vägen hem
-kommer de igång medan draperiet ännu är mörkt (så att ingen hoppar i bild) men ritas bara tio gånger
-i sekunden (`VBAK_TAKT`) tills hörnet har landat; kvalitetsvakten (`kanna`) räknar inte de glesa
-bilderna. Mätt med låst kvalitet (`?rum-kval=0`): i headless Chrome 1440 × 677 gick det nära från
-70–90 ms grafikarbete för 3D per sekund till inget, och på vägen hem ungefär 30 % mindre; i ett
-riktigt Chrome-fönster 1440 × 820 (med 3D:n stilla hela vägen) 4–12 → 0–4 tappade bildrutor på vägen
-fram och 0–2 → 0 på vägen hem, med andra sessioner igång. Provat och förkastat: att låta rummet stå
-helt still och bara vrida hörnet rakt (`varldar` utan hörnet) – det sparade en tredjedel av
-bildpunkterna, men gänget kom då i bild och ritades hela tiden, så det tappade fler bildrutor än förut.
-Att stänga av blandningslägena i ljuset under tiden gav inget mätbart. Mätfällor: ett Chrome-fönster
-som till största delen ligger utanför skärmen, eller en låst skärm, ritas inte – alla bildrutor
-räknas då som tappade; mät varianter om vartannat i samma flik (två flikar gav skeva siffror).
+**Rummet bakom står still** (2026-11-16, "när man zoomar ut så hackar det"). När hela rummet syntes
+bakom draperiet och rörde sig med (en fjärdedel närmare, och vridet rakt och tillbaka mot musen),
+ritade grafikkortet om allt i varje bildruta på vägen fram och tillbaka – ungefär 34 miljoner
+bildpunkter per bildruta i 1440 × 820, mot 18 när kameran förut gick in i hörnet och rummet låg
+utanför bilden – och på en M1 föll bildrutor bort just där hörnet krymper fortast. Nära ritades
+dessutom gänget, sakerna i 3D, dammet och gatan bakom draperiet hela tiden. Nu:
+- **Rummet står kvar** som det står (`rakHorn`): det går inte närmare, vrids inte rakt och följer inte
+  musen (`kamera`) förrän hörnet har landat. Bara hörnets värld (`R.varldar[1]`) vrids rakt mot en med
+  `.rak` och tillbaka till rummets vinkel, och när den har landat vrids den med rummet igen
+  (`rakKlar`; en annan närbild under tiden flyttar landningen dit, `rakMal`). Bildutsnittet nära och
+  vid rutan är detsamma som förut.
+- **3D:n står still** medan videon är framme (`R.vbak`: `frame` ritar den inte), som bakom kupongen i
+  handen (`urFokus`) och i telefonen (`lattVideo`). På vägen hem kommer den igång medan draperiet ännu
+  är mörkt (så att ingen hoppar till en ny pose i bild) men ritas bara tio gånger i sekunden
+  (`VBAK_TAKT`) tills hörnet har landat; kvalitetsvakten (`kanna`) räknar inte de glesa bilderna.
+
+Mätt med låst kvalitet (`?rum-kval=0`). 3D:n stilla: i headless Chrome 1440 × 677 gick 3D-arbetet nära
+från 70–90 ms per sekund till inget och på vägen hem ungefär 30 % ned; i ett riktigt Chrome-fönster
+1440 × 820 (med 3D:n stilla hela vägen) 4–12 → 0–4 tappade bildrutor fram och 0–2 → 0 hem, med andra
+sessioner igång. Rummet stilla: 34 → 24 miljoner bildpunkter per bildruta på vägen hem, och utan
+den stilla 3D:n tappade det ändå fler bildrutor än förut (gänget kom i bild och ritades hela tiden) –
+därför båda. Nära ritade Chrome (headless) 3 bildrutor på 0,9 s mot 53. Båda tillsammans är inte
+mätta i ett riktigt fönster (skärmen var låst). Att stänga av blandningslägena i ljuset under tiden
+gav inget mätbart. Mätfällor: ett Chrome-fönster som till största delen ligger utanför skärmen, eller
+en låst skärm, ritas inte – alla bildrutor räknas då som tappade, också i vila; headless ritar bara när
+något ändras och duger inte till tappade bildrutor; mät varianter om vartannat i samma flik (två
+flikar gav skeva siffror).
 
 Hörnet ritas i sex gånger storleken och förminskas, som tv:n, och dubbelt till (`zoom: 2`)
 när rutan fyller bilden (det andra klicket), så att det är skarpt också där; ritningarna är
