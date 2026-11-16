@@ -8772,7 +8772,14 @@ direkt. På disken är kupongen hopklämd av perspektivet, som notan, och det ä
 
 **Armarna och händerna.** Ärmen har fotots bredd på överarmen, där den möter kavajen där armarna satt,
 och smalnar sedan av från armbågen mot ärmslutet som en kavajärm (`BREDD` i
-[public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Armbågen är en tät böj: på insidan trycks tyget
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Axlarna är fotots: ärmens översta del, till ungefär
+axelleden, syns inte (`ARM_F`), så att det är fotots axel som syns (på hans vänstra med ärmhuvudet och sömmen)
+och ärmen kommer fram under den. Den högra ärmen sitter fast 48 bildpunkter innanför axelleden som armbågen
+räknas från (`SA_SYN` och `SA` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)), så att ärmens ytterkant
+fortsätter fotots kant nedanför axeln; armbågarna och händerna ligger där de låg. Förut tonade ärmen in från
+toppen, 88 enheter ovanför leden, och dess rundade topp stack upp som en kula ovanpå fotots axel, och den
+högra ärmen satt fast på fotots kant, så att halva ärmen hängde utanför och axeln blev bred och fyrkantig
+som en axelvadd (ändrat 2026-11-16). Armbågen är en tät böj: på insidan trycks tyget
 ihop och lägger sig i veck som skuggar sig själva, och överarmens och underarmens tyg stannar var på sin
 sida om armbågens mittplan, så att inget går igenom det andra; normalerna räknas ur formen, så att vecken
 syns i ljuset. Mot ärmslutet blir ärmen platt som handleden, med handflatan åt den platta sidan, och
@@ -9029,6 +9036,14 @@ kaffet, spelade som repliker med gester, där bilden ryckte till vid varje slag 
 spelades. Ljuden är framräknade i en `OfflineAudioContext` och mätta (toppar 0,44–0,55 för slagen,
 0,24 för klirret), men inte lyssnade på, och inte provade i Safari eller på en riktig telefon.
 Samtalet med en riktig analys är inte provat (ingen kupong i provet), bara genomläst.
+
+Axlarna (2026-11-16) är provade i headless Chromium med mjukvarugrafik: figuren ensam i vilan, skrattet (T 3,5),
+klunken (T 23) och `axla` (T 352), före och efter, med närbilder av båda axlarna och av ärmen och kroppen var för
+sig; cigarren vid munnen (T 176,5–183) bild för bild mot main; tolv andra ställen på tidslinjen (slagen, kaffet,
+`halsa`, cigarren) mot main; och hela sidan med `?rum-hasse` i 1440 × 900 med minskad rörelse. Två försök föll
+bort: hela axelleden flyttad in gav andra armbågar i klippen, och en kortare ärm (`TOPP` 30) gav en solfjäder i
+armbågens böj med cigarren vid munnen. Handen på pulten i rummet är oförändrad (samma vila). Inte provat i Safari
+eller på en riktig telefon.
 
 Armarna, händerna och munnen (2026-11-06) är provade i headless Chrome med mjukvarugrafik, i hela sidan med
 `?rum-hasse` (byggd utan att hämta något, så utan kupong) och figuren frusen på tidslinjen: alla 34

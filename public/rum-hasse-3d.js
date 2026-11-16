@@ -1600,7 +1600,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return box;
   }
   // ---------- rörelserna ----------
+  // (axlarna: AXEL i rum-hasse-arm.js) Armbågen räknas från SA, men den högra ärmen sitter fast i SA_SYN, 48
+  // bildpunkter längre in, så att ärmens ytterkant fortsätter fotots kant nedanför axeln. När ärmen satt fast i
+  // SA, på fotots kant, hängde halva ärmen utanför fotots axel, och axeln blev bred och fyrkantig som en axelvadd
+  // (ändrat 2026-11-16). Armbågarna i klippen är desamma som förut: med hela axeln flyttad in blev de andra.
   const SA = W_(352, 792, -52);
+  const SA_SYN = W_(400, 792, -52);
   const SB = W_(987, 800, 8);
   const LA = ARM.LA;
   const LB = ARM.LB;
@@ -3736,6 +3741,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const HOFT = new THREE.Vector3(0, -413, 60);
   const h1 = v();
   const sa = v();
+  const saSyn = v();
   const sb = v();
 
   // Handens form i ett klipp (fA, fB): fingrarna isär (spar), tummen ut (tumme), och e0–e8 som extra
@@ -5534,6 +5540,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     sa.y += axV;
     sa.x -= axV * 0.25;
     sa.applyMatrix4(mk);
+    saSyn.copy(SA_SYN);
+    saSyn.y += axV;
+    saSyn.x -= axV * 0.25;
+    saSyn.applyMatrix4(mk);
     sb.copy(SB);
     sb.y += axH;
     sb.x += axH * 0.25;
@@ -5624,9 +5634,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // (fingrarna samlade och tummen i vilan, utom när handen tar något och när han skrattar)
     const vA = (1 - isar) * (1 - bortA);
     const vB = (1 - isar) * (1 - bortB);
-    if (fA) A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, spar(fA.spar, t), spar(fA.tumme, t), handForm(fA, t, exA));
-    else A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar + SAMLA.A * vA, TUMME + (TUMME_VILA.A - TUMME) * vA, trumA);
-    U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
+    if (fA) A.satt(saSyn, E_, Wr_, a.F, a.P, a.krok, a.peka, spar(fA.spar, t), spar(fA.tumme, t), handForm(fA, t, exA));
+    else A.satt(saSyn, E_, Wr_, a.F, a.P, a.krok, a.peka, isar + SAMLA.A * vA, TUMME + (TUMME_VILA.A - TUMME) * vA, trumA);
+    U.uArm.value[0].copy(saSyn); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
     bekvam(sb, b, -1, VILA_B[0], styrB, t, MINNE.B, E_, Wr_);
     if (fB) B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, spar(fB.spar, t), spar(fB.tumme, t), handForm(fB, t, exB));
     else B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8 + SAMLA.B * vB, TUMME + (TUMME_VILA.B - TUMME) * vB, trumB);
