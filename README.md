@@ -6847,9 +6847,14 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   2026-11-16: bilar som fanns på nittiotalet, inte bara de som tillverkades då): Volvo Amazon med kromlisten från
   strålkastaren, PV:n med puckelryggen, 144:an, Saab 96 och 99, Bubblan och Ankan med skärmarna för sig (Ankan med
   tygtak, räfflad huv och kjol över bakhjulet), Mercedes 123 (ibland taxi), Lada Niva och Minin, ibland med vitt tak,
-  de flesta med kromade stötfångare och i sin tids färger), ritade efter de riktiga måtten (längd, hjulbas, höjd) med
-  backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke, skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller
-  med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
+  de flesta med kromade stötfångare och i sin tids färger. Fler samma dag ("fler bilar som fanns på 90-talet i
+  Sthlm"): Volvo 440 med den höga bakdelen, 480:n med glasbakluckan och de uppfällda strålkastarna, Mercedes 190,
+  Audi 100, Passat-kombin (för alla de mellanstora kombibilarna), Citroën BX med kjol över bakhjulet, Jeep Cherokee,
+  Chrysler Voyager (ibland storbilstaxi), Saab 900 cabriolet med tygtak – och taket nere när det är minst 18 grader och
+  torrt, med dem som åker synliga – och bland de äldre Volvo 145, Lada 2105/2107 och 2104 i kombi, och amerikanaren
+  med fenor, vita däcksidor och ibland vitt tak, bara när det är minst 15 grader och torrt), ritade efter de riktiga
+  måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke,
+  skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
   gånger så fort som de som går på skärmen, så att en bil syns i ungefär tre sekunder (förut knappt två).
