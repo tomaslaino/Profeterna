@@ -2944,8 +2944,10 @@ window.RumHasse = (() => {
     // (ibland med ditt namn, men inte i raden om var han kom, som han säger till er alla)
     const medNamn = e.namn && e.namn[g.lage];
     const sagt = [];
-    // (en stund att läsa hur många rätt han hade, innan poängen kommer)
-    if (g.ok != null) sagt.push({ text: fyll(e.ratt, { ratt: REP().tal[g.ok], av: REP().tal[g.n] }), paus: 1500 });
+    // (en stund att läsa hur många rätt han hade, innan poängen kommer; lottat, med egna rader för alla rätt och
+    // inga rätt från två matcher, och en äldre rum-hasse-repliker.js i cachen har en enda rad)
+    const omRatt = (g.n >= 2 && g.ok === g.n && e.rattAlla) || (g.n >= 2 && g.ok === 0 && e.rattNoll) || e.ratt;
+    if (g.ok != null) sagt.push({ text: fyll(Array.isArray(omRatt) ? lott(omRatt) : omRatt, { ratt: REP().tal[g.ok], av: REP().tal[g.n] }), paus: 1500 });
     sagt.push({ text: (!plats && tilltal(medNamn, 0.3)) || lott(plats || rader) });
     repliker(sagt, { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest(EFTER_GEST[g.lage]) });
     // och efter en stund: det exakta resultatet, om han sa något, och mer om hur det gick (lottat när det sägs)

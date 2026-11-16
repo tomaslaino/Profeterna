@@ -463,8 +463,46 @@
   // går det bra hade han rätt, och går det dåligt var det matcherna som hade fel. Först säger han ratt,
   // och sedan en rad ur listan för hur det gick. Efter en stund säger han fler rader ur samma lista.
   // Varje rad ska också gå att förstå ensam, och den ska kunna följa efter "Jag hade två rätt av sex."
+  // Raden om hur många rätt han hade lottas (Tomas 2026-11-16: "Han säger det här varje gång"), torrt som en
+  // tränare på presskonferens: den ska passa lika bra efter en bra som en dålig omgång, och alla rätt och inga rätt
+  // har egna rader (rattAlla och rattNoll, med {av} som enda tal; gäller från två matcher). Varje rad ryms på två
+  // rader ovanför listan med de längsta talen.
   efter: {
-    ratt: 'Jag hade {ratt} rätt av {av}.',
+    ratt: [
+      'Jag hade {ratt} rätt av {av}.',
+      'Jag fick ihop {ratt} rätt av {av}.',
+      'Det blev {ratt} rätt av {av}. Så är det bara.',
+      'Rent krasst blev det {ratt} rätt av {av}.',
+      'Resultatmässigt blev det {ratt} rätt av {av}.',
+      'Summa summarum blev det {ratt} rätt av {av}.',
+      'Jag kan konstatera att det blev {ratt} rätt av {av}.',
+      'Facit säger {ratt} rätt av {av}, om man tror på det.',
+      'I protokollet står det {ratt} rätt av {av}.',
+      'Jag går rakt på sak. Det blev {ratt} rätt av {av}.',
+      'När röken har lagt sig står det {ratt} rätt av {av}.',
+      'Min organisation gav {ratt} rätt av {av}.',
+      'Jag räknade två gånger och fick {ratt} rätt av {av}.',
+      'Det blev {ratt} rätt av {av}. Jag ångrar ingenting.',
+    ],
+    rattAlla: [
+      'Jag hade {av} rätt av {av}.',
+      'Det blev fullt hus, {av} rätt av {av}.',
+      'Det blev {av} rätt av {av}. Så ska det se ut.',
+      'Summa summarum blev det fullt hus.',
+      'Rent krasst blev det {av} rätt av {av}.',
+      'Jag hade {av} rätt av {av}. Ingen är förvånad.',
+      'Jag kan konstatera att det blev {av} rätt av {av}.',
+      'När röken har lagt sig står det {av} rätt av {av}.',
+    ],
+    rattNoll: [
+      'Jag hade noll rätt av {av}.',
+      'Det blev noll rätt av {av}. Så är det bara.',
+      'Rent krasst blev det inte ett enda rätt.',
+      'Resultatmässigt blev det noll rätt av {av}.',
+      'I protokollet står det en rund nolla.',
+      'Jag går rakt på sak. Det blev noll rätt av {av}.',
+      'När röken har lagt sig står det noll rätt av {av}.',
+    ],
     // Allt satt.
     alla: [
       'Så här ska en kupong se ut.',
@@ -520,6 +558,9 @@
       'Lagen följde mina instruktioner rätt bra.',
       'Jag hade rätt oftare än spelbolagen trodde.',
       'Felen var få och väl valda.',
+      'Det här var en omgång att bygga vidare på.',
+      'Strukturen höll hela vägen.',
+      'Jag är inte nöjd, men jag är inte missnöjd heller.',
     ],
     // Ungefär som chanserna var värda.
     mitten: [
@@ -548,6 +589,9 @@
       'Jag lämnade lite åt slumpen, av vänlighet.',
       'Facit och jag möttes på halva vägen.',
       'Några matcher slutade fel, men jag vet varför.',
+      'Jag får analysera det här i lugn och ro.',
+      'Det finns saker att ta med sig och saker att lämna.',
+      'Det är fotboll, och fotboll är inte alltid rättvis.',
     ],
     // Färre rätt än chanserna var värda.
     daligt: [
@@ -586,6 +630,9 @@
       'Det var inte mina tips som förlorade, det var lagen.',
       'Spelarna gjorde sitt bästa för att jag skulle ha fel.',
       'Spelarna har en tung måndag framför sig.',
+      'Jag tar med mig det positiva och glömmer resten.',
+      'Nu nollställer jag och tar nästa omgång.',
+      'Det är bara att resa sig och gå vidare.',
     ],
     // Inget satt.
     inget: [
