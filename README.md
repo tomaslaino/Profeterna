@@ -1270,6 +1270,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   högra väggen. Närbilderna ser ut som förut: datorns skärm får samma ljus framför kameran, och kameran går i
   en båge runt skärmen dit, så att den inte far förbi datorns sida; videon ses som förut men mer rakt
   framifrån, så att etiketterna läses lättare. Se [Datorn](#datorn) och [Videon](#videon).
+- **Affären utifrån (2026-11-16, användarens önskemål):** "Kan du ordna så att man ser baren lite utifrån om man
+  trycker på 'matchfixarna' på dörren", med ett foto av Bron vid S:t Eriksbron utifrån: "Gör det enkelt och snyggt och vi
+  ska synas där i fönstret - vagt vast med samma inredning etc.", "Tänk på allt som händer ute" och "Du kan zooma in
+  lite mer än på den bilden". Närbilden av dörren är borta; namnet tar en ut på trottoaren, framför det laxrosa huset med
+  skylten MATCHFIXARNA, och genom skyltfönstret syns gänget bakifrån, ritat av samma 3D-scen som inne, i samma ljus,
+  väder och trafik som utsikten. Se [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4242,9 +4248,9 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
-uret, löpsedlarna i fönstret och namnet på dörren tittar man på nära (se
-[Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
-kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
+uret och löpsedlarna i fönstret tittar man på nära (se
+[Närbilderna](#närbilderna)), namnet på dörren tar en ut på trottoaren (se [Fasaden](#fasaden)), och
+tv:n, videon, anslagstavlan, kortregistret och kupongen kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
 Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchbladet mitt i rummet
 (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)):
 
@@ -4339,11 +4345,11 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   lådan står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
   Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
   zoomar ut.
-- **Namnet på dörren** (längst till vänster, under Stängt-skylten) → närbild av dörrens övre
-  del: *Matchfixarna*
+- **Namnet på dörren** (längst till vänster, under Stängt-skylten): *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
-  inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
+  inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet. Ett klick
+  → ut genom dörren, och affären utifrån med gänget i fönstret (se [Fasaden](#fasaden)).
 
 Högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
 pokalhyllan mellan tv:n och datorn på disken (där hängde anslagstavlan till 2026-11-14), i mitten
@@ -6465,7 +6471,7 @@ på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
 [public/rum-ute.css](public/rum-ute.css) för det som rör sig; de som går förbi, löven,
 fåglarna och flaggan ritas i små dukar (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
 Utan nätet är det mulet och månadens vanliga temperatur. Samma himmel och väder syns genom glaset bakom Hasse
-Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)).
+Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren framför affären (se [Fasaden](#fasaden)).
 
 - **Utsikten från Bron (2026-11-10, användarens önskemål):** som från baren Bron, där S:t Eriksgatan går upp på
   S:t Eriksbron. På andra sidan gatan går brons gröna räcke, med en trappa ned i vänstra rutan och en stenpelare där
@@ -6534,6 +6540,51 @@ Utsikten ligger bakom väggen i det bakersta planet och syns genom hålen i den 
 förbi syns först i dörren och sedan i fönstret. Bara de lager vars ljus eller väder har
 ändrats ritas om (`RumUte.paint`), och det som rör sig har bara transform och opacity.
 Med `prefers-reduced-motion` står gatan still och ingen går förbi.
+
+### Fasaden
+
+**Affären utifrån (2026-11-16, användarens önskemål):** ett klick på namnet på dörren och man går ut genom
+dörren och ser tobaksaffären från trottoaren, där baren Bron ligger vid S:t Eriksbron ([public/rum-fasad.js](public/rum-fasad.js),
+[public/rum-fasad.css](public/rum-fasad.css)). Efter användarens foto av Bron utifrån, men närmare: det laxrosa huset med
+ljusa fönsteromfattningar och franska balkonger, den ljusa bottenvåningen med fogar, gesimsen emellan och kedjestenarna på
+hörnet, porten med överljusfönster, en vägglykta och barberarens stång längst till vänster. Över skyltfönstret och dörren
+skylten MATCHFIXARNA i benvitt på mörkt med en tunn guldlinje (sajtens färger och Fraunces) under två lampor på
+svanhalsar, och gatuskylten *S:t Eriksgatan* på hörnet. Till höger om huset börjar bron: stenpelaren, det gröna räcket
+med en cykel mot det, parkeringsförbudet och en gatlykta, och bortom räcket slänten ned mot spåren, trädtopparna,
+kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två lyftkranar, under himlen.
+
+- **Gänget i fönstret:** genom skyltfönstret syns vi vagt, bakifrån, vid barbordet – inte en ritning utan samma 3D-scen
+  som inne (`utifran` i rum-3d.js): en kamera ute på trottoaren i ögonhöjd ser vinkelrätt in genom glaset (`FONSTER`, en
+  ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och rutan kopieras till fasadens duk i
+  samma uppgift som den ritas. Därför är det samma kläder, frisyrer, mössor, flaskor, radion och ampelliljan som inne, och
+  de rör sig: duken ritas om några gånger i sekunden (ungefär 9 i datorn, 4 i telefonen, en gång i en fast bild). De sover
+  på natten och festar i julkläder som inne. Neonen bakom dem lyser mindre på ryggarna än inifrån på ansiktena. Bakom
+  dem rummet, mjukt och ur skärpa: lysröret i taket, hyllan med cigarettpaketen, bardisken, tv:ns blå sken och Tipsligan
+  på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren. Framför dem neonskylten *Tobak*,
+  som läses rätt härifrån och glappar samtidigt som inne (`neonOn`), och skivan med löpsedlarna med baksidan ut.
+- **Dörren:** guldet på glaset står rättvänt (*Matchfixarna*, TOBAK & SPEL, *Öppet till spelstoppet*), och skylten på
+  sugproppen säger ÖPPET på den här sidan – STÄNGT är sidan inåt.
+- **Samma ljus och väder som inifrån:** himlen, solen, månen, stjärnorna och molnen, putsen och stenen i dagsljus,
+  skymning och mörker (`RumUte.light` och `RumUte.farg.facade`), tända fönster efter klockan och adventsljusstakar och
+  stjärnor i advent, regn, duggregn, snö, dimma och blixtar, droppar på glaset, frost i hörnen när det är kallare än
+  −3°, snö på blecken, skylten, lamporna och räcket och trampad snö på trottoaren, våt sten som speglar affärens ljus,
+  höstlöv och trädens färger efter årstiden, måsar, kråkor och fyrverkerier på nyår. På dagen speglar glaset himlen och
+  rummet syns svagare; på kvällen lyser fönstret ut på trottoaren, lamporna tänds på skylten, vid porten och på bron,
+  och när lysröret är släckt på natten (`RumFolk.nattGrad`) är rummet mörkt utom neonen och tv:n.
+- **Det som händer ute:** de som går förbi på trottoaren framför affären, lika många som på gatan inifrån
+  (`RumUte.trafik`), klädda efter vädret, med paraply i regn, mössa och halsduk i kyla, väska och ibland hund. Bilarna
+  och bussarna på gatan bakom en syns som speglingar som far förbi i glaset: mörka skuggor på dagen, strålkastare och
+  baklyktor i mörkret.
+
+Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
+bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
+som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som hos Hasse Backe)
+och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden utifrån; medan rummet syns i
+övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
+den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
+bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
+ritas om när ljuset eller vädret ändras (en gång i minuten prövas det), och det som rör sig har bara transform och
+opacity. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt (för bilder).
 
 ### Kupongen i handen
 
@@ -9565,8 +9616,8 @@ Actions. Notiserna (*Så mår tipslagen*, `data/tidning.json`) är inte skrivna 
 
 ### Närbilderna
 
-Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
-Nacional 1988, VM 94 och Chelsea 1998 på skivan; veckans löpsedel hänger hos Hasse Backe) och namnet på dörren
+Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan och löpsedlarna i fönstret (IFK 1982,
+Nacional 1988, VM 94 och Chelsea 1998 på skivan; veckans löpsedel hänger hos Hasse Backe)
 tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
@@ -9576,8 +9627,8 @@ telefonen också. Rummet vrids rakt medan kameran glider fram och står
 sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
 dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
 vid barbordet och pulten – tonar bort medan kameran går förbi (inte när saken ligger på
-pulten), och vid pokalhyllan tv:n. Dörren siktar kameran på en osynlig ruta över dörrens övre
-del (`#rum-dorrglas`), så att Stängt-skylten och namnet kommer med. Uret,
+pulten), och vid pokalhyllan tv:n. (Namnet på dörren hade en närbild till 2026-11-16; nu leder det ut, se
+[Fasaden](#fasaden).) Uret,
 orakelramen och ramarna kring skårtavlan och korktavlan är ritade i 3D och ritas om i närbildens skala när
 kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet), och
 de står kvar i den skalan tills kameran är tillbaka (`oskarp` i rum.js): i början av vägen tillbaka är
@@ -9596,7 +9647,8 @@ och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistr
 pekar på dem på nära håll, och inte heller på vägen tillbaka förrän musen eller tangenterna används
 (`.sak-hem`, `hemUtanSken`): ljuset är ett filter, som räknades om på den växande eller krympande saken i
 varje bildruta, och saken under musen tändes medan den krympte. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong|radio` visar en närbild i en fast bild (med `?rum-t`).
+`?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|kupong|radio` visar en närbild i en fast bild (med `?rum-t`);
+`?rum-fasad` (eller `?rum-sak=dorr`) visar affären utifrån.
 
 ### Bakåt
 
@@ -9604,7 +9656,7 @@ Bakåtgesten i telefonen och bakåtknappen i datorn lägger bort det översta so
 i rummet ([public/rum-bak.js](public/rum-bak.js)). Lagren, från det översta: spelarkortet, matchbladet,
 Hasses svar om en lapp, en lapp på anslagstavlan eller ett kort i registret, kupongen i handen (också
 hos Hasse), rutan i hela fönstret på videon, och sist tv:n, videon, en närbild, anslagstavlan,
-kortregistret, tidningen eller Hasses vy. Med inget framme lämnar bakåt sajten, som vanligt.
+kortregistret, tidningen, fasaden eller Hasses vy. Med inget framme lämnar bakåt sajten, som vanligt.
 
 Varje lager har en osynlig rad i webbläsarens historik: samma adress, med antalet lager i
 `history.state.rum`. Bakåt ger `popstate`, och det som ligger över raden man kom till läggs bort, samma
