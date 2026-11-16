@@ -6648,6 +6648,24 @@ vänstra del 82 → 95; klockan 21.30 taket 37 → 62, lysröret 55 → 114 och 
 och högra väggen är som förut. Provat också som 1920 × 1080 och 1024 × 768, med musen i ytterlägena, på natten
 (klockan 2) och i telefonen (412 × 870) dragen åt vänster; bygget med `--minify` ger samma bild.
 
+### Takfläkten i bakgrunden (2026-11-16)
+
+Användarens önskemål: "Kan du ordna så att fläktlampan i taket på animationssidan blir mindre prominent. Just nu tar
+den mkt fokus." Takfläkten (`flakt` i rum-inredning.js, i stället för lysröret) hade kupor i nästan vitt glas med ett
+starkt sken kring sig – det ljusaste i rummets överkant, mitt ovanför gänget – och i telefonen på höjden syntes stora
+blad med ljusa rottingfält. Nu lyser den på bordet utan att dra blicken till sig:
+
+- **Mindre:** fyra femtedelar så stor, krympt kring fästet i taket (`FLAKT.S`), så att kuporna hänger högre över
+  Stryktipset-bandet. Det som lyser (`LAMP.lyser`) följer med.
+- **Dämpat glas:** kuporna i varmt, beigt glas i stället för vitt (`GLAS.pa`) och skenet kring dem i deras duk
+  (`medSkenet`) ungefär hälften så starkt.
+- **Mörkare blad:** mahognyn mörkare, rottingfälten mörkare och mindre lack, och ljuset under fläkten svagare.
+- **Mindre ljus i taket:** hålet i dunklet kring fläkten (`ljusKlockan` i rum.js) och den varma tonen på taket runt
+  den är svagare.
+
+Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som dator (1440 × 900) klockan
+14 och 21.30 och som telefon (412 × 870).
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
