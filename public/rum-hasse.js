@@ -1969,6 +1969,21 @@ window.RumHasse = (() => {
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
     return g && g.namn ? Tippoang.kallas(g) : '';
   }
+  // Vad han kallar dig just nu: i nio fall av tio omgångens fel namn, samma som i domen (felNamn).
+  const kalla = (namn) => (namn && Math.random() < 0.9 ? felNamn(namn, omgangNu()) : namn);
+  // Ibland talar han till dig med namn när han säger hur det går (efter.namn och stallning.namn i
+  // rum-hasse-repliker.js, Tomas 2026-11-16): med chansen chans, när kupongen vet vem du är, och högst en gång på
+  // två minuter, så att det inte blir tjat. → raden med namnet, eller null (då tar man en vanlig rad)
+  const TILLTAL_MS = 120000;
+  function tilltal(lista, chans) {
+    if (!Array.isArray(lista) || !lista.length || Math.random() >= chans) return null;
+    const nu = performance.now();
+    if (H.tilltal && nu - H.tilltal < TILLTAL_MS) return null;
+    const namn = dittNamn();
+    if (!namn) return null;
+    H.tilltal = nu;
+    return fyll(lott(lista), { namn: kalla(namn) });
+  }
   // Vem i gänget enheten står på, eller null.
   function duId() {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
@@ -3162,8 +3177,8 @@ window.RumHasse = (() => {
       // (vad klockan är: strax före spelstopp alltid, annars ibland)
       const tid = hela && tidNu(oppna);
       if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
-      // (i nio fall av tio säger han fel namn: omgångens, samma som i domen, se felNamn)
-      const kallad = namn && Math.random() < 0.9 ? felNamn(namn, omgangNu()) : namn;
+      // (i nio fall av tio säger han fel namn: omgångens, samma som i domen, se kalla)
+      const kallad = kalla(namn);
       if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
       // (är kupongen full av landskamper säger han det ibland)
       if (r.land && oppna.filter((m) => landskamp(m.id)).length >= 3 && Math.random() < 0.35) return lott(r.land.oppning);
@@ -3245,14 +3260,16 @@ window.RumHasse = (() => {
     upptagen(g.lage === 'inget' ? 'inget' : g.plats === 'worst' ? 'sist' : g.lage === 'daligt' ? 'daligt' : null);
     const rader = e[g.lage];
     const plats = g.plats === 'best' ? e.forst : g.plats === 'worst' ? e.sist : null;
+    // (ibland med ditt namn, men inte i raden om var han kom, som han säger till er alla)
+    const medNamn = e.namn && e.namn[g.lage];
     const sagt = [];
     // (en stund att läsa hur många rätt han hade, innan poängen kommer)
     if (g.ok != null) sagt.push({ text: fyll(e.ratt, { ratt: REP().tal[g.ok], av: REP().tal[g.n] }), paus: 1500 });
-    sagt.push({ text: lott(plats || rader) });
+    sagt.push({ text: (!plats && tilltal(medNamn, 0.3)) || lott(plats || rader) });
     repliker(sagt, { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest(EFTER_GEST[g.lage]) });
-    // och efter en stund: det exakta resultatet, om han sa något, och mer om hur det gick
+    // och efter en stund: det exakta resultatet, om han sa något, och mer om hur det gick (lottat när det sägs)
     const sedan = g.exakt ? [fyll(lott(e.exakt), { res: g.exakt })] : [];
-    for (let i = plats ? 4 : 3; i > 0; i--) sedan.push(lott(rader));
+    for (let i = plats ? 4 : 3; i > 0; i--) sedan.push(() => tilltal(medNamn, 0.25) || lott(rader));
     H.prat = { rader: sedan, i: 0, nasta: performance.now() + 20000, gang: 20000 };
   }
 
@@ -3352,7 +3369,9 @@ window.RumHasse = (() => {
     };
     // (är matchen slut säger han hur den slutade: Burnley vann med 2–0 mot Leeds)
     const stand = !x.live && S.vann && S.slutLika ? (lika ? S.slutLika : S.vann) : lika ? S.lika : S.leder;
-    return { lista: [{ text: fyll(lott(stand), o), paus: 1400 }, { text: lott(kommentar(x, lika)) }] };
+    // (medan matchen pågår ibland med ditt namn)
+    const namn = x.live && S.namn ? tilltal(S.namn[x.pa ? 'haller' : 'emot'], 0.2) : null;
+    return { lista: [{ text: fyll(lott(stand), o), paus: 1400 }, { text: namn || lott(kommentar(x, lika)) }] };
   }
   // En match i taget, helst en som pågår och som han inte har tagit nyss. → { lista } eller null
   function enMatch(lista, tips) {
@@ -3387,7 +3406,9 @@ window.RumHasse = (() => {
     else {
       // (alla rätt och inga rätt har egna rader, rattAlla och rattNoll; en äldre replikfil har bara ratt)
       const omRatt = (l.ratt === l.av && S.rattAlla) || (l.ratt === 0 && S.rattNoll) || S.ratt;
-      repliker([{ text: fyll(lott(omRatt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: lott(omLaget) }],
+      // (ibland med ditt namn: stallning.namn)
+      const medNamn = tilltal(S.namn && S.namn[lage], 0.3);
+      repliker([{ text: fyll(lott(omRatt), { ratt: tal[l.ratt], av: tal[l.av] }), paus: 1500 }, { text: medNamn || lott(omLaget) }],
         { i: $('.rh-sagt'), rad: true, direkt: calm(), sen: () => gest({ alla: 'skrocka', bra: 'blinka', mitten: 'brynet', daligt: 'suck' }[lage]) });
     }
     const match = () => enMatch(lista, tips) || (extra ? lott(extra) : null);

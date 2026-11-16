@@ -9180,6 +9180,24 @@ ställningar; raden om hur många rätt han har och kommentarerna hörs när iMa
 `stallning` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Har du valt att dölja resultat står ingen
 ställning i listan och han säger inget om den.
 
+**Ditt namn efter och under omgången** (2026-11-16, användarens önskemål: "Även om man har markerat en spelare så blir man
+aldrig benämnd vid namn i sådana här tillfällen"). När kupongen vet vem du är talar han ibland till dig med namn när han
+säger hur det går för honom: ungefär var tredje gång i raden efter *Jag hade åtta rätt av tio.* eller *Just nu har jag fyra
+rätt av sju.*, ibland i det han säger efter en stund, och ungefär var femte gång i kommentaren till en match som pågår
+(*Burnley leder med 2–1 mot Cardiff. Den matchen kunde jag i sömnen, Laine.*), men högst en gång på två minuter, så att det
+inte blir tjat (`tilltal` i [public/rum-hasse.js](public/rum-hasse.js)). Namnet sitter lika illa som annars: i nio fall av
+tio omgångens fel namn, samma som när han hälsar och i domen (`kalla`, se *Domarna efter omgången*). Han säger det på olika
+sätt: först, sist eller mitt i meningen, torrt (*Det här stannar mellan oss, Docke.*), som en lärare (*Unge Laine, så här
+går det när man läser på.*, *Gamle Jönsson*, *Käre Tejler*) och med ironisk artighet i tredje person, som en gammal kypare
+(*Herr Lainio får klaga hos spelarna, inte hos mig.*). Raden om var han kom i tävlingen, som han säger till er alla, och
+kommentaren till en match som har slutat säger han utan namn. Raderna står under `efter.namn` och `stallning.namn` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js), en lista för varje läge, och `npm run repliker` säger till om en
+rad saknar namnet eller inte ryms på två rader ovanför listan med det längsta namnet. Varje rad blir 25 meningar till rösten,
+en för varje namn och felnamn, i allt 1 900, som iMacen läser in under ungefär ett dygn; till dess sägs de tyst. Provat med
+funktionerna ur rum-hasse.js och påhittade data (hur ofta namnet kommer, felnamnen, spärren på två minuter och att inget
+namn sägs när kupongen inte vet vem du är) och att sidan laddar utan fel i headless Chromium; inte i hela rummet med en
+riktig omgång.
+
 **Radion och klockan** (2026-11-09). Radion på fönsterbänken hörs också hos honom, och står den på en station säger han
 något om den en gång (per station och besök på sidan) i stället för nästa rad han säger medan han väntar, och nickar med
 (*Italodisco är bra musik att tippa till.*, *På talkSPORT har de inte förstått sin egen liga.*); mellan stationerna säger
@@ -9252,7 +9270,8 @@ aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då
 när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
 mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
-samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
+samma fel namn hela omgången, när han hälsar, i domen och när han talar till dig om hur det går (se *Ditt namn efter och
+under omgången*), på alla enheter, och nästa omgång har han lärt sig ett annat.
 Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8 (`domFro` i
 rum-hasse.js, 2026-11-15). Däremellan är domen densamma varje gång och på alla enheter, och namnet han säger fel är
 detsamma hela omgången. Han rättar sig aldrig och säger inget om det. Står man kvar
