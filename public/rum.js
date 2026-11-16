@@ -125,7 +125,7 @@ window.Rum = (() => {
     <linearGradient id="rum-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0f19"/><stop offset=".55" stop-color="#121826"/><stop offset="1" stop-color="#1c1d24"/></linearGradient>
     <linearGradient id="rum-furu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1804" stop-opacity=".62"/><stop offset=".22" stop-color="#2e1804" stop-opacity=".12"/>
       <stop offset=".5" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
-    <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#fff2d6" stop-opacity=".22"/><stop offset="1" stop-color="#fff2d6" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#ffe6c0" stop-opacity=".1"/><stop offset="1" stop-color="#ffe6c0" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#6b5733"/><stop offset="1" stop-color="#382d1c"/></linearGradient>
     <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
@@ -135,7 +135,7 @@ window.Rum = (() => {
     <linearGradient id="rum-countertop" gradientUnits="userSpaceOnUse" x1="1060" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#613a23"/><stop offset="1" stop-color="#3a2113"/></linearGradient>
     <linearGradient id="rum-sill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a7262"/><stop offset="1" stop-color="#958b78"/></linearGradient>
     <radialGradient id="rum-sodium" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb35c" stop-opacity=".9"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
-    <radialGradient id="rum-tube" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#eef6ff" stop-opacity=".55"/><stop offset="1" stop-color="#eef6ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-tube" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe2b4" stop-opacity=".45"/><stop offset="1" stop-color="#ffe2b4" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-streak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35c" stop-opacity=".5"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-streakred" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b30" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
@@ -162,11 +162,12 @@ window.Rum = (() => {
       `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 1.4 * sc(x1))} ${x0},${r1(at(x0, yb) + 1.4 * sc(x0))}" fill="#c9bfa5" opacity=".18"/>`;
   }
 
-  // Spotarna i taket: mjukt ljus på orakelramen och på Tipsligan ([cx, cy, rx, ry, styrka] i
+  // Spotarna på skenan i taket (rum-inredning.js): mjukt ljus på uret, orakelramen och Tipsligan ([cx, cy, rx, ry, styrka] i
   // scenens mått). Ljuset är målat i väggens bild, som ritas en gång och följer väggen när kameran rör sig, och
   // ramarna, paketen och disken får samma ljus i 3D (SPOTAR i rum-inredning.js). Färgskiftningen (color-dodge)
   // gör väggen ljusare i sin egen färg, som ljus gör, i stället för att lägga en ljus hinna över den.
   const SPOT = {
+    ur: [1050, 200, 100, 118, 0.7],
     ram: [1050, 372, 150, 190, 1],
     liga: [1492, 369, 104, 150, 0.9],
   };
@@ -175,7 +176,7 @@ window.Rum = (() => {
   }
 
   // Furupanelen på bakväggen: lackade bräder med kvistar och ådring, mörka av
-  // röken upptill och ljusare under lysröret. Där en tavla har hängt (runt
+  // röken upptill och lite ljusare under takfläkten. Där en tavla har hängt (runt
   // ramen) har furan inte mörknat lika mycket.
   function furu() {
     const R0 = rng(11);
@@ -194,7 +195,7 @@ window.Rum = (() => {
     return `${s}<rect x="980" y="282" width="150" height="212" fill="#e2ad6e" opacity=".22"/>
   <rect x="0" y="90" width="1140" height="640" fill="#1c1006" opacity=".3"/>
   <rect x="0" y="90" width="1140" height="640" fill="url(#rum-furu)"/>
-  <ellipse cx="650" cy="90" rx="620" ry="420" fill="url(#rum-furu-lampa)"/>
+  <ellipse cx="575" cy="90" rx="620" ry="420" fill="url(#rum-furu-lampa)"/>
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-flack)" opacity=".3"/>
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-prick)" opacity=".35"/>
   <rect x="0" y="90" width="1140" height="7" fill="#000" opacity=".35"/>`;
@@ -278,7 +279,7 @@ window.Rum = (() => {
   // paketen är i 3D (rum-inredning.js).
   // Taket närmare betraktaren, i telefonen på höjden där scenen står långt ner i fönstret (pan): i
   // bakväggens plan, så att det sitter ihop med bg() när kameran vrids. Plattorna går mot flyktpunkten
-  // och blir större ju närmare man kommer, lysrörets sken klingar av, och högerväggen fortsätter upp,
+  // och blir större ju närmare man kommer, takfläktens sken klingar av, och högerväggen fortsätter upp,
   // över en list där hyllorna slutar.
   function tak() {
     const [X0, X1, Y0] = [-200, 1800, -340];
@@ -291,7 +292,7 @@ window.Rum = (() => {
     }).join('');
     return svg(`<defs>
     <linearGradient id="rum-tak-yta" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Y0}"><stop offset="0" stop-color="#574532"/><stop offset=".34" stop-color="#463829"/><stop offset=".62" stop-color="#32281b"/><stop offset="1" stop-color="#1c160e"/></linearGradient>
-    <radialGradient id="rum-tak-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(620 0) scale(520 190)"><stop offset="0" stop-color="#a88a62" stop-opacity=".3"/><stop offset="1" stop-color="#a88a62" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-tak-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(575 -30) scale(420 170)"><stop offset="0" stop-color="#b48c5c" stop-opacity=".34"/><stop offset="1" stop-color="#b48c5c" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-tak-vagg" gradientUnits="userSpaceOnUse" x1="0" y1="${Y0}" x2="0" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".62"/><stop offset="1" stop-color="#0a0704" stop-opacity="0"/></linearGradient>
     <radialGradient id="rum-tak-flack"><stop offset="0" stop-color="#140c04" stop-opacity=".34"/><stop offset=".7" stop-color="#140c04" stop-opacity=".14"/><stop offset="1" stop-color="#140c04" stop-opacity="0"/></radialGradient>
   </defs>
@@ -320,11 +321,12 @@ window.Rum = (() => {
   <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="#5a4418" opacity=".28" filter="url(#rum-b4)"/>
   <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="none" stroke="#2a1e08" stroke-opacity=".35" stroke-width="1.6"/>
   <g stroke="#000" stroke-opacity=".18" stroke-width="1.2"><line x1="0" y1="45" x2="1194" y2="45"/><line x1="200" y1="0" x2="200" y2="90"/><line x1="560" y1="0" x2="560" y2="90"/><line x1="920" y1="0" x2="920" y2="90"/></g>
-  <ellipse cx="650" cy="62" rx="420" ry="70" fill="url(#rum-tube)" filter="url(#rum-b24)" class="rum-tubeglow"/>
+  <ellipse cx="575" cy="58" rx="330" ry="62" fill="url(#rum-tube)" filter="url(#rum-b24)" class="rum-tubeglow"/>
 
   <g mask="url(#rum-hal)">
   ${furu()}
   <path d="M640 92 q30 26 18 60 q-6 22 10 40" fill="none" stroke="#3b2a12" stroke-opacity=".28" stroke-width="7" filter="url(#rum-b4)"/>
+  ${spotYta(SPOT.ur)}
   ${spotYta(SPOT.ram)}
   </g>
   <ellipse cx="760" cy="104" rx="58" ry="16" fill="none" stroke="#4a3412" stroke-opacity=".3" stroke-width="3" filter="url(#rum-b1)"/>
@@ -1350,17 +1352,17 @@ window.Rum = (() => {
     g.setTransform(c.width / bredd, 0, 0, c.height / hojd, -x0 * c.width / bredd, -y0 * c.height / hojd);
     rita(g);
   }
-  // Ljuset kommer någonstans ifrån: lysröret lyser på gängets bord och på pulten med kupongen
-  // ([cx, cy, rx, ry, styrka] i scenens mått), och runt dem sjunker rummet in i dunkel, mest ute i
-  // kanterna, så att blicken går dit ljuset är (förut var rummet lika upplyst överallt). Dunklet är
-  // en del av .rum-vign och värmen i käglorna av .rum-warm (ljusKlockan): inga nya lager, och inget
-  // ritas i bildrutorna.
+  // Ljuset kommer någonstans ifrån: takfläktens kupor lyser på gängets bord och på pulten med kupongen
+  // ([cx, cy, rx, ry, styrka] i scenens mått), spotarna på skenan på löpsedlarna, uret, ramen och
+  // Tipsligan, och runt dem sjunker rummet in i dunkel, mest ute i kanterna, så att blicken går dit ljuset
+  // är (förut var rummet lika upplyst överallt). Dunklet är en del av .rum-vign och värmen i käglorna av
+  // .rum-warm (ljusKlockan): inga nya lager, och inget ritas i bildrutorna.
   // Lampan över pulten (lampa, i pultens plan, som står 1,05 gånger från mitten): där den hänger i scenen,
   // och dess kägla över notan och kaffet.
   const LAMPA_I = [r1(800 + (LAMPA.x - 800) * 1.05), r1(500 + (LAMPA.y - 500) * 1.05)];
   const KAGLOR = [
-    [575, 470, 470, 300, 0.85],
-    [805, 870, 560, 230, 0.85],
+    [575, 450, 440, 300, 0.92],
+    [805, 870, 560, 230, 0.7],
     [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
   ];
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
@@ -1395,7 +1397,7 @@ window.Rum = (() => {
     for (const [x, r] of [[380, 70], [560, 76], [730, 72]]) form(x - r, x + r, 690, 860, 0.9);
     return c.toDataURL();
   }
-  // Pultens lack speglar det som lyser bakom den, mjukt och utdraget mot betraktaren: lysröret dag som
+  // Pultens lack speglar det som lyser bakom den, mjukt och utdraget mot betraktaren: takfläkten dag som
   // kväll, neonen mer på kvällen och stadens ljus genom fönstret på natten. I samma mått och upplösning som
   // solens fläck, och blandas in i pultens bild på samma sätt (.rum-sol): inget nytt lager. Tv:ns sken är inte
   // med, eftersom det släcks med tv:n och spegelbilden ritas bara när ljuset ändras.
@@ -1410,7 +1412,8 @@ window.Rum = (() => {
     g.beginPath();
     g.rect(-10, 652, 1620, 700);
     g.clip();
-    rad(g, 628, 690, 340, 170, '255, 236, 200', r1(0.14 + 0.08 * kvall));
+    // (takfläktens kupor, KAGLOR[0] ovanför)
+    rad(g, 575, 690, 170, 170, '255, 228, 180', r1(0.16 + 0.08 * kvall));
     // (lampan över pulten: en varm strimma under den, där den speglas)
     rad(g, LAMPA_I[0] + 10, 700, 70, 190, '255, 222, 168', r1(0.2 + 0.1 * kvall));
     // neonen i strimmor, som i lackat trä
@@ -1432,12 +1435,15 @@ window.Rum = (() => {
     const slut = Math.round((1338 - 686 * sm(18, 44, v.sol)) / 20) * 20;
     const kvall = Math.round((1 - sm(0.12, 0.45, L.dag)) * 20) / 20;
     const guld = Math.round(L.guld * 2) / 2;
-    // Lysrörets värme i käglorna (KAGLOR) lyser upp med blandningsläget (screen). Utan det, i telefonen och
+    // Takfläktens värme i käglorna (KAGLOR) lyser upp med blandningsläget (screen). Utan det, i telefonen och
     // från steg 1 (.enkel), blev den en ljus hinna över gänget: där är käglorna bara hålen i dunklet.
     const skarm = !LATT && !R.el.classList.contains('enkel');
-    // (det som lyser i högtidspyntet, rum-pynt.js)
+    // (det som lyser i högtidspyntet, rum-pynt.js, och taklampornas glas, rum-inredning.js)
     const pyntL = R.inr && R.inr.pyntLjus ? R.inr.pyntLjus() : [];
-    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal, skarm, pyntL.join(';')].join('|');
+    const lampL = R.inr && R.inr.lampLjus ? R.inr.lampLjus() : [];
+    // (taklamporna är släckta på natten, rum-folk.js)
+    const ng = window.RumFolk && RumFolk.nattGrad ? Math.round(RumFolk.nattGrad() * 20) / 20 : 0;
+    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal, skarm, pyntL.join(';'), lampL.length, ng].join('|');
     if (nyckel === R.ljusNyckel) return;
     R.ljusNyckel = nyckel;
     R.solNu = { s, vpx };
@@ -1467,19 +1473,27 @@ window.Rum = (() => {
         q.fillStyle = `rgba(14, 8, 10, ${r1(0.5 * kvall)})`;
         q.fillRect(-100, y0v - 100, W + 200, hv + 200);
       }
+      // (mörkare mellan det som fläkten och spotarna lyser på, 2026-11-16)
+      q.fillStyle = 'rgba(14, 8, 6, 0.16)';
+      q.fillRect(-100, y0v - 100, W + 200, hv + 200);
       q.globalCompositeOperation = 'destination-out';
       for (const [x, y, rx, ry, a] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a);
       rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
-      // (lysröret lyser upp taket och väggen överst, och lampan över pulten lyser, 2026-11-16: förut låg
-      // dunklet också över dem, så att lysröret såg grått ut)
-      rad(q, 640, 40, 480, 130, '0, 0, 0', 0.7);
+      // (taklamporna lyser upp taket och väggen överst, och lampan över pulten lyser: förut låg dunklet
+      // också över dem, så att lysröret, som hängde där fläkten hänger, såg grått ut)
+      for (const [x, y, , sort] of lampL) {
+        if (sort === 'flakt') rad(q, x, y, 380, 170, '0, 0, 0', 0.85);
+        else if (sort === 'spot') rad(q, x, y, 40, 30, '0, 0, 0', 0.6);
+      }
+      // (löpsedlarna i spotens ljus)
+      rad(q, 855, 360, 140, 210, '0, 0, 0', 0.95);
       rad(q, LAMPA_I[0], LAMPA_I[1], 170, 125, '0, 0, 0', 0.9);
       // (spotarnas ljus faller på disken under Tipsligan, med pallarna)
       rad(q, 1320, 560, 290, 120, '0, 0, 0', 0.45);
       // (och runt neonens spegelbild i pulten, spegelBild)
       rad(q, 400, 690, 140, 110, '0, 0, 0', 0.7);
       rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
-      for (const [x, y, rx, ry] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.7);
+      for (const [x, y, rx, ry, a] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.6 + 0.3 * a);
       for (const [x, y, rx, ry] of pyntL) rad(q, x, y, rx, ry, '0, 0, 0', 0.8);
       if (s > 0.02) {
         const gr = g.createLinearGradient(0, 0, 0, H);
@@ -1496,8 +1510,20 @@ window.Rum = (() => {
     // lampornas färger (i telefonen läggs ljuset ovanpå utan blandningsläge: svagare)
     const f = kvall * (LATT ? 0.55 : 1);
     ljusPa(R.el.querySelector('.rum-warm'), R.smal ? -300 : 0, R.smal ? 1800 : H, 0, W, (g) => {
-      // lysrörets varma ljus i käglorna, dag som kväll (skarm ovan)
-      if (skarm) for (const [x, y, rx, ry, a] of KAGLOR) rad(g, x, y, rx, ry, '255, 218, 165', r1(0.15 * a));
+      // Takfläktens sken, dag som kväll, men mer på kvällen när det är mörkare runt om, och inte på natten
+      // när lamporna är släckta: på taket och väggen kring fläkten och på gängets bord (skarm ovan). Skenet
+      // kring kuporna och spotarna är i deras egna dukar (rum-inredning.js), som följer med kameran.
+      const ml = (0.45 + 0.55 * kvall) * (1 - ng);
+      for (const [x, y, , sort] of lampL) {
+        if (sort !== 'flakt') continue;
+        rad(g, x, y - 40, 420, 120, '255, 205, 150', r1(0.2 * ml));
+        rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.16 * ml));
+      }
+      if (skarm) {
+        rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.2 * ml));
+        rad(g, 575, 520, 260, 100, '255, 224, 175', r1(0.16 * ml));
+        rad(g, 805, 870, 560, 230, '255, 218, 165', r1(0.12 * (1 - ng)));
+      }
       rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
       rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
       rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));
@@ -1548,7 +1574,9 @@ window.Rum = (() => {
     const g = c.getContext('2d');
     const y = (u) => ((u - y0) / h) * c.height;
     g.clearRect(0, 0, c.width, c.height);
-    g.drawImage(ka, 0, y(0), c.width, y(R.smal ? 1500 : H) - y(0));
+    // (värmen täcker lika mycket som vinjetten: −300…1500 i telefonen på höjden, .rum.smal .rum-warm i rum.css;
+    // till 2026-11-16 ritades den i 0…1500, och ljuset hamnade 250 bildpunkter för lågt)
+    g.drawImage(ka, 0, 0, c.width, c.height);
     const styrka = d ? (parseFloat(d.style.getPropertyValue('--dagsljus')) || 0) * 0.2 : 0;
     if (kd && styrka > 0.004) {
       g.globalAlpha = styrka;
@@ -1596,7 +1624,7 @@ ${plane(-330, `${sill()}${haze()}`)}
 ${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}${lampa()}`, 1.05)}
 ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div><i class="rum-vmork" id="rum-vmork"></i></div>
-<div class="rum-layer rum-mork" id="rum-mork"><i class="a"></i><i class="b"></i></div><i class="rum-mork-ut"></i>
+<div class="rum-layer rum-mork" id="rum-mork"></div><i class="rum-mork-ut"></i>
 <div class="rum-layer rum-warm"></div><div class="rum-layer rum-dagsljus" id="rum-dagsljus"></div><div class="rum-layer rum-vign"></div><div class="rum-layer rum-grain"></div>
 </div>
 ${window.RumRegister ? RumRegister.nara() : ''}
@@ -3373,7 +3401,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     andra.push(tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; if (x.numret) x.numret(hgNumret); R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err)));
     // lysröret, neonen, skyltarna, skivan, uret, ramarna och paketen (rum-inredning.js)
-    andra.push(tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG, ljus: () => ljusKlockan() })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
+    andra.push(tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG, ljus: () => ljusKlockan() })).then((x) => { R.inr = x; ljusKlockan(); tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err)));
     try {
       await tur(async () => {
@@ -6803,10 +6831,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
 
   // ---------- in och ut ----------
 
-  // Lysröret tänds när man kommer in (en gång per sidvisning, inte utan
+  // Taklamporna tänds när man kommer in (en gång per sidvisning, inte utan
   // rörelser): mörkt medan gänget, inredningen och sakerna laddas (three), minst
   // 0,7 och högst 2,6 sekunder i Safari, 3 på datorn och 4,5 i telefonen, där de
-  // startar en i taget (tur), och sedan blinkar det igång (.rum-mork i rum.css).
+  // startar en i taget (tur), och sedan två klick: fläktens kupor och spotarna (.rum-mork i rum.css).
   function tand(ready) {
     const m = document.getElementById('rum-mork');
     if (!m || R.tant || calm() || (window.RumFolk && RumFolk.nattGrad && RumFolk.nattGrad() > 0)) return;

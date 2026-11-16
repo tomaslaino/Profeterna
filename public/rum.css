@@ -974,9 +974,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* ---------- ljus, vinjett och korn ---------- */
 
 
-.rum-warm { background: radial-gradient(900px 500px at 640px 40px, rgba(225, 240, 255, 0.1), rgba(225, 240, 255, 0) 70%), radial-gradient(800px 420px at 800px 860px, rgba(255, 190, 120, 0.12), rgba(255, 190, 120, 0) 70%); mix-blend-mode: screen; }
+.rum-warm { background: radial-gradient(760px 460px at 575px 40px, rgba(255, 214, 160, 0.1), rgba(255, 214, 160, 0) 70%), radial-gradient(800px 420px at 800px 860px, rgba(255, 190, 120, 0.12), rgba(255, 190, 120, 0) 70%); mix-blend-mode: screen; }
 /* (överkanten var 0,55 svart och 0,2 brun: med dunklet ovanpå, ljusKlockan i rum.js, låg det tre gånger över
-   taket och lysröret, som såg grått ut. Nu 0,3 och 0,15, och dunklet har hål vid lamporna, 2026-11-16) */
+   taket och lysröret (nu takfläkten), som såg grått ut. Nu 0,3 och 0,15, och dunklet har hål vid lamporna, 2026-11-16) */
 .rum-vign { background: radial-gradient(120% 95% at 52% 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.6) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0) 11%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.5)),
   linear-gradient(180deg, rgba(70, 46, 8, 0.15), rgba(70, 46, 8, 0.05) 45%, rgba(70, 46, 8, 0) 70%); }
 .rum-grain {
@@ -988,9 +988,10 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* grafikkortet har hängt sig (rum.js): ingen vit ruta medan sidan laddas om */
 .rum.grafik-borta :is(#rum-3d, .rum-saker, .reg-gl) { visibility: hidden; }
 
-/* lysröret tänds när man kommer in (tand i rum.js): mörkt i rummet medan
+/* taklamporna tänds när man kommer in (tand i rum.js): mörkt i rummet medan
    gänget laddas – gatan genom skyltfönstret och dörren och tv:n lyser
-   igenom – startarna glöder i rörets ändar, och sedan blinkar det igång */
+   igenom – och sedan två klick: först takfläktens kupor, sedan spotarna
+   (till 2026-11-16 ett lysrör som blinkade igång, med startarna glödande i ändarna) */
 .rum-mork {
   display: none;
   background: #060504;
@@ -1001,19 +1002,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-mork.tands { animation: rum-tands 1.2s steps(1, end) forwards; }
 @keyframes rum-tands {
   0% { opacity: 1; }
-  7% { opacity: 0.2; }
-  12% { opacity: 1; }
-  31% { opacity: 0.1; }
-  36% { opacity: 0.9; }
-  44% { opacity: 0.04; }
-  52% { opacity: 0.55; }
-  57%, 100% { opacity: 0; }
+  12% { opacity: 0.38; }
+  40%, 100% { opacity: 0; }
 }
-.rum-mork i { position: absolute; top: 9px; width: 34px; height: 18px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 196, 214, 0.75), rgba(255, 120, 160, 0)); opacity: 0; animation: rum-startare 0.34s ease-in-out 0.25s infinite alternate; }
-.rum-mork i.a { left: 330px; }
-.rum-mork i.b { left: 884px; animation-delay: 0.4s; }
-.rum-mork.tands i { animation: none; opacity: 0; }
-@keyframes rum-startare { from { opacity: 0.25; } to { opacity: 0.9; } }
 
 /* ---------- namnet och foten ---------- */
 
@@ -1161,7 +1152,7 @@ canvas.rum-svag { opacity: 0.05; }
 .rum.smal .rum-pult-mer { display: block; position: absolute; left: -10px; top: 1000px; width: 1620px; height: 340px; background: #2b1b10; }
 .rum.smal .pult-kant { display: none; }
 .rum.smal .rum-vign { top: -1200px; height: 1800px; }
-.rum.smal .rum-warm { top: -1200px; height: 1800px; background: radial-gradient(900px 500px at 640px 340px, rgba(225, 240, 255, 0.1), rgba(225, 240, 255, 0) 70%), radial-gradient(800px 420px at 800px 1160px, rgba(255, 190, 120, 0.12), rgba(255, 190, 120, 0) 70%); }
+.rum.smal .rum-warm { top: -1200px; height: 1800px; background: radial-gradient(760px 460px at 575px 340px, rgba(255, 214, 160, 0.1), rgba(255, 214, 160, 0) 70%), radial-gradient(800px 420px at 800px 1160px, rgba(255, 190, 120, 0.12), rgba(255, 190, 120, 0) 70%); }
 .rum.smal .rum-mork.start ~ .rum-mork-ut, .rum.smal .rum-mork.tands ~ .rum-mork-ut { display: block; position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; box-shadow: 0 0 0 1400px #060504; pointer-events: none; }
 .rum.smal .rum-mork.tands ~ .rum-mork-ut { animation: rum-tands 1.2s steps(1, end) forwards; }
 /* pingklockan under kupongen, där tummen är */

@@ -685,7 +685,7 @@ export function affaren(x, L, l, somn, lage, W, H) {
     flack(cx, cy, rx, ry, '0, 0, 0', a, 0, mitt);
     p.globalCompositeOperation = 'source-over';
   };
-  // furan i lysrörets sken: längst in bakom hans huvud och runt gänget, och golvet nedanför
+  // furan i taklampornas sken: längst in bakom hans huvud och runt gänget, och golvet nedanför
   flack(9, 12.8, 11, 5.5, '198, 134, 68', 0.3 * s);
   flack(23, 12.6, 15, 6.5, '208, 148, 78', 0.36 * s);
   flack(21, 18.4, 17, 2.4, '128, 90, 54', 0.24 * s);
@@ -712,9 +712,12 @@ export function affaren(x, L, l, somn, lage, W, H) {
     flack(g.az + 0.15, hy - 0.75, 1.35, 0.85, g.har, 0.7 * s, 0, 0.6);
     if (g.krona) flack(g.az, hy - 1.55, 1.05, 0.45, '238, 188, 64', 0.7 * s, 0, 0.7);
   }
-  // lysröret i taket och skylten Stryktipset ovanför skyltfönstret, framför allt annat
-  flack(26, 8.6, 13, 1.6, '222, 234, 250', 0.24 * s);
-  flack(26, 8.4, 11.5, 0.4, '238, 246, 255', 0.95 * s, -1.5, 0.6);
+  // taklamporna och skylten Stryktipset ovanför skyltfönstret, framför allt annat: takfläkten över gängets
+  // bord, med bladen mörka mot taket och fyra kupor under, och spotskenan mot fönstret (förut ett lysrör)
+  flack(18.8, 8.9, 7.5, 2.2, '255, 210, 150', 0.26 * s);
+  skym(18.8, 8.1, 5.6, 0.3, 0.55 * s, 0.8);
+  for (const d of [-1.7, -0.6, 0.6, 1.7]) flack(18.8 + d, 8.8, 0.6, 0.45, '255, 238, 210', 0.9 * s, 0, 0.6);
+  for (const a of [24.2, 26.4, 28.6]) flack(a, 7.9, 0.5, 0.35, '255, 236, 200', 0.7 * s, 0, 0.6);
   flack(31.5, 9.7, 6.6, 0.48, '198, 48, 38', 0.62 * s, -2, 0.8);
   flack(31.5, 9.7, 5.6, 0.19, '238, 210, 176', 0.35 * s, -2, 0.8);
   x.save();
