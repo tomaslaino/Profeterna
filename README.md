@@ -6561,6 +6561,11 @@ rum-inredning.js).
 Prövat i Chrome med mjukvarugrafik som dator (1440 × 900) på dagen och kvällen och som telefon: rummet byggs utan fel
 och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt ritas i dem.
 
+**Spotskenan togs bort (2026-11-16).** När takfläkten ersatte lysröret fick taket också en svart skena med fyra
+halogenspotar, men den passade inte in i rummet och togs bort samma kväll, i rummet som på fasaden och från Hasses bar.
+Ljuset den lade på löpsedlarna och uret finns kvar (`SPOTAR`, `SPOT.ur` och hålet i dunklet vid löpsedlarna): som de
+andra spotarna syns de inte, bara deras ljus.
+
 ### Ljuskäglorna och skärpedjupet (2026-11-15)
 
 Användarens önskemål: förslagen *Ljus som kommer någonstans ifrån* och *Skärpedjup som styr blicken*. Rummet var
@@ -6665,10 +6670,10 @@ skärm syntes det inte alls: scenen skars lika mycket uppe som nere, och hela ta
 
 - **Undertaket** (`innertak` i [public/rum-inredning.js](public/rum-inredning.js), en egen duk under allt annat i
   bakväggens plan): ett 90-tals undertak i three.js med plattor på 60 × 60 cm (120 enheter) i ett bärverk av
-  vitlackerad plåt och en vinkellist mot väggarna, sett med samma kamera som takfläkten och spotskenan. Fläkten sitter
-  mitt i en platta, skenan är skruvad under plattorna, och ljuset från glaskuporna faller upp i taket med skuggan av
-  bladen och spotarna (osynliga kopior av fläkten och skenan som bara kastar skugga; glaset och hållarna precis över
-  lamporna är borttagna, annars låg en mörk fläck över halva taket). Plattorna är gulnade av röken och brunast över
+  vitlackerad plåt och en vinkellist mot väggarna, sett med samma kamera som takfläkten. Fläkten sitter mitt i en
+  platta, och ljuset från glaskuporna faller upp i taket med skuggan av bladen (en osynlig kopia av fläkten som bara
+  kastar skugga; glaset och hållarna precis över lamporna är borttagna, annars låg en mörk fläck över halva taket).
+  Spotskenan, som också satt i plattorna, är borttagen (se *Spotskenan togs bort* ovan). Plattorna är gulnade av röken och brunast över
   gängets bord, där röken stiger, och mot väggarna. En har en fuktfläck, en ett frånluftsdon med damm runt, och en har
   någon lyft och inte lagt tillbaka riktigt. Taket möter väggarna där de är målade (bakväggen vid y 90, högra väggen
   vid X 1140). På natten släcks lamporna också här; taket ritas då om i tiondelar av natten, inte varje minut.

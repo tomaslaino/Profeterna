@@ -1,6 +1,6 @@
 // Inredningen i tobaksaffären (rum.js) i three.js som gänget (rum-3d.js) och
-// sakerna på pulten (rum-saker.js): takfläkten med sina fyra glaskupor och
-// spotskenan i taket (sedan 2026-11-16; förut ett lysrör), Stryktipset målat på
+// sakerna på pulten (rum-saker.js): takfläkten med sina fyra glaskupor
+// (sedan 2026-11-16; förut ett lysrör), Stryktipset målat på
 // väggen ovanför fönstret, neonskylten i
 // skyltfönstret, Stängt-skylten på dörrens glas, skivan med löpsedlarna i
 // fönstret, stationsuret och orakelramen med mässingsskylten på bakväggen,
@@ -30,12 +30,12 @@
 // timvisaren fram till spetsen.
 //
 // På natten är taklamporna släckta (natt, från rum-folk.js, 0–1 medan de dämpas och tänds; i koden
-// heter det ofta fortfarande lysröret): glaskuporna och spotarna mörka, och det målade bandet mörknar.
+// heter det ofta fortfarande lysröret): glaskuporna mörka, och det målade bandet mörknar.
 //
 // inredning(el, { calm, still, vagg, ljus }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp, pyntLjus(), lampLjus() } (namnet som Kronan.names, ms spelstoppet eller null;
 // vagg: tavlornas mått på högra väggen, VAGG i rum.js; lapp: bladet vid radion för rum-radio.js, radiolapp; ljus: anropas
 // när högtidspyntet har byggts eller tagits bort, pyntLjus: det som lyser i det, [x, y, rx, ry, färg] i scenens bildpunkter;
-// lampLjus: taklampornas glas och spotar, [x, y, r, 'kupa' | 'spot' | 'flakt'] i scenens bildpunkter, för ljusKlockan i rum.js)
+// lampLjus: takfläktens glas, [x, y, r, 'kupa' | 'flakt'] i scenens bildpunkter, för ljusKlockan i rum.js)
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
 import { ROR as NEON_ROR } from './rum-neon.js';
@@ -71,9 +71,8 @@ const BITAR = {
   // (först: allt annat i taket och på väggarna ligger över det)
   innertak: { plan: 0, box: { x: 0, y: INNERTAK.y0, w: INNERTAK.w, h: 94 - INNERTAK.y0 } },
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
-  // takfläkten och spotskenan (FLAKT, SKENA): rutorna räcker upp i taket som syns i telefonen på höjden
+  // takfläkten (FLAKT): rutan räcker upp i taket som syns i telefonen på höjden
   flakt: { plan: 0, box: { x: 226, y: -165, w: 600, h: 320 } },
-  skena: { plan: 0, box: { x: 296, y: 20, w: 930, h: 66 } },
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
   ur: { plan: 0, box: { x: UR.x - 58, y: UR.y - 58, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
   ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
@@ -231,7 +230,8 @@ export async function inredning(el, opt = {}) {
     return cam;
   }
   // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot Tipsligan längst ut
-  // på högra väggen, som också lyser på disken under, och från spotskenan (SKENA) på löpsedlarna och uret. De finns i alla sakers ljus, så att alla delar samma
+  // på högra väggen, som också lyser på disken under, och på löpsedlarna och uret. Själva spotarna syns inte (spotskenan
+  // som bar de två sista togs bort samma kväll som den kom, 2026-11-16). De finns i alla sakers ljus, så att alla delar samma
   // grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i bildrutorna.
   const SPOTAR = [
     { fran: [1050, 30, 330], mot: [1050, -372, WZ], styrka: 1.6, vinkel: 0.34 },
@@ -294,20 +294,17 @@ export async function inredning(el, opt = {}) {
   // mahogny med rottingfält och en krona med fyra tulpaner i frostat glas som lyser ned på gängets bord. Den
   // står still (den ritas en gång, som allt annat här). Mitt över bordet (FLAKT, i världen) och så högt att
   // kuporna slutar ovanför Stryktipset-bandet: bladen närmast en går upp ur bilden på datorn, och i telefonen
-  // på höjden syns hela fläkten. Spotskenan (SKENA) går längs taket närmare bakväggen, med en halogenspot på
-  // löpsedlarna, uret, ramen och Tipsligan (SKENA.spotar: x på skenan och vart den pekar).
+  // på höjden syns hela fläkten.
   // Samma kväll mindre framträdande (FLAKT.S): fyra femtedelar så stor kring fästet i taket, mörkare blad
   // med mindre glans och kupor i varmt, dämpat glas med ett svagare sken, så att den lyser på bordet utan
   // att dra blicken till sig.
   const FLAKT = { X: 623, Z: 260, S: 0.8 };
-  const SKENA = { Y: -108, Z: 150, x0: 380, x1: 1140, spotar: [[855, [855, -360, WZ]], [990, [1050, -190, WZ]], [1050, [1050, -372, WZ]], [1120, [WX, -366, 475]]] };
   const TAK = -90;
-  // det som lyser (glod: glaskuporna, front: spotarnas glas, ljus: ljuset kring dem i deras egna scener), för natten
-  const LAMP = { glod: [], front: [], ljus: [], lyser: [] };
+  // det som lyser (glod: glaskuporna, ljus: ljuset kring dem i fläktens scen), för natten
+  const LAMP = { glod: [], ljus: [], lyser: [] };
   // hur släckta taklamporna är (natt nedan)
   let morkt = 0;
   const MASSING = () => mat('#b8893a', { metalness: 0.85, roughness: 0.32, envMapIntensity: 1.2 });
-  const SVART = () => mat('#161412', { metalness: 0.4, roughness: 0.45 });
   const SEG = LATT ? 36 : 64;
   // frostat glas som lyser: ljusare där man ser rakt in, varmare i kanten (av: släckt). Inte vitt: kuporna
   // var det ljusaste i rummets överkant och drog blicken (2026-11-16)
@@ -331,12 +328,11 @@ export async function inredning(el, opt = {}) {
     b.scene.add(h, f, f.target);
     LAMP.ljus.push([h, 1.1], [f, 0.9]);
   }
-  // Skenet kring det som lyser (LAMP.lyser i den här duken), ritat ovanpå lamporna i deras egen duk, så att
-  // det följer med kameran (i ljuslagren över hela rummet hamnade det bredvid uret i närbilden) och slocknar
-  // med dem på natten.
-  function medSkenet(b, sort) {
+  // Skenet kring kuporna (LAMP.lyser), ritat ovanpå fläkten i dess egen duk, så att det följer med kameran
+  // (i ljuslagren över hela rummet hamnade det bredvid uret i närbilden) och slocknar med kuporna på natten.
+  function medSkenet(b) {
     const rita = b.paint.bind(b);
-    const { box } = BITAR[sort === 'kupa' ? 'flakt' : 'skena'];
+    const { box } = BITAR.flakt;
     b.paint = () => {
       rita();
       const a = 1 - morkt;
@@ -347,12 +343,12 @@ export async function inredning(el, opt = {}) {
       g.save();
       g.globalCompositeOperation = 'lighter';
       for (const [x, y, z, r, s] of LAMP.lyser) {
-        if (s !== sort) continue;
+        if (s !== 'kupa') continue;
         const v = new THREE.Vector3(x, y, z).project(b.cam);
         const px = ((v.x + 1) / 2) * c.width;
         const py = ((1 - v.y) / 2) * c.height;
         const rr = r * (1000 / (1000 - z)) * k;
-        for (const [dy, R, f, al] of sort === 'kupa' ? [[0.5, 2.6, '255, 212, 156', 0.17], [0, 1.4, '255, 236, 210', 0.2]] : [[0, 2.6, '255, 236, 200', 0.4]]) {
+        for (const [dy, R, f, al] of [[0.5, 2.6, '255, 212, 156', 0.17], [0, 1.4, '255, 236, 210', 0.2]]) {
           const gr = g.createRadialGradient(px, py + dy * rr, 0, px, py + dy * rr, R * rr);
           gr.addColorStop(0, `rgba(${f}, ${(al * a).toFixed(3)})`);
           gr.addColorStop(0.45, `rgba(${f}, ${(al * a * 0.4).toFixed(3)})`);
@@ -366,7 +362,7 @@ export async function inredning(el, opt = {}) {
   }
   function flakt(b) {
     lampScen(b);
-    medSkenet(b, 'kupa');
+    medSkenet(b);
     const g = new THREE.Group();
     b.scene.add(g);
     const { X, Z, S } = FLAKT;
@@ -464,46 +460,15 @@ export async function inredning(el, opt = {}) {
     LAMP.ljus.push([pl, 2400]);
     LAMP.lyser.push([...iS(X, TAK - 60, Z), 0, 'flakt']);
   }
-  function skena(b) {
-    lampScen(b);
-    medSkenet(b, 'spot');
-    const { Y, Z, x0, x1 } = SKENA;
-    const sv = SVART();
-    const s = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, 5, 9), sv);
-    s.position.set((x0 + x1) / 2, TAK - 2.5, Z);
-    b.scene.add(s);
-    const front = new THREE.MeshBasicMaterial({ color: '#fff4dc', toneMapped: false });
-    LAMP.front.push(front);
-    const ringM = mat('#2a2622', { metalness: 0.6, roughness: 0.3 });
-    for (const [x, mot] of SKENA.spotar) {
-      const h = new THREE.Group();
-      h.position.set(x, Y, Z);
-      b.scene.add(h);
-      const kropp = new THREE.Mesh(new THREE.CylinderGeometry(9, 10.5, 26, 32), sv);
-      kropp.rotation.x = 90 * DEG;
-      h.add(kropp);
-      const glas = new THREE.Mesh(new THREE.CircleGeometry(8.3, 32), front);
-      glas.position.z = 13.2;
-      h.add(glas);
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(9.5, 1.2, 8, 32), ringM);
-      ring.position.z = 13;
-      h.add(ring);
-      h.lookAt(new THREE.Vector3(...mot));
-      const arm = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, Math.abs(TAK - 6 - Y), 8), sv);
-      arm.position.set(x, (TAK - 6 + Y) / 2, Z);
-      b.scene.add(arm);
-      LAMP.lyser.push([x, Y, Z, 10, 'spot']);
-    }
-  }
 
   // Undertaket (2026-11-16, "tydligare att det finns ett tak"): plattor på 60 × 60 cm (PLATTA enheter) i
   // ett bärverk av vitlackerad plåt, som i varje kiosk på 90-talet, gulnade av röken och mörkast över
-  // gängets bord. Fläkten sitter mitt i en platta och skenan är skruvad i plattorna under den, och från
-  // glaskuporna och spotarna faller ljuset upp i taket, med skuggan av bladen och spotarna. En platta har en
+  // gängets bord. Fläkten sitter mitt i en platta, och från glaskuporna faller ljuset upp i taket, med
+  // skuggan av bladen (spotskenan, som också var skruvad i plattorna, togs bort samma kväll). En platta har en
   // fuktfläck, en ett frånluftsdon, och en har någon lyft och inte lagt tillbaka riktigt. Taket möter
   // väggarna där de är målade i rum.js (bakväggen vid y 90 i bilden, alltså Z 0, och högra väggen vid X 1140),
-  // inte där sakerna på väggarna står (WZ, WX), med en vinkellist mot väggen. Fläkten och skenan står kvar i
-  // sina dukar: här finns bara deras skuggor (osynliga kopior), som ritas när taket ritas – en gång, och om
+  // inte där sakerna på väggarna står (WZ, WX), med en vinkellist mot väggen. Fläkten står kvar i
+  // sin duk: här finns bara dess skugga (osynliga kopior), som ritas när taket ritas – en gång, och om
   // när lamporna släcks och tänds (natt).
   const PLATTA = 120;
   function innertak(b) {
@@ -666,28 +631,25 @@ export async function inredning(el, opt = {}) {
     lista(0.8, 2.4, z1, x1 - 0.4, TAK - 1.2, z1 / 2);
     lista(4.8, 0.8, z1, x1 - 2.4, TAK - 0.4, z1 / 2);
 
-    // Skuggorna: fläkten och skenan som osynliga kopior (bara skugga), utan glaset i kuporna och spotarna
+    // Skuggan: fläkten som en osynlig kopia (bara skugga), utan glaset i kuporna
     // och utan hållarna ovanpå glaset, så att ljuset kommer ut (hållarna tätt över ljuset lade en mörk fläck
     // över halva taket kring fläkten)
     const osynlig = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
     const kupor = LAMP.lyser.filter((l) => l[4] === 'kupa').map(([x, y, z]) => new THREE.Vector3(x, y, z));
     const p = new THREE.Vector3();
-    for (const k of ['flakt', 'skena']) {
-      B[k].scene.updateMatrixWorld(true);
-      B[k].scene.traverse((x) => {
-        if (!x.isMesh || x.material.isShaderMaterial || x.material.isMeshBasicMaterial) return;
-        p.setFromMatrixPosition(x.matrixWorld);
-        if (kupor.some((q) => q.distanceTo(p) < 16)) return;
-        const m = new THREE.Mesh(x.geometry, osynlig);
-        m.matrixAutoUpdate = false;
-        m.matrix.copy(x.matrixWorld);
-        m.castShadow = true;
-        scene.add(m);
-      });
-    }
+    B.flakt.scene.updateMatrixWorld(true);
+    B.flakt.scene.traverse((x) => {
+      if (!x.isMesh || x.material.isShaderMaterial || x.material.isMeshBasicMaterial) return;
+      p.setFromMatrixPosition(x.matrixWorld);
+      if (kupor.some((q) => q.distanceTo(p) < 16)) return;
+      const m = new THREE.Mesh(x.geometry, osynlig);
+      m.matrixAutoUpdate = false;
+      m.matrix.copy(x.matrixWorld);
+      m.castShadow = true;
+      scene.add(m);
+    });
 
-    // Ljuset: rummet underifrån (gulare nära golvet och pulten), glaskuporna med skuggor, spotarnas
-    // värme runt dem och neonen i fönstret
+    // Ljuset: rummet underifrån (gulare nära golvet och pulten), glaskuporna med skuggor och neonen i fönstret
     const ljus = (l, i, natt = true) => {
       l.intensity = i;
       scene.add(l);
@@ -700,19 +662,15 @@ export async function inredning(el, opt = {}) {
     fram.target.position.set(760, TAK, 300);
     scene.add(fram.target);
     for (const [x, y, z, , s] of LAMP.lyser) {
-      if (s === 'kupa') {
-        const l = ljus(new THREE.PointLight('#ffdcb2', 0, 0, 2), 5200);
-        l.position.set(x, y + 6, z);
-        if (gl.shadowMap.enabled) {
-          l.castShadow = true;
-          l.shadow.mapSize.set(LATT ? 512 : 1024, LATT ? 512 : 1024);
-          l.shadow.bias = -0.002;
-          l.shadow.camera.near = 2;
-          l.shadow.camera.far = 1200;
-        }
-      } else if (s === 'spot') {
-        const l = ljus(new THREE.PointLight('#ffe4bc', 0, 0, 2), 90);
-        l.position.set(x, y + 4, z);
+      if (s !== 'kupa') continue;
+      const l = ljus(new THREE.PointLight('#ffdcb2', 0, 0, 2), 5200);
+      l.position.set(x, y + 6, z);
+      if (gl.shadowMap.enabled) {
+        l.castShadow = true;
+        l.shadow.mapSize.set(LATT ? 512 : 1024, LATT ? 512 : 1024);
+        l.shadow.bias = -0.002;
+        l.shadow.camera.near = 2;
+        l.shadow.camera.far = 1200;
       }
     }
     const neonL = ljus(new THREE.PointLight('#ff4630', 0, 0, 2), 1100, false);
@@ -1813,10 +1771,9 @@ export async function inredning(el, opt = {}) {
     // uret och ramen ligger i knappen och länken, så att de lyser när man pekar på dem
     B[k] = bit(k, wallCam(box), i ? el.querySelector(i) : null);
     // (bladet vid radion har sin skugga ritad)
-    if (!['flakt', 'skena', 'innertak'].includes(k)) wallLights(B[k], box, !['tak', 'neon', 'radiolapp'].includes(k));
+    if (!['flakt', 'innertak'].includes(k)) wallLights(B[k], box, !['tak', 'neon', 'radiolapp'].includes(k));
   }
   flakt(B.flakt);
-  skena(B.skena);
   innertak(B.innertak);
   malat(B.tak);
   stangt(B.tak);
@@ -1890,7 +1847,7 @@ export async function inredning(el, opt = {}) {
   // allt på en gång höll huvudtråden medan grafikkortet arbetade, och rummet svarade
   // inte på fingret så länge.
   const paus = () => new Promise((r) => setTimeout(r));
-  for (const k of ['ram', 'ur', 'tak', 'flakt', 'skena', 'innertak', 'neon', 'hogra', 'skiva', 'disk', 'radiolapp']) {
+  for (const k of ['ram', 'ur', 'tak', 'flakt', 'innertak', 'neon', 'hogra', 'skiva', 'disk', 'radiolapp']) {
     if (!B[k]) continue;
     try {
       await gl.compileAsync(B[k].scene, B[k].cam);
@@ -1913,10 +1870,8 @@ export async function inredning(el, opt = {}) {
     if (g === morkt) return;
     morkt = g;
     for (const m of LAMP.glod) for (const [i, u] of [[0, 'c1'], [1, 'c2']]) m.uniforms[u].value.set(GLAS.pa[i]).lerp(new THREE.Color(GLAS.av[i]), g);
-    for (const m of LAMP.front) m.color.set('#fff4dc').lerp(new THREE.Color('#57524a'), g);
     for (const [l, i] of LAMP.ljus) l.intensity = i * (1 - 0.8 * g);
     B.flakt.paint();
-    B.skena.paint();
     // (undertaket, med fyra lampors skuggor, i tiondelar: natten kommer en minut i taget, 23–24 och 6–7)
     if (Math.round(g * 10) !== takSteg) {
       takSteg = Math.round(g * 10);
@@ -2064,7 +2019,7 @@ export async function inredning(el, opt = {}) {
     }
     return ut;
   }
-  // Taklampornas glas och spotar i scenens bildpunkter: [x, y, r, sort] (bakväggens plan står 1,035 gånger från mitten)
+  // Takfläktens glas i scenens bildpunkter: [x, y, r, sort] (bakväggens plan står 1,035 gånger från mitten)
   function lampLjus() {
     return LAMP.lyser.map(([x, y, z, r, sort]) => {
       const f = 1000 / (1000 - z);
