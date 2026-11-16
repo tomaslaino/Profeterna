@@ -69,7 +69,7 @@ const FALT = {
   ledig: ['dag'],
   resultat: ['res'],
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
-  'efter.ratt': ['ratt', 'av'], 'efter.exakt': ['res'],
+  'efter.ratt': ['ratt', 'av'], 'efter.rattAlla': ['av'], 'efter.rattNoll': ['av'], 'efter.exakt': ['res'],
   // (i det som sticker ut också matchen, tecknen, datorns chans och resultatet: domText i rum-hasse.js)
   domar: ['namn', 'antal', 'Antal', 'match', 'tecknet', 'Tecknet', 'den', 'tecknen', 'pct', 'res'],
   'stallning.ratt': ['ratt', 'av'], 'stallning.rattAlla': ['av'], 'stallning.rattNoll': ['av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
@@ -86,7 +86,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
   'fyller.foreslar', 'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
-  'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
+  'efter.ratt', 'efter.rattAlla', 'efter.rattNoll', 'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
   'domar.fraga', 'domar.igen', 'domar.alla', 'domar.glomt', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
@@ -174,6 +174,13 @@ for (const vag of NAMNRADER) {
     const n = (t.match(/\{namn\}/g) || []).length;
     if (n !== 1) fel.push(`${vag}: "${t}" ska ha {namn} en gång, inte ${n}`);
     if (t.replace('{namn}', LANGST).length > 56) fel.push(`${vag}: "${t}" är för lång: högst 56 tecken med namnet, annars ryms den inte på två rader ovanför listan`);
+  }
+}
+// Raden om hur många rätt han hade efter omgången står också ovanför listan: högst 56 tecken med de längsta talen.
+for (const vag of ['efter.ratt', 'efter.rattAlla', 'efter.rattNoll']) {
+  for (const t of varde(vag) || []) {
+    const lang = t.replace(/\{(ratt|av)\}/g, 'tretton');
+    if (lang.length > 56) fel.push(`${vag}: "${t}" är för lång: högst 56 tecken med de längsta talen (${lang.length}), annars ryms den inte på två rader ovanför listan`);
   }
 }
 // Till gruppen säger han ni och er: det är bara ni som använder sidan (Tomas 2026-11-09).

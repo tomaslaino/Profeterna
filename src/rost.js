@@ -47,12 +47,18 @@ const DAGAR = ['i dag', 'i morgon', ...['måndag', 'tisdag', 'onsdag', 'torsdag'
 const RESULTAT = [0, 1, 2, 3, 4].flatMap((h) => [0, 1, 2, 3, 4].map((b) => `${h}–${b}`));
 // Hur många rätt han kan ha haft av hur många: en till tretton matcher (efterat i rum-hasse.js).
 const RATT = repliker.tal.slice(1).flatMap((av, i) => repliker.tal.slice(0, i + 2).map((ratt) => [ratt, av]));
-// Medan matcherna pågår (lagetNu) räknar han från två matcher, och alla rätt och inga rätt har egna rader.
+// Medan matcherna pågår (lagetNu) räknar han från två matcher, och alla rätt och inga rätt har egna rader. Efteråt
+// (efterat) har alla rätt och inga rätt också egna rader från två matcher, men av en match säger han ratt.
 const NOLL = repliker.tal[0];
+const ALLA = RATT.filter(([ratt, av]) => ratt === av && av !== repliker.tal[1]);
+const INGA = RATT.filter(([ratt, av]) => ratt === NOLL && av !== repliker.tal[1]);
 const RATT_VAG = {
   'stallning.ratt': RATT.filter(([ratt, av]) => ratt !== NOLL && ratt !== av),
-  'stallning.rattAlla': RATT.filter(([ratt, av]) => ratt === av && av !== repliker.tal[1]),
-  'stallning.rattNoll': RATT.filter(([ratt, av]) => ratt === NOLL && av !== repliker.tal[1]),
+  'stallning.rattAlla': ALLA,
+  'stallning.rattNoll': INGA,
+  'efter.ratt': RATT.filter(([ratt, av]) => (ratt !== NOLL && ratt !== av) || av === repliker.tal[1]),
+  'efter.rattAlla': ALLA,
+  'efter.rattNoll': INGA,
 };
 // Talen i domarna över gänget: två till tretton i ord (doma i rum-hasse.js; en och noll har egna rader).
 const ANTAL = repliker.tal.slice(2);
