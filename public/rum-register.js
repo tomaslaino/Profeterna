@@ -1772,12 +1772,10 @@ window.RumRegister = (() => {
 
     // (landslagen i Nations League ur A.land, med lagfilens siffror)
     const lagIDiv = (d) => [...(d === 'nl' ? (A.land ? A.land.lag.values() : []) : (A.stats || new Map()).values())].filter((t) => t.comp === d).sort((a, b) => a.name.localeCompare(b.name, 'sv'));
-    // divisionen med flest lag i omgången (landslagen räknas som nl)
-    function standardDiv() {
-      const n = {};
-      for (const x of omgLag()) { const t = lagOf(x) || landOf(x); if (t) { const c = t.land ? 'nl' : t.comp; n[c] = (n[c] || 0) + 1; } }
-      return REG.slice().sort((a, b) => (n[b] || 0) - (n[a] || 0))[0];
-    }
+    // divisionen registret öppnar på: Premier League (sedan 2026-11-16,
+    // användarens val; förut den med flest lag i omgången, vilket gav NL
+    // under landslagsuppehållen)
+    const standardDiv = () => 'pl';
     // Underraden i registret säger vad och var: LAG eller SPELARE till
     // vänster, divisionen till höger, de valda omvända. Divisionerna har
     // hela namnen när raden ryms (annars PL, CH, L1 och L2, och namnet står
@@ -2327,7 +2325,7 @@ window.RumRegister = (() => {
       { namn: 'SPELARE', typ: 'REGISTRET', q: '#spelarna:', ord: ['spelare', 'spelarna'] },
       ...DIVS.map((d) => ({ namn: up(DIVNAME[d]), typ: 'DIVISION', q: `#div:${d}`, ord: [norm(DIVNAME[d]), d, { pl: 'premier', ch: 'champ', l1: 'league 1', l2: 'league 2' }[d]] })),
       { namn: 'NATIONS LEAGUE', typ: 'LANDSLAG', q: '#div:nl', ord: ['nations league', 'nations', 'nl', 'landslag', 'landslagen', 'landskamper', 'landskamperna'] },
-      // Statistiks tal som listor (i divisionen med flest lag i omgången): på
+      // Statistiks tal som listor (i Premier League, standardDiv): på
       // etiketten eller rubriken, hela ordet eller början från fem bokstäver
       ...[['lag', LAGTAL], ['spelare', SPTAL]].flatMap(([slag, l]) => l.map((y) => ({ namn: y.n, typ: 'LISTA', q: `#lista:${slag}::${y.k}`, ord: [...new Set([norm(y.e), norm(y.n)])], lista: true }))),
     ];
@@ -2611,7 +2609,7 @@ window.RumRegister = (() => {
       if (typ === 'spelarna') return { flik: 'lagen', div: id, slag: 'spelare' };
       if (typ === 'lag') return lagOf(id) || landOf(id) ? { flik: 'lagen', lag: id } : null;
       if (typ === 'spelare') return { flik: 'lagen', spelare: id };
-      // en lista: #lista:lag:pl:skapar (utan division: den med flest lag i omgången)
+      // en lista: #lista:lag:pl:skapar (utan division: Premier League, standardDiv)
       if (typ === 'lista') return rest.length === 3 ? { flik: 'lagen', slag: rest[0], div: rest[1], lista: rest[2] } : null;
       if (typ === 'flik') return { flik: GAMLA[id] || id };
       return null;

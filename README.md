@@ -6959,8 +6959,9 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   och *L2* när de hela namnen inte ryms, och då står namnet under strecket); ←/→ bläddrar mellan
   divisionerna. Samma dag ville användaren att underkategorierna skulle vara logiska – med bara
   divisionerna syntes spelarna först inne i ett lag – och valde det här upplägget före att
-  behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på divisionen
-  som har flest lag i omgången. *LAG* är divisionens tabell (sedan 2026-11-16, användarens
+  behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på Premier
+  League (sedan 2026-11-16, användarens val; förut på divisionen med flest lag i omgången, vilket
+  gav NL under landslagsuppehållen). *LAG* är divisionens tabell (sedan 2026-11-16, användarens
   önskemål: "ordna så att tabellerna dyker upp snyggt när man klickar i PL, CH osv."; till dess
   stod lagen i bokstavsordning): platsen, laget, spelade, V O F, målen, målskillnaden och
   poängen, och sist formen i ligan (de fem senaste, senaste först) – V O F, målen och formen när
@@ -7134,8 +7135,8 @@ som finns för dem: matchens fil och [data/landslag.json](#landskamperna).
 - **Registret** har en post till efter divisionerna, *NL* (*Nations League*): grupperna med
   tabellen (plats, spelade, V O F när raden ryms, målskillnad och poäng; två spalter på datorn).
   Grupperna med lag i kupongen står först under *I kupongen*, med lagen ljusa, och sedan *De
-  andra grupperna* A1–D2. Registret öppnar där när landslagen är flest i omgången (som
-  divisionerna). *Spelare* är svagt där – landslagens trupper finns inte.
+  andra grupperna* A1–D2. Registret öppnar på Premier League också när landslagen spelar;
+  NL nås med →/← eller underraden. *Spelare* är svagt där – landslagens trupper finns inte.
 - **Lagkortet** för ett landslag: omgångens match, gruppen och tabellraden, formen, Nations
   League hittills (V-O-F och mål), alla landskamper sedan hösten 2024, nästa match och de tio
   senaste landskamperna med tävling, hemma eller borta, resultat och utfall. ←/→ bläddrar
