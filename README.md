@@ -9857,8 +9857,13 @@ dem, som resten av tidningen.
   citat per lag, två till fyra källor per lag med datum och länk). Källorna är lagens egna medier på deras språk och
   förbundens sidor, alla från de sju dagarna före matchdagen och före avsparken (ingen matchrapport, inget resultat).
   Namnen och talen är kontrollerade mot sidornas text, och tipsorden mot `TIPS_RE`. Bladen för de två spanska
-  matcherna har arenan själva (Ipurua, Nuevo Los Cármenes) och står utan sköldar, eftersom `data/skoldar.json` bara
-  har sajtens lag.
+  matcherna har arenan själva (Ipurua, Nuevo Los Cármenes).
+- **Sköldarna för de spanska klubbarna** (2026-11-16, användarens önskemål: "Gör sköldar för de spanska klubbarna
+  också"): klubbarna står inte i sajtens spelprogram, så sköldhämtningen (`espn_skoldar` i src/sources.js) visste
+  inte om dem. Ett handskrivet matchblad kan nu ha lagens ESPN-id (`lagId`, i samma ordning som `lag`: Eibar 3752,
+  Cádiz 3842, Granada 3747 och Las Palmas 98), och `helgarderatsLag` lägger till dem bland lagen som ska ha en
+  sköld. Skölden står under lagets namn i `data/skoldar.json`, och ett nytt lag gör hämtningen aktuell direkt
+  (`due`), så den görs vid nästa bygge i GitHub Actions.
 - **Sista sidan** (`data/sista-sidan.json`, `"hand": true`) är också skriven för hand, efter reglerna i
   config/sista-sidan.js: Hasse Backes krönika om alla finaler som inte är några, tre notiser i *Vid sidan av* (Eibar,
   Cádiz och Kazakstan, ur Wikipedia) och kåseriet av Gunilla Östberg, undersköterska på nattskift i Skövde.
@@ -9883,8 +9888,10 @@ dem, som resten av tidningen.
 
 Provat 2026-11-16 med en provserver (public/ och de två datafilerna ur arbetskopian, resten från matchfixarna.se) i
 huvudlös Chrome, i 1280 bredd och 390 × 844: omslaget (*Nr 2 · Vecka 46*, *Inför Europatipset*, 15 november),
-innehållet med tretton matcher och sista sidan, matchbladen med flaggorna och utan sköldar (Eibar–Cádiz), sista
-sidan, inget fel i konsolen och inget som sticker ut åt sidan. Med Node: `poddsidor` med kupongtjänstens riktiga
+innehållet med tretton matcher och sista sidan, matchbladen med flaggorna, sista sidan, inget fel i konsolen och
+inget som sticker ut åt sidan. De spanska sköldarna: `espn_skoldar` i en kopia med iMacens spelprogram och ESPN:s
+riktiga bilder för de fyra klubbarna (alla fyra hittades, och `due` blev sann av de nya lagen), och Eibar–Cádiz
+och Granada–Las Palmas med sköldarna på tavlan i provservern. Med Node: `poddsidor` med kupongtjänstens riktiga
 omgång och poddjobbets fil (numret står kvar oförändrat, så nattjobbet skriver inget), en ny omgång (nästa nummer),
 ett eget blad som ersätter ett handskrivet och ett äldre nummer utan `nummer`, och `overst`/`forsta` för det gamla
 och det nya numret. Inte provat i rummet i en riktig webbläsare, i Safari eller i en riktig telefon.
