@@ -266,7 +266,9 @@ window.RumUte = (() => {
     const bilar = rusning ? 3 : dag ? 2 : 1;
     const varv = natt ? [60, 85] : rusning ? [26, 32] : bilar === 2 ? [32, 40] : [42, 52];
     const ut = (v.veckodag === 'lör' || v.veckodag === 'sön') && h < 4;
-    let gaende = h < 1 ? 3 : h < 5 ? (ut ? 3 : 1) : h < 7 ? (helg ? 1 : 3) : helg && h < 9.5 ? 4 : h < 22 ? 7 : 4;
+    // (glest på kvällen: efter halv sju färre, efter åtta bara en och annan, lite fler fredag och lördag)
+    const fest = v.veckodag === 'fre' || v.veckodag === 'lör';
+    let gaende = h < 1 ? (ut ? 3 : 1) : h < 5 ? (ut ? 3 : 1) : h < 7 ? (helg ? 1 : 3) : helg && h < 9.5 ? 4 : h < 18.5 ? 7 : h < 20 ? 5 : h < 22 ? (fest ? 4 : 3) : fest ? 3 : 2;
     if (v.fall && v.mangd > 0.75) gaende = Math.max(1, gaende - 3);
     if (v.kanns < -12) gaende = Math.max(1, gaende - 2);
     // på cykel: inte i snön eller i ösregn, fler på sommaren (1–3, 0 = ingen)

@@ -1323,6 +1323,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   kepsar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar och mobiltelefon med antenn; regnrock,
   sydväst, gummistövlar, regnskydd på barnvagnen och paraplyer som vinden vänder i regnet; mössa, halsduk och
   lovikkavantar i kylan; shorts, solglasögon och glass i värmen. Se *Det som händer ute* under [Fasaden](#fasaden).
+- **Fler sorters människor, och glest på kvällen (2026-11-16, användarens önskemål):** "ha fler varianter på
+  människor - just nu ser det enformigt ut. De ser f ö lite tråkiga ut. dessutom är det otroligt mkt människor som går
+  där just nu mitt i kvällen." Var och en har en egen längd och byggnad (smal, vanlig, kraftig eller rund med mage),
+  en del äldre går framåtböjda, och det finns fler frisyrer (knut, afro), hattar (sixpence, basker), paraplyer (golf i
+  två färger, litet hopfällbart, en genomskinlig bubbla ner över huvudet) och saker att bära (gitarr på ryggen,
+  bandybag med innebandyklubbor, pizzakartong på kvällen, blommor). På kvällen syns klädernas färger svagt i
+  lyktornas och fönstrens sken i stället för att alla är svarta siluetter. Gatan är glesare efter halv sju (`RumUte.trafik`:
+  sju gående på dagen, fem till åtta, tre till tio och två sent, en till på fredag och lördag): en regnig måndagskväll
+  20.30 syns i snitt en i taget i stället för nästan tre, och halva tiden är trottoaren tom.
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6731,7 +6740,7 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
   inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
 - **Det som händer ute:** de som går förbi på trottoaren framför affären, ungefär lika många som på gatan inifrån
-  (`RumUte.trafik`; färre i regn och snöyra, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
+  (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
   (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
   barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
   tidningen i regnet och hundar (labrador, schäfer, tax, terrier och pudel, `HUNDAR`; de små i täcke när det regnar).
@@ -6741,12 +6750,18 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   och mobiltelefon med antenn; i regn paraply (som vinden ibland vänder ut och in), regnrock med luva eller sydväst,
   gummistövlar och regnskydd på barnvagnen, i kyla mössa (ibland med tofs eller öronlappar), sjalett, halsduk, vantar
   (ibland lovikka) och kängor, och i värme t-shirt, shorts med vita sockor, solglasögon, keps och glass. Barnen har större
-  huvud, och i regnet galonställ och stövlar. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
+  huvud, och i regnet galonställ och stövlar. Var och en har sin längd (`o.h`, kvinnor och äldre lite kortare i snitt)
+  och byggnad (`BYGG`, `o.bred`: överkroppen dras ut på bredden i `bredda`, benen lite med, och de runda har mage), en
+  del äldre går framåtböjda, och fler frisyrer (knut, afro) och hattar (sixpence, basker). Paraplyerna är vanliga,
+  golfparaplyer i två färger, små hopfällbara eller genomskinliga bubblor ner över huvudet (`PARAPLY`, `parForm`: en
+  kupol sedd från sidan med kilar och spröt), och en del bär gitarr på ryggen, bandybag med innebandyklubbor,
+  pizzakartong (på kvällen) eller blommor. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
   glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och bara
   den som har båda händerna lediga kan ha dem i fickorna. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
-  framför fönstret (`randLjus`), och speglas svagt i den våta stenen. Där det är mörkt är de lika mörka som mörkret
+  framför fönstret (`randLjus`), och speglas svagt i den våta stenen; kläderna behåller en fjärdedel av sin färg
+  (`NATTF`, `klarL`), så att en röd dunjacka går att skilja från en svart kappa. Där det är mörkt är de lika mörka som mörkret
   omkring (`morkSteg`: fyra steg av samma färger, `MORK`, som räknas ut en gång per figur i `morkna`); förut var en ljus
   rock i mörkret ljusare än väggen bakom, som kvällens mask mörkar, och såg genomskinlig ut, som ett spöke. De går som folk (`gangen`, `stalln`): foten som
   står på marken står still mot stenen medan kroppen går fram – hälen slår i, foten rullar över till tån och lyfts – och
