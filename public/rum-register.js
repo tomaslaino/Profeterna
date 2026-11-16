@@ -120,8 +120,9 @@ window.RumRegister = (() => {
   const LISTA = 20;
   // så många rader skrivs en och en; resten av en lång lista kommer på en gång
   const SKRIV = 50;
-  // duken på disken (scenens px), där datorn syns med sin skugga
-  const BOX = { x: 1136, y: 426, w: 132, h: 112 };
+  // duken på disken (scenens px), där datorn syns med sin skugga (åt höger till
+  // strax före korktavlan, x 1280,5: med ryggen mot väggen når datorns bakre hörn x 1269)
+  const BOX = { x: 1136, y: 426, w: 142, h: 112 };
   // terminalen: minst så här breda rader (telefonen), och så många rader ryms på höjden (dator)
   const BRED = 40;
   const RADER = 20;
