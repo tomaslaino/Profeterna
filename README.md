@@ -1109,6 +1109,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   död – med påhitt som händerna i nacken, skålar över bordet, naglarna, hakan i handen,
   armarna i kors och pannan i bordet, och tre sätt att reagera på ett mål. Se *Gängets humör
   följer kupongen* under [Tobaksaffären](#tobaksaffären).
+- **Gänget är nervöst ibland när matcherna pågår (2026-11-16, användarens önskemål):** "Kan du göra så att vi
+  ibland ser nervösa ut när vi följer matcherna live … vissa resultat t ex. Tänk på naturliga emotioner och att
+  vi inte ska se ut som robotar!" Var och en blir spänd av de matcher där ett mål skulle vända ens eget tips,
+  mest när uddamålet ska hållas mot slutet. Det syns i vågor och olika för var och en (DJ tar det hårdast, DT
+  är den svalaste): stunder framåtlutad med hälen som vippar och ett spänt ansikte, anfall på planen där alla
+  håller andan och sedan blåser ut eller tar sig för huvudet, naglarna och handen för munnen – och lättnaden
+  eller sucken när matchen blåses av. Se *Nerverna under matcherna* under [Tobaksaffären](#tobaksaffären).
 - **Namnet i skrivstil på kupongen, och gänget gör tecken (2026-11-04, användarens önskemål):**
   ett klick på någon i gänget skriver hens namn för hand på kupongen på pulten, i hens egen
   handstil och bläck, i stället för porträtten, och hen gör ett tecken mot en: hang loose,
@@ -4757,6 +4764,53 @@ kring ytterändan, ett ögonlock i hudens färg läggs över ögat och rodnaden 
 Bilderna för läget byggs när det ändras (sju till som mest: ansiktena, deras blinkningar och
 skägget) och de förra släpps; skrattar de åt ett skämt är det de vanliga skrattbilderna.
 
+**Nerverna under matcherna** (2026-11-16, `nerverLage` i rum.js, `NERV` och `nervKropp` i rum-3d.js;
+användarens önskemål: "Kan du göra så att vi ibland ser nervösa ut när vi följer matcherna live … vissa resultat
+t ex. Tänk på naturliga emotioner och att vi inte ska se ut som robotar!"). Medan matcherna pågår är var och en
+mer eller mindre spänd (0–1), efter sitt eget tips – allas när de syns, annars gängets kupong, som vid målen.
+En match spänner när ett mål skulle vända tipset:
+
+- **Uddamålet ska hållas** (tipset håller med ett mål, eller krysset i en jämn match): lite tidigt (0,15), mer
+  och mer från 52:a minuten och fullt i slutet (0,5 vid 70 minuter, 0,85 vid 80).
+- **Ett mål skulle rädda tipset:** nästan lika mycket (0,12 → 0,8).
+- **Två mål emellan:** lite, och mindre ju närmare slutet det är; fler mål eller helgardering: inget.
+
+I halvtidsvilan nästan inget. Flera matcher lägger sig på den mest spända, de andra med en fjärdedel var, och
+kupongen väger in: på gränsen (nästa fel tar vinsten) mer, död mindre. Dolda resultat ger inga nerver. Det syns
+inte jämnt utan kommer och går, och olika för var och en – DJ grubblar och tar det hårdast, DL är glad av sig
+och DT den svalaste (`NERV.lynne`):
+
+- **Stunderna** (`nervStund`): i luckor om 11–17 sekunder, olika långa för var och en, kan en stund börja,
+  oftare och längre ju mer som står på spel: framåtlutad mot tv:n, ena hälen som vippar, snabbare andning och
+  ett oroligt eller spänt ansikte (`nervos` i [public/rum-uttryck.js](public/rum-uttryck.js): ögonbrynen högt
+  uppåt inåt, ögonen vidöppna och läpparna ihoppressade och snett, som när man biter sig i läppen).
+  Däremellan sitter man och tittar som vanligt.
+- **Anfallen på planen** (`sitNu`): samma för alla tre, i gemensamma luckor om 23 sekunder och oftare ju
+  spändare den mest spända är. Var och en reagerar en aning efter de andra och så mycket som hen har på spel:
+  lutar sig fram, reser sig lite ur stolen och håller andan med huvudet stilla – och sedan blåser man ut,
+  far bakåt med handen på huvudet när det var nära, eller sjunker bara tillbaka. Den som inget har på spel
+  tittar bara.
+- **Påhitten** (`NERV.meny`): naglarna, händerna knäppta framför munnen, fingrarna som trummar, kliandet i
+  nacken och – nytt – `tittarInte`: vänder sig bort från tv:n med huvudet nere och handen framför ansiktet,
+  tittar upp med handen för munnen och vänder sig bort igen. Den som är mest spänd korsar sig ibland. Medan
+  det står och väger inga gäspningar eller sträckningar, och när alla är spända inget som gänget gör
+  tillsammans (skålen, allsången).
+- **Stämningen** drar mot orolig, så att ansiktet ibland är oroligt också mellan stunderna; man tittar inte
+  bort från tv:n lika ofta, inte heller på de andra, och benen vippar fort som när kupongen står och väger.
+- **Slutsignalen** (`slut`): när en match som någon satt spänd i (minst 0,3) blåses av – puh: bakåt med en
+  lång utandning, blicken i taket, handen på bröstet och ett nöjt ansikte – eller, när tipset inte höll, en
+  huvudskakning med blicken ner, en suck och ett surt ansikte. Inte när rummet öppnas.
+
+Hur ofta det syns (räknat ur luckorna): med full spänning är DJ spänd ungefär 45 % av tiden, DL 26 % och DT
+17 %, och anfallen kommer i ungefär hälften av luckorna; vid halva spänningen 23, 14 och 9 %. Ett mål går före
+allt det här, och under allsången efter ett mål syns inga nerver. Handen kan inte täcka ögonen (huvudena är
+större än armarna når, som håret), därför vänder man sig bort i stället. Bara bålen, huvudet och händerna som
+redan finns rör sig, och det spända ansiktet byggs när det behövs, som stämningarnas: inga nya delar att
+rita. Utan rörelser (calm) bara stämningen och ansiktet efter slutsignalen; i en fast bild (`?rum-t`) allt,
+efter klockan. Prova med `?rum-nerv=dl:0.9,dt:0.9,dj:0.9` (tv:n står då på; `dt:0.6:jagar` för den som jagar
+ett mål) och `?rum-t=18.4` (alla håller andan), `55` (stunderna) eller `60.6` (nära!), `?rum-slut=dl:1,dt:-1`
+och `?rum-akt=dl:tittarInte`.
+
 **Gänget gör saker tillsammans** (2026-11-06, `GRUPP` och `roller` i rum-3d.js): var 31:a
 sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär två gånger av tre
 som vanligt, nästan nio av tio när det går bra, tre av tio när det är nervöst och sällan när
@@ -5460,7 +5514,9 @@ finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysare
 `halloween`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
-om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
+om matcherna pågick, `?rum-nerv=dl:0.9,dt:0.4:jagar` hur spända de är av matcherna (och tv:n på; se *Nerverna
+under matcherna*), `?rum-slut=dl:1,dt:-1` att en match de satt spända i blåstes av (tipset höll, höll inte;
+vid tiden 0 med `?rum-t`, annars var femtonde sekund) och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
 (rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund; `dl:1b`
 väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, `c` handen i
 bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som

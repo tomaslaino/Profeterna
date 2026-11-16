@@ -2600,7 +2600,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function gangTv(rd, rows, t, p) {
     const q = R.q;
     const soon = (x) => t - x.g.kick < 2.5 * 3600000;
-    const tv = q.has('rum-tittar') || rows.some((x) => x.g.state === 'live' || ((x.g.state === 'started' || (x.g.state === 'hidden' && !x.g.over)) && soon(x)));
+    const tv = q.has('rum-tittar') || q.has('rum-nerv') || rows.some((x) => x.g.state === 'live' || ((x.g.state === 'started' || (x.g.state === 'hidden' && !x.g.over)) && soon(x)));
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : 0;
     const h = q.has('rum-stopp') ? parseFloat(q.get('rum-stopp')) : (first - t) / 3600000;
     const nag = !rd || rd.next || !(h > 0) || h > 24 ? 0 : h <= 1 ? 1 : 0.25 + (0.6 * (24 - h)) / 23;
@@ -2622,6 +2622,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const was = R.ss || {};
     const sum = {};
     R.ss = {};
+    // (ens eget tips när det syns, annars gängets kupong)
+    const tecken = (g, x) => (s && s.tips && s.tips[g.id] ? s.tips[g.id].tecken[x.id] : p && p.inne && p.vem === g.id ? p.tecken[x.id] : null) || x.sign || '';
     for (const x of rows) {
       if (x.g.state !== 'live' || !x.g.score) continue;
       const sc = x.g.score;
@@ -2629,8 +2631,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const w = was[x.id];
       if (!w || (w.home === sc.home && w.away === sc.away)) continue;
       for (const g of gang) {
-        const own = s && s.tips && s.tips[g.id] ? s.tips[g.id].tecken[x.id] : p && p.inne && p.vem === g.id ? p.tecken[x.id] : null;
-        const sign = own || x.sign || '';
+        const sign = tecken(g, x);
         sum[g.id] = (sum[g.id] || 0) + (sign ? Number(sign.includes(res(sc))) - Number(sign.includes(res(w))) : 0);
       }
     }
@@ -2638,6 +2639,88 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // humöret: hur det går för kupongen
     R.spel = spelLage(rd, rows, p);
     if (R.fig && R.fig.spel) R.fig.spel(R.spel, now());
+    // nerverna: hur spänd var och en är av matcherna som pågår, och slutsignalen i en match man satt
+    // spänd i (rum-3d.js, nerver och slut)
+    const nv = nerverLage(rows, gang, tecken, R.spel.lage);
+    R.nerv = nv.vem;
+    if (R.fig && R.fig.nerver) R.fig.nerver(R.nerv, now());
+    if (Object.keys(nv.slut).length && R.fig && R.fig.slut) R.fig.slut(nv.slut, now());
+  }
+
+  // Nerverna under matcherna (rum-3d.js, nerver): hur spänd var och en är, 0–1, av matcherna som
+  // pågår – efter sitt eget tips, som målen. En match spänner när ett mål skulle vända tipset: mest
+  // när tipset håller med uddamålet (eller krysset i en jämn match) och det lider mot slutet, nästan
+  // lika mycket när ett mål skulle rädda det, lite med två mål emellan och inte alls med fler eller
+  // med helgardering. Tidigt i matchen lite, i halvtidsvilan nästan inget. Flera matcher lägger sig på
+  // den mest spända, de andra en fjärdedel var, och kupongen väger in: på gränsen (nästa fel tar
+  // vinsten) mer, död mindre. Dolda resultat ger inga nerver (state hidden, ingen ställning).
+  // slag: om det mest är att hålla undan (haller) eller att jaga ett mål (jagar). slut: när en match
+  // som någon satt spänd i (minst 0,3) har blåsts av – 1 när tipset höll, −1 när det inte gjorde det;
+  // inte första gången (när rummet öppnas).
+  // ?rum-nerv=dl:0.9,dt:0.4:jagar,dj:0.7 för bilder (och då står tv:n på).
+  const NERV_MIN = /^(\d+)'(?:\+(\d+))?/;
+  function matchNerv(sign, sc, clock) {
+    if (!sign || sign.length >= 3 || !sc) return null;
+    const res = (d) => (d > 0 ? '1' : d < 0 ? '2' : 'X');
+    const d = sc.home - sc.away;
+    const hit = sign.includes(res(d));
+    // hur många mål som vänder tipset, åt något håll
+    let mal = 0;
+    for (let k = 1; k <= 2 && !mal; k++) if (sign.includes(res(d + k)) !== hit || sign.includes(res(d - k)) !== hit) mal = k;
+    if (!mal) return null;
+    const c = String(clock || '');
+    const m = NERV_MIN.exec(c);
+    const sent = sm(52, 90, m ? Number(m[1]) + Number(m[2] || 0) : 45);
+    let v = mal === 1 ? (hit ? 0.15 + 0.85 * sent : 0.12 + 0.68 * sent) : (hit ? 0.12 * (1 - 0.7 * sent) : 0.1 * (1 - sent));
+    if (/^HT\b/i.test(c)) v *= 0.3;
+    return { v, haller: hit };
+  }
+  function nerverLage(rows, gang, tecken, lage) {
+    const q = R.q;
+    if (q.has('rum-nerv')) {
+      const vem = {};
+      for (const x of (q.get('rum-nerv') || '').split(',')) {
+        const r = /^(\w+):([\d.]+)(?::(haller|jagar))?$/.exec(x.trim());
+        if (r) vem[r[1].toLowerCase()] = { v: Math.min(1, Number(r[2])), slag: r[3] || 'haller' };
+      }
+      return { vem, slut: {} };
+    }
+    const vikt = lage === 'nerv' ? 1.2 : lage === 'deppig' ? 0.55 : lage === 'glad' ? 0.9 : 1;
+    const vem = {};
+    const nu = {};
+    for (const g of gang) {
+      const v = [];
+      let haller = 0;
+      let jagar = 0;
+      for (const x of rows) {
+        if (x.g.state !== 'live' || !x.g.score) continue;
+        const n = matchNerv(tecken(g, x), x.g.score, x.g.clock);
+        if (!n || n.v < 0.01) continue;
+        v.push(n.v);
+        (nu[x.id] || (nu[x.id] = {}))[g.id] = n.v;
+        if (n.haller) haller = Math.max(haller, n.v);
+        else jagar = Math.max(jagar, n.v);
+      }
+      if (!v.length) continue;
+      v.sort((a, b) => b - a);
+      const x = Math.min(1, (v[0] + 0.25 * v.slice(1).reduce((a, b) => a + b, 0)) * vikt);
+      vem[g.id.toLowerCase()] = { v: Math.round(x * 100) / 100, slag: haller >= jagar ? 'haller' : 'jagar' };
+    }
+    // slutsignalen: en match som var spänd förra gången och nu är slut (och syns)
+    const slut = {};
+    for (const [id, fore] of Object.entries(R.nervM || {})) {
+      const x = rows.find((y) => String(y.id) === id);
+      if (!x || x.g.state !== 'final' || x.g.res == null) continue;
+      for (const g of gang) {
+        const sign = tecken(g, x);
+        if (!(fore[g.id] >= 0.3) || !sign) continue;
+        const k = g.id.toLowerCase();
+        slut[k] = (slut[k] || 0) + (sign.includes(SIGNS[x.g.res]) ? 1 : -1);
+      }
+    }
+    for (const k of Object.keys(slut)) if (!slut[k]) delete slut[k];
+    R.nervM = nu;
+    return { vem, slut };
   }
 
   // Hur det går för gängets kupong, för gängets humör (rum-3d.js, spel): bara
@@ -2713,6 +2796,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (r && r[3]) satt[r[1]] = 'abc'.indexOf(r[3]);
     }
     const go = () => R.fig.mal(m, still() ? 0 : now(), satt);
+    go();
+    if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
+  }
+
+  // ?rum-slut=dl:1,dj:-1: slutsignalen i en match man satt spänd i, för bilder (rum-3d.js, slut) – 1
+  // när tipset höll, −1 när det inte gjorde det; vid tiden 0 med ?rum-t, annars genast och sedan var
+  // femtonde sekund.
+  function provSlut() {
+    const v = R.q.get('rum-slut');
+    if (!v || !R.fig || !R.fig.slut) return;
+    const m = {};
+    for (const x of v.split(',')) {
+      const r = /^(\w+):(-?1)$/.exec(x.trim());
+      if (r) m[r[1]] = Number(r[2]);
+    }
+    const go = () => R.fig.slut(m, still() ? 0 : now());
     go();
     if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
   }
@@ -3498,11 +3597,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
         if (R.spel) R.fig.spel(R.spel, now());
+        if (R.nerv) R.fig.nerver(R.nerv, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappKlick, visa, ta: taKupong, radio: () => sak('radio') });
         if (window.RumRadio) RumRadio.mount({ el: R.el, fig: () => R.fig, now, inr: () => R.inr, sak: (n) => sak(n) });
         radioRuta();
         provMal();
+        provSlut();
         provAkt();
         provLapp();
         provGa();
