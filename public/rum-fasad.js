@@ -23,9 +23,10 @@
 // barberarens stång) ritas i tre dukar i en takt (TAKT), och står still med prefers-reduced-motion.
 //
 //   RumFasad.bygg(rum, o) → { el, ny(), ut() } bygger fasaden i rum (.rum) och ritar den;
-//     o.gang(duk) ritar gänget på duken (false utan), o.neon() neonen tänd just nu, o.natt() 0…1 hur
-//     släckt lysröret är, o.calm() utan rörelser (prefers-reduced-motion), o.still en fast bild på den
-//     tiden (s, ?rum-t i rum.js): allt som rör sig står där det är då
+//     o.gang(duk) ritar gänget på duken (false utan), o.takt() hur många gånger i sekunden (som inne),
+//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.calm() utan rörelser
+//     (prefers-reduced-motion), o.still en fast bild på den tiden (s, ?rum-t i rum.js): allt som rör sig
+//     står där det är då
 
 window.RumFasad = (() => {
   const r1 = (x) => Math.round(x * 10) / 10;
@@ -1541,7 +1542,7 @@ window.RumFasad = (() => {
     el.innerHTML = '<div class="rf-scen"></div>';
     rum.append(el);
     const scen = el.firstChild;
-    const F = { V: null, sig: '', duk: null, raf: 0, sist: 0, neon: null, klar: false, ro: null };
+    const F = { V: null, sig: '', duk: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
     const calm = () => Boolean(o.calm && o.calm());
     // (dukarnas bildpunkter per enhet i världen: skärmens, högst två miljoner bildpunkter på hela fönstret)
     const tathet = (V) => {
@@ -1619,7 +1620,7 @@ window.RumFasad = (() => {
       if (gammal && gammal.width) F.duk.getContext('2d').drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
       F.neon = null;
       passa();
-      gang(true);
+      gang();
       rorelse(true);
     }
     // scenen så stor att den täcker fönstret (vy har fönstrets form)
@@ -1630,12 +1631,29 @@ window.RumFasad = (() => {
       el.style.setProperty('--dorr-x', `${r1((DORR.x + DORR.w / 2 - F.V.x) * k)}px`);
       el.style.setProperty('--dorr-y', `${r1((DORR.y + DORR.h * 0.45 - F.V.y) * k)}px`);
     }
-    // gänget i fönstret och neonen: några gånger i sekunden (i telefonen färre), en gång i en stillbild
-    function gang(nu) {
+    // Gänget i fönstret och neonen: lika ofta som gänget ritas inne (o.takt, efter vad enheten hinner med),
+    // men glesare om en bild av gänget tar mer än en fjärdedel av tiden (GANG_ANDEL; F.tider: de senaste,
+    // och mitten av dem räknas), så att regnet och de som går förbi inte hackar för gängets skull i en svag
+    // telefon eller dator. Gänget ritas direkt efter bildrutan (efter), som inne (efterBild i rum.js): då
+    // har det hela tiden till nästa, och det som ritas i bildrutan väntar inte. En gång i en stillbild.
+    // Förut ritades hela gängets duk några gånger i sekunden, och då hackade gänget fram; nu ritas bara
+    // glaset (utifran i rum-3d.js).
+    const GANG_ANDEL = 0.25;
+    function gangDags(ms) {
+      const takt = (o.takt && o.takt()) || (LATT ? 20 : 30);
+      const tid = F.tider.length ? [...F.tider].sort((a, b) => a - b)[F.tider.length >> 1] : 0;
+      return ms - F.sist >= Math.max(1000 / takt - 4, tid / GANG_ANDEL);
+    }
+    const efter = new MessageChannel();
+    efter.port1.onmessage = () => {
+      F.vantar = false;
+      if (el.isConnected) gang();
+    };
+    function gang() {
       const ms = performance.now();
-      if (!nu && ms - F.sist < (LATT ? 240 : 110)) return;
-      F.sist = ms;
       if (F.duk && o.gang) o.gang(F.duk);
+      F.tider.push(performance.now() - ms);
+      if (F.tider.length > 9) F.tider.shift();
       const on = o.neon ? o.neon() !== false : true;
       if (on !== F.neon) {
         F.neon = on;
@@ -1672,9 +1690,14 @@ window.RumFasad = (() => {
     function loop() {
       cancelAnimationFrame(F.raf);
       if (calm() || o.still != null) return;
-      const tick = () => {
+      const tick = (ms) => {
         if (!el.isConnected) return;
-        gang(false);
+        // (F.sist: bildrutan som gänget ritades efter)
+        if (!F.vantar && gangDags(ms)) {
+          F.sist = ms;
+          F.vantar = true;
+          efter.port2.postMessage(0);
+        }
         rorelse();
         F.raf = requestAnimationFrame(tick);
       };

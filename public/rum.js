@@ -4150,6 +4150,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const f = RumFasad.bygg(R.el, {
       // (medan rummet syns, i övergången, ritas gänget tillbaka inifrån direkt efter)
       gang: (duk) => R.fig && R.fig.utifran ? R.fig.utifran(duk, now(), neonOn(now()), !R.vilar) : false,
+      // (lika ofta som gänget ritas inne, KVAL)
+      takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
       calm: () => RORELSE_AV.matches,
