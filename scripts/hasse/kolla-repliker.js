@@ -10,13 +10,11 @@
 //   - rader som hamnar fel i samtalet: efter "Det slutar 2–1" får raden om kupongen inte
 //     börja med ett Det som låter som resultatet,
 //   - fält som tomt försvinner (fyll i rum-hasse.js skriver inget för ett okänt fält),
-//   - listor som blivit en sträng (lott i rum-hasse.js kräver en lista),
-//   - att rösten får exakt de meningar sidan säger.
+//   - listor som blivit en sträng (lott i rum-hasse.js kräver en lista).
 
 const repliker = require('../../public/rum-hasse-repliker.js');
 const block = require('../../public/rum-block.js');
 const tidning = require('../../public/rum-tidning.js');
-const { repliktexter } = require('../../src/rost.js');
 
 // Underkänt av Tomas, med det som ska stå i stället.
 const UNDERKANT = [
@@ -184,15 +182,6 @@ for (const k of ['1', 'X', '2']) {
   if (!t || !t.du || !t.bestamd) fel.push(`tecken.${k} saknar du eller bestamd`);
 }
 
-// Rösten: alla fält ifyllda, och tecknen i rätt form.
-const tal = repliktexter([{ namn: 'Test Testsson' }]);
-for (const t of tal) if (/\{\w+\}/.test(t)) fel.push(`rösten får ett tomt fält: "${t}"`);
-for (const t of tal) if (/\b(etta|kryss|tvåa|Etta|Kryss|Tvåa) (får|kan) du behålla\b/.test(t)) fel.push(`obestämd form: "${t}"`);
-for (const [vag, t] of alla) {
-  if (INTE_MENINGAR.includes(vag.split('.')[0]) || vag === 'utanRost' || /\{/.test(t)) continue;
-  if (!tal.includes(t.replace(/\s+/g, ' ').trim())) fel.push(`rösten saknar "${t}"`);
-}
-
 // Det han skriver i protokollet och tidningen (public/rum-block.js) sägs inte, och där får en
 // anteckning vara ett ord, men det som är underkänt gäller också där.
 const blockTexter = (o) => (typeof o === 'string' ? [o] : typeof o === 'function' ? [o(9, 11, '1–0', 18)] : Array.isArray(o) ? o.flatMap(blockTexter) : Object.values(o).flatMap(blockTexter));
@@ -215,4 +204,4 @@ if (fel.length) {
   console.error(`Hasses repliker: ${fel.length} fel\n${fel.map((f) => `  ${f}`).join('\n')}`);
   process.exit(1);
 }
-console.log(`Hasses repliker: ${alla.length} rader och ${tal.length} meningar till rösten, inga fel.`);
+console.log(`Hasses repliker: ${alla.length} rader, inga fel.`);
