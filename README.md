@@ -7101,7 +7101,9 @@ står kvar bara på tv:n. Samma tal under samma namn och i samma ordning som kol
 - **Talets lista** (`#lista:lag:pl:skapar`, `#lista:spelare:ch:assist`): divisionens lag eller spelare
   ordnade efter talet, med numret bara på den första vid lika tal (som skytteligan på tv:n), registrets rad med
   divisionerna överst (de ger samma lista där) och ←/→ till förra och nästa tal. Spelarlistan har dem som har spelat,
-  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna).
+  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna). Sedan
+  2026-11-16 är listan en rankning med en stapel per rad, och platsen efter ett tal leder dit (se
+  [Rankningen](#rankningen) nedan).
 - **Matchakten** har också matchsidans rader ur matchens fil: *Matcher 14 d* (med Europacuperna), *Hemma* och *Borta*
   (V–O–F), *Nollor*, *Utan mål*, *På mål*, *Mål mot xG* och *Insl. mot xG*, lagens främsta i *Assist* och *Segermål*
   (*Gula kort* där målens sort saknas) och *Domaren* med gula kort, frisparkar och hemmasegrar mot divisionens snitt.
@@ -7225,6 +7227,35 @@ matchen var i Europa står under VILAN. Mätarnas rutor går nu jämnt upp i bre
 (`background-repeat: round` i [public/rum-register.css](public/rum-register.css)): ett tecken i
 VT323 är en bråkdel bredare än `1ch`, och en ruta till skymtade fram som ett tunt streck efter
 mätarna, också i lagkorten.
+
+#### Rankningen
+
+2026-11-16 ville användaren att platserna efter talen (*4:E*, *12:E*) skulle gå att trycka på och leda till "en
+sida med rankingen för de respektive siffrorna snyggt visualiserade som man sen lätt kan ta sig tillbaka ifrån" –
+för alla tal, både lagens och spelarnas. Mätaren och platsen efter ett tal i lagkortet och spelarkortet (också
+*Poäng* under formen) är nu en tryckbar bit, och platsen efter *Styrka*, *Motståndet* och *Mot oddsen* i matchakten
+likaså (`#plats:lag:pl:styrka:Arsenal` i [public/rum-register.js](public/rum-register.js), `platsQ`). Den leder till
+talets lista, som blev en rankning:
+
+- **Staplarna**: efter talet står en stapel lika lång som talet – från noll till listans högsta, och när någon har
+  minus (*Tur*, *Styrka*, *Mot oddsen*) från en mittlinje åt båda hållen, så att man ser avstånden och inte bara
+  ordningen. De tomma rutorna efter stapeln är skalan, som mätarna i korten; en verklig skillnad syns som minst en
+  ruta, noll som ingenting. Talen där lägst är bäst (*Insläppta*, *Släpper till*) har staplar efter talet ändå,
+  så de kortaste står överst.
+- **Den man kom ifrån** är markerad: namnet omvänt, platsen, talet och stapeln ljusa i ett svagt band, de andras
+  staplar svaga, och raden en tredjedel ner i rutan. Under rubriken står platsen i klartext (*ARSENAL 13:E AV
+  20*). Från matchakten markeras båda lagen (*CHELSEA 10:E · ARSENAL 7:E AV 20*), med det man tryckte på först.
+  Vid lika tal står numret alltid på den markerade raden, annars bara på den första. *Hela listan* i
+  förklaringsrutan markerar kortets lag eller spelare (i matchakten båda lagen) på samma sätt.
+- **Rubriken står still** (divisionerna, talets namn och platsen) medan listan rullar, och ←/→ bläddrar till
+  förra och nästa tal med samma markering.
+- **Tillbaka**: Esc (*◄ Tillbaka* i telefonen) går tillbaka till kortet eller matchakten, i samma flik och lika
+  långt rullat. Ett lag eller en spelare i rankningen öppnar kortet i fliken där talet står.
+
+Spalterna följer bredden: på datorn hela lagnamnet och spelarens lag, i telefonen de korta namnen och en kortare
+stapel (spelarens lag bara när stapeln ändå får minst sex rutor). Med ↑/↓ markeras mätaren och platsen i korten som
+en rad. Platserna som säger var ett lag står i tabellen (formens motståndare, gruppen i Nations League) leder inte
+hit: tabellen står på tv:n.
 
 #### Vad som står var
 
