@@ -126,7 +126,7 @@ window.Rum = (() => {
     <linearGradient id="rum-furu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1804" stop-opacity=".62"/><stop offset=".22" stop-color="#2e1804" stop-opacity=".12"/>
       <stop offset=".5" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
     <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#ffe6c0" stop-opacity=".1"/><stop offset="1" stop-color="#ffe6c0" stop-opacity="0"/></radialGradient>
-    <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#6b5733"/><stop offset="1" stop-color="#382d1c"/></linearGradient>
+    <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".06"/><stop offset="1" stop-color="#0a0704" stop-opacity=".44"/></linearGradient>
     <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d3426"/><stop offset="1" stop-color="#6b5d45"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
     <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
@@ -199,6 +199,76 @@ window.Rum = (() => {
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-flack)" opacity=".3"/>
   <rect x="0" y="90" width="1140" height="640" filter="url(#rum-prick)" opacity=".35"/>
   <rect x="0" y="90" width="1140" height="7" fill="#000" opacity=".35"/>`;
+  }
+
+  // Högra väggen (2026-11-16) tapetserades på 90-talet, medan furun på bakväggen fick vara kvar: ljus
+  // tapet med konfetti i turkos, lila, cerise, gult och blått, en marinblå bård med harlekintrianglar
+  // mellan guldkanter och under den en bröstpanel i samma lackade furu som bakväggen, med en list
+  // överst. Panelen syns mellan bardisken (yb 490) och listen; bården går precis under Tipsligan och
+  // bakom korktavlans nederkant (VAGG). Allt ritas i väggens plan – z in från hörnet mot betraktaren
+  // och yb mätt som i hörnet – och förs ut i bilden med vp, så att bräderna och trianglarna står
+  // tätare in mot hörnet. Röken har gulnat tapeten och mörkt den upptill, och ljuset klingar av ut
+  // mot betraktaren (rum-rwall), som på den nikotingula väggen som var där förut. Ritas mellan x0 och
+  // x1 i bilden: i bg, i taket (tak) där väggen fortsätter upp och i videons hörn (vaggSvg i
+  // rum-video.js, som får den härifrån).
+  const TAPET = { bard: 423, list: 451, panel: 458, bas: '#e2d6bc', konf: ['#1aa3a0', '#7b4fb0', '#d6337a', '#f2b632', '#2f6fb8'] };
+  function hogerVagg(x0 = 1140, x1 = W) {
+    const vp = (z, yb) => { const q = 1000 / (1000 - z); return [VP[0] + 380 * q, VP[1] + (yb - VP[1]) * q]; };
+    const zx = (x) => 1000 * (1 - 380 / (x - VP[0]));
+    const [z0, z1] = [Math.max(0, zx(x0) - 40), Math.min(900, zx(x1) + 40)];
+    const pts = (l) => l.map(([z, yb]) => vp(z, yb)).map(([x, y]) => `${r1(x)},${r1(y)}`).join(' ');
+    const d = (l) => `M${pts(l).replace(/ /g, 'L')}Z`;
+    const quad = (za, zb, ya, yb, fill, extra = '') => `<polygon points="${pts([[za, ya], [zb, ya], [zb, yb], [za, yb]])}" fill="${fill}"${extra}/>`;
+    const { bard: B, list: L, panel: P } = TAPET;
+    // tapeten, med konfettin i en bana per färg (ett streck är en smal fyrhörning i väggens plan)
+    let s = quad(z0, z1, 0, B, TAPET.bas);
+    const R0 = rng(16);
+    const banor = TAPET.konf.map(() => []);
+    for (let z = 0; z < z1; z += 26) {
+      for (let y = 90; y < B; y += 26) {
+        const [u, v, a, l, f, prick] = [z + R0() * 26, y + R0() * 26, R0() * Math.PI, 3 + R0() * 3.5, (R0() * banor.length) | 0, R0() < 0.25];
+        if (u < z0 || u > z1 || v > B - 4) continue;
+        const [c, n] = [[Math.cos(a), Math.sin(a)], [-Math.sin(a), Math.cos(a)]];
+        const [h, b] = prick ? [1.6, 1.6] : [l, 1.1];
+        banor[f].push(d([[u - c[0] * h - n[0] * b, v - c[1] * h - n[1] * b], [u + c[0] * h - n[0] * b, v + c[1] * h - n[1] * b],
+          [u + c[0] * h + n[0] * b, v + c[1] * h + n[1] * b], [u - c[0] * h + n[0] * b, v - c[1] * h + n[1] * b]]));
+      }
+    }
+    s += banor.map((b, i) => `<path d="${b.join('')}" fill="${TAPET.konf[i]}" fill-opacity=".85"/>`).join('');
+    // bården: trianglar upp i cerise och ned i turkos, en gul prick i varje, guldkanter
+    s += quad(z0, z1, B, L, '#22305e');
+    let upp = '';
+    let ned = '';
+    let prickar = '';
+    for (let z = Math.floor(z0 / 30) * 30 - 30; z < z1; z += 30) {
+      upp += d([[z, 447], [z + 15, 427], [z + 30, 447]]);
+      ned += d([[z + 15, 427], [z + 30, 447], [z + 45, 427]]);
+      prickar += d([[z + 15, 440], [z + 16.4, 441.6], [z + 15, 443.2], [z + 13.6, 441.6]]);
+    }
+    s += `<path d="${upp}" fill="#d6337a"/><path d="${ned}" fill="#1aa3a0"/><path d="${prickar}" fill="#f2b632"/>` +
+      quad(z0, z1, B, B + 2.4, '#e9c46a') + quad(z0, z1, L - 2.4, L, '#e9c46a');
+    // bröstpanelen: furubräder som på bakväggen (34 breda), med fogar, ådring och några kvistar
+    const toner = ['#b47c43', '#a9713a', '#bb874c', '#a46c36', '#b78046', '#ad763e'];
+    const R1 = rng(23);
+    for (let z = 0; z < z1; z += 34) {
+      const ton = toner[(R1() * toner.length) | 0];
+      const kvist = R1() < 0.4 ? [z + 6 + R1() * 22, 462 + R1() * 24] : null;
+      if (z + 34 < z0) continue;
+      s += quad(z, z + 34, P, 730, ton) + quad(z, z + 1.8, P, 730, '#26150a', ' opacity=".75"') + quad(z + 1.8, z + 3, P, 730, '#f0c48a', ' opacity=".3"');
+      if (kvist) {
+        const [u, v] = kvist;
+        s += `<path d="${d([0, 1, 2, 3, 4, 5, 6, 7].map((k) => [u + 2.6 * Math.cos(k * 0.785), v + 1.8 * Math.sin(k * 0.785)]))}" fill="#5a3010" opacity=".85"/>`;
+      }
+    }
+    const panel = `<polygon points="${pts([[z0, P], [z1, P], [z1, 730], [z0, 730]])}"`;
+    s += `${panel} filter="url(#rum-ved)" opacity=".55"/>${panel} fill="#1c1006" opacity=".3"/>`;
+    // listen: samma furu, lite utanför panelen, ljus överkant och skugga under
+    s += quad(z0, z1, L, P, '#a46c36') + quad(z0, z1, L, L + 1.4, '#e0b27a', ' opacity=".7"') + quad(z0, z1, P - 1.2, P, '#26150a', ' opacity=".5"') +
+      quad(z0, z1, P, P + 4, '#000', ' opacity=".32"') + quad(z0, z1, P + 4, P + 9, '#000', ' opacity=".12"');
+    // röken upptill och ljuset som klingar av mot betraktaren
+    for (let i = 0; i < 6; i++) s += quad(z0, z1, 90 + i * 22, 112 + i * 22, '#2e1804', ` opacity="${(0.3 - i * 0.05).toFixed(2)}"`);
+    const yta = `<polygon points="${pts([[z0, 0], [z1, 0], [z1, 730], [z0, 730]])}"`;
+    return `${s}${yta} fill="url(#rum-rwall)"/>${yta} filter="url(#rum-flack)" opacity=".45"/>`;
   }
 
   // Bardisken längs högra väggen, som i en pub: en skiva i mörk lackad
@@ -274,8 +344,8 @@ window.Rum = (() => {
       band(ky, 501, 502.6, 'rgba(0,0,0,.55)', a, z);
   }
 
-  // Bakgrunden: taket, väggarna (furupanelen och den nikotingula högra
-  // väggen), dörren, skyltfönstret och disken. Lysröret, skyltarna och
+  // Bakgrunden: taket, väggarna (furupanelen och den tapetserade högra
+  // väggen, hogerVagg), dörren, skyltfönstret och disken. Lysröret, skyltarna och
   // paketen är i 3D (rum-inredning.js).
   // Undertaket är i 3D (innertak i rum-inredning.js), ovanpå taket här och i bg(). Här under står samma
   // bärverk platt, ifall 3D-delen inte kommer: plattor på 60 × 60 cm (120 enheter) med fläkten mitt i en, z
@@ -304,12 +374,13 @@ window.Rum = (() => {
     <radialGradient id="rum-tak-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(575 -30) scale(420 170)"><stop offset="0" stop-color="#b48c5c" stop-opacity=".34"/><stop offset="1" stop-color="#b48c5c" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-tak-vagg" gradientUnits="userSpaceOnUse" x1="0" y1="${Y0}" x2="0" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".62"/><stop offset="1" stop-color="#0a0704" stop-opacity="0"/></linearGradient>
     <radialGradient id="rum-tak-flack"><stop offset="0" stop-color="#140c04" stop-opacity=".34"/><stop offset=".7" stop-color="#140c04" stop-opacity=".14"/><stop offset="1" stop-color="#140c04" stop-opacity="0"/></radialGradient>
+    <clipPath id="rum-tak-hoger"><polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4"/></clipPath>
   </defs>
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-yta)"/>
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-sken)"/>
   <ellipse cx="318" cy="-96" rx="118" ry="30" fill="url(#rum-tak-flack)"/><ellipse cx="846" cy="-188" rx="150" ry="44" fill="url(#rum-tak-flack)"/>
   <g stroke="#efe4c8" stroke-opacity=".3" stroke-width="2.6">${takLinjer(Y0, 0)}</g>
-  <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-rwall)"/>
+  <g clip-path="url(#rum-tak-hoger)">${hogerVagg(1250, X1)}</g>
   <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-tak-vagg)"/>
   <polygon points="1250,4 1265,-12 ${X1},-12 ${X1},4" fill="#160e08" fill-opacity=".8"/>
   <line x1="1265" y1="-12" x2="${X1}" y2="-12" stroke="#b09a74" stroke-opacity=".22" stroke-width="1.4"/>`, 'rum-tak', [X0, Y0, X1 - X0, 4 - Y0], 0.25);
@@ -344,8 +415,7 @@ window.Rum = (() => {
   <g fill="#cbbf9e" opacity=".5"><rect x="512" y="114" width="5" height="3" rx="1"/><rect x="420" y="117" width="5" height="3" rx="1"/></g>
   <path d="M0 470 q30 -10 60 4 l-4 18 q-30 -8 -56 2 z" fill="#2a1e0c" opacity=".14" filter="url(#rum-b4)"/>
 
-  <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" fill="url(#rum-rwall)"/>
-  <polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730" filter="url(#rum-flack)" opacity=".55"/>
+  <g clip-path="url(#rum-hogerklipp)">${hogerVagg()}</g>
   <line x1="1140" y1="90" x2="1140" y2="730" stroke="#000" stroke-opacity=".35" stroke-width="3"/>
   <polygon points="1140,90 1600,0 1600,1000 1140,730" fill="#000" opacity=".2"/>
   ${spotYta(SPOT.liga, 'clip-path="url(#rum-hogerklipp)" ')}
@@ -659,7 +729,7 @@ window.Rum = (() => {
   const tv = () => (window.RumTv ? RumTv.html() : '');
   // Videon på disken, och väggen, disken och pulten till höger om bilden (rum-video.js,
   // som ritar disken där med disk).
-  const vid = (part) => (window.RumVideo ? RumVideo.html(part, { disk }) : '');
+  const vid = (part) => (window.RumVideo ? RumVideo.html(part, { disk, vagg: hogerVagg }) : '');
 
   // Pingklockan på pulten bredvid kupongen: till uppgörelsen ringer
   // man in gänget. Kupan i mässing speglar lysröret och lite av neonskylten.
@@ -2699,8 +2769,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // och pulten blinkade svart.
   const camT = (mx, my) => `translateZ(-330px) rotateX(${(-my * 2.6).toFixed(3)}deg) rotateY(${(mx * 4.5).toFixed(3)}deg) translateZ(330px)`;
   // Världens tre lager (build) vrids alltid lika: samma stil på alla tre, i
-  // samma ögonblick, så att övergångarna går i takt.
-  const varldar = () => R.varldar || [];
+  // samma ögonblick, så att övergångarna går i takt – utom videohörnet medan
+  // det är lyft ur rummet (R.lyftRak, rakHorn): då står det rakt mot en och
+  // vrids för sig.
+  const varldar = () => (R.lyftRak ? (R.varldar || []).filter((w, i) => i !== 1) : R.varldar || []);
   const stil = (s) => { for (const w of varldar()) Object.assign(w.style, s); };
   function setCam(mx, my) {
     const ws = varldar();
@@ -2840,6 +2912,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const f = (R.folj = { t: nu, a: fran, b: [mx, my], ...GLID });
     for (const v of varldar()) v.classList.add('vrider');
     stil({ transform: (R.cam = camT(mx, my)) });
+    // (är videohörnet på väg hem, landar det i den nya vinkeln)
+    rakMal();
     R.camVis = [mx, my];
     setTimeout(() => {
       if (R.folj !== f) return;
@@ -2905,7 +2979,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       R.bildVis = false;
       return;
     }
-    if (!still()) {
+    // (medan videohörnet är lyft ur rummet står rummet still, rakHorn)
+    if (!still() && !R.lyftRak) {
       // lika fort som när den gick 6 % av vägen (12 med kupongen i handen) 30 gånger i sekunden
       const f = 1 - (1 - (R.kup ? 0.12 : 0.06)) ** (dt / (1000 / 30));
       R.mx += (R.tx - R.mx) * f;
@@ -2913,7 +2988,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     // (inte förrän kameran har glidit hem från en närbild: medan världen
     // glider behåller Chrome lagrens upplösning, och den ska bli hemmets)
-    const hemma = R.el.classList.contains('chromium') && !calm() && !nara() && !R.el.classList.contains('sak-nara');
+    const hemma = R.el.classList.contains('chromium') && !calm() && !nara() && !R.lyftRak && !R.el.classList.contains('sak-nara');
     if (!hemma) R.borta = performance.now();
     R.bildVis = !(hemma && performance.now() - (R.borta || 0) > 1000);
     if (R.bildVis) setCam(R.mx, R.my);
@@ -4454,40 +4529,31 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     aim([c[0] + (allt ? 0 : T.dx * m), c[1] + T.dy * m], s / (m * R.k), [mid(0.5)[0], (y - R.oy) / R.k], cls);
   }
 
-  // V: videon nära. Som datorn (register): rummet går bara lite mot hörnet
-  // på disken och mörknar, medan tv:n och lådan bredvid lyfts ur det
-  // (#rum-lyft, ovanpå resten av rummet och draperiet #rum-vmork) och kommer
-  // fram mot en, så att de står rakt framför och så stora som ryms över raden
-  // med tangenterna. Förut gick hela rummet fram till dem och svängde runt
-  // dem, och gänget for förbi i förgrunden.
+  // V: videon nära. Rummet står kvar som det står och mörknar, medan tv:n och
+  // lådan bredvid lyfts ur det (#rum-lyft, ovanpå resten av rummet och
+  // draperiet #rum-vmork) och kommer fram mot en, så att de står rakt framför
+  // och så stora som ryms över raden med tangenterna. Förut gick hela rummet
+  // fram till dem och svängde runt dem, och gänget for förbi i förgrunden.
   function zoomVideo(on) {
     if (!R.video || (!on && !R.vnara)) return;
     if (on && R.zoom) zoomTv(false);
     if (on && R.reg && R.reg.on()) register(false);
-    // Världen vrids först, medan stilen bara är ändrad där: vrid läser av
+    // Hörnet vrids först, medan stilen bara är ändrad där: rakHorn läser av
     // den direkt. Klassen vid-nara räknar om stilen för hela rummet, och satt
     // före gjordes det inne i klicket och en gång till i nästa bildruta –
     // kameran stod still en stund innan den gick, fram och hem (en tiondels
     // sekund i en svag telefon). Nu sätts den sist och räknas om en gång, i
     // bildrutan.
-    if (on) {
-      R.tx = 0;
-      R.ty = 0;
-      if (calm()) R.mx = R.my = 0;
-      vrid(0, 0);
-    } else vridHem();
+    rakHorn(on);
     if (!on) lattVideo(0);
     R.vnara = on;
     // Rummet bakom draperiet står still medan videon är framme: gänget,
     // sakerna i 3D, dammet och gatan ritas inte (frame), som bakom kupongen i
     // handen (urFokus) och i telefonen (lattVideo). På vägen hem kommer det
     // igång medan draperiet fortfarande är mörkt (så att ingen hoppar i bild),
-    // men glesare (VBAK_TAKT) tills hörnet har landat (lyftHornet). Utan det
-    // ritade grafikkortet hela rummet om i varje bildruta också bakom
-    // draperiet: i nästan hela skärmen (2240 × 1063) på en M1 föll 10–50 av
-    // 66 bildrutor bort när kameran stod still vid videon, 20–60 på vägen
-    // fram och 15–35 på vägen tillbaka; så här 0 nära och ungefär hälften så
-    // många på vägen.
+    // men glesare (VBAK_TAKT) tills hörnet har landat (lyftHornet). Med rummet
+    // stilla (rakHorn) ritar grafikkortet då nästan bara det som rör sig:
+    // hörnet och draperiet. Se Rummet bakom står still i README.
     // (en fast bild, ?rum-t, ritas som vanligt)
     R.vbak = still() ? null : on ? 'still' : 'gles';
     clearTimeout(R.vbakT);
@@ -4500,7 +4566,6 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on) R.video.skarp(false);
     else R.vskarp = setTimeout(() => { if (!R.vnara) R.video.skarp(false); }, 900);
     R.vf = R.video.zoom(on);
-    R.vrum = null;
     if (on) aimVideo(calm() ? null : 'glid');
     else {
       aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
@@ -4509,6 +4574,61 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (ovanpå rummet tills det har kommit hem igen)
     if (on) R.el.classList.add('vid-lyft');
     R.el.classList.toggle('vid-nara', on);
+  }
+  // Rummet står still medan tv:n och lådan är lyfta ur det: det vrids inte
+  // rakt och följer inte musen (kamera), och bara världen med hörnet
+  // (R.varldar[1], i #rum-lyft) vrids rakt mot en – och tillbaka till
+  // rummets vinkel, där det landar (rakKlar). Vreds hela rummet rakt och
+  // tillbaka mot musen (vrid, vridHem) och gick en fjärdedel närmare, som
+  // förut, ritade Chrome om allt i rummet i varje bildruta på vägen fram och
+  // tillbaka, och det hackade (se aimVideo).
+  function rakHorn(on) {
+    const lw = (R.varldar || [])[1];
+    if (!lw) return;
+    if (on && !R.lyftRak) {
+      // (rummet stannar där det syns: en vridning efter musen slutar)
+      const s = synlig();
+      setCam(...s);
+      [R.mx, R.my] = s;
+      [R.tx, R.ty] = s;
+      R.lyftRak = true;
+      void getComputedStyle(lw).transform;
+    }
+    if (!R.lyftRak) return;
+    const glid = !calm();
+    if (!on && glid) {
+      // Tillbaka börjar det där det syns – och står det rakt, en tusendel
+      // snett, som i vrid: rakt behåller Chrome närbildens skärpa på vägen hem.
+      const fran = lw.getAnimations().some((a) => a.playState === 'running') ? getComputedStyle(lw).transform : camT(0.001, 0.001);
+      lw.classList.remove('rak');
+      lw.style.transform = fran;
+      void getComputedStyle(lw).transform;
+    }
+    const t = on ? camT(0, 0) : R.cam || camT(R.mx, R.my);
+    sedan('rak', () => {
+      lw.classList.toggle('rak', glid);
+      lw.style.transform = t;
+    }, glid);
+  }
+  // (vrids rummet medan hörnet är på väg hem – en annan närbild – landar det i den nya vinkeln)
+  function rakMal() {
+    const lw = (R.varldar || [])[1];
+    if (R.lyftRak && !R.vnara && lw && R.cam) lw.style.transform = R.cam;
+  }
+  // Hemma: hörnet vrids med rummet igen, när det har vridits klart.
+  function rakKlar() {
+    const lw = (R.varldar || [])[1];
+    if (!lw || !R.lyftRak || R.vnara) return;
+    const pa = lw.getAnimations().filter((a) => a.playState === 'running');
+    if (pa.length) {
+      Promise.all(pa.map((a) => a.finished.catch(() => {}))).then(rakKlar);
+      return;
+    }
+    R.lyftRak = false;
+    lw.classList.remove('rak');
+    const w = R.varldar[0];
+    for (const k of ['transition', 'translate', 'rotate', 'transform']) lw.style[k] = w.style[k];
+    lw.classList.toggle('vrider', w.classList.contains('vrider'));
   }
   // Videohörnet en bit framför rummet (#rum-lyft, inne i kameran): punkten p
   // hamnar på to med förstoringen z, samma väg som kameran går till tv:n
@@ -4537,6 +4657,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         // (rummet bakom ritas som vanligt igen, R.vbak i zoomVideo)
         clearTimeout(R.vbakT);
         R.vbak = null;
+        rakKlar();
       };
       if (!cls) return landat();
       const a = (R.lyftVag = w.animate(zoomVag(fran, { dx, dy, z }), { duration: GLID.ms, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' }));
@@ -4562,36 +4683,30 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const z = Math.min(f.z || 6, ((vx1 - vx0) * m) / (x1 - x0), ((vy1 - vy0) * m) / (y1 - y0));
     const p = [(x0 + x1) / 2, (y0 + y1) / 2];
     const to = [(vx0 + vx1) / 2, (vy0 + vy1) / 2];
-    // Rummet går en fjärdedel närmare och halvvägs mot mitten (som mot
-    // datorn), mätt mot tv:n och lådan: när rutan sedan fyller bilden står
-    // det kvar, och hörnet går resten av vägen.
-    if (!f.fyll || !R.vrum) R.vrum = { p, z: Math.min(VID_RUM, z), to: [p[0] + (to[0] - p[0]) / 2, p[1] + (to[1] - p[1]) / 2] };
-    const r = R.vrum;
-    aim(r.p, r.z, r.to, cls);
-    lyftHornet(p, z / r.z, [r.p[0] + (to[0] - r.to[0]) / r.z, r.p[1] + (to[1] - r.to[1]) / r.z], cls);
-    // Draperiet: över det som syns av scenen hemma och när kameran är framme,
-    // ljusast mitt i fönstret där. Det ritas i en åttondel av storleken och
-    // förstoras (VMORK): Safari ritar ett lager i sin egen storlek gånger
-    // pixeltätheten, och i scenens mått hade det tagit 50–60 MB i en iPhone.
+    // Rummet står kvar där det står och mörknar bara, och hörnet går hela
+    // vägen. (Till 2026-11-16 gick rummet en fjärdedel närmare och halvvägs
+    // mot hörnet, som mot datorn, och vreds rakt: då ritade Chrome om hela
+    // rummet i varje bildruta på vägen fram och tillbaka, ungefär dubbelt så
+    // mycket som när kameran förut gick in i hörnet och rummet låg utanför
+    // bilden, och bildrutor föll bort där hörnet krymper fortast.)
+    aim([800, 500], 1, [800, 500], cls);
+    lyftHornet(p, z, to, cls);
+    // Draperiet: över scenen, ljusast mitt i fönstret. Det ritas i en
+    // åttondel av storleken och förstoras (VMORK): Safari ritar ett lager i
+    // sin egen storlek gånger pixeltätheten, och i scenens mått hade det
+    // tagit 50–60 MB i en iPhone.
     const vm = document.getElementById('rum-vmork');
     if (vm) {
-      const ut = (x, y) => [r.p[0] + (x - r.to[0]) / r.z, r.p[1] + (y - r.to[1]) / r.z];
-      const [a, b] = [ut(vx0, vy0), ut(vx1, vy1)];
-      const [s0, s1] = [ut(0, 0), ut(W, H)];
-      const L = Math.floor(Math.min(0, s0[0]));
-      const T = Math.floor(Math.min(0, s0[1]));
       const k = (v) => `${r1(v / VMORK)}px`;
       Object.assign(vm.style, {
-        left: `${L}px`, top: `${T}px`, width: k(Math.ceil(Math.max(W, s1[0])) - L), height: k(Math.ceil(Math.max(H, s1[1])) - T),
-        background: `radial-gradient(ellipse ${k((b[0] - a[0]) * 0.75)} ${k((b[1] - a[1]) * 0.75)} at ${k((a[0] + b[0]) / 2 - L)} ${k(a[1] + (b[1] - a[1]) * 0.48 - T)}, rgba(10, 8, 6, 0.55), rgba(10, 8, 6, 0.88))`,
+        left: '0px', top: '0px', width: k(W), height: k(H),
+        background: `radial-gradient(ellipse ${k((vx1 - vx0) * 0.75)} ${k((vy1 - vy0) * 0.75)} at ${k((vx0 + vx1) / 2)} ${k(vy0 + (vy1 - vy0) * 0.48)}, rgba(10, 8, 6, 0.55), rgba(10, 8, 6, 0.88))`,
       });
     }
     lattVideo(f.fyll ? 2 : 1);
   }
-  // hur mycket närmare rummet går när videon kommer fram, hur många
-  // gånger draperiet förstoras (.rum-vmork i rum.css), och hur många bilder
+  // hur många gånger draperiet förstoras (.rum-vmork i rum.css), och hur många bilder
   // i sekunden gänget och sakerna ritas på vägen hem från videon (R.vbak)
-  const VID_RUM = 1.25;
   const VMORK = 8;
   const VBAK_TAKT = 10;
 

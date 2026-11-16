@@ -12,6 +12,7 @@ const understat = require('./fetchers/understat');
 const fpl = require('./fetchers/fpl');
 const viaplay = require('./fetchers/viaplay');
 const youtube = require('./fetchers/youtube');
+const elo = require('./fetchers/elo');
 const fs = require('fs');
 const path = require('path');
 const { readCache, CACHE_DIR } = require('./store');
@@ -180,6 +181,23 @@ SOURCES.push({
     const n = d.turneringar.reduce((t, x) => t + x.matches.length, 0);
     return { n, detail: d.turneringar.map((x) => `${x.namn} ${x.matches.length}`).join(', ') };
   },
+});
+
+// Landslagens Elo-tal (sedan 2026-11-16): motståndets styrka i landslagens
+// form och tio senaste, som modellens styrka för klubbarna. Ändras bara när
+// landslagen spelar – en gång om dagen räcker.
+SOURCES.push({
+  id: 'elo_landslag',
+  provider: 'World Football Elo Ratings',
+  short: 'Elo',
+  label: 'Landslagens Elo-tal (motståndets styrka)',
+  comps: INTERNATIONAL.map((c) => c.id),
+  kinds: ['strength'],
+  maxAgeHours: 24,
+  staleAfterHours: 24 * 14,
+  verified: '2026-11-16',
+  fetch: () => elo.fetchElo(),
+  summarize: (d) => ({ n: d.lag.length, detail: `${d.lag.length} landslag, etta ${d.lag.find((x) => x.rank === 1) ? d.lag.find((x) => x.rank === 1).namn[0] : '–'}` }),
 });
 
 for (const c of COMPETITIONS.filter((x) => x.type === 'league')) {

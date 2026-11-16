@@ -229,6 +229,7 @@ function landData() {
   for (const g of groups) for (const r of g.rows) byKey.set(r.key, { group: g, row: r });
   const oc = readCache('espn_odds_land');
   return {
+    landElo: landElo([...land, ...landHist, ...landMoten], groups),
     land,
     landHist,
     landFetchedAt,
@@ -237,6 +238,78 @@ function landData() {
     landMotenFetchedAt: mc ? mc.fetchedAt : null,
     landTabell: { groups, byKey, fetchedAt: tc ? tc.fetchedAt : null },
     landOdds: { byEvent: (oc && oc.data && oc.data.byEvent) || {}, fetchedAt: oc ? oc.fetchedAt : null },
+  };
+}
+
+// Landslagens Elo-tal (elo_landslag, eloratings.net) per nyckel: { rating,
+// rank }. Lagen hittas på ESPN:s engelska namn bland Elo-listans namn och
+// andra stavningar; ESPN:s egna former står i ELO_NAMN. byLeague: Elo-talen
+// i varje liga i Nations League (A–D), starkast först, och alla europeiska
+// lag (all) – skalan för motståndets styrka, som divisionen för klubbarna.
+const ELO_NAMN = {
+  'czech republic': 'Czechia', 'republic of ireland': 'Ireland', 'cape verde islands': 'Cape Verde',
+  'china pr': 'China', 'congo dr': 'DR Congo', 'korea republic': 'South Korea', 'the gambia': 'Gambia',
+  turkiye: 'Turkey',
+};
+const eloNorm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z]/g, '');
+function landElo(matcher, groups) {
+  const c = readCache('elo_landslag');
+  if (!c || !c.data || !c.data.lag) return null;
+  const byName = new Map();
+  for (const t of c.data.lag) for (const n of t.namn) if (!byName.has(eloNorm(n))) byName.set(eloNorm(n), t);
+  const find = (en) => byName.get(eloNorm(ELO_NAMN[String(en || '').toLowerCase()] || en)) || null;
+  const byKey = new Map();
+  const add = (k, en) => {
+    if (byKey.has(k)) return;
+    const t = find(en);
+    if (t) byKey.set(k, { rating: t.rating, rank: t.rank });
+  };
+  for (const m of matcher) { add(m.hk, m.home.en); add(m.ak, m.away.en); }
+  for (const g of groups) for (const r of g.rows) add(r.key, r.en);
+  const byLeague = new Map();
+  const leagueOf = new Map();
+  const all = [];
+  for (const g of groups) {
+    const l = g.id ? g.id[0] : null;
+    for (const r of g.rows) {
+      const e = byKey.get(r.key);
+      if (!e) continue;
+      all.push(e.rating);
+      if (!l) continue;
+      leagueOf.set(r.key, l);
+      if (!byLeague.has(l)) byLeague.set(l, []);
+      byLeague.get(l).push(e.rating);
+    }
+  }
+  // (utan Nations Leagues tabell: alla lag i årets europeiska landskamper)
+  if (!all.length) {
+    for (const m of matcher) {
+      if (m.comp !== 'unl' && m.comp !== 'emk') continue;
+      for (const k of [m.hk, m.ak]) if (byKey.has(k) && !all.includes(byKey.get(k).rating)) all.push(byKey.get(k).rating);
+    }
+  }
+  for (const rs of [all, ...byLeague.values()]) rs.sort((a, b) => b - a);
+  return { byKey, byLeague, leagueOf, all, fetchedAt: c.fetchedAt };
+}
+
+// Motståndet i ett landslags formmatch, som opponentStrength för klubbarna:
+// level 0–1 från den svagaste till den starkaste i lagets egen liga i
+// Nations League (lag utan liga: alla europeiska lag), efter Elo-talen just
+// nu; lag utanför den skalan hamnar i ändarna. rank: platsen i världen.
+// null när något av lagen saknar Elo-tal.
+function landOpponentStrength(D, k, oppKey) {
+  const E = D.landElo;
+  const o = E && E.byKey.get(oppKey);
+  if (!o) return null;
+  const own = (E.leagueOf.has(k) && E.byLeague.get(E.leagueOf.get(k))) || E.all;
+  const top = own[0];
+  const bottom = own[own.length - 1];
+  return {
+    level: own.length > 1 && top > bottom ? Math.round(100 * Math.min(1, Math.max(0, (o.rating - bottom) / (top - bottom)))) / 100 : null,
+    rank: o.rank,
+    of: null,
+    league: null,
+    by: 'elo',
   };
 }
 
@@ -643,9 +716,10 @@ function teamProfile(D, k, before, S = null) {
   });
   p.schedule = schedule(D, cal, before, leagueId);
   // Formen (fem) som förut, utan xG; de tio senaste med lagets och
-  // motståndarnas xG i ligamatcherna (null i cuperna).
+  // motståndarnas xG i ligamatcherna (null i cuperna) och, sedan 2026-11-16,
+  // motståndets styrka (xG-fliken i datorn).
   p.form = form.slice(-FORM_N).reverse().map(({ xg, ...x }) => x);
-  p.senaste = form.slice(-SENASTE_N).reverse().map(({ opp, ...x }) => x);
+  p.senaste = form.slice(-SENASTE_N).reverse();
   // xG i ligan hittills, summerat, ur samma källa som matcherna ovan
   // (lagets och motståndarnas, n = matcher med xG).
   if (xgSrc) p.xg = xgSrc.season(k, before);
@@ -955,11 +1029,12 @@ function landProfile(D, k, before, team) {
       ga: r ? r.ga : null,
       result: !r ? null : r.gf > r.ga ? 'V' : r.gf < r.ga ? 'F' : 'O',
       decided: x.shootout ? 'straffar' : x.status === 'STATUS_FINAL_AET' ? 'förlängning' : null,
-      opp: null,
+      opp: landOpponentStrength(D, k, x.oppKey),
     };
   });
   p.form = form.slice(-FORM_N).reverse();
-  p.senaste = form.slice(-SENASTE_N).reverse().map(({ opp, ...x }) => ({ ...x, xg: null }));
+  // (de tio senaste med motståndets styrka, sedan 2026-11-16: xG-fliken i datorn)
+  p.senaste = form.slice(-SENASTE_N).reverse().map((x) => ({ ...x, xg: null }));
   const brief = (x, days) => (x ? { date: x.kickoff.slice(0, 10), comp: x.short, compName: x.name, home: x.home, opponent: x.opponent, days, played: x.completed } : null);
   const past = cal.filter((x) => x.kickoff < before && (x.completed || !INACTIVE.has(x.status)));
   const last = past.length ? past[past.length - 1] : null;

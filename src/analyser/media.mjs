@@ -21,6 +21,7 @@
 // så att samma artikel inte läses av Claude två gånger.
 
 import crypto from 'node:crypto';
+import dns from 'node:dns/promises';
 import mc from '../../config/media.js';
 import { jsonOf } from './kontroller.mjs';
 import { claudeSvar } from './claude.mjs';
@@ -111,45 +112,78 @@ export function bingNyheter(xml, lag, { cfg = mc, now = Date.now() } = {}) {
     let adress = x.link;
     try { const u = new URL(x.link); if (/(^|\.)bing\.com$/.test(u.hostname) && u.searchParams.get('url')) adress = u.searchParams.get('url'); } catch { continue; }
     const t = Date.parse(x.pubDate);
-    if (!Number.isFinite(t) || now - t > cfg.dagar * DAG || t - now > DAG || !namnerLaget(x.title, lag) || !renAdress(adress) || utesluten(adress, cfg.utesluten)) continue;
+    if (!Number.isFinite(t) || now - t > cfg.dagar * DAG || t - now > DAG || (lag && !namnerLaget(x.title, lag)) || !renAdress(adress) || utesluten(adress, cfg.utesluten)) continue;
     ut.push({ kalla: String(x.source || new URL(adress).hostname.replace(/^www\./, '')).slice(0, 80), titel: String(x.title || '').trim().slice(0, 200), adress, datum: new Date(t).toISOString() });
   }
   return ut;
 }
 
-// Lagets nyheter i Bing News, alla cfg.bing.fragor, samma artikel en gång, de nyaste först. → [{kalla, titel, adress, datum}]
-export async function bingTraffar(lag, { cfg = mc, now = Date.now(), fetchImpl = globalThis.fetch } = {}) {
+// Är sajten spärrad på den här datorn (/etc/hosts pekar den till 0.0.0.0)? Spärren rundas aldrig: en spärrad
+// sajt erbjuds bara inte, eftersom den ändå inte går att läsa här.
+const SPARRADE = new Set(['0.0.0.0', '127.0.0.1', '::', '::1']);
+export async function sparrad(adress, { lookup = dns.lookup } = {}) {
+  try { return SPARRADE.has((await lookup(new URL(adress).hostname)).address); } catch { return false; }
+}
+
+// Lagets nyheter i Bing News, alla cfg.bing.fragor, samma artikel en gång, de nyaste först. sok: {sprak, land,
+// fragor} när laget söks på sitt eget språk (config/utland.js, bingSokord); då står frågorna där, och rubriken
+// behöver inte nämna laget med dess svenska eller engelska namn. Med cfg.bing.sparr tas spärrade sajter bort.
+// → [{kalla, titel, adress, datum}]
+export async function bingTraffar(lag, { cfg = mc, now = Date.now(), fetchImpl = globalThis.fetch, sok = null, lookup = dns.lookup } = {}) {
   if (!cfg.bing) return [];
   const namn = lagetsNamn(lag)[0];
+  const fragor = sok ? sok.fragor : (cfg.bing.fragor || []).map((f) => f.replace('{namn}', namn));
+  const sprak = sok ? `setlang=${sok.sprak}&cc=${sok.land}` : 'setlang=en-GB&cc=GB';
   const sett = new Set();
   const ut = [];
-  for (const f of cfg.bing.fragor) {
-    const q = f.replace('{namn}', namn);
+  for (const q of fragor) {
     let xml;
     try {
-      const res = await fetchImpl(`https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=en-GB&cc=GB`, { headers: { 'user-agent': 'Matchfixarna/1.0 (forumlasare)' }, signal: AbortSignal.timeout(20000) });
+      const res = await fetchImpl(`https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&${sprak}`, { headers: { 'user-agent': 'Matchfixarna/1.0 (forumlasare)' }, signal: AbortSignal.timeout(20000) });
       if (!res.ok) continue;
       xml = await res.text();
     } catch { continue; }
-    for (const x of bingNyheter(xml, lag, { cfg, now })) {
+    for (const x of bingNyheter(xml, sok ? null : lag, { cfg, now })) {
       const ren = renAdress(x.adress);
       if (sett.has(ren)) continue;
       sett.add(ren);
+      if (cfg.bing.sparr && await sparrad(x.adress, { lookup })) continue;
       ut.push(x);
     }
   }
   return ut.sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, cfg.bing.flest);
 }
 
-// Söker fram veckans artiklar om laget, med lagets nyheter i Bing News som träffar när cfg.bing finns.
-// → [{kalla, titel, adress, datum, varfor, slag?}]
-export async function letaArtiklar({ lag, mot = null, avspark = null, now = () => new Date(), claude = claudeSvar, cfg = mc, fetchImpl = globalThis.fetch } = {}) {
-  const bing = cfg.bing ? await bingTraffar(lag, { cfg, now: now().getTime(), fetchImpl }).catch(() => []) : [];
+// Hur laget söks i Bing News på sitt eget språk (cfg.sokordPrompt, config/utland.js): ett kort anrop utan verktyg.
+// → {sprak, land, fragor} eller null (då söker Claude utan Bing)
+export async function bingSokord({ lag, mot = null, avspark = null, now = () => new Date(), claude = claudeSvar, cfg = mc } = {}) {
+  if (!cfg.sokordPrompt || !cfg.bing) return null;
+  const r = await claude({
+    system: cfg.sokordPrompt,
+    prompt: `Idag är det ${nowFmt.format(now())}.\n${cfg.lagOrd || 'Klubben'}: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
+    tools: [], model: cfg.model, effort: 'low', timeoutMs: 120000,
+  });
+  if (r.refused) return null;
+  try {
+    const j = jsonOf(r.content);
+    const sprak = String(j.sprak || '').trim().toLowerCase();
+    const land = String(j.land || '').trim().toUpperCase();
+    const fragor = (Array.isArray(j.fragor) ? j.fragor : []).filter((f) => typeof f === 'string' && f.trim()).map((f) => f.trim().slice(0, 80)).slice(0, cfg.bing.antal || 3);
+    return /^[a-z]{2}$/.test(sprak) && /^[A-Z]{2}$/.test(land) && fragor.length ? { sprak, land, fragor } : null;
+  } catch {
+    return null;
+  }
+}
+
+// Söker fram veckans artiklar om laget, med lagets nyheter i Bing News som träffar när cfg.bing finns (sok: på
+// lagets eget språk, bingSokord). → [{kalla, titel, adress, datum, varfor, slag?}]
+export async function letaArtiklar({ lag, mot = null, avspark = null, now = () => new Date(), claude = claudeSvar, cfg = mc, fetchImpl = globalThis.fetch, sok = null } = {}) {
+  const bing = cfg.bing && (sok || !cfg.sokordPrompt) ? await bingTraffar(lag, { cfg, now: now().getTime(), fetchImpl, sok }).catch(() => []) : [];
   const r = await claude({
     system: cfg.letaPrompt.replace('{dagar}', cfg.dagar).replace('{sokningar}', cfg.sokningar).replace('{artiklar}', cfg.artiklar),
     prompt: [
-      `Idag är det ${nowFmt.format(now())}.`, `Klubben: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
-      bing.length ? `\nVeckans nyheter om klubben i Bing News (de räknas som träffar i dina sökningar):\n${bing.map((b) => `- ${b.datum.slice(0, 10)} ${b.kalla}: "${b.titel}" ${b.adress}`).join('\n')}` : '',
+      `Idag är det ${nowFmt.format(now())}.`, `${cfg.lagOrd || 'Klubben'}: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
+      bing.length ? `\nVeckans nyheter om ${(cfg.lagOrd || 'Klubben').toLowerCase()} i Bing News (de räknas som träffar i dina sökningar):\n${bing.map((b) => `- ${b.datum.slice(0, 10)} ${b.kalla}: "${b.titel}" ${b.adress}`).join('\n')}` : '',
     ].filter(Boolean).join('\n'),
     tools: ['WebSearch'], model: cfg.model, effort: cfg.letaEffort, timeoutMs: cfg.timeoutMs,
   });

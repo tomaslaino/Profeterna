@@ -70,7 +70,7 @@
 // Väggen, disken och pulten fortsätter till höger om bilden (vagg och
 // pult), så att bilden inte tar slut när kameran går dit.
 //
-// RumVideo.html('horn' | 'vagg' | 'pult', { disk }) → delarna (planen -598, -600 och -60 i rum.js;
+// RumVideo.html('horn' | 'vagg' | 'pult', { disk, vagg }) → delarna (planen -598, -600 och -60 i rum.js;
 // disk ritar bardisken i väggen)
 // RumVideo.mount(el, { calm, short, kort, aim, latt }) → { fill(matches, { rd, old }), skarp(on), spelare(), zoom(on) → hörnet i scenen, key(k), stop() }
 // (rd: omgången som gänget tippar, round() i rum.js; old: de färdigspelade kupongerna, Historik.coupons())
@@ -399,17 +399,17 @@ window.RumVideo = (() => {
 
   // ---------- väggen, disken och pulten till höger om bilden ----------
 
-  // Högra väggen som den är ritad i rum.js (bg), förlängd åt höger: samma
-  // toner och fläckar, och bardisken med samma ritning (disk i rum.js, som
+  // Högra väggen som den är ritad i rum.js (bg), förlängd åt höger: tapeten,
+  // bården och bröstpanelen (hogerVagg i rum.js, som skickas hit), och bardisken med samma ritning (disk i rum.js, som
   // skickas hit). Ligger direkt efter bg() i planet -600, under det som
   // hänger på väggen. Den går ända upp till taket (y 0; ovanför fortsätter
   // väggen i tak() i rum.js), så att närbilden av Tipsligan längst ut inte
   // ser ett hål bortom bildens kant.
-  function vaggSvg(disk) {
+  function vaggSvg(disk, vagg) {
     const [a, z] = [1599.5, 2100];
     const r = `x="${a}" y="0" width="${z - a}" height="1020"`;
     return `<svg class="vhs-vagg" viewBox="${a} 0 ${z - a} 1020" aria-hidden="true">
-    <rect ${r} fill="url(#rum-rwall)"/><rect ${r} filter="url(#rum-flack)" opacity=".55"/><rect ${r} fill="#000" opacity=".2"/>
+    ${vagg ? vagg(a, z) : ''}<rect ${r} fill="#000" opacity=".2"/>
     ${disk ? disk(a, z) : ''}
   </svg>`;
   }
@@ -430,7 +430,7 @@ window.RumVideo = (() => {
   const at = (r) => `left:${px(r.x)}; top:${px(r.y)}; width:${px(r.w)}; height:${px(r.h)}`;
 
   function html(part, o = {}) {
-    if (part === 'vagg') return vaggSvg(o.disk);
+    if (part === 'vagg') return vaggSvg(o.disk, o.vagg);
     if (part === 'pult') return pultSvg();
     // knapparna, med tangenterna som gör samma sak nära (key i mount)
     const knappar = [['bak', '◀◀', 'Spola tillbaka', 'ArrowLeft'], ['spela', '▶', 'Spela', 'Space'], ['fram', '▶▶', 'Spola fram', 'ArrowRight'], ['paus', '❚❚', 'Paus', 'Space'], ['stopp', '■', 'Stopp', 'S'], ['ut', '⏏', 'Mata ut']]

@@ -68,6 +68,7 @@ export function attSkrivaSista(round, nu, blad, { now = Date.now(), tvinga = fal
 export function sistaUnderlag(round, blad, tidigare = []) {
   const s = new Map(((blad && blad.sidor) || []).map((x) => [String(x.id), x]));
   return {
+    spelet: (round.spel && round.spel.namn) || (/-et\d+$/.test(String(round.id)) ? 'Europatipset' : 'Stryktipset'),
     matcher: round.matcher.map((x, i) => {
       const b = s.get(String(x.id));
       return { nr: i + 1, match: x.match || null, avspark: x.avspark || null,
