@@ -946,6 +946,8 @@ window.RumRegister = (() => {
     // tecken, lika för båda lagen), H eller B, motståndaren och platsen
     // högerställd – namnet får det som platsen lämnar (BOURNEMOUTH 7:E men
     // SOUTHAMPTO 13:E)
+    // (en rads bredd utan avkortning, med två tecken luft före platsen)
+    const formBredd = (y, rm) => 4 + (rm ? rm + 1 : 0) + kort(y.mot).length + (y.plats ? y.plats.length + 2 : 0);
     function formCeller(l, w, rm = 0) {
       return l.map((y) => {
         const fore = 4 + (rm ? rm + 1 : 0);
@@ -998,6 +1000,8 @@ window.RumRegister = (() => {
     // ett lags rader i listan, w tecken breda: utfallet, resultatet (rm
     // tecken, lika för båda lagen), H eller B, motståndaren, styrkan och en
     // mätare för styrkan (fylld till styrkan, tom när den är okänd)
+    // (en rads bredd utan avkortning: namnet minst nio tecken, så att mätaren får sex)
+    const tioBredd = (y, rm) => 15 + rm + Math.max(9, kort(y.mot).length);
     function tioCeller(l, w, rm) {
       const fast = 9 + rm;
       const mw = Math.max(3, Math.min(6, w - fast - 9));
@@ -1010,6 +1014,26 @@ window.RumRegister = (() => {
           [namn, '', lagOf(y.mot) || landOf(y.mot) ? `#lag:${y.mot}` : null], [pad('', nw - namn.length), ''],
           [` ${padL(st == null ? '–' : String(st), 2)} `, st == null ? 'd' : ''], ...dragStreck(fy, 'mt1'), ...dragStreck(mw - fy, 'mt0')];
       });
+    }
+
+    // Lagens listor i telefonen (formens matcher i ÖVERSIKT, de tio senaste i
+    // xG), där de inte ryms sida vid sida: under varandra med lagets namn
+    // över sin lista och en tom rad mellan lagen, båda listorna lika breda och
+    // tillsammans i mitten av blocket, så att spalterna står i rad. Bredden
+    // är den bredaste radens (bredd), högst blocket; celler(l, w) ger ett
+    // lags rader. (Till 2026-11-16 stod det högra lagets lista högerställd,
+    // och listorna hamnade förskjutna mot varandra.)
+    function underVarandra(G, lag, listor, bredd, celler) {
+      const w = Math.min(G.B, Math.max(...listor.flat().map(bredd), ...lag.map((n) => kort(n).length)));
+      const luft = [pad('', G.M + Math.floor((G.B - w) / 2)), ''];
+      const r = [];
+      listor.forEach((l, j) => {
+        if (!l.length) return;
+        if (r.length) r.push(tom());
+        r.push(rad(luft, [kort(lag[j]).slice(0, w), 'v', `#lag:${lag[j]}`]));
+        for (const c of celler(l, w)) r.push(rad(luft, ...c));
+      });
+      return r;
     }
 
     // Vad lagen spelar för i Nations Leagues sista omgångar (sedan
@@ -1257,7 +1281,7 @@ window.RumRegister = (() => {
       const formRad = raden('FORMEN', form.map((f) => f.join('') || '–'), formB, lq('form'), mott);
       // formens matcher under FORMEN: på datorn lagen sida vid sida på var
       // sin sida om etiketternas spalt (och ut i luften utanför blocket); i
-      // telefonen under varandra, det högra lagets högerställda
+      // telefonen under varandra med lagets namn över (underVarandra)
       const formL = sid.map((s, j) => (S.veil ? [] : formMatcher(m, s, T[j], land)));
       const rm = Math.max(0, ...formL.flat().map((y) => (y.mal || '').length));
       const formRader = [];
@@ -1267,10 +1291,7 @@ window.RumRegister = (() => {
           const c = formL.map((l) => formCeller(l, cw, rm));
           for (let i = 0; i < Math.max(c[0].length, c[1].length); i++) formRader.push(spRad(G, c[0][i] || [], '', null, c[1][i] || []));
         } else {
-          const cw = Math.min(28, G.B);
-          formL.forEach((l, j) => {
-            for (const c of formCeller(l, cw, rm)) formRader.push(rad([pad('', G.M + (j ? G.B - cw : 0))], ...c));
-          });
+          formRader.push(tom(), ...underVarandra(G, lag, formL, (y) => formBredd(y, rm), (l, w) => formCeller(l, w, rm)), tom());
         }
       }
       const mkt0 = (j) => { const x = mkt(T[j]); return x && x.n ? [`${x.fav} AV ${x.n}`, x.fav / x.n] : null; };
@@ -1441,16 +1462,7 @@ window.RumRegister = (() => {
           const c = tioL.map((l) => tioCeller(l, cw, rm));
           for (let i = 0; i < Math.max(c[0].length, c[1].length); i++) tio.push(spRad(G, c[0][i] || [], '', null, c[1][i] || []));
         } else {
-          const cw = Math.min(28, G.B);
-          // (tio rader per lag under varandra: lagets namn över dess lista,
-          // det högra lagets högerställt som raderna)
-          tioL.forEach((l, j) => {
-            if (!l.length) return;
-            if (j) tio.push(tom());
-            const namn = kort(lag[j]).slice(0, cw);
-            tio.push(rad([pad('', G.M + (j ? G.B - namn.length : 0))], [namn, 'd', `#lag:${lag[j]}`]));
-            for (const c of tioCeller(l, cw, rm)) tio.push(rad([pad('', G.M + (j ? G.B - cw : 0))], ...c));
-          });
+          tio.push(...underVarandra(G, lag, tioL, (y) => tioBredd(y, rm), (l, w) => tioCeller(l, w, rm)));
         }
       } else if (S.veil) {
         tio.push(rub('DE TIO SENASTE'), raden('POÄNG/MATCH', ['?', '?'], -1, ordQ('tio-poang')));

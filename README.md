@@ -1621,6 +1621,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   oskarp som utsikten, och bilarna i den bortre filen hamnade högt ovanför räcket. Nu är trafiken lika oskarp
   längs hela bron, 0,8 av utsiktens, och körbanan lutar mindre, så att båda filerna står på bron bakom räcket. Se
   [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som gatan i rummet*.
+- **Bilarna i rummet och bakom Hasse Backe som framför affären (2026-11-16, användarens önskemål):** "Kan du på något
+  sätt ordna så att bilarna som kör förbi utanför animationsbilden och bilden med hasse - liknar de som kör förbi vid
+  ytterbilden. Tänk på att det inte ska dra för mkt grafik!" På gatan genom fönstret och på S:t Eriksbron bakom
+  honom kör nu fasadens fordon: samma nittiotalsbilar (Volvo 240, 740 och 850, Saab, Golf, Mercedes, Kadett, Amazon,
+  Bubblan …), skåpbilar, taxi, bussar och plogbil, i samma lack och lottade och ritade med samma kod som framför
+  affären (`RumFasadGatan.fordon` och `rita` i rum-fasad-gatan.js), i gatans respektive utsiktens ljus. Förut var det
+  egna, nyare bilar (stadsjeepar, halvkombi i dagens färger). Varje fordon ritas en gång i sin bild, som förut, och
+  sedan läggs bara bilden ut: gatans lager ritas om på 3,4 ms i stället för 4,7, och på bron är det färre bilder per
+  fordon (4,8 i stället för 5,9) att lägga ut i varje bildruta. Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -6648,6 +6657,34 @@ vänstra del 82 → 95; klockan 21.30 taket 37 → 62, lysröret 55 → 114 och 
 och högra väggen är som förut. Provat också som 1920 × 1080 och 1024 × 768, med musen i ytterlägena, på natten
 (klockan 2) och i telefonen (412 × 870) dragen åt vänster; bygget med `--minify` ger samma bild.
 
+### Undertaket (2026-11-16)
+
+Användarens önskemål: "Kan du göra det tydligare att det finns ett tak i butiken? … Det bör självklart passa in med
+saker som finns i taket." Taket var en mörkbrun yta med fogar som gick rakt upp och ned, som en vägg, och på en bred
+skärm syntes det inte alls: scenen skars lika mycket uppe som nere, och hela taket (y 0–90) låg ovanför bilden.
+
+- **Undertaket** (`innertak` i [public/rum-inredning.js](public/rum-inredning.js), en egen duk under allt annat i
+  bakväggens plan): ett 90-tals undertak i three.js med plattor på 60 × 60 cm (120 enheter) i ett bärverk av
+  vitlackerad plåt och en vinkellist mot väggarna, sett med samma kamera som takfläkten och spotskenan. Fläkten sitter
+  mitt i en platta, skenan är skruvad under plattorna, och ljuset från glaskuporna faller upp i taket med skuggan av
+  bladen och spotarna (osynliga kopior av fläkten och skenan som bara kastar skugga; glaset och hållarna precis över
+  lamporna är borttagna, annars låg en mörk fläck över halva taket). Plattorna är gulnade av röken och brunast över
+  gängets bord, där röken stiger, och mot väggarna. En har en fuktfläck, en ett frånluftsdon med damm runt, och en har
+  någon lyft och inte lagt tillbaka riktigt. Taket möter väggarna där de är målade (bakväggen vid y 90, högra väggen
+  vid X 1140). På natten släcks lamporna också här; taket ritas då om i tiondelar av natten, inte varje minut.
+- **Under det:** samma rutnät platt i rum.js (`takLinjer` i `bg` och `tak`), ifall 3D-delen inte kommer, i stället
+  för de raka fogarna.
+- **Bred skärm** (`TAK_BRED` i rum.js, `fit`): av det som inte ryms på höjden tas en fjärdedel uppifrån och resten från
+  pulten, i stället för hälften var. I 1500 × 722 (2,08:1) skärs 58 enheter av taket i stället för 115, så att
+  takkanten, plattorna, Stryktipset-bandet och kuporna syns; pulten skärs 172 i stället för 115, och kupongen på
+  pulten visar fyra rader i stället för sju (hela kupongen syns i närbilden). I 1920 × 970 skärs taket 48 i stället för
+  96. I telefonen på bredden är det som förut, och den som har dragit på höjden står kvar där.
+
+Taket ritas en gång, som resten av inredningen: ungefär 4 ms i Chrome, en duk på 3,8 MB på datorn (1300 × 118 i
+planet) och 4,7 MB i telefonen (1560 × 334, upp till rubriken i telefonen på höjden). Inget nytt rör sig i
+bildrutorna. Provat på datorn (1280 × 800, 1500 × 722), i telefonen (360 × 800, 390 × 844, 430 × 932), på natten och
+utan 3D-taket, och med närbilden av uret och kupongen på bred skärm.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
@@ -6691,14 +6728,15 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
   snö. Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
   fler bilar i rusningen och färre på natten (fler taxi då), och på helger och röda dagar ingen
-  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna är olika sorter
-  (sedan, kombi som en gammal Volvo, halvkombi, stadsjeep, Saab, skåpbil och taxi med
-  taklampa) och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
+  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna, bussarna och plogbilen är
+  fasadens (sedan 2026-11-16, rum-fasad-gatan.js: nittiotalets bilar i Stockholm, skåpbilar och taxi med
+  taklampa), i gatans ljus, och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
   Eriksbron kommer i båda riktningarna med några minuters mellanrum: röda 3:an eller 77:an
   och blåa ledbussen 4:an. I en fil åker alla lika fort på ett band med luckor, så att ingen
   kör igenom någon annan (bussarna och plogbilen har varsin lucka och kommer var m:e varv),
   och fordonen ritas en gång och glider bara: de kostar mindre än förut, då de gungade och
-  ritades om i gängets takt (`FORM`, `fordon` och trafiken i `gatliv` i rum-ute.js).
+  ritades om i gängets takt (trafiken i `gatliv` i rum-ute.js). I SVG:n står bara en tom grupp per fordon, som ritas med
+  fasadens kod när figuren görs till en bild (`fordonsFigur`, `delar`).
 - **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och
   orange på hösten och kala annars; löv blåser förbi och ligger på trottoaren på hösten, plogbilen när
   det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till
@@ -7715,7 +7753,7 @@ bland tre skisser i den riktiga närbilden:
   staplar, där räcker siffrorna. LÄGET:s mätare står utanför dagarna på samma sätt, med
   tävlingen och elvan svagt under talen; skadorna står i lagens halvor och domaren med sina tal
   till vänster och divisionens snitt till höger. Formens matcher står på var sin sida om
-  etiketternas spalt (i telefonen under varandra, det högra lagets högerställda). Samma mått i
+  etiketternas spalt (i telefonen under varandra, se nedan). Samma mått i
   alla fyra flikarna (`spegel` i [public/rum-register.js](public/rum-register.js)), så att lagen
   står still när man byter flik; MÖTENA har förra mötet kvar som dragkamp. Staplarna är klasserna
   `sv`, `so` och `sf` i [public/rum-register.css](public/rum-register.css), och skärmen i rummet
@@ -7760,6 +7798,13 @@ bland tre skisser i den riktiga närbilden:
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
   motståndaren i en annan division eller grupp står den efter platsen (*3:E CH*, *2:A A3*).
   Datorn har lagen sida vid sida, telefonen under varandra.
+- **Lagens listor i telefonen** (2026-11-16, användarens synpunkt: "ingen bra lösning på
+  mobilen"): formens matcher i ÖVERSIKT och de tio senaste i xG står i telefonen under varandra,
+  och förut stod det högra lagets lista högerställd – listorna hamnade förskjutna mot varandra och
+  formens listor hade inga namn. Nu har båda listorna lagets namn ljust över sig och en tom rad
+  emellan, är lika breda (den bredaste radens bredd) och står tillsammans i mitten av blocket,
+  så att utfallet, resultatet, motståndaren och platsen står i raka spalter
+  (`underVarandra` i [public/rum-register.js](public/rum-register.js)).
 - **Vad landslagen spelar för** (frågor om playoff, placeringarna i de andra ligorna och vägen
   till EM; *Raden*, med rutan): i Nations Leagues sista omgångar står *SPELAR FÖR* under
   POÄNG – målet laget kan nå och vad som räcker (*KVAR I B · VINST RÄCKER*, *KVARTSFINAL ·
@@ -8496,8 +8541,8 @@ cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på and
 torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
 står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, ungefär som man ser bron härifrån,
 så att körbanan syns som en smal yta bakom räcket; sedan 2026-11-16 0,16 i stället för 0,28, se *Trafiken som
-gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
-fronten eller baken upp till där ovansidan tar vid, och ovansidan i raka bitar ur karossens överkant (`topp`:
+gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är fasadens (sedan 2026-11-16, rum-fasad-gatan.js) och några bilder som ritas en gång: sidan (ritad med fasadens kod, `scen`),
+fronten eller baken upp till där ovansidan tar vid (nittiotalets svarta stötfångare med skylten, strålkastarna med grillen emellan eller baklyktorna, i fasadens mått, `matt`), och ovansidan i raka bitar ur karossens överkant (`topp`:
 motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
 plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
 avbildning för fordonet, så att de möts, och var bit fortsätter en bit in under den som ritas efter, så att
