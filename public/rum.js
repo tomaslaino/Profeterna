@@ -47,7 +47,7 @@
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|kupong|radio en närbild,
-// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr),
+// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr; ?rum-fasad-vem=inlines vilka som går förbi),
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -4372,6 +4372,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
+      // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
+      pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
       calm: () => RORELSE_AV.matches,
       // (en fast bild, ?rum-t: allt står på samma tid)
       still: still() ? R.frozen : null,
@@ -4381,7 +4383,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       e.stopPropagation();
       fasad(false);
     });
-    if (glid) f.el.classList.add('in');
+    // (framme: inget eget lager för toningen längre)
+    if (glid) {
+      f.el.classList.add('in');
+      f.el.addEventListener('animationend', (e) => { if (e.target === f.el && e.animationName === 'rf-in') f.el.classList.remove('in'); });
+    }
     R.fasad = f;
     lager('fasaden', (nu) => fasad(false, !nu));
     // Rummet står still när fasaden täcker det, och ritas inte heller (fasad-tackt i rum-fasad.css): förut

@@ -24,7 +24,7 @@
 .rum.fasad-tackt > .rum-sving * { visibility: hidden !important; }
 
 /* gänget i fönstret: lite mjukt, som genom glas på några meters håll */
-.rf-gang { position: absolute; filter: blur(0.7px) saturate(0.9); }
+.rf-gang { position: absolute; filter: blur(0.6px) saturate(0.9); }
 
 /* neonen glappar som inne (neonOn i rum.js) */
 .rf-neon-av { opacity: 0; }
@@ -34,6 +34,9 @@
 /* det som rör sig ritas i dukar (rum-fasad.js): fram överst, bak bakom huset där himlen syns, och
    barberarens stång på väggen */
 .rf-fram, .rf-bak, .rf-barber { position: absolute; pointer-events: none; }
+
+/* högtidspyntet i skyltfönstret och på dörren, ritat en gång (o.pynt i rum-fasad.js): skarpt, närmast glaset */
+.rf-pynt { position: absolute; pointer-events: none; }
 
 /* I telefonen ingen oskärpa på gänget: den blev ett eget pass på grafikkortet */
 @media (max-width: 700px), (max-height: 500px) {

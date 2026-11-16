@@ -1340,6 +1340,23 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   lyktornas och fönstrens sken i stället för att alla är svarta siluetter. Gatan är glesare efter halv sju (`RumUte.trafik`:
   sju gående på dagen, fem till åtta, tre till tio och två sent, en till på fredag och lördag): en regnig måndagskväll
   20.30 syns i snitt en i taget i stället för nästan tre, och halva tiden är trottoaren tom.
+- **Fasaden lättare för telefonen (2026-11-16, användarens önskemål):** "just nu så kraschar ju den där sidan, så det
+  är viktigt att grafiken, att till exempel en gammal mobil klarar av det där". Samtidigt gjordes *Fasaden kraschade i
+  telefonen* (under [Fasaden](#fasaden): rummet döljs under fasaden, dukarna släpps och inget byggs om vid varje
+  resize). Här dessutom lagren: fasadens stilla lager ritades i världens mått och förminskades (i en telefon på höjden
+  till 0,45), och Safari ritar ett lager i dess egen storlek gånger pixeltätheten, så att vart och ett av nio lager tog
+  ungefär 50 MB i en iPhone i stället för 10. Nu är scenen i fönstrets storlek och de stilla lagren fyra i stället
+  för nio (fem med högtidspyntet). Inte provat i en riktig telefon. Se [Fasaden](#fasaden).
+- **Fler karaktärer som går förbi, och de passar 90-talet (2026-11-16, användarens önskemål):** "Kan du göra de här
+  människorna eller personer som går förbi utanför något mer intressanta eller passande utan att de drar speciellt
+  mycket mer grafik? Tänk som sagt på att det ska vara 90-tal och försök att få till fler karaktärer än vad som redan
+  finns." Nya: inlinesåkare med knä- och handledsskydd som skär fram, en äldre med rullator, supportrar i gäng med
+  halsduken i lagets färger, någon med bergsprängaren på axeln, punkare med tuppkam och nitar och hårdrockare med
+  långt hår, tidningsbudet med reflexväst och kärran full av morgonens tidningar i gryningen, turister med karta och
+  kamera på sommaren, skidåkare med skidorna på axeln när det har snöat en ledig dag och julgranen under armen i
+  december, och bland de andra landslagströjan i värmen, magväskan och julklappar i en kasse före jul. Lika många
+  syns samtidigt som förut, och de nya kostar lika mycket per figur som de gamla. Se *Det som händer ute* under
+  [Fasaden](#fasaden).
 - **Fler sätt att gå, och naturligare (2026-11-16, användarens önskemål):** "Kan du få karaktärerna som går utanför
   tobaksbutiken att gå på fler olika sätt och att det ser naturligt ut? Ja, om de kan variera och få det att se
   naturligt ut så vore det super." Fem nya sätt som skiljer sig i själva rörelsen, inte bara i steglängd och takt:
@@ -5288,6 +5305,44 @@ julbocken 2 800, serpentinerna 2 800, midsommarstången 4 800, lövruskan 6 500,
 med flaskan 8 700, högst åtta nät per sak, var och en byggd på 1–30 ms en gång; gänget har flera hundra tusen
 trianglar och ritas i varje bildruta.
 
+**Snyggare pynt och pyntet utifrån** (2026-11-16, användarens önskemål: "göra högtidsföremålen på både
+animationssidan och Hasse Backe snyggare … men att det ändå inte drar så mycket grafik. Kom ihåg att vissa av de här
+föremålen också ska vara med på utsidan"):
+
+- **Rosetterna** (girlangen, kransarna och äggen) är av ett brett band: två öglor som droppar ut från knuten med den
+  breda sidan framåt och en grop mot hålet, och två band med vridning och ett snett snitt i änden (`rosett`, `yta`).
+  Förut två ringar som såg ut som ståltråd.
+- **Halmstjärnan** har åtta strån runt halva varvet och sexton uddar, långa och korta om vartannat, platta och blanka
+  med spetsiga ändar, och rött garn som går över och under stråna kring mitten. Förut låg de långa stråna två och två
+  på samma led, så att stjärnan blev ett kors med två sneda strån.
+- **Girlangen och julkransen** är fylligare: i varje led av granris är de första korten kortare och mörkare, som djupet
+  inne i riset (`barr`), och fler kort per led. Girlangen har en klase om två eller tre kulor som hänger olika långt i
+  varje båge, små kulor i riset vid rosetterna och en kotte i varje båge, och lamporna sitter tätare. Kransen har
+  lingon runt om med lingonblad, tre kottar nedtill och rosetten fram ur riset. Kottarna har fjäll i förskjutna ringar,
+  ljusa i kanten och mörka i springorna (`kotte`).
+- **Julbocken** (hos Hasse) är buntar av halm, randiga på längden med stråna i olika toner, och breda röda band som
+  ligger an mot halmen, med ändarna avskurna. Förut släta rör med röda ringar som stod ut.
+- **Serpentinerna** är remsor som hänger i en lös skruv med den breda sidan utåt, glesare nedåt. Förut tunna rör i
+  sicksack. **Bladen** (lövruskorna och midsommarstången) är runda nedtill och spetsiga upptill som björkens (förut
+  romber), och blommorna på stången platta kronor med en mitt (förut färgade kulor).
+
+Allt är som förut några få sammanslagna nät per sak med färgen i hörnen och samma material, och ritas en gång: kulorna
+i girlangen är två nät i stället för tre per kula. Uppmätt (`r.info` efter en bild): girlangen 7 900 → 13 400
+trianglar, kransen 5 700 → 9 100, julbocken 2 800 → 4 900 och halmstjärnan 600 → 490, i samma eller färre ritanrop.
+
+**Utifrån** (`pyntUtifran` i [public/rum-inredning.js](public/rum-inredning.js), `pynt` i
+[public/rum-fasad.js](public/rum-fasad.js)): det som hänger i skyltfönstret och på dörrens glas syns från trottoaren
+(se [Fasaden](#fasaden)) – stjärnan, girlangen, halmstjärnorna och julkransen, äggen och påskkransen, vimplarna och
+lövruskorna, kräftlyktorna, spindelnätet och fladdermössen. Samma saker och samma scener som inne, ritade en gång till
+genom en kamera ute på gatan, rakt in och därför spegelvänt (stjärnan som hänger till höger inifrån hänger till
+vänster utifrån, och kransen och girlangen ses bakifrån). Rutan är glaset i scenens mått (`UT_GLAS`), i fönstret från
+karmens överkant så att girlangen syns under skylten, med höjden efter rutan på fasaden så att inget dras ut. Ljuset
+utifrån är dagsljuset mot glaset och lite ljus från gatan; det som lyser lyser som inne, och skenet kring det ritas
+först för sig så att det ligger bakom saken (inifrån ligger det på glaset bakom). Bilden läggs på två dukar
+(`.rf-pynt`) framför neonen och bakom glaset, så att speglingen, imman och dropparna ligger över pyntet, och ritas
+bara när fasaden ritas om (vädret och ljuset), aldrig i bildrutorna. Utan pynt, eller innan rummets 3D-delar är
+klara, finns dukarna inte.
+
 Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på tre egna dukar i väggens plan: fönstrets
 och dörrens under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
 (`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
@@ -6927,6 +6982,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   dem rummet, lite ur skärpa: lysröret i taket, hyllan med cigarettpaketen (paketen går att se), bardisken, tv:ns blå
   sken och Tipsligan på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren, vagare. Framför dem neonskylten *Tobak*,
   som läses rätt härifrån och glappar samtidigt som inne (`neonOn`), och skivan med löpsedlarna med baksidan ut.
+- **Högtidspyntet:** runt högtiderna hänger samma pynt som inne i skyltfönstret och på dörrens glas, sett utifrån och
+  spegelvänt (se *Högtidspyntet* ovan, `.rf-pynt`).
 - **Glaset:** det sitter djupt i karmen (skugga upptill och till vänster), med imma nertill när det är kallt ute och
   varmt inne, droppar efter regn som små linser (mörk kant, en ljusprick nertill och en glans) och några som har runnit
   och lämnat ett spår ned mot blecket.
@@ -6980,7 +7037,22 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   del äldre går framåtböjda, och fler frisyrer (knut, afro) och hattar (sixpence, basker). Paraplyerna är vanliga,
   golfparaplyer i två färger, små hopfällbara eller genomskinliga bubblor ner över huvudet (`PARAPLY`, `parForm`: en
   kupol sedd från sidan med kilar och spröt), och en del bär gitarr på ryggen, bandybag med innebandyklubbor,
-  pizzakartong (på kvällen) eller blommor. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
+  pizzakartong (på kvällen) eller blommor. Sedan 2026-11-16 också (`vemGar`, `sallskap`): inlinesåkare (`skrinna`,
+  `skridTab`: varje ben skjuter ifrån bakåt med hjulen mot stenen i halva varvet och förs fram böjt och lite lyft i den
+  andra, höften lägre och överkroppen framåtlutad, fötterna glider med kroppen; kängor med fyra hjul i neon, ofta knä-
+  och handledsskydd; när det är torrt och minst 7 grader på dagen, fler på sommaren), en äldre med rullator (handtagen,
+  fyra hjul, sitsen och korgen med en kasse i, på dagen), supportrar i gäng med halsduken i lagets två färger
+  (`LAGEN`: Stockholmslagen och engelska lag som många höll på; lediga dagar 11–19.30 och vardagskvällar), någon med
+  bergsprängaren på den bortre axeln bakom huvudet och handen på handtaget, tidningsbudet med reflexväst (ränderna
+  lyser i ljuset i mörkret) och dragkärran med tidningsbuntar mellan 4.30 och 7, turister med karta, kamera på magen
+  och magväska på sommaren, skidåkare med skidorna på den bortre axeln och stavarna i handen när det har snöat en
+  ledig dag, och julgranen i nät under armen 7–23 december. Bland de unga finns punkare med tuppkam i neon, nitar och
+  Dr. Martens och hårdrockare med långt hår i skinnjacka, i värmen ibland landslagströjan (gul med blå krage och
+  ärmkant), och magväskan och julklappar i en papperskasse (före jul) finns bland de andra. De ritas med samma sorts
+  delar som de andra: i en bromsad provmiljö (headless Chrome, processorn ×4) 650–940 µs per figur och bild mot
+  610–1350 för de gamla sorterna, och lika många syns samtidigt som förut. `?rum-fasad-vem=inlines` (eller `rullator`,
+  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `cykel` …) låter alla som går förbi vara sådana,
+  för bilder och prov. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
   glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
   käppen är i den närmre. En ledig hand kan vara i fickan, ibland bara den ena (`st.ficka`: F, B eller båda), också
@@ -7066,15 +7138,21 @@ som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som
 och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden utifrån; medan rummet syns i
 övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
-bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
-ritas om när ljuset eller vädret ändras (en gång i minuten prövas det). Det som rör sig ritas i tre dukar: `rf-fram`
+bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är fyra SVG:er, en
+mellan varje duk (himlen; bortom bron och rummet; fönstret, neonen, glaset, huset, bron, marken, gatan och texten;
+kvällens ljus), som ritas om när ljuset eller vädret ändras (en gång i minuten prövas det); när det finns högtidspynt
+delas den tredje vid pyntets dukar, mellan neonen och glaset (`pyntBilder` tar fram pyntet innan scenen byggs). Scenen är i fönstrets
+punkter (`F.k` per enhet i världen) och förminskas inte: Safari ritar ett lager i dess egen storlek gånger
+pixeltätheten, och förut, i världens mått, tog vart och ett av nio lager ungefär fem gånger så mycket minne som det
+syns i en telefon på höjden (2026-11-16). När storleken ändras skalas scenen om så länge (`passa`), tills den byggs
+om. Toningen in har inget eget lager när den är klar. Det som rör sig ritas i tre dukar: `rf-fram`
 överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
 bildpunkter. Förut var det 27 CSS-animeringar i egna lager (benen och armarna på SVG-barn, regnet i två band över hela
 bilden, bilarna, molnen): fasaden hade 35–38 lager, ungefär tio skärmytor som lades ihop 60 gånger i sekunden. Nu är
-det 5 lager i telefonen och 8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
+det 4–5 lager i telefonen och 6–8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
 arbete från ~300 till ~65–120 ms/s (headless Chrome, `?rum-kval=1`, regn på kvällen); på datorn är grafikprocessens tid
 ungefär som förut. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt
 (för bilder, med `?rum-t` står allt det som rör sig på den tiden).
