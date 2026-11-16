@@ -98,7 +98,7 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
 /* 100 × 140, förstorat med zoom: på pulten (--z i rum-tidning.css) och i tidningen --hg-k gånger, som alla ark (passa i
    rum-tidning.js). Kupongens papper och tryck (papper.css: --pp-paper, --pp-print), utan bild. Kalenderbladet
    (2026-11-13, användarens val F bland fyra minimalistiska skisser, se forsta i rum-tidning.js): numret, veckan och
-   priset maskinskrivna överst, namnet i terrakotta över ett tryckt streck, lördagens datum stort i mitten mellan två
+   priset maskinskrivna överst, namnet i terrakotta över ett tryckt streck, omgångens datum stort i mitten mellan två
    etiketter och devisen nertill, kursiv under ett kort streck som tidningens citat. Förut (C, Helgarderingen) rutorna 1,
    X och 2 ikryssade med den blå pennan i mitten och den första matchen nertill. */
 .hg-omslaget { flex: none; display: flex; scroll-margin-top: 14px; box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35); }
@@ -131,6 +131,13 @@ body.hg-bord { margin: 0; padding: 28px 0 56px; min-height: 100vh; box-sizing: b
   text-transform: uppercase; white-space: nowrap; }
 .hf-et::before, .hf-et::after { content: ""; flex: 1 1 auto; border-top: 0.4px solid var(--hf-tryck); }
 .hf-dag { margin: 0.5px -1.6px 0 0; color: var(--hf-tryck); font: 600 54px/0.98 var(--tryck); letter-spacing: 1.6px; font-variant-numeric: lining-nums; }
+/* En omgång på två dagar (2026-11-16, Europatipset söndag 15 och måndag 16 november): dagarna under varandra, lite
+   mindre, med ett kursivt & i bläck mellan två korta tryckta streck (och till mellan den första och den sista när
+   omgången har fler dagar). */
+.hf-dagar { display: flex; flex-direction: column; align-items: center; }
+.hf-dagar .hf-dag { font-size: 33px; line-height: 0.95; }
+.hf-och { display: flex; align-items: center; gap: 2.4px; width: 30px; margin: -0.6px 0 0.4px; color: var(--hf-svart); font: italic 400 6.4px/1 var(--tryck); white-space: nowrap; }
+.hf-och::before, .hf-och::after { content: ""; flex: 1 1 auto; border-top: 0.4px solid var(--hf-tryck); }
 /* devisen: kursiv i bläck under ett kort tryckt streck, som tidningens citat */
 .hf-forsta .hf-devis { flex: none; margin: 0; padding-bottom: 2.2px; font: italic 400 5.6px/1.2 var(--tryck); letter-spacing: 0.02px; text-wrap: balance; }
 .hf-devis::before { content: ""; display: block; width: 11px; margin: 0 auto 3px; border-top: 0.4px solid var(--hf-tryck); }
