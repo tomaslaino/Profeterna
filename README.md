@@ -460,6 +460,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   redan var spelade. Matchbladen och sista sidan är skrivna för hand inför matcherna, ur veckans press. Omslaget säger
   *Nr 2* och *Inför Europatipset*, och nattjobbet låter numret stå kvar med alla matcherna (se *Nr 2* under
   [Helgarderat](#helgarderat))
+- [x] **Gänget i bild på tv:n (2026-11-16, användarens önskemål: "när vi pratar i mobiltelefon med varandra, att vi
+  har möjlighet att se varandra på TV-apparaten där uppe där text-tv spelas - om vi vill … det ska vara intuitivt och
+  snyggt"):** tv:n i hörnet har fått en AV-ingång. Nära tv:n står *Visa dig på tv:n* i foten: kameran tänds och man
+  syns på tv:n hos de andra, vars tv byter till AV av sig själv, med snö ett ögonblick som när man bytte kanal. Två som
+  visar sig står sida vid sida med namnen i sina färger, man ser sig själv i en liten bild i hörnet, och de som bara
+  tittar syns som porträtt. Bara bild – rösten går i telefonen. Bilden går direkt mellan webbläsarna (WebRTC), och
+  tjänsten profeterna-rummet för bara vidare uppkopplingen (se *Gänget i bild* under [Tv:n](#tvn))
 
 ## Publicering
 
@@ -7232,6 +7239,62 @@ Har en division matcher som döljs just nu (Dölj resultat) visar tabellen och s
 hur många som är dolda och *Visa ändå* – samma nyckel som på Tabeller och Statistik, så att
 det gäller där också.
 
+**Gänget i bild (2026-11-16).** Användaren: "Kan du ordna så att vi, när vi pratar i mobiltelefon med varandra, att vi
+har möjlighet att se varandra på TV-apparaten där uppe där text-tv spelas - om vi vill … Tänk på att det ska vara
+intuitivt och snyggt!" Tv:n har fått en AV-ingång, som när man kopplade in en videokamera
+([public/rum-bild.js](public/rum-bild.js), AV-delen i [public/rum-tv.js](public/rum-tv.js) och
+[public/rum-tv.css](public/rum-tv.css), tjänsten i [worker/bilden.mjs](worker/bilden.mjs)). Bara bild: rösten går i
+telefonen, så det blir inget eko och inget som krockar med samtalet.
+
+- **Visa dig på tv:n** står i foten bredvid Tillbaka när tv:n är nära. Ett tryck tänder kameran (webbläsaren frågar
+  första gången) och tv:n byter till AV. Medan kameran är tänd står *Stäng av kameran* med en röd lampa i foten var man
+  än är i rummet; i telefonen på höjden, där foten står uppe till höger, står den där *Vanlig sida* stod, och nära tv:n
+  viker namnet undan (som med kupongen i handen). Inget annat i rummet ändras.
+- **Hos de andra** byter tv:n till AV av sig själv när någon visar sig – med ett ögonblick snö och en skakning, som när
+  man bytte kanal – och rutan lyser fullt också på håll, så att man ser ansiktet uppe i hörnet. Slutar alla visa sig går
+  tv:n tillbaka till text-tv:n. Man byter själv med **TV/AV**, en avlång knapp under ▼ 0 ▲ i knappsatsen, eller raden
+  *Gänget i bild* på 300; en sida, en siffra eller ▲ ▼ (och svepet i telefonen) går tillbaka till text-tv:n, och tv:n
+  byter då inte till AV igen förrän någon ny visar sig. Displayen visar *AV* (V:et som ett U, som på displayerna då) och
+  *AV* står i grönt uppe till vänster i rutan några sekunder efter bytet.
+- **På rutan:** den som visar sig står stort, två sida vid sida (beskurna på höjden), med namnet vi kallas
+  (`Tippoang.kallas`) i sin färg (`--gang-0–2`) nere till vänster, som en textremsa på tv. Man ser sig själv spegelvänd i
+  en liten bild nere till höger med en tunn vit ram och en röd lampa (bild i bild) – eller stort, med *Tejder ser dig*
+  (eller *Ingen annan har tv:n på*) under, när ingen annan visar sig. De som har tv:n på AV utan att visa sig står som
+  små porträtt i sina färger uppe till höger (*ser på*). Medan en bild letar sig fram står det snö i rutan, och efter
+  femton sekunder utan kontakt *Ingen kontakt*. Utan bild: den blå rutan, som när ingen kassett spelar, med *Ingen i
+  bild* och vad man gör, eller vad som gick fel med kameran (*Kameran fick inte startas. Tillåt den för sajten i
+  webbläsaren och försök igen.*, *Hittar ingen kamera.*, *Kameran används av något annat just nu.*). Linjerna över
+  bilden är svagare än över text-tv:n.
+- **Vem du är:** den du har valt i rummet (`Samtal.pult.du()`), annars den enheten minns från kupongen
+  (`profeterna.samtal.vem`). Vet enheten inte det frågar tv:n *Vem är du?* med porträtten när man trycker på *Visa dig
+  på tv:n* eller TV/AV, och svaret sparas bara för tv:n (`profeterna.tv.vem`) – kupongen påverkas inte. Den som inte är
+  någon i gänget kopplas inte upp och ser ingen. Byter man person i rummet kopplar sidan upp sig som den nya.
+- **Fliken dold eller rummet stängt** (som när man växlar till telefonsamtalet): kameran släcks och förbindelserna
+  stängs, och kommer man tillbaka inom tio minuter tänds kameran igen av sig själv (`ATER`).
+- **Vägen:** bilden går direkt mellan webbläsarna (WebRTC), en förbindelse mellan varje par där minst en visar sig och
+  båda har tv:n på AV; kameran tas i 640 × 480 och högst 30 bilder i sekunden, framkameran i telefonen. Tjänsten
+  profeterna-rummet ([worker/rummet.mjs](worker/rummet.mjs), samma som rummet och kupongen i realtid) har ett tredje
+  Durable Object, *Bilden* ([worker/bilden.mjs](worker/bilden.mjs), websocketen `/bild?vem=DT&id=<fönstret>`), som
+  säger vilka som är med (`alla`: fönster, vem, kamera, med) och för vidare erbjudandena och vägarna mellan
+  fönstren – ingen bild går genom den, och inget sparas. Krockar två erbjudanden ger det fönster efter som har det högre
+  id:t ("perfect negotiation"), med erbjudandet, svaret och backningen uttryckliga för äldre Safari. Webbläsarna hittar
+  varandra med STUN (Cloudflares och Googles). Bakom mobiloperatörernas adressöversättning räcker det inte alltid; då
+  behövs TURN, som tjänsten hämtar från Cloudflare när den har en nyckel (`TURN_ID` och `TURN_NYCKEL`, se nedan).
+- **Driftsättning:** tjänsten driftsätts för hand som förut (`npx wrangler@4.147.0 deploy --config worker/rummet.toml`,
+  migreringen `v3` lägger till *Bilden*). TURN är valfritt: skapa en TURN-nyckel under *Realtime → TURN* i Cloudflares
+  panel och lägg in den med `npx wrangler@4.147.0 secret put TURN_ID --config worker/rummet.toml` och `… secret put
+  TURN_NYCKEL …` (nyckelns id och token). Utan dem används bara STUN.
+- **För prov:** `?rum-bild=ws://127.0.0.1:8787/bild` (tjänsten lokalt, `wrangler dev --config worker/rummet.toml`) och
+  `?rum-bild-vem=DT`.
+
+Provat 2026-11-16 i huvudlös Chrome med låtsaskamera mot tjänsten lokalt (wrangler dev) och sajtens data: två och tre i
+gänget i 1280 × 800 – en visar sig och den andras tv byter själv, båda sida vid sida, en tredje som bara tittar och
+syns som porträtt, en som släcker och tillbaka till text-tv:n när ingen visar sig; i telefonen (390 × 844 och på
+bredden) med *Vem är du?*, tryck med fingret och foten uppe till höger; utan kamera (felet på den blå rutan); TV/AV,
+▲ och raden på 300; fliken dold och visad igen (kameran tänds själv, båda ser varandra igen inom en sekund, också när
+båda gör det samtidigt och erbjudandena krockar) och en sida som laddas om. Inte provat: riktiga kameror, Safari i
+iPhone, två olika nät (mobilnät utan TURN) och tjänsten driftsatt.
+
 **Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
 vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot
 ögat blir den sned, eftersom den sitter högt upp till höger. Man byter sida med ▲ ▼ på
@@ -10270,3 +10333,10 @@ realtid ([worker/kupongen.mjs](worker/kupongen.mjs)) litar på gänget på samma
 sajtens egna ursprung, men vem som helst därifrån kan läsa och ändra dem, och sidan kopplar
 upp sig först när man får se de andras tips, så att ingen ser dem av misstag. Det är ett
 utkast: kupongen som spelas ändras bara genom *Spara*, med sina vanliga kontroller.
+
+Gänget i bild på tv:n ([worker/bilden.mjs](worker/bilden.mjs), [public/rum-bild.js](public/rum-bild.js)) litar på gänget
+på samma sätt: tjänsten släpper bara in sajtens egna ursprung och någon av DL, DT och DJ, men vem man är väljer man
+själv. Därför syns det på tv:n vilka som ser en (*Tejder ser dig*, porträtten under *ser på*), och kameran är bara tänd
+när man själv har tänt den – med en röd lampa i foten och i den egna bilden – och släcks när fliken döljs. Bilden går
+direkt mellan webbläsarna, krypterad (WebRTC) och, med TURN, genom Cloudflare utan att sparas; tjänsten ser bara vem
+som är med och erbjudandena (SDP och ICE), och sparar inget.

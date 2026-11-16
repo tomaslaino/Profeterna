@@ -1629,7 +1629,7 @@ ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div>
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
+<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.varldar = [...el.querySelectorAll('.rum-world')];
@@ -1638,7 +1638,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ringar(el);
     wire();
     // kort: högst elva tecken
-    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
+    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [], avVal: (on) => { if (window.RumBild) RumBild.avVal(on); } }) : null;
+    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång och Visa dig på tv:n i foten
+    if (window.RumBild && R.tv) RumBild.mount(el, { tv: R.tv });
     tangenter();
     // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet
     // som syntes nära något var annars Vanlig sida, som leder ut ur rummet.
@@ -6881,6 +6883,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = true;
     document.documentElement.classList.add('rum-pa');
     if (window.RumFolk) RumFolk.on(true);
+    if (window.RumBild) RumBild.on(true);
     fit();
     kval(R.kval);
     zoomTv(false);
@@ -6959,6 +6962,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = false;
     document.documentElement.classList.remove('rum-pa');
     if (window.RumFolk) RumFolk.on(false);
+    if (window.RumBild) RumBild.on(false);
     cancelAnimationFrame(R.raf);
     clearTimeout(R.vila);
     clearInterval(R.poll);

@@ -1019,6 +1019,13 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum [data-to].hot { background: currentColor; -webkit-text-fill-color: #050505; text-shadow: none; }
 .rum-ft { position: absolute; right: 44px; bottom: 22px; display: flex; gap: 30px; align-items: baseline; z-index: 2; }
 .rum-ft a { font-family: Fraunces, Georgia, serif; font-size: 16px; color: #a9c8fb; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-shadow: 0 1px 8px #000; }
+/* Gänget i bild (rum-bild.js): Visa dig på tv:n står i foten bara nära tv:n, och Stäng av kameran var man än är
+   i rummet så länge den är tänd – med en röd lampa före, som på en kamera som spelar in. */
+.rum-ft a.rum-bildknapp { display: none; cursor: pointer; padding: 10px 18px; margin: -10px -18px; background: radial-gradient(closest-side, rgba(8, 5, 2, 0.72), rgba(8, 5, 2, 0)); text-shadow: 0 0 3px #000, 0 1px 8px #000, 0 0 16px #000; white-space: nowrap; }
+.rum.tv-nara .rum-ft a.rum-bildknapp:not([hidden]), .rum-ft a.rum-bildknapp.pa:not([hidden]) { display: inline; }
+.rum-ft a.rum-bildknapp.sander::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; vertical-align: 1px; background: #ff3a2a; box-shadow: 0 0 6px 1px rgba(255, 58, 42, 0.75); animation: rum-bildlampa 2s ease-in-out infinite; }
+@keyframes rum-bildlampa { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .rum-ft a.rum-bildknapp.sander::before { animation: none; } }
 /* Nära något: samma ställe, samma ord för alla saker. Ligger över det man tittar på, så skuggan är tätare. */
 .rum-ft a.rum-tillbaka { cursor: pointer; padding: 10px 18px; margin: -10px -18px; background: radial-gradient(closest-side, rgba(8, 5, 2, 0.72), rgba(8, 5, 2, 0)); text-shadow: 0 0 3px #000, 0 1px 8px #000, 0 0 16px #000; }
 
@@ -1144,6 +1151,11 @@ canvas.rum-svag { opacity: 0.05; }
 /* kupongen fyller nederkanten: Vanlig sida står uppe till höger, mitt emot
    namnet, i stället för över kupongen */
 .rum.smal .rum-ft { top: 18px; bottom: auto; height: 36px; align-items: center; }
+/* Gänget i bild (rum-bild.js): nära tv:n står Visa dig på tv:n och Tillbaka där uppe, och namnet viker
+   undan som med kupongen i handen; medan kameran är tänd står Stäng av kameran där Vanlig sida stod (det
+   ryms inte bredvid namnet), tills den är släckt. */
+.rum.smal.tv-nara:has(.rum-bildknapp:not([hidden])) .rum-hdr { opacity: 0; pointer-events: none; }
+.rum.smal .rum-ft:has(.rum-bildknapp.pa:not([hidden])) .rum-vanlig { display: none; }
 /* Rummet på höjden står längre bort än scenen är hög (fit i rum.js): taket och pulten fortsätter
    utanför, och ljuset och mörkret med dem. */
 .rum.smal .rum-stage { overflow: visible; background: none; }
