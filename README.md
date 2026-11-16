@@ -1529,6 +1529,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bron ligger i samma mått, så att de som går är närmast och bilarna längre in och högre upp, och fordonen har
   också tak, vindruta, motorhuv och bagagelucka, så att de syns som hela bilar och bussar. Se
   [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Trafiken bakom Hasse Backe som gatan i rummet (2026-11-16, användarens önskemål):** "Det som händer utanför
+  hasses fönster är lite för mycket i fokus - jag vill att de ska vara som på animationsbilden - är de inte i 2D
+  där?" och "så att inte bilar flyger uppe i luften på ena körfältet iaf". På gatan i rummet är bilarna platta
+  bilder från sidan och nästan lika oskarpa som stan bakom; på bron var trafiken bara en sjättedel till hälften så
+  oskarp som utsikten, och bilarna i den bortre filen hamnade högt ovanför räcket. Nu är trafiken lika oskarp
+  längs hela bron, 0,8 av utsiktens, och körbanan lutar mindre, så att båda filerna står på bron bakom räcket. Se
+  [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som gatan i rummet*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -7871,9 +7878,9 @@ så att fordonen krymper och saktar in mot bortre änden som i verkligheten: dä
 eller bakifrån, närmast mer från sidan. Bron har en körbana bakom räcket (sedan 2026-11-15, `TVAR`: gångbanan,
 cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på andra sidan, räcket och lyktstolparna där,
 torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
-står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, mer än bron egentligen skulle säga,
-så att körbanan syns som en yta och filerna inte hamnar i höjd med gångbanan), och de som går ligger i samma mått
-(`gangVag`), närmast räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
+står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, ungefär som man ser bron härifrån,
+så att körbanan syns som en smal yta bakom räcket; sedan 2026-11-16 0,16 i stället för 0,28, se *Trafiken som
+gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
 fronten eller baken upp till där ovansidan tar vid, och ovansidan i raka bitar ur karossens överkant (`topp`:
 motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
 plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
@@ -7891,8 +7898,8 @@ läggs sedan längs bron i trafikens duk; benen byter steg var 0,55:e sekund.
 Den går på gångbanan innanför räcket, lite högre i bilden än brons kant eftersom man ser bron uppifrån, med
 räcket framför upp till höften så att benen bara anas, och den är 1,15 gånger räckets höjd (`GANG`): räcket och
 lyktstolparna är ritade större än husen på andra sidan skulle säga (en våning är en halv grad vid tegelhuset, där
-räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och knappt hälften av utsiktens oskärpa, så att
-man ser att det är en människa (ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
+räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och samma oskärpa som resten av trafiken (se
+nedan; ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
 honom. De som cyklar (`cyklist`) håller sig till cykelbanorna mellan gångbanan och körbanan, i den närmaste mot
 en och på andra sidan bort, 17–24 km/h och lika fort i en bana, så att ingen cyklar igenom någon annan. De kommer
 efter klockan, veckodagen, årstiden och vädret (`cyklar` i `RumUte.trafik`, samma som på gatan: inga i snön, i
@@ -7903,7 +7910,20 @@ mitten eftersom en cykel är smal, och två av var med pedalerna ett halvt varv 
 trampar. Hjälm eller mössa, gul reflexväst hos många, regnjacka i regnet, lyse i mörkret och hos en del också på
 dagen, och alltid en röd reflex bak. Bron ses så snett att de mest syns framifrån eller bakifrån, som en smal
 figur över ett hjul, så styret och armbågarna är lite bredare än på riktigt. Ingen trafik går med minskad rörelse
-eller i en fast bild (`?rum-t`). Förut var
+eller i en fast bild (`?rum-t`).
+
+*Trafiken som gatan i rummet* (2026-11-16). På gatan i rummet är bilarna platta bilder från sidan (gatan går rakt
+tvärs över fönstret) och nästan lika oskarpa som stan bakom (3 px mot 3,4 px, de som går 2,6 px, rum-ute.css). På
+bron hos honom fick trafiken förut sin oskärpa bakad i varje figur, högst 3–3,5 bildpunkter i figurens duk: nära
+honom drygt hälften av utsiktens och längre bort, där figuren är mindre, bara en sjättedel, så att bilarna och
+människorna var skarpare än allt runt omkring. Nu ligger oskärpan på hela trafikens duk, 0,8 av utsiktens och lika
+stor längs hela bron (`oskarpa` i rum-hasse-ute.js, `filter` på `.rh-trafik` i `broDuk`), och figurerna har bara en
+aning själva (`BAKAD`), som gatan i rummet. Glaset klipper ramen runt duken (`clip-path` på `.rh-bron`), så att det
+oskarpa inte breder ut sig över posterna; utan `path()` i `clip-path` klipps duken som förut. Fordonen är kvar som
+hela bilar och bussar med front, bak och ovansida, eftersom bron går snett bort från en, men så oskarpa ser de ut som
+på gatan. Samtidigt lutar körbanan mindre (`LUTA` 0,28 → 0,16, nära vad man faktiskt ser härifrån): förut hamnade den
+bortre filen nästan en och en halv räckeshöjd ovanför räcket, och när körbanan inte syntes, i mörker och regn,
+svävade bilarna där i luften. Förut var
 väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
 kaffebryggaren och kassan (ändrat 2026-11-10).
 
