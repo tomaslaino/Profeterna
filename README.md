@@ -4153,7 +4153,15 @@ inbördes möten, spelkassan och Tipsligan i tobaksaffären, med guld som färg.
 finns inte i `gang` i [config/kupong.js](config/kupong.js) och syns inte när tipsen jämförs inför
 gängets kupong, så att spelet går som förut: inlämningen, när tipsen visas, *Alla inne*, förslaget och
 gängets kupong. *Lagkänsla* och *Den oumbärlige* gäller inte honom, och *Närvaro* räknas från hans
-första omgång.
+första omgång och bara i omgångarna han kunde vara med i.
+
+**Bara när hela gänget spelar (2026-11-16, Tomas beslut):** han tävlar bara i en omgång som alla i
+gänget har tippat (`Tippoang.hasseMed`). Annars får omgången ingen kupong av honom, varken i
+`data/tippar-historik.json` eller i omgången som pågår (`tpScore`), så att en omgång som bara han
+spelar inte ger honom något försprång. Ingen kan lämna in när tipsen väl visas, så det står fast när
+omgången skrivs in. En fryst omgång från innan regeln, där han tippade utan hela gänget (landskamperna
+15–16 november), står kvar i filen men hans tips räknas bort när sidan byggs (`utanHasse`), och en
+omgång som ingen i gänget tippade visas inte alls.
 
 Han spelar under samma regel som alla (`regel` i [config/kupong.js](config/kupong.js), 4 spikar,
 5 halvgarderingar och 4 helgarderingar). Kupongen byggs vid bygget (`hasseKupong` i
@@ -4192,7 +4200,8 @@ Säsongen står i Olympen ([public/kampen.js](public/kampen.js)): ställningen s
 prispall med summan av omgångarnas poäng, antal rätt av de spelade matcherna och antal
 gånger som *Omgångens orakel* (bäst) och *Omgångens Ikaros* (sämst), som märken under
 namnet, och modellen som jämförelse, utan placering. Placering efter summan med en
-decimal, sedan antal rätt. En omgång räknas för den som tippade i den. Tabellen
+decimal, sedan antal rätt. En omgång räknas för den som tippade i den – Hasse Backe bara när
+hela gänget tippade (se [Hasse Backe tävlar](#hasse-backe-tävlar)). Tabellen
 *Omgångarna* visar varje omgång med orakel och Ikaros inramade i guld och rött. Döljer
 spoilerskyddet någon match i en omgång räknas hela omgången bort, med *Visa ändå*. (Fram
 till 2026-10-22 stod samma topplista också under omgångens ruta på förstasidan.)
