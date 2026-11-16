@@ -349,7 +349,7 @@ window.RumHasse = (() => {
     const v = await vagg();
     if (!H.on || H.svanger) return;
     H.vaggBild = v;
-    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag };
+    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag, somn: somn() };
     // (disken speglar väggen: ritas om med den nya)
     H.vaggNr = (H.vaggNr || 0) + 1;
     passa();
@@ -599,7 +599,9 @@ window.RumHasse = (() => {
     x.globalAlpha = 1;
   }
   // Utsikten genom fönstren, underst på väggens duk: ritad en gång per väder och ljus (rum-hasse-ute.js), förstorad
-  // till bildens mått, och glaset med dropparna, snön och frosten. Utan den: himlen i rummets färger.
+  // till bildens mått, glaset med dropparna, snön och frosten, och affären som speglas i glaset när det är mörkare
+  // ute än inne (affaren: lysröret, furan och gänget vid bordet, efter hur tänt röret är och om gänget sover).
+  // Utan den: himlen i rummets färger.
   const uteLage = () => (H.hog ? 'hog' : 'bred');
   const uteNu = () => {
     const v = window.Vader ? Vader.nu() : null;
@@ -609,7 +611,8 @@ window.RumHasse = (() => {
     const u = H.ute && uteNu();
     return u ? H.ute.sig(u.v, u.L) : H.uteSig;
   }
-  function ute(x, W, Hh) {
+  const somn = () => Boolean(window.RumFolk && RumFolk.somn && RumFolk.somn());
+  function ute(x, W, Hh, l) {
     const u = uteNu();
     if (H.ute && u) {
       try {
@@ -618,6 +621,11 @@ window.RumHasse = (() => {
         x.drawImage(d, 0, 0, W, Hh);
         H.ute.glas(x, u.v, u.L, uteLage(), W, Hh);
         H.uteSig = H.ute.sig(u.v, u.L);
+        try {
+          if (H.ute.affaren) H.ute.affaren(x, u.L, l, somn(), uteLage(), W, Hh);
+        } catch (e) {
+          // utsikten står kvar utan spegelbilden
+        }
         return;
       } catch (e) {
         // som utan utsikten
@@ -671,7 +679,7 @@ window.RumHasse = (() => {
     c.width = W;
     c.height = Hh;
     const x = c.getContext('2d');
-    ute(x, W, Hh);
+    ute(x, W, Hh, l);
     if (blanda) {
       x.drawImage(mork, 0, 0, W, Hh);
       x.globalAlpha = l.k;
@@ -739,10 +747,10 @@ window.RumHasse = (() => {
     x.globalAlpha = 1;
   }
   // Väggen står som den ska: samma fönster (på bredden eller höjden), ljus och väder som när den ritades.
-  const vaggSom = (l) => { const f = H.vaggLjus; return Boolean(f && H.vaggBild && f.hog === H.hog && Math.abs(l.k - f.k) < 0.004 && Math.abs(l.f - f.f) < 0.01 && Math.abs(l.dag - f.dag) < 0.01 && uteSig() === H.uteSig); };
+  const vaggSom = (l) => { const f = H.vaggLjus; return Boolean(f && H.vaggBild && f.hog === H.hog && Math.abs(l.k - f.k) < 0.004 && Math.abs(l.f - f.f) < 0.01 && Math.abs(l.dag - f.dag) < 0.01 && f.somn === somn() && uteSig() === H.uteSig); };
   async function vaggNu(l) {
     H.vaggBild = await vagg();
-    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag };
+    H.vaggLjus = { hog: H.hog, k: l.k, f: l.f, dag: l.dag, somn: somn() };
   }
   // En stund efter att rummet har kommit i gång hämtas hans bilder och kod till webbläsarens cache, utan att
   // något byggs eller packas upp: då väntar det första klicket inte på nätet. (I telefonen pekar man inte på
