@@ -5051,7 +5051,8 @@ blommor, bär, ljus och konfetti är sammanslagna till ett nät per sak, så att
 gärna ut högtiderna lite grann (rimligt) så att det inte bara är en dag"): runt högtiderna pyntar affären, och
 pyntet sitter uppe längre än gängets kläder, som i en affär – från några dagar före till en bit efter. Dagen är
 Stockholms, som kläderna. Pyntet hänger i fönstret, i luckorna kring neonen och skivan med löpsedlarna, och står
-på bardisken mellan datorn och lådan med kassetter, vridet mot affären (`pyntSakerna` i
+längst in i hörnet på bardisken, mellan orakelramen och datorn (som står framför det) och under pokalhyllan, långt
+från gullrankan mitt på disken, lite mindre än i verkligheten och vridet mot affären (`pyntSakerna` i
 [public/rum-inredning.js](public/rum-inredning.js)):
 
 - **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian och
@@ -5070,7 +5071,7 @@ på bardisken mellan datorn och lådan med kassetter, vridet mot affären (`pynt
   bardisken och ett spindelnät med en spindel i fönstrets övre vänstra hörn.
 
 Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på två egna dukar i väggens plan: fönstrets
-under neonen, som hänger framför fönstret, och bardiskens framför tavlorna på högra väggen och bakom datorn
+under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
 (`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
 målas på väggen och glaset, och på kvällen går rummets mörker runt dem som runt neonen och spotarna och lysrörets
 värme ligger kring dem (`pyntLjus`, `ljusKlockan` i [public/rum.js](public/rum.js)); det andra mörknar med

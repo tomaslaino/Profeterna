@@ -77,10 +77,10 @@ const BITAR = {
   radiolapp: { plan: 0, box: { x: LAPP.x - 7, y: LAPP.y - 7, w: LAPP.w + 15, h: LAPP.h + 13 }, i: '.rum-radiolapp', at: LAPP },
 };
 // Högtidspyntet (rum-pynt.js), när det är högtid: det som hänger i fönstret, under neonen, som hänger
-// framför det (fore), och det som står på bardisken, framför tavlorna på högra väggen och bakom datorn
+// framför det (fore), och det som står i hörnet på bardisken, framför tavlorna på högra väggen och bakom datorn
 const PYNT_BITAR = {
   pyntF: { plan: 0, box: { x: 222, y: 96, w: 770, h: 214 }, fore: 'canvas.rum-neon' },
-  pyntD: { plan: 0, box: { x: 1170, y: 320, w: 330, h: 285 }, fore: '.rum-hv + *' },
+  pyntD: { plan: 0, box: { x: 1040, y: 330, w: 230, h: 220 }, fore: '.rum-hv + *' },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -1514,14 +1514,15 @@ export async function inredning(el, opt = {}) {
   // Runt högtiderna (pyntet i rum-pynt.js) hänger något i fönstret och står något på bardisken, byggt i
   // centimeter (K enheter på en centimeter i bakväggens plan, som bardisken) och ritat en gång, som det
   // andra. Fönstrets saker hänger från karmen (y KARM) en bit framför glaset (Z FZ), i luckorna kring
-  // neonen och skivan med löpsedlarna; på bardisken står saken mellan datorn och lådan med kassetter,
-  // vriden mot affären. Pyntet byggs bara när det är högtid, och byts om högtiden byts medan sidan står
-  // öppen (var tionde minut).
+  // neonen och skivan med löpsedlarna; på bardisken står saken längst in i hörnet, mellan orakelramen och
+  // datorn (som står framför den), under pokalhyllan och långt från gullrankan mitt på disken (RANKA), lite
+  // mindre än i verkligheten så att den ryms där och vriden mot affären. Pyntet byggs bara när det är högtid,
+  // och byts om högtiden byts medan sidan står öppen (var tionde minut).
   const K = 2.37;
   const KARM = 120;
   const FZ = -15;
   const PK = (x, y, z = FZ) => new THREE.Vector3(x / K, -y / K, z / K);
-  const DISK_PLATS = { x: 1100, z: 390, vrid: -45 };
+  const DISK_PLATS = { x: 1103, z: 100, vrid: -38, k: 0.82 };
   const KROKAR = [244, 420, 596, 772, 948].map((x) => PK(x, KARM));
   function pyntSakerna(P, namn) {
     const S = P.pyntSaker(mat);
@@ -1541,7 +1542,7 @@ export async function inredning(el, opt = {}) {
       // äggen i band från karmen, ovanför gänget och kring mittposten
       F.push(S.agg([[492, 226, 1.7], [548, 200, 1.5], [598, 238, 1.6], [646, 176, 1.8], [690, 222, 1.6], [728, 168, 1.7], [750, 214, 1.4]]
         .map(([x, y, k]) => ({ ...PK(x, KARM, -13), ned: (y - KARM) / K, k }))));
-      D.push(S.paskris());
+      D.push(S.paskris({ hojd: 21 }));
     } else if (namn === 'midsommar') {
       F.push(S.vimplar(KROKAR, { s: 4.5 }));
       D.push(S.blommor());
@@ -1567,7 +1568,7 @@ export async function inredning(el, opt = {}) {
     if (f) f.scale.setScalar(K);
     const d = grupp(D);
     if (d) {
-      d.scale.setScalar(K);
+      d.scale.setScalar(K * DISK_PLATS.k);
       d.position.set(DISK_PLATS.x, DISK.top, DISK_PLATS.z);
       d.rotation.y = DISK_PLATS.vrid * DEG;
     }
@@ -1602,6 +1603,7 @@ export async function inredning(el, opt = {}) {
       wallLights(b, box, k === 'pyntD');
       if (k === 'pyntD') {
         catcher(b, new THREE.PlaneGeometry(DISK.vagg - DISK.kant, DISK.fram), [-90 * DEG, 0, 0], [(DISK.kant + DISK.vagg) / 2, DISK.top + 0.1, DISK.fram / 2], 0.35);
+        backWall(b);
         rightWall(b);
       }
       b.scene.add(g);

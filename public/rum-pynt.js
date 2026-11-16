@@ -645,7 +645,7 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
   // Påskriset: en tät bukett björkris i en vit glaserad kanna med en blå rand, med fjädrar i klara färger
   // på kvistarna och några små målade ägg som hänger i dem.
   const FJADER = ['#ff4f9a', '#ffd21f', '#3fc24a', '#ff7a1a', '#2f8cff', '#a35cff', '#ff3b3b', '#2fd0c4', '#ffe14d'];
-  function paskris() {
+  function paskris({ hojd = 29 } = {}) {
     const g = new THREE.Group();
     const q = rnd(41);
     const H = 13;
@@ -654,7 +654,7 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     rand.position.y = 5;
     g.add(rand);
     const spetsar = [];
-    const geos = kvistar(q, { y0: H, r0: 2.6, antal: 17, hojd: 29, farg: '#3a2420', ut: spetsar, grenar: 2, spridd: 0.32 });
+    const geos = kvistar(q, { y0: H, r0: 2.6, antal: 17, hojd, farg: '#3a2420', ut: spetsar, grenar: 2, spridd: 0.32 });
     mesh(ihop(geos), m('#ffffff', { vertexColors: true, roughness: 0.7 }), g);
     // fjädrarna: en eller två vid varje spets, och fler längs kvistarna
     const lista = [];
