@@ -7,7 +7,8 @@
 // utan verktyg och lika kort som tipsets analys, och koden kontrollerar att
 // inget har hittats på (src/analyser/hasse.mjs). Tecknen och resultatet bestämmer han
 // själv (användarens önskan 2026-11-07: vassare, och emot oddsen när han har skäl):
-// han får analysen, spelbolagens odds, sajtens prognos och kollegans tecken. Macen
+// han får analysen, spelbolagens odds, sajtens prognos och kollegans tecken, och ibland
+// lottas skrällen (bubblare nedan). Macen
 // skriver texten i förväg med Claude Code (scripts/analyser/skriv.mjs), och på sajten
 // låtsas han analysera.
 // ============================================================================
@@ -17,7 +18,7 @@ module.exports = {
   effort: 'medium',
   timeoutMs: 180000,
   // Ändras personan eller frasbanken byts versionen, så att texterna skrivs om.
-  promptVersion: '2026-11-07.1',
+  promptVersion: '2026-11-16.1',
 
   // Högst så många ord i texten: prompten säger 120 (som tipsets analys), och
   // koden släpper igenom lite mer.
@@ -99,6 +100,31 @@ module.exports = {
     'Landslagsfotboll är klubbfotboll med tre dagars försäsong.',
     'Det er helt i orden, som danskarna säger.',
   ],
+  // Skrällen (användarens önskan 2026-11-16: "inte bara bettar på favoriterna utan att han
+  // också hittar bubblare", "inte alltid … utan så ska det vara ibland", med "lämpliga
+  // (Hasse Backe-) argument"): i en match där spelbolagen har en favorit och det andra
+  // lagets seger har odds inom odds lottas skrällen med chansen chans (samma match och
+  // version ger samma lott). Då tippar han det andra lagets seger, aldrig favoritens, och
+  // letar fram skälen i analysen. Med 13 matcher blir det ungefär två skrällar per kupong,
+  // och någon gång ingen. En av raderna lottas med, och han tar den där den passar.
+  bubblare: {
+    chans: 0.22,
+    odds: [3.2, 6.5],
+    rader: [
+      'Matcher vinns inte på pappret.',
+      'Här luktar det skräll.',
+      'Favoriten har redan räknat in segern.',
+      'Det kallas skräll av dem som bara läser oddsen.',
+      'Det är så här skrällar ser ut innan de händer.',
+      'Spelbolagen räknar. Jag tittar på fotboll.',
+      'Oddsen har aldrig spelat en match.',
+      'Det här är ingen skräll. Det är bara ingen annan som har tittat ordentligt.',
+      'En kupong full av favoriter ger ingen utdelning att tala om.',
+      'Favoritskapet är tyngre att bära än man tror.',
+      'Jag har sett större skrällar än den här.',
+      'Det er ikke altid den bedste, der vinder, som man säger i Aalborg.',
+    ],
+  },
   // Bielsa-orden lottas bara när analysen visar att ett lag pressar högt eller
   // har ett rörligt anfallsspel.
   bielsaOrd: ['rotasiones', 'intensidá', 'verticalidá', 'transisiones', 'presjón alta', 'ombre libre'],

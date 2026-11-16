@@ -1585,6 +1585,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   resultatet i modellen, nästan alltid 1–0, 1–1 eller 2–1. Nu väljer han tecken och resultat när
   hans text skrivs, med spelbolagens odds, sajtens prognos och kollegans tecken framför sig. Se
   [Hasse Backe](#hasse-backe), *Rösten*.
+- **Hasse Backe hittar skrällar ibland (2026-11-16, användarens önskemål):** "inte bara bettar på
+  favoriterna utan att han också hittar bubblare – just nu är det otroligt mainstream med låg
+  risk", men "absolut inte alltid", och han ska hitta "lämpliga (Hasse Backe-) argument". Han
+  hade tippat spelbolagens favorit i 26 av 34 matcher, och de åtta andra var nästan bara jämna
+  matcher eller kryss; det djärvaste var Swindon hemma mot Grimsby på 3,22. Nu lottas skrällen i ungefär var femte match med en
+  tydlig men inte överlägsen favorit, cirka två per kupong och någon gång ingen. Då tippar han
+  det andra laget och letar fram skälen i analysen. Se [Hasse Backe](#hasse-backe), *Skrällen*.
 - **Hasse Backe med Tomas röst, och tyst tills man slår på ljudet (2026-11-04, användarens
   beslut):** Hasse Backe talar med Tomas egen röst, klonad med Chatterbox Multilingual på
   iMacen, i stället för Azures Mattias. Ett launchd-jobb läser upp allt han säger, ett
@@ -8930,10 +8937,27 @@ omgången 2026-11-07: 13 ensamma tecken, emot spelbolagens favorit i fyra matche
 mot Cardiff som saknar fyra mittbackar, kryss mot West Ham, Middlesbrough och West Brom), och
 resultat som 3–0 och 2–2.
 
+**Skrällen** (2026-11-16, `bubblare` i [config/hasse.js](config/hasse.js)). Av sig själv gick han
+nästan bara emot favoriten i jämna matcher, så nu lottas skrällen: i en match där spelbolagen har en
+favorit och det andra lagets seger har odds mellan 3,2 och 6,5 får han den med chansen 0,22,
+med egen slump efter matchens id och `promptVersion` (samma match ger samma lott, och fraserna
+lottas som förut). Det blir ungefär två skrällar på en kupong med 13 matcher och någon gång
+ingen; överlägsna favoriter (som Arsenal mot Hull, 1,15) och jämna matcher är aldrig med. Han
+får veta det i uppdraget, med båda lagens odds, och personan säger hur han ser en skräll:
+organisation, orsak och verkan, ett lag som står kompakt eller har publiken i ryggen, en favorit
+som saknar folk bakåt eller tror att matchen redan är vunnen. Sakuppgifterna ska stå i analysen,
+slutsatsen är hans. En av tolv färdiga rader om skrällen lottas med ("Oddsen har aldrig spelat en
+match.", "Spelbolagen räknar. Jag tittar på fotboll.") och han tar den där den passar.
+`granska` kräver att det andra lagets seger är med i hans tecken och att favoritens inte är det. Med
+ett ensamt tecken och störst målskillnad blir skrällen gärna en spik på hans tävlingskupong
+(`hasseKupong` i [src/tippare.js](src/tippare.js) är oförändrad). Lotten sparas i
+`hasse.uppdrag.bubblare`.
+
 **Kontrollerna** (`granska`): inga tal, citat eller namn utanför analysen och oddsen, högst 135
 ord, inga källor ("enligt …"), ingen kollega och inget "i morgon", tecknen som "1", "X", "2" och i
 ord i sista stycket, resultatet med högst 4 mål per lag (rösten har ljud för 0–0 till 4–4) och inom
-tecknen men inte i texten, och inget ur den påhittade tränarens värld.
+tecknen men inte i texten, skrällens tecken med och favoritens inte när skrällen är lottad, och
+inget ur den påhittade tränarens värld.
 Klarar svaret inte det får Claude skriva om en gång, och annars visas analysen som den är. Koden ser
 inte om en mening ändrar betydelse utan att ett tal ändras. Texten ligger i analysens post i
 `data/analyser.json`.

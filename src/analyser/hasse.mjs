@@ -4,12 +4,15 @@
 // sajtens prognos och kollegans tecken (oddsen), personan i prompts/hasse-backe.md och
 // två lottade uttryck ur frasbanken (config/hasse.js) och skriver utan verktyg. Tecknen
 // och resultatet bestämmer han själv, och han får gå emot både oddsen och kollegan när
-// han har skäl. På sajten låtsas han analysera (public/rum-hasse.js).
+// han har skäl. Ibland lottas skrällen (bubblare i config/hasse.js): i en match med en
+// tydlig men inte överlägsen favorit tippar han då det andra laget och letar fram skälen
+// i analysen. På sajten låtsas han analysera (public/rum-hasse.js).
 //
 // Kontrollerna (granska): inga tal, citat eller namn utanför analysen och oddsen, högst
 // maxOrd ord, inga källor ("enligt …"), ingen kollega och inget "i morgon", tecknen som
 // "1", "X", "2" och i ord i sista stycket, resultatet 0–4 mål per lag inom tecknen och
-// inte i texten, Bielsa-orden bara om de lottats och inget ur den påhittade kollegans värld. Klarar svaret inte det får
+// inte i texten, skrällens tecken med och favoritens inte när skrällen är lottad,
+// Bielsa-orden bara om de lottats och inget ur den påhittade kollegans värld. Klarar svaret inte det får
 // Claude skriva om en gång, och annars blir det ingen text.
 //
 // Språket (sprakfel): en läsare utan personan pekar ut det som inte är svenska, och då
@@ -51,17 +54,23 @@ export function resultatAv(r) {
 // ---------- oddsen: vad alla andra tror ----------
 
 const odds2 = (x) => x.toFixed(2).replace('.', ',');
-// Spelbolagens odds (snittet, annars DraftKings), sajtens prognos och kollegans tecken, som
-// rader till Claude. d: matchens fil på sajten (data/match/<id>.json), eller null.
+// Spelbolagens odds för 1, X och 2 (snittet, annars DraftKings), eller null.
+export function bolagsOdds(d) {
+  const p = d && d.prediction;
+  const mk = p && p.baselines && p.baselines.market;
+  const v = mk && Array.isArray(mk.odds) ? mk.odds : d && d.odds && d.odds.espn && d.odds.espn.x12;
+  return Array.isArray(v) && v.length === 3 && v.every((x) => Number.isFinite(x) && x > 1) ? v : null;
+}
+// Spelbolagens odds, sajtens prognos och kollegans tecken, som rader till Claude.
+// d: matchens fil på sajten (data/match/<id>.json), eller null.
 export function oddsen(d, article) {
   const ut = [];
   try {
     const m = d && d.match;
     const p = d && d.prediction;
     const trio = (v) => `${m.home} ${v[0]} · oavgjort ${v[1]} · ${m.away} ${v[2]}`;
-    const mk = p && p.baselines && p.baselines.market;
-    const bolag = mk && Array.isArray(mk.odds) ? mk.odds : d && d.odds && d.odds.espn && d.odds.espn.x12;
-    if (m && Array.isArray(bolag) && bolag.length === 3) ut.push(`Spelbolagen: ${trio(bolag.map(odds2))}. Lägre odds, större chans.`);
+    const bolag = bolagsOdds(d);
+    if (m && bolag) ut.push(`Spelbolagen: ${trio(bolag.map(odds2))}. Lägre odds, större chans.`);
     // En landskamp har marknadens prognos (spelbolagets odds utan marginal), inte sajtens modell.
     if (m && p && Array.isArray(p.p)) ut.push(p.kind === 'marknaden' ? `Utan spelbolagets marginal: ${trio(pct3(p.p).map(pctOdds))}.` : `Sajtens prognos, odds utan spelbolagens marginal: ${trio(pct3(p.p).map(pctOdds))}.`);
   } catch { /* utan odds */ }
@@ -96,13 +105,30 @@ export function kallan(article) {
 }
 const texten = (k) => [k.rubrik, k.ingress, ...k.stycken, k.tips.text, k.tips.marginal].filter(Boolean).join('\n');
 
-// land: en landskamp (kryddan ur kryddorLand).
-export function uppdrag(id, article, land = false) {
+// Skrällen: lottas med egen slump (så att fraserna inte ändras av den) i en match där
+// spelbolagen har en favorit och det andra lagets seger har odds inom hc.bubblare.odds.
+// → {tecken (det andra lagets seger), favorit, lag, mot, odds, favoritOdds, rad} eller null.
+export function bubblare(id, d) {
+  const b = hc.bubblare;
+  const o = bolagsOdds(d);
+  const m = d && d.match;
+  if (!b || !o || !m) return null;
+  const favorit = o[0] < o[2] ? 0 : 2;
+  const tecken = 2 - favorit;
+  if (o[1] < o[favorit] || o[tecken] < b.odds[0] || o[tecken] > b.odds[1]) return null;
+  const sl = lotter(`${id}:${hc.promptVersion}:bubblare`);
+  if (sl() >= b.chans) return null;
+  const namn = [m.home, null, m.away];
+  return { tecken, favorit, lag: namn[tecken], mot: namn[favorit], odds: o[tecken], favoritOdds: o[favorit], rad: ta(b.rader, 1, sl)[0] };
+}
+
+// land: en landskamp (kryddan ur kryddorLand). d: matchens fil, för skrällen.
+export function uppdrag(id, article, land = false, d = null) {
   const sl = lotter(`${id}:${hc.promptVersion}`);
   const fraser = ta(hc.fraser, 2, sl);
   const krydda = sl() < hc.kryddaChans ? ta(land ? hc.kryddorLand : hc.kryddor, 1, sl)[0] : null;
   const bielsa = new RegExp(hc.bielsaNar, 'i').test(texten(kallan(article))) ? ta(hc.bielsaOrd, sl() < 0.5 ? 1 : 2, sl) : [];
-  return { fraser, krydda, bielsa };
+  return { fraser, krydda, bielsa, bubblare: bubblare(id, d) };
 }
 
 // ---------- kontrollerna ----------
@@ -155,6 +181,9 @@ export function granska(svar, article, u, odds = []) {
   const sista = stycken[stycken.length - 1];
   if (!signs) fel.push('tecken ska vara "1", "X", "2", två av dem eller "1X2"');
   else for (const n of signs) if (!TECKEN_RE[n].test(sista)) fel.push(`${ORD[n]} står inte i sista stycket`);
+  const b = u.bubblare;
+  if (b && signs && !signs.includes(b.tecken)) fel.push(`det här är matchen där du ser skrällen: ringa in ${ORD[b.tecken]}, att ${b.lag} vinner`);
+  if (b && signs && signs.includes(b.favorit)) fel.push(`det här är matchen där du ser skrällen: ringa inte in ${ORD[b.favorit]}, att ${b.mot} vinner`);
   if (!res) fel.push('resultat ska vara hemmalagets och bortalagets mål, som "3–1"');
   else {
     if (res.h > 4 || res.b > 4) fel.push('resultatet får ha högst 4 mål per lag');
@@ -167,7 +196,7 @@ export function granska(svar, article, u, odds = []) {
   if (/\bi ?morgon\b/i.test(text)) fel.push('säg inte "i morgon": texten står kvar fram till avspark');
   const lanat = ac.rost.egnaNamn.filter((o) => har(text, o));
   if (lanat.length) fel.push(`${lanat.join(', ')} hör till kollegans historier, inte matchen`);
-  const tillatet = [hc.bielsaCitat, hc.bielsaTillbaka, ...hc.fraser, ...(u.krydda ? [u.krydda] : [])];
+  const tillatet = [hc.bielsaCitat, hc.bielsaTillbaka, ...hc.fraser, ...(u.krydda ? [u.krydda] : []), ...(b && b.rad ? [b.rad] : [])];
   for (const m of text.matchAll(/["“”«»]([^"“”«»]{4,})["“”«»]/g)) {
     if (!har(kalla, m[1]) && !tillatet.some((f) => har(m[1], f) || har(f, m[1]))) fel.push(`citatet "${m[1]}" står inte i analysen`);
   }
@@ -194,7 +223,7 @@ export const hasseKlar = (h, article) => Boolean(h && article.tip && h.tips === 
 // ordning, och också om granskningen inte går att få: den får aldrig stoppa en text.
 export async function sprakfel(stycken, { claude = claudeSvar } = {}) {
   try {
-    const egna = [...hc.fraser, ...hc.kryddor, ...(hc.kryddorLand || []), hc.bielsaCitat, hc.bielsaTillbaka].join(' · ');
+    const egna = [...hc.fraser, ...hc.kryddor, ...(hc.kryddorLand || []), ...((hc.bubblare && hc.bubblare.rader) || []), hc.bielsaCitat, hc.bielsaTillbaka].join(' · ');
     const r = await claude({ system: `${hc.sprak.system}\n\nHans egna uttryck: ${egna}`, prompt: stycken.join('\n\n'), model: hc.model, effort: hc.sprak.effort, timeoutMs: hc.sprak.timeoutMs, tools: [] });
     const lista = jsonOf(r.content).fel;
     if (!Array.isArray(lista)) return [];
@@ -211,12 +240,14 @@ export async function sprakfel(stycken, { claude = claudeSvar } = {}) {
 export async function skrivHasse(id, article, { persona, match = null, now = () => new Date(), claude = claudeSvar }) {
   // (en landskamp: landslagen, inte klubbarna, se config/hasse.js)
   const land = Boolean(match && match.match && match.match.type === 'intl');
-  const u = uppdrag(id, article, land);
+  const u = uppdrag(id, article, land, match);
   const odds = oddsen(match, article);
+  const b = u.bubblare;
   const rader = [
     land && hc.landskamp,
     `Analysen:\n${JSON.stringify(kallan(article))}`,
     ...odds,
+    b && `Det här är matchen där du ser skrällen. Alla andra tippar ${b.mot} (odds ${odds2(b.favoritOdds)}), men du tror att ${b.lag} vinner (odds ${odds2(b.odds)}). Leta i analysen efter det som talar för ${b.lag} och som spelbolagen har underskattat, och grunda ditt tips på det. Ringa in ${ORD[b.tecken]}, helst ensam och aldrig tillsammans med ${ORD[b.favorit]}.${b.rad ? ` En rad om skrällen som du gärna får lägga in ordagrant, där den passar: ${b.rad}` : ''}`,
     `Uttryck du kan ta till där de passar, annars inte alls: ${u.fraser.join(' · ')}.`,
     u.krydda && `En rad du gärna får lägga in ordagrant: ${u.krydda}`,
     u.bielsa.length && `Dina Bielsa-ord, för något som står i analysen: ${u.bielsa.join(', ')}. Den enda Bielsa-repliken du citerar är din favorit: "${hc.bielsaCitat}"`,
