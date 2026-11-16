@@ -6843,8 +6843,12 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   helt: Stockholms bilar i mitten av nittiotalet, ungefär i bilregistrets blandning (`MODELLER`: en tredjedel Volvo –
   240 sedan och kombi med stänkskydd, 740/940 sedan och kombi, 850 sedan och kombi med baklyktorna högt längs
   bakstolpen, 340 – Saab 900 och 9000, Golf, Mercedes W124 med kromlister och grå paneler, Sierra, Kadett, Corolla,
-  BMW E30 och Peugeot 205), ritade efter de riktiga måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller
-  lättmetallfälgar som snurrar och ibland takräcke, skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller
+  BMW E30 och Peugeot 205 – och de äldre som fanns kvar på gatorna, ungefär en femtedel av bilarna (önskemål
+  2026-11-16: bilar som fanns på nittiotalet, inte bara de som tillverkades då): Volvo Amazon med kromlisten från
+  strålkastaren, PV:n med puckelryggen, 144:an, Saab 96 och 99, Bubblan och Ankan med skärmarna för sig (Ankan med
+  tygtak, räfflad huv och kjol över bakhjulet), Mercedes 123 (ibland taxi), Lada Niva och Minin, ibland med vitt tak,
+  de flesta med kromade stötfångare och i sin tids färger), ritade efter de riktiga måtten (längd, hjulbas, höjd) med
+  backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke, skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller
   med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
