@@ -1314,6 +1314,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   fönstren ovanför, och småfelen (den som gick i mörkret såg ut som ett spöke, gatuskylten gick inte att läsa på kvällen,
   och korta färger som `#222` blev ogiltiga). Inte valt: pölar som speglar fönstret och gänget (det dyraste), någon som
   går in genom den öppna dörren och stamkunden som röker under lyktan. Inga nya lager. Se [Fasaden](#fasaden).
+- **Fler som går förbi, och det är 90-tal (2026-11-16, användarens önskemål):** "Ha betydligt fler personer/alternativ
+  med människor (eller djur/hundar?) som går utanför butiken. Tänk på att det är 90-talet! De ska självklart vara
+  anpassade klädesmässigt till vädret!" Två till fyra gånger så många syns samtidigt (färre i regn och på natten),
+  ensamma eller i sällskap: par under samma paraply, gäng, en förälder med ett barn i handen, barnvagn, pulka i snön, en
+  äldre med dragkärra, någon som leder cykeln, någon med tidningen över huvudet i regnet, och fem sorters hundar. Kläderna
+  är 90-tal och efter vädret: vindjackor i färgblock, dunjackor, skinn- och bomberjackor, myskläder, vida jeans, bakvända
+  kepsar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar och mobiltelefon med antenn; regnrock,
+  sydväst, gummistövlar, regnskydd på barnvagnen och paraplyer som vinden vänder i regnet; mössa, halsduk och
+  lovikkavantar i kylan; shorts, solglasögon och glass i värmen. Se *Det som händer ute* under [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6720,9 +6729,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   regnet slår ned blir det stänk – en ring som vidgas och en liten krona – på stenen, fönsterbänkens bleck och skyltens
   tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
   inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
-- **Det som händer ute:** de som går förbi på trottoaren framför affären, lika många som på gatan inifrån
-  (`RumUte.trafik`), klädda efter vädret, med paraply (med spröt och droppar) i regn, mössa, keps eller hatt och halsduk
-  i kyla, väska och ibland hund. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
+- **Det som händer ute:** de som går förbi på trottoaren framför affären, ungefär lika många som på gatan inifrån
+  (`RumUte.trafik`; färre i regn och snöyra, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
+  (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
+  barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
+  tidningen i regnet och hundar (labrador, schäfer, tax, terrier och pudel, `HUNDAR`; de små i täcke när det regnar).
+  Det är 90-tal och kläderna är efter vädret (`klad`, `F90`, `vadret`): vindjackor och myskläder i färgblock, dunjackor
+  med stickningar, skinnjackor, bomberjackor, jeansjackor, fältjackor, trenchcoats, kappor och kavajer, vida jeans,
+  kjolar, bakvända kepsar, fiskarhattar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar, portföljer
+  och mobiltelefon med antenn; i regn paraply (som vinden ibland vänder ut och in), regnrock med luva eller sydväst,
+  gummistövlar och regnskydd på barnvagnen, i kyla mössa (ibland med tofs eller öronlappar), sjalett, halsduk, vantar
+  (ibland lovikka) och kängor, och i värme t-shirt, shorts med vita sockor, solglasögon, keps och glass. Barnen har större
+  huvud, och i regnet galonställ och stövlar. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
+  kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
+  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och bara
+  den som har båda händerna lediga kan ha dem i fickorna. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
   framför fönstret (`randLjus`), och speglas svagt i den våta stenen. Där det är mörkt är de lika mörka som mörkret
   omkring (`morkSteg`: fyra steg av samma färger, `MORK`, som räknas ut en gång per figur i `morkna`); förut var en ljus
@@ -6734,11 +6755,15 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   den sedan står (`landa`); foten går minst 1,5 cm över stenen mitt i svingen. Överkroppen lutar kring höften (armarna
   hänger ändå lodrätt), en lång kappas skört ritas två gånger, med det främre och det bakre låret, så att det vidgas när
   benen går isär, armarna pendlar emot benen med armbågen lite böjd, paraplyet gungar med i stegen och hunden travar
-  fyra steg på ett, med kopplet i en stilla hand. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
+  efter hur långt den har gått, diagonala ben i par och tassen stilla mot stenen, med kopplet i en stilla hand; hjulen
+  på barnvagnen, cykeln och dragkärran rullar på samma sätt. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
   (långa steg, snabbt, framåtlutad, stora armsvingar), strosar (korta steg, långsamt, ofta händerna i fickorna),
   studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram) och rak (upprätt, raka
   knän), och var och en lite olika inom sitt sätt (steglängd, takt, lutning, armsving); farten är steglängden gånger
-  takten, 0,9–1,6 m/s. Sättet lottas ur en egen följd per figur och dag, så att kläderna och var de går är som förut.
+  takten, 0,9–1,6 m/s. Sättet passar den som går (den äldre strosar, barnet studsar, den som blir blöt skyndar sig) och
+  ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
+  fyra gånger så långsam processor kostar fler figurer 0,2 ms mer per bild på dagen och 0,5 ms mer i kvällsregn som
+  telefon, och ungefär 3 ms mer i kvällsregn i datorn (2026-11-16).
   Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
   still hur ofta duken än ritas om (förut svängde benen i halva takten och fötterna gled fram, "de flyter liksom fram",
   2026-11-16; sedan gick alla likadant, med en stel kappa och benet som släpade efter, "inte så naturligt", samma dag).
