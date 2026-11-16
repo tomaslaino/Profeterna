@@ -3371,7 +3371,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         const mod = await import('./rum-3d.js');
         // (ansiktena efter hur det går och gick för kupongen redan från början: spel, senast)
         const vader = R.vader;
-        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader, detalj: KVAL[R.kval].detalj, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame() });
+        R.fig = await mod.figurer(document.getElementById('rum-3d'), { calm: calm(), vader, detalj: KVAL[R.kval].detalj, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel), spel: R.spel, senast: window.RumFolk ? RumFolk.senast() : null, rita: () => frame(), nu: now });
         // (kom det nya vädret medan gänget byggdes: paintUte såg inget gäng att klä om)
         if (R.vader !== vader && R.fig.ute) R.fig.ute(R.vader);
         lappa();
@@ -6808,7 +6808,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (still()) {
       // en fast bild: allt på samma tid, och klar när datan och gänget är
       // ritade (och i telefonen resten av 3D-delarna, tur)
-      ready.then(turTom).then(() => R.fig && R.fig.uttryck && R.fig.uttryck()).then(() => {
+      ready.then(turTom).then(() => R.fig && R.fig.uttryck && R.fig.uttryck(now())).then(() => {
         freezeCss(R.frozen);
         if (q.has('rum-video')) zoomVideo(true);
         if (q.has('rum-sak')) sak(q.get('rum-sak'), null);

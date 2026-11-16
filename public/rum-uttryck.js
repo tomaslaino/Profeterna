@@ -1,4 +1,4 @@
-// Gängets ansiktsuttryck (rum-3d.js): hur glada DL, DT och DJ ser ut.
+// Gängets ansiktsuttryck (rum-3d.js, känslorna): hur DL, DT och DJ ser ut.
 // Ansiktsbilderna (rum/ansikte-*.svg) är ritade glada – DL ler med tänderna,
 // DT skrattar med ögonen hopknipna och DJ ler i skägget (rum/skagg-dj.svg).
 // uttryck ritar om munnen, ögonbrynen, ögonlocken och rodnaden efter läget:
@@ -16,30 +16,35 @@
 //           inte för kupongen utan för sömnen och den som just har vaknat
 //           (rum-3d.js), också för DT, som då får öppna ögon
 //
+// och stämningarna som kommer och går av sig själva (KANSLA i rum-3d.js):
+//
+//   lugn      som de sitter mest: ett litet leende och avslappnade ögonlock
+//   uttrakad  tunga ögonlock, blicken åt sidan och munnen rak och snett
+//   berusad   ett slappt, snett leende, tunga ögonlock, blicken som inte
+//             riktigt fäster och röda kinder
+//   fundersam munnen ihop och åt sidan, ena ögonbrynet uppe och blicken uppåt
+//   sjunger   munnen öppen och rund, ögonbrynen uppe och ögonen öppna
+//
 // Ögonen behåller samma uppbyggnad (ögonvitan, klippet, ögat i klippet och
 // ögonlocket efter), så att blundar i rum-3d.js gör en blinkning av dem.
 // uttryck(svg, 'dl', 'glad') och skaggUttryck(svg, 'glad') – och alla utan
 // läge (null) – ger tillbaka samma text, så att den redan laddade bilden kan
 // användas.
 
+// Hur en kupong gick (rum-folk.js: ansiktet när allt är spelat och den
+// senaste): rum-3d.js väger in det i stämningarna (KANSLA.senast) – i stället
+// för att alla tre hade samma ansikte tills nästa omgång.
 export const LAGEN = ['jublar', 'glad', 'nojd', 'sur', 'deppig', 'orolig'];
-
-// Läget för ansiktena: hur det går för omgången som spelas (spel i rum-3d.js:
-// 'glad', 'nerv' eller 'deppig', och när allt är spelat ett av LAGEN) före
-// hur den senaste kupongen gick (senast, ett av LAGEN från rum-folk.js), och
-// annars null: som bilderna är ritade (med dolda resultat och utan historik).
-export function ansiktsLage(spel, senast) {
-  if (spel === 'nerv') return 'orolig';
-  if (LAGEN.includes(spel)) return spel;
-  return LAGEN.includes(senast) ? senast : null;
-}
 
 // mun: hur munnen böjer sig (1 ett leende, −1 nedåt) eller 'skratt' och
 // 'tander' (öppen); bryn: ögonbrynen vridna kring ytterändan, grader (plus
 // = de inre ändarna upp, minus = ihopdragna); lyft: ögonbrynen upp (minus)
 // eller ner; lock: hur långt övre ögonlocket hänger ner över ögat (0–1);
 // glada: kinderna som trycker upp nedre ögonlocket (0–1); rod: rodnaden mot
-// bilden; pasar: påsar under ögonen; tight: läpparna ihoppressade.
+// bilden; pasar: påsar under ögonen; tight: läpparna ihoppressade (0–1);
+// sida: munnen flyttad åt sidan; snett: högra mungipan upp (minus ner) och
+// den vänstra lite åt andra hållet; skev: vänstra ögonbrynet upp (minus);
+// blick: ögonen (iris och pupill) flyttade [x, y]; kors: ögonen inåt.
 const LAGE = {
   jublar: { mun: 'skratt', lyft: -2.5, glada: 1, rod: 1.3 },
   glad: null,
@@ -51,6 +56,11 @@ const LAGE = {
   // trött och bakfull (rum-3d.js, sömnen): inget läge för kupongen utan för
   // den som sover (med ögonen stängda, blundar) och den som just har vaknat
   trott: { mun: -0.18, bryn: 4, lyft: 1.5, lock: 0.5, rod: 0.35, pasar: 1 },
+  lugn: { mun: 0.22, lock: 0.12, rod: 0.7 },
+  uttrakad: { mun: -0.12, sida: 3.5, snett: -1.8, lock: 0.46, bryn: 1, lyft: 1.6, rod: 0.4, blick: [3.6, 0.3] },
+  berusad: { mun: 0.6, snett: 3.4, sida: -1.5, lock: 0.38, bryn: 5, lyft: -0.5, rod: 2.6, glada: 0.25, blick: [0.6, 1], kors: 0.9 },
+  fundersam: { mun: -0.08, tight: 1, sida: 4.5, snett: 1, skev: -4, bryn: -3, blick: [-2.8, -2.8], lock: 0.04, rod: 0.6 },
+  sjunger: { mun: 'sjung', lyft: -2.8, bryn: 4, glada: 0.5, rod: 1.15 },
 };
 
 // Var sakerna sitter i bilderna (viewBox −80 −100 160 180) och deras färger.
@@ -87,8 +97,41 @@ const ANS = {
 const tal = (el) => (el.getAttribute('d') || '').match(/-?[\d.]+/g).map(Number);
 const r1 = (x) => Math.round(x * 10) / 10;
 
-function las(svg) {
-  return new DOMParser().parseFromString(svg, 'image/svg+xml');
+// DT:s skäggstubb och DJ:s skägg är tusentals små cirklar och streck i långa
+// rader, som inget här rör. Att tolka och skriva ut dem tog nästan all tid
+// (35 ms i datorn per ansikte, mångdubbelt i telefonen), så raderna lyfts ut
+// som text före tolkningen (las) och sätts tillbaka efteråt (skriv) – inte de
+// som innehåller något som letas efter (SKYDD).
+const LYFT = /(<(circle|path)\b[^<>]*\/>)(?:<\2\b[^<>]*\/>){199,}/g;
+let SKYDD = null;
+function skydd() {
+  if (SKYDD) return SKYDD;
+  const s = new Set(['#f7f1ea', 'clip-path', ' id=', SKAGG.lapp, SKAGG.mork, SKAGG.mustasch]);
+  for (const a of Object.values(ANS)) {
+    for (const x of [a.rodnad, a.bryn]) s.add(x);
+    for (const b of [a.bort, a.skratt]) {
+      if (!b) continue;
+      for (const x of [...(b.fill || []), ...(b.stroke || [])]) s.add(x);
+      for (const x of [...(b.d || []), ...(b.rynkor || [])]) s.add(`d="${x}`);
+    }
+  }
+  SKYDD = [...s].filter(Boolean);
+  return SKYDD;
+}
+export function las(svg) {
+  const lyft = [];
+  const txt = svg.replace(LYFT, (m) => {
+    if (skydd().some((x) => m.includes(x))) return m;
+    lyft.push(m);
+    return `<g data-lyft="${lyft.length - 1}"/>`;
+  });
+  const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
+  doc.lyft = lyft;
+  return doc;
+}
+export function skriv(doc) {
+  const s = new XMLSerializer().serializeToString(doc);
+  return doc.lyft && doc.lyft.length ? s.replace(/<g data-lyft="(\d+)"\s*\/>/g, (_, i) => doc.lyft[Number(i)]) : s;
 }
 
 // tar bort det som bort pekar ut (och klippen med det som klipps) och ger
@@ -142,6 +185,12 @@ function ogonen(doc, a, p) {
     const g = doc.querySelector(`g[clip-path="url(#${v.nextElementSibling.id})"]`);
     const lock = g && g.nextElementSibling;
     if (!g || !lock) continue;
+    // blicken: iris, pupill och glansen flyttas inom ögonvitan (kors: inåt)
+    if (p.blick || p.kors) {
+      const [bx, by] = p.blick || [0, 0];
+      const dx = bx - Math.sign(cx) * (p.kors || 0);
+      for (const c of g.querySelectorAll('circle')) c.setAttribute('transform', `translate(${r1(dx)} ${r1(by)})`);
+    }
     let ny = '';
     if (p.lock) {
       const y = ovre + p.lock * (nedre - ovre);
@@ -174,7 +223,8 @@ function brynen(doc, a, p) {
     const px = n[i * 2];
     const py = n[i * 2 + 1];
     const v = sx * (p.bryn || 0);
-    el.setAttribute('transform', `translate(0 ${p.lyft || 0}) rotate(${v} ${px} ${py})`);
+    const ly = (p.lyft || 0) + (sx < 0 ? p.skev || 0 : 0);
+    el.setAttribute('transform', `translate(0 ${ly}) rotate(${v} ${px} ${py})`);
   }
   if (!b.length) return;
   const sist = b[b.length - 1];
@@ -200,9 +250,10 @@ function oppen(m, { y, h, d, band, tunga }) {
 
 // Munnen och vecken runt den. c = p.mun: 1 ett leende, −1 nedåt.
 function munnen(a, p) {
-  const m = a.mun;
+  const m = { ...a.mun, x: a.mun.x + (p.sida || 0) };
   const x = m.x;
   const [nx, ny] = a.nasa;
+  const tight = p.tight || 0;
   let s = '';
   let c;
   let hy;
@@ -213,16 +264,22 @@ function munnen(a, p) {
     hy = m.y - (sk ? 10 : 7);
     s += oppen(m, sk ? { y: hy, h: hh, d: 22, band: 8, tunga: true } : { y: hy, h: hh, d: 15, band: 7, tunga: false });
     c = 1;
+  } else if (p.mun === 'sjung') {
+    // (rund och öppen, smalare än skrattet: tonen)
+    hh = r1(m.w * 0.31);
+    hy = m.y - 6;
+    s += oppen(m, { y: hy, h: hh, d: 17, band: 4, tunga: true });
+    c = 0.45;
   } else {
     c = p.mun;
-    const h = (m.w / 2) * (p.tight ? 0.78 : 1) * (1 + 0.08 * c);
+    const h = (m.w / 2) * (1 - 0.22 * tight) * (1 + 0.08 * c);
     const b = 6.5 * c;
-    const sn = c > 0 ? (m.snett || 0) * c : 0;
-    const yl = r1(m.y - b);
+    const sn = (c > 0 ? (m.snett || 0) * c : 0) + (p.snett || 0);
+    const yl = r1(m.y - b + 0.35 * (p.snett || 0));
     const yr = r1(m.y - b - sn);
     hh = h;
     hy = Math.min(yl, yr);
-    s += `<path d="M${r1(x - h)} ${yl} Q${x} ${r1(m.y + b)} ${r1(x + h)} ${yr}" fill="none" stroke="${m.linje}" stroke-width="${p.tight ? 2.9 : 2.3}" stroke-linecap="round" opacity="0.9"/>`;
+    s += `<path d="M${r1(x - h)} ${yl} Q${x} ${r1(m.y + b)} ${r1(x + h)} ${yr}" fill="none" stroke="${m.linje}" stroke-width="${r1(2.3 + 0.6 * tight)}" stroke-linecap="round" opacity="0.9"/>`;
     // underläppen: en mjuk båge under, som skjuts upp när munnen går nedåt
     const u = m.y + 6 + 0.5 * c;
     s += `<path d="M${r1(x - h * 0.45)} ${r1(u)} Q${x} ${r1(u + 3.4 + 1.2 * c)} ${r1(x + h * 0.45)} ${r1(u)}" fill="none" stroke="${m.lapp}" stroke-width="2.4" stroke-linecap="round" opacity="0.45"/>`;
@@ -267,7 +324,7 @@ export function uttryck(svg, vem, lage) {
   if (p.rod != null) {
     for (const el of doc.querySelectorAll(`ellipse[fill="${a.rodnad}"]`)) el.setAttribute('opacity', Math.round(Number(el.getAttribute('opacity') || 1) * p.rod * 100) / 100);
   }
-  return new XMLSerializer().serializeToString(doc);
+  return skriv(doc);
 }
 
 // DJ:s mun i skägget (rum/skagg-dj.svg) efter läget: läpparna under mustaschen.
@@ -278,22 +335,31 @@ export function skaggUttryck(svg, lage) {
   const doc = las(svg);
   const mus = [...doc.querySelectorAll('path')].find((x) => (x.getAttribute('d') || '').startsWith(SKAGG.mustasch));
   rensa(doc, { fill: [SKAGG.lapp, SKAGG.mork], klipp: ['mdj'] });
-  if (!mus) return new XMLSerializer().serializeToString(doc);
+  if (!mus) return skriv(doc);
   let s;
   if (p.mun === 'skratt') {
     // öppen med tänderna överst, under mustaschen
     const f = 'M-17 38 Q0 42 17 38 Q14 53 0 56 Q-14 53 -17 38 Z';
     s = `<path d="M-19 37.5 Q0 42 19 37.5 Q15 56 0 59 Q-15 56 -19 37.5 Z" fill="${SKAGG.lapp}"/><path d="${f}" fill="${SKAGG.mork}"/><clipPath id="mdj"><path d="${f}"/></clipPath>`
       + `<g clip-path="url(#mdj)"><path d="M-18 37 Q0 41 18 37 L18 44 Q0 48 -18 44 Z" fill="${SKAGG.tand}"/><ellipse cx="0" cy="52" rx="7" ry="3.5" fill="#9c4038"/></g>`;
+  } else if (p.mun === 'sjung') {
+    // rund och öppen under mustaschen, tänderna överst
+    const f = 'M-10 39 Q0 42 10 39 Q9 52 0 55 Q-9 52 -10 39 Z';
+    s = `<path d="M-12 38.5 Q0 42 12 38.5 Q11 55 0 58 Q-11 55 -12 38.5 Z" fill="${SKAGG.lapp}"/><path d="${f}" fill="${SKAGG.mork}"/><clipPath id="mdj"><path d="${f}"/></clipPath>`
+      + `<g clip-path="url(#mdj)"><path d="M-11 38 Q0 41 11 38 L11 42.5 Q0 45.5 -11 42.5 Z" fill="${SKAGG.tand}"/><ellipse cx="0" cy="51" rx="5" ry="3" fill="#9c4038"/></g>`;
   } else {
     const c = p.mun;
-    const h = 16 * (p.tight ? 0.8 : 1);
+    const h = 16 * (1 - 0.2 * (p.tight || 0));
     const b = 6 * c;
     const y = 46;
+    // (snett och åt sidan som i ansiktena, munnen)
+    const x = p.sida || 0;
+    const yl = r1(y - b + 0.35 * (p.snett || 0));
+    const yr = r1(y - b - (p.snett || 0));
     // underläppen som en fylld båge under linjen, linjen mellan läpparna
-    s = `<path d="M${-h} ${r1(y - b)} Q0 ${r1(y + b + 6 + 2 * c)} ${h} ${r1(y - b)} Q0 ${r1(y + b + 1)} ${-h} ${r1(y - b)} Z" fill="${SKAGG.lapp}"/>`
-      + `<path d="M${-h - 1} ${r1(y - b)} Q0 ${r1(y + b)} ${h + 1} ${r1(y - b)}" fill="none" stroke="${SKAGG.mork}" stroke-width="${p.tight ? 3.2 : 2.6}" stroke-linecap="round"/>`;
+    s = `<path d="M${x - h} ${yl} Q${x} ${r1(y + b + 6 + 2 * c)} ${x + h} ${yr} Q${x} ${r1(y + b + 1)} ${x - h} ${yl} Z" fill="${SKAGG.lapp}"/>`
+      + `<path d="M${x - h - 1} ${yl} Q${x} ${r1(y + b)} ${x + h + 1} ${yr}" fill="none" stroke="${SKAGG.mork}" stroke-width="${r1(2.6 + 0.6 * (p.tight || 0))}" stroke-linecap="round"/>`;
   }
   mus.insertAdjacentHTML('beforebegin', s);
-  return new XMLSerializer().serializeToString(doc);
+  return skriv(doc);
 }
