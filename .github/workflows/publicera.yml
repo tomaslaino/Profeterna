@@ -71,20 +71,6 @@ jobs:
           key: kallcache-${{ github.run_id }}
           restore-keys: kallcache-
 
-      # Hasse Backes röst (src/rost.js, scripts/rost/): iMacen lägger ljudet med Tomas
-      # egen röst i grenen rost, en enda commit som skrivs över, så att main inte växer.
-      # Det som saknas där sägs tyst. Finns inte grenen är han tyst.
-      - name: Hämta Hasse Backes egen röst
-        run: |
-          rm -rf data/egen-rost
-          if git fetch -q --depth=1 origin +refs/heads/rost:refs/remotes/origin/rost 2>/dev/null; then
-            mkdir -p data/egen-rost
-            git archive refs/remotes/origin/rost | tar -x -C data/egen-rost
-            echo "Grenen rost: $(find data/egen-rost -name '*.mp3' | wc -l | tr -d ' ') ljudfiler."
-          else
-            echo "Grenen rost finns inte: Hasse Backe är tyst."
-          fi
-
       # Bilderna i tidningen inför omgången (src/analyser/tidning-bilder.mjs): iMacen
       # lägger dem i grenen tidning-bilder, en enda commit som skrivs över. Bygget
       # kopierar dem till sajten; utan grenen visar tidningen lagens sköldar.

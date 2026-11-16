@@ -25,7 +25,9 @@
 //
 //   RumFasad.bygg(rum, o) → { el, ny(), ut() } bygger fasaden i rum (.rum) och ritar den;
 //     o.gang(duk) ritar gänget på duken (false utan), o.takt() hur många gånger i sekunden (som inne),
-//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.calm() utan rörelser
+//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.pynt(namn, { w, h, dag }) högtidspyntet
+//     i fönstret ('pyntF') eller på dörren ('pyntP') sett utifrån, en duk w × h eller null (pyntUtifran i
+//     rum-inredning.js), o.calm() utan rörelser
 //     (prefers-reduced-motion), o.still en fast bild på den tiden (s, ?rum-t i rum.js): allt som rör sig
 //     står där det är då
 
@@ -3019,6 +3021,13 @@ window.RumFasad = (() => {
       const H = el.clientHeight || innerHeight;
       return Math.max(W / V.w, H / V.h) * Math.min(2, devicePixelRatio || 1, Math.sqrt(2e6 / (W * H)));
     };
+    // En duk som inte behövs längre lämnar tillbaka sitt minne genast när den blir noll stor (slapp): annars
+    // ligger bildpunkterna kvar tills skräpsamlingen hinner dit, och i en telefon hann de bli många – vid
+    // varje ombygge av scenen (rita) och varje gång man gick ut och in igen (ut). Scenens dukar, bilarnas och
+    // molnens (dukarna).
+    const slapp = (c) => { if (c && c.width) { c.width = 0; c.height = 0; } };
+    const dukarna = (R) => (R ? [R.fram && R.fram.canvas, R.bak && R.bak.canvas, R.barber && R.barber.canvas,
+      ...(R.bilar || []).map((b) => b.bild), ...((R.himlen && R.himlen.moln) || []).map((m) => m.bild)] : []);
     // (scenen i fönstrets punkter: F.k punkter per enhet i världen, passa)
     const duk = (cls, r, px) => `<canvas class="${cls}" width="${Math.max(1, Math.round(r.w * px))}" height="${Math.max(1, Math.round(r.h * px))}" style="left:${r1((r.x - F.V.x) * F.k)}px; top:${r1((r.y - F.V.y) * F.k)}px; width:${r1(r.w * F.k)}px; height:${r1(r.h * F.k)}px"></canvas>`;
 
@@ -3028,7 +3037,9 @@ window.RumFasad = (() => {
       const v = window.Vader ? Vader.nu() : null;
       if (!v || !U()) return;
       const L = U().light(v);
-      const s = sig(V, v, L, o);
+      // (och dukarnas bildpunkter, i steg om en åttondel: storleken på skärmen, tathet)
+      const px = tathet(V);
+      const s = `${sig(V, v, L, o)},${Math.round(px * 8)}`;
       if (s === F.sig) return;
       F.sig = s;
       F.V = V;
@@ -3044,13 +3055,16 @@ window.RumFasad = (() => {
       const dw = Math.round(Math.min(1400, FON.w * k * pr));
       const dh = Math.round(dw * FON.h / FON.w);
       const gammal = F.duk;
+      const gamla = dukarna(F.ro);
       // det som rör sig: vad, var och hur (inget med prefers-reduced-motion, utom stången som står still)
-      const px = tathet(V);
       const lugn = calm();
       const bakX = Math.max(V.x, HORN - 520);
       const bakR = { x: bakX, y: V.y, w: V.x + V.w - bakX, h: HOR + 60 - V.y };
       const himlen = !lugn && bakR.w > 0 ? himmelsliv(V, v, L, px) : null;
       const barberR = BARBER.x + BARBER.w > V.x && BARBER.x < V.x + V.w ? BARBER : null;
+      // (pyntets dukar: som de andra, men högst 1400 bildpunkter på fönstrets bredd)
+      const pyntPx = Math.min(px, 1400 / FON.w);
+      const pyntBild = pyntBilder(L, pyntPx);
       const R = {
         px, V, L, bakR, himlen,
         folk: lugn ? [] : folket(V, v, L),
@@ -3071,6 +3085,9 @@ window.RumFasad = (() => {
       // i dess egen storlek gånger pixeltätheten, så att varje lager tog fem gånger så mycket minne som det
       // syns (ungefär 50 MB i stället för 10 i en iPhone).
       const sk = F.k;
+      const pyntDukar = pyntBild.map((b, i) => (b ? duk('rf-pynt', i ? DORR : FON, pyntPx) : '')).join('');
+      const framfor = `<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}${texten(v, L)}`;
+      scen.style.transform = '';
       scen.style.width = `${r1(V.w * sk)}px`;
       scen.style.height = `${r1(V.h * sk)}px`;
       scen.innerHTML =
@@ -3078,7 +3095,10 @@ window.RumFasad = (() => {
         (himlen ? duk('rf-bak', bakR, px) : '') +
         svg(V, defs + bortom(V, v, L) + rummet(v, L, o)) +
         `<canvas class="rf-gang" width="${dw}" height="${dh}" style="left:${r1(glasX * sk)}px; top:${r1(glasY * sk)}px; width:${r1(FON.w * sk)}px; height:${r1(FON.h * sk)}px"></canvas>` +
-        svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}${glaset(v, L, o)}<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}${texten(v, L)}`) +
+        // (högtidspyntet mellan neonen och glaset, bara när det finns: annars ett lager mindre)
+        (pyntDukar
+          ? svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}`) + pyntDukar + svg(V, `${defs}${glaset(v, L, o)}${framfor}`)
+          : svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}${glaset(v, L, o)}${framfor}`)) +
         (barberR ? duk('rf-barber', barberR, px) : '') +
         svg(V, kvallsljus(V, v, L, o)) +
         (L.dimma > 0.05 ? `<div class="rf-lager rf-dimma" style="background:${mix('#2a2622', '#aeb3b6', L.dag)}; opacity:${r1(0.32 * L.dimma)}"></div>` : '') +
@@ -3088,19 +3108,42 @@ window.RumFasad = (() => {
       R.bak = himlen ? scen.querySelector('.rf-bak').getContext('2d') : null;
       R.barber = barberR ? scen.querySelector('.rf-barber').getContext('2d') : null;
       F.ro = R;
+      pynt(pyntBild);
       // (en fast bild: allt som rör sig står på samma tid)
       if (o.still != null) for (const an of el.getAnimations({ subtree: true })) { an.pause(); an.currentTime = o.still * 1000; }
       // (gänget från förra gången tills det ritas på nytt)
       if (gammal && gammal.width) F.duk.getContext('2d').drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
+      slapp(gammal);
+      for (const c of gamla) slapp(c);
       F.neon = null;
       passa();
       gang();
       rorelse(true);
     }
-    // dörrens mitt i fönstret, dit man går in och ut (scenen är redan så stor att den täcker fönstret, F.k)
+    // Högtidspyntet i skyltfönstret och på dörren, så som det hänger inne (o.pynt, pyntUtifran i
+    // rum-inredning.js): bilderna tas fram innan scenen byggs (rita), så att dukarna och lagret de kräver bara
+    // finns när det finns pynt, och ritas en gång på var sin duk framför neonen och bakom glaset, så att
+    // speglingen, imman och dropparna ligger över det. Innan rummets 3D-delar är klara finns inget pynt.
+    function pyntBilder(L, px) {
+      return [['pyntF', FON], ['pyntP', DORR]].map(([namn, r]) => {
+        if (!o.pynt) return null;
+        try {
+          return o.pynt(namn, { w: Math.max(1, Math.round(r.w * px)), h: Math.max(1, Math.round(r.h * px)), dag: L.dag }) || null;
+        } catch (err) { return null; /* utan pyntet: glaset som vanligt */ }
+      });
+    }
+    function pynt(bilder) {
+      const dukar = scen.querySelectorAll('.rf-pynt');
+      let j = 0;
+      for (const bild of bilder) if (bild && dukar[j]) dukar[j++].getContext('2d').drawImage(bild, 0, 0);
+    }
+    // Scenen täcker fönstret: den byggs i fönstrets storlek (F.k), och när storleken ändras skalas den om så
+    // länge, tills den byggs om (storlek). Och dörrens mitt i fönstret, dit man går in och ut.
     function passa() {
       if (!F.V) return;
-      const k = F.k;
+      const k = Math.max(el.clientWidth / F.V.w, el.clientHeight / F.V.h) || F.k;
+      const sk = k / F.k;
+      scen.style.transform = Math.abs(sk - 1) < 1e-3 ? '' : `scale(${sk})`;
       el.style.setProperty('--dorr-x', `${r1((DORR.x + DORR.w / 2 - F.V.x) * k)}px`);
       el.style.setProperty('--dorr-y', `${r1((DORR.y + DORR.h * 0.45 - F.V.y) * k)}px`);
     }
@@ -3178,7 +3221,17 @@ window.RumFasad = (() => {
     }
     // vädret och ljuset ändras: ritas om när de har ändrats (sig), en gång i minuten
     const T = setInterval(() => { if (el.isConnected) rita(); }, 60e3);
-    const storlek = () => { F.sig = ''; rita(); };
+    // Storleken ändras (telefonen vrids, adressfältet glider in eller ut): scenen skalas om genast så att
+    // den täcker fönstret (passa), och byggs om först när storleken har stått still en stund, och bara om
+    // vyn eller dukarnas bildpunkter har ändrats (sig). Förut byggdes allt om – alla lager och dukar – vid
+    // varje resize, och i en telefon kommer de en per bildruta medan adressfältet glider: 60 i rad tog
+    // ungefär 600 MB mer minne (som iPhone i Chromium), och sidan kraschade.
+    let storlekT = 0;
+    const storlek = () => {
+      passa();
+      clearTimeout(storlekT);
+      storlekT = setTimeout(() => { if (el.isConnected) rita(); }, 300);
+    };
     addEventListener('resize', storlek);
     rita();
     loop();
@@ -3188,8 +3241,13 @@ window.RumFasad = (() => {
       ut() {
         cancelAnimationFrame(F.raf);
         clearInterval(T);
+        clearTimeout(storlekT);
         removeEventListener('resize', storlek);
         el.remove();
+        for (const c of dukarna(F.ro)) slapp(c);
+        slapp(F.duk);
+        F.ro = null;
+        F.duk = null;
       },
     };
   }

@@ -4348,7 +4348,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       clearTimeout(R.fasadT);
       lagerUt('fasaden');
       R.vilar = false;
-      R.el.classList.remove('fasad-framme');
+      R.el.classList.remove('fasad-tackt');
       if (R.fig && R.on) {
         const t = now();
         const [vx, vy] = synlig();
@@ -4372,6 +4372,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
+      // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
+      pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
       calm: () => RORELSE_AV.matches,
       // (en fast bild, ?rum-t: allt står på samma tid)
       still: still() ? R.frozen : null,
@@ -4388,13 +4390,14 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     }
     R.fasad = f;
     lager('fasaden', (nu) => fasad(false, !nu));
-    // Rummet står still när fasaden täcker det, och syns inte (fasad-framme, som hos Hasse Backe): då släpper
-    // webbläsaren det den har ritat av rummet, och fasaden får minnet. Det ritas igen när man går in.
+    // Rummet står still när fasaden täcker det, och ritas inte heller (fasad-tackt i rum-fasad.css): förut
+    // låg alla rummets lager kvar under fasaden, en och en halv gång fler bildpunkter än fasaden själv i en
+    // telefon, och med dem ute tog sidan för mycket minne. Gängets duk ritar ändå glaset (utifran).
     clearTimeout(R.fasadT);
     R.fasadT = setTimeout(() => {
       if (R.fasad !== f) return;
       R.vilar = true;
-      R.el.classList.add('fasad-framme');
+      R.el.classList.add('fasad-tackt');
     }, glid ? 420 : 0);
     return true;
   }

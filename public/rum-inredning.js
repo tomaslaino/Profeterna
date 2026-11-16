@@ -32,9 +32,10 @@
 // På natten är taklamporna släckta (natt, från rum-folk.js, 0–1 medan de dämpas och tänds; i koden
 // heter det ofta fortfarande lysröret): glaskuporna mörka, och det målade bandet mörknar.
 //
-// inredning(el, { calm, still, vagg, ljus }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp, pyntLjus(), lampLjus() } (namnet som Kronan.names, ms spelstoppet eller null;
+// inredning(el, { calm, still, vagg, ljus }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp, pyntLjus(), lampLjus(), pyntUtifran(namn, o) } (namnet som Kronan.names, ms spelstoppet eller null;
 // vagg: tavlornas mått på högra väggen, VAGG i rum.js; lapp: bladet vid radion för rum-radio.js, radiolapp; ljus: anropas
 // när högtidspyntet har byggts eller tagits bort, pyntLjus: det som lyser i det, [x, y, rx, ry, färg] i scenens bildpunkter;
+// pyntUtifran('pyntF' | 'pyntP', { w, h, dag }): fönstrets eller dörrens pynt sett utifrån (fasaden), en duk eller null;
 // lampLjus: takfläktens glas, [x, y, r, 'kupa' | 'flakt'] i scenens bildpunkter, för ljusKlockan i rum.js)
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
@@ -2082,6 +2083,56 @@ export async function inredning(el, opt = {}) {
     }
     return ut;
   }
+  // Pyntet utifrån (fasaden, rum-fasad.js): det som hänger i fönstret och på dörren, sett från trottoaren
+  // genom glaset. Samma saker och samma scen som inifrån, ritade en gång till genom en kamera ute på gatan:
+  // rakt in (ortografisk, man står fem meter bort) och därför spegelvänt, så att stjärnan som hänger till
+  // höger inifrån hänger till vänster utifrån och man ser kransen och girlangen bakifrån. Glaset i scenens
+  // mått (UT_GLAS: skyltfönstret och dörrens glas) med höjden efter rutan på fasaden (w × h), så att inget
+  // dras ut. Ljuset utifrån: dagsljuset mot glaset (dag 0–1) och lite ljus från gatan; det som lyser
+  // lyser som inne. Skenet kring det som lyser ritas först för sig, så att det ligger bakom saken (inifrån
+  // ligger det på glaset bakom den, utifrån skulle det annars hamna framför). Bara när fasaden ritas om
+  // (vädret, ljuset), aldrig i bildrutorna. → en duk (w × h) eller null utan pynt där.
+  // (fönstret från karmens överkant, en aning utanför glaset, så att girlangen syns under skylten och inte bara
+  // dess nedre kant)
+  const UT_GLAS = { pyntF: { x: 266, y: 117, w: 688 }, pyntP: { x: 50, y: 136, w: 172 } };
+  function pyntUtifran(namn, { w, h, dag = 1 }) {
+    const b = PY.B[namn];
+    const G = UT_GLAS[namn];
+    if (!b || !G || !(w > 1) || !(h > 1)) return null;
+    const H = (G.w * h) / w;
+    const cx = G.x + G.w / 2;
+    const cy = -(G.y + H / 2);
+    const cam = new THREE.OrthographicCamera(-G.w / 2, G.w / 2, H / 2, -H / 2, 10, 20000);
+    cam.position.set(cx, cy, -6000);
+    cam.lookAt(cx, cy, 0);
+    cam.updateMatrixWorld();
+    const ute = [new THREE.HemisphereLight('#dfe6ee', '#3a3430', 0.25 + 0.55 * dag), new THREE.DirectionalLight('#fff4e4', 0.15 + 1.25 * dag)];
+    ute[1].position.set(cx + 260, cy + 700, -2400);
+    ute[1].target.position.set(cx, cy, 0);
+    b.scene.add(...ute, ute[1].target);
+    const sken = [];
+    const andra = [];
+    b.scene.traverse((x) => { if (x.isMesh) (x.material.userData && x.material.userData.sken ? sken : andra).push(x); });
+    gl.setPixelRatio(1);
+    gl.setSize(w, h, false);
+    const ut = document.createElement('canvas');
+    ut.width = w;
+    ut.height = h;
+    const g = ut.getContext('2d');
+    try {
+      for (const [syns, gom] of [[sken, andra], [andra, sken]]) {
+        if (!syns.length) continue;
+        for (const x of gom) x.visible = false;
+        gl.render(b.scene, cam);
+        g.drawImage(gl.domElement, 0, 0, w, h);
+        for (const x of gom) x.visible = true;
+      }
+    } finally {
+      for (const x of [...sken, ...andra]) x.visible = true;
+      b.scene.remove(...ute, ute[1].target);
+    }
+    return ut;
+  }
   // Takfläktens glas i scenens bildpunkter: [x, y, r, sort] (bakväggens plan står 1,035 gånger från mitten)
   function lampLjus() {
     return LAMP.lyser.map(([x, y, z, r, sort]) => {
@@ -2110,5 +2161,5 @@ export async function inredning(el, opt = {}) {
     rad: LP.rad,
     nu(id) { if (LP.nu(id)) B.radiolapp.paint(); },
   };
-  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp, pyntLjus, lampLjus };
+  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp, pyntLjus, lampLjus, pyntUtifran };
 }
