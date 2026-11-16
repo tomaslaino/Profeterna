@@ -16,7 +16,7 @@
 //
 // figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
-// tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
+// tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (tio sätt), cigarren, småsakerna medan han
 // väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
 // rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna då (raknar, tomKopp, slocknad, putsa, vissla,
 // naglar), där han blir ertappad och låtsas som ingenting.
@@ -508,6 +508,14 @@ export const KLIPP = {
   skal: { fran: 150, till: 158.5, vila: 0, grupp: 'kaffe', ned: [[7.25, 0.8]] },
   // kaffet: lillfingret ut, näsan i vädret och två små läppjanden, som en vinprovare
   fint: { fran: 160, till: 168.8, vila: 0, grupp: 'kaffe', ned: [[8.1, 0.18]] },
+  // kaffet: koppen vid bröstet medan han tänker och tittar bort, och när han kommer på det en klunk på saken
+  tanke: { fran: 1100, till: 1110.4, vila: 0, grupp: 'kaffe', ned: [[9.75, 0.45]] },
+  // kaffet har kallnat: en grimas, en misstänksam blick ned i koppen, en axelryckning, och han dricker ändå
+  kallt: { fran: 1112, till: 1122.6, vila: 0, grupp: 'kaffe', ned: [[9.85, 0.4]], ljud: [[5.0, { typ: 'fnys' }], [5.95, { typ: 'anda', sort: 'pust', ms: 600 }]] },
+  // kaffet: koppen stannar halvvägs, och han pekar med den mot en: visst är det så? En blinkning, och klunken
+  halvvags: { fran: 1125, till: 1133.8, vila: 0, grupp: 'kaffe', ned: [[8.0, 0.35]] },
+  // kaffet: skålar mot någon längs baren, och dricker
+  halsa: { fran: 1136, till: 1145, vila: 0, grupp: 'kaffe', ned: [[8.2, 0.35]] },
   // Han njuter av cigarren (cigarrKlipp nedan), med cigarren ur askkoppen och tillbaka:
   // ett långt bloss med slutna ögon, lutar sig bakåt och blåser ut röken länge, ah, och tittar nöjt på den
   lang: { fran: 175, till: 189.8, vila: 0, skynda: true, grupp: 'cigarr' },
@@ -2257,6 +2265,107 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         lill: [[1.2, 0], [1.9, 1], [7.7, 1], [8.1, 0]],
         arm: [[1.2, 0], [2.0, 0.55], [7.5, 0.55], [8.1, 0]],
         ...grepp(8.1),
+      },
+    },
+    // Han tänker: koppen vid bröstet, och han tittar bort ut i affären och snurrar den sakta, med rynkad
+    // panna och munnen i en trut. Så kommer han på det: brynen åker upp, ett leende och två nickar, och han
+    // tar en klunk på saken och ställer ned koppen.
+    tanke: {
+      k: {
+        dricker: [[7.05, 0], [7.35, 0.9], [8.05, 0.9], [8.3, 0]],
+        yaw: [[1.5, 0], [2.4, 0.45], [5.0, 0.45], [5.45, 0.08], [6.6, 0.05], [7.2, 0]],
+        pitch: [[1.4, 0], [2.4, -0.25], [4.9, -0.2], [5.15, 0.05], [5.35, 0.5], [5.6, 0.05], [5.8, 0.45], [6.05, 0], [7.0, 0], [7.6, -0.4], [8.1, -0.45], [8.6, 0.1], [9.4, 0]],
+        roll: [[2.0, 0], [2.6, 0.06], [4.9, 0.06], [5.3, 0]],
+        lut: [[1.5, 0], [2.4, -0.02], [4.9, -0.02], [5.4, 0.02], [6.0, 0]],
+        vrid: [[1.5, 0], [2.4, 0.03], [4.9, 0.03], [5.5, 0]],
+        blickX: [[1.6, 0], [1.9, 4.5], [4.9, 4.5], [5.2, 0]],
+        blickY: [[1.6, 0], [1.9, -1], [4.9, -1], [5.2, 0]],
+        brynX: [[2.0, 0], [2.6, -0.4], [4.8, -0.45], [5.05, 0.9], [5.8, 0.7], [6.6, 0.2], [7.4, 0]],
+        brynY: [[2.0, 0], [2.6, -0.6], [4.8, -0.65], [5.05, 0.45], [5.8, 0.35], [6.6, 0.1], [7.4, 0]],
+        kis: [[2.2, 0], [2.7, 0.3], [4.8, 0.3], [5.05, 0]],
+        rund: [[2.4, 0], [2.8, 0.35], [4.8, 0.35], [5.0, 0]],
+        blund: [[7.3, 0], [7.5, 0.7], [8.1, 0.7], [8.4, 0]],
+        le: [[4.9, 0], [5.3, 0.5], [6.4, 0.45], [7.0, 0.15], [8.6, 0.1], [9.0, 0.4], [10.0, 0.2]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [2.0, 'brost', 30], [6.6, 'brost'], [7.1, 'mun', 20], [8.1, 'mun'], [8.5, 'ah'], [9.2, 'ah'], [9.75, 'fat', 15]],
+        snurr: [[2.3, 0], [2.7, 0.45], [4.6, 0.45], [4.9, 0]],
+        tipp: [[7.1, 0], [7.4, 0.5], [8.0, 0.6], [8.3, 0]],
+        ...grepp(9.75),
+      },
+    },
+    // Kaffet har kallnat: han tar en klunk och stannar med koppen vid läppen, tittar upp på en och
+    // grimaserar. Han sänker den och tittar misstänksamt ned i den, fnyser, rycker på axlarna med en pust,
+    // och dricker vidare ändå, med ett snett leende: det går an.
+    kallt: {
+      k: {
+        dricker: [[2.0, 0], [2.3, 0.8], [2.6, 0.8], [2.75, 0.3], [3.3, 0.3], [3.5, 0], [7.1, 0], [7.45, 0.9], [8.1, 0.9], [8.35, 0]],
+        yaw: [[3.6, 0], [4.1, 0.2], [5.3, 0.2], [5.7, -0.1], [6.6, -0.05], [7.2, 0]],
+        pitch: [[2.7, 0], [3.5, 0], [4.1, 1.4], [5.3, 1.4], [5.6, 0.3], [6.6, 0.2], [7.2, 0], [7.7, -0.3], [8.2, -0.35], [8.7, 0.1], [9.5, 0]],
+        roll: [[5.5, 0], [5.85, 0.07], [6.3, 0.06], [6.7, 0]],
+        lut: [[3.5, 0], [4.1, 0.04], [5.4, 0.04], [5.8, 0], [7.6, -0.03], [8.2, -0.03], [8.7, 0]],
+        axV: [[5.5, 0], [5.85, 30], [6.25, 28], [6.6, 0]],
+        axH: [[5.5, 0], [5.85, 30], [6.25, 28], [6.6, 0]],
+        blickY: [[2.6, 0], [2.75, -2.5], [3.4, -2.5], [3.6, 0], [4.0, 4], [5.3, 4], [5.5, 0]],
+        brynX: [[2.65, 0], [2.85, -0.5], [3.4, -0.55], [3.8, 0.1], [4.2, 0.6], [4.8, 0.5], [4.95, -0.3], [5.4, -0.35], [5.8, 0.6], [6.6, 0.5], [7.2, 0], [8.6, 0], [9.0, 0.4], [9.8, 0]],
+        brynY: [[2.65, 0], [2.85, -0.8], [3.4, -0.85], [3.8, 0], [4.2, 0.4], [4.8, 0.3], [4.95, -0.5], [5.4, -0.55], [5.8, 0.3], [6.6, 0.25], [7.2, 0], [8.6, 0], [9.0, 0.2], [9.8, 0]],
+        kis: [[2.65, 0], [2.85, 0.6], [3.4, 0.6], [3.7, 0], [4.9, 0], [5.05, 0.35], [5.4, 0.35], [5.6, 0]],
+        stel: [[2.65, 0], [2.8, 1], [3.6, 1], [4.0, 0.6], [5.5, 0.6], [5.8, 0]],
+        munn: [[2.7, 0], [2.85, 0.05], [3.3, 0.05], [3.45, 0]],
+        rund: [[5.85, 0], [6.0, 0.4], [6.4, 0.3], [6.6, 0]],
+        blund: [[7.4, 0], [7.55, 0.6], [8.1, 0.6], [8.35, 0]],
+        le: [[5.7, 0], [6.0, 0.35], [6.6, 0.3], [7.1, 0.1], [8.6, 0], [9.0, 0.5], [9.8, 0.4], [10.4, 0.15]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [2.0, 'mun', 60], [3.4, 'mun'], [3.9, 'brost', 10], [6.6, 'brost'], [7.15, 'mun', 15], [8.2, 'mun'], [8.6, 'ah'], [9.3, 'ah'], [9.85, 'fat', 15]],
+        tipp: [[2.0, 0], [2.35, 0.5], [2.6, 0.55], [2.75, 0.2], [3.35, 0.2], [3.5, 0], [7.15, 0], [7.5, 0.6], [8.1, 0.65], [8.35, 0]],
+        ...grepp(9.85),
+      },
+    },
+    // Halvvägs till munnen kommer han på något: koppen stannar under hakan, brynen åker upp, och han pekar
+    // med koppen mot en, två små knyck med den och två nickar: visst är det så? Ett brett leende och en
+    // blinkning, och sedan tar han klunken och ställer ned den.
+    halvvags: {
+      k: {
+        dricker: [[4.85, 0], [5.15, 0.9], [5.9, 0.9], [6.15, 0]],
+        pitch: [[1.6, 0], [2.15, -0.15], [2.6, -0.2], [2.85, -0.25], [3.0, 0.4], [3.18, -0.15], [3.35, 0.45], [3.6, 0], [4.3, 0], [4.8, -0.3], [5.8, -0.4], [6.3, 0.1], [7.0, 0]],
+        yaw: [[2.2, 0], [2.6, -0.1], [3.6, -0.1], [4.4, 0]],
+        lut: [[2.0, 0], [2.6, 0.05], [3.6, 0.05], [4.3, 0]],
+        brynX: [[1.9, 0], [2.15, 1.0], [3.4, 0.9], [3.8, 0.5], [4.6, 0]],
+        brynY: [[1.9, 0], [2.15, 0.5], [3.4, 0.45], [3.8, 0.2], [4.6, 0]],
+        munn: [[2.1, 0], [2.2, 0.08], [2.35, 0]],
+        kis: [[3.4, 0], [3.7, 0.3], [4.3, 0.2], [4.6, 0]],
+        vink: [[3.65, 0], [3.75, 1], [3.95, 1], [4.05, 0]],
+        blund: [[5.1, 0], [5.3, 0.7], [5.9, 0.7], [6.2, 0]],
+        le: [[2.2, 0], [2.6, 0.3], [3.4, 0.4], [3.7, 0.75], [4.4, 0.6], [4.9, 0.2], [6.4, 0.2], [6.8, 0.5], [8.2, 0.3]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [1.85, 'hake', 50], [2.15, 'hake'], [2.6, 'fram'], [2.95, 'fram', 22], [3.3, 'fram', 22], [4.3, 'fram'], [4.85, 'mun', 20], [6.0, 'mun'], [6.4, 'ah'], [7.4, 'ah'], [8.0, 'fat', 15]],
+        tipp: [[4.85, 0], [5.2, 0.55], [5.8, 0.6], [6.1, 0]],
+        arm: [[2.2, 0], [2.6, 0.3], [4.3, 0.3], [4.8, 0]],
+        ...grepp(8.0),
+      },
+    },
+    // Skål mot baren: med koppen vid bröstet får han syn på någon längs baren, vänder sig dit med brynen uppe
+    // och lyfter koppen mot honom med en nick och ett leende, och vänder sig sedan tillbaka till en och dricker.
+    halsa: {
+      k: {
+        dricker: [[5.25, 0], [5.55, 0.9], [6.3, 0.9], [6.55, 0]],
+        yaw: [[1.6, 0], [2.0, 0], [2.4, -0.45], [4.3, -0.45], [4.9, 0]],
+        pitch: [[1.9, 0], [2.4, -0.2], [3.2, -0.2], [3.4, 0.35], [3.7, -0.15], [4.3, -0.1], [4.9, 0], [5.3, -0.3], [6.3, -0.4], [6.8, 0.05], [7.6, 0]],
+        vrid: [[1.9, 0], [2.6, -0.04], [4.3, -0.04], [4.9, 0]],
+        blickX: [[1.9, 0], [2.05, -5], [2.5, -3.5], [4.3, -3.5], [4.5, 0]],
+        brynX: [[2.1, 0], [2.4, 0.9], [3.6, 0.8], [4.3, 0.2], [4.8, 0]],
+        brynY: [[2.1, 0], [2.4, 0.6], [3.6, 0.5], [4.3, 0.1], [4.8, 0]],
+        munn: [[3.3, 0], [3.4, 0.06], [3.55, 0]],
+        blund: [[5.5, 0], [5.7, 0.6], [6.3, 0.6], [6.6, 0]],
+        le: [[2.3, 0], [2.7, 0.55], [4.0, 0.5], [4.6, 0.25], [6.5, 0.2], [7.0, 0.5], [8.4, 0.25]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [1.9, 'brost', 30], [2.3, 'brost'], [2.9, 'halsa', 20], [3.15, 'halsa'], [3.45, 'halsa', 30], [4.2, 'halsa'], [4.8, 'brost'], [5.3, 'mun', 15], [6.4, 'mun'], [6.8, 'ah'], [7.6, 'ah'], [8.2, 'fat', 15]],
+        tipp: [[5.3, 0], [5.6, 0.55], [6.3, 0.6], [6.6, 0]],
+        arm: [[2.3, 0], [2.9, 0.25], [4.2, 0.25], [4.8, 0]],
+        ...grepp(8.2),
       },
     },
   };
@@ -4989,7 +5098,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // grepp hela vägen, fingrarna mot koppen, pekfingret genom örat, tummen ovanpå och handflatan mot
   // honom. Lägena: på fatet; vid läppen, lite lägre (lyft) och under näsan i huvudets mått, så att
   // koppen följer med när han lutar huvudet bakåt; under hakan, en bit ned från munnen (ah), framför
-  // bröstet och upplyft mot en (skal) i kroppens. Klippets kaffe: lägena (kk), lutningen mot läppen
+  // bröstet, upplyft mot en (skal), framhållen mot en (fram) och lyft mot baren (halsa) i kroppens.
+  // Klippets kaffe: lägena (kk; båge mellan två lika lägen är ett litet knyck uppåt), lutningen mot läppen
   // (tipp, radianer: koppen vrids runt kanten mot hans underläpp, så att den ligger kvar där medan han
   // dricker), lillfingret ut (lill), armbågen ut (arm), koppen i små cirklar (snurr), när armen går
   // dit och tillbaka (mot), fingrarna (krok) och ångan (rok).
@@ -5037,6 +5147,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     ah: vidLappen(-150, 130, 0.15),
     brost: { p: V3(70, -10, 480), A: V3(0, 1, -0.3), H: V3(1, 0, 0.45) },
     skal: { p: V3(250, 330, 620), A: V3(0.05, 1, 0.3), H: V3(1, 0, -0.3) },
+    fram: { p: V3(170, 230, 690), A: V3(0, 1, 0.15), H: V3(1, 0, 0.2) },
+    halsa: { p: V3(20, 300, 650), A: V3(-0.1, 1, 0.05), H: V3(1, 0, -0.2) },
   };
   const KP = { fat: koppPose(nyPose(), KUP, V3(0, 1, 0), V3(Math.cos(0.5), 0, Math.sin(0.5))) };
   for (const n of [...Object.keys(KHUV), ...Object.keys(KKROPP)]) KP[n] = nyPose();
