@@ -203,7 +203,7 @@ window.RumFasad = (() => {
 
   // ---------- rummet genom glaset ----------
   //
-  // Det som syns bakom gänget: rummet i lysrörets ljus (och på natten neonens och tv:ns), lite ur skärpa –
+  // Det som syns bakom gänget: rummet i taklampornas ljus (och på natten neonens och tv:ns), lite ur skärpa –
   // hyllan med cigarettpaketen går att se, men gänget i 3D framför står ut; Hasse vagare bakom dörren. Sett utifrån är rummets högra vägg (tv:n,
   // Tipsligan och cigarettpaketen) till vänster och baren där Hasse Backe sitter till höger.
 
@@ -222,11 +222,18 @@ window.RumFasad = (() => {
       let p = '';
       for (let px = X + 8; px < X + W; px += 26) p += `M${px} ${Y} V${Y + H}`;
       s += `<path d="${p}" stroke="#000" stroke-opacity=".14" stroke-width="3"/>`;
-      // taket och lysröret (släckt på natten)
+      // taket och taklamporna (släckta på natten): spotskenan närmast glaset och takfläkten över gängets
+      // bord, mörka blad och fyra kupor under (förut ett lysrör)
       s += `<rect x="${X}" y="${Y}" width="${W}" height="${r1(H * 0.11)}" fill="${tak}"/>`;
       if (hela) {
-        s += `<rect x="${r1(X + W * 0.18)}" y="${r1(Y + H * 0.055)}" width="${r1(W * 0.62)}" height="9" rx="4.5" fill="${mix('#3a3a36', '#fffbea', ljus)}"/>`;
-        if (ljus > 0.3) s += `<ellipse cx="${r1(X + W * 0.49)}" cy="${r1(Y + H * 0.08)}" rx="${r1(W * 0.46)}" ry="${r1(H * 0.2)}" fill="url(#rf-g-vit)" opacity="${r1(0.6 * ljus)}"/>`;
+        const lampa = mix('#3a3a36', '#fff1d6', ljus);
+        s += `<rect x="${r1(X + W * 0.22)}" y="${r1(Y + H * 0.03)}" width="${r1(W * 0.56)}" height="3" fill="#120c08" opacity=".85"/>`;
+        for (const k of [0.3, 0.44, 0.58, 0.7]) s += `<circle cx="${r1(X + W * k)}" cy="${r1(Y + H * 0.03 + 7)}" r="4" fill="${lampa}"/>`;
+        const fx = X + W * 0.48;
+        const fy = Y + H * 0.065;
+        s += `<path d="M${r1(fx - W * 0.16)} ${r1(fy)} L${r1(fx + W * 0.16)} ${r1(fy + 3)}" stroke="#24160c" stroke-width="5" stroke-linecap="round"/>`;
+        for (const k of [-0.045, -0.015, 0.015, 0.045]) s += `<ellipse cx="${r1(fx + W * k)}" cy="${r1(fy + 13)}" rx="7" ry="5" fill="${lampa}"/>`;
+        if (ljus > 0.3) s += `<ellipse cx="${r1(fx)}" cy="${r1(fy + 16)}" rx="${r1(W * 0.34)}" ry="${r1(H * 0.2)}" fill="url(#rf-g-vit)" opacity="${r1(0.6 * ljus)}"/>`;
         // hyllan med cigarettpaketen bakom disken
         const R = rng(19);
         let pk = '';

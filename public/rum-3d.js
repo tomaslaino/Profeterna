@@ -471,19 +471,20 @@ export async function figurer(canvas, opt = {}) {
   }
   sikta();
 
-  // ljuset: lysröret framifrån ovan, neonen bakom till vänster, terminalen till höger
-  // (lysröret och det allmänna ljuset dämpas på natten, draw)
+  // ljuset: takfläktens kupor ovanifrån (fläkten hänger över bordet sedan 2026-11-16; förut lysröret
+  // framifrån ovan), neonen bakom till vänster, terminalen till höger
+  // (taklamporna och det allmänna ljuset dämpas på natten, draw)
   const hemi = new THREE.HemisphereLight('#d8d0b8', '#3a2a20', 0.42);
   scene.add(hemi);
   const KEY = 2.0;
-  const key = new THREE.DirectionalLight('#fff0d6', KEY);
-  key.position.set(120, 520, 520);
+  const key = new THREE.DirectionalLight('#ffdcb0', KEY);
+  key.position.set(-150, 850, 420);
   key.castShadow = true;
   key.shadow.mapSize.set(SKUGGA, SKUGGA);
   key.shadow.radius = 6;
   key.shadow.bias = -0.0004;
   Object.assign(key.shadow.camera, { left: -650, right: 350, top: 450, bottom: -450, near: 10, far: 2000 });
-  key.target.position.set(-150, -50, 0);
+  key.target.position.set(BORD.x, 0, BORD.z);
   scene.add(key, key.target);
   // (neonen släcks när skylten glappar, draw)
   const NEON = 4.2;
@@ -500,7 +501,7 @@ export async function figurer(canvas, opt = {}) {
   const term = new THREE.DirectionalLight('#5ff0dc', 1.1);
   term.position.set(520, 80, -120);
   scene.add(term);
-  const FILL = 0.5;
+  const FILL = 0.4;
   const fill = new THREE.DirectionalLight('#ffd9b0', FILL);
   fill.position.set(-300, -50, 400);
   scene.add(fill);

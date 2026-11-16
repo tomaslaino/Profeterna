@@ -1,7 +1,7 @@
 /* Gänget i rummet och natten (rum-folk.js). */
 
-/* Natten: lysröret är släckt. Mörkret ligger i samma lager som när
-   lysröret tänds (.rum-mork i rum.css), med ljus kvar där gatan lyser in
+/* Natten: taklamporna (takfläkten och spotarna, förut lysröret) är släckta. Mörkret ligger i samma
+   lager som när de tänds (.rum-mork i rum.css), med ljus kvar där gatan lyser in
    genom fönstret och dörren, från tv:n, lampan över pulten och lite över pulten; nära tv:n,
    videon, en sak och med kupongen i handen är det borta. Det tonas in från
    23 till midnatt och ut från sex till sju (--natt-grad på mörkret, rum-folk.js). */
@@ -29,7 +29,6 @@
     radial-gradient(ellipse 16% 21% at 10% 79%, rgba(0, 0, 0, 0.5), #000 100%);
   mask-composite: intersect;
 }
-.rum.natt .rum-mork i { display: none; }
 /* telefonen på höjden: mörkret räcker över taket och pulten utanför scenen (samma ställen i rutan) */
 .rum.smal.natt .rum-mork {
   top: -1200px;
