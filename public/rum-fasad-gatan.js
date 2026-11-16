@@ -5,10 +5,11 @@
 // S:t Eriksgatan mellan en själv och affären (rum-fasad.js): trottoarkanten i granit, rännstenen med gatsten och en
 // brunn, asfalten med mittlinjen och, i en telefon på höjden, kanten på trottoaren där man själv står. På gatan kör det
 // förbi då och då, och då täcker de affären, bussarna nästan helt: Stockholms bilar i mitten av nittiotalet, ungefär
-// som i bilregistret (MODELLER: en tredjedel Volvo med 240:n, 740/940 och 850, Saab 900 och 9000, Golf, Mercedes,
-// Sierra, Kadett, Corolla, BMW och de små franska, och de äldre som fanns kvar: Amazon, PV, 144, Saab 96 och 99,
-// Bubblan, Mercedes 123, Ankan, Nivan och Minin), skåpbilar och VW-bussar, taxi, de röda bussarna och den blåa fyran
-// och plogbilen när det har snöat. Fler i rusningen, få på natten och ingen buss mitt i natten (RumUte.trafik), och i
+// som i bilregistret (MODELLER: en tredjedel Volvo med 240:n, 740/940, 850, 440 och 480, Saab 900 (också cabriolet)
+// och 9000, Golf, Mercedes 190 och W124, Audi 100, Passat och de andra kombibilarna, Sierra, Kadett, Corolla, BMW, de
+// små franska och BX:en, Cherokeen och Voyagern, och de äldre som fanns kvar: Amazon, PV, 144 och 145, Saab 96 och 99,
+// Bubblan, Mercedes 123, Ankan, Ladan, Nivan, Minin och amerikanaren när det är varmt), skåpbilar och VW-bussar, taxi,
+// de röda bussarna och den blåa fyran och plogbilen när det har snöat. Fler i rusningen, få på natten och ingen buss mitt i natten (RumUte.trafik), och i
 // rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in och står med bromsljusen tända, och kör sedan
 // iväg en efter en.
 //
@@ -59,7 +60,8 @@ window.RumFasadGatan = (() => {
   // stänkskydden, krom kromlister, kjol en annan färg under stötlisten, galler ventilerna, rails takräcket (kanske:
   // ibland) och hog de höga (ingen bak). De äldre: listKrom och stotKrom kromad list och kromade stötfångare, duk taket i
   // en annan färg (tygtaket; dukFarg, dukKanske: ibland), flank skärmar som sitter för sig, efter kjolen över bakhjulet
-  // (ritas efter hjulen) och enkel: alltid plåtfälgar.
+  // (ritas efter hjulen) och enkel: alltid plåtfälgar. Den öppna bilen (oppen): de som åker syns ovanför dörrarna, och
+  // taket ligger hopvikt bak (sufflett). nav 'vit': vita däcksidor.
   const FORM = {
     // Volvo 240 kombi: lådan, den lodräta bakluckan, de höga baklyktorna och de stora stötfångarna
     v245: {
@@ -356,6 +358,133 @@ window.RumFasadGatan = (() => {
       stot: [[-156, -42, 12, 8], [146, -42, 12, 8]], stotKrom: true, spegel: [46, -94],
       fram: [143, -78, 8, 13], blink: [146, -56, 6, 6], bak: [-153, -80, 5, 16],
     },
+    // Volvo 145, herrgårdsvagnen: 144:an med det långa taket och lodrät baklucka
+    v145: {
+      L: 464, hj: [-113, 147], r: 31, nav: 'plat', belt: -98, list: [-62, -59], listKrom: true, tak: [-221, 30, -144], forare: [4, -116], rails: 'kanske',
+      kaross: 'M-228 -30 L-231 -38 V-134 Q-231 -144 -221 -144 H34 Q43 -143 48 -139 L98 -98 L222 -92 Q231 -91 231 -82 V-38 L228 -30 Z',
+      hus: 'M-227 -96 V-135 Q-227 -140 -220 -140 H33 Q39 -139 43 -135 L90 -96 Z',
+      rutor: 'M-222 -100 V-133 Q-222 -136 -218 -136 H-136 V-100 Z M-126 -100 V-136 H-26 V-100 Z M-16 -100 V-135 H32 Q36 -135 38 -132 L82 -100 Z',
+      krom: 'M-227 -96 V-135 Q-227 -140 -220 -140 H33 Q39 -139 43 -135 L90 -96 M52 -100 L40 -132',
+      fog: 'M-21 -98 V-32 M88 -97 L87 -40 M-131 -98 V-74', grepp: 'M-44 -90 h14 M60 -90 h14',
+      stot: [[-238, -60, 14, 10], [224, -60, 14, 10]], stotKrom: true, spegel: [86, -100],
+      fram: [225, -82, 6, 12], blink: [223, -66, 8, 7], bak: [-233, -106, 6, 40],
+    },
+    // Lada 2105/2107: Fiatens låda, med rak huv, upprätta rutor, krom kring dem och kromade stötfångare
+    lada: {
+      L: 413, hj: [-114, 128], r: 29, nav: 'stal', belt: -97, list: [-62, -58], listKrom: true, tak: [-103, 20, -142], forare: [0, -117],
+      kaross: 'M-203 -28 L-206 -38 V-92 Q-206 -96 -202 -96 L-140 -98 L-112 -138 Q-109 -142 -103 -142 H20 Q26 -142 29 -138 L66 -98 L200 -92 Q206 -92 206 -86 V-38 L203 -28 Z',
+      hus: 'M-135 -96 L-110 -134 Q-108 -137 -103 -137 H19 Q24 -137 26 -134 L59 -96 Z',
+      rutor: 'M-124 -99 L-106 -128 Q-104 -131 -100 -131 H-24 V-99 Z M-14 -99 V-131 H18 Q22 -131 24 -128 L50 -99 Z',
+      krom: 'M-135 -96 L-110 -134 Q-108 -137 -103 -137 H19 Q24 -137 26 -134 L59 -96 M-132 -98 H58',
+      fog: 'M-19 -97 V-30 M62 -96 L61 -40 M-128 -97 V-72', grepp: 'M-44 -90 h13 M46 -90 h13',
+      stot: [[-214, -60, 14, 14], [200, -60, 14, 14]], stotKrom: true, spegel: [58, -98],
+      fram: [200, -86, 6, 14], blink: [198, -68, 8, 7], bak: [-207, -94, 6, 24],
+    },
+    // Volvo 440: den kilformade halvkombin med hög bakdel, kort lucka och stora svarta stötfångare
+    v440: {
+      L: 431, hj: [-120, 130], r: 29, nav: 'stal', belt: -97, list: [-60, -53], tak: [-134, 8, -138], forare: [-8, -115],
+      kaross: 'M-212 -26 L-215 -36 V-108 Q-215 -114 -209 -115 L-196 -116 L-150 -136 Q-144 -138 -134 -138 H8 Q16 -138 22 -133 L76 -94 L204 -86 Q215 -84 215 -74 V-36 L212 -26 Z',
+      hus: 'M-190 -96 V-112 L-150 -131 Q-146 -133 -138 -133 H7 Q13 -133 17 -129 L68 -95 Z',
+      rutor: 'M-184 -100 V-110 L-152 -126 Q-150 -127 -146 -127 H-130 V-100 Z M-121 -100 V-129 H-32 V-100 Z M-22 -100 V-129 H6 Q11 -129 15 -125 L60 -100 Z',
+      fog: 'M-27 -97 V-30 M70 -94 L69 -40 M-126 -97 V-70', grepp: 'M-56 -89 h13 M48 -88 h13',
+      stot: [[-224, -58, 14, 26], [206, -56, 14, 24]], spegel: [66, -97],
+      fram: [208, -76, 6, 13], blink: [200, -76, 8, 10], bak: [-216, -108, 6, 34],
+    },
+    // Volvo 480: den låga kilen med glasbaklucka och uppfällda strålkastare (de är alltid tända)
+    v480: {
+      L: 426, hj: [-120, 130], r: 30, nav: 'ekrar', belt: -92, list: [-56, -50], tak: [-150, 0, -132], forare: [-14, -110],
+      kaross: 'M-210 -28 L-213 -38 V-84 L-205 -118 Q-203 -123 -196 -124 L-150 -130 Q-80 -133 0 -132 Q10 -132 16 -127 L66 -91 L164 -78 L166 -88 H192 L194 -75 L200 -72 Q213 -70 213 -60 V-38 L210 -28 Z',
+      hus: 'M-207 -86 L-200 -116 Q-198 -120 -192 -120 L-150 -126 Q-80 -128 -1 -127 Q6 -127 11 -123 L58 -91 Z',
+      rutor: 'M-199 -100 L-195 -114 Q-193 -116 -188 -117 L-150 -122 Q-110 -123 -80 -123 V-92 Z M-70 -92 V-123 H-2 Q4 -123 8 -119 L50 -92 Z',
+      fog: 'M-75 -90 V-30 M60 -90 L59 -40 M-205 -86 L-207 -66', grepp: 'M-66 -82 h13',
+      stot: [[-220, -56, 12, 22], [205, -50, 12, 20]], spegel: [56, -92], spegelLack: true,
+      fram: [190, -86, 5, 10], blink: [204, -58, 8, 6], bak: [-214, -80, 6, 20],
+    },
+    // Mercedes 190: den lilla W124:an, kortare och med högre bagagelucka
+    w201: {
+      L: 442, hj: [-121, 145], r: 30, nav: 'hal', belt: -96, list: [-60, -56], tak: [-102, 24, -138], forare: [6, -115], kjol: '#55595e',
+      kaross: 'M-218 -26 L-221 -36 V-96 Q-221 -103 -214 -104 L-152 -106 L-116 -134 Q-110 -138 -102 -138 H24 Q33 -138 38 -133 L92 -96 L212 -88 Q221 -87 221 -77 V-36 L218 -26 Z',
+      hus: 'M-146 -99 L-114 -131 Q-110 -134 -103 -134 H23 Q30 -134 34 -129 L84 -96 Z',
+      rutor: 'M-134 -99 L-110 -124 Q-107 -128 -101 -128 H-24 V-99 Z M-14 -99 V-128 H22 Q27 -128 30 -125 L74 -99 Z',
+      krom: 'M-146 -99 L-114 -131 Q-110 -134 -103 -134 H23 Q30 -134 34 -129 L84 -96 M-142 -97 H80',
+      fog: 'M-19 -96 V-28 M86 -95 L85 -42 M-138 -96 V-72', grepp: 'M-42 -88 h13 M58 -88 h13',
+      stot: [[-226, -61, 9, 26], [216, -61, 9, 26]], spegel: [84, -98], spegelLack: true,
+      fram: [216, -78, 6, 12], blink: [209, -78, 8, 12], bak: [-222, -102, 7, 28],
+    },
+    // Audi 100: den släta, strömlinjeformade sedanen med rutorna i jämnhöjd med plåten och en liten tredje sidoruta
+    a100: {
+      L: 479, hj: [-130, 139], r: 31, nav: 'plat', belt: -98, list: [-58, -52], tak: [-108, 20, -142], forare: [2, -117],
+      kaross: 'M-236 -28 L-240 -38 V-94 Q-240 -102 -232 -104 L-170 -108 Q-150 -122 -128 -136 Q-120 -142 -108 -142 H20 Q32 -142 40 -136 L100 -96 Q170 -92 228 -84 Q240 -82 240 -72 V-38 L236 -28 Z',
+      hus: 'M-160 -100 Q-144 -116 -126 -131 Q-118 -137 -108 -137 H19 Q29 -137 35 -132 L92 -96 Z',
+      rutor: 'M-151 -100 Q-141 -111 -130 -120 V-100 Z M-122 -100 V-126 Q-116 -132 -108 -132 H-30 V-100 Z M-20 -100 V-132 H18 Q26 -132 31 -128 L82 -100 Z',
+      fog: 'M-25 -98 V-30 M92 -96 L91 -42 M-126 -98 V-72', grepp: 'M-54 -90 h13 M58 -89 h13',
+      stot: [[-246, -60, 8, 22], [234, -58, 8, 20]], spegel: [86, -98], spegelLack: true,
+      fram: [233, -76, 7, 12], blink: [226, -76, 7, 10], bak: [-241, -100, 6, 26],
+    },
+    // VW Passat kombi, och de andra mellanstora kombibilarna (Audi 100 Avant, Mazda 626, Carina, Omega): runda hörn
+    passat: {
+      L: 457, hj: [-128, 134], r: 30, nav: 'plat', belt: -97, list: [-58, -52], tak: [-212, 18, -142], forare: [0, -117], rails: 'kanske',
+      kaross: 'M-225 -28 L-228 -38 V-98 L-224 -132 Q-222 -142 -212 -142 H18 Q28 -142 35 -136 L94 -96 L218 -86 Q229 -84 229 -74 V-38 L225 -28 Z',
+      hus: 'M-222 -97 L-218 -132 Q-217 -137 -210 -137 H17 Q25 -137 30 -132 L86 -95 Z',
+      rutor: 'M-216 -100 L-213 -130 Q-212 -133 -207 -133 H-150 V-100 Z M-140 -100 V-133 H-28 V-100 Z M-18 -100 V-133 H16 Q22 -133 26 -129 L76 -100 Z',
+      fog: 'M-23 -97 V-30 M88 -95 L87 -42 M-145 -98 V-72', grepp: 'M-50 -89 h13 M56 -88 h13',
+      stot: [[-234, -58, 9, 22], [223, -56, 9, 20]], spegel: [80, -98],
+      fram: [222, -76, 7, 12], blink: [215, -76, 7, 10], bak: [-229, -104, 6, 30],
+    },
+    // Citroën BX: den vassa kilen med låg nos, sluttande lucka och kjol över bakhjulet
+    bx: {
+      L: 423, hj: [-136, 130], r: 29, nav: 'plat', belt: -96, list: [-56, -50], tak: [-104, -10, -136], forare: [-18, -112],
+      kaross: 'M-208 -28 L-212 -38 V-100 Q-212 -106 -206 -107 L-198 -108 L-104 -136 H-10 Q-2 -136 6 -130 L72 -92 L200 -72 Q211 -70 211 -62 V-38 L208 -28 Z',
+      hus: 'M-192 -96 L-104 -131 H-11 Q-4 -131 2 -127 L64 -92 Z',
+      rutor: 'M-180 -98 L-108 -125 Q-104 -126 -100 -126 V-98 Z M-90 -98 V-127 H-30 V-96 Z M-20 -96 V-127 H-12 Q-6 -127 -1 -123 L52 -93 Z',
+      efter: 'M-171 -42 V-58 Q-171 -65 -163 -65 H-109 Q-101 -65 -101 -58 V-42 Z',
+      fog: 'M-25 -96 V-30 M66 -91 L65 -40 M-95 -97 V-50', grepp: 'M-58 -88 h12 M44 -86 h12',
+      stot: [[-218, -56, 10, 22], [205, -52, 10, 18]], spegel: [62, -94],
+      fram: [203, -66, 8, 9], blink: [195, -66, 8, 7], bak: [-213, -100, 6, 20],
+    },
+    // Jeep Cherokee: lådan på höga hjul, med svart plast nertill och takräcke
+    jeep: {
+      L: 424, hj: [-122, 136], r: 34, nav: 'ekrar', belt: -113, list: [-66, -60], tak: [-202, 22, -160], forare: [-4, -134], rails: 'kanske', kjol: '#2a2b2e',
+      kaross: 'M-209 -40 L-212 -50 V-150 Q-212 -160 -202 -160 H22 Q30 -160 34 -154 L68 -110 L204 -104 Q212 -103 212 -95 V-50 L209 -40 Z',
+      hus: 'M-208 -112 V-152 Q-208 -155 -202 -155 H21 Q27 -155 30 -151 L61 -110 Z',
+      rutor: 'M-202 -114 V-150 H-128 V-114 Z M-118 -114 V-150 H-30 V-114 Z M-20 -114 V-150 H20 Q24 -150 26 -147 L54 -114 Z',
+      fog: 'M-25 -112 V-46 M63 -108 L62 -50 M-123 -112 V-62', grepp: 'M-52 -104 h14 M48 -104 h14',
+      stot: [[-218, -68, 12, 22], [206, -68, 12, 22]], spegel: [62, -112],
+      fram: [206, -100, 6, 12], blink: [204, -86, 8, 8], bak: [-213, -122, 5, 36],
+    },
+    // Chrysler Voyager: enlådsbilen med kort nos och skjutdörr (ibland storbilstaxi)
+    voyager: {
+      L: 470, hj: [-145, 145], r: 32, nav: 'plat', belt: -108, list: [-62, -56], tak: [-224, 30, -170], forare: [44, -138],
+      kaross: 'M-232 -28 L-235 -38 V-160 Q-234 -170 -224 -170 H30 Q40 -170 46 -163 L114 -108 L224 -90 Q235 -88 235 -78 V-38 L232 -28 Z',
+      hus: 'M-231 -106 V-160 Q-231 -165 -224 -165 H29 Q37 -165 41 -160 L106 -106 Z',
+      rutor: 'M-226 -110 V-158 Q-226 -160 -222 -160 H-120 V-110 Z M-110 -110 V-160 H8 V-110 Z M18 -110 V-160 H28 Q34 -160 38 -156 L96 -110 Z',
+      fog: 'M13 -108 V-30 M106 -106 L104 -42 M-116 -108 V-30 M-116 -84 H8', grepp: 'M-12 -98 h14 M84 -98 h14',
+      stot: [[-241, -60, 10, 24], [229, -58, 10, 22]], spegel: [100, -108],
+      fram: [228, -86, 7, 13], blink: [222, -86, 7, 10], bak: [-236, -122, 6, 42],
+    },
+    // Saab 900 cabriolet: tvådörrars med tygtaket, och en varm och torr dag med taket nere (s900cabO nedan)
+    s900cab: {
+      L: 474, hj: [-120, 132], r: 31, nav: 'turbin', belt: -99, list: [-62, -54], tak: [-106, 4, -142], forare: [-12, -117],
+      kaross: 'M-233 -28 L-237 -38 V-90 Q-237 -100 -228 -101 L-180 -103 Q-160 -128 -126 -140 Q-118 -142 -106 -142 H4 Q20 -142 32 -136 L90 -99 Q172 -97 226 -86 Q237 -83 237 -72 V-38 L233 -28 Z',
+      duk: 'M-240 -100 H4 V-150 H-240 Z',
+      hus: 'M-150 -99 Q-138 -118 -122 -131 Q-116 -135 -106 -135 H3 Q16 -135 26 -129 L82 -98 Z',
+      rutor: 'M-140 -101 Q-130 -116 -118 -126 Q-112 -130 -104 -130 H-56 V-101 Z M-46 -101 V-131 H2 Q14 -131 22 -126 L72 -101 Z',
+      fog: 'M-52 -99 V-30 M84 -97 L83 -42', grepp: 'M-40 -91 h12',
+      stot: [[-243, -61, 12, 27], [230, -61, 13, 27]], spegel: [78, -100],
+      fram: [232, -77, 6, 12], blink: [222, -77, 10, 10], bak: [-238, -95, 7, 19],
+    },
+    // Amerikanaren en sommarkväll: lång och låg, med fenor, krom längs sidan, vita däcksidor och ibland vitt tak
+    amis: {
+      L: 535, hj: [-135, 167], r: 32, nav: 'vit', belt: -96, list: [-48, -45], listKrom: true, tak: [-76, 20, -138], forare: [0, -112],
+      kaross: 'M-264 -32 L-268 -42 V-80 Q-268 -90 -262 -92 L-250 -95 L-160 -88 L-120 -94 L-92 -132 Q-86 -138 -76 -138 H20 Q30 -138 36 -132 L72 -96 L256 -86 Q267 -85 267 -76 V-42 L264 -32 Z',
+      duk: 'M-130 -95 H70 V-150 H-130 Z', dukFarg: '#ece8dc', dukKanske: true,
+      hus: 'M-114 -94 L-88 -128 Q-84 -133 -76 -133 H19 Q27 -133 31 -128 L64 -95 Z',
+      rutor: 'M-104 -96 L-84 -124 Q-81 -128 -76 -128 H-10 V-96 Z M0 -96 V-128 H18 Q24 -128 27 -125 L56 -96 Z',
+      krom: 'M-114 -94 L-88 -128 Q-84 -133 -76 -133 H19 Q27 -133 31 -128 L64 -95 M-252 -76 Q-100 -72 252 -70',
+      fog: 'M-6 -94 V-36 M68 -95 L67 -42', grepp: 'M-24 -86 h14',
+      stot: [[-276, -60, 16, 20], [262, -60, 16, 20]], stotKrom: true, spegel: [62, -96],
+      fram: [262, -80, 6, 14], blink: [258, -54, 8, 6], bak: [-270, -92, 6, 14],
+    },
   };
   // T3:an som buss (Caravelle): samma kaross med rutor längs hela sidan
   FORM.t3buss = {
@@ -363,6 +492,26 @@ window.RumFasadGatan = (() => {
     hus: 'M-218 -116 V-184 H-118 V-116 Z M-112 -116 V-184 H20 V-116 Z M34 -116 V-184 H144 V-116 Z M150 -114 V-184 H184 Q193 -184 196 -177 L215 -114 Z',
     rutor: 'M-213 -120 V-179 H-123 V-120 Z M-107 -120 V-179 H15 V-120 Z M39 -120 V-179 H139 V-120 Z M156 -118 V-178 H182 Q189 -178 191 -173 L208 -118 Z',
     fog: 'M146 -186 V-34 M28 -116 V-34 M-120 -116 V-60',
+  };
+  // Ladans kombi (2104): samma nos, taket ända bak
+  FORM.lada4 = {
+    ...FORM.lada,
+    L: 412, tak: [-200, 20, -142], rails: 'kanske',
+    kaross: 'M-203 -28 L-206 -38 V-136 Q-206 -142 -200 -142 H20 Q26 -142 29 -138 L66 -98 L200 -92 Q206 -92 206 -86 V-38 L203 -28 Z',
+    hus: 'M-202 -96 V-134 Q-202 -137 -198 -137 H19 Q24 -137 26 -134 L59 -96 Z',
+    rutor: 'M-198 -99 V-131 H-134 V-99 Z M-124 -99 V-131 H-24 V-99 Z M-14 -99 V-131 H18 Q22 -131 24 -128 L50 -99 Z',
+    krom: 'M-202 -96 V-134 Q-202 -137 -198 -137 H19 Q24 -137 26 -134 L59 -96 M-200 -98 H58',
+    fog: 'M-19 -97 V-30 M62 -96 L61 -40 M-129 -97 V-72',
+    bak: [-207, -110, 6, 40],
+  };
+  // Saaben med taket nere: bara vindrutan står upp, taket ligger hopvikt bak (sufflett) och de som åker syns
+  FORM.s900cabO = {
+    ...FORM.s900cab,
+    oppen: true, duk: null,
+    kaross: 'M-233 -28 L-237 -38 V-90 Q-237 -100 -228 -101 L-180 -103 H44 L28 -137 Q28 -141 33 -139 L90 -99 Q172 -97 226 -86 Q237 -83 237 -72 V-38 L233 -28 Z',
+    sufflett: 'M-206 -101 Q-206 -113 -192 -115 H-150 Q-136 -113 -134 -101 Z',
+    hus: 'M44 -103 L28 -137 Q28 -140 33 -139 L88 -100 Z',
+    rutor: 'M50 -103 L34 -133 L80 -102 Z',
   };
   const BUSS = {
     // stadsbussen, tolv meter: en del med tre dörrar
@@ -403,33 +552,43 @@ window.RumFasadGatan = (() => {
   // (skåpbilarna oftast vita, ibland Postens gula)
   const SKAP = ['#e9e7e0', '#d9d6cc', '#2a3f66', '#c9c3b2', '#e9e7e0', '#f0c419'];
   const T3 = ['#e9e7e0', '#d9cfb4', '#8fa6b8', '#9a2a1e', '#3f5a48', '#c9c3b2'];
-  // de äldre i sina tiders färger: ljusblått, gräddvitt, rött, svart och grågrönt; Bubblan och Ankan i glada färger,
-  // Nivan i beige, vitt, grönt och rödorange, Minin i rött, grönt och marinblått
-  const GAMLA = {
+  // De som har egna färger. De äldre i sina tiders färger: ljusblått, gräddvitt, rött, svart och grågrönt; Bubblan och
+  // Ankan i glada färger, Nivan och Ladan i beige, vitt, grönt, ljusblått och rödorange, Minin i rött, grönt och
+  // marinblått, amerikanaren i turkos, grädde, rosa och ljusblått, och jeepen och Voyagern i nittiotalets mörka färger.
+  const EGNA = {
     amazon: ['#8fb0c8', '#e3d8bc', '#9a2a24', '#1b1d22', '#7d8c78', '#2a3a5a', '#e7e3d8', '#b8b2a2'],
     pv: ['#1b1d22', '#8fa0a8', '#e3d8bc', '#7d8c78', '#9a2a24', '#3a4a5a'],
     bubbla: ['#c9a227', '#d8692a', '#8fb3c9', '#2e4a3c', '#a8262a', '#e7e3d8', '#5a7a4a', '#b8b2a2', '#24345a'],
     ank: ['#a8262a', '#8f9498', '#e3d8bc', '#d9b23a', '#3a4a6a', '#7a8a6a', '#e7e3d8'],
     niva: ['#d6c9a8', '#e7e3d8', '#4a5a3a', '#b8452a', '#6a8aa0', '#7a1f22'],
     mini: ['#a8262a', '#2e4a3c', '#e7e3d8', '#24345a', '#c9a227', '#1b1d22', '#8fb0c8'],
+    lada: ['#d6c9a8', '#e7e3d8', '#8fb0c8', '#a8452a', '#4a6a4a', '#c9a227', '#6a2a2a', '#3a4a6a'],
+    amis: ['#5fa8a0', '#e8dcc0', '#a8262a', '#1b1d22', '#d9a0a8', '#8fb8d0', '#2a3a5a', '#e7e3d8'],
+    jeep: ['#1b1d22', '#2e4a3c', '#5e2a2a', '#e7e3d8', '#9aa0a6', '#24345a'],
+    voyager: ['#24345a', '#5e2a2a', '#9aa0a6', '#e7e3d8', '#2e4a3c', '#1b1d22'],
   };
+  EGNA.lada4 = EGNA.lada;
   const TAXI = ['#1b1d22', '#e7e3d8', '#2a2c30', '#24345a', '#9aa0a6'];
 
   // Bilarna på Stockholms gator i mitten av nittiotalet, ungefär som i bilregistret: en tredjedel Volvo (240:n
   // vanligast), Saab, Golf och de japanska och tyska, fördelade på formerna ovan (siffran: hur många av hundra).
   const MODELLER = [
-    ['v245', 9], ['v240', 7], ['v740', 6], ['v745', 6], ['v855', 4], ['v854', 3], ['v340', 2],
-    ['s900', 9], ['s9000', 4], ['golf', 10], ['w124', 5], ['sierra', 4], ['kadett', 11], ['corolla', 10], ['e30', 5], ['p205', 5],
-    ['v144', 4], ['amazon', 2], ['pv', 1], ['s96', 3], ['s99', 3], ['bubbla', 3], ['w123', 3], ['ank', 1], ['niva', 2], ['mini', 1],
+    ['v245', 9], ['v240', 7], ['v740', 6], ['v745', 6], ['v855', 4], ['v854', 3], ['v440', 5], ['v340', 2], ['v480', 1],
+    ['s900', 9], ['s9000', 4], ['s900cab', 1], ['golf', 10], ['w124', 5], ['w201', 3], ['a100', 3], ['passat', 6], ['sierra', 4],
+    ['kadett', 10], ['corolla', 9], ['e30', 5], ['p205', 5], ['bx', 2], ['jeep', 2], ['voyager', 2],
+    ['v144', 4], ['v145', 3], ['amazon', 2], ['pv', 1], ['s96', 3], ['s99', 3], ['bubbla', 3], ['w123', 3], ['ank', 1],
+    ['lada', 2], ['lada4', 1], ['niva', 2], ['mini', 1], ['amis', 1],
   ];
-  // taxin: oftast en 740/940 eller en Mercedes (ibland en gammal 123:a), ibland en 850 eller en 9000
-  const TAXIBILAR = [['v740', 4], ['w124', 3], ['v745', 1], ['v854', 1], ['s9000', 1], ['w123', 2]];
+  // (amerikanaren bara när det är varmt och torrt)
+  const MODELLER_KALLT = MODELLER.filter(([m]) => m !== 'amis');
+  // taxin: oftast en 740/940 eller en Mercedes (ibland en gammal 123:a), ibland en 850, en 9000 eller en Voyager
+  const TAXIBILAR = [['v740', 4], ['w124', 3], ['v745', 1], ['v854', 1], ['s9000', 1], ['w123', 2], ['voyager', 1]];
   const lotta = (R, lista) => {
     let x = R() * lista.reduce((s, [, n]) => s + n, 0);
     for (const [m, n] of lista) if ((x -= n) < 0) return m;
     return lista[0][0];
   };
-  const lackFor = (m) => (GAMLA[m] ? GAMLA[m] : m[0] === 'v' ? VOLVO : m[0] === 's' && m !== 'skap' ? SAAB : m[0] === 'w' ? MERC : m === 'skap' ? SKAP : m.startsWith('t3') ? T3 : LACK);
+  const lackFor = (m) => (EGNA[m] ? EGNA[m] : m[0] === 'v' ? VOLVO : m[0] === 's' && m !== 'skap' ? SAAB : m[0] === 'w' ? MERC : m === 'skap' ? SKAP : m.startsWith('t3') ? T3 : LACK);
 
   // ---------- gatan ----------
 
@@ -569,7 +728,7 @@ window.RumFasadGatan = (() => {
     } else {
       b.taxi = typ === 'taxi';
       const modell = b.taxi ? lotta(R, TAXIBILAR) : typ;
-      b.F = FORM[modell];
+      b.F = FORM[modell === 's900cab' && varmt(S, 18) ? 's900cabO' : modell];
       b.lack = pick(R, b.taxi ? TAXI : lackFor(modell));
       b.falg = pick(R, ['#b9bdc2', '#a4a8ae', '#c8ccd0']);
       // (navkapslar eller lättmetall och takräcke: olika på varje bil av samma slag)
@@ -577,6 +736,12 @@ window.RumFasadGatan = (() => {
       b.rails = b.F.rails === 'kanske' ? R() < 0.6 : Boolean(b.F.rails);
       b.duk = b.F.duk && (!b.F.dukKanske || R() < 0.5);
       b.passagerare = R() < 0.3;
+      // (i den öppna bilen syns de som åker: tröjan och håret)
+      if (b.F.oppen) {
+        b.klader = [pick(R, KLADER), pick(R, KLADER)];
+        b.har = [pick(R, HAR), pick(R, HAR)];
+        b.passagerare = R() < 0.6;
+      }
       // (i m/s: 12–18 km/h på dagen, lugnare i rusningen och lite fortare på natten)
       b.fart = (T.natt ? 4.6 + R() * 1.4 : T.rusning ? 3.2 + R() * 0.9 : 3.6 + R() * 1.2) * halt;
     }
@@ -587,6 +752,14 @@ window.RumFasadGatan = (() => {
     return b;
   }
 
+  // varmt och torrt (amerikanaren kommer ut, cabben fäller ner taket)
+  function varmt(S, grader) {
+    const v = S.vNu || S.v;
+    return v.temp >= grader && !v.fall && !v.snotackt;
+  }
+  const KLADER = ['#e7e3d8', '#24345a', '#a8262a', '#1b1d22', '#5fa8a0', '#c9a227', '#8fb0c8'];
+  const HAR = ['#2a2018', '#5a3a22', '#c9a86a', '#1b1d22', '#8a6a4a', '#b8b2a2'];
+
   function valjTyp(S, R, T, f, I) {
     const v = S.vNu || S.v;
     if (T.bussar && !T.natt && R() < I / (T.dag ? 420 : 600)) return R() < 0.5 ? 'ledbuss' : 'buss';
@@ -594,7 +767,7 @@ window.RumFasadGatan = (() => {
     if (R() < (T.natt ? 0.4 : 0.1)) return 'taxi';
     // skåpbilarna (och VW-bussarna), färre på helgen
     if (R() < (T.helg ? 0.06 : 0.11)) { const x = R(); return x < 0.5 ? 'skap' : x < 0.8 ? 't3' : 't3buss'; }
-    return lotta(R, MODELLER);
+    return lotta(R, varmt(S, 15) ? MODELLER : MODELLER_KALLT);
   }
 
   // Luckan n i filen f: fordonen i den (oftast inget), var och när de kommer in (t0) och när de är ute (slut). Är
@@ -788,6 +961,17 @@ window.RumFasadGatan = (() => {
       c.beginPath(); c.arc(x, -r, r * 0.68, 0, TAU); c.stroke();
       c.fillStyle = S.G.mix(f, '#ffffff', 0.15);
       c.beginPath(); c.arc(x, -r, r * 0.17, 0, TAU); c.fill();
+    } else if (nav === 'vit') {
+      // vita däcksidor och en stor kromad navkapsel (amerikanaren)
+      c.fillStyle = S.ton('#e9e7df');
+      c.beginPath(); c.arc(x, -r, r * 0.8, 0, TAU); c.fill();
+      c.fillStyle = '#121214';
+      c.beginPath(); c.arc(x, -r, r * 0.6, 0, TAU); c.fill();
+      c.fillStyle = f;
+      c.beginPath(); c.arc(x, -r, r * 0.54, 0, TAU); c.fill();
+      c.strokeStyle = S.G.mix(f, '#000000', 0.35);
+      c.lineWidth = r * 0.05;
+      c.beginPath(); c.arc(x, -r, r * 0.3, 0, TAU); c.stroke();
     } else {
       c.fillStyle = f;
       c.beginPath(); c.arc(x, -r, r * (nav === 'buss' ? 0.56 : 0.66), 0, TAU); c.fill();
@@ -921,8 +1105,9 @@ window.RumFasadGatan = (() => {
     }
   }
 
-  // Skärmarna som sitter för sig (Bubblan, Ankan): i lackens färg, ljusare upptill och med en mörk kant.
-  function skarmar(c, b, d) {
+  // Skärmarna som sitter för sig (Bubblan, Ankan) och kjolarna över bakhjulet (Ankan, BX): i lackens färg, ljusare
+  // upptill och med en mörk kant; kjolen nertill som karossen bakom (S, F: med stötlisten och den mörkare kanten).
+  function skarmar(c, b, d, S, F) {
     const P = vag(d);
     c.fillStyle = b.c;
     c.fill(P);
@@ -930,6 +1115,12 @@ window.RumFasadGatan = (() => {
     c.clip(P);
     c.fillStyle = b.cL;
     c.fillRect(-b.L, -120, 2 * b.L, 34);
+    if (F) {
+      c.fillStyle = F.kjol ? S.ton(F.kjol) : b.cM;
+      c.fillRect(-b.L, F.list[1], 2 * b.L, 60);
+      c.fillStyle = S.ton(F.listKrom ? '#b9bdc2' : '#18191c');
+      c.fillRect(-b.L, F.list[0], 2 * b.L, F.list[1] - F.list[0]);
+    }
     c.restore();
     c.lineWidth = 1.6;
     c.strokeStyle = b.cM;
@@ -942,6 +1133,19 @@ window.RumFasadGatan = (() => {
     const P = vag(F.kaross);
     const h = F.L / 2;
     under(c, b, S, [[F.fram[0], '255,240,210', 0.32], [F.bak[0], '255,60,40', 0.28]]);
+    if (F.oppen) {
+      // de som åker i den öppna bilen (före karossen, som täcker dem nedanför axlarna)
+      const fo = [F.forare];
+      if (b.passagerare) fo.push([F.forare[0] - 105, F.forare[1] + 2]);
+      fo.forEach(([x, y], i) => {
+        c.fillStyle = S.ton(b.klader[i]);
+        c.beginPath(); c.ellipse(x - 2, y + 24, 22, 16, 0, 0, TAU); c.fill();
+        c.fillStyle = S.ton('#d9b49a');
+        c.beginPath(); c.arc(x, y, 11, 0, TAU); c.fill();
+        c.fillStyle = S.ton(b.har[i]);
+        c.beginPath(); c.arc(x - 2, y - 2, 11, Math.PI * 0.55, Math.PI * 1.95); c.fill();
+      });
+    }
     c.fillStyle = b.c;
     c.fill(P);
     // (inom karossen: ljusare under rutorna, där himlen speglas, mörkare nertill och stötlisten)
@@ -962,6 +1166,10 @@ window.RumFasadGatan = (() => {
       c.restore();
     }
     if (F.flank) skarmar(c, b, F.flank);
+    if (F.sufflett) {
+      c.fillStyle = S.ton(F.dukFarg || '#2b2c2f');
+      c.fill(vag(F.sufflett));
+    }
     // rutorna: det mörka bandet, glaset, föraren och himlen i glaset
     c.fillStyle = S.ton('#141518');
     c.fill(vag(F.hus));
@@ -1073,8 +1281,8 @@ window.RumFasadGatan = (() => {
       c.fillRect(t0 + 4, ty, t1 - t0 - 8, 3);
     }
     for (const x of F.hj) ritaHjul(c, x, F.r, b.nav || F.nav, b.falg, -26, S, vrid);
-    // (Ankans kjol över bakhjulet)
-    if (F.efter) skarmar(c, b, F.efter);
+    // (kjolen över bakhjulet)
+    if (F.efter) skarmar(c, b, F.efter, S, F);
     // lyktorna: strålkastaren, blinkersen och baklyktan (bromsljuset lyser starkare)
     const [fx, fy, fw, fh] = F.fram;
     c.fillStyle = S.lamps ? '#fffbea' : '#ece6cf';

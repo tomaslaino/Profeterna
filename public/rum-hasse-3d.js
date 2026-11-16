@@ -5735,22 +5735,37 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const dx = hog ? 1180 : 1520;
     const sak = (g, x, y, z, vrid = 0) => { g.scale.setScalar(PCM); g.position.set(x, y, z); g.rotation.y = vrid * DEG; baren.add(g); return g; };
     const V3 = (x, y, z) => new THREE.Vector3(x / PCM, y / PCM, z / PCM);
-    if (namn === 'jul') {
+    const jul = namn === 'jul' || namn === 'nyar';
+    // (fler saker bredvid, längre åt höger; på höjden ryms de inte)
+    const ex = 1810;
+    if (jul) {
       // (på höjden lite lägre, under sidans namn och Tillbaka)
       sak(S.stjarna({ R: 13, snore: hog ? 50 : 40 }), fx, hog ? -40 : 100, GZ, -6);
       sak(S.ljusstake(), dx, T, DZ, -18);
+      if (!hog) {
+        sak(S.julbock(), ex + 130, T, DZ + 40, -32);
+        sak(S.halmstjarna({ R: 9, band: 45 }), 1500, 330, GZ);
+        sak(S.halmstjarna({ R: 7, band: 50 }), 1720, 160, GZ);
+      }
+      // (ballongerna bortom fönsterposten, så att de inte skymmer stjärnorna)
+      if (namn === 'nyar') sak(S.ballonger([[-5, 44, 0, '#d4a838'], [4, 50, 2, '#c8ccd2'], [0, 39, -4, '#1c1c22']]), hog ? 1330 : ex + 330, T, DZ + 80, 0).scale.multiplyScalar(0.85);
     } else if (namn === 'pask') {
       sak(S.agg([[-160, 360, 1.5], [0, 200, 1.7], [170, 300, 1.5], [330, 140, 1.6], [470, 280, 1.4]]
         .map(([x, y, k]) => ({ ...V3(fx - 200 + x, 900, GZ), ned: (900 - y) / PCM, k }))), 0, 0, 0);
       sak(S.paskris(), dx, T, DZ, -10);
+      sak(S.kycklingar([[-11, 5, 1.4, 0.5], [10, 3, 1.25, -0.4], [2, 11, 1.15, 0.1]]), dx, T, DZ, -10);
     } else if (namn === 'midsommar') {
       sak(S.vimplar([V3(-200, 520, GZ), V3(850, 520, GZ), V3(1866, 520, GZ)], { s: 6, b: 9, h: 12, mellan: 11 }), 0, 0, 0);
       sak(S.blommor(), dx, T, DZ, -10);
+      if (!hog) sak(S.stang(), ex, T, DZ + 30, -20);
     } else if (namn === 'kraftor') {
       sak(S.lyktor([V3(150, 470, GZ), V3(1000, 470, GZ), V3(1866, 470, GZ)], [[0.4, 9, 0], [0.59, 8, 1], [0.77, 9.5, 2], [0.94, 8, 0]], { s: 4 }), 0, 0, 0);
+      sak(S.kraftfat({ snaps: [16, -6] }), dx, T, DZ + 40, -15);
     } else if (namn === 'halloween') {
       sak(S.pumpa({ R: 12 }), dx, T, DZ, -12);
       sak(S.pumpa({ R: 7 }), dx + 330, T, DZ + 60, 20);
+      const fl = (x, y, k) => ({ ...V3(x, 900, GZ), ned: (900 - y) / PCM, k, vrid: ((x / 100) % 5 - 2) * 0.12 });
+      sak(S.fladdermoss((hog ? [[900, 250, 2.4], [1250, 380, 2]] : [[1050, 380, 2.4], [1300, 220, 2.8], [1560, 420, 2.2], [1760, 260, 2.6]]).map(([x, y, k]) => fl(x, y, k))), 0, 0, 0);
     }
     return { namn, hog, scen, baren };
   }

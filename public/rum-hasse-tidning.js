@@ -1027,8 +1027,8 @@ function folio(x, L, W, o, ytterst = null) {
 }
 
 // Omslaget (forsta i rum-tidning.js), Kalenderbladet: numret, veckan och priset maskinskrivna överst, namnet i
-// terrakotta, och under ett tryckt streck lördagens datum som ett kalenderblad, dagen stor mellan vad den gäller (Inför
-// Stryktipset) och månaden i två lika breda etiketter. Nertill devisen, kursiv under ett kort streck. Måtten är .hf-* i
+// terrakotta, och under ett tryckt streck omgångens datum som ett kalenderblad, dagen stor mellan vad den gäller (Inför
+// Stryktipset) och månaden i två lika breda etiketter (två dagar under varandra med & mellan). Nertill devisen, kursiv under ett kort streck. Måtten är .hf-* i
 // helgarderat.css. Utan tider står bara namnet och devisen.
 // Det ritas i omslagets egna mått (100 bred, i CSS-bildpunkter) och förstoras HK gånger, med typsnitten i sin storlek
 // där: Fraunces väljer formen efter storleken (opsz), och ritad direkt i 276 bildpunkter blev datumet tunt och skarpt,
@@ -1072,12 +1072,31 @@ function forstaHg(x, x0, o) {
   linje(x, mitt - 5.5, dy - 3.4, 11, 0.4, HG.tryck);
   const botten = dy - 3.4;
   if (o.blad) {
-    const h = 3.1 + 0.5 + 54 * 0.98 + 3.1;
+    const dagar = o.blad.dagar || [o.blad.dag];
+    // en dag stor (.hf-dag), två under varandra och mindre med & mellan två korta streck (.hf-dagar, .hf-och)
+    const df = dagar.length > 1 ? 33 : 54;
+    const dh = df * (dagar.length > 1 ? 0.95 : 0.98);
+    const of = 6.4;
+    const oh = -0.6 + of + 0.4;
+    const h = 3.1 + dagar.length * (0.5 + dh) + (dagar.length > 1 ? oh : 0) + 3.1;
     let cy = topp + (botten - topp - h) / 2;
     etikett(cy, o.blad.infor);
-    cy += 3.1 + 0.5;
-    skriv(x, o.blad.dag, mitt, cy + 0.85 * 54, FRA(54, 600), { sp: 1.6 / 54, farg: HG.tryck, lin: 'm' });
-    cy += 54 * 0.98;
+    cy += 3.1;
+    dagar.forEach((d, i) => {
+      if (i) {
+        cy += -0.6;
+        const t = o.blad.mellan || '&';
+        const w = bredd(x, t, FRA_K(of));
+        skriv(x, t, mitt, cy + 0.86 * of, FRA_K(of), { farg: HG.svart, lin: 'm' });
+        const s = (30 - w) / 2 - 2.4;
+        linje(x, mitt - 15, cy + of / 2 - 0.2, s, 0.4, HG.tryck);
+        linje(x, mitt + w / 2 + 2.4, cy + of / 2 - 0.2, s, 0.4, HG.tryck);
+        cy += of + 0.4;
+      }
+      cy += 0.5;
+      skriv(x, d, mitt, cy + (dagar.length > 1 ? 0.835 : 0.85) * df, FRA(df, 600), { sp: 1.6 / df, farg: HG.tryck, lin: 'm' });
+      cy += dh;
+    });
     etikett(cy, o.blad.manad);
   }
   x.restore();
