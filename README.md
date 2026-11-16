@@ -6552,6 +6552,11 @@ rum-inredning.js).
 Prövat i Chrome med mjukvarugrafik som dator (1440 × 900) på dagen och kvällen och som telefon: rummet byggs utan fel
 och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt ritas i dem.
 
+**Spotskenan togs bort (2026-11-16).** När takfläkten ersatte lysröret fick taket också en svart skena med fyra
+halogenspotar, men den passade inte in i rummet och togs bort samma kväll, i rummet som på fasaden och från Hasses bar.
+Ljuset den lade på löpsedlarna och uret finns kvar (`SPOTAR`, `SPOT.ur` och hålet i dunklet vid löpsedlarna): som de
+andra spotarna syns de inte, bara deras ljus.
+
 ### Ljuskäglorna och skärpedjupet (2026-11-15)
 
 Användarens önskemål: förslagen *Ljus som kommer någonstans ifrån* och *Skärpedjup som styr blicken*. Rummet var
