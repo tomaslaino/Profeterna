@@ -47,7 +47,7 @@
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|kupong|radio en närbild,
-// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr),
+// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr; ?rum-fasad-vem=inlines vilka som går förbi),
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
