@@ -35,10 +35,35 @@ export { dagens } from './rum-hasse-tidning.js';
 const DEG = Math.PI / 180;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const ss = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+// Nycklarna i klippen ([tid, värde]): en mjuk kurva genom dem, som händerna (nyckel i figuren). Där värdet
+// fortsätter åt samma håll efter en nyckel går det igenom den utan att stanna; där det vänder, står kvar och i
+// klippets båda ändar står det still, med samma mjuka in och ut som förut. Kurvan är monoton, så den går aldrig
+// förbi en nyckel. Förut började och slutade varje sträcka stilla: huvudet, kroppen, brynen och blicken
+// stannade upp en bråkdels sekund vid varje nyckel mitt i en rörelse, som en docka (ändrat 2026-11-16).
+const sparLut = (k, j) => {
+  if (j <= 0 || j >= k.length - 1) return 0;
+  const h0 = k[j][0] - k[j - 1][0];
+  const h1 = k[j + 1][0] - k[j][0];
+  if (h0 < 1e-6 || h1 < 1e-6) return 0;
+  const d0 = (k[j][1] - k[j - 1][1]) / h0;
+  const d1 = (k[j + 1][1] - k[j][1]) / h1;
+  if (d0 * d1 <= 0) return 0;
+  return (3 * (h0 + h1)) / ((2 * h1 + h0) / d0 + (h1 + 2 * h0) / d1);
+};
 const spar = (k, t) => {
   if (t <= k[0][0]) return k[0][1];
-  for (let i = 1; i < k.length; i++) if (t <= k[i][0]) return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * ss(k[i - 1][0], k[i][0], t);
-  return k[k.length - 1][1];
+  const n = k.length - 1;
+  if (t >= k[n][0]) return k[n][1];
+  let i = 1;
+  while (t > k[i][0]) i++;
+  const a = k[i - 1];
+  const b = k[i];
+  const h = b[0] - a[0];
+  if (h < 1e-6) return b[1];
+  const x = (t - a[0]) / h;
+  const x2 = x * x;
+  const x3 = x2 * x;
+  return (2 * x3 - 3 * x2 + 1) * a[1] + (3 * x2 - 2 * x3) * b[1] + h * ((x3 - 2 * x2 + x) * sparLut(k, i - 1) + (x3 - x2) * sparLut(k, i));
 };
 
 // Tiderna när han skriver på din kupong (s, i klippets tid): armen till pennan och greppet, pennan till
@@ -3661,15 +3686,18 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // bara sitter: samma klocka ger alltid samma bild (hash), men inget mönster går igen.
   const hash = (x) => { const s = Math.sin(x * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
   // Han blinkar ungefär var fjärde sekund, någon gång mellan 0,6 och 7,8 s isär och ibland två gånger
-  // i rad.
+  // i rad. Som en riktig blinkning: locket faller fort (70 ms) och går upp långsammare (ungefär 180 ms), och
+  // ibland går det inte ända ned. Förut lika fort ned som upp, i raka linjer, alltid hela vägen (ändrat 2026-11-16).
   const BLINK = 4.2;
+  const blink = (d, upp, djup) => (d < 0 ? 0 : d < 0.07 ? djup * ss(0, 0.07, d) : djup * (1 - ss(0.07, 0.07 + upp, d)));
   function blinkar(n) {
     const k = Math.floor(n / BLINK);
     let b = 0;
     for (let j = k - 1; j <= k; j++) {
       const d = n - (j * BLINK + hash(j * 7.3) * (BLINK - 0.6));
-      b = Math.max(b, 1 - clamp(Math.abs(d - 0.085) / 0.085));
-      if (hash(j * 3.7 + 1) < 0.22) b = Math.max(b, 1 - clamp(Math.abs(d - 0.4) / 0.085));
+      const upp = 0.15 + 0.08 * hash(j * 5.9 + 2);
+      b = Math.max(b, blink(d, upp, hash(j * 4.3 + 3) < 0.15 ? 0.7 : 1));
+      if (hash(j * 3.7 + 1) < 0.22) b = Math.max(b, blink(d - 0.38, upp, 1));
     }
     return b;
   }
@@ -3688,9 +3716,47 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     blickUt[1] = a[1] + (b[1] - a[1]) * f;
     return blickUt;
   }
-  // Huvudet driver långsamt (svängningar som inte går jämnt ut), och andningen byter takt och djup.
+  // Huvudet driver långsamt (svängningar som inte går jämnt ut), och andningen byter takt och djup. Ett andetag
+  // är inte en våg: in går fortare än ut, och efter utandningen vilar bröstet en stund (andetag, −1 … 1 över
+  // ett varv). Axlarna följer med lite, strax efter bröstet (rita). Förut gick bröstet upp och ned i en ren
+  // sinusvåg, och axlarna stod still (ändrat 2026-11-16).
   const drift = (n, a, b, c) => 0.6 * Math.sin(n * a) + 0.4 * Math.sin(n * b + 2) + 0.25 * Math.sin(n * c + 1);
-  const andning = (n) => 7 * (0.85 + 0.2 * Math.sin(n * 0.17 + 1)) * Math.sin(n * 1.45 + 0.9 * Math.sin(n * 0.21));
+  const andetag = (f) => { const u = f - Math.floor(f); return u < 0.36 ? 2 * ss(0, 0.36, u) - 1 : 1 - 2 * ss(0.36, 0.9, u); };
+  const andning = (n) => 7 * (0.85 + 0.2 * Math.sin(n * 0.17 + 1)) * andetag((n * 1.45 + 0.9 * Math.sin(n * 0.21)) / (2 * Math.PI));
+  // Skrattet i stötar, ha-ha-ha, ungefär fyra i sekunden men ojämnt, olika starka och ibland ett uppehåll när
+  // han drar efter andan; varje stöt kommer fort och klingar av (0–1). Förut skakade han i en jämn sinusvåg,
+  // axlarna, huvudet och händerna i samma takt och munnen i en annan (ändrat 2026-11-16).
+  const HA = 0.24;
+  function haha(n) {
+    const k = Math.floor(n / HA);
+    let v = 0;
+    for (let j = k - 1; j <= k; j++) {
+      if (hash(j * 6.7 + 4) < 0.13) continue;
+      const d = n - (j * HA + 0.07 * hash(j * 2.3 + 5));
+      v = Math.max(v, (0.55 + 0.45 * hash(j * 8.1 + 6)) * ss(0, 0.045, d) * (1 - ss(0.06, 0.2, d)));
+    }
+    return v;
+  }
+  // Stavelserna när han pratar (0–1, munnens öppning): ungefär fem i sekunden, olika långa och olika öppna;
+  // mellan dem går munnen mer eller mindre ihop (helt vid m, b och p), och mellan orden blir det korta
+  // uppehåll. Ibland är vokalen rundad (o, u, å: STAV.rund). Förut gick käken upp och ned i en jämn takt (|sin|,
+  // drygt två gånger i sekunden) och läpparna rundades i en egen långsam våg, som en docka (ändrat 2026-11-16).
+  const STAV = { L: 0.2, oppen: 0, rund: 0 };
+  const stavStart = (j) => j * STAV.L + 0.08 * hash(j * 1.7 + 9);
+  const stavOppen = (j) => (hash(j * 3.1 + 7) < 0.13 ? 0 : 0.3 + 0.7 * hash(j * 2.9 + 8));
+  // (mellan stavelse j och j + 1: hur mycket munnen går ihop, 0 = helt)
+  const stavMellan = (j) => Math.min(stavOppen(j), stavOppen(j + 1)) * (hash(j * 4.7 + 3) < 0.18 ? 0 : 0.25 + 0.35 * hash(j * 5.3 + 1));
+  function stavelse(n) {
+    let j = Math.floor(n / STAV.L);
+    if (n < stavStart(j)) j--;
+    const a = stavStart(j);
+    const b = stavStart(j + 1);
+    const u = (n - a) / (b - a);
+    const o = stavOppen(j);
+    STAV.oppen = u < 0.5 ? stavMellan(j - 1) + (o - stavMellan(j - 1)) * ss(0, 0.5, u) : o + (stavMellan(j) - o) * ss(0.5, 1, u);
+    STAV.rund = o > 0 && hash(j * 6.1 + 2) < 0.3 ? (0.5 + 0.5 * hash(j * 7.9 + 4)) * Math.sin(Math.PI * u) : 0;
+    return STAV;
+  }
   // Huvudet medan han pratar: förut i jämna vågor (en nick i sekunden, huvudet fram och tillbaka och brynen upp
   // och ned i var sin takt), som en metronom. Nu i slag som talet: huvudet går till ett nytt läge på en dryg
   // kvarts sekund och stannar där till nästa slag, ungefär var åttonde tiondels sekund; ungefär vart fjärde är ett
@@ -5271,6 +5337,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const st = v && v.styrka ? v.styrka : 1;
     const kan = (x) => spar(HUV[x], t) + d(x) * (st !== 1 && STYRS.has(x) ? st : 1);
     const skratt = ss(2.75, 3.05, t) * (1 - ss(4.25, 4.6, t));
+    // (skrattet i stötar som avtar, haha: axlarna och munnen först, huvudet och händerna strax efter)
+    const avtar = skratt * (1 - 0.4 * ss(3.3, 4.4, t));
+    const ha = avtar > 0.001 ? avtar * haha(n) : 0;
+    const haSen = avtar > 0.001 ? avtar * haha(n - 0.05) : 0;
     const talar = Math.max(tal, ss(5.55, 5.7, t) * (1 - ss(9.4, 9.6, t)));
     const dricker = d('dricker');
     // cigarren: i munnen, och när han blåser ut
@@ -5281,7 +5351,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // (talet i slag, talSlag)
     const ts = talar > 0.001 ? talSlag(n) : TALS;
     const yaw = YAW0 + 0.22 * (kan('yaw') + 0.1 * drift(n, 0.8, 0.37, 1.33) * (1 - iMun * 0.6) + talar * 0.24 * ts.yaw);
-    const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * (0.12 * ts.pitch + 0.34 * ts.nick) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
+    const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * (0.12 * ts.pitch + 0.34 * ts.nick) + 0.3 * (haSen - 0.3 * avtar) - dricker * 1.15);
     nick = pitch;
     const roll = -(kan('roll') + 0.012 * drift(n, 0.29, 0.61, 0.13) + talar * 0.03 * ts.roll);
     eu.set(pitch, yaw, roll, 'YXZ');
@@ -5296,10 +5366,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     h1.copy(HOFT).applyMatrix4(mr);
     mk.setPosition(HOFT.x - h1.x, HOFT.y - h1.y, HOFT.z - h1.z);
     U.uKropp.value.copy(mk);
-    const axV = kan('axV') + skratt * 5 * Math.sin(n * 15);
-    const axH = kan('axH') + skratt * 5 * Math.sin(n * 15);
+    // (axlarna följer andningen lite, strax efter bröstet)
+    const ax = 0.3 * andning(n - 0.2);
+    const axV = kan('axV') + ax + 9 * ha;
+    const axH = kan('axH') + ax + 9 * avtar * haha(n - 0.02);
     U.uAx.value.set(axV, axH);
-    U.uAndas.value = andning(n) + d('andas') + skratt * 5 * Math.sin(n * 15);
+    U.uAndas.value = andning(n) + d('andas') - 6 * (ha - 0.3 * avtar);
     const lyft = talar * 0.38 * ts.bryn;
     // (han blinkar med sitt högra öga, och det brynet går ned lite)
     const vink = d('vink');
@@ -5308,21 +5380,24 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // (nöjd, utom när brynen dras ned)
     const allvar = clamp(-(d('brynX') + d('brynY')) * 0.7);
     U.le.value = Math.max((NOJD + NOJD_TAL * talar) * (1 - allvar) * (1 - d('stel')), skratt * 0.85, 0.85 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
-    // talet: stavelser med små pauser, ibland rundare läppar; läpparna skiljs åt hela tiden han pratar och
-    // öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
-    const stav = Math.abs(Math.sin(n * 7.3)) * (0.42 + 0.58 * ss(-0.35, 0.5, Math.sin(n * 2.3 + 0.7))) * (0.72 + 0.28 * Math.sin(n * 17.3));
+    // talet: stavelser med små pauser, ibland rundare läppar (stavelse); läpparna skiljs åt hela tiden han pratar
+    // och öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
+    const stav = stavelse(n);
     const talMun = (mun === null ? talar : mun) * (1 - dricker) * (1 - Math.max(iMun, blaser));
     // läpparna om cigarren, en pust mellan blossen och ett o när han blåser ut
     const puff = cc ? spar(cc.pust, t) : 0;
-    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.44 + 0.08 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
-    U.rund.value = talMun * Math.max(0, Math.sin(n * 3.1 + 1.3)) * 0.8;
+    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav.oppen), skratt * 0.36 + 0.16 * ha, ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
+    U.rund.value = talMun * stav.rund * 0.8;
     U.kis.value = Math.max(skratt * 0.7, U.le.value * 0.5, d('kis'));
     // blinkningarna och blicken som flyttar sig lite (blinkar, sakkader)
     const bl = blinkar(n);
     const sk = sakkader(n);
     U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser, d('rund'));
-    U.blund.value = Math.max(dricker * 0.82, skratt * 0.3, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
-    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], d('blickY') + sk[1]);
+    // (övre locket följer blicken nedåt, som hos alla: förut stod ögonen vidöppna när han tittade ned, och det
+    // vita syntes ovanför irisen, ändrat 2026-11-16)
+    const blickY = d('blickY') + sk[1];
+    U.blund.value = Math.max(dricker * 0.82, skratt * 0.3, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'), clamp(blickY * 0.05, 0, 0.35));
+    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], blickY);
     sa.copy(SA);
     sa.y += axV;
     sa.x -= axV * 0.25;
@@ -5399,8 +5474,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       a.w.x += k * 10;
       a.F.z += k * 0.25;
     }
-    a.w.y += skratt * 7 * Math.sin(n * 15);
-    b.w.y += skratt * 7 * Math.sin(n * 15 + 1);
+    a.w.y += 12 * (haSen - 0.3 * avtar);
+    b.w.y += 12 * avtar * (haha(n - 0.08) - 0.3);
     const fA = kl && kl.fA;
     const fB = kl && kl.fB;
     if (fA) svang(fA, t, a);

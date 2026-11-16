@@ -1629,6 +1629,17 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ögonen kisar med och skrattrynkor syns i ögonvrårna. Han ler lite mer när han pratar, skrattet har
   kisande ögon i stället för en rak tandrad, och i vilan myser han ibland eller blinkar åt en. Se
   [Hasse Backe](#hasse-backe), *Minen* och *Vilan*.
+- **Hasse Backe rör sig mer som en människa (2026-11-16, användarens önskemål):** "Kan du göra så att hasse ser
+  mer naturlig ut i sina rörelser - så att det inte är helt uppenbart att han är en animerad figur". Det som
+  avslöjade honom var det som gick i jämn takt eller stannade tvärt. Huvudet, kroppen, brynen och blicken
+  stannade upp vid varje nyckel mitt i en rörelse, som en docka (händerna slapp det redan 2026-11-13); nu går de
+  igenom nycklarna i en mjuk kurva och står bara still där rörelsen vänder. Käken gick upp och ned drygt två gånger
+  i sekunden i jämn takt när han pratade; nu kommer stavelserna ungefär fem i sekunden, olika långa och öppna, med
+  läpparna ihop ibland och korta uppehåll mellan orden. Skrattet var en jämn sinusvåg i axlarna, huvudet och
+  händerna; nu kommer det i ojämna stötar, ha-ha-ha, som avtar, med munnen i samma takt som axlarna och huvudet och
+  händerna strax efter. Han blinkar som folk gör, med locket som faller fort och går upp långsammare, och ibland
+  bara halvvägs; övre locket följer blicken när han tittar ned; och andetagen går in fortare än ut, med en vila
+  efter, och axlarna följer med. Se [Hasse Backe](#hasse-backe), *Rörelserna*, *Minen* och *Vilan*.
 - **Hasse Backe snyggare och mindre buggig (2026-11-06, användarens önskemål):** armarna såg ut som
   uppblåsta korvar, med en ballong till armbåge när han böjde dem; händerna var för små och orangea
   bredvid ansiktet, med grå smuts mellan fingrarna och naglar som laxrosa klistermärken; handen gick rakt
@@ -7920,6 +7931,11 @@ sin bit av tidslinjen. Varje klipp börjar och slutar där han står (i vilan, e
 disken när han pratar) och har sina egna nycklar för huvudet, kroppen, ansiktet och armarna
 (`RORELSER`), så att ett nytt klipp bara behöver det som händer i det. Klippen i samma grupp (domen,
 kaffet, cigarren, småsakerna, talet) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+Mellan nycklarna går allt i en mjuk kurva (`spar` för huvudet, kroppen, ansiktet och sakerna, `nyckel` för
+händerna): fortsätter värdet åt samma håll efter en nyckel går det igenom den utan att stanna, och där det vänder
+eller står kvar står det still, med mjukt in och ut. Kurvan går aldrig förbi en nyckel. Förut började och slutade
+varje sträcka stilla, så att han stannade upp en bråkdels sekund vid varje nyckel mitt i en rörelse, som en docka
+(händerna ändrade 2026-11-13, resten 2026-11-16).
 
 **Minen.** Han är nöjd och säker på sin sak, lite överdrivet: hakan lite upp, huvudet nästan rakt, båda
 brynen lite uppe och ett leende som når ögonen, i vilan och när han pratar (`HUV` och `NOJD` i
@@ -7946,6 +7962,16 @@ mörkröd i stället för nästan svart och de nedre tändernas kant syns. I skr
 (0,7 och blund 0,3). Jämför alltid ansiktet i skrattet (T 3,5), skålen (T 155,8) och talet innan
 leendet ändras.
 
+Skrattet kommer i stötar, ha-ha-ha, ungefär fyra i sekunden men ojämnt: stötarna är olika starka, ibland
+blir det ett uppehåll när han drar efter andan, och de avtar mot slutet (`haha`). Varje stöt lyfter axlarna
+och öppnar munnen lite mer, samtidigt, och huvudet och händerna följer strax efter. Förut skakade axlarna,
+huvudet och händerna i en jämn sinusvåg, och munnen i en annan takt (ändrat 2026-11-16).
+
+När han pratar kommer stavelserna ungefär fem i sekunden, olika långa och olika öppna; mellan dem går munnen
+mer eller mindre ihop, helt ibland (m, b, p), och mellan orden blir det korta uppehåll. Ibland är vokalen rundad
+(`stavelse`). Förut gick käken upp och ned drygt två gånger i sekunden i jämn takt, och läpparna rundades i en
+egen långsam våg (ändrat 2026-11-16).
+
 **Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
 aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
 sju och en halv sekund isär och ibland två gånger i rad (`blinkar`); blicken flyttar sig lite med en
@@ -7955,6 +7981,13 @@ i svängningar som inte går jämnt ut (`drift`), och andningen byter takt och d
 går igen. Förut blinkade han exakt var 4,3:e sekund, huvudet vaggade och bröstet hävde sig i
 rena sinusvågor, och det enda han gjorde mellan kaffet och cigarren var att trumma, likadant varje gång
 (ändrat 2026-11-06).
+
+Blinkningen är som en människas: locket faller på 70 ms och går upp långsammare, på 150–230 ms, och ungefär
+var sjunde gång går det bara en bit ned. Övre locket följer blicken nedåt, så att ögonen inte står vidöppna när
+han tittar ned på notan eller kupongen. Ett andetag är ingen våg: han andas in fortare än ut och vilar en
+stund efter utandningen, och axlarna följer bröstet lite, strax efter. Förut blinkade han lika fort ned som upp,
+alltid hela vägen, locken stod kvar när han tittade ned, bröstet gick i en ren sinusvåg och axlarna stod still
+(ändrat 2026-11-16).
 
 Var 5–11:e sekund gör han något litet (`SMATT` i [public/rum-hasse.js](public/rum-hasse.js)), lottat utan
 att samma sak kommer två gånger innan allt har varit med, och fingrarna dubbelt så ofta som det andra.
