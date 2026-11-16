@@ -58,7 +58,7 @@ import fr from '../../config/forra.js';
 import kupongCfg from '../../config/kupong.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
 import { lasForum, taUtForum, lasningsNyckel, forumPoster, forumenAv, provaForum, fragaEfterForum, forumSkaLetas, Sparrad } from '../../src/analyser/forum.mjs';
-import { letaArtiklar, lasArtikel, nyaArtiklar, lastaAvAndra, renAdress, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
+import { letaArtiklar, bingSokord, lasArtikel, nyaArtiklar, lastaAvAndra, renAdress, taUtMedia, mediaPoster, laggTill, Sparrad as MediaSparrad } from '../../src/analyser/media.mjs';
 import { letaForra, lasForraSida, forraSkaLetas, kandaNya } from '../../src/analyser/forra.mjs';
 import { senasteTid, nastaTid, egenTid } from '../../src/analyser/tider.mjs';
 import { provaOmgangen, kallornasTraff, traffText } from '../../src/analyser/traff.mjs';
@@ -344,7 +344,14 @@ async function lasMedierna(fil, lagen, { cfg = mc, vad = 'de insatta medierna' }
     post.avspark = l.avspark;
     try {
       const andras = lastaAvAndra(post, { cfg });
-      const hittade = (await letaArtiklar({ lag: l.lag, mot: l.mot, avspark: l.avspark, cfg })).filter((a) => !andras.has(renAdress(a.adress)));
+      // Landslagen och lagen utanför England söks i Bing News på sitt eget språk (config/utland.js): hur tas fram en
+      // gång per motståndare och sparas i lagets post.
+      let sok = null;
+      if (cfg.sokordPrompt) {
+        sok = post.sokord && post.sokord.mot === l.mot ? post.sokord : await bingSokord({ lag: l.lag, mot: l.mot, avspark: l.avspark, cfg }).catch(() => null);
+        if (sok && sok !== post.sokord) post.sokord = { mot: l.mot, ...sok };
+      }
+      const hittade = (await letaArtiklar({ lag: l.lag, mot: l.mot, avspark: l.avspark, cfg, sok })).filter((a) => !andras.has(renAdress(a.adress)));
       if (!hittade.length) { logg(`${l.lag}: inga artiklar i ${vad}`); continue; }
       const lasta = [];
       for (const a of hittade) {

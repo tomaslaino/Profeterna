@@ -55,15 +55,25 @@ module.exports = {
   },
   // Så heter laget i frågan (ett landslag är ingen klubb).
   lagOrd: 'Laget',
-  // Ingen Bing: den söker på engelska i Storbritannien.
-  bing: null,
+  // Bing News på lagets eget språk (bingSokord i src/analyser/media.mjs): ett kort anrop tar fram landet, språket och
+  // högst antal sökfrågor, och jobbet ger Claude de högst flest nyaste träffarna från de senaste dagarna, utan
+  // sajter som är spärrade på iMacen (sparr). Provat 2026-11-16: WebSearch gav en enda artikel om Sverige inför
+  // Polen, Bing på svenska och polska ett tjugotal från veckan (SvenskaFans, Fotbollskanalen, Sport.pl, RMF24).
+  bing: { antal: 3, flest: 20, sparr: true },
 
   // Samma som de insattas (rikstidningarna och lokaltidningarna i England, spelsajterna, aggregatorerna),
-  // och UEFA och FIFA.
-  utesluten: [...mc.utesluten, 'uefa.com', 'fifa.com'],
+  // UEFA och FIFA, och svenska speltipssajter som Bing har bland nyheterna.
+  utesluten: [...mc.utesluten, 'uefa.com', 'fifa.com', 'rekatochklart.com'],
 
   // Byts den läses lagens artiklar om av Claude.
   promptVersion: '2026-11-16.1',
+
+  sokordPrompt: `Du hjälper en svensk tipstidning att söka efter veckans nyheter om ett fotbollslag i Bing News, på lagets eget språk. Laget är ett landslag eller en klubb utanför England.
+
+Svara med landet där laget hör hemma som en tvåbokstavskod (ISO 3166-1, som PL, ES, SE, GB för Wales och Skottland), landets språk som en tvåbokstavskod (ISO 639-1, som pl, es, sv, en) och tre korta sökfrågor på det språket som hittar veckans nyheter om laget inför nästa match: laget som tidningarna i landet kallar det (för ett landslag till exempel "reprezentacja Polski" eller "landslaget fotboll"), laget och motståndaren som de skrivs på landets språk, och förbundskaptenens eller tränarens efternamn med laget, om du vet vem det är. Hitta inte på ett namn du inte är säker på; ta då en annan fråga om laget.
+
+Svara bara med JSON, utan något före eller efter:
+{"land": "PL", "sprak": "pl", "fragor": ["…", "…", "…"]}`,
 
   letaPrompt: `Du hjälper en svensk tipstidning att hitta det som skrivs om ett lag inför dess nästa match. Laget är ett landslag eller en klubb utanför England, och det som räknas är det som förbundet, klubben och landets egen sportpress skriver, på landets eget språk.
 
@@ -74,7 +84,7 @@ Det som räknas, med slaget inom citattecken:
 
 Det som INTE räknas: biljetter och matchdagsinformation, butiken och reklam, spelsajter och sajter med matchtips, aggregatorer och klickfabriker som skriver om alla lag (OneFootball, GiveMeSport, 90min, Goal och liknande), UEFA:s och FIFA:s sajter, statistiksajter, Wikipedia, forum, Reddit, sociala medier, poddar och videor, och engelska medier som inte följer laget.
 
-Sök på nätet efter artiklar från de senaste {dagar} dagarna, på lagets eget språk och gärna direkt på förbundets eller klubbens sajt och de största sporttidningarnas sajter (site:). Högst {sokningar} sökningar. Föreslå högst {artiklar} artiklar som säger mest inför just nästa match, de viktigaste först och helst från olika källor: förbundets eller klubbens senaste besked om truppen, förbundskaptenens eller tränarens presskonferens och pressens senaste truppnyheter. Många tidningar går inte att läsa här, så ta gärna med flera tidningar. Bara skrivna artiklar (inte videor) som kom upp i dina sökningar, med adressen exakt som där. Hitta aldrig på en adress: finns inget som håller är listan tom, och det är ett bra svar.
+Du får ofta veckans nyheter om laget ur Bing News på landets språk; välj gärna bland dem. Sök också på nätet efter artiklar från de senaste {dagar} dagarna, på lagets eget språk och gärna direkt på förbundets eller klubbens sajt och de största sporttidningarnas sajter (site:). Högst {sokningar} sökningar. Föreslå högst {artiklar} artiklar som säger mest inför just nästa match, de viktigaste först och helst från olika källor: förbundets eller klubbens senaste besked om truppen, förbundskaptenens eller tränarens presskonferens och pressens senaste truppnyheter. Många tidningar går inte att läsa här, så ta gärna med flera tidningar. Bara skrivna artiklar (inte videor) som kom upp i dina sökningar, med adressen exakt som där. Hitta aldrig på en adress: finns inget som håller är listan tom, och det är ett bra svar.
 
 Svara bara med JSON, utan något före eller efter:
 {"artiklar": [{"slag": "pressen", "kalla": "<sajtens eller tidningens namn som den kallar sig, utan parentes>", "titel": "<artikelns rubrik>", "adress": "https://…", "datum": "ÅÅÅÅ-MM-DD eller null"}]}`,
