@@ -6967,9 +6967,18 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   och *L2* när de hela namnen inte ryms, och då står namnet under strecket); ←/→ bläddrar mellan
   divisionerna. Samma dag ville användaren att underkategorierna skulle vara logiska – med bara
   divisionerna syntes spelarna först inne i ett lag – och valde det här upplägget före att
-  behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på divisionen
-  som har flest lag i omgången. *LAG* är divisionens lag i bokstavsordning (två spalter på
-  datorn), de i omgången ljusa, och ett lag öppnar **lagkortet** med truppen. *SPELARE* är
+  behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på Premier
+  League (sedan 2026-11-16, användarens val; förut på divisionen med flest lag i omgången, vilket
+  gav NL under landslagsuppehållen). *LAG* är divisionens tabell (sedan 2026-11-16, användarens
+  önskemål: "ordna så att tabellerna dyker upp snyggt när man klickar i PL, CH osv."; till dess
+  stod lagen i bokstavsordning): platsen, laget, spelade, V O F, målen, målskillnaden och
+  poängen, och sist formen i ligan (de fem senaste, senaste först) – V O F, målen och formen när
+  raden ryms, så i telefonen plats, lag, S V O F, +/- och poäng, och rummets korta namn när det
+  hela inte ryms. Underraden och rubrikerna står still medan lagen rullar. Ett tunt streck går
+  där zonen byts (ESPN:s `note`, samma zoner som på Tabeller), zonerna står med sina platser
+  under tabellen, och ett poängavdrag har * efter poängen. Hela raden öppnar **lagkortet** med
+  truppen (↑/↓ och Enter också). Med dolda resultat står lagen i bokstavsordning – ordningen
+  skulle avslöja resultaten – med ? i stället för talen och *Visa ändå* under skärmen. *SPELARE* är
   divisionens spelare från A till Ö (efternamnet) med plats, lag, speltid och mål, och läget
   (skadad, avstängd) sist när raden ryms: samma spelare som i trupperna, de som har spelat och de
   skadade. En spelare öppnar **spelarkortet** (nedan), och Esc går tillbaka till samma ställe i
@@ -7100,7 +7109,9 @@ står kvar bara på tv:n. Samma tal under samma namn och i samma ordning som kol
 - **Talets lista** (`#lista:lag:pl:skapar`, `#lista:spelare:ch:assist`): divisionens lag eller spelare
   ordnade efter talet, med numret bara på den första vid lika tal (som skytteligan på tv:n), registrets rad med
   divisionerna överst (de ger samma lista där) och ←/→ till förra och nästa tal. Spelarlistan har dem som har spelat,
-  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna).
+  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna). Sedan
+  2026-11-16 är listan en rankning med en stapel per rad, och platsen efter ett tal leder dit (se
+  [Rankningen](#rankningen) nedan).
 - **Matchakten** har också matchsidans rader ur matchens fil: *Matcher 14 d* (med Europacuperna), *Hemma* och *Borta*
   (V–O–F), *Nollor*, *Utan mål*, *På mål*, *Mål mot xG* och *Insl. mot xG*, lagens främsta i *Assist* och *Segermål*
   (*Gula kort* där målens sort saknas) och *Domaren* med gula kort, frisparkar och hemmasegrar mot divisionens snitt.
@@ -7134,8 +7145,8 @@ som finns för dem: matchens fil och [data/landslag.json](#landskamperna).
 - **Registret** har en post till efter divisionerna, *NL* (*Nations League*): grupperna med
   tabellen (plats, spelade, V O F när raden ryms, målskillnad och poäng; två spalter på datorn).
   Grupperna med lag i kupongen står först under *I kupongen*, med lagen ljusa, och sedan *De
-  andra grupperna* A1–D2. Registret öppnar där när landslagen är flest i omgången (som
-  divisionerna). *Spelare* är svagt där – landslagens trupper finns inte.
+  andra grupperna* A1–D2. Registret öppnar på Premier League också när landslagen spelar;
+  NL nås med →/← eller underraden. *Spelare* är svagt där – landslagens trupper finns inte.
 - **Lagkortet** för ett landslag: omgångens match, gruppen och tabellraden, formen, Nations
   League hittills (V-O-F och mål), alla landskamper sedan hösten 2024, nästa match och de tio
   senaste landskamperna med tävling, hemma eller borta, resultat och utfall. ←/→ bläddrar
@@ -7225,6 +7236,35 @@ matchen var i Europa står under VILAN. Mätarnas rutor går nu jämnt upp i bre
 VT323 är en bråkdel bredare än `1ch`, och en ruta till skymtade fram som ett tunt streck efter
 mätarna, också i lagkorten.
 
+#### Rankningen
+
+2026-11-16 ville användaren att platserna efter talen (*4:E*, *12:E*) skulle gå att trycka på och leda till "en
+sida med rankingen för de respektive siffrorna snyggt visualiserade som man sen lätt kan ta sig tillbaka ifrån" –
+för alla tal, både lagens och spelarnas. Mätaren och platsen efter ett tal i lagkortet och spelarkortet (också
+*Poäng* under formen) är nu en tryckbar bit, och platsen efter *Styrka*, *Motståndet* och *Mot oddsen* i matchakten
+likaså (`#plats:lag:pl:styrka:Arsenal` i [public/rum-register.js](public/rum-register.js), `platsQ`). Den leder till
+talets lista, som blev en rankning:
+
+- **Staplarna**: efter talet står en stapel lika lång som talet – från noll till listans högsta, och när någon har
+  minus (*Tur*, *Styrka*, *Mot oddsen*) från en mittlinje åt båda hållen, så att man ser avstånden och inte bara
+  ordningen. De tomma rutorna efter stapeln är skalan, som mätarna i korten; en verklig skillnad syns som minst en
+  ruta, noll som ingenting. Talen där lägst är bäst (*Insläppta*, *Släpper till*) har staplar efter talet ändå,
+  så de kortaste står överst.
+- **Den man kom ifrån** är markerad: namnet omvänt, platsen, talet och stapeln ljusa i ett svagt band, de andras
+  staplar svaga, och raden en tredjedel ner i rutan. Under rubriken står platsen i klartext (*ARSENAL 13:E AV
+  20*). Från matchakten markeras båda lagen (*CHELSEA 10:E · ARSENAL 7:E AV 20*), med det man tryckte på först.
+  Vid lika tal står numret alltid på den markerade raden, annars bara på den första. *Hela listan* i
+  förklaringsrutan markerar kortets lag eller spelare (i matchakten båda lagen) på samma sätt.
+- **Rubriken står still** (divisionerna, talets namn och platsen) medan listan rullar, och ←/→ bläddrar till
+  förra och nästa tal med samma markering.
+- **Tillbaka**: Esc (*◄ Tillbaka* i telefonen) går tillbaka till kortet eller matchakten, i samma flik och lika
+  långt rullat. Ett lag eller en spelare i rankningen öppnar kortet i fliken där talet står.
+
+Spalterna följer bredden: på datorn hela lagnamnet och spelarens lag, i telefonen de korta namnen och en kortare
+stapel (spelarens lag bara när stapeln ändå får minst sex rutor). Med ↑/↓ markeras mätaren och platsen i korten som
+en rad. Platserna som säger var ett lag står i tabellen (formens motståndare, gruppen i Nations League) leder inte
+hit: tabellen står på tv:n.
+
 #### Vad som står var
 
 Statistiken om omgången är fördelad efter vad varje sak är bra på, och varje siffra står på
@@ -7234,7 +7274,7 @@ med flit (nedan):
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom tabellen och skytteligan: laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom skytteligan (tabellerna sedan 2026-11-16, under *LAG*): laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
