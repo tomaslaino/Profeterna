@@ -1332,6 +1332,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   lyktornas och fönstrens sken i stället för att alla är svarta siluetter. Gatan är glesare efter halv sju (`RumUte.trafik`:
   sju gående på dagen, fem till åtta, tre till tio och två sent, en till på fredag och lördag): en regnig måndagskväll
   20.30 syns i snitt en i taget i stället för nästan tre, och halva tiden är trottoaren tom.
+- **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
+  i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
+  (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
+  där på väggen rakt fram och kör bröstpanel av samma trä på sidoväggen". Furun på bakväggen är som förut. Den
+  nikotingula högra väggen har fått ljus konfettitapet (turkos, lila, cerise, gult och blått), en marinblå bård med
+  harlekintrianglar mellan guldkanter precis under Tipsligan och en bröstpanel i bakväggens furu med en list
+  överst, som syns mellan bården och bardisken. Tapeten fortsätter upp i taket i telefonen och i videohörnet. Se
+  [Tobaksaffären](#tobaksaffären).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4419,7 +4427,12 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet. Ett klick
   → ut genom dörren, och affären utifrån med gänget i fönstret (se [Fasaden](#fasaden)).
 
-Högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
+Högra väggen är tapetserad (`hogerVagg` och `TAPET` i rum.js, sedan 2026-11-16): konfettitapet, en
+bård med harlekintrianglar på brösthöjd och under den en bröstpanel i samma furu som bakväggen, ritade i
+väggens plan så att bräderna och trianglarna står tätare in mot hörnet. Samma vägg ritas i taket
+(telefonen) och i videohörnet (`vaggSvg` i rum-video.js får den från rum.js).
+
+Sakerna på högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
 pokalhyllan mellan tv:n och datorn på disken (där hängde anslagstavlan till 2026-11-14), i mitten
 korktavlan och längst ut Tipsligan, med videon och lådan med kassetter på disken under. Tavlorna har
 samma mitt på höjden. Pokalerna är runda och ser likadana ut hur snett väggen än syns; en platt tavla
