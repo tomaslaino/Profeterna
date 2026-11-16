@@ -6770,8 +6770,26 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   Ibland (i ungefär sex av tio varv om 170 s, inte
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
   13 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
-  gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna på gatan bakom en syns som speglingar som far förbi i glaset
+  gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna syns också som speglingar som far förbi i glaset
   och dörren: mörka skuggor på dagen, strålkastare och baklyktor i mörkret.
+- **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
+  ([public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), `RumFasadGatan`): trottoarkanten i granit 0,88 m ut,
+  rännstenen med gatsten och en brunn (bäcken från stupröret slutar där), asfalten med mittlinjen, höstlöv i
+  rännstenen, slask med hjulspår och en plogvall längs kanten när det har snöat och, i en telefon på höjden, kanten
+  mittemot och trottoaren där man själv står. Då och då kör det förbi, och då täcker de affären – bussarna nästan
+  helt: nittiotalsbilar (Volvo 240 kombi med takräcke och stänkskydd, 740, Saab 900, Golf, en skåpbil och taxi med
+  skylten på taket), de röda bussarna (trean och 77:an) och den blåa ledbussen fyran med slutstationen på skylten, och
+  plogbilen med blinkljus när det har snöat. Högertrafik: den bortre filen kör åt vänster, den närmre åt höger.
+  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 1 % av tiden mitt i natten, 9 % på dagen och 25 % i
+  rusningen), och i rusningen ibland en kö mot ljuset vid bron: bilarna bromsar in, står med bromsljusen tända (och
+  avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
+  baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
+  regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
+  när det har snöat. Allt räknas ur tiden: den delas i luckor om nio sekunder per fil och i varje lucka kommer ett
+  fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon är
+  ute ur världen innan nästa kommer, så ingen kör igenom någon. Fordonen ritas med vektorer (inga bilder) i `rf-fram`
+  efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
+  sekunden (30 i telefonen), så att de inte hoppar fram.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -6781,7 +6799,7 @@ och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
 bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
 ritas om när ljuset eller vädret ändras (en gång i minuten prövas det). Det som rör sig ritas i tre dukar: `rf-fram`
-överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, regnet, snön och blixten; i
+överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner

@@ -2511,7 +2511,8 @@ window.RumFasad = (() => {
   }
 
   // Det framför, en bild: speglingarna av dem som går i den våta stenen (tonade nedåt), bilarna i glaset,
-  // de som går och den som har stannat, regnet, snön och blixten. Syns inget som rör sig töms duken en gång.
+  // de som går och den som har stannat, bilarna och bussarna på gatan (rum-fasad-gatan.js), regnet, snön och
+  // blixten. Syns inget som rör sig töms duken en gång.
   function ritaFram(R, t) {
     const { V, L } = R;
     const c = R.fram;
