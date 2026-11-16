@@ -1580,6 +1580,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   doften, skål och lillfingret ut. Medan han väntar på att man ska välja tar han kaffet och cigarren
   varannan gång; förut tog han då bara cigarren, så kaffet kom bara medan han låtsades läsa på. Se
   [Hasse Backe](#hasse-backe), *Kaffet*.
+- **Hasse Backe dricker kaffe på tio sätt (2026-11-16, användarens önskemål):** "Kan du ge hasse fler
+  kaffedrickarrörelser?" Fyra nya, som han lottar bland med de sex gamla: han tänker med koppen vid bröstet och
+  tar en klunk när han kommer på det (`tanke`), kaffet har kallnat och han grimaserar, fnyser och rycker på
+  axlarna men dricker ändå (`kallt`), koppen stannar halvvägs och han pekar med den mot en och blinkar (`halvvags`),
+  och han skålar mot någon längs baren (`halsa`). Koppen har två nya lägen för det, framhållen mot en och lyft
+  mot baren. Se [Hasse Backe](#hasse-backe), *Kaffet*.
 - **Hasse Backe fyller i din kupong (2026-11-05, användarens önskemål):** han får samma kupong som
   ligger på pulten, med samma grafik och det du redan har fyllt i, och fyller i den med pennan: lite slarvigt,
   men självklart. Du väljer 1, X eller 2, stort, direkt eller efter analysen, och efter en analys tar han
@@ -8009,7 +8015,7 @@ nickar när den träffar. Vid varje slag rycker hela bilden till, mer ju hårdar
 [public/rum-hasse.css](public/rum-hasse.css)), och det som står på disken hoppar: koppen studsar
 på fatet, lägre för varje gång, fatet och askkoppen lite och cigarren i urtaget (`hoppar`).
 
-**Kaffet.** Han dricker på sex sätt, och han överdriver och njuter: en ordentlig klunk med slutna
+**Kaffet.** Han dricker på tio sätt, och han överdriver och njuter: en ordentlig klunk med slutna
 ögon, och sedan smackar han och säger mmm med höjda bryn och ett brett leende medan huvudet vaggar
 (`klunk`); blåser på kaffet tre gånger med koppen under hakan, så att ångan far bort från honom,
 smakar försiktigt och rycker till av värmen, och tar sedan en riktig klunk och ett långt *ah* med
@@ -8018,11 +8024,19 @@ ur den i ett svep, tittar förvånat ned i den tomma koppen och ställer ned den
 håller koppen under näsan och drar in doften länge med slutna ögon, så att ångan sugs mot näsan och
 bröstet häver sig, och tar sedan en liten klunk (`dofta`); skålar med en, tar en stor klunk och
 ställer ned koppen med en smäll och ett *ah* (`skal`); eller dricker fint med lillfingret ut och
-näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`).
+näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`). Han kan också
+tänka med koppen vid bröstet, titta bort ut i affären och snurra den sakta med rynkad panna, och när han
+kommer på det åker brynen upp, han nickar och tar en klunk på saken (`tanke`); smaka och stanna med
+koppen vid läppen, för kaffet har kallnat: han grimaserar, tittar misstänksamt ned i koppen, fnyser,
+rycker på axlarna med en pust och dricker vidare ändå, med ett snett leende (`kallt`); stanna halvvägs
+till munnen när han kommer på något och peka med koppen mot en, två små knyck och två nickar – visst är
+det så? – och en blinkning innan han dricker (`halvvags`); eller få syn på någon längs baren och skåla
+mot honom med en nick innan han vänder sig tillbaka och dricker (`halsa`).
 
 Det är koppen som styr, som med cigarren (`kaffeArm` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
 dess läge räknas fram (på fatet; vid läppen och under näsan i huvudets mått, så att den följer med när
-han lutar huvudet bakåt; under hakan, framför bröstet och upplyft mot en i kroppens), och handen sitter
+han lutar huvudet bakåt; under hakan, framför bröstet, upplyft mot en, framhållen mot en och lyft mot
+baren i kroppens), och handen sitter
 i örat med samma grepp hela vägen, fingrarna mot koppen och handflatan mot honom. Vid fatet pekar örat
 bort från honom, så där håller han det bakifrån, med fingrarna genom örat och tummen ovanpå, och handen
 vrids runt örat till greppet medan han lyfter koppen (`GREPP_FAT`). När han dricker lutas
@@ -8854,6 +8868,12 @@ Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugra
 den sugs mot näsan), och koppens och handens förflyttning mellan varje hundradels sekund (inga hopp,
 och båda exakt tillbaka i vilan när klippet slutar). Inte provat i hela sidan, i Safari eller i en
 riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara genomläst.
+
+De fyra nya sätten att dricka kaffe (2026-11-16) är provade i headless Chromium med mjukvarugrafik, figuren ensam i
+1100 × 760: nyckelögonblicken i varje klipp som bilder (koppens nya lägen flyttades efter dem: framhållen högre
+upp, och lyft mot baren framför hakan i stället för vid den vänstra axeln), varje klipp bild för bild utan fel,
+och ljuden (klirret på fatet, fnysningen och pusten). Inte provat i hela sidan, på höjden, i Safari eller i en
+riktig telefon.
 
 Förslaget att fylla i kupongen (2026-11-07) är provat i headless Chromium med mjukvarugrafik i hela sidan, med en
 påhittad omgång från kupongtjänsten och tre matcher i `data/matches.json` (bygget i provet kunde inte hämta något),
