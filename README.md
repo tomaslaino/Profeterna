@@ -1300,6 +1300,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   grafik för sämre datorer/mobiler". Foten i marken står still mot stenen, höften gungar, knät och fotleden böjs och
   armarna pendlar; allt i samma duk som förut, ungefär 4 µs mer per figur och bild. Se *Det som händer ute* under
   [Fasaden](#fasaden).
+- **Var och en går på sitt sätt (2026-11-16, användarens önskemål):** "Gången är bättre men inte helt bra. Det ser inte
+  så naturlligt ut. Jag skulle dessutom vilja att personer hade olika sätt att gå på - så att inte alla går exakt
+  likadant". Benet som förs fram följer nu vinklarna i en människas gång (låret fram tidigt, knät böjt mest strax efter
+  att tån lämnat marken) och hälen landar mjukt ovanifrån, överkroppen lutar, en lång kappa följer låren, och det finns
+  sex sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak) med olika långa steg, takt, lutning och armsving, ibland
+  med händerna i fickorna. Se *Det som händer ute* under [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -6689,14 +6695,24 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
   framför fönstret (`randLjus`), och speglas svagt i den våta stenen. De går som folk (`gangen`, `stalln`): foten som
   står på marken står still mot stenen medan kroppen går fram – hälen slår i, foten rullar över till tån och lyfts – och
-  höften gungar ungefär 4 cm en gång per steg, knät böjs upp till 55° när benet förs fram, armarna pendlar emot benen
-  med armbågen lite böjd, paraplyet gungar med i stegen och hunden travar fyra steg på ett, med kopplet i en stilla
-  hand. Gångcykeln räknas ut en gång (var foten är, och vinklarna i höften, knät och fotleden därifrån) och var i den en
-  figur är tas av hur långt den har gått, så att fötterna står still hur ofta duken än ritas om (förut svängde benen i
-  halva takten och fötterna gled fram, "de flyter liksom fram", 2026-11-16). Ibland (i ungefär sex av tio varv om 170 s, inte
+  höften gungar ungefär 4 cm en gång per steg och knät ger efter lite när hälen tar emot (IK mot foten). Benet som förs
+  fram följer vinklarna i en människas gång: låret svänger fram tidigt, knät böjs mest (50–66°) strax efter att tån
+  lämnat marken och sträcks sedan, och på slutet sänks fotleden ovanifrån och saktar in, så att hälen landar mjukt där
+  den sedan står (`landa`); foten går minst 1,5 cm över stenen mitt i svingen. Överkroppen lutar kring höften (armarna
+  hänger ändå lodrätt), en lång kappas skört ritas två gånger, med det främre och det bakre låret, så att det vidgas när
+  benen går isär, armarna pendlar emot benen med armbågen lite böjd, paraplyet gungar med i stegen och hunden travar
+  fyra steg på ett, med kopplet i en stilla hand. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
+  (långa steg, snabbt, framåtlutad, stora armsvingar), strosar (korta steg, långsamt, ofta händerna i fickorna),
+  studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram) och rak (upprätt, raka
+  knän), och var och en lite olika inom sitt sätt (steglängd, takt, lutning, armsving); farten är steglängden gånger
+  takten, 0,9–1,6 m/s. Sättet lottas ur en egen följd per figur och dag, så att kläderna och var de går är som förut.
+  Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
+  still hur ofta duken än ritas om (förut svängde benen i halva takten och fötterna gled fram, "de flyter liksom fram",
+  2026-11-16; sedan gick alla likadant, med en stel kappa och benet som släpade efter, "inte så naturligt", samma dag).
+  Ibland (i ungefär sex av tio varv om 170 s, inte
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
-  13 s, och går vidare (`stannar`, `bakDelar`) – där skivan med löpsedlarna hänger, så att gänget syns, och utan
-  paraply, som skulle skymma skylten. Bilarna och bussarna på gatan bakom en syns som speglingar som far förbi i glaset
+  13 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
+  gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna på gatan bakom en syns som speglingar som far förbi i glaset
   och dörren: mörka skuggor på dagen, strålkastare och baklyktor i mörkret.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
