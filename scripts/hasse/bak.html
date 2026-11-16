@@ -26,23 +26,75 @@ const tillBar = (v) => [Math.cos(VB) * v[0] - Math.sin(VB) * v[2], v[1], Math.si
 const v3 = (v) => `vec3(${v.map((x) => x.toFixed(5)).join(', ')})`;
 const KP = tillBar(KAM.pos), KR = tillBar(KAM.hoger), KU = tillBar(KAM.upp), KB = tillBar(KAM.bak);
 
-// (atlasen för etiketter och papper: sedan fönstren kom finns inga paket, skyltar eller tidningar på väggen)
-const atlas = document.createElement('canvas'); atlas.width = 64; atlas.height = 64;
+// Atlasen för tryck: sedan fönstren kom finns inga paket, skyltar eller tidningar på väggen, bara trycket på
+// flaskorna (ett varv runt flaskan på bredden, framsidan vid u = 0,25 och baksidan vid 0,75 som i rum-3d.js):
+// etiketten, axelbandet och halsfolien under varandra (ATL: raderna).
+const atlas = document.createElement('canvas'); atlas.width = 512; atlas.height = 256;
+const ATL = { etikett: [0, 184], axel: [190, 214], hals: [220, 256] };
+{
+  // Pripps Blå som gängets (ritaFolie i rum-3d.js, förenklad: lejonen och skeppet blir bara former på det här
+  // avståndet): silveretiketten med den röda bågen, PRIPPS, den marinblå ovalen i guldkant och bandet med BLÅ;
+  // axelbandet i silver med PRIPPS BLÅ, och halsfolien marinblå med guldkant.
+  const g = atlas.getContext('2d'), w = atlas.width, TAU = Math.PI * 2;
+  const NAVY = '#12306e', GULD = '#c79f35', ROD = '#b3202a', BAND = '#1b47a0', SERIF = 'Fraunces, Georgia, serif';
+  const [e0, e1] = ATL.etikett, eh = e1 - e0, sy = eh / 276;
+  const silver = g.createLinearGradient(0, e0, 0, e1);
+  silver.addColorStop(0, '#e9ecef'); silver.addColorStop(0.5, '#c6ccd2'); silver.addColorStop(1, '#e2e5e9');
+  g.fillStyle = silver; g.fillRect(0, e0, w, eh);
+  g.fillStyle = NAVY; g.fillRect(0, e0, w, 5); g.fillRect(0, e1 - 5, w, 5);
+  g.fillStyle = GULD; g.fillRect(0, e0 + 6, w, 2); g.fillRect(0, e1 - 8, w, 2);
+  g.save(); g.translate(0, e0); g.scale(w / 768, sy);
+  for (const cx of [768 * 0.25, 768 * 0.75]) {
+    g.fillStyle = ROD; g.beginPath(); g.moveTo(cx - 72, 39); g.quadraticCurveTo(cx, -4, cx + 72, 39); g.closePath(); g.fill();
+    g.strokeStyle = GULD; g.lineWidth = 2.5; g.stroke();
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = NAVY; g.font = `800 42px ${SERIF}`;
+    g.fillText('PRIPPS', cx, 78);
+    // lejonen: guld på var sin sida om ovalen
+    g.fillStyle = GULD;
+    for (const m of [-1, 1]) { g.beginPath(); g.ellipse(cx + m * 92, 128, 16, 30, m * 0.3, 0, TAU); g.fill(); }
+    g.beginPath(); g.ellipse(cx, 130, 54, 46, 0, 0, TAU); g.fillStyle = NAVY; g.fill();
+    g.strokeStyle = GULD; g.lineWidth = 3; g.stroke();
+    g.fillStyle = '#e8ecf2'; for (const mx of [-21, 2, 25]) g.fillRect(cx + mx - 4, 104, 8, 22);
+    g.fillStyle = GULD; g.fillRect(cx - 30, 134, 60, 9);
+    g.fillStyle = BAND;
+    g.beginPath(); g.moveTo(cx - 96, 180); g.lineTo(cx + 96, 180); g.lineTo(cx + 84, 203); g.lineTo(cx + 96, 228); g.lineTo(cx - 96, 228); g.lineTo(cx - 84, 203); g.closePath(); g.fill();
+    g.strokeStyle = GULD; g.lineWidth = 2.5; g.stroke();
+    g.fillStyle = '#ffffff'; g.font = `800 44px ${SERIF}`; g.textBaseline = 'middle'; g.fillText('BLÅ', cx, 205);
+    g.fillStyle = NAVY; g.font = `700 16px ${SERIF}`; g.textBaseline = 'alphabetic'; g.fillText('KLASS I  ·  ANNO 1828', cx, 253);
+  }
+  g.restore();
+  const [a0, a1] = ATL.axel;
+  g.fillStyle = '#d7dbe0'; g.fillRect(0, a0, w, a1 - a0);
+  g.fillStyle = BAND; g.fillRect(0, a0, w, 3); g.fillRect(0, a1 - 3, w, 3);
+  g.fillStyle = NAVY; g.font = `800 15px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (let i = 0; i < 3; i++) { g.save(); g.translate((i + 0.5) * w / 3, (a0 + a1) / 2 + 1); g.scale(1.75, 1); g.fillText('PRIPPS BLÅ', 0, 0); g.restore(); }
+  const [h0, h1] = ATL.hals;
+  g.fillStyle = NAVY; g.fillRect(0, h0, w, h1 - h0);
+  g.fillStyle = GULD; g.fillRect(0, h0, w, 3); g.fillRect(0, h1 - 3, w, 3);
+}
+// (raderna r0–r1 i atlasen som [u0, v0, u1, v1]: ett helt varv)
+const atlasRad = ([r0, r1]) => [0, r0 / atlas.height, 1, r1 / atlas.height];
 
 // ---------- scenen ----------
 const P = [];
 let slump = 4711; const rnd = () => (slump = (slump * 16807) % 2147483647) / 2147483647;
 const RGB = (h) => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255].map((v) => v ** 2.2);
-// typ: 0 låda, 1 stående cylinder, 2 ellipsoid, 3 liggande cylinder (x). mat: 0 färg, 1 furu, 3 etikett, 4 glas, 5 mässing, 6 lyser, 7 osynlig för kameran, 8 bardiskens front, 10 pulten, 11 bardiskens skiva, 12 aluminium, 13 krom, 15 papper, 16 vinyl, 17 tidning, 18 golvet
+// typ: 0 låda, 1 stående cylinder, 2 ellipsoid, 3 liggande cylinder (x), 4 stående stympad kon utan lock (radien
+// h[0] nedtill och h[2] upptill: flaskornas glas och tryck, varv på varv). mat: 0 färg, 1 furu, 3 etikett, 4 glas,
+// 5 mässing, 6 lyser, 7 osynlig för kameran, 8 bardiskens front, 10 pulten, 11 bardiskens skiva, 12 aluminium, 13 krom,
+// 15 papper, 16 vinyl, 17 tidning, 18 golvet, 19 tryck runt en flaska (atlasen, vriden rot varv)
 const box = (c, h, mat, col = [1, 1, 1], uv = [0, 0, 0, 0]) => P.push({ t: 0, c, h, mat, col, uv });
 const cyl = (c, r, hh, mat, col = [1, 1, 1]) => P.push({ t: 1, c, h: [r, hh, r], mat, col, uv: [0, 0, 0, 0] });
 const ell = (c, h, mat, col = [1, 1, 1]) => P.push({ t: 2, c, h, mat, col, uv: [0, 0, 0, 0] });
 const xcyl = (c, r, hx, mat, col = [1, 1, 1]) => P.push({ t: 3, c, h: [hx, r, r], mat, col, uv: [0, 0, 0, 0] });
+const kon = (c, r0, r1, hh, mat, col = [1, 1, 1], uv = [0, 0, 0, 0], rot = 0) => P.push({ t: 4, c, h: [r0, hh, r1], mat, col, uv, rot });
 const G = [];
+// (en stympad kon når ut till den största radien)
+const halv = (p) => (p.t === 4 ? [Math.max(p.h[0], p.h[2]), p.h[1], Math.max(p.h[0], p.h[2])] : p.h);
 const grupp = (fn) => {
   const a = P.length; fn(); const b = P.length;
   const mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
-  for (let i = a; i < b; i++) for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], P[i].c[k] - P[i].h[k]); mx[k] = Math.max(mx[k], P[i].c[k] + P[i].h[k]); }
+  for (let i = a; i < b; i++) { const h = halv(P[i]); for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], P[i].c[k] - h[k]); mx[k] = Math.max(mx[k], P[i].c[k] + h[k]); } }
   G.push({ mn: mn.map((v) => v - 1), mx: mx.map((v) => v + 1), a, b });
 };
 // väggen med fönstrens hål, golvet, taket och rummet runt om
@@ -101,18 +153,38 @@ grupp(() => {
 // (en barstol som gängets stod längst till höger, vid x = 2760, till 2026-11-13: den trängdes med veckans löpsedel,
 // som hänger i kroken i fältet bredvid, SCEN.LOPSEDEL)
 
-// flaskor som gängets, i verklig storlek
-const flaska = (x, z, col, h = 1, etikett = '#e6dcc0') => {
-  cyl([x, T + 120 * h, z], 50, 120 * h, 4, col);
-  ell([x, T + 240 * h, z], [50, 44, 50], 4, col);
-  cyl([x, T + 310 * h, z], 17, 58 * h, 4, col);
-  cyl([x, T + 372 * h, z], 19, 8, 13, [0.7, 0.68, 0.6]);
-  cyl([x, T + 118 * h, z], 51, 52 * h, 0, RGB(etikett));
+// Flaskor som gängets: Pripps Blå i 90-talets returflaska (bottle i rum-3d.js), i verklig storlek (33 cl, sex cm
+// bred och 20 hög). Glaset följer gängets profil (FLASKA där, förstorad PR gånger) som stympade koner varv på varv,
+// med etiketten, axelbandet och halsfolien som tunna skal utanpå (tryck i atlasen), och kapsylen överst. Förut
+// stod det tre vinflaskor här (2026-11-16: "ölflaskor, samma Pripps som på hemsidan, istället för vinet").
+const PR = 50 / 7.6;
+// profilen (radie, höjd över skivan) från FLASKA, och var trycket sitter (höjderna i rum-3d.js: folieGeo)
+const PROFIL = [[7.6, -24], [7.6, -0.3], [7.35, 2], [5.9, 7.5], [4.2, 11.9], [3.1, 15], [2.85, 17], [2.8, 23], [3.4, 24.5]].map(([r, y]) => [r * PR, (y + 24) * PR]);
+const radie = (y) => { for (let i = 1; i < PROFIL.length; i++) { const [r0, y0] = PROFIL[i - 1], [r1, y1] = PROFIL[i]; if (y <= y1) return r0 + (r1 - r0) * (y - y0) / (y1 - y0); } return PROFIL.at(-1)[0]; };
+const TRYCK = { etikett: [-20.2, -2.8], axel: [8.2, 11.2], hals: [11.8, 23.1] };
+const flaska = (x, z, col, rot = 0) => {
+  for (let i = 1; i < PROFIL.length; i++) {
+    const [r0, y0] = PROFIL[i - 1], [r1, y1] = PROFIL[i];
+    kon([x, T + (y0 + y1) / 2, z], r0, r1, (y1 - y0) / 2, 4, col);
+  }
+  // trycket: ett skal en knapp enhet utanför glaset, i bitar där profilen viker, med sin del av atlasens rader
+  for (const [namn, [ya, yb]] of Object.entries(TRYCK)) {
+    const Y0 = (ya + 24) * PR, Y1 = (yb + 24) * PR;
+    const steg = [Y0, ...PROFIL.map(([, y]) => y).filter((y) => y > Y0 && y < Y1), Y1];
+    const [u0, v0, u1, v1] = atlasRad(ATL[namn]);
+    for (let i = 1; i < steg.length; i++) {
+      const a = steg[i - 1], b = steg[i];
+      const va = v0 + (v1 - v0) * (Y1 - a) / (Y1 - Y0), vb = v0 + (v1 - v0) * (Y1 - b) / (Y1 - Y0);
+      kon([x, T + (a + b) / 2, z], radie(a) + 0.9, radie(b) + 0.9, (b - a) / 2, 19, [1, 1, 1], [u0, vb, u1, va], rot);
+    }
+  }
+  // kapsylen
+  cyl([x, T + (24.5 + 24) * PR + 6, z], 23.5, 6, 0, RGB('#1b3a7a'));
 };
-// tre flaskor mellan matchlistan och hans axel (bakom listan ska det vara lugnt)
+// tre flaskor mellan matchlistan och hans axel (bakom listan ska det vara lugnt), med etiketterna lite olika vridna
 grupp(() => {
   const Z = VAGG + 300;
-  [[-1110, 0], [-980, 60], [-840, -10]].forEach(([x, dz]) => flaska(x, Z + dz, RGB('#2c4a2c'), 1));
+  [[-1110, 0, 0.03], [-980, 60, -0.05], [-840, -10, 0.07]].forEach(([x, dz, rot]) => flaska(x, Z + dz, RGB('#1f5a26'), rot));
 });
 // han själv och pulten framför honom: syns inte, men skuggar och kastar ljus
 const HAN = G.length;
@@ -168,7 +240,7 @@ const gl = c.getContext('webgl2', { preserveDrawingBuffer: true, antialias: fals
 gl.getExtension('EXT_color_buffer_float');
 const DW = 4;
 const data = new Float32Array(DW * 4 * P.length);
-P.forEach((p, i) => { data.set([p.c[0], p.c[1], p.c[2], p.t, p.h[0], p.h[1], p.h[2], p.mat, p.col[0], p.col[1], p.col[2], 0, p.uv[0], p.uv[1], p.uv[2], p.uv[3]], i * DW * 4); });
+P.forEach((p, i) => { data.set([p.c[0], p.c[1], p.c[2], p.t, p.h[0], p.h[1], p.h[2], p.mat, p.col[0], p.col[1], p.col[2], p.rot || 0, p.uv[0], p.uv[1], p.uv[2], p.uv[3]], i * DW * 4); });
 const tex = (w, h, ifmt, fmt, typ, d, filt = gl.NEAREST) => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, ifmt, w, h, 0, fmt, typ, d); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filt); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filt); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); return t; };
 const tP = tex(DW, P.length, gl.RGBA32F, gl.RGBA, gl.FLOAT, data);
 const tA = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tA); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.texImage2D(gl.TEXTURE_2D, 0, gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE, atlas); gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -205,6 +277,16 @@ void prova(int i, vec3 ro, vec3 rd, vec3 ird, inout Hit h) {
   } else if (t == 2) {
     vec3 oc = o / s, dc = rd / s; float a = dot(dc, dc), b = dot(oc, dc), cc = dot(oc, oc) - 1., dd = b * b - a * cc;
     if (dd > 0.) { float sq = sqrt(dd); float tt = (-b - sq) / a; if (tt < 1e-3) tt = (-b + sq) / a; if (tt > 1e-3 && tt < h.t) { h.t = tt; h.id = i; h.n = normalize((o + rd * tt) / (s * s)); } }
+  } else if (t == 4) {
+    // stympad kon utan lock: x² + z² = (rm + k·y)², bara manteln (båda skärningarna: strålen kan komma inifrån glaset)
+    float hh = s.y, k = (s.z - s.x) / (2. * hh), rm = (s.x + s.z) * .5;
+    float qq = rm + k * o.y, e = k * rd.y;
+    float a = dot(rd.xz, rd.xz) - e * e, b = dot(o.xz, rd.xz) - qq * e, cc = dot(o.xz, o.xz) - qq * qq, dd = b * b - a * cc;
+    if (dd > 0. && abs(a) > 1e-9) {
+      float sq = sqrt(dd), ta = (-b - sq) / a, tb = (-b + sq) / a;
+      if (ta > tb) { float tm = ta; ta = tb; tb = tm; }
+      for (int j = 0; j < 2; j++) { float tt = j == 0 ? ta : tb; float y = o.y + rd.y * tt; if (tt > 1e-3 && tt < h.t && abs(y) < hh) { vec3 pp = o + rd * tt; h.t = tt; h.id = i; h.n = normalize(vec3(pp.x, -k * (rm + k * y), pp.z)); break; } }
+    }
   } else {
     float a = dot(rd.yz, rd.yz), b = dot(o.yz, rd.yz), cc = dot(o.yz, o.yz) - s.y * s.y, dd = b * b - a * cc;
     if (dd > 0.) { float tt = (-b - sqrt(dd)) / a; if (tt > 1e-3 && tt < h.t && abs(o.x + rd.x * tt) < s.x) { h.t = tt; h.id = i; h.n = vec3(0., o.y + rd.y * tt, o.z + rd.z * tt) / s.y; } }
@@ -329,6 +411,12 @@ vec4 spara(vec3 ro, vec3 rd) {
     if (m == 3) {
       if (abs(h.n.z) > .5 && d3.z > 0.) { vec3 lc = p - data(h.id, 0).xyz; vec2 uv = lc.xy / d1.xy * .5 + .5; c = textureLod(uA, vec2(mix(d3.x, d3.z, uv.x), mix(d3.w, d3.y, uv.y)), 0.5).rgb; }
       c *= .42; gloss = 0.;
+    }
+    if (m == 19) { // tryck runt en flaska: varvet runt (framsidan mot +z vid u = 0,25), metallfolie som glänser lite
+      vec3 lc = p - data(h.id, 0).xyz;
+      float u = fract(atan(lc.x, lc.z) / (2. * PI) + .25 + d2.w), v = clamp(lc.y / d1.y * .5 + .5, 0., 1.);
+      c = textureLod(uA, vec2(mix(d3.x, d3.z, u), mix(d3.w, d3.y, v)), 0.).rgb;
+      if (rn() < .3) { vec3 r = reflect(rd, n); rd = normalize(r + (vec3(rn(), rn(), rn()) - .5) * .35); if (dot(rd, n) < 0.) rd = reflect(rd, n); ro = p + n * .5; T *= c; spec = true; forsta = false; continue; }
     }
     if (m == 5) { // mässing
       vec3 r = reflect(rd, n); rd = normalize(r + (vec3(rn(), rn(), rn()) - .5) * .26); ro = p + n * .5; T *= c * 1.15; spec = true; forsta = false; continue;

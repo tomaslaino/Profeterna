@@ -221,11 +221,12 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* ---------- visitkortet (rum.js, kortHtml) ---------- */
 
 /* På väggen mellan stationsuret och orakelramen, till höger om palmetten
-   (veckans löpsedel står i stället utanför dörren, rum-affischer.js).
+   och med högerkanten i linje med ramens, så långt ner att urets skugga inte
+   når det (veckans löpsedel står i stället utanför dörren, rum-affischer.js).
    Länken är lite större än kortet, så att det går att träffa med fingret.
    Kortet ritas i sina egna mått (440 × 285, ungefär 85 × 55 mm) och
    förminskas kring stiftet till 44 × 28,5 i scenen. */
-.rum-kort { position: absolute; left: 1060px; top: 235px; width: 56px; height: 40px; display: block; }
+.rum-kort { position: absolute; left: 1063px; top: 250px; width: 56px; height: 40px; display: block; }
 @media (hover: hover) { .rum-kort:hover { filter: brightness(1.12) drop-shadow(0 0 3px rgba(240, 214, 153, 0.5)); } }
 .rum-kort:focus-visible { filter: brightness(1.12) drop-shadow(0 0 3px rgba(240, 214, 153, 0.5)); }
 .rum-kort .vk {
@@ -397,7 +398,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-ur {
   position: absolute;
   left: 996px;
-  top: 98px;
+  top: 130px;
   width: 108px;
   height: 108px;
   display: block;
@@ -925,8 +926,10 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 
 .rum-warm { background: radial-gradient(900px 500px at 640px 40px, rgba(225, 240, 255, 0.1), rgba(225, 240, 255, 0) 70%), radial-gradient(800px 420px at 800px 860px, rgba(255, 190, 120, 0.12), rgba(255, 190, 120, 0) 70%); mix-blend-mode: screen; }
-.rum-vign { background: radial-gradient(120% 95% at 52% 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.6) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 11%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.5)),
-  linear-gradient(180deg, rgba(70, 46, 8, 0.2), rgba(70, 46, 8, 0.05) 45%, rgba(70, 46, 8, 0) 70%); }
+/* (överkanten var 0,55 svart och 0,2 brun: med dunklet ovanpå, ljusKlockan i rum.js, låg det tre gånger över
+   taket och lysröret, som såg grått ut. Nu 0,3 och 0,15, och dunklet har hål vid lamporna, 2026-11-16) */
+.rum-vign { background: radial-gradient(120% 95% at 52% 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.6) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0) 11%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.5)),
+  linear-gradient(180deg, rgba(70, 46, 8, 0.15), rgba(70, 46, 8, 0.05) 45%, rgba(70, 46, 8, 0) 70%); }
 .rum-grain {
   opacity: 0.2;
   mix-blend-mode: overlay;
@@ -942,8 +945,8 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-mork {
   display: none;
   background: #060504;
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
-  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z M30 -20H210V114H30Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/><path fill-opacity='.15' d='M30 -20H210V114H30Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z M30 -20H210V114H30Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/><path fill-opacity='.15' d='M30 -20H210V114H30Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
 }
 .rum-mork.start, .rum-mork.tands { display: block; }
 .rum-mork.tands { animation: rum-tands 1.2s steps(1, end) forwards; }
@@ -1104,8 +1107,8 @@ canvas.rum-svag { opacity: 0.05; }
 /* Rummet på höjden står längre bort än scenen är hög (fit i rum.js): taket och pulten fortsätter
    utanför, och ljuset och mörkret med dem. */
 .rum.smal .rum-stage { overflow: visible; background: none; }
-.rum-tak, .rum-pult-mer, .rum-mork-ut { display: none; }
-.rum.smal .rum-tak { display: block; }
+.rum-tak, .rum-pult-mer, .rum-mork-ut, .rum-lampsladd { display: none; }
+.rum.smal .rum-tak, .rum.smal .rum-lampsladd { display: block; }
 .rum.smal .rum-pult-mer { display: block; position: absolute; left: -10px; top: 1000px; width: 1620px; height: 340px; background: #2b1b10; }
 .rum.smal .pult-kant { display: none; }
 .rum.smal .rum-vign { top: -1200px; height: 1800px; }
