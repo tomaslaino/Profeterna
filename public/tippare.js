@@ -119,7 +119,8 @@ function tpScore(round, now) {
     const rows = tpRows(round, signs, now);
     return { id: g.id, name: g.namn || g.id, rows, ...tpTally(rows) };
   });
-  const hasse = tpHasse(round);
+  // Hasse Backe bara när hela gänget har tippat (Tippoang.hasseMed).
+  const hasse = Tippoang.hasseMed((round.gang || []).map((g) => g.id), (id) => Boolean(s.tecken[id])) && tpHasse(round);
   if (hasse) {
     s.tecken[Tippoang.HASSE.id] = hasse;
     const rows = tpRows(round, hasse, now);

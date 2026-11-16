@@ -222,13 +222,11 @@ window.RumFasad = (() => {
       let p = '';
       for (let px = X + 8; px < X + W; px += 26) p += `M${px} ${Y} V${Y + H}`;
       s += `<path d="${p}" stroke="#000" stroke-opacity=".14" stroke-width="3"/>`;
-      // taket och taklamporna (släckta på natten): spotskenan närmast glaset och takfläkten över gängets
-      // bord, mörka blad och fyra kupor under (förut ett lysrör)
+      // taket och takfläkten över gängets bord (släckt på natten): mörka blad och fyra kupor under (förut ett
+      // lysrör; spotskenan närmast glaset togs bort samma kväll som den kom, 2026-11-16)
       s += `<rect x="${X}" y="${Y}" width="${W}" height="${r1(H * 0.11)}" fill="${tak}"/>`;
       if (hela) {
         const lampa = mix('#3a3a36', '#fff1d6', ljus);
-        s += `<rect x="${r1(X + W * 0.22)}" y="${r1(Y + H * 0.03)}" width="${r1(W * 0.56)}" height="3" fill="#120c08" opacity=".85"/>`;
-        for (const k of [0.3, 0.44, 0.58, 0.7]) s += `<circle cx="${r1(X + W * k)}" cy="${r1(Y + H * 0.03 + 7)}" r="4" fill="${lampa}"/>`;
         const fx = X + W * 0.48;
         const fy = Y + H * 0.065;
         s += `<path d="M${r1(fx - W * 0.16)} ${r1(fy)} L${r1(fx + W * 0.16)} ${r1(fy + 3)}" stroke="#24160c" stroke-width="5" stroke-linecap="round"/>`;

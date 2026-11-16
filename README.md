@@ -408,6 +408,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   *Matchprogrammet* och D *Fanzinet*, sedan de minimalistiska E *Numret*, F *Lördagen* (vald), G *Rubriken* och H
   *Bara namnet*; devisen bland ett tjugotal förslag. Löpsedeln har samma papper, ram, översta rad och namn som förut
   (`forsta` i [public/rum-tidning.js](public/rum-tidning.js), se [Helgarderat](#helgarderat))
+- [x] **Kalenderbladet med omgångens alla dagar (2026-11-16, användarens önskemål: "Förstasidan på helgarderat står 15
+  när det spelades 15+16 … borde alltså ha 15 + 16 på ett passande grafiskt designsätt"):** en omgång på två dagar har
+  dem under varandra på omslaget, lite mindre, med ett kursivt *&* mellan två korta streck (*15 & 16*), och en på fler
+  den första och den sista med *till* mellan. Sidhuvudet säger detsamma (*Nr 2 · 15 och 16 november*), och Hasse Backes
+  tidning ritar samma omslag. Dagarna räknas på avsparkarna i Stockholmstid
 - [x] **Spegeln: man ser vem av de tre man är (2026-11-13, användarens önskemål: "Kan du komma på något smart sätt som
   man kan se vem av de tre som man är inloggad som på animationssidan?", med kravet att det inte får dra mycket
   grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
@@ -1109,6 +1114,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   död – med påhitt som händerna i nacken, skålar över bordet, naglarna, hakan i handen,
   armarna i kors och pannan i bordet, och tre sätt att reagera på ett mål. Se *Gängets humör
   följer kupongen* under [Tobaksaffären](#tobaksaffären).
+- **Gänget är nervöst ibland när matcherna pågår (2026-11-16, användarens önskemål):** "Kan du göra så att vi
+  ibland ser nervösa ut när vi följer matcherna live … vissa resultat t ex. Tänk på naturliga emotioner och att
+  vi inte ska se ut som robotar!" Var och en blir spänd av de matcher där ett mål skulle vända ens eget tips,
+  mest när uddamålet ska hållas mot slutet. Det syns i vågor och olika för var och en (DJ tar det hårdast, DT
+  är den svalaste): stunder framåtlutad med hälen som vippar och ett spänt ansikte, anfall på planen där alla
+  håller andan och sedan blåser ut eller tar sig för huvudet, naglarna och handen för munnen – och lättnaden
+  eller sucken när matchen blåses av. Se *Nerverna under matcherna* under [Tobaksaffären](#tobaksaffären).
 - **Namnet i skrivstil på kupongen, och gänget gör tecken (2026-11-04, användarens önskemål):**
   ett klick på någon i gänget skriver hens namn för hand på kupongen på pulten, i hens egen
   handstil och bläck, i stället för porträtten, och hen gör ett tecken mot en: hang loose,
@@ -1621,6 +1633,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   oskarp som utsikten, och bilarna i den bortre filen hamnade högt ovanför räcket. Nu är trafiken lika oskarp
   längs hela bron, 0,8 av utsiktens, och körbanan lutar mindre, så att båda filerna står på bron bakom räcket. Se
   [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som gatan i rummet*.
+- **Bilarna i rummet och bakom Hasse Backe som framför affären (2026-11-16, användarens önskemål):** "Kan du på något
+  sätt ordna så att bilarna som kör förbi utanför animationsbilden och bilden med hasse - liknar de som kör förbi vid
+  ytterbilden. Tänk på att det inte ska dra för mkt grafik!" På gatan genom fönstret och på S:t Eriksbron bakom
+  honom kör nu fasadens fordon: samma nittiotalsbilar (Volvo 240, 740 och 850, Saab, Golf, Mercedes, Kadett, Amazon,
+  Bubblan …), skåpbilar, taxi, bussar och plogbil, i samma lack och lottade och ritade med samma kod som framför
+  affären (`RumFasadGatan.fordon` och `rita` i rum-fasad-gatan.js), i gatans respektive utsiktens ljus. Förut var det
+  egna, nyare bilar (stadsjeepar, halvkombi i dagens färger). Varje fordon ritas en gång i sin bild, som förut, och
+  sedan läggs bara bilden ut: gatans lager ritas om på 3,4 ms i stället för 4,7, och på bron är det färre bilder per
+  fordon (4,8 i stället för 5,9) att lägga ut i varje bildruta. Se [Hasse Backe](#hasse-backe), *Utsikten*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -4144,7 +4165,15 @@ inbördes möten, spelkassan och Tipsligan i tobaksaffären, med guld som färg.
 finns inte i `gang` i [config/kupong.js](config/kupong.js) och syns inte när tipsen jämförs inför
 gängets kupong, så att spelet går som förut: inlämningen, när tipsen visas, *Alla inne*, förslaget och
 gängets kupong. *Lagkänsla* och *Den oumbärlige* gäller inte honom, och *Närvaro* räknas från hans
-första omgång.
+första omgång och bara i omgångarna han kunde vara med i.
+
+**Bara när hela gänget spelar (2026-11-16, Tomas beslut):** han tävlar bara i en omgång som alla i
+gänget har tippat (`Tippoang.hasseMed`). Annars får omgången ingen kupong av honom, varken i
+`data/tippar-historik.json` eller i omgången som pågår (`tpScore`), så att en omgång som bara han
+spelar inte ger honom något försprång. Ingen kan lämna in när tipsen väl visas, så det står fast när
+omgången skrivs in. En fryst omgång från innan regeln, där han tippade utan hela gänget (landskamperna
+15–16 november), står kvar i filen men hans tips räknas bort när sidan byggs (`utanHasse`), och en
+omgång som ingen i gänget tippade visas inte alls.
 
 Han spelar under samma regel som alla (`regel` i [config/kupong.js](config/kupong.js), 4 spikar,
 5 halvgarderingar och 4 helgarderingar). Kupongen byggs vid bygget (`hasseKupong` i
@@ -4183,7 +4212,8 @@ Säsongen står i Olympen ([public/kampen.js](public/kampen.js)): ställningen s
 prispall med summan av omgångarnas poäng, antal rätt av de spelade matcherna och antal
 gånger som *Omgångens orakel* (bäst) och *Omgångens Ikaros* (sämst), som märken under
 namnet, och modellen som jämförelse, utan placering. Placering efter summan med en
-decimal, sedan antal rätt. En omgång räknas för den som tippade i den. Tabellen
+decimal, sedan antal rätt. En omgång räknas för den som tippade i den – Hasse Backe bara när
+hela gänget tippade (se [Hasse Backe tävlar](#hasse-backe-tävlar)). Tabellen
 *Omgångarna* visar varje omgång med orakel och Ikaros inramade i guld och rött. Döljer
 spoilerskyddet någon match i en omgång räknas hela omgången bort, med *Visa ändå*. (Fram
 till 2026-10-22 stod samma topplista också under omgångens ruta på förstasidan.)
@@ -4748,6 +4778,53 @@ kring ytterändan, ett ögonlock i hudens färg läggs över ögat och rodnaden 
 Bilderna för läget byggs när det ändras (sju till som mest: ansiktena, deras blinkningar och
 skägget) och de förra släpps; skrattar de åt ett skämt är det de vanliga skrattbilderna.
 
+**Nerverna under matcherna** (2026-11-16, `nerverLage` i rum.js, `NERV` och `nervKropp` i rum-3d.js;
+användarens önskemål: "Kan du göra så att vi ibland ser nervösa ut när vi följer matcherna live … vissa resultat
+t ex. Tänk på naturliga emotioner och att vi inte ska se ut som robotar!"). Medan matcherna pågår är var och en
+mer eller mindre spänd (0–1), efter sitt eget tips – allas när de syns, annars gängets kupong, som vid målen.
+En match spänner när ett mål skulle vända tipset:
+
+- **Uddamålet ska hållas** (tipset håller med ett mål, eller krysset i en jämn match): lite tidigt (0,15), mer
+  och mer från 52:a minuten och fullt i slutet (0,5 vid 70 minuter, 0,85 vid 80).
+- **Ett mål skulle rädda tipset:** nästan lika mycket (0,12 → 0,8).
+- **Två mål emellan:** lite, och mindre ju närmare slutet det är; fler mål eller helgardering: inget.
+
+I halvtidsvilan nästan inget. Flera matcher lägger sig på den mest spända, de andra med en fjärdedel var, och
+kupongen väger in: på gränsen (nästa fel tar vinsten) mer, död mindre. Dolda resultat ger inga nerver. Det syns
+inte jämnt utan kommer och går, och olika för var och en – DJ grubblar och tar det hårdast, DL är glad av sig
+och DT den svalaste (`NERV.lynne`):
+
+- **Stunderna** (`nervStund`): i luckor om 11–17 sekunder, olika långa för var och en, kan en stund börja,
+  oftare och längre ju mer som står på spel: framåtlutad mot tv:n, ena hälen som vippar, snabbare andning och
+  ett oroligt eller spänt ansikte (`nervos` i [public/rum-uttryck.js](public/rum-uttryck.js): ögonbrynen högt
+  uppåt inåt, ögonen vidöppna och läpparna ihoppressade och snett, som när man biter sig i läppen).
+  Däremellan sitter man och tittar som vanligt.
+- **Anfallen på planen** (`sitNu`): samma för alla tre, i gemensamma luckor om 23 sekunder och oftare ju
+  spändare den mest spända är. Var och en reagerar en aning efter de andra och så mycket som hen har på spel:
+  lutar sig fram, reser sig lite ur stolen och håller andan med huvudet stilla – och sedan blåser man ut,
+  far bakåt med handen på huvudet när det var nära, eller sjunker bara tillbaka. Den som inget har på spel
+  tittar bara.
+- **Påhitten** (`NERV.meny`): naglarna, händerna knäppta framför munnen, fingrarna som trummar, kliandet i
+  nacken och – nytt – `tittarInte`: vänder sig bort från tv:n med huvudet nere och handen framför ansiktet,
+  tittar upp med handen för munnen och vänder sig bort igen. Den som är mest spänd korsar sig ibland. Medan
+  det står och väger inga gäspningar eller sträckningar, och när alla är spända inget som gänget gör
+  tillsammans (skålen, allsången).
+- **Stämningen** drar mot orolig, så att ansiktet ibland är oroligt också mellan stunderna; man tittar inte
+  bort från tv:n lika ofta, inte heller på de andra, och benen vippar fort som när kupongen står och väger.
+- **Slutsignalen** (`slut`): när en match som någon satt spänd i (minst 0,3) blåses av – puh: bakåt med en
+  lång utandning, blicken i taket, handen på bröstet och ett nöjt ansikte – eller, när tipset inte höll, en
+  huvudskakning med blicken ner, en suck och ett surt ansikte. Inte när rummet öppnas.
+
+Hur ofta det syns (räknat ur luckorna): med full spänning är DJ spänd ungefär 45 % av tiden, DL 26 % och DT
+17 %, och anfallen kommer i ungefär hälften av luckorna; vid halva spänningen 23, 14 och 9 %. Ett mål går före
+allt det här, och under allsången efter ett mål syns inga nerver. Handen kan inte täcka ögonen (huvudena är
+större än armarna når, som håret), därför vänder man sig bort i stället. Bara bålen, huvudet och händerna som
+redan finns rör sig, och det spända ansiktet byggs när det behövs, som stämningarnas: inga nya delar att
+rita. Utan rörelser (calm) bara stämningen och ansiktet efter slutsignalen; i en fast bild (`?rum-t`) allt,
+efter klockan. Prova med `?rum-nerv=dl:0.9,dt:0.9,dj:0.9` (tv:n står då på; `dt:0.6:jagar` för den som jagar
+ett mål) och `?rum-t=18.4` (alla håller andan), `55` (stunderna) eller `60.6` (nära!), `?rum-slut=dl:1,dt:-1`
+och `?rum-akt=dl:tittarInte`.
+
 **Gänget gör saker tillsammans** (2026-11-06, `GRUPP` och `roller` i rum-3d.js): var 31:a
 sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär två gånger av tre
 som vanligt, nästan nio av tio när det går bra, tre av tio när det är nervöst och sällan när
@@ -5170,23 +5247,39 @@ längst in i hörnet på bardisken, mellan orakelramen och datorn (som står fra
 från gullrankan mitt på disken, lite mindre än i verkligheten och vridet mot affären (`pyntSakerna` i
 [public/rum-inredning.js](public/rum-inredning.js)):
 
-- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian och
-  nyåret ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
+- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian
+  ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
   bunden girlang, varmvita små lampor i en slinga runt den, en röd sammetsrosett vid varje krok och röda och
   guldfärgade kulor i bågarna – en adventsstjärna i rött papper i den högra rutan, som lyser inifrån, starkast mot
-  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken.
+  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken. Dessutom tre
+  halmstjärnor med rött garn i trådar ovanför gänget och en julkrans av granris med lingon och en röd rosett på
+  dörrens glas, i ett band från en sugpropp under namnet.
+- **Nyår** (29 december – 2 januari): julpyntet sitter kvar, och serpentiner i lockar hänger från girlangen.
 - **Påsk** (lördagen före palmsöndagen till tisdagen efter annandag påsk): målade ägg – ränder, sicksack, prickar
   och stjärnor i pastell – i band från karmen, och påskris i en vit glaserad kanna med en blå rand, med fjädrar i
-  klara färger och några små ägg bland kvistarna.
+  klara färger och några små ägg bland kvistarna. Tre påskkycklingar av garn vid kannan, och en påskkrans av björkris
+  med fjädrar, små ägg och en gul rosett på dörrens glas.
 - **Midsommar** (måndagen i midsommarveckan till söndagen efter midsommarafton): vimplar i blått och gult längs
-  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar.
+  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar. Lövruskor av
+  björk är bundna vid dörrposterna, med grenarna utåt.
 - **Kräftskivan** (kräftpremiären, andra onsdagen i augusti som på nittiotalet, till sista augusti):
-  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant.
+  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant,
+  och två till på dörrens glas. I hörnet på bardisken ett fat med kräftor och dillkronor, och en flaska brännvin
+  med två snapsglas.
 - **Halloween** (veckan före alla helgons dag och dagen själv): en urholkad pumpa med ett lysande ansikte på
-  bardisken och ett spindelnät med en spindel i fönstrets övre vänstra hörn.
+  bardisken (och en liten bredvid), ett spindelnät med en spindel i fönstrets övre vänstra hörn och fladdermöss i
+  svart papper i trådar i fönstret och på dörrens glas.
 
-Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på två egna dukar i väggens plan: fönstrets
-under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
+Fler saker kom samma dag (användarens önskemål: "fler föremål … De ska inte vara grafikkrävande"). De är byggda så
+att de inte kostar något medan rummet går: var sak är ett eller några få sammanslagna nät med färgen i hörnen och
+samma material som det andra pyntet (inga nya grafikprogram), och den ritas en gång till sin duk som allt pynt.
+Uppmätt i Chromium: halmstjärnan 630 trianglar, fladdermössen 44 styck, kycklingarna 700 styck, ballongerna 2 600,
+julbocken 2 800, serpentinerna 2 800, midsommarstången 4 800, lövruskan 6 500, kransarna 5 700–8 900 och kräftfatet
+med flaskan 8 700, högst åtta nät per sak, var och en byggd på 1–30 ms en gång; gänget har flera hundra tusen
+trianglar och ritas i varje bildruta.
+
+Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på tre egna dukar i väggens plan: fönstrets
+och dörrens under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
 (`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
 målas på väggen och glaset, och på kvällen går rummets mörker runt dem som runt neonen och spotarna och lysrörets
 värme ligger kring dem (`pyntLjus`, `ljusKlockan` i [public/rum.js](public/rum.js)); det andra mörknar med
@@ -5448,10 +5541,12 @@ finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysare
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
 `chokladbollar`) fikat, `?rum-ol=jul` (`pask`) ölen och `?rum-fest=jul` (`lucia`, `nyar`,
 `pask`, `midsommar`, `inget`) högtidskläderna och `?rum-pynt=jul` (`pask`, `midsommar`, `kraftor`,
-`halloween`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
+`halloween`, `nyar`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
-om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
+om matcherna pågick, `?rum-nerv=dl:0.9,dt:0.4:jagar` hur spända de är av matcherna (och tv:n på; se *Nerverna
+under matcherna*), `?rum-slut=dl:1,dt:-1` att en match de satt spända i blåstes av (tipset höll, höll inte;
+vid tiden 0 med `?rum-t`, annars var femtonde sekund) och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
 (rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund; `dl:1b`
 väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, `c` handen i
 bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som
@@ -6552,6 +6647,11 @@ rum-inredning.js).
 Prövat i Chrome med mjukvarugrafik som dator (1440 × 900) på dagen och kvällen och som telefon: rummet byggs utan fel
 och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt ritas i dem.
 
+**Spotskenan togs bort (2026-11-16).** När takfläkten ersatte lysröret fick taket också en svart skena med fyra
+halogenspotar, men den passade inte in i rummet och togs bort samma kväll, i rummet som på fasaden och från Hasses bar.
+Ljuset den lade på löpsedlarna och uret finns kvar (`SPOTAR`, `SPOT.ur` och hålet i dunklet vid löpsedlarna): som de
+andra spotarna syns de inte, bara deras ljus.
+
 ### Ljuskäglorna och skärpedjupet (2026-11-15)
 
 Användarens önskemål: förslagen *Ljus som kommer någonstans ifrån* och *Skärpedjup som styr blicken*. Rummet var
@@ -6648,6 +6748,71 @@ vänstra del 82 → 95; klockan 21.30 taket 37 → 62, lysröret 55 → 114 och 
 och högra väggen är som förut. Provat också som 1920 × 1080 och 1024 × 768, med musen i ytterlägena, på natten
 (klockan 2) och i telefonen (412 × 870) dragen åt vänster; bygget med `--minify` ger samma bild.
 
+### Undertaket (2026-11-16)
+
+Användarens önskemål: "Kan du göra det tydligare att det finns ett tak i butiken? … Det bör självklart passa in med
+saker som finns i taket." Taket var en mörkbrun yta med fogar som gick rakt upp och ned, som en vägg, och på en bred
+skärm syntes det inte alls: scenen skars lika mycket uppe som nere, och hela taket (y 0–90) låg ovanför bilden.
+
+- **Undertaket** (`innertak` i [public/rum-inredning.js](public/rum-inredning.js), en egen duk under allt annat i
+  bakväggens plan): ett 90-tals undertak i three.js med plattor på 60 × 60 cm (120 enheter) i ett bärverk av
+  vitlackerad plåt (gulnad av röken, se *Taket i bakgrunden* nedan) och en vinkellist mot väggarna, sett med samma
+  kamera som takfläkten. Fläkten sitter mitt i en
+  platta, och ljuset från glaskuporna faller upp i taket med skuggan av bladen (en osynlig kopia av fläkten som bara
+  kastar skugga; glaset och hållarna precis över lamporna är borttagna, annars låg en mörk fläck över halva taket).
+  Spotskenan, som också satt i plattorna, är borttagen (se *Spotskenan togs bort* ovan). Plattorna är gulnade av röken och brunast över
+  gängets bord, där röken stiger, och mot väggarna. En har en fuktfläck, en ett frånluftsdon med damm runt, och en har
+  någon lyft och inte lagt tillbaka riktigt. Taket möter väggarna där de är målade (bakväggen vid y 90, högra väggen
+  vid X 1140). På natten släcks lamporna också här; taket ritas då om i tiondelar av natten, inte varje minut.
+- **Under det:** samma rutnät platt i rum.js (`takLinjer` i `bg` och `tak`), ifall 3D-delen inte kommer, i stället
+  för de raka fogarna.
+- **Bred skärm** (`TAK_BRED` i rum.js, `fit`): av det som inte ryms på höjden tas en fjärdedel uppifrån och resten från
+  pulten, i stället för hälften var. I 1500 × 722 (2,08:1) skärs 58 enheter av taket i stället för 115, så att
+  takkanten, plattorna, Stryktipset-bandet och kuporna syns; pulten skärs 172 i stället för 115, och kupongen på
+  pulten visar fyra rader i stället för sju (hela kupongen syns i närbilden). I 1920 × 970 skärs taket 48 i stället för
+  96. I telefonen på bredden är det som förut, och den som har dragit på höjden står kvar där.
+
+Taket ritas en gång, som resten av inredningen: ungefär 4 ms i Chrome, en duk på 3,8 MB på datorn (1300 × 118 i
+planet) och 4,7 MB i telefonen (1560 × 334, upp till rubriken i telefonen på höjden). Inget nytt rör sig i
+bildrutorna. Provat på datorn (1280 × 800, 1500 × 722), i telefonen (360 × 800, 390 × 844, 430 × 932), på natten och
+utan 3D-taket, och med närbilden av uret och kupongen på bred skärm.
+
+### Takfläkten i bakgrunden (2026-11-16)
+
+Användarens önskemål: "Kan du ordna så att fläktlampan i taket på animationssidan blir mindre prominent. Just nu tar
+den mkt fokus." Takfläkten (`flakt` i rum-inredning.js, i stället för lysröret) hade kupor i nästan vitt glas med ett
+starkt sken kring sig – det ljusaste i rummets överkant, mitt ovanför gänget – och i telefonen på höjden syntes stora
+blad med ljusa rottingfält. Nu lyser den på bordet utan att dra blicken till sig:
+
+- **Mindre:** fyra femtedelar så stor, krympt kring fästet i taket (`FLAKT.S`), så att kuporna hänger högre över
+  Stryktipset-bandet. Det som lyser (`LAMP.lyser`) följer med.
+- **Dämpat glas:** kuporna i varmt, beigt glas i stället för vitt (`GLAS.pa`) och skenet kring dem i deras duk
+  (`medSkenet`) ungefär hälften så starkt.
+- **Mörkare blad:** mahognyn mörkare, rottingfälten mörkare och mindre lack, och ljuset under fläkten svagare.
+- **Mindre ljus i taket:** hålet i dunklet kring fläkten (`ljusKlockan` i rum.js) och den varma tonen på taket runt
+  den är svagare.
+
+Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som dator (1440 × 900) klockan
+14 och 21.30 och som telefon (412 × 870).
+
+### Taket i bakgrunden (2026-11-16)
+
+Användarens önskemål: "Kan du göra taket ngt mindre prominent. Det tar en del fokus här. Behåll 90-talsstuket o ge det
+lite patina/rökpåverkan." I telefonen på höjden, där taket fyller bilden ovanför Stryktipset-bandet, var undertaket
+(`innertak` i rum-inredning.js) ett ljust rutnät: bärverket i nästan vit plåt över gulnade plattor, och ett
+frånluftsdon med skarpa svarta springor. Nu är det samma 90-talstak, men så som det ser ut efter många år av rök:
+
+- **Bärverket gulnat** (`plat`): nästan i plattornas ton och mattare, så att rutnätet syns utan att lysa.
+- **Plattorna mörkare och ojämna:** mer nikotin överallt (`GUL`, `BRUN`, `brun`), stråk där röken drog fram, en mörk
+  sotring kring fläktens fäste, mjuka fläckar på varje platta och sot längs kanterna mot bärverket.
+- **Frånluftsdonet smutsigt:** gallret i plattornas gulnade ton och springorna mindre svarta.
+- **Mindre ljus underifrån** (`HemisphereLight` och kupornas ljus i takets scen), så att taket klingar av i dunkel
+  mot betraktaren och ljuset ligger kring fläkten.
+
+Takets ljusstyrka i telefonen (430 × 932, medel i gråskala över taket): klockan 14 65 → 50, klockan 22.50 39 → 31.
+Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som telefon (430 × 932) klockan
+14 och 22.50 och som dator (1440 × 900).
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
@@ -6691,14 +6856,15 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
   snö. Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
   fler bilar i rusningen och färre på natten (fler taxi då), och på helger och röda dagar ingen
-  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna är olika sorter
-  (sedan, kombi som en gammal Volvo, halvkombi, stadsjeep, Saab, skåpbil och taxi med
-  taklampa) och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
+  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna, bussarna och plogbilen är
+  fasadens (sedan 2026-11-16, rum-fasad-gatan.js: nittiotalets bilar i Stockholm, skåpbilar och taxi med
+  taklampa), i gatans ljus, och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
   Eriksbron kommer i båda riktningarna med några minuters mellanrum: röda 3:an eller 77:an
   och blåa ledbussen 4:an. I en fil åker alla lika fort på ett band med luckor, så att ingen
   kör igenom någon annan (bussarna och plogbilen har varsin lucka och kommer var m:e varv),
   och fordonen ritas en gång och glider bara: de kostar mindre än förut, då de gungade och
-  ritades om i gängets takt (`FORM`, `fordon` och trafiken i `gatliv` i rum-ute.js).
+  ritades om i gängets takt (trafiken i `gatliv` i rum-ute.js). I SVG:n står bara en tom grupp per fordon, som ritas med
+  fasadens kod när figuren görs till en bild (`fordonsFigur`, `delar`).
 - **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och
   orange på hösten och kala annars; löv blåser förbi och ligger på trottoaren på hösten, plogbilen när
   det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till
@@ -6847,9 +7013,14 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   2026-11-16: bilar som fanns på nittiotalet, inte bara de som tillverkades då): Volvo Amazon med kromlisten från
   strålkastaren, PV:n med puckelryggen, 144:an, Saab 96 och 99, Bubblan och Ankan med skärmarna för sig (Ankan med
   tygtak, räfflad huv och kjol över bakhjulet), Mercedes 123 (ibland taxi), Lada Niva och Minin, ibland med vitt tak,
-  de flesta med kromade stötfångare och i sin tids färger), ritade efter de riktiga måtten (längd, hjulbas, höjd) med
-  backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke, skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller
-  med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
+  de flesta med kromade stötfångare och i sin tids färger. Fler samma dag ("fler bilar som fanns på 90-talet i
+  Sthlm"): Volvo 440 med den höga bakdelen, 480:n med glasbakluckan och de uppfällda strålkastarna, Mercedes 190,
+  Audi 100, Passat-kombin (för alla de mellanstora kombibilarna), Citroën BX med kjol över bakhjulet, Jeep Cherokee,
+  Chrysler Voyager (ibland storbilstaxi), Saab 900 cabriolet med tygtak – och taket nere när det är minst 18 grader och
+  torrt, med dem som åker synliga – och bland de äldre Volvo 145, Lada 2105/2107 och 2104 i kombi, och amerikanaren
+  med fenor, vita däcksidor och ibland vitt tak, bara när det är minst 15 grader och torrt), ritade efter de riktiga
+  måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke,
+  skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
   gånger så fort som de som går på skärmen, så att en bil syns i ungefär tre sekunder (förut knappt två).
@@ -7732,7 +7903,7 @@ bland tre skisser i den riktiga närbilden:
   staplar, där räcker siffrorna. LÄGET:s mätare står utanför dagarna på samma sätt, med
   tävlingen och elvan svagt under talen; skadorna står i lagens halvor och domaren med sina tal
   till vänster och divisionens snitt till höger. Formens matcher står på var sin sida om
-  etiketternas spalt (i telefonen under varandra, det högra lagets högerställda). Samma mått i
+  etiketternas spalt (i telefonen under varandra, se nedan). Samma mått i
   alla fyra flikarna (`spegel` i [public/rum-register.js](public/rum-register.js)), så att lagen
   står still när man byter flik; MÖTENA har förra mötet kvar som dragkamp. Staplarna är klasserna
   `sv`, `so` och `sf` i [public/rum-register.css](public/rum-register.css), och skärmen i rummet
@@ -7777,6 +7948,13 @@ bland tre skisser i den riktiga närbilden:
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
   motståndaren i en annan division eller grupp står den efter platsen (*3:E CH*, *2:A A3*).
   Datorn har lagen sida vid sida, telefonen under varandra.
+- **Lagens listor i telefonen** (2026-11-16, användarens synpunkt: "ingen bra lösning på
+  mobilen"): formens matcher i ÖVERSIKT och de tio senaste i xG står i telefonen under varandra,
+  och förut stod det högra lagets lista högerställd – listorna hamnade förskjutna mot varandra och
+  formens listor hade inga namn. Nu har båda listorna lagets namn ljust över sig och en tom rad
+  emellan, är lika breda (den bredaste radens bredd) och står tillsammans i mitten av blocket,
+  så att utfallet, resultatet, motståndaren och platsen står i raka spalter
+  (`underVarandra` i [public/rum-register.js](public/rum-register.js)).
 - **Vad landslagen spelar för** (frågor om playoff, placeringarna i de andra ligorna och vägen
   till EM; *Raden*, med rutan): i Nations Leagues sista omgångar står *SPELAR FÖR* under
   POÄNG – målet laget kan nå och vad som räcker (*KVAR I B · VINST RÄCKER*, *KVARTSFINAL ·
@@ -8393,7 +8571,9 @@ adventsljusstaken, påskriset, blommorna eller pumporna står på bardisken till
 löpsedel. Det ritas en gång genom hans kamera på en egen duk mellan väggen och honom (`.rh-pynt`), när bilden passas
 in och när ljuset ändras, och är lika oskarpt som väggen på det djupet, som löpsedeln. Ljuset är barens: lysröret,
 dagsljuset bakifrån genom glaset och mörkret, som på honom; det som lyser lyser ändå. På höjden står det närmare
-honom, så att det ryms i den smalare bilden.
+honom, så att det ryms i den smalare bilden. Bredvid, längre åt höger, står fler saker där bilden är bred: en julbock i halm med röda band och två halmstjärnor
+till jul, ballonger i guld, silver och svart till nyår, påskkycklingar vid påskriset, en liten midsommarstång lindad
+med löv och blommor, kräftfatet med brännvinet (i stället för något annat på disken) och fladdermöss i glaspartiet.
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på en halv sekund, som när kameran vrids åt vänster: den kommer
@@ -8513,8 +8693,8 @@ cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på and
 torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
 står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, ungefär som man ser bron härifrån,
 så att körbanan syns som en smal yta bakom räcket; sedan 2026-11-16 0,16 i stället för 0,28, se *Trafiken som
-gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
-fronten eller baken upp till där ovansidan tar vid, och ovansidan i raka bitar ur karossens överkant (`topp`:
+gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är fasadens (sedan 2026-11-16, rum-fasad-gatan.js) och några bilder som ritas en gång: sidan (ritad med fasadens kod, `scen`),
+fronten eller baken upp till där ovansidan tar vid (nittiotalets svarta stötfångare med skylten, strålkastarna med grillen emellan eller baklyktorna, i fasadens mått, `matt`), och ovansidan i raka bitar ur karossens överkant (`topp`:
 motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
 plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
 avbildning för fordonet, så att de möts, och var bit fortsätter en bit in under den som ritas efter, så att

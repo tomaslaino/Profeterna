@@ -30,6 +30,15 @@
   // inget in, är inte med när tipsen jämförs inför gängets kupong och räknas inte in i den.
   const HASSE = { id: 'HB', namn: 'Hasse Backe' };
 
+  // Han tävlar bara i en omgång som hela gänget har tippat (Tomas 2026-11-16): en omgång
+  // som bara han spelar ger honom inget försprång. ids: omgångens gäng, tog(id): om den
+  // personen har tippat i omgången. Ingen kan lämna in när tipsen väl visas, så svaret
+  // står fast från att omgången skrivs in (worker/samtal.mjs).
+  const hasseMed = (ids, tog) => {
+    const gang = ids.filter((id) => id !== HASSE.id);
+    return gang.length > 0 && gang.every(tog);
+  };
+
   // Vad vi kallar varandra överallt på sidan: efternamnet – alla i gänget heter
   // Daniel – men Dogge för Daniel Johansson. Hela namnet står bara där det måste:
   // Om oss, under autograferna på visitkortet och när man pekar på ett namn.
@@ -154,5 +163,5 @@
     return { people: [...by.values()].sort((a, b) => key(b) - key(a)), model };
   }
 
-  return { SIGNS, BASE, HASSE, kallas, SLAG, regelFor, slag, regelOver, regelKlar, sign, hasseSagt, pct, chance, modelSign, points, tally, runda, key, rank, season };
+  return { SIGNS, BASE, HASSE, hasseMed, kallas, SLAG, regelFor, slag, regelOver, regelKlar, sign, hasseSagt, pct, chance, modelSign, points, tally, runda, key, rank, season };
 });

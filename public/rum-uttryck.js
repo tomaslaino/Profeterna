@@ -12,6 +12,9 @@
 //   deppig  munnen nedåt, ögonbrynen uppåt inåt, tunga ögonlock, påsar under
 //           ögonen och nästan ingen rodnad
 //   orolig  läpparna ihoppressade och ögonbrynen uppåt inåt (rynkor i pannan)
+//   nervos  spänd medan en match står och väger (rum-3d.js, nerverna): ögonbrynen
+//           högt uppåt inåt, ögonen vidöppna mot tv:n och läpparna ihoppressade
+//           och snett, som när man biter sig i läppen – och lite blekare
 //   trott   tunga ögonlock, påsar under ögonen, blek och munnen lite nedåt:
 //           inte för kupongen utan för sömnen och den som just har vaknat
 //           (rum-3d.js), också för DT, som då får öppna ögon
@@ -53,6 +56,9 @@ const LAGE = {
   deppig: { mun: -0.9, bryn: 12, lock: 0.42, rod: 0.15, pasar: 1 },
   // (samlad mer än rädd: gänget är tryggt också när det står och väger)
   orolig: { mun: -0.1, tight: 1, bryn: 7, lyft: -1, rod: 0.6 },
+  // (nerverna under matcherna: inte för kupongen, utan när en match står och väger – stunderna och
+  // situationerna i rum-3d.js. Mer än orolig, men samma ansikte: ingen skräck)
+  nervos: { mun: -0.22, tight: 1, sida: 1.4, snett: -1.3, bryn: 11, lyft: -2.2, blick: [0.4, -0.7], rod: 0.42 },
   // trött och bakfull (rum-3d.js, sömnen): inget läge för kupongen utan för
   // den som sover (med ögonen stängda, blundar) och den som just har vaknat
   trott: { mun: -0.18, bryn: 4, lyft: 1.5, lock: 0.5, rod: 0.35, pasar: 1 },
