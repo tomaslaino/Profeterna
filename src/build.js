@@ -11,7 +11,8 @@
 //                          sammandraget hos Viaplay, src/hojdpunkter.js)
 //   data/match/<id>.json   underlaget och prognosen för en match,
 //                          matchens höjdpunkter och den beräknade
-//                          startelvan (src/startelvor.js)
+//                          startelvan (src/startelvor.js) och spelarnas
+//                          vila före matchen (src/fetchers/s365vila.js)
 //   data/model.json        regelversion, skattade storheter, backtestet och
 //                          kandidatloggen (fliken Modell)
 //   data/evaluation.json   journalen och utvärderingen mot facit (sist på
@@ -335,6 +336,8 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
   // En trasig match får inte stoppa bygget – den saknar då bara sin sida.
   const failed = [];
   let pages = 0;
+  // Spelarnas vila före matchen (src/fetchers/s365vila.js), för datorns LÄGET.
+  const spelarvila = ((readCache('s365_vila') || {}).data || {}).matches || {};
   for (const id of matchIds()) {
     try {
       const d = matchDetail(id, { strength: forecast.strength });
@@ -344,6 +347,7 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
       d.squads = squads(d.match);
       // Den beräknade startelvan (src/startelvor.js), för kommande matcher.
       d.elva = elva(id);
+      d.spelarvila = spelarvila[id] || null;
       d.highlights = video.get(id) || null;
       d.youtube = yt.get(id) || null;
       // Bygget som underlaget kommer ur – matchanalysen jämför mot det.

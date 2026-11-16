@@ -160,6 +160,30 @@
     vila: { e: 'VILAN', n: 'DAGAR SEDAN FÖRRA MATCHEN', t: 'Alla tävlingar räknas. Under dagarna står tävlingen när det inte är ligan.', ex: null },
     nasta: { e: 'NÄSTA', n: 'DAGAR TILL NÄSTA MATCH', t: 'Alla tävlingar räknas. Under dagarna står tävlingen när det inte är ligan.', ex: null },
     matcher: { n: 'MATCHER DE SENASTE DAGARNA', t: 'Alla tävlingar räknas.', ex: null },
+    // spelarnas egen vila (sedan 2026-11-16), också för landskamperna
+    'vila-elvan': {
+      e: 'ELVANS VILA', n: 'DAGAR SEDAN SPELARNAS SENASTE MATCH',
+      t: 'Snittet för startelvan. Varje spelares senaste match räknas, för klubben eller landslaget, och ett inhopp räknas också. Mer än två veckor räknas som två veckor. Elvan under dagarna är den uttagna, 365Scores troliga, sajtens beräknade eller den i förra matchen.',
+      ex: ({ namn, sv }) => {
+        const x = sv && sv.elva;
+        if (!x || !x.p || x.p.length < 2) return null;
+        const tak = (d) => (d == null ? 14 : Math.min(14, d));
+        const per = new Map();
+        for (const [, d] of x.p) per.set(tak(d), (per.get(tak(d)) || 0) + 1);
+        const g = [...per].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
+        const vem = { uttagen: 'uttagna elva', trolig: 'troliga elva', 'beräknad': 'beräknade elva', 'förra': 'elva i förra matchen' }[x.k] || 'elva';
+        const nar = (d) => (d >= 14 ? 'två veckor sedan eller tidigare' : d === 1 ? '1 dag sedan' : `${d} dagar sedan`);
+        if (g.length === 1) return `Alla i ${gen(namn)} ${vem} spelade sin senaste match för ${nar(g[0][0])}.`;
+        const delar = g.map(([d, n], i) => `${hel(n)}${i ? '' : ' sin senaste match'} för ${nar(d)}`);
+        const summa = x.p.reduce((s, [, d]) => s + tak(d), 0);
+        return `I ${gen(namn)} ${vem} spelade ${delar.slice(0, -1).join(', ')} och ${delar[delar.length - 1]}: (${g.map(([d, n]) => `${n} × ${d}`).join(' + ')}) / ${x.p.length} = ${dec(summa / x.p.length)}.`;
+      },
+    },
+    'vila-truppen': {
+      e: 'TRUPPENS VILA', n: 'DAGAR SEDAN SPELARNAS SENASTE MATCH',
+      t: 'Snittet för alla i truppen som har spelat den senaste månaden, i alla tävlingar och för landslaget också. Mer än två veckor räknas som två veckor.',
+      ex: ({ namn, sv }) => (sv && sv.trupp ? `${st(sv.trupp.n, 'spelare', 'spelare')} i ${gen(namn)} trupp har spelat den senaste månaden.` : null),
+    },
     gjorda: { e: 'MÅL', n: 'GJORDA–INSLÄPPTA PER MATCH', t: 'Bara ligamatcherna räknas.', ex: null },
     hemma: { e: 'HEMMA', n: 'HEMMAMATCHERNA I LIGAN', t: 'Vinster, oavgjorda och förluster den här säsongen.', ex: null },
     borta: { e: 'BORTA', n: 'BORTAMATCHERNA I LIGAN', t: 'Vinster, oavgjorda och förluster den här säsongen.', ex: null },

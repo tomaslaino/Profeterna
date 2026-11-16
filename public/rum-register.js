@@ -228,7 +228,9 @@ window.RumRegister = (() => {
   // För landslagen (som inte har tavlans tal): poängen i gruppen (en seger),
   // poängen per match i Nations League och alla landskamper (V-O-F), målen
   // som för klubbarna och marknadens chans som favoritskapet.
-  const SKILJER = { form: 2, vila: 2, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, favorit: 0.15, poang: 3, ppm: 0.5 };
+  const SKILJER = { form: 2, vila: 2, vilaSnitt: 1, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, favorit: 0.15, poang: 3, ppm: 0.5 };
+  // vilken elva spelarnas vila gäller (src/fetchers/s365vila.js), svagt under dagarna
+  const ELVA_SORT = { uttagen: 'UTTAGEN ELVA', trolig: 'TROLIG ELVA', beräknad: 'BERÄKNAD ELVA', förra: 'FÖRRA ELVAN' };
   // matchaktens etiketter (den längsta, STORA CHANSER i förra mötet, är 13
   // tecken) och lagens tal på var sida om dragkampens stapel (24:E −0,89)
   const AKTEN_L = 15;
@@ -1303,16 +1305,33 @@ window.RumRegister = (() => {
           [pad('', mitt), ''], luft(m1), ...m1, [' ', ''], v[1])];
       };
       // dagarna: full mätare vid två veckor; b är laget med den bättre vilan
-      const dagRad = (etikett, v, b, q) => matRad(etikett, v.map((x) => (x == null ? '–' : `${x} D`)), (j) => {
+      const dagRad = (etikett, v, b, q, fmt = (x) => `${x} D`) => matRad(etikett, v.map((x) => (x == null ? '–' : fmt(x))), (j) => {
         const f = v[j] == null ? 0 : Math.min(MATN, Math.round((v[j] * MATN) / 14));
         return [...dragStreck(f, b >= 0 && j !== b ? 'mtd' : 'mt1'), ...dragStreck(MATN - f, 'mt0')];
       }, b, q);
       // en svag rad under lagens tal (bara när något av lagen har en text)
       const under = (v) => (v.some(Boolean) ? dragText(G, '', v.map((x) => [x, 'd'])) : null);
       const tav = (k) => under(sid.map((s, j) => tavlingOf(m, s, sch[j] && sch[j][k], H)));
+      // Spelarnas egen vila (sedan 2026-11-16, användarens önskemål: lagets
+      // VILAN säger lite inför en landskamp, när spelarna har spelat för sina
+      // klubbar under tiden): snittet av dagarna sedan varje spelares senaste
+      // match i alla tävlingar, för startelvan och för truppen, i samma skala
+      // som VILAN. Under elvans dagar står svagt vilken elva det är.
+      // (src/fetchers/s365vila.js)
+      const sv = (d && d.spelarvila) || null;
+      const spv = (k) => sid.map((s) => (sv && sv[s] && sv[s][k] && ok(sv[s][k].d) ? sv[s][k].d : null));
+      const elvV = spv('elva');
+      const trpV = spv('trupp');
+      const snittD = (x) => `${num(x, 1)} D`;
+      const spelarna = [
+        elvV.some(ok) ? dagRad('ELVANS VILA', elvV, bast(elvV, SKILJER.vilaSnitt), ordQ('vila-elvan'), snittD) : null,
+        elvV.some(ok) ? under(sid.map((s) => ELVA_SORT[sv[s] && sv[s].elva ? sv[s].elva.k : ''] || '')) : null,
+        trpV.some(ok) ? dagRad('TRUPPENS VILA', trpV, bast(trpV, SKILJER.vilaSnitt), ordQ('vila-truppen'), snittD) : null,
+      ];
       const laget = [
         dagRad('VILAN', vila, bast(vila, SKILJER.vila), ordQ('vila')),
         tav('last'),
+        ...spelarna,
         dagRad('NÄSTA', sch.map((x) => (x && x.next && x.next.days != null ? x.next.days : null)), -1, ordQ('nasta')),
         tav('next'),
       ];
@@ -1613,6 +1632,8 @@ window.RumRegister = (() => {
         ...(t ? hLag(t) : {}), t, namn: prosa(m[side]),
         form5: T && T.form ? T.form.slice(0, 5).map((x) => ({ mot: heltNamn(x.opponent), tav: tav(x.comp), niva: x.opp && x.opp.level != null ? Math.round(100 * x.opp.level) : null })) : null,
         mott: mottOf(m, side),
+        // spelarnas vila före matchen { elva: { d, n, k, p }, trupp: { d, n } }
+        sv: (d && d.spelarvila && d.spelarvila[side]) || null,
         // det matchsidans rad visar för laget ('5,5–4,2')
         visar: (etikett) => { for (const g of (d && d.rows) || []) for (const x of g.rows || []) if (x.label === etikett) return x.values[j]; return null; },
       };

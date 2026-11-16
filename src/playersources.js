@@ -17,6 +17,7 @@ const espnMinutes = require('./fetchers/espnminutes');
 const s365Ratings = require('./fetchers/s365ratings');
 const s365Squads = require('./fetchers/s365squads');
 const s365Stats = require('./fetchers/s365stats');
+const s365Vila = require('./fetchers/s365vila');
 const { readCache } = require('./store');
 
 // Ligorna och Nations League: de tävlingar som har spelare och lagens siffror.
@@ -225,5 +226,51 @@ for (const c of LEAGUES) {
     },
   });
 }
+
+// Spelarnas vila före de kommande matcherna (src/fetchers/s365vila.js): den
+// troliga elvans och truppens dagar sedan sin senaste match, i alla
+// tävlingar (datorns LÄGET). Läser spelprogrammen, 365Scores trupper och den
+// beräknade startelvan ur cachen. Körs vid varje bygge men hämtar bara det som
+// är för gammalt: trupperna två gånger om dygnet, elvorna oftare nära avspark.
+PLAYER_SOURCES.push({
+  id: 's365_vila',
+  provider: '365Scores',
+  short: '365Scores',
+  label: 'Spelarnas senaste matcher i alla tävlingar och de troliga elvorna – vilan före matchen',
+  comps: [...LEAGUES.map((c) => c.id), 'fac', 'lc', 'vsk'],
+  kinds: ['players', 'lineups'],
+  maxAgeHours: 0.4,
+  staleAfterHours: 48,
+  verified: '2026-11-16',
+  stage: 2,
+  fetch: () => {
+    const { EUROPE } = require('../config/competitions');
+    const INACTIVE = new Set(['STATUS_POSTPONED', 'STATUS_CANCELED', 'STATUS_ABANDONED']);
+    const now = Date.now();
+    const events = [];
+    const ur = (id, comp) => {
+      const fx = readCache(id);
+      for (const m of (fx && fx.data && fx.data.matches) || []) {
+        if (m.completed || INACTIVE.has(m.status) || !m.home || !m.away || Date.parse(m.kickoff) < now - 3 * 3600000) continue;
+        events.push({ id: String(m.id), comp, kickoff: m.kickoff, home: m.home, away: m.away });
+      }
+    };
+    for (const c of [...COMPETITIONS, ...INTERNATIONAL]) ur(`espn_fixtures_${c.id}`, c.id);
+    for (const c of EUROPE) ur(`espn_europe_${c.id}`, c.id);
+    if (!events.length) throw new Error('inget spelprogram i cachen än');
+    const squads = new Map();
+    for (const c of LEAGUES) {
+      const sq = readCache(`s365_squads_${c.id}`);
+      for (const [tid, t] of Object.entries((sq && sq.data && sq.data.teams) || {})) if (!squads.has(tid)) squads.set(tid, t);
+    }
+    if (!squads.size) throw new Error('inga trupper från 365Scores i cachen än');
+    const prev = readCache('s365_vila');
+    return s365Vila.fetchVila({ events, squads, planFor: (id) => require('./startelvor').elvaFor(id), previous: prev && prev.data, now });
+  },
+  summarize: (d) => {
+    const n = Object.keys(d.matches).length;
+    return { n, detail: `${n} matcher med spelarnas vila (${d.computed} av ${d.upcoming} kommande räknade nu)` };
+  },
+});
 
 module.exports = { PLAYER_SOURCES };

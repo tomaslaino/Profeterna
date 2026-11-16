@@ -844,6 +844,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Landslagens flaggor | ESPN:s bildtjänst (`…/teamlogos/countries/500/<kod>.png`, koden ur lagets logo-adress) | landskamperna | när ett nytt lag kommer | Landslagen ligger inte bland klubbarnas sköldar. Sparas som sköldarna, under det svenska namnet. |
 | Landslagens spelare | ESPN:s öppna API (`uefa.nations/teams/<id>/roster` för de uttagna, `summary?event=<id>` för varje spelad match) | Nations League | trupperna 12 h, rapporterna 6 h, bara nya matcher | Verifierat 2026-11-14: 54 landslag. ESPN:s säsongssiffror i landslagens trupper stämmer inte med matcherna (Norge hade spelat 4 matcher men spelarna stod på 6) och truppen är bara den senast uttagna (214 av 1 326 som spelat saknades), så spelarnas siffror räknas ur matchrapporterna (`p` i `espn_minutes_unl`: mål, assist, skott, kort, regelbrott, räddningar och insläppta per spelare och match). Målen stämde med tabellen utom självmålen (299 av 307). Se [Spelare och statistik för landslagen](#spelare-och-statistik-för-landslagen-2026-11-14). |
 | Landslagens xG, skott och kort | 365Scores öppna webb-API (`/web/game/stats/?games=<id>`, matcherna som för betygen) | Nations League | 6 h, bara nya matcher | Verifierat 2026-11-14: tävling 7016, alla 122 spelade matcher hittades och hade xG, skott, skott på mål, hörnor, frisparkar och kort för båda lagen. Skotten och hörnorna stämde med ESPN:s i stickprovet (Turkiet–Belgien). Det som ligorna har ur football-data.co.uk. Betygen och spelarbilderna hämtas som för ligorna (Republic of Ireland heter Ireland där). |
+| Spelarnas vila | 365Scores öppna webb-API (`/web/athletes/?athletes=<id,…>&fullDetails=true` för spelarnas senaste matcher, `/web/games/fixtures/?competitions=<id>` och `/web/game/?gameId=` för elvorna) | ligorna, cuperna, Nations League och vänskapslandskamperna | vid varje bygge, men trupperna högst två gånger om dygnet och elvorna var 6:e timme (var 2:a inom två dygn, varje bygge sista sex timmarna) | Verifierat 2026-11-16: `lastMatches` ger varje spelares fem senaste matcher i alla tävlingar (klubben, cuperna, Europa och landslaget) med `played` och speltiden (`athleteStats` typ 229). En hel trupp i ett anrop, ~100 kB packat och under en sekund (Italiens 31). Första hämtningen: 59 kommande matcher, 117 lag, 186 anrop på 1,5 minut. Lagen ur `s365_squads_<division>`, elvan ur matchens lineups (`Confirmed`/`NotConfirmed`) och annars den beräknade startelvan. Datorns ELVANS VILA och TRUPPENS VILA ([Spelarnas vila](#spelarnas-vila)). Styr inte prognosen. |
 | Höjdpunkter (YouTube) | Kanalernas öppna flöden (`youtube.com/feeds/videos.xml?channel_id=<id>`, de 15 senaste klippen) och oEmbed (`youtube.com/oembed`) | alla sex | 30 min | Ingen nyckel. Kanalerna i [config/youtube.js](config/youtube.js): Premier League, Sky Sports Premier League, Sky Sports Football, EFL och FA-cupen, UEFA (för landskamperna, 2026-11-13), plus de 92 ligaklubbarnas egna kanaler (id ur Wikidata P2397 och länkarna på klubbarnas sajter, 2026-10-20). Bara klipp med *highlights* i titeln; damlag, ungdomslag, träningsmatcher, EFL Trophy och gamla matcher sorteras bort. oEmbed sorterar bort klipp som inte får bäddas in (401) eller är borta (404). Flödet har ingen landsspärr – spärrade klipp märks i spelaren, som tar nästa. Matchen hittas på lag och tid: utlagt 95 minuter till sex dygn efter avspark; i en klubbs kanal ska motståndaren stå i titeln, i en sändares båda lagen; ett resultat i titeln ska vara matchens. Spelas inbäddat från `youtube-nocookie.com`. Styr inte prognosen. |
 
 **Prövat och inte använt:**
@@ -7481,6 +7482,33 @@ matchen var i Europa står under VILAN. Mätarnas rutor går nu jämnt upp i bre
 (`background-repeat: round` i [public/rum-register.css](public/rum-register.css)): ett tecken i
 VT323 är en bråkdel bredare än `1ch`, och en ruta till skymtade fram som ett tunt streck efter
 mätarna, också i lagkorten.
+
+#### Spelarnas vila
+
+2026-11-16 ville användaren ha "någon form av genomsnitt för hur många dagar spelarna i respektive lag har fått
+vila inför denna match – jag tänker då också klubblag", för den förmodade startelvan och för hela truppen: lagets
+VILAN säger lite inför en landskamp, när spelarna har spelat för sina klubbar under tiden (och tvärtom efter ett
+landslagsuppehåll). Under VILAN i LÄGET står nu två rader till, i samma skala och med samma mätare:
+
+- **ELVANS VILA** – snittet för startelvan av dagarna sedan varje spelares senaste match, i alla tävlingar och för
+  landslaget också (ett inhopp räknas). Under dagarna står svagt vilken elva det är: *UTTAGEN ELVA* (365Scores
+  bekräftade, ungefär en timme före avspark), *TROLIG ELVA* (365Scores troliga, "Probable Lineups", ibland flera
+  dagar före – i stickprovet 2026-11-16 för alla landskamper samma och nästa kväll), *BERÄKNAD ELVA* (sajtens
+  beräknade startelva utan dem som saknas, samma som matchbladets Startelvor) eller *FÖRRA ELVAN* (landslagen
+  utan en trolig elva: elvan i lagets förra match).
+- **TRUPPENS VILA** – snittet för alla i 365Scores trupp (för ett landslag den uttagna truppen) som har spelat den
+  senaste månaden; långtidsskadade och de som aldrig spelar räknas inte.
+
+Mer än två veckor räknas som två veckor, som i mätaren: den som kommer tillbaka efter en skada ska inte dra upp hela
+elvans snitt. Det bättre snittet lyser när skillnaden är minst en dag (`SKILJER.vilaSnitt`). Förklaringsrutan har ett
+exempel per lag med uträkningen (*I Coventrys troliga elva spelade 8 sin senaste match för två veckor sedan eller
+tidigare, 2 för 7 dagar sedan och 1 för 9 dagar sedan: (8 × 14 + 2 × 7 + 1 × 9) / 11 = 12,3*).
+
+Datan kommer ur källan `s365_vila` ([src/fetchers/s365vila.js](src/fetchers/s365vila.js)) och står som `spelarvila`
+i matchens fil. Den räknas för alla kommande matcher inom en vecka där minst ett av lagen har en trupp hos 365Scores
+(ligorna, cuperna, Nations League och vänskapslandskamperna). Har laget en annan match före den här (en match i
+veckan före helgens) räknas inget förrän den är spelad, och en spelad match står kvar som den var vid avspark. Före
+ett landslagsuppehåll räknas klubbspelarnas kommande landskamper inte – siffran blir rätt när de är spelade.
 
 #### Rankningen
 

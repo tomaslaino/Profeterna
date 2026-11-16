@@ -63,8 +63,8 @@ const PROVIDERS = [
     id: '365Scores',
     name: '365Scores',
     url: 'https://www.365scores.com/football/england',
-    gives: 'Spelarnas betyg efter varje match, 1–10, och startelvorna. För Nations League också xG, skott, hörnor och kort per match.',
-    used: 'Betygen i statistiken och matchrutan, och landslagens xG och skott',
+    gives: 'Spelarnas betyg efter varje match, 1–10, och startelvorna. Spelarnas senaste matcher i alla tävlingar. För Nations League också xG, skott, hörnor och kort per match.',
+    used: 'Betygen i statistiken och matchrutan, landslagens xG och skott, och spelarnas vila i datorn',
     live: 'Startelvorna och vilka som saknas hämtas när matchrutan öppnas.',
   },
   {
