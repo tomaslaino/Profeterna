@@ -4270,6 +4270,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
+      // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
+      pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
       calm: () => RORELSE_AV.matches,
       // (en fast bild, ?rum-t: allt står på samma tid)
       still: still() ? R.frozen : null,

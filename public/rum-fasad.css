@@ -28,6 +28,9 @@
    barberarens stång på väggen */
 .rf-fram, .rf-bak, .rf-barber { position: absolute; pointer-events: none; }
 
+/* högtidspyntet i skyltfönstret och på dörren, ritat en gång (o.pynt i rum-fasad.js): skarpt, närmast glaset */
+.rf-pynt { position: absolute; pointer-events: none; }
+
 /* I telefonen ingen oskärpa på gänget: den blev ett eget pass på grafikkortet */
 @media (max-width: 700px), (max-height: 500px) {
   .rf-gang { filter: none; }
