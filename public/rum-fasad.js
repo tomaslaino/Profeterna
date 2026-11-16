@@ -41,7 +41,8 @@ window.RumFasad = (() => {
   const pick = (R, a) => a[(R() * a.length) | 0];
   // (färgerna och ljuset ur rum-ute.js, så att det är samma himmel som inifrån)
   const U = () => window.RumUte;
-  const rgb = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+  // (också korta färger som #222: utan det blev blandningen ogiltig, och delen fick färgen före sig)
+  const rgb = (c) => (c.length === 4 ? [1, 2, 3].map((i) => parseInt(c[i] + c[i], 16)) : [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)));
   const hx = (a) => `#${a.map((x) => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0')).join('')}`;
   const mix = (a, b, t) => { const A = rgb(a); const B = rgb(b); return hx(A.map((x, i) => x + (B[i] - x) * t)); };
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
@@ -61,6 +62,8 @@ window.RumFasad = (() => {
   const KARM = 12;
   const SKYLT = { x: 398, y: 296, w: 748, h: 84 };
   const HORN = 1250;
+  // stupröret: mellan fönstren på våningarna och bakom gatuskylten, så att det syns också i en telefon
+  const STUPROR = 1180;
   const RACKE = MARK - 1.1 * M;
   // det som alltid ska synas, och världens kanter
   const FOKUS = { x0: 380, x1: 1180, y0: 270, y1: 960 };
@@ -359,6 +362,8 @@ window.RumFasad = (() => {
   // Ett fönster på våningarna ovanför (cx mitten, y underkant): vita bågar med spröjs, himlen i glaset på
   // dagen och tänt efter klockan, adventsljusstakar och stjärnor i advent, och ibland en fransk balkong.
   const WARM = ['#ffd58a', '#ffc56b', '#f6e7c1', '#ffcf7a', '#a9c4ff'];
+  // ett rinnmärke på putsen, smalare nedåt (toningen rf-rinn står i huset)
+  const rinn = (x, y, w, h) => `<path d="M${r1(x - w / 2)} ${y} Q${r1(x - w * 0.3)} ${r1(y + h * 0.6)} ${r1(x - w * 0.08)} ${r1(y + h)} L${r1(x + w * 0.1)} ${r1(y + h * 0.9)} Q${r1(x + w * 0.3)} ${r1(y + h * 0.5)} ${r1(x + w / 2)} ${y} Z" fill="url(#rf-rinn)"/>`;
   function fonster(v, L, cx, yb, R, balkong) {
     const w = 190;
     const h = 330;
@@ -388,12 +393,28 @@ window.RumFasad = (() => {
         s += `<ellipse cx="${cx}" cy="${r1(b - 30)}" rx="70" ry="40" fill="#ffc874" opacity="${r1(0.25 * on)}"/>`;
       }
     }
+    // Grannarna: i några tända fönster sitter någon vid fönstret eller en katt bakom räcket, som siluetter mot
+    // ljuset inne, på kvällen (en egen följd per fönster och dag, så att det inte ändrar vilka som är tända)
+    const RG = rng(Math.round(cx * 7 - yb * 3) + v.dag * 131 + v.manad * 17 + 7);
+    const vem = RG();
+    const sil = tand && L.dag < 0.5 ? r1(0.82 * (1 - L.dag * 2)) : 0;
+    if (sil && vem < 0.3) {
+      const hx = r1(cx + (RG() - 0.5) * 90);
+      const hy = yb - 102;
+      s += `<path d="M${hx - 46} ${yb} V${hy + 62} Q${hx - 44} ${hy + 36} ${hx - 18} ${hy + 32} Q${hx - 24} ${hy + 20} ${hx - 22} ${hy + 4} Q${hx - 18} ${hy - 22} ${hx} ${hy - 22} Q${hx + 19} ${hy - 22} ${hx + 21} ${hy + 2} Q${hx + 22} ${hy + 20} ${hx + 15} ${hy + 32} Q${hx + 44} ${hy + 38} ${hx + 48} ${hy + 64} V${yb} Z" fill="#160f0a" opacity="${sil}"/>`;
+    } else if (sil && vem < 0.45) {
+      const kx = r1(cx + (RG() - 0.5) * 120);
+      const ky = yb - 2;
+      s += `<g fill="#0b0908" stroke="#0b0908" opacity="${sil}"><path d="M${kx - 20} ${ky} Q${kx - 24} ${ky - 30} ${kx - 10} ${ky - 40} L${kx - 12} ${ky - 54} L${kx - 3} ${ky - 46} Q${kx + 2} ${ky - 48} ${kx + 6} ${ky - 46} L${kx + 12} ${ky - 55} L${kx + 12} ${ky - 40} Q${kx + 24} ${ky - 28} ${kx + 20} ${ky} Z" stroke="none"/><path d="M${kx + 18} ${ky - 2} Q${kx + 46} ${ky - 2} ${kx + 42} ${ky - 28}" fill="none" stroke-width="5" stroke-linecap="round"/></g>`;
+    }
     // bågarna: mittpost, tvärpost och spröjs
     const fr = mix('#2a2622', mix('#f4efe4', '#a6abb2', 0.25 * L.m), L.dag);
     const tv = y + h * 0.32;
     s += `<g stroke="${fr}" fill="none"><rect x="${x + 3}" y="${y + 3}" width="${w - 6}" height="${h - 6}" stroke-width="8"/><path d="M${cx} ${y} V${y + h} M${x} ${r1(tv)} H${x + w}" stroke-width="8"/><path d="M${x} ${r1(tv + (y + h - tv) / 2)} H${x + w}" stroke-width="4"/></g>`;
     // blecket, och snön på det
     s += `<rect x="${x - 26}" y="${yb}" width="${w + 52}" height="12" fill="${mix('#141418', '#d4cfc4', L.dag * (1 - 0.3 * L.m))}"/>`;
+    // regnet har runnit av blecket i åratal: mörka märken under ändarna och några under mitten
+    s += rinn(x - 22, yb + 12, 12 + RG() * 10, 90 + RG() * 120) + rinn(x + w + 22, yb + 12, 12 + RG() * 10, 90 + RG() * 120) + rinn(x + 20 + RG() * (w - 40), yb + 12, 6 + RG() * 8, 40 + RG() * 80);
     if (v.snotackt) s += `<path d="M${x - 26} ${yb + 1} q${r1((w + 52) / 2)} -12 ${w + 52} 0 Z" fill="${snoC(L)}"/>`;
     if (balkong) {
       const g = mix('#0c0e10', '#3a3e44', L.dag);
@@ -421,9 +442,28 @@ window.RumFasad = (() => {
     let fog = '';
     for (let y = 290; y < MARK - 40; y += 46) fog += `M${VARLD.x0} ${y} H${HORN}`;
     s += `<path d="${fog}" stroke="${mix(ljusPuts, '#000000', 0.18)}" stroke-width="3"/>`;
+    // Putsen har levt: stora mjuka fläckar, mörkare och ljusare, och fukten nertill där regnet stänker upp
+    // (mörkare när stenen är våt). Allt står still och ritas med resten av huset.
+    s += '<defs><radialGradient id="rf-flack"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient><radialGradient id="rf-flack-l"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
+      '<linearGradient id="rf-rinn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset=".35" stop-color="#000" stop-opacity=".09"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>' +
+      '<linearGradient id="rf-fukt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000"/></linearGradient></defs>';
+    const RP = rng(61);
+    let fl = '';
+    for (let i = 0; i < 44; i++) {
+      const fx = r1(VARLD.x0 + 200 + RP() * (HORN - VARLD.x0 - 200));
+      const fy = r1(VARLD.y0 + 300 + RP() * (MARK - VARLD.y0 - 300));
+      const ljusF = RP() < 0.3;
+      fl += `<ellipse cx="${fx}" cy="${fy}" rx="${r1(60 + RP() * 150)}" ry="${r1(40 + RP() * 110)}" fill="url(#rf-flack${ljusF ? '-l' : ''})" opacity="${r1((ljusF ? 0.05 : 0.08) + RP() * 0.06)}"/>`;
+    }
+    s += fl;
+    const vat = (L.wet || v.blott) && !v.snotackt;
+    s += `<rect x="${VARLD.x0}" y="${MARK - 110}" width="${HORN - VARLD.x0}" height="110" fill="url(#rf-fukt)" opacity="${vat ? 0.32 : 0.14}"/>`;
     // gesimsen mellan bottenvåningen och våningarna ovanför
     s += `<rect x="${VARLD.x0}" y="214" width="${HORN - VARLD.x0 + 10}" height="22" fill="${list}"/><rect x="${VARLD.x0}" y="236" width="${HORN - VARLD.x0}" height="12" fill="${mix(ljusPuts, '#000000', 0.25)}" opacity=".6"/>`;
     if (sno) s += `<path d="M${VARLD.x0} 216 H${HORN + 10}" stroke="${sno}" stroke-width="7" stroke-linecap="round"/>`;
+    let rg = '';
+    for (let x = VARLD.x0 + 20; x < HORN; x += 110 + RP() * 200) rg += rinn(x, 248, 6 + RP() * 10, 40 + RP() * 110);
+    s += rg;
     // fönstren på våningarna ovanför (de syns i höga fönster)
     const RW = rng(23);
     for (const [yb, bal] of [[178, [-60, 690]], [-302, [330]], [-782, []]]) {
@@ -433,8 +473,18 @@ window.RumFasad = (() => {
     let kedja = '';
     for (let y = VARLD.y0; y < 214; y += 64) kedja += `<rect x="${HORN - 52}" y="${y}" width="${(y / 64) % 2 ? 52 : 40}" height="58" fill="${list}"/>`;
     s += kedja + `<rect x="${HORN - 4}" y="${VARLD.y0}" width="4" height="${MARK - VARLD.y0}" fill="#000" opacity=".25"/>`;
-    // sockeln
+    // sockeln, med en glans i överkanten när den är våt
     s += `<rect x="${VARLD.x0}" y="${MARK - 34}" width="${HORN - VARLD.x0}" height="34" fill="${granit}"/>`;
+    if (vat) s += `<rect x="${VARLD.x0}" y="${MARK - 34}" width="${HORN - VARLD.x0}" height="2" fill="${mix('#ffffff', '#ffe2b0', 1 - L.dag)}" opacity="${r1(0.12 + 0.08 * (1 - L.dag))}"/>`;
+    // Stupröret mellan fönstren, bakom gatuskylten: fästen, en böj nertill och vatten som forsar ut när det
+    // regnar (bäcken över trottoaren står i marken)
+    const ror = mix('#0e0f0f', '#5b605c', L.dag);
+    const rx = STUPROR;
+    s += `<rect x="${rx - 7}" y="${VARLD.y0}" width="14" height="${MARK - 54 - VARLD.y0}" fill="${ror}"/><rect x="${rx - 7}" y="${VARLD.y0}" width="3" height="${MARK - 54 - VARLD.y0}" fill="${mix(ror, L.dag > 0.5 ? '#ffffff' : '#ffd9a0', 0.18)}"/>`;
+    let fasten = '';
+    for (let y = VARLD.y0 + 100; y < MARK - 60; y += 170) fasten += `<rect x="${rx - 10}" y="${y}" width="20" height="7" fill="${mix(ror, '#000000', 0.35)}"/>`;
+    s += fasten + `<path d="M${rx - 7} ${MARK - 54} Q${rx - 7} ${MARK - 30} ${rx + 10} ${MARK - 22} L${rx + 18} ${MARK - 34} Q${rx + 7} ${MARK - 40} ${rx + 7} ${MARK - 54} Z" fill="${ror}"/><ellipse cx="${rx + 15}" cy="${MARK - 27}" rx="5" ry="8" transform="rotate(-35 ${rx + 15} ${MARK - 27})" fill="#060606"/>`;
+    if (v.fall === 'regn' || v.fall === 'blandat') s += `<g stroke="${L.dag > 0.5 ? '#e6eef8' : '#ffe8cc'}" stroke-linecap="round" fill="none"><path d="M${rx + 16} ${MARK - 26} q8 8 10 30" stroke-width="5" opacity=".3"/><path d="M${rx + 14} ${MARK - 24} q6 8 6 28" stroke-width="2" opacity=".5"/><path d="M${rx + 19} ${MARK - 26} q10 6 14 26" stroke-width="1.4" opacity=".4"/></g>`;
 
     // porten till huset, med överljusfönster och omfattning i sten
     const px = 60;
@@ -449,8 +499,11 @@ window.RumFasad = (() => {
 
     // (barberarens stång längst till vänster snurrar, och är en egen ruta: .rf-barber i rita)
     // gatuskylten på hörnet
-    const bla = mix('#0a1020', '#1f4a8a', 0.2 + 0.8 * L.dag);
-    s += `<rect x="1040" y="250" width="186" height="38" rx="3" fill="${bla}"/><rect x="1044" y="254" width="178" height="30" rx="2" fill="none" stroke="${mix('#2a2e36', '#f2f2ee', L.dag)}" stroke-width="1.6"/><text x="1133" y="277" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="19" fill="${mix('#3a3e48', '#f2f2ee', L.dag)}">S:t Eriksgatan</text>`;
+    // (på kvällen i sken av lampan bredvid: emaljen lyser upp, så att namnet går att läsa)
+    const lyst = L.lampor ? 1 - L.dag : 0;
+    const bla = mix(mix('#0a1020', '#1f4a8a', 0.2 + 0.8 * L.dag), '#2c4a7e', 0.6 * lyst);
+    const vit = mix(mix('#3a3e48', '#f2f2ee', L.dag), '#e8e0cc', 0.8 * lyst);
+    s += `<rect x="1040" y="250" width="186" height="38" rx="3" fill="${bla}"/><rect x="1044" y="254" width="178" height="30" rx="2" fill="none" stroke="${vit}" stroke-opacity="${r1(1 - 0.25 * lyst)}" stroke-width="1.6"/><text x="1133" y="277" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="19" fill="${vit}">S:t Eriksgatan</text>`;
 
     // ---------- butiken ----------
     const ram = mix('#08090a', '#25292a', 0.2 + 0.8 * L.dag);
@@ -464,6 +517,12 @@ window.RumFasad = (() => {
     s += `<rect x="${FON.x - k - 18}" y="${FON.y + FON.h + k - 2}" width="${FON.w + 2 * k + 36}" height="12" fill="${mix(granit, '#ffffff', 0.15)}"/>`;
     s += `<rect x="${FON.x + 16}" y="${FON.y + FON.h + k + 26}" width="${FON.w - 32}" height="${MARK - FON.y - FON.h - k - 56}" fill="none" stroke="${mix(morkt, '#ffffff', 0.08)}" stroke-width="2"/>`;
     if (sno) s += `<path d="M${FON.x - k - 18} ${FON.y + FON.h + k} q${r1((FON.w + 2 * k + 36) / 2)} -14 ${FON.w + 2 * k + 36} 0 Z" fill="${sno}"/>`;
+    s += [0.12, 0.31, 0.47, 0.66, 0.84].map((f, i) => rinn(FON.x + FON.w * f, FON.y + FON.h + k + 10, 10, 60 + ((i * 37) % 40))).join('');
+    // källarfönstret med galler, nere i bröstningen
+    const kx = FON.x + 70;
+    const ky = MARK - 62;
+    s += `<rect x="${kx - 8}" y="${ky - 8}" width="156" height="58" fill="${mix(morkt, '#ffffff', 0.06)}"/><rect x="${kx}" y="${ky}" width="140" height="44" fill="#060606"/>`;
+    s += `<g stroke="${mix('#141312', '#5a5650', L.dag)}" stroke-width="5">${[1, 2, 3, 4, 5, 6].map((i) => `<path d="M${kx + i * 20} ${ky} V${ky + 44}"/>`).join('')}<path d="M${kx} ${ky + 22} H${kx + 140}"/></g>`;
     // dörrens handtag och sparkplåten
     s += `<rect x="${DORR.x + 10}" y="${DORR.y + DORR.h * 0.48}" width="7" height="${r1(DORR.h * 0.2)}" rx="3.5" fill="${mix('#3a3c40', '#c8ccd0', L.dag * 0.8 + 0.1)}"/><rect x="${DORR.x}" y="${DORR.y + DORR.h - 34}" width="${DORR.w}" height="34" fill="${mix('#2a2c30', '#9aa0a6', L.dag * 0.8 + 0.1)}" opacity=".9"/>`;
 
@@ -502,6 +561,19 @@ window.RumFasad = (() => {
       <line x1="${cx - 34}" y1="${y0 + 8}" x2="${cx + 34}" y2="${y0 + 8}" stroke="url(#rf-guld)" stroke-width="1"/>
       <text x="${cx}" y="${y0 + 21}" font-weight="700" font-size="8.4" letter-spacing="1.9" fill="url(#rf-guld)" stroke="#3a2808" stroke-width=".3" paint-order="stroke">TOBAK &amp; SPEL</text>
       <text x="${cx}" y="${y0 + 33}" font-style="italic" font-size="7.6" fill="#d8b46a" opacity=".9">Öppet till spelstoppet</text></g>`;
+    // öppettiderna i guld nertill på dörrens glas, och klistermärkena i fönstrets nedre hörn: korten, tipset och
+    // travet, lite blekta (med ljuset inne bakom sig på kvällen)
+    const yt = d.y + d.h - 118;
+    s += `<g font-family="Fraunces, Georgia, serif" text-anchor="middle" fill="#d8b46a" stroke="#3a2808" stroke-width=".25" paint-order="stroke" opacity=".9"><text x="${cx}" y="${yt}" font-size="7.6" font-weight="700" letter-spacing="1.4">ÖPPETTIDER</text><text x="${cx}" y="${yt + 12}" font-size="7.4" font-style="italic">Vardagar 7–22</text><text x="${cx}" y="${yt + 23}" font-size="7.4" font-style="italic">Lördag 9–22</text><text x="${cx}" y="${yt + 34}" font-size="7.4" font-style="italic">Söndag 10–21</text></g>`;
+    let mx = FON.x + 8;
+    const my = FON.y + FON.h - 30;
+    let mk = '';
+    for (const [bg, fg, txt] of [['#1a3a8a', '#f0c040', 'VISA'], ['#c8322a', '#f4eee0', 'EUROCARD'], ['#1f6a3a', '#f4eee0', 'TIPS · LOTTO'], ['#e8c440', '#1a1a1a', 'TRAV']]) {
+      const w = r1(10 + txt.length * 5.2);
+      mk += `<rect x="${r1(mx)}" y="${my}" width="${w}" height="22" rx="2" fill="${mix(bg, '#f4eee0', 0.18)}"/><text x="${r1(mx + w / 2)}" y="${my + 14.5}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="8.4" fill="${fg}">${txt}</text>`;
+      mx += w + 5;
+    }
+    s += `<g opacity="${r1(0.42 + 0.3 * L.dag)}">${mk}</g>`;
     // skylten på sugproppen: ÖPPET på den här sidan (STÄNGT inåt)
     const ox = d.x + d.w * 0.62;
     const oy = d.y + 18;
@@ -546,6 +618,7 @@ window.RumFasad = (() => {
     // ---- kvällen: mörkret över bottenvåningen och trottoaren, utom där något lyser
     const hal = [[FON.x + FON.w / 2, FON.y + FON.h / 2, FON.w * 0.78, FON.h * 0.95], [DORR.x + DORR.w / 2, DORR.y + DORR.h / 2, DORR.w * 1.2, DORR.h * 0.7]];
     for (const lx of lampX) hal.push([lx, sk.y + 30, 230, 130]);
+    if (L.lampor) hal.push([1133, 269, 150, 60]);
     if (L.lampor) hal.push([341, 380, 150, 160], [1720, MARK + 30, 330, 120]);
     hal.push([FON.x + FON.w / 2 + 40, MARK + 50, 520, 120]);
     d += `<mask id="rf-mork-m" maskUnits="userSpaceOnUse" x="${VARLD.x0}" y="${VARLD.y0}" width="${VARLD.x1 - VARLD.x0}" height="${VARLD.y1 - VARLD.y0}"><rect x="${VARLD.x0}" y="${VARLD.y0}" width="${VARLD.x1 - VARLD.x0}" height="${VARLD.y1 - VARLD.y0}" fill="#fff"/>` +
@@ -666,6 +739,16 @@ window.RumFasad = (() => {
     } else if (vat) {
       // våt sten speglar himlen på dagen (och affärens ljus på kvällen: kvallsljus)
       if (L.dag > 0.2) s += `<rect x="${VARLD.x0}" y="${MARK}" width="${VARLD.x1 - VARLD.x0}" height="${y1 - MARK}" fill="${L.sky[2]}" opacity="${r1(0.16 * L.dag)}"/>`;
+    }
+    // bäcken från stupröret ut över trottoaren mot gatan, när det regnar
+    if (vat && !sno && (v.fall === 'regn' || v.fall === 'blandat')) {
+      let b = '';
+      for (let i = 0; i <= 30; i++) {
+        const dd = 0.06 + (i / 30) * 4;
+        const xw = STUPROR + 22 + Math.sin(i * 0.7) * 10 + i * 4;
+        b += `${i ? 'L' : 'M'}${r1(OGA_X + (xw - OGA_X) * skala(dd))} ${r1(markY(dd))}`;
+      }
+      s += `<path d="${b}" stroke="#1a1c20" stroke-width="10" fill="none" opacity=".4" stroke-linecap="round"/><path d="${b}" stroke="${L.dag > 0.5 ? '#ffffff' : '#ffe6c0'}" stroke-width="2.2" fill="none" opacity="${r1(0.2 + 0.15 * (1 - L.dag))}" stroke-linecap="round"/>`;
     }
     // höstlöven
     if (lovet(v) === 'host' && !sno) {
@@ -898,7 +981,7 @@ window.RumFasad = (() => {
       del('M100 -32 l8 3 l-8 3 Z M88 -42 l4 -8 l4 7 Z', h);
       drag('M48 -28 q-10 -8 -8 -18', h, 4);
     }
-    return D;
+    return morkna(D);
   }
   // Någon som har stannat framför fönstret och tittar in, med ryggen mot en.
   function bakDelar(o, L) {
@@ -917,14 +1000,14 @@ window.RumFasad = (() => {
     del(ell(0, -167, 10, 12), t(o.har));
     if (o.halsduk) del('M-8 -157 Q0 -153 8 -157 V-149 Q0 -145 -8 -149 Z', t(o.halsduk));
     if (o.mossa) { del('M-10.5 -166 Q-11.5 -186 0 -186 Q11.5 -186 10.5 -166 Z', t(o.mossa)); del('M-11 -170 H11 V-165.5 H-11 Z', bak(o.mossa), { inre: true }); }
-    return D;
+    return morkna(D);
   }
 
   // Delarna i ställningen P (stalln): allt utom hunden gungar med höften, benen vrids i höften, knät och
   // fotleden (led 0, 1, 2), armarna i axeln och armbågen, och det som sitter fast har sina egna vinklar.
   // rand: bara konturen, lineWidth rand (ljuset i kanten), annars fyllt med alfa A (kontur: bara det som syns
   // i siluetten, för speglingen).
-  function ritaDelar(c, D, P, A, rand, kontur = false) {
+  function ritaDelar(c, D, P, A, rand, kontur = false, z = 0) {
     for (const p of D) {
       if ((rand || kontur) && p.inre) continue;
       if (kontur && p.s) continue;
@@ -960,11 +1043,27 @@ window.RumFasad = (() => {
         c.stroke(p.d);
       } else {
         c.globalAlpha = A * (p.a == null ? 1 : p.a);
-        c.fillStyle = p.f;
+        c.fillStyle = z && p.fz ? p.fz[z] : p.f;
         c.fill(p.d);
       }
       c.restore();
     }
+  }
+
+  // På kvällen är den som går lika mörk som mörkret där den går: utan det var en ljus rock i mörkret ljusare än
+  // väggen bakom (som kvällens mask mörkar) och såg genomskinlig ut, som ett spöke. Fyra steg av samma färger
+  // (MORK, fz på varje del: morkna i figurDelar och bakDelar), från 0 framför fönstret, dörren och lyktorna.
+  const MORK = [0, 0.25, 0.45, 0.62];
+  function morkna(D) {
+    for (const p of D) if (p.f) p.fz = MORK.map((m) => mix(p.f, '#030305', m));
+    return D;
+  }
+  function morkSteg(x, L) {
+    if (L.dag > 0.6) return 0;
+    const nara = (a, b, f) => { const d = x < a ? a - x : x > b ? x - b : 0; return Math.max(0, 1 - d / f); };
+    let n = Math.max(nara(FON.x, FON.x + FON.w, 160), nara(DORR.x, DORR.x + DORR.w, 120));
+    if (L.lampor) n = Math.max(n, 0.6 * nara(300, 380, 150), 0.8 * nara(1640, 1800, 220));
+    return Math.round((1 - L.dag / 0.6) * (1 - n) * 3);
   }
 
   // Hur mycket ljus det är bakom den som går, i kanten (0 … 1): starkast framför fönstret och dörren, lite vid
@@ -1007,7 +1106,7 @@ window.RumFasad = (() => {
       ritaDelar(c, D, P, 1, 2.4);
       c.restore();
     }
-    ritaDelar(c, D, P, ut.A, 0);
+    ritaDelar(c, D, P, ut.A, 0, false, ut.z || 0);
     c.restore();
   }
 
@@ -1203,6 +1302,24 @@ window.RumFasad = (() => {
       const dugg = v.slag === 'dugg';
       streck(Math.round((dugg ? 260 : 320) * k * part), 0.04, dugg ? 10 : 30, dugg ? 22 : 70, 1, dugg ? 2 : 1.1);
       streck(Math.round((dugg ? 160 : 380) * k * part), 0.06, dugg ? 14 : 40, dugg ? 30 : 100, 1.4, dugg ? 1.4 : 0.65 - 0.12 * k);
+      // stänken: på stenen (x i fasadens mått, d meter ut), på fönsterbänkens bleck och skyltens tak (d −1:
+      // y står i x-platsen bredvid), och hur fort och när i varvet; inte där snön ligger
+      if (!v.snotackt) {
+        const RS = rng(7);
+        const yMax = V.y + V.h;
+        const ut = [];
+        const nSten = Math.round((LATT ? 70 : 130) * (0.4 + 0.6 * k) * (dugg ? 0.35 : 1));
+        for (let i = 0; i < nSten; i++) {
+          const d = 0.03 + Math.pow(RS(), 1.25) * 4;
+          const xw = V.x - 200 + RS() * (V.w + 400);
+          if (markY(d) < yMax + 10) ut.push(xw, d, 1.2 + RS(), RS());
+        }
+        const nKant = Math.round((LATT ? 14 : 22) * (0.4 + 0.6 * k) * (dugg ? 0.35 : 1));
+        for (let i = 0; i < nKant; i++) ut.push(FON.x - KARM - 14 + RS() * (FON.w + 2 * KARM + 28), -(FON.y + FON.h + KARM - 2), 1.4 + RS() * 0.6, RS());
+        for (let i = 0; i < nKant * 0.8; i++) ut.push(SKYLT.x - 8 + RS() * (SKYLT.w + 16), -(SKYLT.y - 10), 1.4 + RS() * 0.6, RS());
+        N.stank = new Float32Array(ut);
+        N.droppar = !dugg;
+      }
     }
     if (v.fall === 'sno' || v.fall === 'blandat') {
       const part = (v.fall === 'blandat' ? 0.4 : 1) * yta;
@@ -1214,6 +1331,117 @@ window.RumFasad = (() => {
     N.aska = v.slag === 'aska';
     return N;
   }
+  // ---------- regnet i ljuset ----------
+  //
+  // På kvällen syns regnet där något lyser – i svanhalsarnas käglor, framför fönstret och dörren, kring lyktan
+  // vid porten och under gatlyktan på bron – och knappt i mörkret, och där det lyser är det varmt. Ljuset
+  // räknas ut en gång när scenen ritas (ljusKarta: rutor om RUTA enheter), och varje streck, stänk och droppe
+  // tar sitt ljus ur rutan där det är. På dagen syns regnet lika överallt, som förut.
+  const RUTA = 24;
+  function ljusVid(x, y, L, ljus) {
+    const mork = 1 - L.dag;
+    if (mork < 0.05) return 0;
+    const sk = SKYLT;
+    const ruta = (x0, x1, y0, y1, m) => sm(x0 - m, x0 + m * 0.4, x) * (1 - sm(x1 - m * 0.4, x1 + m, x)) * sm(y0 - m, y0 + m * 0.4, y) * (1 - sm(y1 - m * 0.4, y1 + m, y));
+    let l = 0;
+    if (L.lampor) {
+      for (const lx of [sk.x + sk.w * 0.2 + 47, sk.x + sk.w * 0.8 - 47]) {
+        if (y > 252 && y < 470) {
+          const f = (y - 252) / 190;
+          const w = 14 + 170 * f;
+          const dx = (x - lx) / w;
+          if (dx > -1 && dx < 1) l += (1 - dx * dx) * (1 - 0.5 * f);
+        }
+        l += Math.max(0, 1 - Math.hypot(x - lx, (y - 256) * 1.4) / 85) * 1.1;
+      }
+      l += Math.max(0, 1 - Math.hypot(x - 341, (y - 380) * 0.8) / 150) * 0.9;
+      if (y > LYKTA) {
+        const f = Math.min(1, (y - LYKTA) / (MARK - LYKTA));
+        const w = 26 + 330 * f;
+        const dx = (x - 1720) / w;
+        if (dx > -1 && dx < 1) l += (1 - dx * dx) * 0.7 * (1 - 0.3 * f);
+      }
+      l += Math.max(0, 1 - Math.hypot(x - 1720, y - LYKTA - 16) / 140) * 1.2;
+    }
+    // fönstret och dörren lyser bakom regnet, och ut på trottoaren
+    const inne = 0.35 + 0.65 * ljus;
+    l += inne * (0.55 * ruta(FON.x, FON.x + FON.w, FON.y, FON.y + FON.h + 30, 40) + 0.5 * ruta(DORR.x, DORR.x + DORR.w, DORR.y, DORR.y + DORR.h, 30));
+    if (y > MARK - 10) {
+      const ned = 1 - sm(MARK, MARK + 260, y);
+      l += inne * ned * Math.max(0.8 * sm(FON.x - 90, FON.x + 30, x) * (1 - sm(FON.x + FON.w - 30, FON.x + FON.w + 90, x)),
+        0.85 * sm(DORR.x - 60, DORR.x + 10, x) * (1 - sm(DORR.x + DORR.w - 10, DORR.x + DORR.w + 60, x)));
+      if (L.lampor) l += Math.max(0.45 * (1 - sm(0, 160, Math.abs(x - 341))) * ned, 0.9 * (1 - sm(0, 330, Math.abs(x - 1720))));
+    }
+    return mork * l;
+  }
+  function ljusKarta(V, L, ljus) {
+    const nx = Math.ceil((V.w + 400) / RUTA) + 1;
+    const ny = Math.ceil(V.h / RUTA) + 2;
+    const a = new Float32Array(nx * ny);
+    const x0 = V.x - 200;
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) a[j * nx + i] = ljusVid(x0 + i * RUTA, V.y + j * RUTA, L, ljus);
+    return { a, nx, ny, x0, y0: V.y };
+  }
+  const iKartan = (K, x, y) => {
+    const i = Math.round((x - K.x0) / RUTA);
+    const j = Math.round((y - K.y0) / RUTA);
+    return i < 0 || j < 0 || i >= K.nx || j >= K.ny ? 0 : K.a[j * K.nx + i];
+  };
+  // hur starkt i ljuset (0 … 3): de fyra stegen som strecken delas i, och hur mycket starkare de är där
+  const ljusSteg = (l) => (l < 0.12 ? 0 : l < 0.35 ? 1 : l < 0.7 ? 2 : 3);
+  const STEG_A = [0.3, 0.95, 1.8, 2.8];
+  // Stänken där regnet slår ned (en ring som vidgas och en liten krona i början) och dropparna som hänger
+  // under skyltens kant, lampskärmarna och lyktan och faller: i ljuset på kvällen, svagt på dagen.
+  const DROPPAR = [414, 486, 566, 652, 731, 812, 893, 968, 1046, 1121];
+  function ritaStank(c, N, K, t, dag) {
+    if (!N || !N.stank) return;
+    const S = N.stank;
+    const bin = [new Path2D(), new Path2D(), new Path2D(), new Path2D()];
+    const syn = (x, y) => (K ? ljusSteg(iKartan(K, x, y)) : 1);
+    for (let i = 0; i < S.length; i += 4) {
+      const fas = (t * S[i + 2] + S[i + 3] * 7) % 1;
+      let x; let y; let k;
+      if (S[i + 1] >= 0) { const d = S[i + 1]; x = OGA_X + (S[i] - OGA_X) * skala(d); y = markY(d); k = skala(d) * 1.1; } else { x = S[i]; y = -S[i + 1]; k = 0.8; }
+      const p = bin[dag > 0.5 ? 1 : syn(x, y - 6)];
+      const r = (2.5 + 8 * fas) * k;
+      p.moveTo(x + r, y);
+      p.ellipse(x, y, r, r * 0.26, 0, 0, 2 * Math.PI);
+      if (fas < 0.22) {
+        const h = (1.5 + 9 * fas) * k;
+        p.moveTo(x - k, y); p.lineTo(x - 2.6 * k, y - h);
+        p.moveTo(x + k, y); p.lineTo(x + 2.6 * k, y - h);
+      }
+    }
+    const fall = new Path2D();
+    const hang = new Path2D();
+    if (N.droppar) {
+      const sk = SKYLT;
+      const droppe = (p, x, y, l, b) => { p.moveTo(x + b, y); p.ellipse(x, y, b, l, 0, 0, 2 * Math.PI); };
+      const rad = (x, y0, y1, fart, seed) => {
+        droppe(hang, x, y0 + 2.6, 2.4, 1.8);
+        for (let j = 0; j < 2; j++) {
+          const q = (t * fart + j / 2 + seed) % 1;
+          droppe(fall, x, y0 + 6 + q * q * (y1 - y0), 2.5 + 8 * q, 1.3);
+        }
+      };
+      DROPPAR.forEach((x, i) => rad(x, sk.y + sk.h, FON.y + FON.h + KARM - 6, 0.55 + (i % 3) * 0.06, (i * 0.37) % 1));
+      if (dag < 0.5) for (const lx of [sk.x + sk.w * 0.2 + 47, sk.x + sk.w * 0.8 - 47]) { rad(lx - 17, 254, 330, 0.9, 0.2); rad(lx + 17, 254, 330, 0.85, 0.7); }
+      rad(334, 404, 520, 0.8, 0.4);
+      rad(349, 404, 520, 0.7, 0.9);
+    }
+    const ljust = dag > 0.5 ? '#e4eaf0' : '#fff1dc';
+    c.lineCap = 'round';
+    c.lineWidth = 1.1;
+    c.strokeStyle = ljust;
+    bin.forEach((p, b) => { c.globalAlpha = dag > 0.5 ? 0.16 : [0.05, 0.16, 0.32, 0.5][b]; c.stroke(p); });
+    c.fillStyle = ljust;
+    c.globalAlpha = dag > 0.5 ? 0.35 : 0.85;
+    c.fill(hang);
+    c.globalAlpha = dag > 0.5 ? 0.3 : 0.75;
+    c.fill(fall);
+    c.globalAlpha = 1;
+  }
+
   // blixtens styrka efter p (0 … 1 av varvet): som nyckelbilderna förut
   const BLIXT = [[0, 0], [0.9, 0], [0.906, 0.7], [0.912, 0.06], [0.92, 0.5], [0.94, 0], [1, 0]];
   function blixtA(p) {
@@ -1224,14 +1452,17 @@ window.RumFasad = (() => {
     }
     return 0;
   }
-  function ritaNederbord(c, N, V, t) {
+  function ritaNederbord(c, N, V, t, K, dag = 1) {
     if (!N) return false;
     const { H } = N;
+    // (på kvällen fyra steg i ljuset, ljusKarta; på dagen ett)
+    const NS = K && dag < 0.95 ? 4 : 1;
     for (const l of N.lager) {
       const dy = ((((t / l.dur) % 1) + 1) % 1) * H;
       if (l.typ === 'regn') {
-        // (tre grupper efter hur starka strecken är, så att det blir få anrop)
-        const grupp = [new Path2D(), new Path2D(), new Path2D()];
+        // (tre grupper efter hur starka strecken är och fyra steg i ljuset, så att det blir få anrop)
+        const grupp = [];
+        for (let i = 0; i < 3 * NS; i++) grupp.push(new Path2D());
         const bredd = [0, 0, 0];
         const antal = [0, 0, 0];
         const n = l.s.length / 5;
@@ -1244,14 +1475,17 @@ window.RumFasad = (() => {
           bredd[g] += l.s[i * 5 + 4];
           antal[g]++;
           for (const yy of y > H - len ? [y, y - H] : [y]) {
-            grupp[g].moveTo(x, V.y + yy);
-            grupp[g].lineTo(x - len * N.slant, V.y + yy + len);
+            const p = grupp[g * NS + (NS > 1 ? ljusSteg(iKartan(K, x - len * N.slant * 0.5, V.y + yy + len * 0.5) * (l.fjarr ? 0.75 : 1)) : 0)];
+            p.moveTo(x, V.y + yy);
+            p.lineTo(x - len * N.slant, V.y + yy + len);
           }
         }
-        c.strokeStyle = '#c8d6f0';
         c.lineCap = 'butt';
-        grupp.forEach((p, g) => {
-          c.globalAlpha = (l.fjarr ? 0.8 : 1) * [0.07, 0.12, 0.17][g];
+        grupp.forEach((p, i) => {
+          const g = Math.floor(i / NS);
+          const s = i % NS;
+          c.strokeStyle = NS > 1 && s > 1 ? '#ffe8cc' : '#c8d6f0';
+          c.globalAlpha = (l.fjarr ? 0.8 : 1) * [0.07, 0.12, 0.17][g] * (NS > 1 ? dag + (1 - dag) * STEG_A[s] : 1);
           c.lineWidth = antal[g] ? bredd[g] / antal[g] : 1.4;
           c.stroke(p);
         });
@@ -1507,7 +1741,7 @@ window.RumFasad = (() => {
       c.restore();
     }
     if (bilar) ritaBilar(c, R.bilar, t);
-    for (const [f, D, x, y] of lista) ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L) });
+    for (const [f, D, x, y] of lista) ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L), z: morkSteg(x, L) });
     // (i dimma: samma dis över dem som över allt bakom, bara där något är ritat)
     if (R.dimma) {
       c.save();
@@ -1517,7 +1751,8 @@ window.RumFasad = (() => {
       c.fillRect(V.x, V.y, V.w, V.h);
       c.restore();
     }
-    ritaNederbord(c, R.N, V, t);
+    ritaNederbord(c, R.N, V, t, R.K, L.dag);
+    ritaStank(c, R.N, R.K, t, L.dag);
   }
 
   // ---------- att bygga och rita ----------
@@ -1585,6 +1820,8 @@ window.RumFasad = (() => {
         stanna: lugn ? null : stannar(V, v, L),
         bilar: lugn ? [] : bilarna(v, L, px),
         N: lugn ? null : nederbord(V, v),
+        // (ljuset där regnet faller, på kvällen: ljusKarta)
+        K: !lugn && v.fall && L.dag < 0.95 ? ljusKarta(V, L, inne(o)) : null,
         vat: (L.wet || v.blott) && !v.snotackt,
         A: 1,
         dimma: L.dimma > 0.05 ? { c: mix('#2a2622', '#aeb3b6', L.dag), a: 0.32 * L.dimma } : null,
