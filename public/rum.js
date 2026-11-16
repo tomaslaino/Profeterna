@@ -4348,6 +4348,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       clearTimeout(R.fasadT);
       lagerUt('fasaden');
       R.vilar = false;
+      R.el.classList.remove('fasad-framme');
       if (R.fig && R.on) {
         const t = now();
         const [vx, vy] = synlig();
@@ -4380,12 +4381,21 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       e.stopPropagation();
       fasad(false);
     });
-    if (glid) f.el.classList.add('in');
+    // (framme: inget eget lager för toningen längre)
+    if (glid) {
+      f.el.classList.add('in');
+      f.el.addEventListener('animationend', (e) => { if (e.target === f.el && e.animationName === 'rf-in') f.el.classList.remove('in'); });
+    }
     R.fasad = f;
     lager('fasaden', (nu) => fasad(false, !nu));
-    // rummet står still när fasaden täcker det
+    // Rummet står still när fasaden täcker det, och syns inte (fasad-framme, som hos Hasse Backe): då släpper
+    // webbläsaren det den har ritat av rummet, och fasaden får minnet. Det ritas igen när man går in.
     clearTimeout(R.fasadT);
-    R.fasadT = setTimeout(() => { if (R.fasad === f) R.vilar = true; }, glid ? 420 : 0);
+    R.fasadT = setTimeout(() => {
+      if (R.fasad !== f) return;
+      R.vilar = true;
+      R.el.classList.add('fasad-framme');
+    }, glid ? 420 : 0);
     return true;
   }
 

@@ -2748,7 +2748,8 @@ window.RumFasad = (() => {
       const H = el.clientHeight || innerHeight;
       return Math.max(W / V.w, H / V.h) * Math.min(2, devicePixelRatio || 1, Math.sqrt(2e6 / (W * H)));
     };
-    const duk = (cls, r, px) => `<canvas class="${cls}" width="${Math.max(1, Math.round(r.w * px))}" height="${Math.max(1, Math.round(r.h * px))}" style="left:${r1(r.x - F.V.x)}px; top:${r1(r.y - F.V.y)}px; width:${r1(r.w)}px; height:${r1(r.h)}px"></canvas>`;
+    // (scenen i fönstrets punkter: F.k punkter per enhet i världen, passa)
+    const duk = (cls, r, px) => `<canvas class="${cls}" width="${Math.max(1, Math.round(r.w * px))}" height="${Math.max(1, Math.round(r.h * px))}" style="left:${r1((r.x - F.V.x) * F.k)}px; top:${r1((r.y - F.V.y) * F.k)}px; width:${r1(r.w * F.k)}px; height:${r1(r.h * F.k)}px"></canvas>`;
 
     function rita() {
       const a = (el.clientWidth || innerWidth) / (el.clientHeight || innerHeight);
@@ -2760,6 +2761,7 @@ window.RumFasad = (() => {
       if (s === F.sig) return;
       F.sig = s;
       F.V = V;
+      F.k = Math.max((el.clientWidth || innerWidth) / V.w, (el.clientHeight || innerHeight) / V.h);
       const defs = `<defs><filter id="rf-mjuk" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.4"/></filter><filter id="rf-neon-b" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
         <clipPath id="rf-glas-k"><rect x="${FON.x}" y="${FON.y}" width="${FON.w}" height="${FON.h}"/><rect x="${DORR.x}" y="${DORR.y}" width="${DORR.w}" height="${DORR.h}"/></clipPath>
         <clipPath id="rf-hal"><path clip-rule="evenodd" d="M${VARLD.x0} ${VARLD.y0} H${VARLD.x1} V${VARLD.y1} H${VARLD.x0} Z M${FON.x} ${FON.y} h${FON.w} v${FON.h} h${-FON.w} Z M${DORR.x} ${DORR.y} h${DORR.w} v${DORR.h} h${-DORR.w} Z"/></clipPath></defs>`;
@@ -2793,21 +2795,21 @@ window.RumFasad = (() => {
         spegelA: 0.14 + 0.1 * (1 - L.dag),
         tom: false,
       };
-      scen.style.width = `${V.w}px`;
-      scen.style.height = `${V.h}px`;
+      // Det som står still är en SVG mellan varje duk (fyra i stället för nio), i fönstrets storlek: förut
+      // var de i världens mått och förminskades (i en telefon på höjden till 0,45), och Safari ritar ett lager
+      // i dess egen storlek gånger pixeltätheten, så att varje lager tog fem gånger så mycket minne som det
+      // syns (ungefär 50 MB i stället för 10 i en iPhone).
+      const sk = F.k;
+      scen.style.width = `${r1(V.w * sk)}px`;
+      scen.style.height = `${r1(V.h * sk)}px`;
       scen.innerHTML =
         svg(V, defs + himmel(V, v, L)) +
         (himlen ? duk('rf-bak', bakR, px) : '') +
-        svg(V, bortom(V, v, L)) +
-        svg(V, defs + rummet(v, L, o), 'rf-inne') +
-        `<canvas class="rf-gang" width="${dw}" height="${dh}" style="left:${glasX}px; top:${glasY}px; width:${FON.w}px; height:${FON.h}px"></canvas>` +
-        svg(V, defs + iFonstret(v, L, o)) +
-        svg(V, defs + neonSkylt(), 'rf-neonlager') +
-        svg(V, defs + glaset(v, L, o)) +
-        svg(V, `${defs}<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}`) +
-        svg(V, texten(v, L), 'rf-text') +
+        svg(V, defs + bortom(V, v, L) + rummet(v, L, o)) +
+        `<canvas class="rf-gang" width="${dw}" height="${dh}" style="left:${r1(glasX * sk)}px; top:${r1(glasY * sk)}px; width:${r1(FON.w * sk)}px; height:${r1(FON.h * sk)}px"></canvas>` +
+        svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}${glaset(v, L, o)}<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}${texten(v, L)}`) +
         (barberR ? duk('rf-barber', barberR, px) : '') +
-        svg(V, kvallsljus(V, v, L, o), 'rf-kvall') +
+        svg(V, kvallsljus(V, v, L, o)) +
         (L.dimma > 0.05 ? `<div class="rf-lager rf-dimma" style="background:${mix('#2a2622', '#aeb3b6', L.dag)}; opacity:${r1(0.32 * L.dimma)}"></div>` : '') +
         duk('rf-fram', V, px);
       F.duk = scen.querySelector('.rf-gang');
@@ -2824,11 +2826,10 @@ window.RumFasad = (() => {
       gang();
       rorelse(true);
     }
-    // scenen så stor att den täcker fönstret (vy har fönstrets form)
+    // dörrens mitt i fönstret, dit man går in och ut (scenen är redan så stor att den täcker fönstret, F.k)
     function passa() {
       if (!F.V) return;
-      const k = Math.max(el.clientWidth / F.V.w, el.clientHeight / F.V.h);
-      scen.style.transform = `scale(${k})`;
+      const k = F.k;
       el.style.setProperty('--dorr-x', `${r1((DORR.x + DORR.w / 2 - F.V.x) * k)}px`);
       el.style.setProperty('--dorr-y', `${r1((DORR.y + DORR.h * 0.45 - F.V.y) * k)}px`);
     }
