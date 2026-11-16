@@ -7346,6 +7346,24 @@ bland tre skisser i den riktiga närbilden:
   utanför ligorna). Datan är `hb` i `data/teams/<division>.json` (`hemmaBorta` i
   [src/teamstats.js](src/teamstats.js)): resultaten ur ESPN:s spelprogram, xG ur
   football-data.co.uk och bollinnehavet ur 365Scores.
+- **Dragkampen i hela matchakten** (2026-11-16, efter "hur skulle du förbättra visualiseringen";
+  användarens val *B Dragkampen* bland tre skisser – *Mittlinjen* och *Lamporna och mätarna* var
+  de andra): förra mötets dragkamp gäller nu alla flikar. Varje tal som säger vem som är bättre
+  har en delad stapel mellan lagens tal – formen, styrkan, favoritskapet, mot oddsen och
+  marknaden i ÖVERSIKT, poängen i gruppen, V-O-F, poäng per match, målen, xG, bollinnehavet och
+  poängen mot lagen över och under i MÅLEN och xG. Tal som inte kan vara negativa delas efter
+  lagens andelar; tal med minus (styrkan, mot oddsen, mål- och xG-skillnaden per match) står i
+  mitten vid lika och drar hela vägen vid en skillnad som avståndet mellan divisionens bästa och
+  sämsta (`DRAG_SKALA`). Det bättre lagets del och tal lyser; tal i olika divisioner jämförs inte
+  och står då utan stapel. Platsen i divisionen står utanför talet (*1:A +0,94 … +0,12 14:E*).
+  Namn, V-O-F hemma och borta, nollorna och tal utan bättre lag (motståndet, turen, kryssen) står
+  som text: det vänstra lagets där talen börjar, det högra lagets längst ut till höger, som
+  lagens namn överst. LÄGET behåller sina mätare, men i dragkampens mått: lagets mätare står i
+  dess halva av stapeln från talet in mot mitten. Alla flikar har samma mått (`dragMatt`), så att
+  talen och namnen står still när man byter flik. Formens rader har fått resultatet (*V 2–0 B
+  TJECKIEN 4:E*), och det högra lagets rader står längst ut till höger. I telefonen står
+  etiketten på en egen rad i mitten och raden under går från kant till kant (också i förra
+  mötet). Dolt resultat ger ? och en tom stapel.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
