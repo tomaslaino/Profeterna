@@ -9862,7 +9862,9 @@ dem, som resten av tidningen.
 - **Sista sidan** (`data/sista-sidan.json`, `"hand": true`) är också skriven för hand, efter reglerna i
   config/sista-sidan.js: Hasse Backes krönika om alla finaler som inte är några, tre notiser i *Vid sidan av* (Eibar,
   Cádiz och Kazakstan, ur Wikipedia) och kåseriet av Gunilla Östberg, undersköterska på nattskift i Skövde.
-  Claude Code på iMacen var utloggat när numret gjordes, så nattjobbets `skrivSista` gick inte att köra.
+  Sessionen som gjorde numret nådde inte Claude Codes inloggning (nattjobbet själv är inloggat), så nattjobbets
+  `skrivSista` gick inte att köra därifrån. Nattjobbet skriver inte om sidan, eftersom den är skriven för omgången
+  och har samma `version`.
 - **Numret** står i filen (`nummer`): med veckoräkningen hade Europatipset söndagen den 15 november också blivit Nr 1,
   eftersom omgången börjar samma vecka som Stryktipset den 14 november. `numret` i
   [public/rum-tidning.js](public/rum-tidning.js) tar filens nummer före veckan, och nattjobbet räknar vidare
@@ -9874,6 +9876,10 @@ dem, som resten av tidningen.
 - **Nattjobbet** bygger numret efter gängets omgång var 15:e minut och hade annars tagit bort de två spanska
   matcherna och numrerat om resten 1–11. Har numret som ligger ute för samma omgång alla omgångens matcher och fler,
   står dess kupong kvar med kupongens nummer, och omgångens egna blad ersätter de handskrivna som förut.
+- **Fälla:** nattjobbet laddar sin kod innan det hämtar main (`tillMain` i scripts/analyser/skriv.mjs), så den första
+  körningen efter en push har den gamla koden och de nya datafilerna. Körningen 20.21 skrev därför om numret till
+  elva matcher, och det lades tillbaka för hand. Ändras både koden och numret: lägg ut koden först och numret efter
+  nästa körning.
 
 Provat 2026-11-16 med en provserver (public/ och de två datafilerna ur arbetskopian, resten från matchfixarna.se) i
 huvudlös Chrome, i 1280 bredd och 390 × 844: omslaget (*Nr 2 · Vecka 46*, *Inför Europatipset*, 15 november),
