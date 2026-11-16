@@ -3020,7 +3020,13 @@ som för de engelska lagen: ett kort anrop utan verktyg (`sokordPrompt`, `bingSo
 landet, språket och tre sökfrågor (*reprezentacja Polski*, *Polska Szwecja* …), som sparas i lagets post för
 motståndaren. Sajter som är spärrade på iMacen (/etc/hosts, `sparrad`: namnet pekar på 0.0.0.0) erbjuds inte, eftersom
 de ändå inte går att läsa; spärren rundas inte. Claude föreslår upp till åtta artiklar och jobbet läser de fyra första
-som går att läsa (`lasHogst`). Citatet står på artikelns språk och prövas mot texten som förut, och
+som går att läsa (`lasHogst`). Läsaren avkodar nu alla bokstäver med accent, prickar och ringar (`avkoda` i
+src/analyser/forum.mjs): förbundets sajt och de polska tidningarna skriver å, ä, ö och ó som `&ouml;` och `&oacute;`,
+och citaten gick inte att pröva mot texten. Provet 2026-11-16 med Polen–Sverige (modellen spelad av fristående
+agenter med samma prompter, eftersom inloggningen bara nås av nattjobbet; resten jobbets egen kod): Bing gav tjugo
+nyheter om Polen och sex om Sverige (Expressen, Aftonbladet, SVT och TV4 är spärrade, SvenskaFans svarar 403), fyra
+respektive två artiklar lästes, alla tretton uppgifternas citat stod i texten, och matchbladet gick igenom
+redaktörens kontroll. Citatet står på artikelns språk och prövas mot texten som förut, och
 översättningen trycks. Artiklarna sparas som klubbens och lokaltidningens (`typ: 'lokal'`, id på `u`), så att
 matchbladet och tidningen tar dem som de tar lokaltidningens. Ett blad som har skrivits för hand för samma omgång går
 före jobbets (`poddsidor` i src/analyser/poddar.mjs).
