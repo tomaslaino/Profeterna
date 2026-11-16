@@ -5278,6 +5278,44 @@ julbocken 2 800, serpentinerna 2 800, midsommarstången 4 800, lövruskan 6 500,
 med flaskan 8 700, högst åtta nät per sak, var och en byggd på 1–30 ms en gång; gänget har flera hundra tusen
 trianglar och ritas i varje bildruta.
 
+**Snyggare pynt och pyntet utifrån** (2026-11-16, användarens önskemål: "göra högtidsföremålen på både
+animationssidan och Hasse Backe snyggare … men att det ändå inte drar så mycket grafik. Kom ihåg att vissa av de här
+föremålen också ska vara med på utsidan"):
+
+- **Rosetterna** (girlangen, kransarna och äggen) är av ett brett band: två öglor som droppar ut från knuten med den
+  breda sidan framåt och en grop mot hålet, och två band med vridning och ett snett snitt i änden (`rosett`, `yta`).
+  Förut två ringar som såg ut som ståltråd.
+- **Halmstjärnan** har åtta strån runt halva varvet och sexton uddar, långa och korta om vartannat, platta och blanka
+  med spetsiga ändar, och rött garn som går över och under stråna kring mitten. Förut låg de långa stråna två och två
+  på samma led, så att stjärnan blev ett kors med två sneda strån.
+- **Girlangen och julkransen** är fylligare: i varje led av granris är de första korten kortare och mörkare, som djupet
+  inne i riset (`barr`), och fler kort per led. Girlangen har en klase om två eller tre kulor som hänger olika långt i
+  varje båge, små kulor i riset vid rosetterna och en kotte i varje båge, och lamporna sitter tätare. Kransen har
+  lingon runt om med lingonblad, tre kottar nedtill och rosetten fram ur riset. Kottarna har fjäll i förskjutna ringar,
+  ljusa i kanten och mörka i springorna (`kotte`).
+- **Julbocken** (hos Hasse) är buntar av halm, randiga på längden med stråna i olika toner, och breda röda band som
+  ligger an mot halmen, med ändarna avskurna. Förut släta rör med röda ringar som stod ut.
+- **Serpentinerna** är remsor som hänger i en lös skruv med den breda sidan utåt, glesare nedåt. Förut tunna rör i
+  sicksack. **Bladen** (lövruskorna och midsommarstången) är runda nedtill och spetsiga upptill som björkens (förut
+  romber), och blommorna på stången platta kronor med en mitt (förut färgade kulor).
+
+Allt är som förut några få sammanslagna nät per sak med färgen i hörnen och samma material, och ritas en gång: kulorna
+i girlangen är två nät i stället för tre per kula. Uppmätt (`r.info` efter en bild): girlangen 7 900 → 13 400
+trianglar, kransen 5 700 → 9 100, julbocken 2 800 → 4 900 och halmstjärnan 600 → 490, i samma eller färre ritanrop.
+
+**Utifrån** (`pyntUtifran` i [public/rum-inredning.js](public/rum-inredning.js), `pynt` i
+[public/rum-fasad.js](public/rum-fasad.js)): det som hänger i skyltfönstret och på dörrens glas syns från trottoaren
+(se [Fasaden](#fasaden)) – stjärnan, girlangen, halmstjärnorna och julkransen, äggen och påskkransen, vimplarna och
+lövruskorna, kräftlyktorna, spindelnätet och fladdermössen. Samma saker och samma scener som inne, ritade en gång till
+genom en kamera ute på gatan, rakt in och därför spegelvänt (stjärnan som hänger till höger inifrån hänger till
+vänster utifrån, och kransen och girlangen ses bakifrån). Rutan är glaset i scenens mått (`UT_GLAS`), i fönstret från
+karmens överkant så att girlangen syns under skylten, med höjden efter rutan på fasaden så att inget dras ut. Ljuset
+utifrån är dagsljuset mot glaset och lite ljus från gatan; det som lyser lyser som inne, och skenet kring det ritas
+först för sig så att det ligger bakom saken (inifrån ligger det på glaset bakom). Bilden läggs på två dukar
+(`.rf-pynt`) framför neonen och bakom glaset, så att speglingen, imman och dropparna ligger över pyntet, och ritas
+bara när fasaden ritas om (vädret och ljuset), aldrig i bildrutorna. Utan pynt, eller innan rummets 3D-delar är
+klara, finns dukarna inte.
+
 Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på tre egna dukar i väggens plan: fönstrets
 och dörrens under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
 (`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
@@ -6917,6 +6955,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   dem rummet, lite ur skärpa: lysröret i taket, hyllan med cigarettpaketen (paketen går att se), bardisken, tv:ns blå
   sken och Tipsligan på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren, vagare. Framför dem neonskylten *Tobak*,
   som läses rätt härifrån och glappar samtidigt som inne (`neonOn`), och skivan med löpsedlarna med baksidan ut.
+- **Högtidspyntet:** runt högtiderna hänger samma pynt som inne i skyltfönstret och på dörrens glas, sett utifrån och
+  spegelvänt (se *Högtidspyntet* ovan, `.rf-pynt`).
 - **Glaset:** det sitter djupt i karmen (skugga upptill och till vänster), med imma nertill när det är kallt ute och
   varmt inne, droppar efter regn som små linser (mörk kant, en ljusprick nertill och en glans) och några som har runnit
   och lämnat ett spår ned mot blecket.

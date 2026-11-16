@@ -25,7 +25,9 @@
 //
 //   RumFasad.bygg(rum, o) → { el, ny(), ut() } bygger fasaden i rum (.rum) och ritar den;
 //     o.gang(duk) ritar gänget på duken (false utan), o.takt() hur många gånger i sekunden (som inne),
-//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.calm() utan rörelser
+//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.pynt(namn, { w, h, dag }) högtidspyntet
+//     i fönstret ('pyntF') eller på dörren ('pyntP') sett utifrån, en duk w × h eller null (pyntUtifran i
+//     rum-inredning.js), o.calm() utan rörelser
 //     (prefers-reduced-motion), o.still en fast bild på den tiden (s, ?rum-t i rum.js): allt som rör sig
 //     står där det är då
 
@@ -2787,6 +2789,8 @@ window.RumFasad = (() => {
       const bakR = { x: bakX, y: V.y, w: V.x + V.w - bakX, h: HOR + 60 - V.y };
       const himlen = !lugn && bakR.w > 0 ? himmelsliv(V, v, L, px) : null;
       const barberR = BARBER.x + BARBER.w > V.x && BARBER.x < V.x + V.w ? BARBER : null;
+      // (pyntets dukar: som de andra, men högst 1400 bildpunkter på fönstrets bredd)
+      const pyntPx = Math.min(px, 1400 / FON.w);
       const R = {
         px, V, L, bakR, himlen,
         folk: lugn ? [] : folket(V, v, L),
@@ -2812,6 +2816,7 @@ window.RumFasad = (() => {
         `<canvas class="rf-gang" width="${dw}" height="${dh}" style="left:${glasX}px; top:${glasY}px; width:${FON.w}px; height:${FON.h}px"></canvas>` +
         svg(V, defs + iFonstret(v, L, o)) +
         svg(V, defs + neonSkylt(), 'rf-neonlager') +
+        (o.pynt ? duk('rf-pynt', FON, pyntPx) + duk('rf-pynt', DORR, pyntPx) : '') +
         svg(V, defs + glaset(v, L, o)) +
         svg(V, `${defs}<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}`) +
         svg(V, texten(v, L), 'rf-text') +
@@ -2824,6 +2829,7 @@ window.RumFasad = (() => {
       R.bak = himlen ? scen.querySelector('.rf-bak').getContext('2d') : null;
       R.barber = barberR ? scen.querySelector('.rf-barber').getContext('2d') : null;
       F.ro = R;
+      pynt(L);
       // (en fast bild: allt som rör sig står på samma tid)
       if (o.still != null) for (const an of el.getAnimations({ subtree: true })) { an.pause(); an.currentTime = o.still * 1000; }
       // (gänget från förra gången tills det ritas på nytt)
@@ -2834,6 +2840,26 @@ window.RumFasad = (() => {
       passa();
       gang();
       rorelse(true);
+    }
+    // Högtidspyntet i skyltfönstret och på dörren, så som det hänger inne (o.pynt, pyntUtifran i
+    // rum-inredning.js): ritas en gång när fasaden ritas, på var sin duk framför neonen och bakom glaset, så
+    // att speglingen, imman och dropparna ligger över det. Utan pynt (eller innan rummets 3D-delar är klara)
+    // tas dukarna bort.
+    function pynt(L) {
+      const dukar = scen.querySelectorAll('.rf-pynt');
+      [['pyntF', FON], ['pyntP', DORR]].forEach(([namn], i) => {
+        const d = dukar[i];
+        if (!d) return;
+        let bild = null;
+        try {
+          bild = o.pynt(namn, { w: d.width, h: d.height, dag: L.dag });
+        } catch (err) { /* utan pyntet: glaset som vanligt */ }
+        if (!bild) {
+          d.remove();
+          return;
+        }
+        d.getContext('2d').drawImage(bild, 0, 0);
+      });
     }
     // scenen så stor att den täcker fönstret (vy har fönstrets form)
     function passa() {

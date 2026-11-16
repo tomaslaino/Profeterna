@@ -123,7 +123,8 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       g.setAttribute('color', new THREE.BufferAttribute(a, 4));
       return g;
     });
-    const mt = new THREE.MeshBasicMaterial({ map: skenTex(), vertexColors: true, transparent: true, opacity: 0.8, depthWrite: false, toneMapped: false });
+    // (från båda hållen: fasaden ser pyntet utifrån, pyntUtifran i rum-inredning.js)
+    const mt = new THREE.MeshBasicMaterial({ map: skenTex(), vertexColors: true, transparent: true, opacity: 0.8, depthWrite: false, toneMapped: false, side: THREE.DoubleSide });
     mt.userData.sken = true;
     const x = new THREE.Mesh(mergeGeometries(geos), mt);
     x.renderOrder = 10;
@@ -188,21 +189,63 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     for (let i = 0; i < krokar.length - 1; i++) ut.push(...bage(krokar[i], krokar[i + 1], s, n).slice(i ? 1 : 0));
     return ut;
   }
-  // en rosett: två öglor och två band (färgen, storleken k)
+  // En yta mellan två rader punkter (a och b lika långa), med färgen i hörnen: band, öglor och vimplar.
+  function yta(a, b, farg) {
+    const pos = [];
+    const idx = [];
+    for (let i = 0; i < a.length; i++) {
+      pos.push(a[i].x, a[i].y, a[i].z, b[i].x, b[i].y, b[i].z);
+      if (i) idx.push(2 * i - 2, 2 * i - 1, 2 * i, 2 * i - 1, 2 * i + 1, 2 * i);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return farga(g, farg);
+  }
+  // En rosett av ett brett band (färgen, storleken k): två öglor som droppar ut från knuten, med bandets
+  // breda sida mot betraktaren och en grop mot hålet, så att de får ljus och skugga, och två band som hänger
+  // med lite vridning och ett snett snitt i änden. Förut två ringar (torusar), som såg ut som öglor av
+  // ståltråd. Mitten (knuten) i origo, framsidan mot +z.
   function rosett(farg, k = 1) {
     const g = [];
+    const n = 18;
     for (const s of [-1, 1]) {
-      const o = new THREE.TorusGeometry(1.3 * k, 0.42 * k, 6, 14);
-      o.scale(1.15, 0.75, 0.45);
-      o.translate(s * 1.45 * k, 0.15 * k, 0);
-      o.rotateZ(s * -12 * DEG);
-      g.push(farga(o, farg));
-      const b = new THREE.BoxGeometry(0.9 * k, 3.2 * k, 0.18 * k);
-      b.translate(0, -1.6 * k, 0);
-      b.rotateZ(s * 22 * DEG);
-      g.push(farga(b, farg));
+      const yttre = [];
+      const inre = [];
+      const L = 2.9 * k;
+      const H = 2.3 * k;
+      const mitt = V(s * L * 0.55, 0, 0);
+      for (let i = 0; i <= n; i++) {
+        const th = (i / n) * 2 * Math.PI;
+        const u = (1 - Math.cos(th)) / 2;
+        const p = V(s * L * u, (H / 2) * Math.sin(th) * u ** 0.45, 0.55 * k * u);
+        // (lite uppåt, som en rosett som sitter)
+        p.applyAxisAngle(V(0, 0, 1), s * 14 * DEG);
+        const q = p.clone().lerp(mitt.clone().applyAxisAngle(V(0, 0, 1), s * 14 * DEG), 0.62 * Math.min(1, u * 3));
+        q.z -= 0.7 * k * Math.min(1, u * 2.5);
+        yttre.push(p);
+        inre.push(q);
+      }
+      g.push(yta(s > 0 ? yttre : inre, s > 0 ? inre : yttre, farg));
+      // bandet: tre punkter i bredd, så att änden kan skäras snett (en V)
+      const T = 3.8 * k;
+      const b = 0.95 * k;
+      const rad = [[], [], []];
+      for (let i = 0; i <= 6; i++) {
+        const t = i / 6;
+        const c = V(s * (0.25 + 1.1 * t) * k, -0.2 * k - T * t, 0.2 * k * Math.sin(Math.PI * t));
+        const vr = s * 0.55 * t;
+        const w = V(Math.cos(vr) * b * 0.5, 0, Math.sin(vr) * b * 0.5);
+        const v = i === 6 ? 0.5 * b : 0;
+        rad[0].push(c.clone().sub(w));
+        rad[1].push(c.clone().add(V(0, v, 0)));
+        rad[2].push(c.clone().add(w));
+      }
+      g.push(yta(rad[0], rad[1], farg), yta(rad[1], rad[2], farg));
     }
-    g.push(farga(new THREE.SphereGeometry(0.6 * k, 10, 8), farg));
+    // knuten
+    g.push(farga(new THREE.SphereGeometry(0.62 * k, 10, 8).scale(0.95, 1.05, 0.65).translate(0, 0, 0.3 * k), farg));
     return ihop(g);
   }
 
@@ -407,8 +450,11 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
         N1.copy(fr.normals[i % fr.normals.length]).multiplyScalar(Math.cos(a)).addScaledVector(fr.binormals[i % fr.binormals.length], Math.sin(a));
         dir.copy(N1).multiplyScalar(0.62).addScaledVector(T, 0.78 + (q() - 0.5) * 0.4).normalize();
         sid.crossVectors(dir, N1).normalize().applyAxisAngle(dir, (q() - 0.5) * 1.2);
-        const l = tjock * (1.05 + q() * 0.45);
-        const ljus = 0.72 + q() * 0.5;
+        // (de första korten i varje led är kortare och mörkare: djupet inne i riset, så att girlangen och
+        // kransen blir fylliga och inte platta)
+        const inre = k < per / 3;
+        const l = tjock * (inre ? 0.75 : 1.05 + q() * 0.45);
+        const ljus = inre ? 0.4 + q() * 0.16 : 0.74 + q() * 0.5;
         kort(p.clone().addScaledVector(N1, 0.6), dir, sid, l, l * 0.6, new THREE.Color(ljus, ljus * (0.95 + q() * 0.1), ljus));
       }
     }
@@ -421,15 +467,36 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     mesh(ror(bana.getPoints(slutet ? 80 : 120), tjock * 0.32, tjock * 0.32, '#17351f', 6), m('#ffffff', { vertexColors: true, roughness: 0.9 }), g);
     return { fr, n, L };
   }
+  // En kotte (storleken k, längs y, mitten i origo): fjällen i förskjutna ringar som står ut, ljusa i kanten
+  // och mörka i springorna (färgen i hörnen).
+  function kotte(k = 1) {
+    const g = new THREE.SphereGeometry(1, 12, 14);
+    const p = g.attributes.position;
+    const c = new Float32Array(p.count * 3);
+    const mork = new THREE.Color('#2e1a0c');
+    const ljus = new THREE.Color('#8a5a32');
+    for (let i = 0; i < p.count; i++) {
+      const y = p.getY(i);
+      const a = Math.atan2(p.getZ(i), p.getX(i));
+      const f = Math.max(0, Math.sin((y + 1) * 10 + Math.sin(a * 3) * 1.2));
+      const r = (1 + 0.22 * f) * (1 - 0.25 * Math.max(0, y) ** 2);
+      p.setXYZ(i, p.getX(i) * r * 1.25 * k, y * 2 * k, p.getZ(i) * r * 1.25 * k);
+      c.set(mork.clone().lerp(ljus, f ** 0.6).toArray(), i * 3);
+    }
+    g.computeVertexNormals();
+    g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+    g.deleteAttribute('uv');
+    return g;
+  }
   function girlang(krokar, { s = 6, tjock = 5.5, utan = [] } = {}) {
     const g = new THREE.Group();
     const q = rnd(23);
     const bana = new THREE.CatmullRomCurve3(bagar(krokar, s));
-    const { fr, n, L } = barr(g, bana, { tjock, q });
+    const { fr, n, L } = barr(g, bana, { tjock, q, per: 6 });
     // lamporna i en slinga runt girlangen
     const lampor = [];
     const sk = [];
-    const nl = Math.round(L / 5.5);
+    const nl = Math.round(L / 4.6);
     for (let i = 0; i < nl; i++) {
       const t = (i + 0.5) / nl;
       const j = Math.round(t * n);
@@ -438,7 +505,7 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       const p = mitt.clone().addScaledVector(fr.normals[j], Math.cos(a) * tjock * 0.75).addScaledVector(fr.binormals[j], Math.sin(a) * tjock * 0.75);
       // (de som hamnar bakom girlangen syns inte)
       if (p.z < mitt.z - tjock * 0.1) continue;
-      lampor.push(farga(new THREE.SphereGeometry(0.5, 8, 6).translate(p.x, p.y, p.z), '#fff6dc'));
+      lampor.push(farga(new THREE.SphereGeometry(0.58, 8, 6).translate(p.x, p.y, p.z), '#fff6dc'));
       sk.push([p.clone().add(V(0, 0, 0.8)), 3.4, '#ffcf7a', 0.75]);
     }
     if (lampor.length) {
@@ -446,7 +513,7 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       sken(sk, g);
     }
     // rosetterna och kulorna
-    const sammet = m('#ffffff', { vertexColors: true, roughness: 0.8, sheen: 0.6, sheenColor: '#d42a2a', sheenRoughness: 0.5 });
+    const sammet = m('#ffffff', { vertexColors: true, roughness: 0.8, sheen: 0.6, sheenColor: '#d42a2a', sheenRoughness: 0.5, side: THREE.DoubleSide });
     krokar.forEach((k, i) => {
       const r = new THREE.Mesh(rosett('#8c0c16', 2.1), sammet);
       r.position.copy(k).add(V(0, -1, tjock * 0.85));
@@ -454,18 +521,41 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       r.castShadow = true;
       g.add(r);
     });
+    // Kulorna: i varje båge en klase om två eller tre som hänger olika långt, och små kulor som ligger i
+    // riset vid rosetterna; röda i glas och guld i metall, alla i två nät (förut tre nät per kula), med
+    // trådarna och hättorna i ett tredje. Kottar ligger i riset mitt i bågarna.
+    const roda = [];
+    const gulda = [];
+    const hattor = [];
+    const kottar = [];
+    const kula = (p, R, guld, trad) => {
+      (guld ? gulda : roda).push(farga(new THREE.SphereGeometry(R, 20, 14).translate(p.x, p.y, p.z), guld ? '#d6aa3c' : ['#b0101c', '#9a0c18', '#c0182a'][Math.round(R * 7) % 3]));
+      hattor.push(farga(new THREE.CylinderGeometry(R * 0.24, R * 0.24, R * 0.32, 8).translate(p.x, p.y + R * 0.98, p.z), '#cfae62'));
+      if (trad) hattor.push(ror([trad, p.clone().add(V(0, R * 1.1, 0))], 0.09, 0.09, '#d9b25a', 3));
+    };
     for (let i = 0; i < krokar.length - 1; i++) {
-      if (utan.includes(i)) continue;
       const mitt = bage(krokar[i], krokar[i + 1], s, 2)[1];
-      const guld = i % 2 === 1;
-      const R = guld ? 2.6 : 3.1;
-      const ned = 3 + (i % 3) * 1.6;
-      const tradTopp = mitt.clone().add(V(0, -tjock * 0.4, tjock * 0.3));
-      const kula = tradTopp.clone().add(V(0, -ned - R, 0));
-      mesh(ror([tradTopp, kula.clone().add(V(0, R, 0))], 0.1, 0.1, '#d9b25a', 3), m('#ffffff', { vertexColors: true, metalness: 0.8, roughness: 0.3 }), g);
-      mesh(new THREE.CylinderGeometry(0.6, 0.6, 1, 10).translate(kula.x, kula.y + R + 0.1, kula.z), m('#cfae62', { metalness: 1, roughness: 0.3 }), g);
-      mesh(new THREE.SphereGeometry(R, 24, 18).translate(kula.x, kula.y, kula.z), m(guld ? '#d4a838' : '#b0101c', { metalness: guld ? 1 : 0.35, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.08 }), g);
+      const topp = mitt.clone().add(V(0, -tjock * 0.4, tjock * 0.3));
+      if (!utan.includes(i)) {
+        const klase = i % 2 ? [[0, 6.5, 3.1, false], [-2.6, 3.2, 2.2, true], [2.8, 4.2, 1.9, false]] : [[0, 5.5, 2.9, true], [-2.4, 3.6, 2.1, false], [2.6, 2.6, 2.3, true]];
+        for (const [dx, ned, R, guld] of klase) {
+          const t = topp.clone().add(V(dx * 0.4, 0, dx * 0.05));
+          kula(t.clone().add(V(dx, -ned - R, 0.3 * Math.abs(dx))), R, guld, t);
+        }
+      }
+      // en kotte i riset
+      const kp = mitt.clone().add(V((i % 2 ? 1 : -1) * 4, -tjock * 0.15, tjock * 0.7));
+      kottar.push(kotte(0.85).rotateZ((i % 2 ? -1 : 1) * 70 * DEG).rotateX(-20 * DEG).translate(kp.x, kp.y, kp.z));
     }
+    // små kulor i riset vid rosetterna
+    krokar.forEach((k, i) => {
+      if (i === 0 || i === krokar.length - 1) return;
+      for (const sx of [-1, 1]) kula(k.clone().add(V(sx * 6.5, -2.4 - (i % 2), tjock * 0.6)), 1.5, (i + (sx > 0 ? 1 : 0)) % 2 === 0, null);
+    });
+    if (roda.length) mesh(ihop(roda), m('#ffffff', { vertexColors: true, metalness: 0.35, roughness: 0.14, clearcoat: 1, clearcoatRoughness: 0.06 }), g);
+    if (gulda.length) mesh(ihop(gulda), m('#ffffff', { vertexColors: true, metalness: 1, roughness: 0.24 }), g);
+    mesh(ihop(hattor), m('#ffffff', { vertexColors: true, metalness: 0.9, roughness: 0.3 }), g);
+    mesh(ihop(kottar), m('#ffffff', { vertexColors: true, roughness: 0.85 }), g);
     return g;
   }
 
@@ -540,7 +630,7 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       band.push(ror([V(e.x, e.y, e.z), V(e.x + 0.2, e.y - e.ned * 0.5, e.z), topp], 0.1, 0.1, f, 4));
       band.push(rosett(f, 0.45).translate(topp.x, topp.y + 0.35, topp.z + 0.4));
     });
-    mesh(ihop(band), m('#ffffff', { vertexColors: true, roughness: 0.6 }), g);
+    mesh(ihop(band), m('#ffffff', { vertexColors: true, roughness: 0.6, side: THREE.DoubleSide }), g);
     return g;
   }
 
@@ -1031,11 +1121,17 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
   // Alla är några få sammanslagna nät med färgen i hörnen och samma material som det andra pyntet, så att
   // inga nya grafikprogram behöver byggas, och de ritas en gång som det andra.
 
-  // Ett litet blad (fem hörn, fyra trianglar), byggt längs y och lite vikt längs mittnerven.
+  // Ett litet blad, byggt längs y och lite vikt längs mittnerven: runt nedtill och spetsigt upptill som
+  // björkens (åtta trianglar kring mitten; förut fyra, och bladen blev romber).
   function blad(l, b) {
     const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, -b / 2, l * 0.4, 0, 0, l * 0.45, b * 0.18, b / 2, l * 0.4, 0, 0, l, 0], 3));
-    g.setIndex([0, 2, 1, 0, 3, 2, 1, 2, 4, 2, 3, 4]);
+    const kant = [[0, 0], [-0.36, 0.14], [-0.5, 0.38], [-0.36, 0.66], [0, 1], [0.36, 0.66], [0.5, 0.38], [0.36, 0.14]];
+    const pos = [0, l * 0.42, b * 0.16];
+    for (const [x, y] of kant) pos.push(x * b, y * l, 0);
+    const idx = [];
+    for (let i = 0; i < 8; i++) idx.push(0, 1 + i, 1 + ((i + 1) % 8));
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
     g.computeVertexNormals();
     return g;
   }
@@ -1053,15 +1149,20 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     const ring = (n, r = R, z = 0) => Array.from({ length: n }, (x, i) => V(Math.cos((i / n) * 2 * Math.PI) * r, Math.sin((i / n) * 2 * Math.PI) * r, z));
     const delar = [];
     if (typ === 'gran') {
-      barr(g, new THREE.CatmullRomCurve3(ring(28), true), { tjock: 4.6, q, slutet: true, steg: 0.55 });
-      // lingonen: klasar framtill på den nedre halvan
-      for (let k = 0; k < 6; k++) {
-        const a = Math.PI * (1.12 + (k / 5) * 0.76);
-        const c = V(Math.cos(a) * R, Math.sin(a) * R, 2.6);
-        for (let j = 0; j < 6; j++) delar.push(farga(new THREE.SphereGeometry(0.55 + q() * 0.2, 8, 6).translate(c.x + (q() - 0.5) * 2.4, c.y + (q() - 0.5) * 2.4, c.z + q()), q() > 0.4 ? '#b5121c' : '#8a0b13'));
+      barr(g, new THREE.CatmullRomCurve3(ring(28), true), { tjock: 5.3, q, slutet: true, steg: 0.55, per: 6 });
+      // lingonen: klasar framtill runt om utom under rosetten, tätast nedtill
+      for (let k = 0; k < 10; k++) {
+        const a = Math.PI * (0.78 + (k / 9) * 1.44);
+        const c = V(Math.cos(a) * R * (0.92 + q() * 0.16), Math.sin(a) * R * (0.92 + q() * 0.16), 3.2);
+        const n = k % 3 === 1 ? 4 : 7;
+        for (let j = 0; j < n; j++) delar.push(farga(new THREE.SphereGeometry(0.58 + q() * 0.22, 8, 6).translate(c.x + (q() - 0.5) * 2.6, c.y + (q() - 0.5) * 2.6, c.z + q()), q() > 0.4 ? '#c0141f' : '#8a0b13'));
+        // (och ett par lingonblad vid klasen)
+        if (k % 2 === 0) delar.push(farga(rikta(blad(2.4, 1.3), c.clone().add(V(0, 0, 0.4)), V(Math.cos(a + 1), Math.sin(a + 1), 0.6), 0.3), '#2c5a2a'));
       }
-      const r = new THREE.Mesh(rosett('#8c0c16', 1.9), m('#ffffff', { vertexColors: true, roughness: 0.8, sheen: 0.6, sheenColor: '#d42a2a', sheenRoughness: 0.5 }));
-      r.position.set(0, R + 0.5, 3.2);
+      // tre kottar nedtill
+      for (const [a, k] of [[1.4, 0.8], [1.5, 0.92], [1.6, 0.75]]) delar.push(kotte(k).rotateZ((a - 1.5) * 5).translate(Math.cos(a * Math.PI) * R * 1.02, Math.sin(a * Math.PI) * R * 1.02, 4.2));
+      const r = new THREE.Mesh(rosett('#8c0c16', 2.2), m('#ffffff', { vertexColors: true, roughness: 0.8, sheen: 0.6, sheenColor: '#d42a2a', sheenRoughness: 0.5, side: THREE.DoubleSide }));
+      r.position.set(0, R + 0.8, 5.2);
       r.castShadow = true;
       g.add(r);
       delar.push(...upphang(V(0, R + 1.5, 2.2), band, '#8c0c16'));
@@ -1086,7 +1187,7 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       }
       g.add(fjadrar(lista, q));
       g.add(agg([[-0.35, 1], [0, 1.2], [0.35, 1]].map(([x, k]) => ({ ...V(Math.sin(x) * R * 0.98, -Math.cos(x) * R * 0.98, 2.2), ned: 0.8, k: 1.05 * k }))));
-      const r = new THREE.Mesh(rosett('#f2c21c', 1.6), m('#ffffff', { vertexColors: true, roughness: 0.6 }));
+      const r = new THREE.Mesh(rosett('#f2c21c', 1.8), m('#ffffff', { vertexColors: true, roughness: 0.6, side: THREE.DoubleSide }));
       r.position.set(0, R + 0.5, 2.5);
       g.add(r);
       delar.push(...upphang(V(0, R + 1.5, 1.8), band, '#f2c21c'));
@@ -1097,67 +1198,147 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
 
   // En halmstjärna: åtta strån i kors, fyra långa och fyra korta emellan, med rött garn om mitten och om
   // varje arm, i ett rött snöre (band cm). Mitten i origo.
+  // Förut låg de långa stråna två och två på samma led (varje strå går genom mitten), så att stjärnan blev
+  // ett kors med två sneda strån; nu åtta strån runt halva varvet, sexton uddar.
   function halmstjarna({ R = 8, band = 12 } = {}) {
     const g = new THREE.Group();
     const delar = [];
-    const HALM = ['#d8b35c', '#c9a24b', '#e3c375', '#cfa955'];
+    const HALM = ['#d9a944', '#c8962f', '#e3b856', '#bf8a2c'];
+    // ett strå: platt och blankt, spetsigt snittat i båda ändar, ljusare på mitten
+    const stra = (l, r, farg) => {
+      const geo = new THREE.LatheGeometry([[0, -l / 2], [r, -l / 2 + 3.2 * r], [r, l / 2 - 3.2 * r], [0, l / 2]].map(([x, y]) => new THREE.Vector2(x, y)), 6);
+      geo.scale(1, 1, 0.5);
+      const c = new THREE.Color(farg);
+      const ljus = c.clone().lerp(new THREE.Color('#ffe7a8'), 0.22);
+      const p = geo.attributes.position;
+      const a = new Float32Array(p.count * 3);
+      for (let i = 0; i < p.count; i++) a.set((p.getZ(i) > 0.05 * r ? ljus : c).toArray(), i * 3);
+      geo.setAttribute('color', new THREE.BufferAttribute(a, 3));
+      geo.deleteAttribute('uv');
+      return geo;
+    };
+    const uddar = [];
     for (let i = 0; i < 8; i++) {
-      const a = (i * Math.PI) / 4 + (i % 2 ? Math.PI / 8 : 0);
-      const l = i % 2 ? R * 1.25 : R * 2;
-      // (två strån sida vid sida i varje led)
-      for (const dz of [-0.11, 0.11]) delar.push(farga(new THREE.BoxGeometry(l, 0.45, 0.16).translate(0, dz * 2, (i % 2 ? 0.2 : -0.2) + dz).rotateZ(a), HALM[(i + (dz > 0 ? 1 : 0)) % HALM.length]));
-      const r = (i % 2 ? R * 0.5 : R * 0.62);
-      delar.push(farga(new THREE.BoxGeometry(0.3, 0.75, 0.55).translate(r, 0, 0).rotateZ(a), '#b5121c'));
-      delar.push(farga(new THREE.BoxGeometry(0.3, 0.75, 0.55).translate(-r, 0, 0).rotateZ(a), '#b5121c'));
+      const a = (i * Math.PI) / 8;
+      const l = i % 2 ? R * 1.35 : R * 2;
+      // (de korta framför de långa, och vartannat strå lite framför, som när de är bundna)
+      const z = (i % 2 ? 0.45 : 0) + (i % 4 < 2 ? 0.12 : -0.12);
+      delar.push(stra(l, 0.32, HALM[i % HALM.length]).rotateZ(a - Math.PI / 2).translate(0, 0, z));
+      uddar.push([a, z], [a + Math.PI, z]);
     }
-    delar.push(farga(new THREE.TorusGeometry(0.9, 0.3, 6, 16), '#b5121c'));
+    // det röda garnet: en ring som går över och under stråna kring mitten, och ett kors över mitten
+    const rr = R * 0.36;
+    uddar.sort((x, y) => x[0] - y[0]);
+    const ring = uddar.map(([a, z], i) => V(Math.cos(a) * rr, Math.sin(a) * rr, z + (i % 2 ? -0.32 : 0.42)));
+    delar.push(ror([...ring, ring[0], ring[1]], 0.19, 0.19, '#c8141f', 4));
+    for (const a of [Math.PI / 4, -Math.PI / 4]) delar.push(ror([V(Math.cos(a) * -1, Math.sin(a) * -1, 0.75), V(0, 0, 0.95), V(Math.cos(a), Math.sin(a), 0.75)], 0.16, 0.16, '#b5121c', 4));
     delar.push(ror([V(0, R, 0), V(0.2, R + band / 2, -0.2), V(0, R + band, 0)], 0.1, 0.1, '#b5121c', 3));
-    mesh(ihop(delar), m('#ffffff', { vertexColors: true, roughness: 0.5, clearcoat: 0.4 }), g);
+    mesh(ihop(delar), m('#ffffff', { vertexColors: true, roughness: 0.5, clearcoat: 0.3 }), g);
     return g;
   }
 
   // Julbocken i halm med röda band, stående på hovarna i origo, nosen åt +x.
+  // Förut släta rör med röda ringar (torusar) som stod ut som plastringar; nu buntar av halm, randiga på
+  // längden, och breda röda band som ligger an mot halmen.
   function julbock() {
     const g = new THREE.Group();
-    const H = '#d5ae55';
-    const H2 = '#c49a42';
     const d = [];
-    d.push(ror([V(-8, 13, 0), V(0, 14, 0), V(7, 14.5, 0)], 3.1, 2.8, H, 10));
-    d.push(ror([V(6.5, 15, 0), V(9, 20, 0), V(10.5, 23.5, 0)], 1.8, 1.4, H2, 8));
-    d.push(ror([V(10, 23.5, 0), V(12.5, 22.5, 0), V(14.6, 20.6, 0)], 1.6, 0.9, H, 8));
+    const HALM = ['#d8ae52', '#b98a36', '#e8c773', '#a87a2c', '#cfa147', '#f0d58e'];
+    // en bunt halm längs punkterna: ett rör där vart och ett av hörnen runt om får sitt strås färg
+    const bunt = (pts, r0, r1, rund = 12, fro = 1) => {
+      const geo = ror(pts, r0, r1, '#ffffff', rund);
+      const q = rnd(Math.abs(Math.round(fro * 31)) + 7);
+      const farger = Array.from({ length: rund + 1 }, () => new THREE.Color(HALM[Math.floor(q() * HALM.length)]));
+      farger[rund] = farger[0];
+      const c = geo.attributes.color;
+      for (let i = 0; i < c.count; i++) c.setXYZ(i, ...farger[i % (rund + 1)].toArray());
+      return { geo, kurva: new THREE.CatmullRomCurve3(pts), r0, r1 };
+    };
+    // ett rött band runt bunten vid t (0–1), bredden b
+    const band = (bt, t, b = 1.3) => {
+      const p = bt.kurva.getPointAt(t);
+      const T = bt.kurva.getTangentAt(t);
+      const r = bt.r0 + (bt.r1 - bt.r0) * t + 0.12;
+      const geo = new THREE.CylinderGeometry(r, r, b, 18, 1, true);
+      geo.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), T));
+      geo.translate(p.x, p.y, p.z);
+      d.push(farga(geo, '#b8141e'));
+      // (kanterna, lite tjockare)
+      for (const s of [-1, 1]) {
+        const k = new THREE.TorusGeometry(r, 0.14, 4, 18).rotateX(Math.PI / 2);
+        k.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), T));
+        k.translate(p.x + (T.x * s * b) / 2, p.y + (T.y * s * b) / 2, p.z + (T.z * s * b) / 2);
+        d.push(farga(k, '#8e0c14'));
+      }
+    };
+    const kropp = bunt([V(-9, 13.2, 0), V(-3, 14, 0), V(3, 14.2, 0), V(8, 15, 0)], 3.3, 2.9, 14, 1);
+    const hals = bunt([V(7, 14.8, 0), V(9.2, 19, 0), V(10.4, 23.4, 0)], 2, 1.5, 12, 2);
+    const huvud = bunt([V(9.6, 24, 0), V(12.4, 23, 0), V(15.2, 21, 0)], 1.75, 1.0, 12, 3);
+    const svans = bunt([V(-8.8, 13.8, 0), V(-11, 16.5, 0), V(-11.6, 18.4, 0)], 1.2, 0.35, 8, 4);
+    const delar = [kropp, hals, huvud, svans];
     for (const z of [-1, 1]) {
-      d.push(ror([V(10, 24.5, z * 0.9), V(8.5, 28, z * 1.6), V(5.8, 28.2, z * 2.2), V(5.2, 25.8, z * 2.4)], 0.6, 0.35, H2, 6));
-      d.push(ror([V(11, 23.8, z * 1.3), V(10.5, 23, z * 3)], 0.5, 0.3, H, 5));
-      for (const x of [-6.5, 5]) d.push(ror([V(x, 12, z * 1.9), V(x + 0.5, 6, z * 2.2), V(x, 0, z * 2.3)], 1.1, 0.9, H, 7));
+      // hornen: böjda bakåt och ned i en båge
+      delar.push(bunt([V(10.2, 25, z * 0.8), V(9.4, 28.6, z * 1.5), V(6.6, 29.6, z * 2.3), V(4.8, 27.6, z * 2.8), V(5.6, 25.8, z * 2.9)], 0.75, 0.3, 8, 5 + z));
+      // öronen
+      d.push(farga(new THREE.ConeGeometry(0.6, 2.4, 6).rotateZ(z > 0 ? -1.9 : -1.9).rotateX(z * -0.5).translate(10.6, 24.2, z * 1.9), '#c99f45'));
+      // benen, lite isär nedtill
+      for (const x of [-6.2, 5]) delar.push(bunt([V(x, 12.4, z * 1.8), V(x + 0.3, 6.5, z * 2.1), V(x - 0.2, 0, z * 2.5)], 1.15, 0.95, 10, 9 + x + z));
     }
-    d.push(ror([V(-8.5, 14, 0), V(-10.5, 16, 0)], 0.9, 0.4, H2, 5));
-    // de röda banden: om halsen, två om kroppen och om benen
-    const band = (x, y, r, axel = 'x') => d.push(farga(new THREE.TorusGeometry(r, 0.38, 6, 20).rotateY(axel === 'x' ? Math.PI / 2 : 0).rotateX(axel === 'y' ? Math.PI / 2 : 0).translate(x, y, 0), '#b5121c'));
-    band(-4, 13.4, 3.3);
-    band(3, 14.2, 3.2);
-    band(7.6, 16.6, 2);
-    band(13.2, 21.8, 1.3);
-    for (const z of [-1, 1]) for (const x of [-6.2, 5.3]) d.push(farga(new THREE.TorusGeometry(1.2, 0.3, 6, 14).rotateX(Math.PI / 2).translate(x, 8.5, z * 2.1), '#b5121c'));
-    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.75 }), g);
+    for (const b of delar) d.push(b.geo);
+    // (ändarna på bunten: kroppen bak, nosen och fötterna)
+    const ande = (b, t, f = '#9a6c2c') => {
+      const p = b.kurva.getPointAt(t);
+      const T = b.kurva.getTangentAt(t);
+      const r = t ? b.r1 : b.r0;
+      const geo = new THREE.SphereGeometry(r * 0.98, 12, 6).scale(1, 0.22, 1);
+      geo.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), T));
+      d.push(farga(geo.translate(p.x, p.y, p.z), f));
+    };
+    ande(kropp, 0);
+    ande(kropp, 1);
+    ande(huvud, 1, '#8a5e24');
+    // banden: två om kroppen, om halsen, om nosen och om benen
+    band(kropp, 0.3, 1.5);
+    band(kropp, 0.7, 1.5);
+    band(hals, 0.55, 1.2);
+    band(huvud, 0.72, 0.9);
+    for (const b of delar.slice(5)) if (b.r0 > 1) band(b, 0.42, 1);
+    // ögonen: två små mörka knappar
+    for (const z of [-1, 1]) d.push(farga(new THREE.SphereGeometry(0.28, 6, 4).translate(12.2, 23.9, z * 1.45), '#2a1a10'));
+    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.82 }), g);
     return g;
   }
 
   // Serpentiner som hänger i lockar från punkterna (lista: [punkt, längd cm]) och ballonger i folie med
   // snören ned till en punkt (ballonger: [x, y, z, färg] över snörets fäste i origo).
   const SERP = ['#ff3d7f', '#ffd21f', '#3d9bff', '#4fd65a', '#f2f2f2', '#ff8a2a'];
+  // Serpentinen är en remsa papper som har rullats och hänger i en lös skruv: bandets breda sida vänd utåt,
+  // lockarna glesare nedåt där tyngden drar ut dem. Förut ett tunt rör i sicksack.
   function serpentiner(lista) {
     const g = new THREE.Group();
-    const d = lista.map(([p, l], i) => {
-      const pts = [];
-      const n = Math.round(l * 2.2);
+    const d = [];
+    lista.forEach(([p, l], i) => {
+      const a0 = [];
+      const a1 = [];
+      const n = Math.round(l * 4);
+      const b = 0.55;
+      let y = 0;
       for (let k = 0; k <= n; k++) {
         const t = k / n;
-        const a = t * l * 1.9 + i;
-        pts.push(p.clone().add(V(Math.cos(a) * 1.4 * (0.4 + t), -t * l, Math.sin(a) * 1.4 * (0.4 + t))));
+        // (varvet tar 2,2 cm överst och drygt dubbelt så mycket längst ned)
+        const a = t * l * 1.45 + i * 1.7;
+        y = -t * l;
+        const r = 0.9 + 0.7 * t;
+        const c = p.clone().add(V(Math.cos(a) * r, y, Math.sin(a) * r));
+        // bandet lutar med skruven
+        const lut = 0.45 + 0.25 * t;
+        const w = V(-Math.sin(a) * lut, 1, Math.cos(a) * lut).normalize().multiplyScalar(b / 2);
+        a0.push(c.clone().sub(w));
+        a1.push(c.clone().add(w));
       }
-      return ror(pts, 0.34, 0.3, SERP[i % SERP.length], 4);
+      d.push(yta(a0, a1, SERP[i % SERP.length]));
     });
-    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.35, clearcoat: 0.6 }), g);
+    mesh(ihop(d), m('#ffffff', { vertexColors: true, roughness: 0.4, clearcoat: 0.5, side: THREE.DoubleSide }), g);
     return g;
   }
   function ballonger(lista = [[-6, 52, 0, '#d4a838'], [5, 58, 2, '#c8ccd2'], [0, 46, -4, '#1c1c22']]) {
@@ -1258,8 +1439,15 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
       for (let j = 0; j < n; j++) {
         const p = c.getPointAt(j / n);
         const d = V(q() - 0.5, q() - 0.3, q() - 0.2).normalize();
-        lov.push(farga(rikta(blad(3.2, 2.4), p, d, q() * 3), q() > 0.5 ? '#6fae35' : '#88c444'));
-        if (q() < 0.22) blom.push(farga(new THREE.SphereGeometry(0.85, 6, 4).scale(1, 0.5, 1).translate(p.x + d.x * 1.5, p.y + d.y * 1.5, p.z + d.z * 1.5 + 0.8), FARG[Math.floor(q() * FARG.length)]));
+        lov.push(farga(rikta(blad(2.6, 1.9), p, d, q() * 3), q() > 0.5 ? '#6fae35' : '#88c444'));
+        // blommorna: en platt krona med en mitt, vänd utåt och framåt (förut färgade kulor)
+        if (q() < 0.2) {
+          const f = FARG[Math.floor(q() * FARG.length)];
+          const ut = V(d.x, d.y * 0.5, Math.abs(d.z) + 0.6).normalize();
+          const bp = p.clone().addScaledVector(ut, 1.2);
+          blom.push(farga(rikta(new THREE.CircleGeometry(0.95, f === '#3f78ec' ? 7 : 10).rotateX(-Math.PI / 2), bp, ut), f));
+          blom.push(farga(new THREE.SphereGeometry(0.34, 6, 4).translate(bp.x + ut.x * 0.15, bp.y + ut.y * 0.15, bp.z + ut.z * 0.15), f === '#fbfaf3' ? '#f2c21c' : '#2a3a6a'));
+        }
       }
     });
     tra.push(farga(new THREE.SphereGeometry(0.9, 8, 6).translate(0, hojd + 0.6, 0), '#2f5fd1'));
