@@ -221,11 +221,12 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 /* ---------- visitkortet (rum.js, kortHtml) ---------- */
 
 /* På väggen mellan stationsuret och orakelramen, till höger om palmetten
-   (veckans löpsedel står i stället utanför dörren, rum-affischer.js).
+   och med högerkanten i linje med ramens, så långt ner att urets skugga inte
+   når det (veckans löpsedel står i stället utanför dörren, rum-affischer.js).
    Länken är lite större än kortet, så att det går att träffa med fingret.
    Kortet ritas i sina egna mått (440 × 285, ungefär 85 × 55 mm) och
    förminskas kring stiftet till 44 × 28,5 i scenen. */
-.rum-kort { position: absolute; left: 1060px; top: 235px; width: 56px; height: 40px; display: block; }
+.rum-kort { position: absolute; left: 1063px; top: 250px; width: 56px; height: 40px; display: block; }
 @media (hover: hover) { .rum-kort:hover { filter: brightness(1.12) drop-shadow(0 0 3px rgba(240, 214, 153, 0.5)); } }
 .rum-kort:focus-visible { filter: brightness(1.12) drop-shadow(0 0 3px rgba(240, 214, 153, 0.5)); }
 .rum-kort .vk {
@@ -397,7 +398,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 .rum-ur {
   position: absolute;
   left: 996px;
-  top: 98px;
+  top: 130px;
   width: 108px;
   height: 108px;
   display: block;

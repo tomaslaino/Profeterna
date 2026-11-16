@@ -446,6 +446,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   att dyka upp tvärt efter ljuset. Gängets ansikten sparas mellan besöken,
   och gänget väntar inte på vädret när det finns sparat från de senaste tre timmarna (se *Snabbare och jämnare start*
   under [Tobaksaffären](#tobaksaffären))
+- [x] **Stationsuret längre ner (2026-11-16, användarens önskemål: "Kan du justera ner klockan så att den hamnar i
+  en rimlig höjd … och justera allt det andra så att det blir snyggt och bra!"):** urets hölje satt bara 4 cm under
+  taket. Nu hänger det 32 enheter (ungefär 13 cm) lägre (`UR` i [public/rum-inredning.js](public/rum-inredning.js)),
+  med höljet ungefär 17 cm under taket och i höjd med tv:n, och med ungefär lika mycket luft över sig som ner till
+  ramens palmett. Visitkortet flyttades ner och lite åt höger, så att det ryms mellan uret och ramen, linjerar med
+  ramens högerkant och hamnar utanför urets skugga. Orakelramen och mässingsskylten står kvar, eftersom skylten redan ligger strax ovanför bardisken
+  (se *Stationsuret* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -4295,7 +4302,8 @@ samma mitt på höjden. Pokalerna är runda och ser likadana ut hur snett vägge
 skulle tryckas ihop i hörnet. Tv:ns sladd går i en kort båge till ett uttag strax under väggplattan,
 ovanför Tipsligan.
 
-**Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
+**Stationsuret** sitter på bakväggen till höger om fönstret, ungefär 17 cm under taket och
+i höjd med tv:n på högra väggen, och leder bara till en närbild: ett
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
 svarta streck, gulnad av röken, och visarna i var sitt lager – den röda sekundvisaren
 hoppar varje sekund. Det går efter Stockholms tid, med samma klocka som
