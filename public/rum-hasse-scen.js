@@ -58,7 +58,22 @@ export const SCEN = {
   // hur långt under kroken ramens överkant hänger (NED), och hur långt ut från fyllningen ramens framsida står
   // upptill och nedtill (UT): tråden drar ut överkanten mot kroken, och nederkanten vilar mot fyllningen.
   LOPSEDEL: { X: 1650, B: 600, NED: 92, UT: [50, 22] },
+  // Nacionals flagga (DL:s lag), gammal och blekt, 2026-11-16: den hänger i märlorna i de övre hörnen (IN in från
+  // kanterna) i mässingskrokarna i de två fälten till höger om löpsedelns (KROKAR, x), över stolpen emellan, och går
+  // ut ur bilden till höger. B × H: tyget (58 × 38 cm), UT: hur långt ut från fyllningen det hänger, SAG: hur mycket
+  // överkanten sviktar mellan krokarna. Bilden (public/rum/hasse-flagga.webp, scripts/hasse/flagga.mjs) täcker
+  // flaggan, krokarna och skuggan, KANT runt om (flaggRuta); sidan lägger den på väggens duk (flagga i rum-hasse.js).
+  // (Den andra kroken, vid x = 3450, finns inte i bakningen; den hänger utanför bilden och ritas med flaggan.)
+  FLAGGA: { KROKAR: [2550, 3450], IN: 30, B: 960, H: 640, UT: 26, SAG: 46, KANT: 70 },
 };
+
+// Flaggans bild i barens mått: övre vänstra hörnet (x0, y0), bredden och höjden, och topp: tygets överkant vid
+// märlorna, som vilar på krokarnas skaft (skaftet 10 tjockt, hålet i märlan 17 vitt, som i bak.html).
+export function flaggRuta(S = SCEN) {
+  const G = S.FLAGGA;
+  const topp = S.FRONT.KROK + 5 - 8.5 + G.IN;
+  return { x0: G.KROKAR[0] - G.IN - G.KANT, y0: topp + G.KANT, w: G.B + 2 * G.KANT, h: G.H + G.SAG + 2 * G.KANT, topp };
+}
 
 // Kameran: läget, och axlarna i världen (höger, upp och bakåt; den tittar mot −bak). Rotationen är
 // Ry(VRID)·Rx(−LUT), som three.js Euler(−LUT, VRID, 0, 'YXZ').

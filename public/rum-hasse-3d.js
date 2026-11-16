@@ -27,6 +27,9 @@
 import * as THREE from 'three';
 import { ATLAS, LJUS, ARM, HAND, KAMERA, BORD_GLSL, CIGARR, ASKKOPP, DAG, LYS, VILOHOJD, VILAN, paDisken, inat, laddaFoto, laddaHand, byggArm, byggKopp, byggCigarr, byggAskkopp, byggRok, byggPenna, byggSkugga, byggGlasogon, GLAS, PENNA } from './rum-hasse-arm.js';
 import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten } from './rum-hasse-scen.js';
+// (flaggans ruta som namnrymd: med en äldre rum-hasse-scen.js i webbläsarens cache saknas den bara, i stället för att
+// hela filen inte går att läsa in)
+import * as SCENFIL from './rum-hasse-scen.js';
 import { PULT_GLSL, SKIVA, ringar, NRING, L as PULT_L, franRum } from './rum-pult.js';
 import { byggTidning, ytan } from './rum-hasse-tidning.js';
 import { byggStall, byggSticka, byggBranda, byggTandare, byggLaga, brandLage, STALL, STICKA, TANDARE, BRANDA } from './rum-hasse-eld.js';
@@ -803,6 +806,17 @@ export function lopsedel(v, w, h, bak) {
     return [bak.px + bak.S * u, bak.py + bak.S * q];
   });
   return { form, skala, oskarp, ruta };
+}
+// Nacionals flagga på bardiskens front (SCEN.FLAGGA, flagga i rum-hasse.js): från en punkt i flaggans bild (w × h
+// bildpunkter, som täcker flaggRuta) till väggens bild (bak: BAK), i tygets plan UT framför fyllningen.
+export function flaggan(bak, w, h) {
+  if (!SCENFIL.flaggRuta || !SCEN.FLAGGA) return null;
+  const R = SCENFIL.flaggRuta();
+  const z = SCEN.FRONT.Z + SCEN.FLAGGA.UT;
+  return (x, y) => {
+    const [u, q] = iKamera(franBaren([R.x0 + (x / w) * R.w, R.y0 - (y / h) * R.h, z]), KAM);
+    return [bak.px + bak.S * u, bak.py + bak.S * q];
+  };
 }
 // matrix3d från rektangeln w × h (hörnet uppe till vänster i 0, 0) till fyra punkter i fönstret
 function matris3d(w, h, [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]) {

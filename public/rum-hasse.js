@@ -663,6 +663,7 @@ window.RumHasse = (() => {
     const medDag = dag && (await H.dag.decode().then(() => true, () => false));
     const W = bas.naturalWidth;
     const Hh = bas.naturalHeight;
+    const fl = await flaggForbered(W, Hh, blanda ? [mork, tant] : [bas], medDag ? H.dag : null);
     const t = H.dagDuk || (H.dagDuk = document.createElement('canvas'));
     if (medDag) {
       t.width = W;
@@ -695,6 +696,18 @@ window.RumHasse = (() => {
     }
     x.globalAlpha = 1;
     x.globalCompositeOperation = 'source-over';
+    // Nacionals flagga, i ljuset på fronten där: väggen i små prov (flaggForbered), lagd ihop som bilderna läggs på
+    // duken här (nattens bild och lysrörets så tänt som det är, och dagsljuset i fönstrets färg ovanpå)
+    if (fl) {
+      const [a, b] = fl.prov;
+      const v = new Float32Array(a.length);
+      const F = fl.dag ? l.f * 0.45 : 0;
+      for (let i = 0; i < a.length; i++) {
+        const s = b ? a[i] + (b[i] - a[i]) * l.k : a[i];
+        v[i] = Math.min(255, s + (fl.dag ? fl.dag[i] * l.c[i % 3] * F : 0));
+      }
+      flagga(x, fl, v);
+    }
     rok(x, W, Hh, l);
     H.vy.classList.add('vagg');
     H.vaggNr = (H.vaggNr || 0) + 1;
@@ -774,6 +787,10 @@ window.RumHasse = (() => {
     if (!H.bilder) {
       const l = ljuset();
       H.bilder = [bakbild(l.lys), ...(blandar(l) ? [bakbild(!l.lys)] : []), 'rum/hasse-atlas.webp', ...(l.f >= 0.02 ? [dagbild()] : [])].map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
+      // (Nacionals flagga på väggen: flagga)
+      H.flagga = new Image();
+      H.flagga.src = 'rum/hasse-flagga.webp';
+      H.flaggLjus = fetch('rum/hasse-flagga.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
       H.bilder.push(import('./rum-hasse-3d.js').then((m) => { H.m = m; }));
       H.bilder.push(import('./rum-hasse-ute.js').then((m) => { H.ute = m; }, () => {}));
     }
@@ -1154,6 +1171,215 @@ window.RumHasse = (() => {
     const o = halva(0, N / 2);
     const u = halva(N / 2, N);
     return o && u ? [o, u] : null;
+  }
+
+  // ---------- Nacionals flagga ----------
+  //
+  // DL:s lag (2026-11-16: "lägg in en flagga som tillhör Nacional där nere på Hasse Backes vägg. Det får sannolikt
+  // inte plats helt - men delvis", "På ett snyggt och patinasätt"): en gammal flagga, blekt och gulnad av röken, med
+  // veck där den har legat hopvikt, som hänger i märlorna i mässingskrokarna i de två fälten till höger om löpsedeln
+  // (SCEN.FLAGGA) och går ut ur bilden till höger. Bilden (scripts/hasse/flagga.mjs) är tyget i neutralt ljus, med
+  // vecken, krokarna och skuggan på fronten, och lika oskarp som väggen. Den läggs på väggens duk när den ritas
+  // (vagg), genom hans kamera (flaggan i rum-hasse-3d.js, exakt i perspektiv bildpunkt för bildpunkt), i det ljus
+  // som faller på fronten där: läst ur väggen före flaggan och tonat som bakningen (aces efter 0,7 gånger ljuset),
+  // som löpsedeln (lopLjus). Så hör den till väggen: inget eget lager, röken ligger över den och disken speglar den.
+  // FLAGG_DAMPA: som löpsedeln ska den inte ta uppmärksamheten, och tyget är ljusare än mahognyn runt om.
+  const FLAGG_DAMPA = [0.4, 0.37, 0.32];
+  const acesUt = (x) => (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14);
+  const acesIn = (y) => {
+    const v = Math.min(0.985, y);
+    const a = 2.51 - 2.43 * v;
+    const bb = 0.03 - 0.59 * v;
+    return (-bb + Math.sqrt(bb * bb + 4 * a * 0.14 * v)) / (2 * a);
+  };
+  const LIN8 = new Float32Array(256).map((_, i) => (i / 255) ** 2.2);
+  const GAMMA = new Uint8ClampedArray(16384).map((_, i) => Math.round(255 * (i / 16383) ** (1 / 2.2)));
+  // Var flaggan hamnar på väggens duk (W × Hh, väggens bild): rutan (x0, y0, w × h) och vägen tillbaka från duken
+  // till flaggans bild (planet genom kameran är en homografi, inv), och rutan i bilden (r)
+  function flaggLage(W, Hh) {
+    const { BAK } = H.m;
+    const b = Math.abs(W - BAK.hog.W) < Math.abs(W - BAK.bred.W) ? BAK.hog : BAK.bred;
+    const k = W / b.W;
+    const pa = H.m.flaggan(b, 1, 1);
+    if (!pa) return null;
+    const [[q0x, q0y], [q1x, q1y], [q2x, q2y], [q3x, q3y]] = [[0, 0], [1, 0], [1, 1], [0, 1]].map(([u, v]) => pa(u, v).map((z) => z * k));
+    const dx1 = q1x - q2x;
+    const dx2 = q3x - q2x;
+    const dx3 = q0x - q1x + q2x - q3x;
+    const dy1 = q1y - q2y;
+    const dy2 = q3y - q2y;
+    const dy3 = q0y - q1y + q2y - q3y;
+    const den = dx1 * dy2 - dx2 * dy1;
+    if (!den) return null;
+    const g = (dx3 * dy2 - dx2 * dy3) / den;
+    const hh = (dx1 * dy3 - dx3 * dy1) / den;
+    const a = q1x - q0x + g * q1x;
+    const bq = q3x - q0x + hh * q3x;
+    const d = q1y - q0y + g * q1y;
+    const e = q3y - q0y + hh * q3y;
+    const inv = [e - q0y * hh, q0x * hh - bq, bq * q0y - q0x * e, q0y * g - d, a - q0x * g, q0x * d - a * q0y, d * hh - e * g, bq * g - a * hh, a * e - bq * d];
+    const xs = [q0x, q1x, q2x, q3x];
+    const ys = [q0y, q1y, q2y, q3y];
+    const x0 = Math.max(0, Math.floor(Math.min(...xs)));
+    const y0 = Math.max(0, Math.floor(Math.min(...ys)));
+    const w = Math.min(W, Math.ceil(Math.max(...xs))) - x0;
+    const h = Math.min(Hh, Math.ceil(Math.max(...ys))) - y0;
+    if (w < 2 || h < 2) return null;
+    return { x0, y0, w, h, inv, r: [x0 / k, y0 / k, w / k, h / k], sort: b === BAK.hog ? 'hog' : 'bred' };
+  }
+  // Det som behövs innan väggen ritas: flaggans bildpunkter (en gång) och väggen där den hänger i små prov
+  // (FLAGG_PROV, RGB), ur rum/hasse-flagga.json (scripts/hasse/flagga.mjs läser väggens sex bilder i förväg). Att
+  // läsa dem här, ur väggens duk eller ur bilderna, höll huvudtråden 50–80 ms med fyra gånger långsammare processor.
+  // Är proven gamla (rutan stämmer inte, väggen har fått nya mått) läses bilden här i stället, en gång per bild.
+  // bilder: väggen (en, eller två medan lysröret tonas), dag: dagsljusets bild eller null.
+  // → { x0, y0, w, h, inv, r, sort, prov: [RGB, …], dag: RGB eller null } eller null
+  const FLAGG_PROV = [16, 12];
+  async function flaggForbered(W, Hh, bilder, dag) {
+    const f = H.flagga;
+    if (!f || !H.m || !H.m.flaggan) return null;
+    try {
+      if (!H.flaggTex || H.flaggTex.src !== f.src) {
+        await f.decode();
+        const bm = window.createImageBitmap ? await createImageBitmap(f) : f;
+        const t = document.createElement('canvas');
+        t.width = f.naturalWidth;
+        t.height = f.naturalHeight;
+        const tx = t.getContext('2d', { willReadFrequently: true });
+        tx.drawImage(bm, 0, 0);
+        H.flaggTex = { src: f.src, w: t.width, h: t.height, d: tx.getImageData(0, 0, t.width, t.height).data };
+      }
+    } catch (e) {
+      return null;
+    }
+    const som = `${W}x${Hh}`;
+    if (!H.flaggLagen || H.flaggLagen.som !== som) H.flaggLagen = { ...(flaggLage(W, Hh) || {}), som };
+    const lage = H.flaggLagen;
+    if (!lage.inv) return null;
+    const { r } = lage;
+    const fardiga = H.flaggLjus ? await H.flaggLjus : null;
+    const rf = fardiga && fardiga.r && fardiga.r[lage.sort];
+    const stammer = rf && rf.every((v, i) => Math.abs(v - r[i]) < 0.5);
+    H.flaggProv = H.flaggProv || new Map();
+    const prov = (img) => {
+      const namn = img.src.split('/').pop().split('?')[0];
+      if (stammer && fardiga.prov && fardiga.prov[namn]) return Uint8Array.from(atob(fardiga.prov[namn]), (c) => c.charCodeAt(0));
+      const nyckel = `${img.src}|${r.join()}`;
+      if (!H.flaggProv.has(nyckel)) {
+        const [n, m] = FLAGG_PROV;
+        H.flaggProv.set(nyckel, (async () => {
+          const k2 = document.createElement('canvas');
+          k2.width = n;
+          k2.height = m;
+          const kx = k2.getContext('2d', { willReadFrequently: true });
+          try {
+            kx.drawImage(await createImageBitmap(img, r[0], r[1], r[2], r[3], { resizeWidth: n, resizeHeight: m, resizeQuality: 'medium' }), 0, 0, n, m);
+          } catch (e) {
+            kx.drawImage(img, r[0], r[1], r[2], r[3], 0, 0, n, m);
+          }
+          const d = kx.getImageData(0, 0, n, m).data;
+          return Uint8Array.from({ length: n * m * 3 }, (_, i) => d[((i / 3) | 0) * 4 + (i % 3)]);
+        })().catch(() => null));
+      }
+      return H.flaggProv.get(nyckel);
+    };
+    const [p, d] = await Promise.all([Promise.all(bilder.map(prov)), dag ? prov(dag) : null]);
+    if (!p.every(Boolean)) return null;
+    return { ...lage, prov: p, dag: d };
+  }
+  function flagga(x, fl, vaggen) {
+    const T = H.flaggTex;
+    const { x0, y0, w, h } = fl;
+    const [iA, iB, iC, iD, iE, iF, iG, iH, iI] = fl.inv;
+    const ljus = frontLjus(vaggen, w, h);
+    if (!ljus) return;
+    const o = H.flaggDuk || (H.flaggDuk = document.createElement('canvas'));
+    o.width = w;
+    o.height = h;
+    const ox = o.getContext('2d');
+    const ut = ox.createImageData(w, h);
+    const p = ut.data;
+    const td = T.d;
+    const L = [0, 0, 0];
+    for (let py = 0; py < h; py++) {
+      const Y = y0 + py + 0.5;
+      for (let px = 0; px < w; px++) {
+        const X = x0 + px + 0.5;
+        const n = iG * X + iH * Y + iI;
+        const u = (iA * X + iB * Y + iC) / n;
+        const v = (iD * X + iE * Y + iF) / n;
+        if (!(u > 0 && u < 1 && v > 0 && v < 1)) continue;
+        // bilinjärt, med färgen vägd efter täckningen (så att det genomskinliga inte svärtar kanterna)
+        const fx = Math.min(T.w - 1.001, Math.max(0, u * T.w - 0.5));
+        const fy = Math.min(T.h - 1.001, Math.max(0, v * T.h - 0.5));
+        const ix = fx | 0;
+        const iy = fy | 0;
+        const sx = fx - ix;
+        const sy = fy - iy;
+        let r = 0;
+        let gg = 0;
+        let bb = 0;
+        let al = 0;
+        for (let q = 0; q < 4; q++) {
+          const wq = (q & 1 ? sx : 1 - sx) * (q & 2 ? sy : 1 - sy);
+          const i = ((iy + (q >> 1)) * T.w + ix + (q & 1)) * 4;
+          const aw = wq * td[i + 3];
+          r += aw * td[i];
+          gg += aw * td[i + 1];
+          bb += aw * td[i + 2];
+          al += aw;
+        }
+        if (al < 1) continue;
+        ljus(px, py, L);
+        const j = (py * w + px) * 4;
+        p[j] = GAMMA[Math.min(16383, (acesUt(L[0] * LIN8[Math.round(r / al)]) * 16383) | 0)];
+        p[j + 1] = GAMMA[Math.min(16383, (acesUt(L[1] * LIN8[Math.round(gg / al)]) * 16383) | 0)];
+        p[j + 2] = GAMMA[Math.min(16383, (acesUt(L[2] * LIN8[Math.round(bb / al)]) * 16383) | 0)];
+        p[j + 3] = al;
+      }
+    }
+    ox.putImageData(ut, 0, 0);
+    x.drawImage(o, x0, y0);
+  }
+  // Ljuset på fronten där flaggan hänger (w × h på duken), som löpsedelns (lopLjus), på ett grovt rutnät ur väggen i
+  // små prov (v: RGB, FLAGG_PROV): varje ruta en bit under mitten av sina prov, så att mässingen i kroken och glansen
+  // i träet inte lyser upp tyget. → ljus(px, py, ut): 0,7 gånger ljuset gånger FLAGG_DAMPA i (px, py) på duken inom
+  // rutan, bilinjärt mellan rutorna.
+  function frontLjus(v, w, h) {
+    const GX = 8;
+    const GY = 6;
+    const S = FLAGG_PROV[0] / GX;
+    const N = FLAGG_PROV[0];
+    const celler = [];
+    for (let gy = 0; gy < GY; gy++) {
+      for (let gx = 0; gx < GX; gx++) {
+        const prov = [];
+        for (let yy = 0; yy < S; yy++) {
+          for (let xx = 0; xx < S; xx++) {
+            const i = ((gy * S + yy) * N + gx * S + xx) * 3;
+            prov.push([0, 1, 2].map((j) => acesIn(((v[i + j] || 0) / 255) ** 2.2) / 0.7 / TRA[j]));
+          }
+        }
+        prov.sort((s, t) => s[0] + s[1] + s[2] - t[0] - t[1] - t[2]);
+        celler.push(prov.length ? prov[Math.floor(prov.length * 0.4)] : null);
+      }
+    }
+    const bra = celler.filter(Boolean);
+    if (!bra.length) return null;
+    const medel = [0, 1, 2].map((j) => bra.reduce((s, q) => s + q[j], 0) / bra.length);
+    const M = celler.map((q) => (q || medel).map((e, j) => 0.7 * e * FLAGG_DAMPA[j]));
+    return (px, py, ut) => {
+      const fx = Math.min(GX - 1, Math.max(0, ((px + 0.5) / w) * GX - 0.5));
+      const fy = Math.min(GY - 1, Math.max(0, ((py + 0.5) / h) * GY - 0.5));
+      const ix = Math.min(GX - 2, fx | 0);
+      const iy = Math.min(GY - 2, fy | 0);
+      const sx = fx - ix;
+      const sy = fy - iy;
+      const m00 = M[iy * GX + ix];
+      const m10 = M[iy * GX + ix + 1];
+      const m01 = M[(iy + 1) * GX + ix];
+      const m11 = M[(iy + 1) * GX + ix + 1];
+      for (let j = 0; j < 3; j++) ut[j] = (m00[j] * (1 - sx) + m10[j] * sx) * (1 - sy) + (m01[j] * (1 - sx) + m11[j] * sx) * sy;
+    };
   }
   // Närbilden: löpsedeln förstoras från där den hänger till mitt i bilden, skarp och i fullt ljus, över baren
   // som mörknar bakom. Ett klick, Esc eller bakåt lägger tillbaka den, och man är kvar hos honom. Med minskad
