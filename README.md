@@ -7747,7 +7747,8 @@ rummet, och det tonas bort bakom matchbladet och kupongen i handen. Förut förs
 namnet var borta hos honom, så att det såg ut som en annan sida. Neonskylten i affärens fönster sitter strax
 utanför hans bild till höger, och dess röda sken faller in därifrån som över gänget i rummet (`.rh-ton::before`,
 `--neon` i `tand`): starkast på natten, tydligt på kvällen och nästan borta i dagsljus; en färdig toning utan
-blandning. Man vänder sig med samma drag som man ser sig omkring med i telefonen: när rummets vänstra kant
+blandning. Och när det är mörkt ute ser man affären och gänget speglas i glaset bakom honom (se *Affären i
+glaset*). Man vänder sig med samma drag som man ser sig omkring med i telefonen: när rummets vänstra kant
 redan syns och man drar vidare åt höger (minst 64 bildpunkter, mest i sidled) slår kameran till honom, och
 hos honom drar man åt vänster för att vända sig tillbaka (inte på kupongen eller matchbladet). Med
 tangentbord är det pilen åt vänster i rummet, när inget ligger framme, och pilen åt höger hos honom.
@@ -7798,7 +7799,8 @@ rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna (bars
 färger efter klockan, molnen, den låga solens sken, den kalla dagen, tända fönster och lyktor när det skymmer, en
 grön skylt och en röd lampa på höghuset på kvällen, regn och snö som ett dis, dimma som tar andra sidan, snö på
 taken, bron och träden, och löven efter årstiden. På glaset sitter, som i rummet, droppar efter regn, snö i
-nederkanten och frost i hörnen när det är kallare än −3°, och när det är mörkt ute speglar glaset den varma baren.
+nederkanten och frost i hörnen när det är kallare än −3°, och när det är mörkt ute speglar glaset den varma baren
+och affären (se *Affären i glaset*).
 Allt står still: utsikten ritas en gång när ljuset eller vädret ändras
 ([public/rum-hasse-ute.js](public/rum-hasse-ute.js), `sig`), i halv upplösning och lika oskarp som kamerans
 skärpedjup gör det som är långt borta, med lyktorna som oskarpa skivor. Den läggs underst på väggens duk (`ute` i
@@ -7859,6 +7861,24 @@ figur över ett hjul, så styret och armbågarna är lite bredare än på riktig
 eller i en fast bild (`?rum-t`). Förut var
 väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
 kaffebryggaren och kassan (ändrat 2026-11-10).
+
+**Affären i glaset.** När det är mörkare ute än inne speglar glaspartiet bakom honom tobaksaffären, som ligger
+till höger om en när man har vänt sig mot honom (`affaren` i [public/rum-hasse-ute.js](public/rum-hasse-ute.js)):
+längst in, bakom hans huvud, furan i lysrörets sken; till höger om hans huvud gänget vid det runda bordet, med
+huvudena, håret, mössan med kronan och tröjorna i sina färger; och i den högra rutan lysröret i taket, skylten
+Stryktipset och neonskylten i skyltfönstret. Det är det som visar att han sitter i samma rum som gänget och man
+själv, och inte på ett annat ställe. Den som sitter närmast skyltfönstret i rummet sitter närmast glaset och syns
+därför längst till höger. Som utsikten är spegelbilden flyttad dit den syns: egentligen ligger den högre än vad
+rutorna når i bilden, och gänget längre åt höger, där bara breda fönster når. Den är lika oskarp som kamerans
+skärpedjup gör det som är långt borta: mjuka toningar i grader (som utsikten), målade i halv upplösning och lite
+suddade, där gängets kroppar skymmer furan bakom sig. Den läggs på väggens duk som ljus läggs till ljus, före
+väggen, så att den bara syns i rutorna, och ritas bara när väggen ritas; den kostar alltså ingenting medan man
+sitter hos honom, och pulten framför honom speglar den med väggen. Styrkan följer rummet: så tänt som lysröret
+är och så mörkt som det är ute (`L.dag`), så att den är tydlig på kvällen, svag i skymningen och borta mitt på
+dagen, och från midnatt till sex, när röret är släckt, syns bara neonskylten. När gänget sover (från halv elva,
+`RumFolk.somn`) har huvudena sjunkit, och väggen ritas om när de somnar och vaknar (`vaggSom` i
+[public/rum-hasse.js](public/rum-hasse.js)). Förut syntes ingenting av affären bakom honom, bara baren och
+utsikten, och hans bild såg ut som ett annat ställe än rummet (ändrat 2026-11-16).
 
 **Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, vit som i baren

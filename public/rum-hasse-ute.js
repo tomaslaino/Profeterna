@@ -11,6 +11,7 @@
 //
 //   utsikt(v, L, lage) → duken (halva bildens mått, BAK i rum-hasse-scen.js), sparad tills sig(v, L) ändras
 //   glas(x, v, L, lage, W, H) ritar glaset på väggens duk, innan väggen läggs ovanpå
+//   affaren(x, L, l, somn, lage, W, H) ritar tobaksaffären som speglas i glaset, också innan väggen
 //   sig(v, L) → en sträng som ändras när utsikten behöver ritas om
 //   rutor(lage) → glasets fyra hörn i varje ruta, i väggbildens bildpunkter
 //   gangare(v, L, lage) → någon som går på bron: figuren i två steg och vägen längs bron (bron i rum-hasse.js)
@@ -614,6 +615,117 @@ export function glas(x, v, L, lage, W, H) {
     }
     x.restore();
   }
+}
+
+// ---------- affären i glaset ----------
+
+// Tobaksaffären i glaset. När det är mörkare ute än inne speglar rutorna bakom honom det som är till höger om
+// en, där man har vänt sig ifrån: affären, med gänget vid det runda bordet framför skyltfönstret. Längst in i
+// spegeln, bakom hans huvud, furan på väggen bakom en i lysrörets sken; till höger lysröret i taket, gänget vid
+// bordet, skylten Stryktipset ovanför skyltfönstret och neonskylten i det. Den som sitter längst bort åt
+// skyltfönstret i rummet sitter närmast glaset och syns därför längst till höger. Som utsikten är spegelbilden
+// flyttad dit den syns: egentligen ligger den högre än rutorna når i bilden, och gänget längre åt höger, i den
+// högra rutan som bara syns i breda fönster; här sitter det i rutan bakom honom, till höger om hans huvud, och
+// skyltfönstret och skyltarna i den högra. Den är lika oskarp som kamerans skärpedjup gör det som är långt borta:
+// allt är mjuka toningar i grader (az åt höger och el uppåt, som utsikten, här med y = −el), målade på en egen
+// duk där gänget skymmer furan bakom sig, och lagda på väggens duk som ljus läggs till ljus, innan väggen läggs
+// ovanpå (glaset syns bara i rutorna). Ritas när väggen ritas, alltså bara när ljuset eller vädret ändras.
+// l: ljuset i baren (k: hur tänt lysröret är, dag: hur ljust det är ute), somn: gänget sover (från halv elva,
+// och då sjunker huvudena).
+const AFFAR = { a0: -16, a1: 50, e0: 4, e1: 22, sudd: 0.2 };
+const GANGET = [
+  // (az, hår eller mössa, tröjan, något ljust på den): längst till höger den med mössan och kronan
+  { az: 15.2, har: '122, 76, 42', troja: '46, 64, 134', ljus: '206, 214, 236' },
+  { az: 18.8, har: '204, 116, 52', troja: '40, 152, 142', ljus: '140, 76, 178' },
+  { az: 22.4, har: '118, 150, 214', troja: '44, 38, 50', ljus: '222, 64, 152', krona: true },
+];
+export function affaren(x, L, l, somn, lage, W, H) {
+  const morkt = Math.max(0, 1 - L.dag / 0.7) ** 1.3;
+  const s = (l ? l.k : 1) * morkt;
+  const n = morkt * (1 - 0.35 * (l ? l.k : 1));
+  if (s < 0.01 && n < 0.01) return;
+  const sk = W / BAK[lage].W;
+  const { P } = projektion(lage);
+  // grader → väggens bildpunkter (nästan affint över det här lilla stycket: tre punkter räcker)
+  const [ma, me] = [(AFFAR.a0 + AFFAR.a1) / 2, -(AFFAR.e0 + AFFAR.e1) / 2];
+  const o = P(ma, me);
+  const ex = P(ma + 1, me).map((q, i) => q - o[i]);
+  const ey = P(ma, me - 1).map((q, i) => q - o[i]);
+  const hornen = [[AFFAR.a0, AFFAR.e0], [AFFAR.a1, AFFAR.e0], [AFFAR.a0, AFFAR.e1], [AFFAR.a1, AFFAR.e1]].map(([a, y]) => P(a, -y));
+  const bx = Math.max(0, Math.floor(Math.min(...hornen.map((q) => q[0])) * sk));
+  const by = Math.max(0, Math.floor(Math.min(...hornen.map((q) => q[1])) * sk));
+  const bw = Math.min(W, Math.ceil(Math.max(...hornen.map((q) => q[0])) * sk)) - bx;
+  const bh = Math.min(H, Math.ceil(Math.max(...hornen.map((q) => q[1])) * sk)) - by;
+  if (bw <= 0 || bh <= 0) return;
+  // (i halv upplösning: allt är mjukt ändå)
+  const d = document.createElement('canvas');
+  d.width = Math.ceil(bw / 2);
+  d.height = Math.ceil(bh / 2);
+  const p = d.getContext('2d');
+  const h = sk / 2;
+  p.setTransform(ex[0] * h, ex[1] * h, ey[0] * h, ey[1] * h, (o[0] - ma * ex[0] + me * ey[0]) * h - bx / 2, (o[1] - ma * ex[1] + me * ey[1]) * h - by / 2);
+  const flack = (cx, cy, rx, ry, c, a, rot = 0, mitt = 0.45) => {
+    if (a <= 0.003) return;
+    p.save();
+    p.translate(cx, cy);
+    if (rot) p.rotate(rot * DEG);
+    p.scale(rx, ry);
+    const g = p.createRadialGradient(0, 0, 0, 0, 0, 1);
+    g.addColorStop(0, `rgba(${c}, ${Math.min(1, a).toFixed(3)})`);
+    g.addColorStop(mitt, `rgba(${c}, ${Math.min(1, a * 0.62).toFixed(3)})`);
+    g.addColorStop(1, `rgba(${c}, 0)`);
+    p.fillStyle = g;
+    p.fillRect(-1, -1, 2, 2);
+    p.restore();
+  };
+  // det som skymmer: tar bort ljuset bakom sig (mörkt tyg speglar nästan inget)
+  const skym = (cx, cy, rx, ry, a, mitt = 0.6) => {
+    p.globalCompositeOperation = 'destination-out';
+    flack(cx, cy, rx, ry, '0, 0, 0', a, 0, mitt);
+    p.globalCompositeOperation = 'source-over';
+  };
+  // furan i lysrörets sken: längst in bakom hans huvud och runt gänget, och golvet nedanför
+  flack(9, 12.8, 11, 5.5, '198, 134, 68', 0.3 * s);
+  flack(23, 12.6, 15, 6.5, '208, 148, 78', 0.36 * s);
+  flack(21, 18.4, 17, 2.4, '128, 90, 54', 0.24 * s);
+  // panelen: lodräta bräder, som en svag randning i skenet
+  p.globalCompositeOperation = 'destination-out';
+  for (let a = 1.4; a < 46; a += 1.7) flack(a, 12.6, 0.42, 6.5, '0, 0, 0', 0.09, 0, 0.8);
+  p.globalCompositeOperation = 'source-over';
+  // skyltfönstret till höger om gänget är mörkt (där syns utsikten igenom), med neonskylten i
+  skym(32, 12.8, 7, 3.4, 0.75);
+  flack(30.6, 11.3, 3.2, 0.9, '255, 76, 62', 0.8 * n, -2, 0.55);
+  flack(30.6, 11.5, 6.5, 2.7, '255, 58, 46', 0.22 * n);
+  // det runda bordet: skivan och foten
+  skym(18.8, 17, 0.7, 2, 0.8);
+  flack(18.8, 15.3, 4.2, 0.9, '236, 208, 164', 0.55 * s, 0, 0.7);
+  // gänget: tyget skymmer furan, och sedan huvudet, håret eller mössan och tröjan i lysrörets sken
+  const ned = somn ? 1.7 : 0;
+  for (const g of GANGET) {
+    const hy = 11.8 + ned;
+    skym(g.az, hy + 2.8, 2.1, 2.9, 0.9);
+    skym(g.az, hy, 1.45, 1.55, 0.85);
+    flack(g.az, hy + 2.9, 1.8, 2.2, g.troja, 0.52 * s, 0, 0.6);
+    flack(g.az + 0.3, hy + 2.6, 0.7, 1.4, g.ljus, 0.34 * s, 0, 0.6);
+    flack(g.az, hy + 0.1, 1.3, 1.4, '236, 184, 146', 0.72 * s, 0, 0.62);
+    flack(g.az + 0.15, hy - 0.75, 1.35, 0.85, g.har, 0.7 * s, 0, 0.6);
+    if (g.krona) flack(g.az, hy - 1.55, 1.05, 0.45, '238, 188, 64', 0.7 * s, 0, 0.7);
+  }
+  // lysröret i taket och skylten Stryktipset ovanför skyltfönstret, framför allt annat
+  flack(26, 8.6, 13, 1.6, '222, 234, 250', 0.24 * s);
+  flack(26, 8.4, 11.5, 0.4, '238, 246, 255', 0.95 * s, -1.5, 0.6);
+  flack(31.5, 9.7, 6.6, 0.48, '198, 48, 38', 0.62 * s, -2, 0.8);
+  flack(31.5, 9.7, 5.6, 0.19, '238, 210, 176', 0.35 * s, -2, 0.8);
+  x.save();
+  x.beginPath();
+  for (const q of rutor(lage)) q.forEach(([a, b], i) => (i ? x.lineTo(a * sk, b * sk) : x.moveTo(a * sk, b * sk)));
+  x.clip();
+  x.globalCompositeOperation = 'lighter';
+  x.imageSmoothingQuality = 'high';
+  // (och lite oskarpare där det går: kamerans lins på det avståndet)
+  if (FILTER) x.filter = `blur(${(AFFAR.sudd * Math.hypot(...ex) * sk).toFixed(1)}px)`;
+  x.drawImage(d, bx, by, bw, bh);
+  x.restore();
 }
 
 // ---------- någon på bron ----------
