@@ -446,6 +446,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   att dyka upp tvärt efter ljuset. Gängets ansikten sparas mellan besöken,
   och gänget väntar inte på vädret när det finns sparat från de senaste tre timmarna (se *Snabbare och jämnare start*
   under [Tobaksaffären](#tobaksaffären))
+- [x] **Stationsuret längre ner (2026-11-16, användarens önskemål: "Kan du justera ner klockan så att den hamnar i
+  en rimlig höjd … och justera allt det andra så att det blir snyggt och bra!"):** urets hölje satt bara 4 cm under
+  taket. Nu hänger det 32 enheter (ungefär 13 cm) lägre (`UR` i [public/rum-inredning.js](public/rum-inredning.js)),
+  med höljet ungefär 17 cm under taket och i höjd med tv:n, och med ungefär lika mycket luft över sig som ner till
+  ramens palmett. Visitkortet flyttades ner och lite åt höger, så att det ryms mellan uret och ramen, linjerar med
+  ramens högerkant och hamnar utanför urets skugga. Orakelramen och mässingsskylten står kvar, eftersom skylten redan ligger strax ovanför bardisken
+  (se *Stationsuret* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -1249,6 +1256,26 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ett hål bortom bildens kant. Samma dag, "Ja, gör plats": hyllan rymde bara fyra pokaler (den femte syntes
   inte, så var det också på den gamla platsen). Nu kommer en hylla till upp ovanför, och sedan står pokalerna
   tätare, i två led och till sist mindre, så att en hel säsong ryms. Se [Tobaksaffären](#tobaksaffären).
+- **Bättre ljus och en lampa som hänger ned (2026-11-16, användarens önskemål):** "Kan du ordna med den
+  allmänna belysningen på hemsidan så att den blir bättre och inte drar mer grafik. Det får gärna vara någon
+  lampa som hänger ner på något ställe eller dylikt – så länge som det inte hänger över något som är
+  betydelsefullt. Ordna med det och mergea!" En skomakarlampa i grön emalj hänger ned i vänstra hörnet över
+  notan och kaffet (där finns bara taket och dörrens överkant), och mörkret i överkanten ligger inte längre
+  över lysröret och taket. Se [Lampan över pulten och ljuset i taket](#lampan-över-pulten-och-ljuset-i-taket-2026-11-16).
+- **Datorn och videon parallellt med disken (2026-11-16, användarens önskemål):** "justera både TV:n och
+  datorn så att de står parallellt med bänken - just nu står de liksom lite på sniskan" och "när man zoomar
+  in få en bra bild - precis som vanligt". Datorn var vänd mellan gänget och ögat och videon 22 grader in mot
+  gänget, så att deras kanter pekade åt andra håll än diskens. Nu står båda med ryggen mot väggen och
+  skärmen ut i rummet, som tavlorna på väggen: i rummets perspektiv ses de snett från sidan, som allt längs
+  högra väggen. Närbilderna ser ut som förut: datorns skärm får samma ljus framför kameran, och kameran går i
+  en båge runt skärmen dit, så att den inte far förbi datorns sida; videon ses som förut men mer rakt
+  framifrån, så att etiketterna läses lättare. Se [Datorn](#datorn) och [Videon](#videon).
+- **Affären utifrån (2026-11-16, användarens önskemål):** "Kan du ordna så att man ser baren lite utifrån om man
+  trycker på 'matchfixarna' på dörren", med ett foto av Bron vid S:t Eriksbron utifrån: "Gör det enkelt och snyggt och vi
+  ska synas där i fönstret - vagt vast med samma inredning etc.", "Tänk på allt som händer ute" och "Du kan zooma in
+  lite mer än på den bilden". Närbilden av dörren är borta; namnet tar en ut på trottoaren, framför det laxrosa huset med
+  skylten MATCHFIXARNA, och genom skyltfönstret syns gänget bakifrån, ritat av samma 3D-scen som inne, i samma ljus,
+  väder och trafik som utsikten. Se [Fasaden](#fasaden).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -1522,6 +1549,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bron ligger i samma mått, så att de som går är närmast och bilarna längre in och högre upp, och fordonen har
   också tak, vindruta, motorhuv och bagagelucka, så att de syns som hela bilar och bussar. Se
   [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Trafiken bakom Hasse Backe som gatan i rummet (2026-11-16, användarens önskemål):** "Det som händer utanför
+  hasses fönster är lite för mycket i fokus - jag vill att de ska vara som på animationsbilden - är de inte i 2D
+  där?" och "så att inte bilar flyger uppe i luften på ena körfältet iaf". På gatan i rummet är bilarna platta
+  bilder från sidan och nästan lika oskarpa som stan bakom; på bron var trafiken bara en sjättedel till hälften så
+  oskarp som utsikten, och bilarna i den bortre filen hamnade högt ovanför räcket. Nu är trafiken lika oskarp
+  längs hela bron, 0,8 av utsiktens, och körbanan lutar mindre, så att båda filerna står på bron bakom räcket. Se
+  [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som gatan i rummet*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -1580,6 +1614,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   doften, skål och lillfingret ut. Medan han väntar på att man ska välja tar han kaffet och cigarren
   varannan gång; förut tog han då bara cigarren, så kaffet kom bara medan han låtsades läsa på. Se
   [Hasse Backe](#hasse-backe), *Kaffet*.
+- **Hasse Backe dricker kaffe på tio sätt (2026-11-16, användarens önskemål):** "Kan du ge hasse fler
+  kaffedrickarrörelser?" Fyra nya, som han lottar bland med de sex gamla: han tänker med koppen vid bröstet och
+  tar en klunk när han kommer på det (`tanke`), kaffet har kallnat och han grimaserar, fnyser och rycker på
+  axlarna men dricker ändå (`kallt`), koppen stannar halvvägs och han pekar med den mot en och blinkar (`halvvags`),
+  och han skålar mot någon längs baren (`halsa`). Koppen har två nya lägen för det, framhållen mot en och lyft
+  mot baren. Se [Hasse Backe](#hasse-backe), *Kaffet*.
 - **Hasse Backe fyller i din kupong (2026-11-05, användarens önskemål):** han får samma kupong som
   ligger på pulten, med samma grafik och det du redan har fyllt i, och fyller i den med pennan: lite slarvigt,
   men självklart. Du väljer 1, X eller 2, stort, direkt eller efter analysen, och efter en analys tar han
@@ -1629,6 +1669,17 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ögonen kisar med och skrattrynkor syns i ögonvrårna. Han ler lite mer när han pratar, skrattet har
   kisande ögon i stället för en rak tandrad, och i vilan myser han ibland eller blinkar åt en. Se
   [Hasse Backe](#hasse-backe), *Minen* och *Vilan*.
+- **Hasse Backe rör sig mer som en människa (2026-11-16, användarens önskemål):** "Kan du göra så att hasse ser
+  mer naturlig ut i sina rörelser - så att det inte är helt uppenbart att han är en animerad figur". Det som
+  avslöjade honom var det som gick i jämn takt eller stannade tvärt. Huvudet, kroppen, brynen och blicken
+  stannade upp vid varje nyckel mitt i en rörelse, som en docka (händerna slapp det redan 2026-11-13); nu går de
+  igenom nycklarna i en mjuk kurva och står bara still där rörelsen vänder. Käken gick upp och ned drygt två gånger
+  i sekunden i jämn takt när han pratade; nu kommer stavelserna ungefär fem i sekunden, olika långa och öppna, med
+  läpparna ihop ibland och korta uppehåll mellan orden. Skrattet var en jämn sinusvåg i axlarna, huvudet och
+  händerna; nu kommer det i ojämna stötar, ha-ha-ha, som avtar, med munnen i samma takt som axlarna och huvudet och
+  händerna strax efter. Han blinkar som folk gör, med locket som faller fort och går upp långsammare, och ibland
+  bara halvvägs; övre locket följer blicken när han tittar ned; och andetagen går in fortare än ut, med en vila
+  efter, och axlarna följer med. Se [Hasse Backe](#hasse-backe), *Rörelserna*, *Minen* och *Vilan*.
 - **Hasse Backe snyggare och mindre buggig (2026-11-06, användarens önskemål):** armarna såg ut som
   uppblåsta korvar, med en ballong till armbåge när han böjde dem; händerna var för små och orangea
   bredvid ansiktet, med grå smuts mellan fingrarna och naglar som laxrosa klistermärken; handen gick rakt
@@ -1708,6 +1759,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   den med underarmen rakt fram från armbågen. Handen går lågt över disken, nyper cigarren med flack hand och
   rak handled, och pek- och långfingret ligger lite samlade. Handen går fri från cigarren när han slår i
   disken, och askkoppen syns hel i telefonen. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Hasse håller cigarren bekvämt (2026-11-16, användarens önskemål):** "Kan du ordna så att hasse backe ser mer
+  bekväm ut i alla cigarrörelser - det finns vissa som det ser ut som att det är konstigt hur han håller
+  högerarmen/armbågen." Mellan blossen, när han tittade på cigarren, beundrade den och visade den mot en stod
+  högerarmbågen ute åt sidan i brösthöjd med underarmen vågrät framför bröstet: handen låg platt ovanpå cigarren,
+  och det gick bara med vågrät underarm. Nu vilar armbågen på disken och underarmen står snett upp med handleden i
+  vila, och handen vrids runt underarmen så att cigarren pekar utåt, uppåt eller mot en. Det gäller alla elva sätt
+  att njuta av cigarren, de fyra sätten att tända den och när den har slocknat. Se [Hasse Backe](#hasse-backe), *Cigarren*.
 - **Klicka på Hasses kaffe, askkopp och de andra sakerna (2026-11-10, användarens önskemål):** "kan du ordna så att
   man kan klicka på kaffet, askkoppen osv och så gör Hasse de rörelserna - men att han annars gör dem så som han
   känner för det". Ett klick var som helst i hans bild gick förut tillbaka till rummet. Nu går kaffet, askkoppen med
@@ -2006,6 +2064,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   mycket grafik … gamla mobiler och datorer ska kunna klara av sidan". En ampellilja i lerkruka på
   fönsterbänkens vänstra ände och en liten pilea i en glaserad kruka fram till vänster på barbordet, båda i ett
   enda ritanrop med pennkoppens material. Se [Tobaksaffären](#tobaksaffären), *Växterna*.
+- **En växt på bardisken (2026-11-16, användarens önskemål):** "Ordna med en blomma till här på bänken – som
+  gör att det blir snyggt. Den ska inte dra en massa grafik men den ska vara snygg och bra och passa in", och
+  sedan "En växt – är bättre än en blomma". En gullranka i en krämvit glaserad kruka står mitt på det tomma
+  stycket av disken mellan datorn och fruktlådan, med revor över kanten och längs skivan. Den ritas med disken,
+  en gång, så den kostar ingenting i bildrutorna. Se [Tobaksaffären](#tobaksaffären), *Växterna*.
 - **Alla relevanta forum, inte bara det viktigaste (2026-11-10, användarens önskemål):** "Har du lagt in så att alla
   relevanta forum gås igenom för lagen när artiklarna om matcherna skrivs i Helgarderat" och "Ordna det annars!". Det
   var inte så: varje lag hade ett forum. Nu har varje lag en lista, det viktigaste först och högst fyra. Relevant är
@@ -4185,9 +4248,9 @@ minsta fönstren och om rum.js inte går att hämta visas den vanliga förstasid
 **Föremålen** – pekar man på ett lyser det (pokalerna också), och snabbvalet
 på text-tv:n med samma ämne tänds, som när man pekar på snabbvalet med tv:n nära
 (pärmarna Skyttar). Inget föremål byter sida: oraklet, skårtavlan, pokalhyllan, korktavlan,
-uret, löpsedlarna i fönstret och namnet på dörren tittar man på nära (se
-[Närbilderna](#närbilderna)), och tv:n, videon, anslagstavlan, kortregistret och kupongen
-kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
+uret och löpsedlarna i fönstret tittar man på nära (se
+[Närbilderna](#närbilderna)), namnet på dörren tar en ut på trottoaren (se [Fasaden](#fasaden)), och
+tv:n, videon, anslagstavlan, kortregistret och kupongen kommer fram var och en på sitt sätt. Föremålen är knappar utan adress (`KNAPP` i rum.js), och
 Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchbladet mitt i rummet
 (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)):
 
@@ -4277,16 +4340,16 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
   klick utanför zoomar ut.
 - **Videon** nere i hörnet till höger, en liten Sony-tv med inbyggd video som står på disken med
-  ryggen mot väggen och rutan vänd mot gänget, med repriserna på VHS i en fruktlåda med två
+  ryggen mot väggen och rutan ut i rummet, parallellt med disken, med repriserna på VHS i en fruktlåda med två
   fack bredvid (förra omgången och lagen i nästa), zoomas in med ett klick eller V; tv:n och
   lådan står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
   Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
   zoomar ut.
-- **Namnet på dörren** (längst till vänster, under Stängt-skylten) → närbild av dörrens övre
-  del: *Matchfixarna*
+- **Namnet på dörren** (längst till vänster, under Stängt-skylten): *Matchfixarna*
   i bladguld på glaset, spegelvänt inifrån som neonskylten, med TOBAK & SPEL och *Öppet
   till spelstoppet* under. I fönster som är minst 8:5 syns hela dörren, och där står namnet
-  inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet.
+  inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet. Ett klick
+  → ut genom dörren, och affären utifrån med gänget i fönstret (se [Fasaden](#fasaden)).
 
 Högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
 pokalhyllan mellan tv:n och datorn på disken (där hängde anslagstavlan till 2026-11-14), i mitten
@@ -4295,7 +4358,8 @@ samma mitt på höjden. Pokalerna är runda och ser likadana ut hur snett vägge
 skulle tryckas ihop i hörnet. Tv:ns sladd går i en kort båge till ett uttag strax under väggplattan,
 ovanför Tipsligan.
 
-**Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
+**Stationsuret** sitter på bakväggen till höger om fönstret, ungefär 17 cm under taket och
+i höjd med tv:n på högra väggen, och leder bara till en närbild: ett
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
 svarta streck, gulnad av röken, och visarna i var sitt lager – den röda sekundvisaren
 hoppar varje sekund. Det går efter Stockholms tid, med samma klocka som
@@ -4345,6 +4409,17 @@ hörnen, ett ritanrop (två med skuggkartan) och drygt 5 000 trianglar mot flera
 och de ritas med pennkoppens material, så att ingen ny shader behöver kompileras. Materialet ritar bara
 framsidan, så bladen har båda sidorna i geometrin. Ingenting rör sig. I en stående telefon syns pilean,
 men ampelliljan hamnar nästan helt utanför bilden till vänster.
+
+På bardisken står sedan 2026-11-16 en gullranka (`gullranka` i rum-vaxter.js, `RANKA` i
+[public/rum-inredning.js](public/rum-inredning.js)) i en krämvit glaserad kruka med ett brunt band, på ett
+fat: en tuva av hjärtformade blad, gröna med gula stråk, och fyra revor – två som hänger över diskens kant
+och två som kryper längs skivan, mot datorn och mot fruktlådan utan att nå dem. Den står mitt på det tomma
+stycket mellan datorn och lådan, under korktavlan. Tavlorna på väggen ligger över diskens duk, så tuvan är
+låg (35, krukan 17): den går fri från korktavlans underkant också när musen flyttar kameran åt något håll.
+Revorna hänger över kanten bortom den tredje barstolen. Ögat ser disken nästan från sidan, så bladen vänder
+sig en bit mot det, som mot ljuset i rummet; annars syntes de mest som streck, och de som pekade mot ögat
+visade en undersida i skugga, nästan svart. Gullrankan ritas med disken, en gång till dukens bild, så den
+kostar ingenting i bildrutorna (omkring 4 800 trianglar, en gång); materialet ritar båda sidorna av bladen.
 
 **Gänget** sitter på barstolar runt ett runt barbord framför fönsterbänken, med benen
 hängande: DL och DJ på sidorna, vända in mot bordet, och DT bakom (`BORD` och `FIGS` i
@@ -4883,7 +4958,7 @@ från midnatt till sex, Stockholms tid, och tänds sedan lika långsamt tills de
 igång klockan sex). Hur släckt det är (`nattGrad` i rum-folk.js, 0–1) räknas om varje minut: mörkret
 (`--natt-grad` på `.rum-mork`), ljuset på gänget (`nattW` i rum-3d.js, som glider dit på 2,5 sekunder) och
 rören, reflektorn, det målade bandet och bardisken (rum-inredning.js) följer det. Rummet är mörkt utom där gatan lyser in genom fönstret och dörren, från
-tv:n och lite över pulten (samma lager som när lysröret tänds, med en annan mask), och
+tv:n, från lampan över pulten (sedan 2026-11-16, se [Lampan över pulten och ljuset i taket](#lampan-över-pulten-och-ljuset-i-taket-2026-11-16)) och lite över pulten (samma lager som när lysröret tänds, med en annan mask), och
 rören och reflektorn i taket är grå, och text-tv:n lyser svagt blått på gänget (som sover, se
 nedan; den som är vaken tittar på den). Nära tv:n, videon,
 en sak och med kupongen i handen är mörkret borta. Den som kommer in medan lysröret är dämpat eller
@@ -6393,6 +6468,36 @@ klockan](#ljuset-efter-klockan)); nu lever det mer av sina egna lampor.
 Mätt som ovan klockan 21.30 i klart väder, mot versionen med ljuskäglorna: hörnen 15–18 % mörkare, korktavlan längst
 ut 25 %, gängets bord 7 % och kupongen 6 %. Närbilden av Tipsligan på kvällen går att läsa som förut.
 
+### Lampan över pulten och ljuset i taket (2026-11-16)
+
+Användarens önskemål: bättre ljus i rummet utan mer grafik, gärna en lampa som hänger ned där den inte skymmer något
+som betyder något. Rummet var grumligt upptill: mörkret i överkanten låg i tre lager över taket och lysröret –
+vinjettens överkant i CSS (0,55 svart), den bruna tonen ovanpå (0,2) och dunklet (`DUNKEL`) – så att lysröret såg
+grått ut i stället för att lysa.
+
+- **Lampan** (`lampa` och `LAMPA` i rum.js): en skomakarlampa i grön emalj med kåpa i mässing hänger ned i vänstra
+  hörnet, över notan och kaffet. Där finns bara taket och dörrens överkant; Stängt-skylten hänger under och syns hela,
+  också när rummet vrids så långt det går (musen nere till höger). Vi ser den underifrån: öppningen är en smal ljus
+  ellips med glödlampan, ett mjukt sken ligger runt den och faller ned under kanten. Öppningen är smal så att
+  skärmen syns också i en skärm på 16:9, där överkanten av scenen hamnar utanför. Den ligger i pultens plan (−60), så
+  att den står framför rummet när kameran vrids, tonar bort med pulten vid närbilderna och blir oskarp med pulten när
+  kupongen tas i handen. Sladden upp till taket syns bara i telefonen på höjden, där taket syns (`.rum-lampsladd`).
+- **Lampans ljus:** en ljuskägla bland de andra (`KAGLOR`) över notan och kaffet, med hål i dunklet och värme där
+  blandningsläget finns; en varm strimma i pultens lack under den (`spegelBild`); och på natten, när lysröret är
+  släckt, går mörkret runt den och dess kägla (rum-folk.css), så att den lyser över notan medan gänget sover. Medan
+  lysröret tänds när man kommer in lyser den redan (masken i `.rum-mork`).
+- **Taket och lysröret:** vinjettens överkant är 0,3 i stället för 0,55 och den bruna tonen 0,15 i stället för 0,2
+  (rum.css), och dunklet har hål vid lysröret, som lyser upp taket och väggen överst, och vid lampan
+  (`ljusKlockan`). Spotarnas ljus på disken under Tipsligan har också ett hål i dunklet, med pallarna.
+
+Ingenting ritas i bildrutorna: lampan är en SVG som ritas en gång, och ljuset är fler gradienter i de dukar som redan
+ritas när ljuset ändras. Mätt i Chrome med mjukvarugrafik (1440 × 900, täthet 2, klockan 14 i mulet väder), gammal och
+ny kod: lagren som ritar 93 → 94 (lampan) och deras sammanlagda yta 15,60 → 15,68 miljoner px² (+0,5 %). Ljusare
+i medel (gråskala 0–255, samma bild): klockan 14 taket 58 → 81, lysröret 95 → 140, vänstra hörnet 76 → 92 och pultens
+vänstra del 82 → 95; klockan 21.30 taket 37 → 62, lysröret 55 → 114 och pultens vänstra del 54 → 81. Gänget, kupongen
+och högra väggen är som förut. Provat också som 1920 × 1080 och 1024 × 768, med musen i ytterlägena, på natten
+(klockan 2) och i telefonen (412 × 870) dragen åt vänster; bygget med `--minify` ger samma bild.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret
@@ -6402,7 +6507,7 @@ på enheten), och [public/rum-ute.js](public/rum-ute.js) ritar gatan med
 [public/rum-ute.css](public/rum-ute.css) för det som rör sig; de som går förbi, löven,
 fåglarna och flaggan ritas i små dukar (se [När datorn inte hinner med](#när-datorn-inte-hinner-med)).
 Utan nätet är det mulet och månadens vanliga temperatur. Samma himmel och väder syns genom glaset bakom Hasse
-Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)).
+Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren framför affären (se [Fasaden](#fasaden)).
 
 - **Utsikten från Bron (2026-11-10, användarens önskemål):** som från baren Bron, där S:t Eriksgatan går upp på
   S:t Eriksbron. På andra sidan gatan går brons gröna räcke, med en trappa ned i vänstra rutan och en stenpelare där
@@ -6471,6 +6576,51 @@ Utsikten ligger bakom väggen i det bakersta planet och syns genom hålen i den 
 förbi syns först i dörren och sedan i fönstret. Bara de lager vars ljus eller väder har
 ändrats ritas om (`RumUte.paint`), och det som rör sig har bara transform och opacity.
 Med `prefers-reduced-motion` står gatan still och ingen går förbi.
+
+### Fasaden
+
+**Affären utifrån (2026-11-16, användarens önskemål):** ett klick på namnet på dörren och man går ut genom
+dörren och ser tobaksaffären från trottoaren, där baren Bron ligger vid S:t Eriksbron ([public/rum-fasad.js](public/rum-fasad.js),
+[public/rum-fasad.css](public/rum-fasad.css)). Efter användarens foto av Bron utifrån, men närmare: det laxrosa huset med
+ljusa fönsteromfattningar och franska balkonger, den ljusa bottenvåningen med fogar, gesimsen emellan och kedjestenarna på
+hörnet, porten med överljusfönster, en vägglykta och barberarens stång längst till vänster. Över skyltfönstret och dörren
+skylten MATCHFIXARNA i benvitt på mörkt med en tunn guldlinje (sajtens färger och Fraunces) under två lampor på
+svanhalsar, och gatuskylten *S:t Eriksgatan* på hörnet. Till höger om huset börjar bron: stenpelaren, det gröna räcket
+med en cykel mot det, parkeringsförbudet och en gatlykta, och bortom räcket slänten ned mot spåren, trädtopparna,
+kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två lyftkranar, under himlen.
+
+- **Gänget i fönstret:** genom skyltfönstret syns vi vagt, bakifrån, vid barbordet – inte en ritning utan samma 3D-scen
+  som inne (`utifran` i rum-3d.js): en kamera ute på trottoaren i ögonhöjd ser vinkelrätt in genom glaset (`FONSTER`, en
+  ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och rutan kopieras till fasadens duk i
+  samma uppgift som den ritas. Därför är det samma kläder, frisyrer, mössor, flaskor, radion och ampelliljan som inne, och
+  de rör sig: duken ritas om några gånger i sekunden (ungefär 9 i datorn, 4 i telefonen, en gång i en fast bild). De sover
+  på natten och festar i julkläder som inne. Neonen bakom dem lyser mindre på ryggarna än inifrån på ansiktena. Bakom
+  dem rummet, mjukt och ur skärpa: lysröret i taket, hyllan med cigarettpaketen, bardisken, tv:ns blå sken och Tipsligan
+  på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren. Framför dem neonskylten *Tobak*,
+  som läses rätt härifrån och glappar samtidigt som inne (`neonOn`), och skivan med löpsedlarna med baksidan ut.
+- **Dörren:** guldet på glaset står rättvänt (*Matchfixarna*, TOBAK & SPEL, *Öppet till spelstoppet*), och skylten på
+  sugproppen säger ÖPPET på den här sidan – STÄNGT är sidan inåt.
+- **Samma ljus och väder som inifrån:** himlen, solen, månen, stjärnorna och molnen, putsen och stenen i dagsljus,
+  skymning och mörker (`RumUte.light` och `RumUte.farg.facade`), tända fönster efter klockan och adventsljusstakar och
+  stjärnor i advent, regn, duggregn, snö, dimma och blixtar, droppar på glaset, frost i hörnen när det är kallare än
+  −3°, snö på blecken, skylten, lamporna och räcket och trampad snö på trottoaren, våt sten som speglar affärens ljus,
+  höstlöv och trädens färger efter årstiden, måsar, kråkor och fyrverkerier på nyår. På dagen speglar glaset himlen och
+  rummet syns svagare; på kvällen lyser fönstret ut på trottoaren, lamporna tänds på skylten, vid porten och på bron,
+  och när lysröret är släckt på natten (`RumFolk.nattGrad`) är rummet mörkt utom neonen och tv:n.
+- **Det som händer ute:** de som går förbi på trottoaren framför affären, lika många som på gatan inifrån
+  (`RumUte.trafik`), klädda efter vädret, med paraply i regn, mössa och halsduk i kyla, väska och ibland hund. Bilarna
+  och bussarna på gatan bakom en syns som speglingar som far förbi i glaset: mörka skuggor på dagen, strålkastare och
+  baklyktor i mörkret.
+
+Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
+bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
+som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som hos Hasse Backe)
+och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden utifrån; medan rummet syns i
+övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
+den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
+bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
+ritas om när ljuset eller vädret ändras (en gång i minuten prövas det), och det som rör sig har bara transform och
+opacity. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt (för bilder).
 
 ### Kupongen i handen
 
@@ -6929,7 +7079,15 @@ skissades på disken efter foton på Wikimedia Commons (Macintosh Color Classic,
 Model 25 och Compaq Presario 425), och användaren valde IBM:en. 2026-11-14 flyttade den från
 disken under Tipsligan till hörnet under tv:n, där anslagstavlan hängde (`POS` i rum-dator.js
 och duken `BOX` i rum-register.js): användaren ville ha datorn där "på ett snyggt och bra sätt"
-i stället för tavlan. Den står mitt i det fria fältet mellan hörnet och Tipsligan, vänd som förut. Skyltar och symboler ritas i
+i stället för tavlan. Den står mitt i det fria fältet mellan hörnet och Tipsligan. 2026-11-16 vreds den så att
+den står parallellt med disken (användaren: den stod "lite på sniskan"): med ryggen mot väggen och skärmen ut i
+rummet (`YAW` −90 grader, förut −38, mellan gänget och ögat), och duken på disken är tio bildpunkter bredare åt
+höger, där datorns bakre hörn nu når. I rummet ses den snett från sidan, som tavlorna på väggen. Ljuset är
+rummets, men i närbilden vrids det med kameran (`ljusVrid`), så att skärmen och ramen får ljuset som när datorn
+stod vänd mot gänget (`LJUS_YAW`) – rakt framifrån föll det annars snett längs skärmen. Kameran går dit i en båge
+runt skärmens mitt (`stall`): avståndet minskar jämnt som förut, och kameran vänds så att skärmens mitt glider
+rakt från sin plats i rummet till sin plats framme. Med den raka vägen och en jämn vridning for kameran förbi
+datorns sida och skärmen gled ut ur bilden på vägen, nu när svängen är 90 grader i stället för 38. Skyltar och symboler ritas i
 dukar (IBM i åtta streck med Alfa Slab One), plasten har ett fint korn, och skärmen sitter i
 en sluttande ram med bildrörets svarta kant runt bilden. Datorn ritas med 41 ritanrop, bara
 när skärmen ändras och medan kameran svänger fram. Samma dag skulle operativsystemet bli
@@ -6997,8 +7155,16 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   divisionerna syntes spelarna först inne i ett lag – och valde det här upplägget före att
   behålla divisionerna och visa vägen (division › lag › spelare). Registret öppnar på Premier
   League (sedan 2026-11-16, användarens val; förut på divisionen med flest lag i omgången, vilket
-  gav NL under landslagsuppehållen). *LAG* är divisionens lag i bokstavsordning (två spalter på
-  datorn), de i omgången ljusa, och ett lag öppnar **lagkortet** med truppen. *SPELARE* är
+  gav NL under landslagsuppehållen). *LAG* är divisionens tabell (sedan 2026-11-16, användarens
+  önskemål: "ordna så att tabellerna dyker upp snyggt när man klickar i PL, CH osv."; till dess
+  stod lagen i bokstavsordning): platsen, laget, spelade, V O F, målen, målskillnaden och
+  poängen, och sist formen i ligan (de fem senaste, senaste först) – V O F, målen och formen när
+  raden ryms, så i telefonen plats, lag, S V O F, +/- och poäng, och rummets korta namn när det
+  hela inte ryms. Underraden och rubrikerna står still medan lagen rullar. Ett tunt streck går
+  där zonen byts (ESPN:s `note`, samma zoner som på Tabeller), zonerna står med sina platser
+  under tabellen, och ett poängavdrag har * efter poängen. Hela raden öppnar **lagkortet** med
+  truppen (↑/↓ och Enter också). Med dolda resultat står lagen i bokstavsordning – ordningen
+  skulle avslöja resultaten – med ? i stället för talen och *Visa ändå* under skärmen. *SPELARE* är
   divisionens spelare från A till Ö (efternamnet) med plats, lag, speltid och mål, och läget
   (skadad, avstängd) sist när raden ryms: samma spelare som i trupperna, de som har spelat och de
   skadade. En spelare öppnar **spelarkortet** (nedan), och Esc går tillbaka till samma ställe i
@@ -7129,7 +7295,9 @@ står kvar bara på tv:n. Samma tal under samma namn och i samma ordning som kol
 - **Talets lista** (`#lista:lag:pl:skapar`, `#lista:spelare:ch:assist`): divisionens lag eller spelare
   ordnade efter talet, med numret bara på den första vid lika tal (som skytteligan på tv:n), registrets rad med
   divisionerna överst (de ger samma lista där) och ←/→ till förra och nästa tal. Spelarlistan har dem som har spelat,
-  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna).
+  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna). Sedan
+  2026-11-16 är listan en rankning med en stapel per rad, och platsen efter ett tal leder dit (se
+  [Rankningen](#rankningen) nedan).
 - **Matchakten** har också matchsidans rader ur matchens fil: *Matcher 14 d* (med Europacuperna), *Hemma* och *Borta*
   (V–O–F), *Nollor*, *Utan mål*, *På mål*, *Mål mot xG* och *Insl. mot xG*, lagens främsta i *Assist* och *Segermål*
   (*Gula kort* där målens sort saknas) och *Domaren* med gula kort, frisparkar och hemmasegrar mot divisionens snitt.
@@ -7254,6 +7422,35 @@ matchen var i Europa står under VILAN. Mätarnas rutor går nu jämnt upp i bre
 VT323 är en bråkdel bredare än `1ch`, och en ruta till skymtade fram som ett tunt streck efter
 mätarna, också i lagkorten.
 
+#### Rankningen
+
+2026-11-16 ville användaren att platserna efter talen (*4:E*, *12:E*) skulle gå att trycka på och leda till "en
+sida med rankingen för de respektive siffrorna snyggt visualiserade som man sen lätt kan ta sig tillbaka ifrån" –
+för alla tal, både lagens och spelarnas. Mätaren och platsen efter ett tal i lagkortet och spelarkortet (också
+*Poäng* under formen) är nu en tryckbar bit, och platsen efter *Styrka*, *Motståndet* och *Mot oddsen* i matchakten
+likaså (`#plats:lag:pl:styrka:Arsenal` i [public/rum-register.js](public/rum-register.js), `platsQ`). Den leder till
+talets lista, som blev en rankning:
+
+- **Staplarna**: efter talet står en stapel lika lång som talet – från noll till listans högsta, och när någon har
+  minus (*Tur*, *Styrka*, *Mot oddsen*) från en mittlinje åt båda hållen, så att man ser avstånden och inte bara
+  ordningen. De tomma rutorna efter stapeln är skalan, som mätarna i korten; en verklig skillnad syns som minst en
+  ruta, noll som ingenting. Talen där lägst är bäst (*Insläppta*, *Släpper till*) har staplar efter talet ändå,
+  så de kortaste står överst.
+- **Den man kom ifrån** är markerad: namnet omvänt, platsen, talet och stapeln ljusa i ett svagt band, de andras
+  staplar svaga, och raden en tredjedel ner i rutan. Under rubriken står platsen i klartext (*ARSENAL 13:E AV
+  20*). Från matchakten markeras båda lagen (*CHELSEA 10:E · ARSENAL 7:E AV 20*), med det man tryckte på först.
+  Vid lika tal står numret alltid på den markerade raden, annars bara på den första. *Hela listan* i
+  förklaringsrutan markerar kortets lag eller spelare (i matchakten båda lagen) på samma sätt.
+- **Rubriken står still** (divisionerna, talets namn och platsen) medan listan rullar, och ←/→ bläddrar till
+  förra och nästa tal med samma markering.
+- **Tillbaka**: Esc (*◄ Tillbaka* i telefonen) går tillbaka till kortet eller matchakten, i samma flik och lika
+  långt rullat. Ett lag eller en spelare i rankningen öppnar kortet i fliken där talet står.
+
+Spalterna följer bredden: på datorn hela lagnamnet och spelarens lag, i telefonen de korta namnen och en kortare
+stapel (spelarens lag bara när stapeln ändå får minst sex rutor). Med ↑/↓ markeras mätaren och platsen i korten som
+en rad. Platserna som säger var ett lag står i tabellen (formens motståndare, gruppen i Nations League) leder inte
+hit: tabellen står på tv:n.
+
 #### Vad som står var
 
 Statistiken om omgången är fördelad efter vad varje sak är bra på, och varje siffra står på
@@ -7263,7 +7460,7 @@ med flit (nedan):
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom tabellen och skytteligan: laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom skytteligan (tabellerna sedan 2026-11-16, under *LAG*): laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
@@ -7303,15 +7500,17 @@ det, displayen bakom rökfärgat glas och lampan i en ring. Måtten är desamma 
 kameran och knapparna fungerar som de gjorde.
 Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan och skenet på
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
-väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
-ryms i bilden; i det perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en.
+väggen), vriden 90 grader med ryggen mot väggen och rutan ut i rummet, parallellt med disken, och
+så långt in längs väggen att den ryms i bilden; den står så nära väggen att skuggan bakom den når fram
+till den (`NAR`). Till 2026-11-16 var den vriden 112 grader, mot gänget mitt i rummet, och stod då
+snett mot disken (användarens önskemål: "parallellt med bänken").
 Under rutan sitter kassettfacket och displayen, och till höger om rutan en spalt med knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏ under varandra, med hålgaller till högtalaren över och under. Repriserna på VHS,
 också de lådor (ryggen, taket och ändarna), står i en fruktlåda i furu bredvid, lite längre
 in längs väggen: två fack med en mellanvägg (`MV`), tretton kassetter höga, med en tejpbit
 över varje fack – dagen för förra omgången (*LÖR 24/10*) och *INFÖR 31/10* – och ÄPPLEN ·
 KLASS I på brädan. Lådan är också en låda i 3D (sidan med springor mellan brädorna, taket,
 och innanför öppningen väggen, mellanväggen, botten och baksidan), i tv:ns mått och vriden
-likadant, med öppningen mot gänget.
+likadant, med öppningen ut i rummet.
 
 **Landskamperna** (2026-11-13, när Stryktipset tog in Nations League). De står i `matches.json` som andra matcher,
 med svenska namn, och ger videon inga fel: utan klipp blir det ingen kassett. Höjdpunkterna kan komma från UEFA:s egen
@@ -7350,7 +7549,7 @@ listan tillbaka på samma sida, med den markerad.
 raden med tangenterna, så att etiketterna på kassetterna går att läsa (tv:ns sida får skäras
 bort), och svänger samtidigt runt tv:n in mot rummet, så att man ser rutan snett framifrån i
 stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
-de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* och
+de står kvar längs disken – utan det är kameran som rör sig (se *Kamerans sväng* och
 *Rummet runt tv:n* nedan).
 Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
 fram till lådan (`LADAN`), så att etiketterna går att läsa; där tar en kassett (eller ett
@@ -7507,11 +7706,12 @@ bara med när de lyfts eller när man pekar på dem.
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
 förstoringen: rummets plan vrids 34 grader i 3D kring tv:n (`sving` i rum.js), och hörnet –
-tv:n, högen och lådan, som är lådor i 3D i rummets eget perspektiv – ritas nästan från samma
-håll, 46 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i rum-video.js). De tolv graderna
-extra ställer etiketterna mer framifrån, så att de går att läsa; mer än så går inte rummet
-att vrida utan att gänget och radion kommer in i bild. Lådans bortre ände kommer då mot en,
-så hörnet flyttas också lite uppåt (`lyft`), annars skulle lådan hänga utanför disken. När bilden fyller fönstret ritas hörnet 112 grader runt (`VRID`), så att rutan
+tv:n, högen och lådan, som är lådor i 3D i rummets eget perspektiv – ritas från samma
+håll, 34 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i rum-video.js), så att tv:n och lådan står kvar
+parallellt med väggen; mer än så går inte rummet att vrida utan att gänget och radion kommer in i bild.
+Till 2026-11-16, då tv:n stod snett mot gänget, ritades hörnet 46 grader runt, tolv mer än rummet, för att
+etiketterna skulle stå mer framifrån; parallellt med disken står de nu ännu mer framifrån. Lådans bortre ände kommer då mot en,
+så hörnet flyttas också lite uppåt (`lyft`), annars skulle lådan hänga utanför disken. När bilden fyller fönstret ritas hörnet 90 grader runt (`VRID`), så att rutan
 står parallellt med bilden, och ögat (perspektivets mitt i hörnet) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
 så vänd mot det vanliga ögat blev rutan sned som i kanten av ett vidvinkelfoto, och därifrån
 skymde lådan rutans vänstra kant. Planen vrids som de är, och väggen, skårtavlan, korktavlan och
@@ -7783,7 +7983,8 @@ rummet, och det tonas bort bakom matchbladet och kupongen i handen. Förut förs
 namnet var borta hos honom, så att det såg ut som en annan sida. Neonskylten i affärens fönster sitter strax
 utanför hans bild till höger, och dess röda sken faller in därifrån som över gänget i rummet (`.rh-ton::before`,
 `--neon` i `tand`): starkast på natten, tydligt på kvällen och nästan borta i dagsljus; en färdig toning utan
-blandning. Man vänder sig med samma drag som man ser sig omkring med i telefonen: när rummets vänstra kant
+blandning. Och när det är mörkt ute ser man affären och gänget speglas i glaset bakom honom (se *Affären i
+glaset*). Man vänder sig med samma drag som man ser sig omkring med i telefonen: när rummets vänstra kant
 redan syns och man drar vidare åt höger (minst 64 bildpunkter, mest i sidled) slår kameran till honom, och
 hos honom drar man åt vänster för att vända sig tillbaka (inte på kupongen eller matchbladet). Med
 tangentbord är det pilen åt vänster i rummet, när inget ligger framme, och pilen åt höger hos honom.
@@ -7834,7 +8035,8 @@ rummet och ingen post bakom hans huvud; på bardisken står bara flaskorna (bars
 färger efter klockan, molnen, den låga solens sken, den kalla dagen, tända fönster och lyktor när det skymmer, en
 grön skylt och en röd lampa på höghuset på kvällen, regn och snö som ett dis, dimma som tar andra sidan, snö på
 taken, bron och träden, och löven efter årstiden. På glaset sitter, som i rummet, droppar efter regn, snö i
-nederkanten och frost i hörnen när det är kallare än −3°, och när det är mörkt ute speglar glaset den varma baren.
+nederkanten och frost i hörnen när det är kallare än −3°, och när det är mörkt ute speglar glaset den varma baren
+och affären (se *Affären i glaset*).
 Allt står still: utsikten ritas en gång när ljuset eller vädret ändras
 ([public/rum-hasse-ute.js](public/rum-hasse-ute.js), `sig`), i halv upplösning och lika oskarp som kamerans
 skärpedjup gör det som är långt borta, med lyktorna som oskarpa skivor. Den läggs underst på väggens duk (`ute` i
@@ -7860,9 +8062,9 @@ så att fordonen krymper och saktar in mot bortre änden som i verkligheten: dä
 eller bakifrån, närmast mer från sidan. Bron har en körbana bakom räcket (sedan 2026-11-15, `TVAR`: gångbanan,
 cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på andra sidan, räcket och lyktstolparna där,
 torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
-står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, mer än bron egentligen skulle säga,
-så att körbanan syns som en yta och filerna inte hamnar i höjd med gångbanan), och de som går ligger i samma mått
-(`gangVag`), närmast räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
+står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, ungefär som man ser bron härifrån,
+så att körbanan syns som en smal yta bakom räcket; sedan 2026-11-16 0,16 i stället för 0,28, se *Trafiken som
+gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
 fronten eller baken upp till där ovansidan tar vid, och ovansidan i raka bitar ur karossens överkant (`topp`:
 motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
 plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
@@ -7880,8 +8082,8 @@ läggs sedan längs bron i trafikens duk; benen byter steg var 0,55:e sekund.
 Den går på gångbanan innanför räcket, lite högre i bilden än brons kant eftersom man ser bron uppifrån, med
 räcket framför upp till höften så att benen bara anas, och den är 1,15 gånger räckets höjd (`GANG`): räcket och
 lyktstolparna är ritade större än husen på andra sidan skulle säga (en våning är en halv grad vid tegelhuset, där
-räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och knappt hälften av utsiktens oskärpa, så att
-man ser att det är en människa (ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
+räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och samma oskärpa som resten av trafiken (se
+nedan; ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
 honom. De som cyklar (`cyklist`) håller sig till cykelbanorna mellan gångbanan och körbanan, i den närmaste mot
 en och på andra sidan bort, 17–24 km/h och lika fort i en bana, så att ingen cyklar igenom någon annan. De kommer
 efter klockan, veckodagen, årstiden och vädret (`cyklar` i `RumUte.trafik`, samma som på gatan: inga i snön, i
@@ -7892,9 +8094,40 @@ mitten eftersom en cykel är smal, och två av var med pedalerna ett halvt varv 
 trampar. Hjälm eller mössa, gul reflexväst hos många, regnjacka i regnet, lyse i mörkret och hos en del också på
 dagen, och alltid en röd reflex bak. Bron ses så snett att de mest syns framifrån eller bakifrån, som en smal
 figur över ett hjul, så styret och armbågarna är lite bredare än på riktigt. Ingen trafik går med minskad rörelse
-eller i en fast bild (`?rum-t`). Förut var
+eller i en fast bild (`?rum-t`).
+
+*Trafiken som gatan i rummet* (2026-11-16). På gatan i rummet är bilarna platta bilder från sidan (gatan går rakt
+tvärs över fönstret) och nästan lika oskarpa som stan bakom (3 px mot 3,4 px, de som går 2,6 px, rum-ute.css). På
+bron hos honom fick trafiken förut sin oskärpa bakad i varje figur, högst 3–3,5 bildpunkter i figurens duk: nära
+honom drygt hälften av utsiktens och längre bort, där figuren är mindre, bara en sjättedel, så att bilarna och
+människorna var skarpare än allt runt omkring. Nu ligger oskärpan på hela trafikens duk, 0,8 av utsiktens och lika
+stor längs hela bron (`oskarpa` i rum-hasse-ute.js, `filter` på `.rh-trafik` i `broDuk`), och figurerna har bara en
+aning själva (`BAKAD`), som gatan i rummet. Glaset klipper ramen runt duken (`clip-path` på `.rh-bron`), så att det
+oskarpa inte breder ut sig över posterna; utan `path()` i `clip-path` klipps duken som förut. Fordonen är kvar som
+hela bilar och bussar med front, bak och ovansida, eftersom bron går snett bort från en, men så oskarpa ser de ut som
+på gatan. Samtidigt lutar körbanan mindre (`LUTA` 0,28 → 0,16, nära vad man faktiskt ser härifrån): förut hamnade den
+bortre filen nästan en och en halv räckeshöjd ovanför räcket, och när körbanan inte syntes, i mörker och regn,
+svävade bilarna där i luften. Förut var
 väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
 kaffebryggaren och kassan (ändrat 2026-11-10).
+
+**Affären i glaset.** När det är mörkare ute än inne speglar glaspartiet bakom honom tobaksaffären, som ligger
+till höger om en när man har vänt sig mot honom (`affaren` i [public/rum-hasse-ute.js](public/rum-hasse-ute.js)):
+längst in, bakom hans huvud, furan i lysrörets sken; till höger om hans huvud gänget vid det runda bordet, med
+huvudena, håret, mössan med kronan och tröjorna i sina färger; och i den högra rutan lysröret i taket, skylten
+Stryktipset och neonskylten i skyltfönstret. Det är det som visar att han sitter i samma rum som gänget och man
+själv, och inte på ett annat ställe. Den som sitter närmast skyltfönstret i rummet sitter närmast glaset och syns
+därför längst till höger. Som utsikten är spegelbilden flyttad dit den syns: egentligen ligger den högre än vad
+rutorna når i bilden, och gänget längre åt höger, där bara breda fönster når. Den är lika oskarp som kamerans
+skärpedjup gör det som är långt borta: mjuka toningar i grader (som utsikten), målade i halv upplösning och lite
+suddade, där gängets kroppar skymmer furan bakom sig. Den läggs på väggens duk som ljus läggs till ljus, före
+väggen, så att den bara syns i rutorna, och ritas bara när väggen ritas; den kostar alltså ingenting medan man
+sitter hos honom, och pulten framför honom speglar den med väggen. Styrkan följer rummet: så tänt som lysröret
+är och så mörkt som det är ute (`L.dag`), så att den är tydlig på kvällen, svag i skymningen och borta mitt på
+dagen, och från midnatt till sex, när röret är släckt, syns bara neonskylten. När gänget sover (från halv elva,
+`RumFolk.somn`) har huvudena sjunkit, och väggen ritas om när de somnar och vaknar (`vaggSom` i
+[public/rum-hasse.js](public/rum-hasse.js)). Förut syntes ingenting av affären bakom honom, bara baren och
+utsikten, och hans bild såg ut som ett annat ställe än rummet (ändrat 2026-11-16).
 
 **Kaffet i rummet.** Händerna, koppen och notan på pulten är samma som i hans bild, så att man känner
 igen dem när kameran slår över: koppen är bardiskens modell (`byggKopp`) med samma ljus, vit som i baren
@@ -7948,6 +8181,11 @@ sin bit av tidslinjen. Varje klipp börjar och slutar där han står (i vilan, e
 disken när han pratar) och har sina egna nycklar för huvudet, kroppen, ansiktet och armarna
 (`RORELSER`), så att ett nytt klipp bara behöver det som händer i det. Klippen i samma grupp (domen,
 kaffet, cigarren, småsakerna, talet) lottas av sidan, utan att samma kommer två gånger innan alla har varit med.
+Mellan nycklarna går allt i en mjuk kurva (`spar` för huvudet, kroppen, ansiktet och sakerna, `nyckel` för
+händerna): fortsätter värdet åt samma håll efter en nyckel går det igenom den utan att stanna, och där det vänder
+eller står kvar står det still, med mjukt in och ut. Kurvan går aldrig förbi en nyckel. Förut började och slutade
+varje sträcka stilla, så att han stannade upp en bråkdels sekund vid varje nyckel mitt i en rörelse, som en docka
+(händerna ändrade 2026-11-13, resten 2026-11-16).
 
 **Minen.** Han är nöjd och säker på sin sak, lite överdrivet: hakan lite upp, huvudet nästan rakt, båda
 brynen lite uppe och ett leende som når ögonen, i vilan och när han pratar (`HUV` och `NOJD` i
@@ -7974,6 +8212,16 @@ mörkröd i stället för nästan svart och de nedre tändernas kant syns. I skr
 (0,7 och blund 0,3). Jämför alltid ansiktet i skrattet (T 3,5), skålen (T 155,8) och talet innan
 leendet ändras.
 
+Skrattet kommer i stötar, ha-ha-ha, ungefär fyra i sekunden men ojämnt: stötarna är olika starka, ibland
+blir det ett uppehåll när han drar efter andan, och de avtar mot slutet (`haha`). Varje stöt lyfter axlarna
+och öppnar munnen lite mer, samtidigt, och huvudet och händerna följer strax efter. Förut skakade axlarna,
+huvudet och händerna i en jämn sinusvåg, och munnen i en annan takt (ändrat 2026-11-16).
+
+När han pratar kommer stavelserna ungefär fem i sekunden, olika långa och olika öppna; mellan dem går munnen
+mer eller mindre ihop, helt ibland (m, b, p), och mellan orden blir det korta uppehåll. Ibland är vokalen rundad
+(`stavelse`). Förut gick käken upp och ned drygt två gånger i sekunden i jämn takt, och läpparna rundades i en
+egen långsam våg (ändrat 2026-11-16).
+
 **Vilan.** När han bara sitter och väntar på en upprepar sig ingenting. Det som alltid rör sig går
 aldrig i takt: han blinkar ungefär var fjärde sekund men oregelbundet, någon gång mellan en halv och
 sju och en halv sekund isär och ibland två gånger i rad (`blinkar`); blicken flyttar sig lite med en
@@ -7983,6 +8231,13 @@ i svängningar som inte går jämnt ut (`drift`), och andningen byter takt och d
 går igen. Förut blinkade han exakt var 4,3:e sekund, huvudet vaggade och bröstet hävde sig i
 rena sinusvågor, och det enda han gjorde mellan kaffet och cigarren var att trumma, likadant varje gång
 (ändrat 2026-11-06).
+
+Blinkningen är som en människas: locket faller på 70 ms och går upp långsammare, på 150–230 ms, och ungefär
+var sjunde gång går det bara en bit ned. Övre locket följer blicken nedåt, så att ögonen inte står vidöppna när
+han tittar ned på notan eller kupongen. Ett andetag är ingen våg: han andas in fortare än ut och vilar en
+stund efter utandningen, och axlarna följer bröstet lite, strax efter. Förut blinkade han lika fort ned som upp,
+alltid hela vägen, locken stod kvar när han tittade ned, bröstet gick i en ren sinusvåg och axlarna stod still
+(ändrat 2026-11-16).
 
 Var 5–11:e sekund gör han något litet (`SMATT` i [public/rum-hasse.js](public/rum-hasse.js)), lottat utan
 att samma sak kommer två gånger innan allt har varit med, och fingrarna dubbelt så ofta som det andra.
@@ -8037,7 +8292,7 @@ nickar när den träffar. Vid varje slag rycker hela bilden till, mer ju hårdar
 [public/rum-hasse.css](public/rum-hasse.css)), och det som står på disken hoppar: koppen studsar
 på fatet, lägre för varje gång, fatet och askkoppen lite och cigarren i urtaget (`hoppar`).
 
-**Kaffet.** Han dricker på sex sätt, och han överdriver och njuter: en ordentlig klunk med slutna
+**Kaffet.** Han dricker på tio sätt, och han överdriver och njuter: en ordentlig klunk med slutna
 ögon, och sedan smackar han och säger mmm med höjda bryn och ett brett leende medan huvudet vaggar
 (`klunk`); blåser på kaffet tre gånger med koppen under hakan, så att ångan far bort från honom,
 smakar försiktigt och rycker till av värmen, och tar sedan en riktig klunk och ett långt *ah* med
@@ -8046,11 +8301,19 @@ ur den i ett svep, tittar förvånat ned i den tomma koppen och ställer ned den
 håller koppen under näsan och drar in doften länge med slutna ögon, så att ångan sugs mot näsan och
 bröstet häver sig, och tar sedan en liten klunk (`dofta`); skålar med en, tar en stor klunk och
 ställer ned koppen med en smäll och ett *ah* (`skal`); eller dricker fint med lillfingret ut och
-näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`).
+näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`). Han kan också
+tänka med koppen vid bröstet, titta bort ut i affären och snurra den sakta med rynkad panna, och när han
+kommer på det åker brynen upp, han nickar och tar en klunk på saken (`tanke`); smaka och stanna med
+koppen vid läppen, för kaffet har kallnat: han grimaserar, tittar misstänksamt ned i koppen, fnyser,
+rycker på axlarna med en pust och dricker vidare ändå, med ett snett leende (`kallt`); stanna halvvägs
+till munnen när han kommer på något och peka med koppen mot en, två små knyck och två nickar – visst är
+det så? – och en blinkning innan han dricker (`halvvags`); eller få syn på någon längs baren och skåla
+mot honom med en nick innan han vänder sig tillbaka och dricker (`halsa`).
 
 Det är koppen som styr, som med cigarren (`kaffeArm` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
 dess läge räknas fram (på fatet; vid läppen och under näsan i huvudets mått, så att den följer med när
-han lutar huvudet bakåt; under hakan, framför bröstet och upplyft mot en i kroppens), och handen sitter
+han lutar huvudet bakåt; under hakan, framför bröstet, upplyft mot en, framhållen mot en och lyft mot
+baren i kroppens), och handen sitter
 i örat med samma grepp hela vägen, fingrarna mot koppen och handflatan mot honom. Vid fatet pekar örat
 bort från honom, så där håller han det bakifrån, med fingrarna genom örat och tummen ovanpå, och handen
 vrids runt örat till greppet medan han lyfter koppen (`GREPP_FAT`). När han dricker lutas
@@ -8079,7 +8342,11 @@ handflatan nedåt och lite framåt (`P_VILA`); förut sträckte han ut armen åt
 dök ned på den ovanifrån med raka, utspärrade fingrar (ändrat 2026-11-09). Han håller den löst i
 fingertopparna, tummen under och pek- och långfingret ovanpå, med ring- och lillfingret böjda in mot
 handflatan; vid munnen sitter handen under den vid käken, med fingrarna uppåt i underarmens förlängning
-och armbågen nere (förut satt den vid kinden, och då knäcktes handleden åt sidan). Det är cigarren som
+och armbågen nere (förut satt den vid kinden, och då knäcktes handleden åt sidan). Mellan blossen, när han
+tittar på den, beundrar den och visar den mot en vilar armbågen på disken och underarmen står snett upp, med
+handleden i vila; handen är vriden runt underarmen så att cigarren pekar så nära det tänkta hållet som det
+går (`iArmen`). Förut låg handen där platt ovanpå cigarren, och det gick bara med underarmen vågrät, så
+armbågen stod ute i brösthöjd som en vinge (ändrat 2026-11-16). Det är cigarren som
 styr: dess läge räknas fram (i askkoppen, vid munnen eller i mungipan i huvudets mått så att den följer
 när han rör huvudet, vid axeln, framför bröstet) och handen räknas ur greppet, så att den sitter kvar i
 fingrarna hela vägen. Handen kan också släppa den: då sitter den kvar i munnen och handen vilar på
@@ -8592,7 +8859,14 @@ direkt. På disken är kupongen hopklämd av perspektivet, som notan, och det ä
 
 **Armarna och händerna.** Ärmen har fotots bredd på överarmen, där den möter kavajen där armarna satt,
 och smalnar sedan av från armbågen mot ärmslutet som en kavajärm (`BREDD` i
-[public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Armbågen är en tät böj: på insidan trycks tyget
+[public/rum-hasse-arm.js](public/rum-hasse-arm.js)). Axlarna är fotots: ärmens översta del, till ungefär
+axelleden, syns inte (`ARM_F`), så att det är fotots axel som syns (på hans vänstra med ärmhuvudet och sömmen)
+och ärmen kommer fram under den. Den högra ärmen sitter fast 48 bildpunkter innanför axelleden som armbågen
+räknas från (`SA_SYN` och `SA` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)), så att ärmens ytterkant
+fortsätter fotots kant nedanför axeln; armbågarna och händerna ligger där de låg. Förut tonade ärmen in från
+toppen, 88 enheter ovanför leden, och dess rundade topp stack upp som en kula ovanpå fotots axel, och den
+högra ärmen satt fast på fotots kant, så att halva ärmen hängde utanför och axeln blev bred och fyrkantig
+som en axelvadd (ändrat 2026-11-16). Armbågen är en tät böj: på insidan trycks tyget
 ihop och lägger sig i veck som skuggar sig själva, och överarmens och underarmens tyg stannar var på sin
 sida om armbågens mittplan, så att inget går igenom det andra; normalerna räknas ur formen, så att vecken
 syns i ljuset. Mot ärmslutet blir ärmen platt som handleden, med handflatan åt den platta sidan, och
@@ -8850,6 +9124,14 @@ spelades. Ljuden är framräknade i en `OfflineAudioContext` och mätta (toppar 
 0,24 för klirret), men inte lyssnade på, och inte provade i Safari eller på en riktig telefon.
 Samtalet med en riktig analys är inte provat (ingen kupong i provet), bara genomläst.
 
+Axlarna (2026-11-16) är provade i headless Chromium med mjukvarugrafik: figuren ensam i vilan, skrattet (T 3,5),
+klunken (T 23) och `axla` (T 352), före och efter, med närbilder av båda axlarna och av ärmen och kroppen var för
+sig; cigarren vid munnen (T 176,5–183) bild för bild mot main; tolv andra ställen på tidslinjen (slagen, kaffet,
+`halsa`, cigarren) mot main; och hela sidan med `?rum-hasse` i 1440 × 900 med minskad rörelse. Två försök föll
+bort: hela axelleden flyttad in gav andra armbågar i klippen, och en kortare ärm (`TOPP` 30) gav en solfjäder i
+armbågens böj med cigarren vid munnen. Handen på pulten i rummet är oförändrad (samma vila). Inte provat i Safari
+eller på en riktig telefon.
+
 Armarna, händerna och munnen (2026-11-06) är provade i headless Chrome med mjukvarugrafik, i hela sidan med
 `?rum-hasse` (byggd utan att hämta något, så utan kupong) och figuren frusen på tidslinjen: alla 34
 klipp i sex bilder vardera i 1440 × 900 och jämförda med bilderna före ändringen, närbilder av
@@ -8882,6 +9164,12 @@ Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugra
 den sugs mot näsan), och koppens och handens förflyttning mellan varje hundradels sekund (inga hopp,
 och båda exakt tillbaka i vilan när klippet slutar). Inte provat i hela sidan, i Safari eller i en
 riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara genomläst.
+
+De fyra nya sätten att dricka kaffe (2026-11-16) är provade i headless Chromium med mjukvarugrafik, figuren ensam i
+1100 × 760: nyckelögonblicken i varje klipp som bilder (koppens nya lägen flyttades efter dem: framhållen högre
+upp, och lyft mot baren framför hakan i stället för vid den vänstra axeln), varje klipp bild för bild utan fel,
+och ljuden (klirret på fatet, fnysningen och pusten). Inte provat i hela sidan, på höjden, i Safari eller i en
+riktig telefon.
 
 Förslaget att fylla i kupongen (2026-11-07) är provat i headless Chromium med mjukvarugrafik i hela sidan, med en
 påhittad omgång från kupongtjänsten och tre matcher i `data/matches.json` (bygget i provet kunde inte hämta något),
@@ -9364,8 +9652,8 @@ Actions. Notiserna (*Så mår tipslagen*, `data/tidning.json`) är inte skrivna 
 
 ### Närbilderna
 
-Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan, löpsedlarna i fönstret (IFK 1982,
-Nacional 1988, VM 94 och Chelsea 1998 på skivan; veckans löpsedel hänger hos Hasse Backe) och namnet på dörren
+Uret, skårtavlan, Omgångens orakel, visitkortet, pokalhyllan, korktavlan och löpsedlarna i fönstret (IFK 1982,
+Nacional 1988, VM 94 och Chelsea 1998 på skivan; veckans löpsedel hänger hos Hasse Backe)
 tittar man på nära med ett klick (`sak` i rum.js, `data-sak` på föremålen), och
 kupongen på pulten när den inte går att ta i handen: kameran ställer sig rakt framför och går fram tills
 saken fyller det mesta av fönstret – högst 90 % av bredden och 74–94 % av höjden mellan
@@ -9375,8 +9663,8 @@ telefonen också. Rummet vrids rakt medan kameran glider fram och står
 sedan still: så länge något vrids ritar webbläsaren lagren i den vanliga skalan och förstorar
 dem suddigt, och när det står still ritas de om skarpt. Det som står framför väggen – gänget
 vid barbordet och pulten – tonar bort medan kameran går förbi (inte när saken ligger på
-pulten), och vid pokalhyllan tv:n. Dörren siktar kameran på en osynlig ruta över dörrens övre
-del (`#rum-dorrglas`), så att Stängt-skylten och namnet kommer med. Uret,
+pulten), och vid pokalhyllan tv:n. (Namnet på dörren hade en närbild till 2026-11-16; nu leder det ut, se
+[Fasaden](#fasaden).) Uret,
 orakelramen och ramarna kring skårtavlan och korktavlan är ritade i 3D och ritas om i närbildens skala när
 kameran är framme (`skarp` i rum-inredning.js, högst 2600 bildpunkter på längsta ledet), och
 de står kvar i den skalan tills kameran är tillbaka (`oskarp` i rum.js): i början av vägen tillbaka är
@@ -9395,7 +9683,8 @@ och K, T, A, R och V går direkt till kupongen, tv:n, anslagstavlan, kortregistr
 pekar på dem på nära håll, och inte heller på vägen tillbaka förrän musen eller tangenterna används
 (`.sak-hem`, `hemUtanSken`): ljuset är ett filter, som räknades om på den växande eller krympande saken i
 varje bildruta, och saken under musen tändes medan den krympte. Med `prefers-reduced-motion` går kameran direkt.
-`?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|dorr|kupong|radio` visar en närbild i en fast bild (med `?rum-t`).
+`?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|lopsedel|chelsea|kupong|radio` visar en närbild i en fast bild (med `?rum-t`);
+`?rum-fasad` (eller `?rum-sak=dorr`) visar affären utifrån.
 
 ### Bakåt
 
@@ -9403,7 +9692,7 @@ Bakåtgesten i telefonen och bakåtknappen i datorn lägger bort det översta so
 i rummet ([public/rum-bak.js](public/rum-bak.js)). Lagren, från det översta: spelarkortet, matchbladet,
 Hasses svar om en lapp, en lapp på anslagstavlan eller ett kort i registret, kupongen i handen (också
 hos Hasse), rutan i hela fönstret på videon, och sist tv:n, videon, en närbild, anslagstavlan,
-kortregistret, tidningen eller Hasses vy. Med inget framme lämnar bakåt sajten, som vanligt.
+kortregistret, tidningen, fasaden eller Hasses vy. Med inget framme lämnar bakåt sajten, som vanligt.
 
 Varje lager har en osynlig rad i webbläsarens historik: samma adress, med antalet lager i
 `history.state.rum`. Bakåt ger `popstate`, och det som ligger över raden man kom till läggs bort, samma

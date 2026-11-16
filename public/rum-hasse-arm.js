@@ -537,8 +537,12 @@ void main() {
   // lite glans på tyget där det spänner över armbågen
   ut += vec3(.05, .045, .04) * pow(max(0., dot(n, normalize(NYCKEL + e))), 6.) * (1. - vVeck);
   ut = mix(ut * .3, ut, ute);
-  // ärmhuvudet och insidan av överarmen tonar in i kavajen på fotot
-  float a = smoothstep(.0, .07, vS) * (1. - smoothstep(.62, 1., -vI) * (1. - smoothstep(.07, .2, vS)));
+  // ärmhuvudet och insidan av överarmen tonar in i kavajen på fotot. Ärmens översta 7 % (till ungefär axelleden)
+  // syns inte alls, så att det är fotots axel som syns och ärmen kommer fram under den. Förut tonade den in från
+  // toppen, och dess rundade topp stack upp som en kula ovanpå fotots axel, mest på hans vänstra, där fotot redan
+  // har ärmhuvudet med sömmen (ändrat 2026-11-16). (Ärmen är lika lång som förut: kortare, med TOPP 30, hamnade
+  // armbågens skarpa böj mellan ärmens ringar, som en solfjäder när han håller cigarren vid munnen.)
+  float a = smoothstep(.07, .12, vS) * (1. - smoothstep(.62, 1., -vI) * (1. - smoothstep(.07, .2, vS)));
   gl_FragColor = vec4(ton(ut) * a, a);
 }`;
 const SKJ_F = `precision highp float;
@@ -1420,7 +1424,8 @@ export function byggRok(N = 240, bord = ingenBord()) {
 const DY = SCEN.DISK.Y;
 // armbågens och handledens höjd när armarna vilar på disken
 export const VILOHOJD = { EH: DY + 78, WH: DY + 45 };
-// axlarna, ur fotot (x − 660, 900 − y)
+// axlarna, ur fotot (x − 660, 900 − y): där armbågen räknas från. Ärmen sitter fast på den högra (A) en bit
+// längre in (SA_SYN i rum-hasse-3d.js).
 export const AXEL = { A: [352 - 660, 900 - 792, -52], B: [987 - 660, 900 - 800, 8] };
 // Ur axeln (s), armbågens vinkel ut från rakt fram (a) och underarmens vinkel in (b): armbågen och handleden
 // ligger på disken, med armens längder (lyft: handleden lite högre). → { S, E, W, pol }

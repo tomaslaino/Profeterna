@@ -2,8 +2,8 @@
 
 // Videon i tobaksaffären (rum.js): en liten Sony-tv med inbyggd video som
 // står på disken, nere i hörnet till höger, med ryggen mot väggen och
-// rutan vänd mot gänget mitt i rummet. Bredvid står repriserna på VHS i en
-// fruktlåda med två fack, med öppningen åt samma håll. När man går fram
+// rutan vänd ut i rummet, parallellt med disken. Bredvid står repriserna på
+// VHS i en fruktlåda med två fack, med öppningen åt samma håll. När man går fram
 // (klick eller V) står de kvar som de står, och kameran svänger runt tv:n
 // så att man ser rutan snett framifrån (SVANG) – närmare rutan rakt
 // framifrån, i rummet runt tv:n (väggen och disken i 3D, rumYtor), så att det
@@ -105,17 +105,21 @@ window.RumVideo = (() => {
   // tv:ns djup, och kassetternas (de ligger med ryggen åt samma håll som rutan)
   const DJUP = 40;
   const KAS = { w: 41, h: 5.67, d: 22.4 };
-  // Tv:n står mot väggen (PLATS), så långt in (BAK) att den ryms i bilden,
-  // vriden VRID grader kring mitten av foten: mot gänget mitt i rummet – i
-  // rummets perspektiv ser den annars ut att stå rakt mot en. Platsen är
-  // den där den skulle ta i väggen rakt fram, där disken (490 i hörnet
-  // x = 1140, rum.js) möter den på tv:ns djup.
-  const VRID = 112;
+  // Tv:n står med ryggen mot väggen (PLATS), så långt in (BAK) att den ryms i
+  // bilden, vriden VRID grader kring mitten av foten: rutan är vänd ut i
+  // rummet och tv:n står parallellt med disken, som tavlorna på väggen och
+  // datorn (rum-dator.js). Till 2026-11-16 var den vriden 112 grader, mot
+  // gänget, och stod då snett mot disken. Den står så nära väggen att
+  // skuggan bakom den (ytor) når fram till väggen, där disken (490 i hörnet
+  // x = 1140, rum.js) möter den.
+  const VRID = 90;
   const BAK = -110;
   const MITT = [TV.x + TV.w / 2, TV.y + TV.h, -DJUP / 2];
   const VAGG = VP[0] + (1140 - 760) * (O[1] + TV.y + TV.h - 400) / (490 - 400);
-  const PLATS = [VAGG - 1.5 - TV.w / 2 - MITT[0], BAK];
   const RAD = VRID * Math.PI / 180;
+  // (hur långt tv:n med skuggan når ut från mitten mot väggen, vriden)
+  const NAR = (TV.w / 2 + 7) * Math.abs(Math.cos(RAD)) + (DJUP / 2 + 6) * Math.abs(Math.sin(RAD));
+  const PLATS = [VAGG - NAR - MITT[0], BAK];
   // Lådan står på disken bredvid tv:n, längre in längs väggen: i tv:ns mått
   // till vänster om den och z längre fram, så att den står lika långt från
   // väggen. d är djupet. Den har två fack med en mellanvägg (MV, från
@@ -134,11 +138,14 @@ window.RumVideo = (() => {
   // (perspektivets mitt, oga) flyttat från VP till rakt framför rutan:
   // kameran går fram och förstorar en del av bilden, och vänd mot VP blev
   // rutan sned som i kanten av ett vidvinkelfoto, och från VP skymde lådan
-  // rutans vänstra kant. Nära går hörnet längre runt än rummet (som inte går att
-  // vrida hur långt som helst, då kommer gänget och radion in i bild), så att
-  // etiketterna står mer framifrån och går att läsa. Lådans bortre ände kommer
-  // då mot en, så hörnet flyttas upp (lyft) tills lådan står på disken igen.
-  const SVANG = { nara: { rum: 34, horn: 46, lyft: 12 }, tat: { rum: 34, horn: VRID, oga: [GLAS.x + GLAS.w / 2 + PLATS[0], GLAS.y + GLAS.h / 2] } };
+  // rutans vänstra kant. Nära går hörnet lika långt runt som rummet, så att
+  // tv:n och lådan står kvar parallellt med väggen och disken. (Till
+  // 2026-11-16 gick hörnet 12 grader längre, 46, för att etiketterna skulle stå
+  // mer framifrån när tv:n stod snett mot gänget; parallellt med disken står
+  // de ännu mer framifrån utan det. Rummet går inte att vrida hur långt som
+  // helst: då kommer gänget och radion in i bild.) Lådans bortre ände kommer
+  // mot en, så hörnet flyttas upp (lyft) tills lådan står på disken igen.
+  const SVANG = { nara: { rum: 34, horn: 34, lyft: 12 }, tat: { rum: 34, horn: VRID, oga: [GLAS.x + GLAS.w / 2 + PLATS[0], GLAS.y + GLAS.h / 2] } };
   // Kameran runt tv:n som en enda transform på .vhs-kam (s ur SVANG, null på
   // håll): perspektivet med ögat (förut perspective och perspective-origin på
   // .vhs-in), lyftet och vridningen kring tv:ns mitt (KO). Ögat glider då på
@@ -315,7 +322,7 @@ window.RumVideo = (() => {
 
   // ---------- lådan ----------
 
-  // En fruktlåda i furu på sidan, med öppningen mot gänget som tv:n.
+  // En fruktlåda i furu på sidan, med öppningen ut i rummet som tv:n.
   // Framsidan: brädorna runt öppningen, mellanväggen och en tejpbit över
   // varje fack med dagen (ladaText, fylls i av fill).
   function ladaSvg() {
