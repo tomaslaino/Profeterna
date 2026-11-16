@@ -6670,7 +6670,8 @@ skärm syntes det inte alls: scenen skars lika mycket uppe som nere, och hela ta
 
 - **Undertaket** (`innertak` i [public/rum-inredning.js](public/rum-inredning.js), en egen duk under allt annat i
   bakväggens plan): ett 90-tals undertak i three.js med plattor på 60 × 60 cm (120 enheter) i ett bärverk av
-  vitlackerad plåt och en vinkellist mot väggarna, sett med samma kamera som takfläkten. Fläkten sitter mitt i en
+  vitlackerad plåt (gulnad av röken, se *Taket i bakgrunden* nedan) och en vinkellist mot väggarna, sett med samma
+  kamera som takfläkten. Fläkten sitter mitt i en
   platta, och ljuset från glaskuporna faller upp i taket med skuggan av bladen (en osynlig kopia av fläkten som bara
   kastar skugga; glaset och hållarna precis över lamporna är borttagna, annars låg en mörk fläck över halva taket).
   Spotskenan, som också satt i plattorna, är borttagen (se *Spotskenan togs bort* ovan). Plattorna är gulnade av röken och brunast över
@@ -6707,6 +6708,24 @@ blad med ljusa rottingfält. Nu lyser den på bordet utan att dra blicken till s
 
 Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som dator (1440 × 900) klockan
 14 och 21.30 och som telefon (412 × 870).
+
+### Taket i bakgrunden (2026-11-16)
+
+Användarens önskemål: "Kan du göra taket ngt mindre prominent. Det tar en del fokus här. Behåll 90-talsstuket o ge det
+lite patina/rökpåverkan." I telefonen på höjden, där taket fyller bilden ovanför Stryktipset-bandet, var undertaket
+(`innertak` i rum-inredning.js) ett ljust rutnät: bärverket i nästan vit plåt över gulnade plattor, och ett
+frånluftsdon med skarpa svarta springor. Nu är det samma 90-talstak, men så som det ser ut efter många år av rök:
+
+- **Bärverket gulnat** (`plat`): nästan i plattornas ton och mattare, så att rutnätet syns utan att lysa.
+- **Plattorna mörkare och ojämna:** mer nikotin överallt (`GUL`, `BRUN`, `brun`), stråk där röken drog fram, en mörk
+  sotring kring fläktens fäste, mjuka fläckar på varje platta och sot längs kanterna mot bärverket.
+- **Frånluftsdonet smutsigt:** gallret i plattornas gulnade ton och springorna mindre svarta.
+- **Mindre ljus underifrån** (`HemisphereLight` och kupornas ljus i takets scen), så att taket klingar av i dunkel
+  mot betraktaren och ljuset ligger kring fläkten.
+
+Takets ljusstyrka i telefonen (430 × 932, medel i gråskala över taket): klockan 14 65 → 50, klockan 22.50 39 → 31.
+Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som telefon (430 × 932) klockan
+14 och 22.50 och som dator (1440 × 900).
 
 ### Utsikten och vädret
 

@@ -470,6 +470,11 @@ export async function inredning(el, opt = {}) {
   // inte där sakerna på väggarna står (WZ, WX), med en vinkellist mot väggen. Fläkten står kvar i
   // sin duk: här finns bara dess skugga (osynliga kopior), som ritas när taket ritas – en gång, och om
   // när lamporna släcks och tänds (natt).
+  // Samma kväll mindre framträdande ("tar en del fokus", 2026-11-16): ljusa linjer i bärverket över en
+  // mörkare platta var ett rutnät som drog blicken, och plattorna var ljusare än väggarna. Nu har röken
+  // gulnat bärverket nästan lika mycket som plattorna, plattorna är mörkare med fläckar av nikotin, sotränder
+  // längs kanterna och en sotring kring fläktens fäste, frånluftsdonet är smutsigt, och taket får mindre ljus
+  // underifrån, så att det klingar av i dunkel mot en.
   const PLATTA = 120;
   function innertak(b) {
     const { scene } = b;
@@ -484,11 +489,14 @@ export async function inredning(el, opt = {}) {
     };
     const XS = linjer(x0, x1, FX);
     const ZS = linjer(0, z1, FZ);
-    // nikotinet: gulnat överallt, brunt i ett moln över bordet där röken stiger, och mörkare mot väggarna
-    const brun = (x, z) => Math.min(1, 0.5 * Math.exp(-((Math.hypot(x - FX, (z - FZ) * 1.25) / 300) ** 2)) +
-      0.3 * Math.exp(-z / 50) + 0.3 * Math.exp(-(x1 - x) / 50) + 0.08 * Math.exp(-(((x - 440) / 160) ** 2) - (z / 120) ** 2));
-    const GUL = new THREE.Color('#ddd0b4');
-    const BRUN = new THREE.Color('#97784e');
+    // nikotinet: gulnat överallt, brunt i ett moln över bordet där röken stiger, sotigt kring fläktens
+    // fäste, mörkare mot väggarna och ojämnt (stråk där röken drog fram)
+    const brun = (x, z) => Math.min(1, 0.14 + 0.46 * Math.exp(-((Math.hypot(x - FX, (z - FZ) * 1.25) / 330) ** 2)) +
+      0.26 * Math.exp(-((Math.hypot(x - FX, z - FZ) / 70) ** 2)) +
+      0.3 * Math.exp(-z / 50) + 0.3 * Math.exp(-(x1 - x) / 50) + 0.08 * Math.exp(-(((x - 440) / 160) ** 2) - (z / 120) ** 2) +
+      0.07 * (Math.sin(x / 83 + 1.3) * Math.sin(z / 61 + 0.4) + 0.6 * Math.sin((x + 1.7 * z) / 47 + 2.1)));
+    const GUL = new THREE.Color('#ccb892');
+    const BRUN = new THREE.Color('#7a5b39');
 
     // plattan: mineralull med hål och sprickor, och mörkare i kanten mot bärverket
     const R = LATT ? 128 : 256;
@@ -511,9 +519,19 @@ export async function inredning(el, opt = {}) {
         const r = (0.5 + hash(fro + i * 1.13) * 1.1) * s;
         c.fillRect(hash(fro + i * 0.91) * w, hash(fro + i * 1.57) * h, r, r);
       }
+      // fläckar av nikotin, mjuka och olika stora
+      for (let i = 0; i < 5; i++) {
+        const [x, y, r] = [hash(fro + i * 4.3) * w, hash(fro + i * 6.1 + 0.2) * h, (30 + hash(fro + i * 2.9) * 70) * s];
+        const f = c.createRadialGradient(x, y, 0, x, y, r);
+        f.addColorStop(0, `rgba(122, 86, 42, ${(0.08 + hash(fro + i * 8.3) * 0.1).toFixed(2)})`);
+        f.addColorStop(1, 'rgba(122, 86, 42, 0)');
+        c.fillStyle = f;
+        c.fillRect(0, 0, w, h);
+      }
       if (extra) extra(c, w, h, s);
-      for (let k = 0; k < 4; k++) {
-        c.strokeStyle = `rgba(70, 52, 30, ${(0.28 - k * 0.06).toFixed(2)})`;
+      // soten längs kanterna, där luften drog förbi bärverket
+      for (let k = 0; k < 6; k++) {
+        c.strokeStyle = `rgba(70, 52, 30, ${(0.2 - k * 0.03).toFixed(2)})`;
         c.lineWidth = 2.2 * s;
         c.strokeRect((1 + k * 2) * s, (1 + k * 2) * s, w - (2 + k * 4) * s, h - (2 + k * 4) * s);
       }
@@ -544,17 +562,17 @@ export async function inredning(el, opt = {}) {
       c.fillStyle = d;
       c.fillRect(0, 0, w, h);
       const m = w * 0.21;
-      c.fillStyle = '#ece4d0';
+      c.fillStyle = '#d6c7a4';
       c.fillRect(m, m, w - 2 * m, h - 2 * m);
       for (let k = 0; k < 5; k++) {
         const q = m + (k + 0.6) * w * 0.05;
-        c.strokeStyle = 'rgba(28, 22, 16, .85)';
+        c.strokeStyle = 'rgba(48, 36, 22, .6)';
         c.lineWidth = w * 0.022;
         c.strokeRect(q, q, w - 2 * q, h - 2 * q);
       }
-      c.fillStyle = '#2a2219';
+      c.fillStyle = '#3a2e20';
       c.fillRect(w * 0.47, h * 0.47, w * 0.06, h * 0.06);
-      c.strokeStyle = 'rgba(255, 252, 240, .5)';
+      c.strokeStyle = 'rgba(255, 246, 220, .18)';
       c.lineWidth = 1.5 * s;
       c.strokeRect(m, m, w - 2 * m, h - 2 * m);
     });
@@ -609,8 +627,9 @@ export async function inredning(el, opt = {}) {
     morker.position.set((x0 + x1) / 2, TAK + 30, z1 / 2);
     scene.add(morker);
 
-    // bärverket: T-profiler, 24 mm (4,8 enheter) breda, och vinkellisten mot väggarna
-    const plat = mat('#f1e9d6', { roughness: 0.5, metalness: 0.05, envMapIntensity: 0.3 });
+    // bärverket: T-profiler, 24 mm (4,8 enheter) breda, och vinkellisten mot väggarna, gulnade av röken
+    // (bara lite ljusare än plattorna, så att rutnätet syns utan att lysa)
+    const plat = mat('#bea476', { roughness: 0.7, metalness: 0.05, envMapIntensity: 0.15 });
     const balk = (w, d, x, z) => {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, 1.3, d), plat);
       m.position.set(x, TAK - 0.65, z);
@@ -656,14 +675,14 @@ export async function inredning(el, opt = {}) {
       if (natt) LAMP.ljus.push([l, i]);
       return l;
     };
-    ljus(new THREE.HemisphereLight('#1c150e', '#b4a084', 0), 1.1);
+    ljus(new THREE.HemisphereLight('#1c150e', '#b4a084', 0), 0.8);
     const fram = ljus(new THREE.DirectionalLight('#e2d0b0', 0), 0.45);
     fram.position.set(760, -700, 1000);
     fram.target.position.set(760, TAK, 300);
     scene.add(fram.target);
     for (const [x, y, z, , s] of LAMP.lyser) {
       if (s !== 'kupa') continue;
-      const l = ljus(new THREE.PointLight('#ffdcb2', 0, 0, 2), 5200);
+      const l = ljus(new THREE.PointLight('#ffdcb2', 0, 0, 2), 4200);
       l.position.set(x, y + 6, z);
       if (gl.shadowMap.enabled) {
         l.castShadow = true;
