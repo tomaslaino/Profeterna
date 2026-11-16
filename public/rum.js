@@ -127,7 +127,7 @@ window.Rum = (() => {
       <stop offset=".5" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
     <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#ffe6c0" stop-opacity=".1"/><stop offset="1" stop-color="#ffe6c0" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#6b5733"/><stop offset="1" stop-color="#382d1c"/></linearGradient>
-    <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
+    <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d3426"/><stop offset="1" stop-color="#6b5d45"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
     <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
     <linearGradient id="rum-counter" gradientUnits="userSpaceOnUse" x1="1060" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#472b19"/><stop offset="1" stop-color="#2a180e"/></linearGradient>
@@ -277,6 +277,21 @@ window.Rum = (() => {
   // Bakgrunden: taket, väggarna (furupanelen och den nikotingula högra
   // väggen), dörren, skyltfönstret och disken. Lysröret, skyltarna och
   // paketen är i 3D (rum-inredning.js).
+  // Undertaket är i 3D (innertak i rum-inredning.js), ovanpå taket här och i bg(). Här under står samma
+  // bärverk platt, ifall 3D-delen inte kommer: plattor på 60 × 60 cm (120 enheter) med fläkten mitt i en, z
+  // djupet ut från bakväggen, där taket är y 90 (310 över ögat), och högra väggen vid X 1140.
+  const TAK_X = Array.from({ length: 13 }, (_, i) => -397 + 120 * i);
+  const TAK_Z = [80, 200, 320, 440, 560];
+  function takLinjer(y0, y1) {
+    const ty = (z) => 400 - 310000 / (1000 - z);
+    const tx = (x, z) => 760 + ((x - 760) * 1000) / (1000 - z);
+    const zAv = (y) => 1000 - 310000 / (400 - y);
+    const [za, zb] = [zAv(y1), zAv(y0)];
+    let s = '';
+    for (const x of TAK_X) s += `<line x1="${r1(tx(x, za))}" y1="${r1(ty(za))}" x2="${r1(tx(x, zb))}" y2="${r1(ty(zb))}"/>`;
+    for (const z of TAK_Z) if (z > za && z < zb) s += `<line x1="${r1(tx(-600, z))}" y1="${r1(ty(z))}" x2="${r1(tx(1140, z))}" y2="${r1(ty(z))}"/>`;
+    return s;
+  }
   // Taket närmare betraktaren, i telefonen på höjden där scenen står långt ner i fönstret (pan): i
   // bakväggens plan, så att det sitter ihop med bg() när kameran vrids. Plattorna går mot flyktpunkten
   // och blir större ju närmare man kommer, takfläktens sken klingar av, och högerväggen fortsätter upp,
@@ -284,14 +299,8 @@ window.Rum = (() => {
   function tak() {
     const [X0, X1, Y0] = [-200, 1800, -340];
     const hornX = 1250 + (-Y0 * 110) / 90;
-    const fly = (x, y) => r1(VP[0] + ((x - VP[0]) * (VP[1] - y)) / VP[1]);
-    const fog = [200, 560, 920].map((x) => `<line x1="${x}" y1="0" x2="${fly(x, Y0)}" y2="${Y0}"/>`).join('');
-    const tvars = [[-58, 1.5], [-142, 1.9], [-262, 2.4]].map(([y, b]) => {
-      const x1 = r1(1250 + (-y * 110) / 90);
-      return `<line x1="${X0}" y1="${y}" x2="${x1}" y2="${y}" stroke-width="${b}"/>`;
-    }).join('');
     return svg(`<defs>
-    <linearGradient id="rum-tak-yta" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Y0}"><stop offset="0" stop-color="#574532"/><stop offset=".34" stop-color="#463829"/><stop offset=".62" stop-color="#32281b"/><stop offset="1" stop-color="#1c160e"/></linearGradient>
+    <linearGradient id="rum-tak-yta" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Y0}"><stop offset="0" stop-color="#6b5d45"/><stop offset=".34" stop-color="#4e4332"/><stop offset=".62" stop-color="#3a3125"/><stop offset="1" stop-color="#221c14"/></linearGradient>
     <radialGradient id="rum-tak-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(575 -30) scale(420 170)"><stop offset="0" stop-color="#b48c5c" stop-opacity=".34"/><stop offset="1" stop-color="#b48c5c" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-tak-vagg" gradientUnits="userSpaceOnUse" x1="0" y1="${Y0}" x2="0" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".62"/><stop offset="1" stop-color="#0a0704" stop-opacity="0"/></linearGradient>
     <radialGradient id="rum-tak-flack"><stop offset="0" stop-color="#140c04" stop-opacity=".34"/><stop offset=".7" stop-color="#140c04" stop-opacity=".14"/><stop offset="1" stop-color="#140c04" stop-opacity="0"/></radialGradient>
@@ -299,7 +308,7 @@ window.Rum = (() => {
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-yta)"/>
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-sken)"/>
   <ellipse cx="318" cy="-96" rx="118" ry="30" fill="url(#rum-tak-flack)"/><ellipse cx="846" cy="-188" rx="150" ry="44" fill="url(#rum-tak-flack)"/>
-  <g stroke="#000" stroke-opacity=".2" stroke-width="1.2">${fog}${tvars}</g>
+  <g stroke="#efe4c8" stroke-opacity=".3" stroke-width="2.6">${takLinjer(Y0, 0)}</g>
   <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-rwall)"/>
   <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-tak-vagg)"/>
   <polygon points="1250,4 1265,-12 ${X1},-12 ${X1},4" fill="#160e08" fill-opacity=".8"/>
@@ -320,7 +329,7 @@ window.Rum = (() => {
   <ellipse cx="650" cy="44" rx="470" ry="52" fill="#3a2a0e" opacity=".42" filter="url(#rum-b24)"/>
   <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="#5a4418" opacity=".28" filter="url(#rum-b4)"/>
   <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="none" stroke="#2a1e08" stroke-opacity=".35" stroke-width="1.6"/>
-  <g stroke="#000" stroke-opacity=".18" stroke-width="1.2"><line x1="0" y1="45" x2="1194" y2="45"/><line x1="200" y1="0" x2="200" y2="90"/><line x1="560" y1="0" x2="560" y2="90"/><line x1="920" y1="0" x2="920" y2="90"/></g>
+  <g stroke="#efe4c8" stroke-opacity=".3" stroke-width="1.6">${takLinjer(0, 90)}</g>
   <ellipse cx="575" cy="58" rx="330" ry="62" fill="url(#rum-tube)" filter="url(#rum-b24)" class="rum-tubeglow"/>
 
   <g mask="url(#rum-hal)">
@@ -1886,6 +1895,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // hur stor del av det scenen inte fyller på höjden som hamnar över den (taket), och var i scenen
   // pingklockan under kupongen slutar, som måste rymmas i fönstret (pan)
   const TAK_SMAL = 0.6;
+  // och på en bred skärm, där scenen skärs uppe och nere: hur stor del av det som skärs bort som tas
+  // uppifrån (taket), resten tas från pulten (fit)
+  const TAK_BRED = 0.25;
   const FOT_SMAL = 1090;
   const PENNOR = { bred: [{ x: 276.4, y: 340.6, a: -11 }, { x: 362, y: 440, a: -6 }], smal: [{ x: 268, y: 610, a: -5 }, { x: 268, y: 612, a: -2 }] };
   const PEN_PULT = { ...PENNOR.bred[0] };
@@ -2885,7 +2897,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // med fingret vrids kameran efter var i rummet man står (pan)
     if (R.pek !== 'mouse' && !nara()) {
       if (R.k * W - innerWidth > 1) R.tx = Math.max(-1, Math.min(1, (R.px - (R.pxHem === undefined ? 0.5 : R.pxHem)) * 2));
-      R.ty = R.k * H - innerHeight > 1 ? R.py * 2 - 1 : -0.25;
+      R.ty = R.k * H - innerHeight > 1 ? Math.max(-1, Math.min(1, (R.py - (R.pyHem ?? 0.5)) * 2)) : -0.25;
     }
     // (världen glider själv dit vrid satte den)
     if (R.folj && R.folj.e) {
@@ -6514,6 +6526,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const oh = R.k * H - innerHeight;
     R.px = ow > 1 ? Math.min(1, Math.max(0, px)) : 0.5;
     R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
+    // (har man dragit på höjden står man kvar där, också när fönstret ändras: fit)
+    if (drag && oh > 1) R.drog = true;
     R.ox = -ow * R.px;
     // (scenen är lägre än fönstret i telefonen på höjden: mest tak över och lite pult under, så att
     // rummet får bilden och bordet ungefär en tredjedel, men aldrig så lågt att pingklockan hamnar utanför)
@@ -6759,6 +6773,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const hem = smal && ow > 1 ? Math.min(1, Math.max(0, (HEM_SMAL * R.k - innerWidth / 2) / ow)) : 0.5;
     if (smal !== Boolean(R.smal) || R.px === R.pxHem) R.px = hem;
     R.pxHem = hem;
+    // På en bred skärm skärs både taket och pulten bort, och taket försvann helt (2026-11-16). Därför tas
+    // mer av det som inte ryms nertill (TAK_BRED av det hamnar över bilden, inte hälften), utom i telefonen
+    // på bredden, där kupongen behöver platsen och man drar själv. Har man dragit står man kvar.
+    R.pyHem = innerHeight < 500 && innerWidth > innerHeight ? 0.5 : TAK_BRED;
+    if (!R.drog) R.py = R.pyHem;
     pan(R.px, R.py);
     R.lag = innerHeight < 500 && innerWidth > innerHeight;
     R.el.classList.toggle('lag', R.lag);

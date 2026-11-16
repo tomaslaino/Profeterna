@@ -6601,6 +6601,34 @@ vänstra del 82 → 95; klockan 21.30 taket 37 → 62, lysröret 55 → 114 och 
 och högra väggen är som förut. Provat också som 1920 × 1080 och 1024 × 768, med musen i ytterlägena, på natten
 (klockan 2) och i telefonen (412 × 870) dragen åt vänster; bygget med `--minify` ger samma bild.
 
+### Undertaket (2026-11-16)
+
+Användarens önskemål: "Kan du göra det tydligare att det finns ett tak i butiken? … Det bör självklart passa in med
+saker som finns i taket." Taket var en mörkbrun yta med fogar som gick rakt upp och ned, som en vägg, och på en bred
+skärm syntes det inte alls: scenen skars lika mycket uppe som nere, och hela taket (y 0–90) låg ovanför bilden.
+
+- **Undertaket** (`innertak` i [public/rum-inredning.js](public/rum-inredning.js), en egen duk under allt annat i
+  bakväggens plan): ett 90-tals undertak i three.js med plattor på 60 × 60 cm (120 enheter) i ett bärverk av
+  vitlackerad plåt och en vinkellist mot väggarna, sett med samma kamera som takfläkten och spotskenan. Fläkten sitter
+  mitt i en platta, skenan är skruvad under plattorna, och ljuset från glaskuporna faller upp i taket med skuggan av
+  bladen och spotarna (osynliga kopior av fläkten och skenan som bara kastar skugga; glaset och hållarna precis över
+  lamporna är borttagna, annars låg en mörk fläck över halva taket). Plattorna är gulnade av röken och brunast över
+  gängets bord, där röken stiger, och mot väggarna. En har en fuktfläck, en ett frånluftsdon med damm runt, och en har
+  någon lyft och inte lagt tillbaka riktigt. Taket möter väggarna där de är målade (bakväggen vid y 90, högra väggen
+  vid X 1140). På natten släcks lamporna också här; taket ritas då om i tiondelar av natten, inte varje minut.
+- **Under det:** samma rutnät platt i rum.js (`takLinjer` i `bg` och `tak`), ifall 3D-delen inte kommer, i stället
+  för de raka fogarna.
+- **Bred skärm** (`TAK_BRED` i rum.js, `fit`): av det som inte ryms på höjden tas en fjärdedel uppifrån och resten från
+  pulten, i stället för hälften var. I 1500 × 722 (2,08:1) skärs 58 enheter av taket i stället för 115, så att
+  takkanten, plattorna, Stryktipset-bandet och kuporna syns; pulten skärs 172 i stället för 115, och kupongen på
+  pulten visar fyra rader i stället för sju (hela kupongen syns i närbilden). I 1920 × 970 skärs taket 48 i stället för
+  96. I telefonen på bredden är det som förut, och den som har dragit på höjden står kvar där.
+
+Taket ritas en gång, som resten av inredningen: ungefär 4 ms i Chrome, en duk på 3,8 MB på datorn (1300 × 118 i
+planet) och 4,7 MB i telefonen (1560 × 334, upp till rubriken i telefonen på höjden). Inget nytt rör sig i
+bildrutorna. Provat på datorn (1280 × 800, 1500 × 722), i telefonen (360 × 800, 390 × 844, 430 × 932), på natten och
+utan 3D-taket, och med närbilden av uret och kupongen på bred skärm.
+
 ### Utsikten och vädret
 
 Tobaksaffären ligger där baren Bron ligger, vid S:t Eriksbron i Stockholm, och genom skyltfönstret

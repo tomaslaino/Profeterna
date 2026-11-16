@@ -60,9 +60,16 @@ const MAL = { x0: 262, x1: 958, y0: 92, y1: 121 };
 // ovanför fönsterbänken (y 554), så att det sitter på en enda yta och inte når ned till bänken. Bredden är
 // given, så bladet är högt: där får raderna plats med en handstil som syns nära radion (radiolapp)
 const LAPP = { x: 959.5, y: 503, w: 25.5, h: 45 };
+// undertaket (innertak): i telefonen på höjden syns taket upp till ungefär 200 enheter över scenen
+// (TAK_SMAL i rum.js), på datorn bara överst i bilden, så duken räcker olika högt och brett (y0 och w i
+// bilden, z1 hur långt ut mot en taket går) – den går inte längre än det som syns, för minnets skull
+const TAK_HOGT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+const INNERTAK = TAK_HOGT ? { y0: -240, w: 1560, z1: 560 } : { y0: -24, w: 1300, z1: 320 };
 // Sakerna och dukarna (plan: 0 = väggen). Urets
 // och ramens dukar ligger i knappen och länken (i, med hörnet at).
 const BITAR = {
+  // (först: allt annat i taket och på väggarna ligger över det)
+  innertak: { plan: 0, box: { x: 0, y: INNERTAK.y0, w: INNERTAK.w, h: 94 - INNERTAK.y0 } },
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
   // takfläkten och spotskenan (FLAKT, SKENA): rutorna räcker upp i taket som syns i telefonen på höjden
   flakt: { plan: 0, box: { x: 226, y: -165, w: 600, h: 320 } },
@@ -479,6 +486,229 @@ export async function inredning(el, opt = {}) {
       b.scene.add(arm);
       LAMP.lyser.push([x, Y, Z, 10, 'spot']);
     }
+  }
+
+  // Undertaket (2026-11-16, "tydligare att det finns ett tak"): plattor på 60 × 60 cm (PLATTA enheter) i
+  // ett bärverk av vitlackerad plåt, som i varje kiosk på 90-talet, gulnade av röken och mörkast över
+  // gängets bord. Fläkten sitter mitt i en platta och skenan är skruvad i plattorna under den, och från
+  // glaskuporna och spotarna faller ljuset upp i taket, med skuggan av bladen och spotarna. En platta har en
+  // fuktfläck, en ett frånluftsdon, och en har någon lyft och inte lagt tillbaka riktigt. Taket möter
+  // väggarna där de är målade i rum.js (bakväggen vid y 90 i bilden, alltså Z 0, och högra väggen vid X 1140),
+  // inte där sakerna på väggarna står (WZ, WX), med en vinkellist mot väggen. Fläkten och skenan står kvar i
+  // sina dukar: här finns bara deras skuggor (osynliga kopior), som ritas när taket ritas – en gång, och om
+  // när lamporna släcks och tänds (natt).
+  const PLATTA = 120;
+  function innertak(b) {
+    const { scene } = b;
+    const { X: FX, Z: FZ } = FLAKT;
+    const [x0, x1, z1] = [-420, 1140, INNERTAK.z1];
+    // bärverkets linjer, med fläkten mitt i en platta, och kanterna mot väggarna
+    const linjer = (fran, till, mitt) => {
+      const ut = [fran];
+      for (let v = mitt - PLATTA / 2 - PLATTA * Math.floor((mitt - PLATTA / 2 - fran) / PLATTA); v < till; v += PLATTA) if (v > fran + 1) ut.push(v);
+      ut.push(till);
+      return ut;
+    };
+    const XS = linjer(x0, x1, FX);
+    const ZS = linjer(0, z1, FZ);
+    // nikotinet: gulnat överallt, brunt i ett moln över bordet där röken stiger, och mörkare mot väggarna
+    const brun = (x, z) => Math.min(1, 0.5 * Math.exp(-((Math.hypot(x - FX, (z - FZ) * 1.25) / 300) ** 2)) +
+      0.3 * Math.exp(-z / 50) + 0.3 * Math.exp(-(x1 - x) / 50) + 0.08 * Math.exp(-(((x - 440) / 160) ** 2) - (z / 120) ** 2));
+    const GUL = new THREE.Color('#ddd0b4');
+    const BRUN = new THREE.Color('#97784e');
+
+    // plattan: mineralull med hål och sprickor, och mörkare i kanten mot bärverket
+    const R = LATT ? 128 : 256;
+    const platta = (fro, extra) => tex(R, R, (c, w, h) => {
+      const s = w / 256;
+      c.fillStyle = '#f2e9d4';
+      c.fillRect(0, 0, w, h);
+      for (let i = 0; i < 360; i++) {
+        const x = hash(fro + i * 1.31) * w, y = hash(fro + i * 2.17 + 0.5) * h;
+        const a = hash(fro + i * 3.7) * 2 * Math.PI, l = (2 + hash(fro + i * 5.3) * 10) * s;
+        c.strokeStyle = `rgba(118, 98, 66, ${(0.16 + hash(fro + i * 7.1) * 0.3).toFixed(2)})`;
+        c.lineWidth = (0.7 + hash(fro + i * 1.9) * 1.3) * s;
+        c.beginPath();
+        c.moveTo(x, y);
+        c.quadraticCurveTo(x + Math.cos(a + 0.9) * l * 0.6, y + Math.sin(a + 0.9) * l * 0.6, x + Math.cos(a) * l, y + Math.sin(a) * l);
+        c.stroke();
+      }
+      for (let i = 0; i < 700; i++) {
+        c.fillStyle = `rgba(104, 86, 58, ${(0.14 + hash(fro + i * 0.77) * 0.36).toFixed(2)})`;
+        const r = (0.5 + hash(fro + i * 1.13) * 1.1) * s;
+        c.fillRect(hash(fro + i * 0.91) * w, hash(fro + i * 1.57) * h, r, r);
+      }
+      if (extra) extra(c, w, h, s);
+      for (let k = 0; k < 4; k++) {
+        c.strokeStyle = `rgba(70, 52, 30, ${(0.28 - k * 0.06).toFixed(2)})`;
+        c.lineWidth = 2.2 * s;
+        c.strokeRect((1 + k * 2) * s, (1 + k * 2) * s, w - (2 + k * 4) * s, h - (2 + k * 4) * s);
+      }
+    });
+    const vanlig = [platta(0.11), platta(3.71), platta(7.29)];
+    // fuktfläcken: ränder där vattnet torkade, i ringar
+    const fukt = platta(5.5, (c, w, h, s) => {
+      for (const [r, a, k] of [[78, 0.16, 0.5], [58, 0.12, 0.7], [34, 0.1, 0.9]]) {
+        c.beginPath();
+        for (let i = 0; i <= 48; i++) {
+          const t = (i / 48) * 2 * Math.PI;
+          const q = r * s * (1 + 0.16 * Math.sin(3 * t + k * 4) + 0.09 * Math.sin(7 * t + k) + 0.05 * Math.sin(11 * t));
+          c.lineTo(w * 0.47 + q * Math.cos(t), h * 0.55 + q * 0.86 * Math.sin(t));
+        }
+        c.closePath();
+        c.fillStyle = `rgba(150, 102, 44, ${a})`;
+        c.fill();
+        c.strokeStyle = `rgba(112, 70, 26, ${(a * 3).toFixed(2)})`;
+        c.lineWidth = 2.2 * s;
+        c.stroke();
+      }
+    });
+    // frånluftsdonet: ett fyrkantigt galler med springor i ringar, och dammet som det har dragit till sig runt om
+    const don = platta(9.1, (c, w, h, s) => {
+      const d = c.createRadialGradient(w / 2, h / 2, w * 0.2, w / 2, h / 2, w * 0.52);
+      d.addColorStop(0, 'rgba(60, 46, 30, .5)');
+      d.addColorStop(1, 'rgba(60, 46, 30, 0)');
+      c.fillStyle = d;
+      c.fillRect(0, 0, w, h);
+      const m = w * 0.21;
+      c.fillStyle = '#ece4d0';
+      c.fillRect(m, m, w - 2 * m, h - 2 * m);
+      for (let k = 0; k < 5; k++) {
+        const q = m + (k + 0.6) * w * 0.05;
+        c.strokeStyle = 'rgba(28, 22, 16, .85)';
+        c.lineWidth = w * 0.022;
+        c.strokeRect(q, q, w - 2 * q, h - 2 * q);
+      }
+      c.fillStyle = '#2a2219';
+      c.fillRect(w * 0.47, h * 0.47, w * 0.06, h * 0.06);
+      c.strokeStyle = 'rgba(255, 252, 240, .5)';
+      c.lineWidth = 1.5 * s;
+      c.strokeRect(m, m, w - 2 * m, h - 2 * m);
+    });
+    // (vilken ruta har vad: [x, z] inne i rutan)
+    const SARSKILD = [[983, 140, fukt], [863, 260, don]];
+    const LYFT = [983, 380];
+    const inne = (p, xa, xb, za, zb) => p[0] > xa && p[0] < xb && p[1] > za && p[1] < zb;
+    const plattMats = new Map();
+    const plattMat = (t) => {
+      if (!plattMats.has(t)) plattMats.set(t, new THREE.MeshStandardMaterial({ map: t, vertexColors: true, roughness: 0.96, envMapIntensity: 0.12 }));
+      return plattMats.get(t);
+    };
+    const SEGP = 6;
+    let n = 0;
+    for (let i = 0; i + 1 < XS.length; i++) {
+      for (let j = 0; j + 1 < ZS.length; j++) {
+        const [xa, xb, za, zb] = [XS[i], XS[i + 1], ZS[j], ZS[j + 1]];
+        n++;
+        const geo = new THREE.PlaneGeometry(xb - xa, zb - za, SEGP, SEGP);
+        // (en hel platta får hela bilden, en kapad mot väggen bara sin del; lokalt y är Z när plattan vänds ned)
+        const [u0, v0] = [FX - PLATTA / 2, FZ - PLATTA / 2];
+        const [iu, iv] = [Math.floor(((xa + xb) / 2 - u0) / PLATTA), Math.floor(((za + zb) / 2 - v0) / PLATTA)];
+        const pos = geo.attributes.position;
+        const uv = geo.attributes.uv;
+        const col = new Float32Array(pos.count * 3);
+        const ton = 0.93 + 0.1 * hash(n * 1.7);
+        const c = new THREE.Color();
+        for (let k = 0; k < pos.count; k++) {
+          const X = (xa + xb) / 2 + pos.getX(k);
+          const Z = (za + zb) / 2 + pos.getY(k);
+          uv.setXY(k, (X - u0) / PLATTA - iu, (Z - v0) / PLATTA - iv);
+          c.copy(GUL).lerp(BRUN, brun(X, Z)).multiplyScalar(ton);
+          col.set([c.r, c.g, c.b], k * 3);
+        }
+        geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        const sar = SARSKILD.find((p) => inne(p, xa, xb, za, zb));
+        const m = new THREE.Mesh(geo, plattMat(sar ? sar[2] : vanlig[Math.floor(hash(n * 3.3) * vanlig.length)]));
+        m.rotation.x = 90 * DEG;
+        m.position.set((xa + xb) / 2, TAK, (za + zb) / 2);
+        // den lyfta: snett uppåt och lite åt sidan, så att en mörk springa syns
+        if (inne(LYFT, xa, xb, za, zb)) {
+          m.position.set(m.position.x + 7, TAK + 6, m.position.z - 4);
+          m.rotation.set(90 * DEG - 3.2 * DEG, 1.4 * DEG, 0);
+        }
+        m.receiveShadow = true;
+        scene.add(m);
+      }
+    }
+    // mörkret ovanför plattorna (som syns genom springan)
+    const morker = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1), new THREE.MeshBasicMaterial({ color: '#0b0806' }));
+    morker.rotation.x = 90 * DEG;
+    morker.position.set((x0 + x1) / 2, TAK + 30, z1 / 2);
+    scene.add(morker);
+
+    // bärverket: T-profiler, 24 mm (4,8 enheter) breda, och vinkellisten mot väggarna
+    const plat = mat('#f1e9d6', { roughness: 0.5, metalness: 0.05, envMapIntensity: 0.3 });
+    const balk = (w, d, x, z) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, 1.3, d), plat);
+      m.position.set(x, TAK - 0.65, z);
+      m.receiveShadow = true;
+      scene.add(m);
+    };
+    for (const x of XS.slice(1, -1)) balk(4.8, z1, x, z1 / 2);
+    for (const z of ZS.slice(1, -1)) balk(x1 - x0, 4.8, (x0 + x1) / 2, z);
+    // vinkellisten: på bakväggen och högra väggen, ett ben mot väggen och ett under plattorna
+    const lista = (w, h, d, x, y, z) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), plat);
+      m.position.set(x, y, z);
+      m.receiveShadow = true;
+      scene.add(m);
+    };
+    lista(x1 - x0, 2.4, 0.8, (x0 + x1) / 2, TAK - 1.2, 0.4);
+    lista(x1 - x0, 0.8, 4.8, (x0 + x1) / 2, TAK - 0.4, 2.4);
+    lista(0.8, 2.4, z1, x1 - 0.4, TAK - 1.2, z1 / 2);
+    lista(4.8, 0.8, z1, x1 - 2.4, TAK - 0.4, z1 / 2);
+
+    // Skuggorna: fläkten och skenan som osynliga kopior (bara skugga), utan glaset i kuporna och spotarna
+    // och utan hållarna ovanpå glaset, så att ljuset kommer ut (hållarna tätt över ljuset lade en mörk fläck
+    // över halva taket kring fläkten)
+    const osynlig = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
+    const kupor = LAMP.lyser.filter((l) => l[4] === 'kupa').map(([x, y, z]) => new THREE.Vector3(x, y, z));
+    const p = new THREE.Vector3();
+    for (const k of ['flakt', 'skena']) {
+      B[k].scene.updateMatrixWorld(true);
+      B[k].scene.traverse((x) => {
+        if (!x.isMesh || x.material.isShaderMaterial || x.material.isMeshBasicMaterial) return;
+        p.setFromMatrixPosition(x.matrixWorld);
+        if (kupor.some((q) => q.distanceTo(p) < 16)) return;
+        const m = new THREE.Mesh(x.geometry, osynlig);
+        m.matrixAutoUpdate = false;
+        m.matrix.copy(x.matrixWorld);
+        m.castShadow = true;
+        scene.add(m);
+      });
+    }
+
+    // Ljuset: rummet underifrån (gulare nära golvet och pulten), glaskuporna med skuggor, spotarnas
+    // värme runt dem och neonen i fönstret
+    const ljus = (l, i, natt = true) => {
+      l.intensity = i;
+      scene.add(l);
+      if (natt) LAMP.ljus.push([l, i]);
+      return l;
+    };
+    ljus(new THREE.HemisphereLight('#1c150e', '#b4a084', 0), 1.1);
+    const fram = ljus(new THREE.DirectionalLight('#e2d0b0', 0), 0.45);
+    fram.position.set(760, -700, 1000);
+    fram.target.position.set(760, TAK, 300);
+    scene.add(fram.target);
+    for (const [x, y, z, , s] of LAMP.lyser) {
+      if (s === 'kupa') {
+        const l = ljus(new THREE.PointLight('#ffdcb2', 0, 0, 2), 5200);
+        l.position.set(x, y + 6, z);
+        if (gl.shadowMap.enabled) {
+          l.castShadow = true;
+          l.shadow.mapSize.set(LATT ? 512 : 1024, LATT ? 512 : 1024);
+          l.shadow.bias = -0.002;
+          l.shadow.camera.near = 2;
+          l.shadow.camera.far = 1200;
+        }
+      } else if (s === 'spot') {
+        const l = ljus(new THREE.PointLight('#ffe4bc', 0, 0, 2), 90);
+        l.position.set(x, y + 4, z);
+      }
+    }
+    const neonL = ljus(new THREE.PointLight('#ff4630', 0, 0, 2), 1100, false);
+    neonL.position.set(440, -165, -10);
   }
 
   // Stryktipset målat direkt på bakväggen ovanför fönstret (MAL): ett band i
@@ -1575,10 +1805,11 @@ export async function inredning(el, opt = {}) {
     // uret och ramen ligger i knappen och länken, så att de lyser när man pekar på dem
     B[k] = bit(k, wallCam(box), i ? el.querySelector(i) : null);
     // (bladet vid radion har sin skugga ritad)
-    if (k !== 'flakt' && k !== 'skena') wallLights(B[k], box, !['tak', 'neon', 'radiolapp'].includes(k));
+    if (!['flakt', 'skena', 'innertak'].includes(k)) wallLights(B[k], box, !['tak', 'neon', 'radiolapp'].includes(k));
   }
   flakt(B.flakt);
   skena(B.skena);
+  innertak(B.innertak);
   malat(B.tak);
   stangt(B.tak);
   neon(B.neon, B.tak);
@@ -1651,7 +1882,7 @@ export async function inredning(el, opt = {}) {
   // allt på en gång höll huvudtråden medan grafikkortet arbetade, och rummet svarade
   // inte på fingret så länge.
   const paus = () => new Promise((r) => setTimeout(r));
-  for (const k of ['ram', 'ur', 'tak', 'flakt', 'skena', 'neon', 'hogra', 'skiva', 'disk', 'radiolapp']) {
+  for (const k of ['ram', 'ur', 'tak', 'flakt', 'skena', 'innertak', 'neon', 'hogra', 'skiva', 'disk', 'radiolapp']) {
     if (!B[k]) continue;
     try {
       await gl.compileAsync(B[k].scene, B[k].cam);
@@ -1668,6 +1899,7 @@ export async function inredning(el, opt = {}) {
   });
   for (const m of skivMat) m.userData.dag = m.color.clone();
   // (hur släckta taklamporna är, 0–1: glaset grånar och väggen och skivan mörknar i takt; morkt står överst)
+  let takSteg = 0;
   function natt(g) {
     g = typeof g === 'number' ? Math.max(0, Math.min(1, g)) : g ? 1 : 0;
     if (g === morkt) return;
@@ -1677,6 +1909,11 @@ export async function inredning(el, opt = {}) {
     for (const [l, i] of LAMP.ljus) l.intensity = i * (1 - 0.8 * g);
     B.flakt.paint();
     B.skena.paint();
+    // (undertaket, med fyra lampors skuggor, i tiondelar: natten kommer en minut i taget, 23–24 och 6–7)
+    if (Math.round(g * 10) !== takSteg) {
+      takSteg = Math.round(g * 10);
+      B.innertak.paint();
+    }
     // (skenet från lamporna i rummets ljuslager, ljusKlockan i rum.js)
     if (opt.ljus) opt.ljus();
     malMat.color.copy(malMat.userData.dag).multiplyScalar(1 - 0.6 * g);
