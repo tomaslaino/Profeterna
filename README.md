@@ -4748,6 +4748,44 @@ ungefär 1 % av bildens hela arbete, och med processorn fyra gånger långsammar
 8–13 enheter mellan två bilder, mot 14–20 i de gamla. Största hoppet mellan två bilder under tio
 minuter är detsamma som förut, och det kommer från de gamla påhitten.
 
+**Dygnet** (2026-11-16, `dygnet`, `DYGN_MENY`, `ORK` och `KRONO` i rum-3d.js; användarens önskemål: "fler naturliga
+rörelser och saker som de håller på med under olika delar av dagen … vi ska inte se ut som robotar"). Klockan i Stockholm
+syns på två sätt: i hur pigga de är och i vad de gör.
+
+- **Orken** (`ork`, 0,35–1,08): seg på morgonen, piggast på förmiddagen, en dipp efter lunch, livligast på kvällen och
+  trött från halv tio. Var och en har sin dygnsrytm (`KRONO`): DL är morgonmänniska (tre kvart före klockan) och DT
+  nattuggla (tre kvart efter), med DJ emellan – samma ordning som de somnar i. Den som är trött sitter lite mer
+  ihopsjunken med huvudet lägre, rör huvudet mindre (`smaRor`), blinkar tyngre – ögonen stängda längre och ibland en lång
+  blinkning (`blinkar`) – och pratar mindre (`ordetNr`): klockan 8–9 är det tyst en tredjedel av tiden, 15–16 en femtedel
+  och från kvart i tio nästan fyra tiondelar (förut 8 % dygnet runt), och sent på kvällen har DT ordet dubbelt så ofta som
+  DL. På morgonen dricker de mer sällan (`vanaHoppa`), kring lunch går någon oftare bort till baren (`gaNu0`), och
+  stämningen drar mot uttråkad på morgonen, eftermiddagen och när det blir sent och mot glad på kvällen (`stamVikt`).
+- **Påhitten efter tiden på dygnet** (`DYGN_MENY`, efter var och ens rytm), utöver humörets:
+  - *Morgonen:* sträcker på sig med en stor gäspning, gnuggar ögonen och rullar på nacken som förut – och rullar axlarna
+    bakåt (`axelrull`), vrider ryggen åt båda hållen med slutna ögon längst ut (`vrider`) och, när det känns som under 6°
+    ute, fryser: axlarna uppdragna, blåser i den kupade handen och gnider låret (`fryser`). En lördags- eller
+    söndagsmorgon är någon bakfull, DT oftast: handen för ansiktet med slutna ögon och sedan en återställare (`bakis`).
+  - *Före lunch:* känner efter i magen med handen som går runt, kikar ner mot pulten där kaffet står och upp på klockan,
+    och suckar (`hungrig`). *Efter lunch* klappar de sig på magen, som förut.
+  - *Eftermiddagen:* nickar till som förut – och vilar huvudet i handen medan ögonen sluts, tills armbågen glider och
+    huvudet faller och hen rycker upp och tittar sig omkring (`armstod`), blåser ut med blicken i taket och trummar sakta
+    på bordet (`tradigt`), och när solen står lågt i fönstret bakom dem (klart eller halvklart) hakan upp och ögonen
+    slutna i värmen (`solar`).
+  - *Kvällen:* lutar sig bakåt, sträcker på sig och tittar ut.
+  - *Sent på kvällen:* gäspar, gnuggar ögonen och vilar huvudet i handen – och tittar upp på väggklockan, sedan på någon
+    av de andra, rycker på axlarna och tar en klunk till (`klockan`). Den som sitter till höger har klockan bakom sig och
+    tittar över axeln (`seMot`). Gäspningen smittar, som förut.
+- **Det de gör tillsammans** (`GRUPP_DYGN`, `gruppVal`): på morgonen sällan skål och allsång och oftare en zen-stund, på
+  kvällen oftare skål, skämt och allsång.
+
+Bara bålen, huvudet och händerna som redan finns rör sig, utan fingrar. Med samma påhitt för alla tre ritar grafikkortet
+exakt samma sak före och efter: 218 ritanrop och 172 490 trianglar i var och en av 40 bilder (headless Chrome,
+SwiftShader). Gängets uträkning tar 0,15–0,22 ms per bild före och 0,17–0,22 ms efter, inom bruset. I de nya påhitten
+vrids huvudet och bålen som mest 0,08–0,14 radianer mellan två bilder, som i de gamla. Samtidigt rättat: DJ:s flaska
+gled tillbaka mot bordet innan den kom till munnen när han vaknade bakfull; nu går den från pannan direkt till munnen.
+Prova med `?rum-klocka=08:00` (`11:30`, `15:00`, `21:45`), `?rum-akt=dl:armstod,dt:klockan,dj:fryser` och
+`?rum-t=6&rum-akt=dl:solar@3`. I en fast bild (`?rum-t`) och med minskad rörelse är orken som mitt på dagen.
+
 **Ansiktena följer kupongen** (2026-11-08, [public/rum-uttryck.js](public/rum-uttryck.js),
 `ansikten` i rum-3d.js och `senastAv` i rum-folk.js). Hur glada de ser ut beror på hur gängets
 senaste kupong gick, ända tills nästa är spelad. Blev det vinst (tio rätt av tretton på
