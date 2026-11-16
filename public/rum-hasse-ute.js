@@ -16,6 +16,7 @@
 //   rutor(lage) → glasets fyra hörn i varje ruta, i väggbildens bildpunkter
 //   gangare(v, L, lage) → någon som går på bron: figuren i två steg och vägen längs bron (bron i rum-hasse.js)
 //   fordon(v, L, lage, a, fil) → en bil eller buss i en fil på bron: sidan och fronten eller baken, och vägen
+//   oskarpa(lage) → hur oskarp trafiken på bron är, i väggbildens bildpunkter (rum-hasse.js lägger den på hela duken)
 
 import { SCEN, BAK, kamera, iKamera, franBaren } from './rum-hasse-scen.js';
 
@@ -728,6 +729,20 @@ export function affaren(x, L, l, somn, lage, W, H) {
   x.restore();
 }
 
+// ---------- trafikens oskärpa ----------
+
+// Hur oskarp trafiken på bron är (väggbildens bildpunkter): nästan som utsikten (rita: ofokus / 2), som bilarna
+// och de som går på gatan i rummet är nästan lika oskarpa som stan bakom dem (rum-ute.css). Den läggs på hela
+// trafikens duk (rum-hasse.js), så att den är lika stor längs hela bron: bakad i varje figur krympte den med
+// figuren, och längst bort var bilarna nästan skarpa (ändrat 2026-11-16; förut knappt en sjättedel av utsiktens).
+// I figurerna och fordonen själva bara BAKAD, så att kanterna inte blir hackiga.
+const OSKARPA = 0.8;
+const BAKAD = 0.6;
+export function oskarpa(lage) {
+  const { b } = projektion(lage);
+  return (OSKARPA * (20 * b.S * SCEN.D)) / (SCEN.D - 120) / 2;
+}
+
 // ---------- någon på bron ----------
 
 // Någon som går på bron då och då (bron i rum-hasse.js). Figuren ritas en gång, från sidan i två steg bredvid
@@ -736,25 +751,23 @@ export function affaren(x, L, l, somn, lage, W, H) {
 // bakom. Vägen är fötternas plats längs bron i väggbildens bildpunkter och hur hög figuren är där (u från bortre
 // änden vid tegelhuset till förbi bildens högra kant). Sidan lägger figuren där i trafikens duk (broRita i
 // rum-hasse.js), utan att rita om den.
-// Hur hög figuren är mot räcket (BRO.racke), och hur högt över brons kant fötterna står: räcket i utsikten är
+// Hur hög figuren är mot räcket (BRO.racke), och hur långt innanför räcket den går (meter): räcket i utsikten är
 // ritat högre än ett riktigt, mot husen på andra sidan (en våning är en halv grad vid tegelhuset, där räcket är
 // 0,3°), så en människa är bara lite högre än det. Gångbanan ligger bakom räcket och syns uppifrån, alltså lite
-// högre i bilden än kanten.
-const GANG = { hojd: 1.15, inne: 0.25 };
+// högre i bilden än kanten (LUTA).
+const GANG = { hojd: 1.15, sid: 1.35 };
 export function gangare(v, L, lage, R = Math.random) {
   const F = window.RumUte.farg;
-  const { b, P } = projektion(lage);
+  const { P } = projektion(lage);
   const KG = F.KALL ? F.KALL.gata : 0.3;
   const KH = F.KALL ? F.KALL.himmel : 0.4;
   const kv = Math.max(0, 1 - L.dag / 0.6) * 0.2;
   const ton = (dag, natt) => F.mix(F.mix(F.kall(F.facade(dag, natt, L), L, KG), '#000000', 0.15), '#5c3c22', kv);
   const steg = gangVag(P);
-  // figuren: U bildpunkter hög, med plats för paraplyet ovanför och oskärpan runt om. Oskärpan är knappt hälften
-  // av utsiktens (rita: ofokus / 2 i väggbildens bildpunkter) där figuren syns som störst i fönstren: lika oskarp
-  // som bron blir den en fläck som man inte ser är en människa.
+  // figuren: U bildpunkter hög, med plats för paraplyet ovanför och oskärpan runt om. I figuren bara en aning
+  // (BAKAD där den syns som störst i fönstren); resten läggs på hela trafiken när den ritas (oskarpa).
   const U = 60;
-  const ofokus = (20 * b.S * SCEN.D) / (SCEN.D - 120);
-  const sudd = Math.min(3.2, Math.max(1.6, (0.4 * (ofokus / 2) * U) / steg[14][2]));
+  const sudd = (BAKAD * U) / steg[14][2];
   const pad = Math.ceil(Math.max(12, 3 * sudd));
   const B = Math.round(U * 0.55) + 2 * pad;
   const Hd = Math.round(U * 1.18) + 2 * pad;
@@ -771,7 +784,7 @@ export function gangare(v, L, lage, R = Math.random) {
   const mossa = !regn && v.temp < 3;
   const rack = ton('#2f6243', '#080b0a');
   // räcket: från fötterna upp till handledaren, i figurens mått
-  const hoft = (1 - GANG.inne) / GANG.hojd;
+  const hoft = (1 - LUTA * GANG.sid * METER) / GANG.hojd;
   if (FILTER) x.filter = `blur(${sudd.toFixed(2)}px)`;
   for (let k = 0; k < 2; k++) {
     const cx = k * B + B / 2;
@@ -843,11 +856,13 @@ export function gangare(v, L, lage, R = Math.random) {
 // Bron som en rak linje på marken, uträknad ur räcket som utsikten ritar det (BRO.racke: räckets höjd i grader
 // ger avståndet dit, i räckeshöjder): från bortre änden A vid tegelhuset fram till bildens högra kant. En punkt
 // s räckeshöjder från A, sid innanför räcket och z upp från körbanan hamnar där broPunkt säger, med samma kant och
-// samma räcke som i utsikten. Det som ligger längre in på bron syns uppifrån och hamnar högre (LUTA): så mycket
-// att körbanan syns som en yta bakom räcket och det som kör där står på den, bakom dem som går närmast. En meter
-// är METER räckeshöjder (den som går är 1,75 m).
+// samma räcke som i utsikten. Det som ligger längre in på bron syns uppifrån och hamnar högre (LUTA, i
+// räckeshöjder på en räckeshöjd inåt): ungefär som man ser bron härifrån, så att körbanan syns som en smal yta
+// bakom räcket och det som kör där står på den, bakom dem som går närmast. Förut 0,28, nästan dubbelt så mycket,
+// och då svävade bilarna i den bortre filen långt ovanför räcket när körbanan inte syntes, i mörker och regn
+// (ändrat 2026-11-16). En meter är METER räckeshöjder (den som går är 1,75 m).
 const METER = GANG.hojd / 1.75;
-const LUTA = 0.28;
+const LUTA = 0.16;
 // (fordonen själva, från sida till sida: så lite som man ser dem uppifrån när man tittar längs bron)
 const FLUTA = 0.1;
 const LINJE = (() => {
@@ -869,7 +884,7 @@ function broPunkt(P, s, sid, z) {
 }
 
 // Fötternas väg för den som går (gangare): 21 steg från bortre änden till förbi bildens högra kant, på gångbanan
-// GANG.inne räckeshöjder upp från brons kant, i samma mått som trafiken (broPunkt), så att den som går står på
+// GANG.sid meter innanför räcket, i samma mått som trafiken (broPunkt), så att den som går står på
 // gångbanan bredvid cyklisterna och bilarna och inte i deras väg. → [x, y, figurens höjd] i väggbildens bildpunkter
 // hur långt ut på bron räcket står i riktningen az (grader)
 function langs(az) {
@@ -878,7 +893,7 @@ function langs(az) {
   return -(A[0] * d[1] - A[1] * d[0]) / (ax[0] * d[1] - ax[1] * d[0]);
 }
 function gangVag(P) {
-  const sid = GANG.inne / LUTA;
+  const sid = GANG.sid * METER;
   const ut = [];
   for (let i = 0; i <= 20; i++) {
     const u = langs(BRO.a0 + 0.8 + (42 - 0.8 - BRO.a0) * (i / 20) ** 1.5);
@@ -1069,13 +1084,11 @@ export function fordon(v, L, lage, a, fil) {
   let sEnd = len;
   while (sEnd < LINJE.L + 25 && lage4(sEnd).r0[0] < W + 12) sEnd += 1;
 
-  // dukarna: k bildpunkter på en av rummets enheter, med plats för oskärpan och lyktornas sken
+  // dukarna: k bildpunkter på en av rummets enheter, med plats för oskärpan och lyktornas sken. I dukarna bara
+  // en aning oskärpa (BAKAD där fordonet syns som störst); resten läggs på hela trafiken när den ritas (oskarpa).
   const k = 1.2;
-  const { b } = projektion(lage);
-  const ofokus = (20 * b.S * SCEN.D) / (SCEN.D - 120);
   const nara = lage4(Math.min(sEnd, LINJE.L) * 0.88);
-  // (lite oskarpare än den som går: fordonens kanter och rutor är skarpare i sig)
-  const sudd = Math.min(3.5, Math.max(1, (0.6 * (ofokus / 2) * -TOP * k) / Math.hypot(...nara.up)));
+  const sudd = (BAKAD * -TOP * k) / Math.hypot(...nara.up);
   const pad = Math.ceil(3 * sudd + 10 * k);
   const ws = (M.w * 16);
   const sida = document.createElement('canvas');
@@ -1353,12 +1366,10 @@ export function cyklist(v, L, lage, fil, R = Math.random) {
   let sEnd = len;
   while (sEnd < LINJE.L + 25 && lage4(sEnd).r0[0] < W + 12) sEnd += 1;
 
-  // (lika oskarp som den som går, gangare)
+  // (lika lite oskärpa i bilderna som hos den som går, gangare)
   const k = 1.5;
-  const { b } = projektion(lage);
-  const ofokus = (20 * b.S * SCEN.D) / (SCEN.D - 120);
   const nara = lage4(Math.min(sEnd, LINJE.L) * 0.88);
-  const sudd = Math.min(3.2, Math.max(1, (0.4 * (ofokus / 2) * -TOP * k) / Math.hypot(...nara.up)));
+  const sudd = (BAKAD * -TOP * k) / Math.hypot(...nara.up);
   const pad = Math.ceil(3 * sudd + 6 * k);
   const y1 = pad - TOP * k;
   const racket = Math.max(0, Math.min(1, (1 - 0.04 - LUTA * (FIL[fil].sid - WS / 32) * METER) / hU));
