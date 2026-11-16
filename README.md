@@ -7738,7 +7738,7 @@ bland tre skisser i den riktiga närbilden:
   staplar, där räcker siffrorna. LÄGET:s mätare står utanför dagarna på samma sätt, med
   tävlingen och elvan svagt under talen; skadorna står i lagens halvor och domaren med sina tal
   till vänster och divisionens snitt till höger. Formens matcher står på var sin sida om
-  etiketternas spalt (i telefonen under varandra, det högra lagets högerställda). Samma mått i
+  etiketternas spalt (i telefonen under varandra, se nedan). Samma mått i
   alla fyra flikarna (`spegel` i [public/rum-register.js](public/rum-register.js)), så att lagen
   står still när man byter flik; MÖTENA har förra mötet kvar som dragkamp. Staplarna är klasserna
   `sv`, `so` och `sf` i [public/rum-register.css](public/rum-register.css), och skärmen i rummet
@@ -7783,6 +7783,13 @@ bland tre skisser i den riktiga närbilden:
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
   motståndaren i en annan division eller grupp står den efter platsen (*3:E CH*, *2:A A3*).
   Datorn har lagen sida vid sida, telefonen under varandra.
+- **Lagens listor i telefonen** (2026-11-16, användarens synpunkt: "ingen bra lösning på
+  mobilen"): formens matcher i ÖVERSIKT och de tio senaste i xG står i telefonen under varandra,
+  och förut stod det högra lagets lista högerställd – listorna hamnade förskjutna mot varandra och
+  formens listor hade inga namn. Nu har båda listorna lagets namn ljust över sig och en tom rad
+  emellan, är lika breda (den bredaste radens bredd) och står tillsammans i mitten av blocket,
+  så att utfallet, resultatet, motståndaren och platsen står i raka spalter
+  (`underVarandra` i [public/rum-register.js](public/rum-register.js)).
 - **Vad landslagen spelar för** (frågor om playoff, placeringarna i de andra ligorna och vägen
   till EM; *Raden*, med rutan): i Nations Leagues sista omgångar står *SPELAR FÖR* under
   POÄNG – målet laget kan nå och vad som räcker (*KVAR I B · VINST RÄCKER*, *KVARTSFINAL ·
