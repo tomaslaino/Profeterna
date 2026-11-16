@@ -44,7 +44,10 @@ const WX = 1156;
 // djupet in längs högra väggen där x (i hörnets plan) ligger, som onWall i rum.js
 const wz = (x) => 1000 * (1 - 380 / (x - 760));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-const UR = { x: 1050, y: 152, r: 46 };
+// stationsuret: taket är y 90 och palmetten på ramen börjar vid y 287, så uret hänger med ungefär
+// lika mycket luft över sig som under (till 2026-11-16 y 152, med höljet bara 4 cm under taket); visitkortet
+// (.rum-kort i rum.css) sitter i luckan under det, till höger
+const UR = { x: 1050, y: 184, r: 46 };
 const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // det målade bandet på bakväggen, mellan taket och fönsterkarmen och lika brett
 // som fönstret (i bakväggens bild)
@@ -59,7 +62,7 @@ const LAPP = { x: 959.5, y: 503, w: 25.5, h: 45 };
 const BITAR = {
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
-  ur: { plan: 0, box: { x: 992, y: 94, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
+  ur: { plan: 0, box: { x: UR.x - 58, y: UR.y - 58, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
   ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
   hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 580 } },
   // skivan med löpsedlarna, kedjorna upp till karmen och skuggan på glaset;
