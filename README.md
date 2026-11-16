@@ -7946,7 +7946,7 @@ videohörnet (-598, i `#rum-lyft`) och resten (-470 till 0). De ligger i var sin
 i den ordningen, så hemma ser det ut som förut, och musens vridning sätts på alla tre samtidigt
 (`varldar` och `stil` i `setCam`, `folj` och `vrid`; `H.world` i rum-hasse.js). Planen räknas i
 samma ordning som förut (`.rum-world > .rum-pl`). När man går till videon läggs `#rum-lyft` och
-draperiet över resten (`.vid-lyft`), och `#rum-lyft` får en egen förstoring inne i kameran (`lyft`):
+draperiet över resten (`.vid-lyft`), och `#rum-lyft` får en egen förstoring inne i kameran (`lyftHornet`; förut `lyft`, som tog över tidningens funktion med samma namn så att Helgarderat inte gick att öppna, rättat 2026-11-16):
 kameran gör rummets lilla förflyttning och `#rum-lyft` resten. Inget i hörnet flyttas i sidan –
 YouTubes spelare laddas om när den flyttas, och ett pausat klipp ska spela vidare när man kommer
 tillbaka. `.vid-lyft` tas bort först när hörnet har landat. Hörnets läge läses inte av med
