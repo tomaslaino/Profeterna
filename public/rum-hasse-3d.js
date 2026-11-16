@@ -16,7 +16,7 @@
 //
 // figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
-// tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
+// tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (tio sätt), cigarren, småsakerna medan han
 // väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
 // rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna då (raknar, tomKopp, slocknad, putsa, vissla,
 // naglar), där han blir ertappad och låtsas som ingenting.
@@ -35,10 +35,35 @@ export { dagens } from './rum-hasse-tidning.js';
 const DEG = Math.PI / 180;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const ss = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+// Nycklarna i klippen ([tid, värde]): en mjuk kurva genom dem, som händerna (nyckel i figuren). Där värdet
+// fortsätter åt samma håll efter en nyckel går det igenom den utan att stanna; där det vänder, står kvar och i
+// klippets båda ändar står det still, med samma mjuka in och ut som förut. Kurvan är monoton, så den går aldrig
+// förbi en nyckel. Förut började och slutade varje sträcka stilla: huvudet, kroppen, brynen och blicken
+// stannade upp en bråkdels sekund vid varje nyckel mitt i en rörelse, som en docka (ändrat 2026-11-16).
+const sparLut = (k, j) => {
+  if (j <= 0 || j >= k.length - 1) return 0;
+  const h0 = k[j][0] - k[j - 1][0];
+  const h1 = k[j + 1][0] - k[j][0];
+  if (h0 < 1e-6 || h1 < 1e-6) return 0;
+  const d0 = (k[j][1] - k[j - 1][1]) / h0;
+  const d1 = (k[j + 1][1] - k[j][1]) / h1;
+  if (d0 * d1 <= 0) return 0;
+  return (3 * (h0 + h1)) / ((2 * h1 + h0) / d0 + (h1 + 2 * h0) / d1);
+};
 const spar = (k, t) => {
   if (t <= k[0][0]) return k[0][1];
-  for (let i = 1; i < k.length; i++) if (t <= k[i][0]) return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * ss(k[i - 1][0], k[i][0], t);
-  return k[k.length - 1][1];
+  const n = k.length - 1;
+  if (t >= k[n][0]) return k[n][1];
+  let i = 1;
+  while (t > k[i][0]) i++;
+  const a = k[i - 1];
+  const b = k[i];
+  const h = b[0] - a[0];
+  if (h < 1e-6) return b[1];
+  const x = (t - a[0]) / h;
+  const x2 = x * x;
+  const x3 = x2 * x;
+  return (2 * x3 - 3 * x2 + 1) * a[1] + (3 * x2 - 2 * x3) * b[1] + h * ((x3 - 2 * x2 + x) * sparLut(k, i - 1) + (x3 - x2) * sparLut(k, i));
 };
 
 // Tiderna när han skriver på din kupong (s, i klippets tid): armen till pennan och greppet, pennan till
@@ -508,6 +533,14 @@ export const KLIPP = {
   skal: { fran: 150, till: 158.5, vila: 0, grupp: 'kaffe', ned: [[7.25, 0.8]] },
   // kaffet: lillfingret ut, näsan i vädret och två små läppjanden, som en vinprovare
   fint: { fran: 160, till: 168.8, vila: 0, grupp: 'kaffe', ned: [[8.1, 0.18]] },
+  // kaffet: koppen vid bröstet medan han tänker och tittar bort, och när han kommer på det en klunk på saken
+  tanke: { fran: 1100, till: 1110.4, vila: 0, grupp: 'kaffe', ned: [[9.75, 0.45]] },
+  // kaffet har kallnat: en grimas, en misstänksam blick ned i koppen, en axelryckning, och han dricker ändå
+  kallt: { fran: 1112, till: 1122.6, vila: 0, grupp: 'kaffe', ned: [[9.85, 0.4]], ljud: [[5.0, { typ: 'fnys' }], [5.95, { typ: 'anda', sort: 'pust', ms: 600 }]] },
+  // kaffet: koppen stannar halvvägs, och han pekar med den mot en: visst är det så? En blinkning, och klunken
+  halvvags: { fran: 1125, till: 1133.8, vila: 0, grupp: 'kaffe', ned: [[8.0, 0.35]] },
+  // kaffet: skålar mot någon längs baren, och dricker
+  halsa: { fran: 1136, till: 1145, vila: 0, grupp: 'kaffe', ned: [[8.2, 0.35]] },
   // Han njuter av cigarren (cigarrKlipp nedan), med cigarren ur askkoppen och tillbaka:
   // ett långt bloss med slutna ögon, lutar sig bakåt och blåser ut röken länge, ah, och tittar nöjt på den
   lang: { fran: 175, till: 189.8, vila: 0, skynda: true, grupp: 'cigarr' },
@@ -1567,7 +1600,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     return box;
   }
   // ---------- rörelserna ----------
+  // (axlarna: AXEL i rum-hasse-arm.js) Armbågen räknas från SA, men den högra ärmen sitter fast i SA_SYN, 48
+  // bildpunkter längre in, så att ärmens ytterkant fortsätter fotots kant nedanför axeln. När ärmen satt fast i
+  // SA, på fotots kant, hängde halva ärmen utanför fotots axel, och axeln blev bred och fyrkantig som en axelvadd
+  // (ändrat 2026-11-16). Armbågarna i klippen är desamma som förut: med hela axeln flyttad in blev de andra.
   const SA = W_(352, 792, -52);
+  const SA_SYN = W_(400, 792, -52);
   const SB = W_(987, 800, 8);
   const LA = ARM.LA;
   const LB = ARM.LB;
@@ -2257,6 +2295,107 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         lill: [[1.2, 0], [1.9, 1], [7.7, 1], [8.1, 0]],
         arm: [[1.2, 0], [2.0, 0.55], [7.5, 0.55], [8.1, 0]],
         ...grepp(8.1),
+      },
+    },
+    // Han tänker: koppen vid bröstet, och han tittar bort ut i affären och snurrar den sakta, med rynkad
+    // panna och munnen i en trut. Så kommer han på det: brynen åker upp, ett leende och två nickar, och han
+    // tar en klunk på saken och ställer ned koppen.
+    tanke: {
+      k: {
+        dricker: [[7.05, 0], [7.35, 0.9], [8.05, 0.9], [8.3, 0]],
+        yaw: [[1.5, 0], [2.4, 0.45], [5.0, 0.45], [5.45, 0.08], [6.6, 0.05], [7.2, 0]],
+        pitch: [[1.4, 0], [2.4, -0.25], [4.9, -0.2], [5.15, 0.05], [5.35, 0.5], [5.6, 0.05], [5.8, 0.45], [6.05, 0], [7.0, 0], [7.6, -0.4], [8.1, -0.45], [8.6, 0.1], [9.4, 0]],
+        roll: [[2.0, 0], [2.6, 0.06], [4.9, 0.06], [5.3, 0]],
+        lut: [[1.5, 0], [2.4, -0.02], [4.9, -0.02], [5.4, 0.02], [6.0, 0]],
+        vrid: [[1.5, 0], [2.4, 0.03], [4.9, 0.03], [5.5, 0]],
+        blickX: [[1.6, 0], [1.9, 4.5], [4.9, 4.5], [5.2, 0]],
+        blickY: [[1.6, 0], [1.9, -1], [4.9, -1], [5.2, 0]],
+        brynX: [[2.0, 0], [2.6, -0.4], [4.8, -0.45], [5.05, 0.9], [5.8, 0.7], [6.6, 0.2], [7.4, 0]],
+        brynY: [[2.0, 0], [2.6, -0.6], [4.8, -0.65], [5.05, 0.45], [5.8, 0.35], [6.6, 0.1], [7.4, 0]],
+        kis: [[2.2, 0], [2.7, 0.3], [4.8, 0.3], [5.05, 0]],
+        rund: [[2.4, 0], [2.8, 0.35], [4.8, 0.35], [5.0, 0]],
+        blund: [[7.3, 0], [7.5, 0.7], [8.1, 0.7], [8.4, 0]],
+        le: [[4.9, 0], [5.3, 0.5], [6.4, 0.45], [7.0, 0.15], [8.6, 0.1], [9.0, 0.4], [10.0, 0.2]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [2.0, 'brost', 30], [6.6, 'brost'], [7.1, 'mun', 20], [8.1, 'mun'], [8.5, 'ah'], [9.2, 'ah'], [9.75, 'fat', 15]],
+        snurr: [[2.3, 0], [2.7, 0.45], [4.6, 0.45], [4.9, 0]],
+        tipp: [[7.1, 0], [7.4, 0.5], [8.0, 0.6], [8.3, 0]],
+        ...grepp(9.75),
+      },
+    },
+    // Kaffet har kallnat: han tar en klunk och stannar med koppen vid läppen, tittar upp på en och
+    // grimaserar. Han sänker den och tittar misstänksamt ned i den, fnyser, rycker på axlarna med en pust,
+    // och dricker vidare ändå, med ett snett leende: det går an.
+    kallt: {
+      k: {
+        dricker: [[2.0, 0], [2.3, 0.8], [2.6, 0.8], [2.75, 0.3], [3.3, 0.3], [3.5, 0], [7.1, 0], [7.45, 0.9], [8.1, 0.9], [8.35, 0]],
+        yaw: [[3.6, 0], [4.1, 0.2], [5.3, 0.2], [5.7, -0.1], [6.6, -0.05], [7.2, 0]],
+        pitch: [[2.7, 0], [3.5, 0], [4.1, 1.4], [5.3, 1.4], [5.6, 0.3], [6.6, 0.2], [7.2, 0], [7.7, -0.3], [8.2, -0.35], [8.7, 0.1], [9.5, 0]],
+        roll: [[5.5, 0], [5.85, 0.07], [6.3, 0.06], [6.7, 0]],
+        lut: [[3.5, 0], [4.1, 0.04], [5.4, 0.04], [5.8, 0], [7.6, -0.03], [8.2, -0.03], [8.7, 0]],
+        axV: [[5.5, 0], [5.85, 30], [6.25, 28], [6.6, 0]],
+        axH: [[5.5, 0], [5.85, 30], [6.25, 28], [6.6, 0]],
+        blickY: [[2.6, 0], [2.75, -2.5], [3.4, -2.5], [3.6, 0], [4.0, 4], [5.3, 4], [5.5, 0]],
+        brynX: [[2.65, 0], [2.85, -0.5], [3.4, -0.55], [3.8, 0.1], [4.2, 0.6], [4.8, 0.5], [4.95, -0.3], [5.4, -0.35], [5.8, 0.6], [6.6, 0.5], [7.2, 0], [8.6, 0], [9.0, 0.4], [9.8, 0]],
+        brynY: [[2.65, 0], [2.85, -0.8], [3.4, -0.85], [3.8, 0], [4.2, 0.4], [4.8, 0.3], [4.95, -0.5], [5.4, -0.55], [5.8, 0.3], [6.6, 0.25], [7.2, 0], [8.6, 0], [9.0, 0.2], [9.8, 0]],
+        kis: [[2.65, 0], [2.85, 0.6], [3.4, 0.6], [3.7, 0], [4.9, 0], [5.05, 0.35], [5.4, 0.35], [5.6, 0]],
+        stel: [[2.65, 0], [2.8, 1], [3.6, 1], [4.0, 0.6], [5.5, 0.6], [5.8, 0]],
+        munn: [[2.7, 0], [2.85, 0.05], [3.3, 0.05], [3.45, 0]],
+        rund: [[5.85, 0], [6.0, 0.4], [6.4, 0.3], [6.6, 0]],
+        blund: [[7.4, 0], [7.55, 0.6], [8.1, 0.6], [8.35, 0]],
+        le: [[5.7, 0], [6.0, 0.35], [6.6, 0.3], [7.1, 0.1], [8.6, 0], [9.0, 0.5], [9.8, 0.4], [10.4, 0.15]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [2.0, 'mun', 60], [3.4, 'mun'], [3.9, 'brost', 10], [6.6, 'brost'], [7.15, 'mun', 15], [8.2, 'mun'], [8.6, 'ah'], [9.3, 'ah'], [9.85, 'fat', 15]],
+        tipp: [[2.0, 0], [2.35, 0.5], [2.6, 0.55], [2.75, 0.2], [3.35, 0.2], [3.5, 0], [7.15, 0], [7.5, 0.6], [8.1, 0.65], [8.35, 0]],
+        ...grepp(9.85),
+      },
+    },
+    // Halvvägs till munnen kommer han på något: koppen stannar under hakan, brynen åker upp, och han pekar
+    // med koppen mot en, två små knyck med den och två nickar: visst är det så? Ett brett leende och en
+    // blinkning, och sedan tar han klunken och ställer ned den.
+    halvvags: {
+      k: {
+        dricker: [[4.85, 0], [5.15, 0.9], [5.9, 0.9], [6.15, 0]],
+        pitch: [[1.6, 0], [2.15, -0.15], [2.6, -0.2], [2.85, -0.25], [3.0, 0.4], [3.18, -0.15], [3.35, 0.45], [3.6, 0], [4.3, 0], [4.8, -0.3], [5.8, -0.4], [6.3, 0.1], [7.0, 0]],
+        yaw: [[2.2, 0], [2.6, -0.1], [3.6, -0.1], [4.4, 0]],
+        lut: [[2.0, 0], [2.6, 0.05], [3.6, 0.05], [4.3, 0]],
+        brynX: [[1.9, 0], [2.15, 1.0], [3.4, 0.9], [3.8, 0.5], [4.6, 0]],
+        brynY: [[1.9, 0], [2.15, 0.5], [3.4, 0.45], [3.8, 0.2], [4.6, 0]],
+        munn: [[2.1, 0], [2.2, 0.08], [2.35, 0]],
+        kis: [[3.4, 0], [3.7, 0.3], [4.3, 0.2], [4.6, 0]],
+        vink: [[3.65, 0], [3.75, 1], [3.95, 1], [4.05, 0]],
+        blund: [[5.1, 0], [5.3, 0.7], [5.9, 0.7], [6.2, 0]],
+        le: [[2.2, 0], [2.6, 0.3], [3.4, 0.4], [3.7, 0.75], [4.4, 0.6], [4.9, 0.2], [6.4, 0.2], [6.8, 0.5], [8.2, 0.3]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [1.85, 'hake', 50], [2.15, 'hake'], [2.6, 'fram'], [2.95, 'fram', 22], [3.3, 'fram', 22], [4.3, 'fram'], [4.85, 'mun', 20], [6.0, 'mun'], [6.4, 'ah'], [7.4, 'ah'], [8.0, 'fat', 15]],
+        tipp: [[4.85, 0], [5.2, 0.55], [5.8, 0.6], [6.1, 0]],
+        arm: [[2.2, 0], [2.6, 0.3], [4.3, 0.3], [4.8, 0]],
+        ...grepp(8.0),
+      },
+    },
+    // Skål mot baren: med koppen vid bröstet får han syn på någon längs baren, vänder sig dit med brynen uppe
+    // och lyfter koppen mot honom med en nick och ett leende, och vänder sig sedan tillbaka till en och dricker.
+    halsa: {
+      k: {
+        dricker: [[5.25, 0], [5.55, 0.9], [6.3, 0.9], [6.55, 0]],
+        yaw: [[1.6, 0], [2.0, 0], [2.4, -0.45], [4.3, -0.45], [4.9, 0]],
+        pitch: [[1.9, 0], [2.4, -0.2], [3.2, -0.2], [3.4, 0.35], [3.7, -0.15], [4.3, -0.1], [4.9, 0], [5.3, -0.3], [6.3, -0.4], [6.8, 0.05], [7.6, 0]],
+        vrid: [[1.9, 0], [2.6, -0.04], [4.3, -0.04], [4.9, 0]],
+        blickX: [[1.9, 0], [2.05, -5], [2.5, -3.5], [4.3, -3.5], [4.5, 0]],
+        brynX: [[2.1, 0], [2.4, 0.9], [3.6, 0.8], [4.3, 0.2], [4.8, 0]],
+        brynY: [[2.1, 0], [2.4, 0.6], [3.6, 0.5], [4.3, 0.1], [4.8, 0]],
+        munn: [[3.3, 0], [3.4, 0.06], [3.55, 0]],
+        blund: [[5.5, 0], [5.7, 0.6], [6.3, 0.6], [6.6, 0]],
+        le: [[2.3, 0], [2.7, 0.55], [4.0, 0.5], [4.6, 0.25], [6.5, 0.2], [7.0, 0.5], [8.4, 0.25]],
+      },
+      kaffe: {
+        kk: [[1.1, 'fat'], [1.9, 'brost', 30], [2.3, 'brost'], [2.9, 'halsa', 20], [3.15, 'halsa'], [3.45, 'halsa', 30], [4.2, 'halsa'], [4.8, 'brost'], [5.3, 'mun', 15], [6.4, 'mun'], [6.8, 'ah'], [7.6, 'ah'], [8.2, 'fat', 15]],
+        tipp: [[5.3, 0], [5.6, 0.55], [6.3, 0.6], [6.6, 0]],
+        arm: [[2.3, 0], [2.9, 0.25], [4.2, 0.25], [4.8, 0]],
+        ...grepp(8.2),
       },
     },
   };
@@ -3602,6 +3741,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   const HOFT = new THREE.Vector3(0, -413, 60);
   const h1 = v();
   const sa = v();
+  const saSyn = v();
   const sb = v();
 
   // Handens form i ett klipp (fA, fB): fingrarna isär (spar), tummen ut (tumme), och e0–e8 som extra
@@ -3661,15 +3801,18 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // bara sitter: samma klocka ger alltid samma bild (hash), men inget mönster går igen.
   const hash = (x) => { const s = Math.sin(x * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
   // Han blinkar ungefär var fjärde sekund, någon gång mellan 0,6 och 7,8 s isär och ibland två gånger
-  // i rad.
+  // i rad. Som en riktig blinkning: locket faller fort (70 ms) och går upp långsammare (ungefär 180 ms), och
+  // ibland går det inte ända ned. Förut lika fort ned som upp, i raka linjer, alltid hela vägen (ändrat 2026-11-16).
   const BLINK = 4.2;
+  const blink = (d, upp, djup) => (d < 0 ? 0 : d < 0.07 ? djup * ss(0, 0.07, d) : djup * (1 - ss(0.07, 0.07 + upp, d)));
   function blinkar(n) {
     const k = Math.floor(n / BLINK);
     let b = 0;
     for (let j = k - 1; j <= k; j++) {
       const d = n - (j * BLINK + hash(j * 7.3) * (BLINK - 0.6));
-      b = Math.max(b, 1 - clamp(Math.abs(d - 0.085) / 0.085));
-      if (hash(j * 3.7 + 1) < 0.22) b = Math.max(b, 1 - clamp(Math.abs(d - 0.4) / 0.085));
+      const upp = 0.15 + 0.08 * hash(j * 5.9 + 2);
+      b = Math.max(b, blink(d, upp, hash(j * 4.3 + 3) < 0.15 ? 0.7 : 1));
+      if (hash(j * 3.7 + 1) < 0.22) b = Math.max(b, blink(d - 0.38, upp, 1));
     }
     return b;
   }
@@ -3688,9 +3831,47 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     blickUt[1] = a[1] + (b[1] - a[1]) * f;
     return blickUt;
   }
-  // Huvudet driver långsamt (svängningar som inte går jämnt ut), och andningen byter takt och djup.
+  // Huvudet driver långsamt (svängningar som inte går jämnt ut), och andningen byter takt och djup. Ett andetag
+  // är inte en våg: in går fortare än ut, och efter utandningen vilar bröstet en stund (andetag, −1 … 1 över
+  // ett varv). Axlarna följer med lite, strax efter bröstet (rita). Förut gick bröstet upp och ned i en ren
+  // sinusvåg, och axlarna stod still (ändrat 2026-11-16).
   const drift = (n, a, b, c) => 0.6 * Math.sin(n * a) + 0.4 * Math.sin(n * b + 2) + 0.25 * Math.sin(n * c + 1);
-  const andning = (n) => 7 * (0.85 + 0.2 * Math.sin(n * 0.17 + 1)) * Math.sin(n * 1.45 + 0.9 * Math.sin(n * 0.21));
+  const andetag = (f) => { const u = f - Math.floor(f); return u < 0.36 ? 2 * ss(0, 0.36, u) - 1 : 1 - 2 * ss(0.36, 0.9, u); };
+  const andning = (n) => 7 * (0.85 + 0.2 * Math.sin(n * 0.17 + 1)) * andetag((n * 1.45 + 0.9 * Math.sin(n * 0.21)) / (2 * Math.PI));
+  // Skrattet i stötar, ha-ha-ha, ungefär fyra i sekunden men ojämnt, olika starka och ibland ett uppehåll när
+  // han drar efter andan; varje stöt kommer fort och klingar av (0–1). Förut skakade han i en jämn sinusvåg,
+  // axlarna, huvudet och händerna i samma takt och munnen i en annan (ändrat 2026-11-16).
+  const HA = 0.24;
+  function haha(n) {
+    const k = Math.floor(n / HA);
+    let v = 0;
+    for (let j = k - 1; j <= k; j++) {
+      if (hash(j * 6.7 + 4) < 0.13) continue;
+      const d = n - (j * HA + 0.07 * hash(j * 2.3 + 5));
+      v = Math.max(v, (0.55 + 0.45 * hash(j * 8.1 + 6)) * ss(0, 0.045, d) * (1 - ss(0.06, 0.2, d)));
+    }
+    return v;
+  }
+  // Stavelserna när han pratar (0–1, munnens öppning): ungefär fem i sekunden, olika långa och olika öppna;
+  // mellan dem går munnen mer eller mindre ihop (helt vid m, b och p), och mellan orden blir det korta
+  // uppehåll. Ibland är vokalen rundad (o, u, å: STAV.rund). Förut gick käken upp och ned i en jämn takt (|sin|,
+  // drygt två gånger i sekunden) och läpparna rundades i en egen långsam våg, som en docka (ändrat 2026-11-16).
+  const STAV = { L: 0.2, oppen: 0, rund: 0 };
+  const stavStart = (j) => j * STAV.L + 0.08 * hash(j * 1.7 + 9);
+  const stavOppen = (j) => (hash(j * 3.1 + 7) < 0.13 ? 0 : 0.3 + 0.7 * hash(j * 2.9 + 8));
+  // (mellan stavelse j och j + 1: hur mycket munnen går ihop, 0 = helt)
+  const stavMellan = (j) => Math.min(stavOppen(j), stavOppen(j + 1)) * (hash(j * 4.7 + 3) < 0.18 ? 0 : 0.25 + 0.35 * hash(j * 5.3 + 1));
+  function stavelse(n) {
+    let j = Math.floor(n / STAV.L);
+    if (n < stavStart(j)) j--;
+    const a = stavStart(j);
+    const b = stavStart(j + 1);
+    const u = (n - a) / (b - a);
+    const o = stavOppen(j);
+    STAV.oppen = u < 0.5 ? stavMellan(j - 1) + (o - stavMellan(j - 1)) * ss(0, 0.5, u) : o + (stavMellan(j) - o) * ss(0.5, 1, u);
+    STAV.rund = o > 0 && hash(j * 6.1 + 2) < 0.3 ? (0.5 + 0.5 * hash(j * 7.9 + 4)) * Math.sin(Math.PI * u) : 0;
+    return STAV;
+  }
   // Huvudet medan han pratar: förut i jämna vågor (en nick i sekunden, huvudet fram och tillbaka och brynen upp
   // och ned i var sin takt), som en metronom. Nu i slag som talet: huvudet går till ett nytt läge på en dryg
   // kvarts sekund och stannar där till nästa slag, ungefär var åttonde tiondels sekund; ungefär vart fjärde är ett
@@ -3794,24 +3975,44 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     fA.crossVectors(F, P).negate().normalize();
     return pose(ut, H.clone().addScaledVector(fA, -GREPP.x).addScaledVector(F, GREPP.y).addScaledVector(P, GREPP.z), fA, P);
   }
-  // handen vriden runt cigarrens längd (grader), med cigarren kvar där den är
-  const vridQ = new THREE.Quaternion();
-  const vrid = (ut, grad) => { ut.q.multiply(vridQ.setFromAxisAngle(V3(0, 1, 0), grad * DEG)); return ut; };
-  // (hall vriden 22° så att knogarna och fingrarnas ryggar vetter mot en och fingrarna ligger över
-  // cigarren, se bara 10°, annars for armbågen fort därifrån till munnen, och vift 25° åt andra hållet
-  // så att han håller den från sidan: förut såg man in i handflatan, och fingrarna krokade över
-  // cigarren bakifrån med naglarna mot en, som en klo)
+  // handledens vila: lite bakåtböjd (BAK) och lite mot lillfingret (ULNAR); naturlig nedan räknar från den
+  const VRIST_VILA = { BAK: 12 * DEG, ULNAR: 6 * DEG };
+  // Lägen där armen vilar (2026-11-16): armbågen E (på disken), underarmen U därifrån, och handleden i sin vila
+  // (VRIST_VILA), så att armbågen hamnar där. Handen vrids runt underarmen tills cigarren pekar så nära Ad som
+  // det går: cigarren ligger tvärs över fingrarna, längs tummen, så den del av Ad som går längs underarmen kan
+  // den inte peka, utan att handleden knäcks åt sidan. (Förut gavs handen och cigarren och armbågen fick hamna
+  // där handleden blev rak: i hall och se låg handen platt ovanpå cigarren, med handryggen mot en, och det går
+  // bara med underarmen vågrät, så armbågen stod ute i brösthöjd som en vinge. I visa och vift likadant.)
+  const aA = v();
+  const aP = v();
+  const aT = v();
+  function iArmen(E, U, Ad) {
+    U = U.clone().normalize();
+    const H = E.clone().addScaledVector(U, LB + 26);
+    const F = U.clone();
+    for (let i = 0; i < 4; i++) {
+      aA.copy(Ad).addScaledVector(F, -Ad.dot(F)).normalize();
+      aP.crossVectors(F, aA);
+      aT.crossVectors(F, aP);
+      F.copy(U).addScaledVector(aP, -Math.sin(VRIST_VILA.BAK)).addScaledVector(aT, -Math.sin(VRIST_VILA.ULNAR)).normalize();
+    }
+    aA.copy(Ad).addScaledVector(F, -Ad.dot(F)).normalize();
+    return fraHand(nyPose(), H, F, aP.crossVectors(F, aA));
+  }
+  // (armbågen på disken till höger om axeln, där han vilar armen med cigarren uppe)
+  const E_HALL = V3(-407, -200, 227);
   const PV = {
     vila: pose(nyPose(), HUV_C.clone().addScaledVector(A_VILA, SG), A_VILA, P_VILA),
     // armbågen på disken och handen uppe vid axeln, cigarren tvärs över och glöden utåt och lite uppåt
-    hall: vrid(fraHand(nyPose(), V3(-310, 165, 540), V3(0.4, 0.82, 0.42).normalize(), V3(0.25, -0.45, 0.86).normalize()), -22),
-    // lite högre och vriden, glöden uppåt: han tittar på den
-    se: vrid(fraHand(nyPose(), V3(-290, 215, 560), V3(0.3, 0.85, 0.43).normalize(), V3(0.1, -0.48, 0.87).normalize()), -10),
-    // framför bröstet under hakan, snett uppåt, så att han ser ringen när han beundrar den
-    visa: pose(nyPose(), V3(10, 310, 790), V3(-0.6, 0.6, 0.5).normalize(), V3(0.2, -0.5, 0.85)),
-    // fram mot en, glöden mot en (vift2 lite högre: knycken)
-    vift: vrid(pose(nyPose(), V3(-160, 180, 800), V3(-0.55, 0.25, 0.8).normalize(), V3(0.3, -0.9, 0.2)), 25),
-    vift2: vrid(pose(nyPose(), V3(-150, 215, 830), V3(-0.5, 0.4, 0.77).normalize(), V3(0.3, -0.85, 0.3)), 25),
+    hall: iArmen(E_HALL, V3(0.12, 0.8, 0.59), V3(-0.9, 0.3, -0.3)),
+    // lite högre, glöden uppåt: han tittar på den
+    se: iArmen(E_HALL, V3(0.15, 0.88, 0.45), V3(-0.55, 0.6, -0.6)),
+    // framför bröstet under hakan, snett uppåt och utåt, så att han ser ringen när han beundrar den; armbågen
+    // på disken framför axeln
+    visa: iArmen(V3(-231, -200, 254), V3(0.29, 0.76, 0.58), V3(-0.7, 0.6, -0.2)),
+    // underarmen upp från disken och glöden mot en (vift2 lite högre: knycken)
+    vift: iArmen(V3(-340, -200, 260), V3(0.1, 0.8, 0.59), V3(-0.35, -0.45, 0.82)),
+    vift2: iArmen(V3(-340, -200, 260), V3(0.1, 0.86, 0.5), V3(-0.3, -0.3, 0.9)),
   };
   // Över askkoppen, med glöden över skålen och cigarren snett nedåt ut från handen; han knackar av
   // askan med ett kort ryck nedåt (knackN).
@@ -3928,7 +4129,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // TUM mot tummen och LILL mot lillfingret. POL: hur gärna armbågen ligger åt pol, HOJD: hur ogärna den
   // går upp mot axelns höjd, från HOJD0 under den, och INN: hur ogärna den går in framför magen, från
   // INN0 innanför axeln, båda i överarmens längder)
-  const NAT = { BAK: 12 * DEG, BOJ: 34 * DEG, BAKAT: 40 * DEG, ULNAR: 6 * DEG, TUM: 14 * DEG, LILL: 26 * DEG, POL: 0.5, HOJD: 14, HOJD0: 0.3, INN: 10, INN0: 0.35, N: 36 };
+  const NAT = { BAK: VRIST_VILA.BAK, BOJ: 34 * DEG, BAKAT: 40 * DEG, ULNAR: VRIST_VILA.ULNAR, TUM: 14 * DEG, LILL: 26 * DEG, POL: 0.5, HOJD: 14, HOJD0: 0.3, INN: 10, INN0: 0.35, N: 36 };
   const nD = v();
   const nC = v();
   const n1 = v();
@@ -4989,7 +5190,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // grepp hela vägen, fingrarna mot koppen, pekfingret genom örat, tummen ovanpå och handflatan mot
   // honom. Lägena: på fatet; vid läppen, lite lägre (lyft) och under näsan i huvudets mått, så att
   // koppen följer med när han lutar huvudet bakåt; under hakan, en bit ned från munnen (ah), framför
-  // bröstet och upplyft mot en (skal) i kroppens. Klippets kaffe: lägena (kk), lutningen mot läppen
+  // bröstet, upplyft mot en (skal), framhållen mot en (fram) och lyft mot baren (halsa) i kroppens.
+  // Klippets kaffe: lägena (kk; båge mellan två lika lägen är ett litet knyck uppåt), lutningen mot läppen
   // (tipp, radianer: koppen vrids runt kanten mot hans underläpp, så att den ligger kvar där medan han
   // dricker), lillfingret ut (lill), armbågen ut (arm), koppen i små cirklar (snurr), när armen går
   // dit och tillbaka (mot), fingrarna (krok) och ångan (rok).
@@ -5037,6 +5239,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     ah: vidLappen(-150, 130, 0.15),
     brost: { p: V3(70, -10, 480), A: V3(0, 1, -0.3), H: V3(1, 0, 0.45) },
     skal: { p: V3(250, 330, 620), A: V3(0.05, 1, 0.3), H: V3(1, 0, -0.3) },
+    fram: { p: V3(170, 230, 690), A: V3(0, 1, 0.15), H: V3(1, 0, 0.2) },
+    halsa: { p: V3(20, 300, 650), A: V3(-0.1, 1, 0.05), H: V3(1, 0, -0.2) },
   };
   const KP = { fat: koppPose(nyPose(), KUP, V3(0, 1, 0), V3(Math.cos(0.5), 0, Math.sin(0.5))) };
   for (const n of [...Object.keys(KHUV), ...Object.keys(KKROPP)]) KP[n] = nyPose();
@@ -5271,6 +5475,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     const st = v && v.styrka ? v.styrka : 1;
     const kan = (x) => spar(HUV[x], t) + d(x) * (st !== 1 && STYRS.has(x) ? st : 1);
     const skratt = ss(2.75, 3.05, t) * (1 - ss(4.25, 4.6, t));
+    // (skrattet i stötar som avtar, haha: axlarna och munnen först, huvudet och händerna strax efter)
+    const avtar = skratt * (1 - 0.4 * ss(3.3, 4.4, t));
+    const ha = avtar > 0.001 ? avtar * haha(n) : 0;
+    const haSen = avtar > 0.001 ? avtar * haha(n - 0.05) : 0;
     const talar = Math.max(tal, ss(5.55, 5.7, t) * (1 - ss(9.4, 9.6, t)));
     const dricker = d('dricker');
     // cigarren: i munnen, och när han blåser ut
@@ -5281,7 +5489,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // (talet i slag, talSlag)
     const ts = talar > 0.001 ? talSlag(n) : TALS;
     const yaw = YAW0 + 0.22 * (kan('yaw') + 0.1 * drift(n, 0.8, 0.37, 1.33) * (1 - iMun * 0.6) + talar * 0.24 * ts.yaw);
-    const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * (0.12 * ts.pitch + 0.34 * ts.nick) + skratt * 0.16 * Math.sin(n * 15) - dricker * 1.15);
+    const pitch = 0.17 * (kan('pitch') + 0.07 * drift(n, 0.53, 0.23, 0.97) + talar * (0.12 * ts.pitch + 0.34 * ts.nick) + 0.3 * (haSen - 0.3 * avtar) - dricker * 1.15);
     nick = pitch;
     const roll = -(kan('roll') + 0.012 * drift(n, 0.29, 0.61, 0.13) + talar * 0.03 * ts.roll);
     eu.set(pitch, yaw, roll, 'YXZ');
@@ -5296,10 +5504,12 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     h1.copy(HOFT).applyMatrix4(mr);
     mk.setPosition(HOFT.x - h1.x, HOFT.y - h1.y, HOFT.z - h1.z);
     U.uKropp.value.copy(mk);
-    const axV = kan('axV') + skratt * 5 * Math.sin(n * 15);
-    const axH = kan('axH') + skratt * 5 * Math.sin(n * 15);
+    // (axlarna följer andningen lite, strax efter bröstet)
+    const ax = 0.3 * andning(n - 0.2);
+    const axV = kan('axV') + ax + 9 * ha;
+    const axH = kan('axH') + ax + 9 * avtar * haha(n - 0.02);
     U.uAx.value.set(axV, axH);
-    U.uAndas.value = andning(n) + d('andas') + skratt * 5 * Math.sin(n * 15);
+    U.uAndas.value = andning(n) + d('andas') - 6 * (ha - 0.3 * avtar);
     const lyft = talar * 0.38 * ts.bryn;
     // (han blinkar med sitt högra öga, och det brynet går ned lite)
     const vink = d('vink');
@@ -5308,25 +5518,32 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // (nöjd, utom när brynen dras ned)
     const allvar = clamp(-(d('brynX') + d('brynY')) * 0.7);
     U.le.value = Math.max((NOJD + NOJD_TAL * talar) * (1 - allvar) * (1 - d('stel')), skratt * 0.85, 0.85 * ss(10, 10.5, t) * (1 - ss(11.6, 12.4, t)), d('le'));
-    // talet: stavelser med små pauser, ibland rundare läppar; läpparna skiljs åt hela tiden han pratar och
-    // öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
-    const stav = Math.abs(Math.sin(n * 7.3)) * (0.42 + 0.58 * ss(-0.35, 0.5, Math.sin(n * 2.3 + 0.7))) * (0.72 + 0.28 * Math.sin(n * 17.3));
+    // talet: stavelser med små pauser, ibland rundare läppar (stavelse); läpparna skiljs åt hela tiden han pratar
+    // och öppnas upp till en dryg centimeter (förut knappt en halv, så att han såg ut att mumla)
+    const stav = stavelse(n);
     const talMun = (mun === null ? talar : mun) * (1 - dricker) * (1 - Math.max(iMun, blaser));
     // läpparna om cigarren, en pust mellan blossen och ett o när han blåser ut
     const puff = cc ? spar(cc.pust, t) : 0;
-    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav), skratt * (0.44 + 0.08 * Math.sin(n * 14)), ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
-    U.rund.value = talMun * Math.max(0, Math.sin(n * 3.1 + 1.3)) * 0.8;
+    U.munn.value = Math.max(talMun * (0.06 + 0.8 * stav.oppen), skratt * 0.36 + 0.16 * ha, ss(4.9, 5.0, t) * (1 - ss(5.0, 5.25, t)) * 0.72, iMun * (0.15 + 0.12 * puff), blaser * (0.27 + 0.05 * Math.sin(n * 7)), d('munn'));
+    U.rund.value = talMun * stav.rund * 0.8;
     U.kis.value = Math.max(skratt * 0.7, U.le.value * 0.5, d('kis'));
     // blinkningarna och blicken som flyttar sig lite (blinkar, sakkader)
     const bl = blinkar(n);
     const sk = sakkader(n);
     U.rund.value = Math.max(U.rund.value, dricker * 0.7, iMun * 0.85, blaser, d('rund'));
-    U.blund.value = Math.max(dricker * 0.82, skratt * 0.3, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'));
-    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], d('blickY') + sk[1]);
+    // (övre locket följer blicken nedåt, som hos alla: förut stod ögonen vidöppna när han tittade ned, och det
+    // vita syntes ovanför irisen, ändrat 2026-11-16)
+    const blickY = d('blickY') + sk[1];
+    U.blund.value = Math.max(dricker * 0.82, skratt * 0.3, bl, ss(10.7, 10.9, t) * (1 - ss(11.25, 11.45, t)), d('blund'), clamp(blickY * 0.05, 0, 0.35));
+    U.blick.value.set(4 * clamp((yaw - YAW0) / 0.2, -1, 1) + d('blickX') + sk[0], blickY);
     sa.copy(SA);
     sa.y += axV;
     sa.x -= axV * 0.25;
     sa.applyMatrix4(mk);
+    saSyn.copy(SA_SYN);
+    saSyn.y += axV;
+    saSyn.x -= axV * 0.25;
+    saSyn.applyMatrix4(mk);
     sb.copy(SB);
     sb.y += axH;
     sb.x += axH * 0.25;
@@ -5399,8 +5616,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       a.w.x += k * 10;
       a.F.z += k * 0.25;
     }
-    a.w.y += skratt * 7 * Math.sin(n * 15);
-    b.w.y += skratt * 7 * Math.sin(n * 15 + 1);
+    a.w.y += 12 * (haSen - 0.3 * avtar);
+    b.w.y += 12 * avtar * (haha(n - 0.08) - 0.3);
     const fA = kl && kl.fA;
     const fB = kl && kl.fB;
     if (fA) svang(fA, t, a);
@@ -5417,9 +5634,9 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // (fingrarna samlade och tummen i vilan, utom när handen tar något och när han skrattar)
     const vA = (1 - isar) * (1 - bortA);
     const vB = (1 - isar) * (1 - bortB);
-    if (fA) A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, spar(fA.spar, t), spar(fA.tumme, t), handForm(fA, t, exA));
-    else A.satt(sa, E_, Wr_, a.F, a.P, a.krok, a.peka, isar + SAMLA.A * vA, TUMME + (TUMME_VILA.A - TUMME) * vA, trumA);
-    U.uArm.value[0].copy(sa); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
+    if (fA) A.satt(saSyn, E_, Wr_, a.F, a.P, a.krok, a.peka, spar(fA.spar, t), spar(fA.tumme, t), handForm(fA, t, exA));
+    else A.satt(saSyn, E_, Wr_, a.F, a.P, a.krok, a.peka, isar + SAMLA.A * vA, TUMME + (TUMME_VILA.A - TUMME) * vA, trumA);
+    U.uArm.value[0].copy(saSyn); U.uArm.value[1].copy(E_); U.uArm.value[2].copy(Wr_);
     bekvam(sb, b, -1, VILA_B[0], styrB, t, MINNE.B, E_, Wr_);
     if (fB) B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, spar(fB.spar, t), spar(fB.tumme, t), handForm(fB, t, exB));
     else B.satt(sb, E_, Wr_, b.F, b.P, b.krok, b.peka, isar * 0.8 + SAMLA.B * vB, TUMME + (TUMME_VILA.B - TUMME) * vB, trumB);
