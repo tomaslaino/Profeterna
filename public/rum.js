@@ -167,7 +167,7 @@ window.Rum = (() => {
   // ramarna, paketen och disken får samma ljus i 3D (SPOTAR i rum-inredning.js). Färgskiftningen (color-dodge)
   // gör väggen ljusare i sin egen färg, som ljus gör, i stället för att lägga en ljus hinna över den.
   const SPOT = {
-    ur: [1050, 200, 100, 118, 0.5],
+    ur: [1050, 200, 100, 118, 0.7],
     ram: [1050, 372, 150, 190, 1],
     liga: [1492, 369, 104, 150, 0.9],
   };
@@ -1365,36 +1365,6 @@ window.Rum = (() => {
     [805, 870, 560, 230, 0.7],
     [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
   ];
-  // Spotarnas ljusbågar (en spot som lyser snett ned på en vägg ger en båge, ljusast överst): på löpsedlarna
-  // (bara på skivan, SKIVA i rum-affischer.js), ramen och uret, [x, y överst, b, h, styrka, klipp] i scenens mått.
-  // I .rum-warm (ljusKlockan), som spotarnas runda sken på väggen (SPOT).
-  const BAGAR = [[855, 200, 230, 360, 0.75, [762, 226, 948, 540]], [1050, 255, 240, 310, 0.75], [1050, 112, 160, 160, 0.5]];
-  function bage(g, [x, y, w, h, a, klipp], rgb) {
-    if (a < 0.005) return;
-    g.save();
-    if (klipp) {
-      g.beginPath();
-      g.rect(klipp[0], klipp[1], klipp[2] - klipp[0], klipp[3] - klipp[1]);
-      g.clip();
-    }
-    g.translate(x, y);
-    const gr = g.createLinearGradient(0, 0, 0, h);
-    gr.addColorStop(0, `rgba(${rgb}, 0)`);
-    gr.addColorStop(0.1, `rgba(${rgb}, ${a})`);
-    gr.addColorStop(0.55, `rgba(${rgb}, ${a * 0.55})`);
-    gr.addColorStop(1, `rgba(${rgb}, 0)`);
-    g.beginPath();
-    g.moveTo(-w * 0.12, 0);
-    g.bezierCurveTo(-w * 0.32, h * 0.05, -w * 0.5, h * 0.35, -w * 0.5, h * 0.62);
-    g.bezierCurveTo(-w * 0.5, h * 0.9, -w * 0.25, h, 0, h);
-    g.bezierCurveTo(w * 0.25, h, w * 0.5, h * 0.9, w * 0.5, h * 0.62);
-    g.bezierCurveTo(w * 0.5, h * 0.35, w * 0.32, h * 0.05, w * 0.12, 0);
-    g.closePath();
-    if ('filter' in g) g.filter = 'blur(2px)';
-    g.fillStyle = gr;
-    g.fill();
-    g.restore();
-  }
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
   const DUNKEL = [0.1, 0.2, 0.42];
 
@@ -1471,7 +1441,9 @@ window.Rum = (() => {
     // (det som lyser i högtidspyntet, rum-pynt.js, och taklampornas glas, rum-inredning.js)
     const pyntL = R.inr && R.inr.pyntLjus ? R.inr.pyntLjus() : [];
     const lampL = R.inr && R.inr.lampLjus ? R.inr.lampLjus() : [];
-    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal, skarm, pyntL.join(';'), lampL.length].join('|');
+    // (taklamporna är släckta på natten, rum-folk.js)
+    const ng = window.RumFolk && RumFolk.nattGrad ? Math.round(RumFolk.nattGrad() * 20) / 20 : 0;
+    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal, skarm, pyntL.join(';'), lampL.length, ng].join('|');
     if (nyckel === R.ljusNyckel) return;
     R.ljusNyckel = nyckel;
     R.solNu = { s, vpx };
@@ -1513,7 +1485,7 @@ window.Rum = (() => {
         if (sort === 'flakt') rad(q, x, y, 380, 170, '0, 0, 0', 0.85);
         else if (sort === 'spot') rad(q, x, y, 40, 30, '0, 0, 0', 0.6);
       }
-      // (löpsedlarna i spotens ljus, BAGAR)
+      // (löpsedlarna i spotens ljus)
       rad(q, 855, 360, 140, 210, '0, 0, 0', 0.95);
       rad(q, LAMPA_I[0], LAMPA_I[1], 170, 125, '0, 0, 0', 0.9);
       // (spotarnas ljus faller på disken under Tipsligan, med pallarna)
@@ -1538,25 +1510,20 @@ window.Rum = (() => {
     // lampornas färger (i telefonen läggs ljuset ovanpå utan blandningsläge: svagare)
     const f = kvall * (LATT ? 0.55 : 1);
     ljusPa(R.el.querySelector('.rum-warm'), R.smal ? -300 : 0, R.smal ? 1800 : H, 0, W, (g) => {
-      // Taklampornas sken, dag som kväll, men mer på kvällen när det är mörkare runt om: kring kuporna,
-      // på taket och väggen kring fläkten och på gängets bord (skarm ovan), spotarnas glas och deras
-      // ljusbågar (BAGAR)
-      const ml = 0.45 + 0.55 * kvall;
-      for (const [x, y, r, sort] of lampL) {
-        if (sort === 'kupa') {
-          rad(g, x, y + r, r * 5, r * 4, '255, 210, 150', r1(0.4 * ml));
-          rad(g, x, y, r * 2, r * 1.8, '255, 242, 220', r1(0.6 * ml));
-        } else if (sort === 'flakt') {
-          rad(g, x, y - 40, 420, 120, '255, 205, 150', r1(0.2 * ml));
-          rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.16 * ml));
-        } else rad(g, x, y, 34, 26, '255, 236, 200', r1(0.4 * ml));
+      // Takfläktens sken, dag som kväll, men mer på kvällen när det är mörkare runt om, och inte på natten
+      // när lamporna är släckta: på taket och väggen kring fläkten och på gängets bord (skarm ovan). Skenet
+      // kring kuporna och spotarna är i deras egna dukar (rum-inredning.js), som följer med kameran.
+      const ml = (0.45 + 0.55 * kvall) * (1 - ng);
+      for (const [x, y, , sort] of lampL) {
+        if (sort !== 'flakt') continue;
+        rad(g, x, y - 40, 420, 120, '255, 205, 150', r1(0.2 * ml));
+        rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.16 * ml));
       }
       if (skarm) {
         rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.2 * ml));
         rad(g, 575, 520, 260, 100, '255, 224, 175', r1(0.16 * ml));
-        rad(g, 805, 870, 560, 230, '255, 218, 165', r1(0.1));
+        rad(g, 805, 870, 560, 230, '255, 218, 165', r1(0.12 * (1 - ng)));
       }
-      if (lampL.length) for (const b of BAGAR) bage(g, [...b.slice(0, 4), r1(b[4] * ml), b[5]], '255, 216, 165');
       rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
       rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
       rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));

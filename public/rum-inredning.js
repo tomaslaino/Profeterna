@@ -65,7 +65,7 @@ const LAPP = { x: 959.5, y: 503, w: 25.5, h: 45 };
 const BITAR = {
   tak: { plan: 0, box: { x: 0, y: 0, w: 960, h: 240 } },
   // takfläkten och spotskenan (FLAKT, SKENA): rutorna räcker upp i taket som syns i telefonen på höjden
-  flakt: { plan: 0, box: { x: 226, y: -165, w: 600, h: 272 } },
+  flakt: { plan: 0, box: { x: 226, y: -165, w: 600, h: 320 } },
   skena: { plan: 0, box: { x: 296, y: 20, w: 930, h: 66 } },
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
   ur: { plan: 0, box: { x: UR.x - 58, y: UR.y - 58, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
@@ -223,12 +223,14 @@ export async function inredning(el, opt = {}) {
     cam.updateMatrixWorld();
     return cam;
   }
-  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna, och ljusbågarna på uret, ramen och
-  // löpsedlarna): mot orakelramen och mot Tipsligan längst ut på högra väggen, som också lyser på disken under. De finns i alla sakers ljus, så att alla delar samma
+  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot Tipsligan längst ut
+  // på högra väggen, som också lyser på disken under, och från spotskenan (SKENA) på löpsedlarna och uret. De finns i alla sakers ljus, så att alla delar samma
   // grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i bildrutorna.
   const SPOTAR = [
     { fran: [1050, 30, 330], mot: [1050, -372, WZ], styrka: 1.6, vinkel: 0.34 },
     { fran: [880, 30, 470], mot: [WX, -366, 475], styrka: 0.8, vinkel: 0.36 },
+    { fran: [855, -108, 150], mot: [855, -383, -20], styrka: 1.1, vinkel: 0.5 },
+    { fran: [990, -108, 150], mot: [1050, -190, WZ], styrka: 0.9, vinkel: 0.42 },
   ];
   // ljuset som i rummet: taklampan ovanför och framför till vänster, neonen
   // från fönstret, tv:n från hörnet och spotarna
@@ -292,6 +294,8 @@ export async function inredning(el, opt = {}) {
   const TAK = -90;
   // det som lyser (glod: glaskuporna, front: spotarnas glas, ljus: ljuset kring dem i deras egna scener), för natten
   const LAMP = { glod: [], front: [], ljus: [], lyser: [] };
+  // hur släckta taklamporna är (natt nedan)
+  let morkt = 0;
   const MASSING = () => mat('#b8893a', { metalness: 0.85, roughness: 0.32, envMapIntensity: 1.2 });
   const SVART = () => mat('#161412', { metalness: 0.4, roughness: 0.45 });
   const SEG = LATT ? 36 : 64;
@@ -316,8 +320,42 @@ export async function inredning(el, opt = {}) {
     b.scene.add(h, f, f.target);
     LAMP.ljus.push([h, 1.1], [f, 0.9]);
   }
+  // Skenet kring det som lyser (LAMP.lyser i den här duken), ritat ovanpå lamporna i deras egen duk, så att
+  // det följer med kameran (i ljuslagren över hela rummet hamnade det bredvid uret i närbilden) och slocknar
+  // med dem på natten.
+  function medSkenet(b, sort) {
+    const rita = b.paint.bind(b);
+    const { box } = BITAR[sort === 'kupa' ? 'flakt' : 'skena'];
+    b.paint = () => {
+      rita();
+      const a = 1 - morkt;
+      if (a < 0.02) return;
+      const c = b.canvas;
+      const g = c.getContext('2d');
+      const k = c.width / box.w;
+      g.save();
+      g.globalCompositeOperation = 'lighter';
+      for (const [x, y, z, r, s] of LAMP.lyser) {
+        if (s !== sort) continue;
+        const v = new THREE.Vector3(x, y, z).project(b.cam);
+        const px = ((v.x + 1) / 2) * c.width;
+        const py = ((1 - v.y) / 2) * c.height;
+        const rr = r * (1000 / (1000 - z)) * k;
+        for (const [dy, R, f, al] of sort === 'kupa' ? [[0.5, 3.2, '255, 212, 156', 0.34], [0, 1.6, '255, 242, 222', 0.42]] : [[0, 2.6, '255, 236, 200', 0.4]]) {
+          const gr = g.createRadialGradient(px, py + dy * rr, 0, px, py + dy * rr, R * rr);
+          gr.addColorStop(0, `rgba(${f}, ${(al * a).toFixed(3)})`);
+          gr.addColorStop(0.45, `rgba(${f}, ${(al * a * 0.4).toFixed(3)})`);
+          gr.addColorStop(1, `rgba(${f}, 0)`);
+          g.fillStyle = gr;
+          g.fillRect(px - R * rr, py + dy * rr - R * rr, 2 * R * rr, 2 * R * rr);
+        }
+      }
+      g.restore();
+    };
+  }
   function flakt(b) {
     lampScen(b);
+    medSkenet(b, 'kupa');
     const g = new THREE.Group();
     b.scene.add(g);
     const { X, Z } = FLAKT;
@@ -413,6 +451,7 @@ export async function inredning(el, opt = {}) {
   }
   function skena(b) {
     lampScen(b);
+    medSkenet(b, 'spot');
     const { Y, Z, x0, x1 } = SKENA;
     const sv = SVART();
     const s = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, 5, 9), sv);
@@ -1628,8 +1667,7 @@ export async function inredning(el, opt = {}) {
     if (x.isMesh && !x.material.isMeshBasicMaterial && !x.material.isShadowMaterial) for (const m of [x.material].flat()) skivMat.add(m);
   });
   for (const m of skivMat) m.userData.dag = m.color.clone();
-  // (hur släckta taklamporna är, 0–1: glaset grånar och väggen och skivan mörknar i takt)
-  let morkt = 0;
+  // (hur släckta taklamporna är, 0–1: glaset grånar och väggen och skivan mörknar i takt; morkt står överst)
   function natt(g) {
     g = typeof g === 'number' ? Math.max(0, Math.min(1, g)) : g ? 1 : 0;
     if (g === morkt) return;
@@ -1639,6 +1677,8 @@ export async function inredning(el, opt = {}) {
     for (const [l, i] of LAMP.ljus) l.intensity = i * (1 - 0.8 * g);
     B.flakt.paint();
     B.skena.paint();
+    // (skenet från lamporna i rummets ljuslager, ljusKlockan i rum.js)
+    if (opt.ljus) opt.ljus();
     malMat.color.copy(malMat.userData.dag).multiplyScalar(1 - 0.6 * g);
     B.tak.paint();
     for (const m of skivMat) m.color.copy(m.userData.dag).multiplyScalar(1 - 0.6 * g);
