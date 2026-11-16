@@ -1,9 +1,10 @@
 // Växterna i tobaksaffären (rum-3d.js): en ampellilja i en lerkruka på
 // fönsterbänkens vänstra ände och en liten pilea (pannkaksväxt) i en glaserad
-// kruka fram till vänster på barbordet.
+// kruka fram till vänster på barbordet – och en gullranka på bardisken
+// (rum-inredning.js, längst ner).
 //
 // Rummet ska gå i gamla telefoner och datorer, så växterna kostar så lite som
-// möjligt: båda är en enda geometri med färgen i hörnen (ett ritanrop, två med
+// möjligt: ampelliljan och pilean är en enda geometri med färgen i hörnen (ett ritanrop, två med
 // skuggkartan), som ritas med pennkoppens material (ingen ny shader att
 // kompilera), och bladen är få och enkla – omkring 5 000 trianglar för båda,
 // mot flera hundra tusen för gänget. Materialet ritar bara framsidan, så bladen
@@ -275,6 +276,155 @@ function pilea(ut, m) {
       V(1, 1, 1));
     ut.add(skiva, null, m.clone().multiply(lm), true);
   }
+}
+
+// ---------- gullranka ----------
+
+// Ett hjärtformat blad: fäst i p, riktat åt d med ovansidan åt n (d och n
+// vinkelräta och normaliserade), längden L, halva bredden B och tyngden som
+// böjer spetsen nedåt. Mittlinjen börjar en bit bakom fästet, så att bladets
+// bas sticker ut bakåt som på ett hjärta; bredast en fjärdedel ut och sedan
+// rundat mot en kort spets. Ett blad som når under golv lyfts upp till det.
+// Materialet ritar båda sidorna.
+function hjarta(ut, p, d, n, L, B, tyngd, farg, golv = -Infinity) {
+  const pts = [];
+  const r = d.clone();
+  const q = p.clone().addScaledVector(d, -0.14 * L);
+  for (let i = 0; i < 7; i++) {
+    pts.push(q.clone());
+    q.addScaledVector(r, L / 6);
+    r.y -= tyngd;
+    r.normalize();
+  }
+  const S = new THREE.Vector3();
+  const g = band(pts, (s) => B * (s < 0.25 ? 0.55 + 0.45 * sm(0, 0.25, s) : Math.max(0.02, Math.sqrt(1 - ((s - 0.25) / 0.75) ** 2))),
+    (t) => S.crossVectors(t, n).normalize().clone(), 0.16, farg);
+  g.computeBoundingBox();
+  if (g.boundingBox.min.y < golv) g.translate(0, golv - g.boundingBox.min.y, 0);
+  ut.add(g, null, null, false);
+}
+
+// Gullranka (Epipremnum aureum) i en krämvit glaserad kruka med ett brunt band,
+// på ett fat: en tuva av hjärtformade blad, gröna med gula stråk, och fyra
+// revor – två som hänger över diskens kant och två som kryper längs skivan, åt
+// var sitt håll. Den står på bardisken i rum-inredning.js, som ritas en gång
+// till en duk, så den kostar ingenting i bildrutorna (omkring 4 800 trianglar,
+// en gång). Byggd i verkliga mått som disken: krukan är 24 bred och 17 hög,
+// och tuvan når 35 upp. Ögat ser disken nästan från sidan, så bladen vänder
+// sig en bit mot det (som mot ljuset i rummet): annars syntes de mest som
+// streck. Allt slumpas ur ett fast frö.
+//
+//   gullranka({ kant, rund, oga }) → BufferGeometry (position, normal, color)
+//   med y uppåt och origo mitt under krukan: diskens kant ligger kant bort åt
+//   −x och är rundad med radien rund, z går längs disken och oga är
+//   riktningen mot ögat ({ x, y, z }).
+export function gullranka({ kant, rund, oga }) {
+  const ut = samling();
+  const rnd = rnd0(2311);
+  const m = new THREE.Matrix4();
+  ut.add(svarv([[0, 0], [10.4, 0], [11.6, 0.5], [12.1, 1.9], [11.7, 2.1], [10.5, 1], [0, 1]], 24,
+    () => new THREE.Color('#cbbd9f')), null, m);
+  ut.add(svarv([[0, 1], [8.1, 1], [8.5, 1.5], [9.5, 8], [9.85, 11.3], [9.9, 11.7], [9.95, 12.5], [10, 12.9], [10.2, 14.4],
+    [11.1, 14.6], [11.4, 16.3], [10.9, 16.8], [10.1, 16.4], [9.9, 15]], 24,
+    (y, r) => {
+      const c = new THREE.Color('#e3d7bd');
+      if (y < 3) c.lerp(new THREE.Color('#a8956f'), 0.5 * (1 - y / 3));
+      if (y > 11.5 && y < 12.7) c.set('#7c4527');
+      if (y > 14.5) c.lerp(new THREE.Color('#f3ecdb'), 0.5);
+      if (y > 14.9 && r < 10.5) c.lerp(new THREE.Color('#4a3424'), 0.85);
+      return c;
+    }), null, m);
+  ut.add(jord(9.9, 15), '#3a2a1f', m);
+
+  const GRON = new THREE.Color('#357227');
+  const MORK = new THREE.Color('#1b4315');
+  const GULD = new THREE.Color('#d2c86a');
+  const STJALK = '#7f9a46';
+  const UPP = V(0, 1, 0);
+  const OGA = V(oga.x, oga.y, oga.z).normalize();
+  // mot ögat längs disken, och åt sidan sett därifrån
+  const FRAM = V(OGA.x, 0, OGA.z).normalize();
+  const SIDAN = V(FRAM.z, 0, -FRAM.x);
+  // gula stråk ut från mittnerven, olika mycket på varje blad
+  const farg = () => {
+    const guld = 0.2 + 0.6 * rnd();
+    const fas = rnd() * 6.3;
+    const ljus = 0.85 + 0.25 * rnd();
+    return (s, mitt) => {
+      const strak = guld * sm(0.45, 0.95, 0.5 + 0.5 * Math.sin(9 * s + fas));
+      return GRON.clone().lerp(GULD, mitt ? strak : 0.45 * strak).lerp(MORK, (mitt ? 0 : 0.2) + 0.35 * (1 - sm(0, 0.3, s))).multiplyScalar(ljus);
+    };
+  };
+  // v vinkelrätt mot n (normaliserad)
+  const vinkelratt = (v, n) => v.clone().addScaledVector(n, -v.dot(n)).normalize();
+  // ovansidan för ett blad åt d: uppåt, vänd en bit (k) mot ögat
+  const mot = (d, k) => vinkelratt(vinkelratt(UPP, d).addScaledVector(OGA, k), d);
+
+  // tuvan: de äldsta bladen längst ut och hängande över krukans kant, de
+  // yngsta i mitten och uppåt; skaften ur jorden
+  const ytan = 15;
+  const N = 24;
+  const gyllene = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < N; i++) {
+    const ung = i / (N - 1);
+    const phi = i * gyllene + (rnd() - 0.5) * 0.4;
+    const ri = V(Math.cos(phi), 0, Math.sin(phi));
+    const fot = ri.clone().multiplyScalar(4.5 * (1 - ung) * rnd()).setY(ytan);
+    const el = (28 + 42 * ung + 8 * rnd()) * Math.PI / 180;
+    const fast = fot.clone().addScaledVector(ri.clone().multiplyScalar(Math.cos(el)).setY(Math.sin(el)), 11 - 3 * ung + 2 * rnd());
+    ut.add(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(fot, fot.clone().lerp(fast, 0.5).setY(fast.y + 1.5), fast), 4, 0.42, 3, false), STJALK, m);
+    // (de som pekar mot ögat hänger inte ner framför krukan)
+    const lut = Math.max((-55 + 95 * ung + 12 * rnd()), ri.dot(FRAM) > 0.2 ? -10 : -90) * Math.PI / 180;
+    // ovansidan vänds mot ögat och ljuset, och bladet följer med: de som pekar
+    // mot ögat lutar då mindre uppåt (undersidan låg i skugga och syntes
+    // nästan svart)
+    const d0 = ri.clone().multiplyScalar(Math.cos(lut)).setY(Math.sin(lut)).normalize();
+    const n = vinkelratt(UPP, d0).addScaledVector(OGA, 0.7).normalize();
+    const d = vinkelratt(d0, n);
+    const L = 14.5 + 2 * rnd() - 2.5 * ung;
+    hjarta(ut, fast, d, n, L, L * 0.38, 0.05 * (1 - ung), farg(), 0.4);
+  }
+
+  // revorna: ut över krukans kant och ner på disken, och sedan över kanten
+  // (rundad, med mitten i (−kant + rund, −rund)) och rakt ner, eller längs skivan
+  const kx = -kant + rund;
+  const runt = (a, z) => V(kx + Math.cos(a) * (rund + 0.9), -rund + Math.sin(a) * (rund + 0.9), z);
+  const UT = V(-1, 0.2, 0.35).normalize().addScaledVector(OGA, 0.8).normalize();
+  const ner = (z, y) => [runt(Math.PI / 2, z), runt(Math.PI * 0.75, z + 0.3), runt(Math.PI * 0.95, z + 0.5), V(-kant - 0.9, -14, z + 0.7), V(-kant - 1.1, y * 0.6, z + 1), V(-kant - 2, y, z + 2)];
+  const revor = [
+    [V(-7, 15.2, -5), V(-11, 16.6, -6), V(-17.5, 1.4, -4), V(-27, 0.75, 1), ...ner(3, -47)],
+    [V(-8.5, 15.2, 1), V(-12.5, 16.4, 2), V(-18.5, 1.3, 7), V(-25.5, 0.75, 14), ...ner(19, -33)],
+    [V(-1, 15.4, -8), V(-2, 16.6, -11.5), V(-5, 1.3, -16), V(-8, 0.75, -24), V(-6, 0.75, -32), V(-9, 0.75, -40), V(-10.5, 1.4, -45)],
+    [V(3, 15.4, 8), V(4, 16.6, 11.5), V(2, 1.3, 17), V(-3, 0.75, 26), V(-8, 0.75, 33), V(-10.5, 1.4, 37)],
+  ];
+  for (const pts of revor) {
+    const kurva = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+    ut.add(new THREE.TubeGeometry(kurva, 6 * pts.length, 0.45, 4, false), STJALK, m);
+    // ett blad var femte enhet, växelvis åt var sitt håll, mindre mot spetsen:
+    // där revan hänger (utanför krukan och nedanför diskens kant) vänt utåt och
+    // mot ögat, och på disken resta en bit
+    const len = kurva.getLength();
+    let sida = rnd() < 0.5 ? 1 : -1;
+    for (let l = 6; l < len - 1; l += 4.2 + rnd()) {
+      const u = l / len;
+      const p = kurva.getPointAt(u);
+      const t = kurva.getTangentAt(u);
+      const hanger = t.y < -0.6;
+      const krukan = p.x > kx;
+      // (inga runt kanten, och inga framför krukan sett från ögat)
+      if (hanger && (krukan ? p.dot(FRAM) > 0 && Math.abs(p.dot(SIDAN)) < 9 : p.y > -12)) continue;
+      const F = !hanger ? UPP : krukan ? V(p.x, 0, p.z).normalize().addScaledVector(OGA, 0.8).normalize() : UT;
+      const S = V(0, 0, 0).crossVectors(t, F).normalize();
+      const fast = p.clone().addScaledVector(S, sida * 0.9).addScaledVector(F, hanger ? 0.9 : 0.5);
+      const d = t.clone().multiplyScalar(hanger ? 0.55 : 0.3).addScaledVector(S, sida * 0.95);
+      if (hanger) d.addScaledVector(F, -d.dot(F)).normalize();
+      else d.add(V(0, 0.45, 0)).normalize();
+      const L = 10 - 4 * Math.min(1, l / len) + rnd();
+      hjarta(ut, fast, d, hanger ? vinkelratt(F, d) : mot(d, 0.6), L, L * 0.38, hanger ? 0.03 : 0, farg(), hanger && !krukan ? -Infinity : 0.4);
+      sida = -sida;
+    }
+  }
+  return ut.geo();
 }
 
 export function vaxter(lilja, pilean) {

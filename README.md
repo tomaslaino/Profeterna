@@ -2006,6 +2006,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   mycket grafik … gamla mobiler och datorer ska kunna klara av sidan". En ampellilja i lerkruka på
   fönsterbänkens vänstra ände och en liten pilea i en glaserad kruka fram till vänster på barbordet, båda i ett
   enda ritanrop med pennkoppens material. Se [Tobaksaffären](#tobaksaffären), *Växterna*.
+- **En växt på bardisken (2026-11-16, användarens önskemål):** "Ordna med en blomma till här på bänken – som
+  gör att det blir snyggt. Den ska inte dra en massa grafik men den ska vara snygg och bra och passa in", och
+  sedan "En växt – är bättre än en blomma". En gullranka i en krämvit glaserad kruka står mitt på det tomma
+  stycket av disken mellan datorn och fruktlådan, med revor över kanten och längs skivan. Den ritas med disken,
+  en gång, så den kostar ingenting i bildrutorna. Se [Tobaksaffären](#tobaksaffären), *Växterna*.
 - **Alla relevanta forum, inte bara det viktigaste (2026-11-10, användarens önskemål):** "Har du lagt in så att alla
   relevanta forum gås igenom för lagen när artiklarna om matcherna skrivs i Helgarderat" och "Ordna det annars!". Det
   var inte så: varje lag hade ett forum. Nu har varje lag en lista, det viktigaste först och högst fyra. Relevant är
@@ -4345,6 +4350,17 @@ hörnen, ett ritanrop (två med skuggkartan) och drygt 5 000 trianglar mot flera
 och de ritas med pennkoppens material, så att ingen ny shader behöver kompileras. Materialet ritar bara
 framsidan, så bladen har båda sidorna i geometrin. Ingenting rör sig. I en stående telefon syns pilean,
 men ampelliljan hamnar nästan helt utanför bilden till vänster.
+
+På bardisken står sedan 2026-11-16 en gullranka (`gullranka` i rum-vaxter.js, `RANKA` i
+[public/rum-inredning.js](public/rum-inredning.js)) i en krämvit glaserad kruka med ett brunt band, på ett
+fat: en tuva av hjärtformade blad, gröna med gula stråk, och fyra revor – två som hänger över diskens kant
+och två som kryper längs skivan, mot datorn och mot fruktlådan utan att nå dem. Den står mitt på det tomma
+stycket mellan datorn och lådan, under korktavlan. Tavlorna på väggen ligger över diskens duk, så tuvan är
+låg (35, krukan 17): den går fri från korktavlans underkant också när musen flyttar kameran åt något håll.
+Revorna hänger över kanten bortom den tredje barstolen. Ögat ser disken nästan från sidan, så bladen vänder
+sig en bit mot det, som mot ljuset i rummet; annars syntes de mest som streck, och de som pekade mot ögat
+visade en undersida i skugga, nästan svart. Gullrankan ritas med disken, en gång till dukens bild, så den
+kostar ingenting i bildrutorna (omkring 4 800 trianglar, en gång); materialet ritar båda sidorna av bladen.
 
 **Gänget** sitter på barstolar runt ett runt barbord framför fönsterbänken, med benen
 hängande: DL och DJ på sidorna, vända in mot bordet, och DT bakom (`BORD` och `FIGS` i
