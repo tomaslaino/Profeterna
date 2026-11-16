@@ -4348,6 +4348,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       clearTimeout(R.fasadT);
       lagerUt('fasaden');
       R.vilar = false;
+      R.el.classList.remove('fasad-tackt');
       if (R.fig && R.on) {
         const t = now();
         const [vx, vy] = synlig();
@@ -4383,9 +4384,15 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (glid) f.el.classList.add('in');
     R.fasad = f;
     lager('fasaden', (nu) => fasad(false, !nu));
-    // rummet står still när fasaden täcker det
+    // Rummet står still när fasaden täcker det, och ritas inte heller (fasad-tackt i rum-fasad.css): förut
+    // låg alla rummets lager kvar under fasaden, en och en halv gång fler bildpunkter än fasaden själv i en
+    // telefon, och med dem ute tog sidan för mycket minne. Gängets duk ritar ändå glaset (utifran).
     clearTimeout(R.fasadT);
-    R.fasadT = setTimeout(() => { if (R.fasad === f) R.vilar = true; }, glid ? 420 : 0);
+    R.fasadT = setTimeout(() => {
+      if (R.fasad !== f) return;
+      R.vilar = true;
+      R.el.classList.add('fasad-tackt');
+    }, glid ? 420 : 0);
     return true;
   }
 
