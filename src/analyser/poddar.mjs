@@ -629,23 +629,38 @@ export function poddNyckel(fil) {
 // (2026-11-13, landskamperna: lagen har inga supporterpoddar eller forum, och deras blad är handskrivna i
 // data/poddsidor.json, "hand": true). Det gäller bara samma omgång (samma lördag; numret kan vara lagt innan
 // omgångens id fanns).
-// → {omgang, uppdaterad, amnen, matcher: [{id, nr, match, avspark}], sidor: [{id, nr, match, lag, rubrik, ingress,
-//   summering, citat, delar}]} eller null
+// Ett handskrivet nummer kan ha hela kupongen, också matcher som sajten inte har (2026-11-16, Europatipset 2625:
+// "Självklart ska det vara med alla matcher", med två matcher i spanska andraligan som sajten saknar). Har numret
+// som ligger ute för samma omgång alla omgångens matcher och fler, står dess kupong kvar med kupongens nummer.
+// nummer räknas på de nummer som har kommit ut: samma omgång behåller sitt och en ny omgång får nästa (2026-11-16:
+// Stryktipset lördag och Europatipset söndag–måndag samma vecka fick båda Nr 1 med veckoräkningen i
+// public/rum-tidning.js, som gäller för ett nummer utan nummer). spel är omgångens spel ur kupongtjänsten
+// ({namn: 'Europatipset', nr: 2625}), för omslagets "Inför Europatipset".
+// → {omgang, nummer, spel, uppdaterad, amnen, matcher: [{id, nr, match, avspark}], sidor: [{id, nr, match, lag,
+//   rubrik, ingress, summering, citat, delar}]} eller null
 export const sammaOmgang = (a, b) => Boolean(a && b) && String(a).slice(0, 10) === String(b).slice(0, 10);
 export function poddsidor(fil, round, nu = null) {
   if (!round) return null;
+  const samma = Boolean(nu) && sammaOmgang(nu.omgang, round.id);
   const egen = fil && fil.omgang === round.id && fil.sidor ? fil.sidor : {};
-  const forra = new Map(nu && sammaOmgang(nu.omgang, round.id) && Array.isArray(nu.sidor) ? nu.sidor.map((s) => [String(s.id), s]) : []);
-  const sidor = round.matcher.map((x, i) => {
-    const s = egen[String(x.id)];
+  const forra = new Map(samma && Array.isArray(nu.sidor) ? nu.sidor.map((s) => [String(s.id), s]) : []);
+  const ids = round.matcher.map((x) => String(x.id));
+  const hela = samma && Array.isArray(nu.matcher) && nu.matcher.length > ids.length && ids.every((id) => nu.matcher.some((y) => String(y.id) === id));
+  const fran = (id) => round.matcher.find((x) => String(x.id) === id) || {};
+  const matcher = hela
+    ? nu.matcher.map((y) => ({ id: String(y.id), nr: y.nr, match: fran(String(y.id)).match || y.match || null, avspark: fran(String(y.id)).avspark || y.avspark || null }))
+    : round.matcher.map((x, i) => ({ id: String(x.id), nr: i + 1, match: x.match || null, avspark: x.avspark || null }));
+  const sidor = matcher.map((x) => {
+    const s = egen[x.id];
     if (!s || !Array.isArray(s.delar) || !s.delar.some((d) => (d.grupper || []).length || (d.text || []).length)) {
-      const kvar = forra.get(String(x.id));
-      return kvar ? { ...kvar, nr: i + 1, avspark: x.avspark || kvar.avspark || null } : null;
+      const kvar = forra.get(x.id);
+      return kvar ? { ...kvar, nr: x.nr, avspark: x.avspark || kvar.avspark || null } : null;
     }
-    return { id: String(x.id), nr: i + 1, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null,
+    return { id: x.id, nr: x.nr, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null,
       summering: s.summering || null, ...(s.citat ? { citat: s.citat } : {}), delar: s.delar };
   }).filter(Boolean);
-  const matcher = round.matcher.map((x, i) => ({ id: String(x.id), nr: i + 1, match: x.match || null, avspark: x.avspark || null }));
   const uppdaterad = (fil && fil.omgang === round.id && fil.uppdaterad) || (nu && nu.uppdaterad) || null;
-  return sidor.length ? { omgang: round.id, uppdaterad, amnen: pc.amnen, matcher, sidor } : null;
+  const nummer = nu && Number.isFinite(nu.nummer) ? (samma ? nu.nummer : nu.nummer + 1) : null;
+  const spel = round.spel && round.spel.namn ? { namn: String(round.spel.namn), nr: round.spel.nr ?? null } : samma && nu.spel ? nu.spel : null;
+  return sidor.length ? { omgang: round.id, ...(nummer != null ? { nummer } : {}), ...(spel ? { spel } : {}), uppdaterad, amnen: pc.amnen, matcher, sidor } : null;
 }

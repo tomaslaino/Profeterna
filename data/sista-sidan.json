@@ -1,78 +1,84 @@
 {
- "omgang": "2026-11-14-st4979",
+ "omgang": "2026-11-15-v65ft4",
  "matcher": [
-  "401861166",
-  "401861167",
-  "401861165",
-  "401861168",
-  "401861169",
-  "401861170",
-  "401861164",
-  "401880749",
-  "401880747",
-  "401880745",
-  "401880754",
-  "401880744",
-  "401881266"
+  "401861175",
+  "401861177",
+  "401861178",
+  "401861176",
+  "401861171",
+  "401861172",
+  "401883117",
+  "401883116",
+  "401861185",
+  "401861188",
+  "401861186",
+  "401861187",
+  "401861181"
  ],
- "skriven": "2026-11-13T18:43:31.793Z",
- "model": "claude-opus-5-5",
+ "skriven": "2026-11-16T19:17:59.000Z",
+ "model": null,
+ "hand": true,
  "version": "2026-11-11.2",
  "kronika": {
   "av": "Hasse Backe",
-  "rubrik": "Kupongen är en taktiktavla",
+  "rubrik": "En final kräver en pokal",
   "stycken": [
-   "Lördagen börjar klockan fyra i Milton Keynes och slutar efter halv elva på kvällen. Jag har lagt upp den som ett träningspass: kaffe, kupong och sedan tystnad i soffan. Min fru kallar det för schema. Jag har aldrig sett något skäl att rätta henne.",
-   "I Oslo har det snöat på Ullevaal, och norrmännen har fått träna inomhus. Det har väckt oro. Jag har haft lag som tränade i en idrottshall tre veckor i sträck, och de lärde sig att passa på rätt fot. Efteråt spelade de bättre på gräs än förut.",
-   "Mot Bosnien kan läktarna bli bosniska. Det bekommer mig inte. Spelarna på planen hör inte vilket språk det sjungs på. De vet vem de ska markera. Att Gyökeres tränade vid sidan av har jag noterat, och det har säkert hans fysioterapeut också.",
-   "Enligt matchbladet spelar AFC Wimbledon fotboll i en timme. Det är en timme mer än många lag jag har mött. Resten är kondition, och den går att träna upp.",
-   "Om tippandet vill jag bara säga att en kupong ska fyllas i med samma lugn som när man ritar upp ett zonförsvar. Jag har tippat i fyrtio år och aldrig ångrat en rad. Resultaten har jag ibland haft synpunkter på."
+   "Den här veckan spelas det finaler överallt. Jürgen Klopp kallar mötet med Nederländerna i Berlin årets final, och Santi Denia säger att Tjeckien ska förbereda sig som inför en VM-final, fast laget har förlorat fem raka. Jag har inget emot ordet. Jag vill bara se pokalen först.",
+   "Mark van Bommel är den ende som har räknat. Belgien mot Italien är ingen final, säger han, för spelar man en final kan man vinna något. Där talar en tränare som har läst tävlingsbestämmelserna. Sådana blir sällan omtyckta, men de missar aldrig bussen.",
+   "De finaler jag har varit med om förberedde vi som en vanlig bortamatch i oktober, med samma smörgåsar och samma genomgång. Spelarna märkte ingen skillnad. Det var meningen.",
+   "En omgång som börjar på söndagseftermiddagen i Riga och slutar på måndagskvällen i Skopje ska tas som en serie, match för match. Den som tippar varje rad som en final är slut redan i Limassol.",
+   "Jag fyller i kupongen på söndagsförmiddagen vid köksbordet, med kaffe och utan publik. Det är så jag vill ha mina finaler."
   ]
  },
  "sidan": [
   {
-   "lag": "Sheffield Wednesday",
-   "text": "Namnet är en veckodag. Klubben växte fram ur The Wednesday Cricket Club, vars grundare var lediga på onsdagseftermiddagarna. Fotbollslaget bildades 1867 för att kricketspelarna skulle hålla sig i form över vintern, och först 1929 blev Sheffield officiellt en del av namnet.",
+   "lag": "Eibar",
+   "text": "När Eibar säkrade platsen i La Liga 2014 firade klubben med konfetti som Barcelona hade låtit göra i väntan på en ligatitel som inte kom. Färgerna stämde: Eibars blå och granatröda tröjor kommer från Barcelonas dräkt.",
    "kalla": {
     "source": "Wikipedia",
-    "title": "Sheffield Wednesday F.C.",
-    "url": "https://en.wikipedia.org/wiki/Sheffield_Wednesday_F.C.",
+    "title": "SD Eibar",
+    "url": "https://en.wikipedia.org/wiki/SD_Eibar",
     "publishedAt": null
    }
   },
   {
-   "lag": "AFC Wimbledon",
-   "text": "När Wimbledon FC fick flytta till Milton Keynes 2002 bildade supportrarna en ny klubb med två föresatser: att ta sig upp i Football League och att komma hem till Merton. Arton år senare var AFC Wimbledon tillbaka på Plough Lane, men den första matchen spelades utan publik under pandemin.",
+   "lag": "Cádiz",
+   "text": "Cádiz arena invigdes 1955 som Ramón de Carranza. Lagen om historiskt minne tog bort namnet, som var ett arv från Francotiden, och 2021 valdes Nuevo Mirandilla i en omröstning med över 98 000 röstberättigade. Tacita de Plata och La Pepa förlorade.",
    "kalla": {
-    "source": "BBC Sport",
-    "title": "AFC Wimbledon finish Plough Lane odyssey 18 years after formation",
-    "url": "https://bbc.in/2JwLyjB",
+    "source": "Wikipedia",
+    "title": "Estadio Nuevo Mirandilla",
+    "url": "https://es.wikipedia.org/wiki/Estadio_Nuevo_Mirandilla",
     "publishedAt": null
    }
   },
   {
-   "lag": "Grimsby Town",
-   "text": "Grimsby Town spelar inte i Grimsby. Blundell Park ligger i grannstaden Cleethorpes och beskrivs som Storbritanniens lägst belägna fotbollsarena, bara drygt en halvmeter över havet. Strålkastarna köptes begagnade från Wolverhampton 1958, och det var supporterklubben som samlade in pengarna till monteringen.",
+   "lag": "Kazakstan",
+   "text": "Kazakstan spelade kvalet till VM 2002 i Asien och gick samma år över till Uefa, eftersom landet ligger i två världsdelar. Därför tar Astana nu emot Slovakien i Nations League.",
    "kalla": {
     "source": "Wikipedia",
-    "title": "Blundell Park",
-    "url": "https://en.wikipedia.org/wiki/Blundell_Park",
+    "title": "Kazakhstan national football team",
+    "url": "https://en.wikipedia.org/wiki/Kazakhstan_national_football_team",
     "publishedAt": null
    }
   }
  ],
  "kaseri": {
-  "av": "Rolf Ekdahl",
-  "om": "busschaufför, Ystad",
-  "rubrik": "En uppblåsbar kolja på hatthyllan",
+  "av": "Gunilla Östberg",
+  "om": "undersköterska på nattskift, Skövde",
+  "rubrik": "Europatipset passar den som sover på dagen",
   "stycken": [
-   "Jag kör stadsbussen i Ystad på vardagarna och har lördagarna lediga. Dem har jag ägnat åt Grimsby Town så länge jag kan minnas, av skäl som har med en färja och en regnig vecka att göra.",
-   "Min fru har vant sig. Hon frågar inte längre varför det ligger en uppblåsbar kolja på hatthyllan. Den kom med posten från en man i Cleethorpes som jag har brevväxlat med i många år. Vi har aldrig träffats, men han vet hur det gick med mina tomater i fjol.",
-   "Kupongen lämnar jag in på torsdagen, så att den hinner ligga till sig. Den här veckan står Grimsby på rad tretton, längst ner. Den raden ser man sist och tänker mest på.",
-   "Klockan fyra sätter jag på radion och blåser upp fisken. Den har varit med om mer än jag."
+   "Jag arbetar natt på medicinavdelningen i Skövde och sover medan andra tippar Stryktipset. På lördagarna är jag alltså ingen att räkna med. Europatipset har blivit min kupong, för den tar sin tid.",
+   "Den här veckan börjar den med Lettland mot Armenien klockan tre på söndagen, ungefär när jag vaknar. Jag vet inte mycket om något av lagen, men jag har läst att stämningen i Lettlands trupp är god. Det räcker långt i min bransch också.",
+   "På måndagen spelar Kazakstan mot Slovakien på konstgräs under stängt tak. Det tycker jag om. Någon har tänkt på vädret.",
+   "Kupongen lämnar jag på Ica på vägen till jobbet. Kassörskan har slutat fråga. Hon ser Eibar mot Cádiz på rad sju och nickar, som om hon också hade varit i Baskien.",
+   "Det har hon inte. Inte jag heller."
   ]
  },
  "kasorer": [
+  {
+   "av": "Gunilla Östberg",
+   "om": "undersköterska på nattskift, Skövde"
+  },
   {
    "av": "Rolf Ekdahl",
    "om": "busschaufför, Ystad"

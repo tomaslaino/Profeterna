@@ -169,9 +169,11 @@
     return n >= 1 ? n : null;
   }
   // Upplagans nummer och lördag: { nr, dag }, nr null före det första numret (provnumret 0) och dag null utan tider.
+  // Ett nummer som filen har (nummer, som nattjobbet räknar på de nummer som har kommit ut) går före veckan
+  // (2026-11-16: Stryktipset lördag och Europatipset söndag samma vecka blev annars båda Nr 1).
   function numret(u) {
     const dag = u && Number.isFinite(u.lordag) ? new Date(u.lordag) : null;
-    return { dag, nr: !u ? null : u.prov ? 0 : dag ? nummer(dag) : null };
+    return { dag, nr: !u ? null : u.prov ? 0 : u.nummer >= 1 ? u.nummer : dag ? nummer(dag) : null };
   }
   // Sidhuvudets högra del på alla sidor efter omslaget: Nr 1 · lördag 14 november, samma lördag som omslaget (A,
   // Rutorna, 2026-11-11). Förut stod matchbladens datum där (dagen då de skrevs) och veckan på innehållet.
@@ -271,6 +273,9 @@
     const u = {
       prov: Boolean(prov),
       omgang: String(data.omgang || ''),
+      // numret och spelet, när filen har dem (nattjobbet, src/analyser/poddar.mjs)
+      nummer: Number.isInteger(data.nummer) ? data.nummer : null,
+      spel: data.spel && data.spel.namn ? String(data.spel.namn) : '',
       sidor,
       kupongen,
       // omgångens första dag
@@ -373,9 +378,10 @@
   // ---------- kupongen ----------
 
   // Gängets omgång är Stryktipsets när den har ett nummer därifrån (2026-11-07-st4978) eller tretton matcher,
-  // Europatipsets när numret är därifrån (2026-11-15-et2625).
-  const spelet = (u) => (/-et\d+$/.test(u.omgang) ? TEXT.kupongen.europatipset
-    : /-st\d+$/.test(u.omgang) || u.kupongen.length === 13 ? TEXT.kupongen.stryktipset : TEXT.kupongen.kupongen);
+  // Europatipsets när numret är därifrån (2026-11-15-et2625). Spelet i filen (spel.namn) går före: Europatipset 2625
+  // fick id:t 2026-11-15-v65ft4 och har tretton matcher.
+  const spelet = (u) => (/^europatipset$/i.test(u.spel) || (!u.spel && /-et\d+$/.test(u.omgang)) ? TEXT.kupongen.europatipset
+    : /^stryktipset$/i.test(u.spel) || (!u.spel && (/-st\d+$/.test(u.omgang) || u.kupongen.length === 13)) ? TEXT.kupongen.stryktipset : TEXT.kupongen.kupongen);
   const inforSpel = (u) => {
     const sp = spelet(u);
     return sp === TEXT.kupongen.stryktipset ? TEXT.forsta.infor.stryktipset

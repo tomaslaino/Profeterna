@@ -1,6 +1,11 @@
 {
- "omgang": "2026-11-14-st4979",
- "uppdaterad": "2026-11-14T08:10:38.950Z",
+ "omgang": "2026-11-15-v65ft4",
+ "nummer": 2,
+ "spel": {
+  "namn": "Europatipset",
+  "nr": 2625
+ },
+ "uppdaterad": "2026-11-16T19:14:48.408Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -10,2760 +15,1671 @@
  },
  "matcher": [
   {
-   "id": "401861166",
+   "id": "401861175",
    "nr": 1,
-   "match": "Sverige – Bosnien & Hercegovina",
-   "avspark": "2026-11-14T19:45:00.000Z"
+   "match": "Spanien – England",
+   "avspark": "2026-11-15T19:45:00.000Z"
   },
   {
-   "id": "401861167",
+   "id": "401861177",
    "nr": 2,
-   "match": "Portugal – Danmark",
-   "avspark": "2026-11-14T19:45:00.000Z"
+   "match": "Frankrike – Turkiet",
+   "avspark": "2026-11-15T19:45:00.000Z"
   },
   {
-   "id": "401861165",
+   "id": "401861178",
    "nr": 3,
-   "match": "Norge – Wales",
-   "avspark": "2026-11-14T17:00:00.000Z"
+   "match": "Kroatien – Tjeckien",
+   "avspark": "2026-11-15T19:45:00.000Z"
   },
   {
-   "id": "401861168",
+   "id": "401861176",
    "nr": 4,
-   "match": "Rumänien – Polen",
-   "avspark": "2026-11-14T19:45:00.000Z"
+   "match": "Belgien – Italien",
+   "avspark": "2026-11-15T19:45:00.000Z"
   },
   {
-   "id": "401861169",
+   "id": "401861171",
    "nr": 5,
-   "match": "Nordirland – Ukraina",
-   "avspark": "2026-11-14T19:45:00.000Z"
+   "match": "Lettland – Armenien",
+   "avspark": "2026-11-15T14:00:00.000Z"
   },
   {
-   "id": "401861170",
+   "id": "401861172",
    "nr": 6,
-   "match": "Österrike – Irland",
-   "avspark": "2026-11-14T19:45:00.000Z"
+   "match": "Cypern – Montenegro",
+   "avspark": "2026-11-15T14:00:00.000Z"
   },
   {
-   "id": "401861164",
+   "id": "401883117",
    "nr": 7,
-   "match": "Georgien – Ungern",
-   "avspark": "2026-11-14T17:00:00.000Z"
+   "match": "Eibar – Cádiz",
+   "avspark": "2026-11-15T17:30:00.000Z"
   },
   {
-   "id": "401880749",
+   "id": "401883116",
    "nr": 8,
-   "match": "Milton Keynes Dons – Burton Albion",
-   "avspark": "2026-11-14T15:00:00.000Z"
+   "match": "Granada – Las Palmas",
+   "avspark": "2026-11-15T15:15:00.000Z"
   },
   {
-   "id": "401880747",
+   "id": "401861185",
    "nr": 9,
-   "match": "Sheffield Wednesday – Plymouth Argyle",
-   "avspark": "2026-11-14T15:00:00.000Z"
+   "match": "Tyskland – Nederländerna",
+   "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
-   "id": "401880745",
+   "id": "401861188",
    "nr": 10,
-   "match": "Stockport County – Reading",
-   "avspark": "2026-11-14T15:00:00.000Z"
+   "match": "Grekland – Serbien",
+   "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
-   "id": "401880754",
+   "id": "401861186",
    "nr": 11,
-   "match": "AFC Wimbledon – Blackpool",
-   "avspark": "2026-11-14T15:00:00.000Z"
+   "match": "Schweiz – Skottland",
+   "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
-   "id": "401880744",
+   "id": "401861187",
    "nr": 12,
-   "match": "Wigan Athletic – Barnsley",
-   "avspark": "2026-11-14T15:00:00.000Z"
+   "match": "Nordmakedonien – Slovenien",
+   "avspark": "2026-11-16T19:45:00.000Z"
   },
   {
-   "id": "401881266",
+   "id": "401861181",
    "nr": 13,
-   "match": "Swindon Town – Grimsby Town",
-   "avspark": "2026-11-14T15:00:00.000Z"
+   "match": "Kazakstan – Slovakien",
+   "avspark": "2026-11-16T15:00:00.000Z"
   }
  ],
  "sidor": [
   {
-   "id": "401861166",
+   "id": "401861175",
    "nr": 1,
-   "match": "Sverige – Bosnien & Hercegovina",
+   "match": "Spanien – England",
    "lag": [
-    "Sverige",
-    "Bosnien & Hercegovina"
+    "Spanien",
+    "England"
    ],
-   "avspark": "2026-11-14T19:45:00.000Z",
-   "skriven": "2026-11-13T22:00:00.000Z",
+   "avspark": "2026-11-15T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
    "hand": true,
-   "rubrik": "Bosnisk fest på svensk hemmaplan",
+   "rubrik": "Lamine är fantastisk, Tuchel känner sig missförstådd",
    "ingress": null,
-   "summering": "Sverige behöver en seger för gruppseger och A-divisionen, men Gyökeres tränade vid sidan av och läktarna kan bli bosniska. Obesegrade Bosnien saknar Muharemović och kommer för att vinna.",
-   "arena": "Strawberry Arena",
-   "ort": "Solna",
-   "landskamp": {
-    "turnering": "Nations League",
-    "grupp": "B4"
-   },
+   "summering": "Spanien har vunnit 12 raka matcher och har Lamine Yamal tillbaka, men Alejandro Grimaldo har influensa. England måste vinna för att ta gruppen, ställer James Trafford i mål och har ett gräl om rasism bakom sig.",
    "delar": [
     {
-     "lag": "Sverige",
+     "lag": "Spanien",
      "kallor": [
       {
-       "podd": "Fotbollskanalen",
-       "avsnitt": "Sveriges smäll: Gyökeres utanför lagträning",
-       "datum": "2026-11-12",
-       "adress": "https://www.fotbollskanalen.se/artiklar/sverige/sveriges-small-gyokeres-utanfor-lagtraning",
+       "podd": "Flashscore",
+       "avsnitt": "De la Fuente se rebela y contesta a Tuchel: \"En España no hay racismo\"",
+       "datum": "2026-11-14",
+       "adress": "https://www.flashscore.es/noticias/futbol-liga-de-naciones-de-la-fuente-previa-espana-inglaterra/CGNlkT8l/",
        "typ": "media"
       },
       {
-       "podd": "SvFF",
-       "avsnitt": "Dejan Kulusevski tillbaka i landslaget",
-       "datum": "2026-11-04",
-       "adress": "https://www.svenskfotboll.se/nyheter/landslag/2026/11/herrlandslaget-novembertrupp/",
+       "podd": "Flashscore",
+       "avsnitt": "Sin Grimaldo, que se ha ido, pero con el resto sano: último entrenamiento de España",
+       "datum": "2026-11-14",
+       "adress": "https://www.flashscore.pe/noticias/futbol-liga-naciones-espana-sin-grimaldo-previa-inglaterra/G0ftGQmo/",
        "typ": "media"
       },
       {
-       "podd": "tvmatchen.nu",
-       "avsnitt": "Sverige–Bosnien: Uppgifter om 40 000 bosniska fans",
-       "datum": "2026-11-11",
-       "adress": "https://www.tvmatchen.nu/sport/fotboll/sverige-bosnien-bosniska-supportrar-2026/",
+       "podd": "Libertad Digital",
+       "avsnitt": "España prepara a puerta cerrada el choque ante Inglaterra sin Grimaldo",
+       "datum": "2026-11-14",
+       "adress": "https://www.libertaddigital.com/deportes/futbol/2026-11-14/espana-prepara-a-puerta-cerrada-el-choque-ante-inglaterra-sin-grimaldo-7491595/",
        "typ": "media"
       },
       {
-       "podd": "Hurbra",
-       "avsnitt": "Besfort Zeneli skadad – missar Sveriges Nations League-avgörande",
-       "datum": "2026-11-09",
-       "adress": "https://hurbra.se/besfort-zeneli-skadad-9-november-2026/",
+       "podd": "Crónica Global",
+       "avsnitt": "De la Fuente se pone duro y defiende a Lamine Yamal: \"Me molesta cuando no se dice la verdad\"",
+       "datum": "2026-11-14",
+       "adress": "https://cronicaglobal.elespanol.com/culemania/culemaniacos/20261114/fuente-pone-defiende-lamine-yamal-molesta-verdad/1003742812157_0.html",
        "typ": "media"
       }
      ],
      "text": [
-      "Viktor Gyökeres och Benjamin Nygren stod över torsdagens lagträning i Valencia. Förbundet kallar det en försiktighetsåtgärd, skriver Fotbollskanalen, och båda skulle vara tillbaka på fredagen.",
-      "Dejan Kulusevski är tillbaka efter över 17 månader med knäskada, men räkna med inhopp: själv säger han att han planeras för runt 30 minuter per match. Besfort Zeneli och Patrik Wålemark har lämnat återbud.",
-      "Hemmaplan är en sanning med modifikation. Bosniska medier talar om upp till 40 000 bortasupportrar på Strawberry Arena, något förbundskaptenen Graham Potter säger till Aftonbladet att laget får hantera. Vinst betyder gruppseger och A-divisionen."
+      "Spanien har vunnit 12 raka matcher, och oavgjort räcker för gruppsegern. Luis de la Fuente vill ändå ha seger nummer 13 och tänker inte nöja sig med en poäng.",
+      "Lamine Yamal är tillbaka efter knäbesvären som höll honom borta i Prag. Uppgifterna om särbehandling retade förbundskaptenen. ”Ingen tycker om lögner”, säger han och kallar Yamal fantastisk.",
+      "Alejandro Grimaldo har influensa och har lämnat lägret. Laporte och Nico Williams hade samma virus men är spelklara. Av 28 spelare får 23 vara med. Att peta resten är jobbets otäckaste del, säger De la Fuente."
      ],
      "citat": {
-      "sagt": "Det är något som vi måste hantera.",
-      "vem": "Graham Potter till Aftonbladet",
-      "podd": "tvmatchen.nu",
+      "sagt": "Säg till Thomas att det inte finns någon rasism i Spanien. Så tydligt är det.",
+      "vem": "Luis de la Fuente, till Thomas Tuchel",
+      "podd": "Flashscore",
       "typ": "media",
-      "datum": "2026-11-11",
-      "oversatt": false
+      "datum": "2026-11-14"
      },
      "namn": [
-      "Viktor Gyökeres",
-      "Benjamin Nygren",
-      "Dejan Kulusevski",
-      "Besfort Zeneli",
-      "Patrik Wålemark",
-      "Graham Potter"
+      "Luis de la Fuente",
+      "Lamine Yamal",
+      "Alejandro Grimaldo",
+      "Laporte",
+      "Nico Williams"
      ]
     },
     {
-     "lag": "Bosnien & Hercegovina",
+     "lag": "England",
      "kallor": [
       {
-       "podd": "Klix.ba",
-       "avsnitt": "Barbarez u 11 sati izlazi pred novinare, Zmajevima treba jedna pobjeda do baraža za Ligu A",
+       "podd": "England Football",
+       "avsnitt": "Tuchel: England in 'good moment' ahead of Spain",
+       "datum": "2026-11-14",
+       "adress": "https://www.englandfootball.com/articles/2026/Nov/14/spain-england-uefa-nations-league-thomas-tuchel-press-conference-20261411",
+       "typ": "media"
+      },
+      {
+       "podd": "Sky Sports",
+       "avsnitt": "Thomas Tuchel: England boss unhappy as anti-racism protocol questions overshadow Nations League test in Spain",
+       "datum": "2026-11-14",
+       "adress": "https://www.skysports.com/football/news/13612301/thomas-tuchel-england-boss-unhappy-as-anti-racism-protocol-questions-overshadow-nations-league-test-in-spain",
+       "typ": "media"
+      },
+      {
+       "podd": "The Independent (Yahoo Sports)",
+       "avsnitt": "Thomas Tuchel fumes over ‘twisted’ comments on anti-racism protocol before Spain v England",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/thomas-tuchel-fumes-over-twisted-104514690.html",
+       "typ": "media"
+      },
+      {
+       "podd": "SoccerNews",
+       "avsnitt": "Burn replaces injured Guehi in England squad",
        "datum": "2026-11-09",
-       "adress": "https://www.klix.ba/sport/nogomet/barbarez-u-11-sati-izlazi-pred-novinare-zmajevima-treba-jedna-pobjeda-do-baraza-za-ligu-a/261109023",
-       "typ": "media"
-      },
-      {
-       "podd": "Times.ba",
-       "avsnitt": "Barbarez pred odlučujuće utakmice Lige nacija: U Švedsku idemo po pobjedu, ne zanimaju nas kalkulacije",
-       "datum": "2026-11-09",
-       "adress": "https://www.times.ba/09/11/2026/228578/",
-       "typ": "media"
-      },
-      {
-       "podd": "Klix.ba",
-       "avsnitt": "Zmajevi otputovali za Švedsku prepuni optimizma, pozdravila ih grupica navijača",
-       "datum": "2026-11-13",
-       "adress": "https://www.klix.ba/sport/nogomet/zmajevi-otputovali-za-svedsku-prepuni-optimizma-pozdravila-ih-grupica-navijaca/261113058",
-       "typ": "media"
-      },
-      {
-       "podd": "Fokus.ba",
-       "avsnitt": "Katić bez straha pred Švedsku, Zlomislić najavio pobjedu: \"Nikoga se ne bojimo\"",
-       "datum": "2026-11-12",
-       "adress": "https://www.fokus.ba/sport/reprezentacija/katic-bez-straha-pred-svedsku-zlomislic-najavio-pobjedu-nikoga-se-ne-bojimo/3594668/",
+       "adress": "https://www.soccernews.com/burn-replaces-injured-guehi-in-england-squad/407899/",
        "typ": "media"
       }
      ],
      "text": [
-      "Sergej Barbarez kommer till Solna utan Tarik Muharemović, avstängd för gula kort, och utan Dennis Hadžikadunić, som stannade hemma med en vadskada. Inga ersättare kallades in, och 25 spelare flög till Stockholm på fredagen.",
-      "Laget är obesegrat i gruppen och ligger två poäng efter Sverige. En seger på de två sista matcherna räcker till kval om A-divisionen, men Barbarez säger att han inte bryr sig om kalkyler.",
-      "Målvakten Martin Zlomislić kallar Sverige gruppens starkaste motstånd men lovar ändå seger, skriver Fokus.ba. I truppen finns också 17-årige Matej Deket från Borac, uttagen för första gången."
+      "England är klart för kvartsfinal men måste vinna för att ta gruppsegern. Sedan förlusten med 2–3 på Wembley har laget vunnit fyra raka, bland dem 7–0 mot Kroatien.",
+      "Upptakten har handlat om rasism. Thomas Tuchel sa att han kanske skulle ta fem minuter för att gå igenom Uefas protokoll med spelarna och blev upprörd när orden fördes vidare till De la Fuente. ”Jag har aldrig pratat om rasism i Spanien”, säger han.",
+      "James Trafford står i mål i stället för Jordan Pickford. Ezri Konsa och Djed Spence är tillbaka, medan Marc Guéhi är skadad."
      ],
      "citat": {
-      "sagt": "Vårt minimimål är andraplatsen, för att hamna i andra seedningsgruppen i EM-kvallottningen, och till Sverige åker vi för att försöka vinna.",
-      "vem": "Sergej Barbarez",
-      "podd": "Times.ba",
+      "sagt": "Vi försöker ta det ifrån dem. Vi försöker slå dem, och vi är laddade.",
+      "vem": "Thomas Tuchel, om världsmästarna Spanien",
+      "podd": "England Football",
       "typ": "media",
-      "datum": "2026-11-09"
+      "datum": "2026-11-14"
      },
      "namn": [
-      "Sergej Barbarez",
-      "Tarik Muharemović",
-      "Dennis Hadžikadunić",
-      "Martin Zlomislić",
-      "Matej Deket"
+      "Thomas Tuchel",
+      "De la Fuente",
+      "James Trafford",
+      "Jordan Pickford",
+      "Ezri Konsa",
+      "Djed Spence",
+      "Marc Guéhi"
      ]
     }
    ]
   },
   {
-   "id": "401861167",
+   "id": "401861177",
    "nr": 2,
-   "match": "Portugal – Danmark",
+   "match": "Frankrike – Turkiet",
    "lag": [
-    "Portugal",
-    "Danmark"
+    "Frankrike",
+    "Turkiet"
    ],
-   "avspark": "2026-11-14T19:45:00.000Z",
-   "skriven": "2026-11-13T22:00:00.000Z",
+   "avspark": "2026-11-15T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
    "hand": true,
-   "rubrik": "Utan Ronaldo, Leão och Dorgu i Braga",
+   "rubrik": "Zidane avfärdar ryktena, Turkiet tappar målvakten",
    "ingress": null,
-   "summering": "Portugal gör sin första match utan Ronaldo, saknar Leão och Cancelo men behöver bara en poäng för gruppsegern. Danmark har tappat Dorgu och Christensen, och en tv-expert ilsknar till.",
-   "landskamp": {
-    "turnering": "Nations League",
-    "grupp": "A4"
-   },
+   "summering": "Frankrike har Kylian Mbappé tillbaka efter förlusten i Milano, och Zinédine Zidane kallar ryktena om en spricka dumheter. Turkiet har 0 poäng, förlorade Sergen Yalçıns första match och saknar målvakten Uğurcan Çakır.",
    "delar": [
     {
-     "lag": "Portugal",
+     "lag": "Frankrike",
      "kallor": [
       {
-       "podd": "Record",
-       "avsnitt": "A primeira convocatória de Jorge Jesus após o adeus de Ronaldo à Seleção: sete novidades e uma exclusão por opção",
-       "datum": "2026-11-06",
-       "adress": "https://www.record.pt/internacional/competicoes-de-selecoes/liga-das-nacoes/detalhe/a-primeira-convocatoria-de-jorge-jesus-apos-o-adeus-de-cristiano-ronaldo-a-selecao-nacional",
-       "typ": "media"
-      },
-      {
-       "podd": "TSF",
-       "avsnitt": "Alterações na seleção: Nuno Tavares, Tomás Araújo e Rafael Leão saem, Gonçalo Inácio e Nazinho entram",
-       "datum": "2026-11-09",
-       "adress": "https://www.tsf.pt/desporto/artigo/mais-alteracoes-na-selecao-nuno-tavares-tomas-araujo-e-rafael-leao-sao-baixas-goncalo-inacio-regressa/18146302",
-       "typ": "media"
-      },
-      {
-       "podd": "O Jogo",
-       "avsnitt": "Primeiro estágio sem Cristiano Ronaldo: Portugal arranca preparação com homenagens ao antigo capitão",
-       "datum": "2026-11-09",
-       "adress": "https://www.ojogo.pt/internacional/artigo/primeiro-estagio-sem-cristiano-ronaldo-portugal-arranca-preparacao-com-homenagens-ao-antigo-capitao/18146489",
-       "typ": "media"
-      },
-      {
-       "podd": "DNOTICIAS.PT",
-       "avsnitt": "Palhinha de regresso no último treino de Portugal antes da Dinamarca",
+       "podd": "Eurosport (AFP)",
+       "avsnitt": "France-Turquie (Ligue des nations) : Kylian Mbappé était présent à l'entraînement, Désiré Doué reste incertain",
        "datum": "2026-11-13",
-       "adress": "https://www.dnoticias.pt/2026/11/13/512819-palhinha-de-regresso-no-ultimo-treino-de-portugal-antes-da-dinamarca/",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Första samlingen utan Cristiano Ronaldo började med hyllningar till den forne lagkaptenen, skriver O Jogo. Sedan kom avbräcken: Rafael Leão, Nuno Tavares och Tomás Araújo underkändes av läkarna och fick lämna lägret i måndags.",
-      "Jorge Jesus kallade in Monacos vänsterback Flávio Nazinho för första gången – och Gonçalo Inácio, den ende han hade petat av eget val, enligt Record. Leão ersattes inte alls.",
-      "João Cancelo är avstängd. João Palhinha missade torsdagens träning med influensasymtom men var tillbaka på fredagen. Portugal toppar gruppen med 12 poäng och behöver bara en poäng för att vinna den."
-     ],
-     "namn": [
-      "Cristiano Ronaldo",
-      "Rafael Leão",
-      "Nuno Tavares",
-      "Tomás Araújo",
-      "Jorge Jesus",
-      "Flávio Nazinho",
-      "Gonçalo Inácio",
-      "Leão",
-      "João Cancelo",
-      "João Palhinha"
-     ]
-    },
-    {
-     "lag": "Danmark",
-     "kallor": [
-      {
-       "podd": "TV 2 Sport",
-       "avsnitt": "Dorgu og 'AC' efterudtaget – men kun en møder op",
-       "datum": "2026-11-09",
-       "adress": "https://sport.tv2.dk/fodbold/2026-11-09-dorgu-og-ac-efterudtaget-men-kun-en-moeder-op",
+       "adress": "https://www.eurosport.fr/football/ligue-des-nations/2026-2027/france-turquie-ligue-des-nations-kylian-mbappe-etait-present-a-lentrainement-desire-doue-reste-incertain_sto23355124/story.shtml",
        "typ": "media"
       },
       {
-       "podd": "TV 2 Sport",
-       "avsnitt": "- Det er fuldkommen utilfredsstillende, siger Bruun om Dorgu og Christensen",
-       "datum": "2026-11-09",
-       "adress": "https://sport.tv2.dk/fodbold/2026-11-09-det-er-fuldkommen-utilfredsstillende-siger-bruun-om-dorgu-og-christensen",
-       "typ": "media"
-      },
-      {
-       "podd": "TV 2 Sport",
-       "avsnitt": "Riemer røber intet i atypisk situation for landsholdet",
-       "datum": "2026-11-10",
-       "adress": "https://sport.tv2.dk/fodbold/2026-11-10-riemer-roeber-intet-i-atypisk-situation-for-landsholdet",
-       "typ": "media"
-      },
-      {
-       "podd": "PL Bold",
-       "avsnitt": "Kæmpe nedtur for Danmark: Nu er Manchester United-stjernen sendt hjem",
+       "podd": "RMC Sport (Yahoo)",
+       "avsnitt": "Equipe de France: Mbappé à l'entraînement, Doué incertain face à la Turquie",
        "datum": "2026-11-13",
-       "adress": "https://www.plbold.dk/nyhed/chok-melding-fra-landsholdslejren-stjerne-har-dumpet-test-og-udgaar/",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Patrick Dorgu hann knappt packa upp. Manchester United-backen kallades in i efterhand, men landslagsläkaren Morten Boesen skickade hem honom efter tester som visade att han inte var tillräckligt återställd, skriver PL Bold. Andreas Christensen tackade själv nej.",
-      "Båda hade spelat för sina klubbar helgen innan. I TV 2 Sport kallar Morten Bruun hela historien ”fullkomligt otillfredsställande”.",
-      "Brian Riemer har inte heller avslöjat om Filip Jørgensen eller Mads Hermansen står i mål – två olika men på många sätt lika målvakter, säger han. Efter Braga väntar Norge i ett utsålt Parken."
-     ],
-     "namn": [
-      "Patrick Dorgu",
-      "Morten Boesen",
-      "Andreas Christensen",
-      "Morten Bruun",
-      "Brian Riemer",
-      "Filip Jørgensen",
-      "Mads Hermansen"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "401861165",
-   "nr": 3,
-   "match": "Norge – Wales",
-   "lag": [
-    "Norge",
-    "Wales"
-   ],
-   "avspark": "2026-11-14T17:00:00.000Z",
-   "skriven": "2026-11-13T22:00:00.000Z",
-   "hand": true,
-   "rubrik": "Snö på Ullevaal, tystnad kring Haaland",
-   "ingress": null,
-   "summering": "Norge har tappat Strand Larsen och Aursnes, tränat inomhus och väntar på att Haaland ska tala. Wales saknar två avstängda men har Wilson tillbaka och samma plan som i Cardiff.",
-   "landskamp": {
-    "turnering": "Nations League",
-    "grupp": "A4"
-   },
-   "delar": [
-    {
-     "lag": "Norge",
-     "kallor": [
-      {
-       "podd": "NRK",
-       "avsnitt": "Strand Larsen melder forfall – Botheim inn som erstatter",
-       "datum": "2026-11-11",
-       "adress": "https://www.nrk.no/sport/strand-larsen-melder-forfall-_-botheim-inn-som-erstatter-1.18079004",
+       "adress": "https://fr.news.yahoo.com/sport/equipe-france-mbapp%C3%A9-pr%C3%A9sent-%C3%A0-213140099.html",
        "typ": "media"
       },
       {
-       "podd": "TV 2",
-       "avsnitt": "Wales er finalen",
-       "datum": "2026-11-10",
-       "adress": "https://www.tv2.no/mening-og-analyse/wales-er-finalen/19412461/",
-       "typ": "media"
-      },
-      {
-       "podd": "TV 2",
-       "avsnitt": "Ødegaard etter avlysningen: – Kunne vært bedre forberedt",
-       "datum": "2026-11-13",
-       "adress": "https://www.tv2.no/sport/odegaard-etter-avlysningen-kunne-vaert-bedre-forberedt/19425499/",
-       "typ": "media"
-      },
-      {
-       "podd": "Dagbladet",
-       "avsnitt": "Taus: – Forhandles på bakrommet",
-       "datum": "2026-11-13",
-       "adress": "https://www.dagbladet.no/sport/taus-forhandles-pa-bakrommet/85418604",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Norge har haft snö i stället för träning. Torsdagens pass på Ullevaal ställdes in, och på fredagsmorgonen fick personalen skotta planen. Man kan alltid vara bättre förberedd, medger Martin Ødegaard för TV 2, men det påverkar nog inte laget.",
-      "Jørgen Strand Larsen åkte hem med en fotled som krånglar och ersattes av Erik Botheim. Fredrik Aursnes har en ljumskskada.",
-      "Erling Braut Haaland tiger om domen mot Manchester City, och om han alls möter pressen är oklart, skriver Dagbladet. TV 2:s expert Yaw Amankwah kallar matchen finalen: vinner Norge med två mål är tredjeplatsen säkrad."
-     ],
-     "citat": {
-      "sagt": "Det hänger på en tunn tråd, tror jag.",
-      "vem": "Ståle Solbakken, om Haaland ställer upp för pressen",
-      "podd": "Dagbladet",
-      "typ": "media",
-      "datum": "2026-11-13"
-     },
-     "namn": [
-      "Martin Ødegaard",
-      "Jørgen Strand Larsen",
-      "Erik Botheim",
-      "Fredrik Aursnes",
-      "Erling Braut Haaland",
-      "Yaw Amankwah"
-     ]
-    },
-    {
-     "lag": "Wales",
-     "kallor": [
-      {
-       "podd": "beIN Sports (PA)",
-       "avsnitt": "'Outstanding' Wilson back in Wales' Nations League squad",
-       "datum": "2026-11-04",
-       "adress": "https://www.beinsports.com/en-au/football/uefa-nations-league/articles-video/-outstanding-wilson-back-in-wales-nations-league-squad-2026-11-04",
-       "typ": "media"
-      },
-      {
-       "podd": "beIN Sports (PA)",
-       "avsnitt": "Defending Haaland 'is a collective responsibility', says Wales boss Bellamy",
-       "datum": "2026-11-13",
-       "adress": "https://www.beinsports.com/en-us/soccer/uefa-nations-league/articles/defending-haaland-is-a-collective-responsibility-says-wales-boss-bellamy-2026-11-13",
-       "typ": "media"
-      },
-      {
-       "podd": "Nation.Cymru",
-       "avsnitt": "Craig Bellamy priming Wales for Norway backlash",
-       "datum": "2026-11-13",
-       "adress": "https://nation.cymru/sport/craig-bellamy-priming-wales-for-norway-backlash/",
-       "typ": "media"
-      },
-      {
-       "podd": "Goal",
-       "avsnitt": "'We have full belief' - Dan James backs Wales to silence critics in Norway despite warning of fierce Oslo backlash in Nations League decider",
-       "datum": "2026-11-12",
-       "adress": "https://www.goal.com/en/news/dan-james-wales-silence-critics-norway-oslo-nations-league-decider/blt4d75ba6cd5875f14",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Wales kommer till Oslo med segern från Cardiff i bagaget men utan Ben Cabango och Sorba Thomas, som båda är avstängda. Jordan James är skadad. Harry Wilson är däremot tillbaka, och Craig Bellamy kallar honom enastående.",
-      "Planen mot Haaland är densamma som i oktober: gå upp i press och låt honom inte styra spelet. Bellamy räknar med att Norge är ute efter revansch. ”Men det är fotboll”, säger han.",
-      "Dan James lovar full tro på saken men varnar för ett lag som är svårt att slå. Wales har aldrig vunnit på norsk mark."
-     ],
-     "citat": {
-      "sagt": "Det är ett kollektivt ansvar, inte bara ett individuellt.",
-      "vem": "Craig Bellamy, om att stoppa Haaland",
-      "podd": "beIN Sports (PA)",
-      "typ": "media",
-      "datum": "2026-11-13"
-     },
-     "namn": [
-      "Ben Cabango",
-      "Sorba Thomas",
-      "Jordan James",
-      "Harry Wilson",
-      "Craig Bellamy",
-      "Haaland",
-      "Dan James"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "401861168",
-   "nr": 4,
-   "match": "Rumänien – Polen",
-   "lag": [
-    "Rumänien",
-    "Polen"
-   ],
-   "avspark": "2026-11-14T19:45:00.000Z",
-   "skriven": "2026-11-13T22:00:00.000Z",
-   "hand": true,
-   "rubrik": "Hagi gråter inte, Polen har inte råd att förlora",
-   "ingress": null,
-   "summering": "Rumänien har förlorat fyra raka och saknar Marin, Stanciu och Radu, så Hagi byter i anfallet. Polen måste vinna för att behålla hoppet om bättre seedning, men Bednarek är avstängd.",
-   "landskamp": {
-    "turnering": "Nations League",
-    "grupp": "B4"
-   },
-   "delar": [
-    {
-     "lag": "Rumänien",
-     "kallor": [
-      {
-       "podd": "Antena Sport",
-       "avsnitt": "Gică Hagi, replică pentru Nicuşor Stanciu şi Ionuţ Radu: \"Nu o să plâng niciodată după niciun jucător. România e mult mai mare\"",
-       "datum": "2026-11-13",
-       "adress": "https://as.ro/fotbal/echipa-nationala/gica-hagi-replica-pentru-nicusor-stanciu-si-ionut-radu-nu-o-sa-plang-niciodata-dupa-niciun-jucator-romania-e-mult-mai-mare-707850.html",
-       "typ": "media"
-      },
-      {
-       "podd": "Digi Sport",
-       "avsnitt": "Hagi s-a “săturat” și anunță trei schimbări în atacul României: “Jucătorii nu sunt la forma maximă”",
-       "datum": "2026-11-13",
-       "adress": "https://www.digisport.ro/fotbal/echipa-nationala/hagi-anunta-trei-schimbari-in-atacul-romaniei-jucatorii-nu-sunt-in-forma-maxima-4601723",
-       "typ": "media"
-      },
-      {
-       "podd": "Digi FM",
-       "avsnitt": "Gheorghe Hagi, înainte de meciul cu Polonia din Liga Națiunilor: \"Jucătorilor le-am cerut să nu luăm goluri, nu așa de multe, și să marcăm\"",
-       "datum": "2026-11-13",
-       "adress": "https://www.digifm.ro/stiri/sport/gheorghe-hagi-inainte-de-meciul-cu-polonia-din-liga-natiunilor-jucatorilor-le-am-cerut-sa-nu-luam-goluri-nu-asa-de-multe-si-sa-marcam-377745",
-       "typ": "media"
-      },
-      {
-       "podd": "Fanatik",
-       "avsnitt": "România lui Hagi, la un pas de un record negativ absolut! Nu s-a întâmplat niciodată în 104 ani",
-       "datum": "2026-11-12",
-       "adress": "https://www.fanatik.ro/romania-lui-hagi-la-un-pas-de-un-record-negativ-absolut-nu-s-a-intamplat-niciodata-in-104-ani-21587315",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Gheorghe Hagi lovar minst tre byten i anfallet. Spelarna där framme ”är inte i högform”, sa förbundskaptenen på fredagens presskonferens. Ianis Hagi och Dennis Man får spela i båda novembermatcherna.",
-      "Truppen har glesnat. Lagkaptenen Răzvan Marin är avstängd efter två gula kort mot Sverige, Nicolae Stanciu och Valentin Mihăilă har muskelbesvär och målvakten Ionuț Radu bad att slippa kallelsen för att vårda en axel. Hagi svarade att han aldrig tänker gråta efter någon spelare – Rumänien är större.",
-      "En femte raka förlust har landslaget inte varit med om på 104 år, skriver Fanatik."
-     ],
-     "citat": {
-      "sagt": "Jag har bett spelarna att vi inte ska släppa in mål, inte så många, och att vi ska göra mål.",
-      "vem": "Gheorghe Hagi",
-      "podd": "Digi FM",
-      "typ": "media",
-      "datum": "2026-11-13"
-     },
-     "namn": [
-      "Gheorghe Hagi",
-      "Ianis Hagi",
-      "Dennis Man",
-      "Răzvan Marin",
-      "Nicolae Stanciu",
-      "Valentin Mihăilă",
-      "Ionuț Radu"
-     ]
-    },
-    {
-     "lag": "Polen",
-     "kallor": [
-      {
-       "podd": "PZPN",
-       "avsnitt": "Jan Urban o powołaniach na listopadowe mecze. „Chcemy zobaczyć innych zawodników”",
-       "datum": "2026-11-06",
-       "adress": "https://www.pzpn.pl/reprezentacje/reprezentacja-a/aktualnosci/2026-11-06/jan-urban-o-powolaniach-na-listopadowe-mecze-chcemy-zobaczyc-innych-zawodnikow",
-       "typ": "media"
-      },
-      {
-       "podd": "Polsat Sport",
-       "avsnitt": "Jan Bednarek dołączył do reprezentacji. Wiadomo, co z jego zdrowiem",
-       "datum": "2026-11-11",
-       "adress": "https://www.polsatsport.pl/wiadomosc/2026-11-11/jan-bednarek-dolaczyl-do-reprezentacji-wiadomo-co-z-jego-zdrowiem/",
-       "typ": "media"
-      },
-      {
-       "podd": "Polsat Sport",
-       "avsnitt": "Zmiana w reprezentacji Polski. Jest oficjalny komunikat",
-       "datum": "2026-11-12",
-       "adress": "https://www.polsatsport.pl/wiadomosc/2026-11-12/zmiana-w-reprezentacji-polski-jest-oficjalny-komunikat/",
-       "typ": "media"
-      },
-      {
-       "podd": "Rzeczpospolita",
-       "avsnitt": "W sobotę Rumunia – Polska w Lidze Narodów. Uniknąć katastrofy",
-       "datum": "2026-11-13",
-       "adress": "https://sport.rp.pl/pilka-nozna/art45480161-w-sobote-rumunia-polska-w-lidze-narodow-uniknac-katastrofy",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Bara seger i Bukarest håller liv i hoppet om andra seedningsgruppen inför lottningen till EM 2028, skriver Rzeczpospolita. Jan Urbans jobb anses hänga på de här två matcherna.",
-      "Försvaret är tunnat. Jan Bednarek är avstängd för gula kort och Przemysław Frankowski har lämnat lägret med en muskelskada, ersatt av Arkadiusz Pyrka. Łukasz Skorupski petades vid uttagningen – ”vi letar efter yngre”, sa Urban. In kom tre debutanter, bland dem 19-årige Bartosz Mazurek, som satt bredvid Urban på presskonferensen.",
-      "Robert Lewandowski lovar ingen repris på 6–0 i Warszawa, bara att laget åker dit för att vinna."
-     ],
-     "citat": {
-      "sagt": "Vi vill se andra spelare.",
-      "vem": "Jan Urban",
-      "podd": "PZPN",
-      "typ": "media",
-      "datum": "2026-11-06"
-     },
-     "namn": [
-      "Jan Urban",
-      "Jan Bednarek",
-      "Przemysław Frankowski",
-      "Arkadiusz Pyrka",
-      "Łukasz Skorupski",
-      "Bartosz Mazurek",
-      "Robert Lewandowski"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "401861169",
-   "nr": 5,
-   "match": "Nordirland – Ukraina",
-   "lag": [
-    "Nordirland",
-    "Ukraina"
-   ],
-   "avspark": "2026-11-14T19:45:00.000Z",
-   "skriven": "2026-11-13T22:00:00.000Z",
-   "hand": true,
-   "rubrik": "Nordirland en seger från A-divisionen",
-   "ingress": null,
-   "summering": "Nordirland leder gruppen och går upp i A-divisionen med seger i Belfast. Ukraina, som föll med 0–3 mot samma lag i oktober, kämpar mot nedflyttning utan Jarmolenko, Tsyhankov och Lunin.",
-   "landskamp": {
-    "turnering": "Nations League",
-    "grupp": "B2"
-   },
-   "delar": [
-    {
-     "lag": "Nordirland",
-     "kallor": [
-      {
-       "podd": "News Letter",
-       "avsnitt": "Michael O’Neill says Northern Ireland Nations League promotion would be ‘huge achievement’",
-       "datum": "2026-11-09",
-       "adress": "https://www.newsletter.co.uk/sport/football/michael-oneill-says-northern-ireland-nations-league-promotion-would-be-huge-achievement-9338751",
-       "typ": "media"
-      },
-      {
-       "podd": "News Letter",
-       "avsnitt": "Michael O'Neill disappointed as 'great asset' withdraws from Northern Ireland squad through injury",
-       "datum": "2026-11-10",
-       "adress": "https://www.newsletter.co.uk/sport/football/northern-ireland/michael-oneill-disappointed-as-great-asset-withdraws-from-northern-ireland-squad-through-injury-9341358",
-       "typ": "media"
-      },
-      {
-       "podd": "The People's Person",
-       "avsnitt": "Dermot Mee earns first senior Northern Ireland call-up",
-       "datum": "2026-11-03",
-       "adress": "https://thepeoplesperson.com/2026/11/03/dermot-mee-earns-first-senior-northern-ireland-call-up-321125/",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "En seger på Windsor Park räcker för att lyfta Nordirland till Nations Leagues A-division. Laget leder gruppen med en poäng före Ungern, och i oktober krossades Ukraina med 0–3 i Trnava.",
-      "Michael O'Neill kallar en uppflyttning en enorm bedrift men vill inte lägga någon börda på en ung trupp, skriver News Letter. Målvakten Dermot Mee från Manchester United och Portsmouths anfallare Eoin Kenny har fått sina första kallelser.",
-      "Arsenaltalangen Ceadach O'Neill har däremot lämnat återbud med en skada, och någon ersättare verkar inte vara på väg."
-     ],
-     "namn": [
-      "Michael O'Neill",
-      "Dermot Mee",
-      "Eoin Kenny",
-      "Ceadach O'Neill"
-     ]
-    },
-    {
-     "lag": "Ukraina",
-     "kallor": [
-      {
-       "podd": "Dynamo.kiev.ua",
-       "avsnitt": "Андреа Мальдера оголосив склад збірної України на матчі Ліги націй у листопаді",
-       "datum": "2026-11-04",
-       "adress": "https://dynamo.kiev.ua/uk/news/742306-andrea-maldera-oholosyv-sklad-zbirnoi-ukrainy-na-matchi-lihy-natsii-u-lystopadi",
-       "typ": "media"
-      },
-      {
-       "podd": "Dynamo.kiev.ua",
-       "avsnitt": "Пресконференція. Андреа Мальдера: «Наша головна мета в Лізі націй — зберегти місце в Дивізіоні «Б»",
-       "datum": "2026-11-06",
-       "adress": "https://dynamo.kiev.ua/uk/news/742562-preskonferentsiia-andrea-maldera-nasha-holovna-meta-v-lizi-natsii-zberehty-mistse-v-dyvizioni-b",
-       "typ": "media"
-      },
-      {
-       "podd": "Sport.ua",
-       "avsnitt": "Прес-конференція Мальдери у Белфасті. Дивитись онлайн. LIVE трансляція",
-       "datum": "2026-11-13",
-       "adress": "https://sport.ua/uk/news/924544-pres-konferentsiya-malderi-u-belfasti-divitis-onlayn-live-translyatsiya",
-       "typ": "media"
-      },
-      {
-       "podd": "Sport.ua",
-       "avsnitt": "Вечір суцільної ганьби. Україна розгромно поступилась Північній Ірландії",
-       "datum": "2026-10-02",
-       "adress": "https://sport.ua/uk/news/912152-vechir-sutsilnoi-ganbi-ukraina-rozgromno-postupilas-pivnichniy-irlandii",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Ukraina har bara fyra poäng och spelar inte längre om toppen utan om att stanna kvar i B-divisionen. Det säger Andrea Maldera själv: förbundskaptenen kallar det sitt huvudmål.",
-      "Truppen saknar Viktor Tsyhankov, Andrij Jarmolenko och Andrij Lunin. Hennadij Syntjuk och Oleksij Kasjtjuk är nya namn, medan Artem Dovbyk först bara togs ut som reserv.",
-      "Minnet från oktober svider fortfarande. Sport.ua kallade 0–3 mot just Nordirland för ”en kväll av total skam”, och målvakten Dmytro Riznyk bjöd på ett av målen."
-     ],
-     "citat": {
-      "sagt": "Vårt huvudmål i Nations League är att behålla platsen i division B.",
-      "vem": "Andrea Maldera, förbundskapten",
-      "podd": "Dynamo.kiev.ua",
-      "typ": "media",
-      "datum": "2026-11-06"
-     },
-     "namn": [
-      "Andrea Maldera",
-      "Viktor Tsyhankov",
-      "Andrij Jarmolenko",
-      "Andrij Lunin",
-      "Hennadij Syntjuk",
-      "Oleksij Kasjtjuk",
-      "Artem Dovbyk",
-      "Dmytro Riznyk"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "401861170",
-   "nr": 6,
-   "match": "Österrike – Irland",
-   "lag": [
-    "Österrike",
-    "Irland"
-   ],
-   "avspark": "2026-11-14T19:45:00.000Z",
-   "skriven": "2026-11-13T22:00:00.000Z",
-   "hand": true,
-   "rubrik": "Österrike tappar två, Irland får tillbaka kaptenen",
-   "ingress": null,
-   "summering": "Österrike tar steget upp till Liga A med en seger, men saknar Xaver Schlager och Alexander Prass. Irland har fått tillbaka kaptenen Nathan Collins och behöver vinna.",
-   "landskamp": {
-    "turnering": "Nations League",
-    "grupp": "B3"
-   },
-   "delar": [
-    {
-     "lag": "Österrike",
-     "kallor": [
-      {
-       "podd": "ORF Sport",
-       "avsnitt": "Schlager und Prass fallen gegen Irland aus",
-       "datum": "2026-11-13",
-       "adress": "https://sport.orf.at/stories/3164834",
-       "typ": "media"
-      },
-      {
-       "podd": "ORF Sport",
-       "avsnitt": "A. Schlager wird gegen Irland im ÖFB-Tor stehen",
-       "datum": "2026-11-13",
-       "adress": "https://sport.orf.at/stories/3164846",
-       "typ": "media"
-      },
-      {
-       "podd": "Laola1",
-       "avsnitt": "Zwei Ausfälle im ÖFB-Team vor Irland-Spiel",
-       "datum": "2026-11-13",
-       "adress": "https://www.laola1.at/de/red/fussball/oefb-nationalteam/a-team/news/zwei-ausfaelle-im-oefb-team-vor-irland-spiel/",
-       "typ": "media"
-      },
-      {
-       "podd": "ORF Sport",
-       "avsnitt": "Nations League: Ohne Alaba, mit Baumgartner und Neuling",
-       "datum": "2026-11-02",
-       "adress": "https://sport.orf.at/stories/3164385/",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Österrike står utan två ordinarie. Xaver Schlager och Alexander Prass har muskelskador i låret, och in kommer 19-årige Yanik Spalt från Stuttgart, uppkallad från U21-laget, rapporterar ORF. Kaptenen David Alaba saknades redan när truppen togs ut.",
-      "En seger i Linz ger förstaplatsen och återkomsten till Liga A. Rangnick har lovat sitt starkaste lag och avslöjade på fredagens presskonferens att Alexander Schlager står i mål.",
-      "I truppen finns också 17-årige Luca Weinhandl från Sturm Graz, uttagen för första gången."
-     ],
-     "citat": {
-      "sagt": "Vi kommer att skicka ut vår starkaste elva mot Irland.",
-      "vem": "Ralf Rangnick",
-      "podd": "ORF Sport",
-      "typ": "media",
-      "datum": "2026-11-02"
-     },
-     "namn": [
-      "Xaver Schlager",
-      "Alexander Prass",
-      "Yanik Spalt",
-      "David Alaba",
-      "Rangnick",
-      "Alexander Schlager",
-      "Luca Weinhandl"
-     ]
-    },
-    {
-     "lag": "Irland",
-     "kallor": [
-      {
-       "podd": "RTÉ",
-       "avsnitt": "Collins senses 'different feel' after 'stressful' absence",
-       "datum": "2026-11-13",
-       "adress": "https://www.rte.ie/sport/soccer/2026/1113/1599009-collins-senses-different-feel-after-stressful-absence/",
-       "typ": "media"
-      },
-      {
-       "podd": "The Irish Times",
-       "avsnitt": "Séamus Coleman out for Ireland’s Nations League game against Austria",
-       "datum": "2026-11-13",
-       "adress": "https://www.irishtimes.com/sport/soccer/2026/11/13/seamus-coleman-out-for-irelands-nations-league-game-against-austria/",
-       "typ": "media"
-      },
-      {
-       "podd": "The Irish Times",
-       "avsnitt": "Moving on from Israel and can Troy Parrott keep scoring? Talking points ahead of Austria v Ireland",
-       "datum": "2026-11-12",
-       "adress": "https://www.irishtimes.com/sport/soccer/2026/11/12/austria-v-ireland-training-ground-setup-at-odds-with-hallgrimssons-desire-to-move-on/",
-       "typ": "media"
-      },
-      {
-       "podd": "The Irish Times",
-       "avsnitt": "Nathan Collins aware of ‘scar tissue’ in Ireland camp after Israel games",
-       "datum": "2026-11-13",
-       "adress": "https://www.irishtimes.com/sport/soccer/2026/11/13/nathan-collins-aware-of-scar-tissue-in-ireland-camp-after-israel-games/",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Irland reser till Linz med lagkaptenen Nathan Collins tillbaka efter vadskadan. Han missade de omstridda matcherna mot Israel och säger till RTÉ att det var påfrestande att följa laget utifrån, men att det känns annorlunda i truppen nu.",
-      "Séamus Coleman tränar med laget i en dubbelroll som spelare och tränare men är inte med i lördagens trupp, skriver The Irish Times. Mark Travers ersätter skadade Gavin Bazunu i målvaktsgruppen.",
-      "Vinner Irland båda de återstående matcherna vinner de också gruppen. The Irish Times frågar sig om Troy Parrott kan fortsätta göra mål i samma takt."
-     ],
-     "citat": {
-      "sagt": "Det var förmodligen mer påfrestande att vara utanför än det hade varit att stå mitt i det.",
-      "vem": "Nathan Collins",
-      "podd": "The Irish Times",
-      "typ": "media",
-      "datum": "2026-11-13"
-     },
-     "namn": [
-      "Nathan Collins",
-      "Séamus Coleman",
-      "Mark Travers",
-      "Gavin Bazunu",
-      "Troy Parrott"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "401861164",
-   "nr": 7,
-   "match": "Georgien – Ungern",
-   "lag": [
-    "Georgien",
-    "Ungern"
-   ],
-   "avspark": "2026-11-14T17:00:00.000Z",
-   "skriven": "2026-11-13T22:00:00.000Z",
-   "hand": true,
-   "rubrik": "Ena kaptenen tejpad, den andra opererad",
-   "ingress": null,
-   "summering": "Georgien saknar Kvaratskhelia och prövar nya namn under en ny förbundskapten. Ungern räknar med en poäng i Tbilisi, men vet inte om Szoboszlai kan spela och får spela utan egna supportrar.",
-   "landskamp": {
-    "turnering": "Nations League",
-    "grupp": "B2"
-   },
-   "delar": [
-    {
-     "lag": "Georgien",
-     "kallor": [
-      {
-       "podd": "Lelo.ge",
-       "avsnitt": "[პრესკონფერენცია. საქართველო-უნგრეთი] რამაზ სვანაძე: \"მზად ვართ და იმედია, ეს მოედანზე გამოჩნდება\"...",
-       "datum": "2026-11-13",
-       "adress": "https://lelo.ge/article/%E1%83%9E%E1%83%A0%E1%83%94%E1%83%A1%E1%83%99%E1%83%9D%E1%83%9C%E1%83%A4%E1%83%94%E1%83%A0%E1%83%94%E1%83%9C%E1%83%AA%E1%83%98%E1%83%90-%E1%83%A1%E1%83%90%E1%83%A5%E1%83%90%E1%83%A0%E1%83%97%E1%83%95%E1%83%94%E1%83%9A%E1%83%9D-%E1%83%A3%E1%83%9C%E1%83%92%E1%83%A0%E1%83%94%E1%83%97%E1%83%98-%E1%83%A0%E1%83%90%E1%83%9B%E1%83%90%E1%83%96-%E1%83%A1%E1%83%95%E1%83%90%E1%83%9C%E1%83%90%E1%83%AB%E1%83%94-%E1%83%9B%E1%83%96%E1%83%90%E1%83%93-%E1%83%95%E1%83%90%E1%83%A0%E1%83%97-%E1%83%93%E1%83%90-%E1%83%98%E1%83%9B%E1%83%94%E1%83%93%E1%83%98%E1%83%90-%E1%83%94%E1%83%A1-%E1%83%9B%E1%83%9D%E1%83%94%E1%83%93%E1%83%90%E1%83%9C%E1%83%96%E1%83%94-%E1%83%92%E1%83%90%E1%83%9B%E1%83%9D%E1%83%A9%E1%83%9C%E1%83%93%E1%83%94%E1%83%91%E1%83%90-58952/",
-       "typ": "media"
-      },
-      {
-       "podd": "Crystalsport",
-       "avsnitt": "უნგრეთი მხოლოდ სობოსლაი არაა - სვანაძე რევანშზე ფიქრობს",
-       "datum": "2026-11-10",
-       "adress": "https://www.crystalsport.ge/news/89466-ungreti-mkholod-soboslai-araa--svanadze-revanshze-pikrobs",
-       "typ": "media"
-      },
-      {
-       "podd": "Rustavi 2",
-       "avsnitt": "Squad of the Georgian national team for the UEFA Nations League matches has been announced",
-       "datum": "2026-11-03",
-       "adress": "https://rustavi2.ge/en/news/369954",
-       "typ": "media"
-      },
-      {
-       "podd": "QNC News",
-       "avsnitt": "Kvaratskhelia Begins Long Recovery After PSG Knee Surgery",
-       "datum": "2026-10-27",
-       "adress": "https://qncnews.com/2026/10/27/kvaratskhelia-begins-long-recovery-after-psg-knee-surgery/",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Georgien får klara sig utan Khvicha Kvaratskhelia. Kaptenen och stjärnan har opererats för ett avslitet främre korsband i höger knä, och PSG har inte satt något datum för comebacken.",
-      "Ramaz Svanadze, som tog över efter Willy Sagnol, har i stället kallat in tre nya namn: målvakten Nodar Kalichava, försvararen Giorgi Maisuradze från ukrainska Polissia och mittfältaren Giorgi Moistsrapishvili från Spartak Trnava.",
-      "I Budapest i oktober föll Georgien på uddamålet. Nu talar förbundskaptenen om revansch, och Crystalsport sammanfattar hans resonemang i rubriken: Ungern är inte bara Szoboszlai."
-     ],
-     "namn": [
-      "Khvicha Kvaratskhelia",
-      "Ramaz Svanadze",
-      "Willy Sagnol",
-      "Nodar Kalichava",
-      "Giorgi Maisuradze",
-      "Giorgi Moistsrapishvili",
-      "Szoboszlai"
-     ]
-    },
-    {
-     "lag": "Ungern",
-     "kallor": [
-      {
-       "podd": "Kisalföld",
-       "avsnitt": "Kötéssel a lábán edzett Szoboszlai, az utolsó pillanatban dől el a sorsa",
-       "datum": "2026-11-13",
-       "adress": "https://www.kisalfold.hu/helyi-sport/2026/11/szoboszlai-serules-valogatott",
-       "typ": "media"
-      },
-      {
-       "podd": "Nemzeti Sport",
-       "avsnitt": "Rajtuk keresztül vezet az út az A-ligába – íme a grúz és az északír keret",
-       "datum": "2026-11-10",
-       "adress": "https://www.nemzetisport.hu/magyar-valogatott/2026/11/rajtuk-keresztul-vezet-az-ut-az-a-ligaba-ime-a-gruz-es-az-eszakir-keret",
-       "typ": "media"
-      },
-      {
-       "podd": "Magyar Nemzet",
-       "avsnitt": "Rossi kerete: Varga és Sallai jöhet, Szoboszlai óvatos lesz",
-       "datum": "2026-11-03",
-       "adress": "https://magyarnemzet.hu/sport/2026/11/rossi-keret-magyar-valogatott-szoboszlai-sallai-varga",
-       "typ": "media"
-      },
-      {
-       "podd": "nb1.hu",
-       "avsnitt": "Georgia-Magyarország: drasztikus döntést hozott az UEFA",
-       "datum": "2026-10-22",
-       "adress": "https://nb1.hu/hir/georgia-magyarorszag-nemzetek-ligaja-szankcio-szurkolok-uefa-buntetes/",
-       "typ": "media"
-      }
-     ],
-     "text": [
-      "Dominik Szoboszlai stukade knät mot Crystal Palace, och om han spelar avgörs i sista stund. Han har tränat fullt, men med högerknät tejpat. Står kaptenen över kan nykomlingen József Urblík från Vasas ta platsen, enligt Marco Rossi.",
-      "Roland Sallai och Barnabás Varga är tillbaka i truppen.",
-      "Nemzeti Sport räknar: minst oavgjort i Tbilisi och sedan seger mot Nordirland i Budapest räcker för att ta sig upp i A-divisionen. Hejaramsorna får komma från annat håll. Uefa har förbjudit ungerska bortasupportrar efter bråket på matchen mot Ukraina."
-     ],
-     "namn": [
-      "Dominik Szoboszlai",
-      "József Urblík",
-      "Marco Rossi",
-      "Roland Sallai",
-      "Barnabás Varga"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "401880749",
-   "nr": 8,
-   "match": "Milton Keynes Dons – Burton Albion",
-   "lag": [
-    "Milton Keynes Dons",
-    "Burton Albion"
-   ],
-   "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-14T08:07:53.922Z",
-   "rubrik": "Ingen i Milton Keynes är rädd för Matthew Dennis",
-   "ingress": null,
-   "summering": "MK Dons går in med god stämning och fruktar Webster mer än sin gamle anfallare. Burton har en skadedrabbad trupp, en målvakt utan konkurrens och sätter sitt hopp till unge Scutt.",
-   "delar": [
-    {
-     "lag": "Milton Keynes Dons",
-     "kallor": [
-      {
-       "podd": "The MooCamp",
-       "avsnitt": "Saturday 14th November L1: MK Dons Vs Burton 3pm · Prediction League - Gameweek 14 - Burton Albion (H) · Tuesday 10th Nov FLT: Bromley Vs MK Dobs 7.30pm (SKY)",
+       "podd": "Eurosport",
+       "avsnitt": "Ligue des nations I France - Turquie I Zinédine Zidane sur sa relation avec Kylian Mbappé : \"Ce sont des bêtises, c'est assez agaçant\"",
        "datum": "2026-11-14",
-       "adress": "https://www.moocamp.com/forum/viewtopic.php?t=374",
-       "typ": "forum"
-      },
-      {
-       "podd": "The MooCamp",
-       "avsnitt": "Saturday 14th November L1: MK Dons Vs Burton 3pm · Prediction League - Gameweek 14 - Burton Albion (H) · Tuesday 10th Nov FLT: Bromley Vs MK Dobs 7.30pm (SKY)",
-       "datum": "2026-11-13",
-       "adress": "https://www.moocamp.com/forum/viewtopic.php?t=374",
-       "typ": "forum"
-      },
-      {
-       "podd": "MK Citizen",
-       "avsnitt": "Warne wary not to stir the pot by giving Burton midfielder conflicting messages",
-       "datum": "2026-11-12",
-       "adress": "https://www.miltonkeynes.co.uk/sport/football/mk-dons/warne-wary-not-to-stir-the-pot-by-giving-burton-midfielder-conflicting-messages-9348282",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Stämningen bland supportrarna är god. Segern i Bromley ses som viktig för att hålla igång segersviten inför ligamatchen, och ungdomarna fick värdefull erfarenhet.",
-         "s": "o",
-         "podd": [
-          "The MooCamp"
-         ],
-         "datum": [
-          "2026-11-10"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Burton har inte avskrivit Dennis och han lär vara med. Supportrarna ser ändå Webster som Burtons verkliga hot.",
-         "s": "o",
-         "podd": [
-          "The MooCamp"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna oroar sig inte för att Matthew Dennis ska straffa sin gamla klubb. Han har gjort mål i lägre divisioner men bara två gånger på 26 matcher i League One.",
-         "s": "o",
-         "podd": [
-          "The MooCamp"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Burton har inte uteslutit Matthew Dennis, och han spelar troligen. Supportrarna ser ändå Charlie Webster som Burtons verkliga hot.",
-         "s": "o",
-         "podd": [
-          "The MooCamp"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna oroar sig inte för att förre Donsspelaren Matt Dennis kan spela för Burton. Hans målfacit i League One visar att han sällan gör mål på den här nivån.",
-         "s": "o",
-         "podd": [
-          "The MooCamp"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Lokaltidningen MK Citizen skriver att Will Collar, som MK Dons har lånat ut till Burton, inte får spela mot sin moderklubb på lördag. Han har gjort två mål på sina fyra senaste matcher för Burton.",
-         "s": "b",
-         "podd": [
-          "MK Citizen"
-         ],
-         "datum": [
-          "2026-11-12"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      }
-     ],
-     "text": [
-      "På The MooCamp är ingen orolig för att Matthew Dennis ska straffa sin gamla klubb. Han har gjort mål i lägre divisioner, men att han bara har gjort 2 mål på 26 matcher i League One säger supportrarna allt om hans nivå.",
-      "Burton uteslöt inte Dennis på presskonferensen, men det är Charlie Webster som pekas ut som gästernas ”verkliga hot”. Will Collar, som MK Dons har lånat ut till Burton, får enligt MK Citizen inte spela mot sin moderklubb.",
-      "Stämningen är god efter segern i Bromley, som höll segersviten vid liv inför ligamatchen."
-     ],
-     "citat": {
-      "sagt": "Speltid för dem som behövde det, och värdefull erfarenhet för ungdomarna också.",
-      "vem": "DonnieAndMooie",
-      "podd": "The MooCamp",
-      "typ": "forum",
-      "datum": "2026-11-10"
-     },
-     "namn": [
-      "Matthew Dennis",
-      "Dennis",
-      "Charlie Webster",
-      "Will Collar"
-     ]
-    },
-    {
-     "lag": "Burton Albion",
-     "kallor": [
-      {
-       "podd": "Brewers Babble",
-       "avsnitt": "Episode 92 - Magic of the Cup (feat. FAB)",
-       "datum": "2026-11-13",
-       "adress": "https://shows.acast.com/brewers-babble/episodes/6af6209c7d5cb93e7d83015b",
-       "typ": "podd"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Matthew Dennis tvingades kliva av skadad efter ungefär tolv minuter mot Notts County i tisdags och fyller på en redan lång skadelista.",
-         "s": "b",
-         "podd": [
-          "Brewers Babble"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Corey Addai står i mål mest för att det inte finns något annat val. Alternativet Jacob Kendall Kean bedöms inte vara redo ännu.",
-         "s": "h",
-         "podd": [
-          "Brewers Babble"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Burton har haft svårt att hålla nollan hela säsongen. Supportrarna hoppas att nollan i cupen ger målvakten Corey Addai självförtroende inför ligaspelet.",
-         "s": "o",
-         "podd": [
-          "Brewers Babble"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Den unge anfallaren Zac Scutt har imponerat med självförtroende, teknik och löpningar in i straffområdet. Han har gjort mål i tre olika cuper, och med alla skador i truppen väntas han få många chanser framöver.",
-         "s": "o",
-         "podd": [
-          "Brewers Babble"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Supportrarnas mål för säsongen är att nå ungefär 50 poäng och hålla sig kvar i League One. Pengarna från en cupsvit väger också tungt för en klubb av Burtons storlek.",
-         "s": "o",
-         "podd": [
-          "Brewers Babble"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Ordföranden i supporterrådet menar att ägarna NFG har börjat hitta rätt efter ett turbulent första år. Han ser en plan för en hållbar klubb som utvecklar och säljer spelare.",
-         "s": "h",
-         "podd": [
-          "Brewers Babble"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
-      }
-     ],
-     "text": [
-      "Corey Addai står i Burtons mål mest för att det saknas alternativ: i podden Brewers Babble bedöms Jacob Kendall Kean inte vara redo. Laget har haft svårt att hålla nollan hela säsongen, så nu hoppas man att nollan i cupen ger Addai självförtroende.",
-      "Ljuspunkten är den unge anfallaren Zac Scutt, som har imponerat med teknik och löpningar in i straffområdet. Skadelistan växer, senast med Matthew Dennis som fick kliva av tidigt mot Notts County i tisdags, så Scutt väntas få många chanser."
-     ],
-     "citat": {
-      "sagt": "Jag gillar verkligen det jag ser av Zac Scutt just nu. Jag tycker att självförtroendet finns där.",
-      "vem": null,
-      "podd": "Brewers Babble",
-      "typ": "podd",
-      "datum": "2026-11-13"
-     },
-     "namn": [
-      "Corey Addai",
-      "Jacob Kendall Kean",
-      "Addai",
-      "Zac Scutt",
-      "Matthew Dennis",
-      "Scutt"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "401880747",
-   "nr": 9,
-   "match": "Sheffield Wednesday – Plymouth Argyle",
-   "lag": [
-    "Sheffield Wednesday",
-    "Plymouth Argyle"
-   ],
-   "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-14T08:08:43.280Z",
-   "rubrik": "Palmers trötta ben möter ett Argyle på kryckor",
-   "ingress": null,
-   "summering": "Wednesday ställer en sliten vänsterkant och en modfälld läktare inför Challinors första riktiga prov. Plymouth saknar mannen som täpper till mittfältet och grälar om hur backlinjen ska se ut.",
-   "delar": [
-    {
-     "lag": "Sheffield Wednesday",
-     "kallor": [
-      {
-       "podd": "The Wednesday Week",
-       "avsnitt": "Hello From the Other Side 26/27 - Plymouth Argyle (a)",
-       "datum": "2026-11-13",
-       "adress": "https://shows.acast.com/64abd7bfd593820011a68d78/episodes/hello-from-the-other-side-2627-plymouth-argyle-a",
-       "typ": "podd"
-      },
-      {
-       "podd": "Talking Wednesday | The Sheffield Wednesday Podcast",
-       "avsnitt": "Sheffield Wednesday vs Plymouth Argyle Preview",
-       "datum": "2026-11-13",
-       "adress": "https://talkingwednesday.podbean.com/e/sheffield-wednesday-vs-plymouth-argyle-preview/",
-       "typ": "podd"
-      },
-      {
-       "podd": "Owlstalk",
-       "avsnitt": "OMDT - Sheffield Wednesday vs Plymouth Argyle · Let's Get Plymouth Sold Out · Team for Saturday vs Plymouth at home",
-       "datum": "2026-11-14",
-       "adress": "https://www.owlstalk.co.uk/forums/topic/351013-match-thread/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Owlstalk",
-       "avsnitt": "OMDT - Sheffield Wednesday vs Plymouth Argyle · Let's Get Plymouth Sold Out · Team for Saturday vs Plymouth at home",
-       "datum": "2026-11-14",
-       "adress": "https://www.owlstalk.co.uk/forums/topic/351013-match-thread/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Vital Football",
-       "avsnitt": "Sheffield Wednesday Predicted 11 vs Plymouth: Injuries Stacking Up",
-       "datum": "2026-11-13",
-       "adress": "https://vitalfootball.co.uk/sheffield-wednesday-11-plymouth-26-27-h/",
+       "adress": "https://www.eurosport.fr/football/ligue-des-nations/2026-2027/ligue-des-nations-i-france-turquie-i-zinedine-zidane-sur-sa-relation-avec-kylian-mbappe-ce-sont-des-betises-cest-assez-agacant_sto23355348/story.shtml",
        "typ": "media"
       },
       {
-       "podd": "Vital Football",
-       "avsnitt": "All the Ball But No Killer Instinct from Sheffield Wednesday",
-       "datum": "2026-11-09",
-       "adress": "https://vitalfootball.co.uk/no-killer-instinct-sheffield-wednesday/",
+       "podd": "Foot Mercato",
+       "avsnitt": "Équipe de France : Zinédine Zidane répond cash sur les tensions avec Kylian Mbappé",
+       "datum": "2026-11-14",
+       "adress": "https://www.footmercato.net/a5685789218774891887-equipe-de-france-zinedine-zidane-repond-cash-sur-les-tensions-avec-kylian-mbappe",
        "typ": "media"
-      },
-      {
-       "podd": "The Star",
-       "avsnitt": "SWFC: Owls slapped with yet another injury blow as star faces four-six weeks out",
-       "datum": "2026-11-11",
-       "adress": "https://www.thestar.co.uk/sport/football/sheffield-wednesday/sheffield-wednesday-injury-9345901",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Enligt The Wednesday Word kan målvakten Joe Lumley, Billy Mitchell, Liam Cooper och Louie Barry vara tillbaka och spela i någon form redan nu.",
-         "s": "b",
-         "podd": [
-          "Vital Football"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "media"
-        },
-        {
-         "t": "Tränaren Dave Challinor säger att vänsterbacken Max Lowe har fått tillbaka skadan han hade tidigare i säsongen och blir borta ungefär fyra till sex veckor.",
-         "s": "b",
-         "podd": [
-          "The Star"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Plymouth har bara fyra seniora försvarare tillgängliga. Aaron tror att de går över till en trebackslinje med anfallaren Will Evans som vänsterwingback och den oprövade unga Joe Mwaro till höger.",
-         "s": "h",
-         "podd": [
-          "The Wednesday Week"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Andremålvakten Ashley Maynard-Brewer fick en smäll mot huvudet och missar troligen helgen, säger tränaren Dave Challinor. Enligt lokaltidningen saknas också förstemålvakten Joe Lumley, så laget väntas ställa en tredjemålvakt i mål.",
-         "s": "b",
-         "podd": [
-          "The Star"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Med Max Lowe och Reece James skadade väntar sig värden att Liam Palmer får fylla i bakre linjen. Han oroar sig för att Palmers ben inte längre räcker mot snabba löpare.",
-         "s": "o",
-         "podd": [
-          "Talking Wednesday | The Sheffield Wednesday Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Wednesdayvärden påpekar att Dave Challinor sitter fast med den här truppen åtminstone till januari och att laget redan har blivit förnedrat två gånger under honom. Han vill ändå inte att tränaren ska bort.",
-         "s": "o",
-         "podd": [
-          "The Wednesday Week"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värden försvarar att Henrik Pedersen fick gå trots att resultaten var godkända. Han menar att den som faktiskt såg matcherna förstod varför.",
-         "s": "o",
-         "podd": [
-          "Talking Wednesday | The Sheffield Wednesday Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Enligt Aaron saknar Plymouths mittfält rörlighet, och det är där laget läcker mest just nu. Han skulle själv byta från den stela 4-4-2:an till 4-2-3-1 för att täta mitten.",
-         "s": "o",
-         "podd": [
-          "The Wednesday Week"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
       }
      ],
      "text": [
-      "På Owlstalk jublar få åt ”den ökända duon” Liam Palmer och Jamal Lowe, men skadorna lämnar inget val. Palmer väntas fylla vänsterkanten, och i Talking Wednesday fruktar man att benen inte längre räcker mot snabba löpare. Plymouths egen supporter hoppas just därför att yttern Xavier Amaechi får sin dag mot honom.",
-      "Längst fram vill forumet hellre ha Davis Keillor-Dunn än Lowe, eftersom han ses som klubbens mest naturliga avslutare.",
-      "Uppsvinget efter tränarbytet dog med 0–4 i veckan, ungdomslag eller inte. Nu nöjer sig en del med en poäng och en synlig förändring."
+      "Frankrike förlorade med 1–3 i Milano i torsdags utan Kylian Mbappé, som hade ont i baksidan av låret. Han tränade igen i fredags, och Zinédine Zidane bekräftar att han är med. Oavgjort räcker för kvartsfinal.",
+      "Zidane avfärdar ryktena om en spricka mellan dem. Mbappé ska ha velat spela centralt, medan Zidane först tänkte flytta ut honom till vänster. ”Det är dumheter”, säger förbundskaptenen.",
+      "Désiré Doué fick en tand lossad av en armbåge på San Siro och är osäker. Fredagens träning började med en tyst minut för offren för attentaten den 13 november."
      ],
      "citat": {
-      "sagt": "Att vi spelade med ungdomarna spelar ingen roll, det har blivit ett totalt sammanbrott bland våra supportrar, som ni kan tänka er.",
-      "vem": null,
-      "podd": "Talking Wednesday | The Sheffield Wednesday Podcast",
-      "typ": "podd",
-      "datum": "2026-11-13"
-     },
-     "namn": [
-      "Liam Palmer",
-      "Jamal Lowe",
-      "Palmer",
-      "Xavier Amaechi",
-      "Davis Keillor-Dunn",
-      "Lowe"
-     ]
-    },
-    {
-     "lag": "Plymouth Argyle",
-     "kallor": [
-      {
-       "podd": "Green & White",
-       "avsnitt": "Evans Above The Church: Plymouth Argyle 4-0 Alvechurch",
-       "datum": "2026-11-09",
-       "adress": "https://shows.acast.com/greenwhite/episodes/6af1951957950839ffaec404",
-       "typ": "podd"
-      },
-      {
-       "podd": "Pasoti",
-       "avsnitt": "Sheffield Wednesday v Argyle - the build up · Away Day Picture Thread (Sheffield Wednesday) · Sheffield Wednesday Parking",
-       "datum": "2026-11-14",
-       "adress": "https://pasoti.co.uk/threads/sheffield-wednesday-v-argyle-the-build-up.138021/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Pasoti",
-       "avsnitt": "Sheffield Wednesday v Argyle - the build up · Away Day Picture Thread (Sheffield Wednesday) · Sheffield Wednesday Parking",
-       "datum": "2026-11-13",
-       "adress": "https://pasoti.co.uk/threads/sheffield-wednesday-v-argyle-the-build-up.138021/",
-       "typ": "forum"
-      },
-      {
-       "podd": "NOT606",
-       "avsnitt": "versus Sheffield Wednesday · AUTUMN NEWS 2026 · Season 26/27",
-       "datum": "2026-11-13",
-       "adress": "https://not606.com/threads/versus-sheffield-wednesday.425526/",
-       "typ": "forum"
-      },
-      {
-       "podd": "NOT606",
-       "avsnitt": "versus Sheffield Wednesday · AUTUMN NEWS 2026 · Season 26/27",
-       "datum": "2026-11-13",
-       "adress": "https://not606.com/threads/versus-sheffield-wednesday.425526/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Argyle Life",
-       "avsnitt": "Preview: Sheffield Wednesday vs Plymouth Argyle – Argyle Life",
-       "datum": "2026-11-14",
-       "adress": "https://argyle.life/first-team/matches/preview-sheffield-wednesday-vs-plymouth-argyle-11-26/",
-       "typ": "media"
-      },
-      {
-       "podd": "Argyle News Hub",
-       "avsnitt": "REPORT: Plymouth 4-0 Alvechurch",
-       "datum": "2026-11-09",
-       "adress": "https://argylenewshub.substack.com/p/report-plymouth-4-0-alvechurch",
-       "typ": "media"
-      },
-      {
-       "podd": "Plymouth Live",
-       "avsnitt": "Argyle trying to build a team of robust players says Tom Cleverley",
-       "datum": "2026-11-12",
-       "adress": "https://www.plymouthherald.co.uk/sport/football/plymouth-argyle-trying-build-team-11238402",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Lokaltidningen skriver att Argyle säkert saknar sex skadade spelare till matchen mot Sheffield Wednesday och att ytterligare tre är tveksamma.",
-         "s": "h",
-         "podd": [
-          "Plymouth Live"
-         ],
-         "datum": [
-          "2026-11-12"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Baidoo passar egentligen bakom anfallaren i 3-4-2-1, men det saknas wingbackar när Joe Edwards och Matthew Sorinola är borta. Därför tror man att Tom Cleverley håller fast vid fyrbackslinjen ett tag till.",
-         "s": "o",
-         "podd": [
-          "Green & White"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Ronan Curtis, som för första gången började på bänken, var inblandad i tre av fyra mål. Han jagade varje boll som en terrier och liknade sig själv från januari till maj igen.",
-         "s": "o",
-         "podd": [
-          "Green & White"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Flera vill se Ronan Curtis som högervingback. De menar att han spelade bra där i andra halvlek i cupmatchen i tisdags, samarbetade med Amaechi och gick hem och försvarade när det behövdes.",
-         "s": "o",
-         "podd": [
-          "Pasoti"
-         ],
-         "datum": [
-          "2026-11-12"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Laget har varit endimensionellt hela säsongen. Mellan den djupt liggande Harvey White, en defensiv mittfältare och Aribim Pepple på topp finns ett stort hål. Michael Baidoo fyllde det direkt med väggspel och sena löpningar in i straffområdet.",
-         "s": "o",
-         "podd": [
-          "Green & White"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Anfallsparet Will Evans och Aribim Pepple fungerar inte ihop, allra minst på hemmaplan. Där trängs Pepple ut av två mittbackar, och han dominerade inte ens mittbackar från sjunde divisionen.",
-         "s": "o",
-         "podd": [
-          "Green & White"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Med 4-4-2 kom samma problem tillbaka som irriterat i flera veckor: Harvey White som vänsterback, långa diagonalbollar och ett lag i andra- eller tredjeväxeln. Med 3-4-2-1 mot Reading såg laget farligare ut framåt.",
-         "s": "o",
-         "podd": [
-          "Green & White"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Supportrarna tror att laget får problem om Hartridge spelar i en backlinje med fyra. De påminner om att Stevenage slog sönder laget senast det prövades och vill hellre se tre mittbackar.",
-         "s": "o",
-         "podd": [
-          "Pasoti"
-         ],
-         "datum": [
-          "2026-11-12"
-         ],
-         "typ": "forum"
-        }
-       ]
-      }
-     ],
-     "text": [
-      "I Green & White ser man samma hål vecka efter vecka: ett tomrum mellan Harvey White och anfallaren som ”skriker efter en spelare av Baidoos typ”. Michael Baidoo fyllde det direkt med väggspel och sena löpningar, men nu hör han till den senaste skadevågen.",
-      "På Pasoti fruktar man en backfyra med Alex Hartridge, eftersom Stevenage slet laget i stycken senast, och vill ha tre mittbackar. Ronan Curtis som högervingback delar forumet: bra i cupmatchen, men där var tempot lågt.",
-      "Andra undrar om Argyle över huvud taget har ett lag att ställa upp."
-     ],
-     "citat": {
-      "sagt": "Det är länge sedan vi slog Wednesday, men nu verkar vara rätt tillfälle, innan Challinor hjälper dem att hitta formen igen.",
-      "vem": "argyletraveller",
-      "podd": "Pasoti",
-      "typ": "forum",
+      "sagt": "Jag har en tränares relation till sin spelare, och det fungerar perfekt.",
+      "vem": "Zinédine Zidane, om Kylian Mbappé",
+      "podd": "Eurosport",
+      "typ": "media",
       "datum": "2026-11-14"
      },
      "namn": [
-      "Harvey White",
-      "Michael Baidoo",
-      "Alex Hartridge",
-      "Ronan Curtis"
+      "Kylian Mbappé",
+      "Zinédine Zidane",
+      "Désiré Doué"
+     ]
+    },
+    {
+     "lag": "Turkiet",
+     "kallor": [
+      {
+       "podd": "TR724",
+       "avsnitt": "Montella gitti Sergen Yalçın geldi sonuç değişmedi!",
+       "datum": "2026-11-12",
+       "adress": "https://www.tr724.com/montella-gitti-sergen-yalcin-geldi-sonuc-degilmedi/",
+       "typ": "media"
+      },
+      {
+       "podd": "Anadolu Ajansı",
+       "avsnitt": "Sergen Yalçın: Milli takımımızın ve ülkemizin galibiyete ihtiyacı var",
+       "datum": "2026-11-14",
+       "adress": "https://www.aa.com.tr/tr/spor/sergen-yalcin-milli-takimimizin-ve-ulkemizin-galibiyete-ihtiyaci-var/4125354",
+       "typ": "media"
+      },
+      {
+       "podd": "Sözcü",
+       "avsnitt": "Kader maçına saatler kala Milli Takım'da şok sakatlık! Kadrodan çıkartıldı",
+       "datum": "2026-11-15",
+       "adress": "https://www.sozcu.com.tr/kader-macina-saatler-kala-milli-takim-da-sok-sakatlik-kadrodan-cikartildi-p381549",
+       "typ": "media"
+      },
+      {
+       "podd": "Milli Gazete",
+       "avsnitt": "Türkiye-Fransa maçında puan durumu ne olur? Kazanırsak kaç puan? Beraberlik yeterli mi? Kaybedersek düşer miyiz?",
+       "datum": "2026-11-15",
+       "adress": "https://www.milligazete.com.tr/turkiye-fransa-macinda-puan-durumu-ne-olur-kazanirsak-kac-puan-beraberlik-yeterli-mi-kaybedersek-duser-miyiz",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Sergen Yalçın efterträdde Vincenzo Montella men förlorade sin första match med 1–2 hemma mot Belgien, trots Arda Gülers frispark. Turkiet har 0 poäng och 3–13 i mål efter fem matcher. Gruppjumbona i A-ligans fyra grupper jämförs: de två sämsta åker ur, de andra två spelar kval.",
+      "”Vi har precis kommit, det är väldigt svårt att ändra något i fotboll på 2–3 dagar”, säger Yalçın. Mot Frankrike ska laget ligga lite djupare, och 5–6 spelare kan bytas.",
+      "Uğurcan Çakır har skadat axeln och är struken, så Berke Özer står i mål. Ferdi Kadıoğlu är osäker."
+     ],
+     "citat": {
+      "sagt": "Att Frankrike förlorade sin senaste match ändrar inte vilket lag de är. Där det finns stora stjärnor kan det uppstå små kriser.",
+      "vem": "Berke Özer, om Frankrike",
+      "podd": "Anadolu Ajansı",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Sergen Yalçın",
+      "Vincenzo Montella",
+      "Arda Güler",
+      "Uğurcan Çakır",
+      "Berke Özer",
+      "Ferdi Kadıoğlu"
      ]
     }
    ]
   },
   {
-   "id": "401880745",
-   "nr": 10,
-   "match": "Stockport County – Reading",
+   "id": "401861178",
+   "nr": 3,
+   "match": "Kroatien – Tjeckien",
    "lag": [
-    "Stockport County",
-    "Reading"
+    "Kroatien",
+    "Tjeckien"
    ],
-   "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-14T08:09:11.400Z",
-   "rubrik": "Serieledarna bjöd på kanske sämsta halvleken på 30 år",
+   "avspark": "2026-11-15T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Fyra raka förluster tar emot fem raka",
    "ingress": null,
-   "summering": "Stockport leder serien men kommer från en halvlek som skakade supportrarna och väckte frågor om McNultys snälla stil. Reading kör över de svaga men vinner sällan borta och litar inte på sina målvakter.",
+   "summering": "Kroatien har förlorat fyra raka matcher men klarar sig undan direkt nedflyttning med en poäng, och Sučić och Vlašić saknas. Tjeckien har förlorat fem raka, är utan kaptenen Krejčí och blir trea bara med seger.",
    "delar": [
     {
-     "lag": "Stockport County",
+     "lag": "Kroatien",
      "kallor": [
       {
-       "podd": "SK3 TV",
-       "avsnitt": "#118: Cray Wanderers, Grammar School Scarves and Good Tinfoil",
-       "datum": "2026-11-09",
-       "adress": "https://shows.acast.com/sk3-tv/episodes/118-cray-wanderers-grammar-school-scarves-and-good-tinfoil",
-       "typ": "podd"
+       "podd": "tportal",
+       "avsnitt": "Slaven Bilić otkrio tko neće igrati protiv Češke: 'Bolje je, ali...'",
+       "datum": "2026-11-14",
+       "adress": "https://www.tportal.hr/sport/clanak/slaven-bilic-otkrio-tko-nece-igrati-protiv-ceske-bolje-je-ali-20261114",
+       "typ": "media"
       },
       {
-       "podd": "RAW CHILI",
-       "avsnitt": "Stockport County: Jimmy McNulty \"begged\" England for Whatmuff availability - RAW CHILI | RAWCHILI.COM",
-       "datum": "2026-11-13",
-       "adress": "https://www.rawchili.com/5150345/",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Tränaren Jimmy McNulty bekräftar att försvararen Jay Mingi fick en mycket allvarlig hamstringsskada mot Cray i söndags. Skadan har krävt operation och han är borta från A-laget på obestämd tid.",
-         "s": "b",
-         "podd": [
-          "RAW CHILI"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "lokal"
-        }
-       ]
+       "podd": "Index.hr",
+       "avsnitt": "Četiri poraza zaredom, a sad Češka u Osijeku. Koga biste vi stavili u prvih 11?",
+       "datum": "2026-11-14",
+       "adress": "https://www.index.hr/sport/clanak/cetiri-poraza-zaredom-a-sad-ceska-u-osijeku-koga-biste-vi-stavili-u-prvih-11/2857006.aspx",
+       "typ": "media"
       },
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Tränaren Jimmy McNulty säger att Luca Ashby-Hammond var tänkt att stå i mål, men efter hans röda kort bad klubben England att släppa Oliver Whatmuff. Annars hade klubben letat målvakt på nödmarknaden.",
-         "s": "b",
-         "podd": [
-          "RAW CHILI"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Värdarna menar att rotationen slog bakut. Planen var att vila de mest belastade, men Ethan Pye fick spela mer än om County ställt upp starkast och avgjort efter en timme, och han såg skakig ut mot snabba motståndare.",
-         "s": "o",
-         "podd": [
-          "SK3 TV"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Att låta Lewis Fiorini ensam styra mittfältet från start, ett upplägg som annars används när laget jagar mål, slog enligt värdarna bakut. De tycker att han behöver en partner bredvid sig.",
-         "s": "h",
-         "podd": [
-          "SK3 TV"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Jack Diamond lyfts fram som den som vände matchen. Han kom in med energi och vilja att gå på motståndarna. Värdarna medger att många supportrar tidigare inte hade brytt sig om han lämnat klubben.",
-         "s": "o",
-         "podd": [
-          "SK3 TV"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "När laget hamnade i underläge saknade värdarna rutinerade spelare som pratade och peppade varandra. De förklarar det med att elvan var ihopslängd och ovan att spela tillsammans.",
-         "s": "h",
-         "podd": [
-          "SK3 TV"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Supportrarna gillar tränaren McNulty men undrar om hans lugna, positiva stil räcker när det går emot. Vid 0–2 i halvtid hade de velat se mer ilska och panik från bänken.",
-         "s": "o",
-         "podd": [
-          "SK3 TV"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Trots att County leder League One kallar en av värdarna första halvleken mot Cray Wanderers en kandidat till den sämsta han sett laget spela på 30 år på läktaren. Laget skapade ingenting alls.",
-         "s": "o",
-         "podd": [
-          "SK3 TV"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "Nacional",
+       "avsnitt": "OTKRIVEN PRAVI RAZLOG Evo zašto je Bilić izostavio Vlašića s popisa za Češku",
+       "datum": "2026-11-15",
+       "adress": "https://www.nacional.hr/otkriven-pravi-razlog-evo-zasto-je-bilic-izostavio-vlasica-s-popisa-za-cesku/",
+       "typ": "media"
       }
      ],
      "text": [
-      "Serieledarna i League One öppnade mot Cray Wanderers med en halvlek som en av värdarna i SK3 TV kallar en kandidat till den sämsta han sett på 30 år på läktaren. Laget skapade ingenting alls.",
-      "Matchen vändes av Jack Diamond, som kom in med energi och lust att gå på sina motståndare. Värdarna medger att många supportrar tidigare inte hade saknat honom om han lämnat klubben.",
-      "Tränaren Jimmy McNulty är omtyckt, men supportrarna undrar om hans lugna, positiva stil räcker när det går emot. I halvtidspausen hade de gärna sett mer ilska från bänken."
+      "Kroatien har förlorat fyra raka matcher, senast med 1–2 mot England på Wembley. En poäng i Osijek räcker för att slippa åka ur direkt till Liga B, men Slaven Bilić vill inte nöja sig med det.",
+      "Luka Sučić har virus och hög feber. Nikola Vlašić, som fick ta den ovana platsen som vänsterback hela matchen på Wembley, känner av baksidan av låret. Josip Šutalo, Andrej Kramarić, Marin Pongračić och Franjo Ivanović saknades redan.",
+      "Ivan Perišić är tillbaka efter avstängning. Bilić säger att spelarna gjorde allt som väntades i London: ”Vi kan skilja resultatet från prestationen.”"
      ],
      "citat": {
-      "sagt": "Allt handlar om positiv stämning. Han spelar snäll kille. Han vill att spelarna ska känna sig älskade.",
-      "vem": null,
-      "podd": "SK3 TV",
-      "typ": "podd",
+      "sagt": "Vi ska försöka vara farliga, dominera och undvika svarta hål.",
+      "vem": "Slaven Bilić, om matchen mot Tjeckien",
+      "podd": "tportal",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Slaven Bilić",
+      "Luka Sučić",
+      "Nikola Vlašić",
+      "Josip Šutalo",
+      "Andrej Kramarić",
+      "Marin Pongračić",
+      "Franjo Ivanović",
+      "Ivan Perišić"
+     ]
+    },
+    {
+     "lag": "Tjeckien",
+     "kallor": [
+      {
+       "podd": "České noviny (ČTK)",
+       "avsnitt": "Denia: Musíme hrát dobře od první minuty, zápas v Chorvatsku bude jako finále MS",
+       "datum": "2026-11-13",
+       "adress": "https://www.ceskenoviny.cz/index_view.php?id=2900532",
+       "typ": "media"
+      },
+      {
+       "podd": "iSport",
+       "avsnitt": "Češi už trénovali i s Juráskem, do Chorvatska odletěl i kapitán. Denia vysvětlil důvody",
+       "datum": "2026-11-14",
+       "adress": "https://isport.blesk.cz/clanek/fotbal-reprezentace-liga-narodu/482155/cesi-uz-trenovali-i-s-juraskem-do-chorvatska-odletel-i-kapitan-denia-vysvetlil-duvody.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Deník",
+       "avsnitt": "Češi přiletěli se zpožděním, ale s Krejčím. Hopi? Kouče Chorvatů zaskočil dotaz",
+       "datum": "2026-11-14",
+       "adress": "https://denik.cz/ostatni-fotbal/chorvatsko-cesko-liga-narodu-denia-bilic-hopi/",
+       "typ": "media"
+      },
+      {
+       "podd": "Ruik.cz",
+       "avsnitt": "Česko řeší krizi v obraně před Chorvatskem. Po Krejčím vypadl i Chaloupek",
+       "datum": "2026-11-14",
+       "adress": "https://www.ruik.cz/cesko-resi-krizi-v-obrane-pred-chorvatskem-po-krejcim-vypadl-i-chaloupek/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Tjeckien har förlorat alla fem matcherna i gruppen. Bara en seger lyfter laget till tredjeplatsen, och den skulle enligt Santi Denia ”förändra vårt liv”.",
+      "Kaptenen Ladislav Krejčí blev utvisad mot Spanien, hans andra röda kort i höst, men reste med och sitter på läktaren. Štěpán Chaloupek och Lukáš Provod har lämnat truppen sjuka, och mittbackarna blir troligen David Zima och Tomáš Vlček. Filip Prebsl har kallats in.",
+      "Planet till Osijek försenades av ett motorfel. På sin presskonferens fick Slaven Bilić frågan om den 18-årige debutanten Idris Hopi, som har kroatiska rötter. Det visste han inte."
+     ],
+     "citat": {
+      "sagt": "Vi kommer att förbereda oss som om det vore en VM-final.",
+      "vem": "Santi Denia, om matchen i Osijek",
+      "podd": "České noviny (ČTK)",
+      "typ": "media",
+      "datum": "2026-11-13"
+     },
+     "namn": [
+      "Santi Denia",
+      "Ladislav Krejčí",
+      "Štěpán Chaloupek",
+      "Lukáš Provod",
+      "David Zima",
+      "Tomáš Vlček",
+      "Filip Prebsl",
+      "Slaven Bilić",
+      "Idris Hopi"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401861176",
+   "nr": 4,
+   "match": "Belgien – Italien",
+   "lag": [
+    "Belgien",
+    "Italien"
+   ],
+   "avspark": "2026-11-15T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Lukakus höft och en krans vid Heysel",
+   "ingress": null,
+   "summering": "Belgien måste vinna för att nå kvartsfinal och har fått Lukaku spelklar efter höftbesvären. Italien klarar sig med en poäng men saknar Frattesi och Cambiaghi, och kvällen före hedrade Mancini offren från Heysel.",
+   "delar": [
+    {
+     "lag": "Belgien",
+     "kallor": [
+      {
+       "podd": "Sporza",
+       "avsnitt": "\"Lukaku is zeker inzetbaar\": zelfs in persbabbel met De Ketelaere is recordschutter hét onderwerp, Van Bommel verwacht \"ander\" Italië",
+       "datum": "2026-11-14",
+       "adress": "https://sporza.be/nl/2026/11/14/-lukaku-is-zeker-inzetbaar-zelfs-in-persbabbel-met-de-ketelaere-is-recordschutter-het-onderwerp-van-bommel-verwacht-ander-italie~1794653150479/",
+       "typ": "media"
+      },
+      {
+       "podd": "Voetbalnieuws",
+       "avsnitt": "België-Italië: opsteker Van Bommel op laatste training",
+       "datum": "2026-11-14",
+       "adress": "https://www.voetbalnieuws.be/news/934902/belgieitalie-opsteker-van-bommel-op-laatste-training",
+       "typ": "media"
+      },
+      {
+       "podd": "Sporza",
+       "avsnitt": "Vandenbempt: \"Lijkt mij plausibeler dat Van Bommel Lukaku liever achter de hand houdt voor het laatste half uur\"",
+       "datum": "2026-11-15",
+       "adress": "https://sporza.be/nl/2026/11/15/vandenbempt-lijkt-mij-plausibeler-dat-van-bommel-lukaku-liever~1794767346523/",
+       "typ": "media"
+      },
+      {
+       "podd": "Sporza",
+       "avsnitt": "Een \"luxeprobleem\", maar ook de situatie rond Lukaku en de United-Belgen: Van Bommel geeft laatste inkijk voor duel met Turkije",
+       "datum": "2026-11-11",
+       "adress": "https://sporza.be/nl/2026/11/11/live-met-mark-van-bommel-en-tielemans-wat-hebben-duivels-te-zeggen-voor-duel-met-turkije~1794415369299/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Belgien är trea med 9 poäng, en mindre än Italien och Frankrike, och bara seger ger kvartsfinal. ”Italien har fördelen, för det behöver inte vinna”, säger Mark van Bommel.",
+      "Romelu Lukaku missade segern med 2–1 i Turkiet med ont i höften men har tränat två dagar och kan spela. Han orkar inte 90 minuter tre gånger i veckan, medger förbundskaptenen, och Sporzas Peter Vandenbempt tror snarare att han sparas till den sista halvtimmen.",
+      "Jeremy Doku är tillbaka. Charles De Ketelaere satt bredvid Van Bommel på presskonferensen, och det brukar betyda en plats i elvan."
+     ],
+     "citat": {
+      "sagt": "Det här är ingen final. Spelar man en final kan man vinna något.",
+      "vem": "Mark van Bommel, om matchen mot Italien",
+      "podd": "Sporza",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Mark van Bommel",
+      "Romelu Lukaku",
+      "Peter Vandenbempt",
+      "Jeremy Doku",
+      "Charles De Ketelaere"
+     ]
+    },
+    {
+     "lag": "Italien",
+     "kallor": [
+      {
+       "podd": "FIGC",
+       "avsnitt": "Con il Belgio in palio il pass per i quarti di Nations League. Mancini: \"Essere qui a giocarci la qualificazione è motivo d'orgoglio, vogliamo vincere\"",
+       "datum": "2026-11-14",
+       "adress": "https://www.figc.it/it/nazionali/news/con-il-belgio-in-palio-il-pass-per-i-quarti-di-nations-league-mancini-essere-qui-a-giocarci-la-qualificazione-e-motivo-dorgoglio-vogliamo-vincere-tod0zln9",
+       "typ": "media"
+      },
+      {
+       "podd": "FIGC",
+       "avsnitt": "La Nazionale rende omaggio alle vittime della tragedia dell'Heysel",
+       "datum": "2026-11-14",
+       "adress": "https://www.figc.it/it/nazionali/news/la-nazionale-rende-omaggio-alle-vittime-della-tragedia-dellheysel-u9v0fgij",
+       "typ": "media"
+      },
+      {
+       "podd": "Corriere dello Sport",
+       "avsnitt": "Mancini: \"Giocarci la qualificazione in Nations League è un motivo di orgoglio. Formazione dell'Italia? Nella mia testa...\"",
+       "datum": "2026-11-14",
+       "adress": "https://www.corrieredellosport.it/news/calcio/italia/2026/11/14-152593055/mancini_giocarci_la_qualificazione_in_nations_league_un_motivo_di_orgoglio_formazione_dell_italia_nella_mia_testa_",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "En poäng räcker för Italien till kvartsfinal, och med seger vinner laget gruppen. Roberto Mancini saknar Davide Frattesi och Nicolò Cambiaghi, som båda startade mot Frankrike. Cambiaghi hade fortfarande ont på morgonen. Mancini räknar inte med många förändringar.",
+      "Kvällen före lade förbundets ledning, Mancini och Giorgio Scalvini en krans vid minnestavlan på Kung Baudouins stadion över de 39 som dog vid Heysel den 29 maj 1985. Scalvini möter sin lagkamrat i Atalanta, Charles De Ketelaere.",
+      "Mancini har 40 segrar som förbundskapten, lika många som Enzo Bearzot. Bara Vittorio Pozzo, med 63, har fler."
+     ],
+     "citat": {
+      "sagt": "Vi startar med ett litet försprång, men det betyder inte att vi ska nöja oss.",
+      "vem": "Roberto Mancini, om läget inför matchen",
+      "podd": "Corriere dello Sport",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Roberto Mancini",
+      "Davide Frattesi",
+      "Nicolò Cambiaghi",
+      "Giorgio Scalvini",
+      "Charles De Ketelaere",
+      "Enzo Bearzot",
+      "Vittorio Pozzo"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401861171",
+   "nr": 5,
+   "match": "Lettland – Armenien",
+   "lag": [
+    "Lettland",
+    "Armenien"
+   ],
+   "avspark": "2026-11-15T14:00:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "God stämning i botten, gräl kring Shaghoyan",
+   "ingress": null,
+   "summering": "Lettland är klart sist, men Paolo Nicolato kallar stämningen i truppen mycket positiv trots ännu ett sent baklängesmål. Armeniens Yegishe Melikyan har hamnat i öppet gräl med Ararat-Armenia och saknar flera skadade.",
+   "delar": [
+    {
+     "lag": "Lettland",
+     "kallor": [
+      {
+       "podd": "Sportacentrs.com",
+       "avsnitt": "Nikolato skaidro Dašķeviča nomaiņu un negatavojas sākumsastāva revolūcijai pēdējā spēlē",
+       "datum": "2026-11-14",
+       "adress": "https://sportacentrs.com/futbols/latvijas_izlase/14112026-nikolato_skaidro_daskevica_nomainu_un_neg",
+       "typ": "media"
+      },
+      {
+       "podd": "Sportacentrs.com",
+       "avsnitt": "Latvijas vārtu autoram Meļņikam savainojums",
+       "datum": "2026-11-14",
+       "adress": "https://sportacentrs.com/futbols/latvijas_izlase/14112026-latvijas_vartu_autoram_melnikam_savainoju",
+       "typ": "media"
+      },
+      {
+       "podd": "Sportacentrs.com",
+       "avsnitt": "Dašķevičs par maiņu: \"Cienu trenera lēmumu. Tas arī viss\"",
+       "datum": "2026-11-13",
+       "adress": "https://sportacentrs.com/futbols/latvijas_izlase/13112026-daskevics_par_mainu_cienu_trenera_lemumu_",
+       "typ": "media"
+      },
+      {
+       "podd": "LFF",
+       "avsnitt": "Podgoricas lietū sāpīgs zaudējums kompensācijas laikā",
+       "datum": "2026-11-12",
+       "adress": "https://lff.lv/zinas/19361/podgoricas-lietu-sapigs-zaudejums-kompensacijas-laika/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Lettland är klart sist med en poäng. I Podgorica i torsdags släppte laget in två mål med en man mer, det sista på tilläggstid.",
+      "Deniss Meļņiks, som gjorde sitt första landslagsmål där, har en benskada och spelar troligen inte. Markuss Strods, som varit sjuk, har bättre chans, och Maksims Toņiševs är tillbaka efter att ha blivit pappa. Paolo Nicolato räknar med två eller tre ändringar i elvan.",
+      "Supportrarna har undrat varför Eduards Dašķevičs byttes ut efter 62 minuter. Nicolato såg trötthet. Dašķevičs svarar: ”Jag respekterar tränarens beslut. Det är allt.”"
+     ],
+     "citat": {
+      "sagt": "Stämningen i laget är mycket positiv. Ärligt talat blev jag själv förvånad.",
+      "vem": "Paolo Nicolato, om truppen efter förlusten i Montenegro",
+      "podd": "Sportacentrs.com",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Deniss Meļņiks",
+      "Markuss Strods",
+      "Maksims Toņiševs",
+      "Paolo Nicolato",
+      "Eduards Dašķevičs"
+     ]
+    },
+    {
+     "lag": "Armenien",
+     "kallor": [
+      {
+       "podd": "Sportaran",
+       "avsnitt": "Yeghishe Melikyan after Cyprus draw: \"I won't allow anyone to interfere with my work with Armenia\"",
+       "datum": "2026-11-13",
+       "adress": "https://sportaran.com/en/post/egishe-melikyan-posle-matcha-s-kiprom-nikomu-ne-pozvolyu-vmeshivatsya-v-moyu-rabotu-v-sbornoj-armenii/",
+       "typ": "media"
+      },
+      {
+       "podd": "Armsport.am",
+       "avsnitt": "Թեման ցրելու նուրբ արվեստը. Արարատ-Արմենիայից պատասխանել են Մելիքյանի խոսքերին",
+       "datum": "2026-11-13",
+       "adress": "https://armsport.am/613555/",
+       "typ": "media"
+      },
+      {
+       "podd": "FFA",
+       "avsnitt": "The Armenia National Team departs for Latvia",
+       "datum": "2026-11-13",
+       "adress": "https://www.ffa.am/en/news/Departs-for-Latvia",
+       "typ": "media"
+      },
+      {
+       "podd": "FFA",
+       "avsnitt": "Latvia-Armenia: Yegishe Melikyan and Artur Serobyan hold pre-match press conference",
+       "datum": "2026-11-14",
+       "adress": "https://www.ffa.am/en/news/Latvia-Armenia-press-conference",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Yegishe Melikyan har hamnat i gräl med Ararat-Armenia. Efter 1–1 mot Cypern i torsdags rådde han klubbens tränare Manuel Tulipa att inte lägga näsan i blöt: en spelare som kommer till landslaget ”blir min spelare”.",
+      "Klubben svarade att det var Melikyans egna beslut som fick Zhirayr Shaghoyan att lämna landslagslägret i förtid förra månaden, och kallade utspelet ett försök att avleda uppmärksamheten från landslagets spel.",
+      "Eduard Spertsyan och Vahan Bichakhchyan är skadade. Artur Miranyan är tillbaka i truppen, och Melikyan vill se mer av Artur Gharybyan, som kvitterade mot Cypern, och Hrant-Leon Ranos."
+     ],
+     "citat": {
+      "sagt": "Vi har laganda, men vi behöver också en vinnarmentalitet.",
+      "vem": "Yegishe Melikyan, inför matchen i Riga",
+      "podd": "FFA",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Yegishe Melikyan",
+      "Manuel Tulipa",
+      "Zhirayr Shaghoyan",
+      "Eduard Spertsyan",
+      "Vahan Bichakhchyan",
+      "Artur Miranyan",
+      "Artur Gharybyan",
+      "Hrant-Leon Ranos"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401861172",
+   "nr": 6,
+   "match": "Cypern – Montenegro",
+   "lag": [
+    "Cypern",
+    "Montenegro"
+   ],
+   "avspark": "2026-11-15T14:00:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Historiskt kval för Cypern, Montenegro utan Savić",
+   "ingress": null,
+   "summering": "Cypern är klart för kval om B-divisionen och vill ge fler speltid utan att rubba laget. Montenegro har redan vunnit gruppen men saknar Stefan Savić och fyra skadade, och en seger öppnar i praktiken vägen till EM-kvalspelet.",
+   "delar": [
+    {
+     "lag": "Cypern",
+     "kallor": [
+      {
+       "podd": "Alphanews.live",
+       "avsnitt": "Μάντζιος: «Δεν είναι αδιάφορο το παιχνίδι με το Μαυροβούνιο» (ΒΙΝΤΕΟ)",
+       "datum": "2026-11-14",
+       "adress": "https://www.alphanews.live/sports/mantzios-den-einai-adiaforo-to-paichnidi-me-to-mavrovounio/",
+       "typ": "media"
+      },
+      {
+       "podd": "Kerkida",
+       "avsnitt": "Μάντζιος ενόψει Μαυροβουνίου: \"Δεν είναι αδιάφορο το παιχνίδι - Θέλουμε να μας αγκαλιάσει ο κόσμος\"",
+       "datum": "2026-11-14",
+       "adress": "https://www.kerkida.net/eidiseis/kop-ethniki/aek/mantzios-enopsei-mayroboynioy-den-einai-adiaforo-paihnidi-theloyme-na-mas-agkaliasei-o-kosmos",
+       "typ": "media"
+      },
+      {
+       "podd": "KOP",
+       "avsnitt": "Ολοκληρώθηκε η προετοιμασία της Εθνικής μας για τον αγώνα με το Μαυροβούνιο",
+       "datum": "2026-11-14",
+       "adress": "https://www.cfa.com.cy/Gr/news/54115",
+       "typ": "media"
+      },
+      {
+       "podd": "KOP",
+       "avsnitt": "Έμεινε όρθια στην Αρμενία και κλείδωσε τη 2η θέση",
+       "datum": "2026-11-12",
+       "adress": "https://www.cfa.com.cy/Gr/news/54100",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Cypern är klart tvåa och ska för första gången spela kval om en plats i B-divisionen. Lottningen sker 20 november och matcherna spelas i mars.",
+      "Platsen säkrades med 1–1 i Jerevan, där Iasonas Pikis gjorde mål i sin debut. ”Armenien var mycket starkt hemma. Vi underskattade dem”, medger förbundskaptenen Akis Mantzios.",
+      "Mantzios lovar speltid åt dem som inte har spelat, utan att rubba sammanhållningen. Sju spelare är ett gult kort från avstängning, och korten följer med till kvalet. Nikolas Tsaroulla är skadad. Förköpet har nått 5 000 biljetter."
+     ],
+     "citat": {
+      "sagt": "För mig är det viktigaste att det finns stabilitet och balans, för i så många år siktade vi väldigt högt och föll sedan brant. Nu har vi stabilitet, och det är vad vi behöver.",
+      "vem": "Kostakis Artymatas, en av lagkaptenerna, om landslagets utveckling",
+      "podd": "Alphanews.live",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Iasonas Pikis",
+      "Akis Mantzios",
+      "Nikolas Tsaroulla"
+     ]
+    },
+    {
+     "lag": "Montenegro",
+     "kallor": [
+      {
+       "podd": "CG Sport",
+       "avsnitt": "Grupa je osvojena, ali Vučinić želi još: Pred nama je nešto važno!",
+       "datum": "2026-11-14",
+       "adress": "https://cgsport.me/2026/11/14/grupa-je-osvojena-ali-vucinic-zeli-jos-pred-nama-je-nesto-vazno/",
+       "typ": "media"
+      },
+      {
+       "podd": "CG Sport",
+       "avsnitt": "Danas za 16 bodova i veliki san: Crna Gora na korak od baraža!",
+       "datum": "2026-11-15",
+       "adress": "https://cgsport.me/2026/11/15/danas-za-16-bodova-i-veliki-san-crna-gora-na-korak-od-baraza/",
+       "typ": "media"
+      },
+      {
+       "podd": "Lob Sport",
+       "avsnitt": "Jovetić predvodi Sokole u Limasolu",
+       "datum": "2026-11-15",
+       "adress": "https://lobsport.me/fudbal/jovetic-predvodi-sokole-u-limasolu/",
+       "typ": "media"
+      },
+      {
+       "podd": "CG Sport",
+       "avsnitt": "Ultra Crna Gora tvrdi da su njihovi navijači vraćeni sa aerodroma u Beogradu!",
+       "datum": "2026-11-14",
+       "adress": "https://cgsport.me/2026/11/14/ultra-crna-gora-tvrdi-da-su-njihovi-navijaci-vraceni-sa-aerodroma-u-beogradu/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Montenegro har vunnit gruppen och är klart för B-divisionen. En seger ger 16 poäng och bästa facit i hela C-divisionen, vilket enligt CG Sport i praktiken öppnar vägen till kvalspelet till EM 2028.",
+      "Stefan Savić är avstängd, och Adam Marušić, Andrija Bulatović, Marko Vešović och Milan Roganović är skadade. Džonatan Drešaj väntas debutera som högerback, och lagkaptenen Stevan Jovetić är tillbaka efter skada, på ”sitt” Cypern.",
+      "Supportergruppen Ultra Crna Gora uppger att medlemmar på väg till matchen inte fick flyga med Air Serbia från Belgrad, och utlyser bojkott."
+     ],
+     "citat": {
+      "sagt": "I hemlighet pratade vi om och hoppades på att vinna gruppen. Det klarade vi, och det med en omgång kvar. Nu har vi chansen att ta ett steg högre.",
+      "vem": "Mirko Vučinić, förbundskapten",
+      "podd": "CG Sport",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Stefan Savić",
+      "Adam Marušić",
+      "Andrija Bulatović",
+      "Marko Vešović",
+      "Milan Roganović",
+      "Džonatan Drešaj",
+      "Stevan Jovetić"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401883117",
+   "nr": 7,
+   "match": "Eibar – Cádiz",
+   "lag": [
+    "Eibar",
+    "Cádiz"
+   ],
+   "avspark": "2026-11-15T17:30:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Gorostiza tackar för sig, Cádiz tiger om målvakten",
+   "ingress": null,
+   "summering": "Eibar tar farväl av ordföranden Amaia Gorostiza men har gått fyra omgångar utan seger och saknar Juan Bernat och Elijah Gift. Cádiz ligger under strecket med ett hoplappat försvar och en tränare som håller målvaktsvalet hemligt.",
+   "arena": "Ipurua",
+   "ort": "Eibar",
+   "delar": [
+    {
+     "lag": "Eibar",
+     "kallor": [
+      {
+       "podd": "Naiz",
+       "avsnitt": "Amaia Gorostiza deja la presidencia del Eibar tras una década al frente del club",
+       "datum": "2026-11-09",
+       "adress": "https://www.naiz.eus/info/noticia/20261109/amaia-gorosrtiza-deja-la-presidencia-del-eibar-tras-una-decada-al-frente-del-club",
+       "typ": "media"
+      },
+      {
+       "podd": "SD Eibar",
+       "avsnitt": "Jokin Aranbarri: «Tenemos que estar preparados para sus cambios de estructura»",
+       "datum": "2026-11-13",
+       "adress": "https://www.sdeibar.com/noticias/jokin-aranbarri-tenemos-que-estar-preparados-para-sus-cambios-de-estructura",
+       "typ": "media"
+      },
+      {
+       "podd": "El Gol Digital",
+       "avsnitt": "Amaia Gorostiza se despide del palco de Ipurua con el Eibar ante el Cádiz",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/eibar/eibar-cadiz-previa-amaia-gorostiza-despedida-aranbarri",
+       "typ": "media"
+      },
+      {
+       "podd": "Canal Sur",
+       "avsnitt": "La victoria, pasaporte a la salida del descenso para el Cádiz",
+       "datum": "2026-11-15",
+       "adress": "https://www.canalsur.es/noticias/deportes/futbol/victoria-billete-salida-descenso-cadiz_1_1452896.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Ipurua tar farväl av Amaia Gorostiza. Efter tio år som ordförande sitter hon i hederslogen för sista gången, och Jon Ander Ulazia, 39, tar över. Jokin Aranbarri säger att han möter beslutet med respekt och är tacksam för hur hon behandlat honom.",
+      "Laget har gått fyra omgångar utan seger men har 23 poäng och en match till godo. Aranbarri kallar Cádiz ett bra och farligt lag som kan spela med en eller två anfallare.",
+      "Juan Bernat och Elijah Gift är skadade och Anaitz Arbilla osäker efter en smäll. Sergio Álvarez är tillbaka efter lång skada."
+     ],
+     "citat": {
+      "sagt": "Det har varit en ära att leda Eibar, en klubb som är liten till storleken men enorm i känslan.",
+      "vem": "Amaia Gorostiza, om sina år som ordförande",
+      "podd": "Naiz",
+      "typ": "media",
       "datum": "2026-11-09"
      },
      "namn": [
-      "Jack Diamond",
-      "Jimmy McNulty"
+      "Amaia Gorostiza",
+      "Jon Ander Ulazia",
+      "Jokin Aranbarri",
+      "Juan Bernat",
+      "Elijah Gift",
+      "Anaitz Arbilla",
+      "Sergio Álvarez"
      ]
     },
     {
-     "lag": "Reading",
+     "lag": "Cádiz",
      "kallor": [
       {
-       "podd": "The Tilehurst End - A Reading FC Podcast",
-       "avsnitt": "The Tilehurst End Podcast Episode 480: Granules",
+       "podd": "La Gaceta de Cádiz",
+       "avsnitt": "El rompecabezas de Borja Jiménez en defensa para enfrentarse al Eibar",
+       "datum": "2026-11-12",
+       "adress": "https://lagacetadecadiz.es/el-rompecabezas-de-borja-jimenez-en-defensa-para-enfrentarse-al-eibar/",
+       "typ": "media"
+      },
+      {
+       "podd": "La Gaceta de Cádiz",
+       "avsnitt": "Borja Jiménez mantiene la incógnita en la portería del Cádiz: «Habrá momentos para los dos»",
+       "datum": "2026-11-13",
+       "adress": "https://lagacetadecadiz.es/borja-jimenez-mantiene-la-incognita-en-la-porteria-del-cadiz-habra-momentos-para-los-dos/",
+       "typ": "media"
+      },
+      {
+       "podd": "Portal Cadista",
+       "avsnitt": "Ipurua, una puerta para coger aire fuera de la zona roja",
        "datum": "2026-11-14",
-       "adress": "https://thetilehurstend.podbean.com/e/the-tilehurst-end-podcast-episode-480-granules/",
-       "typ": "podd"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Lewis Wing sägs dra på sig en känning, men värdarna misstänker att Liam bara försöker avleda uppmärksamheten.",
-         "s": "h",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "adress": "https://www.portalcadista.com/cadizcf-equipo/57616-ipurua-una-puerta-para-coger-aire-fuera-de-la-zona-roja",
+       "typ": "media"
       },
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "I mittförsvaret pekas unga Phillip Duah ut som en möjlig startspelare. Han var trygg i speluppbyggnaden mot Bristol Rovers och skulle komplettera Conor Masterson, som är mer av en ren förstörare. Om Masterson vet värdarna egentligen för lite.",
-         "s": "o",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Reading kommer långsamt in i matcherna och behöver tio, femton minuter för att hitta rätt. Ingen av lagets tre 5–0-segrar hade något mål under första kvarten. Hamnar laget i underläge tidigt blir matchen tung.",
-         "s": "o",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Kapten Lewis Wing har en svag säsong och bar skulden för första målet mot Oxford. Ändå förstår värdarna att Liam håller fast vid honom: om Wing hittar tillbaka till sina tio mål per säsong blir Reading omöjliga att stoppa.",
-         "s": "o",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Jack Marriott är på en annan nivå än konkurrenterna när det gäller att hitta ytor och tajma löpningarna in i straffområdet. Jacob Brown och Jamie Reid har inte den förmågan, och fler än Marriott måste börja göra mål.",
-         "s": "o",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Reading riskerar att bli ligans översittare: laget krossar de svaga motståndarna men har bara en bortaseger på sju matcher. Mot topplag som Stockport, Oxford och Plymouth duger det inte, och det är bortaformen som kan stoppa uppflyttningen.",
-         "s": "o",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Målvaktsfrågan är ett stort orosmoln. Jack Stephens borde ha gjort mer mot Bristol Rovers och Joel Pereira har inte övertygat. Skadar sig Pereira kan säsongen vara körd, och värdarna väntar sig en ny målvakt i januari.",
-         "s": "o",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Med så många borta i försvaret tror värdarna inte att det är i den här matchen bortaformen vänder. Stockport spelar bra under Jimmy McNulty och har spelare som kan slita sönder ett oerfaret försvar. Oavgjort vore ett bra resultat.",
-         "s": "o",
-         "podd": [
-          "The Tilehurst End - A Reading FC Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "El Gol Digital",
+       "avsnitt": "Amaia Gorostiza se despide del palco de Ipurua con el Eibar ante el Cádiz",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/eibar/eibar-cadiz-previa-amaia-gorostiza-despedida-aranbarri",
+       "typ": "media"
       }
      ],
      "text": [
-      "Reading krossar de svaga lagen men har en enda bortaseger på sju matcher, och i podden The Tilehurst End varnar man för att laget håller på att bli ligans ”översittare”. Mot topplag som Stockport räcker det inte, och det är bortaformen som kan stoppa uppflyttningen.",
-      "Laget kommer dessutom långsamt in i matcherna och brukar behöva en stund innan det hittar rätt. Hamnar Reading i underläge tidigt blir det tungt.",
-      "Störst oro väcker ändå målvaktsposten: Jack Stephens borde ha gjort mer mot Bristol Rovers, och Joel Pereira har inte övertygat."
+      "Cádiz ligger under nedflyttningsstrecket med 10 poäng efter två raka förluster, mot Mallorca och Oviedo. Borja Jiménez, säsongens tredje tränare, började med 3–1 mot Ceuta och vill att laget försvarar högre upp i planen.",
+      "Försvaret är ett pussel. Javi Castro är borta i tre till fyra veckor, Bojan Kovacevic är med Serbiens U21-lag och Kenan Toibibou med Komorerna. Gonzalo Petit och Vladys är tillbaka.",
+      "Målvakten är en hemlighet. Portal Cadista undrar om Jokin Ezkieta får stå kvar efter sina misstag eller om David Gil tar över. ”Jag tänker inte säga det”, säger Jiménez."
      ],
      "citat": {
-      "sagt": "Målvaktssidan är ett stort orosmoment för mig. Jag skulle bli chockad om de inte värvar någon i januari.",
-      "vem": null,
-      "podd": "The Tilehurst End - A Reading FC Podcast",
-      "typ": "podd",
-      "datum": "2026-11-14"
+      "sagt": "Vi skapar inte tillräckligt mycket framåt för att vinna.",
+      "vem": "Borja Jiménez, om lagets anfallsspel",
+      "podd": "La Gaceta de Cádiz",
+      "typ": "media",
+      "datum": "2026-11-13"
      },
      "namn": [
-      "Jack Stephens",
-      "Joel Pereira"
+      "Borja Jiménez",
+      "Javi Castro",
+      "Bojan Kovacevic",
+      "Kenan Toibibou",
+      "Gonzalo Petit",
+      "Vladys",
+      "Jokin Ezkieta",
+      "David Gil"
      ]
     }
    ]
   },
   {
-   "id": "401880754",
+   "id": "401883116",
+   "nr": 8,
+   "match": "Granada – Las Palmas",
+   "lag": [
+    "Granada",
+    "Las Palmas"
+   ],
+   "avspark": "2026-11-15T15:15:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Fem raka för Granada, Las Palmas väntar sedan 1985",
+   "ingress": null,
+   "summering": "Granada har vunnit fem raka ligamatcher men saknar Owen Emeka, som är med U17-landslaget. Las Palmas har vunnit fyra raka matcher, men försvaret är hoplappat och laget har inte vunnit i Granada sedan 1985.",
+   "arena": "Nuevo Los Cármenes",
+   "ort": "Granada",
+   "delar": [
+    {
+     "lag": "Granada",
+     "kallor": [
+      {
+       "podd": "101TV",
+       "avsnitt": "El Granada CF se enfrenta al juicio del caso Líbero contra los exdirigentes Pina y Pozzo por lucrarse con el traspaso de jugadores",
+       "datum": "2026-11-09",
+       "adress": "https://www.101tv.es/granada/el-granada-cf-se-enfrenta-al-juicio-del-caso-libero-contra-los-exdirigentes-pina-y-pozzo-por-lucrarse-con-el-traspaso-de-jugadores/",
+       "typ": "media"
+      },
+      {
+       "podd": "101TV",
+       "avsnitt": "El Granada CF pone a prueba su racha ganadora ante la UD Las Palmas",
+       "datum": "2026-11-14",
+       "adress": "https://www.101tv.es/granadacf/el-granada-cf-pone-a-prueba-su-racha-ganadora-ante-la-ud-las-palmas/",
+       "typ": "media"
+      },
+      {
+       "podd": "VAVEL España",
+       "avsnitt": "Granada CF - Las Palmas: nuevo reto en Los Cármenes para seguir la dinámica positiva",
+       "datum": "2026-11-14",
+       "adress": "https://www.vavel.com/es/futbol/2026/11/14/granada-cf/1279150-previa-granada-cf-ud-las-palmas-un-nuevo-reto-en-los-carmenes-para-seguir-con-la-dinamica-positiva.html",
+       "typ": "media"
+      },
+      {
+       "podd": "El Gol Digital",
+       "avsnitt": "Pacheta persigue la sexta victoria seguida del Granada ante Las Palmas",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/granada-cf/granada-las-palmas-previa-pacheta-albert-sanchez-racha/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Granada har vunnit fem raka ligamatcher, sex med cupen, och senast laget inte vann var 2–3 mot Andorra den 26 september. Laget har 23 poäng och en match till godo. ”Vi behöver att ögonblicken i matcherna fortsätter att le mot oss”, säger Pacheta.",
+      "Att Owen Emeka kan missa upp till sju matcher med U17-landslaget stör honom: ”Jag förstår inte att det spelas ett U17-VM i november.” José Arnaiz, Baïla Diallo och Pau Casadesús är skadade.",
+      "Samtidigt står klubben åtalad i Líbero-målet, där förre ägaren Gino Pozzo och förre ordföranden Enrique Pina anklagas för skattebrott."
+     ],
+     "citat": {
+      "sagt": "Vi är inne i en period av självförtroende som vi inte får tappa, även om vi fortfarande måste bli bättre både med och utan boll.",
+      "vem": "Pacheta, om segersviten",
+      "podd": "VAVEL España",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "Pacheta",
+      "Owen Emeka",
+      "José Arnaiz",
+      "Baïla Diallo",
+      "Pau Casadesús",
+      "Gino Pozzo",
+      "Enrique Pina"
+     ]
+    },
+    {
+     "lag": "Las Palmas",
+     "kallor": [
+      {
+       "podd": "Canarias7",
+       "avsnitt": "Iván Jaime reconoce que ha explotado en la UD: «Me encuentro en el mejor momento de mi carrera»",
+       "datum": "2026-11-12",
+       "adress": "https://www.canarias7.es/deportes/ud-las-palmas/ivan-jaime-reconoce-explotado-encuentro-mejor-momento-20261112101853-nt.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Canarias7",
+       "avsnitt": "Sánchez recupera a Marvin e Iñaki para Granada: «El reto es romper la racha del rival»",
+       "datum": "2026-11-13",
+       "adress": "https://www.canarias7.es/deportes/ud-las-palmas/palmas-directo-albert-sanchez-analiza-encuentro-conjunto-20261113092244-nt.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Canarias7",
+       "avsnitt": "La UD Las Palmas, a romper un maleficio de 41 años en Granada",
+       "datum": "2026-11-14",
+       "adress": "https://www.canarias7.es/deportes/ud-las-palmas/palmas-romper-maleficio-anos-granada-20261114140820-nt.html",
+       "typ": "media"
+      },
+      {
+       "podd": "El Gol Digital",
+       "avsnitt": "Pacheta persigue la sexta victoria seguida del Granada ante Las Palmas",
+       "datum": "2026-11-15",
+       "adress": "https://www.elgoldigital.com/futbol/granada-cf/granada-las-palmas-previa-pacheta-albert-sanchez-racha/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Las Palmas har inte vunnit i Granada sedan den 17 februari 1985, då Benito Morales gjorde matchens enda mål. Nu kommer laget med fyra raka segrar, och Albert Sánchez har vunnit båda sina ligamatcher. Han ser ett bra läge att bryta Granadas svit.",
+      "Försvaret är hoplappat. Valentín Pezzolesi och Juanma Herzog är med U21-landslaget, Viti Rozada och Enrique Clemente skadade. Sandro Ramírez har en ny liten bristning i vaden, men Marvin Park och Iñaki González är tillbaka.",
+      "Iván Jaime har flyttats till högerkanten och säger att han är i karriärens bästa form."
+     ],
+     "citat": {
+      "sagt": "Jag känner en mycket bra energi i truppen.",
+      "vem": "Albert Sánchez, efter 15 dagar som tränare",
+      "podd": "Canarias7",
+      "typ": "media",
+      "datum": "2026-11-13"
+     },
+     "namn": [
+      "Benito Morales",
+      "Albert Sánchez",
+      "Valentín Pezzolesi",
+      "Juanma Herzog",
+      "Viti Rozada",
+      "Enrique Clemente",
+      "Sandro Ramírez",
+      "Marvin Park",
+      "Iñaki González",
+      "Iván Jaime"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401861185",
+   "nr": 9,
+   "match": "Tyskland – Nederländerna",
+   "lag": [
+    "Tyskland",
+    "Nederländerna"
+   ],
+   "avspark": "2026-11-16T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Årets final för Klopp, Oranje utan De Jong",
+   "ingress": null,
+   "summering": "Tyskland måste vinna för att säkert gå till kvartsfinal, och Jürgen Klopp kallar mötet årets final. Nederländerna är så gott som klart efter 7–0 mot Grekland men saknar Frenkie de Jong och Virgil van Dijk.",
+   "delar": [
+    {
+     "lag": "Tyskland",
+     "kallor": [
+      {
+       "podd": "Sportschau",
+       "avsnitt": "Showdown gegen die Niederlande: Klopp spricht über das \"Endspiel des Jahres\"",
+       "datum": "2026-11-15",
+       "adress": "https://www.sportschau.de/fussball/nationalmannschaft/klopp-spricht-ueber-endspiel-des-jahres,juergen-klopp-pressekonferenz-niederlande-100.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Sportschau",
+       "avsnitt": "DFB-Team gewinnt gegen Serbien - jetzt Endspiel gegen Niederlande",
+       "datum": "2026-11-14",
+       "adress": "https://www.sportschau.de/fussball/nationalmannschaft/dfb-team-sichert-sich-sein-endspiel-gegen-niederlande,serbien-deutschland-spielbericht-100.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Sportschau",
+       "avsnitt": "Neuling vor Debüt: Brajan Gruda - ein \"geiler Zocker\" für Jürgen Klopp",
+       "datum": "2026-11-12",
+       "adress": "https://www.sportschau.de/fussball/nationalmannschaft/brajan-gruda-ein-geiler-zocker-fuer-juergen-klopp,gruda-dfb-team-nations-league-100.html",
+       "typ": "media"
+      },
+      {
+       "podd": "DFB.de",
+       "avsnitt": "Klopp: \"Wir haben nichts anderes vor, als ein top Spiel zu machen\"",
+       "datum": "2026-11-15",
+       "adress": "https://www.dfb.de/news/klopp-wir-haben-nichts-anderes-vor-als-ein-top-spiel-zu-machen",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Jürgen Klopp kallar mötet med Nederländerna årets final. Seger inför 71 000 på ett utsålt Olympiastadion ger säker kvartsfinal. Förlust och norsk seger mot Danmark betyder kval mot nedflyttning i mars. ”Jag blundar inte för det, jag ägnar mig bara inte åt det”, säger Klopp.",
+      "Alla spelare är friska. Brajan Gruda, som Klopp kallar ”en jäkla lirare”, gjorde mål i debuten när Serbien besegrades med 3–1. Han har fått nummer 10 eftersom Jamal Musiala är skadad.",
+      "”Hos oss är man gammal vid 25 när vi spelar gamla mot unga”, säger Klopp om truppen."
+     ],
+     "citat": {
+      "sagt": "Vi hoppas att vi då och då kan sätta en käpp i hjulet.",
+      "vem": "Jürgen Klopp, om Xavis Nederländerna",
+      "podd": "DFB.de",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Jürgen Klopp",
+      "Brajan Gruda",
+      "Jamal Musiala"
+     ]
+    },
+    {
+     "lag": "Nederländerna",
+     "kallor": [
+      {
+       "podd": "NOS",
+       "avsnitt": "Xavi en Gakpo: 'Betekent veel dat we ook tegen Duitsland ons gezicht laten zien'",
+       "datum": "2026-11-15",
+       "adress": "https://nos.nl/artikel/2639629-xavi-en-gakpo-betekent-veel-dat-we-ook-tegen-duitsland-ons-gezicht-laten-zien",
+       "typ": "media"
+      },
+      {
+       "podd": "NOS",
+       "avsnitt": "Hoe Jurriën Timber de joker werd: 'Daarom traint Oranje achter gesloten deuren'",
+       "datum": "2026-11-15",
+       "adress": "https://nos.nl/artikel/2639542-hoe-jurrien-timber-de-joker-werd-daarom-traint-oranje-achter-gesloten-deuren",
+       "typ": "media"
+      },
+      {
+       "podd": "NOS",
+       "avsnitt": "Veerman terug in Berlijn, waar hij de 34 pijnlijkste minuten uit zijn carrière beleefde",
+       "datum": "2026-11-16",
+       "adress": "https://nos.nl/artikel/2639663-veerman-terug-in-berlijn-waar-hij-de-34-pijnlijkste-minuten-uit-zijn-carriere-beleefde",
+       "typ": "media"
+      },
+      {
+       "podd": "Voetbal International",
+       "avsnitt": "Opstelling Oranje: Xavi kiest voor Quinten Timber als vervanger De Jong",
+       "datum": "2026-11-16",
+       "adress": "https://www.vi.nl/nieuws/opstelling-oranje-xavi-kiest-voor-quinten-timber-als-vervanger-de-jong",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Nederländerna kommer till Berlin i ett rus efter 7–0 mot Grekland och är så gott som klart för kvartsfinal med 11 poäng. Ändå säger Xavi att sättet att spela betyder mer än resultatet.",
+      "Frenkie de Jong har lämnat truppen med känningar i höften eller ryggen och ersätts av Quinten Timber. Med Virgil van Dijk borta är Denzel Dumfries kapten. Jurriën Timber, lagets joker enligt Xavi, står som vänsterback men blir offensiv mittfältare när laget har bollen.",
+      "Joey Veerman återvänder till arenan där han byttes ut efter 34 minuter mot Österrike i EM 2024."
+     ],
+     "citat": {
+      "sagt": "Vi måste visa att vi klarar det mot ett topplag också.",
+      "vem": "Cody Gakpo, om mötet med Tyskland",
+      "podd": "NOS",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Xavi",
+      "Frenkie de Jong",
+      "Quinten Timber",
+      "Virgil van Dijk",
+      "Denzel Dumfries",
+      "Jurriën Timber",
+      "Joey Veerman"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401861188",
+   "nr": 10,
+   "match": "Grekland – Serbien",
+   "lag": [
+    "Grekland",
+    "Serbien"
+   ],
+   "avspark": "2026-11-16T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Grekland skakat efter 0–7, Serbien vill rädda stoltheten",
+   "ingress": null,
+   "summering": "Grekland försöker resa sig efter 0–7 i Amsterdam och når kvartsfinal med seger om Tyskland inte vinner. Serbien har förlorat sju raka landskamper men når kvalet mot nedflyttning så länge förlusten inte blir fem mål eller mer.",
+   "delar": [
+    {
+     "lag": "Grekland",
+     "kallor": [
+      {
+       "podd": "Gazzetta",
+       "avsnitt": "Το αληθινό πρόβλημα με τον Ιβάν Γιοβάνοβιτς",
+       "datum": "2026-11-15",
+       "adress": "https://www.gazzetta.gr/football/uefa-nations-league/2586676/alithino-problima-me-ton-iban-giobanobits",
+       "typ": "media"
+      },
+      {
+       "podd": "Gazzetta",
+       "avsnitt": "Ενοχλήσεις για Τζόλη και Ιωαννίδη - Η μαγνητική θα κρίνει τη συμμετοχή τους κόντρα στη Σερβία",
+       "datum": "2026-11-15",
+       "adress": "https://www.gazzetta.gr/football/uefa-nations-league/2586800/ethniki-elladas-tzolis-kai-ioannidis-ponokefaliazoyn-ton",
+       "typ": "media"
+      },
+      {
+       "podd": "Gazzetta",
+       "avsnitt": "Εθνική Ελλάδος: Οι αλλαγές στην αποστολή της για το ματς με τη Σερβία",
+       "datum": "2026-11-16",
+       "adress": "https://www.gazzetta.gr/football/uefa-nations-league/2586859/ethniki-ellados-oi-allages-stin-apostoli-tis-gia-mats-me-tin",
+       "typ": "media"
+      },
+      {
+       "podd": "Gazzetta",
+       "avsnitt": "Γιοβάνοβιτς: «Μας πλήγωσε η ήττα από την Ολλανδία αλλά έχουμε εγωισμό να αντιδράσουμε»",
+       "datum": "2026-11-15",
+       "adress": "https://www.gazzetta.gr/football/uefa-nations-league/2586731/giobanobits-mas-pligose-i-itta-apo-tin-ollandia-alla-ehoyme",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Grekland har fått smälta 0–7 i Amsterdam, där laget låg under med 0–3 redan efter 18 minuter. Gazzettas Antonis Karpetopoulos ser problemet i spelarnas huvuden, inte i taktiken. Spelarna respekterar förbundskaptenen Ivan Jovanović, skriver han, men verkar inte frukta honom.",
+      "Med seger i Volos stannar Grekland i A-divisionen, och vinner inte Tyskland väntar kvartsfinal. Dimitris Kourbelis och Fotis Ioannidis är skadade. Christos Tzolis kände av en muskel på sista träningen men finns med i truppen, och Babis Kostoulas är tillbaka."
+     ],
+     "citat": {
+      "sagt": "Det var en stor förlust, något jag tror att vi inte väntade oss och som ingen väntade sig, men vi måste leva med det.",
+      "vem": "Ivan Jovanović, om 0–7 mot Nederländerna",
+      "podd": "Gazzetta",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Antonis Karpetopoulos",
+      "Ivan Jovanović",
+      "Dimitris Kourbelis",
+      "Fotis Ioannidis",
+      "Christos Tzolis",
+      "Babis Kostoulas"
+     ]
+    },
+    {
+     "lag": "Serbien",
+     "kallor": [
+      {
+       "podd": "Fudbalski savez Srbije",
+       "avsnitt": "Пауновић и Бабић пред Грчку: понос, карактер и жеља да поправимо утисак (видео)",
+       "datum": "2026-11-15",
+       "adress": "https://fss.rs/paunovic-i-babic-pred-grcku-ponos-karakter-i-zelja-da-popravimo-utisak/",
+       "typ": "media"
+      },
+      {
+       "podd": "Sport Klub",
+       "avsnitt": "Srbija oborila negativan rekord star 94 godine!",
+       "datum": "2026-11-14",
+       "adress": "https://sportklub.rs/fudbal/reprezentacija-fudbal/srbija-najvise-poraza-u-istoriji-rekord-srbija-nemacka-fudbal-vesti-veljko-paunovic/",
+       "typ": "media"
+      },
+      {
+       "podd": "B92",
+       "avsnitt": "Hrvatska odigrala za Srbiju: Baraž na vidiku – ako se izbegne debakl u Volosu",
+       "datum": "2026-11-15",
+       "adress": "https://www.b92.net/sport/fudbal/srpski-fudbal/285252/hrvati-ispunili-zelju-srbiji-francuzi-potvrdili-orlovi-izbegli-direktno-ispadanje/vest",
+       "typ": "media"
+      },
+      {
+       "podd": "Sportal",
+       "avsnitt": "Pet poraza i nula bodova Srbije, ali pravi krivac nije Veljko Paunović",
+       "datum": "2026-11-16",
+       "adress": "https://sportal.blic.rs/prica/srbija-i-paunovic-pet-poraza-ali-problem-je-veci-2026111611591361790",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Serbien har förlorat alla fem matcherna i gruppen och sju landskamper i rad, ett nytt bottenrekord. Det förra, sex raka, sattes 1932. Ändå räcker allt utom en förlust med fem mål eller mer för att nå kvalet om att stanna i A-divisionen.",
+      "Andrija Živković och Vanja Dragojević är avstängda efter de röda korten mot Tyskland. Nemanja Maksimović och Saša Lukić är tillbaka, liksom Veljko Paunović på bänken efter sin avstängning.",
+      "Sportal tar förbundskaptenen i försvar: Dušan Vlahović lämnade återbud av privata skäl, och fyra andra har fallit bort med skador eller sjukdom."
+     ],
+     "citat": {
+      "sagt": "Jag väntade kanske alltför länge med att ge Vanja Dragojević en chans.",
+      "vem": "Veljko Paunović, om en av de avstängda",
+      "podd": "Fudbalski savez Srbije",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Andrija Živković",
+      "Vanja Dragojević",
+      "Nemanja Maksimović",
+      "Saša Lukić",
+      "Veljko Paunović",
+      "Dušan Vlahović"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401861186",
    "nr": 11,
-   "match": "AFC Wimbledon – Blackpool",
+   "match": "Schweiz – Skottland",
    "lag": [
-    "AFC Wimbledon",
-    "Blackpool"
+    "Schweiz",
+    "Skottland"
    ],
-   "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-14T08:09:43.432Z",
-   "rubrik": "Ingen bryr sig om matchen, alla om Jackson",
+   "avspark": "2026-11-16T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Jubileum i S:t Gallen, Skottland måste vinna",
    "ingress": null,
-   "summering": "Wimbledon har en uppgiven publik som letar syndabock och ett anfall som hänger på Stockley. Blackpool har en ifrågasatt tränare och en enda renodlad mittback.",
+   "summering": "Schweiz är redan klart för A-divisionen och firar Remo Freulers 100:e landskamp, men saknar Xhaka, Akanji och Vargas. Skottland måste vinna och hoppas på hjälp från Skopje, medan Andy Robertson kan ta landskampsrekordet.",
    "delar": [
     {
-     "lag": "AFC Wimbledon",
+     "lag": "Schweiz",
      "kallor": [
       {
-       "podd": "The Wombles had a Dream Podcast",
-       "avsnitt": "Return of The Yank",
-       "datum": "2026-11-14",
-       "adress": "https://linktr.ee/womblesdream",
-       "typ": "podd"
+       "podd": "SRF",
+       "avsnitt": "«Die coole Socke» und «der Unscheinbare» feiern Jubiläen",
+       "datum": "2026-11-15",
+       "adress": "https://www.srf.ch/sport/fussball/nationalmannschaft/rodriguez-und-freuler-die-coole-socke-und-der-unscheinbare-feiern-jubilaeen",
+       "typ": "media"
       },
       {
-       "podd": "9yrspodcast",
-       "avsnitt": "EP409: NOW YOU'VE DISAPPEARED",
-       "datum": "2026-11-12",
-       "adress": "https://www.podomatic.com/podcasts/9yrs/episodes/2026-11-12T14_35_32-08_00",
-       "typ": "podd"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Gästen menar att laget bara har ett sätt att göra mål: inlägg från James Tilley eller Steve Seddon till Jayden Stockley. Danny Baker säger att det är Stockley eller ingenting, och att laget är körda om han skadar sig.",
-         "s": "o",
-         "podd": [
-          "The Wombles had a Dream Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Supportrarna förstår inte varför Steve Seddon, en vingback som slår inlägg, spelar vänster mittback i trebackslinjen. De undrar också varför mittbacken Freddie Simmonds, som lånades in för just den rollen, inte ens kommer nära laget.",
-         "s": "o",
-         "podd": [
-          "The Wombles had a Dream Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna är oense om Aron Sasu. Den ene påpekar att han har noll målpoäng på nästan 100 matcher. Gästen tycker att han bara är okej, men att det i dagens Wimbledon räknas som att spela bra.",
-         "s": "o",
-         "podd": [
-          "The Wombles had a Dream Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Gästen är trött på ett lag som spelar för oavgjort och i bästa fall norpar en vinst. Han tror ändå inte att någon annan tränare, inte ens Pep Guardiola, skulle kunna göra något annat med den här truppen.",
-         "s": "o",
-         "podd": [
-          "The Wombles had a Dream Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "20 Minuten",
+       "avsnitt": "Nati-Ausfall: Corona-Bschiss abgehakt – nun folgt der nächste Xhaka-Dämpfer",
+       "datum": "2026-11-09",
+       "adress": "https://www.20min.ch/story/nati-ausfall-corona-bschiss-abgehakt-nun-folgt-der-naechste-xhaka-daempfer-103664612",
+       "typ": "media"
       },
       {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Enligt värdarna har Jackson förbättrat laget varje säsong på pappret, men spelet är olidligt att se på. De som går på varje match, hemma och borta, har tröttnat, och det finns ingen spelare som får publiken ur stolarna.",
-         "s": "h",
-         "podd": [
-          "The Wombles had a Dream Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna är överens om att klubben inte har råd att sparka Johnny Jackson. Han får sitta kontraktet ut och tackas av i vår. Danny Baker tror ändå inte att Jackson kan få laget att göra tillräckligt många mål.",
-         "s": "o",
-         "podd": [
-          "The Wombles had a Dream Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "Blick",
+       "avsnitt": "Auch Ruben Vargas reist vorzeitig aus Nati-Camp ab",
+       "datum": "2026-11-16",
+       "adress": "https://www.blick.ch/sport/fussball/nati/auch-ruben-vargas-reist-vorzeitig-aus-nati-camp-ab/mvw9j1v",
+       "typ": "media"
       },
       {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Investeringen som föll och uttåget ur alla cuper har tagit glöden ur supportrarna. En av värdarna bryr sig inte om Blackpoolmatchen och väntar sig att laget försvarar sig för livet, hamnar under med 1–0 och inte kan vända.",
-         "s": "o",
-         "podd": [
-          "The Wombles had a Dream Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna befarar en giftig stämning mot Blackpool. Laget vinner inte och gör inga mål, och ilskan över den fallna affären behöver ett mål. Det målet tror de blir tränaren Johnny Jackson.",
-         "s": "o",
-         "podd": [
-          "9yrspodcast"
-         ],
-         "datum": [
-          "2026-11-12"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "SRF",
+       "avsnitt": "Vorzeitige Vertragsverlängerung mit Yakin? «Ist ihm piepegal!»",
+       "datum": "2026-11-16",
+       "adress": "https://www.srf.ch/sport/fussball/nationalmannschaft/erfolgreicher-nati-coach-vorzeitige-vertragsverlaengerung-mit-yakin-ist-ihm-piepegal",
+       "typ": "media"
       }
      ],
      "text": [
-      "Glöden har gått ur Wimbledons supportrar sedan investeringen föll, och en av värdarna i The Wombles had a Dream Podcast ”kunde inte bry sig mindre” om Blackpool. I 9yrspodcast fruktar man i stället en giftig stämning på Plough Lane, där ilskan får en enda måltavla: tränaren Johnny Jackson.",
-      "Spelet ger ingen tröst. Målen kommer bara när James Tilley eller Steve Seddon slår in bollen till Jayden Stockley, och skadar sig Stockley är laget körda, menar Danny Baker. Varför Seddon, en vingback som lever på sina inlägg, ändå spelar vänster mittback begriper supportrarna inte."
+      "Schweiz är redan klart för A-divisionen och firar två trotjänare. Remo Freuler gör sin 100:e landskamp och bär kaptensbindeln. Ricardo Rodriguez kan nå 150 men startar inte, eftersom han saknar speltid efter en senskada.",
+      "Granit Xhaka skulle ha gjort comeback efter affären med det förfalskade covidintyget och fyra matchers avstängning, men skadade vaden. Johan Manzambi och Miro Muheim är också skadade, och Manuel Akanji, Dan Ndoye och Ruben Vargas har lämnat lägret.",
+      "Murat Yakin förhandlar om nytt kontrakt. Frågan bekymrar medierna mer än honom, tror SRF:s kommentator Sascha Ruefer: ”Det struntar han blankt i.”"
      ],
      "citat": {
-      "sagt": "Men hans fotboll är bedrövlig att titta på. Folk har tråkigt ihjäl sig numera.",
-      "vem": null,
-      "podd": "The Wombles had a Dream Podcast",
-      "typ": "podd",
-      "datum": "2026-11-14"
+      "sagt": "Han märks inte så mycket, men han är extremt viktig för oss.",
+      "vem": "Murat Yakin, om Remo Freuler",
+      "podd": "SRF",
+      "typ": "media",
+      "datum": "2026-11-15"
      },
      "namn": [
-      "Johnny Jackson",
-      "James Tilley",
-      "Steve Seddon",
-      "Jayden Stockley",
-      "Stockley",
-      "Danny Baker",
-      "Seddon"
+      "Remo Freuler",
+      "Ricardo Rodriguez",
+      "Granit Xhaka",
+      "Johan Manzambi",
+      "Miro Muheim",
+      "Manuel Akanji",
+      "Dan Ndoye",
+      "Ruben Vargas",
+      "Murat Yakin",
+      "Sascha Ruefer"
      ]
     },
     {
-     "lag": "Blackpool",
+     "lag": "Skottland",
      "kallor": [
       {
-       "podd": "Vital Blackpool",
-       "avsnitt": "FA CUP Second Round Draw · Hornchurch",
-       "datum": "2026-11-09",
-       "adress": "https://forums.vitalfootball.co.uk/threads/fa-cup-second-round-draw.152246/",
-       "typ": "forum"
+       "podd": "Scottish FA",
+       "avsnitt": "Scotland round off UEFA Nations League campaign with Swiss test in St Gallen",
+       "datum": "2026-11-15",
+       "adress": "https://www.scottishfa.co.uk/en/news/scotland-round-off-uefa-nations-league-campaign-with-swiss-test-in-st-gallen",
+       "typ": "media"
       },
       {
-       "podd": "Blackpool Gazette",
-       "avsnitt": "Blackpool defender is looking forward to AFC Wimbledon encounter",
+       "podd": "Scottish FA",
+       "avsnitt": "Sebastien Pocognoli and Findlay Curtis speak to the media in St Gallen",
+       "datum": "2026-11-15",
+       "adress": "https://www.scottishfa.co.uk/en/news/sebastien-pocognoli-and-findlay-curtis-speak-to-the-media-in-st-gallen",
+       "typ": "media"
+      },
+      {
+       "podd": "STV News",
+       "avsnitt": "Scotland boss Sebastien Pocognoli pleased to see work on training pitch pay off",
        "datum": "2026-11-14",
-       "adress": "https://www.blackpoolgazette.co.uk/sport/olly-casey-blackpool-afc-wimbledon-league-one-9349141",
-       "typ": "lokal"
+       "adress": "https://news.stv.tv/sport/scotland-boss-sebastien-pocognoli-pleased-to-see-work-on-training-pitch-pay-off",
+       "typ": "media"
       },
       {
-       "podd": "Blackpool Gazette",
-       "avsnitt": "Ian Evatt is glad Blackpool are playing during the international break",
-       "datum": "2026-11-13",
-       "adress": "https://www.blackpoolgazette.co.uk/sport/ian-evatt-blackpool-afc-wimbledon-league-one-9347817",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Lokaltidningen skriver att Oliver Casey är Blackpools enda renodlade mittback. Fraser Horsfall, Michael Ihiekwe och Joshua Earl saknas alla.",
-         "s": "h",
-         "podd": [
-          "Blackpool Gazette"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "lokal"
-        },
-        {
-         "t": "Lokaltidningen skriver att Blackpool bara saknar Karoy Anderson, som är uttagen till landslaget. Bailey Peacock-Farrell och Dion Charles, som var borta förra uppehållet, är den här gången tillgängliga.",
-         "s": "b",
-         "podd": [
-          "Blackpool Gazette"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "lokal"
-        },
-        {
-         "t": "Lokaltidningen skriver att antalet frånvarande spelare börjar minska. Casey säger att laget har gjort bra matcher och fått bra resultat när hela truppen varit tillgänglig.",
-         "s": "h",
-         "podd": [
-          "Blackpool Gazette"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Supportrarna kritiserar Evatt för att ha lämnat de bästa spelarna på bänken mot Hornchurch. Femmannabacklinjen var enligt dem usel mot ett lag de kallar ett pubgäng.",
-         "s": "o",
-         "podd": [
-          "Vital Blackpool"
-         ],
-         "datum": [
-          "2026-11-07"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Tränaren Ian Evatt säger att laget måste bli tätare i båda straffområdena och att mycket arbete återstår, men att man aldrig blivit utspelad. Han vill se mer av första halvleken mot Mansfield, inte den andra.",
-         "s": "b",
-         "podd": [
-          "Blackpool Gazette"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Supportrarna ser cupavancemanget mot Hornchurch som ännu en svag insats och tror att det bara skjuter upp tränaren Evatts sorti. En av dem kräver rakt ut att han går.",
-         "s": "o",
-         "podd": [
-          "Vital Blackpool"
-         ],
-         "datum": [
-          "2026-11-07"
-         ],
-         "typ": "forum"
-        }
-       ]
+       "podd": "STV News",
+       "avsnitt": "McTominay had shock on heart two days before Scotland's World Cup opener",
+       "datum": "2026-11-10",
+       "adress": "https://news.stv.tv/sport/scott-mctominay-had-shock-on-heart-two-days-before-scotlands-opening-world-cup-game",
+       "typ": "media"
       }
      ],
      "text": [
-      "På forumet Vital Blackpool ses cupavancemanget mot Hornchurch som ännu en usel insats och bara ett ”uppskov” för tränaren Ian Evatt. Där får han kritik för att ha lämnat de bästa spelarna på bänken.",
-      "Bakåt är det tunt: Blackpool Gazette skriver att Oliver Casey är lagets enda renodlade mittback. Casey tror ändå att resultaten kommer nu när frånvaron minskar, och Evatt säger att laget måste bli tätare i båda straffområdena men aldrig har blivit utspelat."
+      "Andy Robertson tangerade Kenny Dalglishs 102 landskamper mot Nordmakedonien och kan bli ensam rekordhållare i S:t Gallen. Skottland måste vinna och hoppas att Nordmakedonien tar poäng av Slovenien för att nå kvalet till A-divisionen.",
+      "John McGinn gjorde båda målen i 2–1-segern och har nu 24 landslagsmål. Scott McTominay är tillbaka efter ett lyckat hjärtingrepp i september. Två dagar före VM-premiären fick han en elchock mot hjärtat, har han berättat.",
+      "Alla tränade på söndagen och inga nya skador finns. När bussen lämnade Lesser Hampden släppte förbundskaptenen Sebastien Pocognoli ombord några barn som stod vid grinden."
      ],
      "citat": {
-      "sagt": "Vi slet oss knappt förbi vad som i princip var ett pubgäng. De bästa spelarna fick sitta på bänken och femmannabacklinjen var bedrövlig.",
-      "vem": "BobHatton",
-      "podd": "Vital Blackpool",
-      "typ": "forum",
-      "datum": "2026-11-07"
+      "sagt": "I morgon är ett enormt ögonblick för Andy. Vi är medvetna om det och väldigt stolta för hans skull.",
+      "vem": "Sebastien Pocognoli, om Andy Robertson",
+      "podd": "Scottish FA",
+      "typ": "media",
+      "datum": "2026-11-15"
      },
      "namn": [
-      "Ian Evatt",
-      "Oliver Casey",
-      "Casey",
-      "Evatt"
+      "Andy Robertson",
+      "Kenny Dalglish",
+      "John McGinn",
+      "Scott McTominay",
+      "Sebastien Pocognoli"
      ]
     }
    ]
   },
   {
-   "id": "401880744",
+   "id": "401861187",
    "nr": 12,
-   "match": "Wigan Athletic – Barnsley",
+   "match": "Nordmakedonien – Slovenien",
    "lag": [
-    "Wigan Athletic",
-    "Barnsley"
+    "Nordmakedonien",
+    "Slovenien"
    ],
-   "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-14T08:10:12.643Z",
-   "rubrik": "Från sparkningskrav till Aberdeenrykte på två veckor",
+   "avspark": "2026-11-16T19:45:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Nordmakedonien jagar årets första seger, Slovenien andraplatsen",
    "ingress": null,
-   "summering": "Wigan bärs av en Miller som ingen vill peta och en tränare som plötsligt får beröm. Barnsley har självförtroendet från cuperna men brukar tappa matcherna efter paus.",
+   "summering": "Nordmakedonien har inte vunnit på hela året och riskerar sitt första segerlösa kalenderår sedan självständigheten. Slovenien saknar den avstängde Jaka Bijol men har andraplatsen och ett historiskt kval om A-divisionen i egna händer.",
    "delar": [
     {
-     "lag": "Wigan Athletic",
+     "lag": "Nordmakedonien",
      "kallor": [
       {
-       "podd": "Progress With Unity Podcast",
-       "avsnitt": "We're On A Run - Barnsley Preview",
-       "datum": "2026-11-11",
-       "adress": "https://podcasts.apple.com/gb/podcast/progress-with-unity-podcast/id550919658?uo=4",
-       "typ": "podd"
+       "podd": "Makfudbal",
+       "avsnitt": "Македонија посакува победа против Словенија, барем малку да ја разубави 2026 година",
+       "datum": "2026-11-16",
+       "adress": "https://makfudbal.mk/makedonija-posakuva-pobeda-protiv-slovenija-barem-malku-da-ja-razubavi-2026-godina/",
+       "typ": "media"
       },
       {
-       "podd": "Progress With Unity Podcast",
-       "avsnitt": "We're In The Hat - Boreham Wood To Crewe",
-       "datum": "2026-11-08",
-       "adress": "https://podcasts.apple.com/gb/podcast/progress-with-unity-podcast/id550919658?uo=4",
-       "typ": "podd"
-      },
-      {
-       "podd": "Vital Latics Speyk",
-       "avsnitt": "Tics v Tykes · Fans Advisory Board. · Summer Transfer Rumours thread",
-       "datum": "2026-11-14",
-       "adress": "https://forums.vitalfootball.co.uk/threads/tics-v-tykes.152281/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Vital Latics Speyk",
-       "avsnitt": "Tics v Tykes · Fans Advisory Board. · Guess the Gate",
+       "podd": "FFM",
+       "avsnitt": "Македонија поразена во Глазгов, Растодер го постигна својот првенец",
        "datum": "2026-11-13",
-       "adress": "https://forums.vitalfootball.co.uk/threads/tics-v-tykes.152281/",
-       "typ": "forum"
+       "adress": "https://www.ffm.mk/%D0%BC%D0%B0%D0%BA%D0%B5%D0%B4%D0%BE%D0%BD%D0%B8%D1%98%D0%B0-%D0%BF%D0%BE%D1%80%D0%B0%D0%B7%D0%B5%D0%BD%D0%B0-%D0%B2%D0%BE-%D0%B3%D0%BB%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2-%D1%80%D0%B0%D1%81%D1%82%D0%BE/",
+       "typ": "media"
       },
       {
-       "podd": "Wigan Today",
-       "avsnitt": "Caldwell responds to Aberdeen boss job speculation - ‘back home’",
-       "datum": "2026-11-12",
-       "adress": "https://www.wigantoday.net/sport/football/wigan-athletic/wigan-athletic-chief-responds-to-aberdeen-boss-job-speculation-back-home-9348189",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Sonny Perkins har inte fått någon ordning på spelet sedan han kom tillbaka från sin hjärnskakning och missade läge efter läge mot Crewe. Supportrarna tror att han får svårt att ta platsen från Christian Saydee, som gör mål.",
-         "s": "o",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "Ekipa",
+       "avsnitt": "Седлоски: „Не заслуживме пораз…, ВАР реагираше дури по пет минути, Елмас имаше лош ден“",
+       "datum": "2026-11-14",
+       "adress": "https://ekipa.mk/sedloski-ne-zasluzhivme-poraz-var-reagirashe-duri-po-pet-minuti-elmas-imashe-losh-den/",
+       "typ": "media"
       },
       {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Supportrarna ser K'Marni Miller som lagets nya stjärna på vänsterkanten, lika bra bakåt som framåt. Vändningen i lagets resultat sammanfaller med att han kom in i laget, och de anser att han inte går att peta.",
-         "s": "o",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Även när Wigan dominerar helt brukar laget släppa in ett slarvigt mål. Supportrarna ser det som ett återkommande mönster.",
-         "s": "h",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "För två veckor sedan låg Wigan sist och alla ville se tränaren sparkad. Nu är stämningen positiv efter fyra matcher utan förlust, men värdarna varnar för att bli för upprymda innan fler ligapoäng har tagits.",
-         "s": "o",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Supportrarna ser matchen som chansen att dra ifrån nedflyttningsstrecket. Samtidigt oroar de sig för att Wigan brukar vara laget som får igång krisande motståndares säsong.",
-         "s": "o",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Enligt en Barnsleysupporter släpper laget alltid in mål och är svagt på fasta situationer bakåt. Klubben har gått över 20 matcher utan att hålla nollan. Hemma i Wigan har mittbackarna Jeremiah Mullen och Morgan Fox nyss nickat in hörnor.",
-         "s": "h",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Barnsley pressar högt och har mycket energi med Englands yngsta trupp, men enligt en egen supporter håller laget aldrig i 90 minuter. På Reading ledde de i halvtid men slocknade och förlorade.",
-         "s": "h",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Barnsleys ytter Reyes Cleary kan vara bland de bästa i ligan när han har sin dag. Han är dock ojämn och har ifrågasatt attityd, och en egen supporter menar att han är lätt att hålla tyst om han inte har lust.",
-         "s": "o",
-         "podd": [
-          "Progress With Unity Podcast"
-         ],
-         "datum": [
-          "2026-11-11"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "Makfudbal",
+       "avsnitt": "Александер Чеферин долета во Скопје, на покана на Масар Омерагиќ, да го следи мечот Македонија – Словенија (ФОТО)",
+       "datum": "2026-11-16",
+       "adress": "https://makfudbal.mk/aleksander-cheferin-doleta-vo-skopje-na-pokana-na-masar-omeragik-da-go-sledi-mechot-makedonija-slovenija-foto/",
+       "typ": "media"
       }
      ],
      "text": [
-      "För två veckor sedan låg Wigan sist och alla ville se Gary Caldwell sparkad. Nu får skeptikerna på forumet höra att de har tippat fel gång på gång och att det är dags att ge tränaren erkännande. Själv avfärdar han ryktet om Aberdeen i Wigan Today.",
-      "I podden Progress With Unity pekar man på K'Marni Miller: vändningen kom ungefär samtidigt som han tog plats på vänsterkanten, där han är lika bra bakåt som framåt.",
-      "Oron är den gamla vanliga, att Wigan som så ofta blir laget som ”får igång någon annans säsong”."
+      "Nordmakedonien har inte vunnit någon av årets nio landskamper. Utan seger mot Slovenien blir 2026 det första kalenderåret utan vinst sedan självständigheten, skriver Makfudbal. I mars väntar kval för att stanna i B-divisionen.",
+      "I Glasgow kom åtminstone lagets första mål i årets Nations League, Elmin Rastoders första i landslaget. Elif Elmas var missnöjd när han byttes ut, men förbundskaptenen Goce Sedloski tar honom i försvar: alla kan ha en dålig dag.",
+      "På läktaren sitter UEFA:s ordförande Aleksander Čeferin, på privat besök som gäst hos förbundsordföranden Masar Omeragić."
      ],
      "citat": {
-      "sagt": "Aberdeen är en fantastisk fotbollsklubb med en otrolig historia. Men vad mig beträffar ligger det ingenting i det.",
-      "vem": "Gary Caldwell",
-      "podd": "Wigan Today",
-      "typ": "lokal",
-      "datum": "2026-11-12"
+      "sagt": "Vi kommer att gå ut mer offensivt än i de tidigare matcherna. Vi skapar chanser, men vi måste också ta vara på dem.",
+      "vem": "Goce Sedloski, förbundskapten",
+      "podd": "Makfudbal",
+      "typ": "media",
+      "datum": "2026-11-16"
      },
      "namn": [
-      "Gary Caldwell",
-      "K'Marni Miller"
+      "Elmin Rastoder",
+      "Elif Elmas",
+      "Goce Sedloski",
+      "Aleksander Čeferin",
+      "Masar Omeragić"
      ]
     },
     {
-     "lag": "Barnsley",
+     "lag": "Slovenien",
      "kallor": [
       {
-       "podd": "The Yorkshire Post",
-       "avsnitt": "Barnsley FC's worrying second-half numbers which must change for boss",
-       "datum": "2026-11-13",
-       "adress": "https://www.yorkshirepost.co.uk/sport/football/barnsley-fcs-worrying-second-half-numbers-which-must-change-for-daniel-stendel-9347672",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Lokaltidningen skriver att Barnsley släppt in 16 ligamål efter paus mot sex före. Bara Bromley har varit sämre i League One. Även de åtta senaste insläppta målen i cuperna har kommit i andra halvlek.",
-         "s": "h",
-         "podd": [
-          "The Yorkshire Post"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "lokal"
-        },
-        {
-         "t": "Tränaren Daniel Stendel säger att konditionen inte är problemet. Han tror att svackorna efter paus kan bero på att han tidigare tvingades spela med nästan samma trupp match efter match. Nu har han fler alternativ.",
-         "s": "b",
-         "podd": [
-          "The Yorkshire Post"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "lokal"
-        }
-       ]
+       "podd": "RTV SLO",
+       "avsnitt": "\"Moramo biti agresivni od prve minute in držati ritem igre kot proti Švici\"",
+       "datum": "2026-11-15",
+       "adress": "https://www.rtvslo.si/sport/nogomet/moramo-biti-agresivni-od-prve-minute-in-drzati-ritem-igre-kot-proti-svici/800233",
+       "typ": "media"
       },
       {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Stendel medger att trycket inför bottenmötet med Wigan är större än vanligt men säger att det bara är en match. Efter storsegrarna i cuperna känner laget sig i bra form och med medvind.",
-         "s": "b",
-         "podd": [
-          "The Yorkshire Post"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "lokal"
-        }
-       ]
+       "podd": "RTV SLO",
+       "avsnitt": "Možni tekmeci Slovenije za elitno skupino so Hrvaška, Wales, Srbija in Norveška",
+       "datum": "2026-11-16",
+       "adress": "https://www.rtvslo.si/sport/nogomet/liga-narodov/mozni-tekmeci-slovenije-za-elitno-skupino-so-hrvaska-wales-srbija-in-norveska/800249",
+       "typ": "media"
+      },
+      {
+       "podd": "Sportklub",
+       "avsnitt": "Ne slepimo se: Slovenija mora premagati Makedonce",
+       "datum": "2026-11-16",
+       "adress": "https://sportklub.si/nogomet/ne-slepimo-se-slovenija-mora-premagati-makedonce/",
+       "typ": "media"
+      },
+      {
+       "podd": "RTV SLO",
+       "avsnitt": "Cesar ostal brez razigranega Elšnika, med napadalci Celar še naprej vroč",
+       "datum": "2026-11-09",
+       "adress": "https://www.rtvslo.si/sport/nogomet/liga-narodov/cesar-ostal-brez-razigranega-elsnika-med-napadalci-celar-se-naprej-vroc/799517",
+       "typ": "media"
       }
      ],
      "text": [
-      "Barnsley tappar greppet efter paus: enligt The Yorkshire Post har 16 av lagets insläppta ligamål kommit i andra halvlek, och bara Bromley har varit sämre i League One.",
-      "Daniel Stendel säger att konditionen inte är problemet. Han tror snarare att det beror på att han tidigare fick spela med nästan samma trupp match efter match, och nu har han fler att välja mellan.",
-      "Han medger att trycket inför bottenmötet är större än vanligt men kallar det bara en match."
+      "Slovenien är tvåa med 8 poäng, en före Skottland, och har övertaget i de inbördes mötena. Seger eller skotsk poängförlust i Schweiz ger andraplatsen och ett kvalspel i mars om A-divisionen, där landet aldrig har varit.",
+      "Jaka Bijol är avstängd för gula kort men reste ändå med till Skopje. Vanja Drkušić får leda försvaret, och David Brekalo har fortfarande känningar. Benjamin Šeško och Timi Max Elšnik är skadade.",
+      "Arenan i Skopje tar 33 000, men Sportklub räknar med högst 5 000 åskådare."
      ],
      "citat": {
-      "sagt": "Vi ser fram emot det. Vi är i bra form och har medvind.",
-      "vem": "Daniel Stendel",
-      "podd": "The Yorkshire Post",
-      "typ": "lokal",
-      "datum": "2026-11-13"
+      "sagt": "Vi vet att vi på kort tid har fått publiken på vår sida, men hos oss finns det definitivt ingen eufori.",
+      "vem": "Boštjan Cesar, förbundskapten",
+      "podd": "RTV SLO",
+      "typ": "media",
+      "datum": "2026-11-15"
      },
      "namn": [
-      "Daniel Stendel"
+      "Jaka Bijol",
+      "Vanja Drkušić",
+      "David Brekalo",
+      "Benjamin Šeško",
+      "Timi Max Elšnik"
      ]
     }
    ]
   },
   {
-   "id": "401881266",
+   "id": "401861181",
    "nr": 13,
-   "match": "Swindon Town – Grimsby Town",
+   "match": "Kazakstan – Slovakien",
    "lag": [
-    "Swindon Town",
-    "Grimsby Town"
+    "Kazakstan",
+    "Slovakien"
    ],
-   "avspark": "2026-11-14T15:00:00.000Z",
-   "skriven": "2026-11-14T08:10:38.950Z",
-   "rubrik": "Spöket på County Ground skrämmer mest Grimsbys supportrar",
+   "avspark": "2026-11-16T15:00:00.000Z",
+   "skriven": "2026-11-16T19:14:48.408Z",
+   "hand": true,
+   "rubrik": "Weiss talar ryska, van ’t Schip tar ansvaret",
    "ingress": null,
-   "summering": "Swindon står och faller med Drinan och en hoplappad backlinje mot Cook, medan Grimsby kommer slitna, utan nyckelspelare och med en andrabollsoro som inte vill släppa.",
+   "summering": "Kazakstan har inte vunnit i gruppen, och John van ’t Schip tar på sig ansvaret medan Sports.kz vill se honom gå. Slovakien har vunnit gruppen och kommer utan nästan hela startelvan, ledd av Kairats förre tränare Vladimír Weiss.",
    "delar": [
     {
-     "lag": "Swindon Town",
+     "lag": "Kazakstan",
      "kallor": [
       {
-       "podd": "Loathed Strangers: Swindon Town Podcast",
-       "avsnitt": "The Preview 26/27: Grimsby Town (H)",
-       "datum": "2026-11-13",
-       "adress": "https://shows.acast.com/loathed-strangers-swindon-town-podcast-1/episodes/the-preview-2627-grimsby-town-h",
-       "typ": "podd"
+       "podd": "Vesti.kz",
+       "avsnitt": "\"Были хорошие результаты с другими командами\" - ван'т Схип ответил на критику у руля Казахстана",
+       "datum": "2026-11-15",
+       "adress": "https://vesti.kz/national/byili-horoshie-rezultatyi-drugimi-komandami-vant-ship-391019",
+       "typ": "media"
       },
       {
-       "podd": "Loathed Strangers: Swindon Town Podcast",
-       "avsnitt": "The Preview 26/27: Plymouth Argyle (A) - EFL Trophy",
-       "datum": "2026-11-09",
-       "adress": "https://shows.acast.com/loathed-strangers-swindon-town-podcast-1/episodes/the-preview-2627-plymouth-argyle-a-efl-trophy",
-       "typ": "podd"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Med Stephan Negru borta med Moldavien vill en av värdarna se lånet James Debayo göra sin första ligastart som tredje mittback. Han menar att självförtroendet växer sedan supportrarna gick på honom i Accrington och att Ian Holloway har berömt honom på träning.",
-         "s": "o",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "Sports.kz",
+       "avsnitt": "Сплошное Попеску. Сборная Казахстана снова проиграла Молдове, а Ван’т Схипу пора уходить",
+       "datum": "2026-11-14",
+       "adress": "https://www.sports.kz/news/sploshnoe-popesku-sbornaya-kazahstana-snova-proigrala-moldove-avant-shipu-pora-uhodit",
+       "typ": "media"
       },
       {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Enligt värdarna hänger anfallet helt på Aaron Drinan: gör han inte mål händer ingenting. De undrar vem mer i laget som kan kliva fram.",
-         "s": "o",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Tom Nichols, James Ball och Ollie Palmer, som klubben försökte bli av med i somras, har blivit viktiga för truppen. Ball har hållit sig frisk och blivit ordinarie, och Palmer har sett bra ut när han har varit skadefri.",
-         "s": "o",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Mot Plymouth läckte Swindons trebackslinje när bollen tappades på mitten, eftersom motståndarna hade fyra anfallare kvar framme hela tiden. Värdarna tror att andra lag kan ha sett det och försöka göra likadant.",
-         "s": "h",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "Sports.kz",
+       "avsnitt": "«Частая смена тренерских штабов не приводит ни к чему хорошему». Александр Кузнецов разобрал поражение Казахстана от Молдовы и поделился ожиданиями от игры со Словакией",
+       "datum": "2026-11-14",
+       "adress": "https://www.sports.kz/news/chastaya-smena-trenerskih-shtabov-neprivodit-nikchemu-horoshemu-aleksandr-kuznetsov-razobral-porajenie-kazahstana-otmoldovyi-ipodelilsya-ojidaniyami-otigryi-soslovakiey",
+       "typ": "media"
       },
       {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Grimsbys Andy Cook kommer att söka sig mot de korta Mitchell Clark och Joel McGregor vid varje tillfälle. Därför vill värdarna ha tre storvuxna mittbackar i stället för att flytta ner någon av dem.",
-         "s": "o",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Grimsby har inte vunnit på sina sex senaste besök på County Ground, och Swindon har vunnit fyra av dem. Grimsbys egna supportrar säger rakt ut att de fruktar resan dit.",
-         "s": "h",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna är oense om spöket. Den ena tror inte att Grimsbys spelare delar fansens rädsla, eftersom tränaren är mycket bra för nivån och lagets chanser borde räcka till en klar andraplats.",
-         "s": "o",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Grimsbys mittfältare Géza Turi är borta med Färöarna, och förra landslagsuppehållet förlorade Grimsby båda matcherna utan honom, mot Newport och Shrewsbury. Kieran Green är dessutom osäker efter en skada.",
-         "s": "h",
-         "podd": [
-          "Loathed Strangers: Swindon Town Podcast"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "podd": "Sports.kz",
+       "avsnitt": "Провал уже состоялся, впереди лидер группы. Чем закончится выступление Казахстана в Лиге наций?",
+       "datum": "2026-11-15",
+       "adress": "https://www.sports.kz/news/proval-uje-sostoyalsya-vperedi-lider-gruppyi-chem-zakonchitsya-vyistuplenie-kazahstana-vlige-natsiy",
+       "typ": "media"
       }
      ],
      "text": [
-      "I Loathed Strangers är man brutalt ärlig om anfallet: antingen gör Aaron Drinan mål, eller så händer ingenting.",
-      "Bakåt oroar sig värdarna för Andy Cook, som de räknar med ska söka upp de kortväxta Mitchell Clark och Joel McGregor vid varje tillfälle. Därför vill de ha tre storvuxna mittbackar.",
-      "Med Stephan Negru borta med Moldavien vill en av dem ge lånet James Debayo hans första ligastart. Debayo fick kritik av egna supportrar i Accrington, men Ian Holloway har berömt honom på träningarna."
+      "Kazakstan har inte vunnit någon av fem matcher och är klart sist. Efter 1–2 i Moldavien i fredags, andra förlusten mot Moldavien i gruppen, skrev Sports.kz att John van ’t Schip ”utan tvivel mycket snart” packar väskorna.",
+      "Förbundskaptenen kallar kritiken befogad och tar på sig ansvaret, men påminner om att han lyfte Ajax från sista plats till femte. Experten Aleksandr Kuznetsov pekar på språkbarriären och anar ännu ett tränarbyte.",
+      "Maksim Samorodov är avstängd efter rött kort i Moldavien, och Dastan Satpajev och Ramazan Karimov är skadade."
      ],
      "citat": {
-      "sagt": "Plötsligt ser spelarna vi trodde var överflödiga ut att vara helt avgörande för truppen.",
-      "vem": null,
-      "podd": "Loathed Strangers: Swindon Town Podcast",
-      "typ": "podd",
-      "datum": "2026-11-13"
+      "sagt": "Det är viktigt att avsluta turneringen värdigt, för vår egen skull men framför allt för supportrarna i Kazakstan.",
+      "vem": "John van ’t Schip, inför den sista gruppmatchen",
+      "podd": "Vesti.kz",
+      "typ": "media",
+      "datum": "2026-11-15"
      },
      "namn": [
-      "Aaron Drinan",
-      "Andy Cook",
-      "Mitchell Clark",
-      "Joel McGregor",
-      "Stephan Negru",
-      "James Debayo",
-      "Ian Holloway"
+      "John van ’t Schip",
+      "Aleksandr Kuznetsov",
+      "Maksim Samorodov",
+      "Dastan Satpajev",
+      "Ramazan Karimov"
      ]
     },
     {
-     "lag": "Grimsby Town",
+     "lag": "Slovakien",
      "kallor": [
       {
-       "podd": "DN35",
-       "avsnitt": "Load of Saves",
-       "datum": "2026-11-08",
-       "adress": "https://shows.acast.com/dn35-grimsby/episodes/load-of-saves",
-       "typ": "podd"
+       "podd": "SFZ",
+       "avsnitt": "MUŽI A – Tréner Vladimír Weiss pred zápasom Ligy národov v Kazachstane: Byť plní odhodlania a veľa behať",
+       "datum": "2026-11-15",
+       "adress": "https://futbalsfz.sk/muzi-a-trener-vladimir-weiss-pred-zapasom-ligy-narodov-v-kazachstane-byt-plne-odhodlani-a-vela-behat/",
+       "typ": "media"
       },
       {
-       "podd": "The Fishy",
-       "avsnitt": "Forest u-21s and Swindon · Prediction Thread Swindon A 26/27 · Scunthorpe.",
-       "datum": "2026-11-13",
-       "adress": "https://forum.thefishy.co.uk/?m-1794233042/",
-       "typ": "forum"
+       "podd": "Sportnet (SME)",
+       "avsnitt": "Weiss hovoril najprv po rusky. Je to ako hrať proti svojim, vravel pred zápasom s Kazachmi",
+       "datum": "2026-11-15",
+       "adress": "https://sportnet.sme.sk/spravy/futbal-kazachstan-slovensko-tlacova-konferencia-vladimir-weiss-3-skupina-c-divizia-liga-narodov-2026-2027/",
+       "typ": "media"
       },
       {
-       "podd": "The Fishy",
-       "avsnitt": "Forest u-21s and Swindon · Prediction Thread Swindon A 26/27 · Scunthorpe.",
-       "datum": "2026-11-13",
-       "adress": "https://forum.thefishy.co.uk/?m-1794233042/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Grimsby Live",
-       "avsnitt": "Grimsby Town at Swindon - Mariners wary of hosts' 'very strong' home form",
+       "podd": "Hetrik.sk",
+       "avsnitt": "Lukáš Haraslín mohol dostať voľno, no rozhodol sa so Slovenskom letieť do Kazachstanu",
        "datum": "2026-11-14",
-       "adress": "https://www.grimsbytelegraph.co.uk/sport/football/grimsby-town-swindon-mariners-wary-11240984",
-       "typ": "lokal"
-      },
-      {
-       "podd": "Grimsby Live",
-       "avsnitt": "Grimsby Town boss on lessons learned in narrow FA Cup win",
-       "datum": "2026-11-09",
-       "adress": "https://www.grimsbytelegraph.co.uk/sport/football/we-gave-ourselves-mountain-climb-11234103",
-       "typ": "lokal"
-      }
-     ],
-     "grupper": [
-      {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Lokaltidningen skriver att Grimsby saknar nyckelspelarna Maldini Kacurri och Géza Dávid Turi, som båda är iväg på landslagsuppdrag.",
-         "s": "h",
-         "podd": [
-          "Grimsby Live"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Värdarna är oense om målvakten. En vill att Harvey Cartwright, som räddade tre straffar, ska ta platsen från Christy Pym eftersom laget inte går upp med Pym i mål. De andra tycker att det är för tidigt efter en enda bra match.",
-         "s": "o",
-         "podd": [
-          "DN35"
-         ],
-         "datum": [
-          "2026-11-08"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Utan Green vill en av värdarna se Cian Doyle på mitten, eftersom han har löpkraft och energi och går in i närkamperna. En annan tycker att Doyle är för lätt och inte vinner luftdueller.",
-         "s": "o",
-         "podd": [
-          "DN35"
-         ],
-         "datum": [
-          "2026-11-08"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Grimsby spelade 120 minuter på en tung plan i FA-cupen i söndags och sedan Jersey Mike's Trophy på tisdagen. Tränaren David Artell säger att han tar ut det lag som ger bäst chans att vinna mot Swindon.",
-         "s": "b",
-         "podd": [
-          "Grimsby Live"
-         ],
-         "datum": [
-          "2026-11-09"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Det som stör värdarna mest är ett mönster de ser allt oftare den här säsongen: laget kommer sent på varje andraboll. Mot Stafford kom alla insläppta mål ur det. En av dem tror ändå att det var en engångsföreteelse.",
-         "s": "o",
-         "podd": [
-          "DN35"
-         ],
-         "datum": [
-          "2026-11-08"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna konstaterar att laget fortsätter att släppa in mål trots att de bästa fyra backarna stod på planen i slutet. Matcher som slutar 2–2 har blivit lagets kännetecken.",
-         "s": "o",
-         "podd": [
-          "DN35"
-         ],
-         "datum": [
-          "2026-11-08"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Supportrarna ställer sig bakom klubben. Artell sade inför Swindon att spelarfacket PFA inte vill att spelarna gör tre matcher på en vecka, och supportrarna tycker att klubben gjorde rätt som skyddade A-lagets spelare.",
-         "s": "o",
-         "podd": [
-          "The Fishy"
-         ],
-         "datum": [
-          "2026-11-13"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Supportrarna är oroliga inför Swindon. Laget har en tung match på 120 minuter i benen och saknar flera nyckelspelare, och de påminner om lagets dåliga facit i Swindon. Swindons svaga form lugnar dem inte.",
-         "s": "o",
-         "podd": [
-          "DN35"
-         ],
-         "datum": [
-          "2026-11-08"
-         ],
-         "typ": "podd"
-        }
-       ]
+       "adress": "https://www.hetrik.sk/lukas-haraslin-mohol-dostat-volno-no-rozhodol-sa-so-slovenskom-letiet-do-kazachstanu",
+       "typ": "media"
       }
      ],
      "text": [
-      "I DN35 stör man sig mest på att laget kommer sent på varje andraboll, ett mönster som blir allt tydligare och som låg bakom alla insläppta mål mot Stafford.",
-      "Inför resan är oron stor, med 120 minuter i benen, nyckelspelare borta och ett ”underbart facit i Swindon”. Inte ens Swindons svaga form lugnar.",
-      "Målvaktsfrågan delar också podden. En av värdarna vill att straffhjälten Harvey Cartwright tar över efter Christy Pym, eftersom ”vi går inte upp med Pym i mål”, men lokaltidningen tror att Pym behåller platsen."
+      "Slovakien har vunnit gruppen utan förlust men är i Astana utan i stort sett hela startelvan. Milan Škriniar, Dávid Hancko och fyra till fick ledigt, Martin Valjent är avstängd, och Stanislav Lobotka och Tomáš Suslov är skadade.",
+      "Vladimír Weiss tränade Kairat Almaty i tre år och svarade de kazakiska journalisterna på ryska. Han vill se mer löpning än i 2–2 mot Färöarna och lyfter fram Erik Prekop, som gjorde sitt första landslagsmål i den matchen.",
+      "Lukáš Haraslín erbjöds ledigt men valde att följa med. Det spelas på konstgräs under stängt tak."
      ],
      "citat": {
-      "sagt": "Jag hoppas verkligen att vi inte gör som förra gången, när vi låg under efter typ tre minuter.",
-      "vem": "John",
-      "podd": "DN35",
-      "typ": "podd",
-      "datum": "2026-11-08"
+      "sagt": "Tittar man på Kairats anläggning är det som Real Madrid.",
+      "vem": "Vladimír Weiss, om sin gamla klubb Kairat Almaty",
+      "podd": "SFZ",
+      "typ": "media",
+      "datum": "2026-11-15"
      },
      "namn": [
-      "Harvey Cartwright",
-      "Christy Pym"
+      "Milan Škriniar",
+      "Dávid Hancko",
+      "Martin Valjent",
+      "Stanislav Lobotka",
+      "Tomáš Suslov",
+      "Vladimír Weiss",
+      "Erik Prekop",
+      "Lukáš Haraslín"
      ]
     }
    ]

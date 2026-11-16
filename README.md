@@ -453,6 +453,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   ramens palmett. Visitkortet flyttades ner och lite åt höger, så att det ryms mellan uret och ramen, linjerar med
   ramens högerkant och hamnar utanför urets skugga. Orakelramen och mässingsskylten står kvar, eftersom skylten redan ligger strax ovanför bardisken
   (se *Stationsuret* under [Tobaksaffären](#tobaksaffären))
+- [x] **Helgarderat Nr 2 med Europatipset (2026-11-16, användarens önskemål: "släppa en ny tidning med europatipset -
+  istället för den som är nu från 14 november. Självklart ska det vara med alla matcher. Även de som redan har
+  spelats"):** numret gäller Europatipset 2625 (söndag 15 och måndag 16 november) med kupongens alla tretton matcher i
+  kupongens ordning, också Eibar–Cádiz och Granada–Las Palmas i spanska andraligan, som sajten inte har, och de som
+  redan var spelade. Matchbladen och sista sidan är skrivna för hand inför matcherna, ur veckans press. Omslaget säger
+  *Nr 2* och *Inför Europatipset*, och nattjobbet låter numret stå kvar med alla matcherna (se *Nr 2* under
+  [Helgarderat](#helgarderat))
 
 ## Publicering
 
@@ -9806,6 +9813,43 @@ innehållet och sista sidan, utan skriptfel (konsolen visar bara tjänsterna som
 Sammanslagningen i nattjobbet med Node (ett eget blad ersätter, handskrivna står kvar, en annan omgång rörs inte).
 Bildhämtningen för landslagen bara med ett låtsasnät (rätt BBC-flöde och sökord); den riktiga hämtningen gör GitHub
 Actions. Notiserna (*Så mår tipslagen*, `data/tidning.json`) är inte skrivna för landskamperna.
+
+**Nr 2, Europatipset** (2026-11-16, användarens önskemål: "släppa en ny tidning med europatipset - istället för den
+som är nu från 14 november. Självklart ska det vara med alla matcher. Även de som redan har spelats"): numret gäller
+Europatipset 2625 och har kupongens tretton matcher i Svenska Spels ordning: elva landskamper i Nations League, och
+Eibar–Cádiz och Granada–Las Palmas i spanska andraligan (match 7 och 8), som sajten inte har och som därför saknas i
+gängets omgång (`2026-11-15-v65ft4`, elva matcher). Nio av matcherna var redan spelade, men bladen är skrivna inför
+dem, som resten av tidningen.
+
+- **Matchbladen** är skrivna för hand i samma form som Nr 1:s landskamper (`"hand": true`, högst 95 ord per lag, ett
+  citat per lag, två till fyra källor per lag med datum och länk). Källorna är lagens egna medier på deras språk och
+  förbundens sidor, alla från de sju dagarna före matchdagen och före avsparken (ingen matchrapport, inget resultat).
+  Namnen och talen är kontrollerade mot sidornas text, och tipsorden mot `TIPS_RE`. Bladen för de två spanska
+  matcherna har arenan själva (Ipurua, Nuevo Los Cármenes) och står utan sköldar, eftersom `data/skoldar.json` bara
+  har sajtens lag.
+- **Sista sidan** (`data/sista-sidan.json`, `"hand": true`) är också skriven för hand, efter reglerna i
+  config/sista-sidan.js: Hasse Backes krönika om alla finaler som inte är några, tre notiser i *Vid sidan av* (Eibar,
+  Cádiz och Kazakstan, ur Wikipedia) och kåseriet av Gunilla Östberg, undersköterska på nattskift i Skövde.
+  Claude Code på iMacen var utloggat när numret gjordes, så nattjobbets `skrivSista` gick inte att köra.
+- **Numret** står i filen (`nummer`): med veckoräkningen hade Europatipset söndagen den 15 november också blivit Nr 1,
+  eftersom omgången börjar samma vecka som Stryktipset den 14 november. `numret` i
+  [public/rum-tidning.js](public/rum-tidning.js) tar filens nummer före veckan, och nattjobbet räknar vidare
+  (`poddsidor` i src/analyser/poddar.mjs): samma omgång behåller sitt nummer och nästa omgång får ett högre. Ett
+  nummer utan `nummer` räknas på veckan som förut.
+- **Spelet** står också i filen (`spel`, `{namn, nr}` ur kupongtjänstens omgång): omgångens id `2026-11-15-v65ft4`
+  gavs innan tjänsten skrev spelet i id:t (`-et2625`), och med tretton matcher hade omslaget annars sagt *Inför
+  Stryktipset* (`spelet` i rum-tidning.js).
+- **Nattjobbet** bygger numret efter gängets omgång var 15:e minut och hade annars tagit bort de två spanska
+  matcherna och numrerat om resten 1–11. Har numret som ligger ute för samma omgång alla omgångens matcher och fler,
+  står dess kupong kvar med kupongens nummer, och omgångens egna blad ersätter de handskrivna som förut.
+
+Provat 2026-11-16 med en provserver (public/ och de två datafilerna ur arbetskopian, resten från matchfixarna.se) i
+huvudlös Chrome, i 1280 bredd och 390 × 844: omslaget (*Nr 2 · Vecka 46*, *Inför Europatipset*, 15 november),
+innehållet med tretton matcher och sista sidan, matchbladen med flaggorna och utan sköldar (Eibar–Cádiz), sista
+sidan, inget fel i konsolen och inget som sticker ut åt sidan. Med Node: `poddsidor` med kupongtjänstens riktiga
+omgång och poddjobbets fil (numret står kvar oförändrat, så nattjobbet skriver inget), en ny omgång (nästa nummer),
+ett eget blad som ersätter ett handskrivet och ett äldre nummer utan `nummer`, och `overst`/`forsta` för det gamla
+och det nya numret. Inte provat i rummet i en riktig webbläsare, i Safari eller i en riktig telefon.
 
 ### Närbilderna
 
