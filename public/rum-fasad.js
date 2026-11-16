@@ -11,7 +11,7 @@
 // (rum-fasad-gatan.js) och syns som speglingar i glaset.
 //
 // Genom skyltfönstret syns rummet, vagt: gänget vid barbordet bakifrån, ritat i 3D av samma scen som
-// inne (Rum.utifran, utifran i rum-3d.js), med neonskylten Tobak, som läses rätt härifrån, skivan med
+// inne, i gängets egen duk som rummet lånar ut till fönstret (glas, utifran i rum-3d.js), med neonskylten Tobak, som läses rätt härifrån, skivan med
 // löpsedlarna med baksidan ut och rummet bakom i ljuset från lysröret – eller i neonens och tv:ns sken
 // när lysröret är släckt på natten (RumFolk.nattGrad). På dagen speglar glaset himlen och gatan, och
 // rummet syns svagare; på kvällen lyser det ut på trottoaren. Guldet på dörren står rättvänt, och
@@ -23,8 +23,9 @@
 // ljuset eller vädret ändras (sig); det som rör sig (de som går, speglingarna, regnet och snön, molnen och
 // barberarens stång) ritas i tre dukar i en takt (TAKT), och står still med prefers-reduced-motion.
 //
-//   RumFasad.bygg(rum, o) → { el, ny(), ut() } bygger fasaden i rum (.rum) och ritar den;
-//     o.gang(duk) ritar gänget på duken (false utan), o.takt() hur många gånger i sekunden (som inne),
+//   RumFasad.bygg(rum, o) → { el, ny(), ut(), glas(duk) } bygger fasaden i rum (.rum) och ritar den; glas(duk)
+//     ställer gängets duk (rum-3d.js) i skyltfönstret, glas(null) tar bort den igen (rum.js ställer tillbaka den);
+//     o.gang({ w, h }) ritar gänget i den duken med w × h bildpunkter (false utan), o.takt() hur många gånger i sekunden (som inne),
 //     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.pynt(namn, { w, h, dag }) högtidspyntet
 //     i fönstret ('pyntF') eller på dörren ('pyntP') sett utifrån, en duk w × h eller null (pyntUtifran i
 //     rum-inredning.js), o.calm() utan rörelser
@@ -3013,7 +3014,7 @@ window.RumFasad = (() => {
     el.innerHTML = '<div class="rf-scen"></div>';
     rum.append(el);
     const scen = el.firstChild;
-    const F = { V: null, sig: '', duk: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
+    const F = { V: null, sig: '', gl: null, glasR: null, glasPx: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
     const calm = () => Boolean(o.calm && o.calm());
     // (dukarnas bildpunkter per enhet i världen: skärmens, högst två miljoner bildpunkter på hela fönstret)
     const tathet = (V) => {
@@ -3049,12 +3050,11 @@ window.RumFasad = (() => {
         <clipPath id="rf-hal"><path clip-rule="evenodd" d="M${VARLD.x0} ${VARLD.y0} H${VARLD.x1} V${VARLD.y1} H${VARLD.x0} Z M${FON.x} ${FON.y} h${FON.w} v${FON.h} h${-FON.w} Z M${DORR.x} ${DORR.y} h${DORR.w} v${DORR.h} h${-DORR.w} Z"/></clipPath></defs>`;
       const glasX = FON.x - V.x;
       const glasY = FON.y - V.y;
-      // (dukens bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden)
+      // (gängets bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden)
       const k = Math.min(innerWidth / V.w, innerHeight / V.h);
       const pr = Math.min(2, devicePixelRatio || 1);
       const dw = Math.round(Math.min(1400, FON.w * k * pr));
-      const dh = Math.round(dw * FON.h / FON.w);
-      const gammal = F.duk;
+      F.glasPx = { w: dw, h: Math.round(dw * FON.h / FON.w) };
       const gamla = dukarna(F.ro);
       // det som rör sig: vad, var och hur (inget med prefers-reduced-motion, utom stången som står still)
       const lugn = calm();
@@ -3094,16 +3094,16 @@ window.RumFasad = (() => {
         svg(V, defs + himmel(V, v, L)) +
         (himlen ? duk('rf-bak', bakR, px) : '') +
         svg(V, defs + bortom(V, v, L) + rummet(v, L, o)) +
-        `<canvas class="rf-gang" width="${dw}" height="${dh}" style="left:${r1(glasX * sk)}px; top:${r1(glasY * sk)}px; width:${r1(FON.w * sk)}px; height:${r1(FON.h * sk)}px"></canvas>` +
-        // (högtidspyntet mellan neonen och glaset, bara när det finns: annars ett lager mindre)
+        // (här står gängets duk, glas; högtidspyntet mellan neonen och glaset, bara när det finns: annars ett lager mindre)
         (pyntDukar
-          ? svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}`) + pyntDukar + svg(V, `${defs}${glaset(v, L, o)}${framfor}`)
-          : svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}${glaset(v, L, o)}${framfor}`)) +
+          ? svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}`, 'rf-fonster') + pyntDukar + svg(V, `${defs}${glaset(v, L, o)}${framfor}`)
+          : svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}${glaset(v, L, o)}${framfor}`, 'rf-fonster')) +
         (barberR ? duk('rf-barber', barberR, px) : '') +
         svg(V, kvallsljus(V, v, L, o)) +
         (L.dimma > 0.05 ? `<div class="rf-lager rf-dimma" style="background:${mix('#2a2622', '#aeb3b6', L.dag)}; opacity:${r1(0.32 * L.dimma)}"></div>` : '') +
         duk('rf-fram', V, px);
-      F.duk = scen.querySelector('.rf-gang');
+      F.glasR = { x: r1(glasX * sk), y: r1(glasY * sk), w: r1(FON.w * sk), h: r1(FON.h * sk) };
+      placera();
       R.fram = scen.querySelector('.rf-fram').getContext('2d');
       R.bak = himlen ? scen.querySelector('.rf-bak').getContext('2d') : null;
       R.barber = barberR ? scen.querySelector('.rf-barber').getContext('2d') : null;
@@ -3111,9 +3111,6 @@ window.RumFasad = (() => {
       pynt(pyntBild);
       // (en fast bild: allt som rör sig står på samma tid)
       if (o.still != null) for (const an of el.getAnimations({ subtree: true })) { an.pause(); an.currentTime = o.still * 1000; }
-      // (gänget från förra gången tills det ritas på nytt)
-      if (gammal && gammal.width) F.duk.getContext('2d').drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
-      slapp(gammal);
       for (const c of gamla) slapp(c);
       F.neon = null;
       passa();
@@ -3137,6 +3134,32 @@ window.RumFasad = (() => {
       let j = 0;
       for (const bild of bilder) if (bild && dukar[j]) dukar[j++].getContext('2d').drawImage(bild, 0, 0);
     }
+    // Gängets duk i skyltfönstret (glas i rum.js): rummet lånar ut den medan det inte syns, och den står där
+    // gänget syns genom glaset, bakom neonen och glaset. Förut ritades glaset i rummets duk och kopierades
+    // hit efter varje bild, ett arbete på grafikkortet som bara fanns ute; nu visar duken själv det som
+    // ritas i den, som inne. Den följer med när scenen byggs om (placera). null: rummet tar tillbaka den.
+    function glas(c) {
+      const g = F.gl;
+      F.gl = c || null;
+      if (g && g !== F.gl) {
+        g.classList.remove('rf-gang');
+        g.remove();
+      }
+      placera();
+      if (!F.gl) return;
+      gang();
+      // (den kommer när rummet bakom har dolts, och tonar fram)
+      if (F.gl !== g && !calm() && o.still == null && F.gl.animate) F.gl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+    }
+    function placera() {
+      const c = F.gl;
+      const r = F.glasR;
+      if (!c || !r) return;
+      c.classList.add('rf-gang');
+      Object.assign(c.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
+      const fore = scen.querySelector('.rf-fonster');
+      if (c.parentNode !== scen || c.nextSibling !== fore) scen.insertBefore(c, fore);
+    }
     // Scenen täcker fönstret: den byggs i fönstrets storlek (F.k), och när storleken ändras skalas den om så
     // länge, tills den byggs om (storlek). Och dörrens mitt i fönstret, dit man går in och ut.
     function passa() {
@@ -3153,7 +3176,7 @@ window.RumFasad = (() => {
     // telefon eller dator. Gänget ritas direkt efter bildrutan (efter), som inne (efterBild i rum.js): då
     // har det hela tiden till nästa, och det som ritas i bildrutan väntar inte. En gång i en stillbild.
     // Förut ritades hela gängets duk några gånger i sekunden, och då hackade gänget fram; nu ritas bara
-    // glaset (utifran i rum-3d.js).
+    // glaset (utifran i rum-3d.js). Utan duk i fönstret (glas) ritas inget.
     const GANG_ANDEL = 0.25;
     function gangDags(ms) {
       const takt = (o.takt && o.takt()) || (LATT ? 20 : 30);
@@ -3167,7 +3190,7 @@ window.RumFasad = (() => {
     };
     function gang() {
       const ms = performance.now();
-      if (F.duk && o.gang) o.gang(F.duk);
+      if (F.gl && F.glasPx && o.gang) o.gang(F.glasPx);
       F.tider.push(performance.now() - ms);
       if (F.tider.length > 9) F.tider.shift();
       const on = o.neon ? o.neon() !== false : true;
@@ -3238,6 +3261,7 @@ window.RumFasad = (() => {
     return {
       el,
       ny: () => { F.sig = ''; rita(); },
+      glas,
       ut() {
         cancelAnimationFrame(F.raf);
         clearInterval(T);
@@ -3245,9 +3269,9 @@ window.RumFasad = (() => {
         removeEventListener('resize', storlek);
         el.remove();
         for (const c of dukarna(F.ro)) slapp(c);
-        slapp(F.duk);
         F.ro = null;
-        F.duk = null;
+        // (gängets duk är rummets: rum.js ställer tillbaka den, glas)
+        F.gl = null;
       },
     };
   }

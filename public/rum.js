@@ -4338,7 +4338,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // S:t Eriksbron i samma ljus och väder som utsikten, och genom skyltfönstret gänget bakifrån, ritat av samma
   // 3D-scen (utifran). Fasaden tonar fram medan man tar ett steg bakåt från dörren, och ett klick var som helst,
   // Esc eller Tillbaka går in genom dörren igen. Rummet står still bakom så länge (R.vilar, som hos Hasse Backe)
-  // och ritas som vanligt innan det syns igen: gängets duk har bilden utifrån.
+  // och syns inte; gängets duk står då i skyltfönstret (glas) och ritas därifrån.
   //   glid: med rörelse in och ut (annars genast)
   function fasad(pa = true, glid = !calm()) {
     if (!pa) {
@@ -4349,25 +4349,26 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       lagerUt('fasaden');
       R.vilar = false;
       R.el.classList.remove('fasad-tackt');
-      if (R.fig && R.on) {
-        const t = now();
-        const [vx, vy] = synlig();
-        R.fig.draw(t, vx, vy, neonOn(t));
-      }
       if (glid && !(window.RumBak && RumBak.snabbt)) {
         f.el.classList.remove('in');
         f.el.classList.add('ut');
+        // (gänget står kvar i fönstret medan fasaden ännu täcker rummet, rf-ut i rum-fasad.css)
+        R.glasT = setTimeout(() => glas(f, false), 150);
         setTimeout(() => f.ut(), 520);
-      } else f.ut();
+      } else {
+        glas(f, false);
+        f.ut();
+      }
       return false;
     }
     if (R.fasad || !window.RumFasad || !R.on) return Boolean(R.fasad);
+    if (R.glas) glas(R.glas.f, false);
     if (R.sak) sak(null, null);
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
     const f = RumFasad.bygg(R.el, {
-      // (medan rummet syns, i övergången, ritas gänget tillbaka inifrån direkt efter)
-      gang: (duk) => R.fig && R.fig.utifran ? R.fig.utifran(duk, now(), neonOn(now()), !R.vilar) : false,
+      // (i gängets egen duk, när den står i skyltfönstret: glas)
+      gang: (ut) => R.fig && R.fig.utifran ? R.fig.utifran(ut, now(), neonOn(now())) : false,
       // (lika ofta som gänget ritas inne, KVAL)
       takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
@@ -4392,14 +4393,47 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     lager('fasaden', (nu) => fasad(false, !nu));
     // Rummet står still när fasaden täcker det, och ritas inte heller (fasad-tackt i rum-fasad.css): förut
     // låg alla rummets lager kvar under fasaden, en och en halv gång fler bildpunkter än fasaden själv i en
-    // telefon, och med dem ute tog sidan för mycket minne. Gängets duk ritar ändå glaset (utifran).
+    // telefon, och med dem ute tog sidan för mycket minne. Gängets duk står då i skyltfönstret (glas).
+    // (utan rörelse genast, så att en fast bild har gänget i fönstret)
     clearTimeout(R.fasadT);
-    R.fasadT = setTimeout(() => {
+    const tackt = () => {
       if (R.fasad !== f) return;
       R.vilar = true;
       R.el.classList.add('fasad-tackt');
-    }, glid ? 420 : 0);
+      glas(f, true);
+    };
+    if (glid) R.fasadT = setTimeout(tackt, 420);
+    else tackt();
     return true;
+  }
+  // Gängets duk (rum-3d.js) lånas ut till fasadens skyltfönster medan rummet inte syns, och ritar gänget
+  // utifrån där (utifran, lana): förut ritades glaset i duken inne i rummet och kopierades till en duk i
+  // fasaden efter varje bild (drawImage från WebGL), 15–30 gånger i sekunden. Det arbetet på grafikkortet
+  // fanns bara ute, och ute kraschade sidan i telefonen; nu gör fasaden samma sak som rummet, där duken
+  // visar det som ritas i den. Tillbaka (pa false) står den där den stod, med sin stil, och gänget ritas
+  // inifrån genast, innan rummet syns.
+  function glas(f, pa) {
+    clearTimeout(R.glasT);
+    const c = document.getElementById('rum-3d');
+    if (pa) {
+      if (R.glas || !c || !R.fig || !R.fig.lana || !f.glas) return;
+      R.glas = { f, c, hem: c.parentNode, fore: c.nextSibling, stil: c.style.cssText };
+      R.fig.lana(true);
+      f.glas(c);
+      return;
+    }
+    const g = R.glas;
+    if (!g) return;
+    R.glas = null;
+    g.f.glas(null);
+    g.c.style.cssText = g.stil;
+    g.hem.insertBefore(g.c, g.fore && g.fore.parentNode === g.hem ? g.fore : null);
+    R.fig.lana(false);
+    if (R.on && !R.vilar) {
+      const t = now();
+      const [vx, vy] = synlig();
+      R.fig.draw(t, vx, vy, neonOn(t));
+    }
   }
 
   // Tidningen lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka. (UPPE: samma

@@ -1347,6 +1347,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   till 0,45), och Safari ritar ett lager i dess egen storlek gånger pixeltätheten, så att vart och ett av nio lager tog
   ungefär 50 MB i en iPhone i stället för 10. Nu är scenen i fönstrets storlek och de stilla lagren fyra i stället
   för nio (fem med högtidspyntet). Inte provat i en riktig telefon. Se [Fasaden](#fasaden).
+- **Fasaden kraschade fortfarande (2026-11-17, användarens rapport):** "Sidan kraschar fortfarande när man går ut på den
+  här utanför butiken vyn med en mobil." Minnet förklarade det inte längre (i Chromium tar sidan mindre ute än inne).
+  Gänget i fönstret kopierades från rummets WebGL-duk efter varje bild, det enda arbetet på grafikkortet som bara fanns
+  ute; nu står gängets egen duk i skyltfönstret medan rummet inte syns, och inget kopieras. Inte provat i en riktig
+  telefon. Se *Fasaden kraschade fortfarande* under [Fasaden](#fasaden).
 - **Fler karaktärer som går förbi, och de passar 90-talet (2026-11-16, användarens önskemål):** "Kan du göra de här
   människorna eller personer som går förbi utanför något mer intressanta eller passande utan att de drar speciellt
   mycket mer grafik? Tänk som sagt på att det ska vara 90-tal och försök att få till fler karaktärer än vad som redan
@@ -6964,8 +6969,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
 
 - **Gänget i fönstret:** genom skyltfönstret syns vi vagt, bakifrån, vid barbordet – inte en ritning utan samma 3D-scen
   som inne (`utifran` i rum-3d.js): en kamera ute på trottoaren i ögonhöjd ser vinkelrätt in genom glaset (`FONSTER`, en
-  ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och rutan kopieras till fasadens duk i
-  samma uppgift som den ritas. Rutan som kopieras är `STORRE` (1,25) gånger glaset med samma mitt och nederkant, så att
+  ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och det den ser ritas i gängets egen duk,
+  som står i skyltfönstret medan rummet inte syns (`glas` i rum.js; se *Fasaden kraschade fortfarande* nedan). Rutan
+  är `STORRE` (1,25) gånger glaset med samma mitt och nederkant, så att
   gänget blir lika stort som de som går förbi på trottoaren (förut var huvudena dubbelt så stora). Därför är det samma kläder, frisyrer, mössor, flaskor, radion och ampelliljan som inne, och
   de rör sig lika jämnt som inne (se *Gänget i fönstret hackar inte* nedan; en gång i en fast bild). De sover
   på natten och festar i julkläder som inne. Neonen bakom dem lyser mindre på ryggarna än inifrån på ansiktena. Bakom
@@ -7110,9 +7116,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
-som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som hos Hasse Backe)
-och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden utifrån; medan rummet syns i
-övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
+som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som hos Hasse Backe) och syns inte; gängets
+duk står då i skyltfönstret och tonar fram där när rummet har dolts (0,42 s in). När man går in står den kvar i
+0,15 s, medan fasaden ännu täcker rummet, och ritas sedan inifrån innan rummet syns. Scenen ritas i meter-skala på fasaden och
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
 bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är fyra SVG:er, en
 mellan varje duk (himlen; bortom bron och rummet; fönstret, neonen, glaset, huset, bron, marken, gatan och texten;
@@ -7138,10 +7144,10 @@ och var 240:e i telefonen (9 och 4 bilder i sekunden, medan regnet och de som g�
 varje gång hela gängets duk, två till tre gånger fler bildpunkter än det som kopierades. Nu:
 
 - **Bara glaset** (`utifran` i rum-3d.js): kameran ser glaset och inget annat (ett snett synfält med
-  `makePerspective`, eftersom ögat inte står mitt för fönstret), med fasadens dukens bildpunkter och högst så många som
-  glaset fick förut (`H` gånger `prNu`), så att skärpan är densamma. Medan rummet står still krymper gängets duk till
-  just det (`UTE.krympt`); `draw` ger den rummets storlek igen när gänget ritas inifrån (`inneStorlek`), och `narbild`
-  och `kval` vet om det. I övergången, medan rummet syns, ritas glaset i dukens nedre hörn utan att duken krymper.
+  `makePerspective`, eftersom ögat inte står mitt för fönstret), med bildpunkter efter fönstrets storlek på skärmen och
+  högst så många som glaset fick förut (`H` gånger `prNu`), så att skärpan är densamma. Medan rummet står still krymper
+  gängets duk till just det (`UTE.krympt`); `draw` ger den rummets storlek igen när gänget ritas inifrån
+  (`inneStorlek`), och `narbild` och `kval` vet om det.
 - **Skuggorna var fjärde gång** utifrån, i samma bild (på steg 0 var de en fjärdedel av arbetet).
 - **I rummets takt, efter bildrutan** (`gang`, `gangDags` i rum-fasad.js): lika ofta som gänget ritas inne
   (`o.takt`, `KVAL` i rum.js: 30, 20 eller 15), direkt efter bildrutan genom en `MessageChannel` som `efterBild` inne,
@@ -7176,6 +7182,30 @@ mätta i Chromium som iPhone 13 och Pixel 7 (gammal och ny kod i samma körning,
   resize så lång tid att de inte hinner slås ihop helt; i en telefon blir det ett).
 
 Det som syns är detsamma: gänget i fönstret, övergångarna in och ut och rummet när man kommer tillbaka.
+
+**Fasaden kraschade fortfarande (2026-11-17, användarens rapport: "Sidan kraschar fortfarande när man går ut på den här
+utanför butiken vyn med en mobil"):** minnet förklarade det inte längre. I Chromium som Pixel 7 och iPhone 13, med regn
+på kvällen, tog sidan ute 960–1 040 MB mot 1 100–1 160 MB i rummet, och under övergången ut som mest 35 MB mer än i
+rummet. Det enda arbetet på grafikkortet som fanns ute men inte inne var kopieringen: gänget ritades i rummets WebGL-duk
+och kopierades till en duk i fasaden efter varje bild (`drawImage` från WebGL, 15–30 gånger i sekunden). Det liknar det
+som fick Chromes grafikprocess att krascha i Pixel 10 (se *Ingen skuggkarta på PowerVR*): något ritas i en duk och läses
+sedan därifrån i samma bild. Kraschar grafikprocessen laddas sidan om (`webglcontextlost` i rum.js), och det ser ut som
+att sidan kraschar.
+
+Nu lånas gängets egen duk ut till skyltfönstret medan rummet inte syns (`glas` i rum.js, `glas` och `placera` i
+rum-fasad.js, `lana` i rum-3d.js): den flyttas in i fasaden, mellan rummet bakom glaset och fönstrets SVG, krymper till
+glaset och visar själv det som ritas i den, som inne. Inifrån ritas inget i den så länge (`draw`), och när man går in får
+den tillbaka sin plats och stil och ritas inifrån innan rummet syns. Fasaden har ingen duk för gänget längre och
+kopierar inget. Ute gör sidan alltså bara sådant som den redan gör inne i Pixel 10. Det som syns är detsamma (jämfört sida
+vid sida, som telefon och dator), utom att gänget tonar fram i fönstret när rummet har dolts, i stället för att synas från
+början.
+
+Mätt i headless Chrome som Pixel 7 (regn på kvällen, steg 1, gammal och ny om vartannat, två varv, 10 s ute): sidans tråd
+179–211 → 145–152 ms/s, och gänget hinner ritas 3–4 gånger så ofta (106–206 → 713–782 ritanrop i sekunden, ungefär 220
+per bild), eftersom kopieringen inte längre tar tid av det (`GANG_ANDEL`); därför mer arbete i grafikprocessen, som här
+ritar i mjukvara (1 550–2 210 → 2 380–2 560 ms/s). Minnet är detsamma. Snabbt ut och in, ut och genast in igen och att
+lämna rummet medan man står ute ger samma duk i rummet efteråt, och en fast bild (`?rum-t`) har gänget i fönstret. Inte
+provat i en riktig telefon.
 
 ### Kupongen i handen
 
