@@ -88,7 +88,7 @@ window.RumHasse = (() => {
     vy.id = 'rum-hasse-vy';
     vy.hidden = true;
     vy.setAttribute('aria-label', 'Hasse Backe');
-    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"><canvas class="rh-trafik"></canvas></div><button type="button" class="rh-lop" hidden></button><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
+    vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"><canvas class="rh-trafik"></canvas></div><canvas class="rh-pynt" hidden></canvas><button type="button" class="rh-lop" hidden></button><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
       '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i>' +
       '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
     H.panIn.append(vy);
@@ -199,6 +199,7 @@ window.RumHasse = (() => {
       ljusNu();
       pultPapper();
       lopsedel();
+      pynt();
     }, 60000);
     addEventListener('resize', () => {
       if (!H.on) return;
@@ -848,8 +849,34 @@ window.RumHasse = (() => {
     if (H.kupong) H.kupong.passa();
     pultPapper();
     lopsedel();
+    pynt();
     passaSpalter();
     return disk;
+  }
+
+  // Högtidspyntet bakom honom (pyntBild i rum-hasse-3d.js, pyntet i rum-pynt.js): det som hänger i glaspartiet
+  // och står på bardisken när det är högtid, samma saker som i affären. Det ritas när bilden passas in (fönstret,
+  // figuren och ljuset), bara när något av det har ändrats, och en stund efter disken, så att det inte står i
+  // vägen för svängen hit.
+  function pynt() {
+    const ut = $('.rh-pynt');
+    if (!ut || !H.fig || !H.fig.pyntBild || !H.v) return;
+    clearTimeout(H.pyntT);
+    H.pyntT = setTimeout(async () => {
+      try {
+        const P = await import('./rum-pynt.js');
+        const namn = P.pyntet(window.Vader ? Vader.nu() : null);
+        const l = H.ljus || null;
+        const v = H.v;
+        const som = [namn, H.figNr, H.hog, v.W, v.H, v.cx.toFixed(1), v.ey.toFixed(1), v.s.toFixed(5), l ? [l.k, l.dag, l.f].map((x) => x.toFixed(2)).join('/') : ''].join();
+        if (som === H.pyntSom) return;
+        H.pyntSom = som;
+        await H.fig.pyntBild(ut, v, { namn, hog: H.hog, ljus: l, bak: H.m.BAK[H.hog ? 'hog' : 'bred'] });
+      } catch (e) {
+        // (utan pyntet: väggen som vanligt)
+        ut.hidden = true;
+      }
+    }, 400);
   }
 
   // Samtalet: på höjden under honom, annars i en spalt till vänster om honom. På höjden går det upp till

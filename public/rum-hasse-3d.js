@@ -14,7 +14,7 @@
 //
 // Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y, z mot betraktaren.
 //
-// figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
+// figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), pyntBild(duk2d, v, { namn, hog, ljus, bak }), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (sex sätt), cigarren, småsakerna medan han
 // väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
@@ -5477,6 +5477,116 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
 
   // Kameran: v är fönstret (W, H), var ögonhöjden står i det (cx, ey), s bildpunkter på en enhet på
   // avståndet 0, och dukens ruta (x, y, w, h), allt i fönstrets bildpunkter.
+  // ---------- högtidspyntet (pyntBild) ----------
+  // Runt högtiderna (pyntet i rum-pynt.js, samma saker som i affären) hänger något i glaspartiet bakom honom,
+  // till höger om hans huvud, och står något på bardisken till höger om hans arm: på samma ställe som i
+  // affären åt det håll där samtalet inte står. Det ritas en gång genom hans kamera, på en egen duk (ut) mellan
+  // väggen och honom, och är lika oskarpt som väggen på det djupet (LINS, som löpsedeln). Ljuset är barens:
+  // lysröret (k), dagsljuset genom fönstret (dag, f och färgen c) och mörkret (natt), som i ljuset() i
+  // rum-hasse.js; det som lyser lyser ändå.
+  let PYB = null;
+  const PCM = 1 / 0.06;
+  function pyntScen(P, namn, hog) {
+    const S = P.pyntSaker((c, o = {}) => new THREE.MeshPhysicalMaterial(Object.assign({ color: c, roughness: 0.6, envMapIntensity: 0.4 }, o)));
+    const scen = new THREE.Scene();
+    const pm = new THREE.PMREMGenerator(r);
+    scen.environment = pm.fromScene(new THREE.Scene().add(new THREE.HemisphereLight('#f4e6cc', '#3a2412', 1)), 0.04).texture;
+    pm.dispose();
+    const baren = new THREE.Group();
+    baren.rotation.y = SCEN.BAR * DEG;
+    scen.add(baren);
+    // bardiskens ovansida och glaspartiet (barens mått, scripts/hasse/bak.html)
+    const T = SCEN.FONSTER.Y0 - 22;
+    const GZ = SCEN.VAGG - 50;
+    const DZ = SCEN.VAGG + 190;
+    // till höger om honom; på höjden är bilden smalare
+    const fx = hog ? 980 : 1150;
+    const dx = hog ? 1180 : 1520;
+    const sak = (g, x, y, z, vrid = 0) => { g.scale.setScalar(PCM); g.position.set(x, y, z); g.rotation.y = vrid * DEG; baren.add(g); return g; };
+    const V3 = (x, y, z) => new THREE.Vector3(x / PCM, y / PCM, z / PCM);
+    if (namn === 'jul') {
+      sak(S.stjarna({ R: 13, snore: 40 }), fx, 100, GZ, -6);
+      sak(S.ljusstake(), dx, T, DZ, -18);
+    } else if (namn === 'pask') {
+      sak(S.agg([[-160, 360, 1.5], [0, 200, 1.7], [170, 300, 1.5], [330, 140, 1.6], [470, 280, 1.4]]
+        .map(([x, y, k]) => ({ ...V3(fx - 200 + x, 900, GZ), ned: (900 - y) / PCM, k }))), 0, 0, 0);
+      sak(S.paskris(), dx, T, DZ, -10);
+    } else if (namn === 'midsommar') {
+      sak(S.vimplar([V3(-200, 520, GZ), V3(850, 520, GZ), V3(1866, 520, GZ)], { s: 6, b: 9, h: 12, mellan: 11 }), 0, 0, 0);
+      sak(S.blommor(), dx, T, DZ, -10);
+    } else if (namn === 'kraftor') {
+      sak(S.lyktor([V3(150, 560, GZ), V3(1000, 560, GZ), V3(1866, 560, GZ)], [[0.5, 9, 0], [0.66, 8, 1], [0.82, 9.5, 2], [0.96, 8, 0]], { s: 4 }), 0, 0, 0);
+    } else if (namn === 'halloween') {
+      sak(S.pumpa({ R: 12 }), dx, T, DZ, -12);
+      sak(S.pumpa({ R: 7 }), dx + 330, T, DZ + 60, 20);
+    }
+    return { namn, hog, scen, baren };
+  }
+  async function pyntBild(ut, v, { namn, hog = false, ljus = null, bak = null } = {}) {
+    if (!namn) {
+      ut.hidden = true;
+      if (PYB) PYB.namn = null;
+      return null;
+    }
+    const P = await import('./rum-pynt.js');
+    if (!PYB || PYB.namn !== namn || PYB.hog !== hog) {
+      if (PYB) PYB.scen.traverse((x) => {
+        if (x.geometry) x.geometry.dispose();
+        for (const mt of [].concat(x.material || [])) { for (const t of ['map', 'emissiveMap']) if (mt[t]) mt[t].dispose(); mt.dispose(); }
+      });
+      PYB = pyntScen(P, namn, hog);
+    }
+    const sc = PYB.scen;
+    // barens ljus: lysröret ovanför och framför, dagsljuset bakifrån genom glaset och ett svagt sken runt om
+    for (const x of sc.children.filter((c) => c.isLight)) sc.remove(x);
+    const l = ljus || { k: 1, dag: 0, f: 0, c: [1, 1, 1] };
+    const natt = (1 - l.k) * (1 - l.dag);
+    sc.add(new THREE.HemisphereLight('#f0dcc0', '#2a1a10', 0.2 + 0.32 * l.k + 0.22 * Math.min(1, l.f)));
+    const lys = new THREE.DirectionalLight('#ffe8c8', 0.12 + 0.75 * l.k);
+    lys.position.set(-600, 2400, 2600);
+    sc.add(lys);
+    if (l.f > 0.01) {
+      const dag = new THREE.DirectionalLight(new THREE.Color(...l.c), 1.6 * Math.min(1.2, l.f));
+      dag.position.set(400, 900, -4000);
+      sc.add(dag);
+    }
+    P.pyntNatt(PYB.baren, natt);
+    // rutan i fönstret som pyntet täcker (med skenet), inom fönstret
+    PYB.baren.updateMatrixWorld(true);
+    const b3 = new THREE.Box3().setFromObject(PYB.baren);
+    if (b3.isEmpty()) { ut.hidden = true; return null; }
+    const p = [];
+    for (const x of [b3.min.x, b3.max.x]) for (const y of [b3.min.y, b3.max.y]) for (const z of [b3.min.z, b3.max.z]) p.push(iBild(v, x, y, z));
+    const M = 12;
+    const x0 = Math.max(0, Math.floor(Math.min(...p.map((q) => q[0])) - M));
+    const y0 = Math.max(0, Math.floor(Math.min(...p.map((q) => q[1])) - M));
+    const x1 = Math.min(v.W, Math.ceil(Math.max(...p.map((q) => q[0])) + M));
+    const y1 = Math.min(v.H, Math.ceil(Math.max(...p.map((q) => q[1])) + M));
+    if (x1 - x0 < 2 || y1 - y0 < 2) { ut.hidden = true; return null; }
+    const box = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+    const pr = r.getPixelRatio();
+    Object.assign(ut.style, { left: `${box.x}px`, top: `${box.y}px`, width: `${box.w}px`, height: `${box.h}px` });
+    ut.width = Math.round(box.w * pr);
+    ut.height = Math.round(box.h * pr);
+    r.setSize(box.w, box.h, false);
+    C.fov = (2 * Math.atan(v.H / 2 / (v.s * D))) / DEG;
+    C.aspect = v.W / v.H;
+    C.setViewOffset(v.W, v.H, v.W / 2 - v.cx + box.x, v.H / 2 - v.ey + box.y, box.w, box.h);
+    r.render(sc, C);
+    const g = ut.getContext('2d');
+    g.clearRect(0, 0, ut.width, ut.height);
+    g.drawImage(r.domElement, 0, 0, ut.width, ut.height);
+    // lika oskarpt som väggen på det djupet (som löpsedeln, lopsedel ovan)
+    const mitt = b3.getCenter(new THREE.Vector3());
+    const z = iKamera([mitt.x, mitt.y, mitt.z], KAM)[2];
+    const skiva = SCEN.LINS.R * Math.abs(1 - SCEN.LINS.F / z) * (SCEN.D / SCEN.LINS.F) * v.s;
+    const oskarp = Math.hypot(skiva / 2, bak ? (1.1 * v.s) / bak.S : 0);
+    ut.style.filter = `blur(${oskarp.toFixed(2)}px)`;
+    ut.hidden = false;
+    // och figuren igen
+    kamera(v);
+    return box;
+  }
   function kamera(v) {
     Object.assign(duk.style, { left: `${v.x}px`, top: `${v.y}px`, width: `${v.w}px`, height: `${v.h}px` });
     r.setSize(v.w, v.h, false);
@@ -5496,6 +5606,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     rita,
     kamera,
     diskBild,
+    pyntBild,
     handelser,
     // fingrarna trummar en stund (bara i vilan), på ett av sätten i TRUM och med höger (A) eller vänster
     // hand (B); ror() medan de gör det

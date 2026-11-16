@@ -1383,7 +1383,9 @@ window.Rum = (() => {
     // Lysrörets värme i käglorna (KAGLOR) lyser upp med blandningsläget (screen). Utan det, i telefonen och
     // från steg 1 (.enkel), blev den en ljus hinna över gänget: där är käglorna bara hålen i dunklet.
     const skarm = !LATT && !R.el.classList.contains('enkel');
-    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal, skarm].join('|');
+    // (det som lyser i högtidspyntet, rum-pynt.js)
+    const pyntL = R.inr && R.inr.pyntLjus ? R.inr.pyntLjus() : [];
+    const nyckel = [s, s ? vpx : 0, s ? slut : 0, kvall, s ? guld : 0, R.smal, skarm, pyntL.join(';')].join('|');
     if (nyckel === R.ljusNyckel) return;
     R.ljusNyckel = nyckel;
     R.solNu = { s, vpx };
@@ -1420,6 +1422,7 @@ window.Rum = (() => {
       rad(q, 400, 690, 140, 110, '0, 0, 0', 0.7);
       rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
       for (const [x, y, rx, ry] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.7);
+      for (const [x, y, rx, ry] of pyntL) rad(q, x, y, rx, ry, '0, 0, 0', 0.8);
       if (s > 0.02) {
         const gr = g.createLinearGradient(0, 0, 0, H);
         const a = (x) => `rgba(25, 12, 4, ${r1(x * s)})`;
@@ -1441,6 +1444,7 @@ window.Rum = (() => {
       rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
       rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));
       rad(g, 784, 800, 544, 220, '255, 220, 160', r1(0.2 * f));
+      for (const [x, y, rx, ry, c] of pyntL) rad(g, x, y, rx * 1.3, ry * 1.3, c, r1(0.1 + 0.22 * f));
     });
     // tv:ns sken är ett eget lager som släcks med tv:n: starkare på kvällen
     ljusPa(R.el.querySelector('#rum-tvsken'), -60, 480, 1000, 620, (g) => {
@@ -3298,7 +3302,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     andra.push(tur(() => import('./rum-saker.js').then((m) => m.saker(R.el, { calm: calm(), short, namn: tavelnamn, kant: kantutjamning(), enkel: Boolean(KVAL[R.kval].enkel) })).then((x) => { R.saker = x; if (x.numret) x.numret(hgNumret); R.sakDuk = R.el.querySelector('canvas.rum-saker'); sikt(R.sakDuk); kval(R.kval); frame(); }), 2)
       .catch((err) => console.warn('Rummet: sakerna kunde inte ritas', err)));
     // lysröret, neonen, skyltarna, skivan, uret, ramarna och paketen (rum-inredning.js)
-    andra.push(tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
+    andra.push(tur(() => import('./rum-inredning.js').then((m) => m.inredning(R.el, { calm: calm(), still, vagg: VAGG, ljus: () => ljusKlockan() })).then((x) => { R.inr = x; tangenter(); x.namn(R.ramNamn); x.stopp(R.stopp); if (window.RumFolk && RumFolk.nattGrad) x.natt(RumFolk.nattGrad()); if (R.sak) sak(R.sak, null); frame(); }), 1)
       .catch((err) => console.warn('Rummet: inredningen kunde inte ritas', err)));
     try {
       await tur(async () => {

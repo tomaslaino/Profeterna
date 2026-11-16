@@ -40,6 +40,9 @@
 .rh-scen canvas.rh-vagg, .rum-hasse-vy.vagg .rh-scen img.rh-bak { display: none; }
 .rum-hasse-vy.vagg .rh-scen canvas.rh-vagg { display: block; }
 .rh-disk, .rh-nota, .rh-duk { position: absolute; left: 0; top: 0; display: block; pointer-events: none; }
+/* högtidspyntet bakom honom (pynt i rum-hasse.js), oskarpt som väggen (filter sätts där) */
+.rh-pynt { position: absolute; left: 0; top: 0; pointer-events: none; }
+.rh-pynt[hidden] { display: none; }
 /* någon som går på bron då och då (bron i rum-hasse.js): bakom glaset, inom rutorna (clip-path), och bakom honom */
 .rh-bron { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .rh-trafik { position: absolute; left: 0; top: 0; display: block; }

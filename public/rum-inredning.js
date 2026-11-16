@@ -31,8 +31,9 @@
 // På natten är lysröret släckt (natt, från rum-folk.js, 0–1 medan det dämpas och tänds): rören och
 // reflektorn mörka, och det målade bandet mörknar.
 //
-// inredning(el, { calm, still, vagg }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp } (namnet som Kronan.names, ms spelstoppet eller null;
-// vagg: tavlornas mått på högra väggen, VAGG i rum.js; lapp: bladet vid radion för rum-radio.js, radiolapp)
+// inredning(el, { calm, still, vagg, ljus }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp, pyntLjus() } (namnet som Kronan.names, ms spelstoppet eller null;
+// vagg: tavlornas mått på högra väggen, VAGG i rum.js; lapp: bladet vid radion för rum-radio.js, radiolapp; ljus: anropas
+// när högtidspyntet har byggts eller tagits bort, pyntLjus: det som lyser i det, [x, y, rx, ry, färg] i scenens bildpunkter)
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
 import { ROR as NEON_ROR } from './rum-neon.js';
@@ -70,6 +71,12 @@ const BITAR = {
   // bladet med radions stationer (radiolapp): duken ligger i knappen kring bladet, med plats för tejpen
   // och skuggan, och ett klick går fram till det (SAKER.radiolapp i rum.js)
   radiolapp: { plan: 0, box: { x: LAPP.x - 7, y: LAPP.y - 7, w: LAPP.w + 15, h: LAPP.h + 13 }, i: '.rum-radiolapp', at: LAPP },
+};
+// Högtidspyntet (rum-pynt.js), när det är högtid: det som hänger i fönstret, under neonen, som hänger
+// framför det (fore), och det som står på bardisken, framför tavlorna på högra väggen och bakom datorn
+const PYNT_BITAR = {
+  pyntF: { plan: 0, box: { x: 222, y: 96, w: 770, h: 214 }, fore: 'canvas.rum-neon' },
+  pyntD: { plan: 0, box: { x: 1170, y: 320, w: 330, h: 285 }, fore: '.rum-hv + *' },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -138,10 +145,11 @@ export async function inredning(el, opt = {}) {
 
   // En sak: en scen med kamera och ljus, och duken den kopieras till.
   function bit(namn, cam, parent) {
-    const { box } = BITAR[namn];
+    const def = BITAR[namn] || PYNT_BITAR[namn];
+    const { box } = def;
     const canvas = document.createElement('canvas');
     // neonen glappar som förut (rum-neon, .av i rum.css)
-    canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}${BITAR[namn].cls ? ` ${BITAR[namn].cls}` : ''}`;
+    canvas.className = `rum-inr${namn === 'neon' ? ' rum-neon' : ''}${def.cls ? ` ${def.cls}` : ''}`;
     // (vilken sak, för den som letar i sidan)
     canvas.dataset.bit = namn;
     // (neonens sken ritas i duken, utanför rören: medSken)
@@ -149,10 +157,10 @@ export async function inredning(el, opt = {}) {
     canvas.width = Math.round((box.w + 2 * M) * DPR);
     canvas.height = Math.round((box.h + 2 * M) * DPR);
     let pr = DPR;
-    const at = parent ? BITAR[namn].at : { x: 0, y: 0 };
+    const at = parent ? def.at : { x: 0, y: 0 };
     Object.assign(canvas.style, { position: 'absolute', pointerEvents: 'none', left: `${box.x - at.x - M}px`, top: `${box.y - at.y - M}px`, width: `${box.w + 2 * M}px`, height: `${box.h + 2 * M}px` });
-    const pl = parent || planes[BITAR[namn].plan];
-    const fore = BITAR[namn].fore && pl.querySelector(`:scope > ${BITAR[namn].fore}`);
+    const pl = parent || planes[def.plan];
+    const fore = def.fore && pl.querySelector(`:scope > ${def.fore}`);
     if (fore) pl.insertBefore(canvas, fore);
     else pl.append(canvas);
     const scene = new THREE.Scene();
@@ -1482,7 +1490,146 @@ export async function inredning(el, opt = {}) {
       for (const m of LP.mats) m.color.copy(m.userData.dag).multiplyScalar(1 - 0.6 * g);
       B.radiolapp.paint();
     }
+    for (const b of Object.values(PY.B)) {
+      PY.P.pyntNatt(b.pynt, g);
+      b.paint();
+    }
   }
+  // ---------- högtidspyntet (rum-pynt.js) ----------
+
+  // Runt högtiderna (pyntet i rum-pynt.js) hänger något i fönstret och står något på bardisken, byggt i
+  // centimeter (K enheter på en centimeter i bakväggens plan, som bardisken) och ritat en gång, som det
+  // andra. Fönstrets saker hänger från karmen (y KARM) en bit framför glaset (Z FZ), i luckorna kring
+  // neonen och skivan med löpsedlarna; på bardisken står saken mellan datorn och lådan med kassetter,
+  // vriden mot affären. Pyntet byggs bara när det är högtid, och byts om högtiden byts medan sidan står
+  // öppen (var tionde minut).
+  const K = 2.37;
+  const KARM = 120;
+  const FZ = -15;
+  const PK = (x, y, z = FZ) => new THREE.Vector3(x / K, -y / K, z / K);
+  const DISK_PLATS = { x: 1100, z: 390, vrid: -45 };
+  const KROKAR = [244, 420, 596, 772, 948].map((x) => PK(x, KARM));
+  function pyntSakerna(P, namn) {
+    const S = P.pyntSaker(mat);
+    const F = [];
+    const D = [];
+    if (namn === 'jul') {
+      // (ingen kula i bågen ovanför stjärnan)
+      F.push(S.girlang(KROKAR, { s: 7, utan: [2] }));
+      // stjärnan i den högra rutan, mellan neonen och skivan, ovanför gänget
+      const R = 16;
+      const st = S.stjarna({ R, snore: (200 - R * K - KARM) / K });
+      st.position.copy(PK(680, 200, -13));
+      st.rotation.y = -8 * DEG;
+      F.push(st);
+      D.push(S.ljusstake());
+    } else if (namn === 'pask') {
+      // äggen i band från karmen, ovanför gänget och kring mittposten
+      F.push(S.agg([[492, 226, 1.7], [548, 200, 1.5], [598, 238, 1.6], [646, 176, 1.8], [690, 222, 1.6], [728, 168, 1.7], [750, 214, 1.4]]
+        .map(([x, y, k]) => ({ ...PK(x, KARM, -13), ned: (y - KARM) / K, k }))));
+      D.push(S.paskris());
+    } else if (namn === 'midsommar') {
+      F.push(S.vimplar(KROKAR, { s: 4.5 }));
+      D.push(S.blommor());
+    } else if (namn === 'kraftor') {
+      const krok = [244, 596, 760].map((x) => PK(x, KARM));
+      // lyktorna där neonen och skivan inte skymmer dem: längst till vänster, mellan neonen och mittposten
+      // och två i den högra rutan
+      F.push(S.lyktor(krok, [[0.075, 8.5, 0], [0.64, 8, 1], [0.79, 9, 0], [0.93, 8, 2]], { s: 2.5 }));
+    } else if (namn === 'halloween') {
+      const v = S.vav({ b: 30, spindel: 26 });
+      // (i fönstrets övre vänstra hörn, i scenens mått: glaset börjar vid x 262 och y 125)
+      v.position.copy(PK(263, 125, -17));
+      F.push(v);
+      D.push(S.pumpa());
+    }
+    const grupp = (lista) => {
+      if (!lista.length) return null;
+      const g = new THREE.Group();
+      g.add(...lista);
+      return g;
+    };
+    const f = grupp(F);
+    if (f) f.scale.setScalar(K);
+    const d = grupp(D);
+    if (d) {
+      d.scale.setScalar(K);
+      d.position.set(DISK_PLATS.x, DISK.top, DISK_PLATS.z);
+      d.rotation.y = DISK_PLATS.vrid * DEG;
+    }
+    return { pyntF: f, pyntD: d };
+  }
+  const PY = { namn: undefined, B: {}, P: null, n: 0 };
+  async function pynt(namn) {
+    if (namn === PY.namn) return;
+    PY.namn = namn;
+    const n = ++PY.n;
+    for (const [k, b] of Object.entries(PY.B)) {
+      b.canvas.remove();
+      b.scene.traverse((x) => {
+        if (x.geometry) x.geometry.dispose();
+        for (const mt of [].concat(x.material || [])) {
+          for (const t of ['map', 'emissiveMap']) if (mt[t]) mt[t].dispose();
+          mt.dispose();
+        }
+      });
+      delete PY.B[k];
+    }
+    if (!namn || !PY.P) {
+      if (opt.ljus) opt.ljus();
+      return;
+    }
+    const grupper = pyntSakerna(PY.P, namn);
+    for (const [k, g] of Object.entries(grupper)) {
+      if (!g) continue;
+      const box = PYNT_BITAR[k].box;
+      const b = bit(k, wallCam(box));
+      // (i fönstret faller ingen skugga på glaset; på bardisken på skivan och väggen bakom)
+      wallLights(b, box, k === 'pyntD');
+      if (k === 'pyntD') {
+        catcher(b, new THREE.PlaneGeometry(DISK.vagg - DISK.kant, DISK.fram), [-90 * DEG, 0, 0], [(DISK.kant + DISK.vagg) / 2, DISK.top + 0.1, DISK.fram / 2], 0.35);
+        rightWall(b);
+      }
+      b.scene.add(g);
+      b.pynt = g;
+      PY.P.pyntNatt(g, morkt);
+      PY.B[k] = b;
+      try {
+        await gl.compileAsync(b.scene, b.cam);
+      } catch (err) { /* då byggs de när saken ritas */ }
+      if (n !== PY.n) return;
+      b.paint();
+      await paus();
+    }
+    // (rummets mörker på kvällen går runt det som lyser, ljusKlockan i rum.js)
+    if (opt.ljus) opt.ljus();
+  }
+  // Det som lyser i pyntet (userData.ljus i rum-pynt.js), i scenens bildpunkter: [x, y, rx, ry, färg]
+  function pyntLjus() {
+    const ut = [];
+    for (const b of Object.values(PY.B)) {
+      b.pynt.updateMatrixWorld(true);
+      b.pynt.traverse((x) => {
+        for (const l of x.userData.ljus || []) {
+          const p = l.p.clone().applyMatrix4(x.matrixWorld);
+          const f = 1000 / (1000 - p.z);
+          const r = l.r * K * f;
+          ut.push([Math.round(760 + (p.x - 760) * f), Math.round(400 + (-p.y - 400) * f), Math.round(r), Math.round(r * 0.85), l.farg]);
+        }
+      });
+    }
+    return ut;
+  }
+  function pyntNu() {
+    if (!PY.P) return;
+    pynt(PY.P.pyntet(window.Vader ? Vader.nu() : null)).catch(() => {});
+  }
+  import('./rum-pynt.js').then((P) => {
+    PY.P = P;
+    pyntNu();
+    setInterval(pyntNu, 600000);
+  }).catch(() => { /* utan pyntet: rummet som vanligt */ });
+
   // (k: en duk eller flera, som skivan och bladet vid radion)
   const skarp = (k, px) => { for (const n of [].concat(k)) if (B[n]) B[n].skarp(px); };
   // bladet vid radion (rum-radio.js): raderna och bladet som andelar av duken, ringen kring den station
@@ -1494,5 +1641,5 @@ export async function inredning(el, opt = {}) {
     rad: LP.rad,
     nu(id) { if (LP.nu(id)) B.radiolapp.paint(); },
   };
-  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp };
+  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp, pyntLjus };
 }
