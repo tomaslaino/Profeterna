@@ -707,6 +707,69 @@
       'Nästa gång kommer du väl hit före avspark.',
       'Du gick förbi disken hela omgången. Hur gick det?',
     ],
+    // Ibland talar han till dig med namn (tilltal i rum-hasse.js, Tomas 2026-11-16): en rad ur listan för läget i
+    // stället för en av de vanliga, när kupongen vet vem du är. Namnet sitter lika illa som annars (felnamn nedan).
+    // Han säger det på olika sätt: först, sist eller mitt i meningen, kort och torrt, som en lärare (unge, gamle,
+    // käre) eller med ironisk artighet (herr, och då i tredje person, som en gammal kypare). Varje rad ska gå att
+    // säga efter "Jag hade åtta rätt av tio." och ensam, rymmas på två rader med det längsta namnet (npm run
+    // repliker säger till), och har {namn} en gång. Varje rad blir ett tjugotal meningar till rösten, en per namn.
+    namn: {
+      alla: [
+        'Ta en ordentlig titt på min kupong, {namn}.',
+        'Det här, {namn}, kallas organisation.',
+        'Du får berätta för barnbarnen att du var här, {namn}.',
+        'Gamle {namn}, nu har du sett hur det går till.',
+        'Det här förvånar ingen, {namn}, minst av allt mig.',
+        'Rama in den här omgången åt mig, {namn}.',
+      ],
+      bra: [
+        'Vad var det jag sa, {namn}?',
+        'Skriv upp det här, {namn}, så slipper jag upprepa mig.',
+        'Nästa omgång gör du som jag säger, {namn}.',
+        'Lägg det här på minnet, {namn}.',
+        'Det där, {namn}, är orsak och verkan.',
+        'Du får gärna tacka mig, {namn}, men det är inget krav.',
+        'Där ser du, herr {namn}. Så tippar en tränare.',
+        'Unge {namn}, så här går det när man läser på.',
+        'Jag hoppas att du lyssnade, {namn}. Det var gratis.',
+        'Spelbolagen vågar inte anställa mig, {namn}.',
+      ],
+      mitten: [
+        'Jag hade rätt där det räknades, {namn}.',
+        '{namn}, du ska inte tro på allt som står i facit.',
+        'Det jämnar ut sig, {namn}. Det gör det alltid.',
+        'Käre {namn}, ingen kan rå på en studsande boll.',
+        'Några lag lyssnade inte på mig, {namn}.',
+        'Omgången var hygglig, {namn}, för att vara fotboll.',
+        'Felen tar jag upp med lagen, {namn}, inte med dig.',
+        'Nu ska du inte titta på mig så där, {namn}.',
+        'Facit och jag möttes på halva vägen, {namn}.',
+      ],
+      daligt: [
+        'Titta inte på mig, {namn}. Titta på matcherna.',
+        'Jag vet vad du tänker, {namn}, och du har fel.',
+        '{namn}, mina tips var bättre än den här omgången.',
+        'Det här stannar mellan oss, {namn}.',
+        'Gamle {namn}, så här går det när lagen inte lyssnar.',
+        'Spara dina synpunkter, {namn}. Analysen står jag för.',
+        'Det är lagen som ska skämmas, {namn}, inte jag.',
+        'Nästa omgång, {namn}, då ska du få se.',
+        'Herr {namn} får klaga hos spelarna, inte hos mig.',
+      ],
+      inget: [
+        'Det här säger du inte till någon, {namn}.',
+        '{namn}, du har just sett något mycket ovanligt.',
+        'Lyssna nu, {namn}. Den här omgången har aldrig hänt.',
+        'Lägg undan facit, {namn}. Det har läst fel kupong.',
+        'Jag ser att du vill fråga, {namn}. Låt det vara.',
+      ],
+      pagar: [
+        'Sätt dig ner, {namn}. Matcherna slutar som jag sa.',
+        'Du kan sluta titta på klockan, {namn}.',
+        'Ta det lugnt, {namn}. Lagen vet vad de ska göra.',
+        'Luta dig tillbaka, {namn}. Lagen gör jobbet åt mig.',
+      ],
+    },
   },
 
   // Medan matcherna pågår och ställningen syns (stallning i rum-hasse.js): först ratt, hur många av hans tecken
@@ -1101,6 +1164,57 @@
       'Det målet ska jag ta upp med domaren.',
       'Det målet hade ingen bett om.',
     ],
+    // Ibland med namn, som efter.namn: alla, bra, mitten och daligt i stället för raden om läget (efter "Just nu har
+    // jag fyra rätt av sju."), och haller och emot i stället för kommentaren till en match som pågår (efter "Burnley
+    // leder med 2–0 mot Cardiff."). mitten och daligt sägs också när det bara är några minuter kvar, och haller och
+    // emot också när det står lika, så inget om gott om tid, ledningar eller kryss.
+    namn: {
+      alla: [
+        'Titta noga nu, {namn}. Allt går som jag har sagt.',
+        'Där ser du, {namn}. Lagen har läst min analys.',
+        'Spelbolagen svettas, {namn}, och jag dricker kaffe.',
+        'Du kan börja räkna på min vinst, {namn}.',
+        'Det här är organisation, {namn}. Kom ihåg det.',
+      ],
+      bra: [
+        'Det går som jag sa, {namn}, och ingen är förvånad.',
+        'Du kan andas ut, {namn}. Jag har det under kontroll.',
+        'Det ser bra ut, {namn}, och det är ingen slump.',
+        'De flesta lag följer min plan, {namn}.',
+        'Lär dig av det här, unge {namn}.',
+        'Jag sa ju att du kunde lita på mig, {namn}.',
+      ],
+      mitten: [
+        'Lugn nu, {namn}. Det är slutresultatet som räknas.',
+        'Se inte så orolig ut, {namn}. Jag har sett värre.',
+        '{namn}, du ska inte tro på varje ställning du ser.',
+        'Det här har jag räknat med, {namn}.',
+        'Käre {namn}, en ställning har aldrig oroat mig.',
+      ],
+      daligt: [
+        'Det är lagen du ska titta på, {namn}, inte mig.',
+        'Säg inget till de andra, {namn}.',
+        'Matcherna har inte hunnit ikapp mina tips, {namn}.',
+        'Lagen har glömt vad jag sa, {namn}.',
+        'Facit är inte skrivet än, {namn}.',
+        'Jag ändrar mig inte, {namn}. Det borde inte du heller.',
+      ],
+      haller: [
+        'Precis som jag sa till dig, {namn}.',
+        'Den matchen hade jag klar för mig, {namn}.',
+        'Den matchen kunde jag i sömnen, {namn}.',
+        '{namn}, så ser det ut när ett lag är organiserat.',
+        'Lägg den matchen på minnet, {namn}.',
+        'Där ser du vad en tränare ser, {namn}.',
+      ],
+      emot: [
+        'Den matchen har inte läst min analys, {namn}.',
+        'Oroa dig inte, {namn}. Den matchen spelas fel.',
+        '{namn}, den matchen får domaren förklara.',
+        'Titta bort en stund, {namn}. Det där rättar till sig.',
+        'Herr {namn} behöver inte se så bekymrad ut.',
+      ],
+    },
   },
 
   // Radion på fönsterbänken hörs också hos honom (omRadion i rum-hasse.js): en gång per station säger han
@@ -1528,8 +1642,9 @@
     sistLika: ['Otursam', 'Snuvad', 'Oförstådd', 'Kränkt', 'Sårad', 'Fundersam', 'Bekymrad', 'Bitter', 'Lurad', 'Häpen'],
     inget: ['Klok', 'Sparsam', 'Upptagen', 'Bortrest', 'Diskret', 'Ledig', 'Saknad', 'Glömsk', 'Omtänksam', 'Tystlåten'],
   },
-  // Namnen han nästan kan. I nio fall av tio säger han ett av dem, i domen (också om den som vann) och
-  // när han hälsar på dig (felNamn och domNamn i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
+  // Namnen han nästan kan. I nio fall av tio säger han ett av dem, i domen (också om den som vann), när han
+  // hälsar på dig och när han talar till dig om hur det går (efter.namn och stallning.namn; felNamn, kalla och
+  // domNamn i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
   // Felen är sådana som den gör som inte bryr sig: ett namn som låter likadant, ett han kan bättre någon
   // annanstans ifrån (Laine, Tegnér, Mogge, Snejder), ett smeknamn som om ni var gamla bekanta (Teddy, Dodde),
   // och för Dogge ett efternamn i stället för smeknamnet, och då fel efternamn. Felet ska likna det riktiga

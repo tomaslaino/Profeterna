@@ -74,7 +74,12 @@ const FALT = {
   domar: ['namn', 'antal', 'Antal', 'match', 'tecknet', 'Tecknet', 'den', 'tecknen', 'pct', 'res'],
   'stallning.ratt': ['ratt', 'av'], 'stallning.rattAlla': ['av'], 'stallning.rattNoll': ['av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
   'stallning.vann': ['lag', 'mot', 'res'], 'stallning.slutLika': ['match', 'res'], 'stallning.slutsignal': ['match', 'res'],
+  // (ibland med ditt namn: tilltal i rum-hasse.js)
+  'efter.namn': ['namn'], 'stallning.namn': ['namn'],
 };
+// Raderna där han talar till dig med namn (tilltal i rum-hasse.js).
+const NAMNRADER = [...['alla', 'bra', 'mitten', 'daligt', 'inget', 'pagar'].map((k) => `efter.namn.${k}`),
+  ...['alla', 'bra', 'mitten', 'daligt', 'haller', 'emot'].map((k) => `stallning.namn.${k}`)];
 // Sidan lottar bland de här, så de måste vara listor.
 const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
   'fragaTillbaka', 'lar', 'angra', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'ropSvar',
@@ -92,7 +97,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
     'tidigtHaller', 'tidigtEmot', 'halvtidHaller', 'halvtidEmot', 'sentHaller', 'sentEmot', 'storHaller', 'storEmot', 'skrall',
     'slutsignal', 'slutRatt', 'slutFel', 'mal', 'malBra', 'malLugn', 'malFel'].map((k) => `stallning.${k}`),
   ...['italo', 'guld', 'rock', 'p1', 'p3', 'p4g', 'rix', 'sport', 'talksport', 'caroline', 'brus'].map((k) => `radio.${k}`),
-  ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`),
+  ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`), ...NAMNRADER,
   ...['oppning', 'ledig', 'ledigSverige', 'ledigGranne', 'val', 'sverige', 'granne'].map((k) => `land.${k}`)];
 // Knappar och ord, inte meningar.
 const INTE_MENINGAR = ['lar', 'angra', 'tecken', 'tal', 'domord', 'felnamn'];
@@ -117,7 +122,7 @@ for (const [vag, t] of alla) {
   if (vag.startsWith('kupong.') && /^Det\b/.test(t)) fel.push(`${vag}: "${t}" kommer direkt efter resultatet, och Det låter som resultatet. Säg vad det gäller.`);
   if (!/[.?!]$/.test(t)) fel.push(`${vag}: "${t}" saknar punkt`);
   for (const mening of t.split(/(?<=[.?!])\s+/)) if (mening.split(/\s+/).length <= 2 && !KORTA_OK.has(mening)) fel.push(`${vag}: "${mening}" är avhugget. Skriv en hel mening med verb.`);
-  const tillatna = FALT[vag] || FALT[vag.split('.')[0]] || [];
+  const tillatna = FALT[vag] || FALT[vag.split('.').slice(0, 2).join('.')] || FALT[vag.split('.')[0]] || [];
   for (const m of t.matchAll(/\{(\w+)\}/g)) if (!tillatna.includes(m[1])) fel.push(`${vag}: {${m[1]}} går inte att fylla här, så det försvinner`);
 }
 
@@ -160,6 +165,15 @@ for (const vag of FRAGOR) {
     if (vag === 'domar.alla') continue;
     if (/\bhöra om\b/i.test(t)) fel.push(`${vag}: "${t}" säger höra om. Säg vad han ska göra: vad jag tycker om, min bedömning av, domen över.`);
     if (!/kupong/i.test(t) || !GOR.test(t)) fel.push(`${vag}: "${t}" säger inte vad han ska göra med kupongen. Skriv till exempel: Vems kupong ska jag döma nu?`);
+  }
+}
+// Raderna med ditt namn står ovanför listan, där det finns plats för två rader (som de andra i efter och stallning,
+// högst 56 tecken), också med det längsta namnet, och namnet står där en gång.
+for (const vag of NAMNRADER) {
+  for (const t of varde(vag) || []) {
+    const n = (t.match(/\{namn\}/g) || []).length;
+    if (n !== 1) fel.push(`${vag}: "${t}" ska ha {namn} en gång, inte ${n}`);
+    if (t.replace('{namn}', LANGST).length > 56) fel.push(`${vag}: "${t}" är för lång: högst 56 tecken med namnet, annars ryms den inte på två rader ovanför listan`);
   }
 }
 // Till gruppen säger han ni och er: det är bara ni som använder sidan (Tomas 2026-11-09).
