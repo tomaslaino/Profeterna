@@ -446,6 +446,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   att dyka upp tvärt efter ljuset. Gängets ansikten sparas mellan besöken,
   och gänget väntar inte på vädret när det finns sparat från de senaste tre timmarna (se *Snabbare och jämnare start*
   under [Tobaksaffären](#tobaksaffären))
+- [x] **Stationsuret längre ner (2026-11-16, användarens önskemål: "Kan du justera ner klockan så att den hamnar i
+  en rimlig höjd … och justera allt det andra så att det blir snyggt och bra!"):** urets hölje satt bara 4 cm under
+  taket. Nu hänger det 32 enheter (ungefär 13 cm) lägre (`UR` i [public/rum-inredning.js](public/rum-inredning.js)),
+  med höljet ungefär 17 cm under taket och i höjd med tv:n, och med ungefär lika mycket luft över sig som ner till
+  ramens palmett. Visitkortet flyttades ner och lite åt höger, så att det ryms mellan uret och ramen, linjerar med
+  ramens högerkant och hamnar utanför urets skugga. Orakelramen och mässingsskylten står kvar, eftersom skylten redan ligger strax ovanför bardisken
+  (se *Stationsuret* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -1522,6 +1529,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bron ligger i samma mått, så att de som går är närmast och bilarna längre in och högre upp, och fordonen har
   också tak, vindruta, motorhuv och bagagelucka, så att de syns som hela bilar och bussar. Se
   [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Trafiken bakom Hasse Backe som gatan i rummet (2026-11-16, användarens önskemål):** "Det som händer utanför
+  hasses fönster är lite för mycket i fokus - jag vill att de ska vara som på animationsbilden - är de inte i 2D
+  där?" och "så att inte bilar flyger uppe i luften på ena körfältet iaf". På gatan i rummet är bilarna platta
+  bilder från sidan och nästan lika oskarpa som stan bakom; på bron var trafiken bara en sjättedel till hälften så
+  oskarp som utsikten, och bilarna i den bortre filen hamnade högt ovanför räcket. Nu är trafiken lika oskarp
+  längs hela bron, 0,8 av utsiktens, och körbanan lutar mindre, så att båda filerna står på bron bakom räcket. Se
+  [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som gatan i rummet*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -1580,6 +1594,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   doften, skål och lillfingret ut. Medan han väntar på att man ska välja tar han kaffet och cigarren
   varannan gång; förut tog han då bara cigarren, så kaffet kom bara medan han låtsades läsa på. Se
   [Hasse Backe](#hasse-backe), *Kaffet*.
+- **Hasse Backe dricker kaffe på tio sätt (2026-11-16, användarens önskemål):** "Kan du ge hasse fler
+  kaffedrickarrörelser?" Fyra nya, som han lottar bland med de sex gamla: han tänker med koppen vid bröstet och
+  tar en klunk när han kommer på det (`tanke`), kaffet har kallnat och han grimaserar, fnyser och rycker på
+  axlarna men dricker ändå (`kallt`), koppen stannar halvvägs och han pekar med den mot en och blinkar (`halvvags`),
+  och han skålar mot någon längs baren (`halsa`). Koppen har två nya lägen för det, framhållen mot en och lyft
+  mot baren. Se [Hasse Backe](#hasse-backe), *Kaffet*.
 - **Hasse Backe fyller i din kupong (2026-11-05, användarens önskemål):** han får samma kupong som
   ligger på pulten, med samma grafik och det du redan har fyllt i, och fyller i den med pennan: lite slarvigt,
   men självklart. Du väljer 1, X eller 2, stort, direkt eller efter analysen, och efter en analys tar han
@@ -4306,7 +4326,8 @@ samma mitt på höjden. Pokalerna är runda och ser likadana ut hur snett vägge
 skulle tryckas ihop i hörnet. Tv:ns sladd går i en kort båge till ett uttag strax under väggplattan,
 ovanför Tipsligan.
 
-**Stationsuret** sitter på bakväggen till höger om fönstret och leder bara till en närbild: ett
+**Stationsuret** sitter på bakväggen till höger om fönstret, ungefär 17 cm under taket och
+i höjd med tv:n på högra väggen, och leder bara till en närbild: ett
 svarvat hölje i mörk metall från väggen fram till ett glas som buktar lite, vit tavla med
 svarta streck, gulnad av röken, och visarna i var sitt lager – den röda sekundvisaren
 hoppar varje sekund. Det går efter Stockholms tid, med samma klocka som
@@ -7112,7 +7133,9 @@ står kvar bara på tv:n. Samma tal under samma namn och i samma ordning som kol
 - **Talets lista** (`#lista:lag:pl:skapar`, `#lista:spelare:ch:assist`): divisionens lag eller spelare
   ordnade efter talet, med numret bara på den första vid lika tal (som skytteligan på tv:n), registrets rad med
   divisionerna överst (de ger samma lista där) och ←/→ till förra och nästa tal. Spelarlistan har dem som har spelat,
-  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna).
+  över noll som topplistorna. Målen slutar med *Vem gör målen* (anfallarna, mittfältarna och backarna). Sedan
+  2026-11-16 är listan en rankning med en stapel per rad, och platsen efter ett tal leder dit (se
+  [Rankningen](#rankningen) nedan).
 - **Matchakten** har också matchsidans rader ur matchens fil: *Matcher 14 d* (med Europacuperna), *Hemma* och *Borta*
   (V–O–F), *Nollor*, *Utan mål*, *På mål*, *Mål mot xG* och *Insl. mot xG*, lagens främsta i *Assist* och *Segermål*
   (*Gula kort* där målens sort saknas) och *Domaren* med gula kort, frisparkar och hemmasegrar mot divisionens snitt.
@@ -7236,6 +7259,35 @@ matchen var i Europa står under VILAN. Mätarnas rutor går nu jämnt upp i bre
 (`background-repeat: round` i [public/rum-register.css](public/rum-register.css)): ett tecken i
 VT323 är en bråkdel bredare än `1ch`, och en ruta till skymtade fram som ett tunt streck efter
 mätarna, också i lagkorten.
+
+#### Rankningen
+
+2026-11-16 ville användaren att platserna efter talen (*4:E*, *12:E*) skulle gå att trycka på och leda till "en
+sida med rankingen för de respektive siffrorna snyggt visualiserade som man sen lätt kan ta sig tillbaka ifrån" –
+för alla tal, både lagens och spelarnas. Mätaren och platsen efter ett tal i lagkortet och spelarkortet (också
+*Poäng* under formen) är nu en tryckbar bit, och platsen efter *Styrka*, *Motståndet* och *Mot oddsen* i matchakten
+likaså (`#plats:lag:pl:styrka:Arsenal` i [public/rum-register.js](public/rum-register.js), `platsQ`). Den leder till
+talets lista, som blev en rankning:
+
+- **Staplarna**: efter talet står en stapel lika lång som talet – från noll till listans högsta, och när någon har
+  minus (*Tur*, *Styrka*, *Mot oddsen*) från en mittlinje åt båda hållen, så att man ser avstånden och inte bara
+  ordningen. De tomma rutorna efter stapeln är skalan, som mätarna i korten; en verklig skillnad syns som minst en
+  ruta, noll som ingenting. Talen där lägst är bäst (*Insläppta*, *Släpper till*) har staplar efter talet ändå,
+  så de kortaste står överst.
+- **Den man kom ifrån** är markerad: namnet omvänt, platsen, talet och stapeln ljusa i ett svagt band, de andras
+  staplar svaga, och raden en tredjedel ner i rutan. Under rubriken står platsen i klartext (*ARSENAL 13:E AV
+  20*). Från matchakten markeras båda lagen (*CHELSEA 10:E · ARSENAL 7:E AV 20*), med det man tryckte på först.
+  Vid lika tal står numret alltid på den markerade raden, annars bara på den första. *Hela listan* i
+  förklaringsrutan markerar kortets lag eller spelare (i matchakten båda lagen) på samma sätt.
+- **Rubriken står still** (divisionerna, talets namn och platsen) medan listan rullar, och ←/→ bläddrar till
+  förra och nästa tal med samma markering.
+- **Tillbaka**: Esc (*◄ Tillbaka* i telefonen) går tillbaka till kortet eller matchakten, i samma flik och lika
+  långt rullat. Ett lag eller en spelare i rankningen öppnar kortet i fliken där talet står.
+
+Spalterna följer bredden: på datorn hela lagnamnet och spelarens lag, i telefonen de korta namnen och en kortare
+stapel (spelarens lag bara när stapeln ändå får minst sex rutor). Med ↑/↓ markeras mätaren och platsen i korten som
+en rad. Platserna som säger var ett lag står i tabellen (formens motståndare, gruppen i Nations League) leder inte
+hit: tabellen står på tv:n.
 
 #### Vad som står var
 
@@ -7843,9 +7895,9 @@ så att fordonen krymper och saktar in mot bortre änden som i verkligheten: dä
 eller bakifrån, närmast mer från sidan. Bron har en körbana bakom räcket (sedan 2026-11-15, `TVAR`: gångbanan,
 cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på andra sidan, räcket och lyktstolparna där,
 torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
-står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, mer än bron egentligen skulle säga,
-så att körbanan syns som en yta och filerna inte hamnar i höjd med gångbanan), och de som går ligger i samma mått
-(`gangVag`), närmast räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
+står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, ungefär som man ser bron härifrån,
+så att körbanan syns som en smal yta bakom räcket; sedan 2026-11-16 0,16 i stället för 0,28, se *Trafiken som
+gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är några bilder som ritas en gång: sidan (rummets former, `FORM`),
 fronten eller baken upp till där ovansidan tar vid, och ovansidan i raka bitar ur karossens överkant (`topp`:
 motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
 plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
@@ -7863,8 +7915,8 @@ läggs sedan längs bron i trafikens duk; benen byter steg var 0,55:e sekund.
 Den går på gångbanan innanför räcket, lite högre i bilden än brons kant eftersom man ser bron uppifrån, med
 räcket framför upp till höften så att benen bara anas, och den är 1,15 gånger räckets höjd (`GANG`): räcket och
 lyktstolparna är ritade större än husen på andra sidan skulle säga (en våning är en halv grad vid tegelhuset, där
-räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och knappt hälften av utsiktens oskärpa, så att
-man ser att det är en människa (ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
+räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och samma oskärpa som resten av trafiken (se
+nedan; ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
 honom. De som cyklar (`cyklist`) håller sig till cykelbanorna mellan gångbanan och körbanan, i den närmaste mot
 en och på andra sidan bort, 17–24 km/h och lika fort i en bana, så att ingen cyklar igenom någon annan. De kommer
 efter klockan, veckodagen, årstiden och vädret (`cyklar` i `RumUte.trafik`, samma som på gatan: inga i snön, i
@@ -7875,7 +7927,20 @@ mitten eftersom en cykel är smal, och två av var med pedalerna ett halvt varv 
 trampar. Hjälm eller mössa, gul reflexväst hos många, regnjacka i regnet, lyse i mörkret och hos en del också på
 dagen, och alltid en röd reflex bak. Bron ses så snett att de mest syns framifrån eller bakifrån, som en smal
 figur över ett hjul, så styret och armbågarna är lite bredare än på riktigt. Ingen trafik går med minskad rörelse
-eller i en fast bild (`?rum-t`). Förut var
+eller i en fast bild (`?rum-t`).
+
+*Trafiken som gatan i rummet* (2026-11-16). På gatan i rummet är bilarna platta bilder från sidan (gatan går rakt
+tvärs över fönstret) och nästan lika oskarpa som stan bakom (3 px mot 3,4 px, de som går 2,6 px, rum-ute.css). På
+bron hos honom fick trafiken förut sin oskärpa bakad i varje figur, högst 3–3,5 bildpunkter i figurens duk: nära
+honom drygt hälften av utsiktens och längre bort, där figuren är mindre, bara en sjättedel, så att bilarna och
+människorna var skarpare än allt runt omkring. Nu ligger oskärpan på hela trafikens duk, 0,8 av utsiktens och lika
+stor längs hela bron (`oskarpa` i rum-hasse-ute.js, `filter` på `.rh-trafik` i `broDuk`), och figurerna har bara en
+aning själva (`BAKAD`), som gatan i rummet. Glaset klipper ramen runt duken (`clip-path` på `.rh-bron`), så att det
+oskarpa inte breder ut sig över posterna; utan `path()` i `clip-path` klipps duken som förut. Fordonen är kvar som
+hela bilar och bussar med front, bak och ovansida, eftersom bron går snett bort från en, men så oskarpa ser de ut som
+på gatan. Samtidigt lutar körbanan mindre (`LUTA` 0,28 → 0,16, nära vad man faktiskt ser härifrån): förut hamnade den
+bortre filen nästan en och en halv räckeshöjd ovanför räcket, och när körbanan inte syntes, i mörker och regn,
+svävade bilarna där i luften. Förut var
 väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
 kaffebryggaren och kassan (ändrat 2026-11-10).
 
@@ -8042,7 +8107,7 @@ nickar när den träffar. Vid varje slag rycker hela bilden till, mer ju hårdar
 [public/rum-hasse.css](public/rum-hasse.css)), och det som står på disken hoppar: koppen studsar
 på fatet, lägre för varje gång, fatet och askkoppen lite och cigarren i urtaget (`hoppar`).
 
-**Kaffet.** Han dricker på sex sätt, och han överdriver och njuter: en ordentlig klunk med slutna
+**Kaffet.** Han dricker på tio sätt, och han överdriver och njuter: en ordentlig klunk med slutna
 ögon, och sedan smackar han och säger mmm med höjda bryn och ett brett leende medan huvudet vaggar
 (`klunk`); blåser på kaffet tre gånger med koppen under hakan, så att ångan far bort från honom,
 smakar försiktigt och rycker till av värmen, och tar sedan en riktig klunk och ett långt *ah* med
@@ -8051,11 +8116,19 @@ ur den i ett svep, tittar förvånat ned i den tomma koppen och ställer ned den
 håller koppen under näsan och drar in doften länge med slutna ögon, så att ångan sugs mot näsan och
 bröstet häver sig, och tar sedan en liten klunk (`dofta`); skålar med en, tar en stor klunk och
 ställer ned koppen med en smäll och ett *ah* (`skal`); eller dricker fint med lillfingret ut och
-näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`).
+näsan i vädret, två små läppjanden, och smackar och nickar som en vinprovare (`fint`). Han kan också
+tänka med koppen vid bröstet, titta bort ut i affären och snurra den sakta med rynkad panna, och när han
+kommer på det åker brynen upp, han nickar och tar en klunk på saken (`tanke`); smaka och stanna med
+koppen vid läppen, för kaffet har kallnat: han grimaserar, tittar misstänksamt ned i koppen, fnyser,
+rycker på axlarna med en pust och dricker vidare ändå, med ett snett leende (`kallt`); stanna halvvägs
+till munnen när han kommer på något och peka med koppen mot en, två små knyck och två nickar – visst är
+det så? – och en blinkning innan han dricker (`halvvags`); eller få syn på någon längs baren och skåla
+mot honom med en nick innan han vänder sig tillbaka och dricker (`halsa`).
 
 Det är koppen som styr, som med cigarren (`kaffeArm` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
 dess läge räknas fram (på fatet; vid läppen och under näsan i huvudets mått, så att den följer med när
-han lutar huvudet bakåt; under hakan, framför bröstet och upplyft mot en i kroppens), och handen sitter
+han lutar huvudet bakåt; under hakan, framför bröstet, upplyft mot en, framhållen mot en och lyft mot
+baren i kroppens), och handen sitter
 i örat med samma grepp hela vägen, fingrarna mot koppen och handflatan mot honom. Vid fatet pekar örat
 bort från honom, så där håller han det bakifrån, med fingrarna genom örat och tummen ovanpå, och handen
 vrids runt örat till greppet medan han lyfter koppen (`GREPP_FAT`). När han dricker lutas
@@ -8887,6 +8960,12 @@ Kaffet på sex sätt (2026-11-05) är provat i headless Chromium med mjukvarugra
 den sugs mot näsan), och koppens och handens förflyttning mellan varje hundradels sekund (inga hopp,
 och båda exakt tillbaka i vilan när klippet slutar). Inte provat i hela sidan, i Safari eller i en
 riktig telefon, och att han tar kaffet varannan gång medan man väljer är bara genomläst.
+
+De fyra nya sätten att dricka kaffe (2026-11-16) är provade i headless Chromium med mjukvarugrafik, figuren ensam i
+1100 × 760: nyckelögonblicken i varje klipp som bilder (koppens nya lägen flyttades efter dem: framhållen högre
+upp, och lyft mot baren framför hakan i stället för vid den vänstra axeln), varje klipp bild för bild utan fel,
+och ljuden (klirret på fatet, fnysningen och pusten). Inte provat i hela sidan, på höjden, i Safari eller i en
+riktig telefon.
 
 Förslaget att fylla i kupongen (2026-11-07) är provat i headless Chromium med mjukvarugrafik i hela sidan, med en
 påhittad omgång från kupongtjänsten och tre matcher i `data/matches.json` (bygget i provet kunde inte hämta något),
