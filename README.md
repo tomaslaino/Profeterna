@@ -1262,6 +1262,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   betydelsefullt. Ordna med det och mergea!" En skomakarlampa i grön emalj hänger ned i vänstra hörnet över
   notan och kaffet (där finns bara taket och dörrens överkant), och mörkret i överkanten ligger inte längre
   över lysröret och taket. Se [Lampan över pulten och ljuset i taket](#lampan-över-pulten-och-ljuset-i-taket-2026-11-16).
+- **Datorn och videon parallellt med disken (2026-11-16, användarens önskemål):** "justera både TV:n och
+  datorn så att de står parallellt med bänken - just nu står de liksom lite på sniskan" och "när man zoomar
+  in få en bra bild - precis som vanligt". Datorn var vänd mellan gänget och ögat och videon 22 grader in mot
+  gänget, så att deras kanter pekade åt andra håll än diskens. Nu står båda med ryggen mot väggen och
+  skärmen ut i rummet, som tavlorna på väggen: i rummets perspektiv ses de snett från sidan, som allt längs
+  högra väggen. Närbilderna ser ut som förut: datorns skärm får samma ljus framför kameran, och kameran går i
+  en båge runt skärmen dit, så att den inte far förbi datorns sida; videon ses som förut men mer rakt
+  framifrån, så att etiketterna läses lättare. Se [Datorn](#datorn) och [Videon](#videon).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4326,7 +4334,7 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   också omgångens matcher, tabellerna och skytteligorna (se [Tv:n](#tvn)). Esc eller ett
   klick utanför zoomar ut.
 - **Videon** nere i hörnet till höger, en liten Sony-tv med inbyggd video som står på disken med
-  ryggen mot väggen och rutan vänd mot gänget, med repriserna på VHS i en fruktlåda med två
+  ryggen mot väggen och rutan ut i rummet, parallellt med disken, med repriserna på VHS i en fruktlåda med två
   fack bredvid (förra omgången och lagen i nästa), zoomas in med ett klick eller V; tv:n och
   lådan står kvar som de står, och en kassett spelar matchens höjdpunkter i rutan.
   Ett klick på rutan går ännu närmare (se [Videon](#videon)). Esc, V eller ett klick utanför
@@ -6984,7 +6992,15 @@ skissades på disken efter foton på Wikimedia Commons (Macintosh Color Classic,
 Model 25 och Compaq Presario 425), och användaren valde IBM:en. 2026-11-14 flyttade den från
 disken under Tipsligan till hörnet under tv:n, där anslagstavlan hängde (`POS` i rum-dator.js
 och duken `BOX` i rum-register.js): användaren ville ha datorn där "på ett snyggt och bra sätt"
-i stället för tavlan. Den står mitt i det fria fältet mellan hörnet och Tipsligan, vänd som förut. Skyltar och symboler ritas i
+i stället för tavlan. Den står mitt i det fria fältet mellan hörnet och Tipsligan. 2026-11-16 vreds den så att
+den står parallellt med disken (användaren: den stod "lite på sniskan"): med ryggen mot väggen och skärmen ut i
+rummet (`YAW` −90 grader, förut −38, mellan gänget och ögat), och duken på disken är tio bildpunkter bredare åt
+höger, där datorns bakre hörn nu når. I rummet ses den snett från sidan, som tavlorna på väggen. Ljuset är
+rummets, men i närbilden vrids det med kameran (`ljusVrid`), så att skärmen och ramen får ljuset som när datorn
+stod vänd mot gänget (`LJUS_YAW`) – rakt framifrån föll det annars snett längs skärmen. Kameran går dit i en båge
+runt skärmens mitt (`stall`): avståndet minskar jämnt som förut, och kameran vänds så att skärmens mitt glider
+rakt från sin plats i rummet till sin plats framme. Med den raka vägen och en jämn vridning for kameran förbi
+datorns sida och skärmen gled ut ur bilden på vägen, nu när svängen är 90 grader i stället för 38. Skyltar och symboler ritas i
 dukar (IBM i åtta streck med Alfa Slab One), plasten har ett fint korn, och skärmen sitter i
 en sluttande ram med bildrörets svarta kant runt bilden. Datorn ritas med 41 ritanrop, bara
 när skärmen ändras och medan kameran svänger fram. Samma dag skulle operativsystemet bli
@@ -7397,15 +7413,17 @@ det, displayen bakom rökfärgat glas och lampan i en ring. Måtten är desamma 
 kameran och knapparna fungerar som de gjorde.
 Den är en låda i CSS 3D – framsidan, sidorna med springor, taket och skuggan och skenet på
 disken – i rummets eget perspektiv (1000 bildpunkter från flyktpunkten 760, 400, som högra
-väggen), vriden 112 grader mot gänget mitt i rummet och så långt in längs väggen att den
-ryms i bilden; i det perspektivet ser en tv som bara är vriden lite ut att stå rakt mot en.
+väggen), vriden 90 grader med ryggen mot väggen och rutan ut i rummet, parallellt med disken, och
+så långt in längs väggen att den ryms i bilden; den står så nära väggen att skuggan bakom den når fram
+till den (`NAR`). Till 2026-11-16 var den vriden 112 grader, mot gänget mitt i rummet, och stod då
+snett mot disken (användarens önskemål: "parallellt med bänken").
 Under rutan sitter kassettfacket och displayen, och till höger om rutan en spalt med knapparna ◀◀ ▶ ▶▶ ❚❚ ■ ⏏ under varandra, med hålgaller till högtalaren över och under. Repriserna på VHS,
 också de lådor (ryggen, taket och ändarna), står i en fruktlåda i furu bredvid, lite längre
 in längs väggen: två fack med en mellanvägg (`MV`), tretton kassetter höga, med en tejpbit
 över varje fack – dagen för förra omgången (*LÖR 24/10*) och *INFÖR 31/10* – och ÄPPLEN ·
 KLASS I på brädan. Lådan är också en låda i 3D (sidan med springor mellan brädorna, taket,
 och innanför öppningen väggen, mellanväggen, botten och baksidan), i tv:ns mått och vriden
-likadant, med öppningen mot gänget.
+likadant, med öppningen ut i rummet.
 
 **Landskamperna** (2026-11-13, när Stryktipset tog in Nations League). De står i `matches.json` som andra matcher,
 med svenska namn, och ger videon inga fel: utan klipp blir det ingen kassett. Höjdpunkterna kan komma från UEFA:s egen
@@ -7444,7 +7462,7 @@ listan tillbaka på samma sida, med den markerad.
 raden med tangenterna, så att etiketterna på kassetterna går att läsa (tv:ns sida får skäras
 bort), och svänger samtidigt runt tv:n in mot rummet, så att man ser rutan snett framifrån i
 stället för från sidan. Tv:n och lådan vrids inte och flyttas inte –
-de står kvar vända mot gänget – utan det är kameran som rör sig (se *Kamerans sväng* och
+de står kvar längs disken – utan det är kameran som rör sig (se *Kamerans sväng* och
 *Rummet runt tv:n* nedan).
 Kassetterna glider ut en bit när man pekar på dem. I telefonen på höjden går kameran bara
 fram till lådan (`LADAN`), så att etiketterna går att läsa; där tar en kassett (eller ett
@@ -7601,11 +7619,12 @@ bara med när de lyfts eller när man pekar på dem.
 **Kamerans sväng.** Rummet är målat på platta plan, så kameran kan inte gå runt i det på
 riktigt. Svängen är i stället två saker som sker samtidigt, på 0,6 sekunder som
 förstoringen: rummets plan vrids 34 grader i 3D kring tv:n (`sving` i rum.js), och hörnet –
-tv:n, högen och lådan, som är lådor i 3D i rummets eget perspektiv – ritas nästan från samma
-håll, 46 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i rum-video.js). De tolv graderna
-extra ställer etiketterna mer framifrån, så att de går att läsa; mer än så går inte rummet
-att vrida utan att gänget och radion kommer in i bild. Lådans bortre ände kommer då mot en,
-så hörnet flyttas också lite uppåt (`lyft`), annars skulle lådan hänga utanför disken. När bilden fyller fönstret ritas hörnet 112 grader runt (`VRID`), så att rutan
+tv:n, högen och lådan, som är lådor i 3D i rummets eget perspektiv – ritas från samma
+håll, 34 grader runt tv:ns mitt (`SVANG` och `.vhs-kam` i rum-video.js), så att tv:n och lådan står kvar
+parallellt med väggen; mer än så går inte rummet att vrida utan att gänget och radion kommer in i bild.
+Till 2026-11-16, då tv:n stod snett mot gänget, ritades hörnet 46 grader runt, tolv mer än rummet, för att
+etiketterna skulle stå mer framifrån; parallellt med disken står de nu ännu mer framifrån. Lådans bortre ände kommer då mot en,
+så hörnet flyttas också lite uppåt (`lyft`), annars skulle lådan hänga utanför disken. När bilden fyller fönstret ritas hörnet 90 grader runt (`VRID`), så att rutan
 står parallellt med bilden, och ögat (perspektivets mitt i hörnet) flyttas rakt framför rutan: kameran går fram genom att förstora en del av bilden,
 så vänd mot det vanliga ögat blev rutan sned som i kanten av ett vidvinkelfoto, och därifrån
 skymde lådan rutans vänstra kant. Planen vrids som de är, och väggen, skårtavlan, korktavlan och
