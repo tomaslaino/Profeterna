@@ -848,6 +848,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 | Landskamperna: spelprogram, resultat och grupperna | ESPN:s öppna API (`uefa.nations`, `uefa.euroq`, `fifa.friendly`; tabellen i `standings` med en grupp per `children`) | Nations League, EM-kval, vänskapslandskamper | 30 min, tabellen 3 h | Verifierat 2026-11-13: Nations League 2026/27 har 52 matcher 12–17 november, gruppen i `competitions[0].group` ("Group B4") och tabellen i 14 grupper (A1–D2), lagen i id-ordning. Vänskapsmatcherna gäller hela världen – bara de med ett europeiskt landslag tas med. EM-kvalet är tomt till mars 2027. Se [Landskamperna](#landskamperna). |
 | Landskamperna: odds | ESPN matchsammanfattning (DraftKings) | landskamperna | 2 h, tre dagar bakåt till sju dagar fram, sparas; tidigare spelade matcher i Nations League och EM-kvalet frågas en gång | Verifierat 2026-11-13: odds för alla fem landskamperna på Stryktipset 14 november. Ger landskampernas prognos. Oddsen ligger kvar i sammanfattningen efter matchen: 2026-11-14 hade 117 av 122 spelade matcher i Nations League odds (de utan står i `utan` och frågas inte om). Ger också landslagens siffror mot oddsen. |
 | Landslagens tidigare matcher | ESPN (`fifa.world` juni–juli 2026, `fifa.worldq.uefa` 2025–mars 2026, `uefa.nations` 2024/25, `fifa.friendly` 2025–2026) | landskamperna – formen och mötena | 7 d | Bara matcher med ett europeiskt landslag. |
+| Landslagens Elo-tal (motståndets styrka) | World Football Elo Ratings (`eloratings.net/World.tsv` och `en.teams.tsv`) | landskamperna – formen och de tio senaste i datorn | 24 h | Verifierat 2026-11-16: 243 landslag med plats i världen och Elo-tal (Spanien 1:a på 2258), namnen på engelska med andra stavningar i en egen fil; ingen nyckel. Filerna skrivs om efter varje landskamp. Ett ögonblick, ingen historik – styrkan är den just nu, som modellens för klubbarna. Styr inte prognosen. |
 | Landslagens flaggor | ESPN:s bildtjänst (`…/teamlogos/countries/500/<kod>.png`, koden ur lagets logo-adress) | landskamperna | när ett nytt lag kommer | Landslagen ligger inte bland klubbarnas sköldar. Sparas som sköldarna, under det svenska namnet. |
 | Landslagens spelare | ESPN:s öppna API (`uefa.nations/teams/<id>/roster` för de uttagna, `summary?event=<id>` för varje spelad match) | Nations League | trupperna 12 h, rapporterna 6 h, bara nya matcher | Verifierat 2026-11-14: 54 landslag. ESPN:s säsongssiffror i landslagens trupper stämmer inte med matcherna (Norge hade spelat 4 matcher men spelarna stod på 6) och truppen är bara den senast uttagna (214 av 1 326 som spelat saknades), så spelarnas siffror räknas ur matchrapporterna (`p` i `espn_minutes_unl`: mål, assist, skott, kort, regelbrott, räddningar och insläppta per spelare och match). Målen stämde med tabellen utom självmålen (299 av 307). Se [Spelare och statistik för landslagen](#spelare-och-statistik-för-landslagen-2026-11-14). |
 | Landslagens xG, skott och kort | 365Scores öppna webb-API (`/web/game/stats/?games=<id>`, matcherna som för betygen) | Nations League | 6 h, bara nya matcher | Verifierat 2026-11-14: tävling 7016, alla 122 spelade matcher hittades och hade xG, skott, skott på mål, hörnor, frisparkar och kort för båda lagen. Skotten och hörnorna stämde med ESPN:s i stickprovet (Turkiet–Belgien). Det som ligorna har ur football-data.co.uk. Betygen och spelarbilderna hämtas som för ligorna (Republic of Ireland heter Ireland där). |
@@ -7666,6 +7667,32 @@ bland tre skisser i den riktiga närbilden:
   ord, så att tecknen läses som en mening (*Insläppta mål −0,2*: färre än chanserna var
   värda). Talen är desamma som förut; klubbarnas skott och mål mot xG kommer som förut ur
   matchens fil, landslagens ur Nations Leagues lagfil. Ett avsnitt utan tal står inte.
+- **De tio senaste i xG-fliken** (2026-11-16, användarens önskemål: "ha med de senaste 10
+  matcherna … och hur svårt motståndet för de lagen som de har mött har varit – för att få en
+  känsla för hur bra de har varit"; användarens val *A Listan* bland tre skisser – *Listan*,
+  *Mot starka och svaga* och *Staplarna*): överst i xG står *DE TIO SENASTE* med *Poäng/match*,
+  *Målen* (gjorda–insläppta tillsammans) och *Motståndet* (motståndarnas styrka i snitt) över
+  lagets tio senaste matcher i alla tävlingar, efter 90 minuter. Under *MATCH FÖR MATCH* står
+  en rad per match – utfallet, resultatet, H eller B, motståndaren och dess styrka 0–100 med en
+  mätare (*V 3–2 B ENGLAND 88 ▮▮▮▮▮*). Poängen och målen jämförs som formen och det bättre
+  lyser; motståndet säger inte vem som är bättre och står som vanligt. Skalan är formens
+  motstånd: 0 för det svagaste laget i lagets division och 100 för det starkaste, ur matchens
+  fil (`senaste[].opp`, som bygget nu sparar för alla tio och inte bara formens fem). Datorn har
+  lagen sida vid sida, telefonen under varandra med lagets namn över listan. Saknar fler än två
+  av matcherna styrka står inget snitt; med dolda resultat står ?. xG-raderna under gäller som
+  förut säsongen.
+- **Landslagens styrka ur Elo-talen** (2026-11-16, för de tio senaste): modellen räknar bara på
+  lagen i England, så landslagens motståndare hade ingen styrka – formens motstånd stod tomt
+  för landskamperna. Nu kommer den ur World Football Elo Ratings (`elo_landslag`,
+  [src/fetchers/elo.js](src/fetchers/elo.js), en gång om dagen): Elo-talet just nu för varje
+  landslag, på skalan från det svagaste till det starkaste laget i lagets egen liga i Nations
+  League (A–D), som divisionen för klubbarna (`landOpponentStrength` i
+  [src/matches.js](src/matches.js)); lag utanför den skalan hamnar i ändarna (Argentina 83 och
+  Tjeckien 0 för Spanien i liga A). Lagen hittas på ESPN:s engelska namn bland Elo-listans namn
+  och stavningar; ESPN:s egna former (*Czech Republic*, *Republic of Ireland*, *Korea Republic*
+  …) står i `ELO_NAMN`. Prövat 2026-11-16: alla 157 namn i
+  [config/landslag.js](config/landslag.js) hittades. Samma styrka ger nu också formens motstånd
+  i ÖVERSIKT för en landskamp.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
