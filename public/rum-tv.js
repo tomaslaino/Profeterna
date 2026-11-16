@@ -535,9 +535,10 @@ window.RumTv = (() => {
       '<div class="rum-tvpos"><div class="tv-fot"><i class="tv-platta"></i><i class="tv-arm"><i class="a-fram"></i><i class="a-under"></i></i><i class="tv-sladd"></i><i class="tv-uttag"></i></div>' +
       '<div class="rum-tv3" id="rum-tv3">' +
       '<i class="tv-antenn"><b class="folie"></b><b></b></i>' +
-      '<i class="tv-hylla h-botten"></i><i class="tv-hylla h-fram"></i><i class="tv-hylla h-vanster"></i><i class="tv-hylla h-hoger"></i>' +
-      '<i class="tv-f tv-kapa k-topp"></i><i class="tv-f tv-kapa k-botten"></i><i class="tv-f tv-kapa k-vanster"></i><i class="tv-f tv-kapa k-hoger"></i>' +
-      '<i class="tv-f tv-topp"></i><i class="tv-f tv-botten"></i><i class="tv-f tv-vanster"></i><i class="tv-f tv-hoger"></i>' +
+      // (lådans sidor, kåpan och hyllan hör till tv:n, rum-del: klicket där går till länken på fronten)
+      '<i class="tv-hylla rum-del h-botten"></i><i class="tv-hylla rum-del h-fram"></i><i class="tv-hylla rum-del h-vanster"></i><i class="tv-hylla rum-del h-hoger"></i>' +
+      '<i class="tv-f rum-del tv-kapa k-topp"></i><i class="tv-f rum-del tv-kapa k-botten"></i><i class="tv-f rum-del tv-kapa k-vanster"></i><i class="tv-f rum-del tv-kapa k-hoger"></i>' +
+      '<i class="tv-f rum-del tv-topp"></i><i class="tv-f rum-del tv-botten"></i><i class="tv-f rum-del tv-vanster"></i><i class="tv-f rum-del tv-hoger"></i>' +
       '<div class="tv-front" id="rum-tvfront" inert>' +
       '<div class="tv-ram"><div class="tv-glas" id="rum-ttx"><div class="tt"><div class="tr hd"></div><div class="tb"></div></div>' +
       '<i class="tv-scan"></i><i class="tv-glans"></i></div></div>' +

@@ -23,9 +23,10 @@
 // barberarens stång) ritas i tre dukar i en takt (TAKT), och står still med prefers-reduced-motion.
 //
 //   RumFasad.bygg(rum, o) → { el, ny(), ut() } bygger fasaden i rum (.rum) och ritar den;
-//     o.gang(duk) ritar gänget på duken (false utan), o.neon() neonen tänd just nu, o.natt() 0…1 hur
-//     släckt lysröret är, o.calm() utan rörelser (prefers-reduced-motion), o.still en fast bild på den
-//     tiden (s, ?rum-t i rum.js): allt som rör sig står där det är då
+//     o.gang(duk) ritar gänget på duken (false utan), o.takt() hur många gånger i sekunden (som inne),
+//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.calm() utan rörelser
+//     (prefers-reduced-motion), o.still en fast bild på den tiden (s, ?rum-t i rum.js): allt som rör sig
+//     står där det är då
 
 window.RumFasad = (() => {
   const r1 = (x) => Math.round(x * 10) / 10;
@@ -802,93 +803,171 @@ window.RumFasad = (() => {
 
   // ---------- gången ----------
   //
-  // De som går förbi går som folk: foten som står på marken står still mot trottoaren medan kroppen går fram
-  // (hälen slår i, foten rullar över till tån och lyfts), höften gungar upp och ner en gång per steg, knät böjs
-  // när benet förs fram och armarna pendlar emot benen med armbågen lite böjd. Gångcykeln (två steg, GANG.S cm
-  // långa tillsammans) räknas ut en gång (gangen): var foten är i varje del av varvet, och därifrån höften och
-  // vinklarna i höften, knät och fotleden. Var i varvet en figur är tas av hur långt den har gått (stalln), så
-  // att fötterna står still mot stenen hur ofta duken än ritas om.
-  const GANG = { S: 136, B: 0.62, LAR: 45, SMA: 38, HOFT: 90, N: 64, PM: 0.31 };
-  let gangTab = null;
-  function gangen() {
-    if (gangTab) return gangTab;
-    const { S, B, LAR: L1, SMA: L2, N, PM } = GANG;
+  // De som går förbi går som folk, och var och en på sitt sätt. Foten som står på marken står still mot
+  // trottoaren medan kroppen går fram (hälen slår i, foten rullar över till tån och lyfts), höften gungar upp och
+  // ner en gång per steg och knät ger efter lite när hälen tar emot. Benet som förs fram följer vinklarna i en
+  // människas gång: låret svänger fram tidigt och knät böjs mest strax efter att tån har lämnat marken (ca 60°),
+  // sträcks sedan ut och låret dras tillbaka en aning före nästa hälisättning. Armarna pendlar emot benen,
+  // överkroppen lutar lite framåt och en lång kappa följer låren. Gångcykeln (två steg) räknas ut en gång per
+  // sätt att gå (gangen) och var i den en figur är tas av hur långt den har gått (stalln), så att fötterna
+  // står still mot stenen hur ofta duken än ritas om.
+  const GANG = { LAR: 45, SMA: 38, HOFT: 90, N: 128 };
+  // Sätten att gå (STILAR, var och en lite olika, gangStil): S två stegs längd (cm), B hur stor del av varvet en fot
+  // står i marken, x0 hur långt framför höften hälen sätts i (del av S), lyft fotens vinkel när tån lämnar marken,
+  // kna hur mycket knät böjs när benet förs fram (grader), hojd och studs höftens höjd och gung (cm; de raka
+  // benen bestämmer hur högt den når), lut hur mycket överkroppen lutar framåt (grader), arm hur mycket armarna
+  // pendlar, takt varv (två steg) i sekunden och ficka hur ofta händerna är i fickorna. Farten blir S · takt.
+  const STILAR = {
+    vanlig: { S: 128, B: 0.62, x0: 0.19, lyft: 55, kna: 62, hojd: 88.6, studs: 1.7, lut: 2.5, arm: 1, takt: 0.98, ficka: 0.12 },
+    rask: { S: 142, B: 0.6, x0: 0.2, lyft: 58, kna: 65, hojd: 88.4, studs: 2, lut: 5, arm: 1.4, takt: 1.05, ficka: 0 },
+    strosar: { S: 108, B: 0.64, x0: 0.19, lyft: 45, kna: 56, hojd: 88.8, studs: 1.3, lut: 0.5, arm: 0.6, takt: 0.86, ficka: 0.55 },
+    studsar: { S: 124, B: 0.6, x0: 0.19, lyft: 62, kna: 66, hojd: 87.8, studs: 2.8, lut: 1.5, arm: 1.15, takt: 1, ficka: 0 },
+    lunkar: { S: 94, B: 0.66, x0: 0.18, lyft: 32, kna: 50, hojd: 87.6, studs: 1, lut: 9, arm: 0.45, takt: 0.92, ficka: 0.3 },
+    rak: { S: 122, B: 0.62, x0: 0.19, lyft: 48, kna: 56, hojd: 89.4, studs: 1.2, lut: -1, arm: 0.75, takt: 0.98, ficka: 0.2 },
+  };
+  // (ett sätt att gå ur R: vilket, och var och en lite olika; med paraply eller hund är händerna inte i fickorna)
+  function gangStil(R, o = {}) {
+    const namn = o.stil || pick(R, ['vanlig', 'vanlig', 'vanlig', 'rask', 'rask', 'strosar', 'strosar', 'studsar', 'lunkar', 'rak']);
+    const s = STILAR[namn];
+    const j = (x, d) => x + (R() * 2 - 1) * d;
+    return {
+      namn, S: j(s.S, 6), B: s.B, x0: s.x0, lyft: j(s.lyft, 4), kna: j(s.kna, 3), hojd: j(s.hojd, 0.3), studs: j(s.studs, 0.3),
+      lut: j(s.lut, 1), arm: j(s.arm, 0.12), takt: j(s.takt, 0.03),
+      ficka: !o.paraply && !o.hund && R() < s.ficka + (o.kalla ? 0.15 : 0), tab: null,
+    };
+  }
+  let gangVanlig = null;
+  const stilVanlig = () => gangVanlig || (gangVanlig = gangStil(() => 0.5, { stil: 'vanlig' }));
+  function gangen(st) {
+    if (st.tab) return st.tab;
+    const { LAR: L1, SMA: L2, N } = GANG;
+    const { S, B } = st;
+    const PM = B / 2;
     // foten från fotleden (x framåt, y nedåt): hälen och tån; vinkeln positiv när hälen lyfts
     const HAL = [-6.5, 7];
     const TA = [16.5, 7];
     const PSI0 = -12 * DEG;
-    const PSI1 = 55 * DEG;
+    const PSI1 = st.lyft * DEG;
     const rot = (q, a) => [q[0] * Math.cos(a) - q[1] * Math.sin(a), q[0] * Math.sin(a) + q[1] * Math.cos(a)];
     const ss = (x) => { const q = Math.min(1, Math.max(0, x)); return q * q * (3 - 2 * q); };
-    // Stödfasen (0 … B): hälen slår i X0 framför höften och foten fälls ner (till 0,08), står platt (till
-    // 0,36) och rullar över tån (till B). Fotleden och fotens vinkel på marken (y 0), där höften var i 0 vid
-    // hälisättningen och går S per varv.
-    const X0 = 24;
-    function stod(p) {
-      if (p < 0.08) { const psi = PSI0 * (1 - ss(p / 0.08)); const h = rot(HAL, psi); return [X0 - h[0], -h[1], psi]; }
-      if (p < 0.36) return [X0 - HAL[0], -HAL[1], 0];
-      const psi = PSI1 * Math.pow((p - 0.36) / (B - 0.36), 1.5);
-      const q = rot(TA, psi);
-      return [X0 - HAL[0] + TA[0] - q[0], -q[1], psi];
-    }
-    // Svingfasen (B … 1): fotleden förs fram till nästa hälisättning (S längre fram) i en mjuk båge som börjar
-    // i samma fart som foten lämnade marken (hermite), och tårna lyfts.
-    const e = 1e-4;
-    const sw = 1 - B;
-    const a0 = stod(B - e);
-    const a0b = stod(B - 2 * e);
-    const a1 = stod(0);
-    const a1b = stod(e);
-    const v0 = [(a0[0] - a0b[0]) / e * sw, (a0[1] - a0b[1]) / e * sw * 0.5];
-    const v1 = [(a1b[0] - a1[0]) / e * sw * 0.6, (a1b[1] - a1[1]) / e * sw * 0.6];
     const herm = (p0, p1, m0, m1, x) => {
       const x2 = x * x; const x3 = x2 * x;
       return (2 * x3 - 3 * x2 + 1) * p0 + (x3 - 2 * x2 + x) * m0 + (3 * x2 - 2 * x3) * p1 + (x3 - x2) * m1;
     };
-    function fot(p) {
-      if (p < B) return stod(p);
-      const x = (p - B) / sw;
-      return [herm(a0[0], a1[0] + S, v0[0], v1[0], x), herm(a0[1], a1[1], v0[1], v1[1], x) - Math.sin(Math.PI * Math.pow(x, 0.8)) * (1 - 0.3 * x),
-        PSI1 + (PSI0 - PSI1) * ss(x / 0.75)];
+    // Stödfasen (0 … B): hälen slår i X0 framför höften och foten fälls ner (till 0,08), står platt (till HA)
+    // och rullar över tån (till B). Fotleden och fotens vinkel på marken (y 0), där höften var i 0 vid
+    // hälisättningen och går S per varv.
+    const X0 = st.x0 * S;
+    const HA = B - 0.2;
+    function stod(p) {
+      if (p < 0.08) { const psi = PSI0 * (1 - ss(p / 0.08)); const h = rot(HAL, psi); return [X0 - h[0], -h[1], psi]; }
+      if (p < HA) return [X0 - HAL[0], -HAL[1], 0];
+      const psi = PSI1 * Math.pow((p - HA) / (B - HA), 1.7);
+      const q = rot(TA, psi);
+      return [X0 - HAL[0] + TA[0] - q[0], -q[1], psi];
     }
-    // fotleden mätt från höften, för benet som är q in i sitt varv
-    const rel = (q) => { const f = fot(q); return [f[0] - S * q, f[1], f[2]]; };
-    // Höften: högst mitt i steget (PM) och lägst när båda fötterna är i marken, och lite långsammare där uppe;
-    // aldrig högre än att benen som står når marken med knät lite böjt (minst 5°).
+    // fotleden mätt från höften, för benet som är q in i sitt varv (i stödfasen)
+    const rel = (q) => { const f = stod(q); return [f[0] - S * q, f[1], f[2]]; };
+    // Höften: högst mitt i steget (PM) och lägst när båda fötterna är i marken; aldrig högre än att benen som
+    // står når marken med knät lite böjt (minst 5°).
     const ps = [...Array(N)].map((_, i) => i / N);
     const fram = (p) => -0.7 * Math.sin(4 * Math.PI * (p - PM));
     const NA = Math.sqrt(L1 * L1 + L2 * L2 + 2 * L1 * L2 * Math.cos(5 * DEG));
-    const tak = ps.map((p) => Math.min(...[p, (p + 0.5) % 1].map((q) => {
+    const tak = ps.map((p) => Math.min(...[p, (p + 0.5) % 1].filter((q) => q < B).map((q) => {
       const r = rel(q);
       const dx = r[0] - fram(p);
       return Math.sqrt(Math.max(0, NA * NA - dx * dx)) - r[1];
     })));
-    let H = ps.map((p) => 88.6 + 1.7 * Math.cos(4 * Math.PI * (p - PM)));
-    for (let k = 0; k < 6; k++) {
+    let H = ps.map((p) => st.hojd + st.studs * Math.cos(4 * Math.PI * (p - PM)));
+    for (let k = 0; k < 40; k++) {
       H = H.map((h, i) => Math.min(h, tak[i]));
       H = H.map((h, i) => (H[(i + N - 1) % N] + 2 * h + H[(i + 1) % N]) / 4);
     }
     H = H.map((h, i) => Math.min(h, tak[i]));
-    // per del av varvet: höftens förskjutning (x, y) och benets vinklar (lår, smalben, fot; radianer, medurs
-    // som i duken), knät framåt (IK)
-    gangTab = ps.map((p, i) => {
+    const Hp = (p) => { const x = (((p % 1) + 1) % 1) * N; const i = Math.floor(x); return H[i] + (H[(i + 1) % N] - H[i]) * (x - i); };
+    // benet som står (IK, knät framåt): lårets, smalbenets och fotens vinklar (radianer, medurs som i duken)
+    const ik = (p) => {
       const r = rel(p);
       const dx = r[0] - fram(p);
-      const dy = r[1] + H[i];
+      const dy = r[1] + Hp(p);
       const d = Math.min(Math.hypot(dx, dy), L1 + L2 - 1e-6);
       const f1 = Math.atan2(dx, dy) + Math.acos((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d));
       const f2 = Math.atan2(dx - L1 * Math.sin(f1), dy - L1 * Math.cos(f1));
-      return [fram(p), GANG.HOFT - H[i], -f1, f1 - f2, r[2] + f2];
+      return [-f1, f1 - f2, r[2] + f2];
+    };
+    // Benet som förs fram (B … 1, s 0 … 1): mjuka kurvor genom knutar [s, vinkel, lutning], som börjar där och så
+    // som benet lämnade marken och slutar där nästa hälisättning börjar. Låret svänger fram och dras tillbaka
+    // 3° på slutet, knät böjs mest efter 30 % och sträcks, foten fälls upp till 3° och hålls där.
+    const sw = 1 - B;
+    const e = 1e-3;
+    const a0 = ik(B - e);
+    const d0 = ik(B - 2 * e).map((v, j) => (a0[j] - v) / e * sw);
+    const a1 = ik(0);
+    const d1 = ik(e).map((v, j) => (v - a1[j]) / e * sw);
+    const KM = st.kna * DEG;
+    const K = [
+      [[0, a0[0], d0[0]], [0.84, a1[0] - 1.5 * DEG, 0], [1, a1[0], d1[0]]],
+      [[0, a0[1], Math.min(d0[1], 2.5 * (KM - a0[1]) / 0.3)], [0.3, KM, 0], [1, a1[1], 0]],
+      [[0, a0[2], d0[2]], [0.45, -5 * DEG, 0], [1, a1[2], 0]],
+    ];
+    const kurva = (k, s) => {
+      const j = s < k[1][0] ? 0 : 1;
+      const [s0, y0, m0] = k[j];
+      const [s1, y1, m1] = k[j + 1];
+      const h = s1 - s0;
+      return herm(y0, y1, m0 * h, m1 * h, (s - s0) / h);
+    };
+    // Det sista av svingen: fotleden sänks ovanifrån mot nästa hälisättning och saktar in (till halva farten),
+    // så att hälen sätts i mjukt där den sedan står. Banan blandas in från s 0,62 och benet följer den (IK, knät
+    // böjt minst 3°); foten behåller sin vinkel.
+    const A1 = stod(0);
+    const NA3 = Math.sqrt(L1 * L1 + L2 * L2 + 2 * L1 * L2 * Math.cos(3 * DEG));
+    const landa = (p, v) => {
+      const w = ss(((p - B) / sw - 0.62) / 0.33);
+      if (w <= 0) return v;
+      const u = 1 - p;
+      const ax = L1 * Math.sin(-v[0]) + L2 * Math.sin(-v[0] - v[1]);
+      const ay = L1 * Math.cos(v[0]) + L2 * Math.cos(v[0] + v[1]);
+      const tx = S + A1[0] - S * (0.5 * u + 2 * u * u) - S * p - fram(p);
+      const ty = Hp(p) + A1[1] - 300 * u * u;
+      const x = ax + (tx - ax) * w;
+      const y = ay + (ty - ay) * w;
+      const d = Math.min(Math.hypot(x, y), NA3);
+      const f1 = Math.atan2(x, y) + Math.acos((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d));
+      const f2 = Math.atan2(x - L1 * Math.sin(f1), y - L1 * Math.cos(f1));
+      return [-f1, f1 - f2, v[0] + v[1] + v[2] + f2];
+    };
+    // per del av varvet: höftens förskjutning (x, y) och benets vinklar (lår, smalben, fot)
+    const T = ps.map((p) => {
+      const v = p < B ? ik(p) : landa(p, K.map((k) => kurva(k, (p - B) / sw)));
+      return [fram(p), GANG.HOFT - Hp(p), ...v];
     });
-    return gangTab;
+    // Foten som förs fram går minst 1,5 cm över stenen (mitt i svingen; mindre strax efter att den lämnat
+    // marken och strax före hälisättningen): där den inte gör det böjs knät mer och låret förs fram lite.
+    const lagst = (r) => {
+      const [, by, th, kn, ft] = r;
+      const ky = GANG.HOFT - by - L1 * Math.cos(th);
+      const ay = ky - L2 * Math.cos(th + kn);
+      const f = th + kn + ft;
+      return Math.min(...[[-6.5, 7], [16.5, 7]].map(([x, y]) => ay - (x * Math.sin(f) + y * Math.cos(f))));
+    };
+    for (let n = 0; n < 8; n++) {
+      const brist = ps.map((p, i) => (p < B ? 0 : Math.max(0, 1.5 * Math.sin(Math.PI * (p - B) / sw) ** 0.7 - lagst(T[i]))));
+      if (Math.max(...brist) < 0.05) break;
+      const mjuk = brist.map((_, i) => Math.max(...[-3, -2, -1, 0, 1, 2, 3].map((d) => brist[(i + d + N) % N] * (1 - Math.abs(d) / 4))));
+      T.forEach((r, i) => { if (ps[i] >= B) { r[3] += mjuk[i] / 30; r[2] -= mjuk[i] / 90; } });
+    }
+    st.tab = T;
+    return T;
   }
-  // Ställningen p in i varvet (0 … 1; det bortre benet och armen ett halvt varv efter): höften (bx, by), benen
-  // (F, B: lår, smalben, fot), armarna (aF, aB: axel, armbåge), paraplyet (par) och hundens fyra ben (rotate,
-  // scaleY: hunden travar fyra varv på ett, tassen står still halva varvet och lyfts fram i den andra, från
-  // benets topp 20 cm upp). sta: står still.
-  const STAR = { bx: 0, by: 0, F: [0, 0, 0], B: [0, 0, 0], aF: [0, -6 * DEG], aB: [0, -6 * DEG], par: 0, hund: [[0, 1], [0, 1], [0, 1], [0, 1]] };
-  function stalln(p) {
-    const T = gangen();
+  // Ställningen p in i varvet (0 … 1; det bortre benet och armen ett halvt varv efter) för sättet st: höften
+  // (bx, by), benen (F, B: lår, smalben, fot), kappans skört (kF, kB: med det främre och det bakre låret),
+  // överkroppens lutning (lut), armarna (aF, aB: axel, armbåge; i fickorna nästan stilla), paraplyet (par) och
+  // hundens fyra ben (rotate, scaleY: hunden travar fyra varv på ett, tassen står still halva varvet och lyfts
+  // fram i den andra, från benets topp 20 cm upp). STAR: står still.
+  const STAR = { bx: 0, by: 0, F: [0, 0, 0], B: [0, 0, 0], kF: 0, kB: 0, lut: 0, aF: [0, -6 * DEG], aB: [0, -6 * DEG], par: 0, hund: [[0, 1], [0, 1], [0, 1], [0, 1]] };
+  function stalln(p, st) {
+    const T = gangen(st);
     const N = T.length;
     const tab = (q) => {
       const x = ((q % 1) + 1) % 1 * N;
@@ -898,8 +977,11 @@ window.RumFasad = (() => {
     };
     const f = tab(p);
     const b = tab(p + 0.5);
-    const arm = (q) => { const c = Math.cos(2 * Math.PI * (q - 0.04)); return [15 * c * DEG, (-8 - 11 * (1 - c)) * DEG]; };
-    const E = GANG.S / 32;
+    const A = st.arm;
+    const arm = st.ficka
+      ? (q) => [(-2 + 2 * Math.cos(2 * Math.PI * (q - 0.04))) * DEG, -18 * DEG]
+      : (q) => { const c = Math.cos(2 * Math.PI * (q - 0.04)); return [A * 15 * c * DEG, (-8 - 11 * A * (1 - c)) * DEG]; };
+    const E = st.S / 32;
     const tass = (q) => {
       q = ((q % 1) + 1) % 1;
       const s = (q - 0.5) / 0.5;
@@ -908,8 +990,10 @@ window.RumFasad = (() => {
       return [-Math.atan2(x, y), Math.hypot(x, y) / 20];
     };
     const h = 4 * p + 0.3;
-    return { bx: f[0], by: f[1], F: f.slice(2), B: b.slice(2), aF: arm(p), aB: arm(p + 0.5), par: 1.2 * DEG * Math.sin(4 * Math.PI * (p - GANG.PM)),
-      hund: [tass(h), tass(h + 0.5), tass(h + 0.5), tass(h)] };
+    const PM = st.B / 2;
+    return { bx: f[0], by: f[1], F: f.slice(2), B: b.slice(2), kF: 0.7 * Math.min(f[2], b[2]), kB: 0.7 * Math.max(f[2], b[2]),
+      lut: (st.lut + 0.6 * Math.cos(4 * Math.PI * (p - PM - 0.1))) * DEG, aF: arm(p), aB: arm(p + 0.5),
+      par: 1.2 * DEG * Math.sin(4 * Math.PI * (p - PM)), hund: [tass(h), tass(h + 0.5), tass(h + 0.5), tass(h)] };
   }
 
   // En som går (fötterna i 0, vänd åt höger, i centimeter), som delar i den ordning de fylls i: benen i höften,
@@ -928,15 +1012,27 @@ window.RumFasad = (() => {
     const OVER = 'M-6 0 H6 Q6.4 16 5.4 29 Q0 33.5 -5.2 29 Q-6.4 16 -6 0 Z';
     const UNDER = 'M-5.2 -2.5 Q0 -5 5.4 -2.5 L4.6 27 H-4.4 Z';
     const ben = (g, f) => { del(LAR, f(o.byxa), g); del(SMA, f(o.byxa), g, { led: 1 }); del(SKO, f(o.sko), g, { led: 2 }); };
-    const arm = (g, f) => { del(OVER, f(o.arm), g); del(UNDER, f(o.arm), g, { led: 1 }); del(ell(0.4, 31, 4.4, 5.6), f(o.hud), g, { led: 1 }); };
+    // (händerna i fickorna: underarmen in mot kappans ficka, utan hand)
+    const arm = (g, f) => { del(OVER, f(o.arm), g); del(UNDER, f(o.arm), g, { led: 1 }); if (!o.ficka) del(ell(0.4, 31, 4.4, 5.6), f(o.hud), g, { led: 1 }); };
     ben('benB', bak);
     if (!o.paraply) arm('armB', bak);
     ben('benF', t);
     const nere = o.lang ? -40 : -84;
     const hR = o.lang ? 19 : 16;
     const hL = o.lang ? -20 : -17;
-    del(`M-13 -140 Q-16 -151 -7 -152.5 H8 Q16 -151.5 15 -140 L${hR} ${nere} Q0 ${nere + 2.5} ${hL} ${nere} Z`, t(o.rock));
-    del(`M-13 -140 Q-16 -151 -7 -152.5 L-4 -152 Q-9 -120 -11 ${nere + 1} L${hL} ${nere} Z`, '#000', '', { a: 0.2, inre: true });
+    if (o.lang) {
+      // (en lång kappa: nedanför höften följer skörtet låren, en gång med det främre och en gång med det bakre,
+      // så att det vidgas när benen går isär och hänger lite lägre mellan dem)
+      const kjol = `M-15.6 -96 H16.2 L${hR} ${nere} Q0 ${nere + 2.5} ${hL} ${nere} Z`;
+      del(kjol, t(o.rock), 'kjolF');
+      del(kjol, t(o.rock), 'kjolB');
+      del(`M-15.6 -96 H-12 L-11 ${nere + 1} L${hL} ${nere} Z`, '#000', 'kjolB', { a: 0.2, inre: true });
+      del('M-13 -140 Q-16 -151 -7 -152.5 H8 Q16 -151.5 15 -140 L17.2 -84 H-16.9 Z', t(o.rock));
+      del('M-13 -140 Q-16 -151 -7 -152.5 L-4 -152 Q-9 -120 -11.6 -84 H-16.9 Z', '#000', '', { a: 0.2, inre: true });
+    } else {
+      del(`M-13 -140 Q-16 -151 -7 -152.5 H8 Q16 -151.5 15 -140 L${hR} ${nere} Q0 ${nere + 2.5} ${hL} ${nere} Z`, t(o.rock));
+      del(`M-13 -140 Q-16 -151 -7 -152.5 L-4 -152 Q-9 -120 -11 ${nere + 1} L${hL} ${nere} Z`, '#000', '', { a: 0.2, inre: true });
+    }
     drag('M-5 -152 L2 -134 L9 -151.5', bak(o.rock), 2, { inre: true });
     if (o.lang) del('M-15.5 -101 H17 V-97 H-15.8 Z', bak(o.rock), '', { inre: true });
     if (o.vaska) { drag('M8 -151 L-11 -104', bak(o.vaska), 2.2); del('M-24 -105 Q-24 -108 -21 -108 H-9 Q-6 -108 -6 -105 V-88 Q-6 -85 -9 -85 H-21 Q-24 -85 -24 -88 Z', t(o.vaska)); }
@@ -1005,7 +1101,8 @@ window.RumFasad = (() => {
   }
 
   // Delarna i ställningen P (stalln): allt utom hunden gungar med höften, benen vrids i höften, knät och
-  // fotleden (led 0, 1, 2), armarna i axeln och armbågen, och det som sitter fast har sina egna vinklar.
+  // fotleden (led 0, 1, 2), kappans skört i höften med låren, överkroppen lutar kring höften, armarna vrids i
+  // axeln och armbågen, och det som sitter fast har sina egna vinklar.
   // rand: bara konturen, lineWidth rand (ljuset i kanten), annars fyllt med alfa A (kontur: bara det som syns
   // i siluetten, för speglingen).
   function ritaDelar(c, D, P, A, rand, kontur = false, z = 0) {
@@ -1023,10 +1120,20 @@ window.RumFasad = (() => {
           c.rotate(b[0]);
           if (p.led) { c.translate(0, GANG.LAR); c.rotate(b[1]); }
           if (p.led > 1) { c.translate(0, GANG.SMA); c.rotate(b[2]); }
-        } else if (g === 'armF' || g === 'armB') {
+        } else if (g === 'kjolF' || g === 'kjolB') {
+          c.translate(0, -GANG.HOFT);
+          c.rotate(g === 'kjolF' ? P.kF : P.kB);
+          c.translate(0, GANG.HOFT);
+        } else if (P.lut) {
+          c.translate(0, -GANG.HOFT);
+          c.rotate(P.lut);
+          c.translate(0, GANG.HOFT);
+        }
+        if (g === 'armF' || g === 'armB') {
           const a = g === 'armF' ? P.aF : P.aB;
+          // (armarna hänger lodrätt fast överkroppen lutar)
           c.translate(1, -142);
-          c.rotate(a[0]);
+          c.rotate(a[0] - P.lut);
           if (p.led) { c.translate(0, 29); c.rotate(a[1]); }
         } else if (g === 'fast') {
           c.translate(p.px, p.py);
@@ -1081,7 +1188,8 @@ window.RumFasad = (() => {
   // i gångens varv av hur långt den har gått (x), så att foten i marken står still. spegel: upp och ned i den
   // våta stenen, svagt.
   function ritaFigur(c, f, D, x, y, t, L, ut) {
-    const P = f.sta ? STAR : stalln((f.dir * x) / (GANG.S * f.k) + (f.gfas || 0));
+    const st = f.stil || stilVanlig();
+    const P = f.sta ? STAR : stalln((f.dir * x) / (st.S * f.k) + (f.gfas || 0), st);
     c.save();
     c.translate(x, y);
     if (ut.spegel) {
@@ -1144,16 +1252,19 @@ window.RumFasad = (() => {
       o.hatt = o.mossa ? pick(RH, ['mossa', 'mossa', 'keps', 'hatt']) : RH() < 0.25 ? 'hatt' : null;
       if (o.hatt && !o.mossa) o.mossa = pick(RH, ['#1d1d20', '#3a3026', '#2a2e38']);
       o.langHar = !o.hatt && RH() < 0.4;
+      // (sättet att gå ur en tredje följd, och ett annat från dag till dag)
+      const stil = gangStil(rng(i * 59 + v.dag * 11 + v.manad * 3 + 7), { paraply: o.paraply, hund: o.hund, kalla });
+      o.ficka = stil.ficka;
       const dir = R() < 0.5 ? 1 : -1;
-      // (1,3 m/s; varvet är bilden och en paus)
-      const fart = 1.3 * M * skala(dm);
+      // (två steg på takten; ca 0,9–1,6 m/s; varvet är bilden och en paus)
+      const fart = stil.S * k * stil.takt;
       const vag = V.w + 600;
       const varv = vag / fart + 8 + R() * (T.natt ? 70 : 26);
       const extra = varv * fart - vag;
       const a = V.x - 300;
       const b = V.x + V.w + 300 + extra;
       R();
-      ut.push({ D: figurDelar(o, L), k, dir, gfas: (i * 0.618) % 1, dm, y: markY(dm), g: { fran: dir > 0 ? a : b, till: dir > 0 ? b : a, dur: varv, fas: R() * varv } });
+      ut.push({ D: figurDelar(o, L), k, dir, stil, gfas: (i * 0.618) % 1, dm, y: markY(dm), g: { fran: dir > 0 ? a : b, till: dir > 0 ? b : a, dur: varv, fas: R() * varv } });
     }
     return ut.sort((p, q) => p.dm - q.dm);
   }
@@ -1166,7 +1277,6 @@ window.RumFasad = (() => {
     const T = U().trafik.nu(v);
     if (T.gaende < 2 || v.timme < 7 || v.timme >= 23) return null;
     const k = skala(STANNA.dm) * M / 100;
-    const fart = 1.15 * M * skala(STANNA.dm);
     const xs = FON.x + FON.w * 0.11;
     const kalla = v.kanns < 3;
     const C = kladsel(v);
@@ -1177,10 +1287,13 @@ window.RumFasad = (() => {
       const o = { rock: pick(R, C), byxa: pick(R, ['#1d2230', '#2a2a2e', '#3b4a6a']), sko: pick(R, ['#111', '#3a2a1a']), hud: pick(R, ['#e8c4a0', '#c99a72', '#8a5a3a', '#f0d2b4']), har: pick(R, ['#2a1c12', '#6a4a2a', '#8a8a86', '#c9a46a']), lang: true, mossa: kalla || R() < 0.4 ? pick(R, ['#8a1e1e', '#1f2a44', '#2a2a2a']) : null, halsduk: kalla ? pick(R, ['#c8322a', '#e0c040', '#3a6ab0']) : null };
       o.arm = o.rock;
       o.hatt = o.mossa ? 'mossa' : null;
+      // (den som stannar strosar)
+      const stil = gangStil(R, { stil: 'strosar', kalla });
+      o.ficka = stil.ficka;
       const dir = n % 2 ? -1 : 1;
       const xa = dir > 0 ? V.x - 200 : V.x + V.w + 200;
       const xb = dir > 0 ? V.x + V.w + 200 : V.x - 200;
-      return { o, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(o, L), k, dm: STANNA.dm, sta: false };
+      return { o, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(o, L), k, stil, fart: stil.S * k * stil.takt, dm: STANNA.dm, sta: false };
     };
     const minne = new Map();
     return (t) => {
@@ -1189,6 +1302,7 @@ window.RumFasad = (() => {
       const f = minne.get(n);
       if (!f) return null;
       let tau = t - n * STANNA.cykel - STANNA.start;
+      const fart = f.fart;
       const tIn = Math.abs(xs - f.xa) / fart;
       const tUt = Math.abs(f.xb - xs) / fart;
       if (tau < 0 || tau > tIn + STANNA.sta + tUt) return null;
@@ -1722,7 +1836,7 @@ window.RumFasad = (() => {
       if (x > V.x - 220 && x < V.x + V.w + 220) lista.push([f, f.D, x, f.y]);
     }
     const st = R.stanna && R.stanna(t);
-    if (st) lista.unshift([{ k: st.f.k, dir: st.sta ? 1 : st.f.dir, sta: st.sta }, st.sta ? st.f.B : st.f.D, st.x, markY(STANNA.dm)]);
+    if (st) lista.unshift([{ k: st.f.k, dir: st.sta ? 1 : st.f.dir, sta: st.sta, stil: st.f.stil }, st.sta ? st.f.B : st.f.D, st.x, markY(STANNA.dm)]);
     const bilar = R.bilar.some((b) => { const x = glidX(b.g, t); return x < DORR.x + DORR.w + 100 && x + b.w > FON.x - 100; });
     if (!lista.length && !bilar && !R.N && R.tom) return;
     c.setTransform(1, 0, 0, 1, 0, 0);
@@ -1777,7 +1891,7 @@ window.RumFasad = (() => {
     el.innerHTML = '<div class="rf-scen"></div>';
     rum.append(el);
     const scen = el.firstChild;
-    const F = { V: null, sig: '', duk: null, raf: 0, sist: 0, neon: null, klar: false, ro: null };
+    const F = { V: null, sig: '', duk: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
     const calm = () => Boolean(o.calm && o.calm());
     // (dukarnas bildpunkter per enhet i världen: skärmens, högst två miljoner bildpunkter på hela fönstret)
     const tathet = (V) => {
@@ -1857,7 +1971,7 @@ window.RumFasad = (() => {
       if (gammal && gammal.width) F.duk.getContext('2d').drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
       F.neon = null;
       passa();
-      gang(true);
+      gang();
       rorelse(true);
     }
     // scenen så stor att den täcker fönstret (vy har fönstrets form)
@@ -1868,12 +1982,29 @@ window.RumFasad = (() => {
       el.style.setProperty('--dorr-x', `${r1((DORR.x + DORR.w / 2 - F.V.x) * k)}px`);
       el.style.setProperty('--dorr-y', `${r1((DORR.y + DORR.h * 0.45 - F.V.y) * k)}px`);
     }
-    // gänget i fönstret och neonen: några gånger i sekunden (i telefonen färre), en gång i en stillbild
-    function gang(nu) {
+    // Gänget i fönstret och neonen: lika ofta som gänget ritas inne (o.takt, efter vad enheten hinner med),
+    // men glesare om en bild av gänget tar mer än en fjärdedel av tiden (GANG_ANDEL; F.tider: de senaste,
+    // och mitten av dem räknas), så att regnet och de som går förbi inte hackar för gängets skull i en svag
+    // telefon eller dator. Gänget ritas direkt efter bildrutan (efter), som inne (efterBild i rum.js): då
+    // har det hela tiden till nästa, och det som ritas i bildrutan väntar inte. En gång i en stillbild.
+    // Förut ritades hela gängets duk några gånger i sekunden, och då hackade gänget fram; nu ritas bara
+    // glaset (utifran i rum-3d.js).
+    const GANG_ANDEL = 0.25;
+    function gangDags(ms) {
+      const takt = (o.takt && o.takt()) || (LATT ? 20 : 30);
+      const tid = F.tider.length ? [...F.tider].sort((a, b) => a - b)[F.tider.length >> 1] : 0;
+      return ms - F.sist >= Math.max(1000 / takt - 4, tid / GANG_ANDEL);
+    }
+    const efter = new MessageChannel();
+    efter.port1.onmessage = () => {
+      F.vantar = false;
+      if (el.isConnected) gang();
+    };
+    function gang() {
       const ms = performance.now();
-      if (!nu && ms - F.sist < (LATT ? 240 : 110)) return;
-      F.sist = ms;
       if (F.duk && o.gang) o.gang(F.duk);
+      F.tider.push(performance.now() - ms);
+      if (F.tider.length > 9) F.tider.shift();
       const on = o.neon ? o.neon() !== false : true;
       if (on !== F.neon) {
         F.neon = on;
@@ -1910,9 +2041,14 @@ window.RumFasad = (() => {
     function loop() {
       cancelAnimationFrame(F.raf);
       if (calm() || o.still != null) return;
-      const tick = () => {
+      const tick = (ms) => {
         if (!el.isConnected) return;
-        gang(false);
+        // (F.sist: bildrutan som gänget ritades efter)
+        if (!F.vantar && gangDags(ms)) {
+          F.sist = ms;
+          F.vantar = true;
+          efter.port2.postMessage(0);
+        }
         rorelse();
         F.raf = requestAnimationFrame(tick);
       };

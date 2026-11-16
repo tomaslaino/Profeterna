@@ -580,7 +580,24 @@ function skoldarLag() {
       }
     }
   }
+  // (bara när spelprogrammen finns: utan dem hämtas inga sköldar alls, som förut)
+  if (byId.size) for (const t of helgarderatsLag()) if (!byId.has(t.espnId)) byId.set(t.espnId, t);
   return byId;
+}
+
+// Lagen i Helgarderats nummer som inte står i spelprogrammen (2026-11-16, användarens önskemål: "Gör sköldar för de
+// spanska klubbarna också", Eibar, Cádiz, Granada och Las Palmas i Europatipset): ett handskrivet matchblad har
+// lagens ESPN-id i lagId, i samma ordning som lag, och skölden står under lagets namn på bladet.
+// → [{espnId, name}]
+function helgarderatsLag() {
+  let ps = null;
+  try {
+    ps = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'poddsidor.json'), 'utf8'));
+  } catch {
+    return [];
+  }
+  return ((ps && ps.sidor) || []).flatMap((s) => (Array.isArray(s.lagId) && Array.isArray(s.lag)
+    ? s.lagId.map((id, i) => (id && s.lag[i] ? { espnId: String(id), name: String(s.lag[i]) } : null)).filter(Boolean) : []));
 }
 
 async function hamtaSkoldar(byId) {

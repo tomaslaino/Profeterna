@@ -339,6 +339,14 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 .rum-hv { position: absolute; left: 0; top: 0; width: 1600px; height: 1000px; perspective: 1000px; perspective-origin: 760px 400px; }
 .rum-skar, .rum-kork { position: absolute; left: 1140px; display: block; transform-origin: 0 0; box-sizing: border-box; }
+/* Ramarna i 3D (wallRing i rum-inredning.js) går från tavlans plan in till väggen (WX 1156, korktavlan
+   15 djup och Tipsligan 4) och sticker ut en bit runt den: närmast betraktaren syns ramens sida till höger
+   om tavlan, och den var en lucka man inte kunde klicka i. Ytan bakom innehållet (z-index -1, så att
+   kupongerna på korktavlan går att klicka på nära) räcker dit, i tavlans plan. */
+.rum-skar::after, .rum-kork::after { content: ""; position: absolute; z-index: -1; inset: -3px -10px -3px -3px; }
+.rum-kork::after { right: -27px; }
+/* (där korktavlans sida går in bakom Tipsligans ram är det Tipsligan som syns, och klicket går dit) */
+.rum-skar { z-index: 1; }
 /* svart filt med spår var 9,6:e px i en aluminiumram; bokstäverna (b) står i spåren.
    Tipsligan: rubriken, ett tomt spår och de tre i gänget – fem spår, med lika mycket
    filt över det första spåret som under det sista. Tävlar fyra (Hasse Backe) går det

@@ -518,7 +518,8 @@ window.Rum = (() => {
       `<polygon points="${x0},${r1(at(x0, yb) - 0.6)} ${x1},${r1(at(x1, yb) - 0.8)} ${x1},${r1(at(x1, yb) + 0.6)} ${x0},${r1(at(x0, yb) + 0.5)}" fill="#d9d2c0" opacity=".3"/>` +
       // pallen som det bakre ledet står på, med damm på kanten
       (led === 2 ? `<polygon points="${yta(yb - bak, yb)}" fill="#2d231a"/><polygon points="${yta(yb - bak, yb - bak + 0.8)}" fill="#d9d2c0" opacity=".22"/>` : '')).join('') +
-      hit(x0, x1, Math.min(...hyllor) - (led === 2 ? bak : 0) - 36, POKAL.yb + 6, cups);
+      // (ytan går ner över hela hyllkanten, 8 under hyllan i shelf)
+      hit(x0, x1, Math.min(...hyllor) - (led === 2 ? bak : 0) - 36, POKAL.yb + 9, cups);
   }
 
   // ---------- lagren ----------
@@ -4150,6 +4151,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const f = RumFasad.bygg(R.el, {
       // (medan rummet syns, i övergången, ritas gänget tillbaka inifrån direkt efter)
       gang: (duk) => R.fig && R.fig.utifran ? R.fig.utifran(duk, now(), neonOn(now()), !R.vilar) : false,
+      // (lika ofta som gänget ritas inne, KVAL)
+      takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
       calm: () => RORELSE_AV.matches,
@@ -4444,7 +4447,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (on) aimVideo(calm() ? null : 'glid');
     else {
       aim([800, 500], 1, [800, 500], calm() ? null : 'glid');
-      lyft([800, 500], 1, [800, 500], calm() ? null : 'glid');
+      lyftHornet([800, 500], 1, [800, 500], calm() ? null : 'glid');
     }
     // (ovanpå rummet tills det har kommit hem igen)
     if (on) R.el.classList.add('vid-lyft');
@@ -4454,8 +4457,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // hamnar på to med förstoringen z, samma väg som kameran går till tv:n
   // (zoomVag), på samma tid som kameran och tv:n och lådan svänger (.vhs-kam).
   // När det är hemma igen ligger det i rummet igen, under det som står
-  // framför (vid-lyft).
-  function lyft(p, z, to, cls) {
+  // framför (vid-lyft). (Hette först lyft, som tidningens funktion ovan: den
+  // senare tog över namnet, och tidningen gick inte att öppna, 2026-11-16.)
+  function lyftHornet(p, z, to, cls) {
     const w = document.getElementById('rum-lyft');
     if (!w) return;
     const dx = r1(to[0] - 800 - z * (p[0] - 800));
@@ -4501,7 +4505,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!f.fyll || !R.vrum) R.vrum = { p, z: Math.min(VID_RUM, z), to: [p[0] + (to[0] - p[0]) / 2, p[1] + (to[1] - p[1]) / 2] };
     const r = R.vrum;
     aim(r.p, r.z, r.to, cls);
-    lyft(p, z / r.z, [r.p[0] + (to[0] - r.to[0]) / r.z, r.p[1] + (to[1] - r.to[1]) / r.z], cls);
+    lyftHornet(p, z / r.z, [r.p[0] + (to[0] - r.to[0]) / r.z, r.p[1] + (to[1] - r.to[1]) / r.z], cls);
     // Draperiet: över det som syns av scenen hemma och när kameran är framme,
     // ljusast mitt i fönstret där. Det ritas i en åttondel av storleken och
     // förstoras (VMORK): Safari ritar ett lager i sin egen storlek gånger
@@ -6502,11 +6506,20 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.tecknaT = setTimeout(() => { if (R.on) frame(); }, 2300);
   }
 
+  // Saken under t: länken (sel), eller den saken som t är en del av (.rum-del, bredvid länken i
+  // samma låda: tv:ns sidor, kåpa och hylla i rum-tv.js). Också i rum-folk.js.
+  function sakVid(t, sel) {
+    const a = t.closest(sel);
+    if (a) return a;
+    const d = t.closest('.rum-del');
+    return d && d.parentElement.querySelector(`:scope > :is(${sel})`);
+  }
+
   function wire() {
     const el = R.el;
     swipe(el);
     el.addEventListener('mouseover', (e) => {
-      const a = !R.kup && e.target.closest('.rum-sak, .rum-tag');
+      const a = !R.kup && sakVid(e.target, '.rum-sak, .rum-tag');
       hot(a ? a.dataset.nav : null);
       if (a && a.id === 'rum-helgarderat') forberedTidning();
     });
@@ -6569,7 +6582,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (!openCoupon()) sak('kupong');
         return;
       }
-      const a = e.target.closest('.rum-sak');
+      const a = sakVid(e.target, '.rum-sak');
       if (a && el.contains(a)) go(a, e);
       else if (R.zoom && !e.target.closest('.rum-hdr, .rum-ft')) zoomTv(false);
       // där inget går att klicka: du är ingen igen

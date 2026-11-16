@@ -262,7 +262,10 @@ window.RumFolk = (() => {
     if (!f || !f.under || !c || F.o.nara()) return null;
     const r = c.getBoundingClientRect();
     if (x < r.left || x > r.right || y < r.top || y > r.bottom) return null;
-    return f.under(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1));
+    // (med en sak under pekaren går klicket till den där gänget inte syns: mot figurernas form, inte
+    // deras delars lådor, som är större – under i rum-3d.js)
+    const exakt = Boolean(mal && mal.closest && sakVid(mal));
+    return f.under(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1), exakt);
   }
   // Ett klick på någon i gänget (k: dl, dt, dj): du är den som fyller i
   // kupongen. Går medan omgången är öppen och hen inte har lämnat in – och
@@ -359,9 +362,18 @@ window.RumFolk = (() => {
     if (f && f.spegel && F.o) f.spegel(null, 0, 0, F.o.now());
   }
 
+  // Saken under t: länken, eller den saken som t är en del av (.rum-del: tv:ns sidor, kåpa och
+  // hylla, sakVid i rum.js)
+  function sakVid(t) {
+    const a = t.closest('.rum-sak, .rum-tag');
+    if (a) return a;
+    const d = t.closest('.rum-del');
+    return d && d.parentElement.querySelector(':scope > :is(.rum-sak, .rum-tag)');
+  }
+
   function wire(el) {
     el.addEventListener('mouseover', (e) => {
-      const a = e.target.closest('.rum-sak, .rum-tag');
+      const a = sakVid(e.target);
       F.over = a ? nyckel(a) : null;
       egen();
     });
@@ -380,7 +392,7 @@ window.RumFolk = (() => {
       const k = vemUnder(e.clientX, e.clientY, e.target);
       // (radion på fönsterbänken: handen sitter på #rum-radio, rum-radio.css)
       pa(k === 'radio' ? null : k);
-      markor(k && k !== 'radio' ? e.target.closest('.rum-sak, .rum-tag') : null);
+      markor(k && k !== 'radio' ? sakVid(e.target) : null);
     });
     el.addEventListener('mouseleave', () => {
       F.over = null;
