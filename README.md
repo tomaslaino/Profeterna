@@ -9220,6 +9220,19 @@ funktionerna ur rum-hasse.js och påhittade data (hur ofta namnet kommer, felnam
 namn sägs när kupongen inte vet vem du är) och att sidan laddar utan fel i headless Chromium; inte i hela rummet med en
 riktig omgång.
 
+**Hur många rätt han hade** (2026-11-16, användarens önskemål, om *Jag hade åtta rätt av tio.*: "Han säger det här varje
+gång. Kan du ge honom lite Hasse Backe-varianter"). Raden lottas nu bland fjorton sätt att säga det, torrt som en tränare
+på presskonferens (*Rent krasst blev det åtta rätt av tio.*, *Summa summarum blev det åtta rätt av tio.*, *När röken har
+lagt sig står det åtta rätt av tio.*, *Facit säger åtta rätt av tio, om man tror på det.*). Varje rad passar lika bra efter
+en bra som en dålig omgång, eftersom det han säger sedan avgör tonen. Alla rätt och inga rätt har egna rader från två
+matcher (*Det blev fullt hus, tio rätt av tio.*, *I protokollet står det en rund nolla.*), och raderna för bra, mitten och
+dåligt har fått några tränarfraser till (*Strukturen höll hela vägen.*, *Nu nollställer jag och tar nästa omgång.*).
+Raderna står under `efter.ratt`, `efter.rattAlla` och `efter.rattNoll` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) (valet i `efterat` i [public/rum-hasse.js](public/rum-hasse.js)),
+och `npm run repliker` säger till om en rad inte ryms på två rader ovanför listan med de längsta talen (56 tecken med
+*tretton rätt av tretton*). Rösten får ungefär 1 200 nya meningar, eftersom varje rad sägs med alla tal från en till
+tretton matcher; iMacen läser in dem under ungefär tio timmar, och till dess sägs de nya raderna tyst.
+
 **Radion och klockan** (2026-11-09). Radion på fönsterbänken hörs också hos honom, och står den på en station säger han
 något om den en gång (per station och besök på sidan) i stället för nästa rad han säger medan han väntar, och nickar med
 (*Italodisco är bra musik att tippa till.*, *På talkSPORT har de inte förstått sin egen liga.*); mellan stationerna säger
