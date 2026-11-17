@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:06:36.450Z",
+ "uppdaterad": "2026-11-17T17:19:04.911Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3235,6 +3235,648 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-15T19:48:27.995Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879238",
+   "match": "AFC Bournemouth – Nottingham Forest",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:13:24.826Z",
+   "text": "Rose kommer med åtta raka och Forest med Glasner\n\nBournemouth tar emot Nottingham Forest på Vitality Stadium med åtta raka segrar bakom sig under Marco Rose. Forest har just slagit Manchester City med 3–1, och efter den matchen talade Oliver Glasner om en energi han inte trodde fanns på City Ground.\n\nUnder Marco Rose har Bournemouth blivit ett lag som vinner även när det blir trångt. Vid 2–1 borta mot Ipswich gjorde Evanilson mål för femte ligamatchen i rad. Han rullade in bollen i ett tomt mål efter att Christian Walton tappat den, och Ryan Christies skott tog vägen via Leif Davis. Det var lagets åttonde raka seger, och enligt Southern Gazette [1] förklarade Rose den så här: ”We stick together, have good balance in our game, defend together, suffer, and press well.” Han nämner alltså att lida före att pressa, och det tycker jag om. Ett lag som klarar av att lida har gjort sin uppvärmning ordentligt, och det ser du redan på uppvärmningen.\n\nForest har haft en tyngre höst, men mot Manchester City hände något. Liam Delap gjorde två mål, laget ledde med 2–0 i halvlek och lämnade nedflyttningsstrecket på nio poäng. Enligt TimesLIVE [2] sade Glasner efteråt att ”the energy in the team and at the City Ground was so incredible”. Samtidigt har Forest bara gjort 9 mål på tio ligamatcher, och de har blivit utan mål i hälften av dem. Det är långt under vad chanserna borde ha gett. Det där löser man med en hink bollar, gärna en tisdagskväll när ingen ser på.\n\nMötena de senaste säsongerna har för det mesta slutat jämnt, med en enda stor avvikelse. Bournemouth vann 5–0 hemma i januari 2025, men sedan dess har det blivit 2–0 och 1–1. På Forests sida är Nicolò Savona och Nicolás Domínguez borta, och Neco Williams och Xaver Schlager är tveksamma. Hos Bournemouth saknas Álex Jiménez Sánchez, Alex Tóth och två mittbackar till.\n\nTipset: 1 (Ganska säker)\n\nPrognosen ger hemmalaget drygt hälften av chansen, och det stämmer med vad jag har läst. Rose har ett lag som enligt honom själv försvarar tillsammans och pressar bra [1], och Evanilson gör mål varje vecka [1]. Forests seger mot City var på riktigt [2], men en enda kväll ändrar inte att laget har svårt att göra mål. Det enda som oroar mig är Europa League, men det är Forest som får spela i mitten av veckan efter den här matchen. Bollen har aldrig läst en tabell, men den här gången tänker jag inte gå emot den. Jag ringar in en etta.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Rose kommer med åtta raka och Forest med Glasner",
+   "lead": "Bournemouth tar emot Nottingham Forest på Vitality Stadium med åtta raka segrar bakom sig under Marco Rose. Forest har just slagit Manchester City med 3–1, och efter den matchen talade Oliver Glasner om en energi han inte trodde fanns på City Ground.",
+   "paragraphs": [
+    "Under Marco Rose har Bournemouth blivit ett lag som vinner även när det blir trångt. Vid 2–1 borta mot Ipswich gjorde Evanilson mål för femte ligamatchen i rad. Han rullade in bollen i ett tomt mål efter att Christian Walton tappat den, och Ryan Christies skott tog vägen via Leif Davis. Det var lagets åttonde raka seger, och enligt Southern Gazette [1] förklarade Rose den så här: ”We stick together, have good balance in our game, defend together, suffer, and press well.” Han nämner alltså att lida före att pressa, och det tycker jag om. Ett lag som klarar av att lida har gjort sin uppvärmning ordentligt, och det ser du redan på uppvärmningen.",
+    "Forest har haft en tyngre höst, men mot Manchester City hände något. Liam Delap gjorde två mål, laget ledde med 2–0 i halvlek och lämnade nedflyttningsstrecket på nio poäng. Enligt TimesLIVE [2] sade Glasner efteråt att ”the energy in the team and at the City Ground was so incredible”. Samtidigt har Forest bara gjort 9 mål på tio ligamatcher, och de har blivit utan mål i hälften av dem. Det är långt under vad chanserna borde ha gett. Det där löser man med en hink bollar, gärna en tisdagskväll när ingen ser på.",
+    "Mötena de senaste säsongerna har för det mesta slutat jämnt, med en enda stor avvikelse. Bournemouth vann 5–0 hemma i januari 2025, men sedan dess har det blivit 2–0 och 1–1. På Forests sida är Nicolò Savona och Nicolás Domínguez borta, och Neco Williams och Xaver Schlager är tveksamma. Hos Bournemouth saknas Álex Jiménez Sánchez, Alex Tóth och två mittbackar till."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Southern Gazette",
+     "title": "Bournemouth Extend Winning Streak to Eight With Hard-Fought Victory Over Ipswich Town",
+     "url": "https://southerngazette-fkgxhbhybnave9bz.uksouth-01.azurewebsites.net/breaking-news/ipswich-bournemouth-premier-league-win/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "TimesLIVE",
+     "title": "2026 11 08 maresca says man city failed to match forests intensity",
+     "url": "https://www.timeslive.co.za/sport/soccer/2026-11-08-maresca-says-man-city-failed-to-match-forests-intensity/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger hemmalaget drygt hälften av chansen, och det stämmer med vad jag har läst. Rose har ett lag som enligt honom själv försvarar tillsammans och pressar bra [1], och Evanilson gör mål varje vecka [1]. Forests seger mot City var på riktigt [2], men en enda kväll ändrar inte att laget har svårt att göra mål. Det enda som oroar mig är Europa League, men det är Forest som får spela i mitten av veckan efter den här matchen. Bollen har aldrig läst en tabell, men den här gången tänker jag inte gå emot den. Jag ringar in en etta.",
+    "signs": [
+     0
+    ],
+    "note": "Ganska säker",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Southern Gazette",
+      "title": "Bournemouth Extend Winning Streak to Eight With Hard-Fought Victory Over Ipswich Town",
+      "url": "https://southerngazette-fkgxhbhybnave9bz.uksouth-01.azurewebsites.net/breaking-news/ipswich-bournemouth-premier-league-win/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "TimesLIVE",
+      "title": "2026 11 08 maresca says man city failed to match forests intensity",
+      "url": "https://www.timeslive.co.za/sport/soccer/2026-11-08-maresca-says-man-city-failed-to-match-forests-intensity/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:13:24.826Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Bournemouth har vunnit åtta raka under Marco Rose, och laget försvarar tillsammans, lider när det behövs och pressar bra. Vinner man bollen högt blir det transisiones, och då går det fort, Evanilson står där och väntar … Ursäkta. Back to basis.",
+     "Forest har gjort 9 mål på tio ligamatcher och har inte gjort mål alls i hälften av dem. Segern mot City var på riktigt, men en bra kväll gör inte ett lag farligt framåt. Bournemouth saknar visserligen två mittbackar, men det spelar mindre roll när motståndaren har så svårt att göra mål. Evanilson har däremot gjort mål i fem raka ligamatcher. Det är orsak och verkan.",
+     "Jag ringar in en etta och står för den."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-17T17:13:24.826Z",
+    "uppdrag": {
+     "fraser": [
+      "Total kontroll",
+      "Orsak och verkan"
+     ],
+     "krydda": null,
+     "bielsa": [
+      "transisiones"
+     ],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:13:41.312Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401878756",
+   "match": "Aston Villa – Sunderland",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:11:40.953Z",
+   "text": "Villa ledde med två mål och fick ändå jobba\n\nAston Villa ledde med 4–2 på Old Trafford när ordinarie tid var slut och åkte hem med en poäng. Sunderland vann i stället mot Chelsea på en straff och lämnade jumboplatsen. På lördag möts två lag som båda har något att reda ut på Villa Park.\n\nUnai Emery gick in i tunneln före slutsignalen i Manchester, och efteråt var han inte svår att förstå. ”We are disappointed, frustrated because in minute 90 we are winning 2-4”, sa han enligt Sports Mole [1]. United kvitterade med två mål i tilläggstiden, och sedan segern mot Manchester City har Villa inte vunnit en match. Under den tiden har laget släppt in elva mål [1]. ”We threw it away”, sa John McGinn, och han tillade att ”the last five minutes were just madness” [2]. Ett lag som leder med två mål ska stänga butiken och försvara sin egen straffområdeslinje. Det där löser man med en hink bollar och en lång torsdag.\n\nSunderland vann sin första ligamatch sedan augusti när Enzo Le Fée satte en straff i 36:e minuten mot Chelsea [3]. Brian Brobbey drog på sig straffen, och Granit Xhaka fick kliva av redan i inledningen [3, 4]. Regis Le Bris gjorde åtta byten jämfört med förlusten mot Dinamo Zagreb [3]. Han är pressad, men efteråt talade han om läktarna: ”But today, the connection was perfect” [4]. Borta har Sunderland bara tagit en poäng på fem matcher och gjort minst mål av de två lagen. Mot Chelsea höll laget ändå undan en hel andra halvlek. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som står rätt när motståndarna slår in sina inlägg.\n\nTipset: 1X (ettan väger tyngst)\n\nSajtens prognos tror mer på Villa än spelbolaget gör, och det stämmer med att Sunderland gör få mål och nästan aldrig tar poäng på bortaplan. Men prognosen ser bara mål och tabell. Den ser inte att Villa har släppt in elva mål sedan segern mot City [1], eller att Champions League väntar tre dagar senare. Sunderland visade mot Chelsea att laget kan hålla en ledning [2], men Xhaka är tveksam efter att ha klivit av tidigt [3]. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Villa ledde med två mål och fick ändå jobba",
+   "lead": "Aston Villa ledde med 4–2 på Old Trafford när ordinarie tid var slut och åkte hem med en poäng. Sunderland vann i stället mot Chelsea på en straff och lämnade jumboplatsen. På lördag möts två lag som båda har något att reda ut på Villa Park.",
+   "paragraphs": [
+    "Unai Emery gick in i tunneln före slutsignalen i Manchester, och efteråt var han inte svår att förstå. ”We are disappointed, frustrated because in minute 90 we are winning 2-4”, sa han enligt Sports Mole [1]. United kvitterade med två mål i tilläggstiden, och sedan segern mot Manchester City har Villa inte vunnit en match. Under den tiden har laget släppt in elva mål [1]. ”We threw it away”, sa John McGinn, och han tillade att ”the last five minutes were just madness” [2]. Ett lag som leder med två mål ska stänga butiken och försvara sin egen straffområdeslinje. Det där löser man med en hink bollar och en lång torsdag.",
+    "Sunderland vann sin första ligamatch sedan augusti när Enzo Le Fée satte en straff i 36:e minuten mot Chelsea [3]. Brian Brobbey drog på sig straffen, och Granit Xhaka fick kliva av redan i inledningen [3, 4]. Regis Le Bris gjorde åtta byten jämfört med förlusten mot Dinamo Zagreb [3]. Han är pressad, men efteråt talade han om läktarna: ”But today, the connection was perfect” [4]. Borta har Sunderland bara tagit en poäng på fem matcher och gjort minst mål av de två lagen. Mot Chelsea höll laget ändå undan en hel andra halvlek. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som står rätt när motståndarna slår in sina inlägg."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sports Mole",
+     "title": "Premier League Gameweek 10",
+     "url": "https://www.sportsmole.co.uk/football/aston-villa/news/emery-defends-storming-from-old-trafford-after-villa-capitulation_608742.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "SoccerNews",
+     "title": "‘We threw it away’ – McGinn fumes at Villa’s late Old Trafford collapse",
+     "url": "https://www.soccernews.com/we-threw-it-away-mcginn-fumes-at-villas-late-old-trafford-collapse/407835/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "ESPN",
+     "title": "Sunderland 1-0 Chelsea (Nov 8, 2026) Game Analysis",
+     "url": "https://www.espn.com/soccer/report/_/gameId/401879239",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "Sky Sports",
+     "title": "Sunderland 1-0 Chelsea: Enzo Le Fee's penalty lifts Black Cats off bottom of table as Xabi Alonso's side show more inconsistency",
+     "url": "https://www.skysports.com/football/sunderland-vs-chelsea/6275693211850041232",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos tror mer på Villa än spelbolaget gör, och det stämmer med att Sunderland gör få mål och nästan aldrig tar poäng på bortaplan. Men prognosen ser bara mål och tabell. Den ser inte att Villa har släppt in elva mål sedan segern mot City [1], eller att Champions League väntar tre dagar senare. Sunderland visade mot Chelsea att laget kan hålla en ledning [2], men Xhaka är tveksam efter att ha klivit av tidigt [3]. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "ettan väger tyngst",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Mole",
+      "title": "Premier League Gameweek 10",
+      "url": "https://www.sportsmole.co.uk/football/aston-villa/news/emery-defends-storming-from-old-trafford-after-villa-capitulation_608742.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "ESPN",
+      "title": "Sunderland 1-0 Chelsea (Nov 8, 2026) Game Analysis",
+      "url": "https://www.espn.com/soccer/report/_/gameId/401879239",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "Sky Sports",
+      "title": "Sunderland 1-0 Chelsea: Enzo Le Fee's penalty lifts Black Cats off bottom of table as Xabi Alonso's side show more inconsistency",
+      "url": "https://www.skysports.com/football/sunderland-vs-chelsea/6275693211850041232",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:11:40.953Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Aston Villa ledde med 4–2 på Old Trafford när ordinarie tid var slut och åkte hem med en poäng. Sedan segern mot City har laget släppt in elva mål. Det är dålig organisation i slutet av matcher, och det går att träna bort. Men ett lag som släpper in så mycket kommer att släppa in något här också.",
+     "Sunderland har bara tagit en poäng på fem bortamatcher och gör färre mål än Villa. Segern mot Chelsea kom på en straff och en andra halvlek med alla man bakom bollen. Det räcker inte på Villa Park, i synnerhet om Xhaka inte kan spela. Villa gör ett mål mer än de släpper in, och jag ringar in en etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-17T17:11:40.953Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Äsch"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:11:48.786Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
+  },
+  {
+   "id": "401880160",
+   "match": "Bolton Wanderers – Portsmouth",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:16:05.339Z",
+   "text": "Bolton har haft två veckor att börja om\n\nBolton gick in i landslagsuppehållet med en ledning som försvann direkt efter pausen på Pride Park. Portsmouth förlorade sin senaste match hemma mot Stoke. Nu har båda lagen haft två veckor på sig, och på lördag möts de i Bolton.\n\nDet som stör mig mest med Bolton är vad som hände på Pride Park. Ruben Rodrigues gav laget ledningen strax före paus, och mindre än en minut efter omstarten hade Ryan Nyambe kvitterat, skriver Bolton News [1]. Sedan gjorde Jack Robinson 2–1, och Rhian Brewster gjorde 3–1 efter ett misstag av Gaizka Larrazabal. Tränaren Steven Schumacher var lika tydlig som jag hade varit. ”Vi följer inte med löparna och vi vinner inte första och andra bollen i vår egen straffområde”, sa han, och han kallade det en självdestruktiv match, ”för fram till dess var vi det bättre laget” [1]. Hur man kommer ut efter pausen är något man tränar. Det tar vi på torsdagsträningen.\n\nHemma har det gått tungt för Bolton i höst. Laget har två segrar och fem förluster på Toughsheet, och i de två senaste hemmamatcherna har det släppt in åtta mål mot Middlesbrough och Bristol City. Skotten säger ungefär samma sak, för laget släpper till nästan två förväntade mål per match.\n\nPortsmouth är ett jämnare lag men inget lag som gör många mål. Det har gjort mål som det släpper in, ungefär ett i matchen, och hittills har det gjort lite drygt två mål fler än chanserna borde ha gett. Den sortens tur brukar ta slut förr eller senare. Senast förlorade laget med 1–2 hemma mot Stoke. Ändå var mötet med Bolton i april 2024 jämnt och slutade 1–1. Bollen har aldrig läst en tabell.\n\nTipset: X2 (knappt men tydligt)\n\nSajtens prognos ser lagen som nästan jämnstarka. Hemmaplanen drar mot Bolton, men lagets dåliga försvar drar tillbaka. Spelbolagen tror lite mer på Portsmouth. Jag tror inte särskilt mycket på Bolton som hemmalag när det har förlorat fem av sju hemmamatcher och, med Schumachers egna ord, inte vinner första och andra bollen i sitt straffområde [1]. Portsmouth har haft mer tur framför mål än det borde, men laget släpper in få mål. Det troligaste resultatet är 1–1. Därför ringar jag in oavgjort och bortaseger.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Bolton har haft två veckor att börja om",
+   "lead": "Bolton gick in i landslagsuppehållet med en ledning som försvann direkt efter pausen på Pride Park. Portsmouth förlorade sin senaste match hemma mot Stoke. Nu har båda lagen haft två veckor på sig, och på lördag möts de i Bolton.",
+   "paragraphs": [
+    "Det som stör mig mest med Bolton är vad som hände på Pride Park. Ruben Rodrigues gav laget ledningen strax före paus, och mindre än en minut efter omstarten hade Ryan Nyambe kvitterat, skriver Bolton News [1]. Sedan gjorde Jack Robinson 2–1, och Rhian Brewster gjorde 3–1 efter ett misstag av Gaizka Larrazabal. Tränaren Steven Schumacher var lika tydlig som jag hade varit. ”Vi följer inte med löparna och vi vinner inte första och andra bollen i vår egen straffområde”, sa han, och han kallade det en självdestruktiv match, ”för fram till dess var vi det bättre laget” [1]. Hur man kommer ut efter pausen är något man tränar. Det tar vi på torsdagsträningen.",
+    "Hemma har det gått tungt för Bolton i höst. Laget har två segrar och fem förluster på Toughsheet, och i de två senaste hemmamatcherna har det släppt in åtta mål mot Middlesbrough och Bristol City. Skotten säger ungefär samma sak, för laget släpper till nästan två förväntade mål per match.",
+    "Portsmouth är ett jämnare lag men inget lag som gör många mål. Det har gjort mål som det släpper in, ungefär ett i matchen, och hittills har det gjort lite drygt två mål fler än chanserna borde ha gett. Den sortens tur brukar ta slut förr eller senare. Senast förlorade laget med 1–2 hemma mot Stoke. Ändå var mötet med Bolton i april 2024 jämnt och slutade 1–1. Bollen har aldrig läst en tabell."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Bolton News via Yahoo Sports",
+     "title": "MATCH REACTION",
+     "url": "https://uk.sports.yahoo.com/news/match-reaction-steven-schumacher-wanderers-225131613.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos ser lagen som nästan jämnstarka. Hemmaplanen drar mot Bolton, men lagets dåliga försvar drar tillbaka. Spelbolagen tror lite mer på Portsmouth. Jag tror inte särskilt mycket på Bolton som hemmalag när det har förlorat fem av sju hemmamatcher och, med Schumachers egna ord, inte vinner första och andra bollen i sitt straffområde [1]. Portsmouth har haft mer tur framför mål än det borde, men laget släpper in få mål. Det troligaste resultatet är 1–1. Därför ringar jag in oavgjort och bortaseger.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "knappt men tydligt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Bolton News via Yahoo Sports",
+      "title": "MATCH REACTION",
+      "url": "https://uk.sports.yahoo.com/news/match-reaction-steven-schumacher-wanderers-225131613.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:16:05.339Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Bolton ledde på Pride Park vid paus och släppte in kvitteringen direkt efter omstarten. Sedan rann hela matchen iväg. Tränaren sa själv att laget inte följer med löparna och inte vinner första och andra bollen i sitt eget straffområde. Det handlar om organisation, och sånt sitter inte rätt efter två veckors uppehåll.",
+     "Hemma har Bolton förlorat fem av sju matcher, och i de två senaste hemmamatcherna släppte laget in åtta mål. Portsmouth gör inte många mål, men laget släpper inte heller in många. Mot ett lag som ger bort så mycket i sitt eget straffområde räcker det gott.",
+     "Spelbolagen har rätt den här gången, och jag behöver inget kryss för att sova gott. Så är det bara. Jag ringar in en tvåa."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
+    "tips": "2026-11-17T17:16:05.339Z",
+    "uppdrag": {
+     "fraser": [
+      "Så är det bara",
+      "Det är lugnt"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:16:53.333Z",
+    "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879236",
+   "match": "Chelsea – Leeds United",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:07:43.002Z",
+   "text": "Leeds kommer till Bridge med nio insläppta mål\n\nFörra gången Leeds besökte Stamford Bridge blev det nio mål i ligacupen. Nu kommer Daniel Farkes lag tillbaka med ligans snålaste försvar i bagaget, och Xabi Alonso har just sagt högt att hans Chelsea inte vet hur man tar sig igenom en mur.\n\nEfter förlusten med 0–1 mot Sunderland var Xabi Alonso ovanligt rak. ”Mot ett lågt försvar skapade vi inte tillräckligt med chanser”, sa han enligt The Leeds Press [1], och han lade till att laget saknade ”lite snabbhet med bollen, lite tålamod”. Om det mesta annat på fotbollsplanen kan man tycka olika, men en mur bryter man med passningar i två tillslag och folk som rör sig utan boll. Det där löser man med en hink bollar.\n\nLeeds har just en sådan mur. På tio ligamatcher har de bara släppt in åtta mål och hållit nollan fyra gånger. Den långa raden utan seger bröts mot Tottenham när Noah Okafor byttes in i 77:e minuten och gjorde matchens enda mål två minuter senare. Det berättar The False 9 [2], som också skriver att läkarna inte lät honom spela mer än 15 till 20 minuter. I samma artikel säger målvakten James Trafford att han vill bli Englands förstemålvakt: ”It's my aim and it's something I've always dreamed of.” Anton Stach är fortfarande osäker med sin fotskada.\n\nSiffrorna från september ser alltså lite märkliga ut. Inför cupmötet hade Chelsea gått obesegrade genom nio hemmamatcher mot Leeds, med sju segrar och två oavgjorda, skriver 101 Great Goals [3]. Sedan vann de med 6–3. Bollen har aldrig läst en tabell. Chelsea saknar dessutom João Pedro, Reece James och Lacroix, och Alonso vill inte ta några risker med Martínez i målet.\n\nTipset: 1X (Krysset ligger nära)\n\nSajtens prognos ger Chelsea oddset 1,85, och spelbolaget ligger nästan exakt där. Det troligaste resultatet är ändå 1–1. Prognosen räknar bara med mål och tabelläge, men den vet inget om att Alonso själv säger att laget saknar tålamod mot djupa försvar [1], eller att Leeds sällan släpper in mål. Chelsea saknar dessutom João Pedro framtill. Jag tror inte att Leeds vinner på Bridge, men jag ser gott om utrymme för att Chelsea aldrig får hål på muren. Därför ringar jag in hemmaseger och oavgjort.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Leeds kommer till Bridge med nio insläppta mål",
+   "lead": "Förra gången Leeds besökte Stamford Bridge blev det nio mål i ligacupen. Nu kommer Daniel Farkes lag tillbaka med ligans snålaste försvar i bagaget, och Xabi Alonso har just sagt högt att hans Chelsea inte vet hur man tar sig igenom en mur.",
+   "paragraphs": [
+    "Efter förlusten med 0–1 mot Sunderland var Xabi Alonso ovanligt rak. ”Mot ett lågt försvar skapade vi inte tillräckligt med chanser”, sa han enligt The Leeds Press [1], och han lade till att laget saknade ”lite snabbhet med bollen, lite tålamod”. Om det mesta annat på fotbollsplanen kan man tycka olika, men en mur bryter man med passningar i två tillslag och folk som rör sig utan boll. Det där löser man med en hink bollar.",
+    "Leeds har just en sådan mur. På tio ligamatcher har de bara släppt in åtta mål och hållit nollan fyra gånger. Den långa raden utan seger bröts mot Tottenham när Noah Okafor byttes in i 77:e minuten och gjorde matchens enda mål två minuter senare. Det berättar The False 9 [2], som också skriver att läkarna inte lät honom spela mer än 15 till 20 minuter. I samma artikel säger målvakten James Trafford att han vill bli Englands förstemålvakt: ”It's my aim and it's something I've always dreamed of.” Anton Stach är fortfarande osäker med sin fotskada.",
+    "Siffrorna från september ser alltså lite märkliga ut. Inför cupmötet hade Chelsea gått obesegrade genom nio hemmamatcher mot Leeds, med sju segrar och två oavgjorda, skriver 101 Great Goals [3]. Sedan vann de med 6–3. Bollen har aldrig läst en tabell. Chelsea saknar dessutom João Pedro, Reece James och Lacroix, och Alonso vill inte ta några risker med Martínez i målet."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The Leeds Press",
+     "title": "Xabi Alonso admits Chelsea weakness ahead of Leeds United clash",
+     "url": "https://www.theleedspress.com/xabi-alonso-admits-chelsea-weakness-ahead-of-leeds-united-clash-54673",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "The False 9",
+     "title": "Leeds United News Today: Okafor Winner, Trafford Interview and Chelsea Trip (8 November)",
+     "url": "https://thefalse9.com/2026/11/leeds-news-today-8-november-2026.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "101 Great Goals",
+     "title": "Chelsea v Leeds: Preview, expected line-ups, stats and where to watch",
+     "url": "https://www.101greatgoals.com/?p=209969",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos ger Chelsea oddset 1,85, och spelbolaget ligger nästan exakt där. Det troligaste resultatet är ändå 1–1. Prognosen räknar bara med mål och tabelläge, men den vet inget om att Alonso själv säger att laget saknar tålamod mot djupa försvar [1], eller att Leeds sällan släpper in mål. Chelsea saknar dessutom João Pedro framtill. Jag tror inte att Leeds vinner på Bridge, men jag ser gott om utrymme för att Chelsea aldrig får hål på muren. Därför ringar jag in hemmaseger och oavgjort.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Krysset ligger nära",
+    "sources": [
+     {
+      "n": 1,
+      "source": "The Leeds Press",
+      "title": "Xabi Alonso admits Chelsea weakness ahead of Leeds United clash",
+      "url": "https://www.theleedspress.com/xabi-alonso-admits-chelsea-weakness-ahead-of-leeds-united-clash-54673",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:07:43.002Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Chelsea förlorade senast mot Sunderland, och tränaren sa själv efteråt att laget inte skapar tillräckligt med chanser mot ett lågt försvar. Nu kommer Leeds, som bara har släppt in åtta mål på tio ligamatcher. Där har ni orsak och verkan, så är det bara.",
+     "Chelsea saknar dessutom João Pedro framtill, och Reece James och Lacroix är också borta. Leeds står kompakt och väntar på sitt läge, och de har Okafor att sätta in sent, han som avgjorde mot Tottenham två minuter efter att han kommit in. Favoriten har redan räknat in segern. Här höjer jag ett varningens finger.",
+     "Alla andra minns när Chelsea slog Leeds med 6–3 i ligacupen och har missat hur Leeds försvarar i dag. Jag ringar in tvåan, och bara tvåan, och det gör jag jävligt lugnt."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–1",
+    "tips": "2026-11-17T17:07:43.002Z",
+    "uppdrag": {
+     "fraser": [
+      "Så är det bara",
+      "Här höjer jag ett varningens finger"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": {
+      "tecken": 2,
+      "favorit": 0,
+      "lag": "Leeds United",
+      "mot": "Chelsea",
+      "odds": 3.9,
+      "favoritOdds": 1.87,
+      "rad": "Favoriten har redan räknat in segern."
+     }
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:08:15.221Z",
+    "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879235",
+   "match": "Coventry City – Crystal Palace",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:14:48.198Z",
+   "text": "Bottenlaget kommer till Coventry utan sin målskytt\n\nCrystal Palace ligger sist i Premier League och reser till Coventry utan sin avstängde anfallare Jean-Philippe Mateta. Hemmalaget har vunnit stort på hemmaplan men åkt på stryk borta. Det blir en match mellan två lag som skapar chanser men har svårt att göra mål.\n\nDet första jag tittar på är vem som har gjort målen. Palace främste målskytt i ligan är vänsterbacken Tyrick Mitchell, enligt Sports Mole [1]. När ett lag får sina mål från ytterbacken brukar det bero på att anfallarna inte gör dem. Palace har skapat chanser för betydligt fler mål än de har gjort, men de måste avsluta bättre för att få betalt för dem. Nu saknas dessutom Mateta, som blev utvisad mot Tottenham [2]. Tränaren Pierre Sage säger att han har ”stort förtroende för de andra spelarna” [2]. Det blir Jørgen Strand Larsen eller Eddie Nketiah. Om Strand Larsen sa Sage efter skadan att han ”klarar 60, 75 minuter” [2], och det räcker inte till en hel match. Ismaïla Sarr skulle enligt Sage ”komma tillbaka efter landslagsuppehållet” [2], och det är nu.\n\nCoventry har ett eget problem. Laget har slagit Newcastle med 4–1 och Sunderland med 3–1 hemma, men utanför egen stad har det blivit förluster. Jack Rudoni är lagets främste målskytt [1]. Bakåt saknas Woolfenden och Amenda, och då blir det tunt när motståndarna slår inlägg. Det där löser man med en hink bollar och en hel eftermiddag av nickövningar, men det får vänta till nästa vecka. Palace spelar i Europa League redan på torsdagen efter, och det märks på hur en tränare tar ut sitt lag.\n\nTipset: 1X (hemmaplan väger tyngst)\n\nSajtens prognos ser lagen som helt jämbördiga, medan spelbolaget håller Coventry som favorit. Jag lutar åt spelbolaget. Palace saknar Mateta, Strand Larsen orkar inte en hel match [1] och laget måste vila spelare inför Europa League på torsdagen. Coventry har gjort fyra och tre mål i sina två senaste hemmasegrar [2]. Bollen har aldrig läst en tabell, och Palace skapar trots allt chanser, så jag tar med krysset men ringar inte in borta.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Bottenlaget kommer till Coventry utan sin målskytt",
+   "lead": "Crystal Palace ligger sist i Premier League och reser till Coventry utan sin avstängde anfallare Jean-Philippe Mateta. Hemmalaget har vunnit stort på hemmaplan men åkt på stryk borta. Det blir en match mellan två lag som skapar chanser men har svårt att göra mål.",
+   "paragraphs": [
+    "Det första jag tittar på är vem som har gjort målen. Palace främste målskytt i ligan är vänsterbacken Tyrick Mitchell, enligt Sports Mole [1]. När ett lag får sina mål från ytterbacken brukar det bero på att anfallarna inte gör dem. Palace har skapat chanser för betydligt fler mål än de har gjort, men de måste avsluta bättre för att få betalt för dem. Nu saknas dessutom Mateta, som blev utvisad mot Tottenham [2]. Tränaren Pierre Sage säger att han har ”stort förtroende för de andra spelarna” [2]. Det blir Jørgen Strand Larsen eller Eddie Nketiah. Om Strand Larsen sa Sage efter skadan att han ”klarar 60, 75 minuter” [2], och det räcker inte till en hel match. Ismaïla Sarr skulle enligt Sage ”komma tillbaka efter landslagsuppehållet” [2], och det är nu.",
+    "Coventry har ett eget problem. Laget har slagit Newcastle med 4–1 och Sunderland med 3–1 hemma, men utanför egen stad har det blivit förluster. Jack Rudoni är lagets främste målskytt [1]. Bakåt saknas Woolfenden och Amenda, och då blir det tunt när motståndarna slår inlägg. Det där löser man med en hink bollar och en hel eftermiddag av nickövningar, men det får vänta till nästa vecka. Palace spelar i Europa League redan på torsdagen efter, och det märks på hur en tränare tar ut sitt lag."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sports Mole",
+     "title": "Premier League Gameweek 11",
+     "url": "https://www.sportsmole.co.uk/football/premier-league/coventry-city-vs-crystal-palace_game_263118.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Crystal Palace FC",
+     "title": "Sage on Sarr & Strand Larsen fitness",
+     "url": "https://www.cpfc.co.uk/news/first-team/sage-on-sarr-strand-larsen-fitness-and-facing-liverpool/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos ser lagen som helt jämbördiga, medan spelbolaget håller Coventry som favorit. Jag lutar åt spelbolaget. Palace saknar Mateta, Strand Larsen orkar inte en hel match [1] och laget måste vila spelare inför Europa League på torsdagen. Coventry har gjort fyra och tre mål i sina två senaste hemmasegrar [2]. Bollen har aldrig läst en tabell, och Palace skapar trots allt chanser, så jag tar med krysset men ringar inte in borta.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "hemmaplan väger tyngst",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Crystal Palace FC",
+      "title": "Sage on Sarr & Strand Larsen fitness",
+      "url": "https://www.cpfc.co.uk/news/first-team/sage-on-sarr-strand-larsen-fitness-and-facing-liverpool/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sports Mole",
+      "title": "Premier League Gameweek 11",
+      "url": "https://www.sportsmole.co.uk/football/premier-league/coventry-city-vs-crystal-palace_game_263118.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:14:48.198Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Palace ligger sist, och deras bästa målskytt i ligan är en vänsterback. Det säger allt om anfallet. Nu är Mateta avstängd, och den som ersätter honom är antingen Nketiah eller Strand Larsen, som inte orkar en hel match. Laget spelar dessutom Europa League några dagar efter, så tränaren kommer att spara folk.",
+     "Coventry har slagit Newcastle med 4–1 och Sunderland med 3–1 hemma, och laget gör mål när det har publiken bakom sig. Här höjer jag ett varningens finger, för Woolfenden och Amenda saknas i backlinjen. Palace kommer att få in ett mål på ett inlägg. Men ett lag som inte kan göra mål vinner inte borta med en halv anfallare. Så är det bara. Jag ringar in ettan och bara ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-17T17:14:48.198Z",
+    "uppdrag": {
+     "fraser": [
+      "Här höjer jag ett varningens finger",
+      "Så är det bara"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:14:56.034Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880158",
+   "match": "Lincoln City – Wrexham",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:18:29.227Z",
+   "text": "Lincoln möter Wrexham igen, en division högre\n\nLincoln och Wrexham möttes två gånger i League One säsongen 2024/25. Nu möts de i Championship på LNER Stadium. Lincoln har förlorat tre raka matcher, och Wrexhams tränare har nyligen ifrågasatt hur mycket hans spelare egentligen vill.\n\nLincoln kom upp från League One i våras, skriver Irish News [1], och har tagit sig an Championship med hederlig möda men för få mål. Mot QPR lyfte Dom Jefferies in kvitteringen över målvakten Pierce Charles helt lugnt, men Glen Kamara avgjorde i 80:e minuten. Det var tredje raka förlusten och den sjätte på åtta matcher. Lincoln har gjort 4,7 mål färre än chanserna brukar ge, och det säger mig att laget kommer till lägena men inte sätter dem. Det där löser man med en hink bollar. Bäste målskytt är Mikkel Ladefoged, enligt Sports Mole [2].\n\nWrexham kommer från två hemmamatcher utan förlust, 2–0 mot Middlesbrough och 1–1 mot Wolverhampton. Före de matcherna såg det mörkare ut för Phil Parkinson. SI [3] skriver att han var under växande press och att han efter förlusten mot Sheffield United ifrågasatte viljan hos några av spelarna. Anfallaren Sam Smith är borta under en betydande period, så mycket vilar på Kieffer Moore, som är lagets bäste målskytt [2]. Borta har Wrexham en seger på sju matcher.\n\nBåda mötena i League One säsongen 2024/25 vann Wrexham, det senaste med 2–0 på just LNER Stadium. Men det var en annan division och andra förutsättningar. Bollen har aldrig läst en tabell, och gamla matchprotokoll läser den inte heller.\n\nTipset: 1X (knappt men ändå)\n\nPrognosen ger Lincoln ett litet övertag, 2,56 mot 2,94, medan spelbolaget har Wrexham före. Jag håller med prognosen. Lincoln har gjort 4,7 mål färre än chanserna borde ge och släppt in 4,1 fler än väntat, och sådant brukar jämna ut sig. Wrexham saknar Sam Smith [1] och har bara en bortaseger. Tre raka förluster för Lincoln [2] gör ändå att jag inte ringar in ettan ensam. Båda lagen väntas göra 1,3 mål och 1–1 är det troligaste resultatet, så krysset hör hemma bredvid. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Lincoln möter Wrexham igen, en division högre",
+   "lead": "Lincoln och Wrexham möttes två gånger i League One säsongen 2024/25. Nu möts de i Championship på LNER Stadium. Lincoln har förlorat tre raka matcher, och Wrexhams tränare har nyligen ifrågasatt hur mycket hans spelare egentligen vill.",
+   "paragraphs": [
+    "Lincoln kom upp från League One i våras, skriver Irish News [1], och har tagit sig an Championship med hederlig möda men för få mål. Mot QPR lyfte Dom Jefferies in kvitteringen över målvakten Pierce Charles helt lugnt, men Glen Kamara avgjorde i 80:e minuten. Det var tredje raka förlusten och den sjätte på åtta matcher. Lincoln har gjort 4,7 mål färre än chanserna brukar ge, och det säger mig att laget kommer till lägena men inte sätter dem. Det där löser man med en hink bollar. Bäste målskytt är Mikkel Ladefoged, enligt Sports Mole [2].",
+    "Wrexham kommer från två hemmamatcher utan förlust, 2–0 mot Middlesbrough och 1–1 mot Wolverhampton. Före de matcherna såg det mörkare ut för Phil Parkinson. SI [3] skriver att han var under växande press och att han efter förlusten mot Sheffield United ifrågasatte viljan hos några av spelarna. Anfallaren Sam Smith är borta under en betydande period, så mycket vilar på Kieffer Moore, som är lagets bäste målskytt [2]. Borta har Wrexham en seger på sju matcher.",
+    "Båda mötena i League One säsongen 2024/25 vann Wrexham, det senaste med 2–0 på just LNER Stadium. Men det var en annan division och andra förutsättningar. Bollen har aldrig läst en tabell, och gamla matchprotokoll läser den inte heller."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The Irish News",
+     "title": "glen kamara strike sees qpr snatch late victory over lincoln RMSVZ3Z4M5JSHGFWJGUKKBDIFI",
+     "url": "https://www.irishnews.com/sport/soccer/glen-kamara-strike-sees-qpr-snatch-late-victory-over-lincoln-RMSVZ3Z4M5JSHGFWJGUKKBDIFI/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sports Mole",
+     "title": "Championship Gameweek 16",
+     "url": "https://www.sportsmole.co.uk/football/championship/lincoln-city-vs-wrexham_game_263152.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Sports Illustrated",
+     "title": "wrexham vs middlesbrough preview predictions lineups 11 4 26",
+     "url": "https://www.si.com/soccer/wrexham-vs-middlesbrough-preview-predictions-lineups-11-4-26",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Lincoln ett litet övertag, 2,56 mot 2,94, medan spelbolaget har Wrexham före. Jag håller med prognosen. Lincoln har gjort 4,7 mål färre än chanserna borde ge och släppt in 4,1 fler än väntat, och sådant brukar jämna ut sig. Wrexham saknar Sam Smith [1] och har bara en bortaseger. Tre raka förluster för Lincoln [2] gör ändå att jag inte ringar in ettan ensam. Båda lagen väntas göra 1,3 mål och 1–1 är det troligaste resultatet, så krysset hör hemma bredvid. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "knappt men ändå",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Illustrated",
+      "title": "wrexham vs middlesbrough preview predictions lineups 11 4 26",
+      "url": "https://www.si.com/soccer/wrexham-vs-middlesbrough-preview-predictions-lineups-11-4-26",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The Irish News",
+      "title": "glen kamara strike sees qpr snatch late victory over lincoln RMSVZ3Z4M5JSHGFWJGUKKBDIFI",
+      "url": "https://www.irishnews.com/sport/soccer/glen-kamara-strike-sees-qpr-snatch-late-victory-over-lincoln-RMSVZ3Z4M5JSHGFWJGUKKBDIFI/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:18:29.227Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Lincoln kommer till lägena men sätter dem inte. Laget har gjort 4,7 mål färre än chanserna brukar ge, och sådant jämnar ut sig när man fortsätter att ta sig fram till samma lägen. Tre raka förluster ser tunga ut på papperet, men det är avslutningarna som har fallerat och inte arbetet.",
+     "Wrexham är utan Sam Smith en längre tid, så allt hänger på Kieffer Moore. Borta har laget bara en seger på sju matcher. Tränaren har dessutom nyligen ifrågasatt hur mycket spelarna egentligen vill, och sådant försvinner inte för att man klarade sig utan förlust i två hemmamatcher. Att spelbolagen har Wrexham som favorit köper jag aldrig.",
+     "Lincoln spelar hemma och får till slut utdelning. Jag ringar in ettan och står för den ensam."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-17T17:18:29.227Z",
+    "uppdrag": {
+     "fraser": [
+      "Det köper jag aldrig",
+      "Då är jag jävligt snäll"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:19:02.253Z",
+    "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
+  },
+  {
+   "id": "401878754",
+   "match": "Tottenham Hotspur – Ipswich Town",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:09:30.420Z",
+   "text": "De Zerbi får se Ipswich från läktaren\n\nTottenham tar emot Ipswich efter två veckors uppehåll, men Roberto De Zerbi får inte stå vid sidlinjen. Han stängdes av efter förlusten i Leeds. På andra sidan står Gary O'Neil, som tog över efter Kieran McKenna i somras och för första gången i höst har en hel landslagspaus bakom sig.\n\nTottenham föll med 0–1 på Elland Road, där inhopparen Noah Okafor avgjorde i 79:e minuten, 97 sekunder efter att han kommit in. Därmed var en svit på tre raka segrar bruten, enligt Sky Sports [1]. De Zerbi tyckte att Pedro Porros varning var ”incredible”, fick själv ett gult kort för sitt missnöje och sitter av en match på läktaren. Det blir just den här matchen [1]. Mathys Tel fick gå av redan i 43:e minuten efter en smäll mot hälsenan. Jag har varit med om värre, och då hade vi ingen målvakt.\n\nDet är inte bara tränaren som är ifrågasatt. Porro slog bara 65 procent rätt av sina passningar, och Mohammed Kudus lyckades med två av sju dribblingar när Leeds dubblade mot honom, skriver supportersajten To The Lane And Back [2]. Den lyfter också fram Archie Gray som högerback och Antonín Kinskys långa utsparkar som det som fick laget förbi Leeds press [2]. Hälften av Tottenhams ligamatcher har slutat utan eget mål.\n\nIpswich ser ut som ett annat lag. McKenna lämnade klubben i juni för att ta en paus från fotbollen enligt Wikipedia [3], och O'Neil kom från Strasbourg, där han hade slutat åtta i Ligue 1 efter att ha tagit över i januari [4]. Hans lag gör mål, femton på tio matcher, men har inte hållit nollan en enda gång. Det där löser man med en hink bollar och en torsdag med fasta situationer.\n\nTipset: 1X (Tränaren på läktaren)\n\nPrognosen ger Tottenham ungefär sex chanser av tio, och den vilar mest på att Ipswich släpper in mycket. Det håller jag med om, för Ipswich har inte hållit nollan på hela hösten. Prognosen vet däremot inte att De Zerbi sitter på läktaren [1], att Tel haltade av i Leeds [1] eller att Tottenhams kantspelare blev helt isolerade [2]. Ett lag som har gått mållöst i hälften av sina matcher kan lika gärna fastna på ett oavgjort resultat. Jag ringar in etta och kryss, och tvåan får stå utan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "De Zerbi får se Ipswich från läktaren",
+   "lead": "Tottenham tar emot Ipswich efter två veckors uppehåll, men Roberto De Zerbi får inte stå vid sidlinjen. Han stängdes av efter förlusten i Leeds. På andra sidan står Gary O'Neil, som tog över efter Kieran McKenna i somras och för första gången i höst har en hel landslagspaus bakom sig.",
+   "paragraphs": [
+    "Tottenham föll med 0–1 på Elland Road, där inhopparen Noah Okafor avgjorde i 79:e minuten, 97 sekunder efter att han kommit in. Därmed var en svit på tre raka segrar bruten, enligt Sky Sports [1]. De Zerbi tyckte att Pedro Porros varning var ”incredible”, fick själv ett gult kort för sitt missnöje och sitter av en match på läktaren. Det blir just den här matchen [1]. Mathys Tel fick gå av redan i 43:e minuten efter en smäll mot hälsenan. Jag har varit med om värre, och då hade vi ingen målvakt.",
+    "Det är inte bara tränaren som är ifrågasatt. Porro slog bara 65 procent rätt av sina passningar, och Mohammed Kudus lyckades med två av sju dribblingar när Leeds dubblade mot honom, skriver supportersajten To The Lane And Back [2]. Den lyfter också fram Archie Gray som högerback och Antonín Kinskys långa utsparkar som det som fick laget förbi Leeds press [2]. Hälften av Tottenhams ligamatcher har slutat utan eget mål.",
+    "Ipswich ser ut som ett annat lag. McKenna lämnade klubben i juni för att ta en paus från fotbollen enligt Wikipedia [3], och O'Neil kom från Strasbourg, där han hade slutat åtta i Ligue 1 efter att ha tagit över i januari [4]. Hans lag gör mål, femton på tio matcher, men har inte hållit nollan en enda gång. Det där löser man med en hink bollar och en torsdag med fasta situationer."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sky Sports",
+     "title": "Leeds 1-0 Tottenham: Noah Okafor's winner ends Whites' five-game winless run after Jayden Bogle escapes red card",
+     "url": "https://www.skysports.com/football/leeds-united-vs-tottenham-hotspur/7230144843797239232",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "To The Lane And Back",
+     "title": "3 things learned from Tottenham Hotspur's disappointing 1-0 defeat to Leeds United",
+     "url": "https://tothelaneandback.com/2026/11/07/3-things-learned-tottenham-defeat-leeds-united/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Wikipedia",
+     "title": "Kieran McKenna",
+     "url": "https://en.wikipedia.org/wiki/Kieran_McKenna",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "ESPN",
+     "title": "Ipswich Town announce Gary O'Neil as new manager ahead of Premier League return",
+     "url": "https://www.espn.com/soccer/story/_/id/49119895/ipswich-town-announce-gary-o-neil-new-manager-ahead-premier-league-return",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Tottenham ungefär sex chanser av tio, och den vilar mest på att Ipswich släpper in mycket. Det håller jag med om, för Ipswich har inte hållit nollan på hela hösten. Prognosen vet däremot inte att De Zerbi sitter på läktaren [1], att Tel haltade av i Leeds [1] eller att Tottenhams kantspelare blev helt isolerade [2]. Ett lag som har gått mållöst i hälften av sina matcher kan lika gärna fastna på ett oavgjort resultat. Jag ringar in etta och kryss, och tvåan får stå utan.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Tränaren på läktaren",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sky Sports",
+      "title": "Leeds 1-0 Tottenham: Noah Okafor's winner ends Whites' five-game winless run after Jayden Bogle escapes red card",
+      "url": "https://www.skysports.com/football/leeds-united-vs-tottenham-hotspur/7230144843797239232",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "To The Lane And Back",
+      "title": "3 things learned from Tottenham Hotspur's disappointing 1-0 defeat to Leeds United",
+      "url": "https://tothelaneandback.com/2026/11/07/3-things-learned-tottenham-defeat-leeds-united/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:09:30.420Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Tottenham har gått mållösa i hälften av sina ligamatcher, och i Leeds blev kantspelarna ensamma mot två man. Tränaren sitter dessutom på läktaren och Mathys Tel fick gå av med en smäll mot hälsenan. Det låter värre än det är.",
+     "Ipswich har nämligen inte hållit nollan en enda gång på tio matcher. Gary O'Neils lag gör mål men lämnar dörren öppen bakåt, och mot en sådan backlinje hittar till och med Tottenham fram. Det här pratade vi om redan i Manchester City, Svennis och jag. Ett lag som släpper in mål i varje match vinner sällan på bortaplan, hur mycket det än skapar framåt.",
+     "Ipswich gör sitt mål, men Tottenham gör ett till. Lugn nu, jag ringar in ettan och bara ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-17T17:09:30.420Z",
+    "uppdrag": {
+     "fraser": [
+      "Äsch",
+      "Lugn nu"
+     ],
+     "krydda": "Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:10:00.172Z",
     "attempts": 2
    },
    "model": "claude-opus-5-5",

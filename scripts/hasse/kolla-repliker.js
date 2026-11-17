@@ -55,6 +55,13 @@ const UNDERKANT = [
   [/\brättar sig\b(?! efter)/i, 'rättar till sig: rättar sig betyder lyder'],
   // "Det heter ett rätt och inte en rätt" (Tomas 2026-11-15).
   [/\b(en|någon|ingen)( enda)? rätt( till| av|[.,!?]|$)/i, 'ett rätt, inte ett enda rätt: det heter ett rätt'],
+  // Lät översatt från engelska (Tomas 2026-11-17: "undvik swenglish").
+  [/\bHitta (en|ett|någon|något)\b[^.?!]*\bom du kan\b/i, 'Du hittar ingen svår match här: "hitta en …, om du kan" är engelska'],
+  [/\bblir (jävligt |riktigt |väldigt )?bra för mig\b/i, 'Den här omgången tar jag hem: "bra för mig" är engelska'],
+  [/\bkommit till rätt man\b/i, 'Då har du kommit rätt.'],
+  [/\baldrig varit så \S+ som nu\b/i, 'Jag har aldrig varit säkrare.'],
+  [/\bgör inga misstag\b/i, 'tippar inte fel'],
+  [/\bavskyr det här\b/i, 'Sånt här tål inte spelbolagen.'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.

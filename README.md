@@ -473,6 +473,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   lördag 21 november) lades ut för hand samma dag, med omslaget och innehållet. Att skriva bladen för hand, som i Nr 2,
   gick inte: miljön nådde inga nyhetssajter, och ändringen av dess nät avvisades (se *Numret kommer med kupongen* under
   [Helgarderat](#helgarderat))
+- [x] **Gänget i bild på tv:n (2026-11-16, användarens önskemål: "när vi pratar i mobiltelefon med varandra, att vi
+  har möjlighet att se varandra på TV-apparaten där uppe där text-tv spelas - om vi vill … det ska vara intuitivt och
+  snyggt"):** tv:n i hörnet har fått en AV-ingång. Nära tv:n står *Visa dig på tv:n* i foten: kameran tänds och man
+  syns på tv:n hos de andra, vars tv byter till AV av sig själv, med snö ett ögonblick som när man bytte kanal. Två som
+  visar sig står sida vid sida med namnen i sina färger, man ser sig själv i en liten bild i hörnet, och de som bara
+  tittar syns som porträtt. Bara bild – rösten går i telefonen. Bilden går direkt mellan webbläsarna (WebRTC), och
+  tjänsten profeterna-rummet för bara vidare uppkopplingen (se *Gänget i bild* under [Tv:n](#tvn))
 
 ## Publicering
 
@@ -1291,6 +1298,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ljuskäglorna över bordet och pulten tonade ut från mitten, och i datorn från steg 1 låg lampornas färg som en
   hinna över kupongen och gänget. Nu är käglorna jämna över det de lyser på, utan hinna, och kupongen är det
   ljusaste i bilden. Se [Kupongen och gänget i lampornas ljus](#kupongen-och-gänget-i-lampornas-ljus-2026-11-17).
+- **Hörnet under lampan som hos Hasse (2026-11-17, användarens önskemål):** "Kan du ordna så att de här två vyerna
+  passar ihop bättre än vad de gör nu", med en bild av rummet och en av Hasse Backe. Hans händer, kaffet och notan, som
+  syns i båda, var grå och dova i rummet fast lampan hänger rakt ovanför, och ljusa hos honom. Nu ligger lampans ljus
+  jämnt över dem och på handryggarna, så att de är lika ljusa i båda bilderna. Se
+  [Hörnet under lampan, som hos Hasse](#hörnet-under-lampan-som-hos-hasse-2026-11-17).
 - **Datorn och videon parallellt med disken (2026-11-16, användarens önskemål):** "justera både TV:n och
   datorn så att de står parallellt med bänken - just nu står de liksom lite på sniskan" och "när man zoomar
   in få en bra bild - precis som vanligt". Datorn var vänd mellan gänget och ögat och videon 22 grader in mot
@@ -1433,6 +1445,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   fönsterbänken, dörrens glas, och lyktorna på huvudet och axlarna), benen är ett steg mörkare framför den mörka
   bröstningen, ljuset på gatan är en mjuk fläck och strålen syns bara i regn, snö och dimma, som ett mjukt sken.
   Inga nya lager och lika många ritanrop. Se *Ljuset på dem som går och bilarnas strålkastare* under [Fasaden](#fasaden).
+- **Fasaden lugnare och mer levande (2026-11-17, användarens önskemål):** "Kan du göra den här animationsvyn från utanför
+  butiken lugnare/mindre stressig än vad den är nu - men också mer levande". Färre stora och snabba rörelser i
+  förgrunden och fler små och långsamma: mitt på dagen två sällskap åt gången i stället för fem och en kväll knappt ett
+  och ett halvt i stället för knappt tre, men varje gång någon ny och från båda hållen, i lugnare takt och med färre
+  joggare (barnfamiljerna, hundarna och kläderna är kvar); hälften så många bilar, lite långsammare, som
+  sällan bromsar eller står i kö framför affären, och mjukare bromsljus; den som stannar och tittar in gör det oftare
+  och längre. Och nytt: höstlöv
+  som singlar ned och driver i vinden, andedräkten i kylan och duvor som pickar på trottoaren och flyger undan när någon
+  kommer. Se *Lugnare och mer levande* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -6880,8 +6901,9 @@ grått ut i stället för att lysa.
   skärmen syns också i en skärm på 16:9, där överkanten av scenen hamnar utanför. Den ligger i pultens plan (−60), så
   att den står framför rummet när kameran vrids, tonar bort med pulten vid närbilderna och blir oskarp med pulten när
   kupongen tas i handen. Sladden upp till taket syns bara i telefonen på höjden, där taket syns (`.rum-lampsladd`).
-- **Lampans ljus:** en ljuskägla bland de andra (`KAGLOR`) över notan och kaffet, med hål i dunklet och värme där
-  blandningsläget finns; en varm strimma i pultens lack under den (`spegelBild`); och på natten, när lysröret är
+- **Lampans ljus:** en ljuskägla bland de andra (`KAGLOR`) över notan och kaffet (sedan 2026-11-17 jämn över händerna,
+  kaffet och notan, `LAMPA_LJUS`, se [Hörnet under lampan, som hos Hasse](#hörnet-under-lampan-som-hos-hasse-2026-11-17)),
+  med hål i dunklet och värme där blandningsläget finns; en varm strimma i pultens lack under den (`spegelBild`); och på natten, när lysröret är
   släckt, går mörkret runt den och dess kägla (rum-folk.css), så att den lyser över notan medan gänget sover. Medan
   lysröret tänds när man kommer in lyser den redan (masken i `.rum-mork`).
 - **Taket och lysröret:** vinjettens överkant är 0,3 i stället för 0,55 och den bruna tonen 0,15 i stället för 0,2
@@ -6993,6 +7015,27 @@ papper 158 → 202 (medel över kupongen 140/125/103 → 192/178/152) och ansikt
 i telefonen (412 × 870, klockan 16.20) papperet 157 → 205. Dörren, fönstret, högra väggen och Tipsligan är som förut,
 och natten (klockan 2) likaså: där är lampan över notan fortfarande det ljusaste. Inget nytt lager och inget nytt ritas
 i bildrutorna: hålen och färgerna ritas i de dukar som redan ritas om när ljuset ändras.
+
+### Hörnet under lampan, som hos Hasse (2026-11-17)
+
+Användarens önskemål: "Kan du ordna så att de här två vyerna passar ihop bättre än vad de gör nu", med en bild av
+rummet och en av Hasse Backe samma kväll. Det som syns i båda är hörnet där de möts: hans händer, kaffet och notan
+(se *Kaffet i rummet* under [Hasse Backe](#hasse-backe)). Hos honom är notan och koppen det ljusaste på disken; i
+rummet var de grå och händerna dova, fast lampan hänger rakt ovanför. Under rummets lager var de lika ljusa som hos
+honom (notan 212 mot 206 i gråskala), men lampans kägla (`KAGLOR` i rum.js) låg till vänster om notan och tonade ut
+från mitten, så att notan, koppen och händerna hade 0,4 av dunklet och kvällens mörker över sig.
+
+- **Lampans kägla** (`LAMPA_LJUS` i rum.js) ligger jämnt över händerna, kaffet och notan, som kupongens, och på natten
+  ligger lampans ljus över samma ställe (masken i rum-folk.css).
+- **Handryggarna** får lampans ljus (`bord.hud` i [public/rum-hasse-hand.js](public/rum-hasse-hand.js), `uHudLjus` i
+  rum-hasse-arm.js, 1,25 i rummet och 1 i baren): från rummet ses de från sidan där barens nyckelljus inte når, och de
+  var en femtedel mörkare än hos honom, som ärmarna innan de fick `bord.tyg`.
+
+Hans bild är som förut. Mätt i Chrome med mjukvarugrafik (1887 × 1053), gammal och ny kod, i gråskala mot samma ställe
+hos honom: klockan 21.30 i mulet väder notan 163 → 204 (hos honom 206), koppen 117 → 160 (188) och hudens ljusaste
+146 → 196 (198); klockan 13.30 i halvklart notan 167 → 185 (201) och koppen 153 → 174 (190). Kupongen och resten av
+rummet är som förut. På natten (klockan 2) är notan, koppen och händerna det ljusaste vid pulten, och i telefonen
+(412 × 870) syns notans kant i lampans ljus. Inget nytt lager och inget nytt ritas i bildrutorna.
 
 ### Utsikten och vädret
 
@@ -7148,10 +7191,10 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   regnet slår ned blir det stänk – en ring som vidgas och en liten krona – på stenen, fönsterbänkens bleck och skyltens
   tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
   inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
-- **Det som händer ute:** de som går förbi på trottoaren framför affären, fler än på gatan inifrån (`folket`:
-  `RumUte.trafik` plus ett sällskap utom på natten, gånger 1,45 och 1,05 i telefonen; färre i regn och snöyra och
-  glest på kvällen, högst tolv sällskap och sju i telefonen; en kväll 20.30 i snitt 2,6 i bild och mitt på dagen
-  ungefär 8), ensamma eller i sällskap
+- **Det som händer ute:** de som går förbi på trottoaren framför affären (`folket`: platser efter `RumUte.trafik` och en
+  till utom på natten, gånger 0,75 och 0,6 i telefonen, högst sex och fem i telefonen; färre i regn och snöyra och
+  glest på kvällen; mitt på dagen i snitt två sällskap i bild och en kväll 20.30 knappt ett och ett halvt, och varje
+  gång någon ny: se *Lugnare och mer levande* nedan), ensamma eller i sällskap
   (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply, ibland med hunden), ett gäng, en
   förälder med ett barn i handen, en familj (`familj`: två vuxna och barnet i handen, ibland ett större barn som studsar
   i förväg och ibland hunden; barnen till halv nio och oftare på lediga dagar), skolbarn i sällskap med ryggsäckar
@@ -7252,9 +7295,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
   still hur ofta duken än ritas om (förut svängde benen i halva takten och fötterna gled fram, "de flyter liksom fram",
   2026-11-16; sedan gick alla likadant, med en stel kappa och benet som släpade efter, "inte så naturligt", samma dag).
-  Ibland (i ungefär sex av tio varv om 170 s, inte
+  Ibland (i ungefär sju av tio varv om 120 s, inte
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
-  13 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
+  16–28 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
   gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna syns också som speglingar som far förbi i glaset
   och dörren: mörka skuggor på dagen, baklyktor i mörkret, alla åt vänster som på gatan.
 - **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
@@ -7281,8 +7324,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
   som de som går på skärmen, så att en bil syns i fyra–fem sekunder (se *Bilarna kör ute på gatan, och som bilar*
-  nedan). Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 18 % på dagen och
-  40 % i rusningen), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
+  nedan). Hur ofta följer `RumUte.trafik` (sedan 2026-11-17 skyms skyltfönstret ungefär 12 % av tiden på dagen och 24 %
+  i rusningen; se *Lugnare och mer levande* nedan), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
   bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför
   (en mjuk fläck, och strålen bara i regn, snö och dimma; se *Bilarnas strålkastare* nedan),
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
@@ -7358,6 +7401,51 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   Dagen är som förut (samma bild bildpunkt för bildpunkt). Provat i bilder i Chromium med mjukvarugrafik som dator
   (1910 × 920) på dagen, en mulen kväll och en regnig kväll, och som telefon (390 × 844) en regnig kväll; inte i en
   riktig telefon.
+- **Lugnare och mer levande (2026-11-17, användarens önskemål):** "Kan du göra den här animationsvyn från utanför
+  butiken lugnare/mindre stressig än vad den är nu - men också mer levande", med en skärmbild från en kväll där en bil
+  stod med bromsljuset lysande mitt framför skyltfönstret. Principen: det som var stressigt var det stora och snabba i
+  förgrunden – bilar som skymde affären, många som korsade varandra (samma dag hade det blivit fler, se *Fler som går
+  förbi, barnfamiljer och hundar* ovan), joggare – och det som gör gatan levande är det lilla och långsamma och att det
+  hela tiden är någon ny. Därför färre stora rörelser och fler små; barnfamiljerna, skolbarnen, hundarna, kläderna och
+  sätten att gå är kvar:
+  - **De som går förbi** (`folket`, `LUGN` i rum-fasad.js): gatan delas i platser, lika många som på gatan inifrån och
+    en till utom på natten, gånger 0,75 (0,6 i telefonen), högst sex (fem), och var och en har ett varv så långt att det
+    i ett brett fönster i snitt syns 0,75 + 0,18 · `gaende` sällskap (70 s på natten); varven är förskjutna jämnt, så att
+    de inte kommer i klump. I varje varv kommer ett nytt sällskap (eller ingen, i ungefär vart sjunde), lottat ur
+    platsens och varvets nummer, åt det ena eller andra hållet och en stund in i varvet. Förut gick samma sällskap, upp
+    till tolv, runt i samma riktning med några sekunders paus, och samma människa kom tillbaka gång på gång. Var och en
+    byggs först när dess varv börjar (`lopp`), medan den är utanför bilden. De går 7 % långsammare (samma steg, lugnare
+    takt), färre går raskt eller studsar (`GSTIL`, nu också för de vuxna), och det är hälften så många joggare,
+    powerwalkare och inlinesåkare och hälften så många som springer i regnet eller till bussen. Den som stannar och
+    tittar in gör det oftare och längre (se ovan). Mätt över en simulerad halvtimme (datorn, en tisdag i november):
+    mitt på dagen syns i snitt 2,1 sällskap samtidigt i stället för 5,2 (högst 5 i stället för 11), i rusningen 2,0 i
+    stället för 5,4, 18.30 1,7 i stället för 3,5 och 20.30 1,4 i stället för 2,7 (en regnig kväll 1,0 i stället för
+    1,5); tom är trottoaren mitt på dagen 6 % av tiden och 20.30 11 %.
+  - **Bilarna** (`LUGN`, `intervall`, `kor`, `ko` i rum-fasad-gatan.js): ungefär hälften så ofta (en per fil var 76:e
+    sekund på dagen, var 46:e i rusningen, var 120:e på kvällen), 12 % långsammare, färre bussar och färre som följer
+    tätt efter en annan, hälften så många som bromsar in eller stannar framför affären och färre köer (i rusningen i
+    vart femte kö-varv i stället för varannat). Bromsljusen lyser mjukare i mörkret, och baklyktorna är mörkare röda
+    när föraren inte bromsar (förut lika starka). Speglingarna av bilar i glaset är glesare och svagare. Skyltfönstret
+    skyms av fordon 12 % av tiden på dagen (till nio på kvällen) i stället för 21 % och 24 % i rusningen i stället för
+    45 %; fortfarande kör ingen igenom någon (prövat en timme i rusningen, på dagen och en lördag, och en halvtimme vid
+    sex andra tider).
+  - **Det lilla som lever** ([public/rum-fasad-liv.js](public/rum-fasad-liv.js), `RumFasadLiv`): på hösten singlar
+    löv ned från träden vid bron och driver åt vänster i vinden, vaggar och vänder sig, landar på trottoaren eller
+    gatan och ligger en stund; i blåsten far ett och annat längs stenen (tre till nio åt gången, fler när det blåser).
+    När det är kallt (högst 3 grader, eller känns som noll) andas de som går ut en liten rök, mjuk i kanten, som stannar
+    i luften där de var och vidgas och bleknar; på kvällen syns den bara i ljuset från fönstret, dörren och lyktorna. På
+    dagen går en till fyra duvor på trottoaren framför affären (inte varje gång, och inte i regn eller snöfall): de
+    nickar med huvudet när de går, pickar i stenen och står och ser sig om, och när någon kommer inom en dryg meter
+    flyger de upp, de andra intill strax efter, och landar bakom den som gick förbi eller en bit bort, eller flyger ur
+    bilden och kommer tillbaka en stund senare. Löven och andedräkten räknas ur tiden (en stillbild visar dem som de är
+    då); duvorna minns vad de gör från bild till bild. Allt ritas med några få vägar i `rf-fram`, löven i tre lager
+    efter avståndet (bakom dem som går, framför dem och över gatan) och duvorna mellan dem som går närmare fasaden och
+    de andra.
+  - **Vad det kostar:** löven, andedräkten och duvorna tar ungefär 6 ms/s i Chromium som Pixel 7 med processorn ×4, och
+    med färre som går och färre bilar blir det sammantaget billigare (samma prov, utan gänget i fönstret, 30 s, före och
+    efter om vartannat): sidans skript mitt på dagen 79 → 54 ms/s, i rusningen 113 → 91 och en regnig kväll 98 → 73,
+    huvudtrådens arbete 577 → 428, 708 → 586 och 854 → 683 ms/s, och bildtakten i rusningen 47 → 57 och den regniga
+    kvällen 38 → 51 bilder i sekunden. Inga nya lager eller dukar. Inte provat i en riktig telefon.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -7373,7 +7461,7 @@ punkter (`F.k` per enhet i världen) och förminskas inte: Safari ritar ett lage
 pixeltätheten, och förut, i världens mått, tog vart och ett av nio lager ungefär fem gånger så mycket minne som det
 syns i en telefon på höjden (2026-11-16). När storleken ändras skalas scenen om så länge (`passa`), tills den byggs
 om. Toningen in har inget eget lager när den är klar. Det som rör sig ritas i tre dukar: `rf-fram`
-överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
+överst (speglingarna i stenen, bilarna i glaset, löven, duvorna och andedräkten, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
@@ -7842,6 +7930,62 @@ Inte provat: en landskamp som pågår eller är slut, och telefonen i Safari.
 Har en division matcher som döljs just nu (Dölj resultat) visar tabellen och skytteligan bara
 hur många som är dolda och *Visa ändå* – samma nyckel som på Tabeller och Statistik, så att
 det gäller där också.
+
+**Gänget i bild (2026-11-16).** Användaren: "Kan du ordna så att vi, när vi pratar i mobiltelefon med varandra, att vi
+har möjlighet att se varandra på TV-apparaten där uppe där text-tv spelas - om vi vill … Tänk på att det ska vara
+intuitivt och snyggt!" Tv:n har fått en AV-ingång, som när man kopplade in en videokamera
+([public/rum-bild.js](public/rum-bild.js), AV-delen i [public/rum-tv.js](public/rum-tv.js) och
+[public/rum-tv.css](public/rum-tv.css), tjänsten i [worker/bilden.mjs](worker/bilden.mjs)). Bara bild: rösten går i
+telefonen, så det blir inget eko och inget som krockar med samtalet.
+
+- **Visa dig på tv:n** står i foten bredvid Tillbaka när tv:n är nära. Ett tryck tänder kameran (webbläsaren frågar
+  första gången) och tv:n byter till AV. Medan kameran är tänd står *Stäng av kameran* med en röd lampa i foten var man
+  än är i rummet; i telefonen på höjden, där foten står uppe till höger, står den där *Vanlig sida* stod, och nära tv:n
+  viker namnet undan (som med kupongen i handen). Inget annat i rummet ändras.
+- **Hos de andra** byter tv:n till AV av sig själv när någon visar sig – med ett ögonblick snö och en skakning, som när
+  man bytte kanal – och rutan lyser fullt också på håll, så att man ser ansiktet uppe i hörnet. Slutar alla visa sig går
+  tv:n tillbaka till text-tv:n. Man byter själv med **TV/AV**, en avlång knapp under ▼ 0 ▲ i knappsatsen, eller raden
+  *Gänget i bild* på 300; en sida, en siffra eller ▲ ▼ (och svepet i telefonen) går tillbaka till text-tv:n, och tv:n
+  byter då inte till AV igen förrän någon ny visar sig. Displayen visar *AV* (V:et som ett U, som på displayerna då) och
+  *AV* står i grönt uppe till vänster i rutan några sekunder efter bytet.
+- **På rutan:** den som visar sig står stort, två sida vid sida (beskurna på höjden), med namnet vi kallas
+  (`Tippoang.kallas`) i sin färg (`--gang-0–2`) nere till vänster, som en textremsa på tv. Man ser sig själv spegelvänd i
+  en liten bild nere till höger med en tunn vit ram och en röd lampa (bild i bild) – eller stort, med *Tejder ser dig*
+  (eller *Ingen annan har tv:n på*) under, när ingen annan visar sig. De som har tv:n på AV utan att visa sig står som
+  små porträtt i sina färger uppe till höger (*ser på*). Medan en bild letar sig fram står det snö i rutan, och efter
+  femton sekunder utan kontakt *Ingen kontakt*. Utan bild: den blå rutan, som när ingen kassett spelar, med *Ingen i
+  bild* och vad man gör, eller vad som gick fel med kameran (*Kameran fick inte startas. Tillåt den för sajten i
+  webbläsaren och försök igen.*, *Hittar ingen kamera.*, *Kameran används av något annat just nu.*). Linjerna över
+  bilden är svagare än över text-tv:n.
+- **Vem du är:** den du har valt i rummet (`Samtal.pult.du()`), annars den enheten minns från kupongen
+  (`profeterna.samtal.vem`). Vet enheten inte det frågar tv:n *Vem är du?* med porträtten när man trycker på *Visa dig
+  på tv:n* eller TV/AV, och svaret sparas bara för tv:n (`profeterna.tv.vem`) – kupongen påverkas inte. Den som inte är
+  någon i gänget kopplas inte upp och ser ingen. Byter man person i rummet kopplar sidan upp sig som den nya.
+- **Fliken dold eller rummet stängt** (som när man växlar till telefonsamtalet): kameran släcks och förbindelserna
+  stängs, och kommer man tillbaka inom tio minuter tänds kameran igen av sig själv (`ATER`).
+- **Vägen:** bilden går direkt mellan webbläsarna (WebRTC), en förbindelse mellan varje par där minst en visar sig och
+  båda har tv:n på AV; kameran tas i 640 × 480 och högst 30 bilder i sekunden, framkameran i telefonen. Tjänsten
+  profeterna-rummet ([worker/rummet.mjs](worker/rummet.mjs), samma som rummet och kupongen i realtid) har ett tredje
+  Durable Object, *Bilden* ([worker/bilden.mjs](worker/bilden.mjs), websocketen `/bild?vem=DT&id=<fönstret>`), som
+  säger vilka som är med (`alla`: fönster, vem, kamera, med) och för vidare erbjudandena och vägarna mellan
+  fönstren – ingen bild går genom den, och inget sparas. Krockar två erbjudanden ger det fönster efter som har det högre
+  id:t ("perfect negotiation"), med erbjudandet, svaret och backningen uttryckliga för äldre Safari. Webbläsarna hittar
+  varandra med STUN (Cloudflares och Googles). Bakom mobiloperatörernas adressöversättning räcker det inte alltid; då
+  behövs TURN, som tjänsten hämtar från Cloudflare när den har en nyckel (`TURN_ID` och `TURN_NYCKEL`, se nedan).
+- **Driftsättning:** tjänsten driftsätts för hand som förut (`npx wrangler@4.147.0 deploy --config worker/rummet.toml`,
+  migreringen `v3` lägger till *Bilden*). TURN är valfritt: skapa en TURN-nyckel under *Realtime → TURN* i Cloudflares
+  panel och lägg in den med `npx wrangler@4.147.0 secret put TURN_ID --config worker/rummet.toml` och `… secret put
+  TURN_NYCKEL …` (nyckelns id och token). Utan dem används bara STUN.
+- **För prov:** `?rum-bild=ws://127.0.0.1:8787/bild` (tjänsten lokalt, `wrangler dev --config worker/rummet.toml`) och
+  `?rum-bild-vem=DT`.
+
+Provat 2026-11-16 i huvudlös Chrome med låtsaskamera mot tjänsten lokalt (wrangler dev) och sajtens data: två och tre i
+gänget i 1280 × 800 – en visar sig och den andras tv byter själv, båda sida vid sida, en tredje som bara tittar och
+syns som porträtt, en som släcker och tillbaka till text-tv:n när ingen visar sig; i telefonen (390 × 844 och på
+bredden) med *Vem är du?*, tryck med fingret och foten uppe till höger; utan kamera (felet på den blå rutan); TV/AV,
+▲ och raden på 300; fliken dold och visad igen (kameran tänds själv, båda ser varandra igen inom en sekund, också när
+båda gör det samtidigt och erbjudandena krockar) och en sida som laddas om. Inte provat: riktiga kameror, Safari i
+iPhone, två olika nät (mobilnät utan TURN) och tjänsten driftsatt.
 
 **Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
 vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot
@@ -9205,7 +9349,9 @@ mörknar rummet självt). De ses i rummets blickriktning, mot fönstren, lika l�
 (33°) som från ögat i rummet (`RUM` i rum-pult.js), och kantljuset räknas mot det ögat (`vy`), inte mot
 barens kamera: annars blev ärmarnas sidor varmt bruna. Från rummet ses också ärmarnas sida bort från barens
 lampor, och den blev nästan svart; ärmens tyg får därför mer ljus i rummet (`bord.tyg`, 1,35 mot 1 i baren), så
-att det är samma koksgråa kavaj som framifrån. Underarmarna är lika vida som i baren. Bilden flyttas dit där kaffet och notan ligger, så
+att det är samma koksgråa kavaj som framifrån. Handryggarna ses från samma sida och ligger under lampan över pulten, så
+huden får också mer ljus (`bord.hud`, 1,25 mot 1 i baren; förut en femtedel mörkare än framifrån, ändrat 2026-11-17).
+Underarmarna är lika vida som i baren. Bilden flyttas dit där kaffet och notan ligger, så
 att underarmarna kommer in från bildens vänstra kant, den vänstra snett uppifrån över pultens bakre kant och den
 högra under den, med armbågarna och axlarna utanför bilden. Under händerna och underarmarna ligger samma skuggor
 som i baren (`byggSkugga`), med en tät, mörk kontaktskugga där händerna ligger an mot pulten. Det är bara den
@@ -10970,3 +11116,10 @@ realtid ([worker/kupongen.mjs](worker/kupongen.mjs)) litar på gänget på samma
 sajtens egna ursprung, men vem som helst därifrån kan läsa och ändra dem, och sidan kopplar
 upp sig först när man får se de andras tips, så att ingen ser dem av misstag. Det är ett
 utkast: kupongen som spelas ändras bara genom *Spara*, med sina vanliga kontroller.
+
+Gänget i bild på tv:n ([worker/bilden.mjs](worker/bilden.mjs), [public/rum-bild.js](public/rum-bild.js)) litar på gänget
+på samma sätt: tjänsten släpper bara in sajtens egna ursprung och någon av DL, DT och DJ, men vem man är väljer man
+själv. Därför syns det på tv:n vilka som ser en (*Tejder ser dig*, porträtten under *ser på*), och kameran är bara tänd
+när man själv har tänt den – med en röd lampa i foten och i den egna bilden – och släcks när fliken döljs. Bilden går
+direkt mellan webbläsarna, krypterad (WebRTC) och, med TURN, genom Cloudflare utan att sparas; tjänsten ser bara vem
+som är med och erbjudandena (SDP och ICE), och sparar inget.
