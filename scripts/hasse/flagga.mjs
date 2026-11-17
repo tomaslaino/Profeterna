@@ -8,10 +8,9 @@
 // blir lika mycket skarpare som väggen.
 //
 // Patinan: bandet och bokstäverna i blekta färger, gulnade av röken (mest upptill), smutsigare mot kanterna, veck
-// där den har legat hopvikt i fyra, rost runt märlorna, en kaffering och ett hål efter en cigarr. Den är för stor
-// för fronten: den övre delen är vikt bakåt (VIK) och fäst med häftstift i vecket, under bardiskens skiva, och den
-// nedre hänger ut över mässingskrokarna: tyget står ut som ett tält runt varje knopp, med två veck snett nedåt. Det
-// som skivan skymmer är genomskinligt, och bara den del som kan synas räknas fram.
+// där den har legat hopvikt i fyra, rost runt märlorna, en kaffering och ett hål efter en cigarr. Den är fäst med
+// häftstift längs överkanten, under bardiskens skiva, och hänger ut över mässingskrokarna under: tyget står ut som
+// ett tält runt varje knopp, med två veck snett nedåt. Det som skivan skymmer är genomskinligt.
 //
 // Ljuset på fronten där den hänger läser sidan ur små prov av väggens sex bilder, som görs här
 // (public/rum/hasse-flagga.json, ljusprov nedan): bakas väggen om ska skriptet köras igen.
@@ -46,7 +45,7 @@ const DOLD = (UNDER - tz * ogat[1]) / (1 - tz);
 if (R.y0 < DOLD) throw new Error(`FLAGGA.RUTA.Y0 (${R.y0}) ska ligga ovanför ${DOLD.toFixed(1)}, där skivan slutar skymma`);
 // och bildens högra kant: rutan ska räcka förbi den i båda väggens bilder, från DOLD ned till nederkanten
 for (const b of [BAK.bred, BAK.hog]) {
-  for (const Y of [DOLD, G.TOPP - (G.H - G.VIK)]) {
+  for (const Y of [DOLD, G.TOPP - G.H]) {
     const [u] = iKamera(franBaren([R.x0 + R.w, Y, ZP]), KAM);
     if (b.px + b.S * u < b.W) throw new Error(`FLAGGA.RUTA.X1 (${R.x0 + R.w}) syns i bilden ${b.W} bred vid y = ${Math.round(Y)}`);
   }
@@ -129,18 +128,15 @@ function rita({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP }) {
   for (let x2 = KB + 4; x2 < DW; x2 += 9) { g.fillRect(x2, 14 * E, 5, 1.6); g.fillRect(x2, DH - 14 * E, 5, 1.6); }
   for (let y = 4; y < DH; y += 9) g.fillRect(DW - 14 * E, y, 1.6, 5);
 
-  // patinan, bara där tyget kan synas: den framvikta delen (under VIK), till vänster om rutans högra kant
-  const PY = Math.max(0, Math.floor((G.VIK - 40) * E));
-  const PW = Math.min(DW, Math.ceil((R.x0 + R.w - G.X + 20) * E));
-  const PH = DH - PY;
-  const im = g.getImageData(0, PY, PW, PH);
+  // patinan
+  const im = g.getImageData(0, 0, DW, DH);
   const p = im.data;
   const horn = [[G.IN, G.IN], [G.B - G.IN, G.IN], [G.IN, G.H - G.IN], [G.B - G.IN, G.H - G.IN]].map(([a, b]) => [a * E, b * E]);
   const VECK = [[0.5, 1, 'u'], [0.25, -1, 'u'], [0.75, 1, 'u'], [0.5, -1, 'v']];
-  const KAFFE = [0.084 * DW, 0.943 * DH, 26 * E];
-  for (let y = PY; y < DH; y++) {
-    for (let x2 = 0; x2 < PW; x2++) {
-      const i = ((y - PY) * PW + x2) * 4;
+  const KAFFE = [0.13 * DW, 0.85 * DH, 26 * E];
+  for (let y = 0; y < DH; y++) {
+    for (let x2 = 0; x2 < DW; x2++) {
+      const i = (y * DW + x2) * 4;
       let r = LIN[p[i]]; let gg = LIN[p[i + 1]]; let b = LIN[p[i + 2]];
       const u = x2 / DW; const v = y / DH;
       // solen och tvättarna har blekt det ojämnt
@@ -195,13 +191,13 @@ function rita({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP }) {
   const monster = im;
 
   // ---- tyget som hänger ----
-  // tyget (a, b från övre vänstra hörnet) ↔ barens mått: vikt bakåt vid VIK och fäst där, så det hänger rakt
-  const fram = (a, b) => [G.X + a, G.TOPP - (b - G.VIK)];
-  const bak = (X, Y) => [X - G.X, G.TOPP - Y + G.VIK];
+  // tyget (a, b från övre vänstra hörnet) ↔ barens mått: fäst längs överkanten, så det hänger rakt
+  const fram = (a, b) => [G.X + a, G.TOPP - b];
+  const bak = (X, Y) => [X - G.X, G.TOPP - Y];
   const B = G.B; const Hh = G.H; const I = G.IN;
   // knopparna under tyget, i tygets mått
-  const KN = KROKAR.map(([x, y]) => [x - G.X, G.TOPP - y + G.VIK]);
-  // häftstiften i vecket, ungefär var 25:e centimeter (lite ojämnt, som när man sätter upp den för hand)
+  const KN = KROKAR.map(([x, y]) => [x - G.X, G.TOPP - y]);
+  // häftstiften längs överkanten, ungefär var 25:e centimeter (lite ojämnt, som när man sätter upp den för hand)
   const STIFT = Array.from({ length: Math.ceil(B / 420) + 1 }, (_, n) => Math.min(B - 12, 12 + n * 420 + 30 * (hash(n, 5) - 0.5)));
   const hojd = (a, b) => {
     let h = 0;
@@ -212,7 +208,7 @@ function rita({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP }) {
       if (Math.abs(da) > 700) continue;
       const db = b - bh;
       if (db < 0) {
-        const s = clamp((b - G.VIK) / (bh - G.VIK));
+        const s = clamp(b / bh);
         h += KNOPP * s * s * Math.exp(-((da / (24 + 0.9 * -db)) ** 2));
         continue;
       }
@@ -226,12 +222,12 @@ function rita({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP }) {
         h += 0.42 * KNOPP * Math.exp(-langs / 380) * (1 - Math.exp(-langs / 40)) * Math.exp(-((tvars / (9 + 0.07 * langs)) ** 2));
       }
     }
-    // mellan häftstiften buktar vecket ut lite, och det klingar av nedåt
+    // mellan häftstiften buktar överkanten ut lite, och det klingar av nedåt
     {
       let n = 0;
       while (n < STIFT.length - 2 && STIFT[n + 1] < a) n++;
       const s = clamp((a - STIFT[n]) / (STIFT[n + 1] - STIFT[n]));
-      h += 5 * Math.sin(Math.PI * s) * Math.exp(-Math.max(0, b - G.VIK) / 140);
+      h += 5 * Math.sin(Math.PI * s) * Math.exp(-b / 140);
     }
     // ett stort tyg som hänger fritt: långa, mjuka veck uppifrån och ned
     h += 7 * (fbm(a / 160, b / 1100 + 4) - 0.5);
@@ -253,7 +249,7 @@ function rita({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP }) {
   const LJ = (() => { const v = [-0.3, 0.78, 0.55]; const n = Math.hypot(...v); return v.map((x2) => x2 / n); })();
   const AMB = 0.35; const DIF = 0.65;
   // hålet efter en cigarr, i det blå uppe till vänster
-  const HAL = [0.47 * B, 0.82 * Hh, 4.5];
+  const HAL = [0.33 * B, 0.21 * Hh, 4.5];
 
   const tyg = document.createElement('canvas');
   tyg.width = TW; tyg.height = TH;
@@ -262,11 +258,11 @@ function rita({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP }) {
   const o = ut.data;
   const mask = new Float32Array(TW * TH);
   const prov = (u, v) => {
-    const X = clamp(u * DW - 0.5, 0, PW - 1.001); const Y = clamp(v * DH - 0.5 - PY, 0, PH - 1.001);
+    const X = clamp(u * DW - 0.5, 0, DW - 1.001); const Y = clamp(v * DH - 0.5, 0, DH - 1.001);
     const x0 = Math.floor(X); const y0 = Math.floor(Y); const fx = X - x0; const fy = Y - y0;
     const c = [0, 0, 0];
     for (const [xx, yy, w] of [[x0, y0, (1 - fx) * (1 - fy)], [x0 + 1, y0, fx * (1 - fy)], [x0, y0 + 1, (1 - fx) * fy], [x0 + 1, y0 + 1, fx * fy]]) {
-      const i = (yy * PW + xx) * 4;
+      const i = (yy * DW + xx) * 4;
       c[0] += w * LIN[monster.data[i]]; c[1] += w * LIN[monster.data[i + 1]]; c[2] += w * LIN[monster.data[i + 2]];
     }
     return c;

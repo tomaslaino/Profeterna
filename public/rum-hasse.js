@@ -705,19 +705,8 @@ window.RumHasse = (() => {
         const s = b ? a[i] + (b[i] - a[i]) * l.k : a[i];
         v[i] = Math.min(255, s + (fl.dag ? fl.dag[i] * l.c[i % 3] * F : 0));
       }
-      // (löpsedeln hänger framför flaggan och läser ljuset på fronten ur väggen, lopLjus: en mindre kopia utan
-      // flaggan men med röken, så att den inte tar tygets färg för ljuset)
-      const u = H.vaggUtan || (H.vaggUtan = document.createElement('canvas'));
-      u.width = Math.ceil(W / 2);
-      u.height = Math.ceil(Hh / 2);
-      const ux = u.getContext('2d');
-      ux.drawImage(c, 0, 0, u.width, u.height);
       flagga(x, fl, v);
-      ux.save();
-      ux.scale(u.width / W, u.height / Hh);
-      rok(ux, W, Hh, l);
-      ux.restore();
-    } else H.vaggUtan = null;
+    }
     rok(x, W, Hh, l);
     H.vy.classList.add('vagg');
     H.vaggNr = (H.vaggNr || 0) + 1;
@@ -1149,10 +1138,7 @@ window.RumHasse = (() => {
     let d;
     try {
       kx.clearRect(0, 0, N, N);
-      // (väggen utan flaggan, som hänger bakom löpsedeln, när den finns: vagg)
-      const u = H.vaggUtan && H.vaggUtan.width ? H.vaggUtan : c;
-      const s = u.width / c.width;
-      kx.drawImage(u, x0 * s, y0 * s, (x1 - x0) * s, (y1 - y0) * s, 0, 0, N, N);
+      kx.drawImage(c, x0, y0, x1 - x0, y1 - y0, 0, 0, N, N);
       d = kx.getImageData(0, 0, N, N).data;
     } catch (e) {
       return null;
@@ -1190,14 +1176,12 @@ window.RumHasse = (() => {
   //
   // DL:s lag (2026-11-16: "lägg in en flagga som tillhör Nacional där nere på Hasse Backes vägg. Det får sannolikt
   // inte plats helt - men delvis", "På ett snyggt och patinasätt"): en gammal flagga, blekt och gulnad av röken, med
-  // veck där den har legat hopvikt, 300 × 180 cm ("De brukar ju vara stora", "kanske dubbelt så stor"), med den
-  // övre delen vikt bakåt och fäst under bardiskens skiva, bakom löpsedeln och ut över krokarna (SCEN.FLAGGA), och
-  // ut ur bilden till höger; löpsedeln läser därför ljuset ur väggen utan flaggan (vaggUtan). Bilden (flagga.mjs)
+  // veck där den har legat hopvikt, 150 × 90 cm ("De brukar ju vara stora"), fäst under bardiskens skiva till höger
+  // om löpsedeln och ut över krokarna (SCEN.FLAGGA), och ut ur bilden till höger. Bilden (scripts/hasse/flagga.mjs)
   // är tyget i neutralt ljus, med vecken, krokarna under och skuggan på fronten, och lika oskarp som väggen; det som
   // skivan skymmer är genomskinligt. Den läggs på väggens duk när den ritas (vagg), genom hans kamera (flaggan i
   // rum-hasse-3d.js, exakt i perspektiv bildpunkt för bildpunkt), i det ljus som faller på fronten där: läst ur
-  // väggen före flaggan och tonat som bakningen (aces efter 0,7 gånger ljuset), som löpsedeln (lopLjus). Så hör den
-  // till väggen: inget eget lager, röken ligger över den och disken speglar den.
+  // väggen före flaggan och tonat som bakningen (aces efter 0,7 gånger ljuset), som löpsedeln (lopLjus). Så hör den till väggen: inget eget lager, röken ligger över den och disken speglar den.
   // FLAGG_DAMPA: som löpsedeln ska den inte ta uppmärksamheten, och tyget är ljusare än mahognyn runt om.
   const FLAGG_DAMPA = [0.4, 0.37, 0.32];
   const acesUt = (x) => (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14);
