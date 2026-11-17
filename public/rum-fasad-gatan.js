@@ -692,9 +692,12 @@ window.RumFasadGatan = (() => {
   // ---------- trafiken ----------
 
   // Hur ofta det kommer något per fil (s), ur RumUte.trafik: rusning, dag, kväll och natt. (Glesare än förr, när de
-  // körde fortare: varje fordon syns längre, och skyltfönstret ska inte skymmas mer än det gjorde.)
+  // körde fortare: varje fordon syns längre, och skyltfönstret ska inte skymmas mer än det gjorde.) Lugnare sedan
+  // 2026-11-17 ("lugnare/mindre stressig"): ungefär hälften så ofta som förut, lite långsammare (LUGN.fart), färre
+  // bussar (LUGN.buss), och färre som bromsar, stannar eller står i kö framför affären (kor, ko).
+  const LUGN = { fart: 0.88, buss: 0.6 };
   function intervall(T, v) {
-    const s = T.rusning ? 21 : T.natt ? 210 : T.dag ? 41 : 75;
+    const s = T.rusning ? 46 : T.natt ? 260 : T.dag ? 76 : 120;
     return s * (v.snotackt || (v.fall === 'sno' && v.mangd > 0.5) ? 1.3 : 1);
   }
 
@@ -711,6 +714,8 @@ window.RumFasadGatan = (() => {
       koer: new Map(),
       T: null, tT: -1e9,
       lamps: L.lampor || L.dag < 0.35 || L.dimma > 0.4,
+      // (hur mycket i luften som fångar strålkastarnas ljus: regn, snö och dimma; 0 i klar luft)
+      luft: Math.min(1, (v.fall ? 0.35 + 0.65 * v.mangd : 0) + (L.dimma || 0)),
       vat: (L.wet || v.blott) && !v.snotackt,
       regn: v.fall === 'regn' || v.fall === 'blandat',
       snoTak: v.snotackt || (v.fall === 'sno' && v.mangd > 0.4),
@@ -869,8 +874,8 @@ window.RumFasadGatan = (() => {
     const typ = b.typ;
     if (typ === 'plog') return D;
     const buss = typ === 'buss' || typ === 'ledbuss';
-    const stopp = buss ? 0 : T.natt ? 0.02 : T.rusning ? 0.1 : 0.06;
-    const broms = (T.natt ? 0.08 : T.rusning ? 0.24 : 0.16) * (buss ? 0.5 : 1);
+    const stopp = buss ? 0 : T.natt ? 0.01 : T.rusning ? 0.05 : 0.03;
+    const broms = (T.natt ? 0.05 : T.rusning ? 0.14 : 0.09) * (buss ? 0.5 : 1);
     const slapp = T.natt ? 0.1 : 0.14;
     const r = R();
     let v2;
@@ -936,11 +941,12 @@ window.RumFasadGatan = (() => {
     const ut = [];
     if (R() < LUCKA / I) {
       const t0 = n * LUCKA + f.i * 2.1 + R() * 0.8;
-      const a = nyttFordon(S, R, valjTyp(S, R, T, f, I), T, f);
+      const a = nyttFordon(S, R, valjTyp(S, R, T, f, I * LUGN.buss), T, f);
+      a.fart *= LUGN.fart;
       a.D = kor(R, a, T, f, t0);
       ut.push(a);
       // ibland en till efter, som följer den
-      if (a.L < 600 && R() < (T.rusning ? 0.4 : 0.2)) {
+      if (a.L < 600 && R() < (T.rusning ? 0.25 : 0.12)) {
         const b = nyttFordon(S, R, valjTyp(S, R, T, f, 0), T, f);
         if (b.L < 600) {
           b.fart = a.fart;
@@ -966,13 +972,13 @@ window.RumFasadGatan = (() => {
   // bromsar in och ställer sig bakom varandra med den första en bit till vänster om affären; de står med bromsljusen
   // tända tills det slår om, och kör sedan iväg en efter en med en dryg sekund emellan. Var och en kommer i v0,
   // bromsar med a, står, tar fart med a2 upp till v1.
-  const KOF = { v0: 2.2, a: 1.2, a2: 1.0, v1: 2.5, glapp: 1.2 };
+  const KOF = { v0: 1.95, a: 1.1, a2: 0.9, v1: 2.2, glapp: 1.2 };
   function ko(S, f, q) {
     const key = f.i * 1e7 + q;
     if (S.koer.has(key)) return S.koer.get(key);
     const R = S.G.rng(S.fro + 977 + q * 3571);
     const T = nu(S);
-    const p = T.rusning ? 0.55 : T.dag && !T.helg ? 0.12 : T.dag ? 0.08 : 0;
+    const p = T.rusning ? 0.2 : T.dag && !T.helg ? 0.05 : T.dag ? 0.03 : 0;
     let k = null;
     if (f.i === 1 && R() < p) {
       const tq = q * KO + 4 + R() * KO * 0.35;
@@ -984,7 +990,7 @@ window.RumFasadGatan = (() => {
       let s = (f.dir > 0 ? xs - XL : XR - xs) / f.um;
       let ts = tq;
       for (let j = 0; j < n; j++) {
-        const typ = j > 0 && T.bussar && R() < 0.12 ? 'buss' : valjTyp(S, R, T, f, 0);
+        const typ = j > 0 && T.bussar && R() < 0.06 ? 'buss' : valjTyp(S, R, T, f, 0);
         const b = nyttFordon(S, R, typ === 'plog' ? 'v245' : typ, T, f);
         b.f = f;
         b.s = s;
@@ -1492,12 +1498,18 @@ window.RumFasadGatan = (() => {
       else c.fillRect(-h, -300, b.L, 300);
       c.restore();
       if (S.lamps) {
+        // (smalnar av nedåt, som ljus i blöt asfalt, i stället för ett rakt band)
         for (const [x, rgb, a] of ljus) {
           const g = c.createLinearGradient(0, 4, 0, 280);
           g.addColorStop(0, `rgba(${rgb},${a})`);
           g.addColorStop(1, `rgba(${rgb},0)`);
           c.fillStyle = g;
-          c.fillRect(x - 9, 4, 18, 276);
+          c.beginPath();
+          c.moveTo(x - 7, 4);
+          c.quadraticCurveTo(x - 1.5, 70, x, 280);
+          c.quadraticCurveTo(x + 1.5, 70, x + 7, 4);
+          c.closePath();
+          c.fill();
         }
       }
     }
@@ -1539,6 +1551,10 @@ window.RumFasadGatan = (() => {
   }
 
   // Strålkastaren och baklyktan som de lyser i mörkret: skenet kring dem, ljuset på gatan framför och bromsljuset.
+  // Ljuset på gatan är en mjuk fläck på asfalten framför bilen, och strålen syns bara när det finns något i luften
+  // som fångar den (S.luft: regn, snö, dimma), som ett mjukt sken från lyktan och framåt. Förut var fläcken en ellips
+  // med skarpa kanter och strålen en kil med raka kanter också i klar luft, som lade ett grått sken över dem som gick
+  // och bilen framför. Lika många ritanrop som förut.
   function lyktor(c, b, S, fram, bak, broms) {
     const [fx, fy, fw, fh] = fram;
     const [bx, by, bw, bh] = bak;
@@ -1547,27 +1563,38 @@ window.RumFasadGatan = (() => {
     if (S.lamps) {
       c.save();
       c.globalCompositeOperation = 'lighter';
-      // ljuset på gatan framför
-      const g = c.createLinearGradient(fxe, 0, fxe + 450, 0);
-      g.addColorStop(0, 'rgba(255,236,196,0.22)');
+      // ljuset på gatan framför: en fläck som tonar ut åt alla håll, starkast ett par meter fram
+      c.save();
+      c.translate(fxe + 190, -2);
+      c.scale(1, 0.04);
+      const g = c.createRadialGradient(-70, 0, 0, 0, 0, 260);
+      g.addColorStop(0, 'rgba(255,236,196,0.24)');
+      g.addColorStop(0.55, 'rgba(255,236,196,0.09)');
       g.addColorStop(1, 'rgba(255,236,196,0)');
       c.fillStyle = g;
-      c.beginPath();
-      c.moveTo(fxe, fy - 2);
-      c.lineTo(fxe + 450, -24);
-      c.lineTo(fxe + 450, 4);
-      c.lineTo(fxe, fy + fh);
-      c.closePath();
-      c.fill();
-      c.beginPath();
-      c.ellipse(fxe + 200, -2, 230, 9, 0, 0, TAU);
-      c.fill();
+      c.fillRect(-260, -260, 520, 520);
+      c.restore();
+      // strålen i regnet, snön eller dimman: starkast vid lyktan, mjuka kanter, lite nedåt
+      if (S.luft > 0.05) {
+        c.save();
+        c.translate(fxe + 200, fy + fh / 2 + 10);
+        c.rotate(0.07);
+        c.scale(1, 0.15);
+        const s = c.createRadialGradient(-190, 0, 0, 0, 0, 230);
+        s.addColorStop(0, `rgba(255,240,210,${(0.2 * S.luft).toFixed(3)})`);
+        s.addColorStop(0.45, `rgba(255,240,210,${(0.07 * S.luft).toFixed(3)})`);
+        s.addColorStop(1, 'rgba(255,240,210,0)');
+        c.fillStyle = s;
+        c.fillRect(-230, -230, 460, 460);
+        c.restore();
+      }
       sken(c, fxe - 2, fy + fh / 2, 70, '255,244,214', 0.6);
-      sken(c, bx, byc, broms ? 70 : 46, '255,48,32', broms ? 0.6 : 0.38);
+      // (bromsljuset mjukare sedan 2026-11-17: det lyste som en varningslampa i mörkret)
+      sken(c, bx, byc, broms ? 60 : 44, '255,48,32', broms ? 0.44 : 0.32);
       c.restore();
     } else {
       sken(c, fxe - 2, fy + fh / 2, 22, '255,250,232', 0.35);
-      if (broms) sken(c, bx, byc, 34, '255,40,24', 0.45);
+      if (broms) sken(c, bx, byc, 32, '255,40,24', 0.36);
     }
   }
 
@@ -1761,7 +1788,7 @@ window.RumFasadGatan = (() => {
     c.fillStyle = S.ton('#d88a2a');
     c.fillRect(kx, ky, kw, kh);
     const [bx, by, bw, bh] = F.bak;
-    c.fillStyle = broms || S.lamps ? '#ff3a26' : S.ton('#a8201a');
+    c.fillStyle = broms ? '#ff3a26' : S.lamps ? '#cc2c1e' : S.ton('#a8201a');
     c.fillRect(bx, by, bw, bh);
     stank(c, b, S, fart, t, -30);
     lyktor(c, b, S, F.fram, F.bak, broms);
@@ -1855,7 +1882,7 @@ window.RumFasadGatan = (() => {
     const h = F.L / 2;
     c.fillStyle = S.lamps ? '#fffbea' : '#ece6cf';
     c.fillRect(h - 6, -96, 8, 20);
-    c.fillStyle = broms || S.lamps ? '#ff3a26' : S.ton('#a8201a');
+    c.fillStyle = broms ? '#ff3a26' : S.lamps ? '#cc2c1e' : S.ton('#a8201a');
     c.fillRect(-h - 2, -130, 8, 60);
     stank(c, b, S, fart, t, -36);
     lyktor(c, b, S, [h - 6, -96, 8, 20], [-h - 2, -130, 8, 60], broms);

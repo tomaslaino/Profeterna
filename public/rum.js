@@ -1506,13 +1506,18 @@ window.Rum = (() => {
   // igenom 0,3 av det, så att papperet blev grått och de nedre raderna mörka. Nu är kupongen det ljusaste i
   // bilden (2026-11-17).
   const KUPONG_LJUS = [775, 875, 640, 280, 0.94, true];
+  // Lampans kägla ligger jämnt över hans händer, kaffet och notan, som kupongens: det är hörnet där rummet och
+  // hans bild möts, och hos honom är notan och koppen det ljusaste på disken. Förut låg käglan till vänster om
+  // notan och tonade ut från mitten, så att notan, koppen och händerna hade 0,4 av dunklet och kvällens mörker
+  // över sig, rakt under lampan: notan 20 % och koppen 40 % mörkare än hos honom (2026-11-17).
+  const LAMPA_LJUS = [205, 820, 360, 250, 0.94, true];
   // Bordslampans kägla (BORD, bordslampa) ligger över tidningen och pulten under skärmen, jämn som de andra:
   // tidningen låg förut helt i dunklet (2026-11-17).
   const BORD_LJUS = [BORD.x - 75, 752, 250, 175, 0.9, true];
   const KAGLOR = [
     [575, 450, 440, 300, 0.92, true],
     KUPONG_LJUS,
-    [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
+    LAMPA_LJUS,
     BORD_LJUS,
   ];
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
@@ -1795,7 +1800,7 @@ ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div>
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
+<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.varldar = [...el.querySelectorAll('.rum-world')];
@@ -1804,7 +1809,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ringar(el);
     wire();
     // kort: högst elva tecken
-    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
+    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [], avVal: (on) => { if (window.RumBild) RumBild.avVal(on); } }) : null;
+    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång och Visa dig på tv:n i foten
+    if (window.RumBild && R.tv) RumBild.mount(el, { tv: R.tv });
     tangenter();
     // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet
     // som syntes nära något var annars Vanlig sida, som leder ut ur rummet.
@@ -7205,6 +7212,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = true;
     document.documentElement.classList.add('rum-pa');
     if (window.RumFolk) RumFolk.on(true);
+    if (window.RumBild) RumBild.on(true);
     fit();
     kval(R.kval);
     zoomTv(false);
@@ -7283,6 +7291,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = false;
     document.documentElement.classList.remove('rum-pa');
     if (window.RumFolk) RumFolk.on(false);
+    if (window.RumBild) RumBild.on(false);
     cancelAnimationFrame(R.raf);
     clearTimeout(R.vila);
     clearInterval(R.poll);

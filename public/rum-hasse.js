@@ -369,14 +369,15 @@ window.RumHasse = (() => {
   // på bron står där det har hunnit (bronGa räknar fram från en minut tillbaka). Alla i en fil åker lika fort och
   // håller avstånd, så att ingen kör igenom någon annan, och högst BRO_MAX är ute på en gång (färre på rummets
   // lägre steg). Ingen trafik när man har bett om minskad rörelse eller i en fast bild (?rum-t).
-  const BRO_MAX = { ga: [4, 4, 3, 2], fil: [5, 4, 3, 2], cykel: [4, 3, 3, 2] };
+  const BRO_MAX = { ga: [5, 4, 3, 2], fil: [5, 4, 3, 2], cykel: [4, 3, 3, 2] };
   const STROMMAR = ['ga', 'b0', 'b1', 'f0', 'f1', 't0', 't1', 'c2', 'c3'];
   // hur ofta något kommer: de som går, bilarna och cyklisterna (s, i medeltal), bussarna i var riktning (min mellan
   // turerna)
   function broTakt(T) {
     const h = T.h;
     return {
-      // (hälften så många som på gatan, där var och en går fram och tillbaka på ungefär 90 s)
+      // (hälften så många som på gatan, där var och en går fram och tillbaka på ungefär 90 s; över bron tar det en och
+      // en halv till tre minuter, så att det ändå brukar vara någon ute när det är folk i rörelse)
       ga: 180 / Math.max(1, T.gaende),
       bil: (T.varv[0] + T.varv[1]) / 2 / T.bilar,
       // (i var riktning: flest när man cyklar till och från jobbet, då en var tionde sekund på sommaren, färre på
@@ -468,9 +469,11 @@ window.RumHasse = (() => {
     if (k === 'ga') {
       if (forbi > 60) return { meter: 0 };
       if (aktiva.filter((x) => x.k === 'ga').length >= BRO_MAX.ga[steg()]) return null;
-      const sek = 42 + Math.random() * 18;
+      const g = H.ute.gangare(n.v, n.L, lage);
+      // (i gångens fart, som framför affären; den gamla figuren på 42–60 s)
+      const sek = g.sek || 42 + Math.random() * 18;
       if (forbi >= sek) return { meter: 0 };
-      B.aktiva.push({ k, g: H.ute.gangare(n.v, n.L, lage), lage, t0: nu - forbi * 1000, sek });
+      B.aktiva.push({ k, g, lage, t0: nu - forbi * 1000, sek });
       return { meter: 0 };
     }
     const fil = +k[1];
@@ -593,7 +596,8 @@ window.RumHasse = (() => {
       const sc = (r * f * (ah + (bh - ah) * t)) / g.U;
       x.globalAlpha = Math.min(1, p * n, (1 - p) * n);
       x.setTransform(g.mot ? sc : -sc, 0, 0, sc, r * (f * (ax + (bx - ax) * t) + ox), r * (f * (ay + (by - ay) * t) + oy));
-      const k = Math.floor((ms - y.t0) / 550) % 2;
+      // (fasadens människor: FOLK_N ställningar i gångens takt; den gamla figuren byter steg var 0,55:e sekund)
+      const k = g.N ? Math.floor((((ms - y.t0) / 1000) * g.takt * g.N) % g.N) : Math.floor((ms - y.t0) / 550) % 2;
       x.drawImage(g.duk, k * g.B, 0, g.B, g.H, -g.fot[0], -g.fot[1], g.B, g.H);
     }
     x.restore();
