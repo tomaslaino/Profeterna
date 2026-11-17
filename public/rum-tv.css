@@ -460,7 +460,8 @@
 .av-bla p { margin: 0; }
 .av-rubrik { color: #fff23c; font-size: 15px; line-height: 1; letter-spacing: 0.3px; text-transform: uppercase; }
 .av-text { max-width: 150px; font-size: 11px; line-height: 1.05; }
-.av-text b { font-weight: inherit; color: #45f1ff; }
+/* (inne i meningen: tv:ns b är annars block) */
+.av-text b { display: inline !important; font-weight: inherit; color: #45f1ff; }
 /* Vem är du?: porträtten med namnen under, som knappar */
 .av-vem { display: flex !important; gap: 9px; }
 .av-vem button { display: flex; flex-direction: column; align-items: center; gap: 3px; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-shadow: inherit; cursor: pointer; }

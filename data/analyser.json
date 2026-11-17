@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:19:04.911Z",
+ "uppdaterad": "2026-11-17T17:22:01.093Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3776,6 +3776,92 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-16.1",
     "writtenAt": "2026-11-17T17:19:02.253Z",
+    "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
+  },
+  {
+   "id": "401880157",
+   "match": "Middlesbrough – Bristol City",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:20:54.211Z",
+   "text": "Skubala reser norrut med kort tålamod i ryggen\n\nBristol City har klarat sig bra på bortaplan men varit usla hemma, och senast de spelade hemma sjöng de egna supportrarna ut sin tränare. Nu väntar Riverside, där Middlesbrough inte har förlorat en ligamatch i år, mot ett lag de inte har slagit på flera säsonger.\n\nMichael Skubala tog över Bristol City i maj på ett treårskontrakt, enligt azat.tv [1]. Ett halvår senare har han redan hört läktaren sjunga \"You're getting sacked in the morning\" mot honom. Det hände under 0–5 hemma mot Norwich, och laget gick dessutom av planen till burop i halvtid, skriver Sky Sports [2]. \"It's the first massive blow like that I have had in my career and it really hurts\", sa Skubala efteråt [2]. Han medgav att andra halvleken inte höll måttet, varken från honom eller spelarna. Enligt azat.tv bad han supportrarna om ursäkt och sa att han skulle vända det med hårt arbete under landslagsuppehållet [1].\n\nDet märkliga är att resorna inte är problemet. City har förlorat sex av åtta hemmamatcher i ligan, enligt azat.tv [1], men bara en enda gång på bortaplan. Det vet Skubala själv: \"Our away form this season has been good\", sa han [2]. Efter 14 dagar utan match har han haft tid att gå igenom försvarsspelet ordentligt, för efter ett 0–5 finns det mycket att prata om. Det där löser man med en hink bollar och en lång torsdag.\n\nMiddlesbrough skjuter 19,1 skott per match och är obesegrade på Riverside, med fem vinster och två oavgjorda. Ändå har klubben inte vunnit något av mötena med Bristol City sedan 2022. Bollen har aldrig läst en tabell, och uppenbarligen inte den statistiken heller.\n\nTipset: 1X (etta före krysset)\n\nPrognosen ger Middlesbrough klart övertag med 1,72, och laget är obesegrat hemma. Bristol City är dock ett annat lag borta än på Ashton Gate, något Skubala själv påpekar [1], och Boro har inte slagit dem i något möte de senaste säsongerna. Skubala har dessutom lovat att använda uppehållet till hårt arbete [2], och ett lag som reser bort efter en sådan förnedring brukar stå tätt. Bortavinsten hoppar jag över, men krysset är mer än en teoretisk möjlighet, så jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Skubala reser norrut med kort tålamod i ryggen",
+   "lead": "Bristol City har klarat sig bra på bortaplan men varit usla hemma, och senast de spelade hemma sjöng de egna supportrarna ut sin tränare. Nu väntar Riverside, där Middlesbrough inte har förlorat en ligamatch i år, mot ett lag de inte har slagit på flera säsonger.",
+   "paragraphs": [
+    "Michael Skubala tog över Bristol City i maj på ett treårskontrakt, enligt azat.tv [1]. Ett halvår senare har han redan hört läktaren sjunga \"You're getting sacked in the morning\" mot honom. Det hände under 0–5 hemma mot Norwich, och laget gick dessutom av planen till burop i halvtid, skriver Sky Sports [2]. \"It's the first massive blow like that I have had in my career and it really hurts\", sa Skubala efteråt [2]. Han medgav att andra halvleken inte höll måttet, varken från honom eller spelarna. Enligt azat.tv bad han supportrarna om ursäkt och sa att han skulle vända det med hårt arbete under landslagsuppehållet [1].",
+    "Det märkliga är att resorna inte är problemet. City har förlorat sex av åtta hemmamatcher i ligan, enligt azat.tv [1], men bara en enda gång på bortaplan. Det vet Skubala själv: \"Our away form this season has been good\", sa han [2]. Efter 14 dagar utan match har han haft tid att gå igenom försvarsspelet ordentligt, för efter ett 0–5 finns det mycket att prata om. Det där löser man med en hink bollar och en lång torsdag.",
+    "Middlesbrough skjuter 19,1 skott per match och är obesegrade på Riverside, med fem vinster och två oavgjorda. Ändå har klubben inte vunnit något av mötena med Bristol City sedan 2022. Bollen har aldrig läst en tabell, och uppenbarligen inte den statistiken heller."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "azat.tv",
+     "title": "Norwich City Thump Five Past Bristol City As Pressure Mounts On Skubala",
+     "url": "https://azat.tv/en/bristol-city-norwich-city-championship-skubala/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sky Sports",
+     "title": "www.skysports.com",
+     "url": "https://www.skysports.com/football/bristol-city-vs-norwich/report/560668",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Middlesbrough klart övertag med 1,72, och laget är obesegrat hemma. Bristol City är dock ett annat lag borta än på Ashton Gate, något Skubala själv påpekar [1], och Boro har inte slagit dem i något möte de senaste säsongerna. Skubala har dessutom lovat att använda uppehållet till hårt arbete [2], och ett lag som reser bort efter en sådan förnedring brukar stå tätt. Bortavinsten hoppar jag över, men krysset är mer än en teoretisk möjlighet, så jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "etta före krysset",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sky Sports",
+      "title": "www.skysports.com",
+      "url": "https://www.skysports.com/football/bristol-city-vs-norwich/report/560668",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "azat.tv",
+      "title": "Norwich City Thump Five Past Bristol City As Pressure Mounts On Skubala",
+      "url": "https://azat.tv/en/bristol-city-norwich-city-championship-skubala/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:20:54.211Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Bristol City åkte på 0–5 hemma, och de egna supportrarna sjöng att Skubala skulle få sparken. Det gör ont, men det säger mest något om hur laget spelar på hemmaplan. Där har de förlorat sex av åtta ligamatcher, medan de bara har förlorat en enda gång på bortaplan. Borta vet spelarna vad de ska göra.",
+     "Middlesbrough är obesegrade hemma och skjuter 19,1 skott per match. Ändå har de inte slagit Bristol City sedan 2022. Spelbolagen ser bara hemmasviten och den där förnedringen, och det köper jag aldrig. Två veckors lugn träning efter en sådan kväll ger ett lag som står tätt och väntar på sitt läge. Jag ringar in krysset och ingenting annat."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "1–1",
+    "tips": "2026-11-17T17:20:54.211Z",
+    "uppdrag": {
+     "fraser": [
+      "Det köper jag aldrig",
+      "Då är jag jävligt snäll"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:21:50.411Z",
     "attempts": 3
    },
    "model": "claude-opus-5-5",
