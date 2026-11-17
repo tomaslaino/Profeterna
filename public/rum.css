@@ -976,8 +976,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 .rum-warm { background: radial-gradient(760px 460px at 575px 40px, rgba(255, 214, 160, 0.1), rgba(255, 214, 160, 0) 70%), radial-gradient(800px 420px at 800px 860px, rgba(255, 190, 120, 0.12), rgba(255, 190, 120, 0) 70%); mix-blend-mode: screen; }
 /* (överkanten var 0,55 svart och 0,2 brun: med dunklet ovanpå, ljusKlockan i rum.js, låg det tre gånger över
-   taket och lysröret (nu takfläkten), som såg grått ut. Nu 0,3 och 0,15, och dunklet har hål vid lamporna, 2026-11-16) */
-.rum-vign { background: radial-gradient(120% 95% at 52% 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.6) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0) 11%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.5)),
+   taket och lysröret (nu takfläkten), som såg grått ut. Nu 0,3 och 0,15, och dunklet har hål vid lamporna, 2026-11-16.
+   Nederkanten var 0,5 svart över kupongens nedersta rader, nu 0,32: hörnen är mörka av den runda vinjetten, 2026-11-17) */
+.rum-vign { background: radial-gradient(120% 95% at 52% 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.6) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0) 11%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.32)),
   linear-gradient(180deg, rgba(70, 46, 8, 0.15), rgba(70, 46, 8, 0.05) 45%, rgba(70, 46, 8, 0) 70%); }
 .rum-grain {
   opacity: 0.2;
