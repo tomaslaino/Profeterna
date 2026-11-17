@@ -4,8 +4,9 @@
    three.js (rum-dator.js) i en länk i bakväggens plan, ovanför inredningens
    dukar. Närbilden (rum-regn) har sin egen duk över hela
    fönstret, och terminalen ligger på skärmen: grön text på svart, linjer och
-   mörka hörn som på ett bildrör. Menyraden står överst och sökraden och
-   tangenterna längst ner; det mellan dem rullar. */
+   mörka hörn som på ett bildrör. Kortets namn och flikar står överst,
+   sökraden och tangenterna längst ner med menyn längst ut till höger (i
+   telefonen i en egen rad under tangenterna); det mellan dem rullar. */
 
 /* ---------- på disken ---------- */
 
@@ -123,6 +124,17 @@
 .reg-fot { flex: none; display: flex; gap: 3ch; margin-top: 0.2em; padding: 0 1ch; overflow: hidden; white-space: pre; background: var(--gron); color: #010702; text-shadow: none; line-height: 1.12; }
 .reg-fot .a:hover { background: rgba(1, 7, 2, 0.16); }
 .reg-fot .av { opacity: 0.4; }
+/* menyn (KUPONGEN, REGISTRET) längst ut till höger i tangentraden: den
+   valda mörk i det ljusa, utan att något bredvid flyttar sig (fotRita i
+   rum-register.js) */
+.reg-fot .a.val, .reg-fot .a.val:hover { margin: 0 -0.5ch; padding: 0 0.5ch; background: #020a04; color: #c9ffd7; text-shadow: 0 0 0.3em rgba(65, 255, 110, 0.5); }
+.reg-fot .a.fl1, .reg-fot .a.val.fl1 { margin-left: auto; }
+/* menyn i en egen rad under tangenterna (telefonen, och en dator där den inte
+   ryms i tangentraden): två halvor, den valda omvänd, den andra under ett streck */
+.reg-meny { flex: none; display: flex; margin-top: 0.3em; line-height: 1.6; white-space: pre; }
+.reg-meny[hidden] { display: none; }
+.reg-meny .a { flex: 1; text-align: center; background: linear-gradient(var(--svag), var(--svag)) top / 100% 0.09em no-repeat; }
+.reg-meny .a.val, .reg-meny .a.val:hover { background: var(--gron); color: #010702; text-shadow: none; }
 /* prompten: markören är ett block som blinkar */
 .reg-in { position: relative; flex: none; display: flex; margin-top: 0.3em; }
 .reg-in > span { white-space: pre; }

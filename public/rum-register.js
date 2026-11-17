@@ -7,7 +7,10 @@
 // stod på anslagstavlan, ordnat efter match, lag och spelare (tavlan togs bort
 // 2026-11-14, och datorn flyttade till hennes plats).
 //
-// Överst står menyraden, som alltid står still:
+// Menyn står längst ut till höger i tangentraden längst ner, och i
+// telefonen i en egen rad under den (sedan 2026-11-17, användarens val C
+// "Listen nere" bland fyra placeringar; till dess stod den överst), och
+// står alltid still – se fotRita:
 //   KUPONGEN   omgångens matcher i avdelningar efter tävlingen (namnet en
 //              gång, till vänster eller som rubrik), med avsparken på varje
 //              rad; en match öppnar matchakten:
@@ -285,7 +288,7 @@ window.RumRegister = (() => {
     return '<div class="rum-regn" id="rum-regn" role="dialog" aria-label="Datorn" tabindex="-1"><div class="reg-bak"></div><div class="reg-3d" id="reg-3d"></div>' +
       '<div class="reg-term" id="reg-term"><div class="reg-topp" id="reg-topp"></div><div class="reg-rull" id="reg-rull"><div id="reg-ut"></div></div>' +
       `<label class="tr reg-in"><span>${esc(SOK)}</span><input id="reg-fraga" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Sök spelare, lag eller möte"><i class="reg-mark"></i></label>` +
-      '<div class="reg-fot" id="reg-fot"></div><div class="reg-fk" id="reg-fk" hidden></div><div class="reg-lin"></div></div>' +
+      '<div class="reg-fot" id="reg-fot"></div><div class="reg-meny" id="reg-meny" hidden></div><div class="reg-fk" id="reg-fk" hidden></div><div class="reg-lin"></div></div>' +
       '<div class="reg-rad" id="reg-rad"><span id="reg-sp"></span></div></div>';
   }
 
@@ -301,6 +304,7 @@ window.RumRegister = (() => {
     const rull = root.querySelector('#reg-rull');
     const ut = root.querySelector('#reg-ut');
     const fot = root.querySelector('#reg-fot');
+    const menyEl = root.querySelector('#reg-meny');
     const inp = root.querySelector('#reg-fraga');
     const mark = root.querySelector('.reg-mark');
     const sp = root.querySelector('#reg-sp');
@@ -1871,7 +1875,7 @@ window.RumRegister = (() => {
         [k ? 'NÄSTA TALET ↓' : 'NÄSTA ▼', i >= 0 && i < l.length - 1 ? '#fk:1' : null, i < 0 || i >= l.length - 1],
       ];
       if (k && A.fk.lista) b.push(['↵ HELA LISTAN', `#ga:${A.fk.q}`]);
-      return b.map(([t, q, av]) => `<span${q ? ` class="a" data-q="${esc(q)}"` : av ? ' class="av"' : ''}>${esc(t)}</span>`).join('');
+      return b;
     }
     function fkRita() {
       const f = A.fk;
@@ -1883,14 +1887,14 @@ window.RumRegister = (() => {
         `<div class="fk-in">${I.n && !iRamen ? `<div class="d">${esc(I.n)}</div>` : ''}<div class="fk-txt">${esc(I.t)}</div>` +
         I.ex.map((x) => `<div class="fk-txt fk-ex">${esc(x)}</div>`).join('') +
         (mus.matches || !f.lista ? '' : `<div class="fk-ga"><span class="a" data-q="${esc(`#ga:${f.q}`)}">HELA LISTAN ►</span></div>`) + '</div>';
-      fot.innerHTML = fkFot();
+      fotRita(fkFot(), true);
       fkPlats();
     }
     // Rutan över raderna ovanför etiketten, annars under; räcker inte raderna
-    // i kortet får den gå upp över kortets huvud (namnet och flikarna, inte
-    // menyraden). Räcker inte det heller (telefonen) börjar den under
-    // menyraden och täcker också raden den förklarar, och är den ändå för
-    // lång rullar den
+    // i kortet får den gå upp över kortets huvud (namnet och flikarna; menyn
+    // står längst ner sedan 2026-11-17). Räcker inte det heller (telefonen)
+    // börjar den överst och täcker också raden den förklarar, och är den
+    // ändå för lång rullar den
     function fkPlats() {
       if (!A.fk) return;
       const el = fkSaker().find((x) => x.dataset.q === A.fk.q);
@@ -1907,9 +1911,8 @@ window.RumRegister = (() => {
       fkEl.style.setProperty('--fk-o', `${O}px`);
       let n = Math.ceil((fkEl.getBoundingClientRect().height + O + G) / h);
       // raderna ovanför (i kortet och med huvudet) och under
-      const hr = topp.querySelector('.tr.hr');
       const ovanKort = Math.floor((rr.top - U.top + 1) / h);
-      const ovan = Math.max(ovanKort, Math.floor((rr.top - (hr ? hr.getBoundingClientRect().bottom : U.top) + 1) / h));
+      const ovan = Math.max(ovanKort, Math.floor((rr.top - Math.min(U.top, topp.getBoundingClientRect().top) + 1) / h));
       const under = Math.floor((U.bottom - rr.bottom + 1) / h);
       let top;
       if (n <= ovanKort || (n > under && n <= ovan)) top = rr.top - n * h + O;
@@ -1948,7 +1951,7 @@ window.RumRegister = (() => {
       A.fk = null;
       fkEl.hidden = true;
       fkEl.innerHTML = '';
-      if (A.R) fot.innerHTML = fotHtml(A.R);
+      if (A.R) fotRita(fotTangenter(A.R));
     }
     // förra eller nästa tal i vyn, med rutan framme
     function fkFlytta(d) {
@@ -1962,7 +1965,7 @@ window.RumRegister = (() => {
     // Flikraden under namnet (i det som står still överst, så att den inte
     // flyttar sig när man rullar eller byter flik): den valda omvänd, en
     // flik utan något att visa svag och inte tryckbar. Tre mellanslag
-    // emellan som i menyraden, två när raden annars inte ryms (telefonen).
+    // emellan, två när raden annars inte ryms (telefonen).
     function delRad(delar, val, har) {
       const n = delar.reduce((s, [, namn]) => s + namn.length, 0);
       const mellan = n + 3 * (delar.length - 1) <= A.bred ? '   ' : '  ';
@@ -2912,7 +2915,7 @@ window.RumRegister = (() => {
     // ---------- vyerna ----------
     //
     // En vy är { flik, mote, div, lag, spelare } eller en sökning
-    // { flik: 'sok', eko, hits }. bygg ger menyraden (topp), raderna (ut),
+    // { flik: 'sok', eko, hits }. bygg ger kortets huvud (topp), raderna (ut),
     // raderna med nummer (nr), förra och nästa (sido) och om vyn räknar med
     // dolda resultat.
 
@@ -2933,21 +2936,19 @@ window.RumRegister = (() => {
       return vy.slag === 'spelare' ? spelarna(vy.div, S, R) : lagen(vy.div, S, R);
     }
 
-    // (huvud: det som står still under menyraden i ett kort – namnet och
-    // flikarna; delar: kortets flikar som har något, del: den valda)
+    // (huvud: det som står still överst i ett kort – namnet och flikarna;
+    // delar: kortets flikar som har något, del: den valda)
     function bygg(vy) {
       const S = slojan();
       const R = { nr: {}, sido: null, slojas: false, huvud: null, delar: null, del: null };
-      const aktiv = vy.flik === 'sok' ? (A.fore || {}).flik : vy.flik;
-      const meny = rad(...FLIKAR.flatMap(([id, namn], j) => [[namn, aktiv === id ? 'i' : '', `#flik:${id}`], [j < FLIKAR.length - 1 ? '   ' : '', '']]));
       R.ut = vy.flik === 'sok' ? traffLista(vy, R) : vyRader(vy, S, R);
-      R.topp = [meny, streck(), ...(R.huvud || [])];
+      R.topp = R.huvud || [];
       R.veil = S;
       return R;
     }
 
     // Tangenterna längst ner: tryckbara, med tangentens namn när det finns ett tangentbord
-    function fotHtml(R) {
+    function fotTangenter(R) {
       const k = mus.matches;
       const b = [];
       const rot = !A.bak.length && A.vy.flik !== 'sok';
@@ -2959,7 +2960,37 @@ window.RumRegister = (() => {
       if (k && R.delar && R.delar.length > 1) b.push(['TAB FLIK', null]);
       if (k && A.vy.flik === 'sok' && KATEGORIER.filter(([id]) => antal(A.vy.hits || [], id)).length > 1) b.push(['TAB KATEGORI', null]);
       if (k && Object.keys(R.nr).length) b.push(['↑↓ VÄLJ   ↵ ÖPPNA', null]);
-      return b.map(([t, q, av]) => `<span${q ? ` class="a" data-q="${esc(q)}"` : av ? ' class="av"' : ''}>${esc(t)}</span>`).join('');
+      return b;
+    }
+    // Tangentraden (b: [text, fråga, avstängd]) och menyn. Menyn (KUPONGEN,
+    // REGISTRET) står längst ut till höger i tangentraden, den valda mörk i
+    // det ljusa (sedan 2026-11-17, användarens val C "Listen nere" bland fyra
+    // placeringar: A allt på innehållets mittaxel, B ett träd i vänsterkanten,
+    // D menyn och sidorna i de högra hörnen; till dess stod menyn överst med
+    // ett streck under, så att kortets namn, flikar och sidor stod i en trappa
+    // under den). Ryms inte allt går tipsen utan något att trycka på först,
+    // bakifrån. I telefonen, och när inte ens det räcker, står menyn i en egen
+    // rad under tangenterna: två halvor att trycka på med tummen. Medan
+    // förklaringsrutan står framme (rutan) har tangentraden rutans tangenter,
+    // och menyn står bara kvar i sin egen rad – raden kommer och går aldrig
+    // med rutan, så att inget flyttar sig.
+    function fotRita(b, rutan = false) {
+      const aktiv = A.vy.flik === 'sok' ? (A.fore || {}).flik : A.vy.flik;
+      const meny = FLIKAR.map(([id, namn]) => [namn, `#flik:${id}`, id === aktiv]);
+      const bredd = (l) => l.reduce((s, [t]) => s + t.length + 3, -3);
+      // (tangentraden har 1ch luft på var sida och 3ch mellan tangenterna)
+      const ryms = (l) => bredd(l) + 3 + bredd(meny) <= A.bred - 1;
+      const l = b.slice();
+      for (let j = l.length - 1; j >= 0 && !ryms(l); j--) if (!l[j][1] && !l[j][2]) l.splice(j, 1);
+      if (!rutan) A.menyNere = !ov.classList.contains('tel') && ryms(l);
+      const tangenter = (x) => x.map(([t, q, av]) => `<span${q ? ` class="a" data-q="${esc(q)}"` : av ? ' class="av"' : ''}>${esc(t)}</span>`).join('');
+      const menyHtml = (forst) => meny.map(([t, q, val], j) => `<span class="a${val ? ' val' : ''}${forst && !j ? ` ${forst}` : ''}" data-q="${esc(q)}">${esc(t)}</span>`).join('');
+      fot.innerHTML = rutan || !A.menyNere ? tangenter(b) : tangenter(l) + menyHtml('fl1');
+      menyEl.innerHTML = A.menyNere ? '' : menyHtml();
+      if (menyEl.hidden !== Boolean(A.menyNere)) {
+        menyEl.hidden = Boolean(A.menyNere);
+        helaRader();
+      }
     }
 
     // ---------- utskriften ----------
@@ -2980,7 +3011,7 @@ window.RumRegister = (() => {
       A.ut = h;
       A.topp = html(R.topp);
       topp.innerHTML = A.topp;
-      fot.innerHTML = fotHtml(R);
+      fotRita(fotTangenter(R));
       spoilerRad();
       // (rankningen med en markerad rad: på en gång, och rullad dit)
       if (!skriv || o.calm() || R.mig != null) { ut.innerHTML = h; rull.scrollTop = 0; tillMig(R); return; }
@@ -3171,7 +3202,7 @@ window.RumRegister = (() => {
         A.topp = ht;
         ut.innerHTML = h;
         topp.innerHTML = ht;
-        fot.innerHTML = fotHtml(R);
+        if (!A.fk) fotRita(fotTangenter(R));
         rull.scrollTop = y;
         // (rankningen som väntade på datan: till den markerade raden när den kommer)
         if (R.mig != null && !(forra && forra.mig != null)) tillMig(R);
@@ -3181,7 +3212,7 @@ window.RumRegister = (() => {
         if (A.fk) fkRita();
       }
       if (!A.on) { A.R = R; A.ut = h; }
-      // skärmen i rummet: menyraden och det som står i terminalen
+      // skärmen i rummet: det som står i terminalen (kortets huvud och raderna)
       const s = JSON.stringify([R.topp, R.ut]);
       if (A.L && !A.on && s !== A.skarm) {
         A.skarm = s;
@@ -3359,8 +3390,9 @@ window.RumRegister = (() => {
       const kx = 1024 / r.width;
       const ky = 768 / r.height;
       const f = P.f * ky;
-      // (under raderna står sökraden och tangenterna)
-      const n = Math.floor((P.height / P.f - LUFT_TEL.topp - LUFT_TEL.fot - 0.3 - LUFT_TEL.rad - 0.2 - 1.6) / LUFT_TEL.rad);
+      // (under raderna står sökraden, tangenterna och menyn, som i telefonen
+      // har en egen rad: fotRita och .reg-meny i rum-register.css)
+      const n = Math.floor((P.height / P.f - LUFT_TEL.topp - LUFT_TEL.fot - 0.3 - LUFT_TEL.rad - 0.2 - 1.6 - 0.3 - 1.6) / LUFT_TEL.rad);
       return { x: (P.left - r.left + LUFT_TEL.sida * P.f) * kx, y: LUFT_TEL.topp * f, f, rad: LUFT_TEL.rad, hoger: (P.left + P.width - r.left - LUFT_TEL.sida * P.f) * kx, n: Math.max(4, n) };
     }
     // hur många tecken som ryms på en rad (minst BRED), när terminalen syns
@@ -3441,6 +3473,8 @@ window.RumRegister = (() => {
       if (!A.on || !A.L) return;
       placera(A.L.resize());
       if (matBredd()) visa(A.vy, false);
+      // (telefonen eller inte: menyn i tangentraden eller i en egen rad)
+      else if (A.R && !A.fk) fotRita(fotTangenter(A.R));
     });
 
     ov.addEventListener('click', (e) => {

@@ -8182,9 +8182,16 @@ matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man 
 och matchakten fick lagets plats i divisionen efter varje tal, så att det topplistan visade
 finns kvar där.
 
-Överst står menyraden, som alltid står still: *KUPONGEN* och *REGISTRET*, med den valda fliken
-omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
-över hela bredden; det mellan dem rullar.
+Överst står kortets namn, flikar och sidor. Längst ner står sökraden (*SÖK >*) och under den
+tangenterna, omvända över hela bredden, med menyn – *KUPONGEN* och *REGISTRET*, den valda mörk i
+det ljusa – längst ut till höger; i telefonen har menyn en egen rad under tangenterna, två halvor
+att trycka på med tummen. Det mellan dem rullar. Menyn stod överst till 2026-11-17, med ett streck
+under, så att menyn, kortets flikar och sidorna stod i en trappa med tre omvända block. Användaren
+frågade då om placeringen i höjd- och sidled och fick fyra skisser i den riktiga närbilden: A allt
+på innehållets mittaxel, B ett träd i vänsterkanten (bara på datorn), C menyn nere i tangentraden
+och D menyn och sidorna i de högra hörnen. Hen valde C, som ger innehållet två rader till på datorn.
+Ryms inte menyn i tangentraden går tipsen utan något att trycka på först (*↑↓ VÄLJ*), och räcker
+inte det står den i en egen rad som i telefonen (`fotRita` i `public/rum-register.js`).
 
 - **Kupongen** – omgångens matcher numrerade, bara lagen, med divisionen eller cupen där
   raden ryms och avsparken. Avsparken står bara där den skiljer sig från raden ovanför, som i
