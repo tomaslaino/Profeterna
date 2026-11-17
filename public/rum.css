@@ -259,7 +259,7 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* ---------- visitkortet (rum.js, kortHtml) ---------- */
 
-/* På väggen mellan stationsuret och orakelramen, till höger om palmetten
+/* På väggen mellan stationsuret och orakelramen, till höger om mitten och ovanför tavellampan på ramen
    och med högerkanten i linje med ramens, så långt ner att urets skugga inte
    når det (veckans löpsedel står i stället utanför dörren, rum-affischer.js).
    Länken är lite större än kortet, så att det går att träffa med fingret.

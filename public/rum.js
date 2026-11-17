@@ -140,6 +140,7 @@ window.Rum = (() => {
     <linearGradient id="rum-streakred" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3b30" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></linearGradient>
     <linearGradient id="rum-cupg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
     <radialGradient id="rum-spot" fx=".5" fy=".32"><stop offset="0" stop-color="#72613f"/><stop offset=".45" stop-color="#665737"/><stop offset=".78" stop-color="#332b1b"/><stop offset="1" stop-color="#000"/></radialGradient>
+    <radialGradient id="rum-tavelspot" fx=".5" fy=".15"><stop offset="0" stop-color="#72613f"/><stop offset=".45" stop-color="#665737"/><stop offset=".78" stop-color="#332b1b"/><stop offset="1" stop-color="#000"/></radialGradient>
     <linearGradient id="rum-guld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e3a8"/><stop offset=".55" stop-color="#d4a650"/><stop offset="1" stop-color="#9c7230"/></linearGradient>
     <clipPath id="rum-hogerklipp"><polygon points="1140,90 1250,0 1600,0 1600,1000 1140,730"/></clipPath>
     <clipPath id="rum-win"><rect ${box(WIN)}/></clipPath>
@@ -162,17 +163,20 @@ window.Rum = (() => {
       `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 1.4 * sc(x1))} ${x0},${r1(at(x0, yb) + 1.4 * sc(x0))}" fill="#c9bfa5" opacity=".18"/>`;
   }
 
-  // Spotarna i taket (rum-inredning.js): mjukt ljus på uret, orakelramen och Tipsligan ([cx, cy, rx, ry, styrka] i
-  // scenens mått). Ljuset är målat i väggens bild, som ritas en gång och följer väggen när kameran rör sig, och
-  // ramarna, paketen och disken får samma ljus i 3D (SPOTAR i rum-inredning.js). Färgskiftningen (color-dodge)
-  // gör väggen ljusare i sin egen färg, som ljus gör, i stället för att lägga en ljus hinna över den.
+  // Mjukt ljus på uret, orakelramen och Tipsligan ([cx, cy, rx, ry, styrka] i scenens mått): på uret från en spot
+  // man inte ser, på ramen och Tipsligan från tavellamporna över dem (TAVEL i rum-inredning.js). Ljuset är målat i
+  // väggens bild, som ritas en gång och följer väggen när kameran rör sig, och ramarna, paketen och disken får
+  // samma ljus i 3D (SPOTAR i rum-inredning.js). Färgskiftningen (color-dodge) gör väggen ljusare i sin egen färg,
+  // som ljus gör, i stället för att lägga en ljus hinna över den. Under tavellamporna (tavel) är fläcken ljusast
+  // strax under kåpan och tonar ut nedåt (#rum-tavelspot); förut låg den mitt på tavlan och lika mycket ovanför
+  // den, som från taket (2026-11-17).
   const SPOT = {
     ur: [1050, 200, 100, 118, 0.7],
-    ram: [1050, 372, 150, 190, 1],
-    liga: [1492, 369, 104, 150, 0.9],
+    ram: [1050, 410, 150, 128, 1, true],
+    liga: [1500, 410, 108, 136, 0.9, true],
   };
-  function spotYta([cx, cy, rx, ry, a], klipp = '') {
-    return `<ellipse ${klipp}cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#rum-spot)" opacity="${a.toFixed(2)}" style="mix-blend-mode:color-dodge"/>`;
+  function spotYta([cx, cy, rx, ry, a, tavel], klipp = '') {
+    return `<ellipse ${klipp}cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#rum-${tavel ? 'tavelspot' : 'spot'})" opacity="${a.toFixed(2)}" style="mix-blend-mode:color-dodge"/>`;
   }
 
   // Furupanelen på bakväggen: lackade bräder med kvistar och ådring, mörka av
@@ -1493,8 +1497,8 @@ window.Rum = (() => {
     rita(g);
   }
   // Ljuset kommer någonstans ifrån: takfläktens kupor lyser på gängets bord och på pulten med kupongen
-  // ([cx, cy, rx, ry, styrka] i scenens mått), spotarna i taket på löpsedlarna, uret, ramen och
-  // Tipsligan, och runt dem sjunker rummet in i dunkel, mest ute i kanterna, så att blicken går dit ljuset
+  // ([cx, cy, rx, ry, styrka] i scenens mått), tavellamporna på löpsedlarna, ramen och Tipsligan och
+  // en spot på uret, och runt dem sjunker rummet in i dunkel, mest ute i kanterna, så att blicken går dit ljuset
   // är (förut var rummet lika upplyst överallt). Dunklet är en del av .rum-vign och värmen i käglorna av
   // .rum-warm (ljusKlockan): inga nya lager, och inget ritas i bildrutorna.
   // Lampan över pulten (lampa, i pultens plan, som står 1,05 gånger från mitten): där den hänger i scenen,
@@ -1639,16 +1643,17 @@ window.Rum = (() => {
       // (taklamporna lyser upp taket och väggen överst, och lampan över pulten lyser: förut låg dunklet
       // också över dem, så att lysröret, som hängde där fläkten hänger, såg grått ut)
       for (const [x, y, , sort] of lampL) if (sort === 'flakt') rad(q, x, y, 330, 145, '0, 0, 0', 0.7);
-      // (löpsedlarna i spotens ljus)
+      // (löpsedlarna i tavellampans ljus)
       rad(q, 855, 360, 140, 210, '0, 0, 0', 0.95);
       rad(q, LAMPA_I[0], LAMPA_I[1], 170, 125, '0, 0, 0', 0.9);
       rad(q, BORD.x, BORD.kant - 4, 130, 48, '0, 0, 0', 0.85);
-      // (spotarnas ljus faller på disken under Tipsligan, med pallarna)
+      // (tavellampans ljus faller på disken under Tipsligan, med pallarna)
       rad(q, 1320, 560, 290, 120, '0, 0, 0', 0.45);
       // (och runt neonens spegelbild i pulten, spegelBild)
       rad(q, 400, 690, 140, 110, '0, 0, 0', 0.7);
       rad(q, 1232, 180, 230, 150, '0, 0, 0', 0.9);
-      for (const [x, y, rx, ry, a] of Object.values(SPOT)) rad(q, x, y, rx, ry, '0, 0, 0', 0.6 + 0.3 * a);
+      // (under tavellamporna högre upp i fläcken, där den är ljusast: som förut, när den låg mitt på tavlan)
+      for (const [x, y, rx, ry, a, tavel] of Object.values(SPOT)) rad(q, x, tavel ? y - 0.3 * ry : y, rx, ry, '0, 0, 0', 0.6 + 0.3 * a);
       for (const [x, y, rx, ry] of pyntL) rad(q, x, y, rx, ry, '0, 0, 0', 0.8);
       if (s > 0.02) {
         const gr = g.createLinearGradient(0, 0, 0, H);

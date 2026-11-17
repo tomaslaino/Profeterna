@@ -1309,6 +1309,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   (papperet 72–78 av 255, mot kupongens 202). Nu står en bankirlampa med skärm i grönt glas och fot i mässing längst
   till höger på pulten och sticker in i bilden från kanten, och tidningen läses i dess ljus (papperet 178).
   Se [Bordslampan vid Helgarderat](#bordslampan-vid-helgarderat-2026-11-17).
+- **Tavellamporna (2026-11-17, användarens önskemål):** "kan du ordna så att det dyker upp (lämpliga) visualiserade
+  lampor som passar temat som belyser där det just nu är belyst fast det inte finns någon lampa som man ser gör detta
+  … Det ska inte dra en massa grafik". Orakelramen, löpsedlarna och Tipsligan låg i ljus från spotar som inte syntes.
+  Nu lyser tavellampor i mässing på dem: på ramens överkant (där palmetten satt), på skivans överkant och på väggen
+  över Tipsligan, ritade en gång med det de lyser på och släckta på natten. Se
+  [Tavellamporna](#tavellamporna-2026-11-17).
 - **Datorn och videon parallellt med disken (2026-11-16, användarens önskemål):** "justera både TV:n och
   datorn så att de står parallellt med bänken - just nu står de liksom lite på sniskan" och "när man zoomar
   in få en bra bild - precis som vanligt". Datorn var vänd mellan gänget och ögat och videon 22 grader in mot
@@ -4544,11 +4550,12 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   (`Kronan.holders`) som i Olympen och på förstasidans polaroid (`Kronan.scene`) – det
   urklippta fotot på marmorsockeln med lagerkransen (som inte glimmar här, se [När datorn
   inte hinner med](#när-datorn-inte-hinner-med)) och strålarna som vrider sig – bakom
-  glaset i en förgylld ram i 3D med pärlstav, rosetter i hörnen och en palmett överst. Ett
+  glaset i en förgylld ram i 3D med pärlstav, rosetter i hörnen och en tavellampa i mässing överst (till 2026-11-17 en
+  palmett, se [Tavellamporna](#tavellamporna-2026-11-17)). Ett
   skimmer drar snett över glaset var elfte sekund. Mässingsskylten under säger
   *Omgångens orakel* och namnet (delat: *Laino & Dogge*, i mindre stil), och
   ramen och skylten lyser med när man pekar på dem.
-- **Visitkortet** (på väggen mellan stationsuret och orakelramen, till höger om palmetten,
+- **Visitkortet** (på väggen mellan stationsuret och orakelramen, till höger om mitten och ovanför tavellampan på ramen,
   fäst med ett mässingsstift och lite snett) → närbild: Matchfixarnas visitkort på tjockt gräddvitt papper med en dubbel linje i
   terrakotta, logon och MATCHFIXARNA i guldfolie överst, i mitten våra autografer – det vi kallas
   (*Laino*, *Tejder*, *Dogge*) i var och ens handstil och bläck, samma som på kupongen (`sm-k0`–`sm-k2`), med en släng under
@@ -6834,7 +6841,8 @@ och fläckarna ligger där de ska. Inte mätt i bildrutor, eftersom inget nytt r
 **Spotskenan togs bort (2026-11-16).** När takfläkten ersatte lysröret fick taket också en svart skena med fyra
 halogenspotar, men den passade inte in i rummet och togs bort samma kväll, i rummet som på fasaden och från Hasses bar.
 Ljuset den lade på löpsedlarna och uret finns kvar (`SPOTAR`, `SPOT.ur` och hålet i dunklet vid löpsedlarna): som de
-andra spotarna syns de inte, bara deras ljus.
+andra spotarna syns de inte, bara deras ljus. Sedan 2026-11-17 kommer ljuset på ramen, löpsedlarna och Tipsligan från
+tavellampor man ser (se [Tavellamporna](#tavellamporna-2026-11-17)); bara uret har kvar en spot man inte ser.
 
 ### Ljuskäglorna och skärpedjupet (2026-11-15)
 
@@ -7082,6 +7090,38 @@ lampan över pulten (124) är fortfarande det ljusaste vid pulten. Provat också
 telefonen (412 × 870), där lampan är utanför bilden också när man har dragit så långt det går åt höger (tidningen når
 redan kanten där) men tidningen är ljusare. Sakerna på pulten (askkoppen, dosan, fläkten) står till vänster om
 tidningen, långt från lampan.
+
+### Tavellamporna (2026-11-17)
+
+Användarens önskemål: "kan du ordna så att det dyker upp (lämpliga) visualiserade lampor som passar temat som belyser
+där det just nu är belyst fast det inte finns någon lampa som man ser gör detta. Om det inte finns någon snygg lösning
+på det så skippa det i så fall … Det ska inte dra en massa grafik då det ska funka även på sämre mobiler och datorer!"
+Orakelramen, skivan med löpsedlarna och Tipsligan låg i ljus från spotar i taket som inte syntes (spotskenan togs bort,
+se [Spotarna i taket](#spotarna-i-taket)). Nu har var och en en tavellampa i mässing, som i ett galleri: en kåpa, en
+halv cylinder med ändar och knoppar som är öppen nedåt mot tavlan, på en arm (`TAVEL`, `tavellampa` och
+`medTavelsken` i [public/rum-inredning.js](public/rum-inredning.js)).
+
+- **Var de sitter:** på orakelramens överkant med en klämma (där palmetten satt), så låg att visitkortet till höger om
+  mitten går fritt; med en klämma på skivans överkant, mellan kedjorna; och på väggen över Tipsligan, med en platta och
+  en böjd arm. Gängets bord och kupongen ligger i takfläktens käglor (`KAGLOR` i rum.js) och notan under lampan över
+  pulten, så där behövs ingen. Uret har kvar en spot man inte ser: en tavellampa över ett ur ser fel ut.
+- **Ljuset kommer från dem:** spotarna i 3D (`SPOTAR`) sitter i kåporna, med en vid kägla och ljus som avtar med
+  avståndet (inte dess kvadrat: annars blev överkanten vit och resten mörk), och fläckarna på väggen (`SPOT.ram` och
+  `SPOT.liga` i rum.js) är ljusast strax under kåpan och tonar ut nedåt (`#rum-tavelspot`) i stället för att ligga
+  mitt på tavlan och lika mycket ovanför den. Hålen i dunklet ligger där de låg.
+- **Skenet ur kåpan:** en ljus rand längs kåpans underkant och ett mjukt sken under den, ritat ovanpå i sakens egen
+  duk (tre utdragna övertoningar per lampa; en rad runda gav ett brus av svaga övertoningar), som skenet kring
+  takfläktens kupor. Insidan av kåpan lyser (en yta vänd inåt i stället för `DoubleSide`, som hade gett ett nytt
+  grafikprogram).
+- **Natten:** lamporna släcks med taklamporna (`natt`): insidan och skenet slocknar, och ramen och högra väggen ritas
+  om i tiondelar av natten, som undertaket.
+
+Inget nytt lager och inget nytt ritas i bildrutorna: lamporna är 28 små delar i scenerna för ramen, skivan och högra
+väggen, som ritas en gång (när typsnitten har laddats, när oraklet byts och i närbilderna), med samma material och ljus
+som det andra: sidan länkar 123 grafikprogram med lamporna som utan. Ramens duk räcker högre för lampan: 164 × 258 i
+stället för 164 × 232 i planet. Provat i Chrome med mjukvarugrafik som dator (1887 × 1053) klockan 16.20 i mulet väder,
+21.30 och 02.00 i klart, på steg 3 och i telefonen (412 × 870), i närbilderna av ramen, visitkortet och Tipsligan, och
+med bygget i mindre form (`--minify`).
 
 ### Utsikten och vädret
 
