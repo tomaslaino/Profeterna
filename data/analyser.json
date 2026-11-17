@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:26:32.659Z",
+ "uppdaterad": "2026-11-17T18:31:33.955Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3863,6 +3863,77 @@
     "version": "2026-11-16.1",
     "writtenAt": "2026-11-17T17:21:50.411Z",
     "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
+  },
+  {
+   "id": "401880154",
+   "match": "Sheffield United – Watford",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T18:30:56.990Z",
+   "text": "Watford håller nollan hemma, men reser sämre\n\nWatford kommer till Bramall Lane med tre raka hemmamatcher utan insläppt mål och en målvakt i form. Borta har laget däremot inte vunnit en enda gång. Sheffield United har vunnit de fem senaste mötena och har haft två veckor på sig att smälta förlusten i London.\n\nDet mest intressanta med Watford just nu är Federico Ravaglia. Mot Middlesbrough för två veckor sedan räddade han skott från Jeremy Sarmiento, en nick på nära håll från Callum Brittain och till sist ett försök från inhopparen Kyle Joseph, och Irish News kallade det för en storslagen insats [1]. Det behövdes, eftersom Boro hade 81 procent av bollen i första halvlek [1]. Alessio Dionisi, som tidningen beskriver som hårt pressad, tyckte att tredje raka hemmamatchen utan insläppt mål var lugnande [1]. Det får han gärna tycka, men ett lag som lämnar bort bollen så länge lever farligt vid varje hörna. Det ser du redan på uppvärmningen.\n\nBortaplan är något helt annat. Där har Watford sex förluster, en oavgjord och ingen seger, och laget har inte gjort mål i sex av sina femton ligamatcher. Myron Boadu klarade inte ett sent konditionstest före Boro-matchen och Krepin Diatta fick gå av inom en kvart [1], så anfallet är tunt. Dionisi har dessutom haft två målvakter på bänken för sjunde gången den här säsongen [1], vilket säger en del om hur bred truppen är.\n\nSheffield United har vunnit de fem senaste mötena, samtliga med ett måls marginal eller utan insläppt mål. Laget har haft fjorton dagar på sig efter förlusten med 1–2 mot Charlton. I Grusnäs hade vi aldrig så lång tid mellan matcherna, och ändå kom vi alltid fram till samma sak: den som står rätt på fasta situationer vinner de jämna matcherna.\n\nTipset: 1 (trygg etta)\n\nPrognosen sätter hemmasegern till 1,72 och bortasegern till 5,26, och det stämmer med vad jag har läst. Watford har ingen seger borta, ett tunt anfall utan Boadu och kanske utan Diatta [1], och laget lever på en målvakt som räddar åt ett lag som inte har bollen [1]. Mot det står att Watford har släppt in 3,5 mål färre än chanserna mot dem borde ge, så Ravaglia kan hålla det mållöst länge en gång till. Ändå låter jag ettan stå ensam. Ett lag som inte gör mål borta brukar inte heller vinna där.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Watford håller nollan hemma, men reser sämre",
+   "lead": "Watford kommer till Bramall Lane med tre raka hemmamatcher utan insläppt mål och en målvakt i form. Borta har laget däremot inte vunnit en enda gång. Sheffield United har vunnit de fem senaste mötena och har haft två veckor på sig att smälta förlusten i London.",
+   "paragraphs": [
+    "Det mest intressanta med Watford just nu är Federico Ravaglia. Mot Middlesbrough för två veckor sedan räddade han skott från Jeremy Sarmiento, en nick på nära håll från Callum Brittain och till sist ett försök från inhopparen Kyle Joseph, och Irish News kallade det för en storslagen insats [1]. Det behövdes, eftersom Boro hade 81 procent av bollen i första halvlek [1]. Alessio Dionisi, som tidningen beskriver som hårt pressad, tyckte att tredje raka hemmamatchen utan insläppt mål var lugnande [1]. Det får han gärna tycka, men ett lag som lämnar bort bollen så länge lever farligt vid varje hörna. Det ser du redan på uppvärmningen.",
+    "Bortaplan är något helt annat. Där har Watford sex förluster, en oavgjord och ingen seger, och laget har inte gjort mål i sex av sina femton ligamatcher. Myron Boadu klarade inte ett sent konditionstest före Boro-matchen och Krepin Diatta fick gå av inom en kvart [1], så anfallet är tunt. Dionisi har dessutom haft två målvakter på bänken för sjunde gången den här säsongen [1], vilket säger en del om hur bred truppen är.",
+    "Sheffield United har vunnit de fem senaste mötena, samtliga med ett måls marginal eller utan insläppt mål. Laget har haft fjorton dagar på sig efter förlusten med 1–2 mot Charlton. I Grusnäs hade vi aldrig så lång tid mellan matcherna, och ändå kom vi alltid fram till samma sak: den som står rätt på fasta situationer vinner de jämna matcherna."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The Irish News",
+     "title": "keeper federico ravaglia shuts out middlesbrough to earn watford point JH5IT7DAKJNYVH4ZY336DAUP4E",
+     "url": "https://www.irishnews.com/sport/soccer/keeper-federico-ravaglia-shuts-out-middlesbrough-to-earn-watford-point-JH5IT7DAKJNYVH4ZY336DAUP4E/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen sätter hemmasegern till 1,72 och bortasegern till 5,26, och det stämmer med vad jag har läst. Watford har ingen seger borta, ett tunt anfall utan Boadu och kanske utan Diatta [1], och laget lever på en målvakt som räddar åt ett lag som inte har bollen [1]. Mot det står att Watford har släppt in 3,5 mål färre än chanserna mot dem borde ge, så Ravaglia kan hålla det mållöst länge en gång till. Ändå låter jag ettan stå ensam. Ett lag som inte gör mål borta brukar inte heller vinna där.",
+    "signs": [
+     0
+    ],
+    "note": "trygg etta",
+    "sources": [
+     {
+      "n": 1,
+      "source": "The Irish News",
+      "title": "keeper federico ravaglia shuts out middlesbrough to earn watford point JH5IT7DAKJNYVH4ZY336DAUP4E",
+      "url": "https://www.irishnews.com/sport/soccer/keeper-federico-ravaglia-shuts-out-middlesbrough-to-earn-watford-point-JH5IT7DAKJNYVH4ZY336DAUP4E/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T18:30:56.990Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Watford har inte vunnit en enda bortamatch, utan har sex förluster och en oavgjord. Laget har dessutom inte gjort mål i sex av sina femton ligamatcher. Boadu hann inte bli spelklar och Diatta fick kliva av efter en kvart, så det finns inte mycket framåt. Det är ren orsak och verkan att ett sådant lag inte vinner borta.",
+     "Ravaglia är i form, och han kan säkert hålla det mållöst länge. Men ett lag som lämnar ifrån sig bollen så mycket får försvara hörna efter hörna, och någon gång sitter en av dem. Sheffield United har vunnit de fem senaste mötena, alla med uddamålet eller utan insläppt mål, och har haft fjorton dagar på sig att ladda om efter förlusten mot Charlton. Jag ringar in ettan och bara ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "1–0",
+    "tips": "2026-11-17T18:30:56.990Z",
+    "uppdrag": {
+     "fraser": [
+      "Orsak och verkan",
+      "Här höjer jag ett varningens finger"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T18:31:24.920Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
