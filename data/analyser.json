@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:11:59.831Z",
+ "uppdaterad": "2026-11-17T17:13:49.447Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3235,6 +3235,94 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-15T19:48:27.995Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879238",
+   "match": "AFC Bournemouth – Nottingham Forest",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:13:24.826Z",
+   "text": "Rose kommer med åtta raka och Forest med Glasner\n\nBournemouth tar emot Nottingham Forest på Vitality Stadium med åtta raka segrar bakom sig under Marco Rose. Forest har just slagit Manchester City med 3–1, och efter den matchen talade Oliver Glasner om en energi han inte trodde fanns på City Ground.\n\nUnder Marco Rose har Bournemouth blivit ett lag som vinner även när det blir trångt. Vid 2–1 borta mot Ipswich gjorde Evanilson mål för femte ligamatchen i rad. Han rullade in bollen i ett tomt mål efter att Christian Walton tappat den, och Ryan Christies skott tog vägen via Leif Davis. Det var lagets åttonde raka seger, och enligt Southern Gazette [1] förklarade Rose den så här: ”We stick together, have good balance in our game, defend together, suffer, and press well.” Han nämner alltså att lida före att pressa, och det tycker jag om. Ett lag som klarar av att lida har gjort sin uppvärmning ordentligt, och det ser du redan på uppvärmningen.\n\nForest har haft en tyngre höst, men mot Manchester City hände något. Liam Delap gjorde två mål, laget ledde med 2–0 i halvlek och lämnade nedflyttningsstrecket på nio poäng. Enligt TimesLIVE [2] sade Glasner efteråt att ”the energy in the team and at the City Ground was so incredible”. Samtidigt har Forest bara gjort 9 mål på tio ligamatcher, och de har blivit utan mål i hälften av dem. Det är långt under vad chanserna borde ha gett. Det där löser man med en hink bollar, gärna en tisdagskväll när ingen ser på.\n\nMötena de senaste säsongerna har för det mesta slutat jämnt, med en enda stor avvikelse. Bournemouth vann 5–0 hemma i januari 2025, men sedan dess har det blivit 2–0 och 1–1. På Forests sida är Nicolò Savona och Nicolás Domínguez borta, och Neco Williams och Xaver Schlager är tveksamma. Hos Bournemouth saknas Álex Jiménez Sánchez, Alex Tóth och två mittbackar till.\n\nTipset: 1 (Ganska säker)\n\nPrognosen ger hemmalaget drygt hälften av chansen, och det stämmer med vad jag har läst. Rose har ett lag som enligt honom själv försvarar tillsammans och pressar bra [1], och Evanilson gör mål varje vecka [1]. Forests seger mot City var på riktigt [2], men en enda kväll ändrar inte att laget har svårt att göra mål. Det enda som oroar mig är Europa League, men det är Forest som får spela i mitten av veckan efter den här matchen. Bollen har aldrig läst en tabell, men den här gången tänker jag inte gå emot den. Jag ringar in en etta.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Rose kommer med åtta raka och Forest med Glasner",
+   "lead": "Bournemouth tar emot Nottingham Forest på Vitality Stadium med åtta raka segrar bakom sig under Marco Rose. Forest har just slagit Manchester City med 3–1, och efter den matchen talade Oliver Glasner om en energi han inte trodde fanns på City Ground.",
+   "paragraphs": [
+    "Under Marco Rose har Bournemouth blivit ett lag som vinner även när det blir trångt. Vid 2–1 borta mot Ipswich gjorde Evanilson mål för femte ligamatchen i rad. Han rullade in bollen i ett tomt mål efter att Christian Walton tappat den, och Ryan Christies skott tog vägen via Leif Davis. Det var lagets åttonde raka seger, och enligt Southern Gazette [1] förklarade Rose den så här: ”We stick together, have good balance in our game, defend together, suffer, and press well.” Han nämner alltså att lida före att pressa, och det tycker jag om. Ett lag som klarar av att lida har gjort sin uppvärmning ordentligt, och det ser du redan på uppvärmningen.",
+    "Forest har haft en tyngre höst, men mot Manchester City hände något. Liam Delap gjorde två mål, laget ledde med 2–0 i halvlek och lämnade nedflyttningsstrecket på nio poäng. Enligt TimesLIVE [2] sade Glasner efteråt att ”the energy in the team and at the City Ground was so incredible”. Samtidigt har Forest bara gjort 9 mål på tio ligamatcher, och de har blivit utan mål i hälften av dem. Det är långt under vad chanserna borde ha gett. Det där löser man med en hink bollar, gärna en tisdagskväll när ingen ser på.",
+    "Mötena de senaste säsongerna har för det mesta slutat jämnt, med en enda stor avvikelse. Bournemouth vann 5–0 hemma i januari 2025, men sedan dess har det blivit 2–0 och 1–1. På Forests sida är Nicolò Savona och Nicolás Domínguez borta, och Neco Williams och Xaver Schlager är tveksamma. Hos Bournemouth saknas Álex Jiménez Sánchez, Alex Tóth och två mittbackar till."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Southern Gazette",
+     "title": "Bournemouth Extend Winning Streak to Eight With Hard-Fought Victory Over Ipswich Town",
+     "url": "https://southerngazette-fkgxhbhybnave9bz.uksouth-01.azurewebsites.net/breaking-news/ipswich-bournemouth-premier-league-win/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "TimesLIVE",
+     "title": "2026 11 08 maresca says man city failed to match forests intensity",
+     "url": "https://www.timeslive.co.za/sport/soccer/2026-11-08-maresca-says-man-city-failed-to-match-forests-intensity/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger hemmalaget drygt hälften av chansen, och det stämmer med vad jag har läst. Rose har ett lag som enligt honom själv försvarar tillsammans och pressar bra [1], och Evanilson gör mål varje vecka [1]. Forests seger mot City var på riktigt [2], men en enda kväll ändrar inte att laget har svårt att göra mål. Det enda som oroar mig är Europa League, men det är Forest som får spela i mitten av veckan efter den här matchen. Bollen har aldrig läst en tabell, men den här gången tänker jag inte gå emot den. Jag ringar in en etta.",
+    "signs": [
+     0
+    ],
+    "note": "Ganska säker",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Southern Gazette",
+      "title": "Bournemouth Extend Winning Streak to Eight With Hard-Fought Victory Over Ipswich Town",
+      "url": "https://southerngazette-fkgxhbhybnave9bz.uksouth-01.azurewebsites.net/breaking-news/ipswich-bournemouth-premier-league-win/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "TimesLIVE",
+      "title": "2026 11 08 maresca says man city failed to match forests intensity",
+      "url": "https://www.timeslive.co.za/sport/soccer/2026-11-08-maresca-says-man-city-failed-to-match-forests-intensity/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:13:24.826Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Bournemouth har vunnit åtta raka under Marco Rose, och laget försvarar tillsammans, lider när det behövs och pressar bra. Vinner man bollen högt blir det transisiones, och då går det fort, Evanilson står där och väntar … Ursäkta. Back to basis.",
+     "Forest har gjort 9 mål på tio ligamatcher och har inte gjort mål alls i hälften av dem. Segern mot City var på riktigt, men en bra kväll gör inte ett lag farligt framåt. Bournemouth saknar visserligen två mittbackar, men det spelar mindre roll när motståndaren har så svårt att göra mål. Evanilson har däremot gjort mål i fem raka ligamatcher. Det är orsak och verkan.",
+     "Jag ringar in en etta och står för den."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-17T17:13:24.826Z",
+    "uppdrag": {
+     "fraser": [
+      "Total kontroll",
+      "Orsak och verkan"
+     ],
+     "krydda": null,
+     "bielsa": [
+      "transisiones"
+     ],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:13:41.312Z",
     "attempts": 2
    },
    "model": "claude-opus-5-5",
