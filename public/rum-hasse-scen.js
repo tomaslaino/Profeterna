@@ -58,18 +58,19 @@ export const SCEN = {
   // hur långt under kroken ramens överkant hänger (NED), och hur långt ut från fyllningen ramens framsida står
   // upptill och nedtill (UT): tråden drar ut överkanten mot kroken, och nederkanten vilar mot fyllningen.
   LOPSEDEL: { X: 1650, B: 600, NED: 92, UT: [50, 22] },
-  // Nacionals flagga (DL:s lag), gammal och blekt, 2026-11-16: 150 × 90 cm (B × H), fäst med häftstift längs
-  // överkanten i frontens övre list, under bardiskens skiva (TOPP: tygets överkant), från stolpen till höger om
-  // löpsedeln (X: tygets vänstra kant) och ut ur bilden till höger. Den hänger ut över mässingskrokarna som sitter
-  // under, och nederkanten slutar sex centimeter över golvet. Häftstiften och det översta av tyget skyms av skivan.
-  // UT: hur långt ut från fyllningen tyget hänger. Förut hängde den i märlorna i två krokar: först 58 × 38 cm, som
-  // en vimpel ("otroligt liten"), sedan 112 × 74 cm, men längre än så kunde den inte bli utan att nå golvet ("Hela
-  // flaggan behöver verkligen inte synas!", båda 2026-11-16). Märlorna (IN in från hörnen) sitter kvar i tyget.
-  // Bilden (public/rum/hasse-flagga.webp, scripts/hasse/flagga.mjs) täcker bara det som kan synas, med skuggan och
-  // KANT runt om (flaggRuta): RUTA.Y0 strax ovanför där skivan skymmer fronten (y ≈ −756), och RUTA.X1 förbi där den
-  // breda bilden slutar (x ≈ 3790 nedtill; flagga.mjs kontrollerar båda). Sidan lägger den på väggens duk (flagga
-  // i rum-hasse.js).
-  FLAGGA: { X: 2060, TOPP: -700, B: 2500, H: 1500, IN: 30, UT: 20, KANT: 70, RUTA: { Y0: -745, X1: 3900 } },
+  // Nacionals flagga (DL:s lag), gammal och blekt, 2026-11-16: 300 × 180 cm (B × H), för stor för fronten, så den
+  // övre delen (VIK) är vikt bakåt och fäst med häftstift i vecket, i frontens övre list under bardiskens skiva
+  // (TOPP). Den nedre delen hänger fram, från stolpen till vänster om löpsedeln (X: tygets vänstra kant) och ut ur
+  // bilden till höger, ut över mässingskrokarna och ned till sex centimeter över golvet; löpsedeln hänger framför
+  // den i sin krok. Det som syns är den nedre vänstra delen av flaggan, med C.N. stort på bandet. Vecket och
+  // häftstiften skyms av skivan. UT: hur långt ut från fyllningen tyget hänger. Märlorna (IN in från hörnen) sitter
+  // kvar i tyget. Samma kväll var den först 58 × 38 cm och sedan 112 × 74 cm i två krokar ("otroligt liten", "Hela
+  // flaggan behöver verkligen inte synas!"), sedan 150 × 90 cm fäst under skivan, och så dubbelt så stor ("gör den
+  // större – kanske dubbelt så stor", 2026-11-17). Bilden (public/rum/hasse-flagga.webp, scripts/hasse/flagga.mjs)
+  // täcker bara det som kan synas, med skuggan och KANT runt om (flaggRuta): RUTA.Y0 strax ovanför där skivan skymmer
+  // fronten (y ≈ −756), och RUTA.X1 förbi där den breda bilden slutar (x ≈ 3790 nedtill; flagga.mjs kontrollerar
+  // båda). Sidan lägger den på väggens duk (flagga i rum-hasse.js).
+  FLAGGA: { X: 1150, TOPP: -700, B: 5000, H: 3000, VIK: 1500, IN: 30, UT: 20, KANT: 70, RUTA: { Y0: -745, X1: 3900 } },
 };
 
 // Flaggans bild i barens mått: övre vänstra hörnet (x0, y0), bredden och höjden.
@@ -77,7 +78,7 @@ export function flaggRuta(S = SCEN) {
   const G = S.FLAGGA;
   const x0 = G.X - G.KANT;
   const y0 = G.RUTA.Y0;
-  return { x0, y0, w: Math.min(G.X + G.B + G.KANT, G.RUTA.X1) - x0, h: y0 - (G.TOPP - G.H - G.KANT) };
+  return { x0, y0, w: Math.min(G.X + G.B + G.KANT, G.RUTA.X1) - x0, h: y0 - (G.TOPP - (G.H - G.VIK) - G.KANT) };
 }
 
 // Kameran: läget, och axlarna i världen (höger, upp och bakåt; den tittar mot −bak). Rotationen är
