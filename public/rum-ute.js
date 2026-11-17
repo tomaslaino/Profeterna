@@ -874,8 +874,11 @@ window.RumUte = (() => {
   const KALL_FRAM = 0.45;
   // (hela världen: fordonen sorteras bort här, efter var de syns i glasen)
   const ALLT = { x: -1e6, y: 0, w: 2e6, h: 0 };
-  // affärens ljus faller ut på trottoaren framför fönstret och dörren (X), på kvällen
+  // affärens ljus faller ut på trottoaren framför fönstret och dörren (X), på kvällen, och tar slut mjukt på
+  // LJUSKANT m (LJUSTEG steg från ljuset ut i mörkret, fz i framModell)
   const LJUSET = [-2.1, 1.6];
+  const LJUSKANT = 0.9;
+  const LJUSTEG = 4;
 
   // fönstrets form, som fasaden räknar den (vy i rum-fasad.js: var de går och hur långa varven är beror på den)
   function formen(el) {
@@ -895,20 +898,25 @@ window.RumUte = (() => {
     const m = RF.framfor(v, L, a);
     const hex = (c) => typeof c === 'string' && c.length === 7 && c[0] === '#';
     const kl = (c) => (hex(c) ? kallFarg(c, L, KALL_FRAM) : c);
-    // På kvällen lyser affärens ljus på dem framifrån, härifrån sett (utifrån är de siluetter mot fönstret): i
-    // ljuset (z 0) är färgerna ljusare och varmare, utanför det (z 1) som fasadens, och mörkare bort i mörkret.
+    // På kvällen faller affärens ljus på dem framifrån, härifrån sett (utifrån är de siluetter mot fönstret). Men
+    // de är bakgrund: i ljuset (z 0) har de bara sina egna färger med ett varmt sken, utanför det mörkare, och
+    // däremellan LJUSTEG steg, så att ingen tänds på en gång när de går in i ljuset. (Förut blev de 2,3 gånger
+    // ljusare, i ett enda steg, och drog blicken från gänget.)
     const natt = L.dag < 0.6 ? 1 - L.dag / 0.6 : 0;
-    const lys = (c) => (hex(c) ? hx(rgb(c).map((x, i) => x * (1 + 1.3 * natt) + [26, 14, 4][i] * natt)) : c);
+    const lys = (c) => (hex(c) ? hx(rgb(c).map((x, i) => x * (1 - 0.08 * natt) + [16, 8, 0][i] * natt)) : c);
+    const morkt = (c) => mix(c, '#06060a', 0.5 * natt);
     const kalla = (D) => {
       for (const p of D) {
         if (p.f) p.f = kl(p.f);
         if (p.s) p.s = kl(p.s);
         if (p.fz) p.fz = p.fz.map(kl);
         if (natt && hex(p.f) && !p.lys) {
-          p.fz = [lys(p.f), p.f, mix(p.f, '#030305', 0.3), mix(p.f, '#030305', 0.5)];
+          const a = lys(p.f);
+          const b = morkt(p.f);
+          p.fz = Array.from({ length: LJUSTEG + 1 }, (_, i) => mix(a, b, i / LJUSTEG));
           p.f = p.fz[0];
         }
-        if (natt && p.s && hex(p.s)) p.s = lys(p.s);
+        if (natt && p.s && hex(p.s)) p.s = mix(lys(p.s), morkt(p.s), 0.5);
       }
       return D;
     };
@@ -966,9 +974,10 @@ window.RumUte = (() => {
       const X = (x - RF.OGA_X) / um;
       const xi = framX(X, s);
       if (xi + 1.3 * s < r.x || xi - 1.3 * s > r.x + r.w || e <= 0) return;
-      // (på kvällen i affärens ljus framför fönstret och dörren, mörkare bortom)
-      const ljus = X > LJUSET[0] && X < LJUSET[1];
-      fl.push({ f, D, x, xi, yi: framY(dm), q: s / um, dm, ut: { A: Math.min(1, e / um / 0.6), rand: 0, z: ljus || !natt ? 0 : 1 + Math.round(natt) } });
+      // (på kvällen i affärens ljus framför fönstret och dörren, mörkare bortom, med en mjuk kant)
+      const inne = Math.min(X - LJUSET[0], LJUSET[1] - X) / LJUSKANT + 0.5;
+      const z = natt ? Math.round(LJUSTEG * (1 - Math.max(0, Math.min(1, inne)))) : 0;
+      fl.push({ f, D, x, xi, yi: framY(dm), q: s / um, dm, ut: { A: Math.min(1, e / um / 0.6), rand: 0, z } });
     };
     // (var och en får gatans färger första gången den syns: fasaden lottar dem lopp för lopp, folket.vid)
     for (const [f, D, x, , lap] of M.folk.vid(t)) {

@@ -1424,6 +1424,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   upp och huvudet nere i kragen), händerna på ryggen (en del äldre som strosar), powerwalk (morgon och kväll, ofta två
   och två) och vinglar hem från krogen sent fredag och lördag. Gatan inifrån går på samma sätt. Se *Det som händer ute*
   under [Fasaden](#fasaden).
+- **Folket utanför fönstret i bakgrunden (2026-11-17, användarens önskemål):** "de i bakgrunden blir plötsligt
+  belysta här och drar en massa fokus. kan du justera det så att det blir lugnt och bra". På kvällen blev de som gick in
+  i affärens ljus utanför glaset 2,3 gånger ljusare, i ett enda steg från mörkret. Nu har de i ljuset bara sina egna
+  färger med ett varmt sken, utanför det är de mörkare, och däremellan går ljuset över i fyra steg på 0,9 m, så att
+  ingen tänds på en gång. De syns som stilla skuggor bakom gänget. Se *Framför affären* under *Utsikten och vädret* i
+  [Tobaksaffären](#tobaksaffären).
 - **Samma gata inifrån som utifrån (2026-11-17, användarens önskemål):** "Kan du ordna så att trafiken utanför
   fönstret här passar bättre ihop med animationsvyn utanför butiken. Det ska inte dra en massa grafik utan man ska ha
   en känsla av att det är samma - inklusive med bilar, människor, bussar etc." Genom fönstret syntes nästan ingen
@@ -7191,7 +7197,9 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   mått. I sidled står ögat så att det som fasaden ser framför skyltfönstret och dörren ryms i glasen, och den som går
   tonar in och ut där den vänder i kanten av fasadens bild. På dagen är färgerna kalla som resten av gatan, men mindre
   (`KALL_FRAM`: de är närmare). På kvällen lyser affärens ljus ut på trottoaren och på dem som går där, framifrån sett
-  härinifrån, medan de utifrån är siluetter mot fönstret. Fasadens bild beror på fönstrets form, så folket räknas om när
+  härinifrån, medan de utifrån är siluetter mot fönstret. Men de är bakgrund: i ljuset har de sina egna färger med ett
+  varmt sken, utanför det är de mörkare, och kanten är mjuk (`LJUSKANT` 0,9 m i `LJUSTEG` 4 steg), så att ingen tänds
+  på en gång när de går in i ljuset. Fasadens bild beror på fönstrets form, så folket räknas om när
   formen ändras och när trafiken ändras efter klockan (`framModell`). Allt ritas i en enda grov duk över glasen, 0,4
   bildpunkter per px, som blir mjuk när den förstoras: ur skärpa som resten av gatan, utan filter. I telefonen och på
   datorns lägre steg ritas det i gatans duk (`ritaGatan`). Det ritas bara medan något syns: de som går i gängets takt,
