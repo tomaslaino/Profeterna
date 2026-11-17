@@ -9392,6 +9392,17 @@ funktionerna ur rum-hasse.js och påhittade data (hur ofta namnet kommer, felnam
 namn sägs när kupongen inte vet vem du är) och att sidan laddar utan fel i headless Chromium; inte i hela rummet med en
 riktig omgång.
 
+**Ditt namn när han hälsar och efter en analys** (2026-11-17, användarens önskemål: "Hasse säger väldigt sällan ens
+namn … Kan du ordna så att han iaf ibland säger ens namn"). Listan han hälsar med när kupongen vet vem du är
+(`oppningNamn`) var en kopia av den vanliga, utan namnet, så första gången man kom sade han det aldrig; bara när man kom
+tillbaka efter att ha frågat om en match (`tillbakaNamn`). Nu har varje rad namnet (*Unge Laine, vilken match har du fått
+dåliga råd om?*), och han hälsar alltid med namn när kupongen vet vem du är. Efter en analys säger han det ibland i stället
+för den vanliga raden (*Skriv upp det där, Docke, så tar vi nästa match.*, `nastaNamn`): ungefär var tredje gång, men
+högst en gång på två minuter, också räknat från hälsningen (`tilltal`), i snitt ett par gånger under ett besök med tretton
+matcher. Halva kupongen, en match kvar och hela kupongen säger han utan namn. `npm run repliker` kollar raderna som de
+andra med namn. Provat med `forstaRad` ur rum-hasse.js och påhittade data och att sidan laddar utan fel i headless
+Chromium; inte i hela rummet med en riktig omgång.
+
 **Hur många rätt han hade** (2026-11-16, användarens önskemål, om *Jag hade åtta rätt av tio.*: "Han säger det här varje
 gång. Kan du ge honom lite Hasse Backe-varianter"). Raden lottas nu bland fjorton sätt att säga det, torrt som en tränare
 på presskonferens (*Rent krasst blev det åtta rätt av tio.*, *Summa summarum blev det åtta rätt av tio.*, *När röken har
@@ -9474,7 +9485,7 @@ rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett na
 aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska synas.
 Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
-mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
+mening. När han hälsar på dig säger han fel i nio fall av tio. Felet fastnar en omgång: när han säger fel är det
 samma fel namn hela omgången, när han hälsar, i domen och när han talar till dig om hur det går (se *Ditt namn efter och
 under omgången*), på alla enheter, och nästa omgång har han lärt sig ett annat.
 Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8 (`domFro` i
