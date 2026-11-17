@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:22:01.093Z",
+ "uppdaterad": "2026-11-17T17:25:16.267Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3867,6 +3867,107 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 2
+  },
+  {
+   "id": "401880152",
+   "match": "Stoke City – Birmingham City",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:24:37.707Z",
+   "text": "Stokes försäljning gav serieledaren dess bästa ytter\n\nLördagens två lag har samma poäng. Hos serieledaren Birmingham spelar Liam Millar, som bara kunde lånas ut från Hull sedan Hull hade köpt Sorba Thomas av Stoke. Förra mötet avgjordes av hörnor, och det säger mig mer än tabellen gör.\n\nDen här matchen började på transferfönstrets sista dag. Enligt Football League World [1] släppte Hull bara sin kanadensiske ytter Liam Millar, 27 år, på villkor att de först köpte en ersättare. Ersättaren blev Sorba Thomas, som gick från Stoke till Hull för 10,5 miljoner pund. Samma sida skriver att han ”directly contributed to over 40 per cent of the Potters' league goals last season”. Millar hamnade i Birmingham och har gjort fyra mål och tre målgivande passningar på elva seriematcher. Stoke har klarat sig utan Thomas och vunnit fyra av sina fem senaste matcher, men laget gör nästan nio mål fler än chanserna borde ge, och sådant brukar inte hålla en hel vinter.\n\nI Birmingham har Chris Davies enligt samma sida suttit illa till sedan säsongsstarten, och ändå leder laget serien. Efter segern med 3–0 mot Millwall sa han till Irish News [2]: ”We are in a position we deserve to be in.” I den matchen gick sjumålsskytten August Priske av med en knäskada.\n\nDet senaste mötet, 1–1 på St Andrew's i januari, avgjordes helt på fasta situationer. Iwata nickade in 1–0 när Stansfield nickade tillbaka en hörna, och Stokes kvittering kom på en hörna från Cresswell som gick in via Neumann, enligt Irish News [3]. Davies var rasande och sa ”They are just blatant fouls” om Stokes ytterbackar. Där ser man vad saken gäller. Det där löser man med en hink bollar.\n\nTipset: X2 (knappt, men tryggt)\n\nPrognosen ser nästan ingen skillnad mellan lagen och ger Birmingham en hårsmån före. Det håller jag med om. Stokes målskörd vilar på mer tur än chanser, medan Birmingham skapar mest i hela matchbilden, och Millar är i form [1]. Mot det står frågetecknet kring Priskes knä [2] och att förra mötet slutade 1–1 efter två hörnmål [3]. Oavgjort ligger nära till hands när två jämna lag möts, så jag ringar in kryss och borta och låter etta stå.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Stokes försäljning gav serieledaren dess bästa ytter",
+   "lead": "Lördagens två lag har samma poäng. Hos serieledaren Birmingham spelar Liam Millar, som bara kunde lånas ut från Hull sedan Hull hade köpt Sorba Thomas av Stoke. Förra mötet avgjordes av hörnor, och det säger mig mer än tabellen gör.",
+   "paragraphs": [
+    "Den här matchen började på transferfönstrets sista dag. Enligt Football League World [1] släppte Hull bara sin kanadensiske ytter Liam Millar, 27 år, på villkor att de först köpte en ersättare. Ersättaren blev Sorba Thomas, som gick från Stoke till Hull för 10,5 miljoner pund. Samma sida skriver att han ”directly contributed to over 40 per cent of the Potters' league goals last season”. Millar hamnade i Birmingham och har gjort fyra mål och tre målgivande passningar på elva seriematcher. Stoke har klarat sig utan Thomas och vunnit fyra av sina fem senaste matcher, men laget gör nästan nio mål fler än chanserna borde ge, och sådant brukar inte hålla en hel vinter.",
+    "I Birmingham har Chris Davies enligt samma sida suttit illa till sedan säsongsstarten, och ändå leder laget serien. Efter segern med 3–0 mot Millwall sa han till Irish News [2]: ”We are in a position we deserve to be in.” I den matchen gick sjumålsskytten August Priske av med en knäskada.",
+    "Det senaste mötet, 1–1 på St Andrew's i januari, avgjordes helt på fasta situationer. Iwata nickade in 1–0 när Stansfield nickade tillbaka en hörna, och Stokes kvittering kom på en hörna från Cresswell som gick in via Neumann, enligt Irish News [3]. Davies var rasande och sa ”They are just blatant fouls” om Stokes ytterbackar. Där ser man vad saken gäller. Det där löser man med en hink bollar."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Football League World",
+     "title": "Birmingham City owe Stoke a transfer thank-you after winning Derby County race",
+     "url": "https://footballleagueworld.co.uk/birmingham-city-owe-stoke-a-transfer-thank-you-after-winning-derby-county-race/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Irish News",
+     "title": "Chris Davies feels Birmingham ‘deserve’ to be second after Millwall win",
+     "url": "https://www.irishnews.com/sport/soccer/chris-davies-feels-birmingham-deserve-to-be-second-after-millwall-win-RZ5DVNCIKVPMDJFKG6OCBRXJ7E/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Irish News",
+     "title": "Chris Davies furious as Stoke go unpunished for ‘throwing players to the ground’",
+     "url": "https://www.irishnews.com/sport/soccer/chris-davies-furious-as-stoke-go-unpunished-for-throwing-players-to-the-ground-KKZ6BW2IBBMXVH327UYIJFZRIU/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ser nästan ingen skillnad mellan lagen och ger Birmingham en hårsmån före. Det håller jag med om. Stokes målskörd vilar på mer tur än chanser, medan Birmingham skapar mest i hela matchbilden, och Millar är i form [1]. Mot det står frågetecknet kring Priskes knä [2] och att förra mötet slutade 1–1 efter två hörnmål [3]. Oavgjort ligger nära till hands när två jämna lag möts, så jag ringar in kryss och borta och låter etta stå.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "knappt, men tryggt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Football League World",
+      "title": "Birmingham City owe Stoke a transfer thank-you after winning Derby County race",
+      "url": "https://footballleagueworld.co.uk/birmingham-city-owe-stoke-a-transfer-thank-you-after-winning-derby-county-race/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Irish News",
+      "title": "Chris Davies feels Birmingham ‘deserve’ to be second after Millwall win",
+      "url": "https://www.irishnews.com/sport/soccer/chris-davies-feels-birmingham-deserve-to-be-second-after-millwall-win-RZ5DVNCIKVPMDJFKG6OCBRXJ7E/",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "Irish News",
+      "title": "Chris Davies furious as Stoke go unpunished for ‘throwing players to the ground’",
+      "url": "https://www.irishnews.com/sport/soccer/chris-davies-furious-as-stoke-go-unpunished-for-throwing-players-to-the-ground-KKZ6BW2IBBMXVH327UYIJFZRIU/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:24:37.707Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Stoke har vunnit fyra av sina fem senaste matcher, men de har gjort nästan nio mål fler än chanserna säger att de borde. Sådan tur tar slut, och den brukar ta slut mot ett lag som skapar mer framåt. Birmingham har dessutom Millar i form, med fyra mål och tre målgivande passningar på elva matcher.",
+     "Här höjer jag ett varningens finger för Priskes knä, för en sjumålsskytt tappar man inte ostraffat. Men förra mötet avgjordes på två hörnor, och fasta situationer kan man träna in. Stokes fina form efter att Thomas såldes vilar mest på tur. Ikke noget at tale om, som man säger i Aalborg.",
+     "Birmingham vet vad de håller på med. Jag ringar in tvåan och bara tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
+    "tips": "2026-11-17T17:24:37.707Z",
+    "uppdrag": {
+     "fraser": [
+      "Här höjer jag ett varningens finger",
+      "Så är det bara"
+     ],
+     "krydda": "Ikke noget at tale om, som man säger i Aalborg.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:25:05.757Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
   },
   {
    "id": "401878754",
