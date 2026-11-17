@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:10:07.453Z",
+ "uppdaterad": "2026-11-17T17:11:59.831Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3240,6 +3240,112 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
+  },
+  {
+   "id": "401878756",
+   "match": "Aston Villa – Sunderland",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:11:40.953Z",
+   "text": "Villa ledde med två mål och fick ändå jobba\n\nAston Villa ledde med 4–2 på Old Trafford när ordinarie tid var slut och åkte hem med en poäng. Sunderland vann i stället mot Chelsea på en straff och lämnade jumboplatsen. På lördag möts två lag som båda har något att reda ut på Villa Park.\n\nUnai Emery gick in i tunneln före slutsignalen i Manchester, och efteråt var han inte svår att förstå. ”We are disappointed, frustrated because in minute 90 we are winning 2-4”, sa han enligt Sports Mole [1]. United kvitterade med två mål i tilläggstiden, och sedan segern mot Manchester City har Villa inte vunnit en match. Under den tiden har laget släppt in elva mål [1]. ”We threw it away”, sa John McGinn, och han tillade att ”the last five minutes were just madness” [2]. Ett lag som leder med två mål ska stänga butiken och försvara sin egen straffområdeslinje. Det där löser man med en hink bollar och en lång torsdag.\n\nSunderland vann sin första ligamatch sedan augusti när Enzo Le Fée satte en straff i 36:e minuten mot Chelsea [3]. Brian Brobbey drog på sig straffen, och Granit Xhaka fick kliva av redan i inledningen [3, 4]. Regis Le Bris gjorde åtta byten jämfört med förlusten mot Dinamo Zagreb [3]. Han är pressad, men efteråt talade han om läktarna: ”But today, the connection was perfect” [4]. Borta har Sunderland bara tagit en poäng på fem matcher och gjort minst mål av de två lagen. Mot Chelsea höll laget ändå undan en hel andra halvlek. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som står rätt när motståndarna slår in sina inlägg.\n\nTipset: 1X (ettan väger tyngst)\n\nSajtens prognos tror mer på Villa än spelbolaget gör, och det stämmer med att Sunderland gör få mål och nästan aldrig tar poäng på bortaplan. Men prognosen ser bara mål och tabell. Den ser inte att Villa har släppt in elva mål sedan segern mot City [1], eller att Champions League väntar tre dagar senare. Sunderland visade mot Chelsea att laget kan hålla en ledning [2], men Xhaka är tveksam efter att ha klivit av tidigt [3]. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Villa ledde med två mål och fick ändå jobba",
+   "lead": "Aston Villa ledde med 4–2 på Old Trafford när ordinarie tid var slut och åkte hem med en poäng. Sunderland vann i stället mot Chelsea på en straff och lämnade jumboplatsen. På lördag möts två lag som båda har något att reda ut på Villa Park.",
+   "paragraphs": [
+    "Unai Emery gick in i tunneln före slutsignalen i Manchester, och efteråt var han inte svår att förstå. ”We are disappointed, frustrated because in minute 90 we are winning 2-4”, sa han enligt Sports Mole [1]. United kvitterade med två mål i tilläggstiden, och sedan segern mot Manchester City har Villa inte vunnit en match. Under den tiden har laget släppt in elva mål [1]. ”We threw it away”, sa John McGinn, och han tillade att ”the last five minutes were just madness” [2]. Ett lag som leder med två mål ska stänga butiken och försvara sin egen straffområdeslinje. Det där löser man med en hink bollar och en lång torsdag.",
+    "Sunderland vann sin första ligamatch sedan augusti när Enzo Le Fée satte en straff i 36:e minuten mot Chelsea [3]. Brian Brobbey drog på sig straffen, och Granit Xhaka fick kliva av redan i inledningen [3, 4]. Regis Le Bris gjorde åtta byten jämfört med förlusten mot Dinamo Zagreb [3]. Han är pressad, men efteråt talade han om läktarna: ”But today, the connection was perfect” [4]. Borta har Sunderland bara tagit en poäng på fem matcher och gjort minst mål av de två lagen. Mot Chelsea höll laget ändå undan en hel andra halvlek. Bollen har aldrig läst en tabell, men den brukar känna igen ett lag som står rätt när motståndarna slår in sina inlägg."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sports Mole",
+     "title": "Premier League Gameweek 10",
+     "url": "https://www.sportsmole.co.uk/football/aston-villa/news/emery-defends-storming-from-old-trafford-after-villa-capitulation_608742.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "SoccerNews",
+     "title": "‘We threw it away’ – McGinn fumes at Villa’s late Old Trafford collapse",
+     "url": "https://www.soccernews.com/we-threw-it-away-mcginn-fumes-at-villas-late-old-trafford-collapse/407835/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "ESPN",
+     "title": "Sunderland 1-0 Chelsea (Nov 8, 2026) Game Analysis",
+     "url": "https://www.espn.com/soccer/report/_/gameId/401879239",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "Sky Sports",
+     "title": "Sunderland 1-0 Chelsea: Enzo Le Fee's penalty lifts Black Cats off bottom of table as Xabi Alonso's side show more inconsistency",
+     "url": "https://www.skysports.com/football/sunderland-vs-chelsea/6275693211850041232",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos tror mer på Villa än spelbolaget gör, och det stämmer med att Sunderland gör få mål och nästan aldrig tar poäng på bortaplan. Men prognosen ser bara mål och tabell. Den ser inte att Villa har släppt in elva mål sedan segern mot City [1], eller att Champions League väntar tre dagar senare. Sunderland visade mot Chelsea att laget kan hålla en ledning [2], men Xhaka är tveksam efter att ha klivit av tidigt [3]. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "ettan väger tyngst",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Mole",
+      "title": "Premier League Gameweek 10",
+      "url": "https://www.sportsmole.co.uk/football/aston-villa/news/emery-defends-storming-from-old-trafford-after-villa-capitulation_608742.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "ESPN",
+      "title": "Sunderland 1-0 Chelsea (Nov 8, 2026) Game Analysis",
+      "url": "https://www.espn.com/soccer/report/_/gameId/401879239",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "Sky Sports",
+      "title": "Sunderland 1-0 Chelsea: Enzo Le Fee's penalty lifts Black Cats off bottom of table as Xabi Alonso's side show more inconsistency",
+      "url": "https://www.skysports.com/football/sunderland-vs-chelsea/6275693211850041232",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:11:40.953Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Aston Villa ledde med 4–2 på Old Trafford när ordinarie tid var slut och åkte hem med en poäng. Sedan segern mot City har laget släppt in elva mål. Det är dålig organisation i slutet av matcher, och det går att träna bort. Men ett lag som släpper in så mycket kommer att släppa in något här också.",
+     "Sunderland har bara tagit en poäng på fem bortamatcher och gör färre mål än Villa. Segern mot Chelsea kom på en straff och en andra halvlek med alla man bakom bollen. Det räcker inte på Villa Park, i synnerhet om Xhaka inte kan spela. Villa gör ett mål mer än de släpper in, och jag ringar in en etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-17T17:11:40.953Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Äsch"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:11:48.786Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
   },
   {
    "id": "401879236",
