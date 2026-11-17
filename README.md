@@ -1286,6 +1286,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   betydelsefullt. Ordna med det och mergea!" En skomakarlampa i grön emalj hänger ned i vänstra hörnet över
   notan och kaffet (där finns bara taket och dörrens överkant), och mörkret i överkanten ligger inte längre
   över lysröret och taket. Se [Lampan över pulten och ljuset i taket](#lampan-över-pulten-och-ljuset-i-taket-2026-11-16).
+- **Kupongen och gänget i lampornas ljus (2026-11-17, användarens önskemål):** "kan du göra en förbättring av
+  ljussättningen på sidan och mergea", med en bild av rummet en kväll. Kupongen var grå och dov och gänget mörkt:
+  ljuskäglorna över bordet och pulten tonade ut från mitten, och i datorn från steg 1 låg lampornas färg som en
+  hinna över kupongen och gänget. Nu är käglorna jämna över det de lyser på, utan hinna, och kupongen är det
+  ljusaste i bilden. Se [Kupongen och gänget i lampornas ljus](#kupongen-och-gänget-i-lampornas-ljus-2026-11-17).
 - **Datorn och videon parallellt med disken (2026-11-16, användarens önskemål):** "justera både TV:n och
   datorn så att de står parallellt med bänken - just nu står de liksom lite på sniskan" och "när man zoomar
   in få en bra bild - precis som vanligt". Datorn var vänd mellan gänget och ögat och videon 22 grader in mot
@@ -6908,6 +6913,39 @@ frånluftsdon med skarpa svarta springor. Nu är det samma 90-talstak, men så s
 Takets ljusstyrka i telefonen (430 × 932, medel i gråskala över taket): klockan 14 65 → 50, klockan 22.50 39 → 31.
 Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som telefon (430 × 932) klockan
 14 och 22.50 och som dator (1440 × 900).
+
+### Kupongen och gänget i lampornas ljus (2026-11-17)
+
+Användarens önskemål: "kan du göra en förbättring av ljussättningen på sidan och mergea", med en bild av rummet en
+kväll i november. Bilden var dov: kupongens papper nådde 158 av 255 och den svarta texten ungefär 80, så att löpsedlarna
+på väggen var ljusare än kupongen, och gängets ansikten var mörkt orange och platta. Bilden var ritad på steg 3 (det
+enkla ljuset i gänget, `.enkel` i rummet); en kopia i Chrome med mjukvarugrafik, som också hamnar på steg 3, gav samma
+värden (medel över bilden 76/56/47 mot 76/58/48 i användarens). Två saker låg bakom:
+
+- **Käglorna tonade ut från mitten.** Hålen i dunklet (`KAGLOR` i rum.js) var ljusast i mitten och tonade sedan ut
+  hela vägen till kanten. Över kupongen låg 0,3 av dunklet kvar i mitten och nästan hälften vid de nedre raderna, och
+  DL och DJ, som sitter vid bordets kanter, hade en tredjedel av dunklet över sig, DT i mitten en femtedel. Nu är
+  käglorna över bordet och pulten jämna (`jamn` i `rad`): nästan lika ljusa över halva ytan och sedan en mjuk kant, som
+  en lampas ljus över ett bord. Käglan över pulten (`KUPONG_LJUS`) täcker hela kupongen och släpper igenom 0,06 av
+  dunklet i mitten. Vinjettens nederkant (rum.css) är 0,32 i stället för 0,5, så att de nedersta raderna inte mörknar;
+  hörnen är mörka av den runda vinjetten.
+- **Lampornas färg var en hinna.** Utan blandningsläge (i telefonen och i datorn från steg 1) läggs färgen i
+  `.rum-warm` ovanpå som vanligt, och lyfter då det mörka i det den ligger över i stället för att lysa upp det. I
+  telefonen var den därför svagare, men i datorn från steg 1 lika stark som med blandningsläget: 0,2 varmvitt över
+  kupongen (och lagrets grund, CSS-bakgrunden, 0,12 under), 0,2 rött över gänget och 0,3 orange över disken. Nu
+  ligger ingen hinna över kupongen (den och grunden tas bort där, med käglans form), och över gänget och disken är den
+  0,4 så stark (`fh`). Runt neonen och tv:n, där skenet är ljuset självt, är den kvar. Med blandningsläget (steg 0 i
+  datorn) lyser värmen som förut, utom skenet över gänget, 0,2 → 0,12: med den jämna käglan blev de annars för ljusa.
+
+Gängets ljus i 3D är som förut. Ett starkare nyckelljus och mindre ljus från alla håll i det enkla steget
+(`HEMI_ENKEL`) gav knappt någon skillnad, eftersom det var dunklet ovanpå som gjorde dem mörka.
+
+Mätt i Chrome med mjukvarugrafik (1887 × 1053, mulet), gammal och ny kod, i gråskala: på steg 3 klockan 16.20 kupongens
+papper 158 → 202 (medel över kupongen 140/125/103 → 192/178/152) och ansiktena något ljusare (medel 79/44/32 →
+87/51/36), klockan 14 papperet 185 → 210; på steg 0 klockan 16.20 papperet 171 → 212 och ansiktenas ljusaste 170 → 197;
+i telefonen (412 × 870, klockan 16.20) papperet 157 → 205. Dörren, fönstret, högra väggen och Tipsligan är som förut,
+och natten (klockan 2) likaså: där är lampan över notan fortfarande det ljusaste. Inget nytt lager och inget nytt ritas
+i bildrutorna: hålen och färgerna ritas i de dukar som redan ritas om när ljuset ändras.
 
 ### Utsikten och vädret
 

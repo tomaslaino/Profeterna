@@ -1395,13 +1395,16 @@ window.Rum = (() => {
   // (paintUte). Fönstret vetter åt väster, så solen kommer in från lunch till solnedgången, och när den
   // står högt når den inte fram till pulten.
   const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-  const rad = (g, x, y, rx, ry, rgb, a) => {
+  // (jamn: nästan lika starkt över halva ytan och sedan en mjuk kant, som en lampas ljus över ett bord;
+  // annars tonar det ut från mitten)
+  const rad = (g, x, y, rx, ry, rgb, a, jamn) => {
     if (a < 0.005) return;
     g.save();
     g.translate(x, y);
     g.scale(rx, ry);
     const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1);
     gr.addColorStop(0, `rgba(${rgb}, ${a})`);
+    if (jamn) gr.addColorStop(0.45, `rgba(${rgb}, ${Math.round(92 * a) / 100})`);
     gr.addColorStop(1, `rgba(${rgb}, 0)`);
     g.fillStyle = gr;
     g.fillRect(-1, -1, 2, 2);
@@ -1439,9 +1442,15 @@ window.Rum = (() => {
   // Lampan över pulten (lampa, i pultens plan, som står 1,05 gånger från mitten): där den hänger i scenen,
   // och dess kägla över notan och kaffet.
   const LAMPA_I = [r1(800 + (LAMPA.x - 800) * 1.05), r1(500 + (LAMPA.y - 500) * 1.05)];
+  // Käglorna över bordet och pulten (KUPONG_LJUS) har ljuset jämnt över det de lyser på och en mjuk kant
+  // (jamn i rad), som en lampa över ett bord. Förut tonade de ut från mitten: DL och DJ, som sitter vid
+  // bordets kanter, hade en tredjedel av dunklet över sig och DT i mitten en femtedel, och kupongen släppte
+  // igenom 0,3 av det, så att papperet blev grått och de nedre raderna mörka. Nu är kupongen det ljusaste i
+  // bilden (2026-11-17).
+  const KUPONG_LJUS = [775, 875, 640, 280, 0.94, true];
   const KAGLOR = [
-    [575, 450, 440, 300, 0.92],
-    [805, 870, 560, 230, 0.7],
+    [575, 450, 440, 300, 0.92, true],
+    KUPONG_LJUS,
     [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
   ];
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
@@ -1556,7 +1565,7 @@ window.Rum = (() => {
       q.fillStyle = 'rgba(14, 8, 6, 0.16)';
       q.fillRect(-100, y0v - 100, W + 200, hv + 200);
       q.globalCompositeOperation = 'destination-out';
-      for (const [x, y, rx, ry, a] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a);
+      for (const [x, y, rx, ry, a, jamn] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a, jamn);
       rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
       // (taklamporna lyser upp taket och väggen överst, och lampan över pulten lyser: förut låg dunklet
       // också över dem, så att lysröret, som hängde där fläkten hänger, såg grått ut)
@@ -1585,6 +1594,12 @@ window.Rum = (() => {
     });
     // lampornas färger (i telefonen läggs ljuset ovanpå utan blandningsläge: svagare)
     const f = kvall * (LATT ? 0.55 : 1);
+    // Utan blandningsläge (inte skarm: i telefonen och i datorn från steg 1) blir färgen en hinna som lyfter det
+    // mörka i det den ligger över, inte ljus. Över gänget och disken därför bara svagt (fh), och över kupongen
+    // ingen alls: den får sitt ljus av hålet i dunklet (KUPONG_LJUS). Förut var hinnan lika stark i datorn från
+    // steg 1 som med blandningsläget, så att kupongens svarta text blev brungrå och ansiktena röda och
+    // platta (2026-11-17). Runt neonen och tv:n, där skenet är ljuset självt, är den kvar.
+    const fh = skarm ? f : 0.4 * f;
     ljusPa(R.el.querySelector('.rum-warm'), R.smal ? -300 : 0, R.smal ? 1800 : H, 0, W, (g) => {
       // Takfläktens sken, dag som kväll, men mer på kvällen när det är mörkare runt om, och inte på natten
       // när lamporna är släckta: på taket och väggen kring fläkten och på gängets bord (skarm ovan). Skenet
@@ -1596,15 +1611,23 @@ window.Rum = (() => {
         rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.1 * ml));
       }
       if (skarm) {
-        rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.2 * ml));
+        // (0,2 till 2026-11-17: med den jämna käglan över bordet, KAGLOR, blev gänget för ljust)
+        rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.12 * ml));
         rad(g, 575, 520, 260, 100, '255, 224, 175', r1(0.16 * ml));
         rad(g, 805, 870, 560, 230, '255, 218, 165', r1(0.12 * (1 - ng)));
       }
       rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
-      rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
-      rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));
-      rad(g, 784, 800, 544, 220, '255, 220, 160', r1(0.2 * f));
+      rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * fh));
+      rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * fh));
+      if (skarm) rad(g, 784, 800, 544, 220, '255, 220, 160', r1(0.2 * f));
       for (const [x, y, rx, ry, c] of pyntL) rad(g, x, y, rx * 1.3, ry * 1.3, c, r1(0.1 + 0.22 * f));
+      if (!skarm) {
+        // (också lagrets grund, CSS-bakgrunden, låg som en hinna över kupongen)
+        const [x, y, rx, ry] = KUPONG_LJUS;
+        g.globalCompositeOperation = 'destination-out';
+        rad(g, x, y, rx * 0.85, ry * 0.85, '0, 0, 0', 0.9, true);
+        g.globalCompositeOperation = 'source-over';
+      }
     });
     // tv:ns sken är ett eget lager som släcks med tv:n: starkare på kvällen
     ljusPa(R.el.querySelector('#rum-tvsken'), -60, 480, 1000, 620, (g) => {
