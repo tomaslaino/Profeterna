@@ -47,7 +47,7 @@
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|kupong|radio en närbild,
-// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr),
+// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr; ?rum-fasad-vem=inlines vilka som går förbi),
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -127,7 +127,7 @@ window.Rum = (() => {
       <stop offset=".5" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
     <radialGradient id="rum-furu-lampa" cx=".5" cy="0" r=".7"><stop offset="0" stop-color="#ffe6c0" stop-opacity=".1"/><stop offset="1" stop-color="#ffe6c0" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-rwall" gradientUnits="userSpaceOnUse" x1="1140" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".06"/><stop offset="1" stop-color="#0a0704" stop-opacity=".44"/></linearGradient>
-    <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2519"/><stop offset="1" stop-color="#55492f"/></linearGradient>
+    <linearGradient id="rum-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d3426"/><stop offset="1" stop-color="#6b5d45"/></linearGradient>
     <linearGradient id="rum-pult" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#5a3b26"/><stop offset="1" stop-color="#3b2619"/></linearGradient>
     <linearGradient id="rum-alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9a96"/><stop offset=".5" stop-color="#5e5e5b"/><stop offset="1" stop-color="#2e2e2c"/></linearGradient>
     <linearGradient id="rum-counter" gradientUnits="userSpaceOnUse" x1="1060" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#472b19"/><stop offset="1" stop-color="#2a180e"/></linearGradient>
@@ -162,7 +162,7 @@ window.Rum = (() => {
       `<polygon points="${x0},${r1(at(x0, yb))} ${x1},${r1(at(x1, yb))} ${x1},${r1(at(x1, yb) + 1.4 * sc(x1))} ${x0},${r1(at(x0, yb) + 1.4 * sc(x0))}" fill="#c9bfa5" opacity=".18"/>`;
   }
 
-  // Spotarna på skenan i taket (rum-inredning.js): mjukt ljus på uret, orakelramen och Tipsligan ([cx, cy, rx, ry, styrka] i
+  // Spotarna i taket (rum-inredning.js): mjukt ljus på uret, orakelramen och Tipsligan ([cx, cy, rx, ry, styrka] i
   // scenens mått). Ljuset är målat i väggens bild, som ritas en gång och följer väggen när kameran rör sig, och
   // ramarna, paketen och disken får samma ljus i 3D (SPOTAR i rum-inredning.js). Färgskiftningen (color-dodge)
   // gör väggen ljusare i sin egen färg, som ljus gör, i stället för att lägga en ljus hinna över den.
@@ -347,6 +347,21 @@ window.Rum = (() => {
   // Bakgrunden: taket, väggarna (furupanelen och den tapetserade högra
   // väggen, hogerVagg), dörren, skyltfönstret och disken. Lysröret, skyltarna och
   // paketen är i 3D (rum-inredning.js).
+  // Undertaket är i 3D (innertak i rum-inredning.js), ovanpå taket här och i bg(). Här under står samma
+  // bärverk platt, ifall 3D-delen inte kommer: plattor på 60 × 60 cm (120 enheter) med fläkten mitt i en, z
+  // djupet ut från bakväggen, där taket är y 90 (310 över ögat), och högra väggen vid X 1140.
+  const TAK_X = Array.from({ length: 13 }, (_, i) => -397 + 120 * i);
+  const TAK_Z = [80, 200, 320, 440, 560];
+  function takLinjer(y0, y1) {
+    const ty = (z) => 400 - 310000 / (1000 - z);
+    const tx = (x, z) => 760 + ((x - 760) * 1000) / (1000 - z);
+    const zAv = (y) => 1000 - 310000 / (400 - y);
+    const [za, zb] = [zAv(y1), zAv(y0)];
+    let s = '';
+    for (const x of TAK_X) s += `<line x1="${r1(tx(x, za))}" y1="${r1(ty(za))}" x2="${r1(tx(x, zb))}" y2="${r1(ty(zb))}"/>`;
+    for (const z of TAK_Z) if (z > za && z < zb) s += `<line x1="${r1(tx(-600, z))}" y1="${r1(ty(z))}" x2="${r1(tx(1140, z))}" y2="${r1(ty(z))}"/>`;
+    return s;
+  }
   // Taket närmare betraktaren, i telefonen på höjden där scenen står långt ner i fönstret (pan): i
   // bakväggens plan, så att det sitter ihop med bg() när kameran vrids. Plattorna går mot flyktpunkten
   // och blir större ju närmare man kommer, takfläktens sken klingar av, och högerväggen fortsätter upp,
@@ -354,14 +369,8 @@ window.Rum = (() => {
   function tak() {
     const [X0, X1, Y0] = [-200, 1800, -340];
     const hornX = 1250 + (-Y0 * 110) / 90;
-    const fly = (x, y) => r1(VP[0] + ((x - VP[0]) * (VP[1] - y)) / VP[1]);
-    const fog = [200, 560, 920].map((x) => `<line x1="${x}" y1="0" x2="${fly(x, Y0)}" y2="${Y0}"/>`).join('');
-    const tvars = [[-58, 1.5], [-142, 1.9], [-262, 2.4]].map(([y, b]) => {
-      const x1 = r1(1250 + (-y * 110) / 90);
-      return `<line x1="${X0}" y1="${y}" x2="${x1}" y2="${y}" stroke-width="${b}"/>`;
-    }).join('');
     return svg(`<defs>
-    <linearGradient id="rum-tak-yta" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Y0}"><stop offset="0" stop-color="#574532"/><stop offset=".34" stop-color="#463829"/><stop offset=".62" stop-color="#32281b"/><stop offset="1" stop-color="#1c160e"/></linearGradient>
+    <linearGradient id="rum-tak-yta" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Y0}"><stop offset="0" stop-color="#6b5d45"/><stop offset=".34" stop-color="#4e4332"/><stop offset=".62" stop-color="#3a3125"/><stop offset="1" stop-color="#221c14"/></linearGradient>
     <radialGradient id="rum-tak-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(575 -30) scale(420 170)"><stop offset="0" stop-color="#b48c5c" stop-opacity=".34"/><stop offset="1" stop-color="#b48c5c" stop-opacity="0"/></radialGradient>
     <linearGradient id="rum-tak-vagg" gradientUnits="userSpaceOnUse" x1="0" y1="${Y0}" x2="0" y2="0"><stop offset="0" stop-color="#0a0704" stop-opacity=".62"/><stop offset="1" stop-color="#0a0704" stop-opacity="0"/></linearGradient>
     <radialGradient id="rum-tak-flack"><stop offset="0" stop-color="#140c04" stop-opacity=".34"/><stop offset=".7" stop-color="#140c04" stop-opacity=".14"/><stop offset="1" stop-color="#140c04" stop-opacity="0"/></radialGradient>
@@ -370,7 +379,7 @@ window.Rum = (() => {
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-yta)"/>
   <rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${4 - Y0}" fill="url(#rum-tak-sken)"/>
   <ellipse cx="318" cy="-96" rx="118" ry="30" fill="url(#rum-tak-flack)"/><ellipse cx="846" cy="-188" rx="150" ry="44" fill="url(#rum-tak-flack)"/>
-  <g stroke="#000" stroke-opacity=".2" stroke-width="1.2">${fog}${tvars}</g>
+  <g stroke="#efe4c8" stroke-opacity=".3" stroke-width="2.6">${takLinjer(Y0, 0)}</g>
   <g clip-path="url(#rum-tak-hoger)">${hogerVagg(1250, X1)}</g>
   <polygon points="1250,4 ${r1(hornX)},${Y0} ${X1},${Y0} ${X1},4" fill="url(#rum-tak-vagg)"/>
   <polygon points="1250,4 1265,-12 ${X1},-12 ${X1},4" fill="#160e08" fill-opacity=".8"/>
@@ -391,7 +400,7 @@ window.Rum = (() => {
   <ellipse cx="650" cy="44" rx="470" ry="52" fill="#3a2a0e" opacity=".42" filter="url(#rum-b24)"/>
   <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="#5a4418" opacity=".28" filter="url(#rum-b4)"/>
   <path d="M1010 8 q22 -6 40 6 q18 14 -2 26 q-20 10 -40 -2 q-16 -14 2 -30 z" fill="none" stroke="#2a1e08" stroke-opacity=".35" stroke-width="1.6"/>
-  <g stroke="#000" stroke-opacity=".18" stroke-width="1.2"><line x1="0" y1="45" x2="1194" y2="45"/><line x1="200" y1="0" x2="200" y2="90"/><line x1="560" y1="0" x2="560" y2="90"/><line x1="920" y1="0" x2="920" y2="90"/></g>
+  <g stroke="#efe4c8" stroke-opacity=".3" stroke-width="1.6">${takLinjer(0, 90)}</g>
   <ellipse cx="575" cy="58" rx="330" ry="62" fill="url(#rum-tube)" filter="url(#rum-b24)" class="rum-tubeglow"/>
 
   <g mask="url(#rum-hal)">
@@ -1386,13 +1395,16 @@ window.Rum = (() => {
   // (paintUte). Fönstret vetter åt väster, så solen kommer in från lunch till solnedgången, och när den
   // står högt når den inte fram till pulten.
   const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-  const rad = (g, x, y, rx, ry, rgb, a) => {
+  // (jamn: nästan lika starkt över halva ytan och sedan en mjuk kant, som en lampas ljus över ett bord;
+  // annars tonar det ut från mitten)
+  const rad = (g, x, y, rx, ry, rgb, a, jamn) => {
     if (a < 0.005) return;
     g.save();
     g.translate(x, y);
     g.scale(rx, ry);
     const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1);
     gr.addColorStop(0, `rgba(${rgb}, ${a})`);
+    if (jamn) gr.addColorStop(0.45, `rgba(${rgb}, ${Math.round(92 * a) / 100})`);
     gr.addColorStop(1, `rgba(${rgb}, 0)`);
     g.fillStyle = gr;
     g.fillRect(-1, -1, 2, 2);
@@ -1423,16 +1435,22 @@ window.Rum = (() => {
     rita(g);
   }
   // Ljuset kommer någonstans ifrån: takfläktens kupor lyser på gängets bord och på pulten med kupongen
-  // ([cx, cy, rx, ry, styrka] i scenens mått), spotarna på skenan på löpsedlarna, uret, ramen och
+  // ([cx, cy, rx, ry, styrka] i scenens mått), spotarna i taket på löpsedlarna, uret, ramen och
   // Tipsligan, och runt dem sjunker rummet in i dunkel, mest ute i kanterna, så att blicken går dit ljuset
   // är (förut var rummet lika upplyst överallt). Dunklet är en del av .rum-vign och värmen i käglorna av
   // .rum-warm (ljusKlockan): inga nya lager, och inget ritas i bildrutorna.
   // Lampan över pulten (lampa, i pultens plan, som står 1,05 gånger från mitten): där den hänger i scenen,
   // och dess kägla över notan och kaffet.
   const LAMPA_I = [r1(800 + (LAMPA.x - 800) * 1.05), r1(500 + (LAMPA.y - 500) * 1.05)];
+  // Käglorna över bordet och pulten (KUPONG_LJUS) har ljuset jämnt över det de lyser på och en mjuk kant
+  // (jamn i rad), som en lampa över ett bord. Förut tonade de ut från mitten: DL och DJ, som sitter vid
+  // bordets kanter, hade en tredjedel av dunklet över sig och DT i mitten en femtedel, och kupongen släppte
+  // igenom 0,3 av det, så att papperet blev grått och de nedre raderna mörka. Nu är kupongen det ljusaste i
+  // bilden (2026-11-17).
+  const KUPONG_LJUS = [775, 875, 640, 280, 0.94, true];
   const KAGLOR = [
-    [575, 450, 440, 300, 0.92],
-    [805, 870, 560, 230, 0.7],
+    [575, 450, 440, 300, 0.92, true],
+    KUPONG_LJUS,
     [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
   ];
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
@@ -1547,14 +1565,11 @@ window.Rum = (() => {
       q.fillStyle = 'rgba(14, 8, 6, 0.16)';
       q.fillRect(-100, y0v - 100, W + 200, hv + 200);
       q.globalCompositeOperation = 'destination-out';
-      for (const [x, y, rx, ry, a] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a);
+      for (const [x, y, rx, ry, a, jamn] of KAGLOR) rad(q, x, y, rx, ry, '0, 0, 0', a, jamn);
       rad(q, 400, 130, 300, 120, '0, 0, 0', 0.9);
       // (taklamporna lyser upp taket och väggen överst, och lampan över pulten lyser: förut låg dunklet
       // också över dem, så att lysröret, som hängde där fläkten hänger, såg grått ut)
-      for (const [x, y, , sort] of lampL) {
-        if (sort === 'flakt') rad(q, x, y, 380, 170, '0, 0, 0', 0.85);
-        else if (sort === 'spot') rad(q, x, y, 40, 30, '0, 0, 0', 0.6);
-      }
+      for (const [x, y, , sort] of lampL) if (sort === 'flakt') rad(q, x, y, 330, 145, '0, 0, 0', 0.7);
       // (löpsedlarna i spotens ljus)
       rad(q, 855, 360, 140, 210, '0, 0, 0', 0.95);
       rad(q, LAMPA_I[0], LAMPA_I[1], 170, 125, '0, 0, 0', 0.9);
@@ -1579,26 +1594,40 @@ window.Rum = (() => {
     });
     // lampornas färger (i telefonen läggs ljuset ovanpå utan blandningsläge: svagare)
     const f = kvall * (LATT ? 0.55 : 1);
+    // Utan blandningsläge (inte skarm: i telefonen och i datorn från steg 1) blir färgen en hinna som lyfter det
+    // mörka i det den ligger över, inte ljus. Över gänget och disken därför bara svagt (fh), och över kupongen
+    // ingen alls: den får sitt ljus av hålet i dunklet (KUPONG_LJUS). Förut var hinnan lika stark i datorn från
+    // steg 1 som med blandningsläget, så att kupongens svarta text blev brungrå och ansiktena röda och
+    // platta (2026-11-17). Runt neonen och tv:n, där skenet är ljuset självt, är den kvar.
+    const fh = skarm ? f : 0.4 * f;
     ljusPa(R.el.querySelector('.rum-warm'), R.smal ? -300 : 0, R.smal ? 1800 : H, 0, W, (g) => {
       // Takfläktens sken, dag som kväll, men mer på kvällen när det är mörkare runt om, och inte på natten
       // när lamporna är släckta: på taket och väggen kring fläkten och på gängets bord (skarm ovan). Skenet
-      // kring kuporna och spotarna är i deras egna dukar (rum-inredning.js), som följer med kameran.
+      // kring kuporna är i fläktens egen duk (rum-inredning.js), som följer med kameran.
       const ml = (0.45 + 0.55 * kvall) * (1 - ng);
       for (const [x, y, , sort] of lampL) {
         if (sort !== 'flakt') continue;
-        rad(g, x, y - 40, 420, 120, '255, 205, 150', r1(0.2 * ml));
-        rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.16 * ml));
+        rad(g, x, y - 40, 420, 120, '255, 205, 150', r1(0.12 * ml));
+        rad(g, x, y + 40, 320, 200, '255, 214, 160', r1(0.1 * ml));
       }
       if (skarm) {
-        rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.2 * ml));
+        // (0,2 till 2026-11-17: med den jämna käglan över bordet, KAGLOR, blev gänget för ljust)
+        rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.12 * ml));
         rad(g, 575, 520, 260, 100, '255, 224, 175', r1(0.16 * ml));
         rad(g, 805, 870, 560, 230, '255, 218, 165', r1(0.12 * (1 - ng)));
       }
       rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
-      rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * f));
-      rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * f));
-      rad(g, 784, 800, 544, 220, '255, 220, 160', r1(0.2 * f));
+      rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * fh));
+      rad(g, 1376, 560, 384, 160, '255, 190, 110', r1(0.3 * fh));
+      if (skarm) rad(g, 784, 800, 544, 220, '255, 220, 160', r1(0.2 * f));
       for (const [x, y, rx, ry, c] of pyntL) rad(g, x, y, rx * 1.3, ry * 1.3, c, r1(0.1 + 0.22 * f));
+      if (!skarm) {
+        // (också lagrets grund, CSS-bakgrunden, låg som en hinna över kupongen)
+        const [x, y, rx, ry] = KUPONG_LJUS;
+        g.globalCompositeOperation = 'destination-out';
+        rad(g, x, y, rx * 0.85, ry * 0.85, '0, 0, 0', 0.9, true);
+        g.globalCompositeOperation = 'source-over';
+      }
     });
     // tv:ns sken är ett eget lager som släcks med tv:n: starkare på kvällen
     ljusPa(R.el.querySelector('#rum-tvsken'), -60, 480, 1000, 620, (g) => {
@@ -1958,6 +1987,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // hur stor del av det scenen inte fyller på höjden som hamnar över den (taket), och var i scenen
   // pingklockan under kupongen slutar, som måste rymmas i fönstret (pan)
   const TAK_SMAL = 0.6;
+  // och på en bred skärm, där scenen skärs uppe och nere: hur stor del av det som skärs bort som tas
+  // uppifrån (taket), resten tas från pulten (fit)
+  const TAK_BRED = 0.25;
   const FOT_SMAL = 1090;
   const PENNOR = { bred: [{ x: 276.4, y: 340.6, a: -11 }, { x: 362, y: 440, a: -6 }], smal: [{ x: 268, y: 610, a: -5 }, { x: 268, y: 612, a: -2 }] };
   const PEN_PULT = { ...PENNOR.bred[0] };
@@ -2590,7 +2622,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function gangTv(rd, rows, t, p) {
     const q = R.q;
     const soon = (x) => t - x.g.kick < 2.5 * 3600000;
-    const tv = q.has('rum-tittar') || rows.some((x) => x.g.state === 'live' || ((x.g.state === 'started' || (x.g.state === 'hidden' && !x.g.over)) && soon(x)));
+    const tv = q.has('rum-tittar') || q.has('rum-nerv') || rows.some((x) => x.g.state === 'live' || ((x.g.state === 'started' || (x.g.state === 'hidden' && !x.g.over)) && soon(x)));
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : 0;
     const h = q.has('rum-stopp') ? parseFloat(q.get('rum-stopp')) : (first - t) / 3600000;
     const nag = !rd || rd.next || !(h > 0) || h > 24 ? 0 : h <= 1 ? 1 : 0.25 + (0.6 * (24 - h)) / 23;
@@ -2612,6 +2644,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const was = R.ss || {};
     const sum = {};
     R.ss = {};
+    // (ens eget tips när det syns, annars gängets kupong)
+    const tecken = (g, x) => (s && s.tips && s.tips[g.id] ? s.tips[g.id].tecken[x.id] : p && p.inne && p.vem === g.id ? p.tecken[x.id] : null) || x.sign || '';
     for (const x of rows) {
       if (x.g.state !== 'live' || !x.g.score) continue;
       const sc = x.g.score;
@@ -2619,8 +2653,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const w = was[x.id];
       if (!w || (w.home === sc.home && w.away === sc.away)) continue;
       for (const g of gang) {
-        const own = s && s.tips && s.tips[g.id] ? s.tips[g.id].tecken[x.id] : p && p.inne && p.vem === g.id ? p.tecken[x.id] : null;
-        const sign = own || x.sign || '';
+        const sign = tecken(g, x);
         sum[g.id] = (sum[g.id] || 0) + (sign ? Number(sign.includes(res(sc))) - Number(sign.includes(res(w))) : 0);
       }
     }
@@ -2628,6 +2661,88 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // humöret: hur det går för kupongen
     R.spel = spelLage(rd, rows, p);
     if (R.fig && R.fig.spel) R.fig.spel(R.spel, now());
+    // nerverna: hur spänd var och en är av matcherna som pågår, och slutsignalen i en match man satt
+    // spänd i (rum-3d.js, nerver och slut)
+    const nv = nerverLage(rows, gang, tecken, R.spel.lage);
+    R.nerv = nv.vem;
+    if (R.fig && R.fig.nerver) R.fig.nerver(R.nerv, now());
+    if (Object.keys(nv.slut).length && R.fig && R.fig.slut) R.fig.slut(nv.slut, now());
+  }
+
+  // Nerverna under matcherna (rum-3d.js, nerver): hur spänd var och en är, 0–1, av matcherna som
+  // pågår – efter sitt eget tips, som målen. En match spänner när ett mål skulle vända tipset: mest
+  // när tipset håller med uddamålet (eller krysset i en jämn match) och det lider mot slutet, nästan
+  // lika mycket när ett mål skulle rädda det, lite med två mål emellan och inte alls med fler eller
+  // med helgardering. Tidigt i matchen lite, i halvtidsvilan nästan inget. Flera matcher lägger sig på
+  // den mest spända, de andra en fjärdedel var, och kupongen väger in: på gränsen (nästa fel tar
+  // vinsten) mer, död mindre. Dolda resultat ger inga nerver (state hidden, ingen ställning).
+  // slag: om det mest är att hålla undan (haller) eller att jaga ett mål (jagar). slut: när en match
+  // som någon satt spänd i (minst 0,3) har blåsts av – 1 när tipset höll, −1 när det inte gjorde det;
+  // inte första gången (när rummet öppnas).
+  // ?rum-nerv=dl:0.9,dt:0.4:jagar,dj:0.7 för bilder (och då står tv:n på).
+  const NERV_MIN = /^(\d+)'(?:\+(\d+))?/;
+  function matchNerv(sign, sc, clock) {
+    if (!sign || sign.length >= 3 || !sc) return null;
+    const res = (d) => (d > 0 ? '1' : d < 0 ? '2' : 'X');
+    const d = sc.home - sc.away;
+    const hit = sign.includes(res(d));
+    // hur många mål som vänder tipset, åt något håll
+    let mal = 0;
+    for (let k = 1; k <= 2 && !mal; k++) if (sign.includes(res(d + k)) !== hit || sign.includes(res(d - k)) !== hit) mal = k;
+    if (!mal) return null;
+    const c = String(clock || '');
+    const m = NERV_MIN.exec(c);
+    const sent = sm(52, 90, m ? Number(m[1]) + Number(m[2] || 0) : 45);
+    let v = mal === 1 ? (hit ? 0.15 + 0.85 * sent : 0.12 + 0.68 * sent) : (hit ? 0.12 * (1 - 0.7 * sent) : 0.1 * (1 - sent));
+    if (/^HT\b/i.test(c)) v *= 0.3;
+    return { v, haller: hit };
+  }
+  function nerverLage(rows, gang, tecken, lage) {
+    const q = R.q;
+    if (q.has('rum-nerv')) {
+      const vem = {};
+      for (const x of (q.get('rum-nerv') || '').split(',')) {
+        const r = /^(\w+):([\d.]+)(?::(haller|jagar))?$/.exec(x.trim());
+        if (r) vem[r[1].toLowerCase()] = { v: Math.min(1, Number(r[2])), slag: r[3] || 'haller' };
+      }
+      return { vem, slut: {} };
+    }
+    const vikt = lage === 'nerv' ? 1.2 : lage === 'deppig' ? 0.55 : lage === 'glad' ? 0.9 : 1;
+    const vem = {};
+    const nu = {};
+    for (const g of gang) {
+      const v = [];
+      let haller = 0;
+      let jagar = 0;
+      for (const x of rows) {
+        if (x.g.state !== 'live' || !x.g.score) continue;
+        const n = matchNerv(tecken(g, x), x.g.score, x.g.clock);
+        if (!n || n.v < 0.01) continue;
+        v.push(n.v);
+        (nu[x.id] || (nu[x.id] = {}))[g.id] = n.v;
+        if (n.haller) haller = Math.max(haller, n.v);
+        else jagar = Math.max(jagar, n.v);
+      }
+      if (!v.length) continue;
+      v.sort((a, b) => b - a);
+      const x = Math.min(1, (v[0] + 0.25 * v.slice(1).reduce((a, b) => a + b, 0)) * vikt);
+      vem[g.id.toLowerCase()] = { v: Math.round(x * 100) / 100, slag: haller >= jagar ? 'haller' : 'jagar' };
+    }
+    // slutsignalen: en match som var spänd förra gången och nu är slut (och syns)
+    const slut = {};
+    for (const [id, fore] of Object.entries(R.nervM || {})) {
+      const x = rows.find((y) => String(y.id) === id);
+      if (!x || x.g.state !== 'final' || x.g.res == null) continue;
+      for (const g of gang) {
+        const sign = tecken(g, x);
+        if (!(fore[g.id] >= 0.3) || !sign) continue;
+        const k = g.id.toLowerCase();
+        slut[k] = (slut[k] || 0) + (sign.includes(SIGNS[x.g.res]) ? 1 : -1);
+      }
+    }
+    for (const k of Object.keys(slut)) if (!slut[k]) delete slut[k];
+    R.nervM = nu;
+    return { vem, slut };
   }
 
   // Hur det går för gängets kupong, för gängets humör (rum-3d.js, spel): bara
@@ -2703,6 +2818,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (r && r[3]) satt[r[1]] = 'abc'.indexOf(r[3]);
     }
     const go = () => R.fig.mal(m, still() ? 0 : now(), satt);
+    go();
+    if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
+  }
+
+  // ?rum-slut=dl:1,dj:-1: slutsignalen i en match man satt spänd i, för bilder (rum-3d.js, slut) – 1
+  // när tipset höll, −1 när det inte gjorde det; vid tiden 0 med ?rum-t, annars genast och sedan var
+  // femtonde sekund.
+  function provSlut() {
+    const v = R.q.get('rum-slut');
+    if (!v || !R.fig || !R.fig.slut) return;
+    const m = {};
+    for (const x of v.split(',')) {
+      const r = /^(\w+):(-?1)$/.exec(x.trim());
+      if (r) m[r[1]] = Number(r[2]);
+    }
+    const go = () => R.fig.slut(m, still() ? 0 : now());
     go();
     if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
   }
@@ -2961,7 +3092,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // med fingret vrids kameran efter var i rummet man står (pan)
     if (R.pek !== 'mouse' && !nara()) {
       if (R.k * W - innerWidth > 1) R.tx = Math.max(-1, Math.min(1, (R.px - (R.pxHem === undefined ? 0.5 : R.pxHem)) * 2));
-      R.ty = R.k * H - innerHeight > 1 ? R.py * 2 - 1 : -0.25;
+      R.ty = R.k * H - innerHeight > 1 ? Math.max(-1, Math.min(1, (R.py - (R.pyHem ?? 0.5)) * 2)) : -0.25;
     }
     // (världen glider själv dit vrid satte den)
     if (R.folj && R.folj.e) {
@@ -3488,11 +3619,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
         if (R.spel) R.fig.spel(R.spel, now());
+        if (R.nerv) R.fig.nerver(R.nerv, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappKlick, visa, ta: taKupong, radio: () => sak('radio') });
         if (window.RumRadio) RumRadio.mount({ el: R.el, fig: () => R.fig, now, inr: () => R.inr, sak: (n) => sak(n) });
         radioRuta();
         provMal();
+        provSlut();
         provAkt();
         provLapp();
         provGa();
@@ -4230,7 +4363,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // S:t Eriksbron i samma ljus och väder som utsikten, och genom skyltfönstret gänget bakifrån, ritat av samma
   // 3D-scen (utifran). Fasaden tonar fram medan man tar ett steg bakåt från dörren, och ett klick var som helst,
   // Esc eller Tillbaka går in genom dörren igen. Rummet står still bakom så länge (R.vilar, som hos Hasse Backe)
-  // och ritas som vanligt innan det syns igen: gängets duk har bilden utifrån.
+  // och syns inte; gängets duk står då i skyltfönstret (glas) och ritas därifrån.
   //   glid: med rörelse in och ut (annars genast)
   function fasad(pa = true, glid = !calm()) {
     if (!pa) {
@@ -4240,29 +4373,33 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       clearTimeout(R.fasadT);
       lagerUt('fasaden');
       R.vilar = false;
-      if (R.fig && R.on) {
-        const t = now();
-        const [vx, vy] = synlig();
-        R.fig.draw(t, vx, vy, neonOn(t));
-      }
+      R.el.classList.remove('fasad-tackt');
       if (glid && !(window.RumBak && RumBak.snabbt)) {
         f.el.classList.remove('in');
         f.el.classList.add('ut');
+        // (gänget står kvar i fönstret medan fasaden ännu täcker rummet, rf-ut i rum-fasad.css)
+        R.glasT = setTimeout(() => glas(f, false), 150);
         setTimeout(() => f.ut(), 520);
-      } else f.ut();
+      } else {
+        glas(f, false);
+        f.ut();
+      }
       return false;
     }
     if (R.fasad || !window.RumFasad || !R.on) return Boolean(R.fasad);
+    if (R.glas) glas(R.glas.f, false);
     if (R.sak) sak(null, null);
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
     const f = RumFasad.bygg(R.el, {
-      // (medan rummet syns, i övergången, ritas gänget tillbaka inifrån direkt efter)
-      gang: (duk) => R.fig && R.fig.utifran ? R.fig.utifran(duk, now(), neonOn(now()), !R.vilar) : false,
+      // (i gängets egen duk, när den står i skyltfönstret: glas)
+      gang: (ut) => R.fig && R.fig.utifran ? R.fig.utifran(ut, now(), neonOn(now())) : false,
       // (lika ofta som gänget ritas inne, KVAL)
       takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
+      // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
+      pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
       calm: () => RORELSE_AV.matches,
       // (en fast bild, ?rum-t: allt står på samma tid)
       still: still() ? R.frozen : null,
@@ -4272,13 +4409,56 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       e.stopPropagation();
       fasad(false);
     });
-    if (glid) f.el.classList.add('in');
+    // (framme: inget eget lager för toningen längre)
+    if (glid) {
+      f.el.classList.add('in');
+      f.el.addEventListener('animationend', (e) => { if (e.target === f.el && e.animationName === 'rf-in') f.el.classList.remove('in'); });
+    }
     R.fasad = f;
     lager('fasaden', (nu) => fasad(false, !nu));
-    // rummet står still när fasaden täcker det
+    // Rummet står still när fasaden täcker det, och ritas inte heller (fasad-tackt i rum-fasad.css): förut
+    // låg alla rummets lager kvar under fasaden, en och en halv gång fler bildpunkter än fasaden själv i en
+    // telefon, och med dem ute tog sidan för mycket minne. Gängets duk står då i skyltfönstret (glas).
+    // (utan rörelse genast, så att en fast bild har gänget i fönstret)
     clearTimeout(R.fasadT);
-    R.fasadT = setTimeout(() => { if (R.fasad === f) R.vilar = true; }, glid ? 420 : 0);
+    const tackt = () => {
+      if (R.fasad !== f) return;
+      R.vilar = true;
+      R.el.classList.add('fasad-tackt');
+      glas(f, true);
+    };
+    if (glid) R.fasadT = setTimeout(tackt, 420);
+    else tackt();
     return true;
+  }
+  // Gängets duk (rum-3d.js) lånas ut till fasadens skyltfönster medan rummet inte syns, och ritar gänget
+  // utifrån där (utifran, lana): förut ritades glaset i duken inne i rummet och kopierades till en duk i
+  // fasaden efter varje bild (drawImage från WebGL), 15–30 gånger i sekunden. Det arbetet på grafikkortet
+  // fanns bara ute, och ute kraschade sidan i telefonen; nu gör fasaden samma sak som rummet, där duken
+  // visar det som ritas i den. Tillbaka (pa false) står den där den stod, med sin stil, och gänget ritas
+  // inifrån genast, innan rummet syns.
+  function glas(f, pa) {
+    clearTimeout(R.glasT);
+    const c = document.getElementById('rum-3d');
+    if (pa) {
+      if (R.glas || !c || !R.fig || !R.fig.lana || !f.glas) return;
+      R.glas = { f, c, hem: c.parentNode, fore: c.nextSibling, stil: c.style.cssText };
+      R.fig.lana(true);
+      f.glas(c);
+      return;
+    }
+    const g = R.glas;
+    if (!g) return;
+    R.glas = null;
+    g.f.glas(null);
+    g.c.style.cssText = g.stil;
+    g.hem.insertBefore(g.c, g.fore && g.fore.parentNode === g.hem ? g.fore : null);
+    R.fig.lana(false);
+    if (R.on && !R.vilar) {
+      const t = now();
+      const [vx, vy] = synlig();
+      R.fig.draw(t, vx, vy, neonOn(t));
+    }
   }
 
   // Tidningen lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka. (UPPE: samma
@@ -6631,6 +6811,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const oh = R.k * H - innerHeight;
     R.px = ow > 1 ? Math.min(1, Math.max(0, px)) : 0.5;
     R.py = oh > 1 ? Math.min(1, Math.max(0, py)) : 0.5;
+    // (har man dragit på höjden står man kvar där, också när fönstret ändras: fit)
+    if (drag && oh > 1) R.drog = true;
     R.ox = -ow * R.px;
     // (scenen är lägre än fönstret i telefonen på höjden: mest tak över och lite pult under, så att
     // rummet får bilden och bordet ungefär en tredjedel, men aldrig så lågt att pingklockan hamnar utanför)
@@ -6876,6 +7058,11 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const hem = smal && ow > 1 ? Math.min(1, Math.max(0, (HEM_SMAL * R.k - innerWidth / 2) / ow)) : 0.5;
     if (smal !== Boolean(R.smal) || R.px === R.pxHem) R.px = hem;
     R.pxHem = hem;
+    // På en bred skärm skärs både taket och pulten bort, och taket försvann helt (2026-11-16). Därför tas
+    // mer av det som inte ryms nertill (TAK_BRED av det hamnar över bilden, inte hälften), utom i telefonen
+    // på bredden, där kupongen behöver platsen och man drar själv. Har man dragit står man kvar.
+    R.pyHem = innerHeight < 500 && innerWidth > innerHeight ? 0.5 : TAK_BRED;
+    if (!R.drog) R.py = R.pyHem;
     pan(R.px, R.py);
     R.lag = innerHeight < 500 && innerWidth > innerHeight;
     R.el.classList.toggle('lag', R.lag);

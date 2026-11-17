@@ -232,10 +232,6 @@
 .rh-knapp:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.4); }
 .rh-vag { display: inline-flex; align-items: center; gap: 0.35em; min-height: 40px; margin: 0; padding: 0 2px; border: 0; background: none; color: rgba(246, 239, 220, 0.8); font: 700 0.8em/1 Fraunces, Georgia, serif; letter-spacing: 0.17em; text-transform: uppercase; text-decoration: none; text-shadow: inherit; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.12s; }
 .rh-vag::after { content: "→"; font-weight: 400; font-size: 1.3em; letter-spacing: 0; transition: transform 0.12s; }
-.rh-ja::after { content: "»"; }
-/* Läs upp: utan pil; medan han läser heter den Ja, ja, med pilen */
-.rh-las:not(.rh-ja)::after { content: none; }
-.rh-las[hidden] { display: none; }
 .rh-knapp:focus-visible, .rh-vag:focus-visible { outline: 2px solid #f0d699; outline-offset: 3px; }
 /* slaget i disken: bilden rycker till (koppen hoppar i rum-hasse-3d.js) */
 .rh-slag { animation: rh-slag 0.42s linear; }
@@ -264,11 +260,10 @@
 .rum-hasse-vy.hog.kragen .rh-text p:last-child { margin-bottom: 0; }
 /* (två rader för det han säger om kupongen, också innan han har sagt det, nertill mot rutorna) */
 .rum-hasse-vy.hog.kragen .rh-fragan { min-height: 2.84em; align-content: end; }
-/* (och svaren i två rader, knapparna och under dem Läs upp och Matchbladet, så att höjden är densamma
-   innan Läs upp syns) */
+/* (och svaren i två rader, knapparna och under dem Matchbladet) */
 .rum-hasse-vy.hog.kragen .rh-slut::before { content: ''; flex-basis: 100%; order: 1; }
 .rum-hasse-vy.hog.kragen .rh-slut > .rh-vag { order: 2; }
-/* (under domen över en kupong finns bara Tillbaka och Läs upp, och de står på samma rad) */
+/* (under domen över en kupong finns bara Tillbaka) */
 .rum-hasse-vy.hog.kragen .rh-domen ~ .rh-slut::before { content: none; }
 .rum-hasse-vy.hog.kragen .rh-text.mer { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); }
 .rum-hasse-vy.hog .rh-domen { font-size: 1em; }

@@ -7,8 +7,9 @@
 //   - Omgångens matcher och namn: så snart gängets omgång finns (oftast
 //     Stryktipset, måndag kl. 16) skrivs matcherna i data/analyser.json och namnet
 //     i data/omgangsnamn.json.
-//   - Analyserna: på varje tid i config/analyser.js (tider) skrivs en ny analys per
-//     match som inte har börjat, och Hasse Backes text ur den. Misslyckas en match
+//   - Analyserna: så snart omgången finns, och sedan på varje tid i config/analyser.js
+//     (tider), skrivs en ny analys per match som inte har börjat, och Hasse Backes text
+//     ur den. Misslyckas en match
 //     sparas de andra, en gammal analys ligger kvar tills en ny finns, och nästa
 //     körning försöker igen med högst perMatch försök per tid.
 //   - Tidningen inför omgången (Hasse Backe läser den): en notis per match i
@@ -357,8 +358,8 @@ async function namnet(round) {
 
 // ---------- tidningens bilder ----------
 
-// Grenen med bilderna: en enda commit med filerna, som skrivs över varje gång (som rösten i
-// grenen rost), så att main inte växer och förra veckans bilder inte ligger kvar. Workflowen
+// Grenen med bilderna: en enda commit med filerna, som skrivs över varje gång, så att main inte
+// växer och förra veckans bilder inte ligger kvar. Workflowen
 // hämtar den till data/tidning-bilder/. → commitens id
 const BILDGREN = 'tidning-bilder';
 function bildGrenen(mapp, filer, vad) {
@@ -450,17 +451,19 @@ async function tidningen(round) {
 }
 
 // Informationssidorna ur supporterpoddarna (scripts/tidning/poddar.mjs skriver dem på poddarnas tider):
-// läggs ut när de har ändrats. Inget anrop till Claude här.
+// läggs ut när de har ändrats. Inget anrop till Claude här. En ny omgång ger ett nytt nummer direkt, innan något blad
+// är skrivet (2026-11-17: numret kommer ut när kupongen kommer).
 function poddsidorna(round) {
   // Bladen som ligger ute står kvar för matcher som jobbet inte har något eget blad till (landskamperna).
   const nu = vantande.poddsidor || lasJson(FIL.poddsidor, null);
   const ny = poddsidor(lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null), round, nu);
   if (!ny) return;
-  if (nu && nu.omgang === ny.omgang && JSON.stringify([nu.matcher, nu.sidor]) === JSON.stringify([ny.matcher, ny.sidor])) return;
-  if (TORRT) { logg(`skulle lägga ut ${ny.sidor.length} informationssidor ur poddarna`); return; }
+  const nytt = !nu || nu.omgang !== ny.omgang;
+  if (!nytt && JSON.stringify([nu.matcher, nu.sidor]) === JSON.stringify([ny.matcher, ny.sidor])) return;
+  if (TORRT) { logg(`skulle lägga ut ${nytt ? 'ett nytt nummer med ' : ''}${ny.sidor.length} matchblad av ${ny.matcher.length}`); return; }
   vantande.poddsidor = ny;
-  logg(`poddsidor: ${round.id}, ${ny.sidor.length} matcher`);
-  spara(`Supporterpoddarna inför omgången ${round.id}`);
+  logg(`poddsidor: ${round.id}, ${ny.sidor.length} matchblad av ${ny.matcher.length}${nytt ? `, nytt nummer${ny.nummer ? ` (Nr ${ny.nummer})` : ''}` : ''}`);
+  spara(nytt ? `Helgarderat${ny.nummer ? ` Nr ${ny.nummer}` : ''} inför omgången ${round.id}` : `Supporterpoddarna inför omgången ${round.id}`);
 }
 
 // Helgarderats sista sida: en gång per omgång, när omgångens matchblad har kommit.
@@ -582,7 +585,7 @@ async function hasseText(id, entry, roster, d = null, nyckel = `hasse:${id}`) {
 async function analyserna(round, roster) {
   const per = new Map(lasAnalyser().analyser.map((a) => [String(a.id), a]));
   for (const [id, a] of Object.entries(vantande.analyser)) per.set(id, a);
-  const v = attSkriva(round, per, { now: Date.now(), tider: ac.tider, forhandTimmar: ac.forhandTimmar, version: ac.promptVersion, tvinga: TVINGA });
+  const v = attSkriva(round, per, { now: Date.now(), tider: ac.tider, vantaTimmar: ac.vantaTimmar, version: ac.promptVersion, tvinga: TVINGA });
   const nyckel = (x) => `analys:${x.id}:${v.tid}`;
   // (Hasses försök räknas per tid, som analysernas: tre misslyckade får inte stänga av honom i en vecka)
   const hasseNyckel = (x) => `hasse:${x.id}:${v.tid}`;

@@ -9,7 +9,8 @@
 // för del samma dag):
 //
 //   Omslaget     på kupongens papper, utan bild (Kalenderbladet, 2026-11-13): numret och veckan, priset, namnet,
-//                lördagens datum stort som ett kalenderblad (Inför Stryktipset, 14, november) och devisen nertill.
+//                omgångens datum stort som ett kalenderblad (Inför Stryktipset, 14, november; två dagar under
+//                varandra, 15 & 16) och devisen nertill.
 //                100 × 140, förstorat med zoom: litet på pulten och så stort som ryms när tidningen läses (passa).
 //                Alla andra sidor är lika
 //                breda som omslaget och minst lika höga, på samma papper och i samma tryck (helgarderat.css).
@@ -27,7 +28,7 @@
 // finnas på andra ställen på sajten. Koden finns i historiken, före "Helgarderat: en enda tidning".
 //
 // Numret är data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, och det ligger kvar tills nästa
-// kommer, också efter omgången. Utan det står provnumret (helgarderat/utkast.json, poddjobbets provomgång 2026-11-10).
+// kommer, också efter omgången. Nästa kommer med nästa kupong, innan matchbladen är skrivna. Utan det står provnumret (helgarderat/utkast.json, poddjobbets provomgång 2026-11-10).
 // Tidningen har inga bilder sedan Affischen (2026-11-13). Sista sidan skriver samma nattjobb
 // (src/analyser/sista-sidan.mjs).
 // Inget här anropar någon språkmodell.
@@ -85,6 +86,9 @@
       pris: '3 kr',
       prov: 'Provnummer',
       infor: { stryktipset: 'Inför Stryktipset', europatipset: 'Inför Europatipset', omgangen: 'Inför omgången' },
+      // mellan omgångens två dagar på kalenderbladet (15 & 16), och mellan den första och sista när de är fler
+      och: '&',
+      till: 'till',
       devis: 'Sveriges säkraste tipstidning',
     },
     kupongen: {
@@ -168,18 +172,40 @@
     const n = Math.round((mandag - FORSTA) / (7 * 864e5)) + 1;
     return n >= 1 ? n : null;
   }
-  // Upplagans nummer och lördag: { nr, dag }, nr null före det första numret (provnumret 0) och dag null utan tider.
+  // Upplagans nummer, första dag och dagar: { nr, dag, dagar }, nr null före det första numret (provnumret 0) och dag
+  // null utan tider. Dagarna är omgångens alla dagar i ordning (dagar i upplagan), eller bara den första.
   // Ett nummer som filen har (nummer, som nattjobbet räknar på de nummer som har kommit ut) går före veckan
   // (2026-11-16: Stryktipset lördag och Europatipset söndag samma vecka blev annars båda Nr 1).
   function numret(u) {
     const dag = u && Number.isFinite(u.lordag) ? new Date(u.lordag) : null;
-    return { dag, nr: !u ? null : u.prov ? 0 : u.nummer >= 1 ? u.nummer : dag ? nummer(dag) : null };
+    const dagar = u && Array.isArray(u.dagar) && u.dagar.length ? u.dagar.map((t) => new Date(t)) : dag ? [dag] : [];
+    return { dag, dagar, nr: !u ? null : u.prov ? 0 : u.nummer >= 1 ? u.nummer : dag ? nummer(dag) : null };
   }
-  // Sidhuvudets högra del på alla sidor efter omslaget: Nr 1 · lördag 14 november, samma lördag som omslaget (A,
-  // Rutorna, 2026-11-11). Förut stod matchbladens datum där (dagen då de skrevs) och veckan på innehållet.
+  // Omgångens datum i ord: lördag 14 november för en dag, 15 och 16 november för två och 14–16 november för fler (med
+  // båda månaderna när den går över ett månadsskifte: 31 oktober och 1 november). → text, '' utan tider
+  function datumOrd(dagar) {
+    if (!dagar.length) return '';
+    const [a, b] = [dagar[0], dagar.at(-1)];
+    if (dagar.length === 1) return `${fVdagLang.format(a)} ${fDagMan.format(a)}`;
+    const mellan = dagar.length === 2 ? ' och ' : '–';
+    return fMan.format(a) === fMan.format(b) ? `${fDag.format(a)}${mellan}${fDagMan.format(b)}` : `${fDagMan.format(a)}${mellan}${fDagMan.format(b)}`;
+  }
+  // Kalenderbladet på omslaget: vad datumet gäller, dagen eller de två dagarna (den första och den sista när omgången
+  // har fler), vad som står mellan dem och månaden (oktober – november över ett månadsskifte). → blad, null utan tider
+  function kalender(u) {
+    const { dagar } = numret(u);
+    if (!dagar.length) return null;
+    const [a, b] = [dagar[0], dagar.at(-1)];
+    const manad = fMan.format(a) === fMan.format(b) ? fMan.format(a) : `${fMan.format(a)} – ${fMan.format(b)}`;
+    return { infor: inforSpel(u), dagar: dagar.length > 1 ? [fDag.format(a), fDag.format(b)] : [fDag.format(a)],
+      mellan: dagar.length > 2 ? TEXT.forsta.till : TEXT.forsta.och, manad, ord: datumOrd(dagar) };
+  }
+  // Sidhuvudets högra del på alla sidor efter omslaget: Nr 1 · lördag 14 november, samma datum som omslaget (A,
+  // Rutorna, 2026-11-11; Nr 2 · 15 och 16 november när omgången spelas två dagar). Förut stod matchbladens datum där
+  // (dagen då de skrevs) och veckan på innehållet.
   function huvudet(u) {
-    const { nr, dag } = numret(u);
-    return [nr != null ? TEXT.forsta.nr(nr) : '', dag ? `${fVdagLang.format(dag)} ${fDagMan.format(dag)}` : u.datumText].filter(Boolean).join(' · ');
+    const { nr, dagar } = numret(u);
+    return [nr != null ? TEXT.forsta.nr(nr) : '', dagar.length ? datumOrd(dagar) : u.datumText].filter(Boolean).join(' · ');
   }
 
   // ---------- supportrarnas texter och källor ----------
@@ -257,19 +283,23 @@
   // (data/sista-sidan.json). Kupongen är omgångens alla matcher i
   // kupongens ordning (data.matcher, också de utan matchblad), var och en med sitt matchblad om den har ett.
   // Matchbladen är uppslag med två sidor var, från sidan 2 (sida: vänstersidan, alltid jämn), och sista sidan kommer
-  // efter dem (sistaNr).
-  // → upplagan, eller null när numret inte har några matchblad
+  // efter dem (sistaNr). Ett nummer kommer ut med kupongen, innan matchbladen är skrivna (2026-11-17), och har då
+  // bara omslaget och innehållet, med matcherna bleka tills deras blad kommer.
+  // → upplagan, eller null när numret varken har matcher eller matchblad
   function upplaga(data, prov = false, sista = null) {
     const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
-    if (!sidor.length) return null;
+    const l = data && Array.isArray(data.matcher) && data.matcher.length ? data.matcher : sidor;
+    if (!l.length) return null;
     const blad = new Map(sidor.map((s) => [String(s.id), s]));
-    const l = Array.isArray(data.matcher) && data.matcher.length ? data.matcher : sidor;
     const kupongen = l.map((x, i) => {
       const s = blad.get(String(x.id)) || null;
       const lag = s && s.lag ? s.lag : String(x.match || '').split(/\s+[–-]\s+/);
       return { nr: x.nr || i + 1, lag, avspark: x.avspark || (s && s.avspark) || null, sida: s };
     }).sort((a, b) => a.nr - b.nr);
-    const tider = kupongen.map((m) => Date.parse(m.avspark)).filter(Number.isFinite);
+    const tider = kupongen.map((m) => Date.parse(m.avspark)).filter(Number.isFinite).sort((a, b) => a - b);
+    // den första avsparken varje dag, i Stockholm
+    const perDag = new Map();
+    tider.forEach((t) => { const k = fYmd.format(new Date(t)); if (!perDag.has(k)) perDag.set(k, t); });
     const u = {
       prov: Boolean(prov),
       omgang: String(data.omgang || ''),
@@ -278,8 +308,10 @@
       spel: data.spel && data.spel.namn ? String(data.spel.namn) : '',
       sidor,
       kupongen,
-      // omgångens första dag
-      lordag: tider.length ? Math.min(...tider) : NaN,
+      // omgångens första dag, och alla dess dagar (2026-11-16: Europatipset 2625 spelades söndag 15 och måndag 16
+      // november, och omslaget visade bara den 15)
+      lordag: tider.length ? tider[0] : NaN,
+      dagar: [...perDag.values()],
       datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '',
       sida: new Map(sidor.map((s, i) => [s.nr, 2 * i + 2])),
       sista: sistaSidan(sista, String(data.omgang || '')),
@@ -306,22 +338,27 @@
   // "något mer minimalistiskt - kanske bara tidningsnumret eller något dylikt istället för de där ikryssade rutorna?",
   // och sedan: "byta ut texten där nere … mot en devis" och "Inför stryktipset den 14 november - fast på ett snyggare
   // sätt"). På kupongens papper och utan bild: numret, veckan och priset maskinskrivna överst, namnet tryckt i
-  // terrakotta över ett streck, och i mitten lördagens datum som ett kalenderblad, dagen stor mellan två etiketter
-  // (Inför Stryktipset ovanför, månaden under; Inför omgången när omgången inte är Stryktipsets). Nertill devisen,
-  // kursiv som tidningens citat. I tidningen (lankar) går kalenderbladet till innehållet; på pulten ligger omslaget i
+  // terrakotta över ett streck, och i mitten omgångens datum som ett kalenderblad, dagen stor mellan två etiketter
+  // (Inför Stryktipset ovanför, månaden under; Inför omgången när omgången inte är Stryktipsets). En omgång på två
+  // dagar har dem under varandra, lite mindre, med ett kursivt & mellan två korta streck (15 & 16; 2026-11-16,
+  // användarens önskemål: "Förstasidan borde alltså ha 15 + 16 på ett passande grafiskt designsätt"), och en på fler
+  // den första och den sista med till mellan. Nertill devisen, kursiv som tidningens citat. I tidningen (lankar) går kalenderbladet till innehållet; på pulten ligger omslaget i
   // en länk och har inga egna. Utan upplaga, eller utan tider, står namnet och devisen.
   // Förut (2026-11-11, C, Helgarderingen) rutorna 1, X och 2 ikryssade med pennan i mitten, lördagens datum under
   // namnet och den första matchen med sin rubrik nertill. Skisserna som inte valdes: först A Kvällstidningen, B
   // Tipsbladet, C Matchprogrammet och D Fanzinet, sedan E Numret (numret stort i mitten), G Rubriken och H Bara namnet.
   function forsta(u, lankar = false) {
     const G = TEXT.forsta;
-    const { nr, dag } = numret(u);
+    const { nr } = numret(u);
     const over = overst(u);
+    const k = u ? kalender(u) : null;
     let mitt = '<div class="hf-mitt"></div>';
-    if (dag) {
-      const infor = inforSpel(u);
-      const inne = `<span class="hf-et">${esc(infor)}</span><span class="hf-dag">${esc(fDag.format(dag))}</span><span class="hf-et">${esc(fMan.format(dag))}</span>`;
-      mitt = lankar ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(`${infor} ${fVdagLang.format(dag)} ${fDagMan.format(dag)}: ${TEXT.innehall.titel}`)}">${inne}</a>`
+    if (k) {
+      const dagen = k.dagar.length > 1
+        ? `<span class="hf-dagar"><span class="hf-dag">${esc(k.dagar[0])}</span><i class="hf-och">${esc(k.mellan)}</i><span class="hf-dag">${esc(k.dagar[1])}</span></span>`
+        : `<span class="hf-dag">${esc(k.dagar[0])}</span>`;
+      const inne = `<span class="hf-et">${esc(k.infor)}</span>${dagen}<span class="hf-et">${esc(k.manad)}</span>`;
+      mitt = lankar ? `<a class="hf-mitt" href="#hg-kupongen" aria-label="${esc(`${k.infor} ${k.ord}: ${TEXT.innehall.titel}`)}">${inne}</a>`
         : `<div class="hf-mitt">${inne}</div>`;
     }
     return `<div class="hf-forsta" aria-label="${NAMN}${nr != null ? ` nr ${nr}` : ''}">` +
@@ -330,20 +367,20 @@
       '<span class="hf-blad"></span><span class="hf-yta"></span></div>';
   }
   // Omslaget och sista sidan som text, för Hasse Backes tidning, som trycker dem själv på sitt papper (rum-hasse-tidning.js):
-  // samma ord som forsta och sista här. Omslaget är Kalenderbladet (blad: vad datumet gäller, dagen och månaden; null
-  // utan tider) med devisen nertill. Utan sista sidan står innehållet där (Hasse läser dem från baksidan). Utan upplaga
+  // samma ord som forsta och sista här. Omslaget är Kalenderbladet (blad: vad datumet gäller, dagen eller de två
+  // dagarna, vad som står mellan dem och månaden; null utan tider) med devisen nertill. Utan sista sidan står innehållet där (Hasse läser dem från baksidan). Utan upplaga
   // null.
   function omslag(u) {
     if (!u) return null;
     const G = TEXT.forsta;
-    const { dag } = numret(u);
+    const blad = kalender(u);
     const S = u.sista;
     return {
       namn: NAMN,
       over: overst(u),
       prov: u.prov ? G.prov : '',
       pris: G.pris,
-      blad: dag ? { infor: inforSpel(u), dag: fDag.format(dag), manad: fMan.format(dag) } : null,
+      blad: blad ? { infor: blad.infor, dagar: blad.dagar, mellan: blad.mellan, manad: blad.manad } : null,
       devis: G.devis,
       huvudet: huvudet(u),
       sista: S ? { nr: u.sistaNr, kronika: S.kronika, kaseri: S.kaseri, rubriker: TEXT.sista } : null,

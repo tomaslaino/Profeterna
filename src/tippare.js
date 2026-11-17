@@ -53,7 +53,10 @@
 // första avspark, då var och ens egna tips också stänger, och står sedan kvar. I
 // tjänsten (worker/samtal.mjs, gang i config/kupong.js) finns han inte, så inlämningen,
 // när tipsen visas, jämförelsen inför gängets kupong och kupongen själv går som förut.
-// Omgångar som var klara innan han kom med ändras inte.
+// Omgångar som var klara innan han kom med ändras inte. Han är bara med i en omgång som
+// hela gänget har tippat (Tippoang.hasseMed): annars får omgången ingen kupong av honom,
+// och i en fryst omgång från innan regeln räknas hans tips bort (utanHasse). En omgång
+// som ingen tippade står kvar i filen men visas inte.
 
 const fs = require('fs');
 const path = require('path');
@@ -225,10 +228,29 @@ function hasseKupong(rows, regel) {
   return Tippoang.regelKlar(r, Object.values(out)) ? out : null;
 }
 
+// Har hela gänget tippat i omgången, så att Hasse får vara med?
+const hasseFar = (r) => Tippoang.hasseMed(r.gang.map((g) => g.id), (id) => r.matcher.some((row) => row.tips && row.tips[id]));
+
+// Omgången utan Hasse, om inte hela gänget tippade i den.
+function utanHasse(r) {
+  if (!r.gang.some((g) => g.id === HASSE.id) || hasseFar(r)) return r;
+  return {
+    ...r,
+    gang: r.gang.filter((g) => g.id !== HASSE.id),
+    matcher: r.matcher.map((row) => {
+      if (!row.tips || !row.tips[HASSE.id]) return row;
+      const { [HASSE.id]: _, ...tips } = row.tips;
+      return { ...row, tips };
+    }),
+  };
+}
+
 // Omgången med Hasse som tippare. Kupongen följer analyserna (sagt) fram till första
 // avspark och står sedan kvar (prev: omgången från förra bygget), också när nästa
-// omgångs analyser har tagit över. Spelar han inte ändras inget.
+// omgångs analyser har tagit över. Spelar han inte, eller har inte hela gänget tippat,
+// ändras inget.
 function withHasse(f, { sagt, prev, regel, modellAv, now }) {
+  if (!hasseFar(f)) return f;
   const forst = Math.min(...f.matcher.map((row) => Date.parse(row.avspark)).filter(Number.isFinite));
   const was = Object.fromEntries(((prev && prev.matcher) || [])
     .filter((row) => row.tips && row.tips[HASSE.id]).map((row) => [String(row.id), row.tips[HASSE.id]]));
@@ -321,7 +343,8 @@ function scoreRows(r, signOf) {
 }
 
 // En fryst omgång som sidan visar den: poängen per person och modellen.
-function summarize(r) {
+function summarize(fryst) {
+  const r = utanHasse(fryst);
   const people = r.gang.map((g) => {
     const rows = scoreRows(r, (row) => row.tips && row.tips[g.id]);
     if (rows.every((x) => !x)) return { id: g.id, name: g.namn || g.id, none: true };
@@ -417,11 +440,12 @@ function buildTippare({ samtal = null, matches = [], freeze = false, file = FILE
   const rounds = list
     .filter((r) => r && r.klar && Array.isArray(r.matcher) && Array.isArray(r.gang))
     .map(summarize)
+    .filter((r) => r.people.some((p) => !p.none))
     .sort((a, b) => String(b.from).localeCompare(String(a.from)) || b.id.localeCompare(a.id));
   const hasse = {};
   for (const r of list) {
-    if (!r || !fresh.has(String(r.id)) || !Array.isArray(r.matcher)) continue;
-    for (const row of r.matcher) if (row.tips && row.tips[HASSE.id]) hasse[row.id] = row.tips[HASSE.id];
+    if (!r || !fresh.has(String(r.id)) || !Array.isArray(r.matcher) || !Array.isArray(r.gang)) continue;
+    for (const row of utanHasse(r).matcher) if (row.tips && row.tips[HASSE.id]) hasse[row.id] = row.tips[HASSE.id];
   }
   return {
     rounds,

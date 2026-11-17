@@ -8,8 +8,9 @@
 // blir lika mycket skarpare som väggen.
 //
 // Patinan: bandet och bokstäverna i blekta färger, gulnade av röken (mest upptill), smutsigare mot kanterna, veck
-// där den har legat hopvikt i fyra, rost runt märlorna, en kaffering och ett hål efter en cigarr. Märlorna i de
-// övre hörnen hänger i mässingskrokarna, och tyget sviktar emellan, med veck från hörnen.
+// där den har legat hopvikt i fyra, rost runt märlorna, en kaffering och ett hål efter en cigarr. Den är fäst med
+// häftstift längs överkanten, under bardiskens skiva, och hänger ut över mässingskrokarna under: tyget står ut som
+// ett tält runt varje knopp, med två veck snett nedåt. Det som skivan skymmer är genomskinligt.
 //
 // Ljuset på fronten där den hänger läser sidan ur små prov av väggens sex bilder, som görs här
 // (public/rum/hasse-flagga.json, ljusprov nedan): bakas väggen om ska skriptet köras igen.
@@ -31,21 +32,31 @@ const TH = Math.round(R.h * K);
 const KAM = kamera();
 const ZP = SCEN.FRONT.Z + G.UT;
 // väggens breda bild vid flaggan: bildpunkter per enhet, och oskärpan (som lopsedel i rum-hasse-3d.js)
-const z = iKamera(franBaren([(G.KROKAR[0] + G.KROKAR[1]) / 2, R.topp - G.H / 2, ZP]), KAM)[2];
+const z = iKamera(franBaren([R.x0 + R.w / 2, R.y0 - R.h / 2, ZP]), KAM)[2];
 const skala = (BAK.bred.S * SCEN.D) / z;
 const skiva = SCEN.LINS.R * Math.abs(1 - SCEN.LINS.F / z) * (SCEN.D / SCEN.LINS.F) * BAK.bred.S;
 const oskarp = Math.hypot(skiva / 2, 1.1) * (K / skala);
-// Krokarnas knopp (bak.html: plattan 18 framför fronten, skaftet 60 ut, knoppen 6 × 17 × 6 vid 58) sedd från kameran,
-// i tygets plan: där strålen från ögat genom knoppen går genom planet
+// Bardiskens skiva (bak.html: ovansidan T = FONSTER.Y0 − 22, 70 tjock och 560 djup från väggen) skymmer fronten
+// närmast under sig: kameran ser tygets plan först under DOLD, där strålen till ögat går under skivans framkant.
 const ogat = franBaren(KAM.pos, -SCEN.BAR);
-const iPlanet = (p) => {
-  const t = (ZP - ogat[2]) / (p[2] - ogat[2]);
-  return [ogat[0] + t * (p[0] - ogat[0]), ogat[1] + t * (p[1] - ogat[1])];
-};
-const KROKY = SCEN.FRONT.KROK + 16;
-const knopp = G.KROKAR.map((x) => iPlanet([x, KROKY - 2, SCEN.FRONT.Z + 18 + 58]));
+const UNDER = SCEN.FONSTER.Y0 - 22 - 70;
+const tz = (SCEN.VAGG + 560 - ZP) / (ogat[2] - ZP);
+const DOLD = (UNDER - tz * ogat[1]) / (1 - tz);
+if (R.y0 < DOLD) throw new Error(`FLAGGA.RUTA.Y0 (${R.y0}) ska ligga ovanför ${DOLD.toFixed(1)}, där skivan slutar skymma`);
+// och bildens högra kant: rutan ska räcka förbi den i båda väggens bilder, från DOLD ned till nederkanten
+for (const b of [BAK.bred, BAK.hog]) {
+  for (const Y of [DOLD, G.TOPP - G.H]) {
+    const [u] = iKamera(franBaren([R.x0 + R.w, Y, ZP]), KAM);
+    if (b.px + b.S * u < b.W) throw new Error(`FLAGGA.RUTA.X1 (${R.x0 + R.w}) syns i bilden ${b.W} bred vid y = ${Math.round(Y)}`);
+  }
+}
+// Mässingskrokarna under tyget (bak.html: mitt i varje fält, x = 1650 ± n · 900, plattan 18 framför fronten,
+// skaftet ut och knoppen 6 × 17 × 6 vid 58, mitt i y = FRONT.KROK + 14): hur långt knoppen står ut framför tygets plan
+const KROKAR = [];
+for (let x = 1650 - 900 * 8; x < G.X + G.B; x += 900) if (x > G.X) KROKAR.push([x, SCEN.FRONT.KROK + 14]);
+const KNOPP = 18 + 58 + 6 + 2 - G.UT;
 
-function rita({ G, R, K, TW, TH, oskarp, knopp, KROK }) {
+function rita({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP }) {
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const ss = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
   const hash = (x, y) => {
@@ -180,58 +191,46 @@ function rita({ G, R, K, TW, TH, oskarp, knopp, KROK }) {
   const monster = im;
 
   // ---- tyget som hänger ----
-  const D = G.KROKAR[1] - G.KROKAR[0];
-  const XL = G.KROKAR[0] - G.IN;
-  // överkanten sviktar mellan märlorna, och hörnen utanför dem hänger lite
-  const sag = (a) => {
-    const s = (a - G.IN) / D;
-    if (s >= 0 && s <= 1) return G.SAG * 4 * s * (1 - s);
-    return 9 * clamp(Math.abs(s < 0 ? a - G.IN : a - (G.B - G.IN)) / G.IN) ** 1.6;
-  };
-  const inat = (a, b) => 7 * (b / G.H) * (1 - (2 * a) / G.B);
-  // tyget (a, b från övre vänstra hörnet) → barens mått
-  const fram = (a, b) => [XL + a + inat(a, b), R.topp - sag(a) * (1 - 0.45 * b / G.H) - b];
-  const bak = (X, Y) => {
-    let a = X - XL; let b = R.topp - Y;
-    for (let n = 0; n < 4; n++) {
-      a = X - XL - inat(a, b);
-      const s = sag(a);
-      b = (R.topp - s - Y) / (1 - (0.45 * s) / G.H);
-    }
-    return [a, b];
-  };
-  // vecken i tyget (höjd ut från fyllningen, i enheter)
-  const linje = (ax, ay, bx, by, A, w0, w1) => ({ ax, ay, bx, by, A, w0, w1, l: Math.hypot(bx - ax, by - ay) });
+  // tyget (a, b från övre vänstra hörnet) ↔ barens mått: fäst längs överkanten, så det hänger rakt
+  const fram = (a, b) => [G.X + a, G.TOPP - b];
+  const bak = (X, Y) => [X - G.X, G.TOPP - Y];
   const B = G.B; const Hh = G.H; const I = G.IN;
-  const ASAR = [
-    // från den vänstra märlan, i en solfjäder ned mot mitten
-    linje(I + 4, I + 10, B * 0.24, Hh * 1.02, 10, 7, 40),
-    linje(I + 6, I + 8, B * 0.42, Hh * 0.8, 12, 8, 46),
-    linje(I + 8, I + 6, B * 0.6, Hh * 0.44, 9, 7, 38),
-    // små, tätt intill märlan, där tyget drar
-    linje(I + 4, I + 6, I + 120, I + 150, 5, 3, 12),
-    linje(I + 6, I + 4, I + 170, I + 70, 4.5, 3, 11),
-    // från den högra, lite annorlunda
-    linje(B - I - 4, I + 10, B * 0.78, Hh * 1.02, 9, 7, 38),
-    linje(B - I - 6, I + 8, B * 0.56, Hh * 0.82, 12, 8, 48),
-    linje(B - I - 8, I + 6, B * 0.4, Hh * 0.48, 8, 7, 34),
-    linje(B - I - 4, I + 6, B - I - 130, I + 140, 5, 3, 12),
-    linje(B - I - 6, I + 4, B - I - 180, I + 60, 4, 3, 10),
-  ];
+  // knopparna under tyget, i tygets mått
+  const KN = KROKAR.map(([x, y]) => [x - G.X, G.TOPP - y]);
+  // häftstiften längs överkanten, ungefär var 25:e centimeter (lite ojämnt, som när man sätter upp den för hand)
+  const STIFT = Array.from({ length: Math.ceil(B / 420) + 1 }, (_, n) => Math.min(B - 12, 12 + n * 420 + 30 * (hash(n, 5) - 0.5)));
   const hojd = (a, b) => {
     let h = 0;
-    for (const L of ASAR) {
-      const dx = (L.bx - L.ax) / L.l; const dy = (L.by - L.ay) / L.l;
-      const t2 = ((a - L.ax) * dx + (b - L.ay) * dy) / L.l;
-      if (t2 <= 0 || t2 >= 1) continue;
-      const vinkel = (a - L.ax) * dy - (b - L.ay) * dx;
-      const w = L.w0 + (L.w1 - L.w0) * t2;
-      h += 1.6 * L.A * Math.sqrt(t2) * (1 - t2) ** 0.8 * 1.9 * Math.exp(-((vinkel / w) ** 2));
+    // tältet runt varje knopp: ovanför stiger tyget från listan där det är fäst, nedanför faller det tillbaka mot
+    // fronten och breder ut sig, med två veck som går snett nedåt från knoppen
+    for (const [ah, bh] of KN) {
+      const da = a - ah;
+      if (Math.abs(da) > 700) continue;
+      const db = b - bh;
+      if (db < 0) {
+        const s = clamp(b / bh);
+        h += KNOPP * s * s * Math.exp(-((da / (24 + 0.9 * -db)) ** 2));
+        continue;
+      }
+      h += KNOPP * Math.exp(-db / 420) * Math.exp(-((da / (24 + 0.55 * db)) ** 2));
+      for (const sida of [-1, 1]) {
+        const v = 0.36 + 0.06 * sida;
+        const ux = sida * Math.sin(v); const uy = Math.cos(v);
+        const langs = da * ux + db * uy;
+        if (langs <= 0) continue;
+        const tvars = da * uy - db * ux;
+        h += 0.42 * KNOPP * Math.exp(-langs / 380) * (1 - Math.exp(-langs / 40)) * Math.exp(-((tvars / (9 + 0.07 * langs)) ** 2));
+      }
     }
-    // svackan mellan märlorna: ett mjukt U under överkanten
-    const s = clamp((a - I) / D);
-    const u4 = 4 * s * (1 - s);
-    h += 14 * u4 * Math.exp(-(((b - (30 + 50 * u4)) / 26) ** 2)) - 8 * u4 * Math.exp(-(((b - (90 + 80 * u4)) / 30) ** 2)) + 5 * u4 * Math.exp(-(((b - (150 + 100 * u4)) / 34) ** 2));
+    // mellan häftstiften buktar överkanten ut lite, och det klingar av nedåt
+    {
+      let n = 0;
+      while (n < STIFT.length - 2 && STIFT[n + 1] < a) n++;
+      const s = clamp((a - STIFT[n]) / (STIFT[n + 1] - STIFT[n]));
+      h += 5 * Math.sin(Math.PI * s) * Math.exp(-b / 140);
+    }
+    // ett stort tyg som hänger fritt: långa, mjuka veck uppifrån och ned
+    h += 7 * (fbm(a / 160, b / 1100 + 4) - 0.5);
     // vecken där den har legat hopvikt i fyra: skarpa, och en mjuk böj runt
     for (const [at, tecken, led] of VECK) {
       const dd = led === 'u' ? a - at * B : b - at * Hh;
@@ -308,7 +307,7 @@ function rita({ G, R, K, TW, TH, oskarp, knopp, KROK }) {
   }
   tx.putImageData(ut, 0, 0);
 
-  // märlorna (mässing, nött), och krokarna i de övre: knoppen framför tyget, där kameran ser den
+  // märlorna (mässing, nött) i hörnen; de övre skyms av skivan
   const iBilden = (X, Y) => [((X - R.x0) / R.w) * TW, ((R.y0 - Y) / R.h) * TH];
   const marla = (cx, cy) => {
     const r1 = 15 * K; const r0 = 8.5 * K;
@@ -319,40 +318,16 @@ function rita({ G, R, K, TW, TH, oskarp, knopp, KROK }) {
     tx.fillStyle = '#1a0f08';
     tx.beginPath(); tx.arc(cx, cy, r0, 0, 2 * Math.PI); tx.fill();
   };
-  const knappen = ([X, Y], n) => {
-    const X0 = G.KROKAR[n];
-    const [cx, cy] = iBilden(X, Y);
-    // skaftet: från där det går genom märlan (i tygets plan) ut till knoppen
-    const [px, py] = iBilden(X0, KROK);
-    tx.strokeStyle = '#7a5d2a';
-    tx.lineWidth = 9 * K;
-    tx.lineCap = 'round';
-    tx.beginPath(); tx.moveTo(px, py); tx.lineTo(cx, cy); tx.stroke();
-    tx.strokeStyle = 'rgba(240, 220, 160, 0.5)';
-    tx.lineWidth = 2.5 * K;
-    tx.beginPath(); tx.moveTo(px - 2 * K, py - 2 * K); tx.lineTo(cx - 2 * K, cy - 3 * K); tx.stroke();
-    const gr = tx.createRadialGradient(cx - 2.5 * K, cy - 7 * K, 0.5 * K, cx, cy, 17 * K);
-    gr.addColorStop(0, '#f0dca2'); gr.addColorStop(0.45, '#b08c48'); gr.addColorStop(1, '#5e461f');
-    tx.fillStyle = gr;
-    tx.beginPath(); tx.ellipse(cx, cy, 6.5 * K, 17 * K, 0, 0, 2 * Math.PI); tx.fill();
-  };
   const marlor = [[I, I], [B - I, I], [I, Hh - I], [B - I, Hh - I]].map(([a, b]) => iBilden(...fram(a, b)));
   marlor.forEach(([cx, cy]) => marla(cx, cy));
-  const knappar = knopp.map(([X, Y]) => [X, Y]);
 
-  // ---- skuggan på fronten: tyget och knopparna, bort från lamporna (nedåt åt höger) ----
+  // ---- skuggan på fronten: tyget, bort från lamporna (nedåt åt höger) ----
   const sk = document.createElement('canvas');
   sk.width = TW; sk.height = TH;
   const sx = sk.getContext('2d');
   const sm = sx.createImageData(TW, TH);
   for (let n = 0; n < TW * TH; n++) sm.data[n * 4 + 3] = Math.round(255 * mask[n]);
   sx.putImageData(sm, 0, 0);
-  const forma = document.createElement('canvas');
-  forma.width = TW; forma.height = TH;
-  const fx = forma.getContext('2d');
-  fx.drawImage(sk, 0, 0);
-  fx.fillStyle = '#000';
-  for (const [X, Y] of knappar) { const [cx, cy] = iBilden(X, Y); fx.beginPath(); fx.ellipse(cx, cy, 7 * K, 17 * K, 0, 0, 2 * Math.PI); fx.fill(); }
   const UT = G.UT;
   const skugga = document.createElement('canvas');
   skugga.width = TW; skugga.height = TH;
@@ -360,35 +335,40 @@ function rita({ G, R, K, TW, TH, oskarp, knopp, KROK }) {
   // (den skarpa nära tyget och en bred, där tyget skymmer ljuset runt om)
   kx.filter = `blur(${(0.45 * UT * K).toFixed(2)}px)`;
   kx.globalAlpha = 0.5;
-  kx.drawImage(forma, -LJ[0] / LJ[2] * UT * K, LJ[1] / LJ[2] * UT * K);
+  kx.drawImage(sk, -LJ[0] / LJ[2] * UT * K, LJ[1] / LJ[2] * UT * K);
   kx.filter = `blur(${(1.4 * UT * K).toFixed(2)}px)`;
   kx.globalAlpha = 0.28;
-  kx.drawImage(forma, 0.2 * UT * K, 0.4 * UT * K);
+  kx.drawImage(sk, 0.2 * UT * K, 0.4 * UT * K);
   kx.filter = 'none';
   kx.globalAlpha = 1;
 
-  // allt ihop: skuggan, tyget, knopparna framför, och sedan lika oskarpt som väggen
+  // allt ihop: skuggan och tyget, lika oskarpt som väggen, och sist bort det som skivan skymmer (lika oskarpt,
+  // så att övergången följer skivans kant i väggens bild)
   const hop = document.createElement('canvas');
   hop.width = TW; hop.height = TH;
   const hx = hop.getContext('2d');
   hx.drawImage(skugga, 0, 0);
   hx.drawImage(tyg, 0, 0);
-  // knoppens skugga på tyget, och knoppen
-  hx.save();
-  hx.filter = `blur(${(4 * K).toFixed(2)}px)`;
-  hx.globalAlpha = 0.45;
-  hx.fillStyle = '#000';
-  for (const [X, Y] of knappar) { const [cx, cy] = iBilden(X, Y); hx.beginPath(); hx.ellipse(cx + 9 * K, cy + 12 * K, 7 * K, 16 * K, 0.2, 0, 2 * Math.PI); hx.fill(); }
-  hx.restore();
-  const tx0 = tx;
-  tx0.clearRect(0, 0, TW, TH);
-  knappar.forEach(knappen);
-  hx.drawImage(tyg, 0, 0);
+  const dold = (oskarpt) => {
+    const c = document.createElement('canvas');
+    c.width = TW; c.height = TH;
+    const cx = c.getContext('2d');
+    if (oskarpt) cx.filter = `blur(${oskarp.toFixed(2)}px)`;
+    cx.fillStyle = '#000';
+    const y = iBilden(R.x0, DOLD)[1];
+    cx.fillRect(-TW, y, 3 * TW, 2 * TH);
+    return c;
+  };
   const slut = document.createElement('canvas');
   slut.width = TW; slut.height = TH;
   const ux = slut.getContext('2d');
   ux.filter = `blur(${oskarp.toFixed(2)}px)`;
   ux.drawImage(hop, 0, 0);
+  ux.filter = 'none';
+  ux.globalCompositeOperation = 'destination-in';
+  ux.drawImage(dold(true), 0, 0);
+  hx.globalCompositeOperation = 'destination-in';
+  hx.drawImage(dold(false), 0, 0);
   return { url: slut.toDataURL('image/png'), skarp: hop.toDataURL('image/png') };
 }
 
@@ -453,7 +433,7 @@ try {
   await C.send('Page.navigate', { url: 'about:blank' });
   await C.sov(300);
   await C.ev(`document.fonts.load('bold 200px Futura')`);
-  const r = await C.ev(`(${rita.toString()})(${JSON.stringify({ G, R, K, TW, TH, oskarp, knopp, KROK: SCEN.FRONT.KROK })})`);
+  const r = await C.ev(`(${rita.toString()})(${JSON.stringify({ G, R, K, TW, TH, oskarp, DOLD, KROKAR, KNOPP })})`);
   if (!r || !r.url) throw new Error('ingen bild: ' + C.fel.join(' | '));
   const png = path.join(HERE, 'flagga.png');
   fs.writeFileSync(png, Buffer.from(r.url.split(',')[1], 'base64'));

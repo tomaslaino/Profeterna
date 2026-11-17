@@ -193,7 +193,7 @@ window.Betyg = (() => {
 
   // Talen per person ur omgångarna (kampen.js: kampRounds).
   function stats(rounds, gang) {
-    const by = new Map(gang.map((g) => [g.id, { g, n: 0, ok: 0, pts: 0, prob: 0, back: 0, team: 0, gave: 0, came: 0 }]));
+    const by = new Map(gang.map((g) => [g.id, { g, n: 0, ok: 0, pts: 0, prob: 0, back: 0, team: 0, gave: 0, came: 0, kunde: 0 }]));
     let counted = 0;
     let matches = 0;
     let last = null;
@@ -222,10 +222,17 @@ window.Betyg = (() => {
           if (teamOk && id !== Tippoang.HASSE.id) { s.team += 1; if (hit) s.gave += 1; }
         }
       }
+      // Hasse Backe kom med senare och får bara vara med när hela gänget har tippat
+      // (Tippoang.hasseMed): hans Närvaro räknas från hans första omgång och bara i
+      // omgångarna han kunde vara med i.
+      const people = r.people || [];
+      const full = Tippoang.hasseMed(people.map((p) => p.id), (id) => took(people.find((p) => p.id === id)));
       for (const s of by.values()) {
-        if (!took((r.people || []).find((p) => p.id === s.g.id))) continue;
-        s.came += 1;
-        if (s.forsta == null) s.forsta = counted;
+        if (took(people.find((p) => p.id === s.g.id))) {
+          s.came += 1;
+          if (s.forsta == null) s.forsta = counted;
+        }
+        if (s.g.id !== Tippoang.HASSE.id || (full && s.forsta != null)) s.kunde += 1;
       }
     }
     return { people: [...by.values()].filter((s) => s.n), rounds: counted, matches, last };
@@ -242,8 +249,7 @@ window.Betyg = (() => {
     const st = stats(rounds, gang);
     if (!st.people.length) return null;
     const people = st.people.map((s) => {
-      // Hasse Backe kom med senare: Närvaro räknas från hans första omgång.
-      s.rounds = s.g.id === Tippoang.HASSE.id ? st.rounds - s.forsta + 1 : st.rounds;
+      s.rounds = s.kunde;
       const grades = {};
       for (const sub of SUBJECTS) {
         const v = sub.value(s);

@@ -16,8 +16,16 @@
 .rum-fasad.ut { animation: rf-ut 0.5s cubic-bezier(0.5, 0, 0.75, 0.6) both; pointer-events: none; }
 @keyframes rf-ut { from { opacity: 1; scale: 1; } 35% { opacity: 1; } to { opacity: 0; scale: 1.4; } }
 
-/* gänget i fönstret: lite mjukt, som genom glas på några meters håll */
-.rf-gang { position: absolute; filter: blur(0.7px) saturate(0.9); }
+/* Medan fasaden täcker rummet (.fasad-tackt, fasad i rum.js) ritas rummet inte alls, så att det inte tar
+   minne under den: content-visibility hoppar över allt i det, och där den inte finns (äldre Safari)
+   döljs allt, också det som annars visas med visibility: visible (radion, pratbubblorna, videon).
+   Gängets duk står då i skyltfönstret (glas i rum.js, .rf-gang). */
+.rum.fasad-tackt > .rum-sving { visibility: hidden; content-visibility: hidden; }
+.rum.fasad-tackt > .rum-sving * { visibility: hidden !important; }
+
+/* gänget i fönstret, i gängets egen duk som rummet lånar ut (glas i rum.js): lite mjukt, som genom glas på
+   några meters håll */
+.rf-gang { position: absolute; filter: blur(0.6px) saturate(0.9); }
 
 /* neonen glappar som inne (neonOn i rum.js) */
 .rf-neon-av { opacity: 0; }
@@ -27,6 +35,9 @@
 /* det som rör sig ritas i dukar (rum-fasad.js): fram överst, bak bakom huset där himlen syns, och
    barberarens stång på väggen */
 .rf-fram, .rf-bak, .rf-barber { position: absolute; pointer-events: none; }
+
+/* högtidspyntet i skyltfönstret och på dörren, ritat en gång (o.pynt i rum-fasad.js): skarpt, närmast glaset */
+.rf-pynt { position: absolute; pointer-events: none; }
 
 /* I telefonen ingen oskärpa på gänget: den blev ett eget pass på grafikkortet */
 @media (max-width: 700px), (max-height: 500px) {

@@ -10,13 +10,11 @@
 //   - rader som hamnar fel i samtalet: efter "Det slutar 2–1" får raden om kupongen inte
 //     börja med ett Det som låter som resultatet,
 //   - fält som tomt försvinner (fyll i rum-hasse.js skriver inget för ett okänt fält),
-//   - listor som blivit en sträng (lott i rum-hasse.js kräver en lista),
-//   - att rösten får exakt de meningar sidan säger.
+//   - listor som blivit en sträng (lott i rum-hasse.js kräver en lista).
 
 const repliker = require('../../public/rum-hasse-repliker.js');
 const block = require('../../public/rum-block.js');
 const tidning = require('../../public/rum-tidning.js');
-const { repliktexter } = require('../../src/rost.js');
 
 // Underkänt av Tomas, med det som ska stå i stället.
 const UNDERKANT = [
@@ -57,6 +55,13 @@ const UNDERKANT = [
   [/\brättar sig\b(?! efter)/i, 'rättar till sig: rättar sig betyder lyder'],
   // "Det heter ett rätt och inte en rätt" (Tomas 2026-11-15).
   [/\b(en|någon|ingen)( enda)? rätt( till| av|[.,!?]|$)/i, 'ett rätt, inte ett enda rätt: det heter ett rätt'],
+  // Lät översatt från engelska (Tomas 2026-11-17: "undvik swenglish").
+  [/\bHitta (en|ett|någon|något)\b[^.?!]*\bom du kan\b/i, 'Du hittar ingen svår match här: "hitta en …, om du kan" är engelska'],
+  [/\bblir (jävligt |riktigt |väldigt )?bra för mig\b/i, 'Den här omgången tar jag hem: "bra för mig" är engelska'],
+  [/\bkommit till rätt man\b/i, 'Då har du kommit rätt.'],
+  [/\baldrig varit så \S+ som nu\b/i, 'Jag har aldrig varit säkrare.'],
+  [/\bgör inga misstag\b/i, 'tippar inte fel'],
+  [/\bavskyr det här\b/i, 'Sånt här tål inte spelbolagen.'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
@@ -65,23 +70,28 @@ const KORTA_OK = new Set(['Bra.', 'Läs här.']);
 // Vilka fält som går att fylla var (forstaRad, medDag och omKupongen i rum-hasse.js).
 // Står det inget för hela vägen gäller det som står för första delen.
 const FALT = {
-  oppningNamn: ['namn'], tillbakaNamn: ['namn'],
+  oppningNamn: ['namn'], tillbakaNamn: ['namn'], nastaNamn: ['namn'],
   ledig: ['dag'],
   resultat: ['res'],
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
-  'efter.ratt': ['ratt', 'av'], 'efter.exakt': ['res'],
+  'efter.ratt': ['ratt', 'av'], 'efter.rattAlla': ['av'], 'efter.rattNoll': ['av'], 'efter.exakt': ['res'],
   // (i det som sticker ut också matchen, tecknen, datorns chans och resultatet: domText i rum-hasse.js)
   domar: ['namn', 'antal', 'Antal', 'match', 'tecknet', 'Tecknet', 'den', 'tecknen', 'pct', 'res'],
   'stallning.ratt': ['ratt', 'av'], 'stallning.rattAlla': ['av'], 'stallning.rattNoll': ['av'], 'stallning.leder': ['lag', 'mot', 'res'], 'stallning.lika': ['match', 'res'], 'stallning.mal': ['match', 'res'],
   'stallning.vann': ['lag', 'mot', 'res'], 'stallning.slutLika': ['match', 'res'], 'stallning.slutsignal': ['match', 'res'],
+  // (ibland med ditt namn: tilltal i rum-hasse.js)
+  'efter.namn': ['namn'], 'stallning.namn': ['namn'],
 };
+// Raderna där han talar till dig med namn (tilltal i rum-hasse.js).
+const NAMNRADER = [...['alla', 'bra', 'mitten', 'daligt', 'inget', 'pagar'].map((k) => `efter.namn.${k}`),
+  ...['alla', 'bra', 'mitten', 'daligt', 'haller', 'emot'].map((k) => `stallning.namn.${k}`)];
 // Sidan lottar bland de här, så de måste vara listor.
-const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
+const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'nastaNamn', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
   'fragaTillbaka', 'lar', 'angra', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'ropSvar',
   'fyller.foreslar', 'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
   'kupong.samma', 'kupong.farre', 'kupong.fler', 'kupong.korsar', 'kupong.skilda',
-  'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
+  'efter.ratt', 'efter.rattAlla', 'efter.rattNoll', 'efter.alla', 'efter.bra', 'efter.mitten', 'efter.daligt', 'efter.inget', 'efter.forst', 'efter.sist', 'efter.exakt', 'efter.pagar', 'efter.dolt', 'efter.ofragad',
   'domar.fraga', 'domar.igen', 'domar.alla', 'domar.glomt', 'domar.du.forst', 'domar.du.hort', 'domar.du.inte', 'domar.ledig', 'domar.revisorn', 'domar.borta', 'domar.forsakring',
   ...['forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.in.${k}`),
   ...['forsakring', 'forst', 'alla', 'mitten', 'sist', 'sistLika', 'inget'].map((k) => `domar.ut.${k}`),
@@ -92,7 +102,7 @@ const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', '
     'tidigtHaller', 'tidigtEmot', 'halvtidHaller', 'halvtidEmot', 'sentHaller', 'sentEmot', 'storHaller', 'storEmot', 'skrall',
     'slutsignal', 'slutRatt', 'slutFel', 'mal', 'malBra', 'malLugn', 'malFel'].map((k) => `stallning.${k}`),
   ...['italo', 'guld', 'rock', 'p1', 'p3', 'p4g', 'rix', 'sport', 'talksport', 'caroline', 'brus'].map((k) => `radio.${k}`),
-  ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`),
+  ...['bradskar', 'natt', 'morgon', 'kvall'].map((k) => `tid.${k}`), ...NAMNRADER,
   ...['oppning', 'ledig', 'ledigSverige', 'ledigGranne', 'val', 'sverige', 'granne'].map((k) => `land.${k}`)];
 // Knappar och ord, inte meningar.
 const INTE_MENINGAR = ['lar', 'angra', 'tecken', 'tal', 'domord', 'felnamn'];
@@ -117,7 +127,7 @@ for (const [vag, t] of alla) {
   if (vag.startsWith('kupong.') && /^Det\b/.test(t)) fel.push(`${vag}: "${t}" kommer direkt efter resultatet, och Det låter som resultatet. Säg vad det gäller.`);
   if (!/[.?!]$/.test(t)) fel.push(`${vag}: "${t}" saknar punkt`);
   for (const mening of t.split(/(?<=[.?!])\s+/)) if (mening.split(/\s+/).length <= 2 && !KORTA_OK.has(mening)) fel.push(`${vag}: "${mening}" är avhugget. Skriv en hel mening med verb.`);
-  const tillatna = FALT[vag] || FALT[vag.split('.')[0]] || [];
+  const tillatna = FALT[vag] || FALT[vag.split('.').slice(0, 2).join('.')] || FALT[vag.split('.')[0]] || [];
   for (const m of t.matchAll(/\{(\w+)\}/g)) if (!tillatna.includes(m[1])) fel.push(`${vag}: {${m[1]}} går inte att fylla här, så det försvinner`);
 }
 
@@ -162,21 +172,29 @@ for (const vag of FRAGOR) {
     if (!/kupong/i.test(t) || !GOR.test(t)) fel.push(`${vag}: "${t}" säger inte vad han ska göra med kupongen. Skriv till exempel: Vems kupong ska jag döma nu?`);
   }
 }
+// Raderna med ditt namn står ovanför listan, där det finns plats för två rader (som de andra i efter och stallning,
+// högst 56 tecken), också med det längsta namnet, och namnet står där en gång. Så också när han hälsar och efter en
+// analys (oppningNamn, tillbakaNamn och nastaNamn).
+for (const vag of [...NAMNRADER, 'oppningNamn', 'tillbakaNamn', 'nastaNamn']) {
+  for (const t of varde(vag) || []) {
+    const n = (t.match(/\{namn\}/g) || []).length;
+    if (n !== 1) fel.push(`${vag}: "${t}" ska ha {namn} en gång, inte ${n}`);
+    if (t.replace('{namn}', LANGST).length > 56) fel.push(`${vag}: "${t}" är för lång: högst 56 tecken med namnet, annars ryms den inte på två rader ovanför listan`);
+  }
+}
+// Raden om hur många rätt han hade efter omgången står också ovanför listan: högst 56 tecken med de längsta talen.
+for (const vag of ['efter.ratt', 'efter.rattAlla', 'efter.rattNoll']) {
+  for (const t of varde(vag) || []) {
+    const lang = t.replace(/\{(ratt|av)\}/g, 'tretton');
+    if (lang.length > 56) fel.push(`${vag}: "${t}" är för lång: högst 56 tecken med de längsta talen (${lang.length}), annars ryms den inte på två rader ovanför listan`);
+  }
+}
 // Till gruppen säger han ni och er: det är bara ni som använder sidan (Tomas 2026-11-09).
 for (const [vag, t] of alla) if (/\bgäng/i.test(t)) fel.push(`${vag}: "${t}" säger gänget. Skriv ni, er eller allihop.`);
 for (const [vag, t] of alla) if (vag.startsWith('domar.') && t.split(/(?<=[.?!])\s+/).length > 1 && !FRAGOR.includes(vag)) fel.push(`${vag}: "${t}" är två meningar. Domen läses upp mening för mening, så skriv en.`);
 for (const k of ['1', 'X', '2']) {
   const t = repliker.tecken && repliker.tecken[k];
   if (!t || !t.du || !t.bestamd) fel.push(`tecken.${k} saknar du eller bestamd`);
-}
-
-// Rösten: alla fält ifyllda, och tecknen i rätt form.
-const tal = repliktexter([{ namn: 'Test Testsson' }]);
-for (const t of tal) if (/\{\w+\}/.test(t)) fel.push(`rösten får ett tomt fält: "${t}"`);
-for (const t of tal) if (/\b(etta|kryss|tvåa|Etta|Kryss|Tvåa) (får|kan) du behålla\b/.test(t)) fel.push(`obestämd form: "${t}"`);
-for (const [vag, t] of alla) {
-  if (INTE_MENINGAR.includes(vag.split('.')[0]) || vag === 'utanRost' || /\{/.test(t)) continue;
-  if (!tal.includes(t.replace(/\s+/g, ' ').trim())) fel.push(`rösten saknar "${t}"`);
 }
 
 // Det han skriver i protokollet och tidningen (public/rum-block.js) sägs inte, och där får en
@@ -201,4 +219,4 @@ if (fel.length) {
   console.error(`Hasses repliker: ${fel.length} fel\n${fel.map((f) => `  ${f}`).join('\n')}`);
   process.exit(1);
 }
-console.log(`Hasses repliker: ${alla.length} rader och ${tal.length} meningar till rösten, inga fel.`);
+console.log(`Hasses repliker: ${alla.length} rader, inga fel.`);
