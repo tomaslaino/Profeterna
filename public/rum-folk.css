@@ -18,7 +18,7 @@
     radial-gradient(ellipse 9% 32% at 8% 42%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 24% at 48% 92%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 12% at 7.5% 8.5%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 16% 21% at 10% 79%, rgba(0, 0, 0, 0.5), #000 100%);
+    radial-gradient(ellipse 22% 25% at 12.8% 82%, rgba(0, 0, 0, 0.42), #000 100%);
   -webkit-mask-composite: source-in;
   mask-image:
     radial-gradient(ellipse 10% 13% at 78% 18%, rgba(0, 0, 0, 0.2), #000 100%),
@@ -26,7 +26,7 @@
     radial-gradient(ellipse 9% 32% at 8% 42%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 24% at 48% 92%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 12% at 7.5% 8.5%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 16% 21% at 10% 79%, rgba(0, 0, 0, 0.5), #000 100%);
+    radial-gradient(ellipse 22% 25% at 12.8% 82%, rgba(0, 0, 0, 0.42), #000 100%);
   mask-composite: intersect;
 }
 /* telefonen på höjden: mörkret räcker över taket och pulten utanför scenen (samma ställen i rutan) */
@@ -39,14 +39,14 @@
     radial-gradient(ellipse 9% 17.8% at 8% 40%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 13.3% at 48% 67.8%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 6.7% at 7.5% 21.4%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 16% 11.7% at 10% 60.6%, rgba(0, 0, 0, 0.5), #000 100%);
+    radial-gradient(ellipse 22% 13.9% at 12.8% 62.2%, rgba(0, 0, 0, 0.42), #000 100%);
   mask-image:
     radial-gradient(ellipse 10% 7.2% at 78% 26.7%, rgba(0, 0, 0, 0.2), #000 100%),
     radial-gradient(ellipse 29% 16.7% at 37% 36.1%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.6) 60%, #000 100%),
     radial-gradient(ellipse 9% 17.8% at 8% 40%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 13.3% at 48% 67.8%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 6.7% at 7.5% 21.4%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 16% 11.7% at 10% 60.6%, rgba(0, 0, 0, 0.5), #000 100%);
+    radial-gradient(ellipse 22% 13.9% at 12.8% 62.2%, rgba(0, 0, 0, 0.42), #000 100%);
 }
 .rum.natt.tv-nara .rum-mork,
 .rum.natt.vid-nara .rum-mork,
