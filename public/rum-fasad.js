@@ -25,7 +25,8 @@
 //
 //   RumFasad.bygg(rum, o) → { el, ny(), ut(), glas(duk) } bygger fasaden i rum (.rum) och ritar den; glas(duk)
 //     ställer gängets duk (rum-3d.js) i skyltfönstret, glas(null) tar bort den igen (rum.js ställer tillbaka den);
-//     o.gang({ w, h }) ritar gänget i den duken med w × h bildpunkter (false utan), o.takt() hur många gånger i sekunden (som inne),
+//     o.gang({ w, h, skugga }) ritar gänget i den duken med w × h bildpunkter (false utan), o.takt() hur många gånger i sekunden (som inne),
+//     o.kval() rummets steg { k, max } (fasaden börjar inte högre, STEG),
 //     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.pynt(namn, { w, h, dag }) högtidspyntet
 //     i fönstret ('pyntF') eller på dörren ('pyntP') sett utifrån, en duk w × h eller null (pyntUtifran i
 //     rum-inredning.js), o.calm() utan rörelser
@@ -804,6 +805,66 @@ window.RumFasad = (() => {
   const TAKT = LATT ? 24 : 30;
   // (medan en bil eller buss syns: de kör fort, och i 30 bilder i sekunden hoppar de på en stor skärm)
   const TAKT_GATA = LATT ? 30 : 60;
+
+  // ---------- hur mycket fasaden gör ----------
+  //
+  // Fasaden känner efter om enheten hinner med, som rummet inne (kanna i rum.js), och tar ett steg ner när den
+  // inte gör det (kanna i bygg); steget sparas i tre dagar, så att nästa gång ute börjar där. Förut stod rummets
+  // känsla still medan man var ute (R.vilar), och fasaden gjorde lika mycket i en gammal telefon som i en ny dator.
+  //   px och mpx: dukarnas bildpunkter (högst px gånger skärmens punkter, och högst mpx på hela fönstret); takt och
+  //   gata: bilder i sekunden för det som rör sig (gata: medan ett fordon kör förbi); gang: högst så många bilder av
+  //   gänget i fönstret i sekunden, gangPx: gängets bildpunkter (gånger glasets på skärmen, på bredden); skugga:
+  //   gängets skuggor räknas om var så många bilder (0: aldrig ute, de som räknades inne står kvar); folk och regn:
+  //   andelen av dem som går förbi och av regnet och stänken.
+  const STEG = [
+    { px: 2, mpx: 2e6, takt: TAKT, gata: TAKT_GATA, gang: 30, gangPx: 1, skugga: 4, folk: 1, regn: 1 },
+    { px: 1.5, mpx: 1.2e6, takt: LATT ? 20 : 24, gata: LATT ? 24 : 30, gang: 20, gangPx: 0.8, skugga: 8, folk: 0.75, regn: 0.7 },
+    { px: 1, mpx: 0.6e6, takt: 15, gata: 20, gang: 12, gangPx: 0.6, skugga: 0, folk: 0.5, regn: 0.5 },
+  ];
+  // Dog sidan medan man stod ute – telefonen stängde den när minnet tog slut, eller grafikkortet hängde sig och
+  // rummet laddade om sidan (webglcontextlost i rum.js) – börjar fasaden nästa gång på det lättaste steget. Medan
+  // fasaden syns står UTE_NYCKEL i sessionStorage, som finns kvar när fliken laddas om efter en krasch men inte syns
+  // i andra flikar. Den tas bort när man går in, när sidan lämnas och när fliken döljs: en dold flik kan telefonen
+  // stänga för att få minne, och det är ingen krasch ute.
+  const STEG_NYCKEL = 'rum-fasad-steg';
+  const UTE_NYCKEL = 'rum-fasad-ute';
+  function sparaSteg(k) {
+    try {
+      localStorage.setItem(STEG_NYCKEL, JSON.stringify({ k, t: Date.now() }));
+    } catch (e) { /* utan lagring börjar nästa gång som vanligt */ }
+  }
+  function sparatSteg() {
+    try {
+      const s = JSON.parse(localStorage.getItem(STEG_NYCKEL) || 'null');
+      return s && Date.now() - s.t < 3 * 864e5 ? Math.max(0, Math.min(STEG.length - 1, s.k | 0)) : 0;
+    } catch (e) { return 0; }
+  }
+  function utmarkt(pa) {
+    try {
+      if (pa) sessionStorage.setItem(UTE_NYCKEL, '1');
+      else sessionStorage.removeItem(UTE_NYCKEL);
+    } catch (e) { /* utan lagring går det inte att veta */ }
+  }
+  // (fasaderna som är uppe: den som går in finns kvar en stund, och då kan nästa redan vara ute)
+  const UPPE = new Set();
+  const markera = () => utmarkt(UPPE.size > 0 && !document.hidden);
+  try {
+    if (sessionStorage.getItem(UTE_NYCKEL)) {
+      sessionStorage.removeItem(UTE_NYCKEL);
+      sparaSteg(STEG.length - 1);
+    }
+  } catch (e) { /* utan lagring går det inte att veta */ }
+  // Steget fasaden börjar på: det sparade, men minst rummets (kval i rum.js, { k, max }: en svag enhet börjar lägre
+  // där, och rummet går ner när det inte hinner med), så att rummets två lägsta steg är fasadens 1 och 2.
+  // ?rum-fasad-steg=0|1|2 väljer och låser steget (för bilder och prov); en fast bild (?rum-t) har allt.
+  const LAST = (() => { try { return new URLSearchParams(location.search).get('rum-fasad-steg'); } catch (e) { return null; } })();
+  function startSteg(kval) {
+    const max = STEG.length - 1;
+    if (LAST != null) return Math.max(0, Math.min(max, Math.round(Number(LAST)) || 0));
+    let k = sparatSteg();
+    if (kval && kval.max) k = Math.max(k, kval.k - kval.max + max);
+    return Math.max(0, Math.min(max, k));
+  }
   const DEG = Math.PI / 180;
   // fram och tillbaka med mjuka vändningar (som ease-in-out alternate): 0 … 1 … 0 på 2·p sekunder
   const pendel = (t, p) => {
@@ -2499,13 +2560,14 @@ window.RumFasad = (() => {
   }
   // (?rum-fasad-vem=inlines: alla som går förbi är sådana, för bilder och prov; vemGar har namnen)
   const VEM = (() => { try { return new URLSearchParams(location.search).get('rum-fasad-vem'); } catch (e) { return null; } })();
-  function folket(V, v, L) {
+  // (andel: av dem som annars går förbi, efter fasadens steg, STEG)
+  function folket(V, v, L, andel = 1) {
     const T = U().trafik.nu(v);
     const fro = v.ar * 389 + v.manad * 37 + v.dag * 3 + (v.timme >> 1);
     const R = rng(fro + 11);
     const W = vadret(v, L);
     // (färre i regnet och i snöyran)
-    const n = Math.max(1, Math.min(LATT ? 6 : 9, Math.round(T.gaende * (LATT ? 0.9 : 1.2) * (W.regn ? 0.7 : W.sno && v.mangd > 0.5 ? 0.8 : 1))));
+    const n = Math.max(1, Math.round(andel * Math.min(LATT ? 6 : 9, Math.round(T.gaende * (LATT ? 0.9 : 1.2) * (W.regn ? 0.7 : W.sno && v.mangd > 0.5 ? 0.8 : 1)))));
     const ut = [];
     for (let i = 0; i < n; i++) {
       // (vilka de är, kläderna och sättet att gå ur en egen följd per sällskap, så att var och en går där den
@@ -2657,14 +2719,15 @@ window.RumFasad = (() => {
   //
   // Regnet i två lager (långt bort och nära) och snön i två lager som vajar, i fram: strecken och flingorna
   // läggs ut en gång, och var i fallet de är räknas ur tiden.
-  function nederbord(V, v) {
+  // (andel: av strecken, stänken och flingorna, efter fasadens steg, STEG)
+  function nederbord(V, v, andel = 1) {
     if (!v.fall) return null;
     const R = rng(5);
     const W = Math.ceil(V.w);
     const H = Math.ceil(V.h);
     const slant = Math.min(0.55, 0.08 + v.vind * 0.035);
     const k = v.mangd;
-    const yta = (W * H) / (1600 * 1000);
+    const yta = (W * H) / (1600 * 1000) * andel;
     const N = { H, W, slant, lager: [] };
     const streck = (n, o, l0, l1, wd, dur) => {
       const s = new Float32Array(n * 5);
@@ -2687,13 +2750,13 @@ window.RumFasad = (() => {
         const RS = rng(7);
         const yMax = V.y + V.h;
         const ut = [];
-        const nSten = Math.round((LATT ? 70 : 130) * (0.4 + 0.6 * k) * (dugg ? 0.35 : 1));
+        const nSten = Math.round((LATT ? 70 : 130) * (0.4 + 0.6 * k) * (dugg ? 0.35 : 1) * andel);
         for (let i = 0; i < nSten; i++) {
           const d = 0.03 + Math.pow(RS(), 1.25) * 4;
           const xw = V.x - 200 + RS() * (V.w + 400);
           if (markY(d) < yMax + 10) ut.push(xw, d, 1.2 + RS(), RS());
         }
-        const nKant = Math.round((LATT ? 14 : 22) * (0.4 + 0.6 * k) * (dugg ? 0.35 : 1));
+        const nKant = Math.round((LATT ? 14 : 22) * (0.4 + 0.6 * k) * (dugg ? 0.35 : 1) * andel);
         for (let i = 0; i < nKant; i++) ut.push(FON.x - KARM - 14 + RS() * (FON.w + 2 * KARM + 28), -(FON.y + FON.h + KARM - 2), 1.4 + RS() * 0.6, RS());
         for (let i = 0; i < nKant * 0.8; i++) ut.push(SKYLT.x - 8 + RS() * (SKYLT.w + 16), -(SKYLT.y - 10), 1.4 + RS() * 0.6, RS());
         N.stank = new Float32Array(ut);
@@ -3171,11 +3234,18 @@ window.RumFasad = (() => {
     const scen = el.firstChild;
     const F = { V: null, sig: '', gl: null, glasR: null, glasPx: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
     const calm = () => Boolean(o.calm && o.calm());
-    // (dukarnas bildpunkter per enhet i världen: skärmens, högst två miljoner bildpunkter på hela fönstret)
+    // (fasadens steg, STEG: en fast bild har allt och känner inte efter)
+    F.steg = o.still != null ? 0 : startSteg(o.kval && o.kval());
+    F.las = o.still != null || LAST != null;
+    const S = () => STEG[F.steg];
+    // (från steg 1 utan oskärpan på gänget i datorn, rum-fasad.css: den är ett eget pass på grafikkortet i varje bild)
+    el.classList.toggle('rf-latt', F.steg > 0);
+    // (dukarnas bildpunkter per enhet i världen: skärmens, högst två miljoner bildpunkter på hela fönstret, och
+    // färre på fasadens lägre steg, STEG)
     const tathet = (V) => {
       const W = el.clientWidth || innerWidth;
       const H = el.clientHeight || innerHeight;
-      return Math.max(W / V.w, H / V.h) * Math.min(2, devicePixelRatio || 1, Math.sqrt(2e6 / (W * H)));
+      return Math.max(W / V.w, H / V.h) * Math.min(S().px, devicePixelRatio || 1, Math.sqrt(S().mpx / (W * H)));
     };
     // En duk som inte behövs längre lämnar tillbaka sitt minne genast när den blir noll stor (slapp): annars
     // ligger bildpunkterna kvar tills skräpsamlingen hinner dit, och i en telefon hann de bli många – vid
@@ -3205,11 +3275,12 @@ window.RumFasad = (() => {
         <clipPath id="rf-hal"><path clip-rule="evenodd" d="M${VARLD.x0} ${VARLD.y0} H${VARLD.x1} V${VARLD.y1} H${VARLD.x0} Z M${FON.x} ${FON.y} h${FON.w} v${FON.h} h${-FON.w} Z M${DORR.x} ${DORR.y} h${DORR.w} v${DORR.h} h${-DORR.w} Z"/></clipPath></defs>`;
       const glasX = FON.x - V.x;
       const glasY = FON.y - V.y;
-      // (gängets bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden)
+      // (gängets bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden, och färre på de lägre stegen;
+      // skugga: hur ofta skuggorna räknas om, utifran i rum-3d.js)
       const k = Math.min(innerWidth / V.w, innerHeight / V.h);
       const pr = Math.min(2, devicePixelRatio || 1);
-      const dw = Math.round(Math.min(1400, FON.w * k * pr));
-      F.glasPx = { w: dw, h: Math.round(dw * FON.h / FON.w) };
+      const dw = Math.max(1, Math.round(Math.min(1400, FON.w * k * pr) * S().gangPx));
+      F.glasPx = { w: dw, h: Math.max(1, Math.round(dw * FON.h / FON.w)), skugga: S().skugga };
       const gamla = dukarna(F.ro);
       // det som rör sig: vad, var och hur (inget med prefers-reduced-motion, utom stången som står still)
       const lugn = calm();
@@ -3222,11 +3293,11 @@ window.RumFasad = (() => {
       const pyntBild = pyntBilder(L, pyntPx);
       const R = {
         px, V, L, bakR, himlen,
-        folk: lugn ? [] : folket(V, v, L),
+        folk: lugn ? [] : folket(V, v, L, S().folk),
         stanna: lugn ? null : stannar(V, v, L),
         bilar: lugn ? [] : bilarna(v, L, px),
         gata: lugn || !GATA() ? null : GATA().trafik(v, L, gataMatt()),
-        N: lugn ? null : nederbord(V, v),
+        N: lugn ? null : nederbord(V, v, S().regn),
         // (ljuset där regnet faller, på kvällen: ljusKarta)
         K: !lugn && (v.fall === 'regn' || v.fall === 'blandat') && L.dag < 0.95 ? ljusKarta(V, L, inne(o)) : null,
         vat: (L.wet || v.blott) && !v.snotackt,
@@ -3341,7 +3412,7 @@ window.RumFasad = (() => {
     // glaset (utifran i rum-3d.js). Utan duk i fönstret (glas) ritas inget.
     const GANG_ANDEL = 0.25;
     function gangDags(ms) {
-      const takt = (o.takt && o.takt()) || (LATT ? 20 : 30);
+      const takt = Math.min((o.takt && o.takt()) || (LATT ? 20 : 30), S().gang);
       const tid = F.tider.length ? [...F.tider].sort((a, b) => a - b)[F.tider.length >> 1] : 0;
       return ms - F.sist >= Math.max(1000 / takt - 4, tid / GANG_ANDEL);
     }
@@ -3369,11 +3440,12 @@ window.RumFasad = (() => {
       const ms = performance.now();
       const t = o.still != null ? o.still : ms / 1000;
       const dags = (sist, fps) => nu || ms - (sist || 0) >= 1000 / fps - 4;
-      if (R.fram && dags(R.sFram, R.fortGata ? TAKT_GATA : TAKT)) {
+      const K = S();
+      if (R.fram && dags(R.sFram, R.fortGata ? K.gata : K.takt)) {
         R.sFram = ms;
         ritaFram(R, t);
       }
-      if (R.bak && dags(R.sBak, R.fort ? TAKT : 8)) {
+      if (R.bak && dags(R.sBak, R.fort ? K.takt : 8)) {
         R.sBak = ms;
         const c = R.bak;
         c.setTransform(1, 0, 0, 1, 0, 0);
@@ -3381,7 +3453,7 @@ window.RumFasad = (() => {
         c.setTransform(R.px, 0, 0, R.px, -R.bakR.x * R.px, -R.bakR.y * R.px);
         R.fort = ritaHimmel(c, R.himlen, R.V, t);
       }
-      if (R.barber && dags(R.sBarber, 15)) {
+      if (R.barber && dags(R.sBarber, Math.min(15, K.takt))) {
         R.sBarber = ms;
         const c = R.barber;
         c.setTransform(R.px, 0, 0, R.px, -BARBER.x * R.px, -BARBER.y * R.px);
@@ -3402,8 +3474,51 @@ window.RumFasad = (() => {
           efter.port2.postMessage(0);
         }
         rorelse();
+        kanna(ms);
       };
       F.raf = requestAnimationFrame(tick);
+    }
+    // Känna efter, som rummet inne (kanna i rum.js): bildrutorna räknas i två sekunder åt gången medan fasaden står
+    // för sig själv – inte medan den tonar fram och gängets duk flyttas dit, inte strax efter ett nytt steg och inte
+    // när fliken är dold – och två dåliga perioder i rad tar ett steg ner (STEG): färre än 45 bilder i sekunden
+    // (utom stadiga 30, en telefon i strömsparläge) eller fler än var tionde bildruta över 50 ms. Bildrutorna kommer
+    // glesare både när huvudtråden och när grafikkortet inte hinner med. Scenen byggs om med det nya steget, och
+    // steget sparas.
+    F.kanna = { fran: performance.now() + 2500, sist: 0, n: 0, sum: 0, hack: 0, daliga: 0 };
+    function kanna(ms) {
+      const K = F.kanna;
+      const dt = K.sist ? ms - K.sist : 0;
+      K.sist = ms;
+      if (F.las || F.steg >= STEG.length - 1) return;
+      if (document.hidden || !dt || dt > 2000 || ms < K.fran) {
+        if (dt > 2000) K.fran = Math.max(K.fran, ms + 1500);
+        K.n = K.sum = K.hack = 0;
+        return;
+      }
+      K.n++;
+      K.sum += dt;
+      if (dt > 50) K.hack++;
+      if (K.sum < 2000) return;
+      const bps = (K.n / K.sum) * 1000;
+      const dalig = (bps < 45 && Math.abs(bps - 30) > 3) || K.hack > K.n * 0.1;
+      K.daliga = dalig ? K.daliga + 1 : 0;
+      K.n = K.sum = K.hack = 0;
+      if (K.daliga < 2) return;
+      K.daliga = 0;
+      steg(F.steg + 1);
+      sparaSteg(F.steg);
+      K.fran = performance.now() + 3000;
+    }
+    // ett annat steg: scenen byggs om med det (rita), och gänget får sina bildpunkter genast
+    function steg(k) {
+      F.steg = Math.max(0, Math.min(STEG.length - 1, k));
+      el.classList.toggle('rf-latt', F.steg > 0);
+      F.sig = '';
+      try {
+        rita();
+      } catch (err) {
+        console.error(err);
+      }
     }
     // vädret och ljuset ändras: ritas om när de har ändrats (sig), en gång i minuten
     const T = setInterval(() => { if (el.isConnected) rita(); }, 60e3);
@@ -3419,6 +3534,18 @@ window.RumFasad = (() => {
       storlekT = setTimeout(() => { if (el.isConnected) rita(); }, 300);
     };
     addEventListener('resize', storlek);
+    // Medan fasaden syns står den utmärkt (UTE_NYCKEL): finns märket kvar när sidan laddas igen dog den här ute.
+    // Lämnas sidan (pagehide) eller döljs fliken tas det bort, och det kommer igen när den syns. Tappar ett
+    // grafikkort sin duk medan man är ute laddar rummet om sidan (webglcontextlost i rum.js) – det är också en krasch
+    // här, men pagehide hinner ta bort märket, så det lättaste steget sparas direkt.
+    const lamna = () => utmarkt(false);
+    const tappad = () => { if (el.isConnected && !F.las) sparaSteg(STEG.length - 1); };
+    addEventListener('pagehide', lamna);
+    addEventListener('pageshow', markera);
+    document.addEventListener('visibilitychange', markera);
+    addEventListener('webglcontextlost', tappad, true);
+    if (o.still == null) UPPE.add(el);
+    markera();
     // (ett fel när scenen byggs får inte lämna kvar en fasad som inte går att klicka bort: rum.js sätter
     // klicket och Esc först när bygg har kommit tillbaka)
     try {
@@ -3436,6 +3563,12 @@ window.RumFasad = (() => {
         clearInterval(T);
         clearTimeout(storlekT);
         removeEventListener('resize', storlek);
+        removeEventListener('pagehide', lamna);
+        removeEventListener('pageshow', markera);
+        document.removeEventListener('visibilitychange', markera);
+        removeEventListener('webglcontextlost', tappad, true);
+        UPPE.delete(el);
+        markera();
         el.remove();
         for (const c of dukarna(F.ro)) slapp(c);
         F.ro = null;

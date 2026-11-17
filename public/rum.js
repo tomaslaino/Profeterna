@@ -4394,6 +4394,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       gang: (ut) => R.fig && R.fig.utifran ? R.fig.utifran(ut, now(), neonOn(now())) : false,
       // (lika ofta som gänget ritas inne, KVAL)
       takt: () => (KVAL[R.kval] || KVAL[0]).takt,
+      // (rummets steg: fasaden börjar inte högre, STEG i rum-fasad.js)
+      kval: () => ({ k: R.kval, max: KVAL.length - 1 }),
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
       // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)

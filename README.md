@@ -1365,6 +1365,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Gänget i fönstret kopierades från rummets WebGL-duk efter varje bild, det enda arbetet på grafikkortet som bara fanns
   ute; nu står gängets egen duk i skyltfönstret medan rummet inte syns, och inget kopieras. Inte provat i en riktig
   telefon. Se *Fasaden kraschade fortfarande* under [Fasaden](#fasaden).
+- **Fasaden känner efter, och minns en krasch (2026-11-17, användarens önskemål):** "Kan du se till så att utomhusvyn
+  kraschar i mindre utsträckning på gamla mobiler och datorer än vad den gör nu". Inne går rummet ner i kvalitet när
+  enheten inte hinner med, men ute stod den känslan still, och fasaden gjorde lika mycket i en gammal telefon som i en ny
+  dator. Nu har fasaden tre steg och känner själv efter (färre bilder i sekunden och färre bildpunkter i dukarna och i
+  gänget, gängets skuggor mer sällan eller inte alls, färre som går förbi och glesare regn), börjar aldrig högre än
+  rummets steg, och om sidan dog medan man stod ute börjar den nästa gång på det lättaste. Se *Fasaden känner efter,
+  och minns en krasch* under [Fasaden](#fasaden).
 - **Fler karaktärer som går förbi, och de passar 90-talet (2026-11-16, användarens önskemål):** "Kan du göra de här
   människorna eller personer som går förbi utanför något mer intressanta eller passande utan att de drar speciellt
   mycket mer grafik? Tänk som sagt på att det ska vara 90-tal och försök att få till fler karaktärer än vad som redan
@@ -7211,7 +7218,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   bara om det aldrig hamnar för nära något som kör före, så ingen kör igenom någon. Andra vyer som vill rita samma
   fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
   efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
-  sekunden (30 i telefonen), så att de inte hoppar fram.
+  sekunden (30 i telefonen), så att de inte hoppar fram – på fasadens steg 0; på de lägre färre (se *Fasaden känner
+  efter, och minns en krasch* nedan).
 - **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "bilarna verkar åka på samma höjd som
   gångarna", "åker något långsammare … svårt att se dem" och "de ska bete sig som vanliga bilar". Filerna ligger nu
   1,3 och 1,72 m ut (förut 1,02 och 1,24, alldeles innanför trottoarkanten, så att hjulen stod i höjd med fötterna på
@@ -7269,7 +7277,8 @@ om. Toningen in har inget eget lager när den är klar. Det som rör sig ritas i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
-bildpunkter. Förut var det 27 CSS-animeringar i egna lager (benen och armarna på SVG-barn, regnet i två band över hela
+bildpunkter – på fasadens steg 0; på de lägre färre gånger och med färre bildpunkter (se *Fasaden känner efter, och
+minns en krasch* nedan). Förut var det 27 CSS-animeringar i egna lager (benen och armarna på SVG-barn, regnet i två band över hela
 bilden, bilarna, molnen): fasaden hade 35–38 lager, ungefär tio skärmytor som lades ihop 60 gånger i sekunden. Nu är
 det 4–5 lager i telefonen och 6–8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
 arbete från ~300 till ~65–120 ms/s (headless Chrome, `?rum-kval=1`, regn på kvällen); på datorn är grafikprocessens tid
@@ -7350,6 +7359,49 @@ per bild), eftersom kopieringen inte längre tar tid av det (`GANG_ANDEL`); där
 ritar i mjukvara (1 550–2 210 → 2 380–2 560 ms/s). Minnet är detsamma. Snabbt ut och in, ut och genast in igen och att
 lämna rummet medan man står ute ger samma duk i rummet efteråt, och en fast bild (`?rum-t`) har gänget i fönstret. Inte
 provat i en riktig telefon.
+
+**Fasaden känner efter, och minns en krasch (2026-11-17, användarens önskemål: "Kan du se till så att utomhusvyn kraschar
+i mindre utsträckning på gamla mobiler och datorer än vad den gör nu"):** inne känner rummet efter om enheten hinner med
+och går ner ett steg när den inte gör det (`kanna` och `KVAL` i rum.js), men medan man står ute står rummet still
+(`R.vilar`), och då kände ingen efter: fasaden ritade lika ofta och lika skarpt i en gammal telefon som i en ny dator.
+Kraschen ute är troligen att grafikkortet inte hinner med. Hänger det sig tappar WebGL sin duk, och rummet laddar om
+sidan (`webglcontextlost` i rum.js), vilket ser ut som en krasch. Minnet räcker inte som förklaring: mätt med Chromiums
+egen räkning (memory-infra, som Pixel 7 med regn på kvällen) har sidan ungefär lika mycket grafikminne ute som inne, och
+övergången ut kostar bara cirka 30 MB extra under en halv sekund. Nu ([public/rum-fasad.js](public/rum-fasad.js),
+`STEG`):
+
+- **Tre steg.** Steg 0 är som förut. Steg 1 och 2 ritar det som rör sig färre gånger i sekunden (i telefonen 24 → 20
+  → 15, och medan en bil kör förbi 30 → 24 → 20; på datorn 30 → 24 → 15 och 60 → 30 → 20) och med färre bildpunkter
+  (högst 2 → 1,5 → 1 per skärmpunkt och 2 → 1,2 → 0,6 miljoner på hela fönstret); gänget i fönstret högst 30 → 20 → 12
+  gånger i sekunden, med 1 → 0,8 → 0,6 gånger bildpunkterna på bredden, och skuggorna räknas om var 4:e → 8:e gång →
+  aldrig ute (de som räknades inne står kvar; härifrån syns de knappt). Ungefär 1 → 0,75 → 0,5 av dem som går förbi och
+  1 → 0,7 → 0,5 av regnet och stänken. Från steg 1 är gänget skarpt också i datorn (`.rf-latt`): oskärpan var ett eget
+  pass på grafikkortet i varje bild. I en Pixel 7 är det framför 1,4 → 0,8 → 0,35 miljoner bildpunkter, alltså ungefär
+  en sjättedel så många bildpunkter i sekunden på steg 2, och gänget ungefär hälften så många ritanrop.
+- **Fasaden känner efter** (`kanna` i `bygg`), som rummet: bildrutorna räknas två sekunder åt gången, inte medan fasaden
+  tonar fram och gängets duk flyttas dit (de första 2,5 sekunderna), inte strax efter ett nytt steg och inte när fliken
+  är dold. Två dåliga perioder i rad – färre än 45 bilder i sekunden, utom stadiga 30 (en telefon i strömsparläge), eller
+  fler än var tionde bildruta över 50 ms – tar ett steg ner: scenen byggs om med det nya steget (`steg`), och steget
+  sparas i tre dagar (`rum-fasad-steg` i localStorage), så att nästa gång ute börjar där. Bildrutorna kommer glesare både
+  när huvudtråden och när grafikkortet inte hinner med, så det fångar båda.
+- **Aldrig högre än rummet.** Fasaden börjar på det sparade steget, men minst rummets två lägsta steg som 1 och 2: en
+  telefon med lite minne, få kärnor eller ett gammalt grafikkort börjar lägre inne (`startSteg` i rum.js), och rummet går
+  ner när det inte hinner med (`o.kval` i fasaden).
+- **En krasch ute minns.** Medan fasaden syns står `rum-fasad-ute` i sessionStorage (`utmarkt`, `UPPE`). Det tas bort när
+  man går in, när sidan lämnas (`pagehide`) och när fliken döljs (en dold flik kan telefonen stänga för att få minne, och
+  det är ingen krasch ute), och det kommer igen när den syns. Finns märket kvar när sidan laddas har den dött ute, och
+  fasaden börjar nästa gång på steg 2. Tappar en duk sin grafik medan man är ute sparas steg 2 direkt, eftersom rummet
+  laddar om sidan och `pagehide` hinner ta bort märket. sessionStorage hör till fliken (inte till andra flikar) och hålls
+  av webbläsaren utanför sidans process; att den finns kvar när fliken laddas om efter en riktig krasch är inte provat.
+
+`?rum-fasad-steg=0|1|2` väljer och låser steget (för bilder och prov); en fast bild (`?rum-t`) har allt.
+
+Provat i headless Chromium som Pixel 7 (mjukvarugrafik, regn på kvällen): fasaden gick ner till steg 1 efter cirka 7 s och
+till steg 2 efter 13 s, dukarna krympte (framför 824 × 1678 → 618 × 1259 → 412 × 839, gängets glas 492 × 315 → 394 × 252
+→ 295 × 189), och inne fick gänget tillbaka sin duk i rummets storlek. En krasch ute (märket kvar när sidan laddades) gav
+steg 2 nästa gång; en vanlig omladdning ute gav det inte; ut, in och genast ut igen lämnade märket rätt. Bilder sida vid
+sida på steg 0 och 2 i telefonen skiljer sig knappt (regnet är glesare). Hur mycket arbetet minskar gick inte att mäta här:
+mjukvarugrafiken tar alla kärnor, och siffrorna svängde mer än skillnaden. Inte provat i en riktig telefon.
 
 ### Kupongen i handen
 

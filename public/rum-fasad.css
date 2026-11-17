@@ -39,10 +39,12 @@
 /* högtidspyntet i skyltfönstret och på dörren, ritat en gång (o.pynt i rum-fasad.js): skarpt, närmast glaset */
 .rf-pynt { position: absolute; pointer-events: none; }
 
-/* I telefonen ingen oskärpa på gänget: den blev ett eget pass på grafikkortet */
+/* I telefonen ingen oskärpa på gänget: den blev ett eget pass på grafikkortet. Inte heller från fasadens steg 1
+   (.rf-latt, STEG i rum-fasad.js), när datorn inte hinner med. */
 @media (max-width: 700px), (max-height: 500px) {
   .rf-gang { filter: none; }
 }
+.rum-fasad.rf-latt .rf-gang { filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .rum-fasad *, .rum-fasad *::before, .rum-fasad *::after { animation: none !important; }

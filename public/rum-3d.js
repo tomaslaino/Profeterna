@@ -8759,8 +8759,9 @@ export async function figurer(canvas, opt = {}) {
   // fasaden samma sak som rummet, där duken visar det som ritas i den. Inifrån ritas inget så länge den är
   // utlånad (draw), och draw ger den rummets storlek igen när gänget ritas inifrån (inneStorlek).
   //   lana(pa): duken står i fasaden (true) eller i rummet igen (false); rum.js flyttar den
-  //   utifran({ w, h }, t, neonPa) → true om något ritades: glaset med w × h bildpunkter, men inte fler än
-  //     glaset fick när hela duken ritades inifrån (H gånger prNu, efter kval)
+  //   utifran({ w, h, skugga }, t, neonPa) → true om något ritades: glaset med w × h bildpunkter, men inte fler än
+  //     glaset fick när hela duken ritades inifrån (H gånger prNu, efter kval), och skuggorna räknade var
+  //     skugga:e gång (4 om inget sägs, 0 aldrig)
   const FONSTER = { x0: -615, x1: 185, y0: SILL - 4, y1: SILL + 509, z: -150, oga: [-110, 140, -2300] };
   const STORRE = 1.25;
   function lana(pa) {
@@ -8794,10 +8795,12 @@ export async function figurer(canvas, opt = {}) {
     UTE.kam = K;
     UTE.neon = 0.3;
     // (skuggorna räknas om var fjärde gång, i samma bild: härifrån syns de knappt, och på steg 0 var
-    // de en fjärdedel av arbetet)
+    // de en fjärdedel av arbetet; ut.skugga: var så många gånger efter fasadens steg, 0 aldrig – då står
+    // de som räknades inne kvar)
     const au = r.shadowMap.autoUpdate;
     r.shadowMap.autoUpdate = false;
-    if (UTE.n++ % 4 === 0) r.shadowMap.needsUpdate = true;
+    const sk = ut.skugga ?? 4;
+    if (sk > 0 && UTE.n++ % sk === 0) r.shadowMap.needsUpdate = true;
     try {
       draw(t, 0, 0, neonPa);
     } finally {
