@@ -28,9 +28,10 @@
 //              var högst ett halvår sedan, och mötena de senaste fem åren). Det
 //              bättre talet i varje par lyser och
 //              det sämre är svagt (SKILJER), och varje etikett öppnar en
-//              förklaring. Sedan 2026-11-16 är talen som säger vem som är
-//              bättre en dragkamp: en delad stapel mellan lagens tal, med
-//              samma mått i alla flikar (dragRad vid forraMotet)
+//              förklaring. Sedan 2026-11-16 står matchakten i spegeln
+//              (spegel()): etiketterna i mitten och lagen speglade runt dem,
+//              med samma mått i alla flikar – sedan 2026-11-17 också MÖTENA,
+//              och överst kupongens rad med strecket mitt ovanför etiketterna
 //   REGISTRET  lagen och spelarna (fliken hette LAGEN till 2026-11-13; i
 //              koden heter den fortfarande lagen). Underraden säger vad och
 //              var: LAG eller SPELARE, och divisionen. LAG är divisionens
@@ -228,13 +229,9 @@ window.RumRegister = (() => {
   const SKILJER = { form: 2, vila: 2, vilaSnitt: 1, styrka: 0.15, odds: 1.5, mal: 0.25, xg: 0.2, xgMatch: 0.15, skott: 0.5, favorit: 0.15, poang: 3, ppm: 0.5 };
   // vilken elva spelarnas vila gäller (src/fetchers/s365vila.js), svagt under dagarna
   const ELVA_SORT = { uttagen: 'UTTAGEN ELVA', trolig: 'TROLIG ELVA', beräknad: 'BERÄKNAD ELVA', förra: 'FÖRRA ELVAN' };
-  // matchaktens etiketter (den längsta, STORA CHANSER i förra mötet, är 13
-  // tecken) och lagens tal på var sida om dragkampens stapel (24:E −0,89)
-  const AKTEN_L = 15;
-  const DRAG_V = 10;
-  // spegelns etikettspalt i matchakten (den längsta, TRUPPENS VILA, är 13
-  // tecken; på datorn ett tecken luft till på var sida) och ett lags halva
-  // som längst
+  // spegelns etikettspalt i matchakten (de längsta, TRUPPENS VILA och förra
+  // mötets STORA CHANSER, är 13 tecken; på datorn ett tecken luft till på var
+  // sida) och ett lags halva som längst
   const SPEGEL_L = 13;
   const SPEGEL_S = 22;
 
@@ -657,16 +654,14 @@ window.RumRegister = (() => {
     // skiljer avdelningarna åt. Avsparken står på varje rad men svagt; den som
     // skiljer sig från omgångens vanliga (den som mer än hälften av matcherna
     // har) lyser, på datorn också. Delar matcherna lika på flera tider lyser
-    // ingen.
+    // ingen. Sedan 2026-11-17 står strecket på spegelns axel (spAxel), mitt i
+    // matchaktens etiketter, så att det står still när matchen öppnas (där
+    // står samma rad överst, aktRad).
     function kupongen(R) {
       if (!A.ms.length) return [rad('INGEN OMGÅNG')];
       const w = 11;
-      const tider = A.ms.map(tid);
-      const t0 = Math.max(...tider.map((t) => t.length));
-      const antal = new Map();
-      for (const t of tider) antal.set(t, (antal.get(t) || 0) + 1);
-      const [vanlig, flest] = [...antal].sort((a, b) => b[1] - a[1])[0];
-      const tidKl = (t) => (flest * 2 > tider.length && t !== vanlig ? 'v' : 'd');
+      const t0 = Math.max(...A.ms.map((m) => tid(m).length));
+      const tidKl = tidKlass();
       const avd = [];
       for (const m of A.ms) {
         const a = avd.find((x) => x.comp === m.comp);
@@ -679,15 +674,16 @@ window.RumRegister = (() => {
       const hemma = (m) => kort(m.home).slice(0, w);
       const borta = (m) => kort(m.away).slice(0, w);
       // lagens bredd: 11 på datorn; i telefonen så att strecket (–) står i
-      // kolumn c, mitt på raden, efter numret (3 tecken) och hemmalaget, med
-      // bortalaget, ett mellanrum och avsparken efter – åt vänster om
-      // bortalaget annars inte ryms (en omgång över flera dagar, 'LÖR 16.00')
+      // kolumn c, på spegelns axel mitt på raden, efter numret (3 tecken) och
+      // hemmalaget, med bortalaget, ett mellanrum och avsparken efter – åt
+      // vänster om bortalaget annars inte ryms (en omgång över flera dagar,
+      // 'LÖR 16.00')
       let wH = w;
       let wA = w;
       if (!spalt) {
         const hH = Math.max(...A.ms.map((m) => hemma(m).length));
         const hA = Math.max(...A.ms.map((m) => borta(m).length));
-        const c = Math.max(hH + 4, Math.min(Math.floor(A.bred / 2), A.bred - t0 - 4 - hA));
+        const c = Math.max(hH + 4, Math.min(spAxel(spegel()), A.bred - t0 - 4 - hA));
         wH = c - 4;
         wA = Math.max(hA, A.bred - t0 - c - 3);
       }
@@ -710,96 +706,59 @@ window.RumRegister = (() => {
       });
       return r;
     }
+    // avsparkens klass: den som skiljer sig från omgångens vanliga (den som
+    // mer än hälften av matcherna har) lyser, de andra är svaga
+    function tidKlass() {
+      const tider = A.ms.map(tid);
+      const antal = new Map();
+      for (const t of tider) antal.set(t, (antal.get(t) || 0) + 1);
+      const [vanlig, flest] = [...antal].sort((a, b) => b[1] - a[1])[0] || [null, 0];
+      return (t) => (flest * 2 > tider.length && t !== vanlig ? 'v' : 'd');
+    }
+    // Matchaktens huvud (sedan 2026-11-17, användarens önskemål efter
+    // kupongens spegel: "andra ställen ... där det blir snyggt på det här
+    // sättet"; till dess stod numret och lagen till vänster): kupongens rad –
+    // numret, lagen speglade runt strecket och avsparken – med strecket på
+    // spegelns axel, mitt ovanför etiketterna, och avsparken längst ut (i
+    // telefonen vid radens slut som i kupongen, på datorn vid spegelns kant).
+    // Ryms inte bortalaget och avsparken flyttar strecket åt vänster.
+    function aktRad(m, G) {
+      const h = kort(m.home).slice(0, 11);
+      const a = kort(m.away).slice(0, 11);
+      const t = tid(m);
+      const slut = G.tel ? A.bred : G.M + G.B;
+      const c = Math.max(G.M + 4 + h.length, Math.min(spAxel(G), slut - t.length - 3 - a.length));
+      return rad([pad('', G.M), ''], [`${padL(nrAv(m), 2)} `, 'd'], [padL(h, c - G.M - 4), 'v'], [' – ', 'd'],
+        [pad(a, slut - c - 3 - t.length), 'v'], [' ', ''], [t, tidKlass()(t)]);
+    }
 
     // Förra mötet (sedan 2026-11-15, önskemål från gänget: "var det en
     // chansrik affär, vem hade mest bollinnehav, blev det många kort";
     // användarens val bland tre skisser: Matchrapporten). När lagen har mötts
     // det senaste halvåret (lastMeeting i matchens fil) står lagens siffror
-    // från det mötet överst i MÖTENA. Samma kväll, efter "mer pedagogiskt och
-    // överblickbart", användarens val A Dragkampen bland fyra skisser: varje
-    // tal har en delad stapel mellan lagens tal – lika lång på alla rader,
-    // delad där lagens andelar möts, med ett tomt tecken i skarven – så att
-    // man ser hur stor del vart lag hade utan att läsa talen. Det bättre
-    // lagets del och tal lyser och det andras är svagt (målen, xG, chanserna
-    // och skotten); bollinnehavet och korten är gröna på båda sidor. Talen i
-    // den ordning de säger mest om matchen: målen, xG och de stora chanserna
-    // först, bollinnehavet och korten sist. Röda kort bara när något lag fick
-    // ett. Dolt resultat: ? och en tom stapel. Sedan listan med de senaste mötena.
+    // från det mötet överst i MÖTENA. Det bättre lagets tal lyser och det
+    // andras är svagt (målen, xG, chanserna och skotten); bollinnehavet och
+    // korten är gröna på båda sidor. Talen i den ordning de säger mest om
+    // matchen: målen, xG och de stora chanserna först, bollinnehavet och
+    // korten sist. Röda kort bara när något lag fick ett. Dolt resultat: ?.
+    // Sedan listan med de senaste mötena.
     //
-    // Dragkampen gällde hela matchakten en dag (2026-11-16, användarens val B
-    // Dragkampen bland tre skisser: Mittlinjen, Dragkampen och Lamporna och
-    // mätarna); samma kväll valde användaren spegeln för matchakten i stället
-    // (spegel() nedan), och dragkampen står kvar i förra mötet. En dragkampsrad har etiketten,
-    // det vänstra lagets tal högerställt mot stapeln, stapeln och det högra
-    // lagets tal; platsen i divisionen står utanför talet (1:A +0,94 … +0,12
-    // 14:E). En textrad (namn, V-O-F, tal som inte säger vem som är bättre)
-    // har det vänstra lagets text där talen börjar och det högra lagets längst
-    // ut till höger, som lagens namn överst. I telefonen står etiketten på en
-    // egen rad i mitten och raden under går från kant till kant.
-    function dragMatt() {
-      const tel = A.bred < 56;
-      const L = tel ? 0 : AKTEN_L;
-      const V = DRAG_V;
-      const n = Math.max(8, Math.min(36, A.bred - L - 2 * V - 2));
-      return { tel, L, V, n, w: L + V + 1 + n + 1 + V, halv: Math.floor((A.bred - L - 1) / 2) };
-    }
+    // Från samma kväll stod talen i en dragkamp (användarens val A bland fyra
+    // skisser, efter "mer pedagogiskt och överblickbart"): en delad stapel
+    // mellan lagens tal, delad där lagens andelar möts. Dragkampen gällde en
+    // dag hela matchakten och stod kvar här när matchakten fick spegeln
+    // (2026-11-16). Sedan 2026-11-17 står förra mötet också i spegeln
+    // (användarens val bland tre ställen för spegeln i mitten): i telefonen
+    // stod etiketten på en egen rad över varje stapel, så att sju tal tog
+    // sjutton rader; nu tar de tio, och lagen står på samma ställe som i de
+    // andra flikarna.
     const dragLen = (b) => b.reduce((s, y) => s + y[0].length, 0);
     const dragStreck = (k, kl) => (k > 0 ? [[' '.repeat(k), kl]] : []);
-    // etiketten: först på raden på datorn, på en egen rad i mitten i telefonen
-    function dragEtikett(G, etikett, q) {
-      if (!G.tel) return { fore: [[etikett || '', 'd', etikett ? q : null], [pad('', G.L - (etikett || '').length), '']], over: [] };
-      if (!etikett) return { fore: [], over: [] };
-      return { fore: [], over: [rad([pad('', Math.max(0, Math.floor((G.w - etikett.length) / 2)))], [etikett, 'd', q])] };
-    }
     // en bit [text, klass, fråga] ur en text eller en bit, ljus eller svag efter b
     const dragBit = (x, j, b) => {
       const p = Array.isArray(x) ? x : [x, ''];
       return b < 0 ? p : [p[0], j === b ? 'v' : 'd', p[2]];
     };
-    // En dragkampsrad: t är lagens tal, andel det vänstra lagets del av
-    // stapeln (0–1; 'tom' ger en tom stapel för dolda resultat), b laget med
-    // det bättre talet (-1: båda gröna) och ytter en bit utanför talet
-    // (platsen i divisionen). Utan andel blir det en textrad.
-    function dragRad(G, etikett, t, andel, b, q, ytter) {
-      if (andel == null || (andel !== 'tom' && !Number.isFinite(andel))) return dragText(G, etikett, t, q, b, ytter);
-      const E = dragEtikett(G, etikett, q);
-      const y = (j) => (ytter && ytter[j] && ytter[j][0] ? ytter[j] : null);
-      const v = [0, 1].map((j) => dragBit(t[j], j, b));
-      const vanster = y(0) ? [y(0), [' ', ''], v[0]] : [v[0]];
-      const hoger = y(1) ? [v[1], [' ', ''], y(1)] : [v[1]];
-      const n = G.n;
-      const kl = (j) => (b < 0 ? 'mt1' : j === b ? 'mtv' : 'mtd');
-      // det vänstra lagets del av n - 1 tecken (det sista är skarven)
-      const f0 = andel === 'tom' ? 0 : Math.round((n - 1) * Math.min(1, Math.max(0, andel)));
-      const stapel = andel === 'tom' ? dragStreck(n, 'mt0') : [...dragStreck(f0, kl(0)), [' ', ''], ...dragStreck(n - 1 - f0, kl(1))];
-      return [...E.over, rad(...E.fore, [pad('', Math.max(0, G.V - dragLen(vanster))), ''], ...vanster, [' ', ''], ...stapel, [' ', ''], ...hoger)];
-    }
-    // En textrad: det vänstra lagets text där talen börjar, det högra lagets
-    // högerställd längst ut (var och en högst en halv rad)
-    function dragText(G, etikett, t, q, b = -1, ytter) {
-      const E = dragEtikett(G, etikett, q);
-      const max = Math.max(4, Math.floor((G.w - G.L - 1) / 2));
-      const sida = (j) => {
-        const y = ytter && ytter[j] && ytter[j][0] ? ytter[j] : null;
-        const p = dragBit(t[j], j, b);
-        const v = [String(p[0]).slice(0, Math.max(1, max - (y ? y[0].length + 1 : 0))), p[1], p[2]];
-        return y ? (j ? [v, [' ', ''], y] : [y, [' ', ''], v]) : [v];
-      };
-      const v = sida(0);
-      const h = sida(1);
-      return [...E.over, rad(...E.fore, ...v, [pad('', Math.max(1, G.w - G.L - dragLen(v) - dragLen(h))), ''], ...h)];
-    }
-    // lagens namn överst (leder till lagkorten): det vänstra där talen börjar,
-    // det högra längst ut till höger
-    function dragNamn(G, lag) {
-      const max = Math.floor((G.w - G.L - 1) / 2);
-      const namn = lag.map((y) => kort(y).slice(0, max));
-      return rad([pad('', G.L)], [namn[0], '', `#lag:${lag[0]}`], [pad('', Math.max(1, G.w - G.L - namn[0].length - namn[1].length)), ''], [namn[1], '', `#lag:${lag[1]}`]);
-    }
-    // ett avsnitts rubrik med ett streck efter, lika långt som raderna
-    function dragRubrik(G, namn, q = null) {
-      return rad([namn, 'd', q], ...(G.w - 1 > namn.length + 2 ? [[' ', ''], [' '.repeat(G.w - namn.length - 2), 'ln']] : []));
-    }
 
     // Spegeln (sedan 2026-11-16, användarens val B Staplarna bland fyra
     // skisser – Spegeln, Staplarna, Mätarna och Övertaget – "men skippa
@@ -814,16 +773,21 @@ window.RumRegister = (() => {
     // där säger stapeln något som siffrorna inte säger direkt, hur ofta laget
     // kryssar. LÄGET:s mätare står utanför dagarna på samma sätt. Samma mått
     // i ÖVERSIKT, MÅLEN, xG och LÄGET, så att lagen står still när man byter
-    // flik; förra mötet i MÖTENA är kvar som dragkamp.
+    // flik; sedan 2026-11-17 också MÖTENA (förra mötet och listan).
     // spegel(): Lc etikettens spalt, S ett lags halva (med mellanrummet mot
-    // etiketten), B hela blocket och M luften till vänster om det
-    function spegel() {
+    // etiketten), B hela blocket och M luften till vänster om det. Med en
+    // bredd w står blocket i den, från vänsterkanten (spelarkortets med och
+    // utan, lika brett som kortets rader).
+    function spegel(w) {
       const tel = A.bred < 56;
       const Lc = tel ? SPEGEL_L : SPEGEL_L + 2;
-      const S = Math.min(SPEGEL_S, Math.floor((A.bred - Lc) / 2));
+      const S = Math.min(SPEGEL_S, Math.floor(((w || A.bred) - Lc) / 2));
       const B = 2 * S + Lc;
-      return { tel, Lc, S, B, M: Math.max(0, Math.floor((A.bred - B) / 2)) };
+      return { tel, Lc, S, B, M: w ? 0 : Math.max(0, Math.floor((A.bred - B) / 2)) };
     }
+    // spegelns axel: kolumnen mitt i etiketternas spalt, där kupongens och
+    // matchaktens streck och mötenas resultat står
+    const spAxel = (G) => G.M + G.S + Math.floor(G.Lc / 2);
     // en rad: hemmalagets bitar högerställda mot etiketten, etiketten i mitten (q: förklaringen) och bortalagets bitar
     function spRad(G, vanster, etikett, q, hoger) {
       const e = etikett || '';
@@ -896,18 +860,16 @@ window.RumRegister = (() => {
       if (!st[0] || !st[1]) return [];
       const mal = lag.map((n) => (x.home === n ? x.score.home : x.score.away));
       const dolj = Boolean(window.Spoiler && Spoiler.hidesDay(x.kickoff));
-      const G = dragMatt();
+      const G = spegel();
       const plats = x.neutral ? 'PÅ NEUTRAL PLAN' : `${isLand(x.comp) ? 'I' : 'HOS'} ${kort(x.home)}`;
-      const titel = `FÖRRA MÖTET · ${up(dag(x.kickoff)).replace(/ \d{4}$/, '')} · ${plats}`;
-      const r = [dragRubrik(G, titel, ordQ('forra')), dragNamn(G, lag)];
+      // rubriken, datumet och platsen under den, och lagen över spalterna
+      const r = [spRub(G, [['FÖRRA MÖTET', 'd', ordQ('forra')]]), spMitt(G, [[`${up(dag(x.kickoff))} · ${plats}`, 'd']]), spLag(G, lag)];
       const ok = (y) => y != null && Number.isFinite(y);
       for (const [e, k, fmt, battre] of FORRA) {
         const v = k === 'mal' ? mal : st.map((y) => y[k]);
         if (!v.some(ok) || (k === 'rc' && !v.some((y) => y > 0))) continue;
         const b = !dolj && battre && v.every(ok) && v[0] !== v[1] ? (v[0] > v[1] ? 0 : 1) : -1;
-        const txt = v.map((y) => (dolj ? '?' : ok(y) ? fmt(y) : '–'));
-        const sum = v.every(ok) ? v[0] + v[1] : 0;
-        r.push(...dragRad(G, e, txt, dolj || !(sum > 0) ? 'tom' : v[0] / sum, b, ordQ(`forra-${k}`)));
+        r.push(spTal(G, e, v.map((y) => (dolj ? '?' : ok(y) ? fmt(y) : '–')), b, ordQ(`forra-${k}`)));
       }
       return [...r, tom()];
     }
@@ -916,8 +878,17 @@ window.RumRegister = (() => {
     // ha mötena de senaste 5 åren?"; till dess de elva senaste, och för
     // landslagen bara från hösten 2024): säsongens och de tidigare, alla som
     // sajten har inom fem år före avspark (pastMeetings i matchens fil).
+    //
+    // Sedan 2026-11-17 (användarens val bland tre ställen för spegeln i
+    // mitten) står raderna som kupongens: tävlingen först, lagen speglade runt
+    // resultatet, vars streck står på spegelns axel, och datumet längst ut,
+    // under säsongen som rubrik med ett streck efter (landslagen: året). Till
+    // dess stod datumet med året först och resultatet där namnen slutade, så
+    // att det hoppade från rad till rad, och i telefonen bröts raden med långa
+    // namn (BOURNEMOUTH – NOTTINGHAM). Hemmalagets V–O–F står i mitten under.
     function moten(m) {
-      const r = [rad(['MÖTENA DE SENASTE FEM ÅREN', 'd', ordQ('moten')])];
+      const G = spegel();
+      const r = [spRub(G, [['MÖTENA DE SENASTE FEM ÅREN', 'd', ordQ('moten')]])];
       const d = A.match.get(m.id);
       if (d === undefined) return [...r, prickar('HÄMTAR', '')];
       r.unshift(...forraMotet(m, d));
@@ -925,14 +896,44 @@ window.RumRegister = (() => {
         ...(d.meetings || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.kickoff), x, when: x.kickoff, comp: x.compShort, hide: window.Spoiler && Spoiler.hidesDay(x.kickoff) })),
         ...((d.pastMeetings && d.pastMeetings.list) || []).filter((x) => x.score).map((x) => ({ t: Date.parse(x.date), x, when: x.date, comp: x.compShort, hide: false })),
       ].sort((a, b) => b.t - a.t);
-      if (!list.length) return [...r, rad('HAR INTE MÖTTS PÅ FEM ÅR')];
+      if (!list.length) return [...r, spMitt(G, [['HAR INTE MÖTTS PÅ FEM ÅR', '']])];
       const n = { V: 0, O: 0, F: 0 };
+      const land = isLand(m.comp);
+      // (raderna slutar som kupongens: i telefonen vid radens slut, på datorn vid spegelns kant)
+      const slut = G.tel ? A.bred : G.M + G.B;
+      const axel = spAxel(G);
+      r.push(tom());
+      let forra = null;
       for (const { x, when, comp, hide } of list) {
         if (!hide) n[letter(x, m.home)]++;
-        r.push(rad([`${pad(up(dag(when)), 12)}${pad(up(comp || ''), 4)}`, 'd'], `${kort(x.home)} – ${kort(x.away)}  `, [hide ? '?' : `${x.score.home}–${x.score.away}`, 'v']));
+        const s = sasongAv(when, land);
+        if (s !== forra) {
+          r.push(rad([pad('', G.M), ''], [s, 'd'], ...(slut - G.M > s.length + 2 ? [[' ', ''], [' '.repeat(slut - G.M - s.length - 1), 'ln']] : [])));
+          forra = s;
+        }
+        r.push(motRad(G, x, comp, hide, when, axel, slut));
       }
-      r.push(rad([`${kort(m.home)}: `, 'd'], `${n.V} V · ${n.O} O · ${n.F} F`));
+      r.push(tom(), spMitt(G, [[`${kort(m.home)}  `, 'd'], [`${n.V} V · ${n.O} O · ${n.F} F`, '']]));
       return r;
+    }
+    // säsongen (2025/26, från juli) eller för landslagen året
+    function sasongAv(when, land) {
+      const [y, mo] = (/^\d{4}-\d\d-\d\d$/.test(when) ? when : fDay.format(new Date(when))).split('-').map(Number);
+      if (land) return String(y);
+      const f = mo >= 7 ? y : y - 1;
+      return `${f}/${String(f + 1).slice(2)}`;
+    }
+    // Ett möte: tävlingen (4 tecken), hemmalaget högerställt före sina mål,
+    // strecket i kolumn axel, bortalaget efter sina mål och datumet
+    // högerställt så att raden slutar i kolumn slut. Namnen kortas när de inte
+    // ryms (inte i de fyra ligorna, där rummets korta namn är högst 11 tecken).
+    function motRad(G, x, comp, hide, when, axel, slut) {
+      const [mh, ma] = hide ? ['?', '?'] : [String(x.score.home), String(x.score.away)];
+      const dag0 = up(dag(when)).replace(/ \d{4}$/, '');
+      const hw = Math.max(4, axel - mh.length - G.M - 5);
+      const aw = Math.max(4, slut - axel - ma.length - 9);
+      return rad([pad('', G.M), ''], [pad(up(comp || ''), 4), 'd'], padL(kort(x.home).slice(0, hw), hw), [' ', ''], [`${mh}–${ma}`, 'v'], [' ', ''],
+        pad(kort(x.away).slice(0, aw), aw), [' ', ''], [padL(dag0, 6), 'd']);
     }
 
     // De tio senaste (sedan 2026-11-16, på sidan MATCH FÖR MATCH): lagets tio senaste
@@ -1573,7 +1574,7 @@ window.RumRegister = (() => {
       const val = s.val;
       R.delar = s.ordning;
       R.del = val;
-      R.huvud = [rad([`${padL(i + 1, 2)}  `, 'd'], [`${kort(m.home)} – ${kort(m.away)}`, 'v']), delRad(AKTDELAR, s.topp, s.har), s.rad];
+      R.huvud = [aktRad(m, G), delRad(AKTDELAR, s.topp, s.har), s.rad];
       if (val === 'moten') return rader('moten');
       // lagen överst i fliken (leder till lagkorten), med divisionen när den skiljer
       const kol = [spLag(G, lag)];
@@ -2663,15 +2664,27 @@ window.RumRegister = (() => {
       spelarTal(x, S, 'oversikt', r, 'MATCHERNA');
       if (S.veil) return r;
       const mu = p.mu;
+      // Med och utan honom i startelvan i spegeln (sedan 2026-11-17,
+      // användarens val bland tre ställen för spegeln i mitten; till dess en
+      // tabell med raderna MED och UTAN, vars rubrikrad var 42 tecken och
+      // bröts i telefonen): med till vänster, utan till höger och
+      // etiketterna i mitten, lika brett som kortets rader. Det bättre
+      // poängsnittet lyser (SKILJER.ppm, som för landslagen); matcherna,
+      // V-O-F (med matchaktens stapel) och vad oddsen väntade sig per match
+      // säger inte vilket som är bättre och står som vanligt.
       if (mu && mu.m && mu.u) {
-        const raden = (namn, a) => {
-          const [n, v, o2, f] = a;
-          return `${pad(namn, 12)}${padL(n, 3)}  ${pad(`${v}-${o2}-${f}`, 8)}  ${pad(num((3 * v + o2) / n, 2), 7)}  ${num(a[6] / n, 2)}`;
-        };
-        r.push(tom(), rad([`${pad('I STARTELVAN', 12)}${padL('M', 3)}  ${pad('V-O-F', 8)}  ${pad('P/MATCH', 7)}  ODDSEN`, 'd']), rad(raden('MED', mu.m)), rad(raden('UTAN', mu.u)));
+        const G = spegel(kortBredd(TOPP));
+        const mu2 = [mu.m, mu.u];
+        const ppm = mu2.map(([n, v, o2]) => (3 * v + o2) / n);
+        const b = Math.abs(ppm[0] - ppm[1]) >= SKILJER.ppm - 1e-9 ? (ppm[0] > ppm[1] ? 0 : 1) : -1;
+        r.push(tom(), spRub(G, [['I STARTELVAN', 'd']]), spRad(G, [['MED HONOM', '']], '', null, [['UTAN HONOM', '']]),
+          spTal(G, 'MATCHER', mu2.map((a) => String(a[0])), -1),
+          spTal(G, 'V-O-F', mu2.map((a) => `${a[1]}-${a[2]}-${a[3]}`), -1, null, null, mu2.map((a) => ({ w: a[1], d: a[2], l: a[3] }))),
+          spTal(G, 'POÄNG/MATCH', ppm.map((x) => num(x, 2)), b),
+          spTal(G, 'VÄNTAT/MATCH', mu2.map((a) => num(a[6] / a[0], 2)), -1));
         if (mu.fran) {
           const [y, m] = mu.fran.split('-').map(Number);
-          r.push(rad([`I ${up(p.team)} SEDAN ${up(MAN[m - 1])} ${y}`, 'd']));
+          r.push(spMitt(G, [[`I ${up(p.team)} SEDAN ${up(MAN[m - 1])} ${y}`, 'd']]));
         }
       }
       return r;
