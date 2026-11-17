@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:06:36.450Z",
+ "uppdaterad": "2026-11-17T17:08:16.132Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3236,6 +3236,101 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-15T19:48:27.995Z",
     "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879236",
+   "match": "Chelsea – Leeds United",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:07:43.002Z",
+   "text": "Leeds kommer till Bridge med nio insläppta mål\n\nFörra gången Leeds besökte Stamford Bridge blev det nio mål i ligacupen. Nu kommer Daniel Farkes lag tillbaka med ligans snålaste försvar i bagaget, och Xabi Alonso har just sagt högt att hans Chelsea inte vet hur man tar sig igenom en mur.\n\nEfter förlusten med 0–1 mot Sunderland var Xabi Alonso ovanligt rak. ”Mot ett lågt försvar skapade vi inte tillräckligt med chanser”, sa han enligt The Leeds Press [1], och han lade till att laget saknade ”lite snabbhet med bollen, lite tålamod”. Om det mesta annat på fotbollsplanen kan man tycka olika, men en mur bryter man med passningar i två tillslag och folk som rör sig utan boll. Det där löser man med en hink bollar.\n\nLeeds har just en sådan mur. På tio ligamatcher har de bara släppt in åtta mål och hållit nollan fyra gånger. Den långa raden utan seger bröts mot Tottenham när Noah Okafor byttes in i 77:e minuten och gjorde matchens enda mål två minuter senare. Det berättar The False 9 [2], som också skriver att läkarna inte lät honom spela mer än 15 till 20 minuter. I samma artikel säger målvakten James Trafford att han vill bli Englands förstemålvakt: ”It's my aim and it's something I've always dreamed of.” Anton Stach är fortfarande osäker med sin fotskada.\n\nSiffrorna från september ser alltså lite märkliga ut. Inför cupmötet hade Chelsea gått obesegrade genom nio hemmamatcher mot Leeds, med sju segrar och två oavgjorda, skriver 101 Great Goals [3]. Sedan vann de med 6–3. Bollen har aldrig läst en tabell. Chelsea saknar dessutom João Pedro, Reece James och Lacroix, och Alonso vill inte ta några risker med Martínez i målet.\n\nTipset: 1X (Krysset ligger nära)\n\nSajtens prognos ger Chelsea oddset 1,85, och spelbolaget ligger nästan exakt där. Det troligaste resultatet är ändå 1–1. Prognosen räknar bara med mål och tabelläge, men den vet inget om att Alonso själv säger att laget saknar tålamod mot djupa försvar [1], eller att Leeds sällan släpper in mål. Chelsea saknar dessutom João Pedro framtill. Jag tror inte att Leeds vinner på Bridge, men jag ser gott om utrymme för att Chelsea aldrig får hål på muren. Därför ringar jag in hemmaseger och oavgjort.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Leeds kommer till Bridge med nio insläppta mål",
+   "lead": "Förra gången Leeds besökte Stamford Bridge blev det nio mål i ligacupen. Nu kommer Daniel Farkes lag tillbaka med ligans snålaste försvar i bagaget, och Xabi Alonso har just sagt högt att hans Chelsea inte vet hur man tar sig igenom en mur.",
+   "paragraphs": [
+    "Efter förlusten med 0–1 mot Sunderland var Xabi Alonso ovanligt rak. ”Mot ett lågt försvar skapade vi inte tillräckligt med chanser”, sa han enligt The Leeds Press [1], och han lade till att laget saknade ”lite snabbhet med bollen, lite tålamod”. Om det mesta annat på fotbollsplanen kan man tycka olika, men en mur bryter man med passningar i två tillslag och folk som rör sig utan boll. Det där löser man med en hink bollar.",
+    "Leeds har just en sådan mur. På tio ligamatcher har de bara släppt in åtta mål och hållit nollan fyra gånger. Den långa raden utan seger bröts mot Tottenham när Noah Okafor byttes in i 77:e minuten och gjorde matchens enda mål två minuter senare. Det berättar The False 9 [2], som också skriver att läkarna inte lät honom spela mer än 15 till 20 minuter. I samma artikel säger målvakten James Trafford att han vill bli Englands förstemålvakt: ”It's my aim and it's something I've always dreamed of.” Anton Stach är fortfarande osäker med sin fotskada.",
+    "Siffrorna från september ser alltså lite märkliga ut. Inför cupmötet hade Chelsea gått obesegrade genom nio hemmamatcher mot Leeds, med sju segrar och två oavgjorda, skriver 101 Great Goals [3]. Sedan vann de med 6–3. Bollen har aldrig läst en tabell. Chelsea saknar dessutom João Pedro, Reece James och Lacroix, och Alonso vill inte ta några risker med Martínez i målet."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The Leeds Press",
+     "title": "Xabi Alonso admits Chelsea weakness ahead of Leeds United clash",
+     "url": "https://www.theleedspress.com/xabi-alonso-admits-chelsea-weakness-ahead-of-leeds-united-clash-54673",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "The False 9",
+     "title": "Leeds United News Today: Okafor Winner, Trafford Interview and Chelsea Trip (8 November)",
+     "url": "https://thefalse9.com/2026/11/leeds-news-today-8-november-2026.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "101 Great Goals",
+     "title": "Chelsea v Leeds: Preview, expected line-ups, stats and where to watch",
+     "url": "https://www.101greatgoals.com/?p=209969",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos ger Chelsea oddset 1,85, och spelbolaget ligger nästan exakt där. Det troligaste resultatet är ändå 1–1. Prognosen räknar bara med mål och tabelläge, men den vet inget om att Alonso själv säger att laget saknar tålamod mot djupa försvar [1], eller att Leeds sällan släpper in mål. Chelsea saknar dessutom João Pedro framtill. Jag tror inte att Leeds vinner på Bridge, men jag ser gott om utrymme för att Chelsea aldrig får hål på muren. Därför ringar jag in hemmaseger och oavgjort.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Krysset ligger nära",
+    "sources": [
+     {
+      "n": 1,
+      "source": "The Leeds Press",
+      "title": "Xabi Alonso admits Chelsea weakness ahead of Leeds United clash",
+      "url": "https://www.theleedspress.com/xabi-alonso-admits-chelsea-weakness-ahead-of-leeds-united-clash-54673",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:07:43.002Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Chelsea förlorade senast mot Sunderland, och tränaren sa själv efteråt att laget inte skapar tillräckligt med chanser mot ett lågt försvar. Nu kommer Leeds, som bara har släppt in åtta mål på tio ligamatcher. Där har ni orsak och verkan, så är det bara.",
+     "Chelsea saknar dessutom João Pedro framtill, och Reece James och Lacroix är också borta. Leeds står kompakt och väntar på sitt läge, och de har Okafor att sätta in sent, han som avgjorde mot Tottenham två minuter efter att han kommit in. Favoriten har redan räknat in segern. Här höjer jag ett varningens finger.",
+     "Alla andra minns när Chelsea slog Leeds med 6–3 i ligacupen och har missat hur Leeds försvarar i dag. Jag ringar in tvåan, och bara tvåan, och det gör jag jävligt lugnt."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–1",
+    "tips": "2026-11-17T17:07:43.002Z",
+    "uppdrag": {
+     "fraser": [
+      "Så är det bara",
+      "Här höjer jag ett varningens finger"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": {
+      "tecken": 2,
+      "favorit": 0,
+      "lag": "Leeds United",
+      "mot": "Chelsea",
+      "odds": 3.9,
+      "favoritOdds": 1.87,
+      "rad": "Favoriten har redan räknat in segern."
+     }
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:08:15.221Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
