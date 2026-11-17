@@ -63,7 +63,7 @@ const KORTA_OK = new Set(['Bra.', 'Läs här.']);
 // Vilka fält som går att fylla var (forstaRad, medDag och omKupongen i rum-hasse.js).
 // Står det inget för hela vägen gäller det som står för första delen.
 const FALT = {
-  oppningNamn: ['namn'], tillbakaNamn: ['namn'],
+  oppningNamn: ['namn'], tillbakaNamn: ['namn'], nastaNamn: ['namn'],
   ledig: ['dag'],
   resultat: ['res'],
   'kupong.farre': ['du'], 'kupong.fler': ['du'], 'kupong.skilda': ['du'], 'kupong.korsar': ['du', 'Bada'],
@@ -79,7 +79,7 @@ const FALT = {
 const NAMNRADER = [...['alla', 'bra', 'mitten', 'daligt', 'inget', 'pagar'].map((k) => `efter.namn.${k}`),
   ...['alla', 'bra', 'mitten', 'daligt', 'haller', 'emot'].map((k) => `stallning.namn.${k}`)];
 // Sidan lottar bland de här, så de måste vara listor.
-const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
+const LISTOR = ['oppning', 'oppningNamn', 'tillbaka', 'tillbakaNamn', 'nasta', 'nastaNamn', 'halva', 'enKvar', 'alla', 'allaKvar', 'allaIgen', 'ledig', 'val', 'valLasa', 'valVanta',
   'fragaTillbaka', 'lar', 'angra', 'gissar', 'erbjud', 'erbjudNytt', 'resultat', 'ejKlar', 'ropSvar',
   'fyller.foreslar', 'fyller.hit', 'fyller.skriver.1', 'fyller.skriver.X', 'fyller.skriver.2', 'fyller.gardera', 'fyller.medhall', 'fyller.emot',
   'fyller.suddar', 'fyller.inne', 'fyller.fel',
@@ -166,8 +166,9 @@ for (const vag of FRAGOR) {
   }
 }
 // Raderna med ditt namn står ovanför listan, där det finns plats för två rader (som de andra i efter och stallning,
-// högst 56 tecken), också med det längsta namnet, och namnet står där en gång.
-for (const vag of NAMNRADER) {
+// högst 56 tecken), också med det längsta namnet, och namnet står där en gång. Så också när han hälsar och efter en
+// analys (oppningNamn, tillbakaNamn och nastaNamn).
+for (const vag of [...NAMNRADER, 'oppningNamn', 'tillbakaNamn', 'nastaNamn']) {
   for (const t of varde(vag) || []) {
     const n = (t.match(/\{namn\}/g) || []).length;
     if (n !== 1) fel.push(`${vag}: "${t}" ska ha {namn} en gång, inte ${n}`);

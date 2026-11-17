@@ -17,7 +17,7 @@ const { SOURCES, ODDS_WINDOW_DAYS, landEuropa } = require('./sources');
 const { svenskt } = require('../config/landslag');
 const { keyOf, espnKey } = require('./teams');
 const { newsSv } = require('./skadetext');
-const { strengthFromOdds } = require('./strength');
+const { strengthFromOdds, median, difficulty, eloDifficulty } = require('./strength');
 
 const FORM_N = 5;
 // Matchbladet i rummet (sidan Lagen i rum-matchblad.js): de tio senaste matcherna.
@@ -293,19 +293,17 @@ function landElo(matcher, groups) {
 }
 
 // Motståndet i ett landslags formmatch, som opponentStrength för klubbarna:
-// level 0–1 från den svagaste till den starkaste i lagets egen liga i
-// Nations League (lag utan liga: alla europeiska lag), efter Elo-talen just
-// nu; lag utanför den skalan hamnar i ändarna. rank: platsen i världen.
-// null när något av lagen saknar Elo-tal.
+// level 0–1 är Elo-skalans väntade resultat för motståndaren mot medianlaget
+// i lagets egen liga i Nations League (lag utan liga: alla europeiska lag),
+// efter Elo-talen just nu (eloDifficulty i src/strength.js). rank: platsen i
+// världen. null när något av lagen saknar Elo-tal.
 function landOpponentStrength(D, k, oppKey) {
   const E = D.landElo;
   const o = E && E.byKey.get(oppKey);
   if (!o) return null;
   const own = (E.leagueOf.has(k) && E.byLeague.get(E.leagueOf.get(k))) || E.all;
-  const top = own[0];
-  const bottom = own[own.length - 1];
   return {
-    level: own.length > 1 && top > bottom ? Math.round(100 * Math.min(1, Math.max(0, (o.rating - bottom) / (top - bottom)))) / 100 : null,
+    level: own.length > 1 ? Math.round(100 * eloDifficulty(o.rating, median(own))) / 100 : null,
     rank: o.rank,
     of: null,
     league: null,
@@ -868,10 +866,12 @@ function strengthIndex(D, strength) {
   };
 }
 
-// Motståndet i en formmatch: level 0–1 från den egna ligans svagaste lag till
-// dess starkaste (lag från andra divisioner och från utlandet hamnar i ändarna
-// när de är svagare eller starkare än så), och platsen i sin egen liga efter
-// modellens styrka (rank av of). k = det egna laget, x = matchen ur calendar().
+// Motståndet i en formmatch: level 0–1 är motståndarens väntade resultat (vinst
+// 1, oavgjort ½) mot medianlaget i den egna ligan på neutral plan (difficulty i
+// src/strength.js) – 0,5 som medianlaget, och lag från andra divisioner och
+// från utlandet på samma skala utan att fastna i ändarna – och platsen i sin
+// egen liga efter modellens styrka (rank av of). k = det egna laget, x =
+// matchen ur calendar().
 //
 // Styrkan kommer ur modellen för lagen i Premier League–National League. Lag
 // under National League (FA-cupen) har nivåns gemensamma styrka, som i
@@ -895,10 +895,10 @@ function opponentStrength(D, S, leagueId, k, x) {
   const own = S.byLeague.get(leagueId);
   const theirLeague = by ? null : S.league.get(oppKey);
   const theirs = theirLeague ? S.byLeague.get(theirLeague) : null;
-  const top = own && own[0];
-  const bottom = own && own[own.length - 1];
+  const ref = own && own.length > 1 ? median(own) : null;
+  const level = ref == null ? null : difficulty(r - ref, S.scale);
   return {
-    level: own && top > bottom ? Math.round(100 * Math.min(1, Math.max(0, (r - bottom) / (top - bottom)))) / 100 : null,
+    level: level == null ? null : Math.round(100 * level) / 100,
     rank: theirs ? theirs.indexOf(r) + 1 : null,
     of: theirs ? theirs.length : null,
     league: theirs ? competition(theirLeague).name : null,
