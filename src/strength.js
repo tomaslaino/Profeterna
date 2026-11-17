@@ -88,4 +88,35 @@ function strengthFromOdds(scale, own, { home, neutral }, odds) {
   return Number.isFinite(r) ? r : null;
 }
 
-module.exports = { strengthTable, strengthFromOdds };
+// ---------- hur svårt ett motstånd är ----------
+
+// Medianen i en lista av tal (styrkor eller Elo-tal), null när den är tom.
+function median(xs) {
+  if (!xs || !xs.length) return null;
+  const s = xs.slice().sort((a, b) => a - b);
+  const i = (s.length - 1) / 2;
+  return (s[Math.floor(i)] + s[Math.ceil(i)]) / 2;
+}
+
+// Motståndets svårighet 0–1 (sedan 2026-11-17): hur stor del av poängen
+// motståndaren väntas ta mot medianlaget i den egna divisionen på neutral plan,
+// där vinst är 1 och oavgjort ½. d = motståndarens styrka minus medianlagets,
+// i mål per match. Målen är lika många som mellan två genomsnittliga Premier
+// League-lag (scale.a1 · scale.b1 var), fördelade så att skillnaden blir d.
+// 0,5 är ett lag som medianlaget; 0 och 1 nås aldrig, eftersom ingen match
+// är vunnen eller förlorad på förhand. (Till 2026-11-17 gick skalan från
+// divisionens svagaste lag till dess starkaste, och allt utanför fastnade på
+// 0 eller 100 – Hull lika lätt som Fleetwood för Arsenal.)
+function difficulty(d, scale) {
+  if (!Number.isFinite(d)) return null;
+  const mu = scale && scale.a1 > 0 && scale.b1 > 0 ? scale.a1 * scale.b1 : 1.35;
+  const t = Math.asinh(d / (2 * mu));
+  const q = x12(mu * Math.exp(t), mu * Math.exp(-t), (scale && scale.rho) || 0);
+  return q[0] + q[1] / 2;
+}
+
+// Samma sak för landslagen ur Elo-talen: Elo-skalans väntade resultat (vinst 1,
+// oavgjort ½) för motståndaren mot ett lag med referensens tal, neutral plan.
+const eloDifficulty = (elo, ref) => 1 / (1 + 10 ** ((ref - elo) / 400));
+
+module.exports = { strengthTable, strengthFromOdds, median, difficulty, eloDifficulty };

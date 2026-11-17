@@ -174,7 +174,7 @@
     'tio-malen': { e: 'MÅLEN', n: 'GJORDA–INSLÄPPTA, DE TIO SENASTE', t: `Alla mål tillsammans. ${TIO}`, ex: null },
     'tio-motstand': {
       e: 'MOTSTÅNDET', n: 'MOTSTÅNDARNAS STYRKA I SNITT',
-      t: 'Hur starka lagets tio senaste motståndare är i genomsnitt, enligt modellens styrka just nu: divisionens sämsta lag är 0 och dess bästa 100. Ett lag från en högre division eller ett bra lag i Europa kan ligga på 100, ett lag från en lägre division på 0. Ett högt tal betyder att resultaten har kommit mot svårt motstånd.',
+      t: 'Hur svåra lagets tio senaste motståndare är i genomsnitt, enligt modellens styrka just nu. Talet är motståndarens chans mot divisionens mittenlag på neutral plan, där oavgjort räknas som en halv vinst: 50 är lika bra som mittenlaget, och ju högre, desto svårare. Inget lag ligger på 0 eller 100, eftersom ingen match är avgjord på förhand. Ett högt tal betyder att resultaten har kommit mot svårt motstånd.',
       ex: tioMotEx,
     },
     'tio-matcher': {
@@ -184,7 +184,7 @@
     },
     form: {
       e: 'FORMEN', n: 'DE FEM SENASTE MATCHERNA',
-      t: 'Matcher i alla tävlingar, den senaste först och efter 90 minuter. Talet efter bokstäverna är motståndarnas styrka i genomsnitt: divisionens sämsta lag är 0 och dess bästa 100.',
+      t: 'Matcher i alla tävlingar, den senaste först och efter 90 minuter. Talet efter bokstäverna är motståndarnas styrka i genomsnitt: deras chans mot divisionens mittenlag, där 50 är lika bra som mittenlaget.',
       ex: ({ namn, form5, mott }) => {
         const l = (form5 || []).filter((x) => ok(x.niva));
         if (!ok(mott) || l.length < 2) return null;
@@ -349,7 +349,7 @@
     'tio-malen': akten['tio-malen'],
     'tio-motstand': {
       e: 'MOTSTÅNDET', n: 'MOTSTÅNDARNAS STYRKA I SNITT',
-      t: 'Hur starka lagets tio senaste motståndare är i genomsnitt, enligt landslagens Elo-tal just nu (eloratings.net): det svagaste laget i lagets liga i Nations League är 0 och det starkaste 100. Ett starkare lag, som ett av de bästa utanför Europa, ligger på 100. Ett högt tal betyder att resultaten har kommit mot svårt motstånd.',
+      t: 'Hur svåra lagets tio senaste motståndare är i genomsnitt, enligt landslagens Elo-tal just nu (eloratings.net). Talet är motståndarens chans mot mittenlaget i lagets liga i Nations League på neutral plan, där oavgjort räknas som en halv vinst: 50 är lika bra som mittenlaget, och ju högre, desto svårare. Ett högt tal betyder att resultaten har kommit mot svårt motstånd.',
       ex: tioMotEx,
     },
     'tio-matcher': {
@@ -360,7 +360,7 @@
     spelarfor: { e: 'SPELAR FÖR', n: 'NATIONS LEAGUE', t: (h) => REGLER[(h.ins && h.ins.liga) || 'B'], exm: insatsEx },
     form: {
       e: 'FORMEN', n: 'DE FEM SENASTE LANDSKAMPERNA',
-      t: 'Den senaste landskampen står först, och det är resultatet efter 90 minuter som gäller. Talet efter bokstäverna är motståndarnas styrka i genomsnitt enligt landslagens Elo-tal: det svagaste laget i lagets liga i Nations League är 0 och det starkaste 100.',
+      t: 'Den senaste landskampen står först, och det är resultatet efter 90 minuter som gäller. Talet efter bokstäverna är motståndarnas styrka i genomsnitt enligt landslagens Elo-tal: deras chans mot mittenlaget i lagets liga i Nations League, där 50 är lika bra som mittenlaget.',
       ex: akten.form.ex,
     },
     vila: { e: 'VILAN', n: 'DAGAR SEDAN FÖRRA LANDSKAMPEN', t: 'Spelarna har spelat för sina klubbar under tiden, så vilan säger lite om hur trötta de är.', ex: null },

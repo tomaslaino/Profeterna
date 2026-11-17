@@ -13,8 +13,8 @@
 //              rad; en match öppnar matchakten:
 //              allt om matchen på ett ställe, lagen sida vid sida, i flikar
 //              (sedan 2026-11-14): ÖVERSIKT (formen och dess motstånd – hur
-//              bra de fem motståndarna var i snitt, 0–100 från lagets egen
-//              divisions svagaste lag till dess starkaste, ur matchens fil –
+//              bra de fem motståndarna var i snitt, 0–100 som deras chans
+//              mot den egna divisionens mittenlag, ur matchens fil –
 //              styrkan, motståndet, favoritskapet och mot oddsen, med lagets
 //              plats i sin division; de tio senaste i snitt, och för en
 //              landskamp i Nations Leagues sista omgångar SPELAR FÖR; de tio
@@ -589,7 +589,7 @@ window.RumRegister = (() => {
         .map((x) => (window.Spoiler && Spoiler.hidden(x) ? '?' : letter(x, m[side])));
     }
     // Formens motstånd: snittet av motståndarnas styrka i lagets fem senaste,
-    // 0–100 (opp.level i matchens fil). null tills filen har hämtats och när
+    // 0–100 (opp.level i matchens fil: chansen mot divisionens mittenlag). null tills filen har hämtats och när
     // fler än en av matcherna saknar styrka – då säger snittet för lite.
     function mottOf(m, side) {
       const d = A.match.get(m.id);
@@ -1378,9 +1378,9 @@ window.RumRegister = (() => {
       // över lagets tio senaste matcher i alla tävlingar (tioSum, i TALEN
       // under formen), och på sidan MATCH FÖR MATCH en rad per match med
       // utfallet, resultatet, H eller B, motståndaren och dess styrka med en
-      // mätare – 0 för det svagaste laget i lagets division och 100 för det
-      // starkaste, som formens motstånd (landslagen: ligan i Nations League,
-      // efter Elo-talen). På datorn lagen sida vid sida, i telefonen under
+      // mätare – motståndarens chans mot mittenlaget i lagets division (50 som
+      // mittenlaget, sedan 2026-11-17), som formens motstånd (landslagen:
+      // ligan i Nations League, efter Elo-talen). På datorn lagen sida vid sida, i telefonen under
       // varandra. Poängen och målen jämförs som formen (det bättre lyser);
       // motståndet säger inte vem som är bättre och står som vanligt. Till
       // 2026-11-17 stod allt det överst i xG-fliken, som då blev 27 rader.
