@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:25:16.267Z",
+ "uppdaterad": "2026-11-17T17:26:32.659Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3964,6 +3964,100 @@
     "version": "2026-11-16.1",
     "writtenAt": "2026-11-17T17:25:05.757Z",
     "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880151",
+   "match": "Swansea City – West Bromwich Albion",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:26:09.913Z",
+   "text": "Swansea kan få en annan tränare före avspark\n\nWest Bromwich kommer till Wales efter sex ligamatcher utan förlust och har sprungit ifrån sina motståndare. Swansea har förlorat fyra av sina fem senaste matcher, och deras tränare Vitor Matos kan vara på väg till Strasbourg. Allt i Swansea står och väntar på ett besked från Frankrike.\n\nDet här är en match där frågan om vem som står vid sidlinjen hos hemmalaget är minst lika intressant som själva spelet. West Brom News skriver att den franska klubben Strasbourg vill ha Swansea-tränaren Vitor Matos, som är 38 år, om de gör sig av med Hugo Oliveira. Enligt tidningen hänvisar The Guardian till att Swansea är ”increasingly resigned” inför att förlora honom [1]. En spelartrupp som inte vet vem som håller i torsdagsträningen tränar sämre. Det ser du redan på uppvärmningen.\n\nFörlusten i Birmingham före landslagsuppehållet var dyr på flera sätt. Marko Stamenic blev utvisad för en hög tackling på Ethan Laird, Ross Stewart fick en straff räddad av Ryan Allsop, och Jay Stansfield avgjorde i 87:e minuten efter en fast situation [2]. Nu är Stamenic avstängd, Cameron Burgess och Ronald Pereira uppges saknas, och det är osäkert om Goncalo Franco och Stephen Welsh kan spela [1]. Swansea har dessutom släppt in fem mål mot QPR och tre mot Portsmouth på sistone.\n\nWest Brom kommer med helt andra känslor. Efter 3–0 mot Millwall sa James Morrison att ”we just outran them and played some nice football” och att laget ligger ”in the top three for running stats in the division” [3]. Isaac Price satte ett skott från 25 meter, och inhopparen Felix Horn Myhre både slog inlägget till Jayson Molumbys mål och gjorde ett eget [3]. Men även Morrison har frånvaro att hantera: Mikey Johnstone, Toby Collyer och Nolan Galves är borta, och George Campbell kommer troligen tillbaka för tidigt för att hinna med [1]. Bollen har aldrig läst en tabell, men den brukar hitta laget som springer mest.\n\nTipset: X2 (Swansea skakar)\n\nPrognosen ger hemmalaget en liten fördel, men den räknar bara med mål och tabelläget. Den vet inte att Stamenic är avstängd, att Burgess och Pereira saknas eller att tränaren kanske redan har ena foten i Strasbourg [1]. West Brom har inte förlorat på sex ligamatcher och springer ifrån sina motståndare [2]. Samtidigt har de egna frånvarande [1], och de senaste mötena har ofta slutat oavgjort eller med ett enda måls skillnad. Därför ringar jag in kryss och borta.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Swansea kan få en annan tränare före avspark",
+   "lead": "West Bromwich kommer till Wales efter sex ligamatcher utan förlust och har sprungit ifrån sina motståndare. Swansea har förlorat fyra av sina fem senaste matcher, och deras tränare Vitor Matos kan vara på väg till Strasbourg. Allt i Swansea står och väntar på ett besked från Frankrike.",
+   "paragraphs": [
+    "Det här är en match där frågan om vem som står vid sidlinjen hos hemmalaget är minst lika intressant som själva spelet. West Brom News skriver att den franska klubben Strasbourg vill ha Swansea-tränaren Vitor Matos, som är 38 år, om de gör sig av med Hugo Oliveira. Enligt tidningen hänvisar The Guardian till att Swansea är ”increasingly resigned” inför att förlora honom [1]. En spelartrupp som inte vet vem som håller i torsdagsträningen tränar sämre. Det ser du redan på uppvärmningen.",
+    "Förlusten i Birmingham före landslagsuppehållet var dyr på flera sätt. Marko Stamenic blev utvisad för en hög tackling på Ethan Laird, Ross Stewart fick en straff räddad av Ryan Allsop, och Jay Stansfield avgjorde i 87:e minuten efter en fast situation [2]. Nu är Stamenic avstängd, Cameron Burgess och Ronald Pereira uppges saknas, och det är osäkert om Goncalo Franco och Stephen Welsh kan spela [1]. Swansea har dessutom släppt in fem mål mot QPR och tre mot Portsmouth på sistone.",
+    "West Brom kommer med helt andra känslor. Efter 3–0 mot Millwall sa James Morrison att ”we just outran them and played some nice football” och att laget ligger ”in the top three for running stats in the division” [3]. Isaac Price satte ett skott från 25 meter, och inhopparen Felix Horn Myhre både slog inlägget till Jayson Molumbys mål och gjorde ett eget [3]. Men även Morrison har frånvaro att hantera: Mikey Johnstone, Toby Collyer och Nolan Galves är borta, och George Campbell kommer troligen tillbaka för tidigt för att hinna med [1]. Bollen har aldrig läst en tabell, men den brukar hitta laget som springer mest."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "West Brom News via Yahoo Sports",
+     "title": "West Brom receive timely boost as Vitor Matos update rocks Swansea ahead of Championship clash",
+     "url": "https://sports.yahoo.com/articles/west-brom-receive-timely-boost-080416720.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Nation.Cymru",
+     "title": "Swansea beaten as Stansfield double sends Birmingham top of Championship",
+     "url": "https://nation.cymru/sport/swansea-beaten-as-stansfield-double-sends-birmingham-top-of-championship/",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "The Irish News",
+     "title": "James Morrison pleased to see his West Brom squad ‘outrun’ Millwall",
+     "url": "https://www.irishnews.com/sport/soccer/james-morrison-pleased-to-see-his-west-brom-squad-outrun-millwall-RYFHLTG3BZP53BIZ72AJDKBNJM/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger hemmalaget en liten fördel, men den räknar bara med mål och tabelläget. Den vet inte att Stamenic är avstängd, att Burgess och Pereira saknas eller att tränaren kanske redan har ena foten i Strasbourg [1]. West Brom har inte förlorat på sex ligamatcher och springer ifrån sina motståndare [2]. Samtidigt har de egna frånvarande [1], och de senaste mötena har ofta slutat oavgjort eller med ett enda måls skillnad. Därför ringar jag in kryss och borta.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Swansea skakar",
+    "sources": [
+     {
+      "n": 1,
+      "source": "West Brom News via Yahoo Sports",
+      "title": "West Brom receive timely boost as Vitor Matos update rocks Swansea ahead of Championship clash",
+      "url": "https://sports.yahoo.com/articles/west-brom-receive-timely-boost-080416720.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The Irish News",
+      "title": "James Morrison pleased to see his West Brom squad ‘outrun’ Millwall",
+      "url": "https://www.irishnews.com/sport/soccer/james-morrison-pleased-to-see-his-west-brom-squad-outrun-millwall-RYFHLTG3BZP53BIZ72AJDKBNJM/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:26:09.913Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Swansea har förlorat fyra av sina fem senaste matcher, och de vet inte ens om tränaren är kvar, för en fransk klubb vill ha honom. En trupp som går och väntar på ett besked från Frankrike tränar inte som den ska. Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "Bakåt ser det ännu värre ut. Stamenic är avstängd, Burgess och Pereira saknas, och Swansea har nyligen släppt in fem mål mot QPR och tre mot Portsmouth.",
+     "West Brom har inte förlorat på sex ligamatcher och springer ifrån sina motståndare. De har också folk borta, men det är lugnt, för de vet vad de ska göra. Spelbolagen gör det här till en jämn match, och det är jävligt snällt mot Swansea. Jag ringar in tvåan och bara tvåan."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
+    "tips": "2026-11-17T17:26:09.913Z",
+    "uppdrag": {
+     "fraser": [
+      "Det är lugnt",
+      "Glöm det"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:26:19.556Z",
+    "attempts": 1
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
