@@ -22,7 +22,7 @@
 //              MATCH), MÅLEN (hemmalaget hemma mot bortalaget borta, och på
 //              sidan ALLA MATCHER målen, nollorna, skytten och de främsta i
 //              assist och segermål), xG (chanserna, turen och kryssen). En
-//              flik som inte ryms på skärmen har sidor i strecket under
+//              flik som inte ryms på skärmen har sidor, radioknappar under
 //              flikraden (sedan 2026-11-17, se sidorna()), LÄGET (vilan, nästa match, skadorna och
 //              domaren) och MÖTENA (förra mötet med lagens siffror, när det
 //              var högst ett halvår sedan, och mötena de senaste fem åren). Det
@@ -1907,9 +1907,10 @@ window.RumRegister = (() => {
       fkEl.style.setProperty('--fk-o', `${O}px`);
       let n = Math.ceil((fkEl.getBoundingClientRect().height + O + G) / h);
       // raderna ovanför (i kortet och med huvudet) och under
-      const hr = topp.querySelector('.tr.hr');
+      // (under menyraden och den tomma raden under den)
+      const tak = topp.querySelector('.tr.meny + .tr');
       const ovanKort = Math.floor((rr.top - U.top + 1) / h);
-      const ovan = Math.max(ovanKort, Math.floor((rr.top - (hr ? hr.getBoundingClientRect().bottom : U.top) + 1) / h));
+      const ovan = Math.max(ovanKort, Math.floor((rr.top - (tak ? tak.getBoundingClientRect().bottom : U.top) + 1) / h));
       const under = Math.floor((U.bottom - rr.bottom + 1) / h);
       let top;
       if (n <= ovanKort || (n > under && n <= ovan)) top = rr.top - n * h + O;
@@ -1960,21 +1961,25 @@ window.RumRegister = (() => {
     }
 
     // Flikraden under namnet (i det som står still överst, så att den inte
-    // flyttar sig när man rullar eller byter flik): den valda omvänd, en
-    // flik utan något att visa svag och inte tryckbar. Tre mellanslag
-    // emellan som i menyraden, två när raden annars inte ryms (telefonen).
+    // flyttar sig när man rullar eller byter flik): en flik utan något att
+    // visa svag och inte tryckbar. Tre mellanslag emellan som i menyraden, två
+    // när raden annars inte ryms (telefonen). Sedan 2026-11-17 (användarens
+    // val B "DOS-programmet" bland tre skisser av markeringen) är den valda
+    // fliken en mapp man ser in i: en ram runt fliken, öppen nedåt mot
+    // strecket under raden (klassen flik i rum-register.css, och så ritar
+    // skärmen i rummet den, rum-dator.js); till dess var den omvänd.
     function delRad(delar, val, har) {
       const n = delar.reduce((s, [, namn]) => s + namn.length, 0);
       const mellan = n + 3 * (delar.length - 1) <= A.bred ? '   ' : '  ';
-      return rad(...delar.flatMap(([id, namn], j) => [[namn, id === val ? 'i' : har(id) ? '' : 'd', id === val || !har(id) ? null : `#del:${id}`], [j < delar.length - 1 ? mellan : '', '']]));
+      return Object.assign(rad(...delar.flatMap(([id, namn], j) => [[namn, id === val ? 'i' : har(id) ? '' : 'd', id === val || !har(id) ? null : `#del:${id}`], [j < delar.length - 1 ? mellan : '', '']])), { kl: 'flik' });
     }
     // Sidorna i en flik (sedan 2026-11-17, användarens val B "Sidor i
     // fliken" bland två skisser; A var fler flikar, som i telefonen hade
     // hamnat på två rader). En flik som inte rymdes på skärmen – matchaktens
     // xG var 27 rader, MÅLEN 18, landslagens översikt 19 – delas i sidor,
-    // 'oversikt' och 'oversikt/2', och sidorna står i strecket under
-    // flikraden (sidRad), den valda omvänd, så att ingen rad går åt och inget
-    // flyttar sig. En flik med en sida har strecket som förut. delar är
+    // 'oversikt' och 'oversikt/2', och sidorna står på raden under flikraden
+    // (sidRad) som radioknappar, så att ingen rad går åt och inget flyttar
+    // sig. En flik med en sida har en tom rad där. delar är
     // flikarna [[id, namn]], sid en fliks sidor { id: [[id, namn] …] } och
     // finns(id) om en sida har något att visa. Ger den valda sidan (val, en
     // annan sida i samma flik eller fliken när del inte finns, annars
@@ -1986,21 +1991,16 @@ window.RumRegister = (() => {
       const topp = i(t0).length ? t0 : 'oversikt';
       const l = i(topp);
       const val = l.some(([id]) => id === del) ? del : l.length ? l[0][0] : 'oversikt';
-      return { val, topp, har: (id) => i(id).length > 0, ordning: delar.flatMap(([id]) => i(id).map(([x]) => x)), rad: l.length > 1 ? sidRad(l, val) : streck() };
+      return { val, topp, har: (id) => i(id).length > 0, ordning: delar.flatMap(([id]) => i(id).map(([x]) => x)), rad: l.length > 1 ? sidRad(l, val) : tom() };
     }
-    // strecket under flikraden med flikens sidor: ─── TALEN ─── MATCH FÖR MATCH ───
-    // (det sista strecket lite för långt och avklippt vid kanten, klassen
-    // sid, så att det slutar där strecket över hela raden slutar)
+    // flikens sidor som radioknappar under flikraden, den valda ljus:
+    // (•) HEMMA OCH BORTA   ( ) ALLA MATCHER – 38 tecken, ryms i telefonen
+    // (till 2026-11-17 stod sidorna i ett streck, den valda omvänd)
     function sidRad(l, val) {
-      const b = [['   ', 'ln'], [' ', '']];
-      let n = 4;
-      l.forEach(([id, namn], j) => {
-        b.push([namn, id === val ? 'i' : '', id === val ? null : `#del:${id}`], [' ', '']);
-        n += namn.length + 1;
-        if (j < l.length - 1) { b.push(['   ', 'ln'], [' ', '']); n += 4; }
-      });
-      b.push([' '.repeat(Math.max(1, A.bred - n + 2)), 'ln']);
-      return Object.assign(rad(...b), { kl: 'sid' });
+      return Object.assign(rad(...l.flatMap(([id, namn], j) => [
+        id === val ? [`(•) ${namn}`, 'v'] : [`( ) ${namn}`, '', `#del:${id}`],
+        [j < l.length - 1 ? '   ' : '', ''],
+      ])), { kl: 'sid' });
     }
     // Avsnittets rubrik i en flik, med en tom rad före (inte överst) – utom
     // när rubriken säger samma sak som fliken (ODDSEN under ODDSEN): då
@@ -2013,9 +2013,9 @@ window.RumRegister = (() => {
     };
     // Kortets huvud: namnet och raden under (divisionen, eller laget och
     // positionen) – på en rad på datorn när den ryms, så att flikarna under
-    // får plats på skärmen; sedan flikarna och ett streck (slut: strecket
-    // med flikens sidor, sidRad)
-    function huvud(namn, under, flikar, slut = streck()) {
+    // får plats på skärmen; sedan flikarna (med strecket under, delRad) och
+    // en rad till (slut: flikens sidor, sidRad, eller en tom rad)
+    function huvud(namn, under, flikar, slut = tom()) {
       const n = [...namn, ...under].reduce((s, [t]) => s + t.length, 3);
       return [...(A.bred >= 60 && n <= A.bred ? [rad(...namn, ['   ', ''], ...under)] : [rad(...namn), rad(...under)]), flikar, slut];
     }
@@ -2390,7 +2390,7 @@ window.RumRegister = (() => {
       const namn = [[up(t.lag), 'v'], [t.en && t.en !== t.lag ? `  ${up(t.en)}` : '', 'd']];
       const under = [[`${t.grupp ? `NATIONS LEAGUE · GRUPP ${t.grupp}` : 'LANDSLAG'}`, 'd', '#div:nl']];
       // (ett landslag utanför Nations League har bara översikten och ingen flikrad)
-      R.huvud = t.comp === 'nl' ? huvud(namn, under, delRad(LAGDELAR, s.topp, s.har), s.rad) : [rad(...namn), rad(...under), s.rad];
+      R.huvud = t.comp === 'nl' ? huvud(namn, under, delRad(LAGDELAR, s.topp, s.har), s.rad) : [rad(...namn), rad(...under), s.rad.length ? s.rad : streck()];
       if (val === 'truppen') return truppen(t, S, lagTal(t, S, 'truppen'));
       const dold = (x) => Boolean(window.Spoiler && Spoiler.hidesDay(x.datum) && (!Spoiler.hiddenId || Spoiler.hiddenId(x.id) !== false));
       if (val === 'oversikt/2') {
@@ -2934,14 +2934,18 @@ window.RumRegister = (() => {
     }
 
     // (huvud: det som står still under menyraden i ett kort – namnet och
-    // flikarna; delar: kortets flikar som har något, del: den valda)
+    // flikarna; delar: kortets flikar som har något, del: den valda.)
+    // Menyraden är en list över hela bredden som tangentraden längst ner,
+    // med den valda mörk i det ljusa och en tom rad under (klassen meny;
+    // sedan 2026-11-17, användarens val B "DOS-programmet" – till dess var
+    // den valda omvänd och ett streck stod under raden).
     function bygg(vy) {
       const S = slojan();
       const R = { nr: {}, sido: null, slojas: false, huvud: null, delar: null, del: null };
       const aktiv = vy.flik === 'sok' ? (A.fore || {}).flik : vy.flik;
-      const meny = rad(...FLIKAR.flatMap(([id, namn], j) => [[namn, aktiv === id ? 'i' : '', `#flik:${id}`], [j < FLIKAR.length - 1 ? '   ' : '', '']]));
+      const meny = Object.assign(rad(...FLIKAR.flatMap(([id, namn], j) => [[namn, aktiv === id ? 'i' : '', `#flik:${id}`], [j < FLIKAR.length - 1 ? '   ' : '', '']])), { kl: 'meny' });
       R.ut = vy.flik === 'sok' ? traffLista(vy, R) : vyRader(vy, S, R);
-      R.topp = [meny, streck(), ...(R.huvud || [])];
+      R.topp = [meny, tom(), ...(R.huvud || [])];
       R.veil = S;
       return R;
     }

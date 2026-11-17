@@ -8210,9 +8210,19 @@ matcherna), matchakten fick lagkortens siffror, och sökningen svarar medan man 
 och matchakten fick lagets plats i divisionen efter varje tal, så att det topplistan visade
 finns kvar där.
 
-Överst står menyraden, som alltid står still: *KUPONGEN* och *REGISTRET*, med den valda fliken
-omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvända
-över hela bredden; det mellan dem rullar.
+Överst står menyraden, som alltid står still: *KUPONGEN* och *REGISTRET* i en ljus list över
+hela bredden, med den valda fliken mörk i det ljusa. Längst ner står sökraden (*SÖK >*) och
+under den tangenterna, omvända över hela bredden; det mellan dem rullar.
+
+Sedan 2026-11-17 ser menyerna ut som i ett DOS-program: listen överst som tangentraden längst
+ner, kortets valda flik som en mapp man ser in i (en ram runt fliken, öppen nedåt där strecket
+under flikraden tar slut) och flikens sidor som radioknappar, *(•) HEMMA OCH BORTA   ( ) ALLA
+MATCHER*. Till dess var den valda menyn, fliken och sidan omvända block i en trappa. Användaren
+frågade hur menyn kunde bli bättre och fick tre skisser av markeringen (A Strecket som sajtens
+flikar, B DOS-programmet, C Hakparenteser) och fyra av placeringen (mittaxeln, ett träd i
+vänsterkanten, menyn nere i tangentraden, hörnen). Menyn i tangentraden låg ute en stund men
+blev inte bättre, och hen valde B. Skärmen i rummet ritar listen och mappen likadant
+(`rum-dator.js`), så att inget byter utseende när terminalen tar över.
 
 - **Kupongen** – omgångens matcher numrerade, bara lagen, med divisionen eller cupen där
   raden ryms och avsparken. Avsparken står bara där den skiljer sig från raden ovanför, som i

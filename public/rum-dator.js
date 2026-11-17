@@ -588,9 +588,36 @@ export async function dator(o) {
           g.fillRect(x, y + lh / 2 - 1, L.hoger - x, 2);
           return;
         }
+        // DOS-programmet (rum-register.js, klasserna meny och flik): menyraden
+        // är en ljus list över hela skärmen med den valda mörk, och den valda
+        // fliken en mapp – en ram öppen nedåt mot strecket under flikraden
+        const meny = rad.kl === 'meny';
+        const flik = rad.kl === 'flik';
+        const tjock = Math.max(2, 0.09 * f);
+        if (meny) {
+          g.fillStyle = FARG[''];
+          g.fillRect(0, y - 2, c.width, lh);
+        }
+        if (flik) {
+          g.fillStyle = FARG[''];
+          g.fillRect(x, y - 2 + lh - tjock, L.hoger - x, tjock);
+        }
         for (const [t, k] of rad) {
           const w = cw * t.length;
-          if (k === 'i') {
+          if (k === 'i' && meny) {
+            g.fillStyle = FARG.bak;
+            g.fillRect(x - 6 * k34, y - 2, w + 12 * k34, lh);
+          } else if (k === 'i' && flik) {
+            const x0 = x - 0.75 * cw;
+            const x1 = x + w + 0.75 * cw;
+            const y0 = y - 2 - 0.06 * f;
+            g.fillStyle = FARG.bak;
+            g.fillRect(x0, y0, x1 - x0, y - 2 + lh - y0);
+            g.fillStyle = FARG[''];
+            g.fillRect(x0, y0, x1 - x0, tjock);
+            g.fillRect(x0, y0, tjock, y - 2 + lh - y0);
+            g.fillRect(x1 - tjock, y0, tjock, y - 2 + lh - y0);
+          } else if (k === 'i') {
             g.fillStyle = FARG[''];
             g.fillRect(x - 6 * k34, y - 2, w + 12 * k34, lh);
           } else if (k && k.startsWith('st')) {
@@ -610,8 +637,10 @@ export async function dator(o) {
             g.fillStyle = FARG.d;
             g.fillRect(x, y + lh / 2 - 1, w, 2);
           }
-          g.fillStyle = FARG[k || ''];
-          g.shadowColor = k === 'i' ? 'transparent' : 'rgba(65,255,110,.55)';
+          // (i listen: mörk text, den valda ljus; den valda fliken ljus)
+          const ljus = k === 'i' && (meny || flik);
+          g.fillStyle = ljus ? FARG.v : meny ? FARG.i : FARG[k || ''];
+          g.shadowColor = !ljus && (k === 'i' || meny) ? 'transparent' : 'rgba(65,255,110,.55)';
           g.shadowBlur = 8 * k34;
           g.fillText(t, x, y);
           x += w;

@@ -69,8 +69,18 @@
 /* streck över hela bredden */
 .reg-term .tr.hr { position: relative; }
 .reg-term .tr.hr::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 0.09em solid #1c9c3d; }
-/* strecket med flikens sidor (sidRad): det sista strecket klipps vid kanten */
+/* flikens sidor som radioknappar (sidRad) */
 .reg-term .tr.sid { white-space: pre; overflow-x: clip; }
+/* DOS-programmet (sedan 2026-11-17, bygg och delRad i rum-register.js):
+   menyraden är en list över hela bredden som tangentraden, den valda mörk i
+   det ljusa; den valda fliken är en mapp – en ram öppen nedåt, där strecket
+   under flikraden tar slut */
+.reg-term .tr.meny { margin: 0 -1.2em; padding: 0 1.2em; background: var(--gron); color: #010702; text-shadow: none; }
+.reg-term .tr.meny .a:hover { background: rgba(1, 7, 2, 0.16); }
+.reg-term .tr.meny .i, .reg-term .tr.meny .a.i:hover { background: #020a04; color: #c9ffd7; text-shadow: 0 0 0.3em rgba(65, 255, 110, 0.5); }
+.reg-term .tr.flik { background: linear-gradient(var(--gron), var(--gron)) left bottom / 100% 0.09em no-repeat; }
+.reg-term .tr.flik .i { position: relative; z-index: 0; margin: 0; padding: 0; background: none; color: #c9ffd7; text-shadow: 0 0 0.3em rgba(65, 255, 110, 0.5); }
+.reg-term .tr.flik .i::before { content: ''; position: absolute; z-index: -1; left: -0.75ch; right: -0.75ch; top: -0.1em; bottom: -0.12em; border: 0.09em solid var(--gron); border-bottom: 0; background: #020a04; }
 /* kupongens avdelningar: ett tunt streck ovanför den första raden (utan en
    egen rad, så att allt ryms på skärmen), och i telefonen tävlingen som
    rubrik med ett streck efter; registrets tabeller har strecket där zonen
@@ -147,6 +157,10 @@
    och trycka. */
 .rum-regn.tel .reg-term { --svag: #2bb956; border-radius: 0; line-height: 1.25; }
 .rum-regn.tel .reg-term .tr { min-height: 1.25em; }
+/* (listen når kanterna med telefonens mindre luft, och mappens ram når
+   strecket med de glesare raderna) */
+.rum-regn.tel .reg-term .tr.meny { margin: 0 -0.6em; padding: 0 0.6em; }
+.rum-regn.tel .reg-term .tr.flik .i::before { top: -0.16em; bottom: -0.185em; }
 .rum-regn.tel .reg-mark { top: 0.15em; }
 .rum-regn.tel.framme .reg-term { padding: 0.7em 0.6em 0.6em; }
 .rum-regn.tel .reg-lin { background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0 1px, rgba(0, 0, 0, 0) 1px 3px); box-shadow: inset 0 1.4em 1.6em -1em rgba(0, 0, 0, 0.75), inset 0 -1.4em 1.6em -1em rgba(0, 0, 0, 0.75); }
