@@ -7227,6 +7227,13 @@ mätta i Chromium som iPhone 13 och Pixel 7 (gammal och ny kod i samma körning,
   300 ms efter att storleken har stannat, bara om vyn eller dukarnas bildpunkter har ändrats (`sig`, med
   bildpunkterna i steg om en åttondel): 13 ombyggen och högst 1 500 MB i samma prov (i emuleringen tar varje
   resize så lång tid att de inte hinner slås ihop helt; i en telefon blir det ett).
+- **När dukminnet ändå tar slut (samma dag, "så att det flyter bättre o det kraschar mindre på mobiltelefoner"):**
+  då ger `getContext` null, och fasaden kastade ett fel när den byggdes: den stod som en fast bild och gick inte att
+  klicka bort, så att man satt fast ute tills sidan laddades om. Nu står en duk utan minne still och resten rör sig
+  (`R.fram` och pyntets dukar prövas), ett fel när scenen byggs fångas i `bygg` så att klicket och Esc
+  ändå kommer på plats, och nästa bildruta beställs innan den här ritas, så att ett fel i en bild inte stoppar allt som
+  rör sig för gott. Prövat i Chromium som Pixel 7 med fasadens dukar utan minne: förut ett fel, molnen stilla och
+  ingen väg in; nu inga fel, molnen rör sig och ett klick tar en in igen.
 
 Det som syns är detsamma: gänget i fönstret, övergångarna in och ut och rummet när man kommer tillbaka.
 

@@ -3259,6 +3259,9 @@ window.RumFasad = (() => {
         duk('rf-fram', V, px);
       F.glasR = { x: r1(glasX * sk), y: r1(glasY * sk), w: r1(FON.w * sk), h: r1(FON.h * sk) };
       placera();
+      // (getContext ger null när telefonen inte har mer minne till dukar: då står det som skulle ha ritats
+      // där still och resten rör sig ändå – förut kastade det ett fel, och fasaden stod som en fast bild eller
+      // gick inte att klicka bort)
       R.fram = scen.querySelector('.rf-fram').getContext('2d');
       R.bak = himlen ? scen.querySelector('.rf-bak').getContext('2d') : null;
       R.barber = barberR ? scen.querySelector('.rf-barber').getContext('2d') : null;
@@ -3287,7 +3290,11 @@ window.RumFasad = (() => {
     function pynt(bilder) {
       const dukar = scen.querySelectorAll('.rf-pynt');
       let j = 0;
-      for (const bild of bilder) if (bild && dukar[j]) dukar[j++].getContext('2d').drawImage(bild, 0, 0);
+      for (const bild of bilder) {
+        if (!bild || !dukar[j]) continue;
+        const g = dukar[j++].getContext('2d');
+        if (g) g.drawImage(bild, 0, 0);
+      }
     }
     // Gängets duk i skyltfönstret (glas i rum.js): rummet lånar ut den medan det inte syns, och den står där
     // gänget syns genom glaset, bakom neonen och glaset. Förut ritades glaset i rummets duk och kopierades
@@ -3362,7 +3369,7 @@ window.RumFasad = (() => {
       const ms = performance.now();
       const t = o.still != null ? o.still : ms / 1000;
       const dags = (sist, fps) => nu || ms - (sist || 0) >= 1000 / fps - 4;
-      if (dags(R.sFram, R.fortGata ? TAKT_GATA : TAKT)) {
+      if (R.fram && dags(R.sFram, R.fortGata ? TAKT_GATA : TAKT)) {
         R.sFram = ms;
         ritaFram(R, t);
       }
@@ -3386,6 +3393,8 @@ window.RumFasad = (() => {
       if (calm() || o.still != null) return;
       const tick = (ms) => {
         if (!el.isConnected) return;
+        // (nästa bildruta först: ett fel i en bild får inte stoppa allt som rör sig för gott)
+        F.raf = requestAnimationFrame(tick);
         // (F.sist: bildrutan som gänget ritades efter)
         if (!F.vantar && gangDags(ms)) {
           F.sist = ms;
@@ -3393,7 +3402,6 @@ window.RumFasad = (() => {
           efter.port2.postMessage(0);
         }
         rorelse();
-        F.raf = requestAnimationFrame(tick);
       };
       F.raf = requestAnimationFrame(tick);
     }
@@ -3411,7 +3419,13 @@ window.RumFasad = (() => {
       storlekT = setTimeout(() => { if (el.isConnected) rita(); }, 300);
     };
     addEventListener('resize', storlek);
-    rita();
+    // (ett fel när scenen byggs får inte lämna kvar en fasad som inte går att klicka bort: rum.js sätter
+    // klicket och Esc först när bygg har kommit tillbaka)
+    try {
+      rita();
+    } catch (err) {
+      console.error(err);
+    }
     loop();
     return {
       el,
