@@ -1403,6 +1403,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   balkar, Renaults romb, Citroëns vinklar, Ladas skepp, Jeep och Chryslers stjärna), och på några också på karossen:
   SAAB bakom framhjulet på 900:an, CHEROKEE på jeepens framdörr, Bel Air på amerikanarens bakskärm och stjärnan på
   Mercedesarnas huv. Se *Märket på bilarna* under [Fasaden](#fasaden).
+- **Fasaden: ljuset på dem som går och bilarnas strålkastare (2026-11-17, användarens önskemål):** "Kan du göra den
+  här vyn bara allmänt bättre", med en bild av fasaden en kväll, och "Tänk på att det måste funka på en sämre
+  mobiltelefon". Två saker gjorde kvällen platt: de som gick förbi hade en ljus kontur runt hela kroppen, också runt
+  benen och skorna, som klistermärken, och bilarnas strålkastare lade en grå kil med raka kanter över trottoaren, dem
+  som gick och bilen framför, också i klar luft. Nu lyser kanten bara där det lyser bakom figuren (skyltfönstret upp till
+  fönsterbänken, dörrens glas, och lyktorna på huvudet och axlarna), benen är ett steg mörkare framför den mörka
+  bröstningen, ljuset på gatan är en mjuk fläck och strålen syns bara i regn, snö och dimma, som ett mjukt sken.
+  Inga nya lager och lika många ritanrop. Se *Ljuset på dem som går och bilarnas strålkastare* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7137,8 +7145,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
   käppen är i den närmre. En ledig hand kan vara i fickan, ibland bara den ena (`st.ficka`: F, B eller båda), också
   när den andra bär påsen eller paraplyet. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
-  och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
-  framför fönstret (`randLjus`), och speglas svagt i den våta stenen; kläderna behåller en fjärdedel av sin färg
+  och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten där något lyser bakom dem, starkast
+  framför fönstret (`randLjus`, och var på figuren i `kantRuta`, se *Ljuset på dem som går* nedan), och speglas svagt i
+  den våta stenen; kläderna behåller en fjärdedel av sin färg
   (`NATTF`, `klarL`), så att en röd dunjacka går att skilja från en svart kappa. Där det är mörkt är de lika mörka som mörkret
   omkring (`morkSteg`: fyra steg av samma färger, `MORK`, som räknas ut en gång per figur i `morkna`); förut var en ljus
   rock i mörkret ljusare än väggen bakom, som kvällens mask mörkar, och såg genomskinlig ut, som ett spöke. De går som folk (`gangen`, `stalln`): foten som
@@ -7203,7 +7212,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   som de som går på skärmen, så att en bil syns i fyra–fem sekunder (se *Bilarna kör ute på gatan, och som bilar*
   nedan). Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 18 % på dagen och
   40 % i rusningen), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
-  bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
+  bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför
+  (en mjuk fläck, och strålen bara i regn, snö och dimma; se *Bilarnas strålkastare* nedan),
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
   regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
   när det har snöat. Allt räknas ur tiden: den delas i luckor om tolv sekunder per fil och i varje lucka kommer ett
@@ -7250,6 +7260,33 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   dyrare att rita (mätt i Chromium utan grafikkort), som bild syns ingen skillnad i samma mätning. Provat i bilder av
   alla former på nära håll och i fasaden på dagen och på kvällen i datorn; inte i en riktig telefon, där märket i navet
   blir ungefär tjugo bildpunkter brett.
+- **Ljuset på dem som går och bilarnas strålkastare (2026-11-17, användarens önskemål):** "Kan du göra den här vyn bara
+  allmänt bättre", med en bild av fasaden en kväll i november, och "Tänk på att det måste funka på en sämre
+  mobiltelefon t ex så att inte grafiken blir för avancerad". Två saker gjorde kvällen platt, och båda är rättade
+  utan nya lager och med lika många ritanrop:
+  - **Kantljuset låg runt hela figuren.** Det ritas som figurens kontur i ljust (`#ffc98a`) under figuren, och låg
+    förut lika brett runt allt: huvudet, kappans nederkant, benen framför den mörka bröstningen och skorna, så att de
+    som gick såg ut som klistermärken med en ljus kant. Nu klipps det till där ljuset faktiskt är bakom (`kantRuta` i
+    `ritaFigur`, i världens mått): skyltfönstrets och dörrens glas, så att kanten slutar vid fönsterbänken och syns
+    där figuren står mot glaset, och under lyktan vid porten och gatlyktan på bron (`underLykta`) bara en remsa från
+    axlarna och uppåt, där ljuset uppifrån fångas på mössan, håret, axlarna och paraplyet. Hur starkt följer
+    `randLjus` som förut. En klippning per figur som har kantljus, inget mer att rita.
+  - **Benen ett steg mörkare på kvällen** (`benSteg`, `zBen` i `ritaDelar`): skyltfönstrets ljus är bakom
+    överkroppen, men under fönsterbänken är bröstningen mörk och lyktorna lyser uppifrån, så benen, skorna, hunden och
+    det på marken (grupperna i `NERE`, och benen hos den som står och tittar in, `nere` i `bakDelar`) tar nästa av de
+    fyra mörkerstegen (`MORK`) när det är kväll. Förut var ett par ljusa byxor framför fönstret det ljusaste på
+    figuren. Framför dörren, vars glas går nästan ned till stenen, är benen som resten. Färgerna fanns redan (`morkna`).
+  - **Bilarnas strålkastare** (`lyktor` i rum-fasad-gatan.js): ljuset på gatan framför var en ellips med skarpa kanter
+    och strålen en kil med raka kanter från lyktan och 4,5 m fram, med `lighter`, också i klar luft. Kilen lade ett
+    grått sken över trottoaren, dem som gick och bilen framför. Nu är ljuset på gatan en fläck som tonar ut åt alla håll
+    (en radiell toning i en tillplattad ruta), starkast ett par meter framför bilen, och strålen syns bara när något i
+    luften fångar den (`S.luft`: regn och snö efter mängden, och dimma), som ett mjukt sken som är starkast vid
+    lyktan och lutar lite nedåt. Strimmorna av lyktornas ljus i den våta gatan smalnar av nedåt i stället för att vara
+    raka band. I klar luft ritas en fyllning mindre per bil än förut, i regn lika många.
+
+  Dagen är som förut (samma bild bildpunkt för bildpunkt). Provat i bilder i Chromium med mjukvarugrafik som dator
+  (1910 × 920) på dagen, en mulen kväll och en regnig kväll, och som telefon (390 × 844) en regnig kväll; inte i en
+  riktig telefon.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
