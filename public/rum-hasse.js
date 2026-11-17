@@ -1176,12 +1176,12 @@ window.RumHasse = (() => {
   //
   // DL:s lag (2026-11-16: "lägg in en flagga som tillhör Nacional där nere på Hasse Backes vägg. Det får sannolikt
   // inte plats helt - men delvis", "På ett snyggt och patinasätt"): en gammal flagga, blekt och gulnad av röken, med
-  // veck där den har legat hopvikt, som hänger i märlorna i mässingskrokarna i de två fälten till höger om löpsedeln
-  // (SCEN.FLAGGA) och går ut ur bilden till höger. Bilden (scripts/hasse/flagga.mjs) är tyget i neutralt ljus, med
-  // vecken, krokarna och skuggan på fronten, och lika oskarp som väggen. Den läggs på väggens duk när den ritas
-  // (vagg), genom hans kamera (flaggan i rum-hasse-3d.js, exakt i perspektiv bildpunkt för bildpunkt), i det ljus
-  // som faller på fronten där: läst ur väggen före flaggan och tonat som bakningen (aces efter 0,7 gånger ljuset),
-  // som löpsedeln (lopLjus). Så hör den till väggen: inget eget lager, röken ligger över den och disken speglar den.
+  // veck där den har legat hopvikt, 150 × 90 cm ("De brukar ju vara stora"), fäst under bardiskens skiva till höger
+  // om löpsedeln och ut över krokarna (SCEN.FLAGGA), och ut ur bilden till höger. Bilden (scripts/hasse/flagga.mjs)
+  // är tyget i neutralt ljus, med vecken, krokarna under och skuggan på fronten, och lika oskarp som väggen; det som
+  // skivan skymmer är genomskinligt. Den läggs på väggens duk när den ritas (vagg), genom hans kamera (flaggan i
+  // rum-hasse-3d.js, exakt i perspektiv bildpunkt för bildpunkt), i det ljus som faller på fronten där: läst ur
+  // väggen före flaggan och tonat som bakningen (aces efter 0,7 gånger ljuset), som löpsedeln (lopLjus). Så hör den till väggen: inget eget lager, röken ligger över den och disken speglar den.
   // FLAGG_DAMPA: som löpsedeln ska den inte ta uppmärksamheten, och tyget är ljusare än mahognyn runt om.
   const FLAGG_DAMPA = [0.4, 0.37, 0.32];
   const acesUt = (x) => (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14);
