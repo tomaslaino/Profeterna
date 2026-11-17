@@ -1390,6 +1390,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Nu går de med fasadens gång (samma sätt att gå och samma ställning i varje bild), med käpp, joggande, försiktigt på
   halkan och springande i regnet som framför affären. Se *Folk och trafik* under *Utsikten och vädret* i
   [Tobaksaffären](#tobaksaffären).
+- **Var och en känns igen på gången (2026-11-17, användarens önskemål):** "Kan du göra så att personerna som går här
+  går på många olika (naturliga) sätt - där är ofta det som distinguerar en person." Sätten skilde sig mest i
+  steglängd och takt, så de flesta såg ut att gå likadant. Nu har var och en sina egna drag: huvudets hållning
+  (framskjutet, böjt eller med hakan upp), var armarna hänger, hur böjda de är och hur långt de svänger (ofta svänger den
+  ena mindre än den andra), hur hälen sätts i, hur högt foten lyfts, gunget och hur mycket överkroppen gungar med
+  stegen. Och nya sätt som skiljer sig i själva rörelsen: haltar (kortare tid på det onda benet, ett kort och snabbt
+  steg med det goda, och kroppen sjunker och nickar en gång per varv), hasar, kliver, stram, vaggar, fryser (axlarna
+  upp och huvudet nere i kragen), händerna på ryggen (en del äldre som strosar), powerwalk (morgon och kväll, ofta två
+  och två) och vinglar hem från krogen sent fredag och lördag. Gatan inifrån går på samma sätt. Se *Det som händer ute*
+  under [Fasaden](#fasaden).
 - **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
   som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
   långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
@@ -1403,6 +1413,18 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   balkar, Renaults romb, Citroëns vinklar, Ladas skepp, Jeep och Chryslers stjärna), och på några också på karossen:
   SAAB bakom framhjulet på 900:an, CHEROKEE på jeepens framdörr, Bel Air på amerikanarens bakskärm och stjärnan på
   Mercedesarnas huv. Se *Märket på bilarna* under [Fasaden](#fasaden).
+- **Fler som går förbi, barnfamiljer och hundar, och kläderna varierar mer (2026-11-17, användarens önskemål):** "Kan du
+  lägga till fler personer i den här vyn - kanske också med barn ibland och hundar osv" och "Jag vill också att kläderna
+  ska variera mer - mössor, halsdukar etc". En kväll 20.30 syns i snitt 2,6 framför affären i stället för 1,5 (tom
+  trottoar 6 % av tiden i stället för 25 %), mitt på dagen ungefär dubbelt så många som förut. Nya sällskap: familjen
+  (två vuxna, barnet i handen, ibland ett större barn i förväg och ibland hunden) och skolbarn med ryggsäckar; barnen
+  syns till halv nio och oftare på lediga dagar, hundarna oftare och mest på kvällspromenaden, ibland med ett par, och
+  två nya raser (dalmatinern och cockerspanieln) och golden. Mössorna: randiga, tofsen i en egen färg, slak, kort
+  sjömansmössa, jokkmokksmössa med snören, öronmuffar, stickat pannband, luvtröjans luva, rånarluva på barnen och
+  pälsmössa; halsdukarna knutna fram, slängda bakåt, med båda ändarna fram eller lindade tjockt, randiga eller rutiga
+  och ibland i samma set som mössan och vantarna; dunjackor i två färger och pälskant på luvan. Förut var det glesare
+  på kvällen efter användarens önskemål samma vecka (*Fler sorters människor, och glest på kvällen*); nu är det
+  mittemellan. Se *Det som händer ute* under [Fasaden](#fasaden).
 - **Fasaden: ljuset på dem som går och bilarnas strålkastare (2026-11-17, användarens önskemål):** "Kan du göra den
   här vyn bara allmänt bättre", med en bild av fasaden en kväll, och "Tänk på att det måste funka på en sämre
   mobiltelefon". Två saker gjorde kvällen platt: de som gick förbi hade en ljus kontur runt hela kroppen, också runt
@@ -2694,8 +2716,11 @@ de flesta körningar har inget att göra och anropar inte Claude.
   kan ha kvar fler starttider; de gör inget, eftersom skriptet går efter `tider`. Varje
   tid skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten ersätter den
   gamla, så hela omgången ger upp till 26 analyser i veckan. En tid gäller omgångar som fanns när klockan
-  slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
-  det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
+  slog. En match utan analys skrivs så snart omgången finns, vid nästa kontroll, också när omgången kommer
+  efter måndagens tid (användarens önskan 2026-11-17, när Stryktipset 4980 kom först sent måndag kväll och
+  Hasse Backe fick vänta till fredag); kommer en tid inom tre timmar (`vantaTimmar`) och börjar matchen efter
+  den, väntar den på tiden, så att den inte skrivs två gånger i rad. Har matcherna ändrats skrivs de nya vid
+  nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Tidningen inför omgången** så snart omgången finns och en gång till fredag 16.00, med det
   supporterpoddarna, supporterforumen och de insatta medierna har gett sedan dess (se nedan; användarens
@@ -6997,11 +7022,13 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
   snö, och morgon och kväll någon som joggar. Sedan 2026-11-17 går de som framför affären (se *Det som händer ute*
-  under [Fasaden](#fasaden)): samma sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, på
-  halkan, med käpp och springer) och samma ställning i varje bild ur fasadens gång (`RumFasad.gang`: `stalln`), så att
-  foten i marken står still mot stenen, höften gungar, knät böjs, armarna pendlar emot benen och överkroppen lutar;
-  den äldre går ibland med käpp, den unga släntrar ibland, den som blir blöt skyndar sig eller springer, och på halkan
-  går de flesta försiktigt. Figuren ritas i centimeter med fasadens huvud och hår och förminskas till gatan (`folk`,
+  under [Fasaden](#fasaden)): samma sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, hasar,
+  kliver, stram, fryser, haltar, på halkan, med käpp och springer; `RumFasad.gang.GSTIL` efter vem) och samma ställning i
+  varje bild ur fasadens gång (`RumFasad.gang`: `stalln`), så att foten i marken står still mot stenen, höften gungar,
+  knät böjs, armarna pendlar emot benen och överkroppen lutar; den äldre går ibland med käpp eller med händerna på
+  ryggen, den unga släntrar ibland, i kylan fryser en del, en och annan haltar (båda benens varv följer med ur
+  `TABELL`), den som blir blöt skyndar sig eller springer, och på halkan går de flesta försiktigt. Huvudets hållning
+  syns inte i gatans storlek och ritas bara framför affären. Figuren ritas i centimeter med fasadens huvud och hår och förminskas till gatan (`folk`,
   `CMG` px per cm), och delarnas grupper (`g-…`) får sina vinklar ur ställningen (`gangLas`); farten är steglängden
   gånger takten. Gångcykeln räknas en gång per sätt att gå (`TABELL`): i gatans storlek syns inte det som skiljer var
   och en i benen, och den tog ungefär 10 ms per figur i en långsam telefon. Med fyra gånger så långsam processor
@@ -7107,19 +7134,32 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   regnet slår ned blir det stänk – en ring som vidgas och en liten krona – på stenen, fönsterbänkens bleck och skyltens
   tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
   inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
-- **Det som händer ute:** de som går förbi på trottoaren framför affären, ungefär lika många som på gatan inifrån
-  (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
-  (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
-  barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
+- **Det som händer ute:** de som går förbi på trottoaren framför affären, fler än på gatan inifrån (`folket`:
+  `RumUte.trafik` plus ett sällskap utom på natten, gånger 1,45 och 1,05 i telefonen; färre i regn och snöyra och
+  glest på kvällen, högst tolv sällskap och sju i telefonen; en kväll 20.30 i snitt 2,6 i bild och mitt på dagen
+  ungefär 8), ensamma eller i sällskap
+  (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply, ibland med hunden), ett gäng, en
+  förälder med ett barn i handen, en familj (`familj`: två vuxna och barnet i handen, ibland ett större barn som studsar
+  i förväg och ibland hunden; barnen till halv nio och oftare på lediga dagar), skolbarn i sällskap med ryggsäckar
+  (`skolbarn`: vardagar till skolan och hem, och på lediga dagar), barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
   tidningen i regnet, någon som joggar morgon och kväll (`joggare`: myskläder i färgblock eller shorts och t-shirt,
-  gympadojor, pannband och ibland en gul sportfreestyle) och hundar (labrador, schäfer, tax, terrier och pudel,
-  `HUNDAR`; de små i täcke när det regnar).
+  gympadojor, pannband och ibland en gul sportfreestyle), de som powerwalkar i samma kläder morgon och kväll och på
+  helgens förmiddag, ofta två och två (`power`), någon som vinglar hem från krogen sent fredag och lördag, ibland med en
+  kompis som går rakt (`hemvag`), och hundar (labrador, också som golden, schäfer, tax, terrier, pudel, dalmatiner med
+  prickar och cockerspaniel med långa öron, `HUNDAR`; de små i täcke när det regnar; oftast på kvällspromenaden
+  19–22.30).
   Det är 90-tal och kläderna är efter vädret (`klad`, `F90`, `vadret`): vindjackor och myskläder i färgblock, dunjackor
   med stickningar, skinnjackor, bomberjackor, jeansjackor, fältjackor, trenchcoats, kappor och kavajer, vida jeans,
   kjolar, bakvända kepsar, fiskarhattar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar, portföljer
   och mobiltelefon med antenn; i regn paraply (som vinden ibland vänder ut och in), regnrock med luva eller sydväst,
-  gummistövlar och regnskydd på barnvagnen, i kyla mössa (ibland med tofs eller öronlappar), sjalett, halsduk, vantar
-  (ibland lovikka) och kängor, och i värme t-shirt, shorts med vita sockor, solglasögon, keps och glass. Barnen har större
+  gummistövlar och regnskydd på barnvagnen, i kyla mössa, sjalett, halsduk, vantar (ibland lovikka) och kängor. Mössan
+  i kylan (`vinterHatt`, sedan 2026-11-17) är stickad med uppvikt kant, ibland med en eller två ränder i en annan färg och
+  tofsen i en egen färg (`mRand`, `tofsF`), eller slak och slokar bakåt, en kort sjömansmössa högt på huvudet (`docker`),
+  jokkmokksmössan med öronlappar och snören, öronmuffar, ett stickat pannband ner över öronen, luvtröjans luva under
+  jackan, rånarluva på barnen och pälsmössa med platt topp (de äldre, och i sträng kyla); halsduken (`hForm`) är knuten
+  med en ände fram, slängd bakåt över axeln, med båda ändarna fram eller lindad tjockt, ibland randig med fransar
+  (`hRand`) eller rutig (`hRutor`), och ibland i samma färg och ränder som mössan och vantarna. Dunjackan är ibland i två
+  färger (`duo`) och dun- och fältjackan har ibland pälskant på luvan bak på axlarna (`pals`). och i värme t-shirt, shorts med vita sockor, solglasögon, keps och glass. Barnen har större
   huvud, och i regnet galonställ och stövlar. Var och en har sin längd (`o.h`, kvinnor och äldre lite kortare i snitt)
   och byggnad (`BYGG`, `o.bred`: överkroppen dras ut på bredden i `bredda`, benen lite med, och de runda har mage), en
   del äldre går framåtböjda, och fler frisyrer (knut, afro) och hattar (sixpence, basker). Paraplyerna är vanliga,
@@ -7139,7 +7179,7 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   ärmkant), och magväskan och julklappar i en papperskasse (före jul) finns bland de andra. De ritas med samma sorts
   delar som de andra: i en bromsad provmiljö (headless Chrome, processorn ×4) 650–940 µs per figur och bild mot
   610–1350 för de gamla sorterna, och lika många syns samtidigt som förut. `?rum-fasad-vem=inlines` (eller `rullator`,
-  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `cykel` …) låter alla som går förbi vara sådana,
+  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `familj`, `skolbarn`, `cykel` …) låter alla som går förbi vara sådana,
   för bilder och prov. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
   glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
@@ -7170,11 +7210,27 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   kroppen går förbi och förs fram i en låg båge, och armen böjs i armbågen så att handen håller handtaget; och den som
   springer är i luften mellan stegen (`lop`: höften lägst mitt i steget, när knät tar emot), landar på mitten av foten,
   för låret långt fram och drar tillbaka det innan foten tar i (`drive`) och pumpar med böjda armar (utom den som bär
-  något i handen). Var och en är lite olika inom sitt sätt (steglängd, takt, lutning, armsving, och hur böjda armarna
-  är, hur långt fram de svänger och i vilken takt); farten är steglängden gånger takten, 0,7–1,6 m/s, och 2,8–3,3 m/s
-  för den som springer. Sättet passar den som går (den äldre strosar och ibland med käpp, barnet studsar, den unga
-  släntrar ibland, med kjol trippar en del, den som blir blöt skyndar sig och ibland springer, och i rusningen
-  springer någon till bussen), på halkan (`vadret`: snö på marken kring nollan, eller blött i minusgrader) går de
+  något i handen). Sedan 2026-11-17 också: hasar (släpar fötterna, korta steg med hela foten i marken på en gång och
+  blicken ner), kliver (långa steg i lugn takt och raka armar), stram (rak i ryggen, hakan upp, hälen i först och raka
+  armar långt fram och bak), vaggar (korta steg, bakåtlutad, armarna lite fram och axlarna som gungar), fryser (axlarna
+  uppdragna, `axlar`, och huvudet nere i kragen och framåt, `hned`, `hfram`, händerna i fickorna och korta snabba steg),
+  powerwalk (armarna i rät vinkel som pumpar upp till bröstet, `armar: 'power'`), vinglar (överkroppen svajar i en
+  långsammare takt än stegen och armarna slänger, `svaj`; ställningen räknas därför ur hela sträckan, inte bara var i
+  varvet den är) och haltar (`halta`): benen går olika, så `gangen` räknar ett varv per ben (`st.tab`, och `st.tab2`
+  för det bortre, som börjar `st.fas2` in i varvet). Det onda benet står kortare tid i marken och sträcks inte i knät, det
+  goda sätts i tidigare (ett kort, snabbt steg och ett långt), och höften sjunker och överkroppen och huvudet nickar när
+  det onda tar emot (`ontMitt`); höftens bana går genom fyra punkter i varvet, mitt i varje steg och mellan dem, och
+  blir den vanliga cosinusen när benen går lika. En del äldre som strosar går med händerna på ryggen (`armar: 'rygg'`:
+  armbågarna bakåt och händerna knäppta nedanför ryggen). Var och en har dessutom sina egna drag inom sitt sätt
+  (`gangStil`), det som gör att man känner igen någon på gången: steglängd och takt, gunget, hur hälen sätts i (`hal`)
+  och hur högt foten lyfts, lutningen och hur mycket överkroppen gungar med stegen (`lutGung`), huvudets hållning
+  (`huvud`: böjt eller med hakan upp, `hfram`: framskjutet; de äldre oftare framskjutet), armarna (var de hänger och
+  hur böjda, `armFram`, `armBoj`, hur mycket armbågen böjs när armen svänger fram, `knack`, och ofta svänger den ena
+  mindre än den andra, `armA`), och lite axlar som rullar och ett huvud som nickar. Farten är steglängden gånger
+  takten, 0,7–1,7 m/s, och 2,8–3,3 m/s för den som springer. Sättet passar den som går (den äldre strosar och ibland med
+  käpp, barnet studsar, den unga släntrar och hasar ibland, med kjol trippar en del, den som är rund om magen vaggar
+  ibland, den långa kliver ibland, i kylan fryser en del, en och annan haltar, den som blir blöt skyndar sig och ibland
+  springer, och i rusningen springer någon till bussen), på halkan (`vadret`: snö på marken kring nollan, eller blött i minusgrader) går de
   flesta i ett sällskap försiktigt, utom barnen, och ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
   fyra gånger så långsam processor kostar fler figurer 0,2 ms mer per bild på dagen och 0,5 ms mer i kvällsregn som
   telefon, och ungefär 3 ms mer i kvällsregn i datorn (2026-11-16).
