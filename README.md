@@ -470,9 +470,9 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   och det blir gängets omgång lägger nattjobbet ut nästa nummer inom en kvart, med omslaget och kupongens alla matcher
   i innehållet, också innan något matchblad är skrivet. Bladen fylls i när de kommer. Förut kom numret först med det
   första bladet, och Nr 2 låg kvar fast Stryktipset 4980 hade varit omgång i ett dygn. Nr 3 (Stryktipset 4980,
-  lördag 21 november) lades ut för hand samma dag, med omslaget och innehållet. Att skriva bladen för hand, som i Nr 2,
-  gick inte: miljön nådde inga nyhetssajter, och ändringen av dess nät avvisades (se *Numret kommer med kupongen* under
-  [Helgarderat](#helgarderat))
+  lördag 21 november) lades ut för hand samma dag, först med omslaget och innehållet och samma kväll med tolv
+  handskrivna matchblad ur veckans press ("Du får gärna göra nästa tidning nu"). Wolves–Charlton har inget blad än
+  (se *Nr 3* under [Helgarderat](#helgarderat))
 - [x] **Gänget i bild på tv:n (2026-11-16, användarens önskemål: "när vi pratar i mobiltelefon med varandra, att vi
   har möjlighet att se varandra på TV-apparaten där uppe där text-tv spelas - om vi vill … det ska vara intuitivt och
   snyggt"):** tv:n i hörnet har fått en AV-ingång. Nära tv:n står *Visa dig på tv:n* i foten: kameran tänds och man
@@ -10704,6 +10704,26 @@ fylls i, blad utan `hand` som jobbets eget ersätter, ingen omgång, Nr 2 för s
 Nr 3) och i huvudlös Chromium i 1280 bredd och 390 × 844: omslaget (*Nr 3 · Vecka 47*, *Inför Stryktipset*, 21
 november), innehållet med tretton bleka matcher, `omslag` och `overst` för Hasse Backes tidning och löpsedeln, inga
 fel på sidan. Inte provat i rummet, i Safari eller i en riktig telefon.
+
+**Nr 3, Stryktipset 4980** (2026-11-17, användarens önskemål: "Du får gärna göra nästa tidning nu alltså!"): tolv av
+kupongens tretton matcher har ett matchblad skrivet för hand samma kväll, i samma form som nattjobbets och efter
+redaktörens regler i config/poddar.js (`sidaPrompt`): högst 95 ord per lag, källor från 14–17 november (de sju dagarna
+före matchdagen), varje namn, tal och citat kontrollerat mot artikeln, inga tipsord.
+
+- **Källorna** lästes genom sessionens proxy, eftersom molnmiljön bara nådde några få sajter: Yahoo Sports, som
+  återpublicerar de flesta lokaltidningarna (Chronicle Live, Football.London, Birmingham Live, Wales Online, The
+  Northern Echo, Teesside Live, The Bolton News, Evening Standard, BBC Sport med flera), och lagens egna sajter och
+  supportersajter för Bolton, Portsmouth, Lincoln, Wrexham och Middlesbrough. Lokaltidningarnas egna sajter gick inte
+  att lägga till i miljön (ändringen avvisades två gånger).
+- **Det som saknas:** Wolves–Charlton har inget blad (Wolves artiklar från veckan fanns bara på wolves.co.uk, Express &
+  Star och The False 9), och Ipswich och Watford har ingen text (inget från veckan om Ipswich gick att läsa, och det
+  som fanns om Watford handlade om Javi Gracia, som gick i februari). En intervju med Frank Sinclair ströks från
+  Chelseas blad, eftersom den var gjord för spelbolaget Betano.
+- **Nattjobbet** tar över: bladen har inte `hand`, så ett blad som poddjobbet skriver för samma match ersätter det
+  handskrivna (`poddsidor` i src/analyser/poddar.mjs), och de tre matcherna utan text fylls i när jobbet har något.
+  Sista sidan och löpsedeln skriver nattjobbet själv när det ser omgångens blad ("ny omgång"). Provat med Node (både
+  den nya och den gamla koden låter numret stå och byter ett blad mot jobbets) och i huvudlös Chromium i 1280 bredd och
+  390 × 844 (innehållet med tolv sidnummer, inga fel på sidan).
 
 **Det första numret** (2026-11-10, användarens önskemål: "Jag vill att du gör första numret av Helgarderat nu och
 inte väntar på det") gäller lördagen den 14 november och lades i `data/poddsidor.json` för hand, innan nattjobbet
