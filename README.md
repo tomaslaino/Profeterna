@@ -10028,7 +10028,7 @@ porträtt i var och ens färg och namnet i sin handstil, utan siffror (`gangList
 Den man väljer får sin dom slagen i disken i guld, som domen över en match, och under den några stycken (`doma` och
 `domText`): en inledning efter hur det gick i gänget, det som sticker ut på kupongen med vad han tycker om det, och ett
 slut. Kupongen själv visas inte (2026-11-13). Ordet i guld beskriver personen och läget, och han har ett tiotal för varje
-läge (*Ljummen*, *Stabil* och *Mänsklig* i mitten, *Gynnad* och *Ovan* för den som vann, *Modig* och *Hoppfull* för den
+läge (*Ljummen*, *Stabil* och *Mänsklig* i mitten, *Gynnad* och *Oerfaren* för den som vann, *Modig* och *Hoppfull* för den
 som kom sist). Domarna är lågmält hårda och växlar mellan fem toner: den uttråkade veteranen, magistern med rödpennan,
 den kliniske som bara ser orsak och verkan, den falskt omtänksamme och den självupptagne (2026-11-14: de första var för
 snälla och de andra för direkta). Han väljer efter omgången och personen, så att det är samma ord i disken och i listan och på alla enheter

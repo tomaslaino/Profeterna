@@ -62,6 +62,8 @@ const UNDERKANT = [
   [/\baldrig varit så \S+ som nu\b/i, 'Jag har aldrig varit säkrare.'],
   [/\bgör inga misstag\b/i, 'tippar inte fel'],
   [/\bavskyr det här\b/i, 'Sånt här tål inte spelbolagen.'],
+  // "Vilken match ska vi göra enkel?" (Tomas 2026-11-17: "lite konstigt").
+  [/\bgöra enkel\b/i, 'Vilken match ställer till det för dig?: en match gör man inte enkel'],
 ];
 
 // Korta meningar som Tomas själv har valt eller som har ett verb.
