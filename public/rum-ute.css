@@ -22,10 +22,12 @@
    armarna och hjulen ritas i duken: rorelse i rum-ute.js) */
 .rum-gar, .rum-moln, .rum-fagel { position: absolute; left: 0; animation: rum-gar linear infinite; will-change: transform; }
 .rum-gar { filter: blur(2.6px); }
-.rum-gar.fordon { filter: blur(3px); }
 .rum-moln { filter: blur(9px); }
 .rum-fagel { filter: blur(1.8px); }
 @keyframes rum-gar { from { transform: translateX(var(--fran)); } to { transform: translateX(var(--till)); } }
+
+/* det som går och kör förbi framför affären (framDuk i rum-ute.js): en grov duk över glasen, mjuk när den förstoras */
+.rum-fram { position: absolute; }
 
 /* löven som blåser förbi (och snurrar i duken) */
 .rum-lov { position: absolute; left: 0; top: 0; animation: rum-lov linear infinite; filter: blur(2px); will-change: transform; }
