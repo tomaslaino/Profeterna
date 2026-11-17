@@ -32,7 +32,9 @@ module.exports = {
   // ändras här utan att jobbet installeras om – men bara till de klockslagen.
   // Europatipset (och andra spel än Stryktipset) har inga fasta dagar. För en sådan omgång går jobbet också första
   // natten efter att omgången har startats och igen när det är så här många timmar kvar till första avsparken
-  // (egenTid i src/analyser/tider.mjs; 2026-11-16).
+  // (egenTid i src/analyser/tider.mjs; 2026-11-16). Sedan 2026-11-17 går det för varje ny omgång, Stryktipset också,
+  // så snart kupongen har kommit: analysjobbet, som går var 15:e minut, väcker det (poddjobbet i
+  // scripts/analyser/skriv.mjs), så att matchbladen är klara när Helgarderats nummer kommer ut.
   foreAvspark: 30,
   tider: [
     { dag: 2, kl: '02:15' },

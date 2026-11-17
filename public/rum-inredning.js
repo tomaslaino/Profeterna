@@ -48,9 +48,9 @@ const WX = 1156;
 // djupet in längs högra väggen där x (i hörnets plan) ligger, som onWall i rum.js
 const wz = (x) => 1000 * (1 - 380 / (x - 760));
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-// stationsuret: taket är y 90 och palmetten på ramen börjar vid y 287, så uret hänger med ungefär
-// lika mycket luft över sig som under (till 2026-11-16 y 152, med höljet bara 4 cm under taket); visitkortet
-// (.rum-kort i rum.css) sitter i luckan under det, till höger
+// stationsuret: taket är y 90 och palmetten på ramen började vid y 287 (där sitter tavellampan sedan 2026-11-17,
+// TAVEL), så uret hänger med ungefär lika mycket luft över sig som under (till 2026-11-16 y 152, med höljet bara 4 cm
+// under taket); visitkortet (.rum-kort i rum.css) sitter i luckan under det, till höger
 const UR = { x: 1050, y: 184, r: 46 };
 const RAM = { x: 987, y: 302, w: 126, h: 152, b: 12 };
 // det målade bandet på bakväggen, mellan taket och fönsterkarmen och lika brett
@@ -76,7 +76,8 @@ const BITAR = {
   flakt: { plan: 0, box: { x: 226, y: -165, w: 600, h: 320 } },
   neon: { plan: 0, box: { x: 290, y: 104, w: 300, h: 130 } },
   ur: { plan: 0, box: { x: UR.x - 58, y: UR.y - 58, w: 130, h: 142 }, i: '.rum-ur', at: { x: UR.x - 54, y: UR.y - 54 } },
-  ram: { plan: 0, box: { x: 968, y: 280, w: 164, h: 232 }, i: '.rum-ram', at: RAM },
+  // (räcker upp över tavellampan, TAVEL)
+  ram: { plan: 0, box: { x: 968, y: 254, w: 164, h: 258 }, i: '.rum-ram', at: RAM },
   hogra: { plan: 0, box: { x: 1130, y: 0, w: 470, h: 580 } },
   // skivan med löpsedlarna, kedjorna upp till karmen och skuggan på glaset;
   // duken ligger under sedlarna (#rum-skiva, rum-affischer.js)
@@ -232,14 +233,30 @@ export async function inredning(el, opt = {}) {
     cam.updateMatrixWorld();
     return cam;
   }
-  // Spotarna i taket (SPOT i rum.js målar deras ljus på väggarna): mot orakelramen och mot Tipsligan längst ut
-  // på högra väggen, som också lyser på disken under, och på löpsedlarna och uret. Själva spotarna syns inte (spotskenan
-  // som bar de två sista togs bort samma kväll som den kom, 2026-11-16). De finns i alla sakers ljus, så att alla delar samma
-  // grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i bildrutorna.
+  // Tavellamporna (2026-11-17, användarens önskemål: lampor man ser, där rummet är upplyst utan att något syns
+  // lysa dit): tavellampor i mässing på orakelramens överkant, på skivan med löpsedlarna och över Tipsligan, där
+  // spotarna man inte såg lyste förut. Var och en ritas med det den lyser på (tavellampa nedan): ingen ny duk och
+  // inget nytt i bildrutorna. x längs väggen (på högra väggen djupet in från hörnet, som z i onWall i rum.js), y
+  // fästet och z0 dess djup (en klämma över ramens och skivans överkant, en platta på högra väggen), hy kåpans
+  // mitt och ut hur långt ut den sitter, L och r kåpans längd och radie. Lampan på ramen sitter där palmetten satt,
+  // så låg att visitkortet ovanför den till höger går fritt (.rum-kort i rum.css).
+  const TAVEL = {
+    ram: { x: RAM.x + RAM.w / 2, y: RAM.y - 1, z0: -12, hy: RAM.y - 1, ut: 30, L: 72, r: 7 },
+    skiva: { x: SKIVA.x + SKIVA.w / 2, y: SKIVA.y, z0: -3, hy: SKIVA.y - 3, ut: 18, L: 100, r: 7 },
+    skar: { hoger: true, x: (wz(opt.vagg.skar[0]) + wz(opt.vagg.skar[1])) / 2 + 3, y: opt.vagg.skar[2] - 24, z0: 0, hy: opt.vagg.skar[2] - 11, ut: 20, L: 66, r: 6.5 },
+  };
+  // kåpans mitt i världen
+  const kapa = (t) => (t.hoger ? [WX - t.ut, -t.hy, t.x] : [t.x, -t.hy, t.z0 + t.ut]);
+  // Tavellamporna lyser på ramen, Tipsligan (och disken under) och löpsedlarna, och en spot man inte ser på uret
+  // (SPOT i rum.js målar ljuset på väggarna). Till 2026-11-17 kom ljuset från spotar i taket, som inte syntes
+  // (spotskenan togs bort samma kväll som den kom, 2026-11-16). Ljuset finns i alla sakers scener, så att alla
+  // delar samma grafikprogram och ljuset faller lika överallt; sakerna ritas en gång, så det kostar inget i
+  // bildrutorna. Tavellamporna sitter nära, så ljuset avtar med avståndet (avtag 1) i stället för med dess kvadrat
+  // och käglan är vid: annars blev överkanten vit och resten mörk.
   const SPOTAR = [
-    { fran: [1050, 30, 330], mot: [1050, -372, WZ], styrka: 1.6, vinkel: 0.34 },
-    { fran: [880, 30, 470], mot: [WX, -366, 475], styrka: 0.8, vinkel: 0.36 },
-    { fran: [855, -108, 150], mot: [855, -383, -20], styrka: 1.1, vinkel: 0.5 },
+    { fran: kapa(TAVEL.ram), mot: [1050, -392, WZ], styrka: 1.6, vinkel: 0.75, avtag: 1 },
+    { fran: kapa(TAVEL.skar), mot: [WX, -420, TAVEL.skar.x], styrka: 0.8, vinkel: 0.95, avtag: 1 },
+    { fran: kapa(TAVEL.skiva), mot: [TAVEL.skiva.x, -400, -6], styrka: 1.1, vinkel: 0.9, avtag: 1 },
     { fran: [990, -108, 150], mot: [1050, -190, WZ], styrka: 0.9, vinkel: 0.42 },
   ];
   // ljuset som i rummet: taklampan ovanför och framför till vänster, neonen
@@ -271,11 +288,11 @@ export async function inredning(el, opt = {}) {
     const f = new THREE.DirectionalLight('#ffd9b0', 0.35);
     f.position.set(760, -400, 1000);
     scene.add(f);
-    for (const { fran, mot, styrka, vinkel } of SPOTAR) {
-      const s = new THREE.SpotLight('#ffe2b8', 0, 0, vinkel, 0.9, 2);
+    for (const { fran, mot, styrka, vinkel, avtag = 2 } of SPOTAR) {
+      const s = new THREE.SpotLight('#ffe2b8', 0, 0, vinkel, 0.9, avtag);
       s.position.set(...fran);
       s.target.position.set(...mot);
-      s.intensity = styrka * s.position.distanceToSquared(s.target.position);
+      s.intensity = styrka * s.position.distanceTo(s.target.position) ** avtag;
       scene.add(s, s.target);
     }
   }
@@ -1004,8 +1021,8 @@ export async function inredning(el, opt = {}) {
     return { visare, kvar };
   }
 
-  // Orakelramen: förgylld list i två steg med pärlstav, rosetter i hörnen och
-  // palmetten överst; fotot (Kronan.scene i rum.js) syns i hålet, längre in,
+  // Orakelramen: förgylld list i två steg med pärlstav och rosetter i hörnen, och
+  // tavellampan överst (TAVEL); fotot (Kronan.scene i rum.js) syns i hålet, längre in,
   // bakom glaset. Mässingsskylten under med namnet ingraverat.
   function ram(b) {
     const { mesh, occ } = b;
@@ -1037,15 +1054,7 @@ export async function inredning(el, opt = {}) {
       ro.position.set(cx, -cy, 1.6);
       ro.scale.z = 0.6;
     }
-    const blad = new THREE.SphereGeometry(1, 14, 10);
-    [-62, -40, -20, 0, 20, 40, 62].forEach((a, i) => {
-      const len = [6, 8, 10, 11.5, 10, 8, 6][i];
-      const l = mesh(blad, guld);
-      l.scale.set(1.7, len / 2, 1.6);
-      l.position.set(x0 + w / 2 + Math.sin(a * DEG) * (len / 2 + 1.5), -(y0 - 2) + Math.cos(a * DEG) * (len / 2 + 1.5), -6);
-      l.rotation.z = -a * DEG;
-    });
-    mesh(new THREE.SphereGeometry(3.6, 20, 12), guld).position.set(x0 + w / 2, -(y0 - 1), -5);
+    // (palmetten mitt på överkanten gav plats åt tavellampan, TAVEL, 2026-11-17)
     const ruta = new THREE.Mesh(new THREE.PlaneGeometry(w - 2 * kant, h - 2 * kant), glas({ opacity: 0.07, envMapIntensity: 2.2 }));
     ruta.position.set(x0 + w / 2, -(y0 + h / 2), -5);
     b.scene.add(ruta);
@@ -1404,6 +1413,110 @@ export async function inredning(el, opt = {}) {
       s.scale.set(1, 0.42, 1);
       s.position.set(kx, -(y + 2), 1.6);
     }
+  }
+
+  // ---------- tavellamporna ----------
+  // En tavellampa i mässing (TAVEL ovan): en klämma över ramens eller skivans överkant (en platta på väggen), en arm som går ut
+  // och böjer sig ned, och kåpan, en halv cylinder med ändar och knoppar som är öppen nedåt och in mot tavlan, med
+  // en ljus insida. Byggd i lampans egna mått (X längs kåpan, Y uppåt, Z ut från väggen) och vriden till högra
+  // väggen. Den kastar ingen skugga: skuggan föll där den själv lyser. Det som lyser i den släcks på natten (natt).
+  const TAVEL_GLOD = [];
+  // (insidan av kåpan: samma yta vänd inåt, utan DoubleSide, som skulle ge ett grafikprogram till)
+  const inat = (geo) => {
+    const ix = geo.index.array;
+    for (let i = 0; i < ix.length; i += 3) [ix[i + 1], ix[i + 2]] = [ix[i + 2], ix[i + 1]];
+    const n = geo.attributes.normal.array;
+    for (let i = 0; i < n.length; i++) n[i] = -n[i];
+    return geo;
+  };
+  function tavellampa(b, t) {
+    const { y, hy, ut, L, r } = t;
+    const g = new THREE.Group();
+    if (t.hoger) {
+      g.rotation.y = -90 * DEG;
+      g.position.set(WX, -y, t.x);
+    } else g.position.set(t.x, -y, t.z0);
+    b.scene.add(g);
+    const m = MASSING();
+    const del = (geo) => b.mesh(geo, m, g, false);
+    const dy = y - hy;
+    // fästet
+    if (!t.hoger) del(new RB(12, 7, 14, 2, 1.2)).position.set(0, 0.5, 0);
+    else {
+      del(new RB(10, 15, 2.4, 2, 0.9)).position.set(0, 0, 1.2);
+      del(new THREE.SphereGeometry(1.6, 12, 8)).position.set(0, 0, 2.4);
+    }
+    // armen: ut från fästet, lite uppåt, och ned till kåpans rygg
+    const arm = new THREE.CubicBezierCurve3(
+      new THREE.Vector3(0, 0, 2), new THREE.Vector3(0, 5 + Math.max(0, dy) * 0.6, ut * 0.5),
+      new THREE.Vector3(0, dy + r + 7, ut * 0.92), new THREE.Vector3(0, dy + r * 0.85, ut));
+    del(new THREE.TubeGeometry(arm, 24, 1.15, 8));
+    // kåpan: öppen kring 1,4π (nedåt och in mot väggen), som en cylinder längs X
+    const TS = 1.72 * Math.PI, TL = 1.36 * Math.PI;
+    const ror = (rr, h, oppen) => new THREE.CylinderGeometry(rr, rr, h, SEG / 2, 1, oppen, TS, TL).rotateZ(90 * DEG);
+    const kap = new THREE.Group();
+    kap.position.set(0, dy, ut);
+    g.add(kap);
+    b.mesh(ror(r, L, true), m, kap, false);
+    const inne = mat('#fff4de', { emissive: '#ffdcaa', emissiveIntensity: 0.85, roughness: 0.5 });
+    inne.userData.glod = 0.85;
+    TAVEL_GLOD.push(inne);
+    b.mesh(inat(ror(r - 0.3, L - 0.4, true)), inne, kap, false);
+    // glödlampan, ett rör längs kåpan
+    const ljus = mat('#fffaf0', { emissive: '#fff0d0', emissiveIntensity: 1.4, roughness: 0.3 });
+    ljus.userData.glod = 1.4;
+    TAVEL_GLOD.push(ljus);
+    b.mesh(new THREE.CylinderGeometry(1.3, 1.3, L - 6, 12).rotateZ(90 * DEG), ljus, kap, false).position.set(0, -0.6, -0.6);
+    for (const s of [-1, 1]) {
+      b.mesh(ror(r + 0.55, 1.4, false), m, kap, false).position.x = s * (L / 2 + 0.2);
+      b.mesh(new THREE.SphereGeometry(1.7, 12, 8), m, kap, false).position.set(s * (L / 2 + 2), 0, 0);
+    }
+    g.updateMatrixWorld(true);
+    return { g, t };
+  }
+  // Skenet ur kåpan, ritat ovanpå i sakens duk (som kring takfläktens kupor, medSkenet): en ljus rand längs
+  // kåpans underkant och ett mjukt sken under den, på det den lyser på. Släckt på natten.
+  function medTavelsken(b, lampor) {
+    const rita = b.paint.bind(b);
+    b.paint = () => {
+      rita();
+      const a = 1 - morkt;
+      if (a < 0.02) return;
+      const c = b.canvas;
+      const g = c.getContext('2d');
+      const pa = (v) => { v.project(b.cam); return [((v.x + 1) / 2) * c.width, ((1 - v.y) / 2) * c.height]; };
+      g.save();
+      g.globalCompositeOperation = 'lighter';
+      for (const { g: lg, t } of lampor) {
+        const { L, r } = t;
+        // randen längs kåpans underkant, från ände till ände, och bildpunkter per enhet där
+        const lapp = (x) => lg.localToWorld(new THREE.Vector3(x, t.y - t.hy - r * 0.75, t.ut - r * 0.3));
+        const [ax, ay] = pa(lapp(-(L - 8) / 2));
+        const [bx, by] = pa(lapp((L - 8) / 2));
+        const m = lapp(0);
+        const [, my] = pa(m.clone());
+        const [, qy] = pa(m.clone().add(new THREE.Vector3(0, r, 0)));
+        const e = Math.max(0.5, Math.abs(my - qy) / r);
+        const vinkel = Math.atan2(by - ay, bx - ax);
+        const halv = Math.hypot(bx - ax, by - ay) / 2;
+        // (en utdragen ellips per sken: många runda i rad gav ett brus av svaga övertoningar)
+        for (const [dy, R, f, al] of [[0.1, 0.9, '255, 246, 228', 0.62], [0.6, 2, '255, 226, 180', 0.3], [2.8, 4.6, '255, 214, 160', 0.16]]) {
+          const ry = R * r * e;
+          g.save();
+          g.translate((ax + bx) / 2, (ay + by) / 2 + dy * r * e);
+          g.rotate(vinkel);
+          g.scale(halv + ry * 0.7, ry);
+          const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1);
+          gr.addColorStop(0, `rgba(${f}, ${(al * a).toFixed(3)})`);
+          gr.addColorStop(0.55, `rgba(${f}, ${(al * a * 0.45).toFixed(3)})`);
+          gr.addColorStop(1, `rgba(${f}, 0)`);
+          g.fillStyle = gr;
+          g.fillRect(-1, -1, 2, 2);
+          g.restore();
+        }
+      }
+      g.restore();
+    };
   }
 
   // ---------- bladet vid radion ----------
@@ -1823,6 +1936,8 @@ export async function inredning(el, opt = {}) {
   rightWall(B.hogra);
   bardisk(B.disk);
   skiva(B.skiva);
+  // (tavellamporna, med det de lyser på)
+  for (const [k, bit] of [['ram', 'ram'], ['skiva', 'skiva'], ['skar', 'hogra']]) medTavelsken(B[bit], [tavellampa(B[bit], TAVEL[k])]);
   const LP = B.radiolapp ? radiolapp(B.radiolapp) : null;
 
   // Uret går efter Stockholms tid, med samma klocka som utsikten (Vader.nu()
@@ -1887,6 +2002,7 @@ export async function inredning(el, opt = {}) {
   for (const m of skivMat) m.userData.dag = m.color.clone();
   // (hur släckta taklamporna är, 0–1: glaset grånar och väggen och skivan mörknar i takt; morkt står överst)
   let takSteg = 0;
+  let tavelSteg = 0;
   function natt(g) {
     g = typeof g === 'number' ? Math.max(0, Math.min(1, g)) : g ? 1 : 0;
     if (g === morkt) return;
@@ -1903,6 +2019,13 @@ export async function inredning(el, opt = {}) {
     if (opt.ljus) opt.ljus();
     malMat.color.copy(malMat.userData.dag).multiplyScalar(1 - 0.6 * g);
     B.tak.paint();
+    // (tavellamporna släcks med taklamporna; ramen och högra väggen ritas om i tiondelar, som undertaket)
+    for (const m of TAVEL_GLOD) m.emissiveIntensity = m.userData.glod * (1 - g);
+    if (Math.round(g * 10) !== tavelSteg) {
+      tavelSteg = Math.round(g * 10);
+      B.ram.paint();
+      B.hogra.paint();
+    }
     for (const m of skivMat) m.color.copy(m.userData.dag).multiplyScalar(1 - 0.6 * g);
     B.skiva.paint();
     if (LP) {

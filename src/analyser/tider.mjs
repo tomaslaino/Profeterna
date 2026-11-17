@@ -42,17 +42,22 @@ export const senasteTid = (now, tider) => runt(now, tider).filter((t) => t <= no
 export const nastaTid = (now, tider) => runt(now, tider).find((t) => t > now) || null;
 
 // Vilka av omgångens matcher ska skrivas nu? per: match-id → analysen.
-//   - En tid gäller omgångar som fanns när klockan slog, så att en omgång som skapas
-//     strax före nästa tid inte skrivs två gånger i rad.
-//   - En match utan analys skrivs ändå när det är högst forhandTimmar kvar till avspark.
-//   - Analyser med en äldre promptVersion räknas som saknade.
+//   - En match utan aktuell analys (ingen alls, eller en med äldre promptVersion) skrivs så
+//     snart omgången finns (användarens önskan 2026-11-17: Stryktipset 4980 kom först sent
+//     måndag kväll, efter måndagens tid, och Hasse fick vänta till fredag). Kommer en tid inom
+//     vantaTimmar och börjar matchen efter den, väntar den på tiden, så att den inte skrivs två
+//     gånger i rad (måndagens kupong kommer kl. 16, tiden är 17).
+//   - En tid skriver om analyserna för omgångar som fanns när klockan slog, så att en omgång
+//     som skapas strax före nästa tid inte skrivs två gånger i rad.
 // → {kvar, klara, att, tid, nasta}: att är matcherna som ska skrivas, tid den senaste
 // tiden och nasta den som kommer efter.
-export function attSkriva(round, per, { now, tider, forhandTimmar, version, tvinga = false }) {
+export function attSkriva(round, per, { now, tider, vantaTimmar = 0, version, tvinga = false }) {
   const kvar = round.matcher.filter((x) => Date.parse(x.avspark) > now);
   const tid = senasteTid(now, tider);
+  const nasta = nastaTid(now, tider);
   const skapad = Date.parse(round.skapad) || 0;
   const galler = tid >= skapad;
+  const vantar = (x) => nasta !== null && nasta - now <= vantaTimmar * H && Date.parse(x.avspark) > nasta;
   const klara = [];
   const att = [];
   for (const x of kvar) {
@@ -60,10 +65,9 @@ export function attSkriva(round, per, { now, tider, forhandTimmar, version, tvin
     const aktuell = Boolean(a && a.version === version);
     const fardig = aktuell && (!galler || Date.parse(a.writtenAt) >= tid);
     if (fardig) klara.push(x);
-    const saknasNara = !aktuell && Date.parse(x.avspark) - now <= forhandTimmar * H;
-    if (tvinga || (!fardig && (galler || saknasNara))) att.push(x);
+    if (tvinga || (!fardig && (aktuell ? galler : !vantar(x)))) att.push(x);
   }
-  return { kvar, klara, att, tid, nasta: nastaTid(now, tider) };
+  return { kvar, klara, att, tid, nasta };
 }
 
 // Europatipset och andra spel än Stryktipset har inga fasta dagar: omgången kan börja vilken dag som helst, ofta
@@ -72,13 +76,28 @@ export function attSkriva(round, per, { now, tider, forhandTimmar, version, tvin
 // omgången är ny (fil: tider.json, med den senast genomgångna omgången) och igen det sista dygnet före första
 // avsparken (foreTimmar), om jobbet inte har gått sedan dess. round: gängets omgång {id, matcher, spel} eller null.
 // → 'ny omgång', 'inför avsparken' eller null
+// Sedan 2026-11-17 gäller 'ny omgång' också Stryktipset (användarens önskemål: "att det görs automatiskt inför
+// tidningspublikationerna - så att det är klart"): Helgarderats nummer kommer ut när kupongen kommer, och poddarna och
+// forumen läses då direkt i stället för vid nästa fasta tid. Stryktipset har sina fasta tider i övrigt.
 export function egenTid(round, fil, { now = Date.now(), foreTimmar = 30 } = {}) {
   if (!round || !Array.isArray(round.matcher)) return null;
   const spel = (round.spel && round.spel.namn) || (/-et\d+$/.test(String(round.id)) ? 'Europatipset' : 'Stryktipset');
-  if (spel === 'Stryktipset') return null;
   const kvar = round.matcher.map((x) => Date.parse(x.avspark)).filter((t) => Number.isFinite(t) && t > now);
   if (!kvar.length) return null;
   if (!fil || fil.omgang !== round.id) return 'ny omgång';
+  if (spel === 'Stryktipset') return null;
   const fore = Math.min(...kvar) - foreTimmar * H;
   return now >= fore && (Date.parse(fil.senast) || 0) < fore ? 'inför avsparken' : null;
+}
+
+// Ska analysjobbet väcka poddjobbet nu (scripts/analyser/skriv.mjs, poddjobbet)? Poddjobbet startas av launchd bara
+// kl. 02.15 och lördag kl. 08.00, men analysjobbet går var 15:e minut och ser den nya omgången först. Det väcker
+// poddjobbet när omgången har matcher kvar och poddjobbet inte har gått igenom den (tider: poddjobbets tider.json,
+// där en lyckad körning skriver omgången), högst en gång per omTimmar och omgång (knuff: {omgang, at}), så att ett
+// jobb som stannar inte väcks var 15:e minut. Poddjobbet avgör själv om det är dags (egenTid) och kör aldrig två
+// gånger samtidigt. → true eller false
+export function knuffaPoddar(round, tider, knuff, { now = Date.now(), omTimmar = 2 } = {}) {
+  if (!round || !Array.isArray(round.matcher) || !round.matcher.some((x) => Date.parse(x.avspark) > now)) return false;
+  if (tider && tider.omgang === round.id) return false;
+  return !(knuff && knuff.omgang === round.id && now - (Date.parse(knuff.at) || 0) < omTimmar * H);
 }

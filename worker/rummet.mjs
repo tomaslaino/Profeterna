@@ -12,13 +12,17 @@
 //     senaste)
 //   "ping" → "pong" (svaras utan att rummet väcks)
 //
-// Samma tjänst håller gängets kupong i realtid (GET /kupong, worker/kupongen.mjs).
+// Samma tjänst håller gängets kupong i realtid (GET /kupong, worker/kupongen.mjs)
+// och för vidare det som behövs för att gänget ska se varandra på tv:n medan de
+// pratar i telefon (GET /bild, worker/bilden.mjs).
 //
 // Driftsätts för hand: npx wrangler@4.147.0 deploy --config worker/rummet.toml
 
 import { giltigOmgang } from './kupongen.mjs';
+import { giltigVem, giltigtFonster } from './bilden.mjs';
 
 export { Kupongen } from './kupongen.mjs';
+export { Bilden } from './bilden.mjs';
 
 const GANG = new Set(['DL', 'DT', 'DJ']);
 const MOT = /^[a-z0-9]{1,16}$/;
@@ -29,13 +33,17 @@ const ORIGIN = /^(https:\/\/(www\.)?matchfixarna\.se|https:\/\/tomaslaino\.githu
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    if (url.pathname !== '/rum' && url.pathname !== '/kupong') return new Response('Inte här', { status: 404 });
+    if (!['/rum', '/kupong', '/bild'].includes(url.pathname)) return new Response('Inte här', { status: 404 });
     if (req.headers.get('Upgrade') !== 'websocket') return new Response('Bara websocket', { status: 426 });
     const origin = req.headers.get('Origin') || '';
     if (!ORIGIN.test(origin)) return new Response('Fel ursprung', { status: 403 });
     if (url.pathname === '/kupong') {
       if (!giltigOmgang(url.searchParams.get('id'))) return new Response('Fel omgång', { status: 400 });
       return env.KUPONGEN.get(env.KUPONGEN.idFromName('gangets-kupong')).fetch(req);
+    }
+    if (url.pathname === '/bild') {
+      if (!giltigVem(url.searchParams.get('vem')) || !giltigtFonster(url.searchParams.get('id'))) return new Response('Vem?', { status: 400 });
+      return env.BILDEN.get(env.BILDEN.idFromName('tv')).fetch(req);
     }
     const rum = env.RUMMET.get(env.RUMMET.idFromName('tobaksaffaren'));
     return rum.fetch(req);

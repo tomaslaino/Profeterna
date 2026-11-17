@@ -33,6 +33,10 @@
 //             ställning och tecknet, i Stryktipsets ordning när omgången är
 //             Stryktipset; tv:n står på den när man kommer in
 //   381–384   skytteligorna (data/players/<division>.json)
+//   AV        gänget i bild (rum-bild.js): tv:ns AV-ingång, där de i gänget
+//             som visar sig med kameran syns medan vi pratar i telefon. TV/AV
+//             i knappsatsen och raden Gänget i bild på 300 tar fram den, och
+//             en sida, en siffra eller ▲ ▼ går tillbaka till text-tv:n.
 //
 // Filerna hämtas när sidan visas första gången. Byter man sida söker tv:n som
 // förr: sidnumret i rubrikraden rullar fram tills sidan kommer, och den ritas
@@ -45,7 +49,9 @@
 // På håll bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
-// RumTv.mount(el, { calm, short, kort, wd, hm, matches }) → { fill(rows, { spel, next }), tittar(on), matt(rekt) → frontens mått, zoom(on), key(k) }
+// RumTv.mount(el, { calm, short, kort, wd, hm, matches, avVal }) → { fill(rows, { spel, next }), tittar(on), matt(rekt) → frontens mått, zoom(on), key(k),
+//   av(on) → AV-ingången (rum-bild.js ritar i avEl), avEl, avPa() }
+// avVal(on): den som tittar bytte själv mellan text-tv:n och AV på tv:n.
 
 window.RumTv = (() => {
   const COLS = 40;
@@ -192,7 +198,7 @@ window.RumTv = (() => {
       const inner = o.dh ? `<span class="in">${html}</span>` : html;
       const at = `style="--i: ${n}"`;
       if (o.href) out += `<a class="${cls}" ${at} href="${esc(o.href)}">${inner}</a>`;
-      else if (o.sida || o.visa) out += `<button type="button" class="${cls}" ${at} ${o.sida ? `data-sida="${o.sida}"` : `data-visa="${esc(o.visa)}"`}>${inner}</button>`;
+      else if (o.sida || o.visa || o.av) out += `<button type="button" class="${cls}" ${at} ${o.av ? 'data-tv="av"' : o.sida ? `data-sida="${o.sida}"` : `data-visa="${esc(o.visa)}"`}>${inner}</button>`;
       else out += `<div class="${cls}" ${at}>${inner}</div>`;
       n += o.dh ? 2 : 1;
     }
@@ -252,6 +258,8 @@ window.RumTv = (() => {
     rows.push(item('Nations League', NL, 3));
     rows.push(null, line(' ', ['Skytteligor', 'c']));
     DIVS.forEach((d, k) => rows.push(item(d.name, SKY + k, 3)));
+    // tv:ns AV-ingång: gänget i bild (rum-bild.js)
+    rows.push(null, { av: true, html: line(' ', pad('Gänget i bild', 35), ['AV', 'y']) });
     return band('INNEHÅLL') + body(rows) + fast();
   }
 
@@ -516,7 +524,8 @@ window.RumTv = (() => {
   // Sju segment per siffra (a överst, sedan medurs, g i mitten); de släckta
   // syns svagt genom det röda glaset.
   const SEG = { a: [2, 0.6, 8, 1.8], b: [10.4, 2.6, 1.8, 7], c: [10.4, 11.2, 1.8, 7], d: [2, 18.6, 8, 1.8], e: [-0.2, 11.2, 1.8, 7], f: [-0.2, 2.6, 1.8, 7], g: [2, 9.6, 8, 1.8] };
-  const DIG = { 0: 'abcdef', 1: 'bc', 2: 'abdeg', 3: 'abcdg', 4: 'bcfg', 5: 'acdfg', 6: 'acdefg', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g' };
+  // (A och V för AV-ingången: V som ett U, som på displayerna då)
+  const DIG = { 0: 'abcdef', 1: 'bc', 2: 'abdeg', 3: 'abcdg', 4: 'bcfg', 5: 'acdfg', 6: 'acdefg', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g', A: 'abcefg', V: 'bcdef' };
   function led(txt) {
     let s = '';
     [...txt].forEach((ch, i) => {
@@ -527,8 +536,9 @@ window.RumTv = (() => {
 
   // ---------- lådan ----------
 
-  // Knappsatsen i panelen: 1–9 och ▼ 0 ▲ längst ner.
-  const SATS = [...'123456789'].map((d) => [d, d]).concat([['ner', '▼', 'Föregående sida'], ['0', '0'], ['upp', '▲', 'Nästa sida']]);
+  // Knappsatsen i panelen: 1–9, ▼ 0 ▲ och längst ner TV/AV, som byter mellan
+  // text-tv:n och AV-ingången (gänget i bild, rum-bild.js).
+  const SATS = [...'123456789'].map((d) => [d, d]).concat([['ner', '▼', 'Föregående sida'], ['0', '0'], ['upp', '▲', 'Nästa sida'], ['av', 'TV/AV', 'Gänget i bild']]);
 
   function html() {
     return '<i class="tv-sken" id="rum-tvsken"></i>' +
@@ -541,9 +551,11 @@ window.RumTv = (() => {
       '<i class="tv-f rum-del tv-topp"></i><i class="tv-f rum-del tv-botten"></i><i class="tv-f rum-del tv-vanster"></i><i class="tv-f rum-del tv-hoger"></i>' +
       '<div class="tv-front" id="rum-tvfront" inert>' +
       '<div class="tv-ram"><div class="tv-glas" id="rum-ttx"><div class="tt"><div class="tr hd"></div><div class="tb"></div></div>' +
+      // AV-ingången: gänget i bild (rum-bild.js), under linjerna och glansen
+      '<div class="tv-av" id="rum-tvav" hidden></div>' +
       '<i class="tv-scan"></i><i class="tv-glans"></i></div></div>' +
       `<div class="tv-panel"><span class="tv-led" id="rum-tvled">${led(String(LIVE))}</span>` +
-      `<div class="tv-sats">${SATS.map(([k, t, label]) => `<button type="button" class="tv-k${label ? ' pil' : ''}" data-tv="${k}"${label ? ` aria-label="${label}"` : ''}>${t}</button>`).join('')}</div>` +
+      `<div class="tv-sats">${SATS.map(([k, t, label]) => `<button type="button" class="tv-k${k === 'av' ? ' tvav' : label ? ' pil' : ''}" data-tv="${k}"${label ? ` aria-label="${label}"` : ''}>${t}</button>`).join('')}</div>` +
       '<i class="tv-galler"></i>' +
       '<button type="button" class="tv-pa" data-tv="pa" aria-label="Stäng av tv:n" aria-pressed="true"></button><i class="tv-lampa"></i></div>' +
       '<i class="tv-namn">Panasonic</i><i class="tv-fast">FASTEXT</i></div>' +
@@ -555,7 +567,7 @@ window.RumTv = (() => {
 
   function mount(root, o) {
     const T = {
-      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), land: new Map(), typed: '', on: true, near: false, tittar: false,
+      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), land: new Map(), typed: '', on: true, near: false, tittar: false, ingang: false,
       // landslagen med för långa namn kortas (LAND) där lagen inte ryms
       short: o.short, kort: (n) => LAND[n] || (o.kort || o.short)(n), wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
     };
@@ -567,6 +579,7 @@ window.RumTv = (() => {
     const tb = glas.querySelector('.tb');
     const ledEl = root.querySelector('#rum-tvled');
     const sken = root.querySelector('#rum-tvsken');
+    const avEl = root.querySelector('#rum-tvav');
     const showLed = (txt) => { if (ledEl.dataset.v !== txt) { ledEl.dataset.v = txt; ledEl.innerHTML = led(txt); } };
 
     // Sidorna i nummerordning, och hur många undersidor en sida har.
@@ -614,7 +627,8 @@ window.RumTv = (() => {
 
     // På håll är rutan dämpad (rum-tv.css), utom när gänget tittar på
     // matcherna: medan någon pågår och tv:n står på 377 lyser den fullt.
-    const direkt = () => box.classList.toggle('direkt', T.tittar && T.nr === LIVE);
+    // (likaså med gänget i bild: då ska ansiktena synas)
+    const direkt = () => box.classList.toggle('direkt', (T.tittar && T.nr === LIVE) || T.ingang);
 
     // Sidan: ritas om bara när den har ändrats; ny = uppifrån och ner.
     function draw(ny) {
@@ -634,7 +648,7 @@ window.RumTv = (() => {
       }
     }
     function tick() {
-      if (root.hidden || !T.on) return;
+      if (root.hidden || !T.on || T.ingang) return;
       // medan man slår siffrorna står de där sidnumret står, som på riktig text-tv
       const h = head(T.typed ? T.typed.padEnd(3, '-') : T.roll || T.nr, Boolean(T.roll));
       if (hd.dataset.h !== h) {
@@ -657,6 +671,7 @@ window.RumTv = (() => {
     // att sidan skulle sändas), och finns den inte går tv:n tillbaka.
     function go(nr, sub = 0) {
       if (!T.on) return;
+      tillText();
       clearTimeout(T.timer);
       T.typed = '';
       showLed(String(nr));
@@ -695,6 +710,7 @@ window.RumTv = (() => {
     // ▲ ▼: undersidorna först, sedan nästa sida i nummerordning (runt).
     function step(d) {
       if (!T.on) return;
+      if (tillText()) return;
       const sub = T.sub + d;
       if (!T.roll && sub >= 0 && sub < subsOf(T.nr)) {
         T.sub = sub;
@@ -710,10 +726,45 @@ window.RumTv = (() => {
     // och displayen visar dem medan man slår dem.
     function digit(d) {
       if (!T.on) return false;
+      tillText();
       T.typed += d;
       showLed(T.typed.padEnd(3, '-'));
       if (T.typed.length === 3) go(Number(T.typed));
       else tick();
+      return true;
+    }
+    // ---------- AV-ingången ----------
+    //
+    // Gänget i bild (rum-bild.js ritar i avEl): text-tv:n släcks och AV står i
+    // displayen, och bytet sker som på en tv då – ett ögonblick snö innan
+    // bilden kommer. Rutan lyser fullt också på håll (direkt).
+    function av(on) {
+      on = Boolean(on);
+      if (on === T.ingang) return;
+      T.ingang = on;
+      clearTimeout(T.timer);
+      T.roll = 0;
+      T.typed = '';
+      box.classList.toggle('ingang', on);
+      avEl.hidden = !on;
+      if (T.on) showLed(on ? ' AV' : String(T.nr));
+      direkt();
+      if (!on && T.on) {
+        draw(false);
+        tick();
+      }
+      if (T.on && !o.calm()) {
+        glas.classList.remove('byter');
+        void glas.offsetWidth;
+        glas.classList.add('byter');
+      }
+    }
+    // Ett sidbyte från AV går tillbaka till text-tv:n (som när man slog ett
+    // kanalnummer). → om tv:n stod på AV.
+    function tillText() {
+      if (!T.ingang) return false;
+      av(false);
+      if (o.avVal) o.avVal(false);
       return true;
     }
     function power() {
@@ -725,8 +776,8 @@ window.RumTv = (() => {
       const b = box.querySelector('[data-tv="pa"]');
       b.setAttribute('aria-pressed', String(T.on));
       b.setAttribute('aria-label', T.on ? 'Stäng av tv:n' : 'Sätt på tv:n');
-      showLed(T.on ? String(T.nr) : '   ');
-      if (T.on) {
+      showLed(T.on ? (T.ingang ? ' AV' : String(T.nr)) : '   ');
+      if (T.on && !T.ingang) {
         draw(false);
         tick();
       }
@@ -746,7 +797,12 @@ window.RumTv = (() => {
       e.preventDefault();
       e.stopPropagation();
       if (b.dataset.tv === 'pa') power();
-      else if (/^[0-9]$/.test(b.dataset.tv)) digit(b.dataset.tv);
+      else if (b.dataset.tv === 'av') {
+        if (!T.on) return;
+        const on = !T.ingang;
+        av(on);
+        if (o.avVal) o.avVal(on);
+      } else if (/^[0-9]$/.test(b.dataset.tv)) digit(b.dataset.tv);
       else if (b.dataset.tv) step(b.dataset.tv === 'upp' ? 1 : -1);
       else if (b.dataset.visa) { if (window.Spoiler) Spoiler.show(b.dataset.visa.split(' ')); }
       else go(...b.dataset.sida.split('/').map(Number));
@@ -789,7 +845,7 @@ window.RumTv = (() => {
         front.inert = !on;
         if (!on && T.typed) {
           T.typed = '';
-          showLed(T.on ? String(T.nr) : '   ');
+          showLed(T.on ? (T.ingang ? ' AV' : String(T.nr)) : '   ');
         }
         // Nära ritas tv:n i tre gånger storleken (.skarp, rum-tv.css) och på
         // håll i sin egen. zoom ändrar också måtten i vridningen, så den byts
@@ -822,6 +878,10 @@ window.RumTv = (() => {
           }, 900);
         }
       },
+      // AV-ingången (rum-bild.js): på eller av, elementet att rita i och om den är framme.
+      av,
+      avEl,
+      avPa: () => T.ingang,
       // Tangenterna när tv:n är nära: pilarna bläddrar, tre siffror väljer sida.
       key(k) {
         if (/^[0-9]$/.test(k)) return digit(k);
