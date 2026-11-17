@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-16T22:52:41.000Z",
+ "uppdaterad": "2026-11-17T17:25:08.016Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -93,5 +93,1234 @@
    "avspark": "2026-11-21T15:00:00.000Z"
   }
  ],
- "sidor": []
+ "sidor": [
+  {
+   "id": "401879232",
+   "nr": 1,
+   "match": "Newcastle United – Arsenal",
+   "lag": [
+    "Newcastle United",
+    "Arsenal"
+   ],
+   "avspark": "2026-11-21T17:30:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Jaissles lovande manus behöver fortfarande redigeras",
+   "ingress": null,
+   "summering": "Matthias Jaissle är under hård press inför en tung serie där Arsenal är först ut. Arsenal har kommit överens med Declan Rice om ett nytt kontrakt men oroar sig för Martin Zubimendis lår.",
+   "delar": [
+    {
+     "lag": "Newcastle United",
+     "kallor": [
+      {
+       "podd": "The Mag",
+       "avsnitt": "For Newcastle United these are now the steps that matter",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/newcastle-united-now-steps-matter-120139572.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Football Insider",
+       "avsnitt": "Why Anthony Elanga can reshape Matthias Jaissle's Newcastle future, new data is telling",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/why-anthony-elanga-reshape-matthias-095409494.html",
+       "typ": "media"
+      },
+      {
+       "podd": "GOAL",
+       "avsnitt": "Newcastle slam the door on Man Utd as England left-back Lewis Hall is declared not for sale in January",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/newcastle-slam-door-man-utd-183803986.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Roundtable Sports",
+       "avsnitt": "Matthias Jaissle Wants To Be Active In The January Transfer Window",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/matthias-jaissle-wants-active-january-170036001.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "På fansajten The Mag liknar man Matthias Jaissles vertikala fotboll vid ”ett lovande manus som fortfarande behöver redigeras”. Skribenten vill att tränaren släpper lite på principerna: lugnare uppspel när pressen bryts, ett tätare restförsvar och fasta situationer som biter igen.",
+      "Enligt Football Insider kan matcherna mot Arsenal, Brighton, Manchester United och Sunderland avgöra Jaissles framtid. Anthony Elanga, som Jaissle behöver, ser ut att vara i form igen.",
+      "Lewis Hall höll Lamine Yamal i schack när England vann i Madrid. Klubben säljer honom inte i januari, trots Manchester Uniteds intresse."
+     ],
+     "citat": {
+      "sagt": "De behöver tid för att bli redo för Premier League. Det är en annan nivå att spela här.",
+      "vem": "Matthias Jaissle, om sommarens unga värvningar",
+      "podd": "Roundtable Sports",
+      "typ": "media",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Matthias Jaissle",
+      "Anthony Elanga",
+      "Lewis Hall",
+      "Lamine Yamal"
+     ]
+    },
+    {
+     "lag": "Arsenal",
+     "kallor": [
+      {
+       "podd": "Just Arsenal",
+       "avsnitt": "Two Arsenal stars score as England stuns Spain and ends their record run",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/two-arsenal-stars-score-england-090000197.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Evening Standard",
+       "avsnitt": "Arsenal: Declan Rice agrees new long-term contract as Gunners target period of dominance",
+       "datum": "2026-11-17",
+       "adress": "https://uk.sports.yahoo.com/news/arsenal-declan-rice-agrees-long-085907373.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Evening Standard",
+       "avsnitt": "Arsenal dealt major injury blow as star limps off in England victory over Spain",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/arsenal-dealt-major-injury-blow-225630668.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "GOAL",
+       "avsnitt": "Declan Rice confirms new Arsenal contract is 'on the horizon' as England star prepares to commit long-term future to Premier League champions",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/declan-rice-confirms-arsenal-contract-133234004.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Arsenals engelsmän satte sin prägel på segern i Madrid. Ezri Konsa och Ben White gjorde Englands andra och tredje mål mot Spanien, och Declan Rice slog hörnan bakom Konsas mål.",
+      "Rice har dessutom kommit muntligt överens om ett nytt långt kontrakt. Enligt Evening Standard hamnar han kring 350 000 pund i veckan, i samma lönenivå som Bukayo Saka.",
+      "För Martin Zubimendi slutade kvällen sämre: han haltade av med ont i baksidan av låret. Han har haft svårt att få speltid sedan Bruno Guimaraes kom och Rice har varit i form."
+     ],
+     "citat": {
+      "sagt": "Det gamla Arsenal hade kanske haft det svårt på de arenorna.",
+      "vem": "Declan Rice, om bortamatcherna på Bernabéu och i München",
+      "podd": "GOAL",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Ezri Konsa",
+      "Ben White",
+      "Declan Rice",
+      "Bukayo Saka",
+      "Martin Zubimendi",
+      "Bruno Guimaraes"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401879236",
+   "nr": 2,
+   "match": "Chelsea – Leeds United",
+   "lag": [
+    "Chelsea",
+    "Leeds United"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Trafford tar med sig Madridkvällen till Stamford Bridge",
+   "ingress": null,
+   "summering": "Chelsea väntar på besked om João Pedro och sliter hårt på Morgan Rogers. Leeds målvakt kommer från en hjältekväll i Madrid, medan klubben drar ut på Daniel Farkes kontrakt.",
+   "delar": [
+    {
+     "lag": "Chelsea",
+     "kallor": [
+      {
+       "podd": "Evening Standard",
+       "avsnitt": "Chelsea injury update: Joao Pedro, Emi Martinez, Josh Acheampong latest news and return dates",
+       "datum": "2026-11-16",
+       "adress": "https://uk.sports.yahoo.com/news/chelsea-injury-joao-pedro-emi-061546185.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "The Chelsea News",
+       "avsnitt": "The one thing Chelsea fans need to worry about as Morgan Rogers continues hot streak",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/one-thing-chelsea-fans-worry-120100476.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Football Insider",
+       "avsnitt": "Club adviser reveals windfall for new Chelsea scheme that will annoy Xabi Alonso",
+       "datum": "2026-11-14",
+       "adress": "https://uk.sports.yahoo.com/news/club-adviser-reveals-windfall-chelsea-130000163.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "João Pedro har varit en stor förlust, och Xabi Alonso har lovat besked om brasilianaren före Leeds.",
+      "Morgan Rogers har spelat nästan varenda ligaminut och båda landskamperna fullt ut, ett tempo som The Chelsea News kallar ohållbart.",
+      "Mot Leeds har klubbens nya lyxpaket premiär: för 750 pund får supportrar lägga fram spelarnas matchställ i omklädningsrummet. Platserna är redan slutsålda, men Evertons förre vd Keith Wyness tror inte att det blir någon stor inkomst."
+     ],
+     "citat": {
+      "sagt": "Det ligger väldigt nära gränsen för när tränaren säger att vi inte vill ha några avbrott före matchen.",
+      "vem": "Keith Wyness, Evertons förre vd",
+      "podd": "Football Insider",
+      "typ": "media",
+      "datum": "2026-11-14"
+     },
+     "namn": [
+      "João Pedro",
+      "Xabi Alonso",
+      "Morgan Rogers",
+      "Keith Wyness"
+     ]
+    },
+    {
+     "lag": "Leeds United",
+     "kallor": [
+      {
+       "podd": "Leeds United",
+       "avsnitt": "Leeds duo play starring roles as England stun world champions Spain",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/leeds-duo-play-starring-roles-112500680.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Goal UK",
+       "avsnitt": "Luis de la Fuente singles out 'fantastic' James Trafford as Leeds goalkeeper inspires England to victory over Spain",
+       "datum": "2026-11-16",
+       "adress": "https://uk.sports.yahoo.com/news/luis-la-fuente-singles-fantastic-083311430.html",
+       "typ": "media"
+      },
+      {
+       "podd": "MOT Leeds News",
+       "avsnitt": "Why Leeds are kicking the can down the road with Daniel Farke contract, it makes no sense",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/why-leeds-kicking-down-road-080000473.html",
+       "typ": "media"
+      },
+      {
+       "podd": "MOT Leeds News",
+       "avsnitt": "49ers chief hires New York bankers as Leeds United 'sale process' potentially begins",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/49ers-chief-hires-york-bankers-165947073.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "James Trafford kommer till Stamford Bridge som Englands hjälte från Madrid. På tilläggstid räddade han först från Fermin Lopez och sedan Aymeric Laportes retur, och Spaniens förbundskapten Luis de la Fuente kallade insatsen fantastisk.",
+      "Kring klubben skaver det mer. För andra landslagsuppehållet i rad kom inget besked om Daniel Farkes nya kontrakt, trots att grunden till en överenskommelse sägs finnas. Supportersajten MOT Leeds News tycker inte att dröjsmålet går att förstå.",
+      "Dessutom har delägaren Jed York anlitat en bank i New York, och varför är oklart."
+     ],
+     "citat": {
+      "sagt": "Han kanske inleder en försäljning, han kanske söker pengar till en utbyggnad av Elland Road. Kanske både och?",
+      "vem": "Matt Slater, The Athletic, om Jed York",
+      "podd": "MOT Leeds News",
+      "typ": "media",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "James Trafford",
+      "Fermin Lopez",
+      "Aymeric Laporte",
+      "Luis de la Fuente",
+      "Daniel Farke"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401878754",
+   "nr": 3,
+   "match": "Tottenham Hotspur – Ipswich Town",
+   "lag": [
+    "Tottenham Hotspur",
+    "Ipswich Town"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Spurssupportrarna vill se tonåringen Williams-Barnett från start",
+   "ingress": null,
+   "summering": "Tottenham saknar Mathys Tel, och supportrarna vill att tonåringen Luca Williams-Barnett tar hans plats. Båda mittbackarna kommer hem från Nederländernas tyngsta förlust på decennier.",
+   "delar": [
+    {
+     "lag": "Tottenham Hotspur",
+     "kallor": [
+      {
+       "podd": "Hotspur HQ",
+       "avsnitt": "Mathys Tel is looking over his shoulder at Luca Williams-Barnett",
+       "datum": "2026-11-14",
+       "adress": "https://sports.yahoo.com/articles/mathys-tel-looking-over-shoulder-140009120.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Hotspur HQ",
+       "avsnitt": "An early predicted 11 for Tottenham vs. Ipswich Town when the Premier League returns",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/early-predicted-11-tottenham-vs-130005588.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Evening Standard",
+       "avsnitt": "Tottenham injury update: Mathys Tel, James Maddison, Mykhailo Mudryk latest news and return dates",
+       "datum": "2026-11-16",
+       "adress": "https://uk.sports.yahoo.com/news/tottenham-injury-mathys-tel-james-063037169.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Roundtable Sports",
+       "avsnitt": "Tottenham Should be Shocked How The Dutch Media Rated Micky van de Ven's Performance vs Germany",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/tottenham-shocked-dutch-media-rated-050035487.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Med Mathys Tel skadad vill supportrarna se Luca Williams-Barnett från start på vänsterkanten. Tonåringen har inte startat en enda match, men på fansajten Hotspur HQ kallas han den unga sensation som alla hejar på.",
+      "Samma sajt vill att Omar Marmoush står kvar centralt: Dominic Solanke ska inte starta som anfallare ”under några omständigheter”. James Maddison har inte spelat sedan ljumskskadan mot Chelsea.",
+      "Mittbackarna Micky van de Ven och Jan Paul van Hecke kommer hem från Nederländernas största förlust sedan 1959, mot Tyskland i Berlin. Holländska medier gav båda låga betyg."
+     ],
+     "citat": {
+      "sagt": "Luca är bättre än Maddison på kanten.",
+      "vem": "Roberto De Zerbi, om sitt byte mot Leeds",
+      "podd": "Evening Standard",
+      "typ": "lokal",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Mathys Tel",
+      "Luca Williams-Barnett",
+      "Omar Marmoush",
+      "Dominic Solanke",
+      "James Maddison",
+      "Micky van de Ven",
+      "Jan Paul van Hecke"
+     ]
+    },
+    {
+     "lag": "Ipswich Town",
+     "kallor": [],
+     "text": [],
+     "citat": null,
+     "namn": []
+    }
+   ]
+  },
+  {
+   "id": "401878756",
+   "nr": 4,
+   "match": "Aston Villa – Sunderland",
+   "lag": [
+    "Aston Villa",
+    "Sunderland"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Från Kongos andra division till Villa Park",
+   "ingress": null,
+   "summering": "Villa kan bli utan Matty Cash i ett försvar som redan läcker. Sunderland väntar besked om Granit Xhaka och Brian Brobbey och ska ha kallat hem Jules Ahoka för att fylla mittfältet.",
+   "delar": [
+    {
+     "lag": "Aston Villa",
+     "kallor": [
+      {
+       "podd": "The 4th Official",
+       "avsnitt": "Ex-Villa Striker Calls Emery A ‘Master’: Can Aston Villa Hold Onto Him?",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/ex-villa-striker-calls-emery-210000632.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Football Insider",
+       "avsnitt": "Aston Villa owners key to agreeing 'huge' new deal amid 'world-class' development - expert",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/aston-villa-owners-key-agreeing-094034437.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Roundtable Sports",
+       "avsnitt": "Matty Cash a Doubt for Sunderland After Concussion on Poland Duty",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/matty-cash-doubt-sunderland-concussion-145551507.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Villa News",
+       "avsnitt": "Three candidates to replace Matty Cash for Aston Villa vs Sunderland after injury latest",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/three-candidates-replace-matty-cash-120000002.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Darren Bent kallar Unai Emery ”ett absolut geni” som har byggt om laget fast hela ryggraden försvann i somras. Ett nytt kontrakt sägs vara nära.",
+      "Bakåt läcker det däremot. På Old Trafford ledde Villa med två mål när tilläggstiden började och tappade ändå segern, sedan Zion Suzuki felbedömt en hörna.",
+      "Nu riskerar Matty Cash att missa matchen efter en hjärnskakning i landslaget. Aaron Wan-Bissaka har egna skadebekymmer, och Villa News nämner till och med akademispelaren Woody Burgess, som ännu inte har debuterat i a-laget."
+     ],
+     "citat": {
+      "sagt": "När han saknas verkar vi inte riktigt vara samma lag.",
+      "vem": "Dan Bardell, Roundtable Sports, om Matty Cash",
+      "podd": "Roundtable Sports",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Darren Bent",
+      "Unai Emery",
+      "Zion Suzuki",
+      "Matty Cash",
+      "Aaron Wan-Bissaka",
+      "Woody Burgess"
+     ]
+    },
+    {
+     "lag": "Sunderland",
+     "kallor": [
+      {
+       "podd": "The Northern Echo",
+       "avsnitt": "Jules Ahoka Sunderland dressing room message amid Granit Xhaka Aston Villa wait",
+       "datum": "2026-11-15",
+       "adress": "https://uk.sports.yahoo.com/news/jules-ahoka-sunderland-dressing-room-060000858.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Roundtable Sports",
+       "avsnitt": "Sunderland Make Major Jules Ahoka Decision Ahead Of Aston Villa Clash",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/sunderland-major-jules-ahoka-decision-144016164.html",
+       "typ": "media"
+      },
+      {
+       "podd": "The Northern Echo",
+       "avsnitt": "Key Sunderland conversation before Chelsea provided timely & important reminder",
+       "datum": "2026-11-17",
+       "adress": "https://uk.sports.yahoo.com/news/key-sunderland-conversation-chelsea-provided-060000695.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Roker Report (SB Nation)",
+       "avsnitt": "Editorial: Another Huge Week For Sunderland",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/editorial-another-huge-week-sunderland-060000963.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Förra hösten spelade Jules Ahoka i Kongos andra division. Nu ska Sunderland ha kallat hem honom i förtid från landslaget, så att han kan ersätta Granit Xhaka om vadskadan inte läker. Mot Chelsea, där han tidigt ersatte Xhaka, såg det enligt Luke O'Nien ut som ”hans 500:e match”.",
+      "Ovissheten kring Brian Brobbey oroar mer. Han lämnade Nederländernas trupp med ”vissa problem”, och på Roker Report skriver man att laget förlorar ”väldigt mycket” utan honom.",
+      "Där menar man också att Chelsea-segern gav Régis Le Bris andrum, men att spekulationerna tar fart igen om insatserna sjunker."
+     ],
+     "citat": {
+      "sagt": "Alla i omklädningsrummet tror att vi kan vända det här.",
+      "vem": "Enzo Le Fee, mittfältare",
+      "podd": "The Northern Echo",
+      "typ": "lokal",
+      "datum": "2026-11-17"
+     },
+     "namn": [
+      "Jules Ahoka",
+      "Granit Xhaka",
+      "Xhaka",
+      "Luke O'Nien",
+      "Brian Brobbey",
+      "Régis Le Bris"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401879238",
+   "nr": 5,
+   "match": "AFC Bournemouth – Nottingham Forest",
+   "lag": [
+    "AFC Bournemouth",
+    "Nottingham Forest"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Från dödsdömd till nästan messias i Nottingham",
+   "ingress": null,
+   "summering": "Bournemouth får hem Eli Junior Kroupi och David Brooks med färska landslagsmål. Forest andas ut efter segern mot City, men Neco Williams skadade sig i Wales landskamp.",
+   "delar": [
+    {
+     "lag": "AFC Bournemouth",
+     "kallor": [
+      {
+       "podd": "BBC",
+       "avsnitt": "Kroupi scores as France beat Turkey to take top spot",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/kroupi-scores-france-beat-turkey-215305696.html",
+       "typ": "media"
+      },
+      {
+       "podd": "GOAL.com",
+       "avsnitt": "'I thought I was offside!' – Eli Junior Kroupi opens up on emotional first France goal",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/thought-offside-eli-junior-kroupi-080958970.html",
+       "typ": "media"
+      },
+      {
+       "podd": "BBC",
+       "avsnitt": "Wales without injured Williams for Portugal game",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/wales-without-injured-williams-portugal-155546117.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Evening Standard",
+       "avsnitt": "Rayan drops Manchester United transfer hint after Mauricio Pochettino arrival",
+       "datum": "2026-11-14",
+       "adress": "https://sports.yahoo.com/articles/rayan-drops-manchester-united-transfer-102519756.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Bournemouths anfallare kommer hem från uppehållet med mål i bagaget. Eli Junior Kroupi hoppade in mot Turkiet och gjorde sitt första mål för Frankrike, fast han först trodde att han var offside. David Brooks gjorde ett fint inhoppsmål för Wales i Norge.",
+      "Rayan bildar en av ligans mest fruktade anfallskvartetter med Marcus Tavernier, Justin Kluivert och Evanilson. Nu har han berättat att han alltid har hållit på Manchester United, för Cristiano Ronaldos skull, just som Mauricio Pochettino tar över där."
+     ],
+     "citat": {
+      "sagt": "Det var väldigt känslosamt, jag tänkte på min skada.",
+      "vem": "Eli Junior Kroupi, om målet för Frankrike",
+      "podd": "GOAL.com",
+      "typ": "media",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Eli Junior Kroupi",
+      "David Brooks",
+      "Rayan",
+      "Marcus Tavernier",
+      "Justin Kluivert",
+      "Evanilson",
+      "Cristiano Ronaldo",
+      "Mauricio Pochettino"
+     ]
+    },
+    {
+     "lag": "Nottingham Forest",
+     "kallor": [
+      {
+       "podd": "Football Insider",
+       "avsnitt": "Oliver Glasner 'owes' Nottingham Forest 'data team' after Liam Delap revelation - Expert",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/oliver-glasner-owes-nottingham-forest-120000677.html",
+       "typ": "media"
+      },
+      {
+       "podd": "BBC",
+       "avsnitt": "Wales without injured Williams for Portugal game",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/wales-without-injured-williams-portugal-155546117.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Football Insider",
+       "avsnitt": "Luca Netz eyes Nottingham Forest revival as teammate's injury fears emerge - verdict",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/luca-netz-eyes-nottingham-forest-190000874.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Efter segern mot Manchester City har Oliver Glasner gått från dödsdömd till ”nästan en messias”, säger Evertons förre vd Keith Wyness. Liam Delap fick behålla platsen trots supportrarnas kritik. Wyness tror att analytikerna låg bakom, eftersom Delap kom till lägena, och mot City lossnade det.",
+      "Oron gäller vänsterkanten. Neco Williams, som har spelat alla ligamatcher, haltade av i Wales förlust i Norge och missar landskampen mot Portugal. Vänsterfotade Luca Netz har knappt fått spela för Glasner, men Ola Aina kan också fylla ut där."
+     ],
+     "citat": {
+      "sagt": "Glasner är kanske skyldig alla de där datakillarna en låda vin.",
+      "vem": "Keith Wyness, Evertons förre vd",
+      "podd": "Football Insider",
+      "typ": "media",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Oliver Glasner",
+      "Liam Delap",
+      "Neco Williams",
+      "Luca Netz",
+      "Glasner",
+      "Ola Aina"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401879235",
+   "nr": 6,
+   "match": "Coventry City – Crystal Palace",
+   "lag": [
+    "Coventry City",
+    "Crystal Palace"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Thomas Frank börjar laga Palaces försvar i Coventry",
+   "ingress": null,
+   "summering": "Coventry tror på hemmaplan och vill inte släppa Jack Rudoni i januari. Palace har Thomas Frank på bänken för första gången och ligans mest läckande försvar att laga.",
+   "delar": [
+    {
+     "lag": "Coventry City",
+     "kallor": [
+      {
+       "podd": "BBC",
+       "avsnitt": "'Coventry City can cut it at this level'",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/coventry-city-cut-level-144222216.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Associated Press",
+       "avsnitt": "Brazil loses 3-2 to Japan despite Vinicius brace with red cards for Ancelotti and Raphinha",
+       "datum": "2026-11-14",
+       "adress": "https://sports.yahoo.com/articles/brazil-loses-3-2-japan-142511878.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Football Insider",
+       "avsnitt": "Sources: Coventry City fear ‘anarchy' as Jack Rudoni transfer plan revealed",
+       "datum": "2026-11-14",
+       "adress": "https://uk.sports.yahoo.com/news/sources-coventry-city-fear-anarchy-084500678.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Hemmamatcherna blir avgörande, säger Coventry Telegraphs Brian Dick, som tror att laget blir ”riktigt svårt att hantera” när det får gå framåt. Supportern Ged Clarke menar att det numera är de egna misstagen som kostar, inte att laget blir utspelat.",
+      "Tatsuhiro Sakamoto avgjorde Japans match mot Brasilien i tilläggstiden, och Brasiliens protester slutade med att Carlo Ancelotti blev utvisad.",
+      "Jack Rudoni, kanske lagets bästa spelare, lockar Newcastle och Leeds, men enligt Football Insider skulle det bli ”anarki” om han såldes i januari. Kontraktet har ett år kvar efter säsongen, och klubben vill förlänga."
+     ],
+     "citat": {
+      "sagt": "Om du erbjöd mig 17:e plats och sa att vi slutar där, skulle jag ta det.",
+      "vem": "Ged Clarke, supporter, i BBC CWR:s Sky Blues Fancast",
+      "podd": "BBC",
+      "typ": "media",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Tatsuhiro Sakamoto",
+      "Carlo Ancelotti",
+      "Jack Rudoni"
+     ]
+    },
+    {
+     "lag": "Crystal Palace",
+     "kallor": [
+      {
+       "podd": "The Independent",
+       "avsnitt": "Thomas Frank explains why Crystal Palace job was ‘too good to turn down’",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/thomas-frank-explains-why-crystal-131852689.html",
+       "typ": "media"
+      },
+      {
+       "podd": "BBC",
+       "avsnitt": "'Frank is the perfect hire' - fan's view",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/frank-perfect-hire-fans-view-091916783.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Roundtable Sports",
+       "avsnitt": "Thomas Frank Officially Announced As Crystal Palace Manager",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/thomas-frank-officially-announced-crystal-183132358.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Thomas Frank tyckte att jobbet nog var ”för bra för att tacka nej till”. Han vet redan var han ska börja: försvarsspelet, fasta situationer i båda straffområdena och omställningarna bakåt. Saknaden efter Daniel Muñoz och Maxence Lacroix, som lämnade i somras, märks: inget lag i ligan har släppt in fler mål.",
+      "Supportern Ollie Thomas kallar Frank ”det perfekta valet” och ser bygget i Brentford snarare än misslyckandet i Tottenham. Väntan på beskedet retade ändå supportrarna, och många kallar resan till Coventry en match som måste vinnas."
+     ],
+     "citat": {
+      "sagt": "Det här är ett väldigt, väldigt bra lag med väldigt bra spelare, men de måste tro på sig själva.",
+      "vem": "Thomas Frank, ny tränare",
+      "podd": "The Independent",
+      "typ": "media",
+      "datum": "2026-11-17"
+     },
+     "namn": [
+      "Thomas Frank",
+      "Daniel Muñoz",
+      "Maxence Lacroix",
+      "Frank"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401880160",
+   "nr": 7,
+   "match": "Bolton Wanderers – Portsmouth",
+   "lag": [
+    "Bolton Wanderers",
+    "Portsmouth"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Bolton roar publiken men läcker bakåt",
+   "ingress": null,
+   "summering": "Bolton bjuder på öppna matcher men har seriens högsta xG emot. I Portsmouth är det högerbacken Terry Devlin som gjort flest mål, och han kommer från uppehållet med ett landslagsmål och nytt kontrakt.",
+   "delar": [
+    {
+     "lag": "Bolton Wanderers",
+     "kallor": [
+      {
+       "podd": "The Bolton News",
+       "avsnitt": "EFL expert on why leaky defence could send Bolton Wanderers back to League One",
+       "datum": "2026-11-15",
+       "adress": "https://uk.sports.yahoo.com/news/efl-expert-why-leaky-defence-050000660.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "The Bolton News",
+       "avsnitt": "Steven Schumacher gives view on Chris Forino contract talks at Wanderers",
+       "datum": "2026-11-16",
+       "adress": "https://uk.sports.yahoo.com/news/steven-schumacher-gives-view-chris-050000265.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "The Bolton News",
+       "avsnitt": "'He could play in La Liga' - Wales boss Bellamy's praise for Wanderers playmaker",
+       "datum": "2026-11-17",
+       "adress": "https://uk.sports.yahoo.com/news/could-play-la-liga-wales-121132142.html",
+       "typ": "lokal"
+      }
+     ],
+     "text": [
+      "Sky Sports-experten Don Goodman varnar för att Bolton åker tillbaka till League One om inte försvaret blir tätare. Den som går och ser laget får en fantastisk match, säger han, men det släpps in alldeles för många mål. Inget lag i serien har högre xG emot.",
+      "Chris Forino vinner störst andel markdueller i serien, men ljumsken har krånglat. När mittbacken spelar bra har Bolton chans att hålla nollan och vinna, säger Steven Schumacher till lokaltidningen.",
+      "Wales förbundskapten Craig Bellamy öser beröm över mittfältaren Josh Sheehan."
+     ],
+     "citat": {
+      "sagt": "Han är en riktigt speciell spelare. Bodde han i Spanien skulle han spela i La Liga utan problem.",
+      "vem": "Craig Bellamy, Wales förbundskapten, om Josh Sheehan",
+      "podd": "The Bolton News",
+      "typ": "lokal",
+      "datum": "2026-11-17"
+     },
+     "namn": [
+      "Don Goodman",
+      "Chris Forino",
+      "Steven Schumacher",
+      "Craig Bellamy",
+      "Josh Sheehan"
+     ]
+    },
+    {
+     "lag": "Portsmouth",
+     "kallor": [
+      {
+       "podd": "Portsmouth's Express FM",
+       "avsnitt": "Terry Devlin Signs New Pompey Contract",
+       "datum": "2026-11-16",
+       "adress": "https://www.expressfm.com/news/football/terry-devlin-signs-new-pompey-contract/",
+       "typ": "lokal"
+      },
+      {
+       "podd": "BBC Sport",
+       "avsnitt": "Devlin 'in process' of signing new Pompey deal - O'Neill",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/devlin-process-signing-pompey-deal-115738882.html",
+       "typ": "media"
+      },
+      {
+       "podd": "BBC Sport",
+       "avsnitt": "Devlin agrees new Portsmouth deal to 2030",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/devlin-agrees-portsmouth-deal-2030-081743177.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Portsmouths bäste målskytt i serien är högerbacken Terry Devlin, och under uppehållet avgjorde han Nordirlands seger mot Ukraina.",
+      "Förbundskaptenen Michael O'Neill råkade avslöja att ett nytt kontrakt var på gång. Nu är det klart: Devlin stannar på Fratton Park till 2030.",
+      "Enligt BBC Radio Solents kommentator Andrew Moon kan man hävda att Devlin inte ens varit lagets bäste högerback, men hans sena mål mot Swansea och Wolves har gett poäng. John Mousinho räknar med att han får en stor roll i en period som blir ”riktigt hektisk”."
+     ],
+     "citat": {
+      "sagt": "Han är lite av en dröm för en tränare, och han kan bidra med mål.",
+      "vem": "Michael O'Neill, Nordirlands förbundskapten, om Terry Devlin",
+      "podd": "BBC Sport",
+      "typ": "media",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Terry Devlin",
+      "Michael O'Neill",
+      "John Mousinho"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401880158",
+   "nr": 8,
+   "match": "Lincoln City – Wrexham",
+   "lag": [
+    "Lincoln City",
+    "Wrexham"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Landskamperna som kostar Lincoln pengar",
+   "ingress": null,
+   "summering": "Lincolns supportrar har tagit rumänen Andrei Coubiș till sitt hjärta, och Josh Honohan är äntligen spelklar. Wrexham verkar ge Phil Parkinson arbetsro efter en stark vecka, men borta har laget haft det tungt.",
+   "delar": [
+    {
+     "lag": "Lincoln City",
+     "kallor": [
+      {
+       "podd": "Lincoln City FC",
+       "avsnitt": "Coubiș named Bainland October Player of the Month award",
+       "datum": "2026-11-15",
+       "adress": "https://www.weareimps.com/news/coubis-named-bainland-october-player-month-award",
+       "typ": "lokal"
+      },
+      {
+       "podd": "The Stacey West",
+       "avsnitt": "The £125,000 Cost Of Lincoln City Star's International Exploits",
+       "datum": "2026-11-16",
+       "adress": "https://staceywest.net/2026/11/16/the-125000-cost-of-lincoln-city-stars-international-exploits/",
+       "typ": "media"
+      },
+      {
+       "podd": "The Stacey West",
+       "avsnitt": "Jez George Explains Why Lincoln City Forgotten Man Still Has Big Future",
+       "datum": "2026-11-17",
+       "adress": "https://staceywest.net/2026/11/17/jez-george-explains-why-lincoln-city-forgotten-man-still-has-big-future/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Andrei Coubiș är supportrarnas man just nu. Den rumänske försvararen röstades fram till oktobers bästa spelare, och hans volley efter en halv minut mot Millwall blev månadens mål.",
+      "Under uppehållet spelade han hela matchen när Rumänien slog Polen, och enligt rumänska medier kostar det Lincoln omkring 125 000 pund i en klausul till Universitatea Cluj.",
+      "Sportchefen Jez George säger till supportersajten The Stacey West att Josh Honohan, som länge var borta med en överbelastningsskada, nu är helt återställd. Får han inte spela före januari får han gå på lån."
+     ],
+     "citat": {
+      "sagt": "Han är helt enkelt en toppspelare och en fin ung man.",
+      "vem": "Jez George, Lincolns sportchef, om Josh Honohan",
+      "podd": "The Stacey West",
+      "typ": "media",
+      "datum": "2026-11-17"
+     },
+     "namn": [
+      "Andrei Coubiș",
+      "Josh Honohan"
+     ]
+    },
+    {
+     "lag": "Wrexham",
+     "kallor": [
+      {
+       "podd": "The League Paper",
+       "avsnitt": "Morgan Schneiderlin: Wrexham must not act rashly and sack Phil Parkinson",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/morgan-schneiderlin-wrexham-must-not-103939796.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Roundtable Sports",
+       "avsnitt": "Wrexham Warned Over Phil Parkinson Decision As Schneiderlin Urges Patience",
+       "datum": "2026-11-16",
+       "adress": "https://sports.yahoo.com/articles/wrexham-warned-over-phil-parkinson-163020791.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Racecourse Ramble",
+       "avsnitt": "Lincoln City v Wrexham: An opportunity to make a statement on the road",
+       "datum": "2026-11-16",
+       "adress": "https://racecourseramble.substack.com/p/lincoln-city-v-wrexham-an-opportunity",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Wrexhams ägare verkar ha tålamod med Phil Parkinson, åtminstone för stunden. Morgan Schneiderlin, som var med när Southampton bytte Nigel Adkins mot Mauricio Pochettino, manar klubben att tänka sig noga för innan tränaren får gå.",
+      "Den starka veckan före uppehållet visade att laget kan resa sig, men frågan är om det håller genom ett tätt program.",
+      "Supporterpodden Racecourse Ramble kallar resan till Lincoln en chans att visa något på bortaplan. Där har matcherna hittills varit betydligt mindre roliga än hemma på Racecourse."
+     ],
+     "citat": {
+      "sagt": "Ibland måste man ge tränaren chansen att själv ta steget upp.",
+      "vem": "Morgan Schneiderlin, tidigare Southampton-spelare",
+      "podd": "The League Paper",
+      "typ": "media",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Phil Parkinson",
+      "Morgan Schneiderlin",
+      "Nigel Adkins",
+      "Mauricio Pochettino"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401880157",
+   "nr": 9,
+   "match": "Middlesbrough – Bristol City",
+   "lag": [
+    "Middlesbrough",
+    "Bristol City"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Middlesbrough möter sitt spöke",
+   "ingress": null,
+   "summering": "Middlesbrough kan komma att spara Will Lankshear inför en tät vecka och har svårt att ersätta honom. Bristol Citys Michael Skubala fick sitta kvar, men klubben ska redan se sig om efter en ersättare.",
+   "delar": [
+    {
+     "lag": "Middlesbrough",
+     "kallor": [
+      {
+       "podd": "Teesside Live",
+       "avsnitt": "The key thing Middlesbrough must have to get back to winning ways against bogeymen",
+       "datum": "2026-11-16",
+       "adress": "https://www.gazettelive.co.uk/sport/football/football-news/key-thing-middlesbrough-must-back-34916996",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Teesside Live",
+       "avsnitt": "Will Lankshear's Bristol City availability and Middlesbrough's squad depth - Boro mailbag",
+       "datum": "2026-11-15",
+       "adress": "https://www.gazettelive.co.uk/sport/football/football-news/lankshears-bristol-city-availability-middlesbroughs-34914430",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Teesside Live",
+       "avsnitt": "'It's a privilege' - Callum Brittain explains what makes Middlesbrough boss Kim Hellberg special",
+       "datum": "2026-11-16",
+       "adress": "https://www.gazettelive.co.uk/sport/football/football-news/its-privilege-callum-brittain-explains-34914867",
+       "typ": "lokal"
+      }
+     ],
+     "text": [
+      "Middlesbrough har inte slagit Bristol City på nio möten, och lokaltidningens veteran Eric Paylor kallar dem lagets spöke. Det sitter i huvudet, menar han: tror spelarna på sig själva kommer laget tillbaka på rätt spår.",
+      "Reportern Craig Johns skulle inte bli förvånad om Will Lankshear börjar på bänken och sparas till Swansea och Southampton.",
+      "Utan honom har reserverna inte räckt till, och Kyle Joseph ”måste bli bättre”. När Kim Hellberg tvingas ändra går han ofta över till tre mittbackar, och spelet blir sämre nästan varje gång."
+     ],
+     "citat": {
+      "sagt": "Han ser spelet på ett annat sätt, det är fantastiskt.",
+      "vem": "Callum Brittain, Middlesbrough-spelare, om Kim Hellberg",
+      "podd": "Teesside Live",
+      "typ": "lokal",
+      "datum": "2026-11-16"
+     },
+     "namn": [
+      "Will Lankshear",
+      "Kyle Joseph",
+      "Kim Hellberg"
+     ]
+    },
+    {
+     "lag": "Bristol City",
+     "kallor": [
+      {
+       "podd": "The Stacey West",
+       "avsnitt": "Championship Side 'Exploring Replacements' For Lincoln City Title Winner",
+       "datum": "2026-11-16",
+       "adress": "https://staceywest.net/2026/11/16/championship-side-exploring-replacements-for-lincoln-city-title-winner/",
+       "typ": "media"
+      },
+      {
+       "podd": "Football League World",
+       "avsnitt": "Michael Skubala sack twist at Bristol City emerges: 3 managers must be top of the list",
+       "datum": "2026-11-17",
+       "adress": "https://footballleagueworld.co.uk/michael-skubala-sack-twist-at-bristol-city-emerges-3-managers-must-be-top-of-the-list/",
+       "typ": "media"
+      },
+      {
+       "podd": "The League Paper",
+       "avsnitt": "Chris Dunlavy: Michael Skubala deserves chance to turn the tide at Bristol City",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/skubala-deserves-chance-turn-tide-000000416.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Michael Skubala sitter kvar, men enligt journalisten Alan Nixon kollar Bristol City redan upp tänkbara efterträdare och har pengar undan för att köpa loss en tränare. Få supportrar lär jubla över att han fick fortsätta.",
+      "Styrelsen vill se bättre hemmaform, och Lincolnsajten The Stacey West påpekar att första chansen att visa den kommer mot Wrexham tre dagar senare.",
+      "I Lincoln minns man att han behövde tid. De första månaderna var tunga, sedan byggde han ett lag som vann League One."
+     ],
+     "citat": null,
+     "namn": [
+      "Michael Skubala"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401880154",
+   "nr": 10,
+   "match": "Sheffield United – Watford",
+   "lag": [
+    "Sheffield United",
+    "Watford"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Peck får stanna – åtminstone till sommaren",
+   "ingress": null,
+   "summering": "Sheffield United säljer inte Sydie Peck i januari och vill köpa loss Liam Kitching, men supportrarna oroar sig för hur ledningen sköter klubben.",
+   "delar": [
+    {
+     "lag": "Sheffield United",
+     "kallor": [
+      {
+       "podd": "Football Insider",
+       "avsnitt": "Sources: Sheffield United respond to Newcastle and Sunderland's Sydie Peck interest",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/sources-sheffield-united-respond-newcastle-131500549.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Football League World",
+       "avsnitt": "Sheffield United must use Hayden Hackney in Sunderland transfer negotiations",
+       "datum": "2026-11-15",
+       "adress": "https://footballleagueworld.co.uk/sheffield-united-must-use-hayden-hackney-in-sunderland-transfer-negotiations/",
+       "typ": "media"
+      },
+      {
+       "podd": "The 72",
+       "avsnitt": "Chris Wilder discusses potential permanent swoop for ‘refreshing’ Sheffield United loan star",
+       "datum": "2026-11-17",
+       "adress": "https://uk.sports.yahoo.com/news/chris-wilder-discusses-potential-permanent-071500067.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Newcastle och Sunderland vill ha Sydie Peck, men enligt Football Insider säljer Sheffield United inte mittfältaren i januari: han behövs i jakten på playoff.",
+      "Supportrarnas oro gäller ledningen. I somras gick Gus Hamer, Callum O'Hare och Andre Brooks för summor som kändes för låga, skriver Football League World, och Chris Wilder fick nöja sig med lån och fria spelare.",
+      "En av lånespelarna vill Wilder behålla. Mittbacken Liam Kitching kom från Coventry, där vägen till laget var stängd. ”Det var uppfriskande att Liam ville spela fotboll”, säger tränaren, men en permanent affär hänger på styrelsen."
+     ],
+     "citat": {
+      "sagt": "Han hade lätt kunnat sitta kvar där och vara Premier League-spelare.",
+      "vem": "Chris Wilder, tränare, om Liam Kitching",
+      "podd": "The 72",
+      "typ": "media",
+      "datum": "2026-11-17"
+     },
+     "namn": [
+      "Sydie Peck",
+      "Gus Hamer",
+      "Callum O'Hare",
+      "Andre Brooks",
+      "Chris Wilder",
+      "Wilder",
+      "Liam Kitching"
+     ]
+    },
+    {
+     "lag": "Watford",
+     "kallor": [],
+     "text": [],
+     "citat": null,
+     "namn": []
+    }
+   ]
+  },
+  {
+   "id": "401880152",
+   "nr": 11,
+   "match": "Stoke City – Birmingham City",
+   "lag": [
+    "Stoke City",
+    "Birmingham City"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Stoke sålde Sorba Thomas, Birmingham fick Millar på köpet",
+   "ingress": null,
+   "summering": "Stoke har Jack McGlynn att tacka för vändningen men letar efter en målskytt. Birmingham bärs av Jay Stansfields slit och Liam Millar, som kom tack vare att Stoke sålde Sorba Thomas.",
+   "delar": [
+    {
+     "lag": "Stoke City",
+     "kallor": [
+      {
+       "podd": "Football League World",
+       "avsnitt": "Mark Robins has struck serious transfer gold with a £4m Stoke City cheat code",
+       "datum": "2026-11-14",
+       "adress": "https://footballleagueworld.co.uk/mark-robins-has-struck-serious-transfer-gold-with-a-4m-stoke-city-cheat-code/",
+       "typ": "media"
+      },
+      {
+       "podd": "Football League World",
+       "avsnitt": "Mark Robins faces brutal Stoke City January call - £10m forward could leave",
+       "datum": "2026-11-15",
+       "adress": "https://footballleagueworld.co.uk/mark-robins-faces-brutal-stoke-city-january-call-10m-forward-could-leave/",
+       "typ": "media"
+      },
+      {
+       "podd": "Football League World",
+       "avsnitt": "Stoke City urged to sign Sheffield United star who would ‘fit the bill’",
+       "datum": "2026-11-15",
+       "adress": "https://footballleagueworld.co.uk/stoke-city-urged-to-sign-sheffield-united-star-who-would-fit-the-bill/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Jack McGlynn kom från Houston Dynamo i det tysta, på fönstrets sista dag, och har fått Stokesupportrarna att glömma Sorba Thomas. Amerikanen har tagit över den högra platsen bakom anfallaren, och enligt Football League Worlds Stokeskribent var det han och bytet till trebackslinje som räddade Mark Robins jobb efter den svaga starten.",
+      "Bekymret sitter längst fram. Stokes centrala anfallare har tillsammans gjort fem mål, och George Hirst har långt kvar innan han motiverar sommarens prislapp. Supportern Ryan Beresford vill ha tillbaka Tom Cannon, som passade in så bra när han var utlånad till Stoke."
+     ],
+     "citat": {
+      "sagt": "Sheffield United är i en nedåtspiral. Sno honom medan vi kan.",
+      "vem": "Ryan Beresford, Stokesupporter, om Tom Cannon",
+      "podd": "Football League World",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Jack McGlynn",
+      "Sorba Thomas",
+      "Mark Robins",
+      "George Hirst",
+      "Tom Cannon"
+     ]
+    },
+    {
+     "lag": "Birmingham City",
+     "kallor": [
+      {
+       "podd": "Football League World",
+       "avsnitt": "Fresh £30m-40m claim made on Birmingham City ace Jay Stansfield",
+       "datum": "2026-11-15",
+       "adress": "https://footballleagueworld.co.uk/fresh-claim-made-on-birmingham-city-ace-jay-stansfield/",
+       "typ": "media"
+      },
+      {
+       "podd": "Football League World",
+       "avsnitt": "Birmingham City owe Stoke a transfer thank-you after winning Derby County race",
+       "datum": "2026-11-16",
+       "adress": "https://footballleagueworld.co.uk/birmingham-city-owe-stoke-a-transfer-thank-you-after-winning-derby-county-race/",
+       "typ": "media"
+      },
+      {
+       "podd": "Football League World",
+       "avsnitt": "Birmingham City should beat Middlesbrough to Leeds United target after Chris Davies admission",
+       "datum": "2026-11-15",
+       "adress": "https://footballleagueworld.co.uk/birmingham-city-should-beat-middlesbrough-leeds-united-arthur-avom/",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Supportern Jason Moore ville sälja Jay Stansfield i augusti. Nu kallar han klubbens rekordköp ”Mr Birmingham” och vill inte släppa honom under 30–40 miljoner pund. Det är slitet för laget, inte målen, säger Moore, och Chris Davies säger att anfallaren ger allt i varje match.",
+      "Liam Millar har gjort vänsterkanten till sin, och det kan Birmingham tacka lördagens motståndare för. Hull släppte honom bara om klubben fick en ersättare, och den blev Stokes Sorba Thomas.",
+      "Tomoki Iwatas kontrakt går ut i juni, och Davies tror att familjens framtid finns hemma i Japan."
+     ],
+     "citat": {
+      "sagt": "Jag älskar honom så mycket att jag hellre hittar pengarna på annat sätt och behåller honom.",
+      "vem": "Jason Moore, Birminghamsupporter, om Jay Stansfield",
+      "podd": "Football League World",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Jay Stansfield",
+      "Chris Davies",
+      "Liam Millar",
+      "Sorba Thomas",
+      "Tomoki Iwata",
+      "Davies"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401880151",
+   "nr": 12,
+   "match": "Swansea City – West Bromwich Albion",
+   "lag": [
+    "Swansea City",
+    "West Bromwich Albion"
+   ],
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "skriven": "2026-11-17T18:00:00.000Z",
+   "rubrik": "Matos har redan sagt adjö till sina spelare",
+   "ingress": null,
+   "summering": "Swansea tar emot West Brom med tränaren på väg till Strasbourg och ett lag som pressar bra men skjuter för sällan. West Brom har Price i form men saknar Diakite på mittfältet.",
+   "delar": [
+    {
+     "lag": "Swansea City",
+     "kallor": [
+      {
+       "podd": "BBC Sport",
+       "avsnitt": "Swansea boss Matos on brink of Strasbourg move",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/swans-fight-keep-matos-amid-210423924.html",
+       "typ": "media"
+      },
+      {
+       "podd": "Wales Online",
+       "avsnitt": "Euro club 'make official Vitor Matos approach' in Swansea City bombshell",
+       "datum": "2026-11-16",
+       "adress": "https://uk.sports.yahoo.com/news/euro-club-official-vitor-matos-220945871.html",
+       "typ": "lokal"
+      },
+      {
+       "podd": "BBC Sport",
+       "avsnitt": "Can Swansea's pressing kings add to their threat?",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/swanseas-pressing-kings-add-threat-052215625.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Vitor Matos tog i tisdags farväl av spelare och personal på träningsanläggningen Fairwood. Strasbourg har gjort en officiell förfrågan, och han har själv sagt till klubben att han vill gå. Flera ur hans stab väntas följa med, så av ledarna kring a-laget blir bara Leon Britton och Kristian O'Leary kvar.",
+      "Laget han lämnar pressar som få andra. Blackburns Tony Mowbray såg drag av Liverpool under Jürgen Klopp, ett lag som ”inte lät en andas”. Bekymret, skriver BBC, är bollinnehavet: inget lag i serien skapar bättre chanser per avslut, men bara fem skjuter mer sällan."
+     ],
+     "citat": {
+      "sagt": "Vi hoppas att Vitor blir kvar här länge.",
+      "vem": "Tom Gorringe, Swanseas vd",
+      "podd": "BBC Sport",
+      "typ": "media",
+      "datum": "2026-11-17"
+     },
+     "namn": [
+      "Vitor Matos",
+      "Leon Britton",
+      "Kristian O'Leary",
+      "Tony Mowbray",
+      "Jürgen Klopp"
+     ]
+    },
+    {
+     "lag": "West Bromwich Albion",
+     "kallor": [
+      {
+       "podd": "West Brom News",
+       "avsnitt": "Northern Ireland media rate West Brom star Isaac Price after crucial win vs Ukraine",
+       "datum": "2026-11-15",
+       "adress": "https://sports.yahoo.com/articles/northern-ireland-media-rate-west-084500458.html",
+       "typ": "media"
+      },
+      {
+       "podd": "BBC Sport",
+       "avsnitt": "West Brom midfielder Diakite injured on Mali duty",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/west-brom-midfielder-diakite-injured-164057857.html",
+       "typ": "media"
+      },
+      {
+       "podd": "West Brom News",
+       "avsnitt": "West Brom receive timely boost as Vitor Matos update rocks Swansea ahead of Championship clash",
+       "datum": "2026-11-17",
+       "adress": "https://sports.yahoo.com/articles/west-brom-receive-timely-boost-080416720.html",
+       "typ": "media"
+      }
+     ],
+     "text": [
+      "Isaac Price är kanske den ende i West Broms anfall som har hållit jämn nivå hela hösten, skriver West Brom News. Harry Whitwell och Jimmy-Jay Morgan började starkt men har tappat. Price kom till landslagsuppehållet i form och spelade hela matchen för Nordirland mot Ukraina.",
+      "Mittfältet blir tunnare. Ousmane Diakite, som har startat de flesta ligamatcherna, skadade vaden med Mali och är borta långt in i det nya året. Samma sajt hoppas ändå att oron kring Vitor Matos gör stämningen i Swansea till en fördel för Albion."
+     ],
+     "citat": {
+      "sagt": "Överallt som vanligt, men utan att kunna avgöra, trots all glöd och envishet.",
+      "vem": "News Letter om Price mot Ukraina",
+      "podd": "West Brom News",
+      "typ": "media",
+      "datum": "2026-11-15"
+     },
+     "namn": [
+      "Isaac Price",
+      "Harry Whitwell",
+      "Jimmy-Jay Morgan",
+      "Ousmane Diakite",
+      "Vitor Matos"
+     ]
+    }
+   ]
+  }
+ ]
 }
