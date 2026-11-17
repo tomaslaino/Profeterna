@@ -7772,8 +7772,8 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   inom divisionen jämförs bara när lagen spelar i samma, och inget lyser när resultaten är
   dolda.
   Efter formen i matchakten står **formens motstånd** (2026-11-12, användarens önskemål: "en siffra på
-  hur svåra de här lagen har varit"): hur bra de fem motståndarna var i snitt, från 0 (den
-  egna divisionens svagaste lag enligt modellen) till 100 (dess starkaste) – samma mått som
+  hur svåra de här lagen har varit"): hur bra de fem motståndarna var i snitt, 0–100 som deras
+  chans mot den egna divisionens mittenlag (se *Motståndets styrka utan nollor* nedan) – samma mått som
   strecket under formens rutor på matchsidan (`opp.level` i matchens fil). Siffran står
   alltid som vanligt – den säger inte vem som är bättre och lyser inte. Alla motståndare räknas (`opponentStrength` i
   [src/matches.js](src/matches.js)): lag i de fyra ligorna och National League har modellens
@@ -7782,8 +7782,8 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   anfall och försvar i modellen följer motståndarens (`strengthFromOdds` i
   [src/strength.js](src/strength.js)). Prövat 2026-11-12 på 60 spelade matcher i Premier
   League, där modellen har svaret: styrkan ur oddsen följer modellens (samband 0,87) och
-  ligger i snitt 10 steg ifrån för en enskild match. Lag starkare än divisionens bästa eller
-  svagare än dess sämsta hamnar i ändarna (Bayern München 100 för Arsenal, Fleetwood 0).
+  ligger i snitt 10 steg ifrån för en enskild match (på den gamla skalan från divisionens svagaste
+  till dess starkaste).
   Saknar fler än en av de fem matcherna styrka visas ingen siffra. Med dolda resultat står
   ett frågetecken, som för tavlans tal. EFL Trophy hämtas inte och finns varken i formen
   eller i siffran.
@@ -8088,7 +8088,7 @@ bland tre skisser i den riktiga närbilden:
   en rad per match – utfallet, resultatet, H eller B, motståndaren och dess styrka 0–100 med en
   mätare (*V 3–2 B ENGLAND 88 ▮▮▮▮▮*). Poängen och målen jämförs som formen och det bättre
   lyser; motståndet säger inte vem som är bättre och står som vanligt. Skalan är formens
-  motstånd: 0 för det svagaste laget i lagets division och 100 för det starkaste, ur matchens
+  motstånd: motståndarens chans mot mittenlaget i lagets division, ur matchens
   fil (`senaste[].opp`, som bygget nu sparar för alla tio och inte bara formens fem). Datorn har
   lagen sida vid sida, telefonen under varandra med lagets namn över listan. Saknar fler än två
   av matcherna styrka står inget snitt; med dolda resultat står ?. xG-raderna under gäller som
@@ -8098,14 +8098,29 @@ bland tre skisser i den riktiga närbilden:
   lagen i England, så landslagens motståndare hade ingen styrka – formens motstånd stod tomt
   för landskamperna. Nu kommer den ur World Football Elo Ratings (`elo_landslag`,
   [src/fetchers/elo.js](src/fetchers/elo.js), en gång om dagen): Elo-talet just nu för varje
-  landslag, på skalan från det svagaste till det starkaste laget i lagets egen liga i Nations
-  League (A–D), som divisionen för klubbarna (`landOpponentStrength` i
-  [src/matches.js](src/matches.js)); lag utanför den skalan hamnar i ändarna (Argentina 83 och
-  Tjeckien 0 för Spanien i liga A). Lagen hittas på ESPN:s engelska namn bland Elo-listans namn
+  landslag, mot mittenlaget i lagets egen liga i Nations League (A–D), som divisionen för
+  klubbarna (`landOpponentStrength` i [src/matches.js](src/matches.js)). Lagen hittas på ESPN:s engelska namn bland Elo-listans namn
   och stavningar; ESPN:s egna former (*Czech Republic*, *Republic of Ireland*, *Korea Republic*
   …) står i `ELO_NAMN`. Prövat 2026-11-16: alla 157 namn i
   [config/landslag.js](config/landslag.js) hittades. Samma styrka ger nu också formens motstånd
   i ÖVERSIKT för en landskamp.
+- **Motståndets styrka utan nollor** (2026-11-17, användarens fråga: "Är det inte orimligt att vissa
+  lag har '0' i svårighetsgrad?"): skalan gick från 0 för det svagaste laget i lagets division till
+  100 för det starkaste, och allt utanför fastnade i ändarna – för Newcastle var Hull och Millwall
+  0, för Arsenal både Hull, Slavia Prag och Fleetwood, och Bayern München 99. Nu är talet
+  motståndarens chans mot **mittenlaget** (medianen) i lagets division på neutral plan, där oavgjort
+  räknas som en halv vinst: 50 är ett lag som mittenlaget, och ingen motståndare når 0 eller 100,
+  eftersom ingen match är avgjord på förhand. För klubbarna räknas chansen ur modellens styrka:
+  skillnaden mot mittenlaget i mål per match, med lika många mål som mellan två genomsnittliga
+  Premier League-lag, ger sannolikheterna för 1, X och 2 i prognosmodellen (`difficulty` i
+  [src/strength.js](src/strength.js)). För landslagen är det Elo-skalans väntade resultat mot
+  mittenlagets Elo-tal (`eloDifficulty`). Skalan i mål: en motståndare ett halvt mål per match
+  bättre än mittenlaget får omkring 61, ett mål bättre 72 och två mål 86; ett mål sämre 28 och två
+  mål sämre 14 (Elo: 100 poäng över 64, 300 poäng 85). Skalan blir tätare inom divisionen än förut
+  – skillnaderna mellan ligans lag är så små i en enskild match – men lag från andra divisioner och
+  från utlandet skiljs nu åt. Talen är inte prövade mot sajtens riktiga styrkor när ändringen
+  gjordes (källorna gick inte att nå från maskinen); bygget räknar om alla matchfiler. Inget annat ändras: samma fält (`opp.level`, 0–1), samma snitt, mätare
+  och streck.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
