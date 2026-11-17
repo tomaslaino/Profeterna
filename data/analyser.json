@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T18:31:33.955Z",
+ "uppdaterad": "2026-11-17T18:33:12.453Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -4229,6 +4229,90 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-16.1",
     "writtenAt": "2026-11-17T17:10:00.172Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880149",
+   "match": "Wolverhampton Wanderers – Charlton Athletic",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T18:32:43.569Z",
+   "text": "Charlton vann till slut, nu väntar Molineux\n\nCharlton slutade vänta på en seger mot Sheffield United och reser till Molineux med lite mer luft i lungorna. Där väntar ett Wolves vars tränare oroar sig även när laget vinner. Två veckors landslagsuppehåll har gett båda lagen tid att fundera.\n\nCharltons senaste match var den första på länge som Nathan Jones kunde njuta av. Millenic Alli gav laget ledningen efter 12 minuter mot Sheffield United, Jordan Ayew kvitterade och Matty Godden avgjorde i 79:e minuten. Därmed var en svit på 11 ligamatcher utan seger bruten, och förlusterna i de fyra matcherna närmast före var glömda för stunden, enligt Sky Sports [1]. Jones tog det med ro: \"We won't over-egg it because it is just one win.\" Det låter som en tränare som vet att en seger är en seger och inte en säsong. Laget har gått mållöst från 6 av 15 ligamatcher, och det säger mer om veckan som kommer än något citat gör.\n\nI Wolverhampton är stämningen en annan. Cesar Peixoto, som tog över i somras efter Rob Edwards, säger att han är gladare när laget vinner men att han oroar sig hela tiden, eftersom laget har mycket kvar att förbättra, enligt Express & Star [2]. Han tycker att Wolves borde spela bättre med bollen, trots att laget har varit bäst i de flesta matcherna, och han har satt ribban själv: \"Perfect is when we finish the Championship in the top two positions.\" Han har en poäng, för hans lag skapar mycket men har släppt in fyra mål fler än chanserna emot motiverar. Det där löser man med en hink bollar och en målvakt som får stå i ett hörn en hel förmiddag. I Tjäderfors hade vi en tränare som också oroade sig när vi vann, och han fick rätt varje gång.\n\nTipset: 1 (utan större oro)\n\nPrognosen ger Wolves 1,49 och Charlton 7,69, och det jag har läst rubbar inte den bilden. Charlton fick sin första seger på 12 försök i senaste matchen [1], men en seger hemma mot Sheffield United väger lätt mot ett lag som har vunnit en enda bortamatch. Wolves har bara förlorat tre gånger, och Peixoto oroar sig mer för spelet med bollen än för resultaten [2]. Det som drar åt andra hållet är att Wolves har släppt in fler mål än chanserna emot motiverar, och det brukar jämna ut sig till deras fördel. Bollen har aldrig läst en tabell, men den här gången ringar jag bara in hemmasegern.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Charlton vann till slut, nu väntar Molineux",
+   "lead": "Charlton slutade vänta på en seger mot Sheffield United och reser till Molineux med lite mer luft i lungorna. Där väntar ett Wolves vars tränare oroar sig även när laget vinner. Två veckors landslagsuppehåll har gett båda lagen tid att fundera.",
+   "paragraphs": [
+    "Charltons senaste match var den första på länge som Nathan Jones kunde njuta av. Millenic Alli gav laget ledningen efter 12 minuter mot Sheffield United, Jordan Ayew kvitterade och Matty Godden avgjorde i 79:e minuten. Därmed var en svit på 11 ligamatcher utan seger bruten, och förlusterna i de fyra matcherna närmast före var glömda för stunden, enligt Sky Sports [1]. Jones tog det med ro: \"We won't over-egg it because it is just one win.\" Det låter som en tränare som vet att en seger är en seger och inte en säsong. Laget har gått mållöst från 6 av 15 ligamatcher, och det säger mer om veckan som kommer än något citat gör.",
+    "I Wolverhampton är stämningen en annan. Cesar Peixoto, som tog över i somras efter Rob Edwards, säger att han är gladare när laget vinner men att han oroar sig hela tiden, eftersom laget har mycket kvar att förbättra, enligt Express & Star [2]. Han tycker att Wolves borde spela bättre med bollen, trots att laget har varit bäst i de flesta matcherna, och han har satt ribban själv: \"Perfect is when we finish the Championship in the top two positions.\" Han har en poäng, för hans lag skapar mycket men har släppt in fyra mål fler än chanserna emot motiverar. Det där löser man med en hink bollar och en målvakt som får stå i ett hörn en hel förmiddag. I Tjäderfors hade vi en tränare som också oroade sig när vi vann, och han fick rätt varje gång."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sky Sports",
+     "title": "Charlton 2-1 Sheffield United: Matty Godden scores late to seal win for Addicks",
+     "url": "https://www.skysports.com/football/charlton-athletic-vs-sheffield-united/report/560670",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Express & Star (via Head Topics)",
+     "title": "‘Perfection is promotion’ - Boss demands more despite Wolves resurgence",
+     "url": "https://uk.headtopics.com/news/perfection-is-promotion-boss-demands-more-despite-89627977",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Wolves 1,49 och Charlton 7,69, och det jag har läst rubbar inte den bilden. Charlton fick sin första seger på 12 försök i senaste matchen [1], men en seger hemma mot Sheffield United väger lätt mot ett lag som har vunnit en enda bortamatch. Wolves har bara förlorat tre gånger, och Peixoto oroar sig mer för spelet med bollen än för resultaten [2]. Det som drar åt andra hållet är att Wolves har släppt in fler mål än chanserna emot motiverar, och det brukar jämna ut sig till deras fördel. Bollen har aldrig läst en tabell, men den här gången ringar jag bara in hemmasegern.",
+    "signs": [
+     0
+    ],
+    "note": "utan större oro",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sky Sports",
+      "title": "Charlton 2-1 Sheffield United: Matty Godden scores late to seal win for Addicks",
+      "url": "https://www.skysports.com/football/charlton-athletic-vs-sheffield-united/report/560670",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Express & Star (via Head Topics)",
+      "title": "‘Perfection is promotion’ - Boss demands more despite Wolves resurgence",
+      "url": "https://uk.headtopics.com/news/perfection-is-promotion-boss-demands-more-despite-89627977",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T18:32:43.569Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Charlton bröt till slut en svit på elva ligamatcher utan seger när de slog Sheffield United hemma. Det är bra för humöret, men en seger ändrar ingenting i ett lag som har gått mållöst från sex av femton ligamatcher. Borta mot ett lag som har varit bäst i de flesta av sina matcher får de vara glada om de får ett skott på mål.",
+     "Wolves tränare oroar sig även när de vinner, och det är precis så det ska vara. Laget skapar mycket och har släppt in fler mål än motståndarnas chanser motiverar, och sådant jämnar ut sig. Jag har sett det förr, i Manchester. Det gick bra då också. Charlton får stå och vänta på ett läge som aldrig kommer. Så är det bara. Etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–0",
+    "tips": "2026-11-17T18:32:43.569Z",
+    "uppdrag": {
+     "fraser": [
+      "Nej nej nej",
+      "Så är det bara"
+     ],
+     "krydda": "Jag har sett det förr, i Manchester. Det gick bra då också.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T18:33:03.514Z",
     "attempts": 2
    },
    "model": "claude-opus-5-5",
