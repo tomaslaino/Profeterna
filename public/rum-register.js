@@ -22,7 +22,7 @@
 //              MATCH), MÅLEN (hemmalaget hemma mot bortalaget borta, och på
 //              sidan ALLA MATCHER målen, nollorna, skytten och de främsta i
 //              assist och segermål), xG (chanserna, turen och kryssen). En
-//              flik som inte ryms på skärmen har sidor, radioknappar under
+//              flik som inte ryms på skärmen har sidor, ett mindre spår under
 //              flikraden (sedan 2026-11-17, se sidorna()), LÄGET (vilan, nästa match, skadorna och
 //              domaren) och MÖTENA (förra mötet med lagens siffror, när det
 //              var högst ett halvår sedan, och mötena de senaste fem åren). Det
@@ -1996,23 +1996,23 @@ window.RumRegister = (() => {
 
     // Flikraden under namnet (i det som står still överst, så att den inte
     // flyttar sig när man rullar eller byter flik): en flik utan något att
-    // visa svag och inte tryckbar. Tre mellanslag emellan som i menyraden, två
-    // när raden annars inte ryms (telefonen). Sedan 2026-11-17 (användarens
-    // val B "DOS-programmet" bland tre skisser av markeringen) är den valda
-    // fliken en mapp man ser in i: en ram runt fliken, öppen nedåt mot
-    // strecket under raden (klassen flik i rum-register.css, och så ritar
-    // skärmen i rummet den, rum-dator.js); till dess var den omvänd.
+    // visa svagast och inte tryckbar. Sedan kvällen 2026-11-17 (användarens
+    // val A "Spåret" bland fyra avskalade skisser av segmentraden och
+    // knapparna) är raden ett svagt spår över hela bredden, med lika mycket
+    // luft runt varje flik, och den valda fliken ett ljust fält i spåret; de
+    // andra är svaga. Bara flikarna, utan mellanslag: rum-register.css delar
+    // ut bredden (klassen flik), och skärmen i rummet gör det likadant
+    // (rum-dator.js). Tidigare samma dag var den valda fliken en mapp (en ram
+    // öppen nedåt mot ett streck under raden), och till dess omvänd.
     function delRad(delar, val, har) {
-      const n = delar.reduce((s, [, namn]) => s + namn.length, 0);
-      const mellan = n + 3 * (delar.length - 1) <= A.bred ? '   ' : '  ';
-      return Object.assign(rad(...delar.flatMap(([id, namn], j) => [[namn, id === val ? 'i' : har(id) ? '' : 'd', id === val || !har(id) ? null : `#del:${id}`], [j < delar.length - 1 ? mellan : '', '']])), { kl: 'flik' });
+      return Object.assign(rad(...delar.map(([id, namn]) => [namn, id === val ? 'i' : har(id) ? '' : 'd', id === val || !har(id) ? null : `#del:${id}`])), { kl: 'flik' });
     }
     // Sidorna i en flik (sedan 2026-11-17, användarens val B "Sidor i
     // fliken" bland två skisser; A var fler flikar, som i telefonen hade
     // hamnat på två rader). En flik som inte rymdes på skärmen – matchaktens
     // xG var 27 rader, MÅLEN 18, landslagens översikt 19 – delas i sidor,
     // 'oversikt' och 'oversikt/2', och sidorna står på raden under flikraden
-    // (sidRad) som radioknappar, så att ingen rad går åt och inget flyttar
+    // (sidRad) som ett mindre spår, så att ingen rad går åt och inget flyttar
     // sig. En flik med en sida har en tom rad där. delar är
     // flikarna [[id, namn]], sid en fliks sidor { id: [[id, namn] …] } och
     // finns(id) om en sida har något att visa. Ger den valda sidan (val, en
@@ -2027,14 +2027,14 @@ window.RumRegister = (() => {
       const val = l.some(([id]) => id === del) ? del : l.length ? l[0][0] : 'oversikt';
       return { val, topp, har: (id) => i(id).length > 0, ordning: delar.flatMap(([id]) => i(id).map(([x]) => x)), rad: l.length > 1 ? sidRad(l, val) : tom() };
     }
-    // flikens sidor som radioknappar under flikraden, den valda ljus:
-    // (•) HEMMA OCH BORTA   ( ) ALLA MATCHER – 38 tecken, ryms i telefonen
-    // (till 2026-11-17 stod sidorna i ett streck, den valda omvänd)
+    // flikens sidor under flikraden: samma spår som flikarna men mindre och
+    // svagare, i mitten och bara så brett som sidorna (klassen sid), med den
+    // valda sidan i ett svagt fält. Bara sidorna, utan mellanslag:
+    // rum-register.css och rum-dator.js ger luften. (Tidigare 2026-11-17 var
+    // de radioknappar, (•) TALEN   ( ) MATCH FÖR MATCH, och till dess stod de
+    // i ett streck, den valda omvänd.)
     function sidRad(l, val) {
-      return Object.assign(rad(...l.flatMap(([id, namn], j) => [
-        id === val ? [`(•) ${namn}`, 'v'] : [`( ) ${namn}`, '', `#del:${id}`],
-        [j < l.length - 1 ? '   ' : '', ''],
-      ])), { kl: 'sid' });
+      return Object.assign(rad(...l.map(([id, namn]) => (id === val ? [namn, 'v'] : [namn, '', `#del:${id}`]))), { kl: 'sid' });
     }
     // Avsnittets rubrik i en flik, med en tom rad före (inte överst) – utom
     // när rubriken säger samma sak som fliken (ODDSEN under ODDSEN): då

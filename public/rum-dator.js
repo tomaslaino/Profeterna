@@ -588,35 +588,56 @@ export async function dator(o) {
           g.fillRect(x, y + lh / 2 - 1, L.hoger - x, 2);
           return;
         }
-        // DOS-programmet (rum-register.js, klasserna meny och flik): menyraden
-        // är en ljus list över hela skärmen med den valda mörk, och den valda
-        // fliken en mapp – en ram öppen nedåt mot strecket under flikraden
+        // Spåret (rum-register.js och rum-register.css, klasserna flik och
+        // sid): kortets flikar i ett svagt spår över hela skärmen, med lika
+        // mycket luft runt varje flik, och den valda i ett ljust fält; flikens
+        // sidor samma spår mindre och svagare, i mitten med 1,5 tecken luft på
+        // var sida om varje sida, och den valda i ett svagt fält. Spåret och
+        // fältet står inom radens höjd (--spar och --falt i rum-register.css,
+        // telefonens glesare rader längre in).
+        if (rad.kl === 'flik' || rad.kl === 'sid') {
+          const sid = rad.kl === 'sid';
+          const tel = L.rad > 1.2;
+          const ys = (tel ? 0.06 : 0.04) * f;
+          const yf = (tel ? 0.12 : 0.09) * f;
+          const bitar = rad.filter(([t]) => t);
+          const tw = bitar.map(([t]) => cw * t.length);
+          const summa = tw.reduce((s, w) => s + w, 0);
+          const luft = sid ? 3 * cw : Math.max(0, (L.hoger - L.x - summa) / Math.max(1, bitar.length));
+          const bred = summa + luft * bitar.length;
+          let x0 = sid ? (L.x + L.hoger - bred) / 2 : L.x;
+          g.fillStyle = 'rgba(65,255,110,.08)';
+          rundRekt(g, x0, y - 2 + ys, bred, lh - 2 * ys, 0.25 * f);
+          g.fill();
+          g.shadowColor = 'transparent';
+          bitar.forEach(([t, k], j) => {
+            const w = tw[j] + luft;
+            const val = k === (sid ? 'v' : 'i');
+            if (val) {
+              g.fillStyle = sid ? 'rgba(65,255,110,.28)' : 'rgba(65,255,110,.9)';
+              rundRekt(g, x0 + 0.12 * f, y - 2 + yf, w - 0.24 * f, lh - 2 * yf, 0.18 * f);
+              g.fill();
+            }
+            g.globalAlpha = k === 'd' ? 0.45 : 1;
+            g.fillStyle = val ? (sid ? FARG.v : FARG.i) : FARG.d;
+            g.fillText(t, x0 + (w - tw[j]) / 2, y);
+            g.globalAlpha = 1;
+            x0 += w;
+          });
+          return;
+        }
+        // menyraden (rum-register.js, klassen meny): en ljus list över hela
+        // skärmen med den valda mörk
         const meny = rad.kl === 'meny';
-        const flik = rad.kl === 'flik';
-        const tjock = Math.max(2, 0.09 * f);
         if (meny) {
           g.fillStyle = FARG[''];
           g.fillRect(0, y - 2, c.width, lh);
-        }
-        if (flik) {
-          g.fillStyle = FARG[''];
-          g.fillRect(x, y - 2 + lh - tjock, L.hoger - x, tjock);
         }
         for (const [t, k] of rad) {
           const w = cw * t.length;
           if (k === 'i' && meny) {
             g.fillStyle = FARG.bak;
             g.fillRect(x - 6 * k34, y - 2, w + 12 * k34, lh);
-          } else if (k === 'i' && flik) {
-            const x0 = x - 0.75 * cw;
-            const x1 = x + w + 0.75 * cw;
-            const y0 = y - 2 - 0.06 * f;
-            g.fillStyle = FARG.bak;
-            g.fillRect(x0, y0, x1 - x0, y - 2 + lh - y0);
-            g.fillStyle = FARG[''];
-            g.fillRect(x0, y0, x1 - x0, tjock);
-            g.fillRect(x0, y0, tjock, y - 2 + lh - y0);
-            g.fillRect(x1 - tjock, y0, tjock, y - 2 + lh - y0);
           } else if (k === 'i') {
             g.fillStyle = FARG[''];
             g.fillRect(x - 6 * k34, y - 2, w + 12 * k34, lh);
@@ -637,8 +658,8 @@ export async function dator(o) {
             g.fillStyle = FARG.d;
             g.fillRect(x, y + lh / 2 - 1, w, 2);
           }
-          // (i listen: mörk text, den valda ljus; den valda fliken ljus)
-          const ljus = k === 'i' && (meny || flik);
+          // (i listen: mörk text, den valda ljus)
+          const ljus = k === 'i' && meny;
           g.fillStyle = ljus ? FARG.v : meny ? FARG.i : FARG[k || ''];
           g.shadowColor = !ljus && (k === 'i' || meny) ? 'transparent' : 'rgba(65,255,110,.55)';
           g.shadowBlur = 8 * k34;

@@ -8257,15 +8257,24 @@ under den tangenterna, omvända över hela bredden; det mellan dem rullar. Tange
 sedan 2026-11-17 i den svaga gröna, så att menyraden lyser mest och *STÄNG* inte drar
 blicken från innehållet.
 
-Sedan 2026-11-17 ser menyerna ut som i ett DOS-program: listen överst som tangentraden längst
-ner, kortets valda flik som en mapp man ser in i (en ram runt fliken, öppen nedåt där strecket
-under flikraden tar slut) och flikens sidor som radioknappar, *(•) HEMMA OCH BORTA   ( ) ALLA
-MATCHER*. Till dess var den valda menyn, fliken och sidan omvända block i en trappa. Användaren
-frågade hur menyn kunde bli bättre och fick tre skisser av markeringen (A Strecket som sajtens
-flikar, B DOS-programmet, C Hakparenteser) och fyra av placeringen (mittaxeln, ett träd i
-vänsterkanten, menyn nere i tangentraden, hörnen). Menyn i tangentraden låg ute en stund men
-blev inte bättre, och hen valde B. Skärmen i rummet ritar listen och mappen likadant
-(`rum-dator.js`), så att inget byter utseende när terminalen tar över.
+Kortens flikar och flikens sidor står sedan kvällen 2026-11-17 i **spår**: flikraden är ett svagt
+tonat spår över hela bredden, med lika mycket luft runt varje flik, och den valda fliken är ett
+ljust fält i spåret med mörk text; de andra flikarna är svaga, och en flik utan något att visa
+är svagast. Flikens sidor står under i samma spår, mindre och svagare: i mitten, bara så brett
+som sidorna, med den valda sidan i ett svagt fält (*TALEN | MATCH FÖR MATCH*). Spåren har inga
+ramar eller streck – bara fältet säger var man är – och de står inom radens höjd, så att ingen
+rad går åt. Det blev så i tre steg samma dag. Först
+blev menyerna som ett DOS-program: listen överst, den valda fliken en mapp (en ram öppen nedåt
+mot ett streck under flikraden) och sidorna radioknappar, *(•) TALEN   ( ) MATCH FÖR MATCH* –
+användarens val B bland tre skisser av markeringen (A Strecket som sajtens flikar, B
+DOS-programmet, C Hakparenteser) och fyra av placeringen (mittaxeln, ett träd i vänsterkanten,
+menyn nere i tangentraden, hörnen; menyn i tangentraden låg ute en stund men blev inte bättre).
+Till dess var den valda menyn, fliken och sidan omvända block i en trappa. På kvällen ville
+användaren ha något "standardiserat och snyggt" i stället för mappen och radioknapparna och fick
+fyra nya grepp (Segmentraden, Knapparna, Rullgardinen och Bläddraren), ville ha "segmentraden
+eller knapparna, fast mer minimalistiskt" och valde A *Spåret* bland fyra avskalade skisser (A
+Spåret, B Tonade knappar, C Konturen, D Hårstrecken). Skärmen i rummet ritar listen och spåren
+likadant (`rum-dator.js`), så att inget byter utseende när terminalen tar över.
 
 - **Kupongen** – omgångens matcher numrerade, bara lagen, med divisionen eller cupen där
   raden ryms och avsparken. Avsparken står på varje rad, svagt, och den som skiljer sig från
@@ -8398,7 +8407,7 @@ Tab byter flik (i sökningen kategori). Sedan 2026-11-17 går menyraderna också
 (användarens önskemål, "istället för med tab"): ↑ ovanför den första raden går upp i menyn –
 flikens sidor, kortets flikar och listen överst – där ↑/↓ går mellan menyraderna och ←/→ byter
 direkt i raden; ↓ under den nedersta går tillbaka till raderna och Esc lämnar menyn. Raden som
-tangenterna står i lyser: mappen och radioknappen fylls, listens val får en ljus kant.
+tangenterna står i lyser: flikens fält och listens val får en ljus kant, och sidans fält fylls.
 En vald match börjar med markören i flikraden (användarens önskemål samma dag), så att
 ←/→ byter flik direkt; ←/→ till förra och nästa match går efter Esc eller ↓ ner i raderna.
 Raden längst ner säger det med tangenternas namn och går att trycka på; i telefonen står
