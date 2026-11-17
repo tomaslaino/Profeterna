@@ -2698,8 +2698,11 @@ de flesta körningar har inget att göra och anropar inte Claude.
   kan ha kvar fler starttider; de gör inget, eftersom skriptet går efter `tider`. Varje
   tid skriver nya analyser för omgångens matcher som inte har börjat, och den nya texten ersätter den
   gamla, så hela omgången ger upp till 26 analyser i veckan. En tid gäller omgångar som fanns när klockan
-  slog: en omgång som skapas senare väntar till nästa tid, men en match utan analys skrivs ändå när
-  det är högst 24 timmar kvar till avspark. Har matcherna ändrats skrivs de nya vid nästa kontroll.
+  slog. En match utan analys skrivs så snart omgången finns, vid nästa kontroll, också när omgången kommer
+  efter måndagens tid (användarens önskan 2026-11-17, när Stryktipset 4980 kom först sent måndag kväll och
+  Hasse Backe fick vänta till fredag); kommer en tid inom tre timmar (`vantaTimmar`) och börjar matchen efter
+  den, väntar den på tiden, så att den inte skrivs två gånger i rad. Har matcherna ändrats skrivs de nya vid
+  nästa kontroll.
 - **Hasse Backes text** direkt efter varje analys.
 - **Tidningen inför omgången** så snart omgången finns och en gång till fredag 16.00, med det
   supporterpoddarna, supporterforumen och de insatta medierna har gett sedan dess (se nedan; användarens
