@@ -465,6 +465,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   redan var spelade. Matchbladen och sista sidan är skrivna för hand inför matcherna, ur veckans press. Omslaget säger
   *Nr 2* och *Inför Europatipset*, och nattjobbet låter numret stå kvar med alla matcherna (se *Nr 2* under
   [Helgarderat](#helgarderat))
+- [x] **Helgarderat kommer med kupongen (2026-11-17, användarens önskemål: "Jag vill att nästa tidning ska släppas när
+  nästa stryktipskupong (europatipskupong också) släpps!"):** när Svenska Spel öppnar nästa Stryktips eller Europatips
+  och det blir gängets omgång lägger nattjobbet ut nästa nummer inom en kvart, med omslaget och kupongens alla matcher
+  i innehållet, också innan något matchblad är skrivet. Bladen fylls i när de kommer. Förut kom numret först med det
+  första bladet, och Nr 2 låg kvar fast Stryktipset 4980 hade varit omgång i ett dygn. Nr 3 (Stryktipset 4980,
+  lördag 21 november) lades ut för hand samma dag, med omslaget och innehållet. Att skriva bladen för hand, som i Nr 2,
+  gick inte: miljön nådde inga nyhetssajter, och ändringen av dess nät avvisades (se *Numret kommer med kupongen* under
+  [Helgarderat](#helgarderat))
 
 ## Publicering
 
@@ -10299,6 +10307,24 @@ tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång 
 och veckan i huvudet (*Nr 1 · Vecka 46*) och ingen stämpel. Annars visar den provnumret, ett nollnummer (*Nr 0*, med
 stämpeln *Provnummer*). Numret räknas på veckorna: Nr 1 är veckan med lördagen den 14 november 2026, och sedan
 ett nummer i veckan där omgången börjar (`nummer` i [public/helgarderat.js](public/helgarderat.js)).
+
+**Numret kommer med kupongen** (2026-11-17, användarens önskemål: "Jag vill att nästa tidning ska släppas när nästa
+stryktipskupong (europatipskupong också) släpps!"). När Svenska Spel öppnar nästa Stryktips eller Europatips blir det
+gängets omgång av sig själv (tidigast måndagen efter förra omgången kl. 16, `autoRound` i
+[worker/samtal.mjs](worker/samtal.mjs)), och nattjobbets nästa körning, högst en kvart senare, lägger ut nästa nummer:
+omslaget med omgångens dagar och innehållet med kupongens alla matcher, bleka och utan sidnummer tills deras matchblad
+kommer (`poddsidor` i src/analyser/poddar.mjs, `upplaga` i [public/rum-tidning.js](public/rum-tidning.js)). Bladen
+fylls i när poddjobbet har skrivit dem, och sista sidan och löpsedeln skrivs som förut när det första bladet finns.
+Förut kom numret först med det första bladet, och då låg det förra kvar på pulten till dess: Stryktipset 4980 blev
+gängets omgång måndagen den 16 november kl. 23.52, men numret hade inte kommit dagen efter. Ett nummer utan blad har
+dagen då omgången startades som `uppdaterad`, och nattjobbets commit heter *Helgarderat Nr 3 inför omgången …*.
+Nr 3 lades ut för hand 2026-11-17 med samma funktion, ur omgångens matcher i `data/tidning.json`. Nattjobbets
+gamla kod, som kör första gången efter en push, låter ett nummer utan blad stå kvar (den returnerar inget), så här
+finns ingen fälla som den under *Nr 2*. Provat med Node (nytt nummer utan blad, samma omgång igen, jobbets blad som
+fylls i, blad utan `hand` som jobbets eget ersätter, ingen omgång, Nr 2 för sin egen omgång, och den gamla koden mot
+Nr 3) och i huvudlös Chromium i 1280 bredd och 390 × 844: omslaget (*Nr 3 · Vecka 47*, *Inför Stryktipset*, 21
+november), innehållet med tretton bleka matcher, `omslag` och `overst` för Hasse Backes tidning och löpsedeln, inga
+fel på sidan. Inte provat i rummet, i Safari eller i en riktig telefon.
 
 **Det första numret** (2026-11-10, användarens önskemål: "Jag vill att du gör första numret av Helgarderat nu och
 inte väntar på det") gäller lördagen den 14 november och lades i `data/poddsidor.json` för hand, innan nattjobbet

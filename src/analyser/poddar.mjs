@@ -637,11 +637,16 @@ export function poddNyckel(fil) {
 // Stryktipset lördag och Europatipset söndag–måndag samma vecka fick båda Nr 1 med veckoräkningen i
 // public/rum-tidning.js, som gäller för ett nummer utan nummer). spel är omgångens spel ur kupongtjänsten
 // ({namn: 'Europatipset', nr: 2625}), för omslagets "Inför Europatipset".
+// Numret kommer ut när kupongen kommer (2026-11-17, användarens önskemål: "Jag vill att nästa tidning ska släppas när
+// nästa stryktipskupong (europatipskupong också) släpps!"): gängets omgång byter till Svenska Spels nya kupong av sig
+// själv (autoRound i worker/samtal.mjs), och då kommer nästa nummer med omslaget och innehållet, också innan något
+// matchblad är skrivet. Bladen fylls i när jobbet har skrivit dem. Förut kom numret först med det första bladet, och
+// det förra låg kvar på pulten till dess. uppdaterad är för ett nytt nummer utan blad dagen då omgången startades.
 // → {omgang, nummer, spel, uppdaterad, amnen, matcher: [{id, nr, match, avspark}], sidor: [{id, nr, match, lag,
-//   rubrik, ingress, summering, citat, delar}]} eller null
+//   rubrik, ingress, summering, citat, delar}]} (sidor kan vara tom) eller null utan omgång
 export const sammaOmgang = (a, b) => Boolean(a && b) && String(a).slice(0, 10) === String(b).slice(0, 10);
 export function poddsidor(fil, round, nu = null) {
-  if (!round) return null;
+  if (!round || !Array.isArray(round.matcher) || !round.matcher.length) return null;
   const samma = Boolean(nu) && sammaOmgang(nu.omgang, round.id);
   const egen = fil && fil.omgang === round.id && fil.sidor ? fil.sidor : {};
   const forra = new Map(samma && Array.isArray(nu.sidor) ? nu.sidor.map((s) => [String(s.id), s]) : []);
@@ -664,8 +669,8 @@ export function poddsidor(fil, round, nu = null) {
     return { id: x.id, nr: x.nr, match: s.match, lag: s.lag, avspark: x.avspark || s.avspark || null, skriven: s.skriven, rubrik: s.rubrik || null, ingress: s.ingress || null,
       summering: s.summering || null, ...(s.citat ? { citat: s.citat } : {}), delar: s.delar };
   }).filter(Boolean);
-  const uppdaterad = (fil && fil.omgang === round.id && fil.uppdaterad) || (nu && nu.uppdaterad) || null;
+  const uppdaterad = (fil && fil.omgang === round.id && fil.uppdaterad) || (samma && nu.uppdaterad) || round.skapad || null;
   const nummer = nu && Number.isFinite(nu.nummer) ? (samma ? nu.nummer : nu.nummer + 1) : null;
   const spel = round.spel && round.spel.namn ? { namn: String(round.spel.namn), nr: round.spel.nr ?? null } : samma && nu.spel ? nu.spel : null;
-  return sidor.length ? { omgang: round.id, ...(nummer != null ? { nummer } : {}), ...(spel ? { spel } : {}), uppdaterad, amnen: pc.amnen, matcher, sidor } : null;
+  return { omgang: round.id, ...(nummer != null ? { nummer } : {}), ...(spel ? { spel } : {}), uppdaterad, amnen: pc.amnen, matcher, sidor };
 }
