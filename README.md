@@ -1412,6 +1412,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   upp och huvudet nere i kragen), händerna på ryggen (en del äldre som strosar), powerwalk (morgon och kväll, ofta två
   och två) och vinglar hem från krogen sent fredag och lördag. Gatan inifrån går på samma sätt. Se *Det som händer ute*
   under [Fasaden](#fasaden).
+- **Samma gata inifrån som utifrån (2026-11-17, användarens önskemål):** "Kan du ordna så att trafiken utanför
+  fönstret här passar bättre ihop med animationsvyn utanför butiken. Det ska inte dra en massa grafik utan man ska ha
+  en känsla av att det är samma - inklusive med bilar, människor, bussar etc." Genom fönstret syntes nästan ingen
+  trafik: bilarna var lika små som folket på bron men låg lågt i bilden, bakom gänget och fönsterbänken, och de körde åt
+  båda hållen fast gatan utanför är enkelriktad. Nu syns fasadens människor och fordon, samma i samma ögonblick som när
+  man går ut: de som går förbi på trottoaren alldeles utanför glaset (också den som stannar och tittar in, här med
+  ansiktet hitåt), och bortom kanten bilarna, taxin, skåpbilarna och bussarna, alla åt höger, som bromsar, står i kö
+  och tar fart som där. Mjukt ur skärpa i en grov duk, och i affärens ljus på kvällen. Se *Framför affären* under
+  *Utsikten och vädret* i [Tobaksaffären](#tobaksaffären).
 - **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
   som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
   långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
@@ -7090,17 +7099,30 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   gånger takten. Gångcykeln räknas en gång per sätt att gå (`TABELL`): i gatans storlek syns inte det som skiljer var
   och en i benen, och den tog ungefär 10 ms per figur i en långsam telefon. Med fyra gånger så långsam processor
   kostar ställningarna i telefonen 3–13 % mer per bild än de gamla figurerna (som har färre delar), och gatan tar
-  60–80 ms längre att bygga första gången. Utan rum-fasad.js går de som förut (`person`). Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
-  fler bilar i rusningen och färre på natten (fler taxi då), och på helger och röda dagar ingen
-  rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna, bussarna och plogbilen är
-  fasadens (sedan 2026-11-16, rum-fasad-gatan.js: nittiotalets bilar i Stockholm, skåpbilar och taxi med
-  taklampa), i gatans ljus, och halvljuset är alltid tänt, som i Sverige. Bussarna som går över S:t
-  Eriksbron kommer i båda riktningarna med några minuters mellanrum: röda 3:an eller 77:an
-  och blåa ledbussen 4:an. I en fil åker alla lika fort på ett band med luckor, så att ingen
-  kör igenom någon annan (bussarna och plogbilen har varsin lucka och kommer var m:e varv),
-  och fordonen ritas en gång och glider bara: de kostar mindre än förut, då de gungade och
-  ritades om i gängets takt (trafiken i `gatliv` i rum-ute.js). I SVG:n står bara en tom grupp per fordon, som ritas med
-  fasadens kod när figuren görs till en bild (`fordonsFigur`, `delar`).
+  60–80 ms längre att bygga första gången. Utan rum-fasad.js går de som förut (`person`).
+- **Framför affären (2026-11-17):** S:t Eriksgatan alldeles utanför är fasadens (se *Det som händer ute* och *Gatan och
+  trafiken* under [Fasaden](#fasaden)), med samma människor och samma fordon i samma ögonblick som när man går ut genom
+  dörren. Fasadens kod räknar ut vilka de är och var de är ur samma klocka (`RumFasad.framfor`, `RumFasadGatan.syns`)
+  och ritar dem (`ritaFigur`, `RumFasadGatan.rita`), här spegelvända, eftersom de ses från andra hållet (`ritaFram` i
+  rum-ute.js). De som går förbi på trottoaren alldeles utanför glaset syns från midjan och uppåt över fönsterbänken och
+  hela i dörren, och den som stannar och tittar in på oss står med ansiktet hitåt (`framDelar`). Bortom kantstenen och
+  rännstenen kör bilarna, taxin, skåpbilarna, bussarna och plogbilen i gatans två filer, alla åt höger härifrån (gatan
+  är enkelriktad, och utifrån kommer allt från höger). De bromsar in med bromsljusen tända, står i kö i rusningen och tar
+  fart igen, och bussarna når upp över gängets huvuden. Måtten: ögat är 1,25 m över marken med horisonten i y 382, och
+  något d m ut från fasaden har skalan `framS(d)` px per meter och marken i `framY(d)`. Trottoaren, kanten (0,88 m),
+  rännstenen och filerna (1,3 och 1,72 m) ligger alltså som i fasadens mått, och marken inifrån är ritad efter samma
+  mått. I sidled står ögat så att det som fasaden ser framför skyltfönstret och dörren ryms i glasen, och den som går
+  tonar in och ut där den vänder i kanten av fasadens bild. På dagen är färgerna kalla som resten av gatan, men mindre
+  (`KALL_FRAM`: de är närmare). På kvällen lyser affärens ljus ut på trottoaren och på dem som går där, framifrån sett
+  härinifrån, medan de utifrån är siluetter mot fönstret. Fasadens bild beror på fönstrets form, så folket räknas om när
+  formen ändras och när trafiken ändras efter klockan (`framModell`). Allt ritas i en enda grov duk över glasen, 0,4
+  bildpunkter per px, som blir mjuk när den förstoras: ur skärpa som resten av gatan, utan filter. I telefonen och på
+  datorns lägre steg ritas det i gatans duk (`ritaGatan`). Det ritas bara medan något syns: de som går i gängets takt,
+  och medan ett fordon kör förbi i varje bildruta, högst 60 gånger i sekunden (`framDuk`, `glid`). I Chromium utan
+  grafikkort tar det ungefär 0,1 ms per figur och 0,4 ms per fordon och bild, under en halv procent av en kärna i
+  rusningen. Hur mycket trafik det är följer `trafik` (rusning, natt, helger och röda dagar), som fasaden och Hasse
+  Backes utsikt också läser. Förut hade gatan inifrån egna fordon på ett band åt båda hållen (högertrafik), lika små
+  som de som går på bron men lågt i bilden, så att de nästan alltid låg bakom gänget och fönsterbänken.
 - **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och
   orange på hösten och kala annars; löv blåser förbi och ligger på trottoaren på hösten, plogbilen när
   det snöar, adventsstjärnor och ljusstakar i fönstren från första advent till
@@ -7333,7 +7355,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   när det har snöat. Allt räknas ur tiden: den delas i luckor om tolv sekunder per fil och i varje lucka kommer ett
   fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon kommer
   bara om det aldrig hamnar för nära något som kör före, så ingen kör igenom någon. Andra vyer som vill rita samma
-  fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
+  fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Gatan inifrån visar samma fordon i samma ögonblick, åt höger
+  därifrån (`syns` och `rita`; se *Framför affären* under *Utsikten och vädret*). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
   efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
   sekunden (30 i telefonen), så att de inte hoppar fram.
 - **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "bilarna verkar åka på samma höjd som
