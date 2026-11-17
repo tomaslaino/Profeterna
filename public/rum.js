@@ -676,6 +676,64 @@ window.Rum = (() => {
       svg(`<path d="M${x} -520 V-38" stroke="#1a120b" stroke-width="3.2"/>`, 'rum-lampsladd', [x - 3, -520, 6, 484]);
   }
 
+  // Bordslampan bredvid Helgarderat: en bankirlampa med skärm i grönt glas och fot i mässing längst till höger
+  // på pulten, som sticker in i bilden från kanten (2026-11-17, användarens önskemål: "Det är helt mörkt på den
+  // här sidan … Kanske en bordslampa där till höger om densamma som sticker ut?"). Tidningen låg utanför
+  // ljuskäglorna, i rummets hela dunkel; nu läses den i lampans ljus. Det enda som får plats är en smal remsa:
+  // tidningen till vänster, kanten till höger och videon på disken ovanför (den slutar vid y 585 här, och med
+  // kameran vriden så långt det går, musen uppe till höger, når den lite längre ned), så skärmen hänger strax ovanför
+  // tidningens överkant och en dryg tredjedel av lampan är utanför bilden.
+  // Den ligger i pultens plan som lampan över pulten (samma tonande och oskärpa vid närbilderna), ritas en gång
+  // och har sitt ljus bland käglorna (KAGLOR), i lacken (spegelBild) och på natten (rum-folk.css).
+  // Mått i scenens enheter (BORD: skärmens mitt i x, ovankant och nedre kant, foten), omräknade till planet.
+  const BORD = { x: 1588, topp: 601, kant: 655, fot: 770 };
+  function bordslampa() {
+    const { x, topp, kant, fot } = BORD;
+    const a = 90;
+    // skärmen: en halv cylinder sedd snett ovanifrån, med ändarna rundade och framkanten som buktar mot oss
+    const skarm = `M${x - a} ${kant - 6} C${x - a - 4} ${topp + 24} ${x - a + 12} ${topp + 3} ${x - a + 36} ${topp + 1} L${x + a - 36} ${topp + 1} C${x + a - 12} ${topp + 3} ${x + a + 4} ${topp + 24} ${x + a} ${kant - 6} Q${x} ${kant + 6} ${x - a} ${kant - 6} Z`;
+    // (axeln där ovansidan böjer över i framsidan, som fångar takets ljus)
+    const axel = `M${x - a + 14} ${topp + 17} C${x - 30} ${topp + 13} ${x + 30} ${topp + 13} ${x + a - 14} ${topp + 17}`;
+    const rand = `M${x - a} ${kant - 6} Q${x} ${kant + 5} ${x + a} ${kant - 6}`;
+    const k = (1 / 1.05).toFixed(5);
+    return svg(`<defs>
+    <radialGradient id="rum-bl-pol" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(${x - 60} ${fot - 22}) scale(215 96)"><stop offset="0" stop-color="#ffe4ac" stop-opacity=".26"/><stop offset=".5" stop-color="#ffdca0" stop-opacity=".12"/><stop offset="1" stop-color="#ffdca0" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-bl-sken" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(${x} ${kant - 4}) scale(130 46)"><stop offset="0" stop-color="#ffeec8" stop-opacity=".22"/><stop offset=".45" stop-color="#ffe2b0" stop-opacity=".07"/><stop offset="1" stop-color="#ffe2b0" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-bl-lyser" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(${x - 6} ${kant - 4}) scale(${a - 6} 30)"><stop offset="0" stop-color="#7cf0b2" stop-opacity=".42"/><stop offset=".55" stop-color="#3fbf7f" stop-opacity=".14"/><stop offset="1" stop-color="#3fbf7f" stop-opacity="0"/></radialGradient>
+    <radialGradient id="rum-bl-ned" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" fx="0" fy="-0.8" gradientTransform="translate(${x - 8} ${kant}) scale(${a + 34} 66)"><stop offset="0" stop-color="#fff2d2" stop-opacity=".55"/><stop offset=".4" stop-color="#ffe4b0" stop-opacity=".18"/><stop offset="1" stop-color="#ffe4b0" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rum-bl-glas" gradientUnits="userSpaceOnUse" x1="0" y1="${topp}" x2="0" y2="${kant + 5}"><stop offset="0" stop-color="#4a9c70"/><stop offset=".2" stop-color="#247a50"/><stop offset=".34" stop-color="#14573a"/><stop offset=".62" stop-color="#0d442a"/><stop offset=".88" stop-color="#17603f"/><stop offset="1" stop-color="#2f8558"/></linearGradient>
+    <linearGradient id="rum-bl-sida" gradientUnits="userSpaceOnUse" x1="${x - a}" y1="0" x2="${x + a}" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".22" stop-color="#000" stop-opacity=".05"/><stop offset=".5" stop-color="#9dffcf" stop-opacity=".1"/><stop offset=".78" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+    <linearGradient id="rum-bl-massing" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a3210"/><stop offset=".35" stop-color="#b48a3c"/><stop offset=".55" stop-color="#f0d38c"/><stop offset=".75" stop-color="#9a7128"/><stop offset="1" stop-color="#3a2708"/></linearGradient>
+    <linearGradient id="rum-bl-fot" gradientUnits="userSpaceOnUse" x1="${x - 54}" y1="0" x2="${x + 54}" y2="0"><stop offset="0" stop-color="#3a2708"/><stop offset=".3" stop-color="#9a7128"/><stop offset=".5" stop-color="#e6c47a"/><stop offset=".7" stop-color="#8d6624"/><stop offset="1" stop-color="#2e1f06"/></linearGradient>
+    <radialGradient id="rum-bl-topp" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(${x - 14} ${fot - 3}) scale(54 15)"><stop offset="0" stop-color="#f6dc9a"/><stop offset=".5" stop-color="#c49a48"/><stop offset="1" stop-color="#7a5418"/></radialGradient>
+    <radialGradient id="rum-bl-skugga" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(${x + 6} ${fot + 9}) scale(70 15)"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".6" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  </defs>
+  <g transform="translate(800 500) scale(${k}) translate(-800 -500)">
+  <ellipse cx="${x - 60}" cy="${fot - 22}" rx="215" ry="96" fill="url(#rum-bl-pol)"/>
+  <ellipse cx="${x + 6}" cy="${fot + 9}" rx="70" ry="15" fill="url(#rum-bl-skugga)"/>
+  <path d="M${x - 54} ${fot} V${fot + 8} A54 15 0 0 0 ${x + 54} ${fot + 8} V${fot} Z" fill="url(#rum-bl-fot)"/>
+  <ellipse cx="${x}" cy="${fot}" rx="54" ry="15" fill="url(#rum-bl-topp)"/>
+  <ellipse cx="${x}" cy="${fot}" rx="54" ry="15" fill="none" stroke="#fbe7b0" stroke-opacity=".45" stroke-width="1.2"/>
+  <path d="M${x - 22} ${fot - 5} V${fot - 1} A22 6 0 0 0 ${x + 22} ${fot - 1} V${fot - 5} Z" fill="url(#rum-bl-fot)"/>
+  <ellipse cx="${x}" cy="${fot - 5}" rx="22" ry="6" fill="url(#rum-bl-topp)"/>
+  <rect x="${x - 4.2}" y="${kant}" width="8.4" height="${fot - kant - 6}" fill="url(#rum-bl-massing)"/>
+  <ellipse cx="${x}" cy="${r1((kant + fot) / 2 + 6)}" rx="8" ry="5" fill="url(#rum-bl-massing)"/>
+  <path d="M${x - 40} ${kant + 2} V${kant + 36}" stroke="#c9a253" stroke-width="1.5" stroke-dasharray="1.6 1.3"/>
+  <ellipse cx="${x - 40}" cy="${kant + 39}" rx="2.4" ry="3.6" fill="url(#rum-bl-massing)"/>
+  <ellipse cx="${x}" cy="${kant - 4}" rx="130" ry="46" fill="url(#rum-bl-sken)"/>
+  <ellipse cx="${x - 8}" cy="${kant}" rx="${a + 34}" ry="66" fill="url(#rum-bl-ned)"/>
+  <path d="${skarm}" fill="url(#rum-bl-glas)"/>
+  <path d="${skarm}" fill="url(#rum-bl-lyser)"/>
+  <path d="${skarm}" fill="url(#rum-bl-sida)"/>
+  <path d="M${x - a + 30} ${topp + 6} C${x - 20} ${topp + 3} ${x + 20} ${topp + 3} ${x + a - 30} ${topp + 6}" fill="none" stroke="#eafff2" stroke-opacity=".34" stroke-width="3" stroke-linecap="round"/>
+  <path d="${axel}" fill="none" stroke="#06261a" stroke-opacity=".35" stroke-width="1.6"/>
+  <path d="M${x - a + 14} ${topp + 16} C${x - a + 8} ${topp + 24} ${x - a + 8} ${kant - 18} ${x - a + 12} ${kant - 9}" fill="none" stroke="#c9ffe0" stroke-opacity=".18" stroke-width="2" stroke-linecap="round"/>
+  <path d="${rand}" fill="none" stroke="#fff6dc" stroke-opacity=".3" stroke-width="6" stroke-linecap="round"/>
+  <path d="${rand}" fill="none" stroke="#f8f1da" stroke-width="2.6"/>
+  <rect x="${x - 9}" y="${kant - 1}" width="18" height="6" rx="1.5" fill="url(#rum-bl-massing)"/>
+  </g>`, 'rum-bordslampa', [1286, 557, 391, 267], 2 / 3);
+  }
+
   // Ringarna efter glas på pulten: samma som i Hasse Backes bild (rum-pult.js), genom rummets kamera.
   function ringar(el) {
     import('./rum-pult.js').then(({ ringar: lista, iRum, L }) => {
@@ -1452,10 +1510,19 @@ window.Rum = (() => {
   // igenom 0,3 av det, så att papperet blev grått och de nedre raderna mörka. Nu är kupongen det ljusaste i
   // bilden (2026-11-17).
   const KUPONG_LJUS = [775, 875, 640, 280, 0.94, true];
+  // Lampans kägla ligger jämnt över hans händer, kaffet och notan, som kupongens: det är hörnet där rummet och
+  // hans bild möts, och hos honom är notan och koppen det ljusaste på disken. Förut låg käglan till vänster om
+  // notan och tonade ut från mitten, så att notan, koppen och händerna hade 0,4 av dunklet och kvällens mörker
+  // över sig, rakt under lampan: notan 20 % och koppen 40 % mörkare än hos honom (2026-11-17).
+  const LAMPA_LJUS = [205, 820, 360, 250, 0.94, true];
+  // Bordslampans kägla (BORD, bordslampa) ligger över tidningen och pulten under skärmen, jämn som de andra:
+  // tidningen låg förut helt i dunklet (2026-11-17).
+  const BORD_LJUS = [BORD.x - 75, 752, 250, 175, 0.9, true];
   const KAGLOR = [
     [575, 450, 440, 300, 0.92, true],
     KUPONG_LJUS,
-    [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
+    LAMPA_LJUS,
+    BORD_LJUS,
   ];
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
   const DUNKEL = [0.1, 0.2, 0.42];
@@ -1506,8 +1573,10 @@ window.Rum = (() => {
     g.clip();
     // (takfläktens kupor, KAGLOR[0] ovanför)
     rad(g, 575, 690, 170, 170, '255, 228, 180', r1(0.16 + 0.08 * kvall));
-    // (lampan över pulten: en varm strimma under den, där den speglas)
+    // (lampan över pulten: en varm strimma under den, där den speglas; bordslampan i lacken under foten,
+    // i pultens mått)
     rad(g, LAMPA_I[0] + 10, 700, 70, 190, '255, 222, 168', r1(0.2 + 0.1 * kvall));
+    rad(g, r1(800 + (BORD.x - 800) / 1.05), 800, 46, 105, '255, 222, 168', r1(0.16 + 0.08 * kvall));
     // neonen i strimmor, som i lackat trä
     const n = 0.15 + 0.45 * kvall;
     rad(g, 400, 670, 110, 200, '255, 60, 45', r1(n));
@@ -1577,6 +1646,7 @@ window.Rum = (() => {
       // (löpsedlarna i tavellampans ljus)
       rad(q, 855, 360, 140, 210, '0, 0, 0', 0.95);
       rad(q, LAMPA_I[0], LAMPA_I[1], 170, 125, '0, 0, 0', 0.9);
+      rad(q, BORD.x, BORD.kant - 4, 130, 48, '0, 0, 0', 0.85);
       // (tavellampans ljus faller på disken under Tipsligan, med pallarna)
       rad(q, 1320, 560, 290, 120, '0, 0, 0', 0.45);
       // (och runt neonens spegelbild i pulten, spegelBild)
@@ -1620,6 +1690,8 @@ window.Rum = (() => {
         rad(g, 575, 470, 400, 250, '255, 210, 150', r1(0.12 * ml));
         rad(g, 575, 520, 260, 100, '255, 224, 175', r1(0.16 * ml));
         rad(g, 805, 870, 560, 230, '255, 218, 165', r1(0.12 * (1 - ng)));
+        // (bordslampans ljus över tidningen: den är tänd också på natten, som lampan över pulten)
+        rad(g, BORD_LJUS[0], BORD_LJUS[1], 230, 150, '255, 216, 160', r1(0.08 + 0.06 * kvall));
       }
       rad(g, 400, 130, 416, 300, '255, 50, 40', r1(0.42 * f));
       rad(g, 448, 460, 352, 260, '255, 60, 50', r1(0.2 * fh));
@@ -1725,7 +1797,7 @@ ${plane(-598, vid('horn'), 1.035, 'rum-pl3d rum-pl-vhs')}
 </div></div><div class="rum-world">
 ${plane(-470, `${tv()}`, 1.02, 'rum-pl3d')}
 ${plane(-330, `${sill()}${haze()}`)}
-${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}${lampa()}`, 1.05)}
+${plane(-60, `${table()}<svg class="rum-pult-mer" viewBox="-10 1000 1620 340" aria-hidden="true"><image href="rum/pult-mer.webp" x="-10" y="1000" width="1620" height="340" preserveAspectRatio="none"/><g class="rum-sol"></g></svg>${vid('pult')}${lampa()}${bordslampa()}`, 1.05)}
 ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div><i class="rum-vmork" id="rum-vmork"></i></div>
 <div class="rum-layer rum-mork" id="rum-mork"></div><i class="rum-mork-ut"></i>
@@ -1733,7 +1805,7 @@ ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div>
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
+<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.varldar = [...el.querySelectorAll('.rum-world')];
@@ -1742,7 +1814,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ringar(el);
     wire();
     // kort: högst elva tecken
-    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [] }) : null;
+    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [], avVal: (on) => { if (window.RumBild) RumBild.avVal(on); } }) : null;
+    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång och Visa dig på tv:n i foten
+    if (window.RumBild && R.tv) RumBild.mount(el, { tv: R.tv });
     tangenter();
     // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet
     // som syntes nära något var annars Vanlig sida, som leder ut ur rummet.
@@ -3450,12 +3524,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Gatan i en duk (rum-ute.js): medan något far förbi läggs den ut i varje
   // bildruta, högst 60 gånger i sekunden (ms: bildrutans tid), så att bilarna
   // och de som går förbi glider jämnt; ställningarna ritas i gängets takt
-  // (uteTakt). Annars, och när gatan inte syns, ingenting här.
+  // (uteTakt). I datorn, utan gatans duk, bilarna framför affären (framDuk i
+  // rum-ute.js). Annars, och när gatan inte syns, ingenting här.
   function gatan(ms) {
     R.gatGlid = false;
     if (R.vlatt || calm() || !window.RumUte || !RumUte.glid) return;
     const ute = document.getElementById('rum-ute');
-    if (!ute || !ute._gat || ute.classList.contains('vila') || !syns(ute)) return;
+    if (!ute || !(ute._gat || ute._framC) || ute.classList.contains('vila') || !syns(ute)) return;
     R.gatGlid = Boolean(ute._fort);
     if (ms - (R.gatSist || 0) < 1000 / 60 - 4) return;
     R.gatSist = ms;
@@ -7143,6 +7218,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = true;
     document.documentElement.classList.add('rum-pa');
     if (window.RumFolk) RumFolk.on(true);
+    if (window.RumBild) RumBild.on(true);
     fit();
     kval(R.kval);
     zoomTv(false);
@@ -7221,6 +7297,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.on = false;
     document.documentElement.classList.remove('rum-pa');
     if (window.RumFolk) RumFolk.on(false);
+    if (window.RumBild) RumBild.on(false);
     cancelAnimationFrame(R.raf);
     clearTimeout(R.vila);
     clearInterval(R.poll);

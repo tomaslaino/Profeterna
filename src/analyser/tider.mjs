@@ -42,17 +42,22 @@ export const senasteTid = (now, tider) => runt(now, tider).filter((t) => t <= no
 export const nastaTid = (now, tider) => runt(now, tider).find((t) => t > now) || null;
 
 // Vilka av omgångens matcher ska skrivas nu? per: match-id → analysen.
-//   - En tid gäller omgångar som fanns när klockan slog, så att en omgång som skapas
-//     strax före nästa tid inte skrivs två gånger i rad.
-//   - En match utan analys skrivs ändå när det är högst forhandTimmar kvar till avspark.
-//   - Analyser med en äldre promptVersion räknas som saknade.
+//   - En match utan aktuell analys (ingen alls, eller en med äldre promptVersion) skrivs så
+//     snart omgången finns (användarens önskan 2026-11-17: Stryktipset 4980 kom först sent
+//     måndag kväll, efter måndagens tid, och Hasse fick vänta till fredag). Kommer en tid inom
+//     vantaTimmar och börjar matchen efter den, väntar den på tiden, så att den inte skrivs två
+//     gånger i rad (måndagens kupong kommer kl. 16, tiden är 17).
+//   - En tid skriver om analyserna för omgångar som fanns när klockan slog, så att en omgång
+//     som skapas strax före nästa tid inte skrivs två gånger i rad.
 // → {kvar, klara, att, tid, nasta}: att är matcherna som ska skrivas, tid den senaste
 // tiden och nasta den som kommer efter.
-export function attSkriva(round, per, { now, tider, forhandTimmar, version, tvinga = false }) {
+export function attSkriva(round, per, { now, tider, vantaTimmar = 0, version, tvinga = false }) {
   const kvar = round.matcher.filter((x) => Date.parse(x.avspark) > now);
   const tid = senasteTid(now, tider);
+  const nasta = nastaTid(now, tider);
   const skapad = Date.parse(round.skapad) || 0;
   const galler = tid >= skapad;
+  const vantar = (x) => nasta !== null && nasta - now <= vantaTimmar * H && Date.parse(x.avspark) > nasta;
   const klara = [];
   const att = [];
   for (const x of kvar) {
@@ -60,10 +65,9 @@ export function attSkriva(round, per, { now, tider, forhandTimmar, version, tvin
     const aktuell = Boolean(a && a.version === version);
     const fardig = aktuell && (!galler || Date.parse(a.writtenAt) >= tid);
     if (fardig) klara.push(x);
-    const saknasNara = !aktuell && Date.parse(x.avspark) - now <= forhandTimmar * H;
-    if (tvinga || (!fardig && (galler || saknasNara))) att.push(x);
+    if (tvinga || (!fardig && (aktuell ? galler : !vantar(x)))) att.push(x);
   }
-  return { kvar, klara, att, tid, nasta: nastaTid(now, tider) };
+  return { kvar, klara, att, tid, nasta };
 }
 
 // Europatipset och andra spel än Stryktipset har inga fasta dagar: omgången kan börja vilken dag som helst, ofta

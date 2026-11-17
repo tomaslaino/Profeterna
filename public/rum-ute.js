@@ -12,8 +12,9 @@
 // sedan i fönstret.
 //
 // Lagren, bakifrån: himlen (SVG), livet på himlen (molnen, fåglarna,
-// fyrverkerierna), blixten, gatan (SVG), livet på gatan, nederbörden och glaset
-// (dropparna, frosten). Bilderna ritas om när ljuset eller vädret ändras;
+// fyrverkerierna), blixten, gatan (SVG), livet på gatan, det som går och kör
+// förbi alldeles framför affären (fasadens, i samma ögonblick: framDuk),
+// nederbörden och glaset (dropparna, frosten). Bilderna ritas om när ljuset eller vädret ändras;
 // det som rör sig är CSS-animationer med bara transform och opacity
 // (rum-ute.css), som står still med prefers-reduced-motion och ?rum-t.
 //
@@ -417,37 +418,67 @@ window.RumUte = (() => {
       <circle cx="600" cy="313" r="6" fill="${syn('#2a5aa8')}" stroke="${syn('#c8322a')}" stroke-width="1.6"/><path d="M596 309 L604 317" stroke="${syn('#c8322a')}" stroke-width="1.4"/><rect x="595" y="321" width="10" height="5" fill="${syn('#e8a030')}"/>
       <g fill="none" stroke="${syn('#2b2f36')}" stroke-width="1.3"><circle cx="537" cy="394" r="6.5"/><circle cx="560" cy="394" r="6.5"/><path d="M537 394 L545 394 L541 384 M545 394 L555 384 L541 384 M555 384 L560 394 M555 384 L556 379 M541 384 L540 381"/></g>`;
 
-    // marken: trottoaren på bron, kantstenen och gatan – torr, våt eller snöig
+    // marken: trottoaren på bron, kantstenen och gatan – torr, våt eller snöig – och närmast trottoaren utanför
+    // affären, med kantstenen i granit och rännstenen, så som fasaden har dem: i samma mått som de som går och kör
+    // där (framY, rum-fasad-gatan.js: kanten 0,88 m ut, rännstenen till 1 m, filerna 1,3 och 1,72 m och linjen
+    // mellan dem 1,51 m)
     const dry = [mix('#25262b', '#a19f99', L.dag), mix('#121318', '#5b5d61', L.dag)];
     const wet = [mix('#2a2b30', '#6c6e72', L.dag), mix('#121318', '#383b40', L.dag)];
     let [walk, road] = L.wet || v.blott ? wet : dry;
     if (sno) { walk = sno; road = mix('#262b36', '#a3a9b0', L.dag); }
-    s += `<rect x="-80" y="400" width="1100" height="11" fill="${walk}"/><rect x="-80" y="411" width="1100" height="3" fill="${mix(walk, '#000', 0.35)}"/><rect x="-80" y="414" width="1100" height="310" fill="${road}"/>`;
+    const yRann = r1(framY(1));
+    const yKant = r1(framY(0.88));
+    const yTrott = r1(framY(0.76));
+    const nara = sno ? mix(sno, '#9aa2ad', 0.22) : walk;
+    s += `<rect x="-80" y="400" width="1100" height="11" fill="${walk}"/><rect x="-80" y="411" width="1100" height="3" fill="${mix(walk, '#000', 0.35)}"/><rect x="-80" y="414" width="1100" height="310" fill="${road}"/>
+      <rect x="-80" y="${yRann}" width="1100" height="${r1(yKant - yRann)}" fill="${sno ? mix(road, '#000', 0.12) : mix(road, '#4a3e32', 0.35)}"/>
+      <rect x="-80" y="${yKant}" width="1100" height="${r1(yTrott - yKant)}" fill="${sno ? nara : granit}"/><path d="M-80 ${yKant}H1020" stroke="${mix(granit, '#ffffff', 0.18)}" stroke-width="1.2" opacity="${r1(0.3 + 0.4 * L.dag)}"/>
+      <rect x="-80" y="${yTrott}" width="1100" height="${r1(724 - yTrott)}" fill="${nara}"/>
+      <path d="M-80 ${r1(framY(0.6))}H1020M-80 ${r1(framY(0.4))}H1020M-80 ${r1(framY(0.2))}H1020" stroke="${mix(nara, '#000', 0.2)}" stroke-width="1.4" opacity=".55"/>`;
+    if (!sno) {
+      // (gatstenen i rännstenen)
+      let d = '';
+      for (let x = -76; x < 1020; x += 9) d += `M${x} ${yRann}v${r1(yKant - yRann)}`;
+      s += `<path d="${d}" stroke="${mix(road, '#000', 0.3)}" stroke-width="1" opacity=".5"/>`;
+    }
+    // kvällen: affärens ljus faller ut genom fönstret och dörren på trottoaren (X: fasadens meter i sidled, framX)
+    if (L.dag < 0.6) {
+      const a = 1 - L.dag / 0.6;
+      const p = (X, d) => `${r1(framX(X, framS(d)))},${r1(framY(d))}`;
+      s += `<defs><linearGradient id="rum-ute-affar" x1="0" y1="${yKant}" x2="0" y2="${r1(framY(0.1))}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb36a" stop-opacity="0"/><stop offset="1" stop-color="#ffb36a" stop-opacity="${r1(0.34 * a * 100) / 100}"/></linearGradient></defs>
+        <polygon points="${p(-2.1, 0.88)} ${p(1.6, 0.88)} ${p(1.9, 0.05)} ${p(-2.4, 0.05)}" fill="url(#rum-ute-affar)"/>`;
+    }
     if (sno) {
-      s += `<g fill="${mix(road, '#000', 0.25)}"><rect x="-80" y="470" width="1100" height="9"/><rect x="-80" y="500" width="1100" height="9"/><rect x="-80" y="536" width="1100" height="11"/></g>`;
+      // hjulspåren i filerna och plogvallen längs kanten
+      s += `<g fill="${mix(road, '#000', 0.25)}">${[1.3, 1.72].map((d) => `<rect x="-80" y="${r1(framY(d) - 2.5)}" width="1100" height="5"/>`).join('')}</g>`;
       const RP = rng(9);
       let p = 'M-80 418';
       for (let x = -80; x <= 1020; x += 20) p += ` Q${x + 10} ${r1(404 - RP() * 8)} ${x + 20} ${r1(416 + RP() * 3)}`;
       s += `<path d="${p} L1020 420 L-80 420 Z" fill="${mix(sno, '#9aa2ad', 0.2)}"/>`;
+      p = `M-80 ${yKant}`;
+      for (let x = -80; x <= 1020; x += 26) p += ` Q${x + 13} ${r1(yRann - 3 - RP() * 7)} ${x + 26} ${r1(yRann + 1 + RP() * 3)}`;
+      s += `<path d="${p} L1020 ${yKant} Z" fill="${sno}"/>`;
     } else {
-      // mittlinjen
+      // linjen mellan filerna
+      const yl = framY(1.51);
       let d = '';
-      for (let x = -60; x < 1020; x += 110) d += `M${x} 515.5h48`;
+      for (let x = -60; x < 1020; x += 260) d += `M${x} ${r1(yl)}h100`;
       s += `<path d="${d}" stroke="${mix('#3a3c40', '#e2e0da', L.dag)}" stroke-width="3" opacity="${r1(0.35 + 0.25 * L.dag)}"/>`;
       if (v.blott && L.dag > 0.2) {
         s += `<rect x="-80" y="416" width="1100" height="60" fill="${L.sky[2]}" opacity="${r1(0.18 * L.dag)}" filter="url(#rum-ute-b4)"/>`;
         const RP = rng(13);
-        for (let i = 0; i < 7; i++) s += `<ellipse cx="${r1(RP() * 1000)}" cy="${r1(430 + RP() * 120)}" rx="${r1(20 + RP() * 40)}" ry="${r1(2 + RP() * 3)}" fill="${L.sky[1]}" opacity="${r1(0.25 * L.dag)}"/>`;
+        for (let i = 0; i < 7; i++) s += `<ellipse cx="${r1(RP() * 1000)}" cy="${r1(422 + RP() * 58)}" rx="${r1(20 + RP() * 40)}" ry="${r1(2 + RP() * 3)}" fill="${L.sky[1]}" opacity="${r1(0.25 * L.dag)}"/>`;
       }
     }
-    // höstlöven på trottoaren och i rännstenen
+    // höstlöven på trottoaren mittemot, och i rännstenen och på trottoaren utanför (större: närmare)
     if (lov === 'host' && !sno) {
       const RL = rng(29);
       const cols = ['#c7682a', '#d99a2b', '#a8452a', '#8a5a2a', '#c9a23a'];
       for (let i = 0; i < 70; i++) {
         const x = r1(RL() * 1060 - 60);
-        const y = r1(i < 40 ? 401 + RL() * 13 : 414 + RL() * 30);
-        s += `<ellipse cx="${x}" cy="${y}" rx="${r1(1.4 + RL() * 1.4)}" ry="${r1(0.8 + RL() * 0.6)}" fill="${pick(RL, cols)}" opacity="${r1(0.3 + 0.6 * L.dag)}" transform="rotate(${r1(RL() * 180)} ${x} ${y})"/>`;
+        const y = r1(i < 40 ? 401 + RL() * 13 : yRann + RL() * 70);
+        const k = i < 40 ? 1 : 2.6 + (y - yRann) / 30;
+        s += `<ellipse cx="${x}" cy="${y}" rx="${r1((1.4 + RL() * 1.4) * k)}" ry="${r1((0.8 + RL() * 0.6) * k)}" fill="${pick(RL, cols)}" opacity="${r1(0.3 + 0.6 * L.dag)}" transform="rotate(${r1(RL() * 180)} ${x} ${y})"/>`;
       }
     }
 
@@ -460,7 +491,7 @@ window.RumUte = (() => {
       if (L.lampor) {
         const big = 1 + 0.8 * L.dimma;
         s += `<circle cx="${lx}" cy="${ly}" r="${r1(60 * k * big)}" fill="url(#rum-sodium)" opacity="${r1(0.7 * (1 - L.dag))}"/><circle cx="${lx}" cy="${ly}" r="${r1(4 * k)}" fill="#ffe2b0"/>`;
-        if (L.wet || v.blott) s += `<rect x="${lx - 7}" y="418" width="14" height="140" fill="url(#rum-streak)" filter="url(#rum-ute-b4)" opacity="${r1(1 - L.dag)}"/>`;
+        if (L.wet || v.blott) s += `<rect x="${lx - 7}" y="418" width="14" height="66" fill="url(#rum-streak)" filter="url(#rum-ute-b4)" opacity="${r1(1 - L.dag)}"/>`;
         else if (sno) s += `<ellipse cx="${lx}" cy="418" rx="70" ry="16" fill="#ffc27a" opacity="${r1(0.16 * (1 - L.dag))}" filter="url(#rum-ute-b4)"/>`;
       } else s += `<circle cx="${lx}" cy="${ly}" r="${r1(3 * k)}" fill="${mix('#2a2a2a', '#c8ccd0', L.dag)}"/>`;
     }
@@ -516,9 +547,10 @@ window.RumUte = (() => {
   // ---------- de som går: samma gång som framför affären ----------
   //
   // De som går på trottoaren mittemot går som de som går förbi framför affären (rum-fasad.js, RumFasad.gang): samma
-  // sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, på halkan, med käpp och springer),
-  // var och en lite olika, och samma ställning i varje bild (stalln): foten i marken står still mot stenen, höften
-  // gungar, knät böjs, armarna pendlar emot benen och överkroppen lutar. Figuren ritas i centimeter (fötterna i 0,
+  // sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, hasar, kliver, stram, fryser,
+  // haltar, på halkan, med käpp och springer, och händerna på ryggen), var och en på sitt sätt, och samma ställning i
+  // varje bild (stalln): foten i marken står still mot stenen, höften gungar, knät böjs, armarna pendlar emot benen och
+  // överkroppen lutar. Figuren ritas i centimeter (fötterna i 0,
   // vänd åt höger, samma huvud och hår som framför affären) och förminskas till gatan, CMG px per cm, och delarnas
   // grupper (g-…) får sina vinklar ur ställningen (rorelse, gangLas). Farten är steglängden gånger takten, så att
   // fötterna inte glider. Utan rum-fasad.js går de som förut (person).
@@ -538,7 +570,7 @@ window.RumUte = (() => {
       GG.stalln(0, s0);
       TABELL[st.namn] = s0;
     }
-    for (const k of ['S', 'lyft', 'kna', 'hojd', 'studs', 'tab']) st[k] = s0[k];
+    for (const k of ['S', 'B', 'x0', 'hal', 'lyft', 'kna', 'hojd', 'studs', 'tab', 'tab2', 'fas2', 'ontMitt']) st[k] = s0[k];
     return st;
   }
   // handen för armen som hålls stilla ([axel, armbåge], grader; cm från fötterna, som handVid i rum-fasad.js)
@@ -640,37 +672,6 @@ window.RumUte = (() => {
     return `<g transform="translate(${cx} ${cy})"><circle r="${r}" fill="none" stroke="${tone('#1a1a1a', L)}" stroke-width="1.3"/><g class="hjul"><line x1="${-r}" y1="0" x2="${r}" y2="0" stroke="${tone('#777', L)}" stroke-width=".5"/><line x1="0" y1="${-r}" x2="0" y2="${r}" stroke="${tone('#777', L)}" stroke-width=".5"/></g></g>`;
   }
 
-  // ---------- fordonen ----------
-  //
-  // Bilarna, bussarna och plogbilen är fasadens (rum-fasad-gatan.js): samma bilar från nittiotalet i samma lack,
-  // lottade och ritade med samma kod, här i gatans ljus och kalla dag. I gatans SVG står bara en tom grupp
-  // (data-fordon), som ritas med fasadens kod när figuren görs till en bild (duka, delar): en gång, och sedan glider
-  // bilden som förut. Fasadens mått är i centimeter, gatans 16 enheter på en meter (CM).
-  const CM = 0.16;
-  const FORDON = [];
-  // fasadens scen (S i rum-fasad-gatan.js) med gatans färger
-  function fordonsScen(v, L) {
-    const FG = window.RumFasadGatan;
-    if (!FG || !FG.fordon) return null;
-    const S = FG.trafik(v, L, { skala: () => 1, M: 100, markY: () => 0, mix, pick, snoC: snowC });
-    const kalla = (c) => kallFarg(c, L, KALL.liv);
-    S.ton = (c) => kalla(tone(c, L));
-    S.glas = kalla(S.lamps ? '#1c1a17' : mix(tone('#151b22', L), L.sky[2], 0.35 * L.dag));
-    S.himmel = kalla(L.sky[1]);
-    S.vNu = v;
-    return S;
-  }
-  // Fordonet b som figur, vänd åt dir: den tomma gruppen och vad den ritas med (plogbilens blinkljus gör den till
-  // en figur som ritas om i gängets takt: en tom .blink bredvid).
-  function fordonsFigur(b, dir, S) {
-    const n = FORDON.push((g, t) => {
-      // (figuren är redan vänd åt dir; fasadens kod vänder den själv, så att skyltarna läses rätt)
-      g.scale(dir, 1);
-      window.RumFasadGatan.rita(g, S, [{ b, f: { y: 0, dir, k: CM }, x: 0, fart: b.fart, broms: false }], t / 1000);
-    }) - 1;
-    return `<g data-fordon="${n}"></g>${b.typ === 'plog' ? '<g class="blink"></g>' : ''}`;
-  }
-
   const coats = (v) => (v.kanns < 3 ? ['#1c1f26', '#2b2f38', '#3a3226', '#4a4238', '#20283a', '#5a2a2a', '#6b6458', '#2e3a2e']
     : v.kanns < 15 ? ['#3d4a5c', '#6b5a44', '#7a7a70', '#2f3d36', '#8a5a3a', '#2a3550', '#c8b89a', '#4a4a50']
       : ['#e8e4dc', '#c8d8e8', '#d84a3a', '#3a6ab0', '#f0c040', '#2e2e30', '#7ab07a', '#f3ead9']);
@@ -684,19 +685,17 @@ window.RumUte = (() => {
     const varmt = v.kanns >= 16;
     let s = '';
     // o: y (fötterna/hjulen), dir, speed (px/s), pause (s utanför bild),
-    // w/ht halva bredden och höjden före skalan k; för trafiken o.cyc varvets längd (s) i
-    // stället för pause och o.fas var i varvet den är från början, och o.stilla: står still
-    // i sin bild (ritas en gång och glider bara), o.egen: gungar inte som helhet (gången har sin egen höft)
+    // w/ht halva bredden och höjden före skalan k, o.egen: gungar inte som helhet (gången har sin egen höft)
     const walk = (inner, o) => {
       const k = o.k || 1;
       const hw = Math.ceil((o.w || 30) * k);
       const ht = Math.ceil((o.ht || 56) * k);
       const dist = 1000 + 2 * (hw + 40);
       const fran = o.dir > 0 ? -(hw + 40) : 1000 + hw + 40;
-      const cyc = o.cyc || dist / o.speed + o.pause;
+      const cyc = dist / o.speed + o.pause;
       const till = fran + o.dir * cyc * o.speed;
-      const fore = o.fas != null ? Math.round(o.fas * cyc * 100) / 100 : r1(R() * cyc);
-      s += `<svg class="rum-gar${o.cls ? ` ${o.cls}` : ''}" style="left:${-hw}px; top:${r1(o.y - ht)}px; --fran:${fran}px; --till:${r1(till)}px; --steg:${o.steg || 0.9}s; animation-duration:${r1(cyc)}s; animation-delay:-${fore}s" viewBox="${-hw} ${-ht} ${2 * hw} ${ht + 6}" width="${2 * hw}" height="${ht + 6}"><g transform="scale(${o.dir * k} ${k})">${o.stilla || o.egen ? inner : `<g class="gung">${inner}</g>`}</g></svg>`;
+      const fore = r1(R() * cyc);
+      s += `<svg class="rum-gar${o.cls ? ` ${o.cls}` : ''}" style="left:${-hw}px; top:${r1(o.y - ht)}px; --fran:${fran}px; --till:${r1(till)}px; --steg:${o.steg || 0.9}s; animation-duration:${r1(cyc)}s; animation-delay:-${fore}s" viewBox="${-hw} ${-ht} ${2 * hw} ${ht + 6}" width="${2 * hw}" height="${ht + 6}"><g transform="scale(${o.dir * k} ${k})">${o.egen ? inner : `<g class="gung">${inner}</g>`}</g></svg>`;
     };
 
     // pulkan med barnet i, bakom den som drar (px)
@@ -740,14 +739,16 @@ window.RumUte = (() => {
         const rusar = !o.umb && !halt && ((h > 7 && h < 9) || (h > 16 && h < 18)) && R() < 0.06;
         if ((blot && !halt && R() < 0.4) || rusar) namn = 'springer';
         else if (blot) namn = 'rask';
-        else if (vem === 'ung') namn = pick(R, ['vanlig', 'rask', 'studsar', 'studsar', 'lunkar', 'slantrar', 'slantrar']);
-        else if (vem === 'aldre') namn = pick(R, ['strosar', 'strosar', 'rak', 'lunkar', 'trippar']);
+        else if (kallt && !o.umb && R() < 0.3) namn = 'frusen';
+        else if (R() < 0.05) namn = 'haltar';
+        else if (GG.GSTIL[vem]) namn = pick(R, GG.GSTIL[vem]);
       }
       if (halt && namn !== 'springer' && namn !== 'kapp' && R() < 0.65) namn = 'halkar';
       if (varmt && typ === 'gar' && !o.umb && !o.hatt && R() < 0.25) { o.hatt = 'keps'; o.hat = pick(R, ['#2a4a7a', '#e8e4dc', '#c8322a']); }
       const st = gangFor(GG, R, namn, kallt);
-      // (en del äldre går lite framåtböjda)
+      // (en del äldre går lite framåtböjda, och den som strosar har ibland händerna på ryggen)
       if (vem === 'aldre' && !['kapp', 'springer', 'halkar'].includes(st.namn) && R() < 0.4) st.lut += 4 + R() * 3;
+      if (vem === 'aldre' && typ === 'gar' && !o.umb && ['strosar', 'rak', 'stram', 'lunkar'].includes(st.namn) && R() < 0.4) { st.armar = 'rygg'; st.ficka = ''; }
       // den närmre armen håller paraplyet, kopplet, granen under armen eller pulkans snöre; en ledig hand kan vara i
       // fickan
       const F = { fastF: o.umb ? [-6, -104] : typ === 'hund' ? [-12, -35] : typ === 'gran' ? [8, -66] : typ === 'pulka' ? [24, 6] : null };
@@ -824,54 +825,6 @@ window.RumUte = (() => {
       walk(fox, { y: 409, dir: -1, speed: 40, pause: 140, steg: 0.35, cls: 'rav', k: 0.9, w: 20, ht: 18 });
     }
 
-    // trafiken, högertrafik: den närmaste filen åt höger och den bortre åt vänster. Fordonen
-    // i en fil åker lika fort och håller avståndet (ingen kör igenom någon annan): de sitter
-    // på ett band som går runt, B px långt, ett varv på P s. Bussarna som går över S:t
-    // Eriksbron (blåa 4:an, röda 3:an och 77:an) och plogbilen har varsin lucka i bandet och
-    // kommer var m:e varv; resten av varven står luckan tom. Fordonen gungar inte: de ritas en
-    // gång och glider bara (ingen ställning att rita om i gängets takt).
-    const varv = T.varv[0] + R() * (T.varv[1] - T.varv[0]);
-    const FS = fordonsScen(v, L);
-    FORDON.length = 0;
-    // ett fordon av slaget typ (utan typ: en bil, taxi eller skåpbil, lottad som på fasaden) i filen f: halva
-    // längden h, halva bildens bredd w (framåt räcker den för strålkastarnas ljus), ht högst upp, före skalan
-    const fordon = (typ, f, m = 1) => {
-      const FG = window.RumFasadGatan.fordon;
-      const b = FG.nytt(FS, R, typ || FG.valj(FS, R, T, f, 0), T, f);
-      const h = (b.L / 2) * CM;
-      return { b, m, h, w: Math.ceil(h + 74), ht: Math.ceil(((b.F.tak ? -b.F.tak[2] : 300) + 30) * CM) };
-    };
-    for (const [y, dir, k, nara] of FS ? [[532, 1, 1.45, true], [500, -1, 1.25, false]] : []) {
-      const f = { i: nara ? 1 : 0, dir };
-      const lista = [];
-      for (let i = 0; i < T.bilar; i++) lista.push(fordon(null, f));
-      if (T.bussar) {
-        lista.push(fordon('buss', f, 5));
-        lista.push(fordon('ledbuss', f, 7));
-      }
-      if (nara && (v.snotackt || (sno && v.mangd > 0.3))) lista.push(fordon('plog', f, 9));
-      for (let i = lista.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [lista[i], lista[j]] = [lista[j], lista[i]]; }
-      const fart = 160 + R() * 55;
-      // minsta avståndet bakåt till nästa: från dess front till den här bakänden, och 50 px
-      const min = lista.map((a, i) => (lista[(i + 1) % lista.length].h + a.h) * k + 50);
-      const S = min.reduce((x, y2) => x + y2, 0);
-      const P = Math.ceil(Math.max(varv, (S + 400) / fart) * 10) / 10;
-      const B = fart * P;
-      const vikt = lista.map(() => 0.2 + R());
-      const V = vikt.reduce((x, y2) => x + y2, 0);
-      let p = R() * B;
-      lista.forEach((a, i) => {
-        const { w, ht } = a;
-        const cyc = P * a.m;
-        // var i varvet: läget p på bandet (och ett av de m varven för bussen)
-        const u0 = -(Math.ceil(w * k) + 40);
-        const lang = fart * cyc;
-        const q = (((p + Math.floor(R() * a.m) * B - u0) % lang) + lang) % lang;
-        walk(fordonsFigur(a.b, dir, FS), { y, dir, speed: fart, cyc, fas: q / lang, k, cls: 'fordon', w, ht, stilla: true });
-        p -= min[i] + (B - S) * vikt[i] / V;
-      });
-    }
-
     // flaggan på flaggdagarna
     if (flagga(v)) {
       s += `<svg class="rum-flagga" style="left:742px; top:176px" viewBox="-1 -1 28 20" width="28" height="20"><g class="vaj" style="animation-duration:${r1(Math.max(0.9, 3 - v.vind * 0.2))}s"><path d="M0 0 Q12 -1.5 25 1.5 L25 16.5 Q12 13.5 0 15 Z" fill="${tone('#1f62ad', L)}"/><path d="M8 0 V15 M0 7.2 Q12 6 25 9" stroke="${tone('#f6c71c', L)}" stroke-width="3" fill="none"/></g></svg>`;
@@ -893,6 +846,180 @@ window.RumUte = (() => {
       }
     }
     return s;
+  }
+
+  // ---------- framför affären ----------
+  //
+  // S:t Eriksgatan alldeles utanför: de som går förbi på trottoaren framför affären och bilarna och bussarna i gatans
+  // två filer är fasadens (rum-fasad.js, rum-fasad-gatan.js), samma människor och samma fordon i samma ögonblick som
+  // när man går ut genom dörren. Fasadens kod räknar ut vilka de är och var de är vid tiden t (sekunder ur
+  // performance.now, som där) och ritar dem; här ses de från andra hållet, spegelvända: det som kör åt vänster utifrån
+  // kör åt höger inifrån (gatan är enkelriktad), och den som stannar och tittar in på oss står med ansiktet hitåt.
+  //
+  // Måtten: ögat är 1,25 m över marken och horisonten i y 382, där räcket och huvudena på dem som går på bron är.
+  // Något d m ut från fasaden (fasadens mått) har skalan framS(d) px per meter och marken i framY(d): de som går på
+  // trottoaren (0,3–0,8 m ut) syns från midjan och uppåt över fönsterbänken och hela i dörren, fordonen kör bortom
+  // kanten (filerna i y 473 och 459), och bussarna når upp över gängets huvuden. I sidled (X: fasadens meter, med
+  // dess öga i 0) står ögat härinne 0,48 m till vänster om fasadens, sett utifrån, så att det fasaden ser framför
+  // skyltfönstret och dörren ryms i glasen härinifrån.
+  //
+  // Allt ritas i en grov duk över glasen (FRAM.px bildpunkter per px: förstorad blir den mjuk, ur skärpa som resten
+  // av gatan, utan filter), i telefonen och på datorns lägre steg i gatans duk (ritaGatan), och bara medan något
+  // syns: de som går i gängets takt, och medan ett fordon kör förbi i varje bildruta (glid), som på fasaden.
+  const FRAM = { yh: 382, oga: 1.25, K: 166.8, d0: 1.016, xv: 571, XE: -0.483, px: 0.4 };
+  const framS = (d) => FRAM.K / (d + FRAM.d0);
+  const framY = (d) => FRAM.yh + FRAM.oga * framS(d);
+  const framX = (X, s) => FRAM.xv + (FRAM.XE - X) * s;
+  // (färgerna går mot blågrått på dagen som resten av gatan, kall, men mindre än på bron: de är närmare)
+  const KALL_FRAM = 0.45;
+  // (hela världen: fordonen sorteras bort här, efter var de syns i glasen)
+  const ALLT = { x: -1e6, y: 0, w: 2e6, h: 0 };
+  // affärens ljus faller ut på trottoaren framför fönstret och dörren (X), på kvällen
+  const LJUSET = [-2.1, 1.6];
+
+  // fönstrets form, som fasaden räknar den (vy i rum-fasad.js: var de går och hur långa varven är beror på den)
+  function formen(el) {
+    const rum = el.closest('.rum');
+    return ((rum && rum.clientWidth) || innerWidth) / ((rum && rum.clientHeight) || innerHeight || 1);
+  }
+  const tsig = (v) => { const T = trafik(v); return [T.gaende, T.rusning, T.natt, T.dag, T.helg, T.bussar].join(); };
+  let framForm = false;
+  addEventListener('resize', () => { framForm = true; });
+
+  // Fasadens folk och trafik (RumFasad.framfor, RumFasadGatan.trafik) i gatans färger härifrån.
+  function framModell(el, v, L) {
+    const RF = window.RumFasad;
+    const FG = window.RumFasadGatan;
+    if (!RF || !RF.framfor || !FG) return null;
+    const a = formen(el);
+    const m = RF.framfor(v, L, a);
+    const hex = (c) => typeof c === 'string' && c.length === 7 && c[0] === '#';
+    const kl = (c) => (hex(c) ? kallFarg(c, L, KALL_FRAM) : c);
+    // På kvällen lyser affärens ljus på dem framifrån, härifrån sett (utifrån är de siluetter mot fönstret): i
+    // ljuset (z 0) är färgerna ljusare och varmare, utanför det (z 1) som fasadens, och mörkare bort i mörkret.
+    const natt = L.dag < 0.6 ? 1 - L.dag / 0.6 : 0;
+    const lys = (c) => (hex(c) ? hx(rgb(c).map((x, i) => x * (1 + 1.3 * natt) + [26, 14, 4][i] * natt)) : c);
+    const kalla = (D) => {
+      for (const p of D) {
+        if (p.f) p.f = kl(p.f);
+        if (p.s) p.s = kl(p.s);
+        if (p.fz) p.fz = p.fz.map(kl);
+        if (natt && hex(p.f) && !p.lys) {
+          p.fz = [lys(p.f), p.f, mix(p.f, '#030305', 0.3), mix(p.f, '#030305', 0.5)];
+          p.f = p.fz[0];
+        }
+        if (natt && p.s && hex(p.s)) p.s = lys(p.s);
+      }
+      return D;
+    };
+    const S = FG.trafik(v, L, m.G);
+    const ton = S.ton;
+    S.ton = (c) => kl(ton(c));
+    S.glas = kl(S.glas);
+    S.himmel = kl(S.himmel);
+    return { ...m, S, kalla, a, L, T: tsig(v), tT: performance.now() };
+  }
+
+  // Det som syns framför affären vid tiden t (s) i duken g, med hörnet i (ox, oy) och k bildpunkter per px; r: glasen.
+  // → 2 om ett fordon syns (då ritas det i varje bildruta), 1 om bara de som går, 0 om inget.
+  function ritaFram(el, g, t, ox, oy, k, r) {
+    let M = el._fram;
+    if (!M) return 0;
+    // (ny form på fönstret, eller annan trafik än när det byggdes: fasaden har andra som går)
+    const ms = performance.now();
+    if (framForm || ms - M.tT > 30000) {
+      const v = window.Vader ? Vader.nu() : null;
+      M.tT = ms;
+      if (v && ((framForm && Math.abs(formen(el) - M.a) > 0.004) || tsig(v) !== M.T)) M = el._fram = framModell(el, v, light(v)) || M;
+      framForm = false;
+    }
+    const RF = window.RumFasad;
+    const FG = window.RumFasadGatan;
+    const bas = () => g.setTransform(k, 0, 0, k, -ox * k, -oy * k);
+    let ut = 0;
+    // fordonen, den bortre filen härifrån först (fasadens närmre)
+    const lista = FG.syns(M.S, t, ALLT);
+    if (lista) {
+      const rit = [];
+      for (const it of lista) {
+        const s = framS(it.f.d);
+        const x = framX((it.x - M.G.OGA_X) / it.f.um, s);
+        // (strålkastarnas ljus på gatan framför när det är mörkt)
+        const h = (it.b.L / 200) * s + (M.S.lamps ? 5 * s : 0.4 * s);
+        if (x + h < r.x || x - h > r.x + r.w) continue;
+        rit.push({ b: it.b, f: { y: framY(it.f.d), dir: 1, k: s / 100, d: it.f.d }, x, fart: it.fart, broms: it.broms, nig: it.nig });
+      }
+      if (rit.length) {
+        rit.sort((p, q) => q.f.d - p.f.d);
+        bas();
+        FG.rita(g, M.S, rit, t);
+        ut = 2;
+      }
+    }
+    // de som går, de bortre först, och den som har stannat och tittar in (står den: framifrån). Var och en syns där
+    // den syns utifrån och tonar in och ut på en halvmeter i kanterna av fasadens bild, där loppet börjar och slutar.
+    const natt = M.L.dag < 0.6 ? 1 - M.L.dag / 0.6 : 0;
+    const fl = [];
+    const lagg = (f, D, x, dm, e) => {
+      const um = RF.M * RF.skala(dm);
+      const s = framS(dm);
+      const X = (x - RF.OGA_X) / um;
+      const xi = framX(X, s);
+      if (xi + 1.3 * s < r.x || xi - 1.3 * s > r.x + r.w || e <= 0) return;
+      // (på kvällen i affärens ljus framför fönstret och dörren, mörkare bortom)
+      const ljus = X > LJUSET[0] && X < LJUSET[1];
+      fl.push({ f, D, x, xi, yi: framY(dm), q: s / um, dm, ut: { A: Math.min(1, e / um / 0.6), rand: 0, z: ljus || !natt ? 0 : 1 + Math.round(natt) } });
+    };
+    // (var och en får gatans färger första gången den syns: fasaden lottar dem lopp för lopp, folket.vid)
+    for (const [f, D, x, , lap] of M.folk.vid(t)) {
+      if (!f.kall) {
+        f.kall = true;
+        M.kalla(D);
+      }
+      lagg(f, D, x, f.dm, lap ? lap.fart * Math.min(t - lap.start, lap.slut - t) : 1e9);
+    }
+    const st = M.stanna && M.stanna(t);
+    if (st) {
+      const f = st.f;
+      if (!f.kall) {
+        f.kall = true;
+        M.kalla(f.D);
+        f.FR = M.kalla(RF.framDelar(f.bakO, M.L));
+      }
+      lagg({ k: f.k, dir: st.sta ? 1 : f.dir, sta: st.sta, stil: f.stil }, st.sta ? f.FR : f.D, st.x, f.dm, Math.min(Math.abs(st.x - f.xa), Math.abs(f.xb - st.x)));
+    }
+    if (fl.length) {
+      fl.sort((p, q) => q.dm - p.dm);
+      for (const p of fl) {
+        bas();
+        g.translate(p.xi, p.yi);
+        g.scale(-p.q, p.q);
+        g.translate(-p.x, 0);
+        RF.ritaFigur(g, p.f, p.D, p.x, 0, t, M.L, p.ut);
+      }
+      ut = Math.max(ut, 1);
+    }
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+    return ut;
+  }
+
+  // I datorn, där det som rör sig på gatan är egna dukar: en duk över glasen, mellan dem som går på bron och regnet.
+  // nu: ms (performance.now, eller den fasta tiden i en stillbild). → som ritaFram.
+  function framDuk(el, nu) {
+    const c = el._framC;
+    if (!c) return 0;
+    const g = c.getContext('2d');
+    if (!g) return 0;
+    if (!el._framTom) {
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.clearRect(0, 0, c.width, c.height);
+    }
+    const r = el._framR;
+    const ut = RORELSE_AV.matches ? 0 : ritaFram(el, g, nu / 1000, r.x, r.y, FRAM.px, r);
+    el._framTom = !ut;
+    el._fort = ut === 2;
+    return ut;
   }
 
   // ---------- nederbörden ----------
@@ -1167,8 +1294,7 @@ window.RumUte = (() => {
             n.m = [x.a, x.b, x.c, x.d, x.e, x.f];
           }
         }
-        if (k.hasAttribute('data-fordon')) n.op = FORDON[+k.getAttribute('data-fordon')] ? { egen: FORDON[+k.getAttribute('data-fordon')] } : null;
-        else if (k.localName === 'text') n.op = { text: k.textContent, x: parseFloat(k.getAttribute('x')) || 0, y: parseFloat(k.getAttribute('y')) || 0, font: `${parseFloat(a['font-size'])}px ${a['font-family']}`, align: { middle: 'center', end: 'right' }[a['text-anchor']] || 'left', fill: a.fill };
+        if (k.localName === 'text') n.op = { text: k.textContent, x: parseFloat(k.getAttribute('x')) || 0, y: parseFloat(k.getAttribute('y')) || 0, font: `${parseFloat(a['font-size'])}px ${a['font-family']}`, align: { middle: 'center', end: 'right' }[a['text-anchor']] || 'left', fill: a.fill };
         else {
           const f = form(k);
           if (f) n.op = { f, fill: a.fill, stroke: a.stroke, lw: parseFloat(a['stroke-width']), cap: a['stroke-linecap'], join: a['stroke-linejoin'], fo: parseFloat(a['fill-opacity']), so: parseFloat(a['stroke-opacity']), rule: a['fill-rule'] };
@@ -1207,14 +1333,6 @@ window.RumUte = (() => {
       const o = n.op;
       if (!o || !(A[i] > 0)) continue;
       g.setTransform(W[i * 6], W[i * 6 + 1], W[i * 6 + 2], W[i * 6 + 3], W[i * 6 + 4], W[i * 6 + 5]);
-      // (fordonen: ritade med fasadens kod, fordonsFigur)
-      if (o.egen) {
-        g.save();
-        g.globalAlpha = A[i];
-        o.egen(g, t);
-        g.restore();
-        continue;
-      }
       if (o.text != null) {
         g.globalAlpha = A[i];
         g.font = o.font;
@@ -1556,6 +1674,10 @@ window.RumUte = (() => {
     figurer(el._dukar.himliv || []);
     for (const d of G.gata) bakgrund(d);
     figurer(el._dukar.liv || []);
+    // det som går och kör förbi framför affären (ritaFram)
+    if (el._fram && !RORELSE_AV.matches) {
+      if (ritaFram(el, g, nu / 1000, b.x, b.y, GAT_S, b)) fort = true;
+    }
     // regnet och snön: banden faller (och snön driver)
     if (G.fall) {
       if (!RORELSE_AV.matches) fort = true;
@@ -1612,8 +1734,10 @@ window.RumUte = (() => {
   // sig: gatan läggs ut på nytt bara när något som far förbi syns, annars i
   // gängets takt (takt). → om gatan ska ritas i varje bildruta.
   function glid(el, ms) {
-    if (!el || !el._gat || !el._fort || el._fast != null) return false;
-    return ritaGatan(el, ms);
+    if (!el || !el._fort || el._fast != null) return false;
+    if (el._gat) return ritaGatan(el, ms);
+    // (i datorn: medan ett fordon kör förbi framför affären, framDuk)
+    return framDuk(el, ms) === 2;
   }
 
   // Regnets och snöns band (fall) som bilder, en gång, i gatans duk: som egna lager gled de över hela
@@ -1706,6 +1830,11 @@ window.RumUte = (() => {
       if (!el._fort || el._fast != null) ritaGatan(el, nu);
       return;
     }
+    // (framför affären, i datorn: de som går i gängets takt, och medan ett fordon kör förbi i varje bildruta, glid)
+    if (el && el._framC) {
+      if (t != null) el._fast = t;
+      if (el._fast != null || !el._fort) framDuk(el, el._fast != null ? el._fast : performance.now());
+    }
     if (!el || !el._duk) return;
     const [X0, X1] = el._x || [-Infinity, Infinity];
     const nu = performance.now();
@@ -1797,6 +1926,8 @@ window.RumUte = (() => {
       const x = el.querySelector(`[data-lager="${k}"]`);
       x.innerHTML = KALL[k] ? kall(draw[k](), L, KALL[k]) : draw[k]();
       if (k === 'liv' || k === 'himliv') el._dukar[k] = duka(x, s, Boolean(el._gat));
+      // (framför affären: fasadens folk och trafik i det här ljuset och vädret, framModell)
+      if (k === 'liv') el._fram = framModell(el, v, L);
       const G = el._gat;
       // (gatan och himlen bakas till dukar med oskärpan, också i datorn: som filter i CSS lade grafikkortet
       // på oskärpan i varje bildruta, rum-ute.css)
@@ -1809,6 +1940,26 @@ window.RumUte = (() => {
       changed = true;
     }
     el._duk = [...(el._dukar.liv || []), ...(el._dukar.himliv || [])];
+    // I datorn en egen duk över glasen för det framför affären (framDuk); i gatans duk ritas det där.
+    if (el._gat && el._framC) {
+      el._framC.remove();
+      el._framC = null;
+    } else if (!el._gat && !el._framC && rects && rects.length) {
+      const r = { x: Math.min(...rects.map((q) => q.x)), y: Math.min(...rects.map((q) => q.y)) };
+      r.w = Math.max(...rects.map((q) => q.x + q.w)) - r.x;
+      r.h = Math.max(...rects.map((q) => q.y + q.h)) - r.y;
+      const c = document.createElement('canvas');
+      c.className = 'rum-fram';
+      c.setAttribute('aria-hidden', 'true');
+      c.style.cssText = `left:${r.x}px; top:${r.y}px; width:${r.w}px; height:${r.h}px`;
+      c.width = Math.ceil(r.w * FRAM.px);
+      c.height = Math.ceil(r.h * FRAM.px);
+      el._framC = c;
+      el._framR = r;
+      el._framTom = true;
+      el.querySelector('[data-lager="fall"]').before(c);
+    }
+    if (el._framC && changed) framDuk(el, el._fast != null ? el._fast : performance.now());
     if (el._gat && changed) {
       stall(el, el._fast != null ? el._fast : performance.now());
       ritaGatan(el);

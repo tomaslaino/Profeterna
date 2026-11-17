@@ -1,6 +1,7 @@
 # Tobaksaffären tillsammans (worker/rummet.mjs): vilka i gänget som har
 # rummet öppet och vad de pekar på, genom en websocket till ett Durable
-# Object – och gängets kupong i realtid (worker/kupongen.mjs). Egen tjänst, skild från kupongtjänsten (kupong.toml). Driftsätts för
+# Object – gängets kupong i realtid (worker/kupongen.mjs) och gänget i bild på
+# tv:n (worker/bilden.mjs). Egen tjänst, skild från kupongtjänsten (kupong.toml). Driftsätts för
 # hand från en dator:
 #
 #   npx wrangler@4.147.0 deploy --config worker/rummet.toml
@@ -26,3 +27,14 @@ class_name = "Kupongen"
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["Kupongen"]
+
+[[durable_objects.bindings]]
+name = "BILDEN"
+class_name = "Bilden"
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["Bilden"]
+
+# Cloudflares TURN, så att bilden kommer fram också på mobilnät (valfritt;
+# utan dem bara STUN): wrangler secret put TURN_ID / TURN_NYCKEL --config worker/rummet.toml

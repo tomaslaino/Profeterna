@@ -7,8 +7,9 @@
 //   - Omgångens matcher och namn: så snart gängets omgång finns (oftast
 //     Stryktipset, måndag kl. 16) skrivs matcherna i data/analyser.json och namnet
 //     i data/omgangsnamn.json.
-//   - Analyserna: på varje tid i config/analyser.js (tider) skrivs en ny analys per
-//     match som inte har börjat, och Hasse Backes text ur den. Misslyckas en match
+//   - Analyserna: så snart omgången finns, och sedan på varje tid i config/analyser.js
+//     (tider), skrivs en ny analys per match som inte har börjat, och Hasse Backes text
+//     ur den. Misslyckas en match
 //     sparas de andra, en gammal analys ligger kvar tills en ny finns, och nästa
 //     körning försöker igen med högst perMatch försök per tid.
 //   - Tidningen inför omgången (Hasse Backe läser den): en notis per match i
@@ -584,7 +585,7 @@ async function hasseText(id, entry, roster, d = null, nyckel = `hasse:${id}`) {
 async function analyserna(round, roster) {
   const per = new Map(lasAnalyser().analyser.map((a) => [String(a.id), a]));
   for (const [id, a] of Object.entries(vantande.analyser)) per.set(id, a);
-  const v = attSkriva(round, per, { now: Date.now(), tider: ac.tider, forhandTimmar: ac.forhandTimmar, version: ac.promptVersion, tvinga: TVINGA });
+  const v = attSkriva(round, per, { now: Date.now(), tider: ac.tider, vantaTimmar: ac.vantaTimmar, version: ac.promptVersion, tvinga: TVINGA });
   const nyckel = (x) => `analys:${x.id}:${v.tid}`;
   // (Hasses försök räknas per tid, som analysernas: tre misslyckade får inte stänga av honom i en vecka)
   const hasseNyckel = (x) => `hasse:${x.id}:${v.tid}`;

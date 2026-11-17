@@ -216,6 +216,9 @@
   transition: opacity 0.6s;
 }
 .rum-tv3.nara .tv-scan { opacity: 0.85; }
+/* över ansiktena lite svagare */
+.rum-tv3.nara.ingang .tv-scan { opacity: 0.55; }
+@media (max-width: 700px), (max-height: 500px) { .rum-tv3.nara.ingang .tv-scan { opacity: 0.4; } }
 .tv-glans {
   position: absolute;
   inset: 0;
@@ -363,6 +366,10 @@
   transition: transform 0.06s, box-shadow 0.06s;
 }
 .tv-k.pil { background: radial-gradient(circle at 45% 35%, #b9bbc0, #7d7f84 70%); color: #1d1d1f; font-size: 4.5px; }
+/* TV/AV: en avlång knapp under de andra, över hela bredden (gänget i bild, rum-bild.js) */
+.tv-k.tvav { grid-column: 1 / -1; width: auto; height: 8px; margin-top: 1.5px; border-radius: 4px; background: radial-gradient(120% 140% at 45% 30%, #6b6d72, #3c3e42 75%); font-size: 3.9px; line-height: 8px; letter-spacing: 0.35px; }
+.rum-tv3.nara .tv-k.tvav:hover { background: radial-gradient(120% 140% at 45% 30%, #84868b, #4a4c50 75%); }
+.rum-tv3.ingang .tv-k.tvav { color: #8dffc8; text-shadow: 0 0 2px rgba(60, 255, 160, 0.7); }
 /* hela mellanrummet hör till närmaste knapp, så att de går att träffa med fingret */
 .tv-k::after { content: ""; position: absolute; inset: -1.5px -1.25px; }
 .tv-k:active { transform: translateY(0.6px); box-shadow: 0 0.2px 0 #0a0a0b, inset 0 1px 1px rgba(0, 0, 0, 0.3); }
@@ -370,7 +377,7 @@
 .rum-tv3.nara .tv-k.pil:hover { background: radial-gradient(circle at 45% 35%, #d2d4d8, #8e9095 70%); }
 .tv-k:focus-visible, .tv-pa:focus-visible { outline: 1px solid #f0d699; outline-offset: 1px; }
 /* högtalargallret: springor */
-.tv-galler { left: 6px; top: 93px; width: 34px; height: 44px; border-radius: 2px; background: repeating-linear-gradient(180deg, #0d0d0e 0 1.4px, rgba(0, 0, 0, 0) 1.4px 3px), #3a3b3f; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.35); }
+.tv-galler { left: 6px; top: 104px; width: 34px; height: 35px; border-radius: 2px; background: repeating-linear-gradient(180deg, #0d0d0e 0 1.4px, rgba(0, 0, 0, 0) 1.4px 3px), #3a3b3f; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.35); }
 /* strömbrytaren och lampan (grön på, röd av) */
 .tv-pa { left: 8px; top: 147px; width: 13px; height: 13px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #c8cace, #6f7176 60%, #3e4044); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.3); cursor: pointer; }
 .tv-pa:active { transform: scale(0.92); }
@@ -394,7 +401,98 @@
 /* under pekaren lyser rutan upp till full styrka, som en inbjudan att gå fram */
 .rum-tv3:has(> :is(.rum-tv, .rum-del):hover) .tv-glas { filter: brightness(1.05); transition-duration: 0.25s; }
 
+/* ---------- AV-ingången: gänget i bild (rum-bild.js) ----------
+
+   Den som visar sig med kameran står stort på rutan, två sida vid sida, med
+   namnet i sin färg nere till vänster som en textremsa på tv. Du själv i en
+   liten bild nere till höger (bild i bild, spegelvänd), eller stort när ingen
+   annan visar sig. De som bara tittar som porträtt uppe till höger. Ingen bild:
+   den blå rutan, som när ingen kassett spelar. Allt i glasets egna 192 × 144,
+   under linjerna och glansen. */
+
+.rum-tv3.ingang .tt { visibility: hidden; }
+.rum-tv3.av .tv-av { visibility: hidden; }
+.tv-av { position: absolute; inset: 0; overflow: hidden; background: #050606; color: #f4f3ec; font: 10px/1.1 VT323, monospace; font-variant-ligatures: none; text-shadow: 0 0 1.5px currentColor; }
+.tv-av[hidden] { display: none; }
+.tv-av video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #050606; }
+.av-rutor { position: absolute; inset: 0; }
+/* bilden lite mättad och hård, som på ett bildrör */
+.av-ruta { position: absolute; overflow: hidden; box-shadow: 0 0 0 0.5px #000; }
+.av-ruta video { filter: saturate(1.15) contrast(1.06); }
+.av-namn { position: absolute; left: 4px; bottom: 5px; padding: 1px 3px 0; background: var(--k, #f4f3ec); color: #050505; font-size: 10px; line-height: 9px; text-shadow: none; white-space: nowrap; }
+.av-ruta.k0 { --k: var(--gang-0); }
+.av-ruta.k1 { --k: var(--gang-1); }
+.av-ruta.k2 { --k: var(--gang-2); }
+/* medan bilden letar sig fram: snö */
+.av-sno { position: absolute; inset: 0; display: none !important; background: var(--sno, #333) 0 0 / 64px 64px; image-rendering: pixelated; opacity: 0.75; animation: av-sno 0.32s steps(1) infinite; }
+.av-ruta.letar .av-sno { display: block !important; }
+.av-ruta.letar video { visibility: hidden; }
+@keyframes av-sno { 0% { background-position: 0 0; } 25% { background-position: -23px 17px; } 50% { background-position: 31px -9px; } 75% { background-position: -7px -29px; } }
+.av-tappad { position: absolute; left: 0; right: 0; top: 46%; display: none !important; text-align: center; font-size: 11px; }
+.av-tappad::before { content: ""; position: absolute; left: 50%; top: -2px; width: 74px; height: 14px; margin-left: -37px; background: #050606; z-index: -1; }
+.av-ruta.tappad .av-tappad { display: block !important; z-index: 1; }
+/* du själv: bild i bild nere till höger med en tunn vit ram och en röd lampa, spegelvänd */
+.av-jag { position: absolute; right: 7px; bottom: 9px; width: 54px; height: 40.5px; overflow: hidden; background: #050606; box-shadow: 0 0 0 0.75px #f4f3ec, 0 0 0 1.25px #000, 0 1px 5px rgba(0, 0, 0, 0.6); }
+.av-jag[hidden] { display: none; }
+.av-jag video { transform: scaleX(-1); }
+.av-jag::after { content: ""; position: absolute; left: 3px; top: 3px; width: 3.5px; height: 3.5px; border-radius: 50%; background: #ff3a2a; box-shadow: 0 0 2.5px 0.5px rgba(255, 58, 42, 0.8); animation: av-lampa 2s ease-in-out infinite; }
+.av-jag.stor { inset: 0; right: auto; bottom: auto; width: 100%; height: 100%; box-shadow: none; }
+/* (stort säger raden under och foten att du syns: lampan och porträtten behövs inte) */
+.av-jag.stor::after, .tv-av:has(.av-jag.stor:not([hidden])) .av-ser { display: none !important; }
+@keyframes av-lampa { 50% { opacity: 0.45; } }
+.av-under { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; }
+.av-under[hidden] { display: none; }
+.av-under { font-size: 10px; }
+.av-under::first-line { background: rgba(5, 6, 6, 0.75); }
+/* de som tittar utan att visa sig: små porträtt i sin färg uppe till höger */
+.av-ser { position: absolute; right: 6px; top: 6px; display: flex !important; align-items: center; gap: 2.5px; }
+.av-ser[hidden] { display: none !important; }
+.av-ser span { margin-right: 1.5px; padding: 0.5px 2px 0; background: rgba(5, 6, 6, 0.7); font-size: 8.5px; line-height: 8px; }
+.av-ser i { width: 13px; height: 13px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 0.9px var(--k, #f4f3ec), 0 1px 3px rgba(0, 0, 0, 0.7); background: #222; }
+.av-ser i.k0, .av-vem .k0 { --k: var(--gang-0); }
+.av-ser i.k1, .av-vem .k1 { --k: var(--gang-1); }
+.av-ser i.k2, .av-vem .k2 { --k: var(--gang-2); }
+.av-ser img, .av-vem img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.av-ser i span, .av-vem button > span { display: block; font-size: 7px; line-height: 13px; text-align: center; }
+/* den blå rutan: ingen bild, eller något att säga – i text-tv:ns stil */
+.av-bla { position: absolute; inset: 0; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 0 16px; background: radial-gradient(120% 100% at 50% 45%, #1834d8, #0d1c9a); text-align: center; }
+.av-bla[hidden] { display: none !important; }
+.av-bla p { margin: 0; }
+.av-rubrik { color: #fff23c; font-size: 15px; line-height: 1; letter-spacing: 0.3px; text-transform: uppercase; }
+.av-text { max-width: 150px; font-size: 11px; line-height: 1.05; }
+/* (inne i meningen: tv:ns b är annars block) */
+.av-text b { display: inline !important; font-weight: inherit; color: #45f1ff; }
+/* Vem är du?: porträtten med namnen under, som knappar */
+.av-vem { display: flex !important; gap: 9px; }
+.av-vem button { display: flex; flex-direction: column; align-items: center; gap: 3px; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-shadow: inherit; cursor: pointer; }
+.av-vem button > img, .av-vem button > span { width: 30px; height: 30px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 1.2px var(--k, #f4f3ec), 0 1px 4px rgba(0, 0, 0, 0.6); background: #222; transition: transform 0.15s; }
+.av-vem button b { font-weight: inherit; font-size: 10px; }
+.rum-tv3.nara .av-vem button:is(:hover, :focus-visible) > :is(img, span) { transform: scale(1.08); }
+.rum-tv3.nara .av-vem button:focus-visible { outline: none; }
+.rum-tv3.nara .av-vem button:focus-visible b { background: #1428e0; }
+/* AV i grönt uppe till vänster en stund efter bytet, som tv:ns egen text */
+.av-osd { position: absolute; left: 9px; top: 7px; color: #5dff7a; font-size: 14px; font-weight: inherit; line-height: 1; letter-spacing: 0.5px; text-shadow: 1px 1px 0 #000, 0 0 2px rgba(80, 255, 120, 0.6); opacity: 0; pointer-events: none; }
+.rum-tv3.ingang .av-osd { animation: av-osd 3.2s steps(1) both; }
+@keyframes av-osd { 0% { opacity: 1; } 100% { opacity: 0; } }
+/* bytet mellan text-tv:n och AV: ett ögonblick snö och en skakning, som när man bytte kanal */
+.tv-glas.byter::before { content: ""; position: absolute; inset: 0; z-index: 2; background: var(--sno, #555) 0 0 / 64px 64px; image-rendering: pixelated; animation: av-byt 0.42s steps(1) both; pointer-events: none; }
+.tv-glas.byter .tv-av > :not(.av-osd) { animation: av-in 0.42s steps(1) both; }
+@keyframes av-byt {
+  0% { opacity: 0.95; background-position: 0 0; }
+  20% { opacity: 0.9; background-position: -19px 23px; }
+  40% { opacity: 0.8; background-position: 27px -11px; }
+  60% { opacity: 0.55; background-position: -9px -31px; }
+  80% { opacity: 0.25; background-position: 13px 7px; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@keyframes av-in { 0% { opacity: 0; } 40% { opacity: 0.5; transform: translateY(3px); } 60% { opacity: 1; transform: translateY(-1px); } 80% { transform: none; } }
+.rum.enkel .tv-glas.byter::before { display: none; }
+.rum.enkel .av-sno { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
   .rum-tv3, .tv-scan, .tv-glas, .tv-led { transition: none; }
   .tv-glas::after { animation: none; display: none; }
+  .tv-glas.byter .tv-av > *, .av-sno, .av-jag::after { animation: none; }
+  .tv-glas.byter::before { display: none; }
+  .rum-tv3.ingang .av-osd { animation: none; }
 }
