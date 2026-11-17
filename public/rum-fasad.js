@@ -797,7 +797,8 @@ window.RumFasad = (() => {
   //
   // Allt som rör sig hela tiden ritas i dukar, högst TAKT gånger i sekunden och bara när något som rör sig
   // syns: överst (fram) bilarna som speglas i glaset, de som går förbi och deras speglingar i den våta
-  // stenen, någon som ibland stannar och tittar in, regnet, snön och blixten; bakom huset (bak), där himlen
+  // stenen, någon som ibland stannar och tittar in, löven, duvorna och andedräkten (rum-fasad-liv.js), regnet, snön
+  // och blixten; bakom huset (bak), där himlen
   // syns, molnen, fåglarna och fyrverkerierna; och barberarens stång i en liten egen duk på väggen. Förut var
   // det ett trettiotal CSS-animeringar, var och en i ett eget lager, och ett tiotal skärmytor lades ihop 60
   // gånger i sekunden.
@@ -2029,9 +2030,9 @@ window.RumFasad = (() => {
 
   // ---------- vilka som går förbi ----------
   //
-  // Hur många som går förbi: som på gatan inifrån (RumUte.trafik), färre i ösregn och kyla, nästan ingen mitt
-  // i natten. Var och en (eller ett sällskap) går fram och tillbaka över hela bilden med en paus utanför den,
-  // på sitt avstånd från fasaden (fötterna där, och lika mycket större). Det är 90-tal: vindjackor i
+  // Hur många som går förbi: efter gatan inifrån (RumUte.trafik) men färre, färre i ösregn och kyla, nästan ingen
+  // mitt i natten. Var och en (eller ett sällskap) går över hela bilden, åt det ena eller andra hållet, på sitt
+  // avstånd från fasaden (fötterna där, och lika mycket större), och nästa gång är det någon annan (folket). Det är 90-tal: vindjackor i
   // färgblock, dunjackor, skinnjackor, bomberjackor, trenchcoats, myskläder, vida jeans, bakvända kepsar,
   // freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar och en och annan mobiltelefon med
   // antenn. Och klädda efter vädret: paraply, regnrock och sydväst, gummistövlar och regnskydd på
@@ -2257,18 +2258,18 @@ window.RumFasad = (() => {
       ['en', 1.3],
       ['hund', h > 6 && h < 23.5 ? (W.regn ? 0.14 : 0.24) : 0.06],
       ['par', 0.16 + (h > 17 ? 0.1 : 0)],
-      ['gang', h > 13 && h < 23.5 ? 0.09 : T.natt && T.helg ? 0.2 : 0.02],
+      ['gang', h > 13 && h < 23.5 ? 0.06 : T.natt && T.helg ? 0.14 : 0.02],
       ['barn', dag ? 0.14 : 0],
       ['vagn', dag && !(W.sno && v.mangd > 0.5) ? 0.09 : 0],
       ['karra', h > 9 && h < 17 && !W.snoMark ? 0.06 : 0],
       ['cykel', !v.snotackt && !(W.regn && v.mangd > 0.6) && h > 6 && h < 23 ? 0.07 : 0],
       ['pulka', v.snotackt && h > 9 && h < 16.5 ? 0.16 : 0],
       ['tidning', W.regn && v.mangd < 0.85 ? 0.07 : 0],
-      ['jogg', !v.snotackt && !W.halt && !(W.regn && v.mangd > 0.5) && v.kanns > -6 && ((h > 6 && h < 9.5) || (h > 16.5 && h < 21.5)) ? (W.varm ? 0.1 : 0.06) : 0],
+      ['jogg', !v.snotackt && !W.halt && !(W.regn && v.mangd > 0.5) && v.kanns > -6 && ((h > 6 && h < 9.5) || (h > 16.5 && h < 21.5)) ? (W.varm ? 0.05 : 0.03) : 0],
       // (inlines när det är torrt och milt, rullatorn på dagen, supportrarna på väg till eller från matchen,
       // bergsprängaren, julgranen i december, tidningsbudet i gryningen, turisterna på sommaren och skidorna
       // när det har snöat en ledig dag)
-      ['inlines', !W.regn && !W.sno && !v.snotackt && v.kanns >= 7 && h > 9 && h < 21 ? (v.arstid === 'sommar' ? 0.14 : 0.07) : 0],
+      ['inlines', !W.regn && !W.sno && !v.snotackt && v.kanns >= 7 && h > 9 && h < 21 ? (v.arstid === 'sommar' ? 0.07 : 0.035) : 0],
       ['rullator', h > 9 && h < 17 && !(v.snotackt && v.mangd > 0.3) ? 0.07 : 0],
       ['supporter', T.helg ? (h > 11 && h < 19.5 ? 0.16 : 0) : h > 17 && h < 21.5 ? 0.06 : 0],
       ['bergs', !W.regn && !W.sno && v.kanns >= 5 && h > 11 && h < 22 ? 0.05 : 0],
@@ -2284,7 +2285,14 @@ window.RumFasad = (() => {
   // Sättet att gå (STILAR) efter vem det är, eller det sällskapet kräver (namn). På halkan (W.halkar) går de flesta
   // försiktigt, utom barnen och den som springer, och med kjol trippar en del. En hand i fickan bara när den är
   // ledig: med påsen i den ena handen eller paraplyet kan den andra vara i fickan.
-  const GSTIL = { ung: ['vanlig', 'rask', 'studsar', 'studsar', 'lunkar', 'slantrar', 'slantrar'], aldre: ['strosar', 'strosar', 'rak', 'lunkar', 'trippar'], kostym: ['rask', 'rask', 'rak', 'vanlig'], barn: ['studsar', 'vanlig'] };
+  // (lugnt framför affären, 2026-11-17: färre raska och studsande, fler som går vanligt eller strosar)
+  const GSTIL = {
+    ung: ['vanlig', 'vanlig', 'strosar', 'studsar', 'lunkar', 'slantrar', 'slantrar'],
+    vuxen: ['vanlig', 'vanlig', 'vanlig', 'strosar', 'strosar', 'rak', 'rask', 'trippar'],
+    aldre: ['strosar', 'strosar', 'rak', 'lunkar', 'trippar'],
+    kostym: ['vanlig', 'vanlig', 'rask', 'rak'],
+    barn: ['studsar', 'vanlig'],
+  };
   function gangFor(R, o, W, namn) {
     if (W.halkar && o.vem !== 'barn' && !['springer', 'kapp', 'skrinna'].includes(namn)) namn = 'halkar';
     if (!namn && o.ben === 'kjol' && R() < 0.4) namn = 'trippar';
@@ -2489,8 +2497,8 @@ window.RumFasad = (() => {
     // (den som blir blöt skyndar sig, och ibland springer den; i rusningen springer någon till bussen)
     const fort = W.regn && v.mangd > 0.45 && !o.paraply && o.stil !== 'regn';
     const h = v.timme + v.minut / 60;
-    const rusar = !o.paraply && !W.halt && ((h > 7 && h < 9) || (h > 16 && h < 18)) && R() < 0.06;
-    if ((fort && !W.halt && R() < 0.4) || rusar) {
+    const rusar = !o.paraply && !W.halt && ((h > 7 && h < 9) || (h > 16 && h < 18)) && R() < 0.03;
+    if ((fort && !W.halt && R() < 0.2) || rusar) {
       o.cigg = false;
       o.glass = null;
       return ett(o, 'springer');
@@ -2499,45 +2507,85 @@ window.RumFasad = (() => {
   }
   // (?rum-fasad-vem=inlines: alla som går förbi är sådana, för bilder och prov; vemGar har namnen)
   const VEM = (() => { try { return new URLSearchParams(location.search).get('rum-fasad-vem'); } catch (e) { return null; } })();
+  // Lugnt men levande (2026-11-17, användarens önskemål: "lugnare/mindre stressig än vad den är nu – men också mer
+  // levande"): färre går förbi samtidigt och i lugnare takt, men varje gång är det någon ny. Gatan delas i platser (högst
+  // LUGN.max), var och en med ett varv om P sekunder, förskjutna jämnt så att de inte kommer i klump. I varje varv kommer
+  // ett nytt sällskap (eller ingen, LUGN.tom), lottat ur platsens och varvets nummer, åt det ena eller andra hållet, en
+  // stund in i varvet; förut gick samma sex till nio sällskap runt i samma riktning var tjugonde sekund. Allt räknas ur
+  // tiden, så att en stillbild (?rum-t) visar dem som går just då, och varje sällskap byggs först när dess varv börjar
+  // (lopp), medan det ännu är utanför bilden. takt: hur fort de går mot förut (den som springer eller åker inlines som
+  // förut); stegen är lika långa, så att gången är densamma.
+  const LUGN = { andel: LATT ? 0.6 : 0.75, max: LATT ? 4 : 5, tom: 0.15, takt: 0.93 };
   function folket(V, v, L) {
     const T = U().trafik.nu(v);
     const fro = v.ar * 389 + v.manad * 37 + v.dag * 3 + (v.timme >> 1);
     const R = rng(fro + 11);
     const W = vadret(v, L);
     // (färre i regnet och i snöyran)
-    const n = Math.max(1, Math.min(LATT ? 6 : 9, Math.round(T.gaende * (LATT ? 0.9 : 1.2) * (W.regn ? 0.7 : W.sno && v.mangd > 0.5 ? 0.8 : 1))));
-    const ut = [];
-    for (let i = 0; i < n; i++) {
-      // (vilka de är, kläderna och sättet att gå ur en egen följd per sällskap, så att var och en går där den
-      // gick förut)
-      const RK = rng(fro + 977 * (i + 1));
-      // (på halkan går de flesta i ett sällskap försiktigt, halkar i gangFor)
-      const sk = sallskap(RK, VEM || vemGar(R, T, W, v), v, L, W.halt ? { ...W, halkar: RK() < 0.65 } : W);
-      const dm = 0.3 + R() * 0.4;
-      const dir = R() < 0.5 ? 1 : -1;
-      const k0 = skala(dm) * M / 100;
-      // (två steg på takten; ca 0,9–1,6 m/s; varvet är bilden och en paus)
-      const st0 = sk.vem[0].st;
-      const fart = st0.S * k0 * st0.takt;
-      const kant = sk.ut * k0 + 60;
-      const vag = V.w + 2 * kant;
-      const varv = vag / fart + 3 + R() * (T.natt ? 60 : T.gaende >= 6 ? 14 : 28);
-      const a = V.x - kant;
-      const b = V.x + V.w + kant + (varv * fart - vag);
-      const g = { fran: dir > 0 ? a : b, till: dir > 0 ? b : a, dur: varv, fas: R() * varv };
-      for (const m of sk.vem) {
-        const dmm = Math.min(0.82, Math.max(0.12, dm + (m.ddm || 0)));
-        const k = skala(dmm) * M / 100 * (m.k || m.o.h || 1);
-        ut.push({ D: figurDelar(m.o, L), k, dir, stil: m.st, gfas: RK(), dm: dmm, y: markY(dmm), dx: (m.dx || 0) * k0, ut: kant + Math.abs(m.dx || 0) * k0, g });
+    const n = Math.max(1, Math.min(LUGN.max, Math.round(T.gaende * LUGN.andel * (W.regn ? 0.7 : W.sno && v.mangd > 0.5 ? 0.8 : 1))));
+    // (varvet: en passage tar 6–12 s, och resten är tid utanför bilden; glesare på kvällen och på natten)
+    const P = T.natt ? 70 : T.gaende >= 6 ? 26 : T.gaende >= 4 ? 34 : 42;
+    const off = [...Array(n)].map((_, i) => ((i + 0.6 * R()) * P) / n);
+    const minne = new Map();
+    function lopp(i, m) {
+      const key = m * 16 + i;
+      if (minne.has(key)) return minne.get(key);
+      // (vilka de är, kläderna och sättet att gå ur platsens och varvets egen följd)
+      const RK = rng(fro + 977 * (i + 1) + 7919 * m);
+      let lap = null;
+      if (RK() > LUGN.tom) {
+        // (på halkan går de flesta i ett sällskap försiktigt, halkar i gangFor)
+        const sk = sallskap(RK, VEM || vemGar(RK, T, W, v), v, L, W.halt ? { ...W, halkar: RK() < 0.65 } : W);
+        for (const x of sk.vem) if (x.st.namn !== 'springer' && x.st.namn !== 'skrinna') x.st.takt *= LUGN.takt;
+        const dm = 0.3 + RK() * 0.4;
+        const dir = RK() < 0.5 ? 1 : -1;
+        const k0 = skala(dm) * M / 100;
+        // (alla går i den förstas fart)
+        const st0 = sk.vem[0].st;
+        const fart = st0.S * k0 * st0.takt;
+        const kant = sk.ut * k0 + 60;
+        const tc = (V.w + 2 * kant) / fart;
+        const start = m * P + off[i] + RK() * Math.max(0, P - tc);
+        lap = {
+          start, slut: start + tc, fart, dir, fran: dir > 0 ? V.x - kant : V.x + V.w + kant,
+          folk: sk.vem.map((x) => {
+            const dmm = Math.min(0.82, Math.max(0.12, dm + (x.ddm || 0)));
+            const k = skala(dmm) * M / 100 * (x.k || x.o.h || 1);
+            return { D: figurDelar(x.o, L), k, dir, stil: x.st, gfas: RK(), dm: dmm, y: markY(dmm), dx: (x.dx || 0) * k0, o: x.o, and: RK() * 4 };
+          }),
+        };
       }
+      minne.set(key, lap);
+      if (minne.size > 4 * n + 4) minne.delete(minne.keys().next().value);
+      return lap;
     }
-    return ut.sort((p, q) => p.dm - q.dm);
+    // de som syns vid tiden t: [figuren, delarna, x, y, varvet], de bortre först
+    return {
+      vid(t) {
+        const ut = [];
+        for (let i = 0; i < n; i++) {
+          const m = Math.floor((t - off[i]) / P);
+          for (let j = m - 2; j <= m; j++) {
+            const lap = lopp(i, j);
+            if (!lap || t < lap.start || t > lap.slut) continue;
+            const x0 = lap.fran + lap.dir * lap.fart * (t - lap.start);
+            for (const f of lap.folk) {
+              const x = x0 + f.dir * f.dx;
+              if (x > V.x - 260 && x < V.x + V.w + 260) ut.push([f, f.D, x, f.y, lap]);
+            }
+          }
+        }
+        return ut.sort((p, q) => p[0].dm - q[0].dm);
+      },
+    };
   }
 
   // Någon stannar ibland framför fönstret och tittar in på oss: kommer gående, står en stund med ryggen mot
   // en vid fönstrets vänstra del (där skivan med löpsedlarna hänger, så att gänget syns), och går vidare. Inte
-  // varje gång och inte mitt i natten; klädd efter vädret, utan paraply (det skulle skymma skylten).
-  const STANNA = { cykel: 170, start: 24, sta: 13, dm: 0.25 };
+  // varje gång och inte mitt i natten; klädd efter vädret, utan paraply (det skulle skymma skylten). Sedan
+  // 2026-11-17 oftare och längre (16–28 s; förut i sex av tio varv om 170 s och 13 s): den som står stilla och
+  // tittar gör gatan levande utan att något far förbi.
+  const STANNA = { cykel: 120, start: 18, dm: 0.25 };
   function stannar(V, v, L) {
     const T = U().trafik.nu(v);
     if (T.gaende < 2 || v.timme < 7 || v.timme >= 23) return null;
@@ -2547,7 +2595,7 @@ window.RumFasad = (() => {
     // (en ny människa varje varv)
     const vem = (n) => {
       const R = rng(n * 131 + v.dag * 7 + v.manad);
-      if (R() > 0.6) return null;
+      if (R() > 0.72) return null;
       const o = hander(klad(R, v, L, W, pick(R, ['ung', 'vuxen', 'vuxen', 'aldre', 'kostym']), { utanParaply: true }));
       o.walkman = false;
       // (den som stannar strosar, och går försiktigt på halkan)
@@ -2557,7 +2605,7 @@ window.RumFasad = (() => {
       const xa = dir > 0 ? V.x - 200 : V.x + V.w + 200;
       const xb = dir > 0 ? V.x + V.w + 200 : V.x - 200;
       const kk = k * (o.h || 1);
-      return { o, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(bakO, L), k: kk, stil, fart: stil.S * kk * stil.takt, dm: STANNA.dm, sta: false };
+      return { o, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(bakO, L), k: kk, stil, fart: stil.S * kk * stil.takt * LUGN.takt, dm: STANNA.dm, sta: 16 + R() * 12 };
     };
     const minne = new Map();
     return (t) => {
@@ -2569,11 +2617,11 @@ window.RumFasad = (() => {
       const fart = f.fart;
       const tIn = Math.abs(xs - f.xa) / fart;
       const tUt = Math.abs(f.xb - xs) / fart;
-      if (tau < 0 || tau > tIn + STANNA.sta + tUt) return null;
+      if (tau < 0 || tau > tIn + f.sta + tUt) return null;
       if (tau < tIn) return { f, x: f.xa + f.dir * fart * tau, sta: false };
       tau -= tIn;
-      if (tau < STANNA.sta) return { f, x: xs, sta: true };
-      return { f, x: xs + f.dir * fart * (tau - STANNA.sta), sta: false };
+      if (tau < f.sta) return { f, x: xs, sta: true };
+      return { f, x: xs + f.dir * fart * (tau - f.sta), sta: false };
     };
   }
 
@@ -2592,7 +2640,8 @@ window.RumFasad = (() => {
       const dir = -1;
       const buss = T.bussar && R() < 0.25;
       const w = buss ? 900 : 360;
-      const varv = (T.varv[0] + R() * (T.varv[1] - T.varv[0])) * (0.5 + R() * 0.4);
+      // (glesare och svagare sedan 2026-11-17, som bilarna på gatan)
+      const varv = (T.varv[0] + R() * (T.varv[1] - T.varv[0])) * (0.9 + R() * 0.6);
       let bild = null;
       if (!mork) {
         // (kroppen en gång, mjuk: en suddig skugga av en rundad låda)
@@ -2613,7 +2662,7 @@ window.RumFasad = (() => {
       }
       const fran = dir > 0 ? FON.x - w - 200 : FON.x + FON.w + DORR.w + 300;
       const till = dir > 0 ? FON.x + FON.w + DORR.w + 300 : FON.x - w - 200;
-      ut.push({ w, dir, mork, bild, a: LATT ? 0.2 : 0.28, yk, hk, g: { fran, till, dur: varv, fas: R() * varv } });
+      ut.push({ w, dir, mork, bild, a: LATT ? 0.15 : 0.21, yk, hk, g: { fran, till, dur: varv, fas: R() * varv } });
     }
     return ut;
   }
@@ -3095,21 +3144,19 @@ window.RumFasad = (() => {
   function ritaFram(R, t) {
     const { V, L } = R;
     const c = R.fram;
-    const lista = [];
-    for (const f of R.folk) {
-      const x = glidX(f.g, t) + f.dir * (f.dx || 0);
-      if (x > V.x - (f.ut || 220) && x < V.x + V.w + (f.ut || 220)) lista.push([f, f.D, x, f.y]);
-    }
+    const lista = R.folk ? R.folk.vid(t) : [];
     const st = R.stanna && R.stanna(t);
-    if (st) lista.unshift([{ k: st.f.k, dir: st.sta ? 1 : st.f.dir, sta: st.sta, stil: st.f.stil }, st.sta ? st.f.B : st.f.D, st.x, markY(STANNA.dm)]);
+    if (st) lista.unshift([{ k: st.f.k, dir: st.sta ? 1 : st.f.dir, sta: st.sta, stil: st.f.stil, dm: STANNA.dm }, st.sta ? st.f.B : st.f.D, st.x, markY(STANNA.dm)]);
     const bilar = R.bilar.some((b) => { const x = glidX(b.g, t); return x < DORR.x + DORR.w + 100 && x + b.w > FON.x - 100; });
     // (bilarna och bussarna på gatan framför, rum-fasad-gatan.js)
     const gata = R.gata ? GATA().syns(R.gata, t, V) : null;
     R.fortGata = Boolean(gata);
-    if (!lista.length && !bilar && !gata && !R.N && R.tom) return;
+    // (löven, duvorna och andedräkten, rum-fasad-liv.js)
+    const liv = R.liv && LIV().syns(R.liv, t) ? R.liv : null;
+    if (!lista.length && !bilar && !gata && !R.N && !liv && R.tom) return;
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.clearRect(0, 0, c.canvas.width, c.canvas.height);
-    R.tom = !lista.length && !bilar && !gata && !R.N;
+    R.tom = !lista.length && !bilar && !gata && !R.N && !liv;
     if (R.tom) return;
     c.setTransform(R.px, 0, 0, R.px, -V.x * R.px, -V.y * R.px);
     if (R.vat && lista.length) {
@@ -3124,12 +3171,31 @@ window.RumFasad = (() => {
       c.restore();
     }
     if (bilar) ritaBilar(c, R.bilar, t);
-    for (const [f, D, x, y] of lista) ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L), z: morkSteg(x, L) });
+    // (löven närmast fasaden, de som går bakom duvorna, duvorna på stenen, de andra som går, andedräkten, duvorna i
+    // luften och löven framför dem)
+    if (R.liv) LIV().lov(c, R.liv, t, 0);
+    const duvMark = R.liv ? LIV().MARK : 0;
+    let i = 0;
+    for (; i < lista.length && R.liv && lista[i][0].dm < duvMark; i++) {
+      const [f, D, x, y] = lista[i];
+      ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L), z: morkSteg(x, L) });
+    }
+    if (R.liv) LIV().duvor(c, R.liv, t, lista.map(([f, , x]) => [x, f.dm, f.sta ? 0 : f.dir]), false);
+    for (; i < lista.length; i++) {
+      const [f, D, x, y] = lista[i];
+      ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L), z: morkSteg(x, L) });
+    }
+    if (R.liv) {
+      LIV().ande(c, R.liv, lista, t);
+      LIV().duvor(c, R.liv, t, null, true);
+      LIV().lov(c, R.liv, t, 1);
+    }
     // (stänken på stenen bakom dem som kör förbi, och fordonen framför dem som går)
     if (gata) {
       ritaStank(c, R.N, R.K, t, L.dag);
       GATA().rita(c, R.gata, gata, t);
     }
+    if (R.liv) LIV().lov(c, R.liv, t, 2);
     // (i dimma: samma dis över dem som över allt bakom, bara där något är ritat)
     if (R.dimma) {
       c.save();
@@ -3149,6 +3215,10 @@ window.RumFasad = (() => {
   const GATA = () => window.RumFasadGatan || null;
   let gataG = null;
   const gataMatt = () => gataG || (gataG = { M, MARK, HOR, AVST, OGA_X, VARLD, FON, DORR, markY, skala, tone, mix, rng, pick, r1, sm, snoC, lovet, LATT });
+  // Det lilla som lever (rum-fasad-liv.js): löven, andedräkten och duvorna, med samma mått och kantljuset (randLjus).
+  const LIV = () => window.RumFasadLiv || null;
+  let livG = null;
+  const livMatt = () => livG || (livG = { ...gataMatt(), ljus: randLjus });
 
   const bucket = (x, n) => Math.round(x * n) / n;
   function sig(V, v, L, o) {
@@ -3222,10 +3292,11 @@ window.RumFasad = (() => {
       const pyntBild = pyntBilder(L, pyntPx);
       const R = {
         px, V, L, bakR, himlen,
-        folk: lugn ? [] : folket(V, v, L),
+        folk: lugn ? null : folket(V, v, L),
         stanna: lugn ? null : stannar(V, v, L),
         bilar: lugn ? [] : bilarna(v, L, px),
         gata: lugn || !GATA() ? null : GATA().trafik(v, L, gataMatt()),
+        liv: lugn || !LIV() ? null : LIV().liv(V, v, L, livMatt()),
         N: lugn ? null : nederbord(V, v),
         // (ljuset där regnet faller, på kvällen: ljusKarta)
         K: !lugn && (v.fall === 'regn' || v.fall === 'blandat') && L.dag < 0.95 ? ljusKarta(V, L, inne(o)) : null,

@@ -1403,6 +1403,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   balkar, Renaults romb, Citroëns vinklar, Ladas skepp, Jeep och Chryslers stjärna), och på några också på karossen:
   SAAB bakom framhjulet på 900:an, CHEROKEE på jeepens framdörr, Bel Air på amerikanarens bakskärm och stjärnan på
   Mercedesarnas huv. Se *Märket på bilarna* under [Fasaden](#fasaden).
+- **Fasaden lugnare och mer levande (2026-11-17, användarens önskemål):** "Kan du göra den här animationsvyn från utanför
+  butiken lugnare/mindre stressig än vad den är nu - men också mer levande". Färre stora och snabba rörelser i
+  förgrunden och fler små och långsamma: hälften så många som går förbi samtidigt, men varje gång någon ny och från båda
+  hållen, i lugnare takt och med färre joggare; hälften så många bilar, lite långsammare, som sällan bromsar eller står
+  i kö framför affären, och mjukare bromsljus; den som stannar och tittar in gör det oftare och längre. Och nytt: höstlöv
+  som singlar ned och driver i vinden, andedräkten i kylan och duvor som pickar på trottoaren och flyger undan när någon
+  kommer. Se *Lugnare och mer levande* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7099,8 +7106,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   regnet slår ned blir det stänk – en ring som vidgas och en liten krona – på stenen, fönsterbänkens bleck och skyltens
   tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
   inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
-- **Det som händer ute:** de som går förbi på trottoaren framför affären, ungefär lika många som på gatan inifrån
-  (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
+- **Det som händer ute:** de som går förbi på trottoaren framför affären, efter trafiken på gatan inifrån men färre
+  (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst fem platser och fyra i telefonen, och varje gång
+  någon ny: se *Lugnare och mer levande* nedan), ensamma eller i sällskap
   (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
   barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
   tidningen i regnet, någon som joggar morgon och kväll (`joggare`: myskläder i färgblock eller shorts och t-shirt,
@@ -7172,9 +7180,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
   still hur ofta duken än ritas om (förut svängde benen i halva takten och fötterna gled fram, "de flyter liksom fram",
   2026-11-16; sedan gick alla likadant, med en stel kappa och benet som släpade efter, "inte så naturligt", samma dag).
-  Ibland (i ungefär sex av tio varv om 170 s, inte
+  Ibland (i ungefär sju av tio varv om 120 s, inte
   mitt i natten) kommer någon gående, stannar framför fönstrets vänstra del med ryggen mot en och tittar in på oss i
-  13 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
+  16–28 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
   gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna syns också som speglingar som far förbi i glaset
   och dörren: mörka skuggor på dagen, baklyktor i mörkret, alla åt vänster som på gatan.
 - **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
@@ -7201,8 +7209,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
   som de som går på skärmen, så att en bil syns i fyra–fem sekunder (se *Bilarna kör ute på gatan, och som bilar*
-  nedan). Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 18 % på dagen och
-  40 % i rusningen), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
+  nedan). Hur ofta följer `RumUte.trafik` (sedan 2026-11-17 skyms skyltfönstret ungefär 10 % av tiden på dagen, 6 % på
+  kvällen och 22 % i rusningen; se *Lugnare och mer levande* nedan), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
   bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
   regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
@@ -7250,6 +7258,46 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   dyrare att rita (mätt i Chromium utan grafikkort), som bild syns ingen skillnad i samma mätning. Provat i bilder av
   alla former på nära håll och i fasaden på dagen och på kvällen i datorn; inte i en riktig telefon, där märket i navet
   blir ungefär tjugo bildpunkter brett.
+- **Lugnare och mer levande (2026-11-17, användarens önskemål):** "Kan du göra den här animationsvyn från utanför
+  butiken lugnare/mindre stressig än vad den är nu - men också mer levande", med en skärmbild från en kväll där en bil
+  stod med bromsljuset lysande mitt framför skyltfönstret. Principen: det som var stressigt var det stora och snabba i
+  förgrunden – bilar som skymde affären, många som korsade varandra, joggare – och det som gör gatan levande är det lilla
+  och långsamma. Därför färre stora rörelser och fler små:
+  - **De som går förbi** (`folket`, `LUGN` i rum-fasad.js): gatan delas i högst fem platser (fyra i telefonen), var och
+    en med ett varv om 26 s på dagen, 34 s när det är glesare, 42 s på kvällen och 70 s på natten, förskjutna jämnt så
+    att de inte kommer i klump. I varje varv kommer ett nytt sällskap (eller ingen, i ungefär vart sjunde), lottat ur
+    platsens och varvets nummer, åt det ena eller andra hållet och en stund in i varvet. Förut gick samma sex till nio
+    sällskap runt i samma riktning var tjugonde sekund, och samma människa kom tillbaka gång på gång. Var och en byggs
+    först när dess varv börjar (`lopp`), medan den är utanför bilden. De går 7 % långsammare (samma steg, lugnare takt),
+    färre går raskt eller studsar (`GSTIL`, nu också för de vuxna), och det är hälften så många joggare och inlinesåkare
+    och hälften så många som springer i regnet eller till bussen. Den som stannar och tittar in gör det oftare och längre
+    (se ovan). Mätt över en simulerad halvtimme (datorn, en tisdag i november): mitt på dagen syns i snitt 1,5 sällskap
+    samtidigt i stället för 3,0 (högst 5 i stället för 7), i rusningen 1,5 i stället för 3,5, 18.30 1,0 i stället för 1,9
+    och 21.00 0,5 i stället för 1,3.
+  - **Bilarna** (`LUGN`, `intervall`, `kor`, `ko` i rum-fasad-gatan.js): ungefär hälften så ofta (en per fil var 76:e
+    sekund på dagen, var 46:e i rusningen, var 120:e på kvällen), 12 % långsammare, färre bussar och färre som följer
+    tätt efter en annan, hälften så många som bromsar in eller stannar framför affären och färre köer (i rusningen i
+    vart femte kö-varv i stället för varannat). Bromsljusen lyser mjukare i mörkret, och baklyktorna är mörkare röda
+    när föraren inte bromsar (förut lika starka). Speglingarna av bilar i glaset är glesare och svagare. Skyltfönstret
+    skyms av fordon 10 % av tiden på dagen i stället för 21 %, 22 % i rusningen i stället för 45 % och 6 % på kvällen i
+    stället för 11 %; fortfarande kör ingen igenom någon (prövat en timme i rusningen, på dagen och en lördag).
+  - **Det lilla som lever** ([public/rum-fasad-liv.js](public/rum-fasad-liv.js), `RumFasadLiv`): på hösten singlar
+    löv ned från träden vid bron och driver åt vänster i vinden, vaggar och vänder sig, landar på trottoaren eller
+    gatan och ligger en stund; i blåsten far ett och annat längs stenen (tre till nio åt gången, fler när det blåser).
+    När det är kallt (högst 3 grader, eller känns som noll) andas de som går ut en liten rök, mjuk i kanten, som stannar
+    i luften där de var och vidgas och bleknar; på kvällen syns den bara i ljuset från fönstret, dörren och lyktorna. På
+    dagen går en till fyra duvor på trottoaren framför affären (inte varje gång, och inte i regn eller snöfall): de
+    nickar med huvudet när de går, pickar i stenen och står och ser sig om, och när någon kommer inom en dryg meter
+    flyger de upp, de andra intill strax efter, och landar bakom den som gick förbi eller en bit bort, eller flyger ur
+    bilden och kommer tillbaka en stund senare. Löven och andedräkten räknas ur tiden (en stillbild visar dem som de är
+    då); duvorna minns vad de gör från bild till bild. Allt ritas med några få vägar i `rf-fram`, löven i tre lager
+    efter avståndet (bakom dem som går, framför dem och över gatan) och duvorna mellan dem som går närmare fasaden och
+    de andra.
+  - **Vad det kostar:** löven, andedräkten och duvorna tar ungefär 6 ms/s i Chromium som Pixel 7 med processorn ×4, och
+    med färre som går och färre bilar blir det sammantaget billigare (samma prov, utan gänget i fönstret, 30 s, gammal
+    och ny om vartannat): sidans skript mitt på dagen 71 → 39 ms/s, i rusningen 97 → 80 och en regnig kväll 81–83 →
+    59–62, och huvudtrådens arbete 533 → 381, 682 → 548 och 774–787 → 608–630 ms/s (den regniga kvällen 46 → 53–54
+    bilder i sekunden). Inga nya lager eller dukar. Inte provat i en riktig telefon.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -7265,7 +7313,7 @@ punkter (`F.k` per enhet i världen) och förminskas inte: Safari ritar ett lage
 pixeltätheten, och förut, i världens mått, tog vart och ett av nio lager ungefär fem gånger så mycket minne som det
 syns i en telefon på höjden (2026-11-16). När storleken ändras skalas scenen om så länge (`passa`), tills den byggs
 om. Toningen in har inget eget lager när den är klar. Det som rör sig ritas i tre dukar: `rf-fram`
-överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
+överst (speglingarna i stenen, bilarna i glaset, löven, duvorna och andedräkten, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
