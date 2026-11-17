@@ -28,7 +28,7 @@
 // finnas på andra ställen på sajten. Koden finns i historiken, före "Helgarderat: en enda tidning".
 //
 // Numret är data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, och det ligger kvar tills nästa
-// kommer, också efter omgången. Utan det står provnumret (helgarderat/utkast.json, poddjobbets provomgång 2026-11-10).
+// kommer, också efter omgången. Nästa kommer med nästa kupong, innan matchbladen är skrivna. Utan det står provnumret (helgarderat/utkast.json, poddjobbets provomgång 2026-11-10).
 // Tidningen har inga bilder sedan Affischen (2026-11-13). Sista sidan skriver samma nattjobb
 // (src/analyser/sista-sidan.mjs).
 // Inget här anropar någon språkmodell.
@@ -283,13 +283,14 @@
   // (data/sista-sidan.json). Kupongen är omgångens alla matcher i
   // kupongens ordning (data.matcher, också de utan matchblad), var och en med sitt matchblad om den har ett.
   // Matchbladen är uppslag med två sidor var, från sidan 2 (sida: vänstersidan, alltid jämn), och sista sidan kommer
-  // efter dem (sistaNr).
-  // → upplagan, eller null när numret inte har några matchblad
+  // efter dem (sistaNr). Ett nummer kommer ut med kupongen, innan matchbladen är skrivna (2026-11-17), och har då
+  // bara omslaget och innehållet, med matcherna bleka tills deras blad kommer.
+  // → upplagan, eller null när numret varken har matcher eller matchblad
   function upplaga(data, prov = false, sista = null) {
     const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
-    if (!sidor.length) return null;
+    const l = data && Array.isArray(data.matcher) && data.matcher.length ? data.matcher : sidor;
+    if (!l.length) return null;
     const blad = new Map(sidor.map((s) => [String(s.id), s]));
-    const l = Array.isArray(data.matcher) && data.matcher.length ? data.matcher : sidor;
     const kupongen = l.map((x, i) => {
       const s = blad.get(String(x.id)) || null;
       const lag = s && s.lag ? s.lag : String(x.match || '').split(/\s+[–-]\s+/);

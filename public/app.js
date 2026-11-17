@@ -922,7 +922,7 @@ function sideTip(label, values = [], names = []) {
 
 const FORM_TIP = 'Lagets fem senaste matcher i alla tävlingar, nyast till vänster. V = vinst, O = oavgjort, F = förlust. ' +
   'Det är ställningen efter 90 minuter som gäller, så en match som avgjorts i förlängning eller på straffar räknas som oavgjord. ' +
-  'Strecket under rutan är motståndets styrka enligt modellen, från den egna divisionens svagaste lag (kort streck) till dess starkaste (helt streck). ' +
+  'Strecket under rutan är motståndets styrka enligt modellen: ju längre streck, desto svårare motstånd, och ett halvt streck är ett lag som den egna divisionens mittenlag. ' +
   'För lag utanför England räknas styrkan ur matchens odds. Utan streck är styrkan okänd. Peka på en ruta för att se vilken match det var.';
 const FORM_RESULT = { V: 'Vinst', O: 'Oavgjort', F: 'Förlust' };
 const formOrdinal = (n) => `${n}:${n % 10 >= 1 && n % 10 <= 2 && (n % 100 < 11 || n % 100 > 12) ? 'a' : 'e'}`;

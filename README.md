@@ -465,6 +465,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   redan var spelade. Matchbladen och sista sidan är skrivna för hand inför matcherna, ur veckans press. Omslaget säger
   *Nr 2* och *Inför Europatipset*, och nattjobbet låter numret stå kvar med alla matcherna (se *Nr 2* under
   [Helgarderat](#helgarderat))
+- [x] **Helgarderat kommer med kupongen (2026-11-17, användarens önskemål: "Jag vill att nästa tidning ska släppas när
+  nästa stryktipskupong (europatipskupong också) släpps!"):** när Svenska Spel öppnar nästa Stryktips eller Europatips
+  och det blir gängets omgång lägger nattjobbet ut nästa nummer inom en kvart, med omslaget och kupongens alla matcher
+  i innehållet, också innan något matchblad är skrivet. Bladen fylls i när de kommer. Förut kom numret först med det
+  första bladet, och Nr 2 låg kvar fast Stryktipset 4980 hade varit omgång i ett dygn. Nr 3 (Stryktipset 4980,
+  lördag 21 november) lades ut för hand samma dag, med omslaget och innehållet. Att skriva bladen för hand, som i Nr 2,
+  gick inte: miljön nådde inga nyhetssajter, och ändringen av dess nät avvisades (se *Numret kommer med kupongen* under
+  [Helgarderat](#helgarderat))
 
 ## Publicering
 
@@ -1377,12 +1385,24 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   med kjol) och släntrar (långa, sega steg, bakåtlutad, armarna svänger löst, axlarna rullar och huvudet nickar). Var
   och en svänger dessutom armarna på sitt sätt (hur böjda, hur långt fram och i vilken takt), och ibland är bara den ena
   handen i fickan, också när den andra bär påsen eller paraplyet. Se *Det som händer ute* under [Fasaden](#fasaden).
+- **Gatan inifrån går som framför affären (2026-11-17, användarens önskemål):** "Ja, gör samma sak med gatan
+  inifrån". De som går på trottoaren mittemot, sedda genom skyltfönstret, gick på ett enda sätt, med fötter som gled.
+  Nu går de med fasadens gång (samma sätt att gå och samma ställning i varje bild), med käpp, joggande, försiktigt på
+  halkan och springande i regnet som framför affären. Se *Folk och trafik* under *Utsikten och vädret* i
+  [Tobaksaffären](#tobaksaffären).
 - **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
   som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
   långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
   fönster, bilarna kör ungefär 60 % så fort (de syns i fyra–fem sekunder), och var och en kör som en bil: släpper
   gasen, bromsar in med bromsljusen tända och tar fart igen, stannar ibland en stund, följer den framför och niger när
   den bromsar. Se *Bilarna kör ute på gatan, och som bilar* under [Fasaden](#fasaden).
+- **Märket syns på bilarna (2026-11-17, användarens önskemål):** "Det är inte så tydligt vilket märke de olika bilarna
+  har som kör ute … Kan du göra det för de bilar där man kan se det på sidan". Märket sitter där det satt på de riktiga
+  bilarna sett från sidan: i navkapselns eller fälgens mitt på alla utom Minin och amerikanaren (Volvos järntecken, Saabs
+  grip, Mercedesstjärnan, BMW, VW, Audis ringar, Opels blixt, Fords oval, Toyota, Nissan, Mazda, Peugeots lejon, Fiats
+  balkar, Renaults romb, Citroëns vinklar, Ladas skepp, Jeep och Chryslers stjärna), och på några också på karossen:
+  SAAB bakom framhjulet på 900:an, CHEROKEE på jeepens framdörr, Bel Air på amerikanarens bakskärm och stjärnan på
+  Mercedesarnas huv. Se *Märket på bilarna* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -6968,7 +6988,17 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
 - **Folk och trafik:** på brons trottoar mittemot går folk förbi (fler på dagen och kvällen,
   nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
-  snö. Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
+  snö, och morgon och kväll någon som joggar. Sedan 2026-11-17 går de som framför affären (se *Det som händer ute*
+  under [Fasaden](#fasaden)): samma sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, på
+  halkan, med käpp och springer) och samma ställning i varje bild ur fasadens gång (`RumFasad.gang`: `stalln`), så att
+  foten i marken står still mot stenen, höften gungar, knät böjs, armarna pendlar emot benen och överkroppen lutar;
+  den äldre går ibland med käpp, den unga släntrar ibland, den som blir blöt skyndar sig eller springer, och på halkan
+  går de flesta försiktigt. Figuren ritas i centimeter med fasadens huvud och hår och förminskas till gatan (`folk`,
+  `CMG` px per cm), och delarnas grupper (`g-…`) får sina vinklar ur ställningen (`gangLas`); farten är steglängden
+  gånger takten. Gångcykeln räknas en gång per sätt att gå (`TABELL`): i gatans storlek syns inte det som skiljer var
+  och en i benen, och den tog ungefär 10 ms per figur i en långsam telefon. Med fyra gånger så långsam processor
+  kostar ställningarna i telefonen 3–13 % mer per bild än de gamla figurerna (som har färre delar), och gatan tar
+  60–80 ms längre att bygga första gången. Utan rum-fasad.js går de som förut (`person`). Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
   fler bilar i rusningen och färre på natten (fler taxi då), och på helger och röda dagar ingen
   rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna, bussarna och plogbilen är
   fasadens (sedan 2026-11-16, rum-fasad-gatan.js: nittiotalets bilar i Stockholm, skåpbilar och taxi med
@@ -7165,7 +7195,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   Chrysler Voyager (ibland storbilstaxi), Saab 900 cabriolet med tygtak – och taket nere när det är minst 18 grader och
   torrt, med dem som åker synliga – och bland de äldre Volvo 145, Lada 2105/2107 och 2104 i kombi, och amerikanaren
   med fenor, vita däcksidor och ibland vitt tak, bara när det är minst 15 grader och torrt), ritade efter de riktiga
-  måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke,
+  måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar, med märket i mitten (se
+  *Märket på bilarna* nedan), och ibland takräcke,
   skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
@@ -7198,6 +7229,27 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   accelerationen, så att den gungar tillbaka när bilen stannar (`fjader`, `niga`; hjulen står kvar). Provat i en
   simulering av en timme i varje tid på dygnet (inga fordon i varandra) och i bilder från datorn och telefonen, dag,
   regnig kväll och snö.
+- **Märket på bilarna (2026-11-17, användarens önskemål):** "Det är inte så tydligt vilket märke de olika bilarna har som
+  kör ute … Kan du göra det för de bilar där man kan se det på sidan". Märket sitter där det syns från sidan på de
+  riktiga bilarna, inte där det inte gjorde det (en 240:a eller en Golf har bara navet). I navkapselns eller fälgens mitt
+  på alla bilar utom Minin och amerikanaren (`navMarke` i rum-fasad-gatan.js): Volvos järntecken, Saabs röda grip med
+  kronan på blått (de äldre, 96:an och 99:an, med SAAB i bokstäver), Mercedesstjärnan, BMW:s blåvita, VW, Audis fyra
+  ringar, Opels blixt, Fords blå oval, Toyotas ellipser, Nissan, Mazda, Peugeots lejon, Fiats fem balkar, Renaults romb,
+  Citroëns dubbla vinkel, Ladas skepp, Jeep och Chryslers femstjärna. Märket är en fjärdedel till en tredjedel av hjulets
+  radie, något större än i verkligheten så att det går att läsa, snurrar med hjulet (som lättmetallfälgarna) och står
+  rättvänt när bilen kör åt vänster; det läses när bilen står i kön eller rullar sakta. De former som är flera bilar får
+  ett av märkena per bil (`MARKEN`: Kadetten är också Escort och 323:a, Corollan Sunny och Vectra, E30:n Audi 80,
+  205:an Uno och Femman, Passaten de andra mellanstora kombibilarna och skåpbilen Ford, VW, Mercedes eller Toyota), valt
+  ur bilens fart, så att resten av luckan lottas som förut. På karossen (`emblem` och `stjarna` i `FORM`): SAAB i krom
+  bakom framhjulet på 900:an och cabben (emblemet på framskärmen 1984–93), CHEROKEE på jeepens framdörr (mörk på ljus
+  lack, ljus på mörk), förgyllt Bel Air i handstil på amerikanarens bakskärm (som på en 57:a Chevrolet) och
+  Mercedesstjärnan på huven på 123:an, 190:n och W124:an, som från sidan är en smal blank stav på sin fot. Placeringarna
+  är kollade mot reservdelslistor (Saabs emblem, jeepens dörrdekal och Chevrolets bakskärmsskrift). Märkena mörknar på
+  kvällen med resten av bilen. Märket i navet ritas en gång per märke, storlek och ljus i en liten duk (`navBild`, högst
+  32 stycken) och läggs sedan ut vridet: ritat med vägar i varje bild gjorde det bilen en femtedel till en tredjedel
+  dyrare att rita (mätt i Chromium utan grafikkort), som bild syns ingen skillnad i samma mätning. Provat i bilder av
+  alla former på nära håll och i fasaden på dagen och på kvällen i datorn; inte i en riktig telefon, där märket i navet
+  blir ungefär tjugo bildpunkter brett.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
@@ -7810,8 +7862,8 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   inom divisionen jämförs bara när lagen spelar i samma, och inget lyser när resultaten är
   dolda.
   Efter formen i matchakten står **formens motstånd** (2026-11-12, användarens önskemål: "en siffra på
-  hur svåra de här lagen har varit"): hur bra de fem motståndarna var i snitt, från 0 (den
-  egna divisionens svagaste lag enligt modellen) till 100 (dess starkaste) – samma mått som
+  hur svåra de här lagen har varit"): hur bra de fem motståndarna var i snitt, 0–100 som deras
+  chans mot den egna divisionens mittenlag (se *Motståndets styrka utan nollor* nedan) – samma mått som
   strecket under formens rutor på matchsidan (`opp.level` i matchens fil). Siffran står
   alltid som vanligt – den säger inte vem som är bättre och lyser inte. Alla motståndare räknas (`opponentStrength` i
   [src/matches.js](src/matches.js)): lag i de fyra ligorna och National League har modellens
@@ -7820,8 +7872,8 @@ omvänd. Längst ner står sökraden (*SÖK >*) och under den tangenterna, omvä
   anfall och försvar i modellen följer motståndarens (`strengthFromOdds` i
   [src/strength.js](src/strength.js)). Prövat 2026-11-12 på 60 spelade matcher i Premier
   League, där modellen har svaret: styrkan ur oddsen följer modellens (samband 0,87) och
-  ligger i snitt 10 steg ifrån för en enskild match. Lag starkare än divisionens bästa eller
-  svagare än dess sämsta hamnar i ändarna (Bayern München 100 för Arsenal, Fleetwood 0).
+  ligger i snitt 10 steg ifrån för en enskild match (på den gamla skalan från divisionens svagaste
+  till dess starkaste).
   Saknar fler än en av de fem matcherna styrka visas ingen siffra. Med dolda resultat står
   ett frågetecken, som för tavlans tal. EFL Trophy hämtas inte och finns varken i formen
   eller i siffran.
@@ -8126,7 +8178,7 @@ bland tre skisser i den riktiga närbilden:
   en rad per match – utfallet, resultatet, H eller B, motståndaren och dess styrka 0–100 med en
   mätare (*V 3–2 B ENGLAND 88 ▮▮▮▮▮*). Poängen och målen jämförs som formen och det bättre
   lyser; motståndet säger inte vem som är bättre och står som vanligt. Skalan är formens
-  motstånd: 0 för det svagaste laget i lagets division och 100 för det starkaste, ur matchens
+  motstånd: motståndarens chans mot mittenlaget i lagets division, ur matchens
   fil (`senaste[].opp`, som bygget nu sparar för alla tio och inte bara formens fem). Datorn har
   lagen sida vid sida, telefonen under varandra med lagets namn över listan. Saknar fler än två
   av matcherna styrka står inget snitt; med dolda resultat står ?. xG-raderna under gäller som
@@ -8136,14 +8188,29 @@ bland tre skisser i den riktiga närbilden:
   lagen i England, så landslagens motståndare hade ingen styrka – formens motstånd stod tomt
   för landskamperna. Nu kommer den ur World Football Elo Ratings (`elo_landslag`,
   [src/fetchers/elo.js](src/fetchers/elo.js), en gång om dagen): Elo-talet just nu för varje
-  landslag, på skalan från det svagaste till det starkaste laget i lagets egen liga i Nations
-  League (A–D), som divisionen för klubbarna (`landOpponentStrength` i
-  [src/matches.js](src/matches.js)); lag utanför den skalan hamnar i ändarna (Argentina 83 och
-  Tjeckien 0 för Spanien i liga A). Lagen hittas på ESPN:s engelska namn bland Elo-listans namn
+  landslag, mot mittenlaget i lagets egen liga i Nations League (A–D), som divisionen för
+  klubbarna (`landOpponentStrength` i [src/matches.js](src/matches.js)). Lagen hittas på ESPN:s engelska namn bland Elo-listans namn
   och stavningar; ESPN:s egna former (*Czech Republic*, *Republic of Ireland*, *Korea Republic*
   …) står i `ELO_NAMN`. Prövat 2026-11-16: alla 157 namn i
   [config/landslag.js](config/landslag.js) hittades. Samma styrka ger nu också formens motstånd
   i ÖVERSIKT för en landskamp.
+- **Motståndets styrka utan nollor** (2026-11-17, användarens fråga: "Är det inte orimligt att vissa
+  lag har '0' i svårighetsgrad?"): skalan gick från 0 för det svagaste laget i lagets division till
+  100 för det starkaste, och allt utanför fastnade i ändarna – för Newcastle var Hull och Millwall
+  0, för Arsenal både Hull, Slavia Prag och Fleetwood, och Bayern München 99. Nu är talet
+  motståndarens chans mot **mittenlaget** (medianen) i lagets division på neutral plan, där oavgjort
+  räknas som en halv vinst: 50 är ett lag som mittenlaget, och ingen motståndare når 0 eller 100,
+  eftersom ingen match är avgjord på förhand. För klubbarna räknas chansen ur modellens styrka:
+  skillnaden mot mittenlaget i mål per match, med lika många mål som mellan två genomsnittliga
+  Premier League-lag, ger sannolikheterna för 1, X och 2 i prognosmodellen (`difficulty` i
+  [src/strength.js](src/strength.js)). För landslagen är det Elo-skalans väntade resultat mot
+  mittenlagets Elo-tal (`eloDifficulty`). Skalan i mål: en motståndare ett halvt mål per match
+  bättre än mittenlaget får omkring 61, ett mål bättre 72 och två mål 86; ett mål sämre 28 och två
+  mål sämre 14 (Elo: 100 poäng över 64, 300 poäng 85). Skalan blir tätare inom divisionen än förut
+  – skillnaderna mellan ligans lag är så små i en enskild match – men lag från andra divisioner och
+  från utlandet skiljs nu åt. Talen är inte prövade mot sajtens riktiga styrkor när ändringen
+  gjordes (källorna gick inte att nå från maskinen); bygget räknar om alla matchfiler. Inget annat ändras: samma fält (`opp.level`, 0–1), samma snitt, mätare
+  och streck.
 - **Formen med motståndarna** ("namn på motståndare för varje resultatruta inkl. deras placering i
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
@@ -9430,6 +9497,22 @@ funktionerna ur rum-hasse.js och påhittade data (hur ofta namnet kommer, felnam
 namn sägs när kupongen inte vet vem du är) och att sidan laddar utan fel i headless Chromium; inte i hela rummet med en
 riktig omgång.
 
+**Ditt namn när han hälsar och efter en analys** (2026-11-17, användarens önskemål: "Hasse säger väldigt sällan ens
+namn … Kan du ordna så att han iaf ibland säger ens namn"). Listan han hälsar med när kupongen vet vem du är
+(`oppningNamn`) var en kopia av den vanliga, utan namnet, så första gången man kom sade han det aldrig; bara när man kom
+tillbaka efter att ha frågat om en match (`tillbakaNamn`). Nu hälsar han med namn ungefär två gånger av tre när kupongen
+vet vem du är (`HALSA_NAMN`; "inte alltid, men ofta"), också när du kommer tillbaka, och annars som förut. Hälsningarna
+med namn låter som en gammal tränare vid sin disk, lugnt och torrt och helt säker på sin sak ("mer självförtroende"; han
+tvivlar aldrig): *Tjena Laine, sätt dig. Kupongen är redan avgjord.*, *Det är lugnt, Docke. Jag vet hur varje match
+slutar.*, *Tjena Tejler, vad din svåger än säger har jag rätt.* Någon gång säger han det på danska (*Hej med dig, Lainio,
+som man säger i Aalborg.*), som en lärare (*Unge Jönsson, sätt dig ner och se hur det ska gå till.*) eller med ironisk
+artighet (*Herr Tegnér undrar hur matcherna slutar. Det vet jag.*). Efter en analys säger han namnet ibland i stället
+för den vanliga raden (*Skriv upp det där, Docke, så tar vi nästa match.*, `nastaNamn`): ungefär var tredje gång, men
+högst en gång på två minuter, också räknat från hälsningen (`tilltal`), i snitt ett par gånger under ett besök med tretton
+matcher. Halva kupongen, en match kvar och hela kupongen säger han utan namn. `npm run repliker` kollar raderna som de
+andra med namn. Provat med `forstaRad` ur rum-hasse.js och påhittade data och att sidan laddar utan fel i headless
+Chromium; inte i hela rummet med en riktig omgång.
+
 **Hur många rätt han hade** (2026-11-16, användarens önskemål, om *Jag hade åtta rätt av tio.*: "Han säger det här varje
 gång. Kan du ge honom lite Hasse Backe-varianter"). Raden lottas nu bland fjorton sätt att säga det, torrt som en tränare
 på presskonferens (*Rent krasst blev det åtta rätt av tio.*, *Summa summarum blev det åtta rätt av tio.*, *När röken har
@@ -9512,7 +9595,7 @@ rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett na
 aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska synas.
 Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
-mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
+mening. När han hälsar på dig säger han fel i nio fall av tio. Felet fastnar en omgång: när han säger fel är det
 samma fel namn hela omgången, när han hälsar, i domen och när han talar till dig om hur det går (se *Ditt namn efter och
 under omgången*), på alla enheter, och nästa omgång har han lärt sig ett annat.
 Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8 (`domFro` i
@@ -10311,6 +10394,24 @@ tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång 
 och veckan i huvudet (*Nr 1 · Vecka 46*) och ingen stämpel. Annars visar den provnumret, ett nollnummer (*Nr 0*, med
 stämpeln *Provnummer*). Numret räknas på veckorna: Nr 1 är veckan med lördagen den 14 november 2026, och sedan
 ett nummer i veckan där omgången börjar (`nummer` i [public/helgarderat.js](public/helgarderat.js)).
+
+**Numret kommer med kupongen** (2026-11-17, användarens önskemål: "Jag vill att nästa tidning ska släppas när nästa
+stryktipskupong (europatipskupong också) släpps!"). När Svenska Spel öppnar nästa Stryktips eller Europatips blir det
+gängets omgång av sig själv (tidigast måndagen efter förra omgången kl. 16, `autoRound` i
+[worker/samtal.mjs](worker/samtal.mjs)), och nattjobbets nästa körning, högst en kvart senare, lägger ut nästa nummer:
+omslaget med omgångens dagar och innehållet med kupongens alla matcher, bleka och utan sidnummer tills deras matchblad
+kommer (`poddsidor` i src/analyser/poddar.mjs, `upplaga` i [public/rum-tidning.js](public/rum-tidning.js)). Bladen
+fylls i när poddjobbet har skrivit dem, och sista sidan och löpsedeln skrivs som förut när det första bladet finns.
+Förut kom numret först med det första bladet, och då låg det förra kvar på pulten till dess: Stryktipset 4980 blev
+gängets omgång måndagen den 16 november kl. 23.52, men numret hade inte kommit dagen efter. Ett nummer utan blad har
+dagen då omgången startades som `uppdaterad`, och nattjobbets commit heter *Helgarderat Nr 3 inför omgången …*.
+Nr 3 lades ut för hand 2026-11-17 med samma funktion, ur omgångens matcher i `data/tidning.json`. Nattjobbets
+gamla kod, som kör första gången efter en push, låter ett nummer utan blad stå kvar (den returnerar inget), så här
+finns ingen fälla som den under *Nr 2*. Provat med Node (nytt nummer utan blad, samma omgång igen, jobbets blad som
+fylls i, blad utan `hand` som jobbets eget ersätter, ingen omgång, Nr 2 för sin egen omgång, och den gamla koden mot
+Nr 3) och i huvudlös Chromium i 1280 bredd och 390 × 844: omslaget (*Nr 3 · Vecka 47*, *Inför Stryktipset*, 21
+november), innehållet med tretton bleka matcher, `omslag` och `overst` för Hasse Backes tidning och löpsedeln, inga
+fel på sidan. Inte provat i rummet, i Safari eller i en riktig telefon.
 
 **Det första numret** (2026-11-10, användarens önskemål: "Jag vill att du gör första numret av Helgarderat nu och
 inte väntar på det") gäller lördagen den 14 november och lades i `data/poddsidor.json` för hand, innan nattjobbet

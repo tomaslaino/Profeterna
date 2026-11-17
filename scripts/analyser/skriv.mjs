@@ -450,17 +450,19 @@ async function tidningen(round) {
 }
 
 // Informationssidorna ur supporterpoddarna (scripts/tidning/poddar.mjs skriver dem på poddarnas tider):
-// läggs ut när de har ändrats. Inget anrop till Claude här.
+// läggs ut när de har ändrats. Inget anrop till Claude här. En ny omgång ger ett nytt nummer direkt, innan något blad
+// är skrivet (2026-11-17: numret kommer ut när kupongen kommer).
 function poddsidorna(round) {
   // Bladen som ligger ute står kvar för matcher som jobbet inte har något eget blad till (landskamperna).
   const nu = vantande.poddsidor || lasJson(FIL.poddsidor, null);
   const ny = poddsidor(lasJson(path.join(TILLSTAND, 'Tidning', 'omgang.json'), null), round, nu);
   if (!ny) return;
-  if (nu && nu.omgang === ny.omgang && JSON.stringify([nu.matcher, nu.sidor]) === JSON.stringify([ny.matcher, ny.sidor])) return;
-  if (TORRT) { logg(`skulle lägga ut ${ny.sidor.length} informationssidor ur poddarna`); return; }
+  const nytt = !nu || nu.omgang !== ny.omgang;
+  if (!nytt && JSON.stringify([nu.matcher, nu.sidor]) === JSON.stringify([ny.matcher, ny.sidor])) return;
+  if (TORRT) { logg(`skulle lägga ut ${nytt ? 'ett nytt nummer med ' : ''}${ny.sidor.length} matchblad av ${ny.matcher.length}`); return; }
   vantande.poddsidor = ny;
-  logg(`poddsidor: ${round.id}, ${ny.sidor.length} matcher`);
-  spara(`Supporterpoddarna inför omgången ${round.id}`);
+  logg(`poddsidor: ${round.id}, ${ny.sidor.length} matchblad av ${ny.matcher.length}${nytt ? `, nytt nummer${ny.nummer ? ` (Nr ${ny.nummer})` : ''}` : ''}`);
+  spara(nytt ? `Helgarderat${ny.nummer ? ` Nr ${ny.nummer}` : ''} inför omgången ${round.id}` : `Supporterpoddarna inför omgången ${round.id}`);
 }
 
 // Helgarderats sista sida: en gång per omgång, när omgångens matchblad har kommit.

@@ -3445,5 +3445,6 @@ window.RumFasad = (() => {
     };
   }
 
-  return { bygg, vy, FON, DORR };
+  // (gången och huvudet också för dem som går på gatan inifrån, rum-ute.js: samma sätt att gå och samma ställning)
+  return { bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR } };
 })();

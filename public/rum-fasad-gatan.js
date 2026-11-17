@@ -25,7 +25,8 @@
 //
 // Fordonen ritas i fasadens främre duk (rf-fram), efter dem som går och före regnet, med vektorer (inga bilder, för
 // minnets skull i telefonen) i två eller tre toner som resten av fasaden: kaross, rutor med himlen i, list, stötfångare,
-// stänkskydd och hjul med navkapslar; strålkastarna är alltid tända (det är Sverige), och i mörkret lyser de upp gatan
+// stänkskydd och hjul med navkapslar och märket i mitten (och på några också på karossen, där det satt från sidan);
+// strålkastarna är alltid tända (det är Sverige), och i mörkret lyser de upp gatan
 // framför och baklyktorna glöder, bussarna är upplysta inne med folk i, och i regnet stänker det om hjulen och fordonen
 // speglas i den våta gatan. Med snö på taken när det har snöat, och avgaser i kylan när de står still.
 //
@@ -69,7 +70,8 @@ window.RumFasadGatan = (() => {
   // ibland) och hog de höga (ingen bak). De äldre: listKrom och stotKrom kromad list och kromade stötfångare, duk taket i
   // en annan färg (tygtaket; dukFarg, dukKanske: ibland), flank skärmar som sitter för sig, efter kjolen över bakhjulet
   // (ritas efter hjulen) och enkel: alltid plåtfälgar. Den öppna bilen (oppen): de som åker syns ovanför dörrarna, och
-  // taket ligger hopvikt bak (sufflett). nav 'vit': vita däcksidor.
+  // taket ligger hopvikt bak (sufflett). nav 'vit': vita däcksidor. Märket på sidan, där det satt på de riktiga
+  // bilarna (se märkena nedan): emblem [text, x, y, höjd, slag] och stjarna Mercedesstjärnan på huven [x, y].
   const FORM = {
     // Volvo 240 kombi: lådan, den lodräta bakluckan, de höga baklyktorna och de stora stötfångarna
     v245: {
@@ -148,7 +150,7 @@ window.RumFasadGatan = (() => {
       hus: 'M-206 -98 Q-184 -123 -150 -135 Q-136 -139 -110 -139 H3 Q17 -139 27 -132 L82 -98 Z',
       rutor: 'M-190 -101 Q-172 -120 -148 -130 Q-140 -133 -130 -134 V-101 Z M-122 -101 V-134 H-40 V-101 Z M-30 -101 V-134 H2 Q14 -134 22 -128 L72 -101 Z',
       fog: 'M-35 -99 V-30 M84 -97 L83 -42 M-127 -99 V-72', grepp: 'M-62 -91 h12 M44 -91 h12',
-      stot: [[-243, -61, 12, 27], [230, -61, 13, 27]], spegel: [78, -100],
+      stot: [[-243, -61, 12, 27], [230, -61, 13, 27]], spegel: [78, -100], emblem: ['SAAB', 104, -77, 6, 'krom'],
       fram: [232, -77, 6, 12], blink: [222, -77, 10, 10], bak: [-238, -95, 7, 19],
     },
     // Saab 9000: upprätt och luftig, med stora rutor och en kort bagagelucka bakom bakluckan
@@ -179,7 +181,7 @@ window.RumFasadGatan = (() => {
       rutor: 'M-142 -100 L-115 -128 Q-112 -133 -106 -133 H-26 V-100 Z M-15 -100 V-133 H26 Q31 -133 34 -130 L81 -100 Z',
       krom: 'M-154 -101 L-120 -135 Q-116 -139 -108 -139 H27 Q34 -139 38 -134 L91 -97 M-150 -98 H88',
       fog: 'M-21 -97 V-28 M92 -96 L91 -42 M-146 -97 V-72', grepp: 'M-44 -89 h14 M62 -89 h14',
-      stot: [[-242, -61, 10, 27], [232, -61, 10, 27]], spegel: [88, -99], spegelLack: true,
+      stot: [[-242, -61, 10, 27], [232, -61, 10, 27]], spegel: [88, -99], spegelLack: true, stjarna: [221, -88.4],
       fram: [232, -79, 6, 13], blink: [224, -79, 8, 13], bak: [-238, -104, 8, 30],
     },
     // Ford Sierra: den runda kilen med sned nos och en tredje sidoruta
@@ -328,7 +330,7 @@ window.RumFasadGatan = (() => {
       rutor: 'M-140 -103 L-117 -129 Q-114 -134 -108 -134 H-26 V-103 Z M-15 -103 V-134 H24 Q29 -134 32 -131 L74 -103 Z',
       krom: 'M-152 -102 L-123 -134 Q-118 -139 -110 -139 H25 Q32 -139 36 -135 L84 -99 M-148 -100 H82 M-232 -46 H232',
       fog: 'M-21 -100 V-30 M86 -98 L85 -40 M-144 -100 V-74', grepp: 'M-44 -92 h14 M62 -92 h14',
-      stot: [[-242, -62, 14, 22], [228, -62, 14, 22]], stotKrom: true, spegel: [86, -100],
+      stot: [[-242, -62, 14, 22], [228, -62, 14, 22]], stotKrom: true, spegel: [86, -100], stjarna: [219, -94.2],
       fram: [229, -84, 6, 14], blink: [222, -84, 8, 14], bak: [-236, -102, 8, 28],
     },
     // Citroën 2CV, Ankan: hög och smal, med tygtaket, den räfflade huven, de svepande framskärmarna och kjolen bak
@@ -416,7 +418,7 @@ window.RumFasadGatan = (() => {
       rutor: 'M-134 -99 L-110 -124 Q-107 -128 -101 -128 H-24 V-99 Z M-14 -99 V-128 H22 Q27 -128 30 -125 L74 -99 Z',
       krom: 'M-146 -99 L-114 -131 Q-110 -134 -103 -134 H23 Q30 -134 34 -129 L84 -96 M-142 -97 H80',
       fog: 'M-19 -96 V-28 M86 -95 L85 -42 M-138 -96 V-72', grepp: 'M-42 -88 h13 M58 -88 h13',
-      stot: [[-226, -61, 9, 26], [216, -61, 9, 26]], spegel: [84, -98], spegelLack: true,
+      stot: [[-226, -61, 9, 26], [216, -61, 9, 26]], spegel: [84, -98], spegelLack: true, stjarna: [207, -88.3],
       fram: [216, -78, 6, 12], blink: [209, -78, 8, 12], bak: [-222, -102, 7, 28],
     },
     // Audi 100: den släta, strömlinjeformade sedanen med rutorna i jämnhöjd med plåten och en liten tredje sidoruta
@@ -457,7 +459,7 @@ window.RumFasadGatan = (() => {
       hus: 'M-208 -112 V-152 Q-208 -155 -202 -155 H21 Q27 -155 30 -151 L61 -110 Z',
       rutor: 'M-202 -114 V-150 H-128 V-114 Z M-118 -114 V-150 H-30 V-114 Z M-20 -114 V-150 H20 Q24 -150 26 -147 L54 -114 Z',
       fog: 'M-25 -112 V-46 M63 -108 L62 -50 M-123 -112 V-62', grepp: 'M-52 -104 h14 M48 -104 h14',
-      stot: [[-218, -68, 12, 22], [206, -68, 12, 22]], spegel: [62, -112],
+      stot: [[-218, -68, 12, 22], [206, -68, 12, 22]], spegel: [62, -112], emblem: ['CHEROKEE', 18, -77, 7, 'dekal'],
       fram: [206, -100, 6, 12], blink: [204, -86, 8, 8], bak: [-213, -122, 5, 36],
     },
     // Chrysler Voyager: enlådsbilen med kort nos och skjutdörr (ibland storbilstaxi)
@@ -478,7 +480,7 @@ window.RumFasadGatan = (() => {
       hus: 'M-150 -99 Q-138 -118 -122 -131 Q-116 -135 -106 -135 H3 Q16 -135 26 -129 L82 -98 Z',
       rutor: 'M-140 -101 Q-130 -116 -118 -126 Q-112 -130 -104 -130 H-56 V-101 Z M-46 -101 V-131 H2 Q14 -131 22 -126 L72 -101 Z',
       fog: 'M-52 -99 V-30 M84 -97 L83 -42', grepp: 'M-40 -91 h12',
-      stot: [[-243, -61, 12, 27], [230, -61, 13, 27]], spegel: [78, -100],
+      stot: [[-243, -61, 12, 27], [230, -61, 13, 27]], spegel: [78, -100], emblem: ['SAAB', 104, -77, 6, 'krom'],
       fram: [232, -77, 6, 12], blink: [222, -77, 10, 10], bak: [-238, -95, 7, 19],
     },
     // Amerikanaren en sommarkväll: lång och låg, med fenor, krom längs sidan, vita däcksidor och ibland vitt tak
@@ -490,7 +492,7 @@ window.RumFasadGatan = (() => {
       rutor: 'M-104 -96 L-84 -124 Q-81 -128 -76 -128 H-10 V-96 Z M0 -96 V-128 H18 Q24 -128 27 -125 L56 -96 Z',
       krom: 'M-114 -94 L-88 -128 Q-84 -133 -76 -133 H19 Q27 -133 31 -128 L64 -95 M-252 -76 Q-100 -72 252 -70',
       fog: 'M-6 -94 V-36 M68 -95 L67 -42', grepp: 'M-24 -86 h14',
-      stot: [[-276, -60, 16, 20], [262, -60, 16, 20]], stotKrom: true, spegel: [62, -96],
+      stot: [[-276, -60, 16, 20], [262, -60, 16, 20]], stotKrom: true, spegel: [62, -96], emblem: ['Bel Air', -75, -84, 11, 'skrift'],
       fram: [262, -80, 6, 14], blink: [258, -54, 8, 6], bak: [-270, -92, 6, 14],
     },
   };
@@ -597,6 +599,22 @@ window.RumFasadGatan = (() => {
     return lista[0][0];
   };
   const lackFor = (m) => (EGNA[m] ? EGNA[m] : m[0] === 'v' ? VOLVO : m[0] === 's' && m !== 'skap' ? SAAB : m[0] === 'w' ? MERC : m === 'skap' ? SKAP : m.startsWith('t3') ? T3 : LACK);
+
+  // ---------- märkena ----------
+  //
+  // Märket syns där det syns från sidan på de riktiga bilarna: i navkapselns eller fälgens mitt på alla (navMarke; det
+  // snurrar med hjulet och läses när bilen står eller rullar sakta), och på några också på karossen: Saab 900:ans
+  // SAAB-emblem bakom framhjulet, CHEROKEE på jeepens framdörr, amerikanarens förgyllda Bel Air på bakskärmen
+  // (emblem i FORM) och Mercedesstjärnan på huven, som från sidan är en smal blank stav (stjarna). De former som är
+  // flera bilar (Kadetten är också Escort och 323:a, Corollan Sunny och Vectra …) får ett av märkena per bil. Minin
+  // och amerikanaren har inget i navet.
+  const MARKEN = {
+    kadett: ['opel', 'ford', 'mazda'], corolla: ['toyota', 'nissan', 'opel'], e30: ['bmw', 'audi'], p205: ['peugeot', 'fiat', 'renault'],
+    passat: ['vw', 'audi', 'mazda', 'toyota', 'opel'], skap: ['ford', 'vw', 'mercedes', 'toyota'], sierra: ['ford'], a100: ['audi'],
+    golf: ['vw'], t3: ['vw'], t3buss: ['vw'], bubbla: ['vw'], bx: ['citroen'], ank: ['citroen'], jeep: ['jeep'], voyager: ['chrysler'],
+    lada: ['lada'], lada4: ['lada'], niva: ['lada'], s96: ['saabText'], s99: ['saabText'], amazon: ['volvo'], pv: ['volvo'], mini: [], amis: [],
+  };
+  const markenFor = (m) => MARKEN[m] || (m[0] === 'v' ? ['volvo'] : m[0] === 's' ? ['saab'] : m[0] === 'w' ? ['mercedes'] : []);
 
   // ---------- gatan ----------
 
@@ -755,6 +773,9 @@ window.RumFasadGatan = (() => {
       // (i m/s i den tecknade gatan: 2,1–2,7 på dagen, lugnare i rusningen och lite fortare på natten, så att de på
       // skärmen kör två–tre gånger så fort som de som går och hinner synas i fyra–fem sekunder)
       b.fart = (T.natt ? 2.5 + R() * 0.7 : T.rusning ? 1.9 + R() * 0.5 : 2.1 + R() * 0.6) * halt;
+      // märket (ur farten, inte ur R: allt annat i luckan lottas som förut)
+      const mk = markenFor(modell);
+      b.marke = mk.length ? mk[Math.floor((b.fart * 7919) % mk.length)] : null;
     }
     b.L = b.F.L;
     b.c = S.ton(b.lack);
@@ -1039,16 +1060,16 @@ window.RumFasadGatan = (() => {
     c.rotate(NIG);
     c.translate(0, F.r);
   }
-  function ritaHjul(c, x, r, nav, falg, botten, S, vrid = 0) {
-    if (!NIG) return hjulet(c, x, r, nav, falg, botten, S, vrid);
+  function ritaHjul(c, x, r, nav, falg, botten, S, vrid = 0, marke = null, dir = 1) {
+    if (!NIG) return hjulet(c, x, r, nav, falg, botten, S, vrid, marke, dir);
     c.save();
     c.translate(0, -r);
     c.rotate(-NIG);
     c.translate(0, r);
-    hjulet(c, x, r, nav, falg, botten, S, vrid);
+    hjulet(c, x, r, nav, falg, botten, S, vrid, marke, dir);
     c.restore();
   }
-  function hjulet(c, x, r, nav, falg, botten, S, vrid) {
+  function hjulet(c, x, r, nav, falg, botten, S, vrid, marke, dir) {
     // hjulhuset
     c.fillStyle = '#09090a';
     c.beginPath();
@@ -1123,6 +1144,21 @@ window.RumFasadGatan = (() => {
       c.fillStyle = S.G.mix(f, '#000000', 0.3);
       c.beginPath(); c.arc(x, -r, r * 0.16, 0, TAU); c.fill();
     }
+    // märket i mitten, som snurrar med hjulet och läses rättvänt också när bilen kör åt vänster (duken är spegelvänd då)
+    if (marke) {
+      c.save();
+      c.translate(x, -r);
+      c.rotate(vrid / r);
+      c.scale(dir, 1);
+      const R = r * (nav === 'stal' ? 0.26 : nav === 'ekrar' || nav === 'hal' ? 0.24 : nav === 'turbin' ? 0.3 : 0.34);
+      const T = c.getTransform ? c.getTransform() : null;
+      const d = T ? navBild(marke, R * Math.hypot(T.a, T.b), S) : null;
+      if (d) {
+        const k = R / (d.width / 2 - 1);
+        c.drawImage(d, -k * d.width / 2, -k * d.width / 2, k * d.width, k * d.width);
+      } else navMarke(c, marke, R, S);
+      c.restore();
+    }
     // en glans uppe till vänster på fälgen
     c.globalAlpha = 0.35 * (0.3 + 0.7 * S.L.dag);
     c.fillStyle = '#ffffff';
@@ -1143,6 +1179,295 @@ window.RumFasadGatan = (() => {
     c.fillStyle = farg;
     c.fillText(s, 0, 0);
     c.restore();
+  }
+
+  // ---------- märkena ----------
+
+  // märkenas färger i gatans ljus, en gång per färg och scen (S.ton blandar om färgen varje gång)
+  function tonad(S, c) {
+    let m = S.tonMinne;
+    if (!m || m.f !== S.ton) m = S.tonMinne = { f: S.ton, c: new Map() };
+    let x = m.c.get(c);
+    if (x === undefined) m.c.set(c, (x = S.ton(c)));
+    return x;
+  }
+
+  // är lacken ljus? (då är jeepens dekal mörk)
+  const ljus = (hex) => { const n = parseInt(hex.slice(1), 16); return 0.3 * (n >> 16) + 0.59 * ((n >> 8) & 255) + 0.11 * (n & 255) > 140; };
+
+  // Märket på sidan (F.emblem: [text, x, y, höjd, slag]): krom är blanka bokstäver med en mörk kant (Saabens på
+  // framskärmen, synliga på ljus lack också), dekal mörk på ljus lack och ljus på mörk (jeepens framdörr) och skrift
+  // förgylld handstil (amerikanaren). Läses rätt också när bilen kör åt vänster.
+  function emblem(c, b, S, dir) {
+    const [s, x, y, h, slag] = b.F.emblem;
+    c.save();
+    c.translate(x, y);
+    c.scale(dir, 1);
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.lineJoin = 'round';
+    if (slag === 'skrift') {
+      c.font = `italic 700 ${h}px "Brush Script MT", "Segoe Script", "Snell Roundhand", "URW Chancery L", cursive`;
+      c.lineWidth = 1.4;
+      c.strokeStyle = tonad(S, '#4a3818');
+      c.strokeText(s, 0, 0);
+      c.fillStyle = tonad(S, '#e3c26a');
+    } else {
+      c.font = `700 ${h}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+      if (slag === 'krom') {
+        c.lineWidth = 1.6;
+        c.strokeStyle = tonad(S, '#17181b');
+        c.strokeText(s, 0, 0);
+        c.fillStyle = tonad(S, '#dfe2e5');
+      } else c.fillStyle = tonad(S, ljus(b.lack) ? '#26272a' : '#d9dce0');
+    }
+    c.fillText(s, 0, 0);
+    c.restore();
+  }
+
+  // Mercedesstjärnan på huven: från sidan ses ringen från kanten, en smal blank stav på sin fot
+  function stjarna(c, S, [x, y]) {
+    const k = tonad(S, '#d6d9dd');
+    c.fillStyle = k;
+    c.beginPath();
+    c.ellipse(x, y, 3.2, 1.6, 0, Math.PI, 0);
+    c.fill();
+    c.fillRect(x - 0.6, y - 3.2, 1.2, 3.2);
+    c.lineWidth = 1.1;
+    c.strokeStyle = k;
+    c.beginPath();
+    c.ellipse(x, y - 7, 1.3, 3.8, 0, 0, TAU);
+    c.stroke();
+    c.fillRect(x - 0.35, y - 10.6, 0.7, 7.4);
+  }
+
+  // Märkets vägar i en ruta med radien 1 (y nedåt): Peugeots lejon (vänt åt vänster), Saabs grip med kronan och
+  // Ladas skepp.
+  const LEJON = [[-0.18, -0.86], [0.12, -0.78], [0.2, -0.5], [0.32, -0.2], [0.42, 0.15], [0.5, 0.12], [0.66, -0.12], [0.6, -0.42],
+    [0.74, -0.36], [0.76, -0.08], [0.58, 0.26], [0.5, 0.55], [0.46, 0.86], [0.24, 0.86], [0.3, 0.62], [0.22, 0.42], [0, 0.3],
+    [-0.18, 0.32], [-0.52, 0.18], [-0.5, 0.06], [-0.18, 0.08], [-0.12, -0.08], [-0.5, -0.2], [-0.56, -0.32], [-0.44, -0.38],
+    [-0.18, -0.32], [-0.3, -0.5], [-0.5, -0.56], [-0.5, -0.68], [-0.36, -0.8]];
+  const GRIP = [[-0.32, 0.72], [-0.42, 0.3], [-0.6, 0.2], [-0.44, 0.1], [-0.62, -0.02], [-0.4, -0.06], [-0.3, -0.28], [-0.12, -0.38],
+    [0.12, -0.36], [0.34, -0.24], [0.56, -0.1], [0.64, 0.08], [0.5, 0.02], [0.4, 0.1], [0.22, 0.12], [0.12, 0.3], [0.12, 0.5], [0.22, 0.72]];
+  const KRONA = [[-0.3, -0.3], [-0.34, -0.64], [-0.2, -0.46], [-0.08, -0.72], [0.02, -0.46], [0.14, -0.64], [0.12, -0.34]];
+
+  // Märket i navet som en liten bild, en gång per märke, storlek (i bildpunkter, R × skalan) och scen, som sedan läggs ut
+  // vriden: ett par dussin vägar per bil och bild blev en femtedel till en tredjedel mer arbete för bilen (bilderna är
+  // högst 32, ungefär 16 kB var i datorn).
+  function navBild(m, rpx, S) {
+    if (typeof document === 'undefined' || !(rpx > 2)) return null;
+    const n = Math.min(160, Math.ceil(rpx / 2) * 2);
+    let minne = S.navMinne;
+    if (!minne || minne.f !== S.ton) minne = S.navMinne = { f: S.ton, b: new Map() };
+    const key = m + n;
+    let d = minne.b.get(key);
+    if (!d) {
+      d = document.createElement('canvas');
+      d.width = d.height = 2 * n + 2;
+      const g = d.getContext('2d');
+      g.translate(n + 1, n + 1);
+      navMarke(g, m, n, S);
+      minne.b.set(key, d);
+      if (minne.b.size > 32) minne.b.delete(minne.b.keys().next().value);
+    }
+    return d;
+  }
+
+  // Märket i navet, i radien R kring mitten (i lackens ljus, så att det mörknar med resten på kvällen).
+  function navMarke(c, m, R, S) {
+    const t = (f) => tonad(S, f);
+    const MORK = t('#1c1f26');
+    const BLANK = t('#d8dbdf');
+    const disk = (f, rr = R) => { c.fillStyle = f; c.beginPath(); c.arc(0, 0, rr, 0, TAU); c.fill(); };
+    const ring = (f, rr, w) => { c.strokeStyle = f; c.lineWidth = w; c.beginPath(); c.arc(0, 0, rr, 0, TAU); c.stroke(); };
+    const yta = (f, P) => {
+      c.fillStyle = f;
+      c.beginPath();
+      P.forEach(([x, y], i) => (i ? c.lineTo(x * R, y * R) : c.moveTo(x * R, y * R)));
+      c.closePath();
+      c.fill();
+    };
+    const linje = (f, w, ...L) => {
+      c.strokeStyle = f;
+      c.lineWidth = w * R;
+      c.beginPath();
+      for (const P of L) P.forEach(([x, y], i) => (i ? c.lineTo(x * R, y * R) : c.moveTo(x * R, y * R)));
+      c.stroke();
+    };
+    const ellips = (f, w, x, y, rx, ry) => {
+      c.strokeStyle = f;
+      c.lineWidth = w * R;
+      c.beginPath();
+      c.ellipse(x * R, y * R, rx * R, ry * R, 0, 0, TAU);
+      c.stroke();
+    };
+    const ord = (s, h, f, font = `700 ${h * R}px "Helvetica Neue", Helvetica, Arial, sans-serif`) => {
+      c.fillStyle = f;
+      c.font = font;
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText(s, 0, R * 0.04);
+    };
+    c.lineJoin = 'miter';
+    c.miterLimit = 3;
+    c.lineCap = 'butt';
+    switch (m) {
+      case 'volvo': {
+        // järntecknet: ringen med pilen snett uppåt framåt, mörkt på den blanka kapseln
+        disk(t('#c4c8cd'));
+        const k = t('#1f2836');
+        ring(k, R * 0.52, R * 0.15);
+        c.save();
+        c.rotate(-Math.PI / 4);
+        c.fillStyle = k;
+        c.fillRect(R * 0.54, -R * 0.075, R * 0.18, R * 0.15);
+        yta(k, [[0.97, 0], [0.68, -0.24], [0.68, 0.24]]);
+        c.restore();
+        break;
+      }
+      case 'saab':
+        // griphuvudet med kronan, rött på blått
+        disk(t('#e7e3d8'));
+        disk(t('#1f4c9e'), R * 0.86);
+        yta(t('#c62a2e'), GRIP);
+        yta(t('#e2b23a'), KRONA);
+        c.fillStyle = t('#f2efe6');
+        c.beginPath(); c.arc(R * 0.22, -R * 0.17, R * 0.06, 0, TAU); c.fill();
+        break;
+      case 'saabText':
+        disk(t('#c4c8cd'));
+        ord('SAAB', 0.5, MORK);
+        break;
+      case 'mercedes': {
+        // den trearmade stjärnan i ringen
+        disk(MORK);
+        ring(BLANK, R * 0.84, R * 0.1);
+        const P = [];
+        for (let i = 0; i < 3; i++) {
+          const a = -Math.PI / 2 + (i * TAU) / 3;
+          P.push([Math.cos(a) * 0.8, Math.sin(a) * 0.8], [Math.cos(a + Math.PI / 3) * 0.16, Math.sin(a + Math.PI / 3) * 0.16]);
+        }
+        yta(BLANK, P);
+        break;
+      }
+      case 'bmw': {
+        // svart ring kring de blå och vita fälten
+        disk(t('#141519'));
+        ring(BLANK, R * 0.95, R * 0.07);
+        for (let i = 0; i < 4; i++) {
+          c.fillStyle = t(i % 2 ? '#eef0f2' : '#2a6cc0');
+          c.beginPath();
+          c.moveTo(0, 0);
+          c.arc(0, 0, R * 0.6, -Math.PI + (i * Math.PI) / 2, -Math.PI / 2 + (i * Math.PI) / 2);
+          c.closePath();
+          c.fill();
+        }
+        ring(BLANK, R * 0.62, R * 0.05);
+        break;
+      }
+      case 'vw':
+        disk(t('#1d3a70'));
+        ring(BLANK, R * 0.84, R * 0.11);
+        // (V:et och W:et möts i mitten)
+        c.lineJoin = 'round';
+        linje(BLANK, 0.12, [[-0.44, -0.7], [0, 0.12], [0.44, -0.7]], [[-0.8, -0.34], [-0.4, 0.72], [0, 0.12], [0.4, 0.72], [0.8, -0.34]]);
+        break;
+      case 'audi':
+        disk(MORK);
+        for (const x of [-0.48, -0.16, 0.16, 0.48]) ellips(BLANK, 0.07, x, 0, 0.2, 0.2);
+        break;
+      case 'opel':
+        // blixten genom ringen
+        disk(MORK);
+        ring(BLANK, R * 0.7, R * 0.1);
+        yta(BLANK, [[-1, 0.12], [0.18, -0.24], [0.05, -0.04], [1, -0.12], [-0.18, 0.24], [-0.05, 0.04]]);
+        break;
+      case 'ford':
+        // den blå ovalen med namnet
+        disk(t('#2a2d33'));
+        c.fillStyle = t('#1f4596');
+        c.beginPath(); c.ellipse(0, 0, R * 0.92, R * 0.56, 0, 0, TAU); c.fill();
+        c.strokeStyle = t('#e9ecef');
+        c.lineWidth = R * 0.06;
+        c.stroke();
+        ord('Ford', 0.6, t('#ffffff'), `italic 700 ${R * 0.6}px Georgia, "Times New Roman", serif`);
+        break;
+      case 'toyota':
+        disk(MORK);
+        ellips(BLANK, 0.09, 0, 0, 0.84, 0.58);
+        ellips(BLANK, 0.09, 0, 0.04, 0.26, 0.54);
+        ellips(BLANK, 0.09, 0, -0.28, 0.56, 0.2);
+        break;
+      case 'nissan':
+        disk(MORK);
+        ring(BLANK, R * 0.66, R * 0.1);
+        c.fillStyle = BLANK;
+        c.fillRect(-R * 0.92, -R * 0.2, R * 1.84, R * 0.4);
+        ord('NISSAN', 0.27, MORK);
+        break;
+      case 'mazda':
+        disk(MORK);
+        ord('mazda', 0.5, BLANK);
+        break;
+      case 'peugeot':
+        disk(t('#1f2d5c'));
+        yta(BLANK, LEJON);
+        break;
+      case 'fiat':
+        // de fem sneda balkarna
+        disk(t('#1e3c80'));
+        for (let i = 0; i < 5; i++) {
+          const x = -0.7 + i * 0.25;
+          yta(BLANK, [[x, 0.6], [x + 0.13, 0.6], [x + 0.43, -0.6], [x + 0.3, -0.6]]);
+        }
+        break;
+      case 'renault':
+        // romben
+        disk(MORK);
+        linje(BLANK, 0.13, [[0, -0.84], [0.5, 0], [0, 0.84], [-0.5, 0], [0, -0.84], [0.5, 0]]);
+        linje(BLANK, 0.1, [[0, -0.44], [0.26, 0], [0, 0.44], [-0.26, 0], [0, -0.44], [0.26, 0]]);
+        break;
+      case 'citroen':
+        // dubbelvinkeln
+        disk(MORK);
+        for (const y of [-0.32, 0.16]) yta(BLANK, [[-0.66, y + 0.22], [0, y - 0.16], [0.66, y + 0.22], [0.66, y + 0.42], [0, y + 0.04], [-0.66, y + 0.42]]);
+        break;
+      case 'lada':
+        // skeppet med seglet, på rött
+        disk(t('#9e2328'));
+        c.fillStyle = BLANK;
+        c.beginPath();
+        c.moveTo(R * 0.12, -R * 0.68);
+        c.quadraticCurveTo(-R * 0.5, -R * 0.2, -R * 0.5, R * 0.28);
+        c.lineTo(R * 0.12, R * 0.28);
+        c.closePath();
+        c.fill();
+        yta(BLANK, [[-0.6, 0.38], [0.6, 0.38], [0.42, 0.6], [-0.42, 0.6]]);
+        break;
+      case 'jeep':
+        disk(MORK);
+        ord('Jeep', 0.5, BLANK);
+        break;
+      case 'chrysler': {
+        // femstjärnan med femhörningen i mitten
+        disk(MORK);
+        const P = [];
+        for (let i = 0; i < 10; i++) {
+          const a = -Math.PI / 2 + (i * Math.PI) / 5;
+          const rr = i % 2 ? 0.36 : 0.84;
+          P.push([Math.cos(a) * rr, Math.sin(a) * rr]);
+        }
+        yta(BLANK, P);
+        const Q = [];
+        for (let i = 0; i < 5; i++) {
+          const a = Math.PI / 2 + (i * TAU) / 5;
+          Q.push([Math.cos(a) * 0.2, Math.sin(a) * 0.2]);
+        }
+        yta(MORK, Q);
+        break;
+      }
+      default:
+    }
   }
 
   // ljusets sken: en rund toning (i fordonets enheter)
@@ -1369,6 +1694,9 @@ window.RumFasadGatan = (() => {
     c.lineCap = 'round';
     c.strokeStyle = S.ton('#1a1b1e');
     c.stroke(vag(F.grepp));
+    // märket på sidan och stjärnan på huven
+    if (F.emblem) emblem(c, b, S, dir);
+    if (F.stjarna) stjarna(c, S, F.stjarna);
     // stötfångarna och stänkskydden
     c.fillStyle = S.ton(F.stotKrom ? '#aeb2b7' : '#1d1e21');
     for (const [x, y, w, hh] of F.stot) { c.beginPath(); c.roundRect ? c.roundRect(x, y, w, hh, 4) : c.rect(x, y, w, hh); c.fill(); }
@@ -1422,7 +1750,7 @@ window.RumFasadGatan = (() => {
       c.fillStyle = 'rgba(255,214,160,0.3)';
       c.fillRect(t0 + 4, ty, t1 - t0 - 8, 3);
     }
-    for (const x of F.hj) ritaHjul(c, x, F.r, b.nav || F.nav, b.falg, -26, S, vrid);
+    for (const x of F.hj) ritaHjul(c, x, F.r, b.nav || F.nav, b.falg, -26, S, vrid, b.marke, dir);
     // (kjolen över bakhjulet)
     if (F.efter) skarmar(c, b, F.efter, S, F);
     // lyktorna: strålkastaren, blinkersen och baklyktan (bromsljuset lyser starkare)
