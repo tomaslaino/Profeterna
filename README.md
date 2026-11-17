@@ -1380,6 +1380,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   med kjol) och släntrar (långa, sega steg, bakåtlutad, armarna svänger löst, axlarna rullar och huvudet nickar). Var
   och en svänger dessutom armarna på sitt sätt (hur böjda, hur långt fram och i vilken takt), och ibland är bara den ena
   handen i fickan, också när den andra bär påsen eller paraplyet. Se *Det som händer ute* under [Fasaden](#fasaden).
+- **Gatan inifrån går som framför affären (2026-11-17, användarens önskemål):** "Ja, gör samma sak med gatan
+  inifrån". De som går på trottoaren mittemot, sedda genom skyltfönstret, gick på ett enda sätt, med fötter som gled.
+  Nu går de med fasadens gång (samma sätt att gå och samma ställning i varje bild), med käpp, joggande, försiktigt på
+  halkan och springande i regnet som framför affären. Se *Folk och trafik* under *Utsikten och vädret* i
+  [Tobaksaffären](#tobaksaffären).
 - **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
   som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
   långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
@@ -6938,7 +6943,17 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
 - **Folk och trafik:** på brons trottoar mittemot går folk förbi (fler på dagen och kvällen,
   nästan ingen mitt i natten), klädda efter vädret och med paraply när det regnar – i
   hård vind vänder det sig ut och in – med hund, på cykel eller med pulka när det ligger
-  snö. Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
+  snö, och morgon och kväll någon som joggar. Sedan 2026-11-17 går de som framför affären (se *Det som händer ute*
+  under [Fasaden](#fasaden)): samma sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, på
+  halkan, med käpp och springer) och samma ställning i varje bild ur fasadens gång (`RumFasad.gang`: `stalln`), så att
+  foten i marken står still mot stenen, höften gungar, knät böjs, armarna pendlar emot benen och överkroppen lutar;
+  den äldre går ibland med käpp, den unga släntrar ibland, den som blir blöt skyndar sig eller springer, och på halkan
+  går de flesta försiktigt. Figuren ritas i centimeter med fasadens huvud och hår och förminskas till gatan (`folk`,
+  `CMG` px per cm), och delarnas grupper (`g-…`) får sina vinklar ur ställningen (`gangLas`); farten är steglängden
+  gånger takten. Gångcykeln räknas en gång per sätt att gå (`TABELL`): i gatans storlek syns inte det som skiljer var
+  och en i benen, och den tog ungefär 10 ms per figur i en långsam telefon. Med fyra gånger så långsam processor
+  kostar ställningarna i telefonen 3–13 % mer per bild än de gamla figurerna (som har färre delar), och gatan tar
+  60–80 ms längre att bygga första gången. Utan rum-fasad.js går de som förut (`person`). Trafiken är högertrafik: den närmaste filen kör åt höger och den bortre åt vänster,
   fler bilar i rusningen och färre på natten (fler taxi då), och på helger och röda dagar ingen
   rusning och lugnt till halv tio (`trafik`, som Hasse Backes utsikt också läser). Bilarna, bussarna och plogbilen är
   fasadens (sedan 2026-11-16, rum-fasad-gatan.js: nittiotalets bilar i Stockholm, skåpbilar och taxi med
