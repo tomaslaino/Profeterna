@@ -9420,10 +9420,11 @@ namn … Kan du ordna så att han iaf ibland säger ens namn"). Listan han häls
 (`oppningNamn`) var en kopia av den vanliga, utan namnet, så första gången man kom sade han det aldrig; bara när man kom
 tillbaka efter att ha frågat om en match (`tillbakaNamn`). Nu hälsar han med namn ungefär två gånger av tre när kupongen
 vet vem du är (`HALSA_NAMN`; "inte alltid, men ofta"), också när du kommer tillbaka, och annars som förut. Hälsningarna
-med namn låter som en gammal tränare vid sin disk: lugnt och torrt (*Tjena Laine, vilken match ska vi reda ut?*, *Det är
-lugnt, Docke. Jag har redan alla svaren.*, *Kom in, Tejler. Jag har just satt på kaffe.*), någon gång på danska (*Hej med
-dig, Lainio, som man säger i Aalborg.*), som en lärare (*Unge Jönsson*, *Gamle Tegnér*) eller med ironisk artighet (*Herr
-Laine är välkommen. Vilken match gäller det?*). Efter en analys säger han namnet ibland i stället
+med namn låter som en gammal tränare vid sin disk, lugnt och torrt och helt säker på sin sak ("mer självförtroende"; han
+tvivlar aldrig): *Tjena Laine, sätt dig. Kupongen är redan avgjord.*, *Det är lugnt, Docke. Jag vet hur varje match
+slutar.*, *Tjena Tejler, vad din svåger än säger har jag rätt.* Någon gång säger han det på danska (*Hej med dig, Lainio,
+som man säger i Aalborg.*), som en lärare (*Unge Jönsson, sätt dig ner och se hur det ska gå till.*) eller med ironisk
+artighet (*Herr Tegnér undrar hur matcherna slutar. Det vet jag.*). Efter en analys säger han namnet ibland i stället
 för den vanliga raden (*Skriv upp det där, Docke, så tar vi nästa match.*, `nastaNamn`): ungefär var tredje gång, men
 högst en gång på två minuter, också räknat från hälsningen (`tilltal`), i snitt ett par gånger under ett besök med tretton
 matcher. Halva kupongen, en match kvar och hela kupongen säger han utan namn. `npm run repliker` kollar raderna som de
