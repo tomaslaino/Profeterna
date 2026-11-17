@@ -547,9 +547,10 @@ window.RumUte = (() => {
   // ---------- de som går: samma gång som framför affären ----------
   //
   // De som går på trottoaren mittemot går som de som går förbi framför affären (rum-fasad.js, RumFasad.gang): samma
-  // sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, på halkan, med käpp och springer),
-  // var och en lite olika, och samma ställning i varje bild (stalln): foten i marken står still mot stenen, höften
-  // gungar, knät böjs, armarna pendlar emot benen och överkroppen lutar. Figuren ritas i centimeter (fötterna i 0,
+  // sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, hasar, kliver, stram, fryser,
+  // haltar, på halkan, med käpp och springer, och händerna på ryggen), var och en på sitt sätt, och samma ställning i
+  // varje bild (stalln): foten i marken står still mot stenen, höften gungar, knät böjs, armarna pendlar emot benen och
+  // överkroppen lutar. Figuren ritas i centimeter (fötterna i 0,
   // vänd åt höger, samma huvud och hår som framför affären) och förminskas till gatan, CMG px per cm, och delarnas
   // grupper (g-…) får sina vinklar ur ställningen (rorelse, gangLas). Farten är steglängden gånger takten, så att
   // fötterna inte glider. Utan rum-fasad.js går de som förut (person).
@@ -569,7 +570,7 @@ window.RumUte = (() => {
       GG.stalln(0, s0);
       TABELL[st.namn] = s0;
     }
-    for (const k of ['S', 'lyft', 'kna', 'hojd', 'studs', 'tab']) st[k] = s0[k];
+    for (const k of ['S', 'B', 'x0', 'hal', 'lyft', 'kna', 'hojd', 'studs', 'tab', 'tab2', 'fas2', 'ontMitt']) st[k] = s0[k];
     return st;
   }
   // handen för armen som hålls stilla ([axel, armbåge], grader; cm från fötterna, som handVid i rum-fasad.js)
@@ -738,14 +739,16 @@ window.RumUte = (() => {
         const rusar = !o.umb && !halt && ((h > 7 && h < 9) || (h > 16 && h < 18)) && R() < 0.06;
         if ((blot && !halt && R() < 0.4) || rusar) namn = 'springer';
         else if (blot) namn = 'rask';
-        else if (vem === 'ung') namn = pick(R, ['vanlig', 'rask', 'studsar', 'studsar', 'lunkar', 'slantrar', 'slantrar']);
-        else if (vem === 'aldre') namn = pick(R, ['strosar', 'strosar', 'rak', 'lunkar', 'trippar']);
+        else if (kallt && !o.umb && R() < 0.3) namn = 'frusen';
+        else if (R() < 0.05) namn = 'haltar';
+        else if (GG.GSTIL[vem]) namn = pick(R, GG.GSTIL[vem]);
       }
       if (halt && namn !== 'springer' && namn !== 'kapp' && R() < 0.65) namn = 'halkar';
       if (varmt && typ === 'gar' && !o.umb && !o.hatt && R() < 0.25) { o.hatt = 'keps'; o.hat = pick(R, ['#2a4a7a', '#e8e4dc', '#c8322a']); }
       const st = gangFor(GG, R, namn, kallt);
-      // (en del äldre går lite framåtböjda)
+      // (en del äldre går lite framåtböjda, och den som strosar har ibland händerna på ryggen)
       if (vem === 'aldre' && !['kapp', 'springer', 'halkar'].includes(st.namn) && R() < 0.4) st.lut += 4 + R() * 3;
+      if (vem === 'aldre' && typ === 'gar' && !o.umb && ['strosar', 'rak', 'stram', 'lunkar'].includes(st.namn) && R() < 0.4) { st.armar = 'rygg'; st.ficka = ''; }
       // den närmre armen håller paraplyet, kopplet, granen under armen eller pulkans snöre; en ledig hand kan vara i
       // fickan
       const F = { fastF: o.umb ? [-6, -104] : typ === 'hund' ? [-12, -35] : typ === 'gran' ? [8, -66] : typ === 'pulka' ? [24, 6] : null };
@@ -909,7 +912,6 @@ window.RumUte = (() => {
       }
       return D;
     };
-    for (const f of m.folk) kalla(f.D);
     const S = FG.trafik(v, L, m.G);
     const ton = S.ton;
     S.ton = (c) => kl(ton(c));
@@ -955,7 +957,7 @@ window.RumUte = (() => {
       }
     }
     // de som går, de bortre först, och den som har stannat och tittar in (står den: framifrån). Var och en syns där
-    // den syns utifrån och tonar in och ut på en halvmeter i kanterna av fasadens bild, där den vänder.
+    // den syns utifrån och tonar in och ut på en halvmeter i kanterna av fasadens bild, där loppet börjar och slutar.
     const natt = M.L.dag < 0.6 ? 1 - M.L.dag / 0.6 : 0;
     const fl = [];
     const lagg = (f, D, x, dm, e) => {
@@ -966,13 +968,15 @@ window.RumUte = (() => {
       if (xi + 1.3 * s < r.x || xi - 1.3 * s > r.x + r.w || e <= 0) return;
       // (på kvällen i affärens ljus framför fönstret och dörren, mörkare bortom)
       const ljus = X > LJUSET[0] && X < LJUSET[1];
-      fl.push({ f, D, x, xi, yi: framY(dm), q: s / um, dm, ut: { A: Math.min(1, e / um / 0.6), rand: natt * (ljus ? 0.3 : 0.12), z: ljus || !natt ? 0 : 1 + Math.round(natt) } });
+      fl.push({ f, D, x, xi, yi: framY(dm), q: s / um, dm, ut: { A: Math.min(1, e / um / 0.6), rand: 0, z: ljus || !natt ? 0 : 1 + Math.round(natt) } });
     };
-    const V = M.V;
-    for (const f of M.folk) {
-      const x = RF.glidX(f.g, t) + f.dir * (f.dx || 0);
-      const kant = f.ut || 220;
-      lagg(f, f.D, x, f.dm, Math.min(x - (V.x - kant), V.x + V.w + kant - x));
+    // (var och en får gatans färger första gången den syns: fasaden lottar dem lopp för lopp, folket.vid)
+    for (const [f, D, x, , lap] of M.folk.vid(t)) {
+      if (!f.kall) {
+        f.kall = true;
+        M.kalla(D);
+      }
+      lagg(f, D, x, f.dm, lap ? lap.fart * Math.min(t - lap.start, lap.slut - t) : 1e9);
     }
     const st = M.stanna && M.stanna(t);
     if (st) {

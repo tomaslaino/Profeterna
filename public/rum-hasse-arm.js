@@ -115,6 +115,9 @@ export const ELD_AV = { value: new THREE.Vector4() };
 // Kavajens tyg i ljuset (uTyg i ARM_F): 1 i baren. Från rummet ses ärmarnas sida bort från lamporna, och då
 // sätter bord.tyg tonen, så att det är samma gråa kavaj som framifrån.
 const TYG = { value: 1 };
+// Huden i ljuset (uHudLjus i HUD_F): 1 i baren. På pulten i rummet ligger händerna under lampan, och ses
+// från sidan där barens nyckelljus inte når handryggarna: bord.hud lyfter dem till samma ton som framifrån.
+const HUD_LJUS = { value: 1 };
 // Ljuset räknas mot figurens kamera (VY). Ses samma sak från ett annat håll, som hans händer från rummet
 // (rum-hasse-hand.js), ger bord.vy riktningen mot det ögat, så att kantljuset hamnar där det ska.
 const VY_RAD = /const vec3 VY = vec3\([^)]*\);/;
@@ -259,7 +262,7 @@ void main() {
   gl_Position = projectionMatrix * viewMatrix * w4;
 }`;
 const HUD_F = `precision highp float;
-uniform sampler2D foto; uniform vec4 uHud;
+uniform sampler2D foto; uniform vec4 uHud; uniform float uHudLjus;
 varying vec3 vN, vP; varying vec2 vUv, vNagel; varying float vAo, vTon, vPalm, vRygg;
 ${LJUS}
 ${BORD_GLSL}
@@ -303,7 +306,7 @@ void main() {
   // ljuset som går igenom huden: varmare där ljuset tar slut
   float ter = max(0., dot(n, NYCKEL) + .3);
   l += vec3(.16, .045, .025) * ter * (1. - ter) * 1.7;
-  vec3 ut = c * l * mix(vec3(.5, .36, .32), vec3(1.), ao);
+  vec3 ut = c * l * uHudLjus * mix(vec3(.5, .36, .32), vec3(1.), ao);
   vec3 h = normalize(NYCKEL + normalize(cameraPosition - vP));
   float sp = pow(max(0., dot(n, h)), mix(22., 60., nagel));
   // (huden matt som fotots, naglarna blanka: förut glänste knogarna som plast, ändrat 2026-11-08)
@@ -331,6 +334,7 @@ export function byggHand(modell, sida, foto, bord = ingenBord()) {
     uB: { value: ut },
     uHud: { value: new THREE.Vector4((a.hx + 0.5) / a.W, 1 - (a.hy + a.hh - 0.5) / a.H, (a.hw - 1) / a.W, (a.hh - 1) / a.H) },
     uBord: bord, uButik: bord.butik || BUTIK_AV, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uEld: bord.eld || ELD_AV,
+    uHudLjus: bord.hud || HUD_LJUS,
   };
   const mesh = new THREE.Mesh(modell.g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: HUD_V, fragmentShader: medVy(HUD_F, bord), transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   mesh.frustumCulled = false;
