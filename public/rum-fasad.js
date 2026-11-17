@@ -11,7 +11,7 @@
 // (rum-fasad-gatan.js) och syns som speglingar i glaset.
 //
 // Genom skyltfönstret syns rummet, vagt: gänget vid barbordet bakifrån, ritat i 3D av samma scen som
-// inne (Rum.utifran, utifran i rum-3d.js), med neonskylten Tobak, som läses rätt härifrån, skivan med
+// inne, i gängets egen duk som rummet lånar ut till fönstret (glas, utifran i rum-3d.js), med neonskylten Tobak, som läses rätt härifrån, skivan med
 // löpsedlarna med baksidan ut och rummet bakom i ljuset från lysröret – eller i neonens och tv:ns sken
 // när lysröret är släckt på natten (RumFolk.nattGrad). På dagen speglar glaset himlen och gatan, och
 // rummet syns svagare; på kvällen lyser det ut på trottoaren. Guldet på dörren står rättvänt, och
@@ -23,9 +23,12 @@
 // ljuset eller vädret ändras (sig); det som rör sig (de som går, speglingarna, regnet och snön, molnen och
 // barberarens stång) ritas i tre dukar i en takt (TAKT), och står still med prefers-reduced-motion.
 //
-//   RumFasad.bygg(rum, o) → { el, ny(), ut() } bygger fasaden i rum (.rum) och ritar den;
-//     o.gang(duk) ritar gänget på duken (false utan), o.takt() hur många gånger i sekunden (som inne),
-//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.calm() utan rörelser
+//   RumFasad.bygg(rum, o) → { el, ny(), ut(), glas(duk) } bygger fasaden i rum (.rum) och ritar den; glas(duk)
+//     ställer gängets duk (rum-3d.js) i skyltfönstret, glas(null) tar bort den igen (rum.js ställer tillbaka den);
+//     o.gang({ w, h }) ritar gänget i den duken med w × h bildpunkter (false utan), o.takt() hur många gånger i sekunden (som inne),
+//     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.pynt(namn, { w, h, dag }) högtidspyntet
+//     i fönstret ('pyntF') eller på dörren ('pyntP') sett utifrån, en duk w × h eller null (pyntUtifran i
+//     rum-inredning.js), o.calm() utan rörelser
 //     (prefers-reduced-motion), o.still en fast bild på den tiden (s, ?rum-t i rum.js): allt som rör sig
 //     står där det är då
 
@@ -79,16 +82,22 @@ window.RumFasad = (() => {
 
   // Den del av världen som syns i ett fönster med formen a (bredd / höjd).
   function vy(a) {
-    let h = 940;
-    let w = h * a;
     const minW = FOKUS.x1 - FOKUS.x0 + 70;
-    if (w < minW) { w = minW; h = w / a; }
+    let h = Math.max(940, minW / a);
+    // (mer höjd: två tredjedelar uppåt, fler våningar, och resten trottoar)
+    const extra = h - 940;
+    let y = Math.max(VARLD.y0, 40 - extra * 0.66);
+    // (och gatan ut till den närmre filen, rum-fasad-gatan.js: det som fattas nertill i ett brett fönster tas hälften
+    // genom att visa mer och hälften från överkanten)
+    const brist = GATA() ? markY(GATA().SYNS) - (y + h) : 0;
+    if (brist > 0) {
+      h += brist / 2;
+      y += brist / 2;
+    }
+    const w = h * a;
     let x = 860 - w / 2;
     x = Math.max(FOKUS.x1 + 35 - w, Math.min(FOKUS.x0 - 35, x));
     x = Math.max(VARLD.x0, Math.min(VARLD.x1 - w, x));
-    // (mer höjd: två tredjedelar uppåt, fler våningar, och resten trottoar)
-    const extra = Math.max(0, h - 940);
-    const y = Math.max(VARLD.y0, 40 - extra * 0.66);
     return { x: r1(x), y: r1(y), w: r1(w), h: r1(h) };
   }
 
@@ -836,36 +845,92 @@ window.RumFasad = (() => {
   // kna hur mycket knät böjs när benet förs fram (grader), hojd och studs höftens höjd och gung (cm; de raka
   // benen bestämmer hur högt den når), lut hur mycket överkroppen lutar framåt (grader), arm hur mycket armarna
   // pendlar, takt varv (två steg) i sekunden och ficka hur ofta händerna är i fickorna. Farten blir S · takt.
+  // Och för de sätt som skiljer sig mer: hal fotens vinkel när den sätts i (grader; −12 är hälen först, nära 0 hela
+  // foten), lop att höften är lägst mitt i steget och högst i luften (springa), drive hur långt låret förs fram förbi
+  // hälisättningen och dras tillbaka (grader) och larS/knaS var i svingen låret och knät är som längst fram och mest
+  // böjda, armar hur armarna går (spring: böjda och pumpar, balans: ut framför kroppen), rull hur mycket axlarna
+  // rullar med armarna och nick hur mycket huvudet nickar med stegen.
   const STILAR = {
     vanlig: { S: 128, B: 0.62, x0: 0.19, lyft: 55, kna: 62, hojd: 88.6, studs: 1.7, lut: 2.5, arm: 1, takt: 0.98, ficka: 0.12 },
     rask: { S: 142, B: 0.6, x0: 0.2, lyft: 58, kna: 65, hojd: 88.4, studs: 2, lut: 5, arm: 1.4, takt: 1.05, ficka: 0 },
     strosar: { S: 108, B: 0.64, x0: 0.19, lyft: 45, kna: 56, hojd: 88.8, studs: 1.3, lut: 0.5, arm: 0.6, takt: 0.86, ficka: 0.55 },
-    studsar: { S: 124, B: 0.6, x0: 0.19, lyft: 62, kna: 66, hojd: 87.8, studs: 2.8, lut: 1.5, arm: 1.15, takt: 1, ficka: 0 },
+    studsar: { S: 124, B: 0.6, x0: 0.19, lyft: 62, kna: 66, hojd: 87.8, studs: 2.8, lut: 1.5, arm: 1.15, takt: 1, ficka: 0, nick: 0.5 },
     lunkar: { S: 94, B: 0.66, x0: 0.18, lyft: 32, kna: 50, hojd: 87.6, studs: 1, lut: 9, arm: 0.45, takt: 0.92, ficka: 0.3 },
     rak: { S: 122, B: 0.62, x0: 0.19, lyft: 48, kna: 56, hojd: 89.4, studs: 1.2, lut: -1, arm: 0.75, takt: 0.98, ficka: 0.2 },
+    // (på inlines: två skär per varv, S hur långt de glider på dem; skridTab)
+    skrinna: { S: 330, B: 0.5, x0: 0, lyft: 0, kna: 0, hojd: 77, studs: 1.2, lut: 22, arm: 1.7, takt: 0.8, ficka: 0 },
+    // korta, snabba steg och små armrörelser
+    trippar: { S: 90, B: 0.6, x0: 0.17, lyft: 40, kna: 52, hojd: 88.9, studs: 1.1, lut: 1, arm: 0.5, takt: 1.2, ficka: 0.05 },
+    // långa, sega steg, bakåtlutad, armarna svänger löst och axlarna rullar med, huvudet nickar
+    slantrar: { S: 132, B: 0.63, x0: 0.2, lyft: 50, kna: 60, hojd: 88.2, studs: 2.3, lut: -2.5, arm: 1.6, takt: 0.84, ficka: 0.15, rull: 1, nick: 1 },
+    // på halkan: korta steg med hela foten i taget, böjda knän, framåtlutad och armarna ute för balansen
+    halkar: { S: 76, B: 0.68, x0: 0.26, lyft: 12, kna: 26, knaS: 0.55, larS: 0.7, hojd: 86.4, studs: 0.5, lut: 4, arm: 0.4, takt: 1, ficka: 0, hal: -3, armar: 'balans' },
+    // med käpp: korta, försiktiga steg, framåtböjd; käppen går med det bortre benet (kapp i stalln)
+    kapp: { S: 80, B: 0.68, x0: 0.15, lyft: 30, kna: 48, hojd: 87.6, studs: 0.8, lut: 7, arm: 0.35, takt: 0.88, ficka: 0 },
+    // springer (joggar, eller hinner med bussen): i luften mellan stegen, landar på mitten av foten, knät högt fram
+    springer: { S: 212, B: 0.36, x0: 0.09, lyft: 52, kna: 112, hojd: 86.6, studs: 3.2, lut: 7, arm: 1, takt: 1.42, ficka: 0, hal: -3, lop: true, drive: 24, larS: 0.56, knaS: 0.38, armar: 'spring' },
   };
-  // (ett sätt att gå ur R: vilket, och var och en lite olika; med paraply eller hund är händerna inte i fickorna)
+  // (ett sätt att gå ur R: vilket, och var och en lite olika – också armarna: hur böjda, hur långt fram och i vilken
+  // takt de svänger; ibland bara en hand i fickan, F den närmre och B den bortre)
   function gangStil(R, o = {}) {
-    const namn = o.stil || pick(R, ['vanlig', 'vanlig', 'vanlig', 'rask', 'rask', 'strosar', 'strosar', 'studsar', 'lunkar', 'rak']);
+    const namn = o.stil || pick(R, ['vanlig', 'vanlig', 'vanlig', 'rask', 'rask', 'strosar', 'strosar', 'studsar', 'lunkar', 'rak', 'trippar', 'slantrar']);
     const s = STILAR[namn];
     const j = (x, d) => x + (R() * 2 - 1) * d;
+    const ficka = !o.paraply && !o.hund && !s.armar && namn !== 'kapp' && namn !== 'skrinna' && R() < s.ficka + (o.kalla ? 0.15 : 0);
+    const r = R();
     return {
-      namn, S: j(s.S, 6), B: s.B, x0: s.x0, lyft: j(s.lyft, 4), kna: j(s.kna, 3), hojd: j(s.hojd, 0.3), studs: j(s.studs, 0.3),
+      ...s, namn, S: j(s.S, 6), lyft: j(s.lyft, 4), kna: j(s.kna, 3), hojd: j(s.hojd, 0.3), studs: j(s.studs, 0.3),
       lut: j(s.lut, 1), arm: j(s.arm, 0.12), takt: j(s.takt, 0.03),
-      ficka: !o.paraply && !o.hund && R() < s.ficka + (o.kalla ? 0.15 : 0), tab: null,
+      armBoj: j(-8, 5), armFram: j(0, 3), armSen: j(0.04, 0.03),
+      ficka: ficka ? (r < 0.55 ? 'FB' : r < 0.8 ? 'F' : 'B') : '', tab: null, skrid: namn === 'skrinna',
     };
+  }
+  // På inlines (skrinna): varje ben skjuter ifrån bakåt med hjulen mot stenen i halva varvet och förs sedan fram,
+  // böjt och lite lyft, i den andra. Höften står lägre (knäna böjda), överkroppen lutar fram och fötterna glider
+  // med kroppen, som på skridskor. Samma tabell som gångens (gangen): höften och benets vinklar per del av varvet.
+  const SKRIDSULA = 15;
+  function skridTab(st) {
+    const { LAR: L1, SMA: L2, N } = GANG;
+    const ss = (x) => { const q = Math.min(1, Math.max(0, x)); return q * q * (3 - 2 * q); };
+    // fotleden (x framåt, y nedåt från höften) → lår och knä, med knät framåt
+    const ik = (x, y) => {
+      const d = Math.max(5, Math.min(Math.hypot(x, y), L1 + L2 - 0.5));
+      const a = Math.atan2(-x, y) - Math.acos(Math.min(1, (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d)));
+      const kx = -L1 * Math.sin(a);
+      const ky = L1 * Math.cos(a);
+      return [a, Math.atan2(-(x - kx), y - ky) - a];
+    };
+    const FRAM = 20;
+    const BAK = -46;
+    return [...Array(N)].map((_, i) => {
+      const p = i / N;
+      const h = st.hojd + st.studs * Math.cos(4 * Math.PI * p);
+      let x; let y; let tipp = 0;
+      if (p < 0.5) {
+        x = FRAM + (BAK - FRAM) * (p / 0.5);
+        y = h - SKRIDSULA;
+      } else {
+        const s = (p - 0.5) / 0.5;
+        x = BAK + (FRAM - BAK) * ss(s);
+        y = h - SKRIDSULA - 11 * Math.sin(Math.PI * s);
+        tipp = 14 * DEG * Math.sin(Math.PI * s);
+      }
+      const [a, b] = ik(x, y);
+      return [0, GANG.HOFT - h, a, b, -(a + b) + tipp];
+    });
   }
   let gangVanlig = null;
   const stilVanlig = () => gangVanlig || (gangVanlig = gangStil(() => 0.5, { stil: 'vanlig' }));
   function gangen(st) {
     if (st.tab) return st.tab;
+    if (st.skrid) return (st.tab = skridTab(st));
     const { LAR: L1, SMA: L2, N } = GANG;
     const { S, B } = st;
     const PM = B / 2;
     // foten från fotleden (x framåt, y nedåt): hälen och tån; vinkeln positiv när hälen lyfts
     const HAL = [-6.5, 7];
     const TA = [16.5, 7];
-    const PSI0 = -12 * DEG;
+    const PSI0 = (st.hal ?? -12) * DEG;
     const PSI1 = st.lyft * DEG;
     const rot = (q, a) => [q[0] * Math.cos(a) - q[1] * Math.sin(a), q[0] * Math.sin(a) + q[1] * Math.cos(a)];
     const ss = (x) => { const q = Math.min(1, Math.max(0, x)); return q * q * (3 - 2 * q); };
@@ -888,7 +953,8 @@ window.RumFasad = (() => {
     // fotleden mätt från höften, för benet som är q in i sitt varv (i stödfasen)
     const rel = (q) => { const f = stod(q); return [f[0] - S * q, f[1], f[2]]; };
     // Höften: högst mitt i steget (PM) och lägst när båda fötterna är i marken; aldrig högre än att benen som
-    // står når marken med knät lite böjt (minst 5°).
+    // står når marken med knät lite böjt (minst 5°). Den som springer är tvärtom lägst mitt i steget, när knät tar
+    // emot, och högst i luften.
     const ps = [...Array(N)].map((_, i) => i / N);
     const fram = (p) => -0.7 * Math.sin(4 * Math.PI * (p - PM));
     const NA = Math.sqrt(L1 * L1 + L2 * L2 + 2 * L1 * L2 * Math.cos(5 * DEG));
@@ -897,7 +963,7 @@ window.RumFasad = (() => {
       const dx = r[0] - fram(p);
       return Math.sqrt(Math.max(0, NA * NA - dx * dx)) - r[1];
     })));
-    let H = ps.map((p) => st.hojd + st.studs * Math.cos(4 * Math.PI * (p - PM)));
+    let H = ps.map((p) => st.hojd + (st.lop ? -1 : 1) * st.studs * Math.cos(4 * Math.PI * (p - PM)));
     for (let k = 0; k < 40; k++) {
       H = H.map((h, i) => Math.min(h, tak[i]));
       H = H.map((h, i) => (H[(i + N - 1) % N] + 2 * h + H[(i + 1) % N]) / 4);
@@ -916,7 +982,8 @@ window.RumFasad = (() => {
     };
     // Benet som förs fram (B … 1, s 0 … 1): mjuka kurvor genom knutar [s, vinkel, lutning], som börjar där och så
     // som benet lämnade marken och slutar där nästa hälisättning börjar. Låret svänger fram och dras tillbaka
-    // 3° på slutet, knät böjs mest efter 30 % och sträcks, foten fälls upp till 3° och hålls där.
+    // 3° på slutet, knät böjs mest efter 30 % och sträcks, foten fälls upp till 3° och hålls där. Den som springer
+    // för låret långt fram (drive) och drar tillbaka det innan foten tar i, och knät böjs mer och senare (knaS).
     const sw = 1 - B;
     const e = 1e-3;
     const a0 = ik(B - e);
@@ -924,9 +991,10 @@ window.RumFasad = (() => {
     const a1 = ik(0);
     const d1 = ik(e).map((v, j) => (v - a1[j]) / e * sw);
     const KM = st.kna * DEG;
+    const KS = st.knaS || 0.3;
     const K = [
-      [[0, a0[0], d0[0]], [0.84, a1[0] - 1.5 * DEG, 0], [1, a1[0], d1[0]]],
-      [[0, a0[1], Math.min(d0[1], 2.5 * (KM - a0[1]) / 0.3)], [0.3, KM, 0], [1, a1[1], 0]],
+      [[0, a0[0], d0[0]], [st.larS || 0.84, a1[0] - (st.drive || 1.5) * DEG, 0], [1, a1[0], d1[0]]],
+      [[0, a0[1], Math.min(d0[1], 2.5 * (KM - a0[1]) / KS)], [KS, KM, 0], [1, a1[1], 0]],
       [[0, a0[2], d0[2]], [0.45, -5 * DEG, 0], [1, a1[2], 0]],
     ];
     const kurva = (k, s) => {
@@ -983,8 +1051,11 @@ window.RumFasad = (() => {
   // (bx, by), benen (F, B: lår, smalben, fot), kappans och kjolens skört (kF, kB: med det främre och det bakre
   // låret), överkroppens lutning (lut), armarna (aF, aB: axel, armbåge; i fickorna nästan stilla), paraplyet
   // (par), och var i varvet (p), hur långt den har gått (d, cm: hjulen rullar efter det) och stegens längd (S:
-  // hunden travar efter dem). STAR: står still.
+  // hunden travar efter dem); axlarnas rullning (sF, sB, cm framåt), huvudets nick (nick) och käppen (kapp: handtaget
+  // x, y och vinkeln). STAR: står still.
   const STAR = { bx: 0, by: 0, F: [0, 0, 0], B: [0, 0, 0], kF: 0, kB: 0, lut: 0, aF: [0, -6 * DEG], aB: [0, -6 * DEG], par: 0, p: null, d: 0, S: 128 };
+  // käppens längd (cm, från handtaget till spetsen)
+  const KAPP = 84;
   function stalln(p, st) {
     const T = gangen(st);
     const N = T.length;
@@ -996,14 +1067,75 @@ window.RumFasad = (() => {
     };
     const f = tab(p);
     const b = tab(p + 0.5);
-    const A = st.arm;
-    const arm = st.ficka
-      ? (q) => [(-2 + 2 * Math.cos(2 * Math.PI * (q - 0.04))) * DEG, -18 * DEG]
-      : (q) => { const c = Math.cos(2 * Math.PI * (q - 0.04)); return [A * 15 * c * DEG, (-8 - 11 * A * (1 - c)) * DEG]; };
+    // Armarna emot benen: den närmre fram när det närmre benet är bak. I fickan nästan stilla, och då svänger den
+    // andra lite mer. Den som springer har armarna böjda och pumpar (utom den som bär något i handen, st.hang), och på
+    // halkan hålls de ute framför kroppen.
+    const fi = st.ficka || '';
+    const A = st.arm * (fi.length === 1 ? 1.15 : 1);
+    const cos = (q) => Math.cos(2 * Math.PI * (q - st.armSen));
+    const arm = (q, ficka, bar) => {
+      const c = cos(q);
+      if (ficka) return [(-2 + 2 * c) * DEG, -18 * DEG];
+      if (st.armar === 'spring' && bar) return [(A * 16 * c - 4) * DEG, (-24 + 6 * c) * DEG];
+      if (st.armar === 'spring') return [(A * 26 * c - 2) * DEG, (-76 + 12 * c) * DEG];
+      if (st.armar === 'balans') return [(-13 + 4 * A * c) * DEG, (-34 + 3 * c) * DEG];
+      return [(A * 15 * c + st.armFram) * DEG, (st.armBoj - 11 * A * (1 - c)) * DEG];
+    };
     const PM = st.B / 2;
-    return { bx: f[0], by: f[1], F: f.slice(2), B: b.slice(2), kF: 0.7 * Math.min(f[2], b[2]), kB: 0.7 * Math.max(f[2], b[2]),
-      lut: (st.lut + 0.6 * Math.cos(4 * Math.PI * (p - PM - 0.1))) * DEG, aF: arm(p), aB: arm(p + 0.5),
+    const lut = (st.lut + 0.6 * Math.cos(4 * Math.PI * (p - PM - 0.1))) * DEG;
+    const P = { bx: f[0], by: f[1], F: f.slice(2), B: b.slice(2), kF: 0.7 * Math.min(f[2], b[2]), kB: 0.7 * Math.max(f[2], b[2]),
+      lut, aF: arm(p, fi.includes('F'), st.hang === 'F'), aB: arm(p + 0.5, fi.includes('B'), st.hang === 'B'),
       par: 1.2 * DEG * Math.sin(4 * Math.PI * (p - PM)), p, d: p * st.S, S: st.S };
+    // axlarna rullar med armarna (den närmre fram när dess arm är fram), och huvudet nickar en gång per steg
+    if (st.rull) {
+      const s = -2.6 * st.rull * cos(p);
+      P.sF = s;
+      P.sB = -s;
+    }
+    if (st.nick) P.nick = st.nick * 2.2 * DEG * Math.sin(4 * Math.PI * (p - PM + 0.08));
+    if (st.namn === 'kapp') kappen(P, st, lut);
+    return P;
+  }
+  // Käppen i den närmre handen går med det bortre benet, som hos den som går med käpp: spetsen sätts i en bit framför
+  // där den bortre hälen sätts i, samtidigt, och står still medan kroppen går förbi den; den lyfts lite innan foten
+  // lämnar marken och förs fram i en låg båge. Handtaget är där armen når, lite framför axeln, och armen böjs i
+  // armbågen så att handen håller det (P.aF).
+  function kappen(P, st, lut) {
+    const { HOFT } = GANG;
+    const hx = P.bx;
+    const hy = P.by - HOFT;
+    // spetsen: var i det bortre benets varv (q), i figurens mått (den går S på ett varv)
+    const q = (((P.p + 0.5) % 1) + 1) % 1;
+    const CS = st.B * 0.7;
+    const X = st.x0 * st.S + 22;
+    const u = q < CS ? 0 : (q - CS) / (1 - CS);
+    const tx = X + st.S * (u * u * (3 - 2 * u)) - st.S * q;
+    const ty = -5 * Math.sin(Math.PI * u);
+    // axeln (överkroppen lutar kring höften) och handtaget lite framför den
+    const sx = hx + Math.cos(lut) + 52 * Math.sin(lut);
+    const sy = hy + Math.sin(lut) - 52 * Math.cos(lut);
+    const dx = Math.max(-0.4 * KAPP, Math.min(0.4 * KAPP, sx + 9 - tx));
+    let gx = tx + dx;
+    let gy = ty - Math.sqrt(KAPP * KAPP - dx * dx);
+    // armen (överarm 29, underarm 31): räcker den inte når handen så långt den kan, och käppen följer med
+    const A1 = 29;
+    const A2 = 31;
+    let vx = gx - sx;
+    let vy = gy - sy;
+    let d = Math.hypot(vx, vy);
+    if (d > A1 + A2 - 0.5) {
+      const k = (A1 + A2 - 0.5) / d;
+      vx *= k; vy *= k; d = A1 + A2 - 0.5;
+      gx = sx + vx; gy = sy + vy;
+    }
+    // (armbågen bakåt, underarmen fram: vinklarna medurs från rakt ner, som i ritaDelar)
+    const g = Math.acos(Math.max(-1, Math.min(1, (A1 * A1 + d * d - A2 * A2) / (2 * A1 * d))));
+    const a0 = Math.atan2(-vx, vy) + g;
+    const ex = sx - A1 * Math.sin(a0);
+    const ey = sy + A1 * Math.cos(a0);
+    const w = Math.atan2(-(gx - ex), gy - ey);
+    P.aF = [a0, w - a0];
+    P.kapp = [gx, gy, Math.atan2(-(tx - gx), ty - gy)];
   }
 
   // ---------- de som går: kroppen, kläderna och det de har med sig ----------
@@ -1037,6 +1169,8 @@ window.RumFasad = (() => {
     flint: 'M-10 -157 Q-11.5 -167 -7.5 -171 Q-4 -168 -4.5 -162 Q-5 -158 -6.5 -155.5 Z',
     knut: 'M-10 -160 Q-12 -179.5 1 -179.5 Q11 -179 11 -170 Q6 -173 1 -170 Q-3 -166 -5 -160 Q-7 -157 -10 -155 Z M-17.5 -176 a6 5.6 0 1 0 12 0 a6 5.6 0 1 0 -12 0 Z',
     afro: 'M-12 -152 Q-21 -160 -18 -174 Q-14 -190 1 -191 Q15 -191 17 -177 Q18 -170 13.5 -167 Q7 -173 2 -170 Q-2 -165 -3 -158 Q-5 -151 -12 -152 Z',
+    // (tuppkammen: en kam av spetsar från pannan till nacken, sidorna rakade)
+    tupp: 'M-10 -164 Q-12 -175 -8 -181 L-12 -192 L-3.5 -186 L-3.5 -198 L1.5 -187.5 L5 -197 L6.8 -185.5 L13 -190 L10 -178.5 Q11 -175 10.5 -172 Q5 -177.5 -1 -177.5 Q-6.5 -176.5 -10 -164 Z',
   };
   // håret som syns bakom och under mössan
   const HAR_BAK = {
@@ -1045,7 +1179,7 @@ window.RumFasad = (() => {
     svans: 'M-9 -173 Q-19 -172 -19.5 -158 Q-19 -149 -15 -146 Q-15.5 -156 -8.5 -165 Z',
   };
   // Armarna som håller något: vinkeln i axeln och armbågen (grader; framåt negativt) och var handen då är
-  const GREPP = { koppel: [-12, -35], mobil: [-70, -153], glass: [-14, -96], hand: [-5, -8], vagn: [-40, -30], cykel: [-35, -35], drar: [24, 6], upp: [-134, -71], under: [8, -66], barn: [-78, -10], pizza: [-8, -78], blommor: [-18, -98] };
+  const GREPP = { koppel: [-12, -35], mobil: [-70, -153], glass: [-14, -96], hand: [-5, -8], vagn: [-40, -30], cykel: [-35, -35], drar: [24, 6], upp: [-134, -71], under: [8, -66], barn: [-78, -10], pizza: [-8, -78], blommor: [-18, -98], rull: [-24, -42], karta: [-30, -70], skid: [-120, -20], bergs: [-175, -74] };
   const handVid = ([a, b]) => {
     const u = a * DEG; const w = (a + b) * DEG;
     return [1 - 29 * Math.sin(u) + 0.4 * Math.cos(w) - 31 * Math.sin(w), -142 + 29 * Math.cos(u) + 0.4 * Math.sin(w) + 31 * Math.cos(w)];
@@ -1126,8 +1260,9 @@ window.RumFasad = (() => {
     const drag = (d, s, w, x = {}) => D.push({ d: P2(d), s, w, g: '', ...x });
     // (barnen har större huvud)
     const H = o.barn ? (d) => skalad(d, 1.3, 1, -150) : P2;
-    const hd = (d, f, x = {}) => del(H(d), f, '', x);
-    const hdr = (d, s, w, x = {}) => drag(H(d), s, w, x);
+    // (huvudet för sig: det kan nicka, nick i stalln)
+    const hd = (d, f, x = {}) => del(H(d), f, 'huvud', x);
+    const hdr = (d, s, w, x = {}) => drag(H(d), s, w, { g: 'huvud', ...x });
     const stil = o.stil || (o.lang ? 'kappa' : 'kort');
     const nere = HEM[stil] ?? -84;
     const lang = nere > -70;
@@ -1156,6 +1291,11 @@ window.RumFasad = (() => {
       const Q = (s, w) => `${r1(hx + dx * s + n[0] * w)} ${r1(hy + dy * s + n[1] * w)}`;
       skugga(ax - 4, 14);
       drag(`M${r1(hx)} ${r1(hy)} L${ax} ${ay}`, t('#2a2a2e'), 2.2, { g: 'mark' });
+      // (tidningsbudets kärra: buntarna med morgonens tidningar sticker upp ur säcken)
+      if (o.vagn.tidn) {
+        del(`M${Q(0.17, 2)} L${Q(0.3, 2)} L${Q(0.3, 13)} L${Q(0.19, 13)} Z M${Q(0.2, 14)} L${Q(0.3, 14)} L${Q(0.3, 25)} L${Q(0.22, 25)} Z`, t('#e6e2d4'), 'mark');
+        drag(`M${Q(0.18, 7)} L${Q(0.3, 7)} M${Q(0.21, 19)} L${Q(0.3, 19)}`, t('#8a8a84'), 1, { g: 'mark', inre: true });
+      }
       del(`M${Q(0.28, 0)} L${Q(0.93, 0)} L${Q(0.93, 25)} Q${Q(0.6, 29)} ${Q(0.26, 27)} Z`, t(o.vagn.f), 'mark');
       drag(`M${Q(0.3, 8)} L${Q(0.9, 8)} M${Q(0.29, 17)} L${Q(0.9, 17)}`, t(o.vagn.f2), 1.6, { g: 'mark', inre: true, a: 0.7 });
       drag(`M${Q(0.5, 0)} L${Q(0.5, 27)} M${Q(0.72, 0)} L${Q(0.72, 26.5)}`, t(o.vagn.f2), 1.1, { g: 'mark', inre: true, a: 0.5 });
@@ -1194,6 +1334,17 @@ window.RumFasad = (() => {
         del(LARP(ww), f(c), g);
         del(SMAP(ww), f(c), g, { led: 1 });
       }
+      if (o.skoStil === 'inlines') {
+        // (inlines: kängan upp över fotleden, skenan och fyra hjul i neon, knäskydd)
+        del(`M-6.6 ${GANG.SMA - 15} H6.6 L7.2 ${GANG.SMA + 1} H-6.6 Z`, f(o.sko), g, { led: 1 });
+        if (o.skydd) del(ell(2.6, 3, 6.4, 6), f(o.skydd), g, { led: 1 });
+        del('M-6.6 -5 H5 Q15.5 -4.5 17 2.5 V6.5 H-7.2 Q-7.6 0 -6.6 -5 Z', f(o.sko), g, { led: 2 });
+        del('M-6.5 6 H16 V9.2 H-6.5 Z', f('#3a3a40'), g, { led: 2 });
+        const hj = new Path2D();
+        for (const x of [-4.2, 2.4, 9, 15]) hj.ellipse(x, 11.8, 3.2, 3.2, 0, 0, 2 * Math.PI);
+        del(hj, f(o.hjul || '#e8d84a'), g, { led: 2 });
+        return;
+      }
       if (o.skoStil === 'stovel') del(STOVEL, f(o.sko), g, { led: 1 });
       else if (o.skoStil === 'kanga') del(KANGA, f(o.sko), g, { led: 1 });
       del(o.skoStil === 'sneaker' ? SNEAKER : SKO, f(o.sko), g, { led: 2 });
@@ -1216,6 +1367,19 @@ window.RumFasad = (() => {
         drag('M-8 9 Q-6 -1 0 -1 Q6 -1 8 9', f('#141414'), 1.8, { g, ...y });
         del('M-28 7 H26 Q33 7 33 17 Q33 27 26 27 H-28 Q-35 27 -35 17 Q-35 7 -28 7 Z', f(h.f), g, y);
         drag('M-35 17 H33', f(h.f2), 1.6, { g, ...y, inre: true });
+      } else if (h.typ === 'klapp') {
+        // (en papperskasse med julklappar i, inslagna med snören som sticker upp)
+        del('M-10 -3 H1 V9 H-10 Z', f(h.p1), g, y);
+        del('M-2 -7 H9 V9 H-2 Z', f(h.p2), g, y);
+        drag('M-4.5 -3 V9 M3.5 -7 V9 M-2 -2 H9', f('#e8c84a'), 1, { g, ...y, inre: true });
+        drag('M-6 7 Q-4 -2 0 -1 Q4 -2 6 7', f(h.f), 1.4, { g, ...y });
+        del('M-12 5 H12 L11 36 H-11 Z', f(h.f), g, y);
+        drag('M-12 9 H12', f('#000000'), 1, { g, ...y, inre: true, a: 0.2 });
+      } else if (h.typ === 'stavar') {
+        // (skidstavarna, med trissorna nere vid marken)
+        drag('M-1 -6 L-15 74 M2 -6 L-9 74', f('#2a2a30'), 1.4, { g, ...y });
+        drag('M-17 68 h6 M-11 68 h6', f(h.f), 1.6, { g, ...y });
+        del('M-2.5 -9 H3.5 V4 H-2.5 Z', f(h.f), g, y);
       } else {
         drag('M-5 5 Q-5 -1 0 -1 Q5 -1 5 5', f('#141414'), 1.8, { g, ...y });
         del('M-20 4 H20 Q22 4 22 6 V31 Q22 33 20 33 H-20 Q-22 33 -22 31 V6 Q-22 4 -20 4 Z', f(h.f), g, y);
@@ -1230,7 +1394,17 @@ window.RumFasad = (() => {
       const kort = stil === 'tshirt';
       del(OVER, f(kort ? o.hud : o.arm), g, x);
       if (kort) del(ARMEL, f(o.arm), g, x);
+      if (kort && o.sverige) del('M-6.4 9.6 H6.6 L6.4 13.5 Q0 16 -6.1 13.5 Z', f(o.sverige), g, { ...x, inre: true });
       del(UNDER, f(kort ? o.hud : o.arm), g, { ...x, led: 1 });
+      if (o.skydd) del('M-5 19 H5.2 L5 28 H-4.6 Z', f('#1a1a1e'), g, { ...x, led: 1 });
+      // (turistkartan uppvikt framför en, med vikarna och en röd ring)
+      if (gr === 'karta') {
+        const b = { ...x, led: 1, hang: true };
+        del('M-6 -22 H24 L23 6 H-5 Z', f('#ece6d2'), g, b);
+        drag('M4 -22 L4.5 6 M14 -22 L13.6 6 M-5.5 -8 H23.5', f('#9aa0a8'), 0.8, { g, ...b, inre: true });
+        drag('M-2 -16 Q6 -12 9 -4 Q14 0 20 -2', f('#5a8ac8'), 1.2, { g, ...b, inre: true });
+        drag(ell(16, -12, 2.6, 2.2), f('#c8322a'), 1, { g, ...b, inre: true });
+      }
       if (gr === 'mobil') {
         del('M-3 25 H3.4 V46 H-3 Z', f('#1a1a1e'), g, { ...x, led: 1 });
         drag('M2.4 46 V53', f('#1a1a1e'), 1.2, { g, ...x, led: 1 });
@@ -1247,8 +1421,8 @@ window.RumFasad = (() => {
         del('M-3.5 7 H3.5 L10.5 -24 Q0 -20 -10.5 -24 Z', f(o.blomPapper || '#e8e0cc'), g, b);
         drag('M-9 -23 Q-12 -29 -10 -33 M9 -23 Q12 -29 10 -32', f('#3a6a2a'), 1.6, { g, ...b });
       }
-      // (händerna i fickorna: underarmen in mot fickan, utan hand)
-      if (gr || !o.ficka) del(o.vante ? ell(0.4, 31.5, 5.2, 6.4) : ell(0.4, 31, 4.4, 5.6), f(o.vante || o.hud), g, { ...x, led: 1 });
+      // (händerna i fickorna, eller bara den ena: underarmen in mot fickan, utan hand)
+      if (gr || !(o.ficka || '').includes(sida)) del(o.vante ? ell(0.4, 31.5, 5.2, 6.4) : ell(0.4, 31, 4.4, 5.6), f(o.vante || o.hud), g, { ...x, led: 1 });
       if (gr === 'glass') del(ell(0, -6.5, 4.6, 4.2), f(o.glassF || '#e8a0b0'), g, { ...x, led: 1, hang: true });
       if (o.hang && o.hang.sida === sida) hanger(g, f, x);
     };
@@ -1261,6 +1435,23 @@ window.RumFasad = (() => {
     ben('benB', bak);
     if (o.paraply && o.parHand === 'B') parArm(bak);
     else if (!(o.paraply && o.parHand === 'F' && !o.gB && !o.hang)) arm('B', bak);
+    // Bergsprängaren på den bortre axeln, bakom huvudet: två högtalare, kassettluckan, handtaget i den bortre
+    // handen och antennen
+    if (o.bergs) {
+      del('M-54 -168 Q-54 -172 -50 -172 H-2 Q2 -172 2 -168 V-148 Q2 -144 -2 -144 H-50 Q-54 -144 -54 -148 Z', t(o.bergs));
+      del(ring(-41, -157, 9, 3.8), bak('#141416'), '', { inre: true });
+      del(ring(-11, -157, 9, 3.8), bak('#141416'), '', { inre: true });
+      del('M-30 -166 H-22 V-150 H-30 Z', bak('#2a2a30'), '', { inre: true });
+      drag('M-44 -172 V-179 H-6 V-172', t('#2a2a30'), 2.4);
+      drag('M-1 -172 L10 -198', t('#c8c8c8'), 1);
+    }
+    // skidorna på den bortre axeln, spetsarna framåt och uppåt, och bindningarna
+    if (o.skidor) {
+      const sk = (dy) => `M${-96} ${-111 + dy} L90 ${-198 + dy} Q99 ${-205 + dy} 101 ${-198 + dy} L91 ${-193 + dy} L-95 ${-106 + dy} Z`;
+      del(sk(0), t(o.skidor));
+      del(sk(5), bak(o.skidor));
+      drag('M-6 -152 L4 -157 M-4 -147 L6 -152', t('#1a1a1a'), 2.4, { inre: true });
+    }
     // (härifrån till huvudet: överkroppen, som dras ut på bredden, bredda)
     const iKropp = D.length;
     // gitarren i mjukt fodral på ryggen, halsen upp bakom huvudet
@@ -1336,7 +1527,7 @@ window.RumFasad = (() => {
       if (o.slips) del('M3.2 -150 L5.8 -150 L6.3 -132 L4.5 -129 L3 -132 Z', t(o.slips), '', { inre: true });
       drag('M-3 -152 L4 -136 L6 -112', kant, 1.6, { inre: true });
     } else if (stil === 'tshirt') {
-      drag('M-4 -152 Q2 -147 8 -151.5', kant, 1.4, { inre: true });
+      drag('M-4 -152 Q2 -147 8 -151.5', o.sverige ? t(o.sverige) : kant, o.sverige ? 2.6 : 1.4, { inre: true });
       if (o.tryck) del(ell(6, -128, 5.5, 5.5), t(o.tryck), '', { inre: true });
     } else if (stil === 'skjorta') {
       del('M-3 -153.5 L2.5 -146 L7 -153.5 Z', kant, '', { inre: true });
@@ -1359,6 +1550,24 @@ window.RumFasad = (() => {
     if (o.vaska) { drag('M8 -151 L-11 -104', bak(o.vaska), 2.2); del('M-24 -105 Q-24 -108 -21 -108 H-9 Q-6 -108 -6 -105 V-88 Q-6 -85 -9 -85 H-21 Q-24 -85 -24 -88 Z', t(o.vaska)); }
     if (o.ryggsack) drag('M-9 -151.5 Q4 -150 8 -140 Q9.5 -128 6.5 -118', bak(o.ryggsack), 2.4, { inre: true });
     if (o.gitarr) drag('M-8 -152 Q5 -148 10 -132 Q13 -112 8 -96', t('#1a1a1a'), 2, { inre: true });
+    // (nitar på skinnjackans axel och krage)
+    if (o.nitar) drag('M-10 -149 h0.1 M-6 -150.5 h0.1 M-2 -151 h0.1 M11 -147 h0.1 M12.4 -141 h0.1 M13.4 -135 h0.1', t('#d8d8d8'), 2, { inre: true });
+    // Tidningsbudets reflexväst över jackan, med ränderna som lyser i ljuset på morgonen (lys: mörknar inte)
+    if (o.vast) {
+      del('M-12.5 -146 Q-13.5 -151.5 -6 -152 L-2 -151 L4 -140 L9 -151.5 Q15 -151 14.6 -146 L15.6 -100 Q1 -98 -13.6 -100 Z', t(o.vast));
+      del('M-13.2 -124 H15.2 V-120 H-13.3 Z M-13.5 -111 H15.4 V-107 H-13.6 Z', L.dag < 0.5 ? '#c8ccd0' : t('#d8dce0'), '', { inre: true, lys: L.dag < 0.5 });
+    }
+    // turistens kamera på magen och magväskan (nittiotalets midjeväska) över höften
+    if (o.kamera) {
+      drag('M-6 -151 Q2 -140 7 -131', t('#1a1a1a'), 1.1, { inre: true });
+      del('M4 -133 H17 Q18 -133 18 -132 V-124 Q18 -123 17 -123 H4 Z', t('#1e1e22'));
+      del(ell(18.6, -128, 1.8, 3), t('#3a3a44'), '', { inre: true });
+    }
+    if (o.mag && !lang) {
+      drag('M-13 -103 Q0 -101 6 -102', bak(o.mag), 1.8);
+      del('M5 -105 Q5 -110 10 -110 H15 Q20.5 -110 20.5 -104 Q20.5 -97.5 14 -97.5 H10 Q5 -97.5 5 -105 Z', t(o.mag));
+      drag('M6 -104.5 Q12.5 -102 20 -104.5', bak(o.mag), 0.9, { inre: true });
+    }
     bredda(D, iKropp, o.bred);
 
     // --- huvudet
@@ -1371,7 +1580,7 @@ window.RumFasad = (() => {
     if (o.skagg) hd('M7.8 -159.6 Q10.5 -161.4 13 -160 Q11 -158.4 7.8 -159 Z', t(o.har), { inre: true });
     if (o.harStil === 'svans' && o.hatt !== 'luva' && o.hatt !== 'sjal') hd(ell(-11.5, -169.5, 2.6, 3.3), t(o.snodd || '#d8407a'), { inre: true });
     // håret (under mössan bara det som sticker fram bakom)
-    if (!o.hatt || o.hatt === 'basker' || o.hatt === 'kepa') hd(HAR[o.harStil] || HAR.kort, t(o.har));
+    if (!o.hatt || o.hatt === 'basker' || o.hatt === 'kepa' || o.hatt === 'pannband') hd(HAR[o.harStil] || HAR.kort, t(o.har));
     const h = o.hatt;
     const hc = t(o.mossa || '#2a2a2a');
     if (h === 'mossa' || h === 'oron') {
@@ -1380,6 +1589,10 @@ window.RumFasad = (() => {
       if (h === 'oron') hd('M-7.5 -169 Q-9 -157 -3.5 -154.5 Q0.5 -157.5 0 -169 Z', hc);
       if (o.tofs) hd(ell(0.5, -190.5, 4.2, 4), t(o.tofsF || '#f3ead9'));
       if (o.sno) hd('M-8 -186.5 Q0 -191 8 -186.5 Q0 -188.1 -8 -186.5 Z', t('#eef0f2'), { inre: true, a: 0.8 });
+    } else if (h === 'pannband') {
+      // (frottébandet runt pannan på den som joggar)
+      hd('M-11 -175.5 Q0.5 -179 12.2 -174 L12 -168.6 Q0.5 -173.4 -11.2 -170 Z', hc);
+      hdr('M-10.5 -172.6 Q0.5 -176 11.8 -171.2', bak(o.mossa), 0.8, { inre: true, a: 0.5 });
     } else if (h === 'keps') hd('M-10 -167 Q-10 -180 1 -180 Q10.5 -180 11 -171 L19.5 -168.5 Q15 -166 10 -166.5 L-10 -165 Z', hc);
     else if (h === 'kepa') {
       // (sixpence: platt och framåtlutad, med kort skärm)
@@ -1423,7 +1636,7 @@ window.RumFasad = (() => {
       hdr('M-2.5 -167 Q-4 -186 3.5 -185', t('#1a1a1a'), 1.6);
       hd(ell(-1.8, -164.5, 3.4, 3.9), t('#e2762a'));
       drag('M-2 -161 Q-6 -140 -8 -104', t('#111111'), 0.6, { inre: true });
-      del('M-13 -105 H-5 V-94 H-13 Z', t('#3a3a44'));
+      del('M-13 -105 H-5 V-94 H-13 Z', t(o.walkmanF || '#3a3a44'));
     }
     if (o.cigg) {
       hdr('M10.4 -158.4 L17.4 -157.6', t('#ece8e0'), 1.5, { inre: true });
@@ -1434,6 +1647,11 @@ window.RumFasad = (() => {
     if (o.halsduk) {
       hd('M-7 -156 Q1 -152 9 -156 V-148 Q1 -144 -7 -148 Z', t(o.halsduk));
       hd('M4 -149 L10 -121 L4.5 -120 L0.5 -148 Z', t(o.halsduk));
+      // (supporterhalsduken: lagets andra färg i ränder och fransarna)
+      if (o.klubb) {
+        hd('M1.5 -141 H5.7 L6.6 -137 H2.1 Z M2.9 -131 H7.9 L8.7 -127 H3.5 Z M-3 -154.6 Q0 -153.4 3 -153.8 V-146 Q0 -145.6 -3 -146.8 Z', t(o.klubb), { inre: true });
+        hdr('M5 -120 l0.3 3.4 M7 -120.3 l0.3 3.4 M9 -120.6 l0.3 3.4', t(o.klubb), 1);
+      }
     }
 
     // --- det som hålls framför och den närmre armen
@@ -1452,6 +1670,30 @@ window.RumFasad = (() => {
         del(ell(x, -112, 3.6, 2.4), t('#ece8e0'));
         del(ell(x, -94, 3.6, 2.4), t('#ece8e0'));
       }
+    }
+    // käppen, med handtaget i den närmre handen (som håller om det, och ritas efter)
+    if (o.kapp) {
+      del(`M-1.3 4 H1.3 V${KAPP - 3} H-1.3 Z`, t(o.kapp), 'kapp');
+      del(`M-1.9 ${KAPP - 3.5} H1.9 V${KAPP} H-1.9 Z`, t('#141414'), 'kapp');
+      del('M-1.4 5 Q-2.4 -3.6 4.6 -4.6 Q10.4 -5 11.4 -0.6 L8.8 0 Q8 -2.2 4.8 -2 Q0.8 -1.6 1.4 5 Z', t(o.kapp), 'kapp');
+    }
+    // julgranen i nät under den närmre armen, stammen framåt och toppen efter
+    if (o.gran) {
+      const A = [44, -114]; const B = [-112, -88];
+      const ux = B[0] - A[0]; const uy = B[1] - A[1]; const l = Math.hypot(ux, uy);
+      const nx = -uy / l; const ny = ux / l;
+      const P = (s, w) => `${r1(A[0] + ux * s + nx * w)} ${r1(A[1] + uy * s + ny * w)}`;
+      // (bredast en bit från stammen, och lite taggig av grenarna i nätet)
+      const bredd = (s, i) => 25 * (1 - s) * Math.min(1, 0.5 + s * 2.4) * (i % 2 ? 0.86 : 1);
+      let kant = `M${P(0.03, 0)}`;
+      for (let i = 0; i <= 8; i++) { const s = 0.05 + i * 0.115; kant += ` L${P(s, bredd(s, i))}`; }
+      kant += ` L${P(1, 0)}`;
+      for (let i = 8; i >= 0; i--) { const s = 0.05 + i * 0.115; kant += ` L${P(s, -bredd(s, i))}`; }
+      drag(`M${P(-0.06, 0)} L${P(0.05, 0)}`, t('#5a3a22'), 4.2);
+      del(`${kant} Z`, t(o.gran));
+      let nat = '';
+      for (let i = 0; i < 7; i++) { const s = 0.1 + i * 0.12; nat += `M${P(s, -0.85 * bredd(s, 0))} L${P(s + 0.12, 0.85 * bredd(s + 0.12, 0))} M${P(s, 0.85 * bredd(s, 0))} L${P(s + 0.12, -0.85 * bredd(s + 0.12, 0))} `; }
+      drag(nat, t('#d8d2c0'), 0.7, { a: 0.45, inre: true });
     }
     if (o.paraply && o.parHand === 'F') parArm(t);
     else arm('F', t);
@@ -1548,6 +1790,23 @@ window.RumFasad = (() => {
       const [ax, ay] = handVid(GREPP.koppel);
       drag(`M${r1(ax)} ${r1(ay)} Q${r1((ax + cx) / 2)} ${r1(Math.max(ay, cy) + 10)} ${r1(cx)} ${r1(cy)}`, t('#1a1a1a'), 1.5);
     }
+    if (o.vagn && o.vagn.typ === 'rullator') {
+      // (rullatorn: handtagen, ramen ned till fyra hjul, sitsen och korgen med en kasse i)
+      const [hx, hy] = handVid(GREPP.rull);
+      const x0 = Math.round(hx + 3);
+      const x1 = x0 + 50;
+      const f = t(o.vagn.f);
+      const m = { g: 'mark' };
+      skugga((x0 + x1) / 2, 32);
+      drag(`M${r1(hx + 4)} ${r1(hy)} L${x0} -10 M${r1(hx + 4)} ${r1(hy + 3)} Q${x0 + 30} ${r1(hy + 6)} ${x1} -10 M${x0 + 2} -52 H${x1 - 13}`, f, 2.6, m);
+      del(`M${r1(hx - 5)} ${r1(hy - 2.4)} H${r1(hx + 6)} V${r1(hy + 2.4)} H${r1(hx - 5)} Z`, t('#1a1a1a'), 'mark');
+      del(`M${x0 + 4} -55 H${x1 - 16} V-50 H${x0 + 4} Z`, t('#2a2a2e'), 'mark');
+      del(`M${x0 + 16} -82 H${x1 - 4} L${x1 - 8} -60 H${x0 + 19} Z`, t(o.vagn.korg), 'mark', { a: 0.85 });
+      drag(`M${x0 + 18} -75 H${x1 - 5} M${x0 + 18.5} -68 H${x1 - 6.5} M${x0 + 26} -82 L${x0 + 27} -60 M${x0 + 36} -82 L${x0 + 35} -60`, bak(o.vagn.korg), 0.8, { g: 'mark', inre: true });
+      if (o.vagn.kasse) del(`M${x0 + 20} -80 Q${x0 + 24} -94 ${x0 + 31} -92 Q${x0 + 37} -90 ${x1 - 10} -80 Z`, t(o.vagn.kasse), 'mark');
+      hjul(x0, 10, '#1a1a1a', '#9a9a9a', 5);
+      hjul(x1, 10, '#1a1a1a', '#9a9a9a', 5);
+    }
     if (o.vagn && o.vagn.typ === 'barnvagn') {
       const [hx, hy] = handVid(GREPP.vagn);
       const x0 = Math.round(hx + 14);
@@ -1610,6 +1869,7 @@ window.RumFasad = (() => {
     del(ell(-10, -166, 2, 3.2), t(o.hud));
     del(ell(10, -166, 2, 3.2), t(o.hud));
     del(ell(0, -167, 10, 12), t(o.har));
+    if (o.harStil === 'tupp' && !o.mossa) del('M-2.6 -176 L-3.4 -194 L0 -187 L3.4 -195 L2.6 -176 Z', t(o.har));
     if (o.halsduk) del('M-8 -157 Q0 -153 8 -157 V-149 Q0 -145 -8 -149 Z', t(o.halsduk));
     if (o.mossa) { del('M-10.5 -166 Q-11.5 -186 0 -186 Q11.5 -186 10.5 -166 Z', t(o.mossa)); del('M-11 -170 H11 V-165.5 H-11 Z', bak(o.mossa), { inre: true }); }
     return morkna(D);
@@ -1646,6 +1906,12 @@ window.RumFasad = (() => {
       } else if (g === 'hjul') {
         c.translate(p.px, p.py);
         c.rotate(P.d / p.r);
+      } else if (g === 'kapp') {
+        // (käppen: handtaget och vinkeln räknas i stalln, kappen; stilla lodrätt bredvid)
+        if (P.kapp) {
+          c.translate(P.kapp[0], P.kapp[1]);
+          c.rotate(P.kapp[2]);
+        } else c.translate(14, -KAPP);
       } else if (g !== 'mark') {
         c.translate(P.bx, P.by);
         if (g === 'benF' || g === 'benB') {
@@ -1663,9 +1929,14 @@ window.RumFasad = (() => {
           c.rotate(P.lut);
           c.translate(0, GANG.HOFT);
         }
+        if (g === 'huvud' && P.nick) {
+          c.translate(0, -152);
+          c.rotate(P.nick);
+          c.translate(0, 152);
+        }
         if (g === 'armF' || g === 'armB') {
           const a = g === 'armF' ? P.aF : P.aB;
-          c.translate(1, -142);
+          c.translate(1 + ((g === 'armF' ? P.sF : P.sB) || 0), -142);
           c.rotate(a[0] - P.lut);
           if (p.led) { c.translate(0, 29); c.rotate(a[1]); }
           if (p.hang) { c.translate(0.4, 31); c.rotate(-(a[0] + a[1]) * 0.85); }
@@ -1812,6 +2083,8 @@ window.RumFasad = (() => {
       regn, sno: v.fall === 'sno' || v.fall === 'blandat', snoMark: v.snotackt,
       kall: v.kanns < 3, sval: v.kanns >= 3 && v.kanns < 11, varm: v.kanns >= 16, hett: v.kanns >= 21,
       sol: L.sol > 0.4 && L.dag > 0.6,
+      // (halt: snö på marken kring nollan, eller blött och minusgrader)
+      halt: (v.snotackt && v.temp > -8 && v.temp < 2.5) || (v.blott && v.temp < 0.5),
     };
   }
   // Kläderna och det man har med sig, för en som är ung, vuxen, gammal, i kostym eller ett barn (vem), i
@@ -1831,6 +2104,8 @@ window.RumFasad = (() => {
     o.h = barn ? 0.6 + R() * 0.04 : (kv ? 0.95 : 1.01) - (aldre ? 0.025 : 0) + (R() + R() - 1) * 0.065;
     o.bred = pick(R, BYGG[vem] || BYGG.vuxen);
     o.mage = o.bred > 1.15 && !barn && R() < 0.75;
+    // (bland de unga en och annan punkare med tuppkam och nitar, eller hårdrockare med långt hår, i skinnjacka)
+    const sub = ung && !W.varm && R() < 0.1 ? (R() < 0.5 ? 'punk' : 'hardrock') : null;
     let stil;
     if (barn) stil = W.regn ? 'regn' : W.kall || W.snoMark ? 'overall' : W.varm ? 'tshirt' : pick(R, ['vind', 'dun', 'luv', 'jeans']);
     else if (kostym) stil = W.kall ? pick(R, ['kappa', 'kappa', 'trench']) : W.varm ? 'kavaj' : pick(R, ['trench', 'kappa', 'kavaj']);
@@ -1839,6 +2114,7 @@ window.RumFasad = (() => {
     else if (W.sval) stil = pick(R, aldre ? ['kappa', 'trench', 'falt', 'kavaj', 'kappa'] : ung ? ['vind', 'vind', 'bomber', 'skinn', 'jeans', 'luv', 'trackdrakt', 'dun'] : ['trench', 'kappa', 'skinn', 'vind', 'jeans', 'falt', 'bomber', 'dun', 'kappa']);
     else stil = pick(R, aldre ? ['trench', 'kavaj', 'falt', 'skjorta'] : ung ? ['vind', 'jeans', 'luv', 'trackdrakt', 'skjorta', 'bomber'] : ['jeans', 'vind', 'skinn', 'kavaj', 'trench', 'luv', 'skjorta']);
     if (W.regn && !barn && !kostym && R() < (aldre ? 0.15 : 0.25)) stil = 'regn';
+    if (sub) stil = 'skinn';
     o.stil = stil;
     if (stil === 'vind' || stil === 'trackdrakt') {
       const b = pick(R, F90.vind);
@@ -1852,6 +2128,8 @@ window.RumFasad = (() => {
     o.lang = HEM[stil] > -70;
     if (stil === 'kavaj') { o.skjorta = pick(R, ['#e8e4dc', '#c8d8e8', '#f3ead9']); o.slips = kostym ? pick(R, ['#8a1e1e', '#1d2a4a', '#5a2a6a', '#c8a83a']) : null; }
     if (stil === 'tshirt' && R() < 0.4) o.tryck = pick(R, ['#c8322a', '#e8b923', '#2a5ab0', '#1a1a1a', '#e8e4dc']);
+    // (landslagströjan i värmen: gul med blå krage och blå kant på ärmarna)
+    if (stil === 'tshirt' && !kostym && R() < 0.12) { o.rock = '#f0c41c'; o.arm = o.rock; o.sverige = '#1d4a9a'; o.tryck = null; }
     // byxorna (eller kjolen, eller shorts)
     if (stil === 'trackdrakt' || stil === 'overall' || (barn && stil === 'regn')) o.byxa = o.rock;
     else if (W.varm && !aldre && !kostym && R() < 0.45) { o.ben = 'shorts'; o.byxa = pick(R, F90.shorts); o.strumpa = R() < 0.65 ? '#ece8e0' : null; }
@@ -1860,6 +2138,7 @@ window.RumFasad = (() => {
       o.byxa = kostym ? (stil === 'kavaj' ? o.rock : pick(R, F90.kavaj)) : pick(R, ung || barn ? F90.ljusjeans : F90.byxa);
       if (ung && R() < 0.7) o.vidd = 1.28;
     }
+    if (sub) { o.ben = null; o.vidd = 1; o.byxa = sub === 'punk' ? pick(R, ['#1a1a1e', '#6a1a22', '#2a2a30']) : pick(R, ['#3b4a6a', '#1d1d20', '#4a6a90']); }
     // skorna
     if (barn) { o.skoStil = W.regn || W.snoMark ? 'stovel' : 'sneaker'; o.sko = pick(R, o.skoStil === 'stovel' ? F90.stovel : F90.sneaker); }
     else if (W.regn && R() < 0.25) { o.skoStil = 'stovel'; o.sko = pick(R, F90.stovel); }
@@ -1871,6 +2150,9 @@ window.RumFasad = (() => {
     o.harStil = barn ? pick(R, kv ? ['svans', 'page', 'lang'] : ['kort', 'kort', 'page'])
       : aldre ? pick(R, kv ? ['lockar', 'page', 'kort'] : ['flint', 'kort', 'flint'])
         : kv ? pick(R, ['lang', 'svans', 'page', 'lockar', 'lang', 'knut', 'afro']) : pick(R, ung ? ['kort', 'gel', 'hockey', 'lang', 'hockey', 'afro'] : ['kort', 'kort', 'hockey', 'flint', 'lockar', 'afro']);
+    if (sub === 'punk') { o.harStil = 'tupp'; o.har = pick(R, ['#d8407a', '#3ab04a', '#e83a2a', '#1a1a1a', '#e8d84a', '#2a6ad8']); }
+    else if (sub) o.harStil = 'lang';
+    if (sub) { o.skoStil = 'kanga'; o.sko = '#141414'; o.dm = true; o.nitar = sub === 'punk' || R() < 0.4; }
     if (o.harStil === 'svans') o.snodd = pick(R, ['#d8407a', '#1e8a8a', '#e8b923', '#1a1a1a', '#f3ead9', '#4a2a6a']);
     // huvudet
     o.hatt = null;
@@ -1886,6 +2168,7 @@ window.RumFasad = (() => {
         : o.hatt === 'kepa' ? pick(R, ['#5a4a3a', '#4a4a46', '#3a3226', '#6a5a44', '#2a2e38'])
           : o.hatt === 'basker' ? pick(R, ['#1a1a1e', '#8a1e1e', '#2a3a6a', '#5a2a4a', '#2a4a3a'])
             : o.hatt === 'sjal' ? pick(R, ['#8a1e1e', '#2a3a6a', '#d8cbb0', '#4a2a4a']) : pick(R, F90.mossa);
+    if (sub === 'punk') o.hatt = null;
     o.tofs = o.hatt === 'mossa' && R() < (barn ? 0.8 : 0.35);
     o.halsduk = (W.kall && R() < 0.65) || (W.sval && R() < 0.15) || (W.sno && R() < 0.4) ? pick(R, F90.halsduk) : null;
     o.vante = W.kall && R() < 0.7 ? (R() < 0.25 ? '#ece6da' : pick(R, ['#1a1a1a', '#3a2a1a', '#8a1e1e', '#2a3a6a'])) : null;
@@ -1902,7 +2185,10 @@ window.RumFasad = (() => {
       o.mobil = (kostym && R() < 0.35) || (!ung && !aldre && R() < 0.03);
       o.ryggsack = R() < (ung ? 0.35 : aldre ? 0 : 0.08) ? pick(R, F90.ryggsack) : null;
       o.vaska = !o.ryggsack && R() < (kv ? 0.32 : 0.08) ? pick(R, ['#3a2a1a', '#1a1a1a', '#8a6a3a', '#5a1e22']) : null;
-      if (kostym && R() < 0.65) o.hang = { typ: 'portfolj', f: pick(R, ['#2a1c14', '#141414', '#4a3020']) };
+      // (magväskan, julklapparna i december)
+      o.mag = !kostym && !aldre && R() < (ung ? 0.09 : 0.05) ? pick(R, ['#1a1a1e', '#2a5ab0', '#c8322a', '#e0408a', '#1e8a8a', '#4a2a6a']) : null;
+      if (v.manad === 12 && v.dag < 24 && R() < 0.22) o.hang = { typ: 'klapp', f: pick(R, ['#b8322a', '#c8a878', '#1e5a3a', '#ece6d6']), p1: pick(R, ['#c8322a', '#2a5ab0', '#e8b923']), p2: pick(R, ['#1e6a3a', '#d8407a', '#e8e4dc']) };
+      else if (kostym && R() < 0.65) o.hang = { typ: 'portfolj', f: pick(R, ['#2a1c14', '#141414', '#4a3020']) };
       else if (!ung && R() < 0.2) o.hang = { typ: 'pase', f: '#ece8e0', f2: pick(R, ['#c8322a', '#2a5ab0', '#e8b923', '#2a8a4a']) };
       else if (ung && R() < 0.1) o.hang = { typ: 'sport', f: pick(R, ['#1a1a1e', '#1d2a4a', '#8a1e1e', '#2a5a3a']), f2: pick(R, ['#e8e4dc', '#e8b923', '#2a8ad0']) };
       // (gitarren på ryggen, pizzan hem på kvällen, blommorna till någon)
@@ -1936,9 +2222,9 @@ window.RumFasad = (() => {
   // Vad händerna gör: först det som sällskapet kräver (gF, gB: kopplet, barnets hand, barnvagnen …), sedan
   // paraplyet, mobilen, glassen och brädan; påsen och portföljen hänger i en hand som är ledig.
   function hander(o) {
-    const fri = (s) => !(s === 'F' ? o.gF : o.gB) && o.parHand !== s;
+    const fri = (s) => !(s === 'F' ? o.gF || o.kapp : o.gB) && o.parHand !== s;
     if (o.paraply) {
-      o.parHand = !o.gF ? 'F' : !o.gB ? 'B' : null;
+      o.parHand = fri('F') ? 'F' : fri('B') ? 'B' : null;
       if (!o.parHand) o.paraply = null;
     }
     for (const [k, g] of [['mobil', 'mobil'], ['glass', 'glass'], ['skate', 'under'], ['pizza', 'pizza'], ['blommor', 'blommor']]) {
@@ -1963,7 +2249,7 @@ window.RumFasad = (() => {
   }
   // Vem som kommer gående: en ensam, någon med hund, ett par, ett gäng, en förälder med ett barn i handen,
   // med barnvagn, med pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig
-  // med tidningen i regnet; efter klockan och vädret.
+  // med tidningen i regnet, någon som joggar morgon och kväll; efter klockan och vädret.
   function vemGar(R, T, W, v) {
     const h = T.h;
     const dag = h > 8 && h < 19.5;
@@ -1978,27 +2264,154 @@ window.RumFasad = (() => {
       ['cykel', !v.snotackt && !(W.regn && v.mangd > 0.6) && h > 6 && h < 23 ? 0.07 : 0],
       ['pulka', v.snotackt && h > 9 && h < 16.5 ? 0.16 : 0],
       ['tidning', W.regn && v.mangd < 0.85 ? 0.07 : 0],
+      ['jogg', !v.snotackt && !W.halt && !(W.regn && v.mangd > 0.5) && v.kanns > -6 && ((h > 6 && h < 9.5) || (h > 16.5 && h < 21.5)) ? (W.varm ? 0.1 : 0.06) : 0],
+      // (inlines när det är torrt och milt, rullatorn på dagen, supportrarna på väg till eller från matchen,
+      // bergsprängaren, julgranen i december, tidningsbudet i gryningen, turisterna på sommaren och skidorna
+      // när det har snöat en ledig dag)
+      ['inlines', !W.regn && !W.sno && !v.snotackt && v.kanns >= 7 && h > 9 && h < 21 ? (v.arstid === 'sommar' ? 0.14 : 0.07) : 0],
+      ['rullator', h > 9 && h < 17 && !(v.snotackt && v.mangd > 0.3) ? 0.07 : 0],
+      ['supporter', T.helg ? (h > 11 && h < 19.5 ? 0.16 : 0) : h > 17 && h < 21.5 ? 0.06 : 0],
+      ['bergs', !W.regn && !W.sno && v.kanns >= 5 && h > 11 && h < 22 ? 0.05 : 0],
+      ['gran', v.manad === 12 && v.dag >= 7 && v.dag <= 23 && h > 10 && h < 20 ? 0.16 : 0],
+      ['bud', h >= 4.5 && h < 7 ? 1.4 : 0],
+      ['turist', v.manad >= 6 && v.manad <= 8 && h > 10 && h < 19 && !W.regn ? 0.12 : 0],
+      ['skidor', v.snotackt && T.helg && h > 8.5 && h < 16.5 ? 0.12 : 0],
     ];
     let s = kv.reduce((a, [, w]) => a + w, 0) * R();
     for (const [k, w] of kv) { s -= w; if (s <= 0) return k; }
     return 'en';
   }
-  // Sättet att gå (STILAR) efter vem det är, eller det sällskapet kräver (namn); händerna i fickorna bara när
-  // de är lediga.
-  const GSTIL = { ung: ['vanlig', 'rask', 'studsar', 'studsar', 'lunkar'], aldre: ['strosar', 'strosar', 'rak', 'lunkar'], kostym: ['rask', 'rask', 'rak', 'vanlig'], barn: ['studsar', 'vanlig'] };
+  // Sättet att gå (STILAR) efter vem det är, eller det sällskapet kräver (namn). På halkan (W.halkar) går de flesta
+  // försiktigt, utom barnen och den som springer, och med kjol trippar en del. En hand i fickan bara när den är
+  // ledig: med påsen i den ena handen eller paraplyet kan den andra vara i fickan.
+  const GSTIL = { ung: ['vanlig', 'rask', 'studsar', 'studsar', 'lunkar', 'slantrar', 'slantrar'], aldre: ['strosar', 'strosar', 'rak', 'lunkar', 'trippar'], kostym: ['rask', 'rask', 'rak', 'vanlig'], barn: ['studsar', 'vanlig'] };
   function gangFor(R, o, W, namn) {
+    if (W.halkar && o.vem !== 'barn' && !['springer', 'kapp', 'skrinna'].includes(namn)) namn = 'halkar';
+    if (!namn && o.ben === 'kjol' && R() < 0.4) namn = 'trippar';
     const st = gangStil(R, { stil: namn || (GSTIL[o.vem] ? pick(R, GSTIL[o.vem]) : undefined), kalla: W.kall });
-    st.ficka = st.ficka && !o.gF && !o.gB && !o.paraply && !o.hang && !o.hund && !o.vagn && !o.tidning;
+    const ledig = (s) => !(s === 'F' ? o.gF || o.kapp : o.gB) && o.parHand !== s && !(o.hang && o.hang.sida === s);
+    st.ficka = o.hund || o.vagn || o.tidning ? '' : [...st.ficka].filter(ledig).join('');
     // (en del äldre går lite framåtböjda)
-    if (o.vem === 'aldre' && R() < 0.4) st.lut += 4 + R() * 3;
+    if (o.vem === 'aldre' && !['kapp', 'springer', 'halkar'].includes(st.namn) && R() < 0.4) st.lut += 4 + R() * 3;
     o.ficka = st.ficka;
+    st.hang = o.hang ? o.hang.sida : '';
     return st;
+  }
+  // Den som joggar: myskläder (vindtyg i färgblock) eller shorts och t-shirt när det är varmt, gympadojor,
+  // pannband eller mössa och ibland en gul sportfreestyle; inget i händerna.
+  function joggare(R, o, W) {
+    const b = pick(R, F90.vind);
+    Object.assign(o, { stil: 'trackdrakt', rock: b[0], blk: [b[1], b[2]], arm: R() < 0.5 ? b[1] : b[0], lang: false, ben: null, strumpa: null, vidd: 1 });
+    o.byxa = o.rock;
+    if (W.varm) {
+      Object.assign(o, { stil: 'tshirt', rock: pick(R, F90.tshirt), tryck: R() < 0.4 ? pick(R, ['#c8322a', '#e8b923', '#2a5ab0', '#1a1a1a']) : null, ben: 'shorts', byxa: pick(R, F90.shorts), strumpa: '#ece8e0' });
+      o.arm = o.rock;
+    }
+    Object.assign(o, { skoStil: 'sneaker', sko: pick(R, F90.sneaker), dm: false, bred: Math.min(o.bred, 1.08), mage: false, halsduk: null, sverige: null, nitar: false });
+    o.hatt = W.kall || W.sno ? 'mossa' : R() < 0.45 ? 'pannband' : null;
+    if (o.hatt) o.mossa = pick(R, F90.mossa);
+    o.tofs = false;
+    for (const k of ['hang', 'vaska', 'ryggsack', 'gitarr', 'pizza', 'blommor', 'mobil', 'cigg', 'skate', 'glass', 'paraply']) o[k] = null;
+    o.walkman = R() < 0.5;
+    o.walkmanF = R() < 0.6 ? '#e8b923' : null;
+    return o;
   }
   // Ett sällskap: vem (o, st: sättet att gå, dx: cm före den första, ddm: m närmare en, k: barnets storlek)
   // och hur långt det når fram och bak (ut, cm). Alla går i den förstas fart.
+  // Supporterhalsdukarna: lagets två färger (Stockholmslagen och de engelska lag som många höll på)
+  const LAGEN = [['#1a1a1a', '#e8c020'], ['#1d4a9a', '#c8322a'], ['#1e7a3a', '#f3ead9'], ['#b8202a', '#f3ead9'], ['#c8202a', '#1a1a1a'], ['#f3ead9', '#1d3a8a'], ['#1d3a8a', '#f3ead9'], ['#1a1a1a', '#f3ead9'], ['#6a1e3a', '#7ab0e0']];
+  // (det som inte passar ihop med att ha händerna fulla)
+  const tomHand = (o) => { o.hang = null; o.mobil = null; o.glass = null; o.pizza = null; o.blommor = null; o.skate = null; o.gitarr = null; return o; };
   function sallskap(R, typ, v, L, W) {
     const en = (vem, x = {}) => klad(R, v, L, W, vem, x);
     const ett = (o, namn, ut = 100) => ({ vem: [{ o, st: gangFor(R, hander(o), W, namn) }], ut });
+    if (typ === 'inlines') {
+      const vem = pick(R, ['ung', 'ung', 'vuxen']);
+      const ut = [];
+      for (let i = 0, n = R() < 0.3 ? 2 : 1; i < n; i++) {
+        const o = tomHand(en(vem, { utanParaply: true }));
+        o.skoStil = 'inlines';
+        o.sko = pick(R, ['#1a1a1e', '#e8e4dc', '#2a5ab0', '#1a1a1e', '#4a2a6a']);
+        o.hjul = pick(R, ['#e8d84a', '#e0408a', '#7ad8d0', '#f0f0e8', '#8ae04a']);
+        o.skydd = R() < 0.7 ? pick(R, ['#1a1a1e', '#2a2a30', '#c8322a', '#2a5ab0']) : null;
+        o.ryggsack = R() < 0.3 ? o.ryggsack : null;
+        o.cigg = false;
+        o.walkman = o.walkman || (!o.hatt && R() < 0.4);
+        ut.push({ o, st: gangFor(R, hander(o), W, 'skrinna'), dx: i ? -(70 + R() * 60) : 0, ddm: i ? -0.16 : 0 });
+      }
+      return { vem: ut, ut: 130 };
+    }
+    if (typ === 'rullator') {
+      const o = en('aldre', { utanParaply: true });
+      o.gF = 'rull';
+      o.gB = 'rull';
+      o.vagn = { typ: 'rullator', f: pick(R, ['#8a1e22', '#2a3a6a', '#3a5a3a', '#6a6a70']), korg: '#3a3a40', kasse: R() < 0.6 ? pick(R, ['#ece8e0', '#c8322a', '#2a5ab0']) : null };
+      const st = gangFor(R, hander(o), W, 'strosar');
+      st.lut += 6;
+      st.S *= 0.85;
+      return { vem: [{ o, st }], ut: 110 };
+    }
+    if (typ === 'supporter') {
+      const lag = pick(R, LAGEN);
+      const vem = pick(R, ['ung', 'ung', 'vuxen']);
+      const namn = pick(R, ['vanlig', 'rask', 'studsar']);
+      const ut = [];
+      for (let i = 0, n = 2 + (R() < 0.4 ? 1 : 0); i < n; i++) {
+        const o = en(vem, { utanParaply: i > 0 || R() < 0.5 });
+        o.halsduk = lag[0];
+        o.klubb = lag[1];
+        o.blommor = null;
+        if (o.stil === 'tshirt') { o.rock = lag[0]; o.arm = lag[0]; o.tryck = lag[1]; o.sverige = null; }
+        ut.push({ o, st: gangFor(R, hander(o), W, namn), dx: i === 0 ? 0 : i === 1 ? -(16 + R() * 24) : 38 + R() * 16, ddm: i === 1 ? -0.22 : i ? 0.12 : 0 });
+      }
+      return { vem: ut, ut: 120 };
+    }
+    if (typ === 'bergs') {
+      const o = tomHand(en('ung', { utanParaply: true }));
+      o.gB = 'bergs';
+      o.bergs = pick(R, ['#b8bcc0', '#1a1a1e', '#2a2a30', '#c8c8cc']);
+      o.ryggsack = null;
+      o.walkman = false;
+      o.vidd = 1.3;
+      if (!o.hatt && R() < 0.6) o.hatt = 'bakkeps';
+      return ett(o, pick(R, ['studsar', 'lunkar', 'vanlig']));
+    }
+    if (typ === 'gran') {
+      const o = en(pick(R, ['vuxen', 'vuxen', 'aldre', 'ung']), { utanParaply: true });
+      o.gF = 'under';
+      o.gran = pick(R, ['#24452a', '#2a4e30', '#1e3e26']);
+      return ett(o, pick(R, ['vanlig', 'rask']), 150);
+    }
+    if (typ === 'bud') {
+      const o = tomHand(en(pick(R, ['vuxen', 'aldre', 'ung', 'vuxen']), { utanParaply: true }));
+      o.gB = 'drar';
+      o.vast = '#d8e23a';
+      o.vagn = { typ: 'karra', tidn: true, f: pick(R, ['#c8322a', '#1d2a4a', '#2a4a8a', '#e8b923']), f2: pick(R, ['#e8e4dc', '#1a1a1a']) };
+      return ett(o, 'rask', 100);
+    }
+    if (typ === 'turist') {
+      const ut = [];
+      for (let i = 0, n = R() < 0.5 ? 2 : 1; i < n; i++) {
+        const o = tomHand(en('vuxen', { utanParaply: true }));
+        o.kamera = i === 0 || R() < 0.4;
+        o.mag = R() < 0.6 ? pick(R, ['#1a1a1e', '#2a5ab0', '#c8322a', '#e0408a']) : o.mag;
+        if (i === 0) o.gF = 'karta';
+        if (!['keps', 'fiskar'].includes(o.hatt) && R() < 0.6) { o.hatt = pick(R, ['fiskar', 'keps', 'fiskar']); o.mossa = pick(R, ['#e8e0c8', '#c8b48a', '#2a5ab0', '#e8e4dc']); }
+        if (W.varm && o.ben !== 'kjol') { o.ben = 'shorts'; o.byxa = pick(R, F90.shorts); o.strumpa = '#ece8e0'; o.vidd = 1; }
+        ut.push({ o, st: gangFor(R, hander(o), W, 'strosar'), dx: i ? -(18 + R() * 14) : 0, ddm: i ? -0.2 : 0 });
+      }
+      return { vem: ut, ut: 110 };
+    }
+    if (typ === 'skidor') {
+      const o = tomHand(en(pick(R, ['ung', 'vuxen', 'vuxen']), { utanParaply: true }));
+      o.gB = 'skid';
+      o.skidor = pick(R, ['#c8322a', '#e8e4dc', '#1d3a8a', '#e8b923', '#1a1a1a', '#e0408a']);
+      o.hang = { typ: 'stavar', f: pick(R, ['#1a1a1a', '#c8322a', '#2a5ab0']) };
+      o.ryggsack = null;
+      if (o.stil !== 'vind' && o.stil !== 'dun') { const b = pick(R, F90.vind); o.stil = 'vind'; o.rock = b[0]; o.blk = [b[1], b[2]]; o.arm = b[0]; o.lang = false; }
+      if (!o.hatt) { o.hatt = 'mossa'; o.mossa = pick(R, F90.mossa); }
+      return ett(o, 'vanlig', 130);
+    }
     if (typ === 'hund') {
       const o = en(pick(R, ['ung', 'vuxen', 'vuxen', 'aldre']));
       o.gF = 'koppel';
@@ -2008,7 +2421,7 @@ window.RumFasad = (() => {
     }
     if (typ === 'par' || typ === 'gang') {
       const vem = typ === 'gang' ? 'ung' : pick(R, ['ung', 'vuxen', 'vuxen', 'aldre']);
-      const namn = typ === 'gang' ? pick(R, ['vanlig', 'studsar', 'lunkar']) : vem === 'aldre' ? 'strosar' : pick(R, ['vanlig', 'strosar']);
+      const namn = typ === 'gang' ? pick(R, ['vanlig', 'studsar', 'lunkar', 'slantrar']) : vem === 'aldre' ? 'strosar' : pick(R, ['vanlig', 'strosar']);
       const a = en(vem);
       const ut = [{ o: a, st: gangFor(R, hander(a), W, namn) }];
       const n = typ === 'gang' ? 2 + (R() < 0.5 ? 1 : 0) : 2;
@@ -2066,11 +2479,26 @@ window.RumFasad = (() => {
       o.glass = null;
       return ett(o, 'rask');
     }
+    if (typ === 'jogg') return ett(joggare(R, en(pick(R, ['ung', 'ung', 'vuxen'])), W), 'springer', 110);
     const o = en(pick(R, ['ung', 'ung', 'vuxen', 'vuxen', 'vuxen', 'vuxen', 'aldre', 'kostym']));
-    // (den som blir blöt skyndar sig)
+    // (en del äldre går med käpp)
+    if (o.vem === 'aldre' && R() < 0.4) {
+      o.kapp = pick(R, ['#3a2416', '#1a1a1a', '#5a3a22', '#9a9a9a']);
+      return ett(o, 'kapp');
+    }
+    // (den som blir blöt skyndar sig, och ibland springer den; i rusningen springer någon till bussen)
     const fort = W.regn && v.mangd > 0.45 && !o.paraply && o.stil !== 'regn';
+    const h = v.timme + v.minut / 60;
+    const rusar = !o.paraply && !W.halt && ((h > 7 && h < 9) || (h > 16 && h < 18)) && R() < 0.06;
+    if ((fort && !W.halt && R() < 0.4) || rusar) {
+      o.cigg = false;
+      o.glass = null;
+      return ett(o, 'springer');
+    }
     return ett(o, fort ? 'rask' : undefined);
   }
+  // (?rum-fasad-vem=inlines: alla som går förbi är sådana, för bilder och prov; vemGar har namnen)
+  const VEM = (() => { try { return new URLSearchParams(location.search).get('rum-fasad-vem'); } catch (e) { return null; } })();
   function folket(V, v, L) {
     const T = U().trafik.nu(v);
     const fro = v.ar * 389 + v.manad * 37 + v.dag * 3 + (v.timme >> 1);
@@ -2083,7 +2511,8 @@ window.RumFasad = (() => {
       // (vilka de är, kläderna och sättet att gå ur en egen följd per sällskap, så att var och en går där den
       // gick förut)
       const RK = rng(fro + 977 * (i + 1));
-      const sk = sallskap(RK, vemGar(R, T, W, v), v, L, W);
+      // (på halkan går de flesta i ett sällskap försiktigt, halkar i gangFor)
+      const sk = sallskap(RK, VEM || vemGar(R, T, W, v), v, L, W.halt ? { ...W, halkar: RK() < 0.65 } : W);
       const dm = 0.3 + R() * 0.4;
       const dir = R() < 0.5 ? 1 : -1;
       const k0 = skala(dm) * M / 100;
@@ -2121,8 +2550,8 @@ window.RumFasad = (() => {
       if (R() > 0.6) return null;
       const o = hander(klad(R, v, L, W, pick(R, ['ung', 'vuxen', 'vuxen', 'aldre', 'kostym']), { utanParaply: true }));
       o.walkman = false;
-      // (den som stannar strosar)
-      const stil = gangFor(R, o, W, 'strosar');
+      // (den som stannar strosar, och går försiktigt på halkan)
+      const stil = gangFor(R, o, W.halt ? { ...W, halkar: true } : W, 'strosar');
       const bakO = { ...o, mossa: ['mossa', 'oron', 'luva'].includes(o.hatt) ? o.mossa : null };
       const dir = n % 2 ? -1 : 1;
       const xa = dir > 0 ? V.x - 200 : V.x + V.w + 200;
@@ -2740,7 +3169,7 @@ window.RumFasad = (() => {
     el.innerHTML = '<div class="rf-scen"></div>';
     rum.append(el);
     const scen = el.firstChild;
-    const F = { V: null, sig: '', duk: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
+    const F = { V: null, sig: '', gl: null, glasR: null, glasPx: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
     const calm = () => Boolean(o.calm && o.calm());
     // (dukarnas bildpunkter per enhet i världen: skärmens, högst två miljoner bildpunkter på hela fönstret)
     const tathet = (V) => {
@@ -2748,7 +3177,15 @@ window.RumFasad = (() => {
       const H = el.clientHeight || innerHeight;
       return Math.max(W / V.w, H / V.h) * Math.min(2, devicePixelRatio || 1, Math.sqrt(2e6 / (W * H)));
     };
-    const duk = (cls, r, px) => `<canvas class="${cls}" width="${Math.max(1, Math.round(r.w * px))}" height="${Math.max(1, Math.round(r.h * px))}" style="left:${r1(r.x - F.V.x)}px; top:${r1(r.y - F.V.y)}px; width:${r1(r.w)}px; height:${r1(r.h)}px"></canvas>`;
+    // En duk som inte behövs längre lämnar tillbaka sitt minne genast när den blir noll stor (slapp): annars
+    // ligger bildpunkterna kvar tills skräpsamlingen hinner dit, och i en telefon hann de bli många – vid
+    // varje ombygge av scenen (rita) och varje gång man gick ut och in igen (ut). Scenens dukar, bilarnas och
+    // molnens (dukarna).
+    const slapp = (c) => { if (c && c.width) { c.width = 0; c.height = 0; } };
+    const dukarna = (R) => (R ? [R.fram && R.fram.canvas, R.bak && R.bak.canvas, R.barber && R.barber.canvas,
+      ...(R.bilar || []).map((b) => b.bild), ...((R.himlen && R.himlen.moln) || []).map((m) => m.bild)] : []);
+    // (scenen i fönstrets punkter: F.k punkter per enhet i världen, passa)
+    const duk = (cls, r, px) => `<canvas class="${cls}" width="${Math.max(1, Math.round(r.w * px))}" height="${Math.max(1, Math.round(r.h * px))}" style="left:${r1((r.x - F.V.x) * F.k)}px; top:${r1((r.y - F.V.y) * F.k)}px; width:${r1(r.w * F.k)}px; height:${r1(r.h * F.k)}px"></canvas>`;
 
     function rita() {
       const a = (el.clientWidth || innerWidth) / (el.clientHeight || innerHeight);
@@ -2756,28 +3193,33 @@ window.RumFasad = (() => {
       const v = window.Vader ? Vader.nu() : null;
       if (!v || !U()) return;
       const L = U().light(v);
-      const s = sig(V, v, L, o);
+      // (och dukarnas bildpunkter, i steg om en åttondel: storleken på skärmen, tathet)
+      const px = tathet(V);
+      const s = `${sig(V, v, L, o)},${Math.round(px * 8)}`;
       if (s === F.sig) return;
       F.sig = s;
       F.V = V;
+      F.k = Math.max((el.clientWidth || innerWidth) / V.w, (el.clientHeight || innerHeight) / V.h);
       const defs = `<defs><filter id="rf-mjuk" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.4"/></filter><filter id="rf-neon-b" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
         <clipPath id="rf-glas-k"><rect x="${FON.x}" y="${FON.y}" width="${FON.w}" height="${FON.h}"/><rect x="${DORR.x}" y="${DORR.y}" width="${DORR.w}" height="${DORR.h}"/></clipPath>
         <clipPath id="rf-hal"><path clip-rule="evenodd" d="M${VARLD.x0} ${VARLD.y0} H${VARLD.x1} V${VARLD.y1} H${VARLD.x0} Z M${FON.x} ${FON.y} h${FON.w} v${FON.h} h${-FON.w} Z M${DORR.x} ${DORR.y} h${DORR.w} v${DORR.h} h${-DORR.w} Z"/></clipPath></defs>`;
       const glasX = FON.x - V.x;
       const glasY = FON.y - V.y;
-      // (dukens bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden)
+      // (gängets bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden)
       const k = Math.min(innerWidth / V.w, innerHeight / V.h);
       const pr = Math.min(2, devicePixelRatio || 1);
       const dw = Math.round(Math.min(1400, FON.w * k * pr));
-      const dh = Math.round(dw * FON.h / FON.w);
-      const gammal = F.duk;
+      F.glasPx = { w: dw, h: Math.round(dw * FON.h / FON.w) };
+      const gamla = dukarna(F.ro);
       // det som rör sig: vad, var och hur (inget med prefers-reduced-motion, utom stången som står still)
-      const px = tathet(V);
       const lugn = calm();
       const bakX = Math.max(V.x, HORN - 520);
       const bakR = { x: bakX, y: V.y, w: V.x + V.w - bakX, h: HOR + 60 - V.y };
       const himlen = !lugn && bakR.w > 0 ? himmelsliv(V, v, L, px) : null;
       const barberR = BARBER.x + BARBER.w > V.x && BARBER.x < V.x + V.w ? BARBER : null;
+      // (pyntets dukar: som de andra, men högst 1400 bildpunkter på fönstrets bredd)
+      const pyntPx = Math.min(px, 1400 / FON.w);
+      const pyntBild = pyntBilder(L, pyntPx);
       const R = {
         px, V, L, bakR, himlen,
         folk: lugn ? [] : folket(V, v, L),
@@ -2793,42 +3235,93 @@ window.RumFasad = (() => {
         spegelA: 0.14 + 0.1 * (1 - L.dag),
         tom: false,
       };
-      scen.style.width = `${V.w}px`;
-      scen.style.height = `${V.h}px`;
+      // Det som står still är en SVG mellan varje duk (fyra i stället för nio), i fönstrets storlek: förut
+      // var de i världens mått och förminskades (i en telefon på höjden till 0,45), och Safari ritar ett lager
+      // i dess egen storlek gånger pixeltätheten, så att varje lager tog fem gånger så mycket minne som det
+      // syns (ungefär 50 MB i stället för 10 i en iPhone).
+      const sk = F.k;
+      const pyntDukar = pyntBild.map((b, i) => (b ? duk('rf-pynt', i ? DORR : FON, pyntPx) : '')).join('');
+      const framfor = `<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}${texten(v, L)}`;
+      scen.style.transform = '';
+      scen.style.width = `${r1(V.w * sk)}px`;
+      scen.style.height = `${r1(V.h * sk)}px`;
       scen.innerHTML =
         svg(V, defs + himmel(V, v, L)) +
         (himlen ? duk('rf-bak', bakR, px) : '') +
-        svg(V, bortom(V, v, L)) +
-        svg(V, defs + rummet(v, L, o), 'rf-inne') +
-        `<canvas class="rf-gang" width="${dw}" height="${dh}" style="left:${glasX}px; top:${glasY}px; width:${FON.w}px; height:${FON.h}px"></canvas>` +
-        svg(V, defs + iFonstret(v, L, o)) +
-        svg(V, defs + neonSkylt(), 'rf-neonlager') +
-        svg(V, defs + glaset(v, L, o)) +
-        svg(V, `${defs}<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}`) +
-        svg(V, texten(v, L), 'rf-text') +
+        svg(V, defs + bortom(V, v, L) + rummet(v, L, o)) +
+        // (här står gängets duk, glas; högtidspyntet mellan neonen och glaset, bara när det finns: annars ett lager mindre)
+        (pyntDukar
+          ? svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}`, 'rf-fonster') + pyntDukar + svg(V, `${defs}${glaset(v, L, o)}${framfor}`)
+          : svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}${glaset(v, L, o)}${framfor}`, 'rf-fonster')) +
         (barberR ? duk('rf-barber', barberR, px) : '') +
-        svg(V, kvallsljus(V, v, L, o), 'rf-kvall') +
+        svg(V, kvallsljus(V, v, L, o)) +
         (L.dimma > 0.05 ? `<div class="rf-lager rf-dimma" style="background:${mix('#2a2622', '#aeb3b6', L.dag)}; opacity:${r1(0.32 * L.dimma)}"></div>` : '') +
         duk('rf-fram', V, px);
-      F.duk = scen.querySelector('.rf-gang');
+      F.glasR = { x: r1(glasX * sk), y: r1(glasY * sk), w: r1(FON.w * sk), h: r1(FON.h * sk) };
+      placera();
       R.fram = scen.querySelector('.rf-fram').getContext('2d');
       R.bak = himlen ? scen.querySelector('.rf-bak').getContext('2d') : null;
       R.barber = barberR ? scen.querySelector('.rf-barber').getContext('2d') : null;
       F.ro = R;
+      pynt(pyntBild);
       // (en fast bild: allt som rör sig står på samma tid)
       if (o.still != null) for (const an of el.getAnimations({ subtree: true })) { an.pause(); an.currentTime = o.still * 1000; }
-      // (gänget från förra gången tills det ritas på nytt)
-      if (gammal && gammal.width) F.duk.getContext('2d').drawImage(gammal, 0, 0, F.duk.width, F.duk.height);
+      for (const c of gamla) slapp(c);
       F.neon = null;
       passa();
       gang();
       rorelse(true);
     }
-    // scenen så stor att den täcker fönstret (vy har fönstrets form)
+    // Högtidspyntet i skyltfönstret och på dörren, så som det hänger inne (o.pynt, pyntUtifran i
+    // rum-inredning.js): bilderna tas fram innan scenen byggs (rita), så att dukarna och lagret de kräver bara
+    // finns när det finns pynt, och ritas en gång på var sin duk framför neonen och bakom glaset, så att
+    // speglingen, imman och dropparna ligger över det. Innan rummets 3D-delar är klara finns inget pynt.
+    function pyntBilder(L, px) {
+      return [['pyntF', FON], ['pyntP', DORR]].map(([namn, r]) => {
+        if (!o.pynt) return null;
+        try {
+          return o.pynt(namn, { w: Math.max(1, Math.round(r.w * px)), h: Math.max(1, Math.round(r.h * px)), dag: L.dag }) || null;
+        } catch (err) { return null; /* utan pyntet: glaset som vanligt */ }
+      });
+    }
+    function pynt(bilder) {
+      const dukar = scen.querySelectorAll('.rf-pynt');
+      let j = 0;
+      for (const bild of bilder) if (bild && dukar[j]) dukar[j++].getContext('2d').drawImage(bild, 0, 0);
+    }
+    // Gängets duk i skyltfönstret (glas i rum.js): rummet lånar ut den medan det inte syns, och den står där
+    // gänget syns genom glaset, bakom neonen och glaset. Förut ritades glaset i rummets duk och kopierades
+    // hit efter varje bild, ett arbete på grafikkortet som bara fanns ute; nu visar duken själv det som
+    // ritas i den, som inne. Den följer med när scenen byggs om (placera). null: rummet tar tillbaka den.
+    function glas(c) {
+      const g = F.gl;
+      F.gl = c || null;
+      if (g && g !== F.gl) {
+        g.classList.remove('rf-gang');
+        g.remove();
+      }
+      placera();
+      if (!F.gl) return;
+      gang();
+      // (den kommer när rummet bakom har dolts, och tonar fram)
+      if (F.gl !== g && !calm() && o.still == null && F.gl.animate) F.gl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+    }
+    function placera() {
+      const c = F.gl;
+      const r = F.glasR;
+      if (!c || !r) return;
+      c.classList.add('rf-gang');
+      Object.assign(c.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
+      const fore = scen.querySelector('.rf-fonster');
+      if (c.parentNode !== scen || c.nextSibling !== fore) scen.insertBefore(c, fore);
+    }
+    // Scenen täcker fönstret: den byggs i fönstrets storlek (F.k), och när storleken ändras skalas den om så
+    // länge, tills den byggs om (storlek). Och dörrens mitt i fönstret, dit man går in och ut.
     function passa() {
       if (!F.V) return;
-      const k = Math.max(el.clientWidth / F.V.w, el.clientHeight / F.V.h);
-      scen.style.transform = `scale(${k})`;
+      const k = Math.max(el.clientWidth / F.V.w, el.clientHeight / F.V.h) || F.k;
+      const sk = k / F.k;
+      scen.style.transform = Math.abs(sk - 1) < 1e-3 ? '' : `scale(${sk})`;
       el.style.setProperty('--dorr-x', `${r1((DORR.x + DORR.w / 2 - F.V.x) * k)}px`);
       el.style.setProperty('--dorr-y', `${r1((DORR.y + DORR.h * 0.45 - F.V.y) * k)}px`);
     }
@@ -2838,7 +3331,7 @@ window.RumFasad = (() => {
     // telefon eller dator. Gänget ritas direkt efter bildrutan (efter), som inne (efterBild i rum.js): då
     // har det hela tiden till nästa, och det som ritas i bildrutan väntar inte. En gång i en stillbild.
     // Förut ritades hela gängets duk några gånger i sekunden, och då hackade gänget fram; nu ritas bara
-    // glaset (utifran i rum-3d.js).
+    // glaset (utifran i rum-3d.js). Utan duk i fönstret (glas) ritas inget.
     const GANG_ANDEL = 0.25;
     function gangDags(ms) {
       const takt = (o.takt && o.takt()) || (LATT ? 20 : 30);
@@ -2852,7 +3345,7 @@ window.RumFasad = (() => {
     };
     function gang() {
       const ms = performance.now();
-      if (F.duk && o.gang) o.gang(F.duk);
+      if (F.gl && F.glasPx && o.gang) o.gang(F.glasPx);
       F.tider.push(performance.now() - ms);
       if (F.tider.length > 9) F.tider.shift();
       const on = o.neon ? o.neon() !== false : true;
@@ -2906,18 +3399,34 @@ window.RumFasad = (() => {
     }
     // vädret och ljuset ändras: ritas om när de har ändrats (sig), en gång i minuten
     const T = setInterval(() => { if (el.isConnected) rita(); }, 60e3);
-    const storlek = () => { F.sig = ''; rita(); };
+    // Storleken ändras (telefonen vrids, adressfältet glider in eller ut): scenen skalas om genast så att
+    // den täcker fönstret (passa), och byggs om först när storleken har stått still en stund, och bara om
+    // vyn eller dukarnas bildpunkter har ändrats (sig). Förut byggdes allt om – alla lager och dukar – vid
+    // varje resize, och i en telefon kommer de en per bildruta medan adressfältet glider: 60 i rad tog
+    // ungefär 600 MB mer minne (som iPhone i Chromium), och sidan kraschade.
+    let storlekT = 0;
+    const storlek = () => {
+      passa();
+      clearTimeout(storlekT);
+      storlekT = setTimeout(() => { if (el.isConnected) rita(); }, 300);
+    };
     addEventListener('resize', storlek);
     rita();
     loop();
     return {
       el,
       ny: () => { F.sig = ''; rita(); },
+      glas,
       ut() {
         cancelAnimationFrame(F.raf);
         clearInterval(T);
+        clearTimeout(storlekT);
         removeEventListener('resize', storlek);
         el.remove();
+        for (const c of dukarna(F.ro)) slapp(c);
+        F.ro = null;
+        // (gängets duk är rummets: rum.js ställer tillbaka den, glas)
+        F.gl = null;
       },
     };
   }

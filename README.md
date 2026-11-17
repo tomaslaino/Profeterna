@@ -408,6 +408,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   *Matchprogrammet* och D *Fanzinet*, sedan de minimalistiska E *Numret*, F *Lördagen* (vald), G *Rubriken* och H
   *Bara namnet*; devisen bland ett tjugotal förslag. Löpsedeln har samma papper, ram, översta rad och namn som förut
   (`forsta` i [public/rum-tidning.js](public/rum-tidning.js), se [Helgarderat](#helgarderat))
+- [x] **Kalenderbladet med omgångens alla dagar (2026-11-16, användarens önskemål: "Förstasidan på helgarderat står 15
+  när det spelades 15+16 … borde alltså ha 15 + 16 på ett passande grafiskt designsätt"):** en omgång på två dagar har
+  dem under varandra på omslaget, lite mindre, med ett kursivt *&* mellan två korta streck (*15 & 16*), och en på fler
+  den första och den sista med *till* mellan. Sidhuvudet säger detsamma (*Nr 2 · 15 och 16 november*), och Hasse Backes
+  tidning ritar samma omslag. Dagarna räknas på avsparkarna i Stockholmstid
 - [x] **Spegeln: man ser vem av de tre man är (2026-11-13, användarens önskemål: "Kan du komma på något smart sätt som
   man kan se vem av de tre som man är inloggad som på animationssidan?", med kravet att det inte får dra mycket
   grafik):** din egen figur vid bordet tittar på markören var den än är i rummet, i telefonen på fingret, och följer
@@ -503,13 +508,8 @@ GitHub Actions (var 30:e min)  →  källorna  →  src/build.js  →  _site/ (H
 - **Analyserna** ingår inte i bygget: datorn committar `data/analyser.json` och
   `data/omgangsnamn.json` till `main`, och den pushen bygger om sajten som vilken annan push
   som helst. Bygget kopierar filerna till sajten. Se [Analyserna](#analyserna).
-- **Hasse Backes röst** är Tomas egen: iMacen läser upp allt han säger och
-  force-pushar ljudet till grenen `rost`, en enda föräldralös commit med `rost.json` och de
-  mp3-filer som behövs nu. Steget *Hämta Hasse Backes egen röst* hämtar grenen (djup 1) till
-  `data/egen-rost/`, som inte committas. Det som saknas där sägs tyst.
-  Allt laddas upp med sajten (`data/rost/`, `data/rost.json`). Inget av det hamnar på main,
-  och en push till `rost` startar inget bygge: nästa schemalagda körning tar med det nya. Se
-  [Ljudet](#hasse-backe).
+- **Hasse Backes röst** är borttagen (2026-11-17): bygget hämtar inte längre grenen `rost`, och
+  sajten har inget ljud av honom när han pratar. Se [Ljudet](#hasse-backe).
 - **Mindre filer** (se [Mindre filer](#mindre-filer)): bygget körs med `--minify`, som gör
   JavaScript och CSS i `_site/` mindre. Lokala byggen gör det inte, så att koden går att läsa i
   webbläsaren; `npm run build -- --minify` bygger som på GitHub Actions.
@@ -1109,6 +1109,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   död – med påhitt som händerna i nacken, skålar över bordet, naglarna, hakan i handen,
   armarna i kors och pannan i bordet, och tre sätt att reagera på ett mål. Se *Gängets humör
   följer kupongen* under [Tobaksaffären](#tobaksaffären).
+- **Gänget är nervöst ibland när matcherna pågår (2026-11-16, användarens önskemål):** "Kan du göra så att vi
+  ibland ser nervösa ut när vi följer matcherna live … vissa resultat t ex. Tänk på naturliga emotioner och att
+  vi inte ska se ut som robotar!" Var och en blir spänd av de matcher där ett mål skulle vända ens eget tips,
+  mest när uddamålet ska hållas mot slutet. Det syns i vågor och olika för var och en (DJ tar det hårdast, DT
+  är den svalaste): stunder framåtlutad med hälen som vippar och ett spänt ansikte, anfall på planen där alla
+  håller andan och sedan blåser ut eller tar sig för huvudet, naglarna och handen för munnen – och lättnaden
+  eller sucken när matchen blåses av. Se *Nerverna under matcherna* under [Tobaksaffären](#tobaksaffären).
 - **Namnet i skrivstil på kupongen, och gänget gör tecken (2026-11-04, användarens önskemål):**
   ett klick på någon i gänget skriver hens namn för hand på kupongen på pulten, i hens egen
   handstil och bläck, i stället för porträtten, och hen gör ett tecken mot en: hang loose,
@@ -1333,6 +1340,44 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   lyktornas och fönstrens sken i stället för att alla är svarta siluetter. Gatan är glesare efter halv sju (`RumUte.trafik`:
   sju gående på dagen, fem till åtta, tre till tio och två sent, en till på fredag och lördag): en regnig måndagskväll
   20.30 syns i snitt en i taget i stället för nästan tre, och halva tiden är trottoaren tom.
+- **Fasaden lättare för telefonen (2026-11-16, användarens önskemål):** "just nu så kraschar ju den där sidan, så det
+  är viktigt att grafiken, att till exempel en gammal mobil klarar av det där". Samtidigt gjordes *Fasaden kraschade i
+  telefonen* (under [Fasaden](#fasaden): rummet döljs under fasaden, dukarna släpps och inget byggs om vid varje
+  resize). Här dessutom lagren: fasadens stilla lager ritades i världens mått och förminskades (i en telefon på höjden
+  till 0,45), och Safari ritar ett lager i dess egen storlek gånger pixeltätheten, så att vart och ett av nio lager tog
+  ungefär 50 MB i en iPhone i stället för 10. Nu är scenen i fönstrets storlek och de stilla lagren fyra i stället
+  för nio (fem med högtidspyntet). Inte provat i en riktig telefon. Se [Fasaden](#fasaden).
+- **Fasaden kraschade fortfarande (2026-11-17, användarens rapport):** "Sidan kraschar fortfarande när man går ut på den
+  här utanför butiken vyn med en mobil." Minnet förklarade det inte längre (i Chromium tar sidan mindre ute än inne).
+  Gänget i fönstret kopierades från rummets WebGL-duk efter varje bild, det enda arbetet på grafikkortet som bara fanns
+  ute; nu står gängets egen duk i skyltfönstret medan rummet inte syns, och inget kopieras. Inte provat i en riktig
+  telefon. Se *Fasaden kraschade fortfarande* under [Fasaden](#fasaden).
+- **Fler karaktärer som går förbi, och de passar 90-talet (2026-11-16, användarens önskemål):** "Kan du göra de här
+  människorna eller personer som går förbi utanför något mer intressanta eller passande utan att de drar speciellt
+  mycket mer grafik? Tänk som sagt på att det ska vara 90-tal och försök att få till fler karaktärer än vad som redan
+  finns." Nya: inlinesåkare med knä- och handledsskydd som skär fram, en äldre med rullator, supportrar i gäng med
+  halsduken i lagets färger, någon med bergsprängaren på axeln, punkare med tuppkam och nitar och hårdrockare med
+  långt hår, tidningsbudet med reflexväst och kärran full av morgonens tidningar i gryningen, turister med karta och
+  kamera på sommaren, skidåkare med skidorna på axeln när det har snöat en ledig dag och julgranen under armen i
+  december, och bland de andra landslagströjan i värmen, magväskan och julklappar i en kasse före jul. Lika många
+  syns samtidigt som förut, och de nya kostar lika mycket per figur som de gamla. Se *Det som händer ute* under
+  [Fasaden](#fasaden).
+- **Fler sätt att gå, och naturligare (2026-11-16, användarens önskemål):** "Kan du få karaktärerna som går utanför
+  tobaksbutiken att gå på fler olika sätt och att det ser naturligt ut? Ja, om de kan variera och få det att se
+  naturligt ut så vore det super." Fem nya sätt som skiljer sig i själva rörelsen, inte bara i steglängd och takt:
+  springer (i luften mellan stegen, landar på mitten av foten, knät högt fram och armarna böjda; joggare morgon och
+  kväll, någon som springer i regnet eller till bussen i rusningen), med käpp (en del äldre: käppen går med det bortre
+  benet och står still mot stenen medan kroppen går förbi), halkar (på snö kring nollan eller blött i minusgrader går
+  sex av tio försiktigt: korta steg med hela foten, böjda knän och armarna ute), trippar (korta, snabba steg, en del
+  med kjol) och släntrar (långa, sega steg, bakåtlutad, armarna svänger löst, axlarna rullar och huvudet nickar). Var
+  och en svänger dessutom armarna på sitt sätt (hur böjda, hur långt fram och i vilken takt), och ibland är bara den ena
+  handen i fickan, också när den andra bär påsen eller paraplyet. Se *Det som händer ute* under [Fasaden](#fasaden).
+- **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "Bilarna verkar åka på samma höjd
+  som gångarna … kan du ordna det så att bilarna kommer liksom lite längre ut på gatan i deras körfält?", "åker något
+  långsammare" och "de ska bete sig som vanliga bilar". Filerna ligger längre ut och gatan syns också i ett brett
+  fönster, bilarna kör ungefär 60 % så fort (de syns i fyra–fem sekunder), och var och en kör som en bil: släpper
+  gasen, bromsar in med bromsljusen tända och tar fart igen, stannar ibland en stund, följer den framför och niger när
+  den bromsar. Se *Bilarna kör ute på gatan, och som bilar* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -1680,6 +1725,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   grenen `rost` som den låg då: 3 227 av 6 698 meningar fick ljud, alla med egen röst, och en gammal
   `data/cache/rost/` togs bort. Sidan är inte ändrad (den slår upp meningen i registret som förut). Se
   [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Hasse Backe utan röst (2026-11-17, användarens beslut):** "Hasse pratar inte längre. Du kan ta bort
+  det". Han pratar inte högt: det han säger står i skriftens takt, som det alltid har gjort när ljudet var av.
+  Bygget hämtar inte grenen `rost` (`src/rost.js` och steget i workflowen är borta), *Läs upp* under hans text
+  och svaret från baren är borta, och iMacens jobb stänger av sig självt nästa gång det körs. *Ljud på* står
+  kvar, för slagen i disken, koppen och de andra ljuden på disken. Se [Hasse Backe](#hasse-backe), *Ljudet*.
 - **Hasse Backe slår domen i disken på fler sätt, och det hörs (2026-11-05, användarens
   önskemål):** han är en bestämd och tydlig herre, så domen slås i disken på ett av fem sätt
   (skrattet, näven, tre slag, båda händerna, fingret och handflatan), och vid ett bestämt ord
@@ -2135,7 +2185,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   [public/tippoang.js](public/tippoang.js): efternamnet – alla i gänget heter Daniel – men *Dogge* för
   Johansson. Allt som skriver ut ett namn i gänget använder den: Olympen (ställningen, kurvan, duellerna,
   utmärkelserna, betygen och kröningen), Omgångens tippare, samtalet och raden på förstasidan, namnen på
-  kupongen, Tipsligan, löpsedeln, tidningen, protokollet och Hasse Backe, vars röst (`src/rost.js`) får
+  kupongen, Tipsligan, löpsedeln, tidningen, protokollet och Hasse Backe, vars röst (då `src/rost.js`) fick
   samma namn. Han kallar honom ibland nästan rätt, *Docke* eller *Dugge* (`felnamn`). Där sidan förut skrev
   hela namn i löptext (Omgångens tippare, *Tippade inte:* och *Ta bort kupongen?*) står nu samma korta namn
   för alla, så att inte bara en heter något annat. Hela namnet står kvar där det måste: Om oss, tryckt
@@ -2730,7 +2780,7 @@ liggande, minst 480 bildpunkter bred och inte en logga (adressen) eller en grafi
 Insider, Football League World m.fl.) och sajterna som är spärrade på datorn läses inte. Samma bild används inte för två
 lag. `sips` förminskar den till 320 bildpunkter (15–35 kB). Provat på omgången 2026-11-07: 25 av 26 lag fick en bild på
 15–20 sekunder, och de flesta visar rätt lag. Bilderna läggs i grenen `tidning-bilder`, en enda commit som skrivs över
-(som rösten i `rost`), så att main inte växer och förra veckans bilder försvinner; workflowen hämtar den till
+så att main inte växer och förra veckans bilder försvinner; workflowen hämtar den till
 `data/tidning-bilder/` och bygget kopierar den till sajten. Går grenen inte att pusha blir det inga bilder och sidan
 visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiserna (se [Tidningen](#tidningen)). `node scripts/analyser/skriv.mjs --tidning-bilder` hämtar bilderna på nytt till tidningen som
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
@@ -4153,7 +4203,15 @@ inbördes möten, spelkassan och Tipsligan i tobaksaffären, med guld som färg.
 finns inte i `gang` i [config/kupong.js](config/kupong.js) och syns inte när tipsen jämförs inför
 gängets kupong, så att spelet går som förut: inlämningen, när tipsen visas, *Alla inne*, förslaget och
 gängets kupong. *Lagkänsla* och *Den oumbärlige* gäller inte honom, och *Närvaro* räknas från hans
-första omgång.
+första omgång och bara i omgångarna han kunde vara med i.
+
+**Bara när hela gänget spelar (2026-11-16, Tomas beslut):** han tävlar bara i en omgång som alla i
+gänget har tippat (`Tippoang.hasseMed`). Annars får omgången ingen kupong av honom, varken i
+`data/tippar-historik.json` eller i omgången som pågår (`tpScore`), så att en omgång som bara han
+spelar inte ger honom något försprång. Ingen kan lämna in när tipsen väl visas, så det står fast när
+omgången skrivs in. En fryst omgång från innan regeln, där han tippade utan hela gänget (landskamperna
+15–16 november), står kvar i filen men hans tips räknas bort när sidan byggs (`utanHasse`), och en
+omgång som ingen i gänget tippade visas inte alls.
 
 Han spelar under samma regel som alla (`regel` i [config/kupong.js](config/kupong.js), 4 spikar,
 5 halvgarderingar och 4 helgarderingar). Kupongen byggs vid bygget (`hasseKupong` i
@@ -4192,7 +4250,8 @@ Säsongen står i Olympen ([public/kampen.js](public/kampen.js)): ställningen s
 prispall med summan av omgångarnas poäng, antal rätt av de spelade matcherna och antal
 gånger som *Omgångens orakel* (bäst) och *Omgångens Ikaros* (sämst), som märken under
 namnet, och modellen som jämförelse, utan placering. Placering efter summan med en
-decimal, sedan antal rätt. En omgång räknas för den som tippade i den. Tabellen
+decimal, sedan antal rätt. En omgång räknas för den som tippade i den – Hasse Backe bara när
+hela gänget tippade (se [Hasse Backe tävlar](#hasse-backe-tävlar)). Tabellen
 *Omgångarna* visar varje omgång med orakel och Ikaros inramade i guld och rött. Döljer
 spoilerskyddet någon match i en omgång räknas hela omgången bort, med *Visa ändå*. (Fram
 till 2026-10-22 stod samma topplista också under omgångens ruta på förstasidan.)
@@ -4757,6 +4816,53 @@ kring ytterändan, ett ögonlock i hudens färg läggs över ögat och rodnaden 
 Bilderna för läget byggs när det ändras (sju till som mest: ansiktena, deras blinkningar och
 skägget) och de förra släpps; skrattar de åt ett skämt är det de vanliga skrattbilderna.
 
+**Nerverna under matcherna** (2026-11-16, `nerverLage` i rum.js, `NERV` och `nervKropp` i rum-3d.js;
+användarens önskemål: "Kan du göra så att vi ibland ser nervösa ut när vi följer matcherna live … vissa resultat
+t ex. Tänk på naturliga emotioner och att vi inte ska se ut som robotar!"). Medan matcherna pågår är var och en
+mer eller mindre spänd (0–1), efter sitt eget tips – allas när de syns, annars gängets kupong, som vid målen.
+En match spänner när ett mål skulle vända tipset:
+
+- **Uddamålet ska hållas** (tipset håller med ett mål, eller krysset i en jämn match): lite tidigt (0,15), mer
+  och mer från 52:a minuten och fullt i slutet (0,5 vid 70 minuter, 0,85 vid 80).
+- **Ett mål skulle rädda tipset:** nästan lika mycket (0,12 → 0,8).
+- **Två mål emellan:** lite, och mindre ju närmare slutet det är; fler mål eller helgardering: inget.
+
+I halvtidsvilan nästan inget. Flera matcher lägger sig på den mest spända, de andra med en fjärdedel var, och
+kupongen väger in: på gränsen (nästa fel tar vinsten) mer, död mindre. Dolda resultat ger inga nerver. Det syns
+inte jämnt utan kommer och går, och olika för var och en – DJ grubblar och tar det hårdast, DL är glad av sig
+och DT den svalaste (`NERV.lynne`):
+
+- **Stunderna** (`nervStund`): i luckor om 11–17 sekunder, olika långa för var och en, kan en stund börja,
+  oftare och längre ju mer som står på spel: framåtlutad mot tv:n, ena hälen som vippar, snabbare andning och
+  ett oroligt eller spänt ansikte (`nervos` i [public/rum-uttryck.js](public/rum-uttryck.js): ögonbrynen högt
+  uppåt inåt, ögonen vidöppna och läpparna ihoppressade och snett, som när man biter sig i läppen).
+  Däremellan sitter man och tittar som vanligt.
+- **Anfallen på planen** (`sitNu`): samma för alla tre, i gemensamma luckor om 23 sekunder och oftare ju
+  spändare den mest spända är. Var och en reagerar en aning efter de andra och så mycket som hen har på spel:
+  lutar sig fram, reser sig lite ur stolen och håller andan med huvudet stilla – och sedan blåser man ut,
+  far bakåt med handen på huvudet när det var nära, eller sjunker bara tillbaka. Den som inget har på spel
+  tittar bara.
+- **Påhitten** (`NERV.meny`): naglarna, händerna knäppta framför munnen, fingrarna som trummar, kliandet i
+  nacken och – nytt – `tittarInte`: vänder sig bort från tv:n med huvudet nere och handen framför ansiktet,
+  tittar upp med handen för munnen och vänder sig bort igen. Den som är mest spänd korsar sig ibland. Medan
+  det står och väger inga gäspningar eller sträckningar, och när alla är spända inget som gänget gör
+  tillsammans (skålen, allsången).
+- **Stämningen** drar mot orolig, så att ansiktet ibland är oroligt också mellan stunderna; man tittar inte
+  bort från tv:n lika ofta, inte heller på de andra, och benen vippar fort som när kupongen står och väger.
+- **Slutsignalen** (`slut`): när en match som någon satt spänd i (minst 0,3) blåses av – puh: bakåt med en
+  lång utandning, blicken i taket, handen på bröstet och ett nöjt ansikte – eller, när tipset inte höll, en
+  huvudskakning med blicken ner, en suck och ett surt ansikte. Inte när rummet öppnas.
+
+Hur ofta det syns (räknat ur luckorna): med full spänning är DJ spänd ungefär 45 % av tiden, DL 26 % och DT
+17 %, och anfallen kommer i ungefär hälften av luckorna; vid halva spänningen 23, 14 och 9 %. Ett mål går före
+allt det här, och under allsången efter ett mål syns inga nerver. Handen kan inte täcka ögonen (huvudena är
+större än armarna når, som håret), därför vänder man sig bort i stället. Bara bålen, huvudet och händerna som
+redan finns rör sig, och det spända ansiktet byggs när det behövs, som stämningarnas: inga nya delar att
+rita. Utan rörelser (calm) bara stämningen och ansiktet efter slutsignalen; i en fast bild (`?rum-t`) allt,
+efter klockan. Prova med `?rum-nerv=dl:0.9,dt:0.9,dj:0.9` (tv:n står då på; `dt:0.6:jagar` för den som jagar
+ett mål) och `?rum-t=18.4` (alla håller andan), `55` (stunderna) eller `60.6` (nära!), `?rum-slut=dl:1,dt:-1`
+och `?rum-akt=dl:tittarInte`.
+
 **Gänget gör saker tillsammans** (2026-11-06, `GRUPP` och `roller` i rum-3d.js): var 31:a
 sekund kan det bli något som alla tre gör, med chansen efter humöret – ungefär två gånger av tre
 som vanligt, nästan nio av tio när det går bra, tre av tio när det är nervöst och sällan när
@@ -5179,23 +5285,77 @@ längst in i hörnet på bardisken, mellan orakelramen och datorn (som står fra
 från gullrankan mitt på disken, lite mindre än i verkligheten och vridet mot affären (`pyntSakerna` i
 [public/rum-inredning.js](public/rum-inredning.js)):
 
-- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian och
-  nyåret ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
+- **Jul** (fredagen före första advent, då affärerna julskyltar, till tjugondag Knut den 13 januari; lucian
+  ligger inom den): en granrisgirlang längs fönstrets överkant – kvistar av gran lagda åt samma håll som i en
   bunden girlang, varmvita små lampor i en slinga runt den, en röd sammetsrosett vid varje krok och röda och
   guldfärgade kulor i bågarna – en adventsstjärna i rött papper i den högra rutan, som lyser inifrån, starkast mot
-  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken.
+  mitten och klart genom slitsarna, och en elektrisk adventsljusstake i vitmålat trä på bardisken. Dessutom tre
+  halmstjärnor med rött garn i trådar ovanför gänget och en julkrans av granris med lingon och en röd rosett på
+  dörrens glas, i ett band från en sugpropp under namnet.
+- **Nyår** (29 december – 2 januari): julpyntet sitter kvar, och serpentiner i lockar hänger från girlangen.
 - **Påsk** (lördagen före palmsöndagen till tisdagen efter annandag påsk): målade ägg – ränder, sicksack, prickar
   och stjärnor i pastell – i band från karmen, och påskris i en vit glaserad kanna med en blå rand, med fjädrar i
-  klara färger och några små ägg bland kvistarna.
+  klara färger och några små ägg bland kvistarna. Tre påskkycklingar av garn vid kannan, och en påskkrans av björkris
+  med fjädrar, små ägg och en gul rosett på dörrens glas.
 - **Midsommar** (måndagen i midsommarveckan till söndagen efter midsommarafton): vimplar i blått och gult längs
-  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar.
+  fönstrets överkant och en glasburk med prästkragar, blåklint, smörblommor, strån och björkkvistar. Lövruskor av
+  björk är bundna vid dörrposterna, med grenarna utåt.
 - **Kräftskivan** (kräftpremiären, andra onsdagen i augusti som på nittiotalet, till sista augusti):
-  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant.
+  kräftlyktor – gula och orange fullmånar med ansikten som lyser inifrån – i ett snöre längs fönstrets överkant,
+  och två till på dörrens glas. I hörnet på bardisken ett fat med kräftor och dillkronor, och en flaska brännvin
+  med två snapsglas.
 - **Halloween** (veckan före alla helgons dag och dagen själv): en urholkad pumpa med ett lysande ansikte på
-  bardisken och ett spindelnät med en spindel i fönstrets övre vänstra hörn.
+  bardisken (och en liten bredvid), ett spindelnät med en spindel i fönstrets övre vänstra hörn och fladdermöss i
+  svart papper i trådar i fönstret och på dörrens glas.
 
-Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på två egna dukar i väggens plan: fönstrets
-under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
+Fler saker kom samma dag (användarens önskemål: "fler föremål … De ska inte vara grafikkrävande"). De är byggda så
+att de inte kostar något medan rummet går: var sak är ett eller några få sammanslagna nät med färgen i hörnen och
+samma material som det andra pyntet (inga nya grafikprogram), och den ritas en gång till sin duk som allt pynt.
+Uppmätt i Chromium: halmstjärnan 630 trianglar, fladdermössen 44 styck, kycklingarna 700 styck, ballongerna 2 600,
+julbocken 2 800, serpentinerna 2 800, midsommarstången 4 800, lövruskan 6 500, kransarna 5 700–8 900 och kräftfatet
+med flaskan 8 700, högst åtta nät per sak, var och en byggd på 1–30 ms en gång; gänget har flera hundra tusen
+trianglar och ritas i varje bildruta.
+
+**Snyggare pynt och pyntet utifrån** (2026-11-16, användarens önskemål: "göra högtidsföremålen på både
+animationssidan och Hasse Backe snyggare … men att det ändå inte drar så mycket grafik. Kom ihåg att vissa av de här
+föremålen också ska vara med på utsidan"):
+
+- **Rosetterna** (girlangen, kransarna och äggen) är av ett brett band: två öglor som droppar ut från knuten med den
+  breda sidan framåt och en grop mot hålet, och två band med vridning och ett snett snitt i änden (`rosett`, `yta`).
+  Förut två ringar som såg ut som ståltråd.
+- **Halmstjärnan** har åtta strån runt halva varvet och sexton uddar, långa och korta om vartannat, platta och blanka
+  med spetsiga ändar, och rött garn som går över och under stråna kring mitten. Förut låg de långa stråna två och två
+  på samma led, så att stjärnan blev ett kors med två sneda strån.
+- **Girlangen och julkransen** är fylligare: i varje led av granris är de första korten kortare och mörkare, som djupet
+  inne i riset (`barr`), och fler kort per led. Girlangen har en klase om två eller tre kulor som hänger olika långt i
+  varje båge, små kulor i riset vid rosetterna och en kotte i varje båge, och lamporna sitter tätare. Kransen har
+  lingon runt om med lingonblad, tre kottar nedtill och rosetten fram ur riset. Kottarna har fjäll i förskjutna ringar,
+  ljusa i kanten och mörka i springorna (`kotte`).
+- **Julbocken** (hos Hasse) är buntar av halm, randiga på längden med stråna i olika toner, och breda röda band som
+  ligger an mot halmen, med ändarna avskurna. Förut släta rör med röda ringar som stod ut.
+- **Serpentinerna** är remsor som hänger i en lös skruv med den breda sidan utåt, glesare nedåt. Förut tunna rör i
+  sicksack. **Bladen** (lövruskorna och midsommarstången) är runda nedtill och spetsiga upptill som björkens (förut
+  romber), och blommorna på stången platta kronor med en mitt (förut färgade kulor).
+
+Allt är som förut några få sammanslagna nät per sak med färgen i hörnen och samma material, och ritas en gång: kulorna
+i girlangen är två nät i stället för tre per kula. Uppmätt (`r.info` efter en bild): girlangen 7 900 → 13 400
+trianglar, kransen 5 700 → 9 100, julbocken 2 800 → 4 900 och halmstjärnan 600 → 490, i samma eller färre ritanrop.
+
+**Utifrån** (`pyntUtifran` i [public/rum-inredning.js](public/rum-inredning.js), `pynt` i
+[public/rum-fasad.js](public/rum-fasad.js)): det som hänger i skyltfönstret och på dörrens glas syns från trottoaren
+(se [Fasaden](#fasaden)) – stjärnan, girlangen, halmstjärnorna och julkransen, äggen och påskkransen, vimplarna och
+lövruskorna, kräftlyktorna, spindelnätet och fladdermössen. Samma saker och samma scener som inne, ritade en gång till
+genom en kamera ute på gatan, rakt in och därför spegelvänt (stjärnan som hänger till höger inifrån hänger till
+vänster utifrån, och kransen och girlangen ses bakifrån). Rutan är glaset i scenens mått (`UT_GLAS`), i fönstret från
+karmens överkant så att girlangen syns under skylten, med höjden efter rutan på fasaden så att inget dras ut. Ljuset
+utifrån är dagsljuset mot glaset och lite ljus från gatan; det som lyser lyser som inne, och skenet kring det ritas
+först för sig så att det ligger bakom saken (inifrån ligger det på glaset bakom). Bilden läggs på två dukar
+(`.rf-pynt`) framför neonen och bakom glaset, så att speglingen, imman och dropparna ligger över pyntet, och ritas
+bara när fasaden ritas om (vädret och ljuset), aldrig i bildrutorna. Utan pynt, eller innan rummets 3D-delar är
+klara, finns dukarna inte.
+
+Pyntet byggs i three.js som inredningen, i centimeter, och ritas en gång på tre egna dukar i väggens plan: fönstrets
+och dörrens under neonen, som hänger framför fönstret, och hörnets framför tavlorna på högra väggen och bakom datorn
 (`PYNT_BITAR`). Det som lyser – stjärnan, lamporna, lyktorna och pumpan – lyser av sig självt och har ett sken som
 målas på väggen och glaset, och på kvällen går rummets mörker runt dem som runt neonen och spotarna och lysrörets
 värme ligger kring dem (`pyntLjus`, `ljusKlockan` i [public/rum.js](public/rum.js)); det andra mörknar med
@@ -5457,10 +5617,12 @@ finns (`bast`, `samst`, `datorn`, `ledare`, `skrall`, `kross`, `kupong`, `rysare
 `?rum-fika=semlor` (`pepparkakor`, `lussekatter`, `kanelbullar`, `paskagg`,
 `chokladbollar`) fikat, `?rum-ol=jul` (`pask`) ölen och `?rum-fest=jul` (`lucia`, `nyar`,
 `pask`, `midsommar`, `inget`) högtidskläderna och `?rum-pynt=jul` (`pask`, `midsommar`, `kraftor`,
-`halloween`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
+`halloween`, `nyar`, `inget`) högtidspyntet, i rummet och hos Hasse. Gänget: `?rum-plats=0` (`1`, `2`)
 var de sitter vid bordet, `?rum-vantar=DL,DT` som om de inte hade lämnat in,
 `?rum-stopp=<timmar>` som om det var så långt kvar till spelstoppet, `?rum-tittar` som
-om matcherna pågick och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
+om matcherna pågick, `?rum-nerv=dl:0.9,dt:0.4:jagar` hur spända de är av matcherna (och tv:n på; se *Nerverna
+under matcherna*), `?rum-slut=dl:1,dt:-1` att en match de satt spända i blåstes av (tipset höll, höll inte;
+vid tiden 0 med `?rum-t`, annars var femtonde sekund) och `?rum-mal=dl:1,dt:-1,dj:0` ett mål
 (rätt, fel, ingen skillnad; vid tiden 0 med `?rum-t`, annars var femtonde sekund; `dl:1b`
 väljer sättet: `a` som förut, `b` båda armarna eller händerna på huvudet, `c` handen i
 bordet), `?rum-humor=glad` (`nerv`, `deppig`) humöret, `?rum-rank=dl:1,dj:-1` vem som
@@ -6670,7 +6832,8 @@ skärm syntes det inte alls: scenen skars lika mycket uppe som nere, och hela ta
 
 - **Undertaket** (`innertak` i [public/rum-inredning.js](public/rum-inredning.js), en egen duk under allt annat i
   bakväggens plan): ett 90-tals undertak i three.js med plattor på 60 × 60 cm (120 enheter) i ett bärverk av
-  vitlackerad plåt och en vinkellist mot väggarna, sett med samma kamera som takfläkten. Fläkten sitter mitt i en
+  vitlackerad plåt (gulnad av röken, se *Taket i bakgrunden* nedan) och en vinkellist mot väggarna, sett med samma
+  kamera som takfläkten. Fläkten sitter mitt i en
   platta, och ljuset från glaskuporna faller upp i taket med skuggan av bladen (en osynlig kopia av fläkten som bara
   kastar skugga; glaset och hållarna precis över lamporna är borttagna, annars låg en mörk fläck över halva taket).
   Spotskenan, som också satt i plattorna, är borttagen (se *Spotskenan togs bort* ovan). Plattorna är gulnade av röken och brunast över
@@ -6707,6 +6870,24 @@ blad med ljusa rottingfält. Nu lyser den på bordet utan att dra blicken till s
 
 Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som dator (1440 × 900) klockan
 14 och 21.30 och som telefon (412 × 870).
+
+### Taket i bakgrunden (2026-11-16)
+
+Användarens önskemål: "Kan du göra taket ngt mindre prominent. Det tar en del fokus här. Behåll 90-talsstuket o ge det
+lite patina/rökpåverkan." I telefonen på höjden, där taket fyller bilden ovanför Stryktipset-bandet, var undertaket
+(`innertak` i rum-inredning.js) ett ljust rutnät: bärverket i nästan vit plåt över gulnade plattor, och ett
+frånluftsdon med skarpa svarta springor. Nu är det samma 90-talstak, men så som det ser ut efter många år av rök:
+
+- **Bärverket gulnat** (`plat`): nästan i plattornas ton och mattare, så att rutnätet syns utan att lysa.
+- **Plattorna mörkare och ojämna:** mer nikotin överallt (`GUL`, `BRUN`, `brun`), stråk där röken drog fram, en mörk
+  sotring kring fläktens fäste, mjuka fläckar på varje platta och sot längs kanterna mot bärverket.
+- **Frånluftsdonet smutsigt:** gallret i plattornas gulnade ton och springorna mindre svarta.
+- **Mindre ljus underifrån** (`HemisphereLight` och kupornas ljus i takets scen), så att taket klingar av i dunkel
+  mot betraktaren och ljuset ligger kring fläkten.
+
+Takets ljusstyrka i telefonen (430 × 932, medel i gråskala över taket): klockan 14 65 → 50, klockan 22.50 39 → 31.
+Inget nytt lager och inget nytt ritas i bildrutorna. Provat i Chrome med mjukvarugrafik som telefon (430 × 932) klockan
+14 och 22.50 och som dator (1440 × 900).
 
 ### Utsikten och vädret
 
@@ -6804,14 +6985,17 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
 
 - **Gänget i fönstret:** genom skyltfönstret syns vi vagt, bakifrån, vid barbordet – inte en ritning utan samma 3D-scen
   som inne (`utifran` i rum-3d.js): en kamera ute på trottoaren i ögonhöjd ser vinkelrätt in genom glaset (`FONSTER`, en
-  ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och rutan kopieras till fasadens duk i
-  samma uppgift som den ritas. Rutan som kopieras är `STORRE` (1,25) gånger glaset med samma mitt och nederkant, så att
+  ruta i världen från fönsterbänken upp med samma form som fönstret i fasaden), och det den ser ritas i gängets egen duk,
+  som står i skyltfönstret medan rummet inte syns (`glas` i rum.js; se *Fasaden kraschade fortfarande* nedan). Rutan
+  är `STORRE` (1,25) gånger glaset med samma mitt och nederkant, så att
   gänget blir lika stort som de som går förbi på trottoaren (förut var huvudena dubbelt så stora). Därför är det samma kläder, frisyrer, mössor, flaskor, radion och ampelliljan som inne, och
   de rör sig lika jämnt som inne (se *Gänget i fönstret hackar inte* nedan; en gång i en fast bild). De sover
   på natten och festar i julkläder som inne. Neonen bakom dem lyser mindre på ryggarna än inifrån på ansiktena. Bakom
   dem rummet, lite ur skärpa: lysröret i taket, hyllan med cigarettpaketen (paketen går att se), bardisken, tv:ns blå
   sken och Tipsligan på väggen till vänster (rummets högra vägg), och genom dörren Hasse Backe vid baren, vagare. Framför dem neonskylten *Tobak*,
   som läses rätt härifrån och glappar samtidigt som inne (`neonOn`), och skivan med löpsedlarna med baksidan ut.
+- **Högtidspyntet:** runt högtiderna hänger samma pynt som inne i skyltfönstret och på dörrens glas, sett utifrån och
+  spegelvänt (se *Högtidspyntet* ovan, `.rf-pynt`).
 - **Glaset:** det sitter djupt i karmen (skugga upptill och till vänster), med imma nertill när det är kallt ute och
   varmt inne, droppar efter regn som små linser (mörk kant, en ljusprick nertill och en glans) och några som har runnit
   och lämnat ett spår ned mot blecket.
@@ -6851,7 +7035,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
   (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
   barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
-  tidningen i regnet och hundar (labrador, schäfer, tax, terrier och pudel, `HUNDAR`; de små i täcke när det regnar).
+  tidningen i regnet, någon som joggar morgon och kväll (`joggare`: myskläder i färgblock eller shorts och t-shirt,
+  gympadojor, pannband och ibland en gul sportfreestyle) och hundar (labrador, schäfer, tax, terrier och pudel,
+  `HUNDAR`; de små i täcke när det regnar).
   Det är 90-tal och kläderna är efter vädret (`klad`, `F90`, `vadret`): vindjackor och myskläder i färgblock, dunjackor
   med stickningar, skinnjackor, bomberjackor, jeansjackor, fältjackor, trenchcoats, kappor och kavajer, vida jeans,
   kjolar, bakvända kepsar, fiskarhattar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar, portföljer
@@ -6863,10 +7049,26 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   del äldre går framåtböjda, och fler frisyrer (knut, afro) och hattar (sixpence, basker). Paraplyerna är vanliga,
   golfparaplyer i två färger, små hopfällbara eller genomskinliga bubblor ner över huvudet (`PARAPLY`, `parForm`: en
   kupol sedd från sidan med kilar och spröt), och en del bär gitarr på ryggen, bandybag med innebandyklubbor,
-  pizzakartong (på kvällen) eller blommor. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
+  pizzakartong (på kvällen) eller blommor. Sedan 2026-11-16 också (`vemGar`, `sallskap`): inlinesåkare (`skrinna`,
+  `skridTab`: varje ben skjuter ifrån bakåt med hjulen mot stenen i halva varvet och förs fram böjt och lite lyft i den
+  andra, höften lägre och överkroppen framåtlutad, fötterna glider med kroppen; kängor med fyra hjul i neon, ofta knä-
+  och handledsskydd; när det är torrt och minst 7 grader på dagen, fler på sommaren), en äldre med rullator (handtagen,
+  fyra hjul, sitsen och korgen med en kasse i, på dagen), supportrar i gäng med halsduken i lagets två färger
+  (`LAGEN`: Stockholmslagen och engelska lag som många höll på; lediga dagar 11–19.30 och vardagskvällar), någon med
+  bergsprängaren på den bortre axeln bakom huvudet och handen på handtaget, tidningsbudet med reflexväst (ränderna
+  lyser i ljuset i mörkret) och dragkärran med tidningsbuntar mellan 4.30 och 7, turister med karta, kamera på magen
+  och magväska på sommaren, skidåkare med skidorna på den bortre axeln och stavarna i handen när det har snöat en
+  ledig dag, och julgranen i nät under armen 7–23 december. Bland de unga finns punkare med tuppkam i neon, nitar och
+  Dr. Martens och hårdrockare med långt hår i skinnjacka, i värmen ibland landslagströjan (gul med blå krage och
+  ärmkant), och magväskan och julklappar i en papperskasse (före jul) finns bland de andra. De ritas med samma sorts
+  delar som de andra: i en bromsad provmiljö (headless Chrome, processorn ×4) 650–940 µs per figur och bild mot
+  610–1350 för de gamla sorterna, och lika många syns samtidigt som förut. `?rum-fasad-vem=inlines` (eller `rullator`,
+  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `cykel` …) låter alla som går förbi vara sådana,
+  för bilder och prov. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
-  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och bara
-  den som har båda händerna lediga kan ha dem i fickorna. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
+  glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
+  käppen är i den närmre. En ledig hand kan vara i fickan, ibland bara den ena (`st.ficka`: F, B eller båda), också
+  när den andra bär påsen eller paraplyet. De har form – lår och knän, kappa med krage och bälte, huvudet i profil med näsa, öga
   och haka (`figurDelar`) – och på kvällen är de siluetter med ljus i kanten från det som lyser bakom dem, starkast
   framför fönstret (`randLjus`), och speglas svagt i den våta stenen; kläderna behåller en fjärdedel av sin färg
   (`NATTF`, `klarL`), så att en röd dunjacka går att skilja från en svart kappa. Där det är mörkt är de lika mörka som mörkret
@@ -6882,10 +7084,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   efter hur långt den har gått, diagonala ben i par och tassen stilla mot stenen, med kopplet i en stilla hand; hjulen
   på barnvagnen, cykeln och dragkärran rullar på samma sätt. Var och en går på sitt sätt (`STILAR`, `gangStil`): vanlig, rask
   (långa steg, snabbt, framåtlutad, stora armsvingar), strosar (korta steg, långsamt, ofta händerna i fickorna),
-  studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram) och rak (upprätt, raka
-  knän), och var och en lite olika inom sitt sätt (steglängd, takt, lutning, armsving); farten är steglängden gånger
-  takten, 0,9–1,6 m/s. Sättet passar den som går (den äldre strosar, barnet studsar, den som blir blöt skyndar sig) och
-  ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
+  studsar (knät ger efter mer och hälen lyfts högt), lunkar (korta släpiga steg, lutar sig fram), rak (upprätt, raka
+  knän), trippar (korta, snabba steg och små armrörelser) och släntrar (långa, sega steg, bakåtlutad, armarna svänger
+  löst och axlarna rullar med dem, `rull`, och huvudet nickar en gång per steg, `nick`). Tre skiljer sig mer: på halkan
+  sätts hela foten i på en gång (`hal`), stegen är korta och knäna böjda, foten går lågt och armarna hålls ute framför
+  kroppen (`armar: 'balans'`); med käpp går den äldre framåtböjd med korta steg, och käppen i den närmre handen går med
+  det bortre benet (`kappen`): spetsen sätts i en bit framför där den bortre hälen sätts i, står still mot stenen medan
+  kroppen går förbi och förs fram i en låg båge, och armen böjs i armbågen så att handen håller handtaget; och den som
+  springer är i luften mellan stegen (`lop`: höften lägst mitt i steget, när knät tar emot), landar på mitten av foten,
+  för låret långt fram och drar tillbaka det innan foten tar i (`drive`) och pumpar med böjda armar (utom den som bär
+  något i handen). Var och en är lite olika inom sitt sätt (steglängd, takt, lutning, armsving, och hur böjda armarna
+  är, hur långt fram de svänger och i vilken takt); farten är steglängden gånger takten, 0,7–1,6 m/s, och 2,8–3,3 m/s
+  för den som springer. Sättet passar den som går (den äldre strosar och ibland med käpp, barnet studsar, den unga
+  släntrar ibland, med kjol trippar en del, den som blir blöt skyndar sig och ibland springer, och i rusningen
+  springer någon till bussen), på halkan (`vadret`: snö på marken kring nollan, eller blött i minusgrader) går de
+  flesta i ett sällskap försiktigt, utom barnen, och ett sällskap går i den förstas fart. Kantljuset ritas bara där det syns (nära fönstret, dörren och lyktorna). Med
   fyra gånger så långsam processor kostar fler figurer 0,2 ms mer per bild på dagen och 0,5 ms mer i kvällsregn som
   telefon, och ungefär 3 ms mer i kvällsregn i datorn (2026-11-16).
   Gångcykeln räknas ut en gång per figur och var i den en figur är tas av hur långt den har gått, så att fötterna står
@@ -6917,35 +7130,58 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke,
   skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
-  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, i 12–18 km/h, tre–fyra
-  gånger så fort som de som går på skärmen, så att en bil syns i ungefär tre sekunder (förut knappt två).
-  Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 14 % på dagen och 31 % i
-  rusningen), och i rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in, står med bromsljusen tända (och
-  avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
+  2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
+  som de som går på skärmen, så att en bil syns i fyra–fem sekunder (se *Bilarna kör ute på gatan, och som bilar*
+  nedan). Hur ofta följer `RumUte.trafik` (skyltfönstret skyms ungefär 2 % av tiden mitt i natten, 18 % på dagen och
+  40 % i rusningen), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
+  bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför,
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
   regnet stänker det bakom hjulen och fordonen och deras lyktor speglas i den våta gatan, och det ligger snö på taken
   när det har snöat. Allt räknas ur tiden: den delas i luckor om tolv sekunder per fil och i varje lucka kommer ett
   fordon (ibland två efter varandra) eller inget, lottat ur luckans nummer, och köerna har egna luckor; ett fordon kommer
-  bara när de i de två luckorna före är ute ur världen, så ingen kör igenom någon. Andra vyer som vill rita samma
+  bara om det aldrig hamnar för nära något som kör före, så ingen kör igenom någon. Andra vyer som vill rita samma
   fordon har `RumFasadGatan.FORM` och `.fordon` (`nytt`, `valj`). Fordonen ritas med vektorer (inga bilder) i `rf-fram`
   efter dem som går och före regnet, ungefär 0,1 ms per bild, och medan något kör förbi ritas duken 60 gånger i
   sekunden (30 i telefonen), så att de inte hoppar fram.
+- **Bilarna kör ute på gatan, och som bilar (2026-11-16, användarens önskemål):** "bilarna verkar åka på samma höjd som
+  gångarna", "åker något långsammare … svårt att se dem" och "de ska bete sig som vanliga bilar". Filerna ligger nu
+  1,3 och 1,72 m ut (förut 1,02 och 1,24, alldeles innanför trottoarkanten, så att hjulen stod i höjd med fötterna på
+  dem som går), med mittlinjen 1,51 m och kanten mittemot 2,02 m ut, och i ett brett fönster syns marken ut till
+  1,95 m (`SYNS`; `vy` i rum-fasad.js tar hälften av det som fattades nertill genom att visa mer och hälften från
+  överkanten). Farten är ungefär 60 % av förut (2,1–2,7 m/s på dagen i den tecknade gatan, 1,9–2,4 i rusningen,
+  2,5–3,2 på natten, bussarna 1,8–2,2), så att en bil syns i fyra–fem sekunder i stället för två–tre, och det kommer
+  ungefär en fjärdedel färre, så att skyltfönstret inte skyms mycket mer än förut. Var och en har sin färd (`D` i
+  rum-fasad-gatan.js: delar med jämn acceleration, `kor`): de flesta kör förbi i jämn fart, men framför affären
+  släpper ibland föraren gasen (utan bromsljus), bromsar in med bromsljusen tända och tar fart igen, eller stannar och
+  står en stund (bussarna stannar inte, plogbilen kör jämnt); oftare i rusningen, sällan på natten. Den som kör efter en
+  annan gör som den, en stund senare och på samma ställe (`efter`, som i Newells modell), så att bromsljusen tänds
+  efter varandra, och ett fordon kommer bara om det aldrig hamnar för nära något framför (`haller`). Karossen niger när
+  de bromsar och reser sig när de tar fart, genom fjädringen: en dämpad svängning efter varje ändring av
+  accelerationen, så att den gungar tillbaka när bilen stannar (`fjader`, `niga`; hjulen står kvar). Provat i en
+  simulering av en timme i varje tid på dygnet (inga fordon i varandra) och i bilder från datorn och telefonen, dag,
+  regnig kväll och snö.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
-som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som hos Hasse Backe)
-och ritas som vanligt innan det syns igen, eftersom gängets duk har haft bilden utifrån; medan rummet syns i
-övergången ritas gänget tillbaka inifrån direkt efter varje bild utifrån. Scenen ritas i meter-skala på fasaden och
+som satt där man klickade). Rummet står still bakom så länge (`R.vilar`, som hos Hasse Backe) och syns inte; gängets
+duk står då i skyltfönstret och tonar fram där när rummet har dolts (0,42 s in). När man går in står den kvar i
+0,15 s, medan fasaden ännu täcker rummet, och ritas sedan inifrån innan rummet syns. Scenen ritas i meter-skala på fasaden och
 den del som syns väljs efter fönstrets form (`vy`): skylten, skyltfönstret och dörren syns alltid; i ett brett fönster
-bron och himlen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är en SVG per lager som
-ritas om när ljuset eller vädret ändras (en gång i minuten prövas det). Det som rör sig ritas i tre dukar: `rf-fram`
+bron och himlen och gatan ut till den närmre filen, i en telefon på höjden fler våningar och mer trottoar. Det som står still är fyra SVG:er, en
+mellan varje duk (himlen; bortom bron och rummet; fönstret, neonen, glaset, huset, bron, marken, gatan och texten;
+kvällens ljus), som ritas om när ljuset eller vädret ändras (en gång i minuten prövas det); när det finns högtidspynt
+delas den tredje vid pyntets dukar, mellan neonen och glaset (`pyntBilder` tar fram pyntet innan scenen byggs). Scenen är i fönstrets
+punkter (`F.k` per enhet i världen) och förminskas inte: Safari ritar ett lager i dess egen storlek gånger
+pixeltätheten, och förut, i världens mått, tog vart och ett av nio lager ungefär fem gånger så mycket minne som det
+syns i en telefon på höjden (2026-11-16). När storleken ändras skalas scenen om så länge (`passa`), tills den byggs
+om. Toningen in har inget eget lager när den är klar. Det som rör sig ritas i tre dukar: `rf-fram`
 överst (speglingarna i stenen, bilarna i glaset, de som går och den som har stannat, bilarna och bussarna på gatan, regnet, snön och blixten; i
 dimma samma dis över dem med `source-atop`), `rf-bak` bakom huset där himlen syns (molnen, suddiga en gång var,
 fåglarna och fyrverkerierna) och `rf-barber`, barberarens stång, under kvällens mörker. De ritas högst `TAKT` gånger i
 sekunden (30, i telefonen 24; molnen ensamma 8, stången 15), bara när något som rör sig syns, med högst två miljoner
 bildpunkter. Förut var det 27 CSS-animeringar i egna lager (benen och armarna på SVG-barn, regnet i två band över hela
 bilden, bilarna, molnen): fasaden hade 35–38 lager, ungefär tio skärmytor som lades ihop 60 gånger i sekunden. Nu är
-det 5 lager i telefonen och 8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
+det 4–5 lager i telefonen och 6–8 på datorn, inga animeringar, och i telefonstorlek med processorn ×4 sjönk huvudtrådens
 arbete från ~300 till ~65–120 ms/s (headless Chrome, `?rum-kval=1`, regn på kvällen); på datorn är grafikprocessens tid
 ungefär som förut. Med `prefers-reduced-motion` står allt still och ingen går förbi. `?rum-fasad` öppnar den direkt
 (för bilder, med `?rum-t` står allt det som rör sig på den tiden).
@@ -6955,10 +7191,10 @@ och var 240:e i telefonen (9 och 4 bilder i sekunden, medan regnet och de som g�
 varje gång hela gängets duk, två till tre gånger fler bildpunkter än det som kopierades. Nu:
 
 - **Bara glaset** (`utifran` i rum-3d.js): kameran ser glaset och inget annat (ett snett synfält med
-  `makePerspective`, eftersom ögat inte står mitt för fönstret), med fasadens dukens bildpunkter och högst så många som
-  glaset fick förut (`H` gånger `prNu`), så att skärpan är densamma. Medan rummet står still krymper gängets duk till
-  just det (`UTE.krympt`); `draw` ger den rummets storlek igen när gänget ritas inifrån (`inneStorlek`), och `narbild`
-  och `kval` vet om det. I övergången, medan rummet syns, ritas glaset i dukens nedre hörn utan att duken krymper.
+  `makePerspective`, eftersom ögat inte står mitt för fönstret), med bildpunkter efter fönstrets storlek på skärmen och
+  högst så många som glaset fick förut (`H` gånger `prNu`), så att skärpan är densamma. Medan rummet står still krymper
+  gängets duk till just det (`UTE.krympt`); `draw` ger den rummets storlek igen när gänget ritas inifrån
+  (`inneStorlek`), och `narbild` och `kval` vet om det.
 - **Skuggorna var fjärde gång** utifrån, i samma bild (på steg 0 var de en fjärdedel av arbetet).
 - **I rummets takt, efter bildrutan** (`gang`, `gangDags` i rum-fasad.js): lika ofta som gänget ritas inne
   (`o.takt`, `KVAL` i rum.js: 30, 20 eller 15), direkt efter bildrutan genom en `MessageChannel` som `efterBild` inne,
@@ -6971,6 +7207,52 @@ inga fler långa bildrutor; som telefon 4 → 20 i sekunden. Med processorn ×4 
 7–13 bilder av gänget i stället för 4–8,5, och resten jämnare än förut (som dator 50 → 58 bilder i sekunden, långa
 bildrutor 88 → 13 i bästa paret). Tiden går nästan helt till three.js egna ritanrop (~220 utifrån i telefonen, ~300 på
 steg 0), inte till bildpunkterna; delar som blir under två bildpunkter stora utifrån är bara 30 av 223, så de står kvar.
+
+**Fasaden kraschade i telefonen (2026-11-16, användarens rapport: "sidan kraschar ständigt när jag ser butiken
+utifrån och är inne i mobilen"):** sidan tog för mycket minne ute, och telefonen stängde den. Tre orsaker,
+mätta i Chromium som iPhone 13 och Pixel 7 (gammal och ny kod i samma körning, minnet för alla webbläsarens processer):
+
+- **Rummet låg kvar under fasaden.** Det stod still (`R.vilar`) men ritades fortfarande: 155 lager, varav
+  rummets 29 megapixel på skärmen, under en fasad som täcker allt. Nu döljs det när fasaden har tonat fram
+  (`.fasad-tackt` på `.rum`, satt i `fasad` i rum.js samtidigt som `R.vilar`, och borttagen innan man går in):
+  `content-visibility: hidden` och `visibility: hidden` på `.rum-sving` (i rum-fasad.css), och på allt i det, så att
+  inte heller det som visas med `visibility: visible` (radion, pratbubblorna, videon) syns. Gängets duk ritar ändå
+  glaset (`utifran`). Ute nu 11 lager och 12 megapixel på skärmen, i stället för 155 och 29.
+- **Dukarna släpptes inte.** Varje gång man gick ut och in blev cirka 25 MB kvar (dukarnas bildpunkter väntade på
+  skräpsamlingen, medan JS-minnet låg still): 1 204 → 1 808 MB efter 24 varv. Nu sätts fasadens dukar till noll
+  storlek när de byts ut eller fasaden tas bort (`slapp`, `dukarna` i rum-fasad.js: scenens, gängets glas,
+  bilarnas och molnens). Efter 24 varv 1 224 → cirka 1 470 MB, stilla från det fjärde varvet.
+- **Allt byggdes om vid varje resize.** I en telefon kommer de en per bildruta när adressfältet glider in eller ut,
+  och 60 i rad byggde om fasaden 59 gånger: 1 288 → 1 845 MB. Nu skalas scenen om genast (`passa`) och byggs om
+  300 ms efter att storleken har stannat, bara om vyn eller dukarnas bildpunkter har ändrats (`sig`, med
+  bildpunkterna i steg om en åttondel): 13 ombyggen och högst 1 500 MB i samma prov (i emuleringen tar varje
+  resize så lång tid att de inte hinner slås ihop helt; i en telefon blir det ett).
+
+Det som syns är detsamma: gänget i fönstret, övergångarna in och ut och rummet när man kommer tillbaka.
+
+**Fasaden kraschade fortfarande (2026-11-17, användarens rapport: "Sidan kraschar fortfarande när man går ut på den här
+utanför butiken vyn med en mobil"):** minnet förklarade det inte längre. I Chromium som Pixel 7 och iPhone 13, med regn
+på kvällen, tog sidan ute 960–1 040 MB mot 1 100–1 160 MB i rummet, och under övergången ut som mest 35 MB mer än i
+rummet. Det enda arbetet på grafikkortet som fanns ute men inte inne var kopieringen: gänget ritades i rummets WebGL-duk
+och kopierades till en duk i fasaden efter varje bild (`drawImage` från WebGL, 15–30 gånger i sekunden). Det liknar det
+som fick Chromes grafikprocess att krascha i Pixel 10 (se *Ingen skuggkarta på PowerVR*): något ritas i en duk och läses
+sedan därifrån i samma bild. Kraschar grafikprocessen laddas sidan om (`webglcontextlost` i rum.js), och det ser ut som
+att sidan kraschar.
+
+Nu lånas gängets egen duk ut till skyltfönstret medan rummet inte syns (`glas` i rum.js, `glas` och `placera` i
+rum-fasad.js, `lana` i rum-3d.js): den flyttas in i fasaden, mellan rummet bakom glaset och fönstrets SVG, krymper till
+glaset och visar själv det som ritas i den, som inne. Inifrån ritas inget i den så länge (`draw`), och när man går in får
+den tillbaka sin plats och stil och ritas inifrån innan rummet syns. Fasaden har ingen duk för gänget längre och
+kopierar inget. Ute gör sidan alltså bara sådant som den redan gör inne i Pixel 10. Det som syns är detsamma (jämfört sida
+vid sida, som telefon och dator), utom att gänget tonar fram i fönstret när rummet har dolts, i stället för att synas från
+början.
+
+Mätt i headless Chrome som Pixel 7 (regn på kvällen, steg 1, gammal och ny om vartannat, två varv, 10 s ute): sidans tråd
+179–211 → 145–152 ms/s, och gänget hinner ritas 3–4 gånger så ofta (106–206 → 713–782 ritanrop i sekunden, ungefär 220
+per bild), eftersom kopieringen inte längre tar tid av det (`GANG_ANDEL`); därför mer arbete i grafikprocessen, som här
+ritar i mjukvara (1 550–2 210 → 2 380–2 560 ms/s). Minnet är detsamma. Snabbt ut och in, ut och genast in igen och att
+lämna rummet medan man står ute ger samma duk i rummet efteråt, och en fast bild (`?rum-t`) har gänget i fönstret. Inte
+provat i en riktig telefon.
 
 ### Kupongen i handen
 
@@ -8444,7 +8726,9 @@ adventsljusstaken, påskriset, blommorna eller pumporna står på bardisken till
 löpsedel. Det ritas en gång genom hans kamera på en egen duk mellan väggen och honom (`.rh-pynt`), när bilden passas
 in och när ljuset ändras, och är lika oskarpt som väggen på det djupet, som löpsedeln. Ljuset är barens: lysröret,
 dagsljuset bakifrån genom glaset och mörkret, som på honom; det som lyser lyser ändå. På höjden står det närmare
-honom, så att det ryms i den smalare bilden.
+honom, så att det ryms i den smalare bilden. Bredvid, längre åt höger, står fler saker där bilden är bred: en julbock i halm med röda band och två halmstjärnor
+till jul, ballonger i guld, silver och svart till nyår, påskkycklingar vid påskriset, en liten midsommarstång lindad
+med löv och blommor, kräftfatet med brännvinet (i stället för något annat på disken) och fladdermöss i glaspartiet.
 
 **Panoreringen.** Rummet och hans bild ligger bredvid varandra, med hans till vänster och en bit
 vägg emellan, och allt glider åt höger på en halv sekund, som när kameran vrids åt vänster: den kommer
@@ -8984,8 +9268,7 @@ versaler som texten i bandet. Rutorna 1 X 2 står inte här: de kommer först n�
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
 lapp i terrakotta, med *Alla matcher* i krämvitt bredvid (*Fyll i den* i stället för *Titta igen* medan han
-föreslår att fylla i kupongen, se *Din kupong*), och *Läs upp* står bredvid dem med samma versaler som *Matchbladet →* men
-utan pil. Han har alltid svaret (*Den knäckte jag i morse*). Är analysen inte skriven än
+föreslår att fylla i kupongen, se *Din kupong*). Han har alltid svaret (*Den knäckte jag i morse*). Är analysen inte skriven än
 säger han det (*Den tar jag sen*). En match du redan har frågat om står direkt, som han sa
 den: domen i guld, hans text och resultatet, och sist vad han tycker om det du har på kupongen nu.
 Det han sa sparas på enheten, så att det står kvar också när analysen har skrivits om sedan dess
@@ -8999,16 +9282,9 @@ sparades (före 2026-11-06) får dagens analys om tecknen är desamma, annars ba
 resultatet. När du har bett om analysen står hela hans text direkt (`svara` i [public/rum-hasse.js](public/rum-hasse.js)).
 Medan man läser slår han domen i disken (se *Slaget*), och domen står i guld när handen träffar; dess plats är hållen
 från början, så att texten står still, och har han något annat i händerna står domen där ändå efter tre sekunder.
-*Läs upp* under texten låter honom läsa den med sin röst (`lasUpp`, och det hörs, se *Ljudet*): en mening i taget med
-munnen efter ljudet, och meningen han läser står ljus medan resten är dämpad. Det blir en paus mellan meningarna och en
-längre före en kort mening, och gesterna kommer vid de bestämda orden (*Nej nej nej* och *varningens finger* ger
-fingret, annars handflatan i disken eller en av gesterna i *Händerna när han pratar*) eller vid ungefär var tredje lång
-mening, när han sitter så att han kan göra dem. Han läser det som står i rutan: ett stycke som har ljud för sig (en
-färdig replik, som resultatet) i ett svep, annars mening för mening, och det som saknar ljud hoppar han över. Knappen
-syns när minst hälften av det har ljud, och den slår på ljudet om det är av, som *Ljud på*. Medan han läser heter den
-*Ja, ja »* och tystar honom, ett klick i samtalet går till nästa mening, och säger han något annat (om kupongen) slutar
-han läsa. Förut låtsades han läsa på i 15–25 sekunder och sa sedan texten ord för ord, och det orkade ingen lyssna på
-(ändrat 2026-11-07). Efter texten säger han vad matchen slutar (*Det slutar 3–1.*): resultatet han
+Förut låtsades han läsa på i 15–25 sekunder och sa sedan texten ord för ord, och det orkade ingen lyssna på
+(ändrat 2026-11-07); sedan fanns *Läs upp* under texten, som lät honom läsa den med sin röst (borta 2026-11-17, se
+*Ljudet*). Efter texten säger han vad matchen slutar (*Det slutar 3–1.*): resultatet han
 valde när texten skrevs (`hasse.resultat`, se *Rösten*). Texter från före 2026-11-07, och analysen
 i skrift när hans text saknas, tar i stället det troligaste resultatet i modellens prognos
 (resultatmatrisen i `data/match/<id>.json`) bland utfallen han har ringat in, och har modellen
@@ -9046,8 +9322,7 @@ Danmarks något om grannarna (*Grannlandet känner jag väl.*), lika korta som d
 repliker` säger till). Medan man står där blandas raderna om landslagsuppehållet med de vanliga (*Ett landslag kan
 inte köpa spelare. Man får spela med dem man har.*), och när kupongen har minst tre landskamper börjar han ibland med
 dem (*Det är landslagsuppehåll. Vilken match tar vi först?*). Vad som är en landskamp tar han ur tävlingens typ i
-`meta.json` (`landskamp` och `landRader` i [public/rum-hasse.js](public/rum-hasse.js)). Raderna har inga fält, så
-bygget tar fram deras ljud som för de andra replikerna (src/rost.js). Hans text till analysen av en landskamp får
+`meta.json` (`landskamp` och `landRader` i [public/rum-hasse.js](public/rum-hasse.js)). Hans text till analysen av en landskamp får
 samma persona, men med en rad om att det är en landskamp (landslagen, förbundskaptenen och samlingen, inte klubbar,
 division eller ligatabell, och att prognosen är spelbolagens) och kryddan ur `kryddorLand` i
 [config/hasse.js](config/hasse.js) (*Landslagsfotboll är klubbfotboll med tre dagars försäsong.*); de engelska
@@ -9068,10 +9343,38 @@ inte förstått matchen.*). Var femte sekund ser han efter om något har ändrat
 har det blivit mål i en av hans matcher säger han det så snart han har pratat klart, med en kommentar efter om målet var för
 honom, emot men tecknet sitter ändå, eller emot så att det inte gör det (räknat i hur många mål som fattas till hans tecken
 och till något annat, före och efter målet). När den sista matchen har slutat säger han hur det gick, som när man öppnar
-honom efteråt. Ställningen i ord står med korta lagnamn och sägs tyst, eftersom rösten inte kan ha alla lag och
-ställningar; raden om hur många rätt han har och kommentarerna hörs när iMacen har läst in dem. Raderna står under
+honom efteråt. Ställningen i ord står med korta lagnamn. Raderna står under
 `stallning` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js). Har du valt att dölja resultat står ingen
 ställning i listan och han säger inget om den.
+
+**Ditt namn efter och under omgången** (2026-11-16, användarens önskemål: "Även om man har markerat en spelare så blir man
+aldrig benämnd vid namn i sådana här tillfällen"). När kupongen vet vem du är talar han ibland till dig med namn när han
+säger hur det går för honom: ungefär var tredje gång i raden efter *Jag hade åtta rätt av tio.* eller *Just nu har jag fyra
+rätt av sju.*, ibland i det han säger efter en stund, och ungefär var femte gång i kommentaren till en match som pågår
+(*Burnley leder med 2–1 mot Cardiff. Den matchen kunde jag i sömnen, Laine.*), men högst en gång på två minuter, så att det
+inte blir tjat (`tilltal` i [public/rum-hasse.js](public/rum-hasse.js)). Namnet sitter lika illa som annars: i nio fall av
+tio omgångens fel namn, samma som när han hälsar och i domen (`kalla`, se *Domarna efter omgången*). Han säger det på olika
+sätt: först, sist eller mitt i meningen, torrt (*Det här stannar mellan oss, Docke.*), som en lärare (*Unge Laine, så här
+går det när man läser på.*, *Gamle Jönsson*, *Käre Tejler*) och med ironisk artighet i tredje person, som en gammal kypare
+(*Herr Lainio får klaga hos spelarna, inte hos mig.*). Raden om var han kom i tävlingen, som han säger till er alla, och
+kommentaren till en match som har slutat säger han utan namn. Raderna står under `efter.namn` och `stallning.namn` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js), en lista för varje läge, och `npm run repliker` säger till om en
+rad saknar namnet eller inte ryms på två rader ovanför listan med det längsta namnet. Provat med
+funktionerna ur rum-hasse.js och påhittade data (hur ofta namnet kommer, felnamnen, spärren på två minuter och att inget
+namn sägs när kupongen inte vet vem du är) och att sidan laddar utan fel i headless Chromium; inte i hela rummet med en
+riktig omgång.
+
+**Hur många rätt han hade** (2026-11-16, användarens önskemål, om *Jag hade åtta rätt av tio.*: "Han säger det här varje
+gång. Kan du ge honom lite Hasse Backe-varianter"). Raden lottas nu bland fjorton sätt att säga det, torrt som en tränare
+på presskonferens (*Rent krasst blev det åtta rätt av tio.*, *Summa summarum blev det åtta rätt av tio.*, *När röken har
+lagt sig står det åtta rätt av tio.*, *Facit säger åtta rätt av tio, om man tror på det.*). Varje rad passar lika bra efter
+en bra som en dålig omgång, eftersom det han säger sedan avgör tonen. Alla rätt och inga rätt har egna rader från två
+matcher (*Det blev fullt hus, tio rätt av tio.*, *I protokollet står det en rund nolla.*), och raderna för bra, mitten och
+dåligt har fått några tränarfraser till (*Strukturen höll hela vägen.*, *Nu nollställer jag och tar nästa omgång.*).
+Raderna står under `efter.ratt`, `efter.rattAlla` och `efter.rattNoll` i
+[public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) (valet i `efterat` i [public/rum-hasse.js](public/rum-hasse.js)),
+och `npm run repliker` säger till om en rad inte ryms på två rader ovanför listan med de längsta talen (56 tecken med
+*tretton rätt av tretton*).
 
 **Radion och klockan** (2026-11-09). Radion på fönsterbänken hörs också hos honom, och står den på en station säger han
 något om den en gång (per station och besök på sidan) i stället för nästa rad han säger medan han väntar, och nickar med
@@ -9115,11 +9418,10 @@ det skiljer mycket. Chansen är datorns före avspark, som i poängen. Varje sak
 tycker om det (*Sådant händer när favoriterna inte har läst på.*). Spikarna i allmänhet tar han bara när inget annat
 sticker ut. Raderna står under `domar.sak` i rum-hasse-repliker.js och väljs efter omgången och personen, inte på lott,
 så att domen är densamma varje gång och på alla enheter; var och en i gänget får nästa rad i listan, så att samma sak i
-samma omgång låter olika. Varje rad är en mening, så att *Läs upp* kan läsa domen mening för mening. En mening med en match
-hörs inte (rösten kan inte alla lag), så kommentaren efter den ska gå att förstå för sig. Inledningen står lite fetare,
+samma omgång låter olika. Varje rad är en mening, och kommentaren efter en mening med en match ska gå att förstå för sig. Inledningen står lite fetare,
 sakerna indragna bakom ett tunt streck i domens guld, som anteckningar i marginalen, och slutet i kursiv (`.rh-domen` i
 [public/rum-hasse.css](public/rum-hasse.css)). I telefonen går domen upp mot hans krage när den inte ryms under händerna, som
-hans text om en match, med mörkret bakom sig och Tillbaka och *Läs upp* på samma rad (`tillKragen`); förut fick den ett par
+hans text om en match, med mörkret bakom sig och Tillbaka under (`tillKragen`); förut fick den ett par
 rader ovanpå den ljusa kupongen på pulten, där mörkret bara hade börjat, och var svår att läsa (2026-11-14, användarens
 önskemål). Han talar till den som står vid disken, och det kan vara den han dömer: de
 övriga är *de andra* eller *resten*, och *vi* är han och den han talar med, aldrig gänget, där han inte är med (*Dogge var
@@ -9141,11 +9443,12 @@ Till er säger han ni och er, aldrig gänget, eftersom det bara är ni som anvä
 ordet). Namnen sitter inte riktigt, som hos den som aldrig lär sig dem och inte bryr sig (`felnamn` i
 rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett namn som låter nästan likadant (*Tejler*,
 *Docke*), ett han kan bättre någon annanstans ifrån (*Laine*, *Tegnér*, *Mogge*), *Daniel*, som ni alla heter och som därför
-aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska höras
-när rösten läser. Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
+aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska synas.
+Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
 mening. Ungefär var fjärde gång han hälsar på dig säger han också fel. Felet fastnar en omgång: när han säger fel är det
-samma fel namn hela omgången, när han hälsar och i domen, på alla enheter, och nästa omgång har han lärt sig ett annat.
+samma fel namn hela omgången, när han hälsar, i domen och när han talar till dig om hur det går (se *Ditt namn efter och
+under omgången*), på alla enheter, och nästa omgång har han lärt sig ett annat.
 Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8 (`domFro` i
 rum-hasse.js, 2026-11-15). Däremellan är domen densamma varje gång och på alla enheter, och namnet han säger fel är
 detsamma hela omgången. Han rättar sig aldrig och säger inget om det. Står man kvar
@@ -9295,7 +9598,7 @@ lottas när de sägs (`vantar` i rum-hasse.js), så att han inte upprepar sig f�
 när filen ändras (ett kryss på ändringen, publiceringen stoppas inte): uttryck som redan har underkänts,
 avhuggna meningar på ett eller två ord, rader om kupongen som börjar med ett Det som låter som resultatet,
 fält som inte går att fylla, listor som blivit strängar, rader under en vald match som inte får plats på en rad
-(högst 31 tecken) och att rösten får samma meningar som sidan. Vad
+(högst 31 tecken). Vad
 som är bra svenska kan koden inte avgöra, så de underkända uttrycken läggs till där när det händer. Med minskad
 rörelse i systemet står allt direkt, utan gester.
 
@@ -9430,7 +9733,7 @@ ett ensamt tecken och störst målskillnad blir skrällen gärna en spik på han
 
 **Kontrollerna** (`granska`): inga tal, citat eller namn utanför analysen och oddsen, högst 135
 ord, inga källor ("enligt …"), ingen kollega och inget "i morgon", tecknen som "1", "X", "2" och i
-ord i sista stycket, resultatet med högst 4 mål per lag (rösten har ljud för 0–0 till 4–4) och inom
+ord i sista stycket, resultatet med högst 4 mål per lag och inom
 tecknen men inte i texten, skrällens tecken med och favoritens inte när skrällen är lottad, och
 inget ur den påhittade tränarens värld.
 Klarar svaret inte det får Claude skriva om en gång, och annars visas analysen som den är. Koden ser
@@ -9451,75 +9754,13 @@ kraven borta, uttrycken frivilliga och prompten 1 600 tecken i stället för 2 5
 1 400). Prov på sex analyser: 112–127 ord, och i en av dem en tillagd rad om högpress för att
 prova Bielsa-utbrottet.
 
-**Ljudet.** Det han säger hörs, när besökaren har slagit på ljudet. Rösten är Tomas egen,
-klonad med Chatterbox Multilingual på iMacen (se *Den egna rösten* nedan). Hasse Backe är en
-påhittad figur i en verklig persons anda, och rösten är Tomas, inte en kopia av den verklige
-Hasse Backes. Där den egna rösten ännu saknas säger han meningen tyst (fram till 2026-11-14 tog
-bygget fram ljudet med Azures talsyntes där). Han säger två slags saker ([src/rost.js](src/rost.js)): de färdiga
-replikerna i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js) med fälten ifyllda på
-alla sätt som sidan kan fylla dem (gängets namn, `Tippoang.kallas`, dagarna, tecknen i ord och resultaten 0–0
-till 4–4 – 183 repliker, 6 000 tecken), och sin text till varje analys, mening för mening, delad som sidan delar den
-([public/rum-hasse-meningar.js](public/rum-hasse-meningar.js)). En omgång med tretton matcher är
-ungefär 10 000 tecken.
+**Ljudet.** Han pratar inte högt (2026-11-17, användarens beslut: "Hasse pratar inte längre. Du kan ta bort det"):
+det han säger står ord för ord i skriftens takt, med munnen efter orden, och med minskad rörelse står allt direkt.
+*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*, väcker ljudet i webbläsaren, och valet
+minns enheten; sedan heter knappen *Ljud av* (`vakna`, `vaxla` och `ljudknapp` i [public/rum-hasse.js](public/rum-hasse.js)).
+Ljudet är av tills besökaren slår på det.
 
-Bygget ([src/rost.js](src/rost.js), `publicera()`) lägger det som finns i grenen `rost` i
-`_site/data/rost/` med registret `data/rost.json` (mening → fil). Inget av det committas på main, så
-repot växer inte. Utan grenen är han tyst, och bygget går som förut. Bygget skriver hur många
-meningar som har ljud.
-
-**Den egna rösten** ([scripts/rost/](scripts/rost/)). Launchd-jobbet `se.matchfixarna.rost`
-på iMacen körs var 15:e minut (launchd kör det aldrig två gånger samtidigt) i en egen klon som
-återställs till origin/main varje gång, som analysernas jobb. Det tar listan över allt han
-säger ur `texter()` i [src/rost.js](src/rost.js), kommande matchers meningar först och sedan
-replikerna (ca 350 meningar), och läser upp högst 30 som saknas per körning med
-[chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py), som laddar modellen en gång (ca 30 s) och räknar
-ungefär 5 s per sekund tal. Inställningarna står i `rost.egen` i
-[config/hasse.js](config/hasse.js): exaggeration 0,7, cfg_weight 0,5, temperature 0,8 och
-referensen `~/Kod/chatterbox-rost/min_rost.wav`. Talen läses som ord ("2–1" blir "två–ett", 0
-"noll"), eftersom det är oprövat hur Chatterbox läser siffror; meningen i registret är densamma
-som på sidan.
-
-Chatterbox avbryter ibland själv med "forcing EOS token", och ibland blir talet för kort eller
-för långt. Därför mäts talet utan tystnad mot den väntade längden (14 tecken i sekunden): under
-0,55 eller över 2,2 gånger den, eller med "forcing EOS" av någon annan orsak än
-`token_repetition`, görs meningen om med nytt slumpfrö, högst fyra gånger. `token_repetition`
-räknas inte: den slog till i 3 av 4 uppläsningar i provet, redan när samma ljudtoken kom två
-gånger, och Tomas lyssnade på de klippen 2026-11-05 och slutet var helt. Klarar den sig inte prövas den igen efter ett dygn, och
-till dess sägs den tyst. Ljudet sparas som mp3 (64 kbit/s, ffmpeg) i en ljudbank utanför
-repot, `~/Library/Application Support/Matchfixarna/Rost/ljud/`, med ett avtryck på
-inställningarna, referensen och texten: ändras något av dem läses allt upp på nytt.
-
-Efter varje körning byggs grenen `rost` med git:s egna verktyg: en enda commit utan förälder,
-med registret `rost.json` (mening → avtryck) och de mp3-filer som behövs nu. Den force-pushas
-bara när innehållet har ändrats, så git-historiken växer inte, varken på main eller i grenen.
-Loggen är `~/Library/Logs/Matchfixarna/rost.log`, och Chatterbox egen utskrift från senaste
-körningen står i `rost-chatterbox.log` bredvid.
-
-**Sätt upp den egna rösten** på iMacen (Chatterbox ska redan fungera i `~/Kod/chatterbox-rost`):
-
-1. `bash scripts/rost/installera.sh` i repot. Den klonar repot till
-   `~/Library/Application Support/Matchfixarna/Rost/Profeterna`, skriver jobbets fil i
-   `~/Library/LaunchAgents` och säger till om Python-miljön, referensen eller ffmpeg saknas.
-2. Starta jobbet med `launchctl bootstrap` som skriptet skriver ut. Första körningen börjar
-   direkt.
-3. Följ `rost.log`. Efter första körningen finns grenen `rost` på GitHub, och nästa bygge tar
-   med ljudet.
-
-Stoppa med `launchctl bootout gui/$(id -u)/se.matchfixarna.rost`; grenen ligger kvar, och
-bygget fortsätter att ta ljudet ur den. Utan grenen är han tyst.
-
-I sidan spelas ljudet med Web Audio ([public/rum-hasse.js](public/rum-hasse.js), *rösten*). Det
-hämtas medan han gör annat – hans text när den står, om ljudet är på – och orden kommer i takt med
-ljudet, utspridda efter sin längd, medan munnen följer ljudstyrkan. Saknas meningen i registret
-eller är ljudet inte framme inom 2,5 s säger han den tyst, som förut, och när han läser upp sin text
-hoppar han över den. Ett klick i samtalet visar hela repliken och tystar den, *Ja, ja* tystar
-uppläsningen, och han tystnar när man går därifrån. Hans text läses bara upp när man trycker på *Läs
-upp* (se *Samtalet*); de korta replikerna runt omkring hörs när ljudet är på. Ljudet är av tills besökaren trycker på
-*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*, eller på *Läs upp*; klicket väcker
-ljudet i webbläsaren, och valet minns enheten. Sedan heter knappen *Ljud av*. Med minskad
-rörelse står allt direkt och inget hörs utom det man ber honom läsa upp. *Jag har tappat rösten* sägs tyst.
-
-När ljudet är på hörs också det som händer på disken
+När ljudet är på hörs det som händer på disken
 ([public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), hämtas när ljudet slås på): handen i
 disken, och koppen som klirrar på fatet. Figuren säger när det händer (`handelser` i
 rum-hasse-3d.js: slagen, när koppen landar efter dem och när han ställer ned den), och ljudet
@@ -9527,29 +9768,19 @@ räknas fram med Web Audio, utan ljudfiler och lite olika varje gång. Slaget ä
 sjunker, träets knack, handflatans smäll (näven nästan ingen, båda händerna två strax efter
 varandra) och skivan som klingar kort, och allt på disken skramlar till. Klirret är porslin mot
 porslin, några deltoner som inte är övertoner och där de höga klingar av fortast; koppens fot slår
-oftast två gånger. Allt går genom en mjuk begränsare, så att ett hårt slag inte spräcker ljudet, och
-slaget är ungefär lika starkt som rösten. Slaget hörs från hans högra hand till vänster i bilden och
+oftast två gånger. Allt går genom en mjuk begränsare, så att ett hårt slag inte spräcker ljudet. Slaget hörs från hans högra hand till vänster i bilden och
 koppen från höger.
 
-Provat: [src/rost.js](src/rost.js) i Node med låtsad Azure (ordningen, taket per bygge, stopp vid
-429, registret och städningen av cachen); sidan i headless Chrome 1440 × 900 med låtsat tal i
-cachen (en tonstöt per ord, mp3) publicerat med `publicera()` som i bygget: replikerna och
-analysen hördes mening för mening med orden i takt, och *Ljud av* mitt i en mening och ett tomt
-register fungerade utan fel i sidan. Inte provat mot Azure på riktigt (ingen nyckel där provet
-gjordes), och inte i Safari eller en riktig telefon.
-
-Den egna rösten provades 2026-11-04 utan Chatterbox: [las.mjs](scripts/rost/las.mjs) med låtsad
-modell (`--latsas`, tonstötar) mot en låtsad GitHub (ett lokalt repo), som läste upp fem
-meningar och pushade grenen `rost`, inte pushade igen när inget hade ändrats och inte
-markerade något som misslyckat när modellen kraschade; [chatterbox_jobb.py](scripts/rost/chatterbox_jobb.py)
-med låtsad modell, som gjorde om en mening efter "forcing EOS" och gav upp en för kort efter
-fyra försök; workflowens steg mot den låtsade grenen; och `npm run build -- --no-fetch`, som
-tog de fem egna och Azure för resten, och där `fyll()` inte frågade Azure om de egna.
-
-Med den riktiga modellen provades den 2026-11-05 på iMacen: [las.mjs](scripts/rost/las.mjs) utan
-`--publicera` läste upp fyra meningar på 145 s, alla i första försöket. Det provet visade också
-varför skriptet inte får heta `chatterbox.py` (det skuggar paketet med samma namn), vilket den
-låtsade modellen inte kunde visa.
+Förut talade han med Tomas egen röst, klonad med Chatterbox Multilingual på iMacen (2026-11-04 till 2026-11-17; före
+2026-11-14 med Azures talsyntes där den egna saknades). Launchd-jobbet `se.matchfixarna.rost` läste upp allt han sa,
+de färdiga replikerna med fälten ifyllda och hans text till analyserna, och lade ljudet i grenen `rost`, som bygget
+lade på sajten med ett register (mening → fil); *Läs upp* lät honom läsa sin text, och svaret från baren hördes från
+vänster. Allt det är borttaget: `src/rost.js`, steget i workflowen, röstinställningarna i `config/hasse.js`, ljudet i
+sidan och jobbets filer i `scripts/rost/`. Kvar är [scripts/rost/las.mjs](scripts/rost/las.mjs), som launchd fortfarande
+startar på iMacen: inom en halvtimme tar den bort jobbets fil i `~/Library/LaunchAgents` och jobbet ur launchd (den
+första körningen efter ändringen avbryts, eftersom den gamla koden inte hittar `src/rost.js`), och sedan kan filen tas
+bort. Ljudbanken och jobbets klon i `~/Library/Application Support/Matchfixarna/Rost/` och grenen `rost` på
+GitHub rörs inte; de kan tas bort för hand.
 
 **Grafiken.** Handen på pulten är en liten WebGL-duk i pultens plan som läggs dit när rummet är
 klart, med handens modell (228 kB, 150 kB packad) och fotot (149 kB). Den ritas en gång och sedan bara när fingrarna

@@ -1,290 +1,470 @@
 {
- "omgang": "2026-11-15-v65ft4",
+ "omgang": "2026-11-21-st4980",
  "matcher": [
-  "401861175",
-  "401861177",
-  "401861178",
-  "401861176",
-  "401861171",
-  "401861172",
-  "401861185",
-  "401861188",
-  "401861186",
-  "401861187",
-  "401861181"
+  "401879232",
+  "401879236",
+  "401878754",
+  "401878756",
+  "401879238",
+  "401879235",
+  "401880160",
+  "401880158",
+  "401880157",
+  "401880154",
+  "401880152",
+  "401880151",
+  "401880149"
  ],
- "skriven": "2026-11-15T14:09:25.758Z",
+ "skriven": "2026-11-16T22:55:50.930Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-10.3",
  "notiser": [
   {
    "nr": 1,
-   "id": "401861175",
-   "match": "Spanien – England",
-   "avspark": "2026-11-15T19:45:00.000Z",
-   "rubrik": "Gruppsegern avgörs i Madrid",
-   "text": "Spanien har vunnit alla fem matcherna i grupp A3 och leder med 15 poäng, tre före England. I september vann Spanien med 3–2 i England. Rodri saknas, men Lamine Yamal är tillbaka. Englands förbundskapten Thomas Tuchel har bekräftat att James Trafford står i mål före Jordan Pickford. Ezri Konsa och Djed Spence kan spela igen efter att ha missat Kroatienmatchen. Guéhi är skadad.",
+   "id": "401879232",
+   "match": "Newcastle United – Arsenal",
+   "avspark": "2026-11-21T17:30:00.000Z",
+   "rubrik": "Jaissle kritisk efter förlusten mot Everton",
+   "text": "Newcastles tränare Matthias Jaissle var kritisk efter förlusten mot Everton. Spelarna genomförde inte den höga press han ville ha, enligt Arsenalsajten Daily Cannon. Newcastle ligger tolva med 12 poäng och saknar Joelinton och målvakten Jaouen. Serieledande Arsenal, med 27 poäng, är utan Saka och den avstängde Dowman, och Zubimendi är tveksam. William Saliba var tillbaka i truppen mot Slavia Prag efter en lång ryggskada men fick inte spela.",
    "kallor": [
     {
-     "source": "Evening Standard via Yahoo Sports",
-     "title": "England XI vs Spain: Confirmed team news, predicted lineup and injury latest for Nations League",
-     "url": "https://uk.sports.yahoo.com/news/england-xi-vs-spain-confirmed-112123458.html",
-     "publishedAt": null
-    },
-    {
-     "source": "Yahoo Sports",
-     "title": "Spain vs England",
-     "url": "https://sports.yahoo.com/articles/spain-vs-england-predicted-lineup-054900555.html",
+     "source": "Daily Cannon",
+     "title": "arsenals november fixture squeeze puts artetas squad depth to the test",
+     "url": "https://dailycannon.com/2026/11/arsenals-november-fixture-squeeze-puts-artetas-squad-depth-to-the-test/",
      "publishedAt": null
     }
    ],
    "lag": [
-    "Spanien",
-    "England"
+    "Newcastle United",
+    "Arsenal"
    ],
    "bilder": [
-    null,
     {
-     "fil": "england-95727e3a.jpg",
-     "kalla": "BBC Sport",
+     "fil": "newcastle-united-06ee2323.jpg",
+     "kalla": "Sport Witness",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/ckdd17mq2pvmo"
+     "sida": "https://sportwitness.co.uk/its-pure-love-newcastle-united-player-on-the-magpies-connection/"
+    },
+    {
+     "fil": "arsenal-52426904.jpg",
+     "kalla": "ESPN",
+     "foto": "David Price/Arsenal FC via Getty Images",
+     "sida": "https://www.espn.com/soccer/story/_/id/50490171/arsenal-bruno-guimaraes-declan-rice"
     }
    ]
   },
   {
    "nr": 2,
-   "id": "401861177",
-   "match": "Frankrike – Turkiet",
-   "avspark": "2026-11-15T19:45:00.000Z",
-   "rubrik": "Zidanes Frankrike vill resa sig",
-   "text": "Frankrike förlorade med 1–3 i Italien i torsdags och ligger tvåa i grupp A1 med 10 poäng, lika många som gruppettan Italien. Zinedine Zidane tog över efter Didier Deschamps efter VM och har kallat tillbaka Kylian Mbappé. Turkiet har förlorat alla fem matcherna och har gjort 3 mål och släppt in 13. I september vann Frankrike med 1–0 i Turkiet.",
+   "id": "401879236",
+   "match": "Chelsea – Leeds United",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Lång skadelista för Xabi Alonsos Chelsea",
+   "text": "Chelsea, som tränas av Xabi Alonso sedan juli, ligger femma med 16 poäng och förlorade senast 0–1 mot Sunderland. João Pedro, James, Gittens, Lacroix och Hato är skadade, och Acheampong och målvakten Martinez är tveksamma. Daniel Farkes Leeds ligger nia med 14 poäng och slog Tottenham med 1–0 senast. Laget har bara vunnit en av fem bortamatcher. Stach och Gudmundsson är tveksamma, och Mateo Joseph är skadad.",
    "kallor": [
     {
-     "source": "Khel Now",
-     "title": "France name squad for November UEFA Nations League matches; Pablo Pagis earns maiden call-up",
-     "url": "https://khelnow.com/football/france-november-uefa-nations-league-squad-202611",
+     "source": "Wikipedia",
+     "title": "2026–27 Premier League",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_Premier_League",
      "publishedAt": null
     }
    ],
    "lag": [
-    "Frankrike",
-    "Turkiet"
+    "Chelsea",
+    "Leeds United"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "chelsea-291ae0b4.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c98rzr51rlvpo"
+    },
+    {
+     "fil": "leeds-united-88160755.jpg",
+     "kalla": "The 4th Official - A view from the sideline",
+     "foto": null,
+     "sida": "https://the4thofficial.net/2026/11/leeds-united-eye-prolific-croatian-striker-is-he-worth-a-january-gamble/"
+    }
    ]
   },
   {
    "nr": 3,
-   "id": "401861178",
-   "match": "Kroatien – Tjeckien",
-   "avspark": "2026-11-15T19:45:00.000Z",
-   "rubrik": "Tjeckien utan avstängde Krejčí",
-   "text": "Tjeckien har förlorat alla fem matcherna i gruppen och saknar Ladislav Krejčí, som fick sitt andra röda kort i gruppspelet i förlusten mot Spanien. Kroatien under Slaven Bilić har 3 poäng, alla från segern med 2–1 i Prag i september. Sedan dess har laget förlorat fyra raka matcher, bland dem 0–7 hemma mot England. På hemmaplan har Kroatien släppt in 9 mål på två matcher.",
+   "id": "401878754",
+   "match": "Tottenham Hotspur – Ipswich Town",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "De Zerbi saknar flera mittfältare mot Ipswich",
+   "text": "Roberto De Zerbis Tottenham förlorade 0–1 mot Leeds efter tre raka segrar och ligger elva med 12 poäng. Bergvall, Mudryk, Xavi och Odobert är skadade, Tel är tveksam och Sávio väntas tillbaka på lördagen. Ipswich tränas sedan juni av Gary O'Neil, som efterträdde Kieran McKenna. Laget ligger 14:e med 11 poäng och har inga rapporterade skador, men har släppt in 13 mål på fem bortamatcher.",
    "kallor": [
     {
-     "source": "Flashscore",
-     "title": "Croatia v Czech Republic LIVE 15/11/2026",
-     "url": "https://www.flashscore.com/match/football/croatia-K8aznggo/czech-republic-6LHwBDGU/",
+     "source": "Wikipedia",
+     "title": "2026–27 Premier League",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_Premier_League",
      "publishedAt": null
     }
    ],
    "lag": [
-    "Kroatien",
-    "Tjeckien"
+    "Tottenham Hotspur",
+    "Ipswich Town"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "tottenham-hotspur-d63f3851.jpg",
+     "kalla": "The 4th Official - A view from the sideline",
+     "foto": null,
+     "sida": "https://the4thofficial.net/2026/11/tottenham-hotspur-are-facing-stiff-competition-for-this-ligue-1-defender-decent-choice-for-de-zerbi/"
+    },
+    {
+     "fil": "ipswich-town-647dac91.jpg",
+     "kalla": "East Anglian Daily Times",
+     "foto": null,
+     "sida": "https://www.eadt.co.uk/sport/26727970.ipswich-town-rank-all-time-english-top-flight-table/"
+    }
    ]
   },
   {
    "nr": 4,
-   "id": "401861176",
-   "match": "Belgien – Italien",
-   "avspark": "2026-11-15T19:45:00.000Z",
-   "rubrik": "Italien utan målskytten Frattesi",
-   "text": "Italien leder grupp A1 efter 3–1 mot Frankrike men får klara sig utan Davide Frattesi. Han gjorde ett av målen och har nu lämnat truppen med en muskelskada. Enligt Goal räcker en poäng för Roberto Mancinis lag för att gå till kvartsfinal, och med en seger vinner Italien gruppen. Belgien är trea med 9 poäng efter 2–1 i Turkiet och vann med 2–0 i Italien i september.",
+   "id": "401878756",
+   "match": "Aston Villa – Sunderland",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Sunderland väntar på första bortasegern",
+   "text": "Sunderland ligger näst sist med 8 poäng och har inte vunnit någon av fem bortamatcher. Laget slog dock Chelsea med 1–0 senast. Ballard, Diarra och Mundle är skadade, och Xhaka och Brobbey är tveksamma. Unai Emerys Aston Villa spelade 4–4 mot Manchester United och ligger tia med 13 poäng. Cash, som har haft hjärnskakning, och Manzambi och Wan-Bissaka är tveksamma, och Ruggeri är borta till januari. Tre dagar efter matchen väntar Galatasaray.",
    "kallor": [
     {
-     "source": "Goal",
-     "title": "Blow for Italy! Lazio midfielder Davide Frattesi ruled out of crucial Nations League showdown against Belgium with muscular injury",
-     "url": "https://www.goal.com/en/news/davide-frattesi-ruled-out-italy-belgium-nations-league-injury/bltf51be6837b923b27",
+     "source": "Wikipedia",
+     "title": "2026–27 Premier League",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_Premier_League",
      "publishedAt": null
     }
    ],
    "lag": [
-    "Belgien",
-    "Italien"
+    "Aston Villa",
+    "Sunderland"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "aston-villa-70d3e509.jpg",
+     "kalla": "Yardbarker",
+     "foto": null,
+     "sida": "https://www.yardbarker.com/soccer/articles/ex_villa_striker_calls_emery_a_master_can_aston_villa_hold_onto_him/s1_17736_44570402"
+    },
+    {
+     "fil": "sunderland-3d2a60e4.jpg",
+     "kalla": "ESPN",
+     "foto": "Robbie Jay Barratt - AMA/Getty Images",
+     "sida": "https://www.espn.com/soccer/story/_/id/50432831/granit-xhaka-injury-switzerland-nations-league-sunderland"
+    }
    ]
   },
   {
    "nr": 5,
-   "id": "401861171",
-   "match": "Lettland – Armenien",
-   "avspark": "2026-11-15T14:00:00.000Z",
-   "rubrik": "Lettland jagar första segern",
-   "text": "Lettland ligger sist i grupp C2 med 1 poäng och har förlorat de tre senaste matcherna, alla med 1–2. Armenien har 5 poäng men har inte vunnit på fyra matcher sedan segern med 2–0 mot just Lettland i september. Senast blev det 1–1 hemma mot Cypern. På bortaplan har Armenien ännu inte gjort mål i årets Nations League.",
-   "kallor": [],
+   "id": "401879238",
+   "match": "AFC Bournemouth – Nottingham Forest",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Marco Roses Bournemouth har vunnit fem raka",
+   "text": "Bournemouth har vunnit sina fem senaste matcher i alla turneringar under Marco Rose, som tog över i somras. Laget ligger sjua med 15 poäng. Sanchez, Tóth och Araujo är skadade. Oliver Glasners Nottingham Forest slog Manchester City med 3–1 senast men ligger 16:e med 9 poäng och har gjort 6,7 mål färre än xG. Dominguez och Savona är skadade, och Williams och Schlager är tveksamma.",
+   "kallor": [
+    {
+     "source": "Wikipedia",
+     "title": "2026–27 Premier League",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_Premier_League",
+     "publishedAt": null
+    }
+   ],
    "lag": [
-    "Lettland",
-    "Armenien"
+    "AFC Bournemouth",
+    "Nottingham Forest"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "afc-bournemouth-df84438a.jpg",
+     "kalla": "Bournemouth Echo",
+     "foto": null,
+     "sida": "https://www.bournemouthecho.co.uk/sport/26726735.afc-bournemouth-face-norwich-city-fa-cup-second-round/"
+    },
+    {
+     "fil": "nottingham-forest-8d2d43cb.jpg",
+     "kalla": "Nottingham Post",
+     "foto": null,
+     "sida": "https://www.nottinghampost.com/sport/football/transfer-news/nottingham-forest-transfers-gustavo-martins-11243401"
+    }
    ]
   },
   {
    "nr": 6,
-   "id": "401861172",
-   "match": "Cypern – Montenegro",
-   "avspark": "2026-11-15T14:00:00.000Z",
-   "rubrik": "Obesegrat Montenegro redan klart som gruppetta",
-   "text": "Montenegro leder grupp C2 med 13 poäng, fem före Cypern, och kan därmed inte längre passeras när det bara återstår en omgång. Laget är obesegrat i gruppen med fyra segrar och en oavgjord, senast 2–1 mot Lettland. Cypern har vunnit båda hemmamatcherna med sammanlagt 4–1 i mål men förlorade med 1–2 i Montenegro i september.",
-   "kallor": [],
+   "id": "401879235",
+   "match": "Coventry City – Crystal Palace",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Thomas Frank debuterar för Palace i Coventry",
+   "text": "Crystal Palace presenterade på måndagen Thomas Frank som ny tränare, med kontrakt till sommaren 2029, rapporterar Sky Sports. Pierre Sage fick gå den 12 november efter säsongens sjunde ligaförlust, mot Liverpool. Palace ligger sist med 7 poäng. Mateta är avstängd, Chadi Riad är skadad och Strand Larsen är tveksam. Frank Lampards Coventry ligger 17:e med 9 poäng och har sex spelare på skadelistan, bland dem Woolfenden och Wright.",
+   "kallor": [
+    {
+     "source": "Sky Sports",
+     "title": "Thomas Frank: Crystal Palace appoint former Spurs and Brentford boss as Pierre Sage's successor at Selhurst Park",
+     "url": "https://www.skysports.com/football/news/13610988/thomas-frank-crystal-palace-appoint-former-spurs-and-brentford-boss-as-pierre-sages-successor-at-selhurst-park",
+     "publishedAt": null
+    },
+    {
+     "source": "Wikipedia",
+     "title": "2026–27 Premier League",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_Premier_League",
+     "publishedAt": null
+    }
+   ],
    "lag": [
-    "Cypern",
-    "Montenegro"
+    "Coventry City",
+    "Crystal Palace"
    ],
    "bilder": [
-    null,
     {
-     "fil": "montenegro-67bc35a4.jpg",
-     "kalla": "Sports Mole",
+     "fil": "coventry-city-8ae1d9f0.jpg",
+     "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.sportsmole.co.uk/football/montenegro/uefa-nations-league/preview/montenegro-vs-latvia-prediction-team-news-lineups_608846.html"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c6y9741qgqggo"
+    },
+    {
+     "fil": "crystal-palace-7b4d391b.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cv5y18lkk87do"
     }
    ]
   },
   {
    "nr": 7,
-   "id": "401861185",
-   "match": "Tyskland – Nederländerna",
-   "avspark": "2026-11-16T19:45:00.000Z",
-   "rubrik": "Klopp möter Xavi i Berlin",
-   "text": "Nederländerna leder grupp A2 med 11 poäng efter 7–0 mot Grekland. Xavi har bara fem matcher bakom sig som förbundskapten och var ”nöjd med prestationen”. Jürgen Klopps Tyskland är trea med 8 poäng, lika många som Grekland, efter 3–1 i Serbien där Florian Wirtz och Brajan Gruda gjorde mål. Om Tyskland vinner och Grekland inte slår Serbien vinner Tyskland gruppen.",
+   "id": "401880160",
+   "match": "Bolton Wanderers – Portsmouth",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Bolton har förlorat fem av sju hemmamatcher",
+   "text": "Steven Schumachers Bolton ligger 18:e med 17 poäng. Laget har bara vunnit två av sju hemmamatcher och släppt in 15 mål på dem. Senast blev det förlust med 1–3 mot Derby. John Mousinhos Portsmouth ligger elva med 22 poäng och förlorade senast 1–2 hemma mot Stoke. Tre dagar efter matchen tar laget emot West Ham. Det finns inga uppgifter om skador i någon av trupperna.",
    "kallor": [
     {
-     "source": "Bundesliga.com",
-     "title": "Germany vs. Netherlands: UEFA Nations League preview and live blog",
-     "url": "https://www.bundesliga.com/en/bundesliga/news/germany-netherlands-uefa-nations-league-klopp-wirtz-39995",
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 EFL Championship",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_EFL_Championship",
      "publishedAt": null
     }
    ],
    "lag": [
-    "Tyskland",
-    "Nederländerna"
+    "Bolton Wanderers",
+    "Portsmouth"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "bolton-wanderers-210006bd.jpg",
+     "kalla": "The Bolton News",
+     "foto": null,
+     "sida": "https://www.theboltonnews.co.uk/sport/26725845.bolton-wanderers-boss-potential-new-chris-forino-contract/"
+    },
+    {
+     "fil": "portsmouth-0683e76c.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cm3wg6g4zgn5o"
+    }
    ]
   },
   {
    "nr": 8,
-   "id": "401861188",
-   "match": "Grekland – Serbien",
-   "avspark": "2026-11-16T19:45:00.000Z",
-   "rubrik": "Grekland samlar sig efter 0–7",
-   "text": "Grekland kommer från en förlust med 0–7 i Nederländerna, som Greek Reporter kallar historisk. Laget har ändå 8 poäng, lika många som Tyskland, och de två främsta i gruppen går till kvartsfinal. Hemma har Grekland spelat två oavgjorda matcher. Serbien har förlorat alla fem matcherna och har bara gjort 1 mål på bortaplan. I september vann Grekland med 2–1 i Serbien.",
+   "id": "401880158",
+   "match": "Lincoln City – Wrexham",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Lincoln har förlorat tre raka",
+   "text": "Lincoln ligger 21:a med 15 poäng och har förlorat de tre senaste matcherna. Laget tränas av duon Chris Cohen och Tom Shaw sedan Michael Skubala gick till Bristol City i maj. Lincoln har släppt in 16 mål på sju hemmamatcher. Phil Parkinsons Wrexham ligger 15:e med 18 poäng och spelade 1–1 mot Wolves senast. Laget har bara vunnit en av sju bortamatcher.",
    "kallor": [
     {
-     "source": "Greek Reporter",
-     "title": "Greece Suffers Historic 7-0 Defeat to Netherlands in UEFA Nations League",
-     "url": "https://greekreporter.com/2026/11/14/greece-historic-defeat-netherlands-uefa-nations-league",
-     "publishedAt": null
-    },
-    {
-     "source": "Neos Kosmos",
-     "title": "Greece eyeing historic Nations League quarter-final qualification",
-     "url": "https://neoskosmos.com/en/2026/11/12/sport/football/greece-eyeing-historic-nations-league-quarter-final-qualification/",
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 EFL Championship",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_EFL_Championship",
      "publishedAt": null
     }
    ],
    "lag": [
-    "Grekland",
-    "Serbien"
+    "Lincoln City",
+    "Wrexham"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "lincoln-city-ce274ee8.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c64gn20qwywlo"
+    },
+    {
+     "fil": "wrexham-be0a394a.jpg",
+     "kalla": "The League Paper",
+     "foto": null,
+     "sida": "https://www.theleaguepaper.com/latest-news/football-league-championship/wrexham/470280/morgan-schneiderlin-wrexham-must-not-act-rashly-and-sack-phil-parkinson/"
+    }
    ]
   },
   {
    "nr": 9,
-   "id": "401861186",
-   "match": "Schweiz – Skottland",
-   "avspark": "2026-11-16T19:45:00.000Z",
-   "rubrik": "Klart Schweiz vilar sina stjärnor",
-   "text": "Schweiz har redan vunnit grupp B1, och förbundskaptenen Murat Yakin har sagt att han vill vila flera stjärnor. Granit Xhaka har lämnat truppen med en vadskada. Skottland är trea med 7 poäng, en efter Slovenien, efter 2–1 mot Nordmakedonien. Scott McTominay är tillbaka i truppen efter ett ingrepp i hjärtat, medan Scott McKenna saknas med en ryggskada. Schweiz vann med 3–0 i Skottland i september.",
+   "id": "401880157",
+   "match": "Middlesbrough – Bristol City",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Hellbergs Middlesbrough har inte förlorat hemma",
+   "text": "Kim Hellbergs Middlesbrough ligger tvåa med 29 poäng och har inte förlorat någon av sju hemmamatcher: fem segrar och två oavgjorda. Senast blev det 0–0 mot Watford. Bristol City, som tränas av Michael Skubala, ligger 17:e med 18 poäng efter två raka förluster, den senaste med 0–5 hemma mot Norwich. På bortaplan har laget däremot tre segrar på sju matcher.",
    "kallor": [
     {
-     "source": "The Scotsman",
-     "title": "Scotland set to face much-changed team as Switzerland boss sets out ‘less serious’ final game plans",
-     "url": "https://www.scotsman.com/sport/football/international/scotland-set-to-face-much-changed-team-as-switzerland-boss-sets-out-less-serious-final-game-plans-9351160",
-     "publishedAt": null
-    },
-    {
-     "source": "Yahoo Sports",
-     "title": "Swiss suffer Xhaka blow before Scotland visit",
-     "url": "https://sports.yahoo.com/articles/swiss-suffer-xhaka-blow-scotland-232849785.html",
-     "publishedAt": null
-    },
-    {
-     "source": "STV News",
-     "title": "Nations League: Scott McTominay returns to Scotland squad as Rangers' James Penrice earns first call-up",
-     "url": "https://news.stv.tv/sport/nations-league-scott-mctominay-returns-to-scotland-squad-as-rangers-james-penrice-earns-first-call-up",
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 EFL Championship",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_EFL_Championship",
      "publishedAt": null
     }
    ],
    "lag": [
-    "Schweiz",
-    "Skottland"
+    "Middlesbrough",
+    "Bristol City"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "middlesbrough-2367cace.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cqj9mlvjlj1xo"
+    },
+    {
+     "fil": "bristol-city-9a79ef1b.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c54gnev0ydnno"
+    }
    ]
   },
   {
    "nr": 10,
-   "id": "401861187",
-   "match": "Nordmakedonien – Slovenien",
-   "avspark": "2026-11-16T19:45:00.000Z",
-   "rubrik": "Slovenien vill behålla andraplatsen",
-   "text": "Slovenien är tvåa i grupp B1 med 8 poäng, en före Skottland, och spelade 0–0 hemma mot gruppettan Schweiz i torsdags. Nordmakedonien har förlorat alla fem matcherna och bara gjort 1 mål, i förlusten med 1–2 i Skottland. På hemmaplan har laget inte gjort något mål och släppt in 5. Slovenien vann det första mötet med 2–0 i september.",
-   "kallor": [],
+   "id": "401880154",
+   "match": "Sheffield United – Watford",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Watford väntar på första bortasegern",
+   "text": "Watford ligger 20:e med 15 poäng och har inte vunnit någon av sju bortamatcher. Laget har bara gjort 4 mål på dem. Tränaren Alessio Dionisi tog över i juni, efter att Edward Still fått sparken. Chris Wilders Sheffield United ligger tia med 22 poäng men förlorade senast 1–2 mot Charlton. Lagen har mötts sex gånger sedan 2022, och Sheffield United har vunnit fem av matcherna.",
+   "kallor": [
+    {
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 EFL Championship",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_EFL_Championship",
+     "publishedAt": null
+    }
+   ],
    "lag": [
-    "Nordmakedonien",
-    "Slovenien"
+    "Sheffield United",
+    "Watford"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "sheffield-united-7cfdb098.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cmn9r9g5q5dgo"
+    },
+    {
+     "fil": "watford-27ab9250.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cqrkgmk0ymrvo"
+    }
    ]
   },
   {
    "nr": 11,
-   "id": "401861181",
-   "match": "Kazakstan – Slovakien",
-   "avspark": "2026-11-16T15:00:00.000Z",
-   "rubrik": "Kazakstan väntar fortfarande på en seger",
-   "text": "Kazakstan ligger sist i grupp C3 med 2 poäng och har inte vunnit någon match i gruppen. Laget har gjort mål i alla fem matcherna men förlorade senast med 1–2 i Moldavien. Slovakien leder gruppen med 11 poäng men har bara spelat 1–1 och 2–2 mot Färöarna. Slovakien vann det första mötet med 2–1 på hemmaplan i september.",
-   "kallor": [],
+   "id": "401880152",
+   "match": "Stoke City – Birmingham City",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Toppmöte mellan trean och ettan",
+   "text": "Stoke och Birmingham har båda 29 poäng, liksom Middlesbrough. Birmingham leder på målskillnad och Stoke är trea. Mark Robins Stoke har vunnit tre raka och gjort 8,7 mål fler än xG. Chris Davies Birmingham har vunnit två raka och släppt in 6,6 mål färre än xG. Det finns inga uppgifter om skador i någon av trupperna.",
+   "kallor": [
+    {
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 EFL Championship",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_EFL_Championship",
+     "publishedAt": null
+    }
+   ],
    "lag": [
-    "Kazakstan",
-    "Slovakien"
+    "Stoke City",
+    "Birmingham City"
    ],
    "bilder": [
-    null,
-    null
+    {
+     "fil": "stoke-city-a6ebf49c.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/news/articles/c9772jnkzm0do"
+    },
+    {
+     "fil": "birmingham-city-03d89428.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cm1j3j20r2rzo"
+    }
+   ]
+  },
+  {
+   "nr": 12,
+   "id": "401880151",
+   "match": "Swansea City – West Bromwich Albion",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Swansea har bara släppt in tre mål hemma",
+   "text": "Vítor Matos Swansea ligger sexa med 26 poäng men har förlorat fyra av de fem senaste matcherna. Hemma har laget bara släppt in 3 mål på sju matcher. James Morrisons West Bromwich ligger femma med 28 poäng och har inte förlorat på fem matcher: tre segrar och två oavgjorda. Laget har vunnit fyra av sju bortamatcher. I januari möttes lagen två gånger i Swansea, och då blev det 1–1 och 1–0.",
+   "kallor": [
+    {
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 EFL Championship",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_EFL_Championship",
+     "publishedAt": null
+    }
+   ],
+   "lag": [
+    "Swansea City",
+    "West Bromwich Albion"
+   ],
+   "bilder": [
+    {
+     "fil": "swansea-city-1944527f.jpg",
+     "kalla": "The League Paper",
+     "foto": null,
+     "sida": "https://www.theleaguepaper.com/latest-news/football-league-championship/swansea-city/469985/adebayo-akinfenwa-backs-swansea-city-for-promotion-and-reflects-on-his-efl-journey/"
+    },
+    {
+     "fil": "west-bromwich-albion-99e488ec.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/ckwy4y8y4r0lo"
+    }
+   ]
+  },
+  {
+   "nr": 13,
+   "id": "401880149",
+   "match": "Wolverhampton Wanderers – Charlton Athletic",
+   "avspark": "2026-11-21T15:00:00.000Z",
+   "rubrik": "Peixotos Wolves har inte förlorat på fem",
+   "text": "Wolves, som tränas av César Peixoto sedan juni, ligger fyra med 28 poäng. Laget har inte förlorat på fem matcher: tre segrar och två oavgjorda, senast 1–1 mot Wrexham. Hemma har Wolves förlorat en av sju matcher. Nathan Jones Charlton ligger 19:e med 17 poäng men slog Sheffield United med 2–1 senast. Borta har laget släppt in 16 mål på sju matcher.",
+   "kallor": [
+    {
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 EFL Championship",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_EFL_Championship",
+     "publishedAt": null
+    }
+   ],
+   "lag": [
+    "Wolverhampton Wanderers",
+    "Charlton Athletic"
+   ],
+   "bilder": [
+    {
+     "fil": "wolverhampton-wanderers-ee63070c.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cjx232kygqwpo"
+    },
+    {
+     "fil": "charlton-athletic-1cef9cdf.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cmy0e05v1qnlo"
+    }
    ]
   }
  ]

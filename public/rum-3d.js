@@ -126,7 +126,7 @@
 //
 // figurer(canvas, { calm, vader, detalj, spel, senast, rita }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
 // lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), radio(på, t), radioPa(), spel({ lage, rank, ansikte }, t),
-// senast(lage), uttryck(t),
+// nerver({ dl: { v, slag } }, t), slut({ dl: 1, dj: -1 }, t), senast(lage), uttryck(t),
 // prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t), spegel(vem | null, nx, ny, t),
 // hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappVand(vem, ner, t), lappProva(vem, hållning, gör, at), natt(på, t), somn(på, t),
 // vakna(vem, t, sätt), efter({ lage, krona }), under(nx, ny), huvud(vem) }: neon säger om
@@ -136,7 +136,9 @@
 // (sätt: { dl: 0|1|2 }, annars efter tiden), radio sätter på radion eller stänger av den
 // (radioPa: är den på?), spel hur det går för kupongen
 // (lage 'glad' | 'nerv' | 'deppig' | null, rank { dl: 1, dj: -1 }, ansikte när
-// allt är spelat), senast hur den senaste kupongen gick för ansiktena
+// allt är spelat), nerver hur spänd var och en är av matcherna som pågår (v 0–1, slag
+// 'haller' | 'jagar'; rum.js nerverLage), slut att en match man satt spänd i har blåsts av
+// (1 tipset höll, −1 det höll inte), senast hur den senaste kupongen gick för ansiktena
 // (rum-uttryck.js LAGEN, null = inget), uttryck(t) ett löfte som är klart när
 // ansiktena vid t är ritade (rita anropas då också), prova ett
 // påhitt om och om igen för bilder (utan påhitt som vanligt), ga att vem går
@@ -455,7 +457,7 @@ export async function figurer(canvas, opt = {}) {
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
   // (kameran ute på trottoaren, utifran nedan)
-  const UTE = { kam: null, neon: 1, n: 0, krympt: false, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
+  const UTE = { kam: null, neon: 1, n: 0, krympt: false, lanad: false, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
   // Ögat, där betraktaren står (OGA: gänget tittar dit, looks), flyttas efter musen (draw), och bilden
   // förskjuts så att djupet OGA_Z står kvar (en bit av en större bild, som när duken inte är mitt i).
   // Ljuset står kvar, som när man själv rör sig: förut vreds gänget och skuggorna mot lamporna. NARA är
@@ -3776,9 +3778,11 @@ export async function figurer(canvas, opt = {}) {
       pitch += (1.3 * L.pitch - lean * Math.cos(hy) - pitch) * w;
       roll += (-lean * Math.sin(hy) - roll) * w;
     }
-    // (och huvudet står aldrig helt still, smaRor)
+    // (och huvudet står aldrig helt still, smaRor – utom medan man håller andan, nervKropp)
+    const nk = nervKropp(o, t);
     const sr = smaRor(o, t);
-    if (sr) { yaw += sr.yaw; pitch += sr.pitch; roll += sr.roll; }
+    const srW = nk ? 1 - 0.85 * nk.still : 1;
+    if (sr) { yaw += sr.yaw * srW; pitch += sr.pitch * srW; roll += sr.roll * srW; }
     // den berusade gungar sakta och lite ojämnt, med huvudet på sned (berusadW, känslorna)
     const bw = berusadW(o, t);
     if (bw > 0.01) {
@@ -3898,6 +3902,18 @@ export async function figurer(canvas, opt = {}) {
         knee[i] += ne * 0.06 * Math.sin(t * 1.4 + o.phase + i * 2.1) + gl * 0.05 * Math.sin(t * 1.2 + o.phase + i * 2.4);
         knee[i] += (0.06 - knee[i]) * 0.6 * de;
       }
+    }
+    // nerverna under matcherna (nervKropp): framåtlutad med hälen som vippar, upp ur stolen med andan
+    // hållen när det står och väger på planen, och utandningen eller huvudskakningen efteråt
+    if (nk) {
+      lean += nk.lean;
+      pitch += nk.pitch;
+      yaw += nk.yaw;
+      breath += nk.breath;
+      lift += nk.lift;
+      // (framåt lutar man sig utåt, inte in framför den bakom bordet, som påhitten)
+      if (nk.lean > 0) side += nk.lean * o.F.turn * DEG * 1.5;
+      for (let i = 0; i < 2; i++) knee[i] += nk.knee[i];
     }
     // benen under stolen (fotter): inte medan man väntar, gör något annat eller gungar med i radion
     const fo = hv > 0 && vw < 1 && !gungar ? fotter(o, t) : null;
@@ -4020,7 +4036,8 @@ export async function figurer(canvas, opt = {}) {
   function looks0(o, t) {
     const out = [];
     const tv = tvW(t);
-    if (tv > 0) out.push([TV, tv * (1 - ibland(t + o.phase * 1.7, 26, 0.53 + FI(o) * 0.17, 0, 0.8, 3.6, 4.4))]);
+    // (den som är spänd tittar inte bort lika ofta, nvW)
+    if (tv > 0) out.push([TV, tv * (1 - ibland(t + o.phase * 1.7, 26, 0.53 + FI(o) * 0.17, 0, 0.8, 3.6, 4.4) * (1 - 0.75 * nvW(o, t)))]);
     if (!S.nag) return out;
     const wait = figs.filter((x) => x.inneAt === Infinity);
     const by = figs.filter((x) => x.inneAt !== Infinity);
@@ -4736,7 +4753,7 @@ export async function figurer(canvas, opt = {}) {
   function samtalNu(o, t) { return minns(AKT_MINNE.sa, o, t, samtalNu0); }
   function samtalNu0(o, t) {
     if (opt.calm) return null;
-    const g = ready(o, t) * (1 - aktW(o, t)) * (1 - 0.65 * tvW(t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - Math.max(drinkW(o, t), dragW(o, t))) * (o.st ? 1 - o.st.w : 1);
+    const g = ready(o, t) * (1 - aktW(o, t)) * Math.max(0, 1 - 0.65 * tvW(t) - 0.3 * nvW(o, t)) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - Math.max(drinkW(o, t), dragW(o, t))) * (o.st ? 1 - o.st.w : 1);
     if (g <= 0.01) return null;
     const B = samtalSeg(o, t);
     // (stunden före ändras inte: en gång per stund, SAMTAL_FORE)
@@ -4810,13 +4827,15 @@ export async function figurer(canvas, opt = {}) {
     const x = vana(t, F0.per, F0.fro, FOT.len, 0.3);
     if (!x) return null;
     const hum = humAt(x.t0);
+    // (nervös när kupongen står och väger, eller en match för en själv, nvW)
+    const ner = hum === 'nerv' || nvW(o, x.t0) > 0.45;
     const ben = hash(x.n * 3.3 + F0.fro) < 0.5 ? 0 : 1;
     const w = bump(x.l, 0, 0.6, FOT.len - 1.2, FOT.len);
-    if (x.v < (hum === 'glad' ? 0.6 : hum === 'nerv' ? 0.1 : 0.35)) {
+    if (x.v < (ner ? 0.1 : hum === 'glad' ? 0.6 : 0.35)) {
       const a = 0.17 * Math.sin(x.l * 3.3) * w;
       return { ben, knee: a, foot: -0.5 * a };
     }
-    const f = Math.max(0, Math.sin(x.l * (hum === 'nerv' ? 11 : 5.2))) ** 2 * w;
+    const f = Math.max(0, Math.sin(x.l * (ner ? 11 : 5.2))) ** 2 * w;
     return { ben, knee: 0.03 * f, foot: -0.24 * f };
   }
 
@@ -4860,6 +4879,9 @@ export async function figurer(canvas, opt = {}) {
     const ak = aktNu(o, t);
     const ap = ak && ak.a.hand ? ak.a.hand(o, A, t, ak.l, ak) : null;
     if (ap) base = bage(base, ap, ak.wh);
+    // nerverna: den lediga handen på huvudet när det var nära, och över pannan efter slutsignalen
+    const nh = A === fri(o) ? nervHand(o, A, t) : null;
+    if (nh) base = bage(base, nh.pose, nh.w);
     // målen, på tre sätt (malV): 0 som förut, 1 båda armarna upp (rätt) eller
     // båda händerna på huvudet (fel), 2 handen som dunkar i bordet av glädje
     // eller slår i det en gång
@@ -5190,13 +5212,207 @@ export async function figurer(canvas, opt = {}) {
     return (humOf(HUM.lage) === x ? k : 0) + (humOf(HUM.fran) === x ? 1 - k : 0);
   }
 
+  // ---------- nerverna under matcherna ----------
+  // (2026-11-16, användarens önskemål: "ibland ser nervösa ut när vi följer matcherna live … vissa
+  // resultat … naturliga emotioner … inte se ut som robotar")
+  // NV: hur spänd var och en är av matcherna som pågår ({ v 0–1, slag 'haller' | 'jagar' }, rum.js
+  // nerverLage: mest när tipset håller med uddamålet mot slutet), som glider över på NERV.glid sekunder
+  // när det ändras. Spänningen syns inte jämnt utan kommer och går, olika för var och en (NERV.lynne:
+  // DJ grubblar och tar det hårdast, DL är glad av sig och DT den svalaste):
+  // - stunderna (nervStund): i luckor om 11–17 sekunder kan en stund börja, oftare och längre ju mer
+  //   som står på spel – framåtlutad mot tv:n, ena hälen som vippar, snabbare andning och ansiktet
+  //   oroligt eller spänt (nervos). Däremellan sitter man och tittar som vanligt.
+  // - situationerna på planen (sitNu): ett anfall åt något håll, samma för alla tre, i gemensamma
+  //   luckor och oftare ju spändare den mest spända är. Var och en reagerar en aning efter de andra och
+  //   så mycket som hen har att förlora: lutar sig fram, reser sig lite ur stolen och håller andan –
+  //   och sedan blåser man ut (over), far bakåt med handen på huvudet när det var nära (nara) eller
+  //   sjunker bara tillbaka (lugnt). Den som inte har något på spel tittar bara.
+  // - påhitten (egen, NERV.meny): naglarna, händerna knäppta framför munnen, fingrarna som trummar,
+  //   kliandet i nacken och att vända sig bort från tv:n med handen framför ansiktet och sedan titta upp
+  //   med handen för munnen (tittarInte) – och den som är mest spänd korsar sig ibland. Inga gäspningar eller sträckningar medan det står och väger, och
+  //   inget som gänget gör tillsammans (skålen, allsången) när alla är spända.
+  // - stämningen (stamVikt) drar mot orolig, så att ansiktet ibland är oroligt också mellan stunderna;
+  //   man tittar inte bort från tv:n lika ofta, inte heller på de andra (samtalNu), och benen vippar fort
+  //   som när kupongen står och väger (fotter).
+  // - slutsignalen (slut): en match man satt spänd i blåses av – puh, bakåt med en utandning, blicken i
+  //   taket och handen på bröstet, eller en huvudskakning och en suck när tipset inte höll.
+  // Bara bålen, huvudet och händerna som redan finns rör sig, och ansiktet är ett till (nervos i
+  // rum-uttryck.js), som byggs när det behövs: inga nya delar att rita. Utan rörelser (calm) bara
+  // stämningen och ansiktet efter slutsignalen – men i en fast bild (?rum-t) allt, efter klockan.
+  const NERV = {
+    glid: 6,
+    lynne: { dl: 0.85, dt: 0.72, dj: 1.2 },
+    slot: { dl: 13, dt: 17, dj: 11 },
+    fas: { dl: 2.3, dt: 8.1, dj: 5.4 },
+    sit: 23,
+    meny: {
+      haller: { dl: ['knappt', 'trumma', 'tittarInte', 'nasan', 'klia'], dt: ['hakan', 'knappt', 'klia', 'trumma', 'hosta'], dj: ['naglar', 'knappt', 'tittarInte', 'naglar', 'hakan'] },
+      jagar: { dl: ['trumma', 'klia', 'knappt', 'hakan'], dt: ['hakan', 'klia', 'trumma', 'knappt'], dj: ['naglar', 'hakan', 'trumma', 'klia', 'knappt'] },
+    },
+  };
+  const NV = {};
+  let toldNerv = false;
+  // hur spänd vem är vid t (0–1, med lynnet), bara medan matcherna pågår
+  function nvW(o, t) {
+    const x = NV[o.F.key];
+    if (!x) return 0;
+    const v = x.fran + (x.v - x.fran) * sm(x.at, x.at + NERV.glid, t);
+    return Math.min(1, v * NERV.lynne[o.F.key]) * tvW(t);
+  }
+  const nvSlag = (o, t) => { const x = NV[o.F.key]; return !x ? 'haller' : t >= x.at ? x.slag : x.slagFran; };
+  const nvAlla = (t) => figs.reduce((a, o) => a + nvW(o, t), 0) / Math.max(1, figs.length);
+  // En stund vid t ({ l, len, a, v, ben, w }) eller null: i luckan där t är, med chansen och längden
+  // efter hur spänd hen var när luckan började (v) – a hur djupt, w hur mycket som syns nu.
+  function nervStund(o, t) {
+    if (opt.calm && !STILL) return null;
+    const k = o.F.key;
+    const L = NERV.slot[k];
+    const n = Math.floor((t + NERV.fas[k]) / L);
+    const t1 = n * L - NERV.fas[k];
+    const v = nvW(o, t1);
+    if (v < 0.18) return null;
+    const f = n * 4.71 + FI(o) * 9.37;
+    if (hash(f + 0.11) > 0.08 + 0.72 * v) return null;
+    const len = Math.min(L - 0.6, 4 + (2 + 5 * v) * hash(f + 0.53));
+    const t0 = t1 + hash(f + 0.31) * Math.max(0, L - 0.6 - len);
+    const l = t - t0;
+    if (l < 0 || l >= len) return null;
+    const a = (0.55 + 0.45 * hash(f + 0.71)) * Math.min(1, 0.35 + 0.8 * v);
+    return { l, len, a, v, ben: hash(f + 0.93) < 0.5 ? 0 : 1, w: a * bump(l, 0, 1.1, len - 1.5, len) };
+  }
+  // Situationen på planen i luckan där t är ({ n, t0, hall, utfall }) eller null: oftare ju spändare
+  // den mest spända är när luckan börjar, och utfallet ur luckan.
+  const SIT = { upp: 1.25, ut: { over: 2.6, nara: 2.4, lugnt: 1.8 } };
+  function sit0(t) {
+    const L = NERV.sit;
+    const n = Math.floor((t - 6) / L);
+    const T0 = n * L + 6;
+    let mx = 0;
+    for (const o of figs) mx = Math.max(mx, nvW(o, T0));
+    if (mx < 0.2 || hash(n * 3.91 + 0.7) > 0.15 + 0.6 * mx) return null;
+    const r = hash(n * 2.17 + 0.37);
+    return { n, t0: T0 + hash(n * 1.77 + 0.23) * (L - 9), hall: 0.5 + 1.3 * hash(n * 2.31 + 0.41), utfall: r < 0.45 ? 'over' : r < 0.75 ? 'nara' : 'lugnt' };
+  }
+  // Var och ens del i situationen ({ l, r0, a, pa, ut, utfall }): en aning efter de andra (d), så
+  // mycket som hen har på spel (a); pa medan det står och väger, ut när det har löst sig (från r0).
+  function sitNu(o, t) {
+    if (opt.calm && !STILL) return null;
+    const s = sit0(t);
+    if (!s) return null;
+    const i = FI(o);
+    const l = t - s.t0 - (0.08 + 0.42 * hash(s.n * 1.31 + i * 2.71));
+    const r0 = SIT.upp + s.hall;
+    if (l < 0 || l >= r0 + SIT.ut[s.utfall]) return null;
+    const a = nvW(o, s.t0) * (0.7 + 0.3 * hash(s.n * 0.77 + i * 1.9));
+    if (a < 0.06) return null;
+    const pa = sm(0, SIT.upp, l) * (1 - sm(r0, r0 + 0.35, l));
+    const ut = s.utfall === 'nara' ? bump(l, r0, r0 + 0.16, r0 + 0.7, r0 + 2.2)
+      : s.utfall === 'over' ? bump(l, r0, r0 + 0.55, r0 + 1.2, r0 + 2.6) : bump(l, r0, r0 + 0.6, r0 + 0.9, r0 + 1.8);
+    return { l, r0, a, pa, ut, utfall: s.utfall };
+  }
+  // SL: slutsignalen för var och en ({ k: 1 | -1, at }), SLUT.len sekunder.
+  const SL = {};
+  const SLUT = { len: 5.5 };
+  const slutNu = (o, t) => { const s = SL[o.F.key]; const l = s ? t - s.at : -1; return l >= 0 && l < SLUT.len ? { k: s.k, l } : null; };
+  // hur fritt man är att visa nerverna: vaken, inte mitt i ett mål, och inte medan man sjunger
+  function nervFri(o, t) {
+    const x = aktNu(o, t);
+    return vaken(o, t) * (x && x.a.sang ? 1 - x.w : 1);
+  }
+  // Bålen och huvudet ({ lean, pitch, yaw, breath, lift, knee, still }), eller null: still är hur
+  // stilla huvudet står (smaRor) medan man håller andan.
+  function nervKropp(o, t) {
+    const ns = nervStund(o, t);
+    const sn = sitNu(o, t);
+    const sl = opt.calm && !STILL ? null : slutNu(o, t);
+    if (!ns && !sn && !sl) return null;
+    const f = nervFri(o, t);
+    if (f <= 0.001) return null;
+    const out = { lean: 0, pitch: 0, yaw: 0, breath: 0, lift: 0, knee: [0, 0], still: 0 };
+    const tt = t + o.phase;
+    if (ns) {
+      // framåtlutad mot tv:n (mer när man jagar ett mål), hälen som vippar och snabb, ytlig andning
+      const w = ns.w * f;
+      out.lean += (nvSlag(o, t) === 'jagar' ? 0.08 : 0.06) * w;
+      out.pitch += 0.03 * w;
+      out.breath += 0.012 * Math.sin(tt * 4.4) * w;
+      out.knee[ns.ben] += 0.05 * Math.max(0, Math.sin(tt * 10.5)) ** 2 * w;
+    }
+    if (sn) {
+      // fram och upp ur stolen med andan hållen – och sedan hur det löste sig
+      const a = sn.a * f;
+      out.lean += 0.1 * sn.pa * a;
+      out.lift += 2.4 * sn.pa * a;
+      out.breath += 0.035 * sn.pa * a;
+      out.pitch += 0.04 * sn.pa * a;
+      out.still = sn.pa * Math.min(1, 1.6 * a);
+      const u = sn.ut * a;
+      if (sn.utfall === 'over') { out.breath -= 0.05 * u; out.lean -= 0.06 * u; out.pitch -= 0.1 * u; out.lift -= 0.8 * u; }
+      else if (sn.utfall === 'nara') { out.lean -= 0.12 * u; out.pitch -= 0.22 * u; out.breath += 0.02 * u; }
+      else { out.lean -= 0.03 * u; out.breath -= 0.03 * u; }
+    }
+    if (sl && sl.k > 0) {
+      // puh: bakåt med en lång utandning och blicken i taket en stund
+      const b = bump(sl.l, 0.15, 0.9, 2.2, 3.6) * f;
+      out.breath -= 0.06 * b;
+      out.lean -= 0.1 * b;
+      out.lift -= 1.2 * b;
+      out.pitch -= 0.26 * bump(sl.l, 0.3, 0.8, 1.4, 2.1) * f;
+    } else if (sl) {
+      // en huvudskakning med blicken ner, och en suck
+      const b = bump(sl.l, 0.3, 0.8, 3.2, 4.4) * f;
+      out.yaw += 0.2 * Math.sin((sl.l - 0.6) * 5.2) * bump(sl.l, 0.6, 1.0, 2.6, 3.2) * f;
+      out.pitch += 0.14 * b;
+      out.lean += 0.05 * b;
+      out.breath -= 0.04 * bump(sl.l, 2.4, 2.9, 3.4, 4.4) * f;
+    }
+    return out;
+  }
+  // Den lediga handen ({ pose, w }) eller null: på huvudet när det var nära, och på hjärtat efter en
+  // slutsignal där tipset höll.
+  function nervHand(o, A, t) {
+    const sn = sitNu(o, t);
+    if (sn && sn.utfall === 'nara' && sn.a > 0.3) {
+      const w = bump(sn.l, sn.r0 + 0.05, sn.r0 + 0.45, sn.r0 + 1.4, sn.r0 + 2.3) * Math.min(1, 1.5 * sn.a) * nervFri(o, t);
+      if (w > 0.01) return { pose: haret(o, A), w };
+    }
+    const sl = opt.calm && !STILL ? null : slutNu(o, t);
+    if (sl && sl.k > 0) {
+      const w = bump(sl.l, 0.35, 0.85, 3.0, 3.8) * nervFri(o, t);
+      if (w > 0.01) {
+        const s = A.s;
+        const b = balAxlar(o);
+        // (handflatan mot bröstet)
+        const p = iBal(o, new THREE.Vector3(s * o.F.w * 0.08, o.T * 0.6, o.F.depth * 0.85 + 8));
+        return { pose: { p, y: b(-s * 0.55, 0.8, 0.1), z: b(0, 0.1, 1), pole: new THREE.Vector3(s, -0.6, 0.2) }, w };
+      }
+    }
+    return null;
+  }
+  // Ansiktet ({ lage, in }) eller null: lättad eller sur efter slutsignalen, spänd eller orolig när det
+  // står och väger på planen och i stunderna (s: stämningen, för den berusade).
+  function nervAnsikte(o, t, s) {
+    const sl = SL[o.F.key];
+    const d = sl ? t - sl.at : -1;
+    if (d >= 0.2 && d < 7) return sl.k > 0 ? { lage: mild(s, 'nojd'), in: 0.7 } : { lage: 'sur', in: 0.9 };
+    const sn = sitNu(o, t);
+    if (sn) {
+      if (sn.pa * sn.a > 0.28) return { lage: sn.a > 0.5 ? 'nervos' : 'orolig', in: 0.35 };
+      if (sn.utfall === 'nara' && sn.ut * sn.a > 0.25) return { lage: 'nervos', in: 0.2 };
+      if (sn.utfall === 'over' && sn.ut * sn.a > 0.3) return { lage: 'orolig', in: 0.6 };
+    }
+    const ns = nervStund(o, t);
+    if (ns && ns.w > 0.3) return { lage: ns.a > 0.62 ? 'nervos' : 'orolig', in: 0.9 };
+    return null;
+  }
+
   // Påhitten: korta rörelser (AKTER) som var och en gör då och då, ett i
   // taget, i luckor om AKT_SLOT sekunder (förskjutna, så att de inte börjar
   // samtidigt). Vilket påhitt och hur ofta beror på humöret (MENY): utan
   // läge då och då något lugnt (oftast bakåtlutad med handen i nacken), glad
   // ölen i luften, nervös – men trygg – hakan i handen, händerna knäppta
-  // framför munnen och fingrarna som trummar sakta (naglarna och kliandet finns
-  // kvar för ?rum-akt men väljs inte), deppig hakan i handen, huvudet som
+  // framför munnen och fingrarna som trummar sakta (naglarna, kliandet och att vända sig
+  // bort från tv:n väljs bara när en match står och väger för en själv, NERV.meny), deppig hakan i handen, huvudet som
   // skakas, armarna i kors och blicken ner i flaskan – och i alla lägen ibland de små sakerna (fler
   // påhitt nedan): handen om hakan, näsan, axlarna, en blick ut genom fönstret och hostan. Den som leder
   // omgången lutar sig oftare bakåt med händerna i nacken, och den som ligger sist sitter oftare med
@@ -5245,6 +5461,8 @@ export async function figurer(canvas, opt = {}) {
     if (namn === 'allsang') namn = sangVal(n, t0);
     // (och zen-stunderna på sina)
     if (namn === 'zen') namn = zenVal(n, t0);
+    // (inget tillsammans när det står och väger för gänget, nerverna)
+    if (namn && nvAlla(t0) > 0.45) return null;
     if (!namn || (ALLA.has(namn) && !allaVakna(t0))) return null;
     const l = t - t0;
     return l < AKTER[namn].len ? { namn, l, t0, n } : null;
@@ -5265,14 +5483,20 @@ export async function figurer(canvas, opt = {}) {
     const n = Math.floor((t + fas) / AKT_SLOT);
     const t1 = n * AKT_SLOT - fas + 0.5;
     if (t < t1) return null;
-    const meny = MENY[humAt(t1) || 'lugn'];
-    const ks = hash(n * 2.93 + i * 7.7 + KORS_FRO) < korsChansAt(t1) ? korsaVal(o, n, i) : null;
+    // (en match som står och väger, nvW: nervösa påhitt ur NERV.meny, oftare ju spändare, och inget
+    // lugnt eller sömnigt – ibland korstecknet för den som är mest spänd)
+    const nv = nvW(o, t1);
+    const hum = humAt(t1) || 'lugn';
+    const spand = nv > 0.45;
+    const meny = MENY[spand && hum !== 'deppig' ? 'nerv' : hum];
+    const nerv = nv > 0.25 && hash(n * 5.17 + i * 2.93 + 0.37) < 0.72 * nv ** 1.4;
+    const ks = hash(n * 2.93 + i * 7.7 + KORS_FRO) < korsChansAt(t1) || (nerv && nv > 0.7 && hash(n * 1.61 + i * 4.4 + 0.8) < 0.12) ? korsaVal(o, n, i) : null;
     // (tiden på dygnet: utöver humörets påhitt, dygnVal)
-    const dv = ks ? null : dygnVal(o, n, i, t1);
-    if (!ks && !dv && hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans) return null;
-    const val = meny[o.F.key].slice();
+    const dv = ks || spand ? null : dygnVal(o, n, i, t1);
+    if (!ks && !dv && !nerv && hash(n * 7.31 + i * 13.7 + 0.5) > meny.chans) return null;
+    const val = (nerv ? NERV.meny[nvSlag(o, t1)] : meny)[o.F.key].slice();
     const r = rankAt(o.F.key, t1);
-    if (r > 0) val.push('nacke', 'nacke');
+    if (r > 0 && !nerv) val.push('nacke', 'nacke');
     if (r < 0) val.push('kors', 'kors');
     const namn = ks || dv || val[Math.floor(hash(n * 3.17 + i * 5.3 + 0.25) * val.length)];
     const len = AKTER[namn].len;
@@ -5482,6 +5706,29 @@ export async function figurer(canvas, opt = {}) {
         return { p: m.addScaledVector(y, -o.F.arm * 3), y, z: new THREE.Vector3(0, 0.3, 1), pole: new THREE.Vector3(s, -0.8, 0.1) };
       },
       kropp: (o, t) => ({ lean: 0.12, pitch: 0.02, knee: [0.26 * Math.sin(t * 3.6 + o.phase), 0.26 * Math.sin(t * 3.6 + o.phase + 2.2)] }),
+    },
+    // kan inte titta (nerverna): vänder sig bort från tv:n med huvudet nere och handen framför ansiktet,
+    // tittar upp på tv:n en stund med handen för munnen, och bort igen (handen når inte över ögonen:
+    // huvudena är för stora)
+    tittarInte: {
+      len: 6.6, in: 0.7, ut: 1.2,
+      hand: (o, A, t, l) => {
+        if (A !== fri(o)) return null;
+        // (handflatan framför ansiktet – och i titten ner till munnen)
+        const s = A.s;
+        const P = o.F.head;
+        const d = huvudAxlar(o);
+        const y = -P.ry * (0.04 + 0.34 * bump(l, 2.4, 2.8, 3.5, 3.9));
+        return { p: inHead(o, new THREE.Vector3(s * P.rx * 0.1, y, P.rz * 0.96 + o.F.arm * 1.1)), y: d(-s * 0.25, 1, -0.12), z: d(0, 0, 1), pole: new THREE.Vector3(s, -0.7, 0.3) };
+      },
+      kropp: (o, t, l) => {
+        const kik = bump(l, 2.4, 2.8, 3.5, 3.9);
+        // (bort: snett ner på andra sidan om en än tv:n)
+        const h = headIn(o);
+        const bort = h.clone().sub(TV).setY(0).normalize().multiplyScalar(260).add(h);
+        bort.y = h.y - 170;
+        return { lean: 0.1, pitch: 0.12 * (1 - kik), se: bort, seW: 1 - kik };
+      },
     },
     // händerna knäppta framför munnen (om flaskan eller cigaretten),
     // och gungar fram och tillbaka
@@ -8027,6 +8274,13 @@ export async function figurer(canvas, opt = {}) {
     if (tvW(t0) > 0.5) { mul('uttrakad', 0.25); mul('fundersam', 1.8); mul('orolig', 1.5); mul('lugn', 0.7); }
     // (den som inte har lämnat in funderar på kupongen)
     if (o.inneAt === Infinity) { mul('fundersam', 4); mul('orolig', 1.4); }
+    // (en match som står och väger: oroligare, och sällan uttråkad eller uppsluppen – nerverna, i
+    // fjärdedelar så att stämningarna inte räknas om för varje liten ändring)
+    const nv = Math.round(nvW(o, t0) * 4) / 4;
+    if (nv > 0) {
+      mul('orolig', 1 + 6 * nv); mul('fundersam', 1 + 0.5 * nv); mul('uttrakad', 1 - 0.85 * nv);
+      mul('glad', 1 - 0.6 * nv); mul('nojd', 1 - 0.5 * nv); mul('lugn', 1 - 0.3 * nv); mul('berusad', 1 - 0.5 * nv);
+    }
     return v;
   }
   // nästa stämning efter fran i lucka j (som börjar vid t0)
@@ -8070,7 +8324,7 @@ export async function figurer(canvas, opt = {}) {
   // Ansiktet till det man gör (AKTER): ett läge, eller efter stämningen s. Det som inte står här
   // (en blick ut genom fönstret, upp på tv:n, axlarna …) gör man i den stämning man är.
   const AKT_ANSIKTE = {
-    stirrar: 'uttrakad', funderar: 'fundersam', nacke: 'nojd', kors: 'sur', dunk: 'deppig', knappt: 'orolig', naglar: 'orolig',
+    stirrar: 'uttrakad', funderar: 'fundersam', nacke: 'nojd', kors: 'sur', dunk: 'deppig', knappt: 'orolig', naglar: 'orolig', tittarInte: 'nervos',
     skakar: (s) => (s === 'deppig' ? 'deppig' : 'sur'),
     hakan: (s) => (['orolig', 'deppig', 'sur', 'fundersam'].includes(s) ? s : 'uttrakad'),
     trumma: (s) => (s === 'orolig' || s === 'glad' ? s : 'uttrakad'),
@@ -8142,6 +8396,9 @@ export async function figurer(canvas, opt = {}) {
     const vd = valdD(o, t);
     if (vd >= 0 && vd < 2.1) return med({ lage: 'jublar', in: 0.2 });
     if (teckenW(o, t) > 0.3 || hejW(o, t) > 0.3) return med({ lage: mild(s, 'glad'), in: 0.35 });
+    // (nerverna under matcherna: före påhittet, som ofta är nervöst det med)
+    const nf = nervAnsikte(o, t, s);
+    if (nf) return med(nf);
     if (x && x.w > 0.45) {
       const f = AKT_ANSIKTE[x.namn];
       const l = typeof f === 'function' ? f(s, o, x) : f;
@@ -8400,6 +8657,8 @@ export async function figurer(canvas, opt = {}) {
   let lastMx = 0;
   let lastT = null;
   function draw(t, mx, my, neonPa) {
+    // (duken står i skyltfönstret, lana: inifrån ritas inget i den så länge)
+    if (UTE.lanad && !UTE.kam) return;
     AKT_MINNE.ra.clear();
     AKT_MINNE.nu.clear();
     AKT_MINNE.prat.clear();
@@ -8489,25 +8748,26 @@ export async function figurer(canvas, opt = {}) {
 
   // Gänget utifrån, genom skyltfönstret (fasaden i rum-fasad.js): samma scen och samma ställning, men med en
   // kamera ute på trottoaren som ser rakt in, så att man ser dem bakifrån. Glaset (FONSTER: x, y och z i
-  // världen, från fönsterbänken upp) är rutan som kopieras till fasadens duk: kameran står i ögonhöjd framför
-  // fönstret (oga) och ser vinkelrätt mot glaset, så att glaset blir en rätvinklig ruta i bilden, och den rutan
-  // tas ur duken i samma uppgift som den ritas (innan webbläsaren hinner visa eller tömma den). Skuggfångaren
-  // (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre på ryggarna än på ansiktena inifrån.
-  // Rummet står still under tiden (Rum.vila) och ritas som vanligt igen när man går in. Rutan som kopieras är
-  // STORRE gånger glaset (samma mitt och nederkant), så att gänget blir lika stort som de som går förbi ute.
-  // Bara glaset ritas, med fasadens dukens bildpunkter (högst så många som förut, kval): kameran ser glaset
-  // och inget annat (ett snett synfält, eftersom ögat inte står mitt för det), i dukens nedre hörn. Medan
-  // rummet står still krymper duken till just det (UTE.krympt), så att inget annat i den kostar något, och
-  // draw ger den rummets storlek igen när gänget ritas inifrån (inneStorlek). Förut ritades hela duken, två
-  // till tre gånger fler bildpunkter än glaset, och därför bara några gånger i sekunden: gänget hackade fram.
-  //   utifran(duk, t, neonPa, hem) → true om något ritades (hem: duken ritas sedan inifrån igen, medan rummet syns)
+  // världen, från fönsterbänken upp) är det kameran ser: den står i ögonhöjd framför fönstret (oga) och ser
+  // vinkelrätt mot glaset med ett snett synfält (ögat står inte mitt för det), så att glaset fyller duken och
+  // inget annat ritas. Rutan är STORRE gånger glaset (samma mitt och nederkant), så att gänget blir lika stort
+  // som de som går förbi ute. Skuggfångaren (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre
+  // på ryggarna än på ansiktena inifrån.
+  // Medan rummet inte syns (Rum.vila) lånas gängets duk ut till fasaden och står själv i skyltfönstret (lana):
+  // den krymper till glaset (UTE.krympt) och ritas lika ofta som inne. Förut kopierades glaset till en duk i
+  // fasaden efter varje bild (drawImage från WebGL), ett arbete på grafikkortet som bara fanns ute; nu gör
+  // fasaden samma sak som rummet, där duken visar det som ritas i den. Inifrån ritas inget så länge den är
+  // utlånad (draw), och draw ger den rummets storlek igen när gänget ritas inifrån (inneStorlek).
+  //   lana(pa): duken står i fasaden (true) eller i rummet igen (false); rum.js flyttar den
+  //   utifran({ w, h }, t, neonPa) → true om något ritades: glaset med w × h bildpunkter, men inte fler än
+  //     glaset fick när hela duken ritades inifrån (H gånger prNu, efter kval)
   const FONSTER = { x0: -615, x1: 185, y0: SILL - 4, y1: SILL + 509, z: -150, oga: [-110, 140, -2300] };
   const STORRE = 1.25;
-  const UTE_VP = new THREE.Vector4();
-  const UTE_SZ = new THREE.Vector2();
-  function utifran(duk, t, neonPa, hem = false) {
-    const g = duk && duk.getContext('2d');
-    if (!g || !canvas.width || !canvas.height) return false;
+  function lana(pa) {
+    UTE.lanad = Boolean(pa);
+  }
+  function utifran(ut, t, neonPa) {
+    if (!UTE.lanad || NARA || !ut || !(ut.w >= 1) || !(ut.h >= 1)) return false;
     const K = UTE.K;
     const F0 = FONSTER;
     const mx = (F0.x0 + F0.x1) / 2;
@@ -8520,23 +8780,15 @@ export async function figurer(canvas, opt = {}) {
     K.updateMatrixWorld();
     K.projectionMatrix.makePerspective((ex - F.x1) * n, (ex - F.x0) * n, (F.y1 - ey) * n, (F.y0 - ey) * n, K.near, K.far);
     K.projectionMatrixInverse.copy(K.projectionMatrix).invert();
-    // bildpunkterna: dukens, men inte fler än glaset fick när hela duken ritades (H gånger prNu, efter kval)
-    const q = Math.min(1, H * prNu / duk.height);
-    let vw = Math.max(1, Math.round(duk.width * q));
-    let vh = Math.max(1, Math.round(duk.height * q));
-    if (hem || NARA) {
-      inneStorlek();
-      const k = Math.min(1, canvas.width / vw, canvas.height / vh);
-      vw = Math.max(1, Math.floor(vw * k));
-      vh = Math.max(1, Math.floor(vh * k));
-    } else if (canvas.width !== vw || canvas.height !== vh) {
+    const q = Math.min(1, H * prNu / ut.h);
+    const vw = Math.max(1, Math.round(ut.w * q));
+    const vh = Math.max(1, Math.round(ut.h * q));
+    if (!UTE.krympt || canvas.width !== vw || canvas.height !== vh) {
       UTE.krympt = true;
       r.setPixelRatio(1);
       r.setSize(vw, vh, false);
     }
-    const pr = r.getPixelRatio();
-    r.setViewport(0, 0, vw / pr, vh / pr);
-    r.getCurrentViewport(UTE_VP);
+    r.setViewport(0, 0, vw, vh);
     const fang = catcher.visible;
     catcher.visible = false;
     UTE.kam = K;
@@ -8553,17 +8805,6 @@ export async function figurer(canvas, opt = {}) {
       UTE.neon = 1;
       catcher.visible = fang;
       r.shadowMap.autoUpdate = au;
-    }
-    // (glaset ligger i dukens nedre vänstra hörn: WebGL räknar nerifrån)
-    g.clearRect(0, 0, duk.width, duk.height);
-    g.drawImage(canvas, UTE_VP.x, canvas.height - UTE_VP.y - UTE_VP.w, UTE_VP.z, UTE_VP.w, 0, 0, duk.width, duk.height);
-    if (hem || NARA) {
-      r.getSize(UTE_SZ);
-      r.setViewport(0, 0, UTE_SZ.x, UTE_SZ.y);
-    }
-    if (hem) {
-      sikta();
-      r.render(scene, cam);
     }
     return true;
   }
@@ -8737,8 +8978,8 @@ export async function figurer(canvas, opt = {}) {
     const p = Math.max(0.75, Math.min(PR, PR * pr));
     if (p !== prNu) {
       prNu = p;
-      // (krympt till glaset, utifran: storleken inne kommer med inneStorlek)
-      if (!NARA && !UTE.krympt) {
+      // (krympt till glaset eller utlånad, utifran: storleken inne kommer med inneStorlek)
+      if (!NARA && !UTE.krympt && !UTE.lanad) {
         r.setPixelRatio(p);
         r.setSize(W, H, false);
         // (en duk som får ny storlek är tom: annars blinkar gänget bort till nästa bild)
@@ -8910,6 +9151,31 @@ export async function figurer(canvas, opt = {}) {
     const sp = (x && x.ansikte) || lage;
     if (sp !== ANS.spel) stamGlom();
     ANS.spel = sp;
+  }
+  // Hur spänd var och en är av matcherna som pågår ({ dl: { v, slag } }, rum.js nerverLage; den som
+  // inte står med är inte spänd): första gången som det är, sedan glider det över på NERV.glid
+  // sekunder. Stämningarna räknas om när någon har blivit märkbart spändare eller lugnare.
+  function nerver(x, t) {
+    const fore = figs.map((o) => Math.round(nvW(o, t + NERV.glid) * 4));
+    for (const k of ['dl', 'dt', 'dj']) {
+      const y = x && (x[k] || x[k.toUpperCase()]);
+      const v = y ? Math.max(0, Math.min(1, Number(y.v) || 0)) : 0;
+      const slag = y && y.slag === 'jagar' ? 'jagar' : 'haller';
+      const g = NV[k];
+      if (g && g.v === v && g.slag === slag) continue;
+      const nu = g ? g.fran + (g.v - g.fran) * sm(g.at, g.at + NERV.glid, t) : v;
+      NV[k] = { v, fran: toldNerv ? nu : v, at: toldNerv ? t : -1e9, slag, slagFran: g ? g.slag : slag };
+    }
+    toldNerv = true;
+    if (figs.some((o, i) => Math.round(nvW(o, t + NERV.glid) * 4) !== fore[i])) stamGlom();
+  }
+  // Slutsignalen i en match man satt spänd i ({ dl: 1, dj: -1 }): 1 när tipset höll, −1 när det inte
+  // gjorde det (nervKropp, nervHand och nervAnsikte).
+  function slut(vem, t) {
+    for (const k of Object.keys(vem || {})) {
+      const v = Math.sign(Number(vem[k]));
+      if (v) SL[k.toLowerCase()] = { k: v, at: t };
+    }
   }
   // Hur gängets senaste kupong gick (rum-folk.js, rum-uttryck.js LAGEN:
   // 'jublar' … 'deppig', null = inget att gå efter): ansiktena när ingen
@@ -9234,5 +9500,5 @@ export async function figurer(canvas, opt = {}) {
   // syns de som de är ritade och glider sedan över
   await Promise.race([kanKlar(opt.nu ? opt.nu() : 0), new Promise((ok) => setTimeout(ok, 2500))]).catch(() => {});
   ANS.ute = true;
-  return { draw, utifran, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, senast, uttryck: (t) => kanKlar(t ?? KAN.t), prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, utifran, lana, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, nerver, slut, senast, uttryck: (t) => kanKlar(t ?? KAN.t), prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }

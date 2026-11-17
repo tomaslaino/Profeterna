@@ -47,7 +47,7 @@
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|kupong|radio en närbild,
-// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr),
+// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr; ?rum-fasad-vem=inlines vilka som går förbi),
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -2597,7 +2597,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   function gangTv(rd, rows, t, p) {
     const q = R.q;
     const soon = (x) => t - x.g.kick < 2.5 * 3600000;
-    const tv = q.has('rum-tittar') || rows.some((x) => x.g.state === 'live' || ((x.g.state === 'started' || (x.g.state === 'hidden' && !x.g.over)) && soon(x)));
+    const tv = q.has('rum-tittar') || q.has('rum-nerv') || rows.some((x) => x.g.state === 'live' || ((x.g.state === 'started' || (x.g.state === 'hidden' && !x.g.over)) && soon(x)));
     const first = rows.length ? Math.min(...rows.map((x) => Date.parse(x.m.kickoff))) : 0;
     const h = q.has('rum-stopp') ? parseFloat(q.get('rum-stopp')) : (first - t) / 3600000;
     const nag = !rd || rd.next || !(h > 0) || h > 24 ? 0 : h <= 1 ? 1 : 0.25 + (0.6 * (24 - h)) / 23;
@@ -2619,6 +2619,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     const was = R.ss || {};
     const sum = {};
     R.ss = {};
+    // (ens eget tips när det syns, annars gängets kupong)
+    const tecken = (g, x) => (s && s.tips && s.tips[g.id] ? s.tips[g.id].tecken[x.id] : p && p.inne && p.vem === g.id ? p.tecken[x.id] : null) || x.sign || '';
     for (const x of rows) {
       if (x.g.state !== 'live' || !x.g.score) continue;
       const sc = x.g.score;
@@ -2626,8 +2628,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       const w = was[x.id];
       if (!w || (w.home === sc.home && w.away === sc.away)) continue;
       for (const g of gang) {
-        const own = s && s.tips && s.tips[g.id] ? s.tips[g.id].tecken[x.id] : p && p.inne && p.vem === g.id ? p.tecken[x.id] : null;
-        const sign = own || x.sign || '';
+        const sign = tecken(g, x);
         sum[g.id] = (sum[g.id] || 0) + (sign ? Number(sign.includes(res(sc))) - Number(sign.includes(res(w))) : 0);
       }
     }
@@ -2635,6 +2636,88 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // humöret: hur det går för kupongen
     R.spel = spelLage(rd, rows, p);
     if (R.fig && R.fig.spel) R.fig.spel(R.spel, now());
+    // nerverna: hur spänd var och en är av matcherna som pågår, och slutsignalen i en match man satt
+    // spänd i (rum-3d.js, nerver och slut)
+    const nv = nerverLage(rows, gang, tecken, R.spel.lage);
+    R.nerv = nv.vem;
+    if (R.fig && R.fig.nerver) R.fig.nerver(R.nerv, now());
+    if (Object.keys(nv.slut).length && R.fig && R.fig.slut) R.fig.slut(nv.slut, now());
+  }
+
+  // Nerverna under matcherna (rum-3d.js, nerver): hur spänd var och en är, 0–1, av matcherna som
+  // pågår – efter sitt eget tips, som målen. En match spänner när ett mål skulle vända tipset: mest
+  // när tipset håller med uddamålet (eller krysset i en jämn match) och det lider mot slutet, nästan
+  // lika mycket när ett mål skulle rädda det, lite med två mål emellan och inte alls med fler eller
+  // med helgardering. Tidigt i matchen lite, i halvtidsvilan nästan inget. Flera matcher lägger sig på
+  // den mest spända, de andra en fjärdedel var, och kupongen väger in: på gränsen (nästa fel tar
+  // vinsten) mer, död mindre. Dolda resultat ger inga nerver (state hidden, ingen ställning).
+  // slag: om det mest är att hålla undan (haller) eller att jaga ett mål (jagar). slut: när en match
+  // som någon satt spänd i (minst 0,3) har blåsts av – 1 när tipset höll, −1 när det inte gjorde det;
+  // inte första gången (när rummet öppnas).
+  // ?rum-nerv=dl:0.9,dt:0.4:jagar,dj:0.7 för bilder (och då står tv:n på).
+  const NERV_MIN = /^(\d+)'(?:\+(\d+))?/;
+  function matchNerv(sign, sc, clock) {
+    if (!sign || sign.length >= 3 || !sc) return null;
+    const res = (d) => (d > 0 ? '1' : d < 0 ? '2' : 'X');
+    const d = sc.home - sc.away;
+    const hit = sign.includes(res(d));
+    // hur många mål som vänder tipset, åt något håll
+    let mal = 0;
+    for (let k = 1; k <= 2 && !mal; k++) if (sign.includes(res(d + k)) !== hit || sign.includes(res(d - k)) !== hit) mal = k;
+    if (!mal) return null;
+    const c = String(clock || '');
+    const m = NERV_MIN.exec(c);
+    const sent = sm(52, 90, m ? Number(m[1]) + Number(m[2] || 0) : 45);
+    let v = mal === 1 ? (hit ? 0.15 + 0.85 * sent : 0.12 + 0.68 * sent) : (hit ? 0.12 * (1 - 0.7 * sent) : 0.1 * (1 - sent));
+    if (/^HT\b/i.test(c)) v *= 0.3;
+    return { v, haller: hit };
+  }
+  function nerverLage(rows, gang, tecken, lage) {
+    const q = R.q;
+    if (q.has('rum-nerv')) {
+      const vem = {};
+      for (const x of (q.get('rum-nerv') || '').split(',')) {
+        const r = /^(\w+):([\d.]+)(?::(haller|jagar))?$/.exec(x.trim());
+        if (r) vem[r[1].toLowerCase()] = { v: Math.min(1, Number(r[2])), slag: r[3] || 'haller' };
+      }
+      return { vem, slut: {} };
+    }
+    const vikt = lage === 'nerv' ? 1.2 : lage === 'deppig' ? 0.55 : lage === 'glad' ? 0.9 : 1;
+    const vem = {};
+    const nu = {};
+    for (const g of gang) {
+      const v = [];
+      let haller = 0;
+      let jagar = 0;
+      for (const x of rows) {
+        if (x.g.state !== 'live' || !x.g.score) continue;
+        const n = matchNerv(tecken(g, x), x.g.score, x.g.clock);
+        if (!n || n.v < 0.01) continue;
+        v.push(n.v);
+        (nu[x.id] || (nu[x.id] = {}))[g.id] = n.v;
+        if (n.haller) haller = Math.max(haller, n.v);
+        else jagar = Math.max(jagar, n.v);
+      }
+      if (!v.length) continue;
+      v.sort((a, b) => b - a);
+      const x = Math.min(1, (v[0] + 0.25 * v.slice(1).reduce((a, b) => a + b, 0)) * vikt);
+      vem[g.id.toLowerCase()] = { v: Math.round(x * 100) / 100, slag: haller >= jagar ? 'haller' : 'jagar' };
+    }
+    // slutsignalen: en match som var spänd förra gången och nu är slut (och syns)
+    const slut = {};
+    for (const [id, fore] of Object.entries(R.nervM || {})) {
+      const x = rows.find((y) => String(y.id) === id);
+      if (!x || x.g.state !== 'final' || x.g.res == null) continue;
+      for (const g of gang) {
+        const sign = tecken(g, x);
+        if (!(fore[g.id] >= 0.3) || !sign) continue;
+        const k = g.id.toLowerCase();
+        slut[k] = (slut[k] || 0) + (sign.includes(SIGNS[x.g.res]) ? 1 : -1);
+      }
+    }
+    for (const k of Object.keys(slut)) if (!slut[k]) delete slut[k];
+    R.nervM = nu;
+    return { vem, slut };
   }
 
   // Hur det går för gängets kupong, för gängets humör (rum-3d.js, spel): bara
@@ -2710,6 +2793,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       if (r && r[3]) satt[r[1]] = 'abc'.indexOf(r[3]);
     }
     const go = () => R.fig.mal(m, still() ? 0 : now(), satt);
+    go();
+    if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
+  }
+
+  // ?rum-slut=dl:1,dj:-1: slutsignalen i en match man satt spänd i, för bilder (rum-3d.js, slut) – 1
+  // när tipset höll, −1 när det inte gjorde det; vid tiden 0 med ?rum-t, annars genast och sedan var
+  // femtonde sekund.
+  function provSlut() {
+    const v = R.q.get('rum-slut');
+    if (!v || !R.fig || !R.fig.slut) return;
+    const m = {};
+    for (const x of v.split(',')) {
+      const r = /^(\w+):(-?1)$/.exec(x.trim());
+      if (r) m[r[1]] = Number(r[2]);
+    }
+    const go = () => R.fig.slut(m, still() ? 0 : now());
     go();
     if (!still()) setInterval(() => { if (R.on) go(); }, 15000);
   }
@@ -3495,11 +3594,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (R.vem) R.fig.inne(R.vem, now());
         if (R.lage) R.fig.lage(R.lage, now());
         if (R.spel) R.fig.spel(R.spel, now());
+        if (R.nerv) R.fig.nerver(R.nerv, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
         if (window.RumFolk) RumFolk.mount(R.el, { fig: () => R.fig, inr: () => R.inr, now, nara, fokus, teckna, lappKlick, visa, ta: taKupong, radio: () => sak('radio') });
         if (window.RumRadio) RumRadio.mount({ el: R.el, fig: () => R.fig, now, inr: () => R.inr, sak: (n) => sak(n) });
         radioRuta();
         provMal();
+        provSlut();
         provAkt();
         provLapp();
         provGa();
@@ -4237,7 +4338,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // S:t Eriksbron i samma ljus och väder som utsikten, och genom skyltfönstret gänget bakifrån, ritat av samma
   // 3D-scen (utifran). Fasaden tonar fram medan man tar ett steg bakåt från dörren, och ett klick var som helst,
   // Esc eller Tillbaka går in genom dörren igen. Rummet står still bakom så länge (R.vilar, som hos Hasse Backe)
-  // och ritas som vanligt innan det syns igen: gängets duk har bilden utifrån.
+  // och syns inte; gängets duk står då i skyltfönstret (glas) och ritas därifrån.
   //   glid: med rörelse in och ut (annars genast)
   function fasad(pa = true, glid = !calm()) {
     if (!pa) {
@@ -4247,29 +4348,33 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       clearTimeout(R.fasadT);
       lagerUt('fasaden');
       R.vilar = false;
-      if (R.fig && R.on) {
-        const t = now();
-        const [vx, vy] = synlig();
-        R.fig.draw(t, vx, vy, neonOn(t));
-      }
+      R.el.classList.remove('fasad-tackt');
       if (glid && !(window.RumBak && RumBak.snabbt)) {
         f.el.classList.remove('in');
         f.el.classList.add('ut');
+        // (gänget står kvar i fönstret medan fasaden ännu täcker rummet, rf-ut i rum-fasad.css)
+        R.glasT = setTimeout(() => glas(f, false), 150);
         setTimeout(() => f.ut(), 520);
-      } else f.ut();
+      } else {
+        glas(f, false);
+        f.ut();
+      }
       return false;
     }
     if (R.fasad || !window.RumFasad || !R.on) return Boolean(R.fasad);
+    if (R.glas) glas(R.glas.f, false);
     if (R.sak) sak(null, null);
     if (R.zoom) zoomTv(false);
     if (R.vnara) zoomVideo(false);
     const f = RumFasad.bygg(R.el, {
-      // (medan rummet syns, i övergången, ritas gänget tillbaka inifrån direkt efter)
-      gang: (duk) => R.fig && R.fig.utifran ? R.fig.utifran(duk, now(), neonOn(now()), !R.vilar) : false,
+      // (i gängets egen duk, när den står i skyltfönstret: glas)
+      gang: (ut) => R.fig && R.fig.utifran ? R.fig.utifran(ut, now(), neonOn(now())) : false,
       // (lika ofta som gänget ritas inne, KVAL)
       takt: () => (KVAL[R.kval] || KVAL[0]).takt,
       neon: () => neonOn(now()),
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
+      // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
+      pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
       calm: () => RORELSE_AV.matches,
       // (en fast bild, ?rum-t: allt står på samma tid)
       still: still() ? R.frozen : null,
@@ -4279,13 +4384,56 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       e.stopPropagation();
       fasad(false);
     });
-    if (glid) f.el.classList.add('in');
+    // (framme: inget eget lager för toningen längre)
+    if (glid) {
+      f.el.classList.add('in');
+      f.el.addEventListener('animationend', (e) => { if (e.target === f.el && e.animationName === 'rf-in') f.el.classList.remove('in'); });
+    }
     R.fasad = f;
     lager('fasaden', (nu) => fasad(false, !nu));
-    // rummet står still när fasaden täcker det
+    // Rummet står still när fasaden täcker det, och ritas inte heller (fasad-tackt i rum-fasad.css): förut
+    // låg alla rummets lager kvar under fasaden, en och en halv gång fler bildpunkter än fasaden själv i en
+    // telefon, och med dem ute tog sidan för mycket minne. Gängets duk står då i skyltfönstret (glas).
+    // (utan rörelse genast, så att en fast bild har gänget i fönstret)
     clearTimeout(R.fasadT);
-    R.fasadT = setTimeout(() => { if (R.fasad === f) R.vilar = true; }, glid ? 420 : 0);
+    const tackt = () => {
+      if (R.fasad !== f) return;
+      R.vilar = true;
+      R.el.classList.add('fasad-tackt');
+      glas(f, true);
+    };
+    if (glid) R.fasadT = setTimeout(tackt, 420);
+    else tackt();
     return true;
+  }
+  // Gängets duk (rum-3d.js) lånas ut till fasadens skyltfönster medan rummet inte syns, och ritar gänget
+  // utifrån där (utifran, lana): förut ritades glaset i duken inne i rummet och kopierades till en duk i
+  // fasaden efter varje bild (drawImage från WebGL), 15–30 gånger i sekunden. Det arbetet på grafikkortet
+  // fanns bara ute, och ute kraschade sidan i telefonen; nu gör fasaden samma sak som rummet, där duken
+  // visar det som ritas i den. Tillbaka (pa false) står den där den stod, med sin stil, och gänget ritas
+  // inifrån genast, innan rummet syns.
+  function glas(f, pa) {
+    clearTimeout(R.glasT);
+    const c = document.getElementById('rum-3d');
+    if (pa) {
+      if (R.glas || !c || !R.fig || !R.fig.lana || !f.glas) return;
+      R.glas = { f, c, hem: c.parentNode, fore: c.nextSibling, stil: c.style.cssText };
+      R.fig.lana(true);
+      f.glas(c);
+      return;
+    }
+    const g = R.glas;
+    if (!g) return;
+    R.glas = null;
+    g.f.glas(null);
+    g.c.style.cssText = g.stil;
+    g.hem.insertBefore(g.c, g.fore && g.fore.parentNode === g.hem ? g.fore : null);
+    R.fig.lana(false);
+    if (R.on && !R.vilar) {
+      const t = now();
+      const [vx, vy] = synlig();
+      R.fig.draw(t, vx, vy, neonOn(t));
+    }
   }
 
   // Tidningen lyfts från pulten mot en och syns inte där medan den är framme; bort: den läggs tillbaka. (UPPE: samma

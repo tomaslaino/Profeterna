@@ -32,9 +32,10 @@
 // På natten är taklamporna släckta (natt, från rum-folk.js, 0–1 medan de dämpas och tänds; i koden
 // heter det ofta fortfarande lysröret): glaskuporna mörka, och det målade bandet mörknar.
 //
-// inredning(el, { calm, still, vagg, ljus }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp, pyntLjus(), lampLjus() } (namnet som Kronan.names, ms spelstoppet eller null;
+// inredning(el, { calm, still, vagg, ljus }) → { draw(), namn(html), skarp(namn eller [namn], px), natt(0–1), stopp(ms), lapp, pyntLjus(), lampLjus(), pyntUtifran(namn, o) } (namnet som Kronan.names, ms spelstoppet eller null;
 // vagg: tavlornas mått på högra väggen, VAGG i rum.js; lapp: bladet vid radion för rum-radio.js, radiolapp; ljus: anropas
 // när högtidspyntet har byggts eller tagits bort, pyntLjus: det som lyser i det, [x, y, rx, ry, färg] i scenens bildpunkter;
+// pyntUtifran('pyntF' | 'pyntP', { w, h, dag }): fönstrets eller dörrens pynt sett utifrån (fasaden), en duk eller null;
 // lampLjus: takfläktens glas, [x, y, r, 'kupa' | 'flakt'] i scenens bildpunkter, för ljusKlockan i rum.js)
 
 import { SKIVA, skivPlats } from './rum-affischer.js';
@@ -92,6 +93,8 @@ const BITAR = {
 const PYNT_BITAR = {
   pyntF: { plan: 0, box: { x: 222, y: 96, w: 770, h: 214 }, fore: 'canvas.rum-neon' },
   pyntD: { plan: 0, box: { x: 1040, y: 330, w: 230, h: 220 }, fore: '.rum-hv + *' },
+  // dörrens glas: kransen, lövruskorna vid posterna, lyktorna och fladdermössen
+  pyntP: { plan: 0, box: { x: 20, y: 128, w: 236, h: 530 }, fore: 'canvas.rum-neon' },
 };
 // närbilden: högst så många bildpunkter på dukens längsta led
 const SKARP = 2600;
@@ -470,6 +473,11 @@ export async function inredning(el, opt = {}) {
   // inte där sakerna på väggarna står (WZ, WX), med en vinkellist mot väggen. Fläkten står kvar i
   // sin duk: här finns bara dess skugga (osynliga kopior), som ritas när taket ritas – en gång, och om
   // när lamporna släcks och tänds (natt).
+  // Samma kväll mindre framträdande ("tar en del fokus", 2026-11-16): ljusa linjer i bärverket över en
+  // mörkare platta var ett rutnät som drog blicken, och plattorna var ljusare än väggarna. Nu har röken
+  // gulnat bärverket nästan lika mycket som plattorna, plattorna är mörkare med fläckar av nikotin, sotränder
+  // längs kanterna och en sotring kring fläktens fäste, frånluftsdonet är smutsigt, och taket får mindre ljus
+  // underifrån, så att det klingar av i dunkel mot en.
   const PLATTA = 120;
   function innertak(b) {
     const { scene } = b;
@@ -484,11 +492,14 @@ export async function inredning(el, opt = {}) {
     };
     const XS = linjer(x0, x1, FX);
     const ZS = linjer(0, z1, FZ);
-    // nikotinet: gulnat överallt, brunt i ett moln över bordet där röken stiger, och mörkare mot väggarna
-    const brun = (x, z) => Math.min(1, 0.5 * Math.exp(-((Math.hypot(x - FX, (z - FZ) * 1.25) / 300) ** 2)) +
-      0.3 * Math.exp(-z / 50) + 0.3 * Math.exp(-(x1 - x) / 50) + 0.08 * Math.exp(-(((x - 440) / 160) ** 2) - (z / 120) ** 2));
-    const GUL = new THREE.Color('#ddd0b4');
-    const BRUN = new THREE.Color('#97784e');
+    // nikotinet: gulnat överallt, brunt i ett moln över bordet där röken stiger, sotigt kring fläktens
+    // fäste, mörkare mot väggarna och ojämnt (stråk där röken drog fram)
+    const brun = (x, z) => Math.min(1, 0.14 + 0.46 * Math.exp(-((Math.hypot(x - FX, (z - FZ) * 1.25) / 330) ** 2)) +
+      0.26 * Math.exp(-((Math.hypot(x - FX, z - FZ) / 70) ** 2)) +
+      0.3 * Math.exp(-z / 50) + 0.3 * Math.exp(-(x1 - x) / 50) + 0.08 * Math.exp(-(((x - 440) / 160) ** 2) - (z / 120) ** 2) +
+      0.07 * (Math.sin(x / 83 + 1.3) * Math.sin(z / 61 + 0.4) + 0.6 * Math.sin((x + 1.7 * z) / 47 + 2.1)));
+    const GUL = new THREE.Color('#ccb892');
+    const BRUN = new THREE.Color('#7a5b39');
 
     // plattan: mineralull med hål och sprickor, och mörkare i kanten mot bärverket
     const R = LATT ? 128 : 256;
@@ -511,9 +522,19 @@ export async function inredning(el, opt = {}) {
         const r = (0.5 + hash(fro + i * 1.13) * 1.1) * s;
         c.fillRect(hash(fro + i * 0.91) * w, hash(fro + i * 1.57) * h, r, r);
       }
+      // fläckar av nikotin, mjuka och olika stora
+      for (let i = 0; i < 5; i++) {
+        const [x, y, r] = [hash(fro + i * 4.3) * w, hash(fro + i * 6.1 + 0.2) * h, (30 + hash(fro + i * 2.9) * 70) * s];
+        const f = c.createRadialGradient(x, y, 0, x, y, r);
+        f.addColorStop(0, `rgba(122, 86, 42, ${(0.08 + hash(fro + i * 8.3) * 0.1).toFixed(2)})`);
+        f.addColorStop(1, 'rgba(122, 86, 42, 0)');
+        c.fillStyle = f;
+        c.fillRect(0, 0, w, h);
+      }
       if (extra) extra(c, w, h, s);
-      for (let k = 0; k < 4; k++) {
-        c.strokeStyle = `rgba(70, 52, 30, ${(0.28 - k * 0.06).toFixed(2)})`;
+      // soten längs kanterna, där luften drog förbi bärverket
+      for (let k = 0; k < 6; k++) {
+        c.strokeStyle = `rgba(70, 52, 30, ${(0.2 - k * 0.03).toFixed(2)})`;
         c.lineWidth = 2.2 * s;
         c.strokeRect((1 + k * 2) * s, (1 + k * 2) * s, w - (2 + k * 4) * s, h - (2 + k * 4) * s);
       }
@@ -544,17 +565,17 @@ export async function inredning(el, opt = {}) {
       c.fillStyle = d;
       c.fillRect(0, 0, w, h);
       const m = w * 0.21;
-      c.fillStyle = '#ece4d0';
+      c.fillStyle = '#d6c7a4';
       c.fillRect(m, m, w - 2 * m, h - 2 * m);
       for (let k = 0; k < 5; k++) {
         const q = m + (k + 0.6) * w * 0.05;
-        c.strokeStyle = 'rgba(28, 22, 16, .85)';
+        c.strokeStyle = 'rgba(48, 36, 22, .6)';
         c.lineWidth = w * 0.022;
         c.strokeRect(q, q, w - 2 * q, h - 2 * q);
       }
-      c.fillStyle = '#2a2219';
+      c.fillStyle = '#3a2e20';
       c.fillRect(w * 0.47, h * 0.47, w * 0.06, h * 0.06);
-      c.strokeStyle = 'rgba(255, 252, 240, .5)';
+      c.strokeStyle = 'rgba(255, 246, 220, .18)';
       c.lineWidth = 1.5 * s;
       c.strokeRect(m, m, w - 2 * m, h - 2 * m);
     });
@@ -609,8 +630,9 @@ export async function inredning(el, opt = {}) {
     morker.position.set((x0 + x1) / 2, TAK + 30, z1 / 2);
     scene.add(morker);
 
-    // bärverket: T-profiler, 24 mm (4,8 enheter) breda, och vinkellisten mot väggarna
-    const plat = mat('#f1e9d6', { roughness: 0.5, metalness: 0.05, envMapIntensity: 0.3 });
+    // bärverket: T-profiler, 24 mm (4,8 enheter) breda, och vinkellisten mot väggarna, gulnade av röken
+    // (bara lite ljusare än plattorna, så att rutnätet syns utan att lysa)
+    const plat = mat('#bea476', { roughness: 0.7, metalness: 0.05, envMapIntensity: 0.15 });
     const balk = (w, d, x, z) => {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, 1.3, d), plat);
       m.position.set(x, TAK - 0.65, z);
@@ -656,14 +678,14 @@ export async function inredning(el, opt = {}) {
       if (natt) LAMP.ljus.push([l, i]);
       return l;
     };
-    ljus(new THREE.HemisphereLight('#1c150e', '#b4a084', 0), 1.1);
+    ljus(new THREE.HemisphereLight('#1c150e', '#b4a084', 0), 0.8);
     const fram = ljus(new THREE.DirectionalLight('#e2d0b0', 0), 0.45);
     fram.position.set(760, -700, 1000);
     fram.target.position.set(760, TAK, 300);
     scene.add(fram.target);
     for (const [x, y, z, , s] of LAMP.lyser) {
       if (s !== 'kupa') continue;
-      const l = ljus(new THREE.PointLight('#ffdcb2', 0, 0, 2), 5200);
+      const l = ljus(new THREE.PointLight('#ffdcb2', 0, 0, 2), 4200);
       l.position.set(x, y + 6, z);
       if (gl.shadowMap.enabled) {
         l.castShadow = true;
@@ -1911,7 +1933,10 @@ export async function inredning(el, opt = {}) {
     const S = P.pyntSaker(mat);
     const F = [];
     const D = [];
-    if (namn === 'jul') {
+    const DR = [];
+    // det som hänger i trådar och band från karmen i fönstret (y: där saken hänger, mitten för stjärnorna)
+    const halm = (x, y, R) => { const h = S.halmstjarna({ R, band: (y - R * K - KARM) / K }); h.position.copy(PK(x, y, -13)); return h; };
+    if (namn === 'jul' || namn === 'nyar') {
       // (ingen kula i bågen ovanför stjärnan)
       F.push(S.girlang(KROKAR, { s: 7, utan: [2] }));
       // stjärnan i den högra rutan, mellan neonen och skivan, ovanför gänget
@@ -1921,25 +1946,62 @@ export async function inredning(el, opt = {}) {
       st.rotation.y = -8 * DEG;
       F.push(st);
       D.push(S.ljusstake());
+      // halmstjärnor i luckorna ovanför gänget, och julkransen på dörrens glas under namnet, i ett band
+      // från en sugpropp
+      F.push(halm(498, 238, 7), halm(574, 224, 8), halm(744, 244, 6));
+      const kr = S.krans({ typ: 'gran', R: 16, band: 7 });
+      kr.position.copy(PK(136, 366, -18));
+      DR.push(kr);
+      if (namn === 'nyar') {
+        // serpentiner som hänger från girlangen, utom i bågen med stjärnan
+        const ut = [];
+        [[0, 0.2, 18], [0, 0.48, 24], [0, 0.78, 20], [1, 0.2, 22], [1, 0.5, 16], [1, 0.82, 26], [3, 0.3, 22], [3, 0.6, 17], [3, 0.88, 24]].forEach(([i, t, l]) => {
+          const a = KROKAR[i];
+          const b = KROKAR[i + 1];
+          ut.push([a.clone().lerp(b, t).add(new THREE.Vector3(0, -4 * 7 * t * (1 - t) - 1.5, 2.5)), l]);
+        });
+        F.push(S.serpentiner(ut));
+      }
     } else if (namn === 'pask') {
       // äggen i band från karmen, ovanför gänget och kring mittposten
       F.push(S.agg([[492, 226, 1.7], [548, 200, 1.5], [598, 238, 1.6], [646, 176, 1.8], [690, 222, 1.6], [728, 168, 1.7], [750, 214, 1.4]]
         .map(([x, y, k]) => ({ ...PK(x, KARM, -13), ned: (y - KARM) / K, k }))));
       D.push(S.paskris({ hojd: 21 }));
+      D.push(S.kycklingar([[-10, 4, 1.45, 0.6], [9.5, 2.5, 1.3, -0.5], [1.5, 10, 1.2, 0.2]]));
+      const kr = S.krans({ typ: 'pask', R: 15, band: 8 });
+      kr.position.copy(PK(136, 366, -18));
+      DR.push(kr);
     } else if (namn === 'midsommar') {
       F.push(S.vimplar(KROKAR, { s: 4.5 }));
       D.push(S.blommor());
+      // lövruskor vid dörrposterna, bundna nedtill och med grenarna utåt
+      const v = S.bjorkris({ hojd: 200, vanster: true, fro: 3 });
+      v.position.copy(PK(44, 640, -10));
+      const h = S.bjorkris({ hojd: 196, fro: 7 });
+      h.position.copy(PK(229, 640, -10));
+      DR.push(v, h);
     } else if (namn === 'kraftor') {
       const krok = [244, 596, 760].map((x) => PK(x, KARM));
       // lyktorna där neonen och skivan inte skymmer dem: längst till vänster, mellan neonen och mittposten
       // och två i den högra rutan
       F.push(S.lyktor(krok, [[0.075, 8.5, 0], [0.64, 8, 1], [0.79, 9, 0], [0.93, 8, 2]], { s: 2.5 }));
+      // fatet med kräftorna och brännvinet i hörnet, och två lyktor till på dörrens glas under namnet
+      D.push(S.kraftfat());
+      DR.push(S.lyktor([PK(54, 304), PK(218, 304)], [[0.28, 7, 1], [0.72, 7.5, 0]], { s: 2 }));
     } else if (namn === 'halloween') {
       const v = S.vav({ b: 30, spindel: 26 });
       // (i fönstrets övre vänstra hörn, i scenens mått: glaset börjar vid x 262 och y 125)
       v.position.copy(PK(263, 125, -17));
       F.push(v);
       D.push(S.pumpa());
+      const liten = S.pumpa({ R: 6 });
+      liten.position.set(15, 0, 7);
+      liten.rotation.y = 0.5;
+      D.push(liten);
+      // fladdermöss i trådar från karmen och från dörrens överkant
+      const fl = (x, y, k, z = -13, topp = KARM) => ({ ...PK(x, topp, z), ned: (y - topp) / K, k, vrid: ((x * 7) % 5 - 2) * 0.12 });
+      F.push(S.fladdermoss([fl(492, 238, 1.6), fl(566, 216, 1.9), fl(628, 170, 1.7), fl(704, 196, 2), fl(746, 238, 1.5)]));
+      DR.push(S.fladdermoss([fl(96, 340, 1.9, -18, 140), fl(178, 372, 1.6, -18, 140)]));
     }
     const grupp = (lista) => {
       if (!lista.length) return null;
@@ -1955,7 +2017,9 @@ export async function inredning(el, opt = {}) {
       d.position.set(DISK_PLATS.x, DISK.top, DISK_PLATS.z);
       d.rotation.y = DISK_PLATS.vrid * DEG;
     }
-    return { pyntF: f, pyntD: d };
+    const p = grupp(DR);
+    if (p) p.scale.setScalar(K);
+    return { pyntF: f, pyntD: d, pyntP: p };
   }
   const PY = { namn: undefined, B: {}, P: null, n: 0 };
   async function pynt(namn) {
@@ -2019,6 +2083,56 @@ export async function inredning(el, opt = {}) {
     }
     return ut;
   }
+  // Pyntet utifrån (fasaden, rum-fasad.js): det som hänger i fönstret och på dörren, sett från trottoaren
+  // genom glaset. Samma saker och samma scen som inifrån, ritade en gång till genom en kamera ute på gatan:
+  // rakt in (ortografisk, man står fem meter bort) och därför spegelvänt, så att stjärnan som hänger till
+  // höger inifrån hänger till vänster utifrån och man ser kransen och girlangen bakifrån. Glaset i scenens
+  // mått (UT_GLAS: skyltfönstret och dörrens glas) med höjden efter rutan på fasaden (w × h), så att inget
+  // dras ut. Ljuset utifrån: dagsljuset mot glaset (dag 0–1) och lite ljus från gatan; det som lyser
+  // lyser som inne. Skenet kring det som lyser ritas först för sig, så att det ligger bakom saken (inifrån
+  // ligger det på glaset bakom den, utifrån skulle det annars hamna framför). Bara när fasaden ritas om
+  // (vädret, ljuset), aldrig i bildrutorna. → en duk (w × h) eller null utan pynt där.
+  // (fönstret från karmens överkant, en aning utanför glaset, så att girlangen syns under skylten och inte bara
+  // dess nedre kant)
+  const UT_GLAS = { pyntF: { x: 266, y: 117, w: 688 }, pyntP: { x: 50, y: 136, w: 172 } };
+  function pyntUtifran(namn, { w, h, dag = 1 }) {
+    const b = PY.B[namn];
+    const G = UT_GLAS[namn];
+    if (!b || !G || !(w > 1) || !(h > 1)) return null;
+    const H = (G.w * h) / w;
+    const cx = G.x + G.w / 2;
+    const cy = -(G.y + H / 2);
+    const cam = new THREE.OrthographicCamera(-G.w / 2, G.w / 2, H / 2, -H / 2, 10, 20000);
+    cam.position.set(cx, cy, -6000);
+    cam.lookAt(cx, cy, 0);
+    cam.updateMatrixWorld();
+    const ute = [new THREE.HemisphereLight('#dfe6ee', '#3a3430', 0.25 + 0.55 * dag), new THREE.DirectionalLight('#fff4e4', 0.15 + 1.25 * dag)];
+    ute[1].position.set(cx + 260, cy + 700, -2400);
+    ute[1].target.position.set(cx, cy, 0);
+    b.scene.add(...ute, ute[1].target);
+    const sken = [];
+    const andra = [];
+    b.scene.traverse((x) => { if (x.isMesh) (x.material.userData && x.material.userData.sken ? sken : andra).push(x); });
+    gl.setPixelRatio(1);
+    gl.setSize(w, h, false);
+    const ut = document.createElement('canvas');
+    ut.width = w;
+    ut.height = h;
+    const g = ut.getContext('2d');
+    try {
+      for (const [syns, gom] of [[sken, andra], [andra, sken]]) {
+        if (!syns.length) continue;
+        for (const x of gom) x.visible = false;
+        gl.render(b.scene, cam);
+        g.drawImage(gl.domElement, 0, 0, w, h);
+        for (const x of gom) x.visible = true;
+      }
+    } finally {
+      for (const x of [...sken, ...andra]) x.visible = true;
+      b.scene.remove(...ute, ute[1].target);
+    }
+    return ut;
+  }
   // Takfläktens glas i scenens bildpunkter: [x, y, r, sort] (bakväggens plan står 1,035 gånger från mitten)
   function lampLjus() {
     return LAMP.lyser.map(([x, y, z, r, sort]) => {
@@ -2047,5 +2161,5 @@ export async function inredning(el, opt = {}) {
     rad: LP.rad,
     nu(id) { if (LP.nu(id)) B.radiolapp.paint(); },
   };
-  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp, pyntLjus, lampLjus };
+  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp, pyntLjus, lampLjus, pyntUtifran };
 }
