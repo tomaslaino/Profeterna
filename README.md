@@ -1303,6 +1303,12 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   syns i båda, var grå och dova i rummet fast lampan hänger rakt ovanför, och ljusa hos honom. Nu ligger lampans ljus
   jämnt över dem och på handryggarna, så att de är lika ljusa i båda bilderna. Se
   [Hörnet under lampan, som hos Hasse](#hörnet-under-lampan-som-hos-hasse-2026-11-17).
+- **Bordslampan vid Helgarderat (2026-11-17, användarens önskemål):** "Det är helt mörkt på den här sidan. Går det att
+  ordna det på ett snyggt/bra sätt? Kanske en bordslampa där till höger om densamma som sticker ut? Annan idé? Ordna
+  och mergea!", med en bild av tidningen på pulten. Tidningen låg utanför alla ljuskäglor, i rummets hela dunkel
+  (papperet 72–78 av 255, mot kupongens 202). Nu står en bankirlampa med skärm i grönt glas och fot i mässing längst
+  till höger på pulten och sticker in i bilden från kanten, och tidningen läses i dess ljus (papperet 178).
+  Se [Bordslampan vid Helgarderat](#bordslampan-vid-helgarderat-2026-11-17).
 - **Datorn och videon parallellt med disken (2026-11-16, användarens önskemål):** "justera både TV:n och
   datorn så att de står parallellt med bänken - just nu står de liksom lite på sniskan" och "när man zoomar
   in få en bra bild - precis som vanligt". Datorn var vänd mellan gänget och ögat och videon 22 grader in mot
@@ -7045,6 +7051,37 @@ hos honom: klockan 21.30 i mulet väder notan 163 → 204 (hos honom 206), koppe
 146 → 196 (198); klockan 13.30 i halvklart notan 167 → 185 (201) och koppen 153 → 174 (190). Kupongen och resten av
 rummet är som förut. På natten (klockan 2) är notan, koppen och händerna det ljusaste vid pulten, och i telefonen
 (412 × 870) syns notans kant i lampans ljus. Inget nytt lager och inget nytt ritas i bildrutorna.
+
+### Bordslampan vid Helgarderat (2026-11-17)
+
+Användarens önskemål: "Det är helt mörkt på den här sidan … Kanske en bordslampa där till höger om densamma som sticker
+ut?" Helgarderat ligger längst till höger på pulten, utanför käglorna över bordet, pulten och notan (`KAGLOR`), så att
+hela dunklet, och på kvällen mörkret, låg över den. Papperet nådde 72–78 av 255 (samma i användarens bild och i en kopia
+klockan 16.20 på steg 3), mot kupongens 202, och träet bredvid 29.
+
+- **Lampan** (`bordslampa` och `BORD` i rum.js): en bankirlampa med en halv cylinder i grönt glas som skärm, vit
+  opalglas i kanten, stam och fot i mässing och en dragkedja. Den står till höger om tidningen och en dryg tredjedel
+  av den är utanför bilden: där finns bara en smal remsa mellan tidningen, kanten och videon på disken ovanför, och
+  skärmen hänger strax ovanför tidningens överkant. Den går fri från videon också när rummet vrids så långt det går
+  (musen uppe till höger). Den ligger i pultens plan, som lampan över pulten, och tonar bort och blir oskarp med pulten.
+  Grönt och mässing som skomakarlampan i andra hörnet, så att de två ramar in pulten.
+- **Ljuset:** en jämn kägla över tidningen och pulten under skärmen (`BORD_LJUS`), ett hål i dunklet vid skärmen,
+  en varm pöl på träet runt foten och en skugga under den (i lampans SVG), en varm strimma i lacken under foten
+  (`spegelBild`) och, med blandningsläget, lite värme över tidningen (`.rum-warm`; utan det ingen hinna, som över
+  kupongen). Tidningen har ljuset snett från höger och ovanifrån, varmast i det övre högra hörnet
+  (`#rum-helgarderat::before` i [public/rum-tidning.css](public/rum-tidning.css); inte hos Hasse Backe).
+- **Natten och när man kommer in:** lampan är tänd också på natten, som lampan över pulten: mörkret i `.rum-mork`
+  (rum-folk.css) har hål vid skärmen och käglan, och medan taklamporna tänds lyser den redan (masken i rum.css).
+
+Ett nytt lager, lampans SVG (391 × 267 i planet, med två tredjedelar av bildpunkterna i telefonen), som ritas en gång;
+ljuset är fler gradienter i de dukar som redan ritas om när ljuset ändras. Inget nytt i bildrutorna. Mätt i Chrome med
+mjukvarugrafik (1440 × 900), gammal och ny kod, i gråskala: tidningens papper 72 → 178 klockan 16.20 (mulet), också
+på steg 3, och 73 → 180 klockan 21.30; träet till höger om tidningen 29 → 72. Kupongen (202–203), notan, videon och
+resten av rummet är som förut. På natten (klockan 2) tidningen 19 → 84, i höjd med kupongen (85), och notan under
+lampan över pulten (124) är fortfarande det ljusaste vid pulten. Provat också klockan 14, med musen i ytterlägena och i
+telefonen (412 × 870), där lampan är utanför bilden också när man har dragit så långt det går åt höger (tidningen når
+redan kanten där) men tidningen är ljusare. Sakerna på pulten (askkoppen, dosan, fläkten) står till vänster om
+tidningen, långt från lampan.
 
 ### Utsikten och vädret
 

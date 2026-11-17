@@ -2,7 +2,7 @@
 
 /* Natten: taklamporna (takfläkten och spotarna, förut lysröret) är släckta. Mörkret ligger i samma
    lager som när de tänds (.rum-mork i rum.css), med ljus kvar där gatan lyser in
-   genom fönstret och dörren, från tv:n, lampan över pulten och lite över pulten; nära tv:n,
+   genom fönstret och dörren, från tv:n, lampan över pulten, bordslampan vid Helgarderat och lite över pulten; nära tv:n,
    videon, en sak och med kupongen i handen är det borta. Det tonas in från
    23 till midnatt och ut från sex till sju (--natt-grad på mörkret, rum-folk.js). */
 .rum.natt .rum-mork {
@@ -18,7 +18,9 @@
     radial-gradient(ellipse 9% 32% at 8% 42%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 24% at 48% 92%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 12% at 7.5% 8.5%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 22% 25% at 12.8% 82%, rgba(0, 0, 0, 0.42), #000 100%);
+    radial-gradient(ellipse 22% 25% at 12.8% 82%, rgba(0, 0, 0, 0.42), #000 100%),
+    radial-gradient(ellipse 8% 6% at 99% 62.5%, rgba(0, 0, 0, 0.12), #000 100%),
+    radial-gradient(ellipse 15% 17.5% at 94.4% 75.2%, rgba(0, 0, 0, 0.5), #000 100%);
   -webkit-mask-composite: source-in;
   mask-image:
     radial-gradient(ellipse 10% 13% at 78% 18%, rgba(0, 0, 0, 0.2), #000 100%),
@@ -26,7 +28,9 @@
     radial-gradient(ellipse 9% 32% at 8% 42%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 24% at 48% 92%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 12% at 7.5% 8.5%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 22% 25% at 12.8% 82%, rgba(0, 0, 0, 0.42), #000 100%);
+    radial-gradient(ellipse 22% 25% at 12.8% 82%, rgba(0, 0, 0, 0.42), #000 100%),
+    radial-gradient(ellipse 8% 6% at 99% 62.5%, rgba(0, 0, 0, 0.12), #000 100%),
+    radial-gradient(ellipse 15% 17.5% at 94.4% 75.2%, rgba(0, 0, 0, 0.5), #000 100%);
   mask-composite: intersect;
 }
 /* telefonen på höjden: mörkret räcker över taket och pulten utanför scenen (samma ställen i rutan) */
@@ -39,14 +43,18 @@
     radial-gradient(ellipse 9% 17.8% at 8% 40%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 13.3% at 48% 67.8%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 6.7% at 7.5% 21.4%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 22% 13.9% at 12.8% 62.2%, rgba(0, 0, 0, 0.42), #000 100%);
+    radial-gradient(ellipse 22% 13.9% at 12.8% 62.2%, rgba(0, 0, 0, 0.42), #000 100%),
+    radial-gradient(ellipse 8% 3.3% at 99% 51.4%, rgba(0, 0, 0, 0.12), #000 100%),
+    radial-gradient(ellipse 15% 9.7% at 94.4% 58.4%, rgba(0, 0, 0, 0.5), #000 100%);
   mask-image:
     radial-gradient(ellipse 10% 7.2% at 78% 26.7%, rgba(0, 0, 0, 0.2), #000 100%),
     radial-gradient(ellipse 29% 16.7% at 37% 36.1%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.6) 60%, #000 100%),
     radial-gradient(ellipse 9% 17.8% at 8% 40%, rgba(0, 0, 0, 0.5), #000 100%),
     radial-gradient(ellipse 42% 13.3% at 48% 67.8%, rgba(0, 0, 0, 0.6), #000 100%),
     radial-gradient(ellipse 9% 6.7% at 7.5% 21.4%, rgba(0, 0, 0, 0.12), #000 100%),
-    radial-gradient(ellipse 22% 13.9% at 12.8% 62.2%, rgba(0, 0, 0, 0.42), #000 100%);
+    radial-gradient(ellipse 22% 13.9% at 12.8% 62.2%, rgba(0, 0, 0, 0.42), #000 100%),
+    radial-gradient(ellipse 8% 3.3% at 99% 51.4%, rgba(0, 0, 0, 0.12), #000 100%),
+    radial-gradient(ellipse 15% 9.7% at 94.4% 58.4%, rgba(0, 0, 0, 0.5), #000 100%);
 }
 .rum.natt.tv-nara .rum-mork,
 .rum.natt.vid-nara .rum-mork,

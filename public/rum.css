@@ -991,13 +991,13 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
 
 /* taklamporna tänds när man kommer in (tand i rum.js): mörkt i rummet medan
    gänget laddas – gatan genom skyltfönstret och dörren och tv:n lyser
-   igenom – och sedan två klick: först takfläktens kupor, sedan spotarna
+   igenom, och lampan över pulten och bordslampan lyser redan – och sedan två klick: först takfläktens kupor, sedan spotarna
    (till 2026-11-16 ett lysrör som blinkade igång, med startarna glödande i ändarna) */
 .rum-mork {
   display: none;
   background: #060504;
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z M30 -20H210V114H30Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/><path fill-opacity='.15' d='M30 -20H210V114H30Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
-  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z M30 -20H210V114H30Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/><path fill-opacity='.15' d='M30 -20H210V114H30Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z M30 -20H210V114H30Z M1490 590H1680V664H1490Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/><path fill-opacity='.15' d='M30 -20H210V114H30Z M1490 590H1680V664H1490Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='none'><filter id='b' x='-.1' y='-.1' width='1.2' height='1.2'><feGaussianBlur stdDeviation='14'/></filter><g filter='url(%23b)'><path fill-rule='evenodd' d='M-80-80H1680V1080H-80Z M225 114H927V565H225Z M-40 118H173V712H-40Z M1165 98H1300V204H1165Z M30 -20H210V114H30Z M1490 590H1680V664H1490Z'/><path fill-opacity='.55' d='M225 114H927V565H225Z M-40 118H173V712H-40Z'/><path fill-opacity='.3' d='M1165 98H1300V204H1165Z'/><path fill-opacity='.15' d='M30 -20H210V114H30Z M1490 590H1680V664H1490Z'/></g></svg>") 0 0 / 100% 100% no-repeat;
 }
 .rum-mork.start, .rum-mork.tands { display: block; }
 .rum-mork.tands { animation: rum-tands 1.2s steps(1, end) forwards; }
