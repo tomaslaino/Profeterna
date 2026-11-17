@@ -6549,7 +6549,7 @@ efter att ljuset hade tänts.
   har 5 400 cirklar och DJ:s skägg 5 700 delar, och de ritades från SVG tio till sjutton gånger vid varje besök (med
   blinkningarna, skratten och uttrycken): den största delen av gängets start, ungefär 0,4 sekunder med den långsamma
   processorn. Nu hämtas den färdiga bilden och packas upp vid sidan av huvudtråden. Nyckeln är bildens text och
-  storlek, så ett ändrat ansikte ritas om. Nya bilder packas och sparas sex sekunder efter starten, när det är lugnt,
+  storlek, så ett ändrat ansikte ritas om. Nya bilder packas (i en egen tråd sedan 2026-11-17, se *Mindre på huvudtråden* nedan) och sparas sex sekunder efter starten, när det är lugnt,
   och det som inte användes under besöket tas bort då. Utan lagring (privat läge) och med `?rum-baka` ritas de som
   förut. Bilderna är desamma: med fryst tid (`?rum-t`) 82–107 dB mellan ritade och sparade ansikten.
 - **Vädret:** gänget klär sig efter vädret och väntade på Open-Meteo upp till 1,5 sekunder vid varje besök när det
@@ -6624,6 +6624,47 @@ Omräkningarna tog 3–16 ms vardera på huvudtråden med den långsamma process
 Tappade bildrutor är få i båda; den första gången under ett besök, när rummet ritas i närbildens skala första gången,
 kostar lika mycket som förut. I WebKit lika eller bättre (längsta bildrutan per glidning 53–129 ms mot 50–263 ms, med
 stor spridning i båda), och kameran hamnar rätt också där. Inte provat i en riktig telefon.
+
+### Mindre på huvudtråden: blinkande 12:00 och ansiktenas bilder (2026-11-17)
+
+Användarens önskemål: "Kan du göra så att den här sidan flyter bättre på sämre datorer/mobiler utan att grafiken påverkas
+i speciellt hög utsträckning." Rummet hade gåtts igenom många gånger (avsnitten ovan), så först mättes var det fortfarande
+gick tid, i Chrome med grafiken emulerad i processorn (SwiftShader, `--use-angle=swiftshader --enable-gpu-rasterization`,
+så att också dukarna och sammansättningen går genom "grafikkortet" som i en riktig dator), som telefon (412 × 870, täthet
+2,625) och som dator, med processorn fyra gånger långsammare. Två saker gjorde arbete utan att något syntes av det:
+
+- **Klockan på videon som blinkar 12:00** var en animering i CSS (`vhs-blink`) som Chrome inte lade på grafikkortet: rummets
+  stil räknades om i varje bildruta som huvudtråden ritade, i telefonen ungefär 30 gånger i sekunden, för något som ändras två
+  gånger i sekunden – och 12:00 blinkar så fort ingen kassett spelar, alltså nästan jämt. Nu sätts `.slackt` efter klockan,
+  med en väckning vid varje halv sekund (`blinka` i rum-video.js): tänd en halv sekund och släckt en halv som förut. Mätt som
+  telefon med processorn fyra gånger långsammare och allt annat stilla, gammal och ny kod om vartannat: stilen räknas om 31–32 →
+  5–7 gånger i sekunden och tar 25–30 → 9–11 ms/s. Huvudtrådens hela tid svänger mer än så mellan körningarna, så vinsten är
+  ungefär två procent av en svag telefons huvudtråd. Bytena kommer var 497–505 ms, 4–9 ms efter halvsekunden.
+- **Gängets ansikten packades till PNG på huvudtråden** (`toBlob`) när de sparades efter starten (se *Snabbare och jämnare
+  start*): duken lästes av från grafikkortet i ett stopp, och packningen gick sedan på huvudtråden, 1024 × 1152 bildpunkter per
+  ansikte i datorn och 512 × 576 i telefonen – just när rummet hade startat och man började titta och dra, och igen när nya
+  uttryck ritas under kvällen. Nu packas de i en egen tråd (`pngAv` i rum-3d.js: `createImageBitmap`, en worker med
+  `OffscreenCanvas.convertToBlob`), och utan worker, eller om den inte svarar inom 15 sekunder, som förut. Bilderna är
+  desamma: en PNG från tråden och en från `toBlob` av samma duk är lika bildpunkt för bildpunkt. Mätt under de första 22
+  sekunderna efter att gänget kom, som telefon med processorn fyra gånger långsammare: tiden i `toBlob` på huvudtråden 12–19 s
+  → 0 (med den emulerade grafiken blir avläsningen extremt lång; i en riktig telefon är det en bråkdel, men den hamnar i samma
+  stopp).
+
+Prövat och inte infört:
+
+- **Gatans duk med `transferControlToOffscreen`**, så att en ny bild av gatan inte kräver att alla rummets ~450 lager lämnas
+  över (`Commit`) 60 gånger i sekunden: överlämningen blev billigare (150 → 52 ms/s), men att rita i en sådan duk från
+  huvudtråden blev dyrare, och huvudtråden fick mer att göra (575–600 → 760–930 ms/s).
+- **Gatan i 30 bilder i sekunden på steg 2 och 3:** ingen vinst gick att se i mätningarna (bruset var större), och den syns.
+- **Gängets material delade** (121 olika av 221): three.js tid för en bild av gänget 3,0 → 2,8 ms med de material som går att
+  dela säkert, för lite för risken (en del ändras medan gänget ritas).
+- **Gängets delar sorterade framifrån**, så att färre bildpunkter ritas två gånger: överritningen är 1,62 och blir 1,51, ingen
+  mätbar skillnad.
+
+Vad en bild av gänget kostar på steg 1 (1080 × 420, mjukvarugrafik, median): 210–250 ms utan skuggkartan, varav ungefär
+hälften följer bildpunkterna och en knapp tredjedel miljön (reflexerna), och skuggkartan för sig 60–90 ms; på steg 3 ungefär
+85 ms. Gänget täcker 16 % av sin duk. Med en riktig grafikdel är det andra proportioner, och det enda sättet att se vad en svag
+telefon hinner med är fortfarande `matchfixarna.se/?rum-mat` i telefonen.
 
 ### När något går fel i rummet
 

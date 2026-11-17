@@ -291,10 +291,10 @@
   pointer-events: none;
   transform: translateZ(0.5px);
 }
-.vhs-vfd.blink { animation: vhs-blink 1s steps(1) infinite; }
+/* (släckt varannan halv sekund, rum-video.js) */
+.vhs-vfd.blink.slackt { opacity: 0.12; }
 /* displayen bakom rökfärgat glas, med en glans snett över */
 .vhs-vfd::after { content: ""; position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(166deg, rgba(255, 255, 255, 0.1) 0 36%, rgba(255, 255, 255, 0) 36%); }
-@keyframes vhs-blink { 50% { opacity: 0.12; } }
 /* Knapparna som på en video från 90-talet: kuddformade i silvergrå plast,
    med tecknen tryckta i svart, var och en i sin fördjupning i spalten
    (brunnar i rum-video.js). */
@@ -432,7 +432,7 @@
 .rum:not(.vid-nara) .rum-vhs:has(.vhs-hit:is(:hover, :focus-visible)) :is(.vhs-ritning, .vhs-skarm, .vhs-kas, .vhs-yta:not(.vhs-skugga, .vhs-pol), .vhs-band > i) { filter: brightness(1.16); }
 
 @media (prefers-reduced-motion: reduce) {
-  .vhs-brus, .vhs-vfd.blink, .rum-vhs .vhs-sok *, .rum-vhs .vhs-bild { animation: none !important; }
+  .vhs-brus, .rum-vhs .vhs-sok *, .rum-vhs .vhs-bild { animation: none !important; }
   .rum-vhs .sok-rand { transform: translateY(176px); }
   .vhs-band, .vhs-front > .vhs-lucka, .vhs-sken, .vhs-pol, .vhs-skugga, .vhs-kam.glid { transition: none; }
 }
