@@ -299,7 +299,7 @@
     'Så låter en analys. Vilken match tar vi nu?',
     'Det var lätt som en plätt. Vilken match tar vi nu?',
     'Vilken match ska jag avgöra nu?',
-    'Spelbolagen avskyr det här. Vilken match tar vi nu?',
+    'Sånt här tål inte spelbolagen. Vilken match tar vi nu?',
     'Vilken match har du kvar att oroa dig för?',
     'Jag kan fortsätta så här till spelstoppet.',
     'Ge mig nästa match, så får du nästa svar.',
