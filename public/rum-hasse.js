@@ -1974,6 +1974,8 @@ window.RumHasse = (() => {
   // kupongen vet vem du är, och högst en gång på två minuter (också räknat från när han hälsade med namn), så att det
   // inte blir tjat. → raden med namnet, eller null (då tar man en vanlig rad)
   const TILLTAL_MS = 120000;
+  // Hur ofta han hälsar med namn när kupongen vet vem du är (oppningNamn och tillbakaNamn i forstaRad).
+  const HALSA_NAMN = 0.65;
   function tilltal(lista, chans) {
     if (!Array.isArray(lista) || !lista.length || Math.random() >= chans) return null;
     const nu = performance.now();
@@ -2858,9 +2860,9 @@ window.RumHasse = (() => {
       // (vad klockan är: strax före spelstopp alltid, annars ibland)
       const tid = hela && tidNu(oppna);
       if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
-      // (när kupongen vet vem du är hälsar han med namn, i nio fall av tio fel: omgångens, samma som i domen, se
-      // kalla; och sedan dröjer det innan han säger det igen, se tilltal)
-      const namn = dittNamn();
+      // (när kupongen vet vem du är hälsar han oftast med namn, Tomas 2026-11-17: "inte alltid, men ofta"; i nio fall
+      // av tio fel: omgångens, samma som i domen, se kalla; och sedan dröjer det innan han säger det igen, se tilltal)
+      const namn = Math.random() < HALSA_NAMN ? dittNamn() : '';
       const medNamn = (l) => {
         H.tilltal = performance.now();
         return fyll(lott(l), { namn: kalla(namn) });
