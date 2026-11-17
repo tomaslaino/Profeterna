@@ -8253,7 +8253,9 @@ finns kvar där.
 
 Överst står menyraden, som alltid står still: *KUPONGEN* och *REGISTRET* i en ljus list över
 hela bredden, med den valda fliken mörk i det ljusa. Längst ner står sökraden (*SÖK >*) och
-under den tangenterna, omvända över hela bredden; det mellan dem rullar.
+under den tangenterna, omvända över hela bredden; det mellan dem rullar. Tangentraden är
+sedan 2026-11-17 i den svaga gröna, så att menyraden lyser mest och *STÄNG* inte drar
+blicken från innehållet.
 
 Sedan 2026-11-17 ser menyerna ut som i ett DOS-program: listen överst som tangentraden längst
 ner, kortets valda flik som en mapp man ser in i (en ram runt fliken, öppen nedåt där strecket
@@ -8266,9 +8268,13 @@ blev inte bättre, och hen valde B. Skärmen i rummet ritar listen och mappen li
 (`rum-dator.js`), så att inget byter utseende när terminalen tar över.
 
 - **Kupongen** – omgångens matcher numrerade, bara lagen, med divisionen eller cupen där
-  raden ryms och avsparken. Avsparken står bara där den skiljer sig från raden ovanför, som i
-  en tidtabell (*16.00* på första matchen och *18.30* på den sena), och i telefonen, där
-  divisionen inte ryms, står den ensam. Formen och dess motstånd stod förut också här men
+  raden ryms och avsparken. Avsparken står på varje rad, svagt, och den som skiljer sig från
+  omgångens vanliga (den som mer än hälften av matcherna har) lyser – *18.30* bland *16.00*.
+  I telefonen, där divisionen inte ryms i en spalt, står den som rubrik med ett streck efter
+  och en tom rad mellan avdelningarna, och strecket mellan lagen står mitt på raden med
+  avsparken längst ut, så att raderna slutar där rubrikernas streck slutar (2026-11-17,
+  användarens val A *Spegeln i mitten* bland fyra skisser: *Spegeln i mitten*, *Tiden en
+  gång*, *Text-TV-raden* och *Avdelningar i ramar*). Formen och dess motstånd stod förut också här men
   står bara i matchakten sedan 2026-11-13 (användarens önskemål: "mindre rörig"). En match öppnar
   **matchakten**, där allt om matchen står på ett ställe: lagen speglade runt etiketterna (se *Spegeln i matchakten* nedan) med *Formen*,
   *Vilan* och *Nästa* (dagar till nästa match, med cupen när det inte är ligan), tavlans

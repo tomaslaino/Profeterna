@@ -137,7 +137,10 @@
 .reg-fk.rull .fk-in::-webkit-scrollbar { display: none; }
 .reg-fk .fk-txt { max-width: 74ch; white-space: normal; }
 .reg-fk .fk-ex, .reg-fk .fk-ga { margin-top: 0.45em; }
-.reg-fot { flex: none; display: flex; gap: 3ch; margin-top: 0.2em; padding: 0 1ch; overflow: hidden; white-space: pre; background: var(--gron); color: #010702; text-shadow: none; line-height: 1.12; }
+/* tangentraden: en list som menyraden, men i den svaga gröna (sedan 2026-11-17,
+   med kupongens spegel i mitten), så att menyraden lyser mest och STÄNG inte
+   drar blicken från innehållet */
+.reg-fot { flex: none; display: flex; gap: 3ch; margin-top: 0.2em; padding: 0 1ch; overflow: hidden; white-space: pre; background: var(--svag); color: #010702; text-shadow: none; line-height: 1.12; }
 .reg-fot .a:hover { background: rgba(1, 7, 2, 0.16); }
 .reg-fot .av { opacity: 0.4; }
 /* prompten: markören är ett block som blinkar */
