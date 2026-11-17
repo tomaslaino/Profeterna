@@ -1291,6 +1291,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   ljuskäglorna över bordet och pulten tonade ut från mitten, och i datorn från steg 1 låg lampornas färg som en
   hinna över kupongen och gänget. Nu är käglorna jämna över det de lyser på, utan hinna, och kupongen är det
   ljusaste i bilden. Se [Kupongen och gänget i lampornas ljus](#kupongen-och-gänget-i-lampornas-ljus-2026-11-17).
+- **Hörnet under lampan som hos Hasse (2026-11-17, användarens önskemål):** "Kan du ordna så att de här två vyerna
+  passar ihop bättre än vad de gör nu", med en bild av rummet och en av Hasse Backe. Hans händer, kaffet och notan, som
+  syns i båda, var grå och dova i rummet fast lampan hänger rakt ovanför, och ljusa hos honom. Nu ligger lampans ljus
+  jämnt över dem och på handryggarna, så att de är lika ljusa i båda bilderna. Se
+  [Hörnet under lampan, som hos Hasse](#hörnet-under-lampan-som-hos-hasse-2026-11-17).
 - **Datorn och videon parallellt med disken (2026-11-16, användarens önskemål):** "justera både TV:n och
   datorn så att de står parallellt med bänken - just nu står de liksom lite på sniskan" och "när man zoomar
   in få en bra bild - precis som vanligt". Datorn var vänd mellan gänget och ögat och videon 22 grader in mot
@@ -6866,8 +6871,9 @@ grått ut i stället för att lysa.
   skärmen syns också i en skärm på 16:9, där överkanten av scenen hamnar utanför. Den ligger i pultens plan (−60), så
   att den står framför rummet när kameran vrids, tonar bort med pulten vid närbilderna och blir oskarp med pulten när
   kupongen tas i handen. Sladden upp till taket syns bara i telefonen på höjden, där taket syns (`.rum-lampsladd`).
-- **Lampans ljus:** en ljuskägla bland de andra (`KAGLOR`) över notan och kaffet, med hål i dunklet och värme där
-  blandningsläget finns; en varm strimma i pultens lack under den (`spegelBild`); och på natten, när lysröret är
+- **Lampans ljus:** en ljuskägla bland de andra (`KAGLOR`) över notan och kaffet (sedan 2026-11-17 jämn över händerna,
+  kaffet och notan, `LAMPA_LJUS`, se [Hörnet under lampan, som hos Hasse](#hörnet-under-lampan-som-hos-hasse-2026-11-17)),
+  med hål i dunklet och värme där blandningsläget finns; en varm strimma i pultens lack under den (`spegelBild`); och på natten, när lysröret är
   släckt, går mörkret runt den och dess kägla (rum-folk.css), så att den lyser över notan medan gänget sover. Medan
   lysröret tänds när man kommer in lyser den redan (masken i `.rum-mork`).
 - **Taket och lysröret:** vinjettens överkant är 0,3 i stället för 0,55 och den bruna tonen 0,15 i stället för 0,2
@@ -6979,6 +6985,27 @@ papper 158 → 202 (medel över kupongen 140/125/103 → 192/178/152) och ansikt
 i telefonen (412 × 870, klockan 16.20) papperet 157 → 205. Dörren, fönstret, högra väggen och Tipsligan är som förut,
 och natten (klockan 2) likaså: där är lampan över notan fortfarande det ljusaste. Inget nytt lager och inget nytt ritas
 i bildrutorna: hålen och färgerna ritas i de dukar som redan ritas om när ljuset ändras.
+
+### Hörnet under lampan, som hos Hasse (2026-11-17)
+
+Användarens önskemål: "Kan du ordna så att de här två vyerna passar ihop bättre än vad de gör nu", med en bild av
+rummet och en av Hasse Backe samma kväll. Det som syns i båda är hörnet där de möts: hans händer, kaffet och notan
+(se *Kaffet i rummet* under [Hasse Backe](#hasse-backe)). Hos honom är notan och koppen det ljusaste på disken; i
+rummet var de grå och händerna dova, fast lampan hänger rakt ovanför. Under rummets lager var de lika ljusa som hos
+honom (notan 212 mot 206 i gråskala), men lampans kägla (`KAGLOR` i rum.js) låg till vänster om notan och tonade ut
+från mitten, så att notan, koppen och händerna hade 0,4 av dunklet och kvällens mörker över sig.
+
+- **Lampans kägla** (`LAMPA_LJUS` i rum.js) ligger jämnt över händerna, kaffet och notan, som kupongens, och på natten
+  ligger lampans ljus över samma ställe (masken i rum-folk.css).
+- **Handryggarna** får lampans ljus (`bord.hud` i [public/rum-hasse-hand.js](public/rum-hasse-hand.js), `uHudLjus` i
+  rum-hasse-arm.js, 1,25 i rummet och 1 i baren): från rummet ses de från sidan där barens nyckelljus inte når, och de
+  var en femtedel mörkare än hos honom, som ärmarna innan de fick `bord.tyg`.
+
+Hans bild är som förut. Mätt i Chrome med mjukvarugrafik (1887 × 1053), gammal och ny kod, i gråskala mot samma ställe
+hos honom: klockan 21.30 i mulet väder notan 163 → 204 (hos honom 206), koppen 117 → 160 (188) och hudens ljusaste
+146 → 196 (198); klockan 13.30 i halvklart notan 167 → 185 (201) och koppen 153 → 174 (190). Kupongen och resten av
+rummet är som förut. På natten (klockan 2) är notan, koppen och händerna det ljusaste vid pulten, och i telefonen
+(412 × 870) syns notans kant i lampans ljus. Inget nytt lager och inget nytt ritas i bildrutorna.
 
 ### Utsikten och vädret
 
@@ -9153,7 +9180,9 @@ mörknar rummet självt). De ses i rummets blickriktning, mot fönstren, lika l�
 (33°) som från ögat i rummet (`RUM` i rum-pult.js), och kantljuset räknas mot det ögat (`vy`), inte mot
 barens kamera: annars blev ärmarnas sidor varmt bruna. Från rummet ses också ärmarnas sida bort från barens
 lampor, och den blev nästan svart; ärmens tyg får därför mer ljus i rummet (`bord.tyg`, 1,35 mot 1 i baren), så
-att det är samma koksgråa kavaj som framifrån. Underarmarna är lika vida som i baren. Bilden flyttas dit där kaffet och notan ligger, så
+att det är samma koksgråa kavaj som framifrån. Handryggarna ses från samma sida och ligger under lampan över pulten, så
+huden får också mer ljus (`bord.hud`, 1,25 mot 1 i baren; förut en femtedel mörkare än framifrån, ändrat 2026-11-17).
+Underarmarna är lika vida som i baren. Bilden flyttas dit där kaffet och notan ligger, så
 att underarmarna kommer in från bildens vänstra kant, den vänstra snett uppifrån över pultens bakre kant och den
 högra under den, med armbågarna och axlarna utanför bilden. Under händerna och underarmarna ligger samma skuggor
 som i baren (`byggSkugga`), med en tät, mörk kontaktskugga där händerna ligger an mot pulten. Det är bara den
