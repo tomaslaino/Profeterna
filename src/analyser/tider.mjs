@@ -76,13 +76,28 @@ export function attSkriva(round, per, { now, tider, vantaTimmar = 0, version, tv
 // omgången är ny (fil: tider.json, med den senast genomgångna omgången) och igen det sista dygnet före första
 // avsparken (foreTimmar), om jobbet inte har gått sedan dess. round: gängets omgång {id, matcher, spel} eller null.
 // → 'ny omgång', 'inför avsparken' eller null
+// Sedan 2026-11-17 gäller 'ny omgång' också Stryktipset (användarens önskemål: "att det görs automatiskt inför
+// tidningspublikationerna - så att det är klart"): Helgarderats nummer kommer ut när kupongen kommer, och poddarna och
+// forumen läses då direkt i stället för vid nästa fasta tid. Stryktipset har sina fasta tider i övrigt.
 export function egenTid(round, fil, { now = Date.now(), foreTimmar = 30 } = {}) {
   if (!round || !Array.isArray(round.matcher)) return null;
   const spel = (round.spel && round.spel.namn) || (/-et\d+$/.test(String(round.id)) ? 'Europatipset' : 'Stryktipset');
-  if (spel === 'Stryktipset') return null;
   const kvar = round.matcher.map((x) => Date.parse(x.avspark)).filter((t) => Number.isFinite(t) && t > now);
   if (!kvar.length) return null;
   if (!fil || fil.omgang !== round.id) return 'ny omgång';
+  if (spel === 'Stryktipset') return null;
   const fore = Math.min(...kvar) - foreTimmar * H;
   return now >= fore && (Date.parse(fil.senast) || 0) < fore ? 'inför avsparken' : null;
+}
+
+// Ska analysjobbet väcka poddjobbet nu (scripts/analyser/skriv.mjs, poddjobbet)? Poddjobbet startas av launchd bara
+// kl. 02.15 och lördag kl. 08.00, men analysjobbet går var 15:e minut och ser den nya omgången först. Det väcker
+// poddjobbet när omgången har matcher kvar och poddjobbet inte har gått igenom den (tider: poddjobbets tider.json,
+// där en lyckad körning skriver omgången), högst en gång per omTimmar och omgång (knuff: {omgang, at}), så att ett
+// jobb som stannar inte väcks var 15:e minut. Poddjobbet avgör själv om det är dags (egenTid) och kör aldrig två
+// gånger samtidigt. → true eller false
+export function knuffaPoddar(round, tider, knuff, { now = Date.now(), omTimmar = 2 } = {}) {
+  if (!round || !Array.isArray(round.matcher) || !round.matcher.some((x) => Date.parse(x.avspark) > now)) return false;
+  if (tider && tider.omgang === round.id) return false;
+  return !(knuff && knuff.omgang === round.id && now - (Date.parse(knuff.at) || 0) < omTimmar * H);
 }

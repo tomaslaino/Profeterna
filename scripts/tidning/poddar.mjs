@@ -164,7 +164,8 @@ function annanUtskrift() {
 // försöks igen vid nästa start. Saknas filen räknas den senaste tiden som körd, så att ett nytt
 // schema inte ger en extra körning. → {dags, tid, nasta}
 // Europatipset har egna tider (egenTid i src/analyser/tider.mjs): när omgången är ny och det sista dygnet före
-// första avsparken. round: gängets omgång, eller null.
+// första avsparken. En ny omgång är dags för Stryktipset också (2026-11-17), och analysjobbet väcker jobbet när
+// kupongen har kommit (launchctl kickstart, poddjobbet i scripts/analyser/skriv.mjs). round: gängets omgång, eller null.
 function schemat(now = Date.now(), round = null) {
   const tid = senasteTid(now, pc.tider || []);
   const nasta = nastaTid(now, pc.tider || []);

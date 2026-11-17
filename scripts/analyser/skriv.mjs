@@ -61,7 +61,7 @@ import { skrivSista, attSkrivaSista } from '../../src/analyser/sista-sidan.mjs';
 import { skrivLopsedel, attSkrivaLopsedel } from '../../src/analyser/lopsedel.mjs';
 import { poddsidor } from '../../src/analyser/poddar.mjs';
 import { veckansBilder, lagenI } from '../../src/analyser/tidning-bilder.mjs';
-import { attSkriva } from '../../src/analyser/tider.mjs';
+import { attSkriva, knuffaPoddar } from '../../src/analyser/tider.mjs';
 
 const require = createRequire(import.meta.url);
 const { readHistory, writeHistory } = require('../../src/history.js');
@@ -466,6 +466,28 @@ function poddsidorna(round) {
   spara(nytt ? `Helgarderat${ny.nummer ? ` Nr ${ny.nummer}` : ''} inför omgången ${round.id}` : `Supporterpoddarna inför omgången ${round.id}`);
 }
 
+// Poddjobbet (scripts/tidning/poddar.mjs, launchd: se.matchfixarna.poddar) väcks när kupongen kommer, så att
+// poddarna, forumen och de insatta medierna är lästa och matchbladen skrivna inför numret (2026-11-17, användarens
+// önskemål: "att det görs automatiskt inför tidningspublikationerna - så att det är klart"). launchd startar det
+// annars bara kl. 02.15 och lördag kl. 08.00, och Stryktipsets kupong kommer på måndagskvällen. Bara jobbet på iMacen
+// (--publicera) väcker det; knuffaPoddar i src/analyser/tider.mjs säger när. Poddjobbet skriver sina blad i
+// Tidning/omgang.json, och poddsidorna här lägger ut dem vid nästa körning.
+const PODDJOBB = 'se.matchfixarna.poddar';
+const KNUFF = path.join(TILLSTAND, 'poddar-knuff.json');
+function poddjobbet(round) {
+  if (process.platform !== 'darwin' || !PUBLICERA || UT) return;
+  const tider = lasJson(path.join(TILLSTAND, 'Tidning', 'tider.json'), null);
+  if (!knuffaPoddar(round, tider, lasJson(KNUFF, null), { now: Date.now() })) return;
+  if (TORRT) { logg(`skulle väcka poddjobbet för ${round.id}`); return; }
+  try {
+    execFileSync('launchctl', ['kickstart', `gui/${process.getuid()}/${PODDJOBB}`], { timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] });
+    logg(`poddjobbet väckt för ${round.id}`);
+  } catch (err) {
+    logg(`poddjobbet gick inte att väcka: ${String(err.stderr || err.message).trim().slice(0, 200)}`);
+  }
+  skrivJson(KNUFF, { omgang: round.id, at: new Date().toISOString() });
+}
+
 // Helgarderats sista sida: en gång per omgång, när omgångens matchblad har kommit.
 async function sistaSidan(round) {
   const blad = vantande.poddsidor || lasJson(FIL.poddsidor, null);
@@ -742,6 +764,7 @@ async function main() {
   }
 
   if (round) {
+    poddjobbet(round);
     poddsidorna(round);
     await namnet(round);
     if (!lage.stoppad) await analyserna(round, roster);

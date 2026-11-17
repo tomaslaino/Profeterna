@@ -473,6 +473,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   lördag 21 november) lades ut för hand samma dag, först med omslaget och innehållet och samma kväll med tolv
   handskrivna matchblad ur veckans press ("Du får gärna göra nästa tidning nu"). Wolves–Charlton har inget blad än
   (se *Nr 3* under [Helgarderat](#helgarderat))
+- [x] **Poddarna läses när kupongen kommer (2026-11-17, användarens önskemål: "Jag vill att du gör poddgrejen … Eller
+  att det görs automatiskt inför tidningspublikationerna - så att det är klart"):** analysjobbet väcker poddjobbet så
+  snart en ny omgång finns, Stryktipset också, i stället för att det väntar till nästa fasta tid. Poddarna, forumen
+  och de insatta medierna är då lästa och matchbladen skrivna några timmar efter kupongen, och de ersätter handskrivna
+  blad match för match (se *Poddarna läses när kupongen kommer* under *Supporterpoddarna*)
 - [x] **Gänget i bild på tv:n (2026-11-16, användarens önskemål: "när vi pratar i mobiltelefon med varandra, att vi
   har möjlighet att se varandra på TV-apparaten där uppe där text-tv spelas - om vi vill … det ska vara intuitivt och
   snyggt"):** tv:n i hörnet har fått en AV-ingång. Nära tv:n står *Visa dig på tv:n* i foten: kameran tänds och man
@@ -2915,6 +2920,21 @@ men skriptet går bara när en av tiderna (`tider` i config/poddar.js) har slagi
 körningen (`tider.json` i mappen) och slutar annars direkt, så tiderna ändras där utan att jobbet installeras om.
 En tid som missas medan datorn sover körs när den vaknar, och en körning som stoppas försöks igen vid nästa start.
 `--nu` kör oavsett tid.
+
+**Poddarna läses när kupongen kommer** (2026-11-17, användarens önskemål: "Jag vill att du gör poddgrejen … Eller att
+det görs automatiskt inför tidningspublikationerna - så att det är klart"). Helgarderats nummer kommer ut med kupongen,
+men poddjobbet väntade förut på sin nästa tid: Stryktipset 4980 blev omgång måndag kl. 23.52, och tisdagens körning
+gav inga blad, så numret fick sina blad för hand. Nu är en ny omgång dags för poddjobbet direkt, också för
+Stryktipset (`egenTid` i src/analyser/tider.mjs; förut bara Europatipset), och analysjobbet, som går var 15:e minut och
+ser omgången först, väcker det med `launchctl kickstart gui/<uid>/se.matchfixarna.poddar` (`poddjobbet` i
+scripts/analyser/skriv.mjs). Det väcker bara när omgången har matcher kvar och poddjobbet inte har gått igenom den
+(omgången i poddjobbets `tider.json`, som en lyckad körning skriver), och högst varannan timme per omgång
+(`poddar-knuff.json`), så ett jobb som stannar väcks inte var 15:e minut (`knuffaPoddar`). Ingenting behöver
+installeras om på iMacen: båda jobben går ur analysernas klon, som analysjobbet håller i takt med main. Bladen kommer
+några timmar efter kupongen (utskriften tar tid) och fyller i numret när analysjobbet lägger ut dem; de fasta tiderna
+(natten mot tisdag, natten mot fredag och lördag morgon) går som förut och tar med det som har kommit sedan dess.
+Provat med Node (`egenTid` och `knuffaPoddar`). Inte provat på iMacen: att `launchctl kickstart` startar jobbet
+därifrån och att jobbet då går igenom omgången.
 
 ```
 omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp → claude -p → omgang.json
