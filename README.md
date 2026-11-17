@@ -1730,6 +1730,20 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   egna, nyare bilar (stadsjeepar, halvkombi i dagens färger). Varje fordon ritas en gång i sin bild, som förut, och
   sedan läggs bara bilden ut: gatans lager ritas om på 3,4 ms i stället för 4,7, och på bron är det färre bilder per
   fordon (4,8 i stället för 5,9) att lägga ut i varje bildruta. Se [Hasse Backe](#hasse-backe), *Utsikten*.
+- **Trafiken bakom Hasse Backe som utanför affären, och gänget svagare i glaset (2026-11-17, användarens önskemål):**
+  "Kan du ordna så att trafiken utanför fönstret här passar bättre ihop med animationsvyn utanför butiken. Det ska
+  inte dra en massa grafik utan man ska ha en känsla av att det är samma - inklusive med bilar, människor, bussar
+  etc. Ha lite mindre reflektion av oss animerade i fönstret." Bron ligger kvar där den ligger (den är gatan framför
+  affären, som går upp på bron till höger om huset), men det som går och kör där syns nu som det det är. De som går är
+  fasadens människor (`RumFasad.folk` i rum-fasad.js): samma sällskap, kläder och sätt att gå som på trottoaren
+  framför affären – par, hundar, barnvagnar, paraplyer, reflexvästar – i stället för en grå figur i två steg, och de
+  går i gångens fart (ungefär två minuter över bron, förut 42–60 s, nästan joggingfart) och är fler. Allt på bron är
+  i rätt storlek mot räcket (en människa 1,6 räckeshöjder, förut 1,15), lackens och kläderna färger är inte längre
+  lika gråa som husen på andra sidan, och oskärpan är en dryg tredjedel av utsiktens i stället för 0,8: på ungefär
+  40 bildpunkter var bilarna och människorna bara gråa fläckar, nu är de lika mjuka i förhållande till sin storlek
+  som bilarna och de som går på gatan i rummet. Gänget i glaset bakom honom är hälften så starkt. Det som tillkommer
+  att rita är bara de som går: var och en ritas en gång i åtta ställningar (2–6 ms) och läggs sedan ut med en bild
+  per bildruta, som förut. Se [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som framför affären*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -7180,7 +7194,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   delar som de andra: i en bromsad provmiljö (headless Chrome, processorn ×4) 650–940 µs per figur och bild mot
   610–1350 för de gamla sorterna, och lika många syns samtidigt som förut. `?rum-fasad-vem=inlines` (eller `rullator`,
   `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `familj`, `skolbarn`, `cykel` …) låter alla som går förbi vara sådana,
-  för bilder och prov. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
+  för bilder och prov, också på bron bakom Hasse Backe, som lånar samma sällskap (`RumFasad.folk`, se *Trafiken som
+  framför affären* under [Hasse Backe](#hasse-backe)). Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
   glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
   käppen är i den närmre. En ledig hand kan vara i fickan, ibland bara den ena (`st.ficka`: F, B eller båda), också
@@ -9060,13 +9075,13 @@ cykelbanorna på båda sidor, bilar i båda filerna och bussarna (`gangare`, `cy
 rum-hasse.js). Hur mycket följer klockan och dagen som på gatan i rummet (`RumUte.trafik`: rusning vardagar
 7–9.30 och 15.30–18.30, mer på dagen än på kvällen, lite på natten, lugnt till halv tio på helger och röda dagar
 men fler ute natten mot lördag och söndag, färre i ösregn och sträng kyla): bilarna kommer i medeltal lika tätt
-som på gatan (i rusningen var tionde sekund i varje fil), hälften så många går, och bussarna går ungefär som de
+som på gatan (i rusningen var tionde sekund i varje fil), två tredjedelar så många går, och bussarna går ungefär som de
 gör: 4:an var 5:e minut i rusningen och var 6:e på dagen, 3:an och 77:an var 8–10:e, glesare på kvällen och
 helgen och inte alls efter midnatt (`broTakt`). Man sitter på brons östra sida: i den närmaste filen kommer
 bilarna mot en, i den bortre åker de bort (högertrafik). Alla i en fil åker lika fort, 33 km/h i rusningen, 41 på
 dagen och 47 på natten, och håller avstånd, så att ingen kör igenom någon annan. När man vänder sig om är
 trafiken redan i gång (allt från en minut tillbaka räknas fram, och det som fortfarande är på bron står där
-det har hunnit). Högst fem fordon per fil, fyra cyklister per bana och fyra människor är ute på en gång, färre på rummets lägre steg
+det har hunnit). Högst fem fordon per fil, fyra cyklister per bana och sex sällskap som går är ute på en gång, färre på rummets lägre steg
 (`BRO_MAX`). Bron räknas som en rak linje ur räcket som utsikten ritar det (`LINJE`, räckets höjd ger avståndet),
 så att fordonen krymper och saktar in mot bortre änden som i verkligheten: där syns de nästan rakt framifrån
 eller bakifrån, närmast mer från sidan. Bron har en körbana bakom räcket (sedan 2026-11-15, `TVAR`: gångbanan,
@@ -9074,7 +9089,8 @@ cykelbanan, två filer med streckad mittlinje, cykelbanan och gångbanan på and
 torr, blöt eller snöig som gatan i rummet), ritad i utsikten i samma mått som trafiken (`broPunkt`), så att allt
 står på något. Det som ligger längre in på bron hamnar högre i bilden (`LUTA`, ungefär som man ser bron härifrån,
 så att körbanan syns som en smal yta bakom räcket; sedan 2026-11-16 0,16 i stället för 0,28, se *Trafiken som
-gatan i rummet* nedan), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är fasadens (sedan 2026-11-16, rum-fasad-gatan.js) och några bilder som ritas en gång: sidan (ritad med fasadens kod, `scen`),
+gatan i rummet* nedan, och sedan 2026-11-17 lika mycket i bilden fast allt på bron är större mot räcket, se *Trafiken
+som framför affären*), och de som går ligger i samma mått (`gangVag`), 1,35 m innanför räcket. Varje fordon är fasadens (sedan 2026-11-16, rum-fasad-gatan.js) och några bilder som ritas en gång: sidan (ritad med fasadens kod, `scen`),
 fronten eller baken upp till där ovansidan tar vid (nittiotalets svarta stötfångare med skylten, strålkastarna med grillen emellan eller baklyktorna, i fasadens mått, `matt`), och ovansidan i raka bitar ur karossens överkant (`topp`:
 motorhuven, vindrutan, taket, bakrutan och bagageluckan, var och en plåt eller glas). Av ovansidan syns det som är
 plant och det som lutar bort från en, men inte det som skyms av kupén. Alla bitarna läggs med en och samma affina
@@ -9086,15 +9102,16 @@ hela tiden i rummet ritas i gängets takt. Först var var och en en egen animeri
 räknades alla om i varje skärmbild och skärmen ritades om 60 gånger i sekunden fast han bara ritas 15–30 gånger
 när han sitter still; mätt i rusningen (headless Chrome, 1628 × 786) tog animeringarna omkring 45 ms/s mer i
 sidans trådar än den ensamma gående förut, medan duken tar ungefär 2 ms/s i huvudtråden och kompositorn har
-mindre att göra än förut. Människorna går som förut, från tegelhuset hitåt eller bort, i promenadtakt (42–60 s). Figuren ritas en gång, från sidan i två steg, i
-utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt, lite sken från lyktorna i mörkret), och
-läggs sedan längs bron i trafikens duk; benen byter steg var 0,55:e sekund.
+mindre att göra än förut. Människorna går från tegelhuset hitåt eller bort, och de är fasadens (sedan 2026-11-17,
+se *Trafiken som framför affären* nedan): ett sällskap lottat som på trottoaren framför affären (`RumFasad.folk`),
+ritat en gång från sidan i åtta ställningar i gångens varv (`folkPaBron`), som sidan byter i gångens takt medan det
+går i dess fart, lika fort hela vägen (`gangVag` i lika långa steg). Utan rum-fasad.js är det en figur i två steg som
+förut (benen byter steg var 0,55:e sekund, 42–60 s över bron).
 Den går på gångbanan innanför räcket, lite högre i bilden än brons kant eftersom man ser bron uppifrån, med
-räcket framför upp till höften så att benen bara anas, och den är 1,15 gånger räckets höjd (`GANG`): räcket och
-lyktstolparna är ritade större än husen på andra sidan skulle säga (en våning är en halv grad vid tegelhuset, där
-räcket är 0,3°). Den har samma dis som bron i dimma, regn och snö och samma oskärpa som resten av trafiken (se
-nedan; ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket). Den syns bara genom glaset (duken klipps efter rutorna) och går bakom
-honom. De som cyklar (`cyklist`) håller sig till cykelbanorna mellan gångbanan och körbanan, i den närmaste mot
+räcket framför upp till höften så att benen bara anas, och den är 1,6 gånger räckets höjd (`GANG`), som mot ett
+riktigt räcke på 1,1 m (förut 1,15; ändrat 2026-11-11: förut stod den på kanten och var dubbelt så hög som räcket).
+Den har samma dis som bron i dimma, regn och snö och samma oskärpa som resten av trafiken (se nedan). Den syns bara
+genom glaset (duken klipps efter rutorna) och går bakom honom. De som cyklar (`cyklist`) håller sig till cykelbanorna mellan gångbanan och körbanan, i den närmaste mot
 en och på andra sidan bort, 17–24 km/h och lika fort i en bana, så att ingen cyklar igenom någon annan. De kommer
 efter klockan, veckodagen, årstiden och vädret (`cyklar` i `RumUte.trafik`, samma som på gatan: inga i snön, i
 ösregn eller på natten, flest på sommaren; `broTakt`): i rusningen en var tionde sekund åt vart håll på sommaren,
@@ -9110,21 +9127,56 @@ eller i en fast bild (`?rum-t`).
 tvärs över fönstret) och nästan lika oskarpa som stan bakom (3 px mot 3,4 px, de som går 2,6 px, rum-ute.css). På
 bron hos honom fick trafiken förut sin oskärpa bakad i varje figur, högst 3–3,5 bildpunkter i figurens duk: nära
 honom drygt hälften av utsiktens och längre bort, där figuren är mindre, bara en sjättedel, så att bilarna och
-människorna var skarpare än allt runt omkring. Nu ligger oskärpan på hela trafikens duk, 0,8 av utsiktens och lika
-stor längs hela bron (`oskarpa` i rum-hasse-ute.js, `filter` på `.rh-trafik` i `broDuk`), och figurerna har bara en
+människorna var skarpare än allt runt omkring. Nu ligger oskärpan på hela trafikens duk, 0,8 av utsiktens (sedan
+2026-11-17 0,35, se *Trafiken som framför affären*) och lika stor längs hela bron (`oskarpa` i rum-hasse-ute.js, `filter` på `.rh-trafik` i `broDuk`), och figurerna har bara en
 aning själva (`BAKAD`), som gatan i rummet. Glaset klipper ramen runt duken (`clip-path` på `.rh-bron`), så att det
 oskarpa inte breder ut sig över posterna; utan `path()` i `clip-path` klipps duken som förut. Fordonen är kvar som
 hela bilar och bussar med front, bak och ovansida, eftersom bron går snett bort från en, men så oskarpa ser de ut som
 på gatan. Samtidigt lutar körbanan mindre (`LUTA` 0,28 → 0,16, nära vad man faktiskt ser härifrån): förut hamnade den
 bortre filen nästan en och en halv räckeshöjd ovanför räcket, och när körbanan inte syntes, i mörker och regn,
-svävade bilarna där i luften. Förut var
+svävade bilarna där i luften.
+
+*Trafiken som framför affären* (2026-11-17). Med 0,8 av utsiktens oskärpa och en människa 1,15 räckeshöjder var
+trafiken på bron gråa fläckar på 10–40 bildpunkter: nära honom, i den högra rutan, var en bil ungefär 40 bildpunkter
+bred och 2 bildpunkter oskarp, alltså mycket suddigare i förhållande till sin storlek än bilarna på gatan i rummet
+(3 bildpunkter på flera hundra). Bron är fortfarande bron: den är gatan framför affären, som går upp på den till
+höger om huset, och den ligger långt nedanför och går bort från en, så det som är där är litet. Därför:
+
+- **Rätt storlek mot räcket** (`GANG.hojd` 1,15 → 1,6): en människa är 1,6 räckeshöjder, som mot ett riktigt räcke på
+  1,1 m, och fordonen, filerna och körbanan följer (`METER`), så att allt på bron är 39 % större i bilden och bron
+  188 m lång i stället för 260. `LUTA` och `FLUTA` följer `METER`, så att körbanan ligger där den låg i bilden.
+  Fordonen åker lika fort som förut i km/h och kommer därför över bron på kortare tid (16 s i stället för 23 i 41
+  km/h).
+- **Mindre oskärpa** (`OSKARPA` 0,8 → 0,35 av utsiktens, ungefär 0,9 bildpunkter på skärmen): ungefär lika mjukt i
+  förhållande till storleken som gatan i rummet, så att en buss är en röd eller blå buss och den som går har en jacka
+  och ett paraply. Utsikten bakom är lika oskarp som förut.
+- **Färgerna** (`ljus`): lacken är hälften så kall i dagsljuset som utsikten och nästan utan det svarta, och de som går
+  har fasadens färger med bara lite av himlens dis (12 % i dagsljuset), så att bilarna och kläderna har sina färger som
+  framför affären i stället för husens grå. Räcket framför dem är som i utsikten.
+- **Fasadens människor** (`RumFasad.folk` i [public/rum-fasad.js](public/rum-fasad.js): `nytt` lottar ett sällskap
+  som `folket`, `rita` ritar en av dem i en ställning): samma sällskap (ensam, par, gäng, med hund, barn, barnvagn,
+  cykel eller rullator), samma kläder efter vädret (paraplyer, regnkläder, mössor, reflexvästar, 90-talets färger)
+  och samma sätt att gå. `folkPaBron` i rum-hasse-ute.js ritar sällskapet en gång från sidan i åtta ställningar
+  bredvid varandra (96 bildpunkter på en vuxen, så att den som närmast förstoras högst ungefär två gånger), lika
+  mörkt på kvällen som framför affären (`MORK`), med räcket framför benen och brons dis, och `broRita` i rum-hasse.js
+  väljer ställningen efter gångens takt. Farten är gångens (steglängden gånger takten), så ett sällskap går över bron
+  på en och en halv till drygt tre minuter, och det kommer två tredjedelar så många som på gatan (`broTakt`, högst sex,
+  `BRO_MAX`), så att några brukar vara ute när det är folk i rörelse.
+
+Det som tillkommer att rita är bara de som går: ett sällskap tar 2–6 ms att rita en gång (headless Chrome, utan
+grafikkort; ett fordon 1,5 ms) och är en duk på ungefär 950 × 160 bildpunkter, och i varje bildruta läggs det ut med
+en bild, som den gamla figuren. Den mindre oskärpan är billigare för kompositorn, inte dyrare. Prövat i bilder i
+rusningen en sommareftermiddag, en solig vårmorgon, i regn en novembermorgon, en mulen novemberkväll och en klar natt.
+
+Förut var
 väggen bakom honom affärens furupanel med cigarettpaket på en hylla, skylten *Kredit ges ej*, tidningsbunten,
 kaffebryggaren och kassan (ändrat 2026-11-10).
 
 **Affären i glaset.** När det är mörkare ute än inne speglar glaspartiet bakom honom tobaksaffären, som ligger
 till höger om en när man har vänt sig mot honom (`affaren` i [public/rum-hasse-ute.js](public/rum-hasse-ute.js)):
 längst in, bakom hans huvud, furan i lysrörets sken; till höger om hans huvud gänget vid det runda bordet, med
-huvudena, håret, mössan med kronan och tröjorna i sina färger; och i den högra rutan lysröret i taket, skylten
+huvudena, håret, mössan med kronan och tröjorna i sina färger, svagt (`GS`, hälften så starkt sedan 2026-11-17, så att
+man anar dem utan att de tar blicken från utsikten och trafiken); och i den högra rutan lysröret i taket, skylten
 Stryktipset och neonskylten i skyltfönstret. Det är det som visar att han sitter i samma rum som gänget och man
 själv, och inte på ett annat ställe. Den som sitter närmast skyltfönstret i rummet sitter närmast glaset och syns
 därför längst till höger. Som utsikten är spegelbilden flyttad dit den syns: egentligen ligger den högre än vad

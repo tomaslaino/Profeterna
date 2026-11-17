@@ -700,17 +700,19 @@ export function affaren(x, L, l, somn, lage, W, H) {
   // det runda bordet: skivan och foten
   skym(18.8, 17, 0.7, 2, 0.8);
   flack(18.8, 15.3, 4.2, 0.9, '236, 208, 164', 0.55 * s, 0, 0.7);
-  // gänget: tyget skymmer furan, och sedan huvudet, håret eller mössan och tröjan i lysrörets sken
+  // gänget: tyget skymmer furan, och sedan huvudet, håret eller mössan och tröjan i lysrörets sken – svagt (GS), så
+  // att man anar dem i glaset utan att de tar blicken från utsikten och trafiken (2026-11-17; förut dubbelt så starkt)
   const ned = somn ? 1.7 : 0;
+  const GS = 0.45;
   for (const g of GANGET) {
     const hy = 11.8 + ned;
-    skym(g.az, hy + 2.8, 2.1, 2.9, 0.9);
-    skym(g.az, hy, 1.45, 1.55, 0.85);
-    flack(g.az, hy + 2.9, 1.8, 2.2, g.troja, 0.52 * s, 0, 0.6);
-    flack(g.az + 0.3, hy + 2.6, 0.7, 1.4, g.ljus, 0.34 * s, 0, 0.6);
-    flack(g.az, hy + 0.1, 1.3, 1.4, '236, 184, 146', 0.72 * s, 0, 0.62);
-    flack(g.az + 0.15, hy - 0.75, 1.35, 0.85, g.har, 0.7 * s, 0, 0.6);
-    if (g.krona) flack(g.az, hy - 1.55, 1.05, 0.45, '238, 188, 64', 0.7 * s, 0, 0.7);
+    skym(g.az, hy + 2.8, 2.1, 2.9, 0.9 * GS);
+    skym(g.az, hy, 1.45, 1.55, 0.85 * GS);
+    flack(g.az, hy + 2.9, 1.8, 2.2, g.troja, 0.52 * s * GS, 0, 0.6);
+    flack(g.az + 0.3, hy + 2.6, 0.7, 1.4, g.ljus, 0.34 * s * GS, 0, 0.6);
+    flack(g.az, hy + 0.1, 1.3, 1.4, '236, 184, 146', 0.72 * s * GS, 0, 0.62);
+    flack(g.az + 0.15, hy - 0.75, 1.35, 0.85, g.har, 0.7 * s * GS, 0, 0.6);
+    if (g.krona) flack(g.az, hy - 1.55, 1.05, 0.45, '238, 188, 64', 0.7 * s * GS, 0, 0.7);
   }
   // taklamporna och skylten Stryktipset ovanför skyltfönstret, framför allt annat: takfläkten över gängets
   // bord, med bladen mörka mot taket och fyra kupor under (förut ett lysrör)
@@ -733,12 +735,12 @@ export function affaren(x, L, l, somn, lage, W, H) {
 
 // ---------- trafikens oskärpa ----------
 
-// Hur oskarp trafiken på bron är (väggbildens bildpunkter): nästan som utsikten (rita: ofokus / 2), som bilarna
-// och de som går på gatan i rummet är nästan lika oskarpa som stan bakom dem (rum-ute.css). Den läggs på hela
-// trafikens duk (rum-hasse.js), så att den är lika stor längs hela bron: bakad i varje figur krympte den med
-// figuren, och längst bort var bilarna nästan skarpa (ändrat 2026-11-16; förut knappt en sjättedel av utsiktens).
-// I figurerna och fordonen själva bara BAKAD, så att kanterna inte blir hackiga.
-const OSKARPA = 0.8;
+// Hur oskarp trafiken på bron är (väggbildens bildpunkter): en dryg tredjedel av utsiktens (rita: ofokus / 2), så
+// att bilarna, bussarna och de som går syns som det de är, de som kör och går förbi framför affären, fast de är
+// långt borta (2026-11-17; förut 0,8, och då var de bara gråa fläckar). Den läggs på hela trafikens duk
+// (rum-hasse.js), så att den är lika stor längs hela bron: bakad i varje figur krympte den med figuren, och längst
+// bort var bilarna nästan skarpa (ändrat 2026-11-16). I fordonen själva bara BAKAD, så att kanterna inte blir hackiga.
+const OSKARPA = 0.35;
 const BAKAD = 0.6;
 export function oskarpa(lage) {
   const { b } = projektion(lage);
@@ -747,17 +749,20 @@ export function oskarpa(lage) {
 
 // ---------- någon på bron ----------
 
-// Någon som går på bron då och då (bron i rum-hasse.js). Figuren ritas en gång, från sidan i två steg bredvid
-// varandra, i utsiktens ljus och väder (paraply när det regnar, mössa när det är kallt), lika oskarp och i samma
-// dis som det andra långt borta. Den går på gångbanan innanför räcket, som når till höften och som benen anas
-// bakom. Vägen är fötternas plats längs bron i väggbildens bildpunkter och hur hög figuren är där (u från bortre
-// änden vid tegelhuset till förbi bildens högra kant). Sidan lägger figuren där i trafikens duk (broRita i
-// rum-hasse.js), utan att rita om den.
-// Hur hög figuren är mot räcket (BRO.racke), och hur långt innanför räcket den går (meter): räcket i utsikten är
-// ritat högre än ett riktigt, mot husen på andra sidan (en våning är en halv grad vid tegelhuset, där räcket är
-// 0,3°), så en människa är bara lite högre än det. Gångbanan ligger bakom räcket och syns uppifrån, alltså lite
-// högre i bilden än kanten (LUTA).
-const GANG = { hojd: 1.15, sid: 1.35 };
+// De som går på bron (bron i rum-hasse.js) är samma människor som framför affären (RumFasad.folk i rum-fasad.js): ett
+// sällskap lottat som där, efter klockan, dagen och vädret, i samma kläder och med samma sätt att gå – ensam, ett par,
+// med hund, barnvagn eller paraply. Sällskapet ritas en gång, från sidan i FOLK_N ställningar i gångens varv bredvid
+// varandra (folkPaBron), lika mörkt som framför affären på kvällen och i samma dis som bron, och sidan byter bild i
+// gångens takt medan det går i dess fart. Utan rum-fasad.js är det en figur i två steg som förut. Den går på
+// gångbanan innanför räcket, som når till höften och som benen anas bakom. Vägen är fötternas plats längs bron i
+// väggbildens bildpunkter och hur hög figuren är där (u från bortre änden vid tegelhuset till förbi bildens högra
+// kant). Sidan lägger figuren där i trafikens duk (broRita i rum-hasse.js), utan att rita om den.
+// Hur hög figuren är mot räcket (BRO.racke), och hur långt innanför räcket den går (meter): en människa är 1,6
+// räckeshöjder, som mot ett riktigt räcke på 1,1 m, och allt på bron i samma mått (METER), så att bron är 188 m lång.
+// Förut 1,15 (räcket ritat som 1,5 m, en människa bara lite högre än det och bron 260 m), och trafiken var för liten
+// för att kännas igen (ändrat 2026-11-17). Gångbanan ligger bakom räcket och syns uppifrån, alltså lite högre i
+// bilden än kanten (LUTA).
+const GANG = { hojd: 1.6, sid: 1.35 };
 export function gangare(v, L, lage, R = Math.random) {
   const F = window.RumUte.farg;
   const { P } = projektion(lage);
@@ -766,10 +771,18 @@ export function gangare(v, L, lage, R = Math.random) {
   const kv = Math.max(0, 1 - L.dag / 0.6) * 0.2;
   const ton = (dag, natt) => F.mix(F.mix(F.kall(F.facade(dag, natt, L), L, KG), '#000000', 0.15), '#5c3c22', kv);
   const steg = gangVag(P);
+  const FF = window.RumFasad && window.RumFasad.folk;
+  if (FF) {
+    try {
+      return folkPaBron(FF, v, L, steg, R, { F, KG, KH, ton });
+    } catch (err) {
+      console.warn('Bron: de som går kunde inte ritas som framför affären', err);
+    }
+  }
   // figuren: U bildpunkter hög, med plats för paraplyet ovanför och oskärpan runt om. I figuren bara en aning
   // (BAKAD där den syns som störst i fönstren); resten läggs på hela trafiken när den ritas (oskarpa).
   const U = 60;
-  const sudd = (BAKAD * U) / steg[14][2];
+  const sudd = (BAKAD * U) / steg[Math.round(0.8 * GANG_STEG)][2];
   const pad = Math.ceil(Math.max(12, 3 * sudd));
   const B = Math.round(U * 0.55) + 2 * pad;
   const Hd = Math.round(U * 1.18) + 2 * pad;
@@ -853,6 +866,62 @@ export function gangare(v, L, lage, R = Math.random) {
   return { duk, B, H: Hd, fot: [B / 2, Hd - pad], U, steg, mot: R() < 0.5 };
 }
 
+// Sällskapet från fasaden i FOLK_N ställningar (var i gångens varv: i, i + 1 … av FOLK_N), bredvid varandra i en duk:
+// U bildpunkter på en vuxen (175 cm, fasadens centimeter), så att figuren i fönstren som närmast förstoras högst
+// ungefär två gånger. Var och en i sällskapet på sin plats (dx), i sin storlek (k) och i sin del av varvet (fas), de
+// bortersta först. På kvällen lika mörka som framför affären i mörkret (z, MORK i rum-fasad.js), och sedan bronens
+// dis: lite av himlens färg i dagsljuset, dimman och det som faller (som för fordonen, framfor). Räcket framför benen
+// som för den gamla figuren. Farten är gångens (steglängden gånger takten, fasadens cm och varv i sekunden).
+const FOLK_N = 8;
+function folkPaBron(FF, v, L, steg, R, C) {
+  const { F, KG, KH, ton } = C;
+  const vem = FF.nytt(R, v, L);
+  if (!vem.length) throw new Error('ingen');
+  const U = 96;
+  const k = U / 175;
+  const x0 = Math.min(...vem.map((m) => m.dx)) - 100;
+  const x1 = Math.max(...vem.map((m) => m.dx)) + 100;
+  const pad = 4;
+  const B = Math.ceil((x1 - x0) * k) + 2 * pad;
+  const Hd = Math.ceil(275 * k) + 2 * pad;
+  const duk = document.createElement('canvas');
+  duk.width = FOLK_N * B;
+  duk.height = Hd;
+  const x = duk.getContext('2d');
+  const fy = Hd - pad - 8 * k;
+  const fot = [pad - x0 * k, fy];
+  const z = L.dag >= 0.6 ? 0 : Math.round((1 - L.dag / 0.6) * 2);
+  const fas = vem.map(() => R());
+  for (let i = 0; i < FOLK_N; i++) {
+    for (let j = 0; j < vem.length; j++) {
+      const m = vem[j];
+      x.save();
+      x.translate(i * B + fot[0] + m.dx * k, fy);
+      x.scale(k * m.k, k * m.k);
+      FF.rita(x, m, i / FOLK_N + fas[j], 1, z);
+      x.restore();
+    }
+  }
+  // räcket framför benen: mellan spjälorna anas de, och handledaren går över höften (bara på figuren)
+  const rack = ton('#2f6243', '#080b0a');
+  const hoft = (1 - LUTA * GANG.sid * METER) / GANG.hojd;
+  const yr = fy - hoft * U;
+  x.globalCompositeOperation = 'destination-out';
+  ruta(x, 0, yr, duk.width, Hd - yr, '#000', 0.3);
+  x.globalCompositeOperation = 'source-atop';
+  ruta(x, 0, yr, duk.width, Hd - yr, rack, 0.3);
+  ruta(x, 0, yr - 0.02 * U, duk.width, 0.05 * U, rack, 0.8);
+  // brons dis: himlens färg i dagsljuset, dimman, och regnet eller snön i luften
+  ruta(x, 0, 0, duk.width, Hd, F.kall(L.sky[2], L, KH), 0.12 * L.dag);
+  if (L.dimma > 0.02) { ruta(x, 0, 0, duk.width, Hd, L.sky[2], 0.3 * L.dimma); ruta(x, 0, 0, duk.width, Hd, L.sky[2], 0.3 * L.dimma); }
+  if (v.fall) ruta(x, 0, 0, duk.width, Hd, v.fall === 'sno' ? F.kall(F.sno(L), L, KG) : F.kall(L.sky[2], L, KH), (v.fall === 'sno' ? 0.08 : 0.1) + 0.14 * v.mangd);
+  x.globalCompositeOperation = 'source-over';
+  const st = vem.find((m) => m.dx === 0) ? vem.find((m) => m.dx === 0).st : vem[0].st;
+  const takt = st.takt || 1;
+  const fart = Math.max(0.6, ((st.S || 128) * takt) / 100);
+  return { duk, B, H: Hd, fot, U, steg, mot: R() < 0.5, N: FOLK_N, takt, sek: gangMeter() / fart };
+}
+
 // ---------- trafiken på bron ----------
 
 // Bron som en rak linje på marken, uträknad ur räcket som utsikten ritar det (BRO.racke: räckets höjd i grader
@@ -862,11 +931,12 @@ export function gangare(v, L, lage, R = Math.random) {
 // räckeshöjder på en räckeshöjd inåt): ungefär som man ser bron härifrån, så att körbanan syns som en smal yta
 // bakom räcket och det som kör där står på den, bakom dem som går närmast. Förut 0,28, nästan dubbelt så mycket,
 // och då svävade bilarna i den bortre filen långt ovanför räcket när körbanan inte syntes, i mörker och regn
-// (ändrat 2026-11-16). En meter är METER räckeshöjder (den som går är 1,75 m).
+// (ändrat 2026-11-16). En meter är METER räckeshöjder (den som går är 1,75 m). LUTA och FLUTA följer METER, så att
+// körbanan ligger där den låg i bilden när människorna blev större mot räcket (GANG; 0,16 och 0,1 vid 1,15).
 const METER = GANG.hojd / 1.75;
-const LUTA = 0.16;
+const LUTA = (0.16 * 1.15) / GANG.hojd;
 // (fordonen själva, från sida till sida: så lite som man ser dem uppifrån när man tittar längs bron)
-const FLUTA = 0.1;
+const FLUTA = (0.1 * 1.15) / GANG.hojd;
 const LINJE = (() => {
   const g = (az) => { const d = 1 / Math.tan(bro(az, BRO.racke) * DEG); return [d * Math.sin(az * DEG), d * Math.cos(az * DEG)]; };
   const A = g(BRO.a0);
@@ -885,20 +955,27 @@ function broPunkt(P, s, sid, z) {
   return P(az, bro(az, BRO.top) + 0.04 + (LUTA * sid + z) * r + E.ned);
 }
 
-// Fötternas väg för den som går (gangare): 21 steg från bortre änden till förbi bildens högra kant, på gångbanan
-// GANG.sid meter innanför räcket, i samma mått som trafiken (broPunkt), så att den som går står på
-// gångbanan bredvid cyklisterna och bilarna och inte i deras väg. → [x, y, figurens höjd] i väggbildens bildpunkter
+// Fötternas väg för den som går (gangare): GANG_STEG lika långa steg (meter) från bortre änden till förbi bildens
+// högra kant, på gångbanan GANG.sid meter innanför räcket, i samma mått som trafiken (broPunkt), så att den som går
+// står på gångbanan bredvid cyklisterna och bilarna och inte i deras väg, och går lika fort hela vägen, som bilarna:
+// långt bort sakta i bilden (förut tätare steg nära, så att den gick fortare där). → [x, y, figurens höjd] i
+// väggbildens bildpunkter
+const GANG_STEG = 40;
 // hur långt ut på bron räcket står i riktningen az (grader)
 function langs(az) {
   const { A, ax } = LINJE;
   const d = [Math.sin(az * DEG), Math.cos(az * DEG)];
   return -(A[0] * d[1] - A[1] * d[0]) / (ax[0] * d[1] - ax[1] * d[0]);
 }
+const GANG_U = [() => langs(BRO.a0 + 0.8), () => langs(42)];
+// (vägens längd i meter)
+const gangMeter = () => (GANG_U[1]() - GANG_U[0]()) / METER;
 function gangVag(P) {
   const sid = GANG.sid * METER;
   const ut = [];
-  for (let i = 0; i <= 20; i++) {
-    const u = langs(BRO.a0 + 0.8 + (42 - 0.8 - BRO.a0) * (i / 20) ** 1.5);
+  const [u0, u1] = GANG_U.map((f) => f());
+  for (let i = 0; i <= GANG_STEG; i++) {
+    const u = u0 + ((u1 - u0) * i) / GANG_STEG;
     const [x, y] = broPunkt(P, u, sid, 0);
     const [, y2] = broPunkt(P, u, sid, GANG.hojd);
     ut.push([x, y, y - y2]);
@@ -1010,8 +1087,11 @@ function ljus(v, L) {
   const KG = F.KALL ? F.KALL.gata : 0.3;
   const KH = F.KALL ? F.KALL.himmel : 0.4;
   const kv = Math.max(0, 1 - L.dag / 0.6) * 0.2;
-  const ton = (c, natt = F.mix(c, '#07080b', 0.85)) => F.mix(F.mix(F.kall(F.facade(c, natt, L), L, KG), '#000000', 0.15), '#5c3c22', kv);
-  return { F, KG, KH, ton, lampor: L.lampor || L.dimma > 0.4, rack: ton('#2f6243', '#080b0a') };
+  // (lacken: hälften så kall i dagsljuset som utsikten och nästan utan det svarta, så att bilarna och bussarna har
+  // sina färger som framför affären; förut lika grå som husen på andra sidan. Räcket som i utsikten.)
+  const ton = (c, natt = F.mix(c, '#07080b', 0.85)) => F.mix(F.mix(F.kall(F.facade(c, natt, L), L, KG * 0.5), '#000000', 0.05), '#5c3c22', kv);
+  const tonU = (c, natt) => F.mix(F.mix(F.kall(F.facade(c, natt, L), L, KG), '#000000', 0.15), '#5c3c22', kv);
+  return { F, KG, KH, ton, lampor: L.lampor || L.dimma > 0.4, rack: tonU('#2f6243', '#080b0a') };
 }
 const ruta = (x, X, Y, w, h, c, alfa = 1) => { x.globalAlpha = alfa; x.fillStyle = c; x.fillRect(X, Y, w, h); x.globalAlpha = 1; };
 const sken = (x, X, Y, r, c, alfa) => {
