@@ -45,9 +45,10 @@ module.exports = {
     { dag: 1, kl: '17:00' },
     { dag: 5, kl: '16:00' },
   ],
-  // En match utan analys skrivs ändå när det är högst så här många timmar kvar, om
-  // omgången skapades efter den senaste tiden.
-  forhandTimmar: 24,
+  // En match utan analys skrivs så snart omgången finns (användarens önskan 2026-11-17), men
+  // kommer en tid inom så här många timmar och börjar matchen efter den, väntar den på tiden,
+  // så att den inte skrivs två gånger i rad (attSkriva i src/analyser/tider.mjs).
+  vantaTimmar: 3,
   // Försök per match och tid: misslyckas det görs högst så många, med minst så
   // många minuter emellan.
   perMatch: 3,

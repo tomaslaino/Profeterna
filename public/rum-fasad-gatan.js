@@ -714,6 +714,8 @@ window.RumFasadGatan = (() => {
       koer: new Map(),
       T: null, tT: -1e9,
       lamps: L.lampor || L.dag < 0.35 || L.dimma > 0.4,
+      // (hur mycket i luften som fångar strålkastarnas ljus: regn, snö och dimma; 0 i klar luft)
+      luft: Math.min(1, (v.fall ? 0.35 + 0.65 * v.mangd : 0) + (L.dimma || 0)),
       vat: (L.wet || v.blott) && !v.snotackt,
       regn: v.fall === 'regn' || v.fall === 'blandat',
       snoTak: v.snotackt || (v.fall === 'sno' && v.mangd > 0.4),
@@ -1496,12 +1498,18 @@ window.RumFasadGatan = (() => {
       else c.fillRect(-h, -300, b.L, 300);
       c.restore();
       if (S.lamps) {
+        // (smalnar av nedåt, som ljus i blöt asfalt, i stället för ett rakt band)
         for (const [x, rgb, a] of ljus) {
           const g = c.createLinearGradient(0, 4, 0, 280);
           g.addColorStop(0, `rgba(${rgb},${a})`);
           g.addColorStop(1, `rgba(${rgb},0)`);
           c.fillStyle = g;
-          c.fillRect(x - 9, 4, 18, 276);
+          c.beginPath();
+          c.moveTo(x - 7, 4);
+          c.quadraticCurveTo(x - 1.5, 70, x, 280);
+          c.quadraticCurveTo(x + 1.5, 70, x + 7, 4);
+          c.closePath();
+          c.fill();
         }
       }
     }
@@ -1543,6 +1551,10 @@ window.RumFasadGatan = (() => {
   }
 
   // Strålkastaren och baklyktan som de lyser i mörkret: skenet kring dem, ljuset på gatan framför och bromsljuset.
+  // Ljuset på gatan är en mjuk fläck på asfalten framför bilen, och strålen syns bara när det finns något i luften
+  // som fångar den (S.luft: regn, snö, dimma), som ett mjukt sken från lyktan och framåt. Förut var fläcken en ellips
+  // med skarpa kanter och strålen en kil med raka kanter också i klar luft, som lade ett grått sken över dem som gick
+  // och bilen framför. Lika många ritanrop som förut.
   function lyktor(c, b, S, fram, bak, broms) {
     const [fx, fy, fw, fh] = fram;
     const [bx, by, bw, bh] = bak;
@@ -1551,21 +1563,31 @@ window.RumFasadGatan = (() => {
     if (S.lamps) {
       c.save();
       c.globalCompositeOperation = 'lighter';
-      // ljuset på gatan framför
-      const g = c.createLinearGradient(fxe, 0, fxe + 450, 0);
-      g.addColorStop(0, 'rgba(255,236,196,0.22)');
+      // ljuset på gatan framför: en fläck som tonar ut åt alla håll, starkast ett par meter fram
+      c.save();
+      c.translate(fxe + 190, -2);
+      c.scale(1, 0.04);
+      const g = c.createRadialGradient(-70, 0, 0, 0, 0, 260);
+      g.addColorStop(0, 'rgba(255,236,196,0.24)');
+      g.addColorStop(0.55, 'rgba(255,236,196,0.09)');
       g.addColorStop(1, 'rgba(255,236,196,0)');
       c.fillStyle = g;
-      c.beginPath();
-      c.moveTo(fxe, fy - 2);
-      c.lineTo(fxe + 450, -24);
-      c.lineTo(fxe + 450, 4);
-      c.lineTo(fxe, fy + fh);
-      c.closePath();
-      c.fill();
-      c.beginPath();
-      c.ellipse(fxe + 200, -2, 230, 9, 0, 0, TAU);
-      c.fill();
+      c.fillRect(-260, -260, 520, 520);
+      c.restore();
+      // strålen i regnet, snön eller dimman: starkast vid lyktan, mjuka kanter, lite nedåt
+      if (S.luft > 0.05) {
+        c.save();
+        c.translate(fxe + 200, fy + fh / 2 + 10);
+        c.rotate(0.07);
+        c.scale(1, 0.15);
+        const s = c.createRadialGradient(-190, 0, 0, 0, 0, 230);
+        s.addColorStop(0, `rgba(255,240,210,${(0.2 * S.luft).toFixed(3)})`);
+        s.addColorStop(0.45, `rgba(255,240,210,${(0.07 * S.luft).toFixed(3)})`);
+        s.addColorStop(1, 'rgba(255,240,210,0)');
+        c.fillStyle = s;
+        c.fillRect(-230, -230, 460, 460);
+        c.restore();
+      }
       sken(c, fxe - 2, fy + fh / 2, 70, '255,244,214', 0.6);
       // (bromsljuset mjukare sedan 2026-11-17: det lyste som en varningslampa i mörkret)
       sken(c, bx, byc, broms ? 60 : 44, '255,48,32', broms ? 0.44 : 0.32);
