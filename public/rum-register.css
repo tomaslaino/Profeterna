@@ -69,25 +69,41 @@
 /* streck över hela bredden */
 .reg-term .tr.hr { position: relative; }
 .reg-term .tr.hr::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 0.09em solid #1c9c3d; }
-/* flikens sidor som radioknappar (sidRad) */
-.reg-term .tr.sid { white-space: pre; overflow-x: clip; }
-/* DOS-programmet (sedan 2026-11-17, bygg och delRad i rum-register.js):
-   menyraden är en list över hela bredden som tangentraden, den valda mörk i
-   det ljusa; den valda fliken är en mapp – en ram öppen nedåt, där strecket
-   under flikraden tar slut */
+/* Menyraden (sedan 2026-11-17, bygg i rum-register.js) är en list över hela
+   bredden som tangentraden, den valda mörk i det ljusa. */
 .reg-term .tr.meny { margin: 0 -1.2em; padding: 0 1.2em; background: var(--gron); color: #010702; text-shadow: none; }
 .reg-term .tr.meny .a:hover { background: rgba(1, 7, 2, 0.16); }
 .reg-term .tr.meny .i, .reg-term .tr.meny .a.i:hover { background: #020a04; color: #c9ffd7; text-shadow: 0 0 0.3em rgba(65, 255, 110, 0.5); }
-.reg-term .tr.flik { background: linear-gradient(var(--gron), var(--gron)) left bottom / 100% 0.09em no-repeat; }
-.reg-term .tr.flik .i { position: relative; z-index: 0; margin: 0; padding: 0; background: none; color: #c9ffd7; text-shadow: 0 0 0.3em rgba(65, 255, 110, 0.5); }
-.reg-term .tr.flik .i::before { content: ''; position: absolute; z-index: -1; left: -0.75ch; right: -0.75ch; top: -0.1em; bottom: -0.12em; border: 0.09em solid var(--gron); border-bottom: 0; background: #020a04; }
+/* Spåret (sedan kvällen 2026-11-17, delRad och sidRad i rum-register.js): kortets
+   flikar i ett svagt spår över hela bredden, med lika mycket luft runt varje
+   flik, och den valda i ett ljust fält i spåret; de andra svaga och en flik
+   utan något att visa svagast. Flikens sidor är samma spår mindre och
+   svagare, i mitten, med den valda i ett svagt fält. Spåret och fältet står
+   inom radens höjd (--spar och --falt: hur långt in från radens över- och
+   underkant), så att raderna står där skärmen i rummet ritar dem
+   (rum-dator.js). Tidigare samma dag var den valda fliken en mapp och sidorna
+   radioknappar. */
+.reg-term { --spar: 0.04em; --falt: 0.09em; }
+.reg-term .tr.flik, .reg-term .tr.sid { position: relative; z-index: 0; display: flex; white-space: pre; }
+.reg-term .tr.flik::before, .reg-term .tr.sid::before { content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: var(--spar); bottom: var(--spar); border-radius: 0.25em; background: rgba(65, 255, 110, 0.08); }
+.reg-term .tr.flik > span, .reg-term .tr.sid > span { position: relative; color: var(--svag); text-shadow: none; }
+.reg-term .tr.flik > span { flex: 1 1 auto; text-align: center; }
+.reg-term .tr.flik > .d { opacity: 0.45; }
+.reg-term .tr.sid { width: max-content; max-width: 100%; margin: 0 auto; }
+.reg-term .tr.sid > span { padding: 0 1.5ch; }
+.reg-term .tr.flik > .a:hover, .reg-term .tr.sid > .a:hover { background: none; color: var(--gron); }
+.reg-term .tr.flik > .i::before, .reg-term .tr.sid > .v::before { content: ''; position: absolute; z-index: -1; left: 0.12em; right: 0.12em; top: var(--falt); bottom: var(--falt); border-radius: 0.18em; }
+.reg-term .tr.flik > .i { margin: 0; padding: 0; background: none; color: #010702; }
+.reg-term .tr.flik > .i::before { background: rgba(65, 255, 110, 0.9); }
+.reg-term .tr.sid > .v { color: #c9ffd7; }
+.reg-term .tr.sid > .v::before { background: rgba(65, 255, 110, 0.28); }
 /* menyraden som piltangenterna står i (menyTangent i rum-register.js): den
-   valda lyser som en vald rad – mappen och radioknappen fylls, listens val
-   får en ljus kant */
+   valda lyser som en vald rad – listens val och flikens fält får en ljus
+   kant, och sidans fält fylls */
 .reg-term .tr.meny.fokus .i { box-shadow: inset 0 0 0 0.12em #c9ffd7; }
-.reg-term .tr.flik.fokus .i { color: #010702; text-shadow: none; }
-.reg-term .tr.flik.fokus .i::before { background: rgba(65, 255, 110, 0.85); }
-.reg-term .tr.sid.fokus .v { margin: 0 -0.5ch; padding: 0 0.5ch; background: rgba(65, 255, 110, 0.85); color: #010702; text-shadow: none; }
+.reg-term .tr.flik.fokus > .i::before { box-shadow: 0 0 0 0.1em #c9ffd7; }
+.reg-term .tr.sid.fokus > .v { color: #010702; }
+.reg-term .tr.sid.fokus > .v::before { background: rgba(65, 255, 110, 0.85); }
 /* kupongens avdelningar: ett tunt streck ovanför den första raden (utan en
    egen rad, så att allt ryms på skärmen), och i telefonen tävlingen som
    rubrik med ett streck efter; registrets tabeller har strecket där zonen
@@ -165,12 +181,11 @@
    rum-register.js) och större text, svagare linjer, mörker bara uppe och nere,
    ljusare svag text, glesare rader och högre tangenter – allt för att det ska gå att läsa
    och trycka. */
-.rum-regn.tel .reg-term { --svag: #2bb956; border-radius: 0; line-height: 1.25; }
+/* (spåren lika långt från texten som på datorn, i de glesare raderna) */
+.rum-regn.tel .reg-term { --svag: #2bb956; --spar: 0.06em; --falt: 0.12em; border-radius: 0; line-height: 1.25; }
 .rum-regn.tel .reg-term .tr { min-height: 1.25em; }
-/* (listen når kanterna med telefonens mindre luft, och mappens ram når
-   strecket med de glesare raderna) */
+/* (listen når kanterna med telefonens mindre luft) */
 .rum-regn.tel .reg-term .tr.meny { margin: 0 -0.6em; padding: 0 0.6em; }
-.rum-regn.tel .reg-term .tr.flik .i::before { top: -0.16em; bottom: -0.185em; }
 .rum-regn.tel .reg-mark { top: 0.15em; }
 .rum-regn.tel.framme .reg-term { padding: 0.7em 0.6em 0.6em; }
 .rum-regn.tel .reg-lin { background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0 1px, rgba(0, 0, 0, 0) 1px 3px); box-shadow: inset 0 1.4em 1.6em -1em rgba(0, 0, 0, 0.75), inset 0 -1.4em 1.6em -1em rgba(0, 0, 0, 0.75); }
