@@ -457,7 +457,7 @@ export async function figurer(canvas, opt = {}) {
   cam.position.set(0, 0, D);
   cam.lookAt(0, 0, 0);
   // (kameran ute på trottoaren, utifran nedan)
-  const UTE = { kam: null, neon: 1, n: 0, krympt: false, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
+  const UTE = { kam: null, neon: 1, n: 0, krympt: false, lanad: false, K: new THREE.PerspectiveCamera(19, 1, 100, 6000) };
   // Ögat, där betraktaren står (OGA: gänget tittar dit, looks), flyttas efter musen (draw), och bilden
   // förskjuts så att djupet OGA_Z står kvar (en bit av en större bild, som när duken inte är mitt i).
   // Ljuset står kvar, som när man själv rör sig: förut vreds gänget och skuggorna mot lamporna. NARA är
@@ -8657,6 +8657,8 @@ export async function figurer(canvas, opt = {}) {
   let lastMx = 0;
   let lastT = null;
   function draw(t, mx, my, neonPa) {
+    // (duken står i skyltfönstret, lana: inifrån ritas inget i den så länge)
+    if (UTE.lanad && !UTE.kam) return;
     AKT_MINNE.ra.clear();
     AKT_MINNE.nu.clear();
     AKT_MINNE.prat.clear();
@@ -8746,25 +8748,26 @@ export async function figurer(canvas, opt = {}) {
 
   // Gänget utifrån, genom skyltfönstret (fasaden i rum-fasad.js): samma scen och samma ställning, men med en
   // kamera ute på trottoaren som ser rakt in, så att man ser dem bakifrån. Glaset (FONSTER: x, y och z i
-  // världen, från fönsterbänken upp) är rutan som kopieras till fasadens duk: kameran står i ögonhöjd framför
-  // fönstret (oga) och ser vinkelrätt mot glaset, så att glaset blir en rätvinklig ruta i bilden, och den rutan
-  // tas ur duken i samma uppgift som den ritas (innan webbläsaren hinner visa eller tömma den). Skuggfångaren
-  // (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre på ryggarna än på ansiktena inifrån.
-  // Rummet står still under tiden (Rum.vila) och ritas som vanligt igen när man går in. Rutan som kopieras är
-  // STORRE gånger glaset (samma mitt och nederkant), så att gänget blir lika stort som de som går förbi ute.
-  // Bara glaset ritas, med fasadens dukens bildpunkter (högst så många som förut, kval): kameran ser glaset
-  // och inget annat (ett snett synfält, eftersom ögat inte står mitt för det), i dukens nedre hörn. Medan
-  // rummet står still krymper duken till just det (UTE.krympt), så att inget annat i den kostar något, och
-  // draw ger den rummets storlek igen när gänget ritas inifrån (inneStorlek). Förut ritades hela duken, två
-  // till tre gånger fler bildpunkter än glaset, och därför bara några gånger i sekunden: gänget hackade fram.
-  //   utifran(duk, t, neonPa, hem) → true om något ritades (hem: duken ritas sedan inifrån igen, medan rummet syns)
+  // världen, från fönsterbänken upp) är det kameran ser: den står i ögonhöjd framför fönstret (oga) och ser
+  // vinkelrätt mot glaset med ett snett synfält (ögat står inte mitt för det), så att glaset fyller duken och
+  // inget annat ritas. Rutan är STORRE gånger glaset (samma mitt och nederkant), så att gänget blir lika stort
+  // som de som går förbi ute. Skuggfångaren (fönsterbänken) är dold så länge, och neonen bakom dem lyser mindre
+  // på ryggarna än på ansiktena inifrån.
+  // Medan rummet inte syns (Rum.vila) lånas gängets duk ut till fasaden och står själv i skyltfönstret (lana):
+  // den krymper till glaset (UTE.krympt) och ritas lika ofta som inne. Förut kopierades glaset till en duk i
+  // fasaden efter varje bild (drawImage från WebGL), ett arbete på grafikkortet som bara fanns ute; nu gör
+  // fasaden samma sak som rummet, där duken visar det som ritas i den. Inifrån ritas inget så länge den är
+  // utlånad (draw), och draw ger den rummets storlek igen när gänget ritas inifrån (inneStorlek).
+  //   lana(pa): duken står i fasaden (true) eller i rummet igen (false); rum.js flyttar den
+  //   utifran({ w, h }, t, neonPa) → true om något ritades: glaset med w × h bildpunkter, men inte fler än
+  //     glaset fick när hela duken ritades inifrån (H gånger prNu, efter kval)
   const FONSTER = { x0: -615, x1: 185, y0: SILL - 4, y1: SILL + 509, z: -150, oga: [-110, 140, -2300] };
   const STORRE = 1.25;
-  const UTE_VP = new THREE.Vector4();
-  const UTE_SZ = new THREE.Vector2();
-  function utifran(duk, t, neonPa, hem = false) {
-    const g = duk && duk.getContext('2d');
-    if (!g || !canvas.width || !canvas.height) return false;
+  function lana(pa) {
+    UTE.lanad = Boolean(pa);
+  }
+  function utifran(ut, t, neonPa) {
+    if (!UTE.lanad || NARA || !ut || !(ut.w >= 1) || !(ut.h >= 1)) return false;
     const K = UTE.K;
     const F0 = FONSTER;
     const mx = (F0.x0 + F0.x1) / 2;
@@ -8777,23 +8780,15 @@ export async function figurer(canvas, opt = {}) {
     K.updateMatrixWorld();
     K.projectionMatrix.makePerspective((ex - F.x1) * n, (ex - F.x0) * n, (F.y1 - ey) * n, (F.y0 - ey) * n, K.near, K.far);
     K.projectionMatrixInverse.copy(K.projectionMatrix).invert();
-    // bildpunkterna: dukens, men inte fler än glaset fick när hela duken ritades (H gånger prNu, efter kval)
-    const q = Math.min(1, H * prNu / duk.height);
-    let vw = Math.max(1, Math.round(duk.width * q));
-    let vh = Math.max(1, Math.round(duk.height * q));
-    if (hem || NARA) {
-      inneStorlek();
-      const k = Math.min(1, canvas.width / vw, canvas.height / vh);
-      vw = Math.max(1, Math.floor(vw * k));
-      vh = Math.max(1, Math.floor(vh * k));
-    } else if (canvas.width !== vw || canvas.height !== vh) {
+    const q = Math.min(1, H * prNu / ut.h);
+    const vw = Math.max(1, Math.round(ut.w * q));
+    const vh = Math.max(1, Math.round(ut.h * q));
+    if (!UTE.krympt || canvas.width !== vw || canvas.height !== vh) {
       UTE.krympt = true;
       r.setPixelRatio(1);
       r.setSize(vw, vh, false);
     }
-    const pr = r.getPixelRatio();
-    r.setViewport(0, 0, vw / pr, vh / pr);
-    r.getCurrentViewport(UTE_VP);
+    r.setViewport(0, 0, vw, vh);
     const fang = catcher.visible;
     catcher.visible = false;
     UTE.kam = K;
@@ -8810,17 +8805,6 @@ export async function figurer(canvas, opt = {}) {
       UTE.neon = 1;
       catcher.visible = fang;
       r.shadowMap.autoUpdate = au;
-    }
-    // (glaset ligger i dukens nedre vänstra hörn: WebGL räknar nerifrån)
-    g.clearRect(0, 0, duk.width, duk.height);
-    g.drawImage(canvas, UTE_VP.x, canvas.height - UTE_VP.y - UTE_VP.w, UTE_VP.z, UTE_VP.w, 0, 0, duk.width, duk.height);
-    if (hem || NARA) {
-      r.getSize(UTE_SZ);
-      r.setViewport(0, 0, UTE_SZ.x, UTE_SZ.y);
-    }
-    if (hem) {
-      sikta();
-      r.render(scene, cam);
     }
     return true;
   }
@@ -8994,8 +8978,8 @@ export async function figurer(canvas, opt = {}) {
     const p = Math.max(0.75, Math.min(PR, PR * pr));
     if (p !== prNu) {
       prNu = p;
-      // (krympt till glaset, utifran: storleken inne kommer med inneStorlek)
-      if (!NARA && !UTE.krympt) {
+      // (krympt till glaset eller utlånad, utifran: storleken inne kommer med inneStorlek)
+      if (!NARA && !UTE.krympt && !UTE.lanad) {
         r.setPixelRatio(p);
         r.setSize(W, H, false);
         // (en duk som får ny storlek är tom: annars blinkar gänget bort till nästa bild)
@@ -9516,5 +9500,5 @@ export async function figurer(canvas, opt = {}) {
   // syns de som de är ritade och glider sedan över
   await Promise.race([kanKlar(opt.nu ? opt.nu() : 0), new Promise((ok) => setTimeout(ok, 2500))]).catch(() => {});
   ANS.ute = true;
-  return { draw, utifran, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, nerver, slut, senast, uttryck: (t) => kanKlar(t ?? KAN.t), prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, utifran, lana, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, nerver, slut, senast, uttryck: (t) => kanKlar(t ?? KAN.t), prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }
