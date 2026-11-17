@@ -513,6 +513,129 @@ window.RumUte = (() => {
     return `${s}<ellipse cx="0" cy="-6.5" rx="6.5" ry="2.8" fill="${t(c)}"/><circle cx="6.8" cy="-8.8" r="2.4" fill="${t(c)}"/><path d="M-6 -7 Q-9 -10 -8.5 -12" stroke="${t(c)}" stroke-width="1.4" fill="none"/>`;
   }
 
+  // ---------- de som går: samma gång som framför affären ----------
+  //
+  // De som går på trottoaren mittemot går som de som går förbi framför affären (rum-fasad.js, RumFasad.gang): samma
+  // sätt att gå (vanlig, rask, strosar, studsar, lunkar, rak, trippar, släntrar, på halkan, med käpp och springer),
+  // var och en lite olika, och samma ställning i varje bild (stalln): foten i marken står still mot stenen, höften
+  // gungar, knät böjs, armarna pendlar emot benen och överkroppen lutar. Figuren ritas i centimeter (fötterna i 0,
+  // vänd åt höger, samma huvud och hår som framför affären) och förminskas till gatan, CMG px per cm, och delarnas
+  // grupper (g-…) får sina vinklar ur ställningen (rorelse, gangLas). Farten är steglängden gånger takten, så att
+  // fötterna inte glider. Utan rum-fasad.js går de som förut (person).
+  const CMG = 0.19;
+  // sätten att gå för figurerna i gatans SVG (data-gang: platsen här): st, var i varvet den börjar (fas) och den
+  // senaste ställningen (t, P)
+  const GANGAR = [];
+  // Gångcykeln (gangen i rum-fasad.js) en gång per sätt att gå, utan det som skiljer var och en i benen: i gatans
+  // storlek syns det inte, och att räkna den för var och en tog ungefär 10 ms per figur i en långsam telefon. Var och
+  // en är ändå olika i takten, lutningen, armarna och längden (och farten följer).
+  const TABELL = {};
+  function gangFor(GG, R, namn, kalla) {
+    const st = GG.stil(R, { stil: namn, kalla });
+    let s0 = TABELL[st.namn];
+    if (!s0) {
+      s0 = GG.stil(() => 0.5, { stil: st.namn });
+      GG.stalln(0, s0);
+      TABELL[st.namn] = s0;
+    }
+    for (const k of ['S', 'lyft', 'kna', 'hojd', 'studs', 'tab']) st[k] = s0[k];
+    return st;
+  }
+  // handen för armen som hålls stilla ([axel, armbåge], grader; cm från fötterna, som handVid i rum-fasad.js)
+  const handVid = ([a, b]) => {
+    const u = (a * Math.PI) / 180;
+    const w = ((a + b) * Math.PI) / 180;
+    return [1 - 29 * Math.sin(u) - 31 * Math.sin(w), -142 + 29 * Math.cos(u) + 31 * Math.cos(w)];
+  };
+  // F: händerna (fickaF, fickaB: i fickan; fastF: den närmre armen hålls stilla, paraplyet, kopplet …)
+  function folk(o, L, F, GG) {
+    const t = (c) => tone(c, L);
+    const bak = (c) => mix(tone(c, L), '#000000', 0.3);
+    const at = (x, y, inner) => `<g transform="translate(${r1(x)} ${r1(y)})">${inner}</g>`;
+    const g = (d, inner, b2) => `<g class="g-${d}${b2 ? ' b2' : ''}">${inner}</g>`;
+    // (överkroppen lutar kring höften)
+    const luta = (inner) => at(0, -90, g('luta', at(0, 90, inner)));
+    // ett ben från höften: låret, smalbenet och skon (det bortre mörkare)
+    const ben = (b2) => {
+      const f = b2 ? bak : t;
+      const lar = o.shorts
+        ? `<rect x="-6.4" y="-4" width="12.8" height="50" rx="6" fill="${f(o.skin)}"/><rect x="-7.6" y="-7" width="15.2" height="25" rx="5" fill="${f(o.legs2)}"/>`
+        : `<rect x="-7" y="-7" width="14" height="54" rx="6.5" fill="${f(o.legs)}"/>`;
+      const vad = `<rect x="-5.2" y="-3" width="10.4" height="41" rx="4.6" fill="${f(o.shorts ? o.skin : o.legs)}"/>`;
+      const sko = `<path d="M-6.5 -3.5 H5 Q15 -3 16.5 3 V7 H-6.5 Z" fill="${f(o.shoe)}"/>`;
+      return at(0, -90, g('lar', lar + at(0, 45, g('kna', vad + at(0, 38, g('fot', sko, b2)), b2)), b2));
+    };
+    // en arm från axeln: pendlar efter ställningen, eller hålls stilla (fast); handen syns inte i fickan
+    const arm = (b2, fast) => {
+      const f = b2 ? bak : t;
+      const over = o.bare
+        ? `<rect x="-5.4" y="-2" width="10.8" height="33" rx="5.2" fill="${f(o.skin)}"/><rect x="-6.4" y="-3" width="12.8" height="14" rx="5" fill="${f(o.coat)}"/>`
+        : `<rect x="-6" y="-2.5" width="12" height="34" rx="5.6" fill="${f(o.coat)}"/>`;
+      const hand = (b2 ? F.fickaB : F.fickaF) ? '' : `<circle cx=".4" cy="31" r="4.6" fill="${f(o.skin)}"/>`;
+      const under = `<rect x="-4.8" y="-2.5" width="9.6" height="32" rx="4.6" fill="${f(o.bare ? o.skin : o.coat2)}"/>${hand}`;
+      if (fast) return at(1, -142, `<g transform="rotate(${fast[0]})">${over}${at(0, 29, `<g transform="rotate(${fast[1]})">${under}</g>`)}</g>`);
+      return at(1, -142, g('arm', over + at(0, 29, g('armb', under, b2)), b2));
+    };
+    // kroppen: jackan till höften eller kappan till knäna, ränderna på joggarens överdel och väskan på axeln
+    const nere = o.long ? -42 : -86;
+    const hR = o.long ? 19 : 15.5;
+    const hL = o.long ? -20 : -16;
+    let kropp = `<path d="M-13 -140 Q-16 -151 -7 -152.5 H8 Q16 -151.5 15 -140 L${hR} ${nere} Q0 ${nere + 2.5} ${hL} ${nere} Z" fill="${t(o.coat)}"/>`;
+    if (o.rand) kropp += `<path d="M-14 -127 Q0 -129 15.6 -127 L15.8 -119 Q0 -121 -14.2 -119 Z" fill="${t(o.rand)}"/>`;
+    if (o.bag) kropp += `<path d="M8 -151 L-11 -104" stroke="${bak(o.bag)}" stroke-width="2.4"/><rect x="-24" y="-108" width="18" height="23" rx="3" fill="${t(o.bag)}"/>`;
+    // huvudet: håret, mössan, kepsen eller pannbandet
+    let huvud = `<path d="${GG.HUVUD}" fill="${t(o.skin)}"/>`;
+    const har = `<path d="${GG.HAR[o.harStil] || GG.HAR.kort}" fill="${t(o.hair)}"/>`;
+    if (o.hatt === 'mossa') huvud += `<path d="M-10.5 -167.5 Q-11.5 -188.5 0.5 -188.5 Q12 -188.5 11.5 -169.5 Z" fill="${t(o.hat)}"/>`;
+    else if (o.hatt === 'keps') huvud += `${har}<path d="M-10 -167 Q-10 -180 1 -180 Q10.5 -180 11 -171 L19.5 -168.5 Q15 -166 10 -166.5 L-10 -165 Z" fill="${t(o.hat)}"/>`;
+    else if (o.hatt === 'band') huvud += `${har}<path d="M-11 -175.5 Q0.5 -179 12.2 -174 L12 -168.6 Q0.5 -173.4 -11.2 -170 Z" fill="${t(o.hat)}"/>`;
+    else huvud += har;
+    // (så få delar som möjligt: varje del ritas om i varje bild, och i telefonen i processorn)
+    let s = g('kropp', arm(true, F.fastB) + ben(true) + ben(false) + luta(kropp + huvud));
+    // käppen i den närmre handen (handtaget och vinkeln ur ställningen, kappen i rum-fasad.js)
+    if (o.kapp) {
+      const C = GG.KAPP;
+      s += g('kapp', `<rect x="-1.3" y="4" width="2.6" height="${C - 7}" fill="${t(o.kapp)}"/><rect x="-1.9" y="${C - 3.5}" width="3.8" height="3.5" fill="${t('#141414')}"/><path d="M-1.4 5 Q-2.4 -3.6 4.6 -4.6 Q10.4 -5 11.4 -0.6 L8.8 0 Q8 -2.2 4.8 -2 Q0.8 -1.6 1.4 5 Z" fill="${t(o.kapp)}"/>`);
+    }
+    // den närmre armen och det den håller: paraplyet (som vinden ibland vänder) och julgranen under armen
+    let fram = arm(false, F.fastF);
+    if (o.tree) fram = `<path d="M44 -114 L-112 -80 L-106 -120 Z" fill="${t('#2a4e30')}"/><path d="M44 -114 L60 -117" stroke="${t('#5a3a22')}" stroke-width="4"/>${fram}`;
+    if (o.umb) {
+      // (som framför affären, men lägre: skaftet från handen, duken strax över huvudet)
+      const [hx, hy] = handVid(F.fastF);
+      fram += `<path d="M${r1(hx)} ${r1(hy)} V${r1(hy - (o.vand ? 74 : 105))}" stroke="#141414" stroke-width="2.4"/>`;
+      fram += at(hx - 24, hy + 138, o.vand
+        ? `<path d="M-34 -252 C-26 -226 4 -211 24 -210 C44 -211 74 -226 82 -252 Q66 -240 56 -248 Q44 -236 24 -242 Q4 -236 -8 -248 Q-18 -240 -34 -252 Z" fill="${t(o.umb)}"/>`
+        : `<path d="M-42 -206 C-38 -229 -8 -243 24 -243 C56 -243 86 -229 90 -206 Q82 -212 74 -206 Q66 -213 57 -206 Q49 -213 41 -206 Q32 -213 24 -206 Q16 -213 7 -206 Q-1 -213 -9 -206 Q-17 -213 -26 -206 Q-34 -212 -42 -206 Z" fill="${t(o.umb)}"/>`);
+    }
+    return s + g('kropp', luta(fram));
+  }
+  // Ställningen för delen r efter t ms: ur sättet att gå (stalln i rum-fasad.js), en gång per figur och bild. Var i
+  // varvet räknas ur tiden: farten är densamma hela vägen (rum-gar i rum-ute.css), så foten står still ändå.
+  function gangLas(r, t) {
+    const G = r.G;
+    if (G.t !== t) {
+      G.t = t;
+      G.P = window.RumFasad.gang.stalln((t / 1000) * G.st.takt + G.fas, G.st);
+    }
+    const P = G.P;
+    const rot = (a, x = 0, y = 0) => { const c = Math.cos(a); const s = Math.sin(a); return [c, s, -s, c, x, y]; };
+    const sida = r.b2 ? P.B : P.F;
+    const a = r.b2 ? P.aB : P.aF;
+    switch (r.del) {
+      case 'kropp': return [1, 0, 0, 1, P.bx, P.by];
+      case 'luta': return rot(P.lut);
+      case 'lar': return rot(sida[0]);
+      case 'kna': return rot(sida[1]);
+      case 'fot': return rot(sida[2]);
+      // (armarna hänger lodrätt fast överkroppen lutar, och axlarna rullar hos den som släntrar)
+      case 'arm': return rot(a[0] - P.lut, (r.b2 ? P.sB : P.sF) || 0);
+      case 'armb': return rot(a[1]);
+      case 'kapp': return P.kapp ? rot(P.kapp[2], P.kapp[0], P.kapp[1]) : [1, 0, 0, 1, 14, -84];
+      default: return [1, 0, 0, 1, 0, 0];
+    }
+  }
+
   function wheel(cx, cy, r, L) {
     return `<g transform="translate(${cx} ${cy})"><circle r="${r}" fill="none" stroke="${tone('#1a1a1a', L)}" stroke-width="1.3"/><g class="hjul"><line x1="${-r}" y1="0" x2="${r}" y2="0" stroke="${tone('#777', L)}" stroke-width=".5"/><line x1="0" y1="${-r}" x2="0" y2="${r}" stroke="${tone('#777', L)}" stroke-width=".5"/></g></g>`;
   }
@@ -563,7 +686,7 @@ window.RumUte = (() => {
     // o: y (fötterna/hjulen), dir, speed (px/s), pause (s utanför bild),
     // w/ht halva bredden och höjden före skalan k; för trafiken o.cyc varvets längd (s) i
     // stället för pause och o.fas var i varvet den är från början, och o.stilla: står still
-    // i sin bild (ritas en gång och glider bara)
+    // i sin bild (ritas en gång och glider bara), o.egen: gungar inte som helhet (gången har sin egen höft)
     const walk = (inner, o) => {
       const k = o.k || 1;
       const hw = Math.ceil((o.w || 30) * k);
@@ -573,7 +696,74 @@ window.RumUte = (() => {
       const cyc = o.cyc || dist / o.speed + o.pause;
       const till = fran + o.dir * cyc * o.speed;
       const fore = o.fas != null ? Math.round(o.fas * cyc * 100) / 100 : r1(R() * cyc);
-      s += `<svg class="rum-gar${o.cls ? ` ${o.cls}` : ''}" style="left:${-hw}px; top:${r1(o.y - ht)}px; --fran:${fran}px; --till:${r1(till)}px; --steg:${o.steg || 0.9}s; animation-duration:${r1(cyc)}s; animation-delay:-${fore}s" viewBox="${-hw} ${-ht} ${2 * hw} ${ht + 6}" width="${2 * hw}" height="${ht + 6}"><g transform="scale(${o.dir * k} ${k})">${o.stilla ? inner : `<g class="gung">${inner}</g>`}</g></svg>`;
+      s += `<svg class="rum-gar${o.cls ? ` ${o.cls}` : ''}" style="left:${-hw}px; top:${r1(o.y - ht)}px; --fran:${fran}px; --till:${r1(till)}px; --steg:${o.steg || 0.9}s; animation-duration:${r1(cyc)}s; animation-delay:-${fore}s" viewBox="${-hw} ${-ht} ${2 * hw} ${ht + 6}" width="${2 * hw}" height="${ht + 6}"><g transform="scale(${o.dir * k} ${k})">${o.stilla || o.egen ? inner : `<g class="gung">${inner}</g>`}</g></svg>`;
+    };
+
+    // pulkan med barnet i, bakom den som drar (px)
+    const pulka = (o) => `<g transform="translate(-30 0)"><path d="M-8 -2 H8 Q11 -2 11 -5" fill="none" stroke="${tone('#c8322a', L)}" stroke-width="2"/><ellipse cx="0" cy="-6" rx="4" ry="4.5" fill="${tone('#2a6ab0', L)}"/><circle cx=".5" cy="-12" r="2.6" fill="${tone(o.skin, L)}"/><path d="M-2 -13 Q.5 -17 3 -13 Z" fill="${tone('#e8b923', L)}"/></g>`;
+
+    // En som går med fasadens gång (folk): vem (ung, vuxen, äldre), med vad (hund, pulka, gran, joggar) och på vilket
+    // sätt, som framför affären – den äldre strosar och går ibland med käpp, den unga släntrar ibland, den som blir
+    // blöt skyndar sig och ibland springer, i rusningen springer någon till bussen, och på halkan går de flesta
+    // försiktigt.
+    const gaende = (o) => {
+      const GG = window.RumFasad.gang;
+      const roll = R();
+      let typ = 'gar';
+      if (roll < 0.18 && h > 6 && h < 23) typ = 'hund';
+      else if (roll < 0.3 && v.snotackt && L.dag > 0.3) typ = 'pulka';
+      else if (roll < 0.36 && v.manad === 12 && v.dag >= 5 && v.dag <= 23 && h > 9 && h < 20) typ = 'gran';
+      else if (roll < 0.42 && !v.snotackt && !halt && !(regn && v.mangd > 0.5) && v.kanns > -6 && ((h > 6 && h < 9.5) || (h > 16.5 && h < 21.5))) typ = 'jogg';
+      const vem = typ === 'jogg' ? pick(R, ['ung', 'ung', 'vuxen']) : pick(R, ['ung', 'ung', 'vuxen', 'vuxen', 'vuxen', 'aldre']);
+      if (vem === 'aldre') o.hair = pick(R, ['#d8d0c0', '#a8a8a4', '#c8c8c4', '#8a8a86']);
+      o.harStil = vem === 'aldre' ? pick(R, ['flint', 'kort', 'page']) : pick(R, ['kort', 'kort', 'page', 'lockar', 'gel', 'knut']);
+      o.hatt = o.hat ? 'mossa' : null;
+      if (typ === 'gran') { o.tree = true; o.umb = null; }
+      if (typ === 'jogg') {
+        // (myskläder i två färger, eller shorts och t-shirt när det är varmt; gympadojor, pannband eller mössa)
+        const b = pick(R, [['#4a2a6a', '#1e8a8a'], ['#1d3a7a', '#d8407a'], ['#1e6a4a', '#4a2a6a'], ['#c8322a', '#1d2a4a'], ['#10306a', '#e8b923'], ['#2a2a30', '#2a8ad0'], ['#1e8a8a', '#e8e4dc']]);
+        Object.assign(o, { coat: b[0], rand: b[1], legs: b[0], long: false, bag: null, umb: null, shoe: '#e8e4dc', hat: null, hatt: null, bare: false, shorts: false });
+        if (varmt) Object.assign(o, { bare: true, shorts: true, legs2: pick(R, ['#1a1a1a', '#3a4a66', '#d8ccb0']), legs: o.skin, coat: pick(R, ['#e8e4dc', '#c8322a', '#2a5ab0', '#f0c040']), rand: null });
+        o.coat2 = mix(o.coat, '#000000', 0.15);
+        if (kallt || sno) { o.hatt = 'mossa'; o.hat = pick(R, ['#a8322a', '#1a1a1a', '#2a4a7a']); }
+        else if (R() < 0.45) { o.hatt = 'band'; o.hat = pick(R, ['#e8e4dc', '#c8322a', '#e8b923', '#2a8ad0']); }
+      }
+      let namn;
+      if (typ === 'jogg') namn = 'springer';
+      else if (typ === 'gar' && vem === 'aldre' && !o.umb && R() < 0.35) {
+        o.kapp = pick(R, ['#3a2416', '#1a1a1a', '#5a3a22', '#9a9a9a']);
+        namn = 'kapp';
+      } else if (typ === 'hund') namn = pick(R, ['vanlig', 'vanlig', 'strosar', 'rask']);
+      else if (typ === 'pulka' || typ === 'gran') namn = pick(R, ['vanlig', 'strosar']);
+      else {
+        const blot = regn && v.mangd > 0.45 && !o.umb;
+        const rusar = !o.umb && !halt && ((h > 7 && h < 9) || (h > 16 && h < 18)) && R() < 0.06;
+        if ((blot && !halt && R() < 0.4) || rusar) namn = 'springer';
+        else if (blot) namn = 'rask';
+        else if (vem === 'ung') namn = pick(R, ['vanlig', 'rask', 'studsar', 'studsar', 'lunkar', 'slantrar', 'slantrar']);
+        else if (vem === 'aldre') namn = pick(R, ['strosar', 'strosar', 'rak', 'lunkar', 'trippar']);
+      }
+      if (halt && namn !== 'springer' && namn !== 'kapp' && R() < 0.65) namn = 'halkar';
+      if (varmt && typ === 'gar' && !o.umb && !o.hatt && R() < 0.25) { o.hatt = 'keps'; o.hat = pick(R, ['#2a4a7a', '#e8e4dc', '#c8322a']); }
+      const st = gangFor(GG, R, namn, kallt);
+      // (en del äldre går lite framåtböjda)
+      if (vem === 'aldre' && !['kapp', 'springer', 'halkar'].includes(st.namn) && R() < 0.4) st.lut += 4 + R() * 3;
+      // den närmre armen håller paraplyet, kopplet, granen under armen eller pulkans snöre; en ledig hand kan vara i
+      // fickan
+      const F = { fastF: o.umb ? [-6, -104] : typ === 'hund' ? [-12, -35] : typ === 'gran' ? [8, -66] : typ === 'pulka' ? [24, 6] : null };
+      st.ficka = [...st.ficka].filter((x) => x === 'B' || (!F.fastF && !o.kapp)).join('');
+      F.fickaF = st.ficka.includes('F');
+      F.fickaB = st.ficka.includes('B');
+      const K = CMG * o.h;
+      const gi = GANGAR.push({ st, fas: R(), t: null, P: null }) - 1;
+      let inner = `<g data-gang="${gi}" transform="scale(${r1(K * 1000) / 1000})">${folk(o, L, F, GG)}</g>`;
+      if (typ === 'hund' || typ === 'pulka') {
+        const [hx, hy] = handVid(F.fastF).map((x) => r1(x * K));
+        if (typ === 'hund') inner += `<path d="M${hx} ${hy} Q${r1(hx + 6)} ${r1(hy + 9)} 22 -8" fill="none" stroke="${tone('#2a2a2a', L)}" stroke-width=".7"/><g class="gung"><g transform="translate(16 0)">${dog(L, pick(R, ['#3a2a1a', '#d8c09a', '#1a1a1a', '#8a6a4a']))}</g></g>`;
+        else inner += `<path d="M${hx} ${hy} L-24 -4" stroke="${tone('#222', L)}" stroke-width=".7"/>${pulka(o)}`;
+      }
+      // (fart: två steg per varv i takten, så att foten i marken står still; hunden trippar efter, steg)
+      walk(inner, { y: 405 + R() * 6, dir: R() < 0.5 ? 1 : -1, speed: st.S * K * st.takt, pause: typ === 'jogg' ? 60 + R() * 120 : 15 + R() * 70, steg: 0.3, cls: typ, w: typ === 'pulka' ? 42 : 30, egen: true });
     };
 
     // de som går på trottoaren mittemot
@@ -582,6 +772,10 @@ window.RumUte = (() => {
     const cs = coats(v);
     const skins = ['#e9c2a2', '#d8a27c', '#b27a52', '#8a5636', '#f0cfb4'];
     const hairs = ['#2a1d14', '#5a3e24', '#c9a56a', '#1a1a1a', '#8a6a4a', '#d8d0c0'];
+    const GG = window.RumFasad && window.RumFasad.gang;
+    GANGAR.length = 0;
+    // (halt: snö på marken kring nollan, eller blött och minusgrader, som framför affären)
+    const halt = (v.snotackt && v.temp > -8 && v.temp < 2.5) || (v.blott && v.temp < 0.5);
     for (let i = 0; i < n; i++) {
       const o = {
         h: 0.92 + R() * 0.16, coat: pick(R, cs), legs: pick(R, ['#1e2430', '#2b3448', '#3a3a3a', '#4a4236', '#202020']), shoe: '#141414',
@@ -593,6 +787,10 @@ window.RumUte = (() => {
       if (regn && R() < 0.75) { o.umb = pick(R, ['#111215', '#111215', '#1a2a4a', '#8a1e1e', '#2a2a2a']); o.vand = v.vind > 9 && R() < 0.35; }
       if (regn && !o.umb && R() < 0.5) o.coat = pick(R, ['#e8b923', '#c8322a', '#2a5a3a']);
       if (R() < 0.3) o.bag = pick(R, ['#d8c8a8', '#3a3a3a', '#7a4a2a']);
+      if (GG) {
+        gaende(o);
+        continue;
+      }
       let inner = person(o, L);
       let speed = 24 + R() * 10;
       let kind = 'gar';
@@ -600,13 +798,12 @@ window.RumUte = (() => {
       if (roll < 0.18 && h > 6 && h < 23) { kind = 'hund'; o.leash = true; inner = person(o, L) + `<g transform="translate(16 0)">${dog(L, pick(R, ['#3a2a1a', '#d8c09a', '#1a1a1a', '#8a6a4a']))}</g>`; speed = 22; }
       else if (roll < 0.3 && v.snotackt && L.dag > 0.3) {
         kind = 'pulka';
-        inner = person(o, L) + `<path d="M-2 -12 L-24 -4" stroke="${tone('#222', L)}" stroke-width=".7"/><g transform="translate(-30 0)"><path d="M-8 -2 H8 Q11 -2 11 -5" fill="none" stroke="${tone('#c8322a', L)}" stroke-width="2"/><ellipse cx="0" cy="-6" rx="4" ry="4.5" fill="${tone('#2a6ab0', L)}"/><circle cx=".5" cy="-12" r="2.6" fill="${tone(o.skin, L)}"/><path d="M-2 -13 Q.5 -17 3 -13 Z" fill="${tone('#e8b923', L)}"/></g>`;
+        inner = person(o, L) + `<path d="M-2 -12 L-24 -4" stroke="${tone('#222', L)}" stroke-width=".7"/>${pulka(o)}`;
         speed = 20;
       } else if (roll < 0.36 && v.manad === 12 && v.dag >= 5 && v.dag <= 23 && h > 9 && h < 20) { kind = 'gran'; o.tree = true; o.umb = null; inner = person(o, L); speed = 22; }
       if (varmt && kind === 'gar' && o.umb == null && R() < 0.25) { o.hat = pick(R, ['#2a4a7a', '#e8e4dc', '#c8322a']); inner = person(o, L); }
       walk(inner, { y: 405 + R() * 6, dir: R() < 0.5 ? 1 : -1, speed, pause: 15 + R() * 70, steg: r1(0.75 + R() * 0.25), cls: kind, w: kind === "pulka" ? 42 : 30 });
     }
-
     // på cykel (trafik: inte i snön eller i ösregn)
     if (T.cyklar) {
       for (let i = 0; i < T.cyklar; i++) {
@@ -861,9 +1058,16 @@ window.RumUte = (() => {
   // Rörelserna inne i figurerna (klassen i SVG:n): vad som ändras (m: rot
   // vrids, ty gungar, sy viker sig, vaj vajar, op blinkar), från a till b
   // på d ms, fram och tillbaka (alt) eller runt, f ms före (b2 i otakt),
-  // kring o. steg är stegets längd (--steg).
+  // kring o. steg är stegets längd (--steg). Delarna av en som går (g-…: kroppen, lutningen, låren, knäna, fötterna,
+  // armarna och käppen) tar sin ställning ur sättet att gå (gang, gangLas).
   function rorelse(e, steg) {
     const k = e.classList;
+    const gd = /\bg-(\w+)/.exec(e.getAttribute('class') || '');
+    if (gd) {
+      const w = e.closest('[data-gang]');
+      const G = w && GANGAR[+w.getAttribute('data-gang')];
+      return G ? { m: 'gang', del: gd[1], b2: k.contains('b2'), G } : null;
+    }
     const egen = (parseFloat(e.style.animationDuration) || 1) * 1000;
     if (k.contains('gung')) return { m: 'ty', a: 0, b: -0.8, d: steg / 2, alt: 1 };
     if (k.contains('ben')) {
@@ -883,6 +1087,7 @@ window.RumUte = (() => {
 
   // rörelsen r efter t ms: [a, b, c, d, e, f] (eller genomskinligheten)
   function las(r, t) {
+    if (r.m === 'gang') return gangLas(r, t);
     const x = (t + (r.f || 0)) / r.d;
     let p = x - Math.floor(x);
     if (r.m === 'op') return p < 0.5 ? 1 : 0.1;
@@ -1072,7 +1277,7 @@ window.RumUte = (() => {
       return [svg, m ? parseFloat(m[1]) : 0];
     });
     for (const [svg, blur] of alla) {
-      const ror = svg.querySelector('.gung, .ben, .arm, .hjul, .blink, .snurr, .vinge, .vaj');
+      const ror = svg.querySelector('.gung, .ben, .arm, .hjul, .blink, .snurr, .vinge, .vaj, .g-kropp');
       if (!ror && !blur) continue;
       const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
       const w = parseFloat(svg.getAttribute('width'));
