@@ -1448,10 +1448,15 @@ window.Rum = (() => {
   // igenom 0,3 av det, så att papperet blev grått och de nedre raderna mörka. Nu är kupongen det ljusaste i
   // bilden (2026-11-17).
   const KUPONG_LJUS = [775, 875, 640, 280, 0.94, true];
+  // Lampans kägla ligger jämnt över hans händer, kaffet och notan, som kupongens: det är hörnet där rummet och
+  // hans bild möts, och hos honom är notan och koppen det ljusaste på disken. Förut låg käglan till vänster om
+  // notan och tonade ut från mitten, så att notan, koppen och händerna hade 0,4 av dunklet och kvällens mörker
+  // över sig, rakt under lampan: notan 20 % och koppen 40 % mörkare än hos honom (2026-11-17).
+  const LAMPA_LJUS = [205, 820, 360, 250, 0.94, true];
   const KAGLOR = [
     [575, 450, 440, 300, 0.92, true],
     KUPONG_LJUS,
-    [LAMPA_I[0] + 40, 790, 300, 220, 0.8],
+    LAMPA_LJUS,
   ];
   // dunklet i mitten, halvvägs ut och i kanterna (täckning)
   const DUNKEL = [0.1, 0.2, 0.42];

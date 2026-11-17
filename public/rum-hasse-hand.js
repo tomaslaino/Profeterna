@@ -70,6 +70,9 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
     dag: { value: new THREE.Vector4(...l.c.map((x) => x * l.f * 0.8), l.dag) }, lys: { value: new THREE.Vector4(0.587, 0.593, 0.606, 0.75) },
     // (ärmarna ses från sidan bort från barens lampor: samma gråa kavaj som i baren, rum-hasse-arm.js)
     tyg: { value: 1.35 },
+    // (och handryggarna ligger under lampan, som hos honom är det ljusaste på honom efter ansiktet: förut
+    // 20 % mörkare här, 2026-11-17)
+    hud: { value: 1.25 },
   };
   const S = new THREE.Scene();
   // Skuggorna på pulten under händerna och underarmarna, som i baren (byggSkugga): på diskens ovansida runt dem.
