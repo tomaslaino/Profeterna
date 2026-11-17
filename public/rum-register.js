@@ -649,10 +649,24 @@ window.RumRegister = (() => {
     // en kupong som valts för hand) inte delas i flera avdelningar med samma
     // tävling – numren hoppar då. Formen och dess motstånd står i matchakten
     // (2026-11-13, användarens önskemål: "mindre rörig").
+    //
+    // Spegeln i mitten (2026-11-17, användarens val A bland fyra skisser:
+    // Spegeln i mitten, Tiden en gång, Text-TV-raden och Avdelningar i ramar):
+    // i telefonen står strecket mellan lagen mitt på raden och avsparken längst
+    // ut, så att raderna slutar där rubrikernas streck slutar, och en tom rad
+    // skiljer avdelningarna åt. Avsparken står på varje rad men svagt; den som
+    // skiljer sig från omgångens vanliga (den som mer än hälften av matcherna
+    // har) lyser, på datorn också. Delar matcherna lika på flera tider lyser
+    // ingen.
     function kupongen(R) {
       if (!A.ms.length) return [rad('INGEN OMGÅNG')];
       const w = 11;
-      const t0 = Math.max(...A.ms.map((m) => tid(m).length));
+      const tider = A.ms.map(tid);
+      const t0 = Math.max(...tider.map((t) => t.length));
+      const antal = new Map();
+      for (const t of tider) antal.set(t, (antal.get(t) || 0) + 1);
+      const [vanlig, flest] = [...antal].sort((a, b) => b[1] - a[1])[0];
+      const tidKl = (t) => (flest * 2 > tider.length && t !== vanlig ? 'v' : 'd');
       const avd = [];
       for (const m of A.ms) {
         const a = avd.find((x) => x.comp === m.comp);
@@ -662,16 +676,35 @@ window.RumRegister = (() => {
       const L = Math.max(...avd.map((a) => tavNamn(a.comp).length)) + 4;
       // numret och lagen är 28 tecken; tävlingen i en spalt när den ryms
       const spalt = L + 28 + 3 + t0 <= A.bred;
-      const mellan = spalt ? '   ' : '  ';
+      const hemma = (m) => kort(m.home).slice(0, w);
+      const borta = (m) => kort(m.away).slice(0, w);
+      // lagens bredd: 11 på datorn; i telefonen så att strecket (–) står i
+      // kolumn c, mitt på raden, efter numret (3 tecken) och hemmalaget, med
+      // bortalaget, ett mellanrum och avsparken efter – åt vänster om
+      // bortalaget annars inte ryms (en omgång över flera dagar, 'LÖR 16.00')
+      let wH = w;
+      let wA = w;
+      if (!spalt) {
+        const hH = Math.max(...A.ms.map((m) => hemma(m).length));
+        const hA = Math.max(...A.ms.map((m) => borta(m).length));
+        const c = Math.max(hH + 4, Math.min(Math.floor(A.bred / 2), A.bred - t0 - 4 - hA));
+        wH = c - 4;
+        wA = Math.max(hA, A.bred - t0 - c - 3);
+      }
+      const mellan = spalt ? '   ' : ' ';
       const r = [rad([omgDatum(), 'd']), tom()];
       avd.forEach((a, j) => {
-        if (!spalt) r.push(Object.assign(rad([tavNamn(a.comp), 'd']), { kl: 'rub' }));
+        if (!spalt) {
+          if (j) r.push(tom());
+          r.push(Object.assign(rad([tavNamn(a.comp), 'd']), { kl: 'rub' }));
+        }
         a.ms.forEach((m, i) => {
           const nr = nrAv(m);
           R.nr[nr] = `#mote:${m.id}`;
+          const t = tid(m);
           const x = radQ(`#mote:${m.id}`, ...(spalt ? [[pad(i ? '' : tavNamn(a.comp), L), 'd']] : []),
-            [`${padL(nr, 2)} `, 'd'], padL(kort(m.home).slice(0, w), w), [' – ', 'd'], pad(kort(m.away).slice(0, w), w),
-            [mellan, 'd'], [tid(m), 'd']);
+            [`${padL(nr, 2)} `, 'd'], padL(hemma(m), wH), [' – ', 'd'], pad(borta(m), wA),
+            [mellan, 'd'], [padL(t, t0), tidKl(t)]);
           r.push(spalt && j && !i ? Object.assign(x, { kl: 'ny' }) : x);
         });
       });
