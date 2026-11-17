@@ -369,16 +369,16 @@ window.RumHasse = (() => {
   // på bron står där det har hunnit (bronGa räknar fram från en minut tillbaka). Alla i en fil åker lika fort och
   // håller avstånd, så att ingen kör igenom någon annan, och högst BRO_MAX är ute på en gång (färre på rummets
   // lägre steg). Ingen trafik när man har bett om minskad rörelse eller i en fast bild (?rum-t).
-  const BRO_MAX = { ga: [6, 5, 4, 2], fil: [5, 4, 3, 2], cykel: [4, 3, 3, 2] };
+  const BRO_MAX = { ga: [5, 4, 3, 2], fil: [5, 4, 3, 2], cykel: [4, 3, 3, 2] };
   const STROMMAR = ['ga', 'b0', 'b1', 'f0', 'f1', 't0', 't1', 'c2', 'c3'];
   // hur ofta något kommer: de som går, bilarna och cyklisterna (s, i medeltal), bussarna i var riktning (min mellan
   // turerna)
   function broTakt(T) {
     const h = T.h;
     return {
-      // (två tredjedelar så många som på gatan, där var och en går fram och tillbaka på ungefär 90 s; över bron tar
-      // det en och en halv till två minuter, så att några alltid är ute när det är folk i rörelse)
-      ga: 135 / Math.max(1, T.gaende),
+      // (hälften så många som på gatan, där var och en går fram och tillbaka på ungefär 90 s; över bron tar det en och
+      // en halv till tre minuter, så att det ändå brukar vara någon ute när det är folk i rörelse)
+      ga: 180 / Math.max(1, T.gaende),
       bil: (T.varv[0] + T.varv[1]) / 2 / T.bilar,
       // (i var riktning: flest när man cyklar till och från jobbet, då en var tionde sekund på sommaren, färre på
       // helgen, ännu färre på kvällen och tidigt på morgonen, och färre på vintern)

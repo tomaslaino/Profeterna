@@ -1758,7 +1758,7 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   affären, som går upp på bron till höger om huset), men det som går och kör där syns nu som det det är. De som går är
   fasadens människor (`RumFasad.folk` i rum-fasad.js): samma sällskap, kläder och sätt att gå som på trottoaren
   framför affären – par, hundar, barnvagnar, paraplyer, reflexvästar – i stället för en grå figur i två steg, och de
-  går i gångens fart (ungefär två minuter över bron, förut 42–60 s, nästan joggingfart) och är fler. Allt på bron är
+  går i gångens fart (ungefär två minuter över bron, förut 42–60 s, nästan joggingfart), så att de är ute längre. Allt på bron är
   i rätt storlek mot räcket (en människa 1,6 räckeshöjder, förut 1,15), lackens och kläderna färger är inte längre
   lika gråa som husen på andra sidan, och oskärpan är en dryg tredjedel av utsiktens i stället för 0,8: på ungefär
   40 bildpunkter var bilarna och människorna bara gråa fläckar, nu är de lika mjuka i förhållande till sin storlek
@@ -9219,13 +9219,13 @@ cykelbanorna på båda sidor, bilar i båda filerna och bussarna (`gangare`, `cy
 rum-hasse.js). Hur mycket följer klockan och dagen som på gatan i rummet (`RumUte.trafik`: rusning vardagar
 7–9.30 och 15.30–18.30, mer på dagen än på kvällen, lite på natten, lugnt till halv tio på helger och röda dagar
 men fler ute natten mot lördag och söndag, färre i ösregn och sträng kyla): bilarna kommer i medeltal lika tätt
-som på gatan (i rusningen var tionde sekund i varje fil), två tredjedelar så många går, och bussarna går ungefär som de
+som på gatan (i rusningen var tionde sekund i varje fil), hälften så många går, och bussarna går ungefär som de
 gör: 4:an var 5:e minut i rusningen och var 6:e på dagen, 3:an och 77:an var 8–10:e, glesare på kvällen och
 helgen och inte alls efter midnatt (`broTakt`). Man sitter på brons östra sida: i den närmaste filen kommer
 bilarna mot en, i den bortre åker de bort (högertrafik). Alla i en fil åker lika fort, 33 km/h i rusningen, 41 på
 dagen och 47 på natten, och håller avstånd, så att ingen kör igenom någon annan. När man vänder sig om är
 trafiken redan i gång (allt från en minut tillbaka räknas fram, och det som fortfarande är på bron står där
-det har hunnit). Högst fem fordon per fil, fyra cyklister per bana och sex sällskap som går är ute på en gång, färre på rummets lägre steg
+det har hunnit). Högst fem fordon per fil, fyra cyklister per bana och fem sällskap som går är ute på en gång, färre på rummets lägre steg
 (`BRO_MAX`). Bron räknas som en rak linje ur räcket som utsikten ritar det (`LINJE`, räckets höjd ger avståndet),
 så att fordonen krymper och saktar in mot bortre änden som i verkligheten: där syns de nästan rakt framifrån
 eller bakifrån, närmast mer från sidan. Bron har en körbana bakom räcket (sedan 2026-11-15, `TVAR`: gångbanan,
@@ -9304,8 +9304,9 @@ höger om huset, och den ligger långt nedanför och går bort från en, så det
   bredvid varandra (96 bildpunkter på en vuxen, så att den som närmast förstoras högst ungefär två gånger), lika
   mörkt på kvällen som framför affären (`MORK`), med räcket framför benen och brons dis, och `broRita` i rum-hasse.js
   väljer ställningen efter gångens takt. Farten är gångens (steglängden gånger takten), så ett sällskap går över bron
-  på en och en halv till drygt tre minuter, och det kommer två tredjedelar så många som på gatan (`broTakt`, högst sex,
-  `BRO_MAX`), så att några brukar vara ute när det är folk i rörelse.
+  på en och en halv till drygt tre minuter. Det kommer lika ofta som förut, hälften så många som på gatan (`broTakt`),
+  men eftersom de går i rätt fart är de ute dubbelt så länge, så att det brukar vara någon ute när det är folk i
+  rörelse (högst fem, `BRO_MAX`); inte fler, eftersom fasaden samma dag blev lugnare.
 
 Det som tillkommer att rita är bara de som går: ett sällskap tar 2–6 ms att rita en gång (headless Chrome, utan
 grafikkort; ett fordon 1,5 ms) och är en duk på ungefär 950 × 160 bildpunkter, och i varje bildruta läggs det ut med
