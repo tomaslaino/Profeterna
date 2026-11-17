@@ -3445,12 +3445,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Gatan i en duk (rum-ute.js): medan något far förbi läggs den ut i varje
   // bildruta, högst 60 gånger i sekunden (ms: bildrutans tid), så att bilarna
   // och de som går förbi glider jämnt; ställningarna ritas i gängets takt
-  // (uteTakt). Annars, och när gatan inte syns, ingenting här.
+  // (uteTakt). I datorn, utan gatans duk, bilarna framför affären (framDuk i
+  // rum-ute.js). Annars, och när gatan inte syns, ingenting här.
   function gatan(ms) {
     R.gatGlid = false;
     if (R.vlatt || calm() || !window.RumUte || !RumUte.glid) return;
     const ute = document.getElementById('rum-ute');
-    if (!ute || !ute._gat || ute.classList.contains('vila') || !syns(ute)) return;
+    if (!ute || !(ute._gat || ute._framC) || ute.classList.contains('vila') || !syns(ute)) return;
     R.gatGlid = Boolean(ute._fort);
     if (ms - (R.gatSist || 0) < 1000 / 60 - 4) return;
     R.gatSist = ms;

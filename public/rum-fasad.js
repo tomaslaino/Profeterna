@@ -1852,7 +1852,9 @@ window.RumFasad = (() => {
     return morkna(D);
   }
   // Någon som har stannat framför fönstret och tittar in, med ryggen mot en.
-  function bakDelar(o, L) {
+  // (fram: samma figur framifrån, med ansiktet och håret ovanpå, för den som tittar in sedd inifrån, gatan i
+  // rum-ute.js)
+  function bakDelar(o, L, fram = false) {
     const t = klarL(L);
     const bak = (c) => mix(t(c), '#000000', 0.32);
     const D = [];
@@ -1868,7 +1870,10 @@ window.RumFasad = (() => {
     del('M-4.6 -159 H4.6 V-150 H-4.6 Z', bak(o.hud));
     del(ell(-10, -166, 2, 3.2), t(o.hud));
     del(ell(10, -166, 2, 3.2), t(o.hud));
-    del(ell(0, -167, 10, 12), t(o.har));
+    if (fram) {
+      del(ell(0, -167, 10, 12), t(o.hud));
+      if (o.harStil !== 'flint') del('M-10.4 -169 Q-11.6 -180.5 0 -180.5 Q11.6 -180.5 10.4 -169 Q5 -174.5 0 -174 Q-5 -174.5 -10.4 -169 Z', t(o.har));
+    } else del(ell(0, -167, 10, 12), t(o.har));
     if (o.harStil === 'tupp' && !o.mossa) del('M-2.6 -176 L-3.4 -194 L0 -187 L3.4 -195 L2.6 -176 Z', t(o.har));
     if (o.halsduk) del('M-8 -157 Q0 -153 8 -157 V-149 Q0 -145 -8 -149 Z', t(o.halsduk));
     if (o.mossa) { del('M-10.5 -166 Q-11.5 -186 0 -186 Q11.5 -186 10.5 -166 Z', t(o.mossa)); del('M-11 -170 H11 V-165.5 H-11 Z', bak(o.mossa), { inre: true }); }
@@ -2557,7 +2562,7 @@ window.RumFasad = (() => {
       const xa = dir > 0 ? V.x - 200 : V.x + V.w + 200;
       const xb = dir > 0 ? V.x + V.w + 200 : V.x - 200;
       const kk = k * (o.h || 1);
-      return { o, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(bakO, L), k: kk, stil, fart: stil.S * kk * stil.takt, dm: STANNA.dm, sta: false };
+      return { o, bakO, dir, xa, xb, D: figurDelar(o, L), B: bakDelar(bakO, L), k: kk, stil, fart: stil.S * kk * stil.takt, dm: STANNA.dm, sta: false };
     };
     const minne = new Map();
     return (t) => {
@@ -3446,5 +3451,18 @@ window.RumFasad = (() => {
   }
 
   // (gången och huvudet också för dem som går på gatan inifrån, rum-ute.js: samma sätt att gå och samma ställning)
-  return { bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR } };
+  // Det som går och kör förbi framför affären, för gatan inifrån (rum-ute.js): samma människor som här i fönstret med
+  // formen a (vy: var de går och hur långa varven är beror på den), samma som stannar och tittar in, och måtten som
+  // fordonen räknas i (RumFasadGatan.trafik). Allt räknas ur tiden som här, så att det inifrån är samma människor och
+  // samma bilar i samma ögonblick.
+  function framfor(v, L, a) {
+    const V = vy(a);
+    return { V, folk: folket(V, v, L), stanna: stannar(V, v, L), G: gataMatt() };
+  }
+  const framDelar = (o, L) => bakDelar(o, L, true);
+
+  return {
+    bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR },
+    framfor, ritaFigur, framDelar, glidX, skala, M, OGA_X,
+  };
 })();
