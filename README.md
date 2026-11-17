@@ -8274,9 +8274,11 @@ blev inte bättre, och hen valde B. Skärmen i rummet ritar listen och mappen li
   och en tom rad mellan avdelningarna, och strecket mellan lagen står mitt på raden med
   avsparken längst ut, så att raderna slutar där rubrikernas streck slutar (2026-11-17,
   användarens val A *Spegeln i mitten* bland fyra skisser: *Spegeln i mitten*, *Tiden en
-  gång*, *Text-TV-raden* och *Avdelningar i ramar*). Formen och dess motstånd stod förut också här men
+  gång*, *Text-TV-raden* och *Avdelningar i ramar*). Strecket står på spegelns axel, mitt i
+  matchaktens etiketter (`spAxel`), så att det står still när matchen öppnas. Formen och dess motstånd stod förut också här men
   står bara i matchakten sedan 2026-11-13 (användarens önskemål: "mindre rörig"). En match öppnar
-  **matchakten**, där allt om matchen står på ett ställe: lagen speglade runt etiketterna (se *Spegeln i matchakten* nedan) med *Formen*,
+  **matchakten**, där allt om matchen står på ett ställe: överst kupongens rad (se *Spegeln i mitten på fler
+  ställen* nedan), och lagen speglade runt etiketterna (se *Spegeln i matchakten* nedan) med *Formen*,
   *Vilan* och *Nästa* (dagar till nästa match, med cupen när det inte är ligan), tavlans
   *Styrka*, *Kryssar*, *Tur*, *Mot oddsen* och *Motståndet*, och lagkortens *Mål* och *xG*
   per match (för–mot), *Favorit* och *Skytten*; sedan skadelistorna när de finns och de
@@ -8347,7 +8349,8 @@ Esc) kommer vyn tillbaka. En siffra och Enter väljer raden med det numret.
   *Speltid* (minuter och starter av lagets matcher), *Mål* och *xG*, och hur laget har gått
   med och utan honom i startelvan: matcher, V-O-F, poäng per match och vad oddsen väntade
   sig per match (`mu` i `data/players/<division>.json`, se src/medochutan.js), och sedan när
-  han är i laget.
+  han är i laget. Med och utan står sedan 2026-11-17 i spegeln (se *Spegeln i mitten på fler
+  ställen* nedan).
 - **Laget** – omgångens match, *Mål* och *xG* för och mot per match, *Favorit* (hur ofta
   laget har varit favorit) och, för lagen i omgången, *Nästa* (motståndet, hemma eller borta
   och om hur många dagar, med cupen när det inte är ligan). Under det **truppen**: de som har
@@ -8541,8 +8544,9 @@ bland tre skisser i den riktiga närbilden:
   på alla rader och delad där lagens andelar möts, så att man ser hur stor del vart lag hade utan
   att läsa talen. Det bättre lagets del och tal lyser och det andras är svagt (målen, xG,
   chanserna och skotten); bollinnehavet och korten är gröna på båda sidor. Dolt resultat ger ?
-  och en tom stapel, och skärmen i rummet ritar samma streck (`mtv`/`mtd` i rum-dator.js).
-  Under står de senaste mötena som förut. Datan är `lastMeeting` i matchens fil
+  och en tom stapel. Under står de senaste mötena som förut. Sedan 2026-11-17 står förra mötet i
+  spegeln som resten av matchakten (se *Spegeln i mitten på fler ställen* nedan): talen speglade
+  runt etiketten, det bättre ljust, och datumet med platsen under rubriken. Datan är `lastMeeting` i matchens fil
   (`lastMeeting` i [src/matches.js](src/matches.js)): det senaste mötet i någon tävling högst
   183 dagar före avspark, med lagens siffror ur 365Scores och, för ligorna, ur
   football-data.co.uk när 365Scores saknar matchen (då utan bollinnehavet och chanserna).
@@ -8556,7 +8560,8 @@ bland tre skisser i den riktiga närbilden:
   EM 2024 och vänskapsmatcherna – ur den nya källan `espn_land_moten` (`LANDSLAG_MOTEN`, en
   hämtning i månaden). De står bara i mötena; formen och lagens siffror börjar som förut
   hösten 2024. Tjeckien–Spanien får så sina två möten i Nations League 2022 och Polen–Sverige
-  VM-kvalfinalen 2022.
+  VM-kvalfinalen 2022. Sedan 2026-11-17 står raderna som kupongens, under säsongen som rubrik
+  (se *Spegeln i mitten på fler ställen* nedan).
 - **Hemma och borta** ("Tottenham hemma har 64 % bollinnehav i snitt, xG 2,2 och har tagit poäng
   mot lag som ligger över dem"; *Avsnittet*): överst i MÅLEN står hemmalagets ligamatcher
   hemma mot bortalagets borta – *V-O-F*, *Poäng/match*, *Mål*, *xG*, *Bollinnehav*, *Lag
@@ -8584,7 +8589,7 @@ bland tre skisser i den riktiga närbilden:
   TJECKIEN 4:E*), och det högra lagets rader står längst ut till höger. I telefonen står
   etiketten på en egen rad i mitten och raden under går från kant till kant (också i förra
   mötet). Dolt resultat ger ? och en tom stapel. Samma kväll bytte användaren till spegeln
-  (nästa punkt), och dragkampen står kvar bara i förra mötet.
+  (nästa punkt), och dragkampen stod kvar bara i förra mötet, till 2026-11-17.
 - **Spegeln i matchakten** (2026-11-16, användarens val *B Staplarna* bland fyra skisser –
   *Spegeln*, *Staplarna*, *Mätarna* och *Övertaget* – "men skippa staplar där det egentligen
   kanske inte behövs", och sedan "byt till spegeln" i stället för dragkampen): ÖVERSIKT, MÅLEN, xG
@@ -8600,9 +8605,41 @@ bland tre skisser i den riktiga närbilden:
   till vänster och divisionens snitt till höger. Formens matcher står på var sin sida om
   etiketternas spalt (i telefonen under varandra, se nedan). Samma mått i
   alla fyra flikarna (`spegel` i [public/rum-register.js](public/rum-register.js)), så att lagen
-  står still när man byter flik; MÖTENA har förra mötet kvar som dragkamp. Staplarna är klasserna
+  står still när man byter flik; förra mötet i MÖTENA stod kvar som dragkamp till 2026-11-17 (nästa
+  punkt). Staplarna är klasserna
   `sv`, `so` och `sf` i [public/rum-register.css](public/rum-register.css), och skärmen i rummet
   ritar dem själv ([public/rum-dator.js](public/rum-dator.js)).
+- **Spegeln i mitten på fler ställen** (2026-11-17, användarens önskemål efter kupongens *Spegeln i
+  mitten*: "Kan du komma på andra ställen på statistiksidan där det blir snyggt på det här sättet?";
+  av tre skisserade ställen ville användaren ha alla tre, och lagkortets *De fem senaste* fick vara som
+  det är, eftersom det visar ett lag och inte ett par). Matchakten, mötena och kupongen har nu en
+  gemensam axel: kolumnen mitt i etiketternas spalt (`spAxel` i
+  [public/rum-register.js](public/rum-register.js)).
+  - *Matchaktens huvud*: överst står kupongens rad – numret, lagen speglade runt strecket och
+    avsparken längst ut, den avvikande ljus – med strecket rakt ovanför etiketterna (`aktRad`). Till
+    dess stod numret och lagen till vänster medan allt under stod i mitten.
+  - *Förra mötet* i spegeln: *FÖRRA MÖTET* som rubrik i mitten, datumet och platsen under (*28 SEP 2025
+    · HOS NEWCASTLE*), lagen över spalterna och talen speglade runt etiketten, det bättre ljust och det
+    sämre svagt. I telefonen stod etiketten på en egen rad över varje stapel, så att sju tal tog
+    sjutton rader; nu tar de tio.
+  - *Mötena de senaste fem åren* som kupongen: tävlingen först, lagen speglade runt resultatet, vars
+    streck står på axeln, och datumet längst ut (*PL  NEWCASTLE 1–2 ARSENAL  28 SEP*), under
+    säsongen som rubrik med ett streck efter (*2025/26*, från juli; landslagen: året). Hemmalagets
+    V–O–F står i mitten under. Till dess stod datumet med året först och resultatet där namnen
+    slutade, så att det hoppade från rad till rad, och i telefonen bröts raden med långa namn
+    (*BOURNEMOUTH – NOTTINGHAM* blev 46 tecken). Namnen kortas när de inte ryms (`motRad`).
+  - *Med och utan honom* på spelarkortet i spegeln: *I STARTELVAN* som rubrik, *MED HONOM* till
+    vänster och *UTAN HONOM* till höger, och etiketterna *Matcher*, *V-O-F* (med matchaktens
+    stapel), *Poäng/match* och *Väntat/match* (vad oddsen väntade sig) i mitten, lika brett som
+    kortets rader (`spegel(w)`). Det bättre poängsnittet lyser när skillnaden är minst en halv
+    poäng per match (`SKILJER.ppm`, som för landslagen). Till dess var det en tabell vars
+    rubrikrad var 42 tecken och bröts i telefonen.
+
+  Provat 2026-11-17 i huvudlös Chromium med den riktiga terminalen och påhittad data (en låtsasdator i
+  stället för three.js, matchfiler med förra mötet och mötena, en spelare med `mu`), i 412 × 915 och
+  1470 × 833: kupongen, matchakten, MÖTENA för Newcastle–Arsenal, Bournemouth–Nottingham (10–0
+  och elva tecken långa namn på 40 tecken) och Sverige–Bosnien & Hercegovina (året som rubrik) och
+  spelarkortet, utan fel i konsolen. Inte provat: dolda resultat och skärmen i rummet.
 - **xG-fliken med en rad per tal** (2026-11-16, användarens val *A Raderna* bland tre skisser –
   *Raderna*, *Raderna och tallinjen* och *Spalterna* – och rubriken med lagkortets ord för talen
   mot chanserna): paren *1,5–0,2* såg ut som resultat och tvingade fram fyra tal i kors. Nu har
