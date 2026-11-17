@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-16T16:05:57.631Z",
+ "uppdaterad": "2026-11-17T17:06:36.450Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3236,6 +3236,84 @@
     "version": "2026-11-07.1",
     "writtenAt": "2026-11-15T19:48:27.995Z",
     "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879232",
+   "match": "Newcastle United – Arsenal",
+   "avspark": "2026-11-21T17:30Z",
+   "writtenAt": "2026-11-17T17:06:07.425Z",
+   "text": "Arsenal vinner med ett mål och nöjer sig\n\nArsenal kommer till St. James' Park efter tre raka segrar med 1–0 i Premier League och med en anfallare som har gjort mål i åtta raka landskamper. Newcastle har förlorat två gånger mot Everton och har bara vunnit en av fem ligamatcher hemma.\n\nArsenal vinner sina matcher utan att göra något väsen av det. Laget vann med 1–0 på Anfield den 1 november och med 1–0 hemma mot Hull, där Martin Ødegaard gjorde målet, enligt fansajten Little Big Red Dot [1]. Samma sida skriver att Viktor Gyökeres gjorde två straffmål för Sverige mot Bosnien och Hercegovina och nu har gjort mål i åtta raka matcher i Nations League [1]. Bukayo Saka är skadad, men landslagsuppehållet har i övrigt varit snällt mot Arsenal. Timber gjorde två mål när Nederländerna vann med 7–0 mot Grekland, och Calafiori spelade hela matchen för Italien [1]. Sports Mole har en nyhet från den 16 november om ett tidigt besked från en magnetröntgen som ska ha glatt Arsenal [2].\n\nNewcastle har det tyngre. Mot Fulham gav Jacob Murphy laget ledningen med en skruvad boll ungefär tio minuter före slutet, men inhopparen Rodrigo Muniz kvitterade, och Dan Burn fick ett mål bortdömt i första halvlek för en knuff på Timothy Castagne [1]. Lagets bästa chans ligger i kontringarna. Fansajten pekar på Barnes, Murphy och Osula som de som kan straffa Arsenals höga backlinje, och den nämner också att Malick Thiaw har haft två landskamper på kort tid med Tyskland [1]. Det är ett spel som kräver att mittbackarna orkar springa bakåt. Sajten skriver också att fasta situationer kan bli avgörande för båda lagen [1], och det är det klokaste jag har läst den här veckan. Det där löser man med en hink bollar.\n\nTipset: X2 (Arsenal, men försiktigt)\n\nPrognosen ger Arsenal 1,75, och det stämmer med det jag har läst. Arsenal vinner med ett mål om och om igen och släpper nästan inte till något, och laget kommer hem från uppehållet med spelarna i form [1]. Newcastles kontringar är det enda som stör bilden [1]. Därför tar jag med krysset, eftersom 1–1 ligger nästan lika högt som 0–1 bland de troligaste resultaten. Om Newcastle skulle vinna hemma vore det ett mindre mirakel, så den rutan lämnar jag tom.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Arsenal vinner med ett mål och nöjer sig",
+   "lead": "Arsenal kommer till St. James' Park efter tre raka segrar med 1–0 i Premier League och med en anfallare som har gjort mål i åtta raka landskamper. Newcastle har förlorat två gånger mot Everton och har bara vunnit en av fem ligamatcher hemma.",
+   "paragraphs": [
+    "Arsenal vinner sina matcher utan att göra något väsen av det. Laget vann med 1–0 på Anfield den 1 november och med 1–0 hemma mot Hull, där Martin Ødegaard gjorde målet, enligt fansajten Little Big Red Dot [1]. Samma sida skriver att Viktor Gyökeres gjorde två straffmål för Sverige mot Bosnien och Hercegovina och nu har gjort mål i åtta raka matcher i Nations League [1]. Bukayo Saka är skadad, men landslagsuppehållet har i övrigt varit snällt mot Arsenal. Timber gjorde två mål när Nederländerna vann med 7–0 mot Grekland, och Calafiori spelade hela matchen för Italien [1]. Sports Mole har en nyhet från den 16 november om ett tidigt besked från en magnetröntgen som ska ha glatt Arsenal [2].",
+    "Newcastle har det tyngre. Mot Fulham gav Jacob Murphy laget ledningen med en skruvad boll ungefär tio minuter före slutet, men inhopparen Rodrigo Muniz kvitterade, och Dan Burn fick ett mål bortdömt i första halvlek för en knuff på Timothy Castagne [1]. Lagets bästa chans ligger i kontringarna. Fansajten pekar på Barnes, Murphy och Osula som de som kan straffa Arsenals höga backlinje, och den nämner också att Malick Thiaw har haft två landskamper på kort tid med Tyskland [1]. Det är ett spel som kräver att mittbackarna orkar springa bakåt. Sajten skriver också att fasta situationer kan bli avgörande för båda lagen [1], och det är det klokaste jag har läst den här veckan. Det där löser man med en hink bollar."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Little Big Red Dot",
+     "title": "Arsenal Newcastle Preview: Gunners Visit St James’ Park",
+     "url": "https://littlebigreddot.com/arsenal-newcastle-preview-st-james-park-21-november-2026/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sports Mole",
+     "title": "Premier League Gameweek 11",
+     "url": "https://www.sportsmole.co.uk/football/premier-league/newcastle-united-vs-arsenal_game_263178.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Arsenal 1,75, och det stämmer med det jag har läst. Arsenal vinner med ett mål om och om igen och släpper nästan inte till något, och laget kommer hem från uppehållet med spelarna i form [1]. Newcastles kontringar är det enda som stör bilden [1]. Därför tar jag med krysset, eftersom 1–1 ligger nästan lika högt som 0–1 bland de troligaste resultaten. Om Newcastle skulle vinna hemma vore det ett mindre mirakel, så den rutan lämnar jag tom.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Arsenal, men försiktigt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Little Big Red Dot",
+      "title": "Arsenal Newcastle Preview: Gunners Visit St James’ Park",
+      "url": "https://littlebigreddot.com/arsenal-newcastle-preview-st-james-park-21-november-2026/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:06:07.425Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Arsenal har vunnit tre raka ligamatcher med 1–0, och ett lag som gör så vet precis vad det ska göra. Laget gör sitt mål, stänger igen bakåt och släpper knappt till något. Saka är skadad, men resten har kommit hem från landslagen i god form, och Gyökeres har gjort mål i åtta raka landskamper.",
+     "Newcastle har bara vunnit en av fem hemmamatcher och släppte in ett sent kvitteringsmål mot Fulham. Laget hoppas på kontringar mot Arsenals höga backlinje, men för att kontra måste motståndaren tappa ordningen, och det gör inte Arsenal. Krysset köper jag aldrig. Det blir en ren tvåa, och den står jag för."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "0–1",
+    "tips": "2026-11-17T17:06:07.425Z",
+    "uppdrag": {
+     "fraser": [
+      "Nej nej nej",
+      "Det köper jag aldrig"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:06:35.465Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
