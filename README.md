@@ -1403,6 +1403,18 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   balkar, Renaults romb, Citroëns vinklar, Ladas skepp, Jeep och Chryslers stjärna), och på några också på karossen:
   SAAB bakom framhjulet på 900:an, CHEROKEE på jeepens framdörr, Bel Air på amerikanarens bakskärm och stjärnan på
   Mercedesarnas huv. Se *Märket på bilarna* under [Fasaden](#fasaden).
+- **Fler som går förbi, barnfamiljer och hundar, och kläderna varierar mer (2026-11-17, användarens önskemål):** "Kan du
+  lägga till fler personer i den här vyn - kanske också med barn ibland och hundar osv" och "Jag vill också att kläderna
+  ska variera mer - mössor, halsdukar etc". En kväll 20.30 syns i snitt 2,6 framför affären i stället för 1,5 (tom
+  trottoar 6 % av tiden i stället för 25 %), mitt på dagen ungefär dubbelt så många som förut. Nya sällskap: familjen
+  (två vuxna, barnet i handen, ibland ett större barn i förväg och ibland hunden) och skolbarn med ryggsäckar; barnen
+  syns till halv nio och oftare på lediga dagar, hundarna oftare och mest på kvällspromenaden, ibland med ett par, och
+  två nya raser (dalmatinern och cockerspanieln) och golden. Mössorna: randiga, tofsen i en egen färg, slak, kort
+  sjömansmössa, jokkmokksmössa med snören, öronmuffar, stickat pannband, luvtröjans luva, rånarluva på barnen och
+  pälsmössa; halsdukarna knutna fram, slängda bakåt, med båda ändarna fram eller lindade tjockt, randiga eller rutiga
+  och ibland i samma set som mössan och vantarna; dunjackor i två färger och pälskant på luvan. Förut var det glesare
+  på kvällen efter användarens önskemål samma vecka (*Fler sorters människor, och glest på kvällen*); nu är det
+  mittemellan. Se *Det som händer ute* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7099,19 +7111,30 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   regnet slår ned blir det stänk – en ring som vidgas och en liten krona – på stenen, fönsterbänkens bleck och skyltens
   tak, och droppar hänger under skyltens kant, lampskärmarna och lyktan och faller (`ritaStank`); i duggregn färre och
   inga droppar, och inga där snön ligger. På dagen syns regnet lika överallt, som förut. Samma duk och takt som förut.
-- **Det som händer ute:** de som går förbi på trottoaren framför affären, ungefär lika många som på gatan inifrån
-  (`RumUte.trafik`; färre i regn och snöyra och glest på kvällen, högst nio sällskap och sex i telefonen), ensamma eller i sällskap
-  (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply), ett gäng, en förälder med ett
-  barn i handen, barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
+- **Det som händer ute:** de som går förbi på trottoaren framför affären, fler än på gatan inifrån (`folket`:
+  `RumUte.trafik` plus ett sällskap utom på natten, gånger 1,45 och 1,05 i telefonen; färre i regn och snöyra och
+  glest på kvällen, högst tolv sällskap och sju i telefonen; en kväll 20.30 i snitt 2,6 i bild och mitt på dagen
+  ungefär 8), ensamma eller i sällskap
+  (`vemGar`, `sallskap`, efter klockan och vädret): ett par (ibland under samma paraply, ibland med hunden), ett gäng, en
+  förälder med ett barn i handen, en familj (`familj`: två vuxna och barnet i handen, ibland ett större barn som studsar
+  i förväg och ibland hunden; barnen till halv nio och oftare på lediga dagar), skolbarn i sällskap med ryggsäckar
+  (`skolbarn`: vardagar till skolan och hem, och på lediga dagar), barnvagn, pulka i snön, en äldre med dragkärra, någon som leder cykeln, någon som skyddar sig med
   tidningen i regnet, någon som joggar morgon och kväll (`joggare`: myskläder i färgblock eller shorts och t-shirt,
-  gympadojor, pannband och ibland en gul sportfreestyle) och hundar (labrador, schäfer, tax, terrier och pudel,
-  `HUNDAR`; de små i täcke när det regnar).
+  gympadojor, pannband och ibland en gul sportfreestyle) och hundar (labrador, också som golden, schäfer, tax, terrier,
+  pudel, dalmatiner med prickar och cockerspaniel med långa öron, `HUNDAR`; de små i täcke när det regnar; oftast på
+  kvällspromenaden 19–22.30).
   Det är 90-tal och kläderna är efter vädret (`klad`, `F90`, `vadret`): vindjackor och myskläder i färgblock, dunjackor
   med stickningar, skinnjackor, bomberjackor, jeansjackor, fältjackor, trenchcoats, kappor och kavajer, vida jeans,
   kjolar, bakvända kepsar, fiskarhattar, freestyle med orange öronkuddar, fyrkantiga ryggsäckar, plastpåsar, portföljer
   och mobiltelefon med antenn; i regn paraply (som vinden ibland vänder ut och in), regnrock med luva eller sydväst,
-  gummistövlar och regnskydd på barnvagnen, i kyla mössa (ibland med tofs eller öronlappar), sjalett, halsduk, vantar
-  (ibland lovikka) och kängor, och i värme t-shirt, shorts med vita sockor, solglasögon, keps och glass. Barnen har större
+  gummistövlar och regnskydd på barnvagnen, i kyla mössa, sjalett, halsduk, vantar (ibland lovikka) och kängor. Mössan
+  i kylan (`vinterHatt`, sedan 2026-11-17) är stickad med uppvikt kant, ibland med en eller två ränder i en annan färg och
+  tofsen i en egen färg (`mRand`, `tofsF`), eller slak och slokar bakåt, en kort sjömansmössa högt på huvudet (`docker`),
+  jokkmokksmössan med öronlappar och snören, öronmuffar, ett stickat pannband ner över öronen, luvtröjans luva under
+  jackan, rånarluva på barnen och pälsmössa med platt topp (de äldre, och i sträng kyla); halsduken (`hForm`) är knuten
+  med en ände fram, slängd bakåt över axeln, med båda ändarna fram eller lindad tjockt, ibland randig med fransar
+  (`hRand`) eller rutig (`hRutor`), och ibland i samma färg och ränder som mössan och vantarna. Dunjackan är ibland i två
+  färger (`duo`) och dun- och fältjackan har ibland pälskant på luvan bak på axlarna (`pals`). och i värme t-shirt, shorts med vita sockor, solglasögon, keps och glass. Barnen har större
   huvud, och i regnet galonställ och stövlar. Var och en har sin längd (`o.h`, kvinnor och äldre lite kortare i snitt)
   och byggnad (`BYGG`, `o.bred`: överkroppen dras ut på bredden i `bredda`, benen lite med, och de runda har mage), en
   del äldre går framåtböjda, och fler frisyrer (knut, afro) och hattar (sixpence, basker). Paraplyerna är vanliga,
@@ -7131,7 +7154,7 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   ärmkant), och magväskan och julklappar i en papperskasse (före jul) finns bland de andra. De ritas med samma sorts
   delar som de andra: i en bromsad provmiljö (headless Chrome, processorn ×4) 650–940 µs per figur och bild mot
   610–1350 för de gamla sorterna, och lika många syns samtidigt som förut. `?rum-fasad-vem=inlines` (eller `rullator`,
-  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `cykel` …) låter alla som går förbi vara sådana,
+  `supporter`, `bergs`, `gran`, `bud`, `turist`, `skidor`, `jogg`, `hund`, `familj`, `skolbarn`, `cykel` …) låter alla som går förbi vara sådana,
   för bilder och prov. Vad händerna gör bestäms en gång per figur (`hander`, `GREPP`, `handVid`):
   kopplet, barnets hand, barnvagnens handtag, cykelns styre, dragkärran och pulkans snöre, paraplyet, mobilen vid örat,
   glassen, brädan under armen och tidningen över huvudet; påsen och portföljen hänger rakt ner i en ledig hand, och
