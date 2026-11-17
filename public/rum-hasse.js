@@ -1970,8 +1970,9 @@ window.RumHasse = (() => {
   // Vad han kallar dig just nu: i nio fall av tio omgångens fel namn, samma som i domen (felNamn).
   const kalla = (namn) => (namn && Math.random() < 0.9 ? felNamn(namn, omgangNu()) : namn);
   // Ibland talar han till dig med namn när han säger hur det går (efter.namn och stallning.namn i
-  // rum-hasse-repliker.js, Tomas 2026-11-16): med chansen chans, när kupongen vet vem du är, och högst en gång på
-  // två minuter, så att det inte blir tjat. → raden med namnet, eller null (då tar man en vanlig rad)
+  // rum-hasse-repliker.js, Tomas 2026-11-16) och efter en analys (nastaNamn, 2026-11-17): med chansen chans, när
+  // kupongen vet vem du är, och högst en gång på två minuter (också räknat från när han hälsade med namn), så att det
+  // inte blir tjat. → raden med namnet, eller null (då tar man en vanlig rad)
   const TILLTAL_MS = 120000;
   function tilltal(lista, chans) {
     if (!Array.isArray(lista) || !lista.length || Math.random() >= chans) return null;
@@ -2852,23 +2853,28 @@ window.RumHasse = (() => {
     // har någon börjat är det inte hela kupongen längre)
     const kvar = oppna.filter((m) => !fragat[m.id]).length;
     const hela = oppna.length === lista.length;
-    const namn = dittNamn();
     if (forst) {
       if (!kvar) return hela || !r.allaKvar ? lott(r.allaIgen) : enAv(r.allaKvar);
       // (vad klockan är: strax före spelstopp alltid, annars ibland)
       const tid = hela && tidNu(oppna);
       if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
-      // (i nio fall av tio säger han fel namn: omgångens, samma som i domen, se kalla)
-      const kallad = kalla(namn);
-      if (n) return fyll(lott(namn ? r.tillbakaNamn : r.tillbaka), { namn: kallad });
+      // (när kupongen vet vem du är hälsar han med namn, i nio fall av tio fel: omgångens, samma som i domen, se
+      // kalla; och sedan dröjer det innan han säger det igen, se tilltal)
+      const namn = dittNamn();
+      const medNamn = (l) => {
+        H.tilltal = performance.now();
+        return fyll(lott(l), { namn: kalla(namn) });
+      };
+      if (n) return namn ? medNamn(r.tillbakaNamn) : lott(r.tillbaka);
       // (är kupongen full av landskamper säger han det ibland)
       if (r.land && oppna.filter((m) => landskamp(m.id)).length >= 3 && Math.random() < 0.35) return lott(r.land.oppning);
-      return fyll(lott(namn ? r.oppningNamn : r.oppning), { namn: kallad });
+      return namn ? medNamn(r.oppningNamn) : lott(r.oppning);
     }
     if (!kvar) return enAv(hela || !r.allaKvar ? r.alla : r.allaKvar);
     if (kvar === 1) return enAv(r.enKvar);
     if (hela && n === Math.ceil(oppna.length / 2)) return lott(r.halva);
-    return lott(r.antal[n] || r.nasta);
+    // (ibland med ditt namn, Tomas 2026-11-17: nastaNamn)
+    return tilltal(r.nastaNamn, 0.3) || lott(r.antal[n] || r.nasta);
   }
 
   // ---------- hur det gick ----------
