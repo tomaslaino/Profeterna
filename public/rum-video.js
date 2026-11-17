@@ -1457,6 +1457,15 @@ window.RumVideo = (() => {
       if (matare.style.getPropertyValue('--n') !== n) matare.style.setProperty('--n', n);
     }
     setInterval(() => { if (!root.hidden) tick(); }, 500);
+    // 12:00 blinkar: tänd en halv sekund och släckt en halv efter klockan, med en väckning vid varje
+    // halv sekund. Som animering i CSS räknades stilen om i varje bildruta som huvudtråden ritade,
+    // ungefär 30 gånger i sekunden i en telefon, för något som ändras två gånger.
+    const blinka = () => {
+      const nu = performance.now();
+      if (!root.hidden) vfd.classList.toggle('slackt', vfd.classList.contains('blink') && !o.calm() && Math.floor(nu / 500) % 2 === 1);
+      setTimeout(blinka, 500 - (nu % 500) + 4);
+    };
+    blinka();
 
     // Telefonen låstes eller man bytte app: systemet pausar videon, och den
     // spelar vidare när man kommer tillbaka.

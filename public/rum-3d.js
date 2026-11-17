@@ -683,14 +683,57 @@ export async function figurer(canvas, opt = {}) {
         return;
       }
       const vila = () => (window.requestIdleCallback ? requestIdleCallback(nasta, { timeout: 3000 }) : setTimeout(nasta, 200));
-      try {
-        x[2].toBlob((blob) => {
-          if (blob) x[0].put(x[1], new Response(blob, { headers: { 'content-type': 'image/png', 'x-sparad': String(Date.now()) } })).catch(() => {});
-          vila();
-        }, 'image/png');
-      } catch (err) { vila(); }
+      pngAv(x[2]).then((blob) => {
+        if (blob) x[0].put(x[1], new Response(blob, { headers: { 'content-type': 'image/png', 'x-sparad': String(Date.now()) } })).catch(() => {});
+        vila();
+      });
     };
     setTimeout(nasta, 6000);
+  }
+  // Bilden som PNG, packad i en egen tråd (OffscreenCanvas i en worker): med toBlob läses duken av och
+  // packas på huvudtråden, 1024 × 1152 bildpunkter per ansikte, och det kom just när rummet hade startat
+  // och man började titta och dra – i en svag telefon upp till en tiondels sekund per ansikte. Utan
+  // worker, eller om den inte svarar, som förut.
+  let packare = null;
+  function pngAv(c) {
+    return new Promise((klar) => {
+      let svarat = false;
+      const svar = (b) => { if (!svarat) { svarat = true; klar(b || null); } };
+      const vanlig = () => { try { c.toBlob(svar, 'image/png'); } catch (err) { svar(null); } };
+      if (packare === null) {
+        packare = false;
+        try {
+          if (window.Worker && window.createImageBitmap && typeof OffscreenCanvas !== 'undefined') {
+            const kod = 'onmessage = async (e) => { let blob = null; try { const b = e.data.bild; const c = new OffscreenCanvas(b.width, b.height); c.getContext("2d").drawImage(b, 0, 0); b.close(); blob = await c.convertToBlob({ type: "image/png" }); } catch (err) { blob = null; } postMessage({ id: e.data.id, blob }); };';
+            const url = URL.createObjectURL(new Blob([kod], { type: 'text/javascript' }));
+            const w = new Worker(url);
+            URL.revokeObjectURL(url);
+            packare = { w, n: 0, vantar: new Map() };
+            w.onmessage = (e) => {
+              const k = packare.vantar.get(e.data.id);
+              packare.vantar.delete(e.data.id);
+              if (k) k(e.data.blob);
+            };
+            // (går den inte att starta packas resten som förut)
+            w.onerror = () => {
+              const vantar = [...packare.vantar.values()];
+              packare = false;
+              for (const k of vantar) k(null);
+            };
+          }
+        } catch (err) { packare = false; }
+      }
+      if (!packare) return vanlig();
+      const P = packare;
+      createImageBitmap(c).then((bild) => {
+        if (!packare) { bild.close(); return vanlig(); }
+        const id = ++P.n;
+        P.vantar.set(id, (b) => (b ? svar(b) : vanlig()));
+        P.w.postMessage({ id, bild }, [bild]);
+        // (svarar den inte alls)
+        setTimeout(() => { if (P.vantar.delete(id)) vanlig(); }, 15000);
+      }, vanlig);
+    });
   }
   // i telefonen räcker hälften (ansiktena är små där)
   const ANS_W = LATT ? 512 : 1024;
