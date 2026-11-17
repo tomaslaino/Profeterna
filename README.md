@@ -8390,6 +8390,8 @@ Tab byter flik (i sökningen kategori). Sedan 2026-11-17 går menyraderna också
 flikens sidor, kortets flikar och listen överst – där ↑/↓ går mellan menyraderna och ←/→ byter
 direkt i raden; ↓ under den nedersta går tillbaka till raderna och Esc lämnar menyn. Raden som
 tangenterna står i lyser: mappen och radioknappen fylls, listens val får en ljus kant.
+En vald match börjar med markören i flikraden (användarens önskemål samma dag), så att
+←/→ byter flik direkt; ←/→ till förra och nästa match går efter Esc eller ↓ ner i raderna.
 Raden längst ner säger det med tangenternas namn och går att trycka på; i telefonen står
 där *◄ Tillbaka*, *◄ Förra* och *Nästa ►* i stället. Allt i utskriften går att trycka på,
 så att telefonen klarar sig utan tangentbord; tangentbordet kommer fram först när man

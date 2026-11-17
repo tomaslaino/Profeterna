@@ -2978,10 +2978,14 @@ window.RumRegister = (() => {
       fkStang();
       A.vy = vy;
       A.sel = -1;
-      // (piltangenterna står kvar i menyraden bara när de själva bytte vy)
-      const mf = A.menyKvar;
+      // (piltangenterna står kvar i menyraden bara när de själva bytte vy;
+      // en vald match börjar med markören i flikraden, användarens önskemål
+      // 2026-11-17 – med tangentbord, och står inte flikarna där än för att
+      // matchen inte har kommit väntar markören på dem, A.menyVanta)
+      const mf = A.menyKvar || (vy.mote && mus.matches ? 'flik' : null);
       A.menyKvar = null;
       A.meny = null;
+      A.menyVanta = null;
       // (en ny sökning börjar med alla träffar)
       if (vy.flik !== 'sok') A.kat = 'alla';
       A.nr++;
@@ -2992,7 +2996,7 @@ window.RumRegister = (() => {
       A.ut = h;
       A.topp = html(R.topp);
       topp.innerHTML = A.topp;
-      if (mf) menyFokus(mf, false);
+      if (mf) { menyFokus(mf, false); if (!A.meny) A.menyVanta = mf; }
       fot.innerHTML = fotHtml(R);
       spoilerRad();
       // (rankningen med en markerad rad: på en gång, och rullad dit)
@@ -3184,7 +3188,7 @@ window.RumRegister = (() => {
         A.topp = ht;
         ut.innerHTML = h;
         topp.innerHTML = ht;
-        if (A.meny) menyFokus(A.meny, false);
+        if (A.meny || A.menyVanta) menyFokus(A.meny || A.menyVanta, false);
         fot.innerHTML = fotHtml(R);
         rull.scrollTop = y;
         // (rankningen som väntade på datan: till den markerade raden när den kommer)
@@ -3217,7 +3221,7 @@ window.RumRegister = (() => {
     const valbara = () => [...ut.querySelectorAll('[data-q]')].filter((el) => !el.closest('.kat'));
     function valj(i, rulla = true) {
       const l = valbara();
-      if (A.meny && i >= 0) menyFokus(null);
+      if (i >= 0 && (A.meny || A.menyVanta)) menyFokus(null);
       for (const el of ut.querySelectorAll('.sel')) el.classList.remove('sel');
       A.sel = l.length ? Math.max(-1, Math.min(l.length - 1, i)) : -1;
       const el = l[A.sel];
@@ -3239,12 +3243,13 @@ window.RumRegister = (() => {
     // sida) eller KUPONGEN/REGISTRET – och ↓ under den nedersta går tillbaka
     // till raderna. Esc lämnar menyn. Raden som tangenterna står i har
     // klassen fokus (rum-register.css): den valda lyser som en vald rad.
-    // Tab bläddrar som förut.
+    // En vald match börjar i flikraden (visa). Tab bläddrar som förut.
     const menyRader = () => ['meny', 'flik', 'sid'].filter((id) => topp.querySelector(`.tr.${id}`));
     function menyFokus(rad, fotOck = true) {
       for (const el of topp.querySelectorAll('.tr.fokus')) el.classList.remove('fokus');
       const el = rad && topp.querySelector(`.tr.${rad}`);
       A.meny = el ? rad : null;
+      if (el || !rad) A.menyVanta = null;
       if (el) {
         el.classList.add('fokus');
         for (const x of ut.querySelectorAll('.sel')) x.classList.remove('sel');
