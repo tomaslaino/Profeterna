@@ -2045,8 +2045,9 @@ window.RumFasad = (() => {
     const bak = (c) => mix(t(c), '#000000', 0.32);
     const D = [];
     const del = (d, f, x = {}) => D.push({ d: typeof d === 'string' ? new Path2D(d) : d, f, g: '', ...x });
-    del('M-11.5 -90 H-1 L-2 -4 H-9.5 Z M1 -90 H11.5 L9.5 -4 H2 Z', t(o.byxa));
-    del('M-11 -5 H-1 V0 H-12 Z M1 -5 H11 L12 0 H1 Z', t(o.sko));
+    // (benen och skorna är ett steg mörkare på kvällen, benSteg)
+    del('M-11.5 -90 H-1 L-2 -4 H-9.5 Z M1 -90 H11.5 L9.5 -4 H2 Z', t(o.byxa), { nere: true });
+    del('M-11 -5 H-1 V0 H-12 Z M1 -5 H11 L12 0 H1 Z', t(o.sko), { nere: true });
     // (en kort jacka slutar vid höften, en kappa vid knäna)
     const nere = o.stil && HEM[o.stil] < -70 ? HEM[o.stil] + 2 : -46;
     del(`M-17 -141 Q-19 -152 -9 -154 H9 Q19 -152 17 -141 L20 ${nere} Q0 ${nere + 4} -20 ${nere} Z`, t(o.rock));
@@ -2070,7 +2071,10 @@ window.RumFasad = (() => {
   // Hundens ben travar efter hur långt den har gått (tassen står still halva varvet och lyfts fram i den
   // andra), och hjulen rullar. rand: bara konturen, lineWidth rand (ljuset i kanten), annars fyllt med alfa A
   // (kontur: bara det som syns i siluetten, för speglingen) i mörkersteget z (morkna).
-  function ritaDelar(c, D, P, A, rand, kontur = false, z = 0) {
+  // (zBen: hur mörka benen, hunden och det på marken är, MORK, när de står framför något mörkare än resten av
+  // figuren; annars z som allt annat. Benen hos den som står och tittar in, bakDelar, har nere.)
+  const NERE = new Set(['benF', 'benB', 'mark', 'hund', 'hkropp']);
+  function ritaDelar(c, D, P, A, rand, kontur = false, z = 0, zBen = null) {
     for (const p of D) {
       if ((rand || kontur) && p.inre) continue;
       if (kontur && p.s) continue;
@@ -2149,7 +2153,8 @@ window.RumFasad = (() => {
         c.stroke(p.d);
       } else {
         c.globalAlpha = A * (p.a == null ? 1 : p.a);
-        c.fillStyle = z && p.fz ? p.fz[z] : p.f;
+        const zz = zBen != null && (NERE.has(g) || p.nere) ? zBen : z;
+        c.fillStyle = zz && p.fz ? p.fz[zz] : p.f;
         c.fill(p.d);
       }
       c.restore();
@@ -2173,8 +2178,17 @@ window.RumFasad = (() => {
     return Math.round((1 - L.dag / 0.6) * (1 - n) * 3);
   }
 
+  // Benen (och hunden och det på marken) ett steg mörkare än resten på kvällen: skyltfönstrets ljus är bakom
+  // överkroppen, men under fönsterbänken är bröstningen mörk, och lyktorna lyser uppifrån. Framför dörren, vars
+  // glas går nästan ned till stenen, är benen som resten.
+  function benSteg(x, z, L) {
+    if (L.dag > 0.4 || z >= 3) return null;
+    if (x > DORR.x - 20 && x < DORR.x + DORR.w + 20) return null;
+    return z + 1;
+  }
+
   // Hur mycket ljus det är bakom den som går, i kanten (0 … 1): starkast framför fönstret och dörren, lite vid
-  // lyktorna, inget på dagen.
+  // lyktorna, inget på dagen. (Var på figuren: kantRuta.)
   function randLjus(x, L) {
     if (L.dag > 0.6) return 0;
     const nara = (a, b, f) => { const d = x < a ? a - x : x > b ? x - b : 0; return Math.max(0, 1 - d / f); };
@@ -2182,6 +2196,8 @@ window.RumFasad = (() => {
     if (L.lampor) n = Math.max(n, 0.55 * nara(300, 380, 170), 0.6 * nara(1690, 1750, 280));
     return (1 - L.dag / 0.6) * (0.04 + 0.96 * n);
   }
+  // under lyktan vid porten eller gatlyktan på bron
+  const underLykta = (x, L) => L.lampor && ((x > 140 && x < 540) || (x > 1440 && x < 2000));
 
   // En figur i världen: fötterna i (x, y), k gånger centimetrarna, dir 1 åt höger och −1 åt vänster; var
   // i gångens varv av hur långt den har gått (x), så att foten i marken står still. spegel: upp och ned i den
@@ -2190,33 +2206,48 @@ window.RumFasad = (() => {
     const st = f.stil || stilVanlig();
     const P = f.sta ? STAR : stalln((f.dir * x) / (st.S * f.k) + (f.gfas || 0), st);
     c.save();
-    c.translate(x, y);
     if (ut.spegel) {
+      c.translate(x, y);
       c.scale(f.dir * f.k, -f.k * 0.85);
       ritaDelar(c, D, P, ut.spegel, 0, true);
       c.restore();
       return;
     }
+    // Kantljuset bara där ljuset är bakom den som går (kantRuta): där den står framför skyltfönstrets och dörrens
+    // glas, och under lyktorna på huvudet och axlarna. Förut låg det runt hela figuren, också runt benen framför
+    // den mörka bröstningen och skorna, som en ljus kontur kring ett klistermärke.
+    const r = ut.rand;
+    if (r > 0.1) {
+      c.save();
+      kantRuta(c, x, y, f.k, ut.lykta);
+      c.translate(x, y - 1.4 * f.k);
+      c.scale(f.dir * f.k, f.k);
+      c.lineJoin = 'round';
+      c.lineCap = 'round';
+      c.strokeStyle = '#ffc98a';
+      c.globalAlpha = 0.34 * r * ut.A;
+      ritaDelar(c, D, P, 1, 2.4);
+      c.restore();
+    }
+    c.translate(x, y);
     c.scale(f.dir * f.k, f.k);
     c.globalAlpha = 0.26 * ut.A;
     c.fillStyle = '#000';
     c.beginPath();
     c.ellipse(f.sta ? 0 : 8, 1, f.sta ? 22 : 28, 3.6, 0, 0, 2 * Math.PI);
     c.fill();
-    // (kantljuset bara där det syns: nära fönstret, dörren och lyktorna)
-    const r = ut.rand;
-    if (r > 0.1) {
-      c.lineJoin = 'round';
-      c.lineCap = 'round';
-      c.strokeStyle = '#ffc98a';
-      c.save();
-      c.translate(0, -1.4);
-      c.globalAlpha = 0.34 * r * ut.A;
-      ritaDelar(c, D, P, 1, 2.4);
-      c.restore();
-    }
-    ritaDelar(c, D, P, ut.A, 0, false, ut.z || 0);
+    ritaDelar(c, D, P, ut.A, 0, false, ut.z || 0, ut.zBen);
     c.restore();
+  }
+
+  // Där ljuset är bakom den som går, i världen: skyltfönstrets och dörrens glas, och under en lykta (lykta) en
+  // remsa från axlarna och uppåt, så att ljuset uppifrån fångas på huvudet, mössan, axlarna och paraplyet.
+  function kantRuta(c, x, y, k, lykta) {
+    c.beginPath();
+    c.rect(FON.x, FON.y, FON.w, FON.h);
+    c.rect(DORR.x, DORR.y, DORR.w, DORR.h);
+    if (lykta) c.rect(x - 160 * k, y - 300 * k, 320 * k, 172 * k);
+    c.clip();
   }
 
   // ---------- vilka som går förbi ----------
@@ -3443,7 +3474,10 @@ window.RumFasad = (() => {
       c.restore();
     }
     if (bilar) ritaBilar(c, R.bilar, t);
-    for (const [f, D, x, y] of lista) ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L), z: morkSteg(x, L) });
+    for (const [f, D, x, y] of lista) {
+      const z = morkSteg(x, L);
+      ritaFigur(c, f, D, x, y, t, L, { A: R.A, rand: randLjus(x, L), lykta: underLykta(x, L), z, zBen: benSteg(x, z, L) });
+    }
     // (stänken på stenen bakom dem som kör förbi, och fordonen framför dem som går)
     if (gata) {
       ritaStank(c, R.N, R.K, t, L.dag);
