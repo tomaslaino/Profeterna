@@ -2955,14 +2955,18 @@ window.RumRegister = (() => {
       const k = mus.matches;
       const b = [];
       const rot = !A.bak.length && A.vy.flik !== 'sok';
+      // (med piltangenterna i menyn, A.meny, byter ←/→ i menyraden i stället
+      // för förra och nästa, som då bara går att trycka på)
+      const m = k && A.meny;
       b.push([k ? `ESC ${rot ? 'STÄNG' : 'TILLBAKA'}` : `◄ ${rot ? 'STÄNG' : 'TILLBAKA'}`, rot ? '#stang' : '#bak']);
       if (R.sido) {
-        b.push([k ? '← FÖRRA' : '◄ FÖRRA', R.sido[0] ? '#sido:-1' : null, !R.sido[0]]);
-        b.push([k ? 'NÄSTA →' : 'NÄSTA ►', R.sido[1] ? '#sido:1' : null, !R.sido[1]]);
-      } else if (k && rot) b.push(['←→ FLIKARNA', null]);
-      if (k && R.delar && R.delar.length > 1) b.push(['TAB FLIK', null]);
+        b.push([k ? (m ? 'FÖRRA' : '← FÖRRA') : '◄ FÖRRA', R.sido[0] ? '#sido:-1' : null, !R.sido[0]]);
+        b.push([k ? (m ? 'NÄSTA' : 'NÄSTA →') : 'NÄSTA ►', R.sido[1] ? '#sido:1' : null, !R.sido[1]]);
+      } else if (k && rot && !m) b.push(['←→ FLIKARNA', null]);
+      if (m) b.push(['←→ BYT   ↑↓ MENYRAD', null]);
+      else if (k && R.delar && R.delar.length > 1) b.push(['↑ MENYN', null]);
       if (k && A.vy.flik === 'sok' && KATEGORIER.filter(([id]) => antal(A.vy.hits || [], id)).length > 1) b.push(['TAB KATEGORI', null]);
-      if (k && Object.keys(R.nr).length) b.push(['↑↓ VÄLJ   ↵ ÖPPNA', null]);
+      if (k && !m && Object.keys(R.nr).length) b.push(['↑↓ VÄLJ   ↵ ÖPPNA', null]);
       return b.map(([t, q, av]) => `<span${q ? ` class="a" data-q="${esc(q)}"` : av ? ' class="av"' : ''}>${esc(t)}</span>`).join('');
     }
 
@@ -2974,6 +2978,10 @@ window.RumRegister = (() => {
       fkStang();
       A.vy = vy;
       A.sel = -1;
+      // (piltangenterna står kvar i menyraden bara när de själva bytte vy)
+      const mf = A.menyKvar;
+      A.menyKvar = null;
+      A.meny = null;
       // (en ny sökning börjar med alla träffar)
       if (vy.flik !== 'sok') A.kat = 'alla';
       A.nr++;
@@ -2984,6 +2992,7 @@ window.RumRegister = (() => {
       A.ut = h;
       A.topp = html(R.topp);
       topp.innerHTML = A.topp;
+      if (mf) menyFokus(mf, false);
       fot.innerHTML = fotHtml(R);
       spoilerRad();
       // (rankningen med en markerad rad: på en gång, och rullad dit)
@@ -3175,6 +3184,7 @@ window.RumRegister = (() => {
         A.topp = ht;
         ut.innerHTML = h;
         topp.innerHTML = ht;
+        if (A.meny) menyFokus(A.meny, false);
         fot.innerHTML = fotHtml(R);
         rull.scrollTop = y;
         // (rankningen som väntade på datan: till den markerade raden när den kommer)
@@ -3207,6 +3217,7 @@ window.RumRegister = (() => {
     const valbara = () => [...ut.querySelectorAll('[data-q]')].filter((el) => !el.closest('.kat'));
     function valj(i, rulla = true) {
       const l = valbara();
+      if (A.meny && i >= 0) menyFokus(null);
       for (const el of ut.querySelectorAll('.sel')) el.classList.remove('sel');
       A.sel = l.length ? Math.max(-1, Math.min(l.length - 1, i)) : -1;
       const el = l[A.sel];
@@ -3218,6 +3229,60 @@ window.RumRegister = (() => {
         if (r.top < b.top) rull.scrollTop -= b.top - r.top;
         else if (r.bottom > b.bottom) rull.scrollTop += r.bottom - b.bottom;
       }
+    }
+
+    // Piltangenterna i menyraderna (sedan 2026-11-17, användarens önskemål:
+    // "surfa mellan de olika menyraderna med piltangenterna istället för med
+    // tab"). ↑ ovanför den första raden går upp i menyn, till raden närmast
+    // (flikens sidor, kortets flikar eller listen överst); där går ↑/↓ mellan
+    // menyraderna och ←/→ byter direkt i raden – sidan, fliken (dess första
+    // sida) eller KUPONGEN/REGISTRET – och ↓ under den nedersta går tillbaka
+    // till raderna. Esc lämnar menyn. Raden som tangenterna står i har
+    // klassen fokus (rum-register.css): den valda lyser som en vald rad.
+    // Tab bläddrar som förut.
+    const menyRader = () => ['meny', 'flik', 'sid'].filter((id) => topp.querySelector(`.tr.${id}`));
+    function menyFokus(rad, fotOck = true) {
+      for (const el of topp.querySelectorAll('.tr.fokus')) el.classList.remove('fokus');
+      const el = rad && topp.querySelector(`.tr.${rad}`);
+      A.meny = el ? rad : null;
+      if (el) {
+        el.classList.add('fokus');
+        for (const x of ut.querySelectorAll('.sel')) x.classList.remove('sel');
+        A.sel = -1;
+      }
+      if (fotOck && A.R) fot.innerHTML = fotHtml(A.R);
+    }
+    function menyTangent(k) {
+      const l = menyRader();
+      const j = l.indexOf(A.meny);
+      if (k === 'ArrowUp') { if (j > 0) menyFokus(l[j - 1]); return; }
+      if (k === 'ArrowDown') {
+        if (j >= 0 && j < l.length - 1) menyFokus(l[j + 1]);
+        else { menyFokus(null); valj(0); }
+        return;
+      }
+      const d = k === 'ArrowRight' ? 1 : -1;
+      if (A.meny === 'meny') {
+        const i = FLIKAR.findIndex(([id]) => id === A.vy.flik);
+        const n = FLIKAR[i + d];
+        if (!n) return;
+        inp.value = '';
+        markor();
+        A.bak = [];
+        A.menyKvar = 'meny';
+        visa({ flik: n[0] }, true);
+        return;
+      }
+      // kortets flikar och flikens sidor, i ordning (de som har något)
+      const dl = (A.R && A.R.delar) || [];
+      const topp0 = (id) => String(id).split('/')[0];
+      const nu = A.R && A.R.del;
+      const val = A.meny === 'sid' ? dl.filter((id) => topp0(id) === topp0(nu)) : [...new Set(dl.map(topp0))];
+      const i = val.indexOf(A.meny === 'sid' ? nu : topp0(nu));
+      const n = val[i + d];
+      if (i < 0 || !n) return;
+      A.menyKvar = A.meny;
+      visa({ ...A.vy, del: A.meny === 'sid' ? n : dl.find((id) => topp0(id) === n) }, true);
     }
 
     // En tangent i terminalen: true när den har använts
@@ -3252,10 +3317,17 @@ window.RumRegister = (() => {
         return true;
       }
       if (k === 'Escape') {
+        if (A.meny) { menyFokus(null); return true; }
         if (!tomt || iSok) { inp.value = ''; markor(); if (iSok) visa(A.fore || { flik: 'kupongen' }, false); return true; }
         if (!A.bak.length) return false;
         tillbaka();
         return true;
+      }
+      // piltangenterna i menyraderna (menyTangent); ↑ ovanför den första raden går dit
+      if (tomt && !iSok && k.startsWith('Arrow')) {
+        if (A.meny) { menyTangent(k); return true; }
+        const l = menyRader();
+        if (k === 'ArrowUp' && A.sel <= 0 && l.length) { menyFokus(l[l.length - 1]); return true; }
       }
       if (k === 'ArrowUp' || k === 'ArrowDown') { valj(A.sel + (k === 'ArrowDown' ? 1 : -1)); return true; }
       if ((k === 'ArrowLeft' || k === 'ArrowRight') && tomt && !iSok) { sido(k === 'ArrowRight' ? 1 : -1); return true; }

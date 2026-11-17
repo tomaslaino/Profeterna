@@ -8385,7 +8385,11 @@ började skriva.
 Tangenterna: Esc går tillbaka dit man var (och stänger datorn när man är längst tillbaka),
 ↑/↓ markerar en rad och Enter öppnar den, ←/→ bläddrar till förra och nästa match,
 division, lag eller spelare (och bland flikarna när det inte finns något att bläddra i), och
-Tab byter flik (i sökningen kategori).
+Tab byter flik (i sökningen kategori). Sedan 2026-11-17 går menyraderna också med piltangenterna
+(användarens önskemål, "istället för med tab"): ↑ ovanför den första raden går upp i menyn –
+flikens sidor, kortets flikar och listen överst – där ↑/↓ går mellan menyraderna och ←/→ byter
+direkt i raden; ↓ under den nedersta går tillbaka till raderna och Esc lämnar menyn. Raden som
+tangenterna står i lyser: mappen och radioknappen fylls, listens val får en ljus kant.
 Raden längst ner säger det med tangenternas namn och går att trycka på; i telefonen står
 där *◄ Tillbaka*, *◄ Förra* och *Nästa ►* i stället. Allt i utskriften går att trycka på,
 så att telefonen klarar sig utan tangentbord; tangentbordet kommer fram först när man

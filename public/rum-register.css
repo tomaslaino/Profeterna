@@ -81,6 +81,13 @@
 .reg-term .tr.flik { background: linear-gradient(var(--gron), var(--gron)) left bottom / 100% 0.09em no-repeat; }
 .reg-term .tr.flik .i { position: relative; z-index: 0; margin: 0; padding: 0; background: none; color: #c9ffd7; text-shadow: 0 0 0.3em rgba(65, 255, 110, 0.5); }
 .reg-term .tr.flik .i::before { content: ''; position: absolute; z-index: -1; left: -0.75ch; right: -0.75ch; top: -0.1em; bottom: -0.12em; border: 0.09em solid var(--gron); border-bottom: 0; background: #020a04; }
+/* menyraden som piltangenterna står i (menyTangent i rum-register.js): den
+   valda lyser som en vald rad – mappen och radioknappen fylls, listens val
+   får en ljus kant */
+.reg-term .tr.meny.fokus .i { box-shadow: inset 0 0 0 0.12em #c9ffd7; }
+.reg-term .tr.flik.fokus .i { color: #010702; text-shadow: none; }
+.reg-term .tr.flik.fokus .i::before { background: rgba(65, 255, 110, 0.85); }
+.reg-term .tr.sid.fokus .v { margin: 0 -0.5ch; padding: 0 0.5ch; background: rgba(65, 255, 110, 0.85); color: #010702; text-shadow: none; }
 /* kupongens avdelningar: ett tunt streck ovanför den första raden (utan en
    egen rad, så att allt ryms på skärmen), och i telefonen tävlingen som
    rubrik med ett streck efter; registrets tabeller har strecket där zonen
