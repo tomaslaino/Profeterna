@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-17T17:15:06.485Z",
+ "uppdaterad": "2026-11-17T17:16:54.868Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3434,6 +3434,79 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 2
+  },
+  {
+   "id": "401880160",
+   "match": "Bolton Wanderers – Portsmouth",
+   "avspark": "2026-11-21T15:00Z",
+   "writtenAt": "2026-11-17T17:16:05.339Z",
+   "text": "Bolton har haft två veckor att börja om\n\nBolton gick in i landslagsuppehållet med en ledning som försvann direkt efter pausen på Pride Park. Portsmouth förlorade sin senaste match hemma mot Stoke. Nu har båda lagen haft två veckor på sig, och på lördag möts de i Bolton.\n\nDet som stör mig mest med Bolton är vad som hände på Pride Park. Ruben Rodrigues gav laget ledningen strax före paus, och mindre än en minut efter omstarten hade Ryan Nyambe kvitterat, skriver Bolton News [1]. Sedan gjorde Jack Robinson 2–1, och Rhian Brewster gjorde 3–1 efter ett misstag av Gaizka Larrazabal. Tränaren Steven Schumacher var lika tydlig som jag hade varit. ”Vi följer inte med löparna och vi vinner inte första och andra bollen i vår egen straffområde”, sa han, och han kallade det en självdestruktiv match, ”för fram till dess var vi det bättre laget” [1]. Hur man kommer ut efter pausen är något man tränar. Det tar vi på torsdagsträningen.\n\nHemma har det gått tungt för Bolton i höst. Laget har två segrar och fem förluster på Toughsheet, och i de två senaste hemmamatcherna har det släppt in åtta mål mot Middlesbrough och Bristol City. Skotten säger ungefär samma sak, för laget släpper till nästan två förväntade mål per match.\n\nPortsmouth är ett jämnare lag men inget lag som gör många mål. Det har gjort mål som det släpper in, ungefär ett i matchen, och hittills har det gjort lite drygt två mål fler än chanserna borde ha gett. Den sortens tur brukar ta slut förr eller senare. Senast förlorade laget med 1–2 hemma mot Stoke. Ändå var mötet med Bolton i april 2024 jämnt och slutade 1–1. Bollen har aldrig läst en tabell.\n\nTipset: X2 (knappt men tydligt)\n\nSajtens prognos ser lagen som nästan jämnstarka. Hemmaplanen drar mot Bolton, men lagets dåliga försvar drar tillbaka. Spelbolagen tror lite mer på Portsmouth. Jag tror inte särskilt mycket på Bolton som hemmalag när det har förlorat fem av sju hemmamatcher och, med Schumachers egna ord, inte vinner första och andra bollen i sitt straffområde [1]. Portsmouth har haft mer tur framför mål än det borde, men laget släpper in få mål. Det troligaste resultatet är 1–1. Därför ringar jag in oavgjort och bortaseger.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Bolton har haft två veckor att börja om",
+   "lead": "Bolton gick in i landslagsuppehållet med en ledning som försvann direkt efter pausen på Pride Park. Portsmouth förlorade sin senaste match hemma mot Stoke. Nu har båda lagen haft två veckor på sig, och på lördag möts de i Bolton.",
+   "paragraphs": [
+    "Det som stör mig mest med Bolton är vad som hände på Pride Park. Ruben Rodrigues gav laget ledningen strax före paus, och mindre än en minut efter omstarten hade Ryan Nyambe kvitterat, skriver Bolton News [1]. Sedan gjorde Jack Robinson 2–1, och Rhian Brewster gjorde 3–1 efter ett misstag av Gaizka Larrazabal. Tränaren Steven Schumacher var lika tydlig som jag hade varit. ”Vi följer inte med löparna och vi vinner inte första och andra bollen i vår egen straffområde”, sa han, och han kallade det en självdestruktiv match, ”för fram till dess var vi det bättre laget” [1]. Hur man kommer ut efter pausen är något man tränar. Det tar vi på torsdagsträningen.",
+    "Hemma har det gått tungt för Bolton i höst. Laget har två segrar och fem förluster på Toughsheet, och i de två senaste hemmamatcherna har det släppt in åtta mål mot Middlesbrough och Bristol City. Skotten säger ungefär samma sak, för laget släpper till nästan två förväntade mål per match.",
+    "Portsmouth är ett jämnare lag men inget lag som gör många mål. Det har gjort mål som det släpper in, ungefär ett i matchen, och hittills har det gjort lite drygt två mål fler än chanserna borde ha gett. Den sortens tur brukar ta slut förr eller senare. Senast förlorade laget med 1–2 hemma mot Stoke. Ändå var mötet med Bolton i april 2024 jämnt och slutade 1–1. Bollen har aldrig läst en tabell."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Bolton News via Yahoo Sports",
+     "title": "MATCH REACTION",
+     "url": "https://uk.sports.yahoo.com/news/match-reaction-steven-schumacher-wanderers-225131613.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Sajtens prognos ser lagen som nästan jämnstarka. Hemmaplanen drar mot Bolton, men lagets dåliga försvar drar tillbaka. Spelbolagen tror lite mer på Portsmouth. Jag tror inte särskilt mycket på Bolton som hemmalag när det har förlorat fem av sju hemmamatcher och, med Schumachers egna ord, inte vinner första och andra bollen i sitt straffområde [1]. Portsmouth har haft mer tur framför mål än det borde, men laget släpper in få mål. Det troligaste resultatet är 1–1. Därför ringar jag in oavgjort och bortaseger.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "knappt men tydligt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Bolton News via Yahoo Sports",
+      "title": "MATCH REACTION",
+      "url": "https://uk.sports.yahoo.com/news/match-reaction-steven-schumacher-wanderers-225131613.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-17T17:16:05.339Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Bolton ledde på Pride Park vid paus och släppte in kvitteringen direkt efter omstarten. Sedan rann hela matchen iväg. Tränaren sa själv att laget inte följer med löparna och inte vinner första och andra bollen i sitt eget straffområde. Det handlar om organisation, och sånt sitter inte rätt efter två veckors uppehåll.",
+     "Hemma har Bolton förlorat fem av sju matcher, och i de två senaste hemmamatcherna släppte laget in åtta mål. Portsmouth gör inte många mål, men laget släpper inte heller in många. Mot ett lag som ger bort så mycket i sitt eget straffområde räcker det gott.",
+     "Spelbolagen har rätt den här gången, och jag behöver inget kryss för att sova gott. Så är det bara. Jag ringar in en tvåa."
+    ],
+    "tecken": [
+     2
+    ],
+    "resultat": "1–2",
+    "tips": "2026-11-17T17:16:05.339Z",
+    "uppdrag": {
+     "fraser": [
+      "Så är det bara",
+      "Det är lugnt"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-17T17:16:53.333Z",
+    "attempts": 3
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
   },
   {
    "id": "401879236",
