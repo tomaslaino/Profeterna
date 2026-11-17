@@ -8092,7 +8092,8 @@ bland tre skisser i den riktiga närbilden:
   fil (`senaste[].opp`, som bygget nu sparar för alla tio och inte bara formens fem). Datorn har
   lagen sida vid sida, telefonen under varandra med lagets namn över listan. Saknar fler än två
   av matcherna styrka står inget snitt; med dolda resultat står ?. xG-raderna under gäller som
-  förut säsongen.
+  förut säsongen. Sedan 2026-11-17 står snittet i ÖVERSIKT och listan på en egen sida (se
+  *Sidorna i flikarna* nedan).
 - **Landslagens styrka ur Elo-talen** (2026-11-16, för de tio senaste): modellen räknar bara på
   lagen i England, så landslagens motståndare hade ingen styrka – formens motstånd stod tomt
   för landskamperna. Nu kommer den ur World Football Elo Ratings (`elo_landslag`,
@@ -8109,7 +8110,9 @@ bland tre skisser i den riktiga närbilden:
   tabellen"; *Listan*): under FORMEN i ÖVERSIKT en rad per match – resultatet, H eller B,
   motståndaren och dess plats i tabellen just nu (ligans; för ett landslag gruppens). Står
   motståndaren i en annan division eller grupp står den efter platsen (*3:E CH*, *2:A A3*).
-  Datorn har lagen sida vid sida, telefonen under varandra.
+  Datorn har lagen sida vid sida, telefonen under varandra. Borta sedan 2026-11-17: de fem
+  matcherna var desamma som de fem första av de tio senaste, som står på sidan *MATCH FÖR
+  MATCH* med motståndets styrka i stället för tabellplatsen.
 - **Lagens listor i telefonen** (2026-11-16, användarens synpunkt: "ingen bra lösning på
   mobilen"): formens matcher i ÖVERSIKT och de tio senaste i xG står i telefonen under varandra,
   och förut stod det högra lagets lista högerställd – listorna hamnade förskjutna mot varandra och
@@ -8117,6 +8120,24 @@ bland tre skisser i den riktiga närbilden:
   emellan, är lika breda (den bredaste radens bredd) och står tillsammans i mitten av blocket,
   så att utfallet, resultatet, motståndaren och platsen står i raka spalter
   (`underVarandra` i [public/rum-register.js](public/rum-register.js)).
+- **Sidorna i flikarna** (2026-11-17, användarens fråga: "det är lite mycket statistik på vissa
+  av statistiksidorna för lagen i datorn. Hade du delat upp den på något sätt?"; användarens val
+  *B Sidor i fliken* bland två skisser – *A Fler flikar* hade gett sju flikar, i telefonen på
+  två rader). Matchaktens xG var 27 rader (de tio senaste överst, xG-talen under kanten), MÅLEN
+  18 och landslagens översikt 19, mot 12 som ryms på datorns skärm. En flik som inte ryms har
+  nu sidor, och sidorna står i strecket under flikraden (*─ TALEN ─ MATCH FÖR MATCH ─*, den
+  valda omvänd), så att ingen rad går åt och inget flyttar sig; Tab går genom alla sidor, ett
+  tryck på namnet byter, och ←/→ till nästa match eller lag stannar på sidan. Matchakten:
+  ÖVERSIKT har *TALEN* (formen, de tio senaste i snitt och säsongens tal under *I LIGAN*,
+  landskamperna under *NATIONS LEAGUE*) och *MATCH FÖR MATCH* (de tio senaste), MÅLEN *HEMMA OCH
+  BORTA* och *ALLA MATCHER* (en sida när hemma och borta saknas, och för landskamperna); xG har
+  bara chanserna. Lagkortets översikt har *TALEN* (omgången, nästa match, formen på en rad med
+  mätaren och modellen) och *MATCH FÖR MATCH* (de fem senaste), landslagens *TALEN* och de tio
+  senaste landskamperna. Samtidigt försvann raden med tävlingen och avsparken under matchens
+  namn (användarens önskemål: "det tar onödig plats"), så att matchakten har en rad till.
+  Undantag: en landskamp i Nations Leagues sista omgångar, där *SPELAR FÖR* står, är 15 rader i
+  TALEN, och truppen och telefonens listor (lagen under varandra) rullar som förut
+  (`sidorna` och `sidRad` i [public/rum-register.js](public/rum-register.js)).
 - **Vad landslagen spelar för** (frågor om playoff, placeringarna i de andra ligorna och vägen
   till EM; *Raden*, med rutan): i Nations Leagues sista omgångar står *SPELAR FÖR* under
   POÄNG – målet laget kan nå och vad som räcker (*KVAR I B · VINST RÄCKER*, *KVARTSFINAL ·

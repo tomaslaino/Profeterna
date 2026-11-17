@@ -69,6 +69,8 @@
 /* streck över hela bredden */
 .reg-term .tr.hr { position: relative; }
 .reg-term .tr.hr::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 0.09em solid #1c9c3d; }
+/* strecket med flikens sidor (sidRad): det sista strecket klipps vid kanten */
+.reg-term .tr.sid { white-space: pre; overflow-x: clip; }
 /* kupongens avdelningar: ett tunt streck ovanför den första raden (utan en
    egen rad, så att allt ryms på skärmen), och i telefonen tävlingen som
    rubrik med ett streck efter; registrets tabeller har strecket där zonen
