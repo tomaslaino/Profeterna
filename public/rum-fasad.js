@@ -3862,5 +3862,23 @@ window.RumFasad = (() => {
   }
 
   // (gången och huvudet också för dem som går på gatan inifrån, rum-ute.js: samma sätt att gå och samma ställning)
-  return { bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR, GSTIL } };
+  // ---------- samma människor i andra vyer ----------
+  //
+  // Bron bakom Hasse Backe (gangare i rum-hasse-ute.js) har samma människor som trottoaren framför affären: ett
+  // sällskap lottat som här (vemGar och sallskap, efter klockan, dagen och vädret, i samma kläder), var och en med sina
+  // delar (figurDelar), sin längd mot en vuxen (k), sitt sätt att gå (st) och sin plats i sällskapet (dx, cm framåt).
+  // Den andra vyn ritar var och en i en ställning åt gången (folkRita: p är var i gångens varv, fötterna i 0, vänd åt
+  // höger och i centimeter; z hur mörk, MORK).
+  function folkNytt(R, v, L) {
+    const T = U().trafik.nu(v);
+    const W = vadret(v, L);
+    const sk = sallskap(R, VEM || vemGar(R, T, W, v), v, L, W.halt ? { ...W, halkar: R() < 0.65 } : W);
+    // (de bortersta först: ddm, m närmare en)
+    return sk.vem.map((m) => ({ D: figurDelar(m.o, L), k: m.k || m.o.h || 1, st: m.st, dx: m.dx || 0, ddm: m.ddm || 0 })).sort((p, q) => p.ddm - q.ddm);
+  }
+  function folkRita(c, m, p, A = 1, z = 0) {
+    ritaDelar(c, m.D, stalln(p, m.st), A, 0, false, z);
+  }
+
+  return { bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR, GSTIL }, folk: { nytt: folkNytt, rita: folkRita } };
 })();
