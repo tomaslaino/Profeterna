@@ -1378,6 +1378,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   fönster, bilarna kör ungefär 60 % så fort (de syns i fyra–fem sekunder), och var och en kör som en bil: släpper
   gasen, bromsar in med bromsljusen tända och tar fart igen, stannar ibland en stund, följer den framför och niger när
   den bromsar. Se *Bilarna kör ute på gatan, och som bilar* under [Fasaden](#fasaden).
+- **Märket syns på bilarna (2026-11-17, användarens önskemål):** "Det är inte så tydligt vilket märke de olika bilarna
+  har som kör ute … Kan du göra det för de bilar där man kan se det på sidan". Märket sitter där det satt på de riktiga
+  bilarna sett från sidan: i navkapselns eller fälgens mitt på alla utom Minin och amerikanaren (Volvos järntecken, Saabs
+  grip, Mercedesstjärnan, BMW, VW, Audis ringar, Opels blixt, Fords oval, Toyota, Nissan, Mazda, Peugeots lejon, Fiats
+  balkar, Renaults romb, Citroëns vinklar, Ladas skepp, Jeep och Chryslers stjärna), och på några också på karossen:
+  SAAB bakom framhjulet på 900:an, CHEROKEE på jeepens framdörr, Bel Air på amerikanarens bakskärm och stjärnan på
+  Mercedesarnas huv. Se *Märket på bilarna* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7127,7 +7134,8 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   Chrysler Voyager (ibland storbilstaxi), Saab 900 cabriolet med tygtak – och taket nere när det är minst 18 grader och
   torrt, med dem som åker synliga – och bland de äldre Volvo 145, Lada 2105/2107 och 2104 i kombi, och amerikanaren
   med fenor, vita däcksidor och ibland vitt tak, bara när det är minst 15 grader och torrt), ritade efter de riktiga
-  måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar och ibland takräcke,
+  måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar, med märket i mitten (se
+  *Märket på bilarna* nedan), och ibland takräcke,
   skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
   blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
@@ -7160,6 +7168,27 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   accelerationen, så att den gungar tillbaka när bilen stannar (`fjader`, `niga`; hjulen står kvar). Provat i en
   simulering av en timme i varje tid på dygnet (inga fordon i varandra) och i bilder från datorn och telefonen, dag,
   regnig kväll och snö.
+- **Märket på bilarna (2026-11-17, användarens önskemål):** "Det är inte så tydligt vilket märke de olika bilarna har som
+  kör ute … Kan du göra det för de bilar där man kan se det på sidan". Märket sitter där det syns från sidan på de
+  riktiga bilarna, inte där det inte gjorde det (en 240:a eller en Golf har bara navet). I navkapselns eller fälgens mitt
+  på alla bilar utom Minin och amerikanaren (`navMarke` i rum-fasad-gatan.js): Volvos järntecken, Saabs röda grip med
+  kronan på blått (de äldre, 96:an och 99:an, med SAAB i bokstäver), Mercedesstjärnan, BMW:s blåvita, VW, Audis fyra
+  ringar, Opels blixt, Fords blå oval, Toyotas ellipser, Nissan, Mazda, Peugeots lejon, Fiats fem balkar, Renaults romb,
+  Citroëns dubbla vinkel, Ladas skepp, Jeep och Chryslers femstjärna. Märket är en fjärdedel till en tredjedel av hjulets
+  radie, något större än i verkligheten så att det går att läsa, snurrar med hjulet (som lättmetallfälgarna) och står
+  rättvänt när bilen kör åt vänster; det läses när bilen står i kön eller rullar sakta. De former som är flera bilar får
+  ett av märkena per bil (`MARKEN`: Kadetten är också Escort och 323:a, Corollan Sunny och Vectra, E30:n Audi 80,
+  205:an Uno och Femman, Passaten de andra mellanstora kombibilarna och skåpbilen Ford, VW, Mercedes eller Toyota), valt
+  ur bilens fart, så att resten av luckan lottas som förut. På karossen (`emblem` och `stjarna` i `FORM`): SAAB i krom
+  bakom framhjulet på 900:an och cabben (emblemet på framskärmen 1984–93), CHEROKEE på jeepens framdörr (mörk på ljus
+  lack, ljus på mörk), förgyllt Bel Air i handstil på amerikanarens bakskärm (som på en 57:a Chevrolet) och
+  Mercedesstjärnan på huven på 123:an, 190:n och W124:an, som från sidan är en smal blank stav på sin fot. Placeringarna
+  är kollade mot reservdelslistor (Saabs emblem, jeepens dörrdekal och Chevrolets bakskärmsskrift). Märkena mörknar på
+  kvällen med resten av bilen. Märket i navet ritas en gång per märke, storlek och ljus i en liten duk (`navBild`, högst
+  32 stycken) och läggs sedan ut vridet: ritat med vägar i varje bild gjorde det bilen en femtedel till en tredjedel
+  dyrare att rita (mätt i Chromium utan grafikkort), som bild syns ingen skillnad i samma mätning. Provat i bilder av
+  alla former på nära håll och i fasaden på dagen och på kvällen i datorn; inte i en riktig telefon, där märket i navet
+  blir ungefär tjugo bildpunkter brett.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
