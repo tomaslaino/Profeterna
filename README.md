@@ -7363,14 +7363,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   höstlöv och trädens färger efter årstiden, måsar, kråkor och fyrverkerier på nyår. På dagen speglar glaset himlen och
   rummet syns svagare; på kvällen lyser fönstret ut på trottoaren, lamporna tänds på skylten, vid porten och på bron,
   och när lysröret är släckt på natten (`RumFolk.nattGrad`) är rummet mörkt utom neonen och tv:n.
-- **Dämpat ljus inne på kvällen (2026-11-18, användarens önskemål):** "tona ner belysningen i affären något kvällstid.
-  Anpassa ljuset där inne till det som är rimligt." Förut var rummet bakom glaset lika ljust en kväll som mitt på
-  dagen och lyste som en ljusbox ut i mörkret; utifrån dämpades det bara när lysröret släcktes. Nu lyser lamporna med
-  halva ljuset när dagsljuset går (`kvall` och `KVALL_INNE` i `inne`, samma kväll som dunklet inifrån, `ljusKlockan` i
-  rum.js): väggen, hyllan och bardisken mörkare, kuporna och skenet under fläkten varmare, och lite mindre sken ut på
-  väggen och trottoaren. Gänget är 30 % mörkare (`KVALL_UTE` i rum-3d.js, exponeringen när de ritas utifrån: det
-  mesta av ljuset på dem kommer från rummets miljö, och med bara lamporna dämpade blev de 7 % mörkare), så att de
-  fortfarande står ut mot rummet bakom. Neonen lyser som förut och syns därför mer. Dagen och natten är som förut.
+- **Samma ljus utifrån som inifrån (2026-11-18, användarens önskemål):** först "tona ner belysningen i affären något
+  kvällstid. Anpassa ljuset där inne till det som är rimligt", sedan "Tänk på belysningen i animationsbilden i butiken
+  o att det ska passa när man tittar in i butiken utifrån!" Förut var rummet bakom glaset jämnt upplyst och lika ljust
+  en kväll som mitt på dagen, och utifrån dämpades det bara när lysröret släcktes. Inifrån (`ljusKlockan` och
+  `KAGLOR` i rum.js) lyser fläktens kupor på gängets bord, och runt käglan sjunker rummet in i dunkel, mest i kanterna,
+  dag som kväll; på kvällen är det mörkare runt käglan men inte i den, och lamporna lyser igenom. Nu är det samma ljus
+  utifrån (`rummet`): dunklet runt käglan (`rf-dunkel`, `DUNKEL` som i rum.js, med kvällens mörker ovanpå utom i
+  käglan, och i den också när kuporna är släckta på natten), kuporna och deras sken i undertaket ovanpå (gulnade
+  plattor i ett ljust bärverk, som inifrån, i stället för ett mörkt tak; mer sken på kvällen när det är mörkare runt
+  om), neonens röda sken mer på kvällen och tv:ns blå. Lampan med den gröna emaljskärmen (`LAMPA` i rum.js) hänger
+  över Hasse vid pulten genom dörren och lyser på hans huvud, tänd också på natten. Gänget sitter i käglan och är
+  lika ljust kväll som dag, som inifrån (en första version gjorde dem 30 % mörkare utifrån; den är borttagen).
+  Rummet lyser lite mindre ut på glaset, skivan och trottoaren på kvällen (`KVALL_INNE` i `inne`). Mätt klockan 21
+  (1440 × 900, gråskala): fönstret 17 % mörkare än förut, mitten med gänget 15 %, undertaket 7 % och dörren 31 %
+  utom under lampan; inifrån är väggarna ungefär 20 % mörkare klockan 21 än klockan 14.
 - **Gänget ur fokus (2026-11-18, användarens önskemål):** "Vi behöver inte vara så i fokus heller!" Ögat är ställt
   på glaset: skylten, neonen och guldet på dörren är skarpa, gänget mjukt ur fokus och rummet bakom ännu suddigare.
   I datorn är oskärpan på gängets duk 1,3 px (förut 0,6). I telefonen var gänget helt skarpt (`filter: none`, för
