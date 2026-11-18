@@ -91,7 +91,7 @@ window.RumHasse = (() => {
     vy.setAttribute('aria-label', 'Hasse Backe');
     vy.innerHTML = '<div class="rh-scen"><img class="rh-bak" alt="" draggable="false"><img class="rh-bak rh-lys" alt="" draggable="false"><canvas class="rh-bak rh-vagg"></canvas><div class="rh-bron" aria-hidden="true"><canvas class="rh-trafik"></canvas></div><canvas class="rh-pynt" hidden></canvas><button type="button" class="rh-lop" hidden></button><canvas class="rh-disk"></canvas><div class="rh-pulten" aria-hidden="true"></div><canvas class="rh-nota"></canvas><i class="rh-mork"></i></div>' +
       '<canvas class="rh-duk"></canvas><i class="rh-ton" aria-hidden="true"></i>' +
-      '<div class="rh-samtal"></div><div class="rh-fot"><button type="button" class="rh-vag rh-ljud" hidden></button></div>';
+      '<div class="rh-samtal"></div><div class="rh-fot"></div>';
     H.panIn.append(vy);
     H.vy = vy;
     // Namnet uppe i hörnet går undan över matchbladet, kupongen i handen och löpsedeln inzoomad (.undan i rum-hasse.css).
@@ -164,12 +164,6 @@ window.RumHasse = (() => {
     // namnet står kvar hos honom (rum-hasse.css) och leder som i rummet dit: tillbaka
     const namn = rum.querySelector('.rum-brand');
     if (namn) namn.addEventListener('click', () => { if (H.on) stang(); });
-    // ljudet av och på: stannar hos honom
-    vy.querySelector('.rh-ljud').addEventListener('click', (e) => {
-      e.stopPropagation();
-      vaxla();
-    });
-    ljudknapp();
     document.addEventListener('keydown', (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (!H.on) return;
@@ -2351,12 +2345,9 @@ window.RumHasse = (() => {
 
   // ---------- ljudet ----------
   //
-  // Han pratar inte högt (rösten är borttagen, Tomas 2026-11-17): det han säger står i skriftens takt. Det som
-  // hörs är det som händer på disken, när besökaren har slagit på ljudet med knappen i foten.
-  const TYST = 'profeterna.hasse.tyst';
-  // Ljudet är av tills besökaren slår på det med knappen (det minns enheten, '0').
+  // Han pratar inte högt (rösten är borttagen, Tomas 2026-11-17): det han säger står i skriftens takt.
+  // Knappen för ljudet i foten är borttagen (Tomas 2026-11-19), så ljudet är av.
   const V = { ctx: null, av: true };
-  try { V.av = localStorage.getItem(TYST) !== '0'; } catch (e) { /* då är det tyst */ }
 
   // Ljud får bara börja efter ett klick eller en tangent: då väcks det.
   function vakna() {
@@ -2370,18 +2361,6 @@ window.RumHasse = (() => {
     }
   }
 
-  function ljudknapp() {
-    const b = H.vy && H.vy.querySelector('.rh-ljud');
-    if (!b) return;
-    b.hidden = !(window.AudioContext || window.webkitAudioContext);
-    b.textContent = V.av ? 'Ljud på' : 'Ljud av';
-  }
-  function vaxla() {
-    V.av = !V.av;
-    try { localStorage.setItem(TYST, V.av ? '1' : '0'); } catch (e) { /* bara nu */ }
-    if (!V.av) vakna();
-    ljudknapp();
-  }
 
   // Det som händer på disken (handelser i rum-hasse-3d.js): vid varje slag rycker hela bilden till, också
   // rummet i hörnet, mer ju hårdare han slår, och när ljudet är på hörs handen i disken och koppen som
@@ -3524,12 +3503,11 @@ window.RumHasse = (() => {
     H.talMal = 0;
     // (1 X 2 kommer först när du har bett honom om hjälp, i svara)
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><h2 class="rh-sagt"></h2><p class="rh-fragan"><span class="rh-o">${esc(fragan)}</span></p>` +
-      `<div class="rh-svar"><div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa"></button></div>` +
-      `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+      `<div class="rh-svar"><div><button type="button" class="rh-knapp huvud">${esc(lott(r.lar))}</button><button type="button" class="rh-knapp rh-gissa"></button></div></div>`;
     const svar = s.querySelector('.rh-svar');
     const ja = svar.querySelector('.huvud');
-    // Knappen bredvid (tillbaka till alla matcher) lottas bland dem som får plats på samma rad, annars
-    // flyttar sig Matchbladet (i en smal telefon står de på var sin rad ändå).
+    // Knappen bredvid (tillbaka till alla matcher) lottas bland dem som får plats på samma rad
+    // (i en smal telefon står de på var sin rad ändå).
     const egen = svar.querySelector('.rh-gissa');
     egen.textContent = lott(r.angra, (t) => {
       egen.textContent = t;
@@ -3670,7 +3648,7 @@ window.RumHasse = (() => {
     const fylla = K().kan();
     s.innerHTML = `<div class="rh-match">${esc(m.namn)}?</div><div class="rh-dom${d.length > 7 ? ' lang' : ''}">${esc(d)}</div>` +
       `<div class="rh-text"></div>${nu ? `<p class="rh-fragan"><span class="rh-o">${esc(erbjud)}</span></p>` : ''}${fylla ? K().rutor(m.id) : ''}` +
-      `<div class="rh-slut">${knappar(!!nu)}<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a></div>`;
+      `<div class="rh-slut">${knappar(!!nu)}</div>`;
     // (texten läses från början, också när den inte får plats: i telefonen)
     const ruta = repliker([...st, om].filter(Boolean).map((text) => ({ text })), { i: s.querySelector('.rh-text'), direkt: true }).ruta;
     ruta.scrollTop = 0;
@@ -3707,7 +3685,8 @@ window.RumHasse = (() => {
     const ruta = s.querySelector('.rh-text');
     const t = s.querySelector('.rh-tecken');
     const han = (signs || []).map((n) => KORT[n]);
-    const blad = `<a class="rh-vag" href="#match/${esc(m.id)}">Matchbladet</a>`;
+    // (Matchbladet står inte längre under svaren, Tomas 2026-11-19: Hasse ska synas)
+    const blad = '';
     const svaren = (fokus = false) => {
       slut.innerHTML = `${knappar(han.length > 0)}${blad}`;
       kopplaKnappar(slut, m, lista);

@@ -1888,6 +1888,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Bygget hämtar inte grenen `rost` (`src/rost.js` och steget i workflowen är borta), *Läs upp* under hans text
   och svaret från baren är borta, och iMacens jobb stänger av sig självt nästa gång det körs. *Ljud på* står
   kvar, för slagen i disken, koppen och de andra ljuden på disken. Se [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Hasses samtal utan Matchbladet och Ljud på (2026-11-19, användarens önskemål):** "Ta bort där nere där det
+  står Matchbladet o ljud på så att Hasse syns mer o Mergea!" (bild från telefonen efter *Etta.*). *Matchbladet →*
+  står inte längre under svaren, och *Ljud på* i foten är borta, så ljudet är av. Samtalet går nu ned till 18 px
+  från kanten i stället för 52, så att texten oftare ryms under honom utan att flytta upp till kragen. Se
+  [Hasse Backe](#hasse-backe), *Ljudet*.
 - **Hasse Backe slår domen i disken på fler sätt, och det hörs (2026-11-05, användarens
   önskemål):** han är en bestämd och tydlig herre, så domen slås i disken på ett av fem sätt
   (skrattet, näven, tre slag, båda händerna, fingret och handflatan), och vid ett bestämt ord
@@ -10115,8 +10120,8 @@ med baren mörk bakom; *← Hasse* längst ner, Esc eller ett klick utanför lä
 honom (`bladet` i [public/rum-hasse.js](public/rum-hasse.js)). Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
 som ligger på disken: *Jag är idel öra* i terrakotta som kupongens band, *Jag ångrar mig* i krämvitt papper
 bredvid (båda texterna lottas, ur `lar` respektive `angra` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js);
-den bredvid är ödmjuk, som *Tack, inte nu* och *Jag är inte redo*), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
-versaler som texten i bandet. Rutorna 1 X 2 står inte här: de kommer först när man har bett honom om hjälp (se *Din kupong*). Frågan har sin plats från början, osynlig tills han säger den, så att
+den bredvid är ödmjuk, som *Tack, inte nu* och *Jag är inte redo*), båda med en tunn ram innanför kanten. *Matchbladet →* under dem är borta sedan 2026-11-19 (användarens
+önskemål: Hasse ska synas mer); `bladet` ligger kvar men nås inte längre från samtalet. Rutorna 1 X 2 står inte här: de kommer först när man har bett honom om hjälp (se *Din kupong*). Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
 lapp i terrakotta, med *Alla matcher* i krämvitt bredvid (*Fyll i den* i stället för *Titta igen* medan han
@@ -10679,9 +10684,8 @@ prova Bielsa-utbrottet.
 
 **Ljudet.** Han pratar inte högt (2026-11-17, användarens beslut: "Hasse pratar inte längre. Du kan ta bort det"):
 det han säger står ord för ord i skriftens takt, med munnen efter orden, och med minskad rörelse står allt direkt.
-*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*, väcker ljudet i webbläsaren, och valet
-minns enheten; sedan heter knappen *Ljud av* (`vakna`, `vaxla` och `ljudknapp` i [public/rum-hasse.js](public/rum-hasse.js)).
-Ljudet är av tills besökaren slår på det.
+Knappen *Ljud på* längst ned till vänster är borta (2026-11-19, användarens önskemål), så ljudet är av
+(`V.av` i [public/rum-hasse.js](public/rum-hasse.js)); ljuden nedan ligger kvar men spelas inte.
 
 När ljudet är på hörs det som händer på disken
 ([public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), hämtas när ljudet slås på): handen i
