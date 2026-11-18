@@ -21,7 +21,8 @@
 //              senaste matcherna med motståndets styrka på sidan MATCH FÖR
 //              MATCH), MÅLEN (hemmalaget hemma mot bortalaget borta, och på
 //              sidan ALLA MATCHER målen, nollorna, skytten och de främsta i
-//              assist och segermål), xG (chanserna, turen och kryssen). En
+//              assist och segermål), xG (chanserna, turen och kryssen; på
+//              sidan KURVAN lagens xG match för match, sedan 2026-11-18). En
 //              flik som inte ryms på skärmen har sidor, ett mindre spår under
 //              flikraden (sedan 2026-11-17, se sidorna()), LÄGET (vilan, nästa match, skadorna och
 //              domaren) och MÖTENA (förra mötet med lagens siffror, när det
@@ -249,9 +250,54 @@ window.RumRegister = (() => {
   const streck = () => [['', 'hr']];
   const prickar = (vanster, hoger, bred = BRED) => rad([`${vanster} ${'.'.repeat(Math.max(3, Math.min(bred, 40) - vanster.length - hoger.length - 2))} ${hoger}`, 'd']);
   const traffar = (n) => (n ? `${n} ${n === 1 ? 'TRÄFF' : 'TRÄFFAR'}` : 'INGA TRÄFFAR');
-  const bit = ([t, k, q]) => (q
+  const bit = ([t, k, q, x]) => (k === 'kv' ? kurvBit(t, x) : q
     ? `<span class="a${k ? ` ${k}` : ''}" data-q="${esc(q)}">${esc(t)}</span>`
     : k ? `<span class="${k}">${esc(t)}</span>` : esc(t));
+  // KURVAN i matchaktens xG (kurvan nedan): figuren i en bit av mellanslag,
+  // lika bred som panelen, som går ner över x.k rader (rum-register.css). x:
+  // { w tecken, k rader, ru rader per 1,0 xG, f och a lagets och
+  // motståndarnas xG i snitt match för match, fyll fälten där f är över a }.
+  // Linjerna har samma tjocklek hur figuren än dras ut (non-scaling-stroke),
+  // och skärmen i rummet ritar samma figur (kurva i rum-dator.js). Med x.km
+  // rader till står motståndet under figuren (x.mot, kurvMot nedan): en
+  // stapel per match och ett streck för divisionens mittenlag.
+  function kurvBit(t, x) {
+    if (!x) return esc(t);
+    const { w } = x;
+    const k = x.k + (x.km || 0);
+    const X = (i) => kurvX(x, i).toFixed(2);
+    const Y = (v) => kurvY(x, v).toFixed(3);
+    const linje = (l) => l.map((v, i) => `${X(i)},${Y(v)}`).join(' ');
+    const fyll = x.fyll.map((p) => `M${p.map(([i, v]) => `${X(i)},${Y(v)}`).join('L')}Z`).join('');
+    const vag = (v, kl) => `<line class="${kl}" x1="0" x2="${w}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+    return `<span class="kv" style="--k:${k}">${esc(t)}<svg viewBox="0 0 ${w} ${k}" preserveAspectRatio="none" aria-hidden="true">` +
+      `${vag(1, 'kg')}${vag(2, 'kg')}${vag(0, 'k0')}${fyll ? `<path class="kf" d="${fyll}"/>` : ''}` +
+      `<polyline class="ka" points="${linje(x.a)}"/><polyline class="ks" points="${linje(x.f)}"/>${kurvMotSvg(x.mot, w)}</svg></span>`;
+  }
+  function kurvMotSvg(m, w) {
+    if (!m) return '';
+    const f = (v) => v.toFixed(3);
+    return `<line class="kmm" x1="0" x2="${w}" y1="${f(m.mitt)}" y2="${f(m.mitt)}"/>` +
+      m.st.map(([x, y, b, h, svar]) => `<rect class="${svar ? 'kms' : 'kml'}" x="${f(x)}" y="${f(y)}" width="${f(b)}" height="${f(h)}"/>`).join('');
+  }
+  // (figurens mått: match i, också mellan två matcher, i tecken från panelens
+  // vänsterkant, och xG v i rader från figurens överkant)
+  const kurvX = (x, i) => (x.f.length > 1 ? 0.5 + (i * (x.w - 1)) / (x.f.length - 1) : x.w / 2);
+  const kurvY = (x, v) => Math.max(0.05, Math.min(x.k - 0.05, x.k - 0.5 - v * x.ru));
+  // Motståndet under figuren, i samma mått: km rader under figurens k, en
+  // stapel per match mitt under matchens punkt, lika hög som motståndarens
+  // svårighet 0–1 (svar: svårare än divisionens mittenlag), och mittenlagets
+  // höjd (mitt). null utan någon känd svårighet.
+  function kurvMot(x, niva) {
+    if (!x.km || !niva.some((v) => v != null)) return null;
+    const n = niva.length;
+    const b = Math.min(0.6, 0.6 * (n > 1 ? (x.w - 1) / (n - 1) : 1));
+    const bas = x.k + x.km - 0.15;
+    const H = x.km - 0.4;
+    const st = [];
+    niva.forEach((v, i) => { if (v != null) st.push([kurvX(x, i) - b / 2, bas - v * H, b, v * H, v > 0.5]); });
+    return { st, mitt: bas - 0.5 * H };
+  }
   // Bitar i följd med samma fråga blir en tryckbar bit (mätaren och platsen
   // i korten, som leder till rankningen): ett ställe att trycka på och en
   // rad för ↑/↓. Skärmen i rummet (rum-dator.js) läser bitarna en och en.
@@ -847,6 +893,108 @@ window.RumRegister = (() => {
       const bitar = [['sv', h[0]], ['so', h[1]], ['sf', h[2]]].filter(([, c]) => c > 0).map(([k, c]) => [' '.repeat(c), k]);
       return hoger ? bitar : bitar.reverse();
     }
+    // KURVAN (sedan 2026-11-18, användarens val B Oscilloskopet bland fyra
+    // skisser – Blockkurvan, Oscilloskopet, Matchstaplarna och Pilen vid
+    // talet – efter frågan om hur datorn kunde visa vart ett lag är på väg):
+    // en sida i matchaktens xG med lagens xG match för match under säsongen
+    // (fd.serie i lagfilen, ligan; för landslagen Nations League), i snitt
+    // över tre matcher (färre i början), som linjer på ett oscilloskop: den
+    // ljusa är lagets egen xG och den gröna motståndarnas, och fältet mellan
+    // dem är fyllt där laget skapade mer än det släppte till. På datorn står
+    // lagen sida vid sida under sina namn, med 0, 1,0 och 2,0 i etiketternas
+    // spalt mellan dem; i telefonen under varandra med namnet över och talen
+    // till vänster. Under figuren månaderna. Med dolda resultat ett ?.
+    //
+    // Motståndet (sedan 2026-11-19, användarens invändning att kurvan "inte
+    // säger så mycket om man inte vet hur svårt motståndet är"): mellan
+    // figuren och månaderna en stapel per match, lika hög som motståndarens
+    // svårighet 0–1 (fd.serie[i][3], samma skala som MOTSTÅNDET), med ett
+    // streck för divisionens mittenlag och MOT i etiketternas spalt. Staplarna
+    // över strecket är gröna, de under svaga, så att ett tufft program syns
+    // som en rad höga gröna staplar. Staplarna är matcherna en och en, inte i
+    // snitt, så att man ser vilka matcher en sväng i kurvan kommer ifrån.
+    // Saknas svårigheten helt (Nations League) är raderna borta.
+    const KURVA = { k: 9, ru: 3, km: 3, ktel: 6, rutel: 2, kmtel: 2, snitt: 3 };
+    const MAN3 = ['JAN', 'FEB', 'MAR', 'APR', 'MAJ', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEC'];
+    // snittet över de senaste n matcherna (färre i början)
+    const glid = (l, n = KURVA.snitt) => l.map((_, i) => { const y = l.slice(Math.max(0, i - n + 1), i + 1); return y.reduce((a, b) => a + b, 0) / y.length; });
+    // fälten där f är över a, som månghörningar av [match, xG] (en match
+    // mellan två när linjerna korsas)
+    function kurvFyll(f, a) {
+      const l = [];
+      for (let i = 0; i < f.length - 1; i++) {
+        const d0 = f[i] - a[i];
+        const d1 = f[i + 1] - a[i + 1];
+        const kors = () => { const t = d0 / (d0 - d1); return [i + t, f[i] + t * (f[i + 1] - f[i])]; };
+        if (d0 >= 0 && d1 >= 0) l.push([[i, f[i]], [i + 1, f[i + 1]], [i + 1, a[i + 1]], [i, a[i]]]);
+        else if (d0 >= 0) l.push([[i, f[i]], kors(), [i, a[i]]]);
+        else if (d1 >= 0) l.push([kors(), [i + 1, f[i + 1]], [i + 1, a[i + 1]]]);
+      }
+      return l;
+    }
+    // månaderna under en panel w tecken bred: tre bokstäver mitt under
+    // månadens matcher, när de ryms
+    function kurvMan(datum, w) {
+      const ch = Array(w).fill(' ');
+      const x = { w, f: datum };
+      const grupper = [];
+      datum.forEach((d, i) => { const mn = Number(String(d).slice(5, 7)); const g = grupper[grupper.length - 1]; if (g && g.mn === mn) g.sist = i; else grupper.push({ mn, forst: i, sist: i }); });
+      let fri = 0;
+      for (const g of grupper) {
+        const c = Math.max(0, Math.min(w - 3, Math.round(kurvX(x, (g.forst + g.sist) / 2) - 1.5)));
+        if (c < fri || !MAN3[g.mn - 1]) continue;
+        [...MAN3[g.mn - 1]].forEach((t, j) => { ch[c + j] = t; });
+        fri = c + 4;
+      }
+      return ch.join('');
+    }
+    // ett lags panel: k rader w tecken breda (figuren i den första) och månaderna
+    function kurvPanel(t, w, k, ru, veil, km) {
+      const tomt = () => [pad('', w), ''];
+      const text = (x, kl) => {
+        const r = Array.from({ length: k + km }, tomt);
+        r[Math.floor(k / 2)] = [pad(pad('', Math.max(0, Math.floor((w - x.length) / 2))) + x, w), kl];
+        return { rader: r, man: pad('', w) };
+      };
+      if (veil) return text('?', '');
+      const sr = fdOf(t, 'serie');
+      if (!sr || !sr.length) return text('INGEN xG', 'd');
+      if (sr.length < KURVA.snitt) return text('FÖR FÅ MATCHER', 'd');
+      const f = glid(sr.map((y) => y[1]));
+      const a = glid(sr.map((y) => y[2]));
+      const fig = { w, k, ru, km, f, a, fyll: kurvFyll(f, a) };
+      fig.mot = kurvMot(fig, sr.map((y) => (y[3] != null ? y[3] : null)));
+      return { rader: [[pad('', w), 'kv', null, fig], ...Array.from({ length: k + km - 1 }, tomt)], man: kurvMan(sr.map((y) => y[0]), w) };
+    }
+    function kurvan(G, T, lag, veil) {
+      if (!veil && !T.some((t) => fdOf(t, 'serie'))) return [];
+      const q = ordQ('kurvan');
+      const r = [spMitt(G, [['  ', 'lks', q], [' SKAPAR   ', 'v', q], ['  ', 'lkt', q], [' SLÄPPER TILL', '', q], ...(G.tel ? [] : [['   TRE MATCHER I SNITT', 'd', q]])])];
+      // motståndets rader när något av lagen har det
+      const km = !veil && T.some((t) => (fdOf(t, 'serie') || []).some((y) => y[3] != null)) ? (G.tel ? KURVA.kmtel : KURVA.km) : 0;
+      // raderna där 0, 1,0 och 2,0 står, och MOT vid motståndets sista
+      const axel = (k, ru) => new Map([...[0, 1, 2].map((v) => [k - 1 - v * ru, v ? num(v, 1) : '0']).filter(([i]) => i >= 0), ...(km ? [[k + km - 1, 'MOT']] : [])]);
+      if (!G.tel) {
+        const { k, ru } = KURVA;
+        const w = G.S - 1;
+        const p = T.map((t) => kurvPanel(t, w, k, ru, veil, km));
+        const ax = axel(k, ru);
+        for (let i = 0; i < k + km; i++) r.push(spRad(G, [p[0].rader[i]], ax.get(i) || '', null, [p[1].rader[i]]));
+        r.push(spRad(G, [[p[0].man, 'd']], '', null, [[p[1].man, 'd']]));
+        return r;
+      }
+      const { ktel: k, rutel: ru } = KURVA;
+      const w = G.B - 4;
+      const ax = axel(k, ru);
+      T.forEach((t, j) => {
+        const p = kurvPanel(t, w, k, ru, veil, km);
+        if (j) r.push(tom());
+        r.push(rad([pad('', G.M), ''], [kort(lag[j]).slice(0, G.B), 'v', `#lag:${lag[j]}`]));
+        for (let i = 0; i < k + km; i++) r.push(rad([pad('', G.M), ''], [`${padL(ax.get(i) || '', 3)} `, 'd'], p.rader[i]));
+        r.push(rad([pad('', G.M + 4), ''], [p.man, 'd']));
+      });
+      return r;
+    }
     const FORRA = [
       ['MÅL', 'mal', String, true], ['xG', 'xg', (x) => num(x, 2), true], ['STORA CHANSER', 'bc', String, true],
       ['SKOTT', 'sh', String, true], ['PÅ MÅL', 'sot', String, true], ['BOLLINNEHAV', 'poss', (x) => `${Math.round(x)} %`, false],
@@ -1140,7 +1288,8 @@ window.RumRegister = (() => {
     //   MÅLEN     HEMMA OCH BORTA: hemmalaget hemma mot bortalaget borta; ALLA
     //             MATCHER: målen per match, nollorna och vem som gör målen (en
     //             landskamp: Nations League och alla landskamper, en sida)
-    //   xG        chanserna: xG, skotten på mål, målen mot xG, turen och kryssen
+    //   xG        TALEN: chanserna – xG, skotten på mål, målen mot xG, turen
+    //             och kryssen; KURVAN: lagens xG match för match (kurvan)
     //   LÄGET     vilan, nästa match, matcherna de senaste dagarna, skadorna
     //             och domaren
     //   MÖTENA    mötena de senaste fem åren
@@ -1158,6 +1307,7 @@ window.RumRegister = (() => {
     const AKTSIDOR = {
       oversikt: [['oversikt', 'TALEN'], ['oversikt/2', 'MATCH FÖR MATCH']],
       malen: [['malen', 'HEMMA OCH BORTA'], ['malen/2', 'ALLA MATCHER']],
+      xg: [['xg', 'TALEN'], ['xg/2', 'KURVAN']],
     };
     const ordQ = (k) => `#ord:${k}`;
     // lagets främste i ett tal (assist, segermål …), som Spelarna i ligan på
@@ -1565,7 +1715,7 @@ window.RumRegister = (() => {
       }
 
       // flikarnas sidor (AKTSIDOR): 'oversikt/2' och 'malen/2' är den andra sidan
-      const flikar = { oversikt, 'oversikt/2': tioLista, malen, 'malen/2': malen2, xg, laget, moten: moten(m) };
+      const flikar = { oversikt, 'oversikt/2': tioLista, malen, 'malen/2': malen2, xg, 'xg/2': kurvan(G, T, lag, S.veil), laget, moten: moten(m) };
       // (raderna och listorna med rader som dragkampens delar ger, i en lista)
       const platta = (l) => l.flatMap((x) => (!x ? [] : x.length && Array.isArray(x[0]) && Array.isArray(x[0][0]) ? x : [x]));
       const rader = (id) => tvatt(platta(flikar[id] || []));
@@ -1706,8 +1856,8 @@ window.RumRegister = (() => {
     const espnMin = (p) => (p.emin !== undefined ? p.emin : p.min);
     const helt = (p, x) => p.min >= grans(x, 'minMinutesP90', 270);
     const heltE = (p, x) => espnMin(p) >= grans(x, 'minMinutesP90', 270);
-    // mål och assist per 90: FPL:s egna i Premier League (samma matcher som minuterna)
-    const mal90 = (p) => (p.fg !== undefined ? p.fg : p.g);
+    // (mål och assist per 90 är ESPN:s med ESPN:s speltid, som på Statistik;
+    // FPL:s xG och försvar med FPL:s speltid)
     const lagetsMal = (p) => { const t = A.P && A.P.lag.get(String(p.teamId)); return t ? t.goals : null; };
     const MV = (p, v) => (p.pos === 'MV' ? v : null);
     const SPTAL = [
@@ -1716,7 +1866,7 @@ window.RumRegister = (() => {
         f: (v, p) => { const t = A.P && A.P.lag.get(String(p.teamId)); const av = t && t.coverage ? t.coverage.covered : null; return av ? `${v} AV ${av}` : String(v); } },
       { k: 'inhopp', del: 'MATCHERNA', mat: false, e: 'INHOPP', n: 'INHOPP', g: (p) => (p.app != null && p.starts != null ? p.app - p.starts : null), f: String },
       { k: 'speltid', del: 'MATCHERNA', mat: false, e: 'SPELTID', n: 'SPELTID', g: (p) => p.min, f: (v) => `${v} MIN` },
-      { k: 'permatch', del: 'MATCHERNA', mat: false, e: 'PER MATCH', n: 'SPELTID PER MATCH', g: (p) => (p.min != null && p.app ? p.min / p.app : null), f: (v) => `${Math.round(v)} MIN` },
+      { k: 'permatch', del: 'MATCHERNA', mat: false, e: 'PER MATCH', n: 'SPELTID PER MATCH', g: (p) => (p.min != null && p.app ? espnMin(p) / p.app : null), f: (v) => `${Math.round(v)} MIN` },
       { k: 'betyg', del: 'MATCHERNA', e: 'BETYG', n: 'SNITTBETYG', g: (p) => p.rt, f: tal1,
         ok: (p, x) => p.rn >= grans(x, 'minRated', 3) && p.rq >= grans(x, 'minShareRated', 0.5) },
       { k: 'bast', del: 'MATCHERNA', e: 'BÄST PÅ PLAN', n: 'BÄST PÅ PLAN', g: (p) => (p.rt != null ? p.rb : null), f: String },
@@ -1728,12 +1878,12 @@ window.RumRegister = (() => {
       { k: 'pamal', del: 'ANFALL', ute: true, e: 'PÅ MÅL', n: 'SKOTT PÅ MÅL', g: (p) => p.sot, f: String },
       { k: 'malskott', del: 'ANFALL', ute: true, e: 'MÅL/SKOTT', n: 'MÅL PER SKOTT', g: (p) => (p.sh ? p.g / p.sh : null), f: pct, ok: (p, x) => p.sh >= grans(x, 'minShotsConversion', 10) },
       { k: 'malmatch', del: 'ANFALL', ute: true, e: 'MÅL/MATCH', n: 'MÅL PER MATCH', g: (p) => (p.min == null && p.app ? p.g / p.app : null), f: tal2 },
-      { k: 'mal90', del: 'ANFALL', ute: true, e: 'MÅL/90', n: 'MÅL PER 90 MINUTER', g: (p) => per90(mal90(p), p.min), f: tal2, ok: helt },
+      { k: 'mal90', del: 'ANFALL', ute: true, e: 'MÅL/90', n: 'MÅL PER 90 MINUTER', g: (p) => per90(p.g, espnMin(p)), f: tal2, ok: heltE },
       { k: 'xg', del: 'ANFALL', ute: true, e: 'xG', n: 'FÖRVÄNTADE MÅL (xG)', g: (p) => p.xg, f: tal1 },
       { k: 'malmotxg', del: 'ANFALL', ute: true, e: 'MÅL MOT xG', n: 'MÅL MOT xG', g: (p) => (p.xg != null && p.fg != null ? p.fg - p.xg : null), f: tecken(1), noll: true },
       { k: 'xa', del: 'ANFALL', ute: true, e: 'xA', n: 'FÖRVÄNTADE ASSIST (xA)', g: (p) => p.xa, f: tal1 },
       { k: 'xg90', del: 'ANFALL', ute: true, e: 'xG/90', n: 'xG PER 90 MINUTER', g: (p) => per90(p.xg, p.min), f: tal2, ok: helt },
-      { k: 'ma90', del: 'ANFALL', ute: true, e: 'MÅL+ASSIST/90', n: 'MÅL OCH ASSIST PER 90 MINUTER', g: (p) => (mal90(p) == null ? null : per90(mal90(p) + ((p.fg !== undefined ? p.fa : p.a) || 0), p.min)), f: tal2, ok: helt },
+      { k: 'ma90', del: 'ANFALL', ute: true, e: 'MÅL+ASSIST/90', n: 'MÅL OCH ASSIST PER 90 MINUTER', g: (p) => (p.g == null ? null : per90(p.g + (p.a || 0), espnMin(p))), f: tal2, ok: heltE },
       { k: 'segermal', del: 'MÅLEN', mat: false, ute: true, e: 'SEGERMÅL', n: 'SEGERMÅL', g: (p) => p.gw, f: String, visa: (p) => p.g > 0 },
       { k: 'poangmal', del: 'MÅLEN', ute: true, e: 'POÄNG ÅT LAGET', n: 'POÄNG SOM MÅLEN GAV LAGET', g: (p) => p.gpts, f: String, visa: (p) => p.g > 0 },
       { k: 'forsta', del: 'MÅLEN', mat: false, ute: true, e: 'FÖRSTA MÅLET', n: 'MATCHENS FÖRSTA MÅL', g: (p) => p.g1, f: String, visa: (p) => p.g > 0 },
