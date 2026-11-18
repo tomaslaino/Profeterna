@@ -21,7 +21,8 @@
 // Dymo-remsa under. Det ska synas att en person har hand om det, och skivan
 // är färdig. Skivan, kedjorna och remsorna ritas i 3D (rum-inredning.js, en gång);
 // här finns sedlarna, som knappar i #rum-skiva:s plan, och skruvarna, som
-// följer med i sedlarnas lager. Skuggorna är bakade i skivan, inga filter.
+// följer med i sedlarnas lager. Baksidan, mot gatan, har Svenska Spels affischer (reklam i
+// rum-fasad.js). Skuggorna är bakade i skivan, inga filter.
 // Sedlarna sitter alltid på samma ställe, raka; slitaget (rum-saker.js) bleker
 // bara papperet.
 // Veckans löpsedel är den enda som byts. Den ritas här men sätts inte upp i
