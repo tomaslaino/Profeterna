@@ -9,7 +9,8 @@
 // hämtade om allt: JavaScript, stilmallen, typsnitten och rummets bilder,
 // 2–4 MB, och tolkade koden från början.
 //
-// Den här filen (registreras från index.html) sparar dem i stället i
+// Den här filen (registreras från index.html, och av telefon.js för samtalets
+// aviseringar, se nederst) sparar dem i stället i
 // webbläsarens Cache Storage, var och en med sin kontrollsumma. Bygget skriver
 // in listan över filerna och deras kontrollsummor i index.html (rum-filer,
 // src/filer.js), så varje besök vet exakt vilka versioner sidan ska ha:
@@ -186,4 +187,115 @@ self.addEventListener('message', (e) => {
       } catch (err) { /* nästa */ }
     }
   })().catch(() => {}));
+});
+
+// ---------- samtalet: aviseringarna (telefon.js, worker/samtalet.mjs) ----------
+//
+// När gänget ringer och sidan inte är öppen kommer en avisering utan innehåll
+// (web push). Här frågas tjänsten vad det gäller (/samtal/nu) och telefonen
+// visar det: Tejder ringer, med Inte nu och Svara (Android), eller Missat samtal
+// från Tejder – med Gå med medan samtalet pågår och Ring upp efteråt. Samma tag,
+// så att det missade samtalet ersätter det som ringde. Ett tryck öppnar sidan
+// (eller tar fram den som är öppen) och svarar, går med eller ringer upp.
+// Tjänstens adress, namnen vi kallas och porträtten skriver sidan i lådan
+// telefon (telefon.js, aviseringar).
+
+const TEL = 'telefon';
+const TEL_FIL = () => new URL('telefon.json', self.registration.scope).href;
+
+async function telefonen() {
+  try {
+    const r = await (await caches.open(TEL)).match(TEL_FIL());
+    return r ? await r.json() : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function samtalNu(t) {
+  const sub = await self.registration.pushManager.getSubscription();
+  if (!t || !t.bas || !sub) return null;
+  const r = await fetch(`${t.bas}/samtal/nu`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) });
+  return r.ok ? r.json() : null;
+}
+
+const telOrd = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} och ${xs[xs.length - 1]}` : xs[0] || '');
+
+async function ringer() {
+  const t = await telefonen();
+  let d = null;
+  try {
+    d = await samtalNu(t);
+  } catch (err) {
+    d = null;
+  }
+  const namn = (v) => (t && t.namn && t.namn[v]) || v;
+  const bild = (v) => (t && t.bild && t.bild[v]) || new URL('ikon-192.png', self.registration.scope).href;
+  const vem = d && d.vem;
+  const s = d && d.samtal;
+  const f = d && d.senast;
+  const o = { tag: 'samtal', badge: new URL('ikon-maskbar-512.png', self.registration.scope).href, timestamp: Date.now() };
+  let titel;
+  if (s && vem && s.ringer.includes(vem)) {
+    const med = s.med.filter((v) => v !== s.av);
+    titel = `${namn(s.av)} ringer`;
+    Object.assign(o, {
+      body: med.length ? `${telOrd(med.map(namn))} är med` : 'Matchfixarna',
+      icon: bild(s.av),
+      actions: [{ action: 'inte', title: 'Inte nu' }, { action: 'svara', title: 'Svara' }],
+      requireInteraction: true,
+      renotify: true,
+      vibrate: [600, 200, 400, 1400, 600, 200, 400, 1400, 600, 200, 400],
+      data: { samtal: 'svara' },
+    });
+  } else if (s && vem && s.missat.includes(vem) && s.med.length) {
+    titel = `Missat samtal från ${namn(s.av)}`;
+    Object.assign(o, { body: `${telOrd(s.med.map(namn))} pratar fortfarande`, icon: bild(s.av), actions: [{ action: 'svara', title: 'Gå med' }], data: { samtal: 'svara' } });
+  } else if (f && vem && (f.missat || []).includes(vem)) {
+    const k = new Date(f.slut || Date.now());
+    titel = `Missat samtal från ${namn(f.av)}`;
+    Object.assign(o, { body: `kl. ${String(k.getHours()).padStart(2, '0')}.${String(k.getMinutes()).padStart(2, '0')}`, icon: bild(f.av), actions: [{ action: 'ring', title: 'Ring upp' }], data: { samtal: 'ring' } });
+  } else {
+    // (tjänsten svarade inte: något har hänt i samtalet, och sidan visar vad)
+    titel = s && s.med.length ? 'Samtal pågår' : 'Matchfixarna';
+    Object.assign(o, { body: s && s.med.length ? telOrd(s.med.map(namn)) : 'Gänget har ringt', icon: bild(s ? s.av : ''), data: { samtal: s && s.med.length ? 'svara' : '' } });
+  }
+  await self.registration.showNotification(titel, o);
+}
+
+self.addEventListener('push', (e) => {
+  e.waitUntil(ringer());
+});
+
+async function telInte() {
+  const t = await telefonen();
+  const sub = await self.registration.pushManager.getSubscription();
+  if (!t || !t.bas || !sub) return;
+  await fetch(`${t.bas}/samtal/inte`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => {});
+}
+
+// Sidan med rummet (förstasidan): den som är öppen tas fram och får veta vad
+// som trycktes, annars öppnas den.
+async function telOppna(vad) {
+  const rot = new URL(self.registration.scope);
+  const alla = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  const sidan = alla.find((c) => {
+    const u = new URL(c.url);
+    return u.origin === rot.origin && (u.pathname === rot.pathname || u.pathname === `${rot.pathname}index.html`);
+  });
+  if (sidan) {
+    await sidan.focus().catch(() => {});
+    if (vad) sidan.postMessage({ samtal: vad });
+    return;
+  }
+  const u = new URL(rot.href);
+  if (vad) u.searchParams.set('samtal', vad);
+  await self.clients.openWindow(u.href);
+}
+
+self.addEventListener('notificationclick', (e) => {
+  if (e.notification.tag !== 'samtal') return;
+  e.notification.close();
+  const vad = e.action || (e.notification.data && e.notification.data.samtal) || '';
+  e.waitUntil(vad === 'inte' ? telInte() : telOppna(vad));
 });

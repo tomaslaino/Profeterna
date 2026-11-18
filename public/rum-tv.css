@@ -437,39 +437,22 @@
 .av-jag video { transform: scaleX(-1); }
 .av-jag::after { content: ""; position: absolute; left: 3px; top: 3px; width: 3.5px; height: 3.5px; border-radius: 50%; background: #ff3a2a; box-shadow: 0 0 2.5px 0.5px rgba(255, 58, 42, 0.8); animation: av-lampa 2s ease-in-out infinite; }
 .av-jag.stor { inset: 0; right: auto; bottom: auto; width: 100%; height: 100%; box-shadow: none; }
-/* (stort säger raden under och foten att du syns: lampan och porträtten behövs inte) */
-.av-jag.stor::after, .tv-av:has(.av-jag.stor:not([hidden])) .av-ser { display: none !important; }
+/* (stort säger raden under att du syns: lampan behövs inte) */
+.av-jag.stor::after { display: none !important; }
 @keyframes av-lampa { 50% { opacity: 0.45; } }
 .av-under { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; }
 .av-under[hidden] { display: none; }
 .av-under { font-size: 10px; }
 .av-under::first-line { background: rgba(5, 6, 6, 0.75); }
-/* de som tittar utan att visa sig: små porträtt i sin färg uppe till höger */
-.av-ser { position: absolute; right: 6px; top: 6px; display: flex !important; align-items: center; gap: 2.5px; }
-.av-ser[hidden] { display: none !important; }
-.av-ser span { margin-right: 1.5px; padding: 0.5px 2px 0; background: rgba(5, 6, 6, 0.7); font-size: 8.5px; line-height: 8px; }
-.av-ser i { width: 13px; height: 13px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 0.9px var(--k, #f4f3ec), 0 1px 3px rgba(0, 0, 0, 0.7); background: #222; }
-.av-ser i.k0, .av-vem .k0 { --k: var(--gang-0); }
-.av-ser i.k1, .av-vem .k1 { --k: var(--gang-1); }
-.av-ser i.k2, .av-vem .k2 { --k: var(--gang-2); }
-.av-ser img, .av-vem img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.av-ser i span, .av-vem button > span { display: block; font-size: 7px; line-height: 13px; text-align: center; }
-/* den blå rutan: ingen bild, eller något att säga – i text-tv:ns stil */
+/* den blå rutan: ingen bild, och vad man kan göra – i text-tv:ns stil */
 .av-bla { position: absolute; inset: 0; display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 0 16px; background: radial-gradient(120% 100% at 50% 45%, #1834d8, #0d1c9a); text-align: center; }
 .av-bla[hidden] { display: none !important; }
 .av-bla p { margin: 0; }
 .av-rubrik { color: #fff23c; font-size: 15px; line-height: 1; letter-spacing: 0.3px; text-transform: uppercase; }
 .av-text { max-width: 150px; font-size: 11px; line-height: 1.05; }
-/* (inne i meningen: tv:ns b är annars block) */
-.av-text b { display: inline !important; font-weight: inherit; color: #45f1ff; }
-/* Vem är du?: porträtten med namnen under, som knappar */
-.av-vem { display: flex !important; gap: 9px; }
-.av-vem button { display: flex; flex-direction: column; align-items: center; gap: 3px; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-shadow: inherit; cursor: pointer; }
-.av-vem button > img, .av-vem button > span { width: 30px; height: 30px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 1.2px var(--k, #f4f3ec), 0 1px 4px rgba(0, 0, 0, 0.6); background: #222; transition: transform 0.15s; }
-.av-vem button b { font-weight: inherit; font-size: 10px; }
-.rum-tv3.nara .av-vem button:is(:hover, :focus-visible) > :is(img, span) { transform: scale(1.08); }
-.rum-tv3.nara .av-vem button:focus-visible { outline: none; }
-.rum-tv3.nara .av-vem button:focus-visible b { background: #1428e0; }
+/* Ring gänget, Gå med och Visa dig på tv:n: tv:ns cyan text med en ram, som ett val i en meny på skärmen */
+.tv-glas .av-val { margin: 0; padding: 2px 5px 1px; border: 0.75px solid #45f1ff; border-radius: 0; background: rgba(5, 12, 90, 0.35); color: #45f1ff; font: inherit; font-size: 11px; line-height: 1.05; text-shadow: inherit; cursor: pointer; }
+.rum-tv3.nara .tv-glas .av-val:is(:hover, :focus-visible) { outline: none; background: #45f1ff; color: #0d1c9a; text-shadow: none; }
 /* AV i grönt uppe till vänster en stund efter bytet, som tv:ns egen text */
 .av-osd { position: absolute; left: 9px; top: 7px; color: #5dff7a; font-size: 14px; font-weight: inherit; line-height: 1; letter-spacing: 0.5px; text-shadow: 1px 1px 0 #000, 0 0 2px rgba(80, 255, 120, 0.6); opacity: 0; pointer-events: none; }
 .rum-tv3.ingang .av-osd { animation: av-osd 3.2s steps(1) both; }

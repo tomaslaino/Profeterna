@@ -13,16 +13,16 @@
 //   "ping" → "pong" (svaras utan att rummet väcks)
 //
 // Samma tjänst håller gängets kupong i realtid (GET /kupong, worker/kupongen.mjs)
-// och för vidare det som behövs för att gänget ska se varandra på tv:n medan de
-// pratar i telefon (GET /bild, worker/bilden.mjs).
+// och samtalet, när gänget ringer varandra i Matchfixarna (GET /samtal och
+// /samtal/…, worker/samtalet.mjs).
 //
 // Driftsätts för hand: npx wrangler@4.147.0 deploy --config worker/rummet.toml
 
 import { giltigOmgang } from './kupongen.mjs';
-import { giltigVem, giltigtFonster } from './bilden.mjs';
+import { giltigVem, giltigtFonster } from './samtalet.mjs';
 
 export { Kupongen } from './kupongen.mjs';
-export { Bilden } from './bilden.mjs';
+export { Samtalet } from './samtalet.mjs';
 
 const GANG = new Set(['DL', 'DT', 'DJ']);
 const MOT = /^[a-z0-9]{1,16}$/;
@@ -30,20 +30,39 @@ const MAX = 40;
 // sidan på matchfixarna.se (och på GitHub Pages), och lokalt
 const ORIGIN = /^(https:\/\/(www\.)?matchfixarna\.se|https:\/\/tomaslaino\.github\.io|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/;
 
+// Samtalets aviseringar (web push) frågas utan websocket, från sidan och från
+// service workern (public/sw.js): samma ursprung, med CORS.
+const SAMTAL_HTTP = ['/samtal/nyckel', '/samtal/push', '/samtal/nu', '/samtal/inte'];
+const cors = (origin, r) => {
+  const h = new Headers(r.headers);
+  h.set('Access-Control-Allow-Origin', origin);
+  h.set('Vary', 'Origin');
+  return new Response(r.body, { status: r.status, headers: h });
+};
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    if (!['/rum', '/kupong', '/bild'].includes(url.pathname)) return new Response('Inte här', { status: 404 });
-    if (req.headers.get('Upgrade') !== 'websocket') return new Response('Bara websocket', { status: 426 });
     const origin = req.headers.get('Origin') || '';
+    if (SAMTAL_HTTP.includes(url.pathname)) {
+      if (!ORIGIN.test(origin)) return new Response('Fel ursprung', { status: 403 });
+      if (req.method === 'OPTIONS') {
+        return cors(origin, new Response(null, { status: 204, headers: { 'Access-Control-Allow-Methods': 'GET, POST', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400' } }));
+      }
+      if (!['GET', 'POST'].includes(req.method) || (req.method === 'GET') !== (url.pathname === '/samtal/nyckel')) return cors(origin, new Response('Fel metod', { status: 405 }));
+      if (Number(req.headers.get('Content-Length') || 0) > 8000) return cors(origin, new Response('För stort', { status: 413 }));
+      return cors(origin, await env.SAMTALET.get(env.SAMTALET.idFromName('ganget')).fetch(req));
+    }
+    if (!['/rum', '/kupong', '/samtal'].includes(url.pathname)) return new Response('Inte här', { status: 404 });
+    if (req.headers.get('Upgrade') !== 'websocket') return new Response('Bara websocket', { status: 426 });
     if (!ORIGIN.test(origin)) return new Response('Fel ursprung', { status: 403 });
     if (url.pathname === '/kupong') {
       if (!giltigOmgang(url.searchParams.get('id'))) return new Response('Fel omgång', { status: 400 });
       return env.KUPONGEN.get(env.KUPONGEN.idFromName('gangets-kupong')).fetch(req);
     }
-    if (url.pathname === '/bild') {
+    if (url.pathname === '/samtal') {
       if (!giltigVem(url.searchParams.get('vem')) || !giltigtFonster(url.searchParams.get('id'))) return new Response('Vem?', { status: 400 });
-      return env.BILDEN.get(env.BILDEN.idFromName('tv')).fetch(req);
+      return env.SAMTALET.get(env.SAMTALET.idFromName('ganget')).fetch(req);
     }
     const rum = env.RUMMET.get(env.RUMMET.idFromName('tobaksaffaren'));
     return rum.fetch(req);
