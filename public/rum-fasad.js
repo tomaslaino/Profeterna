@@ -111,10 +111,15 @@ window.RumFasad = (() => {
   const puts = (dag, natt, L) => U().farg.facade(dag, natt, L);
   const snoC = (L) => U().farg.sno(L);
 
-  // hur ljust det är inne (1 lysröret tänt … 0 släckt), och hur mycket rummet lyser ut (mer i mörker)
-  function inne(o) {
-    const n = Math.max(0, Math.min(1, o.natt ? o.natt() : 0));
-    return 1 - 0.78 * n;
+  // Hur ljust det är inne (1 fullt … 0 släckt), och hur mycket rummet lyser ut (mer i mörker). På kvällen
+  // (kvall: när dagsljuset går, som kvall i ljusKlockan i rum.js, där dunklet inne går runt lamporna) lyser
+  // lamporna dämpat (KVALL_INNE), och från elva dämpas lysröret vidare till natten (tant, RumFolk.nattGrad).
+  // Förut var rummet lika ljust en kväll som mitt på dagen, och lyste som en ljusbox ut i mörkret.
+  const KVALL_INNE = 0.5;
+  const kvall = (L) => 1 - sm(0.12, 0.45, L.dag);
+  const tant = (o) => 1 - 0.78 * Math.max(0, Math.min(1, o.natt ? o.natt() : 0));
+  function inne(o, L) {
+    return Math.min(tant(o), 1 - KVALL_INNE * kvall(L));
   }
 
   // ---------- himlen ----------
@@ -217,8 +222,9 @@ window.RumFasad = (() => {
   // Tipsligan och cigarettpaketen) till vänster och baren där Hasse Backe sitter till höger.
 
   function rummet(v, L, o) {
-    const ljus = inne(o);
+    const ljus = inne(o, L);
     const n = 1 - ljus;
+    const kv = kvall(L);
     const vagg = mix('#2a1a10', '#8a6440', ljus);
     const tak = mix('#120c08', '#4a3626', ljus);
     const disk = mix('#140c07', '#4a2c18', ljus);
@@ -235,7 +241,8 @@ window.RumFasad = (() => {
       // lysrör; spotskenan närmast glaset togs bort samma kväll som den kom, 2026-11-16)
       s += `<rect x="${X}" y="${Y}" width="${W}" height="${r1(H * 0.11)}" fill="${tak}"/>`;
       if (hela) {
-        const lampa = mix('#3a3a36', '#fff1d6', ljus);
+        // (kuporna lyser också när de är dämpade, varmare)
+        const lampa = mix('#3a3a36', mix('#fff1d6', '#ffd49a', kv), tant(o));
         const fx = X + W * 0.48;
         const fy = Y + H * 0.065;
         s += `<path d="M${r1(fx - W * 0.16)} ${r1(fy)} L${r1(fx + W * 0.16)} ${r1(fy + 3)}" stroke="#24160c" stroke-width="5" stroke-linecap="round"/>`;
@@ -261,7 +268,7 @@ window.RumFasad = (() => {
       return s;
     };
     const glod = (id, c, a) => `<radialGradient id="${id}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${c}" stop-opacity="${a}"/><stop offset=".5" stop-color="${c}" stop-opacity="${r1(a * 0.35)}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`;
-    let s = `<defs>${glod('rf-g-vit', '#fff6dc', 0.6)}${glod('rf-g-bla', '#6a8cff', 0.5)}${glod('rf-g-rod', '#ff3a26', 0.55)}<filter id="rf-inne-b" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter><filter id="rf-inne-h" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
+    let s = `<defs>${glod('rf-g-vit', mix('#fff6dc', '#ffd49a', kv), 0.6)}${glod('rf-g-bla', '#6a8cff', 0.5)}${glod('rf-g-rod', '#ff3a26', 0.55)}<filter id="rf-inne-b" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter><filter id="rf-inne-h" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
       <clipPath id="rf-inne-k"><rect x="${x}" y="${y}" width="${w}" height="${h}"/><rect x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}"/></clipPath></defs>`;
     s += `<g clip-path="url(#rf-inne-k)"><g filter="url(#rf-inne-b)">${ett(x - 10, y - 10, w + 20, h + 20, true)}${ett(d.x - 10, d.y - 10, d.w + 20, d.h + 20, false)}`;
     // Hasse Backe vid baren, en mörk gestalt i kostym genom dörren
@@ -279,7 +286,7 @@ window.RumFasad = (() => {
   // Det som hänger i fönstret framför gänget: skivan med löpsedlarna (baksidan, i ståltråd från karmen)
   // och neonskylten Tobak, som läses rätt härifrån (i ett eget lager: den glappar).
   function iFonstret(v, L, o) {
-    const ljus = inne(o);
+    const ljus = inne(o, L);
     const { x, y, w, h } = FON;
     // skivan: till höger inifrån, alltså till vänster härifrån
     const sx = x + w * 0.015;
@@ -312,7 +319,7 @@ window.RumFasad = (() => {
   // inne), droppar efter regn – små linser med mörk kant och en ljusprick – och några som har runnit och
   // lämnat ett spår, och frost i hörnen när det är kallare än −3°.
   function glaset(v, L, o) {
-    const ljus = inne(o);
+    const ljus = inne(o, L);
     const spegel = Math.min(0.62, 0.12 + 0.5 * L.dag) * (1 - 0.25 * ljus * (1 - L.dag));
     let s = `<defs><linearGradient id="rf-spegel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L.sky[0]}"/><stop offset=".45" stop-color="${L.sky[2]}" stop-opacity=".75"/><stop offset=".62" stop-color="${tone('#5a5048', L)}" stop-opacity=".45"/><stop offset="1" stop-color="${tone('#3a3a3c', L)}" stop-opacity=".6"/></linearGradient>
       <linearGradient id="rf-glans" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".2"/><stop offset=".58" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>`;
@@ -612,7 +619,7 @@ window.RumFasad = (() => {
   // lager på lager, så att det ritas lika fort i telefonen.
   function kvallsljus(V, v, L, o) {
     const mork = 1 - L.dag;
-    const ljus = inne(o);
+    const ljus = inne(o, L);
     const sk = SKYLT;
     const lampX = [sk.x + sk.w * 0.2 + 47, sk.x + sk.w * 0.8 - 47];
     let d = '<defs><radialGradient id="rf-glod" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff2d2" stop-opacity=".95"/><stop offset=".25" stop-color="#ffd08a" stop-opacity=".45"/><stop offset="1" stop-color="#ffb060" stop-opacity="0"/></radialGradient>' +
@@ -3574,7 +3581,7 @@ window.RumFasad = (() => {
   function sig(V, v, L, o) {
     return [V.x, V.y, V.w, V.h, v.slag, bucket(v.mangd, 5), v.snotackt, v.blott, v.advent, v.arstid, lovet(v), v.timme >> 1, v.nyar,
       bucket(L.dag, 20), bucket(L.sol, 10), bucket(L.guld, 10), bucket(L.m, 10), bucket(L.tand, 30), L.lampor, bucket(L.dimma, 5),
-      Math.round(v.temp), Math.round(v.vind / 3), bucket(inne(o), 10)].join();
+      Math.round(v.temp), Math.round(v.vind / 3), bucket(inne(o, L), 10)].join();
   }
 
   function svg(V, inner, cls = '') {
@@ -3649,7 +3656,7 @@ window.RumFasad = (() => {
         liv: lugn || !LIV() ? null : LIV().liv(V, v, L, livMatt()),
         N: lugn ? null : nederbord(V, v),
         // (ljuset där regnet faller, på kvällen: ljusKarta)
-        K: !lugn && (v.fall === 'regn' || v.fall === 'blandat') && L.dag < 0.95 ? ljusKarta(V, L, inne(o)) : null,
+        K: !lugn && (v.fall === 'regn' || v.fall === 'blandat') && L.dag < 0.95 ? ljusKarta(V, L, inne(o, L)) : null,
         vat: (L.wet || v.blott) && !v.snotackt,
         A: 1,
         dimma: L.dimma > 0.05 ? { c: mix('#2a2622', '#aeb3b6', L.dag), a: 0.32 * L.dimma } : null,
