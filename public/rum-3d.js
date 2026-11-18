@@ -9157,16 +9157,9 @@ export async function figurer(canvas, opt = {}) {
     const au = r.shadowMap.autoUpdate;
     r.shadowMap.autoUpdate = false;
     if (UTE.n++ % 4 === 0) r.shadowMap.needsUpdate = true;
-    // På kvällen lyser lamporna dämpat, som rummet bakom dem (inne i rum-fasad.js); inifrån gör dunklet
-    // samma sak (ljusKlockan i rum.js). Hela bilden, inte lamporna i scenen: det mesta av ljuset på gänget
-    // kommer från rummets miljö (scene.environment), och med bara lamporna dämpade blev de 7 % mörkare.
-    // (Natten är som förut: då är lysröret släckt, draw.)
-    const expo = r.toneMappingExposure;
-    r.toneMappingExposure = expo * (1 - KVALL_UTE * kvallNu * (1 - nattW(t)));
     try {
       draw(t, 0, 0, neonPa);
     } finally {
-      r.toneMappingExposure = expo;
       UTE.kam = null;
       UTE.neon = 1;
       catcher.visible = fang;
@@ -9389,9 +9382,6 @@ export async function figurer(canvas, opt = {}) {
   // Ljuset från fönstret efter dagsljuset ute (rum-ute.js), och kläderna:
   // den vars kläder (dress) har ändrats byggs om, och röken följer med.
   let hemiDag = 0.42;
-  // hur mycket det är kväll ute (0–1), och hur mycket mörkare gänget är då sett utifrån (utifran)
-  let kvallNu = 0;
-  const KVALL_UTE = 0.3;
   let vNu = opt.vader;
   // det som hör till högtiden på bordet (nyår: konfetti och serpentiner)
   let bordFest = { namn: undefined, g: null };
@@ -9410,7 +9400,6 @@ export async function figurer(canvas, opt = {}) {
     win.color.set('#ffb35c').lerp(new THREE.Color(L ? L.sky[2] : '#ffb35c'), dag);
     // på kvällen lyser neonen dem bakifrån (ljusKlockan i rum.js)
     const kv = 1 - Math.min(1, Math.max(0, (dag - 0.12) / 0.33));
-    kvallNu = kv;
     win.color.lerp(new THREE.Color('#ff5a48'), 0.55 * kv);
     win.intensity = 0.35 + 1.7 * dag + 0.25 * kv;
     hemiDag = 0.42 + 0.2 * dag;
