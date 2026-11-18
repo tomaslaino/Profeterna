@@ -489,8 +489,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   efter frågan varför han hade slutat läsa tidningen: "Gärna. O så tittar han upp precis när man kommer. Han har på
   sig glasögonen när han läser. Han ska ffa läsa helgarderat"):** han läste bara när det hade gått dåligt för honom,
   och mellan måndag kl. 16 och omgångens första matcher fanns inget som hade gått dåligt. Nu läser han också av
-  gammal vana: varannan gång man kommer läser han redan, och medan han väntar tar han tidningen då och då som kaffet
-  och cigarren. Läser han när man kommer tittar han upp på en just när kameran har stannat, alltid med glasögonen på.
+  gammal vana, och medan han väntar tar han tidningen då och då som kaffet och cigarren. Att han redan läser när man
+  kommer gör han bara ibland ("Det här gör han ibland - absolut inte alltid!"): var fjärde gång av vana och varannan
+  gång när det har gått dåligt (förut varannan gång och alltid). Läser han när man kommer tittar han upp på en just när
+  kameran har stannat, alltid med glasögonen på.
   Tre gånger av fyra är det Helgarderat, och det görs klart medan hans bild byggs, så att det finns redan då (se
   *Tidningen* under [Hasse Backe](#hasse-backe))
 
@@ -2217,10 +2219,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
 - **Hasse läser av vana och mest Helgarderat (2026-11-18, användarens önskemål):** "Han har slutat att läsa tidningen.
   Vet du varför?" – han läste bara när det hade gått dåligt för honom, så mellan omgångarna läste han aldrig. På
   förslaget att han ibland läser ändå, av vana: "Gärna. O så tittar han upp precis när man kommer. Han har på sig
-  glasögonen när han läser. Han ska ffa läsa helgarderat". Varannan gång man kommer läser han redan (`LAS_VANA`),
-  tidningen är en av hans vanor bredvid kaffet och cigarren (`VANA_TIDNING`), han tittar upp på en när kameran har
-  stannat (`kom` i klippen), och Helgarderat är tidningen tre gånger av fyra (`HG_ANDEL`). Se
-  [Hasse Backe](#hasse-backe), *Tidningen*.
+  glasögonen när han läser. Han ska ffa läsa helgarderat", och sedan: "Det här gör han ibland - absolut inte alltid!".
+  Han läser redan när man kommer var fjärde gång av vana (`LAS_VANA`) och varannan gång när det har gått dåligt
+  (`LAS_UPPTAGEN`; förut alltid), tidningen är en av hans vanor bredvid kaffet och cigarren (`VANA_TIDNING`), han
+  tittar upp på en när kameran har stannat (`kom` i klippen), och Helgarderat är tidningen tre gånger av fyra
+  (`HG_ANDEL`). Se [Hasse Backe](#hasse-backe), *Tidningen*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -10158,14 +10161,17 @@ utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
 tidningen, skyldig men nöjd med sig själv. Han läser den också av gammal vana (2026-11-18, användarens önskemål): har
-det inte gått dåligt läser han redan varannan gång man kommer (`LAS_VANA` i rum-hasse.js), och medan han väntar är
+det inte gått dåligt läser han redan var fjärde gång man kommer (`LAS_VANA` i rum-hasse.js), och medan han väntar är
 tidningen en av hans vanor, bredvid kaffet och cigarren, fast den lockar hälften så mycket (`VANA_TIDNING` i `vana`). Då
 blir det bara `lasa` och `lasa2`, där inget i tidningen säger att han hade fel (`VANA_LAS`). Läser han när man kommer,
 av vana eller för att det har gått dåligt, börjar klippet där han för första gången tittar upp på en över tidningen
 (`kom` i klippen: den första av bitarna `glimt`, `harJagFel` och `over`, `KOM` i
 [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Man ser honom läsa medan kameran svänger, och en halv sekund efter
 att den har stannat kommer ögonen upp på en, brynen åker upp och han ler. Förut började klippet där läsandet börjar
-(`LAS_START`), och det kunde dröja en halv minut innan han tittade upp. Han läser alltid med glasögonen på. Provat i
+(`LAS_START`), och det kunde dröja en halv minut innan han tittade upp. Det gör han bara ibland, aldrig alltid
+(användarens önskemål: "Det här gör han ibland - absolut inte alltid!"): också när det har gått dåligt håller han redan
+på med tidningen eller något annat bara varannan gång man kommer (`LAS_UPPTAGEN`; förut alltid), och annars tar han
+fram den efter en stund (`LAS_PAUS`). Han läser alltid med glasögonen på. Provat i
 headless Chromium med mjukvarugrafik i telefonens mått (412 × 915), med bilder från ankomsten med vanan och Helgarderat
 påtvingade, och med vanan medan han väntar. Han läser rad för rad, tittar upp
 över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen syns, nickar åt det som står,
@@ -10300,7 +10306,7 @@ när han inte har det: hakan upp, brynen ned, en bestämd nick, och leendet till
 - `naglar`: synar naglarna, blåser på dem och putsar dem mot kavajen. Ertappad blir handen ett pekfinger mot en, två
   stötar: har jag fel?
 
-Har man just kommit håller han redan på, strax före det man ertappar honom med (`fram` i `KLIPP`, `lasNu` i
+Har man just kommit håller han ibland redan på (`LAS_UPPTAGEN`), strax före det man ertappar honom med (`fram` i `KLIPP`, `lasNu` i
 [public/rum-hasse.js](public/rum-hasse.js)). Visslingen och andetagen räknas fram med Web Audio som de andra ljuden
 (`vissla` och `anda` i [public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), `ljud` i `KLIPP`) och hörs bara med ljudet
 på.

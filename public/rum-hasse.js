@@ -1651,9 +1651,10 @@ window.RumHasse = (() => {
     H.oppnar = false;
     H.T = 0;
     bronSnart(true);
-    // (har det gått dåligt för honom läser han redan när man kommer, och annars ibland av vana: LAS_VANA)
-    if (H.upptagen) lasNu();
-    else if (Math.random() < LAS_VANA) lasNu(true);
+    // (ibland läser han redan när man kommer, aldrig alltid: oftare när det har gått dåligt för honom, LAS_UPPTAGEN, än
+    // av vana, LAS_VANA; har det gått dåligt och han inte läser tar han fram tidningen efter en stund, LAS_PAUS)
+    if (Math.random() < (H.upptagen ? LAS_UPPTAGEN : LAS_VANA)) lasNu(!H.upptagen);
+    else if (H.upptagen) H.lasT = performance.now() + LAS_PAUS[0] + Math.random() * (LAS_PAUS[1] - LAS_PAUS[0]);
     // rummet står still medan man tittar åt hans håll, och rätar upp sig efter musen på vägen
     if (window.Rum && Rum.vila) Rum.vila(true);
     for (const w of H.world) Object.assign(w.style, { transition: 'transform 0.2s ease-out, translate 0.2s ease-out, rotate 0.2s ease-out', translate: 'none', rotate: 'none', transform: 'translateZ(-330px) rotateX(0deg) rotateY(0deg) translateZ(330px)' });
@@ -3184,12 +3185,13 @@ window.RumHasse = (() => {
   //
   // När det har gått dåligt för honom gömmer han sig bakom tidningen, skyldig men nöjd med sig själv: han
   // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
-  // just kommit läser han redan och tittar upp på en just när man är framme (kom i klippen). Tidningen är oftast
+  // just kommit läser han ibland redan (LAS_UPPTAGEN) och tittar upp på en just när man är framme (kom i klippen).
+  // Tidningen är oftast
   // Helgarderat (HG_ANDEL), annars dagens DN eller SvD (dagens i rum-hasse-tidning.js), och han läser alltid med
   // glasögonen på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den
   // direkt.
   // Han har fler sätt att verka upptagen (samma grupp lasa: raknar, tomKopp, slocknad, putsa, vissla, naglar),
-  // och i dem blir han ertappad och låtsas som ingenting; har man just kommit håller han redan på (fram).
+  // och i dem blir han ertappad och låtsas som ingenting; har man just kommit håller han ibland redan på (fram).
   // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
   // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
   const LAS_PAUS = [4000, 10000];
@@ -3201,7 +3203,10 @@ window.RumHasse = (() => {
   // Han läser också av gammal vana, utan att det har gått dåligt (2026-11-18, användarens önskemål): ibland läser han
   // redan när man kommer (LAS_VANA av gångerna), och medan han väntar tar han tidningen då och då som kaffet och
   // cigarren (vana, med vikten VANA_TIDNING). Då bara de klipp där inget i tidningen säger att han hade fel (VANA_LAS).
-  const LAS_VANA = 1 / 2;
+  // Att han redan läser när man kommer gör han bara ibland, också när det har gått dåligt (LAS_UPPTAGEN): "Det här gör
+  // han ibland - absolut inte alltid!" (2026-11-18; förut varannan gång av vana, och alltid när det hade gått dåligt).
+  const LAS_VANA = 1 / 4;
+  const LAS_UPPTAGEN = 1 / 2;
   const VANA_TIDNING = 0.5;
   const VANA_LAS = ['lasa', 'lasa2'];
   // Tidningen i ordning i hans figur: dagens tryck (en gång om dagen, och igen i en ny figur) och Helgarderat (när ett
