@@ -117,6 +117,11 @@
 // stort på morgonen, gnuggar ögonen och rullar på nacken, klappar sig på magen efter
 // lunch, nickar till på eftermiddagen och gäspar med handen för munnen på kvällen – och
 // sent på kvällen smittar gäspningen (gaspSmitta).
+// Det som händer i rummet får dem att reagera (handelse, 2026-11-18): pratar radion lyssnar den vars lag
+// det gäller (DL Sport 890, DJ P4 Göteborg) med handen bakom örat, och de andra rycker på axlarna åt
+// spanskan eller nickar; DT:s rök viftas bort av den bredvid; när neonskylten glappar tittar någon upp på
+// den; den som lämnar in får ölen höjd mot sig, och när alla är inne skålar de; och börjar det regna, snöa
+// eller åska vänder de sig om och tittar ut.
 // Dagen efter en omgång (efter) står en prinsesstårta på bordet och oraklet
 // har en papperskrona när det gick bra, och när det gick illa ligger DT:s
 // extraflaska omkullvält i en pöl och kupongen sönderriven i askkoppen.
@@ -125,7 +130,8 @@
 // partyhatt, påskkärringens huckle och midsommarens blomkrans.
 //
 // figurer(canvas, { calm, vader, detalj, spel, senast, rita }) → { draw(t, mx, my, neon), inne(vem, t), ute(vader),
-// lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), radio(på, t), radioPa(), spel({ lage, rank, ansikte }, t),
+// lage({ tv, nag }, t), mal({ dl: 1, dt: -1, dj: 0 }, t, sätt), radio(på, t), radioPrat(id | null, t), orsak(namn, vem, t, alla),
+// radioPa(), spel({ lage, rank, ansikte }, t),
 // nerver({ dl: { v, slag } }, t), slut({ dl: 1, dj: -1 }, t), senast(lage), uttryck(t),
 // prova(vem, påhitt, at), ga(vem, t, l), pekar(vem, [x, y, z] | null, t), spegel(vem | null, nx, ny, t),
 // hej(vem, t, ut), vald(vem, t), tecken(vem, t, namn), lappar(vem, t), lappVand(vem, ner, t), lappProva(vem, hållning, gör, at), natt(på, t), somn(på, t),
@@ -134,7 +140,8 @@
 // efter vädret (dress) och sätter ljuset från fönstret, lage säger om
 // matcherna pågår (tv) och hur nära spelstoppet är (nag 0–1), mal ett mål
 // (sätt: { dl: 0|1|2 }, annars efter tiden), radio sätter på radion eller stänger av den
-// (radioPa: är den på?), spel hur det går för kupongen
+// (radioPa: är den på?), radioPrat att stationen id pratar (rum-radio.js KANALER, null: tyst), orsak
+// prövar det som händer i rummet (?rum-orsak: 'inne' med vem, 'vader' med regn | sno | aska), spel hur det går för kupongen
 // (lage 'glad' | 'nerv' | 'deppig' | null, rank { dl: 1, dj: -1 }, ansikte när
 // allt är spelat), nerver hur spänd var och en är av matcherna som pågår (v 0–1, slag
 // 'haller' | 'jagar'; rum.js nerverLage), slut att en match man satt spänd i har blåsts av
@@ -4517,10 +4524,18 @@ export async function figurer(canvas, opt = {}) {
   // (stunden räknas en gång per varv)
   const LEDIG = new Map();
   function vanaNu(o, namn, t) {
+    const K = VANOR[namn][o.F.key];
+    if (!K) return null;
+    const x = vanaVarv(o, namn, Math.floor(t / K.per));
+    if (!x) return null;
+    const l = (t - x.t0) / x.s;
+    return l >= 0 && l < VANOR[namn].len ? { ...x, l } : null;
+  }
+  // varv n av vanan ({ t0, s, n, v }) eller null: det varvet blev det ingen (röken frågar efter DT:s bloss)
+  function vanaVarv(o, namn, n) {
     const V = VANOR[namn];
     const K = V[o.F.key];
     if (!K) return null;
-    const n = Math.floor(t / K.per);
     const nyckel = `${o.F.key}${namn}${n}`;
     let x = LEDIG.get(nyckel);
     if (x === undefined) {
@@ -4538,9 +4553,7 @@ export async function figurer(canvas, opt = {}) {
       LEDIG.set(nyckel, x);
       if (LEDIG.size > 60) LEDIG.delete(LEDIG.keys().next().value);
     }
-    if (!x) return null;
-    const l = (t - x.t0) / x.s;
-    return l >= 0 && l < V.len ? { ...x, l } : null;
+    return x;
   }
   function klunk(o, t) {
     const x = vanaNu(o, 'klunk', t);
@@ -5507,15 +5520,20 @@ export async function figurer(canvas, opt = {}) {
     // (inget tillsammans när det står och väger för gänget, nerverna)
     if (namn && nvAlla(t0) > 0.45) return null;
     if (!namn || (ALLA.has(namn) && !allaVakna(t0))) return null;
+    // (inte heller medan radion just har börjat prata fotboll: då lyssnar de, pratFarsk)
+    if (pratFarsk(t0)) return null;
     const l = t - t0;
     return l < AKTER[namn].len ? { namn, l, t0, n } : null;
   }
-  // och inte medan någon är borta
+  // och inte medan någon är borta – och när någon lämnar in eller vädret slår om (det som händer i rummet,
+  // ORS.lista) tonar det bort för alla tre
   function grupp(t) {
     const x = grupp0(t);
     if (!x) return null;
     const len = AKTER[x.namn].len;
-    return gaNu(x.t0) || gaNu(x.t0 + len / 2) || gaNu(x.t0 + len) ? null : x;
+    if (gaNu(x.t0) || gaNu(x.t0 + len / 2) || gaNu(x.t0 + len)) return null;
+    const s = listaStart(x.t0, x.t0 + len);
+    return s == null ? x : s > x.t0 ? { ...x, av: s } : null;
   }
   // Var och ens eget påhitt i luckan där t är (inte samtidigt som gänget gör något). Det börjar var
   // som helst i luckan där det får plats, och går olika fort (s: l är påhittets egen tid) och olika
@@ -5572,9 +5590,15 @@ export async function figurer(canvas, opt = {}) {
       // sången efter ett mål och från radion går före, och det som pågår när den börjar tonar bort (av)
       const f = tvingad(o, t);
       if (f) return f;
+      // och sedan det som händer i rummet (handelse): det egna påhittet tonar bort när det händer, och
+      // inget nytt börjar medan man reagerar (gängets påhitt väntar händelserna in, ledig)
+      const h = handelse(o, t);
+      if (h) return h;
       const x = grupp(t) || egen(o, t);
-      const s = x && tvingStart(x.t0, x.slut ?? x.t0 + AKTER[x.namn].len);
-      return s == null ? x : s > x.t0 ? { ...x, av: s } : null;
+      if (!x) return null;
+      const e = x.slut ?? x.t0 + AKTER[x.namn].len;
+      const s = Math.min(tvingStart(x.t0, e) ?? Infinity, x.n == null ? handStart(o, x.t0, e) ?? Infinity : Infinity);
+      return s === Infinity ? x : s > x.t0 ? { ...x, av: Math.min(s, x.av ?? Infinity) } : null;
     }
     const per = AKTER[pv.namn].len + 1.5;
     const l = (((t - pv.at) % per) + per) % per;
@@ -7114,6 +7138,298 @@ export async function figurer(canvas, opt = {}) {
       return { ...ut, ...se, pitch: ut.pitch + 0.08 * emot, yaw: 0.08 * Math.sin(l * 8) * emot + 0.12 * Math.sin(l * 8) * efter, breath: ut.breath - 0.02 * emot };
     },
     gasp: (o, t, l, x) => gaspMun(l - gaspFor(x, o)),
+  };
+
+  // ---------- det som händer i rummet ----------
+  // (2026-11-18, användarens önskemål: "olika logiska animationer") Påhitten ovan kommer av sig själva, ur
+  // luckorna och humöret. Här är rörelser med en orsak som man ser eller hör i rummet, och de kommer när
+  // orsaken kommer:
+  // - radion pratar (radioPrat, från rum-radio.js): på Sport 890 lyssnar DL (Nacional, Montevideo) med
+  //   handen bakom örat, och de andra tittar på honom och rycker på axlarna åt spanskan; på P4 Göteborg
+  //   lyssnar DJ (IFK) och de andra tittar på honom och nickar; på talkSPORT lyssnar de en i taget, och
+  //   någon nickar eller skakar på huvudet åt det som sägs; på P1 lyssnar någon ibland och någon gäspar.
+  //   Slutar pratet slutar de lyssna.
+  // - röken (rokPlan): när DT blåser ut röken viftar den ena bredvid ibland bort den och vänder sig
+  //   undan, och hostar ibland till.
+  // - neonskylten (neonPlan, samma tider som neonOn i rum.js): när den glappar tittar den som har den
+  //   snett bakom sig ibland upp på den och skakar på huvudet.
+  // - inlämningen (inne): de andra vänder sig mot den som lämnar in och höjer ölen (DT cigaretten) med
+  //   en nick, och när alla tre har lämnat in skålar de.
+  // - vädret (ute): när det börjar regna, snöa eller åska vänder de sig om och tittar ut, en i taget; i
+  //   regnet skakar den tredje på huvudet.
+  // Var och en reagerar bara vaken, inne och ledig: inte medan gänget gör något tillsammans, sjunger eller
+  // dansar, eller när hen går iväg (ledig). Radion, inlämningen och vädret går före det man själv har för
+  // sig, som tonar bort (handStart i aktRa); röken och neonen bara när man inte gör något annat. Allt
+  // räknas ur klockan och sparas per orsak (ORS_MINNE), så att samma tid ger samma bild. Bara bålen,
+  // huvudet och händerna som redan finns rör sig: inga nya delar.
+  // ORS: lista – händelserna som har kommit utifrån ({ k, namn, orsak, t0, mot }: vem, påhittet, när det
+  // hände och när hen reagerar, och vem hen reagerar på), radio – pratet på radion ({ id, fran, till }).
+  const ORS = { lista: [], radio: { id: null, fran: -1e9, till: -1e9 } };
+  const ORS_MINNE = new Map();
+  const RADIO_SE = new THREE.Vector3(RADIO_PLATS.x, SILL + 28, RADIO_PLATS.z);
+  // neonskylten i fönstret (rum-inredning.js: skylten ovanför gänget till vänster)
+  const NEON_SE = new THREE.Vector3(-420, 270, -150);
+  // vaken, inne och inte på väg att vakna (vid t)
+  const vakenInne = (o, t) => ready(o, t) > 0.99 && sovW(o, t) < 0.01 && groggW(o, t) < 0.05 && !vaknaNu(o, t);
+  // o kan reagera mellan a och b: vaken och inne, och gänget gör inget tillsammans (utom när det får ge vika,
+  // overGrupp), ingen sång eller dans, och o går inte iväg – och (egna) har inget eget påhitt för sig
+  function ledig(o, a, b, egna, overGrupp = false) {
+    if ((opt.calm && !STILL) || Object.keys(PROV).length) return false;
+    for (let s = a; s < b + 0.25; s += 0.5) {
+      const g = gaNu(s);
+      if (!vakenInne(o, s) || (!overGrupp && grupp(s)) || tvingad(o, s) || (g && g.o === o) || (egna && egen(o, s))) return false;
+    }
+    return true;
+  }
+  // när något i listan händer någon mellan a och b, första gången (eller a om det redan pågår), eller null:
+  // gängets påhitt ger vika för det (grupp)
+  function listaStart(a, b) {
+    let s = Infinity;
+    for (const h of ORS.lista) if (h.orsak < b && slutAv(h) > a) s = Math.min(s, Math.max(a, h.orsak));
+    return s === Infinity ? null : s;
+  }
+  // radion har pratat fotboll en kort stund (RPRAT.farsk sekunder) vid t: då lyssnar de, och gänget börjar
+  // inget tillsammans (P1 är bara i bakgrunden)
+  const pratFarsk = (t) => {
+    const R = ORS.radio;
+    return Boolean(R.id && R.id !== 'p1' && t >= R.fran && t < Math.min(R.till, R.fran + RPRAT.farsk));
+  };
+  const slutAv = (h) => h.t0 + AKTER[h.namn].len;
+  // Det som kan vara på gång för o kring t, det som går före först: listan, radion, röken och neonen.
+  function handelser(o, t) {
+    const ut = ORS.lista.filter((h) => h.k === o.F.key && h.orsak < t + 20 && slutAv(h) > t - 20);
+    const R = ORS.radio;
+    // (när pratet har slutat står id kvar en stund, så att det som pågick tonar bort, av)
+    if (R.id && t < R.till + RPRAT.slot) {
+      const k = Math.floor((t - R.fran - RPRAT.in) / RPRAT.slot);
+      for (const j of [k - 1, k]) {
+        const h = j >= 0 && pratLucka(j)[o.F.key];
+        if (h) ut.push(R.till < slutAv(h) ? { ...h, av: R.till } : h);
+      }
+    }
+    if (o.F.key !== 'dt') {
+      const n = Math.floor(t / VANOR.bloss.dt.per);
+      for (const j of [n - 1, n]) {
+        const h = iMinnet(ORS_MINNE, `rok${j}`, () => rokPlan(j));
+        if (h && h.k === o.F.key) ut.push(h);
+      }
+    }
+    const n = Math.floor(t / GLAPP.per);
+    for (const j of [n - 1, n]) {
+      const h = iMinnet(ORS_MINNE, `neon${j}`, () => neonPlan(j));
+      if (h && h.k === o.F.key) ut.push(h);
+    }
+    return ut;
+  }
+  // Det o gör vid t för något som har hänt ({ namn, l, t0, orsak, … } som påhitten) eller null. Det som går
+  // före och händer medan man reagerar på något annat får det att tona bort (av).
+  function handelse(o, t) {
+    if (opt.calm && !STILL) return null;
+    const alla = handelser(o, t);
+    for (let i = 0; i < alla.length; i++) {
+      const h = alla[i];
+      const slut = slutAv(h);
+      if (t < h.t0 || t >= slut) continue;
+      let av = h.av ?? Infinity;
+      for (let j = 0; j < i; j++) {
+        const g = alla[j];
+        if (g.orsak < slut && slutAv(g) > h.orsak) av = Math.min(av, Math.max(h.orsak, g.orsak));
+      }
+      if (av <= h.t0) continue;
+      return { ...h, l: t - h.t0, ...(av < slut ? { av } : {}) };
+    }
+    return null;
+  }
+  // När något händer o mellan a och b, första gången (eller a om det redan pågår), eller null.
+  function handStart(o, a, b) {
+    if (opt.calm && !STILL) return null;
+    let s = Infinity;
+    for (const h of handelser(o, (a + b) / 2)) if (h.orsak < b && slutAv(h) > a) s = Math.min(s, Math.max(a, h.orsak));
+    return s === Infinity ? null : s;
+  }
+  // en händelse utifrån i listan, om hen är ledig för den (det egna påhittet och gängets tonar bort)
+  function lagg(h) {
+    const o = figur(h.k);
+    if (!o || !ledig(o, h.orsak, slutAv(h), false, true)) return false;
+    ORS.lista = ORS.lista.filter((g) => slutAv(g) > h.orsak - 60);
+    ORS.lista.push(h);
+    return true;
+  }
+  // Kroppen mot punkten P (k 0–1): med blicken (se) där den räcker, och när P är för långt bakom en
+  // (radion bakom den som sitter till höger, skylten bakom den som sitter bakom bordet) med bålen och
+  // huvudet vridna över axeln åt det hållet, och blicken upp eller ner dit.
+  function motPunkt(o, P, k) {
+    const L = aim(o, P);
+    if (Math.abs(L.yaw) < 1.9) return { se: P, seW: k };
+    const sg = Math.sign(L.yaw);
+    return { twist: sg * 0.4 * k, yaw: sg * 1.2 * k, pitch: Math.max(-0.35, Math.min(0.3, L.pitch)) * k };
+  }
+
+  // Radion pratar: luckor om RPRAT.slot sekunder från att pratet började, och i varje lucka (pratLucka) vem
+  // som lyssnar och vem som reagerar på det, efter stationen. Sparas per lucka. De första RPRAT.farsk
+  // sekunderna lyssnar de mest; sedan har det nya lagt sig, och de lyssnar bara ibland (RPRAT.sen).
+  const RPRAT = { slot: 13, in: 2.5, farsk: 90, sen: 0.5 };
+  function pratLucka(k) {
+    const R = ORS.radio;
+    return iMinnet(ORS_MINNE, `prat${R.id}${R.fran}:${k}`, () => pratPlan(R.id, k, R.fran + RPRAT.in + k * RPRAT.slot));
+  }
+  function pratPlan(id, k, orsak) {
+    const plan = {};
+    if (orsak >= ORS.radio.till) return plan;
+    const r = (i) => hash(orsak * 0.37 + k * 1.93 + i * 0.71);
+    const ny = (p) => (pratFarsk(orsak) ? p : p * RPRAT.sen);
+    const ta = (i, namn, t0, x = {}) => {
+      const o = figs[i];
+      if (!o || plan[o.F.key] || !ledig(o, orsak, t0 + AKTER[namn].len, false)) return null;
+      return (plan[o.F.key] = { k: o.F.key, namn, orsak, t0, ...x });
+    };
+    const annan = (i, x) => (i + 1 + Math.floor(x * 2)) % 3;
+    if (id === 'sport' || id === 'p4g') {
+      // (hans eget lag: DL Nacional på Sport 890, DJ IFK på P4 Göteborg)
+      const i = FIGS.findIndex((F) => F.key === (id === 'sport' ? 'dl' : 'dj'));
+      const h = r(0) < ny(0.85) ? ta(i, 'lyssnar', orsak + 0.9 + 1.5 * r(1)) : null;
+      if (h && r(2) < 0.6) ta(annan(i, r(3)), id === 'sport' ? 'ryckerAt' : 'tittarPa', h.t0 + 2.2 + r(4), { mot: i });
+    } else if (id === 'talksport') {
+      const i = Math.floor(r(0) * 3);
+      const h = r(1) < ny(0.85) ? ta(i, 'lyssnar', orsak + 0.9 + 1.5 * r(2)) : null;
+      if (h && r(3) < 0.5) ta(annan(i, r(4)), r(5) < 0.55 ? 'haller' : 'skakar', h.t0 + 3 + r(6), { mot: i });
+    } else if (id === 'p1') {
+      const i = Math.floor(r(0) * 3);
+      if (r(1) < 0.4) ta(i, 'lyssnar', orsak + 0.9 + 2 * r(2));
+      if (r(3) < 0.3) ta(annan(i, r(4)), 'gaspa', orsak + 0.9 + 4 * r(5));
+    }
+    return plan;
+  }
+  // Röken: när DT blåser ut röken efter ett bloss (blossUt) viftar den ena av de andra ibland bort den,
+  // ungefär vart femte bloss (DT:s varv n, vanaVarv).
+  const ROKEN = { chans: 0.2 };
+  function rokPlan(n) {
+    if (hash(n * 3.31 + 0.47) > ROKEN.chans) return null;
+    const dt = figur('dt');
+    const x = dt && vanaVarv(dt, 'bloss', n);
+    if (!x) return null;
+    const e = x.v < 0.2 ? 0.8 : x.v > 0.8 ? -0.4 : 0;
+    const orsak = x.t0 + (3.2 + e) * x.s;
+    const g = gaNu(orsak);
+    if (!vakenInne(dt, orsak) || (g && g.o === dt)) return null;
+    const o = figs.filter((f) => f !== dt)[Math.floor(hash(n * 1.77 + 0.2) * 2)];
+    const t0 = orsak + 0.55;
+    if (!ledig(o, orsak - 0.5, t0 + AKTER.viftar.len, true)) return null;
+    return { k: o.F.key, namn: 'viftar', orsak, t0, mot: FI(dt), host: hash(n * 2.9 + 0.1) < 0.5 };
+  }
+  // Neonskylten glappar i varje varv om 23 sekunder, länge från 6,2 sekunder in (neonOn i rum.js). Ungefär vart
+  // sjätte varv tittar den som sitter till höger (skylten snett bakom till vänster) eller bakom bordet upp på den.
+  const GLAPP = { per: 23, glapp: 6.25, chans: 0.16 };
+  function neonPlan(n) {
+    if (hash(n * 4.71 + 0.13) > GLAPP.chans) return null;
+    const plats = hash(n * 2.07 + 0.9) < 0.7 ? PLATSER[2] : PLATSER[1];
+    const o = figs.find((f) => f.F.plats === plats);
+    const orsak = n * GLAPP.per + GLAPP.glapp;
+    const t0 = orsak + 0.3;
+    if (!o || !ledig(o, orsak - 0.5, t0 + AKTER.neonKik.len, true)) return null;
+    return { k: o.F.key, namn: 'neonKik', orsak, t0 };
+  }
+  // Inlämningen: de andra höjer ölen mot den som lämnade in, en i taget, och när alla tre är inne skålar de
+  // när hen har tagit sin första klunk (after).
+  function inneOrsak(o, t, alla = figs.every((f) => f.inneAt !== Infinity)) {
+    const j = FI(o);
+    figs.forEach((f, i) => {
+      if (f !== o) lagg({ k: f.F.key, namn: 'inneHej', orsak: t + 0.2, t0: t + 1.1 + 0.45 * ((i - j + 3) % 3), mot: j });
+    });
+    if (alla) for (const f of figs) lagg({ k: f.F.key, namn: 'skal', orsak: t + 7.4, t0: t + 8.3 });
+  }
+  // Vädret slår om: tittar ut en i taget, och i regnet skakar den tredje på huvudet.
+  const FALL = { dugg: 'regn', regn: 'regn', skurar: 'regn', snoblandat: 'sno', sno: 'sno', aska: 'aska' };
+  function vaderOrsak(fall, t) {
+    const f = t * 1.37 % 97;
+    blandad([0, 1, 2], f).forEach((i, n) => {
+      const o = figs[i];
+      const t0 = t + 1.2 + n * (0.7 + 0.6 * hash(f + n));
+      if (n < 2 || fall !== 'regn') lagg({ k: o.F.key, namn: 'tittarUt', orsak: t + 0.3, t0 });
+      else lagg({ k: o.F.key, namn: 'skakar', orsak: t + 0.3, t0: t0 + 1.4 });
+    });
+  }
+
+  // vem o reagerar på (x.mot), och när det provas utan (?rum-akt) DT – eller, för DT, den bredvid
+  const motVem = (o, x) => x.mot ?? (o.F.key === 'dt' ? (FI(o) + 1) % 3 : FI(figur('dt')));
+  // Lyssnar på radion: vänd mot den, lite framåt med huvudet på sned och den lediga handen bakom örat, och
+  // nickar sakta två gånger åt det som sägs.
+  AKTER.lyssnar = {
+    len: 8, in: 1.0, ut: 1.2,
+    hand: (o, A) => {
+      if (A !== fri(o)) return null;
+      const s = A.s;
+      const P = o.F.head;
+      const d = huvudAxlar(o);
+      return handflata(o, inHead(o, new THREE.Vector3(s * P.rx * 0.94, -P.ry * 0.1, -P.rz * 0.08)), d(s * 0.12, 1, 0.12), d(s * 0.35, 0, -1), new THREE.Vector3(s, -0.5, 0));
+    },
+    kropp: (o, t, l) => {
+      const k = bump(l, 0.3, 1.1, 6.4, 7.6);
+      const nick = 0.07 * (bump(l, 3.0, 3.25, 3.4, 3.7) + bump(l, 4.7, 4.95, 5.1, 5.4));
+      const m = motPunkt(o, RADIO_SE, k);
+      return { ...m, lean: 0.07 * k, roll: -fri(o).s * 0.1 * k, pitch: (m.pitch || 0) + nick };
+    },
+  };
+  // Tittar på den som lyssnar (x.mot) och rycker på axlarna, med handflatan upp (axlar): spanskan.
+  AKTER.ryckerAt = {
+    len: 4.8, in: 0.6, ut: 0.9,
+    hand: (o, A, t, l) => {
+      if (A !== fri(o)) return null;
+      const k = bump(l, 1.2, 1.7, 2.7, 3.4);
+      return k > 0 ? lerpPose(handRest(o, A, t), AKTER.axlar.hand(o, A, t, 1.2), k) : null;
+    },
+    kropp: (o, t, l, x) => {
+      const k = bump(l, 1.3, 1.75, 2.6, 3.3);
+      return { se: huvudPa(motVem(o, x)), seW: bump(l, 0, 0.4, 3.6, 4.5), lift: 3.2 * k, roll: fri(o).s * 0.1 * k, pitch: 0.05 * k, breath: 0.03 * k };
+    },
+  };
+  // Tittar på den som lyssnar (x.mot), med huvudet lite på sned, och nickar en gång.
+  AKTER.tittarPa = {
+    len: 3.8, in: 0.5, ut: 0.9,
+    kropp: (o, t, l, x) => ({ se: huvudPa(motVem(o, x)), seW: bump(l, 0, 0.4, 2.8, 3.6), pitch: 0.08 * bump(l, 1.4, 1.6, 1.7, 2.1), roll: 0.05 * bump(l, 0.4, 0.9, 2.6, 3.3) }),
+  };
+  // Håller med radion: tittar på den och nickar två gånger, bestämt.
+  AKTER.haller = {
+    len: 4.2, in: 0.5, ut: 0.9,
+    kropp: (o, t, l) => {
+      const m = motPunkt(o, RADIO_SE, bump(l, 0, 0.45, 3.0, 3.9));
+      return { ...m, lean: 0.04, pitch: (m.pitch || 0) + 0.1 * (bump(l, 1.2, 1.4, 1.5, 1.85) + bump(l, 1.85, 2.05, 2.15, 2.5)) };
+    },
+  };
+  // Viftar bort röken: den lediga handen fram och tillbaka framför ansiktet, med ansiktet bort från den som
+  // blåste den (x.mot) och lite bakåt – och (x.host) två korta hostningar.
+  AKTER.viftar = {
+    len: 4.4, in: 0.45, ut: 0.9,
+    hand: (o, A, t, l) => {
+      if (A !== fri(o)) return null;
+      const s = A.s;
+      const d = huvudAxlar(o);
+      const v = Math.sin((l - 0.45) * 10.5) * bump(l, 0.35, 0.7, 2.5, 3.1);
+      const P = mouthIn(o).addScaledVector(d(0, 0, 1), 11).addScaledVector(d(1, 0, 0), s * 2 + 9 * v).addScaledVector(d(0, 1, 0), 6);
+      return handflata(o, P, d(0.25 * v, 1, 0.15), d(s, 0, 0.1), new THREE.Vector3(s, -0.8, 0));
+    },
+    kropp: (o, t, l, x) => {
+      const h = headIn(o);
+      const bort = h.clone().sub(huvudPa(motVem(o, x))).setY(0).normalize().multiplyScalar(240).add(h);
+      bort.y = h.y - 30;
+      let r = 0;
+      if (x.host) for (const a of [2.5, 2.9]) r += bump(l, a, a + 0.05, a + 0.1, a + 0.3);
+      return { se: bort, seW: 0.8 * bump(l, 0.2, 0.6, 2.8, 3.6), lean: -0.05 + 0.06 * r, pitch: 0.1 * r, lift: -1 * r, breath: -0.03 * r };
+    },
+  };
+  // Tittar upp på neonskylten som glappar, och skakar lite på huvudet åt den.
+  AKTER.neonKik = {
+    len: 5.2, in: 0.5, ut: 1.1,
+    kropp: (o, t, l) => {
+      const m = motPunkt(o, NEON_SE, bump(l, 0.05, 0.55, 2.9, 4.2));
+      return { ...m, lean: -0.03, yaw: (m.yaw || 0) + 0.12 * Math.sin((l - 2.2) * 11) * bump(l, 2.1, 2.3, 2.8, 3.1) };
+    },
+  };
+  // Höjer ölen (DT cigaretten) mot den som just lämnade in (x.mot), med en stöt och en nick.
+  AKTER.inneHej = {
+    len: 4.4, in: 0.6, ut: 1.1,
+    hand: (o, A, t, l) => (A === skalArm(o) ? motMitten(o, A, bump(l, 1.2, 1.35, 1.5, 1.9)) : null),
+    kropp: (o, t, l, x) => ({ se: huvudPa(motVem(o, x)), seW: bump(l, 0, 0.35, 3.4, 4.3), lean: 0.06 * bump(l, 0.3, 0.9, 2.8, 3.6), pitch: 0.12 * bump(l, 1.2, 1.35, 1.5, 1.9) }),
   };
 
   // ---------- dansen ----------
@@ -9114,7 +9430,15 @@ export async function figurer(canvas, opt = {}) {
       sk.o = o;
     }
     for (const p of puffs) { p.born.clear(); p.fore = p.fore2 = null; }
+    // (börjar det regna, snöa eller åska medan sidan är öppen tittar de ut: det som händer i rummet)
+    if (v) {
+      const fall = FALL[v.slag] || null;
+      if (fallNu !== undefined && fall && fall !== fallNu && lastT != null) vaderOrsak(fall, lastT);
+      fallNu = fall;
+    }
   }
+  // nederbörden som det var sist (FALL), undefined innan vädret är känt
+  let fallNu;
   ute(opt.vader);
 
   // Vem som har lämnat in ({ dl: true, dt: false, … }; den som saknas är
@@ -9122,6 +9446,7 @@ export async function figurer(canvas, opt = {}) {
   // blir inne sedan lägger ifrån sig kupongen och tar ölen eller cigaretten.
   let told = false;
   function inne(vem, t) {
+    const nyss = [];
     for (const o of figs) {
       const v = vem[o.F.key] !== false;
       if (!v) o.inneAt = Infinity;
@@ -9130,9 +9455,12 @@ export async function figurer(canvas, opt = {}) {
         // (den som lämnar in mitt i natten vaknar)
         vakna(o, t);
         o.inneAt = t;
+        nyss.push(o);
       }
     }
     told = true;
+    // (de andra höjer ölen mot hen, och skålar när alla är inne: det som händer i rummet)
+    for (const o of nyss) inneOrsak(o, t);
   }
 
   // Matcherna och spelstoppet ({ tv, nag }): första gången som det är, sedan
@@ -9179,6 +9507,23 @@ export async function figurer(canvas, opt = {}) {
       R.till = Infinity;
       RADIO_K.clear();
     } else R.till = t;
+  }
+  // Prat på radion (id: stationen i rum-radio.js, null när det inte hörs längre, från t): någon lyssnar
+  // (pratPlan). Det som pågår när det tystnar tonar bort.
+  function radioPrat(id, t) {
+    const R = ORS.radio;
+    const nu = R.id && t < R.till ? R.id : null;
+    if ((id || null) === nu) return;
+    if (id) Object.assign(R, { id, fran: t, till: Infinity });
+    else R.till = t;
+  }
+  // Prova det som händer i rummet, för bilder (?rum-orsak): 'inne' att vem lämnar in (de andra höjer
+  // ölen; alla = alla tre är inne och skålar), 'vader' att det börjar regna, snöa eller åska (vem: regn,
+  // sno, aska), vid t.
+  function orsak(namn, vem, t, alla = false) {
+    if (namn === 'vader' && ['regn', 'sno', 'aska'].includes(vem)) vaderOrsak(vem, t);
+    const o = namn === 'inne' ? figur(String(vem).toLowerCase()) : null;
+    if (o) inneOrsak(o, t, alla);
   }
 
   // Hur det går för gängets kupong ({ lage: 'glad' | 'nerv' | 'deppig' | null,
@@ -9554,5 +9899,5 @@ export async function figurer(canvas, opt = {}) {
   // syns de som de är ritade och glider sedan över
   await Promise.race([kanKlar(opt.nu ? opt.nu() : 0), new Promise((ok) => setTimeout(ok, 2500))]).catch(() => {});
   ANS.ute = true;
-  return { draw, utifran, lana, inne, ute, lage, mal, radio, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, nerver, slut, senast, uttryck: (t) => kanKlar(t ?? KAN.t), prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
+  return { draw, utifran, lana, inne, ute, lage, mal, radio, radioPrat, orsak, radioPa: () => SJUNG.radio.pa, radioLage, radioEtiketter, radioDetalj, narbild, radioRuta, radioDelar, radioP, radioEtikett, spel, nerver, slut, senast, uttryck: (t) => kanKlar(t ?? KAN.t), prova, ga, pekar, spegel, hej, vald, tecken, lappar, lappVand, lappProva, natt, somn, vakna: vakna1, efter, under, huvud, kval };
 }

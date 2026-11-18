@@ -21,7 +21,8 @@
 // svara provas reservadressen och sedan samma adress utan Web Audio (A.fri), så att en station som
 // har bytt server ändå hörs. Ljudet måste sättas igång av ett tryck, och det gör reglagen och lappen. Gänget sjunger och dansar till musik (fig.radio), inte till
 // brus eller prat, och slutar inte förrän fyra sekunder efter att musiken har försvunnit: den som drar i
-// spaken ska inte få dem att börja om. Radion stängs av när man lämnar rummet (av).
+// spaken ska inte få dem att börja om. Pratar en station som hörs lyssnar de (fig.radioPrat, 2026-11-18). Radion
+// stängs av när man lämnar rummet (av).
 //
 //   RumRadio.mount({ el, fig, now, inr, sak })  när gänget har laddats (inr: inredningen med bladet,
 //                                        sak(namn): kameran går fram till något)
@@ -89,7 +90,7 @@ window.RumRadio = (() => {
   // visaren: den går mot mal (N.mal) med lite tröghet, och ljudet följer den
   const N = { mal: S.p, raf: 0, sen: 0, drag: false };
   // ljudet (A.ctx först efter ett tryck)
-  const A = { ctx: null, el: null, fri: null, friPa: false, steg: 0, kanal: null, klar: false, fick: null, narmast: null, s: 0, fade: 1, las: 0, slapp: 0, gangT: 0, gang: false, omT: 0, fel: {}, basSn: 0 };
+  const A = { ctx: null, el: null, fri: null, friPa: false, steg: 0, kanal: null, klar: false, fick: null, narmast: null, s: 0, fade: 1, las: 0, slapp: 0, gangT: 0, gang: false, prat: null, omT: 0, fel: {}, basSn: 0 };
 
   function narmast(band, f) {
     let bast = null;
@@ -340,8 +341,16 @@ window.RumRadio = (() => {
     } else if (A.gang && !A.gangT) {
       A.gangT = setTimeout(() => { A.gangT = 0; gangSatt(false); }, 4000);
     }
+    // (prat på en station som hörs: gänget lyssnar, fig.radioPrat – den vars lag det gäller mest)
+    pratSatt(pa && k && !k.musik && hors && s > 0.5 ? k.id : null);
     till3d({ s: hors ? s * (S.band === 'am' ? 0.45 + 0.55 * A.fade : 1) : s * 0.12 });
     lappNu();
+  }
+  function pratSatt(id) {
+    if (A.prat === id) return;
+    A.prat = id;
+    const g = fig();
+    if (g && g.radioPrat) g.radioPrat(id, O.now());
   }
   // Hur mycket som hörs just nu, till lysdioderna och högtalarna (rum-3d.js, radioRita).
   function niva() {
