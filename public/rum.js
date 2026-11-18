@@ -2936,6 +2936,20 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     R.fig.radio(true, now() - (Number(R.q.get('rum-radio')) || 0));
   }
 
+  // ?rum-orsak=inne:dt: det som händer i rummet, för bilder (rum-3d.js, handelse) – inne:dt att DT lämnar in
+  // (inne:dt:alla: och alla tre är inne, så att de skålar), vader:regn, vader:sno eller vader:aska att det börjar,
+  // och radio:sport, radio:p4g, radio:talksport eller radio:p1 att stationen pratar. Vid tiden 0 med ?rum-t,
+  // annars genast och sedan var tjugonde sekund (radion pratar hela tiden, med ?rum-t sedan sex sekunder).
+  function provOrsak() {
+    const v = R.q.get('rum-orsak');
+    if (!v || !R.fig || !R.fig.orsak) return;
+    const [namn, vem, alla] = v.split(':').map((y) => y.trim());
+    if (namn === 'radio') { R.fig.radioPrat(vem, now() - (still() ? 6 : 0)); return; }
+    const go = () => R.fig.orsak(namn, vem, still() ? 0 : now(), alla === 'alla');
+    go();
+    if (!still()) setInterval(() => { if (R.on) go(); }, 20000);
+  }
+
   // ?rum-lapp=dl:kinden:kolla@2: hur skylten hålls, för bilder (rum-3d.js, LAPP_HALL i rum-tecken.js).
   function provLapp() {
     const v = R.q.get('rum-lapp');
@@ -3705,6 +3719,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         provMal();
         provSlut();
         provAkt();
+        provOrsak();
         provLapp();
         provGa();
         provRadio();

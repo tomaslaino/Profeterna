@@ -510,6 +510,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   passande rörelser lika snygga som tidigare"):** sex nya småsaker: rättar till slipsen, stryker sig om hakan,
   gäspar bakom handen, hälsar med två fingrar mot baren, sopar ihop askan och pekar på en som med en pistol (se
   *Vilan* under [Hasse Backe](#hasse-backe))
+- [x] **Gänget reagerar på det som händer i rummet (2026-11-18, användarens önskemål: "Lägg till olika logiska
+  animationer på matchfixarna!"):** rörelser med en orsak man ser eller hör. Pratar radion lyssnar den vars lag det
+  gäller – DL på Sport 890, DJ på P4 Göteborg – med handen bakom örat, och de andra rycker på axlarna åt spanskan eller
+  nickar; på talkSPORT lyssnar de en i taget och någon nickar eller skakar på huvudet, och P1 får någon att gäspa. När
+  DT blåser ut röken viftar den bredvid ibland bort den, när neonskylten glappar tittar någon upp på den, den som
+  lämnar in får ölen höjd mot sig och när alla tre är inne skålar de, och börjar det regna, snöa eller åska vänder de
+  sig om och tittar ut (se *Det som händer i rummet* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -4971,6 +4978,40 @@ ungefär 1 % av bildens hela arbete, och med processorn fyra gånger långsammar
 8–13 enheter mellan två bilder, mot 14–20 i de gamla. Största hoppet mellan två bilder under tio
 minuter är detsamma som förut, och det kommer från de gamla påhitten.
 
+**Det som händer i rummet** (2026-11-18, `handelse`, `ORS` och `ledig` i rum-3d.js; användarens önskemål: "Lägg till
+olika logiska animationer på matchfixarna!"). Påhitten ovan kommer av sig själva, ur luckorna och humöret. Det här är
+rörelser med en orsak som man ser eller hör i rummet, och de kommer när orsaken kommer:
+
+- **Radion pratar** (`radioPrat`, från `pratSatt` i [public/rum-radio.js](public/rum-radio.js) när en station utan musik
+  hörs): i luckor om 13 sekunder lyssnar någon – vänd mot radion, lite framåt med huvudet på sned och den lediga handen
+  bakom örat, och nickar sakta åt det som sägs (`lyssnar`). På Sport 890 är det DL (Nacional, Montevideo), och de andra
+  tittar på honom och rycker på axlarna åt spanskan (`ryckerAt`); på P4 Göteborg är det DJ (IFK), och de andra tittar på
+  honom och nickar (`tittarPa`); på talkSPORT lyssnar de en i taget, och någon nickar bestämt mot radion (`haller`) eller
+  skakar på huvudet (`skakar`); på P1 lyssnar någon ibland och någon gäspar. De första 90 sekunderna med fotboll på
+  radion börjar gänget inget tillsammans, och den vars lag det gäller lyssnar i de flesta luckor; sedan har det lagt
+  sig, och de lyssnar hälften så ofta. Slutar pratet tonar det bort. Den som sitter med radion rakt bakom sig vrider
+  sig om över axeln (`motPunkt`).
+- **Röken** (`rokPlan`): när DT blåser ut röken efter ett bloss viftar den ena av de andra ungefär vart femte bloss bort
+  den med den lediga handen framför ansiktet, vänd från DT, och hostar ibland till (`viftar`).
+- **Neonskylten** (`neonPlan`): den glappar en stund var 23:e sekund (`neonOn` i rum.js), och ungefär vart sjätte
+  varv tittar den som har den snett bakom sig – den som sitter till höger, ibland den bakom bordet – upp på den över
+  axeln och skakar lite på huvudet (`neonKik`).
+- **Inlämningen** (`inneOrsak`): när någon lämnar in vänder sig de andra mot hen och höjer ölen (DT cigaretten) med en
+  nick, en i taget (`inneHej`), och när alla tre är inne skålar de, när den sista har tagit sin första klunk.
+- **Vädret** (`vaderOrsak`): börjar det regna, snöa eller åska medan sidan är öppen vänder de sig om och tittar ut,
+  en i taget; i regnet skakar den tredje på huvudet.
+
+Var och en reagerar bara vaken, inne och ledig: inte i sömnen, medan man väntar på kupongen, sjunger eller dansar till
+radion eller går iväg. Radion, inlämningen och vädret går före det man själv har för sig, som tonar bort på knappt en
+sekund innan man reagerar (`handStart`), och inlämningen och vädret går också före det gänget gör tillsammans, som
+tonar bort för alla tre (`listaStart`). Röken och neonen kommer bara när man inte gör något annat. Allt räknas ur
+klockan och sparas per orsak, så att samma tid ger samma bild. Bara bålen, huvudet och händerna som redan finns rör
+sig – inga nya delar, material eller bilder – så grafikkortet gör samma sak som förut. Valet av vad var och en gör tog
+ungefär en mikrosekund mer per bild för alla tre (Chromium, 3 000 bilder vid samma tider före och efter), mot gängets
+hela uträkning på omkring 0,3 ms. Prova med `?rum-orsak=radio:sport` (eller `p4g`, `talksport`, `p1`),
+`?rum-orsak=inne:dt` (`inne:dt:alla` för skålen efteråt) och `?rum-orsak=vader:sno`, i en fast bild med `?rum-t`
+(`?rum-orsak=inne:dt:alla&rum-t=10` skålar), och ett påhitt för sig med `?rum-akt=dl:lyssnar,dt:viftar,dj:neonKik`.
+
 **Ansiktena följer kupongen** (2026-11-08, [public/rum-uttryck.js](public/rum-uttryck.js),
 `ansikten` i rum-3d.js och `senastAv` i rum-folk.js). Hur glada de ser ut beror på hur gängets
 senaste kupong gick, ända tills nästa är spelad. Blev det vinst (tio rätt av tretton på
@@ -5173,7 +5214,8 @@ vilket på en datorskärm är samma bild som radion. Första gången står
 visaren på Italo Disco. Visaren och volymen sparas i webbläsaren, och radion är var och ens egen: den syns inte
 hos de andra och stängs av när man lämnar rummet.
 
-Gänget dansar och sjunger bara till musik (`musik` i `KANALER`), inte till brus eller prat: något nytt var
+Gänget dansar och sjunger bara till musik (`musik` i `KANALER`), inte till brus eller prat (prat får dem att lyssna, se
+*Det som händer i rummet* ovan): något nytt var
 fjortonde sekund, två danser och en sång om vartannat, var för sig i en ordning som blandas om varje varv
 (mot tv:n bara när matcherna pågår, försångaren och tv-studion bara när alla tre är vakna och har lämnat in).
 De slutar först fyra sekunder efter att musiken har försvunnit, så att den som vrider på ratten inte får dem att
