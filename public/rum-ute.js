@@ -867,6 +867,10 @@ window.RumUte = (() => {
   // av gatan, utan filter), i telefonen och på datorns lägre steg i gatans duk (ritaGatan), och bara medan något
   // syns: de som går i gängets takt, och medan ett fordon kör förbi i varje bildruta (glid), som på fasaden.
   const FRAM = { yh: 382, oga: 1.25, K: 166.8, d0: 1.016, xv: 571, XE: -0.483, px: 0.4 };
+  // De som går och kör förbi är bakgrund och ska inte dra blicken från gänget: de ritas skarpa i en egen duk
+  // (kladden) och läggs sedan i glasen ur skärpa (oskarpa: px i scenen) och lite disiga, mot luftens färg
+  // (dis: hur mycket). Utan ctx.filter (äldre Safari) får kladden halva upplösningen i stället för oskärpan.
+  const DIS = { oskarpa: 2.6, dis: 0.15 };
   const framS = (d) => FRAM.K / (d + FRAM.d0);
   const framY = (d) => FRAM.yh + FRAM.oga * framS(d);
   const framX = (X, s) => FRAM.xv + (FRAM.XE - X) * s;
@@ -925,7 +929,9 @@ window.RumUte = (() => {
     S.ton = (c) => kl(ton(c));
     S.glas = kl(S.glas);
     S.himmel = kl(S.himmel);
-    return { ...m, S, kalla, a, L, T: tsig(v), tT: performance.now() };
+    // (luften mellan oss och dem: himlen nere vid taken, lite mörkare nere på gatan)
+    const dis = mix(kl(L.sky[2]), '#000000', 0.15);
+    return { ...m, S, kalla, a, L, dis, T: tsig(v), tT: performance.now() };
   }
 
   // Det som syns framför affären vid tiden t (s) i duken g, med hörnet i (ox, oy) och k bildpunkter per px; r: glasen.
@@ -1013,6 +1019,39 @@ window.RumUte = (() => {
     return ut;
   }
 
+  // Som ritaFram, men ur skärpa och disigt (DIS): skarpt i kladden, som täcker r, och därifrån i g med oskärpan.
+  function ritaFramMjuk(el, g, t, ox, oy, k, r) {
+    const s = FILTER ? k : k / 2;
+    const c = el._framK || (el._framK = document.createElement('canvas'));
+    const w = Math.ceil(r.w * s);
+    const h = Math.ceil(r.h * s);
+    if (c.width !== w || c.height !== h) {
+      c.width = w;
+      c.height = h;
+    }
+    const x = c.getContext('2d');
+    if (!x) return 0;
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.clearRect(0, 0, w, h);
+    const ut = ritaFram(el, x, t, r.x, r.y, s, r);
+    if (!ut) return 0;
+    // (disigt: bara där de är, source-atop)
+    if (DIS.dis > 0 && el._fram) {
+      x.globalCompositeOperation = 'source-atop';
+      x.globalAlpha = DIS.dis;
+      x.fillStyle = el._fram.dis;
+      x.fillRect(0, 0, w, h);
+      x.globalCompositeOperation = 'source-over';
+      x.globalAlpha = 1;
+    }
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+    if (FILTER) g.filter = `blur(${r1(DIS.oskarpa * k * 10) / 10}px)`;
+    g.drawImage(c, 0, 0, w, h, (r.x - ox) * k, (r.y - oy) * k, (w / s) * k, (h / s) * k);
+    if (FILTER) g.filter = 'none';
+    return ut;
+  }
+
   // I datorn, där det som rör sig på gatan är egna dukar: en duk över glasen, mellan dem som går på bron och regnet.
   // nu: ms (performance.now, eller den fasta tiden i en stillbild). → som ritaFram.
   function framDuk(el, nu) {
@@ -1025,7 +1064,7 @@ window.RumUte = (() => {
       g.clearRect(0, 0, c.width, c.height);
     }
     const r = el._framR;
-    const ut = RORELSE_AV.matches ? 0 : ritaFram(el, g, nu / 1000, r.x, r.y, FRAM.px, r);
+    const ut = RORELSE_AV.matches ? 0 : ritaFramMjuk(el, g, nu / 1000, r.x, r.y, FRAM.px, r);
     el._framTom = !ut;
     el._fort = ut === 2;
     return ut;
@@ -1685,7 +1724,7 @@ window.RumUte = (() => {
     figurer(el._dukar.liv || []);
     // det som går och kör förbi framför affären (ritaFram)
     if (el._fram && !RORELSE_AV.matches) {
-      if (ritaFram(el, g, nu / 1000, b.x, b.y, GAT_S, b)) fort = true;
+      if (ritaFramMjuk(el, g, nu / 1000, b.x, b.y, GAT_S, b)) fort = true;
     }
     // regnet och snön: banden faller (och snön driver)
     if (G.fall) {
