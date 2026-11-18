@@ -495,6 +495,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   kameran har stannat, alltid med glasögonen på.
   Tre gånger av fyra är det Helgarderat, och det görs klart medan hans bild byggs, så att det finns redan då (se
   *Tidningen* under [Hasse Backe](#hasse-backe))
+- [x] **Hasse gör fler saker med händerna medan han väntar (2026-11-18, användarens önskemål: "Ge Hasse fler
+  passande rörelser lika snygga som tidigare"):** sex nya småsaker: rättar till slipsen, stryker sig om hakan,
+  gäspar bakom handen, hälsar med två fingrar mot baren, sopar ihop askan och pekar på en som med en pistol (se
+  *Vilan* under [Hasse Backe](#hasse-backe))
 
 ## Publicering
 
@@ -1914,6 +1918,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   långt bloss med *ah*, lutar sig bakåt och blundar, biter om den i mungipan med händerna på disken,
   beundrar den, puffar, visar den mot en och smakar på röken. Se [Hasse Backe](#hasse-backe),
   *Cigarren*.
+- **Hasse Backe gör fler saker med händerna medan han väntar (2026-11-18, användarens önskemål: "Ge Hasse fler
+  passande rörelser lika snygga som tidigare"):** av småsakerna medan han väntade rörde han bara huvudet och
+  ansiktet; händerna låg kvar på disken, utom när fingrarna trummade. Nu finns sex till där händerna är med, valda
+  efter honom: han rättar till slipsknuten, stryker sig om hakan och funderar, gäspar bakom knytnäven, hälsar med
+  två fingrar på någon längs baren, sopar ihop askan på disken och pekar på en med fingret som en pistol och
+  blinkar. Två försök föll bort: att stryka håret bakåt (handen svävade vid huvudet, eftersom håret är fotots
+  kontur) och att dra i kavajslagen (det såg ut som en boxare). Se [Hasse Backe](#hasse-backe), *Vilan*.
 - **Hasse Backe gör fler saker medan han väntar (2026-11-06, användarens önskemål):** i vilan
   upprepades allt: han blinkade exakt var 4,3:e sekund, huvudet och bröstet rörde sig i jämna vågor, och
   mellan kaffet och cigarren trummade han bara, likadant varje gång. Nu går blinkningarna, blicken,
@@ -9722,8 +9733,8 @@ Var 5–11:e sekund gör han något litet (`SMATT` i [public/rum-hasse.js](publi
 att samma sak kommer två gånger innan allt har varit med, och fingrarna dubbelt så ofta som det andra.
 Fingrarna trummar på ett av fyra sätt, oftast med höger hand och annars med vänster: två varv från
 lillfingret till pekfingret, tre fortare, ett långsamt, eller pekfingret som knackar fyra gånger
-(`TRUM`). Annars ett av elva klipp med händerna kvar på disken (gruppen `smatt`), där ögonen går först och
-huvudet efter, som man gör:
+(`TRUM`). Annars ett av sjutton klipp (gruppen `smatt`). I elva av dem ligger händerna kvar på disken, och
+ögonen går först och huvudet efter, som man gör:
 
 - `affaren`: tittar bort mot gänget i affären, kisar, skakar lite på huvudet och ler åt dem.
 - `baren`: tittar längs baren och nickar med brynen upp åt någon han känner.
@@ -9739,6 +9750,23 @@ huvudet efter, som man gör:
 - `blinka`: tittar på en, ler brett och blinkar med sitt högra öga (`vink`: brynet går ned och den
   sidans mungipa och kind upp), med en liten nick: vi vet, du och jag. Det är också vad han gör när han
   har sagt att det har gått bra för en (förut skrockade han, som han fortfarande gör när allt är rätt).
+
+I de andra sex är händerna med (2026-11-18). Handen lyfts från disken och kommer tillbaka dit på samma sätt som
+efter naglarna (`hemA`), och den ligger framför det den rör vid: slipsknuten, hakan och munnen (`KNUT`, `HAKAN`,
+`MUNNEN` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)).
+
+- `slipsen`: hakan upp och huvudet lite åt sidan, och han tar slipsknuten mellan tummen och pekfingret,
+  vickar den på plats och drar upp den, stryker slipsen slät och nickar belåtet.
+- `hakan`: blicken upp åt sidan och brynen ihop, och han stryker sig om hakan med munnen lite framskjuten.
+  Sedan kommer han på det: blicken tillbaka på en, brynen upp, två små nickar och ett leende.
+- `gaspa`: andas in djupt med axlarna upp och ögonen hårt igen, med knytnäven för munnen, och blinkar,
+  skakar av sig det och ler lite ursäktande.
+- `vinka`: får syn på någon längs baren och hälsar med två fingrar, som man gör från ratten: den vänstra
+  handen ligger kvar på disken och pek- och långfingret lyfts, med en nick och brynen upp.
+- `sopar`: tittar ned på disken till höger om sig, sopar ihop askan med handkanten, två tag in mot mitten,
+  och borstar av fingrarna.
+- `pang`: pekar på en med pekfingret och tummen upp, som en pistol, med en liten rekyl och en blinkning:
+  du och jag.
 
 Han spanar också på din kupong (gruppen `spana`). Ligger den på disken framför honom är det ungefär vart
 tredje tillfälle, med en lottad min. Har han sagt vad han tycker om den följer minen orden (`H.spana` i
@@ -10599,6 +10627,14 @@ kaffet, spelade som repliker med gester, där bilden ryckte till vid varje slag 
 spelades. Ljuden är framräknade i en `OfflineAudioContext` och mätta (toppar 0,44–0,55 för slagen,
 0,24 för klirret), men inte lyssnade på, och inte provade i Safari eller på en riktig telefon.
 Samtalet med en riktig analys är inte provat (ingen kupong i provet), bara genomläst.
+
+De sex småsakerna med händerna (2026-11-18) är provade i headless Chromium med mjukvarugrafik, med figuren ensam
+framför väggen och disken i 1440 × 900: varje klipp i nio bilder, närbilder av handen vid slipsknuten, hakan och
+munnen, vägen upp från disken och tillbaka var 0,12:e sekund i `slipsen` och `gaspa` (inga hopp), och alla klipp på
+tidslinjen ritade utan fel och utan att två klipp går in i varandra. Handens lägen hittades med en tillfällig krok i
+`rita` som satte handen direkt, borttagen igen. Hela sidan med `?rum-hasse` gick inte att prova: med mjukvarugrafik
+hinner hans bild inte byggas på de åtta sekunder sidan väntar, likadant utan ändringen. Inte provat i Safari, i
+telefonen på höjden eller på en riktig telefon.
 
 Axlarna (2026-11-16) är provade i headless Chromium med mjukvarugrafik: figuren ensam i vilan, skrattet (T 3,5),
 klunken (T 23) och `axla` (T 352), före och efter, med närbilder av båda axlarna och av ärmen och kroppen var för

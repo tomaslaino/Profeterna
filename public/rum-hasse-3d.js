@@ -17,9 +17,10 @@
 // figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), pyntBild(duk2d, v, { namn, hog, ljus, bak }), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (tio sätt), cigarren, småsakerna medan han
-// väntar, händerna medan han pratar (talet) och tidningen, när det har gått dåligt för honom och ibland av vana (lasa,
-// papperet i rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna när det har gått dåligt (raknar, tomKopp,
-// slocknad, putsa, vissla, naglar), där han blir ertappad och låtsas som ingenting.
+// väntar (också med händerna: slipsen, hakan, gaspa, vinka, sopar, pang), händerna medan han pratar (talet) och
+// tidningen, när det har gått dåligt för honom och ibland av vana (lasa, papperet i rum-hasse-tidning.js), med
+// glasögonen på, och de andra sysslorna när det har gått dåligt (raknar, tomKopp, slocknad, putsa, vissla, naglar),
+// där han blir ertappad och låtsas som ingenting.
 // Inga slingor (2026-11-13): ett klipp spelas inte likadant varje gång. rum-hasse.js väljer fart och styrka för
 // varje gång (fart, styrka: huvudet och kroppen i småsakerna går lite olika långt), händerna står inte stilla som
 // i en bild där nycklarna håller dem i luften (levande), huvudet och brynen följer talet i slag i stället för i
@@ -589,6 +590,19 @@ export const KLIPP = {
   myser: { fran: 460, till: 464.4, vila: 0, skynda: true, grupp: 'smatt' },
   // tittar på en, ler brett och blinkar med ena ögat: vi vet, du och jag
   blinka: { fran: 466, till: 469.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // och med händerna:
+  // rättar till slipsknuten med hakan upp, stryker slipsen slät och nickar belåtet
+  slipsen: { fran: 1150, till: 1154.2, vila: 0, skynda: true, grupp: 'smatt' },
+  // stryker sig om hakan och funderar, och kommer på det
+  hakan: { fran: 1156, till: 1161, vila: 0, skynda: true, grupp: 'smatt' },
+  // gäspar bakom knytnäven, och skakar av sig det med ett ursäktande leende
+  gaspa: { fran: 1162, till: 1166.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // hälsar på någon längs baren med två fingrar från disken
+  vinka: { fran: 1168, till: 1171.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // sopar ihop askan på disken med handkanten och borstar av fingrarna
+  sopar: { fran: 1173, till: 1177, vila: 0, skynda: true, grupp: 'smatt' },
+  // pekar på en med fingret som en pistol och blinkar: pang
+  pang: { fran: 1179, till: 1182.6, vila: 0, skynda: true, grupp: 'smatt' },
   // Medan han pratar, nöjd med det han säger (talet, lottas med armar):
   // handflatan upp mot en: där har du det
   oppna: { fran: 345, till: 348.4, vila: 5.5, start: 5.5, grupp: 'tal' },
@@ -3193,6 +3207,195 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         nedA(3.2),
       ],
       fA: { spar: [[0.6, 0.3], [2.8, 0.3], [3.2, 0]], sv: { amp: [[0.5, 0], [0.9, 1], [2.5, 1], [2.95, 0]], f: 1.5, x: [0, 0, 45], y: [0, 45, 0], F: [0, 0.35, 0] } },
+    },
+  });
+  // Småsakerna med händerna (grupp smatt, lottas med de andra småsakerna): han rättar till slipsen, stryker sig
+  // om hakan, gäspar bakom handen, hälsar med två fingrar, sopar ihop askan på disken och pekar på en med fingret.
+  // greppA: den högra handen, med handflatan vänd så nära D som går (vinkelrätt mot fingrarna F) och armbågen
+  // ut åt sidan; hemA: på väg ned mot disken igen (som efter naglarna).
+  const greppA = (t, W, F, krok, D = [0, 0, -1], peka = 0) => {
+    const f = lang(F, 1);
+    const d = f[0] * D[0] + f[1] * D[1] + f[2] * D[2];
+    return [t, W, POL_UT_A, f, lang(D.map((c, i) => c - d * f[i]), 1), krok, peka];
+  };
+  const hemA = (t) => [t, [-200, -150, 560], PA, [0.6, 0.2, 0.75], [0.2, -0.9, 0.35], 0.3, 0];
+  // (slipsknuten, hakan och munnen: handen framför dem, med fingrarna åt hans vänstra sida)
+  const KNUT = [-172, 252, 442];
+  const HAKAN = [-165, 310, 445];
+  const MUNNEN = [-125, 378, 495];
+  // pekfingret mot en, som i naglarna, men med handflatan inåt så att tummen står upp
+  const PANG = [-275, 300, 620];
+  const PEKA_P = [1, -0.15, 0];
+  // handkanten på disken (som hugget), h högre upp
+  const kanten = (t, x, h, z) => [t, [x, -238 + h, z], PA, [0.3, -0.05, 0.95], [0.95, 0.05, -0.3], 0.06, 0];
+  // den vänstra handen på disken med fingrarna lyfta en bit (vinka): fingrarna 25° upp från vilan
+  const LYFT_B = (() => {
+    const F = lang([vb.F[0], vb.F[1] + 0.45, vb.F[2]], 1);
+    const d = F[0] * vb.P[0] + F[1] * vb.P[1] + F[2] * vb.P[2];
+    return [vb.W, vb.pol, F, lang(vb.P.map((c, i) => c - d * F[i]), 1), vb.krok * 0.55, 0];
+  })();
+  Object.assign(RORELSER, {
+    // Slipsen: hakan upp och huvudet lite åt sidan, och han tar slipsknuten mellan tummen och pekfingret,
+    // vickar den på plats och drar upp den, stryker slipsen slät och nickar belåtet.
+    slipsen: {
+      k: {
+        blickY: [[0.2, 0], [0.9, 3], [1.95, 3], [2.3, 0]],
+        pitch: [[0.2, 0], [0.9, -0.4], [1.95, -0.42], [2.3, -0.12], [2.7, 0.24], [3.0, 0.02], [3.8, 0]],
+        yaw: [[0.2, 0], [0.9, 0.14], [1.95, 0.14], [2.4, 0.04], [3.8, 0]],
+        roll: [[0.3, 0], [0.9, -0.05], [1.25, 0.03], [1.6, -0.04], [1.95, 0], [3.8, 0]],
+        axV: [[0.3, 0], [0.9, 10], [1.95, 10], [2.6, 4], [3.6, 0]],
+        brynX: [[0.3, 0], [0.9, 0.35], [1.95, 0.4], [2.45, 0.65], [3.2, 0.5], [4.0, 0]],
+        brynY: [[0.3, 0], [0.9, 0.3], [1.95, 0.35], [2.45, 0.55], [3.2, 0.45], [4.0, 0]],
+        munn: [[1.0, 0], [1.2, 0.02], [1.8, 0.02], [2.0, 0]],
+        le: [[0.3, 0], [1.0, 0.2], [2.0, 0.25], [2.5, 0.55], [3.4, 0.5], [4.2, 0]],
+        kis: [[0.3, 0], [1.0, 0.15], [2.0, 0.15], [2.5, 0.35], [3.4, 0.3], [4.1, 0]],
+      },
+      A: [
+        greppA(0.5, [-235, 110, 540], [0.75, 0.6, 0.25], 0.5),
+        greppA(0.95, KNUT, [0.97, 0.2, 0.1], 0.72),
+        greppA(1.7, KNUT, [0.97, 0.2, 0.1], 0.72),
+        greppA(1.9, [KNUT[0], KNUT[1] + 9, KNUT[2]], [0.97, 0.2, 0.1], 0.72),
+        greppA(2.15, [-180, 200, 452], [0.95, 0.3, 0.05], 0.3),
+        greppA(2.5, [-186, 110, 470], [0.95, 0.3, 0.05], 0.25),
+        hemA(3.2),
+      ],
+      fA: {
+        spar: [[0.8, 0.6], [1.9, 0.6], [2.2, 0.9], [2.6, 0.9]], tumme: [[0.8, 0.75], [1.9, 0.75], [2.2, 0.3]],
+        sv: { amp: [[1.0, 0], [1.15, 1], [1.6, 1], [1.75, 0]], f: 2.6, x: [8, 2, 0] },
+      },
+    },
+    // Hakan: blicken upp åt sidan, och han stryker sig om hakan med tummen och pekfingret medan han funderar,
+    // med munnen lite framskjuten och brynen ihop. Sedan kommer han på det: blicken tillbaka på en, brynen upp,
+    // två små nickar och ett leende.
+    hakan: {
+      k: {
+        blickX: [[0.15, 0], [0.3, 3], [2.6, 3], [2.75, 0]],
+        blickY: [[0.15, 0], [0.3, -4], [2.6, -4], [2.75, 0]],
+        yaw: [[0.2, 0], [0.9, 0.18], [2.6, 0.15], [3.0, 0.02], [4.2, 0]],
+        pitch: [[0.2, 0], [0.9, -0.12], [2.6, -0.1], [2.95, 0.3], [3.2, 0], [3.45, 0.25], [3.75, 0], [4.4, 0]],
+        roll: [[0.3, 0], [1.0, 0.06], [2.6, 0.06], [3.2, 0], [4.2, 0]],
+        axV: [[0.3, 0], [1.0, 8], [2.7, 8], [3.6, 0]],
+        brynX: [[0.3, 0], [0.9, -0.25], [2.5, -0.3], [2.95, 0.6], [3.8, 0.5], [4.6, 0]],
+        brynY: [[0.3, 0], [0.9, -0.4], [2.5, -0.45], [2.95, 0.5], [3.8, 0.4], [4.6, 0]],
+        kis: [[0.4, 0], [1.0, 0.3], [2.5, 0.3], [2.9, 0.05], [3.3, 0.3], [4.4, 0]],
+        rund: [[0.9, 0], [1.2, 0.35], [2.4, 0.3], [2.7, 0]],
+        munn: [[0.9, 0], [1.2, 0.015], [2.4, 0.015], [2.7, 0]],
+        stel: [[0.6, 0], [1.0, 0.5], [2.5, 0.5], [2.9, 0]],
+        le: [[2.7, 0], [3.2, 0.5], [4.0, 0.45], [4.9, 0]],
+      },
+      A: [
+        greppA(0.45, [-240, 120, 520], [0.75, 0.6, 0.25], 0.5),
+        greppA(1.0, HAKAN, [0.8, 0.58, 0.1], 0.55),
+        greppA(2.65, HAKAN, [0.8, 0.58, 0.1], 0.55),
+        greppA(3.0, [-185, 250, 460], [0.85, 0.5, 0.1], 0.5),
+        hemA(3.6),
+      ],
+      fA: {
+        tumme: [[0.8, 0.9], [2.7, 0.9], [3.2, 0.45]],
+        sv: { amp: [[1.2, 0], [1.35, 1], [2.3, 1], [2.45, 0]], f: 1.4, x: [0, -12, -3] },
+      },
+    },
+    // Gäspningen: han andas in djupt med axlarna upp och ögonen hårt igen, och håller knytnäven för munnen. Sedan
+    // blinkar han, skakar den av sig och ler lite ursäktande.
+    gaspa: {
+      k: {
+        andas: [[0.2, 0], [1.0, 14], [1.7, 15], [2.3, -6], [3.0, 0]],
+        axV: [[0.2, 0], [1.0, 16], [1.7, 16], [2.3, -4], [3.0, 0]],
+        axH: [[0.2, 0], [1.0, 12], [1.7, 12], [2.3, -4], [3.0, 0]],
+        pitch: [[0.2, 0], [1.0, -0.25], [1.7, -0.28], [2.2, 0.1], [2.6, 0], [4.0, 0]],
+        lut: [[0.2, 0], [1.0, -0.025], [1.7, -0.025], [2.3, 0.01], [3.0, 0]],
+        yaw: [[2.3, 0], [2.5, -0.12], [2.7, 0.1], [2.9, -0.06], [3.15, 0]],
+        brynX: [[0.2, 0], [0.9, 0.8], [1.7, 0.85], [2.2, 0.2], [2.9, 0.5], [3.6, 0.45], [4.4, 0]],
+        brynY: [[0.2, 0], [0.9, 0.7], [1.7, 0.75], [2.2, 0.2], [2.9, 0.45], [3.6, 0.4], [4.4, 0]],
+        blund: [[0.3, 0], [0.8, 0.45], [1.1, 0.9], [1.75, 0.9], [2.15, 0], [2.45, 0], [2.52, 0.85], [2.64, 0], [2.78, 0], [2.85, 0.8], [2.97, 0]],
+        kis: [[0.6, 0], [1.1, 0.6], [1.75, 0.6], [2.2, 0]],
+        munn: [[0.5, 0], [1.0, 0.12], [1.6, 0.14], [1.95, 0.03], [2.1, 0]],
+        rund: [[0.5, 0], [1.0, 0.3], [1.6, 0.3], [2.0, 0]],
+        le: [[2.6, 0], [3.0, 0.45], [3.9, 0.4], [4.6, 0]],
+      },
+      A: [
+        greppA(0.45, [-235, 130, 540], [0.8, 0.55, 0.2], 0.7),
+        greppA(0.95, MUNNEN, [0.95, 0.25, -0.1], 0.9),
+        greppA(1.8, [MUNNEN[0], MUNNEN[1] - 4, MUNNEN[2]], [0.95, 0.25, -0.1], 0.9),
+        greppA(2.15, [-190, 220, 520], [0.85, 0.4, 0.2], 0.7),
+        hemA(2.7),
+      ],
+      fA: { tumme: [[0.7, 0.2], [1.9, 0.2]] },
+    },
+    // Han får syn på någon längs baren och hälsar med två fingrar, som man gör från ratten: den vänstra handen
+    // ligger kvar på disken och pek- och långfingret lyfts, med en nick och brynen upp.
+    vinka: {
+      k: {
+        blickX: [[0.1, 0], [0.2, -5], [2.4, -4], [2.55, 0]],
+        yaw: [[0.15, 0], [0.85, -0.45], [2.4, -0.42], [3.3, 0]],
+        pitch: [[0.15, 0], [0.85, -0.15], [1.25, -0.15], [1.5, 0.22], [1.8, -0.1], [2.4, -0.1], [3.3, 0]],
+        brynX: [[0.8, 0], [1.1, 0.75], [1.9, 0.65], [2.6, 0]],
+        brynY: [[0.8, 0], [1.1, 0.6], [1.9, 0.5], [2.6, 0]],
+        le: [[0.8, 0], [1.2, 0.45], [2.3, 0.4], [3.2, 0]],
+        kis: [[0.9, 0], [1.2, 0.25], [2.3, 0.2], [2.9, 0]],
+      },
+      B: [[0.9, ...VILA_B], [1.15, ...LYFT_B], [1.85, ...LYFT_B], [2.15, ...VILA_B]],
+      fB: {
+        e0: [[0.95, 0], [1.15, -0.45], [1.85, -0.45], [2.1, 0]],
+        e1: [[0.95, 0], [1.15, -0.45], [1.85, -0.45], [2.1, 0]],
+        e2: [[0.95, 0], [1.15, 0.35], [1.85, 0.35], [2.1, 0]],
+        e3: [[0.95, 0], [1.15, 0.35], [1.85, 0.35], [2.1, 0]],
+      },
+    },
+    // Askan: han tittar ned på disken till höger om sig och sopar ihop askan med handkanten, två tag in mot
+    // mitten, borstar av fingrarna och ser nöjd ut.
+    sopar: {
+      k: {
+        blickX: [[0.1, 0], [0.25, -2.5], [1.2, -1], [1.6, -2.5], [2.5, -1], [2.75, 0]],
+        blickY: [[0.1, 0], [0.25, 6], [2.6, 6], [2.75, 0]],
+        pitch: [[0.15, 0], [0.7, 0.4], [2.6, 0.4], [3.2, 0]],
+        yaw: [[0.15, 0], [0.7, -0.22], [1.3, -0.12], [1.65, -0.22], [2.4, -0.1], [2.7, -0.12], [3.3, 0]],
+        lut: [[0.3, 0], [0.8, 0.03], [2.6, 0.03], [3.2, 0]],
+        axV: [[0.4, 0], [0.9, 6], [2.6, 6], [3.2, 0]],
+        brynX: [[2.5, 0], [2.9, 0.45], [3.7, 0]],
+        brynY: [[2.5, 0], [2.9, 0.35], [3.7, 0]],
+        le: [[2.6, 0], [3.1, 0.35], [4.0, 0]],
+      },
+      A: [
+        kanten(0.55, -320, 35, 575),
+        kanten(0.75, -320, 0, 575),
+        kanten(1.3, -185, 0, 565),
+        kanten(1.45, -195, 28, 565),
+        kanten(1.7, -315, 32, 575),
+        kanten(1.9, -315, 0, 575),
+        kanten(2.4, -180, 0, 565),
+        [2.65, [-200, -195, 580], PA, [0.6, 0.2, 0.75], [0.2, -0.9, 0.35], 0.2, 0],
+        hemA(3.2),
+      ],
+      // (fingrarna raka och tätt ihop medan han sopar, och han borstar av dem efteråt)
+      fA: {
+        spar: [[0.5, 1], [2.45, 1], [2.7, 0.6]], tumme: [[0.5, 0.1], [2.45, 0.1], [2.7, 0.45]],
+        sv: { amp: [[2.6, 0], [2.72, 1], [3.05, 1], [3.2, 0]], f: 4.5, x: [7, 0, 0], F: [0.18, 0, 0] },
+      },
+    },
+    // Han pekar på en med pekfingret och tummen upp, som en pistol, och blinkar: pang, du och jag.
+    pang: {
+      k: {
+        yaw: [[0.2, 0], [0.7, 0.15], [2.4, 0.15], [3.1, 0]],
+        pitch: [[0.2, 0], [0.7, -0.15], [1.25, -0.15], [1.4, -0.3], [1.65, 0.2], [2.0, -0.05], [2.6, -0.05], [3.2, 0]],
+        roll: [[0.2, 0], [0.7, -0.06], [2.4, -0.06], [3.1, 0]],
+        lut: [[0.3, 0], [0.8, 0.03], [2.4, 0.03], [3.0, 0]],
+        brynY: [[0.8, 0], [1.1, 0.45], [2.0, 0.4], [2.6, 0]],
+        le: [[0.2, 0], [0.8, 0.75], [2.5, 0.75], [3.4, 0]],
+        kis: [[0.5, 0], [0.9, 0.35], [2.5, 0.35], [3.2, 0]],
+        vink: [[1.35, 0], [1.5, 1], [1.85, 1], [2.05, 0]],
+        munn: [[1.38, 0], [1.44, 0.04], [1.52, 0]],
+      },
+      A: [
+        greppA(0.45, [-235, 120, 560], [0.6, 0.6, 0.5], 0.8, PEKA_P),
+        greppA(0.85, PANG, [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        greppA(1.38, PANG, [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        greppA(1.48, [PANG[0] + 3, PANG[1] + 18, PANG[2] - 10], [0.02, 0.74, 0.67], 0.95, PEKA_P, 1),
+        greppA(1.7, PANG, [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        greppA(2.35, [PANG[0] - 2, PANG[1] - 3, PANG[2]], [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        hemA(2.95),
+      ],
+      fA: { tumme: [[0.5, 1], [2.4, 1], [2.9, 0.45]], e8: [[0.5, 1], [2.4, 1], [2.9, 0]] },
     },
   });
   // Klippen in i tidslinjen: nycklarna i tidslinjens tid, med början och slut.
