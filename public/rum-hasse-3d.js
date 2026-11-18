@@ -670,20 +670,20 @@ export const KLIPP = {
   vifta: { fran: 255, till: 267.2, vila: 0, skynda: true, grupp: 'cigarr' },
   // ett bloss som han håller kvar i munnen och smakar på, och röken ut långsamt
   smaka: { fran: 270, till: 283.4, vila: 0, skynda: true, grupp: 'cigarr' },
-  // (och fler, 2026-11-19; efter tidningen på 1150–1440)
+  // (och fler, 2026-11-19; efter tidningen och småsakerna med händerna, på 1150–1483)
   // ett bloss, och sedan tittar han bort och funderar med cigarren vid axeln, ett tankfullt bloss till med röken
   // ut genom näsan, och så kommer han på det: brynen upp, och han nickar mot en
-  tanker: { fran: 1450, till: 1465.0, vila: 0, skynda: true, grupp: 'cigarr' },
+  tanker: { fran: 1600, till: 1615.0, vila: 0, skynda: true, grupp: 'cigarr' },
   // ett långt bloss, och röken rakt upp mot taket med huvudet bakåt och spetsade läppar
-  taket: { fran: 1470, till: 1483.8, vila: 0, skynda: true, grupp: 'cigarr' },
+  taket: { fran: 1620, till: 1633.8, vila: 0, skynda: true, grupp: 'cigarr' },
   // ett bloss, och sedan lutar han sig bakåt och minns: tittar upp åt sidan med ett leende, röken ut genom
   // näsan, en belåten suck och en långsam skakning på huvudet (det var tider)
-  minns: { fran: 1490, till: 1505.2, vila: 0, skynda: true, grupp: 'cigarr',
+  minns: { fran: 1640, till: 1655.2, vila: 0, skynda: true, grupp: 'cigarr',
     ljud: [[7.85, { typ: 'anda', sort: 'pust', ms: 700 }]] },
   // får syn på någon längs baren och lyfter cigarren mot honom med en nick, och tar sedan ett bloss
-  honnor: { fran: 1510, till: 1523.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  honnor: { fran: 1660, till: 1673.4, vila: 0, skynda: true, grupp: 'cigarr' },
   // tittar på glöden, som har falnat, och blåser försiktigt på den så att den glöder upp, och drar ett bloss
-  gloden: { fran: 1530, till: 1544.0, vila: 0, skynda: true, grupp: 'cigarr',
+  gloden: { fran: 1680, till: 1694.0, vila: 0, skynda: true, grupp: 'cigarr',
     ljud: [[3.95, { typ: 'anda', sort: 'blas', ms: 650 }], [5.3, { typ: 'anda', sort: 'blas', ms: 480 }]] },
   // Småsakerna medan han väntar på en (grupp smatt, lottas med fingrarna som trummar), några sekunder
   // var, med händerna på disken:
