@@ -14,7 +14,7 @@
 //
 // Världen: 1 enhet = 1 bildpunkt i fotot, x = fotots x − 660, y = 900 − fotots y, z mot betraktaren.
 //
-// figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), pyntBild(duk2d, v, { namn, hog, ljus, bak }), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
+// figuren(duk, { hog, latt, pr, kant }) → { kamera(v), diskBild(duk2d, v, bak), pyntBild(duk2d, v, { namn, hog, ljus, bak }), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (tio sätt), cigarren, småsakerna medan han
 // väntar, händerna medan han pratar (talet) och tidningen, när det har gått dåligt för honom och ibland av vana (lasa,
@@ -987,10 +987,11 @@ function djup(x, y, drag = true) {
   return Math.max(40, smax(smax(zh, zn), zt));
 }
 
-export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
+// kant: kantutjämning (rum-hasse.js avgör, som för gänget; förut bara utan latt)
+export async function figuren(duk, { hog = false, latt = false, pr = 1, kant = !latt } = {}) {
   // (webbläsarens vanliga grafikkort: med 'high-performance' slog datorer med två grafikkort, som äldre MacBook Pro,
   // på det stora kortet så fort man vände sig mot honom, och fläkten med det; rummet har alltid ritats med det vanliga)
-  const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: !latt, powerPreference: 'default' });
+  const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: kant, powerPreference: 'default' });
   r.setPixelRatio(pr);
   r.setClearColor(0, 0);
   const S = new THREE.Scene();
@@ -4948,7 +4949,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // runt kanten, så att fingertopparna ligger på utsidan (mot en), och underarmen kommer bakifrån utanför
   // papperet. (Med handen på utsidan gick underarmen genom papperet.) På vägen mellan vilan och kanterna går
   // handen först bakåt och sedan ned (eller upp och sedan fram), så att den inte går genom disken.
-  const tidning = byggTidning(bord);
+  // (texturerna laddas upp till grafikkortet i förväg, när han väntar, och inte i bilden där han tar upp tidningen)
+  const tidning = byggTidning(bord, { upp: (tx) => r.initTexture(tx) });
   S.add(tidning.mesh);
   // tidningen han tar upp nästa gång, i stället för klippets: 'hg' (Helgarderat) eller null
   let blad = null;
@@ -5690,7 +5692,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     // tidningen: i hans händer under klippen lasa, annars borta. Klippets egen (DN eller SvD), eller Helgarderat när
     // rum-hasse.js har valt den för den här gången (blad)
     if (kl && kl.las) {
-      tidning.visa(blad && tidning.har(blad) ? blad : kl.tidning);
+      const namn = blad && tidning.har(blad) ? blad : kl.tidning;
+      // Medan han tar på sig glasögonen ligger tidningen i knät bakom disken: är den inte tryckt än trycks den där, en
+      // sida i varje bild, och laddas upp, i stället för allt i bilden där den kommer fram (en halv sekund med en
+      // långsam telefons processor). Det som inte hunnit trycks när han tar upp den.
+      if (!(t - kl.fran < LASBIT.pa.dur - 0.3 && tidning.steg(namn, true))) tidning.visa(namn);
       tidningArm(t, n, kl, a, b);
     }
     else tidning.mesh.visible = false;
@@ -5983,6 +5989,11 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       blad = namn && tidning.har(namn) ? namn : null;
       return Boolean(blad) === Boolean(namn);
     },
+    // är tidningen ('dn', 'svd' eller 'hg') tryckt, så att den kan visas direkt
+    tryckt: (namn) => tidning.klar(namn),
+    // Ett steg av det som görs i förväg när han väntar: Helgarderat och DN (den han oftast läser av dem) trycks en sida
+    // i taget och laddas upp till grafikkortet. → om något gjordes (då finns det kanske mer)
+    forbered: () => tidning.steg('hg') || tidning.steg('dn'),
     info: () => ({ trianglar: r.info.render.triangles, ritanrop: r.info.render.calls, texturer: r.info.memory.textures }),
     ctx: r.getContext(),
     borta() {

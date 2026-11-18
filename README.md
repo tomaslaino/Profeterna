@@ -499,6 +499,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   till, där han är nöjd med det han läser: han tittar upp och blinkar åt en, skrattar tyst för sig själv, funderar på
   en svår match tills det lossnar och blir imponerad med en tyst vissling (`lasa6`–`lasa8`; se *Tidningen* under
   [Hasse Backe](#hasse-backe))
+- [x] **Hasse Backe i svaga telefoner: tidningen utan stopp och jämna kanter (2026-11-18, användarens önskemål: "Kan du se
+  till att den nya grafiken med Hasse blir riktigt bra o passar sämre mobiler"):** när han tog upp tidningen stod han still
+  en halv sekund med en långsam telefons processor, eftersom hela uppslaget trycktes om i den bilden. Nu trycks
+  Helgarderat och dagens DN eller SvD i förväg, en sida i taget, på var sitt ark, och att byta tidning är att byta textur.
+  På telefonens lägre steg har hans bild kantutjämning, så att glasögonbågen inte bryts upp i streck och kanterna inte
+  kryper (se *Hasse Backe i svaga telefoner* under [Tobaksaffären](#tobaksaffären))
 
 ## Publicering
 
@@ -2232,6 +2238,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   klipp, `lasa6`–`lasa8`, där inget i tidningen säger att han hade fel och han är nöjd med det han läser, av de vanliga
   bitarna och fyra nya: `blinkar`, `fniss`, `fundera` och `imponerad`. Av vana läser han nu på fem sätt (`VANA_LAS`).
   Se [Hasse Backe](#hasse-backe), *Tidningen*.
+- **Hasse Backe i svaga telefoner (2026-11-18, användarens önskemål):** "Kan du se till att den nya grafiken med Hasse blir
+  riktigt bra o passar sämre mobiler". Tidningarna trycks i förväg på två ark (Helgarderat, och dagens DN eller SvD) i
+  stället för i bilden där han tar upp dem, och hans bild har kantutjämning där den är gles (telefonens steg 2 och 3), med
+  samma undantag som gängets (mjukvarugrafik och PowerVR; `?rum-kant` för att prova). Se *Hasse Backe i svaga telefoner*
+  under [Tobaksaffären](#tobaksaffären).
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -6692,6 +6703,48 @@ hälften följer bildpunkterna och en knapp tredjedel miljön (reflexerna), och 
 85 ms. Gänget täcker 16 % av sin duk. Med en riktig grafikdel är det andra proportioner, och det enda sättet att se vad en svag
 telefon hinner med är fortfarande `matchfixarna.se/?rum-mat` i telefonen.
 
+### Hasse Backe i svaga telefoner: tidningen och kanterna (2026-11-18)
+
+Användarens önskemål: "Kan du se till att den nya grafiken med Hasse blir riktigt bra o passar sämre mobiler" (efter att han
+börjat läsa av vana, mest Helgarderat, med `lasa6`–`lasa8`). Mätt som telefon i Chromium (412 × 915, täthet 2,625) med
+mjukvarugrafik (SwiftShader, rummet på steg 3) och processorn fyra gånger långsammare, gammal och ny kod om vartannat, med
+rummet färdigladdat innan man vänder sig till honom. Hans bild i vilan och medan han läser kostade lika mycket (5–6 ms i
+median); två saker var fel:
+
+- **Han stod still en halv sekund när han tog upp tidningen.** Det fanns ett ark att trycka på, och varje gång han tog en
+  annan tidning än förra gången trycktes hela uppslaget om och laddades upp till grafikkortet i bilden där klippet började,
+  mitt i rörelsen när han tar fram glasögonen: Helgarderat 550 ms, DN 640 ms och SvD 360 ms. Mest var det textmätning –
+  krönikan på Helgarderats baksida och notiserna på DN:s och SvD:s bröts om med allt mindre text tills de fick plats, upp till
+  34 respektive 23 gånger – och uppladdningen tog 150 ms. Nu finns två ark med egna texturer, Helgarderat och dagens DN eller
+  SvD (`arket` och `steg` i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)), och att byta tidning är att byta
+  textur. De trycks en sida i taget och laddas upp till grafikkortet i förväg, när webbläsaren har tid över
+  (`forberedTidning` i rum-hasse.js, `forbered` i rum-hasse-3d.js): från det att figuren byggs, under svängen dit (som
+  grafikprocessen sköter själv) och medan han väntar, Helgarderat först och sedan DN. Det som ändå inte är tryckt när han
+  börjar läsa (SvD, som finns i två av vanans fem klipp) trycks en sida i varje bild medan han tar på sig glasögonen och
+  tidningen ligger i knät bakom disken (`rita` i rum-hasse-3d.js), och läser han redan när man kommer tar han hellre den som
+  är tryckt (`valjTidning`). Storleken som får plats söks genom halvering (sex försök), och en rad mäts bara hel nära kanten:
+  annars räknas den som raden hittills, ett mellanrum och ordet (`medOrd`). Sidorna är desamma bildpunkt för bildpunkt (DN,
+  SvD och Helgarderat, uppslaget och insidan), och ordens bredder lagda ihop skilde högst 0,0003 bildpunkter från hela
+  radens i 1 794 prov. Mätt: hans bild tar som mest 272–564 → 11–23 ms när klippet börjar, och läser han redan när man
+  kommer börjar svängen till honom 0,25–0,5 s tidigare (Helgarderat trycktes förut först). Det som trycks i förväg tar
+  40–100 ms per sida med den långsamma processorn (första gången DN:s baksida 200–370 ms, när lagens bilder trycks), en gång
+  per besök hos honom och medan han sitter: ett par andetag som kommer en bild för sent i stället för ett stopp mitt i en
+  rörelse. Två ark tar ungefär 7 MB mer än ett.
+- **Kanterna på telefonens lägre steg.** Hans bild ritades aldrig med kantutjämning i en telefon (`antialias: !latt`), och på
+  steg 2 och 3 med 1,25 respektive 1 bildpunkt per punkt, alltså förstorad två–tre gånger: glasögonens tunna båge bröts upp
+  i streck och prickar, och tidningens, koppens, hårets och händernas kanter blev trappsteg som kröp när han rörde sig. Nu
+  har hans bild kantutjämning där duken har högst 1,25 bildpunkter per punkt (telefoner från steg 2, datorer med täthet 1),
+  och i datorn på steg 0 och 1 som förut (`kant` i rum-hasse.js, `kant` till `figuren`). Samma regel som gängets
+  (`kantutjamning` i rum.js): inte med mjukvarugrafik, där processorn räknar varje prov, och inte på PowerVR (Pixel 10), vars
+  drivrutin har kraschat av gängets skuggkarta; grafikkortets namn kommer från rummet (`Rum.gpu`). `?rum-kant` slår på den
+  ändå, för att prova i en sådan telefon. Duken är bara så stor som han, och på de stegen liten. Jämfört i bild med
+  kantutjämningen påtvingad i mjukvarugrafiken: glasögonbågen är hel och kanterna jämna.
+
+Inte provat i en riktig telefon eller i Safari, och kantutjämningens kostnad på en riktig grafikdel är inte mätt
+(mjukvarugrafiken får den inte); för gänget kostade den ungefär en fjärdedel av gängets tid på Apple-grafik (*Flyt och flimmer
+på svaga telefoner*). Hela klippen `lasa`, `lasa2` och `lasa6`–`lasa8`, med Helgarderat, DN och SvD, är spelade i
+telefonens mått utan fel på sidan, och `lasa7` med Helgarderat i datorn (1440 × 900) i bilder.
+
 ### När något går fel i rummet
 
 - **Matcherna går inte att hämta:** `whenMatches` väntar inte förgäves, och `load` försöker igen
@@ -10270,16 +10323,18 @@ och grader, prognosen för Stockholm och kvällens tv i SVT1, SVT2 och TV4. Nyhe
 (`NYHETER`, `PUFFAR` i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)) är påhittade och tidlösa, utan namn på
 riktiga personer och utan sport, och dagen väljer dem (`dagens`): samma hela dagen, och aldrig samma nyhet i båda. Bilderna är målade
 där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga vid en sjö, skärgården med färjan, hyreshus och
-en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen och i varje ny figur
-(`tidningKlar` i rum-hasse.js) och trycks om när han tar upp den andra (`visa`).
+en julgata) och sedan blekta och korniga som i tryck. Tidningen hämtas en gång om dagen och i varje ny figur
+(`tidningKlar` i rum-hasse.js) och trycks i förväg, en sida i taget, på ett eget ark: Helgarderat på ett och dagens DN eller
+SvD på ett annat, så att han kan ta upp vilken som helst utan att något trycks just då (se *Hasse Backe i svaga
+telefoner* under [Tobaksaffären](#tobaksaffären)).
 
 **Helgarderat** (2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste numret av
 helgarderat", och 2026-11-18: "Han ska ffa läsa helgarderat"): tre gånger av fyra när han tar upp tidningen (`HG_ANDEL`
 och `valjTidning` i rum-hasse.js, lottat varje gång; förut en gång av tre) läser han Helgarderat i stället för klippets
 DN eller SvD, och klippet är detsamma. Det är det senaste numret, samma som ligger på pulten (`Rum.numret` i rum.js),
-och det trycks på hans papper när hans figur byggs och igen när ett nytt nummer har kommit (`tidningKlar` i
-rum-hasse.js, `helgarderat` i rum-hasse-tidning.js). I en ny figur väntar bygget på det, högst lika länge som på disken
-(1,5 s), så att det finns när han läser redan när man kommer: förut trycktes det först när han tog upp tidningen, och
+och det görs i ordning när hans figur byggs och igen när ett nytt nummer har kommit (`tidningKlar` i
+rum-hasse.js, `helgarderat` i rum-hasse-tidning.js), och trycks sedan först av allt i förväg. I en ny figur väntar bygget på
+numret, högst lika länge som på disken (1,5 s), så att det finns när han läser redan när man kommer: förut trycktes det först när han tog upp tidningen, och
 då hann det inte bli klart (i headless Chromium med mjukvarugrafik ungefär en sekund för sent), så att han läste DN
 eller SvD. Orden kommer från tidningen själv
 (`RumTidning.omslag` i rum-tidning.js) och måtten från helgarderat.css. Omslaget mot en är Kalenderbladet, 100 × 140

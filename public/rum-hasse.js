@@ -59,6 +59,15 @@ window.RumHasse = (() => {
   // under en hel skärmbilds tid, så att ett ryck i webbläsarens takt inte hoppar över en bild (förut 33 ms, och
   // 32,9 ms mellan två skärmbilder blev ibland 50 ms).
   const takt = (ror) => (ror ? [12, 12, 31, 31] : [31, 31, 48, 64])[steg()];
+  // Kantutjämning i hans bild (2026-11-18): som förut i datorn på steg 0 och 1, och dessutom där duken har högst 1,25
+  // bildpunkter per punkt (alla telefoner från steg 2, och datorer med täthet 1). Där förstoras hans bild två–tre gånger
+  // i en telefon, och utan utjämning bröts glasögonens tunna båge upp i streck och tidningens, koppens och händernas
+  // kanter blev trappsteg som kröp när han rörde sig. Duken är liten där (bara så stor som han), så den kostar lite.
+  // Samma regel som gängets (kantutjamning i rum.js): inte med mjukvarugrafik, där processorn räknar varje prov, och inte
+  // på PowerVR (Pixel 10), vars drivrutin har kraschat av gängets skuggkarta. ?rum-kant slår på den ändå, för att prova.
+  const MJUK_GPU = /SwiftShader|llvmpipe|softpipe|Software|Basic Render|PowerVR/i;
+  const KANT_PROV = /[?&]rum-kant\b/.test(location.search);
+  const kant = () => (!latt() && steg() < 2) || (pixlar() <= 1.25 && (KANT_PROV || !MJUK_GPU.test(window.Rum && Rum.gpu ? Rum.gpu() : '')));
 
   // Rummet är ledigt: ingen närbild, ingen kupong i handen.
   function ledigt() {
@@ -1470,7 +1479,7 @@ window.RumHasse = (() => {
     let ny = false;
     if (!H.fig) {
       H.figHog = H.hog;
-      H.fig = await H.m.figuren($('.rh-duk'), { hog: H.hog, latt: latt() || steg() >= 2, pr: pixlar() });
+      H.fig = await H.m.figuren($('.rh-duk'), { hog: H.hog, latt: latt() || steg() >= 2, pr: pixlar(), kant: kant() });
       H.figNr = (H.figNr || 0) + 1;
       ny = true;
     }
@@ -3213,8 +3222,8 @@ window.RumHasse = (() => {
   // Tidningen i ordning i hans figur: dagens tryck (en gång om dagen, och igen i en ny figur) och Helgarderat (när ett
   // nytt nummer har kommit, och igen i en ny figur). Görs när figuren byggs, och bygget väntar en stund på Helgarderat
   // (som visas först när typsnitten och porträttet har kommit), så att det finns när han läser redan när man kommer;
-  // förut kom det någon sekund för sent, och han läste DN eller SvD. → Promise tills Helgarderat är klart i en ny
-  // figur, annars null.
+  // förut kom det någon sekund för sent, och han läste DN eller SvD. Sedan trycks de i förväg (forberedTidning).
+  // → Promise tills Helgarderat är klart i en ny figur, annars null.
   function tidningKlar() {
     const fig = H.fig;
     if (!fig || !H.m || !H.m.dagens || calm()) return null;
@@ -3222,7 +3231,7 @@ window.RumHasse = (() => {
     if (H.lasDag !== d.dag || H.lasFig !== fig) {
       H.lasDag = d.dag;
       H.lasFig = fig;
-      fig.tidning(d);
+      Promise.resolve(fig.tidning(d)).then(forberedTidning, () => {});
     }
     if (!fig.helgarderat || !window.Rum || !Rum.numret) return null;
     const ny = H.hgFig !== fig;
@@ -3232,7 +3241,23 @@ window.RumHasse = (() => {
       H.hgFig = fig;
       return fig.helgarderat(u);
     }).catch(() => null);
+    klar.then(forberedTidning);
     return ny ? klar : null;
+  }
+  // Tidningarna trycks och laddas upp till grafikkortet i förväg (forbered i rum-hasse-3d.js), ett steg i taget när
+  // webbläsaren har tid över, så att det inte görs i bilden där han tar upp den: med en långsam telefons processor stod
+  // han förut still en halv sekund då. Det börjar när figuren byggs och tidningen har kommit (tidningKlar), går vidare
+  // medan kameran svänger (det är grafikprocessens sak) och medan han väntar, och börjar om när något nytt har kommit.
+  const ledigTid = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 60));
+  function forberedTidning() {
+    const fig = H.fig;
+    if (!fig || !fig.forbered || H.forbFig === fig) return;
+    H.forbFig = fig;
+    const nasta = () => {
+      if (H.fig === fig && fig.forbered()) { ledigTid(nasta); return; }
+      if (H.forbFig === fig) H.forbFig = null;
+    };
+    ledigTid(nasta);
   }
   function upptagen(lage) {
     H.upptagen = Boolean(lage) && !calm() && Boolean(H.fig && H.m && H.m.dagens);
@@ -3240,9 +3265,14 @@ window.RumHasse = (() => {
     tidningKlar();
     H.lasT = performance.now() + (H.on ? 1500 : 0);
   }
-  // Tidningen han tar upp den här gången: oftast Helgarderat (HG_ANDEL), annars klippets egen (DN eller SvD).
-  function valjTidning(k) {
-    if (k && k.tidning && H.fig && H.fig.blad) H.fig.blad(Math.random() < HG_ANDEL ? 'hg' : null);
+  // Tidningen han tar upp den här gången: oftast Helgarderat (HG_ANDEL), annars klippets egen (DN eller SvD). nu: han
+  // läser redan när man kommer, så att den syns direkt: då hellre den som redan är tryckt, om den andra inte är det.
+  function valjTidning(k, nu = false) {
+    if (!(k && k.tidning && H.fig && H.fig.blad)) return;
+    let hg = Math.random() < HG_ANDEL;
+    const f = H.fig;
+    if (nu && f.tryckt && !f.tryckt(hg ? 'hg' : k.tidning) && f.tryckt(hg ? k.tidning : 'hg')) hg = !hg;
+    f.blad(hg ? 'hg' : null);
   }
   // Han läser redan och tittar upp på en just när man är framme (kom), eller håller redan på med något annat, strax
   // innan man ertappar honom (fram). vana: han läser av vana (VANA_LAS), inte för att det har gått dåligt.
@@ -3256,7 +3286,7 @@ window.RumHasse = (() => {
     }
     H.klipp = { ...k };
     H.T = k.fran + (k.fram ?? k.kom ?? H.m.LAS_START);
-    valjTidning(H.klipp);
+    valjTidning(H.klipp, true);
   }
   // Hans omgång i sammanställningen: tävlingskupongen om han spelade, annars det han sa. → { lage, ok, n }
   // (lage null när det inte gick dåligt), eller null.

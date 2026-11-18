@@ -11,7 +11,8 @@
 //
 // Oftast läser han Helgarderat i stället, det senaste numret (helgarderat(upplaga), se Helgarderat nedan).
 //
-// byggTidning(bord) → { mesh, U, tryck(dag), helgarderat(upplaga), har(namn), visa(namn), borta() }; dagens(now) → det tryck() vill ha
+// byggTidning(bord, { upp }) → { mesh, U, tryck(dag), helgarderat(upplaga), steg(namn), har(namn), klar(namn), visa(namn), borta() };
+// upp(textur) laddar upp en textur till grafikkortet i förväg. dagens(now) → det tryck() vill ha
 // ytan(qx, qy, s, ut): punkten (qx −1–1 över uppslaget, qy 0–1 nedifrån) i papperets mått, s: { beta, buk, vag, fas }
 import * as THREE from 'three';
 import { LJUS, BORD_GLSL, DAG, LYS } from './rum-hasse-arm.js';
@@ -194,14 +195,26 @@ function skriv(x, text, x0, y, font, { sp = 0, farg = SVART, max = Infinity, lin
   x.restore();
   return w * k;
 }
+// Raden hittills (r, bredden rw) med ordet o (bredden ow) efter ett mellanrum (sp): bredden, räknad som summan. Den
+// stämmer på tusendelar av en bildpunkt (det finns ingen kerning över mellanrummet), men nära kanten (gräns) mäts raden
+// ändå, så att den bryts exakt som förut. Förut mättes hela raden för varje ord, och raderna blir långa: tre gånger så
+// lång tid, och notiserna och krönikan bryts om flera gånger tills de ryms.
+function medOrd(x, r, rw, o, ow, sp, grans) {
+  const nw = rw + sp + ow;
+  return Math.abs(nw - grans) < 3 ? x.measureText(`${r} ${o}`).width : nw;
+}
 function radbryt(x, text, font, w) {
   x.font = font;
   const ord = String(text).split(/\s+/);
   const rader = [];
+  const sp = x.measureText(' ').width;
   let r = '';
+  let rw = 0;
   for (const o of ord) {
-    const n = r ? `${r} ${o}` : o;
-    if (x.measureText(n).width > w && r) { rader.push(r); r = o; } else r = n;
+    const ow = x.measureText(o).width;
+    if (!r) { r = o; rw = ow; continue; }
+    const nw = medOrd(x, r, rw, o, ow, sp, w);
+    if (nw > w) { rader.push(r); r = o; rw = ow; } else { r = `${r} ${o}`; rw = nw; }
   }
   if (r) rader.push(r);
   return rader;
@@ -785,9 +798,21 @@ function notisRader(x, x0, y0, lista, T) {
     text: radbryt(x, n.text, BROD(p), tw),
   }));
   const hojd = (r, p) => r.rub.length * p * 1.38 + r.text.length * p * 1.22;
-  let p = 10;
-  let rader = satt(p);
-  while (p > 4.5 && rader.some((r) => hojd(r, p) > rh - 4)) { p -= 0.25; rader = satt(p); }
+  // Den största storleken från 10 och nedåt i steg om en kvarts punkt (högst 4,5) där alla ryms, sökt genom halvering:
+  // sex försök i stället för upp till 23, och varje försök bryter alla tretton notiserna. Samma storlek som förut,
+  // eftersom mindre text aldrig tar mer plats.
+  const ryms = (r, p) => !r.some((q) => hojd(q, p) > rh - 4);
+  const prov = new Map();
+  const vid = (k) => { if (!prov.has(k)) prov.set(k, satt(10 - 0.25 * k)); return prov.get(k); };
+  let lo = 0;
+  let hi = 22;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (ryms(vid(mid), 10 - 0.25 * mid)) hi = mid;
+    else lo = mid + 1;
+  }
+  const p = 10 - 0.25 * lo;
+  const rader = vid(lo);
   lista.forEach((n, i) => {
     const ry = y0 + i * rh;
     if (i) linje(x, x0 + M, ry, SB - 2 * M, 0.8, GRA);
@@ -1122,10 +1147,15 @@ function spalter(x, stycken, cw, gap, font, lh, luft, { anfang = false, sign = n
     const forst = rader.length;
     // (de två första raderna går bredvid anfangen)
     const indrag = () => (cap && rader.length - forst < 2 ? capW : 0);
+    const sp = x.measureText(' ').width;
     let r = '';
+    let rw = 0;
     for (const o of t.split(/\s+/)) {
-      const n = r ? `${r} ${o}` : o;
-      if (r && x.measureText(n).width > cw - indrag()) { rader.push({ text: r, font, h: lh, dx: indrag() }); r = o; } else r = n;
+      const ow = x.measureText(o).width;
+      if (!r) { r = o; rw = ow; continue; }
+      const w = cw - indrag();
+      const nw = medOrd(x, r, rw, o, ow, sp, w);
+      if (nw > w) { rader.push({ text: r, font, h: lh, dx: indrag() }); r = o; rw = ow; } else { r = `${r} ${o}`; rw = nw; }
     }
     if (r) rader.push({ text: r, font, h: lh, dx: indrag() });
     if (cap) rader[forst].cap = { ...cap, dy: Math.min(2, rader.length - forst) * lh };
@@ -1211,16 +1241,31 @@ function sistaHg(x, x0, o, portratt) {
   const gap = 30 * f;
   const cw = (W - gap) / 2;
   const kasRub = balans(x, S.kaseri.rubrik, FRA(rf, 600), W, 3).length * rf * 1.14 + 14 * f;
-  let t = 1;
-  let kr;
-  let ks;
-  for (;;) {
+  // Den största skalan från 1 och nedåt i steg om 0,02 (som minst den första under 0,36) där allt ryms, sökt genom
+  // halvering: sex försök i stället för upp till 34, och varje försök mäter varje ord i krönikan och kåseriet (en
+  // tredjedel av en sekund med en långsam telefons processor, mitt i en rörelse). Skalorna räknas som förut, genom att
+  // dra 0,02 i taget, så att de blir exakt desamma; samma skala som förut, eftersom mindre text aldrig tar mer plats.
+  const skalor = [1];
+  while (skalor[skalor.length - 1] >= 0.36) skalor.push(skalor[skalor.length - 1] - 0.02);
+  const prov = new Map();
+  const vid = (i) => {
+    if (prov.has(i)) return prov.get(i);
+    const t = skalor[i];
     const p = 16 * f * t;
-    kr = spalter(x, S.kronika.stycken, cw, gap, FRA(p, 400), p * 1.6, 10 * f * t, { anfang: true });
-    ks = spalter(x, S.kaseri.stycken, cw, gap, FRA(p * 15.5 / 16, 400), p * 1.55, 10 * f * t, { sign: { av: S.kaseri.av, om: S.kaseri.om ? S.kaseri.om[0].toUpperCase() + S.kaseri.om.slice(1) : '' } });
-    if (y + kr.h + 30 * f * t + ef * 1.2 + 16 * f + kasRub + ks.h <= botten || t < 0.36) break;
-    t -= 0.02;
+    const kr = spalter(x, S.kronika.stycken, cw, gap, FRA(p, 400), p * 1.6, 10 * f * t, { anfang: true });
+    const ks = spalter(x, S.kaseri.stycken, cw, gap, FRA(p * 15.5 / 16, 400), p * 1.55, 10 * f * t, { sign: { av: S.kaseri.av, om: S.kaseri.om ? S.kaseri.om[0].toUpperCase() + S.kaseri.om.slice(1) : '' } });
+    const ut = { t, kr, ks, ryms: y + kr.h + 30 * f * t + ef * 1.2 + 16 * f + kasRub + ks.h <= botten };
+    prov.set(i, ut);
+    return ut;
+  };
+  let lo = 0;
+  let hi = skalor.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (vid(mid).ryms) hi = mid;
+    else lo = mid + 1;
   }
+  const { t, kr, ks } = vid(lo);
   kr.rita(x, L, y, botten);
   y += kr.h + 30 * f * t;
   if (y + ef * 1.2 + 16 * f + kasRub < botten) {
@@ -1377,7 +1422,7 @@ function insidaHg(c, seed) {
 }
 
 // ---------- papperet ----------
-export function byggTidning(bord) {
+export function byggTidning(bord, { upp = null } = {}) {
   const NX = 36;
   const NY = 22;
   const pos = [];
@@ -1390,12 +1435,6 @@ export function byggTidning(bord) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setIndex(idx);
-  const ut = document.createElement('canvas');
-  ut.width = 2 * SB;
-  ut.height = SH;
-  const inn = document.createElement('canvas');
-  inn.width = 256;
-  inn.height = 182;
   const tex = (c) => {
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = THREE.NoColorSpace;
@@ -1404,8 +1443,30 @@ export function byggTidning(bord) {
     t.anisotropy = 4;
     return t;
   };
+  // Två ark (2026-11-18): Helgarderat ('hg') och dagens morgontidning ('dag', DN eller SvD), vart och ett med uppslaget
+  // (ut) och insidan (inn) på egna dukar och texturer. Att byta tidning är att byta textur. Förut fanns ett ark, och
+  // varje gång han tog upp en annan tidning än förra gången trycktes den om och laddades upp till grafikkortet i samma
+  // bild: med en långsam telefons processor stod han still en halv sekund medan han tog på sig glasögonen. Nu trycks
+  // de i förväg, en sida i taget (steg): när han sitter och väntar (forbered i rum-hasse.js), och annars medan han tar
+  // på sig glasögonen och tidningen ligger i knät (rita i rum-hasse-3d.js). nyckel: det som står på arket (tidningen
+  // och tryckets nummer), sidor: hur många av de tre sidorna som är tryckta, uppe: texturerna är på grafikkortet.
+  const ark = {};
+  function arket(plats) {
+    if (!ark[plats]) {
+      const ut = document.createElement('canvas');
+      ut.width = 2 * SB;
+      ut.height = SH;
+      const inn = document.createElement('canvas');
+      inn.width = 256;
+      inn.height = 182;
+      ark[plats] = { ut, inn, tUt: tex(ut), tIn: tex(inn), nyckel: -1, sidor: 0, uppe: false };
+    }
+    return ark[plats];
+  }
+  const platsFor = (namn) => (namn === 'hg' ? 'hg' : 'dag');
+  const dag0 = arket('dag');
   const U = {
-    uUt: { value: tex(ut) }, uIn: { value: tex(inn) },
+    uUt: { value: dag0.tUt }, uIn: { value: dag0.tIn },
     uBeta: { value: 0.1 }, uBuk: { value: 0.1 }, uVag: { value: 0 }, uFas: { value: 0 },
     uBord: bord, uButik: bord.butik, uDag: bord.dag || DAG, uLys: bord.lys || LYS,
   };
@@ -1417,40 +1478,74 @@ export function byggTidning(bord) {
   mesh.matrixAutoUpdate = false;
   mesh.visible = false;
   let dagNu = null;
+  // dagens tryck: ökar med en ny dag och när typsnitten och notiserna har kommit (då trycks det om); klart: de har
+  // kommit, och först då trycks det i förväg (annars två gånger)
+  let dagNr = 0;
+  let dagKlar = false;
   let visad = 'dn';
   let nr = 0;
   // Helgarderats nummer (RumTidning.omslag), när typsnitten och porträttet har kommit
   let hg = null;
   let hgNr = 0;
-  // Trycker uppslaget (förstasidan, baksidan och insidan) för tidningen som visas: dagens DN eller SvD, eller
-  // Helgarderat. Typsnitten hämtas först; kommer de sent trycks det om.
-  function rita() {
-    const x = ut.getContext('2d');
-    if (visad === 'hg') {
-      if (!hg) return;
-      if (hg.o.sista) sistaHg(x, 0, hg.o, hg.portratt);
-      else innehallHg(x, 0, hg.o);
-      forstaHg(x, SB, hg.o);
-      insidaHg(inn, hg.seed);
-    } else {
-      if (!dagNu) return;
-      baksida(x, 0, dagNu, visad);
-      (visad === 'svd' ? forstaSvd : forstaDn)(x, SB, dagNu);
-      insida(inn, visad, dagNu);
+  // Det som ska stå på arket för tidningen namn, eller null när den inte går att trycka än
+  const nyckel = (namn) => (namn === 'hg' ? (hg ? hgNr * 2 : null) : dagNu ? dagNr * 2 + (namn === 'svd' ? 1 : 0) : null);
+  // Tidningens tre sidor på arket a: baksidan och förstasidan på uppslaget, och insidan
+  function sida(namn, a, i) {
+    const x = a.ut.getContext('2d');
+    if (namn === 'hg') {
+      if (i === 0) {
+        if (hg.o.sista) sistaHg(x, 0, hg.o, hg.portratt);
+        else innehallHg(x, 0, hg.o);
+      } else if (i === 1) forstaHg(x, SB, hg.o);
+      else insidaHg(a.inn, hg.seed);
+    } else if (i === 0) baksida(x, 0, dagNu, namn);
+    else if (i === 1) (namn === 'svd' ? forstaSvd : forstaDn)(x, SB, dagNu);
+    else insida(a.inn, namn, dagNu);
+  }
+  // Ett steg mot att tidningen namn ligger färdig på sitt ark: en sida, eller uppladdningen (uppNu). → om något gjordes.
+  // Arket som han har i händerna trycks inte om med den andra tidningen, utom när den nya ska fram (tvinga: han tar
+  // upp den nu, eller den ligger redan i knät).
+  function steg(namn, tvinga = false, uppNu = true) {
+    const n = nyckel(namn);
+    if (n === null || (!tvinga && namn !== 'hg' && !dagKlar)) return false;
+    const a = arket(platsFor(namn));
+    if (a.nyckel !== n) {
+      if (!tvinga && mesh.visible && visad !== namn && platsFor(visad) === platsFor(namn)) return false;
+      a.nyckel = n;
+      a.sidor = 0;
+      a.uppe = false;
     }
-    U.uUt.value.needsUpdate = true;
-    U.uIn.value.needsUpdate = true;
+    if (a.sidor < 3) {
+      sida(namn, a, a.sidor);
+      a.sidor += 1;
+      if (a.sidor === 3) {
+        a.tUt.needsUpdate = true;
+        a.tIn.needsUpdate = true;
+      }
+      return true;
+    }
+    if (!a.uppe && upp && uppNu) {
+      upp(a.tUt);
+      upp(a.tIn);
+      a.uppe = true;
+      return true;
+    }
+    return false;
   }
   let fonter = null;
   async function tryck(dag) {
     const mitt = ++nr;
     dagNu = dag;
-    if (visad !== 'hg') rita();
+    dagNr += 1;
+    dagKlar = false;
     fonter = fonter || (document.fonts && document.fonts.load
       ? Promise.race([Promise.all([document.fonts.load(PLAY(30, 900)), document.fonts.load(PLAY(30, 700)), document.fonts.load(FRA(30, 600)), document.fonts.load(FRA(30, 700))]), new Promise((ok) => setTimeout(ok, 2500))])
       : Promise.resolve());
     await Promise.all([fonter, laddaNotiser().then(laddaBilder)]);
-    if (mitt === nr && visad !== 'hg') rita();
+    // (med typsnitten och notiserna trycks den om, när den behövs)
+    if (mitt !== nr) return;
+    dagNr += 1;
+    dagKlar = true;
   }
   let fonterHg = null;
   let portratt = null;
@@ -1468,18 +1563,31 @@ export function byggTidning(bord) {
     const [, bild] = await Promise.all([fonterHg, portratt]);
     if (mitt !== hgNr) return;
     hg = { o, portratt: bild, seed: Math.abs(Number(String(o.over).replace(/\D+/g, '')) || 1) };
-    if (visad === 'hg') rita();
   }
   return {
-    mesh, U, tryck, helgarderat,
+    mesh, U, tryck, helgarderat, steg,
     // finns tidningen att visa ('dn', 'svd' eller 'hg')
     har: (namn) => (namn === 'hg' ? Boolean(hg) : Boolean(TIDNINGAR[namn])),
-    // vilken av tidningarna han har i händerna ('dn', 'svd' eller 'hg'); trycks om när den byts
-    visa(namn) {
-      if (namn === visad || !(namn === 'hg' ? hg : TIDNINGAR[namn])) return;
-      visad = namn;
-      rita();
+    // är den tryckt och klar att visa direkt
+    klar(namn) {
+      const n = nyckel(namn);
+      const a = ark[platsFor(namn)];
+      return n !== null && Boolean(a) && a.nyckel === n && a.sidor === 3;
     },
-    borta() { g.dispose(); mesh.material.dispose(); U.uUt.value.dispose(); U.uIn.value.dispose(); },
+    // vilken av tidningarna han har i händerna ('dn', 'svd' eller 'hg'), i varje bild medan han läser: arkets
+    // texturer, och det som inte är tryckt än trycks nu
+    visa(namn) {
+      if (nyckel(namn) === null) return;
+      while (steg(namn, true, false));
+      visad = namn;
+      const a = ark[platsFor(namn)];
+      U.uUt.value = a.tUt;
+      U.uIn.value = a.tIn;
+    },
+    borta() {
+      g.dispose();
+      mesh.material.dispose();
+      for (const a of Object.values(ark)) { a.tUt.dispose(); a.tIn.dispose(); }
+    },
   };
 }
