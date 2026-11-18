@@ -501,10 +501,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   [Hasse Backe](#hasse-backe))
 - [x] **Tv:n följer med (2026-11-18, användarens önskemål: "Kan du ordna så att man kan välja om man vill få med
   TVapparaten där man ser de andra på en liten bild i ett hörn i mobilen (uppe till höger) när man surfar runt på andra
-  ställen på sidan"):** nära tv:n står *Ta med tv:n* i foten när den står på AV. Då går man till den vanliga sidan, och
-  tv:n krymper till en liten tv uppe till höger, under menyn, som följer med överallt på sajten – också över
-  matchrutan och till Tabeller, Statistik och Om oss. Kameran och bilden fortsätter. Ett tryck på den lilla tv:n går
-  tillbaka till tv:n i rummet, krysset stänger den (se *Tv:n följer med* under [Tv:n](#tvn))
+  ställen på sidan" och "Tänker där jag har text-tv nu"):** nära tv:n står *Ta med tv:n* i foten. Då går man till den
+  vanliga sidan, och tv:n krymper till en liten tv uppe till höger, under menyn, som följer med överallt på sajten –
+  också över matchrutan och till Tabeller, Statistik och Om oss. Den visar det tv:n visar: text-tv:n, som går vidare,
+  eller gänget i bild, och byter till AV när någon visar sig, som i rummet. Kameran och bilden fortsätter. Ett tryck på
+  den lilla tv:n går tillbaka till tv:n i rummet, krysset stänger den (se *Tv:n följer med* under [Tv:n](#tvn))
 
 ## Publicering
 
@@ -8204,35 +8205,41 @@ båda gör det samtidigt och erbjudandena krockar) och en sida som laddas om. In
 iPhone, två olika nät (mobilnät utan TURN) och tjänsten driftsatt.
 
 **Tv:n följer med (2026-11-18).** Användaren: "Kan du ordna så att man kan välja om man vill få med TVapparaten där man
-ser de andra på en liten bild i ett hörn i mobilen (uppe till höger) när man surfar runt på andra ställen på sidan".
-Valet är en knapp, inte en inställning: den lilla tv:n kommer bara när man ber om den, så att ingen kamera fortsätter
-utan att man vet om det ([public/rum-bild.js](public/rum-bild.js), stilen sist i [public/rum-tv.css](public/rum-tv.css)).
+ser de andra på en liten bild i ett hörn i mobilen (uppe till höger) när man surfar runt på andra ställen på sidan", och
+sedan, om text-tv:n: "Tänker där jag har text-tv nu". Valet är en knapp, inte en inställning: den lilla tv:n kommer bara
+när man ber om den, så att ingen kamera fortsätter utan att man vet om det ([public/rum-bild.js](public/rum-bild.js),
+stilen sist i [public/rum-tv.css](public/rum-tv.css)).
 
-- **Ta med tv:n** står i foten nära tv:n när den står på AV (inte medan tv:n frågar *Vem är du?*), bredvid *Visa dig
-  på tv:n*. I telefonen på höjden står den där *Vanlig sida* stod, för den leder också dit. Ett tryck går till den
-  vanliga sidan (`#hem`), och tv:n krymper från sin plats i rummet till hörnet.
+- **Ta med tv:n** står i foten nära tv:n när den är på (inte medan den frågar *Vem är du?*), bredvid *Visa dig på
+  tv:n*. I telefonen på höjden står den där *Vanlig sida* stod, för den leder också dit. Ett tryck går till den vanliga
+  sidan (`#hem`), och tv:n krymper från sin plats i rummet till hörnet.
 - **Den lilla tv:n** är samma Panasonic utan panelen med knapparna: fronten 238 × 196 förminskad till 162 × 133 i
   telefonen och i full storlek på större skärmar, uppe till höger under menyn. I telefonen följer den menyn uppåt när
-  loggans rad skrollas undan (`--topp`). Rutan är densamma som i rummet – bilden flyttas dit med sina videor, som spelar
-  vidare – och lampan under rutan är röd medan din kamera är tänd. Den ligger i det översta lagret (popover), och medan
-  matchrutan är öppen flyttas den in i den, annars gick den inte att trycka på där.
+  loggans rad skrollas undan (`--topp`). Rutan är tv:ns egen – den flyttas dit med text-tv:n och videorna, som går
+  vidare – så den visar det tv:n visar: text-tv:n på den sida den stod på (undersidorna bläddrar själva, och raderna
+  ritas om varje minut, `tvKoll` i rum.js), eller AV. Visar sig någon byter den till AV med snö, och slutar alla går den
+  tillbaka till text-tv:n, som i rummet. Lampan under rutan är röd medan din kamera är tänd. Den ligger i det översta
+  lagret (popover), och medan matchrutan är öppen flyttas den in i den, annars gick den inte att trycka på där.
 - **Ett tryck** på den lilla tv:n går till tv:n i rummet, nära (`Rum.tv()`); **krysset** stänger den: kameran släcks
   och förbindelserna stängs, som när man lämnar rummet, och tv:n i rummet står på text-tv:n tills någon visar sig. Med
-  mus syns krysset när man pekar på tv:n. **Slutar alla visa sig** slocknar den lilla tv:n av sig själv, som tv:n i
-  rummet går tillbaka till text-tv:n – utom medan förbindelsen till tjänsten är nere (en dold flik, ett nät som
-  hackar): då vet sidan inte om någon slutade, och tv:n står kvar tills den vet.
+  mus syns krysset när man pekar på tv:n.
+- **Förstasidan laddad på nytt** (eller från en av de egna sidorna, med `#kupong` …): då finns inget rum, och rum.js
+  bygger bara tv:n i en dold låda (`Rum.tvUtan`), med samma rader som i rummet, så att text-tv:n följer med också då.
+  Går man in i rummet sedan flyttar den tv:n in där, med det den visar.
 - **Egna sidor:** Tabeller, Statistik och Om oss laddas som nya sidor, och då bryts förbindelserna. Tv:n följer ändå
-  med: sidan minns att den följer med (`profeterna.tv.foljer` i sessionStorage, med om kameran var tänd), och där
-  hämtar [public/tv-med.js](public/tv-med.js) tv:ns stil, `tippoang.js` och `rum-bild.js` – bara när tv:n följer med.
-  Den kopplar upp sig igen (snö ett ögonblick), tänder kameran om den var tänd och läser gänget ur
-  `data/kuponger.json` själv. Samma sak tillbaka på förstasidan, där rummet tar över tv:n om man kommer dit. Som med
-  `ATER` följer den bara med inom tio minuter.
+  med: sidan minns att den följer med (`profeterna.tv.foljer` i sessionStorage, med om den stod på AV och om kameran var
+  tänd), och där hämtar [public/tv-med.js](public/tv-med.js) tv:ns stil, `tippoang.js` och `rum-bild.js` – bara när
+  tv:n följer med. Den kopplar upp sig igen (snö ett ögonblick), tänder kameran om den var tänd och läser gänget ur
+  `data/kuponger.json` själv. Text-tv:n kan inte följa med dit (dess rader kommer ur förstasidans kupong och omgång),
+  så där syns den lilla tv:n bara med AV: när någon visar sig, och den slocknar när ingen gör det. Den följer med
+  vidare ändå, och på förstasidan står text-tv:n i den igen. Som med `ATER` följer den bara med inom tio minuter.
 
 Provat 2026-11-18 i huvudlös Chrome med låtsaskamera mot en lokal kopia av tjänsten och ett bygge utan källor (också
-`--minify`): en i telefon (Pixel 7) och en på datorn – Ta med tv:n med och utan egen kamera, skrollat, Matcher,
-matchrutan (tv:n syns och går att trycka på), Tabeller och Statistik (kameran tänds igen och den andra ser en igen),
-tillbaka till Kupong, ett tryck på den lilla tv:n (rummet med tv:n nära), krysset och den andra som släcker sin kamera
-(den lilla tv:n slocknar). Inte provat: riktiga kameror, Safari i iPhone och appen.
+`--minify`): en i telefon (Pixel 7) och en på datorn – Ta med tv:n på text-tv och på AV, med och utan egen kamera,
+skrollat, Matcher, matchrutan (tv:n syns och går att trycka på), den andra som visar sig och släcker (AV och tillbaka
+till text-tv:n), Kupong och Olympen laddade på nytt (tv:n byggd utan rummet, och sedan in i rummet), Tabeller och
+Statistik (bara AV; kameran tänds igen och den andra ser en igen), ett tryck på den lilla tv:n (rummet med tv:n nära)
+och krysset. Inte provat: riktiga kameror, Safari i iPhone och appen.
 
 **Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
 vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot

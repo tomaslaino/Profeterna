@@ -25,14 +25,16 @@
 //  – Fliken dold eller rummet stängt: kameran släcks och tänds igen av sig själv
 //    när man kommer tillbaka inom tio minuter (ATER) – så bryts inget när man
 //    växlar till telefonsamtalet en stund.
-//  – Ta med tv:n (i foten nära tv:n när den står på AV): man går till den vanliga
-//    sidan, och tv:n krymper till en liten tv uppe till höger som följer med vart
-//    man än går på sajten – kameran och bilden fortsätter. Ett tryck på den lilla
-//    tv:n går tillbaka till tv:n i rummet, och krysset stänger den (kameran
-//    släcks, som när man lämnade rummet). Slutar alla visa sig slocknar den lilla
-//    tv:n, som tv:n i rummet går tillbaka till text-tv:n. Till Tabeller, Statistik
-//    och Om oss, som är egna sidor, följer den med genom att koppla upp sig igen
-//    (sessionStorage profeterna.tv.foljer, tv-med.js laddar det som behövs där).
+//  – Ta med tv:n (i foten nära tv:n): man går till den vanliga sidan, och tv:n
+//    krymper till en liten tv uppe till höger som följer med vart man än går på
+//    sajten. Den visar tv:ns egen ruta – text-tv:n, som går vidare, eller AV –
+//    och byter till AV när någon visar sig, som i rummet; kameran och bilden
+//    fortsätter. Ett tryck på den lilla tv:n går tillbaka till tv:n i rummet, och
+//    krysset stänger den (kameran släcks, som när man lämnade rummet). Till
+//    Tabeller, Statistik och Om oss, som är egna sidor, följer den med genom att
+//    koppla upp sig igen (sessionStorage profeterna.tv.foljer, tv-med.js laddar
+//    det som behövs där); text-tv:n finns bara på förstasidan, så där syns den
+//    lilla tv:n bara med AV.
 //
 // Vem du är: den du har valt i rummet (Samtal.pult.du()), annars den enheten
 // minns från kupongen, annars frågar tv:n (Vem är du?, sparas för tv:n i
@@ -52,6 +54,7 @@
 //   RumBild.on(true | false)    rummet visas eller inte
 //   RumBild.avVal(on)           den som tittar bytte själv på tv:n (TV/AV, en sida …)
 //   RumBild.foljer()            tv:n följer med utanför rummet (den lilla tv:n)
+//   RumBild.knapp()             tv:n slogs av eller på (Ta med tv:n i foten)
 //
 // För prov: ?rum-bild=ws://127.0.0.1:8787/bild (en annan tjänst, t.ex. wrangler
 // dev) och ?rum-bild-vem=DT (vem du är här).
@@ -75,8 +78,9 @@ window.RumBild = (() => {
   const B = {
     el: null, tv: null, knapp: null, tamed: null,
     // ute: tv:n följer med utanför rummet (mini: den lilla tv:n), tamed: Ta med tv:n
-    // trycktes nyss (fran: var tv:n stod), tillTv: fram till tv:n när rummet visas
-    ute: false, mini: null, inne: null, tamedNu: false, fran: null, tillTv: false, samtal: null,
+    // trycktes nyss (fran: var tv:n stod), tillTv: fram till tv:n när rummet visas,
+    // ram: där tv:ns ruta sitter i tv:n
+    ute: false, mini: null, inne: null, tamedNu: false, fran: null, tillTv: false, samtal: null, ram: null,
     on: false, ws: null, uppe: false, timer: 0, ping: 0, retry: 0, vem: null, vemT: 0,
     id: fonster(), ice: null, alla: [], peers: new Map(),
     stream: null, startar: false, fel: '', valj: null,
@@ -112,7 +116,7 @@ window.RumBild = (() => {
   const aktiv = () => B.on || B.ute;
 
   // Gänget och tjänstens adress (data/kuponger.json): kupong.js läser dem på
-  // förstasidan; på Tabeller, Statistik och Om oss hämtas de här. → om de finns
+  // förstasidan (loadCoupons); på Tabeller, Statistik och Om oss hämtas de här. → om de finns
   let redoP = null;
   function redo() {
     if (samtal()) return Promise.resolve(true);
@@ -122,6 +126,11 @@ window.RumBild = (() => {
           fetch('data/kuponger.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null))
             .then((d) => { B.samtal = (d && d.samtal) || null; }, () => {})
             .then(() => res(Boolean(samtal())));
+          return;
+        }
+        // (kupong.js läser filen bara på de delar som visar kupongen)
+        if (typeof loadCoupons === 'function') {
+          loadCoupons().catch(() => {}).then(() => res(Boolean(samtal())));
           return;
         }
         let n = 0;
@@ -359,9 +368,7 @@ window.RumBild = (() => {
     skickaLage();
     rita();
     knapp();
-    // tv:n som följer med slocknar när den går tillbaka till text-tv:n
-    if (B.ute && !B.visa) sluta(true);
-    else if (B.ute) miniLage();
+    if (B.ute) miniLage();
   }
 
   // ---------- kameran ----------
@@ -575,9 +582,9 @@ window.RumBild = (() => {
 
   // Knappen i foten: Visa dig på tv:n nära tv:n, och Stäng av kameran var man
   // än är i rummet medan den är tänd (rum.css). Ta med tv:n står bredvid, nära
-  // tv:n när den står på AV.
+  // tv:n när den är på (inte medan den frågar Vem är du?).
   function knapp() {
-    if (B.tamed) B.tamed.hidden = !(kan() && B.visa && jag());
+    if (B.tamed) B.tamed.hidden = Boolean(B.valj) || !(B.tv && B.tv.pa());
     const k = B.knapp;
     if (!k) return;
     k.hidden = !kan();
@@ -612,12 +619,31 @@ window.RumBild = (() => {
     B.inne = d;
     return d;
   }
+  // Tv:ns ruta (text-tv:n och AV) sitter i tv:n, och i den lilla tv:n när den
+  // följer med. Finns ingen tv på sidan (Tabeller, Statistik och Om oss) har den
+  // lilla tv:n en egen ruta med bara AV.
   function plats() {
     const d = inne();
-    const dit = B.ute && !B.on ? mini().querySelector('.tv-av') : B.tv && B.tv.avEl;
-    if (!dit || d.parentNode === dit) return;
-    dit.append(d);
+    const ute = B.ute && !B.on;
+    const g = B.tv && B.tv.glas;
+    if (g) {
+      if (d.parentNode !== B.tv.avEl) B.tv.avEl.append(d);
+      const ram = ute ? mini().querySelector('.tv-ram') : B.ram;
+      if (g.parentNode !== ram) ram.append(g);
+      if (B.mini) B.mini.querySelector('.tv-glas.egen').hidden = ute;
+      B.tv.ute(ute);
+    } else if (ute) {
+      const dit = mini().querySelector('.tv-av');
+      if (d.parentNode !== dit) dit.append(d);
+    }
     for (const v of d.querySelectorAll('video')) if (v.srcObject) v.play().catch(() => {});
+  }
+  // En tv på den här sidan (rummets, eller byggd utan rummet: Rum.tvUtan).
+  function tvIn(tv) {
+    B.tv = tv;
+    B.ram = tv.glas.parentNode;
+    if (!calm()) tv.glas.style.setProperty('--sno', sno());
+    if (B.visa) tv.av(true);
   }
 
   // ---------- tv:n som följer med ----------
@@ -642,7 +668,7 @@ window.RumBild = (() => {
     if (pop(m)) m.popover = 'manual';
     else m.hidden = true;
     m.innerHTML = '<button type="button" class="tv-mini-in" aria-label="Till tv:n i tobaksaffären"></button>' +
-      '<div class="tv-front"><div class="tv-ram"><div class="tv-glas"><div class="tv-av"></div><i class="tv-scan"></i><i class="tv-glans"></i></div></div>' +
+      '<div class="tv-front"><div class="tv-ram"><div class="tv-glas egen"><div class="tv-av"></div><i class="tv-scan"></i><i class="tv-glans"></i></div></div>' +
       '<i class="tv-namn">Panasonic</i><i class="tv-mini-lampa"></i></div>' +
       '<button type="button" class="tv-mini-x" aria-label="Stäng tv:n"></button>';
     if (!calm()) m.querySelector('.tv-glas').style.setProperty('--sno', sno());
@@ -694,11 +720,12 @@ window.RumBild = (() => {
   // Fram: krymp = från tv:n i rummet (Ta med tv:n), annars tänds den som en tv.
   function miniFram(hur) {
     const m = mini();
-    const syns = oppen(m);
-    for (const a of m.getAnimations()) a.cancel();
+    const syns = oppen(m) && !m.classList.contains('slocknar');
+    // (bara det som miniFram och miniBort har satt igång, inte stilens egna)
+    for (const e of [m, m.querySelector('.tv-ram')]) for (const a of e.getAnimations()) if (!a.animationName && !a.transitionProperty) a.cancel();
     m.classList.remove('slocknar');
     B.toppNu();
-    miniLage();
+    lampa();
     oppna(m, true);
     miniVard();
     if (syns || calm()) return;
@@ -713,7 +740,7 @@ window.RumBild = (() => {
         { transform: 'none' },
       ], { duration: 560, easing: 'cubic-bezier(0.3, 0, 0.15, 1)' });
     } else {
-      m.querySelector('.tv-glas').animate([
+      m.querySelector('.tv-ram').animate([
         { transform: 'scale(0.04, 0.012)', filter: 'brightness(3)' },
         { transform: 'scale(1, 0.012)', filter: 'brightness(2.4)', offset: 0.35 },
         { transform: 'none', filter: 'none' },
@@ -723,15 +750,16 @@ window.RumBild = (() => {
   }
   // Bort: slocknar som en tv (krysset, och när alla har slutat visa sig), eller
   // direkt när tv:n är tillbaka i rummet.
-  function miniBort(slocknar) {
+  // efter: det som ska göras när den har slocknat.
+  function miniBort(slocknar, efter) {
     const m = B.mini;
-    if (!m || !oppen(m)) return;
-    if (!slocknar || calm()) {
-      oppna(m, false);
+    if (!m || !oppen(m) || !slocknar || calm()) {
+      if (m) oppna(m, false);
+      if (efter) efter();
       return;
     }
     m.classList.add('slocknar');
-    const g = m.querySelector('.tv-glas').animate([
+    const g = m.querySelector('.tv-ram').animate([
       { transform: 'none', filter: 'none' },
       { transform: 'scale(1, 0.012)', filter: 'brightness(2.6)', offset: 0.55 },
       { transform: 'scale(0.03, 0.012)', filter: 'brightness(3)' },
@@ -740,16 +768,28 @@ window.RumBild = (() => {
       if (!m.classList.contains('slocknar')) return;
       m.classList.remove('slocknar');
       g.cancel();
-      if (!B.ute) oppna(m, false);
-    }, () => {});
+      if (!skaSynas()) oppna(m, false);
+      if (efter) efter();
+    }, () => { if (efter) efter(); });
+  }
+  // Den lilla tv:n syns när tv:n följer med och har något att visa: tv:ns ruta,
+  // eller AV i sin egen ruta där det inte finns någon tv.
+  const skaSynas = () => B.ute && !B.on && (B.visa || Boolean(B.tv));
+  function miniLage() {
+    if (!B.ute || B.on) return;
+    const m = mini();
+    lampa();
+    const syns = skaSynas();
+    if (syns && (!oppen(m) || m.classList.contains('slocknar'))) miniFram('tands');
+    else if (!syns && oppen(m) && !m.classList.contains('slocknar')) miniBort(true);
   }
   // Den lilla tv:ns lampa: röd medan kameran är tänd.
-  function miniLage() {
+  function lampa() {
     if (B.mini) B.mini.classList.toggle('sander', Boolean(B.stream));
   }
 
   const minns = () => {
-    try { sessionStorage.setItem(FOLJER, JSON.stringify({ t: Date.now(), kamera: Boolean(B.stream) || Boolean(B.ater && Date.now() - B.ater < ATER) })); } catch { /* privat läge */ }
+    try { sessionStorage.setItem(FOLJER, JSON.stringify({ t: Date.now(), visa: B.visa, kamera: Boolean(B.stream) || Boolean(B.ater && Date.now() - B.ater < ATER) })); } catch { /* privat läge */ }
   };
   const glom = () => {
     try { sessionStorage.removeItem(FOLJER); } catch { /* privat läge */ }
@@ -757,7 +797,7 @@ window.RumBild = (() => {
 
   // Ta med tv:n: till den vanliga sidan, med tv:n i hörnet (on(false) tar över).
   function taMed() {
-    if (!B.on || !B.visa) return;
+    if (!B.on || !B.tv) return;
     const f = document.getElementById('rum-tvfront');
     B.fran = f ? f.getBoundingClientRect() : null;
     B.tamedNu = true;
@@ -785,16 +825,19 @@ window.RumBild = (() => {
     B.ute = false;
     glom();
     clearInterval(B.vemT);
-    miniBort(slocknar);
-    // (tv:n i rummet står på text-tv:n när man kommer dit; visar sig någon byter den själv)
     B.ater = 0;
-    B.visa = false;
-    B.valj = null;
-    B.fel = '';
-    if (B.tv) B.tv.av(false);
     if (B.stream) kameraAv();
     kopplaNer();
-    plats();
+    // Rutan går tillbaka till tv:n när den lilla har slocknat. Tv:n står då på
+    // text-tv:n när man kommer till rummet; visar sig någon byter den själv.
+    miniBort(slocknar, () => {
+      if (B.ute || B.on) return;
+      B.visa = false;
+      B.valj = null;
+      B.fel = '';
+      if (B.tv) B.tv.av(false);
+      plats();
+    });
   }
   // Följde tv:n med från sidan innan (inom tio minuter)? Då kopplar den upp sig
   // igen här – på förstasidan utan adress tar rummet den (on).
@@ -811,18 +854,25 @@ window.RumBild = (() => {
       return;
     }
     B.ute = true;
-    B.visa = true;
+    B.visa = f.visa !== false;
     B.tillTv = till;
     if (f.kamera) B.ater = Date.now();
     const rummet = () => window.Rum && !location.hash.replace(/^#/, '') && Rum.fits();
-    redo().then((ok) => {
-      if (!ok || !kan()) {
-        if (!B.on) sluta(false);
+    // (när sidans alla skript är lästa: rum.js står efter den här)
+    const lasta = document.readyState === 'loading' ? new Promise((r) => addEventListener('DOMContentLoaded', r, { once: true })) : null;
+    Promise.all([redo(), lasta]).then(([ok]) => {
+      if (!B.ute || B.on || rummet()) return;
+      // på förstasidan byggs tv:n utan rummet, så att text-tv:n följer med
+      if (!B.tv && window.Rum && Rum.tvUtan) {
+        const tv = Rum.tvUtan();
+        if (tv) tvIn(tv);
+      }
+      if (!B.tv && (!ok || !kan())) {
+        sluta(false);
         return;
       }
-      if (!B.ute || B.on || rummet()) return;
       plats();
-      miniFram('tands');
+      if (skaSynas()) miniFram('tands');
       koppla();
       if (B.ater && Date.now() - B.ater < ATER) kameraPa();
       vemKoll();
@@ -837,10 +887,9 @@ window.RumBild = (() => {
     B.knapp = el.querySelector('.rum-bildknapp');
     B.tamed = el.querySelector('.rum-tamed');
     if (!B.tv || !B.tv.avEl) return;
-    const glas = B.tv.avEl.closest('.tv-glas');
-    if (glas && !calm()) glas.style.setProperty('--sno', sno());
+    // (byggdes tv:n utan rummet sitter rutan kvar där den är: i den lilla tv:n)
+    if (!B.ram) tvIn(B.tv);
     plats();
-    if (B.visa) B.tv.av(true);
     if (B.knapp) {
       const tryck = (e) => {
         e.preventDefault();
@@ -884,15 +933,18 @@ window.RumBild = (() => {
         B.tillTv = false;
         setTimeout(() => { if (B.on && window.Rum && Rum.tv) Rum.tv(); }, 0);
       }
-    } else if (B.tamedNu && B.visa) {
+    } else if (B.tamedNu) {
       // Ta med tv:n: allt fortsätter i den lilla tv:n
       B.tamedNu = false;
       B.ute = true;
       minns();
       plats();
-      ordna();
+      koppla();
       // (när den vanliga sidan har lagts ut: sidhuvudet syns inte i rummet)
-      requestAnimationFrame(() => { if (B.ute && !B.on) miniFram('krymp'); });
+      requestAnimationFrame(() => {
+        if (B.ute && !B.on) miniFram('krymp');
+        ordna();
+      });
     } else {
       if (B.stream) kameraAv(true);
       kopplaNer();
@@ -943,5 +995,5 @@ window.RumBild = (() => {
 
   aterstall();
 
-  return { mount, on, avVal, pa: () => Boolean(B.stream), foljer: () => B.ute };
+  return { mount, on, avVal, knapp, pa: () => Boolean(B.stream), foljer: () => B.ute };
 })();

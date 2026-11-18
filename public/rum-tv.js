@@ -49,9 +49,11 @@
 // På håll bläddrar undersidorna själva var tolfte sekund.
 //
 // RumTv.html() → tv:n (i planet -470 i rum.js)
-// RumTv.mount(el, { calm, short, kort, wd, hm, matches, avVal }) → { fill(rows, { spel, next }), tittar(on), matt(rekt) → frontens mått, zoom(on), key(k),
-//   av(on) → AV-ingången (rum-bild.js ritar i avEl), avEl, avPa() }
-// avVal(on): den som tittar bytte själv mellan text-tv:n och AV på tv:n.
+// RumTv.mount(el, { calm, short, kort, wd, hm, matches, avVal, pa }) → { fill(rows, { spel, next }), tittar(on), matt(rekt) → frontens mått, zoom(on), key(k),
+//   av(on) → AV-ingången (rum-bild.js ritar i avEl), avEl, avPa(), glas → rutan, pa() → på eller av,
+//   ute(on) → rutan står i den lilla tv:n som följer med (rum-bild.js) och går också när rummet är dolt,
+//   rot(el) → tv:n har flyttats till el (rum.js: byggd utan rummet, sedan in i rummet) }
+// avVal(on): den som tittar bytte själv mellan text-tv:n och AV på tv:n. pa(on): tv:n slogs av eller på.
 
 window.RumTv = (() => {
   const COLS = 40;
@@ -566,8 +568,9 @@ window.RumTv = (() => {
   // ---------- i rummet ----------
 
   function mount(root, o) {
+    let rot = root;
     const T = {
-      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), land: new Map(), typed: '', on: true, near: false, tittar: false, ingang: false,
+      rows: [], live: { spel: null, next: false }, nr: LIVE, sub: 0, json: new Map(), teams: new Map(), players: new Map(), land: new Map(), typed: '', on: true, near: false, tittar: false, ingang: false, ute: false,
       // landslagen med för långa namn kortas (LAND) där lagen inte ryms
       short: o.short, kort: (n) => LAND[n] || (o.kort || o.short)(n), wd: o.wd, hm: o.hm, matches: o.matches || (() => []),
     };
@@ -648,7 +651,8 @@ window.RumTv = (() => {
       }
     }
     function tick() {
-      if (root.hidden || !T.on || T.ingang) return;
+      // (i den lilla tv:n som följer med går den också när rummet är dolt)
+      if ((rot.hidden && !T.ute) || !T.on || T.ingang) return;
       // medan man slår siffrorna står de där sidnumret står, som på riktig text-tv
       const h = head(T.typed ? T.typed.padEnd(3, '-') : T.roll || T.nr, Boolean(T.roll));
       if (hd.dataset.h !== h) {
@@ -786,6 +790,7 @@ window.RumTv = (() => {
         void glas.offsetWidth;
         glas.classList.add(T.on ? 'tands' : 'slocknar');
       }
+      if (o.pa) o.pa(T.on);
     }
 
     box.addEventListener('click', (e) => {
@@ -882,6 +887,16 @@ window.RumTv = (() => {
       av,
       avEl,
       avPa: () => T.ingang,
+      glas,
+      pa: () => T.on,
+      ute(on) {
+        T.ute = Boolean(on);
+        if (T.ute && T.on && !T.ingang) {
+          draw(false);
+          tick();
+        }
+      },
+      rot(el) { rot = el; },
       // Tangenterna när tv:n är nära: pilarna bläddrar, tre siffror väljer sida.
       key(k) {
         if (/^[0-9]$/.test(k)) return digit(k);
