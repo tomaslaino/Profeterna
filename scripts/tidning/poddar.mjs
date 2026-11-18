@@ -611,6 +611,12 @@ async function main() {
     if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
     throw err;
   }
+  // Poddarna. Först väljs veckans avsnitt för alla lag (flödena går fort), sedan skrivs matchbladen med det som
+  // forumen, artiklarna och lokaltidningen har gett, och sist skrivs avsnitten ut match för match, och matchens
+  // blad skrivs om så snart dess avsnitt är uttagna (2026-11-18). Förut skrevs bladen först när alla avsnitt var
+  // utskrivna, några timmar efter forumen och artiklarna, och inte alls när körningen stoppades på vägen.
+  const attSkrivaUt = new Map(); // match → [{l, post, a}]
+  let valda = 0;
   for (const l of MED_PODDAR ? engelska : []) {
     const poddar = (register[l.lag] && register[l.lag].poddar) || [];
     if (!poddar.length) continue;
@@ -628,10 +634,31 @@ async function main() {
       }
     }
     const val = valjAvsnitt(floden, { mot: l.mot, gjorda: new Set(post.avsnitt.filter((a) => a.version === pc.promptVersion).map((a) => a.id)) }).slice(0, pc.avsnittPerKorning);
-    if (!val.length) continue;
     for (const a of val) {
-      if (gjorda >= pc.flestAvsnitt) break;
+      if (valda >= pc.flestAvsnitt) break;
       if (TORRT) { logg(`skulle skriva ut ${l.lag}: ${a.podd} – "${a.titel}" (${a.datum.slice(0, 10)}, ${a.minuter || '?'} min)`); continue; }
+      valda++;
+      if (!attSkrivaUt.has(l.match)) attSkrivaUt.set(l.match, []);
+      attSkrivaUt.get(l.match).push({ l, post, a });
+    }
+  }
+
+  let sidor = 0;
+  const skrivSidorna = async (vilka) => {
+    try {
+      sidor += await sidorna(fil, vilka);
+    } catch (err) {
+      if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
+      throw err;
+    }
+  };
+  await skrivSidorna(matcher);
+  if (valda) logg(`${valda} avsnitt att skriva ut, matchbladen skrivs om match för match`);
+
+  for (const m of matcher) {
+    const lista = attSkrivaUt.get(m.id) || [];
+    if (!lista.length) continue;
+    for (const { l, post, a } of lista) {
       gjorda++;
       try {
         for (let i = 0; annanUtskrift() && i < 30; i++) await new Promise((ok) => setTimeout(ok, 60000));
@@ -654,13 +681,8 @@ async function main() {
         logg(`FEL ${l.lag}: ${a.podd} – "${a.titel}": ${err.message}`);
       }
     }
-  }
-  let sidor = 0;
-  try {
-    sidor = await sidorna(fil, matcher);
-  } catch (err) {
-    if (err instanceof Stopp) { logg(`STOPP (${err.slag}): ${err.message}`); process.exit(1); }
-    throw err;
+    // Matchens blad med poddarna (skrivs bara om när uppgifterna har ändrats).
+    await skrivSidorna([m]);
   }
   if (!TORRT) logg(`klart: ${id}, ${gjorda} avsnitt, ${nya} nya uppgifter ur poddarna, ${nyaForum} ur forumen, ${nyaMedia} ur de insatta medierna, ${nyaLokal} ur klubben och lokaltidningen, ${nyaUtland} ur förbundet och landets press, ${nyaForra} ur förra klubben, ${sidor} sidor`);
   if (schema) skrivJson(TIDER, { senast: new Date(schema.tid).toISOString(), ...(round ? { omgang: round.id } : {}) });

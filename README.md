@@ -517,6 +517,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   DT blåser ut röken viftar den bredvid ibland bort den, när neonskylten glappar tittar någon upp på den, den som
   lämnar in får ölen höjd mot sig och när alla tre är inne skålar de, och börjar det regna, snöa eller åska vänder de
   sig om och tittar ut (se *Det som händer i rummet* under [Tobaksaffären](#tobaksaffären))
+- [x] **Fredagens presskonferenser och matchbladen före poddarna (2026-11-18, användarens önskemål: "Kan du förbättra
+  informationsinhämtningen till helgarderattidningen"):** nattjobbets fredagskörning går kl. 13.00 i stället för
+  natten mot fredag, då fredagens presskonferenser inför lördagen ännu inte var hållna; analysjobbet väcker det. Och
+  matchbladen skrivs så snart forumen, artiklarna och lokaltidningen är lästa, och sedan om match för match när
+  poddarna är utskrivna. Förut väntade bladen på alla poddar, några timmar, och blev inte skrivna alls om körningen
+  stoppades (se *Fredagens presskonferenser och bladen före poddarna* under *Supporterpoddarna*)
 - [x] **Hasse vänder blad, och tidningen ser ut som papper (2026-11-19, användarens önskemål: "Gör alla läsa -tidningen
   animationer med Hasse bättre/snyggare"):** han läste samma uppslag hela tiden, och papperet var två plana skivor som
   stod helt stilla mellan rörelserna. Nu vänder han blad en gång i alla nio klippen: han tar det översta bladet i hörnet
@@ -2991,13 +2997,14 @@ visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiser
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
 
 **Supporterpoddarna** (2026-11-10, användarens önskan: *transkribera lagens poddar inför nästa stryktips så att
-man får initierad info – det mest intressanta ska med*): natten mot tisdag och natten mot fredag kl. 02.15 och lördag kl. 08.00 (användarens beslut 2026-11-10, före det
-varje natt) lyssnar iMacen
+man får initierad info – det mest intressanta ska med*): natten mot tisdag kl. 02.15, fredag kl. 13.00 och lördag kl.
+08.00 (användarens beslut 2026-11-10, före det varje natt; fredagens tid var natten mot fredag till 2026-11-18) lyssnar iMacen
 igenom veckans avsnitt av supporterpoddarna för lagen i omgången ([scripts/tidning/poddar.mjs](scripts/tidning/poddar.mjs),
 launchd-jobbet `se.matchfixarna.poddar`; logiken i [src/analyser/poddar.mjs](src/analyser/poddar.mjs), gränserna och
 prompterna i [config/poddar.js](config/poddar.js)). launchd startar jobbet varje natt kl. 02.15 och lördag kl. 08.00,
 men skriptet går bara när en av tiderna (`tider` i config/poddar.js) har slagit sedan den senaste lyckade
 körningen (`tider.json` i mappen) och slutar annars direkt, så tiderna ändras där utan att jobbet installeras om.
+Fredag kl. 13.00 startar launchd det inte; där väcker analysjobbet det (se nedan).
 En tid som missas medan datorn sover körs när den vaknar, och en körning som stoppas försöks igen vid nästa start.
 `--nu` kör oavsett tid.
 
@@ -3011,10 +3018,34 @@ scripts/analyser/skriv.mjs). Det väcker bara när omgången har matcher kvar oc
 (omgången i poddjobbets `tider.json`, som en lyckad körning skriver), och högst varannan timme per omgång
 (`poddar-knuff.json`), så ett jobb som stannar väcks inte var 15:e minut (`knuffaPoddar`). Ingenting behöver
 installeras om på iMacen: båda jobben går ur analysernas klon, som analysjobbet håller i takt med main. Bladen kommer
-några timmar efter kupongen (utskriften tar tid) och fyller i numret när analysjobbet lägger ut dem; de fasta tiderna
-(natten mot tisdag, natten mot fredag och lördag morgon) går som förut och tar med det som har kommit sedan dess.
-Provat med Node (`egenTid` och `knuffaPoddar`). Inte provat på iMacen: att `launchctl kickstart` startar jobbet
-därifrån och att jobbet då går igenom omgången.
+efter kupongen och fyller i numret när analysjobbet lägger ut dem; de fasta tiderna (natten mot tisdag, fredag
+eftermiddag och lördag morgon) går som förut och tar med det som har kommit sedan dess. Provat med Node (`egenTid` och
+`knuffaPoddar`). Bladen till Nr 3 skrevs på tisdagskvällen, utan någon fast tid, så väckningen fungerar troligen
+på iMacen.
+
+**Fredagens presskonferenser och bladen före poddarna** (2026-11-18, användarens önskemål: "Kan du förbättra
+informationsinhämtningen till helgarderattidningen"). Två saker höll tillbaka det bästa underlaget:
+- **Fredagens körning gick natten mot fredag**, för veckans presskonferenser. Men inför en lördagsomgång hålls många av
+  dem på torsdagen och fredagen, och lokaltidningarnas referat kommer samma dag, så fredagens presskonferenser kom med
+  först lördag morgon, och Hasse Backes tidning fredag kl. 16.00 fick dem aldrig. Nu går körningen fredag kl. 13.00
+  (`tider` i config/poddar.js), och forumen, artiklarna och lokaltidningen är lästa före kl. 16.00. launchd startar
+  jobbet bara kl. 02.15 och lördag kl. 08.00, så en tid med `vacks: true` väcks av analysjobbet: `knuffaPoddar` säger ja
+  också när en sådan tid har slagit efter poddjobbets senaste lyckade körning (`senast` i `tider.json`), med samma gräns
+  på en gång varannan timme. Ett poddjobb som redan går (låset `Tidning/las` med en levande process) väcks inte, så
+  loggen säger inte *väckt* om ett jobb som redan arbetar. Går väckningen inte tar launchd tiden kl. 02.15 natten efter.
+- **Bladen väntade på poddarna.** De skrevs sist i körningen, när alla avsnitt var utskrivna (5–10 minuter per
+  avsnitt): bladen till Nr 3 skrevs 23.37–23.42 på tisdagskvällen, efter minst fjorton avsnitt, fast forumen och
+  artiklarna hade lästs minst en timme tidigare. Stoppades körningen på vägen (abonnemangets gräns) blev inga blad skrivna alls.
+  Nu väljer jobbet först veckans avsnitt för alla lag, skriver sedan bladen med det som forumen, de insatta, klubben och
+  lokaltidningen har gett, och skriver sist ut avsnitten match för match, kupongens ordning, och skriver om matchens
+  blad så snart dess avsnitt är uttagna. Ett blad skrivs bara om när dess uppgifter har ändrats, så en match vars
+  poddar inte gav något nytt kostar inget extra anrop; en match med nya poddar får ett anrop till.
+
+Provat med Node: `knuffaPoddar` för fredagens tid (inte före 13.00, väcker 13.05, väntar två timmar, inte efter en
+lyckad körning, inte när matcherna har börjat, inte för tisdagens tid efter en körning när kupongen kom), och hela
+nattjobbet med en påhittad omgång på en lokal sajt, två poddar med färdiga utskrifter och ett falskt `claude`: bladen
+skrevs först med forumets uppgifter (1 + 0 stycken) och sedan om, ett i taget, med poddens (1 + 1); `--torrt` visar
+samma ordning. Inte provat på iMacen.
 
 ```
 omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp → claude -p → omgang.json
@@ -3287,8 +3318,8 @@ Stockport–Reading och Sheffield Wednesday–Plymouth. Sheffield Wednesday fick
 känning, Harry Grays höftskada, målvakten, tränaren Dave Challinor om orken), Plymouth tre ur Plymouth Live (Michael
 Baidoo tillbaka efter hamstringsskadan) och matchbladet skrevs med lokaltidningen som källa och tränarens citat.
 Stockport och Reading fick inget: veckans presskonferens hölls inte förrän torsdag, Reading Chronicle säger nej i
-robots.txt och The Star svarade ibland HTTP 403. Körningen natten mot fredag (efter presskonferenserna) är den som
-ska bära källan. Med Node: sökningens svar med slag, Newsquest och påhittade adresser, Bing-träffarna (veckan, laget i
+robots.txt och The Star svarade ibland HTTP 403. Fredagens körning (efter presskonferenserna, kl. 13.00 sedan
+2026-11-18) är den som ska bära källan. Med Node: sökningens svar med slag, Newsquest och påhittade adresser, Bing-träffarna (veckan, laget i
 rubriken, uteslutna sajter), att de står i frågan och räknas som träffar, poster och id, att de insattas och de nya
 inte rör varandras poster, sidans och tidningens underlag och redaktörens nycklar. Helgarderat med ett av provets
 blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
@@ -3349,7 +3380,7 @@ src/analyser/media.mjs):
 - **Registret** (forra.json i jobbets mapp): vem som är ny sparas per lag och tas fram igen efter 28 dagar
   (`giltigDagar`) eller när `promptVersion` byts; nästa sökning får de nya i meddelandet och letar bara sidor. Ett lag
   utan någon ny söks inte förrän då, och ett lag som söktes de senaste två dagarna (`sokIgenDagar`) inte igen: natten mot
-  tisdag och natten mot fredag, inte lördag morgon. Lagets poster från veckan står i registret, och lagets poster i
+  tisdag och fredag eftermiddag, inte lördag morgon. Lagets poster från veckan står i registret, och lagets poster i
   omgångens fil byts mot dem; det som är äldre än sju dagar faller bort.
 - **Sidan och tidningen:** sidan tar lagets två senaste (`typ: 'forra'`, id på `f`), och redaktören får dem som
   `förra_klubben`. I källspalten står de med sitt eget namn och personen (*Owlstalk om Murphy Cooper*). Hasses notiser
