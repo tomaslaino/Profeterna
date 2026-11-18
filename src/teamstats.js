@@ -63,6 +63,7 @@ function blank(name) {
     cards: { n: 0, y: 0, r: 0 },
     mkt: { n: 0, xp: 0, pts: 0, ret: 0, fav: 0 },
     opp: { n: 0, sum: 0 },
+    serie: [],
   };
 }
 
@@ -93,6 +94,8 @@ function add(e, r, s, strengthOf, oppKey) {
     e.xg.xd += px;
     e.xg.pts += gf > ga ? 3 : gf === ga ? 1 : 0;
     if (gf === ga) e.xg.d++;
+    // (matchen i serien för datorns kurva: datumet, lagets xG och motståndarens)
+    if (r.date) e.serie.push([r.date, r2(own('HxG', 'AxG')), r2(opp('HxG', 'AxG'))]);
   }
   if (fin(r.HS) && fin(r.AS) && fin(r.HST) && fin(r.AST)) {
     e.sh.n++;
@@ -133,6 +136,11 @@ function add(e, r, s, strengthOf, oppKey) {
     e.opp.sum += os;
   }
 }
+
+// xG match för match (sedan 2026-11-18, datorns KURVAN i matchakten,
+// användarens val B Oscilloskopet bland fyra skisser): [datum, lagets xG,
+// motståndarens xG] för varje match med xG, äldst först; null utan någon.
+const serieAv = (e) => (e.serie.length ? [...e.serie].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)) : null);
 
 function divisionTeams(div, strengthAll) {
   const cur = readCache(`fdcouk_${div.fdcouk}`);
@@ -215,6 +223,7 @@ function divisionTeams(div, strengthAll) {
         cards: e.cards.n ? e.cards : null,
         mkt: e.mkt.n ? { n: e.mkt.n, xp: r2(e.mkt.xp), pts: e.mkt.pts, ret: r2(e.mkt.ret), fav: e.mkt.fav } : null,
         opp: e.opp.n && expOpp != null ? r3(e.opp.sum / e.opp.n - expOpp) : null,
+        serie: serieAv(e),
       } : null,
       hb: hb.get(t.key) || null,
     };
@@ -310,7 +319,7 @@ function landTeams() {
   let last = null;
   for (const m of played) {
     const sc = m.score90 || m.score;
-    const r = { FTHG: sc.home, FTAG: sc.away };
+    const r = { FTHG: sc.home, FTAG: sc.away, date: m.kickoff ? String(m.kickoff).slice(0, 10) : null };
     const x = stats[m.id] && stats[m.id].t;
     const h = x && x[m.home.espnId];
     const a = x && x[m.away.espnId];
@@ -353,6 +362,7 @@ function landTeams() {
           cards: e.cards.n ? e.cards : null,
           mkt: e.mkt.n ? { n: e.mkt.n, xp: r2(e.mkt.xp), pts: e.mkt.pts, ret: r2(e.mkt.ret), fav: e.mkt.fav } : null,
           opp: null,
+          serie: serieAv(e),
         } : null,
       });
     }

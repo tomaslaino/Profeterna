@@ -1338,6 +1338,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   högra väggen. Närbilderna ser ut som förut: datorns skärm får samma ljus framför kameran, och kameran går i
   en båge runt skärmen dit, så att den inte far förbi datorns sida; videon ses som förut men mer rakt
   framifrån, så att etiketterna läses lättare. Se [Datorn](#datorn) och [Videon](#videon).
+- **Kurvan i datorns xG (2026-11-18, användarens val):** användaren frågade hur statistiken i datorn kunde bli
+  bättre och bad sedan om "olika visualiseringsförslag". Av elva skisser i tre grupper (det som skiljer mest,
+  riktningen och säkerheten) valde hen *B Oscilloskopet* i gruppen om riktningen: en ny sida KURVAN i matchaktens
+  xG med lagens xG match för match under säsongen. Se [Kurvan](#kurvan) under Datorn.
 - **Affären utifrån (2026-11-16, användarens önskemål):** "Kan du ordna så att man ser baren lite utifrån om man
   trycker på 'matchfixarna' på dörren", med ett foto av Bron vid S:t Eriksbron utifrån: "Gör det enkelt och snyggt och vi
   ska synas där i fönstret - vagt vast med samma inredning etc.", "Tänk på allt som händer ute" och "Du kan zooma in
@@ -8836,6 +8840,41 @@ bara när det finns landskamper före klubbmatcherna. Första körningen: 146 la
 beräknade elva gick från 9,3 till 7,5 dagar (sex med en landskamp kvar), Arsenals från 8,3 till 6,6. Förklaringsrutan
 säger vilka som räknas från en landskamp som inte är spelad än (namnen när de är högst tre).
 
+#### Kurvan
+
+2026-11-18 frågade användaren hur statistiken i datorn kunde bli bättre och bad sedan om "olika
+visualiseringsförslag". Elva skisser i datorns terminal, i tre grupper (*Det som skiljer mest*, *Riktningen* och
+*Säkerheten*), visades på en sida med omgångens Newcastle–Arsenal som exempel. För riktningen valde användaren
+*B Oscilloskopet* bland fyra skisser (*Blockkurvan*, *Oscilloskopet*, *Matchstaplarna* och *Pilen vid talet*).
+Säsongens snitt visar var ett lag står men inte vart det är på väg: ett lag som skapar allt mer men förlorar ser ut
+som ett som har varit jämnt hela hösten.
+
+- **Sidan KURVAN** står i matchaktens xG efter *TALEN* och nås med Tab och menyraderna som de andra sidorna. Den visar
+  lagens xG match för match under säsongen som två linjer på ett oscilloskop. Den ljusa linjen är lagets egen xG och
+  den gröna motståndarnas, och fältet mellan dem är fyllt där laget skapade mer än det släppte till. Varje punkt är
+  snittet av tre matcher (de två första av en och två), så att en enstaka match inte drar iväg. Den första matchen
+  står till vänster, och under kurvan står månaderna mitt under sina matcher.
+- **På datorn** står lagen sida vid sida under sina namn, med *0*, *1,0* och *2,0* i etiketternas spalt mellan
+  dem: nio rader, tre per 1,0 xG, och över 2,8 står linjen i taket. Sidan är tolv rader och ryms utan att rulla.
+  **I telefonen** står lagen under varandra med namnet över och talen till vänster: sex rader, två per 1,0 xG.
+- **Datan** är `fd.serie` i `data/teams/<division>.json`: `[datum, lagets xG, motståndarens xG]` för varje
+  ligamatch med xG, äldst först (`serieAv` i [src/teamstats.js](src/teamstats.js)). Den kommer ur samma rader i
+  football-data.co.uk som lagets övriga xG och släpar alltså en omgång som de. För landslagen är det Nations Leagues
+  matcher ur 365Scores (`data/teams/unl.json`). Färre än tre matcher ger *FÖR FÅ MATCHER* och ett lag utan xG
+  *INGEN xG*; har inget av lagen xG finns ingen sida. Med dolda resultat står ett ?.
+- **Teckenförklaringen** överst öppnar rutan med förklaringen och ett exempel per lag, de tre första matcherna mot de
+  tre senaste (*Arsenal skapade 2,2 xG per match i de tre första matcherna och 1,2 i de tre senaste …*; `kurvan`
+  i [public/rum-register-ord.js](public/rum-register-ord.js)).
+- **Ritningen:** i terminalen är figuren en bit av mellanslag i den första raden, lika bred som panelen, med en SVG
+  som går ner över de andra raderna (`kurvBit` i [public/rum-register.js](public/rum-register.js), `.kv` i
+  [public/rum-register.css](public/rum-register.css)). Linjerna är lika tjocka hur figuren än dras ut. Skärmen i
+  rummet ritar samma figur ur samma bit (`kurva` i [public/rum-dator.js](public/rum-dator.js)).
+
+Provat 2026-11-18 i huvudlös Chromium mot ett bygge utan källor (`--no-fetch`) med påhittade lagfiler (xG för tolv
+ligamatcher), i 1440 × 900 och 412 × 860: sidan på datorn och i telefonen, förklaringsrutan, skärmen i rummet efter
+Tillbaka, ett lag utan xG, en match där inget av lagen har xG och dolda resultat, utan fel i konsolen. Inte provat mot
+riktig data, eftersom källorna inte gick att nå från maskinen.
+
 #### Rankningen
 
 2026-11-16 ville användaren att platserna efter talen (*4:E*, *12:E*) skulle gå att trycka på och leda till "en
@@ -8874,7 +8913,7 @@ med flit (nedan):
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom skytteligan (tabellerna sedan 2026-11-16, under *LAG*): laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom skytteligan (tabellerna sedan 2026-11-16, under *LAG*): laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta, och lagens xG match för match (kurvan); landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
