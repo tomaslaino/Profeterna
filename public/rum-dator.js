@@ -633,7 +633,7 @@ export async function dator(o) {
           g.fillStyle = FARG[''];
           g.fillRect(0, y - 2, c.width, lh);
         }
-        for (const [t, k] of rad) {
+        for (const [t, k, , fig] of rad) {
           const w = cw * t.length;
           if (k === 'i' && meny) {
             g.fillStyle = FARG.bak;
@@ -657,6 +657,12 @@ export async function dator(o) {
             // rubrikens streck
             g.fillStyle = FARG.d;
             g.fillRect(x, y + lh / 2 - 1, w, 2);
+          } else if (k === 'lks' || k === 'lkt') {
+            // KURVANS teckenförklaring: lagets linje (ljus) och motståndarnas (grön)
+            g.fillStyle = k === 'lks' ? FARG.v : FARG[''];
+            g.fillRect(x, y + lh / 2 - 1.5 * k34, w, 3 * k34);
+          } else if (k === 'kv' && fig) {
+            kurva(g, fig, x, y - 2, w, lh, k34);
           }
           // (i listen: mörk text, den valda ljus)
           const ljus = k === 'i' && meny;
@@ -679,6 +685,41 @@ export async function dator(o) {
     bild.needsUpdate = true;
     if (S.open && !S.fly) rita();
     else paint();
+  }
+
+  // Matchaktens KURVAN (kurvBit i rum-register.js, sedan 2026-11-18) på
+  // skärmen: samma figur som i terminalen, från biten (x0, y0, bredd) och ner
+  // över fig.k rader – nollan, 1,0 och 2,0, fältet där laget skapade mer än
+  // det släppte till och de två linjerna med sitt sken
+  function kurva(g, fig, x0, y0, bredd, lh, k34) {
+    const { w, k, ru, f, a, fyll } = fig;
+    const n = f.length;
+    const X = (i) => x0 + ((n > 1 ? 0.5 + (i * (w - 1)) / (n - 1) : w / 2) / w) * bredd;
+    const Y = (v) => y0 + Math.max(0.05, Math.min(k - 0.05, k - 0.5 - v * ru)) * lh;
+    g.save();
+    g.shadowColor = 'transparent';
+    g.fillStyle = 'rgba(65,255,110,.2)';
+    for (const v of [1, 2]) g.fillRect(x0, Y(v) - 0.5 * k34, bredd, k34);
+    g.fillStyle = FARG.d;
+    g.fillRect(x0, Y(0) - 0.75 * k34, bredd, 1.5 * k34);
+    g.fillStyle = 'rgba(65,255,110,.16)';
+    for (const p of fyll || []) {
+      g.beginPath();
+      p.forEach(([i, v], j) => (j ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))));
+      g.closePath();
+      g.fill();
+    }
+    g.shadowColor = 'rgba(65,255,110,.55)';
+    g.shadowBlur = 8 * k34;
+    g.lineJoin = 'round';
+    for (const [l, farg, b] of [[a, FARG[''], 2], [f, FARG.v, 2.6]]) {
+      g.strokeStyle = farg;
+      g.lineWidth = b * k34;
+      g.beginPath();
+      l.forEach((v, i) => (i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))));
+      g.stroke();
+    }
+    g.restore();
   }
 
   const S = { open: false, fly: null, raf: 0, t: 0, rect: null };

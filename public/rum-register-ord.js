@@ -177,6 +177,20 @@
       t: 'Hur svåra lagets tio senaste motståndare är i genomsnitt, enligt modellens styrka just nu. Talet är motståndarens chans mot divisionens mittenlag på neutral plan, där oavgjort räknas som en halv vinst: 50 är lika bra som mittenlaget, och ju högre, desto svårare. Inget lag ligger på 0 eller 100, eftersom ingen match är avgjord på förhand. Ett högt tal betyder att resultaten har kommit mot svårt motstånd.',
       ex: tioMotEx,
     },
+    // KURVAN i xG-fliken (sedan 2026-11-18): början av säsongen mot de
+    // senaste tre matcherna, som exempel
+    kurvan: {
+      e: 'KURVAN', n: 'xG MATCH FÖR MATCH',
+      t: ({ m }) => `Lagets chanser i ${m && ['unl', 'emk', 'vsk'].includes(m.comp) ? 'Nations League' : 'ligan'} match för match, med den första matchen till vänster och den senaste till höger. Varje punkt är snittet av tre matcher, så att en enstaka match inte drar iväg. Den ljusa linjen är lagets egen xG och den gröna motståndarnas. Där den ljusa ligger över den gröna är fältet mellan dem fyllt: där skapade laget mer än det släppte till.`,
+      ex: ({ namn, t }) => {
+        const l = t && t.fd && t.fd.serie;
+        if (!l || l.length < 6) return null;
+        const s3 = (x, j) => dec(x.reduce((a, y) => a + y[j], 0) / x.length);
+        const forst = l.slice(0, 3);
+        const sist = l.slice(-3);
+        return `${namn} skapade ${s3(forst, 1)} xG per match i de tre första matcherna och ${s3(sist, 1)} i de tre senaste, och släppte till ${s3(forst, 2)} och ${s3(sist, 2)}.`;
+      },
+    },
     'tio-matcher': {
       e: 'MATCH FÖR MATCH', n: 'DE TIO SENASTE MATCHERNA',
       t: 'Den senaste matchen står först: utfallet, resultatet efter 90 minuter, H för hemma och B för borta, motståndaren och dess styrka från 0 till 100 med en mätare – samma skala som MOTSTÅNDET.',
