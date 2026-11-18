@@ -7433,6 +7433,15 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
 - **Dörren:** guldet på glaset står rättvänt (*Matchfixarna*, TOBAK & SPEL, *Öppet till spelstoppet*, och nertill
   öppettiderna), och skylten på sugproppen säger ÖPPET på den här sidan – STÄNGT är sidan inåt. I fönstrets nedre hörn
   sitter klistermärkena för korten, tipset och travet, lite blekta (`texten`).
+- **Löpsedelsstället (2026-11-19, användarens önskemål):** "en helgarderat-löpsedel på en skylt utanför
+  tobaksaffären … på ett lämpligt o snyggt ställe". På trottoaren tätt intill bröstningen, till höger under
+  skyltfönstret och en bit från dörren, står ett löpsedelsställ av svartlackerat stål (`STALL` och `stallet` i
+  rum-fasad.js): veckans löpsedel från Helgarderat bakom plast, på två ben med en tvärslå och fötter som går in mot
+  väggen och ut mot gatan i perspektiv. Sedeln är samma som hänger hos Hasse Backe (`Rum.lopsedel`, kopierad när den
+  ändras, `sedeln`), så rubriken, numret och slitaget följer med. Den har gatans ljus (`stallLjus`, som
+  multiplikation över papperet): nästan vit på dagen, svalare i mulet, mörk och varm på kvällen; plasten blänker av
+  himlen eller lamporna, stället skuggar stenen under och på dagen bröstningen bakom (inte glaset), och snö lägger
+  sig på ramen. De som går förbi går framför det. Innan rummets saker är ritade står stället undan (`.tom`).
 - **Putsen har levt (2026-11-16):** stora mjuka fläckar i putsen, mörkare och ljusare, rinnmärken under blecken på
   våningarna, under gesimsen och från fönsterbänken ned över bröstningen, fukt nertill på väggen där regnet stänker upp
   (mörkare när stenen är våt) och en glans i sockelns överkant. Stupröret har fästen och en böj nertill; när det regnar

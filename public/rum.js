@@ -4493,6 +4493,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
       // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
       pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
+      // veckans löpsedel i stället på trottoaren (rum-affischer.js; samma som hänger hos Hasse Backe)
+      sedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null),
       calm: () => RORELSE_AV.matches,
       // (en fast bild, ?rum-t: allt står på samma tid)
       still: still() ? R.frozen : null,
