@@ -17,9 +17,9 @@
 // figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), pyntBild(duk2d, v, { namn, hog, ljus, bak }), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (tio sätt), cigarren, småsakerna medan han
-// väntar, händerna medan han pratar (talet) och tidningen när det har gått dåligt för honom (lasa, papperet i
-// rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna då (raknar, tomKopp, slocknad, putsa, vissla,
-// naglar), där han blir ertappad och låtsas som ingenting.
+// väntar, händerna medan han pratar (talet) och tidningen, när det har gått dåligt för honom och ibland av vana (lasa,
+// papperet i rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna när det har gått dåligt (raknar, tomKopp,
+// slocknad, putsa, vissla, naglar), där han blir ertappad och låtsas som ingenting.
 // Inga slingor (2026-11-13): ett klipp spelas inte likadant varje gång. rum-hasse.js väljer fart och styrka för
 // varje gång (fart, styrka: huvudet och kroppen i småsakerna går lite olika långt), händerna står inte stilla som
 // i en bild där nycklarna håller dem i luften (levande), huvudet och brynen följer talet i slag i stället för i
@@ -77,9 +77,10 @@ function skrivSlut(n) { return SKRIV.MOT + SKRIV.LYFT + n * SKRIV.KRYSS + (n - 1
 function skrivTid(n) { return skrivSlut(n) + SKRIV.HALL + SKRIV.TILLBAKA + SKRIV.HEM; }
 
 // ---------- tidningen ----------
-// När det har gått dåligt för honom i tippningen gömmer han sig bakom tidningen (rum-hasse.js väljer när,
-// rum-hasse-tidning.js är papperet): han sätter på sig glasögonen, tar upp den bakom disken, slår upp den och läser, och
-// emellanåt tittar han upp över den på en, skyldig men nöjd med sig själv, och gömmer sig igen. Klippen byggs av
+// När det har gått dåligt för honom i tippningen gömmer han sig bakom tidningen, och ibland läser han den av gammal vana
+// (rum-hasse.js väljer när, rum-hasse-tidning.js är papperet): han sätter på sig glasögonen, tar upp den bakom disken,
+// slår upp den och läser, och emellanåt tittar han upp över den på en, skyldig men nöjd med sig själv, och gömmer sig
+// igen. Klippen byggs av
 // bitar (LASBIT) som alla börjar och slutar i samma läsande läge (LAS för huvudet, LAS_T för tidningen),
 // utom pa och upp före och ned och av efter. Då kan han hoppa från gränsen mellan två bitar (slag) direkt till ned
 // (och av) när något annat väntar, utan att något rycker.
@@ -408,8 +409,11 @@ const LASBIT = {
     ljud: [[1.65, { typ: 'prassel' }], [4.55, { typ: 'prassel', mjuk: true }]],
   },
 };
-// Ett klipp ur bitarna: nycklarna i klippets tid, och gränserna mellan bitarna (slag) och var ned börjar, och
-// ljuden (ljud: [tid, ljud] i klippets tid).
+// Bitarna där han tittar upp på en över tidningen. Läser han redan när man kommer börjar sidan vid den första av dem
+// i klippet (kom), så att han tittar upp just när man har kommit fram (Tomas 2026-11-18).
+const KOM = new Set(['glimt', 'harJagFel', 'over']);
+// Ett klipp ur bitarna: nycklarna i klippets tid, och gränserna mellan bitarna (slag), var ned börjar, var han
+// första gången tittar upp på en (kom), och ljuden (ljud: [tid, ljud] i klippets tid).
 function lasKlipp(bitar) {
   const k = {};
   const t = {};
@@ -417,6 +421,7 @@ function lasKlipp(bitar) {
   const ljud = [];
   let at = 0;
   let ner = 0;
+  let kom = null;
   const kanK = new Set(bitar.flatMap((b) => [...Object.keys(LASBIT[b].k), ...Object.keys(LAS)]));
   const kanT = Object.keys(LAS_T);
   // glasögonen: lägena, och kanalerna med sina värden där inget sägs
@@ -431,6 +436,7 @@ function lasKlipp(bitar) {
   for (const namn of bitar) {
     const b = LASBIT[namn];
     if (namn === 'ned') ner = at;
+    if (kom === null && KOM.has(namn)) kom = at;
     // (bara där han läser: inte före upp eller efter ned)
     else if (at > 0 && forra.till !== null && b.fran !== null) slag.push(at);
     forra = b;
@@ -468,7 +474,7 @@ function lasKlipp(bitar) {
   }
   const ut = (o) => Object.fromEntries(Object.entries(o).map(([x, v]) => [x, v.k]));
   const { gk, ...gn } = g;
-  return { dur: at, k: ut(k), t: ut(t), g: { gk, ...ut(gn) }, slag, ner, ljud };
+  return { dur: at, k: ut(k), t: ut(t), g: { gk, ...ut(gn) }, slag, ner, kom: kom ?? LASBIT.pa.dur + LASBIT.upp.dur, ljud };
 }
 // Fem ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter. I de tre sista står det
 // något i tidningen som säger att han hade fel, och han låtsas som ingenting (skaka, resultat, harJagFel, lugn, vika).
@@ -479,7 +485,7 @@ export const LASA = {
   lasa4: lasKlipp(['pa', 'upp', 'ryck', 'las', 'resultat', 'las', 'glimt', 'las', 'vika', 'las', 'skaka', 'las', 'ned', 'av']),
   lasa5: lasKlipp(['pa', 'upp', 'las', 'harJagFel', 'las', 'skjut', 'vika', 'las', 'lugn', 'las', 'titta', 'las', 'ned', 'av']),
 };
-// var läsandet börjar (med glasögonen på, efter upp): dit hoppar sidan när han redan läser när man kommer
+// var läsandet börjar (med glasögonen på, efter upp)
 export const LAS_START = LASBIT.pa.dur + LASBIT.upp.dur;
 
 // Visslingen (klippet vissla, ljudet i rum-hasse-ljud.js): [tid, Hz, ms, Hz i slutet]. En egen liten slinga,
@@ -620,14 +626,14 @@ export const KLIPP = {
   // lutar sig fram och kisar för att se vad det står, och sätter sig tillbaka med ett oj
   spanaKis: { fran: 453, till: 457.4, vila: 0, skynda: true, grupp: 'spana' },
   // tidningen (LASA ovan): tar upp den, läser och lägger ned den. slag: där han kan sluta läsa, ner: där
-  // han lägger ned den (båda i klippets tid)
+  // han lägger ned den, kom: där sidan börjar när han redan läser när man kommer (alla i klippets tid)
   // (han läser Dagens Nyheter eller Svenska Dagbladet, rum-hasse-tidning.js, och ibland Helgarderat i stället: blad)
-  lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa.slag, ner: LASA.lasa.ner },
-  lasa2: { fran: 570, till: 570 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner },
+  lasa: { fran: 500, till: 500 + LASA.lasa.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa.slag, ner: LASA.lasa.ner, kom: LASA.lasa.kom },
+  lasa2: { fran: 570, till: 570 + LASA.lasa2.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa2.slag, ner: LASA.lasa2.ner, kom: LASA.lasa2.kom },
   // (och där han låtsas att han inte hade fel; ljud: fnysningar, andetag och prassel)
-  lasa3: { fran: 840, till: 840 + LASA.lasa3.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa3.slag, ner: LASA.lasa3.ner, ljud: LASA.lasa3.ljud },
-  lasa4: { fran: 910, till: 910 + LASA.lasa4.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa4.slag, ner: LASA.lasa4.ner, ljud: LASA.lasa4.ljud },
-  lasa5: { fran: 980, till: 980 + LASA.lasa5.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa5.slag, ner: LASA.lasa5.ner, ljud: LASA.lasa5.ljud },
+  lasa3: { fran: 840, till: 840 + LASA.lasa3.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa3.slag, ner: LASA.lasa3.ner, kom: LASA.lasa3.kom, ljud: LASA.lasa3.ljud },
+  lasa4: { fran: 910, till: 910 + LASA.lasa4.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa4.slag, ner: LASA.lasa4.ner, kom: LASA.lasa4.kom, ljud: LASA.lasa4.ljud },
+  lasa5: { fran: 980, till: 980 + LASA.lasa5.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa5.slag, ner: LASA.lasa5.ner, kom: LASA.lasa5.kom, ljud: LASA.lasa5.ljud },
   // Det andra han gör när det har gått dåligt (grupp lasa, som tidningen; sysslorna i figuren): han håller
   // på med något för att verka upptagen, märker att man tittar och fryser (ertappad, utan leende: stel),
   // och sedan låtsas han att inget har hänt, med eftertryck. fram: där sidan börjar när han redan håller på
