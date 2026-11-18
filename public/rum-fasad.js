@@ -114,16 +114,19 @@ window.RumFasad = (() => {
   const puts = (dag, natt, L) => U().farg.facade(dag, natt, L);
   const snoC = (L) => U().farg.sno(L);
 
-  // Hur ljust det är inne (1 fullt … 0 släckt), och hur mycket rummet lyser ut (mer i mörker). På kvällen
-  // (kvall: när dagsljuset går, som kvall i ljusKlockan i rum.js, där dunklet inne går runt lamporna) lyser
-  // lamporna dämpat (KVALL_INNE), och från elva dämpas lysröret vidare till natten (tant, RumFolk.nattGrad).
-  // Förut var rummet lika ljust en kväll som mitt på dagen, och lyste som en ljusbox ut i mörkret.
-  const KVALL_INNE = 0.5;
+  // Ljuset inne är detsamma som inifrån (ljusKlockan i rum.js): fläktens kupor lyser på gängets bord, och runt
+  // käglan sjunker rummet in i dunkel, mest i kanterna, dag som kväll; på kvällen (kvall: när dagsljuset går) är
+  // det mörkare runt käglan, men inte i den. Från elva dämpas lysröret till natten (tant, RumFolk.nattGrad).
+  // tant: hur tända kuporna är (1 … 0,22 släckta); inne: hur mycket rummet lyser ut (glaset, skivan, trottoaren),
+  // lite mindre på kvällen (KVALL_INNE), när bara käglan och lamporna är ljusa.
+  const KVALL_INNE = 0.25;
   const kvall = (L) => 1 - sm(0.12, 0.45, L.dag);
   const tant = (o) => 1 - 0.78 * Math.max(0, Math.min(1, o.natt ? o.natt() : 0));
   function inne(o, L) {
     return Math.min(tant(o), 1 - KVALL_INNE * kvall(L));
   }
+  // dunklet i mitten (käglan), halvvägs ut och i kanterna, som DUNKEL i rum.js
+  const DUNKEL = [0.1, 0.2, 0.42];
 
   // ---------- himlen ----------
 
@@ -220,16 +223,22 @@ window.RumFasad = (() => {
 
   // ---------- rummet genom glaset ----------
   //
-  // Det som syns bakom gänget: rummet i taklampornas ljus (och på natten neonens och tv:ns), lite ur skärpa –
-  // hyllan med cigarettpaketen går att se, men gänget i 3D framför står ut; Hasse vagare bakom dörren. Sett utifrån är rummets högra vägg (tv:n,
-  // Tipsligan och cigarettpaketen) till vänster och baren där Hasse Backe sitter till höger.
+  // Det som syns bakom gänget: rummet i samma ljus som inifrån, lite ur skärpa – hyllan med cigarettpaketen går
+  // att se, men gänget i 3D framför står ut; Hasse vagare bakom dörren. Sett utifrån är rummets högra vägg (tv:n,
+  // Tipsligan och cigarettpaketen) till vänster och pulten där Hasse Backe står till höger, under lampan med den
+  // gröna skärmen som hänger över hans nota och kaffe (LAMPA i rum.js).
+  //
+  // Ljuset (inne ovan): väggarna i kupornas ljus (tant), och över dem dunklet runt käglan över gängets bord, med
+  // kvällens mörker. Det som lyser ritas ovanpå dunklet: kuporna och deras sken i det gulnade undertaket, lampan
+  // över Hasse (tänd också på natten, som inifrån), neonens röda sken (mer på kvällen) och tv:ns blå.
 
   function rummet(v, L, o) {
-    const ljus = inne(o, L);
-    const n = 1 - ljus;
+    const ljus = tant(o);
+    // (kuporna: 1 tända … 0 släckta)
+    const pa = (ljus - 0.22) / 0.78;
     const kv = kvall(L);
     const vagg = mix('#2a1a10', '#8a6440', ljus);
-    const tak = mix('#120c08', '#4a3626', ljus);
+    const tak = mix('#16120c', '#7a6a4e', ljus);
     const disk = mix('#140c07', '#4a2c18', ljus);
     const { x, y, w, h } = FON;
     const d = DORR;
@@ -240,17 +249,12 @@ window.RumFasad = (() => {
       let p = '';
       for (let px = X + 8; px < X + W; px += 26) p += `M${px} ${Y} V${Y + H}`;
       s += `<path d="${p}" stroke="#000" stroke-opacity=".14" stroke-width="3"/>`;
-      // taket och takfläkten över gängets bord (släckt på natten): mörka blad och fyra kupor under (förut ett
-      // lysrör; spotskenan närmast glaset togs bort samma kväll som den kom, 2026-11-16)
-      s += `<rect x="${X}" y="${Y}" width="${W}" height="${r1(H * 0.11)}" fill="${tak}"/>`;
+      // undertaket: gulnade plattor i ett bärverk av vitlackerad plåt, och vinkellisten mot väggen
+      const th = r1(H * 0.11);
+      let b = `M${X} ${r1(Y + th * 0.45)} H${X + W}`;
+      for (let px = X + 30; px < X + W; px += 64) b += `M${px} ${Y} V${r1(Y + th)}`;
+      s += `<rect x="${X}" y="${Y}" width="${W}" height="${th}" fill="${tak}"/><path d="${b}" stroke="${mix('#2a261e', '#d8d0b8', ljus)}" stroke-opacity=".45" stroke-width="1.5"/><path d="M${X} ${r1(Y + th)} H${X + W}" stroke="${mix('#2a261e', '#d8d0b8', ljus)}" stroke-opacity=".6" stroke-width="2"/>`;
       if (hela) {
-        // (kuporna lyser också när de är dämpade, varmare)
-        const lampa = mix('#3a3a36', mix('#fff1d6', '#ffd49a', kv), tant(o));
-        const fx = X + W * 0.48;
-        const fy = Y + H * 0.065;
-        s += `<path d="M${r1(fx - W * 0.16)} ${r1(fy)} L${r1(fx + W * 0.16)} ${r1(fy + 3)}" stroke="#24160c" stroke-width="5" stroke-linecap="round"/>`;
-        for (const k of [-0.045, -0.015, 0.015, 0.045]) s += `<ellipse cx="${r1(fx + W * k)}" cy="${r1(fy + 13)}" rx="7" ry="5" fill="${lampa}"/>`;
-        if (ljus > 0.3) s += `<ellipse cx="${r1(fx)}" cy="${r1(fy + 16)}" rx="${r1(W * 0.34)}" ry="${r1(H * 0.2)}" fill="url(#rf-g-vit)" opacity="${r1(0.6 * ljus)}"/>`;
         // hyllan med cigarettpaketen bakom disken
         const R = rng(19);
         let pk = '';
@@ -259,30 +263,54 @@ window.RumFasad = (() => {
           for (let px = X + W * 0.31; px < X + W * 0.8; px += 12) pk += `<rect x="${r1(px)}" y="${r1(Y + H * hy + 6)}" width="9" height="20" fill="${pick(R, ['#9a3a2c', '#d8ceb8', '#34507a', '#b8903a', '#3a5e44', '#2a2622'])}"/>`;
         }
         s += `<g opacity="${r1(0.35 + 0.5 * ljus)}">${pk}</g>`;
-        // tv:n på den högra väggen (till vänster härifrån) lyser blått
+        // den högra väggen (till vänster härifrån), med tv:n och Tipsligan
         s += `<polygon points="${X},${Y + H * 0.1} ${r1(X + W * 0.16)},${r1(Y + H * 0.2)} ${r1(X + W * 0.16)},${r1(Y + H * 0.82)} ${X},${Y + H}" fill="${mix(vagg, '#000000', 0.3)}"/>`;
-        s += `<rect x="${r1(X + W * 0.04)}" y="${r1(Y + H * 0.2)}" width="${r1(W * 0.08)}" height="${r1(H * 0.12)}" fill="#5a7ac8" opacity="${r1(0.25 + 0.5 * n)}"/>`;
-        s += `<ellipse cx="${r1(X + W * 0.1)}" cy="${r1(Y + H * 0.3)}" rx="${r1(W * 0.22)}" ry="${r1(H * 0.32)}" fill="url(#rf-g-bla)" opacity="${r1(0.25 + 0.5 * n)}"/>`;
-        // Tipsligan, svart med vita rader
         s += `<rect x="${r1(X + W * 0.05)}" y="${r1(Y + H * 0.42)}" width="${r1(W * 0.075)}" height="${r1(H * 0.11)}" fill="#141414" opacity=".8"/>`;
       }
-      // bardisken längs väggen, i höjd med sitsarna
+      // pulten och bardisken längs väggen, i höjd med sitsarna
       s += `<rect x="${X}" y="${r1(Y + H * 0.62)}" width="${W}" height="${r1(H * 0.06)}" fill="${mix(disk, '#ffffff', 0.08 * ljus)}"/><rect x="${X}" y="${r1(Y + H * 0.68)}" width="${W}" height="${r1(H * 0.6)}" fill="${disk}"/>`;
       return s;
     };
     const glod = (id, c, a) => `<radialGradient id="${id}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${c}" stop-opacity="${a}"/><stop offset=".5" stop-color="${c}" stop-opacity="${r1(a * 0.35)}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`;
-    let s = `<defs>${glod('rf-g-vit', mix('#fff6dc', '#ffd49a', kv), 0.6)}${glod('rf-g-bla', '#6a8cff', 0.5)}${glod('rf-g-rod', '#ff3a26', 0.55)}<filter id="rf-inne-b" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter><filter id="rf-inne-h" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
-      <clipPath id="rf-inne-k"><rect x="${x}" y="${y}" width="${w}" height="${h}"/><rect x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}"/></clipPath></defs>`;
-    s += `<g clip-path="url(#rf-inne-k)"><g filter="url(#rf-inne-b)">${ett(x - 10, y - 10, w + 20, h + 20, true)}${ett(d.x - 10, d.y - 10, d.w + 20, d.h + 20, false)}`;
-    // Hasse Backe vid baren, en mörk gestalt i kostym genom dörren
+    // Dunklet runt käglan över gängets bord (K): DUNKEL dag som kväll, och kvällens mörker ovanpå, utom i käglan
+    // – när kuporna är släckta också där.
+    const K = { x: x + w * 0.47, y: y + h * 0.62, r: w * 0.82 };
+    const morkt = [0.15 + 0.85 * (1 - pa), 0.6 + 0.4 * (1 - pa), 1].map((e, i) => r1(1 - (1 - DUNKEL[i]) * (1 - 0.5 * kv * e)));
+    const fx = x + w * 0.48;
+    const fy = y + h * 0.065;
     const hx = d.x + d.w * 0.55;
     const hy = d.y + d.h * 0.62;
-    s += `<g fill="${mix('#0c0c10', '#2a2c38', ljus)}" filter="url(#rf-inne-h)"><path d="M${r1(hx - 30)} ${r1(hy + 30)} Q${r1(hx - 32)} ${r1(hy - 58)} ${hx} ${r1(hy - 60)} Q${r1(hx + 32)} ${r1(hy - 58)} ${r1(hx + 30)} ${r1(hy + 30)} Z"/><circle cx="${hx}" cy="${r1(hy - 82)}" r="17" fill="${mix('#1a120c', '#c49a7a', ljus * 0.8)}"/><path d="M${r1(hx - 16)} ${r1(hy - 88)} Q${hx} ${r1(hy - 104)} ${r1(hx + 16)} ${r1(hy - 88)} Z" fill="${mix('#0a0a0a', '#d8d8d4', ljus * 0.8)}"/></g>`;
-    // neonens röda sken i rummet och, på natten, ljuset från gatan
-    s += `<ellipse cx="${r1(x + w * 0.76)}" cy="${r1(y + h * 0.22)}" rx="${r1(w * 0.5)}" ry="${r1(h * 0.55)}" fill="url(#rf-g-rod)" opacity="${r1(0.3 + 0.55 * n)}"/>`;
+    // lampan över Hasse: under guldet på dörren och ÖPPET-skylten, ovanför Hasse
+    const lx = hx + 4;
+    const ly = d.y + 70;
+    let s = `<defs>${glod('rf-g-varm', '#ffd8a0', 0.6)}${glod('rf-g-bla', '#6a8cff', 0.5)}${glod('rf-g-rod', '#ff3a26', 0.55)}<filter id="rf-inne-b" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter><filter id="rf-inne-h" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
+      <radialGradient id="rf-dunkel" gradientUnits="userSpaceOnUse" cx="${r1(K.x)}" cy="${r1(K.y)}" r="${r1(K.r)}"><stop offset="0" stop-color="#140b05" stop-opacity="${morkt[0]}"/><stop offset=".45" stop-color="#140b05" stop-opacity="${morkt[1]}"/><stop offset="1" stop-color="#140b05" stop-opacity="${morkt[2]}"/></radialGradient>
+      <clipPath id="rf-inne-k"><rect x="${x}" y="${y}" width="${w}" height="${h}"/><rect x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}"/></clipPath></defs>`;
+    s += `<g clip-path="url(#rf-inne-k)"><g filter="url(#rf-inne-b)">${ett(x - 10, y - 10, w + 20, h + 20, true)}${ett(d.x - 10, d.y - 10, d.w + 20, d.h + 20, false)}`;
+    // Hasse Backe vid pulten, en mörk gestalt i kostym genom dörren, med huvudet i lampans ljus
+    s += `<g fill="${mix('#0c0c10', '#2a2c38', ljus)}" filter="url(#rf-inne-h)"><path d="M${r1(hx - 30)} ${r1(hy + 30)} Q${r1(hx - 32)} ${r1(hy - 58)} ${hx} ${r1(hy - 60)} Q${r1(hx + 32)} ${r1(hy - 58)} ${r1(hx + 30)} ${r1(hy + 30)} Z"/><circle cx="${hx}" cy="${r1(hy - 82)}" r="17" fill="${mix('#1a120c', '#c49a7a', Math.max(0.6, ljus * 0.8))}"/><path d="M${r1(hx - 16)} ${r1(hy - 88)} Q${hx} ${r1(hy - 104)} ${r1(hx + 16)} ${r1(hy - 88)} Z" fill="${mix('#0a0a0a', '#d8d8d4', Math.max(0.6, ljus * 0.8))}"/></g>`;
+    // dunklet
+    s += `<rect x="${x - 10}" y="${y - 10}" width="${d.x + d.w - x + 20}" height="${Math.max(h, d.h) + 20}" fill="url(#rf-dunkel)"/>`;
+    // det som lyser: kuporna (dämpade varmare) och deras sken i taket och på väggen, mer på kvällen, när det är
+    // mörkare runt omkring (som inifrån), och inte när de är släckta
+    const lampa = mix('#3a3a36', mix('#fff1d6', '#ffd49a', kv), ljus);
+    s += `<path d="M${r1(fx - w * 0.16)} ${r1(fy)} L${r1(fx + w * 0.16)} ${r1(fy + 3)}" stroke="#24160c" stroke-width="5" stroke-linecap="round"/>`;
+    for (const k of [-0.045, -0.015, 0.015, 0.045]) s += `<ellipse cx="${r1(fx + w * k)}" cy="${r1(fy + 13)}" rx="7" ry="5" fill="${lampa}"/>`;
+    if (pa > 0.05) s += `<ellipse cx="${r1(fx)}" cy="${r1(fy + 6)}" rx="${r1(w * 0.42)}" ry="${r1(h * 0.16)}" fill="url(#rf-g-varm)" opacity="${r1(0.55 * (0.6 + 0.4 * kv) * pa)}"/>`;
+    // lampan över Hasse: en grön emaljskärm med kåpa i mässing, sedd lite underifrån, och ljuset ned över honom
+    s += `<path d="M${lx} ${d.y - 10} V${ly - 9}" stroke="#141010" stroke-width="1.5"/><rect x="${lx - 3}" y="${ly - 10}" width="6" height="5" fill="${mix('#3a2e14', '#b8923a', 0.4 + 0.4 * ljus)}"/>`;
+    s += `<path d="M${lx - 4} ${ly - 5} C${lx - 6} ${ly + 1} ${lx - 15} ${ly + 5} ${lx - 21} ${ly + 9} L${lx + 21} ${ly + 9} C${lx + 15} ${ly + 5} ${lx + 6} ${ly + 1} ${lx + 4} ${ly - 5} Z" fill="${mix('#0e1c13', '#2f6040', 0.3 + 0.5 * ljus)}"/>`;
+    s += `<ellipse cx="${lx}" cy="${ly + 9}" rx="20" ry="3" fill="#ffe9c0"/>`;
+    s += `<ellipse cx="${lx}" cy="${r1(ly + 60)}" rx="62" ry="${r1(d.h * 0.24)}" fill="url(#rf-g-varm)" opacity="${r1(0.3 + 0.35 * kv)}"/>`;
+    s += `<ellipse cx="${lx}" cy="${ly + 12}" rx="30" ry="12" fill="url(#rf-g-varm)" opacity="${r1(0.5 + 0.3 * kv)}"/>`;
+    // tv:n på den högra väggen (till vänster härifrån) lyser blått
+    s += `<rect x="${r1(x - 10 + (w + 20) * 0.04)}" y="${r1(y - 10 + (h + 20) * 0.2)}" width="${r1((w + 20) * 0.08)}" height="${r1((h + 20) * 0.12)}" fill="#5a7ac8" opacity="${r1(0.3 + 0.2 * kv + 0.2 * (1 - pa))}"/>`;
+    s += `<ellipse cx="${r1(x + w * 0.1)}" cy="${r1(y + h * 0.3)}" rx="${r1(w * 0.22)}" ry="${r1(h * 0.32)}" fill="url(#rf-g-bla)" opacity="${r1(0.25 + 0.25 * kv + 0.25 * (1 - pa))}"/>`;
+    // neonens röda sken i rummet, mer på kvällen och natten
+    s += `<ellipse cx="${r1(x + w * 0.76)}" cy="${r1(y + h * 0.22)}" rx="${r1(w * 0.5)}" ry="${r1(h * 0.55)}" fill="url(#rf-g-rod)" opacity="${r1(0.2 + 0.25 * kv + 0.3 * (1 - pa))}"/>`;
     s += '</g>';
-    // gänget sitter i rummets ljus: allt bakom dem mörkare än de själva
-    s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#000" opacity="${r1(0.12 + 0.3 * n)}"/></g>`;
+    // gänget sitter i käglan: allt bakom dem mörkare än de själva
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#000" opacity="${r1(0.12 + 0.3 * (1 - ljus))}"/></g>`;
     return s;
   }
 
