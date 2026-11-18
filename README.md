@@ -517,6 +517,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   DT blåser ut röken viftar den bredvid ibland bort den, när neonskylten glappar tittar någon upp på den, den som
   lämnar in får ölen höjd mot sig och när alla tre är inne skålar de, och börjar det regna, snöa eller åska vänder de
   sig om och tittar ut (se *Det som händer i rummet* under [Tobaksaffären](#tobaksaffären))
+- [x] **Hasse vänder blad, och tidningen ser ut som papper (2026-11-19, användarens önskemål: "Gör alla läsa -tidningen
+  animationer med Hasse bättre/snyggare"):** han läste samma uppslag hela tiden, och papperet var två plana skivor som
+  stod helt stilla mellan rörelserna. Nu vänder han blad en gång i alla nio klippen: han tar det översta bladet i hörnet
+  med höger hand, lyfter det och för det över, släpper det så att det faller över av sig självt och tar kanten igen,
+  medan blicken följer bladet och går upp till början av den nya sidan. Halvorna buktar lite, den bortvända halvan är
+  inte längre randig snett från kameran, och papperet följer andningen och händerna i stället för att stå som
+  fastskruvat (se *Han vänder blad* under [Hasse Backe](#hasse-backe))
 
 ## Publicering
 
@@ -2274,6 +2281,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   klipp, `lasa6`–`lasa8`, där inget i tidningen säger att han hade fel och han är nöjd med det han läser, av de vanliga
   bitarna och fyra nya: `blinkar`, `fniss`, `fundera` och `imponerad`. Av vana läser han nu på fem sätt (`VANA_LAS`).
   Se [Hasse Backe](#hasse-backe), *Tidningen*.
+- **Hasse vänder blad (2026-11-19, användarens önskemål):** "Gör alla läsa -tidningen animationer med Hasse
+  bättre/snyggare". En ny bit, `bladdra`, där han vänder blad, i stället för en av gångerna han läser i vart och ett av
+  de nio klippen (lika lång, så klippen är lika långa som förut), papperet buktar (`KUPA`), trycket filtreras skarpare
+  snett från kameran och papperet lever lite medan han håller det (`LEV_T`). Se [Hasse Backe](#hasse-backe),
+  *Han vänder blad*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -10327,6 +10339,25 @@ rum-hasse.js, 2026-11-15). Däremellan är domen densamma varje gång och på al
 detsamma hela omgången. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
+
+**Han vänder blad** (2026-11-19, användarens önskemål: "Gör alla läsa -tidningen animationer med Hasse
+bättre/snyggare"). I varje klipp vänder han blad en gång (biten `bladdra` i `LASBIT`, i stället för en av gångerna han
+läser, `las`, och lika lång, så att klippen och deras gränser är som förut; i `lasa3`, `lasa4` och `lasa9` strax efter
+det som sa att han hade fel). Han läser sista raden på den högra sidan, släpper kanten med höger hand och tar det översta
+bladet i hörnet, lyfter det och för det över mot ryggen och släpper det där, så att det faller över av sig självt, och tar
+kanten igen; under tiden håller den vänstra handen tidningen, som sjunker lite åt den sidan och öppnas något, och det
+prasslar när han tar bladet och när det landar. Blicken följer bladet och går upp till början av den nya vänstra sidan.
+Bladet är ett eget nät (`blad` i `byggTidning`, formen i `bladYta` och `GLSL_BLAD` i
+[public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)): varje punkt är samma punkt på den högra halvan, vriden
+kring ryggen så långt som `vand` (0–1) säger, och hörnet han håller i leder när han lyfter och släpar efter när bladet
+faller, så att det böjer sig diagonalt. Handen sitter i hörnet medan `vH` är 1 (`bGrepp` i rum-hasse-3d.js, som
+greppet om kanten). Bladet syns bara medan det är på väg över, inte när `vand` går tillbaka till 0 efter biten.
+Samtidigt blev papperet mer som papper: halvorna buktar lite utåt mellan ryggen och händerna (`KUPA`; plana såg de ut
+som kartong), trycket filtreras med anisotropi 8 i stället för 4 (den nästan bortvända halvan blev randig), och medan
+han håller tidningen följer den andningen och händerna med några långsamma svängningar som inte går jämnt upp (`LEV_T`
+i rum-hasse-3d.js; förut stod den helt stilla mellan rörelserna). Provat i headless Chromium med mjukvarugrafik, bild
+för bild genom bladvändningen, med `?rum-hasse&rum-hasse-klipp=lasa&rum-hasse-kt=34` (klippet står still 34 sekunder in;
+utan `rum-hasse-kt` spelas det om och om, och `rum-hasse-hg` ger Helgarderat) eller `RumHasse.prova('lasa', 34, true)`.
 
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
 tidningen, skyldig men nöjd med sig själv. Han läser den också av gammal vana (2026-11-18, användarens önskemål): har

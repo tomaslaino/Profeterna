@@ -1726,6 +1726,16 @@ window.RumHasse = (() => {
         H.stallningT = ms + 5000;
         stallningSteg();
       }
+      // (för bilder: ?rum-hasse-klipp=lasa3 spelar klippet om och om, och &rum-hasse-kt=4.2 står still 4,2 s in i det)
+      if (H.prov !== undefined ? H.prov : (H.prov = provKlipp())) {
+        const p = H.prov;
+        if (!H.klipp || H.klipp.fran !== GEST[p.namn].fran) { H.klipp = { ...GEST[p.namn] }; H.T = H.klipp.fran; tidningKlar(); if (H.fig.blad) H.fig.blad(p.hg ? 'hg' : null); }
+        if (p.t != null) H.T = H.klipp.fran + p.t;
+        else if ((H.T += Math.min(0.1, (ms - (last || ms)) / 1000)) >= H.klipp.till) H.T = H.klipp.fran;
+        last = ms;
+        H.fig.rita(H.T, p.t != null ? p.t : ms / 1000, 0, 0, H.klipp);
+        return;
+      }
       const ror = H.klipp || H.ko.length || (H.sagt && !H.sagt.klar) || H.fig.ror();
       if (ms - last < takt(ror)) return;
       const dt = last ? Math.min(0.1, (ms - last) / 1000) : 0;
@@ -3219,6 +3229,13 @@ window.RumHasse = (() => {
     tidningKlar();
     H.lasT = performance.now() + (H.on ? 1500 : 0);
   }
+  // ?rum-hasse-klipp=namn[&rum-hasse-kt=s][&rum-hasse-hg] → { namn, t, hg } eller null (bara för bilder av klippen)
+  function provKlipp() {
+    const q = new URLSearchParams(location.search);
+    const namn = q.get('rum-hasse-klipp');
+    if (!namn || !GEST[namn]) return null;
+    return { namn, t: q.has('rum-hasse-kt') ? parseFloat(q.get('rum-hasse-kt')) : null, hg: q.has('rum-hasse-hg') };
+  }
   // Tidningen han tar upp den här gången: oftast Helgarderat (HG_ANDEL), annars klippets egen (DN eller SvD).
   function valjTidning(k) {
     if (k && k.tidning && H.fig && H.fig.blad) H.fig.blad(Math.random() < HG_ANDEL ? 'hg' : null);
@@ -3798,5 +3815,7 @@ window.RumHasse = (() => {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vanta);
   else vanta();
 
-  return { oppna, stang, repliker, framat, hoppa, gester: GEST };
+  // (för bilder, som ?rum-hasse-klipp: prova('lasa3', 4.2) står still 4,2 s in i klippet, prova(null) slutar)
+  const prova = (namn, t = null, hg = false) => { H.prov = namn && GEST[namn] ? { namn, t, hg } : null; H.klipp = null; if (!H.prov) H.T = 0; };
+  return { oppna, stang, repliker, framat, hoppa, prova, gester: GEST };
 })();
