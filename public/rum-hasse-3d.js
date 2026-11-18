@@ -670,6 +670,21 @@ export const KLIPP = {
   vifta: { fran: 255, till: 267.2, vila: 0, skynda: true, grupp: 'cigarr' },
   // ett bloss som han håller kvar i munnen och smakar på, och röken ut långsamt
   smaka: { fran: 270, till: 283.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  // (och fler, 2026-11-19; efter tidningen på 1150–1440)
+  // ett bloss, och sedan tittar han bort och funderar med cigarren vid axeln, ett tankfullt bloss till med röken
+  // ut genom näsan, och så kommer han på det: brynen upp, och han nickar mot en
+  tanker: { fran: 1450, till: 1465.0, vila: 0, skynda: true, grupp: 'cigarr' },
+  // ett långt bloss, och röken rakt upp mot taket med huvudet bakåt och spetsade läppar
+  taket: { fran: 1470, till: 1483.8, vila: 0, skynda: true, grupp: 'cigarr' },
+  // ett bloss, och sedan lutar han sig bakåt och minns: tittar upp åt sidan med ett leende, röken ut genom
+  // näsan, en belåten suck och en långsam skakning på huvudet (det var tider)
+  minns: { fran: 1490, till: 1505.2, vila: 0, skynda: true, grupp: 'cigarr',
+    ljud: [[7.85, { typ: 'anda', sort: 'pust', ms: 700 }]] },
+  // får syn på någon längs baren och lyfter cigarren mot honom med en nick, och tar sedan ett bloss
+  honnor: { fran: 1510, till: 1523.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  // tittar på glöden, som har falnat, och blåser försiktigt på den så att den glöder upp, och drar ett bloss
+  gloden: { fran: 1530, till: 1544.0, vila: 0, skynda: true, grupp: 'cigarr',
+    ljud: [[3.95, { typ: 'anda', sort: 'blas', ms: 650 }], [5.3, { typ: 'anda', sort: 'blas', ms: 480 }]] },
   // Småsakerna medan han väntar på en (grupp smatt, lottas med fingrarna som trummar), några sekunder
   // var, med händerna på disken:
   // tittar bort mot gänget i affären, skakar lite på huvudet och ler
@@ -2749,6 +2764,134 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       iMun: [[1.95, 0], [2.15, 1], [3.6, 1], [3.75, 0]],
       blaser: [[6.6, 0], [7.0, 0.32], [8.8, 0.28], [9.1, 0]],
       rok: [{ fran: 6.9, till: 9.0, sort: 'blas', styrka: 45, avtag: 0.3, fart: 0.75, broms: 1.0, lyft: 46 }],
+    }),
+  });
+  // Fler sätt att njuta av cigarren (2026-11-19), med samma lägen för handen som ovan (hall, se, mun, bort):
+  Object.assign(RORELSER, {
+    // Ett bloss och röken i en stråle åt sidan, och sedan funderar han: cigarren vid axeln, blicken upp och bort,
+    // huvudet lite på sned, pannan i lätta veck och läpparna lite spetsade. Mitt i tanken ett kort bloss till,
+    // med röken långsamt ut genom näsan medan han fortfarande tänker. Så kommer han på det: brynen åker upp, han
+    // tittar på en, nickar två gånger och ler.
+    tanker: cigarrKlipp(13.6, {
+      yaw: [[2.0, 0.05], [3.3, 0.05], [3.8, 0.4], [5.0, 0.4], [5.6, 0.25], [7.4, 0.28], [7.9, 0.15], [8.6, 0.17], [9.4, 0.3], [10.3, 0.27], [10.8, 0.02], [12.2, 0.02]],
+      pitch: [[2.0, 0.25], [3.3, 0.25], [3.8, -0.2], [5.0, -0.2], [5.6, -0.38], [7.4, -0.34], [7.9, -0.05], [8.6, -0.05], [9.4, -0.42], [10.3, -0.38], [10.8, 0], [11.15, 0.4], [11.45, 0.05], [11.75, 0.35], [12.1, 0.1]],
+      roll: [[5.0, 0], [5.6, -0.05], [10.3, -0.05], [10.8, 0]],
+      lut: [[2.0, 0], [5.0, -0.01], [5.6, -0.03], [10.3, -0.03], [11.0, 0.01]],
+      axV: [[2.0, 20], [3.3, 24], [4.0, 14], [5.6, 14], [7.6, 22], [8.5, 26], [9.2, 14], [10.3, 14], [11.2, 12]],
+      blickX: [[3.3, 0], [3.7, 3], [5.0, 3], [5.4, 4.5], [7.5, 4.5], [7.8, 1.5], [8.7, 1.5], [9.1, 4.5], [10.3, 4.5], [10.7, 0]],
+      blickY: [[3.3, 0], [3.7, -1], [5.0, -1], [5.4, -2.5], [7.5, -2.5], [7.8, 0], [8.7, 0], [9.1, -2.5], [10.3, -2.5], [10.7, 0]],
+      kis: [[5.4, 0], [5.9, 0.3], [10.3, 0.3], [10.6, 0.1], [11.2, 0.35], [12.4, 0.2]],
+      brynX: [[5.2, 0], [5.8, -0.3], [10.25, -0.35], [10.55, 0.7], [11.6, 0.6], [12.4, 0.3]],
+      brynY: [[5.2, 0], [5.8, -0.35], [10.25, -0.4], [10.55, 0.55], [11.6, 0.45], [12.4, 0.24]],
+      rund: [[5.9, 0], [6.2, 0.25], [7.0, 0.25], [7.3, 0]],
+      blund: [[2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.5, 0], [7.95, 0], [8.15, 0.4], [8.5, 0.4], [8.7, 0]],
+      le: [[3.5, 0], [4.2, 0.15], [5.4, 0.1], [10.3, 0.05], [10.6, 0.4], [11.4, 0.55], [12.6, 0.35]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [7.5, 'hall'], [8.0, 'mun', 15], [8.5, 'mun'], [8.9, 'bort'], [9.5, 'hall'], [12.2, 'hall']],
+      glod: [[2.2, 0], [2.6, 1], [3.05, 0.85], [3.3, 0], [8.05, 0], [8.3, 0.7], [8.5, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.3, 1], [3.45, 0], [7.85, 0], [8.0, 1], [8.5, 1], [8.65, 0]],
+      blaser: [[3.8, 0], [4.0, 0.55], [5.0, 0.5], [5.3, 0]],
+      rok: [{ fran: 3.85, till: 5.2, sort: 'strale', styrka: 55, avtag: 0.8 }, { fran: 8.8, till: 10.6, sort: 'nasa', styrka: 45, avtag: 0.8 }],
+    }),
+    // Ett långt bloss med halvslutna ögon, och sedan lutar han huvudet bakåt, spetsar läpparna och blåser röken
+    // rakt upp mot taket i en lång, smal stråle, och följer den med blicken. Han sänker huvudet med höjda bryn
+    // och ett nöjt leende, och tittar på cigarren.
+    taket: cigarrKlipp(12.4, {
+      yaw: [[2.0, 0.05], [4.2, 0.05], [5.0, 0.15], [8.3, 0.15], [9.0, 0.05], [10.2, 0.05], [10.8, -0.45], [11.6, -0.45]],
+      pitch: [[2.0, 0.25], [4.2, 0.2], [5.0, -0.9], [8.2, -0.95], [8.9, -0.1], [9.35, 0.15], [9.7, 0], [10.2, 0.05], [10.8, 0.5], [11.6, 0.45]],
+      lut: [[2.0, 0], [4.2, -0.01], [5.0, -0.05], [8.2, -0.05], [9.0, 0]],
+      axV: [[2.0, 20], [3.8, 30], [4.4, 30], [5.2, 22], [8.2, 8], [9.0, 12]],
+      rund: [[4.9, 0], [5.15, 0.95], [8.0, 0.85], [8.3, 0]],
+      stel: [[4.8, 0], [5.1, 0.7], [8.0, 0.6], [8.4, 0]],
+      munn: [[4.9, 0], [5.15, 0.05], [8.0, 0.04], [8.3, 0]],
+      blund: [[2.15, 0], [2.6, 0.5], [4.0, 0.6], [4.6, 0.3], [5.2, 0.4], [8.2, 0.4], [8.6, 0.1], [9.0, 0]],
+      blickX: [[4.6, 0], [5.2, 1], [8.2, 1.5], [8.7, 0], [10.4, 0], [10.8, -4], [11.6, -4]],
+      blickY: [[4.6, 0], [5.2, -3], [8.2, -3.5], [8.7, 0], [10.4, 0], [10.8, 1.5], [11.6, 1.5]],
+      brynX: [[2.4, 0], [3.6, 0.3], [4.6, 0.35], [5.2, 0.5], [8.2, 0.55], [8.8, 0.3], [9.4, 0.7], [10.2, 0.4]],
+      brynY: [[2.4, 0], [3.6, 0.25], [4.6, 0.28], [5.2, 0.4], [8.2, 0.44], [8.8, 0.24], [9.4, 0.56], [10.2, 0.32]],
+      le: [[8.2, 0], [8.8, 0.35], [9.6, 0.5], [10.4, 0.4], [11.6, 0.3]],
+      kis: [[8.8, 0], [9.3, 0.3], [10.4, 0.25], [11.0, 0.1]],
+    }, {
+      ck: [[2.1, 'mun', 70], [4.1, 'mun'], [4.5, 'bort'], [5.1, 'hall'], [10.2, 'hall'], [10.8, 'se'], [11.6, 'se']],
+      glod: [[2.2, 0], [2.8, 0.7], [3.6, 1], [3.95, 0.9], [4.2, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [4.1, 1], [4.25, 0]],
+      blaser: [[5.1, 0], [5.35, 0.45], [7.9, 0.4], [8.2, 0]],
+      // (brantare än vanligt: med huvudet bakåt går den snett upp mot taket, förbi ansiktet åt hans vänstra sida;
+      // rakt upp lade den sig framför ansiktet)
+      rok: [{ fran: 5.2, till: 8.1, sort: 'blas', styrka: 70, avtag: 0.35, fart: 0.8, broms: 0.9, rikt: V3(0.8, 0.52, 0.3).normalize() }],
+    }),
+    // Ett bloss, och sedan lutar han sig bakåt med cigarren vid axeln och minns något: blicken upp åt sidan, ett
+    // leende som växer och röken långsamt ut genom näsan. En belåten suck, och han skakar långsamt på huvudet –
+    // det var tider – och tittar på cigarren och nickar.
+    minns: cigarrKlipp(13.8, {
+      yaw: [[2.0, 0.05], [3.4, 0.05], [4.2, 0.05], [5.6, -0.2], [8.6, -0.22], [9.1, -0.08], [9.6, -0.28], [10.1, -0.1], [10.6, -0.24], [11.2, -0.15], [11.8, -0.45], [12.8, -0.45]],
+      pitch: [[2.0, 0.25], [3.4, 0.25], [4.2, -0.15], [5.6, -0.45], [8.6, -0.45], [9.1, -0.2], [11.2, -0.15], [11.8, 0.4], [12.1, 0.6], [12.4, 0.4], [12.8, 0.5]],
+      roll: [[4.4, 0], [5.6, 0.05], [8.6, 0.05], [9.2, 0]],
+      lut: [[2.0, 0], [3.4, 0], [5.6, -0.06], [8.6, -0.06], [9.4, -0.03], [11.2, -0.02], [12.0, 0]],
+      axV: [[2.0, 20], [3.4, 26], [4.4, 14], [6.0, 10], [7.0, 24], [7.9, 8], [9.0, 10], [11.2, 14]],
+      blickX: [[3.4, 0], [4.2, 0], [5.4, -3.5], [8.6, -3.5], [9.1, -1], [11.2, -1], [11.6, -4], [12.8, -4]],
+      blickY: [[3.4, 0], [4.2, 0], [5.4, -2.5], [8.6, -2.5], [9.1, -0.5], [11.2, -0.5], [11.6, 1.5], [12.8, 1.5]],
+      blund: [[2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.6, 0.2], [5.4, 0.25], [7.0, 0.5], [7.9, 0.55], [8.4, 0.2], [11.0, 0.15], [11.4, 0]],
+      brynX: [[4.0, 0], [5.4, 0.45], [8.4, 0.5], [9.0, 0.3], [11.2, 0.25], [11.8, 0.55], [12.8, 0.35]],
+      brynY: [[4.0, 0], [5.4, 0.4], [8.4, 0.45], [9.0, 0.25], [11.2, 0.2], [11.8, 0.45], [12.8, 0.3]],
+      le: [[3.6, 0], [5.0, 0.2], [6.6, 0.4], [8.6, 0.5], [9.4, 0.55], [11.2, 0.45], [12.0, 0.5], [12.8, 0.35]],
+      kis: [[6.0, 0], [7.0, 0.25], [11.2, 0.25], [11.6, 0.1]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [11.2, 'hall'], [11.8, 'se'], [12.8, 'se']],
+      glod: [[2.2, 0], [2.6, 1], [3.05, 0.85], [3.3, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.3, 1], [3.45, 0]],
+      blaser: [[7.8, 0], [8.0, 0.3], [8.4, 0.25], [8.7, 0]],
+      rok: [{ fran: 3.7, till: 6.0, sort: 'nasa', styrka: 55, avtag: 0.7 }, { fran: 7.85, till: 8.6, sort: 'blas', styrka: 18, avtag: 1.5, fart: 0.6 }],
+    }),
+    // Med cigarren i handen får han syn på någon längs baren: han vänder sig dit med brynen uppe och lyfter
+    // cigarren lite mot honom med en kort nick och ett leende, som en hälsning. Sedan tillbaka till en, ett
+    // bloss, och röken i en stråle ur mungipan med ett höjt bryn.
+    honnor: cigarrKlipp(12.0, {
+      yaw: [[2.0, 0.05], [2.8, 0], [3.3, -0.45], [5.0, -0.45], [5.7, 0], [6.6, 0.05], [7.8, 0.05], [8.3, 0.4], [9.6, 0.4], [10.2, 0.1], [11.0, 0.1]],
+      pitch: [[2.0, 0.25], [2.8, 0.05], [3.3, -0.2], [3.9, -0.2], [4.1, 0.3], [4.35, -0.15], [5.0, -0.1], [5.7, 0.05], [6.6, 0.25], [7.8, 0.25], [8.3, -0.2], [9.6, -0.2], [10.2, 0.05]],
+      vrid: [[2.6, 0], [3.3, -0.04], [5.0, -0.04], [5.7, 0]],
+      lut: [[3.0, 0], [3.6, 0.02], [5.0, 0.02], [5.6, 0], [8.3, -0.02], [9.6, -0.02], [10.2, 0]],
+      axV: [[2.0, 20], [2.8, 14], [3.6, 18], [4.0, 22], [5.2, 14], [6.6, 20], [7.8, 24], [8.4, 12], [10.2, 14]],
+      blickX: [[2.8, 0], [3.0, -5], [3.4, -3.5], [5.0, -3.5], [5.3, 0]],
+      brynX: [[3.0, 0], [3.3, 0.9], [4.6, 0.8], [5.2, 0.2], [5.7, 0], [8.3, 0.2], [9.6, 0.2], [10.2, 0]],
+      brynY: [[3.0, 0], [3.3, 0.6], [4.6, 0.5], [5.2, 0.1], [5.7, 0], [8.3, 0.6], [9.6, 0.6], [10.2, 0]],
+      munn: [[3.25, 0], [3.35, 0.06], [3.5, 0]],
+      le: [[3.2, 0], [3.6, 0.5], [4.8, 0.5], [5.4, 0.25], [6.4, 0.15], [8.4, 0.15], [8.8, 0.3], [9.6, 0.3], [10.4, 0.2]],
+      kis: [[3.6, 0], [4.0, 0.3], [4.8, 0.3], [5.3, 0], [8.4, 0], [8.8, 0.25], [9.6, 0.25], [10.0, 0]],
+      blund: [[4.05, 0], [4.2, 0.4], [4.4, 0.4], [4.55, 0], [6.75, 0], [7.05, 0.45], [7.8, 0.45], [8.0, 0]],
+    }, {
+      ck: [[2.6, 'hall', 40], [3.4, 'hall'], [4.0, 'se', 10], [4.6, 'se'], [5.2, 'hall'], [6.0, 'hall'], [6.7, 'mun', 30], [7.8, 'mun'], [8.2, 'bort'], [8.8, 'hall'], [10.8, 'hall']],
+      glod: [[6.8, 0], [7.2, 1], [7.6, 0.85], [7.85, 0]],
+      iMun: [[6.6, 0], [6.8, 1], [7.8, 1], [7.95, 0]],
+      blaser: [[8.25, 0], [8.4, 0.5], [9.4, 0.5], [9.7, 0]],
+      rok: [{ fran: 8.3, till: 9.6, sort: 'strale', styrka: 60, avtag: 0.8 }],
+    }),
+    // Han håller upp cigarren framför bröstet och tittar på glöden, som har falnat, med höjda bryn, och blåser
+    // försiktigt på den två gånger med munnen som ett o, så att den glöder upp. Nöjd tar han ett bloss med halvslutna ögon och blåser ut ett
+    // moln åt sidan, och nickar mot en.
+    gloden: cigarrKlipp(12.6, {
+      yaw: [[2.0, -0.3], [2.6, -0.5], [6.2, -0.55], [6.8, 0.05], [8.2, 0.05], [8.8, 0.4], [10.2, 0.4], [10.8, 0.1], [11.6, 0.1]],
+      pitch: [[2.0, 0.3], [2.6, 0.35], [3.6, 0.35], [3.85, 0.42], [6.2, 0.4], [6.8, 0.25], [8.2, 0.2], [8.8, -0.3], [10.2, -0.3], [10.8, 0.05], [11.1, 0.35], [11.4, 0.05]],
+      roll: [[2.4, 0.02], [2.8, 0.05], [6.2, 0.05], [6.6, 0]],
+      lut: [[2.0, 0], [3.4, 0.02], [6.2, 0.02], [6.8, 0], [8.8, -0.04], [10.2, -0.04], [10.8, 0]],
+      axV: [[2.0, 22], [3.5, 22], [3.8, 27], [4.7, 18], [5.05, 25], [5.9, 18], [6.6, 20], [8.0, 28], [8.8, 12], [10.4, 14]],
+      blickX: [[1.9, -2], [2.3, -6], [6.2, -6], [6.6, 0]],
+      blickY: [[1.9, 1], [2.3, 3.5], [6.2, 3.5], [6.6, 0]],
+      brynX: [[2.4, 0.2], [2.8, 0.6], [3.6, 0.65], [3.9, 0.3], [5.2, 0.3], [5.9, 0.65], [6.4, 0.5], [7.0, 0.2], [8.8, 0.3], [10.2, 0.3], [10.8, 0.5], [11.6, 0.3]],
+      brynY: [[2.4, 0.16], [2.8, 0.48], [3.6, 0.52], [3.9, 0.24], [5.2, 0.24], [5.9, 0.52], [6.4, 0.4], [7.0, 0.16], [8.8, 0.24], [10.2, 0.24], [10.8, 0.4], [11.6, 0.24]],
+      // (munnen som ett o när han blåser, och leendet viker undan så länge)
+      stel: [[3.7, 0], [3.9, 0.8], [4.6, 0.8], [4.85, 0.3], [5.15, 0.8], [5.75, 0.8], [6.0, 0]],
+      rund: [[3.8, 0], [3.95, 1], [4.6, 1], [4.75, 0], [5.15, 0], [5.3, 1], [5.75, 1], [5.9, 0]],
+      munn: [[3.8, 0], [3.95, 0.14], [4.6, 0.12], [4.75, 0], [5.15, 0], [5.3, 0.14], [5.75, 0.12], [5.9, 0]],
+      kis: [[2.6, 0], [3.0, 0.25], [3.7, 0.25], [3.9, 0], [6.0, 0], [6.2, 0.3], [6.5, 0], [8.8, 0], [9.2, 0.3], [10.2, 0.25], [10.6, 0]],
+      le: [[5.9, 0], [6.3, 0.4], [7.0, 0.2], [8.8, 0.15], [9.6, 0.35], [10.6, 0.5], [11.6, 0.35]],
+      blund: [[6.95, 0], [7.25, 0.5], [8.1, 0.5], [8.3, 0], [8.9, 0], [9.2, 0.4], [10.0, 0.4], [10.3, 0]],
+    }, {
+      ck: [[2.0, 'visa', 40], [6.2, 'visa'], [6.9, 'mun', 20], [8.1, 'mun'], [8.5, 'bort'], [9.1, 'hall'], [11.4, 'hall']],
+      glod: [[2.0, 0], [3.9, 0], [4.3, 0.55], [4.75, 0.3], [5.25, 0.3], [5.6, 0.75], [6.0, 0.45], [6.9, 0.4], [7.3, 1], [7.85, 0.9], [8.1, 0.2], [11.0, 0.15], [12.0, 0]],
+      iMun: [[6.75, 0], [6.95, 1], [8.1, 1], [8.25, 0]],
+      blaser: [[8.55, 0], [8.75, 0.8], [9.8, 0.7], [10.1, 0]],
+      rok: [{ fran: 8.6, till: 10.1, sort: 'blas', styrka: 85, avtag: 1.0 }],
     }),
   });
   // Elden (grupp tanda): cigarrklipp där cigarren har slocknat och han tänder den, med cigarren mellan tänderna
@@ -5763,7 +5906,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         const nas = sort === 'nasa';
         if (!nas) {
           iHuvud(pust || strale ? MUNHORN : MUND, rm);
-          riktH(pust ? PUFF : strale ? STRALE : BLAS, rd);
+          // (rikt: en egen riktning i huvudets mått, som rakt upp mot taket i taket)
+          riktH(r.rikt || (pust ? PUFF : strale ? STRALE : BLAS), rd);
         } else riktH(NASDIR, rd);
         for (let i = 0; i < kb; i++) {
           if (nas) iHuvud(NASAN[nasa++ % 2], rm);

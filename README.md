@@ -2062,6 +2062,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och det gick bara med vågrät underarm. Nu vilar armbågen på disken och underarmen står snett upp med handleden i
   vila, och handen vrids runt underarmen så att cigarren pekar utåt, uppåt eller mot en. Det gäller alla elva sätt
   att njuta av cigarren, de fyra sätten att tända den och när den har slocknat. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Hasse Backe röker på fem sätt till (2026-11-19, användarens önskemål):** "Ge Hasse fler röka cigarranimationer"
+  och "Det måste se naturligt ut!" Han hade elva sätt att njuta av cigarren. Nu har han sexton: han funderar med
+  cigarren vid axeln och kommer på det (`tanker`), blåser röken snett upp mot taket med huvudet bakåt (`taket`),
+  lutar sig bakåt och minns, med röken ut genom näsan och en belåten suck (`minns`), lyfter cigarren mot någon längs
+  baren som en hälsning (`honnor`), och blåser försiktigt på glöden när den har falnat (`gloden`). För att det ska
+  se naturligt ut håller han cigarren bara i de lägen som redan är prövade (vid axeln, framför bröstet, vid munnen),
+  och leendet viker undan när han spetsar läpparna. Röken mot taket gick först rakt upp och lade sig då framför
+  ansiktet; nu går den snett förbi det. Se [Hasse Backe](#hasse-backe), *Cigarren*.
 - **Klicka på Hasses kaffe, askkopp och de andra sakerna (2026-11-10, användarens önskemål):** "kan du ordna så att
   man kan klicka på kaffet, askkoppen osv och så gör Hasse de rörelserna - men att han annars gör dem så som han
   känner för det". Ett klick var som helst i hans bild gick förut tillbaka till rummet. Nu går kaffet, askkoppen med
@@ -9946,7 +9954,7 @@ så att man såg in i den (ändrat 2026-11-06).
 **Cigarren.** Till vänster om hans högra hand och en bit framför den står en tung askkopp av samma gods
 som koppen, med två urtag. I det ena ligger cigarren: huvudet på disken och vänt lite in mot honom, ringen
 (guld och rött) synlig och glöden över askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den
-och njuter av den en stund, på ett av elva sätt som lottas (nedan). Han tittar ned, för handen lågt över
+och njuter av den en stund, på ett av sexton sätt som lottas (nedan; elva till 2026-11-19). Han tittar ned, för handen lågt över
 disken med underarmen rakt fram från armbågen och nyper cigarren med flack hand och rak handled, med
 handflatan nedåt och lite framåt (`P_VILA`); förut sträckte han ut armen åt sidan, vred handen 60° utåt och
 dök ned på den ovanifrån med raka, utspärrade fingrar (ändrat 2026-11-09). Han håller den löst i
@@ -9989,7 +9997,7 @@ han det färdigt, och med kupongen i handen väntar det; blir det inte av inom 2
 redan gör (dricker han redan) gör han inte en gång till. Samtalets spalt når över tändaren i datorn: där spalten är
 tom gäller saken under. Med minskad rörelse går ett klick på sakerna tillbaka till rummet som förut.
 
-Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sista byggs med
+Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); alla utom de fyra första byggs med
 `cigarrKlipp`, som fyller i hur han tar upp den och lägger tillbaka den):
 
 - `cigarr`: två bloss med halvslutna ögon (glöden flammar upp, och mellan blossen pyser lite rök ur
@@ -10016,6 +10024,24 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
   och skrockar.
 - `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
   ut den långsamt.
+- `tanker`: ett bloss och röken i en stråle åt sidan, och sedan funderar han med cigarren vid axeln: blicken
+  upp och bort, huvudet lite på sned, pannan i lätta veck och läpparna lite spetsade. Ett kort bloss till mitt i
+  tanken, med röken ut genom näsan, och så kommer han på det: brynen upp, och han nickar två gånger mot en.
+- `taket`: ett långt bloss, och sedan huvudet bakåt och röken ut med spetsade läppar i en lång stråle snett upp
+  mot taket (röken får en egen riktning, `rikt` i huvudets mått), som han följer med blicken; sedan ett nöjt
+  leende med höjda bryn och en blick på cigarren.
+- `minns`: ett bloss, och sedan lutar han sig bakåt med cigarren vid axeln och tittar upp åt sidan med ett
+  leende som växer, medan röken går ut genom näsan. En belåten suck (den hörs), och han skakar långsamt på
+  huvudet – det var tider – och nickar mot cigarren.
+- `honnor`: med cigarren i handen får han syn på någon längs baren, vänder sig dit med brynen uppe och lyfter
+  cigarren lite mot honom med en kort nick och ett leende. Sedan tillbaka till en, ett bloss och röken i en
+  stråle ur mungipan.
+- `gloden`: han håller upp cigarren framför bröstet och tittar på glöden, som har falnat, och blåser försiktigt på
+  den två gånger med munnen som ett o (det hörs), så att den glöder upp. Sedan ett bloss med halvslutna ögon,
+  ett moln åt sidan och en nick mot en.
+
+Leendet han alltid har viker undan (`stel`) när han spetsar läpparna, i `taket` och `gloden`; annars syntes
+inget o.
 
 **Elden.** Cigarren slocknar om han låter den ligga: 2,5–4,7 minuter efter att han rökte sist tonar glöden
 och rökslingan ut på en halv minut (`CIG_LIV`, `slocknar` i [public/rum-hasse.js](public/rum-hasse.js)), och
@@ -10750,6 +10776,11 @@ Cigarrens elva sätt (2026-11-05) är provade med figuren ensam i headless Chrom
 släpper cigarren i mungipan och tar den igen; slaget, gesterna och klunken ser ut som förut. I hela
 sidan (1440 × 900) finns alla elva i lotten, och `tand` och `ringar` spelades utan fel. Inte provade i
 Safari eller i en riktig telefon.
+
+De fem nya sätten (2026-11-19) är provade med figuren ensam i headless Chrome (mjukvarugrafik, SwiftShader),
+900 × 700: varje klipp bild för bild var 0,6–0,8 s och närbilder av handen, ansiktet och röken när han funderar,
+blåser mot taket, minns, hälsar och blåser på glöden. Inte provade i hela sidan, i Safari eller i en riktig
+telefon, och ljuden (sucken och när han blåser på glöden) är inte lyssnade på.
 
 Elden (2026-11-10) är provad i headless Chrome (Metal) med provserver mot sajten: varje klipp bild för bild,
 närbilder av handen, stickan, tändaren och lågan, i dag- och nattljus och i 390 × 844; armbågens förflyttning
