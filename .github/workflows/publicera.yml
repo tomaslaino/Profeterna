@@ -89,6 +89,13 @@ jobs:
       - name: Hämta källor, logga prognoser och bygg sajten
         run: npm run build -- --journal --minify
 
+      # Kontrollen av statistiken (scripts/kolla-statistik.js, README: Beslut):
+      # ett fel blir en varning i körningen och står i sammanfattningen, men
+      # sajten publiceras ändå.
+      - name: Kontrollera statistiken
+        continue-on-error: true
+        run: npm run statistik
+
       - name: Spara källcachen
         if: always()
         uses: actions/cache/save@v4
