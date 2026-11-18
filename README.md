@@ -495,6 +495,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   kameran har stannat, alltid med glasögonen på.
   Tre gånger av fyra är det Helgarderat, och det görs klart medan hans bild byggs, så att det finns redan då (se
   *Tidningen* under [Hasse Backe](#hasse-backe))
+- [x] **Hasse gömmer sig helt bakom tidningen (2026-11-18, användarens önskemål: "Hasse får gärna ibland täcka sitt ansikte
+  helt när han läser tidningen för att 'låtsas' som att han inte har fel på bettingen"):** i ett nytt klipp, `lasa6`, för han
+  upp tidningen så högt att varken ansiktet eller håret syns och sitter där en stund, sänker den långsamt tills ögonen
+  kommer fram, ser att man tittar och far upp bakom den igen, och läser sedan vidare som om inget har hänt. Klippet är ett av
+  de tolv han lottar bland när det har gått dåligt, så det händer ibland (se *Helt bakom tidningen* under
+  [Hasse Backe](#hasse-backe))
 
 ## Publicering
 
@@ -10183,7 +10189,7 @@ headless Chromium med mjukvarugrafik i telefonens mått (412 × 915), med bilder
 påtvingade, och med vanan medan han väntar. Han läser rad för rad, tittar upp
 över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen syns, nickar åt det som står,
 rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` till
-`lasa5`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
+`lasa6`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
 händerna lågt, rakt upp bakom diskens kant tills den är över den, och för den sedan fram över disken och flyttar upp
 händerna; i knät hänger armarna nedåt. Han läser den som man läser något i knät: lågt framför sig, strax över disken och
 lite åt sin högra sida, uppslagen och halvt hopvikt, och lutad framåt så att sidorna vänds upp mot hans ögon, med
@@ -10203,8 +10209,9 @@ långt under vad chanserna var värda, med tävlingskupongen om han spelade och 
 [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och när han dömer gänget. Med
 minskad rörelse läser han inte.
 
-I tre av de fem klippen (`lasa3`, `lasa4` och `lasa5`, 2026-11-10, Tomas önskemål: han läser men låtsas lite, som Walter i
-*The Big Lebowski*, att han inte hade fel) står det något i tidningen som säger att han hade fel. Han medger ingenting:
+I fyra av de sex klippen (`lasa3`, `lasa4` och `lasa5`, 2026-11-10, Tomas önskemål: han läser men låtsas lite, som Walter i
+*The Big Lebowski*, att han inte hade fel; och `lasa6`, se *Helt bakom tidningen* nedan) står det något i tidningen som
+säger att han hade fel. Han medger ingenting:
 antingen är det tidningen som har fel, eller så har inget hänt, och det visar han med eftertryck. Det är fem nya bitar som
 blandas med de vanliga:
 
@@ -10221,12 +10228,26 @@ blandas med de vanliga:
   och nickar bestämt (så, det var det). Sedan slår han upp den igen och läser vidare. Helt hopvikt hamnade händerna
   tätt ihop framför bröstet och armarna syntes inte, därför bara till hälften.
 
+**Helt bakom tidningen** (2026-11-18, användarens önskemål: "Hasse får gärna ibland täcka sitt ansikte helt när han
+läser tidningen för att 'låtsas' som att han inte har fel på bettingen"). I det sjätte klippet, `lasa6` (Svenska
+Dagbladet), gömmer han sig helt bakom den en stund (biten `dold`). Han för upp den som när han gömmer sig, hopvikt som
+ett V med ryggen mot en, men högre, mer upprätt och lite mer uppslagen, och böjer huvudet bakom den, så att varken
+ansiktet eller håret syns (`DOLD_Y`, `DOLD_TILT`, `DOLD_B` och `DOLD_P` i
+[public/rum-hasse-3d.js](public/rum-hasse-3d.js); lägre och mer hopvikt syntes hjässan i vecket). Där sitter han i tre
+sekunder, med en knäpp i papperet och ett prassel, sänker den långsamt tills ögonen kommer fram över vecket, ser att man
+tittar (brynen upp, stel) och far upp bakom den igen på en tredjedels sekund, med ett prassel. Efter två sekunder till
+sänker han den och läser vidare som om inget har hänt. `lasa6` är ett av de tolv han lottar bland när det har gått dåligt
+(gruppen `lasa`: de sex klippen och sysslorna, en gång var per varv), så det händer ibland, inte varje gång; när han läser
+av vana gömmer han sig inte. Helgarderat trycks på samma papper i samma mått och döljer lika mycket. Provat bild för bild i
+headless Chromium med mjukvarugrafik i 1280 × 800 och 412 × 915, med närbilder av vecket: inget av ansiktet syns från att
+tidningen är uppe tills han kikar, och överkanten ryms i figurens duk.
+
 Fnysningen, utandningen och prasslet räknas fram med Web Audio som de andra ljuden (`fnys`, `anda` med `pust` och
 `prassel` i [public/rum-hasse-ljud.js](public/rum-hasse-ljud.js); `ljud` i bitarna) och hörs bara med ljudet på. De är
 räknade fram i en `OfflineAudioContext` (toppar 0,06–0,10, som andetaget på glasögonen) men inte lyssnade på. Bitarna är provade bild för bild i headless Chromium (1280 × 800), med närbilder av
 ansiktet, och tidningen går inte ned i disken i något av de nya klippen (samma räkning som ovan).
 
-Han läser Dagens Nyheter (`lasa`, `lasa3` och `lasa5`) eller Svenska Dagbladet (`lasa2` och `lasa4`), och de ska se ut som de riktiga (Tomas önskemål
+Han läser Dagens Nyheter (`lasa`, `lasa3` och `lasa5`) eller Svenska Dagbladet (`lasa2`, `lasa4` och `lasa6`), och de ska se ut som de riktiga (Tomas önskemål
 2026-11-09): tabloid på grått tidningspapper, med namnet i tidningens stil (skrivet som text, inte loggan: DN:s i en Bodoni,
 Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade versaler), dagens datum, nummer, årgång och pris,
 tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
