@@ -12,7 +12,7 @@
 //
 // Genom skyltfönstret syns rummet, vagt: gänget vid barbordet bakifrån, ritat i 3D av samma scen som
 // inne, i gängets egen duk som rummet lånar ut till fönstret (glas, utifran i rum-3d.js), med neonskylten Tobak, som läses rätt härifrån, skivan med
-// löpsedlarna med baksidan ut och rummet bakom i ljuset från lysröret – eller i neonens och tv:ns sken
+// löpsedlarna med baksidan ut, där Stryktipsets och Svenska Spels affischer sitter (reklam), och rummet bakom i ljuset från lysröret – eller i neonens och tv:ns sken
 // när lysröret är släckt på natten (RumFolk.nattGrad). På dagen speglar glaset himlen och gatan, och
 // rummet syns svagare; på kvällen lyser det ut på trottoaren. Guldet på dörren står rättvänt, och
 // skylten på sugproppen säger ÖPPET på den här sidan.
@@ -330,7 +330,65 @@ window.RumFasad = (() => {
     s += `<rect x="${r1(sx)}" y="${r1(sy)}" width="${r1(sw)}" height="${r1(sh)}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="3"/>`;
     // (de fyra sedlarna lyser svagt igenom papperet där de sitter)
     s += `<g fill="#f3ead9" opacity="${r1(0.05 + 0.05 * ljus)}"><rect x="${r1(sx + 6)}" y="${r1(sy + 6)}" width="${r1(sw / 2 - 9)}" height="${r1(sh / 2 - 9)}"/><rect x="${r1(sx + sw / 2 + 3)}" y="${r1(sy + 6)}" width="${r1(sw / 2 - 9)}" height="${r1(sh / 2 - 9)}"/><rect x="${r1(sx + 6)}" y="${r1(sy + sh / 2 + 3)}" width="${r1(sw / 2 - 9)}" height="${r1(sh / 2 - 9)}"/><rect x="${r1(sx + sw / 2 + 3)}" y="${r1(sy + sh / 2 + 3)}" width="${r1(sw / 2 - 9)}" height="${r1(sh / 2 - 9)}"/></g>`;
-    return `<g filter="url(#rf-mjuk)">${s}</g>`;
+    return `<g filter="url(#rf-mjuk)">${s}</g>${reklam(sx, sy, sw, sh, L)}`;
+  }
+
+  // Svenska Spels reklam på skivans baksida, mot gatan, som i varje tobaksaffär: Stryktipset överst och SPELA HÄR
+  // under, tejpade, lite sneda och solblekta. Affischerna sitter mot glaset och är skarpa (skivan bakom är ur
+  // fokus), och på kvällen ligger de i svanhalsarnas sken (kvallsljus). Inifrån syns de inte: där är skivans
+  // framsida med löpsedlarna (rum-affischer.js). Egna affischer i tipsets anda, inte Svenska Spels märke.
+  function reklam(sx, sy, sw, sh, L) {
+    const blek = (c) => mix(c, '#efe4cc', 0.12);
+    const gradde = '#f6edd8';
+    const bla = blek('#16306a');
+    const rod = blek('#b3241c');
+    const morkt = r1(0.3 * (1 - L.dag));
+    const anton = 'font-family="Anton, Impact, sans-serif"';
+    // en affisch: skuggan på skivan, papperet, innehållet, kvällens mörker och tejpen i hörnen
+    const affisch = (r, vrid, inner) => {
+      const tejp = [[2, -2, -8], [r.w - 16, -2, 7], [2, r.h - 3, 6], [r.w - 16, r.h - 3, -9]]
+        .map(([tx, ty, tv]) => `<rect x="${tx}" y="${ty}" width="14" height="5" fill="#f2ead2" opacity=".6" transform="rotate(${tv} ${tx + 7} ${ty + 2.5})"/>`).join('');
+      return `<g transform="translate(${r1(r.x)} ${r1(r.y)}) rotate(${vrid} ${r1(r.w / 2)} ${r1(r.h / 2)})">` +
+        `<rect x="1.5" y="2" width="${r1(r.w)}" height="${r1(r.h)}" fill="#000" opacity=".3"/>${inner}` +
+        (morkt > 0 ? `<rect width="${r1(r.w)}" height="${r1(r.h)}" fill="#000" opacity="${morkt}"/>` : '') + `${tejp}</g>`;
+    };
+    // Stryktipset: blått band, namnet, en stor 13 RÄTT och en liten kupong med kryss
+    const a = { x: sx + 5, y: sy + 6, w: sw - 10, h: sh * 0.64 };
+    let A = `<rect width="${r1(a.w)}" height="${r1(a.h)}" fill="${rod}"/>`;
+    A += `<rect x="3.5" y="3.5" width="${r1(a.w - 7)}" height="${r1(a.h - 7)}" fill="none" stroke="${gradde}" stroke-opacity=".55" stroke-width=".8"/>`;
+    A += `<rect x="3.5" y="3.5" width="${r1(a.w - 7)}" height="14" fill="${bla}"/>`;
+    A += `<text x="${r1(a.w / 2)}" y="13.6" text-anchor="middle" ${anton} font-size="8" letter-spacing="2.2" fill="${gradde}">SVENSKA SPEL</text>`;
+    A += `<text x="${r1(a.w / 2)}" y="40" text-anchor="middle" ${anton} font-size="21" textLength="${r1(a.w - 14)}" lengthAdjust="spacingAndGlyphs" fill="${gradde}">STRYKTIPSET</text>`;
+    A += `<line x1="8" y1="46" x2="${r1(a.w - 8)}" y2="46" stroke="${blek('#f2c230')}" stroke-width="1.2"/>`;
+    const tx = a.w * 0.33;
+    A += `<text x="${r1(tx + 1.6)}" y="104.5" text-anchor="middle" font-family="'Alfa Slab One', Georgia, serif" font-size="58" fill="#000" opacity=".35">13</text>`;
+    A += `<text x="${r1(tx)}" y="103" text-anchor="middle" font-family="'Alfa Slab One', Georgia, serif" font-size="58" fill="${blek('#f2c230')}">13</text>`;
+    A += `<text x="${r1(tx)}" y="120" text-anchor="middle" ${anton} font-size="14" letter-spacing="3" fill="${gradde}">RÄTT</text>`;
+    // (kupongen: 1 X 2 överst och ett kryss eller två på varje rad, alltid samma)
+    const kx = a.w * 0.64;
+    const ruta = 6.4;
+    let K = `<rect x="${r1(kx - 3)}" y="52" width="${r1(ruta * 3 + 6)}" height="${r1(ruta * 8 + 12)}" fill="${gradde}"/>`;
+    ['1', 'X', '2'].forEach((t, i) => { K += `<text x="${r1(kx + ruta * i + ruta / 2)}" y="60.5" text-anchor="middle" ${anton} font-size="6" fill="${rod}">${t}</text>`; });
+    const kryss = [[0], [1], [0, 2], [2], [0], [1, 2], [0], [1]];
+    kryss.forEach((k, j) => {
+      for (let i = 0; i < 3; i++) {
+        const rx = kx + ruta * i + 0.8;
+        const ry = 63 + ruta * j + 0.8;
+        K += `<rect x="${r1(rx)}" y="${r1(ry)}" width="${r1(ruta - 1.6)}" height="${r1(ruta - 1.6)}" fill="none" stroke="${rod}" stroke-width=".55"/>`;
+        if (k.includes(i)) K += `<path d="M${r1(rx + 0.8)} ${r1(ry + 0.8)} l${r1(ruta - 3.2)} ${r1(ruta - 3.2)} M${r1(rx + ruta - 2.4)} ${r1(ry + 0.8)} l${r1(-(ruta - 3.2))} ${r1(ruta - 3.2)}" stroke="#1a1a1a" stroke-width=".9" stroke-linecap="round"/>`;
+      }
+    });
+    A += K;
+    A += `<text x="${r1(a.w / 2)}" y="${r1(a.h - 10)}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-style="italic" font-size="7.6" fill="${gradde}">Spelstopp lördag 15.59</text>`;
+    // SPELA HÄR: ombudets lapp, på gräddvitt papper
+    const b = { x: sx + 7, y: a.y + a.h + 8, w: sw - 14, h: sh - a.h - 21 };
+    let B = `<rect width="${r1(b.w)}" height="${r1(b.h)}" fill="${blek('#f1e8d0')}"/>`;
+    B += `<rect x="3" y="3" width="${r1(b.w - 6)}" height="${r1(b.h - 6)}" fill="none" stroke="${bla}" stroke-width="1.4"/>`;
+    B += `<text x="${r1(b.w / 2)}" y="27" text-anchor="middle" ${anton} font-size="21" textLength="${r1(b.w - 18)}" lengthAdjust="spacingAndGlyphs" fill="${bla}">SPELA HÄR!</text>`;
+    B += `<line x1="12" y1="33" x2="${r1(b.w - 12)}" y2="33" stroke="${rod}" stroke-width="1.2"/>`;
+    B += `<text x="${r1(b.w / 2)}" y="43" text-anchor="middle" ${anton} font-size="7" letter-spacing=".8" fill="${rod}">TIPS · LOTTO · ODDSET · TRISS</text>`;
+    B += `<text x="${r1(b.w / 2)}" y="${r1(b.h - 7)}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-style="italic" font-size="6.6" fill="#3a3630">Ombud för Svenska Spel</text>`;
+    return affisch(a, -1.2, A) + affisch(b, 0.9, B);
   }
   function neonSkylt() {
     const { x, y, w, h } = FON;
