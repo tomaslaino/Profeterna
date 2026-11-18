@@ -931,12 +931,17 @@ window.Telefon = (() => {
     });
     addEventListener('scroll', placera, { passive: true });
     addEventListener('resize', placera, { passive: true });
+    // (rummet och den vanliga sidan byts utan att något i samtalet ändras: i-rummet på html)
+    new MutationObserver(() => requestAnimationFrame(placera)).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   }
 
   // Överst i mitten: under toppbaren på sajten, och under namnet och foten i rummet.
   function placera() {
     const b = T.bricka;
-    if (!b || !T.synlig) return;
+    if (!b || !T.synlig) {
+      dispatchEvent(new Event('tel-bricka'));
+      return;
+    }
     let top = 12;
     if (document.documentElement.classList.contains('i-rummet')) {
       const ft = document.querySelector('.rum.smal .rum-ft');
@@ -945,7 +950,9 @@ window.Telefon = (() => {
       const tb = document.querySelector('.topbar');
       if (tb) top = Math.max(10, tb.getBoundingClientRect().bottom + 8);
     }
-    b.style.top = `${Math.round(top)}px`;
+    if (b.style.top !== `${Math.round(top)}px`) b.style.top = `${Math.round(top)}px`;
+    // (den lilla tv:n som följer med ställer sig under brickan där de skulle krocka, rum-bild.js)
+    dispatchEvent(new Event('tel-bricka'));
   }
 
   function rita() {

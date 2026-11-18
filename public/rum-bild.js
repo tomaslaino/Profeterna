@@ -315,12 +315,20 @@ window.RumBild = (() => {
     const topp = B.toppNu = () => {
       f = 0;
       const t = document.querySelector('.topbar');
-      const y = t && getComputedStyle(t).position !== 'static' ? Math.max(0, t.getBoundingClientRect().bottom) : 0;
+      let y = t && getComputedStyle(t).position !== 'static' ? Math.max(0, t.getBoundingClientRect().bottom) : 0;
+      // (samtalets bricka står överst i mitten, telefon.js: i telefonen står den lilla tv:n under den)
+      const br = document.getElementById('tel-bricka');
+      if (br && (br.matches(':popover-open') || (!br.popover && !br.hidden))) {
+        const r = br.getBoundingClientRect();
+        const mr = m.getBoundingClientRect();
+        if (r.width && r.right > mr.left - 6 && r.left < mr.right + 6) y = Math.max(y, r.bottom - 4);
+      }
       m.style.setProperty('--topp', `${Math.round(y)}px`);
     };
     B.topp = () => { if (!f) f = requestAnimationFrame(topp); };
     addEventListener('scroll', () => { if (B.ute) B.topp(); }, { passive: true });
     addEventListener('resize', () => { if (B.ute) B.topp(); });
+    addEventListener('tel-bricka', () => { if (B.ute) B.topp(); });
     if (pop(m)) new MutationObserver((ms) => { if (ms.some((x) => x.target.tagName === 'DIALOG')) miniVard(); }).observe(document.body, { subtree: true, attributeFilter: ['open'] });
     return m;
   }
