@@ -492,9 +492,20 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   gammal vana, och medan han väntar tar han tidningen då och då som kaffet och cigarren. Att han redan läser när man
   kommer gör han bara ibland ("Det här gör han ibland - absolut inte alltid!"): var fjärde gång av vana och varannan
   gång när det har gått dåligt (förut varannan gång och alltid). Läser han när man kommer tittar han upp på en just när
-  kameran har stannat, alltid med glasögonen på.
-  Tre gånger av fyra är det Helgarderat, och det görs klart medan hans bild byggs, så att det finns redan då (se
-  *Tidningen* under [Hasse Backe](#hasse-backe))
+  kameran har stannat, alltid med glasögonen på. Tre gånger av fyra är det Helgarderat, och det görs klart medan hans
+  bild byggs, så att det finns redan då (se *Tidningen* under [Hasse Backe](#hasse-backe))
+- [x] **Fler sätt att läsa av vana (2026-11-18, användarens önskemål: "Gör fler tidningsvarianter som passar"):** av vana
+  läste han bara på två sätt, för i de andra tre står det något i tidningen som säger att han hade fel. Nu finns tre
+  till, där han är nöjd med det han läser: han tittar upp och blinkar åt en, skrattar tyst för sig själv, funderar på
+  en svår match tills det lossnar och blir imponerad med en tyst vissling (`lasa6`–`lasa8`; se *Tidningen* under
+  [Hasse Backe](#hasse-backe))
+- [x] **Hasse gömmer sig helt bakom tidningen (2026-11-18, användarens önskemål: "Hasse får gärna ibland täcka sitt ansikte
+  helt när han läser tidningen för att 'låtsas' som att han inte har fel på bettingen"):** i ett nytt klipp, `lasa9`, för han
+  upp tidningen så högt att varken ansiktet eller håret syns och sitter där en stund, sänker den långsamt tills ögonen
+  kommer fram, ser att man tittar och far upp bakom den igen, och läser sedan vidare som om inget har hänt. Läser han det
+  när man kommer far tidningen upp just när kameran har stannat. Klippet är ett av de femton han lottar bland när det har
+  gått dåligt, så det händer ibland (se *Helt bakom tidningen* under
+  [Hasse Backe](#hasse-backe))
 - [x] **Hasse gör fler saker med händerna medan han väntar (2026-11-18, användarens önskemål: "Ge Hasse fler
   passande rörelser lika snygga som tidigare"):** sex nya småsaker: rättar till slipsen, stryker sig om hakan,
   gäspar bakom handen, hälsar med två fingrar mot baren, sopar ihop askan och pekar på en som med en pistol (se
@@ -2235,6 +2246,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   (`LAS_UPPTAGEN`; förut alltid), tidningen är en av hans vanor bredvid kaffet och cigarren (`VANA_TIDNING`), han
   tittar upp på en när kameran har stannat (`kom` i klippen), och Helgarderat är tidningen tre gånger av fyra
   (`HG_ANDEL`). Se [Hasse Backe](#hasse-backe), *Tidningen*.
+- **Fler sätt att läsa av vana (2026-11-18, användarens önskemål):** "Gör fler tidningsvarianter som passar". Tre nya
+  klipp, `lasa6`–`lasa8`, där inget i tidningen säger att han hade fel och han är nöjd med det han läser, av de vanliga
+  bitarna och fyra nya: `blinkar`, `fniss`, `fundera` och `imponerad`. Av vana läser han nu på fem sätt (`VANA_LAS`).
+  Se [Hasse Backe](#hasse-backe), *Tidningen*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -7374,14 +7389,21 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   höstlöv och trädens färger efter årstiden, måsar, kråkor och fyrverkerier på nyår. På dagen speglar glaset himlen och
   rummet syns svagare; på kvällen lyser fönstret ut på trottoaren, lamporna tänds på skylten, vid porten och på bron,
   och när lysröret är släckt på natten (`RumFolk.nattGrad`) är rummet mörkt utom neonen och tv:n.
-- **Dämpat ljus inne på kvällen (2026-11-18, användarens önskemål):** "tona ner belysningen i affären något kvällstid.
-  Anpassa ljuset där inne till det som är rimligt." Förut var rummet bakom glaset lika ljust en kväll som mitt på
-  dagen och lyste som en ljusbox ut i mörkret; utifrån dämpades det bara när lysröret släcktes. Nu lyser lamporna med
-  halva ljuset när dagsljuset går (`kvall` och `KVALL_INNE` i `inne`, samma kväll som dunklet inifrån, `ljusKlockan` i
-  rum.js): väggen, hyllan och bardisken mörkare, kuporna och skenet under fläkten varmare, och lite mindre sken ut på
-  väggen och trottoaren. Gänget är 30 % mörkare (`KVALL_UTE` i rum-3d.js, exponeringen när de ritas utifrån: det
-  mesta av ljuset på dem kommer från rummets miljö, och med bara lamporna dämpade blev de 7 % mörkare), så att de
-  fortfarande står ut mot rummet bakom. Neonen lyser som förut och syns därför mer. Dagen och natten är som förut.
+- **Samma ljus utifrån som inifrån (2026-11-18, användarens önskemål):** först "tona ner belysningen i affären något
+  kvällstid. Anpassa ljuset där inne till det som är rimligt", sedan "Tänk på belysningen i animationsbilden i butiken
+  o att det ska passa när man tittar in i butiken utifrån!" Förut var rummet bakom glaset jämnt upplyst och lika ljust
+  en kväll som mitt på dagen, och utifrån dämpades det bara när lysröret släcktes. Inifrån (`ljusKlockan` och
+  `KAGLOR` i rum.js) lyser fläktens kupor på gängets bord, och runt käglan sjunker rummet in i dunkel, mest i kanterna,
+  dag som kväll; på kvällen är det mörkare runt käglan men inte i den, och lamporna lyser igenom. Nu är det samma ljus
+  utifrån (`rummet`): dunklet runt käglan (`rf-dunkel`, `DUNKEL` som i rum.js, med kvällens mörker ovanpå utom i
+  käglan, och i den också när kuporna är släckta på natten), kuporna och deras sken i undertaket ovanpå (gulnade
+  plattor i ett ljust bärverk, som inifrån, i stället för ett mörkt tak; mer sken på kvällen när det är mörkare runt
+  om), neonens röda sken mer på kvällen och tv:ns blå. Lampan med den gröna emaljskärmen (`LAMPA` i rum.js) hänger
+  över Hasse vid pulten genom dörren och lyser på hans huvud, tänd också på natten. Gänget sitter i käglan och är
+  lika ljust kväll som dag, som inifrån (en första version gjorde dem 30 % mörkare utifrån; den är borttagen).
+  Rummet lyser lite mindre ut på glaset, skivan och trottoaren på kvällen (`KVALL_INNE` i `inne`). Mätt klockan 21
+  (1440 × 900, gråskala): fönstret 17 % mörkare än förut, mitten med gänget 15 %, undertaket 7 % och dörren 31 %
+  utom under lampan; inifrån är väggarna ungefär 20 % mörkare klockan 21 än klockan 14.
 - **Gänget ur fokus (2026-11-18, användarens önskemål):** "Vi behöver inte vara så i fokus heller!" Ögat är ställt
   på glaset: skylten, neonen och guldet på dörren är skarpa, gänget mjukt ur fokus och rummet bakom ännu suddigare.
   I datorn är oskärpan på gängets duk 1,3 px (förut 0,6). I telefonen var gänget helt skarpt (`filter: none`, för
@@ -10200,7 +10222,7 @@ det inte gått dåligt läser han redan var fjärde gång man kommer (`LAS_VANA`
 tidningen en av hans vanor, bredvid kaffet och cigarren, fast den lockar hälften så mycket (`VANA_TIDNING` i `vana`). Då
 blir det bara `lasa` och `lasa2`, där inget i tidningen säger att han hade fel (`VANA_LAS`). Läser han när man kommer,
 av vana eller för att det har gått dåligt, börjar klippet där han för första gången tittar upp på en över tidningen
-(`kom` i klippen: den första av bitarna `glimt`, `harJagFel` och `over`, `KOM` i
+(`kom` i klippen: den första av bitarna `glimt`, `harJagFel`, `over`, `blinkar` och `dold`, `KOM` i
 [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Man ser honom läsa medan kameran svänger, och en halv sekund efter
 att den har stannat kommer ögonen upp på en, brynen åker upp och han ler. Förut började klippet där läsandet börjar
 (`LAS_START`), och det kunde dröja en halv minut innan han tittade upp. Det gör han bara ibland, aldrig alltid
@@ -10211,7 +10233,7 @@ headless Chromium med mjukvarugrafik i telefonens mått (412 × 915), med bilder
 påtvingade, och med vanan medan han väntar. Han läser rad för rad, tittar upp
 över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen syns, nickar åt det som står,
 rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` till
-`lasa5`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
+`lasa9`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
 händerna lågt, rakt upp bakom diskens kant tills den är över den, och för den sedan fram över disken och flyttar upp
 händerna; i knät hänger armarna nedåt. Han läser den som man läser något i knät: lågt framför sig, strax över disken och
 lite åt sin högra sida, uppslagen och halvt hopvikt, och lutad framåt så att sidorna vänds upp mot hans ögon, med
@@ -10231,8 +10253,9 @@ långt under vad chanserna var värda, med tävlingskupongen om han spelade och 
 [public/rum-hasse.js](public/rum-hasse.js)); det gäller både när han säger hur det gick och när han dömer gänget. Med
 minskad rörelse läser han inte.
 
-I tre av de fem klippen (`lasa3`, `lasa4` och `lasa5`, 2026-11-10, Tomas önskemål: han läser men låtsas lite, som Walter i
-*The Big Lebowski*, att han inte hade fel) står det något i tidningen som säger att han hade fel. Han medger ingenting:
+I fyra av de nio klippen (`lasa3`, `lasa4` och `lasa5`, 2026-11-10, Tomas önskemål: han läser men låtsas lite, som Walter i
+*The Big Lebowski*, att han inte hade fel; och `lasa9`, se *Helt bakom tidningen* nedan) står det något i tidningen som
+säger att han hade fel. Han medger ingenting:
 antingen är det tidningen som har fel, eller så har inget hänt, och det visar han med eftertryck. Det är fem nya bitar som
 blandas med de vanliga:
 
@@ -10249,12 +10272,49 @@ blandas med de vanliga:
   och nickar bestämt (så, det var det). Sedan slår han upp den igen och läser vidare. Helt hopvikt hamnade händerna
   tätt ihop framför bröstet och armarna syntes inte, därför bara till hälften.
 
+**Helt bakom tidningen** (2026-11-18, användarens önskemål: "Hasse får gärna ibland täcka sitt ansikte helt när han
+läser tidningen för att 'låtsas' som att han inte har fel på bettingen"). I klippet `lasa9` (Svenska
+Dagbladet) gömmer han sig helt bakom den en stund (biten `dold`). Han för upp den som när han gömmer sig, hopvikt som
+ett V med ryggen mot en, men högre, mer upprätt och lite mer uppslagen, och böjer huvudet bakom den, så att varken
+ansiktet eller håret syns (`DOLD_Y`, `DOLD_TILT`, `DOLD_B` och `DOLD_P` i
+[public/rum-hasse-3d.js](public/rum-hasse-3d.js); lägre och mer hopvikt syntes hjässan i vecket). Där sitter han i tre
+sekunder, med en knäpp i papperet och ett prassel, sänker den långsamt tills ögonen kommer fram över vecket, ser att man
+tittar (brynen upp, stel) och far upp bakom den igen på en tredjedels sekund, med ett prassel. Efter två sekunder till
+sänker han den och läser vidare som om inget har hänt. Biten räknas till `KOM`, och den är den första sådana i `lasa9`:
+läser han det när man kommer far tidningen upp framför ansiktet just när kameran har stannat, och han kikar fram först
+några sekunder senare. `lasa9` är ett av de femton han lottar bland när det har gått dåligt (gruppen `lasa`: de nio
+klippen och sysslorna, en gång var per varv), så det händer ibland, inte varje gång; när han läser av vana gömmer han sig
+inte. Helgarderat trycks på samma papper i samma mått och döljer lika mycket. Provat bild för bild i
+headless Chromium med mjukvarugrafik i 1280 × 800 och 412 × 915, med närbilder av vecket: inget av ansiktet syns från att
+tidningen är uppe tills han kikar, och överkanten ryms i figurens duk.
+
 Fnysningen, utandningen och prasslet räknas fram med Web Audio som de andra ljuden (`fnys`, `anda` med `pust` och
 `prassel` i [public/rum-hasse-ljud.js](public/rum-hasse-ljud.js); `ljud` i bitarna) och hörs bara med ljudet på. De är
 räknade fram i en `OfflineAudioContext` (toppar 0,06–0,10, som andetaget på glasögonen) men inte lyssnade på. Bitarna är provade bild för bild i headless Chromium (1280 × 800), med närbilder av
 ansiktet, och tidningen går inte ned i disken i något av de nya klippen (samma räkning som ovan).
 
-Han läser Dagens Nyheter (`lasa`, `lasa3` och `lasa5`) eller Svenska Dagbladet (`lasa2` och `lasa4`), och de ska se ut som de riktiga (Tomas önskemål
+Av vana (2026-11-18, användarens önskemål: "Gör fler tidningsvarianter som passar") läser han på fem av de nio sätten:
+`lasa` och `lasa2`, och tre som är gjorda för det, `lasa6`, `lasa7` och `lasa8` (`VANA_LAS` i rum-hasse.js). I dem står
+inget om att han hade fel; oftast läser han Helgarderat, med sin egen krönika, och han är nöjd med det han läser och med
+sig själv. De är byggda av de vanliga bitarna och fyra nya:
+
+- `blinkar`: han tittar upp på en över tidningen med ett snett leende och blinkar med ena ögat (vi vet, du och jag).
+  Den räknas som en av bitarna där han tittar upp när man kommer (`KOM`), så i `lasa6` och `lasa8` kan han blinka åt en
+  just när kameran har stannat.
+- `fniss`: blicken stannar, leendet växer och han kisar, och han skrattar tyst för sig själv med tre små stötar i
+  axlarna och huvudet, med en kort pust för varje (`anda` med `pust`).
+- `fundera`: en svår match. Brynen dras ihop, han lutar sig närmare med huvudet på sned och munnen spetsad och läser
+  raden en gång till, och så lossnar det: brynen upp, en kort nick, och han läser vidare.
+- `imponerad`: brynen åker upp och han spetsar munnen till en tyst vissling, drar huvudet lite bakåt och nickar
+  långsamt och uppskattande.
+
+Medan han tittar ned i tidningen öppnar han aldrig ögonen mer än lite: med locken högre upp syns irisens överkant, och då
+ser det ut som att han kikar på en över glasögonen (så såg `fundera` ut först). Tidningen rör sig i de nya bitarna bara
+lite, upp eller ned som i `glimt`. Provat bild för bild i headless Chromium med mjukvarugrafik i telefonens mått
+(412 × 915, dubbel upplösning), med närbilder av ansiktet och med Helgarderat i händerna; pusten i `fniss` är inte
+lyssnad på.
+
+Han läser Dagens Nyheter (`lasa`, `lasa3`, `lasa5`, `lasa6` och `lasa8`) eller Svenska Dagbladet (`lasa2`, `lasa4`, `lasa7` och `lasa9`), och de ska se ut som de riktiga (Tomas önskemål
 2026-11-09): tabloid på grått tidningspapper, med namnet i tidningens stil (skrivet som text, inte loggan: DN:s i en Bodoni,
 Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade versaler), dagens datum, nummer, årgång och pris,
 tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
