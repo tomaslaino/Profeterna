@@ -408,10 +408,70 @@ const LASBIT = {
     },
     ljud: [[1.65, { typ: 'prassel' }], [4.55, { typ: 'prassel', mjuk: true }]],
   },
+  // ---- När han läser av vana (lasa6–lasa8, 2026-11-18, användarens önskemål: "Gör fler tidningsvarianter som passar"):
+  // inget i tidningen säger att han hade fel, och oftast är det Helgarderat, med hans egen krönika. Han är nöjd med det
+  // han läser och med sig själv.
+  // Tittar upp på en över tidningen med ett snett leende och blinkar med ena ögat (vi vet, du och jag), och läser vidare.
+  blinkar: {
+    dur: 3.8,
+    k: {
+      blickY: [[0.5, L('blickY')], [0.62, -1.5], [2.3, -1.5], [2.45, L('blickY')]], blund: [[0.5, L('blund')], [0.6, 0.04], [2.3, 0.04], [2.45, L('blund')]],
+      blickX: [[0.5, L('blickX')], [0.62, EN_X], [2.3, EN_X], [2.45, L('blickX')]],
+      brynX: [[0.5, -0.12], [0.75, 0.4], [2.2, 0.35], [2.8, -0.12]], brynY: [[0.5, -0.08], [0.75, 0.45], [2.2, 0.4], [2.8, -0.08]],
+      pitch: [[0.5, L('pitch')], [0.75, L('pitch', -0.1)], [2.2, L('pitch', -0.1)], [2.7, L('pitch')]], roll: [[0.6, 0], [1.0, 0.06], [2.0, 0.06], [2.6, 0]],
+      le: [[0.8, 0], [1.2, 0.6], [2.2, 0.55], [3.0, 0]], kis: [[1.0, 0.06], [1.3, 0.3], [2.2, 0.25], [2.9, 0.06]],
+      vink: [[1.25, 0], [1.4, 1], [1.62, 1], [1.8, 0]],
+    },
+    t: { y: [[0.5, LY], [0.7, LY - 12], [2.2, LY - 12], [2.5, LY]] },
+  },
+  // Något roar honom: blicken stannar mitt i raden, leendet växer och han kisar, och han skrattar tyst för sig själv,
+  // tre små stötar med axlarna och huvudet och en pust genom näsan för varje, och läser vidare med leendet kvar en stund.
+  fniss: {
+    dur: 4.8,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1)], [1.0, rad(0.3)], [3.4, rad(0.3)], [3.8, rad(1.4)], [4.3, rad(2.4)]],
+      le: [[0.9, 0], [1.4, 0.8], [3.4, 0.7], [4.6, 0]], kis: [[0.9, 0.06], [1.4, 0.45], [3.3, 0.4], [4.4, 0.06]],
+      blund: [[0.9, L('blund')], [1.4, 0.88], [3.3, 0.86], [4.0, L('blund')]],
+      brynX: [[0.9, -0.12], [1.3, 0.3], [3.2, 0.25], [4.2, -0.12]], brynY: [[0.9, -0.08], [1.3, 0.25], [3.2, 0.2], [4.2, -0.08]],
+      pitch: [[1.4, L('pitch')], [1.55, L('pitch', 0.07)], [1.75, L('pitch', -0.02)], [1.95, L('pitch', 0.06)], [2.15, L('pitch', -0.02)], [2.35, L('pitch', 0.05)], [2.6, L('pitch')]],
+      axV: [[1.4, 10], [1.55, 15], [1.75, 9], [1.95, 14], [2.15, 9], [2.35, 13], [2.6, 10]], axH: [[1.4, 10], [1.55, 15], [1.75, 9], [1.95, 14], [2.15, 9], [2.35, 13], [2.6, 10]],
+      andas: [[1.4, 0], [1.52, -4], [1.72, 0], [1.92, -4], [2.12, 0], [2.32, -3], [2.55, 0]], roll: [[1.2, 0], [1.6, 0.03], [3.2, 0.03], [4.2, 0]],
+    },
+    t: { vag: [[1.5, 0], [1.6, 5], [2.0, 0], [2.4, 4], [2.8, 0]] },
+    ljud: [[1.52, { typ: 'anda', sort: 'pust', ms: 160 }], [1.92, { typ: 'anda', sort: 'pust', ms: 150 }], [2.32, { typ: 'anda', sort: 'pust', ms: 140 }]],
+  },
+  // En svår match: blicken stannar, brynen dras ihop och han lutar sig närmare med huvudet på sned och munnen spetsad
+  // och läser raden en gång till. Så lossnar det: brynen upp, en kort nick (javisst), och han läser vidare.
+  fundera: {
+    dur: 6.0,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1)], [1.0, rad(0.2)], [1.6, rad(0.2)], [1.75, rad(-3)], [2.3, rad(-1)], [2.8, rad(0.6)], [3.5, rad(0.6)], [4.6, rad(1.8)], [5.2, rad(2.6)]],
+      brynX: [[1.0, -0.12], [1.4, -0.6], [3.5, -0.55], [3.8, 0.55], [4.4, 0.5], [5.2, -0.12]], brynY: [[1.0, -0.08], [1.4, -0.7], [3.5, -0.65], [3.8, 0.6], [4.4, 0.55], [5.2, -0.08]],
+      kis: [[1.0, 0.06], [1.4, 0.45], [3.5, 0.45], [3.8, 0.1], [4.6, 0.2], [5.4, 0.06]], blund: [[1.0, L('blund')], [1.4, 0.88], [3.5, 0.88], [3.75, 0.8], [4.6, L('blund')]],
+      pitch: [[1.0, L('pitch')], [1.6, L('pitch', 0.12)], [3.5, L('pitch', 0.12)], [3.8, L('pitch', -0.08)], [4.05, L('pitch', 0.1)], [4.3, L('pitch')]],
+      lut: [[1.0, 0.03], [1.6, 0.06], [3.5, 0.06], [4.2, 0.03]], roll: [[1.0, 0], [1.6, -0.06], [3.5, -0.06], [4.2, 0]],
+      rund: [[1.3, 0], [1.6, 0.4], [3.4, 0.35], [3.7, 0]], stel: [[1.0, 0], [1.4, 0.5], [3.5, 0.5], [3.8, 0]], le: [[3.75, 0], [4.1, 0.45], [4.8, 0.35], [5.6, 0]],
+    },
+    t: { y: [[1.0, LY], [1.6, LY + 5], [3.5, LY + 5], [4.0, LY]] },
+  },
+  // Det var inte illa: brynen åker upp och han spetsar munnen till en tyst vissling, drar huvudet lite bakåt och nickar
+  // långsamt och uppskattande åt det som står, och läser vidare.
+  imponerad: {
+    dur: 5.0,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1)], [1.0, rad(0.4)], [3.6, rad(0.4)], [4.2, rad(1.6)], [4.6, rad(2.4)]],
+      brynX: [[0.9, -0.12], [1.25, 0.75], [3.2, 0.7], [4.2, -0.12]], brynY: [[0.9, -0.08], [1.25, 0.9], [3.2, 0.85], [4.2, -0.08]],
+      blund: [[0.9, L('blund')], [1.2, 0.7], [3.2, 0.72], [4.0, L('blund')]],
+      rund: [[1.0, 0], [1.3, 0.55], [2.4, 0.5], [2.7, 0]], munn: [[1.0, 0], [1.3, 0.08], [2.4, 0.07], [2.7, 0]], stel: [[0.9, 0], [1.2, 0.7], [2.5, 0.7], [2.9, 0]],
+      pitch: [[0.9, L('pitch')], [1.3, L('pitch', -0.1)], [2.6, L('pitch', -0.1)], [2.95, L('pitch', 0.1)], [3.3, L('pitch', -0.04)], [3.7, L('pitch', 0.08)], [4.1, L('pitch')]],
+      lut: [[0.9, 0.03], [1.3, 0], [2.6, 0], [3.4, 0.03]], le: [[2.7, 0], [3.1, 0.45], [3.8, 0.4], [4.8, 0]],
+    },
+    t: {},
+  },
 };
 // Bitarna där han tittar upp på en över tidningen. Läser han redan när man kommer börjar sidan vid den första av dem
 // i klippet (kom), så att han tittar upp just när man har kommit fram (Tomas 2026-11-18).
-const KOM = new Set(['glimt', 'harJagFel', 'over']);
+const KOM = new Set(['glimt', 'harJagFel', 'over', 'blinkar']);
 // Ett klipp ur bitarna: nycklarna i klippets tid, och gränserna mellan bitarna (slag), var ned börjar, var han
 // första gången tittar upp på en (kom), och ljuden (ljud: [tid, ljud] i klippets tid).
 function lasKlipp(bitar) {
@@ -476,14 +536,19 @@ function lasKlipp(bitar) {
   const { gk, ...gn } = g;
   return { dur: at, k: ut(k), t: ut(t), g: { gk, ...ut(gn) }, slag, ner, kom: kom ?? LASBIT.pa.dur + LASBIT.upp.dur, ljud };
 }
-// Fem ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter. I de tre sista står det
-// något i tidningen som säger att han hade fel, och han låtsas som ingenting (skaka, resultat, harJagFel, lugn, vika).
+// Åtta ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter. I lasa3–lasa5 står det
+// något i tidningen som säger att han hade fel, och han låtsas som ingenting (skaka, resultat, harJagFel, lugn, vika). I
+// lasa6–lasa8 läser han av vana och är nöjd med det han läser (blinkar, fniss, fundera, imponerad); de, lasa och lasa2
+// är de han läser av vana (VANA_LAS i rum-hasse.js).
 export const LASA = {
   lasa: lasKlipp(['pa', 'upp', 'las', 'glimt', 'las', 'skjut', 'gom', 'nick', 'las', 'over', 'las', 'titta', 'las', 'ned', 'av']),
   lasa2: lasKlipp(['pa', 'upp', 'ryck', 'las', 'nick', 'lyft', 'las', 'glimt', 'las', 'gom', 'skjut', 'las', 'ned', 'av']),
   lasa3: lasKlipp(['pa', 'upp', 'las', 'skaka', 'las', 'harJagFel', 'las', 'nick', 'resultat', 'las', 'lugn', 'las', 'ned', 'av']),
   lasa4: lasKlipp(['pa', 'upp', 'ryck', 'las', 'resultat', 'las', 'glimt', 'las', 'vika', 'las', 'skaka', 'las', 'ned', 'av']),
   lasa5: lasKlipp(['pa', 'upp', 'las', 'harJagFel', 'las', 'skjut', 'vika', 'las', 'lugn', 'las', 'titta', 'las', 'ned', 'av']),
+  lasa6: lasKlipp(['pa', 'upp', 'las', 'blinkar', 'las', 'fniss', 'las', 'nick', 'las', 'fundera', 'las', 'titta', 'las', 'ned', 'av']),
+  lasa7: lasKlipp(['pa', 'upp', 'ryck', 'las', 'fundera', 'las', 'glimt', 'las', 'fniss', 'las', 'skjut', 'las', 'ned', 'av']),
+  lasa8: lasKlipp(['pa', 'upp', 'las', 'imponerad', 'las', 'blinkar', 'las', 'lyft', 'las', 'nick', 'las', 'ned', 'av']),
 };
 // var läsandet börjar (med glasögonen på, efter upp)
 export const LAS_START = LASBIT.pa.dur + LASBIT.upp.dur;
@@ -634,6 +699,10 @@ export const KLIPP = {
   lasa3: { fran: 840, till: 840 + LASA.lasa3.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa3.slag, ner: LASA.lasa3.ner, kom: LASA.lasa3.kom, ljud: LASA.lasa3.ljud },
   lasa4: { fran: 910, till: 910 + LASA.lasa4.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa4.slag, ner: LASA.lasa4.ner, kom: LASA.lasa4.kom, ljud: LASA.lasa4.ljud },
   lasa5: { fran: 980, till: 980 + LASA.lasa5.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa5.slag, ner: LASA.lasa5.ner, kom: LASA.lasa5.kom, ljud: LASA.lasa5.ljud },
+  // (och de han läser av vana, nöjd med det han läser: blinkar, fniss, fundera och imponerad; efter kaffet på 1100–1145)
+  lasa6: { fran: 1150, till: 1150 + LASA.lasa6.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa6.slag, ner: LASA.lasa6.ner, kom: LASA.lasa6.kom, ljud: LASA.lasa6.ljud },
+  lasa7: { fran: 1225, till: 1225 + LASA.lasa7.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa7.slag, ner: LASA.lasa7.ner, kom: LASA.lasa7.kom, ljud: LASA.lasa7.ljud },
+  lasa8: { fran: 1300, till: 1300 + LASA.lasa8.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa8.slag, ner: LASA.lasa8.ner, kom: LASA.lasa8.kom, ljud: LASA.lasa8.ljud },
   // Det andra han gör när det har gått dåligt (grupp lasa, som tidningen; sysslorna i figuren): han håller
   // på med något för att verka upptagen, märker att man tittar och fryser (ertappad, utan leende: stel),
   // och sedan låtsas han att inget har hänt, med eftertryck. fram: där sidan börjar när han redan håller på

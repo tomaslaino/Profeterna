@@ -3202,13 +3202,14 @@ window.RumHasse = (() => {
   const HG_ANDEL = 3 / 4;
   // Han läser också av gammal vana, utan att det har gått dåligt (2026-11-18, användarens önskemål): ibland läser han
   // redan när man kommer (LAS_VANA av gångerna), och medan han väntar tar han tidningen då och då som kaffet och
-  // cigarren (vana, med vikten VANA_TIDNING). Då bara de klipp där inget i tidningen säger att han hade fel (VANA_LAS).
+  // cigarren (vana, med vikten VANA_TIDNING). Då bara de klipp där inget i tidningen säger att han hade fel (VANA_LAS;
+  // lasa6–lasa8 är gjorda för det: han blinkar åt en, skrattar tyst, funderar och blir imponerad).
   // Att han redan läser när man kommer gör han bara ibland, också när det har gått dåligt (LAS_UPPTAGEN): "Det här gör
   // han ibland - absolut inte alltid!" (2026-11-18; förut varannan gång av vana, och alltid när det hade gått dåligt).
   const LAS_VANA = 1 / 4;
   const LAS_UPPTAGEN = 1 / 2;
   const VANA_TIDNING = 0.5;
-  const VANA_LAS = ['lasa', 'lasa2'];
+  const VANA_LAS = ['lasa', 'lasa2', 'lasa6', 'lasa7', 'lasa8'];
   // Tidningen i ordning i hans figur: dagens tryck (en gång om dagen, och igen i en ny figur) och Helgarderat (när ett
   // nytt nummer har kommit, och igen i en ny figur). Görs när figuren byggs, och bygget väntar en stund på Helgarderat
   // (som visas först när typsnitten och porträttet har kommit), så att det finns när han läser redan när man kommer;
