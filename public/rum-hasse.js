@@ -1476,8 +1476,10 @@ window.RumHasse = (() => {
     }
     // cigarren som den var, eller slocknad om han har låtit den ligga sedan sist
     cigarrIgen();
-    // (disken hinner ritas innan kameran slår dit, men den väntar man inte länge på)
-    await Promise.race([passa(), new Promise((ok) => setTimeout(ok, 1500))]);
+    // och tidningen, om han läser när man kommer (Helgarderat i en ny figur: hg)
+    const hg = tidningKlar();
+    // (disken och Helgarderat hinner ritas innan kameran slår dit, men dem väntar man inte länge på)
+    await Promise.race([Promise.all([passa(), hg]), new Promise((ok) => setTimeout(ok, 1500))]);
     // (en ny figur ritas en gång redan här, utom synhåll: grafikprogrammen görs i ordning nu och inte när
     // kameran ska svänga)
     if (ny && H.fig && !H.on) H.fig.rita(0, performance.now() / 1000);
@@ -1649,8 +1651,9 @@ window.RumHasse = (() => {
     H.oppnar = false;
     H.T = 0;
     bronSnart(true);
-    // (har det gått dåligt för honom läser han redan när man kommer)
+    // (har det gått dåligt för honom läser han redan när man kommer, och annars ibland av vana: LAS_VANA)
     if (H.upptagen) lasNu();
+    else if (Math.random() < LAS_VANA) lasNu(true);
     // rummet står still medan man tittar åt hans håll, och rätar upp sig efter musen på vägen
     if (window.Rum && Rum.vila) Rum.vila(true);
     for (const w of H.world) Object.assign(w.style, { transition: 'transform 0.2s ease-out, translate 0.2s ease-out, rotate 0.2s ease-out', translate: 'none', rotate: 'none', transform: 'translateZ(-330px) rotateX(0deg) rotateY(0deg) translateZ(330px)' });
@@ -2040,8 +2043,9 @@ window.RumHasse = (() => {
   const GRUPP = {};
   const grupp = (g) => (GRUPP[g] = GRUPP[g] && GRUPP[g].length ? GRUPP[g] : Object.keys(GEST).filter((n) => GEST[n].grupp === g));
   const ettAv = (g, annars) => lott(grupp(g)) || annars;
-  // Kaffet eller cigarren, det han känner för: det som var längst sedan lockar mest (sedan han tog det själv
-  // eller man klickade på det), så att det oftast blir omväxlande men inte varannan gång som ett urverk.
+  // Kaffet, cigarren eller tidningen, det han känner för: det som var längst sedan lockar mest (sedan han tog det
+  // själv eller man klickade på det), så att det oftast blir omväxlande men inte varannan gång som ett urverk.
+  // Tidningen lockar mindre (VANA_TIDNING), och inte alls när han redan läser för att det har gått dåligt (upptagen).
   // (Det han har tänkt på, vanaNasta, går före: den slocknade cigarren när han har sagt sitt.)
   function vana() {
     const nu = performance.now();
@@ -2051,10 +2055,15 @@ window.RumHasse = (() => {
       const sedan = (s) => nu - (H.senast[s] == null ? nu - 60000 : H.senast[s]);
       const k = sedan('kaffe') ** 1.5;
       const c = sedan('cigarr') ** 1.5;
-      sak = Math.random() * (k + c) < k ? 'kaffe' : 'cigarr';
+      const t = H.upptagen || !H.m || !H.m.dagens ? 0 : VANA_TIDNING * sedan('tidning') ** 1.5;
+      const r = Math.random() * (k + c + t);
+      sak = r < k ? 'kaffe' : r < k + c ? 'cigarr' : 'tidning';
     }
     H.senast[sak] = nu;
-    gest(sak === 'kaffe' ? ettAv('kaffe', 'klunk') : cigarrGest());
+    if (sak === 'tidning') {
+      tidningKlar();
+      gest(lott(VANA_LAS));
+    } else gest(sak === 'kaffe' ? ettAv('kaffe', 'klunk') : cigarrGest());
   }
 
   // ---------- sakerna på disken ----------
@@ -3175,50 +3184,72 @@ window.RumHasse = (() => {
   //
   // När det har gått dåligt för honom gömmer han sig bakom tidningen, skyldig men nöjd med sig själv: han
   // läser, tittar upp över den på en ibland och läser vidare (klippen lasa i rum-hasse-3d.js), och har man
-  // just kommit läser han redan. Tidningen är dagens DN eller SvD (dagens i rum-hasse-tidning.js), ibland Helgarderat
-  // (HG_ANDEL), med glasögonen på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna
-  // lägger han ned den direkt.
+  // just kommit läser han redan och tittar upp på en just när man är framme (kom i klippen). Tidningen är oftast
+  // Helgarderat (HG_ANDEL), annars dagens DN eller SvD (dagens i rum-hasse-tidning.js), och han läser alltid med
+  // glasögonen på. Mellan gångerna gör han annat en stund (LAS_PAUS, ms), och behöver han händerna lägger han ned den
+  // direkt.
   // Han har fler sätt att verka upptagen (samma grupp lasa: raknar, tomKopp, slocknad, putsa, vissla, naglar),
   // och i dem blir han ertappad och låtsas som ingenting; har man just kommit håller han redan på (fram).
   // Dåligt: inte ett rätt (inget), sämst i gänget (sist) eller rätten långt under vad chanserna var värda
   // (daligt, som i hurDetGick). Med minskad rörelse läser han inte.
   const LAS_PAUS = [4000, 10000];
-  // Ibland (HG_ANDEL av gångerna) läser han Helgarderat i stället, det senaste numret, samma som på pulten (Rum.numret
-  // i rum.js; 2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste numret av helgarderat").
-  // Omslaget är mot en, och på baksidan står hans egen krönika (rum-hasse-tidning.js). Utan nummer DN eller SvD.
-  const HG_ANDEL = 1 / 3;
+  // Oftast (HG_ANDEL av gångerna) läser han Helgarderat, det senaste numret, samma som på pulten (Rum.numret i rum.js;
+  // 2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste numret av helgarderat", och
+  // 2026-11-18: "Han ska ffa läsa helgarderat"). Omslaget är mot en, och på baksidan står hans egen krönika
+  // (rum-hasse-tidning.js). Annars, och utan nummer, DN eller SvD.
+  const HG_ANDEL = 3 / 4;
+  // Han läser också av gammal vana, utan att det har gått dåligt (2026-11-18, användarens önskemål): ibland läser han
+  // redan när man kommer (LAS_VANA av gångerna), och medan han väntar tar han tidningen då och då som kaffet och
+  // cigarren (vana, med vikten VANA_TIDNING). Då bara de klipp där inget i tidningen säger att han hade fel (VANA_LAS).
+  const LAS_VANA = 1 / 2;
+  const VANA_TIDNING = 0.5;
+  const VANA_LAS = ['lasa', 'lasa2'];
+  // Tidningen i ordning i hans figur: dagens tryck (en gång om dagen, och igen i en ny figur) och Helgarderat (när ett
+  // nytt nummer har kommit, och igen i en ny figur). Görs när figuren byggs, och bygget väntar en stund på Helgarderat
+  // (som visas först när typsnitten och porträttet har kommit), så att det finns när han läser redan när man kommer;
+  // förut kom det någon sekund för sent, och han läste DN eller SvD. → Promise tills Helgarderat är klart i en ny
+  // figur, annars null.
+  function tidningKlar() {
+    const fig = H.fig;
+    if (!fig || !H.m || !H.m.dagens || calm()) return null;
+    const d = H.m.dagens();
+    if (H.lasDag !== d.dag || H.lasFig !== fig) {
+      H.lasDag = d.dag;
+      H.lasFig = fig;
+      fig.tidning(d);
+    }
+    if (!fig.helgarderat || !window.Rum || !Rum.numret) return null;
+    const ny = H.hgFig !== fig;
+    const klar = Rum.numret().then((u) => {
+      if (!u || H.fig !== fig || (H.hgNummer === u && H.hgFig === fig)) return null;
+      H.hgNummer = u;
+      H.hgFig = fig;
+      return fig.helgarderat(u);
+    }).catch(() => null);
+    return ny ? klar : null;
+  }
   function upptagen(lage) {
     H.upptagen = Boolean(lage) && !calm() && Boolean(H.fig && H.m && H.m.dagens);
     if (!H.upptagen) return;
-    // (trycks en gång om dagen, och igen i en ny figur)
-    const d = H.m.dagens();
-    if (H.lasDag !== d.dag || H.lasFig !== H.fig) {
-      H.lasDag = d.dag;
-      H.lasFig = H.fig;
-      H.fig.tidning(d);
-    }
-    // (Helgarderat när ett nytt nummer har kommit, och igen i en ny figur)
-    const fig = H.fig;
-    if (fig.helgarderat && window.Rum && Rum.numret) {
-      Rum.numret().then((u) => {
-        if (!u || H.fig !== fig || (H.hgNummer === u && H.hgFig === fig)) return;
-        H.hgNummer = u;
-        H.hgFig = fig;
-        fig.helgarderat(u);
-      }).catch(() => {});
-    }
+    tidningKlar();
     H.lasT = performance.now() + (H.on ? 1500 : 0);
   }
-  // Tidningen han tar upp den här gången: klippets egen (DN eller SvD), eller ibland Helgarderat (HG_ANDEL).
+  // Tidningen han tar upp den här gången: oftast Helgarderat (HG_ANDEL), annars klippets egen (DN eller SvD).
   function valjTidning(k) {
     if (k && k.tidning && H.fig && H.fig.blad) H.fig.blad(Math.random() < HG_ANDEL ? 'hg' : null);
   }
-  // han läser redan (efter upp), eller håller redan på med något annat, strax innan man ertappar honom (fram)
-  function lasNu() {
-    const k = GEST[lasaNamn(true)];
-    if (!k || calm()) return;
+  // Han läser redan och tittar upp på en just när man är framme (kom), eller håller redan på med något annat, strax
+  // innan man ertappar honom (fram). vana: han läser av vana (VANA_LAS), inte för att det har gått dåligt.
+  function lasNu(vana = false) {
+    if (calm()) return;
+    const k = GEST[vana ? lott(VANA_LAS) : lasaNamn(true)];
+    if (!k) return;
+    if (vana) {
+      tidningKlar();
+      H.senast.tidning = performance.now();
+    }
     H.klipp = { ...k };
-    H.T = k.fran + (k.fram ?? H.m.LAS_START);
+    H.T = k.fran + (k.fram ?? k.kom ?? H.m.LAS_START);
     valjTidning(H.klipp);
   }
   // Hans omgång i sammanställningen: tävlingskupongen om han spelade, annars det han sa. → { lage, ok, n }

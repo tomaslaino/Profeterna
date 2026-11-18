@@ -485,6 +485,14 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   visar sig står sida vid sida med namnen i sina färger, man ser sig själv i en liten bild i hörnet, och de som bara
   tittar syns som porträtt. Bara bild – rösten går i telefonen. Bilden går direkt mellan webbläsarna (WebRTC), och
   tjänsten profeterna-rummet för bara vidare uppkopplingen (se *Gänget i bild* under [Tv:n](#tvn))
+- [x] **Hasse läser av vana, tittar upp när man kommer och läser mest Helgarderat (2026-11-18, användarens önskemål,
+  efter frågan varför han hade slutat läsa tidningen: "Gärna. O så tittar han upp precis när man kommer. Han har på
+  sig glasögonen när han läser. Han ska ffa läsa helgarderat"):** han läste bara när det hade gått dåligt för honom,
+  och mellan måndag kl. 16 och omgångens första matcher fanns inget som hade gått dåligt. Nu läser han också av
+  gammal vana: varannan gång man kommer läser han redan, och medan han väntar tar han tidningen då och då som kaffet
+  och cigarren. Läser han när man kommer tittar han upp på en just när kameran har stannat, alltid med glasögonen på.
+  Tre gånger av fyra är det Helgarderat, och det görs klart medan hans bild byggs, så att det finns redan då (se
+  *Tidningen* under [Hasse Backe](#hasse-backe))
 
 ## Publicering
 
@@ -2206,6 +2214,13 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   numret av helgarderat". En gång av tre (`HG_ANDEL` i rum-hasse.js) är tidningen han tar upp Helgarderats senaste
   nummer, samma som på pulten, med omslaget mot en och hans egen krönika på baksidan. Se [Hasse Backe](#hasse-backe),
   *Tidningen*.
+- **Hasse läser av vana och mest Helgarderat (2026-11-18, användarens önskemål):** "Han har slutat att läsa tidningen.
+  Vet du varför?" – han läste bara när det hade gått dåligt för honom, så mellan omgångarna läste han aldrig. På
+  förslaget att han ibland läser ändå, av vana: "Gärna. O så tittar han upp precis när man kommer. Han har på sig
+  glasögonen när han läser. Han ska ffa läsa helgarderat". Varannan gång man kommer läser han redan (`LAS_VANA`),
+  tidningen är en av hans vanor bredvid kaffet och cigarren (`VANA_TIDNING`), han tittar upp på en när kameran har
+  stannat (`kom` i klippen), och Helgarderat är tidningen tre gånger av fyra (`HG_ANDEL`). Se
+  [Hasse Backe](#hasse-backe), *Tidningen*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -10142,7 +10157,17 @@ vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Se
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
-dagens morgontidning, skyldig men nöjd med sig själv. Har man just kommit läser han redan; han läser rad för rad, tittar upp
+tidningen, skyldig men nöjd med sig själv. Han läser den också av gammal vana (2026-11-18, användarens önskemål): har
+det inte gått dåligt läser han redan varannan gång man kommer (`LAS_VANA` i rum-hasse.js), och medan han väntar är
+tidningen en av hans vanor, bredvid kaffet och cigarren, fast den lockar hälften så mycket (`VANA_TIDNING` i `vana`). Då
+blir det bara `lasa` och `lasa2`, där inget i tidningen säger att han hade fel (`VANA_LAS`). Läser han när man kommer,
+av vana eller för att det har gått dåligt, börjar klippet där han för första gången tittar upp på en över tidningen
+(`kom` i klippen: den första av bitarna `glimt`, `harJagFel` och `over`, `KOM` i
+[public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Man ser honom läsa medan kameran svänger, och en halv sekund efter
+att den har stannat kommer ögonen upp på en, brynen åker upp och han ler. Förut började klippet där läsandet börjar
+(`LAS_START`), och det kunde dröja en halv minut innan han tittade upp. Han läser alltid med glasögonen på. Provat i
+headless Chromium med mjukvarugrafik i telefonens mått (412 × 915), med bilder från ankomsten med vanan och Helgarderat
+påtvingade, och med vanan medan han väntar. Han läser rad för rad, tittar upp
 över kanten på en med höjda bryn och ler sedan belåtet, lyfter tidningen så att bara ögonen syns, nickar åt det som står,
 rycker den rak och tittar längs baren, och mellan gångerna lägger han den i knät bakom disken en stund (klippen `lasa` till
 `lasa5`, byggda av bitarna i `LASBIT` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)). Ur knät lyfter han den med
@@ -10203,14 +10228,18 @@ och grader, prognosen för Stockholm och kvällens tv i SVT1, SVT2 och TV4. Nyhe
 (`NYHETER`, `PUFFAR` i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)) är påhittade och tidlösa, utan namn på
 riktiga personer och utan sport, och dagen väljer dem (`dagens`): samma hela dagen, och aldrig samma nyhet i båda. Bilderna är målade
 där (`MALA`: en stad i skymningen, snö på en gata, granskog och en röd stuga vid en sjö, skärgården med färjan, hyreshus och
-en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen (`upptagen` i rum-hasse.js) och
-trycks om när han tar upp den andra (`visa`).
+en julgata) och sedan blekta och korniga som i tryck. Tidningen trycks en gång om dagen och i varje ny figur
+(`tidningKlar` i rum-hasse.js) och trycks om när han tar upp den andra (`visa`).
 
 **Helgarderat** (2026-11-13, användarens önskemål: "Jag tycker att hasse ibland ska läsa senaste numret av
-helgarderat"): en gång av tre när han tar upp tidningen (`HG_ANDEL` och `valjTidning` i rum-hasse.js, lottat varje
-gång) läser han Helgarderat i stället för klippets DN eller SvD, och klippet är detsamma. Det är det senaste numret,
-samma som ligger på pulten (`Rum.numret` i rum.js), och det trycks på hans papper när han blir upptagen och igen när
-ett nytt nummer har kommit (`helgarderat` i rum-hasse-tidning.js). Orden kommer från tidningen själv
+helgarderat", och 2026-11-18: "Han ska ffa läsa helgarderat"): tre gånger av fyra när han tar upp tidningen (`HG_ANDEL`
+och `valjTidning` i rum-hasse.js, lottat varje gång; förut en gång av tre) läser han Helgarderat i stället för klippets
+DN eller SvD, och klippet är detsamma. Det är det senaste numret, samma som ligger på pulten (`Rum.numret` i rum.js),
+och det trycks på hans papper när hans figur byggs och igen när ett nytt nummer har kommit (`tidningKlar` i
+rum-hasse.js, `helgarderat` i rum-hasse-tidning.js). I en ny figur väntar bygget på det, högst lika länge som på disken
+(1,5 s), så att det finns när han läser redan när man kommer: förut trycktes det först när han tog upp tidningen, och
+då hann det inte bli klart (i headless Chromium med mjukvarugrafik ungefär en sekund för sent), så att han läste DN
+eller SvD. Orden kommer från tidningen själv
 (`RumTidning.omslag` i rum-tidning.js) och måtten från helgarderat.css. Omslaget mot en är Kalenderbladet, 100 × 140
 förstorat 5,12 gånger: numret, veckan och priset maskinskrivna, namnet i terrakotta, lördagens datum stort mellan
 *Inför Stryktipset* och månaden, och devisen nertill, på gulnat papper med den tunna tryckta ramen och prickar där

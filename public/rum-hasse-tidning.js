@@ -1,4 +1,4 @@
-// Tidningen som Hasse Backe läser när det har gått dåligt för honom (rum-hasse-3d.js, klippen lasa): dagens
+// Tidningen som Hasse Backe läser när det har gått dåligt för honom och ibland av vana (rum-hasse-3d.js, klippen lasa): dagens
 // morgontidning, Dagens Nyheter eller Svenska Dagbladet, uppslagen med förstasidan mot en. Den ska se ut som en
 // riktig tidning: tidningens namn, datumet och numret, puffar, en stor bild och dagens nyhet, och på baksidan
 // sporten inför omgången (notiserna i data/tidning.json, skrivna på iMacen: scripts/analyser/skriv.mjs, en rad per
@@ -9,7 +9,7 @@
 // så att det faller bakåt ovanför händerna (uBuk), och en våg när han rycker i det (uVag). ytan() räknar
 // samma form i JavaScript, så att händerna kan hålla i kanterna. Samma ljus som på allt annat (LJUS).
 //
-// Ibland läser han Helgarderat i stället, det senaste numret (helgarderat(upplaga), se Helgarderat nedan).
+// Oftast läser han Helgarderat i stället, det senaste numret (helgarderat(upplaga), se Helgarderat nedan).
 //
 // byggTidning(bord) → { mesh, U, tryck(dag), helgarderat(upplaga), har(namn), visa(namn), borta() }; dagens(now) → det tryck() vill ha
 // ytan(qx, qy, s, ut): punkten (qx −1–1 över uppslaget, qy 0–1 nedifrån) i papperets mått, s: { beta, buk, vag, fas }
