@@ -7345,6 +7345,14 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   höstlöv och trädens färger efter årstiden, måsar, kråkor och fyrverkerier på nyår. På dagen speglar glaset himlen och
   rummet syns svagare; på kvällen lyser fönstret ut på trottoaren, lamporna tänds på skylten, vid porten och på bron,
   och när lysröret är släckt på natten (`RumFolk.nattGrad`) är rummet mörkt utom neonen och tv:n.
+- **Dämpat ljus inne på kvällen (2026-11-18, användarens önskemål):** "tona ner belysningen i affären något kvällstid.
+  Anpassa ljuset där inne till det som är rimligt." Förut var rummet bakom glaset lika ljust en kväll som mitt på
+  dagen och lyste som en ljusbox ut i mörkret; utifrån dämpades det bara när lysröret släcktes. Nu lyser lamporna med
+  halva ljuset när dagsljuset går (`kvall` och `KVALL_INNE` i `inne`, samma kväll som dunklet inifrån, `ljusKlockan` i
+  rum.js): väggen, hyllan och bardisken mörkare, kuporna och skenet under fläkten varmare, och lite mindre sken ut på
+  väggen och trottoaren. Gänget är 30 % mörkare (`KVALL_UTE` i rum-3d.js, exponeringen när de ritas utifrån: det
+  mesta av ljuset på dem kommer från rummets miljö, och med bara lamporna dämpade blev de 7 % mörkare), så att de
+  fortfarande står ut mot rummet bakom. Neonen lyser som förut och syns därför mer. Dagen och natten är som förut.
 - **Ljuset (`kvallsljus`):** på dagen skuggor under gesimsen, skylten och svanhalsarna och i portens valv, så att
   fasaden får djup. På kvällen är bottenvåningen och trottoaren mörkare (en mask med mjuka hål där något lyser) och
   uppåt mörknar det, så att blicken stannar vid affären; ljuset är skarpt: käglor från svanhalsarna ned över skylten,
