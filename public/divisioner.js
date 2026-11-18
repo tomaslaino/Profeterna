@@ -353,18 +353,20 @@ function segHtml(groups, cur, attr) {
 
 // Gränserna för kvoter, ur spelarfilen (thresholds).
 const TH = { shots: 10, min: 270, rated: 3, shareRated: 0.5 };
+// Per 90 minuter: täljaren och speltiden ur samma källa och samma matcher.
+// FPL:s tal (xG, försvaret) med FPL:s speltid (min), ESPN:s tal (mål, assist,
+// regelbrott) med speltiden ur ESPN:s matchrapporter för truppens matcher
+// (espnMin). I Premier League är min FPL:s och emin rapporternas; i övriga
+// ligor finns bara rapporternas (min). Sedan 2026-11-18: förut räknades mål
+// och assist per 90 i Premier League på FPL:s assist, som räknar fler än
+// ESPN:s i kolumnen Ass (Pascal Gross 6 mot 4).
 const per90 = (x, p) => (x == null || !p.min ? null : (x / p.min) * 90);
-// Mål och assist till per 90: FPL:s egna i Premier League (samma matcher som
-// FPL-minuterna), annars truppens – speltiden räknas för samma matcher.
-const goals90 = (p) => (p.fg !== undefined ? p.fg : p.g);
-const ga90Of = (p) => (goals90(p) == null ? null : goals90(p) + ((p.fg !== undefined ? p.fa : p.a) || 0));
 const dxgOf = (p) => (p.xg != null && p.fg != null ? p.fg - p.xg : null);
 const qMin = { ok: (p) => p.min >= TH.min, okWhy: 'Osäker siffra: mindre än tre hela matchers speltid' };
-// ESPN:s siffror per 90 minuter: i Premier League med speltiden ur
-// matchrapporterna (emin, samma matcher som truppen), annars FPL:s.
 const espnMin = (p) => (p.emin !== undefined ? p.emin : p.min);
 const per90e = (x, p) => (x == null || !espnMin(p) ? null : (x / espnMin(p)) * 90);
 const qMinE = { ok: (p) => espnMin(p) >= TH.min, okWhy: qMin.okWhy };
+const ga90Of = (p) => (p.g == null ? null : per90e(p.g + (p.a || 0), p));
 // Lagets mål i truppen (samma matcher som spelarnas), per lag-id.
 const teamGoals = new Map();
 const goalShare = (p) => {
@@ -404,7 +406,7 @@ const PCOLS = [
   { key: 'gw', label: 'Segermål', title: 'Mål som avgjorde matcher som laget vann, alltså målet som gav en ledning som laget sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.',
     get: (p) => p.gw, cls: 'num', strong: true, in: ['malen'] },
   { key: 'gpts', label: 'Poäng', sub: 'åt laget', name: 'Poäng som målen gav',
-    title: 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort, och ett mål i en oavgjord match en poäng. Mål i matcher som vanns stort eller förlorades ger inga poäng.',
+    title: 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort, och ett mål i en oavgjord match en poäng. Flera mål i samma match räknas tillsammans: två mål i en seger med 2–1 är värda tre poäng. Mål i matcher som vanns stort eller förlorades ger inga poäng.',
     get: (p) => p.gpts, cls: 'num', in: ['malen'] },
   { key: 'g1', label: 'Första', sub: 'målet i matchen', name: 'Matchens första mål', title: 'Matchens första mål, alltså mål som gav laget ledningen med 1–0.',
     get: (p) => p.g1, cls: 'num hide-sm', in: ['malen'] },
@@ -450,12 +452,12 @@ const PCOLS = [
     get: (p) => p.xa, d: 1, cls: 'num hide-xs', fpl: true, in: ['avslut'] },
   { key: 'g90', label: 'Mål', sub: 'per 90 min', name: 'Mål per 90 minuter',
     title: 'Mål per 90 minuters speltid. Talet är rättvisare än mål per match för spelare som ofta byts in eller ut. Dämpade siffror: mindre än tre hela matchers speltid.',
-    get: (p) => per90(goals90(p), p), d: 2, cls: 'num', mins: true, in: ['avslut'], ...qMin },
+    get: (p) => per90e(p.g, p), d: 2, cls: 'num', mins: true, in: ['avslut'], ...qMinE },
   { key: 'xg90', label: 'xG', sub: 'per 90 min', name: 'xG per 90 minuter',
     title: 'Förväntade mål per 90 minuters speltid: hur ofta och hur bra lägen spelaren kommer till, oavsett om de blir mål.',
     get: (p) => per90(p.xg, p), d: 2, cls: 'num hide-sm', fpl: true, in: ['avslut'], ...qMin },
   { key: 'ga90', label: 'M+A', sub: 'per 90 min', name: 'Mål plus assist per 90 minuter', title: 'Mål och assist tillsammans per 90 minuters speltid.',
-    get: (p) => per90(ga90Of(p), p), d: 2, cls: 'num hide-xs', mins: true, in: ['avslut'], ...qMin },
+    get: ga90Of, d: 2, cls: 'num hide-xs', mins: true, in: ['avslut'], ...qMinE },
 
   // Försvar: närkamperna från Fantasy Premier League, målvakterna från ESPN.
   { key: 'tk', label: 'Tacklingar', title: 'Hur många gånger spelaren har tagit bollen från en motståndare i en närkamp. Siffrorna kommer från Fantasy Premier League.',
@@ -939,24 +941,30 @@ function teamRows(T, P) {
 // Alla lag under listan – vad talet betyder står i rubrikens förklaring.
 // Raderna öppnar lagkortet när det finns. Sju rader, så att korten blir
 // lika höga som listorna åt två håll (som Kryssar gärna på anslagstavlan).
-// who = raden, om underraden ska vara något annat än placeringen.
-function teamTop(key, title, list, value, { tip, get, who = teamRow } = {}) {
+// who = raden, om underraden ska vara något annat än placeringen. Lika tal
+// delar plats som i spelarnas topplistor: shown = talet som det visas
+// (avrundat), så att två lag med 27 % inte står som etta och tvåa.
+function teamTop(key, title, list, value, { tip, get, who = teamRow, shown = get } = {}) {
   const rows = list.filter((t) => get(t) != null && Number.isFinite(get(t)))
     .sort((a, b) => get(b) - get(a) || a.rank - b.rank);
-  return topCard(key, title, rows, value, { tip, empty: 'okänt', who, n: 7, all: true });
+  return topCard(key, title, rows, value, { tip, empty: 'okänt', who, n: 7, all: true, same: sameOn(shown) });
 }
+// Talet som det visas med d decimaler (procent: andelen gånger hundra).
+const shownAs = (get, d) => (t) => Math.round(get(t) * 10 ** d);
 
 // En lista åt två håll, som Tur & otur och Slår oddsen på anslagstavlan: de
 // tre högsta (plus) under det första ordet och de tre lägsta (minus) under
 // det andra, med stapeln från mitten. Alla lag visar hela divisionen likadant.
-function twoWay(key, title, list, get, { up, down, value, tip, tone = 'signed' }) {
+// Lika tal (med d decimaler, som de visas) delar plats.
+function twoWay(key, title, list, get, { up, down, value, tip, tone = 'signed', d = 1 }) {
+  const same = sameOn(shownAs(get, d));
   const known = list.filter((t) => get(t) != null && Number.isFinite(get(t)));
   const max = Math.max(...known.map((t) => Math.abs(get(t)))) || 1;
   const hi = known.filter((t) => get(t) > 0).sort((a, b) => get(b) - get(a) || a.rank - b.rank);
   const lo = known.filter((t) => !(get(t) > 0)).sort((a, b) => get(a) - get(b) || b.rank - a.rank);
   const half = (label, side, xs, n, cls = '') => `<p class="dv-lsub ${side}${tone === 'even' ? ' even' : ''}">${esc(label)}</p>` +
     (xs.length
-      ? `<ol${cls ? ` class="${cls}"` : ''}>${xs.slice(0, n).map((t, i) => leaderLi(t, String(i + 1), value, teamRow, dbar(get(t) / max, tone))).join('')}</ol>`
+      ? `<ol${cls ? ` class="${cls}"` : ''}>${((rk) => xs.slice(0, n).map((t, i) => leaderLi(t, rk[i], value, teamRow, dbar(get(t) / max, tone))))(ranks(xs, same)).join('')}</ol>`
       : '<p class="dv-lempty">Inget lag</p>');
   tops.set(key, { title, n: known.length, full: () => half(up, 'up', hi, Infinity, 'dv-toplist') + half(down, 'down', lo, Infinity, 'dv-toplist') });
   const body = known.length
@@ -1006,13 +1014,13 @@ function teamsView(dv, P, T) {
     // (landslagen har ingen styrka i modellen, som bara känner lagen i
     // England: där är det xG-skillnaden per match, som inte väger in ligan)
     (land ? twoWay('styrka', 'xG-skillnad', all, xgd, {
-      up: 'Bäst', down: 'Sämst', value: (t) => `<b>${delta(xgd(t), { d: 2, dead: 0.005 })}</b>`,
+      up: 'Bäst', down: 'Sämst', d: 2, value: (t) => `<b>${delta(xgd(t), { d: 2, dead: 0.005 })}</b>`,
       tip: 'xG-skillnaden per match i Nations League: lagets chanser minus motståndarnas. Ligorna A–D är olika starka.' })
       : twoWay('styrka', 'Starkast & svagast', all, (t) => t.str, {
-        up: 'Starkast', down: 'Svagast', value: (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`,
+        up: 'Starkast', down: 'Svagast', d: 2, value: (t) => `<b>${delta(t.str, { d: 2, dead: 0.005 })}</b>`,
         tip: 'Modellens väntade målskillnad per match mot ett genomsnittligt lag i divisionen, med motståndet inräknat.' })) +
     teamTop('kryss', 'Kryssar gärna', all, (t) => `<b>${pct(xdraw(t))}</b>`,
-      { get: xdraw, tip: 'Chansen till oavgjort i lagets matcher, i genomsnitt, räknat ur båda lagens xG.' }) +
+      { get: xdraw, shown: shownAs(xdraw, 2), tip: 'Chansen till oavgjort i lagets matcher, i genomsnitt, räknat ur båda lagens xG.' }) +
     twoWay('tur', 'Tur & otur', all, xpd, {
       up: 'Tur', down: 'Otur', value: (t) => `<b>${delta(xpd(t), { d: 1 })}</b>`,
       tip: 'Poäng mot chanserna: tagna poäng minus de poäng som lagets chanser (xG) var värda. Tur betyder fler poäng än chanserna var värda och otur färre, och båda brukar jämna ut sig.' }) +
@@ -1022,9 +1030,10 @@ function teamsView(dv, P, T) {
     // (landslagen: hur ofta laget har varit favorit i stället för motståndet)
     (land ? teamTop('favorit', 'Favorit oftast', all, (t) => `<b>${pct(fdOf(t, 'mkt').fav / fdOf(t, 'mkt').n)}</b>`, {
       get: (t) => { const m = fdOf(t, 'mkt'); return m && m.n ? m.fav / m.n : null; },
+      shown: (t) => Math.round((fdOf(t, 'mkt').fav / fdOf(t, 'mkt').n) * 100),
       tip: 'Andelen matcher där laget hade större chans än motståndaren att vinna, enligt oddsen vid avspark.' })
       : twoWay('motstand', 'Motståndet', all, opp, {
-        up: 'Tufft hittills', down: 'Lätt hittills', tone: 'even', value: (t) => `<b class="dv-even">${signed(opp(t), 2)}</b>`,
+        up: 'Tufft hittills', down: 'Lätt hittills', tone: 'even', d: 2, value: (t) => `<b class="dv-even">${signed(opp(t), 2)}</b>`,
         tip: 'Motståndarnas styrka hittills jämfört med ett genomsnittligt spelschema i divisionen, mätt i mål per match med prognosmodellen. Tufft betyder svårare motstånd än genomsnittet och lätt lättare.' }));
 
   return '<div class="dv-leaders">' + leaders + '</div>' +
@@ -1244,7 +1253,8 @@ function openPlayer(id) {
       p.rt != null && p.rb ? [cell(p.rb), 'Bäst på plan', 'Matcher där spelaren fick högst betyg av alla på planen'] : null,
       p.min != null ? [cell(p.starts), 'Från start'] : null,
       [p.app != null && p.starts != null ? cell(p.app - p.starts) : cell(null), 'Inhopp'],
-      p.min != null && p.app ? [`${int(p.min / p.app)} min`, 'Speltid per match'] : null,
+      // (ESPN:s speltid för ESPN:s matcher: FPL:s minuter kan gälla fler matcher än truppens)
+      p.min != null && p.app ? [`${int(espnMin(p) / p.app)} min`, 'Speltid per match'] : null,
       [p.yc || p.rc ? cardsVal(p) : cell(p.yc == null ? null : 0), 'Kort'],
       [cell(p.fs), 'Fälld', 'Gånger spelaren har blivit fälld eller utsatt för en annan förseelse som domaren blåst för'],
       [cell(p.fc), 'Regelbrott', 'Regelbrott spelaren har begått som domaren blåst för'],
@@ -1259,7 +1269,7 @@ function openPlayer(id) {
     } else {
       const conv = p.sh ? pct(p.g / p.sh) : '–';
       let att = msec('Mål och skott', facts([
-        full ? [num(per90(goals90(p), p), 2), 'Mål per 90 min'] : [p.app ? num(p.g / p.app, 2) : '–', 'Mål per match'],
+        qMinE.ok(p) ? [num(per90e(p.g, p), 2), 'Mål per 90 min'] : [p.app ? num(p.g / p.app, 2) : '–', 'Mål per match'],
         [cell(p.sh), 'Skott'],
         [cell(p.sot), 'Skott på mål'],
         [p.sh && p.sh < TH.shots ? unsure(conv, 'Osäker siffra: färre än tio skott') : conv, 'Mål per skott'],
@@ -1746,7 +1756,7 @@ const GLOSSARY = [
   ['M, Start, Min, Ass, M+A', 'Spelartabellen: matcher (från start och inhopp), matcher från start, spelade minuter, assist och mål plus assist.', 'statistik'],
   ['– och grå 0', 'Ett streck betyder okänt (ESPN har ingen statistik för spelaren) och en grå 0 betyder noll.'],
   ['Spelarstatistiken', 'Bara ligamatcher den här säsongen, ur ESPN:s trupper. Den ligger ofta en omgång efter tabellen, och självmål och spelare som har lämnat klubben saknas. I Premier League kommer speltiden, xG och försvarsspelet från Fantasy Premier League. I övriga ligor räknas speltiden ur ESPN:s matchrapporter (byten och röda kort, utan tilläggstid). Målens sort och betydelse kommer från matchrapporterna i alla fyra ligor.', 'statistik'],
-  ['Per 90', 'Per 90 spelade minuter, som om spelaren hade spelat hela matcher. Visas för spelare med minst tre hela matchers speltid. Dämpade siffror har för litet underlag.', 'statistik'],
+  ['Per 90', 'Per 90 spelade minuter, som om spelaren hade spelat hela matcher. Talet och speltiden kommer ur samma källa och samma matcher: mål, assist och regelbrott från ESPN med speltiden ur ESPN:s matchrapporter, xG och försvaret från Fantasy Premier League med dess speltid. Visas för spelare med minst tre hela matchers speltid. Dämpade siffror har för litet underlag.', 'statistik'],
   ['Formen', 'De fem senaste matcherna i ligan och de engelska cuperna (inte Europacuperna), den senaste till vänster. V betyder vinst, O oavgjort och F förlust. Det är ställningen efter 90 minuter som gäller, så en match som avgjordes i förlängningen eller på straffar räknas som oavgjord. Topplistan Formen räknar 3 poäng för vinst och 1 för oavgjort i de fem.', 'statistik'],
   ['Topplistorna under Lagen', 'Samma tal som i datorn i tobaksaffären: Formen, Starkast & svagast, Kryssar gärna, Tur & otur, Mot oddsen och Motståndet. Listorna åt två håll visar de tre högsta och de tre lägsta, med en stapel från mitten (längst för divisionens största tal); Alla lag visar hela divisionen.', 'statistik'],
   ['Delad placering', 'Har två lika tal i en topplista delar de plats, och numret står bara på den första – som skytteligan på text-tv:n.', 'statistik'],
@@ -1754,7 +1764,7 @@ const GLOSSARY = [
   ['Beroende', 'Hur stor del av lagets mål den bästa målskytten har gjort.', 'statistik'],
   ['Effektivast', 'Mål per skott, bland spelare med minst tio skott.', 'statistik'],
   ['Segermål', 'Målet som gav laget den ledning det sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet, vid 1–0 det enda.', 'statistik'],
-  ['Poäng åt laget', 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort. Ett mål i en oavgjord match är värt en poäng, eftersom laget annars hade förlorat. Mål i matcher som vanns stort eller förlorades ger inga poäng.', 'statistik'],
+  ['Poäng åt laget', 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort. Ett mål i en oavgjord match är värt en poäng, eftersom laget annars hade förlorat. Flera mål i samma match räknas tillsammans, så att en match aldrig ger fler poäng än laget tog: två mål i en seger med 2–1 är värda tre poäng. Mål i matcher som vanns stort eller förlorades ger inga poäng.', 'statistik'],
   ['Inblandad i lagets mål', 'Hur stor del av lagets mål spelaren har gjort själv eller slagit den sista passningen till: mål och assist delade med lagets mål.', 'statistik'],
   ['Målen', 'Segermål, poäng åt laget, matchens första mål, sena mål (från 80:e minuten, tilläggstiden inräknad) och mål som inhoppare finns för alla fyra ligor. Straffarna bara för Premier League och Championship – i League One och League Two anger matchrapporterna bara minut och målskytt.', 'statistik'],
   ['Fälld, Fäller', 'Hur många gånger spelaren har blivit fälld, och hur många regelbrott spelaren själv har begått som domaren har blåst för.', 'statistik'],

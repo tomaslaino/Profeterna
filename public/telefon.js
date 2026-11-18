@@ -50,6 +50,8 @@ window.Telefon = (() => {
   const AVISERING = 'profeterna.telefon.avisering';
   // det missade samtal som har visats (senast.id)
   const MISSAT_SETT = 'profeterna.telefon.missat';
+  // samtalet följer med till nästa sida på sajten ({ id, t, kam, tyst }, sessionStorage)
+  const MED = 'profeterna.telefon.med';
   const STUN = [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }];
   const MIK = { audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false };
   // 4:3 som tv:ns ruta; framkameran i telefonen
@@ -70,6 +72,7 @@ window.Telefon = (() => {
     ac: null, signal: null, niva: new Map(), nivaT: 0, jagTalar: false,
     bricka: null, inne: null, lurar: [], oppen: '', liten: false,
     besked: '', beskedT: 0, lasT: 0, tidT: 0, medFor: null, efterVem: null, las: null, synlig: false,
+    data: null, dataP: null, vidare: 0, aterTill: null,
   };
 
   // ---------- vem du är ----------
@@ -77,8 +80,15 @@ window.Telefon = (() => {
   const las = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } };
   const spara = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* privat läge */ } };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-  // (KP i kupong.js är en global const, inte window.KP)
-  const samtalData = () => (typeof KP !== 'undefined' && KP.data && KP.data.samtal) || null;
+  // (KP i kupong.js är en global const, inte window.KP; på Tabeller, Statistik och Om oss finns
+  // den inte, och där hämtas samma uppgifter ur data/kuponger.json: lasData)
+  const samtalData = () => (typeof KP !== 'undefined' && KP.data && KP.data.samtal) || T.data || null;
+  function lasData() {
+    if (typeof KP !== 'undefined' || T.dataP) return;
+    T.dataP = fetch('data/kuponger.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null))
+      .then((d) => { T.data = (d && d.samtal) || null; }, () => {})
+      .then(() => { T.dataP = null; if (!T.data) setTimeout(lasData, 60000); vemKoll(); });
+  }
   const gang = () => (samtalData() && samtalData().gang) || [];
   const iGang = (v) => gang().some((g) => g.id === v);
   const person = (v) => gang().find((g) => g.id === v) || { id: v, namn: v };
@@ -256,7 +266,7 @@ window.Telefon = (() => {
   }
 
   // Ring gänget, svara, gå med: mikrofonen först, sedan säger sidan till tjänsten.
-  async function medI(vad) {
+  async function medI(vad, auto = false) {
     if (T.vill || T.startar) return;
     if (!jag()) {
       T.oppen = 'vem';
@@ -265,7 +275,8 @@ window.Telefon = (() => {
       return;
     }
     ljudKalla();
-    aviseringar(true);
+    // (frågan om aviseringar bara efter ett tryck, inte när sidan går med av sig själv)
+    aviseringar(!auto);
     T.startar = true;
     T.oppen = '';
     rita();
@@ -734,7 +745,22 @@ window.Telefon = (() => {
     history.replaceState(history.state, '', u.pathname + u.search + u.hash);
   }
   function franAvisering() {
-    if (!fran || !T.uppe) return;
+    if (!T.uppe) return;
+    // samtalet följde med från sidan innan: med igen, med kameran och mikrofonen som de var
+    const a = T.aterTill;
+    if (a && T.samtal && !T.vill) {
+      T.aterTill = null;
+      if (T.samtal.id === a.id) {
+        T.tystAter = Boolean(a.tyst);
+        medI('svara', true).then(() => {
+          if (!T.vill) return;
+          if (a.startad) T.startad = a.startad;
+          if (T.tystAter) tysta();
+          if (a.kam) kamera(true);
+        });
+      }
+    } else if (a && T.jag && !T.samtal) T.aterTill = null;
+    if (!fran) return;
     const f = fran;
     fran = null;
     if (f === 'svara' && T.samtal) svara();
@@ -971,18 +997,11 @@ window.Telefon = (() => {
     clearTimeout(T.tidT);
     T.tidT = setTimeout(tick, 1000 - (Date.now() % 1000) + 20);
   }
-  // Syns tv:n i rummet (rum-tv.js) så stor att man ser vem som är i bild? I datorn
-  // står den uppe till höger, men i telefonen på höjden utanför bilden tills man
-  // tar fram den.
-  function tvSyns() {
-    if (!document.documentElement.classList.contains('i-rummet')) return false;
-    const tv = document.querySelector('.rum-tv3 .tv-glas');
-    if (!tv) return false;
-    const r = tv.getBoundingClientRect();
-    return r.width > 110 && r.left > -r.width / 3 && r.right < innerWidth + r.width / 3 && r.top > -r.height / 3 && r.bottom < innerHeight + r.height / 3;
-  }
-  // Bilderna i brickan, när någon visar sig och tv:n inte syns: på sajten, och i
-  // rummet när tv:n är utanför bilden.
+  // Syns bilden redan på en tv: i rummet, där tv:n syns så stor att man ser vem som är i
+  // bild, eller i den lilla tv:n som följer med (rum-bild.js)?
+  const tvSyns = () => Boolean(window.RumBild && RumBild.syns && RumBild.syns());
+  // Bilderna i brickan, när någon visar sig och ingen tv visar dem: på sajten, och i
+  // rummet i telefonen tills man tar fram tv:n.
   function ritaBilder() {
     const box = T.inne && T.inne.querySelector('.tb-bilder');
     if (!box) return;
@@ -991,7 +1010,7 @@ window.Telefon = (() => {
     const egen = !tv && T.kam;
     // (rummet flyttar sig utan att något i samtalet ändras: titta igen om en stund)
     clearTimeout(T.bilderT);
-    if (document.documentElement.classList.contains('i-rummet') && (T.kam || T.alla.some((p) => p.i && p.kamera))) T.bilderT = setTimeout(ritaBilder, 700);
+    if (window.RumBild && (T.kam || T.alla.some((p) => p.i && p.kamera))) T.bilderT = setTimeout(ritaBilder, 700);
     box.hidden = !visar.length && !egen;
     box.classList.toggle('liten', T.liten);
     const nyckel = `${visar.map((x) => x.id).join()}|${egen ? 1 : 0}`;
@@ -1096,17 +1115,35 @@ window.Telefon = (() => {
   });
   // (svarade man från aviseringen fanns inget tryck att starta ljudet med: nästa tryck gör det)
   addEventListener('pointerdown', () => { if (T.ac && T.ac.state === 'suspended') T.ac.resume().catch(() => {}); }, { capture: true, passive: true });
-  // (stängs sidan går man ur samtalet direkt i stället för om 30 sekunder)
+  // Stängs sidan går man ur samtalet direkt, i stället för om 30 sekunder – utom när man
+  // går till en annan sida på sajten (Tabeller, Statistik, Om oss och tillbaka): då följer
+  // samtalet med, och nästa sida går med igen av sig själv inom tjänstens 30 sekunder.
+  const vidare = () => { T.vidare = Date.now(); };
+  addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || e.defaultPrevented) return;
+    const u = new URL(a.href, location.href);
+    if (u.origin === location.origin && u.pathname !== location.pathname) vidare();
+  }, true);
   addEventListener('pagehide', (e) => {
-    if (T.vill && !e.persisted) skicka({ lagg: true });
-    for (const s of [T.mic, T.kam]) if (s && !e.persisted) for (const t of s.getTracks()) t.stop();
+    if (e.persisted) return;
+    if (T.vill && T.samtal && Date.now() - T.vidare < 5000) {
+      try { sessionStorage.setItem(MED, JSON.stringify({ id: T.samtal.id, t: Date.now(), kam: Boolean(T.kam), tyst: T.tyst, startad: T.startad })); } catch { /* privat läge */ }
+    } else if (T.vill) skicka({ lagg: true });
+    for (const s of [T.mic, T.kam]) if (s) for (const t of s.getTracks()) t.stop();
   });
+  try {
+    const a = JSON.parse(sessionStorage.getItem(MED) || 'null');
+    sessionStorage.removeItem(MED);
+    if (a && Date.now() - a.t < 25000) T.aterTill = a;
+  } catch { /* privat läge */ }
 
   // Kupongens data (gänget och tjänstens adress) kommer en stund efter sidan, och
   // vem du är kan ändras i rummet: sidan kopplar upp sig när den vet, och som den
   // nya personen om du byter (men inte mitt i ett samtal).
   function vemKoll() {
     if (document.hidden) return;
+    if (!gang().length) lasData();
     prova();
     const v = jag();
     if (T.ws && !T.vill && v !== T.vem) kopplaNer();
@@ -1165,6 +1202,7 @@ window.Telefon = (() => {
     lagg,
     kamera,
     valjVem: () => { T.oppen = 'vem'; rita(); },
+    vidare,
     strom: (id) => (T.peers.get(id) || {}).strom || null,
     egen: () => T.kam,
     namn: kallas,

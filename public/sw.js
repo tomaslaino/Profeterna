@@ -274,15 +274,16 @@ async function telInte() {
   await fetch(`${t.bas}/samtal/inte`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => {});
 }
 
-// Sidan med rummet (förstasidan): den som är öppen tas fram och får veta vad
-// som trycktes, annars öppnas den.
+// En sida med samtalet (förstasidan, Tabeller, Statistik, Om oss): den som är
+// öppen tas fram och får veta vad som trycktes, annars öppnas förstasidan.
 async function telOppna(vad) {
   const rot = new URL(self.registration.scope);
   const alla = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-  const sidan = alla.find((c) => {
+  const var_ = (c, sidor) => {
     const u = new URL(c.url);
-    return u.origin === rot.origin && (u.pathname === rot.pathname || u.pathname === `${rot.pathname}index.html`);
-  });
+    return u.origin === rot.origin && sidor.some((x) => u.pathname === rot.pathname + x);
+  };
+  const sidan = alla.find((c) => var_(c, ['', 'index.html'])) || alla.find((c) => var_(c, ['tabeller.html', 'statistik.html', 'om-oss.html']));
   if (sidan) {
     await sidan.focus().catch(() => {});
     if (vad) sidan.postMessage({ samtal: vad });

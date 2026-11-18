@@ -17,9 +17,10 @@
 // figuren(duk, { hog, latt, pr }) → { kamera(v), diskBild(duk2d, v, bak), pyntBild(duk2d, v, { namn, hog, ljus, bak }), rita(T, n, tal, mun), handelser(T0, T1), info(), borta() }
 // Klipp: T 0–12,4 (vila, skrattet, domen, gesterna, hem), och sedan ett klipp i taget på var sin bit av
 // tidslinjen (KLIPP): fler sätt att slå domen i disken, kaffet (tio sätt), cigarren, småsakerna medan han
-// väntar, händerna medan han pratar (talet) och tidningen, när det har gått dåligt för honom och ibland av vana (lasa,
-// papperet i rum-hasse-tidning.js), med glasögonen på, och de andra sysslorna när det har gått dåligt (raknar, tomKopp,
-// slocknad, putsa, vissla, naglar), där han blir ertappad och låtsas som ingenting.
+// väntar (också med händerna: slipsen, hakan, gaspa, vinka, sopar, pang), händerna medan han pratar (talet) och
+// tidningen, när det har gått dåligt för honom och ibland av vana (lasa, papperet i rum-hasse-tidning.js), med
+// glasögonen på, och de andra sysslorna när det har gått dåligt (raknar, tomKopp, slocknad, putsa, vissla, naglar),
+// där han blir ertappad och låtsas som ingenting.
 // Inga slingor (2026-11-13): ett klipp spelas inte likadant varje gång. rum-hasse.js väljer fart och styrka för
 // varje gång (fart, styrka: huvudet och kroppen i småsakerna går lite olika långt), händerna står inte stilla som
 // i en bild där nycklarna håller dem i luften (levande), huvudet och brynen följer talet i slag i stället för i
@@ -31,7 +32,7 @@ import { SCEN, BAK, kamera as scenKamera, iKamera, disken, franBaren, franPulten
 // hela filen inte går att läsa in)
 import * as SCENFIL from './rum-hasse-scen.js';
 import { PULT_GLSL, SKIVA, ringar, NRING, L as PULT_L, franRum } from './rum-pult.js';
-import { byggTidning, ytan } from './rum-hasse-tidning.js';
+import { byggTidning, ytan, bladYta } from './rum-hasse-tidning.js';
 import { byggStall, byggSticka, byggBranda, byggTandare, byggLaga, brandLage, STALL, STICKA, TANDARE, BRANDA } from './rum-hasse-eld.js';
 export { dagens } from './rum-hasse-tidning.js';
 
@@ -111,14 +112,21 @@ const OVER_X = 0.5;
 const LX = -70;
 const LY = -235;
 const LZ = 540;
-const LAS_T = { x: LX, y: LY, z: LZ, tilt: -0.8, yaw: -0.15, roll: 0, beta: 0.55, buk: -0.06, vag: 0, mot: 1, gy: 0.25 };
+// (vand: hur långt bladet han vänder har kommit, 0–1, och vH: hur mycket hans högra hand håller i det; bladdra)
+const LAS_T = { x: LX, y: LY, z: LZ, tilt: -0.8, yaw: -0.15, roll: 0, beta: 0.55, buk: -0.06, vag: 0, mot: 1, gy: 0.25, vand: 0, vH: 0 };
+// helt bakom tidningen (dold): huvudet lite böjt, och ryggens nedre ände så högt att överkanten är över hjässan
+// (och tidningen mer upprätt och lite mer uppslagen än i gom, så att det inte syns något av huvudet i vecket)
+const DOLD_P = 1.4;
+const DOLD_Y = LY + 390;
+const DOLD_TILT = -0.18;
+const DOLD_B = 0.78;
 // I knät bakom disken, uppslagen och stående mellan honom och diskens kant, med överkanten under det man
 // ser: där tar han den och dit lägger han den. Han håller den en bit ned (gy), med armarna nästan raka: högt upp,
 // strax under diskens kant, stod armbågarna ut som vingar i axelhöjd.
 // (på väg upp ur knät och ned i det: ryggens nedre ände strax över diskens kant medan den passerar den, annars går
 // tidningen genom disken)
 const UPP_Y = SCEN.DISK.Y + 12;
-const KNA_T = { x: 0, y: -985, z: 140, tilt: 0, yaw: 0, roll: 0, beta: 0.3, buk: 0, vag: 0, mot: 0, gy: 0.38 };
+const KNA_T = { x: 0, y: -985, z: 140, tilt: 0, yaw: 0, roll: 0, beta: 0.3, buk: 0, vag: 0, mot: 0, gy: 0.38, vand: 0, vH: 0 };
 // Med glasögonen i höger hand håller han tidningen med den vänstra (t0–t1 i biten): den lutar ned åt den högra
 // sidan som ingen håller, glider åt den vänstra handen, sjunker lite och faller framåt (ned, mer när han ska synas
 // bakom den; den sjönk förut så mycket att den gick ned i disken).
@@ -230,6 +238,35 @@ const LASBIT = {
     },
     t: { y: [[2.0, LY + 4]], roll: [[2.0, 0.012]] },
   },
+  // Vänder blad (2026-11-19, användarens önskemål: "Gör alla läsa-tidningen-animationer med Hasse bättre/snyggare";
+  // förut läste han samma uppslag hela tiden): han läser sista raden längst ned på den högra sidan, släpper kanten
+  // med höger hand och tar det översta bladet i hörnet, lyfter det och för det över mot ryggen, och släpper det där,
+  // så att det faller över av sig självt (vand i bladYta, rum-hasse-tidning.js), och tar kanten igen. Under tiden
+  // håller den vänstra handen tidningen, som sjunker lite åt den sidan och öppnas något. Blicken följer bladet och
+  // går upp till början av den nya vänstra sidan, och han läser vidare. Lika lång som las, som den byter ut.
+  bladdra: {
+    dur: 4.4,
+    k: {
+      blickX: [[0.15, rad(1.6)], [0.45, rad(2.8)], [1.0, rad(1.6)], [1.6, rad(-1.5)], [2.2, rad(-4)], [2.6, rad(-4)], [2.95, rad(-3)], [3.35, rad(-1.2)], [3.75, rad(0.6)], [4.2, rad(2)]],
+      blickY: [[0.3, L('blickY', 0.8)], [0.9, L('blickY', -1.4)], [1.7, L('blickY', -1.8)], [2.4, L('blickY', -1.2)], [2.9, L('blickY', -0.6)], [3.9, L('blickY')]],
+      blund: [[0.4, L('blund')], [1.1, L('blund', -0.16)], [2.2, L('blund', -0.1)], [2.9, L('blund')]],
+      pitch: [[0.4, L('pitch')], [1.2, L('pitch', -0.12)], [2.1, L('pitch', -0.07)], [2.9, L('pitch', 0.02)], [3.6, L('pitch')]],
+      yaw: [[0.4, L('yaw')], [1.2, L('yaw', -0.05)], [2.2, L('yaw', 0.06)], [3.2, L('yaw')]],
+      brynX: [[0.6, -0.12], [1.2, 0.1], [2.4, 0.05], [3.2, -0.12]], brynY: [[0.6, -0.08], [1.2, 0.12], [2.4, 0.06], [3.2, -0.08]],
+      andas: [[1.9, 0], [2.2, -2], [2.7, 0]],
+    },
+    t: {
+      // bladet: lyfts långsamt, förs över och faller sista biten av sig självt (och ligger kvar tills biten är slut;
+      // där det går tillbaka till 0 syns det inte, se tidningArm)
+      vand: [[0.35, 0], [0.75, 0.07], [1.45, 0.45], [1.85, 0.66], [2.3, 1], [4.3, 1]],
+      vH: [[0.2, 0], [0.5, 1], [1.5, 1], [2.15, 0]],
+      // med en hand: tidningen sjunker lite åt den vänstra handen och öppnas något, och en liten våg när bladet landar
+      x: [[0.25, LX], [0.75, LX + 14], [2.1, LX + 14], [2.7, LX]], y: [[0.25, LY], [0.75, LY - 7], [2.1, LY - 7], [2.7, LY]],
+      roll: [[0.25, 0], [0.75, 0.045], [2.1, 0.045], [2.7, 0]], beta: [[0.25, LAS_T.beta], [0.8, LAS_T.beta - 0.07], [2.15, LAS_T.beta - 0.07], [2.8, LAS_T.beta]],
+      vag: [[2.25, 0], [2.33, 5], [3.0, 0]],
+    },
+    ljud: [[0.55, { typ: 'prassel', mjuk: true }], [2.28, { typ: 'prassel', mjuk: true }]],
+  },
   // Ögonen upp på en över tidningen medan huvudet står kvar: ertappad. Brynen upp, och sedan ett leende som
   // växer och en liten nick (jajamän), och tillbaka till tidningen.
   glimt: {
@@ -260,6 +297,37 @@ const LASBIT = {
       y: [[0.3, LY], [1.0, LY + 209], [4.0, LY + 209], [4.7, LY]], z: [[0.3, LZ], [1.0, 620], [4.0, 620], [4.7, LZ]], tilt: [[0.3, LAS_T.tilt], [1.0, -0.3], [4.0, -0.3], [4.7, LAS_T.tilt]],
       x: [[0.3, LX], [1.0, -20], [4.0, -20], [4.7, LX]], yaw: [[0.3, LAS_T.yaw], [1.0, 0], [4.0, 0], [4.7, LAS_T.yaw]], beta: [[0.3, LAS_T.beta], [1.0, 1.0], [4.0, 1.0], [4.7, LAS_T.beta]],
     },
+  },
+  // Helt bakom tidningen (Tomas önskemål 2026-11-18: han täcker ibland ansiktet helt, och låtsas att han inte hade fel
+  // i tippningen): han för upp den hela vägen, som gom men högre, så att inget av ansiktet syns, och sitter där en
+  // stund, upptagen av något i den, med en knäpp i papperet. Så sänker han den långsamt tills ögonen kommer fram, ser
+  // att man tittar och far upp bakom den igen med ett prassel. Till sist sänker han den och läser vidare som om inget
+  // har hänt. (Bakom tidningen har han huvudet lite böjt, så att håret inte sticker upp över kanten.)
+  dold: {
+    dur: 10.6,
+    k: {
+      pitch: [[0.3, L('pitch')], [1.1, DOLD_P], [4.3, DOLD_P], [5.2, 0.05], [6.15, 0.05], [6.45, DOLD_P], [8.7, DOLD_P], [9.7, L('pitch')]],
+      yaw: [[0.3, L('yaw')], [1.1, -0.1], [8.7, -0.1], [9.7, L('yaw')]],
+      blickY: [[0.3, L('blickY')], [1.0, 2], [4.4, 2], [5.0, -1], [6.15, -1], [6.4, 2], [8.7, 2], [9.6, L('blickY')]],
+      blickX: [[0.3, L('blickX')], [1.0, 0], [4.6, 0], [5.0, -1.5], [5.25, OVER_X], [6.15, OVER_X], [6.4, 0], [8.7, 0], [9.6, L('blickX')]],
+      blund: [[0.3, L('blund')], [1.0, 0.3], [4.4, 0.3], [5.0, 0.05], [6.15, 0.05], [6.4, 0.3], [8.7, 0.3], [9.6, L('blund')]],
+      brynX: [[0.4, -0.12], [1.0, -0.45], [4.4, -0.45], [5.0, 0.2], [5.35, 0.9], [6.15, 0.85], [6.4, -0.45], [8.7, -0.45], [9.6, -0.12]],
+      brynY: [[0.4, -0.08], [1.0, -0.5], [4.4, -0.5], [5.0, 0.3], [5.35, 1.05], [6.15, 1.0], [6.4, -0.5], [8.7, -0.5], [9.6, -0.08]],
+      stel: [[5.2, 0], [5.35, 0.8], [6.1, 0.8], [6.4, 0]], andas: [[5.25, 0], [5.4, -4], [6.2, -4], [6.5, 3], [7.2, 0]],
+      lut: [[0.8, 0.03], [1.3, 0.06], [8.6, 0.06], [9.4, 0.03]],
+    },
+    // (upp framför ansiktet som i gom, hopvikt som ett V med ryggen mot en, men så högt att överkanten är över hjässan;
+    // vid 5 s ned så att ögonen syns över vecket, och upp igen på en tredjedels sekund)
+    t: {
+      y: [[0.3, LY], [1.2, DOLD_Y], [2.2, DOLD_Y], [2.3, DOLD_Y + 8], [2.45, DOLD_Y - 4], [2.7, DOLD_Y], [4.3, DOLD_Y], [5.15, LY + 209], [6.15, LY + 209], [6.45, DOLD_Y + 6], [6.65, DOLD_Y], [8.6, DOLD_Y], [9.7, LY]],
+      z: [[0.3, LZ], [1.2, 600], [4.3, 600], [5.15, 620], [6.15, 620], [6.45, 600], [8.6, 600], [9.7, LZ]],
+      tilt: [[0.3, LAS_T.tilt], [1.2, DOLD_TILT], [4.3, DOLD_TILT], [5.15, -0.3], [6.15, -0.3], [6.45, DOLD_TILT], [8.6, DOLD_TILT], [9.7, LAS_T.tilt]],
+      x: [[0.3, LX], [1.2, -20], [8.6, -20], [9.7, LX]], yaw: [[0.3, LAS_T.yaw], [1.2, 0], [8.6, 0], [9.7, LAS_T.yaw]],
+      beta: [[0.3, LAS_T.beta], [1.2, DOLD_B], [2.2, DOLD_B], [2.32, DOLD_B + 0.15], [2.5, DOLD_B - 0.05], [2.75, DOLD_B], [4.3, DOLD_B], [5.15, 1.0], [6.15, 1.0], [6.45, DOLD_B], [8.6, DOLD_B], [9.7, LAS_T.beta]],
+      gy: [[0.3, LAS_T.gy], [1.2, 0.2], [8.6, 0.2], [9.7, LAS_T.gy]],
+      vag: [[2.25, 0], [2.35, 12], [3.1, 0], [6.35, 0], [6.45, 10], [7.2, 0]],
+    },
+    ljud: [[2.28, { typ: 'prassel' }], [6.35, { typ: 'prassel' }]],
   },
   // läser, håller med det som står och nickar belåtet för sig själv
   nick: {
@@ -301,7 +369,7 @@ const LASBIT = {
       yaw: [[0.05, LAS_T.yaw], [0.7, 0]], tilt: [[0.05, LAS_T.tilt], [0.8, -0.35], [1.15, 0]], beta: [[0.05, LAS_T.beta], [0.5, 0.3], [1.0, 0.3]], mot: [[1.3, 1], [1.95, 0]],
     },
   },
-  // ---- När det står något i tidningen som säger att han hade fel (lasa3–lasa5, Tomas önskemål 2026-11-10: läser men
+  // ---- När det står något i tidningen som säger att han hade fel (lasa3–lasa5 och lasa9, Tomas önskemål 2026-11-10: läser men
   // låtsas lite, som Walter i The Big Lebowski, att han inte hade fel). Han medger ingenting: det är tidningen som har
   // fel, eller så har inget hänt, och det säger han med eftertryck. ljud: [tid, ljud] (rum-hasse-ljud.js).
   // Det stämmer inte: blicken stannar mitt i raden, brynen dras ihop och han skakar långsamt på huvudet åt det som står,
@@ -408,10 +476,71 @@ const LASBIT = {
     },
     ljud: [[1.65, { typ: 'prassel' }], [4.55, { typ: 'prassel', mjuk: true }]],
   },
+  // ---- När han läser av vana (lasa6–lasa8, 2026-11-18, användarens önskemål: "Gör fler tidningsvarianter som passar"):
+  // inget i tidningen säger att han hade fel, och oftast är det Helgarderat, med hans egen krönika. Han är nöjd med det
+  // han läser och med sig själv.
+  // Tittar upp på en över tidningen med ett snett leende och blinkar med ena ögat (vi vet, du och jag), och läser vidare.
+  blinkar: {
+    dur: 3.8,
+    k: {
+      blickY: [[0.5, L('blickY')], [0.62, -1.5], [2.3, -1.5], [2.45, L('blickY')]], blund: [[0.5, L('blund')], [0.6, 0.04], [2.3, 0.04], [2.45, L('blund')]],
+      blickX: [[0.5, L('blickX')], [0.62, EN_X], [2.3, EN_X], [2.45, L('blickX')]],
+      brynX: [[0.5, -0.12], [0.75, 0.4], [2.2, 0.35], [2.8, -0.12]], brynY: [[0.5, -0.08], [0.75, 0.45], [2.2, 0.4], [2.8, -0.08]],
+      pitch: [[0.5, L('pitch')], [0.75, L('pitch', -0.1)], [2.2, L('pitch', -0.1)], [2.7, L('pitch')]], roll: [[0.6, 0], [1.0, 0.06], [2.0, 0.06], [2.6, 0]],
+      le: [[0.8, 0], [1.2, 0.6], [2.2, 0.55], [3.0, 0]], kis: [[1.0, 0.06], [1.3, 0.3], [2.2, 0.25], [2.9, 0.06]],
+      vink: [[1.25, 0], [1.4, 1], [1.62, 1], [1.8, 0]],
+    },
+    t: { y: [[0.5, LY], [0.7, LY - 12], [2.2, LY - 12], [2.5, LY]] },
+  },
+  // Något roar honom: blicken stannar mitt i raden, leendet växer och han kisar, och han skrattar tyst för sig själv,
+  // tre små stötar med axlarna och huvudet och en pust genom näsan för varje, och läser vidare med leendet kvar en stund.
+  fniss: {
+    dur: 4.8,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1)], [1.0, rad(0.3)], [3.4, rad(0.3)], [3.8, rad(1.4)], [4.3, rad(2.4)]],
+      le: [[0.9, 0], [1.4, 0.8], [3.4, 0.7], [4.6, 0]], kis: [[0.9, 0.06], [1.4, 0.45], [3.3, 0.4], [4.4, 0.06]],
+      blund: [[0.9, L('blund')], [1.4, 0.88], [3.3, 0.86], [4.0, L('blund')]],
+      brynX: [[0.9, -0.12], [1.3, 0.3], [3.2, 0.25], [4.2, -0.12]], brynY: [[0.9, -0.08], [1.3, 0.25], [3.2, 0.2], [4.2, -0.08]],
+      pitch: [[1.4, L('pitch')], [1.55, L('pitch', 0.07)], [1.75, L('pitch', -0.02)], [1.95, L('pitch', 0.06)], [2.15, L('pitch', -0.02)], [2.35, L('pitch', 0.05)], [2.6, L('pitch')]],
+      axV: [[1.4, 10], [1.55, 15], [1.75, 9], [1.95, 14], [2.15, 9], [2.35, 13], [2.6, 10]], axH: [[1.4, 10], [1.55, 15], [1.75, 9], [1.95, 14], [2.15, 9], [2.35, 13], [2.6, 10]],
+      andas: [[1.4, 0], [1.52, -4], [1.72, 0], [1.92, -4], [2.12, 0], [2.32, -3], [2.55, 0]], roll: [[1.2, 0], [1.6, 0.03], [3.2, 0.03], [4.2, 0]],
+    },
+    t: { vag: [[1.5, 0], [1.6, 5], [2.0, 0], [2.4, 4], [2.8, 0]] },
+    ljud: [[1.52, { typ: 'anda', sort: 'pust', ms: 160 }], [1.92, { typ: 'anda', sort: 'pust', ms: 150 }], [2.32, { typ: 'anda', sort: 'pust', ms: 140 }]],
+  },
+  // En svår match: blicken stannar, brynen dras ihop och han lutar sig närmare med huvudet på sned och munnen spetsad
+  // och läser raden en gång till. Så lossnar det: brynen upp, en kort nick (javisst), och han läser vidare.
+  fundera: {
+    dur: 6.0,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1)], [1.0, rad(0.2)], [1.6, rad(0.2)], [1.75, rad(-3)], [2.3, rad(-1)], [2.8, rad(0.6)], [3.5, rad(0.6)], [4.6, rad(1.8)], [5.2, rad(2.6)]],
+      brynX: [[1.0, -0.12], [1.4, -0.6], [3.5, -0.55], [3.8, 0.55], [4.4, 0.5], [5.2, -0.12]], brynY: [[1.0, -0.08], [1.4, -0.7], [3.5, -0.65], [3.8, 0.6], [4.4, 0.55], [5.2, -0.08]],
+      kis: [[1.0, 0.06], [1.4, 0.45], [3.5, 0.45], [3.8, 0.1], [4.6, 0.2], [5.4, 0.06]], blund: [[1.0, L('blund')], [1.4, 0.88], [3.5, 0.88], [3.75, 0.8], [4.6, L('blund')]],
+      pitch: [[1.0, L('pitch')], [1.6, L('pitch', 0.12)], [3.5, L('pitch', 0.12)], [3.8, L('pitch', -0.08)], [4.05, L('pitch', 0.1)], [4.3, L('pitch')]],
+      lut: [[1.0, 0.03], [1.6, 0.06], [3.5, 0.06], [4.2, 0.03]], roll: [[1.0, 0], [1.6, -0.06], [3.5, -0.06], [4.2, 0]],
+      rund: [[1.3, 0], [1.6, 0.4], [3.4, 0.35], [3.7, 0]], stel: [[1.0, 0], [1.4, 0.5], [3.5, 0.5], [3.8, 0]], le: [[3.75, 0], [4.1, 0.45], [4.8, 0.35], [5.6, 0]],
+    },
+    t: { y: [[1.0, LY], [1.6, LY + 5], [3.5, LY + 5], [4.0, LY]] },
+  },
+  // Det var inte illa: brynen åker upp och han spetsar munnen till en tyst vissling, drar huvudet lite bakåt och nickar
+  // långsamt och uppskattande åt det som står, och läser vidare.
+  imponerad: {
+    dur: 5.0,
+    k: {
+      blickX: [[0.3, rad(-3)], [0.7, rad(-1)], [1.0, rad(0.4)], [3.6, rad(0.4)], [4.2, rad(1.6)], [4.6, rad(2.4)]],
+      brynX: [[0.9, -0.12], [1.25, 0.75], [3.2, 0.7], [4.2, -0.12]], brynY: [[0.9, -0.08], [1.25, 0.9], [3.2, 0.85], [4.2, -0.08]],
+      blund: [[0.9, L('blund')], [1.2, 0.7], [3.2, 0.72], [4.0, L('blund')]],
+      rund: [[1.0, 0], [1.3, 0.55], [2.4, 0.5], [2.7, 0]], munn: [[1.0, 0], [1.3, 0.08], [2.4, 0.07], [2.7, 0]], stel: [[0.9, 0], [1.2, 0.7], [2.5, 0.7], [2.9, 0]],
+      pitch: [[0.9, L('pitch')], [1.3, L('pitch', -0.1)], [2.6, L('pitch', -0.1)], [2.95, L('pitch', 0.1)], [3.3, L('pitch', -0.04)], [3.7, L('pitch', 0.08)], [4.1, L('pitch')]],
+      lut: [[0.9, 0.03], [1.3, 0], [2.6, 0], [3.4, 0.03]], le: [[2.7, 0], [3.1, 0.45], [3.8, 0.4], [4.8, 0]],
+    },
+    t: {},
+  },
 };
 // Bitarna där han tittar upp på en över tidningen. Läser han redan när man kommer börjar sidan vid den första av dem
-// i klippet (kom), så att han tittar upp just när man har kommit fram (Tomas 2026-11-18).
-const KOM = new Set(['glimt', 'harJagFel', 'over']);
+// i klippet (kom), så att han tittar upp just när man har kommit fram (Tomas 2026-11-18). I dold far tidningen i stället
+// upp framför ansiktet just då, och han kikar fram först en stund senare.
+const KOM = new Set(['glimt', 'harJagFel', 'over', 'blinkar', 'dold']);
 // Ett klipp ur bitarna: nycklarna i klippets tid, och gränserna mellan bitarna (slag), var ned börjar, var han
 // första gången tittar upp på en (kom), och ljuden (ljud: [tid, ljud] i klippets tid).
 function lasKlipp(bitar) {
@@ -476,14 +605,22 @@ function lasKlipp(bitar) {
   const { gk, ...gn } = g;
   return { dur: at, k: ut(k), t: ut(t), g: { gk, ...ut(gn) }, slag, ner, kom: kom ?? LASBIT.pa.dur + LASBIT.upp.dur, ljud };
 }
-// Fem ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter. I de tre sista står det
-// något i tidningen som säger att han hade fel, och han låtsas som ingenting (skaka, resultat, harJagFel, lugn, vika).
+// Nio ordningar, så att det inte blir samma varje gång, och glasögonen på före och av efter. I lasa3–lasa5 och lasa9 står
+// det något i tidningen som säger att han hade fel, och han låtsas som ingenting (skaka, resultat, harJagFel, lugn, vika),
+// och i lasa9 gömmer han sig helt bakom den en stund (dold). I lasa6–lasa8 läser han av vana och är nöjd med det han läser
+// (blinkar, fniss, fundera, imponerad); de, lasa och lasa2 är de han läser av vana (VANA_LAS i rum-hasse.js). I alla
+// vänder han blad en gång (bladdra, i stället för en av gångerna han läser, så att klippen är lika långa som förut); i
+// lasa3, lasa4 och lasa9 strax efter det som sa att han hade fel.
 export const LASA = {
-  lasa: lasKlipp(['pa', 'upp', 'las', 'glimt', 'las', 'skjut', 'gom', 'nick', 'las', 'over', 'las', 'titta', 'las', 'ned', 'av']),
-  lasa2: lasKlipp(['pa', 'upp', 'ryck', 'las', 'nick', 'lyft', 'las', 'glimt', 'las', 'gom', 'skjut', 'las', 'ned', 'av']),
-  lasa3: lasKlipp(['pa', 'upp', 'las', 'skaka', 'las', 'harJagFel', 'las', 'nick', 'resultat', 'las', 'lugn', 'las', 'ned', 'av']),
-  lasa4: lasKlipp(['pa', 'upp', 'ryck', 'las', 'resultat', 'las', 'glimt', 'las', 'vika', 'las', 'skaka', 'las', 'ned', 'av']),
-  lasa5: lasKlipp(['pa', 'upp', 'las', 'harJagFel', 'las', 'skjut', 'vika', 'las', 'lugn', 'las', 'titta', 'las', 'ned', 'av']),
+  lasa: lasKlipp(['pa', 'upp', 'las', 'glimt', 'las', 'skjut', 'gom', 'nick', 'bladdra', 'over', 'las', 'titta', 'las', 'ned', 'av']),
+  lasa2: lasKlipp(['pa', 'upp', 'ryck', 'las', 'nick', 'lyft', 'las', 'glimt', 'bladdra', 'gom', 'skjut', 'las', 'ned', 'av']),
+  lasa3: lasKlipp(['pa', 'upp', 'las', 'skaka', 'las', 'harJagFel', 'bladdra', 'nick', 'resultat', 'las', 'lugn', 'las', 'ned', 'av']),
+  lasa4: lasKlipp(['pa', 'upp', 'ryck', 'las', 'resultat', 'bladdra', 'glimt', 'las', 'vika', 'las', 'skaka', 'las', 'ned', 'av']),
+  lasa5: lasKlipp(['pa', 'upp', 'las', 'harJagFel', 'las', 'skjut', 'vika', 'las', 'lugn', 'bladdra', 'titta', 'las', 'ned', 'av']),
+  lasa6: lasKlipp(['pa', 'upp', 'las', 'blinkar', 'las', 'fniss', 'las', 'nick', 'bladdra', 'fundera', 'las', 'titta', 'las', 'ned', 'av']),
+  lasa7: lasKlipp(['pa', 'upp', 'ryck', 'las', 'fundera', 'las', 'glimt', 'bladdra', 'fniss', 'las', 'skjut', 'las', 'ned', 'av']),
+  lasa8: lasKlipp(['pa', 'upp', 'las', 'imponerad', 'las', 'blinkar', 'bladdra', 'lyft', 'las', 'nick', 'las', 'ned', 'av']),
+  lasa9: lasKlipp(['pa', 'upp', 'ryck', 'las', 'dold', 'las', 'skaka', 'bladdra', 'glimt', 'las', 'nick', 'las', 'ned', 'av']),
 };
 // var läsandet börjar (med glasögonen på, efter upp)
 export const LAS_START = LASBIT.pa.dur + LASBIT.upp.dur;
@@ -565,6 +702,21 @@ export const KLIPP = {
   vifta: { fran: 255, till: 267.2, vila: 0, skynda: true, grupp: 'cigarr' },
   // ett bloss som han håller kvar i munnen och smakar på, och röken ut långsamt
   smaka: { fran: 270, till: 283.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  // (och fler, 2026-11-19; efter tidningen och småsakerna med händerna, på 1150–1483)
+  // ett bloss, och sedan tittar han bort och funderar med cigarren vid axeln, ett tankfullt bloss till med röken
+  // ut genom näsan, och så kommer han på det: brynen upp, och han nickar mot en
+  tanker: { fran: 1600, till: 1615.0, vila: 0, skynda: true, grupp: 'cigarr' },
+  // ett långt bloss, och röken rakt upp mot taket med huvudet bakåt och spetsade läppar
+  taket: { fran: 1620, till: 1633.8, vila: 0, skynda: true, grupp: 'cigarr' },
+  // ett bloss, och sedan lutar han sig bakåt och minns: tittar upp åt sidan med ett leende, röken ut genom
+  // näsan, en belåten suck och en långsam skakning på huvudet (det var tider)
+  minns: { fran: 1640, till: 1655.2, vila: 0, skynda: true, grupp: 'cigarr',
+    ljud: [[7.85, { typ: 'anda', sort: 'pust', ms: 700 }]] },
+  // får syn på någon längs baren och lyfter cigarren mot honom med en nick, och tar sedan ett bloss
+  honnor: { fran: 1660, till: 1673.4, vila: 0, skynda: true, grupp: 'cigarr' },
+  // tittar på glöden, som har falnat, och blåser försiktigt på den så att den glöder upp, och drar ett bloss
+  gloden: { fran: 1680, till: 1694.0, vila: 0, skynda: true, grupp: 'cigarr',
+    ljud: [[3.95, { typ: 'anda', sort: 'blas', ms: 650 }], [5.3, { typ: 'anda', sort: 'blas', ms: 480 }]] },
   // Småsakerna medan han väntar på en (grupp smatt, lottas med fingrarna som trummar), några sekunder
   // var, med händerna på disken:
   // tittar bort mot gänget i affären, skakar lite på huvudet och ler
@@ -589,6 +741,19 @@ export const KLIPP = {
   myser: { fran: 460, till: 464.4, vila: 0, skynda: true, grupp: 'smatt' },
   // tittar på en, ler brett och blinkar med ena ögat: vi vet, du och jag
   blinka: { fran: 466, till: 469.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // och med händerna:
+  // rättar till slipsknuten med hakan upp, stryker slipsen slät och nickar belåtet
+  slipsen: { fran: 1450, till: 1454.2, vila: 0, skynda: true, grupp: 'smatt' },
+  // stryker sig om hakan och funderar, och kommer på det
+  hakan: { fran: 1456, till: 1461, vila: 0, skynda: true, grupp: 'smatt' },
+  // gäspar bakom knytnäven, och skakar av sig det med ett ursäktande leende
+  gaspa: { fran: 1462, till: 1466.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // hälsar på någon längs baren med två fingrar från disken
+  vinka: { fran: 1468, till: 1471.6, vila: 0, skynda: true, grupp: 'smatt' },
+  // sopar ihop askan på disken med handkanten och borstar av fingrarna
+  sopar: { fran: 1473, till: 1477, vila: 0, skynda: true, grupp: 'smatt' },
+  // pekar på en med fingret som en pistol och blinkar: pang
+  pang: { fran: 1479, till: 1482.6, vila: 0, skynda: true, grupp: 'smatt' },
   // Medan han pratar, nöjd med det han säger (talet, lottas med armar):
   // handflatan upp mot en: där har du det
   oppna: { fran: 345, till: 348.4, vila: 5.5, start: 5.5, grupp: 'tal' },
@@ -634,6 +799,12 @@ export const KLIPP = {
   lasa3: { fran: 840, till: 840 + LASA.lasa3.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa3.slag, ner: LASA.lasa3.ner, kom: LASA.lasa3.kom, ljud: LASA.lasa3.ljud },
   lasa4: { fran: 910, till: 910 + LASA.lasa4.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa4.slag, ner: LASA.lasa4.ner, kom: LASA.lasa4.kom, ljud: LASA.lasa4.ljud },
   lasa5: { fran: 980, till: 980 + LASA.lasa5.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa5.slag, ner: LASA.lasa5.ner, kom: LASA.lasa5.kom, ljud: LASA.lasa5.ljud },
+  // (och de han läser av vana, nöjd med det han läser: blinkar, fniss, fundera och imponerad; efter kaffet på 1100–1145)
+  lasa6: { fran: 1150, till: 1150 + LASA.lasa6.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa6.slag, ner: LASA.lasa6.ner, kom: LASA.lasa6.kom, ljud: LASA.lasa6.ljud },
+  lasa7: { fran: 1225, till: 1225 + LASA.lasa7.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa7.slag, ner: LASA.lasa7.ner, kom: LASA.lasa7.kom, ljud: LASA.lasa7.ljud },
+  lasa8: { fran: 1300, till: 1300 + LASA.lasa8.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'dn', slag: LASA.lasa8.slag, ner: LASA.lasa8.ner, kom: LASA.lasa8.kom, ljud: LASA.lasa8.ljud },
+  // (och där han låtsas att han inte hade fel och ibland gömmer sig helt bakom den, dold; efter lasa8)
+  lasa9: { fran: 1375, till: 1375 + LASA.lasa9.dur, vila: 0, skynda: true, grupp: 'lasa', tidning: 'svd', slag: LASA.lasa9.slag, ner: LASA.lasa9.ner, kom: LASA.lasa9.kom, ljud: LASA.lasa9.ljud },
   // Det andra han gör när det har gått dåligt (grupp lasa, som tidningen; sysslorna i figuren): han håller
   // på med något för att verka upptagen, märker att man tittar och fryser (ertappad, utan leende: stel),
   // och sedan låtsas han att inget har hänt, med eftertryck. fram: där sidan börjar när han redan håller på
@@ -2627,6 +2798,134 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       rok: [{ fran: 6.9, till: 9.0, sort: 'blas', styrka: 45, avtag: 0.3, fart: 0.75, broms: 1.0, lyft: 46 }],
     }),
   });
+  // Fler sätt att njuta av cigarren (2026-11-19), med samma lägen för handen som ovan (hall, se, mun, bort):
+  Object.assign(RORELSER, {
+    // Ett bloss och röken i en stråle åt sidan, och sedan funderar han: cigarren vid axeln, blicken upp och bort,
+    // huvudet lite på sned, pannan i lätta veck och läpparna lite spetsade. Mitt i tanken ett kort bloss till,
+    // med röken långsamt ut genom näsan medan han fortfarande tänker. Så kommer han på det: brynen åker upp, han
+    // tittar på en, nickar två gånger och ler.
+    tanker: cigarrKlipp(13.6, {
+      yaw: [[2.0, 0.05], [3.3, 0.05], [3.8, 0.4], [5.0, 0.4], [5.6, 0.25], [7.4, 0.28], [7.9, 0.15], [8.6, 0.17], [9.4, 0.3], [10.3, 0.27], [10.8, 0.02], [12.2, 0.02]],
+      pitch: [[2.0, 0.25], [3.3, 0.25], [3.8, -0.2], [5.0, -0.2], [5.6, -0.38], [7.4, -0.34], [7.9, -0.05], [8.6, -0.05], [9.4, -0.42], [10.3, -0.38], [10.8, 0], [11.15, 0.4], [11.45, 0.05], [11.75, 0.35], [12.1, 0.1]],
+      roll: [[5.0, 0], [5.6, -0.05], [10.3, -0.05], [10.8, 0]],
+      lut: [[2.0, 0], [5.0, -0.01], [5.6, -0.03], [10.3, -0.03], [11.0, 0.01]],
+      axV: [[2.0, 20], [3.3, 24], [4.0, 14], [5.6, 14], [7.6, 22], [8.5, 26], [9.2, 14], [10.3, 14], [11.2, 12]],
+      blickX: [[3.3, 0], [3.7, 3], [5.0, 3], [5.4, 4.5], [7.5, 4.5], [7.8, 1.5], [8.7, 1.5], [9.1, 4.5], [10.3, 4.5], [10.7, 0]],
+      blickY: [[3.3, 0], [3.7, -1], [5.0, -1], [5.4, -2.5], [7.5, -2.5], [7.8, 0], [8.7, 0], [9.1, -2.5], [10.3, -2.5], [10.7, 0]],
+      kis: [[5.4, 0], [5.9, 0.3], [10.3, 0.3], [10.6, 0.1], [11.2, 0.35], [12.4, 0.2]],
+      brynX: [[5.2, 0], [5.8, -0.3], [10.25, -0.35], [10.55, 0.7], [11.6, 0.6], [12.4, 0.3]],
+      brynY: [[5.2, 0], [5.8, -0.35], [10.25, -0.4], [10.55, 0.55], [11.6, 0.45], [12.4, 0.24]],
+      rund: [[5.9, 0], [6.2, 0.25], [7.0, 0.25], [7.3, 0]],
+      blund: [[2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.5, 0], [7.95, 0], [8.15, 0.4], [8.5, 0.4], [8.7, 0]],
+      le: [[3.5, 0], [4.2, 0.15], [5.4, 0.1], [10.3, 0.05], [10.6, 0.4], [11.4, 0.55], [12.6, 0.35]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [7.5, 'hall'], [8.0, 'mun', 15], [8.5, 'mun'], [8.9, 'bort'], [9.5, 'hall'], [12.2, 'hall']],
+      glod: [[2.2, 0], [2.6, 1], [3.05, 0.85], [3.3, 0], [8.05, 0], [8.3, 0.7], [8.5, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.3, 1], [3.45, 0], [7.85, 0], [8.0, 1], [8.5, 1], [8.65, 0]],
+      blaser: [[3.8, 0], [4.0, 0.55], [5.0, 0.5], [5.3, 0]],
+      rok: [{ fran: 3.85, till: 5.2, sort: 'strale', styrka: 55, avtag: 0.8 }, { fran: 8.8, till: 10.6, sort: 'nasa', styrka: 45, avtag: 0.8 }],
+    }),
+    // Ett långt bloss med halvslutna ögon, och sedan lutar han huvudet bakåt, spetsar läpparna och blåser röken
+    // rakt upp mot taket i en lång, smal stråle, och följer den med blicken. Han sänker huvudet med höjda bryn
+    // och ett nöjt leende, och tittar på cigarren.
+    taket: cigarrKlipp(12.4, {
+      yaw: [[2.0, 0.05], [4.2, 0.05], [5.0, 0.15], [8.3, 0.15], [9.0, 0.05], [10.2, 0.05], [10.8, -0.45], [11.6, -0.45]],
+      pitch: [[2.0, 0.25], [4.2, 0.2], [5.0, -0.9], [8.2, -0.95], [8.9, -0.1], [9.35, 0.15], [9.7, 0], [10.2, 0.05], [10.8, 0.5], [11.6, 0.45]],
+      lut: [[2.0, 0], [4.2, -0.01], [5.0, -0.05], [8.2, -0.05], [9.0, 0]],
+      axV: [[2.0, 20], [3.8, 30], [4.4, 30], [5.2, 22], [8.2, 8], [9.0, 12]],
+      rund: [[4.9, 0], [5.15, 0.95], [8.0, 0.85], [8.3, 0]],
+      stel: [[4.8, 0], [5.1, 0.7], [8.0, 0.6], [8.4, 0]],
+      munn: [[4.9, 0], [5.15, 0.05], [8.0, 0.04], [8.3, 0]],
+      blund: [[2.15, 0], [2.6, 0.5], [4.0, 0.6], [4.6, 0.3], [5.2, 0.4], [8.2, 0.4], [8.6, 0.1], [9.0, 0]],
+      blickX: [[4.6, 0], [5.2, 1], [8.2, 1.5], [8.7, 0], [10.4, 0], [10.8, -4], [11.6, -4]],
+      blickY: [[4.6, 0], [5.2, -3], [8.2, -3.5], [8.7, 0], [10.4, 0], [10.8, 1.5], [11.6, 1.5]],
+      brynX: [[2.4, 0], [3.6, 0.3], [4.6, 0.35], [5.2, 0.5], [8.2, 0.55], [8.8, 0.3], [9.4, 0.7], [10.2, 0.4]],
+      brynY: [[2.4, 0], [3.6, 0.25], [4.6, 0.28], [5.2, 0.4], [8.2, 0.44], [8.8, 0.24], [9.4, 0.56], [10.2, 0.32]],
+      le: [[8.2, 0], [8.8, 0.35], [9.6, 0.5], [10.4, 0.4], [11.6, 0.3]],
+      kis: [[8.8, 0], [9.3, 0.3], [10.4, 0.25], [11.0, 0.1]],
+    }, {
+      ck: [[2.1, 'mun', 70], [4.1, 'mun'], [4.5, 'bort'], [5.1, 'hall'], [10.2, 'hall'], [10.8, 'se'], [11.6, 'se']],
+      glod: [[2.2, 0], [2.8, 0.7], [3.6, 1], [3.95, 0.9], [4.2, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [4.1, 1], [4.25, 0]],
+      blaser: [[5.1, 0], [5.35, 0.45], [7.9, 0.4], [8.2, 0]],
+      // (brantare än vanligt: med huvudet bakåt går den snett upp mot taket, förbi ansiktet åt hans vänstra sida;
+      // rakt upp lade den sig framför ansiktet)
+      rok: [{ fran: 5.2, till: 8.1, sort: 'blas', styrka: 70, avtag: 0.35, fart: 0.8, broms: 0.9, rikt: V3(0.8, 0.52, 0.3).normalize() }],
+    }),
+    // Ett bloss, och sedan lutar han sig bakåt med cigarren vid axeln och minns något: blicken upp åt sidan, ett
+    // leende som växer och röken långsamt ut genom näsan. En belåten suck, och han skakar långsamt på huvudet –
+    // det var tider – och tittar på cigarren och nickar.
+    minns: cigarrKlipp(13.8, {
+      yaw: [[2.0, 0.05], [3.4, 0.05], [4.2, 0.05], [5.6, -0.2], [8.6, -0.22], [9.1, -0.08], [9.6, -0.28], [10.1, -0.1], [10.6, -0.24], [11.2, -0.15], [11.8, -0.45], [12.8, -0.45]],
+      pitch: [[2.0, 0.25], [3.4, 0.25], [4.2, -0.15], [5.6, -0.45], [8.6, -0.45], [9.1, -0.2], [11.2, -0.15], [11.8, 0.4], [12.1, 0.6], [12.4, 0.4], [12.8, 0.5]],
+      roll: [[4.4, 0], [5.6, 0.05], [8.6, 0.05], [9.2, 0]],
+      lut: [[2.0, 0], [3.4, 0], [5.6, -0.06], [8.6, -0.06], [9.4, -0.03], [11.2, -0.02], [12.0, 0]],
+      axV: [[2.0, 20], [3.4, 26], [4.4, 14], [6.0, 10], [7.0, 24], [7.9, 8], [9.0, 10], [11.2, 14]],
+      blickX: [[3.4, 0], [4.2, 0], [5.4, -3.5], [8.6, -3.5], [9.1, -1], [11.2, -1], [11.6, -4], [12.8, -4]],
+      blickY: [[3.4, 0], [4.2, 0], [5.4, -2.5], [8.6, -2.5], [9.1, -0.5], [11.2, -0.5], [11.6, 1.5], [12.8, 1.5]],
+      blund: [[2.15, 0], [2.45, 0.45], [3.3, 0.45], [3.6, 0.2], [5.4, 0.25], [7.0, 0.5], [7.9, 0.55], [8.4, 0.2], [11.0, 0.15], [11.4, 0]],
+      brynX: [[4.0, 0], [5.4, 0.45], [8.4, 0.5], [9.0, 0.3], [11.2, 0.25], [11.8, 0.55], [12.8, 0.35]],
+      brynY: [[4.0, 0], [5.4, 0.4], [8.4, 0.45], [9.0, 0.25], [11.2, 0.2], [11.8, 0.45], [12.8, 0.3]],
+      le: [[3.6, 0], [5.0, 0.2], [6.6, 0.4], [8.6, 0.5], [9.4, 0.55], [11.2, 0.45], [12.0, 0.5], [12.8, 0.35]],
+      kis: [[6.0, 0], [7.0, 0.25], [11.2, 0.25], [11.6, 0.1]],
+    }, {
+      ck: [[2.1, 'mun', 70], [3.3, 'mun'], [3.7, 'bort'], [4.3, 'hall'], [11.2, 'hall'], [11.8, 'se'], [12.8, 'se']],
+      glod: [[2.2, 0], [2.6, 1], [3.05, 0.85], [3.3, 0]],
+      iMun: [[1.95, 0], [2.15, 1], [3.3, 1], [3.45, 0]],
+      blaser: [[7.8, 0], [8.0, 0.3], [8.4, 0.25], [8.7, 0]],
+      rok: [{ fran: 3.7, till: 6.0, sort: 'nasa', styrka: 55, avtag: 0.7 }, { fran: 7.85, till: 8.6, sort: 'blas', styrka: 18, avtag: 1.5, fart: 0.6 }],
+    }),
+    // Med cigarren i handen får han syn på någon längs baren: han vänder sig dit med brynen uppe och lyfter
+    // cigarren lite mot honom med en kort nick och ett leende, som en hälsning. Sedan tillbaka till en, ett
+    // bloss, och röken i en stråle ur mungipan med ett höjt bryn.
+    honnor: cigarrKlipp(12.0, {
+      yaw: [[2.0, 0.05], [2.8, 0], [3.3, -0.45], [5.0, -0.45], [5.7, 0], [6.6, 0.05], [7.8, 0.05], [8.3, 0.4], [9.6, 0.4], [10.2, 0.1], [11.0, 0.1]],
+      pitch: [[2.0, 0.25], [2.8, 0.05], [3.3, -0.2], [3.9, -0.2], [4.1, 0.3], [4.35, -0.15], [5.0, -0.1], [5.7, 0.05], [6.6, 0.25], [7.8, 0.25], [8.3, -0.2], [9.6, -0.2], [10.2, 0.05]],
+      vrid: [[2.6, 0], [3.3, -0.04], [5.0, -0.04], [5.7, 0]],
+      lut: [[3.0, 0], [3.6, 0.02], [5.0, 0.02], [5.6, 0], [8.3, -0.02], [9.6, -0.02], [10.2, 0]],
+      axV: [[2.0, 20], [2.8, 14], [3.6, 18], [4.0, 22], [5.2, 14], [6.6, 20], [7.8, 24], [8.4, 12], [10.2, 14]],
+      blickX: [[2.8, 0], [3.0, -5], [3.4, -3.5], [5.0, -3.5], [5.3, 0]],
+      brynX: [[3.0, 0], [3.3, 0.9], [4.6, 0.8], [5.2, 0.2], [5.7, 0], [8.3, 0.2], [9.6, 0.2], [10.2, 0]],
+      brynY: [[3.0, 0], [3.3, 0.6], [4.6, 0.5], [5.2, 0.1], [5.7, 0], [8.3, 0.6], [9.6, 0.6], [10.2, 0]],
+      munn: [[3.25, 0], [3.35, 0.06], [3.5, 0]],
+      le: [[3.2, 0], [3.6, 0.5], [4.8, 0.5], [5.4, 0.25], [6.4, 0.15], [8.4, 0.15], [8.8, 0.3], [9.6, 0.3], [10.4, 0.2]],
+      kis: [[3.6, 0], [4.0, 0.3], [4.8, 0.3], [5.3, 0], [8.4, 0], [8.8, 0.25], [9.6, 0.25], [10.0, 0]],
+      blund: [[4.05, 0], [4.2, 0.4], [4.4, 0.4], [4.55, 0], [6.75, 0], [7.05, 0.45], [7.8, 0.45], [8.0, 0]],
+    }, {
+      ck: [[2.6, 'hall', 40], [3.4, 'hall'], [4.0, 'se', 10], [4.6, 'se'], [5.2, 'hall'], [6.0, 'hall'], [6.7, 'mun', 30], [7.8, 'mun'], [8.2, 'bort'], [8.8, 'hall'], [10.8, 'hall']],
+      glod: [[6.8, 0], [7.2, 1], [7.6, 0.85], [7.85, 0]],
+      iMun: [[6.6, 0], [6.8, 1], [7.8, 1], [7.95, 0]],
+      blaser: [[8.25, 0], [8.4, 0.5], [9.4, 0.5], [9.7, 0]],
+      rok: [{ fran: 8.3, till: 9.6, sort: 'strale', styrka: 60, avtag: 0.8 }],
+    }),
+    // Han håller upp cigarren framför bröstet och tittar på glöden, som har falnat, med höjda bryn, och blåser
+    // försiktigt på den två gånger med munnen som ett o, så att den glöder upp. Nöjd tar han ett bloss med halvslutna ögon och blåser ut ett
+    // moln åt sidan, och nickar mot en.
+    gloden: cigarrKlipp(12.6, {
+      yaw: [[2.0, -0.3], [2.6, -0.5], [6.2, -0.55], [6.8, 0.05], [8.2, 0.05], [8.8, 0.4], [10.2, 0.4], [10.8, 0.1], [11.6, 0.1]],
+      pitch: [[2.0, 0.3], [2.6, 0.35], [3.6, 0.35], [3.85, 0.42], [6.2, 0.4], [6.8, 0.25], [8.2, 0.2], [8.8, -0.3], [10.2, -0.3], [10.8, 0.05], [11.1, 0.35], [11.4, 0.05]],
+      roll: [[2.4, 0.02], [2.8, 0.05], [6.2, 0.05], [6.6, 0]],
+      lut: [[2.0, 0], [3.4, 0.02], [6.2, 0.02], [6.8, 0], [8.8, -0.04], [10.2, -0.04], [10.8, 0]],
+      axV: [[2.0, 22], [3.5, 22], [3.8, 27], [4.7, 18], [5.05, 25], [5.9, 18], [6.6, 20], [8.0, 28], [8.8, 12], [10.4, 14]],
+      blickX: [[1.9, -2], [2.3, -6], [6.2, -6], [6.6, 0]],
+      blickY: [[1.9, 1], [2.3, 3.5], [6.2, 3.5], [6.6, 0]],
+      brynX: [[2.4, 0.2], [2.8, 0.6], [3.6, 0.65], [3.9, 0.3], [5.2, 0.3], [5.9, 0.65], [6.4, 0.5], [7.0, 0.2], [8.8, 0.3], [10.2, 0.3], [10.8, 0.5], [11.6, 0.3]],
+      brynY: [[2.4, 0.16], [2.8, 0.48], [3.6, 0.52], [3.9, 0.24], [5.2, 0.24], [5.9, 0.52], [6.4, 0.4], [7.0, 0.16], [8.8, 0.24], [10.2, 0.24], [10.8, 0.4], [11.6, 0.24]],
+      // (munnen som ett o när han blåser, och leendet viker undan så länge)
+      stel: [[3.7, 0], [3.9, 0.8], [4.6, 0.8], [4.85, 0.3], [5.15, 0.8], [5.75, 0.8], [6.0, 0]],
+      rund: [[3.8, 0], [3.95, 1], [4.6, 1], [4.75, 0], [5.15, 0], [5.3, 1], [5.75, 1], [5.9, 0]],
+      munn: [[3.8, 0], [3.95, 0.14], [4.6, 0.12], [4.75, 0], [5.15, 0], [5.3, 0.14], [5.75, 0.12], [5.9, 0]],
+      kis: [[2.6, 0], [3.0, 0.25], [3.7, 0.25], [3.9, 0], [6.0, 0], [6.2, 0.3], [6.5, 0], [8.8, 0], [9.2, 0.3], [10.2, 0.25], [10.6, 0]],
+      le: [[5.9, 0], [6.3, 0.4], [7.0, 0.2], [8.8, 0.15], [9.6, 0.35], [10.6, 0.5], [11.6, 0.35]],
+      blund: [[6.95, 0], [7.25, 0.5], [8.1, 0.5], [8.3, 0], [8.9, 0], [9.2, 0.4], [10.0, 0.4], [10.3, 0]],
+    }, {
+      ck: [[2.0, 'visa', 40], [6.2, 'visa'], [6.9, 'mun', 20], [8.1, 'mun'], [8.5, 'bort'], [9.1, 'hall'], [11.4, 'hall']],
+      glod: [[2.0, 0], [3.9, 0], [4.3, 0.55], [4.75, 0.3], [5.25, 0.3], [5.6, 0.75], [6.0, 0.45], [6.9, 0.4], [7.3, 1], [7.85, 0.9], [8.1, 0.2], [11.0, 0.15], [12.0, 0]],
+      iMun: [[6.75, 0], [6.95, 1], [8.1, 1], [8.25, 0]],
+      blaser: [[8.55, 0], [8.75, 0.8], [9.8, 0.7], [10.1, 0]],
+      rok: [{ fran: 8.6, till: 10.1, sort: 'blas', styrka: 85, avtag: 1.0 }],
+    }),
+  });
   // Elden (grupp tanda): cigarrklipp där cigarren har slocknat och han tänder den, med cigarren mellan tänderna
   // och höger hand fri för stickan eller tändaren (eld, se eldArm). Den tänds (tand) när han drar med lågan vid
   // glöden.
@@ -3193,6 +3492,195 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         nedA(3.2),
       ],
       fA: { spar: [[0.6, 0.3], [2.8, 0.3], [3.2, 0]], sv: { amp: [[0.5, 0], [0.9, 1], [2.5, 1], [2.95, 0]], f: 1.5, x: [0, 0, 45], y: [0, 45, 0], F: [0, 0.35, 0] } },
+    },
+  });
+  // Småsakerna med händerna (grupp smatt, lottas med de andra småsakerna): han rättar till slipsen, stryker sig
+  // om hakan, gäspar bakom handen, hälsar med två fingrar, sopar ihop askan på disken och pekar på en med fingret.
+  // greppA: den högra handen, med handflatan vänd så nära D som går (vinkelrätt mot fingrarna F) och armbågen
+  // ut åt sidan; hemA: på väg ned mot disken igen (som efter naglarna).
+  const greppA = (t, W, F, krok, D = [0, 0, -1], peka = 0) => {
+    const f = lang(F, 1);
+    const d = f[0] * D[0] + f[1] * D[1] + f[2] * D[2];
+    return [t, W, POL_UT_A, f, lang(D.map((c, i) => c - d * f[i]), 1), krok, peka];
+  };
+  const hemA = (t) => [t, [-200, -150, 560], PA, [0.6, 0.2, 0.75], [0.2, -0.9, 0.35], 0.3, 0];
+  // (slipsknuten, hakan och munnen: handen framför dem, med fingrarna åt hans vänstra sida)
+  const KNUT = [-172, 252, 442];
+  const HAKAN = [-165, 310, 445];
+  const MUNNEN = [-125, 378, 495];
+  // pekfingret mot en, som i naglarna, men med handflatan inåt så att tummen står upp
+  const PANG = [-275, 300, 620];
+  const PEKA_P = [1, -0.15, 0];
+  // handkanten på disken (som hugget), h högre upp
+  const kanten = (t, x, h, z) => [t, [x, -238 + h, z], PA, [0.3, -0.05, 0.95], [0.95, 0.05, -0.3], 0.06, 0];
+  // den vänstra handen på disken med fingrarna lyfta en bit (vinka): fingrarna 25° upp från vilan
+  const LYFT_B = (() => {
+    const F = lang([vb.F[0], vb.F[1] + 0.45, vb.F[2]], 1);
+    const d = F[0] * vb.P[0] + F[1] * vb.P[1] + F[2] * vb.P[2];
+    return [vb.W, vb.pol, F, lang(vb.P.map((c, i) => c - d * F[i]), 1), vb.krok * 0.55, 0];
+  })();
+  Object.assign(RORELSER, {
+    // Slipsen: hakan upp och huvudet lite åt sidan, och han tar slipsknuten mellan tummen och pekfingret,
+    // vickar den på plats och drar upp den, stryker slipsen slät och nickar belåtet.
+    slipsen: {
+      k: {
+        blickY: [[0.2, 0], [0.9, 3], [1.95, 3], [2.3, 0]],
+        pitch: [[0.2, 0], [0.9, -0.4], [1.95, -0.42], [2.3, -0.12], [2.7, 0.24], [3.0, 0.02], [3.8, 0]],
+        yaw: [[0.2, 0], [0.9, 0.14], [1.95, 0.14], [2.4, 0.04], [3.8, 0]],
+        roll: [[0.3, 0], [0.9, -0.05], [1.25, 0.03], [1.6, -0.04], [1.95, 0], [3.8, 0]],
+        axV: [[0.3, 0], [0.9, 10], [1.95, 10], [2.6, 4], [3.6, 0]],
+        brynX: [[0.3, 0], [0.9, 0.35], [1.95, 0.4], [2.45, 0.65], [3.2, 0.5], [4.0, 0]],
+        brynY: [[0.3, 0], [0.9, 0.3], [1.95, 0.35], [2.45, 0.55], [3.2, 0.45], [4.0, 0]],
+        munn: [[1.0, 0], [1.2, 0.02], [1.8, 0.02], [2.0, 0]],
+        le: [[0.3, 0], [1.0, 0.2], [2.0, 0.25], [2.5, 0.55], [3.4, 0.5], [4.2, 0]],
+        kis: [[0.3, 0], [1.0, 0.15], [2.0, 0.15], [2.5, 0.35], [3.4, 0.3], [4.1, 0]],
+      },
+      A: [
+        greppA(0.5, [-235, 110, 540], [0.75, 0.6, 0.25], 0.5),
+        greppA(0.95, KNUT, [0.97, 0.2, 0.1], 0.72),
+        greppA(1.7, KNUT, [0.97, 0.2, 0.1], 0.72),
+        greppA(1.9, [KNUT[0], KNUT[1] + 9, KNUT[2]], [0.97, 0.2, 0.1], 0.72),
+        greppA(2.15, [-180, 200, 452], [0.95, 0.3, 0.05], 0.3),
+        greppA(2.5, [-186, 110, 470], [0.95, 0.3, 0.05], 0.25),
+        hemA(3.2),
+      ],
+      fA: {
+        spar: [[0.8, 0.6], [1.9, 0.6], [2.2, 0.9], [2.6, 0.9]], tumme: [[0.8, 0.75], [1.9, 0.75], [2.2, 0.3]],
+        sv: { amp: [[1.0, 0], [1.15, 1], [1.6, 1], [1.75, 0]], f: 2.6, x: [8, 2, 0] },
+      },
+    },
+    // Hakan: blicken upp åt sidan, och han stryker sig om hakan med tummen och pekfingret medan han funderar,
+    // med munnen lite framskjuten och brynen ihop. Sedan kommer han på det: blicken tillbaka på en, brynen upp,
+    // två små nickar och ett leende.
+    hakan: {
+      k: {
+        blickX: [[0.15, 0], [0.3, 3], [2.6, 3], [2.75, 0]],
+        blickY: [[0.15, 0], [0.3, -4], [2.6, -4], [2.75, 0]],
+        yaw: [[0.2, 0], [0.9, 0.18], [2.6, 0.15], [3.0, 0.02], [4.2, 0]],
+        pitch: [[0.2, 0], [0.9, -0.12], [2.6, -0.1], [2.95, 0.3], [3.2, 0], [3.45, 0.25], [3.75, 0], [4.4, 0]],
+        roll: [[0.3, 0], [1.0, 0.06], [2.6, 0.06], [3.2, 0], [4.2, 0]],
+        axV: [[0.3, 0], [1.0, 8], [2.7, 8], [3.6, 0]],
+        brynX: [[0.3, 0], [0.9, -0.25], [2.5, -0.3], [2.95, 0.6], [3.8, 0.5], [4.6, 0]],
+        brynY: [[0.3, 0], [0.9, -0.4], [2.5, -0.45], [2.95, 0.5], [3.8, 0.4], [4.6, 0]],
+        kis: [[0.4, 0], [1.0, 0.3], [2.5, 0.3], [2.9, 0.05], [3.3, 0.3], [4.4, 0]],
+        rund: [[0.9, 0], [1.2, 0.35], [2.4, 0.3], [2.7, 0]],
+        munn: [[0.9, 0], [1.2, 0.015], [2.4, 0.015], [2.7, 0]],
+        stel: [[0.6, 0], [1.0, 0.5], [2.5, 0.5], [2.9, 0]],
+        le: [[2.7, 0], [3.2, 0.5], [4.0, 0.45], [4.9, 0]],
+      },
+      A: [
+        greppA(0.45, [-240, 120, 520], [0.75, 0.6, 0.25], 0.5),
+        greppA(1.0, HAKAN, [0.8, 0.58, 0.1], 0.55),
+        greppA(2.65, HAKAN, [0.8, 0.58, 0.1], 0.55),
+        greppA(3.0, [-185, 250, 460], [0.85, 0.5, 0.1], 0.5),
+        hemA(3.6),
+      ],
+      fA: {
+        tumme: [[0.8, 0.9], [2.7, 0.9], [3.2, 0.45]],
+        sv: { amp: [[1.2, 0], [1.35, 1], [2.3, 1], [2.45, 0]], f: 1.4, x: [0, -12, -3] },
+      },
+    },
+    // Gäspningen: han andas in djupt med axlarna upp och ögonen hårt igen, och håller knytnäven för munnen. Sedan
+    // blinkar han, skakar den av sig och ler lite ursäktande.
+    gaspa: {
+      k: {
+        andas: [[0.2, 0], [1.0, 14], [1.7, 15], [2.3, -6], [3.0, 0]],
+        axV: [[0.2, 0], [1.0, 16], [1.7, 16], [2.3, -4], [3.0, 0]],
+        axH: [[0.2, 0], [1.0, 12], [1.7, 12], [2.3, -4], [3.0, 0]],
+        pitch: [[0.2, 0], [1.0, -0.25], [1.7, -0.28], [2.2, 0.1], [2.6, 0], [4.0, 0]],
+        lut: [[0.2, 0], [1.0, -0.025], [1.7, -0.025], [2.3, 0.01], [3.0, 0]],
+        yaw: [[2.3, 0], [2.5, -0.12], [2.7, 0.1], [2.9, -0.06], [3.15, 0]],
+        brynX: [[0.2, 0], [0.9, 0.8], [1.7, 0.85], [2.2, 0.2], [2.9, 0.5], [3.6, 0.45], [4.4, 0]],
+        brynY: [[0.2, 0], [0.9, 0.7], [1.7, 0.75], [2.2, 0.2], [2.9, 0.45], [3.6, 0.4], [4.4, 0]],
+        blund: [[0.3, 0], [0.8, 0.45], [1.1, 0.9], [1.75, 0.9], [2.15, 0], [2.45, 0], [2.52, 0.85], [2.64, 0], [2.78, 0], [2.85, 0.8], [2.97, 0]],
+        kis: [[0.6, 0], [1.1, 0.6], [1.75, 0.6], [2.2, 0]],
+        munn: [[0.5, 0], [1.0, 0.12], [1.6, 0.14], [1.95, 0.03], [2.1, 0]],
+        rund: [[0.5, 0], [1.0, 0.3], [1.6, 0.3], [2.0, 0]],
+        le: [[2.6, 0], [3.0, 0.45], [3.9, 0.4], [4.6, 0]],
+      },
+      A: [
+        greppA(0.45, [-235, 130, 540], [0.8, 0.55, 0.2], 0.7),
+        greppA(0.95, MUNNEN, [0.95, 0.25, -0.1], 0.9),
+        greppA(1.8, [MUNNEN[0], MUNNEN[1] - 4, MUNNEN[2]], [0.95, 0.25, -0.1], 0.9),
+        greppA(2.15, [-190, 220, 520], [0.85, 0.4, 0.2], 0.7),
+        hemA(2.7),
+      ],
+      fA: { tumme: [[0.7, 0.2], [1.9, 0.2]] },
+    },
+    // Han får syn på någon längs baren och hälsar med två fingrar, som man gör från ratten: den vänstra handen
+    // ligger kvar på disken och pek- och långfingret lyfts, med en nick och brynen upp.
+    vinka: {
+      k: {
+        blickX: [[0.1, 0], [0.2, -5], [2.4, -4], [2.55, 0]],
+        yaw: [[0.15, 0], [0.85, -0.45], [2.4, -0.42], [3.3, 0]],
+        pitch: [[0.15, 0], [0.85, -0.15], [1.25, -0.15], [1.5, 0.22], [1.8, -0.1], [2.4, -0.1], [3.3, 0]],
+        brynX: [[0.8, 0], [1.1, 0.75], [1.9, 0.65], [2.6, 0]],
+        brynY: [[0.8, 0], [1.1, 0.6], [1.9, 0.5], [2.6, 0]],
+        le: [[0.8, 0], [1.2, 0.45], [2.3, 0.4], [3.2, 0]],
+        kis: [[0.9, 0], [1.2, 0.25], [2.3, 0.2], [2.9, 0]],
+      },
+      B: [[0.9, ...VILA_B], [1.15, ...LYFT_B], [1.85, ...LYFT_B], [2.15, ...VILA_B]],
+      fB: {
+        e0: [[0.95, 0], [1.15, -0.45], [1.85, -0.45], [2.1, 0]],
+        e1: [[0.95, 0], [1.15, -0.45], [1.85, -0.45], [2.1, 0]],
+        e2: [[0.95, 0], [1.15, 0.35], [1.85, 0.35], [2.1, 0]],
+        e3: [[0.95, 0], [1.15, 0.35], [1.85, 0.35], [2.1, 0]],
+      },
+    },
+    // Askan: han tittar ned på disken till höger om sig och sopar ihop askan med handkanten, två tag in mot
+    // mitten, borstar av fingrarna och ser nöjd ut.
+    sopar: {
+      k: {
+        blickX: [[0.1, 0], [0.25, -2.5], [1.2, -1], [1.6, -2.5], [2.5, -1], [2.75, 0]],
+        blickY: [[0.1, 0], [0.25, 6], [2.6, 6], [2.75, 0]],
+        pitch: [[0.15, 0], [0.7, 0.4], [2.6, 0.4], [3.2, 0]],
+        yaw: [[0.15, 0], [0.7, -0.22], [1.3, -0.12], [1.65, -0.22], [2.4, -0.1], [2.7, -0.12], [3.3, 0]],
+        lut: [[0.3, 0], [0.8, 0.03], [2.6, 0.03], [3.2, 0]],
+        axV: [[0.4, 0], [0.9, 6], [2.6, 6], [3.2, 0]],
+        brynX: [[2.5, 0], [2.9, 0.45], [3.7, 0]],
+        brynY: [[2.5, 0], [2.9, 0.35], [3.7, 0]],
+        le: [[2.6, 0], [3.1, 0.35], [4.0, 0]],
+      },
+      A: [
+        kanten(0.55, -320, 35, 575),
+        kanten(0.75, -320, 0, 575),
+        kanten(1.3, -185, 0, 565),
+        kanten(1.45, -195, 28, 565),
+        kanten(1.7, -315, 32, 575),
+        kanten(1.9, -315, 0, 575),
+        kanten(2.4, -180, 0, 565),
+        [2.65, [-200, -195, 580], PA, [0.6, 0.2, 0.75], [0.2, -0.9, 0.35], 0.2, 0],
+        hemA(3.2),
+      ],
+      // (fingrarna raka och tätt ihop medan han sopar, och han borstar av dem efteråt)
+      fA: {
+        spar: [[0.5, 1], [2.45, 1], [2.7, 0.6]], tumme: [[0.5, 0.1], [2.45, 0.1], [2.7, 0.45]],
+        sv: { amp: [[2.6, 0], [2.72, 1], [3.05, 1], [3.2, 0]], f: 4.5, x: [7, 0, 0], F: [0.18, 0, 0] },
+      },
+    },
+    // Han pekar på en med pekfingret och tummen upp, som en pistol, och blinkar: pang, du och jag.
+    pang: {
+      k: {
+        yaw: [[0.2, 0], [0.7, 0.15], [2.4, 0.15], [3.1, 0]],
+        pitch: [[0.2, 0], [0.7, -0.15], [1.25, -0.15], [1.4, -0.3], [1.65, 0.2], [2.0, -0.05], [2.6, -0.05], [3.2, 0]],
+        roll: [[0.2, 0], [0.7, -0.06], [2.4, -0.06], [3.1, 0]],
+        lut: [[0.3, 0], [0.8, 0.03], [2.4, 0.03], [3.0, 0]],
+        brynY: [[0.8, 0], [1.1, 0.45], [2.0, 0.4], [2.6, 0]],
+        le: [[0.2, 0], [0.8, 0.75], [2.5, 0.75], [3.4, 0]],
+        kis: [[0.5, 0], [0.9, 0.35], [2.5, 0.35], [3.2, 0]],
+        vink: [[1.35, 0], [1.5, 1], [1.85, 1], [2.05, 0]],
+        munn: [[1.38, 0], [1.44, 0.04], [1.52, 0]],
+      },
+      A: [
+        greppA(0.45, [-235, 120, 560], [0.6, 0.6, 0.5], 0.8, PEKA_P),
+        greppA(0.85, PANG, [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        greppA(1.38, PANG, [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        greppA(1.48, [PANG[0] + 3, PANG[1] + 18, PANG[2] - 10], [0.02, 0.74, 0.67], 0.95, PEKA_P, 1),
+        greppA(1.7, PANG, [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        greppA(2.35, [PANG[0] - 2, PANG[1] - 3, PANG[2]], [0.02, 0.5, 0.87], 0.95, PEKA_P, 1),
+        hemA(2.95),
+      ],
+      fA: { tumme: [[0.5, 1], [2.4, 1], [2.9, 0.45]], e8: [[0.5, 1], [2.4, 1], [2.9, 0]] },
     },
   });
   // Klippen in i tidslinjen: nycklarna i tidslinjens tid, med början och slut.
@@ -4881,9 +5369,10 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
   // handen först bakåt och sedan ned (eller upp och sedan fram), så att den inte går genom disken.
   const tidning = byggTidning(bord);
   S.add(tidning.mesh);
+  S.add(tidning.blad);
   // tidningen han tar upp nästa gång, i stället för klippets: 'hg' (Helgarderat) eller null
   let blad = null;
-  const TS = { beta: 0, buk: 0, vag: 0, fas: 0 };
+  const TS = { beta: 0, buk: 0, vag: 0, fas: 0, vand: 0, gy: 0.25 };
   // greppet: handflatan så långt utanför kanten, handens origo så långt bakom papperet (längs fingrarna),
   // fingrarnas vinkel uppåt och deras krok
   const TG = { UT: 24, BAK: 64, UPP: 22 * DEG, KROK: 0.62 };
@@ -4922,11 +5411,37 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     tP.copy(tgX).multiplyScalar(sida);
     tH.copy(tg0).addScaledVector(tP, -TG.UT).addScaledVector(tF, -TG.BAK);
   }
+  // höger hand i hörnet på bladet han vänder (bladYta, på höjden gy), som tGrepp med den högra handen: på den högra
+  // halvan är bladets u samma som −qx
+  function bGrepp(gy) {
+    const e = 0.01;
+    bladYta(1, gy, TS, tg0).applyMatrix4(tM);
+    bladYta(1 - e, gy, TS, tg1).applyMatrix4(tM);
+    bladYta(1, gy, TS, tg2).applyMatrix4(tM);
+    tgX.subVectors(tg1, tg2).normalize();
+    bladYta(1, gy + e, TS, tg1).applyMatrix4(tM);
+    bladYta(1, gy - e, TS, tg2).applyMatrix4(tM);
+    tgY.subVectors(tg1, tg2).normalize();
+    tgN.crossVectors(tgX, tgY).normalize();
+    tF.copy(tgN).multiplyScalar(Math.cos(TG.UPP)).addScaledVector(tgY, Math.sin(TG.UPP)).normalize();
+    tP.copy(tgX);
+    tH.copy(tg0).addScaledVector(tP, -TG.UT).addScaledVector(tF, -TG.BAK);
+  }
+  const bW = v();
+  const bPl = v();
+  // Papperet lever lite medan han håller det (2026-11-19): det följer andningen och händerna, som aldrig håller helt
+  // still, med några långsamma svängningar som inte går jämnt upp. Förut stod det som fastskruvat mellan bitarna.
+  // [kanal, styrka, hastighet (rad/s), fas]
+  const LEV_T = [['y', 1.4, 1.17, 0], ['y', 0.7, 2.31, 1.3], ['tilt', 0.007, 0.71, 0.4], ['roll', 0.005, 0.53, 2.1], ['yaw', 0.005, 0.41, 4.2], ['beta', 0.012, 0.37, 0.9]];
+  const levT = (x, n) => LEV_T.reduce((sum, [k, a, w, f]) => (k === x ? sum + a * Math.sin(n * w + f) : sum), 0);
   // → hur mycket händerna håller den (0–1)
   function tidningArm(t, n, kl, a, b) {
     const L = kl.las;
     const s = (x) => spar(L[x], t);
-    TS.beta = s('beta');
+    const mot = s('mot');
+    // (bara när han håller den, inte på väg ur knät)
+    const lev = (x) => s(x) + mot * levT(x, n);
+    TS.beta = lev('beta');
     TS.buk = s('buk');
     TS.vag = s('vag');
     TS.fas = n * 15;
@@ -4935,14 +5450,36 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
     U_.uBuk.value = TS.buk;
     U_.uVag.value = TS.vag;
     U_.uFas.value = TS.fas;
-    tE.set(-s('tilt'), s('yaw'), s('roll'), 'YXZ');
+    tE.set(-lev('tilt'), lev('yaw'), lev('roll'), 'YXZ');
     tQ.setFromEuler(tE);
-    tM.compose(tPos.set(s('x'), s('y'), s('z')), tQ, ETT);
+    tM.compose(tPos.set(s('x'), lev('y'), s('z')), tQ, ETT);
     tidning.mesh.matrix.copy(tM);
     tidning.mesh.matrixWorldNeedsUpdate = true;
     tidning.mesh.visible = true;
-    const mot = s('mot');
     const gy = s('gy');
+    // bladet han vänder: syns medan det är på väg över (inte när det ligger, och inte när vand går tillbaka till 0 efter
+    // biten, bladdra)
+    const vand = L.vand ? s('vand') : 0;
+    const vH = L.vH ? s('vH') : 0;
+    const blad = tidning.blad;
+    blad.visible = vand > 0.002 && vand < 0.995 && spar(L.vand, t - 0.02) <= vand;
+    if (blad.visible) {
+      TS.vand = vand;
+      TS.gy = gy;
+      tidning.UB.uVand.value = vand;
+      tidning.UB.uGy.value = gy;
+      blad.matrix.copy(tM);
+      blad.matrixWorldNeedsUpdate = true;
+    }
+    if (vH > 0) {
+      TS.vand = vand;
+      TS.gy = gy;
+      bGrepp(gy);
+      cPol.set(-0.42, -0.88, -0.3).normalize();
+      vristTill(sa, tH, cPol, cU);
+      bW.copy(cW);
+      bPl.copy(cPol);
+    }
     for (let i = 0; i < 2; i++) {
       const sida = i ? -1 : 1;
       const vila = i ? VILA_B : VILA_A;
@@ -4957,6 +5494,14 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       tW[i].copy(cW);
       tFs[i].copy(tF);
       tPs[i].copy(tP);
+    }
+    // höger hand i bladets hörn medan han vänder det (vH)
+    if (vH > 0) {
+      bGrepp(gy);
+      tW[0].lerp(bW, vH);
+      tPl[0].lerp(bPl, vH);
+      tFs[0].lerp(tF, vH).normalize();
+      tPs[0].lerp(tP, vH).normalize();
     }
     for (let i = 0; i < 2; i++) {
       const h = i ? b : a;
@@ -5450,7 +5995,8 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
         const nas = sort === 'nasa';
         if (!nas) {
           iHuvud(pust || strale ? MUNHORN : MUND, rm);
-          riktH(pust ? PUFF : strale ? STRALE : BLAS, rd);
+          // (rikt: en egen riktning i huvudets mått, som rakt upp mot taket i taket)
+          riktH(r.rikt || (pust ? PUFF : strale ? STRALE : BLAS), rd);
         } else riktH(NASDIR, rd);
         for (let i = 0; i < kb; i++) {
           if (nas) iHuvud(NASAN[nasa++ % 2], rm);
@@ -5624,7 +6170,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1 } = {}) {
       tidning.visa(blad && tidning.har(blad) ? blad : kl.tidning);
       tidningArm(t, n, kl, a, b);
     }
-    else tidning.mesh.visible = false;
+    else tidning.mesh.visible = tidning.blad.visible = false;
     // glasögonen: i fickan, på näsan eller i höger hand
     const gx = glasArm(t, kl, sa, a);
     if (gx) extraA = gx;

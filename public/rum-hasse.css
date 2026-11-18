@@ -69,7 +69,7 @@
 /* samtalet kommer när man har vänt sig mot honom */
 .rh-samtal, .rh-fot { transition: opacity 0.32s ease-out; }
 .rum.hasse-pan .rh-samtal, .rum.hasse-pan .rh-fot, .rum.hasse-pan .rh-mork { opacity: 0; pointer-events: none; }
-.rh-samtal { position: absolute; top: 12%; bottom: 52px; z-index: 2; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
+.rh-samtal { position: absolute; top: 12%; bottom: 18px; z-index: 2; display: flex; flex-direction: column; font-size: clamp(15px, 1.22vw, 18px); line-height: 1.42; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9); }
 .rh-sagt { flex: none; min-height: 1.15em; font: 700 1.62em/1.15 Fraunces, Georgia, serif; margin: 0 0 0.4em; }
 /* över matchlistan alltid plats för två rader, så att listan står still vad han än säger */
 .rh-sagt:has(+ .rh-lista, + .rh-kol) { min-height: 2.3em; text-wrap: balance; }
@@ -159,7 +159,7 @@
    inte till, börjar frågan ändå överst. */
 .rh-samtal:has(> .rh-gang) { text-align: center; }
 .rh-sagt:has(+ .rh-gang) { display: flex; flex-direction: column; justify-content: flex-end; }
-.rum-hasse-vy:not(.hog) .rh-samtal:has(> .rh-gang) { bottom: max(52px, calc(100% - var(--kant, 60%))); }
+.rum-hasse-vy:not(.hog) .rh-samtal:has(> .rh-gang) { bottom: max(18px, calc(100% - var(--kant, 60%))); }
 .rum-hasse-vy:not(.hog) .rh-sagt:has(+ .rh-gang) { margin-top: auto; }
 .rum-hasse-vy:not(.hog) .rh-gang { margin-bottom: auto; }
 @media (hover: hover) {
@@ -246,13 +246,8 @@
    sekund av klockan på text-tv:n, och ett trettiotal gånger i rad när gatan ritades.) */
 .rum-hdr.undan { opacity: 0; pointer-events: none; }
 .rh-fot { position: absolute; bottom: 14px; z-index: 2; display: flex; justify-content: flex-end; pointer-events: none; }
-.rh-ljud { flex: none; font-size: 12px; pointer-events: auto; }
-/* ljudet av och på, längst till vänster */
-.rh-ljud { margin-right: auto; }
-.rh-ljud::after { content: none; }
-.rh-ljud[hidden] { display: none; }
 /* på höjden: han överst, samtalet under honom */
-.rum-hasse-vy.hog .rh-samtal { left: 5%; right: 5%; bottom: 54px; width: auto; font-size: 15px; }
+.rum-hasse-vy.hog .rh-samtal { left: 5%; right: 5%; bottom: 18px; width: auto; font-size: 15px; }
 .rum-hasse-vy.hog .rh-fot { left: 5%; right: 5%; }
 .rum-hasse-vy.hog .rh-text, .rum-hasse-vy.hog .rh-fragan { font-size: 1em; }
 .rum-hasse-vy.hog.kragen .rh-text { font-size: 16px; line-height: 1.5; }
@@ -260,11 +255,6 @@
 .rum-hasse-vy.hog.kragen .rh-text p:last-child { margin-bottom: 0; }
 /* (två rader för det han säger om kupongen, också innan han har sagt det, nertill mot rutorna) */
 .rum-hasse-vy.hog.kragen .rh-fragan { min-height: 2.84em; align-content: end; }
-/* (och svaren i två rader, knapparna och under dem Matchbladet) */
-.rum-hasse-vy.hog.kragen .rh-slut::before { content: ''; flex-basis: 100%; order: 1; }
-.rum-hasse-vy.hog.kragen .rh-slut > .rh-vag { order: 2; }
-/* (under domen över en kupong finns bara Tillbaka) */
-.rum-hasse-vy.hog.kragen .rh-domen ~ .rh-slut::before { content: none; }
 .rum-hasse-vy.hog.kragen .rh-text.mer { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent); }
 .rum-hasse-vy.hog .rh-domen { font-size: 1em; }
 .rum-hasse-vy.hog .rh-sagt { font-size: 1.4em; margin-bottom: 0.2em; }
