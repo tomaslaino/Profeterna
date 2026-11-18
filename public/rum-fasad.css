@@ -23,9 +23,9 @@
 .rum.fasad-tackt > .rum-sving { visibility: hidden; content-visibility: hidden; }
 .rum.fasad-tackt > .rum-sving * { visibility: hidden !important; }
 
-/* gänget i fönstret, i gängets egen duk som rummet lånar ut (glas i rum.js): lite mjukt, som genom glas på
-   några meters håll */
-.rf-gang { position: absolute; filter: blur(0.6px) saturate(0.9); }
+/* gänget i fönstret, i gängets egen duk som rummet lånar ut (glas i rum.js): ur fokus, som genom glas på några
+   meters håll när ögat är ställt på glaset (rummet bakom är ännu suddigare, rf-inne-b i rum-fasad.js) */
+.rf-gang { position: absolute; filter: blur(1.3px) saturate(0.9); }
 
 /* neonen glappar som inne (neonOn i rum.js) */
 .rf-neon-av { opacity: 0; }
@@ -39,9 +39,11 @@
 /* högtidspyntet i skyltfönstret och på dörren, ritat en gång (o.pynt i rum-fasad.js): skarpt, närmast glaset */
 .rf-pynt { position: absolute; pointer-events: none; }
 
-/* I telefonen ingen oskärpa på gänget: den blev ett eget pass på grafikkortet */
+/* I telefonen är fönstret ungefär hälften så stort, och duken har en bildpunkt per px i stället för två
+   (GANG_LATT i rum-fasad.js): en fjärdedel av gängets arbete på grafikkortet, mer än oskärpan kostar.
+   Förut var den skarp där (filter: none), och med färre bildpunkter utan oskärpa blev den kantig. */
 @media (max-width: 700px), (max-height: 500px) {
-  .rf-gang { filter: none; }
+  .rf-gang { filter: blur(0.65px) saturate(0.9); }
 }
 
 @media (prefers-reduced-motion: reduce) {

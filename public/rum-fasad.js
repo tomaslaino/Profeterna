@@ -51,6 +51,9 @@ window.RumFasad = (() => {
   const hx = (a) => `#${a.map((x) => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0')).join('')}`;
   const mix = (a, b, t) => { const A = rgb(a); const B = rgb(b); return hx(A.map((x, i) => x + (B[i] - x) * t)); };
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
+  // Gänget i fönstret ur fokus (ögat är ställt på glaset, oskärpan på .rf-gang i rum-fasad.css). I telefonen en
+  // bildpunkt per px i gängets duk (rita), inte två: oskärpan döljer det, och det är en fjärdedel av arbetet.
+  const GANG_LATT = 1;
 
   // ---------- måtten ----------
   //
@@ -3632,9 +3635,9 @@ window.RumFasad = (() => {
         <clipPath id="rf-hal"><path clip-rule="evenodd" d="M${VARLD.x0} ${VARLD.y0} H${VARLD.x1} V${VARLD.y1} H${VARLD.x0} Z M${FON.x} ${FON.y} h${FON.w} v${FON.h} h${-FON.w} Z M${DORR.x} ${DORR.y} h${DORR.w} v${DORR.h} h${-DORR.w} Z"/></clipPath></defs>`;
       const glasX = FON.x - V.x;
       const glasY = FON.y - V.y;
-      // (gängets bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden)
+      // (gängets bildpunkter: fönstrets storlek på skärmen, högst 1400 på bredden; i telefonen GANG_LATT per px)
       const k = Math.min(innerWidth / V.w, innerHeight / V.h);
-      const pr = Math.min(2, devicePixelRatio || 1);
+      const pr = LATT ? GANG_LATT : Math.min(2, devicePixelRatio || 1);
       const dw = Math.round(Math.min(1400, FON.w * k * pr));
       F.glasPx = { w: dw, h: Math.round(dw * FON.h / FON.w) };
       const gamla = dukarna(F.ro);

@@ -7353,6 +7353,13 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   väggen och trottoaren. Gänget är 30 % mörkare (`KVALL_UTE` i rum-3d.js, exponeringen när de ritas utifrån: det
   mesta av ljuset på dem kommer från rummets miljö, och med bara lamporna dämpade blev de 7 % mörkare), så att de
   fortfarande står ut mot rummet bakom. Neonen lyser som förut och syns därför mer. Dagen och natten är som förut.
+- **Gänget ur fokus (2026-11-18, användarens önskemål):** "Vi behöver inte vara så i fokus heller!" Ögat är ställt
+  på glaset: skylten, neonen och guldet på dörren är skarpa, gänget mjukt ur fokus och rummet bakom ännu suddigare.
+  I datorn är oskärpan på gängets duk 1,3 px (förut 0,6). I telefonen var gänget helt skarpt (`filter: none`, för
+  att spara på grafikkortet); nu har duken en bildpunkt per px i stället för två (`GANG_LATT` i rum-fasad.js) och
+  0,65 px oskärpa, ungefär lika mycket i förhållande till fönstret som i datorn. En fjärdedel av bildpunkterna i
+  gängets 3D-bild sparar mer än oskärpan kostar. Med färre bildpunkter utan oskärpa blev gänget kantigt i stället
+  för mjukt, eftersom telefonen ritar det utan kantutjämning.
 - **Ljuset (`kvallsljus`):** på dagen skuggor under gesimsen, skylten och svanhalsarna och i portens valv, så att
   fasaden får djup. På kvällen är bottenvåningen och trottoaren mörkare (en mask med mjuka hål där något lyser) och
   uppåt mörknar det, så att blicken stannar vid affären; ljuset är skarpt: käglor från svanhalsarna ned över skylten,
