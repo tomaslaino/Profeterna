@@ -492,9 +492,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   gammal vana, och medan han väntar tar han tidningen då och då som kaffet och cigarren. Att han redan läser när man
   kommer gör han bara ibland ("Det här gör han ibland - absolut inte alltid!"): var fjärde gång av vana och varannan
   gång när det har gått dåligt (förut varannan gång och alltid). Läser han när man kommer tittar han upp på en just när
-  kameran har stannat, alltid med glasögonen på.
-  Tre gånger av fyra är det Helgarderat, och det görs klart medan hans bild byggs, så att det finns redan då (se
-  *Tidningen* under [Hasse Backe](#hasse-backe))
+  kameran har stannat, alltid med glasögonen på. Tre gånger av fyra är det Helgarderat, och det görs klart medan hans
+  bild byggs, så att det finns redan då (se *Tidningen* under [Hasse Backe](#hasse-backe))
+- [x] **Fler sätt att läsa av vana (2026-11-18, användarens önskemål: "Gör fler tidningsvarianter som passar"):** av vana
+  läste han bara på två sätt, för i de andra tre står det något i tidningen som säger att han hade fel. Nu finns tre
+  till, där han är nöjd med det han läser: han tittar upp och blinkar åt en, skrattar tyst för sig själv, funderar på
+  en svår match tills det lossnar och blir imponerad med en tyst vissling (`lasa6`–`lasa8`; se *Tidningen* under
+  [Hasse Backe](#hasse-backe))
 
 ## Publicering
 
@@ -2224,6 +2228,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   (`LAS_UPPTAGEN`; förut alltid), tidningen är en av hans vanor bredvid kaffet och cigarren (`VANA_TIDNING`), han
   tittar upp på en när kameran har stannat (`kom` i klippen), och Helgarderat är tidningen tre gånger av fyra
   (`HG_ANDEL`). Se [Hasse Backe](#hasse-backe), *Tidningen*.
+- **Fler sätt att läsa av vana (2026-11-18, användarens önskemål):** "Gör fler tidningsvarianter som passar". Tre nya
+  klipp, `lasa6`–`lasa8`, där inget i tidningen säger att han hade fel och han är nöjd med det han läser, av de vanliga
+  bitarna och fyra nya: `blinkar`, `fniss`, `fundera` och `imponerad`. Av vana läser han nu på fem sätt (`VANA_LAS`).
+  Se [Hasse Backe](#hasse-backe), *Tidningen*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -10226,7 +10234,28 @@ Fnysningen, utandningen och prasslet räknas fram med Web Audio som de andra lju
 räknade fram i en `OfflineAudioContext` (toppar 0,06–0,10, som andetaget på glasögonen) men inte lyssnade på. Bitarna är provade bild för bild i headless Chromium (1280 × 800), med närbilder av
 ansiktet, och tidningen går inte ned i disken i något av de nya klippen (samma räkning som ovan).
 
-Han läser Dagens Nyheter (`lasa`, `lasa3` och `lasa5`) eller Svenska Dagbladet (`lasa2` och `lasa4`), och de ska se ut som de riktiga (Tomas önskemål
+Av vana (2026-11-18, användarens önskemål: "Gör fler tidningsvarianter som passar") läser han på fem av de åtta sätten:
+`lasa` och `lasa2`, och tre som är gjorda för det, `lasa6`, `lasa7` och `lasa8` (`VANA_LAS` i rum-hasse.js). I dem står
+inget om att han hade fel; oftast läser han Helgarderat, med sin egen krönika, och han är nöjd med det han läser och med
+sig själv. De är byggda av de vanliga bitarna och fyra nya:
+
+- `blinkar`: han tittar upp på en över tidningen med ett snett leende och blinkar med ena ögat (vi vet, du och jag).
+  Den räknas som en av bitarna där han tittar upp när man kommer (`KOM`), så i `lasa6` och `lasa8` kan han blinka åt en
+  just när kameran har stannat.
+- `fniss`: blicken stannar, leendet växer och han kisar, och han skrattar tyst för sig själv med tre små stötar i
+  axlarna och huvudet, med en kort pust för varje (`anda` med `pust`).
+- `fundera`: en svår match. Brynen dras ihop, han lutar sig närmare med huvudet på sned och munnen spetsad och läser
+  raden en gång till, och så lossnar det: brynen upp, en kort nick, och han läser vidare.
+- `imponerad`: brynen åker upp och han spetsar munnen till en tyst vissling, drar huvudet lite bakåt och nickar
+  långsamt och uppskattande.
+
+Medan han tittar ned i tidningen öppnar han aldrig ögonen mer än lite: med locken högre upp syns irisens överkant, och då
+ser det ut som att han kikar på en över glasögonen (så såg `fundera` ut först). Tidningen rör sig i de nya bitarna bara
+lite, upp eller ned som i `glimt`. Provat bild för bild i headless Chromium med mjukvarugrafik i telefonens mått
+(412 × 915, dubbel upplösning), med närbilder av ansiktet och med Helgarderat i händerna; pusten i `fniss` är inte
+lyssnad på.
+
+Han läser Dagens Nyheter (`lasa`, `lasa3`, `lasa5`, `lasa6` och `lasa8`) eller Svenska Dagbladet (`lasa2`, `lasa4` och `lasa7`), och de ska se ut som de riktiga (Tomas önskemål
 2026-11-09): tabloid på grått tidningspapper, med namnet i tidningens stil (skrivet som text, inte loggan: DN:s i en Bodoni,
 Playfair Display i [public/typsnitt.css](public/typsnitt.css), SvD:s i spärrade versaler), dagens datum, nummer, årgång och pris,
 tre puffar med små bilder, en stor bild och dagens nyhet med vinjett, rubrik, ingress och sidhänvisning, och innehållet längst
