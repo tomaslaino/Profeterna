@@ -1805,7 +1805,7 @@ ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div>
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
+<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tamed" ${KNAPP} hidden>Ta med tv:n</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
     document.querySelector('main').prepend(el);
     R.el = el;
     R.varldar = [...el.querySelectorAll('.rum-world')];
@@ -1815,7 +1815,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     wire();
     // kort: högst elva tecken
     R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [], avVal: (on) => { if (window.RumBild) RumBild.avVal(on); } }) : null;
-    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång och Visa dig på tv:n i foten
+    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång, och Visa dig på tv:n och
+    // Ta med tv:n i foten
     if (window.RumBild && R.tv) RumBild.mount(el, { tv: R.tv });
     tangenter();
     // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet
@@ -7364,7 +7365,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // (lopsedel: veckans löpsedel, färdigritad, som hänger hos Hasse Backe, rum-hasse.js; null innan sakerna är ritade)
   return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, lopsedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null),
     // Helgarderats senaste nummer, samma som på pulten (Hasse Backe läser det ibland, rum-hasse.js). → Promise: upplagan eller null
-    numret: hamtaTidning, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+    numret: hamtaTidning, smal: () => Boolean(R.smal),
+    // fram till tv:n (den lilla tv:n som följde med, rum-bild.js)
+    tv: () => { if (R.on && !R.zoom) zoomTv(true); }, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

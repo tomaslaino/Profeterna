@@ -1024,6 +1024,9 @@ canvas.rum-neonhalo { opacity: var(--sken, 0.28); }
    i rummet så länge den är tänd – med en röd lampa före, som på en kamera som spelar in. */
 .rum-ft a.rum-bildknapp { display: none; cursor: pointer; padding: 10px 18px; margin: -10px -18px; background: radial-gradient(closest-side, rgba(8, 5, 2, 0.72), rgba(8, 5, 2, 0)); text-shadow: 0 0 3px #000, 0 1px 8px #000, 0 0 16px #000; white-space: nowrap; }
 .rum.tv-nara .rum-ft a.rum-bildknapp:not([hidden]), .rum-ft a.rum-bildknapp.pa:not([hidden]) { display: inline; }
+/* Ta med tv:n: nära tv:n när den står på AV – tv:n krymper till hörnet och följer med till den vanliga sidan */
+.rum-ft a.rum-tamed { display: none; cursor: pointer; padding: 10px 18px; margin: -10px -18px; background: radial-gradient(closest-side, rgba(8, 5, 2, 0.72), rgba(8, 5, 2, 0)); text-shadow: 0 0 3px #000, 0 1px 8px #000, 0 0 16px #000; white-space: nowrap; }
+.rum.tv-nara .rum-ft a.rum-tamed:not([hidden]) { display: inline; }
 .rum-ft a.rum-bildknapp.sander::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; vertical-align: 1px; background: #ff3a2a; box-shadow: 0 0 6px 1px rgba(255, 58, 42, 0.75); animation: rum-bildlampa 2s ease-in-out infinite; }
 @keyframes rum-bildlampa { 50% { opacity: 0.45; } }
 @media (prefers-reduced-motion: reduce) { .rum-ft a.rum-bildknapp.sander::before { animation: none; } }
@@ -1157,6 +1160,10 @@ canvas.rum-svag { opacity: 0.05; }
    ryms inte bredvid namnet), tills den är släckt. */
 .rum.smal.tv-nara:has(.rum-bildknapp:not([hidden])) .rum-hdr { opacity: 0; pointer-events: none; }
 .rum.smal .rum-ft:has(.rum-bildknapp.pa:not([hidden])) .rum-vanlig { display: none; }
+/* Ta med tv:n går också till den vanliga sidan: där uppe står den i stället för Vanlig sida, och de tre står
+   lite tätare */
+.rum.smal.tv-nara .rum-ft:has(.rum-tamed:not([hidden])) { gap: 24px; }
+.rum.smal.tv-nara .rum-ft:has(.rum-tamed:not([hidden])) .rum-vanlig { display: none; }
 /* Rummet på höjden står längre bort än scenen är hög (fit i rum.js): taket och pulten fortsätter
    utanför, och ljuset och mörkret med dem. */
 .rum.smal .rum-stage { overflow: visible; background: none; }
