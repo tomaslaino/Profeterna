@@ -12,7 +12,7 @@
 //
 // Genom skyltfönstret syns rummet, vagt: gänget vid barbordet bakifrån, ritat i 3D av samma scen som
 // inne, i gängets egen duk som rummet lånar ut till fönstret (glas, utifran i rum-3d.js), med neonskylten Tobak, som läses rätt härifrån, skivan med
-// löpsedlarna med baksidan ut, där Stryktipsets och Svenska Spels affischer sitter (reklam), och rummet bakom i ljuset från lysröret – eller i neonens och tv:ns sken
+// löpsedlarna med baksidan ut, där Svenska Spels affischer från 90-talet sitter (reklam), och rummet bakom i ljuset från lysröret – eller i neonens och tv:ns sken
 // när lysröret är släckt på natten (RumFolk.nattGrad). På dagen speglar glaset himlen och gatan, och
 // rummet syns svagare; på kvällen lyser det ut på trottoaren. Guldet på dörren står rättvänt, och
 // skylten på sugproppen säger ÖPPET på den här sidan.
@@ -28,7 +28,8 @@
 //     o.gang({ w, h }) ritar gänget i den duken med w × h bildpunkter (false utan), o.takt() hur många gånger i sekunden (som inne),
 //     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.pynt(namn, { w, h, dag }) högtidspyntet
 //     i fönstret ('pyntF') eller på dörren ('pyntP') sett utifrån, en duk w × h eller null (pyntUtifran i
-//     rum-inredning.js), o.calm() utan rörelser
+//     rum-inredning.js), o.sedel() veckans löpsedel, färdigritad (rum-affischer.js), som står i löpsedelsstället
+//     på trottoaren (null innan rummets saker är ritade), o.calm() utan rörelser
 //     (prefers-reduced-motion), o.still en fast bild på den tiden (s, ?rum-t i rum.js): allt som rör sig
 //     står där det är då
 
@@ -333,62 +334,154 @@ window.RumFasad = (() => {
     return `<g filter="url(#rf-mjuk)">${s}</g>${reklam(sx, sy, sw, sh, L)}`;
   }
 
-  // Svenska Spels reklam på skivans baksida, mot gatan, som i varje tobaksaffär: Stryktipset överst och SPELA HÄR
-  // under, tejpade, lite sneda och solblekta. Affischerna sitter mot glaset och är skarpa (skivan bakom är ur
-  // fokus), och på kvällen ligger de i svanhalsarnas sken (kvallsljus). Inifrån syns de inte: där är skivans
-  // framsida med löpsedlarna (rum-affischer.js). Egna affischer i tipsets anda, inte Svenska Spels märke.
+  // Svenska Spels reklam på skivans baksida, mot gatan, som i en tobaksaffär på 90-talet: Stryktipset överst
+  // (bollen i en solfjäder, kursiv rubrik med kontur och skugga och en stjärna med 13 rätt), Triss och Lotto
+  // under (jackpotten skriven för hand med tuschpenna) och ombudsdekalen på glaset nedanför. Allt har suttit
+  // där i åratal: rött och gult har bleknat i solen (blått står sig), rastret syns, tejpen har gulnat, ett hörn
+  // har släppt och vikit sig och stora affischen har ett veck. Affischerna sitter mot glaset och är skarpa
+  // (skivan bakom är ur fokus), och på kvällen ligger de i svanhalsarnas sken (kvallsljus). Inifrån syns de inte:
+  // där är skivans framsida med löpsedlarna (rum-affischer.js). Egna affischer i tidens anda, inte Svenska
+  // Spels märken.
   function reklam(sx, sy, sw, sh, L) {
-    const blek = (c) => mix(c, '#efe4cc', 0.12);
-    const gradde = '#f6edd8';
-    const bla = blek('#16306a');
-    const rod = blek('#b3241c');
+    const sol = (c, t = 0.22) => mix(c, '#efe2c6', t);
     const morkt = r1(0.3 * (1 - L.dag));
-    const anton = 'font-family="Anton, Impact, sans-serif"';
-    // en affisch: skuggan på skivan, papperet, innehållet, kvällens mörker och tejpen i hörnen
-    const affisch = (r, vrid, inner) => {
-      const tejp = [[2, -2, -8], [r.w - 16, -2, 7], [2, r.h - 3, 6], [r.w - 16, r.h - 3, -9]]
-        .map(([tx, ty, tv]) => `<rect x="${tx}" y="${ty}" width="14" height="5" fill="#f2ead2" opacity=".6" transform="rotate(${tv} ${tx + 7} ${ty + 2.5})"/>`).join('');
-      return `<g transform="translate(${r1(r.x)} ${r1(r.y)}) rotate(${vrid} ${r1(r.w / 2)} ${r1(r.h / 2)})">` +
-        `<rect x="1.5" y="2" width="${r1(r.w)}" height="${r1(r.h)}" fill="#000" opacity=".3"/>${inner}` +
-        (morkt > 0 ? `<rect width="${r1(r.w)}" height="${r1(r.h)}" fill="#000" opacity="${morkt}"/>` : '') + `${tejp}</g>`;
+    const ANTON = 'font-family="Anton, Impact, sans-serif"';
+    const SLAB = 'font-family="\'Alfa Slab One\', Georgia, serif"';
+    const FRAUN = 'font-family="Fraunces, Georgia, serif" font-style="italic"';
+    const bla = sol('#1d3b8f', 0.1);
+    const gul = sol('#ffd21f', 0.25);
+    const vit = '#f8f1e2';
+    const stjarna = (cx, cy, R, r, n) => {
+      let d = '';
+      for (let i = 0; i < n * 2; i++) {
+        const v = (i * Math.PI) / n - Math.PI / 2;
+        const rr = i % 2 ? r : R;
+        d += `${i ? 'L' : 'M'}${r1(cx + rr * Math.cos(v))} ${r1(cy + rr * Math.sin(v))}`;
+      }
+      return `${d}Z`;
     };
-    // Stryktipset: blått band, namnet, en stor 13 RÄTT och en liten kupong med kryss
-    const a = { x: sx + 5, y: sy + 6, w: sw - 10, h: sh * 0.64 };
-    let A = `<rect width="${r1(a.w)}" height="${r1(a.h)}" fill="${rod}"/>`;
-    A += `<rect x="3.5" y="3.5" width="${r1(a.w - 7)}" height="${r1(a.h - 7)}" fill="none" stroke="${gradde}" stroke-opacity=".55" stroke-width=".8"/>`;
-    A += `<rect x="3.5" y="3.5" width="${r1(a.w - 7)}" height="14" fill="${bla}"/>`;
-    A += `<text x="${r1(a.w / 2)}" y="13.6" text-anchor="middle" ${anton} font-size="8" letter-spacing="2.2" fill="${gradde}">SVENSKA SPEL</text>`;
-    A += `<text x="${r1(a.w / 2)}" y="40" text-anchor="middle" ${anton} font-size="21" textLength="${r1(a.w - 14)}" lengthAdjust="spacingAndGlyphs" fill="${gradde}">STRYKTIPSET</text>`;
-    A += `<line x1="8" y1="46" x2="${r1(a.w - 8)}" y2="46" stroke="${blek('#f2c230')}" stroke-width="1.2"/>`;
-    const tx = a.w * 0.33;
-    A += `<text x="${r1(tx + 1.6)}" y="104.5" text-anchor="middle" font-family="'Alfa Slab One', Georgia, serif" font-size="58" fill="#000" opacity=".35">13</text>`;
-    A += `<text x="${r1(tx)}" y="103" text-anchor="middle" font-family="'Alfa Slab One', Georgia, serif" font-size="58" fill="${blek('#f2c230')}">13</text>`;
-    A += `<text x="${r1(tx)}" y="120" text-anchor="middle" ${anton} font-size="14" letter-spacing="3" fill="${gradde}">RÄTT</text>`;
-    // (kupongen: 1 X 2 överst och ett kryss eller två på varje rad, alltid samma)
-    const kx = a.w * 0.64;
-    const ruta = 6.4;
-    let K = `<rect x="${r1(kx - 3)}" y="52" width="${r1(ruta * 3 + 6)}" height="${r1(ruta * 8 + 12)}" fill="${gradde}"/>`;
-    ['1', 'X', '2'].forEach((t, i) => { K += `<text x="${r1(kx + ruta * i + ruta / 2)}" y="60.5" text-anchor="middle" ${anton} font-size="6" fill="${rod}">${t}</text>`; });
-    const kryss = [[0], [1], [0, 2], [2], [0], [1, 2], [0], [1]];
-    kryss.forEach((k, j) => {
-      for (let i = 0; i < 3; i++) {
-        const rx = kx + ruta * i + 0.8;
-        const ry = 63 + ruta * j + 0.8;
-        K += `<rect x="${r1(rx)}" y="${r1(ry)}" width="${r1(ruta - 1.6)}" height="${r1(ruta - 1.6)}" fill="none" stroke="${rod}" stroke-width=".55"/>`;
-        if (k.includes(i)) K += `<path d="M${r1(rx + 0.8)} ${r1(ry + 0.8)} l${r1(ruta - 3.2)} ${r1(ruta - 3.2)} M${r1(rx + ruta - 2.4)} ${r1(ry + 0.8)} l${r1(-(ruta - 3.2))} ${r1(ruta - 3.2)}" stroke="#1a1a1a" stroke-width=".9" stroke-linecap="round"/>`;
+    let s = `<defs><pattern id="rf-raster" width="2.4" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="1.2" cy="1.2" r=".5" fill="#000"/></pattern>
+      <linearGradient id="rf-stryk" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="${sol('#ff8a1c')}"/><stop offset=".5" stop-color="${sol('#e8361e', 0.26)}"/><stop offset="1" stop-color="${sol('#a8141c', 0.2)}"/></linearGradient>
+      <linearGradient id="rf-triss" x1="0" y1="0" x2=".4" y2="1"><stop offset="0" stop-color="${sol('#2a3a9a', 0.12)}"/><stop offset="1" stop-color="${sol('#6a1f80', 0.18)}"/></linearGradient>
+      <linearGradient id="rf-baksida" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6dcc4"/><stop offset="1" stop-color="#9a8e74"/></linearGradient>
+      <linearGradient id="rf-silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2e2e6"/><stop offset=".5" stop-color="#a9a9b2"/><stop offset="1" stop-color="#d4d4da"/></linearGradient>
+      <clipPath id="rf-boll-k"><circle cx="0" cy="0" r="15"/></clipPath></defs>`;
+    // en affisch: skuggan, papperet, rastret, solen, kvällens mörker, ett hörn som har släppt (horn) och tejpen
+    // (gulnad; den som höll hörnet är borta)
+    const affisch = (r, vrid, inner, horn = false) => {
+      const c = 9;
+      const tejp = [[1, -2, -8], [r.w - 15, -2, 7], [1, r.h - 3, 6], ...(horn ? [] : [[r.w - 15, r.h - 3, -9]])]
+        .map(([tx, ty, tv]) => `<rect x="${tx}" y="${ty}" width="14" height="5" fill="#e6cf86" opacity=".55" stroke="#a8925a" stroke-opacity=".35" stroke-width=".4" transform="rotate(${tv} ${tx + 7} ${ty + 2.5})"/>`).join('');
+      let g = `<g transform="translate(${r1(r.x)} ${r1(r.y)}) rotate(${vrid} ${r1(r.w / 2)} ${r1(r.h / 2)})">`;
+      g += `<path d="M1.5 2 H${r1(r.w + 1.5)} V${r1(r.h + 2 - (horn ? c : 0))} L${r1(r.w + 1.5 - (horn ? c : 0))} ${r1(r.h + 2)} H1.5 Z" fill="#000" opacity=".32"/>`;
+      g += `<g${horn ? ` clip-path="url(#rf-horn-${r.id})"` : ''}>${inner}`;
+      g += `<rect width="${r1(r.w)}" height="${r1(r.h)}" fill="url(#rf-raster)" opacity=".07"/><rect width="${r1(r.w)}" height="${r1(r.h)}" fill="#fff4dc" opacity=".08"/></g>`;
+      if (horn) {
+        g = `<defs><clipPath id="rf-horn-${r.id}"><path d="M0 0 H${r1(r.w)} V${r1(r.h - c)} L${r1(r.w - c)} ${r1(r.h)} H0 Z"/></clipPath></defs>${g}`;
+        g += `<path d="M${r1(r.w - c)} ${r1(r.h)} L${r1(r.w)} ${r1(r.h - c)} L${r1(r.w - c - 1)} ${r1(r.h - c - 1)} Z" fill="url(#rf-baksida)"/>`;
+        g += `<path d="M${r1(r.w - c)} ${r1(r.h)} L${r1(r.w - c - 1)} ${r1(r.h - c - 1)}" stroke="#000" stroke-opacity=".25" stroke-width=".6"/>`;
+      }
+      if (morkt > 0) g += `<rect width="${r1(r.w)}" height="${r1(r.h)}" fill="#000" opacity="${morkt}"/>`;
+      return `${g}${tejp}</g>`;
+    };
+
+    // Stryktipset
+    const a = { id: 'a', x: sx + 4, y: sy + 5, w: sw - 8, h: sh * 0.64 };
+    const bx = a.w * 0.76;
+    const by = 27;
+    let A = `<rect width="${r1(a.w)}" height="${r1(a.h)}" fill="url(#rf-stryk)"/>`;
+    // (solfjädern bakom bollen)
+    let fj = '';
+    for (let i = 0; i < 18; i += 2) {
+      const v0 = (i * Math.PI) / 9;
+      const v1 = ((i + 1) * Math.PI) / 9;
+      fj += `M${r1(bx)} ${by} L${r1(bx + 160 * Math.cos(v0))} ${r1(by + 160 * Math.sin(v0))} L${r1(bx + 160 * Math.cos(v1))} ${r1(by + 160 * Math.sin(v1))} Z`;
+    }
+    A += `<svg width="${r1(a.w)}" height="${r1(a.h)}" overflow="hidden"><path d="${fj}" fill="${gul}" opacity=".16"/></svg>`;
+    // (bollen, med fartränder)
+    A += `<path d="M${r1(bx - 22)} ${by - 6} h-14 M${r1(bx - 21)} ${by} h-20 M${r1(bx - 22)} ${by + 6} h-12" stroke="${vit}" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>`;
+    let boll = '<circle r="15" fill="#f7f3ea"/>';
+    const fem = (cx, cy, r, rot) => {
+      let d = '';
+      for (let i = 0; i < 5; i++) {
+        const v = rot + (i * 2 * Math.PI) / 5 - Math.PI / 2;
+        d += `${i ? 'L' : 'M'}${r1(cx + r * Math.cos(v))} ${r1(cy + r * Math.sin(v))}`;
+      }
+      return `${d}Z`;
+    };
+    boll += `<path d="${fem(0, 0, 5.4, 0.2)}" fill="#1a1a1a"/>`;
+    for (let i = 0; i < 5; i++) {
+      const v = 0.2 + (i * 2 * Math.PI) / 5 - Math.PI / 2;
+      const ux = Math.cos(v);
+      const uy = Math.sin(v);
+      boll += `<path d="M${r1(5.4 * ux)} ${r1(5.4 * uy)} L${r1(9.5 * ux)} ${r1(9.5 * uy)}" stroke="#1a1a1a" stroke-width=".8"/>`;
+      boll += `<path d="${fem(14.5 * Math.cos(v + Math.PI / 5), 14.5 * Math.sin(v + Math.PI / 5), 5, v + Math.PI / 5 + Math.PI)}" fill="#1a1a1a"/>`;
+    }
+    A += `<g transform="translate(${r1(bx)} ${by}) rotate(-12)"><g clip-path="url(#rf-boll-k)">${boll}</g><circle r="15" fill="none" stroke="#1a1a1a" stroke-width=".9"/><circle cx="-5" cy="-6" r="5" fill="#fff" opacity=".35"/></g>`;
+    // (rubriken: kursiv, gul med blå kontur och skugga)
+    const rubrik = (t, y, fs) => `<g transform="translate(6 ${y}) skewX(-11)"><text x="2" y="2" ${ANTON} font-size="${fs}" fill="#3a0a0a" opacity=".55">${t}</text><text ${ANTON} font-size="${fs}" fill="${gul}" stroke="${bla}" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke">${t}</text></g>`;
+    A += rubrik('STRYK', 54, 25) + rubrik('TIPSET', 79, 25);
+    A += [['VEM BLIR', 97], ['VECKANS', 108], ['MILJONÄR?', 119]].map(([t, y]) => `<text transform="translate(8 ${y}) skewX(-8)" ${ANTON} font-size="9.5" letter-spacing=".4" fill="${vit}">${t}</text>`).join('');
+    // (stjärnan: 13 rätt)
+    const scx = a.w * 0.75;
+    const scy = 104;
+    A += `<path d="${stjarna(scx + 1.5, scy + 2, 21, 15, 14)}" fill="#000" opacity=".3"/><path d="${stjarna(scx, scy, 21, 15, 14)}" fill="${gul}" stroke="${sol('#c8161c', 0.15)}" stroke-width=".7"/>`;
+    A += `<g transform="rotate(-10 ${r1(scx)} ${scy})" text-anchor="middle"><text x="${r1(scx)}" y="${scy + 4}" ${SLAB} font-size="16" fill="${sol('#c8161c', 0.15)}">13</text><text x="${r1(scx)}" y="${scy + 12}" ${ANTON} font-size="6.4" letter-spacing=".6" fill="${bla}">RÄTT!</text></g>`;
+    // (det blå bandet nertill, som står sig i solen)
+    A += `<rect y="${r1(a.h - 22)}" width="${r1(a.w)}" height="1.6" fill="${gul}"/><rect y="${r1(a.h - 20.4)}" width="${r1(a.w)}" height="20.4" fill="${bla}"/>`;
+    A += `<text x="${r1(a.w / 2)}" y="${r1(a.h - 9.5)}" text-anchor="middle" ${ANTON} font-size="8.5" letter-spacing="2.4" fill="${vit}">SVENSKA SPEL</text>`;
+    A += `<text x="${r1(a.w / 2)}" y="${r1(a.h - 3)}" text-anchor="middle" ${FRAUN} font-size="5" fill="${vit}" opacity=".85">Spelstopp lördag 15.59</text>`;
+    // (vecket, där den har legat vikt)
+    A += `<path d="M0 ${r1(a.h * 0.47)} L${r1(a.w)} ${r1(a.h * 0.45)}" stroke="#fff" stroke-opacity=".22" stroke-width="1"/><path d="M0 ${r1(a.h * 0.47 + 0.9)} L${r1(a.w)} ${r1(a.h * 0.45 + 0.9)}" stroke="#000" stroke-opacity=".12" stroke-width=".8"/>`;
+
+    // Triss och Lotto under, sida vid sida
+    const ny = a.y + a.h + 5;
+    const nh = sh - a.h - 12;
+    const nw = (sw - 11) / 2;
+    const b = { id: 'b', x: sx + 3.5, y: ny, w: nw, h: nh };
+    let B = `<rect width="${r1(b.w)}" height="${r1(b.h)}" fill="url(#rf-triss)"/>`;
+    B += `<path d="${stjarna(b.w - 9, 9, 6, 2.4, 4)}" fill="${gul}" opacity=".7"/><path d="${stjarna(8, b.h - 24, 4, 1.6, 4)}" fill="#fff" opacity=".5"/>`;
+    B += `<text x="${r1(b.w / 2)}" y="21" text-anchor="middle" ${SLAB} font-size="15.5" fill="${sol('#f5c842', 0.12)}" stroke="#1a0f3a" stroke-width="1.4" paint-order="stroke">TRISS</text>`;
+    B += `<text x="${r1(b.w / 2)}" y="31" text-anchor="middle" ${ANTON} font-size="7.2" letter-spacing=".5" fill="${vit}">SKRAPA &amp; VINN!</text>`;
+    // (tre fält: två skrapade med en stjärna, det tredje silver med skrapmärken)
+    [0, 1, 2].forEach((i) => {
+      const fx = b.w / 2 + (i - 1) * 15;
+      const fy = 44;
+      if (i < 2) {
+        B += `<circle cx="${r1(fx)}" cy="${fy}" r="6.4" fill="${vit}"/><path d="${stjarna(fx, fy, 4.6, 1.9, 5)}" fill="${sol('#e8361e', 0.1)}"/>`;
+        B += `<circle cx="${r1(fx)}" cy="${fy}" r="6.4" fill="none" stroke="url(#rf-silver)" stroke-width="1.4" stroke-dasharray="3 2"/>`;
+      } else {
+        B += `<circle cx="${r1(fx)}" cy="${fy}" r="6.4" fill="url(#rf-silver)"/><path d="M${r1(fx - 3)} ${fy - 2} l5 3 M${r1(fx - 2)} ${fy + 2} l4 -2" stroke="#7a7a84" stroke-width=".7"/>`;
       }
     });
-    A += K;
-    A += `<text x="${r1(a.w / 2)}" y="${r1(a.h - 10)}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-style="italic" font-size="7.6" fill="${gradde}">Spelstopp lördag 15.59</text>`;
-    // SPELA HÄR: ombudets lapp, på gräddvitt papper
-    const b = { x: sx + 7, y: a.y + a.h + 8, w: sw - 14, h: sh - a.h - 21 };
-    let B = `<rect width="${r1(b.w)}" height="${r1(b.h)}" fill="${blek('#f1e8d0')}"/>`;
-    B += `<rect x="3" y="3" width="${r1(b.w - 6)}" height="${r1(b.h - 6)}" fill="none" stroke="${bla}" stroke-width="1.4"/>`;
-    B += `<text x="${r1(b.w / 2)}" y="27" text-anchor="middle" ${anton} font-size="21" textLength="${r1(b.w - 18)}" lengthAdjust="spacingAndGlyphs" fill="${bla}">SPELA HÄR!</text>`;
-    B += `<line x1="12" y1="33" x2="${r1(b.w - 12)}" y2="33" stroke="${rod}" stroke-width="1.2"/>`;
-    B += `<text x="${r1(b.w / 2)}" y="43" text-anchor="middle" ${anton} font-size="7" letter-spacing=".8" fill="${rod}">TIPS · LOTTO · ODDSET · TRISS</text>`;
-    B += `<text x="${r1(b.w / 2)}" y="${r1(b.h - 7)}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-style="italic" font-size="6.6" fill="#3a3630">Ombud för Svenska Spel</text>`;
-    return affisch(a, -1.2, A) + affisch(b, 0.9, B);
+    B += `<text x="${r1(b.w / 2)}" y="${r1(b.h - 5)}" text-anchor="middle" ${FRAUN} font-size="5" fill="${vit}" opacity=".85">Tre lika – du vinner!</text>`;
+
+    const c = { id: 'c', x: sx + 7.5 + nw, y: ny + 1.5, w: nw, h: nh - 1.5 };
+    let C = `<rect width="${r1(c.w)}" height="${r1(c.h)}" fill="${sol('#f6efda', 0.1)}"/>`;
+    C += `<rect width="${r1(c.w)}" height="18" fill="${sol('#d4201c', 0.24)}"/>`;
+    C += `<text x="${r1(c.w / 2)}" y="14" text-anchor="middle" ${SLAB} font-size="12.5" fill="${vit}">LOTTO</text>`;
+    [['#f2c230', 9], ['#2a6ac8', 28], ['#3a9a4a', 47]].forEach(([fg, kx]) => {
+      C += `<circle cx="${kx}" cy="23.5" r="3" fill="${sol(fg, 0.2)}"/><circle cx="${kx - 0.9}" cy="22.6" r=".9" fill="#fff" opacity=".6"/>`;
+    });
+    C += `<text x="${r1(c.w / 2)}" y="37" text-anchor="middle" ${ANTON} font-size="9.5" letter-spacing=".8" fill="${bla}">JACKPOT</text>`;
+    C += `<rect x="5" y="40" width="${r1(c.w - 10)}" height="17" fill="none" stroke="${bla}" stroke-width=".5" stroke-dasharray="1.5 1.2"/>`;
+    // (för hand, med blå tuschpenna, och inringat med röd)
+    C += `<text x="${r1(c.w / 2)}" y="53.5" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="14" fill="#1b2a9a" transform="rotate(-5 ${r1(c.w / 2)} 50)">25 milj!</text>`;
+    C += `<path d="M${r1(c.w - 6)} 43 C${r1(c.w + 1)} 49 ${r1(c.w - 9)} 59.5 ${r1(c.w / 2)} 58.5 C8 58 1 51 8 44.5 C14 39.5 ${r1(c.w - 14)} 38.5 ${r1(c.w - 4)} 45" fill="none" stroke="#c8201c" stroke-width=".9" stroke-linecap="round" opacity=".8"/>`;
+    C += `<text x="${r1(c.w / 2)}" y="${r1(c.h - 4)}" text-anchor="middle" ${FRAUN} font-size="5" fill="#3a3630">Dragning lördag</text>`;
+
+    s += affisch(a, -1.4, A) + affisch(b, -2.2, B) + affisch(c, 2.6, C, true);
+
+    // Ombudsdekalen på glaset under skivan: blå med gul text, solblekt och med en kant som har släppt
+    const dx = FON.x + 8;
+    const dy = sy + sh + 13;
+    const dw = 128;
+    let D = `<rect x="${r1(dx)}" y="${r1(dy)}" width="${dw}" height="17" rx="3" fill="${sol('#1d3b8f', 0.2)}"/>`;
+    D += `<rect x="${r1(dx + 2)}" y="${r1(dy + 2)}" width="${dw - 4}" height="13" rx="2" fill="none" stroke="${gul}" stroke-width=".6" opacity=".8"/>`;
+    D += `<text x="${r1(dx + dw / 2)}" y="${r1(dy + 11.8)}" text-anchor="middle" ${ANTON} font-size="8.4" letter-spacing="1.3" fill="${gul}">OMBUD FÖR SVENSKA SPEL</text>`;
+    D += `<path d="M${r1(dx + dw - 6)} ${r1(dy)} h3 a3 3 0 0 1 3 3 v3 Z" fill="#e8dfc8" opacity=".55"/>`;
+    s += `<g opacity="${r1(0.62 + 0.28 * L.dag)}">${D}</g>`;
+    return s;
   }
   function neonSkylt() {
     const { x, y, w, h } = FON;
@@ -833,6 +926,93 @@ window.RumFasad = (() => {
       s += `<g fill="none" stroke="${c}" stroke-width="5"><circle cx="1480" cy="${by}" r="46"/><circle cx="1620" cy="${by}" r="46"/><path d="M1480 ${by} L1532 ${by} L1508 ${by - 64} M1532 ${by} L1596 ${by - 64} L1508 ${by - 64} M1596 ${by - 64} L1620 ${by} M1596 ${by - 64} L1600 ${by - 92} M1508 ${by - 64} L1502 ${by - 80}"/><path d="M1588 ${by - 92} h26 M1490 ${by - 82} h26" stroke-width="7"/></g>`;
     }
     return s;
+  }
+
+  // ---------- löpsedelsstället ----------
+  //
+  // Helgarderats löpsedel i ett löpsedelsställ på trottoaren, som utanför en riktig tobaksaffär (2026-11-19,
+  // användarens önskemål: "en helgarderat-löpsedel på en skylt utanför tobaksaffären … på ett lämpligt o snyggt
+  // ställe"). Det står tätt intill bröstningen till höger under skyltfönstret, en bit från dörren, så att det inte
+  // står i vägen in och de som går förbi går framför det. Ramen är svartlackerat stål med sedeln bakom plast, på två
+  // ben med fötter som går in mot väggen och ut mot gatan. Sedeln är veckans (Rum.lopsedel, samma som hänger hos
+  // Hasse Backe och är samma nummer som tidningen på pulten), kopierad hit (sedeln i bygg), och har gatans ljus: dagen,
+  // vädret och på kvällen skenet från fönstret och lamporna. Snö lägger sig på ramen.
+  // x: mitten, d: meter ut från fasaden; i meter: PAP sedelns bredd (100 × 140 som papperet), RAM ramens bredd, BEN
+  // ramens underkant över marken.
+  const STALL = { x: 884, d: 0.12, PAP: 0.42, RAM: 0.032, BEN: 0.3 };
+  function stallMatt() {
+    const u = M * skala(STALL.d);
+    const y0 = markY(STALL.d);
+    const pw = STALL.PAP * u;
+    const ph = pw * 1.4;
+    const b = STALL.RAM * u;
+    const rw = pw + 2 * b;
+    const rh = ph + 2 * b;
+    const rx = STALL.x - rw / 2;
+    const ry = y0 - STALL.BEN * u - rh;
+    // (rutan för allt: skuggan åt höger och fötterna nedåt)
+    const box = { x: rx - 0.08 * u, y: ry - 0.06 * u, w: rw + 0.3 * u, h: y0 + 0.12 * u - (ry - 0.06 * u) };
+    return { u, y0, pw, ph, b, rw, rh, rx, ry, box };
+  }
+  // Ljuset på sedeln, som multiplikation över papperet: på dagen nästan vitt (svalare i mulet), i skymningen och på
+  // kvällen mörkare, och varmt där lamporna och fönstret lyser.
+  function stallLjus(v, L, o) {
+    const dag = mix('#d6dade', '#fdf9f0', Math.max(L.sol, 1 - L.m));
+    const natt = mix('#26262c', '#7a6248', (L.lampor ? 0.55 : 0.2) + 0.45 * inne(o, L));
+    return mix(natt, dag, L.dag);
+  }
+  // Ramen, benen och skuggorna (bak: bakom sedeln) och ramens front, plastens blänk och snön (fram: över den), i
+  // stället egna mått (box), och var sedeln ska stå.
+  function stallet(v, L, o) {
+    const S = stallMatt();
+    const { u, y0, pw, ph, b, rw, rh, rx, ry, box } = S;
+    const stal = mix('#08090a', '#25282a', 0.15 + 0.85 * L.dag);
+    const kant = mix(stal, L.dag > 0.5 ? '#dfe6ee' : '#ffd9a0', 0.16 + 0.1 * (1 - L.dag) * (L.lampor ? 1 : 0));
+    const mork = mix(stal, '#000000', 0.5);
+    // en punkt på marken d m ut från fasaden, rakt ut från x vid stället (fötterna följer perspektivet)
+    const pkt = (x, d) => [r1(OGA_X + (OGA_X + (x - OGA_X) / skala(STALL.d) - OGA_X) * skala(d)), r1(markY(d))];
+    let bak = '';
+    // skuggan på stenen under, och på dagen snett ned åt höger på bröstningen bakom (som skyltens och rörets)
+    const skugga = L.dag * (0.22 + 0.4 * L.sol * (1 - 0.6 * L.m));
+    bak += `<ellipse cx="${r1(STALL.x + 0.03 * u)}" cy="${r1(y0 + 0.008 * u)}" rx="${r1(rw * 0.58)}" ry="${r1(0.038 * u)}" fill="#000" opacity="${r1(0.16 + 0.16 * skugga)}"/>`;
+    // (bara på bröstningen: på glaset syns ingen skugga)
+    const brost = FON.y + FON.h + KARM;
+    const sy = Math.max(ry + 0.07 * u, brost);
+    if (skugga > 0.02 && ry + 0.07 * u + rh > sy) bak += `<rect x="${r1(rx + 0.05 * u)}" y="${r1(sy)}" width="${r1(rw)}" height="${r1(ry + 0.07 * u + rh - sy)}" fill="#000" opacity="${r1(0.3 * skugga)}"/>`;
+    // benen: fyrkantsrör under ramens sidor, och fötterna in mot väggen och ut mot gatan
+    const bw = 0.024 * u;
+    const ben = [rx + b * 0.5, rx + rw - b * 0.5 - bw];
+    for (const x of ben) {
+      const fx = x + bw / 2;
+      const [ax, ay] = pkt(fx - 0.014 * u, STALL.d - 0.11);
+      const [bx, by] = pkt(fx + 0.014 * u, STALL.d - 0.11);
+      const [cx, cy] = pkt(fx + 0.014 * u, STALL.d + 0.17);
+      const [dx, dy] = pkt(fx - 0.014 * u, STALL.d + 0.17);
+      bak += `<path d="M${ax} ${ay} L${bx} ${by} L${cx} ${cy} L${dx} ${dy} Z" fill="${mork}"/>`;
+      bak += `<rect x="${r1(x)}" y="${r1(ry + rh - 2)}" width="${r1(bw)}" height="${r1(y0 - ry - rh + 2)}" fill="${stal}"/><rect x="${r1(x)}" y="${r1(ry + rh - 2)}" width="${r1(bw * 0.3)}" height="${r1(y0 - ry - rh + 2)}" fill="${kant}" opacity=".7"/>`;
+      // (gummitassen där foten möter stenen)
+      bak += `<rect x="${r1(fx - 0.02 * u)}" y="${r1(y0 - 0.012 * u)}" width="${r1(0.04 * u)}" height="${r1(0.014 * u)}" rx="1" fill="#050505"/>`;
+    }
+    // tvärslån mellan benen
+    const ty = y0 - 0.12 * u;
+    bak += `<rect x="${r1(ben[0])}" y="${r1(ty)}" width="${r1(ben[1] + bw - ben[0])}" height="${r1(0.016 * u)}" fill="${stal}"/>`;
+    // bakstycket bakom sedeln (det syns i kanten där plasten slutar)
+    bak += `<rect x="${r1(rx)}" y="${r1(ry)}" width="${r1(rw)}" height="${r1(rh)}" rx="1.5" fill="${mork}"/>`;
+    // Fram: ramens front, en fas i ljuset upptill och till vänster och mörkt nedtill och till höger, plastens
+    // läpp lite in över papperet, och blänket
+    const px = rx + b;
+    const py = ry + b;
+    let fram = `<path fill-rule="evenodd" fill="${stal}" d="M${r1(rx)} ${r1(ry)} h${r1(rw)} v${r1(rh)} h${r1(-rw)} Z M${r1(px + 0.6)} ${r1(py + 0.6)} v${r1(ph - 1.2)} h${r1(pw - 1.2)} v${r1(-ph + 1.2)} Z"/>`;
+    fram += `<path d="M${r1(rx + 0.6)} ${r1(ry + rh - 0.6)} V${r1(ry + 0.6)} H${r1(rx + rw - 0.6)}" fill="none" stroke="${kant}" stroke-width="1.2" opacity=".8"/>`;
+    fram += `<path d="M${r1(rx + rw - 0.6)} ${r1(ry + 1.2)} V${r1(ry + rh - 0.6)} H${r1(rx + 1.2)}" fill="none" stroke="#000" stroke-width="1.2" opacity=".55"/>`;
+    fram += `<rect x="${r1(px)}" y="${r1(py)}" width="${r1(pw)}" height="${r1(ph)}" fill="none" stroke="#000" stroke-width="1.6" opacity=".35"/>`;
+    // (plasten speglar himlen på dagen och lamporna på kvällen, snett över och svagt)
+    const blank = L.dag > 0.3 ? mix('#ffffff', L.sky ? L.sky[1] : '#ffffff', 0.4) : '#ffe2b0';
+    fram += `<defs><linearGradient id="rf-stall-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${blank}" stop-opacity=".22"/><stop offset=".3" stop-color="${blank}" stop-opacity="0"/><stop offset=".62" stop-color="${blank}" stop-opacity="0"/><stop offset=".7" stop-color="${blank}" stop-opacity=".08"/><stop offset=".78" stop-color="${blank}" stop-opacity="0"/></linearGradient></defs>`;
+    fram += `<rect x="${r1(px)}" y="${r1(py)}" width="${r1(pw)}" height="${r1(ph)}" fill="url(#rf-stall-g)" opacity="${r1(0.5 + 0.5 * L.dag)}"/>`;
+    if (v.snotackt) fram += `<path d="M${r1(rx - 2)} ${r1(ry + 1)} q${r1(rw / 2 + 2)} ${r1(-0.035 * u)} ${r1(rw + 4)} 0 Z" fill="${snoC(L)}"/>`;
+    const vb = `${r1(box.x)} ${r1(box.y)} ${r1(box.w)} ${r1(box.h)}`;
+    return { S, bak, fram, vb, ljus: stallLjus(v, L, o) };
   }
 
   // ---------- trottoaren ----------
@@ -3771,6 +3951,7 @@ window.RumFasad = (() => {
           ? svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}`, 'rf-fonster') + pyntDukar + svg(V, `${defs}${glaset(v, L, o)}${framfor}`)
           : svg(V, `${defs}${iFonstret(v, L, o)}${neonSkylt()}${glaset(v, L, o)}${framfor}`, 'rf-fonster')) +
         (barberR ? duk('rf-barber', barberR, px) : '') +
+        stallHtml(stallet(v, L, o)) +
         svg(V, kvallsljus(V, v, L, o)) +
         (L.dimma > 0.05 ? `<div class="rf-lager rf-dimma" style="background:${mix('#2a2622', '#aeb3b6', L.dag)}; opacity:${r1(0.32 * L.dimma)}"></div>` : '') +
         duk('rf-fram', V, px);
@@ -3783,6 +3964,8 @@ window.RumFasad = (() => {
       R.bak = himlen ? scen.querySelector('.rf-bak').getContext('2d') : null;
       R.barber = barberR ? scen.querySelector('.rf-barber').getContext('2d') : null;
       F.ro = R;
+      F.sedelHtml = '';
+      sedeln();
       pynt(pyntBild);
       // (en fast bild: allt som rör sig står på samma tid)
       if (o.still != null) for (const an of el.getAnimations({ subtree: true })) { an.pause(); an.currentTime = o.still * 1000; }
@@ -3791,6 +3974,38 @@ window.RumFasad = (() => {
       passa();
       gang();
       rorelse(true);
+    }
+    // Löpsedelsstället (stallet): ramen och benen i två SVG i ställets egen ruta, och sedeln emellan, i scenens
+    // punkter. Sedeln läggs i av sedeln, när den finns.
+    function stallHtml(st) {
+      const { S, bak, fram, vb } = st;
+      const k = F.k;
+      const box = S.box;
+      const lag = (inner, cls) => `<svg class="${cls}" viewBox="${vb}" preserveAspectRatio="none" aria-hidden="true">${inner}</svg>`;
+      return `<div class="rf-stall tom" aria-hidden="true" style="left:${r1((box.x - F.V.x) * k)}px; top:${r1((box.y - F.V.y) * k)}px; width:${r1(box.w * k)}px; height:${r1(box.h * k)}px; --ljus:${st.ljus}">` +
+        lag(bak, 'rf-stall-bak') +
+        `<span class="rf-stall-sedel" style="left:${r1((S.rx + S.b - box.x) * k)}px; top:${r1((S.ry + S.b - box.y) * k)}px; transform:scale(${(S.pw * k / 100).toFixed(4)})"></span>` +
+        lag(fram, 'rf-stall-fram') + '</div>';
+    }
+    // Veckans löpsedel i stället (o.sedel: den som rummet har ritat, rum-affischer.js), kopierad när den har ändrats
+    // (rubriken, numret, slitaget). Innan rummets saker är ritade finns ingen: då står stället undan och det
+    // försöker igen strax.
+    const ETIKETT = el.getAttribute('aria-label');
+    function sedeln() {
+      clearTimeout(F.sedelT);
+      const plats = scen.querySelector('.rf-stall-sedel');
+      if (!plats) return;
+      const s = o.sedel ? o.sedel() : null;
+      if (!s || !s.childElementCount) {
+        if (o.sedel && el.isConnected) F.sedelT = setTimeout(sedeln, 2500);
+        return;
+      }
+      const html = s.outerHTML;
+      if (html === F.sedelHtml) return;
+      F.sedelHtml = html;
+      plats.innerHTML = `${html}<i class="rf-stall-ljus"></i>`;
+      plats.parentNode.classList.remove('tom');
+      el.setAttribute('aria-label', `${ETIKETT}. På trottoaren står ${s.title || 'Helgarderats löpsedel'}`);
     }
     // Högtidspyntet i skyltfönstret och på dörren, så som det hänger inne (o.pynt, pyntUtifran i
     // rum-inredning.js): bilderna tas fram innan scenen byggs (rita), så att dukarna och lagret de kräver bara
@@ -3923,7 +4138,12 @@ window.RumFasad = (() => {
       F.raf = requestAnimationFrame(tick);
     }
     // vädret och ljuset ändras: ritas om när de har ändrats (sig), en gång i minuten
-    const T = setInterval(() => { if (el.isConnected) rita(); }, 60e3);
+    // (och löpsedeln i stället, om den har ändrats)
+    const T = setInterval(() => {
+      if (!el.isConnected) return;
+      rita();
+      sedeln();
+    }, 60e3);
     // Storleken ändras (telefonen vrids, adressfältet glider in eller ut): scenen skalas om genast så att
     // den täcker fönstret (passa), och byggs om först när storleken har stått still en stund, och bara om
     // vyn eller dukarnas bildpunkter har ändrats (sig). Förut byggdes allt om – alla lager och dukar – vid
@@ -3952,6 +4172,7 @@ window.RumFasad = (() => {
         cancelAnimationFrame(F.raf);
         clearInterval(T);
         clearTimeout(storlekT);
+        clearTimeout(F.sedelT);
         removeEventListener('resize', storlek);
         el.remove();
         for (const c of dukarna(F.ro)) slapp(c);

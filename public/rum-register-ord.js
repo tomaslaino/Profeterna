@@ -181,14 +181,17 @@
     // senaste tre matcherna, som exempel
     kurvan: {
       e: 'KURVAN', n: 'xG MATCH FÖR MATCH',
-      t: ({ m }) => `Lagets chanser i ${m && ['unl', 'emk', 'vsk'].includes(m.comp) ? 'Nations League' : 'ligan'} match för match, med den första matchen till vänster och den senaste till höger. Varje punkt är snittet av tre matcher, så att en enstaka match inte drar iväg. Den ljusa linjen är lagets egen xG och den gröna motståndarnas. Där den ljusa ligger över den gröna är fältet mellan dem fyllt: där skapade laget mer än det släppte till.`,
+      t: ({ m }) => `Lagets chanser i ${m && ['unl', 'emk', 'vsk'].includes(m.comp) ? 'Nations League' : 'ligan'} match för match, med den första matchen till vänster och den senaste till höger. Varje punkt är snittet av tre matcher, så att en enstaka match inte drar iväg. Den ljusa linjen är lagets egen xG och den gröna motståndarnas. Där den ljusa ligger över den gröna är fältet mellan dem fyllt: där skapade laget mer än det släppte till.${m && ['unl', 'emk', 'vsk'].includes(m.comp) ? '' : ' Staplarna under kurvan (MOT) är motståndarna match för match, på samma skala som MOTSTÅNDET: ju högre stapel, desto svårare lag. Strecket genom dem är divisionens mittenlag, och staplarna över det är gröna. En dipp i kurvan mot en rad höga staplar säger alltså mindre än en dipp mot låga.'}`,
       ex: ({ namn, t }) => {
         const l = t && t.fd && t.fd.serie;
         if (!l || l.length < 6) return null;
         const s3 = (x, j) => dec(x.reduce((a, y) => a + y[j], 0) / x.length);
         const forst = l.slice(0, 3);
         const sist = l.slice(-3);
-        return `${namn} skapade ${s3(forst, 1)} xG per match i de tre första matcherna och ${s3(sist, 1)} i de tre senaste, och släppte till ${s3(forst, 2)} och ${s3(sist, 2)}.`;
+        // motståndet 0–100 i snitt, när alla tre har det
+        const m3 = (x) => (x.every((y) => y[3] != null) ? String(Math.round((100 * x.reduce((a, y) => a + y[3], 0)) / x.length)) : null);
+        const mot = m3(forst) && m3(sist) ? ` Motståndet låg på ${m3(forst)} i snitt i de tre första och ${m3(sist)} i de tre senaste.` : '';
+        return `${namn} skapade ${s3(forst, 1)} xG per match i de tre första matcherna och ${s3(sist, 1)} i de tre senaste, och släppte till ${s3(forst, 2)} och ${s3(sist, 2)}.${mot}`;
       },
     },
     'tio-matcher': {
