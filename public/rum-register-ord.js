@@ -473,7 +473,7 @@
     ma90: { t: 'Mål och assist tillsammans per 90 minuters speltid.' },
     segermal: { t: 'Mål som gav en ledning som laget sedan aldrig tappade. Vid 3–1 är lagets andra mål segermålet.' },
     poangmal: {
-      t: 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort. Ett mål i en oavgjord match är värt en poäng, eftersom laget annars hade förlorat.',
+      t: 'Poängen som laget hade gått miste om utan spelarens mål. Ett mål i en uddamålsseger är värt två poäng, eftersom matchen annars hade slutat oavgjort. Ett mål i en oavgjord match är värt en poäng, eftersom laget annars hade förlorat. Två mål i en seger med 2–1 är värda tre poäng.',
       ex: ({ p, namn, lag: l }) => (ok(p.gpts) && p.g ? `Utan ${gen(namn)} ${st(p.g, 'mål', 'mål')} hade ${l || 'laget'} haft ${st(p.gpts, 'poäng', 'poäng')} färre.` : null),
     },
     forsta: { t: 'Mål som gav laget ledningen med 1–0.' },

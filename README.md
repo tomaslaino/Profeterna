@@ -517,6 +517,13 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   DT blåser ut röken viftar den bredvid ibland bort den, när neonskylten glappar tittar någon upp på den, den som
   lämnar in får ölen höjd mot sig och när alla tre är inne skålar de, och börjar det regna, snöa eller åska vänder de
   sig om och tittar ut (se *Det som händer i rummet* under [Tobaksaffären](#tobaksaffären))
+- [x] **Statistiken kontrollerad (2026-11-18, användarens önskemål: "förbättra och säkerställa statistiken på
+  sidan"):** alla tal under Statistik prövades mot varandra och mot ESPN och FPL. Tre fel är rättade: *Poäng åt laget*
+  räknade varje mål för sig, så att flera mål i samma match gav fel tal (11 spelare i Premier League, t.ex. Nicolas
+  Jackson 9 i stället för 8 och Alexander Isak 5 i stället för 7); *M+A per 90* i Premier League räknades på FPL:s assist
+  i stället för ESPN:s i kolumnen Ass; *Speltid per match* delade FPL:s minuter med ESPN:s matcher (Iliman Ndiaye 96
+  min). Lagens topplistor har delad placering som spelarnas, och `npm run statistik` prövar filerna efter varje bygge
+  (se *Statistiken kontrolleras* under [Beslut](#beslut))
 
 ## Publicering
 
@@ -855,6 +862,7 @@ npm run refresh        # bygget med omhämtning av alla källor
 npm run check          # prognosmotorns kontroll mot förra säsongen (se Prognosmotorn)
 npm run backtest       # walk-forward-backtest över alla säsonger, ~1,5 min (se Backtestet)
 npm run kandidater     # kandidatjakten, ~15 min första gången (se Kandidatjakten)
+npm run statistik      # kontrollen av statistiken i _site/data (eller -- --url https://matchfixarna.se)
 ```
 
 Lokala byggen **läser** journalen som den ligger i repot men skriver aldrig i den – det gör
@@ -1364,6 +1372,35 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bättre och bad sedan om "olika visualiseringsförslag". Av elva skisser i tre grupper (det som skiljer mest,
   riktningen och säkerheten) valde hen *B Oscilloskopet* i gruppen om riktningen: en ny sida KURVAN i matchaktens
   xG med lagens xG match för match under säsongen. Se [Kurvan](#kurvan) under Datorn.
+- **Statistiken kontrolleras (2026-11-18, användarens önskemål):** "Kan du förbättra och säkerställa statistiken
+  på sidan." Spelar- och lagfilerna för alla fem flikarna (de fyra ligorna och Nations League) prövades mot sig själva
+  och mot källorna: tabellen mot matchstatistiken, spelarnas mål mot lagens, målens betydelse mot ESPN:s matchrapporter
+  och speltiden mot FPL. Det mesta stämde; tre saker var fel och är rättade, på Statistik och i datorn:
+  - *Poäng åt laget* (`gpts` i [src/players.js](src/players.js)) räknas per match och spelare: poängen med spelarens mål
+    minus poängen utan alla hans mål i matchen. Förut räknades varje mål för sig, så att två mål i en seger med 2–1 gav
+    4 poäng (laget tog 3) och två mål i en seger med 2–0 gav 0. I Premier League fick 11 spelare ett annat tal, åt båda
+    hållen. Talet är aldrig större än poängen laget tog, och summan över säsongen är precis vad förklaringen säger: så
+    många poäng färre utan hans mål.
+  - *Per 90* räknas med talet och speltiden ur samma källa och samma matcher: mål, assist och regelbrott (ESPN) med
+    speltiden ur ESPN:s matchrapporter, xG och försvaret (FPL) med FPL:s speltid. Förut räknades *Mål per 90* och *M+A
+    per 90* i Premier League på FPL:s mål och assist. FPL räknar fler assist än ESPN (t.ex. ett skott som styrs in), så
+    55 av 451 spelare hade ett annat antal än i kolumnen *Ass*: Pascal Gross 6 mot 4, och M+A per 90 1,02 i stället för
+    0,82. De andra ligorna räknades redan så.
+  - *Speltid per match* (spelarkortet och datorn) är ESPN:s minuter delat med ESPN:s matcher. FPL:s minuter delat med
+    ESPN:s matcher gav 96 minuter per match för Iliman Ndiaye, eftersom ESPN:s trupp saknar två av hans tio matcher.
+  - Lagens topplistor under Lagen har **delad placering** som spelarnas: två lag med samma tal som det visas (27 %,
+    +0,15) delar plats, och numret står bara på den första.
+  - **Kontrollen** (`npm run statistik`, [scripts/kolla-statistik.js](scripts/kolla-statistik.js)) prövar de byggda
+    filerna, eller den publicerade sajten med `--url https://matchfixarna.se`, mot sådant som alltid måste stämma:
+    tabellens poäng och målskillnad, att matchstatistiken och tabellen säger samma sak när de gäller lika många matcher
+    (annars är ett lag kopplat till fel rader), att spelarnas mål summerar till lagets, att segermål, sena mål och poäng
+    åt laget inte är fler än möjligt och att speltiden ryms i matcherna. Räkningen av målens betydelse prövas mot sju
+    påhittade matcher med facit, som fångar det gamla felet. Ett fel avslutar med kod 1; skillnader mellan källorna (en
+    trupp som släpar, FPL och ESPN som inte är överens om en spelares matcher) skrivs bara ut. Kontrollen körs i
+    `publicera.yml` efter bygget: ett fel blir en varning i körningen och står i körningens sammanfattning, men sajten
+    publiceras ändå. Den publicerade sajten 2026-11-18 hade inga fel i filerna och två skillnader mellan källorna
+    (Ndiaye ovan och Burnleys trupp, en omgång efter); felet i poäng åt laget syns inte i filerna utan bara mot
+    matchrapporterna.
 - **Affären utifrån (2026-11-16, användarens önskemål):** "Kan du ordna så att man ser baren lite utifrån om man
   trycker på 'matchfixarna' på dörren", med ett foto av Bron vid S:t Eriksbron utifrån: "Gör det enkelt och snyggt och vi
   ska synas där i fönstret - vagt vast med samma inredning etc.", "Tänk på allt som händer ute" och "Du kan zooma in

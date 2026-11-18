@@ -1819,8 +1819,8 @@ window.RumRegister = (() => {
     const espnMin = (p) => (p.emin !== undefined ? p.emin : p.min);
     const helt = (p, x) => p.min >= grans(x, 'minMinutesP90', 270);
     const heltE = (p, x) => espnMin(p) >= grans(x, 'minMinutesP90', 270);
-    // mål och assist per 90: FPL:s egna i Premier League (samma matcher som minuterna)
-    const mal90 = (p) => (p.fg !== undefined ? p.fg : p.g);
+    // (mål och assist per 90 är ESPN:s med ESPN:s speltid, som på Statistik;
+    // FPL:s xG och försvar med FPL:s speltid)
     const lagetsMal = (p) => { const t = A.P && A.P.lag.get(String(p.teamId)); return t ? t.goals : null; };
     const MV = (p, v) => (p.pos === 'MV' ? v : null);
     const SPTAL = [
@@ -1829,7 +1829,7 @@ window.RumRegister = (() => {
         f: (v, p) => { const t = A.P && A.P.lag.get(String(p.teamId)); const av = t && t.coverage ? t.coverage.covered : null; return av ? `${v} AV ${av}` : String(v); } },
       { k: 'inhopp', del: 'MATCHERNA', mat: false, e: 'INHOPP', n: 'INHOPP', g: (p) => (p.app != null && p.starts != null ? p.app - p.starts : null), f: String },
       { k: 'speltid', del: 'MATCHERNA', mat: false, e: 'SPELTID', n: 'SPELTID', g: (p) => p.min, f: (v) => `${v} MIN` },
-      { k: 'permatch', del: 'MATCHERNA', mat: false, e: 'PER MATCH', n: 'SPELTID PER MATCH', g: (p) => (p.min != null && p.app ? p.min / p.app : null), f: (v) => `${Math.round(v)} MIN` },
+      { k: 'permatch', del: 'MATCHERNA', mat: false, e: 'PER MATCH', n: 'SPELTID PER MATCH', g: (p) => (p.min != null && p.app ? espnMin(p) / p.app : null), f: (v) => `${Math.round(v)} MIN` },
       { k: 'betyg', del: 'MATCHERNA', e: 'BETYG', n: 'SNITTBETYG', g: (p) => p.rt, f: tal1,
         ok: (p, x) => p.rn >= grans(x, 'minRated', 3) && p.rq >= grans(x, 'minShareRated', 0.5) },
       { k: 'bast', del: 'MATCHERNA', e: 'BÄST PÅ PLAN', n: 'BÄST PÅ PLAN', g: (p) => (p.rt != null ? p.rb : null), f: String },
@@ -1841,12 +1841,12 @@ window.RumRegister = (() => {
       { k: 'pamal', del: 'ANFALL', ute: true, e: 'PÅ MÅL', n: 'SKOTT PÅ MÅL', g: (p) => p.sot, f: String },
       { k: 'malskott', del: 'ANFALL', ute: true, e: 'MÅL/SKOTT', n: 'MÅL PER SKOTT', g: (p) => (p.sh ? p.g / p.sh : null), f: pct, ok: (p, x) => p.sh >= grans(x, 'minShotsConversion', 10) },
       { k: 'malmatch', del: 'ANFALL', ute: true, e: 'MÅL/MATCH', n: 'MÅL PER MATCH', g: (p) => (p.min == null && p.app ? p.g / p.app : null), f: tal2 },
-      { k: 'mal90', del: 'ANFALL', ute: true, e: 'MÅL/90', n: 'MÅL PER 90 MINUTER', g: (p) => per90(mal90(p), p.min), f: tal2, ok: helt },
+      { k: 'mal90', del: 'ANFALL', ute: true, e: 'MÅL/90', n: 'MÅL PER 90 MINUTER', g: (p) => per90(p.g, espnMin(p)), f: tal2, ok: heltE },
       { k: 'xg', del: 'ANFALL', ute: true, e: 'xG', n: 'FÖRVÄNTADE MÅL (xG)', g: (p) => p.xg, f: tal1 },
       { k: 'malmotxg', del: 'ANFALL', ute: true, e: 'MÅL MOT xG', n: 'MÅL MOT xG', g: (p) => (p.xg != null && p.fg != null ? p.fg - p.xg : null), f: tecken(1), noll: true },
       { k: 'xa', del: 'ANFALL', ute: true, e: 'xA', n: 'FÖRVÄNTADE ASSIST (xA)', g: (p) => p.xa, f: tal1 },
       { k: 'xg90', del: 'ANFALL', ute: true, e: 'xG/90', n: 'xG PER 90 MINUTER', g: (p) => per90(p.xg, p.min), f: tal2, ok: helt },
-      { k: 'ma90', del: 'ANFALL', ute: true, e: 'MÅL+ASSIST/90', n: 'MÅL OCH ASSIST PER 90 MINUTER', g: (p) => (mal90(p) == null ? null : per90(mal90(p) + ((p.fg !== undefined ? p.fa : p.a) || 0), p.min)), f: tal2, ok: helt },
+      { k: 'ma90', del: 'ANFALL', ute: true, e: 'MÅL+ASSIST/90', n: 'MÅL OCH ASSIST PER 90 MINUTER', g: (p) => (p.g == null ? null : per90(p.g + (p.a || 0), espnMin(p))), f: tal2, ok: heltE },
       { k: 'segermal', del: 'MÅLEN', mat: false, ute: true, e: 'SEGERMÅL', n: 'SEGERMÅL', g: (p) => p.gw, f: String, visa: (p) => p.g > 0 },
       { k: 'poangmal', del: 'MÅLEN', ute: true, e: 'POÄNG ÅT LAGET', n: 'POÄNG SOM MÅLEN GAV LAGET', g: (p) => p.gpts, f: String, visa: (p) => p.g > 0 },
       { k: 'forsta', del: 'MÅLEN', mat: false, ute: true, e: 'FÖRSTA MÅLET', n: 'MATCHENS FÖRSTA MÅL', g: (p) => p.g1, f: String, visa: (p) => p.g > 0 },
