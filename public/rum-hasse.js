@@ -1009,7 +1009,7 @@ window.RumHasse = (() => {
       sa.top = `${(H.vy.classList.contains('kragen') ? krage : topp).toFixed(0)}px`;
       sa.left = sa.width = fo.left = fo.width = '';
       s.setProperty('--mork', `${(topp - 46).toFixed(0)}px`);
-      s.setProperty('--mork-krage', `${(krage - 112).toFixed(0)}px`);
+      s.setProperty('--mork-krage', `${(krage - 36).toFixed(0)}px`);
     } else {
       const hoger = v.vanster - 28;
       const bredd = Math.min(hoger - 28, Math.max(340, v.W * 0.3), 620);
