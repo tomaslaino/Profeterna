@@ -522,6 +522,11 @@ window.RumHasse = (() => {
       }
       B.nasta[k] = t + broIntervall(k, n.takt) * 1000;
     }
+    // (så mycket som syns genom glaset just nu: mindre i skymningen, när affären speglas, och i dimma)
+    if (H.broDuk && H.ute.synlig) {
+      const op = H.ute.synlig(n.v, n.L).toFixed(2);
+      if (H.broDuk.op !== op) { H.broDuk.op = op; H.broDuk.el.style.opacity = op; }
+    }
     // (också när han inte ritas, som medan kameran svänger: då står trafiken där den står så länge)
     broRita(nu);
     H.bronT = setTimeout(bronGa, Math.max(100, Math.min(...STROMMAR.map((s) => B.nasta[s])) - nu));

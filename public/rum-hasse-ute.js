@@ -735,15 +735,23 @@ export function affaren(x, L, l, somn, lage, W, H) {
 
 // ---------- trafikens oskärpa ----------
 
-// Hur oskarp trafiken på bron är (väggbildens bildpunkter): sex tiondelar av utsiktens (rita: ofokus / 2), så att
-// den är mjuk som det som går och kör förbi utanför rummets fönster och hör till utsikten, men bilarna, bussarna och
-// de som går ännu syns som det de är (2026-11-19, användarens önskemål: "Det behöver inte vara så skarpt - som
-// inomhusbilden"; 0,35 sedan 2026-11-17, då stack de ut skarpa mot stan bakom, och förut 0,8, då var de bara gråa
-// fläckar). Den läggs på hela trafikens duk
+// Hur oskarp trafiken på bron är (väggbildens bildpunkter): åtta tiondelar av utsiktens (rita: ofokus / 2), nästan
+// som stan bakom, så att den är mjuk som det som går och kör förbi utanför rummets fönster och hör till utsikten
+// (2026-11-19, användarens önskemål: "Det behöver inte vara så skarpt - som inomhusbilden", och efter 0,6 "Det ser
+// fortfarande ganska skarpt ut"; 0,35 sedan 2026-11-17, då stack de ut skarpa mot stan bakom. Vid 0,8 förut var
+// figurerna en fjärdedel mindre och bara gråa fläckar). Den läggs på hela trafikens duk
 // (rum-hasse.js), så att den är lika stor längs hela bron: bakad i varje figur krympte den med figuren, och längst
 // bort var bilarna nästan skarpa (ändrat 2026-11-16). I fordonen själva bara BAKAD, så att kanterna inte blir hackiga.
-const OSKARPA = 0.6;
+const OSKARPA = 0.8;
 const BAKAD = 0.6;
+// Hur mycket av trafiken som syns genom glaset (0…1). Trafikens duk ligger framför väggens, där glaset är ritat, så det
+// som ligger i glaset – affären som speglas när det är mörkare ute än inne (affaren) och dimman över utsikten – låg
+// förut bakom trafiken: i skymningen och i dimma stod bilarna och de som går kvar som mörka, tydliga figurer fast bron
+// under dem inte syntes, och såg ut att sväva (2026-11-19). Nu bleknar de som bron: med spegelbilden och med dimman.
+export function synlig(v, L) {
+  const morkt = Math.max(0, 1 - L.dag / 0.7) ** 1.3;
+  return (1 - 0.45 * morkt) * (1 - 0.6 * Math.min(1, L.dimma || 0)) * (1 - (v.fall ? 0.1 + 0.15 * v.mangd : 0));
+}
 export function oskarpa(lage) {
   const { b } = projektion(lage);
   return (OSKARPA * (20 * b.S * SCEN.D)) / (SCEN.D - 120) / 2;
@@ -942,9 +950,11 @@ export function gangSek(vem) {
 // (ändrat 2026-11-16). En meter är METER räckeshöjder (den som går är 1,75 m). LUTA och FLUTA följer METER, så att
 // körbanan ligger där den låg i bilden när människorna blev större mot räcket (GANG; 0,16 och 0,1 vid 1,15).
 const METER = GANG.hojd / 1.75;
-const LUTA = (0.16 * 1.15) / GANG.hojd;
+// (2026-11-19: 0,16 → 0,09, användarens ord: "det ser ut som att de flyger i högerfilen". När bron inte syns, i
+// skymningen och i dimma, stod den bortre filen och cykelbanan en bra bit ovanför räcket.)
+const LUTA = (0.09 * 1.15) / GANG.hojd;
 // (fordonen själva, från sida till sida: så lite som man ser dem uppifrån när man tittar längs bron)
-const FLUTA = (0.1 * 1.15) / GANG.hojd;
+const FLUTA = (0.056 * 1.15) / GANG.hojd;
 const LINJE = (() => {
   const g = (az) => { const d = 1 / Math.tan(bro(az, BRO.racke) * DEG); return [d * Math.sin(az * DEG), d * Math.cos(az * DEG)]; };
   const A = g(BRO.a0);
