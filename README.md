@@ -544,6 +544,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   också över matchrutan och till Tabeller, Statistik och Om oss. Den visar det tv:n visar: text-tv:n, som går vidare,
   eller gänget i bild, och byter till AV när någon visar sig, som i rummet. Kameran och bilden fortsätter. Ett tryck på
   den lilla tv:n går tillbaka till tv:n i rummet, krysset stänger den (se *Tv:n följer med* under [Tv:n](#tvn))
+- [x] **Newsquests lokaltidningar via Yahoo Sports (2026-11-19, användarens beslut, efter att ha fått veta att både
+  tidningarna och Yahoo säger nej till AI-läsare):** The Bolton News, Watford Observer, East Anglian Daily Times, Daily
+  Echo och Newsquests andra tidningar går inte att läsa på sina egna sajter, men Yahoo Sports publicerar många av deras
+  artiklar. Nattjobbet läser nu kopiorna där, när sidan själv säger att den kommer från en lokaltidning, och de står i
+  matchbladet med tidningens namn. Bing News rubriker ur tidningarna får Claude att söka upp på Yahoo (se *Newsquests
+  tidningar via Yahoo Sports* under *Klubben, lokaltidningen och motståndarens intervju*)
 
 ## Publicering
 
@@ -3339,6 +3345,23 @@ omgångens lag → Bing News (veckans nyheter om laget) → claude -p söker (We
   Reach, National World, Express & Star, Shropshire Star och KentOnline släpper in. Klubbarnas nya EFL-sajter (samma
   plattform hos Sheffield Wednesday och Reading) visar texten först i webbläsaren och ger 0 tecken; deras
   interna nyhets-API används inte. Sökningen tar därför hellre lokaltidningens referat av presskonferensen.
+- **Newsquests tidningar via Yahoo Sports** (2026-11-19, användarens beslut: "Ja", efter att ha fått veta att både
+  tidningarna och Yahoo säger nej till AI-läsare). Yahoo Sports publicerar många av lokaltidningarnas artiklar,
+  Newsquests också, och sidan säger i sin JSON-LD vilken tidning artikeln kommer från (`provider`, med tidningens namn
+  och adress). Yahoos robots.txt säger nej till ChatGPT-User, ClaudeBot, Claude-Web och anthropic-ai men inget till
+  Claude-User, och på `uk.sports.yahoo.com` och `sports.yahoo.com` räknas bara det som sägs till oss (`yahoo` i
+  config/lokal.js, `baraVara` i `robotsRegler` i src/analyser/forum.mjs); överallt annars gäller regeln som förut, också
+  för de insatta medierna och forumen. Läsaren tar Yahoos brödtext ur `<div class="content-body">`, som står utanför
+  `<article>`. En sida på Yahoo läses bara när tidningen i `provider` är en av lokaltidningarna (`lokaltidningar` i
+  config/media.js), och den står med tidningens namn (*The Bolton News*) och Yahoos adress; BBC Sport, The Independent
+  och andra rikstäckande på Yahoo stryks, liksom Yahoos andra sajter (Finance, News). Bing News rubriker ur en tidning
+  som inte går att läsa på sin egen sajt följer med till Claude som rubriker att söka upp på Yahoo Sports, högst åtta
+  (`yahoo.rubriker`), och adresserna räknas inte som träffar. Sökningen har åtta sökningar i stället för sex.
+  Provat 2026-11-19 med jobbets läsare mot Yahoo: Bolton News artikel om Chris Forinos kontrakt lästes (2 621 tecken,
+  *The Bolton News*, Marc Iles, 16 november), en artikel från BBC Sport om Terry Devlin på Yahoo avvisades, och samma sida
+  stoppas av robots.txt med de insattas regler. Med Node: Bing-träffarnas uppdelning, sökningens svar och frågan till
+  Claude. Inte provat med riktiga sökningar på iMacen: om WebSearch hittar kopiorna på Yahoo syns först i nattjobbets
+  logg.
 - **Läsningen och uppgifterna** är de insattas, med samma ämnen, slag och vikt, utom: artiklar från de senaste sju
   dagarna och minst 400 tecken (klubbens besked kan vara några stycken under en video). Claude får veta vad varje
   artikel är för källa (`slagText`). En artikel som den andra läsningen redan har läses inte igen (`lastaAvAndra`),
@@ -5081,6 +5104,30 @@ ungefär 1 % av bildens hela arbete, och med processorn fyra gånger långsammar
 `prat`, `sa`, `ordet`). De nya påhitten för handen lika fort som de gamla eller långsammare: som mest
 8–13 enheter mellan två bilder, mot 14–20 i de gamla. Största hoppet mellan två bilder under tio
 minuter är detsamma som förut, och det kommer från de gamla påhitten.
+
+**Inte som robotar** (2026-11-19, rum-3d.js; användarens önskemål: "Gör animationerna för alla mer naturliga. Så att de
+inte ser ut som robotar"). Gänget spelades in bild för bild (var varje del är, 30 bilder i sekunden i 18 sekunder,
+klockan 14). Tre saker fick dem att se ut som maskiner: händerna och armarna stod blixtstilla i upp till tio sekunder
+åt gången medan något annat rörde sig, huvudet ställde om sig med ett ryck på 0,22 sekunder var 1,7:e sekund och stod
+sedan stilla, och ett stort blickbyte kunde vrida huvudet ett kvarts varv på ett par bilder. Nu:
+
+- **Andningen** (`andetag`, `andning`): i stället för en jämn sinusvåg andas var och en i sin takt (DL 4,3, DT 3,7 och
+  DJ 4,8 sekunder), som glider lite fortare och långsammare och lite olika djupt. In går fortare än ut, och efter
+  utandningen vilar bröstet en stund. Bröstet vidgas, och bålen lyfts lite, så att axlarna och armarna följer med.
+- **Kroppen svajar** lite snabbare ovanpå det långsamma svajet, som när man sitter.
+- **Händerna står aldrig helt still** (`liv`): handen som vilar på bordet, håller flaskan eller cigaretten driver lite
+  och vrids en aning, i takter som inte går jämnt upp. Mot bordet bara i sidled.
+- **Huvudets små flyttar** (`smaRor`) kommer mer sällan (var 2,4:e sekund i stället för 1,7:e), tar 0,4–0,75 sekunder i
+  stället för 0,22, och börjar där den förra var om den inte hann fram. Däremellan driver huvudet långsamt.
+- **Blickarna går genom en fjäder** (`blickFolj`, `BLICK`): det blickarna gör med huvudet och bålen följer en
+  kritiskt dämpad fjäder med en mjuk gräns för farten (4,5 radianer i sekunden). Huvudet kommer en aning efter blicken,
+  som hos folk, och de stora byten tar en halv sekund med fart som kommer och går. Fjädern minns från bild till bild,
+  så den gäller inte i en fast bild (`?rum-t`) eller utan rörelser.
+
+Mätt i samma 18 sekunder före och efter: andelen av tiden som en del som annars rör sig står helt still gick från 19 %
+till 4 % (median) och den längsta stunden helt stilla från 10 till 2,7 sekunder. Huvudets högsta fart (mätt över en
+tiondels sekund) gick från 19 till 3,6 radianer i sekunden. Inga nya delar eller bilder, så grafikkortet gör samma sak
+som förut.
 
 **Det som händer i rummet** (2026-11-18, `handelse`, `ORS` och `ledig` i rum-3d.js; användarens önskemål: "Lägg till
 olika logiska animationer på matchfixarna!"). Påhitten ovan kommer av sig själva, ur luckorna och humöret. Det här är
