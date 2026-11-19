@@ -3,8 +3,9 @@
 // Tv:n som följer med (rum-bild.js) till Tabeller, Statistik och Om oss, som är
 // egna sidor: följde tv:n med från sidan innan (sessionStorage
 // profeterna.tv.foljer, inom tio minuter som ATER i rum-bild.js) hämtas det som
-// behövs för den här – tv:ns stil, vad vi kallas (tippoang.js) och rum-bild.js,
-// som kopplar upp sig igen. Annars hämtas ingenting.
+// behövs för den här – tv:ns stil och rum-bild.js, som visar bilden ur samtalet
+// (telefon.js, som står på sidan och följer med av sig själv). Annars hämtas
+// ingenting.
 (function () {
   let f = null;
   try {

@@ -1805,7 +1805,7 @@ ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div>
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tamed" ${KNAPP} hidden>Ta med tv:n</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
+<div class="rum-ft"><span class="tel-ctl"></span><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tamed" ${KNAPP} hidden>Ta med tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
     document.querySelector('main').prepend(el);
     // tv:n som byggdes utan rummet (tvUtan) flyttar in, med det den visar
     if (R.tvLada) {
@@ -1821,8 +1821,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     ringar(el);
     wire();
     if (!R.tv) R.tv = window.RumTv ? RumTv.mount(el, tvOpts()) : null;
-    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång, och Visa dig på tv:n och
-    // Ta med tv:n i foten
+    // Samtalet (telefon.js): luren i foten. Bilden från dem som visar sig står på tv:ns AV-ingång, och nära tv:n
+    // står Ta med tv:n i foten (rum-bild.js)
+    if (window.Telefon) Telefon.lur(el.querySelector('.rum-ft .tel-ctl'));
     if (window.RumBild && R.tv) RumBild.mount(el, { tv: R.tv });
     tangenter();
     // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet

@@ -1,7 +1,7 @@
 # Tobaksaffären tillsammans (worker/rummet.mjs): vilka i gänget som har
 # rummet öppet och vad de pekar på, genom en websocket till ett Durable
-# Object – gängets kupong i realtid (worker/kupongen.mjs) och gänget i bild på
-# tv:n (worker/bilden.mjs). Egen tjänst, skild från kupongtjänsten (kupong.toml). Driftsätts för
+# Object – gängets kupong i realtid (worker/kupongen.mjs) och samtalet, när
+# gänget ringer varandra i Matchfixarna (worker/samtalet.mjs). Egen tjänst, skild från kupongtjänsten (kupong.toml). Driftsätts för
 # hand från en dator:
 #
 #   npx wrangler@4.147.0 deploy --config worker/rummet.toml
@@ -29,12 +29,20 @@ tag = "v2"
 new_sqlite_classes = ["Kupongen"]
 
 [[durable_objects.bindings]]
-name = "BILDEN"
-class_name = "Bilden"
+name = "SAMTALET"
+class_name = "Samtalet"
 
 [[migrations]]
 tag = "v3"
 new_sqlite_classes = ["Bilden"]
 
-# Cloudflares TURN, så att bilden kommer fram också på mobilnät (valfritt;
-# utan dem bara STUN): wrangler secret put TURN_ID / TURN_NYCKEL --config worker/rummet.toml
+# Gänget i bild på tv:n (Bilden) blev samtalet (2026-11-18): samma Durable
+# Object med nytt namn – det sparade ingenting, och samtalet sparar sitt läge,
+# de som vill bli uppringda och VAPID-nyckeln till aviseringarna.
+[[migrations]]
+tag = "v4"
+renamed_classes = [{ from = "Bilden", to = "Samtalet" }]
+
+# Cloudflares TURN, så att rösten och bilden kommer fram också på mobilnät
+# (valfritt, men utan dem bara STUN, och då händer det att två telefoner inte
+# hittar varandra): wrangler secret put TURN_ID / TURN_NYCKEL --config worker/rummet.toml

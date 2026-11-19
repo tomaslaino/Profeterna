@@ -544,6 +544,15 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   också över matchrutan och till Tabeller, Statistik och Om oss. Den visar det tv:n visar: text-tv:n, som går vidare,
   eller gänget i bild, och byter till AV när någon visar sig, som i rummet. Kameran och bilden fortsätter. Ett tryck på
   den lilla tv:n går tillbaka till tv:n i rummet, krysset stänger den (se *Tv:n följer med* under [Tv:n](#tvn))
+- [x] **Samtalet i Matchfixarna (2026-11-18, användarens önskemål: "Gör telefonuppringningen på matchfixarna ännu
+  bättre o ännu mer logisk", och på frågorna: hela samtalet i appen, avisering i telefonen, hela gänget på en gång):**
+  gänget ringer varandra i Matchfixarna i stället för i telefonen, med röst och – för den som vill – bild på tv:n. En
+  lur i toppbaren och i rummets fot tar fram *Ring gänget*; det ringer hos de andra i sidan och som avisering i
+  telefonen (*Laino ringer*, med *Inte nu* och *Svara*), och den som missade ser *Missat samtal* och kan gå med så länge
+  samtalet pågår. Samtalet är en bricka överst i mitten, likadan på sajten och i tobaksaffären: vilka som är med (ringen
+  lyser när någon pratar), tiden, mikrofonen, kameran och *Lägg på*. Det följer med över hela sajten, som den lilla
+  tv:n, också till Tabeller, Statistik och Om oss. Förut var tv:n bara bild till ett vanligt telefonsamtal vid sidan av
+  (se [Samtalet](#samtalet))
 
 ## Publicering
 
@@ -3995,7 +4004,7 @@ det att prova med en egen mapp: `KUPONG_DIR=/tmp/kuponger npm run build`.
 Någon i gänget skapar omgångens kupong – väljer matcherna – och var och en fyller i den för
 sig: ett tecken, en halvgardering eller en helgardering per match. Man ser de andras tips
 först när man själv har lämnat in. Allas tips blir underlaget för uppgörelsen i telefon där
-gängets kupong bestäms.
+gängets kupong bestäms – sedan 2026-11-18 i ett samtal i Matchfixarna (se [Samtalet](#samtalet)).
 
 Allt ligger under *Kupong*. Överst visar fyra steg var
 omgången står: *Välj matcher*, *Alla tippar*, *Uppgörelsen* och *Matcherna* (hur många
@@ -4315,6 +4324,103 @@ räknas fram (lag som spelar flera gånger, största favorit, jämnaste match, c
 modellens troligaste tecken), och gängets senaste kupong och de tolv senaste namnen följer med, så
 att namnen skiftar. Tal i förklaringen måste finnas i underlaget. Namnet sparas för alltid per omgång
 och matcher. Bygget skriver filens adress i `data/kuponger.json` under `samtal.namn`.
+
+## Samtalet
+
+Gänget ringer varandra i Matchfixarna, med röst och – för den som vill – bild på tv:n i tobaksaffären (2026-11-18,
+användarens önskemål: "Gör telefonuppringningen på matchfixarna ännu bättre o ännu mer logisk"). Förut pratade vi i ett
+vanligt telefonsamtal vid sidan av och kunde visa oss på tv:n ([Gänget i bild](#tvn)); nu är samtalet en del av sajten.
+Användarens val, en fråga i taget: hela samtalet i appen (röst och bild), det ska ringa i telefonen också när appen inte
+är öppen, och man ringer hela gänget på en gång. Det går i hela förstasidan – rummet, kupongen, uppgörelsen, Olympen –
+och följer med när man byter vy, så att man kan prata och kryssa på samma gång
+([public/telefon.js](public/telefon.js), [public/telefon.css](public/telefon.css), tjänsten i
+[worker/samtalet.mjs](worker/samtalet.mjs), aviseringarna i [public/sw.js](public/sw.js)).
+
+- **Att ringa:** luren står i toppbaren bredvid förstoringsglaset och i rummets fot före *Vanlig sida*. Den tar fram
+  brickan med de andra – en grön prick på den som har sidan öppen just nu – och *Ring gänget*. Två steg, så att ingen
+  ringer upp alla av misstag. Vet enheten inte vem du är frågar brickan *Vem är du?* först.
+- **Det ringer:** i 45 sekunder hos alla som inte är med. Har man sidan öppen står *Laino ringer* i brickan (med *Tejder
+  är med* när någon redan har svarat), med *Inte nu* och *Svara*, luren skakar i grönt och klockan ringer (Web Audio: två
+  klangskålar som slås an 25 gånger i sekunden, var fjärde sekund, och telefonen vibrerar). Den som ringer hör den
+  svenska ringsignalen, 425 Hz en sekund på och fem av, och ser porträtten av dem det ringer hos andas; den som sa
+  *Inte nu* blir grå. Har det ringt klart utan svar har man missat samtalet.
+- **I samtalet:** brickan visar de andra med ringen i sin färg, som lyser när hen pratar (ljudnivån i rösten), tiden från
+  att någon svarade, och tre runda knappar: mikrofonen (av: ljus knapp och en röd prick på ens porträtt hos de andra),
+  kameran (*Visa dig på tv:n*, med en röd lampa när den är tänd) och *Lägg på* i rött. Ett grått porträtt är någon som
+  inte är med: ett tryck ringer hen igen. Ett kort pling när någon kommer eller går. Visar någon sig står bilden på tv:n
+  i rummet; där tv:n inte syns – på sajten, och i rummet i telefonen tills man tar fram tv:n – står bilderna i brickan
+  (ett tryck gör dem mindre).
+- **Pågår ett samtal utan en** står *Samtal pågår* och *Gå med* i brickan (och luren har en grön prick). Det gäller också
+  den som sa *Inte nu* eller missade.
+- **När det tar slut:** samtalet är slut när ingen är kvar att prata med – den sista lägger på, eller ingen svarade – och
+  då hörs upptagettonen (425 Hz, tre korta) och brickan säger varför en stund: *Ingen svarade*, *Tejder och Dogge kan inte
+  nu*, *Samtalet är slut · 12:34*. Den som har missat ett samtal ser *Missat samtal från Laino* nästa gång sidan öppnas
+  (inom tolv timmar, en gång).
+- **En enhet i taget:** svarar man på en annan enhet flyttar samtalet dit (*Samtalet fortsätter på en annan enhet*).
+  Medan man är med byter man inte person i rummet.
+- **Över hela sajten:** luren och brickan finns också på Tabeller, Statistik och Om oss, som är egna sidor (där läser
+  telefon.js gänget ur `data/kuponger.json` själv). Går man dit mitt i ett samtal följer det med: sidan minns samtalet
+  (`profeterna.telefon.med` i sessionStorage, med mikrofonen, kameran och tiden), lägger inte på, och nästa sida går
+  med igen av sig själv inom tjänstens 30 sekunder – ett hack i rösten, inget mer. Stänger man sidan lägger man på.
+  Den lilla tv:n som följer med ([Tv:n](#tvn), *Tv:n följer med*) visar bilden när den står på AV; då står den inte
+  också i brickan.
+- **Dold flik, släckt skärm:** samtalet går ur bara när man lägger på eller stänger sidan. I Android (appen eller
+  Chrome) fortsätter rösten med skärmen släckt eller i en annan app; kameran släcks när fliken döljs och tänds igen när
+  man kommer tillbaka inom tio minuter. Safari i iPhone stannar sidan när skärmen släcks, så där hålls skärmen tänd
+  under samtalet (Screen Wake Lock), men den som byter app tappar rösten tills sidan visas igen. Tappar man
+  uppkopplingen till tjänsten är man med i 30 sekunder till; rösten går direkt mellan webbläsarna och hackar inte av det.
+
+**Aviseringarna** (web push): när man ringer, svarar eller går med första gången frågar webbläsaren om sajten får visa
+aviseringar. Får den det prenumererar sidan hos tjänsten (`POST /samtal/push`, med vem man är), och när det ringer
+skickar tjänsten en avisering utan innehåll till varje telefon som personen har. Service workern ([public/sw.js](public/sw.js))
+frågar då tjänsten vad det gäller (`POST /samtal/nu`) och visar *Laino ringer* med porträttet, *Inte nu* och *Svara*
+(knapparna i Android; i iPhone öppnar ett tryck sidan), eller *Missat samtal från Laino* – med *Gå med* medan samtalet
+pågår och *Ring upp* efteråt. Samma tag, så att det missade samtalet ersätter det som ringde, och samma ämne (`Topic`)
+hos pushtjänsten, så att en avisering som inte har kommit fram ersätts av nästa. *Svara* tar fram sidan om den är öppen,
+annars öppnas den med `?samtal=svara` och svarar själv; *Inte nu* svarar tjänsten utan att öppna något
+(`POST /samtal/inte`). Sidan stänger aviseringen när den visar samtalet. Tjänstens adress, namnen vi kallas och
+porträtten skriver sidan i Cache Storage (lådan `telefon`), där service workern läser dem. Android-appen visar
+aviseringarna som sina egna (se [Appen](#appen)); i iPhone kommer de bara om sajten ligger på hemskärmen (iOS 16.4 eller
+senare). Service workern registreras av telefon.js också när bygget inte har skrivit in filernas lista.
+
+**Tjänsten** är profeterna-rummet ([worker/rummet.mjs](worker/rummet.mjs)), med Durable Objectet *Samtalet*
+([worker/samtalet.mjs](worker/samtalet.mjs); det hette *Bilden* och döptes om, migreringen `v4`). Det håller samtalet –
+vem som ringde, vilka som är med, vilka det ringer hos, vilka som sa *Inte nu* eller missade, vilka som tappade
+uppkopplingen – och sparar det i sin lagring, så att larmet (45 sekunder, 30 sekunder) och aviseringarna fungerar också
+när ingen har sidan öppen. Rösten och bilden går direkt mellan webbläsarna (WebRTC, en förbindelse mellan varje par som
+är med, rösten alltid och bilden när kameran är tänd, med ekosläckning och brusreducering); tjänsten för bara vidare
+erbjudandena och vägarna (SDP och ICE). Krockar två erbjudanden ger det fönster efter som har det högre id:t ("perfect
+negotiation"). Webbläsarna hittar varandra med STUN (Cloudflares och Googles), och bakom mobiloperatörernas
+adressöversättning med TURN, som tjänsten hämtar från Cloudflare när den har en nyckel.
+
+- **Websocketen** `/samtal?vem=DT&id=<fönstret>`: sidan kopplar upp sig när den är synlig och vet vem man är, och
+  kopplar ner när den döljs (utom under ett samtal). In: `ring` (ring gänget, eller en: `{"ring": "DJ"}`), `svara`,
+  `inte`, `lagg`, `lage` (`kamera`, `tyst`) och vägarna till ett annat fönster; ut: `{alla, samtal, senast}` till alla
+  när något ändras (fönstren med `i`, `kamera` och `tyst`; samtalet med `med`, `ringer`, `inte`, `missat`, `borta`;
+  det förra samtalet) och `flyttat`.
+- **Aviseringarna:** `GET /samtal/nyckel` (den publika VAPID-nyckeln), `POST /samtal/push`, `/samtal/nu` och
+  `/samtal/inte`, med CORS för sajtens ursprung. VAPID-nyckeln skapas av tjänsten första gången och sparas i Durable
+  Objectets lagring – ingen hemlighet att lägga in. Bara webbläsarnas pushtjänster tas emot som adresser (Google, Apple,
+  Mozilla, Microsoft); en som svarar 404 eller 410 tas bort.
+- **Driftsättning:** för hand som förut, `npx wrangler@4.147.0 deploy --config worker/rummet.toml`. TURN är valfritt men
+  bör finnas för samtal mellan två telefoner på mobilnät: skapa en TURN-nyckel under *Realtime → TURN* i Cloudflares
+  panel och lägg in den med `npx wrangler@4.147.0 secret put TURN_ID --config worker/rummet.toml` och `… secret put
+  TURN_NYCKEL …` (nyckelns id och token). Sajten publiceras av sig själv; tills tjänsten är driftsatt finns ingen
+  `/samtal`, och då syns ingen lur.
+- **För prov:** `?rum-samtal=ws://127.0.0.1:8787/samtal` (tjänsten lokalt, `wrangler dev --config worker/rummet.toml`,
+  med `PUSH_LOKALT=1` i `worker/.dev.vars` för låtsade pushadresser på 127.0.0.1) och `?rum-samtal-vem=DT`.
+
+Provat 2026-11-18 mot tjänsten lokalt (wrangler dev): tjänsten med tre websocketar och en låtsad pushtjänst som
+kontrollerade VAPID-signaturen – ringa, svara, *Inte nu* från aviseringen, mikrofon och kamera, lägga på, ingen som
+svarar på 45 sekunder (missat och en ny avisering), tappad uppkoppling tillbaka inom 30 sekunder och ute efter, samtalet
+som flyttar till en annan enhet, ringa en igen. I Chromium med låtsaskamera och låtsasmikrofon, tre i gänget i 1280 ×
+800 och 390 × 844, på sajten och i rummet: luren, *Ring gänget*, det ringer hos två, svara, *Inte nu*, rösten åt båda
+hållen (och till tre), porträttet och mikrofonen som lyser när någon pratar, mikrofonen av, kameran på tv:n och i
+brickan, *Gå med* (i brickan och på tv:ns blå ruta), lägga på tills samtalet är slut, *Vem är du?*, en dold flik mitt i
+samtalet, och samma sak i det förminskade och buntade bygget. Aviseringarna i Chromium (service workern väckt med en
+push): *Laino ringer* med *Inte nu*/*Svara*, *Inte nu* till tjänsten, *Missat samtal* med *Ring upp*, `?samtal=svara`
+och *Svara* i en sida som redan är öppen. Inte provat: riktiga telefoner (Android-appen, Safari i iPhone), en riktig
+pushtjänst (huvudlös Chromium kan inte prenumerera), två olika nät och tjänsten driftsatt.
 
 ## Kuponghistoriken
 
@@ -8321,61 +8427,32 @@ Har en division matcher som döljs just nu (Dölj resultat) visar tabellen och s
 hur många som är dolda och *Visa ändå* – samma nyckel som på Tabeller och Statistik, så att
 det gäller där också.
 
-**Gänget i bild (2026-11-16).** Användaren: "Kan du ordna så att vi, när vi pratar i mobiltelefon med varandra, att vi
-har möjlighet att se varandra på TV-apparaten där uppe där text-tv spelas - om vi vill … Tänk på att det ska vara
-intuitivt och snyggt!" Tv:n har fått en AV-ingång, som när man kopplade in en videokamera
-([public/rum-bild.js](public/rum-bild.js), AV-delen i [public/rum-tv.js](public/rum-tv.js) och
-[public/rum-tv.css](public/rum-tv.css), tjänsten i [worker/bilden.mjs](worker/bilden.mjs)). Bara bild: rösten går i
-telefonen, så det blir inget eko och inget som krockar med samtalet.
+**Gänget i bild** (2026-11-16, sedan 2026-11-18 en del av [Samtalet](#samtalet)). Användaren: "Kan du ordna så att vi,
+när vi pratar i mobiltelefon med varandra, att vi har möjlighet att se varandra på TV-apparaten där uppe där text-tv
+spelas - om vi vill … Tänk på att det ska vara intuitivt och snyggt!" Tv:n har en AV-ingång, som när man kopplade in en
+videokamera ([public/rum-bild.js](public/rum-bild.js), AV-delen i [public/rum-tv.js](public/rum-tv.js) och
+[public/rum-tv.css](public/rum-tv.css)). Där syns de i samtalet som visar sig.
 
-- **Visa dig på tv:n** står i foten bredvid Tillbaka när tv:n är nära. Ett tryck tänder kameran (webbläsaren frågar
-  första gången) och tv:n byter till AV. Medan kameran är tänd står *Stäng av kameran* med en röd lampa i foten var man
-  än är i rummet; i telefonen på höjden, där foten står uppe till höger, står den där *Vanlig sida* stod, och nära tv:n
-  viker namnet undan (som med kupongen i handen). Inget annat i rummet ändras.
-- **Hos de andra** byter tv:n till AV av sig själv när någon visar sig – med ett ögonblick snö och en skakning, som när
-  man bytte kanal – och rutan lyser fullt också på håll, så att man ser ansiktet uppe i hörnet. Slutar alla visa sig går
-  tv:n tillbaka till text-tv:n. Man byter själv med **TV/AV**, en avlång knapp under ▼ 0 ▲ i knappsatsen, eller raden
-  *Gänget i bild* på 300; en sida, en siffra eller ▲ ▼ (och svepet i telefonen) går tillbaka till text-tv:n, och tv:n
-  byter då inte till AV igen förrän någon ny visar sig. Displayen visar *AV* (V:et som ett U, som på displayerna då) och
-  *AV* står i grönt uppe till vänster i rutan några sekunder efter bytet.
+- **Byter själv:** när någon i samtalet visar sig (eller du själv) byter tv:n till AV – med ett ögonblick snö och en
+  skakning, som när man bytte kanal – och rutan lyser fullt också på håll, så att man ser ansiktet uppe i hörnet. Slutar
+  alla visa sig går tv:n tillbaka till text-tv:n. Man byter själv med **TV/AV**, en avlång knapp under ▼ 0 ▲ i
+  knappsatsen, eller raden *Gänget i bild* på 300; en sida, en siffra eller ▲ ▼ (och svepet i telefonen) går tillbaka
+  till text-tv:n, och tv:n byter då inte till AV igen förrän någon ny visar sig. Displayen visar *AV* (V:et som ett U,
+  som på displayerna då) och *AV* står i grönt uppe till vänster i rutan några sekunder efter bytet.
 - **På rutan:** den som visar sig står stort, två sida vid sida (beskurna på höjden), med namnet vi kallas
   (`Tippoang.kallas`) i sin färg (`--gang-0–2`) nere till vänster, som en textremsa på tv. Man ser sig själv spegelvänd i
   en liten bild nere till höger med en tunn vit ram och en röd lampa (bild i bild) – eller stort, med *Tejder ser dig*
-  (eller *Ingen annan har tv:n på*) under, när ingen annan visar sig. De som har tv:n på AV utan att visa sig står som
-  små porträtt i sina färger uppe till höger (*ser på*). Medan en bild letar sig fram står det snö i rutan, och efter
-  femton sekunder utan kontakt *Ingen kontakt*. Utan bild: den blå rutan, som när ingen kassett spelar, med *Ingen i
-  bild* och vad man gör, eller vad som gick fel med kameran (*Kameran fick inte startas. Tillåt den för sajten i
-  webbläsaren och försök igen.*, *Hittar ingen kamera.*, *Kameran används av något annat just nu.*). Linjerna över
-  bilden är svagare än över text-tv:n.
-- **Vem du är:** den du har valt i rummet (`Samtal.pult.du()`), annars den enheten minns från kupongen
-  (`profeterna.samtal.vem`). Vet enheten inte det frågar tv:n *Vem är du?* med porträtten när man trycker på *Visa dig
-  på tv:n* eller TV/AV, och svaret sparas bara för tv:n (`profeterna.tv.vem`) – kupongen påverkas inte. Den som inte är
-  någon i gänget kopplas inte upp och ser ingen. Byter man person i rummet kopplar sidan upp sig som den nya.
-- **Fliken dold eller rummet stängt** (som när man växlar till telefonsamtalet): kameran släcks och förbindelserna
-  stängs, och kommer man tillbaka inom tio minuter tänds kameran igen av sig själv (`ATER`).
-- **Vägen:** bilden går direkt mellan webbläsarna (WebRTC), en förbindelse mellan varje par där minst en visar sig och
-  båda har tv:n på AV; kameran tas i 640 × 480 och högst 30 bilder i sekunden, framkameran i telefonen. Tjänsten
-  profeterna-rummet ([worker/rummet.mjs](worker/rummet.mjs), samma som rummet och kupongen i realtid) har ett tredje
-  Durable Object, *Bilden* ([worker/bilden.mjs](worker/bilden.mjs), websocketen `/bild?vem=DT&id=<fönstret>`), som
-  säger vilka som är med (`alla`: fönster, vem, kamera, med) och för vidare erbjudandena och vägarna mellan
-  fönstren – ingen bild går genom den, och inget sparas. Krockar två erbjudanden ger det fönster efter som har det högre
-  id:t ("perfect negotiation"), med erbjudandet, svaret och backningen uttryckliga för äldre Safari. Webbläsarna hittar
-  varandra med STUN (Cloudflares och Googles). Bakom mobiloperatörernas adressöversättning räcker det inte alltid; då
-  behövs TURN, som tjänsten hämtar från Cloudflare när den har en nyckel (`TURN_ID` och `TURN_NYCKEL`, se nedan).
-- **Driftsättning:** tjänsten driftsätts för hand som förut (`npx wrangler@4.147.0 deploy --config worker/rummet.toml`,
-  migreringen `v3` lägger till *Bilden*). TURN är valfritt: skapa en TURN-nyckel under *Realtime → TURN* i Cloudflares
-  panel och lägg in den med `npx wrangler@4.147.0 secret put TURN_ID --config worker/rummet.toml` och `… secret put
-  TURN_NYCKEL …` (nyckelns id och token). Utan dem används bara STUN.
-- **För prov:** `?rum-bild=ws://127.0.0.1:8787/bild` (tjänsten lokalt, `wrangler dev --config worker/rummet.toml`) och
-  `?rum-bild-vem=DT`.
-
-Provat 2026-11-16 i huvudlös Chrome med låtsaskamera mot tjänsten lokalt (wrangler dev) och sajtens data: två och tre i
-gänget i 1280 × 800 – en visar sig och den andras tv byter själv, båda sida vid sida, en tredje som bara tittar och
-syns som porträtt, en som släcker och tillbaka till text-tv:n när ingen visar sig; i telefonen (390 × 844 och på
-bredden) med *Vem är du?*, tryck med fingret och foten uppe till höger; utan kamera (felet på den blå rutan); TV/AV,
-▲ och raden på 300; fliken dold och visad igen (kameran tänds själv, båda ser varandra igen inom en sekund, också när
-båda gör det samtidigt och erbjudandena krockar) och en sida som laddas om. Inte provat: riktiga kameror, Safari i
-iPhone, två olika nät (mobilnät utan TURN) och tjänsten driftsatt.
+  (de andra i samtalet) eller *Ingen annan i samtalet* under, när ingen annan visar sig. Medan en bild letar sig fram
+  står det snö i rutan, och efter femton sekunder utan kontakt *Ingen kontakt*. Linjerna över bilden är svagare än över
+  text-tv:n.
+- **Den blå rutan** (ingen i bild, som när ingen kassett spelar) säger vad man kan göra, med samma ord som brickan, och
+  det är knappar i tv:ns cyan med en ram, som ett val i en meny på skärmen: *Ring gänget*, *Tejder ringer* → *Svara*,
+  *Samtal pågår* → *Gå med* eller, i samtalet, *Ingen i bild* → *Visa dig på tv:n*. Går kameran inte att starta står
+  felet där (*Kameran fick inte startas. Tillåt den för sajten i webbläsaren och försök igen.*, *Hittar ingen kamera.*,
+  *Kameran används av något annat just nu.*) med *Försök igen*.
+- Förut (2026-11-16–18) var tv:n bara bild till ett vanligt telefonsamtal: *Visa dig på tv:n* i foten nära tv:n,
+  *Stäng av kameran* i foten, *Vem är du?* på tv:n och de som bara tittade som porträtt (*ser på*). Allt det är nu
+  brickan i samtalet.
 
 **Tv:n följer med (2026-11-18).** Användaren: "Kan du ordna så att man kan välja om man vill få med TVapparaten där man
 ser de andra på en liten bild i ett hörn i mobilen (uppe till höger) när man surfar runt på andra ställen på sidan", och
@@ -8383,8 +8460,8 @@ sedan, om text-tv:n: "Tänker där jag har text-tv nu". Valet är en knapp, inte
 när man ber om den, så att ingen kamera fortsätter utan att man vet om det ([public/rum-bild.js](public/rum-bild.js),
 stilen sist i [public/rum-tv.css](public/rum-tv.css)).
 
-- **Ta med tv:n** står i foten nära tv:n när den är på (inte medan den frågar *Vem är du?*), bredvid *Visa dig på
-  tv:n*. I telefonen på höjden står den där *Vanlig sida* stod, för den leder också dit. Ett tryck går till den vanliga
+- **Ta med tv:n** står i foten nära tv:n när den är på, bredvid luren. I telefonen på höjden står den där *Vanlig
+  sida* stod, för den leder också dit, och namnet viker undan. Ett tryck går till den vanliga
   sidan (`#hem`), och tv:n krymper från sin plats i rummet till hörnet.
 - **Den lilla tv:n** är samma Panasonic utan panelen med knapparna: fronten 238 × 196 förminskad till 162 × 133 i
   telefonen och i full storlek på större skärmar, uppe till höger under menyn. I telefonen följer den menyn uppåt när
@@ -8393,17 +8470,17 @@ stilen sist i [public/rum-tv.css](public/rum-tv.css)).
   ritas om varje minut, `tvKoll` i rum.js), eller AV. Visar sig någon byter den till AV med snö, och slutar alla går den
   tillbaka till text-tv:n, som i rummet. Lampan under rutan är röd medan din kamera är tänd. Den ligger i det översta
   lagret (popover), och medan matchrutan är öppen flyttas den in i den, annars gick den inte att trycka på där.
-- **Ett tryck** på den lilla tv:n går till tv:n i rummet, nära (`Rum.tv()`); **krysset** stänger den: kameran släcks
-  och förbindelserna stängs, som när man lämnar rummet, och tv:n i rummet står på text-tv:n tills någon visar sig. Med
-  mus syns krysset när man pekar på tv:n.
+- **Ett tryck** på den lilla tv:n går till tv:n i rummet, nära (`Rum.tv()`); **krysset** stänger den, och tv:n i rummet
+  står på text-tv:n tills någon visar sig. Samtalet och kameran fortsätter – de är brickans (se [Samtalet](#samtalet)) –
+  och bilderna står då i brickan. Med mus syns krysset när man pekar på tv:n.
 - **Förstasidan laddad på nytt** (eller från en av de egna sidorna, med `#kupong` …): då finns inget rum, och rum.js
   bygger bara tv:n i en dold låda (`Rum.tvUtan`), med samma rader som i rummet, så att text-tv:n följer med också då.
   Går man in i rummet sedan flyttar den tv:n in där, med det den visar.
 - **Egna sidor:** Tabeller, Statistik och Om oss laddas som nya sidor, och då bryts förbindelserna. Tv:n följer ändå
   med: sidan minns att den följer med (`profeterna.tv.foljer` i sessionStorage, med om den stod på AV och om kameran var
-  tänd), och där hämtar [public/tv-med.js](public/tv-med.js) tv:ns stil, `tippoang.js` och `rum-bild.js` – bara när
-  tv:n följer med. Den kopplar upp sig igen (snö ett ögonblick), tänder kameran om den var tänd och läser gänget ur
-  `data/kuponger.json` själv. Text-tv:n kan inte följa med dit (dess rader kommer ur förstasidans kupong och omgång),
+  tänd), och där hämtar [public/tv-med.js](public/tv-med.js) tv:ns stil och `rum-bild.js` – bara när tv:n följer
+  med. Samtalet följer med dit av sig självt (telefon.js finns på de sidorna, se [Samtalet](#samtalet)), och med det
+  bilden och kameran, om den var tänd. Text-tv:n kan inte följa med dit (dess rader kommer ur förstasidans kupong och omgång),
   så där syns den lilla tv:n bara med AV: när någon visar sig, och den slocknar när ingen gör det. Den följer med
   vidare ändå, och på förstasidan står text-tv:n i den igen. Som med `ATER` följer den bara med inom tio minuter.
 
@@ -11789,9 +11866,12 @@ sajtens egna ursprung, men vem som helst därifrån kan läsa och ändra dem, oc
 upp sig först när man får se de andras tips, så att ingen ser dem av misstag. Det är ett
 utkast: kupongen som spelas ändras bara genom *Spara*, med sina vanliga kontroller.
 
-Gänget i bild på tv:n ([worker/bilden.mjs](worker/bilden.mjs), [public/rum-bild.js](public/rum-bild.js)) litar på gänget
-på samma sätt: tjänsten släpper bara in sajtens egna ursprung och någon av DL, DT och DJ, men vem man är väljer man
-själv. Därför syns det på tv:n vilka som ser en (*Tejder ser dig*, porträtten under *ser på*), och kameran är bara tänd
-när man själv har tänt den – med en röd lampa i foten och i den egna bilden – och släcks när fliken döljs. Bilden går
-direkt mellan webbläsarna, krypterad (WebRTC) och, med TURN, genom Cloudflare utan att sparas; tjänsten ser bara vem
-som är med och erbjudandena (SDP och ICE), och sparar inget.
+Samtalet ([worker/samtalet.mjs](worker/samtalet.mjs), [public/telefon.js](public/telefon.js)) litar på gänget på
+samma sätt: tjänsten släpper bara in sajtens egna ursprung och någon av DL, DT och DJ, men vem man är väljer man själv.
+Därför syns alla som är med i brickan hos de andra – ingen kan lyssna utan att synas – och svarar någon som en person som
+redan är med flyttar samtalet dit, så att den riktiga personen märker det (*Samtalet fortsätter på en annan enhet*).
+Mikrofonen och kameran är bara på när man själv har ringt, svarat eller tänt kameran; kameran med en röd lampa, och den
+släcks när fliken döljs. Rösten och bilden går direkt mellan webbläsarna, krypterade (WebRTC) och, med TURN, genom
+Cloudflare utan att sparas; tjänsten ser bara vem som är med och erbjudandena (SDP och ICE). Tjänsten sparar samtalets
+läge, det förra samtalet, aviseringarnas adresser (med vem de hör till) och VAPID-nyckeln. Aviseringarna har inget
+innehåll: service workern frågar tjänsten, och den som känner till en adress får veta om det ringer hos den personen.
