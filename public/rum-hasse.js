@@ -364,7 +364,69 @@ window.RumHasse = (() => {
   // håller avstånd, så att ingen kör igenom någon annan, och högst BRO_MAX är ute på en gång (färre på rummets
   // lägre steg). Ingen trafik när man har bett om minskad rörelse eller i en fast bild (?rum-t).
   const BRO_MAX = { ga: [5, 4, 3, 2], fil: [5, 4, 3, 2], cykel: [4, 3, 3, 2] };
-  const STROMMAR = ['ga', 'b0', 'b1', 'f0', 'f1', 't0', 't1', 'c2', 'c3'];
+  const STROMMAR = ['ga', 'm0', 'b0', 'b1', 'f0', 'f1', 't0', 't1', 'c2', 'c3'];
+  // Samma gata (2026-11-19): bron är gatan framför affären, som går upp på den till höger om huset, så det som rör sig
+  // här är det som rör sig där. Gatans tidtabell (rummets modell i rum-ute.js, densamma som utanför: RumFasadGatan.kommer
+  // och folket.kommer i rum-fasad.js) läses i förväg. Gatan är enkelriktad från bron, så allt som kör hitåt över bron
+  // (m0, i stället för b0, f0 och t0) är just de bilar, taxibilar och bussar som strax kör förbi affären, i samma lack
+  // och i den ordningen, och de lämnar bron när de kommer in på gatan. De som går är sällskap därifrån: den som har gått
+  // förbi affären mot bron går ut på den, och den som snart kommer därifrån är redan på väg hitåt (broVem). Filen bort
+  // och cyklisterna lottas som förut. Utan rummets modell lottas allt som förut.
+  const gatan = () => {
+    const el = document.getElementById('rum-ute');
+    const M = el && el._fram;
+    const FG = window.RumFasadGatan;
+    return M && M.S && M.folk && M.folk.kommer && FG && FG.kommer && FG.fordon.som ? M : null;
+  };
+  // hur långt fram tidtabellen läses (s): längre än något fordon är på bron
+  const MOT_FRAM = 34;
+  // Det som kommer in på gatan de närmaste MOT_FRAM sekunderna läggs ut på bron, så att det är framme när det kommer
+  // in där: det börjar tiden över bron (sek) före, eller så snart den framför har hunnit undan. → när nästa läses (ms)
+  function motKom(M, n, nu) {
+    const B = H.bro;
+    if (!M || !H.ute.fordon) return nu + 5000;
+    const lage = uteLage();
+    for (const b of RumFasadGatan.kommer(M.S, B.motSist, nu / 1000 + MOT_FRAM)) {
+      // (hur tätt de kommer, jämnat över de senaste: lika tätt går filen bort, broIntervall)
+      const lucka = Math.min(240, b.t0 - B.motSist);
+      B.motLucka = B.motLucka ? 0.75 * B.motLucka + 0.25 * lucka : Math.max(lucka, 20);
+      B.motSist = b.t0;
+      const ifil = B.aktiva.filter((x) => x.fil === 0 && nu - x.t0 < x.sek * 1000);
+      if (ifil.length >= BRO_MAX.fil[steg()]) continue;
+      if (!ifil.length) B.fart[0] = broFart(n.T);
+      // (plogbilen har ingen form för bron)
+      if (b.typ === 'plog') continue;
+      const g = H.ute.fordon(n.v, n.L, lage, b.typ, 0, n.T, b);
+      if (!g) continue;
+      const sek = g.vag / B.fart[0];
+      const t0 = Math.max(b.t0 * 1000 - sek * 1000, B.fri[0]);
+      if (nu - t0 >= sek * 1000) continue;
+      B.fri[0] = t0 + ((g.meter + 8) / B.fart[0]) * 1000;
+      B.aktiva.push({ k: 'm0', fil: 0, g, lage, t0, sek });
+    }
+    return nu + 2000;
+  }
+  // Vilka som går ut på bron vid tiden tt (s): det sällskap ur gatans tidtabell som passar bäst, högst tolv sekunder
+  // sent eller åtta tidigt. Den som har gått åt höger förbi affären går ut på bron när den har lämnat gatan (slut), och
+  // den som kommer från höger går ut i andra änden så långt i förväg som det tar att gå över (gangSek). → { vem, mot,
+  // ts } eller null när ingen passar.
+  function broVem(M, tt) {
+    const B = H.bro;
+    if (B.gaFolk !== M.folk) { B.gaFolk = M.folk; B.gaTagna = new Set(); }
+    let bast = null;
+    for (const l of M.folk.kommer(tt - 12, tt + 300)) {
+      if (B.gaTagna.has(l.id)) continue;
+      const mot = l.dir < 0;
+      const ts = mot ? l.start - H.ute.gangSek(l.vem) : l.slut;
+      if (ts - tt < -12 || ts - tt > 8) continue;
+      if (!bast || Math.abs(ts - tt) < Math.abs(bast.ts - tt)) bast = { vem: l.vem, mot, ts, id: l.id };
+    }
+    if (bast) {
+      B.gaTagna.add(bast.id);
+      if (B.gaTagna.size > 80) B.gaTagna.delete(B.gaTagna.values().next().value);
+    }
+    return bast;
+  }
   // hur ofta något kommer: de som går, bilarna och cyklisterna (s, i medeltal), bussarna i var riktning (min mellan
   // turerna)
   function broTakt(T) {
@@ -394,6 +456,8 @@ window.RumHasse = (() => {
   function broIntervall(k, takt) {
     const ex = (m) => -Math.log(1 - Math.random()) * m;
     if (k === 'ga') return Math.max(4, ex(takt.ga));
+    // (filen bort har inte mer trafik än gatan, när dess fordon kör hitåt: motKom)
+    if (k === 'b1' && H.bro && H.bro.motLucka && gatan()) return Math.max(1.6, ex(Math.max(takt.bil, H.bro.motLucka)));
     if (k[0] === 'b') return Math.max(1.6, ex(takt.bil));
     if (k[0] === 'c') return takt.cykel ? Math.max(2.5, ex(takt.cykel)) : 120;
     const m = (k[0] === 'f' ? takt.fyra : takt.tre) * 60;
@@ -417,6 +481,9 @@ window.RumHasse = (() => {
       for (const k of STROMMAR) B.nasta[k] = t0 + broIntervall(k, n.takt) * (k[0] === 'f' || k[0] === 't' ? Math.random() : 1) * 1000;
       B.fri = [0, 0, 0, 0];
       B.fart = [broFart(n.T), broFart(n.T), broCykelFart(), broCykelFart()];
+      B.nasta.m0 = nu;
+      B.motSist = nu / 1000;
+      B.motLucka = 0;
       B.geo = null;
     }
     bronGa();
@@ -437,6 +504,10 @@ window.RumHasse = (() => {
       for (const s of STROMMAR) if (B.nasta[s] <= nu && (!k || B.nasta[s] < B.nasta[k])) k = s;
       if (!k) break;
       const t = B.nasta[k];
+      // (filen hitåt: gatans egna fordon när rummets modell finns, annars lottade som förut)
+      const M = gatan();
+      if (k === 'm0') { B.nasta.m0 = motKom(M, n, nu); continue; }
+      if (M && (k === 'b0' || k === 'f0' || k === 't0')) { B.nasta[k] = nu + 5000; continue; }
       const fil = k === 'ga' ? -1 : +k[1];
       // (i filen håller man avstånd till den framför)
       if (fil >= 0 && t < B.fri[fil]) { B.nasta[k] = B.fri[fil] + 100; continue; }
@@ -446,6 +517,8 @@ window.RumHasse = (() => {
         // (fullt: försök igen om en stund)
         if (!kom) { B.nasta[k] = t + 2000; continue; }
         if (fil >= 0) B.fri[fil] = t + ((kom.meter + (k[0] === 'c' ? 3 : 8)) / B.fart[fil]) * 1000;
+        // (ingen på gatan passade just då: se efter igen om en stund)
+        if (kom.tom) { B.nasta[k] = t + 6000; continue; }
       }
       B.nasta[k] = t + broIntervall(k, n.takt) * 1000;
     }
@@ -463,11 +536,17 @@ window.RumHasse = (() => {
     if (k === 'ga') {
       if (forbi > 60) return { meter: 0 };
       if (aktiva.filter((x) => x.k === 'ga').length >= BRO_MAX.ga[steg()]) return null;
-      const g = H.ute.gangare(n.v, n.L, lage);
+      // (gatans egna sällskap när rummets modell finns, annars lottat som förut)
+      const M = H.ute.gangSek ? gatan() : null;
+      const val = M ? broVem(M, nu / 1000 - forbi) : null;
+      if (M && !val) return { meter: 0, tom: true };
+      const g = H.ute.gangare(n.v, n.L, lage, Math.random, val ? val.vem : null);
+      if (val) g.mot = val.mot;
+      const t0 = val ? val.ts * 1000 : nu - forbi * 1000;
       // (i gångens fart, som framför affären; den gamla figuren på 42–60 s)
       const sek = g.sek || 42 + Math.random() * 18;
-      if (forbi >= sek) return { meter: 0 };
-      B.aktiva.push({ k, g, lage, t0: nu - forbi * 1000, sek });
+      if (nu - t0 >= sek * 1000) return { meter: 0 };
+      B.aktiva.push({ k, g, lage, t0, sek });
       return { meter: 0 };
     }
     const fil = +k[1];
@@ -540,7 +619,7 @@ window.RumHasse = (() => {
     if (!D) return;
     const x = D.x;
     const B = H.bro;
-    const levande = B && B.aktiva.length ? B.aktiva.filter((y) => ms - y.t0 < y.sek * 1000 && y.lage === uteLage()) : [];
+    const levande = B && B.aktiva.length ? B.aktiva.filter((y) => ms >= y.t0 && ms - y.t0 < y.sek * 1000 && y.lage === uteLage()) : [];
     if (B) B.aktiva = B.aktiva.filter((y) => ms - y.t0 < y.sek * 1000);
     if (!levande.length && D.tom) return;
     x.setTransform(1, 0, 0, 1, 0, 0);

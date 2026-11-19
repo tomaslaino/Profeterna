@@ -3650,26 +3650,35 @@ window.RumFasad = (() => {
     const P = T.natt ? 70 : Math.max(14, Math.min(40, (n0 * 7.6) / (0.75 + 0.18 * T.gaende)));
     const off = [...Array(n)].map((_, i) => ((i + 0.6 * R()) * P) / n);
     const minne = new Map();
+    const fron = (i, m) => rng(fro + 977 * (i + 1) + 7919 * m);
+    // Sällskapet i varvet m på platsen i, åt vilket håll det går och när (null: ingen kommer), det första ur följden RK
+    function vilka(RK, i, m) {
+      if (!(RK() > LUGN.tom)) return null;
+      // (på halkan går de flesta i ett sällskap försiktigt, halkar i gangFor)
+      const sk = sallskap(RK, VEM || vemGar(RK, T, W, v), v, L, W.halt ? { ...W, halkar: RK() < 0.65 } : W);
+      for (const x of sk.vem) if (x.st.namn !== 'springer' && x.st.namn !== 'skrinna') x.st.takt *= LUGN.takt;
+      const dm = 0.3 + RK() * 0.4;
+      const dir = RK() < 0.5 ? 1 : -1;
+      const k0 = skala(dm) * M / 100;
+      // (alla går i den förstas fart)
+      const st0 = sk.vem[0].st;
+      const fart = st0.S * k0 * st0.takt;
+      const kant = sk.ut * k0 + 60;
+      const tc = (V.w + 2 * kant) / fart;
+      const start = m * P + off[i] + RK() * Math.max(0, P - tc);
+      livet(sk, W, v);
+      return { sk, dm, dir, k0, fart, kant, tc, start };
+    }
+    const titt = new Map();
     function lopp(i, m) {
       const key = m * 16 + i;
       if (minne.has(key)) return minne.get(key);
       // (vilka de är, kläderna och sättet att gå ur platsens och varvets egen följd)
-      const RK = rng(fro + 977 * (i + 1) + 7919 * m);
+      const RK = fron(i, m);
       let lap = null;
-      if (RK() > LUGN.tom) {
-        // (på halkan går de flesta i ett sällskap försiktigt, halkar i gangFor)
-        const sk = sallskap(RK, VEM || vemGar(RK, T, W, v), v, L, W.halt ? { ...W, halkar: RK() < 0.65 } : W);
-        for (const x of sk.vem) if (x.st.namn !== 'springer' && x.st.namn !== 'skrinna') x.st.takt *= LUGN.takt;
-        const dm = 0.3 + RK() * 0.4;
-        const dir = RK() < 0.5 ? 1 : -1;
-        const k0 = skala(dm) * M / 100;
-        // (alla går i den förstas fart)
-        const st0 = sk.vem[0].st;
-        const fart = st0.S * k0 * st0.takt;
-        const kant = sk.ut * k0 + 60;
-        const tc = (V.w + 2 * kant) / fart;
-        const start = m * P + off[i] + RK() * Math.max(0, P - tc);
-        livet(sk, W, v);
+      const vi = vilka(RK, i, m);
+      if (vi) {
+        const { sk, dm, dir, k0, fart, kant, tc, start } = vi;
         lap = {
           start, slut: start + tc, fart, dir, fran: dir > 0 ? V.x - kant : V.x + V.w + kant,
           folk: sk.vem.map((x) => {
@@ -3700,6 +3709,26 @@ window.RumFasad = (() => {
           }
         }
         return ut.sort((p, q) => p[0].dm - q[0].dm);
+      },
+      // De sällskap som går förbi någon gång mellan ta och tb (s), utan att figurerna byggs: { id, start, slut, dir
+      // (1: åt höger, mot bron), vem } med vem som i sallskap. För bron bakom Hasse Backe (rum-hasse.js), där de som
+      // har gått förbi affären går vidare och de som snart kommer redan är på väg.
+      kommer(ta, tb) {
+        const ut = [];
+        for (let i = 0; i < n; i++) {
+          for (let m = Math.floor((ta - off[i]) / P) - 2; m <= Math.floor((tb - off[i]) / P); m++) {
+            const key = m * 16 + i;
+            let g = titt.get(key);
+            if (g === undefined) {
+              const vi = vilka(fron(i, m), i, m);
+              g = vi ? { id: key, start: vi.start, slut: vi.start + vi.tc, dir: vi.dir, vem: vi.sk.vem } : null;
+              titt.set(key, g);
+              if (titt.size > 240) titt.delete(titt.keys().next().value);
+            }
+            if (g && g.slut > ta && g.start < tb) ut.push(g);
+          }
+        }
+        return ut;
       },
     };
   }
@@ -4692,7 +4721,11 @@ window.RumFasad = (() => {
     const W = vadret(v, L);
     const sk = livet(sallskap(R, VEM || vemGar(R, T, W, v), v, L, W.halt ? { ...W, halkar: R() < 0.65 } : W), W, v);
     // (de bortersta först: ddm, m närmare en)
-    return sk.vem.map((m) => ({ D: figurDelar(m.o, L), k: m.k || m.o.h || 1, st: m.st, dx: m.dx || 0, ddm: m.ddm || 0 })).sort((p, q) => p.ddm - q.ddm);
+    return folkAv(sk.vem, L);
+  }
+  // (ett sällskap som redan är lottat, folket.kommer: samma människor som går förbi affären)
+  function folkAv(vem, L) {
+    return vem.map((m) => ({ D: figurDelar(m.o, L), k: m.k || m.o.h || 1, st: m.st, dx: m.dx || 0, ddm: m.ddm || 0 })).sort((p, q) => p.ddm - q.ddm);
   }
   function folkRita(c, m, p, A = 1, z = 0) {
     ritaDelar(c, m.D, stalln(p, m.st), A, 0, false, z);
@@ -4710,7 +4743,7 @@ window.RumFasad = (() => {
 
   // (gången och huvudet också för dem som går på gatan inifrån, rum-ute.js: samma sätt att gå och samma ställning)
   return {
-    bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR, GSTIL }, folk: { nytt: folkNytt, rita: folkRita },
+    bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR, GSTIL }, folk: { nytt: folkNytt, av: folkAv, rita: folkRita },
     framfor, ritaFigur, framDelar, skala, M, OGA_X,
   };
 })();
