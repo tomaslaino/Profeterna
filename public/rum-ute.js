@@ -617,10 +617,12 @@ window.RumUte = (() => {
     if (o.bag) kropp += `<path d="M8 -151 L-11 -104" stroke="${bak(o.bag)}" stroke-width="2.4"/><rect x="-24" y="-108" width="18" height="23" rx="3" fill="${t(o.bag)}"/>`;
     // huvudet: håret, mössan, kepsen eller pannbandet
     let huvud = `<path d="${GG.HUVUD}" fill="${t(o.skin)}"/>`;
+    // (under mössan och kepsen bara håret som syns under kanten, GG.HAR_UNDER: inga lockar eller spetsar genom kullen)
     const har = `<path d="${GG.HAR[o.harStil] || GG.HAR.kort}" fill="${t(o.hair)}"/>`;
-    if (o.hatt === 'mossa') huvud += `<path d="M-10.5 -167.5 Q-11.5 -188.5 0.5 -188.5 Q12 -188.5 11.5 -169.5 Z" fill="${t(o.hat)}"/>`;
-    else if (o.hatt === 'keps') huvud += `${har}<path d="M-10 -167 Q-10 -180 1 -180 Q10.5 -180 11 -171 L19.5 -168.5 Q15 -166 10 -166.5 L-10 -165 Z" fill="${t(o.hat)}"/>`;
-    else if (o.hatt === 'band') huvud += `${har}<path d="M-11 -175.5 Q0.5 -179 12.2 -174 L12 -168.6 Q0.5 -173.4 -11.2 -170 Z" fill="${t(o.hat)}"/>`;
+    const harU = `<path d="${(GG.HAR_UNDER && GG.HAR_UNDER[o.harStil]) || GG.HAR.kort}" fill="${t(o.hair)}"/>`;
+    if (o.hatt === 'mossa') huvud += `${harU}<path d="M-10.8 -166.4 Q-11.8 -188.5 0.5 -188.5 Q12 -188.5 11.6 -171.4 Z" fill="${t(o.hat)}"/>`;
+    else if (o.hatt === 'keps') huvud += `${harU}<path d="M-10 -167 Q-10 -180 1 -180 Q10.5 -180 11 -171 L19.5 -168.5 Q15 -166 10 -166.5 L-10 -165 Z" fill="${t(o.hat)}"/>`;
+    else if (o.hatt === 'band') huvud += `${har}<path d="M-11.2 -175.6 Q-1 -179.2 7.8 -177.2 Q10.6 -174.4 11.3 -169.8 Q0.5 -172.8 -11.4 -169.8 Z" fill="${t(o.hat)}"/>`;
     else huvud += har;
     // (så få delar som möjligt: varje del ritas om i varje bild, och i telefonen i processorn)
     let s = g('kropp', arm(true, F.fastB) + ben(true) + ben(false) + luta(kropp + huvud));

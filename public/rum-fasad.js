@@ -1643,6 +1643,20 @@ window.RumFasad = (() => {
     hockey: 'M-10 -161 Q-12.5 -152 -11 -146 Q-8 -144.5 -4.5 -147.5 Q-5.5 -153 -5 -160 Z',
     svans: 'M-9 -173 Q-19 -172 -19.5 -158 Q-19 -149 -15 -146 Q-15.5 -156 -8.5 -165 Z',
   };
+  // Håret under en mössa, keps eller hatt: det som syns under kanten (nacken, luggen, lockarna och afron som väller
+  // fram bakom och under). Det som annars skulle sticka upp genom kullen trycks ner: tuppkammen och gelens spetsar
+  // blir kort hår, knuten sitter lågt i nacken (figurDelar), och sidhåret, lockarna och afron når högst till huvudets topp.
+  const HAR_UNDER = {
+    kort: HAR.kort, gel: HAR.kort, tupp: HAR.kort, flint: HAR.flint,
+    page: 'M-11 -152 Q-13.5 -166 -10 -174.5 Q-4.5 -179.6 2.5 -179 Q10.5 -178.2 11.4 -169.5 Q7 -173 2 -170.5 Q-1 -166 0 -158 Q0 -153 -2 -151.5 Q-7 -150 -11 -152 Z',
+    lockar: 'M-13 -150 Q-19 -160 -14.6 -170.5 Q-13 -178.6 -3 -179.4 Q9.6 -179.8 12.2 -172 Q13.4 -169 12 -167.5 Q7 -172 2 -169.5 Q-2 -165 -2 -158 Q-3 -151 -7 -147 Q-11 -146 -13 -150 Z',
+    afro: 'M-12 -152 Q-21.5 -158.5 -20 -168 Q-18.6 -177 -9 -178.6 Q4 -180.4 11.4 -175.6 Q14.6 -172 13.5 -167 Q7 -173 2 -170 Q-2 -165 -3 -158 Q-5 -151 -12 -152 Z',
+    knut: HAR.kort,
+  };
+  // Var det man har på huvudet är högst (cm), för bygeln på öronmuffarna och hörlurarna: håret utan mössa, annars
+  // mössans kulle
+  const HAR_TOPP = { kort: -179.6, gel: -181.4, page: -181.4, lockar: -184, afro: -190.8, flint: -178.2, knut: -179.6, tupp: -179 };
+  const HATT_TOPP = { mossa: -188.5, oron: -188.5, slak: -189.4, docker: -187.6, pals: -191.4, keps: -180, bakkeps: -180, kepa: -181.4, basker: -184, hatt: -186.6, fiskar: -184 };
   // Armarna som håller något: vinkeln i axeln och armbågen (grader; framåt negativt) och var handen då är
   const GREPP = { koppel: [-12, -35], dras: [-50, -6], handBak: [16, -12], handFram: [-16, -14], barnBak: [30, -6], barnFram: [-80, -6], mobil: [-70, -153], glass: [-14, -96], hand: [-5, -8], vagn: [-40, -30], cykel: [-35, -35], drar: [24, 6], upp: [-134, -71], under: [8, -66], barn: [-78, -10], pizza: [-8, -78], blommor: [-18, -98], rull: [-24, -42], karta: [-30, -70], skid: [-120, -20], bergs: [-175, -74] };
   const handVid = ([a, b]) => {
@@ -2184,17 +2198,24 @@ window.RumFasad = (() => {
     ansiktet(o, hd, hdr, t, bak);
     if (o.skagg) hd('M7.8 -159.6 Q10.5 -161.4 13 -160 Q11 -158.4 7.8 -159 Z', t(o.har), { inre: true });
     if (o.harStil === 'svans' && o.hatt !== 'luva' && o.hatt !== 'sjal') hd(ell(-11.5, -169.5, 2.6, 3.3), t(o.snodd || '#d8407a'), { inre: true });
-    // håret (under mössan bara det som sticker fram bakom)
-    if (!o.hatt || ['basker', 'kepa', 'pannband', 'docker', 'muffar'].includes(o.hatt)) hd(HAR[o.harStil] || HAR.kort, t(o.har));
+    // Håret: helt utan mössa och under pannbandet och öronmuffarna, annars bara det som syns under kanten (HAR_UNDER);
+    // under luvan och sjaletten inget.
     const h = o.hatt;
+    if (!h || h === 'pannband' || h === 'muffar') hd(HAR[o.harStil] || HAR.kort, t(o.har));
+    else if (h !== 'luva' && h !== 'sjal') {
+      hd(HAR_UNDER[o.harStil] || HAR.kort, t(o.har));
+      if (o.harStil === 'knut') hd(ell(-12, -163.4, 3.9, 3.7), t(o.har));
+    }
     const hc = t(o.mossa || '#2a2a2a');
+    const topp = (h && HATT_TOPP[h]) || HAR_TOPP[o.harStil] || HAR_TOPP.kort;
     if (h === 'mossa' || h === 'oron' || h === 'slak') {
-      // (stickad mössa med uppvikt kant; den slaka slokar bakåt)
-      hd(h === 'slak' ? 'M-10.5 -167.5 Q-12 -175 -16.5 -180.5 Q-19 -188.5 -8 -190 Q11.5 -191 11.5 -169.5 Z' : 'M-10.5 -167.5 Q-11.5 -188.5 0.5 -188.5 Q12 -188.5 11.5 -169.5 Z', hc);
-      hd('M-11 -172 H12 V-167.6 H-11 Z', bak(o.mossa), { inre: true });
+      // (stickad mössa med uppvikt kant, lite längre ner i nacken än i pannan så att ögonbrynen syns; den slaka
+      // slokar bakåt)
+      hd(h === 'slak' ? 'M-10.8 -166.4 Q-12 -175 -16.5 -180.5 Q-19 -188.5 -8 -190 Q11.5 -191 11.6 -171.4 Z' : 'M-10.8 -166.4 Q-11.8 -188.5 0.5 -188.5 Q12 -188.5 11.6 -171.4 Z', hc);
+      hd('M-11.2 -170.6 L12 -175 L11.8 -170.4 L-11 -166 Z', bak(o.mossa), { inre: true });
       if (o.mRand) {
-        hd('M-10.1 -178.5 Q0.5 -179.6 11 -178.5 L11.3 -175.5 Q0.5 -176.6 -10.4 -175.5 Z', t(o.mRand), { inre: true });
-        if (o.mRand2) hd('M-8.4 -183 Q0.5 -184.2 9.4 -183 L10.3 -180.6 Q0.5 -181.8 -9.3 -180.6 Z', t(o.mRand), { inre: true });
+        hd('M-10.4 -177.2 Q0.5 -179.6 11.2 -179.8 L11.5 -176.8 Q0.5 -176.6 -10.6 -174.2 Z', t(o.mRand), { inre: true });
+        if (o.mRand2) hd('M-8.6 -182 Q0.5 -184.2 9.6 -184 L10.4 -181.6 Q0.5 -181.8 -9.4 -179.6 Z', t(o.mRand), { inre: true });
       }
       if (h === 'oron') {
         hd('M-7.5 -169 Q-9 -157 -3.5 -154.5 Q0.5 -157.5 0 -169 Z', hc);
@@ -2205,22 +2226,22 @@ window.RumFasad = (() => {
       if (o.sno) hd('M-8 -186.5 Q0 -191 8 -186.5 Q0 -188.1 -8 -186.5 Z', t('#eef0f2'), { inre: true, a: 0.8 });
     } else if (h === 'docker') {
       // (den korta sjömansmössan högt upp på huvudet, öronen fria)
-      hd('M-9.6 -177 Q-10.4 -190 0.5 -190 Q11 -190 11 -177.5 Z', hc);
-      hd('M-10 -180.6 H11.4 V-176.4 H-9.8 Z', bak(o.mossa), { inre: true });
+      hd('M-10.6 -171.8 Q-11.6 -187.6 0.5 -187.6 Q12 -187.6 11.6 -172.6 Z', hc);
+      hd('M-11 -176.4 H11.8 V-171.8 H-10.8 Z', bak(o.mossa), { inre: true });
     } else if (h === 'pals') {
       // (pälsmössan, hög med platt topp och uppvikt brätte runt om)
-      hd('M-11.5 -166.5 Q-12.8 -183 -9.6 -189 Q0.5 -191.5 10.6 -189 Q13.6 -183 12.8 -167.5 Z', hc);
-      hd('M-12.4 -173 Q0.5 -176.5 13.4 -173 L13 -165.4 Q0.5 -168.6 -12 -165.4 Z', bak(o.mossa));
-      if (o.sno) hd('M-8 -186.5 Q0 -191 8 -186.5 Q0 -188.1 -8 -186.5 Z', t('#eef0f2'), { inre: true, a: 0.8 });
+      hd('M-11.5 -169.5 Q-12.8 -184.6 -9.6 -190 Q0.5 -192.5 10.6 -190 Q13.6 -184.6 12.8 -170.5 Z', hc);
+      hd('M-12.4 -176 Q0.5 -179.5 13.4 -176 L13 -168.4 Q0.5 -171.6 -12 -168.4 Z', bak(o.mossa));
+      if (o.sno) hd('M-8 -187.5 Q0 -192 8 -187.5 Q0 -189.1 -8 -187.5 Z', t('#eef0f2'), { inre: true, a: 0.8 });
     } else if (h === 'muffar') {
       // (öronmuffarna: bygeln över huvudet och en luddig muff över örat)
-      hdr('M-2.6 -166 Q-4.5 -187.5 3.5 -186.5', bak(o.mossa), 1.4);
+      hdr(`M-2.4 -166 Q-2.8 ${r1(topp + 6)} -1.2 ${r1(topp - 0.6)}`, bak(o.mossa), 1.4);
       hd(ell(-1.8, -164.5, 4.6, 5.3), hc);
     } else if (h === 'pannband') {
       // (frottébandet runt pannan på den som joggar; i kylan ett stickat pannband som går ner över öronen)
-      hd('M-11 -175.5 Q0.5 -179 12.2 -174 L12 -168.6 Q0.5 -173.4 -11.2 -170 Z', hc);
-      if (o.stickat) hd('M-11.2 -173 Q-4 -174 0.6 -173.6 Q1.6 -165 -1 -158.4 Q-6 -158 -9 -162.4 Q-11.4 -167 -11.2 -173 Z', hc);
-      hdr('M-10.5 -172.6 Q0.5 -176 11.8 -171.2', bak(o.mossa), 0.8, { inre: true, a: 0.5 });
+      if (o.stickat) hd('M-11.4 -176 Q-1 -179.6 7.8 -177.2 Q10.8 -174.4 11.6 -169.6 Q6.4 -171 2.6 -169.6 Q2.4 -162.4 -1.4 -160 Q-4.8 -159.8 -5.6 -164 Q-6 -167 -11.6 -168.6 Z', hc);
+      else hd('M-11.2 -175.6 Q-1 -179.2 7.8 -177.2 Q10.6 -174.4 11.3 -169.8 Q0.5 -172.8 -11.4 -169.8 Z', hc);
+      hdr(o.stickat ? 'M-10.8 -171.4 Q0.5 -174.6 10.9 -172.6' : 'M-10.6 -172.6 Q0.5 -175.8 10.6 -173.4', bak(o.mossa), 0.8, { inre: true, a: 0.5 });
     } else if (h === 'keps') hd('M-10 -167 Q-10 -180 1 -180 Q10.5 -180 11 -171 L19.5 -168.5 Q15 -166 10 -166.5 L-10 -165 Z', hc);
     else if (h === 'kepa') {
       // (sixpence: platt och framåtlutad, med kort skärm)
@@ -2233,7 +2254,7 @@ window.RumFasad = (() => {
     }
     else if (h === 'bakkeps') {
       hd('M11 -167 Q11 -180 0 -180 Q-9.5 -180 -10 -171 L-18.5 -168.5 Q-14 -166 -9 -166.5 L11 -165 Z', hc);
-      hd('M8 -168 Q10 -166 11 -162 Q9 -160.5 7.5 -162 Z', t(o.har), { inre: true });
+      if (o.harStil !== 'flint') hd('M8 -168 Q10 -166 11 -162 Q9 -160.5 7.5 -162 Z', t(o.har), { inre: true });
     } else if (h === 'hatt') {
       hd('M-8 -171 Q-8.5 -187 1.5 -186 Q9.5 -187 9.5 -171 Z', hc);
       hd('M-15 -170.5 Q1 -174.5 18 -170 Q2 -166.5 -15 -170.5 Z', hc);
@@ -2261,7 +2282,7 @@ window.RumFasad = (() => {
       hdr('M4.6 -168 L-2 -166.5', t('#0e0e10'), 1, { inre: true });
     }
     if (o.walkman) {
-      hdr('M-2.5 -167 Q-4 -186 3.5 -185', t('#1a1a1a'), 1.6);
+      hdr(`M-2.4 -167 Q-2.8 ${r1(topp + 6)} -1.2 ${r1(topp - 0.6)}`, t('#1a1a1a'), 1.6);
       hd(ell(-1.8, -164.5, 3.4, 3.9), t('#e2762a'));
       drag('M-2 -161 Q-6 -140 -8 -104', t('#111111'), 0.6, { inre: true });
       del('M-13 -105 H-5 V-94 H-13 Z', t(o.walkmanF || '#3a3a44'));
@@ -5322,7 +5343,7 @@ window.RumFasad = (() => {
 
   // (gången och huvudet också för dem som går på gatan inifrån, rum-ute.js: samma sätt att gå och samma ställning)
   return {
-    bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR, GSTIL }, folk: { nytt: folkNytt, av: folkAv, rita: folkRita },
+    bygg, vy, FON, DORR, gang: { stil: gangStil, stalln, KAPP, HUVUD, HAR, HAR_UNDER, GSTIL }, folk: { nytt: folkNytt, av: folkAv, rita: folkRita },
     framfor, ritaFigur, framDelar, skala, M, OGA_X,
   };
 })();
