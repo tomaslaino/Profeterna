@@ -7351,12 +7351,13 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   härinifrån, medan de utifrån är siluetter mot fönstret. Men de är bakgrund: i ljuset har de sina egna färger med ett
   varmt sken, utanför det är de mörkare, och kanten är mjuk (`LJUSKANT` 0,9 m i `LJUSTEG` 4 steg), så att ingen tänds
   på en gång när de går in i ljuset. Fasadens bild beror på fönstrets form, så folket räknas om när
-  formen ändras och när trafiken ändras efter klockan (`framModell`). Allt ritas i en enda grov duk över glasen, 0,4
-  bildpunkter per px, som blir mjuk när den förstoras: ur skärpa som resten av gatan, utan filter. I telefonen och på
-  datorns lägre steg ritas det i gatans duk (`ritaGatan`). Det ritas bara medan något syns: de som går i gängets takt,
-  och medan ett fordon kör förbi i varje bildruta, högst 60 gånger i sekunden (`framDuk`, `glid`). I Chromium utan
-  grafikkort tar det ungefär 0,1 ms per figur och 0,4 ms per fordon och bild, under en halv procent av en kärna i
-  rusningen. Hur mycket trafik det är följer `trafik` (rusning, natt, helger och röda dagar), som fasaden och Hasse
+  formen ändras och när trafiken ändras efter klockan (`framModell`). Allt ligger i en grov duk över glasen, 0,4
+  bildpunkter per px, och är ur skärpa (2,6 px) och lite disigt, så att det inte drar blicken från gänget. I telefonen och
+  på datorns lägre steg ligger det i gatans duk (`ritaGatan`). Var och en som går och varje fordon är en egen liten bild
+  som ritas i gängets takt, och i bildrutorna däremellan läggs bilderna bara ut där de är (`ritaFramMjuk`, se
+  [Det som far förbi framför affären i egna bilder](#det-som-far-förbi-framför-affären-i-egna-bilder-2026-11-19)). Det
+  ritas bara medan något syns: i datorn de som går i gängets takt, och medan ett fordon kör förbi i varje bildruta,
+  högst 60 gånger i sekunden (`framDuk`, `glid`); i gatans duk i varje bildruta så länge något far förbi. Hur mycket trafik det är följer `trafik` (rusning, natt, helger och röda dagar), som fasaden och Hasse
   Backes utsikt också läser. Förut hade gatan inifrån egna fordon på ett band åt båda hållen (högertrafik), lika små
   som de som går på bron men lågt i bilden, så att de nästan alltid låg bakom gänget och fönsterbänken.
 - **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och

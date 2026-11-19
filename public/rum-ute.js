@@ -867,9 +867,9 @@ window.RumUte = (() => {
   // av gatan, utan filter), i telefonen och på datorns lägre steg i gatans duk (ritaGatan), och bara medan något
   // syns: de som går i gängets takt, och medan ett fordon kör förbi i varje bildruta (glid), som på fasaden.
   const FRAM = { yh: 382, oga: 1.25, K: 166.8, d0: 1.016, xv: 571, XE: -0.483, px: 0.4 };
-  // De som går och kör förbi är bakgrund och ska inte dra blicken från gänget: de ritas skarpa i en egen duk
-  // (kladden) och läggs sedan i glasen ur skärpa (oskarpa: px i scenen) och lite disiga, mot luftens färg
-  // (dis: hur mycket). Utan ctx.filter (äldre Safari) får kladden halva upplösningen i stället för oskärpan.
+  // De som går och kör förbi är bakgrund och ska inte dra blicken från gänget: de ritas skarpa i en kladd och läggs
+  // sedan i sina bilder ur skärpa (oskarpa: px i scenen) och lite disiga, mot luftens färg (dis: hur mycket), se
+  // ritaFramMjuk. Utan ctx.filter (äldre Safari) får bilderna halva upplösningen i stället för oskärpan.
   const DIS = { oskarpa: 2.6, dis: 0.15 };
   const framS = (d) => FRAM.K / (d + FRAM.d0);
   const framY = (d) => FRAM.yh + FRAM.oga * framS(d);
@@ -934,11 +934,13 @@ window.RumUte = (() => {
     return { ...m, S, kalla, a, L, dis, T: tsig(v), tT: performance.now() };
   }
 
-  // Det som syns framför affären vid tiden t (s) i duken g, med hörnet i (ox, oy) och k bildpunkter per px; r: glasen.
-  // → 2 om ett fordon syns (då ritas det i varje bildruta), 1 om bara de som går, 0 om inget.
-  function ritaFram(el, g, t, ox, oy, k, r) {
+  // Det som syns framför affären vid tiden t (s) genom glasen r: { fordon, folk }, de bortre först, eller null.
+  // fordon: { b, f, x, fart, broms, nig } som fasadens (RumFasadGatan.rita), folk: { f, D, x, xi, yi, q, dm, id, ut }
+  // (fötterna i xi, yi och q px per fasadens enhet; id: den som går, också den som har stannat, som kommer som ett nytt
+  // föremål varje gång).
+  function framLista(el, t, r) {
     let M = el._fram;
-    if (!M) return 0;
+    if (!M) return null;
     // (ny form på fönstret, eller annan trafik än när det byggdes: fasaden har andra som går)
     const ms = performance.now();
     if (framForm || ms - M.tT > 30000) {
@@ -949,41 +951,31 @@ window.RumUte = (() => {
     }
     const RF = window.RumFasad;
     const FG = window.RumFasadGatan;
-    const bas = () => g.setTransform(k, 0, 0, k, -ox * k, -oy * k);
-    let ut = 0;
     // fordonen, den bortre filen härifrån först (fasadens närmre)
-    const lista = FG.syns(M.S, t, ALLT);
-    if (lista) {
-      const rit = [];
-      for (const it of lista) {
-        const s = framS(it.f.d);
-        const x = framX((it.x - M.G.OGA_X) / it.f.um, s);
-        // (strålkastarnas ljus på gatan framför när det är mörkt)
-        const h = (it.b.L / 200) * s + (M.S.lamps ? 5 * s : 0.4 * s);
-        if (x + h < r.x || x - h > r.x + r.w) continue;
-        rit.push({ b: it.b, f: { y: framY(it.f.d), dir: 1, k: s / 100, d: it.f.d }, x, fart: it.fart, broms: it.broms, nig: it.nig });
-      }
-      if (rit.length) {
-        rit.sort((p, q) => q.f.d - p.f.d);
-        bas();
-        FG.rita(g, M.S, rit, t);
-        ut = 2;
-      }
+    const fordon = [];
+    for (const it of FG.syns(M.S, t, ALLT) || []) {
+      const s = framS(it.f.d);
+      const x = framX((it.x - M.G.OGA_X) / it.f.um, s);
+      // (strålkastarnas ljus på gatan framför när det är mörkt)
+      const h = (it.b.L / 200) * s + (M.S.lamps ? 5 * s : 0.4 * s);
+      if (x + h < r.x || x - h > r.x + r.w) continue;
+      fordon.push({ b: it.b, f: { y: framY(it.f.d), dir: 1, k: s / 100, d: it.f.d }, x, fart: it.fart, broms: it.broms, nig: it.nig });
     }
+    fordon.sort((p, q) => q.f.d - p.f.d);
     // de som går, de bortre först, och den som har stannat och tittar in (står den: framifrån). Var och en syns där
     // den syns utifrån och tonar in och ut på en halvmeter i kanterna av fasadens bild, där loppet börjar och slutar.
     const natt = M.L.dag < 0.6 ? 1 - M.L.dag / 0.6 : 0;
-    const fl = [];
-    const lagg = (f, D, x, dm, e) => {
+    const folk = [];
+    const lagg = (f, D, x, dm, e, id = f) => {
       const um = RF.M * RF.skala(dm);
       const s = framS(dm);
       const X = (x - RF.OGA_X) / um;
       const xi = framX(X, s);
-      if (xi + 1.3 * s < r.x || xi - 1.3 * s > r.x + r.w || e <= 0) return;
+      if (xi + FB.x * s < r.x || xi - FB.x * s > r.x + r.w || e <= 0) return;
       // (på kvällen i affärens ljus framför fönstret och dörren, mörkare bortom, med en mjuk kant)
       const inne = Math.min(X - LJUSET[0], LJUSET[1] - X) / LJUSKANT + 0.5;
       const z = natt ? Math.round(LJUSTEG * (1 - Math.max(0, Math.min(1, inne)))) : 0;
-      fl.push({ f, D, x, xi, yi: framY(dm), q: s / um, dm, ut: { A: Math.min(1, e / um / 0.6), rand: 0, z } });
+      folk.push({ f, D, x, xi, yi: framY(dm), q: s / um, dm, id, ut: { A: Math.min(1, e / um / 0.6), rand: 0, z } });
     };
     // (var och en får gatans färger första gången den syns: fasaden lottar dem lopp för lopp, folket.vid)
     for (const [f, D, x, , lap] of M.folk.vid(t)) {
@@ -1001,55 +993,147 @@ window.RumUte = (() => {
         M.kalla(f.D);
         f.FR = M.kalla(RF.framDelar(f.bakO, M.L));
       }
-      lagg({ k: f.k, dir: st.sta ? 1 : f.dir, sta: st.sta, stil: f.stil }, st.sta ? f.FR : f.D, st.x, f.dm, Math.min(Math.abs(st.x - f.xa), Math.abs(f.xb - st.x)));
+      lagg({ k: f.k, dir: st.sta ? 1 : f.dir, sta: st.sta, stil: f.stil }, st.sta ? f.FR : f.D, st.x, f.dm, Math.min(Math.abs(st.x - f.xa), Math.abs(f.xb - st.x)), f);
     }
-    if (fl.length) {
-      fl.sort((p, q) => q.dm - p.dm);
-      for (const p of fl) {
-        bas();
-        g.translate(p.xi, p.yi);
-        g.scale(-p.q, p.q);
-        g.translate(-p.x, 0);
-        RF.ritaFigur(g, p.f, p.D, p.x, 0, t, M.L, p.ut);
-      }
-      ut = Math.max(ut, 1);
-    }
-    g.setTransform(1, 0, 0, 1, 0, 0);
-    g.globalAlpha = 1;
-    return ut;
+    folk.sort((p, q) => q.dm - p.dm);
+    return fordon.length || folk.length ? { fordon, folk } : null;
   }
 
-  // Som ritaFram, men ur skärpa och disigt (DIS): skarpt i kladden, som täcker r, och därifrån i g med oskärpan.
+  // (disigt: bara där något är ritat i x, source-atop)
+  function disa(el, x, w, h) {
+    if (!(DIS.dis > 0) || !el._fram) return;
+    x.globalCompositeOperation = 'source-atop';
+    x.globalAlpha = DIS.dis;
+    x.fillStyle = el._fram.dis;
+    x.fillRect(0, 0, w, h);
+    x.globalCompositeOperation = 'source-over';
+    x.globalAlpha = 1;
+  }
+
+  // Det som syns framför affären vid tiden t (s) i duken g (k bildpunkter per px, hörnet i ox, oy), ur skärpa och
+  // disigt (DIS); r: glasen. → 2 om ett fordon syns (då ritas det i varje bildruta), 1 om bara de som går, 0 om inget.
+  //
+  // Var och en som går förbi och varje fordon är en egen liten bild (2026-11-19, användarens önskemål: flyta bättre på
+  // sämre enheter). Medan något far förbi läggs gatan ut i varje bildruta (glid), och förut ritades då allt framför
+  // affären om från grunden varje gång – fasadens figurer och fordon, några hundra former var – och lades i glasen med
+  // oskärpan över hela fönstret: åtta gånger så mycket arbete för grafiken som resten av gatan tillsammans. Nu ritas
+  // var och en skarp i kladden, disig och med oskärpan i sin bild i gängets takt (el._framTakt, takt), och i
+  // bildrutorna däremellan läggs bara bilderna ut där var och en är, som gatans egna figurer (stall, ark). Den som har
+  // stannat och står still ritas en gång. Ett fordons bild är klippt till glasen med FMARG m marginal och ritas om när
+  // det har kört mer än hälften av den sedan förra gången. Utan ctx.filter (äldre Safari) har bilderna halva
+  // upplösningen i stället för oskärpan.
+  //
+  // FB: hur långt en figur når från fötterna (m), paraplyet och hunden med (mätt över 6 000 figurer i olika väder och
+  // tider: 1,67 m åt sidan och 2,75 m upp). FBIL: ett fordon från mitten (m) utöver halva längden, på kvällen med
+  // strålkastarnas ljus framför och bakom (mätt: 4,4 m; på dagen 0,35), upp och ner med spegelbilden i den våta gatan
+  // (mätt: 4,4 m upp för plogbilen och 2,5 m ner).
+  const FB = { x: 1.75, upp: 2.85, ned: 0.1 };
+  const FBIL = { x: 4.6, dag: 0.6, upp: 4.6, ned: 2.7 };
+  const FMARG = 2;
   function ritaFramMjuk(el, g, t, ox, oy, k, r) {
+    const L = framLista(el, t, r);
+    if (!L) return 0;
+    const M = el._fram;
+    const RF = window.RumFasad;
+    const FG = window.RumFasadGatan;
     const s = FILTER ? k : k / 2;
-    const c = el._framK || (el._framK = document.createElement('canvas'));
-    const w = Math.ceil(r.w * s);
-    const h = Math.ceil(r.h * s);
-    if (c.width !== w || c.height !== h) {
-      c.width = w;
-      c.height = h;
-    }
-    const x = c.getContext('2d');
-    if (!x) return 0;
-    x.setTransform(1, 0, 0, 1, 0, 0);
-    x.clearRect(0, 0, w, h);
-    const ut = ritaFram(el, x, t, r.x, r.y, s, r);
-    if (!ut) return 0;
-    // (disigt: bara där de är, source-atop)
-    if (DIS.dis > 0 && el._fram) {
-      x.globalCompositeOperation = 'source-atop';
-      x.globalAlpha = DIS.dis;
-      x.fillStyle = el._fram.dis;
-      x.fillRect(0, 0, w, h);
-      x.globalCompositeOperation = 'source-over';
-      x.globalAlpha = 1;
-    }
+    const B = el._framB || (el._framB = new Map());
+    const nu = performance.now();
+    // (i en stillbild ritas allt, på den fasta tiden)
+    const ep = el._fast != null ? -1 : el._framTakt || 0;
+    const pad = FILTER ? Math.ceil(3 * DIS.oskarpa * s) + 1 : 1;
+    const f = k / s;
+    // bilden b (W × H) ritas om: skarp i kladden (rita), disig, och därifrån med oskärpan
+    const kl = el._framF || (el._framF = document.createElement('canvas').getContext('2d'));
+    if (!kl) return 0;
+    const bild = (b, W, H, rita) => {
+      if (kl.canvas.width < W || kl.canvas.height < H) {
+        kl.canvas.width = Math.max(kl.canvas.width, W);
+        kl.canvas.height = Math.max(kl.canvas.height, H);
+      }
+      kl.setTransform(1, 0, 0, 1, 0, 0);
+      kl.globalAlpha = 1;
+      kl.clearRect(0, 0, W, H);
+      rita(kl);
+      kl.setTransform(1, 0, 0, 1, 0, 0);
+      disa(el, kl, W, H);
+      const c = b.c;
+      if (c.width !== W || c.height !== H) {
+        c.width = W;
+        c.height = H;
+      }
+      const x = c.getContext('2d');
+      if (!x) return;
+      x.clearRect(0, 0, W, H);
+      if (FILTER) x.filter = `blur(${r1(DIS.oskarpa * s * 10) / 10}px)`;
+      x.drawImage(kl.canvas, 0, 0, W, H, 0, 0, W, H);
+      if (FILTER) x.filter = 'none';
+      b.W = W;
+      b.H = H;
+      b.ep = ep;
+    };
+    const hamta = (id) => {
+      let b = B.get(id);
+      if (!b) B.set(id, (b = { c: document.createElement('canvas') }));
+      b.sist = nu;
+      return b;
+    };
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.globalAlpha = 1;
-    if (FILTER) g.filter = `blur(${r1(DIS.oskarpa * k * 10) / 10}px)`;
-    g.drawImage(c, 0, 0, w, h, (r.x - ox) * k, (r.y - oy) * k, (w / s) * k, (h / s) * k);
-    if (FILTER) g.filter = 'none';
-    return ut;
+    for (const v of L.fordon) {
+      const sm = v.f.k * 100;
+      const b = hamta(v.b);
+      if (ep < 0 || b.ep !== ep || Math.abs(v.x - b.x) > (FMARG / 2) * sm) {
+        // (bilden: fordonet med ljuset, klippt till glasen med marginalen, i scenens px)
+        const hx = (v.b.L / 200 + (M.S.lamps ? FBIL.x : FBIL.dag)) * sm;
+        const x0 = Math.max(v.x - hx, r.x - FMARG * sm);
+        const x1 = Math.min(v.x + hx, r.x + r.w + FMARG * sm);
+        const y0 = Math.max(v.f.y - FBIL.upp * sm, r.y - pad / s);
+        const y1 = Math.min(v.f.y + FBIL.ned * sm, r.y + r.h + pad / s);
+        if (x1 <= x0 || y1 <= y0) continue;
+        b.x = v.x;
+        b.x0 = x0;
+        b.y0 = y0;
+        bild(b, Math.ceil((x1 - x0) * s) + 2 * pad, Math.ceil((y1 - y0) * s) + 2 * pad, (c) => {
+          c.setTransform(s, 0, 0, s, pad - x0 * s, pad - y0 * s);
+          FG.rita(c, M.S, [v], t);
+        });
+      }
+      if (!b.W) continue;
+      g.drawImage(b.c, 0, 0, b.W, b.H, (b.x0 + v.x - b.x - ox) * k - pad * f, (b.y0 - oy) * k - pad * f, b.W * f, b.H * f);
+    }
+    for (const p of L.folk) {
+      const sm = framS(p.dm);
+      const W = Math.ceil(2 * FB.x * sm * s) + 2 * pad;
+      const H = Math.ceil((FB.upp + FB.ned) * sm * s) + 2 * pad;
+      const cx = pad + FB.x * sm * s;
+      const cy = pad + FB.upp * sm * s;
+      const sta = Boolean(p.f.sta);
+      const b = hamta(p.id);
+      if (ep < 0 || (!sta && b.ep !== ep) || b.W !== W || b.H !== H || b.z !== p.ut.z || b.D !== p.D || b.sta !== sta || b.dir !== p.f.dir) {
+        Object.assign(b, { z: p.ut.z, D: p.D, sta, dir: p.f.dir });
+        bild(b, W, H, (c) => {
+          c.translate(cx, cy);
+          c.scale(-p.q * s, p.q * s);
+          c.translate(-p.x, 0);
+          RF.ritaFigur(c, p.f, p.D, p.x, 0, t, M.L, { A: 1, rand: 0, z: p.ut.z });
+        });
+      }
+      if (!b.W) continue;
+      // (i kanterna av fasadens bild tonar den in och ut)
+      g.globalAlpha = p.ut.A;
+      g.drawImage(b.c, 0, 0, W, H, (p.xi - ox) * k - cx * f, (p.yi - oy) * k - cy * f, W * f, H * f);
+    }
+    g.globalAlpha = 1;
+    // (det som inte har synts på en sekund: bilden släpps)
+    if (B.size > L.fordon.length + L.folk.length) {
+      for (const [id, b] of B) {
+        if (nu - b.sist < 1000) continue;
+        b.c.width = 0;
+        B.delete(id);
+      }
+    }
+    return L.fordon.length ? 2 : 1;
   }
 
   // I datorn, där det som rör sig på gatan är egna dukar: en duk över glasen, mellan dem som går på bron och regnet.
@@ -1869,6 +1953,8 @@ window.RumUte = (() => {
   // något har ändrats. Däremellan räknas läget fram ur farten.
   let tur = 0;
   function takt(el, t, glesa = true) {
+    // (det som går och kör förbi framför affären ritas om i den här takten, ritaFramMjuk)
+    if (el) el._framTakt = (el._framTakt || 0) + 1;
     if (el && el._gat) {
       // (i en stillbild står klockan still, också när bilderna blir klara efteråt)
       if (t != null) el._fast = t;
