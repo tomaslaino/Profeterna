@@ -763,7 +763,7 @@ export function oskarpa(lage) {
 // för att kännas igen (ändrat 2026-11-17). Gångbanan ligger bakom räcket och syns uppifrån, alltså lite högre i
 // bilden än kanten (LUTA).
 const GANG = { hojd: 1.6, sid: 1.35 };
-export function gangare(v, L, lage, R = Math.random) {
+export function gangare(v, L, lage, R = Math.random, vem = null) {
   const F = window.RumUte.farg;
   const { P } = projektion(lage);
   const KG = F.KALL ? F.KALL.gata : 0.3;
@@ -774,7 +774,7 @@ export function gangare(v, L, lage, R = Math.random) {
   const FF = window.RumFasad && window.RumFasad.folk;
   if (FF) {
     try {
-      return folkPaBron(FF, v, L, steg, R, { F, KG, KH, ton });
+      return folkPaBron(FF, v, L, steg, R, { F, KG, KH, ton }, vem);
     } catch (err) {
       console.warn('Bron: de som går kunde inte ritas som framför affären', err);
     }
@@ -873,9 +873,10 @@ export function gangare(v, L, lage, R = Math.random) {
 // dis: lite av himlens färg i dagsljuset, dimman och det som faller (som för fordonen, framfor). Räcket framför benen
 // som för den gamla figuren. Farten är gångens (steglängden gånger takten, fasadens cm och varv i sekunden).
 const FOLK_N = 8;
-function folkPaBron(FF, v, L, steg, R, C) {
+function folkPaBron(FF, v, L, steg, R, C, givna) {
   const { F, KG, KH, ton } = C;
-  const vem = FF.nytt(R, v, L);
+  // (givna: ett sällskap ur gatans tidtabell, folket.kommer i rum-fasad.js: samma människor som går förbi affären)
+  const vem = givna && FF.av ? FF.av(givna, L) : FF.nytt(R, v, L);
   if (!vem.length) throw new Error('ingen');
   const U = 96;
   const k = U / 175;
@@ -916,10 +917,15 @@ function folkPaBron(FF, v, L, steg, R, C) {
   if (L.dimma > 0.02) { ruta(x, 0, 0, duk.width, Hd, L.sky[2], 0.3 * L.dimma); ruta(x, 0, 0, duk.width, Hd, L.sky[2], 0.3 * L.dimma); }
   if (v.fall) ruta(x, 0, 0, duk.width, Hd, v.fall === 'sno' ? F.kall(F.sno(L), L, KG) : F.kall(L.sky[2], L, KH), (v.fall === 'sno' ? 0.08 : 0.1) + 0.14 * v.mangd);
   x.globalCompositeOperation = 'source-over';
-  const st = vem.find((m) => m.dx === 0) ? vem.find((m) => m.dx === 0).st : vem[0].st;
-  const takt = st.takt || 1;
-  const fart = Math.max(0.6, ((st.S || 128) * takt) / 100);
-  return { duk, B, H: Hd, fot, U, steg, mot: R() < 0.5, N: FOLK_N, takt, sek: gangMeter() / fart };
+  const st = forst(vem);
+  return { duk, B, H: Hd, fot, U, steg, mot: R() < 0.5, N: FOLK_N, takt: st.takt || 1, sek: gangMeter() / gangFart(st) };
+}
+// den i sällskapet som de andra går efter, och gångens fart (m/s: steglängden gånger takten, fasadens cm och varv/s)
+const forst = (vem) => (vem.find((m) => !m.dx) || vem[0]).st;
+const gangFart = (st) => Math.max(0.6, ((st.S || 128) * (st.takt || 1)) / 100);
+// hur länge ett sällskap går över bron (s)
+export function gangSek(vem) {
+  return gangMeter() / gangFart(forst(vem));
 }
 
 // ---------- trafiken på bron ----------
@@ -1183,7 +1189,7 @@ function topp(M) {
 // avbildning (vid), så att de möts som på en riktig kaross. Räcket står framför det nedersta, som framför den som
 // går, och allt är lika oskarpt och i samma dis. vag: vägen i meter, från bortre änden till förbi bildens högra
 // kant, och meter: fordonets längd.
-export function fordon(v, L, lage, typ, fil, T) {
+export function fordon(v, L, lage, typ, fil, T, av = null) {
   const FG = window.RumFasadGatan;
   if (!FG || !FG.fordon) return null;
   const C = ljus(v, L);
@@ -1191,7 +1197,8 @@ export function fordon(v, L, lage, typ, fil, T) {
   const bort = FIL[fil].bort;
   const S = scen(v, L, C);
   const fs = { i: 0, dir: bort ? -1 : 1 };
-  const bil = FG.fordon.nytt(S, Math.random, typ || FG.fordon.valj(S, Math.random, T, fs, 0), T, fs);
+  // (av: ett fordon ur gatans tidtabell, RumFasadGatan.kommer: samma bil som strax kör förbi affären, i brons ljus)
+  const bil = av && FG.fordon.som ? FG.fordon.som(S, av) : FG.fordon.nytt(S, Math.random, typ || FG.fordon.valj(S, Math.random, T, fs, 0), T, fs);
   const M = matt(bil);
   const { b: B0, f: F0, top: TOP, buss } = M;
   const len = ((F0 - B0) / 16) * METER;
@@ -1445,8 +1452,11 @@ export function fordon(v, L, lage, typ, fil, T) {
 // (rum-ute.js): från sidan, och framifrån (de som kommer mot en) eller bakifrån (de som åker bort). Den är smal,
 // så de två bilderna står i kors genom mitten (inte som fordonens sida och ände, som hörnen på en låda): långt
 // bort syns den framifrån och nära mest från sidan. Två bilder av var, med pedalerna ett halvt varv isär, om
-// vartannat medan den trampar (tramp ms, broRita i rum-hasse.js). Hjälm eller mössa, regnjacka i regnet och lyse
-// när det är mörkt; räcket framför benen, som för den som går.
+// vartannat medan den trampar (tramp ms, broRita i rum-hasse.js). Klädd som de som går förbi affären i mitten av
+// nittiotalet (2026-11-19): täckjacka, jeansjacka, flanell eller vindjacka i tidens färger, jeans, barhuvad eller i
+// mössa eller keps, nästan aldrig hjälm och ingen reflexväst (förut hjälm på sex av tio och gul väst på var femte, som
+// i dag); regnjacka i regnet, ofta en korg eller en väska på pakethållaren, och lyse när det är mörkt. Räcket framför
+// benen, som för den som går.
 export function cyklist(v, L, lage, fil, R = Math.random) {
   const C = ljus(v, L);
   const { F, ton, lampor } = C;
@@ -1489,22 +1499,26 @@ export function cyklist(v, L, lage, fil, R = Math.random) {
   const kall = v.kanns < 5;
   const varmt = v.kanns >= 16;
   const regn = v.fall === 'regn' || v.fall === 'blandat';
-  // (många som cyklar till jobbet har gul reflexväst, mest när det är mörkt eller kallt)
-  const vast = R() < (lampor || kall ? 0.35 : v.arstid === 'sommar' ? 0.1 : 0.2);
-  const jacka = ton(vast ? '#d6e04c' : regn && R() < 0.6 ? valj(['#e8b923', '#c8322a', '#2a5a3a', '#1c1f26'])
-    : kall ? valj(['#1c1f26', '#2b2f38', '#3a3226', '#20283a', '#5a2a2a', '#2e3a2e', '#6b6458'])
-      : valj(['#6b6458', '#4a5a6a', '#8a4a3a', '#3a4a3a', '#d84a3a', '#3a6ab0', '#e8e4dc']));
-  // lyse: när det är mörkt, och hos en del också på dagen
-  const lyse = lampor || R() < 0.3;
+  // (regnjackan gul, röd, grön eller marinblå; i kylan täckjackor och rockar, också i lila, vinrött och petrol; annars
+  // jeansjackan, flanellen, vindjackan och collegetröjan)
+  const jacka = ton(regn && R() < 0.6 ? valj(['#e8b923', '#c8322a', '#2a5a3a', '#1d2a4a'])
+    : kall ? valj(['#1c1f26', '#3a3226', '#20283a', '#5a2a2a', '#2e3a2e', '#6b6458', '#5a2a6a', '#1f6a6a', '#7a1e3a', '#8a7a5a'])
+      : valj(['#5a7aa0', '#6f8fb4', '#8a3a2e', '#3a5a3a', '#c8322a', '#1f6a6a', '#5a2a6a', '#e8e4dc', '#b9a37a', '#24345a']));
+  // lyse: bara när det är mörkt (dynamon surrar mot däcket)
+  const lyse = lampor;
   const jacka2 = F.mix(jacka, '#000000', 0.3);
-  const byxor = ton(valj(['#1e2430', '#2b3448', '#3a3a3a', '#202020', '#4a4236']));
+  // (mest jeans, blekta eller mörka)
+  const byxor = ton(valj(['#3f5878', '#56729a', '#2b3448', '#3f5878', '#202020', '#4a4236', '#8a7a5a']));
   const byxor2 = F.mix(byxor, '#000000', 0.35);
   const hud = ton(valj(['#e9c2a2', '#d8a27c', '#b27a52', '#8a5636', '#f0cfb4']));
   const har = ton(valj(['#2a1d14', '#5a3e24', '#c9a56a', '#1a1a1a', '#8a6a4a']));
-  const hjalm = R() < 0.6;
-  const huvud = hjalm ? ton(valj(['#e8e4dc', '#1a1a1a', '#c8322a', '#2a6ab0', '#a9adb2'])) : kall ? ton(valj(['#a8322a', '#1a1a1a', '#2a4a7a', '#5a5a5a'])) : null;
-  const ram = ton(valj(['#1a1a1a', '#1a2a4a', '#8a1e1e', '#a9adb2', '#2e4a36', '#e8e4dc']));
-  const vaska = R() < 0.35 ? ton(valj(['#1a1a1a', '#a8322a', '#e8b923', '#2a3a2a'])) : null;
+  // (hjälm hade få vuxna då: en av tolv, vit eller i en glad färg; annars mössa i kylan, ibland keps, oftast barhuvad)
+  const hjalm = R() < 0.08;
+  const huvud = hjalm ? ton(valj(['#e8e4dc', '#e8e4dc', '#c8322a', '#2a6ab0']))
+    : kall ? ton(valj(['#a8322a', '#1a1a1a', '#2a4a7a', '#5a5a5a', '#e8e4dc', '#2e4a36'])) : R() < 0.15 ? ton(valj(['#1d2a4a', '#a8262a', '#e8e4dc'])) : null;
+  // (cykeln i fasadens lack, som den någon leder förbi affären; korgen eller väskan på pakethållaren)
+  const ram = ton(valj(['#8a1e1e', '#1a1a1a', '#1d3a7a', '#2a5a3a', '#a8d0c0', '#e8e4dc', '#4a2a6a']));
+  const vaska = R() < 0.45 ? ton(valj(['#8a6a3a', '#8a6a3a', '#1a1a1a', '#a8322a', '#2a3a2a'])) : null;
   const svart = ton('#121418', '#050505');
   const dack = ton('#141518', '#040404');
   const linje = (x, c, w, ...p) => {
