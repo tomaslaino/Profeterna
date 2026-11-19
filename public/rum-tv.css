@@ -20,9 +20,11 @@
 /* allt i tv:ns mått, förminskat mot väggen (z -130), så att den sitter uppe
    i hörnet och inte sticker ut så långt i rummet */
 .rum-tvpos { position: absolute; left: 1206px; top: 100px; width: 292px; height: 196px; transform-style: preserve-3d; transform-origin: 0 0 -130px; transform: scale3d(0.78, 0.78, 0.78); }
-.rum-tv3 {
-  /* mörkgrå plast med ett fint korn */
+.rum-tv3, .tv-mini {
+  /* mörkgrå plast med ett fint korn (också den lilla tv:n som följer med) */
   --plast: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='k' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23k)'/%3E%3C/svg%3E") 0 0 / 120px 120px, linear-gradient(180deg, #4a4b4f, #353639);
+}
+.rum-tv3 {
   position: absolute;
   left: 0;
   top: 0;
@@ -415,7 +417,7 @@
 .tv-av { position: absolute; inset: 0; overflow: hidden; background: #050606; color: #f4f3ec; font: 10px/1.1 VT323, monospace; font-variant-ligatures: none; text-shadow: 0 0 1.5px currentColor; }
 .tv-av[hidden] { display: none; }
 .tv-av video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #050606; }
-.av-rutor { position: absolute; inset: 0; }
+.av-inne, .av-rutor { position: absolute; inset: 0; }
 /* bilden lite mättad och hård, som på ett bildrör */
 .av-ruta { position: absolute; overflow: hidden; box-shadow: 0 0 0 0.5px #000; }
 .av-ruta video { filter: saturate(1.15) contrast(1.06); }
@@ -476,7 +478,7 @@
 @keyframes av-osd { 0% { opacity: 1; } 100% { opacity: 0; } }
 /* bytet mellan text-tv:n och AV: ett ögonblick snö och en skakning, som när man bytte kanal */
 .tv-glas.byter::before { content: ""; position: absolute; inset: 0; z-index: 2; background: var(--sno, #555) 0 0 / 64px 64px; image-rendering: pixelated; animation: av-byt 0.42s steps(1) both; pointer-events: none; }
-.tv-glas.byter .tv-av > :not(.av-osd) { animation: av-in 0.42s steps(1) both; }
+.tv-glas.byter .av-inne > :not(.av-osd) { animation: av-in 0.42s steps(1) both; }
 @keyframes av-byt {
   0% { opacity: 0.95; background-position: 0 0; }
   20% { opacity: 0.9; background-position: -19px 23px; }
@@ -492,7 +494,72 @@
 @media (prefers-reduced-motion: reduce) {
   .rum-tv3, .tv-scan, .tv-glas, .tv-led { transition: none; }
   .tv-glas::after { animation: none; display: none; }
-  .tv-glas.byter .tv-av > *, .av-sno, .av-jag::after { animation: none; }
+  .tv-glas.byter .av-inne > *, .av-sno, .av-jag::after, .tv-mini.sander .tv-mini-lampa { animation: none; }
   .tv-glas.byter::before { display: none; }
   .rum-tv3.ingang .av-osd { animation: none; }
 }
+
+/* ---------- tv:n som följer med (rum-bild.js) ----------
+   Ta med tv:n: samma tv uppe till höger på de andra sidorna, under sidhuvudet (--topp, som rum-bild.js
+   följer när det skrollas undan i telefonen), utan panelen med knapparna – fronten 238 × 196, förminskad
+   (--s). Den ligger i det översta lagret (popover), så webbläsarens egna mått för det skrivs över. */
+.tv-mini {
+  --s: 0.68;
+  position: fixed;
+  inset: auto;
+  top: calc(var(--topp, 0px) + 10px);
+  right: max(10px, env(safe-area-inset-right));
+  z-index: 60;
+  width: calc(238px * var(--s));
+  height: calc(196px * var(--s));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: calc(6px * var(--s));
+  background: none;
+  color: #f4f3ec;
+  overflow: visible;
+  box-shadow: 0 16px 34px -10px rgba(0, 0, 0, 0.75), 0 3px 9px rgba(0, 0, 0, 0.45);
+  transform-origin: 0 0;
+}
+@media (min-width: 761px) { .tv-mini { --s: 1; top: calc(var(--topp, 0px) + 14px); right: max(20px, env(safe-area-inset-right)); } }
+.tv-mini[hidden] { display: none; }
+.tv-mini .tv-front { width: 238px; transform: scale(var(--s)); transform-origin: 0 0; pointer-events: none; }
+.tv-mini .tv-scan { opacity: 0.45; }
+.tv-mini .av-vem button { pointer-events: auto; }
+/* lampan under rutan: grön, röd medan din kamera är tänd */
+.tv-mini-lampa { left: 211px; top: 182.5px; width: 5px; height: 5px; border-radius: 50%; background: #5dff7a; box-shadow: 0 0 4px 1px rgba(80, 255, 120, 0.7); }
+.tv-mini.sander .tv-mini-lampa { background: #ff3a2a; box-shadow: 0 0 4px 1px rgba(255, 58, 42, 0.8); animation: av-lampa 2s ease-in-out infinite; }
+/* hela tv:n är knappen till tv:n i rummet */
+.tv-mini-in { position: absolute; inset: 0; margin: 0; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tv-mini-in:focus-visible { outline: 2px solid rgba(240, 214, 153, 0.85); outline-offset: 3px; }
+.tv-mini:has(.tv-mini-in:hover) .tv-glas { filter: brightness(1.07); }
+/* krysset i hörnet: en mörk knapp över ramen, med lite mer att träffa runt om */
+.tv-mini-x {
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background:
+    linear-gradient(45deg, transparent calc(50% - 0.75px), #e9e7df calc(50% - 0.75px) calc(50% + 0.75px), transparent calc(50% + 0.75px)) center / 10px 10px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 0.75px), #e9e7df calc(50% - 0.75px) calc(50% + 0.75px), transparent calc(50% + 0.75px)) center / 10px 10px no-repeat,
+    #1c1d20;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 2px 6px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tv-mini-x::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; }
+.tv-mini-x:focus-visible { outline: 2px solid rgba(240, 214, 153, 0.85); outline-offset: 2px; }
+/* med mus syns krysset när man pekar på tv:n */
+@media (hover: hover) and (pointer: fine) {
+  .tv-mini-x { opacity: 0; }
+  .tv-mini:hover .tv-mini-x, .tv-mini-x:focus-visible { opacity: 1; }
+}
+.tv-mini.slocknar { pointer-events: none; }

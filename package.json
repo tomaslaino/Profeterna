@@ -11,7 +11,8 @@
     "backtest": "node src/backtest.js",
     "kandidater": "node src/candidates.js",
     "analyser": "node scripts/analyser/skriv.mjs",
-    "repliker": "node scripts/hasse/kolla-repliker.js"
+    "repliker": "node scripts/hasse/kolla-repliker.js",
+    "statistik": "node scripts/kolla-statistik.js"
   },
   "engines": {
     "node": ">=18"

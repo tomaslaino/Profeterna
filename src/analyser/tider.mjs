@@ -95,9 +95,13 @@ export function egenTid(round, fil, { now = Date.now(), foreTimmar = 30 } = {}) 
 // poddjobbet när omgången har matcher kvar och poddjobbet inte har gått igenom den (tider: poddjobbets tider.json,
 // där en lyckad körning skriver omgången), högst en gång per omTimmar och omgång (knuff: {omgang, at}), så att ett
 // jobb som stannar inte väcks var 15:e minut. Poddjobbet avgör själv om det är dags (egenTid) och kör aldrig två
-// gånger samtidigt. → true eller false
-export function knuffaPoddar(round, tider, knuff, { now = Date.now(), omTimmar = 2 } = {}) {
+// gånger samtidigt. Sedan 2026-11-18 väcker det också när en av poddjobbets tider som launchd inte startar det på
+// (schema: tiderna med vacks i config/poddar.js, fredag kl. 13.00 efter presskonferenserna) har slagit efter den
+// senaste lyckade körningen (tider.senast). → true eller false
+export function knuffaPoddar(round, tider, knuff, { now = Date.now(), omTimmar = 2, schema = [] } = {}) {
   if (!round || !Array.isArray(round.matcher) || !round.matcher.some((x) => Date.parse(x.avspark) > now)) return false;
-  if (tider && tider.omgang === round.id) return false;
+  const tid = senasteTid(now, schema);
+  const dags = !tider || tider.omgang !== round.id || (tid > 0 && tid > (Date.parse(tider.senast) || 0));
+  if (!dags) return false;
   return !(knuff && knuff.omgang === round.id && now - (Date.parse(knuff.at) || 0) < omTimmar * H);
 }

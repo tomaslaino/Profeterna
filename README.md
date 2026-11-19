@@ -517,6 +517,33 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   DT blåser ut röken viftar den bredvid ibland bort den, när neonskylten glappar tittar någon upp på den, den som
   lämnar in får ölen höjd mot sig och när alla tre är inne skålar de, och börjar det regna, snöa eller åska vänder de
   sig om och tittar ut (se *Det som händer i rummet* under [Tobaksaffären](#tobaksaffären))
+- [x] **Fredagens presskonferenser och matchbladen före poddarna (2026-11-18, användarens önskemål: "Kan du förbättra
+  informationsinhämtningen till helgarderattidningen"):** nattjobbets fredagskörning går kl. 13.00 i stället för
+  natten mot fredag, då fredagens presskonferenser inför lördagen ännu inte var hållna; analysjobbet väcker det. Och
+  matchbladen skrivs så snart forumen, artiklarna och lokaltidningen är lästa, och sedan om match för match när
+  poddarna är utskrivna. Förut väntade bladen på alla poddar, några timmar, och blev inte skrivna alls om körningen
+  stoppades (se *Fredagens presskonferenser och bladen före poddarna* under *Supporterpoddarna*)
+- [x] **Hasse vänder blad, och tidningen ser ut som papper (2026-11-19, användarens önskemål: "Gör alla läsa -tidningen
+  animationer med Hasse bättre/snyggare"):** han läste samma uppslag hela tiden, och papperet var två plana skivor som
+  stod helt stilla mellan rörelserna. Nu vänder han blad en gång i alla nio klippen: han tar det översta bladet i hörnet
+  med höger hand, lyfter det och för det över, släpper det så att det faller över av sig självt och tar kanten igen,
+  medan blicken följer bladet och går upp till början av den nya sidan. Halvorna buktar lite, den bortvända halvan är
+  inte längre randig snett från kameran, och papperet följer andningen och händerna i stället för att stå som
+  fastskruvat (se *Han vänder blad* under [Hasse Backe](#hasse-backe))
+- [x] **Statistiken kontrollerad (2026-11-18, användarens önskemål: "förbättra och säkerställa statistiken på
+  sidan"):** alla tal under Statistik prövades mot varandra och mot ESPN och FPL. Tre fel är rättade: *Poäng åt laget*
+  räknade varje mål för sig, så att flera mål i samma match gav fel tal (11 spelare i Premier League, t.ex. Nicolas
+  Jackson 9 i stället för 8 och Alexander Isak 5 i stället för 7); *M+A per 90* i Premier League räknades på FPL:s assist
+  i stället för ESPN:s i kolumnen Ass; *Speltid per match* delade FPL:s minuter med ESPN:s matcher (Iliman Ndiaye 96
+  min). Lagens topplistor har delad placering som spelarnas, och `npm run statistik` prövar filerna efter varje bygge
+  (se *Statistiken kontrolleras* under [Beslut](#beslut))
+- [x] **Tv:n följer med (2026-11-18, användarens önskemål: "Kan du ordna så att man kan välja om man vill få med
+  TVapparaten där man ser de andra på en liten bild i ett hörn i mobilen (uppe till höger) när man surfar runt på andra
+  ställen på sidan" och "Tänker där jag har text-tv nu"):** nära tv:n står *Ta med tv:n* i foten. Då går man till den
+  vanliga sidan, och tv:n krymper till en liten tv uppe till höger, under menyn, som följer med överallt på sajten –
+  också över matchrutan och till Tabeller, Statistik och Om oss. Den visar det tv:n visar: text-tv:n, som går vidare,
+  eller gänget i bild, och byter till AV när någon visar sig, som i rummet. Kameran och bilden fortsätter. Ett tryck på
+  den lilla tv:n går tillbaka till tv:n i rummet, krysset stänger den (se *Tv:n följer med* under [Tv:n](#tvn))
 
 ## Publicering
 
@@ -855,6 +882,7 @@ npm run refresh        # bygget med omhämtning av alla källor
 npm run check          # prognosmotorns kontroll mot förra säsongen (se Prognosmotorn)
 npm run backtest       # walk-forward-backtest över alla säsonger, ~1,5 min (se Backtestet)
 npm run kandidater     # kandidatjakten, ~15 min första gången (se Kandidatjakten)
+npm run statistik      # kontrollen av statistiken i _site/data (eller -- --url https://matchfixarna.se)
 ```
 
 Lokala byggen **läser** journalen som den ligger i repot men skriver aldrig i den – det gör
@@ -1360,6 +1388,39 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   högra väggen. Närbilderna ser ut som förut: datorns skärm får samma ljus framför kameran, och kameran går i
   en båge runt skärmen dit, så att den inte far förbi datorns sida; videon ses som förut men mer rakt
   framifrån, så att etiketterna läses lättare. Se [Datorn](#datorn) och [Videon](#videon).
+- **Kurvan i datorns xG (2026-11-18, användarens val):** användaren frågade hur statistiken i datorn kunde bli
+  bättre och bad sedan om "olika visualiseringsförslag". Av elva skisser i tre grupper (det som skiljer mest,
+  riktningen och säkerheten) valde hen *B Oscilloskopet* i gruppen om riktningen: en ny sida KURVAN i matchaktens
+  xG med lagens xG match för match under säsongen. Se [Kurvan](#kurvan) under Datorn.
+- **Statistiken kontrolleras (2026-11-18, användarens önskemål):** "Kan du förbättra och säkerställa statistiken
+  på sidan." Spelar- och lagfilerna för alla fem flikarna (de fyra ligorna och Nations League) prövades mot sig själva
+  och mot källorna: tabellen mot matchstatistiken, spelarnas mål mot lagens, målens betydelse mot ESPN:s matchrapporter
+  och speltiden mot FPL. Det mesta stämde; tre saker var fel och är rättade, på Statistik och i datorn:
+  - *Poäng åt laget* (`gpts` i [src/players.js](src/players.js)) räknas per match och spelare: poängen med spelarens mål
+    minus poängen utan alla hans mål i matchen. Förut räknades varje mål för sig, så att två mål i en seger med 2–1 gav
+    4 poäng (laget tog 3) och två mål i en seger med 2–0 gav 0. I Premier League fick 11 spelare ett annat tal, åt båda
+    hållen. Talet är aldrig större än poängen laget tog, och summan över säsongen är precis vad förklaringen säger: så
+    många poäng färre utan hans mål.
+  - *Per 90* räknas med talet och speltiden ur samma källa och samma matcher: mål, assist och regelbrott (ESPN) med
+    speltiden ur ESPN:s matchrapporter, xG och försvaret (FPL) med FPL:s speltid. Förut räknades *Mål per 90* och *M+A
+    per 90* i Premier League på FPL:s mål och assist. FPL räknar fler assist än ESPN (t.ex. ett skott som styrs in), så
+    55 av 451 spelare hade ett annat antal än i kolumnen *Ass*: Pascal Gross 6 mot 4, och M+A per 90 1,02 i stället för
+    0,82. De andra ligorna räknades redan så.
+  - *Speltid per match* (spelarkortet och datorn) är ESPN:s minuter delat med ESPN:s matcher. FPL:s minuter delat med
+    ESPN:s matcher gav 96 minuter per match för Iliman Ndiaye, eftersom ESPN:s trupp saknar två av hans tio matcher.
+  - Lagens topplistor under Lagen har **delad placering** som spelarnas: två lag med samma tal som det visas (27 %,
+    +0,15) delar plats, och numret står bara på den första.
+  - **Kontrollen** (`npm run statistik`, [scripts/kolla-statistik.js](scripts/kolla-statistik.js)) prövar de byggda
+    filerna, eller den publicerade sajten med `--url https://matchfixarna.se`, mot sådant som alltid måste stämma:
+    tabellens poäng och målskillnad, att matchstatistiken och tabellen säger samma sak när de gäller lika många matcher
+    (annars är ett lag kopplat till fel rader), att spelarnas mål summerar till lagets, att segermål, sena mål och poäng
+    åt laget inte är fler än möjligt och att speltiden ryms i matcherna. Räkningen av målens betydelse prövas mot sju
+    påhittade matcher med facit, som fångar det gamla felet. Ett fel avslutar med kod 1; skillnader mellan källorna (en
+    trupp som släpar, FPL och ESPN som inte är överens om en spelares matcher) skrivs bara ut. Kontrollen körs i
+    `publicera.yml` efter bygget: ett fel blir en varning i körningen och står i körningens sammanfattning, men sajten
+    publiceras ändå. Den publicerade sajten 2026-11-18 hade inga fel i filerna och två skillnader mellan källorna
+    (Ndiaye ovan och Burnleys trupp, en omgång efter); felet i poäng åt laget syns inte i filerna utan bara mot
+    matchrapporterna.
 - **Affären utifrån (2026-11-16, användarens önskemål):** "Kan du ordna så att man ser baren lite utifrån om man
   trycker på 'matchfixarna' på dörren", med ett foto av Bron vid S:t Eriksbron utifrån: "Gör det enkelt och snyggt och vi
   ska synas där i fönstret - vagt vast med samma inredning etc.", "Tänk på allt som händer ute" och "Du kan zooma in
@@ -1884,6 +1945,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   Bygget hämtar inte grenen `rost` (`src/rost.js` och steget i workflowen är borta), *Läs upp* under hans text
   och svaret från baren är borta, och iMacens jobb stänger av sig självt nästa gång det körs. *Ljud på* står
   kvar, för slagen i disken, koppen och de andra ljuden på disken. Se [Hasse Backe](#hasse-backe), *Ljudet*.
+- **Hasses samtal utan Matchbladet och Ljud på (2026-11-19, användarens önskemål):** "Ta bort där nere där det
+  står Matchbladet o ljud på så att Hasse syns mer o Mergea!" (bild från telefonen efter *Etta.*). *Matchbladet →*
+  står inte längre under svaren, och *Ljud på* i foten är borta, så ljudet är av. Samtalet går nu ned till 18 px
+  från kanten i stället för 52, så att texten oftare ryms under honom utan att flytta upp till kragen. Se
+  [Hasse Backe](#hasse-backe), *Ljudet*.
 - **Hasse Backe slår domen i disken på fler sätt, och det hörs (2026-11-05, användarens
   önskemål):** han är en bestämd och tydlig herre, så domen slås i disken på ett av fem sätt
   (skrattet, näven, tre slag, båda händerna, fingret och handflatan), och vid ett bestämt ord
@@ -2058,6 +2124,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och det gick bara med vågrät underarm. Nu vilar armbågen på disken och underarmen står snett upp med handleden i
   vila, och handen vrids runt underarmen så att cigarren pekar utåt, uppåt eller mot en. Det gäller alla elva sätt
   att njuta av cigarren, de fyra sätten att tända den och när den har slocknat. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Hasse Backe röker på fem sätt till (2026-11-19, användarens önskemål):** "Ge Hasse fler röka cigarranimationer"
+  och "Det måste se naturligt ut!" Han hade elva sätt att njuta av cigarren. Nu har han sexton: han funderar med
+  cigarren vid axeln och kommer på det (`tanker`), blåser röken snett upp mot taket med huvudet bakåt (`taket`),
+  lutar sig bakåt och minns, med röken ut genom näsan och en belåten suck (`minns`), lyfter cigarren mot någon längs
+  baren som en hälsning (`honnor`), och blåser försiktigt på glöden när den har falnat (`gloden`). För att det ska
+  se naturligt ut håller han cigarren bara i de lägen som redan är prövade (vid axeln, framför bröstet, vid munnen),
+  och leendet viker undan när han spetsar läpparna. Röken mot taket gick först rakt upp och lade sig då framför
+  ansiktet; nu går den snett förbi det. Se [Hasse Backe](#hasse-backe), *Cigarren*.
 - **Klicka på Hasses kaffe, askkopp och de andra sakerna (2026-11-10, användarens önskemål):** "kan du ordna så att
   man kan klicka på kaffet, askkoppen osv och så gör Hasse de rörelserna - men att han annars gör dem så som han
   känner för det". Ett klick var som helst i hans bild gick förut tillbaka till rummet. Nu går kaffet, askkoppen med
@@ -2257,6 +2331,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   klipp, `lasa6`–`lasa8`, där inget i tidningen säger att han hade fel och han är nöjd med det han läser, av de vanliga
   bitarna och fyra nya: `blinkar`, `fniss`, `fundera` och `imponerad`. Av vana läser han nu på fem sätt (`VANA_LAS`).
   Se [Hasse Backe](#hasse-backe), *Tidningen*.
+- **Hasse vänder blad (2026-11-19, användarens önskemål):** "Gör alla läsa -tidningen animationer med Hasse
+  bättre/snyggare". En ny bit, `bladdra`, där han vänder blad, i stället för en av gångerna han läser i vart och ett av
+  de nio klippen (lika lång, så klippen är lika långa som förut), papperet buktar (`KUPA`), trycket filtreras skarpare
+  snett från kameran och papperet lever lite medan han håller det (`LEV_T`). Se [Hasse Backe](#hasse-backe),
+  *Han vänder blad*.
 - **Hasse Backe minns vad han sa (2026-11-06, användarens önskemål):** klickade man på en match
   man redan hade frågat om slog han domen i disken en gång till, och efter en omladdning gjorde han
   om allt, med 15–25 sekunders väntan. Nu står det han sa direkt, sparat på enheten så att det
@@ -2962,13 +3041,14 @@ visar lagens sköldar. Tidningen bakom löpsedeln trycker samma bilder i notiser
 finns, utan Claude (med `--ut <mapp>` hamnar de i `<mapp>/tidning-bilder/`).
 
 **Supporterpoddarna** (2026-11-10, användarens önskan: *transkribera lagens poddar inför nästa stryktips så att
-man får initierad info – det mest intressanta ska med*): natten mot tisdag och natten mot fredag kl. 02.15 och lördag kl. 08.00 (användarens beslut 2026-11-10, före det
-varje natt) lyssnar iMacen
+man får initierad info – det mest intressanta ska med*): natten mot tisdag kl. 02.15, fredag kl. 13.00 och lördag kl.
+08.00 (användarens beslut 2026-11-10, före det varje natt; fredagens tid var natten mot fredag till 2026-11-18) lyssnar iMacen
 igenom veckans avsnitt av supporterpoddarna för lagen i omgången ([scripts/tidning/poddar.mjs](scripts/tidning/poddar.mjs),
 launchd-jobbet `se.matchfixarna.poddar`; logiken i [src/analyser/poddar.mjs](src/analyser/poddar.mjs), gränserna och
 prompterna i [config/poddar.js](config/poddar.js)). launchd startar jobbet varje natt kl. 02.15 och lördag kl. 08.00,
 men skriptet går bara när en av tiderna (`tider` i config/poddar.js) har slagit sedan den senaste lyckade
 körningen (`tider.json` i mappen) och slutar annars direkt, så tiderna ändras där utan att jobbet installeras om.
+Fredag kl. 13.00 startar launchd det inte; där väcker analysjobbet det (se nedan).
 En tid som missas medan datorn sover körs när den vaknar, och en körning som stoppas försöks igen vid nästa start.
 `--nu` kör oavsett tid.
 
@@ -2982,10 +3062,34 @@ scripts/analyser/skriv.mjs). Det väcker bara när omgången har matcher kvar oc
 (omgången i poddjobbets `tider.json`, som en lyckad körning skriver), och högst varannan timme per omgång
 (`poddar-knuff.json`), så ett jobb som stannar väcks inte var 15:e minut (`knuffaPoddar`). Ingenting behöver
 installeras om på iMacen: båda jobben går ur analysernas klon, som analysjobbet håller i takt med main. Bladen kommer
-några timmar efter kupongen (utskriften tar tid) och fyller i numret när analysjobbet lägger ut dem; de fasta tiderna
-(natten mot tisdag, natten mot fredag och lördag morgon) går som förut och tar med det som har kommit sedan dess.
-Provat med Node (`egenTid` och `knuffaPoddar`). Inte provat på iMacen: att `launchctl kickstart` startar jobbet
-därifrån och att jobbet då går igenom omgången.
+efter kupongen och fyller i numret när analysjobbet lägger ut dem; de fasta tiderna (natten mot tisdag, fredag
+eftermiddag och lördag morgon) går som förut och tar med det som har kommit sedan dess. Provat med Node (`egenTid` och
+`knuffaPoddar`). Bladen till Nr 3 skrevs på tisdagskvällen, utan någon fast tid, så väckningen fungerar troligen
+på iMacen.
+
+**Fredagens presskonferenser och bladen före poddarna** (2026-11-18, användarens önskemål: "Kan du förbättra
+informationsinhämtningen till helgarderattidningen"). Två saker höll tillbaka det bästa underlaget:
+- **Fredagens körning gick natten mot fredag**, för veckans presskonferenser. Men inför en lördagsomgång hålls många av
+  dem på torsdagen och fredagen, och lokaltidningarnas referat kommer samma dag, så fredagens presskonferenser kom med
+  först lördag morgon, och Hasse Backes tidning fredag kl. 16.00 fick dem aldrig. Nu går körningen fredag kl. 13.00
+  (`tider` i config/poddar.js), och forumen, artiklarna och lokaltidningen är lästa före kl. 16.00. launchd startar
+  jobbet bara kl. 02.15 och lördag kl. 08.00, så en tid med `vacks: true` väcks av analysjobbet: `knuffaPoddar` säger ja
+  också när en sådan tid har slagit efter poddjobbets senaste lyckade körning (`senast` i `tider.json`), med samma gräns
+  på en gång varannan timme. Ett poddjobb som redan går (låset `Tidning/las` med en levande process) väcks inte, så
+  loggen säger inte *väckt* om ett jobb som redan arbetar. Går väckningen inte tar launchd tiden kl. 02.15 natten efter.
+- **Bladen väntade på poddarna.** De skrevs sist i körningen, när alla avsnitt var utskrivna (5–10 minuter per
+  avsnitt): bladen till Nr 3 skrevs 23.37–23.42 på tisdagskvällen, efter minst fjorton avsnitt, fast forumen och
+  artiklarna hade lästs minst en timme tidigare. Stoppades körningen på vägen (abonnemangets gräns) blev inga blad skrivna alls.
+  Nu väljer jobbet först veckans avsnitt för alla lag, skriver sedan bladen med det som forumen, de insatta, klubben och
+  lokaltidningen har gett, och skriver sist ut avsnitten match för match, kupongens ordning, och skriver om matchens
+  blad så snart dess avsnitt är uttagna. Ett blad skrivs bara om när dess uppgifter har ändrats, så en match vars
+  poddar inte gav något nytt kostar inget extra anrop; en match med nya poddar får ett anrop till.
+
+Provat med Node: `knuffaPoddar` för fredagens tid (inte före 13.00, väcker 13.05, väntar två timmar, inte efter en
+lyckad körning, inte när matcherna har börjat, inte för tisdagens tid efter en körning när kupongen kom), och hela
+nattjobbet med en påhittad omgång på en lokal sajt, två poddar med färdiga utskrifter och ett falskt `claude`: bladen
+skrevs först med forumets uppgifter (1 + 0 stycken) och sedan om, ett i taget, med poddens (1 + 1); `--torrt` visar
+samma ordning. Inte provat på iMacen.
 
 ```
 omgångens lag → registret (lagets poddar) → veckans avsnitt → whisper.cpp → claude -p → omgang.json
@@ -3258,8 +3362,8 @@ Stockport–Reading och Sheffield Wednesday–Plymouth. Sheffield Wednesday fick
 känning, Harry Grays höftskada, målvakten, tränaren Dave Challinor om orken), Plymouth tre ur Plymouth Live (Michael
 Baidoo tillbaka efter hamstringsskadan) och matchbladet skrevs med lokaltidningen som källa och tränarens citat.
 Stockport och Reading fick inget: veckans presskonferens hölls inte förrän torsdag, Reading Chronicle säger nej i
-robots.txt och The Star svarade ibland HTTP 403. Körningen natten mot fredag (efter presskonferenserna) är den som
-ska bära källan. Med Node: sökningens svar med slag, Newsquest och påhittade adresser, Bing-träffarna (veckan, laget i
+robots.txt och The Star svarade ibland HTTP 403. Fredagens körning (efter presskonferenserna, kl. 13.00 sedan
+2026-11-18) är den som ska bära källan. Med Node: sökningens svar med slag, Newsquest och påhittade adresser, Bing-träffarna (veckan, laget i
 rubriken, uteslutna sajter), att de står i frågan och räknas som träffar, poster och id, att de insattas och de nya
 inte rör varandras poster, sidans och tidningens underlag och redaktörens nycklar. Helgarderat med ett av provets
 blad och en påhittad intervju, i webbläsarpanelen i 1280 bredd och 375 × 812: källspalten, citatet och baksidan,
@@ -3320,7 +3424,7 @@ src/analyser/media.mjs):
 - **Registret** (forra.json i jobbets mapp): vem som är ny sparas per lag och tas fram igen efter 28 dagar
   (`giltigDagar`) eller när `promptVersion` byts; nästa sökning får de nya i meddelandet och letar bara sidor. Ett lag
   utan någon ny söks inte förrän då, och ett lag som söktes de senaste två dagarna (`sokIgenDagar`) inte igen: natten mot
-  tisdag och natten mot fredag, inte lördag morgon. Lagets poster från veckan står i registret, och lagets poster i
+  tisdag och fredag eftermiddag, inte lördag morgon. Lagets poster från veckan står i registret, och lagets poster i
   omgångens fil byts mot dem; det som är äldre än sju dagar faller bort.
 - **Sidan och tidningen:** sidan tar lagets två senaste (`typ: 'forra'`, id på `f`), och redaktören får dem som
   `förra_klubben`. I källspalten står de med sitt eget namn och personen (*Owlstalk om Murphy Cooper*). Hasses notiser
@@ -7416,6 +7520,15 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
 - **Dörren:** guldet på glaset står rättvänt (*Matchfixarna*, TOBAK & SPEL, *Öppet till spelstoppet*, och nertill
   öppettiderna), och skylten på sugproppen säger ÖPPET på den här sidan – STÄNGT är sidan inåt. I fönstrets nedre hörn
   sitter klistermärkena för korten, tipset och travet, lite blekta (`texten`).
+- **Löpsedelsstället (2026-11-19, användarens önskemål):** "en helgarderat-löpsedel på en skylt utanför
+  tobaksaffären … på ett lämpligt o snyggt ställe". På trottoaren tätt intill bröstningen, till höger under
+  skyltfönstret och en bit från dörren, står ett löpsedelsställ av svartlackerat stål (`STALL` och `stallet` i
+  rum-fasad.js): veckans löpsedel från Helgarderat bakom plast, på två ben med en tvärslå och fötter som går in mot
+  väggen och ut mot gatan i perspektiv. Sedeln är samma som hänger hos Hasse Backe (`Rum.lopsedel`, kopierad när den
+  ändras, `sedeln`), så rubriken, numret och slitaget följer med. Den har gatans ljus (`stallLjus`, som
+  multiplikation över papperet): nästan vit på dagen, svalare i mulet, mörk och varm på kvällen; plasten blänker av
+  himlen eller lamporna, stället skuggar stenen under och på dagen bröstningen bakom (inte glaset), och snö lägger
+  sig på ramen. De som går förbi går framför det. Innan rummets saker är ritade står stället undan (`.tom`).
 - **Putsen har levt (2026-11-16):** stora mjuka fläckar i putsen, mörkare och ljusare, rinnmärken under blecken på
   våningarna, under gesimsen och från fönsterbänken ned över bröstningen, fukt nertill på väggen där regnet stänker upp
   (mörkare när stenen är våt) och en glans i sockelns överkant. Stupröret har fästen och en böj nertill; när det regnar
@@ -8264,6 +8377,43 @@ bredden) med *Vem är du?*, tryck med fingret och foten uppe till höger; utan k
 båda gör det samtidigt och erbjudandena krockar) och en sida som laddas om. Inte provat: riktiga kameror, Safari i
 iPhone, två olika nät (mobilnät utan TURN) och tjänsten driftsatt.
 
+**Tv:n följer med (2026-11-18).** Användaren: "Kan du ordna så att man kan välja om man vill få med TVapparaten där man
+ser de andra på en liten bild i ett hörn i mobilen (uppe till höger) när man surfar runt på andra ställen på sidan", och
+sedan, om text-tv:n: "Tänker där jag har text-tv nu". Valet är en knapp, inte en inställning: den lilla tv:n kommer bara
+när man ber om den, så att ingen kamera fortsätter utan att man vet om det ([public/rum-bild.js](public/rum-bild.js),
+stilen sist i [public/rum-tv.css](public/rum-tv.css)).
+
+- **Ta med tv:n** står i foten nära tv:n när den är på (inte medan den frågar *Vem är du?*), bredvid *Visa dig på
+  tv:n*. I telefonen på höjden står den där *Vanlig sida* stod, för den leder också dit. Ett tryck går till den vanliga
+  sidan (`#hem`), och tv:n krymper från sin plats i rummet till hörnet.
+- **Den lilla tv:n** är samma Panasonic utan panelen med knapparna: fronten 238 × 196 förminskad till 162 × 133 i
+  telefonen och i full storlek på större skärmar, uppe till höger under menyn. I telefonen följer den menyn uppåt när
+  loggans rad skrollas undan (`--topp`). Rutan är tv:ns egen – den flyttas dit med text-tv:n och videorna, som går
+  vidare – så den visar det tv:n visar: text-tv:n på den sida den stod på (undersidorna bläddrar själva, och raderna
+  ritas om varje minut, `tvKoll` i rum.js), eller AV. Visar sig någon byter den till AV med snö, och slutar alla går den
+  tillbaka till text-tv:n, som i rummet. Lampan under rutan är röd medan din kamera är tänd. Den ligger i det översta
+  lagret (popover), och medan matchrutan är öppen flyttas den in i den, annars gick den inte att trycka på där.
+- **Ett tryck** på den lilla tv:n går till tv:n i rummet, nära (`Rum.tv()`); **krysset** stänger den: kameran släcks
+  och förbindelserna stängs, som när man lämnar rummet, och tv:n i rummet står på text-tv:n tills någon visar sig. Med
+  mus syns krysset när man pekar på tv:n.
+- **Förstasidan laddad på nytt** (eller från en av de egna sidorna, med `#kupong` …): då finns inget rum, och rum.js
+  bygger bara tv:n i en dold låda (`Rum.tvUtan`), med samma rader som i rummet, så att text-tv:n följer med också då.
+  Går man in i rummet sedan flyttar den tv:n in där, med det den visar.
+- **Egna sidor:** Tabeller, Statistik och Om oss laddas som nya sidor, och då bryts förbindelserna. Tv:n följer ändå
+  med: sidan minns att den följer med (`profeterna.tv.foljer` i sessionStorage, med om den stod på AV och om kameran var
+  tänd), och där hämtar [public/tv-med.js](public/tv-med.js) tv:ns stil, `tippoang.js` och `rum-bild.js` – bara när
+  tv:n följer med. Den kopplar upp sig igen (snö ett ögonblick), tänder kameran om den var tänd och läser gänget ur
+  `data/kuponger.json` själv. Text-tv:n kan inte följa med dit (dess rader kommer ur förstasidans kupong och omgång),
+  så där syns den lilla tv:n bara med AV: när någon visar sig, och den slocknar när ingen gör det. Den följer med
+  vidare ändå, och på förstasidan står text-tv:n i den igen. Som med `ATER` följer den bara med inom tio minuter.
+
+Provat 2026-11-18 i huvudlös Chrome med låtsaskamera mot en lokal kopia av tjänsten och ett bygge utan källor (också
+`--minify`): en i telefon (Pixel 7) och en på datorn – Ta med tv:n på text-tv och på AV, med och utan egen kamera,
+skrollat, Matcher, matchrutan (tv:n syns och går att trycka på), den andra som visar sig och släcker (AV och tillbaka
+till text-tv:n), Kupong och Olympen laddade på nytt (tv:n byggd utan rummet, och sedan in i rummet), Tabeller och
+Statistik (bara AV; kameran tänds igen och den andra ser en igen), ett tryck på den lilla tv:n (rummet med tv:n nära)
+och krysset. Inte provat: riktiga kameror, Safari i iPhone och appen.
+
 **Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
 vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot
 ögat blir den sned, eftersom den sitter högt upp till höger. Man byter sida med ▲ ▼ på
@@ -8911,6 +9061,41 @@ bara när det finns landskamper före klubbmatcherna. Första körningen: 146 la
 beräknade elva gick från 9,3 till 7,5 dagar (sex med en landskamp kvar), Arsenals från 8,3 till 6,6. Förklaringsrutan
 säger vilka som räknas från en landskamp som inte är spelad än (namnen när de är högst tre).
 
+#### Kurvan
+
+2026-11-18 frågade användaren hur statistiken i datorn kunde bli bättre och bad sedan om "olika
+visualiseringsförslag". Elva skisser i datorns terminal, i tre grupper (*Det som skiljer mest*, *Riktningen* och
+*Säkerheten*), visades på en sida med omgångens Newcastle–Arsenal som exempel. För riktningen valde användaren
+*B Oscilloskopet* bland fyra skisser (*Blockkurvan*, *Oscilloskopet*, *Matchstaplarna* och *Pilen vid talet*).
+Säsongens snitt visar var ett lag står men inte vart det är på väg: ett lag som skapar allt mer men förlorar ser ut
+som ett som har varit jämnt hela hösten.
+
+- **Sidan KURVAN** står i matchaktens xG efter *TALEN* och nås med Tab och menyraderna som de andra sidorna. Den visar
+  lagens xG match för match under säsongen som två linjer på ett oscilloskop. Den ljusa linjen är lagets egen xG och
+  den gröna motståndarnas, och fältet mellan dem är fyllt där laget skapade mer än det släppte till. Varje punkt är
+  snittet av tre matcher (de två första av en och två), så att en enstaka match inte drar iväg. Den första matchen
+  står till vänster, och under kurvan står månaderna mitt under sina matcher.
+- **På datorn** står lagen sida vid sida under sina namn, med *0*, *1,0* och *2,0* i etiketternas spalt mellan
+  dem: nio rader, tre per 1,0 xG, och över 2,8 står linjen i taket. Sidan är tolv rader och ryms utan att rulla.
+  **I telefonen** står lagen under varandra med namnet över och talen till vänster: sex rader, två per 1,0 xG.
+- **Datan** är `fd.serie` i `data/teams/<division>.json`: `[datum, lagets xG, motståndarens xG]` för varje
+  ligamatch med xG, äldst först (`serieAv` i [src/teamstats.js](src/teamstats.js)). Den kommer ur samma rader i
+  football-data.co.uk som lagets övriga xG och släpar alltså en omgång som de. För landslagen är det Nations Leagues
+  matcher ur 365Scores (`data/teams/unl.json`). Färre än tre matcher ger *FÖR FÅ MATCHER* och ett lag utan xG
+  *INGEN xG*; har inget av lagen xG finns ingen sida. Med dolda resultat står ett ?.
+- **Teckenförklaringen** överst öppnar rutan med förklaringen och ett exempel per lag, de tre första matcherna mot de
+  tre senaste (*Arsenal skapade 2,2 xG per match i de tre första matcherna och 1,2 i de tre senaste …*; `kurvan`
+  i [public/rum-register-ord.js](public/rum-register-ord.js)).
+- **Ritningen:** i terminalen är figuren en bit av mellanslag i den första raden, lika bred som panelen, med en SVG
+  som går ner över de andra raderna (`kurvBit` i [public/rum-register.js](public/rum-register.js), `.kv` i
+  [public/rum-register.css](public/rum-register.css)). Linjerna är lika tjocka hur figuren än dras ut. Skärmen i
+  rummet ritar samma figur ur samma bit (`kurva` i [public/rum-dator.js](public/rum-dator.js)).
+
+Provat 2026-11-18 i huvudlös Chromium mot ett bygge utan källor (`--no-fetch`) med påhittade lagfiler (xG för tolv
+ligamatcher), i 1440 × 900 och 412 × 860: sidan på datorn och i telefonen, förklaringsrutan, skärmen i rummet efter
+Tillbaka, ett lag utan xG, en match där inget av lagen har xG och dolda resultat, utan fel i konsolen. Inte provat mot
+riktig data, eftersom källorna inte gick att nå från maskinen.
+
 #### Rankningen
 
 2026-11-16 ville användaren att platserna efter talen (*4:E*, *12:E*) skulle gå att trycka på och leda till "en
@@ -8949,7 +9134,7 @@ med flit (nedan):
 | | Vad | Innehåll |
 |---|---|---|
 | **Tv:n** | Matcherna och ligorna, nu | Stryktipset live (377), omgångens matcher (331), en sida per match med odds, prognos, tabelläget och hemma/borta (332–369), tabellerna (371–374) och skytteligorna (381–384) |
-| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom skytteligan (tabellerna sedan 2026-11-16, under *LAG*): laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta; landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
+| **Datorn** | Ett lag eller en spelare i taget, och historiken – och tavlans siffror vid varje match | All statistik från Statistik och matchsidan utom skytteligan (tabellerna sedan 2026-11-16, under *LAG*): laget (formen, målen, xG, mot chanserna, modellen, spelet, oddsen, truppen), spelaren (läget, matcherna, anfallet eller målet, försvaret, regelbrotten, med och utan honom mot oddsen), listor över divisionen för varje tal och mötena med resultaten (förra mötet med lagens siffror); anslagstavlans siffror i matchakten, med lagets plats i divisionen, formens motståndare och hemmalaget hemma mot bortalaget borta, och lagens xG match för match (kurvan); landslagen (Nations Leagues grupper, lagkorten med alla landskamper sedan 2024, och i matchakten gruppen, vad lagen spelar för, Nations League, landskamperna och marknadens chans) |
 | **Matchbladet** | En match i taget, när man tippar – på kupongen i handen, hos Hasse Backe och från tv:n | Lagen (chansen ur oddsen, mål och xG i ligan hittills och de tio senaste matcherna hemma och borta), prognosen, analysen, startelvorna, tabellen och mötena (se *Matchbladet* under [Kupongen i handen](#kupongen-i-handen)) |
 
 Matchbladet är ett undantag med flit (2026-11-07, användarens önskemål): det samlar allt om en
@@ -9907,7 +10092,7 @@ så att man såg in i den (ändrat 2026-11-06).
 **Cigarren.** Till vänster om hans högra hand och en bit framför den står en tung askkopp av samma gods
 som koppen, med två urtag. I det ena ligger cigarren: huvudet på disken och vänt lite in mot honom, ringen
 (guld och rött) synlig och glöden över askkoppens mitt, där en tunn rökslinga stiger. Då och då tar han den
-och njuter av den en stund, på ett av elva sätt som lottas (nedan). Han tittar ned, för handen lågt över
+och njuter av den en stund, på ett av sexton sätt som lottas (nedan; elva till 2026-11-19). Han tittar ned, för handen lågt över
 disken med underarmen rakt fram från armbågen och nyper cigarren med flack hand och rak handled, med
 handflatan nedåt och lite framåt (`P_VILA`); förut sträckte han ut armen åt sidan, vred handen 60° utåt och
 dök ned på den ovanifrån med raka, utspärrade fingrar (ändrat 2026-11-09). Han håller den löst i
@@ -9950,7 +10135,7 @@ han det färdigt, och med kupongen i handen väntar det; blir det inte av inom 2
 redan gör (dricker han redan) gör han inte en gång till. Samtalets spalt når över tändaren i datorn: där spalten är
 tom gäller saken under. Med minskad rörelse går ett klick på sakerna tillbaka till rummet som förut.
 
-Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sista byggs med
+Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); alla utom de fyra första byggs med
 `cigarrKlipp`, som fyller i hur han tar upp den och lägger tillbaka den):
 
 - `cigarr`: två bloss med halvslutna ögon (glöden flammar upp, och mellan blossen pyser lite rök ur
@@ -9977,6 +10162,24 @@ Sätten (`KLIPP` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js); de sju sist
   och skrockar.
 - `smaka`: han håller röken i munnen och smakar på den med slutna ögon och höjda bryn, och släpper sedan
   ut den långsamt.
+- `tanker`: ett bloss och röken i en stråle åt sidan, och sedan funderar han med cigarren vid axeln: blicken
+  upp och bort, huvudet lite på sned, pannan i lätta veck och läpparna lite spetsade. Ett kort bloss till mitt i
+  tanken, med röken ut genom näsan, och så kommer han på det: brynen upp, och han nickar två gånger mot en.
+- `taket`: ett långt bloss, och sedan huvudet bakåt och röken ut med spetsade läppar i en lång stråle snett upp
+  mot taket (röken får en egen riktning, `rikt` i huvudets mått), som han följer med blicken; sedan ett nöjt
+  leende med höjda bryn och en blick på cigarren.
+- `minns`: ett bloss, och sedan lutar han sig bakåt med cigarren vid axeln och tittar upp åt sidan med ett
+  leende som växer, medan röken går ut genom näsan. En belåten suck (den hörs), och han skakar långsamt på
+  huvudet – det var tider – och nickar mot cigarren.
+- `honnor`: med cigarren i handen får han syn på någon längs baren, vänder sig dit med brynen uppe och lyfter
+  cigarren lite mot honom med en kort nick och ett leende. Sedan tillbaka till en, ett bloss och röken i en
+  stråle ur mungipan.
+- `gloden`: han håller upp cigarren framför bröstet och tittar på glöden, som har falnat, och blåser försiktigt på
+  den två gånger med munnen som ett o (det hörs), så att den glöder upp. Sedan ett bloss med halvslutna ögon,
+  ett moln åt sidan och en nick mot en.
+
+Leendet han alltid har viker undan (`stel`) när han spetsar läpparna, i `taket` och `gloden`; annars syntes
+inget o.
 
 **Elden.** Cigarren slocknar om han låter den ligga: 2,5–4,7 minuter efter att han rökte sist tonar glöden
 och rökslingan ut på en halv minut (`CIG_LIV`, `slocknar` i [public/rum-hasse.js](public/rum-hasse.js)), och
@@ -10050,8 +10253,8 @@ med baren mörk bakom; *← Hasse* längst ner, Esc eller ett klick utanför lä
 honom (`bladet` i [public/rum-hasse.js](public/rum-hasse.js)). Svaren står direkt under hans fråga, som lappar i tipskupongens tryck
 som ligger på disken: *Jag är idel öra* i terrakotta som kupongens band, *Jag ångrar mig* i krämvitt papper
 bredvid (båda texterna lottas, ur `lar` respektive `angra` i [public/rum-hasse-repliker.js](public/rum-hasse-repliker.js);
-den bredvid är ödmjuk, som *Tack, inte nu* och *Jag är inte redo*), båda med en tunn ram innanför kanten, och *Matchbladet →* under dem med små spärrade
-versaler som texten i bandet. Rutorna 1 X 2 står inte här: de kommer först när man har bett honom om hjälp (se *Din kupong*). Frågan har sin plats från början, osynlig tills han säger den, så att
+den bredvid är ödmjuk, som *Tack, inte nu* och *Jag är inte redo*), båda med en tunn ram innanför kanten. *Matchbladet →* under dem är borta sedan 2026-11-19 (användarens
+önskemål: Hasse ska synas mer); `bladet` ligger kvar men nås inte längre från samtalet. Rutorna 1 X 2 står inte här: de kommer först när man har bett honom om hjälp (se *Din kupong*). Frågan har sin plats från början, osynlig tills han säger den, så att
 knapparna inte flyttar sig. Förut stod svaren som små länkar längst ned i spalten och syntes knappt
 i telefonen, och sedan som piller i guld (ändrat 2026-11-04). *Titta igen* efter analysen är samma
 lapp i terrakotta, med *Alla matcher* i krämvitt bredvid (*Fyll i den* i stället för *Titta igen* medan han
@@ -10257,6 +10460,25 @@ rum-hasse.js, 2026-11-15). Däremellan är domen densamma varje gång och på al
 detsamma hela omgången. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
+
+**Han vänder blad** (2026-11-19, användarens önskemål: "Gör alla läsa -tidningen animationer med Hasse
+bättre/snyggare"). I varje klipp vänder han blad en gång (biten `bladdra` i `LASBIT`, i stället för en av gångerna han
+läser, `las`, och lika lång, så att klippen och deras gränser är som förut; i `lasa3`, `lasa4` och `lasa9` strax efter
+det som sa att han hade fel). Han läser sista raden på den högra sidan, släpper kanten med höger hand och tar det översta
+bladet i hörnet, lyfter det och för det över mot ryggen och släpper det där, så att det faller över av sig självt, och tar
+kanten igen; under tiden håller den vänstra handen tidningen, som sjunker lite åt den sidan och öppnas något, och det
+prasslar när han tar bladet och när det landar. Blicken följer bladet och går upp till början av den nya vänstra sidan.
+Bladet är ett eget nät (`blad` i `byggTidning`, formen i `bladYta` och `GLSL_BLAD` i
+[public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)): varje punkt är samma punkt på den högra halvan, vriden
+kring ryggen så långt som `vand` (0–1) säger, och hörnet han håller i leder när han lyfter och släpar efter när bladet
+faller, så att det böjer sig diagonalt. Handen sitter i hörnet medan `vH` är 1 (`bGrepp` i rum-hasse-3d.js, som
+greppet om kanten). Bladet syns bara medan det är på väg över, inte när `vand` går tillbaka till 0 efter biten.
+Samtidigt blev papperet mer som papper: halvorna buktar lite utåt mellan ryggen och händerna (`KUPA`; plana såg de ut
+som kartong), trycket filtreras med anisotropi 8 i stället för 4 (den nästan bortvända halvan blev randig), och medan
+han håller tidningen följer den andningen och händerna med några långsamma svängningar som inte går jämnt upp (`LEV_T`
+i rum-hasse-3d.js; förut stod den helt stilla mellan rörelserna). Provat i headless Chromium med mjukvarugrafik, bild
+för bild genom bladvändningen, med `?rum-hasse&rum-hasse-klipp=lasa&rum-hasse-kt=34` (klippet står still 34 sekunder in;
+utan `rum-hasse-kt` spelas det om och om, och `rum-hasse-hg` ger Helgarderat) eller `RumHasse.prova('lasa', 34, true)`.
 
 **Tidningen** (2026-11-09). Har det gått dåligt för honom i tippningen låtsas han vara upptagen: han gömmer sig bakom
 tidningen, skyldig men nöjd med sig själv. Han läser den också av gammal vana (2026-11-18, användarens önskemål): har
@@ -10614,9 +10836,8 @@ prova Bielsa-utbrottet.
 
 **Ljudet.** Han pratar inte högt (2026-11-17, användarens beslut: "Hasse pratar inte längre. Du kan ta bort det"):
 det han säger står ord för ord i skriftens takt, med munnen efter orden, och med minskad rörelse står allt direkt.
-*Ljud på* längst ned till vänster, med samma små versaler som *Matchbladet →*, väcker ljudet i webbläsaren, och valet
-minns enheten; sedan heter knappen *Ljud av* (`vakna`, `vaxla` och `ljudknapp` i [public/rum-hasse.js](public/rum-hasse.js)).
-Ljudet är av tills besökaren slår på det.
+Knappen *Ljud på* längst ned till vänster är borta (2026-11-19, användarens önskemål), så ljudet är av
+(`V.av` i [public/rum-hasse.js](public/rum-hasse.js)); ljuden nedan ligger kvar men spelas inte.
 
 När ljudet är på hörs det som händer på disken
 ([public/rum-hasse-ljud.js](public/rum-hasse-ljud.js), hämtas när ljudet slås på): handen i
@@ -10711,6 +10932,11 @@ Cigarrens elva sätt (2026-11-05) är provade med figuren ensam i headless Chrom
 släpper cigarren i mungipan och tar den igen; slaget, gesterna och klunken ser ut som förut. I hela
 sidan (1440 × 900) finns alla elva i lotten, och `tand` och `ringar` spelades utan fel. Inte provade i
 Safari eller i en riktig telefon.
+
+De fem nya sätten (2026-11-19) är provade med figuren ensam i headless Chrome (mjukvarugrafik, SwiftShader),
+900 × 700: varje klipp bild för bild var 0,6–0,8 s och närbilder av handen, ansiktet och röken när han funderar,
+blåser mot taket, minns, hälsar och blåser på glöden. Inte provade i hela sidan, i Safari eller i en riktig
+telefon, och ljuden (sucken och när han blåser på glöden) är inte lyssnade på.
 
 Elden (2026-11-10) är provad i headless Chrome (Metal) med provserver mot sajten: varje klipp bild för bild,
 närbilder av handen, stickan, tändaren och lågan, i dag- och nattljus och i 390 × 844; armbågens förflyttning

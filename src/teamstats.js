@@ -33,6 +33,7 @@ const { readCache } = require('./store');
 const { keyOf, espnKey } = require('./teams');
 const r1 = (x) => Math.round(x * 10) / 10;
 const { scoreMatrix, outcomes } = require('./model');
+const { median, difficulty } = require('./strength');
 
 const DIVS = COMPETITIONS.filter((c) => c.fdcouk);
 
@@ -63,6 +64,7 @@ function blank(name) {
     cards: { n: 0, y: 0, r: 0 },
     mkt: { n: 0, xp: 0, pts: 0, ret: 0, fav: 0 },
     opp: { n: 0, sum: 0 },
+    serie: [],
   };
 }
 
@@ -93,6 +95,9 @@ function add(e, r, s, strengthOf, oppKey) {
     e.xg.xd += px;
     e.xg.pts += gf > ga ? 3 : gf === ga ? 1 : 0;
     if (gf === ga) e.xg.d++;
+    // (matchen i serien för datorns kurva: datumet, lagets xG, motståndarens
+    // och motståndarens styrka, som serieAv gör om till svårighet)
+    if (r.date) e.serie.push([r.date, r2(own('HxG', 'AxG')), r2(opp('HxG', 'AxG')), strengthOf(oppKey)]);
   }
   if (fin(r.HS) && fin(r.AS) && fin(r.HST) && fin(r.AST)) {
     e.sh.n++;
@@ -132,6 +137,25 @@ function add(e, r, s, strengthOf, oppKey) {
     e.opp.n++;
     e.opp.sum += os;
   }
+}
+
+// xG match för match (sedan 2026-11-18, datorns KURVAN i matchakten,
+// användarens val B Oscilloskopet bland fyra skisser): [datum, lagets xG,
+// motståndarens xG, motståndets svårighet] för varje match med xG, äldst
+// först; null utan någon. Svårigheten (sedan 2026-11-19, användarens
+// invändning att kurvan "inte säger så mycket om man inte vet hur svårt
+// motståndet är") är samma 0–1 som formens motstånd: motståndarens väntade
+// resultat mot divisionens mittenlag efter modellens styrka just nu
+// (difficulty i src/strength.js). niva(styrka) ger den; utan niva, eller när
+// motståndarens styrka är okänd, har matchen bara de tre första fälten.
+function serieAv(e, niva) {
+  if (!e.serie.length) return null;
+  return [...e.serie]
+    .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
+    .map(([d, f, a, r]) => {
+      const n = niva && r != null ? niva(r) : null;
+      return n == null ? [d, f, a] : [d, f, a, Math.round(100 * n) / 100];
+    });
 }
 
 function divisionTeams(div, strengthAll) {
@@ -193,6 +217,10 @@ function divisionTeams(div, strengthAll) {
   const ratings = teams.map((t) => strengthOf(t.key));
   const known = ratings.filter((x) => x != null);
   const total = known.reduce((s, x) => s + x, 0);
+  // (kurvans motstånd: mot divisionens mittenlag, som formens)
+  const mitten = known.length > 1 ? median(known) : null;
+  const scale = strengthAll && strengthAll.scale;
+  const niva = mitten == null ? null : (r) => difficulty(r - mitten, scale);
 
   const hb = hemmaBorta(div, teams, rows);
   const out = teams.map((t, i) => {
@@ -215,6 +243,7 @@ function divisionTeams(div, strengthAll) {
         cards: e.cards.n ? e.cards : null,
         mkt: e.mkt.n ? { n: e.mkt.n, xp: r2(e.mkt.xp), pts: e.mkt.pts, ret: r2(e.mkt.ret), fav: e.mkt.fav } : null,
         opp: e.opp.n && expOpp != null ? r3(e.opp.sum / e.opp.n - expOpp) : null,
+        serie: serieAv(e, niva),
       } : null,
       hb: hb.get(t.key) || null,
     };
@@ -310,7 +339,7 @@ function landTeams() {
   let last = null;
   for (const m of played) {
     const sc = m.score90 || m.score;
-    const r = { FTHG: sc.home, FTAG: sc.away };
+    const r = { FTHG: sc.home, FTAG: sc.away, date: m.kickoff ? String(m.kickoff).slice(0, 10) : null };
     const x = stats[m.id] && stats[m.id].t;
     const h = x && x[m.home.espnId];
     const a = x && x[m.away.espnId];
@@ -353,6 +382,7 @@ function landTeams() {
           cards: e.cards.n ? e.cards : null,
           mkt: e.mkt.n ? { n: e.mkt.n, xp: r2(e.mkt.xp), pts: e.mkt.pts, ret: r2(e.mkt.ret), fav: e.mkt.fav } : null,
           opp: null,
+          serie: serieAv(e),
         } : null,
       });
     }

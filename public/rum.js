@@ -787,8 +787,8 @@ window.Rum = (() => {
     );
   }
 
-  // Tv:n i hörnet (rum-tv.js).
-  const tv = () => (window.RumTv ? RumTv.html() : '');
+  // Tv:n i hörnet (rum-tv.js). Är den redan byggd utan rummet (tvUtan) flyttas den in här (build).
+  const tv = () => (R.tvLada ? '<i id="rum-tvplats"></i>' : window.RumTv ? RumTv.html() : '');
   // Videon på disken, och väggen, disken och pulten till höger om bilden (rum-video.js,
   // som ritar disken där med disk).
   const vid = (part) => (window.RumVideo ? RumVideo.html(part, { disk, vagg: hogerVagg }) : '');
@@ -1924,17 +1924,24 @@ ${plane(0, tidningHtml() + paper() + hasseHtml())}
 </div>
 ${window.RumRegister ? RumRegister.nara() : ''}
 <div class="rum-hdr"><a class="rum-brand" href="#">Matchfixarna</a></div>
-<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
+<div class="rum-ft"><a class="rum-vanlig" href="#hem">Vanlig sida</a><a class="rum-tamed" ${KNAPP} hidden>Ta med tv:n</a><a class="rum-bildknapp" ${KNAPP} aria-pressed="false" hidden>Visa dig på tv:n</a><a class="rum-tillbaka" ${KNAPP} hidden>Tillbaka</a></div>`;
     document.querySelector('main').prepend(el);
+    // tv:n som byggdes utan rummet (tvUtan) flyttar in, med det den visar
+    if (R.tvLada) {
+      el.querySelector('#rum-tvplats').replaceWith(...R.tvLada.childNodes);
+      R.tvLada.remove();
+      R.tvLada = null;
+      R.tv.rot(el);
+    }
     R.el = el;
     R.varldar = [...el.querySelectorAll('.rum-world')];
     R.built = true;
     takDuk(el.querySelector('.rum-tak'));
     ringar(el);
     wire();
-    // kort: högst elva tecken
-    R.tv = window.RumTv ? RumTv.mount(el, { calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [], avVal: (on) => { if (window.RumBild) RumBild.avVal(on); } }) : null;
-    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång och Visa dig på tv:n i foten
+    if (!R.tv) R.tv = window.RumTv ? RumTv.mount(el, tvOpts()) : null;
+    // Gänget i bild på tv:n medan vi pratar i telefon (rum-bild.js): tv:ns AV-ingång, och Visa dig på tv:n och
+    // Ta med tv:n i foten
     if (window.RumBild && R.tv) RumBild.mount(el, { tv: R.tv });
     tangenter();
     // Foten: Vanlig sida i rummet på håll, och Tillbaka så fort något ligger framme. Det enda ordet
@@ -2071,6 +2078,47 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // Omgången som gänget tippar (GET …/samtal: samtal.js, som rummet läser om
   // varje minut, annars TP.round), annars omgångens kupong (kupong.js):
   // matcherna efter avspark.
+  // ---------- tv:n utan rummet ----------
+  //
+  // Tv:n som följer med (rum-bild.js) visar tv:ns egen ruta, text-tv:n och AV. Laddas
+  // förstasidan på en annan del (#kupong …) medan tv:n följer med finns inget rum, och då
+  // byggs bara tv:n, i en dold låda: rutan flyttas till den lilla tv:n, och byggs rummet
+  // sedan flyttar tv:n in där (build). Raderna är desamma som i rummet (round, roundRows),
+  // ritade om varje minut medan tv:n följer med och rummet inte syns (tvKoll).
+  // kort: högst elva tecken
+  const tvOpts = () => ({
+    calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [],
+    avVal: (on) => { if (window.RumBild) RumBild.avVal(on); },
+    pa: () => { if (window.RumBild && RumBild.knapp) RumBild.knapp(); },
+  });
+  function tvFyll() {
+    if (!R.tv) return;
+    const rd = round();
+    R.tv.fill(rd ? roundRows(rd, Date.now()) : [], { spel: rd && rd.spel ? rd.ids : null, next: Boolean(rd && rd.next) });
+  }
+  function tvKoll() {
+    if (R.tvKoll) return;
+    R.tvKoll = setInterval(() => {
+      if (!R.on && R.tv && !document.hidden && window.RumBild && RumBild.foljer()) tvFyll();
+    }, 60000);
+  }
+  function tvUtan() {
+    if (R.tv || !window.RumTv) return R.tv || null;
+    const box = document.createElement('div');
+    box.hidden = true;
+    box.innerHTML = RumTv.html();
+    document.body.append(box);
+    R.tvLada = box;
+    R.tv = RumTv.mount(box, tvOpts());
+    tvKoll();
+    // (samma data som rummet läser, load)
+    Promise.all([typeof whenMatches === 'function' ? whenMatches() : null, typeof loadCoupons === 'function' ? loadCoupons() : null])
+      .then(() => Promise.all([typeof tpLoad === 'function' ? tpLoad() : null, window.Samtal && Samtal.load ? Samtal.load() : null]))
+      .catch(() => {})
+      .then(tvFyll);
+    return R.tv;
+  }
+
   function round() {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     const r = p ? p.s : typeof TP !== 'undefined' ? TP.round : null;
@@ -4612,6 +4660,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
       // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
       pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
+      // veckans löpsedel i stället på trottoaren (rum-affischer.js; samma som hänger hos Hasse Backe)
+      sedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null),
       calm: () => RORELSE_AV.matches,
       // (en fast bild, ?rum-t: allt står på samma tid)
       still: still() ? R.frozen : null,
@@ -7432,6 +7482,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     document.documentElement.classList.remove('rum-pa');
     if (window.RumFolk) RumFolk.on(false);
     if (window.RumBild) RumBild.on(false);
+    // (med tv:n som följer med ritas text-tv:n om varje minut också nu)
+    if (R.tv) tvKoll();
     cancelAnimationFrame(R.raf);
     clearTimeout(R.vila);
     clearInterval(R.poll);
@@ -7498,7 +7550,10 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // (lopsedel: veckans löpsedel, färdigritad, som hänger hos Hasse Backe, rum-hasse.js; null innan sakerna är ritade)
   return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, lopsedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null),
     // Helgarderats senaste nummer, samma som på pulten (Hasse Backe läser det ibland, rum-hasse.js). → Promise: upplagan eller null
-    numret: hamtaTidning, smal: () => Boolean(R.smal), redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+    numret: hamtaTidning, smal: () => Boolean(R.smal),
+    // fram till tv:n (den lilla tv:n som följde med, rum-bild.js), och tv:n utan rummet (tvUtan)
+    tv: () => { if (R.on && !R.zoom) zoomTv(true); },
+    tvUtan, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

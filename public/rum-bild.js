@@ -25,6 +25,16 @@
 //  – Fliken dold eller rummet stängt: kameran släcks och tänds igen av sig själv
 //    när man kommer tillbaka inom tio minuter (ATER) – så bryts inget när man
 //    växlar till telefonsamtalet en stund.
+//  – Ta med tv:n (i foten nära tv:n): man går till den vanliga sidan, och tv:n
+//    krymper till en liten tv uppe till höger som följer med vart man än går på
+//    sajten. Den visar tv:ns egen ruta – text-tv:n, som går vidare, eller AV –
+//    och byter till AV när någon visar sig, som i rummet; kameran och bilden
+//    fortsätter. Ett tryck på den lilla tv:n går tillbaka till tv:n i rummet, och
+//    krysset stänger den (kameran släcks, som när man lämnade rummet). Till
+//    Tabeller, Statistik och Om oss, som är egna sidor, följer den med genom att
+//    koppla upp sig igen (sessionStorage profeterna.tv.foljer, tv-med.js laddar
+//    det som behövs där); text-tv:n finns bara på förstasidan, så där syns den
+//    lilla tv:n bara med AV.
 //
 // Vem du är: den du har valt i rummet (Samtal.pult.du()), annars den enheten
 // minns från kupongen, annars frågar tv:n (Vem är du?, sparas för tv:n i
@@ -43,6 +53,8 @@
 //   RumBild.mount(el, { tv })   när tv:n är byggd (rum.js); tv = RumTv.mount(…)
 //   RumBild.on(true | false)    rummet visas eller inte
 //   RumBild.avVal(on)           den som tittar bytte själv på tv:n (TV/AV, en sida …)
+//   RumBild.foljer()            tv:n följer med utanför rummet (den lilla tv:n)
+//   RumBild.knapp()             tv:n slogs av eller på (Ta med tv:n i foten)
 //
 // För prov: ?rum-bild=ws://127.0.0.1:8787/bild (en annan tjänst, t.ex. wrangler
 // dev) och ?rum-bild-vem=DT (vem du är här).
@@ -51,6 +63,10 @@ window.RumBild = (() => {
   const q = new URLSearchParams(location.search);
   const TV_VEM = 'profeterna.tv.vem';
   const SAMTAL_VEM = 'profeterna.samtal.vem';
+  // tv:n följer med till en annan sida på sajten ({ t, kamera }), och ett tryck på
+  // den lilla tv:n där som ska fram till tv:n i rummet (sessionStorage)
+  const FOLJER = 'profeterna.tv.foljer';
+  const TILL_TV = 'profeterna.tv.till';
   const STUN = [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }];
   // 4:3 som rutan; framkameran i telefonen
   const KAMERA = { video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } }, audio: false };
@@ -60,7 +76,11 @@ window.RumBild = (() => {
   const fonster = () => [...crypto.getRandomValues(new Uint8Array(12))].map((x) => (x % 36).toString(36)).join('');
 
   const B = {
-    el: null, tv: null, av: null, knapp: null,
+    el: null, tv: null, knapp: null, tamed: null,
+    // ute: tv:n följer med utanför rummet (mini: den lilla tv:n), tamed: Ta med tv:n
+    // trycktes nyss (fran: var tv:n stod), tillTv: fram till tv:n när rummet visas,
+    // ram: där tv:ns ruta sitter i tv:n
+    ute: false, mini: null, inne: null, tamedNu: false, fran: null, tillTv: false, samtal: null, ram: null,
     on: false, ws: null, uppe: false, timer: 0, ping: 0, retry: 0, vem: null, vemT: 0,
     id: fonster(), ice: null, alla: [], peers: new Map(),
     stream: null, startar: false, fel: '', valj: null,
@@ -73,7 +93,8 @@ window.RumBild = (() => {
   const spara = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* privat läge */ } };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
   // (KP i kupong.js är en global const, inte window.KP)
-  const samtal = () => (typeof KP !== 'undefined' && KP.data && KP.data.samtal) || null;
+  // (på sidorna utan kupong.js hämtar redo() samma uppgifter)
+  const samtal = () => (typeof KP !== 'undefined' && KP.data && KP.data.samtal) || B.samtal || null;
   const gang = () => (samtal() && samtal().gang) || [];
   const iGang = (v) => gang().some((g) => g.id === v);
   const person = (v) => gang().find((g) => g.id === v) || { id: v, namn: v };
@@ -91,12 +112,49 @@ window.RumBild = (() => {
   }
   const kan = () => Boolean(adress() && 'WebSocket' in window && 'RTCPeerConnection' in window);
   const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // i rummet, eller med tv:n som följer med
+  const aktiv = () => B.on || B.ute;
+
+  // Gänget och tjänstens adress (data/kuponger.json): kupong.js läser dem på
+  // förstasidan (loadCoupons); på Tabeller, Statistik och Om oss hämtas de här. → om de finns
+  let redoP = null;
+  function redo() {
+    if (samtal()) return Promise.resolve(true);
+    if (!redoP) {
+      redoP = new Promise((res) => {
+        if (typeof KP === 'undefined') {
+          fetch('data/kuponger.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null))
+            .then((d) => { B.samtal = (d && d.samtal) || null; }, () => {})
+            .then(() => res(Boolean(samtal())));
+          return;
+        }
+        // (kupong.js läser filen bara på de delar som visar kupongen)
+        if (typeof loadCoupons === 'function') {
+          loadCoupons().catch(() => {}).then(() => res(Boolean(samtal())));
+          return;
+        }
+        let n = 0;
+        const t = setInterval(() => {
+          if (!samtal() && ++n < 80) return;
+          clearInterval(t);
+          res(Boolean(samtal()));
+        }, 250);
+      });
+      redoP.then(() => { redoP = null; });
+    }
+    return redoP;
+  }
   const ord = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} och ${xs[xs.length - 1]}` : xs[0] || '');
 
   // ---------- tjänsten ----------
 
   function koppla() {
-    if (B.ws || !B.on || document.hidden || !kan()) return;
+    if (B.ws || !aktiv() || document.hidden) return;
+    if (!samtal()) {
+      redo().then((ok) => { if (ok) koppla(); });
+      return;
+    }
+    if (!kan()) return;
     const v = jag();
     if (!v) return;
     let ws;
@@ -133,7 +191,7 @@ window.RumBild = (() => {
       B.alla = [];
       ordna();
       // försök igen om en stund (längre och längre, högst en minut)
-      if (B.on && !document.hidden) {
+      if (aktiv() && !document.hidden) {
         clearTimeout(B.timer);
         B.timer = setTimeout(() => { B.timer = 0; koppla(); }, Math.min(60000, 2000 * 2 ** B.retry++));
       }
@@ -285,16 +343,19 @@ window.RumBild = (() => {
     const nya = sander.filter((p) => !B.sett.has(p.id));
     for (const id of [...B.sett]) if (!sander.some((p) => p.id === id)) B.sett.delete(id);
     for (const p of nya) B.sett.add(p.id);
-    if (B.on && B.tv) {
+    // (med tv:n som följer med: inte medan förbindelsen till tjänsten är nere –
+    // då vet den inte om någon slutade, och den lilla tv:n ska inte slockna av det)
+    const vet = B.uppe || !B.ute;
+    if (aktiv() && (B.tv || B.ute)) {
       if (nya.length && !B.visa) {
         B.visa = true;
-        B.tv.av(true);
-      } else if (!sander.length && B.sander && !B.stream && B.visa && !B.valj && !B.fel) {
+        if (B.tv) B.tv.av(true);
+      } else if (vet && !sander.length && B.sander && !B.stream && B.visa && !B.valj && !B.fel) {
         B.visa = false;
-        B.tv.av(false);
+        if (B.tv) B.tv.av(false);
       }
     }
-    B.sander = sander.length > 0;
+    if (vet) B.sander = sander.length > 0;
     const med = Boolean(B.stream) || B.visa;
     for (const p of B.alla) {
       const ska = med && p.med && (Boolean(B.stream) || p.kamera);
@@ -307,6 +368,7 @@ window.RumBild = (() => {
     skickaLage();
     rita();
     knapp();
+    if (B.ute) miniLage();
   }
 
   // ---------- kameran ----------
@@ -314,7 +376,9 @@ window.RumBild = (() => {
   async function kameraPa() {
     if (B.stream || B.startar) return;
     if (!jag()) {
-      vemFraga('kamera');
+      // (gänget är inte läst än: sedan)
+      if (!gang().length) redo().then((ok) => { if (ok && aktiv() && gang().length) kameraPa(); });
+      else vemFraga('kamera');
       return;
     }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -328,7 +392,7 @@ window.RumBild = (() => {
     knapp();
     try {
       const s = await navigator.mediaDevices.getUserMedia(KAMERA);
-      if (!B.on || document.hidden) {
+      if (!aktiv() || document.hidden) {
         for (const t of s.getTracks()) t.stop();
         B.ater = Date.now();
         return;
@@ -432,7 +496,7 @@ window.RumBild = (() => {
   };
 
   function rita() {
-    const av = B.av;
+    const av = B.inne;
     if (!av) return;
     const sander = [...B.peers.values()].filter((x) => B.alla.some((p) => p.id === x.id && p.kamera));
     const ser = B.alla.filter((p) => p.med && !p.kamera);
@@ -517,8 +581,10 @@ window.RumBild = (() => {
   }
 
   // Knappen i foten: Visa dig på tv:n nära tv:n, och Stäng av kameran var man
-  // än är i rummet medan den är tänd (rum.css).
+  // än är i rummet medan den är tänd (rum.css). Ta med tv:n står bredvid, nära
+  // tv:n när den är på (inte medan den frågar Vem är du?).
   function knapp() {
+    if (B.tamed) B.tamed.hidden = Boolean(B.valj) || !(B.tv && B.tv.pa());
     const k = B.knapp;
     if (!k) return;
     k.hidden = !kan();
@@ -530,28 +596,300 @@ window.RumBild = (() => {
     k.setAttribute('aria-pressed', String(Boolean(B.stream)));
   }
 
-  // ---------- i rummet ----------
+  // ---------- rutan ----------
 
-  function mount(el, o) {
-    B.el = el;
-    B.tv = o.tv;
-    B.av = B.tv && B.tv.avEl;
-    B.knapp = el.querySelector('.rum-bildknapp');
-    if (!B.av) return;
-    B.av.innerHTML = '<div class="av-rutor"></div><div class="av-jag" hidden><video autoplay muted playsinline aria-hidden="true"></video></div>' +
+  // Det som står på rutan: i tv:n i rummet, eller i den lilla tv:n när tv:n
+  // följer med (plats). Videorna flyttas med och spelar vidare.
+  function inne() {
+    if (B.inne) return B.inne;
+    const d = document.createElement('div');
+    d.className = 'av-inne';
+    d.innerHTML = '<div class="av-rutor"></div><div class="av-jag" hidden><video autoplay muted playsinline aria-hidden="true"></video></div>' +
       '<p class="av-under" hidden></p><div class="av-ser" hidden></div><div class="av-bla"></div><b class="av-osd" aria-hidden="true">AV</b>';
-    const ev = B.av.querySelector('.av-jag video');
+    const ev = d.querySelector('.av-jag video');
     ev.muted = true;
     ev.playsInline = true;
-    const glas = B.av.closest('.tv-glas');
-    if (glas && !calm()) glas.style.setProperty('--sno', sno());
-    B.av.addEventListener('click', (e) => {
+    d.addEventListener('click', (e) => {
       const b = e.target.closest('[data-vem]');
       if (!b) return;
       e.preventDefault();
       e.stopPropagation();
       valdes(b.dataset.vem);
     });
+    B.inne = d;
+    return d;
+  }
+  // Tv:ns ruta (text-tv:n och AV) sitter i tv:n, och i den lilla tv:n när den
+  // följer med. Finns ingen tv på sidan (Tabeller, Statistik och Om oss) har den
+  // lilla tv:n en egen ruta med bara AV.
+  function plats() {
+    const d = inne();
+    const ute = B.ute && !B.on;
+    const g = B.tv && B.tv.glas;
+    if (g) {
+      if (d.parentNode !== B.tv.avEl) B.tv.avEl.append(d);
+      const ram = ute ? mini().querySelector('.tv-ram') : B.ram;
+      if (g.parentNode !== ram) ram.append(g);
+      if (B.mini) B.mini.querySelector('.tv-glas.egen').hidden = ute;
+      B.tv.ute(ute);
+    } else if (ute) {
+      const dit = mini().querySelector('.tv-av');
+      if (d.parentNode !== dit) dit.append(d);
+    }
+    for (const v of d.querySelectorAll('video')) if (v.srcObject) v.play().catch(() => {});
+  }
+  // En tv på den här sidan (rummets, eller byggd utan rummet: Rum.tvUtan).
+  function tvIn(tv) {
+    B.tv = tv;
+    B.ram = tv.glas.parentNode;
+    if (!calm()) tv.glas.style.setProperty('--sno', sno());
+    if (B.visa) tv.av(true);
+  }
+
+  // ---------- tv:n som följer med ----------
+  //
+  // Den lilla tv:n uppe till höger, under sidhuvudet: samma Panasonic som i
+  // rummet utan panelen med knapparna (rum-tv.css). Ett tryck på den går till
+  // tv:n i rummet, krysset stänger den. Den ligger i det översta lagret
+  // (popover), så att den syns också över matchrutan.
+
+  const pop = (m) => typeof m.showPopover === 'function';
+  const oppen = (m) => (pop(m) ? m.matches(':popover-open') : !m.hidden);
+  function oppna(m, on) {
+    if (on === oppen(m)) return;
+    if (!pop(m)) m.hidden = !on;
+    else if (on) m.showPopover();
+    else m.hidePopover();
+  }
+  function mini() {
+    if (B.mini) return B.mini;
+    const m = document.createElement('div');
+    m.className = 'tv-mini';
+    if (pop(m)) m.popover = 'manual';
+    else m.hidden = true;
+    m.innerHTML = '<button type="button" class="tv-mini-in" aria-label="Till tv:n i tobaksaffären"></button>' +
+      '<div class="tv-front"><div class="tv-ram"><div class="tv-glas egen"><div class="tv-av"></div><i class="tv-scan"></i><i class="tv-glans"></i></div></div>' +
+      '<i class="tv-namn">Panasonic</i><i class="tv-mini-lampa"></i></div>' +
+      '<button type="button" class="tv-mini-x" aria-label="Stäng tv:n"></button>';
+    if (!calm()) m.querySelector('.tv-glas').style.setProperty('--sno', sno());
+    m.querySelector('.tv-mini-in').addEventListener('click', tillbaka);
+    m.querySelector('.tv-mini-x').addEventListener('click', (e) => {
+      e.stopPropagation();
+      sluta(true);
+    });
+    document.body.append(m);
+    B.mini = m;
+    // under sidhuvudet, och uppåt med det när det skrollas undan i telefonen
+    let f = 0;
+    const topp = B.toppNu = () => {
+      f = 0;
+      const t = document.querySelector('.topbar');
+      const y = t && getComputedStyle(t).position !== 'static' ? Math.max(0, t.getBoundingClientRect().bottom) : 0;
+      m.style.setProperty('--topp', `${Math.round(y)}px`);
+    };
+    B.topp = () => { if (!f) f = requestAnimationFrame(topp); };
+    addEventListener('scroll', () => { if (B.ute) B.topp(); }, { passive: true });
+    addEventListener('resize', () => { if (B.ute) B.topp(); });
+    if (pop(m)) new MutationObserver((ms) => { if (ms.some((x) => x.target.tagName === 'DIALOG')) miniVard(); }).observe(document.body, { subtree: true, attributeFilter: ['open'] });
+    return m;
+  }
+  // Matchrutan (en dialog) läggs överst och gör allt utanför sig obrukbart medan
+  // den är öppen: den lilla tv:n flyttas in i den så länge och läggs överst igen.
+  function miniVard() {
+    const m = B.mini;
+    if (!m || !pop(m)) return;
+    let modal = null;
+    for (const d of document.querySelectorAll('dialog[open]')) {
+      try {
+        if (d.matches(':modal')) modal = d;
+      } catch {
+        modal = d;
+      }
+    }
+    const hem = modal || document.body;
+    const syns = oppen(m) || m.parentNode !== hem;
+    if (m.parentNode === hem && !modal) return;
+    // (en popover som flyttas stängs, och läggs överst när den öppnas igen)
+    if (oppen(m)) m.hidePopover();
+    if (m.parentNode !== hem) hem.append(m);
+    if (syns && B.ute && !B.on) {
+      m.showPopover();
+      for (const v of m.querySelectorAll('video')) if (v.srcObject) v.play().catch(() => {});
+    }
+  }
+  // Fram: krymp = från tv:n i rummet (Ta med tv:n), annars tänds den som en tv.
+  function miniFram(hur) {
+    const m = mini();
+    const syns = oppen(m) && !m.classList.contains('slocknar');
+    // (bara det som miniFram och miniBort har satt igång, inte stilens egna)
+    for (const e of [m, m.querySelector('.tv-ram')]) for (const a of e.getAnimations()) if (!a.animationName && !a.transitionProperty) a.cancel();
+    m.classList.remove('slocknar');
+    B.toppNu();
+    lampa();
+    oppna(m, true);
+    miniVard();
+    if (syns || calm()) return;
+    const fran = hur === 'krymp' && B.fran;
+    B.fran = null;
+    const r = m.getBoundingClientRect();
+    if (fran && fran.width > 40 && r.width) {
+      // (tv:ns front i rummet är bredare: panelen med knapparna sitter till höger om rutan)
+      const k = (fran.width * (238 / 292)) / r.width;
+      m.animate([
+        { transform: `translate(${fran.left - r.left}px, ${fran.top - r.top}px) scale(${k})`, boxShadow: 'none' },
+        { transform: 'none' },
+      ], { duration: 560, easing: 'cubic-bezier(0.3, 0, 0.15, 1)' });
+    } else {
+      m.querySelector('.tv-ram').animate([
+        { transform: 'scale(0.04, 0.012)', filter: 'brightness(3)' },
+        { transform: 'scale(1, 0.012)', filter: 'brightness(2.4)', offset: 0.35 },
+        { transform: 'none', filter: 'none' },
+      ], { duration: 380, easing: 'ease-out' });
+      m.animate([{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1 }], { duration: 380 });
+    }
+  }
+  // Bort: slocknar som en tv (krysset, och när alla har slutat visa sig), eller
+  // direkt när tv:n är tillbaka i rummet.
+  // efter: det som ska göras när den har slocknat.
+  function miniBort(slocknar, efter) {
+    const m = B.mini;
+    if (!m || !oppen(m) || !slocknar || calm()) {
+      if (m) oppna(m, false);
+      if (efter) efter();
+      return;
+    }
+    m.classList.add('slocknar');
+    const g = m.querySelector('.tv-ram').animate([
+      { transform: 'none', filter: 'none' },
+      { transform: 'scale(1, 0.012)', filter: 'brightness(2.6)', offset: 0.55 },
+      { transform: 'scale(0.03, 0.012)', filter: 'brightness(3)' },
+    ], { duration: 340, easing: 'ease-in' });
+    m.animate([{ opacity: 1 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 520 }).finished.then(() => {
+      if (!m.classList.contains('slocknar')) return;
+      m.classList.remove('slocknar');
+      g.cancel();
+      if (!skaSynas()) oppna(m, false);
+      if (efter) efter();
+    }, () => { if (efter) efter(); });
+  }
+  // Den lilla tv:n syns när tv:n följer med och har något att visa: tv:ns ruta,
+  // eller AV i sin egen ruta där det inte finns någon tv.
+  const skaSynas = () => B.ute && !B.on && (B.visa || Boolean(B.tv));
+  function miniLage() {
+    if (!B.ute || B.on) return;
+    const m = mini();
+    lampa();
+    const syns = skaSynas();
+    if (syns && (!oppen(m) || m.classList.contains('slocknar'))) miniFram('tands');
+    else if (!syns && oppen(m) && !m.classList.contains('slocknar')) miniBort(true);
+  }
+  // Den lilla tv:ns lampa: röd medan kameran är tänd.
+  function lampa() {
+    if (B.mini) B.mini.classList.toggle('sander', Boolean(B.stream));
+  }
+
+  const minns = () => {
+    try { sessionStorage.setItem(FOLJER, JSON.stringify({ t: Date.now(), visa: B.visa, kamera: Boolean(B.stream) || Boolean(B.ater && Date.now() - B.ater < ATER) })); } catch { /* privat läge */ }
+  };
+  const glom = () => {
+    try { sessionStorage.removeItem(FOLJER); } catch { /* privat läge */ }
+  };
+
+  // Ta med tv:n: till den vanliga sidan, med tv:n i hörnet (on(false) tar över).
+  function taMed() {
+    if (!B.on || !B.tv) return;
+    const f = document.getElementById('rum-tvfront');
+    B.fran = f ? f.getBoundingClientRect() : null;
+    B.tamedNu = true;
+    setTimeout(() => { B.tamedNu = false; }, 1000);
+    location.hash = 'hem';
+  }
+  // Ett tryck på den lilla tv:n: till tv:n i rummet. På förstasidan genast; från
+  // de andra sidorna laddas förstasidan, och tv:n följer med dit.
+  function tillbaka() {
+    if (!B.ute) return;
+    if (window.Rum && Rum.fits()) {
+      B.tillTv = true;
+      location.hash = '';
+      return;
+    }
+    if (window.Rum) return;
+    minns();
+    try { sessionStorage.setItem(TILL_TV, '1'); } catch { /* privat läge */ }
+    location.href = './';
+  }
+  // Tv:n följer inte med längre: kameran släcks och förbindelserna stängs, som
+  // när man lämnar rummet. slocknar: med en tv:s sista ljuspunkt.
+  function sluta(slocknar) {
+    if (!B.ute) return;
+    B.ute = false;
+    glom();
+    clearInterval(B.vemT);
+    B.ater = 0;
+    if (B.stream) kameraAv();
+    kopplaNer();
+    // Rutan går tillbaka till tv:n när den lilla har slocknat. Tv:n står då på
+    // text-tv:n när man kommer till rummet; visar sig någon byter den själv.
+    miniBort(slocknar, () => {
+      if (B.ute || B.on) return;
+      B.visa = false;
+      B.valj = null;
+      B.fel = '';
+      if (B.tv) B.tv.av(false);
+      plats();
+    });
+  }
+  // Följde tv:n med från sidan innan (inom tio minuter)? Då kopplar den upp sig
+  // igen här – på förstasidan utan adress tar rummet den (on).
+  function aterstall() {
+    let f = null;
+    let till = false;
+    try {
+      f = JSON.parse(sessionStorage.getItem(FOLJER) || 'null');
+      till = sessionStorage.getItem(TILL_TV) === '1';
+      sessionStorage.removeItem(TILL_TV);
+    } catch { /* privat läge */ }
+    if (!f || !(Date.now() - f.t < ATER)) {
+      glom();
+      return;
+    }
+    B.ute = true;
+    B.visa = f.visa !== false;
+    B.tillTv = till;
+    if (f.kamera) B.ater = Date.now();
+    const rummet = () => window.Rum && !location.hash.replace(/^#/, '') && Rum.fits();
+    // (när sidans alla skript är lästa: rum.js står efter den här)
+    const lasta = document.readyState === 'loading' ? new Promise((r) => addEventListener('DOMContentLoaded', r, { once: true })) : null;
+    Promise.all([redo(), lasta]).then(([ok]) => {
+      if (!B.ute || B.on || rummet()) return;
+      // på förstasidan byggs tv:n utan rummet, så att text-tv:n följer med
+      if (!B.tv && window.Rum && Rum.tvUtan) {
+        const tv = Rum.tvUtan();
+        if (tv) tvIn(tv);
+      }
+      if (!B.tv && (!ok || !kan())) {
+        sluta(false);
+        return;
+      }
+      plats();
+      if (skaSynas()) miniFram('tands');
+      koppla();
+      if (B.ater && Date.now() - B.ater < ATER) kameraPa();
+      vemKoll();
+    });
+  }
+
+  // ---------- i rummet ----------
+
+  function mount(el, o) {
+    B.el = el;
+    B.tv = o.tv;
+    B.knapp = el.querySelector('.rum-bildknapp');
+    B.tamed = el.querySelector('.rum-tamed');
+    if (!B.tv || !B.tv.avEl) return;
+    // (byggdes tv:n utan rummet sitter rutan kvar där den är: i den lilla tv:n)
+    if (!B.ram) tvIn(B.tv);
+    plats();
     if (B.knapp) {
       const tryck = (e) => {
         e.preventDefault();
@@ -562,9 +900,18 @@ window.RumBild = (() => {
       B.knapp.addEventListener('click', tryck);
       B.knapp.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') tryck(e); });
     }
+    if (B.tamed) {
+      const tryck = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        taMed();
+      };
+      B.tamed.addEventListener('click', tryck);
+      B.tamed.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') tryck(e); });
+    }
     knapp();
     rita();
-    if (B.on) koppla();
+    if (aktiv()) koppla();
   }
 
   function on(v) {
@@ -572,9 +919,32 @@ window.RumBild = (() => {
     if (v === B.on) return;
     B.on = v;
     if (v) {
+      // tv:n som följde med är tillbaka i rummet
+      const ute = B.ute;
+      B.ute = false;
+      glom();
+      plats();
+      miniBort(false);
+      if (ute && B.tv) B.tv.av(B.visa);
       koppla();
-      if (B.ater && Date.now() - B.ater < ATER) kameraPa();
+      if (!B.stream && B.ater && Date.now() - B.ater < ATER) kameraPa();
       vemKoll();
+      if (B.tillTv) {
+        B.tillTv = false;
+        setTimeout(() => { if (B.on && window.Rum && Rum.tv) Rum.tv(); }, 0);
+      }
+    } else if (B.tamedNu) {
+      // Ta med tv:n: allt fortsätter i den lilla tv:n
+      B.tamedNu = false;
+      B.ute = true;
+      minns();
+      plats();
+      koppla();
+      // (när den vanliga sidan har lagts ut: sidhuvudet syns inte i rummet)
+      requestAnimationFrame(() => {
+        if (B.ute && !B.on) miniFram('krymp');
+        ordna();
+      });
     } else {
       if (B.stream) kameraAv(true);
       kopplaNer();
@@ -583,9 +953,9 @@ window.RumBild = (() => {
   // Har du blivit någon annan i rummet kopplar sidan upp sig som hen.
   function vemKoll() {
     clearInterval(B.vemT);
-    if (!B.on) return;
+    if (!aktiv()) return;
     B.vemT = setInterval(() => {
-      if (!B.on || document.hidden) return;
+      if (!aktiv() || document.hidden) return;
       const v = jag();
       if (B.ws && v !== B.vem) {
         if (B.stream) kameraAv();
@@ -597,7 +967,7 @@ window.RumBild = (() => {
     }, 3000);
   }
   addEventListener('visibilitychange', () => {
-    if (!B.on) return;
+    if (!aktiv()) return;
     if (document.hidden) {
       if (B.stream) kameraAv(true);
       kopplaNer();
@@ -606,7 +976,11 @@ window.RumBild = (() => {
       if (B.ater && Date.now() - B.ater < ATER) kameraPa();
     }
   });
-  addEventListener('pagehide', () => { if (B.stream) for (const t of B.stream.getTracks()) t.stop(); });
+  addEventListener('pagehide', () => {
+    // (tv:n följer med till nästa sida, också kameran om den var tänd)
+    if (B.ute) minns();
+    if (B.stream) for (const t of B.stream.getTracks()) t.stop();
+  });
 
   // Den som tittar bytte själv på tv:n (TV/AV, Gänget i bild, en sida …).
   function avVal(on2) {
@@ -619,5 +993,7 @@ window.RumBild = (() => {
     ordna();
   }
 
-  return { mount, on, avVal, pa: () => Boolean(B.stream) };
+  aterstall();
+
+  return { mount, on, avVal, knapp, pa: () => Boolean(B.stream), foljer: () => B.ute };
 })();
