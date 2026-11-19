@@ -17,6 +17,7 @@ import * as THREE from 'three';
 import { HAND as HM, VILAN, byggArm, byggKopp, byggSkugga, laddaFoto, laddaHand, vittTon } from './rum-hasse-arm.js';
 import { disken, franBaren } from './rum-hasse-scen.js';
 import { RUM, L } from './rum-pult.js';
+import { felkoll } from './rum-gpu.js';
 
 const DEG = Math.PI / 180;
 const V3 = (a) => new THREE.Vector3(...a);
@@ -61,6 +62,7 @@ export async function armen(plan, { hand: HAND, kopp: KOPP, pr = 1.5, ljus = nul
   // (bilden behålls: ligger duken utanför bilden när den ritas, som i telefonen på höjden, kan Chrome
   // annars visa en tom duk när den kommer in i bilden)
   const r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: true });
+  felkoll(r);
   r.setClearColor(0, 0);
   // Barens ljus (LJUS i rum-hasse-arm.js): fönstret efter klockan och vädret som i baren, och lysröret tänt.
   // (På natten mörknar rummet självt, rum-folk.css, så handen gör det inte en gång till.)
