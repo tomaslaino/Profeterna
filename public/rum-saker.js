@@ -30,7 +30,7 @@
 // rubrik: rum-affischer.js)
 
 import { dagens, bord } from './rum-fika.js';
-import { utanSkuggor } from './rum-gpu.js';
+import { utanSkuggor, felkoll } from './rum-gpu.js';
 import { affischer } from './rum-affischer.js';
 
 const DEG = Math.PI / 180;
@@ -198,6 +198,7 @@ async function props(pult, opt) {
   const LATT = matchMedia('(max-width: 700px), (max-height: 500px)').matches;
   const SKUGGA = LATT ? 1024 : 2048;
   const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: opt.kant !== false });
+  felkoll(r);
   const PR = LATT ? 1.5 : Math.min((window.devicePixelRatio || 1) * 1.25, 2.5);
   r.setPixelRatio(PR);
   r.setSize(BOX.w, BOX.h, false);

@@ -163,7 +163,7 @@
 // också från början)
 // (nx, ny, −1…1 i duken) eller null och huvud var vems huvud är.
 import * as THREE from 'three';
-import { utanSkuggor } from './rum-gpu.js';
+import { utanSkuggor, felkoll } from './rum-gpu.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -437,6 +437,7 @@ export async function figurer(canvas, opt = {}) {
   const seg = (n, min) => Math.max(min, Math.round(n * DET));
   // (kantutjämning efter vad enheten klarar, kantutjamning i rum.js)
   const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: opt.kant !== false });
+  felkoll(r);
   // (i telefonen på höjden står rummet längre bort, fit i rum.js: gänget är mindre på skärmen och blir
   // lika skarpt med färre bildpunkter)
   const PR = LATT ? (innerWidth < 600 && innerHeight > innerWidth ? 1.2 : 1.5) : Math.min(window.devicePixelRatio || 1, 2);
@@ -673,63 +674,81 @@ export async function figurer(canvas, opt = {}) {
     return (4294967296 * (2097151 & b) + (a >>> 0)).toString(36);
   };
   const ansAnvanda = new Set();
+  // Nya bilder sparas sex sekunder efter att de ritades, när det är lugnt. Med en packare i egen
+  // tråd (pngAv) packas allt som väntar på en gång, högst åtta åt gången; utan den en i taget med
+  // en paus emellan, som förut (2026-11-18: förut alltid en i taget, med upp till tre sekunder
+  // emellan, och i en svag telefon hann bara fyra av de ungefär tjugo bilderna ett besök använder
+  // sparas på en halv minut – resten ritades från SVG igen vid nästa besök, också de nio gänget
+  // behöver när det startar, ungefär en tiondels sekund av huvudtrådens tid var).
   const ansSpara = [];
+  let ansVantar = false;
   function ansSparaSen(lada, adr, c) {
     ansSpara.push([lada, adr, c]);
-    if (ansSpara.length > 1) return;
-    // (en i taget när det är lugnt, och sedan bort med det som inte användes)
-    const nasta = () => {
-      const x = ansSpara.shift();
-      if (!x) {
-        const gammal = async (q) => {
-          if (!q.url.includes('/rum-ansikten/k/')) return true;
-          const r = await lada.match(q);
-          return !r || Date.now() - Number(r.headers.get('x-sparad') || 0) > 21 * 864e5;
-        };
-        lada.keys().then((ks) => Promise.all(ks.filter((q) => !ansAnvanda.has(q.url)).map(async (q) => { if (await gammal(q)) await lada.delete(q); }))).catch(() => {});
+    if (ansVantar) return;
+    ansVantar = true;
+    setTimeout(ansPacka, 6000);
+  }
+  function ansPacka() {
+    if (packare === null) startaPackare();
+    const tur = ansSpara.splice(0, packare ? 8 : 1);
+    Promise.all(tur.map(([lada, adr, c]) => pngAv(c).then((blob) => (blob
+      ? lada.put(adr, new Response(blob, { headers: { 'content-type': 'image/png', 'x-sparad': String(Date.now()) } }))
+      : null)).catch(() => {}))).then(() => {
+      if (ansSpara.length) {
+        // (det som kom under tiden, när det är lugnt)
+        if (window.requestIdleCallback) requestIdleCallback(ansPacka, { timeout: packare ? 1000 : 3000 });
+        else setTimeout(ansPacka, 200);
         return;
       }
-      const vila = () => (window.requestIdleCallback ? requestIdleCallback(nasta, { timeout: 3000 }) : setTimeout(nasta, 200));
-      pngAv(x[2]).then((blob) => {
-        if (blob) x[0].put(x[1], new Response(blob, { headers: { 'content-type': 'image/png', 'x-sparad': String(Date.now()) } })).catch(() => {});
-        vila();
-      });
+      ansVantar = false;
+      if (tur.length) ansStada(tur[0][0]);
+    });
+  }
+  // Det som inte har använts under besöket tas bort när det har legat en tid: känslornas bilder (k/,
+  // kanAnsikte), som kanske behövs först i kväll, efter tre veckor, och de andra (lägena, som också
+  // följer kupongen) efter tre dagar. Förut togs de andra bort direkt när det nya var sparat, också
+  // de som skulle användas senare under samma besök, och de ritades då om vid nästa besök.
+  function ansStada(lada) {
+    const gammal = async (q) => {
+      const r = await lada.match(q);
+      return !r || Date.now() - Number(r.headers.get('x-sparad') || 0) > (q.url.includes('/rum-ansikten/k/') ? 21 : 3) * 864e5;
     };
-    setTimeout(nasta, 6000);
+    lada.keys().then((ks) => Promise.all(ks.filter((q) => !ansAnvanda.has(q.url)).map(async (q) => { if (await gammal(q)) await lada.delete(q); }))).catch(() => {});
   }
   // Bilden som PNG, packad i en egen tråd (OffscreenCanvas i en worker): med toBlob läses duken av och
   // packas på huvudtråden, 1024 × 1152 bildpunkter per ansikte, och det kom just när rummet hade startat
   // och man började titta och dra – i en svag telefon upp till en tiondels sekund per ansikte. Utan
   // worker, eller om den inte svarar, som förut.
   let packare = null;
+  function startaPackare() {
+    packare = false;
+    try {
+      if (window.Worker && window.createImageBitmap && typeof OffscreenCanvas !== 'undefined') {
+        const kod = 'onmessage = async (e) => { let blob = null; try { const b = e.data.bild; const c = new OffscreenCanvas(b.width, b.height); c.getContext("2d").drawImage(b, 0, 0); b.close(); blob = await c.convertToBlob({ type: "image/png" }); } catch (err) { blob = null; } postMessage({ id: e.data.id, blob }); };';
+        const url = URL.createObjectURL(new Blob([kod], { type: 'text/javascript' }));
+        const w = new Worker(url);
+        URL.revokeObjectURL(url);
+        packare = { w, n: 0, vantar: new Map() };
+        w.onmessage = (e) => {
+          const k = packare.vantar.get(e.data.id);
+          packare.vantar.delete(e.data.id);
+          if (k) k(e.data.blob);
+        };
+        // (går den inte att starta packas resten som förut)
+        w.onerror = () => {
+          const vantar = [...packare.vantar.values()];
+          packare = false;
+          for (const k of vantar) k(null);
+        };
+      }
+    } catch (err) { packare = false; }
+  }
   function pngAv(c) {
     return new Promise((klar) => {
       let svarat = false;
       const svar = (b) => { if (!svarat) { svarat = true; klar(b || null); } };
       const vanlig = () => { try { c.toBlob(svar, 'image/png'); } catch (err) { svar(null); } };
-      if (packare === null) {
-        packare = false;
-        try {
-          if (window.Worker && window.createImageBitmap && typeof OffscreenCanvas !== 'undefined') {
-            const kod = 'onmessage = async (e) => { let blob = null; try { const b = e.data.bild; const c = new OffscreenCanvas(b.width, b.height); c.getContext("2d").drawImage(b, 0, 0); b.close(); blob = await c.convertToBlob({ type: "image/png" }); } catch (err) { blob = null; } postMessage({ id: e.data.id, blob }); };';
-            const url = URL.createObjectURL(new Blob([kod], { type: 'text/javascript' }));
-            const w = new Worker(url);
-            URL.revokeObjectURL(url);
-            packare = { w, n: 0, vantar: new Map() };
-            w.onmessage = (e) => {
-              const k = packare.vantar.get(e.data.id);
-              packare.vantar.delete(e.data.id);
-              if (k) k(e.data.blob);
-            };
-            // (går den inte att starta packas resten som förut)
-            w.onerror = () => {
-              const vantar = [...packare.vantar.values()];
-              packare = false;
-              for (const k of vantar) k(null);
-            };
-          }
-        } catch (err) { packare = false; }
-      }
+      if (packare === null) startaPackare();
       if (!packare) return vanlig();
       const P = packare;
       createImageBitmap(c).then((bild) => {
