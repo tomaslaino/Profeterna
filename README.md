@@ -5105,6 +5105,30 @@ ungefär 1 % av bildens hela arbete, och med processorn fyra gånger långsammar
 8–13 enheter mellan två bilder, mot 14–20 i de gamla. Största hoppet mellan två bilder under tio
 minuter är detsamma som förut, och det kommer från de gamla påhitten.
 
+**Inte som robotar** (2026-11-19, rum-3d.js; användarens önskemål: "Gör animationerna för alla mer naturliga. Så att de
+inte ser ut som robotar"). Gänget spelades in bild för bild (var varje del är, 30 bilder i sekunden i 18 sekunder,
+klockan 14). Tre saker fick dem att se ut som maskiner: händerna och armarna stod blixtstilla i upp till tio sekunder
+åt gången medan något annat rörde sig, huvudet ställde om sig med ett ryck på 0,22 sekunder var 1,7:e sekund och stod
+sedan stilla, och ett stort blickbyte kunde vrida huvudet ett kvarts varv på ett par bilder. Nu:
+
+- **Andningen** (`andetag`, `andning`): i stället för en jämn sinusvåg andas var och en i sin takt (DL 4,3, DT 3,7 och
+  DJ 4,8 sekunder), som glider lite fortare och långsammare och lite olika djupt. In går fortare än ut, och efter
+  utandningen vilar bröstet en stund. Bröstet vidgas, och bålen lyfts lite, så att axlarna och armarna följer med.
+- **Kroppen svajar** lite snabbare ovanpå det långsamma svajet, som när man sitter.
+- **Händerna står aldrig helt still** (`liv`): handen som vilar på bordet, håller flaskan eller cigaretten driver lite
+  och vrids en aning, i takter som inte går jämnt upp. Mot bordet bara i sidled.
+- **Huvudets små flyttar** (`smaRor`) kommer mer sällan (var 2,4:e sekund i stället för 1,7:e), tar 0,4–0,75 sekunder i
+  stället för 0,22, och börjar där den förra var om den inte hann fram. Däremellan driver huvudet långsamt.
+- **Blickarna går genom en fjäder** (`blickFolj`, `BLICK`): det blickarna gör med huvudet och bålen följer en
+  kritiskt dämpad fjäder med en mjuk gräns för farten (4,5 radianer i sekunden). Huvudet kommer en aning efter blicken,
+  som hos folk, och de stora byten tar en halv sekund med fart som kommer och går. Fjädern minns från bild till bild,
+  så den gäller inte i en fast bild (`?rum-t`) eller utan rörelser.
+
+Mätt i samma 18 sekunder före och efter: andelen av tiden som en del som annars rör sig står helt still gick från 19 %
+till 4 % (median) och den längsta stunden helt stilla från 10 till 2,7 sekunder. Huvudets högsta fart (mätt över en
+tiondels sekund) gick från 19 till 3,6 radianer i sekunden. Inga nya delar eller bilder, så grafikkortet gör samma sak
+som förut.
+
 **Det som händer i rummet** (2026-11-18, `handelse`, `ORS` och `ledig` i rum-3d.js; användarens önskemål: "Lägg till
 olika logiska animationer på matchfixarna!"). Påhitten ovan kommer av sig själva, ur luckorna och humöret. Det här är
 rörelser med en orsak som man ser eller hör i rummet, och de kommer när orsaken kommer:
