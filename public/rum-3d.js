@@ -34,6 +34,10 @@
 // sin lucka och går olika fort och olika långt (egen); bålen börjar och slutar dem en aning före
 // armen och svänger förbi när den sätter sig (aktNu: wk och wh). DJ pratar med händerna i slag i
 // stället för i en jämn åtta (pratSlag).
+// Inte som robotar (2026-11-19): andningen är ett andetag med paus i var och ens takt och lyfter axlarna (andetag,
+// andning), händerna som vilar driver lite (liv), huvudets små flyttar är färre och lugnare och huvudet driver
+// däremellan (smaRor), och blickarna går genom en dämpad fjäder med en gräns för farten (blickFolj), så att huvudet
+// inte knycker runt vid ett stort blickbyte.
 // Armarna går runt huvudena (2026-11-13): handen flyttas ut ur huvudet och armbågen vrids undan,
 // så att armen inte går igenom det egna huvudet eller grannens när handen är uppe, bakom huvudet,
 // vid ansiktet eller ute över bordet (huvudFri).
@@ -253,6 +257,14 @@ const fj = (a, b, x, an = 0.06, ov = 0.1) => {
 const gung = (x) => 0.62 * Math.sin(x) + 0.38 * Math.sin(x * 1.618 + 1.9);
 // mjuk gräns: x nära noll, aldrig över m
 const grans = (x, m) => m * Math.tanh(x / m);
+// Ett andetag, 0 → 1 → 0 över varvet u (2026-11-19): in går fortare än ut, utandningen släpper först och
+// klingar sedan av, och efter den vilar bröstet en stund – inte en jämn våg, som gör att man ser en maskin.
+const andetag = (u) => {
+  u -= Math.floor(u);
+  if (u < 0.36) return sm(0, 0.36, u);
+  if (u < 0.84) return 1 - sm(0, 1, 1 - (1 - (u - 0.36) / 0.48) ** 1.5);
+  return 0;
+};
 // Det som återkommer, i varv om per sekunder: förut på samma sekund i varje varv (bump(t % per, …)),
 // lika fort varje gång. Här har varje varv sin egen stund: var i varvet det börjar, hur fort det går
 // (s, 0,85–1,2 av len) och ibland (hoppa) inte alls – och ett tal v för hur just den gången är. Bara
@@ -3697,7 +3709,8 @@ export async function figurer(canvas, opt = {}) {
     if (opt.calm) { body0(o, t); slapVila(o); return; }
     const n = o.tofs ? 3 : o.duk ? 2 : 1;
     const s = [];
-    for (let i = n; i >= 0; i--) { body0(o, t - i * SLAP); s[i] = las(o); }
+    for (let i = n; i >= 0; i--) { o.slot = i; body0(o, t - i * SLAP); s[i] = las(o); }
+    o.slot = 0;
     o.hg.rotation.set(s[1].hx, s[1].hy, s[1].hz);
     if (o.tofs) {
       // huvudets vridning i rummet: bålens nu och nackens för SLAP sedan (framåt, åt sidan) och höjden
@@ -3741,8 +3754,9 @@ export async function figurer(canvas, opt = {}) {
     const drink = drinkW(o, t);
     const drag = dragW(o, t);
     // (lugna och trygga: rak i ryggen med hakan lite upp, och allt går sakta)
-    let lean = 0.07 - 0.12 * drink + 0.015 * gung(tt * 0.3);
-    o.torso.rotation.z = 0.01 * gung(tt * 0.18);
+    // (och kroppen vilar aldrig helt: ett långsamt svaj och ett snabbare, mindre ovanpå, som när man sitter)
+    let lean = 0.07 - 0.12 * drink + 0.015 * gung(tt * 0.3) + 0.005 * gung(tt * 0.83 + 0.4);
+    o.torso.rotation.z = 0.01 * gung(tt * 0.18) + 0.004 * gung(tt * 0.71 + 1.3);
     let breath = 1;
     let pitch = -0.07 + 0.02 * gung(tt * 0.25);
     let yaw = 0;
@@ -3811,6 +3825,8 @@ export async function figurer(canvas, opt = {}) {
     if (kb && kb.se && kb.seW !== 0) blickar.unshift([kb.se, ak.w * (kb.seW ?? 1)]);
     const sa = samtalNu(o, t);
     if (sa) blickar.unshift([sa.P, sa.w]);
+    // (det blickarna gör går genom fjädern, blickFolj)
+    const fore = [yaw, pitch, roll, twist];
     for (const [P, w0] of blickar) {
       let w = w0 * (1 - 0.75 * sink) * (1 - skriv);
       if (w <= 0) continue;
@@ -3827,6 +3843,13 @@ export async function figurer(canvas, opt = {}) {
       yaw += (hy - yaw) * w;
       pitch += (1.3 * L.pitch - lean * Math.cos(hy) - pitch) * w;
       roll += (-lean * Math.sin(hy) - roll) * w;
+    }
+    {
+      const b = blickFolj(o, t, [yaw - fore[0], pitch - fore[1], roll - fore[2], twist - fore[3]]);
+      yaw = fore[0] + b[0];
+      pitch = fore[1] + b[1];
+      roll = fore[2] + b[2];
+      twist = fore[3] + b[3];
     }
     // (och huvudet står aldrig helt still, smaRor – utom medan man håller andan, nervKropp)
     const nk = nervKropp(o, t);
@@ -4015,10 +4038,12 @@ export async function figurer(canvas, opt = {}) {
     }
     o.torso.rotation.y = twist;
     o.torso.rotation.z += side;
+    // andningen lyfter bröstet och axlarna, och armarna med (andning)
+    const an = andning(o, t);
     // (och ett skutt när man blir vald)
-    o.torso.position.y = o.hipY + 3 + lift + (up > 0 ? 2.4 * up * Math.abs(Math.sin((t - M[k].at) * 7.5)) : 0) + (jag > 0 ? 3 * bump(valdD(o, t), 0.02, 0.14, 0.24, 0.5) : 0);
+    o.torso.position.y = o.hipY + 3 + lift + 0.6 * an * breath + (up > 0 ? 2.4 * up * Math.abs(Math.sin((t - M[k].at) * 7.5)) : 0) + (jag > 0 ? 3 * bump(valdD(o, t), 0.02, 0.14, 0.24, 0.5) : 0);
     o.torso.rotation.x = lean;
-    o.chest.scale.set(1 + 0.009 * Math.sin(tt * 1.15), (1 + 0.014 * Math.sin(tt * 1.15)) * breath, 1);
+    o.chest.scale.set(1 + 0.014 * an - 0.006, (1 + 0.024 * an - 0.01) * breath, 1);
     o.hg.rotation.x = pitch;
     o.hg.rotation.y = yaw;
     // huvudena nickar efter musen (headA, draw)
@@ -4862,17 +4887,80 @@ export async function figurer(canvas, opt = {}) {
   // Huvudet står aldrig helt still: var och varannan sekund en liten justering, en grad eller två åt
   // något håll, fort och med lite överslag (fj) – som när blicken flyttas lite i det man tittar på.
   // Förut gled huvudet bara i andningens långsamma vågor mellan blickarna.
-  const SMA = { per: 1.7, kvar: 0.25, fro: { dl: 0.33, dt: 0.66, dj: 0.99 } };
+  const SMA = { per: 2.4, kvar: 0.25, fro: { dl: 0.33, dt: 0.66, dj: 0.99 } };
   const SMA_MINNE = new Map();
+  // Huvudets små flyttar (2026-11-19): förut ett ryck på 0,22 sekunder var 1,7:e sekund och sedan helt stilla
+  // till nästa, som en robot som ställer om sig. Nu flyttar det sig mer sällan och lugnare, olika fort (0,4–0,75
+  // sekunder) och med ett litet överslag, och däremellan driver det långsamt, så att det aldrig står helt still.
   function smaRor(o, t) {
     if (opt.calm) return null;
     const fro = SMA.fro[o.F.key];
     const s = stund(t, SMA.per, fro, SMA.kvar);
-    const v = (id) => iMinnet(SMA_MINNE, `${o.F.key}${id}`, () => [0, 1, 2].map((i) => 2 * hash(id * 0.913 + fro * 4.1 + i * 1.37) - 1));
-    const a = v(s.fore);
+    const v = (id) => iMinnet(SMA_MINNE, `${o.F.key}${id}`, () => [0, 1, 2, 3].map((i) => 2 * hash(id * 0.913 + fro * 4.1 + i * 1.37) - 1));
+    const len = (x) => 0.4 + 0.35 * (0.5 + 0.5 * x[3]);
+    // (varifrån: där förra flytten var när den här började – den hann inte alltid fram)
+    const f = v(s.fore);
+    const ff = v(stund(s.foreAt - 1e-4, SMA.per, fro, SMA.kvar).id);
+    const kf = fj(s.foreAt, s.foreAt + len(f), s.at, 0, 0.06);
+    const a = f.map((x, i) => ff[i] + (x - ff[i]) * kf);
     const b = v(s.id);
-    const k = fj(s.at, s.at + 0.22, t, 0.03, 0.12);
-    return { yaw: 0.035 * (a[0] + (b[0] - a[0]) * k), pitch: 0.025 * (a[1] + (b[1] - a[1]) * k), roll: 0.02 * (a[2] + (b[2] - a[2]) * k) };
+    const k = fj(s.at, s.at + len(b), t, 0, 0.06);
+    const d = t + fro * 37;
+    return {
+      yaw: 0.035 * (a[0] + (b[0] - a[0]) * k) + 0.012 * gung(d * 0.37),
+      pitch: 0.025 * (a[1] + (b[1] - a[1]) * k) + 0.009 * gung(d * 0.29 + 1.7),
+      roll: 0.02 * (a[2] + (b[2] - a[2]) * k) + 0.007 * gung(d * 0.23 + 3.1),
+    };
+  }
+  // Andningen i vaket tillstånd (andetag; sömnens är andas): var och en i sin takt, som glider lite fortare och lite långsammare, och lite olika djupt.
+  // 0 utandad, omkring 1 inandad. Bröstet vidgas (body), och bålen lyfts, så att axlarna och armarna följer med.
+  const ANDNING = { dl: 4.3, dt: 3.7, dj: 4.8 };
+  function andning(o, t) {
+    if (opt.calm) return 0.5;
+    const tt = t + o.phase * 7;
+    return (0.85 + 0.2 * gung(tt * 0.07)) * andetag(tt / ANDNING[o.F.key] + 0.25 * Math.sin(tt * 0.13 + o.phase));
+  }
+  // Händerna står aldrig helt still (2026-11-19): handen som vilar på bordet, håller flaskan eller cigaretten
+  // driver lite fram och tillbaka och vrids en aning, i takter som inte går jämnt upp (gung). Mot bordet bara i
+  // sidled (mark), annars också upp och ner. Förut stod de som fastskruvade i upp till tio sekunder åt gången.
+  function liv(o, A, t, P, mark) {
+    if (opt.calm) return P;
+    const a = t + 13.7 * (o.phase + 1.9 * A.s);
+    P.p.x += 1.0 * gung(a * 0.53) + 0.4 * gung(a * 1.37 + 2.1);
+    P.p.z += 0.8 * gung(a * 0.41 + 0.8) + 0.3 * gung(a * 1.11 + 4.2);
+    if (!mark) P.p.y += 0.7 * gung(a * 0.47 + 1.6);
+    const vr = 0.08 * gung(a * 0.37 + 2.7);
+    P.y.applyAxisAngle(UP, vr);
+    P.z.applyAxisAngle(UP, vr);
+    return P;
+  }
+  // Blicken (2026-11-19): ett stort blickbyte – mot den som går iväg bakom en, ut genom fönstret, tillbaka från tv:n –
+  // kunde vrida huvudet ett kvarts varv på ett par bildrutor, ett knyck som ingen människa gör. Det blickarna gör
+  // med huvudet och bålen (body0) går därför genom en dämpad fjäder (kritiskt dämpad, BLICK.w) med en mjuk gräns för
+  // farten (BLICK.v, radianer i sekunden): små och lugna byten som förut, en aning efter – huvudet kommer strax
+  // efter blicken, som hos folk – och de stora mjukt, med fart som kommer och går. Fjädern minns från bild till bild
+  // (per figur och per tid i body, slot), så i en fast bild och utan rörelser står den inte i vägen.
+  const BLICK = { w: 8, v: 4.5 };
+  const STILL_BLICK = new URLSearchParams(location.search).has('rum-t');
+  function blickFolj(o, t, x) {
+    if (opt.calm || STILL_BLICK) return x;
+    const m = o.blick || (o.blick = []);
+    const i = o.slot || 0;
+    const s = m[i];
+    const dt = s ? t - s.t : -1;
+    if (!s || dt < 0 || dt > 0.25) { m[i] = { t, x: x.slice(), v: x.map(() => 0) }; return x; }
+    if (dt === 0) return s.x.slice();
+    const n = Math.ceil(dt / 0.01);
+    const h = dt / n;
+    const w = BLICK.w;
+    for (let j = 0; j < n; j++) {
+      for (let k = 0; k < x.length; k++) {
+        s.v[k] = grans(s.v[k] + (w * w * (x[k] - s.x[k]) - 2 * w * s.v[k]) * h, BLICK.v);
+        s.x[k] += s.v[k] * h;
+      }
+    }
+    s.t = t;
+    return s.x.slice();
   }
   // Benen under stolen: en stund då och då vippar den ena foten i en takt – fort när man är nervös –
   // eller dinglar ena benet fram och tillbaka (oftare den som är glad). Bara knäna och fötterna.
@@ -5173,7 +5261,7 @@ export async function figurer(canvas, opt = {}) {
     const y0 = o.hipY;
     if (A.kind === 'flaska') {
       // står på bordet i handen, där den stod medan man väntade
-      const rest = grip(A.bench.matrix, A.thing.matrix, new THREE.Vector3(s, -0.6, -0.6));
+      const rest = liv(o, A, t, grip(A.bench.matrix, A.thing.matrix, new THREE.Vector3(s, -0.6, -0.6)), true);
       // (och snurras ibland, virvel: handen i en liten cirkel och flaskan lutad utåt kring botten)
       const vv = virvel(o, t);
       if (vv) {
@@ -5202,6 +5290,7 @@ export async function figurer(canvas, opt = {}) {
       const rest = A.kind === 'cigg'
         ? { p: new THREE.Vector3(ak[0] - s * 8.1, BORD.y + 7, ak[1] + 4.5), y: new THREE.Vector3(s * 0.2, 0.6, 1), z: new THREE.Vector3(s * 0.9, 0.4, -0.2), pole: new THREE.Vector3(s, -0.4, -0.7) }
         : { p: new THREE.Vector3(s * Wd * 0.4, y0 + 13, th * 0.78), y: new THREE.Vector3(-s * 0.15, 0.25, 1), z: new THREE.Vector3(s * 0.4, 1, -0.1), pole: new THREE.Vector3(s, -0.5, -0.5) };
+      liv(o, A, t, rest, false);
       // (DT knackar av askan ibland)
       const ka = A.kind === 'cigg' ? askan(o, t) : 0;
       if (ka > 0) {
@@ -5239,6 +5328,7 @@ export async function figurer(canvas, opt = {}) {
     const vila = bv
       ? { p: new THREE.Vector3(bv[0] + s * hx, BORD.y + 3 + hy, bv[1] + hz), y: new THREE.Vector3(-s * 0.1, -0.05, 1), z: new THREE.Vector3(0, 1, 0.05), pole: new THREE.Vector3(s, -0.3, -0.6) }
       : { p: new THREE.Vector3(s * (Wd * 0.36 + 0.3 * hx), y0 + 9 + hy, th * 0.92 + 0.3 * hz), y: new THREE.Vector3(-s * 0.1, -0.15, 1), z: new THREE.Vector3(0, 1, 0.1), pole: new THREE.Vector3(s, -0.3, -0.6) };
+    liv(o, A, t, vila, Boolean(bv));
     // DL pratar med den lediga handen, i slag (pratSlag) och lite mindre än DJ (DT med cigaretten ovan)
     const k = o.F.key === 'dl' ? pratW(o, t) : 0;
     if (k > 0) {
