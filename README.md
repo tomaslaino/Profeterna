@@ -6980,6 +6980,69 @@ Kvar, som de som mätningen pekar på: gängets bygge (figurerna, håret och kl�
 den långsamma processorn vid ett återbesök) och grafikprogrammen, ungefär hundra i sex WebGL-dukar som inte delar dem (se
 *Det som är kvar* under [Mindre filer](#mindre-filer)).
 
+### Det som far förbi framför affären i egna bilder (2026-11-19)
+
+Användarens önskemål: "Förbättra grafiken o flyter på animationssidan allmänt o få det att flyta bättre o gör så att det
+funkar bättre på sämre enheter." Mätt först, som telefon (412 × 870, steg 1 låst) i Chromium med grafiken emulerad i
+processorn, med rummets delar avstängda en i taget i samma sidvisning. Efter gänget var det gatan som tog mest av grafiken:
+med gänget och sakerna avstängda gick rummet i 14 bilder i sekunden, och utan att gatan ritades om i 50–58. Nästan allt det var
+det som går och kör förbi framför affären (*Framför affären* under [Utsikten och vädret](#utsikten-och-vädret)):
+
+- Medan något far förbi läggs gatans duk ut i varje bildruta (`glid`), och framför affären far något förbi nästan hela dagen
+  (räknat i 1 200 halvsekunder klockan 8, 14, 17.30 och 22: någon syns i 84–91 % av tiden och ett fordon i 18–46 %; klockan 3
+  i 15 %). Varje gång ritades alla som gick där och alla fordon om från grunden – fasadens figurer och fordon, några hundra
+  former var – och kladden lades i glasen med oskärpan över hela fönstret.
+- Isolerat, med grafiken avslutad efter varje bild: gatans duk 36 ms per bild i den emulerade grafiken, varav 32 framför
+  affären (formerna 14 och oskärpan 18), och resten av gatan – himlen, husen, bron och 27 figurer – 4 ms.
+
+Nu är var och en som går och varje fordon en egen liten bild (`ritaFramMjuk` i rum-ute.js): skarp i en kladd och därifrån
+disig och ur skärpa i bilden, i gängets takt (`el._framTakt`, från `takt`). I bildrutorna däremellan läggs bara bilderna ut där
+var och en är, som gatans egna figurer sedan 2026-11-09 (ställningen i gängets takt, platsen i varje bildruta). Den som har
+stannat och tittar in ritas en gång. En figurs bild är bara så stor som det den har med sig (`figurRam`; mätt över 6 000 figurer
+i fyra väder och fyra tider: utan något 0,9 m åt sidorna och 2,1 m upp, med hund 1,3 m framåt, med paraply 2,75 m upp, med
+vagn, cykel eller skidor 1,7 m åt sidorna), så att oskärpan inte räknas över tom yta. Ett fordons bild är klippt till glasen med
+två meters marginal (`FMARG`) och ritas om också när fordonet har kört mer än en meter sedan sist, med strålkastarnas sken bara på
+kvällen (`FBIL`: 4,4 m framför och bakom, och spegelbilden i den våta gatan 2,5 m ner). Bilder som inte har synts på en sekund
+släpps.
+
+Mätt med gammal och ny kod om vartannat, två varv. Gatans duk isolerad, bild för bild med gängets takt var tredje bildruta som i
+telefonen och grafiken avslutad efter varje bild, i sex tider om 120 bildrutor klockan 14, 17.30 och 21.30 (de två första
+tiderna, där grafikprogrammen värms upp, oräknade); och hela gatan i realtid med gänget och sakerna avstängda:
+
+| | Före | Efter |
+|---|---|---|
+| Gatans duk per bildruta: grafikprocessens former (Skia) | 7,5 ms | 1,7 ms |
+| Gatans duk per bildruta: bildpunkterna (emulerade) | 25,0 ms | 2,7 ms |
+| Gatans duk per bildruta: sidans huvudtråd | 4,7 ms | 3,6 ms |
+| Bara gatan i realtid: bilder i sekunden | 13–15 | 18–19 |
+| Bara gatan i realtid: grafikens arbete per bildruta | 230–260 ms | 180–195 ms |
+
+I realtid är den emulerade grafiken fortfarande full: där kostar oskärpan efter ytan, och bilderna ritas om i gängets takt, 20
+gånger i sekunden. Med hela rummet (gänget med) går den emulerade grafiken i 2,4–2,5 bilder i sekunden före och 2,6–2,8 efter:
+där är det gänget som håller tillbaka.
+
+**Samma bild:** gatans duk med fryst tid, gammal och ny kod, i regn (paraplyer), snö och klart väder klockan 14 och 17.30, 24
+tider var: 47–75 dB, och det som skiljer är kanterna (en figur som ligger över en annan blir mjuk var för sig, och bilden läggs ut
+på en bråkdel av en bildpunkt); ingen figur och inget fordon är klippt. I rörelse, där ställningen är upp till två bildrutor
+gammal: 49–68 dB.
+
+**Kvalitetssteget** sparas under en ny nyckel (`rum-kval4` i rum.js), som 2026-11-15: rummet går ner ett steg när bildrutorna blir
+för långa, och steget sparas i tre dagar, så den som gick ner för gatans skull 2026-11-18–19 får gänget i full kvalitet igen.
+
+**Mätsättet:** headless Chromium sätter ihop bilden i processorn, och då läses varje 3D-duk tillbaka i varje bildruta
+(`LayerTreeHost::DoUpdateLayers` → `GLES2::ReadPixels`, 0,7 s per sekund på huvudtråden), vilket inte händer i en riktig enhet.
+Med ett fönster under Xvfb (`headless: false`, `--use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist
+--enable-gpu-rasterization`) sätts bilden ihop på det emulerade grafikkortet som i en riktig dator. Grafikprocessens tid per tråd
+ur `/proc`: huvudtråden (Skia, där formerna görs om till trianglar) och SwiftShaders trådar (bildpunkterna). En maskin med fyra
+kärnor hinner bara ett par bilder av gänget i sekunden, så delarna mäts isolerat eller med gänget avstängt.
+
+Inte provat i Safari eller i en riktig telefon (`matchfixarna.se/?rum-mat`). Där är bildpunkterna troligen billiga i
+förhållande till formerna, som görs om till trianglar på processorn i grafikprocessen, och formerna ritas nu i gängets takt i
+stället för i varje bildruta: en gång av tre i 60 bilder i sekunden.
+
+Prövat och inte infört: kladden i halva upplösningen utan oskärpa (som i äldre Safari) – halverade kostnaden, men formerna var
+kvar i varje bildruta.
+
 ### När något går fel i rummet
 
 - **Matcherna går inte att hämta:** `whenMatches` väntar inte förgäves, och `load` försöker igen
@@ -7575,12 +7638,13 @@ Backe (se *Utsikten* under [Hasse Backe](#hasse-backe)) och ute på trottoaren f
   härinifrån, medan de utifrån är siluetter mot fönstret. Men de är bakgrund: i ljuset har de sina egna färger med ett
   varmt sken, utanför det är de mörkare, och kanten är mjuk (`LJUSKANT` 0,9 m i `LJUSTEG` 4 steg), så att ingen tänds
   på en gång när de går in i ljuset. Fasadens bild beror på fönstrets form, så folket räknas om när
-  formen ändras och när trafiken ändras efter klockan (`framModell`). Allt ritas i en enda grov duk över glasen, 0,4
-  bildpunkter per px, som blir mjuk när den förstoras: ur skärpa som resten av gatan, utan filter. I telefonen och på
-  datorns lägre steg ritas det i gatans duk (`ritaGatan`). Det ritas bara medan något syns: de som går i gängets takt,
-  och medan ett fordon kör förbi i varje bildruta, högst 60 gånger i sekunden (`framDuk`, `glid`). I Chromium utan
-  grafikkort tar det ungefär 0,1 ms per figur och 0,4 ms per fordon och bild, under en halv procent av en kärna i
-  rusningen. Hur mycket trafik det är följer `trafik` (rusning, natt, helger och röda dagar), som fasaden och Hasse
+  formen ändras och när trafiken ändras efter klockan (`framModell`). Allt ligger i en grov duk över glasen, 0,4
+  bildpunkter per px, och är ur skärpa (2,6 px) och lite disigt, så att det inte drar blicken från gänget. I telefonen och
+  på datorns lägre steg ligger det i gatans duk (`ritaGatan`). Var och en som går och varje fordon är en egen liten bild
+  som ritas i gängets takt, och i bildrutorna däremellan läggs bilderna bara ut där de är (`ritaFramMjuk`, se
+  [Det som far förbi framför affären i egna bilder](#det-som-far-förbi-framför-affären-i-egna-bilder-2026-11-19)). Det
+  ritas bara medan något syns: i datorn de som går i gängets takt, och medan ett fordon kör förbi i varje bildruta,
+  högst 60 gånger i sekunden (`framDuk`, `glid`); i gatans duk i varje bildruta så länge något far förbi. Hur mycket trafik det är följer `trafik` (rusning, natt, helger och röda dagar), som fasaden och Hasse
   Backes utsikt också läser. Förut hade gatan inifrån egna fordon på ett band åt båda hållen (högertrafik), lika små
   som de som går på bron men lågt i bilden, så att de nästan alltid låg bakom gänget och fönsterbänken.
 - **Årstiderna:** träden nedanför bron är ljusgröna i maj, gröna på sommaren, gula och

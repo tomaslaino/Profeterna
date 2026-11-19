@@ -3524,8 +3524,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     KVAL[1].damm = false;
   }
   // (3: 2026-11-15 gjorde gatans oskärpa bildrutan så dyr i datorn att rummet kunde gå ner ett steg i onödan,
-  // och steget sparades i tre dagar; med en ny nyckel börjar alla om)
-  const KVAL_NYCKEL = 'rum-kval3';
+  // och steget sparades i tre dagar; med en ny nyckel börjar alla om. 4: likadant 2026-11-18–19 med dem som går och
+  // kör förbi framför affären, som ritades om från grunden i varje bildruta, ritaFramMjuk i rum-ute.js)
+  const KVAL_NYCKEL = 'rum-kval4';
   // Där rummet börjar, efter vad enheten säger om sig själv: kommer rummet upp på
   // ett för högt steg byggs gänget om för varje steg ner, och det är det som hackar
   // mest. (Safari säger ingenting, där får kanna känna efter.)
