@@ -1585,6 +1585,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   och längre. Och nytt: höstlöv
   som singlar ned och driver i vinden, andedräkten i kylan och duvor som pickar på trottoaren och flyger undan när någon
   kommer. Se *Lugnare och mer levande* under [Fasaden](#fasaden).
+- **De som går förbi visar känslor och lever (2026-11-19, användarens önskemål):** "Jag skulle vilja ha en större
+  variation på människorna. De är lite tråkiga som det är. De får gärna kanske visa någon emotion eller dylikt? Det är
+  något som gör att de inte verkar mänskliga och att de verkar helt enformiga allihop." Alla hade samma huvud med en prick
+  till öga och ett streck till bryn, och ingen gjorde något annat än att gå rakt fram. Nu har var och en ett eget ansikte
+  (näsa, haka, ögon, bryn, skägg, rynkor, rosiga kinder i kylan) och ett humör för dagen som syns i munnen, brynen och
+  hållningen, och de lever medan de går: blinkar, vänder sig om, tittar upp och ner, kollar klockan, vinkar, gäspar,
+  kliar sig i huvudet, nyser, suckar, ler och skrattar; i sällskap pratar de med varandra och skrattar ihop, barnen
+  hoppar och pekar och tittar upp på föräldern, supportrarna sjunger. Samma antal och lika mycket arbete per bild (0,3 ms
+  för sex figurer). Se *Ansiktet, humöret och det de gör* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -1593,6 +1602,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   harlekintrianglar mellan guldkanter precis under Tipsligan och en bröstpanel i bakväggens furu med en list
   överst, som syns mellan bården och bardisken. Tapeten fortsätter upp i taket i telefonen och i videohörnet. Se
   [Tobaksaffären](#tobaksaffären).
+- **Pubtapet i stället för konfettin (2026-11-19, användarens önskemål):** "Det kanske är lite för mycket färger på
+  den nu - kan du ge mig fler alternativ till tapet till väggen. Det ska vara 80/90-tal." Av fem lugnare tapeter i
+  den riktiga scenen (A randig med vinröd nålrand, B engelsk pub, C laxrosa stänktapet, D småblommigt, E sandfärgat
+  rombmönster) valde användaren B: flaskgrönt med ett spaljémönster i ton och en mörkgrön bård med guldkanter och
+  guldromber. Bröstpanelen i furu och bakväggen är som förut. Se [Tobaksaffären](#tobaksaffären).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4857,9 +4871,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet. Ett klick
   → ut genom dörren, och affären utifrån med gänget i fönstret (se [Fasaden](#fasaden)).
 
-Högra väggen är tapetserad (`hogerVagg` och `TAPET` i rum.js, sedan 2026-11-16): konfettitapet, en
-bård med harlekintrianglar på brösthöjd och under den en bröstpanel i samma furu som bakväggen, ritade i
-väggens plan så att bräderna och trianglarna står tätare in mot hörnet. Samma vägg ritas i taket
+Högra väggen är tapetserad (`hogerVagg` och `TAPET` i rum.js, sedan 2026-11-16; pubtapeten sedan
+2026-11-19): flaskgrön tapet med ett spaljémönster i ton, en mörkgrön bård med guldkanter och guldromber på
+brösthöjd och under den en bröstpanel i samma furu som bakväggen, ritade i väggens plan så att bräderna,
+spaljén och romberna står tätare in mot hörnet. Samma vägg ritas i taket
 (telefonen) och i videohörnet (`vaggSvg` i rum-video.js får den från rum.js).
 
 Sakerna på högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet
@@ -7886,6 +7901,34 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   16–28 s, och går vidare (`stannar`, `bakDelar`; den som stannar strosar) – där skivan med löpsedlarna hänger, så att
   gänget syns, och utan paraply, som skulle skymma skylten. Bilarna och bussarna syns också som speglingar som far förbi i glaset
   och dörren: mörka skuggor på dagen, baklyktor i mörkret, alla åt vänster som på gatan.
+- **Ansiktet, humöret och det de gör (2026-11-19):** var och en som går förbi har ett eget ansikte och ett humör, och
+  lever medan den går (`ansiktsDrag`, `humor`, `livet`, `levande` i rum-fasad.js). Ansiktet (`ansiktet`, `o.ans`):
+  näsan (rak, liten, uppnäsa, stor, örnnäsa eller knölig, `NASOR`) och hakan (vanlig, svag, stark, dubbelhaka hos de
+  kraftiga) i huvudets profil (`huvudForm`), ögonens storlek (barnens större), brynens tjocklek (buskiga hos äldre män),
+  skägg (helskägg, pipskägg, skäggstubb eller polisonger, utöver mustaschen), rynkor hos de äldre och rosiga kinder i
+  kylan och hos barnen. Humöret (`HUMOR`: glad, lugn, sur, trött, fundersam, stressad) lottas efter sättet att gå (den
+  som studsar är oftare glad, den som hasar trött eller sur), vädret (blöt utan paraply: sur, sol: glad), klockan (trött
+  tidigt och sent), vem det är (kostym: stressad, barnen glada) och vad den bär (blommor, pizza, glass: glad), och syns i
+  munnen och brynen (`MUN`, `BRYN`), den trötta har tunga ögonlock, och i huvudets hållning (`NICK`). Varje bild
+  väljs vilka varianter av ansiktet som syns (`om` på delen, `P.ans`): munnen stängd, ler, pratar eller skrattar (då
+  fälls käken ner och munnen är mörk, med tänderna), ögat öppet, blundar eller kisar, brynen som humöret eller höjda;
+  huvudet kan vändas bakåt över axeln (`P.vand`: speglat kring halsen, smalt på vägen så att det ser ut som en
+  vridning; halsduken följer inte med). Det de gör (`AKT`, `aktNu`): ensam i ungefär tre av fyra avsnitt om 6,5–12,5 s (i sällskap färre) något
+  som passar den (`livFor`): tittar sig om, tittar upp (oftare i regn och snö) eller ner, ler, kollar klockan (i kostym
+  och stressad), vinkar, gäspar (trött, tidigt och sent), kliar sig i huvudet (fundersam), stryker undan håret, nyser
+  (i kylan), hostar (äldre och rökare), suckar (axlarna upp och ner), skrattar till, sjunger (den som vinglar hem),
+  tittar ner på hunden eller i barnvagnen och pratar, skuggar ögonen i regnet, blåser i händerna i kylan, och barnen
+  hoppar (oftare i regn) och pekar. Händerna tas ur fickan (`fickaF`, `fickaB`) och går i en rak linje till klockan,
+  munnen eller huvudet (`armTill`, `iHuvud`), bara om de är lediga (inte i kopplet, barnets hand, påsen, paraplyet
+  eller pumpande armar). I sällskap (samtalet `S` i `livet`): avsnitt om 2,4 s där det är tyst, någon pratar (munnen
+  rör sig och ibland händerna), alla skrattar (huvudet bakåt, axlarna skakar, ögonen kisar) eller supportrarna sjunger
+  i takt med näven i luften; de som lyssnar tittar på den som pratar en stund (vänder sig om när den går bakom, tittar
+  ner på barnet, barnet upp), nickar och ler. De unga skrattar oftare, de äldre är oftare tysta. Den som har freestylen
+  nickar i takt och sjunger med ibland, den som har mobilen pratar, lyssnar och skrattar, och den som springer flåsar.
+  Allt räknas ur tiden och figurens egna tal (`hasch`), så att en stillbild (`?rum-t`) visar det som händer då; ansiktet
+  och livet lottas ur en egen följd, så att kläderna och sällskapen är desamma som förut. Bara framför affären
+  (`ut.liv` i `ritaFigur`): inifrån och på bron är de bakgrund och går som förut, med sina ansikten. Arbetet: 0,3 ms
+  för sex figurer per bild med eller utan livet, `levande` 0,5 µs per figur (headless Chrome på Macen).
 - **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
   ([public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), `RumFasadGatan`): trottoarkanten i granit 0,88 m ut,
   rännstenen med gatsten och en brunn (bäcken från stupröret slutar där), asfalten med mittlinjen, höstlöv i
