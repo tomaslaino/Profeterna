@@ -11,9 +11,10 @@
 //
 // Oftast läser han Helgarderat i stället, det senaste numret (helgarderat(upplaga), se Helgarderat nedan).
 //
-// byggTidning(bord, { upp }) → { mesh, U, tryck(dag), helgarderat(upplaga), steg(namn), har(namn), klar(namn), visa(namn), borta() };
-// upp(textur) laddar upp en textur till grafikkortet i förväg. dagens(now) → det tryck() vill ha
+// byggTidning(bord, { upp }) → { mesh, U, blad, UB, tryck(dag), helgarderat(upplaga), steg(namn), har(namn), klar(namn), visa(namn),
+// borta() }; upp(textur) laddar upp en textur till grafikkortet i förväg. dagens(now) → det tryck() vill ha
 // ytan(qx, qy, s, ut): punkten (qx −1–1 över uppslaget, qy 0–1 nedifrån) i papperets mått, s: { beta, buk, vag, fas }
+// bladYta(u, qy, s, ut): punkten på bladet han vänder (u 0–1 från ryggen), s som ovan och { vand, gy }
 import * as THREE from 'three';
 import { LJUS, BORD_GLSL, DAG, LYS } from './rum-hasse-arm.js';
 
@@ -94,6 +95,9 @@ export function dagens(now = Date.now()) {
 // En sida: bredd och höjd i världens enheter (en tidning i tabloid, 28 × 40 cm, ungefär 0,62 mm på en enhet).
 export const TIDNING = { B: 450, H: 640, RYGG: 18 };
 
+// Papperet är aldrig helt plant: varje halva buktar lite utåt, mot en, mellan ryggen och kanten där han håller
+// (KUPA, en andel av sidans bredd), mer upptill där ingen håller. Plana halvor såg ut som kartong (2026-11-19).
+export const KUPA = 0.024;
 const GLSL_YTA = `
 uniform float uBeta, uBuk, uVag, uFas;
 vec3 yta(vec2 q) {
@@ -102,6 +106,8 @@ vec3 yta(vec2 q) {
   // ryggen är rundad: vecket böjer sig mjukt
   float zr = sqrt(u * u + ${TIDNING.RYGG * TIDNING.RYGG}.) - ${TIDNING.RYGG}.;
   vec3 p = vec3(q.x * ${TIDNING.B}. * cos(uBeta), y, -zr * sin(uBeta));
+  // halvorna buktar lite (KUPA)
+  p.z += ${KUPA} * ${TIDNING.B}. * sin(3.14159 * abs(q.x)) * (.7 + .3 * q.y);
   // mjukt: ovanför händerna faller det bakåt mot honom, mest vid ryggen där ingen håller
   float ov = max(0., q.y - .48);
   p.z -= uBuk * ov * ov * ${TIDNING.H}. * (1. - .55 * abs(q.x));
@@ -116,8 +122,34 @@ export function ytan(qx, qy, s, ut) {
   const u = Math.abs(qx) * B;
   const zr = Math.sqrt(u * u + RYGG * RYGG) - RYGG;
   const ov = Math.max(0, qy - 0.48);
-  const z = -zr * Math.sin(s.beta) - s.buk * ov * ov * H * (1 - 0.55 * Math.abs(qx)) + s.vag * Math.sin(Math.PI * Math.abs(qx)) * Math.sin(qy * 4 + s.fas);
+  const z = -zr * Math.sin(s.beta) + KUPA * B * Math.sin(Math.PI * Math.abs(qx)) * (0.7 + 0.3 * qy) - s.buk * ov * ov * H * (1 - 0.55 * Math.abs(qx)) + s.vag * Math.sin(Math.PI * Math.abs(qx)) * Math.sin(qy * 4 + s.fas);
   return ut.set(qx * B * Math.cos(s.beta), qy * H, z);
+}
+
+// Bladet han vänder (2026-11-19, användarens önskemål: "Gör alla läsa-tidningen-animationer med Hasse bättre/snyggare"):
+// det översta bladet på hans högra halva, u 0–1 från ryggen ut, går över till den vänstra när vand går från 0 till 1.
+// Varje punkt är samma punkt på den högra halvan, vriden kring ryggen. Kanten han håller i (u 1, höjden gy) leder när
+// han lyfter bladet och släpar efter när det faller över av sig självt, och det som är längre från greppet släpar
+// efter, så att bladet böjer sig diagonalt som ett riktigt tidningsblad. (Vinkeln aldrig helt 0 eller 1, så att det
+// ligger en hårsmån ovanpå sidan under.)
+const GLSL_BLAD = `
+uniform float uVand, uGy;
+vec3 blad(vec2 q) {
+  float u = q.x;
+  vec3 m = yta(vec2(-u, q.y));
+  float f = uVand + .24 * sin(6.28318 * uVand) * (u - .5) - .18 * sin(3.14159 * uVand) * (q.y - uGy) * u;
+  f = clamp(f, .006, .994);
+  float r = length(m.xz);
+  float a = atan(-m.z, m.x) + (2. * uBeta - 3.14159) * f;
+  return vec3(r * cos(a), m.y, -r * sin(a));
+}`;
+export function bladYta(u, qy, s, ut) {
+  ytan(-u, qy, s, ut);
+  let f = s.vand + 0.24 * Math.sin(2 * Math.PI * s.vand) * (u - 0.5) - 0.18 * Math.sin(Math.PI * s.vand) * (qy - s.gy) * u;
+  f = Math.min(0.994, Math.max(0.006, f));
+  const r = Math.hypot(ut.x, ut.z);
+  const a = Math.atan2(-ut.z, ut.x) + (2 * s.beta - Math.PI) * f;
+  return ut.set(r * Math.cos(a), ut.y, -r * Math.sin(a));
 }
 
 const V = `${GLSL_YTA}
@@ -133,8 +165,24 @@ void main() {
   vN = normalize(mat3(modelMatrix) * n);
   gl_Position = projectionMatrix * viewMatrix * w;
 }`;
+// bladet: samma papper, med u 0–1 från ryggen (en halv sida), och samma ruta i trycket som den högra halvan
+const V_BLAD = `${GLSL_YTA}
+${GLSL_BLAD}
+varying vec2 vUv; varying vec3 vN, vP;
+void main() {
+  vec2 q = position.xy;
+  vec3 p = blad(q);
+  vec2 e = vec2(.004, 0.);
+  vec3 n = normalize(cross(blad(q - e.xy) - blad(q + e.xy), blad(q + e.yx) - blad(q - e.yx)));
+  vUv = vec2(.5 - .5 * q.x, q.y);
+  vec4 w = modelMatrix * vec4(p, 1.);
+  vP = w.xyz;
+  vN = normalize(mat3(modelMatrix) * n);
+  gl_Position = projectionMatrix * viewMatrix * w;
+}`;
 const F = `precision highp float;
 uniform sampler2D uUt, uIn;
+uniform float uBladet;
 varying vec2 vUv; varying vec3 vN, vP;
 ${LJUS}
 ${BORD_GLSL}
@@ -142,7 +190,9 @@ void main() {
   if (underBord(vP)) discard;
   vec3 n = normalize(vN);
   vec3 c;
-  if (gl_FrontFacing) c = texture2D(uUt, vUv).rgb;
+  // (bladet han vänder har insidor på båda sidor: den högra sidan han har läst och den vänstra han ska läsa)
+  if (gl_FrontFacing && uBladet < .5) c = texture2D(uUt, vUv).rgb;
+  else if (gl_FrontFacing) c = texture2D(uIn, vUv).rgb;
   else { c = texture2D(uIn, vec2(1. - vUv.x, vUv.y)).rgb; n = -n; }
   // vecket vid ryggen: en mörkare fåra
   float r = abs(vUv.x - .5) * ${2 * TIDNING.B}.;
@@ -1440,7 +1490,8 @@ export function byggTidning(bord, { upp = null } = {}) {
     t.colorSpace = THREE.NoColorSpace;
     t.generateMipmaps = true;
     t.minFilter = THREE.LinearMipmapLinearFilter;
-    t.anisotropy = 4;
+    // (snett från kameran blev trycket på den bortvända halvan randigt med 4)
+    t.anisotropy = 8;
     return t;
   };
   // Två ark (2026-11-18): Helgarderat ('hg') och dagens morgontidning ('dag', DN eller SvD), vart och ett med uppslaget
@@ -1468,7 +1519,7 @@ export function byggTidning(bord, { upp = null } = {}) {
   const U = {
     uUt: { value: dag0.tUt }, uIn: { value: dag0.tIn },
     uBeta: { value: 0.1 }, uBuk: { value: 0.1 }, uVag: { value: 0 }, uFas: { value: 0 },
-    uBord: bord, uButik: bord.butik, uDag: bord.dag || DAG, uLys: bord.lys || LYS,
+    uBord: bord, uButik: bord.butik, uDag: bord.dag || DAG, uLys: bord.lys || LYS, uBladet: { value: 0 },
   };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U, vertexShader: V, fragmentShader: F, side: THREE.DoubleSide, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
   // efter kroppen (djupet börjar om där) och före armarna, så att händerna framför papperet syns och
@@ -1477,6 +1528,24 @@ export function byggTidning(bord, { upp = null } = {}) {
   mesh.frustumCulled = false;
   mesh.matrixAutoUpdate = false;
   mesh.visible = false;
+  // bladet han vänder (bladYta): en halv sida, med papperets ljus, tryck och läge och egna uVand och uGy
+  const BX = 18;
+  const bpos = [];
+  for (let j = 0; j <= NY; j++) for (let i = 0; i <= BX; i++) bpos.push(i / BX, j / NY, 0);
+  const bidx = [];
+  for (let j = 0; j < NY; j++) for (let i = 0; i < BX; i++) {
+    const a = j * (BX + 1) + i;
+    bidx.push(a, a + 1, a + BX + 1, a + 1, a + BX + 2, a + BX + 1);
+  }
+  const bg = new THREE.BufferGeometry();
+  bg.setAttribute('position', new THREE.Float32BufferAttribute(bpos, 3));
+  bg.setIndex(bidx);
+  const UB = { ...U, uVand: { value: 0 }, uGy: { value: 0.25 }, uBladet: { value: 1 } };
+  const blad = new THREE.Mesh(bg, new THREE.ShaderMaterial({ uniforms: UB, vertexShader: V_BLAD, fragmentShader: F, side: THREE.DoubleSide, transparent: true, depthWrite: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+  blad.renderOrder = 4;
+  blad.frustumCulled = false;
+  blad.matrixAutoUpdate = false;
+  blad.visible = false;
   let dagNu = null;
   // dagens tryck: ökar med en ny dag och när typsnitten och notiserna har kommit (då trycks det om); klart: de har
   // kommit, och först då trycks det i förväg (annars två gånger)
@@ -1565,7 +1634,7 @@ export function byggTidning(bord, { upp = null } = {}) {
     hg = { o, portratt: bild, seed: Math.abs(Number(String(o.over).replace(/\D+/g, '')) || 1) };
   }
   return {
-    mesh, U, tryck, helgarderat, steg,
+    mesh, U, blad, UB, tryck, helgarderat, steg,
     // finns tidningen att visa ('dn', 'svd' eller 'hg')
     har: (namn) => (namn === 'hg' ? Boolean(hg) : Boolean(TIDNINGAR[namn])),
     // är den tryckt och klar att visa direkt
@@ -1586,7 +1655,9 @@ export function byggTidning(bord, { upp = null } = {}) {
     },
     borta() {
       g.dispose();
+      bg.dispose();
       mesh.material.dispose();
+      blad.material.dispose();
       for (const a of Object.values(ark)) { a.tUt.dispose(); a.tIn.dispose(); }
     },
   };

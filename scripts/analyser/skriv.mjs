@@ -51,6 +51,7 @@ import { fileURLToPath } from 'node:url';
 import ac from '../../config/analyser.js';
 import hc from '../../config/hasse.js';
 import kupongCfg from '../../config/kupong.js';
+import poddCfg from '../../config/poddar.js';
 import { betalvagar, inloggning, Stopp } from '../../src/analyser/claude.mjs';
 import { skrivAnalys } from '../../src/analyser/artikel.mjs';
 import { skrivHasse, hasseKlar } from '../../src/analyser/hasse.mjs';
@@ -471,17 +472,30 @@ function poddsidorna(round) {
 // önskemål: "att det görs automatiskt inför tidningspublikationerna - så att det är klart"). launchd startar det
 // annars bara kl. 02.15 och lördag kl. 08.00, och Stryktipsets kupong kommer på måndagskvällen. Bara jobbet på iMacen
 // (--publicera) väcker det; knuffaPoddar i src/analyser/tider.mjs säger när. Poddjobbet skriver sina blad i
-// Tidning/omgang.json, och poddsidorna här lägger ut dem vid nästa körning.
+// Tidning/omgang.json, och poddsidorna här lägger ut dem vid nästa körning. Sedan 2026-11-18 väcks det också när en
+// av dess tider har slagit (config/poddar.js, tider): fredag kl. 13.00 startar launchd det inte. Ett jobb som redan går
+// (låset Tidning/las med en levande process) väcks inte.
 const PODDJOBB = 'se.matchfixarna.poddar';
 const KNUFF = path.join(TILLSTAND, 'poddar-knuff.json');
+function poddjobbetGar() {
+  try {
+    const pid = Number(fs.readFileSync(path.join(TILLSTAND, 'Tidning', 'las'), 'utf8'));
+    if (!pid) return false;
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
 function poddjobbet(round) {
   if (process.platform !== 'darwin' || !PUBLICERA || UT) return;
   const tider = lasJson(path.join(TILLSTAND, 'Tidning', 'tider.json'), null);
-  if (!knuffaPoddar(round, tider, lasJson(KNUFF, null), { now: Date.now() })) return;
+  if (!knuffaPoddar(round, tider, lasJson(KNUFF, null), { now: Date.now(), schema: (poddCfg.tider || []).filter((t) => t.vacks) })) return;
+  if (poddjobbetGar()) return;
   if (TORRT) { logg(`skulle väcka poddjobbet för ${round.id}`); return; }
   try {
     execFileSync('launchctl', ['kickstart', `gui/${process.getuid()}/${PODDJOBB}`], { timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] });
-    logg(`poddjobbet väckt för ${round.id}`);
+    logg(`poddjobbet väckt för ${round.id}${tider && tider.omgang === round.id ? ' (en av dess tider har slagit)' : ''}`);
   } catch (err) {
     logg(`poddjobbet gick inte att väcka: ${String(err.stderr || err.message).trim().slice(0, 200)}`);
   }
