@@ -181,17 +181,25 @@
     // senaste tre matcherna, som exempel
     kurvan: {
       e: 'KURVAN', n: 'xG MATCH FÖR MATCH',
-      t: ({ m }) => `Lagets chanser i ${m && ['unl', 'emk', 'vsk'].includes(m.comp) ? 'Nations League' : 'ligan'} match för match, med den första matchen till vänster och den senaste till höger. Varje punkt är snittet av tre matcher, så att en enstaka match inte drar iväg. Den ljusa linjen är lagets egen xG och den gröna motståndarnas. Där den ljusa ligger över den gröna är fältet mellan dem fyllt: där skapade laget mer än det släppte till.${m && ['unl', 'emk', 'vsk'].includes(m.comp) ? '' : ' Talen under kurvan (MOT) är motståndarna match för match, på samma skala som MOTSTÅNDET: 50 är ett lag som divisionens mittenlag, och ju högre, desto svårare. Talen över 50 är gröna, de andra svaga. Det sista talet, omvänt, är den här matchens motståndare. En dipp i kurvan mot en rad höga tal säger alltså mindre än en dipp mot låga.'}`,
+      // (mot ett mittenlag när lagfilens serie har mittenlagets värden, sedan
+      // 2026-11-19; annars, som i Nations League, lagets och motståndarnas xG)
+      t: ({ m }) => (m && ['unl', 'emk', 'vsk'].includes(m.comp)
+        ? 'Lagets chanser i Nations League match för match, med den första matchen till vänster och den senaste till höger. Varje punkt är snittet av tre matcher, så att en enstaka match inte drar iväg. Den ljusa linjen är lagets egen xG och den gröna motståndarnas. Där den ljusa ligger över den gröna är fältet mellan dem fyllt: där skapade laget mer än det släppte till.'
+        : 'Lagets xG-skillnad i ligan match för match – det laget skapade minus det laget släppte till – med den första matchen till vänster och den senaste till höger. Varje punkt är snittet av tre matcher. Den prickade linjen är vad ett mittenlag hade fått mot samma motståndare, hemma eller borta, enligt modellen: den ligger högt mot lätta motståndare och lågt mot svåra. Där lagets linje ligger över den prickade är fältet ljust – där spelade laget bättre än ett mittenlag hade gjort mot samma lag – och där den ligger under är det svagt.'),
       ex: ({ namn, t }) => {
         const l = t && t.fd && t.fd.serie;
         if (!l || l.length < 6) return null;
-        const s3 = (x, j) => dec(x.reduce((a, y) => a + y[j], 0) / x.length);
-        const forst = l.slice(0, 3);
         const sist = l.slice(-3);
-        // motståndet 0–100 i snitt, när alla tre har det
-        const m3 = (x) => (x.every((y) => y[3] != null) ? String(Math.round((100 * x.reduce((a, y) => a + y[3], 0)) / x.length)) : null);
-        const mot = m3(forst) && m3(sist) ? ` Motståndet låg på ${m3(forst)} i snitt i de tre första och ${m3(sist)} i de tre senaste.` : '';
-        return `${namn} skapade ${s3(forst, 1)} xG per match i de tre första matcherna och ${s3(sist, 1)} i de tre senaste, och släppte till ${s3(forst, 2)} och ${s3(sist, 2)}.${mot}`;
+        const s3 = (x, f) => x.reduce((a, y) => a + f(y), 0) / x.length;
+        const tal = (v) => `${v > 0 ? '+' : ''}${dec(v, 2)}`;
+        if (sist.every((y) => y.length >= 5)) {
+          const lagt = s3(sist, (y) => y[1] - y[2]);
+          const mitt = s3(sist, (y) => y[3] - y[4]);
+          return `${namn} hade ${tal(lagt)} i xG-skillnad per match i de tre senaste matcherna. Ett mittenlag hade haft ${tal(mitt)} mot samma motståndare, så ${namn} var ${lagt >= mitt ? 'bättre' : 'sämre'} än så.`;
+        }
+        const forst = l.slice(0, 3);
+        const d1 = (x, j) => dec(s3(x, (y) => y[j]));
+        return `${namn} skapade ${d1(forst, 1)} xG per match i de tre första matcherna och ${d1(sist, 1)} i de tre senaste, och släppte till ${d1(forst, 2)} och ${d1(sist, 2)}.`;
       },
     },
     'tio-matcher': {

@@ -140,11 +140,13 @@
 .reg-term .kv .kf { fill: rgba(65, 255, 110, 0.16); stroke: none; }
 .reg-term .kv .ka { stroke: var(--gron); stroke-width: 2px; }
 .reg-term .kv .ks { stroke: #c9ffd7; stroke-width: 2.6px; }
-/* motståndet under kurvan: talen står i raderna under figuren, med ett tunt
-   streck från nollan ner till vart och ett (kmt), och den här matchens
-   motståndare sist med ett streckat lodrätt streck genom figuren (knu) */
-.reg-term .kv .kmt { stroke: rgba(65, 255, 110, 0.22); stroke-width: 1px; }
-.reg-term .kv .knu { stroke: #c9ffd7; stroke-width: 1.2px; stroke-dasharray: 3 4; opacity: 0.75; }
+/* mot ett mittenlag (sedan 2026-11-19): mittenlagets linje prickad (kvan),
+   fältet ljust där laget var bättre (kfo) och svagt där det var sämre (kfs),
+   och teckenförklaringens prickade streck (lkp) */
+.reg-term .kv .kvan { stroke: var(--gron); stroke-width: 2.6px; stroke-dasharray: 0.1 6; stroke-linecap: round; }
+.reg-term .kv .kfo { fill: rgba(201, 255, 215, 0.2); stroke: none; }
+.reg-term .kv .kfs { fill: rgba(65, 255, 110, 0.07); stroke: none; }
+.reg-term .lkp { color: var(--gron); background: repeating-linear-gradient(90deg, currentColor 0 0.14em, transparent 0.14em 0.42em) left center / 100% 0.14em no-repeat; }
 .reg-term .lks, .reg-term .lkt { background: linear-gradient(currentColor, currentColor) left center / 100% 0.12em no-repeat; }
 .reg-term .lks { color: #c9ffd7; }
 /* matchaktens V-O-F (spegeln i rum-register.js): en stapel med vinsterna

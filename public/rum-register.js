@@ -255,80 +255,34 @@ window.RumRegister = (() => {
     : k ? `<span class="${k}">${esc(t)}</span>` : esc(t));
   // KURVAN i matchaktens xG (kurvan nedan): figuren i en bit av mellanslag,
   // lika bred som panelen, som går ner över x.k rader (rum-register.css). x:
-  // { w tecken, k rader, ru rader per 1,0 xG, f och a lagets och
-  // motståndarnas xG i snitt match för match, fyll fälten där f är över a,
-  // N platser (en fler än matcherna när matchens motståndare står sist) }.
-  // Linjerna har samma tjocklek hur figuren än dras ut (non-scaling-stroke),
-  // och skärmen i rummet ritar samma figur (kurva i rum-dator.js). Med x.km
-  // rader till står motståndets tal under figuren (x.mot, kurvMot nedan): ett
-  // tunt streck från nollan ner till varje tal, och ett streckat lodrätt
-  // streck vid matchens motståndare.
+  // { w tecken, k rader, N platser (matcherna), y0 raden för värdet 0, ry
+  // rader per 1,0, vagar [värde, klass] (de vågräta strecken), falt [lista av
+  // månghörningar av [plats, värde], klass] och linjer [värden, klass] (null
+  // där värdet saknas: linjen bryts) }. Linjerna har samma tjocklek hur
+  // figuren än dras ut (non-scaling-stroke), och skärmen i rummet ritar
+  // samma figur ur samma x (kurva i rum-dator.js).
   function kurvBit(t, x) {
     if (!x) return esc(t);
-    const { w } = x;
-    const k = x.k + (x.km || 0);
+    const { w, k } = x;
     const X = (i) => kurvX(x, i).toFixed(2);
     const Y = (v) => kurvY(x, v).toFixed(3);
-    const linje = (l) => l.map((v, i) => `${X(i)},${Y(v)}`).join(' ');
-    const fyll = x.fyll.map((p) => `M${p.map(([i, v]) => `${X(i)},${Y(v)}`).join('L')}Z`).join('');
-    const vag = (v, kl) => `<line class="${kl}" x1="0" x2="${w}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+    const linje = ([l, kl]) => kurvBitar(l).map((d) => `<polyline class="${kl}" points="${d.map(([i, v]) => `${X(i)},${Y(v)}`).join(' ')}"/>`).join('');
+    const falt = ([ps, kl]) => (ps.length ? `<path class="${kl}" d="${ps.map((p) => `M${p.map(([i, v]) => `${X(i)},${Y(v)}`).join('L')}Z`).join('')}"/>` : '');
+    const vag = ([v, kl]) => `<line class="${kl}" x1="0" x2="${w}" y1="${Y(v)}" y2="${Y(v)}"/>`;
     return `<span class="kv" style="--k:${k}">${esc(t)}<svg viewBox="0 0 ${w} ${k}" preserveAspectRatio="none" aria-hidden="true">` +
-      `${kurvMotSvg(x.mot)}${vag(1, 'kg')}${vag(2, 'kg')}${vag(0, 'k0')}${fyll ? `<path class="kf" d="${fyll}"/>` : ''}` +
-      `<polyline class="ka" points="${linje(x.a)}"/><polyline class="ks" points="${linje(x.f)}"/></svg></span>`;
+      `${x.vagar.map(vag).join('')}${x.falt.map(falt).join('')}${x.linjer.map(linje).join('')}</svg></span>`;
   }
-  function kurvMotSvg(m) {
-    if (!m) return '';
-    const f = (v) => v.toFixed(3);
-    return m.st.map(([x, y0, y1]) => `<line class="kmt" x1="${f(x)}" x2="${f(x)}" y1="${f(y0)}" y2="${f(y1)}"/>`).join('') +
-      (m.nu ? `<line class="knu" x1="${f(m.nu[0])}" x2="${f(m.nu[0])}" y1="${f(m.nu[1])}" y2="${f(m.nu[2])}"/>` : '');
+  // (en linje med luckor som delar av [plats, värde] utan null)
+  function kurvBitar(l) {
+    const ut = [];
+    let d = null;
+    l.forEach((v, i) => { if (v == null) d = null; else { if (!d) ut.push((d = [])); d.push([i, v]); } });
+    return ut.filter((x) => x.length > 1);
   }
   // (figurens mått: plats i, också mellan två, i tecken från panelens
-  // vänsterkant, och xG v i rader från figurens överkant)
+  // vänsterkant, och värdet v i rader från figurens överkant)
   const kurvX = (x, i) => { const n = x.N || x.f.length; return n > 1 ? 0.5 + (i * (x.w - 1)) / (n - 1) : x.w / 2; };
-  const kurvY = (x, v) => Math.max(0.05, Math.min(x.k - 0.05, x.k - 0.5 - v * x.ru));
-  // Motståndets tal under figuren, i samma mått: niva är svårigheten 0–1 per
-  // match (null när den är okänd) och nu matchens motståndares (eller null).
-  // Talen (0–100) står mitt under sin punkt, växelvis i x.km rader så att
-  // två tecken och ett mellanrum ryms; ryms de ändå inte (sent på säsongen
-  // på datorn) faller de bort som krockar med ett senare, streck och allt.
-  // { st: streck [x, y0, y1], nu: matchens streck, tal: [rad, kolumn, text,
-  // klass] } eller null. Talen över 50 (svårare än divisionens
-  // mittenlag) är gröna, de andra svaga, och matchens motståndares omvänt.
-  function kurvMot(x, niva, nu) {
-    if (!x.km || !niva.some((v) => v != null)) return null;
-    const tal = [];
-    const st = [];
-    const n = niva.length;
-    const lista = niva.map((v, i) => [i, v, v != null && v > 0.5 ? '' : 'd']);
-    if (nu != null) lista.push([n, nu, 'i']);
-    // (från den senaste och bakåt: varje rad fylls från höger)
-    const fri = Array(x.km).fill(Infinity);
-    for (let j = lista.length - 1; j >= 0; j--) {
-      const [i, v, kl] = lista[j];
-      if (v == null) continue;
-      const t = String(Math.round(100 * v));
-      const r = i % x.km;
-      const c = motKol(x, i, t);
-      if (c + t.length >= fri[r]) continue;
-      fri[r] = c;
-      tal.push([r, c, t, kl]);
-      if (kl !== 'i') st.push([kurvX(x, i), x.k - 0.5, x.k + r + 0.08]);
-    }
-    return { st, tal, nu: nu != null ? [kurvX(x, n), 0.2, x.k - 0.5] : null };
-  }
-  // talets kolumn: mitt under plats i, innanför panelen
-  const motKol = (x, i, t) => Math.max(0, Math.min(x.w - t.length, Math.round(kurvX(x, i) - t.length / 2)));
-  // två rader när N tal på två tecken ryms där med ett mellanrum, annars tre
-  function kurvMotRader(w, N) {
-    const x = { w, N, f: [] };
-    const slut = [-1, -1];
-    for (let i = 0; i < N; i++) {
-      const c = motKol(x, i, '50');
-      if (c <= slut[i % 2]) return 3;
-      slut[i % 2] = c + 2;
-    }
-    return 2;
-  }
+  const kurvY = (x, v) => Math.max(0.05, Math.min(x.k - 0.05, x.y0 - v * x.ry));
   // Bitar i följd med samma fråga blir en tryckbar bit (mätaren och platsen
   // i korten, som leder till rankningen): ett ställe att trycka på och en
   // rad för ↑/↓. Skärmen i rummet (rum-dator.js) läser bitarna en och en.
@@ -927,44 +881,49 @@ window.RumRegister = (() => {
     // KURVAN (sedan 2026-11-18, användarens val B Oscilloskopet bland fyra
     // skisser – Blockkurvan, Oscilloskopet, Matchstaplarna och Pilen vid
     // talet – efter frågan om hur datorn kunde visa vart ett lag är på väg):
-    // en sida i matchaktens xG med lagens xG match för match under säsongen
+    // en sida i matchaktens xG med lagen match för match under säsongen
     // (fd.serie i lagfilen, ligan; för landslagen Nations League), i snitt
-    // över tre matcher (färre i början), som linjer på ett oscilloskop: den
-    // ljusa är lagets egen xG och den gröna motståndarnas, och fältet mellan
-    // dem är fyllt där laget skapade mer än det släppte till. På datorn står
-    // lagen sida vid sida under sina namn, med 0, 1,0 och 2,0 i etiketternas
-    // spalt mellan dem; i telefonen under varandra med namnet över och talen
-    // till vänster. Under figuren månaderna. Med dolda resultat ett ?.
+    // över tre matcher (färre i början). På datorn står lagen sida vid sida
+    // under sina namn, med värdena i etiketternas spalt mellan dem; i
+    // telefonen under varandra med namnet över och värdena till vänster.
+    // Under figuren månaderna. Med dolda resultat ett ?.
     //
-    // Motståndet (sedan 2026-11-19, användarens invändning att kurvan "inte
-    // säger så mycket om man inte vet hur svårt motståndet är"): mellan
-    // figuren och månaderna motståndarens svårighet som tal, ett per match
-    // (fd.serie[i][3], samma skala som MOTSTÅNDET: 50 är divisionens
-    // mittenlag), med MOT i etiketternas spalt. Talen över 50 är gröna, de
-    // andra svaga. Sist, efter de spelade, står den här matchens motståndare
-    // omvänt (lagets niva i lagfilen, bara inom samma division), och kurvan
-    // slutar en plats före. Talen är matcherna en och en, inte i snitt, så
-    // att man ser vilka matcher en sväng i kurvan kommer ifrån. (Först, samma
-    // dag, en stapel per match – de såg nästan lika höga ut; bland fem
-    // skisser valde användaren B Namnen men med svårigheten i stället för
-    // lagnamnet.) Saknas svårigheten helt (Nations League) är raderna borta.
+    // Mot ett mittenlag (sedan 2026-11-19, användarens val B bland tre skisser
+    // efter frågan hur motståndets svårighet kunde synas i kurvan – samma dag
+    // först som staplar och sedan som tal under kurvan, som hen ville bli av
+    // med): den ljusa linjen är lagets xG-skillnad (skapat minus släppt till)
+    // och den prickade vad ett mittenlag hade fått mot samma motståndare,
+    // hemma eller borta (fd.serie[i][3] och [4], modellens väntade mål). Den
+    // prickade ligger högt mot lätta motståndare och lågt mot svåra, och
+    // fältet mellan linjerna är ljust där laget var bättre än så, svagt där
+    // det var sämre. Har inget av lagen mittenlagets värden (Nations League)
+    // är kurvan som förut: lagets xG ljus, motståndarnas grön, fältet fyllt
+    // där laget skapade mer.
     const KURVA = { k: 9, ru: 3, ktel: 6, rutel: 2, snitt: 3 };
     const MAN3 = ['JAN', 'FEB', 'MAR', 'APR', 'MAJ', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEC'];
-    // snittet över de senaste n matcherna (färre i början)
-    const glid = (l, n = KURVA.snitt) => l.map((_, i) => { const y = l.slice(Math.max(0, i - n + 1), i + 1); return y.reduce((a, b) => a + b, 0) / y.length; });
-    // fälten där f är över a, som månghörningar av [match, xG] (en match
-    // mellan två när linjerna korsas)
-    function kurvFyll(f, a) {
-      const l = [];
+    // snittet över de senaste n matcherna (färre i början), av de värden som
+    // finns; null när inget av dem finns
+    const glid = (l, n = KURVA.snitt) => l.map((_, i) => {
+      const y = l.slice(Math.max(0, i - n + 1), i + 1).filter((v) => v != null);
+      return y.length ? y.reduce((a, b) => a + b, 0) / y.length : null;
+    });
+    // fälten mellan f och a som månghörningar av [match, värde] (en match
+    // mellan två när linjerna korsas): [där f är över a, där f är under]
+    function kurvFalt(f, a) {
+      const ut = [[], []];
       for (let i = 0; i < f.length - 1; i++) {
+        if (f[i] == null || a[i] == null || f[i + 1] == null || a[i + 1] == null) continue;
         const d0 = f[i] - a[i];
         const d1 = f[i + 1] - a[i + 1];
-        const kors = () => { const t = d0 / (d0 - d1); return [i + t, f[i] + t * (f[i + 1] - f[i])]; };
-        if (d0 >= 0 && d1 >= 0) l.push([[i, f[i]], [i + 1, f[i + 1]], [i + 1, a[i + 1]], [i, a[i]]]);
-        else if (d0 >= 0) l.push([[i, f[i]], kors(), [i, a[i]]]);
-        else if (d1 >= 0) l.push([kors(), [i + 1, f[i + 1]], [i + 1, a[i + 1]]]);
+        if ((d0 >= 0) === (d1 >= 0)) ut[d0 >= 0 ? 0 : 1].push([[i, f[i]], [i + 1, f[i + 1]], [i + 1, a[i + 1]], [i, a[i]]]);
+        else {
+          const t = d0 / (d0 - d1);
+          const kors = [i + t, f[i] + t * (f[i + 1] - f[i])];
+          ut[d0 >= 0 ? 0 : 1].push([[i, f[i]], kors, [i, a[i]]]);
+          ut[d1 >= 0 ? 0 : 1].push([kors, [i + 1, f[i + 1]], [i + 1, a[i + 1]]]);
+        }
       }
-      return l;
+      return ut;
     }
     // månaderna under en panel w tecken bred: tre bokstäver mitt under
     // månadens matcher, när de ryms
@@ -982,12 +941,18 @@ window.RumRegister = (() => {
       }
       return ch.join('');
     }
-    // ett lags panel: k rader w tecken breda (figuren i den första) och
-    // månaderna; nu är matchens motståndares svårighet och dag (eller null)
-    function kurvPanel(t, w, k, ru, veil, km, nu) {
+    // figurens mått: mot ett mittenlag nollan i mitten och 1,0 per två rader
+    // (en i telefonen), som förut nollan längst ner och ru rader per 1,0
+    const kurvMatt = (tel, mitten) => {
+      const k = tel ? KURVA.ktel : KURVA.k;
+      return mitten ? { k, y0: tel ? 2.5 : 4.5, ry: tel ? 1 : 2 } : { k, y0: k - 0.5, ry: tel ? KURVA.rutel : KURVA.ru };
+    };
+    // ett lags panel: k rader w tecken breda (figuren i den första) och månaderna
+    function kurvPanel(t, w, M, mitten, veil) {
+      const { k } = M;
       const tomt = () => [pad('', w), ''];
       const text = (x, kl) => {
-        const r = Array.from({ length: k + km }, tomt);
+        const r = Array.from({ length: k }, tomt);
         r[Math.floor(k / 2)] = [pad(pad('', Math.max(0, Math.floor((w - x.length) / 2))) + x, w), kl];
         return { rader: r, man: pad('', w) };
       };
@@ -995,67 +960,43 @@ window.RumRegister = (() => {
       const sr = fdOf(t, 'serie');
       if (!sr || !sr.length) return text('INGEN xG', 'd');
       if (sr.length < KURVA.snitt) return text('FÖR FÅ MATCHER', 'd');
-      const f = glid(sr.map((y) => y[1]));
-      const a = glid(sr.map((y) => y[2]));
-      const niva = sr.map((y) => (y[3] != null ? y[3] : null));
-      // (matchens motståndare sist, när det finns tal att ställa den bredvid)
-      const sist = km && nu && niva.some((v) => v != null) ? nu : null;
-      const fig = { w, k, ru, km, f, a, fyll: kurvFyll(f, a), N: f.length + (sist ? 1 : 0) };
-      fig.mot = kurvMot(fig, niva, sist ? sist.niva : null);
-      const rader = [[pad('', w), 'kv', null, fig], ...Array.from({ length: k + km - 1 }, tomt)];
-      // talen i sina rader, som bitar mellan mellanslagen
-      if (fig.mot) {
-        for (let r = 0; r < km; r++) {
-          const l = fig.mot.tal.filter((x) => x[0] === r).sort((x, y) => x[1] - y[1]);
-          if (!l.length) continue;
-          const b = [];
-          let c = 0;
-          for (const [, cc, tt, kl] of l) { if (cc > c) b.push([pad('', cc - c), '']); b.push([tt, kl]); c = cc + tt.length; }
-          if (c < w) b.push([pad('', w - c), '']);
-          rader[k + r] = b;
-        }
+      const fig = { w, ...M, N: sr.length };
+      if (mitten) {
+        const f = glid(sr.map((y) => y[1] - y[2]));
+        const v = glid(sr.map((y) => (y.length >= 5 ? y[3] - y[4] : null)));
+        const [over, under] = kurvFalt(f, v);
+        Object.assign(fig, { vagar: [[1, 'kg'], [-1, 'kg'], [0, 'k0']], falt: [[over, 'kfo'], [under, 'kfs']], linjer: [[v, 'kvan'], [f, 'ks']] });
+      } else {
+        const f = glid(sr.map((y) => y[1]));
+        const a = glid(sr.map((y) => y[2]));
+        Object.assign(fig, { vagar: [[1, 'kg'], [2, 'kg'], [0, 'k0']], falt: [[kurvFalt(f, a)[0], 'kf']], linjer: [[a, 'ka'], [f, 'ks']] });
       }
-      return { rader, man: kurvMan([...sr.map((y) => y[0]), ...(sist ? [sist.dag] : [])], w) };
+      return { rader: [[pad('', w), 'kv', null, fig], ...Array.from({ length: k - 1 }, tomt)], man: kurvMan(sr.map((y) => y[0]), w) };
     }
-    function kurvan(G, T, lag, veil, m) {
+    function kurvan(G, T, lag, veil) {
       if (!veil && !T.some((t) => fdOf(t, 'serie'))) return [];
       const q = ordQ('kurvan');
-      const r = [spMitt(G, [['  ', 'lks', q], [' SKAPAR   ', 'v', q], ['  ', 'lkt', q], [' SLÄPPER TILL', '', q], ...(G.tel ? [] : [['   TRE MATCHER I SNITT', 'd', q]])])];
-      const w = G.tel ? G.B - 4 : G.S - 1;
-      // matchens motståndare för vart lag: det andra lagets svårighet, när
-      // lagen spelar i samma division och matchen inte redan står i serien
-      const dag = m && m.kickoff ? String(m.kickoff).slice(0, 10) : null;
-      const nu = T.map((t, j) => {
-        const o = T[1 - j];
-        const sr = fdOf(t, 'serie');
-        if (!dag || !o || !t || !t.comp || o.comp !== t.comp || o.niva == null || !sr || !sr.length || sr[sr.length - 1][0] >= dag) return null;
-        return { niva: o.niva, dag };
-      });
-      // motståndets rader när något av lagen har det: två, eller tre när
-      // talen inte ryms i två
-      const harMot = (t) => (fdOf(t, 'serie') || []).some((y) => y[3] != null);
-      const km = !veil && T.some(harMot)
-        ? Math.max(...T.map((t, j) => (harMot(t) ? kurvMotRader(w, fdOf(t, 'serie').length + (nu[j] ? 1 : 0)) : 2)))
-        : 0;
-      // raderna där 0, 1,0 och 2,0 står, och MOT vid talens första (mittersta)
-      const axel = (k, ru) => new Map([...[0, 1, 2].map((v) => [k - 1 - v * ru, v ? num(v, 1) : '0']).filter(([i]) => i >= 0), ...(km ? [[k + Math.floor((km - 1) / 2), 'MOT']] : [])]);
-      // (en panelrad är en bit eller en lista av bitar)
-      const bitar = (x) => (Array.isArray(x[0]) ? x : [x]);
+      // mot ett mittenlag när något av lagen har mittenlagets värden
+      const mitten = T.some((t) => (fdOf(t, 'serie') || []).some((y) => y.length >= 5));
+      const r = [spMitt(G, mitten
+        ? [['  ', 'lks', q], [' LAGET   ', 'v', q], ['   ', 'lkp', q], [G.tel ? ' ETT MITTENLAG' : ' ETT MITTENLAG MOT SAMMA LAG', '', q], ...(G.tel ? [] : [['   TRE I SNITT', 'd', q]])]
+        : [['  ', 'lks', q], [' SKAPAR   ', 'v', q], ['  ', 'lkt', q], [' SLÄPPER TILL', '', q], ...(G.tel ? [] : [['   TRE MATCHER I SNITT', 'd', q]])])];
+      const M = kurvMatt(G.tel, mitten);
+      // raderna där värdena står: +1,0, 0 och -1,0 mot ett mittenlag, annars 0, 1,0 och 2,0
+      const ax = new Map((mitten ? [1, 0, -1] : [0, 1, 2]).map((v) => [Math.round(kurvY(M, v) - 0.5), v === 0 ? '0' : `${mitten && v > 0 ? '+' : v < 0 ? '-' : ''}${G.tel && mitten ? Math.abs(v) : num(v, 1)}`]));
       if (!G.tel) {
-        const { k, ru } = KURVA;
-        const p = T.map((t, j) => kurvPanel(t, w, k, ru, veil, km, nu[j]));
-        const ax = axel(k, ru);
-        for (let i = 0; i < k + km; i++) r.push(spRad(G, bitar(p[0].rader[i]), ax.get(i) || '', null, bitar(p[1].rader[i])));
+        const w = G.S - 1;
+        const p = T.map((t) => kurvPanel(t, w, M, mitten, veil));
+        for (let i = 0; i < M.k; i++) r.push(spRad(G, [p[0].rader[i]], ax.get(i) || '', null, [p[1].rader[i]]));
         r.push(spRad(G, [[p[0].man, 'd']], '', null, [[p[1].man, 'd']]));
         return r;
       }
-      const { ktel: k, rutel: ru } = KURVA;
-      const ax = axel(k, ru);
+      const w = G.B - 4;
       T.forEach((t, j) => {
-        const p = kurvPanel(t, w, k, ru, veil, km, nu[j]);
+        const p = kurvPanel(t, w, M, mitten, veil);
         if (j) r.push(tom());
         r.push(rad([pad('', G.M), ''], [kort(lag[j]).slice(0, G.B), 'v', `#lag:${lag[j]}`]));
-        for (let i = 0; i < k + km; i++) r.push(rad([pad('', G.M), ''], [`${padL(ax.get(i) || '', 3)} `, 'd'], ...bitar(p.rader[i])));
+        for (let i = 0; i < M.k; i++) r.push(rad([pad('', G.M), ''], [`${padL(ax.get(i) || '', 3)} `, 'd'], p.rader[i]));
         r.push(rad([pad('', G.M + 4), ''], [p.man, 'd']));
       });
       return r;
@@ -1780,7 +1721,7 @@ window.RumRegister = (() => {
       }
 
       // flikarnas sidor (AKTSIDOR): 'oversikt/2' och 'malen/2' är den andra sidan
-      const flikar = { oversikt, 'oversikt/2': tioLista, malen, 'malen/2': malen2, xg, 'xg/2': kurvan(G, T, lag, S.veil, m), laget, moten: moten(m) };
+      const flikar = { oversikt, 'oversikt/2': tioLista, malen, 'malen/2': malen2, xg, 'xg/2': kurvan(G, T, lag, S.veil), laget, moten: moten(m) };
       // (raderna och listorna med rader som dragkampens delar ger, i en lista)
       const platta = (l) => l.flatMap((x) => (!x ? [] : x.length && Array.isArray(x[0]) && Array.isArray(x[0][0]) ? x : [x]));
       const rader = (id) => tvatt(platta(flikar[id] || []));

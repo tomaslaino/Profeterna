@@ -33,7 +33,6 @@ const { readCache } = require('./store');
 const { keyOf, espnKey } = require('./teams');
 const r1 = (x) => Math.round(x * 10) / 10;
 const { scoreMatrix, outcomes } = require('./model');
-const { median, difficulty } = require('./strength');
 
 const DIVS = COMPETITIONS.filter((c) => c.fdcouk);
 
@@ -95,9 +94,10 @@ function add(e, r, s, strengthOf, oppKey) {
     e.xg.xd += px;
     e.xg.pts += gf > ga ? 3 : gf === ga ? 1 : 0;
     if (gf === ga) e.xg.d++;
-    // (matchen i serien för datorns kurva: datumet, lagets xG, motståndarens
-    // och motståndarens styrka, som serieAv gör om till svårighet)
-    if (r.date) e.serie.push([r.date, r2(own('HxG', 'AxG')), r2(opp('HxG', 'AxG')), strengthOf(oppKey)]);
+    // (matchen i serien för datorns kurva: datumet, lagets xG, motståndarens,
+    // motståndaren och om laget spelade hemma, som serieAv gör om till vad
+    // ett mittenlag brukar få i samma match)
+    if (r.date) e.serie.push([r.date, r2(own('HxG', 'AxG')), r2(opp('HxG', 'AxG')), oppKey, H]);
   }
   if (fin(r.HS) && fin(r.AS) && fin(r.HST) && fin(r.AST)) {
     e.sh.n++;
@@ -141,20 +141,20 @@ function add(e, r, s, strengthOf, oppKey) {
 
 // xG match för match (sedan 2026-11-18, datorns KURVAN i matchakten,
 // användarens val B Oscilloskopet bland fyra skisser): [datum, lagets xG,
-// motståndarens xG, motståndets svårighet] för varje match med xG, äldst
-// först; null utan någon. Svårigheten (sedan 2026-11-19, användarens
-// invändning att kurvan "inte säger så mycket om man inte vet hur svårt
-// motståndet är") är samma 0–1 som formens motstånd: motståndarens väntade
-// resultat mot divisionens mittenlag efter modellens styrka just nu
-// (difficulty i src/strength.js). niva(styrka) ger den; utan niva, eller när
-// motståndarens styrka är okänd, har matchen bara de tre första fälten.
-function serieAv(e, niva) {
+// motståndarens xG, vad ett mittenlag brukar skapa, vad det brukar släppa
+// till] för varje match med xG, äldst först; null utan någon. De två sista
+// (sedan 2026-11-19, användarens val B Mot ett mittenlag efter frågan om
+// motståndets svårighet i kurvan) är modellens väntade mål för ett lag med
+// divisionens snittanfall och snittförsvar mot samma motståndare, på samma
+// plan: vantat(motståndare, hemma) ger dem. Utan vantat, eller när
+// motståndaren saknas i modellen, har matchen bara de tre första fälten.
+function serieAv(e, vantat) {
   if (!e.serie.length) return null;
   return [...e.serie]
     .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
-    .map(([d, f, a, r]) => {
-      const n = niva && r != null ? niva(r) : null;
-      return n == null ? [d, f, a] : [d, f, a, Math.round(100 * n) / 100];
+    .map(([d, f, a, o, hemma]) => {
+      const v = vantat && o != null ? vantat(o, hemma) : null;
+      return v ? [d, f, a, r2(v[0]), r2(v[1])] : [d, f, a];
     });
 }
 
@@ -217,10 +217,19 @@ function divisionTeams(div, strengthAll) {
   const ratings = teams.map((t) => strengthOf(t.key));
   const known = ratings.filter((x) => x != null);
   const total = known.reduce((s, x) => s + x, 0);
-  // (kurvans motstånd: mot divisionens mittenlag, som formens)
-  const mitten = known.length > 1 ? median(known) : null;
-  const scale = strengthAll && strengthAll.scale;
-  const niva = mitten == null ? null : (r) => difficulty(r - mitten, scale);
+  // Kurvans mittenlag: modellen säger hemmalagets mål = anfall · bortalagets
+  // försvar · hemmafördelen och bortalagets = anfall · hemmalagets försvar.
+  // Mittenlaget har divisionens snittanfall och snittförsvar (geometriska
+  // medel), och vantat ger dess mål mot motståndaren k, hemma eller borta.
+  const ab = new Map(((strengthAll && strengthAll.list) || []).map((t) => [t.key, t]));
+  const egna = [...byKey.keys()].map((k) => ab.get(k)).filter((t) => t && t.a > 0 && t.b > 0);
+  const hf = strengthAll && strengthAll.scale ? strengthAll.scale.home : null;
+  const gm = (f) => Math.exp(egna.reduce((s, t) => s + Math.log(f(t)), 0) / egna.length);
+  const A0 = egna.length > 1 ? gm((t) => t.a) : null;
+  const B0 = egna.length > 1 ? gm((t) => t.b) : null;
+  const vantat = A0 && B0 && hf > 0
+    ? (k, hemma) => { const o = ab.get(k); return o && o.a > 0 && o.b > 0 ? [A0 * o.b * (hemma ? hf : 1), o.a * B0 * (hemma ? 1 : hf)] : null; }
+    : null;
 
   const hb = hemmaBorta(div, teams, rows);
   const out = teams.map((t, i) => {
@@ -233,9 +242,6 @@ function divisionTeams(div, strengthAll) {
       espnId: t.espnId,
       ...t.table,
       str: own != null && known.length ? r2(own - total / known.length) : null,
-      // (hur svårt laget är att möta, 0–1 på serie-fältets skala: datorns
-      // KURVAN sätter talet sist under kurvan för matchens motståndare)
-      niva: niva && own != null ? r2(niva(own)) : null,
       fd: e ? {
         n: e.n, w: e.w, d: e.d, l: e.l, gf: e.gf, ga: e.ga,
         cs: e.cs, fts: e.fts, o25: e.o25, btts: e.btts,
@@ -246,7 +252,7 @@ function divisionTeams(div, strengthAll) {
         cards: e.cards.n ? e.cards : null,
         mkt: e.mkt.n ? { n: e.mkt.n, xp: r2(e.mkt.xp), pts: e.mkt.pts, ret: r2(e.mkt.ret), fav: e.mkt.fav } : null,
         opp: e.opp.n && expOpp != null ? r3(e.opp.sum / e.opp.n - expOpp) : null,
-        serie: serieAv(e, niva),
+        serie: serieAv(e, vantat),
       } : null,
       hb: hb.get(t.key) || null,
     };

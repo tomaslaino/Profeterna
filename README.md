@@ -1398,6 +1398,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bättre och bad sedan om "olika visualiseringsförslag". Av elva skisser i tre grupper (det som skiljer mest,
   riktningen och säkerheten) valde hen *B Oscilloskopet* i gruppen om riktningen: en ny sida KURVAN i matchaktens
   xG med lagens xG match för match under säsongen. Se [Kurvan](#kurvan) under Datorn.
+- **Kurvan mot ett mittenlag (2026-11-19, användarens val):** talen under kurvan sa hur svåra motståndarna var
+  men inte hur bra laget var mot dem, och användaren ville bli av med dem. Efter tre skissomgångar valde hen *B Mot
+  ett mittenlag*: lagets xG-skillnad match för match mot en prickad linje för vad ett mittenlag hade fått mot samma
+  motståndare, ljust där laget var bättre. Talen och lagens `niva` i lagfilerna är borta. Se [Kurvan](#kurvan).
 - **Motståndet under kurvan som tal (2026-11-19, användarens val):** kurvan sa lite utan att man visste hur svåra
   motståndarna var, och staplarna som kom först samma dag såg nästan lika höga ut. Av fem skisser (ljuset bakom
   kurvan, namnen under matcherna, väntad xG mot samma motstånd, spridningen och högarna) ville användaren ha namnen
@@ -9408,33 +9412,41 @@ som ett som har varit jämnt hela hösten.
   den gröna motståndarnas, och fältet mellan dem är fyllt där laget skapade mer än det släppte till. Varje punkt är
   snittet av tre matcher (de två första av en och två), så att en enstaka match inte drar iväg. Den första matchen
   står till vänster, och under kurvan står månaderna mitt under sina matcher.
-- **På datorn** står lagen sida vid sida under sina namn, med *0*, *1,0* och *2,0* i etiketternas spalt mellan
-  dem: nio rader, tre per 1,0 xG, och över 2,8 står linjen i taket. Med motståndets två rader är sidan fjorton
-  rader och rullar en rad.
-  **I telefonen** står lagen under varandra med namnet över och talen till vänster: sex rader, två per 1,0 xG.
-- **Datan** är `fd.serie` i `data/teams/<division>.json`: `[datum, lagets xG, motståndarens xG]` för varje
-  ligamatch med xG, äldst först (`serieAv` i [src/teamstats.js](src/teamstats.js)). Den kommer ur samma rader i
+- **Mot ett mittenlag** (2026-11-19, se nedan) i ligorna: den ljusa linjen är lagets xG-skillnad (skapat minus
+  släppt till) och den prickade vad ett mittenlag hade fått mot samma motståndare, hemma eller borta. Den prickade
+  ligger högt mot lätta motståndare och lågt mot svåra, och fältet mellan linjerna är ljust där laget var bättre än
+  så och svagt där det var sämre. Nations League har inga sådana värden och visar lagets och motståndarnas xG som
+  förut.
+- **På datorn** står lagen sida vid sida under sina namn, med värdena i etiketternas spalt mellan dem: nio rader.
+  Mot ett mittenlag står nollan i mitten med *+1,0* och *-1,0* två rader upp och ner (över ±2,2 står linjen i
+  taket eller golvet); i Nations League *0*, *1,0* och *2,0*, tre rader per 1,0 xG. Sidan är tolv rader och ryms
+  utan att rulla.
+  **I telefonen** står lagen under varandra med namnet över och värdena till vänster: sex rader, en per 1,0 mot ett
+  mittenlag och två per 1,0 i Nations League.
+- **Datan** är `fd.serie` i `data/teams/<division>.json`: `[datum, lagets xG, motståndarens xG, vad ett mittenlag
+  brukar skapa, vad det brukar släppa till]` för varje ligamatch med xG, äldst först (`serieAv` i
+  [src/teamstats.js](src/teamstats.js)). Mittenlagets värden är modellens väntade mål för ett lag med divisionens
+  snittanfall och snittförsvar (geometriska medel av lagens anfall och försvar i modellen) mot samma motståndare,
+  med hemmafördelen där matchen spelades; saknas motståndaren i modellen har matchen bara de tre första fälten. Den kommer ur samma rader i
   football-data.co.uk som lagets övriga xG och släpar alltså en omgång som de. För landslagen är det Nations Leagues
   matcher ur 365Scores (`data/teams/unl.json`). Färre än tre matcher ger *FÖR FÅ MATCHER* och ett lag utan xG
   *INGEN xG*; har inget av lagen xG finns ingen sida. Med dolda resultat står ett ?.
-- **Motståndet** (2026-11-19) står under figuren, med *MOT* i etiketternas spalt: motståndarens svårighet som tal
-  under varje match, på samma skala som *MOTSTÅNDET* i översikten (motståndarens chans mot divisionens mittenlag på
-  neutral plan, där oavgjort är en halv; 50 är ett lag som mittenlaget). Talen över 50 är gröna och de andra svaga,
-  och ett tunt streck går från nollan ner till vart och ett. Talen står växelvis i två rader, så att två siffror och
-  ett mellanrum ryms; på datorn blir det tre rader från ungefär den femtonde matchen, och ryms de inte ens då (sent på
-  säsongen) faller de tal bort som krockar med ett senare. Sist står den här matchens motståndare omvänt, med ett
-  streckat lodrätt streck genom figuren, och kurvan slutar en plats före – bara när lagen spelar i samma division
-  och matchen inte redan finns i serien. Talet per match är `fd.serie[i][3]` och motståndarens `niva` i lagfilen
-  (`divisionTeams` i [src/teamstats.js](src/teamstats.js)); `kurvMot` och `kurvMotRader` i
-  [public/rum-register.js](public/rum-register.js) placerar talen. Nations League har ingen svårighet och inga rader.
-  Först samma dag var motståndet en stapel per match, men skalan är smal (i Premier League 30–71), så staplarna såg
-  nästan lika höga ut.
-- **Teckenförklaringen** överst öppnar rutan med förklaringen och ett exempel per lag, de tre första matcherna mot de
-  tre senaste (*Arsenal skapade 2,2 xG per match i de tre första matcherna och 1,2 i de tre senaste …*; `kurvan`
-  i [public/rum-register-ord.js](public/rum-register-ord.js)).
+- **Motståndet** syntes först (2026-11-19) som en stapel per match under kurvan och sedan som motståndarens
+  svårighet i tal (0–100, samma skala som *MOTSTÅNDET*) med matchens motståndare sist. Användaren tyckte att det
+  inte gick att läsa formen ur det: staplarna såg nästan lika höga ut (skalan är 30–71 i Premier League), och talen
+  sa hur svåra motståndarna var men inte hur bra laget var mot dem. Tre skissomgångar (formen som nivå, formen utan
+  talen, siffror på skapat och släppt till mot ett mittenlag) visade att en omräknad kurva inte heller förklarade
+  sig själv. Det som fungerade var att visa jämförelsen: vad ett mittenlag brukar få mot samma motståndare bredvid
+  vad laget fick. Användaren valde *B Mot ett mittenlag* bland *A Ribban* (en pinne per match från mittenlagets
+  värde till lagets), *B* och *C Skapat och släppt till* (staplar uppåt och nedåt med mittenlagets streck).
+- **Teckenförklaringen** överst öppnar rutan med förklaringen och ett exempel per lag: de tre senaste matcherna mot
+  vad ett mittenlag hade fått (*Tottenham hade +0,79 i xG-skillnad per match i de tre senaste matcherna. Ett
+  mittenlag hade haft −0,09 mot samma motståndare …*); i Nations League de tre första mot de tre senaste. `kurvan`
+  i [public/rum-register-ord.js](public/rum-register-ord.js).
 - **Ritningen:** i terminalen är figuren en bit av mellanslag i den första raden, lika bred som panelen, med en SVG
   som går ner över de andra raderna (`kurvBit` i [public/rum-register.js](public/rum-register.js), `.kv` i
-  [public/rum-register.css](public/rum-register.css)). Linjerna är lika tjocka hur figuren än dras ut. Skärmen i
+  [public/rum-register.css](public/rum-register.css)). Biten bär figuren som vågräta streck, fält och linjer
+  (`kurvPanel`), så att båda lägena ritas av samma kod. Linjerna är lika tjocka hur figuren än dras ut. Skärmen i
   rummet ritar samma figur ur samma bit (`kurva` i [public/rum-dator.js](public/rum-dator.js)).
 
 Provat 2026-11-18 i huvudlös Chromium mot ett bygge utan källor (`--no-fetch`) med påhittade lagfiler (xG för tolv

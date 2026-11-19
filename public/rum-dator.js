@@ -663,6 +663,10 @@ export async function dator(o) {
             // KURVANS teckenförklaring: lagets linje (ljus) och motståndarnas (grön)
             g.fillStyle = k === 'lks' ? FARG.v : FARG[''];
             g.fillRect(x, y + lh / 2 - 1.5 * k34, w, 3 * k34);
+          } else if (k === 'lkp') {
+            // och mittenlagets prickade linje
+            g.fillStyle = FARG[''];
+            for (let j = 0; j < w; j += cw * 0.55) g.fillRect(x + j, y + lh / 2 - 1.5 * k34, 3 * k34, 3 * k34);
           } else if (k === 'kv' && fig) {
             kurva(g, fig, x, y - 2, w, lh, k34);
           }
@@ -691,51 +695,46 @@ export async function dator(o) {
 
   // Matchaktens KURVAN (kurvBit i rum-register.js, sedan 2026-11-18) på
   // skärmen: samma figur som i terminalen, från biten (x0, y0, bredd) och ner
-  // över fig.k rader – nollan, 1,0 och 2,0, fältet där laget skapade mer än
-  // det släppte till och de två linjerna med sitt sken (motståndets tal står
-  // som text i raderna under och ritas med dem)
+  // över fig.k rader – de vågräta strecken, fälten och linjerna med sitt sken
+  // (mot ett mittenlag sedan 2026-11-19: mittenlagets linje prickad, fältet
+  // ljust där laget var bättre och svagt där det var sämre)
+  const KURV_FARG = { kg: 'rgba(65,255,110,.2)', k0: null, kf: 'rgba(65,255,110,.16)', kfo: 'rgba(201,255,215,.2)', kfs: 'rgba(65,255,110,.07)' };
   function kurva(g, fig, x0, y0, bredd, lh, k34) {
-    const { w, k, ru, f, a, fyll, mot } = fig;
-    const n = fig.N || f.length;
+    const { w, k } = fig;
+    const n = fig.N;
     const X = (i) => x0 + ((n > 1 ? 0.5 + (i * (w - 1)) / (n - 1) : w / 2) / w) * bredd;
-    const Y = (v) => y0 + Math.max(0.05, Math.min(k - 0.05, k - 0.5 - v * ru)) * lh;
+    const Y = (v) => y0 + Math.max(0.05, Math.min(k - 0.05, fig.y0 - v * fig.ry)) * lh;
     g.save();
     g.shadowColor = 'transparent';
-    g.fillStyle = 'rgba(65,255,110,.2)';
-    for (const v of [1, 2]) g.fillRect(x0, Y(v) - 0.5 * k34, bredd, k34);
-    g.fillStyle = FARG.d;
-    g.fillRect(x0, Y(0) - 0.75 * k34, bredd, 1.5 * k34);
-    g.fillStyle = 'rgba(65,255,110,.16)';
-    for (const p of fyll || []) {
-      g.beginPath();
-      p.forEach(([i, v], j) => (j ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))));
-      g.closePath();
-      g.fill();
+    for (const [v, kl] of fig.vagar) {
+      const h = (kl === 'k0' ? 1.5 : 1) * k34;
+      g.fillStyle = KURV_FARG[kl] || FARG.d;
+      g.fillRect(x0, Y(v) - h / 2, bredd, h);
+    }
+    for (const [ps, kl] of fig.falt) {
+      g.fillStyle = KURV_FARG[kl] || KURV_FARG.kf;
+      for (const p of ps) {
+        g.beginPath();
+        p.forEach(([i, v], j) => (j ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))));
+        g.closePath();
+        g.fill();
+      }
     }
     g.shadowColor = 'rgba(65,255,110,.55)';
     g.shadowBlur = 8 * k34;
     g.lineJoin = 'round';
-    for (const [l, farg, b] of [[a, FARG[''], 2], [f, FARG.v, 2.6]]) {
-      g.strokeStyle = farg;
-      g.lineWidth = b * k34;
+    for (const [l, kl] of fig.linjer) {
+      const prick = kl === 'kvan';
+      g.strokeStyle = kl === 'ks' ? FARG.v : FARG[''];
+      g.lineWidth = (kl === 'ks' || prick ? 2.6 : 2) * k34;
+      g.lineCap = prick ? 'round' : 'butt';
+      g.setLineDash(prick ? [0.1, 6 * k34] : []);
       g.beginPath();
-      l.forEach((v, i) => (i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))));
+      let i0 = true;
+      l.forEach((v, i) => { if (v == null) { i0 = true; return; } if (i0) g.moveTo(X(i), Y(v)); else g.lineTo(X(i), Y(v)); i0 = false; });
       g.stroke();
     }
-    // motståndets streck under figuren (kurvMot i rum-register.js), i tecken
-    // och rader: från nollan ner till varje tal, och det streckade vid
-    // matchens motståndare
-    if (mot) {
-      const px = (x) => x0 + (x / w) * bredd;
-      g.shadowColor = 'transparent';
-      g.fillStyle = 'rgba(65,255,110,.22)';
-      for (const [x, ya, yb] of mot.st) g.fillRect(px(x) - 0.5 * k34, y0 + ya * lh, k34, (yb - ya) * lh);
-      if (mot.nu) {
-        const [x, ya, yb] = mot.nu;
-        g.fillStyle = 'rgba(201,255,215,.6)';
-        for (let y = ya * lh; y < yb * lh; y += 7 * k34) g.fillRect(px(x) - 0.6 * k34, y0 + y, 1.2 * k34, Math.min(3 * k34, yb * lh - y));
-      }
-    }
+    g.setLineDash([]);
     g.restore();
   }
 
