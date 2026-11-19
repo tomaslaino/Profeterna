@@ -49,8 +49,10 @@
 /* väggen och disken mörknar bakom samtalet, så att texten går att läsa */
 .rh-mork { position: absolute; top: 0; bottom: 0; left: 0; width: var(--mork, 40%); background: linear-gradient(to right, rgba(14, 8, 4, 0.8) 72%, rgba(14, 8, 4, 0)); pointer-events: none; transition: opacity 0.32s ease-out; }
 .rum-hasse-vy.hog .rh-mork { z-index: 1; width: auto; right: 0; top: var(--mork, 46%); bottom: 0; background: linear-gradient(to bottom, rgba(18, 12, 7, 0), rgba(18, 12, 7, 0.72) 90px, rgba(18, 12, 7, 0.9) 40%, #120c07 86%); }
-/* hans text om matchen upp till kragen (tillKragen i rum-hasse.js): mörkret därifrån tonas fram över kroppen och disken */
-.rum-hasse-vy.hog .rh-mork::before { content: ''; position: absolute; left: 0; right: 0; top: calc(var(--mork-krage, 0px) - var(--mork, 0px)); bottom: 0; background: linear-gradient(to bottom, rgba(18, 12, 7, 0), rgba(18, 12, 7, 0.8) 80px, rgba(18, 12, 7, 0.93) 150px, #120c07 70%); opacity: 0; transition: opacity 0.35s ease-out; }
+/* hans text om matchen upp till kragen (tillKragen i rum-hasse.js): mörkret därifrån tonas fram över kroppen och disken.
+   Det börjar strax ovanför samtalet, under hakan, så att ansiktet, kragen och slipsen står i ljuset (förut började det
+   en bit upp i ansiktet, och han syntes knappt: ändrat 2026-11-19) */
+.rum-hasse-vy.hog .rh-mork::before { content: ''; position: absolute; left: 0; right: 0; top: calc(var(--mork-krage, 0px) - var(--mork, 0px)); bottom: 0; background: linear-gradient(to bottom, rgba(18, 12, 7, 0), rgba(18, 12, 7, 0.7) 64px, rgba(18, 12, 7, 0.92) 130px, #120c07 70%); opacity: 0; transition: opacity 0.35s ease-out; }
 .rum-hasse-vy.hog.kragen .rh-mork::before { opacity: 1; }
 /* Samma ton över hela bilden: hörnen mörknar, varmt bakom honom och lite kallt från affären till
    höger. (Förut rörde sig också ett korn över hela bilden, ett lager dubbelt så stort som fönstret som
