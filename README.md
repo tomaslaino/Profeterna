@@ -2166,6 +2166,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   se naturligt ut håller han cigarren bara i de lägen som redan är prövade (vid axeln, framför bröstet, vid munnen),
   och leendet viker undan när han spetsar läpparna. Röken mot taket gick först rakt upp och lade sig då framför
   ansiktet; nu går den snett förbi det. Se [Hasse Backe](#hasse-backe), *Cigarren*.
+- **Hasse Backe dricker kaffet naturligare och på fem sätt till (2026-11-19, användarens önskemål):** "Kan du
+  förbättra Hasses kaffedrickarrörelser och ge honom fler." När han höll koppen framför sig (under hakan, vid
+  bröstet, framhållen) gick underarmen vågrätt ut till en armbåge i axelhöjd, som en vinge. Nu pekar örat snett
+  bakåt i de lägena, så att underarmen kommer underifrån och armbågen hänger längs sidan eller vilar på pulten;
+  vid skålen står koppen upprätt. Han tittar också ned på koppen när han tar den och när han ställer ned den.
+  Fem nya sätt: en snabb klunk i förbigående (`snabb`), han granskar en över koppkanten med ett bryn uppe
+  (`granska`), dricker ur och håller upp den tomma koppen mot baren för en påtår (`patar`), spiller på slipsen,
+  håller undan koppen och torkar, och tittar upp som om ingenting har hänt (`spill`), och torkar sig om munnen
+  med knogen efter en ordentlig klunk (`torka`). Se [Hasse Backe](#hasse-backe), *Kaffet*.
 - **Klicka på Hasses kaffe, askkopp och de andra sakerna (2026-11-10, användarens önskemål):** "kan du ordna så att
   man kan klicka på kaffet, askkoppen osv och så gör Hasse de rörelserna - men att han annars gör dem så som han
   känner för det". Ett klick var som helst i hans bild gick förut tillbaka till rummet. Nu går kaffet, askkoppen med
@@ -10319,7 +10328,7 @@ nickar när den träffar. Vid varje slag rycker hela bilden till, mer ju hårdar
 [public/rum-hasse.css](public/rum-hasse.css)), och det som står på disken hoppar: koppen studsar
 på fatet, lägre för varje gång, fatet och askkoppen lite och cigarren i urtaget (`hoppar`).
 
-**Kaffet.** Han dricker på tio sätt, och han överdriver och njuter: en ordentlig klunk med slutna
+**Kaffet.** Han dricker på femton sätt, och han överdriver och njuter: en ordentlig klunk med slutna
 ögon, och sedan smackar han och säger mmm med höjda bryn och ett brett leende medan huvudet vaggar
 (`klunk`); blåser på kaffet tre gånger med koppen under hakan, så att ångan far bort från honom,
 smakar försiktigt och rycker till av värmen, och tar sedan en riktig klunk och ett långt *ah* med
@@ -10335,7 +10344,13 @@ koppen vid läppen, för kaffet har kallnat: han grimaserar, tittar misstänksam
 rycker på axlarna med en pust och dricker vidare ändå, med ett snett leende (`kallt`); stanna halvvägs
 till munnen när han kommer på något och peka med koppen mot en, två små knyck och två nickar – visst är
 det så? – och en blinkning innan han dricker (`halvvags`); eller få syn på någon längs baren och skåla
-mot honom med en nick innan han vänder sig tillbaka och dricker (`halsa`).
+mot honom med en nick innan han vänder sig tillbaka och dricker (`halsa`). Och sedan 2026-11-19: en snabb klunk
+i förbigående med ögonen på en och ett kort smack (`snabb`); dricka långsamt och granska en över koppkanten med
+hakan nere, ett bryn högt och utan att le, och sedan ett torrt leende och en nick (`granska`); dricka ur med
+huvudet bakåt, titta förvånat ned i den tomma koppen och hålla upp den mot baren med två små skakningar: en
+påtår, tack (`patar`); spilla på slipsen, hålla undan koppen och torka med fingrarna, och sedan titta upp utan
+en min som om ingenting har hänt (`spill`); eller torka sig om munnen med knogen efter en ordentlig klunk
+(`torka`). Han tittar ned på koppen när han tar den och när han ställer ned den (`koppBlick`), utom i `spill`.
 
 Det är koppen som styr, som med cigarren (`kaffeArm` i [public/rum-hasse-3d.js](public/rum-hasse-3d.js)):
 dess läge räknas fram (på fatet; vid läppen och under näsan i huvudets mått, så att den följer med när
@@ -10358,7 +10373,11 @@ han håller i kan armbågen bara ligga på en cirkel mellan axeln och handen, oc
 underarmen går i handens förlängning: handleden lite bakåtböjd, hellre böjd mot handflatan än åt
 sidan, och armbågen inte upp över axeln eller in framför magen. Förut pekade armbågen åt ett fast
 håll, och då kunde handen sitta nästan i rät vinkel mot underarmen och sticka ut ur manschettens sida,
-så att man såg in i den (ändrat 2026-11-06).
+så att man såg in i den (ändrat 2026-11-06). Det handen håller i bestämmer ändå mycket: när han höll koppen
+framför sig pekade örat åt sidan och fram, och då gick underarmen vågrätt ut till en armbåge i axelhöjd, som en
+vinge. Sedan 2026-11-19 pekar örat snett bakåt i de lägena (`KKROPP`), så att underarmen kommer underifrån och
+armbågen hänger längs sidan eller vilar på pulten. Armbågen svänger då upp på vägen till munnen, fortare än förut
+(upp till 55 enheter per bildruta mot 15–20) men utan hopp.
 
 **Cigarren.** Till vänster om hans högra hand och en bit framför den står en tung askkopp av samma gods
 som koppen, med två urtag. I det ena ligger cigarren: huvudet på disken och vänt lite in mot honom, ringen
