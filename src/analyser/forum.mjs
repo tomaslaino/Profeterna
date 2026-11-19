@@ -52,11 +52,16 @@ export async function hamtaSida(url, { timeoutMs = 30000, fetchImpl = globalThis
 // forumet nej till AI-assistenters läsning (Claude-User, ChatGPT-User, Perplexity-User) eller till
 // AI-svar (Content-Signal: ai-input=no) läses det inte alls. Spärrar mot AI-träning (ClaudeBot,
 // GPTBot, CCBot …) gäller inte oss: inget tränas, och bara korta översatta citat trycks.
+// Undantaget är Yahoo Sports med lokaltidningarnas artiklar (config/lokal.js, yahoo; användarens beslut
+// 2026-11-19): Yahoo säger nej till ChatGPT-User men inget till Claude-User, och där gäller bara det som
+// sägs till oss (baraVara).
 const VARA_AGENTER = ['matchfixarna', 'claude-user'];
 const AI_LASARE = ['claude-user', 'chatgpt-user', 'perplexity-user'];
 
-// robots.txt: reglerna för alla (*) och för oss. → (url) => true om sidan får läsas.
-export function robotsRegler(txt) {
+// robots.txt: reglerna för alla (*) och för oss. baraVara: bara ett nej till Claude-User räknas som ett nej
+// till AI-assistenter, inte ett till ChatGPT-User eller Perplexity-User. → (url) => true om sidan får läsas.
+export function robotsRegler(txt, { baraVara = false } = {}) {
+  const aiLasare = baraVara ? ['claude-user'] : AI_LASARE;
   const grupper = [];
   let g = null;
   let iAgenter = false;
@@ -74,7 +79,7 @@ export function robotsRegler(txt) {
       if (v || falt === 'allow') g.regler.push({ ok: falt === 'allow', monster: v });
     } else iAgenter = false;
   }
-  const aiNej = grupper.some((x) => x.agenter.some((a) => AI_LASARE.includes(a.split('/')[0])) && x.regler.some((r) => !r.ok && r.monster === '/') && !x.regler.some((r) => r.ok && r.monster === '/'))
+  const aiNej = grupper.some((x) => x.agenter.some((a) => aiLasare.includes(a.split('/')[0])) && x.regler.some((r) => !r.ok && r.monster === '/') && !x.regler.some((r) => r.ok && r.monster === '/'))
     || /^\s*content-signal\s*:[^\n]*\bai-input\s*=\s*no\b/im.test(String(txt || ''));
   if (aiNej) return () => false;
   const vara = grupper.filter((x) => x.agenter.some((a) => VARA_AGENTER.includes(a.split('/')[0].trim())));
@@ -97,17 +102,20 @@ export function robotsRegler(txt) {
 }
 
 const robotsCache = new Map();
+// opts.baraVara: värdarna där bara ett nej till Claude-User räknas (robotsRegler).
 async function farLasas(url, opts = {}) {
   const u = new URL(url);
-  if (!robotsCache.has(u.origin)) {
+  const baraVara = (opts.baraVara || []).includes(u.hostname.toLowerCase());
+  const nyckel = `${u.origin}${baraVara ? ' bara vara' : ''}`;
+  if (!robotsCache.has(nyckel)) {
     let regel = () => true;
     try {
       const res = await (opts.fetchImpl || globalThis.fetch)(`${u.origin}/robots.txt`, { signal: AbortSignal.timeout(15000), headers: { 'user-agent': UA }, redirect: 'follow' });
-      if (res.ok) regel = robotsRegler(await res.text());
+      if (res.ok) regel = robotsRegler(await res.text(), { baraVara });
     } catch { /* ingen robots.txt: inga regler */ }
-    robotsCache.set(u.origin, regel);
+    robotsCache.set(nyckel, regel);
   }
-  return robotsCache.get(u.origin)(url);
+  return robotsCache.get(nyckel)(url);
 }
 
 export async function lasSida(url, opts = {}) {
