@@ -1023,11 +1023,19 @@ window.RumUte = (() => {
   // det har kört mer än hälften av den sedan förra gången. Utan ctx.filter (äldre Safari) har bilderna halva
   // upplösningen i stället för oskärpan.
   //
-  // FB: hur långt en figur når från fötterna (m), paraplyet och hunden med (mätt över 6 000 figurer i olika väder och
-  // tider: 1,67 m åt sidan och 2,75 m upp). FBIL: ett fordon från mitten (m) utöver halva längden, på kvällen med
+  // FB: hur långt en figur når från fötterna (m) framåt och bakåt i den riktning den går, och uppåt, efter vad den har
+  // med sig (figurRam; mätt över 6 000 figurer i olika väder och tider: utan något 0,9 m åt sidorna och 2,1 m upp, med
+  // hund 1,3 m framåt, med paraply 1,2 m framåt och 2,75 m upp, med vagn, cykel eller skidor 1,7 m åt sidorna); x: det
+  // mesta, för att veta om den syns. Bilden är bara så stor, så att oskärpan inte räknas över tom yta. FBIL: ett fordon från mitten (m) utöver halva längden, på kvällen med
   // strålkastarnas ljus framför och bakom (mätt: 4,4 m; på dagen 0,35), upp och ner med spegelbilden i den våta gatan
   // (mätt: 4,4 m upp för plogbilen och 2,5 m ner).
-  const FB = { x: 1.75, upp: 2.85, ned: 0.1 };
+  const FB = { x: 1.8, sida: 1, hund: 1.45, paraply: 1.3, vagn: 1.8, upp: 2.25, uppParaply: 2.85, ned: 0.1 };
+  // [åt vänster, åt höger, upp] i bilden (m från fötterna) för den som går åt dir (1: åt vänster härinifrån) med o
+  function figurRam(o, dir) {
+    const fram = o.vagn ? FB.vagn : o.hund ? FB.hund : o.paraply ? FB.paraply : FB.sida;
+    const bak = o.vagn ? FB.vagn : FB.sida;
+    return [dir === 1 ? fram : bak, dir === 1 ? bak : fram, o.paraply ? FB.uppParaply : FB.upp];
+  }
   const FBIL = { x: 4.6, dag: 0.6, upp: 4.6, ned: 2.7 };
   const FMARG = 2;
   function ritaFramMjuk(el, g, t, ox, oy, k, r) {
@@ -1104,10 +1112,11 @@ window.RumUte = (() => {
     }
     for (const p of L.folk) {
       const sm = framS(p.dm);
-      const W = Math.ceil(2 * FB.x * sm * s) + 2 * pad;
-      const H = Math.ceil((FB.upp + FB.ned) * sm * s) + 2 * pad;
-      const cx = pad + FB.x * sm * s;
-      const cy = pad + FB.upp * sm * s;
+      const [v, h, u] = figurRam(p.id.o || p.f.o || {}, p.f.dir);
+      const W = Math.ceil((v + h) * sm * s) + 2 * pad;
+      const H = Math.ceil((u + FB.ned) * sm * s) + 2 * pad;
+      const cx = pad + v * sm * s;
+      const cy = pad + u * sm * s;
       const sta = Boolean(p.f.sta);
       const b = hamta(p.id);
       if (ep < 0 || (!sta && b.ep !== ep) || b.W !== W || b.H !== H || b.z !== p.ut.z || b.D !== p.D || b.sta !== sta || b.dir !== p.f.dir) {
