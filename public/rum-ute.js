@@ -1030,11 +1030,12 @@ window.RumUte = (() => {
   // mesta, för att veta om den syns. Bilden är bara så stor, så att oskärpan inte räknas över tom yta. FBIL: ett fordon från mitten (m) utöver halva längden, på kvällen med
   // strålkastarnas ljus framför och bakom (mätt: 4,4 m; på dagen 0,35), upp och ner med spegelbilden i den våta gatan
   // (mätt: 4,4 m upp för plogbilen och 2,5 m ner).
-  const FB = { x: 1.8, sida: 1, hund: 1.45, paraply: 1.3, vagn: 1.8, upp: 2.25, uppParaply: 2.85, ned: 0.1 };
+  // (2026-11-19: hundrastaren med två eller tre hundar i rad når 3,2 m framåt, och cykeln som en vagn)
+  const FB = { x: 3.3, sida: 1, hund: 1.45, rastare: 3.2, paraply: 1.3, vagn: 1.8, upp: 2.25, uppParaply: 2.85, ned: 0.1 };
   // [åt vänster, åt höger, upp] i bilden (m från fötterna) för den som går åt dir (1: åt vänster härinifrån) med o
   function figurRam(o, dir) {
-    const fram = o.vagn ? FB.vagn : o.hund ? FB.hund : o.paraply ? FB.paraply : FB.sida;
-    const bak = o.vagn ? FB.vagn : FB.sida;
+    const fram = o.vagn || o.cykel ? FB.vagn : o.hundar ? FB.rastare : o.hund ? FB.hund : o.paraply ? FB.paraply : FB.sida;
+    const bak = o.vagn || o.cykel ? FB.vagn : FB.sida;
     return [dir === 1 ? fram : bak, dir === 1 ? bak : fram, o.paraply ? FB.uppParaply : FB.upp];
   }
   const FBIL = { x: 4.6, dag: 0.6, upp: 4.6, ned: 2.7 };

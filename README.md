@@ -1607,6 +1607,16 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bilarna kör om: mitt på dagen 306 fordon i timmen i stället för 110, och något kör förbi 38 % av tiden. Det mesta av
   det nya skymmer inte affären, och bilarna bromsar och står i kö lika sällan som förut. Se *Mer trafik, och på två
   hjul* under [Fasaden](#fasaden).
+- **Fler sorters människor och hundar, som går på olika sätt (2026-11-19, användarens önskemål):** "Kan du ge mig mer
+  olika typer av människor och hundar som går utanför butiken. De får gärna gå på lite olika sätt - så att de skiljer
+  ut sig från varandra." och "De får gärna vara lite mer intressanta än vad de är nu - inklusive emotioner. Alla måste
+  inte gå så fort - även om det är bra om vissa springer och vissa tränar, cyklar eller vad de nu kan hitta på". Åtta
+  nya hundraser (15 i allt) som går på åtta sätt – travar, skrittar, trippar, vaggar, drar i kopplet, nosar sig fram,
+  studsar som valp och galopperar bredvid den som joggar – med svansen som viftar efter humöret. Nya som går förbi:
+  hundrastaren med två eller tre hundar, joggaren med hund, cyklister som trampar på riktigt (damcykel, herrcykel,
+  mountainbike, tävlingscykel och barnet på sin lilla cykel), förälskade hand i hand, ett par som grälar, barnet som
+  tjurar och hänger bakåt i handen, någon arg och någon ledsen. De som går tar det lugnare och fler flanerar. Se *Fler
+  hundar, cyklister och känslor* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7951,6 +7961,27 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   och livet lottas ur en egen följd, så att kläderna och sällskapen är desamma som förut. Bara framför affären
   (`ut.liv` i `ritaFigur`): inifrån och på bron är de bakgrund och går som förut, med sina ansikten. Arbetet: 0,3 ms
   för sex figurer per bild med eller utan livet, `levande` 0,5 µs per figur (headless Chrome på Macen).
+- **Fler hundar, cyklister och känslor (2026-11-19):** hundarna (`HUNDAR`, `hundVal`, `ritaHund` i `figurDelar`):
+  labrador, schäfer, tax, terrier, pudel, dalmatiner, cocker, collie med vit krage, boxer med mörk nos, mops med
+  svansen i en ring, yorkshireterrier med päls ner över benen och rosett, jämthund med ringlad svans, whippet, corgi och
+  sankt bernhardshund; nosen, öronen (hängande, uppstående, collieöron, vinthundens bakåtvikta) och svansen ur tabellen.
+  Hur de går (`HGANG`, `hu.gang`): hur länge tassen står i marken och hur högt den lyfts, benens ordning (diagonalt i
+  travet, ett i taget i skritten, parvis i valpens studs och i galoppen), hur kroppen gungar, tippar och vaggar, och var
+  huvudet och svansen hålls. Benen (`hund`), kroppen (`hkropp`), svansen (`hsvans`, viftar kring roten efter tiden) och
+  huvudet (`hhuvud`, nosar mot stenen en stund i taget eller tittar upp mot den som håller i kopplet) ritas i hundens
+  storlek kring kroppens mitt (`hk` i `ritaDelar`; valpen två tredjedelar), och tassarna står still mot stenen också
+  då. Den som drar sträcker kopplet och husse eller matte lutar sig bakåt med armen framåt (`dras`, `GREPP.dras`).
+  Hundrastaren har `o.hundar` i rad. Cyklisterna (`CYKLAR`, `cykelStil`, `cykelTab`): höften står still på sadeln och
+  fötterna följer pedalerna runt vevlagret (`VEV`) med IK, händerna på styret hur överkroppen än lutar (`styret`),
+  hjulen rullar och vevarmarna går runt ett varv per tramptag (`vev`); ramen efter cykeln. Känslorna: nya sätt att gå
+  (`flanerar`, `stampar` arg, `deppig` ledsen, `svavar` förälskad, `tjurar` barnet som inte vill, `dras`), humöret
+  `ledsen` (munnen och brynen), `o.hum` för den som har ett givet humör, och nya saker de gör: torkar ögonen, muttrar,
+  fnyser och visslar. I samtalet tittar de förälskade på varandra också när de är tysta (`S.kar`), och i grälet
+  (`S.gral`) för den som pratar talan med händerna medan den som går först vänder sig om bara för att fräsa något. Barnet
+  och föräldern håller varandra i handen där armarna når med överkroppens lutning (`handMed`). `LUGN.takt` 0,86 (förut
+  0,93). Bron och gatan inifrån ger plats för cyklarna och hundarna (`fram`/`bak` i `folkAv`, `FB.rastare` i
+  rum-ute.js). `?rum-fasad-vem=rastare` (eller `jogghund`, `kar`, `gral`, `tjurbarn`, `arg`, `ledsen`, `cyklist`) visar
+  bara sådana.
 - **Gatan och trafiken (2026-11-16, användarens önskemål):** mellan en själv och affären går S:t Eriksgatan
   ([public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), `RumFasadGatan`): trottoarkanten i granit 0,88 m ut,
   rännstenen med gatsten och en brunn (bäcken från stupröret slutar där), asfalten med mittlinjen, höstlöv i

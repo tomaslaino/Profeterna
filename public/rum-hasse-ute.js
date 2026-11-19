@@ -880,8 +880,9 @@ function folkPaBron(FF, v, L, steg, R, C, givna) {
   if (!vem.length) throw new Error('ingen');
   const U = 96;
   const k = U / 175;
-  const x0 = Math.min(...vem.map((m) => m.dx)) - 100;
-  const x1 = Math.max(...vem.map((m) => m.dx)) + 100;
+  // (hundarna och cyklarna når längre fram än 1 m, m.fram)
+  const x0 = Math.min(...vem.map((m) => m.dx - (m.bak || 100) * m.k));
+  const x1 = Math.max(...vem.map((m) => m.dx + (m.fram || 100) * m.k));
   const pad = 4;
   const B = Math.ceil((x1 - x0) * k) + 2 * pad;
   const Hd = Math.ceil(275 * k) + 2 * pad;
