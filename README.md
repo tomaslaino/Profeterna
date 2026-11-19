@@ -8104,8 +8104,9 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
     lykta, tank med rand, kylflänsar och krom) och sporthojen (kåpan i nittiotalets färger med en rand i en andra färg,
     vindrutan och den höga stjärten), med föraren i hel hjälm, ofta skinnjacka, och på den nakna ibland någon där bak;
     var tolfte fordon när det är minst 15 grader och torrt, var sextonde vid 8–15 grader, var tjugoandra vid 3–8 och
-    var fyrtionde i kylan, nästan inga i regnet och ingen i snön. Bron bakom Hasse Backe lottar med `valjTyp` som
-    förut och får inga av dem (den ritar bara bilar och bussar).
+    var fyrtionde i kylan, nästan inga i regnet och ingen i snön. Bron bakom Hasse Backe, som visar gatans bilar
+    innan de kommer in på den (`kommer`), hoppar över dem och det som har två hjul (`motKom` i rum-hasse.js): den
+    ritar bara bilar och bussar.
   - **Längs kanten** (`CYKELKANT`, `intervallCykel`, `valjCykel`): på affärens sida, 1,12 m ut, innanför bilarnas fil,
     så att bilarna och bussarna kör om dem framför dem. Mest cyklar: herrcyklar och damcyklar i Crescents och Monarks
     färger, med stänkskärmar, kedjeskydd och pakethållare, ibland korg och väska, och lyktan tänd i mörkret på dem som
@@ -10147,8 +10148,10 @@ höger om huset, och den ligger långt nedanför och går bort från en, så det
 hitåt gatans egen trafik: `motKom` i [public/rum-hasse.js](public/rum-hasse.js) läser 34 sekunder framåt i gatans
 tidtabell (`RumFasadGatan.kommer` i [public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), ur rummets modell
 `_fram` i rum-ute.js, densamma som utanför) och lägger ut varje fordon så att det lämnar bron när det kommer in på
-gatan, i samma lack men i brons ljus (`fordon.som`); den framför hinner alltid undan först. Filen bort lottas som
-förut, men inte tätare än gatan. De som går väljs ur gatans sällskap (`folket.kommer` i rum-fasad.js, som lottar vilka
+gatan, i samma lack men i brons ljus (`fordon.som`); den framför hinner alltid undan först. Lastbilarna,
+motorcyklarna, cyklarna och mopederna på gatan (sedan samma dag, se *Mer trafik, och på två hjul* under
+[Fasaden](#fasaden)) har ingen form för bron och kommer bara på gatan; de räknas inte heller in i hur tätt filen bort
+går. Filen bort lottas som förut, men inte tätare än gatan. De som går väljs ur gatans sällskap (`folket.kommer` i rum-fasad.js, som lottar vilka
 de är utan att bygga figurerna; `broVem`): den som har gått åt höger förbi affären går ut på bron när den har lämnat
 gatan, och den som kommer från höger börjar i andra änden så långt i förväg som det tar att gå över (`gangSek`).
 De kommer lika ofta som förut (`broTakt`); passar ingen just då kommer ingen. Cyklisterna (`cyklist`) lottas för sig
