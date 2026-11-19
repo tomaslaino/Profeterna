@@ -34,6 +34,7 @@ import * as SCENFIL from './rum-hasse-scen.js';
 import { PULT_GLSL, SKIVA, ringar, NRING, L as PULT_L, franRum } from './rum-pult.js';
 import { byggTidning, ytan, bladYta } from './rum-hasse-tidning.js';
 import { byggStall, byggSticka, byggBranda, byggTandare, byggLaga, brandLage, STALL, STICKA, TANDARE, BRANDA } from './rum-hasse-eld.js';
+import { felkoll } from './rum-gpu.js';
 export { dagens } from './rum-hasse-tidning.js';
 
 const DEG = Math.PI / 180;
@@ -1094,6 +1095,7 @@ export async function figuren(duk, { hog = false, latt = false, pr = 1, kant = !
   // (webbläsarens vanliga grafikkort: med 'high-performance' slog datorer med två grafikkort, som äldre MacBook Pro,
   // på det stora kortet så fort man vände sig mot honom, och fläkten med det; rummet har alltid ritats med det vanliga)
   const r = new THREE.WebGLRenderer({ canvas: duk, alpha: true, antialias: kant, powerPreference: 'default' });
+  felkoll(r);
   r.setPixelRatio(pr);
   r.setClearColor(0, 0);
   const S = new THREE.Scene();

@@ -550,6 +550,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   Helgarderat och dagens DN eller SvD i förväg, en sida i taget, på var sitt ark, och att byta tidning är att byta textur.
   På telefonens lägre steg har hans bild kantutjämning, så att glasögonbågen inte bryts upp i streck och kanterna inte
   kryper (se *Hasse Backe i svaga telefoner* under [Tobaksaffären](#tobaksaffären))
+- [x] **Newsquests lokaltidningar via Yahoo Sports (2026-11-19, användarens beslut, efter att ha fått veta att både
+  tidningarna och Yahoo säger nej till AI-läsare):** The Bolton News, Watford Observer, East Anglian Daily Times, Daily
+  Echo och Newsquests andra tidningar går inte att läsa på sina egna sajter, men Yahoo Sports publicerar många av deras
+  artiklar. Nattjobbet läser nu kopiorna där, när sidan själv säger att den kommer från en lokaltidning, och de står i
+  matchbladet med tidningens namn. Bing News rubriker ur tidningarna får Claude att söka upp på Yahoo (se *Newsquests
+  tidningar via Yahoo Sports* under *Klubben, lokaltidningen och motståndarens intervju*)
 
 ## Publicering
 
@@ -3350,6 +3356,23 @@ omgångens lag → Bing News (veckans nyheter om laget) → claude -p söker (We
   Reach, National World, Express & Star, Shropshire Star och KentOnline släpper in. Klubbarnas nya EFL-sajter (samma
   plattform hos Sheffield Wednesday och Reading) visar texten först i webbläsaren och ger 0 tecken; deras
   interna nyhets-API används inte. Sökningen tar därför hellre lokaltidningens referat av presskonferensen.
+- **Newsquests tidningar via Yahoo Sports** (2026-11-19, användarens beslut: "Ja", efter att ha fått veta att både
+  tidningarna och Yahoo säger nej till AI-läsare). Yahoo Sports publicerar många av lokaltidningarnas artiklar,
+  Newsquests också, och sidan säger i sin JSON-LD vilken tidning artikeln kommer från (`provider`, med tidningens namn
+  och adress). Yahoos robots.txt säger nej till ChatGPT-User, ClaudeBot, Claude-Web och anthropic-ai men inget till
+  Claude-User, och på `uk.sports.yahoo.com` och `sports.yahoo.com` räknas bara det som sägs till oss (`yahoo` i
+  config/lokal.js, `baraVara` i `robotsRegler` i src/analyser/forum.mjs); överallt annars gäller regeln som förut, också
+  för de insatta medierna och forumen. Läsaren tar Yahoos brödtext ur `<div class="content-body">`, som står utanför
+  `<article>`. En sida på Yahoo läses bara när tidningen i `provider` är en av lokaltidningarna (`lokaltidningar` i
+  config/media.js), och den står med tidningens namn (*The Bolton News*) och Yahoos adress; BBC Sport, The Independent
+  och andra rikstäckande på Yahoo stryks, liksom Yahoos andra sajter (Finance, News). Bing News rubriker ur en tidning
+  som inte går att läsa på sin egen sajt följer med till Claude som rubriker att söka upp på Yahoo Sports, högst åtta
+  (`yahoo.rubriker`), och adresserna räknas inte som träffar. Sökningen har åtta sökningar i stället för sex.
+  Provat 2026-11-19 med jobbets läsare mot Yahoo: Bolton News artikel om Chris Forinos kontrakt lästes (2 621 tecken,
+  *The Bolton News*, Marc Iles, 16 november), en artikel från BBC Sport om Terry Devlin på Yahoo avvisades, och samma sida
+  stoppas av robots.txt med de insattas regler. Med Node: Bing-träffarnas uppdelning, sökningens svar och frågan till
+  Claude. Inte provat med riktiga sökningar på iMacen: om WebSearch hittar kopiorna på Yahoo syns först i nattjobbets
+  logg.
 - **Läsningen och uppgifterna** är de insattas, med samma ämnen, slag och vikt, utom: artiklar från de senaste sju
   dagarna och minst 400 tecken (klubbens besked kan vara några stycken under en video). Claude får veta vad varje
   artikel är för källa (`slagText`). En artikel som den andra läsningen redan har läses inte igen (`lastaAvAndra`),
@@ -5093,6 +5116,30 @@ ungefär 1 % av bildens hela arbete, och med processorn fyra gånger långsammar
 8–13 enheter mellan två bilder, mot 14–20 i de gamla. Största hoppet mellan två bilder under tio
 minuter är detsamma som förut, och det kommer från de gamla påhitten.
 
+**Inte som robotar** (2026-11-19, rum-3d.js; användarens önskemål: "Gör animationerna för alla mer naturliga. Så att de
+inte ser ut som robotar"). Gänget spelades in bild för bild (var varje del är, 30 bilder i sekunden i 18 sekunder,
+klockan 14). Tre saker fick dem att se ut som maskiner: händerna och armarna stod blixtstilla i upp till tio sekunder
+åt gången medan något annat rörde sig, huvudet ställde om sig med ett ryck på 0,22 sekunder var 1,7:e sekund och stod
+sedan stilla, och ett stort blickbyte kunde vrida huvudet ett kvarts varv på ett par bilder. Nu:
+
+- **Andningen** (`andetag`, `andning`): i stället för en jämn sinusvåg andas var och en i sin takt (DL 4,3, DT 3,7 och
+  DJ 4,8 sekunder), som glider lite fortare och långsammare och lite olika djupt. In går fortare än ut, och efter
+  utandningen vilar bröstet en stund. Bröstet vidgas, och bålen lyfts lite, så att axlarna och armarna följer med.
+- **Kroppen svajar** lite snabbare ovanpå det långsamma svajet, som när man sitter.
+- **Händerna står aldrig helt still** (`liv`): handen som vilar på bordet, håller flaskan eller cigaretten driver lite
+  och vrids en aning, i takter som inte går jämnt upp. Mot bordet bara i sidled.
+- **Huvudets små flyttar** (`smaRor`) kommer mer sällan (var 2,4:e sekund i stället för 1,7:e), tar 0,4–0,75 sekunder i
+  stället för 0,22, och börjar där den förra var om den inte hann fram. Däremellan driver huvudet långsamt.
+- **Blickarna går genom en fjäder** (`blickFolj`, `BLICK`): det blickarna gör med huvudet och bålen följer en
+  kritiskt dämpad fjäder med en mjuk gräns för farten (4,5 radianer i sekunden). Huvudet kommer en aning efter blicken,
+  som hos folk, och de stora byten tar en halv sekund med fart som kommer och går. Fjädern minns från bild till bild,
+  så den gäller inte i en fast bild (`?rum-t`) eller utan rörelser.
+
+Mätt i samma 18 sekunder före och efter: andelen av tiden som en del som annars rör sig står helt still gick från 19 %
+till 4 % (median) och den längsta stunden helt stilla från 10 till 2,7 sekunder. Huvudets högsta fart (mätt över en
+tiondels sekund) gick från 19 till 3,6 radianer i sekunden. Inga nya delar eller bilder, så grafikkortet gör samma sak
+som förut.
+
 **Det som händer i rummet** (2026-11-18, `handelse`, `ORS` och `ledig` i rum-3d.js; användarens önskemål: "Lägg till
 olika logiska animationer på matchfixarna!"). Påhitten ovan kommer av sig själva, ur luckorna och humöret. Det här är
 rörelser med en orsak som man ser eller hör i rummet, och de kommer när orsaken kommer:
@@ -6072,8 +6119,9 @@ Därför:
 - **Filtren bakas.** Brus- och oskärpefiltren i SVG:n ritas en gång till bilder (`baka` i
   rum.js, på datorn också – de ser likadana ut). Bruset (feTurbulence och en färgmatris med
   fast färg) räknas ut i rum.js med specifikationens algoritm och samma frö (`turbulens`,
-  `brus`), och oskärpan av en form i en färg med tre lådfilter som i specifikationen
-  (`oskarpa`, `sudda`); bilderna sparas som PNG utan duk (`png`). Bara det som inte går
+  `brusTal`, `brusBild`), och oskärpan av en form i en färg med tre lådfilter som i specifikationen
+  (`oskarpa`, `sudda`); bilderna sparas som PNG utan duk (`png`), sedan 2026-11-18 i egna trådar
+  (`bakverk`, se *Bakningen i egna trådar* nedan). Bara det som inte går
   så (skenet från lysröret, med en gradient) ritas som förut via en bild av SVG:n. Safari
   höll kvar fyra–fem kopior av varje bild som gick via en SVG-bild och en duk, ungefär 350 MB
   för furun, väggen och pulten (oavsett pixeltäthet), och bakningen tog flera sekunder. Bruset
@@ -6625,7 +6673,7 @@ musen i rörelse och vägen fram till närbilderna och tillbaka. Det mesta som k
   huvudtråden med processorn fyra gånger långsammare, och i telefonen syns världen först när det är klart. Nu ligger
   bilderna i webbläsarens lagring (Cache Storage, `rum-bakat-1`, `baka` i rum.js), en per filter, ruta och form, med
   allt bilden räknas ur som nyckel: en fläck som har flyttat sig eller ett ändrat filter bakas om, och det som inte
-  längre används tas bort. Första besöket bakar som förut, och utan lagring (privat läge) bakas allt varje gång.
+  längre används tas bort. (Brusets nyckel är sedan 2026-11-18 bara filtret och rutan, se *Bakningen i egna trådar*.) Första besöket bakar som förut, och utan lagring (privat läge) bakas allt varje gång.
   `?rum-baka` bakar om utan lagringen. Bilderna är desamma, bildpunkt för bildpunkt.
 - **I Chrome i telefonen** väntar 3D-delarna 0,4 sekunder före den första och mellan dem i stället för 0,8
   (`TUR_PAUS` i rum.js; pausen finns för Safari, som släpper minne efter ungefär en sekund, och där är den kvar), och
@@ -6750,8 +6798,9 @@ efter att ljuset hade tänts.
   har 5 400 cirklar och DJ:s skägg 5 700 delar, och de ritades från SVG tio till sjutton gånger vid varje besök (med
   blinkningarna, skratten och uttrycken): den största delen av gängets start, ungefär 0,4 sekunder med den långsamma
   processorn. Nu hämtas den färdiga bilden och packas upp vid sidan av huvudtråden. Nyckeln är bildens text och
-  storlek, så ett ändrat ansikte ritas om. Nya bilder packas (i en egen tråd sedan 2026-11-17, se *Mindre på huvudtråden* nedan) och sparas sex sekunder efter starten, när det är lugnt,
-  och det som inte användes under besöket tas bort då. Utan lagring (privat läge) och med `?rum-baka` ritas de som
+  storlek, så ett ändrat ansikte ritas om. Nya bilder packas (i en egen tråd sedan 2026-11-17, se *Mindre på huvudtråden* nedan) och sparas sex sekunder efter att de ritades,
+  sedan 2026-11-18 alla på en gång, och det som inte har använts under besöket tas bort när det har legat tre dagar
+  (känslornas bilder tre veckor; se *Bakningen i egna trådar*). Utan lagring (privat läge) och med `?rum-baka` ritas de som
   förut. Bilderna är desamma: med fryst tid (`?rum-t`) 82–107 dB mellan ritade och sparade ansikten.
 - **Vädret:** gänget klär sig efter vädret och väntade på Open-Meteo upp till 1,5 sekunder vid varje besök när det
   sparade vädret var äldre än en kvart (60–960 ms i mätningen). Är det sparade vädret yngre än tre timmar
@@ -6911,6 +6960,81 @@ Inte provat i en riktig telefon eller i Safari, och kantutjämningens kostnad p�
 på svaga telefoner*). Klippen `lasa`, `lasa2`, `lasa6`–`lasa8` och, med bladvändningen, `lasa9` är spelade hela i
 telefonens mått utan fel på sidan; början av fem av dem med Helgarderat, DN och SvD bestämda, och `lasa9` med SvD, där
 bladet han vänder har samma tryck som arket (det delar arkets texturer). `lasa7` är provat i datorn (1440 × 900) i bilder.
+
+### Bakningen i egna trådar och ansiktena sparade (2026-11-18)
+
+Användarens önskemål: "Gör animationen på huvudsidan så att den laddas fortare o bättre. Även på sämre mobiler." Mätt först,
+som telefon i Chromium (412 × 870 punkter, täthet 2,625) med mjukvarugrafik (SwiftShader, som en svag grafikdel), med och utan
+processorn fyra gånger långsammare, mot en lokal server som skickar som GitHub Pages (HTTP/2, gzip, `max-age=600`) med nätet
+bromsat som 4G (9 Mbit/s, 70 ms) och den publicerade sajtens data, med spårning av huvudtråden och en profil av JavaScriptet.
+Tre saker gjorde arbete på huvudtråden som inte behövde göras där, eller inte alls:
+
+- **Bakningen** (brus och oskärpa, se *De bakade bilderna sparas mellan besöken* ovan): 78 bilder i telefonen (74 i datorn),
+  2,9 MB som PNG, 1,6 sekunder av processorns tid i full fart och ungefär 5 med den långsamma processorn, varav 2,3 sekunder
+  bara att packa bilderna (`CompressionStream`, som går på den tråd som anropar den). Det gäller första besöket, och varje
+  besök efter att något i bakningens nyckel har ändrats – och där var alla gradienter i rummet med (`DEFS`). Rummet visades
+  då efter sin längsta väntan i telefonen (4 sekunder, `.laddar`), och bakningen fortsatte i flera sekunder till medan gänget
+  byggdes. Nu räknas och packas bilderna i 1–3 egna trådar (`bakverk` och bakarna i rum.js; högst två i telefonen och i Safari),
+  flera på en gång, och huvudtråden gör bara det som kräver sidan: filtrens tal, formerna och bilderna i rummet. Trådarna kör
+  samma funktion som text (`bakverk` läser inget utanför sig själv), så bilderna blir desamma byte för byte, och utan trådar
+  bakas de på huvudtråden som förut (också med `?rum-baka-sjalv`). Bildpunkterna skrivs direkt i PNG-filens rader i stället för
+  att kopieras dit, så två bilder som bakas samtidigt tar som mest lika mycket minne som en tog förut (upp till 40 MB var).
+  Brusets nyckel i lagringen är bara filtret och rutan, det enda bruset räknas ur, så en ändrad gradient bakar inte om bruset
+  (1,3 av de 1,6 sekunderna); oskärpan har kvar formen och färgen, och det som bakas via en bild av SVG:n allt. Med den nya
+  nyckeln bakas bruset om en gång hos alla.
+- **Gängets ansikten** sparades en i taget, sex sekunder efter starten och sedan med upp till tre sekunders paus emellan (när
+  huvudtråden hade en stund över, `requestIdleCallback`). I en svag telefon hann bara fyra av de ungefär 25 bilder ett besök
+  använder sparas på en halv minut, och resten ritades från SVG vid nästa besök – också de nio gänget behöver när det startar,
+  DT:s ansikte med 5 400 cirklar, ungefär en tiondels sekund av huvudtrådens tid var med den långsamma processorn. Efter tre
+  besök på en halv minut ritades fortfarande ett av dem från SVG när gänget startade. Packningen går sedan 2026-11-17 i en egen tråd, så pausen
+  behövs inte: nu packas allt som väntar på en gång, högst åtta åt gången (`ansPacka` i rum-3d.js; utan tråden en i taget som
+  förut). Det som inte har använts under besöket togs bort så fort det sparade var klart, också bilder som skulle användas
+  senare under samma besök; nu först när det har legat tre dagar (känslornas bilder tre veckor, som förut, `ansStada`).
+- **Grafikprogrammens fellogg:** three.js frågar efter varje grafikprograms logg (`getProgramInfoLog`, två `getShaderInfoLog`)
+  och om det gick att länka. Frågorna väntar in grafikprocessen, och under starten, när den har texturer och ritningar i kö, står
+  huvudtråden still tills allt före är gjort – för ungefär hundra program, 0,7 sekunder sammanlagt i profilen vid ett återbesök
+  med den långsamma processorn. Loggen läses nu bara med `?rum-fel`, där felrutan visar den (`felkoll` i rum-gpu.js, för alla sex
+  renderarna).
+
+Mätt med gammal och ny kod om vartannat, tre varv var, medianer (tiderna från att sidan börjar hämtas; "inredningen" är
+lysröret, neonen, skyltarna och uret, rum-inredning.js):
+
+| Telefon | Före | Efter |
+|---|---|---|
+| Första besöket, processorn ×4: rummet syns | 6,8 s | 4,3 s |
+| Första besöket, processorn ×4: gänget ritas | 12,1 s | 8,5 s |
+| Första besöket, processorn ×4: inredningen ritas | 17,0 s | 12,2 s |
+| Första besöket, full fart: rummet syns | 3,3 s | 2,7 s |
+| Första besöket, full fart: gänget ritas | 4,5 s | 3,8 s |
+| Första besöket, full fart: inredningen ritas | 6,8 s | 5,8 s |
+| Återbesök efter en publicering, processorn ×4: gänget ritas | 6,9 s | 5,7 s |
+| Återbesök efter en publicering, processorn ×4: inredningen ritas | 10,7 s | 9,2 s |
+| Ansiktsbilder sparade under första besökets 30 sekunder | 4 | 24 |
+| Ansiktsbilder ritade från SVG vid andra besöket / tredje | 24 / 19 | 1 / 0 |
+
+Chromes processorbroms gäller bara huvudtråden (prövat: samma slinga tar fyra gånger så lång tid där, men lika lång tid i en
+worker), så med bromsen bakar trådarna i datorns fart och vinsten ser större ut än den blir i en svag telefon; raderna i full
+fart jämför på lika villkor. Återbesöket är med webbläsarens vanliga cache tömd (som efter en publicering) och sajtens sparade
+filer, bakade bilder och ansikten kvar.
+
+**Lysröret** tändes i mätningen lika sent vid första besöket (efter sin längsta väntan, 4,5 sekunder efter att rummet visats, i
+båda) och 1,5–2 sekunder senare än förut vid återbesöket och i full fart, fast allt i rummet kommer tidigare: vid återbesöket
+står gänget nu där när ljuset tänds (förut kom det en sekund efter, i ett tänt rum). Orsaken är mjukvarugrafiken, som saknar
+parallell kompilering av grafikprogram (`KHR_parallel_shader_compile`): 3D-delarnas program kompileras då i långa uppgifter på
+över en sekund, och nu när delarna startar tidigare pågår en sådan just när väntan tar slut. Tändningen kan inte gå före en
+uppgift som redan pågår (prövat: att tända i nästa bildruta med `requestAnimationFrame` gav ingen tydlig skillnad). Chrome med
+ett riktigt grafikkort kompilerar programmen parallellt (`compileAsync`, se *Grafikprogrammen i bakgrunden* under
+[Mindre filer](#mindre-filer)). Inte mätt där, i Safari eller i en riktig telefon (`matchfixarna.se/?rum-mat`).
+
+**Samma bild:** de bakade bilderna (`?rum-baka`, inget sparat) jämförda med kontrollsummor, gammal och ny kod: alla 78 i
+telefonen och 74 i datorn är lika byte för byte, också när de bakas på huvudtråden. Rummet med fryst tid (`?rum-t=4`) som
+telefon bildpunkt för bildpunkt lika, också vid återbesöket ur det sparade, och som dator lika med en laddning av den gamla
+koden (två laddningar av den gamla skiljer mer). Gänget, inredningen, sakerna, datorn, handen och Hasse Backe startar utan nya
+varningar.
+
+Kvar, som de som mätningen pekar på: gängets bygge (figurerna, håret och kläderna, ungefär 1,6 sekunder av huvudtrådens tid med
+den långsamma processorn vid ett återbesök) och grafikprogrammen, ungefär hundra i sex WebGL-dukar som inte delar dem (se
+*Det som är kvar* under [Mindre filer](#mindre-filer)).
 
 ### När något går fel i rummet
 
