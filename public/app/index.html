@@ -35,34 +35,41 @@
     </div>
   </header>
 
-  <!-- Nedladdningen av appen (android/, README → Appen). Adressen att skicka
-       till gänget: matchfixarna.se/app. matchfixarna.apk byts när appen byggs
-       om; versionen och storleken står här nedan. -->
+  <!-- Appen (README → Appen). Adressen att skicka till gänget:
+       matchfixarna.se/app. Installera = Chromes egen installation (sajten blir
+       en app i telefonen eller datorn, ingen fil); filen är den gamla vägen,
+       matchfixarna.apk, som byts när appen byggs om: versionen och storleken
+       står i rutan. -->
   <main class="appen">
     <div class="appen-topp">
       <img class="appen-ikon" src="../ikon-192.png" alt="" width="96" height="96">
       <h2 class="page-title">Matchfixarna i telefonen</h2>
       <p class="appen-lede">Hela sajten som en app – tobaksaffären, kupongen och Olympen, utan adressfält.</p>
 
-      <div class="appen-android">
-        <a class="appen-knapp" href="matchfixarna.apk" download="Matchfixarna.apk">Ladda ner till Android</a>
-        <p class="appen-fakta">Gratis · version 1.0 · 0,6 MB</p>
+      <div class="appen-installera">
+        <button class="appen-knapp" type="button">Installera</button>
+        <p class="appen-rad" aria-live="polite"></p>
       </div>
       <p class="appen-redan" hidden>Du har redan appen – det är den du tittar i.</p>
     </div>
 
-    <ol class="appen-steg" aria-label="Så installerar du">
-      <li><b>Tryck på knappen.</b> Frågar Chrome om du vill behålla filen, svara <i>Ladda ned ändå</i>.</li>
-      <li><b>Öppna filen</b> när den är nedladdad – tryck i aviseringen eller under <i>Nedladdningar</i>.</li>
-      <li><b>Tillåt installationen</b> första gången: <i>Inställningar</i> → <i>Tillåt från den här källan</i>, och tillbaka.</li>
-      <li><b>Installera.</b> Varnar Play Protect för en okänd app, välj <i>Installera ändå</i> – appen kommer inte från Play Butik.</li>
-    </ol>
-
     <ul class="appen-mer">
-      <li>Håll fingret på ikonen för <b>Kupongen</b>, <b>Olympen</b>, <b>Matcherna</b> och <b>Tabeller</b>.</li>
-      <li>Dela en skärmbild av systemet i Svenska Spels app till <b>Ladda upp system</b>, så fylls kupongen i.</li>
+      <li>Dela en skärmbild av systemet i Svenska Spels app till <b>Matchfixarna</b>, så fylls kupongen i.</li>
       <li>Tipsen och namnet du valt i Chrome följer med till appen.</li>
     </ul>
+
+    <details class="fold appen-fil">
+      <summary>Hämta appen som fil i stället</summary>
+      <div class="fold-body">
+        <ol class="appen-steg" aria-label="Så installerar du filen">
+          <li><b>Ladda ner filen.</b> Frågar Chrome om du vill behålla den, svara <i>Ladda ned ändå</i>.</li>
+          <li><b>Öppna filen</b> när den är nedladdad – tryck i aviseringen eller under <i>Nedladdningar</i>.</li>
+          <li><b>Tillåt installationen</b> första gången: <i>Inställningar</i> → <i>Tillåt från den här källan</i>, och tillbaka.</li>
+          <li><b>Installera.</b> Varnar Play Protect för en okänd app, välj <i>Installera ändå</i> – appen kommer inte från Play Butik.</li>
+        </ol>
+        <p class="appen-fakta"><a class="kp-btn" href="matchfixarna.apk" download="Matchfixarna.apk">Ladda ner filen</a> Gratis · version 1.0 · 0,6 MB</p>
+      </div>
+    </details>
 
     <section class="appen-iphone" aria-labelledby="appen-iphone-rubrik">
       <h3 id="appen-iphone-rubrik">Har du iPhone?</h3>
@@ -76,15 +83,65 @@
     <nav class="foot-links" aria-label="Mer"><a href="../index.html#kallor">Källor</a><a href="../index.html#modell">Modell</a><a href="../om-oss.html">Om oss</a><a href="./" aria-current="page">Appen</a></nav>
   </footer>
   <script>
-    // iPhone: Safari-vägen först. I appen (eller sajten installerad från
-    // Chrome): ingen knapp, den behövs inte.
+    // Installera: Chromes egen installation (Android och datorn), med
+    // beforeinstallprompt. Chrome skickar den först när sajten har använts en
+    // stund (ett tryck och en halv minut, någon gång); innan dess, och i
+    // andra webbläsare, säger raden under knappen var installationen finns.
+    // iPhone: Safari-vägen i stället för knappen. I appen, eller när appen
+    // redan finns i telefonen (getInstalledRelatedApps, related_applications
+    // i manifestet): ingen knapp.
     (() => {
       const r = document.documentElement;
-      if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) r.classList.add('ios');
+      const ua = navigator.userAgent;
+      const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const android = !ios && /Android/.test(ua);
+      r.classList.add(ios ? 'ios' : android ? 'android' : 'dator');
+      if (!ios && !android) document.querySelector('.appen-topp .page-title').textContent = 'Matchfixarna på datorn';
+      const redan = document.querySelector('.appen-redan');
+      const klar = (text) => {
+        r.classList.add('installerad');
+        if (text) redan.textContent = text;
+        redan.hidden = false;
+      };
       if (matchMedia('(display-mode: standalone)').matches || document.referrer.startsWith('android-app://')) {
         r.classList.add('i-appen');
-        document.querySelector('.appen-redan').hidden = false;
+        klar();
+        return;
       }
+      if (ios) return;
+
+      const knapp = document.querySelector('.appen-knapp');
+      const rad = document.querySelector('.appen-rad');
+      const chrome = 'BeforeInstallPromptEvent' in window;
+      const safari = !chrome && /Safari\//.test(ua) && !/Chrome|Chromium|Firefox|Edg\//.test(ua);
+      const hjalp = chrome
+        ? (android ? 'Tryck på ⋮ uppe till höger och välj att installera appen.' : 'Klicka på installationsikonen längst till höger i adressfältet.')
+        : safari ? 'Välj Arkiv → Lägg till i Dock.'
+        : android ? 'Öppna sidan i Chrome, eller hämta appen som fil här nedanför.'
+        : 'Öppna sidan i Chrome eller Edge, så går den att installera.';
+      let fraga = null;
+      addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        fraga = e;
+        rad.textContent = '';
+      });
+      addEventListener('appinstalled', () => klar('Klart – Matchfixarna ligger bland dina appar.'));
+      if (navigator.getInstalledRelatedApps) {
+        navigator.getInstalledRelatedApps().then((a) => { if (a.length) klar('Du har redan appen.'); }).catch(() => {});
+      }
+      knapp.addEventListener('click', async () => {
+        const f = fraga;
+        if (!f) {
+          rad.textContent = hjalp;
+          return;
+        }
+        fraga = null;
+        try {
+          await f.prompt();
+        } catch (err) {
+          rad.textContent = hjalp;
+        }
+      });
     })();
   </script>
 </body>

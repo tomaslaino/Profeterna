@@ -252,6 +252,10 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   (Kupongen, Olympen, Matcherna, Tabeller) och *Dela → Ladda upp system* för en skärmbild av systemet. Se
   [Appen](#appen). Samma dag: "Jag vill att mina vänner ska kunna ladda ner den på ett enkelt sätt bara" –
   gratis nedladdning på **matchfixarna.se/app** (Google Play kostar 25 dollar och kräver 12 testare i 14 dagar)
+- [x] **Installera med ett tryck (2026-11-19, användarens önskemål):** "Hur kan mina vänner … installera den på ett
+  smart sätt?" – och "jag vill ju att man använder sig av animationssidan". Guldknappen på matchfixarna.se/app heter
+  *Installera* och öppnar Chromes egen installation (i Android och på datorn): ingen fil, inga varningar, och appen
+  startar i tobaksaffären. Filen finns kvar i en hopfälld ruta i Android, se [Appen](#appen)
 - [x] **Med och utan spelaren (2026-11-11, användarens önskemål):** "Går det att få in den här
   informationen för de respektive spelarna" (StatMuses Man City med och utan Haaland), "det kan säga
   något om hur betydelsefulla de är för lagen" – "Haaland t ex är mindre viktig än vad man tror - han
@@ -856,11 +860,20 @@ okänd källa), `app/build/outputs/bundle/release/app-release.aab` är för Goog
 [android/app/build.gradle](android/app/build.gradle) för varje ny version. Utan nyckeln byggs bara
 `assembleDebug`, som Chrome inte litar på (adressfältet syns).
 
-**Nedladdningen:** <https://matchfixarna.se/app> ([public/app/index.html](public/app/index.html),
-[public/appen.css](public/appen.css)) – adressen att skicka till gänget. En guldknapp *Ladda ner till Android*
-och de fyra stegen i telefonen (behåll filen, öppna den, tillåt installationen från Chrome, *Installera ändå*
-om Play Protect varnar). I en iPhone står Safari-vägen (*Dela → Lägg till på hemskärmen*) först, och i appen
-själv (eller sajten installerad från Chrome, `display-mode: standalone`) visas varken knappen eller stegen.
+**Installationen:** <https://matchfixarna.se/app> ([public/app/index.html](public/app/index.html),
+[public/appen.css](public/appen.css)) – adressen att skicka till gänget. Guldknappen *Installera* använder Chromes
+egen installation (`beforeinstallprompt`, i Android och i Chrome/Edge på datorn): sajten blir en app i telefonen
+eller datorn, med `start_url` `/`, alltså tobaksaffären. Chrome 157 skickade händelsen direkt, också i en ny profil
+utan service worker; kommer den inte (äldre Chrome som vill att sajten har använts en stund, eller en annan
+webbläsare) skriver knappen i raden under sig var installationen finns (⋮ i Android, ikonen i adressfältet på
+datorn, Arkiv → Lägg till i Dock i Safari). Raden har plats för två rader från början, så inget flyttar sig.
+Manifestets genvägar till Kupongen, Olympen, Matcherna och Tabeller lades inte in: de leder till den vanliga sidan,
+och appen ska vara affären. När appen redan finns – den installerade sajten (`display-mode: standalone`), appen
+nedan eller sajten installerad från Chrome (`navigator.getInstalledRelatedApps` med `related_applications` i
+[public/manifest.webmanifest](public/manifest.webmanifest)) – står *Du har redan appen* i stället för knappen. I
+Android ligger APK:n i en hopfälld ruta, *Hämta appen som fil i stället*, med de fyra stegen (behåll filen, öppna
+den, tillåt installationen från Chrome, *Installera ändå* om Play Protect varnar). I en iPhone står Safari-vägen
+(*Dela → Lägg till på hemskärmen*) i stället för knappen; på datorn heter rubriken *Matchfixarna på datorn*.
 Filen är [public/app/matchfixarna.apk](public/app/matchfixarna.apk), en kopia av `app-release.apk`: byts
 när appen byggs om, och då ändras versionen och storleken på sidan. Länken *Appen* står i foten på
 förstasidan, Om oss, Tabeller och Statistik, dold i appen (`.bara-webb` i theme.css). Menyikonerna i
