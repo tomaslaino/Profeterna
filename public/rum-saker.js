@@ -44,20 +44,25 @@ const O = { x: 1190, y: 665 };
 const BOX = { x: 882, y: 400, w: 426, h: 570 };
 // Högen med de inlämnade kupongerna till höger om kupongen (HOG i rum.js),
 // i pultens px. Där låg domarens kort och visselpipa förut.
-const HOGEN = { x0: 1080, x1: 1322, y0: 816, y1: 1014 };
+// (8 åt vänster sedan tidningen blev större, 2026-11-19)
+const HOGEN = { x0: 1072, x1: 1314, y0: 816, y1: 1014 };
+// Askkoppen, snusdosan och locket är STOR gånger så stora som måtten nedan
+// (en femtedel större sedan 2026-11-19, när tidningen också blev det).
+const STOR = 1.2;
 // Platserna på pulten (pultens px), en per dag: fläkten med det håll den
 // svänger kring (grader, 90 = mot betraktaren, 180 = åt vänster),
 // askkoppen och snusdosan. Locket och prisen läggs där det finns plats.
 // (Allt bakom högen, mellan kupongen och tidningen, som breder ut sig nedtill
-// i perspektivet: 1100 ≤ x ≤ 1265, y ≤ 806.)
+// i perspektivet: 1100 ≤ x ≤ 1235, y ≤ 806. Före 2026-11-19, då tidningen
+// och sakerna blev större, gick det till x 1265.)
 const LAYOUTS = [
-  { fan: [1231, 670, 160], ash: [1138, 724], snus: [1235, 779] },
-  { fan: [1233, 668, 140], ash: [1215, 763], snus: [1145, 729] },
-  { fan: [1185, 667, 80], ash: [1143, 763], snus: [1243, 773] },
-  { fan: [1145, 667, 100], ash: [1231, 729], snus: [1147, 781] },
+  { fan: [1205, 670, 160], ash: [1138, 724], snus: [1214, 781] },
+  { fan: [1208, 668, 130], ash: [1188, 768], snus: [1120, 722] },
+  { fan: [1170, 667, 80], ash: [1134, 750], snus: [1222, 784] },
+  { fan: [1140, 667, 100], ash: [1200, 727], snus: [1134, 784] },
 ];
 // där det finns plats: bakom högen, mellan kupongen och tidningen
-const free = ([px, py]) => py >= 662 && py <= 806 && px <= 1265 && px >= 1100;
+const free = ([px, py]) => py >= 662 && py <= 806 && px <= 1235 && px >= 1100;
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
@@ -308,8 +313,9 @@ async function props(pult, opt) {
 
   // ---------- askkoppen ----------
 
-  const ASH = { x: 0, z: 0, R: 45 };
+  const ASH = { x: 0, z: 0, R: 45 * STOR };
   const tray = new THREE.Group();
+  tray.scale.setScalar(STOR);
   world.add(tray);
   // genomskärningen utifrån och in: foten, sidan, kanten och skålen
   const prof = [[0, 0], [36, 0], [40, 0.6], [43, 2.6], [44.6, 8], [45, 13.2], [44, 15.2], [40.5, 16], [37, 15.2], [34.5, 11], [31.5, 7], [22, 5.9], [0, 5.7]]
@@ -534,8 +540,10 @@ async function props(pult, opt) {
 
   // ---------- snusdosan ----------
 
-  const SN = { x: 0, z: 0 };
+  // (SN.R och LID.R: hur mycket plats dosan och locket tar på pulten)
+  const SN = { x: 0, z: 0, R: 21 * STOR };
   const dosa = new THREE.Group();
+  dosa.scale.setScalar(STOR);
   world.add(dosa);
   const bandTex = canvasTex(512, 64, (g, w, h) => {
     g.fillStyle = '#efe8d8';
@@ -579,6 +587,7 @@ async function props(pult, opt) {
     specks(g, w, h, 160, ['#bfb39a', '#8a7f68'], 1.6, 83);
   });
   const lid = new THREE.Group();
+  lid.scale.setScalar(STOR);
   world.add(lid);
   const lidTop = mesh(new THREE.CylinderGeometry(21.6, 21.6, 1, 48), [mat('#efe8d8', { roughness: 0.4 }), mat('#ffffff', { map: lidTex, roughness: 0.35, clearcoat: 0.5 }), mat('#d8cfbb', { roughness: 0.5 })], lid);
   lidTop.position.y = 4;
@@ -598,23 +607,23 @@ async function props(pult, opt) {
   }
   // locket, efter dagen: bredvid dosan (längre bort när det går dåligt),
   // lutat mot dosans kant eller upp och ner
-  const LID = { x: 0, z: 0 };
+  const LID = { x: 0, z: 0, R: 22 * STOR };
   function placeLid(w, s) {
     const v = hash(s + 21);
     const lean = v >= 0.4 && v < 0.75 && w <= 0.7;
-    const d = lean ? 30 : 46 + w * 18 + hash(s + 23) * 8;
+    const d = (lean ? 30 : 46 + w * 18 + hash(s + 23) * 8) * STOR;
     const a0 = hash(s + 22) * Math.PI * 2;
-    const at = spotNear(SN, d, a0, lean ? 8 : 22) || spotNear(SN, 30, a0, 8) || { x: SN.x - 30, z: SN.z, a: Math.PI };
+    const at = spotNear(SN, d, a0, (lean ? 8 : 22) * STOR) || spotNear(SN, 30 * STOR, a0, 8 * STOR) || { x: SN.x - 30 * STOR, z: SN.z, a: Math.PI };
     lid.rotation.set(0, hash(s + 24) * 6, 0);
     Object.assign(LID, { x: at.x, z: at.z });
     if (lean) {
-      lid.position.set(at.x, 3, at.z);
+      lid.position.set(at.x, 3 * STOR, at.z);
       lid.rotation.set(0, -at.a + Math.PI / 2, 0);
       lid.rotateX(58 * DEG);
     } else if (v < 0.75) {
       lid.position.set(at.x, 0, at.z);
     } else {
-      lid.position.set(at.x, 4.6, at.z);
+      lid.position.set(at.x, 4.6 * STOR, at.z);
       lid.rotation.x = Math.PI;
     }
   }
@@ -633,12 +642,12 @@ async function props(pult, opt) {
   fleck.rotation.x = -Math.PI / 2;
   fleck.castShadow = false;
   function placeSnus(w, s) {
-    const pr = spotNear(ASH, 62 + hash(s + 31) * 14, hash(s + 32) * Math.PI * 2, 8, [[SN.x, SN.z, 21], [LID.x, LID.z, 22]]) || { x: ASH.x + 60, z: ASH.z + 40 };
+    const pr = spotNear(ASH, (62 + hash(s + 31) * 14) * STOR, hash(s + 32) * Math.PI * 2, 8, [[SN.x, SN.z, SN.R], [LID.x, LID.z, LID.R]]) || { x: ASH.x + 60 * STOR, z: ASH.z + 40 * STOR };
     const n = Math.round(w * 22);
     crumbs.forEach((m, i) => {
       m.visible = i < n;
       const a = hash(s + i * 1.37) * Math.PI * 2;
-      const rr = 22 + hash(s + i * 2.17) ** 1.5 * 34;
+      const rr = (22 + hash(s + i * 2.17) ** 1.5 * 34) * STOR;
       m.position.set(SN.x + Math.cos(a) * rr, 0.5, SN.z + Math.sin(a) * rr * 0.75);
       if (paHogen(m.position.x, m.position.z)) m.visible = false;
       const k = 0.6 + hash(s + i * 4.3) * 1.2;
@@ -818,11 +827,11 @@ async function props(pult, opt) {
   function placeFika(w, s) {
     if (!fikat) { FK.visa(null); return; }
     const r = FK.r(fikat);
-    const busy = [[ASH.x, ASH.z, ASH.R], [SN.x, SN.z, 21], [LID.x, LID.z, 22]];
+    const busy = [[ASH.x, ASH.z, ASH.R], [SN.x, SN.z, SN.R], [LID.x, LID.z, LID.R]];
     if (fan.visible) busy.push([FAN.x, FAN.z, FAN.R]);
     if (pris.visible) busy.push([pris.position.x, pris.position.z, 8]);
     const cand = [];
-    for (let y = 690; y <= 800; y += 12) for (let x = 1120; x <= 1250; x += 13) cand.push([x, y]);
+    for (let y = 690; y <= 800; y += 12) for (let x = 1110; x <= 1230; x += 12) cand.push([x, y]);
     const ok = cand.find((c) => { const p = onDesk(...c); return free(c) && !paHogen(p.x, p.z, r * 0.8) && busy.every(([bx, bz, br]) => Math.hypot(p.x - bx, p.z - bz) > br + r * 0.8); });
     FK.visa(fikat, onDesk(...(ok || cand[0])), w, s);
   }

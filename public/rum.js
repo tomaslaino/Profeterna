@@ -686,7 +686,8 @@ window.Rum = (() => {
   // Den ligger i pultens plan som lampan över pulten (samma tonande och oskärpa vid närbilderna), ritas en gång
   // och har sitt ljus bland käglorna (KAGLOR), i lacken (spegelBild) och på natten (rum-folk.css).
   // Mått i scenens enheter (BORD: skärmens mitt i x, ovankant och nedre kant, foten), omräknade till planet.
-  const BORD = { x: 1588, topp: 601, kant: 655, fot: 770 };
+  // (x 1588 till 2026-11-19, då tidningen blev större och lampan flyttades lite åt höger för att ge den plats)
+  const BORD = { x: 1598, topp: 601, kant: 655, fot: 770 };
   function bordslampa() {
     const { x, topp, kant, fot } = BORD;
     const a = 90;
@@ -2592,8 +2593,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // i rum-saker.js: HOGEN där). Högen ligger så långt fram, och kupongerna
   // så tätt att namnen nätt och jämnt syns, sedan tidningen låg bakom den
   // (till 2026-11-11); på höjden är kupongerna högre (420 × 620), och där
-  // ligger den ännu lite längre fram (smal).
-  const HOG = { s: 0.3, at: [[1204, 874, 5], [1196, 910, -4], [1208, 946, 2]], smal: 18, skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
+  // ligger den ännu lite längre fram (smal). 8 åt vänster sedan tidningen blev större (2026-11-19).
+  const HOG = { s: 0.3, at: [[1196, 874, 5], [1188, 910, -4], [1200, 946, 2]], smal: 18, skugga: '0 22px 30px rgba(0, 0, 0, 0.55)' };
   const INK = ['#2146a6', '#16784b', '#6d3aa8', '#8a6a0c', '#a0306a'];
   function slot(i) {
     const [x, y, a] = HOG.at[i % HOG.at.length];

@@ -18,11 +18,14 @@
    med överkanten vid pultens bakkant; askkoppen, dosan och fläkten står bakom högen (rum-saker.js). Förut låg den
    bakom högen, med kupongerna på dess nedre del (ändrat 2026-11-11). Lite snett och platt i pultens perspektiv, i
    rummets ljus och med ett veck på mitten, vriden kring överkanten. --vila är läget där den ligger, och lyft i rum.js lyfter den därifrån (UPPE, samma
-   funktioner). Samma tidning ligger på pulten hos Hasse Backe (.rh-pa-hg, pultPapper i rum-hasse.js). */
-#rum-helgarderat, .rh-pa-hg { --z: 1.75; }
+   funktioner). Samma tidning ligger på pulten hos Hasse Backe (.rh-pa-hg, pultPapper i rum-hasse.js).
+   2026-11-19 en femtedel större (--z 1,75 → 2,1, "lite större"): den växer mest åt vänster och nedåt, med mitten vid
+   x 1408 i stället för 1415. Bordslampan flyttades 10 åt höger, högen 8 åt vänster och askkoppen och dosan, som
+   också blev större, närmare kupongen (rum-saker.js), så att det är lika luftigt mellan sakerna som förut. */
+#rum-helgarderat, .rh-pa-hg { --z: 2.1; }
 #rum-helgarderat {
   --vila: perspective(1100px) translate3d(0px, 0px, 0px) rotateX(41deg) rotateZ(-3deg) scale(1);
-  position: absolute; left: calc(1415px - var(--z) * 50px); top: 664px; width: calc(var(--z) * 100px); height: calc(var(--z) * 140px); overflow: hidden;
+  position: absolute; left: calc(1408px - var(--z) * 50px); top: 664px; width: calc(var(--z) * 100px); height: calc(var(--z) * 140px); overflow: hidden;
   transform: var(--vila); transform-origin: 50% 0;
   /* tunt papper som ligger an mot pulten: skuggan tätt intill, bara lite mer nertill där det buktar upp */
   box-shadow: 0 0.6px 1px rgba(0, 0, 0, 0.55), 0 3px 7px rgba(0, 0, 0, 0.32);
