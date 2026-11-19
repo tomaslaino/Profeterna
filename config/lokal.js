@@ -28,8 +28,9 @@ const mc = require('./media.js');
 const LOKALTIDNINGAR = new Set(mc.lokaltidningar);
 
 // Newsquests tidningar säger nej till AI-assistenters läsning (Claude-User i robots.txt, kontrollerat
-// 2026-11-10 för alla nedan), så jobbet läser dem aldrig. De stryks ur sökningen, så att platserna går
-// till tidningar som går att läsa (Reach, National World, Express & Star, KentOnline m.fl.).
+// 2026-11-10 för alla nedan), så jobbet läser dem aldrig på deras egna sajter. De stryks ur sökningen, så att platserna går
+// till tidningar som går att läsa (Reach, National World, Express & Star, KentOnline m.fl.). Deras artiklar på Yahoo
+// Sports läses sedan 2026-11-19 (yahoo nedan).
 const SAGER_NEJ = [
   'readingchronicle.co.uk', 'oxfordmail.co.uk', 'thisisoxfordshire.co.uk', 'theboltonnews.co.uk', 'lancashiretelegraph.co.uk',
   'thisislancashire.co.uk', 'burytimes.co.uk', 'warringtonguardian.co.uk', 'thenorthernecho.co.uk', 'yorkpress.co.uk',
@@ -46,8 +47,9 @@ module.exports = {
   effort: 'medium',
   timeoutMs: 420000,
 
-  // Så många sökningar per lag, och högst så många artiklar som läses per lag och natt.
-  sokningar: 6,
+  // Så många sökningar per lag, och högst så många artiklar som läses per lag och natt. (8 sedan 2026-11-19, så att
+  // det finns plats att söka upp lokaltidningens rubriker på Yahoo Sports.)
+  sokningar: 8,
   artiklar: 4,
   // Bara artiklar från de senaste så här många dagarna: presskonferensen är från veckan.
   dagar: 7,
@@ -78,6 +80,19 @@ module.exports = {
   // Samma som de insattas lista, utom lokaltidningarna (här är de med), och Newsquests tidningar.
   utesluten: [...mc.utesluten.filter((d) => !LOKALTIDNINGAR.has(d)), ...SAGER_NEJ],
 
+  // Lokaltidningarnas artiklar på Yahoo Sports (användarens beslut 2026-11-19, efter att ha fått veta att både
+  // Newsquest och Yahoo säger nej till AI-läsare). Newsquests tidningar säger nej till Claude-User på sina egna
+  // sajter, men Yahoo Sports publicerar många av deras artiklar, med tidningen som källa i sidans JSON-LD
+  // (provider). Yahoo säger nej till ChatGPT-User, ClaudeBot och Claude-Web men inget till Claude-User, och på
+  // värdarna här räknas bara det som sägs till oss (robotsRegler i src/analyser/forum.mjs). En sida där läses
+  // bara när den kommer från en av lokaltidningarna (tidningar: sajtens adress i provider), och den står i
+  // matchbladet med tidningens namn. Newsquests rubriker i Bing News får Claude som rubriker att söka upp på Yahoo.
+  yahoo: {
+    vardar: ['uk.sports.yahoo.com', 'sports.yahoo.com'],
+    tidningar: mc.lokaltidningar,
+    rubriker: 8,
+  },
+
   // Byts den läses lagens artiklar om av Claude.
   promptVersion: '2026-11-10.1',
 
@@ -88,9 +103,9 @@ Det som räknas, med slaget inom citattecken:
 - "tidningen": lokaltidningens reporter som följer klubben, också i Reach och National World: truppnyheter, väntad startelva, vad tränaren sa på presskonferensen, iakttagelser från träningen,
 - "intervju": inför just nästa match, motståndarlagets fansajt, lokaltidning eller nyhetsbrev som intervjuar en supporter till klubben ("opposition view", "Q&A", "enemy lines", "the view from …").
 
-Det som INTE räknas: biljetter, matchdagsinformation, butiken och klubbens reklam, klubbens egna fansajter, fanzines och supporternyhetsbrev (de läses för sig), de nationella mediehusen (BBC, Sky, de rikstäckande tidningarna), Newsquests tidningar (Reading Chronicle, Oxford Mail, The Bolton News, Lancashire Telegraph, The Northern Echo och de andra; de går inte att läsa här), ligans sajter, spelsajter och sajter med matchtips, aggregatorer och klickfabriker som skriver om alla klubbar (Football League World, Football Fancast, TEAMtalk, GiveMeSport, Football Insider, HITC, OneFootball och liknande), statistiksajter, forum, Reddit, sociala medier, poddar och videor.
+Det som INTE räknas: biljetter, matchdagsinformation, butiken och klubbens reklam, klubbens egna fansajter, fanzines och supporternyhetsbrev (de läses för sig), de nationella mediehusen (BBC, Sky, de rikstäckande tidningarna, också när Yahoo Sports publicerar dem), Newsquests tidningar på sina egna sajter (Reading Chronicle, Oxford Mail, The Bolton News, Lancashire Telegraph, The Northern Echo, East Anglian Daily Times, Watford Observer, Daily Echo och de andra; de går inte att läsa där), ligans sajter, spelsajter och sajter med matchtips, aggregatorer och klickfabriker som skriver om alla klubbar (Football League World, Football Fancast, TEAMtalk, GiveMeSport, Football Insider, HITC, OneFootball och liknande), statistiksajter, forum, Reddit, sociala medier, poddar och videor.
 
-Du får ofta veckans nyheter om klubben ur Bing News; välj gärna bland dem. Sök på nätet efter klubbens och lokaltidningens artiklar från de senaste {dagar} dagarna och efter intervjun inför nästa match. Sök gärna direkt på klubbens sajt och lokaltidningens sajt (site:). Det senaste skadebeskedet räknas också när det kom efter förra matchen och inte nämner nästa. Högst {sokningar} sökningar. Välj de högst {artiklar} artiklar som säger mest inför nästa match: helst tränarens presskonferens eller klubbens senaste skadebesked, lokaltidningens senaste truppnyheter och, om den finns, intervjun. Många klubbsajter visar texten först i webbläsaren och går inte att läsa här, så ta hellre lokaltidningens referat av presskonferensen än klubbens, och klubbens sajt bara när det är en skriven artikel (inte en video). Ta bara med artiklar som kom upp i dina sökningar, med adressen exakt som där. Hitta aldrig på en adress: finns inget som håller är listan tom, och det är ett bra svar.
+Du får ofta veckans nyheter om klubben ur Bing News; välj gärna bland dem. Yahoo Sports (uk.sports.yahoo.com) publicerar många lokaltidningars artiklar, Newsquests också, med tidningen som källa: när lokaltidningen är en av Newsquests, sök upp dess artiklar där (site:uk.sports.yahoo.com och klubbens namn eller artikelns rubrik), ge Yahoo-adressen och tidningens namn som kalla. Får du rubriker ur en sådan tidning, sök upp just dem på Yahoo Sports. Sök på nätet efter klubbens och lokaltidningens artiklar från de senaste {dagar} dagarna och efter intervjun inför nästa match. Sök gärna direkt på klubbens sajt och lokaltidningens sajt (site:). Det senaste skadebeskedet räknas också när det kom efter förra matchen och inte nämner nästa. Högst {sokningar} sökningar. Välj de högst {artiklar} artiklar som säger mest inför nästa match: helst tränarens presskonferens eller klubbens senaste skadebesked, lokaltidningens senaste truppnyheter och, om den finns, intervjun. Många klubbsajter visar texten först i webbläsaren och går inte att läsa här, så ta hellre lokaltidningens referat av presskonferensen än klubbens, och klubbens sajt bara när det är en skriven artikel (inte en video). Ta bara med artiklar som kom upp i dina sökningar, med adressen exakt som där. Hitta aldrig på en adress: finns inget som håller är listan tom, och det är ett bra svar.
 
 Svara bara med JSON, utan något före eller efter:
 {"artiklar": [{"slag": "klubben", "kalla": "<sajtens eller tidningens namn som den kallar sig, utan parentes>", "titel": "<artikelns rubrik>", "adress": "https://…", "datum": "ÅÅÅÅ-MM-DD eller null"}]}`,

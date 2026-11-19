@@ -60,6 +60,17 @@ export function utesluten(url, lista = mc.utesluten) {
   return lista.some((d) => v === d || v.endsWith(`.${d}`));
 }
 
+// Värden utan www.
+const vardAv = (url) => { try { return new URL(url).hostname.toLowerCase().replace(/^www\./, ''); } catch { return null; } };
+const paSajt = (v, lista) => Boolean(v) && lista.some((d) => v === d || v.endsWith(`.${d}`));
+
+// Yahoo Sports med lokaltidningarnas artiklar (cfg.yahoo, config/lokal.js): en sådan adress är inte utesluten,
+// fast Yahoo annars är det. Om sidan kommer från en lokaltidning avgör läsningen (lasArtikel).
+export const arYahoo = (url, cfg = mc) => Boolean(cfg.yahoo) && (cfg.yahoo.vardar || []).includes(vardAv(url) || '');
+const uteslutenFor = (url, cfg) => !arYahoo(url, cfg) && utesluten(url, cfg.utesluten);
+// En lokaltidning som inte går att läsa på sin egen sajt men vars rubrik kan sökas upp på Yahoo Sports.
+const viaYahoo = (url, cfg) => Boolean(cfg.yahoo) && utesluten(url, cfg.utesluten) && paSajt(vardAv(url), cfg.yahoo.tidningar || []);
+
 // Claudes svar på sökningen → artiklarna som håller: adressen kom upp i en sökning (found) och hör
 // inte till en utesluten sajt. Samma artikel tas en gång. Har konfigurationen slag (config/lokal.js)
 // följer artikelns slag med, och en artikel med ett okänt slag stryks. Personen som artikeln handlar om (om,
@@ -74,7 +85,7 @@ export function artiklarAv(content, found = [], { cfg = mc, flest = cfg.artiklar
   for (const x of j.artiklar) {
     const adress = x && typeof x.adress === 'string' ? x.adress.trim() : '';
     const ren = renAdress(adress);
-    if (!ren || tagna.has(ren) || !sedda.has(ren) || utesluten(adress, cfg.utesluten)) continue;
+    if (!ren || tagna.has(ren) || !sedda.has(ren) || uteslutenFor(adress, cfg)) continue;
     const slag = cfg.slag ? (x && typeof x.slag === 'string' ? x.slag.trim().toLowerCase() : '') : null;
     if (cfg.slag && !cfg.slag[slag]) continue;
     tagna.add(ren);
@@ -105,15 +116,19 @@ export function namnerLaget(titel, lag) {
   return re.test(String(titel || ''));
 }
 
-// Bing News RSS → veckans nyheter om laget på sajter som inte är uteslutna. → [{kalla, titel, adress, datum}]
+// Bing News RSS → veckans nyheter om laget på sajter som inte är uteslutna. Med cfg.yahoo följer också en
+// lokaltidning som inte går att läsa på sin egen sajt med, som viaYahoo: dess rubrik kan sökas upp på Yahoo Sports.
+// → [{kalla, titel, adress, datum, viaYahoo?}]
 export function bingNyheter(xml, lag, { cfg = mc, now = Date.now() } = {}) {
   const ut = [];
   for (const x of parseRss(xml)) {
     let adress = x.link;
     try { const u = new URL(x.link); if (/(^|\.)bing\.com$/.test(u.hostname) && u.searchParams.get('url')) adress = u.searchParams.get('url'); } catch { continue; }
     const t = Date.parse(x.pubDate);
-    if (!Number.isFinite(t) || now - t > cfg.dagar * DAG || t - now > DAG || (lag && !namnerLaget(x.title, lag)) || !renAdress(adress) || utesluten(adress, cfg.utesluten)) continue;
-    ut.push({ kalla: String(x.source || new URL(adress).hostname.replace(/^www\./, '')).slice(0, 80), titel: String(x.title || '').trim().slice(0, 200), adress, datum: new Date(t).toISOString() });
+    if (!Number.isFinite(t) || now - t > cfg.dagar * DAG || t - now > DAG || (lag && !namnerLaget(x.title, lag)) || !renAdress(adress)) continue;
+    const via = viaYahoo(adress, cfg);
+    if (!via && uteslutenFor(adress, cfg)) continue;
+    ut.push({ kalla: String(x.source || new URL(adress).hostname.replace(/^www\./, '')).slice(0, 80), titel: String(x.title || '').trim().slice(0, 200), adress, datum: new Date(t).toISOString(), ...(via ? { viaYahoo: true } : {}) });
   }
   return ut;
 }
@@ -151,7 +166,9 @@ export async function bingTraffar(lag, { cfg = mc, now = Date.now(), fetchImpl =
       ut.push(x);
     }
   }
-  return ut.sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, cfg.bing.flest);
+  ut.sort((a, b) => b.datum.localeCompare(a.datum));
+  // Rubrikerna att söka upp på Yahoo Sports tar inte platsen från dem som går att läsa.
+  return [...ut.filter((x) => !x.viaYahoo).slice(0, cfg.bing.flest), ...ut.filter((x) => x.viaYahoo).slice(0, (cfg.yahoo && cfg.yahoo.rubriker) || 0)];
 }
 
 // Hur laget söks i Bing News på sitt eget språk (cfg.sokordPrompt, config/utland.js): ett kort anrop utan verktyg.
@@ -178,12 +195,15 @@ export async function bingSokord({ lag, mot = null, avspark = null, now = () => 
 // Söker fram veckans artiklar om laget, med lagets nyheter i Bing News som träffar när cfg.bing finns (sok: på
 // lagets eget språk, bingSokord). → [{kalla, titel, adress, datum, varfor, slag?}]
 export async function letaArtiklar({ lag, mot = null, avspark = null, now = () => new Date(), claude = claudeSvar, cfg = mc, fetchImpl = globalThis.fetch, sok = null } = {}) {
-  const bing = cfg.bing && (sok || !cfg.sokordPrompt) ? await bingTraffar(lag, { cfg, now: now().getTime(), fetchImpl, sok }).catch(() => []) : [];
+  const traffar = cfg.bing && (sok || !cfg.sokordPrompt) ? await bingTraffar(lag, { cfg, now: now().getTime(), fetchImpl, sok }).catch(() => []) : [];
+  const bing = traffar.filter((b) => !b.viaYahoo);
+  const rubriker = traffar.filter((b) => b.viaYahoo);
   const r = await claude({
     system: cfg.letaPrompt.replace('{dagar}', cfg.dagar).replace('{sokningar}', cfg.sokningar).replace('{artiklar}', cfg.artiklar),
     prompt: [
       `Idag är det ${nowFmt.format(now())}.`, `${cfg.lagOrd || 'Klubben'}: ${lag}.${mot ? ` Nästa match: mot ${mot}${avspark ? `, ${nowFmt.format(new Date(avspark))}` : ''}.` : ''}`,
       bing.length ? `\nVeckans nyheter om ${(cfg.lagOrd || 'Klubben').toLowerCase()} i Bing News (de räknas som träffar i dina sökningar):\n${bing.map((b) => `- ${b.datum.slice(0, 10)} ${b.kalla}: "${b.titel}" ${b.adress}`).join('\n')}` : '',
+      rubriker.length ? `\nVeckans rubriker i lokaltidningar som inte går att läsa på sin egen sajt (sök upp samma artikel på Yahoo Sports; de här adresserna räknas inte):\n${rubriker.map((b) => `- ${b.datum.slice(0, 10)} ${b.kalla}: "${b.titel}"`).join('\n')}` : '',
     ].filter(Boolean).join('\n'),
     tools: ['WebSearch'], model: cfg.model, effort: cfg.letaEffort, timeoutMs: cfg.timeoutMs,
   });
@@ -235,8 +255,9 @@ const namnAv = (v) => {
 };
 const tidAv = (v) => (v && Number.isFinite(Date.parse(v)) ? new Date(Date.parse(v)).toISOString() : null);
 
-// Sidans html → {titel, datum, forfattare, sajt, text}. Texten är artikelns (<article>, annars
-// <main>, annars hela sidan), utan meny, sidfot, formulär och inbäddat.
+// Sidans html → {titel, datum, forfattare, sajt, ursprung, text}. Texten är artikelns (<article>, annars
+// <main>, annars hela sidan), utan meny, sidfot, formulär och inbäddat. Yahoo Sports har brödtexten utanför
+// <article>, i <div class="content-body">, och tidningen den kommer från i JSON-LD:s provider (ursprung: {namn, adress}).
 export function artikelAv(html) {
   const s = String(html || '');
   const meta = metaTaggar(s);
@@ -249,7 +270,7 @@ export function artikelAv(html) {
   // Den längsta <article> (en sida kan ha puffar för andra artiklar), annars <main>, annars hela sidan.
   const texten = (el) => tillText(el.replace(/<header\b[\s\S]*?<\/header>/gi, ' '));
   let text = '';
-  for (const m of s.matchAll(/<article\b/gi)) {
+  for (const m of s.matchAll(/<article\b|<div\b[^>]*\bclass=["']content-body["']/gi)) {
     const el = elementVid(s, m.index);
     const t = el ? texten(el) : '';
     if (t.length > text.length) text = t;
@@ -259,16 +280,25 @@ export function artikelAv(html) {
     const el = i >= 0 ? elementVid(s, i) : null;
     text = texten(el || s.slice(Math.max(0, s.search(/<body\b/i))));
   }
-  return { titel: avkoda(titel0).replace(/\s+/g, ' ').trim().slice(0, 200) || null, datum, forfattare: forfattare ? avkoda(forfattare).trim() : null, sajt: sajt ? avkoda(sajt).trim().slice(0, 80) : null, text };
+  const prov = ld.provider && typeof ld.provider === 'object' && !Array.isArray(ld.provider) ? ld.provider : null;
+  const ursprung = prov && typeof prov.name === 'string' && prov.name.trim() ? { namn: avkoda(prov.name).trim().slice(0, 80), adress: typeof prov.url === 'string' ? prov.url : null } : null;
+  return { titel: avkoda(titel0).replace(/\s+/g, ' ').trim().slice(0, 200) || null, datum, forfattare: forfattare ? avkoda(forfattare).trim() : null, sajt: sajt ? avkoda(sajt).trim().slice(0, 80) : null, ursprung, text };
 }
 
 export const kortad = (text, flest) => (text.length > flest ? `${text.slice(0, flest).replace(/\s+\S*$/, '')} …` : text);
 
 // Läser en artikel som sökningen gav. → {kalla, titel, adress, datum, forfattare, text, nyckel, slag?} eller kastar
-// (Sparrad när sidan inte får eller kan läsas, Error när den är för gammal eller för kort).
+// (Sparrad när sidan inte får eller kan läsas, Error när den är för gammal eller för kort). En sida på Yahoo Sports
+// (cfg.yahoo) läses bara när den kommer från en lokaltidning, och källan är då tidningen.
 export async function lasArtikel(a, { now = Date.now(), cfg = mc, ...opts } = {}) {
-  const { url, html } = await lasSida(a.adress, opts);
+  const yahoo = arYahoo(a.adress, cfg);
+  const { url, html } = await lasSida(a.adress, yahoo ? { ...opts, baraVara: cfg.yahoo.vardar } : opts);
   const art = artikelAv(html);
+  if (yahoo) {
+    const fran = art.ursprung;
+    if (!fran || !paSajt(vardAv(fran.adress), cfg.yahoo.tidningar || [])) throw new Error(`på Yahoo Sports från ${fran ? fran.namn : 'en okänd källa'}, inte en lokaltidning`);
+    a = { ...a, kalla: fran.namn };
+  }
   const datum = art.datum || (a.datum ? `${a.datum}T12:00:00.000Z` : null);
   if (datum && now - Date.parse(datum) > cfg.dagar * DAG) throw new Error(`för gammal (${datum.slice(0, 10)})`);
   if (art.text.length < cfg.minstTecken) throw new Error(`för kort (${art.text.length} tecken)`);
