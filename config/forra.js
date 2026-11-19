@@ -19,7 +19,7 @@
 //
 // Vem som är ny ändras sällan: den delen sparas per lag i forra.json (utanför repot) och tas fram igen
 // efter giltigDagar dagar. Ett lag utan någon ny söks inte förrän då. Veckans sidor söks igen när den
-// förra sökningen är äldre än sokIgenDagar dagar (natten mot tisdag och mot fredag, inte lördag morgon).
+// förra sökningen är äldre än sokIgenDagar dagar (natten mot tisdag och fredag eftermiddag, inte lördag morgon).
 // Källan sparas som typ 'forra' och står i matchbladet med sitt eget namn.
 //
 // Sidorna är andras och läggs aldrig i repot eller på sajten; dit kommer bara tidningens egna

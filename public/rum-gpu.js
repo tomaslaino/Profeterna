@@ -12,3 +12,13 @@ export function utanSkuggor(renderare) {
   const d = g.getExtension('WEBGL_debug_renderer_info');
   return Boolean(d) && /PowerVR/i.test(String(g.getParameter(d.UNMASKED_RENDERER_WEBGL)));
 }
+
+// three.js frågar efter varje grafikprogram efter dess fellogg (getProgramInfoLog och två
+// getShaderInfoLog) och om det gick att länka. Det är frågor som väntar in grafikprocessen:
+// under starten, när den har texturer och ritningar i kö, står huvudtråden still tills allt
+// före är gjort, för ungefär hundra program i rummet (i en svag telefon 0,7 sekunder sammanlagt,
+// 2026-11-18). Loggen behövs bara när något är fel, så den läses bara med ?rum-fel, där
+// felrutan (rum-fel.js) visar den.
+export function felkoll(renderare) {
+  renderare.debug.checkShaderErrors = /[?&]rum-fel\b/.test(location.search);
+}

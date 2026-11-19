@@ -5,9 +5,10 @@
   installera.sh och hamnar i ~/Library/LaunchAgents.
 
   Startas varje natt kl. 02.15, när datorn inte används, och lördag kl. 08.00 för avsnitten som
-  kom på fredagskvällen, men skriptet går bara på tiderna i config/poddar.js (2026-11-10: natten
-  mot tisdag, natten mot fredag och lördag kl. 08.00) och slutar annars direkt. Sover datorn
-  körs jobbet när den vaknar. LowPriorityIO och Nice: utskriften
+  kom på fredagskvällen, men skriptet går bara på tiderna i config/poddar.js (natten mot tisdag,
+  fredag kl. 13.00 och lördag kl. 08.00) och slutar annars direkt. Fredag kl. 13.00 startar
+  analysjobbet det (launchctl kickstart, poddjobbet i scripts/analyser/skriv.mjs), och när en ny
+  omgång har kommit. Sover datorn körs jobbet när den vaknar. LowPriorityIO och Nice: utskriften
   får inte tränga undan något annat. Skriptet körs ur analysernas klon och rör aldrig git.
 -->
 <plist version="1.0">

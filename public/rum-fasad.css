@@ -50,3 +50,13 @@
   .rum-fasad *, .rum-fasad *::before, .rum-fasad *::after { animation: none !important; }
   .rum-fasad.in, .rum-fasad.ut { animation: none; }
 }
+
+/* Löpsedelsstället på trottoaren (stallet i rum-fasad.js): ramen och benen i två SVG och veckans löpsedel
+   (rum-affischer.css, 100 × 140) emellan, förminskad till sedelns plats. Papperet får gatans ljus (--ljus, som
+   multiplikation). Innan sedeln finns står stället undan (.tom). */
+.rf-stall { position: absolute; pointer-events: none; }
+.rf-stall.tom { visibility: hidden; }
+.rf-stall > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.rf-stall-sedel { position: absolute; width: 100px; height: 140px; overflow: hidden; transform-origin: 0 0; }
+.rf-stall-sedel .rum-aff { left: 0; top: 0; transform: none; filter: none; pointer-events: none; }
+.rf-stall-ljus { position: absolute; inset: 0; background: var(--ljus, #fff); mix-blend-mode: multiply; pointer-events: none; }

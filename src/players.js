@@ -472,14 +472,18 @@ function linkIndexes(compId, teams) {
 //
 //   gw   segermål: målet som gav vinnaren den ledning den aldrig tappade
 //        (vid 3–1 lagets andra mål)
-//   gpts poäng som målen gav: vad laget tappat utan just det målet – 2 i en
-//        match vunnen med ett mål, 1 i en oavgjord, annars 0
+//   gpts poäng som målen gav: vad laget hade tappat utan spelarens mål i
+//        matchen – alla hans mål på en gång (sedan 2026-11-18; förut räknades
+//        varje mål för sig, så att två mål i en 2–1-seger gav 4 poäng av 3).
+//        Ett mål i en uddamålsseger ger 2, i en oavgjord 1; aldrig mer än
+//        laget tog i matchen
 //   g1   matchens första mål     ghd nick     gpen straff     gfk frispark
 //   gout utanför straffområdet   glate från 80:e minuten (tilläggstid räknas)
 //   gsub som inhoppare           pmiss missade straffar
 const GOAL_KEYS = ['g', 'gw', 'gpts', 'g1', 'ghd', 'gpen', 'gfk', 'gout', 'glate', 'gsub', 'pmiss'];
 const KIND_KEYS = ['ghd', 'gpen', 'gfk', 'gout', 'pmiss'];
 const LATE_MINUTE = 80;
+const points = (us, them) => (us > them ? 3 : us === them ? 1 : 0);
 
 function matchGoals(m) {
   const out = new Map();
@@ -489,16 +493,15 @@ function matchGoals(m) {
   };
   const final = {};
   for (const x of m.g) final[x.t] = (final[x.t] || 0) + 1;
+  const against = (team) => Object.keys(m.t).filter((t) => t !== team).reduce((sum, t) => sum + (final[t] || 0), 0);
   const run = {};
   m.g.forEach((x, i) => {
     run[x.t] = (run[x.t] || 0) + 1;
     if (x.o || !x.p) return;
     const k = `${x.t}|${x.p}`;
-    const us = final[x.t];
-    const them = Object.keys(m.t).filter((t) => t !== x.t).reduce((sum, t) => sum + (final[t] || 0), 0);
+    const them = against(x.t);
     add(k, 'g');
-    if (us > them && run[x.t] === them + 1) add(k, 'gw');
-    if (us - them === 1) { add(k, 'gpts'); add(k, 'gpts'); } else if (us === them) add(k, 'gpts');
+    if (final[x.t] > them && run[x.t] === them + 1) add(k, 'gw');
     if (i === 0) add(k, 'g1');
     if (x.s === 'n') add(k, 'ghd');
     if (x.s === 's') add(k, 'gpen');
@@ -507,6 +510,13 @@ function matchGoals(m) {
     if (x.m >= LATE_MINUTE) add(k, 'glate');
     if (x.i) add(k, 'gsub');
   });
+  // Poängen åt laget: resultatet med spelarens mål mot resultatet utan dem.
+  for (const [k, s] of out) {
+    if (!s.g) continue;
+    const t = k.slice(0, k.indexOf('|'));
+    const them = against(t);
+    s.gpts = points(final[t], them) - points(final[t] - s.g, them);
+  }
   for (const x of m.pm || []) add(`${x.t}|${x.p}`, 'pmiss');
   return out;
 }
@@ -780,4 +790,4 @@ function playerFiles() {
   return DIVISIONS.map((c) => ({ path: `players/${c.id}.json`, data: divisionPlayers(c.id) }));
 }
 
-module.exports = { divisionPlayers, teamSquad, playerFiles, linkIndexes, LEAGUES };
+module.exports = { divisionPlayers, teamSquad, playerFiles, linkIndexes, matchGoals, LEAGUES };

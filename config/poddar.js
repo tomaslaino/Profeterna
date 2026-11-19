@@ -25,11 +25,16 @@ module.exports = {
   timeoutMs: 420000,
 
   // När genomgången körs, i svensk tid (dag: 0 = söndag, 1 = måndag …; användarens beslut
-  // 2026-11-10, före det varje natt): natten mot tisdag för helgens efterhandsavsnitt, natten
-  // mot fredag för veckans presskonferenser och lördag morgon för förhandsavsnitten som kom på
-  // fredagen. launchd startar skriptet varje natt kl. 02.15 och lördag kl. 08.00 (plist-filen),
-  // och skriptet går bara när en av tiderna här har slagit sedan förra gången, så tiderna kan
-  // ändras här utan att jobbet installeras om – men bara till de klockslagen.
+  // 2026-11-10, före det varje natt): natten mot tisdag för helgens efterhandsavsnitt, fredag
+  // kl. 13.00 för veckans presskonferenser och lördag morgon för förhandsavsnitten som kom på
+  // fredagen. Fredagens tid var natten mot fredag till 2026-11-18, men då hade fredagens
+  // presskonferenser inför lördagen inte hållits; kl. 13.00 är de flesta hållna och skrivna om,
+  // och textkällorna hinner läsas före tidningen kl. 16.00 (config/tidning.js). launchd startar
+  // skriptet varje natt kl. 02.15 och lördag kl. 08.00 (plist-filen). En tid med vacks: true är
+  // en som launchd inte startar det på: analysjobbet, som går var 15:e minut, väcker det när tiden
+  // har slagit utan att jobbet har gått (knuffaPoddar i src/analyser/tider.mjs). Skriptet går bara
+  // när en av tiderna har slagit sedan förra gången, så tiderna kan ändras här utan att jobbet
+  // installeras om. Går väckningen inte körs en missad tid kl. 02.15 natten efter.
   // Europatipset (och andra spel än Stryktipset) har inga fasta dagar. För en sådan omgång går jobbet också första
   // natten efter att omgången har startats och igen när det är så här många timmar kvar till första avsparken
   // (egenTid i src/analyser/tider.mjs; 2026-11-16). Sedan 2026-11-17 går det för varje ny omgång, Stryktipset också,
@@ -38,7 +43,7 @@ module.exports = {
   foreAvspark: 30,
   tider: [
     { dag: 2, kl: '02:15' },
-    { dag: 5, kl: '02:15' },
+    { dag: 5, kl: '13:00', vacks: true },
     { dag: 6, kl: '08:00' },
   ],
 

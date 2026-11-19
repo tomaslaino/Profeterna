@@ -89,7 +89,9 @@ export async function dator(o) {
   const DPR = LATT ? 1.5 : Math.min(2.5, Math.max(2, (window.devicePixelRatio || 1) * 1.25));
   const gl = new THREE.WebGLRenderer({ alpha: true, antialias: !LATT, preserveDrawingBuffer: true });
   gl.toneMapping = THREE.ACESFilmicToneMapping;
-  gl.shadowMap.enabled = !(await import('./rum-gpu.js')).utanSkuggor(gl);
+  const gpu = await import('./rum-gpu.js');
+  gpu.felkoll(gl);
+  gl.shadowMap.enabled = !gpu.utanSkuggor(gl);
   gl.shadowMap.type = THREE.PCFSoftShadowMap;
   gl.domElement.className = 'reg-gl';
   o.nara.append(gl.domElement);
@@ -692,7 +694,7 @@ export async function dator(o) {
   // över fig.k rader – nollan, 1,0 och 2,0, fältet där laget skapade mer än
   // det släppte till och de två linjerna med sitt sken
   function kurva(g, fig, x0, y0, bredd, lh, k34) {
-    const { w, k, ru, f, a, fyll } = fig;
+    const { w, k, ru, f, a, fyll, mot } = fig;
     const n = f.length;
     const X = (i) => x0 + ((n > 1 ? 0.5 + (i * (w - 1)) / (n - 1) : w / 2) / w) * bredd;
     const Y = (v) => y0 + Math.max(0.05, Math.min(k - 0.05, k - 0.5 - v * ru)) * lh;
@@ -718,6 +720,18 @@ export async function dator(o) {
       g.beginPath();
       l.forEach((v, i) => (i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))));
       g.stroke();
+    }
+    // motståndet under figuren (kurvMot i rum-register.js), i tecken och rader
+    if (mot) {
+      const px = (x) => x0 + (x / w) * bredd;
+      g.shadowColor = 'transparent';
+      g.fillStyle = 'rgba(65,255,110,.35)';
+      for (let x = 0; x < bredd; x += 5 * k34) g.fillRect(x0 + x, y0 + mot.mitt * lh - 0.5 * k34, 2 * k34, k34);
+      g.shadowColor = 'rgba(65,255,110,.55)';
+      for (const [x, y, b, h, svar] of mot.st) {
+        g.fillStyle = svar ? FARG[''] : FARG.d;
+        g.fillRect(px(x), y0 + y * lh, (b / w) * bredd, h * lh);
+      }
     }
     g.restore();
   }
