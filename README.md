@@ -1593,6 +1593,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   harlekintrianglar mellan guldkanter precis under Tipsligan och en bröstpanel i bakväggens furu med en list
   överst, som syns mellan bården och bardisken. Tapeten fortsätter upp i taket i telefonen och i videohörnet. Se
   [Tobaksaffären](#tobaksaffären).
+- **Pubtapet i stället för konfettin (2026-11-19, användarens önskemål):** "Det kanske är lite för mycket färger på
+  den nu - kan du ge mig fler alternativ till tapet till väggen. Det ska vara 80/90-tal." Av fem lugnare tapeter i
+  den riktiga scenen (A randig med vinröd nålrand, B engelsk pub, C laxrosa stänktapet, D småblommigt, E sandfärgat
+  rombmönster) valde användaren B: flaskgrönt med ett spaljémönster i ton och en mörkgrön bård med guldkanter och
+  guldromber. Bröstpanelen i furu och bakväggen är som förut. Se [Tobaksaffären](#tobaksaffären).
 - **Inga länkar ut ur tobaksaffären (2026-11-03, användarens önskemål):** det enda som leder
   till den vanliga sajten är *Vanlig sida* i hörnet. Oraklet och skårtavlan har ingen länk
   under närbilden längre, och pokalhyllan, korktavlan, namnet på dörren och kvittot leder
@@ -4848,9 +4853,10 @@ Enter och mellanslag klickar på dem. En match på text-tv:n lägger fram matchb
   inte i menyns hörn; i smalare fönster skärs dörren av och namnet står kvar i hörnet. Ett klick
   → ut genom dörren, och affären utifrån med gänget i fönstret (se [Fasaden](#fasaden)).
 
-Högra väggen är tapetserad (`hogerVagg` och `TAPET` i rum.js, sedan 2026-11-16): konfettitapet, en
-bård med harlekintrianglar på brösthöjd och under den en bröstpanel i samma furu som bakväggen, ritade i
-väggens plan så att bräderna och trianglarna står tätare in mot hörnet. Samma vägg ritas i taket
+Högra väggen är tapetserad (`hogerVagg` och `TAPET` i rum.js, sedan 2026-11-16; pubtapeten sedan
+2026-11-19): flaskgrön tapet med ett spaljémönster i ton, en mörkgrön bård med guldkanter och guldromber på
+brösthöjd och under den en bröstpanel i samma furu som bakväggen, ritade i väggens plan så att bräderna,
+spaljén och romberna står tätare in mot hörnet. Samma vägg ritas i taket
 (telefonen) och i videohörnet (`vaggSvg` i rum-video.js får den från rum.js).
 
 Sakerna på högra väggen (`VAGG` och `POKAL` i rum.js; VAGG ger också ramarna i 3D sina mått): i hörnet

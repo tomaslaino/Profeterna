@@ -205,17 +205,17 @@ window.Rum = (() => {
   <rect x="0" y="90" width="1140" height="7" fill="#000" opacity=".35"/>`;
   }
 
-  // Högra väggen (2026-11-16) tapetserades på 90-talet, medan furun på bakväggen fick vara kvar: ljus
-  // tapet med konfetti i turkos, lila, cerise, gult och blått, en marinblå bård med harlekintrianglar
-  // mellan guldkanter och under den en bröstpanel i samma lackade furu som bakväggen, med en list
-  // överst. Panelen syns mellan bardisken (yb 490) och listen; bården går precis under Tipsligan och
-  // bakom korktavlans nederkant (VAGG). Allt ritas i väggens plan – z in från hörnet mot betraktaren
-  // och yb mätt som i hörnet – och förs ut i bilden med vp, så att bräderna och trianglarna står
-  // tätare in mot hörnet. Röken har gulnat tapeten och mörkt den upptill, och ljuset klingar av ut
-  // mot betraktaren (rum-rwall), som på den nikotingula väggen som var där förut. Ritas mellan x0 och
-  // x1 i bilden: i bg, i taket (tak) där väggen fortsätter upp och i videons hörn (vaggSvg i
-  // rum-video.js, som får den härifrån).
-  const TAPET = { bard: 423, list: 451, panel: 458, bas: '#e2d6bc', konf: ['#1aa3a0', '#7b4fb0', '#d6337a', '#f2b632', '#2f6fb8'] };
+  // Högra väggen (2026-11-16) tapetserades på 90-talet, medan furun på bakväggen fick vara kvar: en
+  // engelsk pubtapet i flaskgrönt med ett spaljémönster i ton (2026-11-19, i stället för konfettin, som
+  // hade för många färger), en mörkgrön bård med guldkanter och guldromber och under den en bröstpanel
+  // i samma lackade furu som bakväggen, med en list överst. Panelen syns mellan bardisken (yb 490) och
+  // listen; bården går precis under Tipsligan och bakom korktavlans nederkant (VAGG). Allt ritas i
+  // väggens plan – z in från hörnet mot betraktaren och yb mätt som i hörnet – och förs ut i bilden med
+  // vp, så att bräderna, spaljén och romberna står tätare in mot hörnet. Röken har mörkt tapeten
+  // upptill, och ljuset klingar av ut mot betraktaren (rum-rwall), som på den nikotingula väggen som var
+  // där förut. Ritas mellan x0 och x1 i bilden: i bg, i taket (tak) där väggen fortsätter upp och i
+  // videons hörn (vaggSvg i rum-video.js, som får den härifrån).
+  const TAPET = { bard: 423, list: 451, panel: 458, farg: { bas: '#2e4a3a', spalje: '#3f604b', ros: '#4d7059', bard: '#1d3127', guld: '#b8964e' } };
   function hogerVagg(x0 = 1140, x1 = W) {
     const vp = (z, yb) => { const q = 1000 / (1000 - z); return [VP[0] + 380 * q, VP[1] + (yb - VP[1]) * q]; };
     const zx = (x) => 1000 * (1 - 380 / (x - VP[0]));
@@ -224,33 +224,33 @@ window.Rum = (() => {
     const d = (l) => `M${pts(l).replace(/ /g, 'L')}Z`;
     const quad = (za, zb, ya, yb, fill, extra = '') => `<polygon points="${pts([[za, ya], [zb, ya], [zb, yb], [za, yb]])}" fill="${fill}"${extra}/>`;
     const { bard: B, list: L, panel: P } = TAPET;
-    // tapeten, med konfettin i en bana per färg (ett streck är en smal fyrhörning i väggens plan)
-    let s = quad(z0, z1, 0, B, TAPET.bas);
-    const R0 = rng(16);
-    const banor = TAPET.konf.map(() => []);
-    for (let z = 0; z < z1; z += 26) {
-      for (let y = 90; y < B; y += 26) {
-        const [u, v, a, l, f, prick] = [z + R0() * 26, y + R0() * 26, R0() * Math.PI, 3 + R0() * 3.5, (R0() * banor.length) | 0, R0() < 0.25];
-        if (u < z0 || u > z1 || v > B - 4) continue;
-        const [c, n] = [[Math.cos(a), Math.sin(a)], [-Math.sin(a), Math.cos(a)]];
-        const [h, b] = prick ? [1.6, 1.6] : [l, 1.1];
-        banor[f].push(d([[u - c[0] * h - n[0] * b, v - c[1] * h - n[1] * b], [u + c[0] * h - n[0] * b, v + c[1] * h - n[1] * b],
-          [u + c[0] * h + n[0] * b, v + c[1] * h + n[1] * b], [u - c[0] * h + n[0] * b, v - c[1] * h + n[1] * b]]));
+    const F = TAPET.farg;
+    // en smal fyrhörning längs sträckan a–b i väggens plan, b bred, och en romb kring (u, v)
+    const streck = ([a0, a1], [b0, b1], b) => {
+      const n = Math.hypot(b0 - a0, b1 - a1) || 1;
+      const [nx, ny] = [((a1 - b1) / n) * b / 2, ((b0 - a0) / n) * b / 2];
+      return d([[a0 - nx, a1 - ny], [b0 - nx, b1 - ny], [b0 + nx, b1 + ny], [a0 + nx, a1 + ny]]);
+    };
+    const romb = (u, v, bz, by) => d([[u, v - by], [u + bz, v], [u, v + by], [u - bz, v]]);
+    // (mönstren börjar på jämna steg från hörnet, så att de möts där bilden, taket och videohörnet möts)
+    const forst = (steg) => Math.floor(z0 / steg) * steg - steg;
+    // tapeten: spaljén är två diagonaler i varje fält, 30 brett och 40 högt, med en romb där de korsar
+    // fältens hörn och en mindre i mitten, i en bana per ton
+    let s = quad(z0, z1, 0, B, F.bas);
+    let spalje = '';
+    let rosor = '';
+    for (let z = forst(30); z < z1; z += 30) {
+      for (let y = 0; y < B; y += 40) {
+        spalje += streck([z, y], [z + 30, y + 40], 1.3) + streck([z + 30, y], [z, y + 40], 1.3);
+        rosor += romb(z, y, 3.2, 4.2) + romb(z + 15, y + 20, 2.2, 3);
       }
     }
-    s += banor.map((b, i) => `<path d="${b.join('')}" fill="${TAPET.konf[i]}" fill-opacity=".85"/>`).join('');
-    // bården: trianglar upp i cerise och ned i turkos, en gul prick i varje, guldkanter
-    s += quad(z0, z1, B, L, '#22305e');
-    let upp = '';
-    let ned = '';
-    let prickar = '';
-    for (let z = Math.floor(z0 / 30) * 30 - 30; z < z1; z += 30) {
-      upp += d([[z, 447], [z + 15, 427], [z + 30, 447]]);
-      ned += d([[z + 15, 427], [z + 30, 447], [z + 45, 427]]);
-      prickar += d([[z + 15, 440], [z + 16.4, 441.6], [z + 15, 443.2], [z + 13.6, 441.6]]);
-    }
-    s += `<path d="${upp}" fill="#d6337a"/><path d="${ned}" fill="#1aa3a0"/><path d="${prickar}" fill="#f2b632"/>` +
-      quad(z0, z1, B, B + 2.4, '#e9c46a') + quad(z0, z1, L - 2.4, L, '#e9c46a');
+    s += `<path d="${spalje}" fill="${F.spalje}"/><path d="${rosor}" fill="${F.ros}"/>`;
+    // bården: mörkgrön med två guldlinjer och en rad guldromber
+    let ruter = '';
+    for (let z = forst(24); z < z1; z += 24) ruter += romb(z + 12, (B + L) / 2, 3.4, 4.6);
+    s += quad(z0, z1, B, L, F.bard) + quad(z0, z1, B + 3, B + 4.4, F.guld) + quad(z0, z1, L - 4.4, L - 3, F.guld) +
+      `<path d="${ruter}" fill="${F.guld}"/>`;
     // bröstpanelen: furubräder som på bakväggen (34 breda), med fogar, ådring och några kvistar
     const toner = ['#b47c43', '#a9713a', '#bb874c', '#a46c36', '#b78046', '#ad763e'];
     const R1 = rng(23);
