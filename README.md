@@ -1594,6 +1594,14 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   kliar sig i huvudet, nyser, suckar, ler och skrattar; i sällskap pratar de med varandra och skrattar ihop, barnen
   hoppar och pekar och tittar upp på föräldern, supportrarna sjunger. Samma antal och lika mycket arbete per bild (0,3 ms
   för sex figurer). Se *Ansiktet, humöret och det de gör* under [Fasaden](#fasaden).
+- **Mer trafik framför affären, och på två hjul (2026-11-19, användarens önskemål):** "Kan du ordna så att det åker
+  något mer med bilar/bussar/motorcyklar eller vad det nu kan vara här. Det är knappt så att det åker några öht." Sedan
+  2026-11-17 kom det en bil per fil var 76:e sekund på dagen och var 120:e på kvällen, och mitt på dagen körde något
+  förbi 14 % av tiden. Nu kör bilarna ungefär dubbelt så ofta, med lite fler bussar och lastbilar med skåp på
+  vardagarna, motorcyklar i filerna (sporthojar och nakna) och cyklar och mopeder längs kanten på affärens sida, som
+  bilarna kör om: mitt på dagen 306 fordon i timmen i stället för 110, och något kör förbi 38 % av tiden. Det mesta av
+  det nya skymmer inte affären, och bilarna bromsar och står i kö lika sällan som förut. Se *Mer trafik, och på två
+  hjul* under [Fasaden](#fasaden).
 - **Högra väggen tapetserad på 90-talet (2026-11-16, användarens önskemål):** "Hur skulle du justera väggen inne
   i butiken så att den blev mer 90-tal. Ge mig olika visualiserade exempel!" Av fyra skisser i den riktiga scenen
   (A ljus vitlaserad furu, B tapet med bård, C svampmålat, D memphismönster) valde användaren B, "men behåll trät
@@ -7941,11 +7949,13 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   måtten (längd, hjulbas, höjd) med backspeglar, navkapslar eller lättmetallfälgar som snurrar, med märket i mitten (se
   *Märket på bilarna* nedan), och ibland takräcke,
   skåpbilar (ibland Postens gula) och VW-bussar (T3, som skåp eller med rutor), taxi med skylten på taket (oftast 740/940 eller Mercedes), de röda bussarna (trean och 77:an) och den
-  blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat. Enkelriktat (vald
+  blåa ledbussen fyran med slutstationen på skylten, och plogbilen med blinkljus när det har snöat; sedan 2026-11-19
+  också lastbilar med skåp, motorcyklar och, längs kanten på affärens sida, cyklar och mopeder (se *Mer trafik, och på
+  två hjul* nedan). Enkelriktat (vald
   2026-11-16, "jag vill att bilarna ska komma från höger"): allt kommer från höger i två filer, två–tre gånger så fort
   som de som går på skärmen, så att en bil syns i fyra–fem sekunder (se *Bilarna kör ute på gatan, och som bilar*
-  nedan). Hur ofta följer `RumUte.trafik` (sedan 2026-11-17 skyms skyltfönstret ungefär 12 % av tiden på dagen och 24 %
-  i rusningen; se *Lugnare och mer levande* nedan), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
+  nedan). Hur ofta följer `RumUte.trafik` (sedan 2026-11-19 kör något förbi 38 % av tiden på dagen och 60 % i
+  rusningen; se *Mer trafik, och på två hjul* nedan), och i rusningen ibland en kö i den närmre filen, förarnas vänstra, mot ljuset till vänster: bilarna
   bromsar in, står med bromsljusen tända (och avgaser i kylan) och kör sedan iväg en efter en. Strålkastarna är alltid tända; i mörkret lyser de upp gatan framför
   (en mjuk fläck, och strålen bara i regn, snö och dimma; se *Bilarnas strålkastare* nedan),
   baklyktorna glöder, fordonen är siluetter med lackens färg i (som de som går) och bussarna upplysta inne med folk i. I
@@ -8049,7 +8059,7 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
     när föraren inte bromsar (förut lika starka). Speglingarna av bilar i glaset är glesare och svagare. Skyltfönstret
     skyms av fordon 12 % av tiden på dagen (till nio på kvällen) i stället för 21 % och 24 % i rusningen i stället för
     45 %; fortfarande kör ingen igenom någon (prövat en timme i rusningen, på dagen och en lördag, och en halvtimme vid
-    sex andra tider).
+    sex andra tider). Tätare igen sedan 2026-11-19, se *Mer trafik, och på två hjul* nedan.
   - **Det lilla som lever** ([public/rum-fasad-liv.js](public/rum-fasad-liv.js), `RumFasadLiv`): på hösten singlar
     löv ned från träden vid bron och driver åt vänster i vinden, vaggar och vänder sig, landar på trottoaren eller
     gatan och ligger en stund; i blåsten far ett och annat längs stenen (tre till nio åt gången, fler när det blåser).
@@ -8067,6 +8077,43 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
     efter om vartannat): sidans skript mitt på dagen 79 → 54 ms/s, i rusningen 113 → 91 och en regnig kväll 98 → 73,
     huvudtrådens arbete 577 → 428, 708 → 586 och 854 → 683 ms/s, och bildtakten i rusningen 47 → 57 och den regniga
     kvällen 38 → 51 bilder i sekunden. Inga nya lager eller dukar. Inte provat i en riktig telefon.
+- **Mer trafik, och på två hjul (2026-11-19, användarens önskemål):** "Kan du ordna så att det åker något mer med
+  bilar/bussar/motorcyklar eller vad det nu kan vara här. Det är knappt så att det åker några öht." (med en skärmbild
+  från en mulen kväll med tom gata). Principen från *Lugnare och mer levande* gäller fortfarande: bilarna bromsar och
+  står i kö lika sällan som förut, och det mesta av det nya är sådant som inte skymmer affären.
+  - **Tätare** (`LUGN`, `intervall` i [public/rum-fasad-gatan.js](public/rum-fasad-gatan.js)): en bil per fil var 38:e
+    sekund på dagen (förut var 76:e), var 27:e i rusningen (46), var 58:e på kvällen (120) och var 130:e på natten
+    (260), och lite fler bussar (`LUGN.buss` 0,8 i stället för 0,6).
+  - **Lastbilar och motorcyklar i filerna** (`valjFasad`): lastbilen med skåp, en frambyggd distributionsbil med
+    oftast vit hytt, skåpet ibland i en annan färg och med en rand, och föraren i rutan: var tjugonde fordon på
+    vardagarna mellan sex och fem och färre annars; den stannar inte framför affären. Motorcyklarna: den nakna (rund
+    lykta, tank med rand, kylflänsar och krom) och sporthojen (kåpan i nittiotalets färger med en rand i en andra färg,
+    vindrutan och den höga stjärten), med föraren i hel hjälm, ofta skinnjacka, och på den nakna ibland någon där bak;
+    var tolfte fordon när det är minst 15 grader och torrt, var sextonde vid 8–15 grader, var tjugoandra vid 3–8 och
+    var fyrtionde i kylan, nästan inga i regnet och ingen i snön. Bron bakom Hasse Backe lottar med `valjTyp` som
+    förut och får inga av dem (den ritar bara bilar och bussar).
+  - **Längs kanten** (`CYKELKANT`, `intervallCykel`, `valjCykel`): på affärens sida, 1,12 m ut, innanför bilarnas fil,
+    så att bilarna och bussarna kör om dem framför dem. Mest cyklar: herrcyklar och damcyklar i Crescents och Monarks
+    färger, med stänkskärmar, kedjeskydd och pakethållare, ibland korg och väska, och lyktan tänd i mörkret på dem som
+    har dynamo; den som cyklar trampar (vevarna går ett varv på två och ett halvt hjulvarv), har mössa och vantar i
+    kylan och ibland lång rock eller cykelhjälm, och ibland cyklar två efter varandra. Skotrar och mopeder (en Puch
+    Maxi) med föraren i hjälm, öppen eller hel: var femte (var tredje på sommaren, var tionde under två grader). De kör
+    en och en halv gång så fort som de som går. Lika ofta som bilarna i rusningen och glesare annars (var 46:e sekund
+    på dagen och var 80:e på kvällen på hösten och våren), färre i kylan (under tre grader), på vintern och i regnet,
+    fler på sommaren, och inga på natten, i snön eller i ösregnet (`T.cyklar`, som på bron).
+  - **Ritade som bilarna** (`ritaLastbil`, `ritaCykel`, `ritaHoj`): med vektorer i `rf-fram`, lacken och kläderna i
+    gatans ljus (siluetter i mörkret), lyktorna alltid tända på mopederna och motorcyklarna, avgaser i kylan när de står
+    (inte cyklarna), och de som åker har ett ansikte i profil med näsa och öga och hår, mössa eller hjälm. Ungefär lika
+    mycket arbete per fordon som en bil (0,02–0,04 ms i Chromium på datorn). Filerna ritas bortifrån (`S.ordning`), så
+    att cyklarna hamnar bakom bilarna och bussarna som kör om dem. Gatan inifrån visar samma fordon.
+  - **Mätt** (en timme vid varje tid, 6 grader och uppehåll, en tisdag och en torsdag i november, före → efter): mitt
+    på dagen 110 → 306 fordon i timmen (varav 87 cyklar, 20 mopeder, 5 motorcyklar och 9 lastbilar), i rusningen 204 →
+    489, 18.30 113 → 317, 21.30 73 → 183, en lördag klockan två 132 → 309 och klockan två på natten 36 → 68.
+    Skyltfönstrets bredd är i snitt skymd till 8,5 → 15,7 % mitt på dagen, 16 → 25 % i rusningen och 8 → 10 % halv tio
+    på kvällen. Något kör förbi i bilden 14 → 38 % av tiden mitt på dagen och 18.30, 30 → 60 % i rusningen och 9 →
+    23 % halv tio; så länge ritas fasaden i full takt, så den kostar mer än förut. Ingen kör igenom någon i samma fil
+    (fem timmar vid olika tider, 12 grader). Provat i bilder på datorn på dagen och en mulen kväll; inte i en riktig
+    telefon.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
