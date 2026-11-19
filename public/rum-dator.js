@@ -692,10 +692,11 @@ export async function dator(o) {
   // Matchaktens KURVAN (kurvBit i rum-register.js, sedan 2026-11-18) på
   // skärmen: samma figur som i terminalen, från biten (x0, y0, bredd) och ner
   // över fig.k rader – nollan, 1,0 och 2,0, fältet där laget skapade mer än
-  // det släppte till och de två linjerna med sitt sken
+  // det släppte till och de två linjerna med sitt sken (motståndets tal står
+  // som text i raderna under och ritas med dem)
   function kurva(g, fig, x0, y0, bredd, lh, k34) {
     const { w, k, ru, f, a, fyll, mot } = fig;
-    const n = f.length;
+    const n = fig.N || f.length;
     const X = (i) => x0 + ((n > 1 ? 0.5 + (i * (w - 1)) / (n - 1) : w / 2) / w) * bredd;
     const Y = (v) => y0 + Math.max(0.05, Math.min(k - 0.05, k - 0.5 - v * ru)) * lh;
     g.save();
@@ -721,16 +722,18 @@ export async function dator(o) {
       l.forEach((v, i) => (i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))));
       g.stroke();
     }
-    // motståndet under figuren (kurvMot i rum-register.js), i tecken och rader
+    // motståndets streck under figuren (kurvMot i rum-register.js), i tecken
+    // och rader: från nollan ner till varje tal, och det streckade vid
+    // matchens motståndare
     if (mot) {
       const px = (x) => x0 + (x / w) * bredd;
       g.shadowColor = 'transparent';
-      g.fillStyle = 'rgba(65,255,110,.35)';
-      for (let x = 0; x < bredd; x += 5 * k34) g.fillRect(x0 + x, y0 + mot.mitt * lh - 0.5 * k34, 2 * k34, k34);
-      g.shadowColor = 'rgba(65,255,110,.55)';
-      for (const [x, y, b, h, svar] of mot.st) {
-        g.fillStyle = svar ? FARG[''] : FARG.d;
-        g.fillRect(px(x), y0 + y * lh, (b / w) * bredd, h * lh);
+      g.fillStyle = 'rgba(65,255,110,.22)';
+      for (const [x, ya, yb] of mot.st) g.fillRect(px(x) - 0.5 * k34, y0 + ya * lh, k34, (yb - ya) * lh);
+      if (mot.nu) {
+        const [x, ya, yb] = mot.nu;
+        g.fillStyle = 'rgba(201,255,215,.6)';
+        for (let y = ya * lh; y < yb * lh; y += 7 * k34) g.fillRect(px(x) - 0.6 * k34, y0 + y, 1.2 * k34, Math.min(3 * k34, yb * lh - y));
       }
     }
     g.restore();

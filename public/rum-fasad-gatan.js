@@ -877,11 +877,17 @@ window.RumFasadGatan = (() => {
       b.marke = mk.length ? mk[Math.floor((b.fart * 7919) % mk.length)] : null;
     }
     b.L = b.F.L;
+    return lacka(S, b);
+  }
+  // lacken i scenens ljus
+  function lacka(S, b) {
     b.c = S.ton(b.lack);
     b.cM = S.G.mix(b.c, '#000000', 0.32);
     b.cL = S.G.mix(b.c, '#ffffff', 0.05 + 0.16 * S.L.dag);
     return b;
   }
+  // samma fordon i en annan scens ljus (bron bakom Hasse Backe, rum-hasse-ute.js)
+  const somFordon = (S, b) => lacka(S, { ...b });
 
   // varmt och torrt (amerikanaren kommer ut, cabben fäller ner taket)
   function varmt(S, grader) {
@@ -1202,6 +1208,19 @@ window.RumFasadGatan = (() => {
       }
     }
     return ut.length ? ut : null;
+  }
+
+  // De fordon som kommer in på gatan, från bron till höger, mellan ta och tb (s), i den ordning de kommer: för bron
+  // bakom Hasse Backe (rum-hasse.js), där de kör över bron innan de kör förbi affären.
+  function kommer(S, ta, tb) {
+    if (!window.RumUte || !RumUte.trafik) return [];
+    const ut = [];
+    const med = (b) => { if (b.t0 > ta && b.t0 <= tb) ut.push(b); };
+    for (const f of S.filer) {
+      for (let n = Math.floor((ta - f.i * 2.1) / LUCKA) - 1; n <= Math.floor((tb - f.i * 2.1) / LUCKA); n++) lucka(S, f, n).forEach(med);
+      for (let q = Math.floor(ta / KO) - 1; q <= Math.floor(tb / KO) + 1; q++) { const k = ko(S, f, q); if (k) k.bilar.forEach(med); }
+    }
+    return ut.sort((a, b) => a.t0 - b.t0);
   }
 
   // ---------- att rita ----------
@@ -2777,5 +2796,5 @@ window.RumFasadGatan = (() => {
     c.globalAlpha = 1;
   }
 
-  return { mark, trafik, syns, rita, KANT, FILER, SYNS, FORM, fordon: { nytt: nyttFordon, valj: valjTyp, BUSS, PLOG } };
+  return { mark, trafik, syns, kommer, rita, KANT, FILER, SYNS, FORM, fordon: { nytt: nyttFordon, som: somFordon, valj: valjTyp, BUSS, PLOG } };
 })();

@@ -140,11 +140,11 @@
 .reg-term .kv .kf { fill: rgba(65, 255, 110, 0.16); stroke: none; }
 .reg-term .kv .ka { stroke: var(--gron); stroke-width: 2px; }
 .reg-term .kv .ks { stroke: #c9ffd7; stroke-width: 2.6px; }
-/* motståndet under kurvan: staplar för svårare motståndare än divisionens
-   mittenlag gröna (kms), för lättare svaga (kml), och mittenlagets streck */
-.reg-term .kv .kms { fill: var(--gron); }
-.reg-term .kv .kml { fill: var(--svag); }
-.reg-term .kv .kmm { stroke: rgba(65, 255, 110, 0.35); stroke-width: 1px; stroke-dasharray: 2 3; }
+/* motståndet under kurvan: talen står i raderna under figuren, med ett tunt
+   streck från nollan ner till vart och ett (kmt), och den här matchens
+   motståndare sist med ett streckat lodrätt streck genom figuren (knu) */
+.reg-term .kv .kmt { stroke: rgba(65, 255, 110, 0.22); stroke-width: 1px; }
+.reg-term .kv .knu { stroke: #c9ffd7; stroke-width: 1.2px; stroke-dasharray: 3 4; opacity: 0.75; }
 .reg-term .lks, .reg-term .lkt { background: linear-gradient(currentColor, currentColor) left center / 100% 0.12em no-repeat; }
 .reg-term .lks { color: #c9ffd7; }
 /* matchaktens V-O-F (spegeln i rum-register.js): en stapel med vinsterna

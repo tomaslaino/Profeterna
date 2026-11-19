@@ -805,7 +805,8 @@ window.RumUte = (() => {
       if (varmt && kind === 'gar' && o.umb == null && R() < 0.25) { o.hat = pick(R, ['#2a4a7a', '#e8e4dc', '#c8322a']); inner = person(o, L); }
       walk(inner, { y: 405 + R() * 6, dir: R() < 0.5 ? 1 : -1, speed, pause: 15 + R() * 70, steg: r1(0.75 + R() * 0.25), cls: kind, w: kind === "pulka" ? 42 : 30 });
     }
-    // på cykel (trafik: inte i snön eller i ösregn)
+    // på cykel (trafik: inte i snön eller i ösregn). På huvudet en mössa i kylan och annars sällan något: det är
+    // nittiotal, och få vuxna hade hjälm (förut något på sex av tio; ändrat 2026-11-19 med cyklisterna på bron)
     if (T.cyklar) {
       for (let i = 0; i < T.cyklar; i++) {
         const c = pick(R, cs);
@@ -813,7 +814,7 @@ window.RumUte = (() => {
         const bike = `${wheel(-9, -6, 6, L)}${wheel(10, -6, 6, L)}<path d="M-9 -6 L-1 -6 L-4 -16 M-1 -6 L7 -16 L-4 -16 M7 -16 L10 -6 M7 -16 L8 -20" fill="none" stroke="${tone('#3a3a3a', L)}" stroke-width="1.2"/>`;
         const rider = `<g transform="translate(-4 -16)"><g class="ben"><rect x="-1.5" y="0" width="3" height="11" rx="1.4" fill="${tone('#2b3448', L)}"/></g></g><g transform="translate(-4 -16)"><g class="ben b2"><rect x="-1.5" y="0" width="3" height="11" rx="1.4" fill="${tone('#2b3448', L)}"/></g></g>
           <path d="M-5.5 -15 L-2 -29 L4 -27 L3 -15 Z" fill="${tone(c, L)}"/><path d="M1 -26 L8 -20" stroke="${tone(varmt ? sk : c, L)}" stroke-width="2.6" stroke-linecap="round"/><circle cx="0" cy="-32" r="3.2" fill="${tone(sk, L)}"/>
-          ${R() < 0.6 ? `<path d="M-3.6 -32.5 Q0 -38 3.6 -32.5 Z" fill="${tone(pick(R, ['#1a1a1a', '#c8322a', '#e8e4dc', '#2a6ab0']), L)}"/>` : ''}`;
+          ${R() < (v.kanns < 5 ? 0.45 : 0.12) ? `<path d="M-3.6 -32.5 Q0 -38 3.6 -32.5 Z" fill="${tone(pick(R, ['#1a1a1a', '#c8322a', '#e8e4dc', '#2a6ab0']), L)}"/>` : ''}`;
         const light = L.lampor ? '<circle cx="12" cy="-17" r="1.6" fill="#fffbe8"/><circle cx="12" cy="-17" r="6" fill="#fff2cc" opacity=".4"/><circle cx="-11" cy="-12" r="1.3" fill="#ff3b30"/>' : '';
         walk(bike + rider + light, { y: 418 + R() * 8, dir: R() < 0.5 ? 1 : -1, speed: 70 + R() * 30, pause: 30 + R() * 90, steg: 0.45, cls: 'cykel', w: 22, ht: 42 });
       }

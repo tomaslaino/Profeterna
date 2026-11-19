@@ -1398,6 +1398,11 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   bättre och bad sedan om "olika visualiseringsförslag". Av elva skisser i tre grupper (det som skiljer mest,
   riktningen och säkerheten) valde hen *B Oscilloskopet* i gruppen om riktningen: en ny sida KURVAN i matchaktens
   xG med lagens xG match för match under säsongen. Se [Kurvan](#kurvan) under Datorn.
+- **Motståndet under kurvan som tal (2026-11-19, användarens val):** kurvan sa lite utan att man visste hur svåra
+  motståndarna var, och staplarna som kom först samma dag såg nästan lika höga ut. Av fem skisser (ljuset bakom
+  kurvan, namnen under matcherna, väntad xG mot samma motstånd, spridningen och högarna) ville användaren ha namnen
+  men "svårighetsgraden … istället för själva lagnamnet": motståndarens svårighet som tal under varje match och den
+  här matchens motståndare sist. Se [Kurvan](#kurvan).
 - **Statistiken kontrolleras (2026-11-18, användarens önskemål):** "Kan du förbättra och säkerställa statistiken
   på sidan." Spelar- och lagfilerna för alla fem flikarna (de fyra ligorna och Nations League) prövades mot sig själva
   och mot källorna: tabellen mot matchstatistiken, spelarnas mål mot lagens, målens betydelse mot ESPN:s matchrapporter
@@ -1918,6 +1923,15 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   som bilarna och de som går på gatan i rummet. Gänget i glaset bakom honom är hälften så starkt. Det som tillkommer
   att rita är bara de som går: var och en ritas en gång i åtta ställningar (2–6 ms) och läggs sedan ut med en bild
   per bildruta, som förut. Se [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som framför affären*.
+- **Samma bilar och människor på bron som framför affären (2026-11-19, användarens önskemål):** "Kan du ordna så att
+  de som rör sig i bakgrunden här med Hasse blir mer samordnad med de som rör sig i bakgrunden på de andra bilderna",
+  "liknande bilar, människor och 90-talstema". Figurerna var redan fasadens, men på bron lottades de för sig, och
+  cyklisterna hade en egen ritning i dagens klädsel. Nu läser bron gatans tidtabell i förväg: det som kör hitåt över
+  bron är just de bilar, taxibilar och bussar som sekunderna efter kör förbi affären, och de som går är sällskap
+  därifrån – den som har gått förbi mot bron går ut på den, och den som snart kommer är redan på väg. Cyklisterna är
+  klädda som nittiotalet: nästan aldrig hjälm, ingen reflexväst, jeans, täckjacka eller jeansjacka i tidens färger och
+  ofta en korg på pakethållaren (också de små cyklisterna på gatan genom rummets fönster har sällan hjälm). Inget mer
+  ritas än förut. Se [Hasse Backe](#hasse-backe), *Utsikten*, *Samma gata*.
 - **En gång bakom Hasse Backe (2026-11-11, användarens önskemål):** "ett litet avstånd mellan väggen och hasse så
   att människor kommer förbi", och fönstren skulle fortfarande vara stora, "så kanske dra ner dem lite?". Väggen
   med bardisken står 48 cm längre bort, så att det är ungefär 75 cm mellan hans rygg och diskens kant, och golvet
@@ -9354,13 +9368,26 @@ som ett som har varit jämnt hela hösten.
   snittet av tre matcher (de två första av en och två), så att en enstaka match inte drar iväg. Den första matchen
   står till vänster, och under kurvan står månaderna mitt under sina matcher.
 - **På datorn** står lagen sida vid sida under sina namn, med *0*, *1,0* och *2,0* i etiketternas spalt mellan
-  dem: nio rader, tre per 1,0 xG, och över 2,8 står linjen i taket. Sidan är tolv rader och ryms utan att rulla.
+  dem: nio rader, tre per 1,0 xG, och över 2,8 står linjen i taket. Med motståndets två rader är sidan fjorton
+  rader och rullar en rad.
   **I telefonen** står lagen under varandra med namnet över och talen till vänster: sex rader, två per 1,0 xG.
 - **Datan** är `fd.serie` i `data/teams/<division>.json`: `[datum, lagets xG, motståndarens xG]` för varje
   ligamatch med xG, äldst först (`serieAv` i [src/teamstats.js](src/teamstats.js)). Den kommer ur samma rader i
   football-data.co.uk som lagets övriga xG och släpar alltså en omgång som de. För landslagen är det Nations Leagues
   matcher ur 365Scores (`data/teams/unl.json`). Färre än tre matcher ger *FÖR FÅ MATCHER* och ett lag utan xG
   *INGEN xG*; har inget av lagen xG finns ingen sida. Med dolda resultat står ett ?.
+- **Motståndet** (2026-11-19) står under figuren, med *MOT* i etiketternas spalt: motståndarens svårighet som tal
+  under varje match, på samma skala som *MOTSTÅNDET* i översikten (motståndarens chans mot divisionens mittenlag på
+  neutral plan, där oavgjort är en halv; 50 är ett lag som mittenlaget). Talen över 50 är gröna och de andra svaga,
+  och ett tunt streck går från nollan ner till vart och ett. Talen står växelvis i två rader, så att två siffror och
+  ett mellanrum ryms; på datorn blir det tre rader från ungefär den femtonde matchen, och ryms de inte ens då (sent på
+  säsongen) faller de tal bort som krockar med ett senare. Sist står den här matchens motståndare omvänt, med ett
+  streckat lodrätt streck genom figuren, och kurvan slutar en plats före – bara när lagen spelar i samma division
+  och matchen inte redan finns i serien. Talet per match är `fd.serie[i][3]` och motståndarens `niva` i lagfilen
+  (`divisionTeams` i [src/teamstats.js](src/teamstats.js)); `kurvMot` och `kurvMotRader` i
+  [public/rum-register.js](public/rum-register.js) placerar talen. Nations League har ingen svårighet och inga rader.
+  Först samma dag var motståndet en stapel per match, men skalan är smal (i Premier League 30–71), så staplarna såg
+  nästan lika höga ut.
 - **Teckenförklaringen** överst öppnar rutan med förklaringen och ett exempel per lag, de tre första matcherna mot de
   tre senaste (*Arsenal skapade 2,2 xG per match i de tre första matcherna och 1,2 i de tre senaste …*; `kurvan`
   i [public/rum-register-ord.js](public/rum-register-ord.js)).
@@ -10115,6 +10142,19 @@ höger om huset, och den ligger långt nedanför och går bort från en, så det
   på en och en halv till drygt tre minuter. Det kommer lika ofta som förut, hälften så många som på gatan (`broTakt`),
   men eftersom de går i rätt fart är de ute dubbelt så länge, så att det brukar vara någon ute när det är folk i
   rörelse (högst fem, `BRO_MAX`); inte fler, eftersom fasaden samma dag blev lugnare.
+
+*Samma gata* (2026-11-19). Bron är gatan framför affären, och gatan där är enkelriktad från bron. Därför är filen
+hitåt gatans egen trafik: `motKom` i [public/rum-hasse.js](public/rum-hasse.js) läser 34 sekunder framåt i gatans
+tidtabell (`RumFasadGatan.kommer` i [public/rum-fasad-gatan.js](public/rum-fasad-gatan.js), ur rummets modell
+`_fram` i rum-ute.js, densamma som utanför) och lägger ut varje fordon så att det lämnar bron när det kommer in på
+gatan, i samma lack men i brons ljus (`fordon.som`); den framför hinner alltid undan först. Filen bort lottas som
+förut, men inte tätare än gatan. De som går väljs ur gatans sällskap (`folket.kommer` i rum-fasad.js, som lottar vilka
+de är utan att bygga figurerna; `broVem`): den som har gått åt höger förbi affären går ut på bron när den har lämnat
+gatan, och den som kommer från höger börjar i andra änden så långt i förväg som det tar att gå över (`gangSek`).
+De kommer lika ofta som förut (`broTakt`); passar ingen just då kommer ingen. Cyklisterna (`cyklist`) lottas för sig
+men är klädda som de som går förbi affären: hjälm på en av tolv (förut sex av tio), ingen reflexväst (förut var
+femte), mössa i kylan och ibland keps, cykeln i fasadens lack och lyse bara i mörker. Utan rummets modell lottas allt
+som förut.
 
 Det som tillkommer att rita är bara de som går: ett sällskap tar 2–6 ms att rita en gång (headless Chrome, utan
 grafikkort; ett fordon 1,5 ms) och är en duk på ungefär 950 × 160 bildpunkter, och i varje bildruta läggs det ut med

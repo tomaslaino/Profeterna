@@ -233,6 +233,9 @@ function divisionTeams(div, strengthAll) {
       espnId: t.espnId,
       ...t.table,
       str: own != null && known.length ? r2(own - total / known.length) : null,
+      // (hur svårt laget är att möta, 0–1 på serie-fältets skala: datorns
+      // KURVAN sätter talet sist under kurvan för matchens motståndare)
+      niva: niva && own != null ? r2(niva(own)) : null,
       fd: e ? {
         n: e.n, w: e.w, d: e.d, l: e.l, gf: e.gf, ga: e.ga,
         cs: e.cs, fts: e.fts, o25: e.o25, btts: e.btts,
