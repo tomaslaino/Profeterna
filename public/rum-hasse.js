@@ -2061,8 +2061,14 @@ window.RumHasse = (() => {
     const g = p && p.vem && p.s.gang && p.s.gang.find((x) => x.id === p.vem);
     return g && g.namn ? Tippoang.kallas(g) : '';
   }
-  // Vad han kallar dig just nu: i nio fall av tio omgångens fel namn, samma som i domen (felNamn).
-  const kalla = (namn) => (namn && Math.random() < 0.9 ? felNamn(namn, omgangNu()) : namn);
+  // Vad han kallar dig just nu: i nio fall av tio ett fel namn, ett nytt varje gång (lott: alla hans felnamn för
+  // dig innan något kommer igen, och aldrig samma två gånger i rad). Tomas 2026-11-19: "Det känns som att Hasse
+  // alltid kallar en samma smeknamn". Förut fastnade felet en omgång, och samma omgång gav Laitinen, Tegnér och
+  // Mogge varje gång han sa något.
+  const kalla = (namn) => {
+    const fel = namn && Math.random() < 0.9 ? felLista(namn) : null;
+    return fel ? bytSista(namn, lott(fel)) : namn;
+  };
   // Ibland talar han till dig med namn när han säger hur det går (efter.namn och stallning.namn i
   // rum-hasse-repliker.js, Tomas 2026-11-16) och efter en analys (nastaNamn, 2026-11-17): med chansen chans, när
   // kupongen vet vem du är, och högst en gång på två minuter (också räknat från när han hälsade med namn), så att det
@@ -2083,11 +2089,6 @@ window.RumHasse = (() => {
   function duId() {
     const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
     return (p && p.vem) || null;
-  }
-  // Omgången på pulten (kupongens id, samma som protokollets), eller ''.
-  function omgangNu() {
-    const p = window.Samtal && Samtal.pult ? Samtal.pult.state() : null;
-    return (p && p.s && p.s.id) || '';
   }
   // Vad klockan säger när man kommer: 'bradskar' när det är mindre än 90 minuter till första avsparken,
   // 'natt' 00–05, 'morgon' 05–08, 'kvall' 22–24 (i Stockholm), annars null.
@@ -2946,7 +2947,7 @@ window.RumHasse = (() => {
       const tid = hela && tidNu(oppna);
       if (tid && r.tid && r.tid[tid] && (tid === 'bradskar' || Math.random() < 0.5)) return lott(r.tid[tid]);
       // (när kupongen vet vem du är hälsar han oftast med namn, Tomas 2026-11-17: "inte alltid, men ofta"; i nio fall
-      // av tio fel: omgångens, samma som i domen, se kalla; och sedan dröjer det innan han säger det igen, se tilltal)
+      // av tio fel, och ett nytt fel varje gång, se kalla; och sedan dröjer det innan han säger det igen, se tilltal)
       const namn = Math.random() < HALSA_NAMN ? dittNamn() : '';
       const medNamn = (l) => {
         H.tilltal = performance.now();
@@ -3379,8 +3380,8 @@ window.RumHasse = (() => {
   }
   const versal = (t) => t.replace(/^./, (c) => c.toUpperCase());
   // Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8, när
-  // han har sovit på saken (Tomas 2026-11-15). Däremellan står domen sig, varje gång och på alla enheter. Namnen
-  // han säger fel byts inte: de fastnar hela omgången (felNamn).
+  // han har sovit på saken (Tomas 2026-11-15). Däremellan står domen sig, varje gång och på alla enheter, också
+  // namnet han säger fel (domNamn). På morgonen har han glömt det och säger ett annat.
   function domFro(sum) {
     if (!sum.sista) return '';
     const morgon = new Date(sum.sista);
@@ -3391,26 +3392,31 @@ window.RumHasse = (() => {
   // Ordet i guld: ett av många för läget (domord i rum-hasse-repliker.js), samma för samma omgång, person och
   // dom, så att det som slås i disken också står under namnet i listan.
   const domOrd = (p, sum) => fast(REP().domord[p.lage] || [''], `${sum.id}${domFro(sum)}:${p.id}:ord`) || '';
-  // Namnen sitter inte riktigt (felnamn i rum-hasse-repliker.js), och han rättar sig aldrig. Felet fastnar en
-  // omgång: när han säger fel är det samma fel namn hela omgången, när han hälsar och i domen, på alla enheter,
-  // och nästa omgång har han lärt sig ett annat. omgang: omgångens id (kupongens, som protokollets).
-  function felNamn(namn, omgang) {
+  // Namnen sitter inte riktigt (felnamn i rum-hasse-repliker.js), och han rättar sig aldrig. Han kan inte heller
+  // bestämma sig för vilket fel namn det är: när han hälsar och talar till dig blir det ett nytt varje gång
+  // (kalla), och i domen ett för varje dom (domNamn). → listan med felnamn för namnet vi kallas, eller null.
+  function felLista(namn) {
     const ord = String(namn).trim().split(/\s+/);
-    const sist = ord[ord.length - 1];
-    const fel = (REP().felnamn || {})[sist];
-    if (!fel || !fel.length) return namn;
-    return [...ord.slice(0, -1), fast(fel, `${omgang}:${sist}:namn`)].join(' ');
+    const fel = (REP().felnamn || {})[ord[ord.length - 1]];
+    return fel && fel.length ? fel : null;
+  }
+  // namn med det sista ordet bytt mot fel
+  function bytSista(namn, fel) {
+    const ord = String(namn).trim().split(/\s+/);
+    return [...ord.slice(0, -1), fel].join(' ');
   }
   // Vad han kallar någon i domen. Han säger fel om var och en i nio domar av tio, också om den som vann. I var
   // nionde dom med fel börjar han rätt och tappar namnet efter första meningen
-  // med det, som om han slutade lyssna. Samma omgång och person ger samma svar, så att domen är densamma varje
-  // gång och på alla enheter.
+  // med det, som om han slutade lyssna. Samma dom (omgång, kväll eller morgon, och person) ger samma svar, så att
+  // domen är densamma varje gång och på alla enheter. På morgonen säger han ett annat fel namn än på kvällen.
   // → { forst, sedan }: namnet i första meningen med namnet, och i resten.
   function domNamn(p, sum) {
-    const nyckel = `${sum.id}:${p.id}`;
-    if (fast([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], `${nyckel}:fel`) === 0) return { forst: p.namn, sedan: p.namn };
-    const fel = felNamn(p.namn, sum.id);
-    return { forst: fast([0, 1, 2, 3, 4, 5, 6, 7, 8], `${nyckel}:tappar`) ? fel : p.namn, sedan: fel };
+    const nyckel = `${sum.id}${domFro(sum)}:${p.id}`;
+    const fel = felLista(p.namn);
+    if (!fel || fast([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], `${nyckel}:fel`) === 0) return { forst: p.namn, sedan: p.namn };
+    const kvall = domFro(sum) && fel.length > 1 ? fast(fel, `${sum.id}:${p.id}:namn`) : null;
+    const namn = bytSista(p.namn, fast(fel.filter((x) => x !== kvall), `${nyckel}:namn`));
+    return { forst: fast([0, 1, 2, 3, 4, 5, 6, 7, 8], `${nyckel}:tappar`) ? namn : p.namn, sedan: namn };
   }
   // Vilka i gänget du har hört domen över, på enheten för den omgången: han vet vem han har dömt, också nästa
   // gång du kommer.

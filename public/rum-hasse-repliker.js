@@ -1691,7 +1691,8 @@
   },
   // Namnen han nästan kan. I nio fall av tio säger han ett av dem, i domen (också om den som vann), när han
   // hälsar på dig och när han talar till dig om hur det går (efter.namn och stallning.namn; felNamn, kalla och
-  // domNamn i rum-hasse.js). Han rättar sig aldrig och säger inget om det.
+  // domNamn i rum-hasse.js), och han lottar ett nytt varje gång han hälsar eller talar till dig, och ett för varje
+  // dom. Han rättar sig aldrig och säger inget om det.
   // Felen är sådana som den gör som inte bryr sig: ett namn som låter likadant, ett han kan bättre någon
   // annanstans ifrån (Laine, Tegnér, Mogge, Snejder), ett smeknamn som om ni var gamla bekanta (Teddy, Dodde),
   // och för Dogge ett efternamn i stället för smeknamnet, och då fel efternamn. Felet ska likna det riktiga

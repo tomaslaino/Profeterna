@@ -10714,7 +10714,7 @@ säger hur det går för honom: ungefär var tredje gång i raden efter *Jag had
 rätt av sju.*, ibland i det han säger efter en stund, och ungefär var femte gång i kommentaren till en match som pågår
 (*Burnley leder med 2–1 mot Cardiff. Den matchen kunde jag i sömnen, Laine.*), men högst en gång på två minuter, så att det
 inte blir tjat (`tilltal` i [public/rum-hasse.js](public/rum-hasse.js)). Namnet sitter lika illa som annars: i nio fall av
-tio omgångens fel namn, samma som när han hälsar och i domen (`kalla`, se *Domarna efter omgången*). Han säger det på olika
+tio ett fel namn, ett nytt varje gång (`kalla`, se *Domarna efter omgången*). Han säger det på olika
 sätt: först, sist eller mitt i meningen, torrt (*Det här stannar mellan oss, Docke.*), som en lärare (*Unge Laine, så här
 går det när man läser på.*, *Gamle Jönsson*, *Käre Tejler*) och med ironisk artighet i tredje person, som en gammal kypare
 (*Herr Lainio får klaga hos spelarna, inte hos mig.*). Raden om var han kom i tävlingen, som han säger till er alla, och
@@ -10823,12 +10823,15 @@ rum-hasse-repliker.js, `felNamn` och `domNamn` i rum-hasse.js). Felen är ett na
 aldrig är fel, och för Dogge ett efternamn i stället för smeknamnet, och då fel (*Jansson*, *Johnsson*). Varje fel ska synas.
 Vinnaren kan han; den som kom sist säger han fel om i ungefär två domar av tre, de andra i ungefär en av
 tre. I hälften av domarna med fel börjar han rätt och tappar namnet efter första meningen med det, men aldrig mitt i en
-mening. När han hälsar på dig säger han fel i nio fall av tio. Felet fastnar en omgång: när han säger fel är det
-samma fel namn hela omgången, när han hälsar, i domen och när han talar till dig om hur det går (se *Ditt namn efter och
-under omgången*), på alla enheter, och nästa omgång har han lärt sig ett annat.
+mening. När han hälsar på dig säger han fel i nio fall av tio. Han kan inte bestämma sig för vilket fel namn det är: när
+han hälsar och när han talar till dig om hur det går (se *Ditt namn efter och under omgången*) lottar han ett nytt varje
+gång, bland alla hans felnamn för dig innan något kommer igen och aldrig samma två gånger i rad (`kalla` med `lott`). I
+domen har han ett fel namn för varje dom (2026-11-19, användarens önskemål: "Det känns som att Hasse alltid kallar en
+samma smeknamn". Förut fastnade felet en hel omgång, och omgången 2026-11-21 gav *Laitinen*, *Tegnér* och *Mogge* varje
+gång han sa något; Laino hade fått *Laitinen* omgången före också).
 Han dömer två gånger: när omgången är spelad, och en gång till morgonen efter den sista avsparken kl. 8 (`domFro` i
-rum-hasse.js, 2026-11-15). Däremellan är domen densamma varje gång och på alla enheter, och namnet han säger fel är
-detsamma hela omgången. Han rättar sig aldrig och säger inget om det. Står man kvar
+rum-hasse.js, 2026-11-15). Däremellan är domen densamma varje gång och på alla enheter, också namnet han säger fel, och
+på morgonen säger han ett annat fel namn än på kvällen. Han rättar sig aldrig och säger inget om det. Står man kvar
 vid listan kan han nämna *Revisorn* när någon vann på helgarderingar och *Semesterfiraren* när någon inte lämnade in,
 utan att säga vem han menar (`domar.revisorn`, `domar.borta`).
 
