@@ -1910,6 +1910,10 @@ bara lokalt. Analyserna visas som de ligger i `data/analyser.json`; hur de skriv
   som bilarna och de som går på gatan i rummet. Gänget i glaset bakom honom är hälften så starkt. Det som tillkommer
   att rita är bara de som går: var och en ritas en gång i åtta ställningar (2–6 ms) och läggs sedan ut med en bild
   per bildruta, som förut. Se [Hasse Backe](#hasse-backe), *Utsikten*, *Trafiken som framför affären*.
+- **Trafiken på bron mjukare (2026-11-19, användarens önskemål):** "Det behöver inte vara så skarpt - som
+  inomhusbilden". Det som går och kör på bron bakom Hasse Backe var skarpare än stan bakom och stack ut. Nu är det
+  sex tiondelar så oskarpt som utsikten (`OSKARPA` 0,35 → 0,6 i rum-hasse-ute.js), mjukt som gatan genom rummets
+  fönster, men en buss är fortfarande en röd eller blå buss.
 - **Samma bilar och människor på bron som framför affären (2026-11-19, användarens önskemål):** "Kan du ordna så att
   de som rör sig i bakgrunden här med Hasse blir mer samordnad med de som rör sig i bakgrunden på de andra bilderna",
   "liknande bilar, människor och 90-talstema". Figurerna var redan fasadens, men på bron lottades de för sig, och
@@ -10061,7 +10065,7 @@ höger om huset, och den ligger långt nedanför och går bort från en, så det
   188 m lång i stället för 260. `LUTA` och `FLUTA` följer `METER`, så att körbanan ligger där den låg i bilden.
   Fordonen åker lika fort som förut i km/h och kommer därför över bron på kortare tid (16 s i stället för 23 i 41
   km/h).
-- **Mindre oskärpa** (`OSKARPA` 0,8 → 0,35 av utsiktens, ungefär 0,9 bildpunkter på skärmen): ungefär lika mjukt i
+- **Mindre oskärpa** (`OSKARPA` 0,8 → 0,35 av utsiktens, ungefär 0,9 bildpunkter på skärmen; sedan 2026-11-19 0,6, mjukare igen): ungefär lika mjukt i
   förhållande till storleken som gatan i rummet, så att en buss är en röd eller blå buss och den som går har en jacka
   och ett paraply. Utsikten bakom är lika oskarp som förut.
 - **Färgerna** (`ljus`): lacken är hälften så kall i dagsljuset som utsikten och nästan utan det svarta, och de som går

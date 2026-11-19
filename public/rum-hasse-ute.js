@@ -735,12 +735,14 @@ export function affaren(x, L, l, somn, lage, W, H) {
 
 // ---------- trafikens oskärpa ----------
 
-// Hur oskarp trafiken på bron är (väggbildens bildpunkter): en dryg tredjedel av utsiktens (rita: ofokus / 2), så
-// att bilarna, bussarna och de som går syns som det de är, de som kör och går förbi framför affären, fast de är
-// långt borta (2026-11-17; förut 0,8, och då var de bara gråa fläckar). Den läggs på hela trafikens duk
+// Hur oskarp trafiken på bron är (väggbildens bildpunkter): sex tiondelar av utsiktens (rita: ofokus / 2), så att
+// den är mjuk som det som går och kör förbi utanför rummets fönster och hör till utsikten, men bilarna, bussarna och
+// de som går ännu syns som det de är (2026-11-19, användarens önskemål: "Det behöver inte vara så skarpt - som
+// inomhusbilden"; 0,35 sedan 2026-11-17, då stack de ut skarpa mot stan bakom, och förut 0,8, då var de bara gråa
+// fläckar). Den läggs på hela trafikens duk
 // (rum-hasse.js), så att den är lika stor längs hela bron: bakad i varje figur krympte den med figuren, och längst
 // bort var bilarna nästan skarpa (ändrat 2026-11-16). I fordonen själva bara BAKAD, så att kanterna inte blir hackiga.
-const OSKARPA = 0.35;
+const OSKARPA = 0.6;
 const BAKAD = 0.6;
 export function oskarpa(lage) {
   const { b } = projektion(lage);
