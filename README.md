@@ -6877,7 +6877,7 @@ median); två saker var fel:
 
 - **Han stod still en halv sekund när han tog upp tidningen.** Det fanns ett ark att trycka på, och varje gång han tog en
   annan tidning än förra gången trycktes hela uppslaget om och laddades upp till grafikkortet i bilden där klippet började,
-  mitt i rörelsen när han tar fram glasögonen: Helgarderat 550 ms, DN 640 ms och SvD 360 ms. Mest var det textmätning –
+  mitt i rörelsen när han tar fram glasögonen: Helgarderat 515 ms, DN 415 ms och SvD 270–630 ms. Mest var det textmätning –
   krönikan på Helgarderats baksida och notiserna på DN:s och SvD:s bröts om med allt mindre text tills de fick plats, upp till
   34 respektive 23 gånger – och uppladdningen tog 150 ms. Nu finns två ark med egna texturer, Helgarderat och dagens DN eller
   SvD (`arket` och `steg` i [public/rum-hasse-tidning.js](public/rum-hasse-tidning.js)), och att byta tidning är att byta
@@ -6889,11 +6889,13 @@ median); två saker var fel:
   är tryckt (`valjTidning`). Storleken som får plats söks genom halvering (sex försök), och en rad mäts bara hel nära kanten:
   annars räknas den som raden hittills, ett mellanrum och ordet (`medOrd`). Sidorna är desamma bildpunkt för bildpunkt (DN,
   SvD och Helgarderat, uppslaget och insidan), och ordens bredder lagda ihop skilde högst 0,0003 bildpunkter från hela
-  radens i 1 794 prov. Mätt: hans bild tar som mest 272–564 → 11–23 ms när klippet börjar, och läser han redan när man
-  kommer börjar svängen till honom 0,25–0,5 s tidigare (Helgarderat trycktes förut först). Det som trycks i förväg tar
-  40–100 ms per sida med den långsamma processorn (första gången DN:s baksida 200–370 ms, när lagens bilder trycks), en gång
-  per besök hos honom och medan han sitter: ett par andetag som kommer en bild för sent i stället för ett stopp mitt i en
-  rörelse. Två ark tar ungefär 7 MB mer än ett.
+  radens i 1 794 prov. Mätt mot main med bladvändningen, med tidningen bestämd i varje klipp: hans bild tar som mest
+  200–560 → 11–84 ms när klippet börjar (84 ms när SvD trycks, en sida i knät), och den längsta tiden mellan två bilder är
+  270–630 → 100–165 ms, mjukvarugrafikens vanliga takt där. När han redan läser när man kommer gick ingen skillnad att se:
+  tiden tills kameran svänger är ungefär 5 s med mjukvarugrafik, och nästan allt är att figuren byggs. Det som trycks i
+  förväg tar 40–100 ms per sida med den långsamma processorn (första gången DN:s baksida 200–370 ms, när lagens bilder
+  trycks), en gång per besök hos honom och medan han sitter: ett par andetag som kommer en bild för sent i stället för ett
+  stopp mitt i en rörelse. Två ark tar ungefär 7 MB mer än ett.
 - **Kanterna på telefonens lägre steg.** Hans bild ritades aldrig med kantutjämning i en telefon (`antialias: !latt`), och på
   steg 2 och 3 med 1,25 respektive 1 bildpunkt per punkt, alltså förstorad två–tre gånger: glasögonens tunna båge bröts upp
   i streck och prickar, och tidningens, koppens, hårets och händernas kanter blev trappsteg som kröp när han rörde sig. Nu
@@ -6906,8 +6908,9 @@ median); två saker var fel:
 
 Inte provat i en riktig telefon eller i Safari, och kantutjämningens kostnad på en riktig grafikdel är inte mätt
 (mjukvarugrafiken får den inte); för gänget kostade den ungefär en fjärdedel av gängets tid på Apple-grafik (*Flyt och flimmer
-på svaga telefoner*). Hela klippen `lasa`, `lasa2` och `lasa6`–`lasa8`, med Helgarderat, DN och SvD, är spelade i
-telefonens mått utan fel på sidan, och `lasa7` med Helgarderat i datorn (1440 × 900) i bilder.
+på svaga telefoner*). Klippen `lasa`, `lasa2`, `lasa6`–`lasa8` och, med bladvändningen, `lasa9` är spelade hela i
+telefonens mått utan fel på sidan; början av fem av dem med Helgarderat, DN och SvD bestämda, och `lasa9` med SvD, där
+bladet han vänder har samma tryck som arket (det delar arkets texturer). `lasa7` är provat i datorn (1440 × 900) i bilder.
 
 ### När något går fel i rummet
 
