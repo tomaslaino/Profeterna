@@ -9,7 +9,10 @@
 // och 9000, Golf, Mercedes 190 och W124, Audi 100, Passat och de andra kombibilarna, Sierra, Kadett, Corolla, BMW, de
 // små franska och BX:en, Cherokeen och Voyagern, och de äldre som fanns kvar: Amazon, PV, 144 och 145, Saab 96 och 99,
 // Bubblan, Mercedes 123, Ankan, Ladan, Nivan, Minin och amerikanaren när det är varmt), skåpbilar och VW-bussar, taxi,
-// de röda bussarna och den blåa fyran och plogbilen när det har snöat. Fler i rusningen, få på natten och ingen buss mitt i natten (RumUte.trafik), och i
+// de röda bussarna och den blåa fyran, lastbilar med skåp (mest på vardagarna), motorcyklar (den nakna och sporthojen,
+// flest när det är varmt och torrt) och plogbilen när det har snöat; längs kanten på affärens sida cyklarna (herr- och
+// damcyklar) och mopederna (skotern och Puch Maxin), som bilarna kör om. Fler i rusningen, få på natten och ingen buss
+// mitt i natten (RumUte.trafik), och i
 // rusningen ibland en kö mot ljuset till vänster: bilarna bromsar in och står med bromsljusen tända, och kör sedan
 // iväg en efter en.
 //
@@ -50,6 +53,9 @@ window.RumFasadGatan = (() => {
   const LINJE = 1.51;
   const MOT = 2.02;
   const FILER = [{ d: 1.3, dir: -1 }, { d: 1.72, dir: -1 }];
+  // Cyklarna och mopederna håller till höger (förarnas höger, affärens sida), längs kanten en bit innanför bilarnas
+  // fil, så att bilarna kör om dem framför dem.
+  const CYKELKANT = { d: 1.12, dir: -1, cykel: true };
   const SYNS = 1.95;
   const LUCKA = 12;
   const LIV = 5 * LUCKA - 2;
@@ -531,6 +537,44 @@ window.RumFasadGatan = (() => {
   };
   // Plogbilen: hytt, flak med sandspridare, det sneda plogbladet och det gula blinkljuset.
   const PLOG = { L: 860, hj: [-250, 160], r: 46 };
+  // Lastbilen med skåp (distributionsbilen, som en FL6 eller en Scania): frambyggd hytt och skåpet bakom.
+  const LASTBIL = { L: 770, hj: [-190, 262], r: 48 };
+
+  // På två hjul, som bilarna i centimeter och vända åt höger: herrcykeln och damcykeln (med stänkskärmar,
+  // kedjeskydd och pakethållare), skotern, mopeden (en Puch Maxi) och motorcyklarna (den nakna och sporthojen med
+  // kåpan). sadel: där den som åker har höften, axel: axlarna (hur upprätt den sitter), styre: händerna, fot:
+  // vristen (på fotpinnen eller golvet; cyklarna trampar runt vev med pedalarmen pv), ram: vägarna för ramen och
+  // styret på cyklarna, fram och bak: lyktorna [x, y, b, h].
+  const TVA = {
+    herr: {
+      L: 180, hj: [-54, 52], r: 34, sadel: [-22, -106], axel: [2, -154], styre: [23, -107], vev: [-6, -30], pv: 17,
+      ram: 'M-54 -34 L-6 -30 L-16 -88 Z M-16 -88 L34 -94 M-6 -30 L37 -78 M34 -94 L37 -78 Q45 -62 52 -34',
+      styret: 'M34 -94 L33 -103 Q31 -108 21 -107', stolpe: 'M-16 -88 L-18 -98',
+      sits: 'M-36 -99 Q-24 -104 -8 -100 Q-9 -96 -14 -96 H-31 Q-36 -96 -36 -99 Z', lampa: [38, -86], reflex: [-89, -60],
+    },
+    dam: {
+      L: 180, hj: [-54, 52], r: 34, sadel: [-24, -104], axel: [-14, -156], styre: [19, -112], vev: [-6, -30], pv: 17,
+      ram: 'M-54 -34 L-6 -30 L-17 -86 Z M37 -80 Q14 -42 -6 -30 M35 -88 Q10 -60 -14 -62 M35 -96 L37 -80 Q45 -62 52 -34',
+      styret: 'M35 -96 L34 -106 Q30 -114 17 -112', stolpe: 'M-17 -86 L-19 -96',
+      sits: 'M-38 -97 Q-26 -102 -10 -98 Q-11 -94 -16 -94 H-33 Q-38 -94 -38 -97 Z', lampa: [39, -88], reflex: [-89, -60],
+    },
+    skoter: {
+      L: 172, hj: [-56, 62], r: 22, sadel: [-44, -98], axel: [-22, -148], styre: [34, -118], fot: [6, -47],
+      fram: [60, -116, 5, 8], bak: [-103, -64, 4, 9],
+    },
+    maxi: {
+      L: 168, hj: [-54, 56], r: 29, sadel: [-38, -104], axel: [-18, -154], styre: [29, -118], fot: [-6, -46],
+      fram: [48, -110, 5, 11], bak: [-94, -97, 5, 7],
+    },
+    mc: {
+      L: 214, hj: [-72, 76], r: 32, sadel: [-30, -110], axel: [-14, -162], styre: [37, -125], fot: [-14, -54],
+      fram: [72, -118, 4, 16], bak: [-106, -98, 5, 8],
+    },
+    mcSport: {
+      L: 210, hj: [-72, 74], r: 31, sadel: [-36, -112], axel: [10, -148], styre: [40, -112], fot: [-26, -60], sport: true,
+      fram: [84, -100, 5, 9], bak: [-100, -116, 5, 6],
+    },
+  };
 
   const vagar = {};
   const vag = (s) => vagar[s] || (vagar[s] = new Path2D(s));
@@ -579,6 +623,15 @@ window.RumFasadGatan = (() => {
   };
   EGNA.lada4 = EGNA.lada;
   const TAXI = ['#1b1d22', '#e7e3d8', '#2a2c30', '#24345a', '#9aa0a6'];
+  // Cyklarna i Crescents och Monarks färger, skotrarna och mopederna i glada färger, motorcyklarna i nittiotalets
+  // (och sporthojarnas kåpor med en rand i en andra färg), lastbilarnas hytter mest vita.
+  const CYKLAR = ['#1b1d22', '#24345a', '#7a1f22', '#2e4a3c', '#e7e3d8', '#9a2a1e', '#3c5a7a', '#5e2a44', '#c9a227', '#9aa0a6'];
+  const SKOTRAR = ['#a8262a', '#e9e7e0', '#1b1d22', '#2a6ab0', '#c9a227', '#5fa8a0', '#9aa0a6'];
+  const MAXI = ['#a8262a', '#2a6ab0', '#1b1d22', '#e9e7e0', '#3f5a48', '#c9a227'];
+  const MCLACK = ['#a8262a', '#1b1d22', '#2a4a9a', '#e9e7e0', '#c9a227', '#2f5a58', '#5e2a44', '#9aa0a6'];
+  const RANDER = ['#e9e7e0', '#1b1d22', '#c9a227', '#2a6ab0', '#a8262a'];
+  const HYTTER = ['#e9e7e0', '#e9e7e0', '#e9e7e0', '#a8262a', '#24345a', '#2e4a3c', '#d8692a'];
+  const SKAPEN = ['#e9e7e0', '#e9e7e0', '#d9d6cc', '#c9c3b2', '#24345a', '#9a2a1e'];
 
   // Bilarna på Stockholms gator i mitten av nittiotalet, ungefär som i bilregistret: en tredjedel Volvo (240:n
   // vanligast), Saab, Golf och de japanska och tyska, fördelade på formerna ovan (siffran: hur många av hundra).
@@ -694,19 +747,29 @@ window.RumFasadGatan = (() => {
   // Hur ofta det kommer något per fil (s), ur RumUte.trafik: rusning, dag, kväll och natt. (Glesare än förr, när de
   // körde fortare: varje fordon syns längre, och skyltfönstret ska inte skymmas mer än det gjorde.) Lugnare sedan
   // 2026-11-17 ("lugnare/mindre stressig"): ungefär hälften så ofta som förut, lite långsammare (LUGN.fart), färre
-  // bussar (LUGN.buss), och färre som bromsar, stannar eller står i kö framför affären (kor, ko).
-  const LUGN = { fart: 0.88, buss: 0.6 };
+  // bussar (LUGN.buss), och färre som bromsar, stannar eller står i kö framför affären (kor, ko). Tätare igen sedan
+  // 2026-11-19 ("knappt så att det åker några öht"): ungefär dubbelt så ofta och lite fler bussar, men inte fler som
+  // bromsar eller står i kö, och det mesta av det nya är det som inte skymmer affären: motorcyklarna i filerna och
+  // cyklarna och mopederna längs kanten (intervallCykel).
+  const LUGN = { fart: 0.88, buss: 0.8 };
   function intervall(T, v) {
-    const s = T.rusning ? 46 : T.natt ? 260 : T.dag ? 76 : 120;
+    const s = T.rusning ? 27 : T.natt ? 130 : T.dag ? 38 : 58;
     return s * (v.snotackt || (v.fall === 'sno' && v.mangd > 0.5) ? 1.3 : 1);
+  }
+  // Längs kanten: cyklarna och mopederna, flest i rusningen och på sommaren, färre i kylan, på vintern och i regnet,
+  // och inga på natten, i snön eller i ösregnet (T.cyklar, som på bron). 0: inga.
+  function intervallCykel(T, v) {
+    if (!T.cyklar) return 0;
+    const s = T.rusning ? 30 : T.dag ? 46 : 80;
+    return s * (T.cyklar === 1 ? 2.2 : T.cyklar === 3 ? 0.7 : 1) * (v.fall ? 1.7 : 1) * (v.temp < 3 ? 1.5 : 1);
   }
 
   function trafik(v, L, G) {
     const S = {
       G, L, v,
-      filer: FILER.map((f, i) => {
+      filer: [...FILER, CYKELKANT].map((f, i) => {
         const sk = G.skala(f.d);
-        return { i, d: f.d, dir: f.dir, sk, k: (G.M * sk) / 100, y: G.markY(f.d), um: G.M * sk };
+        return { i, d: f.d, dir: f.dir, sk, k: (G.M * sk) / 100, y: G.markY(f.d), um: G.M * sk, cykel: Boolean(f.cykel) };
       }),
       fro: v.ar * 7919 + v.manad * 613 + v.dag * 31,
       luckor: new Map(),
@@ -725,6 +788,8 @@ window.RumFasadGatan = (() => {
     S.ton = (c) => G.mix(G.mix('#06070a', c, 0.13 + 0.87 * L.dag), '#ffb060', 0.07 * (1 - L.dag));
     S.glas = S.lamps ? '#0c0d10' : G.mix(S.ton('#1d252e'), L.sky[2], 0.35 * L.dag);
     S.himmel = L.sky[0];
+    // (filerna i den ordning de ritas: den bortersta, närmast affären, först)
+    S.ordning = [...S.filer].sort((a, b) => a.d - b.d);
     return S;
   }
 
@@ -758,6 +823,35 @@ window.RumFasadGatan = (() => {
       b.F = PLOG;
       b.lack = '#e07a1a';
       b.fart = 1.5 + R() * 0.3;
+    } else if (typ === 'cykel') {
+      // (en och en halv gång så fort som de som går; damcykeln oftast med korg)
+      b.F = TVA[R() < 0.55 ? 'dam' : 'herr'];
+      b.lack = pick(R, CYKLAR);
+      b.fart = (1.25 + R() * 0.4) * halt;
+      b.ry = ryttare(S, R, v, 'cykel');
+      b.korg = R() < (b.F === TVA.dam ? 0.4 : 0.1) ? S.ton(pick(R, ['#a07a4a', '#1a1a1a', '#c9b98f'])) : null;
+      b.vaska = R() < 0.3 ? S.ton(pick(R, ['#3a2a1e', '#1a1a1a', '#24345a', '#5a4632', '#7a1f22'])) : null;
+      b.lampa = R() < 0.6;
+      b.kromSkarm = R() < 0.5;
+    } else if (typ === 'skoter' || typ === 'maxi') {
+      b.F = TVA[typ];
+      b.lack = pick(R, typ === 'maxi' ? MAXI : SKOTRAR);
+      b.fart = (1.6 + R() * 0.35) * halt;
+      b.ry = ryttare(S, R, v, 'moped');
+    } else if (typ === 'mc') {
+      b.F = TVA[R() < 0.5 ? 'mcSport' : 'mc'];
+      b.lack = pick(R, MCLACK);
+      b.lack2 = S.ton(pick(R, RANDER));
+      b.fart = (T.natt ? 2.6 + R() * 0.7 : T.rusning ? 2.0 + R() * 0.5 : 2.2 + R() * 0.6) * halt;
+      b.ry = ryttare(S, R, v, 'mc');
+      // (ibland någon där bak, på den nakna)
+      b.bak = b.F === TVA.mc && R() < 0.25 ? ryttare(S, R, v, 'mc') : null;
+    } else if (typ === 'lastbil') {
+      b.F = LASTBIL;
+      b.lack = pick(R, HYTTER);
+      b.skap = S.ton(pick(R, SKAPEN));
+      b.rand = R() < 0.6 ? S.ton(pick(R, RANDER.slice(2))) : null;
+      b.fart = (1.8 + R() * 0.35) * halt;
     } else {
       b.taxi = typ === 'taxi';
       const modell = b.taxi ? lotta(R, TAXIBILAR) : typ;
@@ -811,6 +905,61 @@ window.RumFasadGatan = (() => {
     // skåpbilarna (och VW-bussarna), färre på helgen
     if (R() < (T.helg ? 0.06 : 0.11)) { const x = R(); return x < 0.5 ? 'skap' : x < 0.8 ? 't3' : 't3buss'; }
     return lotta(R, varmt(S, 15) ? MODELLER : MODELLER_KALLT);
+  }
+
+  // Vad som kommer i bilarnas filer framför affären: ibland en motorcykel (flest när det är varmt och torrt, få i
+  // regnet och ingen i snön) eller en lastbil med varor (mest på vardagarna), annars som valjTyp. (Bara här: bron
+  // bakom Hasse Backe lottar med valjTyp och ritar bara bilar och bussar.)
+  function valjFasad(S, R, T, f, I) {
+    const v = S.vNu || S.v;
+    const mc = v.snotackt || v.fall === 'sno' ? 0 : v.fall ? 0.008 : v.temp >= 15 ? 0.08 : v.temp >= 8 ? 0.06 : v.temp >= 3 ? 0.045 : 0.025;
+    if (R() < mc * (T.natt ? 0.5 : 1)) return 'mc';
+    if (R() < (!T.helg && T.h > 6 && T.h < 17 ? 0.05 : T.natt ? 0.01 : 0.02)) return 'lastbil';
+    return valjTyp(S, R, T, f, I * LUGN.buss);
+  }
+  // Längs kanten: mest cyklar, och skotrar och mopeder (färre i kylan).
+  function valjCykel(S, R) {
+    const v = S.vNu || S.v;
+    if (R() < (v.temp < 2 ? 0.1 : v.arstid === 'sommar' ? 0.3 : 0.2)) return R() < 0.6 ? 'skoter' : 'maxi';
+    return 'cykel';
+  }
+
+  // Den som åker på två hjul: kläderna (mössa och vantar i kylan, ibland en lång rock på cykeln), och hjälmen:
+  // cykelhjälm på några (det var nittiotal), alltid hjälm på mopeden (öppen eller hel) och hel på motorcykeln, där
+  // de flesta har skinnjacka. Färgerna i gatans ljus (S.ton) redan här.
+  const JACKOR = ['#24345a', '#1b1d22', '#a8262a', '#2f5a58', '#5e2a44', '#c9b98f', '#3f5a48', '#6e7f8c', '#8a5a2a', '#e7e3d8', '#3a4a8a'];
+  const BYXOR = ['#2a3448', '#1b1d22', '#3a4a66', '#4a4236', '#5a5a5a', '#c9b98f'];
+  const HY = ['#e0b896', '#d9a982', '#c48a62', '#8a5a3a', '#f0cdb0'];
+  const MOSSOR = ['#a8322a', '#1a1a1a', '#d8d0c0', '#2a4a7a', '#5a5a5a', '#3f5a48'];
+  const HJALMAR = ['#e9e7e0', '#a8262a', '#1b1d22', '#24345a', '#c9a227', '#2f5a58', '#9aa0a6'];
+  function ryttare(S, R, v, slag) {
+    const { pick, mix } = S.G;
+    const kallt = v.temp < 5;
+    const mc = slag === 'mc';
+    const r = {
+      jacka: S.ton(mc ? pick(R, ['#1b1d22', '#1b1d22', '#3a2a22', '#24345a', '#a8262a']) : pick(R, JACKOR)),
+      byxor: S.ton(mc ? pick(R, ['#1b1d22', '#2a3448', '#1b1d22']) : pick(R, BYXOR)),
+      sko: S.ton(pick(R, ['#1a1a1a', '#1a1a1a', '#3a2a1e', '#5a4632', '#e7e3d8'])),
+      hy: S.ton(pick(R, HY)),
+      har: S.ton(pick(R, HAR)),
+      lang: slag === 'cykel' && R() < (kallt ? 0.35 : 0.15),
+      langtHar: R() < 0.35,
+    };
+    r.jackaM = mix(r.jacka, '#000000', 0.3);
+    r.byxorM = mix(r.byxor, '#000000', 0.35);
+    r.skoM = mix(r.sko, '#000000', 0.35);
+    r.hand = mc ? S.ton('#1a1a1a') : kallt ? S.ton(pick(R, ['#1a1a1a', '#5a4632', '#a8322a'])) : r.hy;
+    if (slag === 'cykel') {
+      if (R() < 0.15) {
+        r.hjalm = 'cykel';
+        r.hjalmF = S.ton(pick(R, ['#e9e7e0', '#c9a227', '#2a6ab0', '#a8262a', '#5fa8a0']));
+      } else if (kallt && R() < 0.6) r.mossa = S.ton(pick(R, MOSSOR));
+    } else {
+      r.hjalm = mc || R() < 0.3 ? 'hel' : 'oppen';
+      r.hjalmF = S.ton(pick(R, HJALMAR));
+      r.rand = R() < 0.5 ? S.ton(pick(R, HJALMAR)) : null;
+    }
+    return r;
   }
 
   // ---------- hur de kör ----------
@@ -872,14 +1021,14 @@ window.RumFasadGatan = (() => {
 
   // Vad föraren gör framför affären: oftast kör den förbi i jämn fart, men ibland släpper den gasen en stund, bromsar
   // in (för något längre fram: någon som går över, en som svänger) och tar fart igen, eller stannar och står en stund.
-  // Var: fronten någonstans framför affären när det börjar, så att det syns i alla fönster. Bussarna stannar inte och
-  // plogbilen kör jämnt.
+  // Var: fronten någonstans framför affären när det börjar, så att det syns i alla fönster. Bussarna och lastbilarna
+  // stannar inte, och plogbilen och cyklarna kör jämnt.
   function kor(R, b, T, f, t0) {
     const v = b.fart;
     const D = fard(t0, v);
     const typ = b.typ;
-    if (typ === 'plog') return D;
-    const buss = typ === 'buss' || typ === 'ledbuss';
+    if (typ === 'plog' || typ === 'cykel') return D;
+    const buss = typ === 'buss' || typ === 'ledbuss' || typ === 'lastbil';
     const stopp = buss ? 0 : T.natt ? 0.01 : T.rusning ? 0.05 : 0.03;
     const broms = (T.natt ? 0.05 : T.rusning ? 0.14 : 0.09) * (buss ? 0.5 : 1);
     const slapp = T.natt ? 0.1 : 0.14;
@@ -943,17 +1092,17 @@ window.RumFasadGatan = (() => {
     if (S.luckor.has(key)) return S.luckor.get(key);
     const R = S.G.rng(S.fro + f.i * 104729 + n * 7907);
     const T = nu(S);
-    const I = intervall(T, S.vNu || S.v);
+    const I = f.cykel ? intervallCykel(T, S.vNu || S.v) : intervall(T, S.vNu || S.v);
     const ut = [];
-    if (R() < LUCKA / I) {
+    if (I && R() < LUCKA / I) {
       const t0 = n * LUCKA + f.i * 2.1 + R() * 0.8;
-      const a = nyttFordon(S, R, valjTyp(S, R, T, f, I * LUGN.buss), T, f);
-      a.fart *= LUGN.fart;
+      const a = nyttFordon(S, R, f.cykel ? valjCykel(S, R) : valjFasad(S, R, T, f, I), T, f);
+      if (!f.cykel) a.fart *= LUGN.fart;
       a.D = kor(R, a, T, f, t0);
       ut.push(a);
-      // ibland en till efter, som följer den
-      if (a.L < 600 && R() < (T.rusning ? 0.25 : 0.12)) {
-        const b = nyttFordon(S, R, valjTyp(S, R, T, f, 0), T, f);
+      // ibland en till efter, som följer den (längs kanten två som cyklar ihop)
+      if (a.L < 600 && R() < (f.cykel ? (a.typ === 'cykel' ? 0.15 : 0) : T.rusning ? 0.25 : 0.12)) {
+        const b = nyttFordon(S, R, f.cykel ? 'cykel' : valjTyp(S, R, T, f, 0), T, f);
         if (b.L < 600) {
           b.fart = a.fart;
           b.D = efter(a.D, (T.rusning ? 0.9 : 1.2) + R() * 1.2, a.L / 100 + 1.6 + R() * 0.9);
@@ -1044,11 +1193,11 @@ window.RumFasadGatan = (() => {
       const xf = f.dir > 0 ? XL + l.p * f.um : XR - l.p * f.um;
       const xa = f.dir > 0 ? xf - w : xf;
       if (xa > V.x + V.w + marg || xa + w < V.x - marg) return;
-      const tung = b.typ === 'buss' || b.typ === 'ledbuss' || b.typ === 'plog' ? 0.4 : 1;
+      const tung = b.typ === 'buss' || b.typ === 'ledbuss' || b.typ === 'plog' || b.typ === 'lastbil' ? 0.4 : b.F.sadel ? 0.6 : 1;
       const nig = Math.max(-0.016, Math.min(0.016, -0.008 * fjader(b.D, t))) * tung;
       ut.push({ b, f, x: xa + w / 2, fart: l.v, broms: bromsar(b.D, l, t), nig });
     };
-    for (const f of S.filer) {
+    for (const f of S.ordning) {
       const n = Math.floor((t - f.i * 2.1) / LUCKA);
       for (let m = n - 4; m <= n; m++) for (const b of lucka(S, f, m)) fram(b, f);
       const q = Math.floor(t / KO);
@@ -1514,7 +1663,8 @@ window.RumFasadGatan = (() => {
       c.globalAlpha = 0.16;
       c.fillStyle = b.c;
       if (b.F.kaross) c.fill(vag(b.F.kaross));
-      else c.fillRect(-h, -300, b.L, 300);
+      // (på två hjul bara lyktornas strimmor: en låda vore fel)
+      else if (!b.F.sadel) c.fillRect(-h, -300, b.L, 300);
       c.restore();
       if (S.lamps) {
         // (smalnar av nedåt, som ljus i blöt asfalt, i stället för ett rakt band)
@@ -1559,7 +1709,7 @@ window.RumFasadGatan = (() => {
         c.restore();
       }
     }
-    if (S.kallt && fart < 0.6) {
+    if (S.kallt && fart < 0.6 && b.typ !== 'cykel') {
       // (mjuka moln ur avgasröret som växer, stiger och bleknar)
       const x0 = -b.L / 2 + 6;
       for (let i = 0; i < 3; i++) {
@@ -1970,6 +2120,664 @@ window.RumFasadGatan = (() => {
     lyktor(c, b, S, [288, -110, 10, 18], [-452, -150, 8, 30], broms);
   }
 
+  // Lastbilen: skåpet med reglar och ibland en rand, den frambyggda hytten med föraren, dörren och steget,
+  // dieseltanken mellan hjulen, backspegeln och stötfångaren.
+  function ritaLastbil(c, b, dir, S, fart, broms, t) {
+    const F = b.F;
+    const mix = S.G.mix;
+    const svart = tonad(S, '#18191c');
+    under(c, b, S, [[386, '255,240,210', 0.3], [-386, '255,60,40', 0.25]]);
+    niga(c, F);
+    c.fillStyle = svart;
+    c.fillRect(-372, -100, 742, 26);
+    c.fillStyle = b.skap;
+    c.fillRect(-386, -352, 556, 250);
+    c.fillStyle = mix(b.skap, '#000000', 0.12);
+    for (let x = -330; x < 170; x += 62) c.fillRect(x, -346, 3, 238);
+    c.fillRect(-386, -352, 556, 7);
+    if (b.rand) {
+      c.fillStyle = b.rand;
+      c.fillRect(-386, -176, 556, 20);
+    }
+    c.fillStyle = mix(b.skap, '#000000', 0.32);
+    c.fillRect(-386, -110, 556, 8);
+    // hytten, rutan med föraren, dörrens fog och handtag och steget
+    c.fillStyle = b.c;
+    c.fill(vag('M180 -92 V-298 Q180 -312 194 -312 H356 Q370 -312 374 -298 L388 -160 L390 -92 Z'));
+    c.fillStyle = tonad(S, '#141518');
+    c.fill(vag('M200 -292 H356 Q364 -292 366 -284 L376 -196 H200 Z'));
+    const R = vag('M206 -286 H354 Q359 -286 360 -281 L369 -202 H206 Z');
+    c.fillStyle = S.lamps ? '#1a1814' : S.glas;
+    c.fill(R);
+    if (!S.lamps) {
+      c.save();
+      c.clip(R);
+      c.fillStyle = 'rgba(8,9,12,0.5)';
+      c.beginPath();
+      c.arc(300, -252, 13, 0, TAU);
+      c.ellipse(296, -214, 26, 20, 0, 0, TAU);
+      c.fill();
+      c.globalAlpha = 0.18 + 0.22 * S.L.dag;
+      c.fillStyle = S.himmel;
+      c.beginPath(); c.moveTo(230, -286); c.lineTo(300, -286); c.lineTo(250, -202); c.lineTo(180, -202); c.closePath(); c.fill();
+      c.restore();
+    }
+    c.lineCap = 'round';
+    c.strokeStyle = b.cM;
+    c.lineWidth = 2;
+    c.stroke(vag('M196 -296 V-104'));
+    c.strokeStyle = svart;
+    c.lineWidth = 4;
+    c.stroke(vag('M214 -184 h22'));
+    c.fillStyle = svart;
+    c.fillRect(214, -114, 64, 8);
+    c.fillStyle = tonad(S, '#2a2c30');
+    c.fillRect(366, -106, 30, 32);
+    c.strokeStyle = svart;
+    c.lineWidth = 3;
+    c.stroke(vag('M372 -262 L396 -262'));
+    c.fillRect(392, -284, 9, 58);
+    c.fillStyle = tonad(S, '#9a9ea4');
+    c.fillRect(20, -106, 130, 38);
+    for (const x of F.hj) ritaHjul(c, x, F.r, 'buss', '#b8bcc2', -40, S);
+    if (S.snoTak) {
+      c.fillStyle = S.G.snoC(S.L);
+      c.fillRect(-380, -360, 544, 8);
+      c.fillRect(196, -318, 160, 7);
+    }
+    c.fillStyle = S.lamps ? '#fffbea' : '#ece6cf';
+    c.fillRect(384, -124, 8, 18);
+    c.fillStyle = tonad(S, '#d88a2a');
+    c.fillRect(377, -146, 8, 12);
+    c.fillStyle = broms ? '#ff3a26' : S.lamps ? '#cc2c1e' : tonad(S, '#a8201a');
+    c.fillRect(-390, -136, 8, 30);
+    stank(c, b, S, fart, t, -40);
+    lyktor(c, b, S, [384, -124, 8, 18], [-390, -136, 8, 30], broms);
+  }
+
+  // ---------- på två hjul ----------
+
+  // en båge (utan linjen dit från förra biten av vägen)
+  function bage(c, x, y, r, a0, a1) {
+    c.moveTo(x + r * Math.cos(a0), y + r * Math.sin(a0));
+    c.arc(x, y, r, a0, a1);
+  }
+  // Leden (knät, armbågen) mellan p och q, l1 från p och l2 till q, böjd framåt (s 1) eller nedåt (s -1); når
+  // benen inte fram blir de raka.
+  function led(p, q, l1, l2, s) {
+    const dx = q[0] - p[0];
+    const dy = q[1] - p[1];
+    const d = Math.max(Math.abs(l1 - l2) + 0.5, Math.min(l1 + l2 - 0.5, Math.hypot(dx, dy)));
+    const a = Math.atan2(dy, dx) - s * Math.acos((l1 * l1 + d * d - l2 * l2) / (2 * l1 * d));
+    return [p[0] + l1 * Math.cos(a), p[1] + l1 * Math.sin(a)];
+  }
+  // Benet från höften H till vristen P, med knät framåt och skon på foten.
+  function benet(c, H, P, farg, sko) {
+    const K = led(H, P, 44, 46, 1);
+    c.strokeStyle = farg;
+    c.lineWidth = 13;
+    c.beginPath();
+    c.moveTo(H[0], H[1]);
+    c.lineTo(K[0], K[1]);
+    c.lineTo(P[0], P[1]);
+    c.stroke();
+    c.fillStyle = sko;
+    c.beginPath();
+    c.ellipse(P[0] + 6, P[1] + 4, 12, 5.5, 0, 0, TAU);
+    c.fill();
+  }
+  // Kroppen från höften H till axlarna A: jackan, lite bredare över bröstet och mörkare längs ryggen, och den
+  // långa rocken som hänger ned bakom sadeln. (p: a längs ryggen från höften, b framåt)
+  function kroppen(c, H, A, r) {
+    const l = Math.hypot(A[0] - H[0], A[1] - H[1]);
+    const ux = (A[0] - H[0]) / l;
+    const uy = (A[1] - H[1]) / l;
+    const p = (a, b) => [H[0] + ux * a - uy * b, H[1] + uy * a + ux * b];
+    const lin = (q) => c.lineTo(q[0], q[1]);
+    const kv = (k, q) => c.quadraticCurveTo(k[0], k[1], q[0], q[1]);
+    c.fillStyle = r.jacka;
+    if (r.lang) {
+      // (rocken hänger rakt ned kring sadeln, över låret)
+      const [hx, hy] = H;
+      c.beginPath();
+      c.moveTo(hx - 12, hy - 10);
+      c.lineTo(hx - 19, hy + 20);
+      c.quadraticCurveTo(hx, hy + 24, hx + 18, hy + 17);
+      c.lineTo(hx + 12, hy - 4);
+      c.closePath();
+      c.fill();
+    }
+    c.beginPath();
+    const s = p(-6, -13);
+    c.moveTo(s[0], s[1]);
+    lin(p(-6, 12));
+    kv(p(l * 0.55, 17), p(l - 6, 12));
+    kv(p(l + 7, 9), p(l + 5, -5));
+    kv(p(l * 0.5, -17), s);
+    c.closePath();
+    c.fill();
+    c.fillStyle = r.jackaM;
+    c.beginPath();
+    const s2 = p(-4, -13);
+    c.moveTo(s2[0], s2[1]);
+    kv(p(l * 0.5, -17), p(l + 4, -6));
+    kv(p(l * 0.5, -9), p(-4, -6));
+    c.closePath();
+    c.fill();
+  }
+  // Armen från axeln A till handen på styret Hd, med armbågen nedåt.
+  function armen(c, A, Hd, r) {
+    const E = led(A, Hd, 30, 32, -1);
+    const l = Math.hypot(Hd[0] - E[0], Hd[1] - E[1]) || 1;
+    const k = Math.max(0, 1 - 5 / l);
+    c.strokeStyle = r.jacka;
+    c.lineWidth = 10;
+    c.beginPath();
+    c.moveTo(A[0], A[1]);
+    c.lineTo(E[0], E[1]);
+    c.lineTo(E[0] + (Hd[0] - E[0]) * k, E[1] + (Hd[1] - E[1]) * k);
+    c.stroke();
+    c.fillStyle = r.hand;
+    c.beginPath();
+    c.arc(Hd[0], Hd[1], 4.6, 0, TAU);
+    c.fill();
+  }
+  // Huvudet över axlarna (framåt när ryggen lutar), i profil åt höger: nacken, ansiktet med näsan och ögat, håret
+  // och mössan, eller hjälmen (cykelhjälmen, den öppna med hakremmen, den hela med visiret).
+  function huvudet(c, A, H, r) {
+    const l = Math.hypot(A[0] - H[0], A[1] - H[1]);
+    const ux = (A[0] - H[0]) / l;
+    const uy = (A[1] - H[1]) / l;
+    const x = A[0] + ux * 19 + 4;
+    const y = A[1] + uy * 19 - 2;
+    c.strokeStyle = r.hy;
+    c.lineWidth = 8;
+    c.beginPath();
+    c.moveTo(A[0] + ux * 3, A[1] + uy * 3);
+    c.lineTo(x - 1, y + 7);
+    c.stroke();
+    if (r.hjalm === 'hel') {
+      c.fillStyle = r.hjalmF;
+      c.beginPath();
+      c.ellipse(x + 1, y + 1, 16, 15, 0, 0, TAU);
+      c.fill();
+      if (r.rand) {
+        c.strokeStyle = r.rand;
+        c.lineWidth = 3;
+        c.beginPath();
+        c.arc(x + 1, y + 1, 12, Math.PI * 1.05, Math.PI * 1.75);
+        c.stroke();
+      }
+      c.fillStyle = '#121418';
+      c.beginPath();
+      c.moveTo(x + 4, y - 6);
+      c.quadraticCurveTo(x + 15, y - 7, x + 17, y + 1);
+      c.lineTo(x + 16, y + 5);
+      c.lineTo(x + 5, y + 5);
+      c.closePath();
+      c.fill();
+      c.fillStyle = 'rgba(255,255,255,0.22)';
+      c.beginPath();
+      c.ellipse(x - 4, y - 8, 6, 2.6, -0.5, 0, TAU);
+      c.fill();
+      return;
+    }
+    c.fillStyle = r.hy;
+    c.beginPath();
+    c.arc(x, y, 11, 0, TAU);
+    c.moveTo(x + 9.5, y - 2);
+    c.lineTo(x + 14.5, y + 3.5);
+    c.lineTo(x + 9.5, y + 5.5);
+    c.fill();
+    c.fillStyle = 'rgba(20,14,10,0.8)';
+    c.beginPath();
+    c.arc(x + 5.5, y - 1.5, 1.3, 0, TAU);
+    c.fill();
+    // (håret bak och upptill, så att pannan och ögat syns)
+    c.fillStyle = r.har;
+    c.beginPath();
+    c.arc(x - 0.5, y - 0.5, 12, Math.PI * 0.72, Math.PI * 1.78);
+    c.closePath();
+    c.fill();
+    if (r.langtHar && r.hjalm !== 'oppen') {
+      c.beginPath();
+      c.ellipse(x - 8, y + 9, 6, 11, 0.2, 0, TAU);
+      c.fill();
+    }
+    if (r.hjalm === 'oppen') {
+      c.fillStyle = r.hjalmF;
+      c.beginPath();
+      c.arc(x - 1, y, 14.5, Math.PI * 0.55, Math.PI * 1.9);
+      c.lineTo(x + 7, y - 5);
+      c.lineTo(x + 3, y + 6);
+      c.closePath();
+      c.fill();
+      if (r.rand) {
+        c.strokeStyle = r.rand;
+        c.lineWidth = 2.6;
+        c.beginPath();
+        c.arc(x - 1, y, 11.5, Math.PI * 1.1, Math.PI * 1.7);
+        c.stroke();
+      }
+      c.strokeStyle = '#1a1a1a';
+      c.lineWidth = 1.2;
+      c.beginPath();
+      c.moveTo(x + 3, y + 6);
+      c.lineTo(x + 7, y + 11);
+      c.stroke();
+    } else if (r.hjalm === 'cykel') {
+      c.fillStyle = r.hjalmF;
+      c.beginPath();
+      c.arc(x - 1, y - 3.5, 13.5, Math.PI, Math.PI * 2);
+      c.closePath();
+      c.fill();
+      // (ventilerna)
+      c.strokeStyle = 'rgba(10,10,12,0.6)';
+      c.lineWidth = 1.6;
+      c.beginPath();
+      c.moveTo(x - 8, y - 11); c.lineTo(x - 4, y - 14);
+      c.moveTo(x - 1, y - 13); c.lineTo(x + 3, y - 14);
+      c.moveTo(x + 6, y - 11); c.lineTo(x + 9, y - 10);
+      c.stroke();
+    } else if (r.mossa) {
+      c.fillStyle = r.mossa;
+      c.beginPath();
+      c.arc(x, y - 3, 12.8, Math.PI * 1.02, Math.PI * 1.98);
+      c.closePath();
+      c.fill();
+    }
+  }
+
+  // Cykelns hjul: däcket, fälgen och ekrarna, som snurrar.
+  function ekerhjul(c, x, r, S, vrid) {
+    const y = -r;
+    c.strokeStyle = '#141416';
+    c.lineWidth = 4.4;
+    c.beginPath();
+    c.arc(x, y, r - 2.2, 0, TAU);
+    c.stroke();
+    c.strokeStyle = tonad(S, '#a9adb3');
+    c.lineWidth = 1.8;
+    c.beginPath();
+    c.arc(x, y, r - 5, 0, TAU);
+    c.stroke();
+    c.globalAlpha = 0.65;
+    c.lineWidth = 0.8;
+    c.beginPath();
+    const a0 = vrid / r;
+    for (let i = 0; i < 16; i++) {
+      const a = a0 + (i * TAU) / 16;
+      c.moveTo(x + Math.cos(a) * 3, y + Math.sin(a) * 3);
+      c.lineTo(x + Math.cos(a + 0.18) * (r - 5), y + Math.sin(a + 0.18) * (r - 5));
+    }
+    c.stroke();
+    c.globalAlpha = 1;
+    c.fillStyle = tonad(S, '#8a8e94');
+    c.beginPath();
+    c.arc(x, y, 3.2, 0, TAU);
+    c.fill();
+  }
+  // Mopedens och motorcykelns hjul: det tjocka däcket, och fälgen med n ekrar som snurrar (ekrade på mopeden,
+  // gjutna på skotern och motorcyklarna) och bromsskivan fram.
+  function hojhjul(c, x, r, S, vrid, n, skiva) {
+    const y = -r;
+    const d = r * 0.22;
+    const fa = tonad(S, '#a9adb3');
+    const a0 = vrid / r;
+    if (n > 6) {
+      c.strokeStyle = '#121214';
+      c.lineWidth = d;
+      c.beginPath();
+      c.arc(x, y, r - d / 2, 0, TAU);
+      c.stroke();
+    } else {
+      c.fillStyle = '#121214';
+      c.beginPath();
+      c.arc(x, y, r, 0, TAU);
+      c.fill();
+      c.fillStyle = tonad(S, '#3a3c40');
+      c.beginPath();
+      c.arc(x, y, r - d, 0, TAU);
+      c.fill();
+    }
+    if (skiva) {
+      c.strokeStyle = tonad(S, '#8a8e94');
+      c.lineWidth = r * 0.1;
+      c.beginPath();
+      c.arc(x, y, r * 0.42, 0, TAU);
+      c.stroke();
+    }
+    c.strokeStyle = fa;
+    c.lineWidth = n > 6 ? 0.8 : r * 0.13;
+    c.beginPath();
+    for (let i = 0; i < n; i++) {
+      const a = a0 + (i * TAU) / n;
+      c.moveTo(x + Math.cos(a) * r * 0.16, y + Math.sin(a) * r * 0.16);
+      c.lineTo(x + Math.cos(a) * (r - d), y + Math.sin(a) * (r - d));
+    }
+    c.stroke();
+    c.lineWidth = 1.6;
+    c.beginPath();
+    c.arc(x, y, r - d, 0, TAU);
+    c.stroke();
+    c.fillStyle = tonad(S, '#8a8e94');
+    c.beginPath();
+    c.arc(x, y, r * 0.16, 0, TAU);
+    c.fill();
+  }
+
+  // Cykeln och den som cyklar: hjulen och stänkskärmarna, det bortre benet bakom ramen, pakethållaren (ibland med
+  // en väska), ramen med kedjeskyddet, sadeln och styret, korgen, lyktan och reflexen, och sedan kroppen, det
+  // närmre benet, armen och huvudet. Vevarna går runt med hjulen (ett varv på två och ett halvt hjulvarv) och
+  // står still när cykeln står; lyktan lyser i mörkret på dem som har dynamo.
+  function ritaCykel(c, b, dir, S, fart, broms, t, vrid) {
+    const F = b.F;
+    const r = b.ry;
+    const ljus = S.lamps && b.lampa;
+    under(c, b, S, ljus ? [[F.lampa[0], '255,240,210', 0.14]] : []);
+    niga(c, F);
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    const krom = tonad(S, '#b4b8bd');
+    const svart = tonad(S, '#18191c');
+    const a = vrid / F.r / 2.5;
+    const [vx, vy] = F.vev;
+    const ca = F.pv * Math.cos(a);
+    const sa = F.pv * Math.sin(a);
+    const p1 = [vx + ca, vy + sa];
+    const p2 = [vx - ca, vy - sa];
+    const vrist = (p) => [p[0] - 2, p[1] - 8];
+    for (const x of F.hj) ekerhjul(c, x, F.r, S, vrid);
+    c.strokeStyle = b.kromSkarm ? krom : b.c;
+    c.lineWidth = 3.4;
+    c.beginPath();
+    bage(c, F.hj[0], -F.r, F.r + 4.5, Math.PI * 0.8, Math.PI * 1.88);
+    bage(c, F.hj[1], -F.r, F.r + 4.5, Math.PI * 1.02, Math.PI * 1.95);
+    c.stroke();
+    c.strokeStyle = tonad(S, '#6a6e74');
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(vx, vy);
+    c.lineTo(p2[0], p2[1]);
+    c.stroke();
+    c.fillStyle = svart;
+    c.fillRect(p2[0] - 5, p2[1] - 1.5, 10, 3);
+    benet(c, F.sadel, vrist(p2), r.byxorM, r.skoM);
+    c.strokeStyle = krom;
+    c.lineWidth = 1.8;
+    c.stroke(vag('M-22 -82 L-80 -82 M-78 -82 L-54 -34 M-62 -82 L-55 -36'));
+    if (b.vaska) {
+      c.fillStyle = b.vaska;
+      c.beginPath();
+      if (c.roundRect) c.roundRect(-80, -103, 42, 21, 4); else c.rect(-80, -103, 42, 21);
+      c.fill();
+    }
+    c.strokeStyle = b.c;
+    c.lineWidth = 3.8;
+    c.stroke(vag(F.ram));
+    c.fillStyle = b.cM;
+    c.fill(vag('M-52 -41 L-6 -43 Q6 -43 7 -33 Q6 -25 -4 -24 L-50 -29 Q-55 -35 -52 -41 Z'));
+    c.strokeStyle = krom;
+    c.lineWidth = 2.4;
+    c.stroke(vag(F.stolpe));
+    c.stroke(vag(F.styret));
+    c.fillStyle = svart;
+    c.fill(vag(F.sits));
+    if (b.korg) {
+      c.fillStyle = b.korg;
+      c.fill(vag('M30 -116 H58 L55 -92 H33 Z'));
+      c.strokeStyle = S.G.mix(b.korg, '#000000', 0.35);
+      c.lineWidth = 1;
+      c.stroke(vag('M31 -108 H57 M32 -100 H56 M40 -116 L40 -92 M48 -116 L47.5 -92'));
+    }
+    const [lx, ly] = F.lampa;
+    c.fillStyle = ljus ? '#fffbea' : tonad(S, '#d8d6cc');
+    c.fillRect(lx, ly, 7, 6);
+    const [rx, ry] = F.reflex;
+    c.fillStyle = tonad(S, '#b8201a');
+    c.fillRect(rx, ry, 4, 7);
+    kroppen(c, F.sadel, F.axel, r);
+    c.strokeStyle = tonad(S, '#8a8e94');
+    c.lineWidth = 3.2;
+    c.beginPath();
+    c.moveTo(vx, vy);
+    c.lineTo(p1[0], p1[1]);
+    c.stroke();
+    c.fillStyle = svart;
+    c.fillRect(p1[0] - 5, p1[1] - 1.5, 10, 3);
+    c.fillStyle = krom;
+    c.beginPath();
+    c.arc(vx, vy, 3, 0, TAU);
+    c.fill();
+    benet(c, F.sadel, vrist(p1), r.byxor, r.sko);
+    armen(c, F.axel, F.styre, r);
+    huvudet(c, F.axel, F.sadel, r);
+    if (ljus) {
+      c.save();
+      c.globalCompositeOperation = 'lighter';
+      sken(c, lx + 6, ly + 3, 40, '255,244,214', 0.5);
+      sken(c, rx + 2, ry + 3, 16, '255,48,32', 0.25);
+      c.restore();
+    }
+    stank(c, b, S, fart, t, -20);
+  }
+
+  // Skotern: golvet, kåpan bak över motorn och bakhjulet, benskölden, framskärmen, styret och sadeln.
+  function skotern(c, b, S, F, krom, svart, gra) {
+    c.fillStyle = gra;
+    c.fill(vag('M-8 -42 L40 -42 L44 -30 L-8 -30 Z'));
+    c.fillStyle = b.c;
+    c.fill(vag('M-102 -48 Q-104 -72 -84 -80 L-16 -82 Q-6 -82 -6 -70 L-6 -36 L-56 -34 Q-90 -34 -102 -48 Z'));
+    c.fill(vag('M36 -30 Q48 -36 48 -60 L50 -104 L61 -106 Q67 -62 61 -36 Q59 -28 50 -26 Z'));
+    c.fill(vag('M46 -104 L45 -116 Q45 -122 52 -122 L62 -120 L62 -106 Z'));
+    c.fillStyle = b.cL;
+    c.fill(vag('M-98 -62 Q-92 -76 -82 -78 L-16 -80 L-16 -74 L-90 -70 Z'));
+    c.strokeStyle = b.c;
+    c.lineWidth = 5;
+    c.beginPath();
+    bage(c, F.hj[1], -F.r, F.r + 5, Math.PI * 1.05, Math.PI * 1.75);
+    c.stroke();
+    c.strokeStyle = svart;
+    c.lineWidth = 4.4;
+    c.stroke(vag('M48 -118 L28 -118'));
+    c.fillStyle = svart;
+    c.fill(vag('M-86 -80 Q-84 -90 -64 -90 L-24 -88 Q-14 -88 -14 -82 L-14 -80 Z'));
+    c.strokeStyle = krom;
+    c.lineWidth = 4;
+    c.stroke(vag('M-44 -30 L-92 -26'));
+  }
+  // Mopeden (Puch Maxi): gaffeln, ramen, tanken under sadeln, motorn med flänsarna och avgasröret, stänkskärmarna,
+  // stötdämparen, pakethållaren, sadeln, styret och pedalen.
+  function maxin(c, b, S, F, krom, svart, gra) {
+    c.strokeStyle = krom;
+    c.lineWidth = 3;
+    c.stroke(vag('M40 -100 L47 -64 L56 -29'));
+    c.strokeStyle = b.c;
+    c.lineWidth = 7;
+    c.stroke(vag('M40 -100 Q22 -68 0 -50 L-14 -44'));
+    c.lineWidth = 3.4;
+    c.beginPath();
+    bage(c, F.hj[0], -F.r, F.r + 4, Math.PI * 0.95, Math.PI * 1.8);
+    bage(c, F.hj[1], -F.r, F.r + 4, Math.PI * 1.1, Math.PI * 1.85);
+    c.stroke();
+    c.strokeStyle = svart;
+    c.lineWidth = 4;
+    c.stroke(vag('M-14 -40 L-54 -29'));
+    c.strokeStyle = krom;
+    c.lineWidth = 3;
+    c.stroke(vag('M-58 -66 L-52 -34'));
+    c.fillStyle = b.c;
+    c.fill(vag('M-66 -86 L-18 -86 Q-10 -86 -8 -78 L-4 -58 Q-6 -52 -14 -52 L-58 -60 Q-66 -62 -66 -70 Z'));
+    c.fillStyle = gra;
+    c.fill(vag('M-24 -56 H2 Q8 -56 8 -48 V-30 Q8 -24 2 -24 H-20 Q-26 -24 -26 -30 Z'));
+    c.strokeStyle = svart;
+    c.lineWidth = 1.2;
+    c.stroke(vag('M-22 -48 H4 M-22 -42 H4 M-22 -36 H4'));
+    c.strokeStyle = krom;
+    c.lineWidth = 4;
+    c.stroke(vag('M4 -28 Q-6 -20 -40 -24 L-78 -28'));
+    c.fillStyle = krom;
+    c.beginPath();
+    c.ellipse(-80, -29, 14, 4.5, 0.05, 0, TAU);
+    c.fill();
+    c.lineWidth = 2;
+    c.stroke(vag('M-66 -90 L-92 -90 M-90 -90 L-78 -66'));
+    c.fillStyle = svart;
+    c.fill(vag('M-68 -88 Q-66 -97 -48 -97 H-22 Q-14 -97 -14 -91 L-14 -87 H-68 Z'));
+    c.strokeStyle = krom;
+    c.lineWidth = 2.6;
+    c.stroke(vag('M40 -100 L39 -112 Q36 -118 27 -118'));
+    c.beginPath();
+    c.arc(48, -104, 7, 0, TAU);
+    c.stroke();
+    c.lineWidth = 2.4;
+    c.stroke(vag('M-6 -36 L0 -40'));
+  }
+  // Den nakna motorcykeln: svingarmen och stötdämparen, motorn med kylflänsarna, avgasröret och ljuddämparen,
+  // tanken med randen, sadeln och bakskärmen, gaffeln, framskärmen, den runda lyktan och styret med backspegeln.
+  function nakenHoj(c, b, S, F, krom, svart, gra) {
+    c.strokeStyle = svart;
+    c.lineWidth = 6;
+    c.stroke(vag('M-12 -50 L-72 -32'));
+    c.strokeStyle = krom;
+    c.lineWidth = 4.5;
+    c.stroke(vag('M-38 -98 L-56 -50'));
+    c.fillStyle = gra;
+    c.fill(vag('M-24 -84 L28 -88 L36 -62 L30 -36 H-18 Q-26 -36 -26 -46 Z'));
+    c.strokeStyle = svart;
+    c.lineWidth = 1.4;
+    c.stroke(vag('M-18 -78 L28 -81 M-18 -72 L30 -74 M-18 -66 L32 -67 M-18 -60 L33 -60'));
+    c.strokeStyle = krom;
+    c.lineWidth = 5;
+    c.stroke(vag('M32 -60 Q40 -34 18 -30 L-40 -36'));
+    c.fillStyle = krom;
+    c.fill(vag('M-38 -42 L-98 -54 Q-104 -50 -100 -45 L-38 -34 Z'));
+    c.fillStyle = gra;
+    c.fill(vag('M-98 -54 Q-104 -50 -100 -45 L-96 -46 Q-99 -50 -95 -53 Z'));
+    c.fillStyle = b.c;
+    c.fill(vag('M-14 -106 Q-2 -122 26 -118 Q44 -114 46 -100 L36 -88 L-12 -88 Z'));
+    c.fillStyle = b.lack2;
+    c.fill(vag('M-6 -104 Q6 -114 30 -110 L28 -104 Q8 -106 -4 -98 Z'));
+    c.fillStyle = b.c;
+    c.fill(vag('M-78 -96 L-104 -98 Q-108 -92 -104 -86 L-78 -88 Z'));
+    c.fillStyle = svart;
+    c.fill(vag('M-14 -106 L-76 -106 Q-88 -104 -90 -96 L-76 -92 L-14 -92 Z'));
+    c.strokeStyle = krom;
+    c.lineWidth = 5;
+    c.stroke(vag('M54 -120 L76 -32'));
+    c.strokeStyle = b.c;
+    c.beginPath();
+    bage(c, F.hj[1], -F.r, F.r + 5, Math.PI * 1.1, Math.PI * 1.7);
+    c.stroke();
+    c.fillStyle = krom;
+    c.beginPath();
+    c.arc(68, -110, 10, 0, TAU);
+    c.fill();
+    c.strokeStyle = svart;
+    c.lineWidth = 3.6;
+    c.stroke(vag('M54 -122 L36 -126'));
+    c.strokeStyle = gra;
+    c.lineWidth = 2.4;
+    c.stroke(vag('M50 -124 L46 -144'));
+    c.fillStyle = svart;
+    c.beginPath();
+    c.ellipse(45, -148, 3, 5, 0, 0, TAU);
+    c.fill();
+  }
+  // Sporthojen: svingarmen, motorn under kåpan, ljuddämparen upp mot stjärten, gaffeln och framskärmen, kåpan i
+  // lacken med randen i den andra färgen och vindrutan, tanken, stjärten och sadeln, och styret lågt.
+  function sportHoj(c, b, S, F, krom, svart, gra) {
+    c.strokeStyle = svart;
+    c.lineWidth = 6;
+    c.stroke(vag('M-14 -50 L-72 -31'));
+    c.fillStyle = gra;
+    c.fill(vag('M-20 -86 L30 -90 L34 -40 H-16 Z'));
+    c.fillStyle = krom;
+    c.fill(vag('M-34 -44 L-92 -64 Q-98 -60 -95 -55 L-36 -36 Z'));
+    c.strokeStyle = krom;
+    c.lineWidth = 5;
+    c.stroke(vag('M62 -118 L74 -31'));
+    c.strokeStyle = b.c;
+    c.beginPath();
+    bage(c, F.hj[1], -F.r, F.r + 4, Math.PI * 1.1, Math.PI * 1.75);
+    c.stroke();
+    // (kåpan: nosen över framhjulet och sidan ned bakom det, över motorn)
+    const kapa = vag('M60 -132 Q76 -122 88 -102 L90 -94 L72 -88 L56 -86 L44 -46 Q38 -37 26 -37 L-8 -38 Q-18 -40 -18 -50 L-16 -84 L-8 -96 L28 -104 Z');
+    c.fillStyle = b.c;
+    c.fill(kapa);
+    c.save();
+    c.clip(kapa);
+    c.fillStyle = b.lack2;
+    c.beginPath();
+    c.moveTo(96, -96);
+    c.lineTo(-20, -78);
+    c.lineTo(-20, -66);
+    c.lineTo(96, -82);
+    c.closePath();
+    c.fill();
+    c.restore();
+    c.fillStyle = svart;
+    c.fill(vag('M10 -62 L34 -66 L32 -56 L10 -54 Z'));
+    c.fillStyle = S.glas;
+    c.globalAlpha = 0.85;
+    c.fill(vag('M60 -132 L48 -148 Q55 -151 62 -145 L76 -124 Z'));
+    c.globalAlpha = 1;
+    // tanken, stjärten (som slutar ovanför bakhjulet, med randen) och sadeln
+    c.fillStyle = b.c;
+    c.fill(vag('M-10 -104 Q2 -124 32 -120 L44 -106 L36 -98 L-10 -96 Z'));
+    c.fill(vag('M-10 -100 L-58 -106 L-92 -118 Q-99 -116 -98 -108 L-86 -96 L-64 -86 L-16 -84 Z'));
+    c.fillStyle = b.lack2;
+    c.fill(vag('M-58 -100 L-92 -112 L-92 -106 L-62 -94 Z'));
+    c.fillStyle = svart;
+    c.fill(vag('M-8 -104 L-56 -110 L-60 -103 L-10 -99 Z'));
+    c.strokeStyle = svart;
+    c.lineWidth = 3.6;
+    c.stroke(vag('M50 -110 L38 -112'));
+  }
+
+  // Skotern, mopeden och motorcyklarna med den som åker (och ibland någon där bak på motorcykeln): det bortre
+  // benet bakom, hjulen, hojen, kroppen, det närmre benet på fotpinnen eller golvet, armen och huvudet med hjälmen,
+  // och lyktorna, som alltid är tända.
+  function ritaHoj(c, b, dir, S, fart, broms, t, vrid) {
+    const F = b.F;
+    const r = b.ry;
+    under(c, b, S, [[F.fram[0], '255,240,210', 0.26], [F.bak[0], '255,60,40', 0.22]]);
+    niga(c, F);
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    const krom = tonad(S, '#b9bdc2');
+    const svart = tonad(S, '#18191c');
+    const gra = tonad(S, '#5a5e64');
+    const [fx, fy] = F.fot;
+    benet(c, F.sadel, [fx + 4, fy - 2], r.byxorM, r.skoM);
+    const n = b.typ === 'maxi' ? 24 : b.typ === 'skoter' ? 5 : 3;
+    hojhjul(c, F.hj[0], F.r, S, vrid, n, false);
+    hojhjul(c, F.hj[1], F.r, S, vrid, n, b.typ === 'mc');
+    if (b.typ === 'skoter') skotern(c, b, S, F, krom, svart, gra);
+    else if (b.typ === 'maxi') maxin(c, b, S, F, krom, svart, gra);
+    else if (F.sport) sportHoj(c, b, S, F, krom, svart, gra);
+    else nakenHoj(c, b, S, F, krom, svart, gra);
+    const p = b.bak;
+    if (p) {
+      kroppen(c, [-64, -114], [-60, -166], p);
+      benet(c, [-64, -114], [-44, -62], p.byxor, p.sko);
+      huvudet(c, [-60, -166], [-64, -114], p);
+    }
+    kroppen(c, F.sadel, F.axel, r);
+    benet(c, F.sadel, F.fot, r.byxor, r.sko);
+    armen(c, F.axel, F.styre, r);
+    huvudet(c, F.axel, F.sadel, r);
+    if (p) armen(c, [-58, -160], [-28, -126], p);
+    const [lx, ly, lw, lh] = F.fram;
+    c.fillStyle = S.lamps ? '#fffbea' : '#ece6cf';
+    c.fillRect(lx, ly, lw, lh);
+    const [bx, by, bw, bh] = F.bak;
+    c.fillStyle = broms ? '#ff3a26' : S.lamps ? '#cc2c1e' : tonad(S, '#a8201a');
+    c.fillRect(bx, by, bw, bh);
+    stank(c, b, S, fart, t, -24);
+    lyktor(c, b, S, F.fram, F.bak, broms);
+  }
+
   function rita(c, S, lista, t) {
     for (const { b, f, x, fart, broms, nig } of lista) {
       c.save();
@@ -1978,6 +2786,9 @@ window.RumFasadGatan = (() => {
       NIG = nig || 0;
       if (b.typ === 'buss' || b.typ === 'ledbuss') ritaBuss(c, b, f.dir, S, fart, broms, t);
       else if (b.typ === 'plog') ritaPlog(c, b, f.dir, S, fart, broms, t);
+      else if (b.typ === 'lastbil') ritaLastbil(c, b, f.dir, S, fart, broms, t);
+      else if (b.typ === 'cykel') ritaCykel(c, b, f.dir, S, fart, broms, t, (f.dir * x) / f.k);
+      else if (b.F.sadel) ritaHoj(c, b, f.dir, S, fart, broms, t, (f.dir * x) / f.k);
       else ritaBil(c, b, f.dir, S, fart, broms, t, (f.dir * x) / f.k);
       c.restore();
     }

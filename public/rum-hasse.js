@@ -387,6 +387,9 @@ window.RumHasse = (() => {
     if (!M || !H.ute.fordon) return nu + 5000;
     const lage = uteLage();
     for (const b of RumFasadGatan.kommer(M.S, B.motSist, nu / 1000 + MOT_FRAM)) {
+      // (lastbilarna och det som har två hjul, sedan 2026-11-19 på gatan, har ingen form för bron: de kommer bara där,
+      // och räknas inte heller in i hur tätt filen bort går)
+      if (b.typ === 'lastbil' || (b.F && b.F.sadel)) continue;
       // (hur tätt de kommer, jämnat över de senaste: lika tätt går filen bort, broIntervall)
       const lucka = Math.min(240, b.t0 - B.motSist);
       B.motLucka = B.motLucka ? 0.75 * B.motLucka + 0.25 * lucka : Math.max(lucka, 20);
