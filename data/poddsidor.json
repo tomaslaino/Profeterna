@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T14:59:54.862Z",
+ "uppdaterad": "2026-11-20T15:34:33.714Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2906,14 +2906,21 @@
     "Bristol City"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:04:57.855Z",
-   "rubrik": "Skubala hoppade över presskonferensen, frågorna står kvar",
+   "skriven": "2026-11-20T15:03:50.846Z",
+   "rubrik": "Boros spöklag kommer till Riverside mitt i krisen",
    "ingress": null,
-   "summering": "Boro har sin skyttekung tillbaka i träning men kanske inte i startelvan, medan City kommer med en tränare som klubben backar offentligt men redan letar ersättare till.",
+   "summering": "Boro väntar på besked om Lankshear startar och undrar varför Vítek står kvar på mållinjen. City kommer med en tränare som gömmer sig för pressen och en klubb som redan letar efterträdare.",
    "delar": [
     {
      "lag": "Middlesbrough",
      "kallor": [
+      {
+       "podd": "The Boro Breakdown Podcast",
+       "avsnitt": "The Opposition Show: Middlesbrough vs Bristol City",
+       "datum": "2026-11-19",
+       "adress": "https://shows.acast.com/theborobreakdown/episodes/the-opposition-show-middlesbrough-vs-bristol-city",
+       "typ": "podd"
+      },
       {
        "podd": "Jacob Powley",
        "avsnitt": "Kim Hellberg and the Old School Number Nine",
@@ -2979,33 +2986,6 @@
           "2026-11-15"
          ],
          "typ": "lokal"
-        },
-        {
-         "t": "Tränaren Kim Hellberg sa på presskonferensen att Sebastian Berhalter och Riley McGree kom tillbaka sent från landslagen och inte kunde träna fullt i torsdags. Han har också nyligen sagt att McGrees speltid fortfarande måste doseras.",
-         "s": "b",
-         "podd": [
-          "Teesside Live"
-         ],
-         "datum": [
-          "2026-11-20"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Lokaltidningens Craig Johns tror att Lankshear kan börja på bänken mot Bristol City. Då sparas han till de viktigare matcherna mot Swansea och Southampton, eftersom Boro spelar tre matcher på sju dagar.",
-         "s": "o",
-         "podd": [
-          "Teesside Live"
-         ],
-         "datum": [
-          "2026-11-15"
-         ],
-         "typ": "lokal"
         }
        ]
       },
@@ -3013,57 +2993,80 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Lankshear bär anfallet. Han har gjort 13 mål på 13 matcher och leder skytteligan med god marginal. Laget har ställts om för att spela kring en ren målskytt.",
+         "t": "Värden säger att det som oroar Boro-supportrarna mest just nu är att Radek Vítek inte känns trygg i målområdet. Han står kvar på mållinjen och går inte ut på inlägg, trots sin längd.",
          "s": "h",
          "podd": [
-          "Jacob Powley"
+          "The Boro Breakdown Podcast"
          ],
          "datum": [
-          "2026-11-15"
+          "2026-11-19"
          ],
-         "typ": "media"
+         "typ": "podd"
         },
         {
-         "t": "Lokaltidningen skriver att förlusten mot Wrexham och oavgjort mot Watford visade hur beroende Boro är av Lankshear, som har gjort 15 mål. Spelet har tappat tydligt de tre gånger Kyle Joseph har startat i hans ställe.",
+         "t": "Tom säger att Vítek dominerade målområdet när han var utlånad till Bristol City och är den bästa målvakt han har sett där. Värden lutar därför åt att det är tränarnas instruktioner, inte målvakten själv, som har ändrat hans spel.",
          "s": "o",
          "podd": [
-          "Teesside Live"
+          "The Boro Breakdown Podcast"
          ],
          "datum": [
-          "2026-11-15"
+          "2026-11-19"
          ],
-         "typ": "lokal"
+         "typ": "podd"
         },
         {
-         "t": "Utan Lankshear kom det gamla avslutsproblemet tillbaka. Mot Watford skapade laget chanser för 1,99 förväntade mål men gjorde inget.",
+         "t": "Värden menar att Boro har blivit ett mycket mer vertikalt lag efter att Hayden Hackney försvann. Nu räcker ett par passningar: Malanda spelar igenom linjerna, Berhalter tar det vidare och Lankshear löper igenom mot mål.",
          "s": "o",
          "podd": [
-          "Jacob Powley"
+          "The Boro Breakdown Podcast"
          ],
          "datum": [
-          "2026-11-15"
+          "2026-11-19"
          ],
-         "typ": "media"
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Efter 0–5 hemma mot Norwich vände sig flera tusen av Bristol Citys egna supportrar mot tränaren Michael Skubala. Tom tror att hans ställning är ohållbar, trots att klubbens vd har gått ut och stöttat honom.",
+         "s": "b",
+         "podd": [
+          "The Boro Breakdown Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Enligt Tom spelar Bristol City direkt och är bättre utan boll. I matcherna de har vunnit har de oftast haft under 40 procents bollinnehav. Han ser inga tydliga spelmönster, och Skubala har bytt både målvakt och system.",
+         "s": "h",
+         "podd": [
+          "The Boro Breakdown Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Will Lankshear är tillbaka i träning, men Craig Johns på Teesside Live tror ändå att skyttekungen börjar på bänken.",
-      "Kim Hellberg har antytt att han inte ska sparas om han är redo, men med Swansea och Southampton direkt efter vore en vilodag ingen överraskning. Utan honom har spelet tappat tydligt, och mot Watford var laget sällan så slösaktigt framför mål.",
-      "Johns ser dessutom en farlig reflex hos tränaren: när mittfältare saknas blir det trebackslinje, och den ”fungerar inte”. Tidningen kallar Bristol City för Boros spöklag, med nio raka möten utan seger."
+      "Will Lankshear skadade sig före landslagsuppehållet. I de två matcherna utan honom gjorde Middlesbrough inga mål. Artikeln säger inte om han är tillbaka till lördagen. Will Lankshear, lagets bästa målskytt, var tillbaka i träning i torsdags. Enligt lokaltidningen antydde tränaren Kim Hellberg att Lankshear inte sparas inför Swansea och Southampton om han är redo. Laget har inte vunnit någon av de två matcherna utan honom. Skyttekungen Will Lankshear väntas vara tillbaka i träning den här veckan, enligt tränaren Kim Hellberg efter Watfordmatchen. Lokaltidningen skriver att skadan bakom kulisserna beskrivs som inget allvarligt och att han väntas bli spelklar.",
+      "Värden säger att det som oroar Boro-supportrarna mest just nu är att Radek Vítek inte känns trygg i målområdet. Han står kvar på mållinjen och går inte ut på inlägg, trots sin längd. Tom säger att Vítek dominerade målområdet när han var utlånad till Bristol City och är den bästa målvakt han har sett där. Värden lutar därför åt att det är tränarnas instruktioner, inte målvakten själv, som har ändrat hans spel. Värden menar att Boro har blivit ett mycket mer vertikalt lag efter att Hayden Hackney försvann. Nu räcker ett par passningar: Malanda spelar igenom linjerna, Berhalter tar det vidare och Lankshear löper igenom mot mål.",
+      "Efter 0–5 hemma mot Norwich vände sig flera tusen av Bristol Citys egna supportrar mot tränaren Michael Skubala. Tom tror att hans ställning är ohållbar, trots att klubbens vd har gått ut och stöttat honom. Enligt Tom spelar Bristol City direkt och är bättre utan boll. I matcherna de har vunnit har de oftast haft under 40 procents bollinnehav. Han ser inga tydliga spelmönster, och Skubala har bytt både målvakt och system."
      ],
      "citat": {
-      "sagt": "Hellberg har brukat byta till en trebackslinje, och det har gått ut över lagets prestation nästan varje gång.",
-      "vem": "Craig Johns",
-      "podd": "Teesside Live",
-      "typ": "lokal",
-      "datum": "2026-11-15"
-     },
-     "namn": [
-      "Will Lankshear",
-      "Kim Hellberg"
-     ]
+      "sagt": "Men vem vet i Middlesbrough – när de säger att en spelare är skadad får man lägga på fyra, fem veckor till.",
+      "vem": null,
+      "podd": "The Boro Breakdown Podcast",
+      "typ": "podd",
+      "datum": "2026-11-19"
+     }
     },
     {
      "lag": "Bristol City",
@@ -3196,9 +3199,10 @@
       }
      ],
      "text": [
-      "Michael Skubala ställde inte upp på presskonferensen före matchen, och på forumet NOT606 tror man att han ville slippa frågorna.",
-      "Klubben har offentligt gett honom sitt stöd men kollar enligt medieuppgifter redan upp efterträdare, vilket supportrarna kallar sent och reaktivt. Många ger honom tid till jul men fruktar att en liten förbättring bara skjuter problemen framför sig.",
-      "Inför resan till Riverside är stämningen dyster: laget beskrivs som vilset och man fruktar en ”pinsam målskörd”, även om en röst tror att City kan ta mer här än hemma mot Wrexham."
+      "Michael Skubala ställde inte upp på presskonferensen inför matchen, och på forumet NOT606 tror man att han ville slippa frågorna.",
+      "Enligt medieuppgifter letar klubben redan efterträdare, trots att den offentligt har stött honom.",
+      "Supportrarna är oense: många vill ge honom tid till jul men fruktar att en liten förbättring bara blir ”ännu ett år med besvikelser”.",
+      "Laget beskrivs som vilset, och en City-supporter sa i Boro-podden att laget gör det bättre med mindre av bollen."
      ],
      "citat": {
       "sagt": "Men jag tycker att han borde gå ut och kämpa, vara stark och göra det han tror på.",
@@ -3222,14 +3226,21 @@
     "Watford"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:05:21.324Z",
-   "rubrik": "Watfordsupportrar hoppas på storstryk i Sheffield",
+   "skriven": "2026-11-20T15:11:32.762Z",
+   "rubrik": "Watfords egna supportrar hoppas på storstryk i Sheffield",
    "ingress": null,
-   "summering": "Sheffield United har ett försvar som läcker trots många man bakom bollen och en publik som tappat tron på Wilder. Watford har en tränare på lånad tid och supportrar som delvis önskar förlust.",
+   "summering": "United lever på knappa segrar mot svagare lag men har en publik som tappat tron på Wilder. Watford kommer med en tränare på lånad tid och supportrar som delvis önskar förlust.",
    "delar": [
     {
      "lag": "Sheffield United",
      "kallor": [
+      {
+       "podd": "Sheff United Way",
+       "avsnitt": "Match Preview: Sheff United vs Watford",
+       "datum": "2026-11-20",
+       "adress": "https://www.youtube.com/SheffUnitedWay",
+       "typ": "podd"
+      },
       {
        "podd": "S24SU",
        "avsnitt": "Pre-Match View From Watford · Watford away form · Presser questions for Blades v Watford, 21/11/26",
@@ -3280,15 +3291,15 @@
        "amne": "elva",
        "punkter": [
         {
-         "t": "Supportrarna vill att Wilder slutar spela mittfältaren Hamza Choudhury som högerback och i stället ger den rutinerade Matt Doherty chansen. Doherty har bara spelat 42 ligaminuter den här säsongen.",
+         "t": "Klarar Bamford en timme måste han starta, eftersom ingen annan anfallare är i närheten av honom. Värdarna är osäkra på vem som ska ge plats och vill inte se Bamford och Brereton Díaz ihop igen efter Stoke.",
          "s": "o",
          "podd": [
-          "S24SU"
+          "Sheff United Way"
          ],
          "datum": [
-          "2026-11-18"
+          "2026-11-20"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -3307,15 +3318,26 @@
          "typ": "forum"
         },
         {
-         "t": "Spelet beskrivs som medelmåttigt till dåligt. Det är mycket långa bollar på chans, och poängen kommer av att någon enskild spelare gör något extra, inte av ett system som växer.",
-         "s": "o",
+         "t": "Under Chris Wilder tar laget nästan alla sina poäng mot lag i nedre halvan och har ett dåligt facit mot topplagen. Värdarna tycker att man får acceptera att det är så laget är.",
+         "s": "h",
          "podd": [
-          "S24SU"
+          "Sheff United Way"
          ],
          "datum": [
-          "2026-11-17"
+          "2026-11-20"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Liam Kitching ger mittförsvaret en elakhet som ingen annan har. Med McGuinness och Tanganga ser det enligt supportrarna för snällt ut och lätt för en anfallare.",
+         "s": "o",
+         "podd": [
+          "Sheff United Way"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -3332,28 +3354,6 @@
           "2026-11-17"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Tron på Chris Wilder är borta hos många. Supportrarna fasar för att han ska sitta kvar också nästa säsong.",
-         "s": "o",
-         "podd": [
-          "S24SU"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna ser ingen återuppbyggnad. Hålen i truppen täpps till med äldre spelare som har sina bästa år bakom sig, och flera av dem får spela på positioner som inte är deras egentliga.",
-         "s": "o",
-         "podd": [
-          "S24SU"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
         }
        ]
       },
@@ -3361,35 +3361,45 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Watford har inte vunnit en enda bortamatch, och supportrarna är rädda att det är just United som ska ge dem den första.",
+         "t": "Värdarna är oense om Watford. Den ena ser sju poäng på de senaste fem matcherna, den andra menar att segrarna kom mot Charlton och Lincoln och att klubben är i kaos med fanprotester mot ägarna.",
          "s": "o",
          "podd": [
-          "S24SU"
+          "Sheff United Way"
          ],
          "datum": [
-          "2026-11-18"
+          "2026-11-20"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Watfords försvar ses som svagt och mittfältet som beroende av Kyprianou. Faran är den unga, snabba offensiven med Bravo, Maamma och Nabizada, som kan ta sig in bakom backlinjen.",
+         "s": "o",
+         "podd": [
+          "Sheff United Way"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På forumet S24SU är man rädd att det blir just United som ger Watford deras första bortaseger.",
-      "Det som oroar mest är försvaret. Laget har nio eller tio man bakom bollen men lämnar ändå motståndarna fria i och runt straffområdet. Supportrarna misstänker zonmarkeringen och vill att Tanganga och Cooper tar befälet.",
-      "Stämningen är mer likgiltig än arg. Tron på Chris Wilder är borta hos många, och tanken på att han sitter kvar nästa säsong får en skribent att frukta ”18 månader av den här skiten”."
+      "Hos United är skräcken att just de ska bli laget som ger Watford säsongens första bortaseger.",
+      "I podden Sheff United Way kallar man Chris Wilders linje medveten: hålla matcherna jämna, låta ett mål avgöra och lita på att laget hamnar på rätt sida. Poängen kommer nästan bara mot lag i nedre halvan, och därför är det hemmamatcher som denna som oroar mest.",
+      "På forumet S24SU är tonen mörkare. Där sägs tabellplaceringen bara spegla ett lätt spelschema, och tron på Wilder är borta hos många."
      ],
      "citat": {
-      "sagt": "Så lite entusiasm för United att jag inte ens orkar läsa vad motståndarfansen skriver.",
-      "vem": "brownblade",
+      "sagt": "Tänk om Wilder är kvar nästa säsong. Då har vi kanske ytterligare 18 månader av den här skiten framför oss.",
+      "vem": "PeterNdlovu081",
       "podd": "S24SU",
       "typ": "forum",
-      "datum": "2026-11-20"
+      "datum": "2026-11-19"
      },
      "namn": [
-      "Tanganga",
-      "Cooper",
-      "Chris Wilder"
+      "Chris Wilder",
+      "Wilder"
      ]
     },
     {
@@ -3537,9 +3547,9 @@
       }
      ],
      "text": [
-      "På WFC Forums säger flera supportrar rent ut att de hoppas på förlust, gärna ”med rekordsiffror”, så djupt går missnöjet med klubbledningen. Andra svarar att de i så fall borde hålla på ett annat lag.",
-      "I podden Do Not Scratch Your Eyes trodde alla att Dionisi skulle få gå under landslagsuppehållet. På forumet kallas resan till Sheffield nästa avsnitt i ett utdraget farväl.",
-      "Ljuspunkten är målvakten Federico Ravaglia, som poddarna tror kan bli säsongens bästa spelare."
+      "Ilskan mot klubbledningen har gått så långt att flera supportrar på WFC Forums säger att de hoppas på förlust med rekordsiffror. Andra svarar att de i så fall borde byta lag.",
+      "Att Alessio Dionisi sitter kvar förvånar. I podden Do Not Scratch Your Eyes tror man att fyra poäng hemma och Gino Pozzos rättegång i Spanien räddade honom under uppehållet, och på forumet kallas resan till Sheffield nästa avsnitt i ett utdraget farväl.",
+      "Hoppet står till målvakten Federico Ravaglia, som podden tror kan bli säsongens bästa spelare."
      ],
      "citat": {
       "sagt": "Nu leder ett insläppt mål till fler och laget vissnar.",
@@ -3549,7 +3559,8 @@
       "datum": "2026-11-17"
      },
      "namn": [
-      "Dionisi",
+      "Alessio Dionisi",
+      "Gino Pozzo",
       "Federico Ravaglia"
      ]
     }
@@ -3564,14 +3575,21 @@
     "Birmingham City"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:05:56.258Z",
-   "rubrik": "Birmingham har mätt Stoke på längden",
+   "skriven": "2026-11-20T15:23:12.624Z",
+   "rubrik": "Stoke hoppas att Cochrane minns de sex dribblingarna",
    "ingress": null,
-   "summering": "Stoke vinner mer än siffrorna säger, är som starkast hemma och har Johansson i mål. Birmingham litar på huvudspelet vid fasta situationer och funderar på om Priske ens behövs.",
+   "summering": "Stoke vill släppa Manhoef på en vänsterback med dåliga minnen och pressa gästernas korta uppspel. Birmingham litar på längden och Klarers huvud vid de fasta situationerna.",
    "delar": [
     {
      "lag": "Stoke City",
      "kallor": [
+      {
+       "podd": "Every Step Along The Way - A Stoke City Podcast",
+       "avsnitt": "Match Preview: Birmingham (H) - 21/11/26",
+       "datum": "2026-11-19",
+       "adress": "https://shows.acast.com/every-step-along-the-way/episodes/match-preview-birmingham-h-211126",
+       "typ": "podd"
+      },
       {
        "podd": "The Neckender",
        "avsnitt": "Who You Gonna Call? xG Busters!",
@@ -3589,56 +3607,40 @@
      ],
      "grupper": [
       {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Tränaren Mark Robins sa inför matchen att alla har kommit tillbaka friska från landslagsuppehållet och att spelare som varit borta nu knackar på dörren. Truppen är nästan helt skadefri.",
-         "s": "b",
-         "podd": [
-          "Stoke-on-Trent Live"
-         ],
-         "datum": [
-          "2026-11-20"
-         ],
-         "typ": "lokal"
-        },
-        {
-         "t": "Lokaltidningen skriver att Lamine Cisse har missat de tre senaste matcherna med en muskelskada och är tveksam till lördagens match.",
-         "s": "h",
-         "podd": [
-          "Stoke-on-Trent Live"
-         ],
-         "datum": [
-          "2026-11-20"
-         ],
-         "typ": "lokal"
-        },
-        {
-         "t": "Enligt lokaltidningen är vänsterbacken Eric Bocat fortfarande borta och har missat de fyra senaste matcherna.",
-         "s": "h",
-         "podd": [
-          "Stoke-on-Trent Live"
-         ],
-         "datum": [
-          "2026-11-20"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
        "amne": "elva",
        "punkter": [
         {
-         "t": "Målvakten Viktor Johansson har redan räddat 2,5 mål mer än förväntat den här säsongen. Skribenten menar att han i snitt är värd omkring tio räddade mål per säsong och vinner poäng på egen hand.",
+         "t": "Jack McGlynn har rest till USA och Haiti och tillbaka utan att spela en minut. Värdarna tror att resetröttheten gör att han börjar på bänken och att Million Manhoef har förtjänat att behålla platsen.",
          "s": "o",
          "podd": [
-          "The Neckender"
+          "Every Step Along The Way - A Stoke City Podcast"
          ],
          "datum": [
-          "2026-11-14"
+          "2026-11-19"
          ],
-         "typ": "media"
+         "typ": "podd"
+        },
+        {
+         "t": "En av värdarna vill inte se Róbert Bozeník i startelvan. Han hamnar ständigt i offside, har gjort ett mål på 474 minuter och har varit usel. Är Sam Gallagher frisk ska Gallagher spela.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Andra värdar vill ändå starta Bozeník. Birmingham spelar sig ut kort från mittbackarna, och hans press kan tvinga fram misstag och omställningar. Gallagher behöver efter sin frånvaro byggas upp med inhopp.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -3646,65 +3648,85 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Det svaga xG-facit kommer främst från bortamatcherna, där Stoke i snitt har −0,97 i förväntad målskillnad per match. På hemmaplan har de +0,22 och är nästan alltid det något bättre laget.",
-         "s": "h",
-         "podd": [
-          "The Neckender"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "media"
-        },
-        {
-         "t": "När Stoke tar ledningen släpper de nästan aldrig något. På de senaste tolv matcherna, Cardiff borträknat, har de bara släppt in tre mål i ledning, alla sent i matcherna.",
-         "s": "h",
-         "podd": [
-          "The Neckender"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "media"
-        },
-        {
-         "t": "Stoke leder Championship men är enligt FotMob-data det lag som slår sina förväntade värden mest. De har gjort ungefär 50 procent fler mål och tagit 60 procent fler poäng än xG antyder.",
-         "s": "h",
-         "podd": [
-          "The Neckender"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "media"
-        },
-        {
-         "t": "Skribenten ser en mental styrka som tidigare Stokelag saknat och ger Mark Robins äran. Laget har vänt underlägen mot Sheffield United och Portsmouth och nyligen vunnit fem raka ligamatcher, första gången sedan 1947.",
+         "t": "Stoke har tre friska anfallare men målen kommer inte från dem. Laget har levt på fasta situationer, Jack McGlynn och mittbacken Ben Wilmot, och supportrarna menar att det inte håller i längden.",
          "s": "o",
          "podd": [
-          "The Neckender"
+          "Every Step Along The Way - A Stoke City Podcast"
          ],
          "datum": [
-          "2026-11-14"
+          "2026-11-19"
          ],
-         "typ": "media"
+         "typ": "podd"
+        },
+        {
+         "t": "Med tre backar och Ethan Galbraith som faller ner blir det fyra spelare bakom bollen i uppspelsfasen, vilket han tycker är förlegat. Mark Robins prioriterar att hålla bakdörren stängd, och Bosun Lawals förmåga att driva bollen kommer inte till sin rätt.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "När lagen möttes förra säsongen dribblade Million Manhoef förbi Birminghams vänsterback Alex Cochrane sex gånger. Cochrane väntas starta igen, och värdarna tror att han minns det och blir försiktigare framåt.",
+         "s": "h",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "En värd som sett Birmingham flera gånger trodde först att de låg för högt men har ändrat sig. Han menar att de har förtjänat platsen och borde ha krossat Swansea, och att Stoke måste gå på dem i stället för att backa.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Birmingham tar risker i sitt passningsspel. När Stoke vinner bollen kan det öppna ytor för Manhoefs fart, något McGlynn inte kan erbjuda på samma sätt.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Inget lag i Championship slår sina förväntade värden med större marginal än Stoke, har The Neckender räknat ut. Men det svaga underliggande facit kommer nästan helt från bortamatcherna, och hemma är Stoke nästan alltid det något bättre laget.",
-      "När laget väl har tagit ledningen släpper det sällan något. En stor del av förklaringen står i mål: Viktor Johansson är enligt skribenten värd omkring tio räddade mål per säsong och ”vinner bokstavligen poäng på egen hand”."
+      "Stokes supportrar räknar med att Alex Cochrane minns hur Million Manhoef dribblade förbi honom sex gånger i förra mötet.",
+      "I podden Every Step Along The Way tror man att Birminghams vänsterback därför blir försiktigare framåt, och att gästernas riskfyllda uppspel öppnar ytor för Manhoefs fart. Den resetrötte Jack McGlynn får gärna vänta på bänken.",
+      "Oenigheten gäller Róbert Bozeník: en värd vill inte se honom i närheten av elvan, andra vill att hans press ska tvinga Birminghams mittbackar till misstag. The Neckender påpekar att inget lag i serien slår sina förväntade värden med större marginal än Stoke."
      ],
      "citat": {
-      "sagt": "Det finns en mental motståndskraft som genomsyrar hela laget, mycket starkare än vi sett de senaste åren.",
-      "vem": "Ben Rowley",
-      "podd": "The Neckender",
-      "typ": "media",
-      "datum": "2026-11-14"
+      "sagt": "Vi kan inte fortsätta förlita oss på fasta situationer, Jack McGlynn och, ironiskt nog, Ben Wilmot. Det går inte i längden.",
+      "vem": null,
+      "podd": "Every Step Along The Way - A Stoke City Podcast",
+      "typ": "podd",
+      "datum": "2026-11-19"
      },
      "namn": [
-      "Viktor Johansson"
+      "Alex Cochrane",
+      "Million Manhoef",
+      "Jack McGlynn",
+      "Róbert Bozeník"
      ]
     },
     {
@@ -3838,20 +3860,20 @@
       }
      ],
      "text": [
-      "På forumet har en supporter mätt Stokes trupp på längden och ser ett klart övertag på fasta situationer. Lagkaptenen Christoph Klarer vinner flest nickdueller i Championship, och Stoke anses inte längre vara lika fysiskt som förr.",
-      "Veckans fråga är om August Priske ska rakt in i elvan om han är frisk, när laget har vunnit övertygande utan honom. Lokaltidningen påminner om att det utan honom krävs ett öppnare och mer riskfyllt spel.",
-      "Tränaren Chris Davies har en torr fördel: eftersom många, även egna supportrar, inte tycker att han är något särskilt, är det ingen som värvar honom."
+      "På forumet Small Heath Alliance har man mätt Stokes trupp på längden och tror att Birmingham har övertaget vid fasta situationer.",
+      "Där ska Christoph Klarer, som enligt lokaltidningen har vunnit flest nickdueller i serien, och Phil Neumann nicka in målen. Att laget är farligt vid fasta situationer är nytt, och supportrarna känner sig hörda när bristerna har rättats till ”i värvningarna och i spelstilen”.",
+      "Att många, också de egna supportrarna, inte tycker att Chris Davies är något särskilt ser man som en fördel: då vill ingen annan klubb värva honom. Det kan förstås ändras under säsongen."
      ],
      "citat": {
-      "sagt": "Det blir en tuff match, nästan fullt hus, och de kommer att försöka göra det så skrämmande som möjligt.",
-      "vem": "Lee_C",
+      "sagt": "De har all rätt att vara självsäkra, deras form är fenomenal sedan de förlorade sina tre första matcher.",
+      "vem": "Charcy",
       "podd": "Small Heath Alliance",
       "typ": "forum",
       "datum": "2026-11-20"
      },
      "namn": [
       "Christoph Klarer",
-      "August Priske",
+      "Phil Neumann",
       "Chris Davies"
      ]
     }
