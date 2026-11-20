@@ -36,10 +36,8 @@
   </header>
 
   <!-- Appen (README → Appen). Adressen att skicka till gänget:
-       matchfixarna.se/app. Installera = Chromes egen installation (sajten blir
-       en app i telefonen eller datorn, ingen fil); filen är den gamla vägen,
-       matchfixarna.apk, som byts när appen byggs om: versionen och storleken
-       står i rutan. -->
+       matchfixarna.se/app. Installera = Chromes egen installation: sajten blir
+       en app i telefonen eller datorn, som startar i tobaksaffären. -->
   <main class="appen">
     <div class="appen-topp">
       <img class="appen-ikon" src="../ikon-192.png" alt="" width="96" height="96">
@@ -57,19 +55,6 @@
       <li>Dela en skärmbild av systemet i Svenska Spels app till <b>Matchfixarna</b>, så fylls kupongen i.</li>
       <li>Tipsen och namnet du valt i Chrome följer med till appen.</li>
     </ul>
-
-    <details class="fold appen-fil">
-      <summary>Hämta appen som fil i stället</summary>
-      <div class="fold-body">
-        <ol class="appen-steg" aria-label="Så installerar du filen">
-          <li><b>Ladda ner filen.</b> Frågar Chrome om du vill behålla den, svara <i>Ladda ned ändå</i>.</li>
-          <li><b>Öppna filen</b> när den är nedladdad – tryck i aviseringen eller under <i>Nedladdningar</i>.</li>
-          <li><b>Tillåt installationen</b> första gången: <i>Inställningar</i> → <i>Tillåt från den här källan</i>, och tillbaka.</li>
-          <li><b>Installera.</b> Varnar Play Protect för en okänd app, välj <i>Installera ändå</i> – appen kommer inte från Play Butik.</li>
-        </ol>
-        <p class="appen-fakta"><a class="kp-btn" href="matchfixarna.apk" download="Matchfixarna.apk">Ladda ner filen</a> Gratis · version 1.0 · 0,6 MB</p>
-      </div>
-    </details>
 
     <section class="appen-iphone" aria-labelledby="appen-iphone-rubrik">
       <h3 id="appen-iphone-rubrik">Har du iPhone?</h3>
@@ -117,7 +102,7 @@
       const hjalp = chrome
         ? (android ? 'Tryck på ⋮ uppe till höger och välj att installera appen.' : 'Klicka på installationsikonen längst till höger i adressfältet.')
         : safari ? 'Välj Arkiv → Lägg till i Dock.'
-        : android ? 'Öppna sidan i Chrome, eller hämta appen som fil här nedanför.'
+        : android ? 'Öppna sidan i Chrome, så går den att installera.'
         : 'Öppna sidan i Chrome eller Edge, så går den att installera.';
       let fraga = null;
       addEventListener('beforeinstallprompt', (e) => {

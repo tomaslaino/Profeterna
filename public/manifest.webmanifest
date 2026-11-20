@@ -21,7 +21,6 @@
     "params": { "files": [{ "name": "bild", "accept": ["image/*"] }] }
   },
   "related_applications": [
-    { "platform": "webapp", "url": "https://matchfixarna.se/manifest.webmanifest" },
-    { "platform": "play", "id": "se.matchfixarna.app" }
+    { "platform": "webapp", "url": "https://matchfixarna.se/manifest.webmanifest" }
   ]
 }

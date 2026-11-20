@@ -255,7 +255,12 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
 - [x] **Installera med ett tryck (2026-11-19, användarens önskemål):** "Hur kan mina vänner … installera den på ett
   smart sätt?" – och "jag vill ju att man använder sig av animationssidan". Guldknappen på matchfixarna.se/app heter
   *Installera* och öppnar Chromes egen installation (i Android och på datorn): ingen fil, inga varningar, och appen
-  startar i tobaksaffären. Filen finns kvar i en hopfälld ruta i Android, se [Appen](#appen)
+  startar i tobaksaffären. Se [Appen](#appen)
+- [x] **Bara Installera, ingen fil (2026-11-20, användarens val):** Android-appens genvägar ledde till den vanliga
+  sidan, och "det är till animationssidan som den är betydelsefull". Genvägarna sitter i APK:n, och nyckeln den
+  måste signeras med fanns inte på MacBooken (iMacen svarade inte). Användaren valde "Ja, bara Installera": filen
+  och dess ruta är borta från matchfixarna.se/app, och den som har den gamla appen avinstallerar den och trycker
+  på *Installera*
 - [x] **Med och utan spelaren (2026-11-11, användarens önskemål):** "Går det att få in den här
   informationen för de respektive spelarna" (StatMuses Man City med och utan Haaland), "det kan säga
   något om hur betydelsefulla de är för lagen" – "Haaland t ex är mindre viktig än vad man tror - han
@@ -799,6 +804,12 @@ med sin nya kontrollsumma.
 
 ## Appen
 
+Appen är sajten installerad från Chrome (*Installera* på matchfixarna.se/app, se **Installationen** nedan): den
+startar i tobaksaffären, och allt i den styrs från sajten. Android-appen nedan (APK:n) är pensionerad sedan
+2026-11-20: filen ligger inte längre på sajten, och signeringsnyckeln fanns inte på MacBooken, så den går inte
+att uppdatera. Koden står kvar i [android/](android/), och assetlinks.json ligger kvar, så att de appar som
+redan är installerade fungerar tills de avinstalleras.
+
 Matchfixarna som app i Android ([android/](android/), paketet `se.matchfixarna.app`): sajten körs i
 telefonens egen Chrome som en *Trusted Web Activity* (Googles
 [androidbrowserhelper](https://github.com/GoogleChrome/android-browser-helper) 2.7.4). Det är alltså samma
@@ -868,14 +879,12 @@ utan service worker; kommer den inte (äldre Chrome som vill att sajten har anv�
 webbläsare) skriver knappen i raden under sig var installationen finns (⋮ i Android, ikonen i adressfältet på
 datorn, Arkiv → Lägg till i Dock i Safari). Raden har plats för två rader från början, så inget flyttar sig.
 Manifestets genvägar till Kupongen, Olympen, Matcherna och Tabeller lades inte in: de leder till den vanliga sidan,
-och appen ska vara affären. När appen redan finns – den installerade sajten (`display-mode: standalone`), appen
-nedan eller sajten installerad från Chrome (`navigator.getInstalledRelatedApps` med `related_applications` i
-[public/manifest.webmanifest](public/manifest.webmanifest)) – står *Du har redan appen* i stället för knappen. I
-Android ligger APK:n i en hopfälld ruta, *Hämta appen som fil i stället*, med de fyra stegen (behåll filen, öppna
-den, tillåt installationen från Chrome, *Installera ändå* om Play Protect varnar). I en iPhone står Safari-vägen
-(*Dela → Lägg till på hemskärmen*) i stället för knappen; på datorn heter rubriken *Matchfixarna på datorn*.
-Filen är [public/app/matchfixarna.apk](public/app/matchfixarna.apk), en kopia av `app-release.apk`: byts
-när appen byggs om, och då ändras versionen och storleken på sidan. Länken *Appen* står i foten på
+och appen ska vara affären. När appen redan finns – den installerade sajten (`display-mode: standalone`) eller
+sajten installerad från Chrome (`navigator.getInstalledRelatedApps` med `related_applications` i
+[public/manifest.webmanifest](public/manifest.webmanifest)) – står *Du har redan appen* i stället för knappen.
+Android-appen nedan står inte i `related_applications`: den som har den ska kunna installera den nya. I en
+iPhone står Safari-vägen (*Dela → Lägg till på hemskärmen*) i stället för knappen; på datorn heter rubriken
+*Matchfixarna på datorn*. Länken *Appen* står i foten på
 förstasidan, Om oss, Tabeller och Statistik, dold i appen (`.bara-webb` i theme.css). Menyikonerna i
 telefonen känner igen länkarna på slutet av adressen (`href$=`), så att de syns också från `app/`.
 

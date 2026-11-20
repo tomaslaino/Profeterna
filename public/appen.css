@@ -82,49 +82,6 @@
 }
 .appen-redan { margin: 26px 0 0; color: var(--gold-hi); font-family: var(--display); font-style: italic; font-size: 19px; }
 
-/* filen, den gamla vägen: hopfälld, bara i Android */
-.appen-fil { width: min(100%, 560px); margin: 0; }
-.appen-fil .appen-steg { width: 100%; }
-.appen-fakta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin: 16px 0 0; color: var(--muted); font-size: 13px; }
-
-/* stegen, numrerade i terrakotta */
-.appen-steg {
-  counter-reset: steg;
-  display: grid;
-  gap: 12px;
-  width: min(100%, 560px);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.appen-steg li {
-  counter-increment: steg;
-  position: relative;
-  padding: 14px 16px 14px 58px;
-  background: var(--glass);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  color: var(--ink-soft);
-  line-height: 1.45;
-}
-.appen-steg li::before {
-  content: counter(steg);
-  position: absolute;
-  left: 16px;
-  top: 13px;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--terra);
-  color: var(--bone);
-  font-weight: 700;
-  font-size: 14px;
-}
-.appen-steg b { color: var(--fg); }
-
 .appen-mer {
   display: grid;
   gap: 8px;
@@ -148,9 +105,7 @@
 .appen-iphone p { margin: 0; line-height: 1.45; }
 
 /* bara det som gäller apparaten man tittar i */
-.appen-fil,
 .appen-mer { display: none; }
-.android .appen-fil { display: block; }
 .android .appen-mer { display: grid; }
 
 /* iPhone: Safari-vägen i stället för knappen */
@@ -158,7 +113,6 @@
 .ios .appen-iphone { order: -1; border-style: solid; border-color: var(--gold); }
 .ios .appen-topp { order: -2; }
 
-/* i appen, eller när appen redan finns: knappen och filen behövs inte */
+/* i appen, eller när appen redan finns: knappen behövs inte */
 .installerad .appen-installera,
-.installerad .appen-fil,
 .i-appen .appen-iphone { display: none; }
