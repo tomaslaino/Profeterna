@@ -443,6 +443,20 @@ const citatAv = (c) => ({ sagt: c.sagt, vem: c.vem || null, podd: c.podd, typ: c
 
 const RAKNEORD = /^(två|tre|fyra|fem|sex|sju|åtta|nio|tio|elva|tolv)$/i;
 
+// Styckena l som högst n stycken: fler slås ihop i ordning, de första lika långa eller ett längre än de sista
+// (fem blir 2 + 2 + 1).
+export function slaIhop(l, n) {
+  if (!(n >= 1) || l.length <= n) return l;
+  const ut = [];
+  let i = 0;
+  for (let k = 0; k < n; k++) {
+    const st = Math.ceil((l.length - i) / (n - k));
+    ut.push(l.slice(i, i + st).join(' '));
+    i += st;
+  }
+  return ut;
+}
+
 // Redaktörens svar → matchbladet: rubrik, introduktion (ingress; ingen sedan 2026-11-12, när sidan.ingressOrd är 0),
 // ett till några stycken per lag med lagets citat (bara ett kort: sidan.citatOrd) och
 // personerna som nämns (namn, i fetstil i tidningen), och sammanfattning. Sedan 2026-11-11 har varje lag sitt citat
@@ -476,15 +490,23 @@ export function sidaAv(content, underlag, lagen) {
     const del = delAv(lag, egna, underlag.kallor[lag]);
     if (!egna.length) return { ...del, text: [] };
     const svar = j.lag[lag] && typeof j.lag[lag] === 'object' && !Array.isArray(j.lag[lag]) ? j.lag[lag] : {};
-    const stycken = (Array.isArray(svar.text) ? svar.text : [svar.text]).filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim());
+    // Redaktören lägger ibland varje mening i ett eget stycke (2026-11-20: Charlton fick fem stycken om en mening var):
+    // fler stycken än sidan.stycken slås ihop till så många, i ordning och så jämnt som det går, i stället för att
+    // lagets text faller tillbaka på uppgifterna som löptext.
+    const stycken = slaIhop((Array.isArray(svar.text) ? svar.text : [svar.text]).filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim()), pc.sidan.stycken);
     const ord = stycken.reduce((a, t) => a + antalOrd(t), 0);
-    const why = !stycken.length ? 'saknas' : stycken.length > pc.sidan.stycken + 1 ? `${stycken.length} stycken` : ord > pc.sidan.lagOrd + Math.round(pc.sidan.lagOrd / 3) ? `${ord} ord`
+    const why = !stycken.length ? 'saknas' : ord > pc.sidan.lagOrd + Math.round(pc.sidan.lagOrd / 3) ? `${ord} ord`
       : stycken.map((t) => varfor(t, Infinity)).find(Boolean) || null;
     if (why) fel.push(`${lag}: ${why}`);
     const lc = typeof svar.citat === 'string' && egna.find((x) => x.id === svar.citat && x.sagt && antalOrd(x.sagt) <= pc.sidan.citatOrd + 4);
     const namn = why ? [] : [...new Set((Array.isArray(svar.namn) ? svar.namn : []).filter((n) => typeof n === 'string').map((n) => n.trim()))]
       .filter((n) => n.length > 2 && stycken.some((t) => t.includes(n)));
-    return { ...del, text: why ? textUtan(egna) : stycken, ...(lc ? { citat: citatAv(lc) } : {}), ...(namn.length ? { namn } : {}) };
+    // Står på spel (2026-11-20): en mening om vad matchen betyder för laget, eller inget. Den prövas för sig, så att
+    // en mening som inte håller bara faller bort och inte drar lagets text med sig.
+    const ps = typeof svar.pa_spel === 'string' ? svar.pa_spel.trim() : '';
+    const psWhy = ps ? varfor(ps, pc.sidan.paSpelOrd + 4) : null;
+    if (psWhy) fel.push(`${lag} (står på spel): ${psWhy}`);
+    return { ...del, text: why ? textUtan(egna) : stycken, ...(lc ? { citat: citatAv(lc) } : {}), ...(namn.length ? { namn } : {}), ...(ps && !psWhy ? { paSpel: ps } : {}) };
   });
   const c = !delar.some((d) => d.citat) && typeof j.citat === 'string' && alla.find((x) => x.id === j.citat && x.sagt);
   return {
@@ -509,7 +531,8 @@ export async function skrivSida(fil, lagen, { avspark = null, now = () => new Da
   let sekunder = 0;
   try {
     const system = pc.sidaPrompt.replace('{rubrikOrd}', pc.sidan.rubrikOrd).replace('{ingressOrd}', pc.sidan.ingressOrd).replace('{stycken}', pc.sidan.stycken)
-      .replace('{lagOrd}', pc.sidan.lagOrd).replace('{summeringOrd}', pc.sidan.summeringOrd).replace('{meningar}', pc.sidan.meningar).replace('{citatOrd}', pc.sidan.citatOrd);
+      .replace('{lagOrd}', pc.sidan.lagOrd).replace('{summeringOrd}', pc.sidan.summeringOrd).replace('{meningar}', pc.sidan.meningar).replace('{citatOrd}', pc.sidan.citatOrd)
+      .replace('{paSpelOrd}', pc.sidan.paSpelOrd);
     const data = { match: lagen.join(' – '), ...(avspark ? { avspark: nowFmt.format(new Date(avspark)) } : {}), lag: Object.fromEntries(lagen.map((lag) => [lag, underlag.lag[lag].map((x) => ({ id: x.id, amne: x.a, slag: x.s, vikt: x.vikt, [KALLNYCKEL[x.typ] || 'podd']: x.podd, datum: x.datum, uppgift: x.t, ...(x.sagt ? { citat: x.sagt } : {}) }))])) };
     // Källornas träffsäkerhet om truppen, när den är prövad tillräckligt många gånger: redaktören får den
     // vid uppgiften och en rad om hur den ska användas (config/traff.js).

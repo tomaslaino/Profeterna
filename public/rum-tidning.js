@@ -5,8 +5,8 @@
 // Tidningen Helgarderat: det supportrarna vet inför lördagens matcher. Det finns en enda tidning (2026-11-11,
 // användarens önskemål: "Det ska alltså bara finnas en tidning"), och den ritas här, av samma kod på sajtens sida
 // (helgarderat.html, helgarderat.js) och på pulten i tobaksaffären (tidningPult och tidningen i rum.js, och hos Hasse
-// Backe, pultPapper i rum-hasse.js). Utseendet står i helgarderat.css. Tidningen är fyra delar, inget mer (bestämt del
-// för del samma dag):
+// Backe, pultPapper i rum-hasse.js). Utseendet står i helgarderat.css. Tidningen är fem delar, inget mer (bestämt del
+// för del samma dag, och familjesidan 2026-11-20):
 //
 //   Omslaget     på kupongens papper, utan bild (Kalenderbladet, 2026-11-13): numret och veckan, priset, namnet,
 //                omgångens datum stort som ett kalenderblad (Inför Stryktipset, 14, november; två dagar under
@@ -15,11 +15,15 @@
 //                Alla andra sidor är lika
 //                breda som omslaget och minst lika höga, på samma papper och i samma tryck (helgarderat.css).
 //   Innehållet   efter omslaget (Förteckningen): en rad per match med numret, lagen och prickar till sidnumret och
-//                matchbladets rubrik under, och sist sista sidan. Raden leder till sidan.
+//                matchbladets rubrik under, och sist familjesidan och sista sidan. Raden leder till sidan.
 //   Matchbladen  ett uppslag (två sidor) per match, från sidan 2 (Affischen, 2026-11-13): till vänster matchens
 //                affisch med numret, tavlan (lagen mot varandra med sköldarna, dagen och avsparken i omslagets
-//                rutor), rubriken, sammanfattningen och arenan; till höger lagens text efter varandra, med ett citat
-//                var under, och källorna (med en länk till varje avsnitt, forumtråd och artikel).
+//                rutor), rubriken, sammanfattningen, vad som står på spel för vardera laget (2026-11-20) och
+//                arenan; till höger lagens text efter varandra, med ett citat var under, och källorna (med en länk
+//                till varje avsnitt, forumtråd och artikel).
+//   Familjesidan det som har hänt i omgångens klubbar den här veckan (2026-11-20): tränare som kommer, går, leder
+//                tillfälligt eller sitter löst, återseenden och besked som en klubb väntar på, ur
+//                data/familjesidan.json. Bara när veckan har något att säga.
 //   Sista sidan  Hasse Backes krönika, Vid sidan av (det udda om omgångens lag, som inte står i matchbladen) och
 //                ett kåseri av en ny person varje vecka (Spalterna), ur data/sista-sidan.json. Utan den slutar tidningen med matchbladen.
 //
@@ -29,13 +33,13 @@
 //
 // Numret är data/poddsidor.json, som nattjobbet på iMacen skriver inför varje omgång, och det ligger kvar tills nästa
 // kommer, också efter omgången. Nästa kommer med nästa kupong, innan matchbladen är skrivna. Utan det står provnumret (helgarderat/utkast.json, poddjobbets provomgång 2026-11-10).
-// Tidningen har inga bilder sedan Affischen (2026-11-13). Sista sidan skriver samma nattjobb
-// (src/analyser/sista-sidan.mjs).
+// Tidningen har inga bilder sedan Affischen (2026-11-13). Familjesidan och sista sidan skriver samma nattjobb
+// (src/analyser/familjesidan.mjs, src/analyser/sista-sidan.mjs).
 // Inget här anropar någon språkmodell.
 //
 // RumTidning.hamta() → Promise: upplagan, eller null
-// RumTidning.upplaga(data, prov, sista) → upplagan (det som behövs för att rita tidningen), eller null
-// RumTidning.tidning(upplaga) → html: omslaget, innehållet, matchbladen och sista sidan, i ett element med klassen hg
+// RumTidning.upplaga(data, prov, sista, familj) → upplagan (det som behövs för att rita tidningen), eller null
+// RumTidning.tidning(upplaga) → html: omslaget, innehållet, matchbladen, familjesidan och sista sidan, i ett element med klassen hg
 // RumTidning.forsta(upplaga) → omslaget ensamt, utan länkar (pulten). Utan upplaga står bara namnet.
 // RumTidning.overst(upplaga) → raden överst på omslaget (Nr 1 · Vecka 46), som också står på löpsedeln (rum-affischer.js)
 // RumTidning.omslag(upplaga) → omslagets och sista sidans ord som text, för Hasse Backes tidning (rum-hasse-tidning.js)
@@ -97,10 +101,17 @@
       kupongen: 'Kupongen',
       utan: 'inget matchblad',
     },
-    // Innehållet (Förteckningen): rubriken, och raden till sista sidan med vad som står där.
+    // Innehållet (Förteckningen): rubriken, och raderna till familjesidan och sista sidan med vad som står där.
     innehall: {
       titel: 'I detta nummer',
+      familj: 'Familjesidan',
       sista: 'Sista sidan',
+    },
+    // Familjesidan (2026-11-20): etiketten överst och notisernas slag, i sidans ordning (src/analyser/familjesidan.mjs).
+    familj: {
+      titel: 'Familjesidan',
+      slag: { valkommen: 'Välkommen', avflyttad: 'Avflyttad', tillforordnad: 'Tillförordnad', aterseende: 'Återseende',
+        sitter_lost: 'Sitter löst', besked: 'I väntan på besked' },
     },
     // Sista sidan: krönikan, Vid sidan av och kåseriet.
     sista: {
@@ -122,6 +133,8 @@
       // över lagets text, som står efter varandra
       hemma: 'Hemma',
       borta: 'Borta',
+      // på affischen under sammanfattningen: vad matchen betyder för vardera laget (2026-11-20)
+      paSpel: 'Står på spel',
       ingen: 'Ingen supporterpodd, inget forum och inget från de insatta, klubben eller lokaltidningen att hämta något ur den här veckan.',
       kallorna: 'Källorna',
       // Källans namn som det står på sidan: forumet med ordet forumet framför, poddens namn utan undertiteln,
@@ -279,14 +292,21 @@
     const text = (t) => t && t.rubrik && Array.isArray(t.stycken) && t.stycken.some(Boolean);
     return text(x.kronika) && text(x.kaseri) ? { kronika: x.kronika, kaseri: x.kaseri, sidan: (x.sidan || []).filter((n) => n && n.text) } : null;
   }
-  // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov) och sista sidan
-  // (data/sista-sidan.json). Kupongen är omgångens alla matcher i
+  // Familjesidan (data/familjesidan.json) när den är skriven för samma omgång och har minst två notiser av kända slag.
+  function familjSidan(x, omgang) {
+    if (!x || String(x.omgang || '') !== omgang || !x.rubrik) return null;
+    const S = TEXT.familj.slag;
+    const notiser = (Array.isArray(x.notiser) ? x.notiser : []).filter((n) => n && S[n.slag] && n.namn && n.text);
+    return notiser.length >= 2 ? { rubrik: String(x.rubrik), notiser } : null;
+  }
+  // Det som behövs för att rita tidningen, ur numret (data/poddsidor.json eller provnumret, prov), familjesidan
+  // (data/familjesidan.json) och sista sidan (data/sista-sidan.json). Kupongen är omgångens alla matcher i
   // kupongens ordning (data.matcher, också de utan matchblad), var och en med sitt matchblad om den har ett.
-  // Matchbladen är uppslag med två sidor var, från sidan 2 (sida: vänstersidan, alltid jämn), och sista sidan kommer
-  // efter dem (sistaNr). Ett nummer kommer ut med kupongen, innan matchbladen är skrivna (2026-11-17), och har då
-  // bara omslaget och innehållet, med matcherna bleka tills deras blad kommer.
+  // Matchbladen är uppslag med två sidor var, från sidan 2 (sida: vänstersidan, alltid jämn), och familjesidan och
+  // sista sidan kommer efter dem (familjNr, sistaNr). Ett nummer kommer ut med kupongen, innan matchbladen är skrivna
+  // (2026-11-17), och har då bara omslaget och innehållet, med matcherna bleka tills deras blad kommer.
   // → upplagan, eller null när numret varken har matcher eller matchblad
-  function upplaga(data, prov = false, sista = null) {
+  function upplaga(data, prov = false, sista = null, familj = null) {
     const sidor = ((data && data.sidor) || []).filter((s) => s && Array.isArray(s.delar) && s.delar.some(harInnehall)).sort((a, b) => a.nr - b.nr);
     const l = data && Array.isArray(data.matcher) && data.matcher.length ? data.matcher : sidor;
     if (!l.length) return null;
@@ -314,16 +334,19 @@
       dagar: [...perDag.values()],
       datumText: giltig(data.uppdaterad) ? fDatum.format(new Date(data.uppdaterad)) : '',
       sida: new Map(sidor.map((s, i) => [s.nr, 2 * i + 2])),
+      // familjesidan bara när numret har matchblad (den är skriven ur dem)
+      familj: sidor.length ? familjSidan(familj, String(data.omgang || '')) : null,
       sista: sistaSidan(sista, String(data.omgang || '')),
-      sistaNr: 2 * sidor.length + 2,
     };
+    u.familjNr = u.familj ? 2 * sidor.length + 2 : null;
+    u.sistaNr = 2 * sidor.length + 2 + (u.familj ? 1 : 0);
     return u;
   }
   // Numret: veckans, och utan det provnumret. → Promise: upplagan, eller null
   const hamtaJson = (url) => fetch(url, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   function hamta() {
-    return Promise.all([hamtaJson('data/poddsidor.json'), hamtaJson('data/sista-sidan.json')])
-      .then(([veckans, sista]) => upplaga(veckans, false, sista) || hamtaJson('helgarderat/utkast.json').then((x) => upplaga(x, true)));
+    return Promise.all([hamtaJson('data/poddsidor.json'), hamtaJson('data/sista-sidan.json'), hamtaJson('data/familjesidan.json')])
+      .then(([veckans, sista, familj]) => upplaga(veckans, false, sista, familj) || hamtaJson('helgarderat/utkast.json').then((x) => upplaga(x, true)));
   }
 
   // ---------- omslaget ----------
@@ -443,9 +466,35 @@
       return rad(m.nr, `${esc(kort(lag[0]))} – ${esc(kort(lag[1]))}`, rub, m.sida ? u.sida.get(m.sida.nr) : null);
     }).join('');
     const S = u.sista;
-    const sista = S ? `<ol class="hg-i-sista">${rad('', esc(I.sista), [S.kronika.av, S.sidan.length ? TEXT.sista.vidSidanAv : '', S.kaseri.av].filter(Boolean).join(' · '), u.sistaNr)}</ol>` : '';
+    const efter = (u.familj ? rad('', esc(I.familj), u.familj.rubrik, u.familjNr) : '') +
+      (S ? rad('', esc(I.sista), [S.kronika.av, S.sidan.length ? TEXT.sista.vidSidanAv : '', S.kaseri.av].filter(Boolean).join(' · '), u.sistaNr) : '');
     return `<section class="hg-kupong" id="hg-kupongen" aria-label="${esc(I.titel)}"><header class="hg-i-hd"><a href="#hg-forsta">${NAMN}</a><span>${esc(huvudet(u))}</span></header>` +
-      `<h2 class="hg-i-titel">${esc(I.titel)}</h2><ol>${rader}</ol>${sista}</section>`;
+      `<h2 class="hg-i-titel">${esc(I.titel)}</h2><ol>${rader}</ol>${efter ? `<ol class="hg-i-sista">${efter}</ol>` : ''}</section>`;
+  }
+
+  // ---------- familjesidan ----------
+
+  // Familjesidan (2026-11-20, användarens val C bland sex skisser, när tidningen skulle få "mer information - som
+  // självklart inte är statistik som redan finns på datorn"): det som har hänt i omgångens klubbar den här veckan, som
+  // en dagstidnings familjesida. Etiketten och rubriken överst, sedan Välkommen, Avflyttad, Tillförordnad och Återseende
+  // i var sin ruta med klubbens sköld, slaget, namnet och texten som fortsätter efter namnet (två rutor i bredd på
+  // datorn, och den sista över hela bredden när de är udda), och sist Sitter löst och I väntan på besked som listor
+  // över hela bredden. Klubbens namn står i listan när namnet är en person.
+  function familj(u) {
+    const F = u.familj;
+    const S = TEXT.familj.slag;
+    const nr = u.familjNr;
+    const LISTOR = ['sitter_lost', 'besked'];
+    const ordning = Object.keys(S);
+    const rutor = F.notiser.filter((n) => !LISTOR.includes(n.slag)).sort((a, b) => ordning.indexOf(a.slag) - ordning.indexOf(b.slag));
+    const ruta = (n, i) => `<div class="hg-f-ruta${rutor.length % 2 && i === rutor.length - 1 ? ' hg-f-bred' : ''}">${skold(n.lag, 'hg-f-skold')}` +
+      `<span class="hg-f-slag">${esc(S[n.slag])}</span><b class="hg-f-namn">${esc(n.namn)}</b><p>${esc(hel(n.text))}</p></div>`;
+    const listor = LISTOR.map((sl) => [sl, F.notiser.filter((n) => n.slag === sl)]).filter(([, l]) => l.length).map(([sl, l]) =>
+      `<div class="hg-f-ruta hg-f-bred hg-f-lista"><span class="hg-f-slag">${esc(S[sl])}</span><ul>${l.map((n) =>
+        `<li><b>${esc(n.namn)}</b>${n.namn !== n.lag && kort(n.namn) !== kort(n.lag) ? ` <i>${esc(kort(n.lag))}</i>` : ''} ${esc(hel(n.text))}</li>`).join('')}</ul></div>`).join('');
+    return `<section class="hg-ark hg-sida hg-familj" id="hg-sida-${nr}" aria-label="Sidan ${nr}: ${esc(TEXT.familj.titel)}">${folio(u, nr)}` +
+      `<p class="hg-etikett">${esc(TEXT.familj.titel)}</p><h2 class="hg-rub">${esc(hel(F.rubrik))}</h2>` +
+      `<div class="hg-f-grid">${rutor.map(ruta).join('')}${listor}</div></section>`;
   }
 
   // ---------- sista sidan ----------
@@ -521,9 +570,15 @@
     // Sammanfattningen under rubriken; ett äldre blad utan en har introduktionen där. Ord med bindestreck (A-divisionen)
     // bryts inte, för i den centrerade texten blir ett avbrutet ord en ensam stavelse.
     const dek = s.summering || s.ingress;
+    // Står på spel (2026-11-20, användarens val E bland sex skisser): en mening per lag om vad matchen betyder för det,
+    // under lagets namn, i två spalter som tavlans lag (en mitt på sidan när bara ett lag har en). Bara när redaktören
+    // har skrivit någon (paSpel på lagets del i data/poddsidor.json, config/poddar.js).
+    const spel = [0, 1].map((i) => ({ lag: namn(i), t: s.delar && s.delar[i] && s.delar[i].paSpel })).filter((x) => x.t);
+    const paSpel = spel.length ? `<div class="hg-paspel"><p class="hg-etikett">${esc(T.paSpel)}</p><div class="hg-paspel-par${spel.length < 2 ? ' en' : ''}">` +
+      spel.map((x) => `<div><b>${esc(x.lag)}</b><p>${esc(hel(x.t))}</p></div>`).join('') + '</div></div>' : '';
     return '<div class="hg-affisch">' + (over ? `<p class="hg-etikett">${esc(over)}</p>` : '') +
       `<div class="hg-tavla-rad">${lagK(0)}${mitt}${lagK(1)}</div><h2 class="hg-rub">${esc(hel(rubrik))}</h2>` +
-      (dek ? `<p class="hg-dek">${esc(hel(dek)).replace(/[^\s-]+(?:-[^\s-]+)+/g, '<span class="hg-hel">$&</span>')}</p>` : '') +
+      (dek ? `<p class="hg-dek">${esc(hel(dek)).replace(/[^\s-]+(?:-[^\s-]+)+/g, '<span class="hg-hel">$&</span>')}</p>` : '') + paSpel +
       (plats ? `<p class="hg-plats"><span>${esc(plats)}</span></p>` : '') + '</div>';
   }
   // Matchbladet. Först 2026-11-10 (användarens önskemål: "ett matchblad med information. Först en kort introduktion,
@@ -575,10 +630,10 @@
 
   // ---------- tidningen ----------
 
-  // Hela tidningen: omslaget, innehållet, matchbladen och sista sidan. Utan upplaga står bara omslaget med namnet.
+  // Hela tidningen: omslaget, innehållet, matchbladen, familjesidan och sista sidan. Utan upplaga står bara omslaget med namnet.
   function tidning(u) {
     const omslag = `<section class="hg-omslaget" id="hg-forsta" aria-label="Omslaget">${forsta(u, Boolean(u))}</section>`;
-    return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') + (u.sista ? sista(u) : '') : omslag;
+    return u ? omslag + kupong(u) + u.sidor.map((s) => matchblad(u, s)).join('') + (u.familj ? familj(u) : '') + (u.sista ? sista(u) : '') : omslag;
   }
 
   return { hamta, upplaga, tidning, forsta, omslag, passa, nummer, overst, TEXT };

@@ -108,8 +108,8 @@ function writeSite(outDir = OUT, { journal = false, couponEndpoint, samtal = nul
     // Landskamperna (type 'intl') efter de engelska tävlingarna.
     competitions: [...COMPETITIONS, ...INTERNATIONAL].map((c) => ({ id: c.id, name: c.name, short: c.short, type: c.type, espn: c.espn })),
   });
-  // Analyserna, omgångarnas namn och tidningen (med Helgarderats sista sida och veckans löpsedel), som de ligger i repot.
-  for (const f of ['analyser.json', 'omgangsnamn.json', 'tidning.json', 'poddsidor.json', 'sista-sidan.json', 'lopsedel.json']) {
+  // Analyserna, omgångarnas namn och tidningen (med Helgarderats familjesida och sista sida och veckans löpsedel), som de ligger i repot.
+  for (const f of ['analyser.json', 'omgangsnamn.json', 'tidning.json', 'poddsidor.json', 'sista-sidan.json', 'lopsedel.json', 'familjesidan.json']) {
     const src = path.join(ROOT, 'data', f);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dataDir, f));
   }

@@ -299,6 +299,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   nummer, en rubrik, kupongens matcher med datorns tecken, Rysaren och Spika) och sidorna inför omgången och *Åtta
   knep*. Ett nummer finns alltid, också efter omgången och mellan omgångarna (se *Tipsguiden* under
   [Tidningen](#tidningen))
+- [x] **Helgarderat: Familjesidan och Står på spel (2026-11-20, användarens önskemål: "Hur skulle du göra tidningen
+  helgarderat bättre? Det får gärna vara mer information - som självklart inte är statistik som redan finns på
+  datorn"):** sex skisser ritades i veckans nummer (A Läktarvädret, B Läktarens tips, C Familjesidan, D Svenskarna, E
+  Står på spel, F Läktaren tror), och valet blev C och E, de rekommenderade. Familjesidan står efter matchbladen och
+  Står på spel på varje affisch (se *Familjesidan och Står på spel* under [Helgarderat](#helgarderat))
 - [x] **Helgarderat i ett tryck (2026-11-11, användarens önskemål: "just nu känns det lite mixat med olika stilar. Gör det
   mer enhetligt och snyggt"):** ett typsnitt rakt igenom, Fraunces, också i brödtexten (förut Georgia), och
   skrivmaskinen bara för det ifyllda (sidhuvudet, avsparken, källorna och signaturen). Fyra nivåer och inget mer:
@@ -11745,6 +11750,31 @@ tre dagar gammal (2026-11-10: "Ordnas det här automatiskt inför varje omgång 
 och veckan i huvudet (*Nr 1 · Vecka 46*) och ingen stämpel. Annars visar den provnumret, ett nollnummer (*Nr 0*, med
 stämpeln *Provnummer*). Numret räknas på veckorna: Nr 1 är veckan med lördagen den 14 november 2026, och sedan
 ett nummer i veckan där omgången börjar (`nummer` i [public/helgarderat.js](public/helgarderat.js)).
+
+**Familjesidan och Står på spel** (2026-11-20, användarens val C och E bland sex skisser, när tidningen skulle få mer
+information som inte är statistik). *Står på spel* är en mening per lag om vad matchen betyder för laget, så som
+supportrarna, de insatta eller klubben ser det just den veckan (en nedflyttningsstrid med ett väntat poängavdrag, en
+premiär, krafter som sparas till en viktigare match), under sammanfattningen på affischen, i två spalter som tavlans lag
+och mitt på sidan när bara ett lag har en. Redaktören skriver den i samma svar som matchbladet (`pa_spel` i
+`sidaPrompt`, högst `sidan.paSpelOrd` = 14 ord, config/poddar.js), och den prövas för sig i `sidaAv`
+(src/analyser/poddar.mjs): ord, tipsord och tal som inte står i uppgifterna; en mening som inte håller faller bort utan att
+lagets text gör det. Säger underlaget inget blir det ingen. Samtidigt slås fler stycken än `sidan.stycken` ihop i
+stället för att lagets text faller tillbaka på löptext (`slaIhop`): redaktören lade ibland varje mening i ett eget
+stycke. *Familjesidan* är en egen sida efter matchbladen och före sista sidan: tränare som kommer (Välkommen), går
+(Avflyttad), leder tillfälligt (Tillförordnad) eller sitter löst, återseenden och besked som en klubb väntar på
+(poängavdrag, nya ägare, pengar, en rättegång), med klubbens sköld i varje ruta. Claude skriver den ur matchbladens
+underlag utan verktyg, som löpsedeln (src/analyser/familjesidan.mjs, config/familjesidan.js, `--familjesidan` i
+scripts/analyser/skriv.mjs), när matchbladen har kommit och igen när de har uppdaterats, fram till första avsparken,
+till data/familjesidan.json. Kontrollen: känt slag, ett av omgångens lag, namnet står i underlaget, högst 34 ord,
+inga tipsord eller okända tal; med färre än två notiser blir det ingen sida den veckan. Innehållet har en rad till sidan,
+och sista sidan får numret efter. I Nr 3 skrevs båda med samma kod på MacBooken med appens claude, ur bladen
+som iMacen lade ut efter fredagens körning kl. 13.00 (familjesidan 25 s; Står på spel för alla tretton blad på 116 s, 18 av
+26 lag fick en mening, bladens texter är iMacens). iMacen skriver om bladen vid nästa poddtid eftersom `sidan.version`
+är ny, och familjesidan när bladen har uppdaterats. Provat i huvudlös Chrome i 1440 × 900 och 412 × 915: affischerna med en och två
+meningar, familjesidan, innehållet och sista sidans nummer, inga fel på sidan. Inte provat i rummet, i Safari eller i en
+riktig telefon. Skisserna som inte valdes (Läktarvädret, Läktarens tips, Svenskarna, Läktaren tror) ligger på den
+lokala grenen `skiss/helgarderat-mer-information`; Vädret vid avspark ströks innan det ritades (klart och stilla på
+alla tretton arenor den lördagen, och det flyttar sällan ett tecken).
 
 **Numret kommer med kupongen** (2026-11-17, användarens önskemål: "Jag vill att nästa tidning ska släppas när nästa
 stryktipskupong (europatipskupong också) släpps!"). När Svenska Spel öppnar nästa Stryktips eller Europatips blir det

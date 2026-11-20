@@ -287,7 +287,8 @@
       "Matthias Jaissle",
       "Fabian Schär",
       "Bruno Guimarães"
-     ]
+     ],
+     "paSpel": "Ett tecken på att uppehållet ändrat något, annars är varningsflaggorna på riktigt."
     },
     {
      "lag": "Arsenal",
@@ -685,7 +686,8 @@
       "Lacroix",
       "Mike Penders",
       "Xabi Alonso"
-     ]
+     ],
+     "paSpel": "Mindre poängen än chansen att äntligen se en spelidé under Alonso."
     },
     {
      "lag": "Leeds United",
@@ -851,7 +853,8 @@
       "Rogers",
       "Palmer",
       "Stach"
-     ]
+     ],
+     "paSpel": "Chansen att visa experterna, som inte ger laget en chans, att de har fel."
     }
    ]
   },
@@ -1239,7 +1242,8 @@
      },
      "namn": [
       "Christian Walton"
-     ]
+     ],
+     "paSpel": "Att visa att försvaret håller, annars hänger kontraktet löst enligt podden."
     }
    ]
   },
@@ -1420,7 +1424,8 @@
       "Pau Torres",
       "Lindelöf",
       "Amadou Onana"
-     ]
+     ],
+     "paSpel": "Inget utrymme alls: allt annat än seger räknas som tappade poäng."
     },
     {
      "lag": "Sunderland",
@@ -1613,7 +1618,8 @@
       "Ahoka",
       "Brian Brobbeys",
       "Wilson Isidor"
-     ]
+     ],
+     "paSpel": "Om tron från Chelsea-segern håller, eller läktaren faller tillbaka i pessimism."
     }
    ]
   },
@@ -1785,7 +1791,8 @@
       "Adam Smith",
       "Alex Scott",
       "Morgan Gibbs-White"
-     ]
+     ],
+     "paSpel": "Rollen som Forests eviga spöke, och en segersvit som Glasner gärna bryter."
     },
     {
      "lag": "Nottingham Forest",
@@ -1954,7 +1961,8 @@
       "Oliver Glasner",
       "Jair Cunha",
       "Murillo"
-     ]
+     ],
+     "paSpel": "Att bryta förbannelsen, fast många nöjer sig gärna med en poäng."
     }
    ]
   },
@@ -2342,7 +2350,8 @@
       "Frank",
       "Ethan Pinnock",
       "Ismaïla Sarr"
-     ]
+     ],
+     "paSpel": "Franks premiär, och chansen att vinna läktaren med en tidig nolla."
     }
    ]
   },
@@ -2493,7 +2502,8 @@
      "namn": [
       "Steven Schumacher",
       "Josh Sheehan"
-     ]
+     ],
+     "paSpel": "Första matchen efter uppehållet, och kanske premiär för en ny uppställning."
     },
     {
      "lag": "Portsmouth",
@@ -2722,7 +2732,8 @@
      "namn": [
       "Andrei Coubis",
       "Ivan Varfolomeev"
-     ]
+     ],
+     "paSpel": "En chans att hålla nollan och bygga vidare på grunden för att stanna."
     },
     {
      "lag": "Wrexham",
@@ -2893,7 +2904,8 @@
       "Issa Kaboré",
       "Max Cleworth",
       "Kieffer Moore"
-     ]
+     ],
+     "paSpel": "Inte tränarjobbet än: Parkinson får arbetsro så länge säsongen inte rasar."
     }
    ]
   },
@@ -3066,7 +3078,8 @@
       "podd": "The Boro Breakdown Podcast",
       "typ": "podd",
       "datum": "2026-11-19"
-     }
+     },
+     "paSpel": "Lankshears återkomst, trots att två uppflyttningsrivaler väntar inom sex dagar."
     },
     {
      "lag": "Bristol City",
@@ -3213,7 +3226,8 @@
      },
      "namn": [
       "Michael Skubala"
-     ]
+     ],
+     "paSpel": "Skubalas jobb, och risken att en hygglig insats köper honom tid."
     }
    ]
   },
@@ -3400,7 +3414,8 @@
      "namn": [
       "Chris Wilder",
       "Wilder"
-     ]
+     ],
+     "paSpel": "En nedflyttningsstrid med väntat poängavdrag; tappade poäng kan få säsongen att rasa."
     },
     {
      "lag": "Watford",
@@ -3562,7 +3577,8 @@
       "Alessio Dionisi",
       "Gino Pozzo",
       "Federico Ravaglia"
-     ]
+     ],
+     "paSpel": "Dionisis fortsatta respit, och för vissa supportrar ett storstryk som protest."
     }
    ]
   },
@@ -4098,7 +4114,8 @@
       "Kris O'Leary",
       "Marko Stamenic",
       "Stephen Eustáquio"
-     ]
+     ],
+     "paSpel": "Livet efter Matos börjar, och chansen att sluta ge upp mot topplagen."
     },
     {
      "lag": "West Bromwich Albion",
@@ -4377,7 +4394,8 @@
       "På forumet NOT606 har man redan skrivit av lördagen.",
       "Efter den ”extatiska segern mot Sheffield” räknar supportrarna med att tränaren byter ut flera spelare och att laget får stryk borta mot ett Wolves i högform.",
       "Blicken är i stället riktad mot Lincoln några dagar senare, en direkt duell som man kallar ”sexpoängsmatchen”. Molineux ses som en match att offra, inte att vinna."
-     ]
+     ],
+     "paSpel": "Inte mycket: krafterna sparas till Lincoln några dagar senare."
     }
    ]
   }

@@ -297,6 +297,41 @@ a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 
 .hs-kalla { color: var(--gra); font: 400 11.5px/1 var(--skriv); white-space: nowrap; }
 .hs-kalla a { color: inherit; text-decoration-color: var(--streck); text-underline-offset: 2px; }
 
+/* ---------- står på spel (affischen) ---------- */
+
+/* Står på spel (2026-11-20, användarens val E bland sex skisser): under sammanfattningen på affischen, etiketten och en
+   mening per lag i två spalter som tavlans lag, med lagets namn i röda versaler ovanför; en mitt på sidan när bara ett
+   lag har en. Affischen fördelar luften jämnt (space-evenly), så den tar luft och inte höjd. */
+.hg-paspel { align-self: stretch; }
+.hg .hg-paspel .hg-etikett { margin-bottom: 14px; }
+.hg-paspel-par { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 26px; text-align: center; }
+.hg-paspel-par.en { grid-template-columns: minmax(0, 24em); justify-content: center; }
+.hg-paspel-par b { display: block; margin-bottom: 6px; color: var(--rod); font: 600 12.5px/1.25 var(--tryck); letter-spacing: 0.14em; text-transform: uppercase; text-wrap: balance; }
+.hg-paspel-par p { font: 400 17px/1.45 var(--serif); text-wrap: balance; hyphens: manual; -webkit-hyphens: manual; }
+
+/* ---------- familjesidan (rum-tidning.js, familj) ---------- */
+
+/* Familjesidan (2026-11-20, användarens val C bland sex skisser): en dagstidnings familjesida för omgångens klubbar.
+   Notiserna i omslagets ruta (tavlans), två i bredd: klubbens sköld i tryckets gråskala, slaget som etikett, namnet och
+   texten centrerat under ett kort streck; den sista över hela bredden när rutorna är udda, och listorna (Sitter löst,
+   I väntan på besked) över hela bredden med en rad per notis. */
+.hg-familj { display: flex; flex-direction: column; }
+.hg-familj > .hg-etikett { margin-top: calc(var(--hg-k) * 4.4px); }
+.hg .hg-familj > .hg-rub { margin-bottom: 18px; }
+.hg-f-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 6px; }
+.hg-f-ruta { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 16px 15px; background: var(--ruta);
+  box-shadow: inset 0 0 0 calc(var(--hg-k) * 0.45px) var(--rod); text-align: center; }
+.hg-f-bred { grid-column: 1 / -1; }
+.hg-f-ruta .hg-f-skold { width: 34px; height: 34px; }
+.hg-f-slag { color: var(--rod); font: var(--etikett); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
+.hg-f-namn { font: 600 21px/1.15 var(--tryck); letter-spacing: -0.01em; text-wrap: balance; }
+.hg-f-ruta > p { font: 400 15.5px/1.5 var(--serif); text-wrap: pretty; }
+.hg-f-ruta > p::after { content: ""; display: block; width: 34px; margin: 11px auto 0; border-top: var(--linje) solid var(--rod); }
+.hg-f-lista ul { align-self: stretch; margin: 2px 0 0; padding: 0; list-style: none; text-align: left; }
+.hg-f-lista li { padding: 7px 0; border-top: 1px solid var(--streck); font: 400 15.5px/1.45 var(--serif); text-wrap: pretty; }
+.hg-f-lista li b { font-weight: 600; }
+.hg-f-lista li i { color: var(--rod); font: 600 11px/1 var(--tryck); letter-spacing: 0.12em; text-transform: uppercase; }
+
 /* ---------- smal: en spalt ---------- */
 
 @media (max-width: 720px) {
@@ -325,6 +360,9 @@ a.hf-mitt:focus-visible { outline: 0.5px solid var(--hf-tryck); outline-offset: 
   .hg-i-lag { font-size: 13px; letter-spacing: 0.05em; }
   .hg-i-rub { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
   .hs-text, .hs-ktext { column-count: 1; }
+  .hg-paspel-par { column-gap: 14px; }
+  .hg-paspel-par p { font-size: 16px; }
+  .hg-f-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media print {

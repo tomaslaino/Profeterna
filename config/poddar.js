@@ -96,9 +96,13 @@ module.exports = {
   // sammanfattningen läget), det viktigaste i lagets första mening, två eller tre saker per lag och
   // inget som redan står på sajten (skadelistor, resultat, tabell). Kort får inte bli torrt: det var
   // faktana som var torra förra gången, inte kortheten.
+  // 2026-11-20, när tidningen skulle få mer information som inte är statistik (val E, Står på
+  // spel, bland sex skisser): en mening per lag om vad matchen betyder för laget, så som
+  // supportrarna, de insatta eller klubben ser det just den här veckan. Den står på affischen
+  // under sammanfattningen (rum-tidning.js), och bara när underlaget säger det.
   sidan: {
     // Byts den skrivs bladen om nästa natt, utan att avsnitten tas ut på nytt.
-    version: '2026-11-12.1',
+    version: '2026-11-20.1',
     // Lagets senaste avsnitt som bladet bygger på, och så många av uppgifterna som sparas
     // under laget (och blir löptext när redaktörens text inte håller).
     avsnitt: 3,
@@ -113,6 +117,8 @@ module.exports = {
     summeringOrd: 35,
     // Ett citat trycks bara när det är kort.
     citatOrd: 22,
+    // Står på spel: en mening per lag, högst så många ord.
+    paSpelOrd: 14,
     effort: 'medium',
     // Bara källor från de senaste så här många dagarna före matchen (användarens beslut
     // 2026-11-14: "Det ska vara fräsch information i tidningen - helst från senaste dagarna.
@@ -296,6 +302,7 @@ Välj först, skriv sedan. Läsaren har redan tabellen, formen, resultaten, mål
 Skriv så här:
 - rubrik: högst {rubrikOrd} ord. En riktig tidningsrubrik med en enda vinkel: det mest talande i veckans underlag, gärna med en torr underton när underlaget bjuder på det, men aldrig krystad. Inte en uppräkning av läget i båda lagen.
 - lag: ett avsnitt per lag, hemmalaget först. Högst {stycken} korta stycken, sammanlagt {meningar} meningar och högst {lagOrd} ord. Den första meningen bär det viktigaste och ska gå att läsa ensam. Ange i "ur" id för uppgifterna avsnittet bygger på, i "citat" id för en av lagets egna uppgifter vars citat är kort (högst {citatOrd} ord), talande och säger något som texten inte säger (hellre null än ett svagt eller långt), och i "namn" personerna (spelare och tränare) som nämns i texten, så som de står där. Har laget inga uppgifter blir texten en tom lista.
+- pa_spel (för varje lag): vad som står på spel för laget i just den här matchen, i en enda mening på högst {paSpelOrd} ord, så som supportrarna, de insatta eller klubben själva ser det i underlaget: tränarens framtid, ett poängavdrag, en premiär, en viktigare match några dagar senare som laget sparar sig till, ett derby, en revansch, eller att supportrarna hoppas på något annat än seger. Det handlar om vad matchen betyder, inte om vad laget måste göra på planen: inte taktik, motståndarens styrkor eller hur matchen ska vinnas. Börja i saken, utan lagets namn (det står ovanför), gärna torrt (till exempel "Inte mycket: krafterna sparas till matchen på tisdag." eller "Tränarens premiär, och chansen att vinna läktaren med en nolla."). Inga tabellplaceringar, poäng i tabellen eller resultat, och inget om vem som vinner. Säger underlaget inget om vad matchen betyder för laget blir det null; hellre null än en allmän fras som "tre viktiga poäng".
 - summering: läget före avspark i en eller två meningar, högst {summeringOrd} ord: det som väger tyngst i vart och ett av lagen, med nya ord och inte rubriken en gång till.
 
 Kort är inte torrt. Det ska vara en njutning att läsa, som några rader från någon som står på läktaren varje vecka:
@@ -310,5 +317,5 @@ Språket: skriv som en svensk sportjournalist, i hela meningar med svensk ordfö
 Bara det som står i uppgifterna: inga nya fakta, namn eller tal, och gör inte en gammal sak till en nyhet. Skriv tal precis som de står i uppgifterna. Inga tips: inte vem som vinner, vilket tecken man ska välja eller vem som är favorit, och inga odds.
 
 Svara bara med JSON, utan något före eller efter:
-{"rubrik": "…", "lag": {"<lagets namn som i underlaget>": {"ur": ["<id>"], "text": ["…"], "citat": null, "namn": ["…"]}}, "summering": "…"}`,
+{"rubrik": "…", "lag": {"<lagets namn som i underlaget>": {"ur": ["<id>"], "text": ["…"], "citat": null, "namn": ["…"], "pa_spel": "…"}}, "summering": "…"}`,
 };
