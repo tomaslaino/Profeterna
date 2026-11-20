@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T13:26:44.411Z",
+ "uppdaterad": "2026-11-20T13:40:37.280Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -510,14 +510,21 @@
     "Leeds United"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:01:26.590Z",
-   "rubrik": "Chelsea vinner matcher men letar fortfarande efter en idé",
+   "skriven": "2026-11-20T13:34:25.836Z",
+   "rubrik": "Chelsea fruktar att Leeds har läst Sunderlands manus",
    "ingress": null,
-   "summering": "Chelsea saknar en röd tråd i spelet och har mittbackar som lämnar sina positioner. I Leeds hänger mycket på om Farke väljer tre anfallare eller ett tätare mittfält.",
+   "summering": "Chelseas skakiga mittbackar och osäkre målvakt väntar på Leeds luftspel, under en tränare som supportrarna tycker saknar tydlig idé. Leeds åker dit optimistiska men oroliga för att Farke ställer upp ett för tunt mittfält.",
    "delar": [
     {
      "lag": "Chelsea",
      "kallor": [
+      {
+       "podd": "London Is Blue - Chelsea FC Podcast",
+       "avsnitt": "#1676 | Time To Take The Handbrake Off! Leeds Preview ft. CFC Central! #CFC",
+       "datum": "2026-11-19",
+       "adress": "https://podcasts.apple.com/gb/podcast/london-is-blue-chelsea-fc-podcast/id914691565?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "Chelsea FanCast",
        "avsnitt": "’50 Years of Chelsea: 2008/09 Part One’ Chelsea FanCast #1434",
@@ -559,6 +566,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Supportrarna menar att hela ligan vet att Colwill, Fofana och Lacroix har börjat svaja. Motståndarna söker sig mot mittbackarna med långa bollar och dueller, och det har fungerat hela säsongen, inte bara i en match.",
+         "s": "o",
+         "podd": [
+          "London Is Blue - Chelsea FC Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Resultaten har smickrat laget, anser värdarna. Mot Bournemouth blev det 5–1 på ungefär 1,1 i förväntade mål, och sedan João Pedro skadade sig har anfallet fallit platt.",
          "s": "o",
          "podd": [
@@ -581,46 +599,24 @@
          "typ": "podd"
         },
         {
-         "t": "Försvaret får D+. Felet ligger delvis i taktiken: det vertikala spelet gör att bollen kommer tillbaka snabbt, och mittbackarna får försvara omställningar och dueller ute i kanalerna, något de inte trivs med.",
-         "s": "o",
-         "podd": [
-          "London Is Blue - Chelsea FC Podcast"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Caicedo är navet, utan honom faller allt. Supportrarna lägger skulden för mittfältets problem mer på Alonso än på spelarna: systemet tvingar 36-årige Henderson att springa fram och tillbaka och gör Caicedo skadebenägen.",
-         "s": "o",
-         "podd": [
-          "London Is Blue - Chelsea FC Podcast"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Cole Palmer är inne i en svacka. Han har inte gjort något mål ur spel på nio matcher, bara en straff, och har inte varit avgörande kreativt.",
+         "t": "Värdarna har sett målvakten Mike Penders bli allt osäkrare när han går ut på inlägg. Mot Calvert-Lewin, som är bland de bästa i ligan i luftdueller, kan ett enda felgrepp straffa sig direkt.",
          "s": "h",
          "podd": [
           "London Is Blue - Chelsea FC Podcast"
          ],
          "datum": [
-          "2026-11-16"
+          "2026-11-19"
          ],
          "typ": "podd"
         },
         {
-         "t": "Wingbackarna Chavarría och Palestra är försvarare som inte bidrar framåt, så anfallet blir för tunt. Supportrarna vill se Pedro Neto som wingback med João Pedro centralt, eller en övergång till 4-2-3-1.",
+         "t": "Cole Palmer har bara ett mål utanför straffar på sina senaste nio matcher, och måltorkan återkommer för andra eller tredje säsongen i rad. En värd vill därför värva konkurrens om hans plats, så att han inte blir för bekväm.",
          "s": "o",
          "podd": [
           "London Is Blue - Chelsea FC Podcast"
          ],
          "datum": [
-          "2026-11-16"
+          "2026-11-19"
          ],
          "typ": "podd"
         }
@@ -630,13 +626,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Alonso får C+ och värdarna är besvikna, särskilt som laget utan europaspel har haft tid att träna. Ingen vill ändå få honom sparkad, och stödet för honom finns kvar.",
+         "t": "En värd tycker att Alonso är för försiktig. Chelsea brukar starta snabbt och göra mål tidigt, men spelar i praktiken bara en bra halvlek. Därför vill han att Alonso släpper handbromsen och startar med en extra anfallare från början.",
          "s": "o",
          "podd": [
           "London Is Blue - Chelsea FC Podcast"
          ],
          "datum": [
-          "2026-11-16"
+          "2026-11-19"
          ],
          "typ": "podd"
         }
@@ -645,6 +641,17 @@
       {
        "amne": "match",
        "punkter": [
+        {
+         "t": "Värdarna är rädda att Leeds kopierar Sunderlands recept från förra matchen: en stark target-forward som Calvert-Lewin som går på Chelseas mittbackar. Det som ställde till det senast är just sådant som Leeds gör bra.",
+         "s": "o",
+         "podd": [
+          "London Is Blue - Chelsea FC Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Senast mot Leeds var Chelsea enligt värdarna uselt i omkring 50 minuter och låg under med 2–0, innan laget gjorde sex mål på de sista 40 minuterna.",
          "s": "h",
@@ -660,25 +667,36 @@
       }
      ],
      "text": [
-      "Under Xabi Alonso kontrar Chelsea i ena matchen och jagar bollinnehav i nästa, ibland båda i samma match. I podden London Is Blue skulle man hellre se ”brist på resultat än brist på filosofi”.",
-      "Värdarna tycker att resultaten har smickrat laget och att anfallet föll ihop när João Pedro skadade sig. På forumet The Shed End tror man ändå inte att hans eventuella återkomst räcker, eftersom anfallet inte fungerade när han spelade heller.",
-      "Mest oro väcker mittbackarna. Det vertikala spelet gör att bollen snabbt kommer tillbaka, och då måste de försvara omställningar ute på kanterna, något de inte trivs med."
+      "”Alla tre mittbackarna är lätta måltavlor”, säger man i podden London Is Blue, och på lördag kommer Dominic Calvert-Lewin. Rädslan är att Leeds kopierar Sunderlands recept från förra matchen: långa bollar och dueller mot Colwill, Fofana och Lacroix.",
+      "Värdarna har också sett Mike Penders bli allt osäkrare i luften, och mot en av ligans bästa nickspelare kan ett felgrepp straffa sig direkt.",
+      "Kritiken når även Xabi Alonso, vars lag kontrar ena matchen, jagar bollinnehav i nästa och i praktiken bara spelar en bra halvlek. Stödet för honom finns kvar, men en värd vill att han släpper handbromsen."
      ],
      "citat": {
-      "sagt": "Hur ställer man upp laget för att kompensera för två mittbackar som alltför ofta är som bortblåsta?",
-      "vem": "dermott",
-      "podd": "The Shed End",
-      "typ": "forum",
-      "datum": "2026-11-20"
+      "sagt": "Just nu är det osammanhängande. Som du sa: vi skulle hellre se brist på resultat än brist på filosofi.",
+      "vem": null,
+      "podd": "London Is Blue - Chelsea FC Podcast",
+      "typ": "podd",
+      "datum": "2026-11-16"
      },
      "namn": [
-      "Xabi Alonso",
-      "João Pedro"
+      "Dominic Calvert-Lewin",
+      "Colwill",
+      "Fofana",
+      "Lacroix",
+      "Mike Penders",
+      "Xabi Alonso"
      ]
     },
     {
      "lag": "Leeds United",
      "kallor": [
+      {
+       "podd": "The Square Ball: Leeds United Podcast",
+       "avsnitt": "Like a Proud Dad | The Square Ball",
+       "datum": "2026-11-19",
+       "adress": "https://thesquareball.net/plus",
+       "typ": "podd"
+      },
       {
        "podd": "Marching On Together",
        "avsnitt": "Chelsea vs Leeds United Match Thread · Chelsea v Leeds Outcome - Poll of the Day (20th Nov) · How are you feeling about the Chelsea game? Poll of the Day 2 (19th Nov)",
@@ -710,24 +728,19 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Flera supportrar vill att Joe Rodon går rakt in i elvan igen. Utan honom har backlinjen saknat fart och laget har varit sämre framåt, och James Justin är en wingback som bara gör ett hyggligt jobb som mittback.",
-         "s": "o",
-         "podd": [
-          "Marching On Together"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Supportrarna förundras över hur oberörd målvakten James Trafford är. Efter misstaget mot Bournemouth gjorde han en stark landskamp för England, och värdarna har aldrig sett en Leedsspelare skaka av sig misstag så lätt.",
+         "s": "h",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Enligt supportrarna avgörs matchen av Farkes elva. Med Calvert-Lewin, Okafor och Wilson samtidigt blir mittfältet för tunt, och Rogers och Palmer får för stora ytor. De vill se ett tremannamittfält, gärna med Stach tillbaka.",
          "s": "o",
@@ -745,6 +758,28 @@
        "amne": "klubb",
        "punkter": [
         {
+         "t": "Ägarna har anlitat den diskreta New York-banken Allen & Co för att värdera klubben och ta in nya pengar. Enligt värdarna överraskade kapitalbehovet en del delägare och stämmer dåligt med vad de tidigare fått höra.",
+         "s": "h",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarnas första reaktion på kapitaljakten är att rygga tillbaka: det känns destabiliserande när allt går bra. Med västläktaren ofärdig undrar den cyniska sidan om pengarna redan är slut, även om de inte tror att det är så.",
+         "s": "o",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "En klar majoritet av supportrarna är optimistiska. Experterna ger Leeds ingen chans, men många räknar med minst en poäng och tror att laget kan överraska.",
          "s": "o",
          "podd": [
@@ -760,6 +795,17 @@
       {
        "amne": "match",
        "punkter": [
+        {
+         "t": "Supportrarna åker till Chelsea med optimism och tror att Leeds kan mäta sig med dem. Chelsea släpper in många mål och blev överkörda med 3–0 av Brentford, och värdarna tror att Leeds kan matcha den mer fysiska stilen.",
+         "s": "o",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Supportrarna ser en match där Chelseas svaga backlinje möter ett Leeds som slarvar framåt men står stadigt bakåt. Mittfältet ska avgöra, och de räknar inte med att släppa in sex mål i en andra halvlek igen.",
          "s": "o",
@@ -781,47 +827,14 @@
           "2026-11-19"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Ett Leeds-poddsamtal som supportrarna lyfter fram menar att Chelsea har slutat skapa chanser sedan förlusten mot Brentford. Utan João Pedro som fokuspunkt för Palmer och Rogers ser de en enkel väg till poäng, om Leeds kan frustrera hemmalaget.",
-         "s": "b",
-         "podd": [
-          "Marching On Together"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna tycker att 5-3-2 passar på Stamford Bridge, men rädslan är ett tidigt baklängesmål. Laget är bra på att hålla tätt men saknar enligt dem en extra växel för att jaga en match mot ett lag med så bred bänk.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Cupförlusten med 3–6 på Stamford Bridge i september ser supportrarna som en följd av en hopplockad cupelva, och de drar inga slutsatser av den inför lördagen.",
-         "s": "o",
-         "podd": [
-          "Marching On Together"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "forum"
         }
        ]
       }
      ],
      "text": [
-      "På forumet Marching On Together tror man att matchen avgörs redan när Farke tar ut laget.",
-      "Startar Calvert-Lewin, Okafor och Wilson tillsammans blir mittfältet för tunt, och då får Rogers och Palmer stora ytor. Supportrarna vill hellre se tre centrala mittfältare, gärna med Stach tillbaka.",
-      "Joe Rodon delar läktaren. En del vill ha in honom direkt, eftersom backlinjen har saknat fart utan honom. Andra vill spara honom till hemmamatchen mot Coventry, efter tio veckors skada och två fulla landskamper för Wales."
+      "Väljer Daniel Farke Calvert-Lewin, Okafor och Wilson från start blir det ”en lång eftermiddag”, varnar man på forumet Marching On Together. Mittfältet blir då för tunt mot Rogers och Palmer, och många vill se tre centrala mittfältare, gärna med Stach tillbaka.",
+      "Annars råder optimism: experterna ger Leeds ingen chans, men flera räknar med minst en poäng.",
+      "Utanför planen skaver det. Enligt podden The Square Ball har ägarna anlitat banken Allen & Co för att ta in nytt kapital, något som överraskade en del delägare. Med västläktaren ofärdig undrar den cyniska sidan om pengarna redan är slut."
      ],
      "citat": {
       "sagt": "Jag skulle älska att slå dem på deras egen sophög och köra upp London-förbannelsen där bak på dem.",
@@ -831,14 +844,13 @@
       "datum": "2026-11-19"
      },
      "namn": [
-      "Farke",
+      "Daniel Farke",
       "Calvert-Lewin",
       "Okafor",
       "Wilson",
       "Rogers",
       "Palmer",
-      "Stach",
-      "Joe Rodon"
+      "Stach"
      ]
     }
    ]
