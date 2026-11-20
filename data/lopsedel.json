@@ -15,29 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-20T14:18:34.120Z",
+ "skriven": "2026-11-20T14:33:53.084Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-20T14:12:04.792Z",
+ "underlag": "2026-11-20T14:26:03.432Z",
  "rubrik": {
-  "id": "401879238",
-  "kick": "NOTTINGHAM FOREST",
+  "id": "401879232",
+  "kick": "ARSENAL",
   "rad": [
    [
-    "GLASNER",
+    "ARSENALFANS",
     0
    ],
    [
-    "TATUERAD PÅ",
+    "TVIVLAR PÅ",
     0
    ],
    [
-    "BAKDELEN",
+    "GYÖKERES",
     1
    ]
   ],
-  "under": "Supporter på Forest Forum efter segern mot City: har nu Oliver Glasners ansikte tatuerat där",
-  "plus": "FANS TVIVLAR PÅ GYÖKERES",
-  "plusId": "401879232"
+  "under": "Arsenalpodden om anfallet: ”Det är jag mycket mindre säker på.”",
+  "plus": "WATFORDFANS HOPPAS PÅ STRYK",
+  "plusId": "401880154"
  }
 }
