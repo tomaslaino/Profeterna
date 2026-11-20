@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-20T16:06:20.785Z",
+ "uppdaterad": "2026-11-20T16:06:52.934Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -4192,15 +4192,14 @@
    },
    "hasse": {
     "stycken": [
-     "Tottenham har gått mållösa i hälften av sina ligamatcher, och i Leeds blev kantspelarna ensamma mot två man. Tränaren sitter dessutom på läktaren och Mathys Tel fick gå av med en smäll mot hälsenan. Det låter värre än det är.",
-     "Ipswich har nämligen inte hållit nollan en enda gång på tio matcher. Gary O'Neils lag gör mål men lämnar dörren öppen bakåt, och mot en sådan backlinje hittar till och med Tottenham fram. Det här pratade vi om redan i Manchester City, Svennis och jag. Ett lag som släpper in mål i varje match vinner sällan på bortaplan, hur mycket det än skapar framåt.",
-     "Ipswich gör sitt mål, men Tottenham gör ett till. Lugn nu, jag ringar in ettan och bara ettan."
+     "Tottenham har bollen mest hela tiden och slår över tjugo inlägg per match, men de har bara gjort tio mål på tio matcher. Inlägg blir inga mål om ingen står rätt i straffområdet. Det här pratade vi om redan i Manchester City, Svennis och jag.",
+     "Men Ipswich har inte hållit nollan en enda gång på tio ligamatcher och har släppt in tjugo mål. Ett lag som läcker så mycket får det jobbigt borta mot ett lag som har bollen hela eftermiddagen. Nu kommer dessutom Bergvall, Savio och Udogie tillbaka, och då blir truppen bredare. Ipswich gör väl ett mål genom Enciso på någon lång boll, men det räcker inte. Jag spikar etta, och bara etta."
     ],
     "tecken": [
      0
     ],
     "resultat": "2–1",
-    "tips": "2026-11-17T17:09:30.420Z",
+    "tips": "2026-11-20T15:03:31.866Z",
     "uppdrag": {
      "fraser": [
       "Äsch",
@@ -4212,7 +4211,7 @@
     },
     "model": "claude-opus-5-5",
     "version": "2026-11-16.1",
-    "writtenAt": "2026-11-17T17:10:00.172Z",
+    "writtenAt": "2026-11-20T16:06:47.613Z",
     "attempts": 2
    },
    "model": "claude-opus-5-5",
