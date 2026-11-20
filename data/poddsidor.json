@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T14:48:46.237Z",
+ "uppdaterad": "2026-11-20T14:59:54.862Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2573,14 +2573,21 @@
     "Wrexham"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:04:28.674Z",
-   "rubrik": "Lincolns forum ber tränarna sluta pilla med elvan",
+   "skriven": "2026-11-20T14:59:54.862Z",
+   "rubrik": "Lika bra som Birmingham, tycker man i Wrexhams omklädningsrum",
    "ingress": null,
-   "summering": "Lincoln letar efter en fast elva och sitt tappade självförtroende. Wrexham har en kapten på väg fram men saknar både spelare och skärpa i anfallet på bortaplan.",
+   "summering": "Lincolns supportrar kräver en fast elva med Coubis och ser nollan som veckans uppgift. Wrexham har ett stabilt försvar och stora ord i omklädningsrummet, men Moore blir ensam längst fram och ytan bakom högerkanten står öppen.",
    "delar": [
     {
      "lag": "Lincoln City",
      "kallor": [
+      {
+       "podd": "The Stacey West Podcast",
+       "avsnitt": "511 - Wrexham, International Imps and Looking Ahead",
+       "datum": "2026-11-18",
+       "adress": "https://shows.acast.com/staceywest/episodes/511-wrexham-international-imps-and-looking-ahead",
+       "typ": "podd"
+      },
       {
        "podd": "Vital Imps",
        "avsnitt": "Predict the Attendance - Wrexham (H) · 25% More Line-Up Changes Than Last Season · International Call Ups",
@@ -2597,33 +2604,6 @@
       }
      ],
      "grupper": [
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Andrei Coubis kommer hem från Rumäniens landslag först sent på onsdagen. Supportrarna menar ändå att han måste starta mot Wrexham, eftersom han hör till det bästa laget och det är nu det gäller för att hänga kvar.",
-         "s": "o",
-         "podd": [
-          "Vital Imps"
-         ],
-         "datum": [
-          "2026-11-15"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "En supporter tror att alla som har varit iväg med landslag börjar på bänken på lördag. Hen misstänker att den medicinska staben kräver det för att spara dem till våren, och då kan det vara för sent.",
-         "s": "o",
-         "podd": [
-          "Vital Imps"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
       {
        "amne": "spel",
        "punkter": [
@@ -2661,15 +2641,26 @@
          "typ": "forum"
         },
         {
-         "t": "Förra säsongen kallades tränaren också för en som ständigt ändrade i laget. Supportrarna påminner om att han ungefär vid den här tiden hittade sin elva och sedan höll fast vid den, och att laget därefter gick 29 matcher utan förlust.",
+         "t": "Andrei Coubis har varit enastående som högerback eller högerwingback och drar med sig hela laget framåt. Adam Reach på vänsterkanten räknas till säsongens bästa spelare.",
          "s": "o",
          "podd": [
-          "Vital Imps"
+          "The Stacey West Podcast"
          ],
          "datum": [
-          "2026-11-20"
+          "2026-11-18"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Laget är välorganiserat men saknar en spelare med flair som kan avgöra. Värdarna ser kantpositionerna i anfallet som lagets svaga punkt och vill att klubben värvar just där i januari.",
+         "s": "o",
+         "podd": [
+          "The Stacey West Podcast"
+         ],
+         "datum": [
+          "2026-11-18"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -2688,39 +2679,61 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna saknar fortfarande Moylan, som såldes. De menar att han var den som stod för fantasin och målen centralt och att laget får betala för att ingen har ersatt honom.",
+         "t": "Supportrarna godtar att laget kan spela fult och trist en tid, så länge det håller sig kvar i Championship. Målet är att lägga en grund som gör att laget stannar i serien.",
          "s": "o",
          "podd": [
-          "Vital Imps"
+          "The Stacey West Podcast"
          ],
          "datum": [
           "2026-11-18"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Wrexham skapar sämst i ligan när det gäller stora chanser och är svaga framåt. Värdarna ser hemmamatchen som ett bra tillfälle för Lincoln att hålla nollan.",
+         "s": "o",
+         "podd": [
+          "The Stacey West Podcast"
+         ],
+         "datum": [
+          "2026-11-18"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Mot QPR gick Lincoln över till fembackslinje, men Andrei Coubis, som många på forumet Vital Imps räknar till lagets bästa, kom inte ens in från bänken. I stället fick högerfotade Deji Elerewe spela vänster mittback, och supportrarna kallar det bisarrt.",
-      "Ändringarna i elvan irriterar, men samma kritik hördes förra säsongen. Ungefär vid den här tiden hittade tränaren sin elva och höll fast vid den, och sedan gick laget 29 matcher utan förlust.",
-      "En ensam röst säger emot och tror inte att bytena är problemet: självförtroendet har rasat, som för så många lag som vunnit League One stort."
+      "Andrei Coubis är supportrarnas nya förälskelse, och därför förstår ingen varför han inte ens byttes in när laget gick över till fembackslinje mot QPR. På forumet Vital Imps undrar man samma sak om Ivan Varfolomeev, som många ser som lagets bästa mittfältare men som knappt har fått starta på länge. Där tröstar man sig med förra säsongen: då pillade tränaren också med elvan tills han hittade sin, och sedan gick laget 29 matcher utan förlust.",
+      "I podden har man ställt in sig på ful och trist fotboll så länge laget håller sig kvar. Mot ett Wrexham som skapar så lite gäller det framför allt att hålla nollan."
      ],
      "citat": {
-      "sagt": "Spelarna, hela truppen sammantaget, är helt enkelt inte tillräckligt bra för att vinna matcher regelbundet på den nivån.",
-      "vem": "Sincilbanks",
-      "podd": "Vital Imps",
-      "typ": "forum",
-      "datum": "2026-11-20"
+      "sagt": "Hur välstrukturerade, välorganiserade och bra en del av våra spelare än är, var ska flairen komma ifrån hos oss?",
+      "vem": null,
+      "podd": "The Stacey West Podcast",
+      "typ": "podd",
+      "datum": "2026-11-18"
      },
      "namn": [
       "Andrei Coubis",
-      "Deji Elerewe"
+      "Ivan Varfolomeev"
      ]
     },
     {
      "lag": "Wrexham",
      "kallor": [
+      {
+       "podd": "Rob. Ryan. Red.",
+       "avsnitt": "Episode 335: Missing Linc",
+       "datum": "2026-11-18",
+       "adress": "https://shows.acast.com/6486dd5af5bfbf001188bea7/episodes/episode-335",
+       "typ": "podd"
+      },
       {
        "podd": "Rob. Ryan. Red.",
        "avsnitt": "Episode 334: Dragon Development",
@@ -2764,39 +2777,22 @@
           "2026-11-19"
          ],
          "typ": "media"
-        },
+        }
+       ]
+      },
+      {
+       "amne": "elva",
+       "punkter": [
         {
-         "t": "Kieffer Moore missade Wales landskamper på grund av en ryggskada som gav känningar i baksida lår. Parkinson menar att vilan har gjort honom gott men bekräftade inte att han kan spela mot Lincoln.",
-         "s": "b",
+         "t": "Värdarna är oense om upplägget. Den ena vill ha två offensiva mittfältare bakom Moore i de vinnbara matcherna men 3-5-1-1 i de tuffa, eftersom Josh Windass och Nathan Broadhead aldrig har varit bra samtidigt.",
+         "s": "o",
          "podd": [
-          "Sportin Wales"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "media"
-        },
-        {
-         "t": "Issa Kaboré blev uttagen av Burkina Faso men lämnade återbud under landslagsuppehållet på grund av en uppgiven skada i baksida lår.",
-         "s": "b",
-         "podd": [
-          "Racecourse Ramble"
+          "Rob. Ryan. Red."
          ],
          "datum": [
           "2026-11-18"
          ],
-         "typ": "media"
-        },
-        {
-         "t": "Sam Smith är borta resten av säsongen efter en knäoperation, vilket tillsammans med de andra skadorna ger Parkinson få alternativ på offensiven.",
-         "s": "b",
-         "podd": [
-          "Sportin Wales"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "media"
+         "typ": "podd"
         }
        ]
       },
@@ -2804,26 +2800,37 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Wrexham har bara gjort fem mål på sju ligamatcher på bortaplan. Skribenten menar att laget måste skapa fler riktiga chanser och bli mer effektivt i anfallet borta.",
+         "t": "Försvaret är bäst bland lagen i nedre halvan och släpper till få farliga lägen. Problemet sitter framåt: Wrexham har skapat minst antal klara målchanser i hela serien, 21 stycken mot West Hams 59.",
          "s": "h",
          "podd": [
-          "Racecourse Ramble"
+          "Rob. Ryan. Red."
          ],
          "datum": [
-          "2026-11-16"
+          "2026-11-18"
          ],
-         "typ": "media"
+         "typ": "podd"
         },
         {
-         "t": "Wrexham har inte vunnit borta sedan 3–0 mot Millwall i september. Parkinson säger att bortaformen och prestationerna på bortaplan måste upp till nivån från säsongsinledningen.",
-         "s": "b",
+         "t": "Laget blir snett eftersom Issa Kaboré går mycket högt på högerkanten och lämnar Max Cleworth med mycket jobb bakom sig. Wolves såg snabbt att ytan bakom högerwingbacken var vägen in.",
+         "s": "h",
          "podd": [
-          "Sportin Wales"
+          "Rob. Ryan. Red."
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-18"
          ],
-         "typ": "media"
+         "typ": "podd"
+        },
+        {
+         "t": "När laget backar hem saknas en snabb spelare som kan sträcka motståndarnas försvar. Mot Kieffer Moore kan backlinjen stå kvar, han tvingas djupare och laget får ingen avlastning när bollen vinns.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-18"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -2831,13 +2838,24 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Enligt värdarna vill flera spelare i A-laget att mittbacken Max Cleworth, som kommer från klubbens egen akademi, ska bli lagkapten. Båda värdarna tror att han till slut får bindeln.",
+         "t": "Enligt värdarnas källor nära omklädningsrummet anser spelarna att truppen man för man är lika bra som serieledande Birmingham. Det har bara inte stämt ännu på grund av skador, dåliga resultat och bristande insats i vissa matcher.",
          "s": "h",
          "podd": [
           "Rob. Ryan. Red."
          ],
          "datum": [
-          "2026-11-17"
+          "2026-11-18"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna tror att Phil Parkinson får jobba ordentligt under nye sportchefen Steve Nixon innan tränarfrågan avgörs, om inte säsongen rasar. Skälen är skadekrisen och att den som skötte sommarens värvningar redan har lämnat klubben.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-18"
          ],
          "typ": "podd"
         }
@@ -2847,33 +2865,34 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Lincoln har bara vunnit en av sju hemmamatcher i ligan och har släppt in 16 mål hemma. Skribenten tycker att Wrexham ska pressa backlinjen direkt i stället för att låta hemmalaget komma till ro.",
-         "s": "h",
+         "t": "Värdarna varnar för att underskatta nykomlingen Lincoln, som stod upp bra mot Southampton och Birmingham. Wrexham måste vara offensivare och inte låta Lincoln styra matchen, och Moore får inte bli isolerad.",
+         "s": "o",
          "podd": [
-          "Racecourse Ramble"
+          "Rob. Ryan. Red."
          ],
          "datum": [
-          "2026-11-16"
+          "2026-11-18"
          ],
-         "typ": "media"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Flera i A-laget vill se Max Cleworth, mittbacken från klubbens egen akademi, bära kaptensbindeln, och båda värdarna i podden Rob. Ryan. Red. tror att han får den till slut.",
-      "Framåt är det tunnare. Racecourse Ramble efterlyser fler riktiga chanser på bortaplan, och med flera anfallsspelare skadade blir det inte lättare.",
-      "Skribenten vill att Wrexham pressar Lincolns backlinje från start i stället för att låta hemmalaget komma till ro."
+      "Spelarna i Wrexhams omklädningsrum anser att de man för man är lika bra som serieledande Birmingham, uppger podden Rob. Ryan. Red. med stöd av källor nära truppen. Samma värdar konstaterar att inget lag i serien har skapat färre klara målchanser, bara 21.",
+      "Försvaret håller, men Issa Kaboré går så högt på högerkanten att Max Cleworth lämnas ensam bakom honom, och Wolves hittade snabbt den ytan. Laget saknar dessutom en snabb spelare, så motståndarnas backlinje kan stå kvar mot Kieffer Moore, som tvingas allt längre ner och blir isolerad."
      ],
      "citat": {
-      "sagt": "Fem mål på sju bortamatcher i ligan är ingen skörd som ger särskilt många försvar i Championship sömnlösa nätter.",
+      "sagt": "Jag tror inte att man kan åka dit och låta Lincoln styra, för de kämpar precis som vi.",
       "vem": null,
-      "podd": "Racecourse Ramble",
-      "typ": "media",
-      "datum": "2026-11-16"
+      "podd": "Rob. Ryan. Red.",
+      "typ": "podd",
+      "datum": "2026-11-18"
      },
      "namn": [
-      "Max Cleworth"
+      "Issa Kaboré",
+      "Max Cleworth",
+      "Kieffer Moore"
      ]
     }
    ]
