@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T15:34:33.714Z",
+ "uppdaterad": "2026-11-20T15:45:31.917Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3888,14 +3888,21 @@
     "West Bromwich Albion"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:06:21.769Z",
-   "rubrik": "Matos stack till Strasbourg, Williams fick två dagar",
+   "skriven": "2026-11-20T15:45:31.917Z",
+   "rubrik": "Swansea fick två dagar, West Brom två veckor",
    "ingress": null,
-   "summering": "Swansea går in med en tillfällig stab och supportrar som misstänker att det knakat i klubben länge. West Brom vilar på Mephams ledarskap i en tunn backlinje och oroar sig för att Swansea hunnit hämta andan.",
+   "summering": "Swansea ställer upp med en tillfällig stab av klubbtrotjänare och frågor om vad som hände bakom kulisserna. West Brom vilar på Mephams ledarskap men måste fylla hålet efter Diakité.",
    "delar": [
     {
      "lag": "Swansea City",
      "kallor": [
+      {
+       "podd": "The JackCast",
+       "avsnitt": "AstalaVitor...Matos",
+       "datum": "2026-11-18",
+       "adress": "https://jackcast.podbean.com/e/astalavitormatos/",
+       "typ": "podd"
+      },
       {
        "podd": "Vital Swansea",
        "avsnitt": "Swansea City v West Bromwich Albion · Matos verging on an exit?",
@@ -3972,15 +3979,26 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Supportrarna ser Ben Cabango som lagets viktigaste mittback i försvarsarbetet, trots att han räknas som trea bakom Filip Lissah och Stephen Welsh, som är bättre med bollen.",
-         "s": "o",
+         "t": "Swansea har bara tagit fyra poäng av arton möjliga mot lagen på topp tio den här säsongen, och förra säsongen vann Matos en av tretton sådana matcher. Supportrarna tycker att bra resultat mot svagare lag döljer ett gammalt problem.",
+         "s": "h",
          "podd": [
-          "Swansea Independent"
+          "The JackCast"
          ],
          "datum": [
-          "2026-11-20"
+          "2026-11-18"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Med tre centerforwards, Vipotnik, Idah och Stewart, byts den som startar nästan alltid ut efter ungefär en timme. Förra säsongens skyttekung Vipotnik har bara startat tre matcher, och tillsammans har de tre bara gjort åtta mål.",
+         "s": "h",
+         "podd": [
+          "The JackCast"
+         ],
+         "datum": [
+          "2026-11-18"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -4041,17 +4059,6 @@
           "2026-11-17"
          ],
          "typ": "lokal"
-        },
-        {
-         "t": "Supportrarna tror att Matos och hans stab blev en självgod klick när laget låg först, och att de förödmjukades när motståndarna listade ut hur man spelar mot hans lag.",
-         "s": "o",
-         "podd": [
-          "Swansea Independent"
-         ],
-         "datum": [
-          "2026-11-20"
-         ],
-         "typ": "forum"
         }
        ]
       },
@@ -4059,36 +4066,38 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Supportrarna oroar sig för att West Broms tränare har haft två veckor att kartlägga Swanseas styrkor och svagheter, medan Swanseas tillfälliga ledare bara har haft två dygn på sig.",
+         "t": "Supportrarna har vant sig vid att ge upp i förväg mot topplagen, och det stör värdarna. Inför West Brom tycker de att Swansea ska gå in för att vinna, trots att laget saknar tränare.",
          "s": "o",
          "podd": [
-          "Swansea Independent"
+          "The JackCast"
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-18"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På Swansea Independent tror man att Vitor Matos och hans stab blev en självgod klick när laget låg först i serien, ”förmer än oss vanliga dödliga”, och att de förödmjukades när motståndarna listade ut hans spel.",
-      "Där misstänker man också att något stort hände redan före QPR-matchen, när ett hårt arbetande och stabilt lag plötsligt föll ihop.",
-      "Nu leder klubblegendaren Ashley Williams laget tillfälligt efter att ha tagit över träningen först i torsdags, och supportrarna oroar sig för att West Brom har haft två veckor att läsa av Swansea.",
-      "Ändå är man överens om att Matos gav laget en tydlig identitet som efterträdaren måste bygga vidare på."
+      "På forumet Swansea Independent tror man inte att Vitor Matos flytt till Strasbourg kom ur tomma intet. Staben ska ha blivit en självgod klick med ”en aura av överlägsenhet” när laget låg först, och raset mot QPR misstänks ha haft med det att göra.",
+      "Ändå är stämningen i podden The JackCast lugn. Med Ashley Williams, Leon Britton och Kris O'Leary vid sidlinjen tror man att trotjänarna kan samla läktaren. Oron gäller förberedelserna: West Broms stab har haft två veckor på sig, den tillfälliga två dygn.",
+      "Utan Marko Stamenic hänger mittfältet på Stephen Eustáquio."
      ],
      "citat": {
-      "sagt": "Profilen måste likna Vitors, eftersom vi nu har spelarna för att spela på det sättet.",
-      "vem": "trueswan16",
-      "podd": "Vital Swansea",
-      "typ": "forum",
-      "datum": "2026-11-17"
+      "sagt": "Jag måste vara ärlig och säga att jag inte riktigt ser det här som någon världens undergång heller.",
+      "vem": "Steve Carroll",
+      "podd": "The JackCast",
+      "typ": "podd",
+      "datum": "2026-11-18"
      },
      "namn": [
       "Vitor Matos",
       "Ashley Williams",
-      "Matos"
+      "Leon Britton",
+      "Kris O'Leary",
+      "Marko Stamenic",
+      "Stephen Eustáquio"
      ]
     },
     {
@@ -4099,6 +4108,13 @@
        "avsnitt": "Who was Paul Robinson’s favourite player to ‘smash’ in a tackle? Baggies Broadcast Q&A special (S10 E10)",
        "datum": "2026-11-17",
        "adress": "https://shows.acast.com/baggies-broadcast/episodes/6afb6482a7a01041bb2a22e9",
+       "typ": "podd"
+      },
+      {
+       "podd": "Albion Analysis",
+       "avsnitt": "Albion Analysis XIs: Albion's Most Underrated Players",
+       "datum": "2026-11-14",
+       "adress": "https://albionanalysis.substack.com/",
        "typ": "podd"
       },
       {
@@ -4123,22 +4139,6 @@
         {
          "t": "Lokaltidningen skriver att mittfältaren Ousmane Diakite är borta i minst två månader. Han skadade vaden i Malis landslag och missar säkert matchen mot Swansea.",
          "s": "b",
-         "podd": [
-          "Express & Star"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "lokal"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Lokaltidningens reporter tror att Rabby Nzingoula flyttas in centralt på mittfältet bredvid Jayson Molumby när Diakite saknas. Toby Collyer är enligt honom inte riktigt redo att spela.",
-         "s": "h",
          "podd": [
           "Express & Star"
          ],
@@ -4195,6 +4195,17 @@
           "2026-11-17"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Laget har många kvaliteter men saknar hot på fasta situationer. Hall saknar en huvudstark mittback som går upp på hörnor och vill gärna ha ett långt inkast som vapen igen.",
+         "s": "o",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-14"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -4227,10 +4238,9 @@
       }
      ],
      "text": [
-      "I podden Baggies Broadcast beskrivs Chris Mepham, som tog Nathaniel Phillips plats, som en sällsynt komplett mittback som styr hela backlinjen med rösten.",
-      "Han behövs, för sedan Christian Bielik såldes finns bara tre mittbackar i truppen.",
-      "Värdarna pekar också ut vad som får Isaac Price att lyfta: Callum Styles löpningar på vänsterkanten, som försvinner om Styles tvingas över till högerbacken.",
-      "Inför Swansea känner man sig ändå mindre säker än för två veckor sedan, eftersom landslagsuppehållet gett motståndaren tid att samla sig."
+      "I podden Baggies Broadcast beskrivs Chris Mepham, som tog Nathaniel Phillips plats, som en sällsynt komplett mittback: lugn, spelförståndig och med passningar genom leden. James Morrison har själv medgett att det var tungt att peta Phillips, och hans sätt att hantera folk ses som hans stora styrka. Ingen får en plats utlovad.",
+      "Värre är hålet efter Ousmane Diakité, som supportrarna numera räknar till seriens bästa mittfältare. Lokaltidningen Express & Star tror att Rabby Nzingoula flyttas in bredvid Jayson Molumby.",
+      "Swanseas svacka lugnar ingen, eftersom uppehållet har gett motståndaren tid att samla sig."
      ],
      "citat": {
       "sagt": "Han täcker i stort sett hela backlinjen med sina positioner, men också med rösten. Han är en ledare.",
@@ -4242,9 +4252,11 @@
      "namn": [
       "Chris Mepham",
       "Nathaniel Phillips",
-      "Christian Bielik",
-      "Isaac Price",
-      "Callum Styles"
+      "James Morrison",
+      "Phillips",
+      "Ousmane Diakité",
+      "Rabby Nzingoula",
+      "Jayson Molumby"
      ]
     }
    ]
