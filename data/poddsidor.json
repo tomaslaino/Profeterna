@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-17T22:42:30.641Z",
+ "uppdaterad": "2026-11-20T13:01:26.590Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,10 +103,10 @@
     "Arsenal"
    ],
    "avspark": "2026-11-21T17:30:00.000Z",
-   "skriven": "2026-11-17T22:37:00.680Z",
-   "rubrik": "Helgen utan match var Newcastles bästa på länge",
+   "skriven": "2026-11-20T13:00:59.217Z",
+   "rubrik": "Bruno återvänder till en läktare som njöt av uppehållet",
    "ingress": null,
-   "summering": "Newcastle tar emot ligaledaren med en läktare som tappat tron på Jaissle och veteraner som verkar ha gjort likadant. Arsenal vinner utan att övertyga framåt och lutar sig mot en pånyttfödd Ødegaard.",
+   "summering": "Newcastle tar emot sin gamle kapten med spelare som letar efter sina platser och en läktare som tappat tron på Jaissle. Arsenal lutar sig mot Ødegaard men tvivlar på sina anfallare.",
    "delar": [
     {
      "lag": "Newcastle United",
@@ -120,33 +120,61 @@
       },
       {
        "podd": "NOT606",
+       "avsnitt": "NUFC vs Gooners · Man City to sue the Premier League. · Toon General Matchday Thread",
+       "datum": "2026-11-20",
+       "adress": "https://not606.com/threads/nufc-vs-gooners.425568/",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
        "avsnitt": "NUFC vs Gooners · Toon General Matchday Thread · The January Transfer Window 2027",
        "datum": "2026-11-17",
        "adress": "https://not606.com/threads/nufc-vs-gooners.425568/",
        "typ": "forum"
       },
       {
-       "podd": "NOT606",
-       "avsnitt": "Toon General Matchday Thread · Merseyside Makems vs Newcastle United · Jaissle out",
-       "datum": "2026-11-16",
-       "adress": "https://not606.com/threads/toon-general-matchday-thread.386430/",
-       "typ": "forum"
+       "podd": "True Faith – Independent NUFC Fanzine",
+       "avsnitt": "TF Preview - Arsenal (h), 21 November 2026",
+       "datum": "2026-11-20",
+       "adress": "https://tf1892.substack.com/p/tf-preview-arsenal-h-21-november",
+       "typ": "media"
+      },
+      {
+       "podd": "NUFC The Mag",
+       "avsnitt": "Official Newcastle United injury update made public on Thursday ahead of Arsenal - NUFC The Mag",
+       "datum": "2026-11-19",
+       "adress": "https://www.themag.co.uk/2026/11/official-newcastle-united-injury-update-made-public-on-thursday-ahead-of-arsenal/",
+       "typ": "media"
+      },
+      {
+       "podd": "Shields Gazette",
+       "avsnitt": "Newcastle United drop Bruno Guimaraes bombshell ahead of Arsenal game",
+       "datum": "2026-11-19",
+       "adress": "https://www.shieldsgazette.com/sport/football/newcastle-united/newcastle-united-drop-bruno-guimaraes-bombshell-arsenal-9361866",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Newcastle United",
+       "avsnitt": "Matthias Jaissle's team news update: Joelinton and Livr... | NUFC",
+       "datum": "2026-11-19",
+       "adress": "https://www.newcastleunited.com/en/news/matthias-jaissles-team-news-update-joelinton-and-livramento-latest-ahead-of-arsenal-visit",
+       "typ": "lokal"
       }
      ],
      "grupper": [
       {
-       "amne": "elva",
+       "amne": "trupp",
        "punkter": [
         {
-         "t": "Värdarna menar att Sean Steurs starka match bara kom för att andra var borta, inte för att Jaissle valde honom. De vill se sommarens nyförvärv som Steur, Touré och Bamba spela; Bamba har fått tre minuter totalt.",
-         "s": "o",
+         "t": "Klubbens sajt skriver att Joelinton inte hinner bli spelklar till Arsenal. Han har inte spelat sedan förlusten mot Everton i början av november. Tränaren Matthias Jaissle vill inte säga hur länge han blir borta och väntar på besked från specialister.",
+         "s": "b",
          "podd": [
-          "True Faith NUFC Podcast"
+          "Newcastle United"
          ],
          "datum": [
-          "2026-11-15"
+          "2026-11-19"
          ],
-         "typ": "podd"
+         "typ": "lokal"
         }
        ]
       },
@@ -166,17 +194,6 @@
         },
         {
          "t": "De tidiga segrarna mot Liverpool och Spurs gav en falsk bild. Enligt Adam var de ett kaotiskt adrenalinlyft för en ny tränare, inte tecken på att ett system höll på att sätta sig.",
-         "s": "o",
-         "podd": [
-          "True Faith NUFC Podcast"
-         ],
-         "datum": [
-          "2026-11-15"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Chris förstår inte varför Yoane Wissa står i startelvan vecka efter vecka. Assisterande tränaren kallade honom i veckan en kvalitetsanfallare med rutin, men Chris säger att Wissa mest går runt på planen.",
          "s": "o",
          "podd": [
           "True Faith NUFC Podcast"
@@ -219,6 +236,17 @@
          "typ": "podd"
         },
         {
+         "t": "Supportrarna väntar sig att Bruno Guimarães blir utbuad när han kommer tillbaka med Arsenal. Flera försvarar honom ändå: han ville spela på högsta nivå under sina bästa år, och han var den förste kaptenen sedan 1955 som lyfte en inhemsk titel.",
+         "s": "o",
+         "podd": [
+          "NOT606"
+         ],
+         "datum": [
+          "2026-11-18"
+         ],
+         "typ": "forum"
+        },
+        {
          "t": "Förr kom Newcastle starkare tillbaka efter landslagsuppehåll, eftersom tränaren hade de flesta spelarna kvar hemma och kunde förbereda nästa match. Nu är nästan hela truppen ute med landslagen, så Jaissle hinner inte träna in mer än motståndarna.",
          "s": "o",
          "podd": [
@@ -244,9 +272,9 @@
       }
      ],
      "text": [
-      "Stämningen har vänt bland vanliga Newcastlesupportrar. I True Faith-podden berättar en av värdarna om en arbetskamrat som var lättad över att landslagsuppehållet gav en helg utan match, och själv är han lika orolig för klubben som han någonsin varit.",
-      "När Fabian Schär slängde tränarens lapp på marken mot Everton tolkade värdarna det som att veteranerna inte köper Jaissle, medan de yngre ser piggare ut.",
-      "Arsenal ses ändå som en gratischans, eftersom ingen väntar sig något. Enligt podden kan bara poäng här eller mot Manchester United, följt av ett bra derby mot Sunderland, vinna tillbaka läktaren."
+      "”De där svartvita jävlarna kan inte förstöra min helg”, sa en arbetskamrat till en av värdarna i podden True Faith, lättad över en helg utan match.",
+      "Spelarna har tittat mot bänken för att få veta var de ska stå. När Fabian Schär slängde Matthias Jaissles lapp i marken mot Everton tolkade man det som att veteranerna inte köper tränaren.",
+      "På forumet NOT606 är man oense om hur Bruno Guimarães ska tas emot. Några förlåter honom inte superagenten han tog in för att komma därifrån, andra minns den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
      ],
      "citat": {
       "sagt": "Vi kunde spela 490 minuter till här utan att skapa ett enda målhot. Det får vi inte se igen.",
@@ -257,7 +285,8 @@
      },
      "namn": [
       "Fabian Schär",
-      "Jaissle"
+      "Matthias Jaissle",
+      "Bruno Guimarães"
      ]
     },
     {
@@ -276,6 +305,27 @@
        "datum": "2026-11-16",
        "adress": "https://shows.acast.com/arseblog/episodes/arsecast-extra-episode-721-16112026",
        "typ": "podd"
+      },
+      {
+       "podd": "Arsenal Mania",
+       "avsnitt": "Premier League: Newcastle vs Arsenal | Saturday 21st November | 17:30 GMT | Sky Sports · Arsenal random classic matches · Noni Madueke: There is Noni to be Mad",
+       "datum": "2026-11-20",
+       "adress": "https://arsenal-mania.com/forum/threads/premier-league-newcastle-vs-arsenal-saturday-21st-november-17-30-gmt-sky-sports.37569/",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "Newcastle United vs Arsenal - Matchday Thread · Arsenal Team News and Injury Updates · Transfer Rumours Thread",
+       "datum": "2026-11-20",
+       "adress": "https://not606.com/threads/newcastle-united-vs-arsenal-matchday-thread.425572/",
+       "typ": "forum"
+      },
+      {
+       "podd": "Online Gooner",
+       "avsnitt": "ALL Transfer talk - merged thread · Peter Storey R.I.P. · VAR",
+       "datum": "2026-11-20",
+       "adress": "https://forum.onlinegooner.com/viewtopic.php?t=39417",
+       "typ": "forum"
       },
       {
        "podd": "NOT606",
@@ -299,18 +349,11 @@
        "typ": "forum"
       },
       {
-       "podd": "Arsenal Mania",
-       "avsnitt": "Premier League: Newcastle vs Arsenal | Saturday 21st November | 17:30 GMT | Sky Sports · Kai Havertz: Kais and Lows · Max Dowman: Mad Max",
-       "datum": "2026-11-17",
-       "adress": "https://arsenal-mania.com/forum/threads/premier-league-newcastle-vs-arsenal-saturday-21st-november-17-30-gmt-sky-sports.37569/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Online Gooner",
-       "avsnitt": "Other Matches Thread · ALL Transfer talk - merged thread · Forum Login - PLEASE READ",
-       "datum": "2026-11-16",
-       "adress": "https://forum.onlinegooner.com/viewtopic.php?t=39500",
-       "typ": "forum"
+       "podd": "Arseblog News",
+       "avsnitt": "Arsenal lose Zubimendi to injury, Saka four weeks from returning",
+       "datum": "2026-11-20",
+       "adress": "https://arseblog.news/2026/11/arsenal-lose-zubimendi-to-injury-saka-a-month-from-returning/",
+       "typ": "media"
       },
       {
        "podd": "football.london",
@@ -324,6 +367,17 @@
       {
        "amne": "trupp",
        "punkter": [
+        {
+         "t": "William Saliba är spelklar för första gången den här säsongen. Han har klarat en match med U21-laget och en träningsmatch bakom stängda dörrar utan problem, och Arteta säger att han är redo.",
+         "s": "b",
+         "podd": [
+          "Arseblog News"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "media"
+        },
         {
          "t": "Martín Zubimendi tog sig för baksida lår i söndags och byttes ut i Spaniens landskamp. Football.london skriver att han ska undersökas när han kommer tillbaka till England men kan ändå vara tillgänglig på lördag. Inget besked om hans skick har kommit än.",
          "s": "b",
@@ -340,22 +394,6 @@
          "s": "h",
          "podd": [
           "The ArsenalVision Podcast - Arsenal FC"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Värdarna tror inte att William Saliba startar på St James' Park. Han har bara spelat 45 minuter med U21 och brukar behöva några matcher för att komma i gång. Konsa och Gabriel har varit för stabila för att brytas upp, så Dortmund ses som hans första start.",
-         "s": "o",
-         "podd": [
-          "Arseblog Arsecast, The Arsenal Podcast"
          ],
          "datum": [
           "2026-11-16"
@@ -436,22 +474,23 @@
       }
      ],
      "text": [
-      "Arsenal vinner fortfarande men kör inte längre över någon. På Arsenal Mania konstaterar man att det blir uddamålssegrar och att anfallarna har gått kallt länge.",
-      "På forumen anses varken Kai Havertz eller Viktor Gyökeres ha visat att han kan vara lagets självklara centertank.",
-      "Ljuspunkten är Martin Ødegaard, som i Arsecast beskrivs som tillbaka i toppform och avgörande för kreativiteten.",
-      "Trygga känner sig supportrarna ändå inte: Newcastle brukar se ut som ett topplag mot Arsenal och sedan förlora mot sämre motstånd."
+      "I Arseblogs podd gläds man åt att Martin Ødegaard ”ser ut som Martin Ødegaard igen”: en av ligans bästa och den som bär kreativiteten i ett lag som inte gör mål särskilt lätt.",
+      "Längst fram är förtroendet lägre. På forumet NOT606 anses varken Viktor Gyökeres eller Kai Havertz ha visat att de kan bära anfallet, och många vill sälja en av dem.",
+      "Med Bukayo Saka skadad har Noni Madueke däremot tagit chansen till höger. De som följer honom noga ser att inläggen äntligen har blivit jämnare."
      ],
      "citat": {
-      "sagt": "Det som har varit riktigt härligt är att se Martin Ødegaard se ut som Martin Ødegaard igen.",
+      "sagt": "Kommer vi att vakna en dag och Mikel har dragit till Barcelona och alla är 32?",
       "vem": null,
       "podd": "Arseblog Arsecast, The Arsenal Podcast",
       "typ": "podd",
       "datum": "2026-11-16"
      },
      "namn": [
-      "Kai Havertz",
+      "Martin Ødegaard",
       "Viktor Gyökeres",
-      "Martin Ødegaard"
+      "Kai Havertz",
+      "Bukayo Saka",
+      "Noni Madueke"
      ]
     }
    ]
@@ -465,10 +504,10 @@
     "Leeds United"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-17T22:37:34.628Z",
-   "rubrik": "Hellre förlora med en idé än vinna utan",
+   "skriven": "2026-11-20T13:01:26.590Z",
+   "rubrik": "Chelsea vinner matcher men letar fortfarande efter en idé",
    "ingress": null,
-   "summering": "Chelsea har fått resultat men saknar en tydlig spelidé och väntar på besked om João Pedro. Leeds supportrar trivs, men grälar om Rodon och oroar sig för att arenabygget ska kosta dem Trafford.",
+   "summering": "Chelsea saknar en röd tråd i spelet och har mittbackar som lämnar sina positioner. I Leeds hänger mycket på om Farke väljer tre anfallare eller ett tätare mittfält.",
    "delar": [
     {
      "lag": "Chelsea",
@@ -486,6 +525,13 @@
        "datum": "2026-11-16",
        "adress": "https://podcasts.apple.com/gb/podcast/london-is-blue-chelsea-fc-podcast/id914691565?uo=4",
        "typ": "podd"
+      },
+      {
+       "podd": "The Shed End",
+       "avsnitt": "Xabi Alonso - New Chelsea Manager · BlueCo buy Chelsea FC · Our New Stadium",
+       "datum": "2026-11-20",
+       "adress": "https://www.theshedend.com/threads/xabi-alonso-new-chelsea-manager.37502/",
+       "typ": "forum"
       },
       {
        "podd": "The Shed End",
@@ -608,27 +654,39 @@
       }
      ],
      "text": [
-      "Under Xabi Alonso kontrar Chelsea i ett ena veckan och jagar bollinnehav nästa, ibland i samma match, och i podden London Is Blue skulle man ”hellre se brist på resultat än brist på filosofi”. Resultaten anses dessutom ha smickrat laget, och sedan João Pedro skadade sig har anfallet fallit platt.",
-      "Chelsea-skribenten Si Phillips håller det öppet om han hinner tillbaka till lördag.",
-      "Ljuspunkten är Jordan Henderson. Han var tänkt som reserv men har blivit en av lagets bättre centrala mittfältare, även om supportrarna tycker att systemet låter honom springa fram och tillbaka alldeles för mycket."
+      "Under Xabi Alonso kontrar Chelsea i ena matchen och jagar bollinnehav i nästa, ibland båda i samma match. I podden London Is Blue skulle man hellre se ”brist på resultat än brist på filosofi”.",
+      "Värdarna tycker att resultaten har smickrat laget och att anfallet föll ihop när João Pedro skadade sig. På forumet The Shed End tror man ändå inte att hans eventuella återkomst räcker, eftersom anfallet inte fungerade när han spelade heller.",
+      "Mest oro väcker mittbackarna. Det vertikala spelet gör att bollen snabbt kommer tillbaka, och då måste de försvara omställningar ute på kanterna, något de inte trivs med."
      ],
      "citat": {
-      "sagt": "När man försöker spela en väldigt vertikal fotboll kommer bollen tillbaka dubbelt så fort som man själv.",
-      "vem": "Sam",
-      "podd": "London Is Blue - Chelsea FC Podcast",
-      "typ": "podd",
-      "datum": "2026-11-16"
+      "sagt": "Hur ställer man upp laget för att kompensera för två mittbackar som alltför ofta är som bortblåsta?",
+      "vem": "dermott",
+      "podd": "The Shed End",
+      "typ": "forum",
+      "datum": "2026-11-20"
      },
      "namn": [
       "Xabi Alonso",
-      "João Pedro",
-      "Si Phillips",
-      "Jordan Henderson"
+      "João Pedro"
      ]
     },
     {
      "lag": "Leeds United",
      "kallor": [
+      {
+       "podd": "Marching On Together",
+       "avsnitt": "Chelsea vs Leeds United Match Thread · Chelsea v Leeds Outcome - Poll of the Day (20th Nov) · How are you feeling about the Chelsea game? Poll of the Day 2 (19th Nov)",
+       "datum": "2026-11-20",
+       "adress": "https://www.motforum.com/phpbb/viewtopic.php?t=50493",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "Chelsea v Leeds Utd Match Thread · Predict 6 - Premier League 2026-27 · The #LUFC Breakfast Debate (Friday 20th November)",
+       "datum": "2026-11-20",
+       "adress": "https://not606.com/threads/chelsea-v-leeds-utd-match-thread.425590/",
+       "typ": "forum"
+      },
       {
        "podd": "Marching On Together",
        "avsnitt": "The #LUFC Breakfast Debate (Tuesday 17th November) Leeds can frustrate Chelsea if João Pedro is absent · Guess the ground · Should Rodon return to first team after the international break - Poll of the Day (17th Nov)",
@@ -641,13 +699,6 @@
        "avsnitt": "Predict 6 - Premier League 2026-27 · OLOF's political thread · The #LUFC Breakfast Debate (Tuesday 17th November)",
        "datum": "2026-11-17",
        "adress": "https://not606.com/threads/predict-6-premier-league-2026-27.424077/",
-       "typ": "forum"
-      },
-      {
-       "podd": "NOT606",
-       "avsnitt": "OLOF's political thread · The #LUFC Breakfast Debate (Friday 13th November) · The #LUFC Breakfast Debate (Monday 15th November)",
-       "datum": "2026-11-16",
-       "adress": "https://not606.com/threads/olofs-political-thread.353454/",
        "typ": "forum"
       }
      ],
@@ -665,15 +716,20 @@
           "2026-11-17"
          ],
          "typ": "forum"
-        },
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
         {
-         "t": "Andra supportrar vill ha Rodon på bänken mot Chelsea. Försvaret har hållit tätt, och efter tio veckors skada följt av två hela landskamper för Wales vill de hellre se honom starta hemma mot Coventry veckan efter.",
+         "t": "Enligt supportrarna avgörs matchen av Farkes elva. Med Calvert-Lewin, Okafor och Wilson samtidigt blir mittfältet för tunt, och Rogers och Palmer får för stora ytor. De vill se ett tremannamittfält, gärna med Stach tillbaka.",
          "s": "o",
          "podd": [
           "Marching On Together"
          ],
          "datum": [
-          "2026-11-17"
+          "2026-11-19"
          ],
          "typ": "forum"
         }
@@ -683,46 +739,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Supportrarna känner sig ovanligt positiva till klubben just nu. De pekar på en hygglig tabellplacering, flera kvalitetsspelare och den planerade utbyggnaden av Elland Road, och minns att Leeds för inte länge sedan inte ens ägde sin egen arena.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "En äldre supporter påminner om 1956. Läktarbranden då slutade med att klubben sålde John Charles för att finansiera bygget. Han är rädd att utbyggnaden av arenan nu ska betalas med försäljningar av James Trafford och Tarik Muharemovic.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Trots att laget ligger bra till är stämningen att Europaspel skulle komma för tidigt. Supportrarna tycker att truppen är för tunn, och de oroar sig för att skador och avstängningar skulle kunna dra ner laget mot nedflyttningsstrecket.",
+         "t": "En klar majoritet av supportrarna är optimistiska. Experterna ger Leeds ingen chans, men många räknar med minst en poäng och tror att laget kan överraska.",
          "s": "o",
          "podd": [
           "Marching On Together"
          ],
          "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "En supporter går emot de andra och säger att Leeds är redo för Europa nu. Han vill då att klubben slutar värva åldrande vandringsspelare och i stället tar in unga talanger som Cresswell och Bahoya.",
-         "s": "o",
-         "podd": [
-          "Marching On Together"
-         ],
-         "datum": [
-          "2026-11-17"
+          "2026-11-19"
          ],
          "typ": "forum"
         }
@@ -731,6 +754,28 @@
       {
        "amne": "match",
        "punkter": [
+        {
+         "t": "Supportrarna ser en match där Chelseas svaga backlinje möter ett Leeds som slarvar framåt men står stadigt bakåt. Mittfältet ska avgöra, och de räknar inte med att släppa in sex mål i en andra halvlek igen.",
+         "s": "o",
+         "podd": [
+          "Marching On Together"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Supportrarna oroar sig för domaren Michael Oliver. De menar att han bryter spelet, har delat ut tre röda kort på tre matcher och kommer att gå på Chelseas filmningar. Leeds vann bara en av fem matcher med honom förra säsongen.",
+         "s": "o",
+         "podd": [
+          "NOT606"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "forum"
+        },
         {
          "t": "Ett Leeds-poddsamtal som supportrarna lyfter fram menar att Chelsea har slutat skapa chanser sedan förlusten mot Brentford. Utan João Pedro som fokuspunkt för Palmer och Rogers ser de en enkel väg till poäng, om Leeds kan frustrera hemmalaget.",
          "s": "b",
@@ -752,26 +797,41 @@
           "2026-11-17"
          ],
          "typ": "forum"
+        },
+        {
+         "t": "Cupförlusten med 3–6 på Stamford Bridge i september ser supportrarna som en följd av en hopplockad cupelva, och de drar inga slutsatser av den inför lördagen.",
+         "s": "o",
+         "podd": [
+          "Marching On Together"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "forum"
         }
        ]
       }
      ],
      "text": [
-      "På NOT606 drar en äldre supporter fram 1956, då en läktarbrand slutade med att klubben sålde John Charles för att betala bygget. Nu när Elland Road ska byggas ut fruktar han att notan landar på James Trafford och Tarik Muharemovic. Många tror ändå att Trafford stannar, eftersom det var i Leeds han blev landslagsspelare.",
-      "Om Joe Rodon är forumet kluvet. En del vill ha honom rakt in i en backlinje som har saknat fart, andra vill spara honom till Coventry efter den långa skadefrånvaron och de fulla landskamperna för Wales."
+      "På forumet Marching On Together tror man att matchen avgörs redan när Farke tar ut laget.",
+      "Startar Calvert-Lewin, Okafor och Wilson tillsammans blir mittfältet för tunt, och då får Rogers och Palmer stora ytor. Supportrarna vill hellre se tre centrala mittfältare, gärna med Stach tillbaka.",
+      "Joe Rodon delar läktaren. En del vill ha in honom direkt, eftersom backlinjen har saknat fart utan honom. Andra vill spara honom till hemmamatchen mot Coventry, efter tio veckors skada och två fulla landskamper för Wales."
      ],
      "citat": {
-      "sagt": "Det är inte värt risken för mig om han har spelat två hela matcher efter tio veckor borta.",
-      "vem": "Johnthewhite",
+      "sagt": "Jag skulle älska att slå dem på deras egen sophög och köra upp London-förbannelsen där bak på dem.",
+      "vem": "CUSSIE01",
       "podd": "Marching On Together",
       "typ": "forum",
-      "datum": "2026-11-17"
+      "datum": "2026-11-19"
      },
      "namn": [
-      "John Charles",
-      "James Trafford",
-      "Tarik Muharemovic",
-      "Trafford",
+      "Farke",
+      "Calvert-Lewin",
+      "Okafor",
+      "Wilson",
+      "Rogers",
+      "Palmer",
+      "Stach",
       "Joe Rodon"
      ]
     }
