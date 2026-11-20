@@ -15,29 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-20T13:17:17.548Z",
+ "skriven": "2026-11-20T13:32:37.726Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-20T13:06:42.290Z",
+ "underlag": "2026-11-20T13:26:44.411Z",
  "rubrik": {
-  "id": "401879238",
-  "kick": "NOTTINGHAM FOREST",
+  "id": "401880154",
+  "kick": "WATFORD",
   "rad": [
    [
-    "GLASNERS",
+    "FANSEN",
     0
    ],
    [
-    "ANSIKTE",
+    "HOPPAS PÅ",
     0
    ],
    [
-    "PÅ ARSLET",
+    "STORSTRYK",
     1
    ]
   ],
-  "under": "Efter 3–1 mot City har en före detta kritiker på Forest Forum tatuerat in tränaren",
-  "plus": "WATFORDFANS VILL FÖRLORA",
-  "plusId": "401880154"
+  "under": "Flera på WFC Forums hoppas på förlust ”med rekordsiffror”, så djupt går missnöjet med ledningen.",
+  "plus": "GLASNER TATUERAD PÅ ARSLET",
+  "plusId": "401879238"
  }
 }
