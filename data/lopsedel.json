@@ -15,29 +15,33 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-20T15:35:20.288Z",
+ "skriven": "2026-11-20T15:50:41.459Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-20T15:34:33.714Z",
+ "underlag": "2026-11-20T15:45:31.917Z",
  "rubrik": {
-  "id": "401880154",
-  "kick": "WATFORD",
+  "id": "401879238",
+  "kick": "FOREST",
   "rad": [
    [
-    "EGNA FANSEN",
+    "GLASNERS",
     0
    ],
    [
-    "HOPPAS PÅ",
+    "ANSIKTE PÅ",
     0
    ],
    [
-    "STORSTRYK",
+    "SUPPORTERNS",
+    0
+   ],
+   [
+    "BAKDEL",
     1
    ]
   ],
-  "under": "Ilskan mot ledningen så stor att flera supportrar hoppas på förlust med rekordsiffror.",
-  "plus": "FANS TVIVLAR PÅ GYÖKERES",
-  "plusId": "401879232"
+  "under": "Efter 3–1 mot City skriver en supporter att han har Glasners ansikte tatuerat på bakdelen",
+  "plus": "WATFORDFANS VILL HA STRYK",
+  "plusId": "401880154"
  }
 }
