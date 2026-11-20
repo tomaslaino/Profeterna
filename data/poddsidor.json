@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T14:26:03.432Z",
+ "uppdaterad": "2026-11-20T14:48:46.237Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2355,14 +2355,21 @@
     "Portsmouth"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:03:55.713Z",
-   "rubrik": "Portsmouths nya mittfältsnav hänger på en vad",
+   "skriven": "2026-11-20T14:38:05.982Z",
+   "rubrik": "Bolton grälar om pressen som ger flest mål",
    "ingress": null,
-   "summering": "I Bolton pratar man om Max Lotts lovande första start. Portsmouth väntar på besked om Iyad Mohamed, och på vem av Adams och Shein som får chansen om han saknas.",
+   "summering": "I Bolton går debatten om pressen het, och de fasta situationerna oroar. Portsmouth väntar besked om Mohamed, som har gjort mittfältsplatsen till sin men nu kan ersättas av Adams eller Shein.",
    "delar": [
     {
      "lag": "Bolton Wanderers",
      "kallor": [
+      {
+       "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
+       "avsnitt": "Portsmouth & West Bromwich Albion - The Preview Show",
+       "datum": "2026-11-19",
+       "adress": "https://podcasters.spotify.com/pod/show/ben-timberlake2/episodes/Portsmouth--West-Bromwich-Albion---The-Preview-Show-e3smscp",
+       "typ": "podd"
+      },
       {
        "podd": "The Bolton News",
        "avsnitt": "Why Bolton Wanderers have high hopes for ex-Aston Villa winger Max Lott",
@@ -2373,24 +2380,119 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
+       "amne": "spel",
        "punkter": [
         {
-         "t": "Den 19-årige yttern Max Lott, som kom från Aston Villa i somras, startade nyligen borta mot Charlton och satt på bänken mot Wolves. Enligt U21-tränaren Julian Darby tyckte spelarna att han gjorde en bra första match.",
-         "s": "b",
+         "t": "Statistikern Cal tycker att Boltons press slår fel. Laget gör flest mål i serien på bollvinster högt upp men vinner bollen sällan där. Han vill att Steven Schumacher går över till ett mittblock i 4-4-2 i stället för den manskapsbaserade pressen.",
+         "s": "o",
          "podd": [
-          "The Bolton News"
+          "The Fanzone Pod - Bolton Wanderers Podcast"
          ],
          "datum": [
-          "2026-11-18"
+          "2026-11-19"
          ],
-         "typ": "lokal"
+         "typ": "podd"
+        },
+        {
+         "t": "En av värdarna håller inte med om mittblocket. Han vill aldrig se Bolton backa hem, eftersom han tycker att de flesta chanserna kommer när laget vinner bollen högt upp.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Cole ville se Bolton gå över till tre eller fem i backlinjen redan efter förra landslagsuppehållet. Han tror att Schumacher kan överraska med en ny uppställning nu, eftersom laget behöver en förändring.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Liam kallar kapten Josh Sheehan den kanske viktigaste spelaren bakom Boltons väg tillbaka till Championship. Nu när laget spelar mer i omställningar än i bollinnehav passar hans långa passningar ännu bättre.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna tycker att Boltons spelare är för låsta i sina positioner. De önskar sig en mer rörlig spelare på vänsterkanten, och en av dem säger rakt ut att han inte står ut med Thierry Gale.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna ser försvarsspelet vid fasta situationer som Boltons akilleshäl den här säsongen. Det väger tungt mot ett Portsmouth som har gjort sju mål på fasta situationer.",
+         "s": "h",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Andra lags supportrar hånar ofta Gavin Bazunu, men i Bolton anser man att han har gjort det mycket bra sedan han kom. Han är ingen sensation, men har överraskat dem som tvivlade.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Cole medger att avståndet mellan League One och Championship var större än han trodde. Ändå ser han ingen anledning till panik, eftersom de underliggande siffrorna är positiva och laget har skaffat sig en marginal nedåt.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Den 19-årige yttern Max Lott, som kom från Aston Villa i somras, startade nyligen borta mot Charlton och satt på bänken mot Wolves. Enligt U21-tränaren Julian Darby tyckte spelarna att han gjorde en bra första match."
+      "Bolton gör flest mål i serien på bollvinster högt upp, men statistikern Cal i The Fanzone Pod tycker ändå att pressen slår fel. Han vill att Steven Schumacher byter den manskapsbaserade pressen mot ett mittblock. En av värdarna vägrar och vill ”aldrig se oss backa hem”.",
+      "Om kapten Josh Sheehan är man däremot enig: han är kanske den viktigaste spelaren bakom vägen tillbaka, och i omställningsspelet kommer hans långa passningar ännu mer till sin rätt.",
+      "Oron gäller fasta situationer, säsongens akilleshäl, mot ett Portsmouth som har gjort sju mål på just sådana."
+     ],
+     "citat": {
+      "sagt": "De underliggande siffrorna ser riktigt bra ut för vår del. Det är absolut inte läge för panik, inte på långa vägar.",
+      "vem": "Cole",
+      "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
+      "typ": "podd",
+      "datum": "2026-11-19"
+     },
+     "namn": [
+      "Steven Schumacher",
+      "Josh Sheehan"
      ]
     },
     {
@@ -2450,8 +2552,14 @@
       }
      ],
      "text": [
-      "Lokaltidningen skriver att Iyad Mohamed, som missade matchen mot Stoke med en vadskada, är 50-50 till Bolton. Tränaren John Mousinho sa på presskonferensen att Mohamed annars spelar mot West Ham eller Wrexham. Lokaltidningen skriver att inga andra skadade spelare är aktuella mot Bolton. Keshi Anderson har flera veckor kvar till comeback och Márk Kosznovszky väntas vara borta i sex veckor.",
-      "Lokaltidningen skriver att Mohamed har startat sex av de senaste sju matcherna och hållit Ebrima Adams och Rocco Robert Shein utanför elvan. Saknas han bör någon av dem in på mittfältet."
+      "Iyad Mohamed har tagit en ordinarie plats på Portsmouths mittfält. Den defensive mittfältaren har hållit både Ebrima Adams och Rocco Robert Shein utanför elvan.",
+      "Nu bedömer lokaltidningen The News honom som 50-50 efter vadskadan som höll honom borta mot Stoke. John Mousinho sa på presskonferensen att Mohamed annars spelar mot West Ham eller Wrexham. Saknas han är det Adams eller Shein som ska ta platsen."
+     ],
+     "namn": [
+      "Iyad Mohamed",
+      "Ebrima Adams",
+      "Rocco Robert Shein",
+      "John Mousinho"
      ]
     }
    ]
