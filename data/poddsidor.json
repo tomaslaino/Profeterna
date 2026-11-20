@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T13:40:37.280Z",
+ "uppdaterad": "2026-11-20T13:59:11.465Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -864,14 +864,21 @@
     "Ipswich Town"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:01:55.322Z",
-   "rubrik": "Hemma hos Spurs är varje match ett lotteri",
+   "skriven": "2026-11-20T13:52:35.367Z",
+   "rubrik": "Ipswich hoppas att Spurs är lika goda värdar",
    "ingress": null,
-   "summering": "Tottenham kommer fram till bra lägen men saknar någon som skapar chanserna. Ipswich har en dirigent i Palacios men ett försvar som brukar släppa in mål tidigt.",
+   "summering": "Spurs saknar fortfarande en spelfördelare som gör hemmamatcherna till mer än lotterier, medan Ipswich vill ligga lågt och kontra med ett försvar som släpper in flest mål av alla under första kvarten.",
    "delar": [
     {
      "lag": "Tottenham Hotspur",
      "kallor": [
+      {
+       "podd": "The Extra Inch (Spurs Podcast)",
+       "avsnitt": "Behind The Lines: Ipswich at Home with Alex Griffin",
+       "datum": "2026-11-19",
+       "adress": "https://podcasts.apple.com/gb/podcast/the-extra-inch-spurs-podcast/id1337670733?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "The Extra Inch (Spurs Podcast)",
        "avsnitt": "A Creative International Moment",
@@ -1051,26 +1058,31 @@
       }
      ],
      "text": [
-      "”I stort sett varje hemmamatch är ett lotteri”, säger man i The Fighting Cock. Laget tar sig fram till bra lägen under De Zerbi men skapar inga chanser därifrån.",
-      "The Extra Inch ser ett systemfel. När Spurs lockar fram motståndaren dras även tian ner mot bollen, och sista tredjedelen står tom. Kudus får inte längre två försvarare på sig, och när han förlorar duellerna ett mot ett faller uppspelet ihop.",
-      "På forumet vill många avbryta lånet av Mudryk i januari, sedan han enligt en podd ska ha sagt att han bara är där för att ta sig tillbaka till Chelsea."
+      "I podden The Fighting Cock kallas varje hemmamatch för ett lotteri: Spurs tar sig fram till bra lägen men skapar nästan inga chanser därifrån.",
+      "Grundfelet är tian. Maddison klarar inte 90 minuter vecka efter vecka, och när laget lockar fram motståndarna drar det samtidigt ner tian mot bollen, så att sista tredjedelen står tom.",
+      "Förlusten i Leeds visade dessutom vägen för gästerna. Gör matchen till dueller och slå långt mot en stark anfallare, för Spurs vinner knappt en defensiv nick med någon auktoritet."
      ],
      "citat": {
-      "sagt": "Vill man slå Spurs är det bästa sättet, om man har en Calvert-Lewin på topp, att bara slå långt.",
-      "vem": "Sean",
-      "podd": "The Fighting Cock (Tottenham Hotspur Podcast)",
+      "sagt": "Vi har ju blivit väldigt goda värdar på sistone.",
+      "vem": "Bardi",
+      "podd": "The Extra Inch (Spurs Podcast)",
       "typ": "podd",
-      "datum": "2026-11-16"
+      "datum": "2026-11-19"
      },
      "namn": [
-      "De Zerbi",
-      "Kudus",
-      "Mudryk"
+      "Maddison"
      ]
     },
     {
      "lag": "Ipswich Town",
      "kallor": [
+      {
+       "podd": "Blue Monday: An Ipswich Town Podcast",
+       "avsnitt": "🔍 TOTTENHAM V IPSWICH TOWN MATCH PREVIEW | PREMIER LEAGUE | The Prematch Show",
+       "datum": "2026-11-19",
+       "adress": "https://shows.acast.com/bluemondaypodcast/episodes/tottenham-v-ipswich-town-match-preview-premier-league-the-p",
+       "typ": "podd"
+      },
       {
        "podd": "Blue Monday: An Ipswich Town Podcast",
        "avsnitt": "📊 WHO ARE TOWN'S TOP PERFORMERS?? | PREMIER LEAGUE | The Flagship Show",
@@ -1112,6 +1124,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Värdarna menar att Ipswich inte klarar kontraktet om laget fortsätter släppa in två mål per match. De vill gå över till tre mittbackar, med Jacob Greaves in för fysik, vänsterfotsbalans och hans samspel med Leif Davis.",
+         "s": "o",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Christian Walton flyttas ner i rankningen. Supportrarna anser att han bär skulden för minst tre insläppta mål sedan förra landslagsuppehållet och att han inte håller Premier League-klass, men de tror inte att han petas. En debatt om Kjell Scherpen väntar.",
          "s": "o",
          "podd": [
@@ -1143,28 +1166,6 @@
           "2026-11-19"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Exequiel Palacios flyttas upp till högsta nivån. Värdarna beskriver honom som lagets dirigent som styr medspelarna med foten på bollen, och menar att han måste hålla den här nivån om Ipswich ska klara kontraktet.",
-         "s": "o",
-         "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Julio Enciso ses som lagets enda riktiga matchvinnare och största hot. Supportrarna förstår att folk retar sig när han tappar bollen, men menar att det är just därför han spelar: han försöker det som ingen annan gör.",
-         "s": "o",
-         "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
-         ],
-         "datum": [
-          "2026-11-14"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -1183,13 +1184,24 @@
          "typ": "podd"
         },
         {
-         "t": "Värdarna oroar sig för att lagets tre bästa spelare den här säsongen, Enciso, Palacios och Ouattara, kanske inte är kvar nästa säsong. Ouattara har som högerback blivit en av de viktigaste spelarna.",
+         "t": "Supportrarna kände att det började glida efter en mycket bra inledning fram till första landslagsuppehållet. De tycker att laget behöver fräschas upp över hela planen.",
          "s": "o",
          "podd": [
           "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-14"
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna påpekar att sommarens pengar gick till anfall och mittfält medan försvaret knappt rördes. Tre av fem i backlinjen och målvakten är kvar från förra säsongens Championship-lag.",
+         "s": "o",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
          ],
          "typ": "podd"
         }
@@ -1213,20 +1225,20 @@
       }
      ],
      "text": [
-      "På TWTD fruktar man starten. Ipswich släpper in flest mål av alla under matchernas första kvart, och en supporter ser framför sig hur ett tidigt mål ger Spurs självförtroende.",
-      "I podden Blue Monday får Christian Walton skulden för minst tre insläppta mål sedan förra landslagsuppehållet. Han anses inte hålla Premier League-klass, men ingen tror att han petas.",
-      "Exequiel Palacios har i stället blivit lagets dirigent, som med foten på bollen visar medspelarna var de ska stå: ”Det är en fröjd att se.”"
+      "I podden Blue Monday är man ense om var kontraktet avgörs: fortsätter Ipswich att släppa in två mål per match åker laget ur.",
+      "Christian Walton pekas ut för minst tre baklängesmål sedan förra landslagsuppehållet, men han anses ändå vara den bästa av klubbens tre A-lagsmålvakter.",
+      "Planen är att ligga kompakt, göra hemmapubliken nervös och slå snabbt i ytorna bakom Spurs offensiva ytterbackar.",
+      "På forumet TWTD ser en supporter haken. Inget lag släpper in fler mål under matchernas första kvart."
      ],
      "citat": {
-      "sagt": "Vi vet alla att om vi fortsätter att släppa in mål i den här takten så åker vi ur.",
+      "sagt": "Om vi gör första målet känner jag mig ganska säker på oss.",
       "vem": null,
       "podd": "Blue Monday: An Ipswich Town Podcast",
       "typ": "podd",
-      "datum": "2026-11-14"
+      "datum": "2026-11-19"
      },
      "namn": [
-      "Christian Walton",
-      "Exequiel Palacios"
+      "Christian Walton"
      ]
     }
    ]
@@ -1240,10 +1252,10 @@
     "Sunderland"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:02:25.561Z",
-   "rubrik": "Villa kräver seger och fruktar sitt eget slarv",
+   "skriven": "2026-11-20T13:59:11.465Z",
+   "rubrik": "En 19-åring får bära Sunderlands sköra optimism",
    "ingress": null,
-   "summering": "Villa går in med en omdiskuterad målvakt och ett sårbart luftspel. Sunderland saknar både sin anfallare och sin kapten och sätter sin tilltro till en mittfältare utan en enda start i Premier League.",
+   "summering": "Villa kräver seger men tvivlar på målvakten och luftspelet. Sunderland saknar sin ryggrad och lägger ett tungt ansvar på en tonåring med en enda start bakom sig.",
    "delar": [
     {
      "lag": "Aston Villa",
@@ -1390,13 +1402,13 @@
       }
      ],
      "text": [
-      "På Vital Villa är man oense om Zion Suzuki. Den ena sidan menar att målvakten har kostat laget segern i båda de senaste matcherna och påminner om bollen han tappade framför en motspelare mot United. Den andra tycker att han redan är ”ljusår före Martínez” i samma ålder.",
-      "Utan Amadou Onana blir luftspelet en tydlig svaghet. Pau Torres och Lindelöf beskrivs som bra men långsamma och svaga i huvudspelet, och att sätta in Mings skapar enligt supportrarna nya problem.",
-      "Allt annat än seger räknas som tappade poäng, men under kravet ligger den gamla rädslan för hur Villa brukar slarva bort lägen på hemmaplan."
+      "En del på Vital Villa anser att Zion Suzuki har ”kostat oss två segrar på två matcher” med sin osäkra bollhantering. Andra försvarar honom hårt: Martínez gjorde misstag nog, och Suzuki ligger redan långt före där Martínez var i samma ålder.",
+      "Större oro väcker luftspelet. Pau Torres och Lindelöf ses som bra men långsamma och svaga i huvudspelet, och utan Amadou Onana blir det en tydlig svaghet.",
+      "Allt annat än seger räknas som tappade poäng, men under kraven ligger den gamla rädslan: ”Det här är Villa på Villa Park.”"
      ],
      "citat": {
-      "sagt": "Det här är Villa på Villa Park. Vi kan segla mot en seger, och sen … oj.",
-      "vem": "Villan57",
+      "sagt": "Vi verkar alltid släppa in ett dumt mål, så vi behöver nog göra två för att vinna.",
+      "vem": "ironside",
       "podd": "Vital Villa",
       "typ": "forum",
       "datum": "2026-11-19"
@@ -1404,15 +1416,22 @@
      "namn": [
       "Zion Suzuki",
       "Martínez",
-      "Amadou Onana",
+      "Suzuki",
       "Pau Torres",
       "Lindelöf",
-      "Mings"
+      "Amadou Onana"
      ]
     },
     {
      "lag": "Sunderland",
      "kallor": [
+      {
+       "podd": "Wise Men Say",
+       "avsnitt": "PREVIEW | ASTON VILLA (A)",
+       "datum": "2026-11-19",
+       "adress": "https://shows.acast.com/wisemensay/episodes/preview-aston-villa-a26",
+       "typ": "podd"
+      },
       {
        "podd": "Ready To Go",
        "avsnitt": "Team and formation for Villa · Aston Villa (A) · Villa match in Alicante on Saturday",
@@ -1535,6 +1554,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Supportrarna tror att 19-årige Jules Ahoka får bära mittfältet tillsammans med Sadiki tills Xhaka är tillbaka, kanske i januari. Med åtta, nio matcher på kort tid är det tungt för en spelare som knappt har spelat, och prestationerna kan sjunka.",
+         "s": "o",
+         "podd": [
+          "Wise Men Say"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna menar att Brian Brobbeys frånvaro märks i hela laget, inte bara i målen. Med Wilson Isidor på topp måste laget spela på ett helt annat sätt, och då tappar de övriga spelarna det självförtroende som Brobbey ger.",
          "s": "o",
          "podd": [
@@ -1544,17 +1574,6 @@
           "2026-11-19"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Andra säger emot: Régis Le Bris spelar Hume på kanten för att han vill ha en extra försvarare på planen. Han skulle göra det även med en riktig högerytter i truppen och bara byta in yttern senare.",
-         "s": "o",
-         "podd": [
-          "Ready To Go"
-         ],
-         "datum": [
-          "2026-11-20"
-         ],
-         "typ": "forum"
         }
        ]
       },
@@ -1562,39 +1581,38 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "En supporter menar att det är rekryteringen som ska klandras för att Trai Hume, en hygglig breddspelare, måste spela varje match. Klubben köpte ingen riktig högerytter i somras, och det är enligt honom inte tränaren Le Bris fel.",
+         "t": "Stämningen efter Chelsea-segern är skör. Förlorar Sunderland stort och Ahoka gör en dålig match tror Stephen Goldsmith att läktaren snabbt faller tillbaka i pessimismen från tidigare.",
          "s": "o",
          "podd": [
-          "Ready To Go"
+          "Wise Men Say"
          ],
          "datum": [
-          "2026-11-20"
+          "2026-11-19"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Brian Brobbeys frånvaro märks i hela laget, inte bara i målen, menar man på NOT606. Med Wilson Isidor på topp måste Sunderland spela på ett annat sätt, och självförtroendet sjunker.",
-      "Utan Granit Xhaka väntas Jules Ahoka göra sin första Premier League-start på det djupaste mittfältet, skriver Sunderland Echo. Régis Le Bris medger att Ahoka ibland har haft det svårt i cupspelet men säger att han vill lära sig.",
-      "På Ready To Go skulle en supporter se 0–0 som fantastiskt och fruktar att Manzambi ska ”terrorisera” högerkanten när Mukiele flyttas in som mittback."
+      "Det är 19-årige Jules Ahoka som väntas ta Granit Xhakas plats längst ner på mittfältet, i sin första start i Premier League. I podden Wise Men Say undrar man hur länge han och Sadiki orkar bära mittfältet med ett tätt spelschema framför sig.",
+      "Stämningen efter segern mot Chelsea är skör, och gör Ahoka en mardrömsmatch väntas läktaren snabbt falla tillbaka i den gamla pessimismen.",
+      "På forumet NOT606 menar man att Brian Brobbeys frånvaro märks i hela laget. Med Wilson Isidor på topp blir spelet ett helt annat, och självförtroendet sjunker."
      ],
      "citat": {
-      "sagt": "Isidor klarar verkligen inte rollen som ensam anfallare på den här nivån, och vi måste ändra vårt sätt att spela.",
-      "vem": "Father Jack Hackett",
-      "podd": "Ready To Go",
-      "typ": "forum",
-      "datum": "2026-11-20"
+      "sagt": "Kan vi spela som i söndags är jag mer än säker på att vi tar minst en poäng. Men klarar vi det utan Brobbey?",
+      "vem": "Jordan Harrington",
+      "podd": "Wise Men Say",
+      "typ": "podd",
+      "datum": "2026-11-19"
      },
      "namn": [
-      "Brian Brobbey",
-      "Wilson Isidor",
-      "Granit Xhaka",
       "Jules Ahoka",
-      "Régis Le Bris",
-      "Manzambi",
-      "Mukiele"
+      "Granit Xhakas",
+      "Sadiki",
+      "Ahoka",
+      "Brian Brobbeys",
+      "Wilson Isidor"
      ]
     }
    ]
