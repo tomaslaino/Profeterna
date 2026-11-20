@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T13:06:42.290Z",
+ "uppdaterad": "2026-11-20T13:26:44.411Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,10 +103,10 @@
     "Arsenal"
    ],
    "avspark": "2026-11-21T17:30:00.000Z",
-   "skriven": "2026-11-20T13:00:59.217Z",
-   "rubrik": "Bruno återvänder till en läktare som njöt av uppehållet",
+   "skriven": "2026-11-20T13:18:52.171Z",
+   "rubrik": "Matchfri helg var den bästa på länge i Newcastle",
    "ingress": null,
-   "summering": "Newcastle tar emot sin gamle kapten med spelare som letar efter sina platser och en läktare som tappat tron på Jaissle. Arsenal lutar sig mot Ødegaard men tvivlar på sina anfallare.",
+   "summering": "Newcastle har en tränare som håller på att tappa både läktaren och veteranerna. Arsenal vinner sent och snålt, men supportrarna litar inte på anfallet framför Ødegaard.",
    "delar": [
     {
      "lag": "Newcastle United",
@@ -272,26 +272,33 @@
       }
      ],
      "text": [
-      "”De där svartvita jävlarna kan inte förstöra min helg”, sa en arbetskamrat till en av värdarna i podden True Faith, lättad över en helg utan match.",
-      "Spelarna har tittat mot bänken för att få veta var de ska stå. När Fabian Schär slängde Matthias Jaissles lapp i marken mot Everton tolkade man det som att veteranerna inte köper tränaren.",
-      "På forumet NOT606 är man oense om hur Bruno Guimarães ska tas emot. Några förlåter honom inte superagenten han tog in för att komma därifrån, andra minns den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
+      "En värd i True Faith-podden har en arbetskamrat som var lättad över att landslagsuppehållet gav en helg utan match, och själv har han aldrig varit mer orolig för klubben.",
+      "Matthias Jaissle bygger sitt spel på en tia som truppen saknar, och spelarna har tittat mot bänken för att få veta var de ska stå. Att Fabian Schär slängde tränarens lapp på marken mot Everton ses som ett tecken på att veteranerna inte köper honom.",
+      "Nu kommer Bruno Guimarães hem i Arsenaltröjan. På forumet försvarar somliga honom, medan andra inte förlåter superagenten han tog in för att komma därifrån."
      ],
      "citat": {
-      "sagt": "Vi kunde spela 490 minuter till här utan att skapa ett enda målhot. Det får vi inte se igen.",
+      "sagt": "Det är ingen match i helgen. De där svartvita jävlarna kan inte förstöra min helg.",
       "vem": null,
       "podd": "True Faith NUFC Podcast",
       "typ": "podd",
       "datum": "2026-11-15"
      },
      "namn": [
-      "Fabian Schär",
       "Matthias Jaissle",
+      "Fabian Schär",
       "Bruno Guimarães"
      ]
     },
     {
      "lag": "Arsenal",
      "kallor": [
+      {
+       "podd": "The ArsenalVision Podcast - Arsenal FC",
+       "avsnitt": "Are Alex Scott, Odegaard and Havertz Arsenal’s Next Big Squad Decisions?",
+       "datum": "2026-11-19",
+       "adress": "https://www.arsenalvisionpodcast.com/episodes/episode-1052",
+       "typ": "podd"
+      },
       {
        "podd": "The ArsenalVision Podcast - Arsenal FC",
        "avsnitt": "Ben White's Last Laugh & Arsenal's Transfer Market Conundrum",
@@ -388,17 +395,6 @@
           "2026-11-16"
          ],
          "typ": "lokal"
-        },
-        {
-         "t": "Zubimendi lämnade Spaniens match mot England med en baksida lår, enligt värdarna.",
-         "s": "h",
-         "podd": [
-          "The ArsenalVision Podcast - Arsenal FC"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -415,6 +411,39 @@
           "2026-11-16"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Värdarna menar att Arsenal i år avstår från den högsta pressen mot motståndarnas backlinje, och att det är ett eget val. Därför får Havertz, en av ligans bästa pressande anfallare, inte användas fullt ut på det sättet.",
+         "s": "h",
+         "podd": [
+          "The ArsenalVision Podcast - Arsenal FC"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Enligt supportrarna gör Arsenal sällan tidiga mål. Mönstret de ser är att det står 0–0 länge, att målet kommer runt 70:e minuten och att laget sedan håller undan.",
+         "s": "h",
+         "podd": [
+          "The ArsenalVision Podcast - Arsenal FC"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Vänsterkanten ses som lagets tydligaste lucka. Arteta har alltid velat ha en offensiv dribbler där, men Tzolis dribblar inte. Han liknar Trossard i spelstil men har mindre fart förbi sin back.",
+         "s": "o",
+         "podd": [
+          "The ArsenalVision Podcast - Arsenal FC"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -422,35 +451,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Värdarna menar att de åtta matcherna från Newcastle borta till United hemma kan avgöra mycket. Arsenal har chansen att dra ifrån jagarna inför januari, något laget missade förra säsongen.",
+         "t": "Supportrarna tror på mittfältet, men de tvivlar på anfallet. Havertz har inte längre samma inverkan i alla delar av spelet, och värdarna är osäkra på om nuvarande anfallslinje räcker för att vinna allt.",
          "s": "o",
          "podd": [
           "The ArsenalVision Podcast - Arsenal FC"
          ],
          "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Arsenal köpte Eze först när Havertz skadade sig. Tim tror att Arteta tvekade om honom och att man nu ser varför.",
-         "s": "o",
-         "podd": [
-          "The ArsenalVision Podcast - Arsenal FC"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Elliot anser att Arsenal måste köpa en anfallare i januari för att kunna vinna både ligan och Champions League. Att klubben vill ha en ny forward visar enligt honom att Gyökeres inte var hela lösningen.",
-         "s": "o",
-         "podd": [
-          "The ArsenalVision Podcast - Arsenal FC"
-         ],
-         "datum": [
-          "2026-11-16"
+          "2026-11-19"
          ],
          "typ": "podd"
         }
@@ -460,13 +467,13 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Värdarna ser Newcastle som ett mycket svagt lag i år. De vill inte inleda den tuffa perioden med att tappa poäng, även om St James' Park aldrig är en rolig plats att åka till.",
+         "t": "Supportrarna hoppas att Newcastle pressar högt, eftersom de anser att Newcastle har pressat dåligt i år. Samtidigt pekar de på en risk: Newcastles framgångar har kommit på kontringar, och att hantera kontringar är just där Arsenal har haft problem i höst.",
          "s": "o",
          "podd": [
           "The ArsenalVision Podcast - Arsenal FC"
          ],
          "datum": [
-          "2026-11-16"
+          "2026-11-19"
          ],
          "typ": "podd"
         }
@@ -474,23 +481,22 @@
       }
      ],
      "text": [
-      "I Arseblogs podd gläds man åt att Martin Ødegaard ”ser ut som Martin Ødegaard igen”: en av ligans bästa och den som bär kreativiteten i ett lag som inte gör mål särskilt lätt.",
-      "Längst fram är förtroendet lägre. På forumet NOT606 anses varken Viktor Gyökeres eller Kai Havertz ha visat att de kan bära anfallet, och många vill sälja en av dem.",
-      "Med Bukayo Saka skadad har Noni Madueke däremot tagit chansen till höger. De som följer honom noga ser att inläggen äntligen har blivit jämnare."
+      "I ArsenalVision-podden beskriver man säsongens mönster: mållöst länge, ett mål runt 70:e minuten och sedan håller laget undan. Det man fruktar på St James' Park är Newcastles kontringar, just den sortens anfall som Arsenal har haft svårt att hantera i höst.",
+      "Längre fram är tron svagare. Varken Kai Havertz eller Viktor Gyökeres anses ge laget nog, och kreativiteten vilar på Martin Ødegaard, som efter ett par svagare säsonger ser ut som sig själv igen.",
+      "På forumet Arsenal Mania vill man helst se Bruno Guimarães börja på bänken, inte minst för att det är borta."
      ],
      "citat": {
-      "sagt": "Kommer vi att vakna en dag och Mikel har dragit till Barcelona och alla är 32?",
+      "sagt": "Tror jag att vi kan vinna allt med den anfallslinje vi har nu? Det är jag mycket mindre säker på.",
       "vem": null,
-      "podd": "Arseblog Arsecast, The Arsenal Podcast",
+      "podd": "The ArsenalVision Podcast - Arsenal FC",
       "typ": "podd",
-      "datum": "2026-11-16"
+      "datum": "2026-11-19"
      },
      "namn": [
-      "Martin Ødegaard",
-      "Viktor Gyökeres",
       "Kai Havertz",
-      "Bukayo Saka",
-      "Noni Madueke"
+      "Viktor Gyökeres",
+      "Martin Ødegaard",
+      "Bruno Guimarães"
      ]
     }
    ]
