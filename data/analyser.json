@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-20T15:17:19.856Z",
+ "uppdaterad": "2026-11-20T16:06:20.785Z",
  "omgang": {
   "id": "2026-11-21-st4980",
   "matcher": [
@@ -3563,15 +3563,14 @@
    },
    "hasse": {
     "stycken": [
-     "Chelsea förlorade senast mot Sunderland, och tränaren sa själv efteråt att laget inte skapar tillräckligt med chanser mot ett lågt försvar. Nu kommer Leeds, som bara har släppt in åtta mål på tio ligamatcher. Där har ni orsak och verkan, så är det bara.",
-     "Chelsea saknar dessutom João Pedro framtill, och Reece James och Lacroix är också borta. Leeds står kompakt och väntar på sitt läge, och de har Okafor att sätta in sent, han som avgjorde mot Tottenham två minuter efter att han kommit in. Favoriten har redan räknat in segern. Här höjer jag ett varningens finger.",
-     "Alla andra minns när Chelsea slog Leeds med 6–3 i ligacupen och har missat hur Leeds försvarar i dag. Jag ringar in tvåan, och bara tvåan, och det gör jag jävligt lugnt."
+     "Chelsea saknar sin anfallare João Pedro, och bakåt är Lacroix, Hato och Reece James borta. Då får tränaren lägga pussel med dem som är kvar, och ett pussel blir sällan någon organisation. Chelsea har dessutom gjort fler mål än chanserna borde ge, och sådan tur tar slut förr eller senare.",
+     "Leeds kommer med nästan hela truppen frisk, och Rodon har spelat flera halvlekar efter tio veckor borta. De har släppt in åtta mål på tio ligamatcher och räknas till ligans mest fysiska försvarslag. Att de inte har vunnit på Stamford Bridge sedan 1999 bryr jag mig inte ett skit om, för de här spelarna var inte med då. Favoriten har redan räknat in segern. Jag ringar in tvåan, och bara tvåan."
     ],
     "tecken": [
      2
     ],
-    "resultat": "0–1",
-    "tips": "2026-11-17T17:07:43.002Z",
+    "resultat": "1–2",
+    "tips": "2026-11-20T15:02:24.125Z",
     "uppdrag": {
      "fraser": [
       "Så är det bara",
@@ -3584,14 +3583,14 @@
       "favorit": 0,
       "lag": "Leeds United",
       "mot": "Chelsea",
-      "odds": 3.9,
+      "odds": 3.89,
       "favoritOdds": 1.87,
       "rad": "Favoriten har redan räknat in segern."
      }
     },
     "model": "claude-opus-5-5",
     "version": "2026-11-16.1",
-    "writtenAt": "2026-11-17T17:08:15.221Z",
+    "writtenAt": "2026-11-20T16:06:20.270Z",
     "attempts": 3
    },
    "model": "claude-opus-5-5",
