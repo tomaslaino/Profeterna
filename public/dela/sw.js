@@ -2,13 +2,13 @@
 
 // ---------- delat till appen ----------
 //
-// En skärmbild som delas till Matchfixarna i telefonen (Dela → Ladda upp
-// system, appen i android/ eller sajten installerad från Chrome) skickas som
-// ett formulär till /dela/ – share_target i manifest.webmanifest. GitHub Pages
-// tar inte emot formulär, så det här tar emot det i webbläsaren: bilderna
-// läggs i lådan "delat" och sidan öppnas på kupongen med ?delat, där
-// systembild.js läser dem som om de valts med Ladda upp system. Bilderna
-// lämnar aldrig telefonen.
+// En skärmbild som delas till Matchfixarna i telefonen (Dela → Matchfixarna,
+// sajten installerad från Chrome, eller Ladda upp system i den gamla appen i
+// android/) skickas som ett formulär till /dela/ – share_target i
+// manifest.webmanifest. GitHub Pages tar inte emot formulär, så det här tar
+// emot det i webbläsaren: bilderna läggs i lådan "delat" och tobaksaffären
+// öppnas med ?delat, där systembild.js läser dem och kryssar gängets kupong på
+// pulten. Bilderna lämnar aldrig telefonen.
 //
 // Gäller bara adresser under /dela/ (registreras med scope /dela/ i
 // systembild.js) – resten av sajten går som förut, utan service worker.
@@ -33,6 +33,6 @@ self.addEventListener('fetch', (e) => {
     } catch (_) {
       filer = [];
     }
-    return Response.redirect(`/?delat=${filer.length}#kupong`, 303);
+    return Response.redirect(`/?delat=${filer.length}`, 303);
   })());
 });

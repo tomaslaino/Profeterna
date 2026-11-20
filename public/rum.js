@@ -6161,6 +6161,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!R.on || nara() || R.vilar || !p || !p.hand) return false;
     return openCoupon();
   }
+  // Gängets kupong i handen, som ett klick på kupongen på pulten (systembild.js: en skärmbild av systemet som
+  // delats till appen har just kryssat den). → om den togs.
+  function taGang() {
+    const p = pult();
+    if (!R.on || nara() || R.vilar || R.kup || R.summa || !p || !p.gang) return false;
+    return openCoupon();
+  }
 
   // ---------- den du är ----------
   //
@@ -7555,7 +7562,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     numret: hamtaTidning, smal: () => Boolean(R.smal),
     // fram till tv:n (den lilla tv:n som följde med, rum-bild.js), och tv:n utan rummet (tvUtan)
     tv: () => { if (R.on && !R.zoom) zoomTv(true); },
-    tvUtan, redraw: () => { if (R.on) fill(); }, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
+    tvUtan, redraw: () => { if (R.on) fill(); }, taGang, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)
       if (!v) { R.mx = R.my = 0; setCam(0, 0); }

@@ -2497,6 +2497,32 @@
     klubba(id) {
       if (SM.data) klubba(SM.data, id);
     },
+    // Systemet ni spelade, ur en skärmbild som delats till appen (systembild.js):
+    // tecken = {matchens id: tecknet, eller '' när det inte gick att läsa}. Det
+    // blir gängets tecken i de matcher som går att fylla i, hos alla, och de
+    // omtvistade av dem är klubbade – som om gänget hade kryssat dem. Spara gör
+    // man på kupongen som vanligt. → de matcher som ändrades, eller null utan
+    // gängets kupong (gang).
+    systemet(tecken) {
+      const s = SM.data;
+      if (!s || !pult.gang()) return null;
+      const rows = analyse(s);
+      const forr = decisions(s, rows);
+      const val = { ...forr };
+      const k = klar(s, rows);
+      for (const r of rows) {
+        const id = String(r.x.id);
+        if (!r.open || !(id in tecken)) continue;
+        if (tecken[id]) val[r.x.id] = tecken[id];
+        else delete val[r.x.id];
+        if (r.strid && tecken[id]) k.add(r.x.id);
+      }
+      kpStore(DECIDE, { id: s.id, val, own: true });
+      sparaKlubbat(s.id, k);
+      SM.again = false;
+      dela(s, { satt: { val, klar: [...k] } });
+      return rows.filter((r) => (forr[r.x.id] || '') !== (val[r.x.id] || '')).map((r) => r.x.id);
+    },
     // Spara gängets kupong, som guldordet i uppgörelsen här (makeCoupon).
     // again: spara trots matcher utan tecken (eller över den som någon annan
     // just sparade), anyway: som en kupong till för samma dag, adjust: i Ny

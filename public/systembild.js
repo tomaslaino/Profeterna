@@ -22,7 +22,9 @@
 // Resultatet blir ett utkast i Ny kupong – eller Ändra, om en kupong som inte
 // är färdigspelad redan har minst hälften av matcherna, så att det inte blir
 // två kuponger för samma omgång – med matcherna på papperskupongen. Där ser
-// man över det och sparar som vanligt.
+// man över det och sparar som vanligt. En skärmbild som delas till appen
+// öppnar i stället tobaksaffären, och där kryssas gängets kupong på pulten
+// (iRummet).
 //
 // Läses efter kupong.js och använder dess hjälpare (KP, KP_DRAFT, kpStore,
 // newDraft, allCoupons, gradeCoupon, fillable, whenMatches, loadCoupons,
@@ -288,6 +290,29 @@ window.Systembild = (() => {
       }
     }
     for (const r of runs) r.on = filled(img, r, y0, y1);
+    // Den vita siffran i en ifylld ruta delar den i två där den går igenom
+    // (siffran tar mer än en fjärdedel av höjden). Två ifyllda bitar tätt
+    // intill varandra, med rutans färg också mellan dem – ovanför och under
+    // siffran, så där tittas lite högre och lägre (mellan två rutor är det
+    // bara bakgrund) – är samma ruta.
+    const ya = Math.max(0, Math.round(row.c - 0.5 * h));
+    const yb = Math.min(Ht - 1, Math.round(row.c + 0.5 * h));
+    for (let i = runs.length - 1; i > 0; i--) {
+      const a = runs[i - 1];
+      const b = runs[i];
+      if (!a.on || !b.on || b.x0 - a.x1 > 0.8 * h || b.x1 - a.x0 + 1 > 4 * h) continue;
+      let samma = true;
+      for (let x = a.x1 + 1; x < b.x0 && samma; x++) {
+        let k = 0;
+        for (let y = ya; y <= yb; y++) if (off(at(x, y))) k++;
+        samma = k >= (yb - ya + 1) * 0.2;
+      }
+      if (!samma) continue;
+      a.x1 = b.x1;
+      a.w = a.x1 - a.x0 + 1;
+      a.cx = (a.x0 + a.x1) / 2;
+      runs.splice(i, 1);
+    }
     return runs;
   }
 
@@ -460,9 +485,62 @@ window.Systembild = (() => {
     window.scrollTo(0, 0);
   }
 
+  // ---------- i tobaksaffären ----------
+  //
+  // En skärmbild som delas till appen öppnar tobaksaffären (dela/sw.js). Där
+  // blir bildens tecken gängets tecken på kupongen på pulten, hos alla
+  // (Samtal.pult.systemet), och kupongen tas i handen (Rum.taGang), där man
+  // ser över den och sparar som vanligt. Raden överst säger vad som kom med.
+  async function iRummet({ found, missing, info }) {
+    const P = window.Samtal && Samtal.pult;
+    let st = P ? P.state() : null;
+    if (P && !st && Samtal.load) {
+      await Samtal.load();
+      st = P.state();
+    }
+    if (!st) {
+      toast('Det ligger ingen kupong på pulten.', { error: true });
+      return;
+    }
+    const pa = new Set(st.s.matcher.map((x) => String(x.id)));
+    const har = found.filter((x) => pa.has(String(x.m.id)));
+    if (!har.length) {
+      toast('Matcherna på bilden står inte på kupongen på pulten.', { error: true });
+      return;
+    }
+    const now = Date.now();
+    const tecken = {};
+    const started = [];
+    const blank = [];
+    for (const x of har) {
+      if (!fillable(x.m, now)) started.push(x.m);
+      else {
+        tecken[String(x.m.id)] = x.sign || '';
+        if (!x.sign) blank.push(x.m);
+      }
+    }
+    const andrat = P.systemet(tecken);
+    if (!andrat) {
+      toast(st.vem || st.s.visas ? 'Gängets kupong går att kryssa när ni ser varandras tips.' : 'Klicka på dig själv vid bordet och dela bilden igen.', { error: true });
+      return;
+    }
+    dispatchEvent(new CustomEvent('gangets-kupong', { detail: { andrat, av: null } }));
+    if (window.Rum && Rum.taGang) Rum.taGang();
+    const teams = (ms) => ms.map((m) => `${m.home} – ${m.away}`).join(', ');
+    const n = har.length - started.length - blank.length;
+    const utanfor = found.filter((x) => !pa.has(String(x.m.id))).map((x) => x.m);
+    const mer = [
+      blank.length ? `Kryssa i: ${teams(blank)}.` : null,
+      started.length ? `Har startat: ${teams(started)}.` : null,
+      utanfor.length ? `Står inte på kupongen: ${teams(utanfor)}.` : null,
+      missing.length ? `Hittades inte: ${missing.join(', ')}.` : null,
+    ].filter(Boolean);
+    toast([`${n} ${n === 1 ? 'match' : 'matcher'} från bilden${info.system ? ` · ${info.system}` : ''}.`, ...mer].join(' '), { ms: 7000 + 3000 * mer.length });
+  }
+
   // ---------- knappen ----------
 
-  function toast(text, { error = false, stay = false } = {}) {
+  function toast(text, { error = false, stay = false, ms = 7000 } = {}) {
     if (!S.toast) {
       S.toast = document.createElement('div');
       S.toast.className = 'sb-toast';
@@ -473,10 +551,11 @@ window.Systembild = (() => {
     S.toast.hidden = !text;
     S.toast.classList.toggle('error', error);
     S.toast.textContent = text || '';
-    if (text && !stay) S.toast.timer = setTimeout(() => { S.toast.hidden = true; }, 7000);
+    if (text && !stay) S.toast.timer = setTimeout(() => { S.toast.hidden = true; }, ms);
   }
 
-  async function run(files) {
+  // rum: bilden delades till appen och öppnade tobaksaffären (delade).
+  async function run(files, { rum = false } = {}) {
     if (S.busy || !files.length) return;
     S.busy = true;
     clearTimeout(S.idle);
@@ -513,7 +592,9 @@ window.Systembild = (() => {
         return;
       }
       toast('');
-      apply(all);
+      // (rum.js läses efter den här filen: först nu vet vi att affären finns)
+      if (rum && window.Rum && Rum.fits && Rum.fits()) await iRummet(all);
+      else apply(all);
     } catch (e) {
       toast(e && e.message === 'script' ? 'Textläsaren gick inte att hämta. Försök igen.' : 'Bilden gick inte att läsa.', { error: true });
     } finally {
@@ -547,9 +628,11 @@ window.Systembild = (() => {
 
   // ---------- delat till appen ----------
   //
-  // En skärmbild som delas till Matchfixarna i telefonen (Dela → Ladda upp
-  // system) tas emot av dela/sw.js, som lägger bilderna i lådan "delat" och
-  // öppnar sidan med ?delat=<antal>#kupong. Här läses de som om de valts med
+  // En skärmbild som delas till Matchfixarna i telefonen (Dela → Matchfixarna)
+  // tas emot av dela/sw.js, som lägger bilderna i lådan "delat" och öppnar
+  // tobaksaffären med ?delat=<antal>. Här läses de, och i affären kryssas
+  // gängets kupong på pulten (iRummet); utan affären (en gammal adress med
+  // #kupong, eller ett fönster där den inte får plats) som om de valts med
   // knappen. Service workern gäller bara /dela/ och registreras här, så att
   // den finns när man delar – appen och sajten har öppnats minst en gång.
   if ('serviceWorker' in navigator) {
@@ -577,8 +660,9 @@ window.Systembild = (() => {
         await lada.delete(req);
       }
     } catch (_) { /* ingen låda: inget att läsa */ }
-    if (filer.length) run(filer);
-    else toast('Bilden kom inte fram. Tryck på Ladda upp system och välj den där.', { error: true });
+    const rum = !location.hash;
+    if (filer.length) run(filer, { rum });
+    else toast(rum ? 'Bilden kom inte fram. Dela den en gång till.' : 'Bilden kom inte fram. Tryck på Ladda upp system och välj den där.', { error: true });
   }
   delade();
 

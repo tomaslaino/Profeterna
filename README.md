@@ -261,6 +261,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   måste signeras med fanns inte på MacBooken (iMacen svarade inte). Användaren valde "Ja, bara Installera": filen
   och dess ruta är borta från matchfixarna.se/app, och den som har den gamla appen avinstallerar den och trycker
   på *Installera*
+- [x] **Delad skärmbild in i affären (2026-11-20, användarens val "Fylla i pultens kupong"):** en skärmbild av systemet
+  som delas till appen öppnar tobaksaffären i stället för Ny kupong på den vanliga sidan. Bildens tecken blir
+  gängets tecken på kupongen på pulten, hos alla, och kupongen tas i handen, där man ser över den och sparar. Se
+  [Ladda upp system](#ladda-upp-system). Samtidigt läser Ladda upp system ifyllda rutor rätt också när den vita
+  siffran i dem delade rutan i två (tecknen hamnade då en kolumn fel)
 - [x] **Med och utan spelaren (2026-11-11, användarens önskemål):** "Går det att få in den här
   informationen för de respektive spelarna" (StatMuses Man City med och utan Haaland), "det kan säga
   något om hur betydelsefulla de är för lagen" – "Haaland t ex är mindre viktig än vad man tror - han
@@ -836,9 +841,9 @@ om när det som står här ändras.
 - **Länkar** till matchfixarna.se (i sms, mejl, chattar) öppnas i appen.
 - **Dela → Ladda upp system:** en skärmbild av systemet i Svenska Spels app kan delas direkt till appen.
   Chrome skickar den som ett formulär till `/dela/`, där [public/dela/sw.js](public/dela/sw.js) tar emot den
-  i webbläsaren (GitHub Pages tar inte emot formulär), lägger den i lådan `delat` och öppnar
-  `/?delat=<antal>#kupong`; [public/systembild.js](public/systembild.js) läser bilden som om den valts med
-  knappen och tar bort `?delat` ur adressen. Samma `share_target` står i
+  i webbläsaren (GitHub Pages tar inte emot formulär), lägger den i lådan `delat` och öppnar tobaksaffären med
+  `/?delat=<antal>`; [public/systembild.js](public/systembild.js) läser bilden, kryssar gängets kupong på
+  pulten (se [Ladda upp system](#ladda-upp-system)) och tar bort `?delat` ur adressen. Samma `share_target` står i
   [public/manifest.webmanifest](public/manifest.webmanifest), så det fungerar också för den som har lagt
   sajten på hemskärmen från Chrome. Service workern gäller bara adresser under `/dela/` och registreras av
   systembild.js; den finns alltså först när sajten har öppnats en gång.
@@ -4005,8 +4010,16 @@ matchlistan kommer från sköldarnas källa, som inte nås från molnmiljön –
 
 ### Ladda upp system
 
-I appen och på hemskärmen går det också att dela skärmbilden direkt från telefonens bilder eller
-skärmbildsvyn: *Dela → Ladda upp system* (se [Appen](#appen)).
+I appen går det också att dela skärmbilden direkt från telefonens bilder eller skärmbildsvyn: *Dela →
+Matchfixarna* (se [Appen](#appen)). Då öppnas tobaksaffären, och där blir bildens tecken gängets tecken på
+kupongen på pulten (`iRummet` i systembild.js, `Samtal.pult.systemet` i [public/samtal.js](public/samtal.js)):
+i de matcher som går att fylla i, hos alla som ser kupongen (hela kupongen på en gång, `satt`, som *Börja om*),
+och de omtvistade av dem är klubbade. Matcher vars tecken inte gick att läsa står tomma. Kupongen tas i handen
+(`Rum.taGang` i rum.js), där man ser över den och sparar som vanligt, och raden överst säger vad som kom med
+(*13 matcher från bilden · R0-7-16.*, matcher att kryssa i, som har startat eller inte står på kupongen). Går
+gängets kupong inte att fylla i än (ni ser inte varandras tips) eller står bildens matcher inte på kupongen
+säger raden det. Utan affären (en gammal adress med `#kupong`) blir det Ny kupong som förut. Beslutet tas när
+bilden är läst: rum.js läses efter systembild.js.
 
 Knappen *Ladda upp system* (i Ny kupong och Ändra och under omgångens kupong) tar en eller flera skärmbilder av ett spelat system –
 som raderna i Svenska Spels app, med lagen och rutorna 1, X och 2 där de valda är
@@ -4023,7 +4036,10 @@ färgade – och fyller i kupongen. Allt sker i webbläsaren
    QPR, Man Utd, MK Dons, Nott'm Forest, Boro). Möts samma lag två gånger avgör
    avsparkstiden på raden.
 3. **Tecknen:** rutorna till höger på raden letas upp i bildpunkterna, och en färgad ruta
-   räknas som vald, en vit eller grå som tom. Går tecknen på en rad inte att läsa kommer
+   räknas som vald, en vit eller grå som tom. Den vita siffran i en ifylld ruta kan dela den i två
+   bitar; två ifyllda bitar tätt intill varandra med rutans färg också mellan dem (ovanför och under
+   siffran) är samma ruta – förut hamnade tecknen då en kolumn fel (provat 2026-11-20 med påhittade
+   skärmbilder i ljust och mörkt läge, små och stora siffror: 13 av 13 rätt, förut 2 av 13). Går tecknen på en rad inte att läsa kommer
    matchen med utan tecken, med en rad om att trycka i dem.
 4. **Namnet:** vecka och system blir kupongens namn, t.ex. *Vecka 42 · R0-7-16* (eller
    systemet efter ett namn som redan finns). Kupongen rättas per match som vanligt; ett
