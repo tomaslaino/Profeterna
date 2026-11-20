@@ -15,33 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-20T13:01:57.118Z",
+ "skriven": "2026-11-20T13:17:17.548Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-20T13:01:26.590Z",
+ "underlag": "2026-11-20T13:06:42.290Z",
  "rubrik": {
-  "id": "401879232",
-  "kick": "NEWCASTLE",
+  "id": "401879238",
+  "kick": "NOTTINGHAM FOREST",
   "rad": [
    [
-    "SCHÄR",
+    "GLASNERS",
     0
    ],
    [
-    "SLÄNGDE",
+    "ANSIKTE",
+    0
+   ],
+   [
+    "PÅ ARSLET",
     1
-   ],
-   [
-    "TRÄNARENS",
-    0
-   ],
-   [
-    "LAPP",
-    0
    ]
   ],
-  "under": "Mot Everton kastade Fabian Schär Matthias Jaissles lapp i marken. Nu väntar Arsenal.",
-  "plus": "MATOS STACK TILL STRASBOURG",
-  "plusId": "401880151"
+  "under": "Efter 3–1 mot City har en före detta kritiker på Forest Forum tatuerat in tränaren",
+  "plus": "WATFORDFANS VILL FÖRLORA",
+  "plusId": "401880154"
  }
 }
