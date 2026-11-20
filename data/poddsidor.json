@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T14:12:04.792Z",
+ "uppdaterad": "2026-11-20T14:26:03.432Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1967,14 +1967,21 @@
     "Crystal Palace"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:03:32.114Z",
-   "rubrik": "Palace-supportrarna tar gärna en nolla i Franks debut",
+   "skriven": "2026-11-20T14:26:03.432Z",
+   "rubrik": "Palaces dröm inför Franks premiär: en mållös match",
    "ingress": null,
-   "summering": "Coventry grälar om högerbacken och en tränare som inte kan nöja sig med en poäng. Palace hoppas att Thomas Frank äntligen lär laget att försvara, medan förtroendet för Sarr är slut.",
+   "summering": "Coventry vill ha fart men oroar sig för ett mittfält utan Yirenkyi. Palace kommer med en ny tränare och supportrar som helst ser att nollan står.",
    "delar": [
     {
      "lag": "Coventry City",
      "kallor": [
+      {
+       "podd": "Sky Blue Fans TV",
+       "avsnitt": "Coventry City FC LIVE Podcast | Coventry City Vs Crystal Palace",
+       "datum": "2026-11-20",
+       "adress": "https://podcasters.spotify.com/pod/show/skybluefanstv/episodes/Coventry-City-FC-LIVE-Podcast--Coventry-City-Vs-Crystal-Palace-e3snihs",
+       "typ": "podd"
+      },
       {
        "podd": "Sky Blues Talk",
        "avsnitt": "Coventry City vs Crystal Palace (H) - Coventry Building Society Arena - Sat 21st November (3pm KO) · so after Palace...",
@@ -2013,46 +2020,35 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
+       "amne": "trupp",
        "punkter": [
         {
-         "t": "Om Yirenkyi saknas fruktar flera ett mittfält med Torp och Grimes, som de tror blir för svagt. De vill att Onyeka går in i stället, och enligt en supporter är han spelklar.",
-         "s": "o",
-         "podd": [
-          "Sky Blues Talk"
-         ],
-         "datum": [
-          "2026-11-20"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Många supportrar vill att Kaine Kesler Hayden ersätter Milan van Ewijk som högerback. De menar att van Ewijk har varit dålig nästan hela säsongen och att Lampard inte verkar lita på Kesler Hayden.",
-         "s": "o",
-         "podd": [
-          "Sky Blues Talk"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Lokaltidningen tror på 4-2-3-1 med Thomas och Pinnock som mittbackspar före Stephen Mfuni, Onyeka och Torp centralt om Yirenkyi saknas, den nyss återkomne Loum Tchaouna före Sakamoto och Taiwo Awoniyi på topp.",
+         "t": "Caleb Yirenkyi spelade inte för Ghana eftersom han ska ha fått en smäll på träningen, och värdarna vet inte hur illa det är.",
          "s": "h",
          "podd": [
-          "Coventry Telegraph"
+          "Sky Blue Fans TV"
          ],
          "datum": [
           "2026-11-20"
          ],
-         "typ": "lokal"
+         "typ": "podd"
         }
        ]
       },
       {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "En av Coventryvärdarna menar att laget är bra när bollen går fort. När Matt Grimes är på planen och saktar ner spelet blir det ett helt annat lag.",
+         "s": "o",
+         "podd": [
+          "Sky Blue Fans TV"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "En supporter tycker att Sakamotos form beror på Milan van Ewijk. När van Ewijk rusar framåt måste Sakamoto täcka upp bakåt. Han tror att Sakamoto skulle bli bättre om laget spelade med tre mittbackar.",
          "s": "o",
@@ -2065,26 +2061,31 @@
          "typ": "forum"
         },
         {
-         "t": "Lampard byter nästan aldrig ytterbackarna, kanske för att behålla de långa inkasten. En supporter tycker att inkasten gör laget endimensionellt och att de inte ens ger något.",
+         "t": "Värdarna kallar Tatsuhiro Sakamoto lagets lysande stjärna de senaste matcherna: han verkar vara den som sliter hårdast på planen och slutar aldrig springa. De hoppas att Frank Lampard fortsätter att spela honom till höger.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
-          "2026-11-17"
+          "2026-11-20"
          ],
-         "typ": "forum"
-        },
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
         {
-         "t": "Supportrarna tycker att laget borde nöja sig med oavgjort i jämna matcher när varje poäng räknas i bottenstriden. De menar att laget inte klarar det, eftersom Lampard vill gå för vinst i varje match.",
+         "t": "Miles säger att ägaren Doug King har byggt laget steg för steg och att sommarens värvningar för 145 miljoner var de största någonsin. Det är fantastiska tider, men laget har det tungt.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
-          "2026-11-17"
+          "2026-11-20"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -2092,43 +2093,61 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Supportrarna tror inte att Palace nya tränare hinner påverka laget på så kort tid, eftersom de ser en trupp vars självförtroende borde vara knäckt.",
+         "t": "Palacegästen är mest rädd för Yirenkyis snabba bolltempo och hans sätt att hitta fickorna, och för Brandon Thomas-Asantes snabbhet. Han hoppas att de är trötta efter Ghanas landskamper.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-20"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Någon varnar för att räkna med ett lätt motstånd bara för att Palace saknar flera ordinarie. Enligt honom har Coventry fått betala för det förut, när reserverna gjort sitt livs match.",
+         "t": "Palacesupportern Freddie säger att trebackslinjen aldrig har fungerat, oavsett vilka tre som spelat, och att laget blivit blottat på kanterna. Han tror att Thomas Frank går över till fyra backar direkt.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-20"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Palacesupportern Rich säger att Adam Wharton lämnas ensam på mitten medan Quinten Timber springer överallt, och att Wharton hör till de sämsta i defensiva omställningar. Han hoppas på tre centrala mittfältare.",
+         "s": "o",
+         "podd": [
+          "Sky Blue Fans TV"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Tatsuhiro Sakamotos svaga form har en förklaring på Sky Blues Talk: han måste hela tiden täcka upp när Milan van Ewijk rusar framåt. Många vill hellre se Kaine Kesler Hayden som högerback, men tror att Frank Lampard inte litar på honom.",
-      "Lampard själv oroar också. Han vill vinna varje match, medan supportrarna hellre skulle ”parkera bussen” i jämna lägen när varje poäng räknas i bottenstriden.",
-      "Lagkaptenen Ethan Pinnock spelade i flera år under Thomas Frank i Brentford. I lokaltidningen beskriver han Franks lag som svårslagna och fulla av energi."
+      "Coventry är som bäst när bollen går fort, och därför delar Matt Grimes supportrarna. I podden blir laget ”ett annat lag” när han saktar ner spelet, medan andra på forumet vill ha in honom för att få mer boll.",
+      "Desto mer oroar smällen som Caleb Yirenkyi fick med Ghana. Ett mittfält med Victor Torp och Grimes kallas ”en katastrof”, och många vill hellre se Frank Onyeka där.",
+      "Tatsuhiro Sakamoto hyllas som den som sliter hårdast, men en supporter påpekar att han får täcka upp varje gång högerbacken Milan van Ewijk rusar framåt."
      ],
+     "citat": {
+      "sagt": "Att skänka bort sex poäng till de där två lagen är precis sånt som gör att man åker ur.",
+      "vem": "Brighton Sky Blue",
+      "podd": "Sky Blues Talk",
+      "typ": "forum",
+      "datum": "2026-11-17"
+     },
      "namn": [
+      "Matt Grimes",
+      "Caleb Yirenkyi",
+      "Victor Torp",
+      "Grimes",
+      "Frank Onyeka",
       "Tatsuhiro Sakamoto",
-      "Milan van Ewijk",
-      "Kaine Kesler Hayden",
-      "Frank Lampard",
-      "Lampard",
-      "Ethan Pinnock",
-      "Thomas Frank"
+      "Milan van Ewijk"
      ]
     },
     {
@@ -2307,9 +2326,9 @@
       }
      ],
      "text": [
-      "I FYP Podcast tar man ”0–0 mot Coventry direkt”. Ett nollat i Thomas Franks första match skulle vinna supportrarna lika snabbt som nollan mot Leeds i höstas.",
-      "Huvudsaken är att den nya tränaren faktiskt vill träna försvaret. På Holmesdale Online oroar man sig redan för Ethan Pinnock, som Frank själv värvade till Brentford, och hans styrka i luften och långa inkast.",
-      "Där har tålamodet med Ismaïla Sarr tagit slut. Många tror inte längre på ljumskskadan och påpekar att han varken byttes ut eller nämndes, utan bara försvann ur laget."
+      "Palacesupportrarna vill inte ha någon målfest i Thomas Franks premiär: i podden FYP tar man ”0–0 mot Coventry direkt”. Där drömmer man om dagen då Frank ställer in sexmannaspelet för att låta laget öva på att försvara hörnor.",
+      "På forumet Holmesdale Online oroar man sig därför för Ethan Pinnock, som Frank själv värvade till Brentford och som är stark i luften och har ett långt inkast.",
+      "Ismaïla Sarr, förra säsongens bästa spelare, är borta med en ljumskskada, men där tror många inte längre på den. De misstänker att han vill tvinga fram en flytt."
      ],
      "citat": {
       "sagt": "Sage och nu Thomas ursäktar honom båda två. Personligen tror jag att han har lagt ner arbetet.",
@@ -2319,9 +2338,9 @@
       "datum": "2026-11-19"
      },
      "namn": [
-      "Thomas Franks",
-      "Ethan Pinnock",
+      "Thomas Frank",
       "Frank",
+      "Ethan Pinnock",
       "Ismaïla Sarr"
      ]
     }
