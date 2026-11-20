@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T13:59:11.465Z",
+ "uppdaterad": "2026-11-20T14:12:04.792Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1626,14 +1626,21 @@
     "Nottingham Forest"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-20T13:02:52.798Z",
-   "rubrik": "Från kritik till tatuering på en enda match",
+   "skriven": "2026-11-20T14:12:04.792Z",
+   "rubrik": "Glasners nya anhängare möter sitt gamla spöke",
    "ingress": null,
-   "summering": "Bournemouth ställer upp med en 35-årig högerback som delar forumet. Forest kommer med nyfunnen tro på Glasner men tvivlar fortfarande på att laget någonsin kan slå just Bournemouth.",
+   "summering": "Bournemouth litar på en 35-årig högerback och rycker på axlarna åt Alex Scott. Forest har fått ny tro på Glasner och högt klivande mittbackar, men bär på en gammal rädsla för just Bournemouth.",
    "delar": [
     {
      "lag": "AFC Bournemouth",
      "kallor": [
+      {
+       "podd": "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast",
+       "avsnitt": "CAN CHERRIES CHOP THE FOREST AGAIN - AFC Bournemouth v Nottingham Forest - The Lowdown With Mr Dore",
+       "datum": "2026-11-19",
+       "adress": "https://shows.acast.com/up-the-cherries-in-all-departments-utciad/episodes/can-cherries-chop-the-forest-agai",
+       "typ": "podd"
+      },
       {
        "podd": "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast",
        "avsnitt": "FOREST GOING IN WRONG DIRECTION? - Geoff Murphy (Call Me Amour) on Career & Nottingham Forest 🍒 v 🌳",
@@ -1697,17 +1704,6 @@
           "2026-11-20"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Andra ser det som ett tecken på dålig planering att klubben flera år senare, med två matcher i veckan, fortfarande hänger på en 35-årig högerback.",
-         "s": "o",
-         "podd": [
-          "Vital Bournemouth"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
         }
        ]
       },
@@ -1715,40 +1711,51 @@
        "amne": "match",
        "punkter": [
         {
+         "t": "Bournemouthsupportrarna ser sitt lag som Forests stora spöke. Det spelar ingen roll i vilken form Forest kommer, Bournemouth brukar ändå gå segrande ur mötena. Forest har inte vunnit på Bournemouths hemmaplan sedan 2015.",
+         "s": "o",
+         "podd": [
+          "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Forest-supportern tror att hans lag bara kan ta något om det stör Bournemouths spel med små ojusta fällningar, kryper under skinnet på spelarna och tystar publiken, på samma sätt som Forest gjorde mot Aston Villa.",
+         "s": "o",
+         "podd": [
+          "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Båda tror att matchen avgörs på mittfältet. När Bournemouth vann med 2–0 förra säsongen körde Alex Scott och Tyler Adams enligt Forest-supportern över Forests mittfält.",
+         "s": "o",
+         "podd": [
+          "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värden tror att det blir tuffare den här gången. Forest var enligt honom utmärkt mot Manchester City och har haft otur i match efter match, och han tror att det håller på att vända för dem.",
+         "s": "o",
+         "podd": [
+          "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Värden från Bournemouth varnar för att Forests tränare Oliver Glasner inte har något dåligt facit mot Bournemouth och kan vara sugen på att störa lagets segersvit.",
-         "s": "o",
-         "podd": [
-          "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Forest-supportern Geoff Murphy tycker att Liam Delap, som tidigare inte fått det att stämma, till slut visade vad han går för i segern mot Manchester City och kan ställa till problem för vilket försvar som helst.",
-         "s": "o",
-         "podd": [
-          "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Trots segern mot City litar Forest-supportern Geoff Murphy inte helt på laget: han tycker att Forest sällan lyckas hålla farten uppe och hoppas att City-matchen blir vändpunkten.",
-         "s": "o",
-         "podd": [
-          "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Forest-supportern Geoff Murphy vill inte vara för kaxig inför resan till Bournemouth. Han tycker att Forest haft otur mot Bournemouth i de senaste sju–åtta mötena och ser laget som mycket svårslaget.",
          "s": "o",
          "podd": [
           "Up The Cherries In All Departments - AFC Bournemouth Fans Podcast"
@@ -1762,20 +1769,20 @@
       }
      ],
      "text": [
-      "Högerbacken är veckans stora fråga på forumet Vital Bournemouth, där platsen åter faller på 35-årige Adam Smith nu när Juanlu är borta i månader.",
-      "Hans försvarare menar att han gör ”sitt livs säsong” och att det bara är åldern som skrämmer folk. Andra ser det som dålig planering att klubben, med två matcher i veckan, fortfarande hänger på honom.",
-      "Att Alex Scott vill bort efter nyår bekymrar ingen, så länge klubben får rätt pris. Inför lördagen oroar man sig mest för Morgan Gibbs-White, som anses alltid spela bra mot Bournemouth."
+      "Veckans fråga på Vital Bournemouth är en 35-åring. Med Juanlu borta i månader blir Adam Smith åter högerback, och hans försvarare menar att han gör sin bästa säsong. Andra kallar det dålig planering att klubben med så täta matcher fortfarande hänger på honom.",
+      "Att Alex Scott hoppas på en ny klubb efter nyår rycker man på axlarna åt: ”Vi har klarat oss utmärkt utan honom.”",
+      "Podden kallar Bournemouth Forests ”ultimata spöke”, men den som oroar mest är Morgan Gibbs-White, som enligt forumet alltid spelar bra mot dem."
      ],
      "citat": {
-      "sagt": "Alex hoppas på en ny klubb efter nyår. Vi har klarat oss utmärkt utan honom. Nästa.",
-      "vem": "dragonm8",
+      "sagt": "Tur att 35-åringen gör sitt livs säsong. Hade han varit 25 hade du inte varit orolig…",
+      "vem": "Neil Dawson",
       "podd": "Vital Bournemouth",
       "typ": "forum",
-      "datum": "2026-11-20"
+      "datum": "2026-11-17"
      },
      "namn": [
-      "Adam Smith",
       "Juanlu",
+      "Adam Smith",
       "Alex Scott",
       "Morgan Gibbs-White"
      ]
@@ -1783,6 +1790,13 @@
     {
      "lag": "Nottingham Forest",
      "kallor": [
+      {
+       "podd": "Forest Focus",
+       "avsnitt": "Bournemouth v Forest opposition verdict | Unstoppable force?",
+       "datum": "2026-11-20",
+       "adress": "https://podcasts.apple.com/gb/podcast/forest-focus/id1718916536?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "Forest Focus",
        "avsnitt": "Servicemen on their viral Nottingham Forest moment",
@@ -1821,22 +1835,6 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Om Schlager inte är spelklar vill supportrarna se McAtee på mittfältet och Igor Jesus som tia bakom Delap. De tror att det skulle skapa kaos i Bournemouths försvar.",
-         "s": "o",
-         "podd": [
-          "Forest Forum"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
         {
@@ -1867,6 +1865,17 @@
        "amne": "klubb",
        "punkter": [
         {
+         "t": "Bournemouth-supportern Matt Davis menar att Forest ligger falskt till. Med den kvalitet och den tränare laget har borde det enligt bland annat xG ligga mycket högre, och han har sett matcher på tv och undrat hur Forest kunde förlora dem.",
+         "s": "o",
+         "podd": [
+          "Forest Focus"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Efter sex tränare på fjorton månader varnar supportrarna för att börja prata om nästa tränarbyte. De vill ha lugn kring Glasner och ser segern mot City som en språngbräda.",
          "s": "o",
          "podd": [
@@ -1894,6 +1903,17 @@
        "amne": "match",
        "punkter": [
         {
+         "t": "Enligt Bournemouth-supportern är Evanilsons mål delvis skänkta. Han menar ändå att de är förtjänta, eftersom lagets höga press och de fyra främstas arbete tvingar fram misstag hos lag som vill spela ut bakifrån via målvakten.",
+         "s": "h",
+         "podd": [
+          "Forest Focus"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "En supporter tror att Bournemouths segersvit kan gynna Forest. Hemmalaget kommer att ha bollen, och står Forest stadigt bakåt och kontrar lika aggressivt som mot City passar det lagets styrkor.",
          "s": "o",
          "podd": [
@@ -1914,33 +1934,21 @@
           "2026-11-18"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Bournemouth har vapen framåt och ett starkt mittfält, särskilt om Tyler Adams och Alex Scott startar. Backlinjen ses däremot som medioker, och tränaren Andoni Iraola sägs ibland bli överkörd taktiskt.",
-         "s": "o",
-         "podd": [
-          "Forest Forum"
-         ],
-         "datum": [
-          "2026-11-17"
-         ],
-         "typ": "forum"
         }
        ]
       }
      ],
      "text": [
-      "Segern mot Manchester City har gjort flera av Oliver Glasners kritiker på Forest Forum till anhängare, och en av dem har nu tränarens ansikte ”tatuerat på arslet”.",
-      "I podden Forest Focus vill man få tyst på allt prat om tränarbyte: efter sex tränare på kort tid behöver laget stabilitet.",
-      "Förklaringen till segern ser supportrarna i mittbackarna, där Jair Cunha och Murillo klev upp i banan och kvävde Citys mittfält.",
-      "Bournemouth är ändå en sorts förbannelse. Forest har varit bättre i båda oavgjorda ligamatcherna där utan att vinna, och många skulle gärna ta en poäng nu."
+      "Kritikerna har blivit anhängare: efter segern mot Manchester City skriver en supporter på Forest Forum att han nu har Oliver Glasners ansikte tatuerat på bakdelen. I podden Forest Focus ber man om lugn efter sex tränare och vill inte höra talas om nästa byte.",
+      "Segern förklaras med att mittbackarna Jair Cunha och Murillo klev upp i banan och kvävde Citys mittfält.",
+      "Bournemouth känns ändå som en förbannelse, och många skulle vara nöjda med en poäng."
      ],
      "citat": {
-      "sagt": "Jag skulle gnaga av mig alla lemmar för en poäng. Vi slår ju aldrig de här, så allt vore ett bra resultat.",
-      "vem": "Beardo7",
-      "podd": "Forest Forum",
-      "typ": "forum",
-      "datum": "2026-11-17"
+      "sagt": "Ibland undrar jag om det borde vara en säsong på 36 matcher bara för att slippa möta Bournemouth. Men vi slår dem till slut.",
+      "vem": null,
+      "podd": "Forest Focus",
+      "typ": "podd",
+      "datum": "2026-11-20"
      },
      "namn": [
       "Oliver Glasner",
