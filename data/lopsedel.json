@@ -15,10 +15,10 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-17T22:48:58.148Z",
+ "skriven": "2026-11-20T13:01:57.118Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-17T22:42:30.641Z",
+ "underlag": "2026-11-20T13:01:26.590Z",
  "rubrik": {
   "id": "401879232",
   "kick": "NEWCASTLE",
@@ -29,18 +29,18 @@
    ],
    [
     "SLÄNGDE",
-    0
+    1
    ],
    [
-    "JAISSLES",
+    "TRÄNARENS",
     0
    ],
    [
     "LAPP",
-    1
+    0
    ]
   ],
-  "under": "Fabian Schär slängde Jaissles lapp på marken mot Everton. Podden: veteranerna köper inte tränaren.",
+  "under": "Mot Everton kastade Fabian Schär Matthias Jaissles lapp i marken. Nu väntar Arsenal.",
   "plus": "MATOS STACK TILL STRASBOURG",
   "plusId": "401880151"
  }
