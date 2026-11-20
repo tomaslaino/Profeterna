@@ -15,29 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-20T15:19:59.949Z",
+ "skriven": "2026-11-20T15:35:20.288Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-20T14:59:54.862Z",
+ "underlag": "2026-11-20T15:34:33.714Z",
  "rubrik": {
-  "id": "401879232",
-  "kick": "ARSENAL",
+  "id": "401880154",
+  "kick": "WATFORD",
   "rad": [
    [
-    "ARSENALFANS",
+    "EGNA FANSEN",
     0
    ],
    [
-    "TVIVLAR PÅ",
+    "HOPPAS PÅ",
     0
    ],
    [
-    "GYÖKERES",
+    "STORSTRYK",
     1
    ]
   ],
-  "under": "”Tror jag att vi kan vinna allt med den anfallslinje vi har nu?” – ArsenalVision-podden",
-  "plus": "WATFORDFANS VILL SE FÖRLUST",
-  "plusId": "401880154"
+  "under": "Ilskan mot ledningen så stor att flera supportrar hoppas på förlust med rekordsiffror.",
+  "plus": "FANS TVIVLAR PÅ GYÖKERES",
+  "plusId": "401879232"
  }
 }
