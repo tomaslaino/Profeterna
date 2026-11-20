@@ -15,33 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-20T13:47:58.676Z",
+ "skriven": "2026-11-20T14:03:16.626Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-20T13:40:37.280Z",
+ "underlag": "2026-11-20T13:59:11.465Z",
  "rubrik": {
-  "id": "401879238",
-  "kick": "NOTTINGHAM FOREST",
+  "id": "401880154",
+  "kick": "WATFORD",
   "rad": [
    [
-    "FORESTFAN",
+    "EGNA FANSEN",
     0
    ],
    [
-    "TATUERADE",
+    "HOPPAS PÅ",
     0
    ],
    [
-    "GLASNER",
-    0
-   ],
-   [
-    "PÅ ARSLET",
+    "STORSTRYK",
     1
    ]
   ],
-  "under": "Efter 3–1 mot City har en tidigare kritiker på Forest Forum Glasners ansikte tatuerat på arslet.",
-  "plus": "SCHÄR SLÄNGDE JAISSLES LAPP",
+  "under": "Missnöjet med ledningen: supportrar på WFC Forums vill se förlust ”med rekordsiffror”",
+  "plus": "SCHÄR SLÄNGDE TRÄNARENS LAPP",
   "plusId": "401879232"
  }
 }
