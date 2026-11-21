@@ -15,29 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-21T10:16:13.866Z",
+ "skriven": "2026-11-21T10:32:04.845Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-21T10:06:28.235Z",
+ "underlag": "2026-11-21T10:23:57.614Z",
  "rubrik": {
   "id": "401879232",
-  "kick": "ARSENAL",
+  "kick": "BRUNO TILLBAKA",
   "rad": [
    [
-    "EGNA FANSEN",
+    "BRUNO HEM",
     0
    ],
    [
-    "TVIVLAR PÅ",
+    "TILL ARGA",
     0
    ],
    [
-    "GYÖKERES",
+    "NEWCASTLE",
     1
    ]
   ],
-  "under": "På forumen ses varken Havertz eller Gyökeres som en centerforward som kan bära laget",
-  "plus": "TVIVEL PÅ SARRS SKADA",
+  "under": "Arsenalfansen vill att Rice och Ødegaard säger ”gör det inte, för fan” om Bruno ser rött.",
+  "plus": "PALACEFANS TVIVLAR PÅ SARR",
   "plusId": "401879235"
  }
 }
