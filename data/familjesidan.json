@@ -15,59 +15,59 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-21T08:01:50.247Z",
+ "skriven": "2026-11-21T08:17:40.413Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-21T08:00:43.833Z",
+ "underlag": "2026-11-21T08:08:30.362Z",
  "rubrik": "En tränare har kommit, en har gått och två sitter löst",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Crystal Palace",
    "namn": "Thomas Frank",
-   "text": "tar över efter Pierre Sage, som fick sparken, och har kontrakt till juni 2029. Han gör sin första match borta mot Coventry, och supportrarna ser honom som ett vettigt val."
+   "text": "gör sin första match som tränare borta mot Coventry och säger att han är mycket glad att vara tillbaka i fotbollen. Supportrarna ser honom som ett vettigt val som vill träna försvaret."
   },
   {
    "slag": "avflyttad",
    "lag": "Swansea City",
    "namn": "Vitor Matos",
-   "text": "har lämnat Swansea för Strasbourg mitt i landslagsuppehållet och ledde träningen på tisdagsmorgonen innan flytten blev klar. Supportrarna tycker att tidpunkten var den sämsta tänkbara."
+   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att tidpunkten är den sämsta tänkbara och undrar om blicken redan var riktad mot Strasbourg."
   },
   {
    "slag": "tillforordnad",
    "lag": "Swansea City",
    "namn": "Ashley Williams",
-   "text": "leder laget mot West Brom som tillfällig huvudtränare, med Leon Britton, Joe Allen och Kris O'Leary vid sin sida. Klubben har ännu inte sagt något om en permanent tränare."
+   "text": "leder laget tillfälligt mot West Bromwich Albion med en minimal stab. Supportrarna oroar sig för att den nya ledningen haft ungefär 48 timmar på sig, medan motståndarna haft två veckor."
   },
   {
    "slag": "aterseende",
    "lag": "Arsenal",
    "namn": "Bruno Guimarães",
-   "text": "kommer tillbaka till St James' Park med Arsenal och väntas bli utbuad. Flera Newcastlesupportrar försvarar honom ändå, eftersom han var den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
+   "text": "kommer tillbaka till St James' Park med Arsenal och väntas bli utbuad. Flera försvarar honom: han ville spela på högsta nivå och var den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har flera tusen av lagets egna supportrar emot sig efter 0–5 hemma mot Norwich. Vd:n har stöttat honom offentligt, men enligt uppgifter i medier kollar klubben redan upp efterträdare."
+   "text": "har flera tusen av klubbens egna supportrar emot sig efter 0–5 hemma mot Norwich. Enligt medier ska klubben redan kolla upp efterträdare, trots att vd:n offentligt har stöttat honom."
   },
   {
    "slag": "sitter_lost",
    "lag": "Watford",
    "namn": "Alessio Dionisi",
-   "text": "väntades av alla få sparken under landslagsuppehållet. Fyra poäng i de två senaste hemmamatcherna och ägaren Gino Pozzos rättegång i Spanien tros ha räddat honom tills vidare."
+   "text": "väntades få sparken under landslagsuppehållet men tros ha räddats tills vidare av fyra poäng i de två senaste hemmamatcherna och av ägaren Gino Pozzos rättegång i Spanien."
   },
   {
    "slag": "besked",
    "lag": "Leeds United",
    "namn": "Leeds United",
-   "text": "ska värderas av New York-banken Allen & Co, som ägarna har anlitat för att ta in nya pengar. Kapitalbehovet ska ha överraskat en del delägare."
+   "text": "har genom ägarna anlitat New York-banken Allen & Co för att värdera klubben och ta in nya pengar. Supportrarna tycker att det känns destabiliserande när allt går bra."
   },
   {
    "slag": "besked",
    "lag": "Sheffield United",
    "namn": "Sheffield United",
-   "text": "räknar med ett poängavdrag på 12 poäng och ser därför matchen mot Watford som en nedflyttningsstrid, enligt en av klubbens supportrar."
+   "text": "räknar med ett poängavdrag på 12 poäng, enligt en av klubbens supportrar, och ser därför hemmamatchen mot Watford som en nedflyttningsstrid."
   }
  ]
 }
