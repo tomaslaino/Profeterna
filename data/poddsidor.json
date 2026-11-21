@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-20T15:45:31.917Z",
+ "uppdaterad": "2026-11-21T08:00:43.833Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,10 +103,10 @@
     "Arsenal"
    ],
    "avspark": "2026-11-21T17:30:00.000Z",
-   "skriven": "2026-11-20T13:18:52.171Z",
-   "rubrik": "Matchfri helg var den bästa på länge i Newcastle",
+   "skriven": "2026-11-21T08:00:43.833Z",
+   "rubrik": "Bruno återvänder till en publik som hellre sluppit matchen",
    "ingress": null,
-   "summering": "Newcastle har en tränare som håller på att tappa både läktaren och veteranerna. Arsenal vinner sent och snålt, men supportrarna litar inte på anfallet framför Ødegaard.",
+   "summering": "Newcastles publik har tappat tron på Jaissle och grälar om Bruno. Arsenal fruktar hemmalagets kontringar, litar på sena mål och tvivlar på sitt anfall.",
    "delar": [
     {
      "lag": "Newcastle United",
@@ -140,11 +140,25 @@
        "typ": "media"
       },
       {
-       "podd": "NUFC The Mag",
+       "podd": "The Mag",
        "avsnitt": "Official Newcastle United injury update made public on Thursday ahead of Arsenal - NUFC The Mag",
        "datum": "2026-11-19",
        "adress": "https://www.themag.co.uk/2026/11/official-newcastle-united-injury-update-made-public-on-thursday-ahead-of-arsenal/",
        "typ": "media"
+      },
+      {
+       "podd": "NUFC Blog",
+       "avsnitt": "Nico Gonzalez & Joe Willock hand double boost to Jaissle ahead of Arsenal clash",
+       "datum": "2026-11-18",
+       "adress": "https://nufcblog.co.uk/nico-gonzalez-joe-willock-hand-double-boost-to-jaissle-ahead-of-arsenal-clash-44018",
+       "typ": "media"
+      },
+      {
+       "podd": "Chronicle Live",
+       "avsnitt": "Matthias Jaissle facing Premier League ban as Newcastle boss makes candid claim",
+       "datum": "2026-11-20",
+       "adress": "https://www.chroniclelive.co.uk/sport/football/football-news/matthias-jaissle-faces-premier-league-34940357",
+       "typ": "lokal"
       },
       {
        "podd": "Shields Gazette",
@@ -166,6 +180,17 @@
        "amne": "trupp",
        "punkter": [
         {
+         "t": "Lokaltidningen skriver att Joelinton är den enda skadade utespelaren inför matchen. Tino Livramento och Matias Fernandez-Pardo är friska igen och Jacob Ramsey är tillbaka efter avstängning.",
+         "s": "h",
+         "podd": [
+          "Chronicle Live"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "lokal"
+        },
+        {
          "t": "Klubbens sajt skriver att Joelinton inte hinner bli spelklar till Arsenal. Han har inte spelat sedan förlusten mot Everton i början av november. Tränaren Matthias Jaissle vill inte säga hur länge han blir borta och väntar på besked från specialister.",
          "s": "b",
          "podd": [
@@ -183,17 +208,6 @@
        "punkter": [
         {
          "t": "Jaissles system bygger på tre roller som laget saknar: en riktig nia, en tia och en ytter till höger som håller sig skadefri. Värdarna säger att spelarna har sett vilsna ut och tittat mot bänken för att få veta var de ska stå.",
-         "s": "o",
-         "podd": [
-          "True Faith NUFC Podcast"
-         ],
-         "datum": [
-          "2026-11-15"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "De tidiga segrarna mot Liverpool och Spurs gav en falsk bild. Enligt Adam var de ett kaotiskt adrenalinlyft för en ny tränare, inte tecken på att ett system höll på att sätta sig.",
          "s": "o",
          "podd": [
           "True Faith NUFC Podcast"
@@ -272,22 +286,22 @@
       }
      ],
      "text": [
-      "En värd i True Faith-podden har en arbetskamrat som var lättad över att landslagsuppehållet gav en helg utan match, och själv har han aldrig varit mer orolig för klubben.",
-      "Matthias Jaissle bygger sitt spel på en tia som truppen saknar, och spelarna har tittat mot bänken för att få veta var de ska stå. Att Fabian Schär slängde tränarens lapp på marken mot Everton ses som ett tecken på att veteranerna inte köper honom.",
-      "Nu kommer Bruno Guimarães hem i Arsenaltröjan. På forumet försvarar somliga honom, medan andra inte förlåter superagenten han tog in för att komma därifrån."
+      "I True Faith-podden berättar en värd om arbetskamraten som var glad över landslagsuppehållet: ”De där svartvita jävlarna kan inte förstöra min helg.” När Fabian Schär slängde tränarens lapp på marken mot Everton såg värdarna ett tecken på att veteranerna inte köper Matthias Jaissle. Bara poäng mot Arsenal eller Manchester United kan vinna tillbaka läktaren före derbyt mot Sunderland, menar de.",
+      "På NOT606 är man oense om hur Bruno Guimarães ska tas emot. Somliga minns kaptenen som lyfte en inhemsk titel, andra förlåter inte att han tog in en superagent för att komma bort när klubben behövde honom mest."
      ],
      "citat": {
-      "sagt": "Det är ingen match i helgen. De där svartvita jävlarna kan inte förstöra min helg.",
+      "sagt": "Vi kunde spela 490 minuter till här utan att skapa ett enda målhot. Det får vi inte se igen.",
       "vem": null,
       "podd": "True Faith NUFC Podcast",
       "typ": "podd",
       "datum": "2026-11-15"
      },
      "namn": [
-      "Matthias Jaissle",
       "Fabian Schär",
+      "Matthias Jaissle",
       "Bruno Guimarães"
-     ]
+     ],
+     "paSpel": "Jaissles chans att vinna tillbaka läktaren före derbyt, och Brunos mottagande."
     },
     {
      "lag": "Arsenal",
@@ -316,6 +330,27 @@
       {
        "podd": "Arsenal Mania",
        "avsnitt": "Premier League: Newcastle vs Arsenal | Saturday 21st November | 17:30 GMT | Sky Sports · Arsenal random classic matches · Noni Madueke: There is Noni to be Mad",
+       "datum": "2026-11-21",
+       "adress": "https://arsenal-mania.com/forum/threads/premier-league-newcastle-vs-arsenal-saturday-21st-november-17-30-gmt-sky-sports.37569/",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "Newcastle United vs Arsenal - Matchday Thread · Arsenal Team News and Injury Updates · Transfer Rumours Thread",
+       "datum": "2026-11-20",
+       "adress": "https://not606.com/threads/newcastle-united-vs-arsenal-matchday-thread.425572/",
+       "typ": "forum"
+      },
+      {
+       "podd": "Online Gooner",
+       "avsnitt": "ALL Transfer talk - merged thread · VAR · Peter Storey R.I.P.",
+       "datum": "2026-11-20",
+       "adress": "https://forum.onlinegooner.com/viewtopic.php?t=39417",
+       "typ": "forum"
+      },
+      {
+       "podd": "Arsenal Mania",
+       "avsnitt": "Premier League: Newcastle vs Arsenal | Saturday 21st November | 17:30 GMT | Sky Sports · Arsenal random classic matches · Noni Madueke: There is Noni to be Mad",
        "datum": "2026-11-20",
        "adress": "https://arsenal-mania.com/forum/threads/premier-league-newcastle-vs-arsenal-saturday-21st-november-17-30-gmt-sky-sports.37569/",
        "typ": "forum"
@@ -335,25 +370,18 @@
        "typ": "forum"
       },
       {
-       "podd": "NOT606",
-       "avsnitt": "Arsenal Team News and Injury Updates",
-       "datum": "2026-11-17",
-       "adress": "https://not606.com/threads/arsenal-team-news-and-injury-updates.412375/",
-       "typ": "forum"
+       "podd": "ArsenalNews.co.uk",
+       "avsnitt": "Mikel Arteta could make one big Arsenal change vs Newcastle United - ArsenalNews.co.uk",
+       "datum": "2026-11-21",
+       "adress": "https://arsenalnews.co.uk/2026/11/21/mikel-arteta-could-make-one-big-arsenal-change-vs-newcastle-united/",
+       "typ": "media"
       },
       {
-       "podd": "Arsenal Mania",
-       "avsnitt": "Premier League: Newcastle vs Arsenal | Saturday 21st November | 17:30 GMT | Sky Sports · Peter Storey · Player Contract Watch",
-       "datum": "2026-11-17",
-       "adress": "https://arsenal-mania.com/forum/threads/premier-league-newcastle-vs-arsenal-saturday-21st-november-17-30-gmt-sky-sports.37569/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Online Gooner",
-       "avsnitt": "ALL Transfer talk - merged thread · Other Matches Thread · Forum Login - PLEASE READ",
-       "datum": "2026-11-17",
-       "adress": "https://forum.onlinegooner.com/viewtopic.php?t=39417",
-       "typ": "forum"
+       "podd": "AFTV",
+       "avsnitt": "Arsenal Predicted XI vs Newcastle: Mikel Arteta faces big decisions as William Saliba and Bruno Guimaraes push for starts",
+       "datum": "2026-11-20",
+       "adress": "https://aftv.co.uk/match-centre/arsenal-predicted-xi-vs-newcastle-mikel-arteta-faces-big-decisions-as-william-saliba-and-bruno-guimaraes-push-for-starts/",
+       "typ": "media"
       },
       {
        "podd": "Arseblog News",
@@ -361,6 +389,13 @@
        "datum": "2026-11-20",
        "adress": "https://arseblog.news/2026/11/arsenal-lose-zubimendi-to-injury-saka-a-month-from-returning/",
        "typ": "media"
+      },
+      {
+       "podd": "Arsenal.com",
+       "avsnitt": "Arteta's update on Saka, Saliba and Zubimendi",
+       "datum": "2026-11-20",
+       "adress": "https://www.arsenal.com/news/artetas-update-on-saka-saliba-and-zubimendi-aeGpX1u8JqKG",
+       "typ": "lokal"
       },
       {
        "podd": "football.london",
@@ -375,6 +410,17 @@
        "amne": "trupp",
        "punkter": [
         {
+         "t": "Martín Zubimendi skadade baksida lår i Spaniens 3–2-förlust mot England. Arteta har bekräftat att han missar några veckor.",
+         "s": "b",
+         "podd": [
+          "AFTV"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "media"
+        },
+        {
          "t": "William Saliba är spelklar för första gången den här säsongen. Han har klarat en match med U21-laget och en träningsmatch bakom stängda dörrar utan problem, och Arteta säger att han är redo.",
          "s": "b",
          "podd": [
@@ -384,6 +430,28 @@
           "2026-11-20"
          ],
          "typ": "media"
+        },
+        {
+         "t": "Martín Zubimendi missar matchen. Han fick kliva av i landskampen för Spanien, och enligt Mikel Arteta visade magnetröntgen en baksidesskada som håller honom borta i några veckor.",
+         "s": "b",
+         "podd": [
+          "Arsenal.com"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "lokal"
+        },
+        {
+         "t": "William Saliba är tillbaka efter en lång frånvaro. Han satt på bänken mot Slavia Prag och startade för U21-laget före uppehållet. Arteta säger att han är redo och att hans speltid ska ökas.",
+         "s": "b",
+         "podd": [
+          "Arsenal.com"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "lokal"
         },
         {
          "t": "Martín Zubimendi tog sig för baksida lår i söndags och byttes ut i Spaniens landskamp. Football.london skriver att han ska undersökas när han kommer tillbaka till England men kan ändå vara tillgänglig på lördag. Inget besked om hans skick har kommit än.",
@@ -422,44 +490,6 @@
           "2026-11-19"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Enligt supportrarna gör Arsenal sällan tidiga mål. Mönstret de ser är att det står 0–0 länge, att målet kommer runt 70:e minuten och att laget sedan håller undan.",
-         "s": "h",
-         "podd": [
-          "The ArsenalVision Podcast - Arsenal FC"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Vänsterkanten ses som lagets tydligaste lucka. Arteta har alltid velat ha en offensiv dribbler där, men Tzolis dribblar inte. Han liknar Trossard i spelstil men har mindre fart förbi sin back.",
-         "s": "o",
-         "podd": [
-          "The ArsenalVision Podcast - Arsenal FC"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Supportrarna tror på mittfältet, men de tvivlar på anfallet. Havertz har inte längre samma inverkan i alla delar av spelet, och värdarna är osäkra på om nuvarande anfallslinje räcker för att vinna allt.",
-         "s": "o",
-         "podd": [
-          "The ArsenalVision Podcast - Arsenal FC"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -481,9 +511,8 @@
       }
      ],
      "text": [
-      "I ArsenalVision-podden beskriver man säsongens mönster: mållöst länge, ett mål runt 70:e minuten och sedan håller laget undan. Det man fruktar på St James' Park är Newcastles kontringar, just den sortens anfall som Arsenal har haft svårt att hantera i höst.",
-      "Längre fram är tron svagare. Varken Kai Havertz eller Viktor Gyökeres anses ge laget nog, och kreativiteten vilar på Martin Ødegaard, som efter ett par svagare säsonger ser ut som sig själv igen.",
-      "På forumet Arsenal Mania vill man helst se Bruno Guimarães börja på bänken, inte minst för att det är borta."
+      "I ArsenalVision-podden oroar man sig mindre för Newcastles press än för kontringarna, och det är just kontringar som Arsenal har haft svårast att hantera i höst. På Arsenal Mania är det Elanga som skrämmer med sin fart, och man hoppas på ett tidigt mål som tvingar hemmalaget att komma ut.",
+      "Det brukar dröja. Värdarna i podden ser ett lag som gör sitt mål runt 70:e minuten och sedan håller undan. Förtroendet för anfallet är tunt, och på NOT606 kallas både Viktor Gyökeres och Kai Havertz i bästa fall breddspelare."
      ],
      "citat": {
       "sagt": "Tror jag att vi kan vinna allt med den anfallslinje vi har nu? Det är jag mycket mindre säker på.",
@@ -493,11 +522,11 @@
       "datum": "2026-11-19"
      },
      "namn": [
-      "Kai Havertz",
+      "Elanga",
       "Viktor Gyökeres",
-      "Martin Ødegaard",
-      "Bruno Guimarães"
-     ]
+      "Kai Havertz"
+     ],
+     "paSpel": "En god start på en tät period med Dortmund, City och Real Madrid."
     }
    ]
   },
