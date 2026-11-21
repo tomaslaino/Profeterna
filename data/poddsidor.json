@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-21T08:20:39.020Z",
+ "uppdaterad": "2026-11-21T08:41:15.765Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -543,10 +543,10 @@
     "Leeds United"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-21T08:01:17.382Z",
-   "rubrik": "Chelseas supportrar vill hellre ha en idé än resultat",
+   "skriven": "2026-11-21T08:41:15.765Z",
+   "rubrik": "Hela ligan vet var Chelsea svajar, även Leeds",
    "ingress": null,
-   "summering": "Chelsea går in med sköra mittbackar och en tränare utan tydlig spelidé. Leeds supportrar oroar sig mest för Bogles nästa tackling, domaren och ägarnas jakt på nytt kapital.",
+   "summering": "Chelsea oroar sig för en backlinje som motståndarna vet hur de ska pressa och för en tränare utan tydlig idé. Leeds åker söderut med optimism, men Bogle och domaren gör supportrarna nervösa.",
    "delar": [
     {
      "lag": "Chelsea",
@@ -719,12 +719,11 @@
       }
      ],
      "text": [
-      "I podden London Is Blue kallar man mittbackarna ”lätta måltavlor”, och Leeds är byggt för att träffa dem. Långa bollar och dueller mot Colwill och Fofana har fungerat för motståndarna hela säsongen, och med Calvert-Lewin på topp fruktar man en kopia av Sunderlands recept.",
-      "Värdarna saknar också en spelidé under Xabi Alonso: ena matchen kontrar laget, nästa jagar det bollen, ibland i samma match. Ändå vill ingen få honom sparkad.",
-      "Om Cole Palmer är man oense: en värd vill värva konkurrens efter ännu en måltorka, en annan påpekar att han assisterar som under sin första säsong."
+      "I podden London Is Blue säger man rakt ut att hela ligan vet att mittbackarna Colwill och Fofana är ”lätta måltavlor” för långa bollar och dueller. Därför fruktar värdarna att Leeds kopierar Sunderlands recept och skickar Calvert-Lewin rakt på dem.",
+      "Ännu mer skaver det att de inte ser någon spelidé under Xabi Alonso. Ena matchen kontrar laget i ett, i nästa jagar det bollinnehav, ibland gör det båda i samma match. Hellre brist på resultat än brist på filosofi, säger de, men ingen vill få honom sparkad."
      ],
      "citat": {
-      "sagt": "Just nu är det osammanhängande. Som du sa: vi skulle hellre se brist på resultat än brist på filosofi.",
+      "sagt": "Siffrorna har smickrat oss lite. Och efter João Pedros skada har vi bara fallit pladask.",
       "vem": null,
       "podd": "London Is Blue - Chelsea FC Podcast",
       "typ": "podd",
@@ -734,14 +733,20 @@
       "Colwill",
       "Fofana",
       "Calvert-Lewin",
-      "Xabi Alonso",
-      "Cole Palmer"
+      "Xabi Alonso"
      ],
-     "paSpel": "Första ligasegern mot Leeds sedan Farke lade om uppställningen."
+     "paSpel": "Chansen att äntligen slå Farkes omgjorda Leeds i ligan."
     },
     {
      "lag": "Leeds United",
      "kallor": [
+      {
+       "podd": "The Square Ball: Leeds United Podcast",
+       "avsnitt": "Wilko92: Look at Those Thighs! | The West Stand",
+       "datum": "2026-11-20",
+       "adress": "https://thesquareball.net/plus",
+       "typ": "podd"
+      },
       {
        "podd": "The Square Ball: Leeds United Podcast",
        "avsnitt": "Like a Proud Dad | The Square Ball",
@@ -801,24 +806,19 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "En del supportrar vill vila Jayden Bogle en match. De tycker att han har hamnat så mycket i rampljuset efter domarpanelens 3–2-beslut att nästa jämna närkamp kan ge rött kort.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "James Trafford är så lugn att han ibland verkar ointresserad och skakar av sig både misstag och storräddningar på en halv minut. Supportrarna vill ändå att han dominerar straffområdet och sina försvarare mer.",
+         "s": "h",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Supportrarna förundras över hur oberörd målvakten James Trafford är. Efter misstaget mot Bournemouth gjorde han en stark landskamp för England, och värdarna har aldrig sett en Leedsspelare skaka av sig misstag så lätt.",
          "s": "h",
@@ -836,19 +836,30 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Ägarna har anlitat den diskreta New York-banken Allen & Co för att värdera klubben och ta in nya pengar. Enligt värdarna överraskade kapitalbehovet en del delägare och stämmer dåligt med vad de tidigare fått höra.",
+         "t": "Supporterhistorikern Dave Tomlinson tycker att Farke säljer in sig dåligt och underskattas. Hans styrka är jämnheten: laget är aldrig lysande och aldrig katastrofalt, men det har chans att vinna i varje match.",
+         "s": "o",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna är oense om stämningen. Gästen tycker att fansen redan tar säkerheten för given. Värden menar att oron kom tillbaka så fort laget inte vann på några matcher efter segern mot Newcastle, och att ingen riktigt vet var de står.",
          "s": "h",
          "podd": [
           "The Square Ball: Leeds United Podcast"
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-20"
          ],
          "typ": "podd"
         },
         {
-         "t": "Värdarnas första reaktion på kapitaljakten är att rygga tillbaka: det känns destabiliserande när allt går bra. Med västläktaren ofärdig undrar den cyniska sidan om pengarna redan är slut, även om de inte tror att det är så.",
-         "s": "o",
+         "t": "Ägarna har anlitat den diskreta New York-banken Allen & Co för att värdera klubben och ta in nya pengar. Enligt värdarna överraskade kapitalbehovet en del delägare och stämmer dåligt med vad de tidigare fått höra.",
+         "s": "h",
          "podd": [
           "The Square Ball: Leeds United Podcast"
          ],
@@ -874,58 +885,48 @@
          "typ": "media"
         },
         {
-         "t": "Supportrarna åker till Chelsea med optimism och tror att Leeds kan mäta sig med dem. Chelsea släpper in många mål och blev överkörda med 3–0 av Brentford, och värdarna tror att Leeds kan matcha den mer fysiska stilen.",
+         "t": "Bortamatcher mot topplagen känns inte längre som förlorade på förhand, som de gjorde under Jesse Marsch och till och med under Bielsa. Matchen mot Arsenal visade att laget kan mäta sig med vem som helst.",
          "s": "o",
          "podd": [
           "The Square Ball: Leeds United Podcast"
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-20"
          ],
          "typ": "podd"
         },
         {
-         "t": "Den stora lärdomen från cupförlusten är att Cole Palmer fick alldeles för mycket utrymme. Det får inte hända igen på Stamford Bridge.",
+         "t": "Supportrarna ser Chelsea som sårbart i år: dålig start och ny tränare att vänja sig vid. Ligacupförlusten med 3–6 kom med ett omgjort lag och Zetterer i mål. Nu väntar de Trafford och ett fullt försvar.",
          "s": "o",
          "podd": [
-          "Marching On Together"
+          "The Square Ball: Leeds United Podcast"
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-20"
          ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna är rädda att Chelseaspelarna medvetet kommer att söka upp Bogle och kasta sig vid minsta kontakt, och att domaren kommer att ha extra koll på honom.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På forumet NOT606 grälar man om huruvida Jayden Bogle ska vila efter domarpanelens beslut: en del fruktar att nästa jämna närkamp blir rött kort. Andra menar att peta honom vore att böja sig för medierna.",
-      "Att Michael Oliver dömer gör inte saken bättre, eftersom han ses som en domare som bryter spelet och går på Chelseas filmningar.",
-      "I podden The Square Ball skaver något annat: ägarna har anlitat New York-banken Allen & Co för att ta in nya pengar, och enligt värdarna kom kapitalbehovet som en överraskning för en del delägare."
+      "På forumet NOT606 är man oense om Jayden Bogle efter domarpanelens 3–2-beslut. Somliga vill vila honom, av rädsla för att Chelseaspelarna söker upp honom och att Michael Oliver ger rött vid nästa jämna närkamp. Andra menar att det vore att ”böja sig för medierna”.",
+      "I The Square Ball konstaterar man att bortamatcherna mot topplagen inte längre känns förlorade på förhand, som de gjorde under Jesse Marsch och till och med under Bielsa. Där tror man att Chelsea går att slå i år, och cupförlusten i september avfärdas som ett hopplockat cuplags verk."
      ],
      "citat": {
-      "sagt": "Man ser att västläktaren inte är klar och att de letar investerare, och tänker: oj, har pengarna redan tagit slut?",
-      "vem": null,
+      "sagt": "Med Farke handlar det om jämnheten. Man är aldrig i världsklass och aldrig helt katastrofal, utan någonstans mittemellan.",
+      "vem": "Dave Tomlinson",
       "podd": "The Square Ball: Leeds United Podcast",
       "typ": "podd",
-      "datum": "2026-11-19"
+      "datum": "2026-11-20"
      },
      "namn": [
       "Jayden Bogle",
-      "Michael Oliver"
+      "Michael Oliver",
+      "Jesse Marsch",
+      "Bielsa"
      ],
-     "paSpel": "Chansen att bryta London-förbannelsen, och det på Stamford Bridge."
+     "paSpel": "Att bryta London-förbannelsen, helst på Chelseas egen mark."
     }
    ]
   },
