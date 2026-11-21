@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-21T08:41:15.765Z",
+ "uppdaterad": "2026-11-21T09:04:14.829Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -939,10 +939,10 @@
     "Ipswich Town"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-21T08:02:02.666Z",
-   "rubrik": "Ipswich hoppas på Spurs nyvunna gästfrihet",
+   "skriven": "2026-11-21T09:04:14.829Z",
+   "rubrik": "Goda värdar möter gäster som släpper in tidigt",
    "ingress": null,
-   "summering": "Tottenham får fram bollen men skapar för lite och har tränaren på läktaren. Ipswich kommer med ett läckande försvar och en olöst målvaktsfråga, och hoppas på en nervös hemmapublik.",
+   "summering": "Tottenham tar sig fram till målet men har ingen att lita på i avslutet, och hemmapubliken är skör. Ipswich vill spela på nerverna, men släpper själva in tidigt och har en målvakt som oroar.",
    "delar": [
     {
      "lag": "Tottenham Hotspur",
@@ -955,17 +955,17 @@
        "typ": "podd"
       },
       {
+       "podd": "The Fighting Cock (Tottenham Hotspur Podcast)",
+       "avsnitt": "S16E33 - Would You Swap De Zerbi for Poch?",
+       "datum": "2026-11-19",
+       "adress": "https://podcasts.apple.com/gb/podcast/the-fighting-c-k-tottenham-hotspur-podcast/id575912069?uo=4",
+       "typ": "podd"
+      },
+      {
        "podd": "The Extra Inch (Spurs Podcast)",
        "avsnitt": "A Creative International Moment",
        "datum": "2026-11-16",
        "adress": "https://podcasts.apple.com/gb/podcast/the-extra-inch-spurs-podcast/id1337670733?uo=4",
-       "typ": "podd"
-      },
-      {
-       "podd": "The Fighting Cock (Tottenham Hotspur Podcast)",
-       "avsnitt": "S16E32 - Getting Punched After a Last-Minute Equaliser",
-       "datum": "2026-11-16",
-       "adress": "https://podcasts.apple.com/gb/podcast/the-fighting-c-k-tottenham-hotspur-podcast/id575912069?uo=4",
        "typ": "podd"
       },
       {
@@ -1071,6 +1071,28 @@
           "2026-11-16"
          ],
          "typ": "media"
+        },
+        {
+         "t": "Tränaren Roberto De Zerbi sa på presskonferensen att Tosin Adarabioyo egentligen är frisk men att han inte tar några risker. Mathys Tel, som skadade fotleden mot Leeds, är borta i ytterligare två till tre veckor.",
+         "s": "b",
+         "podd": [
+          "Tottenham Hotspur"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "lokal"
+        },
+        {
+         "t": "Klubbens sajt skriver att Lucas Bergvall, Sávio och Destiny Udogie kan spela mot Ipswich. Bergvall har varit borta med en knäskada sedan 10 oktober och Sávio med en muskelskada sedan 13 oktober.",
+         "s": "b",
+         "podd": [
+          "Tottenham Hotspur"
+         ],
+         "datum": [
+          "2026-11-20"
+         ],
+         "typ": "lokal"
         }
        ]
       },
@@ -1078,43 +1100,21 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Supportrarna ser att De Zerbis uppspel steg för steg blir bättre och att bollen når fram till de farliga spelarna. Men på sista tredjedelen gör laget inte ont, och de litar inte på någon av anfallarna ensam med målvakten.",
+         "s": "o",
+         "podd": [
+          "The Fighting Cock (Tottenham Hotspur Podcast)"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Lagets chansbrist beror inte bara på att Maddison saknas. När spelarna lockar motståndaren framåt drar de också ner tian mot bollen och lämnar sista tredjedelen tom. Systemet måste kunna skapa chanser även utan en spelfördelare.",
          "s": "o",
          "podd": [
           "The Extra Inch (Spurs Podcast)"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Förlusten i Leeds visade enligt supportrarna hur man slår Tottenham: spela direkt, gör matchen till dueller och slå långt mot en stark anfallare. Laget vinner knappt en defensiv nick med någon auktoritet.",
-         "s": "o",
-         "podd": [
-          "The Fighting Cock (Tottenham Hotspur Podcast)"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Supportrarna säger att Kudus inte längre får två försvarare på sig som före skadan. Han förlorar sina dueller ett mot ett, och eftersom han är lagets utlösningsboll faller hela uppspelet ihop när han tappar den.",
-         "s": "h",
-         "podd": [
-          "The Fighting Cock (Tottenham Hotspur Podcast)"
-         ],
-         "datum": [
-          "2026-11-16"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Supportrarna tycker att problemet under De Zerbi inte är att få in bollen i bra lägen utan att skapa chanser därifrån. Därför blir varje hemmamatch ett lotteri, oavsett motståndare.",
-         "s": "o",
-         "podd": [
-          "The Fighting Cock (Tottenham Hotspur Podcast)"
          ],
          "datum": [
           "2026-11-16"
@@ -1147,9 +1147,9 @@
       }
      ],
      "text": [
-      "I The Extra Inch skämtar man bittert om att Spurs har blivit ”väldigt goda värdar” på sistone. På Glory-Glory berättar en säsongsbesökare att han inte har sett en enda ligaseger på hemmaplan på tio besök.",
-      "Felet sitter på tian. När laget lockar fram motståndarna drar systemet ner även tian mot bollen, och då står sista tredjedelen tom. Roberto De Zerbi säger att James Maddison har tränat bra varje dag sedan Leeds.",
-      "Själv sitter tränaren avstängd och lovar att staben klarar matchen, ”kanske bättre än jag”."
+      "Uppspelet blir ”lite bättre för varje match”, säger man i The Fighting Cock, men bollen hamnar hos anfallare som ingen litar på när de är ensamma med målvakten. På forumet Glory-Glory beskrivs Solanke som färdig, och få tror att Marmoush är bättre längst fram.",
+      "Om hemmamatcherna är tonen syrlig. Supportrarna kallar laget ”väldigt goda värdar”, och en med säsongskort har inte sett en ligaseger på tio besök.",
+      "Mest galla får den inlånade Mudryk, som ska ha sagt att han bara är i klubben för att ta sig tillbaka till Chelsea. Hans minuter vill man hellre ge unge Luca Williams-Barnett."
      ],
      "citat": {
       "sagt": "Gör vi första målet vinner vi. Går vi mållösa till halvtid hittar vi förmodligen ett sätt att förlora.",
@@ -1159,10 +1159,12 @@
       "datum": "2026-11-20"
      },
      "namn": [
-      "Roberto De Zerbi",
-      "James Maddison"
+      "Solanke",
+      "Marmoush",
+      "Mudryk",
+      "Luca Williams-Barnett"
      ],
-     "paSpel": "Reaktionen efter Leeds som De Zerbi kräver, fast han själv sitter avstängd."
+     "paSpel": "Revansch för hemmaförlusten mot Ipswich, som fortfarande svider på läktaren."
     },
     {
      "lag": "Ipswich Town",
@@ -1172,6 +1174,13 @@
        "avsnitt": "🔍 TOTTENHAM V IPSWICH TOWN MATCH PREVIEW | PREMIER LEAGUE | The Prematch Show",
        "datum": "2026-11-19",
        "adress": "https://shows.acast.com/bluemondaypodcast/episodes/tottenham-v-ipswich-town-match-preview-premier-league-the-p",
+       "typ": "podd"
+      },
+      {
+       "podd": "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star",
+       "avsnitt": "668: Kings of Anglia: Will Town bounce back at Spurs? Preview, predictions and GTA chat",
+       "datum": "2026-11-19",
+       "adress": "https://audioboom.com/posts/8978934",
        "typ": "podd"
       },
       {
@@ -1284,23 +1293,23 @@
           "2026-11-19"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Värdarna påpekar att sommarens pengar gick till anfall och mittfält medan försvaret knappt rördes. Tre av fem i backlinjen och målvakten är kvar från förra säsongens Championship-lag.",
-         "s": "o",
-         "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "podd"
         }
        ]
       },
       {
        "amne": "match",
        "punkter": [
+        {
+         "t": "Supportrarna tror att Tottenhams hemmapublik fortfarande är nervös efter två säsonger nere i tabellen. Ett tidigt bakslag kan räcka för att stämningen ska vända, och det är den osäkerheten Ipswich ska spela på.",
+         "s": "o",
+         "podd": [
+          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
+         ],
+         "datum": [
+          "2026-11-19"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "En supporter menar att Tottenhams segersvit är tunnare än den ser ut. Segrarna kom mot Coventry, mot ett Palace som fick en man utvisad efter 20 minuter och mot ett Chelsea som gjorde självmål och också fick en utvisning.",
          "s": "o",
@@ -1316,23 +1325,21 @@
       }
      ],
      "text": [
-      "På Blue Monday säger man det rakt ut: fortsätter laget att släppa in två mål per match åker det ur. Värdarna är oense om Gary O'Neil, som nästan bara pratar om anfallsspel, och de tror att Christian Walton behåller platsen, men bara som ”den bästa av våra tre seniora målvakter”.",
-      "Julio Enciso är lagets enda riktiga matchvinnare, och att han tappar bollen när han chansar är just därför han spelar.",
-      "På TWTD hoppas man att Spurs hemmapublik vänder sig mot sitt lag om Ipswich håller nollan länge."
+      "I podden Kings of Anglia tror man att Tottenhams hemmapublik bara behöver ett tidigt bakslag för att tänka ”nu börjar det igen”. Planen är att ligga kompakt och vänta på att läktaren blir orolig.",
+      "Haken, påpekar en supporter på TWTD, är att laget självt släpper in flest mål av alla under matchernas första kvart.",
+      "I försvaret har inget gjorts. Sommarens pengar gick till mittfält och anfall, och Christian Walton beskrivs som stabil men inte som en målvakt för Premier League. Ändå väntas han stå kvar, mest för att ingen av reserverna anses vara bättre."
      ],
      "citat": {
-      "sagt": "Om vi gör första målet känner jag mig ganska säker på oss.",
+      "sagt": "Vi vet alla att om vi fortsätter att släppa in mål i den här takten så åker vi ur.",
       "vem": null,
       "podd": "Blue Monday: An Ipswich Town Podcast",
       "typ": "podd",
-      "datum": "2026-11-19"
+      "datum": "2026-11-14"
      },
      "namn": [
-      "Gary O'Neil",
-      "Christian Walton",
-      "Julio Enciso"
+      "Christian Walton"
      ],
-     "paSpel": "Ren bonus, mitt i en svit där O'Neils framtid börjar diskuteras."
+     "paSpel": "Inte mycket: allt som tas med hem från Tottenham ses som en bonus."
     }
    ]
   },
