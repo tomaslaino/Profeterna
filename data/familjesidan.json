@@ -15,29 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-21T09:52:00.564Z",
+ "skriven": "2026-11-21T10:00:55.990Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-21T09:43:45.845Z",
+ "underlag": "2026-11-21T09:55:25.511Z",
  "rubrik": "En tränare har kommit, en har gått och två sitter löst",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Crystal Palace",
    "namn": "Thomas Frank",
-   "text": "gör sin första match som tränare i Crystal Palace borta mot Coventry och säger att han är mycket glad att vara tillbaka i fotbollen. Supportrarna ser honom som ett vettigt val."
+   "text": "gör sin första match i Crystal Palace borta mot Coventry och säger att han är mycket glad att vara tillbaka. Supportrarna ser honom som ett vettigt val som faktiskt vill träna försvaret."
   },
   {
    "slag": "avflyttad",
    "lag": "Swansea City",
    "namn": "Vitor Matos",
-   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att det är sämsta tänkbara tillfälle och noterar att klubben knappt har sagt ett ord."
+   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att tidpunkten är den sämsta tänkbara och noterar att klubben knappt har sagt ett ord."
   },
   {
    "slag": "tillforordnad",
    "lag": "Swansea City",
    "namn": "Ashley Williams",
-   "text": "leder Swansea City tillfälligt mot West Brom. Supportrarna oroar sig för att den nya ledningen bara har haft ungefär 48 timmar på sig, medan motståndarnas stab har haft två veckor."
+   "text": "leder Swansea City tillfälligt mot West Bromwich Albion. Supportrarna oroar sig för att den nya ledningen har haft ungefär 48 timmar på sig, medan motståndarnas stab har haft två veckor."
   },
   {
    "slag": "aterseende",
@@ -49,25 +49,25 @@
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har fått klubbens offentliga stöd, men enligt uppgifter i medier kollar Bristol City redan upp möjliga efterträdare. Flera tusen egna supportrar vände sig mot honom efter 0–5 hemma mot Norwich."
+   "text": "fick flera tusen av Bristol Citys egna supportrar emot sig efter 0–5 hemma mot Norwich. Klubben har offentligt ställt sig bakom honom men kollar enligt uppgifter redan upp möjliga efterträdare."
   },
   {
    "slag": "sitter_lost",
    "lag": "Watford",
    "namn": "Alessio Dionisi",
-   "text": "väntades få sparken under landslagsuppehållet men tros ha räddats tills vidare av fyra poäng i de två senaste hemmamatcherna och av ägaren Gino Pozzos rättegång i Spanien."
+   "text": "väntades få sparken under landslagsuppehållet. Fyra poäng i de två senaste hemmamatcherna och ägaren Gino Pozzos rättegång i Spanien tros ha räddat honom tills vidare."
   },
   {
    "slag": "besked",
    "lag": "Sheffield United",
    "namn": "Sheffield United",
-   "text": "räknar med ett poängavdrag på 12 poäng, och enligt supportern Chad ses matchen mot Watford därför som en nedflyttningsstrid."
+   "text": "räknar enligt en supporter med ett poängavdrag på 12 poäng, och därför ses matchen mot Watford som en nedflyttningsstrid."
   },
   {
    "slag": "besked",
    "lag": "Leeds United",
    "namn": "Leeds United",
-   "text": "väntar på nya pengar sedan ägarna anlitat New York-banken Allen & Co för att värdera klubben. Kapitalbehovet ska ha överraskat en del delägare och stämmer dåligt med vad de tidigare fått höra."
+   "text": "har genom ägarna anlitat New York-banken Allen & Co för att värdera klubben och ta in nya pengar. Kapitalbehovet ska ha överraskat en del delägare."
   }
  ]
 }
