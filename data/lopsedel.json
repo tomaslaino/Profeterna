@@ -15,29 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-21T09:35:37.984Z",
+ "skriven": "2026-11-21T09:51:30.610Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-21T09:31:22.755Z",
+ "underlag": "2026-11-21T09:43:45.845Z",
  "rubrik": {
   "id": "401879232",
-  "kick": "BRUNO GUIMARÃES",
+  "kick": "ÅTERKOMSTEN",
   "rad": [
    [
-    "”GÖR DET",
+    "BRUNO",
     0
    ],
    [
-    "INTE,",
+    "TILLBAKA",
     0
    ],
    [
-    "FÖR FAN”",
+    "SOM FIENDE",
     1
    ]
   ],
-  "under": "Arsenalpodden vill att Rice och Ødegaard lugnar Bruno när han möter gamla klubben Newcastle",
-  "plus": "WATFORDFANS HOPPAS PÅ STRYK",
-  "plusId": "401880154"
+  "under": "Newcastlefans kallar superagenten han tog in för att komma bort ”oförlåtligt”",
+  "plus": "SARR MISSTROS AV EGNA FANS",
+  "plusId": "401879235"
  }
 }
