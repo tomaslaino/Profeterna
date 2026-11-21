@@ -15,29 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-21T08:32:58.653Z",
+ "skriven": "2026-11-21T08:48:54.070Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-21T08:20:39.020Z",
+ "underlag": "2026-11-21T08:41:15.765Z",
  "rubrik": {
   "id": "401879232",
-  "kick": "NEWCASTLE",
+  "kick": "BRUNOS RETUR",
   "rad": [
    [
-    "BÄSTA",
+    "EXKAPTENEN",
     0
    ],
    [
-    "HELGEN VAR",
+    "MOT SIN",
     0
    ],
    [
-    "UTAN MATCH",
+    "GAMLA KLUBB",
     1
    ]
   ],
-  "under": "”De där svartvita jävlarna kan inte förstöra min helg.” Arbetskamrat till värd i True Faith",
-  "plus": "WATFORDFANS HOPPAS PÅ STRYK",
-  "plusId": "401880154"
+  "under": "Arsenalpodden: ser Bruno rött ska Rice och Ødegaard säga ”gör det inte, för fan”",
+  "plus": "MATOS LÄMNADE SWANSEA",
+  "plusId": "401880151"
  }
 }
