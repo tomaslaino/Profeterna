@@ -15,33 +15,29 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-20T15:50:41.459Z",
+ "skriven": "2026-11-21T08:01:23.133Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-20T15:45:31.917Z",
+ "underlag": "2026-11-21T08:00:43.833Z",
  "rubrik": {
-  "id": "401879238",
-  "kick": "FOREST",
+  "id": "401879232",
+  "kick": "ARSENAL",
   "rad": [
    [
-    "GLASNERS",
+    "GYÖKERES",
     0
    ],
    [
-    "ANSIKTE PÅ",
+    "KALLAS",
     0
    ],
    [
-    "SUPPORTERNS",
-    0
-   ],
-   [
-    "BAKDEL",
+    "BREDDSPELARE",
     1
    ]
   ],
-  "under": "Efter 3–1 mot City skriver en supporter att han har Glasners ansikte tatuerat på bakdelen",
-  "plus": "WATFORDFANS VILL HA STRYK",
-  "plusId": "401880154"
+  "under": "På NOT606 kallas Viktor Gyökeres och Kai Havertz i bästa fall breddspelare.",
+  "plus": "FAN HAR GLASNER PÅ BAKDELEN",
+  "plusId": "401879238"
  }
 }
