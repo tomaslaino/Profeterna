@@ -15,59 +15,59 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-21T08:33:28.819Z",
+ "skriven": "2026-11-21T08:49:22.986Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-21T08:20:39.020Z",
+ "underlag": "2026-11-21T08:41:15.765Z",
  "rubrik": "En tränare har kommit, en har gått och två sitter löst",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Crystal Palace",
    "namn": "Thomas Frank",
-   "text": "gör sin första match som tränare i Crystal Palace borta mot Coventry och säger att han är mycket glad att vara tillbaka. Supportrarna ser honom som ett vettigt val som faktiskt vill träna försvaret."
+   "text": "gör sin första match som tränare i Crystal Palace borta mot Coventry. Supportrarna ser honom som ett vettigt val, framför allt för att han faktiskt vill träna försvaret."
   },
   {
    "slag": "avflyttad",
    "lag": "Swansea City",
    "namn": "Vitor Matos",
-   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att tidpunkten var den sämsta tänkbara och noterar att klubben knappt har sagt ett ord."
+   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att tidpunkten är den sämsta tänkbara och noterar att klubben knappt har sagt ett ord."
   },
   {
    "slag": "tillforordnad",
    "lag": "Swansea City",
    "namn": "Ashley Williams",
-   "text": "leder Swansea City tillfälligt mot West Brom. Supportrarna oroar sig för att den nya ledningen har haft ungefär 48 timmar på sig, medan motståndarna har haft två veckor."
+   "text": "leder Swansea City tillfälligt mot West Brom. Supportrarna oroar sig för att den nya ledningen bara har haft ungefär 48 timmar på sig, medan motståndarna har haft två veckor."
   },
   {
    "slag": "aterseende",
    "lag": "Arsenal",
    "namn": "Bruno Guimarães",
-   "text": "kommer tillbaka till St James' Park i sin första match mot den gamla klubben och väntas bli utbuad, även om flera försvarar honom som den förste kaptenen sedan 1955 med en inhemsk titel."
+   "text": "kommer tillbaka till St James' Park med Arsenal och väntas bli utbuad. Flera Newcastlefans försvarar honom ändå, eftersom han var den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "är under press sedan flera tusen egna supportrar vände sig mot honom efter 0–5 hemma mot Norwich. Vd:n har stöttat honom offentligt, men enligt medieuppgifter kollar klubben redan upp efterträdare."
+   "text": "har flera tusen av klubbens egna supportrar emot sig efter 0–5 hemma mot Norwich. Vd:n har offentligt stött honom, men enligt uppgifter i medier kollar klubben redan upp efterträdare."
   },
   {
    "slag": "sitter_lost",
    "lag": "Watford",
    "namn": "Alessio Dionisi",
-   "text": "väntades få sparken under landslagsuppehållet men tros tills vidare ha räddats av fyra poäng i de två senaste hemmamatcherna och ägaren Gino Pozzos rättegång i Spanien."
-  },
-  {
-   "slag": "besked",
-   "lag": "Sheffield United",
-   "namn": "Sheffield United",
-   "text": "räknar med ett poängavdrag på 12 poäng, och supportrarna ser därför hemmamatchen mot Watford som en nedflyttningsstrid."
+   "text": "väntades av alla få sparken under landslagsuppehållet. Fyra poäng i de två senaste hemmamatcherna och ägaren Gino Pozzos rättegång i Spanien tros ha räddat honom tills vidare."
   },
   {
    "slag": "besked",
    "lag": "Leeds United",
    "namn": "Leeds United",
-   "text": "väntar på nya pengar sedan ägarna anlitat New York-banken Allen & Co för att värdera klubben. Behovet ska ha överraskat en del delägare, och supportrarna tycker att det känns destabiliserande."
+   "text": "ska värderas av New York-banken Allen & Co, som ägarna har anlitat för att ta in nya pengar. Enligt supporterpodden överraskade kapitalbehovet en del delägare."
+  },
+  {
+   "slag": "besked",
+   "lag": "Sheffield United",
+   "namn": "Sheffield United",
+   "text": "räknar med ett poängavdrag på 12 poäng, enligt en supporter, som därför ser matchen mot Watford som en nedflyttningsstrid."
   }
  ]
 }
