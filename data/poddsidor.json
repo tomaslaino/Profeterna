@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-21T09:04:14.829Z",
+ "uppdaterad": "2026-11-21T09:31:22.755Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1352,14 +1352,21 @@
     "Sunderland"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-21T08:02:47.660Z",
-   "rubrik": "Passningsspelaren Villa efterlyste har stått där hela säsongen",
+   "skriven": "2026-11-21T09:24:21.338Z",
+   "rubrik": "Båda läktarna har sett samma sak: Suzuki och inläggen",
    "ingress": null,
-   "summering": "Villa grälar om målvakten och oroar sig för sitt eget slarv på hemmaplan. Sunderlands mittfält vilar på en tonåring, och supportrarna bävar för att Trai Hume flyttas in bredvid honom.",
+   "summering": "Villa tar med sig oron för sin målvakt och för sin egen hemmaplan in i matchen. Sunderland saknar sin uppspelspunkt men låter gärna värdarna ha bollen.",
    "delar": [
     {
      "lag": "Aston Villa",
      "kallor": [
+      {
+       "podd": "My Old Man Said — An Aston Villa Podcast",
+       "avsnitt": "Aston Villa's Quarter-Season Checkpoint and New Contract Accountancy",
+       "datum": "2026-11-21",
+       "adress": "https://shows.acast.com/myoldmansaid/episodes/aston-villas-quarter-season-checkpoint-and-new-contract",
+       "typ": "podd"
+      },
       {
        "podd": "Vital Villa",
        "avsnitt": "Aston Villa v Sunderland Match Thread - Sat 21st Nov - 3pm · Manchester United v Aston Villa Match Thread - Sun 8 Nov - 4.30pm · The Johan Manzambi Thread",
@@ -1442,59 +1449,53 @@
          "typ": "forum"
         },
         {
-         "t": "Efter 96:e-minutens kvittering mot United menar en del supportrar att Zion Suzukis bollhantering är ett verkligt problem. De anser att han har kostat laget två segrar på två matcher och att han tappade bollen redan i första halvlek.",
+         "t": "Supportrarna undrar vad klubbens timmar av videoanalys ger. Efter Fulham-målet borde laget ha skyddat målvakten bättre i Uniteds sena hörna, och mot Sunderland vill de se om Suzuki får mer hjälp.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-18"
+          "2026-11-21"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Andra supportrar försvarar Suzuki med kraft. De påpekar att Emiliano Martínez var långt ifrån sin bästa nivå de två senaste säsongerna och att 24-årige Suzuki redan är mycket bättre än Martínez var i samma ålder.",
+         "t": "Värdarna är oense om Ian Maatsen. Phil Shaw ser honom som en kantspelare som felaktigt skolats om till back. De andra kallar honom en modern wingback som spelar bättre mot starka lag.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-19"
+          "2026-11-21"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "En del supportrar tycker att det korta uppspelet bakifrån är riskabelt för Villa. Bara Pau Torres och Suzuki har enligt dem förmågan att spela sig ur en press.",
+         "t": "Villas vänsterkant har blivit en svag punkt. Utan en fysisk spelare framför Maatsen lämnas han ofta ensam, och motståndarna har börjat anfalla just där.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-20"
+          "2026-11-21"
          ],
-         "typ": "forum"
-        },
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
         {
-         "t": "En del supportrar tycker att målvakten Zion Suzuki har kostat laget två segrar på två matcher. De menar att hans bollhantering är osäker och att han tappade en boll framför en motspelare redan i första halvlek mot United.",
+         "t": "Före landslagsuppehållet trodde supportrarna att försvaret var tillrättat, särskilt efter City-matchen. Nu tror de att det bara var en fasad och att motståndarna har listat ut Villa och Suzuki.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-18"
+          "2026-11-21"
          ],
-         "typ": "forum"
-        },
-        {
-         "t": "Andra försvarar Suzuki hårt. De påpekar att Martínez gjorde misstag nog de senaste säsongerna och att Suzuki redan som 24-åring är långt före där Martínez var.",
-         "s": "o",
-         "podd": [
-          "Vital Villa"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -1502,41 +1503,58 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Sunderland har gjort få mål och saknar sin anfallare och sin lagkapten, men supportrarna litar inte på sitt eget lags ojämnhet. Laget har varit bra mot Manchester City och Tottenham men tappat fokus mot Brentford, Fulham och Brighton och rasat ihop mot United.",
+         "t": "Suzuki har tappat flest inlägg i ligan och möter fler inlägg än han gjorde i Italien. Supportrarna tror att motståndarna har börjat sikta på honom, och Sunderland är just ett lag som lever på inlägg.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-20"
+          "2026-11-21"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Villa har bara vunnit en ligamatch på Villa Park, och det oroar supportrarna mest. De menar att Sunderlandmatchen är viktigare än den ser ut, eftersom stämningen måste vända direkt.",
+         "s": "o",
+         "podd": [
+          "My Old Man Said — An Aston Villa Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På forumet Vital Villa har man upptäckt att passningsspelaren man har efterlyst redan finns i laget: enligt statistiken slår Johan Manzambi fler chansskapande djupledsbollar än någon annan i ligan. Att ingen har sett det förklaras med att laget hoppar över mittfältet och skickar bollen från backlinjen raka vägen till anfallet.",
-      "Målvakten Zion Suzuki delar supportrarna. Kritikerna menar att hans osäkra bollhantering har kostat två segrar, medan försvararna tycker att han redan är ”ljusår före Martínez” i samma ålder.",
-      "Och under kravet på seger ligger den gamla rädslan för vad Villa kan ställa till med på hemmaplan."
+      "Zion Suzuki har tappat flest inlägg i ligan, och i podden My Old Man Said tror man att motståndarna har börjat sikta på honom. Och nu kommer Sunderland, ett lag som lever på inlägg.",
+      "Ännu mer oroar hemmaformen: laget har bara vunnit en ligamatch på egen plan, och på forumet Vital Villa vet man att Villa kan ”segla mot en seger, och sen … oj”.",
+      "Där har man också upptäckt att Johan Manzambi slår fler chansskapande djupledsbollar än någon annan i ligan. Passningsspelaren som alla efterlyst har alltså funnits i laget hela säsongen."
      ],
      "citat": {
-      "sagt": "Det här är Villa på Villa Park. Vi kan segla mot en seger, och sen … oj.",
+      "sagt": "Grabben är ljusår före Martínez vid 24 års ålder. Martínez var 29 innan han slog igenom.",
       "vem": "Villan57",
       "podd": "Vital Villa",
       "typ": "forum",
       "datum": "2026-11-19"
      },
      "namn": [
-      "Johan Manzambi",
       "Zion Suzuki",
-      "Martínez"
+      "Johan Manzambi"
      ],
-     "paSpel": "Champions League väntar på tisdag, men Emery säger att ligan går först."
+     "paSpel": "Att vända stämningen på Villa Park, med Champions League redan på tisdag."
     },
     {
      "lag": "Sunderland",
      "kallor": [
+      {
+       "podd": "Haway The Podcast – Sunderland AFC",
+       "avsnitt": "NO XHAKA, NO BROBBEY… NOW WHAT?! | Aston Villa v Sunderland Preview",
+       "datum": "2026-11-21",
+       "adress": "https://podcasts.apple.com/gb/podcast/haway-the-podcast-sunderland-afc/id1800684854?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "Wise Men Say",
        "avsnitt": "PREVIEW | ASTON VILLA (A)",
@@ -1622,28 +1640,6 @@
           "2026-11-20"
          ],
          "typ": "media"
-        },
-        {
-         "t": "Brian Brobbey skadade sig mot Chelsea och missar matchen mot Aston Villa. Det är en ny skada som inte hänger ihop med den förra. Den är allvarlig och ska bedömas vecka för vecka, så det finns ingen tidsplan för comebacken.",
-         "s": "b",
-         "podd": [
-          "A Love Supreme"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "media"
-        },
-        {
-         "t": "Lagkaptenen Granit Xhaka är också skadad och missar matchen. Sunderland har totalt fem spelare skadade.",
-         "s": "b",
-         "podd": [
-          "A Love Supreme"
-         ],
-         "datum": [
-          "2026-11-19"
-         ],
-         "typ": "media"
         }
        ]
       },
@@ -1666,6 +1662,17 @@
       {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Utan Brobbey förlorar laget sin uppspelspunkt, han som höll bollen i upp till tio sekunder medan resten flyttade upp. När han var borta senast spelade laget på Isidor på samma sätt mot Brighton, och det fungerade inte alls.",
+         "s": "h",
+         "podd": [
+          "Haway The Podcast – Sunderland AFC"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Supportrarna tror att 19-årige Jules Ahoka får bära mittfältet tillsammans med Sadiki tills Xhaka är tillbaka, kanske i januari. Med åtta, nio matcher på kort tid är det tungt för en spelare som knappt har spelat, och prestationerna kan sjunka.",
          "s": "o",
@@ -1710,6 +1717,17 @@
        "amne": "match",
        "punkter": [
         {
+         "t": "Villas supportrar räknar med att dominera bollen, och det ser Sunderlands supportrar som en fördel. Martin Manless känner sig tryggare inför Villa borta än inför en hemmamatch mot Forest, eftersom laget är som bäst utan boll.",
+         "s": "o",
+         "podd": [
+          "Haway The Podcast – Sunderland AFC"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna tror att Brobbeys frånvaro påverkar hela lagets spel. Utan någon som kan hålla i bollen längst fram väntas Villa vinna tillbaka den hela tiden och trycka på mot Sunderlands mål.",
          "s": "o",
          "podd": [
@@ -1724,26 +1742,23 @@
       }
      ],
      "text": [
-      "Sunderland lägger mittfältet i händerna på en 19-åring: Jules Ahoka väntas göra sin första start i Premier League i lagkaptenen Granit Xhakas ställe. I podden Wise Men Say fruktar man att han och Noah Sadiki slits ut innan Xhaka är tillbaka.",
-      "På forumet Ready To Go är det ändå Trai Hume som skrämmer mest. Le Bris har berättat att Hume har spelat mittfältare för Nordirland, och många minns hur bortkommen han var där förra säsongen.",
-      "Utan Brian Brobbey längst fram väntar man sig på NOT606 dessutom att bollen ”hela tiden” kommer tillbaka mot det egna målet."
+      "Brian Brobbey saknas mer för sitt spel än för sina mål: han höll bollen i upp till tio sekunder medan laget flyttade upp. När laget senast försökte spela på Wilson Isidor på samma sätt, mot Brighton, ”fungerade det inte alls”, påminner man i Haway The Podcast.",
+      "Ändå ser man en fördel i att Villa väntas ha bollen: ”Vi har inget emot att vara utan boll.”",
+      "I Wise Men Say beskrivs stämningen efter segern mot Chelsea som skör. Gör Jules Ahoka en mardrömsmatch i sin första start i Premier League vet man ”hur supportrar kan vara”."
      ],
      "citat": {
-      "sagt": "Förlorar vi, och förlorar stort, och Ahoka gör en riktig mardrömsmatch, ja, då vet man ju hur supportrar kan vara.",
-      "vem": "Stephen Goldsmith",
-      "podd": "Wise Men Say",
-      "typ": "podd",
-      "datum": "2026-11-19"
+      "sagt": "Utan Brobbey som kan hålla i bollen kommer den hela tiden att komma tillbaka mot vårt mål.",
+      "vem": "Bank of England 2",
+      "podd": "NOT606",
+      "typ": "forum",
+      "datum": "2026-11-20"
      },
      "namn": [
-      "Jules Ahoka",
-      "Granit Xhaka",
-      "Noah Sadiki",
-      "Trai Hume",
-      "Le Bris",
-      "Brian Brobbey"
+      "Brian Brobbey",
+      "Wilson Isidor",
+      "Jules Ahoka"
      ],
-     "paSpel": "Den sköra tron efter Chelsea-segern, och en poäng skulle göra podden överlycklig."
+     "paSpel": "Om segern mot Chelsea var en mall, och om läktarens nyvunna tro håller."
     }
    ]
   },
