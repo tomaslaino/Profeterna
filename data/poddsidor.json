@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-21T09:43:45.845Z",
+ "uppdaterad": "2026-11-21T09:55:25.511Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2524,10 +2524,10 @@
     "Portsmouth"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-21T08:04:26.252Z",
-   "rubrik": "I Bolton är man oense om pressen",
+   "skriven": "2026-11-21T09:55:25.511Z",
+   "rubrik": "Bolton grälar om pressen, inte om paniken",
    "ingress": null,
-   "summering": "Bolton grälar om hur högt laget ska pressa och oroar sig för de fasta situationerna. I Portsmouth handlar allt om ifall mittfältsankaret Iyad Mohamed hinner bli klar.",
+   "summering": "Boltonpodden är oenig om pressen men enig om Sheehan och om att panik inte behövs. Hos Portsmouth hänger mittfältet på om Iyad Mohamed hinner bli av med vadskadan.",
    "delar": [
     {
      "lag": "Bolton Wanderers",
@@ -2537,6 +2537,13 @@
        "avsnitt": "Portsmouth & West Bromwich Albion - The Preview Show",
        "datum": "2026-11-19",
        "adress": "https://podcasters.spotify.com/pod/show/ben-timberlake2/episodes/Portsmouth--West-Bromwich-Albion---The-Preview-Show-e3smscp",
+       "typ": "podd"
+      },
+      {
+       "podd": "The Lion of Vienna - A Bolton Wanderers podcast",
+       "avsnitt": "LOVpod Special - The Ian Evatt Years",
+       "datum": "2026-11-18",
+       "adress": "https://shows.acast.com/the-lion-of-vienna-a-bolton-wanderers-podcast/episodes/lovpod-special-the-ian-evatt-years",
        "typ": "podd"
       },
       {
@@ -2648,9 +2655,9 @@
       }
      ],
      "text": [
-      "I Bolton är man oense om pressen. I The Fanzone Pod säger statistikern Cal att laget gör flest mål i serien på höga bollvinster men vinner bollen där för sällan, och han vill att Steven Schumacher går över till ett mittblock i 4-4-2. En av värdarna vill däremot ”aldrig se oss backa hem”.",
-      "Kaptenen Josh Sheehan kallas den kanske viktigaste spelaren bakom vägen tillbaka till Championship. Nu när laget spelar mer i omställningar kommer hans långa passningar ännu bättre till sin rätt.",
-      "Oron inför lördagen gäller försvaret vid fasta situationer, som podden kallar säsongens akilleshäl, mot ett Portsmouth som är farligt just där."
+      "Boltons press är veckans gräl i The Fanzone Pod. Statistikern Cal noterar att laget gör flest mål i serien på bollvinster högt upp men sällan vinner bollen där, och han vill se Steven Schumacher byta till ett mittblock i 4-4-2. En av värdarna vägrar: ”Jag skulle aldrig vilja se oss backa hem.”",
+      "Kapten Josh Sheehan ses fortfarande som lagets kanske viktigaste spelare, och när Bolton nu spelar mer i omställningar kommer hans långa passningar ännu bättre till sin rätt.",
+      "Oron inför lördagen gäller försvaret vid fasta situationer, säsongens akilleshäl, mot ett Portsmouth med sju mål på sådana."
      ],
      "citat": {
       "sagt": "De underliggande siffrorna ser riktigt bra ut för vår del. Det är absolut inte läge för panik, inte på långa vägar.",
@@ -2660,10 +2667,11 @@
       "datum": "2026-11-19"
      },
      "namn": [
+      "Cal",
       "Steven Schumacher",
       "Josh Sheehan"
      ],
-     "paSpel": "Ett test av om Schumacher vågar ändra något, som podden länge efterlyst."
+     "paSpel": "Att visa att steget upp är stort, men inget skäl till panik."
     },
     {
      "lag": "Portsmouth",
@@ -2722,9 +2730,8 @@
       }
      ],
      "text": [
-      "Frågan i Portsmouth är om Iyad Mohamed hinner bli klar. Den defensive mittfältaren har spelat sig till en ordinarie plats i John Mousinhos lag och startat sex av de senaste sju matcherna.",
-      "Lokaltidningen The News bedömer honom som osäker efter vadskadan, och Mousinho sa på presskonferensen att han annars spelar mot West Ham eller Wrexham.",
-      "Saknas han får Ebrima Adams eller Rocco Robert Shein, som han har hållit utanför elvan, en chans på mittfältet."
+      "Lokaltidningen The News beskriver Iyad Mohamed som den defensive mittfältskrigare som har spelat sig in i John Mousinhos elva och hållit Ebrima Adams och Rocco Robert Shein utanför laget.",
+      "Efter vadskadan som höll honom borta mot Stoke är han nu 50-50, och saknas han bör en av de två ta hans plats. I så fall räknar Mousinho med honom mot West Ham eller Wrexham. Mittfältet på lördag kan alltså se annorlunda ut än det har gjort på sistone."
      ],
      "namn": [
       "Iyad Mohamed",
