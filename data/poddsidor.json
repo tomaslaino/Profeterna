@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4980
  },
- "uppdaterad": "2026-11-21T09:55:25.511Z",
+ "uppdaterad": "2026-11-21T10:06:28.235Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2751,10 +2751,10 @@
     "Wrexham"
    ],
    "avspark": "2026-11-21T15:00:00.000Z",
-   "skriven": "2026-11-21T08:05:02.948Z",
-   "rubrik": "Lincoln älskar sin rumän, men tränarna lät honom sitta",
+   "skriven": "2026-11-21T10:06:28.235Z",
+   "rubrik": "Netflix FC kommer till stan, Lincolnpubliken stannar hemma",
    "ingress": null,
-   "summering": null,
+   "summering": "Lincoln letar efter en fast elva och någon som kan göra skillnad framåt, inför en gles läktare. Wrexham tror på sin trupp men har svårt att skapa chanser och hänger på Moores rygg.",
    "delar": [
     {
      "lag": "Lincoln City",
@@ -2899,19 +2899,23 @@
       }
      ],
      "text": [
-      "Mittfältaren Conor McGrandles är avstängd igen, nu för sex gula kort, trots att han precis avtjänat en avstängning före landslagsuppehållet. Tom Bayliss och Ivan Varfolomeev slåss om hans plats.",
-      "Supportrarna tycker att det senaste mot QPR var bisarrt. Coubis, som de räknar som en av lagets bästa, kom inte ens in när laget gick över till fembackslinje. I stället tvingades högerfotade Deji Elerewe spela vänster mittback medan Towler satt på bänken. Supportrarna menar att Varfolomeev, Konak och McGrandles är samma sorts mittfältare och inte kan spela tillsammans. Laget saknar någon som kan ta bollen framåt centralt, och de vill ha två bollsäkra mittfältare vid sidan av Varfolomeev eller McGrandles. Andrei Coubis har varit enastående som högerback eller högerwingback och drar med sig hela laget framåt. Adam Reach på vänsterkanten räknas till säsongens bästa spelare. Laget är välorganiserat men saknar en spelare med flair som kan avgöra. Värdarna ser kantpositionerna i anfallet som lagets svaga punkt och vill att klubben värvar just där i januari.",
-      "En supporter säger emot de andra. Han tror inte att alla byten i elvan är problemet. Han tror att truppen helt enkelt inte är tillräckligt bra för Championship och att självförtroendet har rasat, som för många lag som vunnit League One stort. Supportrarna godtar att laget kan spela fult och trist en tid, så länge det håller sig kvar i Championship. Målet är att lägga en grund som gör att laget stannar i serien.",
-      "Wrexham skapar sämst i ligan när det gäller stora chanser och är svaga framåt. Värdarna ser hemmamatchen som ett bra tillfälle för Lincoln att hålla nollan."
+      "Andrei Coubis är rumänen som Lincolnsupportrarna har förälskat sig i, och därför tyckte man på forumet Vital Imps att det var bisarrt när han inte ens kom in mot QPR. När laget gick över till fem backar fick i stället högerfotade Ayodeji Elerewe flytta till vänster mittback.",
+      "Tränarstaben ändrar i elvan dubbelt så ofta som förra säsongen, och många påminner om att Skubala hittade sin elva ungefär vid den här tiden i fjol och sedan höll fast vid den. En supporter säger emot: truppen är ”helt enkelt inte tillräckligt bra” för Championship.",
+      "Läktaren väntas bli säsongens glesaste, för ”Netflix FC” lockar inte Lincolnpubliken."
      ],
      "citat": {
-      "sagt": "Det kan bli säsongens lägsta publiksiffra. Det ser ut som att Lincolnpubliken inte lockas av Netflix FC.",
-      "vem": "Scotimp",
-      "podd": "Vital Imps",
-      "typ": "forum",
-      "datum": "2026-11-20"
+      "sagt": "Hur välstrukturerade, välorganiserade och bra en del av våra spelare än är, var ska flairen komma ifrån hos oss?",
+      "vem": null,
+      "podd": "The Stacey West Podcast",
+      "typ": "podd",
+      "datum": "2026-11-18"
      },
-     "paSpel": "Chansen att äntligen börja ta poäng hemma, som supportrarna länge har krävt."
+     "namn": [
+      "Andrei Coubis",
+      "Ayodeji Elerewe",
+      "Skubala"
+     ],
+     "paSpel": "Chansen att äntligen tysta klagomålen över de tunna poängskördarna hemma."
     },
     {
      "lag": "Wrexham",
@@ -2921,6 +2925,13 @@
        "avsnitt": "Episode 335: Missing Linc",
        "datum": "2026-11-18",
        "adress": "https://shows.acast.com/6486dd5af5bfbf001188bea7/episodes/episode-335",
+       "typ": "podd"
+      },
+      {
+       "podd": "Fearless in Devotion",
+       "avsnitt": "Episode 378 - Why Kenya is Going Crazy for Wrexham! Plus Lincoln Preview",
+       "datum": "2026-11-18",
+       "adress": "https://fidpodcast.com/",
        "typ": "podd"
       },
       {
@@ -3068,14 +3079,14 @@
       }
      ],
      "text": [
-      "I podden Rob. Ryan. Red. berättar man att spelarna tror att truppen man för man håller samma klass som serieledande Birmingham.",
-      "Försvaret är det bästa i nedre halvan, men inget lag i serien har skapat färre klara chanser, bara 21. Utan en snabb spelare kan motståndarnas backlinje stå kvar mot Kieffer Moore, och laget får ingen avlastning.",
-      "Phil Parkinson väntas ändå få tid under nye sportchefen Steve Nixon, om inte säsongen rasar. Den som skötte sommarens värvningar har redan lämnat klubben."
+      "Spelarna i omklädningsrummet anser att de man för man är lika bra som serieledande Birmingham, enligt källorna till podden Rob. Ryan. Red. Ändå har inget lag i Championship skapat färre klara målchanser, bara 21.",
+      "Kieffer Moore lämnade Wales med en ryggskada, men i en annan supporterpodd är man lugn. Samma dag var han nämligen på ett välgörenhetsevenemang i en leksaksaffär, och då ligger han ”uppenbarligen inte på behandlingsbänken”.",
+      "Phil Parkinson väntas få jobba ordentligt under nye sportchefen Steve Nixon, så länge säsongen inte rasar."
      ],
      "citat": {
-      "sagt": "Jag tror inte att man kan åka dit och låta Lincoln styra, för de kämpar precis som vi.",
+      "sagt": "Det fanns ett visst missnöje och oro bland fansen. Sedan gav de två insatserna alla lite mod och tro igen.",
       "vem": null,
-      "podd": "Rob. Ryan. Red.",
+      "podd": "Fearless in Devotion",
       "typ": "podd",
       "datum": "2026-11-18"
      },
@@ -3084,7 +3095,7 @@
       "Phil Parkinson",
       "Steve Nixon"
      ],
-     "paSpel": "Att bryta bortatorkan sedan september, med Bristol City redan på tisdag."
+     "paSpel": "Att få bortaformen på rätt spår igen och visa att den nyvunna tron håller."
     }
    ]
   },
