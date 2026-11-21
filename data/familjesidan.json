@@ -15,59 +15,59 @@
   "401880151",
   "401880149"
  ],
- "skriven": "2026-11-21T10:16:41.732Z",
+ "skriven": "2026-11-21T10:32:35.412Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-21T10:06:28.235Z",
+ "underlag": "2026-11-21T10:23:57.614Z",
  "rubrik": "En tränare har kommit, en har gått och två sitter löst",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Crystal Palace",
    "namn": "Thomas Frank",
-   "text": "gör sin första match som tränare i Crystal Palace borta mot Coventry och säger att han är mycket glad att vara tillbaka. Supportrarna ser honom som ett vettigt val, eftersom han vill träna försvaret."
+   "text": "gör sin första match som tränare i Crystal Palace borta mot Coventry City. Supportrarna ser honom som ett vettigt val, framför allt eftersom han faktiskt vill träna försvaret."
   },
   {
    "slag": "avflyttad",
    "lag": "Swansea City",
    "namn": "Vitor Matos",
-   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att tidpunkten är den sämsta tänkbara."
+   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att det är sämsta tänkbara tillfälle och noterar att klubben knappt har sagt ett ord."
   },
   {
    "slag": "tillforordnad",
    "lag": "Swansea City",
    "namn": "Ashley Williams",
-   "text": "leder laget tillfälligt mot West Bromwich Albion. Supportrarna oroar sig för att motståndarna har haft två veckor att studera Swansea medan den nya ledningen bara har haft ungefär 48 timmar."
+   "text": "leder Swansea City tillfälligt mot West Bromwich Albion. Supportrarna oroar sig för att den nya ledningen bara har haft ungefär 48 timmar på sig, mot motståndarnas två veckor."
   },
   {
    "slag": "aterseende",
    "lag": "Arsenal",
    "namn": "Bruno Guimarães",
-   "text": "kommer tillbaka till St James' Park med Arsenal och väntas bli utbuad, även om flera Newcastlefans försvarar honom som den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
+   "text": "kommer tillbaka till St James' Park med Arsenal och väntas bli utbuad. Flera Newcastlesupportrar försvarar honom ändå, eftersom han var den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har klubbens offentliga stöd, men enligt uppgifter i medierna letar klubben redan efter en efterträdare. Flera tusen egna supportrar vände sig mot honom efter 0–5 hemma mot Norwich."
+   "text": "har klubbdirektörens offentliga stöd, men flera tusen egna supportrar vände sig mot honom efter 0–5 hemma mot Norwich, och enligt uppgifter i medierna kollar klubben redan upp möjliga efterträdare."
   },
   {
    "slag": "sitter_lost",
    "lag": "Watford",
    "namn": "Alessio Dionisi",
-   "text": "väntades få sparken under landslagsuppehållet men tros ha räddats tills vidare av fyra poäng i de två senaste hemmamatcherna och av ägaren Gino Pozzos rättegång i Spanien."
+   "text": "väntades få sparken under landslagsuppehållet. Fyra poäng i de två senaste hemmamatcherna och ägaren Gino Pozzos rättegång i Spanien tros ha räddat honom tills vidare."
   },
   {
    "slag": "besked",
    "lag": "Sheffield United",
    "namn": "Sheffield United",
-   "text": "räknar enligt supportern Chad med ett poängavdrag på 12 poäng, och därför ses matchen mot Watford som en nedflyttningsstrid."
+   "text": "räknar med ett poängavdrag på 12 poäng, och därför ser klubben enligt en supporter hemmamatchen mot Watford som en nedflyttningsstrid."
   },
   {
    "slag": "besked",
    "lag": "Leeds United",
    "namn": "Leeds United",
-   "text": "har genom ägarna anlitat New York-banken Allen & Co för att värdera klubben och ta in nya pengar. Enligt supporterpodden överraskade kapitalbehovet en del delägare."
+   "text": "låter New York-banken Allen & Co värdera klubben och ta in nya pengar, enligt supporterpodden. Kapitalbehovet ska ha överraskat en del delägare."
   }
  ]
 }
