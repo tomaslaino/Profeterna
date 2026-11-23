@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T17:42:43.321Z",
+ "uppdaterad": "2026-11-23T18:16:08.061Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1876,14 +1876,21 @@
     "Bristol City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:02:01.939Z",
-   "rubrik": "Skubalas bästa elva sitter på bänken",
+   "skriven": "2026-11-23T18:05:25.492Z",
+   "rubrik": "Bristolsupportern som undrar om han vill se förlust",
    "ingress": null,
-   "summering": "Albion väntar på besked om hur länge Isaac Price blir borta. I Bristol hänger Skubalas jobb på tisdagens match mot Wrexham, och supportrarna har redan släppt honom.",
+   "summering": "West Brom bärs av en fotboll som roar och ett lag som reser sig ur underläge, men minuterna börjar ta ut sin rätt. I Bristol hänger allt på tisdagen och Skubalas jobb.",
    "delar": [
     {
      "lag": "West Bromwich Albion",
      "kallor": [
+      {
+       "podd": "Albion Analysis",
+       "avsnitt": "Swansea (a): Panenka Perils But Plenty Of Positives",
+       "datum": "2026-11-22",
+       "adress": "https://albionanalysis.substack.com/",
+       "typ": "podd"
+      },
       {
        "podd": "Albion Analysis",
        "avsnitt": "Swansea (a): Panenka Perils But Plenty Of Positives",
@@ -1897,6 +1904,17 @@
        "amne": "trupp",
        "punkter": [
         {
+         "t": "Isaac Price började halta kraftigt i en spurt mot Swansea utan att någon hade varit nära honom. Värdarna räknar inte med honom på flera veckor, och de ser honom som lagets främste chansskapare.",
+         "s": "h",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Isaac Price är skadad efter matchen mot Swansea. De insatta på Albion Analysis frågar sig hur stor förlust det kan bli för laget, men skadans art och längd framgår inte.",
          "s": "b",
          "podd": [
@@ -1908,19 +1926,114 @@
          "typ": "media"
         }
        ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Tidigare i höstas sades det att Albion vann mer än spelet var värt. Nu menar värdarna att resultaten motsvarar prestationerna, och de ser laget som ett av dem som har utvecklats mest sedan september.",
+         "s": "o",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Albion har hamnat i underläge oftare än något annat lag i serien men har kommit tillbaka varje gång. Under Ryan Mason föll laget ihop när motgångarna kom. Det här laget samlar sig i halvtid och tar över matchen igen.",
+         "s": "o",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna har räknat ihop spelarnas minuter i klubb och landslag. Price, Diakite och Campbell, som toppar listan, har alla blivit skadade. Nästa i tur är Styles, Molumby och Morgan, och därför oroar sig värdarna för dem.",
+         "s": "h",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "På högerkanten har ytterbacken Brayann Pereira och yttern Kareem Tunde börjat spela väl ihop. Tunde håller bredden och Pereira driver bollen inåt. Enligt värdarna har de gett laget en rakhet som saknades när det spelades passningar utan syfte.",
+         "s": "o",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Hotet kommer från hela laget. Mot Swansea hade mittfältarna Horn Myhre och Molumby flest bolltouchar i straffområdet, och båda ytterbackarna och till och med mittbacken Campbell driver fram. Värdarna tycker att motståndarna knappt vet var de ska börja försvara.",
+         "s": "o",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Trots att Albion har tappat poäng säger sig supportrarna vara närmast yra av glädje. Det beror mindre på att laget är obesegrat i sju matcher än på att det för första gången på flera år spelar fotboll som är rolig att se, med chans efter chans.",
+         "s": "o",
+         "podd": [
+          "Albion Analysis"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
       }
      ],
      "text": [
-      "Hos Albion Analysis handlar veckan om hur stort hål Isaac Price lämnar efter sig.",
-      "Han skadade sig mot Swansea, och varken vad det är för skada eller hur länge han blir borta har gått ut."
+      "I podden Albion Analysis är supportrarna ”nästan yra” av glädje, mindre för sju obesegrade matcher än för att laget äntligen spelar fotboll med chans efter chans.",
+      "Inget lag i serien har hamnat i underläge oftare, men där laget under Ryan Mason föll ihop samlar det sig nu i halvtid och tar över igen.",
+      "Oron gäller kroppen. Isaac Price, lagets främste chansskapare, började halta utan någon i närheten, och värdarna har räknat minuter i klubb och landslag: de tre som toppade listan har alla skadats, och näst på tur står Styles, Molumby och Morgan."
      ],
+     "citat": {
+      "sagt": "Jag skulle inte vilja vara den tränare som just nu ska lista ut hur man försvarar sig mot West Bromwich Albion.",
+      "vem": "Chris Hall",
+      "podd": "Albion Analysis",
+      "typ": "podd",
+      "datum": "2026-11-22"
+     },
      "namn": [
-      "Isaac Price"
+      "Ryan Mason",
+      "Isaac Price",
+      "Styles",
+      "Molumby",
+      "Morgan"
      ]
     },
     {
      "lag": "Bristol City",
      "kallor": [
+      {
+       "podd": "Forever Bristol City Podcast",
+       "avsnitt": "BORO (A) the verdict ..... predictable result with no evidence of improvement",
+       "datum": "2026-11-22",
+       "adress": "https://shows.acast.com/forever-bristol/episodes/boro-a-the-verdict-predictable-result-with-no-evidence-of-im",
+       "typ": "podd"
+      },
       {
        "podd": "NOT606",
        "avsnitt": "Bristol City v Wrexham (POLL) · Middlesbrough v Bristol City (Poll) · Bristol City Talk.",
@@ -1931,24 +2044,19 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Klubben lade enligt supportrarna 70 procent av budgeten på anfallarna Lorent Tolaj och Dominic Ballard, men Skubala spelar aldrig båda samtidigt: den ena går ut och den andra kommer in. De tror att en ny tränare genast skulle låta dem spela ihop.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Enligt Dave tappade Skubala modet efter 1–4 mot Southampton, trots att City spelade bra där. Sedan dess backar laget hem så fort det behöver resultat.",
+         "s": "o",
+         "podd": [
+          "Forever Bristol City Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Supportrarna menar att Skubala inte vet vilken som är hans bästa elva. Laget blir bättre när avbytarna kommer in, och mot Middlesbrough var de fem högst betygsatta spelarna inhoppare.",
          "s": "o",
@@ -1961,43 +2069,43 @@
          "typ": "forum"
         },
         {
-         "t": "Mittfältet anses vara problemet. Jason Knight hade bara en dålig dag, men Brian De Keersmaecker och Sam Greenwood är enligt supportrarna dåliga match efter match.",
+         "t": "Neil tror att den försiktiga uppställningen mot Middlesbrough handlade om att Skubala ville undvika en storförlust och rädda jobbet till tisdag, inte om att vinna matchen.",
          "s": "o",
          "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Enligt supportrarna gick laget bra fram till landslagsuppehållet, men sedan dess har både passningsspelet och kantspelet försvunnit. Med Greenwood, Wallace och Hirakawa som enda alternativ framåt befarar de att laget åker ur.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna tycker att laget går in i matcherna nervöst och bara med siktet inställt på att överleva. De frågar sig varför laget inte startar med den inställning det visar när matchen redan är förlorad.",
-         "s": "o",
-         "podd": [
-          "NOT606"
+          "Forever Bristol City Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Dave tycker att Robert Dickie är nervös och inte längre håller på den här nivån, och att mittbackskombinationen med Robert Atkinson saknar fart.",
+         "s": "o",
+         "podd": [
+          "Forever Bristol City Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       },
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "En livslång supporter undrar för första gången om han vill att City förlorar på tisdag, eftersom en seger bara förlänger Skubalas tid och plågan.",
+         "s": "o",
+         "podd": [
+          "Forever Bristol City Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Supportrarna har i stort sett gett upp om tränaren Michael Skubala. Hans lag, spelare och fotboll håller enligt dem bara League One-nivå, och de anser att en förlust mot Wrexham på tisdag avgör hans öde.",
          "s": "o",
@@ -2010,48 +2118,54 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna tror inte att en sparkning skulle lösa mycket på kort sikt. De väntar sig en lång rekryteringsprocess som slutar med ännu en blek tränare, och ingen tid att bygga laget i januarifönstret.",
+         "t": "Alla vet att tränarens framtid avgörs i tisdagens hemmamatch mot Wrexham. Enligt värdarna saknar både spelarna och ledningen tro på det de gör.",
          "s": "o",
          "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Ilskan riktas också uppåt. Supportrarna menar att ägaren Steve Lansdown, trots alla pengar han har lagt ner, har gjort klubben till en fotbollsmässig bakgård som aldrig kommer att kunna konkurrera i toppen.",
-         "s": "o",
-         "podd": [
-          "NOT606"
+          "Forever Bristol City Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Värdarna fruktar att även en seger mot Wrexham bara skjuter upp beslutet om tränaren. En storförlust mot West Brom skulle i så fall göra Swanseamatchen till hans nästa sista chans.",
+         "s": "o",
+         "podd": [
+          "Forever Bristol City Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På forumet NOT606 har man i stort sett gett upp om Michael Skubala: ”League One-tränare, League One-spelare, League One-fotboll.” Förlorar City mot Wrexham på tisdag är hans öde avgjort, tror man.",
-      "Laget blir bättre när han gör byten: mot Middlesbrough var de högst betygsatta spelarna inhoppare. Anfallarna Lorent Tolaj och Dominic Ballard, som enligt supportrarna kostade 70 procent av budgeten, får aldrig spela ihop. Den ena går ut när den andra kommer in.",
-      "Någon räddning i en sparkning ser man ändå inte, bara veckor av intervjuer och ”ännu en blek tränare”."
+      "En livslång supporter undrar i podden Forever Bristol City för första gången om han vill att laget förlorar mot Wrexham på tisdag. En seger förlänger bara Michael Skubalas tid, och plågan. Det är den matchen som väntas avgöra tränarens öde.",
+      "På forumet NOT606 har man i stort sett gett upp om honom och undrar varför han aldrig låter Tolaj och Ballard spela ihop, trots att de slukade 70 procent av budgeten.",
+      "Poddvärdarna ser ingen ledning från bänken: assistenterna sitter ner, och Skubala sätter sig och stirrar på en skärm bredvid analytikern."
      ],
      "citat": {
-      "sagt": "När han gör byten blir hela prestationen bättre, så jag måste fråga honom: vet han ens vilken som är hans bästa startelva?",
-      "vem": "invermeremike",
+      "sagt": "League One-tränare, League One-spelare, League One-fotboll. Riktigt usel fotboll för att bevisa att jobbet är säkert.",
+      "vem": "wizered",
       "podd": "NOT606",
       "typ": "forum",
       "datum": "2026-11-21"
      },
      "namn": [
       "Michael Skubala",
-      "Lorent Tolaj",
-      "Dominic Ballard"
+      "Tolaj",
+      "Ballard",
+      "Skubala"
      ],
-     "paSpel": "Kanske ingenting för Skubala: hans öde avgörs redan mot Wrexham på tisdag."
+     "paSpel": "Överlever Skubala tisdagen kan en storförlust här göra Swanseamatchen till hans sista."
     }
    ]
   },
