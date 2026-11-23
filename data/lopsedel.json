@@ -15,29 +15,33 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T16:41:55.101Z",
+ "skriven": "2026-11-23T16:57:38.882Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-23T16:33:27.519Z",
+ "underlag": "2026-11-23T16:54:42.827Z",
  "rubrik": {
-  "id": "401880134",
-  "kick": "WATFORD",
+  "id": "401879226",
+  "kick": "MAN UNITED",
   "rad": [
    [
-    "FANS VILL SE",
+    "UNITEDFANS",
     0
    ],
    [
-    "WATFORD",
-    0
-   ],
-   [
-    "FÖRLORA",
+    "AVTRUBBADE:",
     1
+   ],
+   [
+    "”VI ÄR VANA",
+    0
+   ],
+   [
+    "VID DET”",
+    0
    ]
   ],
-  "under": "Varje förlust ökar pressen på ägaren Gino Pozzo, menar supportrar på WFC Forums",
-  "plus": "30 RAKA UTAN NOLLA I IPSWICH",
+  "under": "Efter 0–4 mot Liverpool: ”Det värsta av allt är att det inte gör ont längre” – supporterpodd",
+  "plus": "IPSWICH UTAN NOLLA I 30 RAKA",
   "plusId": "401878752"
  }
 }
