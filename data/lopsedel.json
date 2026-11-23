@@ -15,25 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T17:46:22.718Z",
+ "skriven": "2026-11-23T18:17:12.036Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-23T17:42:43.321Z",
+ "underlag": "2026-11-23T18:16:08.061Z",
  "rubrik": {
   "id": "401879226",
-  "kick": "MANCHESTER UNITED",
+  "kick": "MAN UNITED",
   "rad": [
    [
-    "DET GÖR INTE",
+    "UNITEDFANS:",
     0
    ],
    [
-    "ONT LÄNGRE",
+    "”VI ÄR VANA",
     1
+   ],
+   [
+    "VID DET”",
+    0
    ]
   ],
-  "under": "”Vi är vana vid det. Och det är skit.” – United We Stand Podcast efter 0–4 mot Liverpool",
-  "plus": "IPSWICH: 30 RAKA UTAN NOLLA",
+  "under": "”Det värsta av allt är att det inte gör ont längre” – United We Stand efter 0–4 mot Liverpool",
+  "plus": "IPSWICH UTAN NOLLA I 30 RAKA",
   "plusId": "401878752"
  }
 }
