@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T16:33:27.519Z",
+ "uppdaterad": "2026-11-23T16:54:42.827Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -419,14 +419,21 @@
     "Brentford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T15:59:51.293Z",
-   "rubrik": "Pochettinos första val har redan fått underkänt",
+   "skriven": "2026-11-23T16:45:01.604Z",
+   "rubrik": "Det gör inte ens ont längre",
    "ingress": null,
-   "summering": "I United riktas misstron mot ett mittbackspar som anses sakna fysik och mot en ny tränare vars uttagningar redan ifrågasätts, inte minst om Rashford får spela.",
+   "summering": "United har en ny tränare men i supportrarnas ögon samma långsamma backlinje. Brentford saknar sin oumbärliga anfallare och bär på en naivitet som redan har kostat röda kort.",
    "delar": [
     {
      "lag": "Manchester United",
      "kallor": [
+      {
+       "podd": "United We Stand Podcast",
+       "avsnitt": "United We Stand podcast 750. Liverpool away",
+       "datum": "2026-11-22",
+       "adress": "https://podcasts.apple.com/gb/podcast/united-we-stand-podcast/id1096678620?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "NOT606",
        "avsnitt": "United v Whoever - match thread.",
@@ -437,45 +444,29 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Att Pochettino valde de Ligt framför Maguire ses som ett misstag. De Ligt har varit borta i ett år och anses inte vara i matchform än.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
         {
-         "t": "Supportrarna tycker att mittbacksparet saknar fysik: Yoro är för lätt och spinkig för Premier League och Martínez för kort för en mittback. Det gör backlinjen katastrofal, och Dalot får ingen tilltro alls.",
+         "t": "Värdarna menar att backlinjen är för långsam och orörlig. Mot lag med kantspelare och anfallare som kan springa och dribbla av sin man blir den utsatt.",
          "s": "o",
          "podd": [
-          "NOT606"
+          "United We Stand Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Martínez anses ha gått på halvfart sedan VM, och det förvånar att han fortsätter att få spela. Yoro tros klara sig bättre som ytterback än som mittback.",
-         "s": "o",
+         "t": "Senne Lammens höll laget kvar med flera fina räddningar, säger värdarna. Ändå menar de att han nästan aldrig räddar skott utifrån och att de skotten brukar gå in.",
+         "s": "h",
          "podd": [
-          "NOT606"
+          "United We Stand Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -483,47 +474,236 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Supportrarna är cyniska till att Shaw och Rashford blev spelklara precis när en ny tränare kom. De anser att Pochettino gör bort sig om han ställer in sig hos Rashford och spelar honom.",
+         "t": "Supportrarna såg inget av Pochettinos avtryck på Anfield. Efter utvisningen tidigt i matchen hade det kunnat vara vilken som helst av de senaste tränarna vid sidlinjen.",
          "s": "o",
          "podd": [
-          "NOT606"
+          "United We Stand Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "En supporter säger att det värsta efter 4–0 på Anfield är att det inte längre gör ont. Han beskriver tjugo år av motgångar som gjort supportrarna vana vid förlusterna.",
+         "s": "o",
+         "podd": [
+          "United We Stand Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "En av värdarna menar att klubben på tio år inte har anställt en riktig tränare med erfarenhet av stora klubbar. Han hoppas att Pochettino är den första.",
+         "s": "o",
+         "podd": [
+          "United We Stand Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna vill stötta Pochettino men tänker fortsätta protestera mot ägarna. De tycker att klubben är rutten inifrån.",
+         "s": "o",
+         "podd": [
+          "United We Stand Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna är oense om säsongens mål. En tror på mittenplacering och en ny Europaplats, en annan menar att målet nu är att hålla sig kvar i ligan.",
+         "s": "o",
+         "podd": [
+          "United We Stand Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Supportrarna ser Brentford hemma som viktigare än Champions League-matchen mot Sporting i veckan. De räknar Brentford, Newcastle och Palace som enorma ligamatcher. En av dem vill skriva av Sporting, en annan tycker att laget inte har råd att skriva av någon match.",
+         "s": "o",
+         "podd": [
+          "United We Stand Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På forumet NOT606 kallas Pochettinos val av de Ligt framför Maguire ”en katastrof”. De Ligt har varit borta i ett år och anses långt ifrån matchform.",
-      "Grundproblemet ser man i mittbacksparet, där Yoro anses för spinkig för Premier League och Martínez för kort för att vara mittback. Yoro tros göra mer nytta som ytterback.",
-      "Att Shaw och Rashford blev spelklara just när den nye tränaren kom möts med cynism. Ställer Pochettino in sig hos Rashford och spelar honom gör han bort sig, menar man."
+      "Pochettino stod vid sidlinjen på Anfield, men i United We Stand Podcast såg man inte ett spår av honom. Efter den tidiga utvisningen var det, som en av värdarna sa, ”bara samma gamla skit”.",
+      "Inför lördagen oroar backlinjen mest: den är stillastående och orörlig mot lag med kantspelare som går förbi sin man. På forumet NOT606 kallas Yoro för spinkig och Martínez för kort för att vara mittback. Att de Ligt, borta i ett år, fick gå före Maguire ses där som en katastrof."
      ],
      "citat": {
-      "sagt": "Obegripligt att han fortsätter att bli uttagen. Han har gått på sparlåga ända sedan VM.",
-      "vem": "Chief",
-      "podd": "NOT606",
-      "typ": "forum",
+      "sagt": "Det värsta av allt är att det inte gör ont längre, för vi är vana vid det. Och det är skit.",
+      "vem": null,
+      "podd": "United We Stand Podcast",
+      "typ": "podd",
       "datum": "2026-11-22"
      },
      "namn": [
       "Pochettino",
-      "de Ligt",
-      "Maguire",
       "Yoro",
       "Martínez",
-      "Shaw",
-      "Rashford"
+      "de Ligt",
+      "Maguire"
      ],
-     "paSpel": "Ett tidigt test av om den nye tränaren står emot Rashford."
+     "paSpel": "Mer än Champions League mot Sporting, tycker supportrarna: ligan går först."
     },
     {
      "lag": "Brentford",
-     "kallor": [],
-     "grupper": [],
-     "text": []
+     "kallor": [
+      {
+       "podd": "The Beesotted Brentford Pride of West London Podcast",
+       "avsnitt": "Monday Night Blues As Bees Face Everton",
+       "datum": "2026-11-21",
+       "adress": "https://shows.acast.com/the-beesotted-brentford-pride-of-west-london-podcast/episodes/monday-night-blues-as-bees-face-everton",
+       "typ": "podd"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Värdarna är oense om vem som ska ersätta Thiago. Den ena tycker att 34-årige Callum Wilson är för långsam för lagets spel och vill hellre se de snabba Ouattara, Schade och Anthony. Den andra vill ge Wilson chansen eftersom han har gjort mål varje gång han har fått spela.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Värdarna avvisar bilden av ett Brentford med disciplinproblem. Laget är naivt och oerfaret och går på slugare motståndares provokationer. Två röda kort mot Liverpool och ett mot Brighton låg bakom säsongens båda förluster.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Många supportrar kritiserar Igor Thiago för att han gör färre mål än förra säsongen. Värdarna menar att han är oumbärlig eftersom han drar med sig försvarare och öppnar för kantspelarna, och de tvivlar på att Callum Wilson kan göra samma sak.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Den ena värdaren tycker att Brentford spelade på samma sätt mot Aston Villa som mot Brighton. Mot Villa kallades laget fult och tufft, mot Brighton naivt, och därför menar han att reglerna tillämpas olika.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Keane Lewis-Potter är omtyckt och kan spela på åtta positioner. Men han har orsakat straff två gånger, mot Sunderland och mot Brighton, genom att brottas med motståndare i straffområdet.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Kantspelet oroar mer än anfallaren. Dango Ouattara och Jaidon Anthony slåss om en plats, men ingen av dem tar den, och därför byts de in och ut.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Missnöjet bland supportrarna beror enligt värdarna på förväntningarna. Laget var en nick från Europa förra säsongen, och i somras sa både klubben och fansen att det var dags att satsa. Starten har inte levt upp till det.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "En supporter efter Brighton menar att domarna dömer olika beroende på vem som spelar. Utvisningen och straffen mot Brentford hade aldrig blivit av mot de stora klubbarna, Manchester United inräknat.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "I Beesotted-podden vägrar man tala om disciplinproblem: Brentford har ”ett naivitetsproblem” och nappar på slugare motståndares provokationer. Röda kort låg bakom förlusterna mot Liverpool och Brighton, och en supporter är säker på att samma domslut aldrig hade fallit mot Manchester United.",
+      "Igor Thiago kritiseras för att han gör färre mål, men värdarna kallar honom oumbärlig eftersom han drar med sig försvarare och öppnar kanterna. Om ersättaren är de oense: Callum Wilson har gjort mål varje gång han fått spela, men han är 34 och laget bygger på fart."
+     ],
+     "citat": {
+      "sagt": "Vi blir starkare för varje år, och jag tycker att det finns en otålighet ibland, och jag förstår den.",
+      "vem": null,
+      "podd": "The Beesotted Brentford Pride of West London Podcast",
+      "typ": "podd",
+      "datum": "2026-11-21"
+     },
+     "namn": [
+      "Igor Thiago",
+      "Callum Wilson"
+     ],
+     "paSpel": "Att visa att sommarens tal om att satsa mot Europa inte var tomt."
     }
    ]
   },
