@@ -15,23 +15,23 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T18:17:29.429Z",
+ "skriven": "2026-11-23T18:33:08.455Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T18:16:08.061Z",
- "rubrik": "Tre tränare sitter löst och Duff återvänder till Adams Park",
+ "underlag": "2026-11-23T18:27:44.728Z",
+ "rubrik": "En tränare möter sin gamla klubb och tre sitter löst",
  "notiser": [
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Michael Duff",
-   "text": "kommer tillbaka till Adams Park med Bradford City. Wycombes supportrar tycker att han har tappat fart sedan han lämnade klubben, och även de som höll på honom berömmer hans efterträdare."
+   "text": "kommer tillbaka till Wycombe med Bradford. Även de som höll på honom tycker att efterträdaren har svetsat ihop truppen, och supportrarna menar att han har tappat fart sedan han lämnade klubben."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "har allt färre supportrar bakom sig. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
+   "text": "möter ett tålamod som håller på att ta slut. Flera supportrar vill se honom sparkad om de två närmaste matcherna inte ger några poäng, eftersom de inte tror att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
@@ -43,7 +43,7 @@
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "får sin framtid avgjord i tisdagens hemmamatch mot Wrexham, menar supportrarna, som i stort sett har gett upp om honom. Värdarna fruktar att även en seger bara skjuter upp beslutet."
+   "text": "har i stort sett förlorat supportrarnas förtroende, och enligt dem avgörs hans öde i tisdagens hemmamatch mot Wrexham. En livslång supporter undrar för första gången om han vill se City förlora."
   }
  ]
 }
