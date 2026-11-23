@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-23T16:24:32.527Z",
+ "uppdaterad": "2026-11-23T17:30:29.626Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3872,6 +3872,78 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
+  },
+  {
+   "id": "401880723",
+   "match": "Sheffield Wednesday – Reading",
+   "avspark": "2026-11-28T15:00Z",
+   "writtenAt": "2026-11-23T17:30:14.938Z",
+   "text": "Reading sköt tjugonio gånger och fick ingenting\n\nReading kommer till Hillsborough efter tre raka förluster i ligan och en eftermiddag då Bromleys målvakt räddade allt. Sheffield Wednesday släpper in betydligt färre mål än chanserna säger. På lördag möts ett lag som har svårt att göra mål och ett lag som sällan släpper in några.\n\nMot Bromley, som låg sist i tabellen, sköt Reading 29 gånger och motståndarnas målvakt gjorde 13 räddningar, enligt Yahoo Sports [1]. Victor Adeboyejo avgjorde i andra halvlek, och det var Readings tredje raka förlust i ligan. ”Ultimately today we didn't put the last touch on the ball, which is the hardest one”, sa Leam Richardson efteråt [1]. Han lade till att ”we have to win now” och att man i den här branschen bedöms var 72:a timme. Så gjorde vi i Tjäderfors, och där regnade det in. Den sista tredjedelen är den del av spelet som en tränare har minst makt över, och det vet alla som har stått vid sidlinjen en lördag.\n\nSheffield Wednesday är svårare att få grepp om. Laget har släppt in 15 mål på 15 ligamatcher, och det är 6,1 mål färre än chanserna mot dem borde ha gett. Antingen står de mycket bra i straffområdet eller så har de haft tur. Formen har ändå vänt efter tre raka oavgjorda matcher: först 3–0 hemma mot Plymouth och sedan 2–1 borta mot Barnsley.\n\nHemma har Wednesday bara förlorat en gång, men de har spelat oavgjort fyra gånger på Hillsborough. Reading har bara vunnit en av åtta bortamatcher. Med tanke på alla hörnor och inlägg som gick åt mot Bromley skulle jag titta noga på hur hemmalaget markerar på fasta situationer. Det ser du redan på uppvärmningen.\n\nTipset: 1X (hemma, men knappt)\n\nPrognosen sätter Wednesday på 2,44, oavgjort på 3,85 och Reading på 3,03. Det som talar för hemmalaget är att Reading har förlorat tre raka ligamatcher och bara har en seger på åtta bortamatcher. Men Reading sköt 29 gånger mot Bromley [1], och ett lag som skapar så mycket börjar göra mål förr eller senare. Wednesday har dessutom släppt in 6,1 mål färre än chanserna säger, och sådant brukar jämna ut sig. Fyra oavgjorda hemmamatcher gör krysset rimligt. Därför ringar jag in etta och kryss och stryker Reading.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Reading sköt tjugonio gånger och fick ingenting",
+   "lead": "Reading kommer till Hillsborough efter tre raka förluster i ligan och en eftermiddag då Bromleys målvakt räddade allt. Sheffield Wednesday släpper in betydligt färre mål än chanserna säger. På lördag möts ett lag som har svårt att göra mål och ett lag som sällan släpper in några.",
+   "paragraphs": [
+    "Mot Bromley, som låg sist i tabellen, sköt Reading 29 gånger och motståndarnas målvakt gjorde 13 räddningar, enligt Yahoo Sports [1]. Victor Adeboyejo avgjorde i andra halvlek, och det var Readings tredje raka förlust i ligan. ”Ultimately today we didn't put the last touch on the ball, which is the hardest one”, sa Leam Richardson efteråt [1]. Han lade till att ”we have to win now” och att man i den här branschen bedöms var 72:a timme. Så gjorde vi i Tjäderfors, och där regnade det in. Den sista tredjedelen är den del av spelet som en tränare har minst makt över, och det vet alla som har stått vid sidlinjen en lördag.",
+    "Sheffield Wednesday är svårare att få grepp om. Laget har släppt in 15 mål på 15 ligamatcher, och det är 6,1 mål färre än chanserna mot dem borde ha gett. Antingen står de mycket bra i straffområdet eller så har de haft tur. Formen har ändå vänt efter tre raka oavgjorda matcher: först 3–0 hemma mot Plymouth och sedan 2–1 borta mot Barnsley.",
+    "Hemma har Wednesday bara förlorat en gång, men de har spelat oavgjort fyra gånger på Hillsborough. Reading har bara vunnit en av åtta bortamatcher. Med tanke på alla hörnor och inlägg som gick åt mot Bromley skulle jag titta noga på hur hemmalaget markerar på fasta situationer. Det ser du redan på uppvärmningen."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Yahoo Sports",
+     "title": "Leam Richardson Rues Lack Of Ruthlessness In Bromley Loss",
+     "url": "https://sports.yahoo.com/articles/leam-richardson-rues-lack-ruthlessness-115214464.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen sätter Wednesday på 2,44, oavgjort på 3,85 och Reading på 3,03. Det som talar för hemmalaget är att Reading har förlorat tre raka ligamatcher och bara har en seger på åtta bortamatcher. Men Reading sköt 29 gånger mot Bromley [1], och ett lag som skapar så mycket börjar göra mål förr eller senare. Wednesday har dessutom släppt in 6,1 mål färre än chanserna säger, och sådant brukar jämna ut sig. Fyra oavgjorda hemmamatcher gör krysset rimligt. Därför ringar jag in etta och kryss och stryker Reading.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "hemma, men knappt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Yahoo Sports",
+      "title": "Leam Richardson Rues Lack Of Ruthlessness In Bromley Loss",
+      "url": "https://sports.yahoo.com/articles/leam-richardson-rues-lack-ruthlessness-115214464.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-23T17:30:14.938Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Reading sköt 29 gånger mot Bromley, som låg sist i tabellen, och förlorade ändå. Det var deras tredje raka förlust i ligan, och borta har de bara vunnit en gång på åtta matcher. Många säger att målen kommer förr eller senare när man skapar så mycket. Jag säger att ett lag som inte kan göra mål på jumbon inte gör det på Hillsborough heller.",
+     "Wednesday har släppt in 15 mål på 15 matcher och har vunnit sina två senaste. Hemma har de bara förlorat en gång. De står tätt i straffområdet och väntar på sitt läge, och det räcker gott mot ett lag som inte kan sätta bollen i mål. Orsak och verkan. Så er det sagt, som vi sa i Köpenhamn. Jag ringar in en ren etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "1–0",
+    "tips": "2026-11-23T17:30:14.938Z",
+    "uppdrag": {
+     "fraser": [
+      "Orsak och verkan",
+      "Då är jag jävligt snäll"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-23T17:30:23.251Z",
+    "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
   },
   {
    "id": "401880127",
