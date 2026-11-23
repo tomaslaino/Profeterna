@@ -15,20 +15,20 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T19:03:31.037Z",
+ "skriven": "2026-11-23T19:19:07.562Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-23T18:58:59.985Z",
+ "underlag": "2026-11-23T19:15:30.581Z",
  "rubrik": {
   "id": "401879226",
-  "kick": "UNITED-KRISEN",
+  "kick": "MANCHESTER UNITED",
   "rad": [
    [
     "”DET GÖR",
     0
    ],
    [
-    "INTE ONT",
+    "INTE ENS ONT",
     1
    ],
    [
@@ -36,8 +36,8 @@
     0
    ]
   ],
-  "under": "Supporterpodden United We Stand efter 0–4 på Anfield. Yoro avstängd mot Brentford.",
-  "plus": "IPSWICH: 30 UTAN NOLLA",
+  "under": "Supporterpodden efter 0–4 på Anfield: ”…för vi är vana vid det. Och det är skit.”",
+  "plus": "IPSWICH: 30 RAKA UTAN NOLLA",
   "plusId": "401878752"
  }
 }
