@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T16:54:42.827Z",
+ "uppdaterad": "2026-11-23T17:06:46.254Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -716,14 +716,21 @@
     "Coventry City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:00:19.207Z",
+   "skriven": "2026-11-23T17:06:46.254Z",
    "rubrik": "Coventry åker till Elland Road för att rädda målskillnaden",
    "ingress": null,
-   "summering": "Leeds har en läktare som tycker om sitt lag, men vet att nätet vaknar vid ett tapp. Coventry kommer med Rudoni som nav och blicken redan riktad mot tisdagen.",
+   "summering": "Leeds tar med sig självförtroendet från Chelseasegern men vet att ett tapp hemma väcker kritiken mot Farke. Coventry reser med låga förväntningar, tänker på tisdagen och litar på Rudoni, som Leeds sägs vilja köpa.",
    "delar": [
     {
      "lag": "Leeds United",
      "kallor": [
+      {
+       "podd": "Leeds, That! - A Leeds United Fan Podcast",
+       "avsnitt": "RUTHLESS! Chelsea 1-4 Leeds Reaction + Coventry Preview",
+       "datum": "2026-11-23",
+       "adress": "https://podcasts.apple.com/gb/podcast/leeds-that-a-leeds-united-fan-podcast/id1473091800?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "Marching On Together",
        "avsnitt": "Pochettino to be sacked by Manure come the end of this season - Hot Take of the Day (23rd Nov)t · Chelsea vs Leeds United Match Thread · Rate our team performance vs Chelsea (a) - Poll of the Day (22 Nov)",
@@ -758,26 +765,15 @@
        "amne": "elva",
        "punkter": [
         {
-         "t": "Longstaff valdes före Stach, som var tillbaka efter sin fotskada, och supportrarna tycker att laget har sett bättre ut de två senaste matcherna med Longstaff. De anser att han bör behålla platsen.",
+         "t": "Att Joe Rodon inte kom tillbaka i laget ser en av värdarna som en signal från Farke: James Justin har platsen tills han gör några dåliga matcher. En annan håller inte med, eftersom han räknar Rodon bland ligans bästa försvarare.",
          "s": "o",
          "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Rodon anses vara den jämnaste mittbacken över en hel säsong. Supportrarna tycker ändå att försvaret har spelat så bra de senaste matcherna att det inte finns skäl att ändra något mot Coventry.",
-         "s": "o",
-         "podd": [
-          "Marching On Together"
+          "Leeds, That! - A Leeds United Fan Podcast"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -785,26 +781,26 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Stach ser inte ut som samma spelare i sin nya roll. Supportrarna tror att hans chans i stället kommer när Ampadu, som ligger nära en avstängning, måste stå över, eftersom den positionen passar Stach bättre.",
+         "t": "Enligt supportrarna skilde det inte mycket mellan prestationen mot Chelsea och den sega svit på fem matcher som föregick den. Det som avgjorde var mer energi och en press som stängde in Chelsea i hörnen.",
          "s": "o",
          "podd": [
-          "NOT606"
+          "Leeds, That! - A Leeds United Fan Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Supportrarna ser några få självklara startspelare under Farke: Ampadu, Calvert-Lewin, Trafford och kanske snart Muharemovic. Resten av truppen anser de vara utbytbar, och de har sett att vissa spelare petas direkt medan andra alltid får komma tillbaka.",
-         "s": "o",
+         "t": "Noah Okafor har satt alla sina fyra skott på mål den här säsongen och orkar nu spela till omkring 70:e eller 75:e minuten. Förra säsongen tyckte supportrarna att han behövde ta ett steg till, och nu har han gjort det.",
+         "s": "h",
          "podd": [
-          "NOT606"
+          "Leeds, That! - A Leeds United Fan Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -812,56 +808,72 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Supportrarna jämför Farkes lag med Bielsas: spelare som sliter för tröjan och som det är lätt att tycka om. De påpekar att Farke har byggt laget själv och att bara Aaronson och James fanns i klubben när han kom.",
+         "t": "Rocco Dean anser att James Trafford redan är världens bästa målvakt och är rädd att Leeds inte kan behålla honom. En annan värd tycker att Trafford har potentialen men ännu inte har bevisat det på högsta nivå.",
          "s": "o",
          "podd": [
-          "Marching On Together"
+          "Leeds, That! - A Leeds United Fan Podcast"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Supportrarna menar att kritiken mot Farke mest finns i sociala medier och att han har haft starkt stöd på arenan. Men de räknar med att det blir oro igen om laget inte vinner hemma mot Coventry.",
+         "t": "Supportrarna tycker att ligan är öppen i år och ser hos Leeds samma egenskaper som Leicesters mästarlag hade: sammanhållning, organisation och ledarskap. Frågan nu är om laget orkar hålla nivån över tid.",
          "s": "o",
          "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna ser att laget inte längre fruktar de stora bortamatcherna, med Old Trafford i fjol och Emirates och Stamford Bridge i år. De talar om en ny mentalitet i en trupp utan bråkstakar.",
-         "s": "o",
-         "podd": [
-          "NOT606"
+          "Leeds, That! - A Leeds United Fan Podcast"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
-        },
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
         {
-         "t": "Supportrarna dämpar segeryran. Chelsea hade en mjuk mage, och de väntar sig en säsong med både bra och dåliga perioder, som ett typiskt mittenlag i Premier League.",
+         "t": "Supportrarna väntar sig att Coventry ställer sig lågt och packar straffområdet. Det blir en helt annan uppgift än mot Chelsea, men de tror att Leeds kan bryta ner ett lågt försvar.",
          "s": "o",
          "podd": [
-          "NOT606"
+          "Leeds, That! - A Leeds United Fan Podcast"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Eftersom Leeds bygger sitt spel på försvaret oroar sig supportrarna inte för Coventrys kontringar. Vore Leeds ett renodlat anfallslag skulle de vara rädda för just det. Att tappa poäng hemma efter Chelseasegern skulle vara förödande.",
+         "s": "o",
+         "podd": [
+          "Leeds, That! - A Leeds United Fan Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Coventry går för vinsten i varje match, så det blir sällan oavgjort. Supportrarna har lagt märke till Jack Rudoni, som de tycker ser riktigt bra ut, och vill inte ta något för givet.",
+         "s": "h",
+         "podd": [
+          "Leeds, That! - A Leeds United Fan Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Tappar Leeds poäng hemma mot Coventry blir det enligt NOT606 ”ett helvete, åtminstone på nätet”. På arenan har Daniel Farke starkt stöd, och kritiken lever mest i sociala medier.",
-      "På Marching On Together jämförs hans lag med Bielsas: spelare som sliter för tröjan, och nästan alla har han hämtat själv.",
-      "Noah Okafor ville en del peta för bara några veckor sedan. Nu gör han att försvararna inte längre kan koncentrera sig enbart på Dominic Calvert-Lewin, och LeedsAllOver noterar att han gång på gång kliver fram mot de starka lagen."
+      "Efter Chelseasegern är det inte Coventry som oroar Leeds supportrar, utan vad som händer om poängen uteblir. På NOT606 menar man att kritiken mot Daniel Farke mest lever i sociala medier, men att en tappad hemmamatch väcker den direkt.",
+      "I podden Leeds, That! väntar man sig att Coventry packar straffområdet, och man tror att laget kan bryta ner det.",
+      "Hoppet heter Noah Okafor, som några ville peta för bara några veckor sedan. Alla hans fyra skott på mål i år har gått in, och nu måste försvararna hålla koll på mer än Dominic Calvert-Lewin."
      ],
      "citat": {
       "sagt": "Farke har byggt ett lag som är lätt att älska. Och det är han som har byggt det.",
@@ -875,11 +887,18 @@
       "Noah Okafor",
       "Dominic Calvert-Lewin"
      ],
-     "paSpel": "Arbetsron kring Farke: utan hemmaseger väntar en ny storm i sociala medier."
+     "paSpel": "Lugnet kring Farke: en tappad hemmamatch väcker kritiken på nätet igen."
     },
     {
      "lag": "Coventry City",
      "kallor": [
+      {
+       "podd": "Sky Blue Fans TV",
+       "avsnitt": "Coventry City FC LIVE Podcast | The Phoenix is Rising!",
+       "datum": "2026-11-23",
+       "adress": "https://podcasters.spotify.com/pod/show/skybluefanstv/episodes/Coventry-City-FC-LIVE-Podcast--The-Phoenix-is-Rising-e3srv77",
+       "typ": "podd"
+      },
       {
        "podd": "Sky Blues Talk",
        "avsnitt": "Leeds United vs Coventry City (A) - Elland Road - Sat 28th November (3pm KO) · Ellis Simms Sale · Coventry City vs Crystal Palace (H) - Coventry Building Society Arena - Sat 21st November (3pm KO)",
@@ -897,34 +916,40 @@
      ],
      "grupper": [
       {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Awoniyi hade fotleden i en stövel när han lämnade arenan på lördagen, och skadan ser allvarlig ut enligt en supporter.",
-         "s": "h",
-         "podd": [
-          "Sky Blues Talk"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
        "amne": "elva",
        "punkter": [
         {
-         "t": "Ett förslag är att Brandon Thomas-Asante spelar längst fram igen, som mot Forest, för hans energi. Gboho skulle då sparas på bänken som ett hemligt vapen.",
+         "t": "Gustavo Hamer bör starta på mitten. Med sin passningsblick hör han hemma centralt, inte på kanten. Will tvivlar ändå på att det händer och tror att Hamer har blivit en inhoppare för gott.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Stephen Mfuni fick spela vänsterback före Jay Da Silva. Han kommer gärna framåt men är ovan vid positionen och lämnade stora ytor bakom sig. Han blev också av med bollen för ofta.",
+         "s": "o",
+         "podd": [
+          "Sky Blue Fans TV"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Sidiki Cherif, som väntas ersätta Awoniyi, är en helt annan typ av anfallare, och lagets spel passade honom inte. Han är ung och ny i ligan men visade glimtar, bland annat när han vann hörnan före segermålet.",
+         "s": "o",
+         "podd": [
+          "Sky Blue Fans TV"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -932,88 +957,67 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Supportrarna tycker att Rudoni saknar ersättare som tia. Skadar han sig står laget utan alternativ, och flera vill värva en tia som konkurrent.",
+         "t": "Båda Palacemålen var hela lagets fel. Ingen stoppar inläggen, och Bahoya drar sig inåt så tidigt vid en inspark att motståndarnas högerback står helt fri på mittlinjen.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Lokaltidningen skriver att Jack Rudoni har burit laget i höst, med fem mål eller målgivande passningar på de sex senaste matcherna. Mot Crystal Palace i lördags spelade han fram till två mål.",
-         "s": "h",
+         "t": "Bahoya får kritik från läktaren för att han tappar bollen, men han och Rudoni är de enda som driver spelet framåt snabbt. En annan supporter menar att för mycket coachning tar bort magin hos sådana spelare.",
+         "s": "o",
          "podd": [
-          "Coventry Telegraph"
+          "Sky Blue Fans TV"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "lokal"
+         "typ": "podd"
         },
         {
-         "t": "Flera vill gå tillbaka till en trebackslinje och spela kompakt. Mfuni ska kunna kliva upp på mittfältet när laget har bollen, och fasta situationer ses som Coventrys chans.",
+         "t": "Frank Lampard byter ofta för sent och reagerar i stället för att ligga steget före. Mot Palace väntade han in motståndarnas byten, men bytena vände ändå matchen.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Stämningen inför Leeds borta är dyster. De flesta räknar med förlust och hoppas främst att den inte blir så stor att målskillnaden tar skada.",
-         "s": "o",
-         "podd": [
-          "Sky Blues Talk"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "En supporter går emot stämningen. Enligt honom är Leeds inte alls i toppform: segern mot Chelsea var en slumpträff mot ett svagt lag, och hemma har de bara gjort mer än ett mål mot Newcastle.",
-         "s": "o",
-         "podd": [
-          "Sky Blues Talk"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Segern mot Palace har tagit bort trycket inför Leeds. Matchen på tisdag ses som den viktiga, och en förlust med högst två mål vore ingen katastrof.",
+         "t": "Matt Grimes överraskade positivt och gick framåt mer än på länge. Men med honom och Victor Torp tillsammans orkar mittfältet inte, och motståndarna kunde spela sig snabbt igenom.",
          "s": "o",
          "podd": [
-          "Sky Blues Talk"
+          "Sky Blue Fans TV"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Tatsuhiro Sakamoto har tystat dem som tyckte att han var för liten för Premier League. Han har förenklat sitt spel, slutar aldrig springa och är den spelare supportrarna minst oroar sig för.",
+         "s": "o",
+         "podd": [
+          "Sky Blue Fans TV"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På Sky Blues Talk räknar de flesta med förlust och hoppas mest att siffrorna hålls nere så att målskillnaden klarar sig.",
-      "Segern mot Palace har tagit bort trycket, och det är tisdagens match som verkligen räknas.",
-      "Lokaltidningen kallar Jack Rudoni lagets stora gestalt i höst, och enligt rykten under landslagsuppehållet vill just Leeds värva honom. Frank Lampard avfärdar det och säger att Rudoni ska använda ryktena ”som bränsle”."
+      "På Sky Blues Talk räknar de flesta med förlust och hoppas mest att siffrorna hålls nere så att målskillnaden inte tar stryk. Segern mot Palace har tagit bort trycket, och det är tisdagens match som verkligen gäller.",
+      "Den som kan ändra stämningen är Jack Rudoni, som enligt lokaltidningen har burit laget i höst och som Leeds ryktas vilja värva. Frank Lampard avfärdar ryktet: Rudoni ”ska ingenstans”.",
+      "Själv väntas Lampard få ett fientligt mottagande på Elland Road, och en del supportrar skulle älska att se honom vinna just där."
      ],
      "citat": {
       "sagt": "Just nu är jag helt för en reserv eller konkurrent till Rudoni som tia. Blir han skadad är vi verkligen körda.",
@@ -1026,7 +1030,7 @@
       "Jack Rudoni",
       "Frank Lampard"
      ],
-     "paSpel": "Mest målskillnaden: krafterna och nerverna sparas till tisdagens viktigare match."
+     "paSpel": "Inte mycket: målskillnaden ska skyddas, tisdagens match är den som gäller."
     }
    ]
   },
