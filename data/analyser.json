@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-23T16:20:19.441Z",
+ "uppdaterad": "2026-11-23T16:21:56.185Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3521,6 +3521,91 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
+  },
+  {
+   "id": "401880726",
+   "match": "Luton Town – Oxford United",
+   "avspark": "2026-11-28T15:00Z",
+   "writtenAt": "2026-11-23T16:21:26.011Z",
+   "text": "Wilshere mot Ramsey, och ingen ger sig i förtid\n\nPå lördag möts fyran och trean i League One på Kenilworth Road. Luton har Nahki Wells i målform, och Oxford kommer från en upphämtning som var minst sagt ovanlig. Två poäng skiljer lagen åt, och Oxford har spelat en match mindre.\n\nOxford United låg under med 3–0 mot Wycombe på Kassam Stadium när det var 17 minuter kvar, och ändå vann de med 4–3, rapporterar The League Paper [1]. Aidomo Emakhu reducerade i 73:e minuten och Cameron Brannagan satte en straff i den 80:e. En minut senare kvitterade Harris, och Gatlin O'Donkor nickade in segermålet i den 95:e minuten. Wycombe hade då förlorat Dan Casey på utvisning. Laget tränas av Aaron Ramsey, och tidningen skriver att han lyfte fram spelarnas motståndskraft. Själv ser jag hellre ett lag som inte släpper in ett mål redan i första minuten, och det gjorde Oxford. Det där löser man med en hink bollar och en ordentlig uppvärmning. Men det säger något om karaktären när man vänder en sådan match.\n\nHos Luton står och faller mycket med Nahki Wells. I lördags borta mot Burton låg Jack Wilsheres lag under efter 20 minuter. Wells kvitterade på straff sedan Kasey Palmer fällts och gjorde segermålet ungefär en kvart före slutet. Enligt Bernews [2] var det hans elfte mål för säsongen, och Luton har nu vunnit fem av sina sex senaste ligamatcher. Även Luton fick alltså jaga i underläge, och båda lagen har visat att de inte släpper en match i förtid. Så gjorde vi i Tjäderfors, och där regnade det in. Den som går och hämtar kaffe i pausen på Kenilworth Road gör det på egen risk.\n\nTipset: 1X (Hemmalaget, försiktigt)\n\nPrognosen ger Luton störst chans, och spelbolaget tror ännu mer på hemmalaget. Luton har vunnit fem av sex ligamatcher och Wells har gjort elva mål för säsongen [1]. Oxfords försvar ser bättre ut i tabellen än i chanserna, eftersom laget har släppt in klart färre mål än chanserna brukar ge, och sådant brukar jämna ut sig. Samtidigt förlorar Oxford sällan, och de visade mot Wycombe att de inte ger sig [2]. Ett oavgjort resultat ligger därför nära till hands. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Wilshere mot Ramsey, och ingen ger sig i förtid",
+   "lead": "På lördag möts fyran och trean i League One på Kenilworth Road. Luton har Nahki Wells i målform, och Oxford kommer från en upphämtning som var minst sagt ovanlig. Två poäng skiljer lagen åt, och Oxford har spelat en match mindre.",
+   "paragraphs": [
+    "Oxford United låg under med 3–0 mot Wycombe på Kassam Stadium när det var 17 minuter kvar, och ändå vann de med 4–3, rapporterar The League Paper [1]. Aidomo Emakhu reducerade i 73:e minuten och Cameron Brannagan satte en straff i den 80:e. En minut senare kvitterade Harris, och Gatlin O'Donkor nickade in segermålet i den 95:e minuten. Wycombe hade då förlorat Dan Casey på utvisning. Laget tränas av Aaron Ramsey, och tidningen skriver att han lyfte fram spelarnas motståndskraft. Själv ser jag hellre ett lag som inte släpper in ett mål redan i första minuten, och det gjorde Oxford. Det där löser man med en hink bollar och en ordentlig uppvärmning. Men det säger något om karaktären när man vänder en sådan match.",
+    "Hos Luton står och faller mycket med Nahki Wells. I lördags borta mot Burton låg Jack Wilsheres lag under efter 20 minuter. Wells kvitterade på straff sedan Kasey Palmer fällts och gjorde segermålet ungefär en kvart före slutet. Enligt Bernews [2] var det hans elfte mål för säsongen, och Luton har nu vunnit fem av sina sex senaste ligamatcher. Även Luton fick alltså jaga i underläge, och båda lagen har visat att de inte släpper en match i förtid. Så gjorde vi i Tjäderfors, och där regnade det in. Den som går och hämtar kaffe i pausen på Kenilworth Road gör det på egen risk."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "The League Paper",
+     "title": "Oxford United 4-3 Wycombe Wanderers: Gatlin O’Donkor puts the seal on U’s comeback for the ages",
+     "url": "https://www.theleaguepaper.com/latest-news/football-league-division-one/oxford-united/470537/gatlin-puts-the-seal-on-us-comeback-for-the-ages/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Bernews",
+     "title": "Video: Wells Scores Twice In Luton’s 2-1 Victory",
+     "url": "https://bernews.com/2026/11/nov21nahki-wells-scores-twice-in-lutons-2-1-victory/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Luton störst chans, och spelbolaget tror ännu mer på hemmalaget. Luton har vunnit fem av sex ligamatcher och Wells har gjort elva mål för säsongen [1]. Oxfords försvar ser bättre ut i tabellen än i chanserna, eftersom laget har släppt in klart färre mål än chanserna brukar ge, och sådant brukar jämna ut sig. Samtidigt förlorar Oxford sällan, och de visade mot Wycombe att de inte ger sig [2]. Ett oavgjort resultat ligger därför nära till hands. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "Hemmalaget, försiktigt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Bernews",
+      "title": "Video: Wells Scores Twice In Luton’s 2-1 Victory",
+      "url": "https://bernews.com/2026/11/nov21nahki-wells-scores-twice-in-lutons-2-1-victory/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The League Paper",
+      "title": "Oxford United 4-3 Wycombe Wanderers: Gatlin O’Donkor puts the seal on U’s comeback for the ages",
+      "url": "https://www.theleaguepaper.com/latest-news/football-league-division-one/oxford-united/470537/gatlin-puts-the-seal-on-us-comeback-for-the-ages/",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-23T16:21:26.011Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Oxford vände 0–3 till 4–3 mot Wycombe under de sista sjutton minuterna, och alla pratar om karaktär. Här höjer jag ett varningens finger. Laget släppte in ett mål redan i första minuten, och bakåt har de kommit undan billigt med tanke på alla chanser de släpper till. Sådant brukar jämna ut sig, och borta mot ett lag i form gör det gärna det.",
+     "Luton har vunnit fem av sina sex senaste ligamatcher. Senast låg de under borta mot Burton, och då gjorde Nahki Wells båda målen. Ett hemmalag med en anfallare som sätter bollen i nät möter en backlinje som har levt på marginaler. Det er helt i orden, som danskarna säger. Jag ringar in en ren etta."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-23T16:21:26.011Z",
+    "uppdrag": {
+     "fraser": [
+      "Här höjer jag ett varningens finger",
+      "Det köper jag aldrig"
+     ],
+     "krydda": "Det er helt i orden, som danskarna säger.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-23T16:21:49.224Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
   },
   {
    "id": "401879226",
