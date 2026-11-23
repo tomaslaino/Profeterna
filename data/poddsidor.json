@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T18:27:44.728Z",
+ "uppdaterad": "2026-11-23T18:58:59.985Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2506,14 +2506,21 @@
     "Stoke City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:03:07.937Z",
-   "rubrik": "West Ham fick allt utom resultatet, igen",
+   "skriven": "2026-11-23T18:49:46.002Z",
+   "rubrik": "West Ham har bollen, Stoke har tron",
    "ingress": null,
-   "summering": "West Ham äger bollen men läcker och letar fortfarande efter sin bästa elva. I Stoke håller man andan för Djibril Soumaré, lagets farligaste spelare mot Birmingham.",
+   "summering": "West Ham äger bollen men saknar idéer mot låga försvar, och läktaren tröttnar. Stoke kommer till London med en känsla av att vara oslagbara, men troligen utan Soumaré.",
    "delar": [
     {
      "lag": "West Ham United",
      "kallor": [
+      {
+       "podd": "Moore Than Just A Podcast - West Ham Podcast",
+       "avsnitt": "Canning Town Len's return to Stratford",
+       "datum": "2026-11-22",
+       "adress": "https://shows.acast.com/moorethanjustapodcast/episodes/canning-town-lens-return-to-stratford",
+       "typ": "podd"
+      },
       {
        "podd": "KUMB",
        "avsnitt": "⚽ Portsmouth v West Ham Utd: match thread · ⚽ West Ham Utd v Preston North End: match thread · Goodbye and thank you. David Moyes' Claret and Blue Army",
@@ -2548,15 +2555,15 @@
        "amne": "elva",
        "punkter": [
         {
-         "t": "Oliver Scarles, kanske lagets enda naturliga vänsterback, slog fler inlägg på sitt korta inhopp än alla andra vänsterbackar tillsammans. Supportrarna hoppas att Parker inte går tillbaka till Morato på kanten, men andra tyckte att Scarles såg sårbar och vårdslös ut.",
+         "t": "Värdarna förstår inte varför laget spelar med en ensam anfallare mot ett bottenlag. De vill flytta in Bowen centralt bredvid en partner och sätta en annan spelare till höger.",
          "s": "o",
          "podd": [
-          "KUMB"
+          "Moore Than Just A Podcast - West Ham Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -2564,70 +2571,37 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Motståndarna har lärt sig att stänga in Jarrod Bowen på högerkanten, och West Ham saknar en högerback som kan överlappa och hjälpa honom. Därför vill en del supportrar flytta upp honom som anfallare.",
+         "t": "När motståndarna ställer upp med två femmannalinjer har West Ham inget sätt att ta sig igenom. Len efterlyser en kreativ mittfältare av Ian Bishops eller Berkovics slag.",
          "s": "o",
          "podd": [
-          "KUMB"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Det som stjälper laget vecka efter vecka är slarv: bollar som tappas i farliga lägen, onödiga hörnor och frisparkar och billiga mål på hörnor. Försvinner det kommer självförtroendet och poängen tillbaka.",
-         "s": "o",
-         "podd": [
-          "KUMB"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Siffrorna döljer en bättre bild än resultaten. De senaste tre matcherna har West Ham haft 69 skott, varav 18 på mål, och mycket mer boll och xG än motståndarna. Spelet sitter, det är försvaret som fattas.",
-         "s": "o",
-         "podd": [
-          "WHU606"
+          "Moore Than Just A Podcast - West Ham Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Hotet försvann när Divine Mukasa byttes ut mot Preston. Joël Piroe bidrar bara med kombinationsspel och har ingen att spela ihop med, inte heller Valentín Castellanos. Dessutom slogs ofta en passning för mycket i stället för att skjuta.",
+         "t": "De inverterade yttrarna drar sig hela tiden inåt och gör planen smal, i stället för att hålla bredden ute vid kortlinjen. Värdarna är dock överens om att Bowen är farligast när han skär in.",
          "s": "o",
          "podd": [
-          "WHU606"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Edson Álvarez valdes av nästan alla till bäst mot Preston i sin första match på länge. Han var den första den här säsongen som verkligen ville vinna lösbollarna på mitten, även om en del oroar sig för hans temperament.",
-         "s": "o",
-         "podd": [
-          "WHU606"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "West Ham har gått fem ligamatcher utan seger och har släppt in första målet i alla fem. Därför jagar laget hela tiden, och motståndarna kan backa hem och försvara sig djupt.",
-         "s": "b",
-         "podd": [
-          "West Ham World"
+          "Moore Than Just A Podcast - West Ham Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "media"
+         "typ": "podd"
+        },
+        {
+         "t": "Austbø och Engels har kostat runt 40 miljoner pund tillsammans, men värdarna menar att de lika gärna kunde ersättas av akademispelarna Ajala och Orford. Det säger de är ett misslyckande.",
+         "s": "o",
+         "podd": [
+          "Moore Than Just A Podcast - West Ham Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -2635,40 +2609,85 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "I slutet av november har varken supportrarna eller tränaren Parker fått grepp om vilken elva som är den bästa. Laget ändras från match till match.",
+         "t": "Len ser ingen talang alls bland säsongens nyförvärv och tycker att Bowen är den ende riktigt bra spelaren. Han kallar det kanske det sämsta West Ham-lag han har sett.",
          "s": "o",
          "podd": [
-          "KUMB"
+          "Moore Than Just A Podcast - West Ham Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna ger Scott Parker beröm för att han vågade ändra i elvan. En agent med god insyn i West Ham har sagt till dem att problemet inte är tränarna utan rekryteringen.",
+         "s": "h",
+         "podd": [
+          "Moore Than Just A Podcast - West Ham Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Len misstror att klubbledningen, med Karim och Paul Stringer, plötsligt söker kontakt med supporterkanaler, och ser det som ett tecken på att det går dåligt. En medvärd påpekar att Karim länge arbetade med digitala medier på klubben.",
+         "s": "o",
+         "podd": [
+          "Moore Than Just A Podcast - West Ham Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Hemmaformen är sämre än bortaformen, och värdarna oroar sig för att Stokematchen blir en upprepning av Preston: West Ham har bollen men kommer ingenstans. Flera säger att hemmamatcherna har börjat kännas som ett tvång.",
+         "s": "o",
+         "podd": [
+          "Moore Than Just A Podcast - West Ham Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Mot Preston sköt West Ham 30 gånger och fick, enligt Scott Parker, allt han ville ha ”utom resultatet”. På WHU606 menar man att spelet sitter och att det bara är försvaret som fattas. På KUMB pekar man i stället på slarvet: onödiga hörnor och billiga mål på dem.",
-      "Ljusglimten var Edson Álvarez, den förste den här säsongen som verkligen ville vinna lösbollarna på mitten, även om hans humör oroar en del.",
-      "Ändå verkar ingen, Parker inräknad, veta vilken elva som är den bästa nu i slutet av november."
+      "I podden Moore Than Just A Podcast fruktar man ett nytt Preston: West Ham har bollen men kommer ingenstans, och hemmamatcherna har börjat kännas som ett tvång. Mot två femmannalinjer har laget, som en av värdarna säger, ”ingenting” att ta sig igenom med.",
+      "På forumet KUMB ser man hur Jarrod Bowen stängs in till höger, utan någon högerback som överlappar, och allt fler vill flytta in honom som anfallare.",
+      "Edson Álvarez var på WHU606 den förste i år som verkligen ville vinna lösbollarna på mitten. En poddvärd vill ändå inte se honom i laget efter två år av försök att lämna klubben."
      ],
      "citat": {
-      "sagt": "Några av spelarna verkar fortfarande tro att de bara behöver dyka upp, så vinner vi matcherna.",
-      "vem": "Fortuneseeker",
-      "podd": "WHU606",
-      "typ": "forum",
-      "datum": "2026-11-21"
+      "sagt": "Det visar att folk inte orkar gå en vinterlördag klockan tre, eftersom de vet vilket skräp som har spelats.",
+      "vem": null,
+      "podd": "Moore Than Just A Podcast - West Ham Podcast",
+      "typ": "podd",
+      "datum": "2026-11-22"
      },
      "namn": [
-      "Scott Parker",
-      "Edson Álvarez",
-      "Parker"
-     ]
+      "Jarrod Bowen",
+      "Edson Álvarez"
+     ],
+     "paSpel": "Att hemmamatcherna slutar kännas som ett tvång för läktaren."
     },
     {
      "lag": "Stoke City",
      "kallor": [
+      {
+       "podd": "Every Step Along The Way - A Stoke City Podcast",
+       "avsnitt": "Match Preview: Millwall(H) - 25/11/26",
+       "datum": "2026-11-23",
+       "adress": "https://shows.acast.com/every-step-along-the-way/episodes/match-preview-millwallh-251126",
+       "typ": "podd"
+      },
       {
        "podd": "Stoke-on-Trent Live",
        "avsnitt": "Stoke vs Birmingham live match updates as ten-man Potters hold on for huge win",
@@ -2693,6 +2712,17 @@
          "typ": "lokal"
         },
         {
+         "t": "Djibril Soumaré tvingades kliva av mot Birmingham och lämnade arenan i en ortopedisk känga, och värdarna tror inte att han hinner bli spelklar till lördagen.",
+         "s": "h",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Djibril Soumaré fick vård och byttes ut efter 59 minuter mot Birmingham, men gick av planen själv. Lokaltidningens reporter kallar det oroande, eftersom Soumaré hade varit farlig hela matchen och spelade fram till målet.",
          "s": "b",
          "podd": [
@@ -2704,15 +2734,95 @@
          "typ": "lokal"
         }
        ]
+      },
+      {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Ben Johnson, som kommer från West Hams ungdomsakademi, bör vila mot Millwall enligt värdarna. Han väntas vara extra laddad mot sin gamla klubb.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "George Hirst har gjort mål men har gång på gång petats direkt efteråt. Värdarna vill att han får en följd av matcher, men supportrarna är delade och en del vill hellre se Sam Gallagher.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Efter fyra raka segrar och seger mot serieledande Birmingham känner värdarna att laget är oslagbart just nu. De beskriver känslan som overklig och helt annorlunda än för ett år sedan.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Värdarna ser bortamatchen mot West Ham som det verkliga provet. En seger i London skulle ge klubbrekord i raka bortasegrar och få alla att börja tro på allvar.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "En av värdarna är inte rädd för West Ham. Han kallar dem ett konstigt lag och påpekar att Preston tog poäng där.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
       }
      ],
      "text": [
-      "Enligt lokaltidningens reporter var Djibril Soumaré farlig hela matchen mot Birmingham, och det var han som spelade fram till målet.",
-      "Därför kallar reportern det oroande att han fick vård och byttes ut efter 59 minuter, även om han klev av ”för egen maskin”."
+      "”Kalla dem bara de oslagbara”, säger man i podden Every Step Along The Way, där fyra raka segrar ger en känsla som är overklig jämfört med för ett år sedan.",
+      "Ändå ses lördagen som det verkliga provet: vinner Stoke i London börjar alla tro på allvar.",
+      "Ben Johnson, fostrad i West Hams akademi, vill värdarna vila mot Millwall så att han är redo när han väntas vara extra laddad mot sin gamla klubb. Mer oroande är att Djibril Soumaré lämnade arenan i en ortopedisk känga. Enligt värdarna säger det allt om honom att vem som helst kan spela bredvid honom."
      ],
+     "citat": {
+      "sagt": "Jag tror faktiskt att vi slår West Ham. De är ett konstigt lag. Preston åkte dit och tog en poäng.",
+      "vem": null,
+      "podd": "Every Step Along The Way - A Stoke City Podcast",
+      "typ": "podd",
+      "datum": "2026-11-23"
+     },
      "namn": [
+      "Ben Johnson",
       "Djibril Soumaré"
-     ]
+     ],
+     "paSpel": "Klubbrekord i raka bortasegrar, och provet som får alla att tro."
     }
    ]
   },
@@ -2725,16 +2835,140 @@
     "Portsmouth"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:03:22.364Z",
-   "rubrik": "En poäng i Bolton som ingen i Portsmouth firar",
+   "skriven": "2026-11-23T18:58:59.985Z",
+   "rubrik": "Wrexham har slutat försöka se bra ut",
    "ingress": null,
-   "summering": "Portsmouth kommer till Wrexham med en poäng som de egna supportrarna kallar räddad snarare än förtjänad, och med Jayden Meghomas skada som ett frågetecken.",
+   "summering": "Wrexham har valt fulspel och lutar sig mot en backlinje där Cleworth är den tysta nyckeln. Portsmouths supportrar ser sin senaste poäng som räddad snarare än förtjänt, och Meghoma är osäker.",
    "delar": [
     {
      "lag": "Wrexham",
-     "kallor": [],
-     "grupper": [],
-     "text": []
+     "kallor": [
+      {
+       "podd": "Rob. Ryan. Red.",
+       "avsnitt": "Episode 336: Digging Deep",
+       "datum": "2026-11-23",
+       "adress": "https://shows.acast.com/6486dd5af5bfbf001188bea7/episodes/episode-336",
+       "typ": "podd"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Med Max Cleworth på planen har Wrexham bara släppt in två av säsongens 20 mål. Laget tar ungefär två poäng per match när han startar och 0,9 när han inte gör det. Värdarna tycker att han presterar bättre än Doyle och Worrall utan att någon märker det.",
+         "s": "h",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna ser det defensiva 3-5-1-1 som en nödlösning. Så fort Windass, Broadhead och O'Hare är tillbaka vill de ha två spelare bakom Kieffer Moore, annars når laget aldrig topp sex.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "En av värdarna håller fast vid att Ben Sheaf är klubbens bästa centrala mittfältare. Han förstår ändå varför Sheaf sitter på bänken: utan kreativa spelare behövs löpare som Thomason, som pressar högre än Sheaf och Matty James.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna tycker att det har gått fel när laget ska hålla en ledning. Mot Cardiff byttes George Dobson in, men i slutminuterna behövs lugnet hos Matty James eller Ben Sheaf.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Värdarna säger rakt ut att Wrexham inte är särskilt bra just nu. Därför måste laget spela på ett sätt som ger poäng och inte på ett sätt som ser bra ut. De kallar det klassiskt Parkinson-spel.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna menar att något vände efter förlusten mot Sheffield United, när Parkinson sa att laget saknade kämpaglöd. Sedan dess spelar han med sina slitvargar och tar matcherna som skyttegravskrig.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna säger sig veta att flera spelare i truppen vill se Max Cleworth som lagkapten, även om Joe Worrall leder backlinjen just nu.",
+         "s": "h",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Målet just nu är att hänga kvar inom räckhåll fram till januari. Då måste klubben hitta en anfallare som gör skillnad, vilket blir dyrt mitt i säsongen.",
+         "s": "o",
+         "podd": [
+          "Rob. Ryan. Red."
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "I podden Rob. Ryan. Red. säger man det rakt ut: Wrexham är ”inte särskilt bra just nu” och måste spela för poängen, inte för ögat. Sedan förlusten mot Sheffield United, när Parkinson tyckte att kämpaglöden saknades, tar laget matcherna som skyttegravskrig med sina slitvargar. Värdarna kallar det klassiskt Parkinson-spel.",
+      "Den som bär det hela är Max Cleworth, som enligt podden spelar bättre än Doyle och Worrall utan att någon märker det. Värdarna säger sig dessutom veta att flera i omklädningsrummet vill se honom som kapten, fast Worrall leder backlinjen just nu."
+     ],
+     "citat": {
+      "sagt": "Wrexham tar ungefär två poäng per match när Max startar, och 0,9 när han inte gör det.",
+      "vem": null,
+      "podd": "Rob. Ryan. Red.",
+      "typ": "podd",
+      "datum": "2026-11-23"
+     },
+     "namn": [
+      "Parkinson",
+      "Max Cleworth",
+      "Doyle",
+      "Worrall"
+     ],
+     "paSpel": "Att hålla sig kvar i striden till januari, när anfallaren ska köpas."
     },
     {
      "lag": "Portsmouth",
@@ -2782,8 +3016,8 @@
       }
      ],
      "text": [
-      "På forumet NOT606 är man inte imponerad av oavgjort i Bolton. ”Bolton var det bättre laget”, konstaterar supportrarna, och poängen kom mest för att Portsmouth höll undan.",
-      "Matchen lämnade också ett frågetecken efter sig. Jayden Meghoma fick kliva av skadad i slutspelet, och supportrarna tror att han missar hemmamatchen mot West Ham i veckan. Därmed hänger även hans plats mot Wrexham i luften."
+      "På forumet NOT606 slår man inte på trumman för poängen borta mot Bolton. Hemmalaget var bättre, och Portsmouth höll helt enkelt undan.",
+      "Poängen kostade dessutom Jayden Meghoma, som fick gå av skadad i slutet. Supportrarna tror att han missar hemmamatchen mot West Ham i veckan, och därmed hänger även lördagen löst."
      ],
      "namn": [
       "Jayden Meghoma"
