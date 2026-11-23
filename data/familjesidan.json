@@ -15,41 +15,47 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T16:42:15.441Z",
+ "skriven": "2026-11-23T16:58:07.646Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T16:33:27.519Z",
- "rubrik": "En tränare har kommit, tre sitter löst och en återvänder",
+ "underlag": "2026-11-23T16:54:42.827Z",
+ "rubrik": "Watford byter tränare, tre sitter löst och Duff kommer tillbaka",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Watford",
    "namn": "Edward Iordănescu",
-   "text": "tar över efter Alessio Dionisi och väntas leda laget redan i onsdagens hemmamatch mot Blackburn. Supportrarna oroar sig för att han har hamnat i bråk med ägarna i tidigare klubbar."
+   "text": "blir ny tränare i Watford enligt talkSPORT-reportern Alex Crook och väntas leda laget redan i onsdagens hemmamatch mot Blackburn. Supportrarna oroar sig för att han har bråkat med ägarna i tidigare klubbar."
+  },
+  {
+   "slag": "avflyttad",
+   "lag": "Watford",
+   "namn": "Alessio Dionisi",
+   "text": "har lämnat Watford, där Edward Iordănescu tar över. Många supportrar hade tröttnat på hans taktik, särskilt på bortaplan, men de tror inte att ännu ett tränarbyte ändrar något."
   },
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Michael Duff",
-   "text": "möter sin gamla klubb Wycombe, vars supportrar tycker att han har tappat fart sedan han lämnade dem för Bradford."
+   "text": "kommer tillbaka till Adams Park med Bradford City. Wycombes supportrar tycker att han har tappat fart sedan han lämnade dem, och även de som höll på honom berömmer efterträdaren."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "har allt fler supportrar emot sig. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
+   "text": "har supportrarnas tålamod på upphällningen. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "känner trycket växa från supportrarna, som vill ha en förändring, men ägarna fortsätter att backa honom."
+   "text": "känner trycket växa i Derby, där supportrarna vill ha en förändring. Ägarna står fortfarande bakom honom, trots att en ny nedflyttning hotar att kosta flera års återuppbyggnad."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har i stort sett förlorat supportrarnas förtroende, och enligt dem avgör en förlust mot Wrexham på tisdag hans öde."
+   "text": "har supportrarna i stort sett gett upp om. De anser att hans lag bara håller League One-nivå och att en förlust mot Wrexham på tisdag avgör hans öde."
   }
  ]
 }
