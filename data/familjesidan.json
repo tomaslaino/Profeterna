@@ -15,35 +15,41 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T18:33:08.455Z",
+ "skriven": "2026-11-23T19:03:50.580Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T18:27:44.728Z",
- "rubrik": "En tränare möter sin gamla klubb och tre sitter löst",
+ "underlag": "2026-11-23T18:58:59.985Z",
+ "rubrik": "Tre tränare sitter löst och två möter sina gamla klubbar",
  "notiser": [
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Michael Duff",
-   "text": "kommer tillbaka till Wycombe med Bradford. Även de som höll på honom tycker att efterträdaren har svetsat ihop truppen, och supportrarna menar att han har tappat fart sedan han lämnade klubben."
+   "text": "kommer tillbaka till sin gamla klubb Wycombe, nu med Bradford. Supportrarna i Wycombe tycker att han har tappat fart sedan han lämnade dem."
+  },
+  {
+   "slag": "aterseende",
+   "lag": "Stoke City",
+   "namn": "Ben Johnson",
+   "text": "möter West Ham, där han kommer från ungdomsakademin. Han väntas vara extra laddad mot sin gamla klubb."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "möter ett tålamod som håller på att ta slut. Flera supportrar vill se honom sparkad om de två närmaste matcherna inte ger några poäng, eftersom de inte tror att han kan hålla laget kvar."
+   "text": "har allt mindre stöd på läktarna, och flera supportrar vill se honom sparkad om de två närmaste matcherna inte ger några poäng. De tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "känner trycket växa. Supportrarna vill ha en förändring, men ägarna fortsätter att stå bakom honom, samtidigt som en ny nedflyttning hotar att ge flera års återuppbyggnad."
+   "text": "har fortfarande ägarnas stöd, men trycket växer och supportrarna vill ha en förändring. Ännu en nedflyttning hotar att ge flera års återuppbyggnad."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har i stort sett förlorat supportrarnas förtroende, och enligt dem avgörs hans öde i tisdagens hemmamatch mot Wrexham. En livslång supporter undrar för första gången om han vill se City förlora."
+   "text": "väntas få sin framtid avgjord i tisdagens hemmamatch mot Wrexham, och supportrarna har i stort sett gett upp om honom. Värdarna fruktar att även en seger bara skjuter upp beslutet."
   }
  ]
 }
