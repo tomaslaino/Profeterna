@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T16:04:08.668Z",
+ "uppdaterad": "2026-11-23T16:33:27.519Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,14 +103,21 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-23T15:59:25.809Z",
-   "rubrik": "O'Neil får två matcher på sig, och Villa kommer först",
+   "skriven": "2026-11-23T16:23:23.944Z",
+   "rubrik": "I Ipswich skulle man jubla åt 0–0",
    "ingress": null,
-   "summering": "Ipswich har en tränare på tunn is, en press som försvunnit och en hemmapublik som kan vända sig. Villa äger bollen men saknar mod, och mittfältet letar fortfarande efter sina roller.",
+   "summering": "Ipswich bär på en lång rad matcher med insläppta mål och en splittrad syn på tränaren. Villa har ett mittfält utan riktning och en tränare som fortfarande lägger pussel.",
    "delar": [
     {
      "lag": "Ipswich Town",
      "kallor": [
+      {
+       "podd": "Blue Monday: An Ipswich Town Podcast",
+       "avsnitt": "🚩TOTTENHAM 2-0 IPSWICH TOWN MATCH REACTION | PREMIER LEAGUE | Flagship Show",
+       "datum": "2026-11-22",
+       "adress": "https://shows.acast.com/bluemondaypodcast/episodes/tottenham-2-0-ipswich-town-match-reaction-premier-league-fla",
+       "typ": "podd"
+      },
       {
        "podd": "TWTD",
        "avsnitt": "Walking 60 miles for Prostate Cancer Research in November · money wasted · Gary O'Neil",
@@ -151,6 +158,22 @@
        ]
       },
       {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Ouattara gjorde återigen misstag i försvaret. Joe funderar på att gå tillbaka till säsongsinledningens lag, med O'Shea som högerback och Ouattara utanför en tid, eftersom laget var stabilare då.",
+         "s": "o",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
        "amne": "spel",
        "punkter": [
         {
@@ -165,48 +188,37 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna tycker att O'Neil fortfarande inte har hittat sin bästa elva eller sin formation, medan konkurrenterna har börjat sätta sig. Det är svårt att se vilken spelstil laget egentligen ska ha.",
+         "t": "De senaste fem–sex insläppta målen har alla gått att undvika, och laget är inte bra nog för att fortsätta släppa in sådana mål.",
          "s": "o",
          "podd": [
-          "TWTD"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Leif Davis är ett dilemma. Han behöver stå högt för att hans styrkor ska komma till sin rätt, men då läcker det bakåt. Står han lågt väger försvarsspelet inte upp det laget förlorar framåt.",
-         "s": "o",
-         "podd": [
-          "TWTD"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna stör sig på att O'Neil pekar ut enskilda spelare offentligt. Kritiken mot Emersonn förstår de inte, och inte heller varför Jack Clarke fortsätter att sitta på bänken.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Motståndarna fäller Ipswichspelare som är på väg i kontring och tar gärna ett gult kort för det. Ipswich låter i samma läge löparen gå. Supportrarna menar att laget måste lära sig Premier Leagues fula knep.",
-         "s": "o",
-         "podd": [
-          "NOT606"
+          "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Alla väntade sig Greaves i en femmannabackslinje, men O'Neill satte in Furlong för att balansera de offensiva ytterbackarna Ouattara och Davis. Furlong hamnade mittemellan och var varken högerback eller mittback.",
+         "s": "o",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna är oense om försvaret. Joe menar att O'Shea, Davis och Diop alla håller för Premier League. Dave tycker att mittbackparet Diop och O'Shea inte räcker i nuvarande form och tror på en mittbacksvärvning i januari.",
+         "s": "o",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -223,46 +235,48 @@
           "2026-11-23"
          ],
          "typ": "forum"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
+        },
         {
-         "t": "Inför hemmamatchen på lördag oroar sig en del för publiken. De menar att formsvackan är högst två och en halv match lång och att spelarna behöver stöd, men att läktaren verkar beredd att vända sig mot laget.",
+         "t": "Mot Spurs tävlade laget aldrig, inte ens efter underläge som mot Liverpool, och det var säsongens första sådana insats. Supportrarna hoppas att den blir en engångsföreteelse. Dave tycker ändå att tecknen har funnits ett tag.",
          "s": "o",
          "podd": [
-          "TWTD"
+          "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På forumet TWTD har tålamodet med Gary O'Neil nästan tagit slut: blir det inga poäng i de två kommande matcherna vill flera se honom sparkad. Några tar emot och kallar krisprat överdrivet så länge laget ligger ovanför strecket.",
-      "På NOT606 saknar man mest pressen, som var lagets stora vapen i början av säsongen men nu verkar ha försvunnit. Laget står lågt och passivt utan att vara organiserat för det.",
-      "Inför lördagen oroar sig flera mer för läktaren än för Villa: spelarna behöver stöd, men publiken verkar mest vilja ”explodera”."
+      "Dave i podden Blue Monday skulle gärna ta 0–0 mot Villa, för då vore det äntligen en nolla efter 30 ligamatcher i rad med insläppta mål. Han menar att målen gick att undvika och att laget inte är bra nog för sådana misstag.",
+      "Om Gary O'Neil går åsikterna isär. På forumet TWTD vill flera sparka honom om de närmaste matcherna inte ger några poäng, medan podden varnar för att Ipswich nästan säkert åker ur om han får gå.",
+      "Forumet oroar sig också för lördagens publik, som verkar beredd att vända sig mot laget."
      ],
      "citat": {
-      "sagt": "Kritiken mot Emersonn är särskilt obegriplig. Precis som att Jack Clarke fortsätter att bänkas.",
-      "vem": "YorkieLancsHampyLondoner",
-      "podd": "NOT606",
+      "sagt": "Det som oroar mig är hemmapubliken på lördag! Spelarna behöver stöd. Men om forumet är något att gå efter vill publiken bara explodera.",
+      "vem": "unstableblue",
+      "podd": "TWTD",
       "typ": "forum",
-      "datum": "2026-11-21"
+      "datum": "2026-11-23"
      },
      "namn": [
       "Gary O'Neil"
      ],
-     "paSpel": "Kanske O'Neils jobb, och chansen att vinna tillbaka tron på hemmaplan."
+     "paSpel": "Tränarens framtid enligt forumet, och för podden en första nolla på länge."
     },
     {
      "lag": "Aston Villa",
      "kallor": [
+      {
+       "podd": "The Villa Filler Podcast",
+       "avsnitt": "BORING SCORELESS DRAW - Aston Villa 0-0 Sunderland REACTION - The Villa Filler Podcast",
+       "datum": "2026-11-21",
+       "adress": "https://podcasters.spotify.com/pod/show/thevillafiller/episodes/BORING-SCORELESS-DRAW---Aston-Villa-0-0-Sunderland-REACTION---The-Villa-Filler-Podcast-e3spu9b",
+       "typ": "podd"
+      },
       {
        "podd": "Vital Villa",
        "avsnitt": "Aston Villa v Sunderland Match Thread - Sat 21st Nov - 3pm · Champions League 2026/2027 Thread · Villa Park",
@@ -276,6 +290,28 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Villa har inte vunnit någon av sina tio senaste ligamatcher där det stått lika i halvtid; senast var mot Brighton i februari. Värdarna menar att bilden av ett Villa som tar över i andra halvlek inte längre stämmer.",
+         "s": "h",
+         "podd": [
+          "The Villa Filler Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna tror att Emery för första gången inte vet vilket hans bästa lag är. Bara målvakt, anfallare och ytterbackar är givna, och resten av elvan lägger han fortfarande pussel med.",
+         "s": "o",
+         "podd": [
+          "The Villa Filler Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna tycker att Villa trots enormt bollinnehav inte vågar ta initiativ. I stället för att trycka på och slå inlägg väntar laget på att motståndarna ska öppna sig av sig själva.",
          "s": "o",
          "podd": [
@@ -287,37 +323,37 @@
          "typ": "forum"
         },
         {
-         "t": "En supporter som följt laget i över sextio år menar att Villa länge har haft svårt att låsa upp lag som kommer till Villa Park bara för att stoppa spelet. Den här gången misslyckades laget igen.",
+         "t": "McGinn började på bänken med tanke på tisdagen, och laget såg platt ut tills han kom in. Värdarna menar att ingen annan visade samma vilja och undrar varför varken Goretzka eller Kamara tar den rollen.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "The Villa Filler Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-21"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Mittfältet såg entonigt och idéfattigt ut tills John McGinn kom in och höjde intensiteten. Alysson var för försiktig och spelade hellre bakåt och i sidled, och supportrarna saknar Amadou Onanas fart framåt.",
+         "t": "Villa saknar Matty Cash, som värdarna kallar lagets jämnaste spelare de senaste 18–20 månaderna. Wan-Bissaka överlappar inte, mittfältet blev smalt och bara Maatsen gav bredd; inte ens när Madjo kom in slogs några inlägg.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "The Villa Filler Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-21"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Supportrarna menar att problemet på mittfältet är systemet och inte spelarna. Boubacar Kamara verkar inte själv veta vilken roll han har.",
+         "t": "Villa saknar en linjebrytare efter att Tielemans försvann, menar värdarna. Kamara försöker slå Tielemans-passningar men har inte verktygen, och de saknar också Onanas närvaro i straffområdet.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "The Villa Filler Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-21"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -325,71 +361,52 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Supportrarna tror att Emery har bestämt sig för att först täppa till bakåt efter elva insläppta mål på några matcher. De jämför med Ron Saunders, som byggde om sitt lag genom att först sluta förlora och sedan lära det att vinna.",
+         "t": "Värdarna ser inte längre de tappade poängen som undantag. De börjar tro att det helt enkelt är så Villa är den här säsongen, och att Champions League kan vara ett steg för långt.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "The Villa Filler Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-21"
          ],
-         "typ": "forum"
-        },
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
         {
-         "t": "Några supportrar ber om tålamod. Truppen har inte haft någon försäsong tillsammans, anfallaren köptes in sent och laget har i praktiken spelat få matcher. De som buade bör lugna ner sig.",
-         "s": "o",
+         "t": "Värdarna har sett ett mönster: Villa tappar i ligan just före Europamatcherna men brukar vara bra när de kommer tillbaka till ligan efteråt. Ipswich borta spelas på lördagen efter bortamatchen mot Galatasaray på tisdag.",
+         "s": "h",
          "podd": [
-          "Vital Villa"
+          "The Villa Filler Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-21"
          ],
-         "typ": "forum"
-        },
-        {
-         "t": "Den som tycker att spelet är tråkigt får mothugg med siffror: Emery tar i snitt två poäng per match, och det går inte ihop med påståendet att laget spelar slow motion-fotboll varje vecka.",
-         "s": "o",
-         "podd": [
-          "Vital Villa"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Det finns också optimism. Talangen finns där, laget håller på att formas och det bästa väntas komma längre fram.",
-         "s": "o",
-         "podd": [
-          "Vital Villa"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På Vital Villa retar man sig på ett lag som har bollen men inte vågar använda den. I stället för att trycka på väntar det på att motståndarna ska ”dela sig som Röda havet”.",
-      "Mittfältet såg entonigt ut tills John McGinn kom in, och Boubacar Kamara verkar inte själv veta vilken roll han har. Felet sitter i systemet, inte i spelarna, menar supportrarna.",
-      "Många tror att Unai Emery först vill täppa till bakåt och jämför med Ron Saunders, som byggde om genom att först sluta förlora."
+      "I podden The Villa Filler tror man att Unai Emery för första gången inte vet vilket hans bästa lag är. Bara målvakt, anfallare och ytterbackar känns givna, resten lägger han fortfarande pussel med.",
+      "På forumet Vital Villa såg mittfältet ”entonigt och idéfattigt” ut i lördags, tills John McGinn kom in från bänken och höjde tempot.",
+      "Poddvärdarna ser ändå ett mönster som ger hopp inför lördagen: Villa brukar tappa just före Europamatcherna men vara bra när de kommer tillbaka till ligan. Ipswich borta kommer direkt efter tisdagens resa till Galatasaray."
      ],
      "citat": {
-      "sagt": "Talangen finns uppenbarligen där, men vi utvecklas också som lag, så det är rimligt att vänta sig att det bästa är kvar.",
-      "vem": "The French Connection",
-      "podd": "Vital Villa",
-      "typ": "forum",
-      "datum": "2026-11-22"
+      "sagt": "Det värsta är att inse att det kanske helt enkelt är sådant här Villa är i år.",
+      "vem": null,
+      "podd": "The Villa Filler Podcast",
+      "typ": "podd",
+      "datum": "2026-11-21"
      },
      "namn": [
-      "John McGinn",
-      "Boubacar Kamara",
       "Unai Emery",
-      "Ron Saunders"
+      "John McGinn"
      ],
-     "paSpel": "Kanske mindre än det verkar: en supporter tror Emery prioriterar Champions League."
+     "paSpel": "Första ligamatchen efter Galatasaray, där podden brukar se Villa vakna."
     }
    ]
   },
@@ -2518,6 +2535,288 @@
      "kallor": [],
      "grupper": [],
      "text": []
+    }
+   ]
+  },
+  {
+   "id": "401880719",
+   "nr": 13,
+   "match": "Wycombe Wanderers – Bradford City",
+   "lag": [
+    "Wycombe Wanderers",
+    "Bradford City"
+   ],
+   "avspark": "2026-11-28T15:00:00.000Z",
+   "skriven": "2026-11-23T16:04:51.703Z",
+   "rubrik": "Ingen ledning är säker på Adams Park",
+   "ingress": null,
+   "summering": "Wycombe fruktar att varje motståndare nu tror på en upphämtning, men tar emot Duff med en trupp som Hounsell har svetsat ihop. Bradford anfaller bättre men har tappat greppet om matcherna när laget leder.",
+   "delar": [
+    {
+     "lag": "Wycombe Wanderers",
+     "kallor": [
+      {
+       "podd": "The Gasroom",
+       "avsnitt": "Fans Forum - Tuesday 17th November · Match Thread: W3 vs Moneyfields, 22nd Nov 2026 · Match Day Thread: Oxford 21st Nov 2026 (A)",
+       "datum": "2026-11-23",
+       "adress": "https://www.gasroom.org/t/fans-forum-tuesday-17th-november/1124",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "Trigon Trip Ewes v Chairboys 21st Nov 26 · EFL & Premier League Managers 2026-27 · What day of the week is it thread",
+       "datum": "2026-11-23",
+       "adress": "https://not606.com/threads/trigon-trip-ewes-v-chairboys-21st-nov-26.425599/",
+       "typ": "forum"
+      },
+      {
+       "podd": "Bucks Free Press",
+       "avsnitt": "'These are just finite moments' - Hounsell on Wycombe's red cards in Oxford loss",
+       "datum": "2026-11-21",
+       "adress": "https://uk.sports.yahoo.com/news/just-finite-moments-hounsell-wycombes-181458622.html",
+       "typ": "lokal"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "trupp",
+       "punkter": [
+        {
+         "t": "Mittbacken Dan Casey blev utvisad mot Oxford efter två gula kort för två olika tacklingar. Tränaren Tom Hounsell säger att han är mer irriterad över det första gula kortet än över det andra.",
+         "s": "b",
+         "podd": [
+          "Bucks Free Press"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "lokal"
+        },
+        {
+         "t": "Luke Leahy fick rött kort direkt för en avsiktlig hands på ett skott, bara en stund efter att han hade bytts in. Tränaren Tom Hounsell tycker att domslutet var hårt.",
+         "s": "b",
+         "podd": [
+          "Bucks Free Press"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "lokal"
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Wycombe har tappat en 2–0-ledning tre gånger den här säsongen. Supportrarna är rädda att motståndarna nu vet att de alltid kan komma tillbaka, oavsett ställning.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Trots förlusten var Wycombe utmärkta i 70 minuter i Oxford, bara yttrarna var för mjuka. Supportrarna tror att laget hade vunnit stort med elva man på planen.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Luke Leahy ses som viktig i omklädningsrummet och som täckning på mitten. Supportrarna noterar att lagets svacka sammanföll med att Duff lät honom sitta utanför.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "forum"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Även supportrar som höll på Duff menar att den nya tränaren har svetsat ihop truppen och fått den att spela bra.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Misstron mot ägarna växer. Supportrarna befarar att ägarna låter arenan förfalla för att pressa supporterstiftelsen att lämna ifrån sig Adams Park.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "forum"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Supportrarna tycker att Michael Duff har tappat fart med Bradford sedan han lämnade Wycombe. De menar att om laget spelar som mot Oxford ska det räcka.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "forum"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "På The Gasroom fruktar man inte underläge utan ledning. Tre gånger har Wycombe släppt en tvåmålsledning den här säsongen, och nu tror supportrarna att varje motståndare vet att det alltid går att komma tillbaka.",
+      "Lördagen är också ett återseende med Michael Duff, och även de som höll på honom medger att Tom Hounsell har svetsat ihop truppen.",
+      "Luke Leahy delar läktaren: på ett forum ses han som viktig i omklädningsrummet, på ett annat som en belastning. Det röda kortet i Oxford, för en avsiktlig hands strax efter inhoppet, svalkar knappast debatten."
+     ],
+     "citat": {
+      "sagt": "Det är ingen slump att formsvackan kom när Duff gång på gång petade honom.",
+      "vem": "Benk",
+      "podd": "The Gasroom",
+      "typ": "forum",
+      "datum": "2026-11-22"
+     },
+     "namn": [
+      "Michael Duff",
+      "Tom Hounsell",
+      "Luke Leahy"
+     ],
+     "paSpel": "Återseendet med Michael Duff, som supportrarna tycker har tappat farten sedan han gick."
+    },
+    {
+     "lag": "Bradford City",
+     "kallor": [
+      {
+       "podd": "Width of a Post",
+       "avsnitt": "A necessary evolution brings new problems for Bradford City",
+       "datum": "2026-11-21",
+       "adress": "https://widthofapost.com/2026/11/21/a-necessary-evolution-brings-new-problems-for-bradford-city/",
+       "typ": "media"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "trupp",
+       "punkter": [
+        {
+         "t": "Kantspelaren Josh Neufville är tillbaka efter skada och spelade för första gången på två månader. Han byttes ut under matchen eftersom han fortfarande trappas upp.",
+         "s": "b",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "media"
+        }
+       ]
+      },
+      {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Duff har ändrat elvan för att bli mer offensiv: Nick Powell spelade längst fram och gjorde sin första ligastart, Antoni Sarcevic flyttades ut till höger och Kieran Morgan tog den offensiva mittfältsrollen.",
+         "s": "b",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "media"
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Bradford har blivit farligare framåt men också läckare bakåt. På de två senaste ligamatcherna har laget släppt in lika många mål som under hela säsongen dessförinnan, efter 15 nollor på 21 matcher.",
+         "s": "h",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "media"
+        },
+        {
+         "t": "Bradford har länge haft svårt att göra mål. Laget gick mållöst i fem av sex ligamatcher efter att Duff tog över, och motståndarna ställer sig ofta väldigt defensivt mot laget.",
+         "s": "h",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "media"
+        },
+        {
+         "t": "Enligt skribenten har Bradford tappat förmågan att styra och stänga matcher, som var lagets styrka de senaste säsongerna. Mot Doncaster tappade laget en ledning på övertid efter en hörna.",
+         "s": "o",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "media"
+        },
+        {
+         "t": "Med Sarcevic ute på kanten blir mittfältet sårbart när laget leder. Den unge Kieran Morgan hade inte erfarenheten att falla tillbaka, och Doncaster fick yta centralt.",
+         "s": "o",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "media"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "Bradford har blivit farligare framåt och läckare bakåt på samma gång.",
+      "Width of a Post konstaterar att laget, som länge levde på att hålla nollan, på de två senaste ligamatcherna har släppt in lika många mål som under hela säsongen dessförinnan. Förklaringen hittas i Michael Duffs offensivare elva.",
+      "Med Antoni Sarcevic ute på högerkanten tar den unge Kieran Morgan den offensiva mittfältsrollen, och han saknar ännu erfarenheten att falla tillbaka när laget leder. Mot Doncaster fick motståndarna yta centralt, och ledningen försvann på övertid efter en hörna."
+     ],
+     "citat": {
+      "sagt": "De verkar också ha tappat en egenskap som har tjänat dem så väl de senaste säsongerna – förmågan att kontrollera en match.",
+      "vem": "Jason McKeown",
+      "podd": "Width of a Post",
+      "typ": "media",
+      "datum": "2026-11-21"
+     },
+     "namn": [
+      "Michael Duff",
+      "Antoni Sarcevic",
+      "Kieran Morgan"
+     ]
     }
    ]
   }
