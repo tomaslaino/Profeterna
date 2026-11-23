@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-23T16:18:39.749Z",
+ "uppdaterad": "2026-11-23T16:20:19.441Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3905,6 +3905,114 @@
    ],
    "tip": null,
    "hasse": null,
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880125",
+   "match": "Wrexham – Portsmouth",
+   "avspark": "2026-11-28T15:00Z",
+   "writtenAt": "2026-11-23T16:19:50.357Z",
+   "text": "Thomason avgjorde i Lincoln, Portsmouth väntar på Racecourse\n\nWrexham vann äntligen en ligamatch på bortaplan och tar nu emot Portsmouth på STōK Cae Ras. Det är två lag mitt i tabellen med var sitt orosmoment. Hos Wrexham handlar det om skador och en tunn trupp, hos Portsmouth om en målvakt som tränaren vägrar peta.\n\nWrexham fick slita för segern i Lincoln. George Thomason gjorde matchens enda mål i 82:a minuten när han tog vara på en dålig bakåtpassning, och det var hans andra mål för säsongen. Enligt Sky Sports [1] var det Wrexhams första ligaseger på bortaplan sedan 2–0 mot Millwall i början av september. Lincoln sköt mer, men Anthony Patterson räddade både före paus och i slutet. Yahoo Sports [2] gav både honom och Thomason betyget 8,0. ”Varje seger är så svår”, sa Phil Parkinson till Sky Sports [1]. Han berättade också att skadorna har tvingat honom att lappa ihop laget på olika sätt. Det där löser man med en hink bollar och en målvakt som håller ihop det hela.\n\nI Portsmouth handlar det mest om två namn. Josh Murphy är tillbaka i startelvan, och han nickade in ledningsmålet i 1–1 mot Bolton. John Mousinho vill ändå vara försiktig med honom: ”Vi tänker inte köra slut på honom”, lyder rubriken i The News [3]. Den andra frågan gäller målvakten Nicolas Schmid. Efter ännu ett dyrt misstag i Bolton gick tränaren ut och försvarade honom under rubriken ”Jag står kvar vid honom” [4].\n\nFörra säsongen tog Wrexham hand om hemmamötet med 2–1 sedan det hade blivit 0–0 på Fratton Park. I Grusnäs hade vi en gång en målvakt som alla ville byta ut. Jag behöll honom och lät honom ta hörnorna på torsdagsträningen tills han slutade tveka.\n\nTipset: 1X (hemmalaget, knappt)\n\nEnligt prognosen vinner Wrexham ungefär varannan gång, och oavgjort och bortaseger är lika troliga. Det stämmer med vad jag har läst. Wrexham har inte förlorat på tre matcher och har en målvakt i form [1]. Samtidigt säger Parkinson själv att skadorna har gjort truppen tunn [1]. Portsmouth har en målvakt som gör misstag [2] och en Murphy som ska tas försiktigt fram [3], men laget har bara förlorat två av åtta bortamatcher, och de flesta av dem slutade oavgjort. Hemmasegern väger tyngst, men en ettamålsmatch kan lika gärna sluta lika. Därför ringar jag in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Thomason avgjorde i Lincoln, Portsmouth väntar på Racecourse",
+   "lead": "Wrexham vann äntligen en ligamatch på bortaplan och tar nu emot Portsmouth på STōK Cae Ras. Det är två lag mitt i tabellen med var sitt orosmoment. Hos Wrexham handlar det om skador och en tunn trupp, hos Portsmouth om en målvakt som tränaren vägrar peta.",
+   "paragraphs": [
+    "Wrexham fick slita för segern i Lincoln. George Thomason gjorde matchens enda mål i 82:a minuten när han tog vara på en dålig bakåtpassning, och det var hans andra mål för säsongen. Enligt Sky Sports [1] var det Wrexhams första ligaseger på bortaplan sedan 2–0 mot Millwall i början av september. Lincoln sköt mer, men Anthony Patterson räddade både före paus och i slutet. Yahoo Sports [2] gav både honom och Thomason betyget 8,0. ”Varje seger är så svår”, sa Phil Parkinson till Sky Sports [1]. Han berättade också att skadorna har tvingat honom att lappa ihop laget på olika sätt. Det där löser man med en hink bollar och en målvakt som håller ihop det hela.",
+    "I Portsmouth handlar det mest om två namn. Josh Murphy är tillbaka i startelvan, och han nickade in ledningsmålet i 1–1 mot Bolton. John Mousinho vill ändå vara försiktig med honom: ”Vi tänker inte köra slut på honom”, lyder rubriken i The News [3]. Den andra frågan gäller målvakten Nicolas Schmid. Efter ännu ett dyrt misstag i Bolton gick tränaren ut och försvarade honom under rubriken ”Jag står kvar vid honom” [4].",
+    "Förra säsongen tog Wrexham hand om hemmamötet med 2–1 sedan det hade blivit 0–0 på Fratton Park. I Grusnäs hade vi en gång en målvakt som alla ville byta ut. Jag behöll honom och lät honom ta hörnorna på torsdagsträningen tills han slutade tveka."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sky Sports",
+     "title": "Lincoln 0-1 Wrexham: George Thomason nets winner for Red Dragons",
+     "url": "https://www.skysports.com/football/news/13611554/lincoln-0-1-wrexham-george-thomason-nets-winner-for-red-dragons",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Yahoo Sports",
+     "title": "Wrexham Player Ratings: Thomason Settles Lincoln Contest As Patterson Shines",
+     "url": "https://sports.yahoo.com/articles/wrexham-player-ratings-thomason-settles-210010064.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "The News (Portsmouth)",
+     "title": "‘We won’t flog him to death’: Portsmouth boss details first-team plans for Josh Murphy",
+     "url": "https://portsmouth.co.uk/sport/football/portsmouth-fc/portsmouth-fc-murphy-west-ham-mousinho-9367920",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "The News (Portsmouth)",
+     "title": "‘I’m sticking with him’: Portsmouth boss defends under-fire Nicolas Schmid after latest costly mistake",
+     "url": "https://www.portsmouth.co.uk/sport/football/portsmouth-fc/portsmouth-fc-mousinho-bolton-9365774",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Enligt prognosen vinner Wrexham ungefär varannan gång, och oavgjort och bortaseger är lika troliga. Det stämmer med vad jag har läst. Wrexham har inte förlorat på tre matcher och har en målvakt i form [1]. Samtidigt säger Parkinson själv att skadorna har gjort truppen tunn [1]. Portsmouth har en målvakt som gör misstag [2] och en Murphy som ska tas försiktigt fram [3], men laget har bara förlorat två av åtta bortamatcher, och de flesta av dem slutade oavgjort. Hemmasegern väger tyngst, men en ettamålsmatch kan lika gärna sluta lika. Därför ringar jag in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "hemmalaget, knappt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sky Sports",
+      "title": "Lincoln 0-1 Wrexham: George Thomason nets winner for Red Dragons",
+      "url": "https://www.skysports.com/football/news/13611554/lincoln-0-1-wrexham-george-thomason-nets-winner-for-red-dragons",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "The News (Portsmouth)",
+      "title": "‘I’m sticking with him’: Portsmouth boss defends under-fire Nicolas Schmid after latest costly mistake",
+      "url": "https://www.portsmouth.co.uk/sport/football/portsmouth-fc/portsmouth-fc-mousinho-bolton-9365774",
+      "publishedAt": null
+     },
+     {
+      "n": 3,
+      "source": "The News (Portsmouth)",
+      "title": "‘We won’t flog him to death’: Portsmouth boss details first-team plans for Josh Murphy",
+      "url": "https://portsmouth.co.uk/sport/football/portsmouth-fc/portsmouth-fc-murphy-west-ham-mousinho-9367920",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-23T16:19:50.357Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Portsmouth har en målvakt som har gjort ännu ett dyrt misstag, och tränaren går ut och säger att han står bakom honom. Det är snällt mot målvakten men dyrt för laget. När målvakten tvekar blir hela backlinjen nervös, och då kommer misstagen i klump.",
+     "Wrexham har en tunn trupp och får lappa ihop laget på olika sätt. Men de har inte förlorat på tre matcher, och Patterson står i mål och räddar det som ska räddas. Murphy kan nicka in ett mål för Portsmouth, men han ska slussas in försiktigt och lär inte få spela hela matchen.",
+     "Lugn nu, det här avgörs i straffområdet. Det ena laget har en målvakt som håller och det andra en som skakar. Jag ringar in ettan och bara ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "2–1",
+    "tips": "2026-11-23T16:19:50.357Z",
+    "uppdrag": {
+     "fraser": [
+      "Lugn nu",
+      "Total kontroll"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-23T16:20:12.868Z",
+    "attempts": 2
+   },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
