@@ -15,35 +15,41 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T16:26:33.760Z",
+ "skriven": "2026-11-23T16:42:15.441Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T16:04:08.668Z",
- "rubrik": "En tränare har kommit till Watford och tre sitter löst",
+ "underlag": "2026-11-23T16:33:27.519Z",
+ "rubrik": "En tränare har kommit, tre sitter löst och en återvänder",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Watford",
    "namn": "Edward Iordănescu",
-   "text": "tar över efter Alessio Dionisi och väntas leda laget redan i onsdagens hemmamatch mot Blackburn. Supportrarna oroar sig för att han har bråkat med ägarna i sina tidigare klubbar."
+   "text": "tar över efter Alessio Dionisi och väntas leda laget redan i onsdagens hemmamatch mot Blackburn. Supportrarna oroar sig för att han har hamnat i bråk med ägarna i tidigare klubbar."
+  },
+  {
+   "slag": "aterseende",
+   "lag": "Bradford City",
+   "namn": "Michael Duff",
+   "text": "möter sin gamla klubb Wycombe, vars supportrar tycker att han har tappat fart sedan han lämnade dem för Bradford."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "har allt fler supportrar emot sig, och flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng. De tror inte att han kan hålla laget kvar."
-  },
-  {
-   "slag": "sitter_lost",
-   "lag": "Bristol City",
-   "namn": "Michael Skubala",
-   "text": "har i stort sett förlorat supportrarnas förtroende, och de menar att en förlust mot Wrexham på tisdag avgör hans öde."
+   "text": "har allt fler supportrar emot sig. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "pressas allt hårdare av supportrarna, som vill ha en förändring, men ägarna fortsätter att backa honom."
+   "text": "känner trycket växa från supportrarna, som vill ha en förändring, men ägarna fortsätter att backa honom."
+  },
+  {
+   "slag": "sitter_lost",
+   "lag": "Bristol City",
+   "namn": "Michael Skubala",
+   "text": "har i stort sett förlorat supportrarnas förtroende, och enligt dem avgör en förlust mot Wrexham på tisdag hans öde."
   }
  ]
 }
