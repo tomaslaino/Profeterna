@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-23T16:17:06.273Z",
+ "uppdaterad": "2026-11-23T16:18:39.749Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3870,6 +3870,41 @@
     "writtenAt": "2026-11-23T16:15:30.975Z",
     "attempts": 3
    },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880126",
+   "match": "West Ham United – Stoke City",
+   "avspark": "2026-11-28T15:00Z",
+   "writtenAt": "2026-11-23T16:18:39.130Z",
+   "text": "Parker väntar fortfarande, och Stoke har slutat förlora\n\nScott Parker har tre matcher bakom sig som West Hams tränare och ännu ingen seger. På lördag kommer Stoke till London Stadium efter fyra raka segrar. Laget delar tabelltoppen och vann senast med tio man på planen.\n\nWest Ham sköt 27 gånger mot Preston, som ligger sist i serien, och fick nöja sig med 1–1. Enligt East London Advertiser [1] träffade Bowen, Veltman och Austbø ramen. Preston gjorde sitt mål på en hörna efter 18 minuter. Det mönstret känner jag igen, och det löser man med en hink bollar. Konstantinos Mavropanos kvitterade med huvudet och har nu gjort sex mål den här säsongen. Före det hade Parker spelat 3–3 mot Cardiff och förlorat mot Blackburn. ”Jag fick den briljanta insatsen men bara en poäng”, sa han [1]. Unge Finlay Herrick stod i mål i stället för Mads Hermansen, som enligt Parker ”har haft det tufft” [1]. Innan Stoke kommer har West Ham dessutom en tisdagsmatch mot Portsmouth [1].\n\nStoke vann mot Birmingham med 1–0 trots att Luca Bombino blev utvisad med två gula kort i 63:e minuten. Enligt Sky Sports [2] saknades tio spelare ur truppen från Portsmouthmatchen eftersom de var på landslagsuppdrag. George Hirst gjorde segermålet strax efter paus. Det var hans första mål sedan början av september. ”Jag är förtjust i den insatsen från början till slut”, sa Mark Robins [2]. Stoke har bara släppt in 18 mål på 16 matcher, och det är ungefär fyra mål färre än chanserna brukar ge. Ett försvar som har den turen brukar förr eller senare få betala tillbaka den. Bollen har aldrig läst en tabell, men den räknar.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Parker väntar fortfarande, och Stoke har slutat förlora",
+   "lead": "Scott Parker har tre matcher bakom sig som West Hams tränare och ännu ingen seger. På lördag kommer Stoke till London Stadium efter fyra raka segrar. Laget delar tabelltoppen och vann senast med tio man på planen.",
+   "paragraphs": [
+    "West Ham sköt 27 gånger mot Preston, som ligger sist i serien, och fick nöja sig med 1–1. Enligt East London Advertiser [1] träffade Bowen, Veltman och Austbø ramen. Preston gjorde sitt mål på en hörna efter 18 minuter. Det mönstret känner jag igen, och det löser man med en hink bollar. Konstantinos Mavropanos kvitterade med huvudet och har nu gjort sex mål den här säsongen. Före det hade Parker spelat 3–3 mot Cardiff och förlorat mot Blackburn. ”Jag fick den briljanta insatsen men bara en poäng”, sa han [1]. Unge Finlay Herrick stod i mål i stället för Mads Hermansen, som enligt Parker ”har haft det tufft” [1]. Innan Stoke kommer har West Ham dessutom en tisdagsmatch mot Portsmouth [1].",
+    "Stoke vann mot Birmingham med 1–0 trots att Luca Bombino blev utvisad med två gula kort i 63:e minuten. Enligt Sky Sports [2] saknades tio spelare ur truppen från Portsmouthmatchen eftersom de var på landslagsuppdrag. George Hirst gjorde segermålet strax efter paus. Det var hans första mål sedan början av september. ”Jag är förtjust i den insatsen från början till slut”, sa Mark Robins [2]. Stoke har bara släppt in 18 mål på 16 matcher, och det är ungefär fyra mål färre än chanserna brukar ge. Ett försvar som har den turen brukar förr eller senare få betala tillbaka den. Bollen har aldrig läst en tabell, men den räknar."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "East London Advertiser",
+     "title": "Parker still looking for first win as West Ham United are held by Preston North End",
+     "url": "https://www.eastlondonadvertiser.co.uk/sport/26752173.parker-denied-preston-hold-hammers-1-1-draw/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sky Sports",
+     "title": "Stoke 1-0 Birmingham: George Hirst scores as 10-man Potters claim win",
+     "url": "https://www.skysports.com/football/news/13611558/stoke-1-0-birmingham-george-hirst-scores-as-10-man-potters-claim-win",
+     "publishedAt": null
+    }
+   ],
+   "tip": null,
+   "hasse": null,
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
