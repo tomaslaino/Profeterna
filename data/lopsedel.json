@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T18:32:51.502Z",
+ "skriven": "2026-11-23T19:03:31.037Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-23T18:27:44.728Z",
+ "underlag": "2026-11-23T18:58:59.985Z",
  "rubrik": {
   "id": "401879226",
-  "kick": "KRISEN",
+  "kick": "UNITED-KRISEN",
   "rad": [
    [
-    "UNITED-FANS:",
+    "”DET GÖR",
     0
    ],
    [
-    "”VI ÄR VANA",
+    "INTE ONT",
     1
    ],
    [
-    "VID DET”",
+    "LÄNGRE”",
     0
    ]
   ],
-  "under": "”Det värsta av allt är att det inte gör ont längre” – United We Stand efter 0–4 på Anfield",
-  "plus": "IPSWICH SLÄPPT IN I 30 RAKA",
+  "under": "Supporterpodden United We Stand efter 0–4 på Anfield. Yoro avstängd mot Brentford.",
+  "plus": "IPSWICH: 30 UTAN NOLLA",
   "plusId": "401878752"
  }
 }
