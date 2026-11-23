@@ -15,35 +15,35 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T17:46:46.327Z",
+ "skriven": "2026-11-23T18:17:29.429Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T17:42:43.321Z",
- "rubrik": "Tre tränare sitter löst, och Duff återvänder till Wycombe",
+ "underlag": "2026-11-23T18:16:08.061Z",
+ "rubrik": "Tre tränare sitter löst och Duff återvänder till Adams Park",
  "notiser": [
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Michael Duff",
-   "text": "kommer tillbaka till Adams Park. Wycombes supportrar tycker att han har tappat fart sedan han lämnade dem, och de påpekar att lagets svacka sammanföll med att han lät Luke Leahy sitta utanför."
+   "text": "kommer tillbaka till Adams Park med Bradford City. Wycombes supportrar tycker att han har tappat fart sedan han lämnade klubben, och även de som höll på honom berömmer hans efterträdare."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "känner hur tålamodet tryter på läktaren. Flera supportrar vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
+   "text": "har allt färre supportrar bakom sig. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "känner trycket växa när supportrarna vill ha en förändring. Ägarna står fortfarande bakom honom, men en ny nedflyttning hotar att ge klubben flera års återuppbyggnad."
+   "text": "känner trycket växa. Supportrarna vill ha en förändring, men ägarna fortsätter att stå bakom honom, samtidigt som en ny nedflyttning hotar att ge flera års återuppbyggnad."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har i stort sett förlorat supportrarna, som anser att en förlust mot Wrexham på tisdag avgör hans öde. Samtidigt tror de inte att en sparkning skulle lösa mycket på kort sikt."
+   "text": "får sin framtid avgjord i tisdagens hemmamatch mot Wrexham, menar supportrarna, som i stort sett har gett upp om honom. Värdarna fruktar att även en seger bara skjuter upp beslutet."
   }
  ]
 }
