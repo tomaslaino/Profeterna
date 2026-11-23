@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T17:24:52.563Z",
+ "uppdaterad": "2026-11-23T17:42:43.321Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1590,14 +1590,21 @@
     "Burnley"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:01:38.267Z",
-   "rubrik": "Millwall passar bakåt medan klockan tickar för Neil",
+   "skriven": "2026-11-23T17:42:43.321Z",
+   "rubrik": "Två lag som har glömt hur man vinner",
    "ingress": null,
-   "summering": "I Millwall är supportrarna oense om Alex Neil, och laget som ska rädda honom saknar modet att spela bollen framåt.",
+   "summering": "Millwall har redan gett upp Stoke och lägger allt på lördagen, med en tränare vars stöd börjar knaka. Burnley är ofta bättre i matcherna men har inte lärt sig att hålla i en ledning.",
    "delar": [
     {
      "lag": "Millwall",
      "kallor": [
+      {
+       "podd": "Achtung! Millwall Podcast",
+       "avsnitt": "ACHTUNG! MILLWALL 905 - VOICEMAILS PART TWO",
+       "datum": "2026-11-23",
+       "adress": "https://podcasts.apple.com/gb/podcast/achtung-millwall-podcast/id1469782502?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "Millwall Online",
        "avsnitt": "Wall V Qpr match thread. Saturday 12.30 · Just Back v QP ha ha · Team v Potters",
@@ -1608,73 +1615,46 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Lukas Jensens återkomst i målet gav försvaret en annan trygghet. Supportrarna litar inte på att Max Crocombe räddar skotten och vill att Jensen står kvar.",
-         "s": "o",
-         "podd": [
-          "Millwall Online"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
         {
-         "t": "Det är inte viljan det är fel på utan självförtroendet. Spelarna vågar inte slå passningar in i farliga ytor och spelar hellre bakåt. Därför skapar laget nästan ingenting framåt.",
-         "s": "o",
-         "podd": [
-          "Millwall Online"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Mittfältet är i oordning. Casper de Norre har fått spela djupt framför backlinjen, och då försvinner hans kreativitet. Därför blir det långbollar i stället för ett sammanhållet uppspel.",
-         "s": "o",
-         "podd": [
-          "Millwall Online"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Camiel Neghli flyttas runt över hela planen, i samma match på fyra olika positioner. Flera supportrar tycker att han i stället borde få styra spelet från mitten.",
+         "t": "Med Casper de Norre framför backlinjen och Lukas Jensen tillbaka i mål såg försvaret stabilare ut än på flera matcher. De Norre organiserade och skyddade backfyran, men orkar inte springa för en utvisad lagkamrat.",
          "s": "h",
          "podd": [
-          "Millwall Online"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Alfie Doughty verkar ha hamnat utanför. Zak Lovelace fick hoppa in före honom, och en supporter såg honom sitta med huvudet i händerna i avbytarbåset. Han ser dessutom överviktig ut.",
-         "s": "h",
-         "podd": [
-          "Millwall Online"
+          "Achtung! Millwall Podcast"
          ],
          "datum": [
           "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Kyrell Lisbie skulle vara den snabba yttern som går förbi sina motståndare, men enligt supportrarna är han inte redo: han kör fast, tvekar i löpningarna och väljer fel. Laget saknar en riktig ytter på båda kanterna.",
+         "s": "o",
+         "podd": [
+          "Achtung! Millwall Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
         }
        ]
       },
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Allt fler supportrar menar att skadorna inte längre är förklaringen. Sommarens värvningar var unga och lovande spelare som ersatte rutinerade, och de håller enligt dem helt enkelt inte Championship-klass.",
+         "s": "o",
+         "podd": [
+          "Achtung! Millwall Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Med tre segrar på 15 matcher tror en del supportrar att klubbens tålamod snart tar slut. Blir det storförlust i Stoke och sedan förlust mot Burnley kan klubben agera.",
          "s": "o",
@@ -1698,42 +1678,192 @@
          "typ": "forum"
         },
         {
-         "t": "Andra står kvar bakom Alex Neil. De menar att han har fått jobba med en lappad trupp där spelare har fått fylla fel positioner vecka efter vecka. De som kräver snabba lösningar missar att problemen är långsiktiga.",
+         "t": "En trogen supporter menar att Millwall befinner sig i en bottenstrid och att truppen inte räcker till ens utan skador. Andra hoppas på mittentabell men medger att det mest är en förhoppning.",
          "s": "o",
          "podd": [
-          "Millwall Online"
+          "Achtung! Millwall Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Det som oroar mest är att ingen på planen tar befälet och skäller på de andra när det går emot. Varken Danny Batth eller Jake Cooper anses ha det i sig, och en supporter saknar Massimo Luongos lugnande inverkan.",
+         "s": "o",
+         "podd": [
+          "Achtung! Millwall Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Supportrarna har i praktiken redan skrivit av bortamatchen mot Stoke och ser hemmamatchen mot Burnley som ett måste. Går den förlorad fruktar de en svit på fem–sex raka förluster.",
+         "s": "o",
+         "podd": [
+          "Achtung! Millwall Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På Millwall Online tror en del att klubbens tålamod med Alex Neil snart tar slut om laget blir överkört i Stoke och sedan förlorar mot Burnley. Andra försvarar honom: han har fått jobba med en lappad trupp där spelare fyller fel positioner vecka efter vecka.",
-      "Camiel Neghli hann i samma match spela på fyra positioner, bland annat vänsterback.",
-      "Felet är inte viljan utan självförtroendet, menar flera: spelarna vågar inte slå passningen in i farliga ytor och vänder hellre bakåt. Därför skapar laget nästan ingenting framåt."
+      "I podden Achtung! Millwall har supportrarna i praktiken redan skrivit av bortamatchen i Stoke, och därför har Burnley blivit ett måste. Förlorar laget även den här matchen fruktar de en svit på fem, sex raka förluster.",
+      "På forumet Millwall Online varnar några för att klubbens tålamod med Alex Neil kan ta slut efter två sådana nederlag. De flesta står ändå kvar bakom tränaren och skyller på sommarens unga värvningar.",
+      "Mest oroar att ingen på planen tar befälet när det går emot. Varken Danny Batth eller Jake Cooper anses vara den som ”skriker, gapar och skäller”."
      ],
-     "citat": {
-      "sagt": "Romain Esse är kanske vår mest kompletta spelare, om han bara kan hitta tillbaka till självförtroendet.",
-      "vem": "Budgies' Boy",
-      "podd": "Millwall Online",
-      "typ": "forum",
-      "datum": "2026-11-23"
-     },
      "namn": [
       "Alex Neil",
-      "Camiel Neghli"
+      "Danny Batth",
+      "Jake Cooper"
      ],
-     "paSpel": "Kanske Alex Neils jobb, om det dessutom går illa i Stoke först."
+     "paSpel": "Bortamatchen i Stoke är avskriven, så det är här tålamodet med Neil prövas."
     },
     {
      "lag": "Burnley",
-     "kallor": [],
-     "grupper": [],
-     "text": []
+     "kallor": [
+      {
+       "podd": "TurfCast",
+       "avsnitt": "The Fan Reaction Podcast | BURNLEY 2-2 BLACKBURN",
+       "datum": "2026-11-22",
+       "adress": "https://shows.acast.com/turfcastpodcast/episodes/the-fan-reaction-podcast-burnley-2-2-blackburn",
+       "typ": "podd"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Josh Laurent fick spela som tia och fick hård kritik. Supportrarna menar att han är en enkel passningsspelare och inte en offensiv mittfältare. Om straffen är de oense: en kallar den korkad, en annan tycker att den var mjuk och att Laurent hade otur.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna ifrågasätter att Celestini inte startar med en riktig nia. Zeki Amdouni får spela falsk nia, men Jamie Vardy borde enligt dem få en timme i stället för sina korta inhopp. De menar att just löpningarna i straffområdet saknas.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Enligt supportrarna går det likadant varje vecka: Burnley är bättre och tar ledningen, gör sedan ett dumt misstag, backar hem och tappar greppet. Mot Blackburn släppte laget en ledning två gånger, och en värd räknar till 25 poäng som tappats från ledningsläge.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Max Weiß i målet lyfts fram som en vinst. En värd har länge tyckt att han är den bättre av de två målvakterna och att han borde ha tagits tillbaka mycket tidigare, eftersom han är säkrare i straffområdet.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Kantspelarna Jaydon Banel och Largie Ramazani var lagets ljuspunkter och gjorde båda målen. Supportrarna tycker ändå att laget använder dem för lite och inte söker dem tillräckligt.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Burnleys spel beskrivs som tandlöst och förutsägbart, med bollen i sidled och bakåt. Bara kring de två målen fanns det något värt att se.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Efter fyra matcher har Fabio Celestini ännu ingen seger. Supportrarna har släppt tankarna på uppflyttning och mittenplacering och säger att allt nu handlar om att hålla sig kvar.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Hemmaformen tynger. En värd räknar till runt 24 hemmamatcher utan seger, och en annan berättar att hans son, som började gå på matcher den här säsongen, aldrig har sett Burnley vinna.",
+         "s": "h",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "I podden TurfCast beskriver man samma match varje vecka: Burnley är bättre, tar ledningen, gör ett dumt misstag, backar hem och tappar greppet. En värd räknar till 25 poäng som har gått förlorade i ledningsläge.",
+      "Under Fabio Celestini har det ännu inte blivit någon seger, och drömmarna om uppflyttning har bytts mot att bara hålla sig kvar.",
+      "Tränaren får också frågor om varför han startar utan en riktig nia. Zeki Amdouni får spela falsk nia, men supportrarna vill hellre se Jamie Vardy från start, eftersom det är löpningarna i straffområdet som saknas."
+     ],
+     "citat": {
+      "sagt": "Vardy hade väl gjort mer nytta om han fått spela 60 minuter i stället för de 25 han fick.",
+      "vem": null,
+      "podd": "TurfCast",
+      "typ": "podd",
+      "datum": "2026-11-22"
+     },
+     "namn": [
+      "Fabio Celestini",
+      "Zeki Amdouni",
+      "Jamie Vardy"
+     ],
+     "paSpel": "Celestinis första seger, i en säsong som nu bara handlar om att överleva."
     }
    ]
   },
