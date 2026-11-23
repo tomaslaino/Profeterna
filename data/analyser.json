@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-20T16:23:13.750Z",
+ "uppdaterad": "2026-11-23T16:06:34.464Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3267,6 +3267,106 @@
     "version": "2026-11-16.1",
     "writtenAt": "2026-11-20T15:01:26.037Z",
     "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401878752",
+   "match": "Ipswich Town – Aston Villa",
+   "avspark": "2026-11-28T17:30Z",
+   "writtenAt": "2026-11-23T16:05:53.685Z",
+   "text": "O'Neil tar emot Villa där Wolves-sparken började\n\nGary O'Neil fick lämna Wolverhampton efter en förlust mot Ipswich. Nu leder han samma klubb, och på lördag tar han emot ett Aston Villa som inte har vunnit på fem matcher och nyss släppte en tvåmålsledning mot Manchester United.\n\nGary O'Neil har en udda historia med Ipswich. Enligt Wikipedia [1] fick han sparken från Wolverhampton i december 2024, direkt efter en hemmaförlust med 2–1 mot just Ipswich. I juni i år skrev han på ett treårskontrakt med samma klubb. Han efterträdde Kieran McKenna, som enligt säsongssammanställningen [2] lämnade både Ipswich och tränaryrket. O'Neil kom från Strasbourg och tog med sig Julio Enciso och Abdoul Ouattara därifrån. Hittills har han 4 segrar, 2 oavgjorda och 7 förluster på 13 matcher [1]. Ipswich har inte hållit nollan i någon av sina elva ligamatcher, och det ser du redan på uppvärmningen, där ingen står kvar på stolpen.\n\nInför förlusten med 0–2 mot Tottenham gjorde O'Neil tre ändringar och bytte spelsystem. Exequiel Palacios hade flugit hem från Argentina samma vecka, och O'Neil sade att det hade varit riskabelt att låta honom spela hela matchen efter allt resande [3]. Leif Davis fick gå av efter 83 minuter efter en tackling av Mohammed Kudus. O'Neil kallade den ”en ganska otäck tackling” men hoppas att det inte är något allvarligt [3].\n\nAston Villa har spelat fem matcher utan att vinna. Mot Manchester United slutade det 4–4, och enligt Read Aston Villa [4] släppte laget då en tvåmålsledning. Efter det blev det 0–0 hemma mot Sunderland. Matty Cash fick en hjärnskakning när han var med polska landslaget [4], och Onana och Ruggeri är fortfarande borta. Lagens två senaste möten slutade 2–2 och 1–1. Att tappa en tvåmålsledning löser man med en hink bollar och en lång torsdag.\n\nTipset: X2 (Villa, men nervöst)\n\nPrognosen ger Villa ungefär varannan seger, och spelbolagen ligger nära. Men Villa har inte vunnit på fem matcher och släppte en tvåmålsledning mot United [1]. Ipswich håller aldrig nollan, men laget gör mål. Ändå är det svårt att lita på Villa när de inte orkar hålla en ledning. Båda de tidigare mötena slutade oavgjort, och Ipswich kan få tillbaka Davis [2]. Kryssets odds på drygt fyra säger att oavgjort är mer sannolikt än det låter. Jag ringar in krysset och Villa och låter hemmalaget gå.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "O'Neil tar emot Villa där Wolves-sparken började",
+   "lead": "Gary O'Neil fick lämna Wolverhampton efter en förlust mot Ipswich. Nu leder han samma klubb, och på lördag tar han emot ett Aston Villa som inte har vunnit på fem matcher och nyss släppte en tvåmålsledning mot Manchester United.",
+   "paragraphs": [
+    "Gary O'Neil har en udda historia med Ipswich. Enligt Wikipedia [1] fick han sparken från Wolverhampton i december 2024, direkt efter en hemmaförlust med 2–1 mot just Ipswich. I juni i år skrev han på ett treårskontrakt med samma klubb. Han efterträdde Kieran McKenna, som enligt säsongssammanställningen [2] lämnade både Ipswich och tränaryrket. O'Neil kom från Strasbourg och tog med sig Julio Enciso och Abdoul Ouattara därifrån. Hittills har han 4 segrar, 2 oavgjorda och 7 förluster på 13 matcher [1]. Ipswich har inte hållit nollan i någon av sina elva ligamatcher, och det ser du redan på uppvärmningen, där ingen står kvar på stolpen.",
+    "Inför förlusten med 0–2 mot Tottenham gjorde O'Neil tre ändringar och bytte spelsystem. Exequiel Palacios hade flugit hem från Argentina samma vecka, och O'Neil sade att det hade varit riskabelt att låta honom spela hela matchen efter allt resande [3]. Leif Davis fick gå av efter 83 minuter efter en tackling av Mohammed Kudus. O'Neil kallade den ”en ganska otäck tackling” men hoppas att det inte är något allvarligt [3].",
+    "Aston Villa har spelat fem matcher utan att vinna. Mot Manchester United slutade det 4–4, och enligt Read Aston Villa [4] släppte laget då en tvåmålsledning. Efter det blev det 0–0 hemma mot Sunderland. Matty Cash fick en hjärnskakning när han var med polska landslaget [4], och Onana och Ruggeri är fortfarande borta. Lagens två senaste möten slutade 2–2 och 1–1. Att tappa en tvåmålsledning löser man med en hink bollar och en lång torsdag."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Wikipedia",
+     "title": "Gary O'Neil",
+     "url": "https://en.wikipedia.org/wiki/Gary_O%27Neil",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Wikipedia",
+     "title": "2026%E2%80%9327 Ipswich Town F.C. season",
+     "url": "https://en.wikipedia.org/wiki/2026%E2%80%9327_Ipswich_Town_F.C._season",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "TWTD",
+     "title": "O'Neil: Davis Hopeful Injury Not Serious",
+     "url": "https://www.twtd.co.uk/ipswich-town-news/53240/oneil-davis-hopeful-injury-not-serious",
+     "publishedAt": null
+    },
+    {
+     "n": 4,
+     "source": "Read Aston Villa",
+     "title": "readastonvilla.com",
+     "url": "https://readastonvilla.com/2026/11/19/aston-villa-sunderland-injury-news-team-news/index.md",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Villa ungefär varannan seger, och spelbolagen ligger nära. Men Villa har inte vunnit på fem matcher och släppte en tvåmålsledning mot United [1]. Ipswich håller aldrig nollan, men laget gör mål. Ändå är det svårt att lita på Villa när de inte orkar hålla en ledning. Båda de tidigare mötena slutade oavgjort, och Ipswich kan få tillbaka Davis [2]. Kryssets odds på drygt fyra säger att oavgjort är mer sannolikt än det låter. Jag ringar in krysset och Villa och låter hemmalaget gå.",
+    "signs": [
+     1,
+     2
+    ],
+    "note": "Villa, men nervöst",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Read Aston Villa",
+      "title": "readastonvilla.com",
+      "url": "https://readastonvilla.com/2026/11/19/aston-villa-sunderland-injury-news-team-news/index.md",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "TWTD",
+      "title": "O'Neil: Davis Hopeful Injury Not Serious",
+      "url": "https://www.twtd.co.uk/ipswich-town-news/53240/oneil-davis-hopeful-injury-not-serious",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-23T16:05:53.685Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Aston Villa har inte vunnit på fem matcher, och mot Manchester United tappade de en tvåmålsledning och fick nöja sig med 4–4. Det handlar om organisation. Ett lag som inte vet hur det ska stänga en match tappar poäng på slutet. Dessutom är Onana och Ruggeri borta och Cash har fått en hjärnskakning, och då blir det glest både bakåt och på mitten.",
+     "Ipswich har inte hållit nollan i en enda ligamatch, så Villa kommer att göra mål. Men hemmalaget gör också sina mål, och de två senaste mötena slutade 2–2 och 1–1. Spelbolagen gör Villa till favoriter för att de heter Villa. Jag tittar på hur de spelar. Lugn nu, det blir delad pott. Jag spikar krysset, bara krysset."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "2–2",
+    "tips": "2026-11-23T16:05:53.685Z",
+    "uppdrag": {
+     "fraser": [
+      "Solklart",
+      "Lugn nu"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-23T16:06:33.883Z",
+    "attempts": 3
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
