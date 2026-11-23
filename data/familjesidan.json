@@ -15,41 +15,35 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T17:13:51.869Z",
+ "skriven": "2026-11-23T17:31:04.078Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T17:06:46.254Z",
- "rubrik": "En tränare har kommit, en återvänder och tre sitter löst",
+ "underlag": "2026-11-23T17:24:52.563Z",
+ "rubrik": "Tre tränare sitter löst och en återvänder till sin gamla klubb",
  "notiser": [
-  {
-   "slag": "valkommen",
-   "lag": "Watford",
-   "namn": "Edward Iordănescu",
-   "text": "tar över efter Alessio Dionisi och väntas leda laget redan i onsdagens hemmamatch mot Blackburn. Supportrarna oroar sig för att han har hamnat i bråk med ägarna i sina tidigare klubbar."
-  },
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Michael Duff",
-   "text": "kommer tillbaka till Wycombe, nu som tränare för Bradford. Supportrarna där tycker att han har tappat fart sedan han lämnade dem och minns att svackan kom när han petade Luke Leahy."
+   "text": "möter sitt gamla Wycombe på Adams Park, där supportrarna tycker att han har tappat fart sedan flytten till Bradford. Även de som höll på honom berömmer efterträdaren för att ha svetsat ihop truppen."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "möter supportrar vars tålamod håller på att ta slut. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng och tror inte att han kan hålla laget kvar."
-  },
-  {
-   "slag": "sitter_lost",
-   "lag": "Bristol City",
-   "namn": "Michael Skubala",
-   "text": "har i stort sett förlorat supportrarnas förtroende. De anser att en förlust mot Wrexham på tisdag avgör hans öde, men tror inte att en sparkning skulle lösa mycket på kort sikt."
+   "text": "har snart förbrukat supportrarnas tålamod. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "känner trycket växa, och supportrarna vill ha en förändring. Ägarna fortsätter ändå att stödja honom."
+   "text": "pressas allt hårdare av supportrarna, som vill ha en förändring, men har fortfarande ägarnas stöd. En ny nedflyttning hotar att ge flera års återuppbyggnad."
+  },
+  {
+   "slag": "sitter_lost",
+   "lag": "Bristol City",
+   "namn": "Michael Skubala",
+   "text": "har i stort sett förlorat supportrarnas förtroende. De anser att en förlust mot Wrexham på tisdag avgör hans öde."
   }
  ]
 }
