@@ -1,81 +1,75 @@
 {
- "omgang": "2026-11-21-st4980",
+ "omgang": "2026-11-28-st4981",
  "matcher": [
-  "401879232",
-  "401879236",
-  "401878754",
-  "401878756",
-  "401879238",
-  "401879235",
-  "401880160",
-  "401880158",
-  "401880157",
-  "401880154",
-  "401880152",
-  "401880151",
-  "401880149"
+  "401878752",
+  "401879226",
+  "401879227",
+  "401880136",
+  "401880134",
+  "401880132",
+  "401880127",
+  "401880130",
+  "401880126",
+  "401880125",
+  "401880726",
+  "401880723",
+  "401880719"
  ],
- "skriven": "2026-11-17T17:29:22.853Z",
+ "skriven": "2026-11-23T16:26:04.523Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-16.1",
  "kronika": {
   "av": "Hasse Backe",
-  "rubrik": "Laget spelar alltid förra månadens träningar",
+  "rubrik": "När klockan tickar ska tränaren ändra ingenting",
   "stycken": [
-   "Det som syns på planen en lördag tränades in flera veckor tidigare. Så har det alltid varit. Jag har haft gott om tid att kontrollera det, eftersom jag har tränat ungefär alla lag som har funnits.",
-   "Thomas Frank sitter på Crystal Palace bänk för första gången, och det blir i Coventry. Han tar över ligans mest läckande försvar, och de spelarna kommer att stå där de har lärt sig att stå. En ny röst i omklädningsrummet flyttar ingen ytterback en meter på fyra dagar. Möjligen flyttar den honom en halvmeter åt fel håll, eftersom han lyssnar för noga.",
-   "I Swansea är det tvärtom. Matos har redan tagit farväl av sina spelare och är på väg till Strasbourg. Det betyder mindre än man tror. Laget kommer att pressa som han har lärt dem i flera veckor till, oavsett vem som står vid sidlinjen.",
-   "Själv har jag lämnat klubbar med kort varsel några gånger. Lagen fortsatte att spela min fotboll länge efteråt. Först när de började vinna tyckte styrelsen att något hade förändrats.",
-   "Den som tippar ska alltså läsa förra månadens matcher och låta veckans presskonferenser vara. Själv läser jag helst träningsprotokoll. De ljuger mer sällan än tränarna, och det vet jag, för jag har skrivit båda."
+   "Den här lördagen står flera tränare med en klocka som tickar. O'Neil i Ipswich har fått två matcher på sig. Alex Neil i Millwall har en läktare som inte kan enas om honom, och Skubala i Bristol vet att tisdagen mot Wrexham avgör. Jag har stått där fler gånger än jag har stått på en prispall, och jag vet precis vad som ska göras. Ingenting nytt.",
+   "En tränare under press vill visa handlingskraft. Han byter system på torsdagen, flyttar en ytterback in till mitten och håller ett långt möte i videorummet. Sedan går spelarna ut på lördagen och tänker på mötet. Det syns direkt på andrabollarna.",
+   "Ta Millwall. Laget passar bakåt, står det i matchbladet. Det är en följd av något annat. Ingen vet vem som ska ta emot bollen framåt, och det löser man på träningsplanen i lugn och ro och inte på en presskonferens.",
+   "I Ipswich har pressen försvunnit, och då har avstånden blivit fel. Ett par meter för mycket mellan backlinjen och mittfältet räcker. Sådant mäter man och rättar till. Jag har mätt avstånd hela mitt yrkesliv och har aldrig behövt ett krismöte för det.",
+   "Samma sak gäller er som tippar. Ni har ett system. Håll fast vid det på lördag, även om det regnar i Wrexham."
   ]
  },
  "sidan": [
   {
-   "lag": "Lincoln City",
-   "text": "Smeknamnet The Imps kommer från en liten djävulsfigur som är huggen i sten i Lincolnkatedralens änglakör. I augusti 2025 fick katedralens besökscenter en röd skylt om sambandet. Den sattes upp av supportrarnas stiftelse Red Imps Community Trust, som redan har märkt ut platsen där klubben grundades.",
+   "lag": "Luton Town",
+   "text": "Luton har spelat på Kenilworth Road sedan 1905. Bortaläktaren Oak Road är byggd runt ett kvarter med bostadshus, och den enda ingången går under några av husen och genom en grannes trädgård på baksidan. Bortafansen brukar gärna ta bilder där.",
    "kalla": {
-    "source": "Lincoln City FC",
-    "title": "Cathedral plaque to mark Imp history",
-    "url": "https://www.weareimps.com/news/cathedral-plaque-mark-imp-history",
+    "source": "Premier League",
+    "title": "Luton's Kenilworth Road stadium ready for Premier League action",
+    "url": "https://www.premierleague.com/en/news/3659886",
     "publishedAt": null
    }
   },
   {
-   "lag": "Wrexham",
-   "text": "Wrexhams Racecourse Ground är enligt Guinness världens äldsta arena för landskamper som fortfarande används. Den 5 mars 1877 förlorade Wales sin första hemmalandskamp där med 0–2 mot Skottland. När rekordet räknades fram, den 5 april 2024, slog Wales damer Kroatien med 4–0 på samma gräs.",
-   "kalla": {
-    "source": "Guinness World Records",
-    "title": "Oldest international football ground",
-    "url": "https://www.guinnessworldrecords.com/world-records/oldest-international-football-ground",
-    "publishedAt": null
-   }
-  },
-  {
-   "lag": "Charlton Athletic",
-   "text": "På juldagen 1937 spelade Charlton mot Chelsea på Stamford Bridge när dimman blev så tät att matchen blåstes av. Målvakten Sam Bartram hörde ingen visselpipa och stod kvar i sitt mål tills en polis berättade att matchen hade varit avbruten i en kvart.",
+   "lag": "Sheffield Wednesday",
+   "text": "Namnet kommer från The Wednesday Cricket Club, vars grundare var ledig på onsdagseftermiddagarna. Fotbollslaget bildades 1867 som en sidogren till cricketklubben, så att medlemmarna hade något att göra på vintern. Fram till 1929 hette klubben bara The Wednesday.",
    "kalla": {
     "source": "Wikipedia",
-    "title": "Sam Bartram",
-    "url": "https://en.wikipedia.org/wiki/Sam_Bartram",
+    "title": "Sheffield Wednesday F.C.",
+    "url": "https://en.wikipedia.org/wiki/Sheffield_Wednesday_F.C.",
     "publishedAt": null
    }
   }
  ],
  "kaseri": {
-  "av": "Göran Holm och Birgitta Sandell",
-  "om": "grannar i samma radhuslänga, Lindesberg",
-  "rubrik": "Raden går över häcken, mest åt ett håll",
+  "av": "Henrik Åström",
+  "om": "pappaledig, Luleå",
+  "rubrik": "Direkt från parkeringen utanför simhallen",
   "stycken": [
-   "Göran: Vi har tippat ihop över häcken sedan Birgitta flyttade in för elva år sedan. Hon står på sin sida och jag på min, och raden går fram och tillbaka tills den är klar.",
-   "Birgitta: Det var tolv år sedan. Och raden går mest åt ett håll.",
-   "Göran: Jag har hållit på Sheffield United sedan jag åkte dit på tågluff som ung. Bramall Lane, regn och paj i pausen. Ett sådant band håller livet ut.",
-   "Birgitta: Det var Hillsborough. Han har visat mig bilderna, och det står Wednesday på halsduken.",
-   "Göran: Halsduken var lånad. Hur som helst ska man ha ett lag i England, annars blir lördagarna bara väder.",
-   "Birgitta: Han klipper häcken på lördagarna, mellan tre och fem, så att han hör resultaten från min radio."
+   "Klockan är 15.52. Vi befinner oss på parkeringen utanför simhallen. Det är fyra grader kallt, och motorn har varit avstängd i sex minuter. Inne i byggnaden har nybörjargruppen just gått ner i vattnet. Min dotter är med, i rosa badmössa.",
+   "15.58. Radion står på. I telefonen ligger veckans tretton rader. Lampan över entrén blinkar. Ingen har kommenterat det.",
+   "16.00. Avspark på elva arenor i England. Här är läget oförändrat. En Volvo backar ut två platser bort, försiktigt och utan problem.",
+   "16.09. Det har börjat snöa. Vindrutan täcks långsamt. Jag låter torkarna vara, av hänsyn till batteriet och till stämningen.",
+   "16.21. Radion nämner Elland Road. Jag sätter mig rakare i sätet. Sedan kommer vädret. 16.30. Dörren öppnas, och hon kommer ut med blött hår. Hon har simmat utan platta. Det är dagens största händelse, och då har jag räknat med Elland Road."
   ],
-  "form": "tva"
+  "form": "referat"
  },
  "kasorer": [
+  {
+   "av": "Henrik Åström",
+   "om": "pappaledig, Luleå",
+   "form": "referat"
+  },
   {
    "av": "Göran Holm och Birgitta Sandell",
    "om": "grannar i samma radhuslänga, Lindesberg",
