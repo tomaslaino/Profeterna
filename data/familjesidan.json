@@ -1,73 +1,49 @@
 {
- "omgang": "2026-11-21-st4980",
+ "omgang": "2026-11-28-st4981",
  "matcher": [
-  "401879232",
-  "401879236",
-  "401878754",
-  "401878756",
-  "401879238",
-  "401879235",
-  "401880160",
-  "401880158",
-  "401880157",
-  "401880154",
-  "401880152",
-  "401880151",
-  "401880149"
+  "401878752",
+  "401879226",
+  "401879227",
+  "401880136",
+  "401880134",
+  "401880132",
+  "401880127",
+  "401880130",
+  "401880126",
+  "401880125",
+  "401880726",
+  "401880723",
+  "401880719"
  ],
- "skriven": "2026-11-21T10:32:35.412Z",
+ "skriven": "2026-11-23T16:26:33.760Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-21T10:23:57.614Z",
- "rubrik": "En tränare har kommit, en har gått och två sitter löst",
+ "underlag": "2026-11-23T16:04:08.668Z",
+ "rubrik": "En tränare har kommit till Watford och tre sitter löst",
  "notiser": [
   {
    "slag": "valkommen",
-   "lag": "Crystal Palace",
-   "namn": "Thomas Frank",
-   "text": "gör sin första match som tränare i Crystal Palace borta mot Coventry City. Supportrarna ser honom som ett vettigt val, framför allt eftersom han faktiskt vill träna försvaret."
+   "lag": "Watford",
+   "namn": "Edward Iordănescu",
+   "text": "tar över efter Alessio Dionisi och väntas leda laget redan i onsdagens hemmamatch mot Blackburn. Supportrarna oroar sig för att han har bråkat med ägarna i sina tidigare klubbar."
   },
   {
-   "slag": "avflyttad",
-   "lag": "Swansea City",
-   "namn": "Vitor Matos",
-   "text": "har lämnat Swansea City för Strasbourg, och fyra ur hans stab väntas följa med. Supportrarna tycker att det är sämsta tänkbara tillfälle och noterar att klubben knappt har sagt ett ord."
-  },
-  {
-   "slag": "tillforordnad",
-   "lag": "Swansea City",
-   "namn": "Ashley Williams",
-   "text": "leder Swansea City tillfälligt mot West Bromwich Albion. Supportrarna oroar sig för att den nya ledningen bara har haft ungefär 48 timmar på sig, mot motståndarnas två veckor."
-  },
-  {
-   "slag": "aterseende",
-   "lag": "Arsenal",
-   "namn": "Bruno Guimarães",
-   "text": "kommer tillbaka till St James' Park med Arsenal och väntas bli utbuad. Flera Newcastlesupportrar försvarar honom ändå, eftersom han var den förste kaptenen sedan 1955 som lyfte en inhemsk titel."
+   "slag": "sitter_lost",
+   "lag": "Ipswich Town",
+   "namn": "Gary O'Neil",
+   "text": "har allt fler supportrar emot sig, och flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng. De tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har klubbdirektörens offentliga stöd, men flera tusen egna supportrar vände sig mot honom efter 0–5 hemma mot Norwich, och enligt uppgifter i medierna kollar klubben redan upp möjliga efterträdare."
+   "text": "har i stort sett förlorat supportrarnas förtroende, och de menar att en förlust mot Wrexham på tisdag avgör hans öde."
   },
   {
    "slag": "sitter_lost",
-   "lag": "Watford",
-   "namn": "Alessio Dionisi",
-   "text": "väntades få sparken under landslagsuppehållet. Fyra poäng i de två senaste hemmamatcherna och ägaren Gino Pozzos rättegång i Spanien tros ha räddat honom tills vidare."
-  },
-  {
-   "slag": "besked",
-   "lag": "Sheffield United",
-   "namn": "Sheffield United",
-   "text": "räknar med ett poängavdrag på 12 poäng, och därför ser klubben enligt en supporter hemmamatchen mot Watford som en nedflyttningsstrid."
-  },
-  {
-   "slag": "besked",
-   "lag": "Leeds United",
-   "namn": "Leeds United",
-   "text": "låter New York-banken Allen & Co värdera klubben och ta in nya pengar, enligt supporterpodden. Kapitalbehovet ska ha överraskat en del delägare."
+   "lag": "Derby County",
+   "namn": "John Eustace",
+   "text": "pressas allt hårdare av supportrarna, som vill ha en förändring, men ägarna fortsätter att backa honom."
   }
  ]
 }
