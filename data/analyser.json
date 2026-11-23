@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-23T16:08:00.029Z",
+ "uppdaterad": "2026-11-23T16:09:31.206Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3266,6 +3266,100 @@
     "model": "claude-opus-5-5",
     "version": "2026-11-16.1",
     "writtenAt": "2026-11-20T15:01:26.037Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401879227",
+   "match": "Leeds United – Coventry City",
+   "avspark": "2026-11-28T15:00Z",
+   "writtenAt": "2026-11-23T16:09:09.227Z",
+   "text": "Leeds kommer hem efter en ganska bra lördag\n\nLeeds vann på Stamford Bridge för första gången sedan 1999 och tar nu emot Coventry på Elland Road. Coventry kommer dit efter en seger mot Crystal Palace som avgjordes på ett inkast. Därför handlar lördagen om press och fasta situationer.\n\nDaniel Farke har haft en bra vecka. Leeds vann med 4–1 på Stamford Bridge, klubbens första seger där sedan 1999, med två mål av Noah Okafor och ett var av Dominic Calvert-Lewin och Brenden Aaronson, enligt Hayters [1]. Chelsea gjorde första målet, men det brydde sig Leeds inte om. ”Jag hade varit besviken med oavgjort i dag”, sa Farke, och om andra halvlek: ”Då var det bara vi.” Planen var att ”pressa dem högt, så att de inte kan visa sin potential i världsklass” [1]. Ett lag som vill vinna så mycket redan i paus ser du redan på uppvärmningen.\n\nCoventry vann sin senaste match med 3–2 mot Crystal Palace. Avgörandet kom i 85:e minuten, när Milan van Ewijks långa inkast nickades vidare av Bobby Thomas och Brandon Thomas-Asantes skott gick in via Dwight McNeil, skriver Sky Sports [2]. Frank Lampard höll igen efteråt: ”Vi får inte bli för upphetsade” [2]. Taiwo Awoniyi, som gjorde första målet, fick gå av skadad i paus [2]. Två veckor tidigare förlorade laget med 3–1 mot Everton, och Lampard skyllde på domslut, enligt beIN Sports [3]. Lagets bästa skapare är Jack Rudoni, med 17 skott och 17 skapade chanser [3].\n\nHemma har Coventry tagit nio poäng av tolv i de fyra senaste matcherna [2]. Borta har de bara vunnit en av fem. Själv tycker jag att en lång inkastare förtjänar respekt. Så gjorde vi i Tjäderfors, och där regnade det in. Leeds bör vara beredda på att Coventry kastar in bollen i straffområdet mer än en gång.\n\nTipset: 1 (Med lugn hand)\n\nPrognosen ger Leeds oddset 1,67, och spelbolaget är ännu säkrare med 1,53. Det jag har läst drar åt samma håll. Leeds pressade sönder Chelsea på bortaplan [1] och har inte förlorat hemma i år. Coventry har bara vunnit en av fem bortamatcher och släpper in många mål. Awoniyi gick dessutom av skadad senast [2]. Det som talar emot är Coventrys inkast och fasta situationer, som avgjorde mot Palace [2], och att Leeds spelat oavgjort tre gånger på fem hemmamatcher. Ändå ringar jag in en ren hemmaseger. Det man släpper in på inkast löser man med en hink bollar.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Leeds kommer hem efter en ganska bra lördag",
+   "lead": "Leeds vann på Stamford Bridge för första gången sedan 1999 och tar nu emot Coventry på Elland Road. Coventry kommer dit efter en seger mot Crystal Palace som avgjordes på ett inkast. Därför handlar lördagen om press och fasta situationer.",
+   "paragraphs": [
+    "Daniel Farke har haft en bra vecka. Leeds vann med 4–1 på Stamford Bridge, klubbens första seger där sedan 1999, med två mål av Noah Okafor och ett var av Dominic Calvert-Lewin och Brenden Aaronson, enligt Hayters [1]. Chelsea gjorde första målet, men det brydde sig Leeds inte om. ”Jag hade varit besviken med oavgjort i dag”, sa Farke, och om andra halvlek: ”Då var det bara vi.” Planen var att ”pressa dem högt, så att de inte kan visa sin potential i världsklass” [1]. Ett lag som vill vinna så mycket redan i paus ser du redan på uppvärmningen.",
+    "Coventry vann sin senaste match med 3–2 mot Crystal Palace. Avgörandet kom i 85:e minuten, när Milan van Ewijks långa inkast nickades vidare av Bobby Thomas och Brandon Thomas-Asantes skott gick in via Dwight McNeil, skriver Sky Sports [2]. Frank Lampard höll igen efteråt: ”Vi får inte bli för upphetsade” [2]. Taiwo Awoniyi, som gjorde första målet, fick gå av skadad i paus [2]. Två veckor tidigare förlorade laget med 3–1 mot Everton, och Lampard skyllde på domslut, enligt beIN Sports [3]. Lagets bästa skapare är Jack Rudoni, med 17 skott och 17 skapade chanser [3].",
+    "Hemma har Coventry tagit nio poäng av tolv i de fyra senaste matcherna [2]. Borta har de bara vunnit en av fem. Själv tycker jag att en lång inkastare förtjänar respekt. Så gjorde vi i Tjäderfors, och där regnade det in. Leeds bör vara beredda på att Coventry kastar in bollen i straffområdet mer än en gång."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Hayters",
+     "title": "Farke revels in historic Leeds victory at Stamford Bridge",
+     "url": "https://hayters.com/farke-revels-in-historic-leeds-victory-at-stamford-bridge/",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sky Sports",
+     "title": "Coventry 3-2 Crystal Palace: Dwight McNeil own goal hands Sky Blues important win and Thomas Frank a losing start with Eagles",
+     "url": "https://www.skysports.com/football/news/13611872/coventry-3-2-crystal-palace-dwight-mcneil-own-goal-hands-sky-blues-important-win-and-thomas-frank-a-losing-start-with-eagles",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "beIN Sports",
+     "title": "Lampard: Decisions went against Coventry in defeat to Everton",
+     "url": "https://www.beinsports.com/en-us/soccer/premier-league/articles/lampard-decisions-went-against-coventry-in-defeat-to-everton-2026-11-19",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ger Leeds oddset 1,67, och spelbolaget är ännu säkrare med 1,53. Det jag har läst drar åt samma håll. Leeds pressade sönder Chelsea på bortaplan [1] och har inte förlorat hemma i år. Coventry har bara vunnit en av fem bortamatcher och släpper in många mål. Awoniyi gick dessutom av skadad senast [2]. Det som talar emot är Coventrys inkast och fasta situationer, som avgjorde mot Palace [2], och att Leeds spelat oavgjort tre gånger på fem hemmamatcher. Ändå ringar jag in en ren hemmaseger. Det man släpper in på inkast löser man med en hink bollar.",
+    "signs": [
+     0
+    ],
+    "note": "Med lugn hand",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Hayters",
+      "title": "Farke revels in historic Leeds victory at Stamford Bridge",
+      "url": "https://hayters.com/farke-revels-in-historic-leeds-victory-at-stamford-bridge/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sky Sports",
+      "title": "Coventry 3-2 Crystal Palace: Dwight McNeil own goal hands Sky Blues important win and Thomas Frank a losing start with Eagles",
+      "url": "https://www.skysports.com/football/news/13611872/coventry-3-2-crystal-palace-dwight-mcneil-own-goal-hands-sky-blues-important-win-and-thomas-frank-a-losing-start-with-eagles",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-23T16:09:09.227Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "Leeds åkte till Chelsea, låg under och vann ändå med 4–1 genom att pressa högt i en hel andra halvlek. Ett sådant lag vet precis vad det ska göra. Pressen gör att motståndaren aldrig hittar sin ombre libre, ingen ombre libre någonstans på planen, och det finns 28 sätt att bryta ner en backlinje… Ursäkta. Back to basis.",
+     "Coventry har vunnit en av fem bortamatcher, och Awoniyi, som gjorde första målet senast, gick av skadad. Här höjer jag ett varningens finger för de långa inkasten, som avgjorde förra matchen. Men ett lag som måste leva på inkast vinner inte borta mot ett lag som pressar så högt. Leeds har kryssat för mycket hemma, men det tar slut nu. Etta, rakt av."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-23T16:09:09.227Z",
+    "uppdrag": {
+     "fraser": [
+      "Lugn nu",
+      "Här höjer jag ett varningens finger"
+     ],
+     "krydda": null,
+     "bielsa": [
+      "ombre libre"
+     ],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-23T16:09:23.428Z",
     "attempts": 2
    },
    "model": "claude-opus-5-5",
