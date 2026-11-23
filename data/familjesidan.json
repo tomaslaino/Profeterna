@@ -15,41 +15,41 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T19:03:50.580Z",
+ "skriven": "2026-11-23T19:19:28.032Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T18:58:59.985Z",
+ "underlag": "2026-11-23T19:15:30.581Z",
  "rubrik": "Tre tränare sitter löst och två möter sina gamla klubbar",
  "notiser": [
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Michael Duff",
-   "text": "kommer tillbaka till sin gamla klubb Wycombe, nu med Bradford. Supportrarna i Wycombe tycker att han har tappat fart sedan han lämnade dem."
+   "text": "kommer tillbaka till Adams Park med Bradford City. Wycombes supportrar tycker att han har tappat fart sedan han lämnade klubben."
   },
   {
    "slag": "aterseende",
    "lag": "Stoke City",
    "namn": "Ben Johnson",
-   "text": "möter West Ham, där han kommer från ungdomsakademin. Han väntas vara extra laddad mot sin gamla klubb."
+   "text": "möter West Ham, där han kommer från ungdomsakademin, och väntas vara extra laddad mot sin gamla klubb. Värdarna vill därför att han vilar mot Millwall."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "har allt mindre stöd på läktarna, och flera supportrar vill se honom sparkad om de två närmaste matcherna inte ger några poäng. De tror inte att han kan hålla laget kvar."
-  },
-  {
-   "slag": "sitter_lost",
-   "lag": "Derby County",
-   "namn": "John Eustace",
-   "text": "har fortfarande ägarnas stöd, men trycket växer och supportrarna vill ha en förändring. Ännu en nedflyttning hotar att ge flera års återuppbyggnad."
+   "text": "har allt fler supportrar emot sig, och flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng. De tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "väntas få sin framtid avgjord i tisdagens hemmamatch mot Wrexham, och supportrarna har i stort sett gett upp om honom. Värdarna fruktar att även en seger bara skjuter upp beslutet."
+   "text": "får sin framtid avgjord i tisdagens hemmamatch mot Wrexham, menar supportrarna, som i stort sett har gett upp om honom. Värdarna fruktar att även en seger bara skjuter upp beslutet."
+  },
+  {
+   "slag": "sitter_lost",
+   "lag": "Derby County",
+   "namn": "John Eustace",
+   "text": "har fortfarande ägarnas stöd, men trycket växer och supportrarna vill ha en förändring. De fruktar att en ny nedflyttning skulle innebära flera års återuppbyggnad."
   }
  ]
 }
