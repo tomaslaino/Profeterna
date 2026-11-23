@@ -15,20 +15,16 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T17:30:44.597Z",
+ "skriven": "2026-11-23T17:46:22.718Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-23T17:24:52.563Z",
+ "underlag": "2026-11-23T17:42:43.321Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "DET GÖR",
-    0
-   ],
-   [
-    "INTE ENS",
+    "DET GÖR INTE",
     0
    ],
    [
@@ -36,8 +32,8 @@
     1
    ]
   ],
-  "under": "”Vi är vana vid det. Och det är skit.” Supporterpodden United We Stand efter 0–4 mot Liverpool",
-  "plus": "IPSWICH SLÄPPT IN I 30 RAKA",
+  "under": "”Vi är vana vid det. Och det är skit.” – United We Stand Podcast efter 0–4 mot Liverpool",
+  "plus": "IPSWICH: 30 RAKA UTAN NOLLA",
   "plusId": "401878752"
  }
 }
