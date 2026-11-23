@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T18:16:08.061Z",
+ "uppdaterad": "2026-11-23T18:27:44.728Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2178,10 +2178,10 @@
     "Sheffield United"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:02:35.089Z",
-   "rubrik": "QPR litar på alla, utom på sina avslut",
+   "skriven": "2026-11-23T18:27:44.728Z",
+   "rubrik": "QPR litar på varenda spelare, bara inte på avsluten",
    "ingress": null,
-   "summering": "QPR har en ryggrad som supportrarna litar på men avslut utan kraft. Sheffield United ligger bättre till än väntat, och Wilder försvarar sitt unga mittfältspar mot forumets tvivel.",
+   "summering": "QPR har äntligen en ryggrad att lita på, men ett anfall som placerar i stället för att skjuta. Sheffield United står bättre till än den egna podden tycker att laget förtjänar, och har ett hål på högerbacken.",
    "delar": [
     {
      "lag": "Queens Park Rangers",
@@ -2328,26 +2328,35 @@
       }
      ],
      "text": [
-      "På Loft For Words litar man för första gången på länge på varenda spelare som QPR ställer på planen. Ryggraden från Ronnie Edwards till Ilias Chair bär, och Nicolas Madsen är tillbaka i fjolårsform. Supportrarna misstänker att han spelade med en känning i höstas.",
-      "Det som skaver är avsluten. Laget skjuter ofta men nästan aldrig hårt, och inte ens segermålet mot Millwall nådde ända in i nätet. ”Våra killar verkar inte klara av att sätta foten i bollen”, skriver en supporter, medan en annan hellre ser färre slöa distansskott."
+      "På Loft For Words skriver en supporter att det var ”länge, länge sedan” han litade på varenda spelare i QPR:s elva. Ryggraden med Ronnie Edwards, Nicolas Madsen, Glen Kamara och Ilias Chair anses bära laget.",
+      "Det som skaver är avsluten. Laget skjuter ofta men sällan hårt, mest med försiktiga insidesplaceringar som målvakten hinner ner på, och inte ens segermålet mot Millwall gick ända in i nätet. En ensam röst går emot och vill att laget skjuter mindre och i stället fortsätter leta luckor.",
+      "Kommer anfallet igång tror man att många får skjuta upp sina semesterbokningar i maj."
      ],
      "citat": {
-      "sagt": "Det var länge, länge sedan vi ställde elva spelare på planen och jag litade på varenda en av dem.",
-      "vem": "stevec",
+      "sagt": "Jag undrar om han släpade på en känning tidigare under säsongen, för nu är han tillbaka i förra säsongens form.",
+      "vem": "nix",
       "podd": "Loft For Words",
       "typ": "forum",
       "datum": "2026-11-23"
      },
      "namn": [
       "Ronnie Edwards",
-      "Ilias Chair",
-      "Nicolas Madsen"
+      "Nicolas Madsen",
+      "Glen Kamara",
+      "Ilias Chair"
      ],
-     "paSpel": "Tredje matchen på en vecka, med nyss skadeläkta spelare att hushålla med."
+     "paSpel": "Tredje matchen på en vecka, med nyss återvända spelare som måste hushållas."
     },
     {
      "lag": "Sheffield United",
      "kallor": [
+      {
+       "podd": "Blades Ramble - A Sheffield United Podcast",
+       "avsnitt": "Chris Wilder Speaks Before Watford! | Hot Off The Presser ⚔️🗞️",
+       "datum": "2026-11-23",
+       "adress": "https://podcasts.apple.com/gb/podcast/blades-ramble-a-sheffield-united-podcast/id1777788630?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "Vital Blades",
        "avsnitt": "Match summary v Watford · BLADES v Watford at BDBL · Another one bites the dust",
@@ -2365,35 +2374,19 @@
      ],
      "grupper": [
       {
-       "amne": "trupp",
-       "punkter": [
-        {
-         "t": "Kalvin Phillips har problem med ett lår och startade inte mot Watford. Om han spelar beror på hur han svarar. Wilder säger att klubben räknade med att han ibland skulle missa matcher.",
-         "s": "b",
-         "podd": [
-          "Sheff United Way"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "media"
-        },
-        {
-         "t": "Patrick Bamford och Jamie Shackleton är tillbaka efter frånvaro och satt på bänken mot Watford. Bamford kom in sent och gjorde en målgivande passning.",
-         "s": "b",
-         "podd": [
-          "Sheff United Way"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "media"
-        }
-       ]
-      },
-      {
        "amne": "elva",
        "punkter": [
+        {
+         "t": "Laget har fyra spelare som kan spela högerback men ingen som tränaren både litar på och kan använda. Därför kan Wilder tvingas överge sin favoritformation med fyrbackslinje och gå över till en femmannalinje.",
+         "s": "b",
+         "podd": [
+          "Blades Ramble - A Sheffield United Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Ben Brereton Díaz gjorde två mål centralt mot Watford. En supporter tycker att han är mycket bättre där än ute på kanten, men att Patrick Bamford ändå måste starta på topp om han är frisk.",
          "s": "o",
@@ -2404,23 +2397,23 @@
           "2026-11-23"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Vissa supportrar tvivlar på att de unga akademimittfältarna Oliver Arblaster och Sydie Peck kan spela ihop. Chris Wilder kallar kritiken nonsens och står fast vid paret.",
-         "s": "b",
-         "podd": [
-          "Sheff United Way"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "media"
         }
        ]
       },
       {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Wilder säger att Hamza Choudhury kan spela högerback, men aldrig att han är högerback. Värdarna tolkar det som att tränaren inte ser honom som en lösning och att det är en vink till ägarna om att det behövs en riktig högerback.",
+         "s": "o",
+         "podd": [
+          "Blades Ramble - A Sheffield United Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Trots storsegern tycker en supporter att Oliver Arblaster var dålig. Han halkade och föll gång på gång och slarvade bort bollen, och flera av hans brytningar var försök att rädda lägen han själv hade orsakat.",
          "s": "o",
@@ -2431,34 +2424,45 @@
           "2026-11-23"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Chris Wilder vilade Bamford och troligen Kalvin Phillips. Valet att i stället starta Ayew, Brereton Díaz och Chong ifrågasattes, men supportrarna menar att alla tre gjorde bra matcher i lagets mest kontrollerade insats den här säsongen.",
-         "s": "o",
-         "podd": [
-          "Vital Blades"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Sydie Peck pekas ut som lagets bästa spelare mot Watford. Supportrarna tycker att hela elvan höll en jämn och bra nivå, men att han stack ut.",
-         "s": "o",
-         "podd": [
-          "Vital Blades"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
         }
        ]
       },
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Wilder menar att laget har några poäng för lite. Värdarna anser tvärtom att laget har fått mer än spelet förtjänat, med matcherna mot Bolton och Cardiff som exempel. En plats bland de åtta bästa vore en falsk bild av en klubb i omställning.",
+         "s": "o",
+         "podd": [
+          "Blades Ramble - A Sheffield United Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna är trötta på att nyförvärv som Matt Doherty nästan aldrig är spelbara. Efter Tom Davies, Rhian Brewster och Rhys Norrington-Davies frågar de sig om felet ligger i rehabiliteringen bakom kulisserna.",
+         "s": "o",
+         "podd": [
+          "Blades Ramble - A Sheffield United Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna ser Wilders ord om att ta sig till den 1 januari som en begäran om förstärkningar i transferfönstret. De menar att ägarna borde satsa om laget då ligger nära playoffplatserna.",
+         "s": "o",
+         "podd": [
+          "Blades Ramble - A Sheffield United Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Efter 4–0 menar en supporter att laget ligger mycket bättre till än nästan någon trodde. Han misstänker att alla inte ens är glada över det, och att det mest säger något om hur svag ligan är.",
          "s": "o",
@@ -2474,24 +2478,22 @@
       }
      ],
      "text": [
-      "På Vital Blades konstaterar en supporter att laget ligger mycket bättre till än nästan någon trodde, och han misstänker att inte alla ens är glada över det.",
-      "Mittfältet delar forumet. Sydie Peck var bäst mot Watford, medan Oliver Arblaster enligt en supporter halkade omkull gång på gång och slarvade bort bollen. Chris Wilder kallar tvivlen på det unga akademiparet nonsens och står fast vid dem.",
-      "Längst fram vill forumet se Patrick Bamford starta om han är frisk, trots att Ben Brereton Díaz gjorde två mål centralt."
+      "I podden Blades Ramble är man oense med Chris Wilder: han tycker att laget har fått för lite ut av resultaten, värdarna att det har fått mer än spelet förtjänat. På Vital Blades misstänker en supporter att alla inte ens är glada över att laget ligger så bra till.",
+      "Wilder säger att Hamza Choudhury kan spela högerback, men aldrig att han är högerback. Det tolkas som en vink till ägarna. Med fyra tänkbara högerbackar men ingen som han både litar på och kan använda kan han tvingas överge fyrbackslinjen för en femmannalinje."
      ],
      "citat": {
-      "sagt": "Om jag inte trodde att de kunde spela ihop skulle jag inte ta ut dem. Klart att de kan spela ihop, de har alla sina egenskaper.",
-      "vem": "Chris Wilder",
-      "podd": "Sheff United Way",
-      "typ": "media",
+      "sagt": "Han har den första januari i tankarna, och vi vet alla vad som händer då. Det är då transferfönstret öppnar.",
+      "vem": null,
+      "podd": "Blades Ramble - A Sheffield United Podcast",
+      "typ": "podd",
       "datum": "2026-11-23"
      },
      "namn": [
-      "Sydie Peck",
-      "Oliver Arblaster",
       "Chris Wilder",
-      "Patrick Bamford",
-      "Ben Brereton Díaz"
-     ]
+      "Wilder",
+      "Hamza Choudhury"
+     ],
+     "paSpel": "Att hänga kvar nära playoff till nyår, så att ägarna vågar satsa i januari."
     }
    ]
   },
