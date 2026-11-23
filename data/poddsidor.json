@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T18:58:59.985Z",
+ "uppdaterad": "2026-11-23T19:15:30.581Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3034,16 +3034,150 @@
     "Oxford United"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:03:51.419Z",
-   "rubrik": "Sydkoreansk inhoppare räddade Oxford, nu vill man skona honom",
+   "skriven": "2026-11-23T19:10:24.375Z",
+   "rubrik": "Lättviktiga Luton har äntligen lärt sig att slåss",
    "ingress": null,
    "summering": null,
    "delar": [
     {
      "lag": "Luton Town",
-     "kallor": [],
-     "grupper": [],
-     "text": []
+     "kallor": [
+      {
+       "podd": "30 Points! Who Gives A Pod",
+       "avsnitt": "Burton Albion 1-2 Luton Town: The Live Show!",
+       "datum": "2026-11-23",
+       "adress": "https://podcasts.apple.com/gb/podcast/30-points-who-gives-a-pod/id1700311219?uo=4",
+       "typ": "podd"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "trupp",
+       "punkter": [
+        {
+         "t": "Enligt en tittare i chatten hade Liam Walsh armen i en mitella efter matchen, troligen på grund av en axelskada.",
+         "s": "h",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Fysiska lag är fortfarande Lutons svaga punkt. Burton var första laget på fem veckor som tog i ordentligt, och Luton blev genast överkört på mittfältet de första 20 minuterna.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Liam Walsh blir enligt supportrarna gång på gång bortknuffad från bollen när han spelar djupt. De tycker att han kan styra ett helt spel, men inte från positionen framför backlinjen.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Daniel Gore kom in tidigt mot Burton och vände matchen. Värdarna ser honom som framtiden på den defensiva mittfältsplatsen och menar att Walsh spelar bättre längre fram, med Gore bakom sig.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Teden Mengi, som Wilshere har sagt att klubben inte står i vägen för om han vill flytta, var överlägsen i försvaret i sin första match på länge. Med flera mittbackar skadade behövs han.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Värdarna menar att Luton hade förlorat den här matchen förra säsongen. Trots flera tidigare falska gryningar tycker de sig nu se en verklig tro i laget, märkbar även i reaktionerna på läktaren efter slutsignalen.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Den största skillnaden mot Jack Wilsheres lag i början av säsongen är enligt värdarna att det nu kan förlora mittfältskampen i en halvtimme, slåss, nicka bort bollar och ändå vinna fult.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Oxfords rutinerade Cameron Brannagan pekas ut som lagets hjärta och den spelare Luton måste hålla tyst. Därför vill supportrarna ha Gore i stället för Walsh på mittfältet på lördag.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "Mot lag som tar i ser Luton fortfarande ”lite lättviktiga” ut, och i podden 30 Points! Who Gives A Pod såg man Burton köra över mittfältet de första 20 minuterna. Skillnaden mot Jack Wilsheres lag i början av säsongen är att det nu kan förlora den kampen, slåss, nicka bort bollar och ändå vinna fult.",
+      "Inför lördagen pekas Cameron Brannagan ut som Oxfords hjärta. Därför vill värdarna se Daniel Gore, som vände matchen med ”mer bett”, framför backlinjen i stället för Liam Walsh, som gång på gång knuffas bort där. En tittare såg dessutom Walsh med armen i mitella efter matchen."
+     ],
+     "citat": {
+      "sagt": "Det känns verkligen som att tron är tillbaka i laget, att vi faktiskt är bättre än tre fjärdedelar av den här ligan.",
+      "vem": null,
+      "podd": "30 Points! Who Gives A Pod",
+      "typ": "podd",
+      "datum": "2026-11-23"
+     },
+     "namn": [
+      "Jack Wilshere",
+      "Cameron Brannagan",
+      "Daniel Gore",
+      "Liam Walsh"
+     ],
+     "paSpel": "Beviset på att tron är äkta den här gången, inte ännu en falsk gryning."
     },
     {
      "lag": "Oxford United",
@@ -3174,21 +3308,21 @@
       }
      ],
      "text": [
-      "På Yellows Forum handlar allt om Jeon Jin-Woo, sydkoreanen som hoppade in mot Wycombe och låg bakom det mesta av vändningen. Han krävde bollen direkt, och man fastnar för en mottagning som för honom framåt i stället för att döda bollen.",
-      "Före bytet var laget skakigt i 70 minuter, och Oxford Clarion beskriver osäkra uppspel och kanter som inte gav något.",
-      "Ändå vill en del inte kasta in honom från start i högt tempo mot Luton. De tror att klubben låter honom starta på tisdag och skonar honom på lördag."
+      "Jeon nöjde sig inte med några säkra passningar när han hoppade in. Han krävde bollen direkt och gick på med finter, och på Yellows Forum menar man att han låg bakom det mesta av vändningen mot Wycombe.",
+      "Oxford Clarion är helt såld på honom. På forumet fastnar man för första touchen, som tar bollen framåt i stället för att bara döda den.",
+      "Ändå vill en del inte se honom från start i en match med högt tempo mot Luton. Innan han kom in var laget mycket svagt i 70 minuter, med darriga uppspel från en nödbetonad backlinje utan Michal Helik."
      ],
      "citat": {
-      "sagt": "Han var enormt betydelsefull vid mål två, tre och fyra. Borde ha blivit matchens lirare.",
-      "vem": "Brahma",
-      "podd": "Yellows Forum",
-      "typ": "forum",
-      "datum": "2026-11-22"
+      "sagt": "Han kom in, ställde sig till vänster och visade snabbt sina höftfinter och dra-vänster-dra-höger-rusa-till-kortlinjen-rörelser.",
+      "vem": "Toby Sprigings",
+      "podd": "Oxford Clarion",
+      "typ": "media",
+      "datum": "2026-11-23"
      },
      "namn": [
-      "Jeon Jin-Woo"
-     ],
-     "paSpel": "Om nya publikfavoriten Jeon får starta, eller skonas efter tisdagens match."
+      "Jeon",
+      "Michal Helik"
+     ]
     }
    ]
   },
@@ -3201,14 +3335,21 @@
     "Reading"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:04:08.668Z",
-   "rubrik": "Wednesday gjorde två mål och slutade sedan spela",
+   "skriven": "2026-11-23T19:15:30.581Z",
+   "rubrik": "Wednesday vinner igen, och ingen blir särskilt glad",
    "ingress": null,
-   "summering": "Wednesday vann utan att övertyga: Cooper höll ihop bakåt, Lowe fick äntligen upprättelse och den täta matchföljden väcker oro för de skadebenägna.",
+   "summering": "Wednesday vinner utan att övertyga och lutar sig mot Liam Cooper och veteranerna, medan fyra matcher på elva dagar väcker frågan om vem som ska vilas.",
    "delar": [
     {
      "lag": "Sheffield Wednesday",
      "kallor": [
+      {
+       "podd": "The Wednesday Week",
+       "avsnitt": "Hello From the Other Side 26/27 - Stevenage (a)",
+       "datum": "2026-11-22",
+       "adress": "https://shows.acast.com/64abd7bfd593820011a68d78/episodes/hello-from-the-other-side-2627-stevenage-a",
+       "typ": "podd"
+      },
       {
        "podd": "Owlstalk",
        "avsnitt": "Man of the match and player ratings vs Barnsley (A), 26/27 · Let's Get Reading Sold Out · Stevenage away next - pick YOUR STARTING Team????",
@@ -3293,47 +3434,53 @@
          "typ": "forum"
         },
         {
-         "t": "Barry Bannan spelar högt upp i banan, och flera vill hellre se honom på det centrala mittfältet. En supporter tycker att tränaren ännu inte har bestämt hur han bäst ska användas.",
+         "t": "Det är veteranerna som bär Wednesday just nu, särskilt Barry Bannan på mittfältet och Liam Cooper i backlinjen, som har klivit fram i den nye tränarens första matcher.",
          "s": "o",
          "podd": [
-          "Owlstalk"
+          "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-22"
          ],
-         "typ": "forum"
-        },
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
         {
-         "t": "Jaden Heskey delar supportrarna. Kritikerna menar att han försvinner i matcherna, så att Billy Mitchell får slita dubbelt på mittfältet.",
-         "s": "o",
+         "t": "Enligt Wednesday-supportrar som Stevenage-gästen Luca har pratat med har ingen gått i taket över de två segrarna under den nye tränaren Dave Challoner, eftersom spelet inte har imponerat.",
+         "s": "h",
          "podd": [
-          "Owlstalk"
+          "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Segern mot Barnsley firades knappt på Owlstalk: efter den tidiga ledningen tystnade Wednesday och ”lät dem styra matchen”, med ett bottenlag som passade snyggare. Supportrarna känner igen mönstret från säsongsstarten.",
-      "Att det ändå höll tillskrivs Liam Cooper, som kallas klippan och ledaren som höll ihop laget när Barnsley tryckte på.",
-      "Jamal Lowe, som gjorde båda målen, får samtidigt upprättelse. Hans försvarare menar att han länge har betygsatts efter sitt rykte och inte efter sitt spel, och att han ser bäst ut som vänster vingback."
+      "Mot Barnsley ledde Wednesday med 2–0 tidigt, slutade sedan spela och lät ett bottenlag styra matchen med snyggare passningar. På forumet Owlstalk känner man igen mönstret från säsongsstarten.",
+      "Den som höll ihop laget var Liam Cooper, som där kallas en klippa och en ledare. I podden The Wednesday Week räknar man honom och Barry Bannan till veteranerna som bär laget just nu.",
+      "Jamal Lowe, som gjorde båda målen, får samtidigt upprättelse: hans försvarare menar att han länge har bedömts efter sitt rykte och inte efter sitt spel."
      ],
      "citat": {
-      "sagt": "Cooper: 8, matchens lirare. Förmodligen främsta skälet till att vi lyckades hålla undan. Och han slog en målgivande passning också.",
-      "vem": "davetherivelinowl",
-      "podd": "Owlstalk",
-      "typ": "forum",
-      "datum": "2026-11-21"
+      "sagt": "De har inte överdrivit prestationerna. Visst, det har blivit två segrar, men det har inte varit några fantastiska insatser från er sida.",
+      "vem": "Luca",
+      "podd": "The Wednesday Week",
+      "typ": "podd",
+      "datum": "2026-11-22"
      },
      "namn": [
       "Liam Cooper",
+      "Barry Bannan",
       "Jamal Lowe"
      ],
-     "paSpel": "Mest frågan om vilka sköra spelare som orkar i den täta matchföljden."
+     "paSpel": "En av fyra matcher på elva dagar, där de skadeömma måste hushållas."
     },
     {
      "lag": "Reading",
