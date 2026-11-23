@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-23T16:15:31.557Z",
+ "uppdaterad": "2026-11-23T16:17:06.273Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3689,6 +3689,100 @@
     "version": "2026-11-16.1",
     "writtenAt": "2026-11-23T16:13:30.340Z",
     "attempts": 1
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 1
+  },
+  {
+   "id": "401880130",
+   "match": "Queens Park Rangers – Sheffield United",
+   "avspark": "2026-11-28T15:00Z",
+   "writtenAt": "2026-11-23T16:16:30.106Z",
+   "text": "Loftus Road har inte varit snällt mot QPR\n\nQueens Park Rangers vann derbyt mot Millwall och ligger på jakt efter sin första placering bland playofflagen på tolv år. Nu kommer Sheffield United till Loftus Road. Blades har just kört över Watford med fyra mål och har inte förlorat där på länge.\n\nJulien Stephan sa före Millwallmatchen att de kommande fem matcherna kan avgöra \"lite mer var vi står nu\". Han lade till att de inte avgör \"kvaliteten på säsongen\", enligt BBC via Yahoo Sports [1]. Där står också att tretton lag skiljs åt av bara åtta poäng och att QPR senast slutade på en playoffplats i Championship säsongen 2013–14. Efter förra veckans 1–0 borta mot Millwall [2] ligger laget sjua med 27 poäng. QPR skapar mer än nästan alla andra men får in för lite. Mot sina chanser har de gjort drygt ett mål för lite i år och släppt in nästan två för mycket. Det där löser man med en hink bollar och en lång eftermiddag framför mål.\n\nSheffield United kommer från ett 4–0 mot Watford där Ben Brereton Díaz satte två mål på de första åtta minuterna, det andra på straff, och där Jordan Ayew och Sydie Peck gjorde resten. Sheffield United Way skriver att Blades \"monterade ner Watford fullständigt\" [3]. Domaren delade ut tretton gula kort, så det var ingen lugn eftermiddag. Hos Blades är det tvärtom mot QPR, för de gör fler mål än chanserna säger. Sådant brukar jämna ut sig, men det vet inte bollen om.\n\nDet som skaver för hemmalaget är historiken. QPR har inte vunnit något av de fyra senaste mötena på Loftus Road: 1–3, 1–1, 1–2 och i februari 0–2. På Bramall Lane har det däremot gått bättre för dem. Bollen har aldrig läst en tabell, men en del lag verkar ha läst sina egna gamla resultat.\n\nTipset: 1X (hemmalaget, knappt)\n\nPrognosen ser nästan ingen skillnad mellan lagen, och 1–1 är det troligaste resultatet. Jag tror ändå att hemmalaget är något bättre än den säger. QPR skapar mer än de får betalt för, medan Blades mål mot Watford [1] kom ur en effektivitet som brukar avta. Säsongens mål ensamma pekar också mot QPR. Mot det står fyra raka hemmamöten utan seger för QPR och en tabell där tretton lag ligger inom åtta poäng [2], så oavgjort ligger nära till hands. Jag ringar in etta och kryss.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Loftus Road har inte varit snällt mot QPR",
+   "lead": "Queens Park Rangers vann derbyt mot Millwall och ligger på jakt efter sin första placering bland playofflagen på tolv år. Nu kommer Sheffield United till Loftus Road. Blades har just kört över Watford med fyra mål och har inte förlorat där på länge.",
+   "paragraphs": [
+    "Julien Stephan sa före Millwallmatchen att de kommande fem matcherna kan avgöra \"lite mer var vi står nu\". Han lade till att de inte avgör \"kvaliteten på säsongen\", enligt BBC via Yahoo Sports [1]. Där står också att tretton lag skiljs åt av bara åtta poäng och att QPR senast slutade på en playoffplats i Championship säsongen 2013–14. Efter förra veckans 1–0 borta mot Millwall [2] ligger laget sjua med 27 poäng. QPR skapar mer än nästan alla andra men får in för lite. Mot sina chanser har de gjort drygt ett mål för lite i år och släppt in nästan två för mycket. Det där löser man med en hink bollar och en lång eftermiddag framför mål.",
+    "Sheffield United kommer från ett 4–0 mot Watford där Ben Brereton Díaz satte två mål på de första åtta minuterna, det andra på straff, och där Jordan Ayew och Sydie Peck gjorde resten. Sheffield United Way skriver att Blades \"monterade ner Watford fullständigt\" [3]. Domaren delade ut tretton gula kort, så det var ingen lugn eftermiddag. Hos Blades är det tvärtom mot QPR, för de gör fler mål än chanserna säger. Sådant brukar jämna ut sig, men det vet inte bollen om.",
+    "Det som skaver för hemmalaget är historiken. QPR har inte vunnit något av de fyra senaste mötena på Loftus Road: 1–3, 1–1, 1–2 och i februari 0–2. På Bramall Lane har det däremot gått bättre för dem. Bollen har aldrig läst en tabell, men en del lag verkar ha läst sina egna gamla resultat."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Yahoo Sports (BBC Sport)",
+     "title": "Next five games are defining for QPR - Stephan",
+     "url": "https://sports.yahoo.com/articles/next-five-games-defining-qpr-134430222.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Yahoo Sports (BBC Sport)",
+     "title": "QPR boss Stephan reacts to win at Millwall",
+     "url": "https://sports.yahoo.com/articles/qpr-boss-stephan-reacts-win-184201063.html",
+     "publishedAt": null
+    },
+    {
+     "n": 3,
+     "source": "Sheffield United Way",
+     "title": "Sheffield United 4-0 Watford: Blades Sting Hornets at Bramall Lane",
+     "url": "https://sheffunitedway.co.uk/2026/11/22/sheffield-united-4-0-watford-blades-sting-hornets-at-bramall-lane/",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen ser nästan ingen skillnad mellan lagen, och 1–1 är det troligaste resultatet. Jag tror ändå att hemmalaget är något bättre än den säger. QPR skapar mer än de får betalt för, medan Blades mål mot Watford [1] kom ur en effektivitet som brukar avta. Säsongens mål ensamma pekar också mot QPR. Mot det står fyra raka hemmamöten utan seger för QPR och en tabell där tretton lag ligger inom åtta poäng [2], så oavgjort ligger nära till hands. Jag ringar in etta och kryss.",
+    "signs": [
+     0,
+     1
+    ],
+    "note": "hemmalaget, knappt",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sheffield United Way",
+      "title": "Sheffield United 4-0 Watford: Blades Sting Hornets at Bramall Lane",
+      "url": "https://sheffunitedway.co.uk/2026/11/22/sheffield-united-4-0-watford-blades-sting-hornets-at-bramall-lane/",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Yahoo Sports (BBC Sport)",
+      "title": "Next five games are defining for QPR - Stephan",
+      "url": "https://sports.yahoo.com/articles/next-five-games-defining-qpr-134430222.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-23T16:16:30.106Z",
+    "attempts": 1
+   },
+   "hasse": {
+    "stycken": [
+     "QPR skapar mer än nästan alla andra lag i serien men får inte in bollen. De har gjort drygt ett mål för lite mot sina chanser och släppt in nästan två för mycket. Så ser ett lag ut som jobbar hårt och sedan betalar för sitt eget slarv.",
+     "Sheffield United gjorde fyra mål mot Watford, men de gör fler mål än chanserna säger, och sådan effektivitet brukar avta. Samtidigt har QPR inte vunnit något av de fyra senaste mötena på Loftus Road. Lugn nu, det betyder inte att Sheffield United vinner. Det betyder att QPR inte kan utnyttja sina chanser när det gäller.",
+     "Här möts två lag som tar ut varandra. Så er det sagt, som vi sa i Köpenhamn: ett kryss och inget annat."
+    ],
+    "tecken": [
+     1
+    ],
+    "resultat": "1–1",
+    "tips": "2026-11-23T16:16:30.106Z",
+    "uppdrag": {
+     "fraser": [
+      "Nej nej nej",
+      "Lugn nu"
+     ],
+     "krydda": "Så er det sagt, som vi sa i Köpenhamn.",
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-23T16:16:50.320Z",
+    "attempts": 2
    },
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
