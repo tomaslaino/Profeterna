@@ -1,5 +1,5 @@
 {
- "uppdaterad": "2026-11-23T16:09:31.206Z",
+ "uppdaterad": "2026-11-23T16:11:06.310Z",
  "omgang": {
   "id": "2026-11-28-st4981",
   "matcher": [
@@ -3271,6 +3271,90 @@
    "model": "claude-opus-5-5",
    "version": "2026-11-04.1",
    "attempts": 1
+  },
+  {
+   "id": "401880136",
+   "match": "Birmingham City – Bolton Wanderers",
+   "avspark": "2026-11-28T15:00Z",
+   "writtenAt": "2026-11-23T16:10:36.598Z",
+   "text": "Birmingham behövde sex insläppta mål för att vakna\n\nBirmingham har ännu inte förlorat på St. Andrew's i år, men laget kommer från en förlust i Stoke. Bolton kommer med en lång skadelista och ett försvar som har läckt i varje förlust. Senast lagen möttes vann Bolton med 3–1.\n\nBirminghams säsong började med ett 1–6 mot Brentford i ligacupen den 25 augusti. Sedan dess har Chris Davies enligt Sports Mole lett en ”anmärkningsvärd vändning” [1]. Laget vann sex av sju ligamatcher, tog fyra raka hemmasegrar och låg före Stokematchen etta i Championship för första gången sedan säsongen 2008/09. Den matchen förlorade de med 0–1, och nu står de fyra i tabellen. Jay Stansfield, som kostade 20 miljoner pund, hade gjort tre mål på två matcher, bland dem ett sent segermål mot Swansea [1]. Hemma har de fyra segrar och fyra oavgjorda. Ett lag som efter ett 1–6 kommer tillbaka på det viset har tränat på något, och jag gissar att det är fasta situationer.\n\nSteven Schumacher reser söderut med ett halvt lag på behandlingsbänken. Före Portsmouthmatchen var Eoin Toal, Ethan Erhahon, John McAtee, Jayden Nelson och Ryan Hardie borta, och målvakten Gavin Bazunu var tveksam med en lårskada [2]. Enligt Sports Mole hade Bolton förlorat tre av fyra matcher och släppt in minst tre mål i varje förlust [2]. Mot Middlesbrough blev det 1–5 hemma. Mot Portsmouth räckte det till 1–1, med Ruben Rodrigues och Sam Dalby längst fram. Mellanåker talar jag helst inte om, men där lärde jag mig att ett försvar som släpper in en hög mål varje gång det förlorar inte har ett problem med taktiken. Det har ett problem med hur det står vid hörnorna, och det löser man med en hink bollar.\n\nTipset: 1 (spik)\n\nPrognosen sätter Birmingham till 1,61 mot 5,88 för Bolton, och det jag har läst drar åt samma håll. Hemmalaget har inte förlorat på St. Andrew's i år och har en målskytt i form i Stansfield [1]. Bolton saknar fem spelare, kanske också sin målvakt, och har släppt in minst tre mål i varje förlust på sistone [2]. Det som talar emot är att Birmingham har släppt in 6,6 mål färre än chanserna mot dem borde ge, och sådan tur brukar ta slut. Fyra oavgjorda hemma gör krysset värt en tanke, men jag ringar in bara ettan.",
+   "author": "Sixten Bråvall (påhittad)",
+   "title": "Birmingham behövde sex insläppta mål för att vakna",
+   "lead": "Birmingham har ännu inte förlorat på St. Andrew's i år, men laget kommer från en förlust i Stoke. Bolton kommer med en lång skadelista och ett försvar som har läckt i varje förlust. Senast lagen möttes vann Bolton med 3–1.",
+   "paragraphs": [
+    "Birminghams säsong började med ett 1–6 mot Brentford i ligacupen den 25 augusti. Sedan dess har Chris Davies enligt Sports Mole lett en ”anmärkningsvärd vändning” [1]. Laget vann sex av sju ligamatcher, tog fyra raka hemmasegrar och låg före Stokematchen etta i Championship för första gången sedan säsongen 2008/09. Den matchen förlorade de med 0–1, och nu står de fyra i tabellen. Jay Stansfield, som kostade 20 miljoner pund, hade gjort tre mål på två matcher, bland dem ett sent segermål mot Swansea [1]. Hemma har de fyra segrar och fyra oavgjorda. Ett lag som efter ett 1–6 kommer tillbaka på det viset har tränat på något, och jag gissar att det är fasta situationer.",
+    "Steven Schumacher reser söderut med ett halvt lag på behandlingsbänken. Före Portsmouthmatchen var Eoin Toal, Ethan Erhahon, John McAtee, Jayden Nelson och Ryan Hardie borta, och målvakten Gavin Bazunu var tveksam med en lårskada [2]. Enligt Sports Mole hade Bolton förlorat tre av fyra matcher och släppt in minst tre mål i varje förlust [2]. Mot Middlesbrough blev det 1–5 hemma. Mot Portsmouth räckte det till 1–1, med Ruben Rodrigues och Sam Dalby längst fram. Mellanåker talar jag helst inte om, men där lärde jag mig att ett försvar som släpper in en hög mål varje gång det förlorar inte har ett problem med taktiken. Det har ett problem med hur det står vid hörnorna, och det löser man med en hink bollar."
+   ],
+   "sources": [
+    {
+     "n": 1,
+     "source": "Sports Mole",
+     "title": "Championship Gameweek 16",
+     "url": "https://www.sportsmole.co.uk/football/stoke-city/preview/stoke-vs-birmingham-prediction-team-news-lineups_609425.html",
+     "publishedAt": null
+    },
+    {
+     "n": 2,
+     "source": "Sports Mole",
+     "title": "Championship Gameweek 16",
+     "url": "https://www.sportsmole.co.uk/football/bolton-wanderers/preview/bolton-vs-portsmouth-prediction-team-news-lineups_609415.html",
+     "publishedAt": null
+    }
+   ],
+   "tip": {
+    "text": "Prognosen sätter Birmingham till 1,61 mot 5,88 för Bolton, och det jag har läst drar åt samma håll. Hemmalaget har inte förlorat på St. Andrew's i år och har en målskytt i form i Stansfield [1]. Bolton saknar fem spelare, kanske också sin målvakt, och har släppt in minst tre mål i varje förlust på sistone [2]. Det som talar emot är att Birmingham har släppt in 6,6 mål färre än chanserna mot dem borde ge, och sådan tur brukar ta slut. Fyra oavgjorda hemma gör krysset värt en tanke, men jag ringar in bara ettan.",
+    "signs": [
+     0
+    ],
+    "note": "spik",
+    "sources": [
+     {
+      "n": 1,
+      "source": "Sports Mole",
+      "title": "Championship Gameweek 16",
+      "url": "https://www.sportsmole.co.uk/football/stoke-city/preview/stoke-vs-birmingham-prediction-team-news-lineups_609425.html",
+      "publishedAt": null
+     },
+     {
+      "n": 2,
+      "source": "Sports Mole",
+      "title": "Championship Gameweek 16",
+      "url": "https://www.sportsmole.co.uk/football/bolton-wanderers/preview/bolton-vs-portsmouth-prediction-team-news-lineups_609415.html",
+      "publishedAt": null
+     }
+    ],
+    "model": "claude-opus-5-5",
+    "version": "2026-11-04.1",
+    "writtenAt": "2026-11-23T16:10:36.598Z",
+    "attempts": 2
+   },
+   "hasse": {
+    "stycken": [
+     "Birmingham började säsongen med att släppa in sex mål mot Brentford i ligacupen. Sedan dess har de vunnit sex av sju ligamatcher och inte förlorat en enda hemmamatch. Ett lag som reser sig så efter en sådan förnedring vet vad det håller på med, och förlusten i Stoke ändrar inte på det. Stansfield gör dessutom mål när det behövs.",
+     "Bolton kommer med fem man skadade och kanske utan sin målvakt. De har släppt in minst tre mål i varje förlust på sistone, och ett försvar som saknar folk blir sällan bättre på bortaplan. Birmingham har haft tur bakåt ett tag, så Bolton lär få in ett mål. Det räcker inte på långa vägar. Jag ringar in ettan och bara ettan."
+    ],
+    "tecken": [
+     0
+    ],
+    "resultat": "3–1",
+    "tips": "2026-11-23T16:10:36.598Z",
+    "uppdrag": {
+     "fraser": [
+      "Glöm det",
+      "Nej nej nej"
+     ],
+     "krydda": null,
+     "bielsa": [],
+     "bubblare": null
+    },
+    "model": "claude-opus-5-5",
+    "version": "2026-11-16.1",
+    "writtenAt": "2026-11-23T16:11:00.524Z",
+    "attempts": 2
+   },
+   "model": "claude-opus-5-5",
+   "version": "2026-11-04.1",
+   "attempts": 2
   },
   {
    "id": "401879227",
