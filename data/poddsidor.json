@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-23T17:06:46.254Z",
+ "uppdaterad": "2026-11-23T17:24:52.563Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1043,10 +1043,10 @@
     "Bolton Wanderers"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:00:43.056Z",
-   "rubrik": "Fler anfallare, färre idéer i Birmingham",
+   "skriven": "2026-11-23T17:18:26.963Z",
+   "rubrik": "Bolton trivs bäst när någon annan har bollen",
    "ingress": null,
-   "summering": "I Birmingham handlar snacket om Davies alla man framåt mot Stoke och om en publik som tappar fattningen efter en enda förlust.",
+   "summering": "Birmingham letar balans efter slutminuternas kaos mot Stoke. Bolton vill få betalt för sitt övertag och undrar vad som hänt med Ruben Rodrigues.",
    "delar": [
     {
      "lag": "Birmingham City",
@@ -1138,9 +1138,9 @@
       }
      ],
      "text": [
-      "På forumet Small Heath Alliance menar man att Davies släppte all plan i slutet mot Stoke och kastade in varenda anfallare med fria roller. Det gav dåliga inlägg från dåliga lägen och spelare som stod i vägen för varandra.",
-      "En supporter tror att laget ofta är farligare med färre anfallare, så länge balansen finns och det finns en bestämd plan för att föra fram bollen.",
-      "En annan oroar sig mer för läktaren, som reagerar ”hysteriskt” på en enda förlust mot ett lag i form. Det rimmar illa med drömmen om att pengarna ska satsas på U21-laget och dataanalysen."
+      "På forumet Small Heath Alliance tycker man att Davies i slutet mot Stoke släppte all plan och kastade in varenda anfallsspelare med fri roll. Det gav dåliga inlägg från dåliga lägen och spelare som stod i vägen för varandra.",
+      "En supporter drar den motsatta slutsatsen: laget blir ofta farligare med färre anfallare på planen, så länge balansen finns och det finns en bestämd plan för att föra fram bollen.",
+      "Samtidigt tvivlar man på läktarens tålamod. Redan en förlust mot ett lag i form räcker för att väcka hysteri."
      ],
      "namn": [
       "Davies"
@@ -1148,9 +1148,137 @@
     },
     {
      "lag": "Bolton Wanderers",
-     "kallor": [],
-     "grupper": [],
-     "text": []
+     "kallor": [
+      {
+       "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
+       "avsnitt": "Draw-ll That Bad? - The Fanzone Pod Ep.212",
+       "datum": "2026-11-22",
+       "adress": "https://podcasters.spotify.com/pod/show/ben-timberlake2/episodes/Draw-ll-That-Bad----The-Fanzone-Pod-Ep-212-e3srag2",
+       "typ": "podd"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Supportrarna ser ett växande problem: Bolton dominerar matcher utan att avgöra dem. Före lördagen hade laget förlorat sex av sju matcher där de haft mest boll. Laget anses vara som bäst utan boll och på kontringar.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna vill att yttrarna spelar på sin naturliga kant och slår inlägg till Sam Dalby i stället för att dra sig inåt. Samuel Iling-Junior på vänsterkanten gjorde sin bästa match, och Thierry Gales inåtskär har inte gett tillräckligt.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Analytikern Statman menar att uppspelen bakifrån mot ett högt pressande lag gav det tidiga baklänges målet. Xavier Simons stod kvar vid mittlinjen i stället för att erbjuda sig. Laget släpper in för många sådana mål och måste spela enklare i Championship.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Statman tycker att Max Conway och Iling-Junior står på exakt samma yta och att en av dem slösas bort. Värdarna håller inte med: de ser ett samspel där Iling-Juniors defensiva arbete täcker för Conways brister bakåt.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Ruben Rodrigues har inte varit samma spelare som förra säsongen, och en av värdarna misstänker att han bär på en skada sedan försäsongen. Tian-rollen kallas förbannad, och alternativet John McAtee övertygar ingen.",
+         "s": "h",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Tränaren var märkbart försiktigare defensivt än tidigare i höstas, och supportrarna tror att han lär sig under resans gång. Ett tidigare Bolton i Championship hade enligt dem förlorat den matchen.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna går ofta hem besvikna efter matcher där laget spelat bra men tappat poäng. Ser de till helheten är läget ändå bra, eftersom ingen av dem trodde på bättre än en 17:e eller 18:e plats före säsongen.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
+        {
+         "t": "Bortamatchen mot Birmingham ses som mycket svårare än Portsmouth. Samtidigt påpekar supportrarna att laget har gått bra på bortaplan, särskilt mot starka lag, så ingen vågar säga vad som händer.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "Bolton är som bäst utan boll, och i The Fanzone Pod ser man ett växande problem i att laget dominerar utan att avgöra. Före lördagen hade det förlorat sex av sju matcher där det haft mest boll.",
+      "Resan till Birmingham anses mycket svårare än Portsmouth, men bortaformen mot starka lag gör att ingen vågar säga vad som händer.",
+      "Oron gäller Ruben Rodrigues, som inte är samma spelare som förra säsongen. En av värdarna misstänker att han bär på en skada sedan försäsongen och tycker att han ”sprungit i sirap”. Alternativet John McAtee övertygar ingen."
+     ],
+     "citat": {
+      "sagt": "Det var lite som säsongen i miniatyr: jag gick därifrån besviken på resultatet.",
+      "vem": "Ben",
+      "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
+      "typ": "podd",
+      "datum": "2026-11-22"
+     },
+     "namn": [
+      "Ruben Rodrigues",
+      "John McAtee"
+     ],
+     "paSpel": "Ett nytt prov på bortaformen mot riktigt bra lag."
     }
    ]
   },
@@ -1163,10 +1291,10 @@
     "Watford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-23T16:01:17.331Z",
-   "rubrik": "För vissa Watfordsupportrar är förlust bättre än seger",
+   "skriven": "2026-11-23T17:24:52.563Z",
+   "rubrik": "Ny tränare i Watford, där vissa hoppas på förlust",
    "ingress": null,
-   "summering": "Derby gräver ner sig bakom bollen medan pressen på Eustace växer. I Watford har en ny tränare precis kommit, men delar av läktaren bryr sig mer om att bli av med Pozzo.",
+   "summering": "Derby har krupit ihop bakom bollen under en tränare som bara ägarna tror på. Watford byter tränare igen inför supportrar som har slutat vänta sig något på bortaplan.",
    "delar": [
     {
      "lag": "Derby County",
@@ -1282,9 +1410,9 @@
       }
      ],
      "text": [
-      "Under John Eustace har Derby krupit tillbaka in i skalet. Lokaltidningens reporter beskriver tio man bakom bollen, mittbackar vid straffområdeskanten och ett anfallsspel som helt hänger på kontringar. Hamnar laget i underläge finns ingen udd kvar framåt.",
-      "På The Eleven Points växer trycket på tränaren. Supportrarna vill ha en förändring och ägarna står kvar bakom honom, medan oron är att ännu en nedflyttning ska kosta flera års återuppbyggnad.",
-      "I omklädningsrummet låtsas ingen att läget är något annat."
+      "Supportrarna vill ha en förändring, men ägarna fortsätter att stötta John Eustace. Fansajten The Eleven Points beskriver rädslan bakom kraven: en ny nedflyttning kan betyda flera års återuppbyggnad.",
+      "Lokaltidningens reporter ser ett lag som har krupit ihop. Mot Southampton låg tio man bakom bollen, mittbackarna stod vid straffområdets kant och allt hängde på kontringarna.",
+      "När Derby väl hamnar i underläge finns ingen udd kvar framåt."
      ],
      "citat": {
       "sagt": "Vi är i en kamp för att hänga kvar, och det är verkligheten.",
@@ -1296,11 +1424,18 @@
      "namn": [
       "John Eustace"
      ],
-     "paSpel": "Eustaces jobb, med läktaren emot honom och ägarna ännu bakom."
+     "paSpel": "En bottenstrid där läktaren redan ifrågasätter tränarens framtid."
     },
     {
      "lag": "Watford",
      "kallor": [
+      {
+       "podd": "From The Rookery End - A show about Watford FC",
+       "avsnitt": "Blunt at the Blades - Should Watford Take the Handbrake Off?",
+       "datum": "2026-11-22",
+       "adress": "https://shows.acast.com/watfordpodcast/episodes/blunt-at-the-blades-should-watford-take-the-handbrake-off",
+       "typ": "podd"
+      },
       {
        "podd": "WFC Forums",
        "avsnitt": "Watford Fc V Blackburn Rovers - 25/11/2026 · Alessio Dionisi Sacked · Championship - 2026/2027",
@@ -1321,15 +1456,26 @@
        "amne": "elva",
        "punkter": [
         {
-         "t": "Supportrarna är säkra på att Edo Kayembe spelar oavsett tränare. De menar att det är Bayat och inte tränaren som tar ut laget, och att en spelare under godkänd nivå spelar 90 minuter varje vecka.",
-         "s": "o",
+         "t": "Amin Nabizada var en av få ljuspunkter och den enda som slapp de värsta buropen efter matchen. Ändå har han knappt spelat sedan Alessio Dionisi själv lyfte fram honom som den ende anfallaren som höll måttet.",
+         "s": "h",
          "podd": [
-          "WFC Forums"
+          "From The Rookery End - A show about Watford FC"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Det väckte förvåning att Hector Kyprianou inte kom tillbaka in efter sin avstängning. Supportrarna menar att Dionisi belönade elvan från Middlesbrough-matchen trots att uppgiften var en helt annan, och att Martín Payero och Edo Kayembe aldrig var med.",
+         "s": "o",
+         "podd": [
+          "From The Rookery End - A show about Watford FC"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -1337,21 +1483,54 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Supportrarna tror inte att ett nytt tränarbyte ändrar något. De menar att truppen är dåligt ihopköpt och ständigt skadad, även om många också har tröttnat på Dionisis taktik, särskilt på bortaplan.",
+         "t": "Värdarna är oense om vägen framåt. Sam vill lossa handbromsen och spela Rocco Vata och Amin Nabizada eftersom laget släpper in mål borta oavsett elva. Andra menar att yttrarna inte får plats och att det saknas en spelklar anfallare.",
          "s": "o",
          "podd": [
-          "NOT606"
+          "From The Rookery End - A show about Watford FC"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Laget faller ihop vid första motgång. Mot Swansea, Burnley, Cardiff och nu Sheffield United låg det tidigt under, och mot Norwich rasade en 2–0-ledning.",
+         "s": "o",
+         "podd": [
+          "From The Rookery End - A show about Watford FC"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna ser ingen grundstruktur. Formationen ändras varje vecka, och även när den är densamma ändras uppdraget: ena matchen ska ytterbackarna stanna kvar i en fembackslinje, nästa ska de gå framåt.",
+         "s": "h",
+         "podd": [
+          "From The Rookery End - A show about Watford FC"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
         }
        ]
       },
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Supportrarna har slutat vänta sig något på bortaplan. Laget har inte vunnit borta sedan mitten av februari, spelarna verkar gå på autopilot och på bortasektionen var det inte ens någon ilska efter 0–4, bara uppgivenhet.",
+         "s": "h",
+         "podd": [
+          "From The Rookery End - A show about Watford FC"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Många har slutat bry sig. Tränarbyten betyder ingenting längre för dem, och de menar att klubben har förlorat sin själ och bara är Watford till namnet.",
          "s": "o",
@@ -1362,72 +1541,34 @@
           "2026-11-23"
          ],
          "typ": "forum"
-        },
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
         {
-         "t": "Ägaren Gino Pozzo får skulden för hela nedgången. Supportrarna kallar honom ”the Prisoner” och menar att han upprepar samma misstag och är för beroende av en spelaragent.",
-         "s": "o",
+         "t": "Förra säsongens långa svit utan bortaseger tog slut just på Pride Park, där Watford möter Derby på lördag.",
+         "s": "b",
          "podd": [
-          "WFC Forums"
+          "From The Rookery End - A show about Watford FC"
          ],
          "datum": [
           "2026-11-22"
          ],
-         "typ": "forum"
-        },
-        {
-         "t": "En del supportrar vill helst se laget förlora, eftersom förluster sätter press på ägarna. De vill också att klacken 1881 slutar applådera laget och i stället sjunger mot Pozzo.",
-         "s": "o",
-         "podd": [
-          "WFC Forums"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna oroar sig för att den nye tränaren har hamnat i bråk med ägarna i sina tidigare klubbar. De ser det som ett dåligt tecken i en klubb där ägaren styr det mesta.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Enligt talkSPORT-reportern Alex Crook blir rumänen Edward Iordănescu ny tränare efter Alessio Dionisi. Han väntas leda laget redan i onsdagens hemmamatch mot Blackburn.",
-         "s": "b",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Någon tar Iordănescu i försvar. Han vann en cup med Legia Warszawa och förde Rumänien till EM 2024. En annan påpekar dock att titeln med Legia var supercupen.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På WFC Forums finns de som hellre ser laget förlora, eftersom varje förlust ökar pressen på ägaren Gino Pozzo. De vill att klacken 1881 slutar applådera och i stället sjunger mot honom. Andra har redan gett upp och menar att klubben har tappat sin själ och är Watford ”bara till namnet”.",
-      "Inte heller tränarbytet väcker något hopp. Enligt talkSPORT tar rumänen Edward Iordănescu över efter Alessio Dionisi, och på NOT606 noterar man att han har hamnat i bråk med ägarna i tidigare klubbar, vilket knappast lovar gott i en klubb där ägaren styr det mesta."
+      "Efter senaste 0–4 fanns ingen ilska kvar på Watfords bortasektion, bara uppgivenhet, berättar podden From The Rookery End. Förra säsongens långa svit utan bortaseger bröts för övrigt just på Pride Park.",
+      "Enligt talkSPORT tar rumänen Edward Iordănescu över efter Alessio Dionisi och väntas leda laget redan mot Blackburn på onsdag. På forumet NOT606 tror få att det hjälper en dåligt ihopköpt trupp, och man noterar oroat att han har bråkat med ägarna i sina tidigare klubbar.",
+      "På WFC Forums går en del ännu längre och vill se laget förlora, eftersom förluster sätter press på ägaren Gino Pozzo."
      ],
      "citat": {
-      "sagt": "Ännu en 0–4-förlust inför de glatt klappande sälarna i 1881 skulle vara roligare än en seger.",
-      "vem": "3000",
+      "sagt": "Klubben är död. Själen har slitits ur den helt. Vi är Watford FC bara till namnet vid det här laget.",
+      "vem": "NathWFC",
       "podd": "WFC Forums",
       "typ": "forum",
       "datum": "2026-11-23"
@@ -1436,7 +1577,7 @@
       "Edward Iordănescu",
       "Alessio Dionisi"
      ],
-     "paSpel": "Iordănescus andra match, och för en del en chans att pressa Pozzo."
+     "paSpel": "Iordănescus första bortamatch, där vissa supportrar hellre ser förlust för att pressa ägaren."
     }
    ]
   },
