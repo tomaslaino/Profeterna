@@ -15,13 +15,13 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-24T02:05:15.548Z",
+ "skriven": "2026-11-24T02:20:53.619Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-24T02:04:44.487Z",
+ "underlag": "2026-11-24T02:11:00.949Z",
  "rubrik": {
   "id": "401879226",
-  "kick": "MANCHESTER UNITED",
+  "kick": "UNITED",
   "rad": [
    [
     "DET GÖR",
@@ -36,8 +36,8 @@
     1
    ]
   ],
-  "under": "United-podden efter 0–4 på Anfield: Pochettinos första match var ”samma gamla skit”",
-  "plus": "WATFORD: ”KLUBBEN ÄR DÖD”",
-  "plusId": "401880134"
+  "under": "Efter 0–4 på Anfield: Pochettinos första match var ”samma gamla skit”, säger United We Stand",
+  "plus": "BURNLEY: 25 POÄNG TAPPADE",
+  "plusId": "401880132"
  }
 }
