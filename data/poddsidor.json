@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-24T02:11:00.949Z",
+ "uppdaterad": "2026-11-24T02:29:41.042Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,14 +103,21 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-24T02:04:16.104Z",
-   "rubrik": "Ipswich skulle nöja sig med 0–0",
+   "skriven": "2026-11-24T02:29:41.042Z",
+   "rubrik": "I Ipswich vore en mållös match en seger",
    "ingress": null,
-   "summering": "Ipswich har tappat sin press och kanske snart tålamodet med tränaren, och läktaren kan vända sig. Villa har bollen men saknar idéer, och supportrarna litar på att Europaspelet brukar väcka laget.",
+   "summering": "Ipswich går in med en tränare som forumet ger två matcher och en backlinje som aldrig håller tätt. Villa trivs bäst när motståndaren öppnar sig, och det gör de oftast borta.",
    "delar": [
     {
      "lag": "Ipswich Town",
      "kallor": [
+      {
+       "podd": "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star",
+       "avsnitt": "669: Kings of Anglia: Should we be worried after Town’s defeat at Spurs?",
+       "datum": "2026-11-23",
+       "adress": "https://audioboom.com/posts/8980538",
+       "typ": "podd"
+      },
       {
        "podd": "Blue Monday: An Ipswich Town Podcast",
        "avsnitt": "🚩TOTTENHAM 2-0 IPSWICH TOWN MATCH REACTION | PREMIER LEAGUE | Flagship Show",
@@ -172,22 +179,6 @@
        ]
       },
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Ouattara gjorde återigen misstag i försvaret. Joe funderar på att gå tillbaka till säsongsinledningens lag, med O'Shea som högerback och Ouattara utanför en tid, eftersom laget var stabilare då.",
-         "s": "o",
-         "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
         {
@@ -213,24 +204,35 @@
          "typ": "forum"
         },
         {
-         "t": "De senaste fem–sex insläppta målen har alla gått att undvika, och laget är inte bra nog för att fortsätta släppa in sådana mål.",
+         "t": "Fina siffror vilseleder enligt Alex Jones. Ipswich vann xG-kampen mot Liverpool bara för att man låg under och fick jaga. Motståndarna får tidiga mål serverade och behöver sedan inte trycka på.",
          "s": "o",
          "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
+          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
          "typ": "podd"
         },
         {
-         "t": "Alla väntade sig Greaves i en femmannabackslinje, men O'Neill satte in Furlong för att balansera de offensiva ytterbackarna Ouattara och Davis. Furlong hamnade mittemellan och var varken högerback eller mittback.",
+         "t": "Femmannaförsvaret med Darnell Furlong som både mittback och högerback fungerade inte. Alex Jones vill hellre se tre riktiga mittbackar och tror att klubben missade att värva en till i somras.",
          "s": "o",
          "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
+          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Nästan allt spel gick via högerkanten, där Abdoul Ouattara och Furlong inte hittade varandra alls och där båda målen kom. De få gånger bollen gick till vänster blev det farligt.",
+         "s": "h",
+         "podd": [
+          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
+         ],
+         "datum": [
+          "2026-11-23"
          ],
          "typ": "podd"
         }
@@ -251,13 +253,13 @@
          "typ": "forum"
         },
         {
-         "t": "Mot Spurs tävlade laget aldrig, inte ens efter underläge som mot Liverpool, och det var säsongens första sådana insats. Supportrarna hoppas att den blir en engångsföreteelse. Dave tycker ändå att tecknen har funnits ett tag.",
+         "t": "Gary O'Neill hittar alltid något positivt efter förluster. Alex Jones menar att det skaver när laget bara har en seger på åtta matcher: Spurs behövde aldrig anstränga sig, så talet om att Ipswich höll dem på tårna håller inte.",
          "s": "o",
          "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
+          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
          "typ": "podd"
         }
@@ -265,26 +267,34 @@
       }
      ],
      "text": [
-      "I podden Blue Monday skulle Dave gärna ta 0–0 mot Villa, bara för att laget äntligen skulle hålla nollan efter 30 ligamatcher utan.",
-      "Målen som släpps in har gått att undvika, och på forumet NOT606 undrar man vart pressen tog vägen, den som var ”lysande” i början av säsongen.",
-      "Om Gary O'Neil är supportrarna splittrade. På TWTD vill flera se honom sparkad om varken Villa eller Coventry ger poäng, medan podden tror att laget nästan säkert åker ur om han får gå. Somliga oroar sig mest för läktaren, som verkar beredd att vända sig mot spelarna."
+      "På forumet TWTD har tålamodet med Gary O'Neil tagit slut, och flera vill se honom sparkad om det inte blir poäng mot Villa eller Coventry. I podden Blue Monday vänder man på det: får O'Neil gå åker laget nästan säkert ur.",
+      "Där längtar man i stället efter något så blygsamt som en nolla. Laget har gått 30 ligamatcher i rad utan att hålla tätt, och Dave skulle gärna ta en mållös match på lördag.",
+      "På TWTD oroar sig andra för läktaren, där publiken enligt dem ”bara vill explodera” just när spelarna behöver stöd."
      ],
      "citat": {
-      "sagt": "Nu går vi åt andra hållet. Man har ingen frihet i de här matcherna och känner att man börjar hamna i underläge.",
-      "vem": null,
-      "podd": "Blue Monday: An Ipswich Town Podcast",
-      "typ": "podd",
+      "sagt": "Och vad har hänt med vår press? Den var lysande i början av säsongen, men nu verkar den bara ha försvunnit.",
+      "vem": "itfcptc",
+      "podd": "NOT606",
+      "typ": "forum",
       "datum": "2026-11-22"
      },
      "namn": [
-      "Dave",
-      "Gary O'Neil"
+      "Gary O'Neil",
+      "O'Neil",
+      "Dave"
      ],
-     "paSpel": "Kanske tränarens jobb, och chansen att äntligen hålla nollan."
+     "paSpel": "Kanske tränarens jobb, och chansen att äntligen hålla en nolla."
     },
     {
      "lag": "Aston Villa",
      "kallor": [
+      {
+       "podd": "My Old Man Said — An Aston Villa Podcast",
+       "avsnitt": "Aston Villa 0-0 Sunderland: Ponderous and Devoid of Ideas - the Midfield Problem Emery Hasn't Solved",
+       "datum": "2026-11-22",
+       "adress": "https://shows.acast.com/myoldmansaid/episodes/aston-villa-0-0-sunderland-ponderous-and-devoid-of-ideas-the",
+       "typ": "podd"
+      },
       {
        "podd": "The Villa Filler Podcast",
        "avsnitt": "BORING SCORELESS DRAW - Aston Villa 0-0 Sunderland REACTION - The Villa Filler Podcast",
@@ -326,6 +336,28 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Supportrarna ser de två defensiva mittfältarna som lagets stora svaghet just nu. Enligt dem är det de två sexorna som avgör om laget blir riktigt starkt eller skört, och just nu är det skört.",
+         "s": "o",
+         "podd": [
+          "My Old Man Said — An Aston Villa Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Enligt supportrarna är laget just nu byggt för att spela på bortaplan och kontra. Målen mot Manchester City, Fenerbahce och Tottenham kom när motståndarna var i omställning. Mot lag som ligger lågt saknas verktygen för att dominera.",
+         "s": "o",
+         "podd": [
+          "My Old Man Said — An Aston Villa Podcast"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Villa har inte vunnit någon av sina tio senaste ligamatcher där det stått lika i halvtid; senast var mot Brighton i februari. Värdarna menar att bilden av ett Villa som tar över i andra halvlek inte längre stämmer.",
          "s": "h",
          "podd": [
@@ -359,35 +391,13 @@
          "typ": "forum"
         },
         {
-         "t": "McGinn började på bänken med tanke på tisdagen, och laget såg platt ut tills han kom in. Värdarna menar att ingen annan visade samma vilja och undrar varför varken Goretzka eller Kamara tar den rollen.",
+         "t": "Leon Goretzka kan inte ersätta Tielemans som den som styr tempot och slår passningarna genom linjerna. Han spelade bakåt och i sidled, och han och Kamara är för lika. Supportrarna tycker att han passar bäst som inhoppare för att hålla undan en ledning.",
          "s": "o",
          "podd": [
-          "The Villa Filler Podcast"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Villa saknar Matty Cash, som värdarna kallar lagets jämnaste spelare de senaste 18–20 månaderna. Wan-Bissaka överlappar inte, mittfältet blev smalt och bara Maatsen gav bredd; inte ens när Madjo kom in slogs några inlägg.",
-         "s": "o",
-         "podd": [
-          "The Villa Filler Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Villa saknar en linjebrytare efter att Tielemans försvann, menar värdarna. Kamara försöker slå Tielemans-passningar men har inte verktygen, och de saknar också Onanas närvaro i straffområdet.",
-         "s": "o",
-         "podd": [
-          "The Villa Filler Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
+          "2026-11-22"
          ],
          "typ": "podd"
         }
@@ -406,20 +416,15 @@
           "2026-11-21"
          ],
          "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
+        },
         {
-         "t": "Värdarna har sett ett mönster: Villa tappar i ligan just före Europamatcherna men brukar vara bra när de kommer tillbaka till ligan efteråt. Ipswich borta spelas på lördagen efter bortamatchen mot Galatasaray på tisdag.",
-         "s": "h",
+         "t": "Phil Shaw menar att lag som parkerar bussen är Emerys svaghet, och det har de sett ända sedan han kom. Värdarna var också besvikna på att han inte ändrade något i paus mot Sunderland, trots att spelet var helt förutsägbart.",
+         "s": "o",
          "podd": [
-          "The Villa Filler Podcast"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-22"
          ],
          "typ": "podd"
         }
@@ -427,21 +432,22 @@
       }
      ],
      "text": [
-      "Villa som tar över efter paus finns inte längre: i podden The Villa Filler noterar man att laget inte har vunnit någon av de tio senaste ligamatcherna där det stått lika i halvtid.",
-      "Där börjar man misstänka att det helt enkelt är ”sådant här Villa är i år”, och att Unai Emery för första gången inte vet vilket hans bästa lag är. På Vital Villa ser supportrarna ett lag som äger bollen men väntar på att motståndet ska ”dela sig som Röda havet”.",
-      "Podden har ändå sett ett mönster: svackorna kommer före Europamatcherna, inte efter, och lördagen följer på Galatasaray borta."
+      "I podden My Old Man Said säger man rakt ut att laget är ”byggt för att spela på bortaplan och kontra” och saknar verktygen mot lag som ligger lågt.",
+      "The Villa Filler har dessutom sett att Villa brukar komma tillbaka starkt i ligan efter Europaspel, och Ipswich väntar lördagen efter Galatasaray borta. Där tror man också att Unai Emery för första gången inte vet vilket hans bästa lag är.",
+      "Det alla är överens om är John McGinn, som ensam drev bollen rakt på Sunderlands försvar efter inhoppet medan resten aldrig hängde med."
      ],
      "citat": {
-      "sagt": "Ärligt talat visade ingen tillstymmelse till samma vilja som John McGinn förrän han kom in på planen.",
+      "sagt": "Det är fortfarande de två sexorna. Det är där allt vilar. Det är det som gör laget riktigt starkt eller skört.",
       "vem": null,
-      "podd": "The Villa Filler Podcast",
+      "podd": "My Old Man Said — An Aston Villa Podcast",
       "typ": "podd",
-      "datum": "2026-11-21"
+      "datum": "2026-11-22"
      },
      "namn": [
-      "Unai Emery"
+      "Unai Emery",
+      "John McGinn"
      ],
-     "paSpel": "Ett test av poddens teori att laget studsar tillbaka efter Europaspel."
+     "paSpel": "Ett test av mönstret att laget vaknar i ligan efter Europaspel."
     }
    ]
   },
