@@ -15,41 +15,41 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T19:19:28.032Z",
+ "skriven": "2026-11-24T02:05:33.939Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-23T19:15:30.581Z",
+ "underlag": "2026-11-24T02:04:44.487Z",
  "rubrik": "Tre tränare sitter löst och två möter sina gamla klubbar",
  "notiser": [
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Michael Duff",
-   "text": "kommer tillbaka till Adams Park med Bradford City. Wycombes supportrar tycker att han har tappat fart sedan han lämnade klubben."
+   "text": "möter Wycombe Wanderers, klubben han lämnade för Bradford City. Wycombes supportrar tycker att han har tappat fart sedan han gick."
   },
   {
    "slag": "aterseende",
    "lag": "Stoke City",
    "namn": "Ben Johnson",
-   "text": "möter West Ham, där han kommer från ungdomsakademin, och väntas vara extra laddad mot sin gamla klubb. Värdarna vill därför att han vilar mot Millwall."
+   "text": "kommer från West Hams ungdomsakademi och möter sin gamla klubb i omgången. Han väntas vara extra laddad, och Stokepoddens värdar vill att han vilar mot Millwall dessförinnan."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "har allt fler supportrar emot sig, och flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng. De tror inte att han kan hålla laget kvar."
-  },
-  {
-   "slag": "sitter_lost",
-   "lag": "Bristol City",
-   "namn": "Michael Skubala",
-   "text": "får sin framtid avgjord i tisdagens hemmamatch mot Wrexham, menar supportrarna, som i stort sett har gett upp om honom. Värdarna fruktar att även en seger bara skjuter upp beslutet."
+   "text": "börjar tappa supportrarnas tålamod. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "har fortfarande ägarnas stöd, men trycket växer och supportrarna vill ha en förändring. De fruktar att en ny nedflyttning skulle innebära flera års återuppbyggnad."
+   "text": "känner ett växande tryck. Supportrarna vill ha en förändring, men ägarna fortsätter att backa honom."
+  },
+  {
+   "slag": "sitter_lost",
+   "lag": "Bristol City",
+   "namn": "Michael Skubala",
+   "text": "spelar enligt supportrarna om jobbet i tisdagens hemmamatch mot Wrexham. De har i stort sett gett upp om honom och menar att en förlust avgör hans öde."
   }
  ]
 }
