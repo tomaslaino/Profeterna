@@ -15,10 +15,10 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-25T02:18:09.834Z",
+ "skriven": "2026-11-25T02:33:48.470Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-25T02:11:56.463Z",
+ "underlag": "2026-11-25T02:31:10.084Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
@@ -28,7 +28,7 @@
     0
    ],
    [
-    "INTE ENS ONT",
+    "INTE ONT",
     1
    ],
    [
@@ -36,7 +36,7 @@
     0
    ]
   ],
-  "under": "”Det värsta av allt är att det inte gör ont längre, för vi är vana vid det.” – United We Stand",
+  "under": "Det värsta, säger en supporter i United We Stand, är att förlusterna inte gör ont längre.",
   "plus": "BURNLEY RÄDDA FÖR ATT VINNA",
   "plusId": "401880132"
  }
