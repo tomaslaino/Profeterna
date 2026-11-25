@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-25T02:11:56.463Z",
+ "uppdaterad": "2026-11-25T02:31:10.084Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,14 +103,21 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-25T02:05:12.228Z",
-   "rubrik": "Ipswich jagar en nolla, tränaren sitt jobb",
+   "skriven": "2026-11-25T02:27:29.020Z",
+   "rubrik": "En mållös match vore fest på Portman Road",
    "ingress": null,
-   "summering": "Ipswich går in med en tränare i gungning och en läktare som kan tystna vid första baklängesmålet. Villa letar fortfarande sin bästa elva och trivs bäst när motståndaren anfaller.",
+   "summering": "Ipswichs tränare står på spel inför en läktare som kan vända sig mot laget. Villa saknar passningar genom linjerna på mittfältet och har mest John McGinns vilja att luta sig mot.",
    "delar": [
     {
      "lag": "Ipswich Town",
      "kallor": [
+      {
+       "podd": "Blue Monday: An Ipswich Town Podcast",
+       "avsnitt": "🔵 THE FINAL WORD ON SPURS AND MATCH DAY 11 | Midweek Blues",
+       "datum": "2026-11-24",
+       "adress": "https://shows.acast.com/bluemondaypodcast/episodes/the-final-word-on-spurs-and-match-day-11-midweek-blues",
+       "typ": "podd"
+      },
       {
        "podd": "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star",
        "avsnitt": "669: Kings of Anglia: Should we be worried after Town’s defeat at Spurs?",
@@ -180,6 +187,28 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "När Ipswich backade hem och försökte kontra mot Tottenham fungerade det inte alls. Henry menar att laget måste gå på motståndaren och vinna matcher genom att anfalla, även om det kostar baklängesmål.",
+         "s": "o",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna ser samma fel match efter match: ingen går ut och möter spelare som driver mot straffområdet. Det hände mot Hull och igen mot Tottenham. Läktaren skriker åt spelarna att gå på.",
+         "s": "h",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Pressen var lagets styrka i säsongens första matcher men har försvunnit. Laget står nu passivt utan att vara tillräckligt organiserat för att spela så.",
          "s": "o",
          "podd": [
@@ -191,57 +220,35 @@
          "typ": "forum"
         },
         {
-         "t": "Fina siffror vilseleder enligt Alex Jones. Ipswich vann xG-kampen mot Liverpool bara för att man låg under och fick jaga. Motståndarna får tidiga mål serverade och behöver sedan inte trycka på.",
-         "s": "o",
-         "podd": [
-          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Femmannaförsvaret med Darnell Furlong som både mittback och högerback fungerade inte. Alex Jones vill hellre se tre riktiga mittbackar och tror att klubben missade att värva en till i somras.",
-         "s": "o",
-         "podd": [
-          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Nästan allt spel gick via högerkanten, där Abdoul Ouattara och Furlong inte hittade varandra alls och där båda målen kom. De få gånger bollen gick till vänster blev det farligt.",
+         "t": "Darnell Furlong är högerback och vet hur en sådan försvarar, men som högra mittback i en femmannabackslinje verkade han inte veta om han skulle gå ut mot yttern. Han släppte in honom i straffområdet gång på gång.",
          "s": "h",
          "podd": [
-          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
+          "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-24"
          ],
          "typ": "podd"
         },
         {
-         "t": "Christian Walton har fått mycket kritik, men Alex Jones var en av matchens bästa. Han gjorde sju räddningar, flera svåra, och var orsaken till att förlusten inte blev större.",
+         "t": "Sasa Lukic är tillbaka, och Henry ser honom och Exequiel Palacios som klart bästa mittfältsparet eftersom båda tar hand om bollen. Florentino, som spelat medan Lukic var borta, tappar den för lätt.",
          "s": "o",
          "podd": [
-          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
+          "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-24"
          ],
          "typ": "podd"
         },
         {
-         "t": "Målen hänger nästan bara på Julio Enciso. Daizen Maeda, Jaden Philogene, Fatawu Issahaku och Emersonn är ur form, och Jack Clarke får mest hoppa in. Fasta situationer och Leif Davis inlägg måste bli bättre.",
+         "t": "Zian Flemming får kritik, men Henry försvarar honom. Flemming är en avslutare i straffområdet som inte löper i kanalerna som Emersonn, och han har bara fått höga bollar mot längre mittbackar och nästan inga chanser på flera veckor.",
          "s": "o",
          "podd": [
-          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
+          "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-24"
          ],
          "typ": "podd"
         }
@@ -262,13 +269,13 @@
          "typ": "forum"
         },
         {
-         "t": "Gary O'Neill hittar alltid något positivt efter förluster. Alex Jones menar att det skaver när laget bara har en seger på åtta matcher: Spurs behövde aldrig anstränga sig, så talet om att Ipswich höll dem på tårna håller inte.",
-         "s": "o",
+         "t": "Mot Tottenham saknades all intensitet. Ingen pekade eller skrek efter misstag, och spelarna promenerade fram för att lägga hörnor fast laget låg under med 0–2. Stämningen på läktaren var lika platt.",
+         "s": "h",
          "podd": [
-          "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star"
+          "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-24"
          ],
          "typ": "podd"
         }
@@ -276,23 +283,21 @@
       }
      ],
      "text": [
-      "I podden Blue Monday skulle Dave gärna ta 0–0 mot Villa, bara för att Ipswich äntligen skulle hålla nollan.",
-      "På forumet TWTD vill flera se Gary O'Neill sparkad om varken Villa eller Coventry ger några poäng. Joe i Blue Monday varnar för motsatsen: får tränaren gå åker laget ”nästan säkert ur”.",
-      "Oron gäller också läktaren. Släpper Ipswich in tidigt igen väntar man sig att publiken blir platt, och en del fruktar att den vänder sig mot laget."
+      "På forumet TWTD har tålamodet med Gary O'Neil tagit slut, och flera vill se honom sparkad om varken Villa eller Coventry ger några poäng.",
+      "I podden Blue Monday håller man emot men beskriver ett lag som slutade bry sig mot Tottenham. Ingen pekade eller skrek efter misstagen, och spelarna promenerade fram till hörnorna trots underläge.",
+      "Nu oroar man sig för att publiken vänder sig mot laget om det rasar tidigt igen. Därför skulle många gärna ta en mållös match, eftersom laget inte har hållit nollan en enda gång den här säsongen."
      ],
      "citat": {
-      "sagt": "Nu går vi åt andra hållet. Man har ingen frihet i de här matcherna och känner att man börjar hamna i underläge.",
-      "vem": null,
+      "sagt": "Hamnar vi i ett läge där Gary O'Neill får sparken någon gång den här säsongen, då åker vi nästan säkert ur.",
+      "vem": "Joe",
       "podd": "Blue Monday: An Ipswich Town Podcast",
       "typ": "podd",
       "datum": "2026-11-22"
      },
      "namn": [
-      "Dave",
-      "Gary O'Neill",
-      "Joe"
+      "Gary O'Neil"
      ],
-     "paSpel": "Tränarens jobb: utan poäng mot Villa och Coventry vill många se honom gå."
+     "paSpel": "Tränarens jobb, och chansen att äntligen hålla nollan."
     },
     {
      "lag": "Aston Villa",
@@ -309,6 +314,13 @@
        "avsnitt": "BORING SCORELESS DRAW - Aston Villa 0-0 Sunderland REACTION - The Villa Filler Podcast",
        "datum": "2026-11-21",
        "adress": "https://podcasters.spotify.com/pod/show/thevillafiller/episodes/BORING-SCORELESS-DRAW---Aston-Villa-0-0-Sunderland-REACTION---The-Villa-Filler-Podcast-e3spu9b",
+       "typ": "podd"
+      },
+      {
+       "podd": "My Old Man Said — An Aston Villa Podcast",
+       "avsnitt": "Aston Villa v Sunderland: Cash's Concussion, Rotation and One Eye on Galatasaray",
+       "datum": "2026-11-21",
+       "adress": "https://shows.acast.com/myoldmansaid/episodes/aston-villa-v-sunderland-cashs-concussion-rotation-and-one-e",
        "typ": "podd"
       },
       {
@@ -405,17 +417,6 @@
           "2026-11-22"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Supportrarna ser vecka efter vecka att laget inte läser av matchläget. När det ska försvara en ledning i slutminuterna slarvar det bort bollen, och när det jagar mål håller det i bollen i stället för att gå framåt.",
-         "s": "h",
-         "podd": [
-          "My Old Man Said — An Aston Villa Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -427,6 +428,17 @@
          "s": "o",
          "podd": [
           "The Villa Filler Podcast"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Trots att Villa är obesegrat i sex matcher ser supportrarna inte Villa Park som en borg den här säsongen. Laget har bara en ligaseger hemma och behöver få fastare mark under fötterna där.",
+         "s": "o",
+         "podd": [
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
           "2026-11-21"
@@ -448,23 +460,24 @@
       }
      ],
      "text": [
-      "I podden My Old Man Said beskrivs Villa just nu som ett lag ”byggt för att spela på bortaplan och kontra”. Det är mot motståndare som ligger lågt som verktygen saknas, och det har man sett ända sedan Unai Emery kom.",
-      "I The Villa Filler tror man att Emery för första gången inte vet vilket hans bästa lag är.",
-      "Mot Sunderland såg laget platt ut tills John McGinn kom in från bänken. Han var den ende på planen med ”en svettdroppe i pannan”, men ingen annan svarade upp."
+      "I podden My Old Man Said kallar man Villa ett lag ”byggt för att spela på bortaplan och kontra”. Målen har kommit när motståndarna varit i omställning, och mot lag som ligger lågt saknas verktygen.",
+      "Felet sitter på mittfältet. Sedan Tielemans försvann finns ingen som slår passningarna genom linjerna, och Leon Goretzka och Boubacar Kamara anses vara för lika.",
+      "Mot Sunderland var John McGinn den ende som drev bollen rakt mot försvaret. Han började på bänken för att sparas till Europaspelet, och laget vaknade först när han kom in."
      ],
      "citat": {
-      "sagt": "Det värsta är att inse att det kanske helt enkelt är sådant här Villa är i år.",
+      "sagt": "Goretzka putsade bara på sin statistik. Bakåt och i sidled, bakåt och i sidled, tillbaka till mittbackarna.",
       "vem": null,
-      "podd": "The Villa Filler Podcast",
+      "podd": "My Old Man Said — An Aston Villa Podcast",
       "typ": "podd",
-      "datum": "2026-11-21"
+      "datum": "2026-11-22"
      },
      "namn": [
-      "Unai Emery",
-      "Emery",
+      "Tielemans",
+      "Leon Goretzka",
+      "Boubacar Kamara",
       "John McGinn"
      ],
-     "paSpel": "Att visa att de tappade poängen inte bara är sådant Villa är i år."
+     "paSpel": "Ett prov på teorin att laget är som bäst direkt efter Europaspel."
     }
    ]
   },
@@ -477,10 +490,10 @@
     "Brentford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-25T02:05:44.093Z",
-   "rubrik": "Det gör inte ens ont längre i Manchester",
+   "skriven": "2026-11-25T02:31:10.084Z",
+   "rubrik": "Det gör inte ens ont längre på Old Trafford",
    "ingress": null,
-   "summering": "United har en tränare utan avtryck än, en långsam backlinje och väntar på beskedet om Yoro. Brentford har en naivitet som kostat både röda kort och straffar.",
+   "summering": "Uniteds supportrar är avtrubbade och litar inte på en stillastående backlinje under Pochettino. I Brentfords podd tror man att segern på Old Trafford ligger i luften, om laget håller naiviteten i schack.",
    "delar": [
     {
      "lag": "Manchester United",
@@ -632,12 +645,12 @@
       }
      ],
      "text": [
-      "I podden United We Stand såg man inget av Mauricio Pochettino i debuten på Anfield: efter den tidiga utvisningen var det ”samma gamla skit”, och vid sidlinjen hade lika gärna Carrick, Amorim eller ten Hag kunnat stå.",
-      "Utåt ställer sig supportrarna ändå bakom honom, men protesterna mot ägarna fortsätter.",
-      "Oron gäller en backlinje som anses långsam och orörlig mot kantspelare och anfallare som går förbi sin man. Därför väger överklagandet av Leny Yoros röda kort tungt; fansajten The Peoples Person kallar honom lagets förmodligen stabilaste mittback."
+      "Det värsta, säger en supporter i podden United We Stand, är att förlusterna inte gör ont längre. Tjugo år av motgångar har gjort dem vana.",
+      "Mauricio Pochettinos första match på Anfield kunde lika gärna ha letts av Carrick, Amorim eller ten Hag, men utåt ska han få stöd medan protesterna riktas mot ägarna.",
+      "På forumet NOT606 kallar man det en katastrof att Matthijs de Ligt startade före Maguire efter så lång frånvaro. Klubben överklagar Leny Yoros röda kort, och The Peoples Person kallar honom lagets kanske stabilaste mittback."
      ],
      "citat": {
-      "sagt": "Det värsta av allt är att det inte gör ont längre, för vi är vana vid det. Och det är skit.",
+      "sagt": "Han räddar aldrig något utanför straffområdet. Varje skott utifrån går in.",
       "vem": null,
       "podd": "United We Stand Podcast",
       "typ": "podd",
@@ -648,13 +661,22 @@
       "Carrick",
       "Amorim",
       "ten Hag",
+      "Matthijs de Ligt",
+      "Maguire",
       "Leny Yoro"
      ],
-     "paSpel": "Mer än Sporting i Champions League: supportrarna kallar den en enorm ligamatch."
+     "paSpel": "Viktigare än Sporting, tycker supportrarna, som räknar den som en enorm ligamatch."
     },
     {
      "lag": "Brentford",
      "kallor": [
+      {
+       "podd": "The Beesotted Brentford Pride of West London Podcast",
+       "avsnitt": "Brentford 4 Everton 0 - The Bees Run Riot as Tarkowski Gets His Karma | Post-Match Podcast From The Stands",
+       "datum": "2026-11-24",
+       "adress": "https://shows.acast.com/the-beesotted-brentford-pride-of-west-london-podcast/episodes/brentford-4-everton-0-the-bees-run-riot-as-tarkowski-gets-hi",
+       "typ": "podd"
+      },
       {
        "podd": "The Beesotted Brentford Pride of West London Podcast",
        "avsnitt": "Monday Night Blues As Bees Face Everton",
@@ -679,35 +701,30 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
+       "amne": "spel",
        "punkter": [
         {
-         "t": "Värdarna är oense om vem som ska ersätta Thiago. Den ena tycker att 34-årige Callum Wilson är för långsam för lagets spel och vill hellre se de snabba Ouattara, Schade och Anthony. Den andra vill ge Wilson chansen eftersom han har gjort mål varje gång han har fått spela.",
+         "t": "Det värdarna lyfter fram är bredden: in från bänken kommer nu spelare som kostat 20–40 miljoner pund. Mathias Jensen kunde ersätta en stark Mikkel Damsgaard utan att kvaliteten sjönk.",
          "s": "o",
          "podd": [
           "The Beesotted Brentford Pride of West London Podcast"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-24"
          ],
          "typ": "podd"
         },
         {
-         "t": "Callum Wilson gjorde sin första Premier League-start för Brentford mot Everton, eftersom ordinarie anfallaren Igor Thiago var avstängd. Om Thiago är tillbaka mot United framgår inte.",
-         "s": "b",
+         "t": "Enligt värdarna satte Yehor Yarmoliuk tonen och var enorm den första halvtimmen. Han och Vitaly Janelt beskrivs som overkliga på mittfältet.",
+         "s": "o",
          "podd": [
-          "West London Sport"
+          "The Beesotted Brentford Pride of West London Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-24"
          ],
-         "typ": "media"
-        }
-       ]
-      },
-      {
-       "amne": "spel",
-       "punkter": [
+         "typ": "podd"
+        },
         {
          "t": "Värdarna avvisar bilden av ett Brentford med disciplinproblem. Laget är naivt och oerfaret och går på slugare motståndares provokationer. Två röda kort mot Liverpool och ett mot Brighton låg bakom säsongens båda förluster.",
          "s": "o",
@@ -729,28 +746,6 @@
           "2026-11-21"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Den ena värdaren tycker att Brentford spelade på samma sätt mot Aston Villa som mot Brighton. Mot Villa kallades laget fult och tufft, mot Brighton naivt, och därför menar han att reglerna tillämpas olika.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Keane Lewis-Potter är omtyckt och kan spela på åtta positioner. Men han har orsakat straff två gånger, mot Sunderland och mot Brighton, genom att brottas med motståndare i straffområdet.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -758,13 +753,24 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Missnöjet bland supportrarna beror enligt värdarna på förväntningarna. Laget var en nick från Europa förra säsongen, och i somras sa både klubben och fansen att det var dags att satsa. Starten har inte levt upp till det.",
+         "t": "Mot dem som är dystra påpekar en av värdarna att laget bara förlorat två gånger i år, och båda gångerna med tio man redan i första halvlek. Med fullt lag har Brentford alltså inte förlorat.",
          "s": "o",
          "podd": [
           "The Beesotted Brentford Pride of West London Podcast"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna tycker att de senaste veckorna före landslagsuppehållet var platta, inte dåliga. De menar att uppehållet gav laget den vila det behövde och att det kom tillbaka skarpare och fräschare.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-24"
          ],
          "typ": "podd"
         }
@@ -773,6 +779,17 @@
       {
        "amne": "match",
        "punkter": [
+        {
+         "t": "Supportrarna menar att Brentford är långt överdue en seger på Old Trafford. De tror inte på snacket att United ska ta i extra just mot dem, eftersom United redan förlorat många matcher den senaste tiden.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "En supporter efter Brighton menar att domarna dömer olika beroende på vem som spelar. Utvisningen och straffen mot Brentford hade aldrig blivit av mot de stora klubbarna, Manchester United inräknat.",
          "s": "o",
@@ -788,23 +805,23 @@
       }
      ],
      "text": [
-      "I Beesotted-podden vägrar man kalla det ett disciplinproblem: Brentford har ett ”naivitetsproblem” och går på slugare motståndares provokationer, och röda kort låg bakom båda säsongens förluster.",
-      "Keane Lewis-Potter sammanfattar det. Han har redan gjort fler mål än under någon tidigare säsong i klubben, men har orsakat straff mot både Sunderland och Brighton genom att brottas med motståndare i straffområdet.",
-      "Om Igor Thiago är tillbaka är oklart. Värdarna kallar honom oumbärlig trots färre mål, eftersom han drar ut mittbackarna och öppnar för kanterna, och tvivlar på att 34-årige Callum Wilson klarar samma jobb."
+      "I podden Beesotted tror man att Brentford nu äntligen ska vinna på Old Trafford. Säsongens båda förluster kom med en man mindre redan före paus, och värdarna kallar det ett ”naivitetsproblem” snarare än ett disciplinproblem.",
+      "Keane Lewis-Potter är bilden av det. Han har gjort fler mål än under någon tidigare säsong i klubben, men har också orsakat straffar genom att dra i motståndare i straffområdet.",
+      "Om Igor Thiago är tillbaka framgår inte, och i podden tvivlar man på att Callum Wilson kan dra isär ett försvar på samma sätt."
      ],
      "citat": {
-      "sagt": "Vi blir starkare för varje år, och jag tycker att det finns en otålighet ibland, och jag förstår den.",
+      "sagt": "Laget såg samspelt ut och fullt av självförtroende. Spelarna täckte upp för varandra, och vi vann varje andraboll.",
       "vem": null,
       "podd": "The Beesotted Brentford Pride of West London Podcast",
       "typ": "podd",
-      "datum": "2026-11-21"
+      "datum": "2026-11-24"
      },
      "namn": [
       "Keane Lewis-Potter",
       "Igor Thiago",
       "Callum Wilson"
      ],
-     "paSpel": "Tålamodet: supportrarna väntar fortfarande på satsningen som alla talade om i somras."
+     "paSpel": "En länge efterlängtad seger på Old Trafford, om man frågar podden."
     }
    ]
   },
