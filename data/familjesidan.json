@@ -15,47 +15,47 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-26T02:16:36.731Z",
+ "skriven": "2026-11-26T02:32:21.241Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-26T02:15:54.864Z",
- "rubrik": "En tränare sparkad, tre sitter löst och Duff återvänder till Wycombe",
+ "underlag": "2026-11-26T02:27:07.741Z",
+ "rubrik": "En tränare har fått gå, tre sitter löst och Duff kommer tillbaka",
  "notiser": [
   {
    "slag": "avflyttad",
    "lag": "Watford",
    "namn": "Alessio Dionisi",
-   "text": "har fått sparken av Watford efter förlusten mot Sheffield United. Han lämnar klubben efter tre segrar på de senaste 13 matcherna."
+   "text": "har fått sparken efter förlusten mot Sheffield United. Han lämnar klubben med tre segrar på de senaste 13 matcherna."
   },
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Duff",
-   "text": "kommer tillbaka till Wycombe Wanderers, som sparkade honom. Supportrarna där tycker att det var orättvist och misstänker att han fick gå för att han vågade säga emot ledningen."
+   "text": "kommer tillbaka till Wycombe som tränare för Bradford City. Supportrarna där tycker att han sparkades orättvist och fruktar att han ska hämnas på sin gamla klubb."
   },
   {
    "slag": "aterseende",
    "lag": "Stoke City",
    "namn": "Ben Johnson",
-   "text": "möter West Ham United, klubben vars ungdomsakademi han kommer från. Värdarna i Stokes supporterpodd väntar sig att han är extra laddad mot sin gamla klubb."
+   "text": "möter West Ham, där han kommer från ungdomsakademin, och väntas enligt poddvärdarna vara extra laddad mot sin gamla klubb."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "Gary O'Neil",
-   "text": "har allt fler supportrar emot sig. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
+   "text": "har allt färre supportrar bakom sig. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng, och de tror inte att han kan hålla laget kvar."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "står inför en avgörande match mot Watford. Ligger Derby fortfarande minst fem poäng från säker plats efter lördagen tror värdarna att kraven på hans avgång blir högre än någonsin."
+   "text": "står inför en avgörande match mot Watford. Är Derby fortfarande minst fem poäng från säker plats efter lördagen tror poddvärdarna att kraven på hans avgång blir högre än någonsin."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har av vd Charlie Boss fått ”möjligheten” att vända formen efter en svag start. Supportrarna fruktar att även en seger bara skjuter upp beslutet om tränaren."
+   "text": "har i ett videobesked från vd:n Charlie Boss fått ”möjligheten” att vända formen efter en svag start. Supportrarna fruktar att beslutet om honom bara skjuts upp."
   }
  ]
 }
