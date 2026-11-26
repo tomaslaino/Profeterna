@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-26T02:16:13.457Z",
+ "skriven": "2026-11-26T02:31:56.374Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-26T02:15:54.864Z",
+ "underlag": "2026-11-26T02:27:07.741Z",
  "rubrik": {
-  "id": "401879226",
-  "kick": "MANCHESTER UNITED",
+  "id": "401880132",
+  "kick": "BURNLEY",
   "rad": [
    [
-    "UNITED-FANS:",
+    "”RÄDSLAN",
     0
    ],
    [
-    "DET GÖR INTE",
+    "FÖR ATT",
     0
    ],
    [
-    "ONT LÄNGRE",
+    "VINNA”",
     1
    ]
   ],
-  "under": "Efter 0–4 mot Liverpool har en supporter i United We Stand-podden vant sig: 20 år av motgångar.",
-  "plus": "BURNLEY RÄDDA FÖR ATT VINNA",
-  "plusId": "401880132"
+  "under": "Fabio Celestini om sina spelare, som har tappat 25 poäng från ledningsläge den här säsongen",
+  "plus": "UNITEDFANS: GÖR INTE ONT",
+  "plusId": "401879226"
  }
 }
