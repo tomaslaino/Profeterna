@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-26T02:15:54.864Z",
+ "uppdaterad": "2026-11-26T02:27:07.741Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3820,10 +3820,10 @@
     "Reading"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-25T02:11:26.865Z",
-   "rubrik": "När mittbacken är bäst på planen säger det allt",
+   "skriven": "2026-11-26T02:16:24.402Z",
+   "rubrik": "Bannan dirigerar, men resten hör inte musiken",
    "ingress": null,
-   "summering": "Wednesday vinner under Challoner utan att övertyga: Bannan bär mittfältet ensam och framåt saknas udd. Supportrarna vill framför allt se laget hålla en hel match.",
+   "summering": "En pånyttfödd Bannan och ett stabilt försvar håller Wednesday uppe, men framåt saknas udd och på läktaren saknas lust.",
    "delar": [
     {
      "lag": "Sheffield Wednesday",
@@ -3837,15 +3837,15 @@
       },
       {
        "podd": "Owlstalk",
-       "avsnitt": "Let's Get Reading Sold Out · Team for reading… · Man of the Match & Player Ratings vs Stevenage (A), 26/27",
-       "datum": "2026-11-25",
+       "avsnitt": "Let's Get Reading Sold Out · Man of the Match & Player Ratings vs Stevenage (A), 26/27 · Video- WEAVER TO GO OUT ON LOAN FOR REAL THIS TIME",
+       "datum": "2026-11-26",
        "adress": "https://www.owlstalk.co.uk/forums/topic/351057-lets-get-reading-sold-out/",
        "typ": "forum"
       },
       {
        "podd": "Owlstalk",
-       "avsnitt": "Let's Get Reading Sold Out · OMDT - Stevenage v Sheffield Wednesday - 19:45 Tuesday 24th November 2026 @ SPORTA Arena - EFL League 1 · Charlie McNeill 'disappointed' not to be playing more at loan club (article, free to read)",
-       "datum": "2026-11-24",
+       "avsnitt": "Let's Get Reading Sold Out · Team for reading… · Man of the Match & Player Ratings vs Stevenage (A), 26/27",
+       "datum": "2026-11-25",
        "adress": "https://www.owlstalk.co.uk/forums/topic/351057-lets-get-reading-sold-out/",
        "typ": "forum"
       }
@@ -3855,13 +3855,13 @@
        "amne": "elva",
        "punkter": [
         {
-         "t": "Davis Keillor-Dunn anses inte vara någon nia. Han kommer bara till sin rätt bakom en riktig anfallare, även om supportrarna inte heller är övertygade om Al-Hamadi.",
+         "t": "Callum Slattery har tappat sedan säsongsstarten och anses spelas på fel plats som yttre tia. Supportrarna vill ha honom centralt på mittfältet.",
          "s": "o",
          "podd": [
           "Owlstalk"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-25"
          ],
          "typ": "forum"
         }
@@ -3871,6 +3871,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Supportrarna ser en pånyttfödd Barry Bannan efter tränarbytet till Challinor. Men han får dra mittfältet ensam, eftersom spelarna runt honom inte hänger med i hans tankar.",
+         "s": "o",
+         "podd": [
+          "Owlstalk"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "forum"
+        },
+        {
          "t": "Att matchens lirare nästan alltid är en mittback eller målvakten ses som ett bevis på hur tandlöst laget är framåt.",
          "s": "o",
          "podd": [
@@ -3878,6 +3889,17 @@
          ],
          "datum": [
           "2026-11-24"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Davis Kellior-Dunn ses som felplacerad som ensam spets. Han är ingen nia och blir isolerad i systemet utan någon nära sig, så anfallet får ingen boll.",
+         "s": "o",
+         "podd": [
+          "Owlstalk"
+         ],
+         "datum": [
+          "2026-11-25"
          ],
          "typ": "forum"
         },
@@ -3902,28 +3924,6 @@
           "2026-11-24"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Chansskapandet hänger på Louie Barry och Bannan. Supportrarna menar att de många yttrarna måste börja slå bra inlägg.",
-         "s": "o",
-         "podd": [
-          "Owlstalk"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Det är veteranerna som bär Wednesday just nu, särskilt Barry Bannan på mittfältet och Liam Cooper i backlinjen, som har klivit fram i den nye tränarens första matcher.",
-         "s": "o",
-         "podd": [
-          "The Wednesday Week"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -3931,49 +3931,47 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "En del supportrar tycker att laget helt enkelt inte är särskilt bra. De är ändå säkra på att det hade blivit förlust under förre tränaren Pedersen.",
+         "t": "Tre matcher in under Challinor menar supportrarna att truppen är långt ifrån räcker till. Rekryteringen var bra med tanke på begränsningarna, men laget saknar fart, kraft, längd och en stor spelare både centralt och längst fram.",
          "s": "o",
          "podd": [
           "Owlstalk"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-25"
          ],
          "typ": "forum"
         },
         {
-         "t": "Enligt Wednesday-supportrar som Stevenage-gästen Luca har pratat med har ingen gått i taket över de två segrarna under den nye tränaren Dave Challoner, eftersom spelet inte har imponerat.",
-         "s": "h",
+         "t": "Laget ligger högt i tabellen, men spelet lockar inte. Även säsongskortsinnehavare säger att de inte skulle betala för att se laget just nu, och publiken väntas hamna under 30 000.",
+         "s": "o",
          "podd": [
-          "The Wednesday Week"
+          "Owlstalk"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-25"
          ],
-         "typ": "podd"
+         "typ": "forum"
         }
        ]
       }
      ],
      "text": [
-      "På Owlstalk konstaterar man att matchens bäste nästan alltid är en mittback eller målvakten. Det säger allt om hur ”helt tandlösa” de är framåt.",
-      "Barry Bannan är tillbaka nära sitt bästa och var planens bäste igen, men han står ensam på mittfältet. Callum Slattery får höra att han jämt slarvar bort bollen.",
-      "Två segrar under nye tränaren Dave Challoner har inte fått någon att gå i taket. En del ser tecken på hans spelidé och hoppas att det lossnar på lördag, andra nöjer sig med att det hade blivit förlust under förre tränaren Pedersen."
+      "Barry Bannan har fått nytt liv efter tränarbytet och har återigen varit bäst på planen, men han drar mittfältet ensam. På Owlstalk suckar man över att spelarna runt honom ”inte är på hans våglängd”, och Callum Slattery får höra att han ständigt slarvar bort bollen.",
+      "Längst fram är det värre. Att matchens bäste nästan alltid är en mittback eller målvakten ses som beviset på att man är ”helt tandlösa”.",
+      "Inte ens segrarna under den nye tränaren har fått supportrarna att gå i taket, och publiken väntas stanna under 30 000."
      ],
      "citat": {
-      "sagt": "Vi har ingen fast elva och ingen vet vilket vårt bästa lag är.",
-      "vem": "FPOwls",
+      "sagt": "Jag har säsongskort och jag går, men ärligt talat är jag inte sugen på lördag. Jag skulle inte betala för att se det här just nu.",
+      "vem": "MBMitchell",
       "podd": "Owlstalk",
       "typ": "forum",
-      "datum": "2026-11-24"
+      "datum": "2026-11-25"
      },
      "namn": [
       "Barry Bannan",
-      "Callum Slattery",
-      "Dave Challoner",
-      "Pedersen"
+      "Callum Slattery"
      ],
-     "paSpel": "Säsongens första hela match, och att Challoners spelidé till slut lossnar."
+     "paSpel": "Chansen att visa att de gröna skotten under nye tränaren faktiskt växer."
     },
     {
      "lag": "Reading",
@@ -3992,14 +3990,28 @@
     "Bradford City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-25T02:11:56.463Z",
-   "rubrik": "Duff återvänder till klubben som inte ville ha honom",
+   "skriven": "2026-11-26T02:16:54.661Z",
+   "rubrik": "Duff återvänder till en läktare som vinner oavsett",
    "ingress": null,
-   "summering": "Wycombe tar emot sin gamle tränare med misstro mot ledningen och ett lag som inte kan förvalta ledningar. Duffs Bradford har bytt sin täta defensiv mot fler mål åt båda hållen.",
+   "summering": "Wycombe tar emot sin förre tränare med en kluven läktare och ett lag som hänger på Warehams mål. Duff kommer med ett Bradford som läcker på mitten och frågor från egna led.",
    "delar": [
     {
      "lag": "Wycombe Wanderers",
      "kallor": [
+      {
+       "podd": "The Gasroom",
+       "avsnitt": "Samaritans score prediction - Bradford (h) · Other football · Match Day Thread: Bromley 24th Nov 2026 (A)",
+       "datum": "2026-11-26",
+       "adress": "https://www.gasroom.org/t/samaritans-score-prediction-bradford-h/1148",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "Raving Mad Ravens v Chairboys 24th Nov 26 · What day of the week is it thread · EFL Trophy Thread 2026/7",
+       "datum": "2026-11-25",
+       "adress": "https://not606.com/threads/raving-mad-ravens-v-chairboys-24th-nov-26.425645/",
+       "typ": "forum"
+      },
       {
        "podd": "The Gasroom",
        "avsnitt": "Samaritans score prediction - Bradford (h) · Loan Players · Match Day Thread: Bromley 24th Nov 2026 (A)",
@@ -4015,20 +4027,6 @@
        "typ": "forum"
       },
       {
-       "podd": "The Gasroom",
-       "avsnitt": "Fans Forum - Tuesday 17th November · Match Thread: W3 vs Moneyfields, 22nd Nov 2026 · Bromley (a) Attendance Prediction - Sat 23rd Nov - Match 15 in 26 /27",
-       "datum": "2026-11-24",
-       "adress": "https://www.gasroom.org/t/fans-forum-tuesday-17th-november/1124",
-       "typ": "forum"
-      },
-      {
-       "podd": "NOT606",
-       "avsnitt": "Trigon Trip Ewes v Chairboys 21st Nov 26 · EFL & Premier League Managers 2026-27 · What day of the week is it thread",
-       "datum": "2026-11-23",
-       "adress": "https://not606.com/threads/trigon-trip-ewes-v-chairboys-21st-nov-26.425599/",
-       "typ": "forum"
-      },
-      {
        "podd": "Bucks Free Press",
        "avsnitt": "'These are just finite moments' - Hounsell on Wycombe's red cards in Oxford loss",
        "datum": "2026-11-21",
@@ -4041,46 +4039,13 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Supportrarna oroar sig mest för hur laget spelar av matcher. I lördags blev en 2–0-ledning en förlust med 3–4, och enligt dem har laget redan tappat flera 2–0-ledningar den här säsongen.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna ser att laget släpper in ett riktigt dåligt mål i varje match. Grundproblemet tycker de är att laget saknar en tydlig spelform och identitet, och därför är det svårt att veta vad som ska rättas till.",
+         "t": "En annan supporter svarar att Duff gjorde fel i laguttagningarna och litade för mycket på Steve Cook, som de ser som ett riktigt dåligt köp. Han tycker att han har sett mer av laget under TH.",
          "s": "o",
          "podd": [
           "The Gasroom"
          ],
          "datum": [
-          "2026-11-24"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Fasta situationer är ett stort problem. Mot Bromley fick motståndarna fria nickar eller vann luftduellerna mot båda mittbackarna, och supportrarna vill ha en ny mittback av hög klass i januari.",
-         "s": "o",
-         "podd": [
-          "The Gasroom"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna tycker att det i stort sett bara är Caolan Boyd-Munce och Jayden Wareham som bär laget just nu. Utan Waremans mål vore laget illa ute, och de vill ha tillbaka Ewan Henderson i form.",
-         "s": "o",
-         "podd": [
-          "The Gasroom"
-         ],
-         "datum": [
-          "2026-11-24"
+          "2026-11-25"
          ],
          "typ": "forum"
         }
@@ -4089,6 +4054,17 @@
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Supportrarna är oeniga om bytet av tränare. En av dem menar att laget inte har spelat bättre under TH än under Duff, att segrarna har kommit mot svagare lag och att den egentliga förstärkningen är anfallaren Jayden Wareham.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "forum"
+        },
         {
          "t": "Supportrarna misstänker att Duff fick gå för att han hade egna åsikter och vågade säga emot ledningen, inte för att laget skulle bli bättre. Under Hounsell har det inte blivit bättre, trots ett enklare spelschema.",
          "s": "o",
@@ -4101,7 +4077,7 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna oroar sig för att ingen i klubbledningen eller bland tränarna har erfarenhet av att vända en dålig period. De påpekar att huvudtränaren Hounsell saknar både spelarkarriär och erfarenhet som tränare på hög nivå.",
+         "t": "Supportrarna tycker inte att laget är dåligt, men väl blekt och dömt att göra lite besviket gång på gång. Ändå tippade nästan alla seger mot Bromley, där det till slut blev oavgjort.",
          "s": "o",
          "podd": [
           "The Gasroom"
@@ -4112,13 +4088,13 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna tycker att laget inte är dåligt men blekt, och att det alltid gör lite besviket. Inför förra matchen tippade 44 av 50 i forumets tipstävling vinst, men det blev oavgjort.",
+         "t": "Supportrarna menar att truppen har talangen men känns splittrad och obalanserad, med för mycket i vissa lagdelar. Med tanke på hur mycket pengar klubben har lagt ut tycker en del att resultaten är svåra att acceptera.",
          "s": "o",
          "podd": [
           "The Gasroom"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-25"
          ],
          "typ": "forum"
         }
@@ -4137,14 +4113,36 @@
           "2026-11-24"
          ],
          "typ": "forum"
+        },
+        {
+         "t": "Supportrarna fruktar att Duff, som fick gå med avgångsvederlag, ska hämnas på sin gamla klubb nu när han har ett lag med bättre chans att gå upp än Wycombe.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Supportrarna vill att Wycombe gör planen bred, spelar med två yttrar och pressar i stället för att passa bakåt. De påminner om att Bradford inte klarade Huddersfields kantspel när de förlorade stort hemma.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "forum"
         }
        ]
       }
      ],
      "text": [
-      "På The Gasroom ses lördagen som Duffs återkomst, och många tror att han fick gå för att han sa emot ledningen, inte för att laget skulle bli bättre. Under Tom Hounsell har det inte blivit bättre, och oron är att ingen i klubben vet hur man vänder en dålig period.",
-      "I spelet skaver matchhanteringen mest: laget har redan släppt flera 2–0-ledningar, senast i lördags.",
-      "Framåt är det i stort sett Caolan Boyd-Munce och Jayden Wareham som bär laget, och utan Warehams mål vore man illa ute."
+      "På The Gasroom har man räknat ut att lördagen inte går att förlora: vinner Wycombe blir de som ville bli av med Michael Duff glada, förlorar laget blir hans anhängare det.",
+      "Många misstänker att Duff fick gå för att han sa emot ledningen, och de ser inte att Tom Hounsell har gjort laget bättre. Rädslan är att den gamle tränaren ”sätter dit oss på lördag”.",
+      "Framåt bär Jayden Wareham och Caolan Boyd-Munce i stort sett laget själva. Bakåt fruktar man hörnorna, där båda mittbackarna blev utklassade i luften mot Bromley."
      ],
      "citat": {
       "sagt": "Tränaren vi släppte har fått jobb i en mycket större klubb än vår. Undrar varför.",
@@ -4154,16 +4152,24 @@
       "datum": "2026-11-24"
      },
      "namn": [
+      "Michael Duff",
       "Duff",
       "Tom Hounsell",
-      "Caolan Boyd-Munce",
-      "Jayden Wareham"
+      "Jayden Wareham",
+      "Caolan Boyd-Munce"
      ],
-     "paSpel": "Revansch mot Duff, eller ett kvitto på att han borde ha fått stanna."
+     "paSpel": "Duffs återkomst, och en dom över tränarbytet som läktaren är oense om."
     },
     {
      "lag": "Bradford City",
      "kallor": [
+      {
+       "podd": "Width of a Post",
+       "avsnitt": "The strange dissatisfaction of a 3-0 Bradford City win",
+       "datum": "2026-11-25",
+       "adress": "https://widthofapost.com/2026/11/25/the-strange-dissatisfaction-of-a-3-0-bradford-city-win/",
+       "typ": "media"
+      },
       {
        "podd": "Width of a Post",
        "avsnitt": "A necessary evolution brings new problems for Bradford City",
@@ -4177,23 +4183,18 @@
        "amne": "trupp",
        "punkter": [
         {
-         "t": "Kantspelaren Josh Neufville är tillbaka efter skada och spelade för första gången på två månader. Han byttes ut under matchen eftersom han fortfarande trappas upp.",
+         "t": "Wingbacken Josh Neufville vilades mot Barnsley eftersom han fortfarande håller på att bygga upp full matchkondition. Duff bytte dessutom hela sin främre trio jämfört med lördagens match.",
          "s": "b",
          "podd": [
           "Width of a Post"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-25"
          ],
          "typ": "media"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
+        },
         {
-         "t": "Duff har ändrat elvan för att bli mer offensiv: Nick Powell spelade längst fram och gjorde sin första ligastart, Antoni Sarcevic flyttades ut till höger och Kieran Morgan tog den offensiva mittfältsrollen.",
+         "t": "Kantspelaren Josh Neufville är tillbaka efter skada och spelade för första gången på två månader. Han byttes ut under matchen eftersom han fortfarande trappas upp.",
          "s": "b",
          "podd": [
           "Width of a Post"
@@ -4220,6 +4221,17 @@
          "typ": "media"
         },
         {
+         "t": "Mittfältsparet Callum Connolly och Kieran Morgan är bra med boll men lämnar stora luckor utan boll. Jumbon Barnsley hade 63 procent av bollinnehavet och 23 skott mot Citys 10, och skribenten ser ingen snabb lösning på hålet.",
+         "s": "o",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "media"
+        },
+        {
          "t": "Bradford har länge haft svårt att göra mål. Laget gick mållöst i fem av sex ligamatcher efter att Duff tog över, och motståndarna ställer sig ofta väldigt defensivt mot laget.",
          "s": "h",
          "podd": [
@@ -4242,13 +4254,24 @@
          "typ": "media"
         },
         {
-         "t": "Med Sarcevic ute på kanten blir mittfältet sårbart när laget leder. Den unge Kieran Morgan hade inte erfarenheten att falla tillbaka, och Doncaster fick yta centralt.",
+         "t": "Stephen Humphrys, som kunde ha lämnat klubben på deadline day, är tillbaka i toppform och gjorde två mål. Nick Powell är också i utmärkt form.",
          "s": "o",
          "podd": [
           "Width of a Post"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-25"
+         ],
+         "typ": "media"
+        },
+        {
+         "t": "Adam Phillips fortsätter att göra skribenten besviken, och Will Swan gör inte samma avtryck när han startar som när han kommer in från bänken.",
+         "s": "o",
+         "podd": [
+          "Width of a Post"
+         ],
+         "datum": [
+          "2026-11-25"
          ],
          "typ": "media"
         }
@@ -4256,23 +4279,25 @@
       }
      ],
      "text": [
-      "Duffs Bradford har blivit farligare framåt men läckare bakåt: de två senaste ligamatcherna har kostat lika många insläppta mål som hela säsongen dessförinnan.",
-      "Den förmåga som burit laget de senaste säsongerna, att styra och stänga matcher, verkar borta, skriver Width of a Post. Mot Doncaster gick ledningen förlorad på övertid efter en hörna.",
-      "Duff har ritat om elvan för att bli mer offensiv, med Nick Powell längst fram och Antoni Sarcevic ute till höger. Priset betalas på mitten, där unge Kieran Morgan saknade erfarenheten att falla tillbaka när laget ledde."
+      "Michael Duff kommer tillbaka till Wycombe utan att ha fått tyst på sina egna: enligt Width of a Post räckte segern mot Barnsley inte för att avsluta supportrarnas frågor.",
+      "Bakåt läcker det, och skribenten pekar på mittfältsparet Callum Connolly och Kieran Morgan, som är användbara med boll men lämnar ”oroväckande” luckor utan. Till och med bottenlaget Barnsley sköt 23 gånger.",
+      "Framåt finns det ljus. Stephen Humphrys, som kunde ha lämnat klubben när transferfönstret stängde, är tillbaka i toppform, och Nick Powell likaså."
      ],
      "citat": {
-      "sagt": "Powell spelade längst fram – otroligt nog var det hans första ligastart, cirka 15 månader efter att han kom till Bradford.",
+      "sagt": "De verkar också ha tappat en egenskap som har tjänat dem så väl de senaste säsongerna – förmågan att kontrollera en match.",
       "vem": "Jason McKeown",
       "podd": "Width of a Post",
       "typ": "media",
       "datum": "2026-11-21"
      },
      "namn": [
-      "Duff",
-      "Nick Powell",
-      "Antoni Sarcevic",
-      "Kieran Morgan"
-     ]
+      "Michael Duff",
+      "Callum Connolly",
+      "Kieran Morgan",
+      "Stephen Humphrys",
+      "Nick Powell"
+     ],
+     "paSpel": "Duffs återkomst till klubben som sparkade honom, med egna supportrar som undrar."
     }
    ]
   }
