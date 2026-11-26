@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-26T02:27:07.741Z",
+ "uppdaterad": "2026-11-26T02:46:28.728Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,10 +103,10 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-26T02:09:48.369Z",
-   "rubrik": "Ipswich skulle gärna ta 0–0, bara för nollans skull",
+   "skriven": "2026-11-26T02:33:42.023Z",
+   "rubrik": "Ipswich skulle gärna ta en mållös lördag",
    "ingress": null,
-   "summering": "Ipswich spelar om tränarens framtid och längtar mest efter att hålla tätt. Villa kommer från Turkiet med ett lag som trivs bäst borta men ännu saknar en given elva.",
+   "summering": "Ipswich spelar med tränarens framtid och en nervös läktare i potten. Villa har ett segerkrav som laget knappt tror på och en McGinn som får dra det mesta.",
    "delar": [
     {
      "lag": "Ipswich Town",
@@ -283,25 +283,32 @@
       }
      ],
      "text": [
-      "På forumet TWTD har tålamodet med Gary O'Neil tagit slut. Flera vill se honom sparkad om de två närmaste matcherna inte ger några poäng. I podden Blue Monday håller en av värdarna emot och menar att laget nästan säkert åker ur om tränaren får gå.",
-      "Mest skaver det att pressen från säsongsstarten är borta och att laget aldrig var med och tävlade mot Tottenham.",
-      "Laget har gått 30 ligamatcher i rad utan att hålla nollan, och i podden skulle man gärna ta en mållös match på lördag."
+      "Tålamodet med Gary O'Neil har tagit slut för många supportrar: blir det inga poäng mot Villa eller Coventry vill de se honom sparkad. I podden Blue Monday varnar en av värdarna för motsatsen, för får O'Neil gå åker laget nästan säkert ur.",
+      "Ännu mer oroar tomheten mot Tottenham, där spelarna promenerade fram till hörnorna i underläge och ”såg bara ut som: jaha”. Nu fruktar en del att läktaren vänder sig mot laget om ett tidigt mål släpps in igen.",
+      "Laget har gått 30 ligamatcher i rad utan att hålla nollan, så en mållös match skulle tas emot tacksamt."
      ],
      "citat": {
-      "sagt": "Även när vi släppte en hörna eller tappade bollen, då brukar folk peka och skrika åt varandra. Alla såg bara ut som: jaha.",
-      "vem": "Henry",
+      "sagt": "Nu går vi åt andra hållet. Man har ingen frihet i de här matcherna och känner att man börjar hamna i underläge.",
+      "vem": null,
       "podd": "Blue Monday: An Ipswich Town Podcast",
       "typ": "podd",
-      "datum": "2026-11-24"
+      "datum": "2026-11-22"
      },
      "namn": [
       "Gary O'Neil"
      ],
-     "paSpel": "Halva tränarens respit; den andra halvan spelas i Coventry."
+     "paSpel": "Kanske tränarens jobb, och chansen att äntligen hålla nollan."
     },
     {
      "lag": "Aston Villa",
      "kallor": [
+      {
+       "podd": "The Villa Filler Podcast",
+       "avsnitt": "What is WRONG with Villa?! Galatasaray 1-0 Aston Villa REACTION - The Villa Filler Podcast",
+       "datum": "2026-11-25",
+       "adress": "https://podcasters.spotify.com/pod/show/thevillafiller/episodes/What-is-WRONG-with-Villa---Galatasaray-1-0-Aston-Villa-REACTION---The-Villa-Filler-Podcast-e3t1a6q",
+       "typ": "podd"
+      },
       {
        "podd": "My Old Man Said — An Aston Villa Podcast",
        "avsnitt": "Aston Villa 0-0 Sunderland: Ponderous and Devoid of Ideas - the Midfield Problem Emery Hasn't Solved",
@@ -314,13 +321,6 @@
        "avsnitt": "BORING SCORELESS DRAW - Aston Villa 0-0 Sunderland REACTION - The Villa Filler Podcast",
        "datum": "2026-11-21",
        "adress": "https://podcasters.spotify.com/pod/show/thevillafiller/episodes/BORING-SCORELESS-DRAW---Aston-Villa-0-0-Sunderland-REACTION---The-Villa-Filler-Podcast-e3spu9b",
-       "typ": "podd"
-      },
-      {
-       "podd": "My Old Man Said — An Aston Villa Podcast",
-       "avsnitt": "Aston Villa v Sunderland: Cash's Concussion, Rotation and One Eye on Galatasaray",
-       "datum": "2026-11-21",
-       "adress": "https://shows.acast.com/myoldmansaid/episodes/aston-villa-v-sunderland-cashs-concussion-rotation-and-one-e",
        "typ": "podd"
       },
       {
@@ -417,17 +417,6 @@
           "2026-11-23"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Leon Goretzka kan inte ersätta Tielemans som den som styr tempot och slår passningarna genom linjerna. Han spelade bakåt och i sidled, och han och Kamara är för lika. Supportrarna tycker att han passar bäst som inhoppare för att hålla undan en ledning.",
-         "s": "o",
-         "podd": [
-          "My Old Man Said — An Aston Villa Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -444,15 +433,31 @@
           "2026-11-21"
          ],
          "typ": "podd"
-        },
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
         {
-         "t": "Trots att Villa är obesegrat i sex matcher ser supportrarna inte Villa Park som en borg den här säsongen. Laget har bara en ligaseger hemma och behöver få fastare mark under fötterna där.",
+         "t": "Matcherna mot Bournemouth, Sunderland, Ipswich, Everton och Palace sågs som chansen att vända. Efter dem väntar PSG, Chelsea, Liverpool och Dortmund, så värdarna menar att allt annat än seger i Ipswich är oacceptabelt.",
          "s": "o",
          "podd": [
-          "My Old Man Said — An Aston Villa Podcast"
+          "The Villa Filler Podcast"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Trots kravet på seger är en av värdarna mörkrädd inför matchen. Han säger att självförtroendet är på botten och att han inte ser hur laget ska kunna vinna i Ipswich.",
+         "s": "o",
+         "podd": [
+          "The Villa Filler Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
          ],
          "typ": "podd"
         }
@@ -460,22 +465,22 @@
       }
      ],
      "text": [
-      "I podden My Old Man Said kallar man laget ”byggt för att spela på bortaplan och kontra”. Mot lag som ligger lågt saknas verktygen, och på forumet Vital Villa klagar man över bollinnehav utan idé.",
-      "I The Villa Filler tror man att Unai Emery för första gången inte vet vilket som är hans bästa lag. Bara John McGinn höjde tempot när han kom in mot Sunderland, och ingen annan svarade upp.",
-      "Ett hopp finns: Villa brukar vara bra när laget kommer tillbaka till ligan efter en Europamatch."
+      "I podden The Villa Filler kallas allt annat än seger i Ipswich oacceptabelt, men i samma andetag säger en av värdarna att han inte kan se laget vinna. Självförtroendet beskrivs som på botten.",
+      "John McGinn är den som bär laget: mot Sunderland var han den ende med ”en svettdroppe i pannan”, men resten svarade aldrig upp.",
+      "Samtidigt tror man att Unai Emery för första gången inte vet vilket hans bästa lag är. Ett halmstrå finns, för laget brukar vara bra när det kommer tillbaka till ligan efter Europaspel."
      ],
      "citat": {
-      "sagt": "Det är fortfarande de två sexorna. Det är där allt vilar. Det är det som gör laget riktigt starkt eller skört.",
+      "sagt": "Det värsta är att inse att det kanske helt enkelt är sådant här Villa är i år.",
       "vem": null,
-      "podd": "My Old Man Said — An Aston Villa Podcast",
+      "podd": "The Villa Filler Podcast",
       "typ": "podd",
-      "datum": "2026-11-22"
+      "datum": "2026-11-21"
      },
      "namn": [
-      "Unai Emery",
-      "John McGinn"
+      "John McGinn",
+      "Unai Emery"
      ],
-     "paSpel": "Chansen att starta Emerys ”patenterade segerrad” efter sex matcher utan seger."
+     "paSpel": "Chansen att vända innan PSG, Chelsea, Liverpool och Dortmund står på tur."
     }
    ]
   },
@@ -826,14 +831,21 @@
     "Coventry City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-26T02:10:59.573Z",
-   "rubrik": "Efter Chelseafesten fruktar Leeds den vanliga baksmällan",
+   "skriven": "2026-11-26T02:45:02.957Z",
+   "rubrik": "Elland Road fruktar baksmällan efter Chelseakvällen",
    "ingress": null,
-   "summering": "Leeds oroar sig mer för sin egen vana att tappa efter storsegrar än för Coventry. Gästernas supportrar tvivlar på försvaret mot inlägg och grälar om Hamers plats.",
+   "summering": "Leeds supportrar är rädda att laget faller igenom mot ett lågt försvar efter storkvällen i London. Coventry tror på ett mognare lag, bara backlinjen håller koncentrationen.",
    "delar": [
     {
      "lag": "Leeds United",
      "kallor": [
+      {
+       "podd": "The Square Ball: Leeds United Podcast",
+       "avsnitt": "Propaganda: Let It Die Down",
+       "datum": "2026-11-25",
+       "adress": "https://thesquareball.net/plus",
+       "typ": "podd"
+      },
       {
        "podd": "The Square Ball: Leeds United Podcast",
        "avsnitt": "Simon Grayson: We Just Bullied Them | The West Stand",
@@ -1006,22 +1018,23 @@
       }
      ],
      "text": [
-      "Det Leeds fruktar mest inför lördagen är sitt eget mönster. I podden The Square Ball minns man hur alla efter Newcastle trodde att det var dags att plocka fram passen, och hur det sedan blev 0–0 mot ett formsvagt Palace.",
-      "På forumen ser man också var det skaver: laget trivs mot motståndare som vill spela fotboll men saknar ”listen” att bryta ner dem som ställer bussen. Och bussen är precis vad man väntar sig.",
-      "Frank Lampard kan räkna med ett kyligt mottagande, eftersom läktaren inte har glömt hans arrogans mot Marcelo Bielsa i spionaffären."
+      "”Det är matcherna där alla väntar sig att man ska vinna”, säger man i The Square Ball, och just det oroar mer än Coventry. Senast Elland Road gick hem i extas, efter Newcastle, kom ett formsvagt Palace och det slutade 0–0.",
+      "På forumet NOT606 är diagnosen hård: Leeds trivs mot lag som vill spela, men mot dem som ställer bussen saknas listen. Ingen i truppen anses kunna slå den avgörande passningen, så supportrarna vill se fler distansskott, gärna från Anton Stach.",
+      "Frank Lampard kan räkna med ett iskallt mottagande, eftersom hans uppträdande mot Marcelo Bielsa i spionaffären inte är glömt."
      ],
      "citat": {
-      "sagt": "Vi gör en enastående insats mot ett lag som på papperet är topp sex. Sedan försvinner vi och nivån sjunker.",
-      "vem": "Musicman1965",
-      "podd": "Marching On Together",
-      "typ": "forum",
-      "datum": "2026-11-24"
+      "sagt": "Gör man mål under de första 20–25 minuterna slappnar hela arenan av, och förhoppningsvis kan laget också slappna av och spela.",
+      "vem": null,
+      "podd": "The Square Ball: Leeds United Podcast",
+      "typ": "podd",
+      "datum": "2026-11-23"
      },
      "namn": [
+      "Anton Stach",
       "Frank Lampard",
       "Marcelo Bielsa"
      ],
-     "paSpel": "Beviset att Chelseasegern inte var en engångsföreteelse, med City borta veckan efter."
+     "paSpel": "Att visa att Chelsea inte var en engångsföreteelse, med City väntande veckan efter."
     },
     {
      "lag": "Coventry City",
@@ -1175,16 +1188,16 @@
       }
      ],
      "text": [
-      "I Coventry är det inläggen som håller supportrarna vakna. ”Stoppa inlägget”, upprepar man i podden Sky Blue Fans TV, där båda Palacemålen beskrivs som hela lagets fel.",
-      "På forumet pekas Milan van Ewijk och Bobby Thomas ut, eftersom de stod och tittade på bollen när två anfallare löpte in fritt.",
-      "Gustavo Hamer gjorde intryck när han hoppade in, och Frank Lampard säger själv att han nu kan spela djupare. Ändå är supportrarna oense: vissa vill se honom centralt från start, andra tror mer på en halvtimme från bänken."
+      "På Sky Blues Talk tror man att Elland Road kan bli platsen för säsongens första oavgjorda match. Laget anses ha varit ”naivt” när det kastade bort poäng mot Hull, Fulham och City, men har nu blivit mer slipat.",
+      "Oron gäller försvaret. Vid fasta situationer har Milan van Ewijk och Bobby Thomas stått och tittat på bollen, och i Sky Blue Fans TV upprepas samma mantra: ”stoppa inlägget”.",
+      "Gustavo Hamer är veckans fråga. Frank Lampard säger att Hamer kan spela djupare och ger honom ett nytt alternativ, men i podden tror man att han redan har blivit inhoppare för gott."
      ],
      "citat": {
-      "sagt": "Varför säger alla att Leeds är formlaget och att de flyger? Vi har tagit fler poäng än de på de sex senaste.",
-      "vem": "curly_tom",
+      "sagt": "Problemet i Premier League är att man måste vara på tårna hela matchen, hela tiden. I Championship kommer man undan med lite dagdrömmande.",
+      "vem": "jordan210",
       "podd": "Sky Blues Talk",
       "typ": "forum",
-      "datum": "2026-11-23"
+      "datum": "2026-11-24"
      },
      "namn": [
       "Milan van Ewijk",
@@ -1192,7 +1205,7 @@
       "Gustavo Hamer",
       "Frank Lampard"
      ],
-     "paSpel": "Hoppet om säsongens första oavgjorda, efter flera naivt bortkastade kryss."
+     "paSpel": "Lampards återkomst till Elland Road, och kanske säsongens första poängdelning."
     }
    ]
   },
@@ -1205,10 +1218,10 @@
     "Bolton Wanderers"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-26T02:11:33.632Z",
-   "rubrik": "Boltons recept: låt motståndaren ha bollen",
+   "skriven": "2026-11-26T02:46:28.728Z",
+   "rubrik": "Solis tillbaka, och Birmingham får spela fotboll igen",
    "ingress": null,
-   "summering": "Birmingham har Solis tillbaka men har kört fast mot lag som backar hem. Bolton mår å sin sida bäst när motståndaren har bollen.",
+   "summering": "Birmingham har sin mittfältsmotor tillbaka men oroar sig för hur laget klarar ett lågt försvar. Bolton tvivlar på sin playoffhjälte och trivs bäst utan boll.",
    "delar": [
     {
      "lag": "Birmingham City",
@@ -1357,28 +1370,33 @@
       }
      ],
      "text": [
-      "I podden Tilton Talk jämför man Birmingham utan Jhon Solis med Spanien utan Rodri. Mot Stoke stod Paik Seung-Ho bredvid Tomoki Iwata, drev ut till vänster och lämnade ett hål mitt i planen.",
-      "Solis är spelklar, men Chris Davies påminner om att tre matcher i veckan är mycket begärt av en ung landslagsman. På forumet Small Heath Alliance oroar man sig mer för att Cardiff och Stoke stoppade laget på samma sätt: en timme utan chanser, sedan stånk mot ett lågt försvar.",
-      "En skribent talar om en tränare med ”en taktisk blind fläck”."
+      "I podden Tilton Talk är veckans slutsats att allt hänger på Jhon Solis. Utan honom mot Stoke föll laget tillbaka i långa bollar mot August Priske: ”Vi har gått tillbaka ett halvår.” I Burnley var han tillbaka och gav laget lugn i uppbyggnaden igen.",
+      "På forumet oroar man sig mer för Chris Davies. Förlusterna mot Cardiff och Stoke såg likadana ut, med en timme utan chanser och sedan stångande mot ett lågt försvar. Andra påminner om att laget vann de sex övriga matcherna."
      ],
      "citat": {
-      "sagt": "Jhon är ung, och tre matcher i veckan är mycket begärt när han också spelar landslagsfotboll, så vi kommer att behöva alla.",
-      "vem": "Chris Davies",
-      "podd": "Birmingham Live",
-      "typ": "lokal",
-      "datum": "2026-11-24"
+      "sagt": "Vi är ett topp åtta-lag med en tränare som har en taktisk blind fläck mot lag som ställer upp på ett visst sätt.",
+      "vem": "Burns Eyebrows",
+      "podd": "Small Heath Alliance",
+      "typ": "forum",
+      "datum": "2026-11-23"
      },
      "namn": [
       "Jhon Solis",
-      "Paik Seung-Ho",
-      "Tomoki Iwata",
+      "August Priske",
       "Chris Davies"
      ],
-     "paSpel": "Ett svar på om tränaren har en blind fläck mot lag som backar."
+     "paSpel": "Att hänga med till januari, då värvningarna ska lyfta laget."
     },
     {
      "lag": "Bolton Wanderers",
      "kallor": [
+      {
+       "podd": "The Lion of Vienna - A Bolton Wanderers podcast",
+       "avsnitt": "LOVpod 2026/27 Episode 16",
+       "datum": "2026-11-24",
+       "adress": "https://shows.acast.com/the-lion-of-vienna-a-bolton-wanderers-podcast/episodes/lovpod-202627-episode-16",
+       "typ": "podd"
+      },
       {
        "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
        "avsnitt": "Draw-ll That Bad? - The Fanzone Pod Ep.212",
@@ -1399,21 +1417,43 @@
        "amne": "elva",
        "punkter": [
         {
-         "t": "Tränaren Steven Schumacher sa att Christian Forino Joseph och Thierry Gale petades mot Portsmouth för att de var trötta efter en lång landslagsresa. Han tillade att de som spelat förtjänade att få fortsätta.",
-         "s": "b",
+         "t": "Värdarna vill att Atsuki Ito tar Rodrigues plats som offensiv mittfältare eftersom han tar bättre hand om bollen och spelar snabbare. En av dem vill hellre se Rodrigues som djupare åtta med Ito framför sig.",
+         "s": "o",
          "podd": [
-          "The Bolton News"
+          "The Lion of Vienna - A Bolton Wanderers podcast"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-24"
          ],
-         "typ": "lokal"
+         "typ": "podd"
         }
        ]
       },
       {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Ruben Rodrigues, hjälten från playoff-finalen på Wembley, ser vilsen ut i Championship. Han är för långsam med bollen, överanalyserar och bromsar anfallen. Värdarna tror att tempot i serien är för högt för honom.",
+         "s": "o",
+         "podd": [
+          "The Lion of Vienna - A Bolton Wanderers podcast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Vänsterkanten med Conway, Famewo och Iling-Junior är lagets svaga punkt. Där tappas bollen och spelarna trasslar in sig i varandra, medan högersidan med Larrazabal och Stevenson fungerar. Ständig rotation på vänsterkanten anses göra det värre.",
+         "s": "o",
+         "podd": [
+          "The Lion of Vienna - A Bolton Wanderers podcast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Supportrarna ser ett växande problem: Bolton dominerar matcher utan att avgöra dem. Före lördagen hade laget förlorat sex av sju matcher där de haft mest boll. Laget anses vara som bäst utan boll och på kontringar.",
          "s": "o",
@@ -1426,41 +1466,19 @@
          "typ": "podd"
         },
         {
+         "t": "Lagets hörnor ger ingenting trots att det finns gott om längd i laget. Hittills har det blivit 88 hörnor utan ett enda mål, och det senaste vanliga hörnmålet med huvudet kom i februari.",
+         "s": "h",
+         "podd": [
+          "The Lion of Vienna - A Bolton Wanderers podcast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna vill att yttrarna spelar på sin naturliga kant och slår inlägg till Sam Dalby i stället för att dra sig inåt. Samuel Iling-Junior på vänsterkanten gjorde sin bästa match, och Thierry Gales inåtskär har inte gett tillräckligt.",
          "s": "o",
-         "podd": [
-          "The Fanzone Pod - Bolton Wanderers Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Analytikern Statman menar att uppspelen bakifrån mot ett högt pressande lag gav det tidiga baklänges målet. Xavier Simons stod kvar vid mittlinjen i stället för att erbjuda sig. Laget släpper in för många sådana mål och måste spela enklare i Championship.",
-         "s": "o",
-         "podd": [
-          "The Fanzone Pod - Bolton Wanderers Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Statman tycker att Max Conway och Iling-Junior står på exakt samma yta och att en av dem slösas bort. Värdarna håller inte med: de ser ett samspel där Iling-Juniors defensiva arbete täcker för Conways brister bakåt.",
-         "s": "o",
-         "podd": [
-          "The Fanzone Pod - Bolton Wanderers Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Ruben Rodrigues har inte varit samma spelare som förra säsongen, och en av värdarna misstänker att han bär på en skada sedan försäsongen. Tian-rollen kallas förbannad, och alternativet John McAtee övertygar ingen.",
-         "s": "h",
          "podd": [
           "The Fanzone Pod - Bolton Wanderers Podcast"
          ],
@@ -1475,13 +1493,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Tränaren var märkbart försiktigare defensivt än tidigare i höstas, och supportrarna tror att han lär sig under resans gång. Ett tidigare Bolton i Championship hade enligt dem förlorat den matchen.",
+         "t": "Med 18 poäng och sju poäng ner till nedflyttningsstrecket tycker värdarna att säsongen redan är godkänd. Supportrarna måste sluta vänta sig mer än så av laget.",
          "s": "o",
          "podd": [
-          "The Fanzone Pod - Bolton Wanderers Podcast"
+          "The Lion of Vienna - A Bolton Wanderers podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-24"
          ],
          "typ": "podd"
         }
@@ -1505,21 +1523,21 @@
       }
      ],
      "text": [
-      "Bolton har ett märkligt problem: laget dominerar matcher utan att avgöra dem. Före lördagen mot Portsmouth hade det förlorat sex av sju matcher där det haft mest boll, och i podden The Fanzone Pod anses laget vara som bäst utan boll och på kontringar.",
-      "Därför vågar ingen avskriva resan till Birmingham, eftersom laget ofta har stått upp mot riktigt bra lag på bortaplan.",
-      "Mer oro väcker Ruben Rodrigues, som en av värdarna misstänker har burit på en skada sedan försäsongen och som har sett ut att ha ”sprungit i sirap”."
+      "Ruben Rodrigues, playoffhjälten från Wembley, ser vilsen ut i Championship, och i podden The Lion of Vienna tycker man att han är för långsam med bollen. En värd i en annan podd misstänker en skada sedan försäsongen: han har sett ut ”som om han sprungit i sirap”. Många vill se Atsuki Ito i hans ställe.",
+      "Den större gåtan är att laget dominerar utan att avgöra, och supportrarna tror att det är som bäst utan boll och på kontringar. Därför vågar ingen avskriva lördagen, eftersom det har gått bra borta mot starka lag."
      ],
      "citat": {
-      "sagt": "Det var lite som säsongen i miniatyr: jag gick därifrån besviken på resultatet.",
-      "vem": "Ben",
-      "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
+      "sagt": "Vi är bokstavligen sneda som lag. Jag har noll förtroende för den där vänsterkanten.",
+      "vem": null,
+      "podd": "The Lion of Vienna - A Bolton Wanderers podcast",
       "typ": "podd",
-      "datum": "2026-11-22"
+      "datum": "2026-11-24"
      },
      "namn": [
-      "Ruben Rodrigues"
+      "Ruben Rodrigues",
+      "Atsuki Ito"
      ],
-     "paSpel": "Ett nytt prov på bortaformen mot de riktigt bra lagen."
+     "paSpel": "Inte mycket: säsongen är redan godkänd, tycker podden."
     }
    ]
   },
