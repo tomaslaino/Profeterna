@@ -15,28 +15,28 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-25T02:33:48.470Z",
+ "skriven": "2026-11-26T02:16:13.457Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-25T02:31:10.084Z",
+ "underlag": "2026-11-26T02:15:54.864Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "DET GÖR",
+    "UNITED-FANS:",
     0
    ],
    [
-    "INTE ONT",
+    "DET GÖR INTE",
+    0
+   ],
+   [
+    "ONT LÄNGRE",
     1
-   ],
-   [
-    "LÄNGRE",
-    0
    ]
   ],
-  "under": "Det värsta, säger en supporter i United We Stand, är att förlusterna inte gör ont längre.",
+  "under": "Efter 0–4 mot Liverpool har en supporter i United We Stand-podden vant sig: 20 år av motgångar.",
   "plus": "BURNLEY RÄDDA FÖR ATT VINNA",
   "plusId": "401880132"
  }
