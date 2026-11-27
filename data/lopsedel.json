@@ -15,29 +15,33 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T02:34:04.648Z",
+ "skriven": "2026-11-27T03:15:58.857Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T02:31:00.774Z",
+ "underlag": "2026-11-27T02:53:36.361Z",
  "rubrik": {
-  "id": "401879226",
-  "kick": "MANCHESTER UNITED",
+  "id": "401880132",
+  "kick": "BURNLEY",
   "rad": [
    [
-    "UNITEDFANS:",
+    "TRÄNAREN:",
     0
    ],
    [
-    "GÖR INTE",
+    "”RÄDSLAN",
     0
    ],
    [
-    "ONT LÄNGRE",
+    "FÖR ATT",
+    0
+   ],
+   [
+    "VINNA”",
     1
    ]
   ],
-  "under": "Det värsta efter 0–4 mot Liverpool, enligt en supporter i podden United We Stand",
-  "plus": "BURNLEY RÄDDA FÖR ATT VINNA",
-  "plusId": "401880132"
+  "under": "Fabio Celestini ser rädslan hos spelarna. Burnley har tappat 25 poäng från ledningsläge.",
+  "plus": "BOLTON: 88 HÖRNOR – 0 MÅL",
+  "plusId": "401880136"
  }
 }
