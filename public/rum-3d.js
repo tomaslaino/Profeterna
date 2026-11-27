@@ -4133,13 +4133,14 @@ export async function figurer(canvas, opt = {}) {
     // (den som är spänd tittar inte bort lika ofta, nvW)
     if (tv > 0) out.push([TV, tv * (1 - ibland(t + o.phase * 1.7, 26, 0.53 + FI(o) * 0.17, 0, 0.8, 3.6, 4.4) * (1 - 0.75 * nvW(o, t)))]);
     if (!S.nag) return out;
-    const wait = figs.filter((x) => x.inneAt === Infinity);
-    const by = figs.filter((x) => x.inneAt !== Infinity);
+    // (den som har lagt ifrån sig kupongen för radions skull dansar: ingen tittar på hen för det, medKupong)
+    const wait = figs.filter((x) => medKupong(x, t));
+    const by = figs.filter((x) => !medKupong(x, t));
     if (!wait.length || !by.length) return out;
     // (båda samtidigt: samma stund för alla, vana)
     const bv = S.nag >= 1 ? vana(t, 27, 0.87, 4.5, 0) : null;
     const both = bv ? bump(bv.l, 0, 0.5, 3.8, 4.5) : 0;
-    if (o.inneAt === Infinity) {
+    if (medKupong(o, t)) {
       if (both > 0) out.push([headIn(nearest(o, by)), bump(bv.l, 1.4, 1.8, 2.9, 3.4)]);
       return out;
     }
@@ -4287,7 +4288,26 @@ export async function figurer(canvas, opt = {}) {
   // som vanligt (0,82) och strax därpå det första blosset eller klunken.
   const TR = 4.4;
   const SLOT = 10;
-  const uOf = (o, t) => (t - o.inneAt) / TR;
+  // Radion: den som inte har lämnat in nickar först med i musiken, lägger sedan kupongen på bordet och
+  // pennan bakom örat (samma övergång som när man lämnar in), tar ölen och hänger på dansen efter de
+  // andra – och tar upp kupongen igen när musiken är slut. Förut satt den som väntade kvar med
+  // kupongen och dansade aldrig, och före en omgång har ofta ingen lämnat in.
+  // KUPR per figur { at, u0, d }: u står på u0 till at och går sedan mot 1 (d 1) eller 0 (d −1).
+  const KUPR = {};
+  const kupU = (o, t) => {
+    const s = KUPR[o.F.key];
+    if (!s) return 0;
+    return t <= s.at ? s.u0 : Math.min(1, Math.max(0, s.u0 + (s.d * (t - s.at)) / TR));
+  };
+  // (när händerna är fria för dansen, eller null: den som inte väntar, eller redan är fri)
+  function kupFri(o) {
+    const s = KUPR[o.F.key];
+    if (o.inneAt !== Infinity || !s || s.d < 0 || s.u0 >= 0.9) return null;
+    return s.at + (0.9 - s.u0) * TR;
+  }
+  const uOf = (o, t) => (o.inneAt === Infinity ? kupU(o, t) : (t - o.inneAt) / TR);
+  // (sitter med kupongen i handen just nu)
+  const medKupong = (o, t) => o.inneAt === Infinity && kupU(o, t) < 0.5;
   const ready = (o, t) => sm(0.8, 0.9, uOf(o, t));
   const after = (o, t, a, b, c, d) => bump(t - o.inneAt - TR * 0.85, a, b, c, d);
   // VAL: vem som just valdes som den som fyller i kupongen (vald) och när.
@@ -5714,8 +5734,10 @@ export async function figurer(canvas, opt = {}) {
     return { namn: pv.namn, l, t0: t - l };
   }
   // (den som just har vaknat kommer igång allt eftersom: dansen och påhitten växer fram)
-  const vaken = (o, t) => ready(o, t) * (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - 0.85 * groggW(o, t))
+  // (vakenFri: detsamma utan att räkna med kupongen, för takten i kroppen medan man håller i den)
+  const vakenFri = (o, t) => (1 - sovW(o, t)) * (1 - vaknaW(o, t)) * (1 - 0.85 * groggW(o, t))
     * (1 - Math.max(cheerW(o, t), sinkW(o, t), nodW(o, t))) * (1 - hejW(o, t)) * (1 - teckenW(o, t)) * (1 - gaHar(o, t));
+  const vaken = (o, t) => ready(o, t) * vakenFri(o, t);
   // Påhittet som pågår vid t ({ namn, a, l, t0, w, wk, wh }) eller null. w är hur mycket av det som
   // syns, wk för bålen och wh för armarna: bålen börjar en aning före armen och slutar en aning efter,
   // tar lite sats och svänger förbi när den sätter sig (fj) – förut gick allt in och ut samtidigt och
@@ -7556,6 +7578,9 @@ export async function figurer(canvas, opt = {}) {
       rol: i === R.a ? 0 : i === R.b ? 1 : 2, a: R.a, vem: [R.a, R.b, R.c], i, t0: x.t0, k: x.k, fro: x.fro ?? 0, per: RADIO_SLOT / DANS_SLAG,
       sang: A && A === sangArm(o), skal: A && A === skalArm(o), ting: Boolean(A && A.bench), flaskan: o.arms.some((B) => B.thing),
     };
+    // (den som först lägger ifrån sig kupongen: slaget då händerna är fria, kupFri)
+    const kf = kupFri(o);
+    if (kf != null) v.fri = (kf - x.t0 - DANS_IN) / DANS_SLAG;
     if (granne && x.forra) v.forra = { d: DANSER[x.forra], v: dansV(o, A, { t0: x.t0 - RADIO_SLOT, k: x.k - 1, fro: x.fro }, false) };
     if (granne && x.nasta) v.nasta = { d: DANSER[x.nasta], v: dansV(o, A, { t0: x.t0 + RADIO_SLOT, k: x.k + 1, fro: x.fro }, false) };
     return v;
@@ -7672,7 +7697,16 @@ export async function figurer(canvas, opt = {}) {
     const d0 = R.fran + 0.3 + 1.6 * hash(R.fran * 0.37 + i * 5.1);
     const w = sm(d0, d0 + 1.4, t) * (1 - sm(R.till, R.till + 1.2, t)) * (1 - (ak ? ak.w : 0));
     if (w < 0.01) return null;
-    return dansGung((t - R.fran - RADIO_IN - DANS_IN) / DANS_SLAG - 0.02 - 0.1 * hash(R.fran * 0.77 + i * 3.9 + 0.3), dansStil(R.fran, i), w * vaken(o, t));
+    const b = (t - R.fran - RADIO_IN - DANS_IN) / DANS_SLAG - 0.02 - 0.1 * hash(R.fran * 0.77 + i * 3.9 + 0.3);
+    const g = dansGung(b, dansStil(R.fran, i), w * vaken(o, t));
+    // (med kupongen i handen nickar man bara med, tills den ligger på bordet)
+    const rd = o.inneAt === Infinity ? ready(o, t) : 1;
+    if (rd >= 1) return g;
+    const n = dansGung(b, 'nick', 0.75 * w * (1 - rd) * vakenFri(o, t));
+    const k = [0, 1].map((j) => (g.knee ? g.knee[j] : 0) + (n.knee ? n.knee[j] : 0));
+    const ut = { knee: k };
+    for (const x of ['pitch', 'lift', 'roll', 'side', 'twist']) ut[x] = (g[x] || 0) + (n[x] || 0);
+    return ut;
   }
   // (radions luckor är lika långa som dansen får vara: rum-dans.js räknar med dansens egen längd)
   for (const namn of Object.keys(DANSER)) {
@@ -8740,8 +8774,8 @@ export async function figurer(canvas, opt = {}) {
     }
     // (matcherna: med i det, inte uttråkade)
     if (tvW(t0) > 0.5) { mul('uttrakad', 0.25); mul('fundersam', 1.8); mul('orolig', 1.5); mul('lugn', 0.7); }
-    // (den som inte har lämnat in funderar på kupongen)
-    if (o.inneAt === Infinity) { mul('fundersam', 4); mul('orolig', 1.4); }
+    // (den som inte har lämnat in funderar på kupongen – utom när den ligger på bordet för radions skull)
+    if (medKupong(o, t0)) { mul('fundersam', 4); mul('orolig', 1.4); }
     // (en match som står och väger: oroligare, och sällan uttråkad eller uppsluppen – nerverna, i
     // fjärdedelar så att stämningarna inte räknas om för varje liten ändring)
     const nv = Math.round(nvW(o, t0) * 4) / 4;
@@ -9552,7 +9586,8 @@ export async function figurer(canvas, opt = {}) {
       else if (o.inneAt === Infinity) {
         // (den som lämnar in mitt i natten vaknar)
         vakna(o, t);
-        o.inneAt = t;
+        // (och den som redan har lagt kupongen på bordet för radions skull fortsätter därifrån, kupU)
+        o.inneAt = t - kupU(o, t) * TR;
         nyss.push(o);
       }
     }
@@ -9605,6 +9640,25 @@ export async function figurer(canvas, opt = {}) {
       R.till = Infinity;
       RADIO_K.clear();
     } else R.till = t;
+    // (den som sitter med kupongen lägger den på bordet efter en stund – efter uppvaknandet om hen
+    // sov – och tar upp den igen när dansen har tonat bort; mitt i rörelsen vänder handen genast, KUPR.
+    // En i taget: i den första dansens ordning, så att den som börjar dansa också är först att lägga
+    // ifrån sig kupongen, och tillbaka i en egen ordning – förut gjorde alla tre det på samma gång.)
+    const R0 = roller({ t0: t + RADIO_IN });
+    const ord = pa ? [R0.a, R0.b, R0.c] : [0, 1, 2].sort((a, b) => hash(t * 0.29 + a * 1.9) - hash(t * 0.29 + b * 1.9));
+    for (const o of figs) {
+      const k = o.F.key;
+      const s = KUPR[k];
+      const u = kupU(o, t);
+      const i = FI(o);
+      const n = ord.indexOf(i);
+      const h = hash(t * 0.53 + i * 2.9 + 0.7);
+      let at = t + (pa ? [0.9 + 0.8 * h, 2.6 + 1.2 * h, 4.6 + 2.2 * h][n] : [0.8 + 0.6 * h, 1.9 + 0.9 * h, 3.1 + 1.4 * h][n]);
+      const v = VAK[k];
+      if (pa && v && v.djup > 0.05 && v.at >= t) at = Math.max(at, v.at + VAKNA_LEN * 0.75);
+      if (s && t > s.at && u > 0 && u < 1) at = t;
+      KUPR[k] = { at, u0: u, d: pa ? 1 : -1 };
+    }
   }
   // Prat på radion (id: stationen i rum-radio.js, null när det inte hörs längre, från t): någon lyssnar
   // (pratPlan). Det som pågår när det tystnar tonar bort.

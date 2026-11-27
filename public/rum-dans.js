@@ -684,12 +684,13 @@ function insteg(v) {
   return s === 'flaska' && !v.flaskan ? 'knapp' : s;
 }
 // När man hänger på (slag in i dansen): när radion just har satts på dröjer det, efter en sång
-// går det fortare. Den som provar en dans (utan k) börjar genast.
+// går det fortare. Den som provar en dans (utan k) börjar genast. Den som först har lagt
+// kupongen på bordet hänger på ett par slag efter att händerna blev fria (v.fri, rum-3d.js).
 function inSlag(v) {
   if (v.k == null) return 0;
   const h = pers(v, 1);
-  if (v.k === 0) return [0.5 + 1.5 * h, 4 + 4 * h, 8.5 + 5 * h][v.rol] + (insteg(v) === 'tittar' ? 3 : 0);
-  return [0, 0.5 + 1.5 * h, 1.5 + 2.5 * h][v.rol];
+  const s = v.k === 0 ? [0.5 + 1.5 * h, 4 + 4 * h, 8.5 + 5 * h][v.rol] + (insteg(v) === 'tittar' ? 3 : 0) : [0, 0.5 + 1.5 * h, 1.5 + 2.5 * h][v.rol];
+  return v.fri != null ? Math.max(s, v.fri + 1.5 + 2 * h) : s;
 }
 const utSlag = (d, v) => slutB(d) - (v.k == null ? 0 : 1.6 * pers(v, 2));
 // Ordningen i bytet vid sömmen kD (radions lucka för den nya dansen).
@@ -791,7 +792,8 @@ export function dansLage(d, b, s, v) {
   if (inn >= 1) return { ...L, upp: ut };
   const W = forLage(insteg(v), b - sen, s, v);
   if (!W) return { ...L, upp: inn * ut };
-  const wu = sm(-2, -0.7, b);
+  // (den som just har lagt kupongen på bordet lyfter armen först när händerna är fria, v.fri)
+  const wu = sm(-2, -0.7, b) * (v.fri != null ? sm(v.fri, v.fri + 2, b) : 1);
   return { ...byt(W, L, inn, v), upp: (wu + (1 - wu) * inn) * ut };
 }
 // Kroppen (lean, pitch …) med allt det där inräknat.
