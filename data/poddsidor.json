@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T14:01:27.279Z",
+ "uppdaterad": "2026-11-27T14:20:46.395Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1303,14 +1303,21 @@
     "Bolton Wanderers"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:07:03.126Z",
-   "rubrik": "Allt hänger på Solis – och Solis på ett kort",
+   "skriven": "2026-11-27T14:13:31.525Z",
+   "rubrik": "Bolton känner sig tryggast långt hemifrån",
    "ingress": null,
-   "summering": "Birmingham har en mittfältare de inte klarar sig utan och en läktare som kan bli nervös. Bolton har en tia som springer i sirap, men trivs bäst borta utan boll.",
+   "summering": "Birmingham vilar tungt på Solis och fruktar en nervös hemmaläktare. Bolton reser med en bortaform som supportrarna själva inte litar på, och med ett försvar som stänger av några minuter åt gången.",
    "delar": [
     {
      "lag": "Birmingham City",
      "kallor": [
+      {
+       "podd": "Tilton Talk Birmingham City podcast",
+       "avsnitt": "Blues v Bolton The Away End",
+       "datum": "2026-11-26",
+       "adress": "https://shows.acast.com/tiltontak/episodes/blues-v-bolton-the-away-end",
+       "typ": "podd"
+      },
       {
        "podd": "Tilton Talk Birmingham City podcast",
        "avsnitt": "Episode 12 Season 16-Tilton Talk-A Birmingham City Podcast",
@@ -1416,6 +1423,17 @@
          "typ": "podd"
         },
         {
+         "t": "Birmingham-värden menar att August Priske, som tog lång tid på sig att göra sitt första mål, nu har kommit in i laget. Han hamnar rätt, är besvärlig för backarna och saknas när han inte är med.",
+         "s": "o",
+         "podd": [
+          "Tilton Talk Birmingham City podcast"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Flera av värdarna menar att Paik Seung-Ho inte passar lagets spel längre. Han driver ut till vänster och lämnar ett hål mitt i planen, och några vill sälja honom i januari.",
          "s": "o",
          "podd": [
@@ -1436,37 +1454,31 @@
           "2026-11-24"
          ],
          "typ": "podd"
-        },
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
         {
-         "t": "Både mot Cardiff och mot Stoke kom laget till matchen med förväntningar men blev överkört i början och föll tillbaka i att slå långt mot Priske, en spelstil supportrarna trodde var borta.",
-         "s": "o",
+         "t": "Enligt Bolton-supportern Ben Gardner släpper laget gång på gång in mål på låga inlägg mitt i straffområdet. Det hände igen mot West Brom, och båda målen mot Bristol kom på samma sätt. Han tror att motståndarna har upptäckt svagheten.",
+         "s": "h",
          "podd": [
           "Tilton Talk Birmingham City podcast"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Laget var lätt att läsa och spelade det anfallsspel supportrarna vill se först de sista 15–20 minuterna. Då hade Priske redan bytts ut, så inläggen gick till ingen.",
+         "t": "Bolton har varit uruselt hemma men spelar bättre på bortaplan, med segrar mot bland andra Wolves och Norwich. Ben Gardner säger att han numera känner sig tryggare inför bortamatcher än inför hemmamatcher.",
          "s": "o",
          "podd": [
           "Tilton Talk Birmingham City podcast"
          ],
          "datum": [
-          "2026-11-24"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Supportrarna oroar sig för bredden på topp. Om Priske eller Stansfield saknas finns ingen pålitlig anfallare att ta in, och Luis Vázquez har inte fungerat som inhoppare.",
-         "s": "o",
-         "podd": [
-          "Tilton Talk Birmingham City podcast"
-         ],
-         "datum": [
-          "2026-11-24"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -1474,29 +1486,33 @@
       }
      ],
      "text": [
-      "I podden Tilton Talk är lärdomen av förlusten mot Stoke enkel: utan Jhon Solis är Birmingham som Spanien utan Rodri.",
-      "Bredvid Paik Seung-Ho blir Tomoki Iwata en annan spelare, och flera av värdarna vill sälja Paik redan i januari. Lokaltidningen påminner om baksidan: Solis står på fyra gula kort, och nästa betyder avstängning.",
-      "På forumet Small Heath Alliance oroar man sig i stället för läktaren. Spelar Bolton för att göra hemmapubliken nervös och tyst kan hemmaplan bli en press man slipper borta, och då får publiken skapa trycket själv."
+      "I podden Tilton Talk är man överens om höstens viktigaste lärdom: utan Jhon Solis är Birmingham som Spanien utan Rodri. Tomoki Iwata blir en annan spelare när han har Paik Seung-Ho bredvid sig i stället. Lokaltidningen påminner om att Solis går på fyra gula kort, så varje närkamp han går in i blir en risk.",
+      "På forumet Small Heath Alliance oroar man sig mer för hemmaplanen än för motståndet. Om Bolton spelar för att göra publiken ”nervös och tyst” kan det bli jämnare än tabellen antyder, och då får läktaren själv skapa trycket. Poddens värd kallar matchen ett typiskt bananskal och tror att det väntade regnet kan bjuda på skott från distans."
      ],
      "citat": {
-      "sagt": "Plötsligt började vi sparka upp bollen till Priske, och jag tänkte: vad håller vi på med? Vi har gått tillbaka ett halvår.",
-      "vem": null,
-      "podd": "Tilton Talk Birmingham City podcast",
-      "typ": "podd",
-      "datum": "2026-11-24"
+      "sagt": "Jag tror att Bolton är mycket bättre på bortaplan än hemma, och deras tränare är rätt listig.",
+      "vem": "JohnP",
+      "podd": "Small Heath Alliance",
+      "typ": "forum",
+      "datum": "2026-11-27"
      },
      "namn": [
       "Jhon Solis",
-      "Paik Seung-Ho",
       "Tomoki Iwata",
-      "Paik",
-      "Solis"
+      "Paik Seung-Ho"
      ],
-     "paSpel": "Att hänga med i toppen till januari, när truppen ska förstärkas."
+     "paSpel": "Att hänga med i toppstriden fram till januari, när truppen ska förstärkas."
     },
     {
      "lag": "Bolton Wanderers",
      "kallor": [
+      {
+       "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
+       "avsnitt": "Baggies of Trouble - The Fanzone Pod Ep.213",
+       "datum": "2026-11-26",
+       "adress": "https://podcasters.spotify.com/pod/show/ben-timberlake2/episodes/Baggies-of-Trouble---The-Fanzone-Pod-Ep-213-e3t39b9",
+       "typ": "podd"
+      },
       {
        "podd": "The Lion of Vienna - A Bolton Wanderers podcast",
        "avsnitt": "LOVpod 2026/27 Episode 16",
@@ -1521,24 +1537,30 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Värdarna vill att Atsuki Ito tar Rodrigues plats som offensiv mittfältare eftersom han tar bättre hand om bollen och spelar snabbare. En av dem vill hellre se Rodrigues som djupare åtta med Ito framför sig.",
-         "s": "o",
-         "podd": [
-          "The Lion of Vienna - A Bolton Wanderers podcast"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Mönstret går igen vecka efter vecka: Bolton släpper knappt till något under långa perioder men har sedan fem–tio minuter då försvaret faller ihop och släpper in samma sorts mål.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Motståndarna kan lugnt ge Bolton bollen. Laget saknar kvalitet att bryta ner ett bra försvar och behöver fyra–fem chanser per mål. Utom Sam Dalby finns ingen man litar på framför mål.",
+         "s": "o",
+         "podd": [
+          "The Fanzone Pod - Bolton Wanderers Podcast"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Ruben Rodrigues, hjälten från playoff-finalen på Wembley, ser vilsen ut i Championship. Han är för långsam med bollen, överanalyserar och bromsar anfallen. Värdarna tror att tempot i serien är för högt för honom.",
          "s": "o",
@@ -1573,56 +1595,35 @@
          "typ": "podd"
         },
         {
-         "t": "Lagets hörnor ger ingenting trots att det finns gott om längd i laget. Hittills har det blivit 88 hörnor utan ett enda mål, och det senaste vanliga hörnmålet med huvudet kom i februari.",
-         "s": "h",
+         "t": "Bolton har gjort sina bästa matcher borta mot topplagen men tappat poäng mot lagen runt och under sig. Med samma insatser mot de svagare lagen hade de legat i mitten av tabellen.",
+         "s": "o",
          "podd": [
-          "The Lion of Vienna - A Bolton Wanderers podcast"
+          "The Fanzone Pod - Bolton Wanderers Podcast"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Supportrarna vill att yttrarna spelar på sin naturliga kant och slår inlägg till Sam Dalby i stället för att dra sig inåt. Samuel Iling-Junior på vänsterkanten gjorde sin bästa match, och Thierry Gales inåtskär har inte gett tillräckligt.",
+         "t": "Samuel Iling-Junior har blommat ut sedan han flyttades till vänsterkanten. På högerkanten såg han vilsen ut, men nu tar han sig till kortlinjen, slår inlägg och jobbar dessutom hem.",
          "s": "o",
          "podd": [
           "The Fanzone Pod - Bolton Wanderers Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-26"
          ],
          "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
+        },
         {
-         "t": "Med 18 poäng och sju poäng ner till nedflyttningsstrecket tycker värdarna att säsongen redan är godkänd. Supportrarna måste sluta vänta sig mer än så av laget.",
-         "s": "o",
-         "podd": [
-          "The Lion of Vienna - A Bolton Wanderers podcast"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Bortamatchen mot Birmingham ses som mycket svårare än Portsmouth. Samtidigt påpekar supportrarna att laget har gått bra på bortaplan, särskilt mot starka lag, så ingen vågar säga vad som händer.",
+         "t": "Poddens analytiker menar att Bolton ska backa till ett mellanblock när motståndarna har bollen i stället för att stå kvar med hög backlinje. Den höga linjen har redan kostat många mål.",
          "s": "o",
          "podd": [
           "The Fanzone Pod - Bolton Wanderers Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -1630,22 +1631,18 @@
       }
      ],
      "text": [
-      "I podden The Lion of Vienna ser man Ruben Rodrigues, hjälten från playoff-finalen på Wembley, gå vilse i Championship: han är för långsam med bollen och tänker för mycket.",
-      "I The Fanzone Pod misstänker en värd att han har burit på en skada sedan försäsongen, medan man i den andra podden hellre startar Atsuki Ito. Hörnorna är ett eget kapitel: 88 i år och inte ett enda mål.",
-      "Tröstan är att laget är som bäst utan boll och på kontringar, och att det har gått bra borta mot riktigt bra lag."
+      "I The Fanzone Pod ser man samma mönster vecka efter vecka. Bolton släpper knappt till något under långa stunder, men sedan kommer några minuter då försvaret ”plötsligt försvinner helt”.",
+      "I podden The Lion of Vienna gnager något annat: laget har gott om längd men har inte fått ut ett enda mål av 88 hörnor.",
+      "Stämningen har också svalnat. Efter tomma läktare och kyla i senaste hemmamatchen talar supportrarna om en känsla av förfall, som om all glans med att vara i Championship ”liksom försvann”."
      ],
      "citat": {
-      "sagt": "Vi är bokstavligen sneda som lag. Jag har noll förtroende för den där vänsterkanten.",
-      "vem": null,
-      "podd": "The Lion of Vienna - A Bolton Wanderers podcast",
+      "sagt": "Ett växande problem för oss den här säsongen är att vi dominerar men inte avgör.",
+      "vem": "Daryl",
+      "podd": "The Fanzone Pod - Bolton Wanderers Podcast",
       "typ": "podd",
-      "datum": "2026-11-24"
+      "datum": "2026-11-22"
      },
-     "namn": [
-      "Ruben Rodrigues",
-      "Atsuki Ito"
-     ],
-     "paSpel": "Inte mycket: säsongen är redan godkänd, och mer än så ska ingen begära."
+     "paSpel": "Ett nytt prov på bortaformen mot starka lag, som ingen riktigt vågar lita på."
     }
    ]
   },
@@ -1658,10 +1655,10 @@
     "Watford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:07:31.463Z",
-   "rubrik": "Julhandeln konkurrerar med bottenmötet på Pride Park",
+   "skriven": "2026-11-27T14:20:46.395Z",
+   "rubrik": "Plan A är 0–0, plan B är julhandeln",
    "ingress": null,
-   "summering": "Derby har en tränare under hård press och en läktare som håller på att tappa intresset. Watford har en ny tränare som ingen tror på och en ägare som supportrarna har gett upp om.",
+   "summering": "Derby bygger allt på att hålla nollan inför en läktare som hellre går på julhandel. Watford har bytt tränare men tror fortfarande inte på något på bortaplan.",
    "delar": [
     {
      "lag": "Derby County",
@@ -1820,9 +1817,8 @@
       }
      ],
      "text": [
-      "I The Rams Review Podcast sammanfattas John Eustaces fotboll kort: ”Plan A är 0–0”, och spricker den finns ingen fortsättning. Bytena vid 0–1 i Southampton var spelare mot spelare och kändes som att ge upp.",
-      "Värdarna hör allt fler supportrar säga att de inte ens kollade resultatet förrän matchen var slut. Säsongskorten håller uppe publiksiffran, men på lördag väntas många tomma stolar, och julhandeln lockar mer.",
-      "Matchen ses som avgörande för Eustace. Blir avståndet till säker plats kvar efteråt tror värdarna att ropen på hans avgång blir de högsta hittills."
+      "I The Rams Review Podcast har man genomskådat John Eustaces spelidé: ”Plan A är 0–0”. När motståndarna gör mål vet ingen vad laget ska göra, och bytena i underläge mot Southampton kändes som att ge upp matchen.",
+      "Ännu värre är likgiltigheten. Säsongskorten håller uppe publiksiffran, men värdarna väntar sig många tomma stolar och hör supportrar som inte ens kollat resultatet förrän matchen var slut. Just nu lockar julhandeln många mer än Pride Park."
      ],
      "citat": {
       "sagt": "Nej, det fungerade inte, John, för vi blev bombarderade de första 35 minuterna.",
@@ -1832,14 +1828,20 @@
       "datum": "2026-11-23"
      },
      "namn": [
-      "John Eustace",
-      "Eustace"
+      "John Eustace"
      ],
-     "paSpel": "Eustaces framtid: oförändrat läge efteråt, och ropen på hans avgång blir de högsta hittills."
+     "paSpel": "Eustaces framtid: ett nytt bakslag och ropen på hans avgång blir de högsta hittills."
     },
     {
      "lag": "Watford",
      "kallor": [
+      {
+       "podd": "Do Not Scratch Your Eyes",
+       "avsnitt": "DERBY COUNTY v WATFORD | OPPOSITION VIEW",
+       "datum": "2026-11-26",
+       "adress": "https://podcasts.apple.com/gb/podcast/do-not-scratch-your-eyes/id1537939738?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "From The Rookery End - A show about Watford FC",
        "avsnitt": "Blunt at the Blades - Should Watford Take the Handbrake Off?",
@@ -1889,17 +1891,6 @@
        "punkter": [
         {
          "t": "Värdarna är oense om vägen framåt. Sam vill lossa handbromsen och spela Rocco Vata och Amin Nabizada eftersom laget släpper in mål borta oavsett elva. Andra menar att yttrarna inte får plats och att det saknas en spelklar anfallare.",
-         "s": "o",
-         "podd": [
-          "From The Rookery End - A show about Watford FC"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Laget faller ihop vid första motgång. Mot Swansea, Burnley, Cardiff och nu Sheffield United låg det tidigt under, och mot Norwich rasade en 2–0-ledning.",
          "s": "o",
          "podd": [
           "From The Rookery End - A show about Watford FC"
@@ -1979,27 +1970,38 @@
           "2026-11-22"
          ],
          "typ": "media"
+        },
+        {
+         "t": "Supportrarna tycker att de har haft fel varje gång de trott att botten var nådd. Klubben har gång på gång visat att det kan bli ännu värre, och de kallar den en bilolycka.",
+         "s": "o",
+         "podd": [
+          "Do Not Scratch Your Eyes"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På WFC Forums avundas man Derby, som har en lokal ägare som själv är supporter. Under Gino Pozzo är hoppet om framgång ”stendött”.",
-      "Tränarbytet väntas inte ändra något. På NOT606 frågar man varför spelarna skulle vilja imponera på en tränare som ”förmodligen är borta till påsk”.",
-      "Dionisi fick gå efter 0–4 mot Sheffield United, och i podden From The Rookery End beskrivs bortasektionen som uppgiven snarare än arg. Det enda att klamra sig fast vid är att förra säsongens långa svit utan bortaseger bröts just på Pride Park."
+      "Efter 0–4 mot Sheffield United fanns inte ens ilska kvar på Watfords bortasektion, bara uppgivenhet. I podden From The Rookery End tycker man att spelarna går ”på autopilot” på bortaplan.",
+      "Att Alessio Dionisi har fått gå väcker ingen förhoppning. På NOT606 undrar man varför spelarna skulle vilja imponera på en tränare ”som förmodligen är borta till påsk”.",
+      "På WFC Forums avundas man rentav Derby, som har en lokal ägare och därmed hopp om en vändning. Under Gino Pozzo är det hoppet ”stendött”."
      ],
      "citat": {
-      "sagt": "Det här laget känns så skört att vi rasar ihop vid minsta motgång.",
+      "sagt": "Vi ser bara ut som ett gäng främlingar som sparkar boll en söndag i parken.",
       "vem": null,
-      "podd": "From The Rookery End - A show about Watford FC",
+      "podd": "Do Not Scratch Your Eyes",
       "typ": "podd",
-      "datum": "2026-11-22"
+      "datum": "2026-11-26"
      },
      "namn": [
-      "Gino Pozzo",
-      "Dionisi"
+      "Alessio Dionisi",
+      "Gino Pozzo"
      ],
-     "paSpel": "En sexpoängsmatch i botten, på arenan där förra säsongens bortasvit bröts."
+     "paSpel": "En sexpoängsmatch i botten, på planen där förra säsongens svit utan bortaseger bröts."
     }
    ]
   },
