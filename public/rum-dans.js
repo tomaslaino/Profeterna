@@ -639,6 +639,9 @@ export const DANSER = {
 // tar ingen ett varv till (varvNu).
 DANSER.italoSnurr.igang = 1;
 DANSER.italoSnurr.helaVarv = 1;
+// Synten har sin allvarliga min och blåset munnen på instrumenten: där sjunger ingen med (sjungMed).
+DANSER.italoSynt.egenMun = 1;
+DANSER.italoBlas.egenMun = 1;
 // När var och en snurrar (slag), och alla tre.
 const SNURR = [4, 8, 12];
 const SNURR_ALLA = 18;
@@ -760,6 +763,25 @@ function varvNu(d, v) {
 }
 // hur mycket man är inne i varvet (armen, fötterna och munnen), en stund före och efter
 const varvW = (VV, b) => (VV ? bump(b, VV.a - 1, VV.a, VV.a + VV.len, VV.a + VV.len + 1) : 0);
+
+// ---------- att sjunga med ----------
+// Låten på radion har en refräng, åtta slag av sexton (på olika ställen i varje lucka), och där
+// sjunger de med i dansen, var och en på sitt sätt och olika för varje refräng (sjungMed): hela
+// raderna med ett andetag i slutet, bara slutet av varje rad, eller inte den gången. Sångaren
+// (rol 0) sjunger oftast, och ofta en bit av versen också (de andra någon gång). Förut sjöng de bara där dansen själv
+// sa det, ungefär en tredjedel av tiden. Inte där munnen har annat för sig (egenMun).
+function sjungMed(d, b, v) {
+  if (v.k == null || d.egenMun) return false;
+  const o = Math.floor(16 * hash(v.fro * 0.47 + v.k * 1.31 + 0.2));
+  const fr = mod(b + o, 16);
+  const h = hash(v.fro * 0.71 + v.k * 2.9 + Math.floor((b + o) / 16) * 1.13 + v.i * 3.7);
+  const rad = mod(fr, 4);
+  if (fr < 8) {
+    if (h < (v.rol === 0 ? 0.7 : 0.5)) return rad < 3.4;
+    return h < 0.92 && rad > 1.9 && rad < 3.5;
+  }
+  return h < (v.rol === 0 ? 0.5 : 0.15) && rad > 0.5 && rad < 3;
+}
 
 // munnen (de skriker med, och den som tittar skrattar) och ögonen
 const vildSjung = (satt, b) => (satt === 'titta' ? mod(b, 4) < 2.6 : mod(b, 2) < 1.5);
@@ -960,15 +982,15 @@ export function dansSjung(d, b, v) {
   if (f) {
     const [P, vP, D, vD, bD, kD] = f;
     const { k1, k2 } = overK(P, bD, v, kD);
-    if (k1 < 0.5) return P.sjung && P.sjung(bD + v.per - sen, vP) ? 1 : 0;
-    return k2 > 0.5 && D.sjung && D.sjung(bD - sen, vD) ? 1 : 0;
+    if (k1 < 0.5) return (P.sjung && P.sjung(bD + v.per - sen, vP)) || sjungMed(P, bD + v.per - sen, vP) ? 1 : 0;
+    return k2 > 0.5 && ((D.sjung && D.sjung(bD - sen, vD)) || sjungMed(D, bD - sen, vD)) ? 1 : 0;
   }
   const { inn, ut } = med(d, b, v);
   if (inn < 0.5) return insteg(v) === 'flaska' && mod(b, 8) > 5 ? 1 : 0;
   const V = vildNu(d, b, v);
   if (V && V.w * inn * ut > 0.5) return vildSjung(V.satt, b - sen) ? 1 : 0;
   if (varvW(varvNu(d, v), b) > 0.5) return 1;
-  return d.sjung && d.sjung(b - sen, v) ? sm(0.5, 0.8, inn * ut) : 0;
+  return (d.sjung && d.sjung(b - sen, v)) || sjungMed(d, b - sen, v) ? sm(0.5, 0.8, inn * ut) : 0;
 }
 export function dansBlund(d, b, v) {
   const sen = senOf(v);

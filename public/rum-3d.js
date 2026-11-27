@@ -7712,6 +7712,18 @@ export async function figurer(canvas, opt = {}) {
     for (const x of ['pitch', 'lift', 'roll', 'side', 'twist']) ut[x] = (g[x] || 0) + (n[x] || 0);
     return ut;
   }
+  // Munnen när radion spelar och ingen dans eller sång pågår: var och en sjunger med i ungefär
+  // varannan fras om åtta slag, raderna med ett andetag emellan (vaken och inne, en stund efter
+  // att musiken har börjat). Förut var man tyst mellan danserna.
+  function radioMun(o, t) {
+    const R = SJUNG.radio;
+    if (!R.pa || t < R.fran + 2.5 || vaken(o, t) < 0.9) return false;
+    const b = (t - R.fran - RADIO_IN - DANS_IN) / DANS_SLAG;
+    const n = Math.floor(b / 8);
+    if (hash(R.fran * 0.29 + n * 1.7 + FI(o) * 2.3 + 0.6) > 0.5) return false;
+    const rad = (((b % 4) + 4) % 4);
+    return rad > 0.3 && rad < 3.4;
+  }
   // (radions luckor är lika långa som dansen får vara: rum-dans.js räknar med dansens egen längd)
   for (const namn of Object.keys(DANSER)) {
     const d = DANSER[namn];
@@ -8902,6 +8914,8 @@ export async function figurer(canvas, opt = {}) {
     const vd = valdD(o, t);
     if (vd >= 0 && vd < 2.1) return med({ lage: 'jublar', in: 0.2 });
     if (teckenW(o, t) > 0.3 || hejW(o, t) > 0.3) return med({ lage: mild(s, 'glad'), in: 0.35 });
+    // (radion: mellan danserna och sångerna sjunger man med en rad här och där, radioMun)
+    if (!x && radioMun(o, t)) return med({ lage: 'sjunger', in: 0.12 });
     // (nerverna under matcherna: före påhittet, som ofta är nervöst det med)
     const nf = nervAnsikte(o, t, s);
     if (nf) return med(nf);
