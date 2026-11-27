@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T13:33:44.378Z",
+ "skriven": "2026-11-27T13:49:43.772Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T13:33:12.913Z",
+ "underlag": "2026-11-27T13:43:10.982Z",
  "rubrik": {
   "id": "401879226",
-  "kick": "UNITED",
+  "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "”DET GÖR",
+    "UNITED-FANS",
     0
    ],
    [
-    "INTE ONT",
+    "HAR SLUTAT",
+    0
+   ],
+   [
+    "KÄNNA SMÄRTA",
     1
-   ],
-   [
-    "LÄNGRE”",
-    0
    ]
   ],
-  "under": "Efter 0–4 mot Liverpool: ”Vi är vana vid det. Och det är skit.” (United We Stand Podcast)",
-  "plus": "BURNLEY RÄDDA FÖR ATT VINNA",
+  "under": "”Det värsta av allt är att det inte gör ont längre” – United We Stand Podcast",
+  "plus": "BURNLEY: RÄDDA FÖR ATT VINNA",
   "plusId": "401880132"
  }
 }
