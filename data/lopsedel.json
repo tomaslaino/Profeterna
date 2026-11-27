@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T15:54:30.085Z",
+ "skriven": "2026-11-27T16:11:36.671Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T15:52:21.771Z",
+ "underlag": "2026-11-27T16:04:00.945Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "UNITED-FANS:",
+    "POCHETTINOS",
     0
    ],
    [
-    "”VI ÄR VANA",
+    "HEMMAPREMIÄR",
+    0
+   ],
+   [
+    "BRUNO SJUK",
     1
-   ],
-   [
-    "VID DET”",
-    0
    ]
   ],
-  "under": "”Det värsta av allt är att det inte gör ont längre” – United We Stand Podcast",
-  "plus": "IPSWICH: 34 MATCHER UTAN NOLLA",
+  "under": "Bruno Fernandes kände sig sjuk och missade fredagens träning, skriver Manchester Evening News.",
+  "plus": "IPSWICH: 34 RAKA UTAN NOLLA",
   "plusId": "401878752"
  }
 }
