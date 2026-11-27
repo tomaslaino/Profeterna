@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T13:17:52.757Z",
+ "skriven": "2026-11-27T13:33:44.378Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T13:12:17.540Z",
+ "underlag": "2026-11-27T13:33:12.913Z",
  "rubrik": {
-  "id": "401880132",
-  "kick": "BURNLEY",
+  "id": "401879226",
+  "kick": "UNITED",
   "rad": [
    [
-    "SPELARNA",
+    "”DET GÖR",
     0
    ],
    [
-    "RÄDDA FÖR",
+    "INTE ONT",
     1
    ],
    [
-    "ATT VINNA",
+    "LÄNGRE”",
     0
    ]
   ],
-  "under": "Celestinis egen diagnos. Laget har tappat 25 poäng från ledningsläge den här säsongen.",
-  "plus": "SPORTCHEFENS HUVUD I POTTEN",
-  "plusId": "401879226"
+  "under": "Efter 0–4 mot Liverpool: ”Vi är vana vid det. Och det är skit.” (United We Stand Podcast)",
+  "plus": "BURNLEY RÄDDA FÖR ATT VINNA",
+  "plusId": "401880132"
  }
 }
