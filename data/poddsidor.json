@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T13:12:17.540Z",
+ "uppdaterad": "2026-11-27T13:33:12.913Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,10 +103,10 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-27T13:04:59.007Z",
-   "rubrik": "I Ipswich skulle en mållös match kännas som seger",
+   "skriven": "2026-11-27T13:24:31.155Z",
+   "rubrik": "Ett 0–0 vore en triumf på Portman Road",
    "ingress": null,
-   "summering": "Ipswich går in med en tränare i blåsväder och ett försvar som inte går in i duellerna. Villa har en elva som Emery fortfarande pusslar med och ett segerkrav som få tror på.",
+   "summering": "Ipswich har en hemmapublik vars tålamod med O'Neil tar slut och ett försvar som upprepar sina misstag. Villa kräver seger men tvivlar på den, med McGinn som ende pådrivare.",
    "delar": [
     {
      "lag": "Ipswich Town",
@@ -119,17 +119,17 @@
        "typ": "podd"
       },
       {
+       "podd": "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star",
+       "avsnitt": "671: Kings of Anglia: Relegation battle breakdown and Aston Villa preview",
+       "datum": "2026-11-26",
+       "adress": "https://audioboom.com/posts/8981992",
+       "typ": "podd"
+      },
+      {
        "podd": "Blue Monday: An Ipswich Town Podcast",
        "avsnitt": "🔵 THE FINAL WORD ON SPURS AND MATCH DAY 11 | Midweek Blues",
        "datum": "2026-11-24",
        "adress": "https://shows.acast.com/bluemondaypodcast/episodes/the-final-word-on-spurs-and-match-day-11-midweek-blues",
-       "typ": "podd"
-      },
-      {
-       "podd": "Kings of Anglia - Ipswich Town podcast from the EADT and Ipswich Star",
-       "avsnitt": "669: Kings of Anglia: Should we be worried after Town’s defeat at Spurs?",
-       "datum": "2026-11-23",
-       "adress": "https://audioboom.com/posts/8980538",
        "typ": "podd"
       },
       {
@@ -290,13 +290,13 @@
       }
      ],
      "text": [
-      "I podden Blue Monday svider det mest att Tottenhams andra mål var en kopia av ett mål mot Hull: en motspelare fick löpa genom hela planen utan att någon tacklade. ”Vi lärde oss ingenting”, konstaterar en av värdarna.",
-      "På forumet TWTD beskrivs Gary O'Neils förtroende som nästan förbrukat, och supportrarna uppmanas att stötta laget i stället för att bua åt varje felpass.",
-      "Efter 34 raka ligamatcher utan hållen nolla vill en poddvärd helst se en mållös match. Hans kollega nöjer sig med kamp och passion inför Coventry."
+      "På forumet TWTD beskrivs förtroendet för Gary O'Neil som ”nära övertrasserat”, och inför kvällsmatchen uppmanas supportrarna att stötta laget i stället för att bua åt varje felpass. Ett tidigt baklängesmål tros räcka för att tysta läktaren.",
+      "I podden Blue Monday svider det mest att Tottenhams andra mål var en kopia av ett mål mot Hull, där en motspelare fick löpa genom hela planen utan att någon tacklade.",
+      "Efter 34 raka ligamatcher utan hållen nolla skulle en av värdarna helst se 0–0."
      ],
      "citat": {
-      "sagt": "Njut av Palacios medan ni kan. Värvar vi inte mer riktig kvalitet i januari stannar han inte länge i det här gänget.",
-      "vem": "San Diego",
+      "sagt": "Vad har hänt med vår press? Den var lysande i början av säsongen, och nu verkar den bara ha försvunnit.",
+      "vem": "itfcptc",
       "podd": "NOT606",
       "typ": "forum",
       "datum": "2026-11-22"
@@ -304,7 +304,7 @@
      "namn": [
       "Gary O'Neil"
      ],
-     "paSpel": "O'Neils sviktande förtroende, och en nytändning inför bortamatchen mot Coventry."
+     "paSpel": "Läktarens tålamod med O'Neil, och en efterlängtad första nolla."
     },
     {
      "lag": "Aston Villa",
@@ -479,22 +479,22 @@
       }
      ],
      "text": [
-      "I podden The Villa Filler är allt annat än seger i Ipswich ”oacceptabelt”, samtidigt som en av värdarna erkänner att självförtroendet är på botten.",
-      "Där tror man också att Unai Emery för första gången inte vet vilket som är hans bästa lag. Bara målvakt, anfallare och ytterbackar är givna, och resten lägger han pussel med.",
-      "John McGinn var enligt podden My Old Man Said den ende med ”en svettdroppe i pannan” när han byttes in mot Sunderland. Före det spelades bollen bakåt så fort en motspelare stod i vägen."
+      "I The Villa Filler säger man att allt annat än seger i Ipswich är oacceptabelt, men en av värdarna erkänner samtidigt: ”Jag kan inte se oss vinna den matchen.”",
+      "John McGinn ses som den ende med vilja. Laget var platt mot Sunderland tills han byttes in, och han var den ende som drev bollen rakt mot försvaret.",
+      "Värdarna tror att Unai Emery för första gången inte vet vilket som är hans bästa lag: bara målvakten, anfallaren och ytterbackarna är givna."
      ],
      "citat": {
-      "sagt": "Jag vet inte vart vi tar vägen om vi förlorar den. Jag kan inte se oss vinna den matchen.",
+      "sagt": "Det är fortfarande de två sexorna. Det är där allt vilar. Det är det som gör laget riktigt starkt eller skört.",
       "vem": null,
-      "podd": "The Villa Filler Podcast",
+      "podd": "My Old Man Said — An Aston Villa Podcast",
       "typ": "podd",
-      "datum": "2026-11-25"
+      "datum": "2026-11-22"
      },
      "namn": [
-      "Unai Emery",
-      "John McGinn"
+      "John McGinn",
+      "Unai Emery"
      ],
-     "paSpel": "Chansen att vända innan PSG, Chelsea, Liverpool och Dortmund väntar."
+     "paSpel": "Sista chansen att vända innan PSG, Chelsea, Liverpool och Dortmund väntar."
     }
    ]
   },
