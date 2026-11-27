@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T16:04:00.945Z",
+ "uppdaterad": "2026-11-27T16:18:35.469Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3838,14 +3838,21 @@
     "Oxford United"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:11:20.903Z",
-   "rubrik": "Ligans bästa lag nöjer sig gärna med en poäng",
+   "skriven": "2026-11-27T16:12:54.706Z",
+   "rubrik": "Ligans bästa lag hoppas på en poäng i Luton",
    "ingress": null,
-   "summering": "Lutons podd vill tysta Brannagan med Gores bett på mittfältet. Oxford väntar på besked om Helik och förbereder sig på en eftermiddag i försvar.",
+   "summering": "Luton vill ha Gore mot Brannagan och har hittat en trygg Mengi bakåt. Oxford hänger på Heliks hälsa och skulle inte klaga på en delning.",
    "delar": [
     {
      "lag": "Luton Town",
      "kallor": [
+      {
+       "podd": "30 Points! Who Gives A Pod",
+       "avsnitt": "Luton Town vs Oxford United: The Preview Show!",
+       "datum": "2026-11-26",
+       "adress": "https://podcasts.apple.com/gb/podcast/30-points-who-gives-a-pod/id1700311219?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "30 Points! Who Gives A Pod",
        "avsnitt": "Burton Albion 1-2 Luton Town: The Live Show!",
@@ -3859,13 +3866,29 @@
        "amne": "trupp",
        "punkter": [
         {
-         "t": "Enligt en tittare i chatten hade Liam Walsh armen i en mitella efter matchen, troligen på grund av en axelskada.",
+         "t": "Enligt kommentarer från poddens livesändning gick Liam Walsh runt planen med armen i mitella efter matchen mot Burton.",
          "s": "h",
          "podd": [
           "30 Points! Who Gives A Pod"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Värdarna vill att Daniel Gore startar i stället för Walsh, skadad eller inte. De tycker att Walsh verkar sliten och är rädda att Cameron Brannagan ska vinna bollen från honom. Gore ger mer stabilitet och för bollen framåt direkt.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -3886,62 +3909,24 @@
          "typ": "podd"
         },
         {
-         "t": "Liam Walsh blir enligt supportrarna gång på gång bortknuffad från bollen när han spelar djupt. De tycker att han kan styra ett helt spel, men inte från positionen framför backlinjen.",
-         "s": "o",
+         "t": "Lutons förväntade insläppta mål är lägre än Oxfords, trots att Oxford har släppt in åtta mål färre. Värdarna ser det som ett bevis på att Luton har skänkt bort mål genom misstag och inte har ett dåligt försvarsupplägg.",
+         "s": "h",
          "podd": [
           "30 Points! Who Gives A Pod"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Daniel Gore kom in tidigt mot Burton och vände matchen. Värdarna ser honom som framtiden på den defensiva mittfältsplatsen och menar att Walsh spelar bättre längre fram, med Gore bakom sig.",
+         "t": "Mads Andersen har gått från syndabock till en av lagets bästa spelare. Han vann varje duell mot Burton och hamnar inte längre fel i positionsspelet. Värdarna medger att fansen har varit orättvist hårda mot honom och Kal Naismith.",
          "s": "o",
          "podd": [
           "30 Points! Who Gives A Pod"
          ],
          "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Teden Mengi, som Wilshere har sagt att klubben inte står i vägen för om han vill flytta, var överlägsen i försvaret i sin första match på länge. Med flera mittbackar skadade behövs han.",
-         "s": "o",
-         "podd": [
-          "30 Points! Who Gives A Pod"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Värdarna menar att Luton hade förlorat den här matchen förra säsongen. Trots flera tidigare falska gryningar tycker de sig nu se en verklig tro i laget, märkbar även i reaktionerna på läktaren efter slutsignalen.",
-         "s": "o",
-         "podd": [
-          "30 Points! Who Gives A Pod"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Den största skillnaden mot Jack Wilsheres lag i början av säsongen är enligt värdarna att det nu kan förlora mittfältskampen i en halvtimme, slåss, nicka bort bollar och ändå vinna fult.",
-         "s": "o",
-         "podd": [
-          "30 Points! Who Gives A Pod"
-         ],
-         "datum": [
-          "2026-11-23"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -3960,29 +3945,52 @@
           "2026-11-23"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Värdarna ser inte Oxfords vändning mot Wycombe som ett styrkebesked. Oxford låg under med 3–0 och vann först mot nio man. För dem visar matchen att Oxford har försvarsproblem och går att komma åt.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna tror att Oxford, med en match mindre spelad och två poäng mer, nöjer sig med oavgjort. Därför måste Luton gå på dem direkt och vinna mittfältet de första tio minuterna, inte ge bort en tjugo minuter lång start som mot Burton.",
+         "s": "o",
+         "podd": [
+          "30 Points! Who Gives A Pod"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "I podden 30 Points! Who Gives A Pod vill man ha Daniel Gore framför backlinjen för att hålla Cameron Brannagan, ”hjärtat i deras lag”, tyst. Där blir Liam Walsh annars gång på gång bortknuffad från bollen.",
-      "Fysiska lag är fortfarande Lutons akilleshäl, och Burton körde genast över mittfältet. Skillnaden mot i början av säsongen är att Jack Wilsheres lag nu kan förlora mittfältskampen i en halvtimme, nicka bort bollar och ändå vinna fult.",
-      "Tron är tillbaka, menar värdarna, och den märktes på läktaren efter slutsignalen."
+      "Hela veckan har podden 30 Points! Who Gives A Pod kretsat kring en duell som värdarna helst vill slippa: Liam Walsh mot Oxfords Cameron Brannagan. Walsh knuffas gång på gång bort från bollen framför backlinjen, medan Daniel Gore, som vände matchen mot Burton, har ”betydligt mer bett”.",
+      "I backlinjen har Teden Mengi, som värdarna inte trodde skulle spela för Luton igen, tagit befälet. Han spelar som om han ”kunde ha Crocs på fötterna” och ändå köra över anfallarna.",
+      "Efter en höst av kritik mot spelarna är det nu läktarens tur, i första hemmamatchen sedan Nicky Toons bortgång."
      ],
      "citat": {
-      "sagt": "Det verkar verkligen vara vår akilleshäl. Vi ser alltid lite lättviktiga ut mot de här lagen som försöker gå hårt åt oss.",
-      "vem": "Pete",
+      "sagt": "Det känns verkligen som att tron är tillbaka i laget, att vi faktiskt är bättre än tre fjärdedelar av den här ligan.",
+      "vem": null,
       "podd": "30 Points! Who Gives A Pod",
       "typ": "podd",
       "datum": "2026-11-23"
      },
      "namn": [
-      "Daniel Gore",
-      "Cameron Brannagan",
       "Liam Walsh",
-      "Jack Wilshere"
+      "Cameron Brannagan",
+      "Walsh",
+      "Daniel Gore",
+      "Teden Mengi"
      ],
-     "paSpel": "Ett kvitto på att den nyvunna tron inte är ännu en falsk gryning."
+     "paSpel": "Chansen att gå på ett Oxford som tros nöja sig med oavgjort."
     },
     {
      "lag": "Oxford United",
@@ -4120,9 +4128,8 @@
       }
      ],
      "text": [
-      "Utan Michał Helik har Oxford släppt in 8 mål i de ligamatcher han missat, har en supporter på Yellows Forum räknat fram. Ciaron Brown ser dessutom mycket sämre ut utan honom bredvid sig, och få tror att Sam Long står emot Lutons anfall.",
-      "Lokaltidningen skriver att Helik har varit med på åtminstone en del av träningen.",
-      "På samma forum menar man att tabellen ljuger och att Oxford är ”helt uppenbart” seriens bästa lag. Ändå skulle många vara nöjda med en poäng i Luton, där man räknar med att mest få försvara sig."
+      "På Yellows Forum står och faller allt med Michał Helik. Utan honom ser också Ciaron Brown mycket sämre ut, och ingen tror på Sam Long mot Nahki Wells, Jamie Donley och Kasey Palmer. Lokaltidningen skriver att Helik har varit med på åtminstone en del av träningen.",
+      "Annars är tonen märkligt ödmjuk för ett lag som samtidigt kallar sig ”helt uppenbart” seriens bästa: många skulle vara nöjda med en poäng i Luton. Ilskan riktas hellre mot Jack Wilshere, som anses ha startat ett massbråk efter matchen mot Barnsley."
      ],
      "citat": {
       "sagt": "Klockan fem på lördag hoppas jag att jag njuter av den varma famnen av åtminstone en poäng.",
@@ -4134,9 +4141,14 @@
      "namn": [
       "Michał Helik",
       "Ciaron Brown",
-      "Sam Long"
+      "Sam Long",
+      "Nahki Wells",
+      "Jamie Donley",
+      "Kasey Palmer",
+      "Helik",
+      "Jack Wilshere"
      ],
-     "paSpel": "Första halvan av en vecka som ska visa League One vad laget vill."
+     "paSpel": "Starten på en avgörande vecka: fyra poäng till tisdag kväll vore en signal."
     }
    ]
   },
