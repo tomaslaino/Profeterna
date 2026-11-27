@@ -15,16 +15,16 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T02:18:08.668Z",
+ "skriven": "2026-11-27T02:34:04.648Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T02:17:43.024Z",
+ "underlag": "2026-11-27T02:31:00.774Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "UNITED",
+    "UNITEDFANS:",
     0
    ],
    [
@@ -36,7 +36,7 @@
     1
    ]
   ],
-  "under": "Efter 0–4 på Anfield säger en supporter i podden United We Stand att det inte gör ont längre.",
+  "under": "Det värsta efter 0–4 mot Liverpool, enligt en supporter i podden United We Stand",
   "plus": "BURNLEY RÄDDA FÖR ATT VINNA",
   "plusId": "401880132"
  }
