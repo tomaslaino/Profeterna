@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T02:53:36.361Z",
+ "uppdaterad": "2026-11-27T13:12:17.540Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,10 +103,10 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-27T02:31:00.774Z",
-   "rubrik": "Samma misstag igen, och ingen på Portman Road skrek",
+   "skriven": "2026-11-27T13:04:59.007Z",
+   "rubrik": "I Ipswich skulle en mållös match kännas som seger",
    "ingress": null,
-   "summering": "Ipswich släpper fram motståndarna utan att tackla och har tappat gnistan både på planen och på läktaren. Villa kräver seger men tvivlar, med McGinn som enda drivkraft och en tränare som fortfarande letar sin elva.",
+   "summering": "Ipswich går in med en tränare i blåsväder och ett försvar som inte går in i duellerna. Villa har en elva som Emery fortfarande pusslar med och ett segerkrav som få tror på.",
    "delar": [
     {
      "lag": "Ipswich Town",
@@ -131,6 +131,13 @@
        "datum": "2026-11-23",
        "adress": "https://audioboom.com/posts/8980538",
        "typ": "podd"
+      },
+      {
+       "podd": "TWTD",
+       "avsnitt": "Net migration falls to lowest level for 30 years · Tammy Abraham · Fan base unhappy",
+       "datum": "2026-11-27",
+       "adress": "https://www.twtd.co.uk/forum/643446/net-migration-falls-to-lowest-level-for-30-years/#120",
+       "typ": "forum"
       },
       {
        "podd": "NOT606",
@@ -209,17 +216,6 @@
          "typ": "podd"
         },
         {
-         "t": "Pressen som imponerade i säsongens första matcher har försvunnit. Nu backar laget hem och står passivt, och ändå skapar motståndarna chanser nästan varje gång de går framåt.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "forum"
-        },
-        {
          "t": "Pressen som imponerade i höstens första matcher har enligt supportrarna försvunnit. Laget står passivt och lågt utan att vara organiserat nog för det.",
          "s": "o",
          "podd": [
@@ -231,18 +227,18 @@
          "typ": "forum"
         },
         {
-         "t": "Värdarna är mest uppgivna över att Tottenhams andra mål var en kopia av ett mål Ipswich släppte in mot Hull några veckor tidigare. En motspelare fick löpa genom hela planen utan att någon gick in i en tackling.",
+         "t": "Pressen som imponerade i säsongens första matcher har försvunnit. Nu backar laget hem och står passivt, och ändå skapar motståndarna chanser nästan varje gång de går framåt.",
          "s": "o",
          "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
+          "NOT606"
          ],
          "datum": [
-          "2026-11-26"
+          "2026-11-22"
          ],
-         "typ": "podd"
+         "typ": "forum"
         },
         {
-         "t": "Mot Tottenham verkade spelarna inte veta vad de skulle göra i trebackslinjen. Ouattara såg obekväm ut som högervingback, och Maeda blev bortkastad när laget inte pressade.",
+         "t": "Värdarna är mest uppgivna över att Tottenhams andra mål var en kopia av ett mål Ipswich släppte in mot Hull några veckor tidigare. En motspelare fick löpa genom hela planen utan att någon gick in i en tackling.",
          "s": "o",
          "podd": [
           "Blue Monday: An Ipswich Town Podcast"
@@ -269,6 +265,17 @@
          "typ": "podd"
         },
         {
+         "t": "Missnöjet växer, och O'Neils förtroende sägs nästan vara förbrukat. En ny kollaps mot Villa inför tv-kamerorna kan döda stämningen helt, så supportrarna uppmanas att stötta laget i stället för att bua åt varje felpass.",
+         "s": "o",
+         "podd": [
+          "TWTD"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "forum"
+        },
+        {
          "t": "De tre segrarna i slutminuterna, som tidigare sågs som ett tecken på kämparanda, har börjat oroa. Supportrarna ser dem nu som ett bevis på att laget aldrig kan vinna en match bekvämt.",
          "s": "o",
          "podd": [
@@ -283,13 +290,13 @@
       }
      ],
      "text": [
-      "Tottenhams andra mål svider mest i podden Blue Monday: det var en kopia av ett mål mot Hull, när en motspelare fick löpa genom hela planen utan att någon tacklade. ”Vi lärde oss ingenting”, suckar en av värdarna, som ser drag från nedflyttningssäsongen dyka upp igen.",
-      "Ingen pekade eller skrek efter misstagen, och spelarna promenerade fram till hörnorna i underläge. ”Alla såg bara ut som: jaha.”",
-      "Nu hörs för första gången röster om att Gary O'Neil inte är rätt man, och det är spelet snarare än resultaten som skaver."
+      "I podden Blue Monday svider det mest att Tottenhams andra mål var en kopia av ett mål mot Hull: en motspelare fick löpa genom hela planen utan att någon tacklade. ”Vi lärde oss ingenting”, konstaterar en av värdarna.",
+      "På forumet TWTD beskrivs Gary O'Neils förtroende som nästan förbrukat, och supportrarna uppmanas att stötta laget i stället för att bua åt varje felpass.",
+      "Efter 34 raka ligamatcher utan hållen nolla vill en poddvärd helst se en mållös match. Hans kollega nöjer sig med kamp och passion inför Coventry."
      ],
      "citat": {
-      "sagt": "Och vad har hänt med vår press? Den var lysande i början av säsongen, men nu verkar den bara vara borta.",
-      "vem": "itfcptc",
+      "sagt": "Njut av Palacios medan ni kan. Värvar vi inte mer riktig kvalitet i januari stannar han inte länge i det här gänget.",
+      "vem": "San Diego",
       "podd": "NOT606",
       "typ": "forum",
       "datum": "2026-11-22"
@@ -297,7 +304,7 @@
      "namn": [
       "Gary O'Neil"
      ],
-     "paSpel": "Full styrka för att få fart inför Coventry, matchen med röd ring."
+     "paSpel": "O'Neils sviktande förtroende, och en nytändning inför bortamatchen mot Coventry."
     },
     {
      "lag": "Aston Villa",
@@ -325,17 +332,24 @@
       },
       {
        "podd": "Vital Villa",
+       "avsnitt": "The Alejandro Garnacho Thread · Other Clubs News Discussion Thread · The Unai Emery Thread",
+       "datum": "2026-11-27",
+       "adress": "https://forums.vitalfootball.co.uk/threads/the-alejandro-garnacho-thread.150502/",
+       "typ": "forum"
+      },
+      {
+       "podd": "Vital Villa",
        "avsnitt": "The Unai Emery Thread · Other Clubs News Discussion Thread · The Alejandro Garnacho Thread",
        "datum": "2026-11-27",
        "adress": "https://forums.vitalfootball.co.uk/threads/the-unai-emery-thread.127577/",
        "typ": "forum"
       },
       {
-       "podd": "Vital Villa",
-       "avsnitt": "Aston Villa v Sunderland Match Thread - Sat 21st Nov - 3pm · Other Clubs News Discussion Thread · The Alejandro Garnacho Thread",
-       "datum": "2026-11-25",
-       "adress": "https://forums.vitalfootball.co.uk/threads/aston-villa-v-sunderland-match-thread-sat-21st-nov-3pm.152337/",
-       "typ": "forum"
+       "podd": "AVillaFan.com",
+       "avsnitt": "How to watch Ipswich Town v Aston Villa in the UK: kick-off time, live streaming and TV channels - AVillaFan.com – Aston Villa Fan Site",
+       "datum": "2026-11-27",
+       "adress": "https://www.avillafan.com/41450/how-to-watch-ipswich-town-v-aston-villa-in-the-uk-kick-off-time-live-streaming-and-tv-channels/",
+       "typ": "media"
       },
       {
        "podd": "AVillaFan.com",
@@ -349,13 +363,6 @@
        "avsnitt": "VILLA’S DEFENCE GAVE US A CHANCE, BUT OUR ATTACK NEVER TOOK IT",
        "datum": "2026-11-24",
        "adress": "https://justintalksvilla.substack.com/p/villas-defence-gave-us-a-chance-but",
-       "typ": "media"
-      },
-      {
-       "podd": "Talk Villa+",
-       "avsnitt": "Underwhelming Villa held to drab draw vs Sunderland",
-       "datum": "2026-11-22",
-       "adress": "https://talkvilla.substack.com/p/underwhelming-villa-held-to-drab",
        "typ": "media"
       },
       {
@@ -415,15 +422,15 @@
          "typ": "podd"
         },
         {
-         "t": "Nicolas Jackson tar sig förbi ytterbacken till bra lägen men står ofta utan passningsalternativ i straffområdet. Ska Mbaye och Alysson flyttas upp för farten behöver de stöd, annars stannar anfallet av.",
+         "t": "Ian Maatsen får mycket kritik från supportrarna, men en av värdarna tycker att det är orättvist. Enligt honom är Maatsen en av de få som verkligen försöker bidra, men han får ingen hjälp av lagkamraterna.",
          "s": "o",
          "podd": [
-          "Vital Villa"
+          "The Villa Filler Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-25"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -472,22 +479,22 @@
       }
      ],
      "text": [
-      "I The Villa Filler Podcast är allt annat än seger i Ipswich oacceptabelt, med PSG, Chelsea, Liverpool och Dortmund näst på tur. Ändå säger en av värdarna att han inte kan se laget vinna.",
-      "Den ende som tänder något är John McGinn, som efter inhoppet mot Sunderland var den ende på planen med ”en svettdroppe i pannan”.",
-      "Runt honom roterar Unai Emery så mycket att supportrarna för första gången tror att han inte vet vilken hans bästa elva är. Bara målvakt, anfallare och ytterbackar räknas som givna."
+      "I podden The Villa Filler är allt annat än seger i Ipswich ”oacceptabelt”, samtidigt som en av värdarna erkänner att självförtroendet är på botten.",
+      "Där tror man också att Unai Emery för första gången inte vet vilket som är hans bästa lag. Bara målvakt, anfallare och ytterbackar är givna, och resten lägger han pussel med.",
+      "John McGinn var enligt podden My Old Man Said den ende med ”en svettdroppe i pannan” när han byttes in mot Sunderland. Före det spelades bollen bakåt så fort en motspelare stod i vägen."
      ],
      "citat": {
-      "sagt": "Det värsta är att inse att det kanske helt enkelt är sådant här Villa är i år.",
+      "sagt": "Jag vet inte vart vi tar vägen om vi förlorar den. Jag kan inte se oss vinna den matchen.",
       "vem": null,
       "podd": "The Villa Filler Podcast",
       "typ": "podd",
-      "datum": "2026-11-21"
+      "datum": "2026-11-25"
      },
      "namn": [
-      "John McGinn",
-      "Unai Emery"
+      "Unai Emery",
+      "John McGinn"
      ],
-     "paSpel": "Sista chansen att vända innan PSG, Chelsea, Liverpool och Dortmund."
+     "paSpel": "Chansen att vända innan PSG, Chelsea, Liverpool och Dortmund väntar."
     }
    ]
   },
@@ -500,10 +507,10 @@
     "Brentford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:53:36.361Z",
-   "rubrik": "Revolution på Old Trafford: alla bakom bollen",
+   "skriven": "2026-11-27T13:05:41.231Z",
+   "rubrik": "Sportchefens huvud ligger i potten på Old Trafford",
    "ingress": null,
-   "summering": "United har hittat en enkel ordning utan boll men fruktar kollapsen efter första misstaget. Brentford vill pressa en skakig backlinje och har en vänsterback som gör mål men drar i motståndarna.",
+   "summering": "United har förenklat spelet men fruktar sina snabba ras, och en förlust kan kosta Wilcox. Brentford kommer med ett slitstarkt mittfält och en vingback som både gör mål och orsakar straffar.",
    "delar": [
     {
      "lag": "Manchester United",
@@ -537,6 +544,13 @@
        "typ": "forum"
       },
       {
+       "podd": "The Peoples Person",
+       "avsnitt": "Man United aiming to maintain stunning record versus Brentford in huge end to November",
+       "datum": "2026-11-27",
+       "adress": "https://thepeoplesperson.com/2026/11/27/mauricio-pochettinos-man-united-home-debut-vs-brentford-323582/",
+       "typ": "media"
+      },
+      {
        "podd": "MUFCLatest",
        "avsnitt": "Preview: Pochettino seeking his first United win; United need to overcome poor refereeing!",
        "datum": "2026-11-26",
@@ -551,11 +565,11 @@
        "typ": "media"
       },
       {
-       "podd": "The Peoples Person",
-       "avsnitt": "\"A test that for me was very positive\": Mauricio Pochettino makes baffling claim after Man United's Liverpool humiliation",
-       "datum": "2026-11-22",
-       "adress": "https://thepeoplesperson.com/2026/11/22/mauricio-pochettino-claims-positives-after-man-uniteds-liverpool-loss-323203/",
-       "typ": "media"
+       "podd": "Manchester Evening News",
+       "avsnitt": "Manchester United hit by Bruno Fernandes scare as Mauricio Pochettino faces late decision - AOL",
+       "datum": "2026-11-27",
+       "adress": "https://www.aol.co.uk/articles/manchester-united-hit-bruno-fernandes-114442000.html",
+       "typ": "lokal"
       }
      ],
      "grupper": [
@@ -583,6 +597,17 @@
           "2026-11-23"
          ],
          "typ": "media"
+        },
+        {
+         "t": "Lokaltidningen skriver, med ESPN som källa, att lagkaptenen Bruno Fernandes missade fredagens träning av försiktighetsskäl eftersom han kände sig sjuk. Beslutet om han kan spela fattas sent.",
+         "s": "h",
+         "podd": [
+          "Manchester Evening News"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "lokal"
         }
        ]
       },
@@ -632,17 +657,6 @@
           "2026-11-26"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Det farligaste mönstret är att laget efter ett misstag rasar ihop under några få minuter och då inte går att rädda. Det hände mot Liverpool och var nära att hända mot Sporting.",
-         "s": "h",
-         "podd": [
-          "No Question About That - a Manchester United podcast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -664,9 +678,9 @@
       }
      ],
      "text": [
-      "I podden No Question About That kändes det nästan revolutionerande att se United mot Sporting falla ner i ett kompakt 5-4-1 med alla bakom bollen. Pochettino har också satt vänsterfotade Mbeumo till vänster, så att laget sträcker ut planen i stället för att hela tiden söka sig inåt som under Carrick.",
-      "Den gamla oron finns kvar. Efter ett misstag rasar laget ihop på några minuter, som på Anfield, och det var nära att hända igen i Lissabon.",
-      "Mest pressad är ändå sportchefen Jason Wilcox, menar värdarna: blir det förlust är det hans huvud som krävs först."
+      "Förlorar United hemma mot Brentford kräver supportrarna sportchefen Jason Wilcox huvud först, före både tränarens och spelarnas, tror man i podden No Question About That.",
+      "Mauricio Pochettino har annars gjort något som känns nästan revolutionerande: han har förenklat. Vänsterfotade spelare som Bryan Mbeumo står på vänsterkanten, laget sträcker ut planen, och mot Sporting föll det ner i en kompakt femback med alla bakom bollen.",
+      "Det som skrämmer är de få minuterna efter ett misstag, när laget rasar ihop och inte går att rädda. Så gick det på Anfield, och det var nära i Lissabon."
      ],
      "citat": {
       "sagt": "Det värsta av allt är att det inte gör ont längre, för vi är vana vid det. Och det är skit.",
@@ -676,12 +690,11 @@
       "datum": "2026-11-22"
      },
      "namn": [
-      "Pochettino",
-      "Mbeumo",
-      "Carrick",
-      "Jason Wilcox"
+      "Jason Wilcox",
+      "Mauricio Pochettino",
+      "Bryan Mbeumo"
      ],
-     "paSpel": "Pochettinos första seger, och enligt podden sportchefens jobb vid förlust."
+     "paSpel": "Pochettinos första hemmamatch, och sportchefen Wilcox jobb om den går förlorad."
     },
     {
      "lag": "Brentford",
@@ -715,6 +728,13 @@
        "typ": "media"
       },
       {
+       "podd": "The Chiswick Calendar",
+       "avsnitt": "Brentford 4 Everton 0 – Bees rout subpar visitors to spoil Moyes' record night - Chiswick Calendar - Sport in Chiswick Features – Overview",
+       "datum": "2026-11-23",
+       "adress": "https://chiswickcalendar.co.uk/brentford-4-everton-0-bees-rout-subpar-visitors-to-spoil-moyes-record-night/",
+       "typ": "media"
+      },
+      {
        "podd": "West London Sport",
        "avsnitt": "Brentford v Everton player ratings - West London Sport",
        "datum": "2026-11-23",
@@ -730,20 +750,47 @@
       },
       {
        "podd": "Brentford FC",
+       "avsnitt": "Keith Andrews delivers positive injury update ahead of Manchester United trip | Brentford FC",
+       "datum": "2026-11-26",
+       "adress": "https://www.brentfordfc.com/en/news/first-team-manchester-united-v-brentford-premier-league-28-11-2026-injury-update",
+       "typ": "lokal"
+      },
+      {
+       "podd": "Brentford FC",
        "avsnitt": "Manchester United v Brentford - Match Preview, Kick-off time & More - Brentford FC",
        "datum": "2026-11-26",
        "adress": "https://www.brentfordfc.com/en/news/match-previews-manchester-united-v-brentford-premier-league-28-11-2026",
        "typ": "lokal"
-      },
-      {
-       "podd": "West London Sport",
-       "avsnitt": "Superb Brentford crush 10-man Everton - West London Sport",
-       "datum": "2026-11-23",
-       "adress": "https://www.westlondonsport.com/brentford/brentford-v-everton-report-final",
-       "typ": "lokal"
       }
      ],
      "grupper": [
+      {
+       "amne": "trupp",
+       "punkter": [
+        {
+         "t": "Igor Thiago avtjänar en avstängning på tre matcher för sitt röda kort mot Brighton. Everton-matchen var den första av de tre, så han saknas även mot Manchester United.",
+         "s": "b",
+         "podd": [
+          "The Chiswick Calendar"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "media"
+        },
+        {
+         "t": "Igor Thiago är avstängd mot Manchester United. Enligt klubbens sajt avtjänar han då den andra av tre matcher i sin avstängning.",
+         "s": "b",
+         "podd": [
+          "Brentford FC"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "lokal"
+        }
+       ]
+      },
       {
        "amne": "spel",
        "punkter": [
@@ -795,28 +842,6 @@
           "2026-11-26"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Mot dem som är dystra påpekar en av värdarna att laget bara förlorat två gånger i år, och båda gångerna med tio man redan i första halvlek. Med fullt lag har Brentford alltså inte förlorat.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Supportrarna tycker att de senaste veckorna före landslagsuppehållet var platta, inte dåliga. De menar att uppehållet gav laget den vila det behövde och att det kom tillbaka skarpare och fräschare.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -849,9 +874,8 @@
       }
      ],
      "text": [
-      "I Beesotted-podden vill man gå på United direkt, mot ett försvar och en målvakt som värdarna kallar lika ”skakiga”.",
-      "Keane Lewis-Potter dömdes länge ut av supportrarna som kantspelare, men som vingback har han blivit en av lagets bästa, och vänsterbacken är hans att förlora. Baksidan är att han redan har orsakat två straffar genom att brottas med motståndare i straffområdet.",
-      "Snacket om att United tar i extra just mot Brentford biter inte på supportrarna, som tycker att laget länge har väntat på en seger på Old Trafford."
+      "Keane Lewis-Potter kom som kantspelare och dömdes länge ut av supportrarna, men omskolad till vingback räknas han nu till lagets bästa. Alla hans ligamål har kommit från ytterbacksplatsen. Baksidan är att han redan har orsakat två straffar genom att brottas med motståndare i straffområdet.",
+      "I podden Beesotted pekar man också på Yehor Yarmoliuk och Vitaly Janelt, som mot Everton jagade tillbaka bollen inom sekunder efter varje bolltapp. Samma mittfält ska nu till Old Trafford, där supportrarna tycker att segern länge har dröjt och tänker åka dit ”med mycket envishet”."
      ],
      "citat": {
       "sagt": "Jag håller inte med om att vi har ett disciplinproblem. Jag tror att vi har ett naivitetsproblem.",
@@ -861,9 +885,11 @@
       "datum": "2026-11-21"
      },
      "namn": [
-      "Keane Lewis-Potter"
+      "Keane Lewis-Potter",
+      "Yehor Yarmoliuk",
+      "Vitaly Janelt"
      ],
-     "paSpel": "En seger på Old Trafford, som supportrarna tycker att laget länge har förtjänat."
+     "paSpel": "Chansen att äntligen få betalt på Old Trafford, där segern länge dröjt."
     }
    ]
   },
@@ -876,10 +902,10 @@
     "Coventry City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:12:12.127Z",
-   "rubrik": "Coventry vet inte hur man spelar för ett kryss",
+   "skriven": "2026-11-27T13:06:23.545Z",
+   "rubrik": "Leeds har vunnit stort, och fruktar just det",
    "ingress": null,
-   "summering": "Leeds bär självförtroendet från Chelsea men oroar sig för lag som backar hem. Coventry saknar sin enda bollhållande anfallare och har redan blicken på Ipswich.",
+   "summering": "Leeds bär på självförtroendet från Chelsea men vet att ett lågt försvar är deras svaga punkt. Coventry saknar sin bollhållande anfallare och har redan blicken på Ipswich.",
    "delar": [
     {
      "lag": "Leeds United",
@@ -914,44 +940,44 @@
       },
       {
        "podd": "Marching On Together",
+       "avsnitt": "Should Rodon replace Bogle or Justin vs Coventry? Poll of the Day (27th Nov) · Longstaff or Stach to start vs Coventry - Poll of the Day (26th Nov) · Leeds v Coventry - Correct Score/First Scorer - Saturday (3pm)",
+       "datum": "2026-11-27",
+       "adress": "https://www.motforum.com/phpbb/viewtopic.php?t=50535",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "Leeds Utd v Coventry City Match Thread · Predict 6 - Premier League 2026-27 · Chelsea v Leeds Utd Match Thread",
+       "datum": "2026-11-27",
+       "adress": "https://not606.com/threads/leeds-utd-v-coventry-city-match-thread.425681/",
+       "typ": "forum"
+      },
+      {
+       "podd": "Marching On Together",
        "avsnitt": "Leeds v Coventry - Correct Score/First Scorer - Saturday (3pm) · Which two players would you take from Coventry - Poll of the Day 25th Nov · Longstaff or Stach to start vs Coventry - Poll of the Day (26th Nov)",
        "datum": "2026-11-26",
        "adress": "https://www.motforum.com/phpbb/viewtopic.php?t=50526",
        "typ": "forum"
       },
       {
-       "podd": "Marching On Together",
-       "avsnitt": "Leeds v Coventry - Correct Score/First Scorer - Saturday (3pm) · Coventry to win at Leeds this Saturday - Hot Take of the Day (25th Nov) · Which two players would you take from Coventry - Poll of the Day 25th Nov",
-       "datum": "2026-11-26",
-       "adress": "https://www.motforum.com/phpbb/viewtopic.php?t=50526",
-       "typ": "forum"
+       "podd": "The Marching On Newsletter",
+       "avsnitt": "The Marching On Newsletter 🟡 Pre-match bus palava at Chelsea set tone for legendary Leeds win",
+       "datum": "2026-11-27",
+       "adress": "https://themarchingonnewsletter.substack.com/p/the-marching-on-newsletter-pre-match",
+       "typ": "media"
       },
       {
-       "podd": "NOT606",
-       "avsnitt": "Chelsea v Leeds Utd Match Thread · Predict 6 - Premier League 2026-27 · The #LUFC Breakfast Debate (Tuesday 25th November)",
-       "datum": "2026-11-25",
-       "adress": "https://not606.com/threads/chelsea-v-leeds-utd-match-thread.425590/",
-       "typ": "forum"
+       "podd": "MOT Leeds News",
+       "avsnitt": "Leeds United predicted XI vs Coventry: Harry Wilson back with a bang in key Elland Road switch",
+       "datum": "2026-11-26",
+       "adress": "https://motleedsnews.com/match/leeds-united-predicted-xi-vs-coventry-harry-wilson-back-with-a-bang-in-key-elland-road-switch",
+       "typ": "media"
       },
       {
        "podd": "MOT Leeds News",
        "avsnitt": "Leeds United to believe in ultimate Premier League goal as new fixture reveal emerges",
        "datum": "2026-11-25",
        "adress": "https://motleedsnews.com/match/leeds-united-to-believe-in-ultimate-premier-league-goal-as-new-fixture-reveal-emerges",
-       "typ": "media"
-      },
-      {
-       "podd": "MOT Leeds News",
-       "avsnitt": "Chelsea vs Leeds stat attack: Ethan Ampadu a menace as teammate’s numbers tell a lie",
-       "datum": "2026-11-23",
-       "adress": "https://motleedsnews.com/match/chelsea-vs-leeds-stat-attack-ethan-ampadu-a-menace-as-teammates-numbers-tell-a-lie",
-       "typ": "media"
-      },
-      {
-       "podd": "MOT Leeds News",
-       "avsnitt": "How Sean Longstaff may have quietly secured Daniel Farke's favour after Leeds win vs Chelsea",
-       "datum": "2026-11-22",
-       "adress": "https://motleedsnews.com/match/how-sean-longstaff-may-have-quietly-secured-daniel-farkes-favour-after-leeds-win-vs-chelsea",
        "typ": "media"
       },
       {
@@ -989,6 +1015,17 @@
       {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "En supporter tror att Leeds är bäst mot fotbollsspelande lag som går att pressa ur rytmen. Mot lag som parkerar bussen har laget svårt, eftersom det saknar finess att bryta ner dem.",
+         "s": "o",
+         "podd": [
+          "NOT606"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "forum"
+        },
         {
          "t": "Supportrarna ser ett mönster: Leeds är bra mot lag som vill spela fotboll och som går att pressa ur rytmen. Mot lag som parkerar bussen har man svårt, för det saknas list att bryta ner dem.",
          "s": "o",
@@ -1050,17 +1087,6 @@
          "typ": "podd"
         },
         {
-         "t": "Supportrarna fruktar att Coventry ställer alla bakom bollen. Leeds saknar en spelare som kan slå den avgörande passningen genom ett tätt försvar. Därför vill de se fler distansskott, och Anton Stach kan få en bra dag.",
-         "s": "o",
-         "podd": [
-          "Marching On Together"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
          "t": "Värdarna minns hur det gick senast efter en stor seger: efter Newcastle-matchen trodde alla att ett formsvagt Palace skulle köras över, men det blev 0–0. Det är den repetitionen de vill undvika nu.",
          "s": "o",
          "podd": [
@@ -1075,22 +1101,23 @@
       }
      ],
      "text": [
-      "I The Square Ball fruktar man baksmällan efter storsegern mot Chelsea. Förra gången alla lämnade Elland Road i segerrus, efter Newcastle, blev det mållöst mot ett formsvagt Palace.",
-      "På NOT606 pekar man på ett mönster: Leeds trivs mot lag som vill spela fotboll, men mot dem som parkerar bussen ”saknar vi listen att bryta ner dem”. Och Coventry väntas lägga sig lågt.",
-      "Därför är supportrarna oense om mittfältet. De flesta vill behålla Sean Longstaff för hans press, medan en minoritet vill ha in Anton Stach för distansskotten och de fasta situationerna."
+      "I The Square Ball minns man vad som hände när Leeds senast lämnade Elland Road i extas: efter Newcastle skulle ett formsvagt Palace köras över, och det blev mållöst.",
+      "Nu väntas Coventry lägga sig lågt, och det är just den sortens lag som Leeds har svårt mot. ”Vi saknar finessen för att bryta ner dem”, skriver en supporter.",
+      "Därför handlar veckans debatt om mittfältet. Flertalet på Marching On Together vill behålla Sean Longstaff för hans press, medan andra hellre vill se Anton Stachs fasta situationer eller Harry Wilsons passningar mot ett kompakt försvar."
      ],
      "citat": {
-      "sagt": "Det enda som är säkert i helgen är att Frank Lampard inte kommer att få något fint mottagande, och det med rätta.",
-      "vem": "Simon Grayson",
-      "podd": "The Square Ball: Leeds United Podcast",
-      "typ": "podd",
+      "sagt": "Jag skulle gå all in för segern mot Coventry och låta City-matchen sköta sig själv, den är en gratischans.",
+      "vem": "Marcos Barber",
+      "podd": "NOT606",
+      "typ": "forum",
       "datum": "2026-11-23"
      },
      "namn": [
       "Sean Longstaff",
-      "Anton Stach"
+      "Anton Stach",
+      "Harry Wilson"
      ],
-     "paSpel": "Att för en gångs skull följa upp en storseger, med Lampard i bortabåset."
+     "paSpel": "Att inte slösa bort Chelseasegern i en match alla väntar sig att vinna."
     },
     {
      "lag": "Coventry City",
@@ -1104,17 +1131,24 @@
       },
       {
        "podd": "Sky Blues Talk",
-       "avsnitt": "Frank Lampard Pre-Match Press Conference | Leeds United vs Coventry City | Premier League · Leeds United vs Coventry City (A) - Elland Road - Sat 28th November (3pm KO) · Saka Vs Bellingham",
+       "avsnitt": "Frank Lampard Pre-Match Press Conference | Leeds United vs Coventry City | Premier League · Leeds United vs Coventry City (A) - Elland Road - Sat 28th November (3pm KO) · Confirmed : Lampard Head Coach",
        "datum": "2026-11-27",
        "adress": "https://www.skybluestalk.co.uk/threads/frank-lampard-pre-match-press-conference-leeds-united-vs-coventry-city-premier-league.182052/",
        "typ": "forum"
       },
       {
        "podd": "Sky Blues Talk",
-       "avsnitt": "Leeds United vs Coventry City (A) - Elland Road - Sat 28th November (3pm KO) · Injuries · Saka Vs Bellingham",
-       "datum": "2026-11-26",
-       "adress": "https://www.skybluestalk.co.uk/threads/leeds-united-vs-coventry-city-a-elland-road-sat-28th-november-3pm-ko.182040/",
+       "avsnitt": "Frank Lampard Pre-Match Press Conference | Leeds United vs Coventry City | Premier League · Leeds United vs Coventry City (A) - Elland Road - Sat 28th November (3pm KO) · Saka Vs Bellingham",
+       "datum": "2026-11-27",
+       "adress": "https://www.skybluestalk.co.uk/threads/frank-lampard-pre-match-press-conference-leeds-united-vs-coventry-city-premier-league.182052/",
        "typ": "forum"
+      },
+      {
+       "podd": "Coventry Telegraph",
+       "avsnitt": "Five players to miss Leeds vs Coventry City as Frank Lampard confirms surgery",
+       "datum": "2026-11-27",
+       "adress": "https://www.coventrytelegraph.net/sport/football/football-news/coventry-city-leeds-united-injuries-34975039",
+       "typ": "lokal"
       },
       {
        "podd": "Coventry Telegraph",
@@ -1129,19 +1163,23 @@
        "datum": "2026-11-26",
        "adress": "https://www.coventrytelegraph.net/sport/football/football-news/coventry-city-leeds-united-injuries-34970038",
        "typ": "lokal"
-      },
-      {
-       "podd": "Coventry Telegraph",
-       "avsnitt": "Frank Lampard must decide whether Leeds United price is worth paying",
-       "datum": "2026-11-25",
-       "adress": "https://www.coventrytelegraph.net/sport/football/football-news/coventry-city-leeds-premier-league-34966549",
-       "typ": "lokal"
       }
      ],
      "grupper": [
       {
        "amne": "trupp",
        "punkter": [
+        {
+         "t": "Anfallaren Taiwo Awoniyi har en allvarlig fotledsskada och missar matchen. Frank Lampard ville inte säga hur länge han blir borta och kallade läget lite komplicerat.",
+         "s": "b",
+         "podd": [
+          "Coventry Telegraph"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "lokal"
+        },
         {
          "t": "Tränaren Frank Lampard sa på presskonferensen att anfallaren Taiwo Awoniyi har en betydande skada i fotleden och missar matchen mot Leeds. Hur länge han blir borta vet man inte än, men troligen även fler matcher.",
          "s": "b",
@@ -1179,17 +1217,6 @@
           "2026-11-23"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Sidiki Cherif, som väntas ersätta Awoniyi, är en helt annan typ av anfallare, och lagets spel passade honom inte. Han är ung och ny i ligan men visade glimtar, bland annat när han vann hörnan före segermålet.",
-         "s": "o",
-         "podd": [
-          "Sky Blue Fans TV"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -1206,6 +1233,17 @@
           "2026-11-23"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Bortaformen oroar. Supportrarna menar att varken Tottenham eller Everton behövde göra mycket för sina mål, och att Coventry trots fint uppspel skapade nästan ingenting. Mot Manchester City skapade laget mer än i båda de matcherna tillsammans.",
+         "s": "o",
+         "podd": [
+          "Sky Blues Talk"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "forum"
         },
         {
          "t": "Bahoya får kritik från läktaren för att han tappar bollen, men han och Rudoni är de enda som driver spelet framåt snabbt. En annan supporter menar att för mycket coachning tar bort magin hos sådana spelare.",
@@ -1228,38 +1266,28 @@
           "2026-11-23"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Matt Grimes överraskade positivt och gick framåt mer än på länge. Men med honom och Victor Torp tillsammans orkar mittfältet inte, och motståndarna kunde spela sig snabbt igenom.",
-         "s": "o",
-         "podd": [
-          "Sky Blue Fans TV"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Coventrysupportrarna har nästan redan skrivit av Elland Road. På Sky Blues Talk ser man tisdagens match mot Ipswich som den som avgör säsongen.",
-      "Om ett kryss är man oense. Några tror att laget har slutat vara naivt och står inför säsongens första oavgjorda match, medan andra tvivlar: ”Jag tror inte att vi vet hur man spelar för oavgjort.”",
-      "Taiwo Awoniyis fotledsskada svider extra, eftersom supportrarna ser honom som den enda anfallaren som håller i bollen och flyttar upp laget i planen. Frank Lampard säger själv att Awoniyi just höll på att bli den spelare klubben värvade honom för att vara."
+      "På Sky Blues Talk har många redan släppt Elland Road: det är tisdagens match mot Ipswich som ska avgöra hur säsongen slutar.",
+      "Med Taiwo Awoniyi borta saknas den ende anfallaren som kan hålla i bollen och flytta upp laget. Bakåt ser laget sårbart ut så fort motståndarna kommer framåt, och längst fram vilar hoppet på Yann Gbohos samspel med Jack Rudoni.",
+      "Att krypa ihop för en poäng tror ingen på: ”Jag tror inte att vi vet hur man spelar för oavgjort.”"
      ],
      "citat": {
-      "sagt": "Man kan inte ha som inmarschmusik en låt om en stads fattigdom och förfall. Det måste väl vara något som lyfter.",
-      "vem": "Claudio",
-      "podd": "Sky Blue Fans TV",
-      "typ": "podd",
-      "datum": "2026-11-23"
+      "sagt": "Just nu inte bland de tre sista i Premier League, och det är ungefär det bästa vi kan begära den här säsongen.",
+      "vem": "TomRad85",
+      "podd": "Sky Blues Talk",
+      "typ": "forum",
+      "datum": "2026-11-27"
      },
      "namn": [
       "Taiwo Awoniyi",
-      "Frank Lampard"
+      "Yann Gboho",
+      "Jack Rudoni"
      ],
-     "paSpel": "Inte mycket: den match som avgör säsongen är mot Ipswich på tisdag."
+     "paSpel": "Inte så mycket: det är tisdagens Ipswichmatch som räknas."
     }
    ]
   },
@@ -1272,10 +1300,10 @@
     "Bolton Wanderers"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:12:42.653Z",
-   "rubrik": "Bolton har slagit 88 hörnor och väntar fortfarande",
+   "skriven": "2026-11-27T13:07:03.126Z",
+   "rubrik": "Allt hänger på Solis – och Solis på ett kort",
    "ingress": null,
-   "summering": "Birmingham står och faller med Solis, som är ett gult kort från avstängning. Bolton letar efter sin gamle Wembleyhjälte och trivs bäst när motståndaren har bollen.",
+   "summering": "Birmingham har en mittfältare de inte klarar sig utan och en läktare som kan bli nervös. Bolton har en tia som springer i sirap, men trivs bäst borta utan boll.",
    "delar": [
     {
      "lag": "Birmingham City",
@@ -1289,16 +1317,16 @@
       },
       {
        "podd": "Small Heath Alliance",
-       "avsnitt": "Bolton Saturday · Bolton Predictions · NHS shenanigans",
-       "datum": "2026-11-26",
+       "avsnitt": "Bolton Saturday · Bolton Predictions · Mr Driscoll",
+       "datum": "2026-11-27",
        "adress": "https://www.smallheathalliance.com/read.php?1,4128132",
        "typ": "forum"
       },
       {
        "podd": "Small Heath Alliance",
-       "avsnitt": "Every word Chris Davies said on Priske, Fry, Laird injury and Birmingham City's 'great trait' · LondonBlue · Blues at Burnley - full teams and match thread",
+       "avsnitt": "Bolton Saturday · Bolton Predictions · NHS shenanigans",
        "datum": "2026-11-26",
-       "adress": "https://www.smallheathalliance.com/read.php?1,4128051",
+       "adress": "https://www.smallheathalliance.com/read.php?1,4128132",
        "typ": "forum"
       },
       {
@@ -1443,9 +1471,9 @@
       }
      ],
      "text": [
-      "Utan Jhon Solis är Birmingham som Spanien utan Rodri, sammanfattar man i podden Tilton Talk efter förlusten mot Stoke. Tomoki Iwata blir en helt annan spelare med Paik Seung-Ho bredvid sig än med Solis.",
-      "Därför skaver det att Solis enligt lokaltidningen står på fyra gula kort. Ett till, och laget måste klara sig utan honom igen.",
-      "På forumet Small Heath Alliance varnar en supporter för att hemmaplanen kan bli en börda. Får Bolton publiken nervös och tyst blir det jämnare än tabellen antyder, och då är det läktarens sak att skapa tryck."
+      "I podden Tilton Talk är lärdomen av förlusten mot Stoke enkel: utan Jhon Solis är Birmingham som Spanien utan Rodri.",
+      "Bredvid Paik Seung-Ho blir Tomoki Iwata en annan spelare, och flera av värdarna vill sälja Paik redan i januari. Lokaltidningen påminner om baksidan: Solis står på fyra gula kort, och nästa betyder avstängning.",
+      "På forumet Small Heath Alliance oroar man sig i stället för läktaren. Spelar Bolton för att göra hemmapubliken nervös och tyst kan hemmaplan bli en press man slipper borta, och då får publiken skapa trycket själv."
      ],
      "citat": {
       "sagt": "Plötsligt började vi sparka upp bollen till Priske, och jag tänkte: vad håller vi på med? Vi har gått tillbaka ett halvår.",
@@ -1456,11 +1484,12 @@
      },
      "namn": [
       "Jhon Solis",
-      "Rodri",
+      "Paik Seung-Ho",
       "Tomoki Iwata",
-      "Paik Seung-Ho"
+      "Paik",
+      "Solis"
      ],
-     "paSpel": "Att hänga med fram till januari, då truppen ska förstärkas för toppstriden."
+     "paSpel": "Att hänga med i toppen till januari, när truppen ska förstärkas."
     },
     {
      "lag": "Bolton Wanderers",
@@ -1598,8 +1627,9 @@
       }
      ],
      "text": [
-      "Ruben Rodrigues, hjälten från playoff-finalen på Wembley, ser vilsen ut i Championship. I podden The Lion of Vienna tycker man att han är för långsam med bollen och tänker för mycket, och i en annan podd misstänker en värd att han bär på en skada sedan försäsongen och har sprungit ”i sirap”. Båda poddarna hellre vill se Atsuki Ito på hans plats.",
-      "Supportrarna ser också ett mönster: laget dominerar utan att avgöra och är som bäst utan boll och på kontringar, gärna borta mot starka lag. Fasta situationer hjälper inte, för 88 hörnor har inte gett ett enda mål."
+      "I podden The Lion of Vienna ser man Ruben Rodrigues, hjälten från playoff-finalen på Wembley, gå vilse i Championship: han är för långsam med bollen och tänker för mycket.",
+      "I The Fanzone Pod misstänker en värd att han har burit på en skada sedan försäsongen, medan man i den andra podden hellre startar Atsuki Ito. Hörnorna är ett eget kapitel: 88 i år och inte ett enda mål.",
+      "Tröstan är att laget är som bäst utan boll och på kontringar, och att det har gått bra borta mot riktigt bra lag."
      ],
      "citat": {
       "sagt": "Vi är bokstavligen sneda som lag. Jag har noll förtroende för den där vänsterkanten.",
@@ -1612,7 +1642,7 @@
       "Ruben Rodrigues",
       "Atsuki Ito"
      ],
-     "paSpel": "Inte mycket: för supportrarna är säsongen redan godkänd."
+     "paSpel": "Inte mycket: säsongen är redan godkänd, och mer än så ska ingen begära."
     }
    ]
   },
@@ -1625,10 +1655,10 @@
     "Watford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:13:19.056Z",
-   "rubrik": "Två läktare som slutat bry sig möts på Pride Park",
+   "skriven": "2026-11-27T13:07:31.463Z",
+   "rubrik": "Julhandeln konkurrerar med bottenmötet på Pride Park",
    "ingress": null,
-   "summering": "Derbys supportrar ser en tränare utan plan B och väljer hellre julhandeln. I Watfords läger har man gett upp så grundligt att till och med tränarbytet möts med en axelryckning.",
+   "summering": "Derby har en tränare under hård press och en läktare som håller på att tappa intresset. Watford har en ny tränare som ingen tror på och en ägare som supportrarna har gett upp om.",
    "delar": [
     {
      "lag": "Derby County",
@@ -1787,13 +1817,13 @@
       }
      ],
      "text": [
-      "I The Rams Review Podcast är domen hård: John Eustace har bara en plan, att hålla nollan, och när den spricker vet ingen vad laget ska göra. ”Plan A är 0–0”, som en av värdarna säger, och bytena vid underläge kändes som att ge upp.",
-      "Värre är likgiltigheten. Säsongskorten håller uppe publiksiffran, men på lördag väntas många tomma stolar, och julhandeln lockar fler än Pride Park.",
-      "Därför ses matchen som avgörande för Eustace: blir det inget lyft tror värdarna att ropen på hans avgång blir de högsta hittills."
+      "I The Rams Review Podcast sammanfattas John Eustaces fotboll kort: ”Plan A är 0–0”, och spricker den finns ingen fortsättning. Bytena vid 0–1 i Southampton var spelare mot spelare och kändes som att ge upp.",
+      "Värdarna hör allt fler supportrar säga att de inte ens kollade resultatet förrän matchen var slut. Säsongskorten håller uppe publiksiffran, men på lördag väntas många tomma stolar, och julhandeln lockar mer.",
+      "Matchen ses som avgörande för Eustace. Blir avståndet till säker plats kvar efteråt tror värdarna att ropen på hans avgång blir de högsta hittills."
      ],
      "citat": {
-      "sagt": "Jag har börjat höra supportrar säga: vet du vad, jag såg inte matchen i lördags. Jag kollade inte ens resultatet förrän den var slut.",
-      "vem": "Nigel Owen",
+      "sagt": "Nej, det fungerade inte, John, för vi blev bombarderade de första 35 minuterna.",
+      "vem": null,
       "podd": "The Rams Review Podcast",
       "typ": "podd",
       "datum": "2026-11-23"
@@ -1802,7 +1832,7 @@
       "John Eustace",
       "Eustace"
      ],
-     "paSpel": "Eustaces jobb, och om läktaren alls orkar bry sig längre."
+     "paSpel": "Eustaces framtid: oförändrat läge efteråt, och ropen på hans avgång blir de högsta hittills."
     },
     {
      "lag": "Watford",
@@ -1815,8 +1845,22 @@
        "typ": "podd"
       },
       {
+       "podd": "WFC Forums",
+       "avsnitt": "Derby County V Watford Fc - 28/11/2026 - Ko 1500 · Edward Iordanescu - Head Coach · Championship - 2026/2027",
+       "datum": "2026-11-27",
+       "adress": "https://www.wfcforums.com/index.php?threads/derby-county-v-watford-fc-28-11-2026-ko-1500.63283/",
+       "typ": "forum"
+      },
+      {
        "podd": "NOT606",
        "avsnitt": "Watford V Blackburn Weds 25th November 19.45 (Brrrr) · Watford Short News Items · The Canary Dave",
+       "datum": "2026-11-26",
+       "adress": "https://not606.com/threads/watford-v-blackburn-weds-25th-november-19-45-brrrr.425649/",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "Watford V Blackburn Weds 25th November 19.45 (Brrrr) · Watford Short News Items · Sheffield Utd. v Watford FC - Saturday 21st November, 15.00",
        "datum": "2026-11-26",
        "adress": "https://not606.com/threads/watford-v-blackburn-weds-25th-november-19-45-brrrr.425649/",
        "typ": "forum"
@@ -1826,20 +1870,6 @@
        "avsnitt": "Derby County V Watford Fc - 28/11/2026 - Ko 1500 · Championship - 2026/2027 · Edward Iordanescu - Head Coach",
        "datum": "2026-11-26",
        "adress": "https://www.wfcforums.com/index.php?threads/derby-county-v-watford-fc-28-11-2026-ko-1500.63283/",
-       "typ": "forum"
-      },
-      {
-       "podd": "WFC Forums",
-       "avsnitt": "Watford Fc 0-1 Blackburn Rovers - 25/11/2026 · Championship - 2026/2027 · Edward Iordanescu - Head Coach",
-       "datum": "2026-11-26",
-       "adress": "https://www.wfcforums.com/index.php?threads/watford-fc-0-1-blackburn-rovers-25-11-2026.63279/",
-       "typ": "forum"
-      },
-      {
-       "podd": "NOT606",
-       "avsnitt": "Watford V Blackburn Weds 25th November 19.45 (Brrrr) · The Canary Dave · Watford Short News Items",
-       "datum": "2026-11-25",
-       "adress": "https://not606.com/threads/watford-v-blackburn-weds-25th-november-19-45-brrrr.425649/",
        "typ": "forum"
       },
       {
@@ -1893,7 +1923,29 @@
          "typ": "podd"
         },
         {
+         "t": "Supportrarna avundas Derby, som har en lokal ägare som själv är supporter och därför har hopp om att vända. Hos Watford tycker de att allt hopp om framgång är dött så länge Gino Pozzo äger klubben.",
+         "s": "o",
+         "podd": [
+          "WFC Forums"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "forum"
+        },
+        {
          "t": "Supportrarna tror inte att Iordanescu får någon effekt som ny tränare. Spelarna har ingen anledning att imponera på en tränare som ändå lär vara borta inom några månader.",
+         "s": "o",
+         "podd": [
+          "NOT606"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Supportrarna väntar sig ingen effekt av tränarbytet. Spelarna har ingen anledning att imponera på en tränare som ändå lär vara borta inom några månader, och därför har det inte blivit något lyft efter en ny tränare på länge.",
          "s": "o",
          "podd": [
           "NOT606"
@@ -1915,17 +1967,6 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna har slutat tro på att laget klarar sig. Flera skriver att det inte finns någon kamp, varken på planen eller på läktaren, och att en degradering nästan vore en lättnad om den för klubben närmare att bli av med ägaren Pozzo.",
-         "s": "o",
-         "podd": [
-          "WFC Forums"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
          "t": "Watford har sparkat tränaren Alessio Dionisi efter förlusten mot Sheffield United. Han lämnar klubben efter tre segrar på de senaste 13 matcherna.",
          "s": "b",
          "podd": [
@@ -1937,43 +1978,25 @@
          "typ": "media"
         }
        ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Förra säsongens långa svit utan bortaseger tog slut just på Pride Park, där Watford möter Derby på lördag.",
-         "s": "b",
-         "podd": [
-          "From The Rookery End - A show about Watford FC"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        }
-       ]
       }
      ],
      "text": [
-      "Watford har bytt ut Alessio Dionisi mot Edward Iordănescu, men på NOT606 tror ingen på någon nytändning: varför skulle spelarna imponera på en tränare ”som förmodligen är borta till påsk”?",
-      "På WFC Forums har många redan gett upp. En supporter på plats såg varken ilska eller galghumor på läktaren, bara likgiltighet, och flera ser en degradering nästan som en lättnad om den för klubben närmare att bli av med ägaren Gino Pozzo.",
-      "Några gillar ändå Iordănescu, för att han enligt rumänska uppgifter har krävt en topplön och inte finner sig i ägarens snålhet."
+      "På WFC Forums avundas man Derby, som har en lokal ägare som själv är supporter. Under Gino Pozzo är hoppet om framgång ”stendött”.",
+      "Tränarbytet väntas inte ändra något. På NOT606 frågar man varför spelarna skulle vilja imponera på en tränare som ”förmodligen är borta till påsk”.",
+      "Dionisi fick gå efter 0–4 mot Sheffield United, och i podden From The Rookery End beskrivs bortasektionen som uppgiven snarare än arg. Det enda att klamra sig fast vid är att förra säsongens långa svit utan bortaseger bröts just på Pride Park."
      ],
      "citat": {
-      "sagt": "Det som retar mig mest med Pozzo-cirkusen är att drömmarna och hoppet om framgång är borta. Helt döda.",
-      "vem": "Robert Peel",
-      "podd": "WFC Forums",
-      "typ": "forum",
-      "datum": "2026-11-26"
+      "sagt": "Det här laget känns så skört att vi rasar ihop vid minsta motgång.",
+      "vem": null,
+      "podd": "From The Rookery End - A show about Watford FC",
+      "typ": "podd",
+      "datum": "2026-11-22"
      },
      "namn": [
-      "Alessio Dionisi",
-      "Edward Iordănescu",
       "Gino Pozzo",
-      "Iordănescu"
+      "Dionisi"
      ],
-     "paSpel": "Chansen att bryta bortatorkan på samma arena som förra säsongen."
+     "paSpel": "En sexpoängsmatch i botten, på arenan där förra säsongens bortasvit bröts."
     }
    ]
   },
@@ -1986,10 +2009,10 @@
     "Burnley"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:13:53.702Z",
-   "rubrik": "Burnleys tränare har hittat problemet: rädslan för att vinna",
+   "skriven": "2026-11-27T13:08:06.580Z",
+   "rubrik": "Burnleys tränare ställer diagnosen: rädsla för att vinna",
    "ingress": null,
-   "summering": "Millwall saknar någon som skäller och har en tränare som säger att några gömmer sig. Burnley tar gärna ledningen men tappar greppet så fort de har den.",
+   "summering": "Millwall saknar en röst som skäller på planen och grälar om värvningarna. Burnley tappar ledningar av ren nervositet, under en tränare som fortfarande väntar på sin första seger.",
    "delar": [
     {
      "lag": "Millwall",
@@ -2003,15 +2026,15 @@
       },
       {
        "podd": "Millwall Online",
-       "avsnitt": "2026-27 League Ladders Game (21) Burnley (Home) · Stoke V Wall match thread. Wednesday 8pm · Royal British Legion.",
+       "avsnitt": "Wall V Burnley match thread 3pm · 2026-27 League Ladders Game (21) Burnley (Home) · Stoke V Wall match thread. Wednesday 8pm",
        "datum": "2026-11-27",
-       "adress": "https://millwallonline.com/forum/threads/2026-27-league-ladders-game-19-table.59411/post-1109878",
+       "adress": "https://millwallonline.com/forum/threads/wall-v-burnley-match-thread-3pm.59430/post-1110730",
        "typ": "forum"
       },
       {
        "podd": "Millwall Online",
-       "avsnitt": "2026-27 League Ladders Game (21) Burnley (Home) · Stoke V Wall match thread. Wednesday 8pm",
-       "datum": "2026-11-26",
+       "avsnitt": "2026-27 League Ladders Game (21) Burnley (Home) · Stoke V Wall match thread. Wednesday 8pm · Royal British Legion.",
+       "datum": "2026-11-27",
        "adress": "https://millwallonline.com/forum/threads/2026-27-league-ladders-game-19-table.59411/post-1109878",
        "typ": "forum"
       },
@@ -2129,24 +2152,24 @@
       }
      ],
      "text": [
-      "Det som oroar mest i podden Achtung! Millwall är inte skadorna utan tystnaden: ingen på planen tar befälet och skäller på de andra när det går emot. Varken Danny Batth eller Jake Cooper anses ha det i sig.",
-      "Alex Neil sa själv efter Stokematchen att han hade bytt fler om han kunnat och att några gömde sig, och en del pekar ut Mihailo Ivanovic.",
-      "Hemmamatchen mot Burnley beskrivs som ett måste. Går den förlorad fruktar man en svit på fem, sex raka förluster."
+      "Det som oroar Millwalls supportrar mest är att ingen på planen tar befälet när det går emot, varken Danny Batth eller Jake Cooper.",
+      "I podden Achtung! Millwall har allt fler slutat skylla på skadorna. Sommarens unga värvningar håller helt enkelt inte Championship-klass, menar de. På forumet Millwall Online säger andra emot: talanger som Kyrell Lisbie har kastats in för tidigt.",
+      "Alex Neil vill nästan ingen sparka. Men vid en femte raka förlust, skriver en på forumet, börjar han titta nedåt i tabellen i stället för uppåt."
      ],
      "citat": {
-      "sagt": "Det här är en beprövad, erfaren och medievan tränare som i princip säger till oss att vissa spelare inte är tillräckligt bra.",
-      "vem": "Ilderton Wanderer",
-      "podd": "Millwall Online",
-      "typ": "forum",
-      "datum": "2026-11-26"
+      "sagt": "Han får bollen och kör fast. Han är som en katt på hett plåttak, dansar bara runt utan att egentligen göra något.",
+      "vem": "Hassan",
+      "podd": "Achtung! Millwall Podcast",
+      "typ": "podd",
+      "datum": "2026-11-23"
      },
      "namn": [
       "Danny Batth",
       "Jake Cooper",
-      "Alex Neil",
-      "Mihailo Ivanovic"
+      "Kyrell Lisbie",
+      "Alex Neil"
      ],
-     "paSpel": "Ett måste: en förlust befaras inleda en lång rad raka nederlag."
+     "paSpel": "Att bryta förlustsviten innan den växer till fem, sex raka."
     },
     {
      "lag": "Burnley",
@@ -2272,12 +2295,12 @@
       }
      ],
      "text": [
-      "Fabio Celestini har hittat ett ovanligt problem: han ser en rädsla hos spelarna, ”rädslan för att vinna”. Under landslagsuppehållet tränade han därför lika mycket på mentaliteten som på taktiken.",
-      "I podden TurfCast känner man igen mönstret varje vecka: laget är bättre, tar ledningen, gör ett dumt misstag och backar hem. Mot Blackburn slutade laget enligt Celestini själv att spela med bollen och väntade bara på slutsignalen, precis som i Cardiff.",
-      "Jaydon Banel var ett ständigt hot på vänsterkanten i sin första start men fick gå av med en smäll."
+      "Fabio Celestini har själv ställt diagnosen: spelarna är rädda för att vinna, och under landslagsuppehållet tränade han mentalitet lika mycket som taktik.",
+      "I podden TurfCast känner man igen mönstret från varje match. Burnley är bättre och tar ledningen, gör sedan ett dumt misstag, backar hem och tappar greppet. Celestini säger själv att laget slutar spela med bollen och bara väntar på slutsignalen.",
+      "Ljuspunkten var Jaydon Banel på vänsterkanten, men han fick gå av med en smäll. Tankarna på uppflyttning är borta, och nu handlar allt om att hålla sig kvar."
      ],
      "citat": {
-      "sagt": "Vardy hade väl gjort mer nytta om han fått spela 60 minuter i stället för de 25 han fick.",
+      "sagt": "Min grabb började gå på matcher den här säsongen och han har fortfarande inte sett oss vinna en enda match i hela sitt liv.",
       "vem": null,
       "podd": "TurfCast",
       "typ": "podd",
@@ -2288,7 +2311,7 @@
       "Celestini",
       "Jaydon Banel"
      ],
-     "paSpel": "Celestinis första seger, och ett bevis på att rädslan går att träna bort."
+     "paSpel": "Celestinis första seger och ett bevis på att laget kan hålla en ledning."
     }
    ]
   },
@@ -2301,10 +2324,10 @@
     "Bristol City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:14:30.303Z",
-   "rubrik": "I Bristols coachområde står ingen alls",
+   "skriven": "2026-11-27T13:08:48.097Z",
+   "rubrik": "Bristolsupportern som inte längre vet om han vill vinna",
    "ingress": null,
-   "summering": "West Brom spelar fotboll som supportrarna njuter av och vänder varje underläge, men saknar chansskaparen Price. I Bristol tvivlar supportrarna på både elvan och bänken, och Skubalas jobb är i fara.",
+   "summering": "Albion bärs av ett lag som reser sig ur underläge och en högerkant som går rakt på. I Bristol handlar det mest om hur länge Skubala blir kvar.",
    "delar": [
     {
      "lag": "West Bromwich Albion",
@@ -2430,9 +2453,9 @@
       }
      ],
      "text": [
-      "I podden Albion Analysis säger man sig vara ”nästan yr”, och det handlar mindre om sviten än om att laget för första gången på flera år är roligt att se. Hotet kommer från alla håll: mot Swansea hade mittfältarna Horn Myhre och Molumby flest bolltouchar i straffområdet.",
-      "Underläge skrämmer ingen längre. Albion har legat under oftare än något annat lag i serien och kommit tillbaka varje gång, medan laget under Ryan Mason föll ihop vid motgång.",
-      "Oron gäller i stället Isaac Price, lagets främste chansskapare, som började halta kraftigt i en spurt utan att någon var i närheten."
+      "Albion-supportrarna är ”nästan yra”, och i podden Albion Analysis beror det mindre på sju matcher utan förlust än på att fotbollen äntligen är rolig att se. Inget lag har hamnat i underläge oftare, men under Ryan Mason föll laget ihop, och nu samlar det sig i halvtid.",
+      "Högerkanten är nyckeln: Kareem Tunde håller bredden och ytterbacken Brayann Pereira driver bollen inåt.",
+      "Isaac Prices skada göder en mörkare teori. De som har spelat mest i klubb och landslag skadas en efter en, och näst på tur står Styles, Molumby och Morgan."
      ],
      "citat": {
       "sagt": "Jag skulle inte vilja vara den tränare som just nu ska lista ut hur man försvarar sig mot West Bromwich Albion.",
@@ -2442,10 +2465,13 @@
       "datum": "2026-11-22"
      },
      "namn": [
-      "Horn Myhre",
-      "Molumby",
       "Ryan Mason",
-      "Isaac Price"
+      "Kareem Tunde",
+      "Brayann Pereira",
+      "Isaac Price",
+      "Styles",
+      "Molumby",
+      "Morgan"
      ]
     },
     {
@@ -2460,15 +2486,15 @@
       },
       {
        "podd": "NOT606",
-       "avsnitt": "Bristol City v Wrexham (Poll) · Bristol City Talk. · Jude Bellingham",
-       "datum": "2026-11-26",
-       "adress": "https://not606.com/threads/bristol-city-v-wrexham-poll.425623/",
+       "avsnitt": "W.B.A v Bristol City · Bristol City v Wrexham (Poll) · Bristol City Talk.",
+       "datum": "2026-11-27",
+       "adress": "https://not606.com/threads/w-b-a-v-bristol-city.425689/",
        "typ": "forum"
       },
       {
        "podd": "NOT606",
-       "avsnitt": "Bristol City v Wrexham (Poll) · Bristol City Talk. · Middlesbrough v Bristol City (Poll)",
-       "datum": "2026-11-25",
+       "avsnitt": "Bristol City v Wrexham (Poll) · Bristol City Talk. · Jude Bellingham",
+       "datum": "2026-11-26",
        "adress": "https://not606.com/threads/bristol-city-v-wrexham-poll.425623/",
        "typ": "forum"
       },
@@ -2495,9 +2521,9 @@
       },
       {
        "podd": "Bristol Live",
-       "avsnitt": "Every word Skubala on said City's defeat and fans before Wrexham visit",
-       "datum": "2026-11-23",
-       "adress": "https://www.bristolpost.co.uk/sport/football/football-news/every-word-michael-skubala-said-11252658",
+       "avsnitt": "Bristol City end losing run but improved outing only earns Wrexham draw",
+       "datum": "2026-11-24",
+       "adress": "https://www.bristolpost.co.uk/sport/football/match-reports/bristol-city-end-losing-run-11254554",
        "typ": "lokal"
       }
      ],
@@ -2513,6 +2539,17 @@
          ],
          "datum": [
           "2026-11-25"
+         ],
+         "typ": "lokal"
+        },
+        {
+         "t": "Lokaltidningen skriver att mittbacken Luke McNally fick lämna planen redan efter 19 minuter mot Wrexham på grund av en skada. Rob Dickie ersatte honom.",
+         "s": "b",
+         "podd": [
+          "Bristol Live"
+         ],
+         "datum": [
+          "2026-11-24"
          ],
          "typ": "lokal"
         }
@@ -2533,7 +2570,7 @@
          "typ": "podd"
         },
         {
-         "t": "Supportrarna menar att laget aldrig försöker ta över en match. Det väntar in motståndaren i stället för att pressa och tvinga fram misstag, och spelet blir långsamt och förutsägbart. De lägger skulden på Skubalas taktik.",
+         "t": "Supportrarna ser ett lag som aldrig försöker ta kommandot. Laget väntar på vad motståndaren ska hitta på i stället för att pressa högt, och de lägger skulden på Skubalas taktik.",
          "s": "o",
          "podd": [
           "NOT606"
@@ -2544,13 +2581,13 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna menar att Skubala inte vet vilken som är hans bästa elva. Laget blir bättre varje gång han byter in spelare, och mot Middlesbrough var alla fem högst betygsatta spelarna inhoppare.",
+         "t": "Supportrarna menar att laget aldrig försöker ta över en match. Det väntar in motståndaren i stället för att pressa och tvinga fram misstag, och spelet blir långsamt och förutsägbart. De lägger skulden på Skubalas taktik.",
          "s": "o",
          "podd": [
           "NOT606"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-25"
          ],
          "typ": "forum"
         }
@@ -2569,17 +2606,6 @@
           "2026-11-22"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Klubbens vd Charlie Boss har gett ett videobesked om Michael Skubalas framtid. Tränaren har fått ”möjligheten” att vända formen efter en svag start. Lokaltidningen skriver att tisdagens hemmamatch mot Wrexham därför står i strålkastarljuset.",
-         "s": "b",
-         "podd": [
-          "Bristol Live"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "lokal"
         },
         {
          "t": "Alla vet att tränarens framtid avgörs i tisdagens hemmamatch mot Wrexham. Enligt värdarna saknar både spelarna och ledningen tro på det de gör.",
@@ -2612,20 +2638,22 @@
       }
      ],
      "text": [
-      "Neil i Forever Bristol City Podcast tittar bort mot coachområdet och konstaterar att ”där står ingen”, medan Michael Skubala sitter och stirrar på en skärm bredvid analytikern. På forumet NOT606 undrar man om han ens vet vilken som är hans bästa elva, sedan alla fem högst betygsatta mot Middlesbrough var inhoppare.",
-      "Vd Charlie Boss har gett honom ”möjligheten” att vända formen, och supportrarna buade mot honom under första halvlek mot Wrexham. Lokaltidningens reporter såg ändå en andra halvlek där spelarna tydligt spelade för sin tränare."
+      "Inför tisdagens match mot Wrexham undrade en livslång supporter i Forever Bristol City Podcast för första gången om han ville se laget förlora, eftersom en seger bara förlänger Michael Skubalas tid och ”plågan”. I samma podd ser man ingen som leder laget från bänken: Skubala sätter sig och stirrar på en skärm bredvid analytikern.",
+      "På forumet NOT606 beskrivs ett lag som aldrig försöker ta kommandot utan väntar in motståndaren. Där skyller man på taktiken.",
+      "Lokaltidningens reporter såg ändå i andra halvleken mot Wrexham ett lag som fortfarande spelar för sin tränare."
      ],
      "citat": {
-      "sagt": "I går hade vi en tränare där hela upplägget och sättet vi spelade på handlade om att begränsa skadorna och behålla jobbet.",
-      "vem": "Neil",
+      "sagt": "Det är ett mål på omställning, men Dickie är en så nervös försvarare. Han och Atkinson tillsammans fungerar inte längre.",
+      "vem": "Dave",
       "podd": "Forever Bristol City Podcast",
       "typ": "podd",
       "datum": "2026-11-22"
      },
      "namn": [
-      "Michael Skubala"
+      "Michael Skubala",
+      "Skubala"
      ],
-     "paSpel": "Tränarens jobb: en storförlust kan göra Swanseamatchen till hans sista chans."
+     "paSpel": "Skubalas jobb: en storförlust här kan göra Swanseamatchen till hans sista chans."
     }
    ]
   },
@@ -2638,14 +2666,28 @@
     "Sheffield United"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:15:13.846Z",
-   "rubrik": "Fyra högerbackar, ingen som Wilder litar på",
+   "skriven": "2026-11-27T13:09:31.834Z",
+   "rubrik": "Stéphan backar inte: bollen ska fortsätta gå via Charles",
    "ingress": null,
-   "summering": "QPR hänger på Kamaras passningar och på en målvakt som får fortsätta chansa. Sheffield United har en högerkant som alla går på och en anfallare som supportrarna redan har gett upp om.",
+   "summering": "QPR står fast vid sin spelande målvakt men oroar sig för att för lite blir mål. Sheffield United saknar en högerback som tränaren litar på och har tröttnat på Thomas Cannon.",
    "delar": [
     {
      "lag": "Queens Park Rangers",
      "kallor": [
+      {
+       "podd": "Loft For Words",
+       "avsnitt": "Our best team if 100% availability - do we need January recruits · Shirt Design - Don't you just hate the EFL! · QPR Bond update",
+       "datum": "2026-11-27",
+       "adress": "https://www.fansnetwork.co.uk/football/queensparkrangers/forum/335557/our-best-team-if-100-availability--do-we-need-january-recruits/#46",
+       "typ": "forum"
+      },
+      {
+       "podd": "NOT606",
+       "avsnitt": "QPR vs Sheffield United · Norwich City vs QPR · The Review Thread",
+       "datum": "2026-11-27",
+       "adress": "https://not606.com/threads/qpr-vs-sheffield-united.425666/",
+       "typ": "forum"
+      },
       {
        "podd": "Loft For Words",
        "avsnitt": "Match Thread: NARY a chance that Norwich CAN beat the Supers? · Vale makes point about the new and improved QPR - Report · Shirt Design - Don't you just hate the EFL!",
@@ -2661,20 +2703,6 @@
        "typ": "forum"
       },
       {
-       "podd": "Loft For Words",
-       "avsnitt": "QPR Loan Watch 2026-27 · Discriminate chanting · Our best team if 100% availability - do we need January recruits",
-       "datum": "2026-11-26",
-       "adress": "https://www.fansnetwork.co.uk/football/queensparkrangers/forum/333454/qpr-loan-watch-2026-27/#133",
-       "typ": "forum"
-      },
-      {
-       "podd": "NOT606",
-       "avsnitt": "QPR vs Sheffield United · Norwich City vs QPR · The 'F' Word.",
-       "datum": "2026-11-25",
-       "adress": "https://not606.com/threads/qpr-vs-sheffield-united.425666/",
-       "typ": "forum"
-      },
-      {
        "podd": "LoftforWords",
        "avsnitt": "The flying Canaries versus the in form R's - Preview - Queens Park Rangers News",
        "datum": "2026-11-27",
@@ -2683,16 +2711,16 @@
       },
       {
        "podd": "Loft For Words",
-       "avsnitt": "The flying Canaries versus the in form R's - Preview - Queens Park Rangers News",
+       "avsnitt": "Vale makes point about the new and improved QPR - Report - Queens Park Rangers News",
        "datum": "2026-11-26",
-       "adress": "https://loftforwords.fansnetwork.co.uk/news/67286",
+       "adress": "https://www.fansnetwork.co.uk/football/queensparkrangers/news/67305/vale-makes-point-about-the-new-and-improved-qpr--report",
        "typ": "media"
       },
       {
-       "podd": "West London Sport",
-       "avsnitt": "Vale scores as QPR draw at Norwich - West London Sport",
-       "datum": "2026-11-24",
-       "adress": "https://www.westlondonsport.com/qpr/norwich-v-qpr-fc-report-2411",
+       "podd": "Loft For Words",
+       "avsnitt": "The flying Canaries versus the in form R's - Preview - Queens Park Rangers News",
+       "datum": "2026-11-26",
+       "adress": "https://loftforwords.fansnetwork.co.uk/news/67286",
        "typ": "media"
       },
       {
@@ -2738,13 +2766,35 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Supportrarna menar att Nicolas Madsen är den enda på mittfältet som regelbundet spelar bollen framåt. Glen Kamara håller bollen men bryter inga linjer, och utan Madsen saknar laget någon som för spelet framåt.",
+         "t": "Supportrarna menar att QPR skapar mycket men sätter för lite. Laget har redan sju oavgjorda och tappar poäng mot lag som borde slås. Anfallarna Kone, Burrell och Kolli anses inte räcka mot ligans topplag.",
          "s": "o",
          "podd": [
           "Loft For Words"
          ],
          "datum": [
           "2026-11-26"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Flera supportrar är hårda mot anfallarna. Burrells spel utöver målen anses svagt, och Kone beskrivs som orörlig, i dålig form och tekniskt svag.",
+         "s": "o",
+         "podd": [
+          "Loft For Words"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Målvakten Pierce Charles hyllas trots ett misstag som kostade ett mål. Supportrarna ser honom som en spelande målvakt som gör laget offensivt bakifrån, och en av dem tror mer på honom än på Eze och Walker.",
+         "s": "o",
+         "podd": [
+          "NOT606"
+         ],
+         "datum": [
+          "2026-11-27"
          ],
          "typ": "forum"
         },
@@ -2769,28 +2819,6 @@
           "2026-11-26"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Jonathan Varane delar supportrarna. Kritikerna menar att han tappade bollen nästan varje gång i andra halvlek och har gått bakåt sedan sin första säsong. Andra framhåller hans försvarsspel och passningar framåt.",
-         "s": "o",
-         "podd": [
-          "Loft For Words"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "När Norwich ställde två spelare på Glen Kamara stannade QPR:s anfallsspel upp. Det tyder på att mycket av spelet hänger på honom.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "forum"
         }
        ]
       },
@@ -2798,13 +2826,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Supportrarna njuter av att för en gångs skull ligga i övre tredjedelen av tabellen. Att inte gå till varje match med nedflyttningsångest betyder mer för dem än att vinna stort.",
+         "t": "En supporter tar anfallarna i försvar. Han menar att de stigande förväntningarna gör att nyckelspelare plötsligt ses som för dåliga, trots att Kone och Burrell är ett lyft och att klubben har en av ligans minsta budgetar.",
          "s": "o",
          "podd": [
           "Loft For Words"
          ],
          "datum": [
-          "2026-11-25"
+          "2026-11-27"
          ],
          "typ": "forum"
         }
@@ -2828,23 +2856,23 @@
       }
      ],
      "text": [
-      "När Norwich ställde två man på Glen Kamara i andra halvlek blev QPR:s anfallsspel enligt en supporter på NOT606 ”tungrott och tandlöst”. Så mycket hänger på honom.",
-      "Pierce Charles felpass inför kvitteringen har också delat supportrarna, och en del tycker att målvakten har ”det i sig att bli lite för mycket primadonna”. Julien Stephan ändrar ändå ingenting: laget ska fortsätta spela upp bakifrån via honom.",
-      "På Loft For Words minns man att Sheffield United brukar trivas på Loftus Road, och man hoppas att laget går på dem i stället för att backa hem."
+      "Pierce Charles slog bollen rakt på en Norwichspelare och kvitteringen kom direkt, men Julien Stéphan ändrar ingenting: spelet ska fortsätta byggas via den unge målvakten. På NOT606 har en supporter aldrig varit säkrare på att en ung spelare i klubben ska nå toppen, Eze och Walker inräknade.",
+      "På Loft For Words sitter oron längre fram på planen. Laget skapar mycket men sätter för lite, och efter ledningen mot Norwich backade det hem i stället för att döda matchen. Mot ett Sheffield United som brukar trivas på Loftus Road hoppas man på ”en hänsynslös sida”."
      ],
      "citat": {
-      "sagt": "Jag kommer inte att ändra hur jag pratar med spelarna. Jag kommer inte att ändra hur vi vill spela. Vi fortsätter.",
-      "vem": "Julien Stephan",
-      "podd": "West London Sport",
-      "typ": "lokal",
-      "datum": "2026-11-25"
+      "sagt": "Femma i att skapa avslut, sjuttonde i att göra mål på dem. Det blir vårt problem.",
+      "vem": "Fleckers86",
+      "podd": "Loft For Words",
+      "typ": "forum",
+      "datum": "2026-11-26"
      },
      "namn": [
-      "Glen Kamara",
       "Pierce Charles",
-      "Julien Stephan"
+      "Julien Stéphan",
+      "Eze",
+      "Walker"
      ],
-     "paSpel": "Chansen att visa hänsynslöshet mot ett lag som brukar trivas på Loftus Road."
+     "paSpel": "Att få gå till en match utan nedflyttningsångest, för en gångs skull."
     },
     {
      "lag": "Sheffield United",
@@ -2855,6 +2883,20 @@
        "datum": "2026-11-23",
        "adress": "https://podcasts.apple.com/gb/podcast/blades-ramble-a-sheffield-united-podcast/id1777788630?uo=4",
        "typ": "podd"
+      },
+      {
+       "podd": "S24SU",
+       "avsnitt": "Pre-Match View From QPR · Queens Park Rangers v. Sheffield United - 28th November 2026 · v QPR (a)",
+       "datum": "2026-11-27",
+       "adress": "https://www.s24su.com/forum/threads/pre-match-view-from-qpr.108179/",
+       "typ": "forum"
+      },
+      {
+       "podd": "Vital Blades",
+       "avsnitt": "Pre match view from QPR · BLADES away at QPR · BLADES v Saints at BDBL",
+       "datum": "2026-11-27",
+       "adress": "https://forums.vitalfootball.co.uk/threads/pre-match-view-from-qpr.152441/",
+       "typ": "forum"
       },
       {
        "podd": "S24SU",
@@ -2871,24 +2913,17 @@
        "typ": "forum"
       },
       {
-       "podd": "S24SU",
-       "avsnitt": "Presser questions for QPR v Blades, 28/11/26 · Wilder mouthing of again at the fans ....... · Sheffield United v. Southampton - 24th November 2026",
-       "datum": "2026-11-26",
-       "adress": "https://www.s24su.com/forum/threads/presser-questions-for-qpr-v-blades-28-11-26.108175/",
-       "typ": "forum"
-      },
-      {
-       "podd": "Vital Blades",
-       "avsnitt": "BLADES v Saints at BDBL · Match summary v saints · It’s quiet on here…",
-       "datum": "2026-11-25",
-       "adress": "https://forums.vitalfootball.co.uk/threads/blades-v-saints-at-bdbl.152395/",
-       "typ": "forum"
-      },
-      {
        "podd": "Sheff United Way",
        "avsnitt": "Queens Park Rangers vs Sheffield United – Preview",
        "datum": "2026-11-26",
        "adress": "https://sheffunitedway.co.uk/2026/11/26/queens-park-rangers-vs-sheffield-united-preview-3/",
+       "typ": "media"
+      },
+      {
+       "podd": "Dem Blades",
+       "avsnitt": "Uncy Ayew",
+       "datum": "2026-11-26",
+       "adress": "https://demblades.substack.com/p/uncy-ayew",
        "typ": "media"
       },
       {
@@ -2931,17 +2966,6 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna är eniga om att anfallaren Tom Cannon inte bidrar med något. Han anklagas för att inte ens springa: kommer bollen inte direkt till honom står han bara och tittar på medan lagkamraterna sliter.",
-         "s": "o",
-         "podd": [
-          "Vital Blades"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
          "t": "Wilder säger att Hamza Choudhury kan spela högerback, men aldrig att han är högerback. Värdarna tolkar det som att tränaren inte ser honom som en lösning och att det är en vink till ägarna om att det behövs en riktig högerback.",
          "s": "o",
          "podd": [
@@ -2953,13 +2977,13 @@
          "typ": "podd"
         },
         {
-         "t": "Enligt supportrarna kommer nästan alla insläppta mål från omarkerade spelare, och resten från distansskott där ingen har gått ut mot skytten.",
+         "t": "Supportrarna dömer ut anfallaren Thomas Cannon. De menar att han inte jobbar alls när bollen inte kommer direkt till honom, utan står och ser på medan lagkamraterna sliter.",
          "s": "o",
          "podd": [
-          "S24SU"
+          "Vital Blades"
          ],
          "datum": [
-          "2026-11-26"
+          "2026-11-25"
          ],
          "typ": "forum"
         }
@@ -3000,30 +3024,41 @@
           "2026-11-23"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Supportrarna är arga på klubben för att den betalade mycket för Thomas Cannon och nu fortsätter spela honom i hopp om ett mirakel. De menar att det redan har kostat laget poäng.",
+         "s": "o",
+         "podd": [
+          "Vital Blades"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "forum"
         }
        ]
       }
      ],
      "text": [
-      "På forumet S24SU undrar man om Chris Wilder har någon plan när nästan varje motståndare går på högersidan i försvaret.",
-      "I podden har man lagt märke till att Wilder säger att Hamza Choudhury kan spela högerback, men aldrig att han är det, och man läser det som en vink till ägarna inför januari.",
-      "Tom Cannon har supportrarna på Vital Blades gett upp om: kommer bollen inte direkt till honom ”står han bokstavligen still och tittar på”. Somliga tror att han ställs ut i skyltfönstret inför januari, och i så fall fungerar det inte. Jordan Ayew har däremot överraskat alla."
+      "Chris Wilder säger att Hamza Choudhury kan spela högerback, aldrig att han är det, och i podden tolkar man det som en vink till ägarna. På forumet S24SU konstaterar man att nästan varje motståndare går på högersidan, och Choudhurys positionsspel får skulden för flera insläppta mål. Bristen kan tvinga Wilder bort från fyrbackslinjen till en femmannalinje.",
+      "Längst fram har Vital Blades gett upp om Thomas Cannon, som ”står bokstavligen och tittar på” när bollen inte kommer till honom. I stället kan Patrick Bamford, som pressade varenda boll efter inhoppet mot Southampton, få starta."
      ],
      "citat": {
-      "sagt": "Southampton blottade vår usla högersida och tog varenda lös boll.",
-      "vem": "Bulmer1889",
-      "podd": "Vital Blades",
-      "typ": "forum",
-      "datum": "2026-11-25"
+      "sagt": "Han har den första januari i tankarna, och vi vet alla vad som händer då. Det är då transferfönstret öppnar.",
+      "vem": null,
+      "podd": "Blades Ramble - A Sheffield United Podcast",
+      "typ": "podd",
+      "datum": "2026-11-23"
      },
      "namn": [
       "Chris Wilder",
-      "Wilder",
       "Hamza Choudhury",
-      "Tom Cannon",
-      "Jordan Ayew"
+      "Choudhurys",
+      "Wilder",
+      "Thomas Cannon",
+      "Patrick Bamford"
      ],
-     "paSpel": "Ett steg mot januari, då Wilder hoppas att ägarna köper en högerback."
+     "paSpel": "Ett steg mot den 1 januari, när Wilder hoppas att ägarna öppnar plånboken."
     }
    ]
   },
@@ -3036,10 +3071,10 @@
     "Stoke City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:15:43.640Z",
-   "rubrik": "Stoke känner sig oslagbara, West Ham känner ingenting",
+   "skriven": "2026-11-27T13:09:58.658Z",
+   "rubrik": "Ett skott på mål räcker mot West Ham",
    "ingress": null,
-   "summering": "West Ham har bollen men varken spets eller tro, och tränaren känner redan trycket. Stoke kommer med självförtroende, en laddad akademiprodukt och en center som äntligen hittat formen.",
+   "summering": "West Ham har ett lag som stressar så fort motståndarna skjuter och en läktare som har tröttnat. Stoke kommer till London med den overkliga känslan av att ingen kan slå dem.",
    "delar": [
     {
      "lag": "West Ham United",
@@ -3050,6 +3085,20 @@
        "datum": "2026-11-22",
        "adress": "https://shows.acast.com/moorethanjustapodcast/episodes/canning-town-lens-return-to-stratford",
        "typ": "podd"
+      },
+      {
+       "podd": "KUMB",
+       "avsnitt": "⚽ West Ham Utd vs Stoke City: match thread · The January Transfer Window · Ezra Mayers",
+       "datum": "2026-11-27",
+       "adress": "https://www.kumb.com/forum/viewtopic.php?t=194020",
+       "typ": "forum"
+      },
+      {
+       "podd": "WHU606",
+       "avsnitt": "Stoke City (H) 3pm Saturday 28th November · Portsmouth v West Ham Tues Nov 24th 1945 · MOTM vs Portsmouth",
+       "datum": "2026-11-27",
+       "adress": "https://www.whu606.com/discussion/12775/stoke-city-h-3pm-saturday-28th-november",
+       "typ": "forum"
       },
       {
        "podd": "KUMB",
@@ -3066,38 +3115,24 @@
        "typ": "forum"
       },
       {
-       "podd": "KUMB",
-       "avsnitt": "⚽ West Ham Utd vs Stoke City: match thread · Daniel Kretinsky and the Ownership of West Ham · ⚽ Portsmouth v West Ham Utd: match thread",
-       "datum": "2026-11-26",
-       "adress": "https://www.kumb.com/forum/viewtopic.php?t=194020",
-       "typ": "forum"
+       "podd": "The West Ham Way",
+       "avsnitt": "Parker says West Ham have been playing well – we need home truths",
+       "datum": "2026-11-27",
+       "adress": "https://www.thewesthamway.com/2026/11/27/parker-says-west-ham-have-been-playing-well-we-need-home-truths/",
+       "typ": "media"
       },
       {
-       "podd": "WHU606",
-       "avsnitt": "Stoke City (H) 3pm Saturday 28th November · MOTM vs Portsmouth · Portsmouth v West Ham Tues Nov 24th 1945",
-       "datum": "2026-11-26",
-       "adress": "https://www.whu606.com/discussion/12775/stoke-city-h-3pm-saturday-28th-november",
-       "typ": "forum"
+       "podd": "Claret and Hugh",
+       "avsnitt": "West Ham v Stoke Preview: Predicted Lineups As Pressure Mounts On Parker",
+       "datum": "2026-11-27",
+       "adress": "https://www.claretandhugh.info/west-ham-v-stoke-preview-predicted-lineups-as-pressure-mounts-on-parker/",
+       "typ": "media"
       },
       {
        "podd": "Green Street Hammers",
        "avsnitt": "West Ham vs. Stoke preview: Prediction, team news, and lineups",
        "datum": "2026-11-26",
        "adress": "https://greenstreethammers.com/west-ham-vs-stoke-preview-prediction-team-news-and-lineups-01m8bpr8zvz8",
-       "typ": "media"
-      },
-      {
-       "podd": "The West Ham Way",
-       "avsnitt": "West Ham fans are already losing patience with Parker",
-       "datum": "2026-11-26",
-       "adress": "https://www.thewesthamway.com/2026/11/26/west-ham-fans-are-already-losing-patience-with-parker/",
-       "typ": "media"
-      },
-      {
-       "podd": "The West Ham Way",
-       "avsnitt": "West Ham must find out who is up for the fight, says ExWHUEmployee",
-       "datum": "2026-11-25",
-       "adress": "https://www.thewesthamway.com/2026/11/25/west-ham-must-find-out-who-is-up-for-the-fight-says-exwhuemployee/",
        "typ": "media"
       },
       {
@@ -3140,6 +3175,28 @@
          "typ": "podd"
         },
         {
+         "t": "En supporter har räknat på de senaste sju matcherna. Lagets tre centeranfallare har tillsammans gjort ett mål, och laget har släppt in 13 mål på 20 skott på mål.",
+         "s": "h",
+         "podd": [
+          "KUMB"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "forum"
+        },
+        {
+         "t": "Supportrarna menar att målvaktsmissarna smittar av sig på hela laget. Motståndarna vet att ett skott på mål ofta blir mål, och West Hams anfallare tror att de måste göra två mål och stressar därför bort sina lägen.",
+         "s": "o",
+         "podd": [
+          "WHU606"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "forum"
+        },
+        {
          "t": "Supportrarna menar att de svaga målvakterna smittar av sig på anfallarna. Motståndarna vet att ett skott på mål ofta räcker, och West Hams egna spelare tror att de måste göra två mål, så de stressar och missar.",
          "s": "o",
          "podd": [
@@ -3151,29 +3208,7 @@
          "typ": "forum"
         },
         {
-         "t": "Målvaktsproblemen smittar enligt supportrarna resten av laget. Motståndarna vet att ett skott på mål ofta räcker, medan West Hams anfallare tror att de måste göra två mål och därför stressar och missar.",
-         "s": "o",
-         "podd": [
-          "WHU606"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
          "t": "De inverterade yttrarna drar sig hela tiden inåt och gör planen smal, i stället för att hålla bredden ute vid kortlinjen. Värdarna är dock överens om att Bowen är farligast när han skär in.",
-         "s": "o",
-         "podd": [
-          "Moore Than Just A Podcast - West Ham Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Austbø och Engels har kostat runt 40 miljoner pund tillsammans, men värdarna menar att de lika gärna kunde ersättas av akademispelarna Ajala och Orford. Det säger de är ett misslyckande.",
          "s": "o",
          "podd": [
           "Moore Than Just A Podcast - West Ham Podcast"
@@ -3219,22 +3254,23 @@
       }
      ],
      "text": [
-      "Hemmamatcherna har börjat kännas som ett tvång, säger man i podden Moore Than Just A Podcast, och man fruktar att Stoke blir ett nytt Preston: mycket boll men ingenstans att ta vägen. Mot två femmannalinjer har laget ”ingenting att ta sig igenom med”.",
-      "På forumet WHU606 ser man osäkerheten i målet smitta av sig framåt: anfallarna tror att de behöver två mål och stressar bort lägena.",
-      "Där beskrivs också en likgiltighet så djup att varken tränarbytet eller Mark Noble har ändrat något. Enligt The West Ham Way kräver supportrar redan att Scott Parker får gå."
+      "På forumet WHU606 är man övertygad om att målvaktsmissarna har smittat hela laget: motståndarna vet att ett skott på mål ofta räcker, och de egna anfallarna stressar bort lägena i tron att de måste göra två.",
+      "I podden Moore Than Just A Podcast fruktar man att Stoke blir en ny Preston, med bollen men utan väg igenom två femmannalinjer. Len efterlyser en kreativ mittfältare av Ian Bishops slag och kallar det kanske det sämsta West Ham-lag han har sett.",
+      "Kring klubben ligger en uppgivenhet som varken tränarbytet eller Mark Noble har rubbat."
      ],
      "citat": {
-      "sagt": "Det visar att folk inte orkar gå en vinterlördag klockan tre, eftersom de vet vilket skräp som har spelats.",
+      "sagt": "Jag såg tisdagens match från andra raden på Fratton Park och blev skrämd av hur lite tro några av våra spelare hade.",
       "vem": null,
-      "podd": "Moore Than Just A Podcast - West Ham Podcast",
-      "typ": "podd",
-      "datum": "2026-11-22"
+      "podd": "Claret and Hugh",
+      "typ": "media",
+      "datum": "2026-11-27"
      },
      "namn": [
-      "Mark Noble",
-      "Scott Parker"
+      "Len",
+      "Ian Bishop",
+      "Mark Noble"
      ],
-     "paSpel": "Scott Parkers jobb: kraven på sparken växer med ännu en förlust."
+     "paSpel": "Scott Parkers första seger, innan tålamodet med honom hinner ta slut."
     },
     {
      "lag": "Stoke City",
@@ -3372,12 +3408,12 @@
       }
      ],
      "text": [
-      "I podden Every Step Along The Way kallar man laget ”de oslagbara” och beskriver en overklig känsla, helt annorlunda än för ett år sedan. Ändå är det lördagen som ses som det verkliga provet: med en bortaseger i London ”börjar alla tro”.",
-      "Ben Johnson, som kommer från West Hams ungdomsakademi, väntas vara extra laddad mot sin gamla klubb.",
-      "Lokaltidningen beskriver George Hirst som en kraftfull och spelskicklig center mot Birmingham. Själv kallar han det säsongens bästa match och tackar det enskilda arbetet med Mark Robins."
+      "I podden Every Step Along The Way kallar man laget ”de oslagbara” och beskriver känslan som overklig, helt annorlunda än för ett år sedan. Resan till London ses som det verkliga provet: en seger där skulle få alla att börja tro på allvar.",
+      "Ben Johnson, fostrad i West Hams akademi, väntas vara extra laddad mot sin gamla klubb.",
+      "George Hirst kallar själv insatsen mot Birmingham sin bästa för säsongen och tackar samtalen med Mark Robins. Bland supportrarna är man ändå delad, och en del vill hellre se Sam Gallagher."
      ],
      "citat": {
-      "sagt": "George Hirst kan inte spela en match, petas i fyra och sedan tas in för en. Han behöver lite kontinuitet.",
+      "sagt": "Jag tror faktiskt att vi slår West Ham. De är ett konstigt lag. Preston åkte dit och tog en poäng.",
       "vem": null,
       "podd": "Every Step Along The Way - A Stoke City Podcast",
       "typ": "podd",
@@ -3386,9 +3422,10 @@
      "namn": [
       "Ben Johnson",
       "George Hirst",
-      "Mark Robins"
+      "Mark Robins",
+      "Sam Gallagher"
      ],
-     "paSpel": "Ett klubbrekord i raka bortasegrar, och beviset som får alla att tro."
+     "paSpel": "Klubbrekord i raka bortasegrar, och provet som ska få alla att tro."
     }
    ]
   },
@@ -3401,10 +3438,10 @@
     "Portsmouth"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:16:14.801Z",
-   "rubrik": "Wrexham erkänner: inte särskilt bra, men i skyttegraven",
+   "skriven": "2026-11-27T13:10:40.348Z",
+   "rubrik": "I Wrexham är ful fotboll numera en strategi",
    "ingress": null,
-   "summering": "Wrexham lever på ett försvar byggt kring Cleworth medan klubben väntar på januari. Portsmouth kommer från en seger som supportrarna själva tillskriver slit, tur och Schmid.",
+   "summering": "Wrexham har valt skyttegravarna kring en underskattad Cleworth och tar farväl av Steve Parkin. Portsmouth lever på slit, en ifrågasatt målvakt som just levererade och Mohameds nya energi på mittfältet.",
    "delar": [
     {
      "lag": "Wrexham",
@@ -3415,6 +3452,13 @@
        "datum": "2026-11-23",
        "adress": "https://shows.acast.com/6486dd5af5bfbf001188bea7/episodes/episode-336",
        "typ": "podd"
+      },
+      {
+       "podd": "Wrexham is the Game",
+       "avsnitt": "WitG: Farewell to Parkin & Pompey Preview",
+       "datum": "2026-11-26",
+       "adress": "https://wrexhamisthegame.substack.com/p/witg-farewell-to-parkin-and-pompey",
+       "typ": "media"
       },
       {
        "podd": "Wrexham is the Game",
@@ -3452,17 +3496,6 @@
         },
         {
          "t": "En av värdarna håller fast vid att Ben Sheaf är klubbens bästa centrala mittfältare. Han förstår ändå varför Sheaf sitter på bänken: utan kreativa spelare behövs löpare som Thomason, som pressar högre än Sheaf och Matty James.",
-         "s": "o",
-         "podd": [
-          "Rob. Ryan. Red."
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna tycker att det har gått fel när laget ska hålla en ledning. Mot Cardiff byttes George Dobson in, men i slutminuterna behövs lugnet hos Matty James eller Ben Sheaf.",
          "s": "o",
          "podd": [
           "Rob. Ryan. Red."
@@ -3520,13 +3553,25 @@
           "2026-11-23"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Assisterande tränaren Steve Parkin lämnar Wrexham efter lördagens match av personliga skäl. Han kom i juli 2021 och har varit en stor personlighet i omklädningsrummet under klubbens tre raka uppflyttningar.",
+         "s": "b",
+         "podd": [
+          "Wrexham is the Game"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "media"
         }
        ]
       }
      ],
      "text": [
-      "I podden Rob. Ryan. Red. säger man rakt ut att Wrexham inte är särskilt bra just nu, och att laget därför måste spela för poäng i stället för att se bra ut. Efter förlusten mot Sheffield United, när Parkinson saknade kämpaglöd, satte han in slitvargarna och tar sedan dess matcherna som skyttegravskrig.",
-      "Den som håller ihop det är Max Cleworth. Med honom på planen har laget knappt släppt in några mål, och värdarna tycker att han är bättre än Doyle och Worrall utan att någon märker det. Enligt dem vill flera i omklädningsrummet ha honom som kapten."
+      "I podden Rob. Ryan. Red. säger man rakt ut att Wrexham inte är särskilt bra just nu och därför måste spela för poängen, inte för ögat. Sedan förlusten mot Sheffield United tar Parkinson matcherna som skyttegravskrig.",
+      "Det som bär är Max Cleworth: när han startar tar laget ungefär två poäng per match. Värdarna tycker att han spelar bättre än Joe Worrall och Doyle utan att någon märker det. Flera i omklädningsrummet lär dessutom vilja se honom som kapten.",
+      "Lördagen blir assisterande tränaren Steve Parkins sista match, eftersom han lämnar av personliga skäl efter alla uppflyttningarna."
      ],
      "citat": {
       "sagt": "För mig är det helt klart en tillfällig lösning. Det är inte så vi tar Wrexham upp på topp sex, topp sju.",
@@ -3538,10 +3583,11 @@
      "namn": [
       "Parkinson",
       "Max Cleworth",
+      "Joe Worrall",
       "Doyle",
-      "Worrall"
+      "Steve Parkin"
      ],
-     "paSpel": "Att hänga kvar inom räckhåll till januari, då en anfallare måste köpas."
+     "paSpel": "Steve Parkins sista match, och att hänga kvar fram till januari."
     },
     {
      "lag": "Portsmouth",
@@ -3561,6 +3607,20 @@
        "typ": "forum"
       },
       {
+       "podd": "Pompey-Fans.com",
+       "avsnitt": "Promising signs - Mousinho takes Pompey to Wrexham with optimism growing - Portsmouth News",
+       "datum": "2026-11-27",
+       "adress": "https://pompey-fans.fansnetwork.co.uk/news/67310",
+       "typ": "media"
+      },
+      {
+       "podd": "Josh Chesters",
+       "avsnitt": "Pompey 1-0 West Ham: Bailey’s first Blues goal enough for the huge win.",
+       "datum": "2026-11-25",
+       "adress": "https://joshuapompeychesters.substack.com/p/pompey-1-0-west-ham-baileys-first",
+       "typ": "media"
+      },
+      {
        "podd": "Express FM",
        "avsnitt": "REPORT: Pompey 1, West Ham 0",
        "datum": "2026-11-24",
@@ -3570,16 +3630,32 @@
      ],
      "grupper": [
       {
+       "amne": "trupp",
+       "punkter": [
+        {
+         "t": "Inga skadade spelare väntas tillbaka till lördagen. Målvakten Daniel Bielica är inte tillgänglig, och det finns inga klara besked om Jayden Meghomas fotledsskada eller om när Connor Ogilvie är tillbaka. John Swift kan tidigast vara med mot West Brom nästa vecka.",
+         "s": "b",
+         "podd": [
+          "Pompey-Fans.com"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "media"
+        }
+       ]
+      },
+      {
        "amne": "elva",
        "punkter": [
         {
-         "t": "John Mousinho gjorde fyra ändringar mot West Ham. Thomas Waddingham fick sin första start för säsongen på topp, och Ryan Kavuma-McQueen, Ebrima Adams och Iyad Mohamed kom tillbaka i startelvan. Portsmouth spelade 4-2-3-1.",
-         "s": "b",
+         "t": "Thomas Waddingham är enligt skribenten den enda renodlade anfallaren som är frisk. Därför var det väntat att han startade mot West Ham, bara hans andra start för klubben.",
+         "s": "h",
          "podd": [
-          "Express FM"
+          "Josh Chesters"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-25"
          ],
          "typ": "media"
         }
@@ -3622,13 +3698,35 @@
          "typ": "forum"
         },
         {
-         "t": "Portsmouth har bara förlorat en av de nio senaste matcherna. Mot West Ham fick de slita för segern under sju minuters tilläggstid.",
+         "t": "John Mousinho säger att den stora skillnaden i år är bredden i truppen. Spelarna som kommit in vid rotation har hållit nivån eller till och med höjt den.",
          "s": "b",
          "podd": [
-          "Express FM"
+          "Pompey-Fans.com"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-27"
+         ],
+         "typ": "media"
+        },
+        {
+         "t": "Mittbacksparet Regan Poole och Madiodio \"Jojo\" Dia beskrivs som avgörande för lagets senaste framgångar. Båda spelar enligt skribenten på toppnivå.",
+         "s": "o",
+         "podd": [
+          "Josh Chesters"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "media"
+        },
+        {
+         "t": "Målvakten Nicolas Schmid har legat bakom många insläppta mål på sistone och fått mycket kritik. Han var bra mot West Ham, men hans utsparkar är fortfarande osäkra ibland.",
+         "s": "o",
+         "podd": [
+          "Josh Chesters"
+         ],
+         "datum": [
+          "2026-11-25"
          ],
          "typ": "media"
         }
@@ -3636,20 +3734,14 @@
       }
      ],
      "text": [
-      "På forumet NOT606 gör ingen sig några illusioner om segern mot West Ham: den byggde på ”lite tur och en massa slit”. Laget var underlägset i spelet och fick försvara sig hårt, särskilt i slutet av matchen.",
-      "Den som höll Portsmouth kvar var målvakten Nicolas Schmid. John Mousinho hade också ändrat om, och Thomas Waddingham fick sin första start för säsongen på topp."
+      "Nicolas Schmid har fått mycket kritik för att ha legat bakom många insläppta mål, men mot West Ham var det målvakten som höll Portsmouth kvar. På forumet NOT606 kallar man segern ett resultat av ”lite tur och en massa slit”, där laget var underlägset och fick försvara sig hårt på slutet.",
+      "Josh Chesters noterar dock att utsparkarna fortfarande är osäkra ibland.",
+      "Formuppgången sammanfaller enligt honom med att Iyad Mohamed kom till klubben. Mittfältaren beskrivs som atletisk, trygg med bollen och orädd i närkampen."
      ],
-     "citat": {
-      "sagt": "En lysande insats av målvakten Nicolas Schmid, min matchens lirare. Han gjorde några utmärkta räddningar.",
-      "vem": "Wooperts_duck",
-      "podd": "NOT606",
-      "typ": "forum",
-      "datum": "2026-11-24"
-     },
      "namn": [
       "Nicolas Schmid",
-      "John Mousinho",
-      "Thomas Waddingham"
+      "Josh Chesters",
+      "Iyad Mohamed"
      ]
     }
    ]
@@ -3663,10 +3755,10 @@
     "Oxford United"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:16:52.578Z",
-   "rubrik": "Utan Helik läcker Oxford, och supportrarna vet om det",
+   "skriven": "2026-11-27T13:11:20.903Z",
+   "rubrik": "Ligans bästa lag nöjer sig gärna med en poäng",
    "ingress": null,
-   "summering": "Luton har fått tillbaka tron men oroar sig för fysiska motståndare och för vem som ska stoppa Brannagan. Oxford väntar på besked om Helik och tar gärna en poäng.",
+   "summering": "Lutons podd vill tysta Brannagan med Gores bett på mittfältet. Oxford väntar på besked om Helik och förbereder sig på en eftermiddag i försvar.",
    "delar": [
     {
      "lag": "Luton Town",
@@ -3790,12 +3882,13 @@
       }
      ],
      "text": [
-      "I podden 30 Points! Who Gives A Pod vill man ha in Daniel Gore för att hålla Oxfords Cameron Brannagan tyst. Liam Walsh knuffas gång på gång bort från bollen när han spelar djupt, medan Gore vände matchen mot Burton med ”betydligt mer bett”. Enligt en tittare i chatten bar Walsh dessutom armen i mitella efter slutsignalen.",
-      "Fysiska lag är fortfarande akilleshälen, och Burton körde över mittfältet direkt. Skillnaden mot i början av säsongen är att laget nu kan slåss, nicka bort bollar och ändå vinna fult. Tron är tillbaka, menar värdarna, och den här gången på riktigt."
+      "I podden 30 Points! Who Gives A Pod vill man ha Daniel Gore framför backlinjen för att hålla Cameron Brannagan, ”hjärtat i deras lag”, tyst. Där blir Liam Walsh annars gång på gång bortknuffad från bollen.",
+      "Fysiska lag är fortfarande Lutons akilleshäl, och Burton körde genast över mittfältet. Skillnaden mot i början av säsongen är att Jack Wilsheres lag nu kan förlora mittfältskampen i en halvtimme, nicka bort bollar och ändå vinna fult.",
+      "Tron är tillbaka, menar värdarna, och den märktes på läktaren efter slutsignalen."
      ],
      "citat": {
-      "sagt": "Det känns verkligen som att tron är tillbaka i laget, att vi faktiskt är bättre än tre fjärdedelar av den här ligan.",
-      "vem": null,
+      "sagt": "Det verkar verkligen vara vår akilleshäl. Vi ser alltid lite lättviktiga ut mot de här lagen som försöker gå hårt åt oss.",
+      "vem": "Pete",
       "podd": "30 Points! Who Gives A Pod",
       "typ": "podd",
       "datum": "2026-11-23"
@@ -3804,26 +3897,25 @@
       "Daniel Gore",
       "Cameron Brannagan",
       "Liam Walsh",
-      "Gore",
-      "Walsh"
+      "Jack Wilshere"
      ],
-     "paSpel": "Ett kvitto på att den nya tron håller mot ett av seriens bästa lag."
+     "paSpel": "Ett kvitto på att den nyvunna tron inte är ännu en falsk gryning."
     },
     {
      "lag": "Oxford United",
      "kallor": [
       {
        "podd": "Yellows Forum",
-       "avsnitt": "Away Match Thread Luton Town v Oxford United · League One · Sat 28 Nov, 15:00 · Raheem Sterling · Michał Helik",
+       "avsnitt": "Away Match Thread Luton Town v Oxford United · League One · Sat 28 Nov, 15:00 · Ruben Roosken · Raheem Sterling",
        "datum": "2026-11-27",
-       "adress": "https://yellowsforum.co.uk/threads/luton-town-v-oxford-united-league-one-sat-28-nov-15-00.14113/post-1270496",
+       "adress": "https://yellowsforum.co.uk/threads/luton-town-v-oxford-united-league-one-sat-28-nov-15-00.14113/post-1270602",
        "typ": "forum"
       },
       {
        "podd": "Yellows Forum",
-       "avsnitt": "Away Match Thread Luton Town v Oxford United · League One · Sat 28 Nov, 15:00 · Jeon Jin-Woo · Mark Harris",
-       "datum": "2026-11-25",
-       "adress": "https://yellowsforum.co.uk/threads/luton-town-v-oxford-united-league-one-sat-28-nov-15-00.14113/post-1270145",
+       "avsnitt": "Away Match Thread Luton Town v Oxford United · League One · Sat 28 Nov, 15:00 · Raheem Sterling · Michał Helik",
+       "datum": "2026-11-27",
+       "adress": "https://yellowsforum.co.uk/threads/luton-town-v-oxford-united-league-one-sat-28-nov-15-00.14113/post-1270496",
        "typ": "forum"
       },
       {
@@ -3848,17 +3940,6 @@
           "2026-11-25"
          ],
          "typ": "forum"
-        },
-        {
-         "t": "Mittbacken Michal Helik saknades mot Wycombe och förstemålvakten var fortfarande avstängd. Det framgår inte om någon av dem är tillbaka till matchen mot Luton.",
-         "s": "h",
-         "podd": [
-          "Oxford Clarion"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "media"
         }
        ]
       },
@@ -3888,24 +3969,13 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna ser kvalitet i Jeon Jin-Woos inhopp i de små detaljerna: hans första touch tar laget framåt i stället för att bara döda bollen, så motståndarna får mindre tid att organisera sig.",
+         "t": "Supportrarna anser att Oxford med sin trupp ska spela för att vinna varje vecka och inte för att undvika förlust. De ser ingenting hos tränaren Ramsey som tyder på något annat.",
          "s": "o",
          "podd": [
           "Yellows Forum"
          ],
          "datum": [
-          "2026-11-23"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "En supporter menar att Jeon Jin-Woo verkar vara en ovanligt intelligent fotbollsspelare och tror att han efter nyår kommer att räknas till de bästa i League One.",
-         "s": "o",
-         "podd": [
-          "Yellows Forum"
-         ],
-         "datum": [
-          "2026-11-23"
+          "2026-11-27"
          ],
          "typ": "forum"
         }
@@ -3914,6 +3984,17 @@
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Supportrarna anser att tabellen ljuger så tidigt på säsongen. Oxford är uppenbart ligans bästa lag och Luton kanske det tredje bästa, så att Luton har sämre facit än Oxford säger ingenting.",
+         "s": "o",
+         "podd": [
+          "Yellows Forum"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "forum"
+        },
         {
          "t": "En supporter menar att tabellen ljuger så här tidigt. Oxford är uppenbart seriens bästa lag, och Luton kan mycket väl vara det tredje bästa.",
          "s": "o",
@@ -3931,6 +4012,17 @@
        "amne": "match",
        "punkter": [
         {
+         "t": "Supportrarna ser Helik som nyckeln till försvaret och väntar sig att laget mest får försvara sig i Luton. Flera tror att det kan sluta med förlust om han inte spelar.",
+         "s": "o",
+         "podd": [
+          "Yellows Forum"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "forum"
+        },
+        {
          "t": "Om Helik inte spelar oroar sig supportrarna för att Sam Long ska få ta hand om Lutons offensiv med Nahki Wells, Jamie Donley och Kasey Palmer.",
          "s": "o",
          "podd": [
@@ -3945,12 +4037,13 @@
       }
      ],
      "text": [
-      "Med Michał Helik släpper Oxford in 0,5 mål per match, har en supporter räknat ut på Yellows Forum, och utan honom rasar det. Ciaron Brown ser också mycket sämre ut utan honom bredvid sig. Det är oklart om Helik är tillbaka, och få tror på Sam Long mot Nahki Wells, Jamie Donley och Kasey Palmer.",
-      "Ljuspunkten är Jeon Jin-Woo, vars första touch tar laget framåt i stället för att bara döda bollen. En supporter tror att han räknas till ligans bästa efter nyår, även om han ibland dribblar en gång för mycket när någon står fri."
+      "Utan Michał Helik har Oxford släppt in 8 mål i de ligamatcher han missat, har en supporter på Yellows Forum räknat fram. Ciaron Brown ser dessutom mycket sämre ut utan honom bredvid sig, och få tror att Sam Long står emot Lutons anfall.",
+      "Lokaltidningen skriver att Helik har varit med på åtminstone en del av träningen.",
+      "På samma forum menar man att tabellen ljuger och att Oxford är ”helt uppenbart” seriens bästa lag. Ändå skulle många vara nöjda med en poäng i Luton, där man räknar med att mest få försvara sig."
      ],
      "citat": {
-      "sagt": "Det är helt rimligt att säga att Luton ”möjligen” är seriens tredje bästa lag. Vi är helt uppenbart seriens bästa lag.",
-      "vem": "RgYellows",
+      "sagt": "Klockan fem på lördag hoppas jag att jag njuter av den varma famnen av åtminstone en poäng.",
+      "vem": "Orkney Islands Yellow",
       "podd": "Yellows Forum",
       "typ": "forum",
       "datum": "2026-11-26"
@@ -3958,14 +4051,9 @@
      "namn": [
       "Michał Helik",
       "Ciaron Brown",
-      "Helik",
-      "Sam Long",
-      "Nahki Wells",
-      "Jamie Donley",
-      "Kasey Palmer",
-      "Jeon Jin-Woo"
+      "Sam Long"
      ],
-     "paSpel": "Hoppet om ”åtminstone en poäng” borta mot laget i form."
+     "paSpel": "Första halvan av en vecka som ska visa League One vad laget vill."
     }
    ]
   },
@@ -3978,10 +4066,10 @@
     "Reading"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:17:14.984Z",
-   "rubrik": "Wednesday vinner, men inte ens säsongskorten lockar",
+   "skriven": "2026-11-27T13:11:43.131Z",
+   "rubrik": "Bannan drar lasset, resten hänger inte med",
    "ingress": null,
-   "summering": "Wednesday vinner under den nye tränaren, men spelet hänger på Bannan, anfallet svälter och läktaren har svalnat trots resultaten.",
+   "summering": "Wednesday har vunnit under den nye tränaren utan att övertyga. Bannan är motorn, och supportrarna tror inte på Keillor-Dunn som ensam anfallare.",
    "delar": [
     {
      "lag": "Sheffield Wednesday",
@@ -3995,14 +4083,14 @@
       },
       {
        "podd": "Owlstalk",
-       "avsnitt": "Let's Get Reading Sold Out · Man of the Match & Player Ratings vs Stevenage (A), 26/27 · Jowl/Jamie Geeker/Terry Henfleet",
-       "datum": "2026-11-26",
-       "adress": "https://www.owlstalk.co.uk/forums/topic/351057-lets-get-reading-sold-out/",
+       "avsnitt": "Video- Sheffield Wednesday F.C. Vs Reading F.C. Preview 2026 2027 · Let's Get Reading Sold Out · Jowl/Jamie Geeker/Terry Henfleet",
+       "datum": "2026-11-27",
+       "adress": "https://www.owlstalk.co.uk/forums/topic/351400-match-thread/",
        "typ": "forum"
       },
       {
        "podd": "Owlstalk",
-       "avsnitt": "Let's Get Reading Sold Out · Man of the Match & Player Ratings vs Stevenage (A), 26/27 · Video- WEAVER TO GO OUT ON LOAN FOR REAL THIS TIME",
+       "avsnitt": "Let's Get Reading Sold Out · Man of the Match & Player Ratings vs Stevenage (A), 26/27 · Jowl/Jamie Geeker/Terry Henfleet",
        "datum": "2026-11-26",
        "adress": "https://www.owlstalk.co.uk/forums/topic/351057-lets-get-reading-sold-out/",
        "typ": "forum"
@@ -4051,17 +4139,6 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna ser en pånyttfödd Barry Bannan efter tränarbytet till Challinor. Men han får dra mittfältet ensam, eftersom spelarna runt honom inte hänger med i hans tankar.",
-         "s": "o",
-         "podd": [
-          "Owlstalk"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
          "t": "Mittbacken Sil Swinkels har svårt att hänga med i löpningarna, och supportrarna befarar att det kan straffa sig mot bättre motstånd.",
          "s": "o",
          "podd": [
@@ -4073,15 +4150,15 @@
          "typ": "forum"
         },
         {
-         "t": "Davis Kellior-Dunn ses som felplacerad som ensam spets. Han är ingen nia och blir isolerad i systemet utan någon nära sig, så anfallet får ingen boll.",
+         "t": "Det är veteranerna som bär Wednesday just nu, särskilt Barry Bannan på mittfältet och Liam Cooper i backlinjen, som har klivit fram i den nye tränarens första matcher.",
          "s": "o",
          "podd": [
-          "Owlstalk"
+          "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-25"
+          "2026-11-22"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
@@ -4100,13 +4177,24 @@
          "typ": "forum"
         },
         {
-         "t": "Tre matcher in under Challinor menar supportrarna att truppen är långt ifrån räcker till. Rekryteringen var bra med tanke på begränsningarna, men laget saknar fart, kraft, längd och en stor spelare både centralt och längst fram.",
+         "t": "Enligt Wednesday-supportrar som Stevenage-gästen Luca har pratat med har ingen gått i taket över de två segrarna under den nye tränaren Dave Challoner, eftersom spelet inte har imponerat.",
+         "s": "h",
+         "podd": [
+          "The Wednesday Week"
+         ],
+         "datum": [
+          "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna är stolta över hur många som följer laget den här säsongen, både på hemmamatcherna och på bortaplan.",
          "s": "o",
          "podd": [
           "Owlstalk"
          ],
          "datum": [
-          "2026-11-25"
+          "2026-11-27"
          ],
          "typ": "forum"
         }
@@ -4114,9 +4202,9 @@
       }
      ],
      "text": [
-      "På Owlstalk ser man en pånyttfödd Barry Bannan sedan Challinor tog över, men han drar mittfältet ensam: spelarna runt honom är ”som vanligt” inte på hans våglängd.",
-      "Mest synd tycker man om Davis Keillor-Dunn, som står ensam längst fram utan någon i närheten och knappt får en boll. Truppen saknar fart, kraft, längd och en stor spelare både centralt och i anfallet, menar en supporter.",
-      "Segrarna har inte tänt någon. Även säsongskortsinnehavare säger att de inte skulle betala för att se laget just nu, och publiken väntas hamna under 30 000."
+      "Barry Bannan har vuxit sedan den nye tränaren kom och styrde hela andra halvleken mot Stevenage. På Owlstalk konstaterar man ändå att han får dra mittfältet ensam, eftersom spelarna runt honom inte är på samma våglängd.",
+      "I podden The Wednesday Week hörs samma sak: det är veteranerna, med Liam Cooper bakom Bannan, som bär laget. Ingen har gått i taket över segrarna, för spelet har inte imponerat.",
+      "Längst fram slarvar Davis Keillor-Dunn bort det mesta som ensam anfallare, och en supporter tycker att truppen saknar ”fart, kraft, längd”."
      ],
      "citat": {
       "sagt": "Jag gillar honom, men han slarvade bort nästan allt som kom hans väg. Ledsen, men han är ingen centerforward.",
@@ -4127,10 +4215,10 @@
      },
      "namn": [
       "Barry Bannan",
-      "Challinor",
+      "Liam Cooper",
       "Davis Keillor-Dunn"
      ],
-     "paSpel": "Att ge säsongskortsinnehavarna något som är värt att gå för."
+     "paSpel": "Chansen att visa att segrarna under nye tränaren också kan bli bra spel."
     },
     {
      "lag": "Reading",
@@ -4149,14 +4237,21 @@
     "Bradford City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:17:43.024Z",
-   "rubrik": "Oavsett resultat blir halva Adams Park nöjd",
+   "skriven": "2026-11-27T13:12:17.540Z",
+   "rubrik": "Duff återvänder till ett Wycombe som inte blivit bättre",
    "ingress": null,
-   "summering": "Wycombes supportrar vet knappt vem de håller på när Duff kommer tillbaka och ser Wareham som lagets enda riktiga lyft. Bradford har blivit farligare framåt men lämnar stora hål på mittfältet.",
+   "summering": "Wycombe lutar sig mot Warehams mål och en trött läktare som fruktar Duffs press mot mittbackarna. Bradford har Powell i brinnande form men ett mittfält som läcker så fort bollen är förlorad.",
    "delar": [
     {
      "lag": "Wycombe Wanderers",
      "kallor": [
+      {
+       "podd": "The Gasroom",
+       "avsnitt": "Bradford City (h) Attendance Prediction - Sat 30th Nov - Match 16 in 26 /27 · Samaritans score prediction - Bradford (h)",
+       "datum": "2026-11-27",
+       "adress": "https://www.gasroom.org/t/bradford-city-h-attendance-prediction-sat-30th-nov-match-16-in-26-27/1149",
+       "typ": "forum"
+      },
       {
        "podd": "The Gasroom",
        "avsnitt": "Samaritans score prediction - Bradford (h) · Bradford City (h) Attendance Prediction - Sat 30th Nov - Match 16 in 26 /27 · Match Day Thread: Bromley 24th Nov 2026 (A)",
@@ -4172,18 +4267,18 @@
        "typ": "forum"
       },
       {
-       "podd": "The Gasroom",
-       "avsnitt": "Samaritans score prediction - Bradford (h) · Other football · Match Day Thread: Bromley 24th Nov 2026 (A)",
+       "podd": "NOT606",
+       "avsnitt": "Raving Mad Ravens v Chairboys 24th Nov 26 · What day of the week is it thread · Trigon Trip Ewes v Chairboys 21st Nov 26",
        "datum": "2026-11-26",
-       "adress": "https://www.gasroom.org/t/samaritans-score-prediction-bradford-h/1148",
+       "adress": "https://not606.com/threads/raving-mad-ravens-v-chairboys-24th-nov-26.425645/",
        "typ": "forum"
       },
       {
-       "podd": "NOT606",
-       "avsnitt": "Raving Mad Ravens v Chairboys 24th Nov 26 · What day of the week is it thread · EFL Trophy Thread 2026/7",
-       "datum": "2026-11-25",
-       "adress": "https://not606.com/threads/raving-mad-ravens-v-chairboys-24th-nov-26.425645/",
-       "typ": "forum"
+       "podd": "Bucks Free Press",
+       "avsnitt": "'I've got the utmost respect for him' - Hounsell on ex-Wycombe boss Michael Duff",
+       "datum": "2026-11-27",
+       "adress": "https://uk.sports.yahoo.com/news/ive-got-utmost-respect-him-050000744.html",
+       "typ": "lokal"
       },
       {
        "podd": "Bucks Free Press",
@@ -4197,6 +4292,17 @@
       {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Laget har tappat 2–0-ledningar flera gånger den här säsongen, senast när det förlorade med 4–3. Supportrarna saknar förmågan att stänga matcher.",
+         "s": "o",
+         "podd": [
+          "NOT606"
+         ],
+         "datum": [
+          "2026-11-21"
+         ],
+         "typ": "forum"
+        },
         {
          "t": "Spelet har blivit prydligare, med korta passningstrianglar. Mittbackarna Hagelskjaer och Taylor uppmuntras att spela fram bollen, och Onyedinma och Mothersille går på ytterbackarna och slår in bollar till Wareham.",
          "s": "o",
@@ -4225,29 +4331,7 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Spelmässigt har laget inte blivit bättre under Hounsell än under Duff, menar en supporter. Segrarna har kommit mot svagare lag som Duff aldrig hann möta, och det verkliga lyftet är anfallaren Wareham.",
-         "s": "o",
-         "podd": [
-          "The Gasroom"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna är oeniga om bytet av tränare. En av dem menar att laget inte har spelat bättre under TH än under Duff, att segrarna har kommit mot svagare lag och att den egentliga förstärkningen är anfallaren Jayden Wareham.",
-         "s": "o",
-         "podd": [
-          "The Gasroom"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Trots att 44 av 50 tippade seger förra omgången har supportrarna slutat vänta sig mycket. Laget är inte dåligt, men blekt och dömt att göra lite besviket.",
+         "t": "Supportrarna tror på seger vecka efter vecka och blir besvikna. De ser laget som inte dåligt, men blekt och dömt att alltid göra lite besviken.",
          "s": "o",
          "podd": [
           "The Gasroom"
@@ -4258,13 +4342,13 @@
          "typ": "forum"
         },
         {
-         "t": "Sedan Bloomfield lämnade har laget under Gracey, Dodds, Duff och nu Hounsell tagit 1,40 poäng per match. Det ser dystert ut med tanke på hur mycket pengar som lagts på övergångar och löner.",
+         "t": "Spelmässigt har laget inte blivit bättre under Hounsell än under Duff, menar en supporter. Segrarna har kommit mot svagare lag som Duff aldrig hann möta, och det verkliga lyftet är anfallaren Wareham.",
          "s": "o",
          "podd": [
           "The Gasroom"
          ],
          "datum": [
-          "2026-11-26"
+          "2026-11-25"
          ],
          "typ": "forum"
         }
@@ -4273,6 +4357,17 @@
       {
        "amne": "match",
        "punkter": [
+        {
+         "t": "Bradford leds av Duff, som återvänder till Wycombe. Supportrarna tror att han vet precis hur han ska pressa fram misstag från Wycombes mittbackar.",
+         "s": "o",
+         "podd": [
+          "The Gasroom"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "forum"
+        },
         {
          "t": "Lördagen blir ett återseende med Duff, som fick sparken från Wycombe. Supportrarna tror att han vill visa ordföranden Dan Rice att det var fel.",
          "s": "o",
@@ -4299,25 +4394,24 @@
       }
      ],
      "text": [
-      "På The Gasroom har man räknat ut att lördagen inte kan göra alla besvikna. Vinner Wycombe jublar de som ville bli av med Michael Duff, och förlorar laget får hans anhängare rätt.",
-      "Själv tros Duff vilja visa ordföranden Dan Rice att sparken var ett misstag, och flera fruktar att han ska ”sätta dit oss”.",
-      "Inte heller efterträdaren Tom Hounsell övertygar alla. En supporter menar att segrarna har kommit mot svagare lag och att den verkliga förstärkningen är anfallaren Jayden Wareham. På NOT606 beskrivs han som den som ensam bär laget med sina mål."
+      "På forumet The Gasroom har man slutat vänta sig mycket: laget är inte dåligt, men ”blekt och dömt att alltid göra en lite besviken”. Samma supportrar ser inget lyft under Tom Hounsell. Det verkliga tillskottet är i stället anfallaren Jayden Wareham, som bär laget med sina mål.",
+      "Inför återseendet med Michael Duff, som fick sparken i september, är oron konkret.",
+      "Man tror att han vet exakt hur han ska pressa fram misstag från mittbackarna, och att han vill visa ordföranden Dan Rice att det var fel att låta honom gå."
      ],
      "citat": {
-      "sagt": "De är inte usla, men de är bleka och dömda att göra oss lite besvikna.",
-      "vem": "DevC",
+      "sagt": "Jag kan inte låta bli att känna att det inte finns särskilt mycket vinnarvilja just nu.",
+      "vem": "WildWestFC",
       "podd": "The Gasroom",
       "typ": "forum",
-      "datum": "2026-11-24"
+      "datum": "2026-11-26"
      },
      "namn": [
-      "Michael Duff",
-      "Duff",
-      "Dan Rice",
       "Tom Hounsell",
-      "Jayden Wareham"
+      "Jayden Wareham",
+      "Michael Duff",
+      "Dan Rice"
      ],
-     "paSpel": "Ett återseende med Duff, och en läktare som är kluven om vad den hoppas på."
+     "paSpel": "Återseendet med den sparkade Duff, och en prövning av ordföranden Dan Rices beslut."
     },
     {
      "lag": "Bradford City",
@@ -4455,24 +4549,24 @@
       }
      ],
      "text": [
-      "Michael Duff återvänder till Adams Park med egna supportrar som har börjat ifrågasätta honom. Enligt Width of a Post räckte den röriga segern mot Barnsley inte för att tysta diskussionen.",
-      "Mittfältsparet Callum Connolly och Kieran Morgan ger laget mer framåt men lämnar ”oroväckande stora” hål utan boll, och mot Barnsley fick jumbon skjuta 23 skott. Skribenten saknar dessutom förmågan att styra och stänga matcher, som länge var lagets styrka.",
-      "Ljuspunkten heter Nick Powell: sedan början av november har ingen spelare i Englands fyra högsta divisioner haft fler målgivande insatser."
+      "Nick Powell har gått från bänken till att bli lagets hetaste spelare, och sedan början av november har ingen i de fyra högsta divisionerna i England fler målgivande insatser. Det skaver i stället bakåt.",
+      "Fansajten Width of a Post beskriver ett lag som har blivit farligare framåt men allt läckare. Mittfältsparet Callum Connolly och Kieran Morgan fungerar med bollen men lämnar ”oroväckande stora” hål utan den.",
+      "Supportrarna har dessutom börjat ifrågasätta Michael Duff, och enligt skribenten räckte den röriga segern mot Barnsley inte för att tysta den diskussionen."
      ],
      "citat": {
-      "sagt": "På de två senaste matcherna har City släppt in lika många mål som under hela säsongen dessförinnan.",
+      "sagt": "De verkar också ha tappat en egenskap som har tjänat dem så väl de senaste säsongerna – förmågan att kontrollera en match.",
       "vem": "Jason McKeown",
       "podd": "Width of a Post",
       "typ": "media",
       "datum": "2026-11-21"
      },
      "namn": [
-      "Michael Duff",
+      "Nick Powell",
       "Callum Connolly",
       "Kieran Morgan",
-      "Nick Powell"
+      "Michael Duff"
      ],
-     "paSpel": "Duffs återkomst till klubben som sparkade honom, med en egen läktare som tvivlar."
+     "paSpel": "Återkomsten till klubben som sparkade Duff, och chansen att tysta hans kritiker."
     }
    ]
   }
