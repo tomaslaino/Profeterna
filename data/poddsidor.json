@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T13:33:12.913Z",
+ "uppdaterad": "2026-11-27T13:43:10.982Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -507,10 +507,10 @@
     "Brentford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:05:41.231Z",
-   "rubrik": "Sportchefens huvud ligger i potten på Old Trafford",
+   "skriven": "2026-11-27T13:33:56.492Z",
+   "rubrik": "Pochettinos revolution: en vänsterfotad på vänsterkanten",
    "ingress": null,
-   "summering": "United har förenklat spelet men fruktar sina snabba ras, och en förlust kan kosta Wilcox. Brentford kommer med ett slitstarkt mittfält och en vingback som både gör mål och orsakar straffar.",
+   "summering": "United hoppas att Pochettinos enkla ordning håller när det första misstaget kommer. Brentford åker dit obesegrade på lika villkor och med en seger de tycker sig ha till godo.",
    "delar": [
     {
      "lag": "Manchester United",
@@ -678,9 +678,9 @@
       }
      ],
      "text": [
-      "Förlorar United hemma mot Brentford kräver supportrarna sportchefen Jason Wilcox huvud först, före både tränarens och spelarnas, tror man i podden No Question About That.",
-      "Mauricio Pochettino har annars gjort något som känns nästan revolutionerande: han har förenklat. Vänsterfotade spelare som Bryan Mbeumo står på vänsterkanten, laget sträcker ut planen, och mot Sporting föll det ner i en kompakt femback med alla bakom bollen.",
-      "Det som skrämmer är de få minuterna efter ett misstag, när laget rasar ihop och inte går att rädda. Så gick det på Anfield, och det var nära i Lissabon."
+      "Det som känns nästan omvälvande med Mauricio Pochettino är hur enkelt han gör det. I podden No Question About That noterar man att den vänsterfotade Bryan Mbeumo nu står till vänster och sträcker ut planen. Mot Sporting föll laget dessutom ner i ett kompakt försvar med alla bakom bollen.",
+      "Rädslan är densamma som förr: efter ett misstag rasar laget ihop på några minuter.",
+      "Pressen ligger ändå tyngst på sportchefen Jason Wilcox, och förlorar United hemma är det hans huvud som krävs först. En seger skulle däremot kännas som ”en jordbävning” för både gruppen och tränaren."
      ],
      "citat": {
       "sagt": "Det värsta av allt är att det inte gör ont längre, för vi är vana vid det. Och det är skit.",
@@ -690,15 +690,22 @@
       "datum": "2026-11-22"
      },
      "namn": [
-      "Jason Wilcox",
       "Mauricio Pochettino",
-      "Bryan Mbeumo"
+      "Bryan Mbeumo",
+      "Jason Wilcox"
      ],
-     "paSpel": "Pochettinos första hemmamatch, och sportchefen Wilcox jobb om den går förlorad."
+     "paSpel": "Pochettinos första hemmamatch, och vid förlust sportchefens huvud."
     },
     {
      "lag": "Brentford",
      "kallor": [
+      {
+       "podd": "The Beesotted Brentford Pride of West London Podcast",
+       "avsnitt": "Can The Bees Beat Man United? United Stand & Anfield Wrap Perspectives | Man Utd v Brentford Preview Podcast Part 2",
+       "datum": "2026-11-27",
+       "adress": "https://shows.acast.com/the-beesotted-brentford-pride-of-west-london-podcast/episodes/can-the-bees-beat-united-united-stand-anfield-wrap-perspecti",
+       "typ": "podd"
+      },
       {
        "podd": "The Beesotted Brentford Pride of West London Podcast",
        "avsnitt": "Everton Humbled, Saunders Moves On & United Up Next | Man United v Brentford Preview Podcast Part 1",
@@ -711,13 +718,6 @@
        "avsnitt": "Brentford 4 Everton 0 - The Bees Run Riot as Tarkowski Gets His Karma | Post-Match Podcast From The Stands",
        "datum": "2026-11-24",
        "adress": "https://shows.acast.com/the-beesotted-brentford-pride-of-west-london-podcast/episodes/brentford-4-everton-0-the-bees-run-riot-as-tarkowski-gets-hi",
-       "typ": "podd"
-      },
-      {
-       "podd": "The Beesotted Brentford Pride of West London Podcast",
-       "avsnitt": "Monday Night Blues As Bees Face Everton",
-       "datum": "2026-11-21",
-       "adress": "https://shows.acast.com/the-beesotted-brentford-pride-of-west-london-podcast/episodes/monday-night-blues-as-bees-face-everton",
        "typ": "podd"
       },
       {
@@ -792,62 +792,19 @@
        ]
       },
       {
-       "amne": "spel",
-       "punkter": [
-        {
-         "t": "Lewis-Potter kom som kantspelare och dömdes länge ut av supportrarna. Nu ses han som en spelare i lagets toppskikt sedan klubben lärt honom försvarsspelet som wingback. Vänsterbacksplatsen anses vara hans att förlora.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Enligt värdarna vinner Brentford inte för att motståndarna är dåliga, utan för att laget hindrar dem från att spela. Det mönstret har de sett mot Tottenham, Chelsea och Everton.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Mittfältsduon Yarmoliuk och Janelt satte tonen genom att jaga tillbaka bollen inom några sekunder efter varje bolltapp. Värdarna tror att samma mittfält, med Damsgaard, kan göra om det på Old Trafford.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "klubb",
-       "punkter": [
-        {
-         "t": "Mot bilden av en besvikelsesäsong pekar värdarna på att Brentford bara har förlorat två ligamatcher, och att laget hade en spelare utvisad i båda.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
        "amne": "match",
        "punkter": [
+        {
+         "t": "Neil från The Anfield Wrap menar att Brentfordspelarna är lika bra som Uniteds och att laget har en bättre struktur. Han tror att fem, sex Brentfordspelare skulle ta plats i en gemensam elva och att Keane Lewis-Potter är bättre än alla Uniteds vänsterbackar.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Värdarna ser Uniteds försvar och målvakt som osäkra och vill att Brentford går på dem direkt. De påpekar att laget brukar prestera bättre mot de starkare lagen.",
          "s": "o",
@@ -869,27 +826,59 @@
           "2026-11-24"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Uniteds egen supporter Mauds säger att Brentford skrämmer honom mer än något annat lag. Han är fortfarande märkt av 0–4 i halvtid och ser lördagar klockan tre utan tv som just Brentfords sorts match.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "United-supportern Mauds pekar på att laget släpper in mål tidigt, ofta redan under de första minuterna. Han ser det som en fråga om spelarnas koncentration och inte om tränaren.",
+         "s": "h",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Neil såg Liverpool vinna med 4–0 över United och menar att Brentford ska gå på dem med fart på kanterna. Uniteds backlinje vet inte var den ska stå och vill inte ligga djupt hemma på Old Trafford.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Keane Lewis-Potter kom som kantspelare och dömdes länge ut av supportrarna, men omskolad till vingback räknas han nu till lagets bästa. Alla hans ligamål har kommit från ytterbacksplatsen. Baksidan är att han redan har orsakat två straffar genom att brottas med motståndare i straffområdet.",
-      "I podden Beesotted pekar man också på Yehor Yarmoliuk och Vitaly Janelt, som mot Everton jagade tillbaka bollen inom sekunder efter varje bolltapp. Samma mittfält ska nu till Old Trafford, där supportrarna tycker att segern länge har dröjt och tänker åka dit ”med mycket envishet”."
+      "”På lika villkor har vi inte förlorat än”, påminner man i podden Beesotted, eftersom laget hade tio man på planen i båda ligaförlusterna. Därför åker man till Old Trafford i tron att segern som tidigare ryckts ifrån dem där äntligen ska komma, som när McTominay gjorde två mål på tilläggstid.",
+      "Symbolen för uppsvinget är Keane Lewis-Potter. Supportrarna dömde länge ut honom som kantspelare, men omskolad till vingback är han nu lagets bäste målskytt i ligan. Till och med United-supportern Mauds erkänner att Brentford skrämmer honom mer än något annat lag."
      ],
      "citat": {
-      "sagt": "Jag håller inte med om att vi har ett disciplinproblem. Jag tror att vi har ett naivitetsproblem.",
-      "vem": null,
+      "sagt": "Vi spelar honom som wingback, och han har den där naturliga löpförmågan och dessutom en kants finter.",
+      "vem": "Lainey",
       "podd": "The Beesotted Brentford Pride of West London Podcast",
       "typ": "podd",
-      "datum": "2026-11-21"
+      "datum": "2026-11-26"
      },
      "namn": [
-      "Keane Lewis-Potter",
-      "Yehor Yarmoliuk",
-      "Vitaly Janelt"
+      "McTominay",
+      "Keane Lewis-Potter"
      ],
-     "paSpel": "Chansen att äntligen få betalt på Old Trafford, där segern länge dröjt."
+     "paSpel": "Revanschen: segern på Old Trafford som laget anser sig ha till godo."
     }
    ]
   },
