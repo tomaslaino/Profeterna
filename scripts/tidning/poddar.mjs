@@ -45,7 +45,7 @@
 // Varje körning börjar med att pröva den förra omgångens spelade matcher (src/analyser/traff.mjs),
 // medan deras uppgifter ännu ligger i omgang.json.
 
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -527,6 +527,14 @@ async function main() {
   const fel = betalvagar();
   if (fel.length) { logg(`STOPP: ${fel.join(', ')} är satt. Då skulle Claude Code kunna debiteras som API. Ta bort variabeln.`); process.exit(1); }
   if (!tagLas()) { logg('en körning pågår redan'); return; }
+  // Datorn får inte somna mitt i körningen (2026-11-27: körningen kl. 02.15 stannade varje natt efter drygt en
+  // och en halv timme, utan att bli klar, och började om från början natten efter – med nya matchblad, en ny
+  // löpsedel och en ny familjesida varje natt). caffeinate håller datorn vaken tills den här processen slutar.
+  if (process.platform === 'darwin' && !TORRT) {
+    try {
+      spawn('/usr/bin/caffeinate', ['-i', '-s', '-w', String(process.pid)], { stdio: 'ignore', detached: true }).on('error', () => {}).unref();
+    } catch { /* att hålla datorn vaken är inte värt ett stopp */ }
+  }
   if (MED_PODDAR && !fs.existsSync(path.join(MAPP, pc.modell))) { logg(`STOPP: whisper-modellen saknas (${path.join(MAPP, pc.modell)})`); process.exit(1); }
 
   if (!TORRT) {
