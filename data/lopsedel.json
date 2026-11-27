@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T15:38:37.997Z",
+ "skriven": "2026-11-27T15:54:30.085Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T15:34:15.793Z",
+ "underlag": "2026-11-27T15:52:21.771Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "BRUNO SJUK",
+    "UNITED-FANS:",
+    0
+   ],
+   [
+    "”VI ÄR VANA",
     1
    ],
    [
-    "INFÖR",
-    0
-   ],
-   [
-    "HEMMAPREMIÄR",
+    "VID DET”",
     0
    ]
   ],
-  "under": "Bruno Fernandes missade fredagens träning. Pochettino leder United hemma för första gången.",
-  "plus": "IPSWICH: 34 RAKA UTAN NOLLA",
+  "under": "”Det värsta av allt är att det inte gör ont längre” – United We Stand Podcast",
+  "plus": "IPSWICH: 34 MATCHER UTAN NOLLA",
   "plusId": "401878752"
  }
 }
