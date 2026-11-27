@@ -15,29 +15,36 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-23T15:03:46.477Z",
+ "skriven": "2026-11-27T15:22:52.987Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-10.3",
+ "poddar": "0691269bc4da,0d5a20eddf79,0e9a69d6c293,16d1dcf43163,199ae8acf0af,282d0b4f8a4c,28d689f30cbe,344a7f179f37,372cee3b19c3,3aaa0db86598,4120c8f6933b,46931663422f,4ef61c6c3e16,4f90419d2d8b,5753dda08338,5e253e3aafdd,630470a2749d,6c816cc02950,7989feda6ac5,7d9a6ccc47c4,7db5d6a08456,7fec4020420a,82883d5b0848,83876fe35812,8add977dc32a,8df3d353404a,92906be4b19b,96b09c346c54,988e3b4567b6,9fdb922e01e2,9fdc8fde686f,ad6065266a9b,bc78dd22c48c,c7566c83be16,c83120bcfd97,cc767458e537,cddb94012b5b,d5dfcf169bf1,d8c5f7d46e48,e1c1a0a263ca,e858cdc4b8ea,e96a589cb69f,ee641a438e1c,f069a1450003,f06be4de1bca,f06f64327f86,f0709ae5a967,f0946b8373c2,f09777434a14,f0f189c82406,f13b5474c073,f14ffef28ce4,f15fb04b628f,f1ae1e003b4f,f1deb9190012,f1f15c5d1a92,f201f4f9732c,f2317f8a1e38,f24649e27016,f277201a62d9,f28121b75705,f283ef4ad19a,f285d24b239a,f316de80ba69,f35dfd12f1dc,f36ab2f9ca2d,f38257592533,f38dd215edd1,f39918204128,f3ad0bcba0db,f3e3592e92cd,f3f7f078c1a1,f3f896ab9b42,f3ff3b61cb0e,f402e330862b,f40617a22d2b,f42be0b6faf8,f45e2dd0238a,f46840ef2b98,f4a7f33a3ca3,f4c7d6f4a0bf,f509822cb767,f5548194458a,f58144263575,f5b7fb504edb,f5d173fc62c0,f64b8038a6c3,f663a4a4ad15,f6955db1fb0e,f6b5e4827534,f6d9d740cc63,f7c36f7ecd65,f7ec57324731,f7f5624ff9a6,f85967ad9b0e,f8cdaf7db14d,f96c577af5e1,f99c9ed3c624,f9cdc5b49dfe,fa4a0fdd3518,fabb5f14f5d4,fae50774d50b,fb2430289171,fb24d15f82cb,fb39da507849,fb44e7aed38a,fb52b6bbd11b,fb5d899ef31c,fb63a7146a29,fb804967f288,fbfb87fb9d4a,fc1c96085dbf,fc35dddafbcf,fc4274040d17,fc4b7a888506,fcad3eaff024,fd1c0a695005,fd1c172931b4,fd2761f4118f,fd56f9380695,fd9074ada9f0,fdf3e6fcf2f7,fdfb9a7ad327,fe3baad4847b,fe6699fbbccb,fe736c5e5691,fe9174750518,fe96106f2630,feae0a268ee0,febabae32c9a,fecd72db52da,fed001b242d1,ff0b543b1081,ff37efb68e67,ff48731183b2,ff57421d83e6,ffa80b82f671,ffc74369993d,l059c2444bae,l17239ff8409,l19d00ab358a,l258ec24697f,l26f9df861b6,l346c4e9f64a,l34f2d28334f,l387874b978d,l39ccc2b584b,l50a260e4266,l5471bee92a0,l5b5484c433c,l5e9398a6268,l6821bc049ea,l70b397191d9,l77b25e732f0,l85375b33032,l87562b4ca25,l88d73f2c95f,l898e6121022,l8fe96cf3b79,l9481a872bd1,la34dfaecf5b,la4ec2d20680,la8a26439747,lb1b76fd2422,lb319b94b047,lba34e4ee3d0,lc3a2e07b0cc,lc4e933551d1,lc5e40939474,lc6157f3988a,ld09f1ac8e80,ld962fa8ee9b,ldb3cbb20042,leabd9854a2f,lee0eb660c9a,leee01cd591b,lef217ce1e70,lf290f9d8723,lf9d4744655a,lfa9bbeaba9d,lfe6fb539beb,m099241f78e6,m09b98b7cd67,m0e5f3947c17,m110c1424d2e,m1351b06c1d1,m29054cc40cd,m297ec489e61,m33b6b7ba016,m371b09b7dc3,m387bfcd61b5,m425aebf024f,m439cceab07a,m46549923cde,m539fbcb970a,m53c78443052,m544050c4a74,m54a94dd9bf2,m5612dcb1c96,m5f39d193ec8,m680c99e4d01,m714150ebf9d,m78154832bdc,m7a26270b8e6,m84836c0dd5c,m8684210e9e3,m8e4909172a9,m8ea5af2a98e,m9fa90ecf411,ma193be4256c,ma270a6ea3ba,ma328174d505,ma7f1f59ef31,mabd16491e98,maf052b5ae0e,mb4e79f0b03e,mb70d2789813,mc640b1085be,md442c517d01,mdfa7848e4bd,me241f6559c9,me4cfeea9d7a,me5b04d0ca77,me5b3abe12c9,me75f1303f63,meaa0046b170,mefddcba5d3f,mf0524acce12,mf0d1c80b272,mf989f1e812d,mf9c763d3d93,mfa4e6a4a8cd,mfba5f3c2450",
  "notiser": [
   {
    "nr": 1,
    "id": "401878752",
    "match": "Ipswich Town – Aston Villa",
    "avspark": "2026-11-28T17:30:00.000Z",
-   "rubrik": "Emery frustrerad efter mållöst mot Sunderland",
-   "text": "Aston Villa spelade 0–0 hemma mot Sunderland i lördags. Unai Emery sade att han var ”lite frustrerad”: laget dominerade men skapade få klara chanser. Lagkaptenen John McGinn började på bänken. Cash, Ruggeri och Onana är skadade, och Lindelöf är sjuk och tveksam. Ipswich förlorade med 0–2 mot Tottenham. Båda lagen har gått fem matcher utan seger. Ipswichs Davis har en vadskada och är tveksam.",
+   "rubrik": "Ipswich och Villa jagar en seger",
+   "text": "Supporterpodden Blue Monday tycker att Ipswichs säsong glider iväg och nu påminner om nedflyttningssäsongen för två år sedan. Laget har inte vunnit på fem matcher, har släppt in 22 ligamål och har ännu inte hållit nollan. Aston Villa har gått sex matcher utan seger efter 0–1 borta mot Galatasaray. Matty Cash följer hjärnskakningsprotokollet och är tveksam. Matteo Ruggeri och Amadou Onana är skadade.",
    "kallor": [
     {
-     "source": "Sky Sports",
-     "title": "Aston Villa 0-0 Sunderland: Unai Emery's side held to frustrating draw following tepid performance",
-     "url": "https://www.skysports.com/football/news/13611870/aston-villa-0-0-sunderland-unai-emerys-side-held-to-frustrating-draw-following-tepid-performance",
-     "publishedAt": null
+     "source": "Blue Monday: An Ipswich Town Podcast",
+     "title": "Blue Monday: An Ipswich Town Podcast: 🔍 IPSWICH TOWN V ASTON VILLA MATCH PREVIEW | PREMIER LEAGUE",
+     "url": "https://shows.acast.com/bluemondaypodcast/episodes/ipswich-town-v-aston-villa-match-preview-premier-league-the",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
     },
     {
-     "source": "ESPN",
-     "title": "Spurs 2-0 Ipswich (21 Nov, 2026) Final Score",
-     "url": "https://www.espn.co.uk/football/match/_/gameId/401878754",
-     "publishedAt": null
+     "source": "TWTD",
+     "title": "TWTD: Diop: They Were Better Than Us Today",
+     "url": "https://www.twtd.co.uk/ipswich-town-news/53238/diop-they-were-better-than-us-today",
+     "publishedAt": "2026-11-21T00:00:00.000Z"
+    },
+    {
+     "source": "AVillaFan.com",
+     "title": "AVillaFan.com: Unai Emery and his midseason winless runs, should Aston Villa worry? - AVillaFan.com",
+     "url": "https://www.avillafan.com/41446/unai-emery-and-his-midseason-winless-runs-should-aston-villa-worry/",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -46,16 +53,16 @@
    ],
    "bilder": [
     {
-     "fil": "ipswich-town-9604e40f.jpg",
-     "kalla": "East Anglian Daily Times",
+     "fil": "ipswich-town-6eeb0e96.jpg",
+     "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.eadt.co.uk/sport/26753605.ipswich-town---ex-blue-conor-sammon-appointed-alloa-boss/"
+     "sida": "https://www.bbc.co.uk/sport/football/videos/cqevr07zx8mvo"
     },
     {
-     "fil": "aston-villa-863bcd83.jpg",
+     "fil": "aston-villa-faf3470c.jpg",
      "kalla": "ESPN",
-     "foto": "Getty",
-     "sida": "https://www.espn.com/soccer/story/_/id/50541443/aston-villa-johan-manzambi-sunderland"
+     "foto": "Ozan KOSE / AFP via Getty Images",
+     "sida": "http://www.espn.com/soccer/report/_/gameId/401915300"
     }
    ]
   },
@@ -64,14 +71,20 @@
    "id": "401879226",
    "match": "Manchester United – Brentford",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "United utan Yoro efter rött kort",
-   "text": "Leny Yoro fick rött kort efter åtta minuter när Manchester United förlorade med 0–4 mot Liverpool. Han är avstängd till den 2 december. Pochettino ifrågasatte utvisningen och kallade förlusten ”så smärtsam”. United ligger näst sist och saknar också Shaw, Rashford, Baleba, Šeško och Ugarte. Brentford har inte vunnit någon av sina fem bortamatcher i ligan i år. Thiago är avstängd, och Hickey, Collins och Henry är skadade.",
+   "rubrik": "Pochettinos första hemmamatch på Old Trafford",
+   "text": "Enligt supporterpodden No Question About That är Manchester Uniteds farligaste mönster att laget rasar ihop några minuter efter ett misstag, som det gjorde mot Liverpool. Mauricio Pochettino väntar fortfarande på sin första seger och leder nu laget hemma för första gången. Bruno Fernandes missade fredagens träning eftersom han kände sig sjuk, skriver Manchester Evening News. Brentford saknar den avstängde Igor Thiago samt Collins, Hickey, Henry och Furo.",
    "kallor": [
     {
-     "source": "Notjustok",
-     "title": "Mauricio Pochettino reacts to Man United defeat against Liverpool",
-     "url": "https://notjustok.com/sports/mauricio-pochettino-reacts-to-man-united-defeat-against-liverpool/",
-     "publishedAt": null
+     "source": "podcasts.apple.com",
+     "title": "No Question About That - a Manchester United podcast: Green Shoots, Red Cards",
+     "url": "https://podcasts.apple.com/gb/podcast/no-question-about-that-a-manchester-united-podcast/id327751771?uo=4",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
+    },
+    {
+     "source": "The Peoples Person",
+     "title": "The Peoples Person: Man United aiming to maintain stunning record versus Brentford in huge end to November",
+     "url": "https://thepeoplesperson.com/2026/11/27/mauricio-pochettinos-man-united-home-debut-vs-brentford-323582/",
+     "publishedAt": "2026-11-27T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -80,16 +93,16 @@
    ],
    "bilder": [
     {
-     "fil": "manchester-united-54f84cb6.jpg",
+     "fil": "manchester-united-ca9d2bdb.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/videos/cm0rkzzyl2ego"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c6d91j5geepqo"
     },
     {
-     "fil": "brentford-c522b90e.jpg",
-     "kalla": "ESPN",
-     "foto": "Tony McArdle/Everton FC via Getty Images",
-     "sida": "https://www.espn.com/soccer/story/_/id/50541708/jack-grealish-everton-brentford"
+     "fil": "brentford-337edd3e.jpg",
+     "kalla": "BBC Sport",
+     "foto": null,
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cmdx1vll31k1o"
     }
    ]
   },
@@ -98,20 +111,20 @@
    "id": "401879227",
    "match": "Leeds United – Coventry City",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Leeds tog historisk seger på Stamford Bridge",
-   "text": "Leeds vann med 4–1 mot Chelsea och tog sin första seger på Stamford Bridge sedan 1999. Noah Okafor gjorde två mål. Daniel Farke sade att segern var fullt förtjänt. Leeds är sexa och har inte förlorat hemma i år. Coventry har vunnit en av fem bortamatcher och gjort 3 mål på dem. Awoniyi, Yirenkyi och Mason-Clark är tveksamma, och Amenda, Woolfenden och Eccles är skadade.",
+   "rubrik": "Leeds söker tredje raka ligasegern",
+   "text": "Leeds har inte tagit tre raka ligasegrar sedan uppflyttningen, påpekar supporterpodden The Square Ball, och efter 4–1 mot Chelsea väcks de gamla tvivlen. Daniel Farke har hela truppen tillgänglig. Coventry saknar Taiwo Awoniyi, som har en allvarlig fotledsskada, och Josh Eccles, som har opererats. Ephron Mason-Clark och Caleb Yirenkyi kan däremot spela. Coventry har släppt in 21 mål på 11 matcher.",
    "kallor": [
     {
-     "source": "Sky Sports",
-     "title": "Chelsea 1-4 Leeds: Blues dismantled as pressure grows on manager Xabi Alonso after Noah Okafor's double",
-     "url": "https://www.skysports.com/football/chelsea-vs-leeds-united/8413998954361023232",
-     "publishedAt": null
+     "source": "The Square Ball: Leeds United Podcast",
+     "title": "The Square Ball: Leeds United Podcast: DCL the MVP",
+     "url": "https://thesquareball.net/plus",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
     },
     {
-     "source": "AOL",
-     "title": "Chelsea 1-4 Leeds: What Farke and Ampadu said",
-     "url": "https://www.aol.com/articles/chelsea-1-4-leeds-farke-174033000.html",
-     "publishedAt": null
+     "source": "The Marching On Newsletter",
+     "title": "The Marching On Newsletter: The Marching On Newsletter 🟡 Pre-match bus palava at Chelsea set tone for legendary Leeds win",
+     "url": "https://themarchingonnewsletter.substack.com/p/the-marching-on-newsletter-pre-match",
+     "publishedAt": "2026-11-27T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -120,10 +133,10 @@
    ],
    "bilder": [
     {
-     "fil": "leeds-united-433fa759.jpg",
-     "kalla": "The 4th Official - A view from the sideline",
+     "fil": "leeds-united-e8503b6a.jpg",
+     "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://the4thofficial.net/2026/11/leeds-united-have-strong-chance-of-striking-this-striker-bargain-should-farke-push-for-him/"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cx62pnz1evv4o"
     },
     {
      "fil": "coventry-city-db096d60.jpg",
@@ -138,14 +151,14 @@
    "id": "401880136",
    "match": "Birmingham City – Bolton Wanderers",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Birmingham förlorade och fick en man utvisad",
-   "text": "Birmingham gick in i lördagens match mot Stoke som serieledare men förlorade med 0–1. Luca Bombino blev utvisad i 63:e minuten. Laget är nu fyra i tabellen och har inte förlorat hemma i år: 4 segrar och 4 oavgjorda, med 19 gjorda mål. Bolton ligger på 17:e plats och har en seger på de fem senaste matcherna. Senast blev det 1–1 hemma mot Portsmouth.",
+   "rubrik": "Birmingham utan Cochrane mot Bolton",
+   "text": "Bolton släpper gång på gång in mål på låga inlägg mitt i straffområdet, säger Bolton-supportern Ben Gardner i supporterpodden Tilton Talk, och han tror att motståndarna har upptäckt svagheten. Birmingham är obesegrat hemma men saknar vänsterbacken Alex Cochrane, som är avstängd efter sitt femte gula kort. Ethan Laird är tveksam, och Jhon Solis står på fyra gula kort. Bolton förlorade senast med 1–3 mot West Brom.",
    "kallor": [
     {
-     "source": "The League Paper",
-     "title": "Stoke City 1-0 Birmingham City: George Hirst fires the Potters into the top two",
-     "url": "https://www.theleaguepaper.com/latest-news/football-league-championship/stoke-city/470673/hirst-fires-up-to-craft-way",
-     "publishedAt": null
+     "source": "Tilton Talk Birmingham City podcast",
+     "title": "Tilton Talk Birmingham City podcast: Blues v Bolton The Away End",
+     "url": "https://shows.acast.com/tiltontak/episodes/blues-v-bolton-the-away-end",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -160,10 +173,10 @@
      "sida": "https://www.bbc.co.uk/sport/football/articles/c6j4r5y4w1g8o"
     },
     {
-     "fil": "bolton-wanderers-20982757.jpg",
+     "fil": "bolton-wanderers-1736893d.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cq3dg44vxr77o"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/ck8dv60prle6o"
     }
    ]
   },
@@ -172,14 +185,26 @@
    "id": "401880134",
    "match": "Derby County – Watford",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Bottenlag möts på Pride Park",
-   "text": "Derby är näst sist med 10 poäng efter 0–2 borta mot Southampton i lördags. Hemma har laget bara en seger och fem förluster. Watford ligger trea från slutet och föll med 0–4 mot Sheffield United, där Ben Brereton Díaz gjorde två mål. Watford har ingen seger på åtta bortamatcher och har bara gjort 4 mål på dem.",
+   "rubrik": "Bottenmöte med Eustaces framtid i potten",
+   "text": "Supporterpodden The Rams Review tror att kraven på att John Eustace ska gå blir högre än någonsin under säsongen om Derby fortfarande ligger minst fem poäng från säker plats efter lördagen. Derby är sist med 10 poäng. Watford sparkade Alessio Dionisi efter 0–4 mot Sheffield United, och på forumet NOT606 tror supportrarna inte att efterträdaren Iordanescu får någon effekt. Watford har inte vunnit borta i år.",
    "kallor": [
     {
-     "source": "The72",
-     "title": "'Very tough test': Sheffield United vs Southampton predictions",
-     "url": "https://the72.co.uk/2026/11/23/sheffield-united-vs-southampton-predictions/",
-     "publishedAt": null
+     "source": "The Rams Review Podcast",
+     "title": "The Rams Review Podcast: Derby drift to Southampton defeat",
+     "url": "https://podcasters.spotify.com/pod/show/ramsreview/episodes/Derby-drift-to-Southampton-defeat-e3ssvv3",
+     "publishedAt": "2026-11-23T00:00:00.000Z"
+    },
+    {
+     "source": "Tom Bodell",
+     "title": "Tom Bodell: Dionisi pays the price for folding too often as Watford roll the dice",
+     "url": "https://tbbodell.substack.com/p/dionisi-pays-the-price-for-folding",
+     "publishedAt": "2026-11-22T00:00:00.000Z"
+    },
+    {
+     "source": "NOT606",
+     "title": "NOT606: Watford V Blackburn Weds 25th November 19.45 (Brrrr)",
+     "url": "https://not606.com/threads/watford-v-blackburn-weds-25th-november-19-45-brrrr.425649/",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -188,16 +213,16 @@
    ],
    "bilder": [
     {
-     "fil": "derby-county-9cb94990.jpg",
+     "fil": "derby-county-326ef79b.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cvj6l79x9xe6o"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/ck987jqzpq0lo"
     },
     {
-     "fil": "watford-8566c2e3.jpg",
+     "fil": "watford-c67db3b9.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cj7523r0vrp0o"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cw7726543kyzo"
     }
    ]
   },
@@ -206,14 +231,20 @@
    "id": "401880132",
    "match": "Millwall – Burnley",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Burnley tappade ledning två gånger igen",
-   "text": "Burnley ledde två gånger men fick bara 2–2 hemma mot Blackburn. Laget har tappat 25 poäng från ledningsläge den här säsongen. ”Vi tappade två poäng”, sade Fabio Celestini, som tog över efter Nicky Hayen förra månaden. Burnley är 22:a och har en seger på åtta bortamatcher. Millwall har förlorat fyra av sina fem senaste matcher och har inte gjort mål på tre matcher.",
+   "rubrik": "Krisande lag möts på The Den",
+   "text": "Enligt supporterpodden TurfCast menar en av värdarna att Burnleys omklädningsrum är förlorat, eftersom spelarna grälar och viftar irriterat åt varandra. Laget har tappat 23 poäng från ledningsläge, skriver Lancashire Telegraph. Millwall har förlorat fyra raka matcher och har dessutom fått böta 70 000 pund av FA, som också har stängt en del av Dockers Stand efter ramsorna mot Charlton i januari.",
    "kallor": [
     {
-     "source": "Yahoo Sports",
-     "title": "Burnley 2-2 Blackburn Rovers: Clarets’ home win wait goes on as Rovers pay tribute to Tony Mowbray",
-     "url": "https://sports.yahoo.com/articles/burnley-2-2-blackburn-rovers-162858387.html",
-     "publishedAt": null
+     "source": "TurfCast",
+     "title": "TurfCast: The Fan Reaction Podcast | BURNLEY 0-2 BIRMINGHAM CITY",
+     "url": "https://shows.acast.com/turfcastpodcast/episodes/the-fan-reaction-podcast-burnley-0-2-birmingham-city",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
+    },
+    {
+     "source": "The Millwall Standard",
+     "title": "The Millwall Standard: A convenient coat peg: Millwall, the FA, and the hunt for someone to blame",
+     "url": "https://thatmillwallpodcast.substack.com/p/a-convenient-coat-peg-millwall-the",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -222,10 +253,10 @@
    ],
    "bilder": [
     {
-     "fil": "millwall-aafbc144.jpg",
+     "fil": "millwall-51166f86.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/c6m2lelll4n1o"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c6wy474lxd22o"
     },
     {
      "fil": "burnley-e42e4ced.jpg",
@@ -240,9 +271,16 @@
    "id": "401880127",
    "match": "West Bromwich Albion – Bristol City",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Bristol City har förlorat tre raka",
-   "text": "Bristol City har förlorat tre matcher i rad, med målskillnaden 1–9, och ligger på 18:e plats. Laget har gjort 5,1 mål färre än xG. West Bromwich är femma och har förlorat en hemmamatch i år. Senast blev det 2–2 borta mot Swansea. Bristol City vann ändå förra hösten med 2–1 på The Hawthorns. Ingen fri källa redovisar skador.",
-   "kallor": [],
+   "rubrik": "Frågetecken för Price, press på Skubala",
+   "text": "Isaac Price har en knäskada som enligt rykten inte är allvarlig, men Lewis Cox i supporterpodden Baggies Broadcast räknar ändå med att han är ett stort frågetecken mot Bristol City. West Brom är femma. Bristol Citys tränare Michael Skubala är hårt pressad. Supportrarna buade mot honom under 1–1 mot Wrexham, och fasta situationer har upprepade gånger kostat mål den här månaden, skriver Bristol Live.",
+   "kallor": [
+    {
+     "source": "Baggies Broadcast",
+     "title": "Baggies Broadcast: Isaac pays the Price for Panenka attempt",
+     "url": "https://shows.acast.com/baggies-broadcast/episodes/6b04ac13fd8dab7e15a5aea5",
+     "publishedAt": "2026-11-24T00:00:00.000Z"
+    }
+   ],
    "lag": [
     "West Bromwich Albion",
     "Bristol City"
@@ -267,14 +305,26 @@
    "id": "401880130",
    "match": "Queens Park Rangers – Sheffield United",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "QPR tar emot formstarkt Sheffield United",
-   "text": "QPR ligger sjua och har vunnit sina två senaste matcher, senast med 1–0 borta mot Millwall. Hemma har laget bara förlorat en gång och gjort 16 mål. Sheffield United är nia, två poäng efter, och vann i lördags med 4–0 mot Watford. Ben Brereton Díaz gjorde två av målen. Sheffield United har inte förlorat i de sex senaste mötena med QPR.",
+   "rubrik": "Wilder saknar en högerback han litar på",
+   "text": "Sheffield United har fyra spelare som kan spela högerback men ingen som Chris Wilder både litar på och kan använda, berättar supporterpodden Blades Ramble. Han kan därför tvingas gå över till en femmannalinje. Kalvin Phillips är tillbaka i truppen. QPR vet inte om mittbacken Jimmy Dunne hinner bli spelklar, men Tariq Lamptey kan vara tillbaka. Julien Stephan står kvar vid målvakten Pierce Charles efter misstaget mot Norwich.",
    "kallor": [
     {
-     "source": "The72",
-     "title": "'Very tough test': Sheffield United vs Southampton predictions",
-     "url": "https://the72.co.uk/2026/11/23/sheffield-united-vs-southampton-predictions/",
-     "publishedAt": null
+     "source": "podcasts.apple.com",
+     "title": "Blades Ramble - A Sheffield United Podcast: Chris Wilder Speaks Before Watford!",
+     "url": "https://podcasts.apple.com/gb/podcast/blades-ramble-a-sheffield-united-podcast/id1777788630?uo=4",
+     "publishedAt": "2026-11-23T00:00:00.000Z"
+    },
+    {
+     "source": "Sheff United Way",
+     "title": "Sheff United Way: Queens Park Rangers vs Sheffield United",
+     "url": "https://sheffunitedway.co.uk/2026/11/26/queens-park-rangers-vs-sheffield-united-preview-3/",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
+    },
+    {
+     "source": "LoftforWords",
+     "title": "LoftforWords: The flying Canaries versus the in form R's - Preview",
+     "url": "https://www.fansnetwork.co.uk/football/queensparkrangers/news/67286/the-flying-canaries-versus-the-in-form-rs--preview",
+     "publishedAt": "2026-11-27T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -289,10 +339,10 @@
      "sida": "https://www.bbc.co.uk/sport/football/articles/cw7721vdly55o"
     },
     {
-     "fil": "sheffield-united-313e3fa7.jpg",
+     "fil": "sheffield-united-1506adda.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/c699exd42gzxo"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c8qlq05vdvdqo"
     }
    ]
   },
@@ -301,26 +351,20 @@
    "id": "401880126",
    "match": "West Ham United – Stoke City",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Parker väntar fortfarande på första segern",
-   "text": "Scott Parker väntar fortfarande på sin första seger som West Ham-tränare. Mot Preston, som ligger sist, räddade Konstantinos Mavropanos 1–1. ”Vi var värda tre poäng, men det fanns mycket positivt”, sade Parker. West Ham är tia och har inte vunnit på fem matcher. Stoke är tvåa efter fyra raka segrar. Senast vann laget med 1–0 mot Birmingham på ett mål av George Hirst.",
+   "rubrik": "Segerlöst West Ham möter Stoke i form",
+   "text": "Djibril Soumaré lämnade arenan i en ortopedisk känga efter matchen mot Birmingham, och supporterpodden Every Step Along The Way tror inte att han hinner bli spelklar. Stoke är tvåa och har vunnit fem raka matcher. Scott Parker har inte vunnit på sina fyra matcher som West Hams tränare, och laget har tagit 2 poäng av de senaste 18 möjliga. Kyle Walker-Peters och Alphonse Areola är under bedömning.",
    "kallor": [
     {
-     "source": "Sky Sports",
-     "title": "West Ham 1-1 Preston: Konstantinos Mavropanos earns a point for Hammers",
-     "url": "https://www.skysports.com/football/west-ham-united-vs-preston-north-end/6195096270144621232",
-     "publishedAt": null
+     "source": "shows.acast.com",
+     "title": "Every Step Along The Way - A Stoke City Podcast: Match Preview: Millwall(H)",
+     "url": "https://shows.acast.com/every-step-along-the-way/episodes/match-preview-millwallh-251126",
+     "publishedAt": "2026-11-23T00:00:00.000Z"
     },
     {
-     "source": "Morning Star",
-     "title": "Parker stays positive after uninspiring West Ham fail to win another match",
-     "url": "https://morningstaronline.co.uk/article/sport-p15-match-report-parker-stays-positive-after-uninspiring-west-ham-fail-win-another",
-     "publishedAt": null
-    },
-    {
-     "source": "The League Paper",
-     "title": "Stoke City 1-0 Birmingham City: George Hirst fires the Potters into the top two",
-     "url": "https://www.theleaguepaper.com/latest-news/football-league-championship/stoke-city/470673/hirst-fires-up-to-craft-way",
-     "publishedAt": null
+     "source": "Claret and Hugh",
+     "title": "Claret and Hugh: West Ham v Stoke Preview: Predicted Lineups As Pressure Mounts On Parker",
+     "url": "https://www.claretandhugh.info/west-ham-v-stoke-preview-predicted-lineups-as-pressure-mounts-on-parker/",
+     "publishedAt": "2026-11-27T00:00:00.000Z"
     }
    ],
    "lag": [
@@ -329,16 +373,16 @@
    ],
    "bilder": [
     {
-     "fil": "west-ham-united-ff05f21c.jpg",
+     "fil": "west-ham-united-d78e3c83.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cmn0dw4lx8ero"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c6zxvy970eq5o"
     },
     {
-     "fil": "stoke-city-7a79380d.jpg",
+     "fil": "stoke-city-cb06dfcd.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cmrrgzelxvrko"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cqp8g8gyjj0eo"
     }
    ]
   },
@@ -347,25 +391,44 @@
    "id": "401880125",
    "match": "Wrexham – Portsmouth",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Wrexham har tre matcher utan förlust",
-   "text": "Wrexham har gått tre matcher utan förlust och vann senast med 1–0 borta mot Lincoln. Laget är 14:e, två poäng efter Portsmouth. Portsmouth är tolva och spelade 1–1 borta mot Bolton i lördags. Laget har bara släppt in 6 mål på åtta bortamatcher. Lagen har mötts två gånger: förra säsongen slutade det 0–0 och 2–1 till Wrexham. Ingen fri källa redovisar skador.",
-   "kallor": [],
+   "rubrik": "Cleworth nyckeln i Wrexhams försvar",
+   "text": "Med Max Cleworth på planen har Wrexham bara släppt in 2 av säsongens 20 mål, säger supporterpodden Rob. Ryan. Red. Laget tar ungefär två poäng per match när han startar och 0,9 när han inte gör det. Assisterande tränaren Steve Parkin lämnar klubben efter lördagens match. Portsmouth vann senast med 1–0 mot West Ham, men målvakten Daniel Bielica är inte tillgänglig.",
+   "kallor": [
+    {
+     "source": "Rob. Ryan. Red.",
+     "title": "Rob. Ryan. Red.: Episode 336: Digging Deep",
+     "url": "https://shows.acast.com/6486dd5af5bfbf001188bea7/episodes/episode-336",
+     "publishedAt": "2026-11-23T00:00:00.000Z"
+    },
+    {
+     "source": "Wrexham is the Game",
+     "title": "Wrexham is the Game: WitG: Farewell to Parkin & Pompey Preview",
+     "url": "https://wrexhamisthegame.substack.com/p/witg-farewell-to-parkin-and-pompey",
+     "publishedAt": "2026-11-26T00:00:00.000Z"
+    },
+    {
+     "source": "Pompey-Fans.com",
+     "title": "Pompey-Fans.com: Promising signs - Mousinho takes Pompey to Wrexham with optimism growing",
+     "url": "https://pompey-fans.fansnetwork.co.uk/news/67310",
+     "publishedAt": "2026-11-27T00:00:00.000Z"
+    }
+   ],
    "lag": [
     "Wrexham",
     "Portsmouth"
    ],
    "bilder": [
     {
-     "fil": "wrexham-ea797675.jpg",
-     "kalla": "The Leader",
+     "fil": "wrexham-e84e10bd.jpg",
+     "kalla": "Daily Star",
      "foto": null,
-     "sida": "https://www.leaderlive.co.uk/news/26752677.wrexham-top-efl-attendance-figures-98-8-capacity/"
+     "sida": "https://www.dailystar.co.uk/sport/football/ryan-reynolds-rob-mac-spent-37914789"
     },
     {
-     "fil": "portsmouth-57b23f40.jpg",
+     "fil": "portsmouth-b575452b.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/ckpdwzg42p7lo"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cm9309ndqleqo"
     }
    ]
   },
@@ -374,25 +437,44 @@
    "id": "401880726",
    "match": "Luton Town – Oxford United",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Toppmöte på Kenilworth Road",
-   "text": "Luton är fyra och har inte förlorat i fem matcher. Senast vann laget med 2–1 borta mot Burton. Oxford är trea, två poäng före och med en match mindre spelad. Laget vann med 4–3 mot Wycombe i senaste omgången. Oxford har släppt in 9,3 mål färre än xG. Laget åkte dock ur FA-cupen mot Stevenage. Ingen fri källa redovisar skador.",
-   "kallor": [],
+   "rubrik": "Topplag möts, Helik tillbaka i träning",
+   "text": "I supporterpodden 30 Points! Who Gives A Pod pekas Oxfords Cameron Brannagan ut som den spelare Luton måste hålla tyst, och värdarna vill därför se Daniel Gore i stället för Liam Walsh på mittfältet. Oxford, trea, saknade mittbacken Michal Helik mot Wycombe. Enligt lokaltidningen har han varit med på en del av träningen, medan Siriki Dembele inte tränade i onsdags. Luton är femma.",
+   "kallor": [
+    {
+     "source": "30 Points! Who Gives A Pod",
+     "title": "30 Points! Who Gives A Pod: Burton Albion 1-2 Luton Town: The Live Show!",
+     "url": "https://podcasts.apple.com/gb/podcast/30-points-who-gives-a-pod/id1700311219?uo=4",
+     "publishedAt": "2026-11-23T00:00:00.000Z"
+    },
+    {
+     "source": "Yellows Forum",
+     "title": "Yellows Forum: Away Match Thread Luton Town v Oxford United · League One · Sat 28 Nov, 15:00",
+     "url": "https://yellowsforum.co.uk/threads/luton-town-v-oxford-united-league-one-sat-28-nov-15-00.14113/post-1270602",
+     "publishedAt": "2026-11-27T00:00:00.000Z"
+    },
+    {
+     "source": "Oxford Clarion",
+     "title": "Oxford Clarion: OUFC Diaries: “the most thrilling, confounding, uproarious and stadium-rattling experience”",
+     "url": "https://oxfordclarion.uk/oufc-diaries-the-most-thrilling-confounding-uproarious-and-stadium-rattling-experience/",
+     "publishedAt": "2026-11-23T00:00:00.000Z"
+    }
+   ],
    "lag": [
     "Luton Town",
     "Oxford United"
    ],
    "bilder": [
     {
-     "fil": "luton-town-353c14ff.jpg",
+     "fil": "luton-town-fe27253e.jpg",
      "kalla": "Sports Mole",
      "foto": null,
-     "sida": "https://www.sportsmole.co.uk/football/burton-albion/preview/burton-albion-vs-luton-prediction-team-news-lineups_609432.html"
+     "sida": "https://www.sportsmole.co.uk/football/luton-town/preview/luton-vs-oxford-utd-prediction-team-news-lineups_609895.html"
     },
     {
-     "fil": "oxford-united-72e502c6.jpg",
+     "fil": "oxford-united-6280cc90.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cr15ez0qewy9o"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/c6n8304x99epo"
     }
    ]
   },
@@ -401,25 +483,32 @@
    "id": "401880723",
    "match": "Sheffield Wednesday – Reading",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Wednesday har täppt till hemma",
-   "text": "Sheffield Wednesday är femma och har bara släppt in 5 mål på åtta hemmamatcher. Laget har inte förlorat på fem matcher och vann senast med 2–1 borta mot Barnsley. Reading har förlorat två ligamatcher i rad, senast 0–1 hemma mot Bromley. Borta har laget en seger på åtta matcher. Reading vann dock med 5–0 mot Peterborough i FA-cupen. Ingen fri källa redovisar skador.",
-   "kallor": [],
+   "rubrik": "Veteranerna bär Wednesday under nye tränaren",
+   "text": "Enligt de Wednesday-supportrar som gästen Luca har talat med i supporterpodden The Wednesday Week har ingen gått i taket över de två segrarna under nye tränaren Dave Challoner, eftersom spelet inte har imponerat. Veteranerna Barry Bannan och Liam Cooper bär laget. Wednesday är fyra och har bara släppt in 5 mål på 8 hemmamatcher. Reading har förlorat två raka ligamatcher, senast 0–1 hemma mot Bromley.",
+   "kallor": [
+    {
+     "source": "The Wednesday Week",
+     "title": "The Wednesday Week: Hello From the Other Side 26/27",
+     "url": "https://shows.acast.com/64abd7bfd593820011a68d78/episodes/hello-from-the-other-side-2627-stevenage-a",
+     "publishedAt": "2026-11-22T00:00:00.000Z"
+    }
+   ],
    "lag": [
     "Sheffield Wednesday",
     "Reading"
    ],
    "bilder": [
     {
-     "fil": "sheffield-wednesday-3cd49414.jpg",
+     "fil": "sheffield-wednesday-91044e78.jpg",
      "kalla": "BBC Sport",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cw0k6g22j2yjo"
+     "sida": "https://www.bbc.co.uk/sport/football/articles/cw8dvegrl1nqo"
     },
     {
-     "fil": "reading-8ce8d296.jpg",
+     "fil": "reading-d536129b.jpg",
      "kalla": "Reading Chronicle",
      "foto": null,
-     "sida": "https://www.readingchronicle.co.uk/sport/26745909.reading-fc-boss-issues-injury-update-ahead-bromley-clash/"
+     "sida": "https://www.readingchronicle.co.uk/sport/26762592.reading-fc-owner-backs-leam-richardson-form-slump/"
     }
    ]
   },
@@ -428,25 +517,38 @@
    "id": "401880719",
    "match": "Wycombe Wanderers – Bradford City",
    "avspark": "2026-11-28T15:00:00.000Z",
-   "rubrik": "Bradford snålt på bortaplan",
-   "text": "Bradford är sexa och har bara släppt in 3 mål på sju bortamatcher, men också bara gjort 4. Senast blev det 2–2 hemma mot Doncaster. Wycombe är 15:e och förlorade med 3–4 borta mot Oxford. Laget har släppt in 5,5 mål fler än xG. Bradford har vunnit de tre senaste mötena, bland annat med 2–1 på Adams Park i april. Ingen fri källa redovisar skador.",
-   "kallor": [],
+   "rubrik": "Duff tillbaka på Adams Park",
+   "text": "Enligt klubbens fystränare, som citeras i supporterpodden The Heroes of HP12, ligger Wycombes mittback Connor Taylor nu bland de bästa tio procenten av mittbackarna i League One. Bradfords tränare Michael Duff återvänder till Adams Park, där han fick sparken i september, och han har aldrig förlorat där som tränare. Nick Powell har gjort fyra mål och två assist sedan början av november.",
+   "kallor": [
+    {
+     "source": "The Heroes of HP12",
+     "title": "The Heroes of HP12: 60 People and a Dog Called Bob",
+     "url": "https://shows.acast.com/the-heroes-of-hp12-the-wycombe-wanderers-fans-podcast/episodes/60-people-and-a-dog-called-bob",
+     "publishedAt": "2026-11-18T00:00:00.000Z"
+    },
+    {
+     "source": "Nathan Evans",
+     "title": "Nathan Evans: Bradford City vs Barnsley (H) 2026-27",
+     "url": "https://nathanevans.substack.com/p/bradford-city-vs-barnsley-the-stats-match-report-2026-2027-league-one-home",
+     "publishedAt": "2026-11-25T00:00:00.000Z"
+    }
+   ],
    "lag": [
     "Wycombe Wanderers",
     "Bradford City"
    ],
    "bilder": [
     {
-     "fil": "wycombe-wanderers-d702b9a7.jpg",
+     "fil": "wycombe-wanderers-2544eeed.jpg",
      "kalla": "Bucks Free Press",
      "foto": null,
-     "sida": "https://www.bucksfreepress.co.uk/sport/26745837.wycombe-wanderers-winger-junior-quitirna-knee-surgery/"
+     "sida": "https://www.bucksfreepress.co.uk/sport/26766484.tom-hounsell-praises-michael-duff-wycombe-prepare-bradford/"
     },
     {
-     "fil": "bradford-city-b102bdd1.jpg",
-     "kalla": "BBC Sport",
+     "fil": "bradford-city-8f5759e6.jpg",
+     "kalla": "Vital Football",
      "foto": null,
-     "sida": "https://www.bbc.co.uk/sport/football/articles/cvrlgke13e9go"
+     "sida": "https://vitalfootball.co.uk/bradford-3-0-barnsley-match-analysis/"
     }
    ]
   }
