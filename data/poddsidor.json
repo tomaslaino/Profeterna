@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T16:18:35.469Z",
+ "uppdaterad": "2026-11-27T16:41:36.229Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -4161,14 +4161,21 @@
     "Reading"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:11:43.131Z",
-   "rubrik": "Bannan drar lasset, resten hänger inte med",
+   "skriven": "2026-11-27T16:30:02.567Z",
+   "rubrik": "Lewis Wing bromsar Reading, men vem vågar peta honom?",
    "ingress": null,
-   "summering": "Wednesday har vunnit under den nye tränaren utan att övertyga. Bannan är motorn, och supportrarna tror inte på Keillor-Dunn som ensam anfallare.",
+   "summering": "Wednesday vinner utan att övertyga, och Bannan drar mittfältet ensam. I Reading skapas chanserna men ingen sätter dem, och tränaren, som supportrarna aldrig har trott på, tvekar inför att peta kaptenen.",
    "delar": [
     {
      "lag": "Sheffield Wednesday",
      "kallor": [
+      {
+       "podd": "The Wednesday Week",
+       "avsnitt": "Hello From the Other Side 26/27- Reading (h)",
+       "datum": "2026-11-26",
+       "adress": "https://shows.acast.com/64abd7bfd593820011a68d78/episodes/hello-from-the-other-side-2627-reading-h",
+       "typ": "podd"
+      },
       {
        "podd": "The Wednesday Week",
        "avsnitt": "Hello From the Other Side 26/27 - Stevenage (a)",
@@ -4234,24 +4241,13 @@
          "typ": "forum"
         },
         {
-         "t": "Mittbacken Sil Swinkels har svårt att hänga med i löpningarna, och supportrarna befarar att det kan straffa sig mot bättre motstånd.",
-         "s": "o",
-         "podd": [
-          "Owlstalk"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Det är veteranerna som bär Wednesday just nu, särskilt Barry Bannan på mittfältet och Liam Cooper i backlinjen, som har klivit fram i den nye tränarens första matcher.",
+         "t": "Readinggästen säger att han fruktar Jamal Lowe. Wednesday-värden beskriver honom mindre smickrande: han är långsam, men ibland kommer det plötsligt en glimt av klass.",
          "s": "o",
          "podd": [
           "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -4270,56 +4266,200 @@
           "2026-11-25"
          ],
          "typ": "forum"
-        },
+        }
+       ]
+      },
+      {
+       "amne": "match",
+       "punkter": [
         {
-         "t": "Enligt Wednesday-supportrar som Stevenage-gästen Luca har pratat med har ingen gått i taket över de två segrarna under den nye tränaren Dave Challoner, eftersom spelet inte har imponerat.",
-         "s": "h",
+         "t": "Readingsupportern Ben menar att lagets usla bortaform inte beror på taktiken, eftersom Richardson spelar likadant hemma och borta. Han tror att problemet sitter i huvudet: spelarna tappar självförtroendet så fort de reser.",
+         "s": "o",
          "podd": [
           "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Supportrarna är stolta över hur många som följer laget den här säsongen, både på hemmamatcherna och på bortaplan.",
+         "t": "Readingsupportern Ben räknar inte med något i Sheffield. Han säger att han vore glad för en poäng, eftersom laget har haft så många bortamatcher den här säsongen där han bara undrat vad de håller på med.",
          "s": "o",
          "podd": [
-          "Owlstalk"
+          "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-27"
+          "2026-11-26"
          ],
-         "typ": "forum"
+         "typ": "podd"
+        },
+        {
+         "t": "Enligt Readings supportrar bromsar kaptenen Lewis Wing hela spelet. När han vilade i cupen mot Peterborough gick det mycket snabbare framåt, men han kom direkt tillbaka i laget och tempot försvann igen.",
+         "s": "o",
+         "podd": [
+          "The Wednesday Week"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Barry Bannan har vuxit sedan den nye tränaren kom och styrde hela andra halvleken mot Stevenage. På Owlstalk konstaterar man ändå att han får dra mittfältet ensam, eftersom spelarna runt honom inte är på samma våglängd.",
-      "I podden The Wednesday Week hörs samma sak: det är veteranerna, med Liam Cooper bakom Bannan, som bär laget. Ingen har gått i taket över segrarna, för spelet har inte imponerat.",
-      "Längst fram slarvar Davis Keillor-Dunn bort det mesta som ensam anfallare, och en supporter tycker att truppen saknar ”fart, kraft, längd”."
+      "Barry Bannan har lyft sig sedan den nye tränaren kom och styrde hela andra halvlek mot Stevenage. Men på Owlstalk konstaterar man att han får dra mittfältet själv, eftersom medspelarna inte är på samma våglängd.",
+      "Längst fram används Davis Keillor-Dunn som ensam anfallare, och han slarvade bort nästan allt som kom hans väg. ”Ledsen, men han är ingen centerforward”, skriver en supporter.",
+      "I podden The Wednesday Week har man dessutom hört att ingen har gått i taket över de två segrarna, eftersom spelet inte har imponerat."
      ],
      "citat": {
-      "sagt": "Jag gillar honom, men han slarvade bort nästan allt som kom hans väg. Ledsen, men han är ingen centerforward.",
-      "vem": "davetherivelinowl",
+      "sagt": "men vi saknar fart, kraft, längd och en stor kille på mittfältet och längst fram.",
+      "vem": "onlyonedavidhirst",
       "podd": "Owlstalk",
       "typ": "forum",
       "datum": "2026-11-25"
      },
      "namn": [
       "Barry Bannan",
-      "Liam Cooper",
       "Davis Keillor-Dunn"
      ],
-     "paSpel": "Chansen att visa att segrarna under nye tränaren också kan bli bra spel."
+     "paSpel": "Att visa att den nye tränaren kan ge mer än glanslösa segrar."
     },
     {
      "lag": "Reading",
-     "kallor": [],
-     "grupper": [],
-     "text": []
+     "kallor": [
+      {
+       "podd": "The Tilehurst End - A Reading FC Podcast",
+       "avsnitt": "The Tilehurst End Podcast Episode 482: Standards",
+       "datum": "2026-11-25",
+       "adress": "https://thetilehurstend.podbean.com/e/the-tilehurst-end-podcast-episode-482-standards/",
+       "typ": "podd"
+      }
+     ],
+     "grupper": [
+      {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Daniel Kyerewaa måste spela mycket bättre, annars förlorar han platsen när Paddy Lane och Kyreece Lisbie är tillgängliga. En av värdarna skulle redan nu välja Randell Williams före honom.",
+         "s": "o",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna är oense om Wing. Den ene tror att han startar ändå, eftersom Liam Richardson vet att det blir bråk om han petar honom och att det kan kosta honom jobbet om det går fel.",
+         "s": "o",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
+        {
+         "t": "Avsluten är lagets stora problem. Daniel Kyerewaa skaffade sig nästan ett mål i förväntade mål mot Bromley, men skotten på mål var bara värda 0,05. Jack Marriott är den ende som kan avsluta.",
+         "s": "h",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "George Earthy är pusselbiten laget har saknat. Han rör sig hela tiden mellan linjerna och ser nästa passning innan han får bollen. När han byttes ut mot Bromley tappade Reading greppet.",
+         "s": "h",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Lewis Wing har börjat slarva. Vid en hörna mot Bromley gav han troligen fel tecken, så att alla tre löpte till första stolpen medan bollen gick till den bortre. Värden tycker inte att han förtjänar att starta.",
+         "s": "h",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Flera spelare har gått bakåt under Liam Richardson: Charlie Savage, Daniel Kyerewaa och troligen Lewis Wing. En av värdarna menar att också målvakten Joel Pereira har blivit sämre.",
+         "s": "o",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Supportrarna har aldrig riktigt tagit Liam Richardson till sig. En av värdarna har aldrig trott på honom och väntade sig att laget skulle dala mot mitten från november. Han tror att Richardson får gå om Reading ligger under tolfteplatsen i ett par veckor.",
+         "s": "o",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Truppen räcker inte för att gå upp. Värdarna menar att klubben måste lägga riktiga pengar i januari och göra sig av med dödvikt. Varken med det här laget eller den här tränaren blir det uppflyttning.",
+         "s": "o",
+         "podd": [
+          "The Tilehurst End - A Reading FC Podcast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        }
+       ]
+      }
+     ],
+     "text": [
+      "I The Tilehurst End handlar allt om huruvida kaptenen Lewis Wing ska få starta. Mot Bromley gav han troligen fel tecken vid en hörna, och den ena värden tycker att koncentrationen sviker honom. Den andra tror att Wing spelar ändå, eftersom Liam Richardson vet att det ”tänder en ny stubin” den dag han petar honom.",
+      "Richardson får beröm för att laget numera skapar chanser, men ingen sätter dem utom Jack Marriott.",
+      "Supportrarna har aldrig riktigt tagit tränaren till sig, och en av värdarna har hela tiden väntat sig att laget skulle dala från november."
+     ],
+     "citat": {
+      "sagt": "Det här är ingen trupp som går upp. Inte om de inte lägger rejält med pengar i januari och gör sig av med dödvikten.",
+      "vem": null,
+      "podd": "The Tilehurst End - A Reading FC Podcast",
+      "typ": "podd",
+      "datum": "2026-11-25"
+     },
+     "namn": [
+      "Lewis Wing",
+      "Liam Richardson",
+      "Jack Marriott"
+     ],
+     "paSpel": "Tränarens jobb, inför en läktare som aldrig riktigt har trott på honom."
     }
    ]
   },
@@ -4332,14 +4472,21 @@
     "Bradford City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:12:17.540Z",
-   "rubrik": "Duff återvänder till ett Wycombe som inte blivit bättre",
+   "skriven": "2026-11-27T16:41:36.229Z",
+   "rubrik": "Duff tillbaka, och ingen vet om man ska bua",
    "ingress": null,
-   "summering": "Wycombe lutar sig mot Warehams mål och en trött läktare som fruktar Duffs press mot mittbackarna. Bradford har Powell i brinnande form men ett mittfält som läcker så fort bollen är förlorad.",
+   "summering": "Wycombe lutar sig mot Warehams mål och fruktar sina egna slutminuter. Bradford har hittat målen men tappat tätheten bakåt, och tränaren som kommer på besök är ifrågasatt i båda lägren.",
    "delar": [
     {
      "lag": "Wycombe Wanderers",
      "kallor": [
+      {
+       "podd": "The Heroes of HP12",
+       "avsnitt": "3 Stands 3 Goals 0 Points",
+       "datum": "2026-11-25",
+       "adress": "https://shows.acast.com/the-heroes-of-hp12-the-wycombe-wanderers-fans-podcast/episodes/3-stands-3-goals-0-points",
+       "typ": "podd"
+      },
       {
        "podd": "The Gasroom",
        "avsnitt": "Bradford City (h) Attendance Prediction - Sat 30th Nov - Match 16 in 26 /27 · Samaritans score prediction - Bradford (h)",
@@ -4388,6 +4535,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Laget har på senare tid tappat ett kontrollerat ledningsläge fyra gånger. Värdarna är oense om orsaken: några ser ett mentalt problem, andra menar att det handlade om oerfarna byten, som att ta ut den ende anfallaren och Aaron Morley, och om enstaka hastiga misstag.",
+         "s": "o",
+         "podd": [
+          "The Heroes of HP12"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Laget har tappat 2–0-ledningar flera gånger den här säsongen, senast när det förlorade med 4–3. Supportrarna saknar förmågan att stänga matcher.",
          "s": "o",
          "podd": [
@@ -4399,32 +4557,32 @@
          "typ": "forum"
         },
         {
-         "t": "Spelet har blivit prydligare, med korta passningstrianglar. Mittbackarna Hagelskjaer och Taylor uppmuntras att spela fram bollen, och Onyedinma och Mothersille går på ytterbackarna och slår in bollar till Wareham.",
-         "s": "o",
+         "t": "Wycombe har ännu inte vunnit någon match där de har hamnat i underläge med 0–1. Värdarna ser det som ett tecken på bristande mentalitet.",
+         "s": "b",
          "podd": [
-          "The Gasroom"
+          "The Heroes of HP12"
          ],
          "datum": [
-          "2026-11-26"
+          "2026-11-25"
          ],
-         "typ": "forum"
-        },
-        {
-         "t": "Samma supporter oroar sig för att laget inte klarar motståndare som pressar högt och saknar förmåga att ställa om under matchen. Mot Bromley syntes bristande tro och ovilja att ge bollen till Morley.",
-         "s": "o",
-         "podd": [
-          "The Gasroom"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       },
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Huvudtränaren Tom övergav det som fungerade mot Oxford, snabbt spel ut på kanterna med Silko Thomas och Malik Mothersille högt upp, och ställde mot Bromley upp med en högerytter men ingen vänsterytter. Supportrarna tycker att han var rädd att förlora.",
+         "s": "o",
+         "podd": [
+          "The Heroes of HP12"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Supportrarna tror på seger vecka efter vecka och blir besvikna. De ser laget som inte dåligt, men blekt och dömt att alltid göra lite besviken.",
          "s": "o",
@@ -4453,60 +4611,48 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Bradford leds av Duff, som återvänder till Wycombe. Supportrarna tror att han vet precis hur han ska pressa fram misstag från Wycombes mittbackar.",
+         "t": "Supportrarna är oense om hur Michael Duff ska tas emot. Somliga tycker att det var fel att sparka honom. Andra menar att det som sägs ha hänt bakom kulisserna förtjänar burop, men vill inte bua eftersom det bara skulle elda på honom.",
          "s": "o",
          "podd": [
-          "The Gasroom"
-         ],
-         "datum": [
-          "2026-11-27"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Lördagen blir ett återseende med Duff, som fick sparken från Wycombe. Supportrarna tror att han vill visa ordföranden Dan Rice att det var fel.",
-         "s": "o",
-         "podd": [
-          "The Gasroom"
+          "The Heroes of HP12"
          ],
          "datum": [
           "2026-11-25"
          ],
-         "typ": "forum"
+         "typ": "podd"
         },
         {
-         "t": "Bradford föll tungt hemma mot Huddersfield för några veckor sedan och klarade inte deras anfall på kanterna. Därför vill supportrarna se två yttrar och ett lag som pressar framåt i stället för att passa bakåt.",
-         "s": "o",
+         "t": "Värdarna säger att många Bradfordfans inte har accepterat Duff, eftersom han har tränat både Huddersfield och Barnsley. Det missnöjet hoppas de kunna utnyttja, men de väntar sig en mycket tuff match där laget måste försvara sig ordentligt.",
+         "s": "h",
          "podd": [
-          "The Gasroom"
+          "The Heroes of HP12"
          ],
          "datum": [
           "2026-11-25"
          ],
-         "typ": "forum"
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På forumet The Gasroom har man slutat vänta sig mycket: laget är inte dåligt, men ”blekt och dömt att alltid göra en lite besviken”. Samma supportrar ser inget lyft under Tom Hounsell. Det verkliga tillskottet är i stället anfallaren Jayden Wareham, som bär laget med sina mål.",
-      "Inför återseendet med Michael Duff, som fick sparken i september, är oron konkret.",
-      "Man tror att han vet exakt hur han ska pressa fram misstag från mittbackarna, och att han vill visa ordföranden Dan Rice att det var fel att låta honom gå."
+      "Podden The Heroes of HP12 kan inte enas om hur Michael Duff ska tas emot. Somliga tycker att sparken var fel, andra att han förtjänar burop men låter bli för att inte elda på honom.",
+      "På forumet NOT606 är man överens om en sak: Jayden Wareham bär laget, och utan hans mål vore Wycombe ”i rejäla problem”.",
+      "Oron gäller slutminuterna. Laget har fyra gånger på senare tid kastat bort en ledning det hade under kontroll, och ingen vet om felet sitter i huvudet eller i Tom Hounsells byten."
      ],
      "citat": {
-      "sagt": "Jag kan inte låta bli att känna att det inte finns särskilt mycket vinnarvilja just nu.",
-      "vem": "WildWestFC",
-      "podd": "The Gasroom",
-      "typ": "forum",
-      "datum": "2026-11-26"
+      "sagt": "Vi har inte vunnit en enda match när vi har legat under med 1–0. Det säger något om vår mentalitet.",
+      "vem": null,
+      "podd": "The Heroes of HP12",
+      "typ": "podd",
+      "datum": "2026-11-25"
      },
      "namn": [
-      "Tom Hounsell",
-      "Jayden Wareham",
       "Michael Duff",
-      "Dan Rice"
+      "Jayden Wareham",
+      "Tom Hounsell"
      ],
-     "paSpel": "Återseendet med den sparkade Duff, och en prövning av ordföranden Dan Rices beslut."
+     "paSpel": "Återseendet med Duff, som supportrarna tror vill bevisa något för Dan Rice."
     },
     {
      "lag": "Bradford City",
@@ -4644,9 +4790,9 @@
       }
      ],
      "text": [
-      "Nick Powell har gått från bänken till att bli lagets hetaste spelare, och sedan början av november har ingen i de fyra högsta divisionerna i England fler målgivande insatser. Det skaver i stället bakåt.",
-      "Fansajten Width of a Post beskriver ett lag som har blivit farligare framåt men allt läckare. Mittfältsparet Callum Connolly och Kieran Morgan fungerar med bollen men lämnar ”oroväckande stora” hål utan den.",
-      "Supportrarna har dessutom börjat ifrågasätta Michael Duff, och enligt skribenten räckte den röriga segern mot Barnsley inte för att tysta den diskussionen."
+      "Width of a Post ser ett lag som har blivit farligare framåt men läcker bakåt: på de två senaste ligamatcherna släppte Bradford in lika många mål som under hela säsongen dessförinnan. Mot Doncaster gick en ledning förlorad på övertid efter en hörna.",
+      "Hålen syns på mitten. Callum Connolly och Kieran Morgan är användbara med bollen, men utan boll är luckorna ”oroväckande stora”.",
+      "Samtidigt har supportrarna börjat ifrågasätta Michael Duff, och den röriga segern mot Barnsley räckte inte för att tysta dem."
      ],
      "citat": {
       "sagt": "De verkar också ha tappat en egenskap som har tjänat dem så väl de senaste säsongerna – förmågan att kontrollera en match.",
@@ -4656,12 +4802,11 @@
       "datum": "2026-11-21"
      },
      "namn": [
-      "Nick Powell",
       "Callum Connolly",
       "Kieran Morgan",
       "Michael Duff"
      ],
-     "paSpel": "Återkomsten till klubben som sparkade Duff, och chansen att tysta hans kritiker."
+     "paSpel": "Duffs återkomst till klubben som sparkade honom, med egna supportrar som tvivlar."
     }
    ]
   }
