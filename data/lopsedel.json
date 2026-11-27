@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T13:49:43.772Z",
+ "skriven": "2026-11-27T14:05:33.159Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T13:43:10.982Z",
+ "underlag": "2026-11-27T14:01:27.279Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "UNITED-FANS",
+    "”DET GÖR",
     0
    ],
    [
-    "HAR SLUTAT",
-    0
-   ],
-   [
-    "KÄNNA SMÄRTA",
+    "INTE ONT",
     1
+   ],
+   [
+    "LÄNGRE”",
+    0
    ]
   ],
-  "under": "”Det värsta av allt är att det inte gör ont längre” – United We Stand Podcast",
-  "plus": "BURNLEY: RÄDDA FÖR ATT VINNA",
+  "under": "”Vi är vana vid det. Och det är skit.” Podden United We Stand om laget som ligger näst sist",
+  "plus": "BURNLEY HAR TAPPAT 25 POÄNG",
   "plusId": "401880132"
  }
 }
