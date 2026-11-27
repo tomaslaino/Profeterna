@@ -107,6 +107,16 @@ function build() {
       if (!espnTeams.has(ak)) noteUnmapped('Understat', m.away, 'Premier League');
     }
   }
+  // Understat används bara så länge den inte ligger efter football-data.co.uk.
+  // Står den still (sajten var nere hela november 2026) tar football-data
+  // över xG i hela Premier League, så att siffrorna inte fryser vid den
+  // sista lyckade hämtningen. Tre dagars marginal: football-data brukar
+  // ligga en omgång efter, och ligan ska inte byta källa fram och tillbaka.
+  const lastXgDay = (days) => days.filter(Boolean).sort().pop() || null;
+  const usLast = lastXgDay(understat.matches.filter((m) => m.played && m.xg && m.kickoff).map((m) => m.kickoff.slice(0, 10)));
+  const fdLast = lastXgDay((fd.pl ? fd.pl.rows : []).filter((r) => r.FTHG != null && r.HxG != null).map((r) => r.date));
+  // (Kandidatjakten i src/modeldata.js läser byPair som förut: de matcher Understat har är riktiga.)
+  understat.efter = Boolean(usLast && fdLast && (Date.parse(fdLast) - Date.parse(usLast)) / 864e5 > 3);
 
   const oc = readCache('espn_odds');
   const odds = { byEvent: oc && oc.data ? oc.data.byEvent : {}, fetchedAt: oc ? oc.fetchedAt : null };
@@ -664,7 +674,7 @@ function teamProfile(D, k, before, S = null) {
   }
 
   // xG från Understat (bara PL)
-  if (leagueId === 'pl' && D.understat.matches.length) {
+  if (leagueId === 'pl' && D.understat.matches.length && !D.understat.efter) {
     const ms = D.understat.matches.filter((m) => m.played && m.xg && m.kickoff < before && (m.hk === k || m.ak === k));
     p.understat = {
       n: ms.length,
@@ -731,7 +741,7 @@ function teamProfile(D, k, before, S = null) {
 function xgSource(D, leagueId) {
   const r2 = (x) => Math.round(x * 100) / 100;
   const fin = (x) => typeof x === 'number' && Number.isFinite(x);
-  if (leagueId === 'pl' && D.understat.matches.length) {
+  if (leagueId === 'pl' && D.understat.matches.length && !D.understat.efter) {
     const ok = (m) => m && m.played && m.xg && fin(m.xg.home) && fin(m.xg.away);
     return {
       of(hk, ak, home) {
@@ -1186,7 +1196,9 @@ function sideBySide(h, a, { land = false } = {}) {
     through: [h.stats && h.stats.through, a.stats && a.stats.through],
     note: 'Gjorda–insläppta. xG från football-data.co.uk: leverantören är odokumenterad, finns bara 2026/27. '
       + 'Mål mot xG: mål minus xG i år, summerat – plus betyder fler mål än chanserna brukar ge, och sådant brukar jämna ut sig. '
-      + 'Premier League räknas mot Understat, övriga mot football-data.co.uk.',
+      + (h.understat || a.understat
+        ? 'Premier League räknas mot Understat, övriga mot football-data.co.uk.'
+        : 'Alla räknas mot football-data.co.uk.'),
     rows: [
       { label: 'Skott', values: both((p) => pair(p.stats, 'shotsFor', 'shotsAgainst', 1)) },
       { label: 'Skott på mål', values: both((p) => pair(p.stats, 'sotFor', 'sotAgainst', 1)) },
