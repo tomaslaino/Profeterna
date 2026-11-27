@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T02:17:43.024Z",
+ "uppdaterad": "2026-11-27T02:31:00.774Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,14 +103,21 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-27T02:11:02.233Z",
-   "rubrik": "I Ipswich drömmer man om en mållös match",
+   "skriven": "2026-11-27T02:31:00.774Z",
+   "rubrik": "Samma misstag igen, och ingen på Portman Road skrek",
    "ingress": null,
-   "summering": "Ipswich har tappat både pressen och gnistan och längtar efter en nolla. Villa vilar på McGinn, har en tränare som letar efter sin elva och supportrar som kräver seger men fruktar förlust.",
+   "summering": "Ipswich släpper fram motståndarna utan att tackla och har tappat gnistan både på planen och på läktaren. Villa kräver seger men tvivlar, med McGinn som enda drivkraft och en tränare som fortfarande letar sin elva.",
    "delar": [
     {
      "lag": "Ipswich Town",
      "kallor": [
+      {
+       "podd": "Blue Monday: An Ipswich Town Podcast",
+       "avsnitt": "🔍 IPSWICH TOWN V ASTON VILLA MATCH PREVIEW | PREMIER LEAGUE | The Prematch Show",
+       "datum": "2026-11-26",
+       "adress": "https://shows.acast.com/bluemondaypodcast/episodes/ipswich-town-v-aston-villa-match-preview-premier-league-the",
+       "typ": "podd"
+      },
       {
        "podd": "Blue Monday: An Ipswich Town Podcast",
        "avsnitt": "🔵 THE FINAL WORD ON SPURS AND MATCH DAY 11 | Midweek Blues",
@@ -123,13 +130,6 @@
        "avsnitt": "669: Kings of Anglia: Should we be worried after Town’s defeat at Spurs?",
        "datum": "2026-11-23",
        "adress": "https://audioboom.com/posts/8980538",
-       "typ": "podd"
-      },
-      {
-       "podd": "Blue Monday: An Ipswich Town Podcast",
-       "avsnitt": "🚩TOTTENHAM 2-0 IPSWICH TOWN MATCH REACTION | PREMIER LEAGUE | Flagship Show",
-       "datum": "2026-11-22",
-       "adress": "https://shows.acast.com/bluemondaypodcast/episodes/tottenham-2-0-ipswich-town-match-reaction-premier-league-fla",
        "typ": "podd"
       },
       {
@@ -231,35 +231,24 @@
          "typ": "forum"
         },
         {
-         "t": "Darnell Furlong är högerback och vet hur en sådan försvarar, men som högra mittback i en femmannabackslinje verkade han inte veta om han skulle gå ut mot yttern. Han släppte in honom i straffområdet gång på gång.",
-         "s": "h",
-         "podd": [
-          "Blue Monday: An Ipswich Town Podcast"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Sasa Lukic är tillbaka, och Henry ser honom och Exequiel Palacios som klart bästa mittfältsparet eftersom båda tar hand om bollen. Florentino, som spelat medan Lukic var borta, tappar den för lätt.",
+         "t": "Värdarna är mest uppgivna över att Tottenhams andra mål var en kopia av ett mål Ipswich släppte in mot Hull några veckor tidigare. En motspelare fick löpa genom hela planen utan att någon gick in i en tackling.",
          "s": "o",
          "podd": [
           "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Zian Flemming får kritik, men Henry försvarar honom. Flemming är en avslutare i straffområdet som inte löper i kanalerna som Emersonn, och han har bara fått höga bollar mot längre mittbackar och nästan inga chanser på flera veckor.",
+         "t": "Mot Tottenham verkade spelarna inte veta vad de skulle göra i trebackslinjen. Ouattara såg obekväm ut som högervingback, och Maeda blev bortkastad när laget inte pressade.",
          "s": "o",
          "podd": [
           "Blue Monday: An Ipswich Town Podcast"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -268,6 +257,17 @@
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Värdarna oroar sig mer för hur laget förlorade mot Tottenham än för förlusten. Insatsen saknade energi och kamp, och sedan Fulhammatchen tycker de att säsongen glider iväg och påminner om nedflyttningssäsongen för två år sedan.",
+         "s": "o",
+         "podd": [
+          "Blue Monday: An Ipswich Town Podcast"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "De tre segrarna i slutminuterna, som tidigare sågs som ett tecken på kämparanda, har börjat oroa. Supportrarna ser dem nu som ett bevis på att laget aldrig kan vinna en match bekvämt.",
          "s": "o",
@@ -283,21 +283,21 @@
       }
      ],
      "text": [
-      "I podden Blue Monday skulle man gärna ta 0–0 mot Villa, för laget har gått 30 Premier League-matcher i rad utan att hålla nollan.",
-      "Mot Tottenham saknades också gnistan: ingen pekade eller skrek efter misstag, och spelarna promenerade fram till hörnorna trots underläget. Pressen som imponerade i säsongens början verkar dessutom ha försvunnit.",
-      "För första gången hörs röster om att Gary O'Neil inte är rätt man. Värdarna själva varnar för att en sparkad tränare nästan säkert skulle betyda nedflyttning."
+      "Tottenhams andra mål svider mest i podden Blue Monday: det var en kopia av ett mål mot Hull, när en motspelare fick löpa genom hela planen utan att någon tacklade. ”Vi lärde oss ingenting”, suckar en av värdarna, som ser drag från nedflyttningssäsongen dyka upp igen.",
+      "Ingen pekade eller skrek efter misstagen, och spelarna promenerade fram till hörnorna i underläge. ”Alla såg bara ut som: jaha.”",
+      "Nu hörs för första gången röster om att Gary O'Neil inte är rätt man, och det är spelet snarare än resultaten som skaver."
      ],
      "citat": {
-      "sagt": "Nu går vi åt andra hållet. Man har ingen frihet i de här matcherna och känner att man börjar hamna i underläge.",
-      "vem": null,
-      "podd": "Blue Monday: An Ipswich Town Podcast",
-      "typ": "podd",
+      "sagt": "Och vad har hänt med vår press? Den var lysande i början av säsongen, men nu verkar den bara vara borta.",
+      "vem": "itfcptc",
+      "podd": "NOT606",
+      "typ": "forum",
       "datum": "2026-11-22"
      },
      "namn": [
       "Gary O'Neil"
      ],
-     "paSpel": "Säsongens första nolla, och lugn inför bortamatchen mot Coventry."
+     "paSpel": "Full styrka för att få fart inför Coventry, matchen med röd ring."
     },
     {
      "lag": "Aston Villa",
@@ -472,9 +472,9 @@
       }
      ],
      "text": [
-      "I The Villa Filler Podcast kallar man allt annat än seger i Ipswich oacceptabelt, men en av värdarna säger samtidigt att han inte ser hur laget ska kunna vinna.",
-      "John McGinn är den som bär laget: när han byttes in mot Sunderland var han den ende som drev bollen rakt mot försvaret, och resten hängde inte med. Värdarna tror att Unai Emery för första gången inte vet vilket hans bästa lag är.",
-      "Kvar finns ändå tron på ”Unais patenterade segerrad”."
+      "I The Villa Filler Podcast är allt annat än seger i Ipswich oacceptabelt, med PSG, Chelsea, Liverpool och Dortmund näst på tur. Ändå säger en av värdarna att han inte kan se laget vinna.",
+      "Den ende som tänder något är John McGinn, som efter inhoppet mot Sunderland var den ende på planen med ”en svettdroppe i pannan”.",
+      "Runt honom roterar Unai Emery så mycket att supportrarna för första gången tror att han inte vet vilken hans bästa elva är. Bara målvakt, anfallare och ytterbackar räknas som givna."
      ],
      "citat": {
       "sagt": "Det värsta är att inse att det kanske helt enkelt är sådant här Villa är i år.",
@@ -487,7 +487,7 @@
       "John McGinn",
       "Unai Emery"
      ],
-     "paSpel": "Sista vinnbara matchen innan PSG, Chelsea, Liverpool och Dortmund väntar."
+     "paSpel": "Sista chansen att vända innan PSG, Chelsea, Liverpool och Dortmund."
     }
    ]
   },
