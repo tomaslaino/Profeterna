@@ -15,17 +15,17 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T16:12:08.845Z",
+ "skriven": "2026-11-27T16:30:28.907Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-27T16:04:00.945Z",
- "rubrik": "En tränare har fått gå, en har kommit och tre sitter löst",
+ "underlag": "2026-11-27T16:18:35.469Z",
+ "rubrik": "En har gått, en kommit, en återvänder och tre sitter löst",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Watford",
    "namn": "Iordanescu",
-   "text": "är Watfords nye tränare. Supportrarna väntar sig ingen effekt, eftersom spelarna inte har någon anledning att imponera på en tränare som ändå lär vara borta inom några månader."
+   "text": "har tagit över Watford, men supportrarna tror inte att tränarbytet ger någon effekt, eftersom spelarna inte har någon anledning att imponera på en tränare som lär vara borta inom några månader."
   },
   {
    "slag": "avflyttad",
@@ -37,25 +37,25 @@
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Duff",
-   "text": "återvänder till Adams Park som tränare för Bradford City, sedan Wycombe gav honom sparken. Supportrarna där tror att han vill visa ordföranden Dan Rice att beslutet var fel."
-  },
-  {
-   "slag": "sitter_lost",
-   "lag": "Derby County",
-   "namn": "John Eustace",
-   "text": "står inför en avgörande match mot Watford. Är Derby fortfarande minst fem poäng från säker plats efter lördagen, tror poddvärdarna att kraven på hans avgång blir högre än någonsin."
+   "text": "återvänder till Adams Park som Bradfords tränare, sedan han fått sparken av Wycombe. Supportrarna där tror att han vill visa ordföranden Dan Rice att beslutet var fel."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "O'Neil",
-   "text": "har enligt supportrarna nästan förbrukat sitt förtroende. En ny kollaps mot Aston Villa inför tv-kamerorna kan döda stämningen helt, varnar de."
+   "text": "har enligt supportrarna nästan förbrukat sitt förtroende, och missnöjet växer. De fruktar att en ny kollaps mot Aston Villa inför tv-kamerorna dödar stämningen helt."
+  },
+  {
+   "slag": "sitter_lost",
+   "lag": "Derby County",
+   "namn": "John Eustace",
+   "text": "går in i en avgörande match mot Watford. Ligger Derby fortfarande minst fem poäng från säker plats efter lördagen tror poddvärdarna att kraven på att han ska gå blir högre än någonsin."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "får skulden för lagets passiva spel av supportrarna. En livslång supporter undrar till och med om han vill se City förlora, eftersom en seger bara förlänger tränarens tid och plågan."
+   "text": "är så ifrågasatt att en livslång supporter undrade om han ville se City förlora, eftersom en seger bara förlänger tränarens tid. Poddvärdarna tror ändå inte att omklädningsrummet är förlorat."
   }
  ]
 }
