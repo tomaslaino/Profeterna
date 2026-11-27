@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T16:29:54.956Z",
+ "skriven": "2026-11-27T16:45:55.401Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T16:18:35.469Z",
+ "underlag": "2026-11-27T16:41:36.229Z",
  "rubrik": {
   "id": "401879226",
-  "kick": "MANCHESTER UNITED",
+  "kick": "MAN UNITED",
   "rad": [
    [
-    "”DET GÖR",
+    "UNITED-FANS:",
     0
    ],
    [
-    "INTE ONT",
+    "”VI ÄR VANA",
+    0
+   ],
+   [
+    "VID DET”",
     1
-   ],
-   [
-    "LÄNGRE”",
-    0
    ]
   ],
-  "under": "Pochettino väntar på första segern, och Bruno Fernandes kände sig sjuk och missade träningen",
-  "plus": "WEST HAM: 15 000 SATT HEMMA",
-  "plusId": "401880126"
+  "under": "Pochettino väntar på första segern, och Bruno Fernandes missade fredagens träning sjuk",
+  "plus": "IPSWICH 34 RAKA UTAN NOLLA",
+  "plusId": "401878752"
  }
 }
