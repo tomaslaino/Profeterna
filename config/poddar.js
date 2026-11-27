@@ -40,9 +40,14 @@ module.exports = {
   // (egenTid i src/analyser/tider.mjs; 2026-11-16). Sedan 2026-11-17 går det för varje ny omgång, Stryktipset också,
   // så snart kupongen har kommit: analysjobbet, som går var 15:e minut, väcker det (poddjobbet i
   // scripts/analyser/skriv.mjs), så att matchbladen är klara när Helgarderats nummer kommer ut.
+  // Natten mot tisdag gick jobbet kl. 02.15 till 2026-11-27, men iMacen startar om varje natt kl. 04.00, och
+  // körningen (forumen, medierna och ett tjugotal avsnitt, ett par timmar) avbröts då mitt i. Eftersom den aldrig
+  // blev klar började den om från början varje natt, med nya matchblad, en ny löpsedel och en ny familjesida, och
+  // blev avbruten igen. Tiden är nu efter omstarten, och analysjobbet väcker jobbet (launchd startar det fortfarande
+  // kl. 02.15, men då är det inte dags).
   foreAvspark: 30,
   tider: [
-    { dag: 2, kl: '02:15' },
+    { dag: 2, kl: '04:15', vacks: true },
     { dag: 5, kl: '13:00', vacks: true },
     { dag: 6, kl: '08:00' },
   ],
