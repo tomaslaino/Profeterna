@@ -537,6 +537,9 @@ async function lopsedeln(round) {
   const blad = vantande.poddsidor || lasJson(FIL.poddsidor, null);
   const nu = vantande.lopsedel || lasJson(FIL.lopsedel, null);
   const v = attSkrivaLopsedel(round, nu, blad, { now: Date.now(), tvinga: BARA_LOPSEDEL });
+  // Medan poddjobbet går skrivs matchbladen om match för match, och poddsidorna läggs ut var 15:e minut. Löpsedeln
+  // väntar tills det är klart: fredagen 2026-11-27 skrevs den annars om tio gånger under en körning.
+  if (v.skriv && v.varfor === 'nya matchblad' && poddjobbetGar()) return;
   // (nya matchblad ger nya försök)
   const nyckel = `lopsedel:${round.id}:${(blad && blad.uppdaterad) || ''}`;
   if (!v.skriv || !(BARA_LOPSEDEL || far(nyckel))) return;
@@ -561,6 +564,8 @@ async function familjesidan(round) {
   const blad = vantande.poddsidor || lasJson(FIL.poddsidor, null);
   const nu = vantande.familj || lasJson(FIL.familj, null);
   const v = attSkrivaFamilj(round, nu, blad, { now: Date.now(), tvinga: BARA_FAMILJ });
+  // (väntar som löpsedeln medan poddjobbet går)
+  if (v.skriv && v.varfor === 'nya matchblad' && poddjobbetGar()) return;
   // (nya matchblad ger nya försök)
   const nyckel = `familj:${round.id}:${(blad && blad.uppdaterad) || ''}`;
   if (!v.skriv || !(BARA_FAMILJ || far(nyckel))) return;
