@@ -15,53 +15,47 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T15:55:02.358Z",
+ "skriven": "2026-11-27T16:12:08.845Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-27T15:52:21.771Z",
- "rubrik": "En har kommit, två har gått, tre sitter löst och en återvänder",
+ "underlag": "2026-11-27T16:04:00.945Z",
+ "rubrik": "En tränare har fått gå, en har kommit och tre sitter löst",
  "notiser": [
   {
    "slag": "valkommen",
    "lag": "Watford",
    "namn": "Iordanescu",
-   "text": "tar över Watford efter Alessio Dionisi. Supportrarna väntar sig ingen effekt, eftersom spelarna inte har någon anledning att imponera på en tränare som ändå lär vara borta inom några månader."
+   "text": "är Watfords nye tränare. Supportrarna väntar sig ingen effekt, eftersom spelarna inte har någon anledning att imponera på en tränare som ändå lär vara borta inom några månader."
   },
   {
    "slag": "avflyttad",
    "lag": "Watford",
    "namn": "Alessio Dionisi",
-   "text": "har fått sparken av Watford efter 0–4 mot Sheffield United. Han lämnar klubben efter tre segrar på de senaste 13 matcherna."
-  },
-  {
-   "slag": "avflyttad",
-   "lag": "Wrexham",
-   "namn": "Steve Parkin",
-   "text": "lämnar sitt uppdrag som assisterande tränare i Wrexham efter lördagens match av personliga skäl. Han kom i juli 2021 och har varit en stor personlighet i omklädningsrummet under de tre raka uppflyttningarna."
+   "text": "har fått sparken av Watford efter 0–4 mot Sheffield United. Han lämnar klubben med tre segrar på de senaste 13 matcherna."
   },
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Duff",
-   "text": "återvänder till Adams Park som Bradfords tränare, efter att ha fått sparken av Wycombe. Wycombesupportrarna tror att han vill visa ordföranden Dan Rice att beslutet var fel."
-  },
-  {
-   "slag": "sitter_lost",
-   "lag": "Ipswich Town",
-   "namn": "O'Neil",
-   "text": "har enligt supportrarna på TWTD nästan förbrukat sitt förtroende. Värdarna i Blue Monday tycker att säsongen glider iväg och påminner om nedflyttningssäsongen för två år sedan."
+   "text": "återvänder till Adams Park som tränare för Bradford City, sedan Wycombe gav honom sparken. Supportrarna där tror att han vill visa ordföranden Dan Rice att beslutet var fel."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "står inför en avgörande match mot Watford. Är Derby fortfarande minst fem poäng från säker plats efter lördagen, tror värdarna att kraven på att han ska gå blir högre än någonsin."
+   "text": "står inför en avgörande match mot Watford. Är Derby fortfarande minst fem poäng från säker plats efter lördagen, tror poddvärdarna att kraven på hans avgång blir högre än någonsin."
+  },
+  {
+   "slag": "sitter_lost",
+   "lag": "Ipswich Town",
+   "namn": "O'Neil",
+   "text": "har enligt supportrarna nästan förbrukat sitt förtroende. En ny kollaps mot Aston Villa inför tv-kamerorna kan döda stämningen helt, varnar de."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "har enligt poddvärdarna inte tappat omklädningsrummet, men en livslång supporter undrar för första gången om han vill se City förlora, eftersom en seger bara förlänger tränarens tid."
+   "text": "får skulden för lagets passiva spel av supportrarna. En livslång supporter undrar till och med om han vill se City förlora, eftersom en seger bara förlänger tränarens tid och plågan."
   }
  ]
 }
