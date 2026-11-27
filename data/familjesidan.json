@@ -15,53 +15,59 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T13:50:14.278Z",
+ "skriven": "2026-11-27T14:06:14.767Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-20.1",
- "underlag": "2026-11-27T13:43:10.982Z",
- "rubrik": "En tränare sparkad, en assistent på väg och tre sitter löst",
+ "underlag": "2026-11-27T14:01:27.279Z",
+ "rubrik": "En tränare har fått sparken, en assistent går och tre sitter löst",
  "notiser": [
+  {
+   "slag": "valkommen",
+   "lag": "Watford",
+   "namn": "Iordanescu",
+   "text": "är Watfords nya tränare. Supportrarna tror inte att bytet ger någon effekt, eftersom spelarna inte har någon anledning att imponera på en tränare som ändå lär vara borta inom några månader."
+  },
   {
    "slag": "avflyttad",
    "lag": "Watford",
    "namn": "Alessio Dionisi",
-   "text": "har fått sparken av Watford efter 0–4 mot Sheffield United. Han lämnar klubben med tre segrar på de senaste 13 matcherna."
+   "text": "har fått sparken av Watford efter 0–4 mot Sheffield United och lämnar klubben med tre segrar på de senaste 13 matcherna."
   },
   {
    "slag": "avflyttad",
    "lag": "Wrexham",
    "namn": "Steve Parkin",
-   "text": "lämnar Wrexham av personliga skäl efter lördagens match. Den assisterande tränaren kom i juli 2021 och har varit en stor personlighet i omklädningsrummet under de tre raka uppflyttningarna."
+   "text": "lämnar av personliga skäl jobbet som assisterande tränare efter lördagens match. Han kom i juli 2021 och har varit en stor personlighet i omklädningsrummet under klubbens tre raka uppflyttningar."
   },
   {
    "slag": "aterseende",
    "lag": "Bradford City",
    "namn": "Duff",
-   "text": "återvänder till Wycombe som Bradfords tränare, efter att ha fått sparken där. Supportrarna tror att han vill visa ordföranden Dan Rice att det var fel beslut."
+   "text": "kommer tillbaka till Adams Park som Bradfords tränare efter att ha fått sparken av Wycombe. Supportrarna där tror att han vill visa ordföranden Dan Rice att det var fel."
   },
   {
    "slag": "aterseende",
    "lag": "Stoke City",
    "namn": "Ben Johnson",
-   "text": "möter West Ham, klubben vars ungdomsakademi han kommer från. Poddvärdarna väntar sig att han blir extra laddad mot sin gamla klubb."
+   "text": "möter West Ham, där han kommer från ungdomsakademin, och väntas enligt värdarna vara extra laddad mot sin gamla klubb."
   },
   {
    "slag": "sitter_lost",
    "lag": "Ipswich Town",
    "namn": "O'Neil",
-   "text": "har enligt supportrarna nästan förbrukat sitt förtroende. Missnöjet växer, och de fruktar att en ny kollaps mot Aston Villa inför tv-kamerorna kan döda stämningen helt."
+   "text": "har enligt supportrarna nästan förbrukat sitt förtroende. Missnöjet växer, och en ny kollaps mot Villa inför tv-kamerorna kan döda stämningen helt."
   },
   {
    "slag": "sitter_lost",
    "lag": "Derby County",
    "namn": "John Eustace",
-   "text": "står inför en avgörande match mot Watford. Är Derby fortfarande minst fem poäng från säker plats efteråt tror poddvärdarna att kraven på hans avgång blir högre än någonsin."
+   "text": "står inför en avgörande match mot Watford. Är Derby fortfarande minst fem poäng från säker plats efter lördagen tror värdarna att kraven på hans avgång blir högre än någonsin."
   },
   {
    "slag": "sitter_lost",
    "lag": "Bristol City",
    "namn": "Michael Skubala",
-   "text": "skulle enligt poddvärdarna få sin framtid avgjord i tisdagens hemmamatch mot Wrexham, men de fruktar att även en seger bara skjuter upp beslutet. Varken spelarna eller ledningen sägs tro på det de gör."
+   "text": "skulle enligt värdarna få sin framtid avgjord i tisdagens hemmamatch mot Wrexham. De befarade att även en seger bara skulle skjuta upp beslutet."
   }
  ]
 }
