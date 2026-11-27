@@ -15,29 +15,33 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T14:05:33.159Z",
+ "skriven": "2026-11-27T14:21:38.830Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T14:01:27.279Z",
+ "underlag": "2026-11-27T14:20:46.395Z",
  "rubrik": {
-  "id": "401879226",
-  "kick": "MANCHESTER UNITED",
+  "id": "401880132",
+  "kick": "BURNLEY",
   "rad": [
    [
-    "”DET GÖR",
+    "TRÄNAREN:",
     0
    ],
    [
-    "INTE ONT",
+    "LAGET ÄR",
+    0
+   ],
+   [
+    "RÄDDA FÖR",
     1
    ],
    [
-    "LÄNGRE”",
+    "ATT VINNA",
     0
    ]
   ],
-  "under": "”Vi är vana vid det. Och det är skit.” Podden United We Stand om laget som ligger näst sist",
-  "plus": "BURNLEY HAR TAPPAT 25 POÄNG",
-  "plusId": "401880132"
+  "under": "Burnley har tappat 25 poäng från ledningsläge den här säsongen, senast två gånger mot Blackburn.",
+  "plus": "LINDELÖF SJUK OCH TVEKSAM",
+  "plusId": "401878752"
  }
 }
