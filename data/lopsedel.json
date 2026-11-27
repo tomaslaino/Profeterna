@@ -15,33 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T03:15:58.857Z",
+ "skriven": "2026-11-27T13:17:52.757Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T02:53:36.361Z",
+ "underlag": "2026-11-27T13:12:17.540Z",
  "rubrik": {
   "id": "401880132",
   "kick": "BURNLEY",
   "rad": [
    [
-    "TRÄNAREN:",
+    "SPELARNA",
     0
    ],
    [
-    "”RÄDSLAN",
-    0
-   ],
-   [
-    "FÖR ATT",
-    0
-   ],
-   [
-    "VINNA”",
+    "RÄDDA FÖR",
     1
+   ],
+   [
+    "ATT VINNA",
+    0
    ]
   ],
-  "under": "Fabio Celestini ser rädslan hos spelarna. Burnley har tappat 25 poäng från ledningsläge.",
-  "plus": "BOLTON: 88 HÖRNOR – 0 MÅL",
-  "plusId": "401880136"
+  "under": "Celestinis egen diagnos. Laget har tappat 25 poäng från ledningsläge den här säsongen.",
+  "plus": "SPORTCHEFENS HUVUD I POTTEN",
+  "plusId": "401879226"
  }
 }
