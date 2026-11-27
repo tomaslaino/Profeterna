@@ -68,6 +68,7 @@ import { skrivFamilj, attSkrivaFamilj } from '../../src/analyser/familjesidan.mj
 import { poddsidor } from '../../src/analyser/poddar.mjs';
 import { veckansBilder, lagenI } from '../../src/analyser/tidning-bilder.mjs';
 import { attSkriva, knuffaPoddar } from '../../src/analyser/tider.mjs';
+import { skickaLoggarna } from '../../src/analyser/loggar.mjs';
 
 const require = createRequire(import.meta.url);
 const { readHistory, writeHistory } = require('../../src/history.js');
@@ -723,6 +724,11 @@ async function main() {
       logg(`git: ${String(err.stderr || err.message).trim().slice(0, 300)}`);
       return;
     }
+  }
+  // Loggarna till MacBooken, krypterade (src/analyser/loggar.mjs): högst var 30:e minut och bara när något är nytt.
+  if (PUBLICERA && !TORRT && !UT) {
+    const r = skickaLoggarna({ root: ROOT, tillstand: TILLSTAND, loggmapp: path.dirname(LOGG) });
+    if (r && !r.startsWith('loggarna skickade')) logg(r);
   }
 
   const roster = {
