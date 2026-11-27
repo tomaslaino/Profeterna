@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T02:31:00.774Z",
+ "uppdaterad": "2026-11-27T02:53:36.361Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -500,14 +500,21 @@
     "Brentford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T02:11:33.446Z",
-   "rubrik": "När förlusterna inte ens gör ont längre",
+   "skriven": "2026-11-27T02:53:36.361Z",
+   "rubrik": "Revolution på Old Trafford: alla bakom bollen",
    "ingress": null,
-   "summering": "Unitedsupportrarna har vant sig vid förlusterna och ser ett gapande hål framför backlinjen. Brentford reser med envishet, en målfarlig men straffbenägen vänsterback och tron att segern på Old Trafford är länge sedan förfallen.",
+   "summering": "United har hittat en enkel ordning utan boll men fruktar kollapsen efter första misstaget. Brentford vill pressa en skakig backlinje och har en vänsterback som gör mål men drar i motståndarna.",
    "delar": [
     {
      "lag": "Manchester United",
      "kallor": [
+      {
+       "podd": "No Question About That - a Manchester United podcast",
+       "avsnitt": "Green Shoots, Red Cards",
+       "datum": "2026-11-26",
+       "adress": "https://podcasts.apple.com/gb/podcast/no-question-about-that-a-manchester-united-podcast/id327751771?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "United We Stand Podcast",
        "avsnitt": "United We Stand podcast 750. Liverpool away",
@@ -583,6 +590,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Pochettino har gått tillbaka till en enkel grundbalans: vänsterfotade spelare på vänsterkanten, med Mbeumo där. Laget sträcker ut planen i stället för att som under Carrick alltid söka sig inåt.",
+         "s": "h",
+         "podd": [
+          "No Question About That - a Manchester United podcast"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna menar att lagets stora problem sitter framför backlinjen: sedan Casemiro försvann finns ett hål på mittfältet som lämnar försvaret öppet match efter match. Det är det första tränaren måste lösa.",
          "s": "o",
          "podd": [
@@ -605,24 +623,24 @@
          "typ": "forum"
         },
         {
-         "t": "Värdarna menar att backlinjen är för långsam och orörlig. Mot lag med kantspelare och anfallare som kan springa och dribbla av sin man blir den utsatt.",
-         "s": "o",
+         "t": "Efter Carricks okoordinerade press föll United mot Sporting ner i en kompakt 5-4-1 utan boll med alla bakom bollen. Det kändes nästan revolutionerande att se laget göra något så enkelt.",
+         "s": "h",
          "podd": [
-          "United We Stand Podcast"
+          "No Question About That - a Manchester United podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Senne Lammens höll laget kvar med flera fina räddningar, säger värdarna. Ändå menar de att han nästan aldrig räddar skott utifrån och att de skotten brukar gå in.",
+         "t": "Det farligaste mönstret är att laget efter ett misstag rasar ihop under några få minuter och då inte går att rädda. Det hände mot Liverpool och var nära att hända mot Sporting.",
          "s": "h",
          "podd": [
-          "United We Stand Podcast"
+          "No Question About That - a Manchester United podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -632,29 +650,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Supportrarna såg inget av Pochettinos avtryck på Anfield. Efter utvisningen tidigt i matchen hade det kunnat vara vilken som helst av de senaste tränarna vid sidlinjen.",
+         "t": "Säsongens mål har krympt till att hålla sig kvar och sluta i mitten av tabellen. Det som finns att hoppas på utöver det är Champions Leagues utslagsrundor och FA-cupen.",
          "s": "o",
          "podd": [
-          "United We Stand Podcast"
+          "No Question About That - a Manchester United podcast"
          ],
          "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
-       "amne": "match",
-       "punkter": [
-        {
-         "t": "Supportrarna ser Brentford hemma som viktigare än Champions League-matchen mot Sporting i veckan. De räknar Brentford, Newcastle och Palace som enorma ligamatcher. En av dem vill skriva av Sporting, en annan tycker att laget inte har råd att skriva av någon match.",
-         "s": "o",
-         "podd": [
-          "United We Stand Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -662,28 +664,35 @@
       }
      ],
      "text": [
-      "Det värsta efter Anfield, säger en supporter i podden United We Stand, är att ”det inte gör ont längre” efter tjugo år av motgångar.",
-      "Av Pochettino såg värdarna inget i den matchen: efter den tidiga utvisningen kunde vilken som helst av de senaste tränarna ha stått vid sidlinjen. Ändå tänker de stå bakom honom utåt och fortsätta protestera mot ägarna.",
-      "På forumet NOT606 pekar man på hålet framför backlinjen sedan Casemiro försvann, som lämnar försvaret vidöppet match efter match. Där vill man se Andrey Santos som defensiv mittfältare i stället för Youri Tielemans."
+      "I podden No Question About That kändes det nästan revolutionerande att se United mot Sporting falla ner i ett kompakt 5-4-1 med alla bakom bollen. Pochettino har också satt vänsterfotade Mbeumo till vänster, så att laget sträcker ut planen i stället för att hela tiden söka sig inåt som under Carrick.",
+      "Den gamla oron finns kvar. Efter ett misstag rasar laget ihop på några minuter, som på Anfield, och det var nära att hända igen i Lissabon.",
+      "Mest pressad är ändå sportchefen Jason Wilcox, menar värdarna: blir det förlust är det hans huvud som krävs först."
      ],
      "citat": {
-      "sagt": "Det visade att vi behöver minst fyra nya försvarare och en målvakt! Bara Yoro är tillräckligt bra av hela gänget.",
-      "vem": "Chief",
-      "podd": "NOT606",
-      "typ": "forum",
-      "datum": "2026-11-26"
+      "sagt": "Det värsta av allt är att det inte gör ont längre, för vi är vana vid det. Och det är skit.",
+      "vem": null,
+      "podd": "United We Stand Podcast",
+      "typ": "podd",
+      "datum": "2026-11-22"
      },
      "namn": [
       "Pochettino",
-      "Casemiro",
-      "Andrey Santos",
-      "Youri Tielemans"
+      "Mbeumo",
+      "Carrick",
+      "Jason Wilcox"
      ],
-     "paSpel": "Pochettinos första hemmamatch, och fortfarande väntan på hans första seger."
+     "paSpel": "Pochettinos första seger, och enligt podden sportchefens jobb vid förlust."
     },
     {
      "lag": "Brentford",
      "kallor": [
+      {
+       "podd": "The Beesotted Brentford Pride of West London Podcast",
+       "avsnitt": "Everton Humbled, Saunders Moves On & United Up Next | Man United v Brentford Preview Podcast Part 1",
+       "datum": "2026-11-26",
+       "adress": "https://shows.acast.com/the-beesotted-brentford-pride-of-west-london-podcast/episodes/everton-humbled-saunders-moves-on-united-up-next-man-united",
+       "typ": "podd"
+      },
       {
        "podd": "The Beesotted Brentford Pride of West London Podcast",
        "avsnitt": "Brentford 4 Everton 0 - The Bees Run Riot as Tarkowski Gets His Karma | Post-Match Podcast From The Stands",
@@ -739,46 +748,35 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Det värdarna lyfter fram är bredden: in från bänken kommer nu spelare som kostat 20–40 miljoner pund. Mathias Jensen kunde ersätta en stark Mikkel Damsgaard utan att kvaliteten sjönk.",
+         "t": "Lewis-Potter kom som kantspelare och dömdes länge ut av supportrarna. Nu ses han som en spelare i lagets toppskikt sedan klubben lärt honom försvarsspelet som wingback. Vänsterbacksplatsen anses vara hans att förlora.",
          "s": "o",
          "podd": [
           "The Beesotted Brentford Pride of West London Podcast"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Enligt värdarna satte Yehor Yarmoliuk tonen och var enorm den första halvtimmen. Han och Vitaly Janelt beskrivs som overkliga på mittfältet.",
+         "t": "Enligt värdarna vinner Brentford inte för att motståndarna är dåliga, utan för att laget hindrar dem från att spela. Det mönstret har de sett mot Tottenham, Chelsea och Everton.",
          "s": "o",
          "podd": [
           "The Beesotted Brentford Pride of West London Podcast"
          ],
          "datum": [
-          "2026-11-24"
+          "2026-11-26"
          ],
          "typ": "podd"
         },
         {
-         "t": "Värdarna avvisar bilden av ett Brentford med disciplinproblem. Laget är naivt och oerfaret och går på slugare motståndares provokationer. Två röda kort mot Liverpool och ett mot Brighton låg bakom säsongens båda förluster.",
+         "t": "Mittfältsduon Yarmoliuk och Janelt satte tonen genom att jaga tillbaka bollen inom några sekunder efter varje bolltapp. Värdarna tror att samma mittfält, med Damsgaard, kan göra om det på Old Trafford.",
          "s": "o",
          "podd": [
           "The Beesotted Brentford Pride of West London Podcast"
          ],
          "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Många supportrar kritiserar Igor Thiago för att han gör färre mål än förra säsongen. Värdarna menar att han är oumbärlig eftersom han drar med sig försvarare och öppnar för kantspelarna, och de tvivlar på att Callum Wilson kan göra samma sak.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
+          "2026-11-26"
          ],
          "typ": "podd"
         }
@@ -787,6 +785,17 @@
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Mot bilden av en besvikelsesäsong pekar värdarna på att Brentford bara har förlorat två ligamatcher, och att laget hade en spelare utvisad i båda.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Mot dem som är dystra påpekar en av värdarna att laget bara förlorat två gånger i år, och båda gångerna med tio man redan i första halvlek. Med fullt lag har Brentford alltså inte förlorat.",
          "s": "o",
@@ -815,6 +824,17 @@
        "amne": "match",
        "punkter": [
         {
+         "t": "Värdarna ser Uniteds försvar och målvakt som osäkra och vill att Brentford går på dem direkt. De påpekar att laget brukar prestera bättre mot de starkare lagen.",
+         "s": "o",
+         "podd": [
+          "The Beesotted Brentford Pride of West London Podcast"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna menar att Brentford är långt överdue en seger på Old Trafford. De tror inte på snacket att United ska ta i extra just mot dem, eftersom United redan förlorat många matcher den senaste tiden.",
          "s": "o",
          "podd": [
@@ -824,37 +844,26 @@
           "2026-11-24"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "En supporter efter Brighton menar att domarna dömer olika beroende på vem som spelar. Utvisningen och straffen mot Brentford hade aldrig blivit av mot de stora klubbarna, Manchester United inräknat.",
-         "s": "o",
-         "podd": [
-          "The Beesotted Brentford Pride of West London Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "I podden Beesotted tycker man att segern på Old Trafford har låtit vänta på sig alldeles för länge, och man tror att den kommer nu. Att United skulle ta i extra just mot Brentford köper värdarna inte, eftersom United har förlorat för mycket på sistone.",
-      "Säsongens båda förluster kom efter röda kort, men värdarna vägrar kalla det ett disciplinproblem. Laget är oerfaret och går på slugare motståndares provokationer, och de kallar det ett ”naivitetsproblem”.",
-      "Keane Lewis-Potter är ett bra exempel: vänsterbacken gör mål som aldrig förr men har redan orsakat två straffar genom att brottas med motståndare i straffområdet."
+      "I Beesotted-podden vill man gå på United direkt, mot ett försvar och en målvakt som värdarna kallar lika ”skakiga”.",
+      "Keane Lewis-Potter dömdes länge ut av supportrarna som kantspelare, men som vingback har han blivit en av lagets bästa, och vänsterbacken är hans att förlora. Baksidan är att han redan har orsakat två straffar genom att brottas med motståndare i straffområdet.",
+      "Snacket om att United tar i extra just mot Brentford biter inte på supportrarna, som tycker att laget länge har väntat på en seger på Old Trafford."
      ],
      "citat": {
-      "sagt": "Laget såg samspelt ut och fullt av självförtroende. Spelarna täckte upp för varandra, och vi vann varje andraboll.",
+      "sagt": "Jag håller inte med om att vi har ett disciplinproblem. Jag tror att vi har ett naivitetsproblem.",
       "vem": null,
       "podd": "The Beesotted Brentford Pride of West London Podcast",
       "typ": "podd",
-      "datum": "2026-11-24"
+      "datum": "2026-11-21"
      },
      "namn": [
       "Keane Lewis-Potter"
      ],
-     "paSpel": "Chansen att äntligen ta den länge väntade segern på Old Trafford."
+     "paSpel": "En seger på Old Trafford, som supportrarna tycker att laget länge har förtjänat."
     }
    ]
   },
