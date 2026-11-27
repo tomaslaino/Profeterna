@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T15:34:15.793Z",
+ "uppdaterad": "2026-11-27T15:52:21.771Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3122,14 +3122,21 @@
     "Stoke City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:09:58.658Z",
-   "rubrik": "Ett skott på mål räcker mot West Ham",
+   "skriven": "2026-11-27T15:45:37.008Z",
+   "rubrik": "Ett skott på mål räcker, tror båda lägren",
    "ingress": null,
-   "summering": "West Ham har ett lag som stressar så fort motståndarna skjuter och en läktare som har tröttnat. Stoke kommer till London med den overkliga känslan av att ingen kan slå dem.",
+   "summering": "West Ham har glesa läktare och ett lag som har tappat tron på sin målvakt. Stoke kommer i segerrus och hoppas att London Stadium vänder sig mot sina egna.",
    "delar": [
     {
      "lag": "West Ham United",
      "kallor": [
+      {
+       "podd": "Moore Than Just A Podcast - West Ham Podcast",
+       "avsnitt": "Sean Free",
+       "datum": "2026-11-23",
+       "adress": "https://shows.acast.com/moorethanjustapodcast/episodes/sean-free",
+       "typ": "podd"
+      },
       {
        "podd": "Moore Than Just A Podcast - West Ham Podcast",
        "avsnitt": "Canning Town Len's return to Stratford",
@@ -3196,22 +3203,6 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Värdarna förstår inte varför laget spelar med en ensam anfallare mot ett bottenlag. De vill flytta in Bowen centralt bredvid en partner och sätta en annan spelare till höger.",
-         "s": "o",
-         "podd": [
-          "Moore Than Just A Podcast - West Ham Podcast"
-         ],
-         "datum": [
-          "2026-11-22"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
         {
@@ -3259,13 +3250,13 @@
          "typ": "forum"
         },
         {
-         "t": "De inverterade yttrarna drar sig hela tiden inåt och gör planen smal, i stället för att hålla bredden ute vid kortlinjen. Värdarna är dock överens om att Bowen är farligast när han skär in.",
-         "s": "o",
+         "t": "Tystnaden på London Stadium beror enligt värdarna på själva spelet. Laget är långsamt och saknar både fart och kreativitet, och det finns inget som får publiken att resa sig.",
+         "s": "h",
          "podd": [
           "Moore Than Just A Podcast - West Ham Podcast"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
          "typ": "podd"
         }
@@ -3282,6 +3273,17 @@
          ],
          "datum": [
           "2026-11-22"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna har gett upp tanken på direktuppflyttning. De tror inte längre på topp två och varnar för att läget blir desperat om laget inte börjar ta poäng, eftersom serien svänger fort.",
+         "s": "o",
+         "podd": [
+          "Moore Than Just A Podcast - West Ham Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
          ],
          "typ": "podd"
         }
@@ -3305,27 +3307,32 @@
       }
      ],
      "text": [
-      "På forumet WHU606 är man övertygad om att målvaktsmissarna har smittat hela laget: motståndarna vet att ett skott på mål ofta räcker, och de egna anfallarna stressar bort lägena i tron att de måste göra två.",
-      "I podden Moore Than Just A Podcast fruktar man att Stoke blir en ny Preston, med bollen men utan väg igenom två femmannalinjer. Len efterlyser en kreativ mittfältare av Ian Bishops slag och kallar det kanske det sämsta West Ham-lag han har sett.",
-      "Kring klubben ligger en uppgivenhet som varken tränarbytet eller Mark Noble har rubbat."
+      "Målvaktsmissarna har smittat hela laget, menar man på forumet WHU606. Motståndarna vet att ett skott på mål ofta räcker, och de egna anfallarna stressar bort lägena i tron att de behöver två mål.",
+      "I podden Moore Than Just A Podcast räknar man med att omkring 15 000 säsongskortsinnehavare stannade hemma senast. En av värdarna kände för första gången inte igen spelarna utan fick titta på skärmarna för att se vem som var vem.",
+      "Bowen är den ende alla litar på, och går laget inte upp tror man att det här blir hans sista säsong."
      ],
      "citat": {
-      "sagt": "Jag såg tisdagens match från andra raden på Fratton Park och blev skrämd av hur lite tro några av våra spelare hade.",
+      "sagt": "Börjar vi inte ta poäng blir det desperat. Jag tror faktiskt att topp två är borta nu.",
       "vem": null,
-      "podd": "Claret and Hugh",
-      "typ": "media",
-      "datum": "2026-11-27"
+      "podd": "Moore Than Just A Podcast - West Ham Podcast",
+      "typ": "podd",
+      "datum": "2026-11-23"
      },
      "namn": [
-      "Len",
-      "Ian Bishop",
-      "Mark Noble"
+      "Bowen"
      ],
-     "paSpel": "Scott Parkers första seger, innan tålamodet med honom hinner ta slut."
+     "paSpel": "Parkers första seger, innan tålamodet med honom tar slut."
     },
     {
      "lag": "Stoke City",
      "kallor": [
+      {
+       "podd": "Every Step Along The Way - A Stoke City Podcast",
+       "avsnitt": "Match Preview - West Ham(A) - 28/11/26",
+       "datum": "2026-11-27",
+       "adress": "https://shows.acast.com/every-step-along-the-way/episodes/match-preview-west-hama-281126",
+       "typ": "podd"
+      },
       {
        "podd": "Every Step Along The Way - A Stoke City Podcast",
        "avsnitt": "Match Preview: Millwall(H) - 25/11/26",
@@ -3362,28 +3369,6 @@
           "2026-11-21"
          ],
          "typ": "lokal"
-        },
-        {
-         "t": "Djibril Soumaré tvingades kliva av mot Birmingham och lämnade arenan i en ortopedisk känga, och värdarna tror inte att han hinner bli spelklar till lördagen.",
-         "s": "h",
-         "podd": [
-          "Every Step Along The Way - A Stoke City Podcast"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Djibril Soumaré fick vård och byttes ut efter 59 minuter mot Birmingham, men gick av planen själv. Lokaltidningens reporter kallar det oroande, eftersom Soumaré hade varit farlig hela matchen och spelade fram till målet.",
-         "s": "b",
-         "podd": [
-          "Stoke-on-Trent Live"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "lokal"
         }
        ]
       },
@@ -3391,24 +3376,29 @@
        "amne": "elva",
        "punkter": [
         {
-         "t": "Ben Johnson, som kommer från West Hams ungdomsakademi, bör vila mot Millwall enligt värdarna. Han väntas vara extra laddad mot sin gamla klubb.",
+         "t": "En av värdarna vill ha in Ingelsson som defensiv mittfältare som dubblerar mot Bowen. Hans långa inkast skulle dessutom skapa oro hos West Hams unga målvakt och försvar.",
          "s": "o",
          "podd": [
           "Every Step Along The Way - A Stoke City Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-27"
          ],
          "typ": "podd"
-        },
+        }
+       ]
+      },
+      {
+       "amne": "spel",
+       "punkter": [
         {
-         "t": "George Hirst har gjort mål men har gång på gång petats direkt efteråt. Värdarna vill att han får en följd av matcher, men supportrarna är delade och en del vill hellre se Sam Gallagher.",
-         "s": "o",
+         "t": "Mot Millwall vågade tränaren ställa två lätta, bollskickliga mittfältare, Galbraith och McGlynn, mot ett fysiskt lag, och passningsspelet tog udden av Millwalls styrka. Frågan är om samma modiga val håller borta mot West Ham.",
+         "s": "h",
          "podd": [
           "Every Step Along The Way - A Stoke City Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-27"
          ],
          "typ": "podd"
         }
@@ -3445,13 +3435,35 @@
          "typ": "podd"
         },
         {
-         "t": "En av värdarna är inte rädd för West Ham. Han kallar dem ett konstigt lag och påpekar att Preston tog poäng där.",
+         "t": "Supportrarna tror att första målet avgör stämningen: leder Stoke kan hemmapubliken vända sig mot sitt eget lag. Gör West Ham första målet kan det bli en lång eftermiddag.",
          "s": "o",
          "podd": [
           "Every Step Along The Way - A Stoke City Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "West Hams målvaktsproblem ses som Stokes chans. Den rutinerade målvakten har petats för en ung debutant, och Stoke har flera mittfältare som skjuter bra från distans. Värdarna funderar på att skjuta så fort läget finns.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Bowen ses som den stora faran, en spelare en klass över serien som kan avgöra på egen hand. Supportrarna hoppas att hans frustration över lagkamraterna, som även West Ham-fansen nu kritiserar honom för, håller i sig.",
+         "s": "o",
+         "podd": [
+          "Every Step Along The Way - A Stoke City Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
          ],
          "typ": "podd"
         }
@@ -3459,9 +3471,9 @@
       }
      ],
      "text": [
-      "I podden Every Step Along The Way kallar man laget ”de oslagbara” och beskriver känslan som overklig, helt annorlunda än för ett år sedan. Resan till London ses som det verkliga provet: en seger där skulle få alla att börja tro på allvar.",
-      "Ben Johnson, fostrad i West Hams akademi, väntas vara extra laddad mot sin gamla klubb.",
-      "George Hirst kallar själv insatsen mot Birmingham sin bästa för säsongen och tackar samtalen med Mark Robins. Bland supportrarna är man ändå delad, och en del vill hellre se Sam Gallagher."
+      "”Kalla dem bara de oslagbara”, säger man i podden Every Step Along The Way, där segersviten känns overklig. Bortamatchen i London ses som det stora provet.",
+      "Vinner Stoke tror man att även de luttrade, som nöjde sig med en plats mitt i tabellen, börjar tro på allvar.",
+      "Första målet väntas avgöra stämningen, för leder Stoke kan hemmapubliken vända sig mot sitt eget lag. Med en osäker målvakt hos West Ham är värdarna frestade att skjuta så fort läget finns."
      ],
      "citat": {
       "sagt": "Jag tror faktiskt att vi slår West Ham. De är ett konstigt lag. Preston åkte dit och tog en poäng.",
@@ -3470,13 +3482,7 @@
       "typ": "podd",
       "datum": "2026-11-23"
      },
-     "namn": [
-      "Ben Johnson",
-      "George Hirst",
-      "Mark Robins",
-      "Sam Gallagher"
-     ],
-     "paSpel": "Klubbrekord i raka bortasegrar, och provet som ska få alla att tro."
+     "paSpel": "Ett klubbrekord i raka bortasegrar, och att läktaren börjar tro på allvar."
     }
    ]
   },
