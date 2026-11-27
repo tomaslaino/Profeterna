@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T14:52:37.180Z",
+ "skriven": "2026-11-27T15:38:37.997Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T14:50:10.508Z",
+ "underlag": "2026-11-27T15:34:15.793Z",
  "rubrik": {
   "id": "401879226",
   "kick": "MANCHESTER UNITED",
   "rad": [
    [
-    "SÅ VANA",
-    0
-   ],
-   [
-    "ATT DET",
-    0
-   ],
-   [
-    "INTE GÖR ONT",
+    "BRUNO SJUK",
     1
+   ],
+   [
+    "INFÖR",
+    0
+   ],
+   [
+    "HEMMAPREMIÄR",
+    0
    ]
   ],
-  "under": "United We Stand Podcast: ”Det värsta av allt är att det inte gör ont längre, för vi är vana vid det.”",
-  "plus": "BURNLEY HAR TAPPAT 25 POÄNG",
-  "plusId": "401880132"
+  "under": "Bruno Fernandes missade fredagens träning. Pochettino leder United hemma för första gången.",
+  "plus": "IPSWICH: 34 RAKA UTAN NOLLA",
+  "plusId": "401878752"
  }
 }
