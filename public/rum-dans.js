@@ -635,8 +635,10 @@ export const DANSER = {
     sjung: (b) => mod(b, 8) > 6.2 && mod(b, 8) < 7.4,
   },
 };
-// Snurrar man redan fullt måste alla vara igång (radioNamn): inte som första dans.
+// Snurrar man redan fullt måste alla vara igång (radioNamn): inte som första dans. Och där
+// tar ingen ett varv till (varvNu).
 DANSER.italoSnurr.igang = 1;
+DANSER.italoSnurr.helaVarv = 1;
 // När var och en snurrar (slag), och alla tre.
 const SNURR = [4, 8, 12];
 const SNURR_ALLA = 18;
@@ -681,7 +683,7 @@ function vildNu(d, b, v) {
   if (w <= 0.001) return null;
   // (ibland ett varv på barstolen, på tre slag, mitt i lossen)
   const vh = hash(f + v.i * 4.3 + 10.3);
-  const varv = satt !== 'titta' && satt !== 'skaka' && vh < (v.i === forst ? 0.5 : 0.2) && e - a > 8 ? a + 2.5 + (e - a - 8) * vh * 2 : null;
+  const varv = satt !== 'titta' && satt !== 'skaka' && vh < (v.i === forst ? 0.8 : 0.45) && e - a > 8 ? a + 2.5 + (e - a - 8) * vh * 2 : null;
   return { w, satt, forst, varv };
 }
 // armen i lossen (b i dansens slag, s armens sida, v.ytter: armen utåt från bordet, 0 i mitten)
@@ -728,6 +730,37 @@ function vildKropp(V, b) {
   const sk = Math.sin(4 * PI * b);
   return { lift: 2.5 * hb, roll: 0.07 * sk, twist: 0.12 * sk, side: 0.05 * Math.sin(2 * PI * b), pitch: 0.05, lean: 0.05, knee: bas.knee };
 }
+// ---------- varvet på barstolen ----------
+// Barstolarna snurrar, och i ungefär sex danser av tio tar någon ett varv mitt i dansen (varvNu):
+// pekfingret upp och den andra handen in mot bröstet som i snurrdansen (eller ölen i luften, om
+// den är i handen), fötterna lyfts och man lutar sig bakåt och tjoar. De andra tar efter med lite
+// under hälften chans var, ett par slag senare och åt sitt eget håll. Inte i snurrdansen (där
+// snurrar alla redan, helaVarv), inte i den första dansen efter vilan (då kommer man igång) och inte när någon släpper
+// loss (där snurrar man i lossen, vildNu).
+const VARV_CHANS = 0.6;
+const VARV_EFTER = 0.45;
+const VARV_TATT = arm([0.3, 0.04, 0.42], [-0.3, 0.7, 0.3], [0.1, 0.3, -1], HAND.nave, { pole: [1, -0.8, 0] });
+const VARV_FLASKA = { ...arm([0.38, 0.56, 0.3], [0.12, 1, 0.05], [-0.55, -0.75, -0.3], HAND.nave, { pole: [1, -0.6, -0.3] }), sak: 1 };
+// varvet för figuren i dansens lucka: { a (slaget det börjar), len (slag), dir (1 eller −1) } eller null
+function varvNu(d, v) {
+  if (v.k == null || v.k === 0 || d.helaVarv) return null;
+  const f = v.fro * 0.83 + v.k * 1.91;
+  if (hash(f + 0.4) > VARV_CHANS || hash(v.fro * 0.61 + v.k * 2.13 + 0.9) <= VILD_CHANS) return null;
+  // (först efter insteget eller bytet, och klart före nästa byte eller slutet)
+  const lo = 6;
+  const E = slutB(d) - (v.nasta ? 2 : 4);
+  const plats = E - lo - 9;
+  if (plats < 0) return null;
+  let a = lo + plats * hash(f + 2.2);
+  if (v.i !== Math.floor(hash(f + 1.3) * 3)) {
+    if (hash(f + v.i * 1.7 + 3.1) > VARV_EFTER) return null;
+    a += 2 + 2.5 * hash(f + v.i * 2.3 + 4.4);
+  }
+  return { a, len: 3 + 1.2 * hash(f + v.i * 0.7 + 5.5), dir: hash(f + v.i * 3.9 + 6.6) < 0.5 ? -1 : 1 };
+}
+// hur mycket man är inne i varvet (armen, fötterna och munnen), en stund före och efter
+const varvW = (VV, b) => (VV ? bump(b, VV.a - 1, VV.a, VV.a + VV.len, VV.a + VV.len + 1) : 0);
+
 // munnen (de skriker med, och den som tittar skrattar) och ögonen
 const vildSjung = (satt, b) => (satt === 'titta' ? mod(b, 4) < 2.6 : mod(b, 2) < 1.5);
 const vildBlund = (satt, b) => (satt === 'horn' || satt === 'skaka') && mod(b, 8) < 5;
@@ -880,7 +913,10 @@ export function dansLage(d, b, s, v) {
   // (lossen, vildNu: armen glider över i den vilda rörelsen och tillbaka)
   const V = vildNu(d, b, v);
   const L0 = d.lage(b - sen, s, v);
-  const L = V && V.satt !== 'titta' ? byt(L0, vildLage(V.satt, b - sen, s, v), V.w * inn * ut, v) : L0;
+  const L1 = V && V.satt !== 'titta' ? byt(L0, vildLage(V.satt, b - sen, s, v), V.w * inn * ut, v) : L0;
+  // (och varvet: pekfingret upp och den andra handen in, eller ölen i luften)
+  const vk = varvW(varvNu(d, v), b);
+  const L = vk > 0 ? byt(L1, L1.sak ? VARV_FLASKA : s > 0 ? PEK_UPP : VARV_TATT, vk, v) : L1;
   if (inn >= 1) return { ...L, upp: ut };
   const W = forLage(insteg(v), b - sen, s, v);
   if (!W) return { ...L, upp: inn * ut };
@@ -907,6 +943,12 @@ export function dansKropp(d, b, v) {
   let egen = r > 0 ? skala(d.kropp(b - sen, v), amp) : null;
   const V = r > 0 ? vildNu(d, b, v) : null;
   if (V) egen = blandaKropp(egen, vildKropp(V, b - sen), V.w * r);
+  // (varvet: fötterna upp, lutad bakåt med hakan upp, och blicken följer med runt)
+  const vk = egen ? varvW(varvNu(d, v), b) : 0;
+  if (vk > 0) {
+    egen = { ...egen, lean: (egen.lean || 0) - 0.05 * vk, pitch: (egen.pitch || 0) - 0.08 * vk, knee: [0, 1].map((i) => (egen.knee ? egen.knee[i] : 0) + 0.32 * vk) };
+    if (egen.se != null) egen.seW = (egen.seW ?? 1) * (1 - vk);
+  }
   if (r >= 1) return egen;
   const fore = forKropp(inn < 1 ? insteg(v) : 'nick', b - sen, v, stil);
   return egen ? blandaKropp(fore, egen, r) : fore;
@@ -925,6 +967,7 @@ export function dansSjung(d, b, v) {
   if (inn < 0.5) return insteg(v) === 'flaska' && mod(b, 8) > 5 ? 1 : 0;
   const V = vildNu(d, b, v);
   if (V && V.w * inn * ut > 0.5) return vildSjung(V.satt, b - sen) ? 1 : 0;
+  if (varvW(varvNu(d, v), b) > 0.5) return 1;
   return d.sjung && d.sjung(b - sen, v) ? sm(0.5, 0.8, inn * ut) : 0;
 }
 export function dansBlund(d, b, v) {
@@ -955,5 +998,7 @@ export function dansVarv(d, b, v) {
   const x = d.snurr ? norm(d.snurr(b - sen, v)) * inn * ut : 0;
   // (lossen: ett varv på tre slag)
   const V = vildNu(d, b, v);
-  return V && V.varv != null ? norm(x + 360 * sm(V.varv, V.varv + 3, b)) : x;
+  const VV = varvNu(d, v);
+  const y = x + (V && V.varv != null ? 360 * sm(V.varv, V.varv + 3, b) : 0) + (VV ? 360 * VV.dir * sm(VV.a, VV.a + VV.len, b) : 0);
+  return y === x ? x : norm(y);
 }
