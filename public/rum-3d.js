@@ -7571,6 +7571,7 @@ export async function figurer(canvas, opt = {}) {
   const dansB = (l) => (l - DANS_IN) / DANS_SLAG;
   // Det dansen behöver veta (rum-dans.js): rollerna, vem, radions lucka och armen – och dansen
   // före och efter när två danser följer på varandra (granne).
+  const YTTER_X = PLATSER.reduce((s, p) => s + p.x, 0) / PLATSER.length;
   function dansV(o, A, x, granne = true) {
     const R = roller(x);
     const i = FI(o);
@@ -7578,6 +7579,9 @@ export async function figurer(canvas, opt = {}) {
       rol: i === R.a ? 0 : i === R.b ? 1 : 2, a: R.a, vem: [R.a, R.b, R.c], i, t0: x.t0, k: x.k, fro: x.fro ?? 0, per: RADIO_SLOT / DANS_SLAG,
       sang: A && A === sangArm(o), skal: A && A === skalArm(o), ting: Boolean(A && A.bench), flaskan: o.arms.some((B) => B.thing),
     };
+    // (armen utåt från bordet, för lossen i rum-dans.js: −1 till vänster i bilden, 1 till höger, 0 i mitten)
+    const px = o.F.plats ? o.F.plats.x : 0;
+    v.ytter = px < YTTER_X - 60 ? -1 : px > YTTER_X + 60 ? 1 : 0;
     // (den som först lägger ifrån sig kupongen: slaget då händerna är fria, kupFri)
     const kf = kupFri(o);
     if (kf != null) v.fri = (kf - x.t0 - DANS_IN) / DANS_SLAG;

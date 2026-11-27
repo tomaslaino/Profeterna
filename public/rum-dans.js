@@ -57,6 +57,8 @@ const HAND = {
   spray: { f: [0.3, 1, 1, 1], sp: [0, 0, 0, 0], tu: [0.1, 0.5, -0.8], tb: 0.5 },
   // fingerpistolen: pekfingret ut och tummen upp
   pistol: { f: [0, 1, 1, 1], sp: [0, 0, 0, 0], tu: [1, 0.1, 0.02], tb: 0 },
+  // djävulshornen: pekfingret och lillfingret ut, tummen över de andra (lossen)
+  horn: { f: [0, 1, 1, 0], sp: [-0.12, 0, 0, 0.14], tu: TUMME_IN, tb: 0.55 },
   // en lös näve, när man bara gungar med
   los: { f: [0.55, 0.62, 0.68, 0.74], sp: [0, 0, 0, 0], tu: [-0.1, 0.75, -0.6], tb: 0.3 },
 };
@@ -643,6 +645,93 @@ function snurrNar(b, v) {
   return Math.max(bump(b, a - 0.5, a + 0.2, a + 3.8, a + 4.5), bump(b, SNURR_ALLA - 0.5, SNURR_ALLA + 0.2, SNURR_ALLA + 3.8, SNURR_ALLA + 4.5));
 }
 
+// ---------- lossen: ibland tappar de det ----------
+// I ungefär fyra danser av tio släpper någon loss en stund mitt i dansen (vildNu): nävarna i
+// luften om vartannat, händerna som viftar över huvudet, lasson, djävulshornen med huvudet som
+// slår, eller skakande händer – med studs, nick, sparkande ben och munnen öppen, och ibland ett
+// helt varv på barstolen (varv). Oftast hänger de andra på efter ett par slag, med samma rörelse
+// eller en egen; ibland är det bara en, och då studsar de andra med och tittar på hen (titta).
+// Bara mitt i dansen, inte medan man kommer igång eller byter. (Luftgitarren gick inte att läsa:
+// halsen såg ut som en näve vid axeln och handen som slog an hamnade bakom bordet.)
+const VILD_CHANS = 0.4;
+const VILDA = ['pump', 'vifta', 'lasso', 'horn', 'skaka'];
+// lossen för figuren vid slag b: { w (0–1), satt, forst (figuren som började), varv (slaget då
+// hen snurrar ett varv, eller null) } eller null
+function vildNu(d, b, v) {
+  if (v.k == null) return null;
+  const f = v.fro * 0.61 + v.k * 2.13;
+  if (hash(f + 0.9) > VILD_CHANS) return null;
+  const S = (v.k % 3 === 0 ? 12.5 : 6.5) + 2.5 * hash(f + 3.3);
+  const E = Math.min(S + 7 + 3 * hash(f + 4.1), slutB(d) - (v.nasta ? 1.6 : 3.5));
+  if (E < S + 4) return null;
+  const forst = Math.floor(hash(f + 1.7) * 3);
+  const satt0 = VILDA[Math.floor(hash(f + 5.3) * VILDA.length)];
+  let a = S;
+  let e = E;
+  let amp = 1;
+  let satt = satt0;
+  if (v.i !== forst) {
+    const h = hash(f + v.i * 1.37 + 6.1);
+    a = S + 1.2 + 2.6 * h;
+    e = E - 1.4 * hash(f + v.i * 2.71 + 7.3);
+    if (hash(f + 2.9) < 0.35) { satt = 'titta'; amp = 0.65; a = S + 0.5 + h; e = E + 0.5; }
+    else if (hash(f + v.i * 3.1 + 8.2) < 0.4) satt = VILDA[Math.floor(hash(f + v.i * 0.9 + 9.4) * VILDA.length)];
+  }
+  const w = amp * bump(b, a, a + 1.6, e - 1.6, e);
+  if (w <= 0.001) return null;
+  // (ibland ett varv på barstolen, på tre slag, mitt i lossen)
+  const vh = hash(f + v.i * 4.3 + 10.3);
+  const varv = satt !== 'titta' && satt !== 'skaka' && vh < (v.i === forst ? 0.5 : 0.2) && e - a > 8 ? a + 2.5 + (e - a - 8) * vh * 2 : null;
+  return { w, satt, forst, varv };
+}
+// armen i lossen (b i dansens slag, s armens sida, v.ytter: armen utåt från bordet, 0 i mitten)
+function vildLage(satt, b, s, v) {
+  const ytter = v.ytter || (hash(v.fro * 0.37 + v.i) < 0.5 ? -1 : 1);
+  if (satt === 'pump') {
+    // nävarna stöts upp om vartannat, varannan arm i varje slag (flaskan med om den är i handen)
+    const f = mod(b + (s > 0 ? 0 : 1), 2);
+    const u = sm(0, 0.16, f) * (1 - sm(0.45, 1.3, f));
+    if (v.skal && v.flaskan) return { ...arm([0.42, 0.42 + 0.22 * u, 0.3], [0.12, 1, 0.05], [-0.55, -0.75, -0.3], HAND.nave, { pole: [1, -0.6, -0.3] }), sak: 1 };
+    return arm([0.46, 0.42 + 0.36 * u, 0.24 - 0.06 * u], [0.2, 1, 0.15], [0.1, 0.1, -1], HAND.nave, { pole: [1, -0.6, -0.3] });
+  }
+  if (satt === 'vifta') {
+    // båda händerna högt och åt samma håll, en sväng i varje slag, och handlederna som skakar
+    const sv = Math.sin(PI * b);
+    return arm([0.46 + 0.14 * sv * s, 0.6 - 0.05 * Math.abs(sv), 0.2], [0.25 + 0.6 * sv * s, 1, -0.05], [0.1, 0.05, -1], HAND.oppen, { pole: [1, -0.5, -0.4], vink: 0.2 * Math.sin(4 * PI * b) });
+  }
+  if (satt === 'lasso') {
+    // pekfingret runt i en ring bredvid huvudet (huvudet är för stort för att nå över), och handen på höften
+    if (s !== ytter) return HOFT;
+    const fi = PI * b;
+    return arm([0.5 + 0.12 * Math.cos(fi), 0.64, 0.24 + 0.12 * Math.sin(fi)], [0.25, 1, 0.1], [0.1, 0.1, -1], HAND.pek, { pole: [1, -0.5, -0.3] });
+  }
+  if (satt === 'horn') {
+    // djävulshornen i luften med båda händerna, som stöts upp i varje slag när huvudet slår
+    const f = mod(b, 1);
+    const u = sm(0, 0.14, f) * (1 - sm(0.4, 1, f));
+    return arm([0.46 + 0.04 * u, 0.4 + 0.3 * u, 0.26], [0.22, 1, 0.12], [0.1, 0.1, -1], HAND.horn, { pole: [1, -0.6, -0.3] });
+  }
+  // skaka: händerna framför sig med fingrarna utspärrade, och handlederna som skakar fort
+  return arm([0.5 + 0.03 * Math.sin(8 * PI * b), 0.02 + 0.04 * Math.sin(8 * PI * b + 1), 0.45], [0.35, 0.9, 0.2], [0.1, 0.1, -1], HAND.oppen, { pole: [1, -0.7, -0.3], vink: 0.35 * Math.sin(8 * PI * b) });
+}
+// kroppen i lossen: studs, nick och knän större än i dansen
+function vildKropp(V, b) {
+  const hb = Math.cos(PI * b) ** 2;
+  const nick = 0.5 + 0.5 * Math.cos(2 * PI * b);
+  const sn = Math.sin(PI * b);
+  const bas = { lift: 7 * hb, pitch: 0.16 * nick - 0.06, knee: [0.45 * Math.max(0, sn), 0.45 * Math.max(0, -sn)] };
+  if (V.satt === 'titta') return { ...bas, lift: 4.5 * hb, pitch: 0.07 * nick - 0.02, knee: [0.2 * Math.max(0, sn), 0.2 * Math.max(0, -sn)], se: V.forst, seW: 1 };
+  if (V.satt === 'vifta') return { ...bas, roll: 0.2 * sn, side: 0.1 * sn, pitch: -0.14 + 0.05 * nick };
+  if (V.satt === 'pump') return { ...bas, lean: -0.05, twist: 0.16 * sn, roll: 0.06 * sn };
+  if (V.satt === 'lasso') return { ...bas, yaw: 0.2 * Math.sin(PI * b / 2), pitch: -0.08 + 0.1 * nick, roll: 0.06 * sn };
+  if (V.satt === 'horn') return { ...bas, pitch: 0.34 * nick - 0.12, lean: 0.07, roll: 0.05 * sn };
+  const sk = Math.sin(4 * PI * b);
+  return { lift: 2.5 * hb, roll: 0.07 * sk, twist: 0.12 * sk, side: 0.05 * Math.sin(2 * PI * b), pitch: 0.05, lean: 0.05, knee: bas.knee };
+}
+// munnen (de skriker med, och den som tittar skrattar) och ögonen
+const vildSjung = (satt, b) => (satt === 'titta' ? mod(b, 4) < 2.6 : mod(b, 2) < 1.5);
+const vildBlund = (satt, b) => (satt === 'horn' || satt === 'skaka') && mod(b, 8) < 5;
+
 // ---------- att komma igång, byta dans och sluta ----------
 // Ingen dans börjar på en signal. Musiken går en stund, sedan kör en igång och de andra kommer
 // efter, var och en på sitt sätt (INSTEG: nickar med, trummar på bordet, knäpper med fingrarna,
@@ -788,7 +877,10 @@ export function dansLage(d, b, s, v) {
     return { ...L, upp: 1 };
   }
   const { inn, ut } = med(d, b, v);
-  const L = d.lage(b - sen, s, v);
+  // (lossen, vildNu: armen glider över i den vilda rörelsen och tillbaka)
+  const V = vildNu(d, b, v);
+  const L0 = d.lage(b - sen, s, v);
+  const L = V && V.satt !== 'titta' ? byt(L0, vildLage(V.satt, b - sen, s, v), V.w * inn * ut, v) : L0;
   if (inn >= 1) return { ...L, upp: ut };
   const W = forLage(insteg(v), b - sen, s, v);
   if (!W) return { ...L, upp: inn * ut };
@@ -812,7 +904,9 @@ export function dansKropp(d, b, v) {
   }
   const { inn, ut } = med(d, b, v);
   const r = inn * ut;
-  const egen = r > 0 ? skala(d.kropp(b - sen, v), amp) : null;
+  let egen = r > 0 ? skala(d.kropp(b - sen, v), amp) : null;
+  const V = r > 0 ? vildNu(d, b, v) : null;
+  if (V) egen = blandaKropp(egen, vildKropp(V, b - sen), V.w * r);
   if (r >= 1) return egen;
   const fore = forKropp(inn < 1 ? insteg(v) : 'nick', b - sen, v, stil);
   return egen ? blandaKropp(fore, egen, r) : fore;
@@ -829,6 +923,8 @@ export function dansSjung(d, b, v) {
   }
   const { inn, ut } = med(d, b, v);
   if (inn < 0.5) return insteg(v) === 'flaska' && mod(b, 8) > 5 ? 1 : 0;
+  const V = vildNu(d, b, v);
+  if (V && V.w * inn * ut > 0.5) return vildSjung(V.satt, b - sen) ? 1 : 0;
   return d.sjung && d.sjung(b - sen, v) ? sm(0.5, 0.8, inn * ut) : 0;
 }
 export function dansBlund(d, b, v) {
@@ -842,6 +938,8 @@ export function dansBlund(d, b, v) {
   }
   const { inn, ut } = med(d, b, v);
   if (inn < 0.5) return insteg(v) === 'nick' && dansStil(v.fro, v.i) === 'nick' && mod(b, 8) > 2 && mod(b, 8) < 6;
+  const V = vildNu(d, b, v);
+  if (V && V.w * inn * ut > 0.5) return vildBlund(V.satt, b - sen);
   return inn * ut > 0.5 && Boolean(d.blund && d.blund(b - sen, v));
 }
 // Varvet på barstolen (grader).
@@ -853,7 +951,9 @@ export function dansVarv(d, b, v) {
     const { k1, k2 } = overK(P, bD, v, kD);
     return (P.snurr ? norm(P.snurr(bD + v.per - sen, vP)) * (1 - k1) : 0) + (D.snurr ? norm(D.snurr(bD - sen, vD)) * k2 : 0);
   }
-  if (!d.snurr) return 0;
   const { inn, ut } = med(d, b, v);
-  return norm(d.snurr(b - sen, v)) * inn * ut;
+  const x = d.snurr ? norm(d.snurr(b - sen, v)) * inn * ut : 0;
+  // (lossen: ett varv på tre slag)
+  const V = vildNu(d, b, v);
+  return V && V.varv != null ? norm(x + 360 * sm(V.varv, V.varv + 3, b)) : x;
 }
