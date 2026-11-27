@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-27T15:52:21.771Z",
+ "uppdaterad": "2026-11-27T16:04:00.945Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3495,14 +3495,21 @@
     "Portsmouth"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-27T13:10:40.348Z",
-   "rubrik": "I Wrexham är ful fotboll numera en strategi",
+   "skriven": "2026-11-27T16:04:00.944Z",
+   "rubrik": "Pompey andas ut först när Schmid håller bollen",
    "ingress": null,
-   "summering": "Wrexham har valt skyttegravarna kring en underskattad Cleworth och tar farväl av Steve Parkin. Portsmouth lever på slit, en ifrågasatt målvakt som just levererade och Mohameds nya energi på mittfältet.",
+   "summering": "Wrexham erkänner att laget inte är bra och lutar sig mot slitet och mittbacken Cleworth. Portsmouth litar på sitt mittfält men inte på målvakten.",
    "delar": [
     {
      "lag": "Wrexham",
      "kallor": [
+      {
+       "podd": "Fearless in Devotion",
+       "avsnitt": "Episode 380 - Bristol City vs Wrexham Reaction | Fast Start, Fading Legs & Portsmouth Preview",
+       "datum": "2026-11-27",
+       "adress": "https://fidpodcast.com/",
+       "typ": "podd"
+      },
       {
        "podd": "Rob. Ryan. Red.",
        "avsnitt": "Episode 336: Digging Deep",
@@ -3527,8 +3534,46 @@
      ],
      "grupper": [
       {
+       "amne": "elva",
+       "punkter": [
+        {
+         "t": "Kieffer Moore fick vila i Bristol för att hans speltid ska hållas nere efter skadan. Värdarna är säkra på att han startar på lördag, och att poängen utan honom gör det än bättre.",
+         "s": "o",
+         "podd": [
+          "Fearless in Devotion"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "En av värdarna vill ge Danny Imray chansen före Kaboré till högerwingback för att få igång konkurrensen igen. Den andra tror att Imrays knuff i straffområdet, som kunde ha gett Bristol straff, får Parkinson att låta honom sitta.",
+         "s": "o",
+         "podd": [
+          "Fearless in Devotion"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Wrexham är inget lag som kontrollerar matcher, utan ett slitarlag som ska löpa ifrån motståndet. När det inte orkar, som i andra halvlek i Bristol, blir laget utarbetat och tappar greppet.",
+         "s": "o",
+         "podd": [
+          "Fearless in Devotion"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Med Max Cleworth på planen har Wrexham bara släppt in två av säsongens 20 mål. Laget tar ungefär två poäng per match när han startar och 0,9 när han inte gör det. Värdarna tycker att han presterar bättre än Doyle och Worrall utan att någon märker det.",
          "s": "h",
@@ -3541,18 +3586,18 @@
          "typ": "podd"
         },
         {
-         "t": "Värdarna ser det defensiva 3-5-1-1 som en nödlösning. Så fort Windass, Broadhead och O'Hare är tillbaka vill de ha två spelare bakom Kieffer Moore, annars når laget aldrig topp sex.",
+         "t": "Issa Kaboré var ospelbar de första tio minuterna men föll sedan ihop. Hans självförtroende svänger inte från match till match utan från minut till minut, och efter ett par dåliga passningar är han en annan spelare.",
          "s": "o",
          "podd": [
-          "Rob. Ryan. Red."
+          "Fearless in Devotion"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-27"
          ],
          "typ": "podd"
         },
         {
-         "t": "En av värdarna håller fast vid att Ben Sheaf är klubbens bästa centrala mittfältare. Han förstår ändå varför Sheaf sitter på bänken: utan kreativa spelare behövs löpare som Thomason, som pressar högre än Sheaf och Matty James.",
+         "t": "Värdarna ser det defensiva 3-5-1-1 som en nödlösning. Så fort Windass, Broadhead och O'Hare är tillbaka vill de ha två spelare bakom Kieffer Moore, annars når laget aldrig topp sex.",
          "s": "o",
          "podd": [
           "Rob. Ryan. Red."
@@ -3579,76 +3624,48 @@
          "typ": "podd"
         },
         {
-         "t": "Värdarna menar att något vände efter förlusten mot Sheffield United, när Parkinson sa att laget saknade kämpaglöd. Sedan dess spelar han med sina slitvargar och tar matcherna som skyttegravskrig.",
+         "t": "Värdarna menar att laget haltar fram till januarifönstret med spelare på fel positioner och flera stora namn borta. Med den truppen har det överpresterat, och varje poäng ska firas snarare än vägas mot en fullstark elva.",
          "s": "o",
          "podd": [
-          "Rob. Ryan. Red."
+          "Fearless in Devotion"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-27"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Värdarna säger sig veta att flera spelare i truppen vill se Max Cleworth som lagkapten, även om Joe Worrall leder backlinjen just nu.",
-         "s": "h",
-         "podd": [
-          "Rob. Ryan. Red."
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Målet just nu är att hänga kvar inom räckhåll fram till januari. Då måste klubben hitta en anfallare som gör skillnad, vilket blir dyrt mitt i säsongen.",
-         "s": "o",
-         "podd": [
-          "Rob. Ryan. Red."
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Assisterande tränaren Steve Parkin lämnar Wrexham efter lördagens match av personliga skäl. Han kom i juli 2021 och har varit en stor personlighet i omklädningsrummet under klubbens tre raka uppflyttningar.",
-         "s": "b",
-         "podd": [
-          "Wrexham is the Game"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "media"
         }
        ]
       }
      ],
      "text": [
-      "I podden Rob. Ryan. Red. säger man rakt ut att Wrexham inte är särskilt bra just nu och därför måste spela för poängen, inte för ögat. Sedan förlusten mot Sheffield United tar Parkinson matcherna som skyttegravskrig.",
-      "Det som bär är Max Cleworth: när han startar tar laget ungefär två poäng per match. Värdarna tycker att han spelar bättre än Joe Worrall och Doyle utan att någon märker det. Flera i omklädningsrummet lär dessutom vilja se honom som kapten.",
-      "Lördagen blir assisterande tränaren Steve Parkins sista match, eftersom han lämnar av personliga skäl efter alla uppflyttningarna."
+      "Wrexham ska vara ett slitarlag som ”jobbar ihjäl motståndarna”, men i andra halvlek i Bristol var det tvärtom, konstaterar man i podden Fearless in Devotion. I Rob. Ryan. Red. säger man rakt ut att laget inte är särskilt bra just nu och måste spela för poängen, inte för ögat.",
+      "Där pekar man på mittbacken Max Cleworth som den som ingen märker: laget tar mer än dubbelt så många poäng per match när han startar. Enligt podden vill flera i omklädningsrummet se honom som kapten.",
+      "Oron finns på högerkanten, där Issa Kaborés självförtroende svänger ”från minut till minut”. En av värdarna vill ge Danny Imray chansen i stället."
      ],
      "citat": {
-      "sagt": "För mig är det helt klart en tillfällig lösning. Det är inte så vi tar Wrexham upp på topp sex, topp sju.",
+      "sagt": "Han ser alltid till säsongen som helhet. Han spelar alltid på procenten.",
       "vem": null,
-      "podd": "Rob. Ryan. Red.",
+      "podd": "Fearless in Devotion",
       "typ": "podd",
-      "datum": "2026-11-23"
+      "datum": "2026-11-27"
      },
      "namn": [
-      "Parkinson",
       "Max Cleworth",
-      "Joe Worrall",
-      "Doyle",
-      "Steve Parkin"
+      "Issa Kaboré",
+      "Danny Imray"
      ],
-     "paSpel": "Steve Parkins sista match, och att hänga kvar fram till januari."
+     "paSpel": "Avskedet för assisterande tränaren efter tre raka uppflyttningar."
     },
     {
      "lag": "Portsmouth",
      "kallor": [
+      {
+       "podd": "PO4cast: Pompey Podcast",
+       "avsnitt": "Pompey Nail the Hammers",
+       "datum": "2026-11-27",
+       "adress": "https://soundcloud.com/po4cast/pompey-nail-the-hammers",
+       "typ": "podd"
+      },
       {
        "podd": "NOT606",
        "avsnitt": "Pompey v West Ham · Jokes thread · Add a word to ruin a movie title !",
@@ -3687,34 +3704,18 @@
      ],
      "grupper": [
       {
-       "amne": "trupp",
+       "amne": "elva",
        "punkter": [
         {
-         "t": "Inga skadade spelare väntas tillbaka till lördagen. Målvakten Daniel Bielica är inte tillgänglig, och det finns inga klara besked om Jayden Meghomas fotledsskada eller om när Connor Ogilvie är tillbaka. John Swift kan tidigast vara med mot West Brom nästa vecka.",
-         "s": "b",
+         "t": "Abu Kamara har en målgivande passning på 17 matcher och är en självförtroendespelare. Freddie vill ge honom en enklare roll och tycker inte att han ska användas centralt. Hade det funnits fler högerytter hade han fått vila.",
+         "s": "o",
          "podd": [
-          "Pompey-Fans.com"
+          "PO4cast: Pompey Podcast"
          ],
          "datum": [
           "2026-11-27"
          ],
-         "typ": "media"
-        }
-       ]
-      },
-      {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Thomas Waddingham är enligt skribenten den enda renodlade anfallaren som är frisk. Därför var det väntat att han startade mot West Ham, bara hans andra start för klubben.",
-         "s": "h",
-         "podd": [
-          "Josh Chesters"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "media"
+         "typ": "podd"
         }
        ]
       },
@@ -3722,84 +3723,109 @@
        "amne": "spel",
        "punkter": [
         {
-         "t": "Supportrarna ser 1–0 mot West Ham som en seger byggd på slit och lite tur. Laget var underlägset i spelet och fick försvara sig hårt, särskilt de sista tjugo minuterna.",
+         "t": "Målvakten Nicolas Schmid har gjort sex, sju grova misstag på fyra, fem matcher. Efter Bolton ansåg Andy att det hade varit försumligt av tränaren att inte peta honom, och bara Daniel Bielicas skada höll Schmid kvar mot West Ham.",
          "s": "o",
          "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Målvakten Nicolas Schmid lyfts fram som den som höll Portsmouth kvar i matchen mot West Ham med flera fina räddningar.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "Supportrarna lyfter fram målvakten Nicolas Schmid som den som bar laget mot West Ham. Med flera viktiga räddningar var han matchens bästa spelare enligt dem.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-24"
-         ],
-         "typ": "forum"
-        },
-        {
-         "t": "John Mousinho säger att den stora skillnaden i år är bredden i truppen. Spelarna som kommit in vid rotation har hållit nivån eller till och med höjt den.",
-         "s": "b",
-         "podd": [
-          "Pompey-Fans.com"
+          "PO4cast: Pompey Podcast"
          ],
          "datum": [
           "2026-11-27"
          ],
-         "typ": "media"
+         "typ": "podd"
         },
         {
-         "t": "Mittbacksparet Regan Poole och Madiodio \"Jojo\" Dia beskrivs som avgörande för lagets senaste framgångar. Båda spelar enligt skribenten på toppnivå.",
-         "s": "o",
+         "t": "Utan Ebrima Adams och Iyad Mohamed på mitten blev Pompey överkört fysiskt av Bolton, som vann nästan dubbelt så många dueller. Med dem tillbaka mot West Ham kändes laget stabilt igen. Supportrarna ser dem som lagets ryggrad.",
+         "s": "h",
          "podd": [
-          "Josh Chesters"
+          "PO4cast: Pompey Podcast"
          ],
          "datum": [
-          "2026-11-25"
+          "2026-11-27"
          ],
-         "typ": "media"
+         "typ": "podd"
         },
         {
-         "t": "Målvakten Nicolas Schmid har legat bakom många insläppta mål på sistone och fått mycket kritik. Han var bra mot West Ham, men hans utsparkar är fortfarande osäkra ibland.",
+         "t": "Två fina räddningar mot West Ham ändrar inte bilden för Andy. Han litar inte längre ens på de enkla skotten och andas ut först när bollen ligger säkert i Schmids händer.",
          "s": "o",
          "podd": [
-          "Josh Chesters"
+          "PO4cast: Pompey Podcast"
          ],
          "datum": [
-          "2026-11-25"
+          "2026-11-27"
          ],
-         "typ": "media"
+         "typ": "podd"
+        },
+        {
+         "t": "Terry Devlin har alltid haft arbetskapaciteten och varit stark i närkamperna. Nu tycker supportrarna att hans teknik och inlägg har tagit ett stort kliv, och han är lagets bäste målskytt från ytterbacken.",
+         "s": "o",
+         "podd": [
+          "PO4cast: Pompey Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna menar att laget är som bäst när det pressar högt, vinner bollen på offensiv planhalva och snabbt spelar diagonala bollar ut till kanterna. West Ham kunde inte hantera de långa bollarna mot Devlin och yttrarna.",
+         "s": "o",
+         "podd": [
+          "PO4cast: Pompey Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Trots formen saknar laget en riktig anfallare. Colby Bishop har krånglat, och att ytterbacken Devlin är bäste målskytt är inget tecken på ett lag som kan klättra. Thomas Waddingham fick ändå beröm för att han höll i bollen mot West Ham.",
+         "s": "o",
+         "podd": [
+          "PO4cast: Pompey Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna tror inte att den nuvarande takten håller. Pompey hade lägre förväntade mål än motståndaren i båda veckans matcher, och de väntar sig att det jämnar ut sig. Något ras tror de dock inte på.",
+         "s": "o",
+         "podd": [
+          "PO4cast: Pompey Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Nicolas Schmid har fått mycket kritik för att ha legat bakom många insläppta mål, men mot West Ham var det målvakten som höll Portsmouth kvar. På forumet NOT606 kallar man segern ett resultat av ”lite tur och en massa slit”, där laget var underlägset och fick försvara sig hårt på slutet.",
-      "Josh Chesters noterar dock att utsparkarna fortfarande är osäkra ibland.",
-      "Formuppgången sammanfaller enligt honom med att Iyad Mohamed kom till klubben. Mittfältaren beskrivs som atletisk, trygg med bollen och orädd i närkampen."
+      "Två fina räddningar mot West Ham ändrar ingenting för Andy i PO4cast, som har ”noll förtroende” för Nicolas Schmid även på de enkla skotten. Efter Bolton tyckte han att det vore försumligt att inte peta målvakten, och det var bara Daniel Bielicas skada som höll kvar Schmid.",
+      "Det som bär laget sitter i stället på mitten. Utan Ebrima Adams och Iyad Mohamed blev Pompey överkört fysiskt av Bolton, men med dem tillbaka kändes laget stabilt igen.",
+      "Värdarna tror ändå inte att den ”galna sviten” håller, även om de inte väntar sig något ras."
      ],
+     "citat": {
+      "sagt": "Vi får fortfarande fram bollen snabbare till våra kantspelare. Det är det vi är bra på.",
+      "vem": null,
+      "podd": "PO4cast: Pompey Podcast",
+      "typ": "podd",
+      "datum": "2026-11-27"
+     },
      "namn": [
       "Nicolas Schmid",
-      "Josh Chesters",
+      "Daniel Bielica",
+      "Ebrima Adams",
       "Iyad Mohamed"
-     ]
+     ],
+     "paSpel": "Ett nytt prov på en svit som poddens egna värdar inte tror håller."
     }
    ]
   },
