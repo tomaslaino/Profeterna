@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-28T09:31:07.038Z",
+ "uppdaterad": "2026-11-28T09:46:44.752Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3583,14 +3583,21 @@
     "Portsmouth"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T07:59:32.494Z",
-   "rubrik": "Slitarlaget möter en målvakt som ingen litar på",
+   "skriven": "2026-11-28T09:38:09.857Z",
+   "rubrik": "Parkin tackar för sig från skyttegraven han grävde",
    "ingress": null,
-   "summering": "Wrexham haltar fram till januari på slit och skyttegravsfotboll. Portsmouths svit vilar på mittfältet med Adams och Mohamed, och på en målvakt som de egna supportrarna inte vågar lita på.",
+   "summering": "Wrexham tar farväl av sin assisterande tränare och lutar sig mot slitet och lugnet hos inhopparna på mitten. Portsmouth bärs av mittfältsparet men skakar så fort bollen går mot målvakten.",
    "delar": [
     {
      "lag": "Wrexham",
      "kallor": [
+      {
+       "podd": "Fearless in Devotion",
+       "avsnitt": "Episode 381 - Steve Parkin LEAVES Wrexham! End of a 762-Game Era",
+       "datum": "2026-11-27",
+       "adress": "https://fidpodcast.com/",
+       "typ": "podd"
+      },
       {
        "podd": "Fearless in Devotion",
        "avsnitt": "Episode 380 - Bristol City vs Wrexham Reaction | Fast Start, Fading Legs & Portsmouth Preview",
@@ -3629,33 +3636,6 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Kieffer Moore fick vila i Bristol för att hans speltid ska hållas nere efter skadan. Värdarna är säkra på att han startar på lördag, och att poängen utan honom gör det än bättre.",
-         "s": "o",
-         "podd": [
-          "Fearless in Devotion"
-         ],
-         "datum": [
-          "2026-11-27"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "En av värdarna vill ge Danny Imray chansen före Kaboré till högerwingback för att få igång konkurrensen igen. Den andra tror att Imrays knuff i straffområdet, som kunde ha gett Bristol straff, får Parkinson att låta honom sitta.",
-         "s": "o",
-         "podd": [
-          "Fearless in Devotion"
-         ],
-         "datum": [
-          "2026-11-27"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
         {
@@ -3681,7 +3661,7 @@
          "typ": "podd"
         },
         {
-         "t": "Issa Kaboré var ospelbar de första tio minuterna men föll sedan ihop. Hans självförtroende svänger inte från match till match utan från minut till minut, och efter ett par dåliga passningar är han en annan spelare.",
+         "t": "När laget hade det tungt i höstas gick Parkinson och Parkin tillbaka till grunderna och lade det progressiva spelet åt sidan. Supportrarna menar att den nya assisterande tränaren också måste våga säga emot Parkinson.",
          "s": "o",
          "podd": [
           "Fearless in Devotion"
@@ -3692,13 +3672,24 @@
          "typ": "podd"
         },
         {
-         "t": "Värdarna ser det defensiva 3-5-1-1 som en nödlösning. Så fort Windass, Broadhead och O'Hare är tillbaka vill de ha två spelare bakom Kieffer Moore, annars når laget aldrig topp sex.",
+         "t": "I tisdags tappade laget greppet efter 20 minuter och slarvade med bollen. Först när Matty James och Ben Sheaf kom in i 85:e minuten fick laget kontroll, och utan någon av dem saknas en mittfältsgeneral.",
          "s": "o",
          "podd": [
-          "Rob. Ryan. Red."
+          "Fearless in Devotion"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna saknar en offensiv mittfältare bakom anfallaren. Kieffer Moore klarar inte 90 minuter tre gånger i veckan, och laget behöver få tillbaka någon av Windass, Broadhead eller O'Hare.",
+         "s": "o",
+         "podd": [
+          "Fearless in Devotion"
+         ],
+         "datum": [
+          "2026-11-27"
          ],
          "typ": "podd"
         }
@@ -3719,6 +3710,17 @@
          "typ": "podd"
         },
         {
+         "t": "Steve Parkin lämnar efter lördagens match mot Portsmouth. Supportrarna menar att han var lika viktig som Phil Parkinson och pengarna bakom de tre raka uppflyttningarna, och att laget nu går in i okänt vatten.",
+         "s": "o",
+         "podd": [
+          "Fearless in Devotion"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Värdarna menar att laget haltar fram till januarifönstret med spelare på fel positioner och flera stora namn borta. Med den truppen har det överpresterat, och varje poäng ska firas snarare än vägas mot en fullstark elva.",
          "s": "o",
          "podd": [
@@ -3733,22 +3735,27 @@
       }
      ],
      "text": [
-      "Wrexham är ett slitarlag som ska jobba ihjäl motståndet, säger man i podden Fearless in Devotion, men i andra halvlek i Bristol var det tvärtom. I Rob. Ryan. Red. säger man rakt ut att laget inte är särskilt bra just nu.",
-      "Därför spelar Phil Parkinson för poängen och inte för ögat. Sedan förlusten mot Sheffield United, när han tyckte att laget saknade kämpaglöd, tar han matcherna som skyttegravskrig.",
-      "Osäkrast är Issa Kaboré, vars självförtroende svänger ”från minut till minut under en match”. Efter ett par dåliga passningar är han en annan spelare."
+      "Steve Parkin leder laget för sista gången, och i podden Fearless in Devotion ses den assisterande tränaren som lika viktig för tre raka uppflyttningar som Phil Parkinson och pengarna. Han slutar av personliga skäl, och supportrarna väntar sig ett avsked som kommer att överraska honom.",
+      "Det var Parkin och Parkinson som i höstas lade det progressiva spelet på hyllan och gick tillbaka till hårt slit. Men när orken tryter, som i andra halvlek i Bristol, tappar laget greppet.",
+      "Kontrollen kom först med inhopparna Ben Sheaf och Matty James, och Sheaf önskas från start."
      ],
      "citat": {
-      "sagt": "Nej, Kieffer spelar definitivt på lördag. Det var ju hela poängen med att han inte startade.",
+      "sagt": "Jag tycker inte att Wrexham är särskilt bra just nu. Därför måste de spela på ett sätt som ger resultat.",
       "vem": null,
-      "podd": "Fearless in Devotion",
+      "podd": "Rob. Ryan. Red.",
       "typ": "podd",
-      "datum": "2026-11-27"
+      "datum": "2026-11-23"
      },
      "namn": [
+      "Steve Parkin",
       "Phil Parkinson",
-      "Issa Kaboré"
+      "Parkin",
+      "Parkinson",
+      "Ben Sheaf",
+      "Matty James",
+      "Sheaf"
      ],
-     "paSpel": "Assisterande tränaren Steve Parkins sista match innan han lämnar klubben."
+     "paSpel": "Ett känslosamt farväl till Steve Parkin inför en fullsatt arena."
     },
     {
      "lag": "Portsmouth",
@@ -3902,24 +3909,25 @@
       }
      ],
      "text": [
-      "Målvakten Nicolas Schmid var matchens lirare mot West Ham enligt forumet NOT606, men i podden PO4cast andas Andy ut först när bollen ligger säkert i hans händer. Efter Bolton tyckte han att det vore försumligt att inte peta Schmid, och bara Daniel Bielicas skada höll honom kvar i laget.",
-      "Ryggraden står framför honom. Utan Ebrima Adams och Iyad Mohamed blev laget fysiskt överkört av Bolton, men med dem tillbaka var det stabilt igen mot West Ham. Supportrarna ger också Joe Morrell i tränarstaben mycket av äran för mer fight och mer press."
+      "I podden PO4cast andas Andy ut först när bollen ligger säkert i Nicolas Schmids händer. Målvakten har gjort en rad grova misstag, och bara Daniel Bielicas skada höll honom kvar i målet mot West Ham. Två fina räddningar där ändrar inte hans bild.",
+      "Ryggraden sitter på mitten: utan Ebrima Adams och Iyad Mohamed blev laget fysiskt överkört av Bolton, med dem kändes det stabilt igen. Längst fram saknas en riktig anfallare, och att ytterbacken Terry Devlin är bäste målskytt ser supportrarna som ett tak för laget."
      ],
      "citat": {
-      "sagt": "Han är precis den sortens person man vill ska prägla truppen, eller hur? Riktig terrier-känsla.",
+      "sagt": "Då skulle jag säga att om tränaren inte tog honom ur skottlinjen vore det försumligt.",
       "vem": "Andy Mitchemore",
       "podd": "PO4cast: Pompey Podcast",
       "typ": "podd",
       "datum": "2026-11-27"
      },
      "namn": [
+      "Andy",
       "Nicolas Schmid",
       "Daniel Bielica",
       "Ebrima Adams",
       "Iyad Mohamed",
-      "Joe Morrell"
+      "Terry Devlin"
      ],
-     "paSpel": "Ett prov på om sviten håller, något podden inte riktigt tror på."
+     "paSpel": "Ett test av en svit som inte ens den egna podden tror håller."
     }
    ]
   },
