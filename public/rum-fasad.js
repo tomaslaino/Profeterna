@@ -786,11 +786,11 @@ window.RumFasad = (() => {
       mx += w + 5;
     }
     s += `<g opacity="${r1(0.42 + 0.3 * L.dag)}">${mk}</g>`;
-    // skylten på sugproppen: ÖPPET på den här sidan (STÄNGT inåt)
+    // skylten på sugproppen: ÖPPET i grönt på den här sidan (STÄNGT i rött inåt)
     const ox = d.x + d.w * 0.62;
     const oy = d.y + 18;
     s += `<g transform="rotate(-4 ${r1(ox)} ${oy})"><circle cx="${r1(ox)}" cy="${oy}" r="4" fill="#d8dde0" opacity=".7"/><path d="M${r1(ox)} ${oy} L${r1(ox - 24)} ${oy + 16} M${r1(ox)} ${oy} L${r1(ox + 24)} ${oy + 16}" stroke="#2a2a2a" stroke-width="1"/>
-      <rect x="${r1(ox - 34)}" y="${oy + 16}" width="68" height="24" rx="2" fill="${mix('#3a3630', '#f4eee0', 0.3 + 0.7 * L.dag)}" stroke="#b8352a" stroke-width="2"/><text x="${r1(ox)}" y="${oy + 34}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="14" letter-spacing="1.5" fill="#b8352a">ÖPPET</text></g>`;
+      <rect x="${r1(ox - 34)}" y="${oy + 16}" width="68" height="24" rx="2" fill="${mix('#3a3630', '#f4eee0', 0.3 + 0.7 * L.dag)}" stroke="#2a7040" stroke-width="2"/><text x="${r1(ox)}" y="${oy + 34}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="14" letter-spacing="1.5" fill="#2a7040">ÖPPET</text></g>`;
     return s;
   }
 
