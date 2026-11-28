@@ -8253,6 +8253,33 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
     23 % halv tio; så länge ritas fasaden i full takt, så den kostar mer än förut. Ingen kör igenom någon i samma fil
     (fem timmar vid olika tider, 12 grader). Provat i bilder på datorn på dagen och en mulen kväll; inte i en riktig
     telefon.
+- **De som åker (2026-11-28, användarens önskemål):** "Kan du ordna så att personerna i bilarna och bussarna som
+  swishar förbi inte ser ut så här - utan ser ut som riktiga personer … Tänk på att det är 90-tal om du ska ha nån
+  inredning och att det ska vara läckert och att det inte ska dra så mkt grafik" (med en bild av en skåpbil där
+  föraren var en grå cirkel med en oval under). Förut var alla som åkte en mörk halvgenomskinlig cirkel och oval, i
+  bussen likadant och i cabben en cirkel med en halvcirkel hår.
+  - **Människor i profil** (`person`, `manniska` i [public/rum-fasad-gatan.js](public/rum-fasad-gatan.js)): huvudet
+    med näsan och hakan, örat, ögat, brynet och munnen, håret och mössorna i samma former som de som går förbi
+    (rum-fasad.js), halsen och axlarna i jackan eller tröjan, ibland skjortkrage med slips eller polokrage, och
+    bältet över axeln på den som kör. Nittiotal: page, permanent, hockeyfrilla, hästsvans med snodd och gelé i håret,
+    mustasch och helskägg, kepsen, mössan i kylan och kepan på de äldre, stora glasögon och solglasögon i solen,
+    walkman, en cigarett i mungipan (inte i bussen) och ibland mobiltelefonen vid örat.
+  - **Inredningen:** sätets rygg och nackstödet bakom föraren (inga nackstöd i de gamla: PV:n, Amazonen, Bubblan,
+    Ankan, Minin, 96:an, 140-serien och Ladan), ratten som en smal ring med överkanten framåt och handen på den (vante
+    i kylan), ibland en Wunderbaum i backspegeln som svänger fram när bilen bromsar, ett barn i baksätet och en hund
+    bakom baksätet i kombin. I bussen sätena i rad med handtaget ovanpå, de som sitter (en fjärdedel baklänges), de
+    som står och håller i stången ovanför (fler i rusningen), chauffören i SL:s blå skjorta och slips, och gula
+    stänger i dörrarnas glas. Lastbilen och plogbilen har en förare vid ratten, VW-bussen ibland två bak. Alla lutar
+    sig lite fram när det bromsar.
+  - **Genom glaset:** ett dis av glaset över dem och himlen som speglas som förut. På kvällen syns de mörkt, med
+    instrumentens sken i förarens ansikte (grönt i Saabarna, rött i de tyska, gult i de andra) och glöden från
+    cigaretten; i bussen syns de i inneljuset med sina färger.
+  - **Samma trafik och lite arbete:** vem som åker lottas en gång per fordon och scen (`inne`) ur ett eget frö, så
+    att luckornas lottning och därmed all trafik är exakt som förut (6 854 lägen jämförda). Vägarna sparas (`vag`),
+    inga bilder, och när ett huvud är mindre än 16 bildpunkter (`finare`) hoppar den över örat, ögat, munnen och de
+    små sakerna. Fyra fordon med en full ledbuss: 0,10 → 0,14 ms per bild att rita i Chromium på datorn. Gatan
+    inifrån och bron bakom Hasse Backe visar samma människor, eftersom de ritar med samma kod. Provat i bilder av alla
+    former på nära håll dag och kväll och i fasaden på datorn; inte i en riktig telefon.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
