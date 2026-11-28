@@ -1812,6 +1812,11 @@ window.RumFasadGatan = (() => {
   // de står öppna i karossen, så att affären och de som går förbi syns svagt genom bilen (bussen bara på dagen, då
   // den inte är upplyst inne).
   //
+  // Nittiotal (2026-11-28): biltelefonen med spiralsladd i de stora bilarna, hantverkaren i arbetsjacka och keps i
+  // skåpbilen och brevbäraren i Postens blå i den gula, raggaren med flottfrilla i amerikanaren med tärningarna i
+  // backspegeln, någon som sover i bussen (huvudet sjunker och rycker upp), och en varm dag står förarrutan nedvevad med
+  // armbågen i (armUte).
+  //
   // Allt lottas en gång per fordon och scen (inne) ur ett eget frö, inte ur luckans R, så att trafiken är densamma
   // som förut, och ritas med sparade vägar (vag), utan bilder. Glaset lägger ett dis över dem och himlen speglas i
   // det; på kvällen är de mörka, med instrumentens sken (grönt i Saabarna, rött i de tyska, gult i de andra) i
@@ -1853,7 +1858,7 @@ window.RumFasadGatan = (() => {
   const NASBORRE = 'M10.9 -161.5 Q11.7 -161.2 12.1 -161.9';
   const LAPPAR = 'M8.3 -159.1 Q9.7 -159.7 10.9 -159.1 Q10.9 -158.1 9.9 -157.9 Q8.9 -158.1 8.3 -159.1 Z';
   const KIND = ellS(5.4, -161.2, 2.7, 2);
-  const HAR_LYS = { kort: 'M-7.5 -174.5 Q-2 -178.3 5.5 -177.2', gel: 'M-6 -177 Q-1 -179.4 5 -178.4', knut: 'M-7.5 -174.5 Q-2 -178.3 5.5 -177.2', page: 'M-9.4 -169 Q-7 -177.6 2 -178.8', flint: 'M-4 -175.6 Q1 -177.4 5.4 -175.8' };
+  const HAR_LYS = { bakat: 'M-7.5 -175 Q-1 -179 7 -177.6', flott: 'M-3.6 -181.4 Q3 -185.4 10.6 -182.6', kort: 'M-7.5 -174.5 Q-2 -178.3 5.5 -177.2', gel: 'M-6 -177 Q-1 -179.4 5 -178.4', knut: 'M-7.5 -174.5 Q-2 -178.3 5.5 -177.2', page: 'M-9.4 -169 Q-7 -177.6 2 -178.8', flint: 'M-4 -175.6 Q1 -177.4 5.4 -175.8' };
   const HAR_LOCKAR = 'M-15.6 -163 q1.6 -2.6 3.2 0 M-14.2 -170.6 q1.6 -2.6 3.2 0 M-10 -177.6 q1.6 -2.6 3.2 0 M-3 -181.2 q1.6 -2.6 3.2 0 M4.4 -180 q1.6 -2.6 3.2 0 M-12.4 -155 q1.6 -2.6 3.2 0 M8.6 -173.8 q1.6 -2.6 3.2 0';
   const HAR_STRA = { lang: 'M-8.6 -156 Q-9.6 -149 -7.4 -142', hockey: 'M-9 -158 Q-10.4 -153 -9.6 -148.4', svans: 'M-12 -169 Q-17 -164 -17 -154' };
   const NACK_SOM = 'M-23.4 -165 H-12.4';
@@ -1883,6 +1888,9 @@ window.RumFasadGatan = (() => {
     flint: 'M-10 -157 Q-11.5 -167 -7.5 -171 Q-4 -168 -4.5 -162 Q-5 -158 -6.5 -155.5 Z',
     knut: 'M-10 -160 Q-12 -179.5 1 -179.5 Q11 -179 11 -170 Q6 -173 1 -170 Q-3 -166 -5 -160 Q-7 -157 -10 -155 Z M-17.5 -176 a6 5.6 0 1 0 12 0 a6 5.6 0 1 0 -12 0 Z',
     afro: 'M-12 -152 Q-21 -160 -18 -174 Q-14 -190 1 -191 Q15 -191 17 -177 Q18 -170 13.5 -167 Q7 -173 2 -170 Q-2 -165 -3 -158 Q-5 -151 -12 -152 Z',
+    // (bakåtkammat, och raggarnas flottfrilla med luggen i en våg framåt; som HAR i rum-fasad.js)
+    bakat: 'M-10 -160 Q-12.6 -178 -2.5 -180.6 Q7.6 -181.6 11.4 -174 Q8 -175.6 3.4 -174.8 Q-1.6 -173.6 -4.4 -167 Q-6.6 -160 -10 -155 Z',
+    flott: 'M-10 -160 Q-12.4 -178.5 -3.4 -183 Q5.6 -187.4 13.2 -183.6 Q15.8 -181 12.6 -178.2 Q11.2 -176 10.8 -172.6 Q6 -175 1.4 -172.4 Q-3 -167 -5 -160 Q-7 -157 -10 -155 Z',
   };
   const HARET_BAK = {
     lang: 'M-10 -160 Q-13 -150 -9 -139 L-3 -141 Q-6 -150 -5 -160 Z',
@@ -1890,18 +1898,18 @@ window.RumFasadGatan = (() => {
     svans: 'M-9 -173 Q-19 -172 -19.5 -158 Q-19 -149 -15 -146 Q-15.5 -156 -8.5 -165 Z',
   };
   const HARET_UNDER = {
-    kort: HARET.kort, gel: HARET.kort, knut: HARET.kort, flint: HARET.flint,
+    kort: HARET.kort, gel: HARET.kort, knut: HARET.kort, flint: HARET.flint, bakat: HARET.kort, flott: HARET.kort,
     page: 'M-11 -152 Q-13.5 -166 -10 -174.5 Q-4.5 -179.6 2.5 -179 Q10.5 -178.2 11.4 -169.5 Q7 -173 2 -170.5 Q-1 -166 0 -158 Q0 -153 -2 -151.5 Q-7 -150 -11 -152 Z',
     lockar: 'M-13 -150 Q-19 -160 -14.6 -170.5 Q-13 -178.6 -3 -179.4 Q9.6 -179.8 12.2 -172 Q13.4 -169 12 -167.5 Q7 -172 2 -169.5 Q-2 -165 -2 -158 Q-3 -151 -7 -147 Q-11 -146 -13 -150 Z',
     afro: 'M-12 -152 Q-21.5 -158.5 -20 -168 Q-18.6 -177 -9 -178.6 Q4 -180.4 11.4 -175.6 Q14.6 -172 13.5 -167 Q7 -173 2 -170 Q-2 -165 -3 -158 Q-5 -151 -12 -152 Z',
   };
-  const TOPP = { kort: -179.6, gel: -181.4, page: -181.4, lockar: -184, afro: -190.8, flint: -178.2, knut: -179.6, mossa: -188.5, keps: -180, kepa: -181.4 };
+  const TOPP = { kort: -179.6, gel: -181.4, page: -181.4, lockar: -184, afro: -190.8, flint: -178.2, knut: -179.6, bakat: -180.8, flott: -186.4, mossa: -188.5, keps: -180, kepa: -181.4 };
   // frisyrerna: håret framtill och det som hänger bakom
   const FRISYRER = {
     kort: ['kort'], gel: ['gel'], flint: ['flint'], perm: ['lockar'], page: ['page'], knut: ['knut'], afro: ['afro'],
-    hockey: ['kort', 'hockey'], lang: ['kort', 'lang'], svans: ['kort', 'svans'],
+    hockey: ['kort', 'hockey'], lang: ['kort', 'lang'], svans: ['kort', 'svans'], bakat: ['bakat'], flott: ['flott'],
   };
-  const FRISYR_MAN = [['kort', 34], ['hockey', 14], ['flint', 8], ['gel', 8], ['perm', 6], ['page', 3], ['lang', 3], ['svans', 2], ['afro', 1]];
+  const FRISYR_MAN = [['kort', 34], ['hockey', 14], ['flint', 8], ['gel', 8], ['perm', 6], ['page', 3], ['lang', 3], ['svans', 2], ['afro', 1], ['bakat', 4], ['flott', 1]];
   const FRISYR_ALDRE = [['kort', 10], ['flint', 12], ['perm', 2]];
   const FRISYR_KV = [['page', 24], ['perm', 22], ['lang', 18], ['svans', 13], ['knut', 8], ['kort', 10], ['afro', 2]];
   const FRISYR_BARN = [['kort', 4], ['page', 3], ['svans', 3], ['hockey', 1]];
@@ -1929,6 +1937,9 @@ window.RumFasadGatan = (() => {
   const SOLGLAS = 'M4.5 -169 H12.6 L12.2 -165.2 Q9 -163.4 5.2 -165.2 Z';
   const LUREN = ellS(-1.8, -164.5, 3.4, 3.9);
   const CIGG = 'M10.4 -158.4 L17.4 -157.6';
+  // (biltelefonens lur med spiralsladden ned mot instrumentbrädan, 2026-11-28)
+  const BILTEL = 'M-2.8 -165 L0.4 -168.4 L11.8 -157.4 L8.6 -154 Z';
+  const SLADD = (() => { let d = 'M9.6 -154.6'; for (let i = 1; i <= 14; i++) { const u = i / 14; d += ` L${r1(9.6 + 22 * u + (i % 2 ? 2.2 : -2.2))} ${r1(-154.6 + 30 * u + (i % 2 ? -1.6 : 1.6))}`; } return d; })();
   const GLODEN = ellS(17.9, -157.6, 0.95, 0.95);
   const GLORIA = ellS(17.9, -157.6, 3.4, 3.4);
   const SNODD = ellS(-13.4, -170.4, 2.2, 2.8);
@@ -1975,6 +1986,18 @@ window.RumFasadGatan = (() => {
   const KEPSAR = ['#1b1d22', '#24345a', '#a8262a', '#e7e3d8', '#2e4a3c', '#c9a227'];
   const SNODDAR = ['#d84a8a', '#2fa8a8', '#1b1d22', '#6a3a9a', '#e7e3d8', '#c9262a'];
   const SATEN = ['#45474c', '#3a4458', '#5a4636', '#1e1f22', '#8a7458', '#4a3a3a', '#55575c'];
+  // (de stora bilarna, där en och annan hade biltelefon)
+  const STORA = new Set(['w124', 'w201', 'w123', 's9000', 'v740', 'v745', 'v855', 'v854', 'voyager', 'jeep']);
+  // Rutorna utom den främsta (förarens), för den bil där den är nedvevad: null om bilen bara har en ruta eller den
+  // sista inte är den främsta.
+  function rutorBak(F) {
+    if (F.rutorBak !== undefined) return F.rutorBak;
+    const delar = F.rutor.split(/(?=M)/).map((d) => d.trim()).filter(Boolean);
+    const x0 = (d) => parseFloat(d.slice(1));
+    const sist = delar[delar.length - 1];
+    F.rutorBak = delar.length > 1 && delar.slice(0, -1).every((d) => x0(d) < x0(sist)) ? delar.slice(0, -1).join(' ') : null;
+    return F.rutorBak;
+  }
   // de gamla utan nackstöd, och instrumentens sken på kvällen
   const UTAN_NACKSTOD = new Set(['pv', 'amazon', 'bubbla', 'ank', 'mini', 's96', 'amis', 'v144', 'v145', 'lada', 'lada4']);
   const skenFor = (m) => (/^s\d/.test(m) ? '110,230,140' : ['golf', 'passat', 'a100', 't3', 't3buss', 'bubbla', 'e30', 'w124', 'w201', 'w123'].includes(m) ? '255,96,64' : '255,178,92');
@@ -2091,7 +2114,14 @@ window.RumFasadGatan = (() => {
     if (slag === 'bil' && !o.gammal && !p.cigg && R() < 0.05) {
       p.mobil = { H: MOBIL_H, E: led(AXEL, MOBIL_H, 28, 29, 1), f: V.t('#1c1d20') };
       p.hand = p.hy;
-    } else p.ratt = ratten(slag, belt);
+    } else {
+      p.ratt = ratten(slag, belt);
+      // (biltelefonen i de stora bilarna: luren vid örat och spiralsladden ner till instrumentbrädan)
+      if (slag === 'bil' && o.stor && !p.cigg && R() < 0.07) {
+        p.biltel = { H: MOBIL_H, E: led(AXEL, MOBIL_H, 28, 29, 1), f: V.t('#1c1d20'), s: V.t('#2a2b30') };
+        p.hand = p.hy;
+      }
+    }
     p.rattF = V.t('#2e2f33');
     if (slag !== 'buss') p.balte = V.t('#26272b');
     return p;
@@ -2109,7 +2139,7 @@ window.RumFasadGatan = (() => {
     const lyst = bussen && S.lamps;
     // (i bussens inneljus på kvällen: sina färger, lite varmare och mörkare)
     const t = lyst ? (c) => mix(mix(c, '#ffd9a0', 0.12), '#000000', 0.14) : S.ton;
-    const V = { t, mix, pick, buss: bussen, kallt: v.temp < 5, sol: !S.lamps && S.L.dag > 0.75 && !v.fall, rus: Boolean(S.T && S.T.rusning) };
+    const V = { t, mix, pick, buss: bussen, kallt: v.temp < 5, varmt: v.temp >= 16 && !v.fall, sol: !S.lamps && S.L.dag > 0.75 && !v.fall, rus: Boolean(S.T && S.T.rusning) };
     const I = { folk: [], dis: lyst ? 0.1 : S.lamps ? 0.24 : 0.08 + 0.16 * (1 - S.L.dag) };
     const F = b.F;
     if (bussen) bussFolk(I, R, V, b);
@@ -2140,11 +2170,38 @@ window.RumFasadGatan = (() => {
         }
       }
       const yb = -166 + F.belt - fy;
-      const d = satt(forare(R, V, { gammal, aldre: b.taxi ? 0.3 : gammal ? 0.4 : 0.2, kv: b.taxi ? R() < 0.1 : undefined }, F.hog ? 'hog' : 'bil', yb));
+      const d = satt(forare(R, V, { gammal, stor: STORA.has(m), aldre: b.taxi ? 0.3 : gammal ? 0.4 : 0.2, kv: b.taxi ? R() < 0.1 : undefined }, F.hog ? 'hog' : 'bil', yb));
       d.x = fx;
       d.y = fy;
+      d.sill = yb;
       d.sken = skenFor(m);
       I.folk.push(d);
+      // (2026-11-28) Hantverkaren i arbetsjacka och ofta keps i skåpbilen, och brevbäraren i Postens blå i den gula;
+      // raggaren med flottfrillan i amerikanaren, i jeansjacka med fårskinnskrage eller skinnjacka, med tärningarna i
+      // backspegeln (nedan). Ur ett eget frö, så att resten är som förut.
+      const R4 = froet(fro + 11);
+      const jacka = (c, plagg = null) => { d.jacka = t(c); d.jackaM = mix(d.jacka, '#000000', 0.3); d.som = mix(d.jacka, '#000000', 0.24); d.plagg = plagg; d.krage = null; d.slips = null; };
+      const keps = (c) => { d.hatt = 'keps'; d.hattF = t(c); d.hattM = mix(d.hattF, '#000000', 0.3); if (d.frisyr === 'gel' || d.frisyr === 'knut' || d.frisyr === 'flott') d.frisyr = 'kort'; };
+      if (m === 'skap' || m === 't3') {
+        if (b.lack === '#f0c419') { jacka('#1f3a7a'); if (R4() < 0.5) keps('#1d2a4a'); } else {
+          jacka(pick(R4, ['#1d2a4a', '#1a1a1e', '#2a3a5a', '#8a1e1e', '#3a4430', '#e9e7e0']));
+          if (R4() < 0.55) keps(pick(R4, ['#1b1d22', '#24345a', '#a8262a', '#e7e3d8', '#c9a227']));
+        }
+      }
+      if (m === 'amis' && !d.mobil && !d.biltel) {
+        if (d.frisyr !== 'lockar' && d.frisyr !== 'page' && R4() < 0.75) { d.frisyr = 'flott'; d.bak = null; d.hatt = null; d.har = t(pick(R4, ['#1b1d22', '#2a2018', '#5a3a22', '#d8c08a'])); d.brynF = mix(d.har, '#000000', 0.25); d.harLjus = mix(d.har, '#ffffff', 0.24); d.harM = mix(d.har, '#000000', 0.28); }
+        if (R4() < 0.6) { jacka(pick(R4, ['#4a6a9a', '#3a5478']), 'jeans'); d.fall = t('#e8dcc4'); d.som2 = mix(d.jacka, '#ffffff', 0.25); } else jacka('#1b1d22');
+        I.tarn = { x: fx + 26, y: F.tak[2] + 12, f: t(pick(R4, ['#f0ece4', '#c8262a', '#f0ece4'])), prick: t('#141414'), sp: t('#1a1b1e'), tr: t('#d8d4cc'), ph: R4() * 6 };
+      }
+      // Nedvevat en varm dag: armbågen i rutan (armUte; kortärmat när det är riktigt varmt), och inget glas framför
+      // föraren (rutorBak).
+      if (V.varmt && !F.hog && !F.oppen && rutorBak(F) && R4() < (m === 'amis' ? 0.8 : 0.35)) {
+        I.oppen = true;
+        if (!d.mobil && !d.biltel && R4() < 0.65) {
+          d.armUte = true;
+          d.kortArm = v.temp >= 18 && R4() < 0.75;
+        }
+      }
       // (i den öppna bilen tröjorna och håret som förut, b.klader och b.har)
       if (F.oppen) {
         const [q] = I.folk.filter((p) => p !== d && p.s === 1 && p.x < fx - 50);
@@ -2154,7 +2211,7 @@ window.RumFasadGatan = (() => {
         const [f, fm] = pick(R, HUNDAR);
         I.hund = { x: F.tak[0] + 46, y: F.belt - 17, s: 1.15, f: t(f), m: t(fm), n: t('#141210') };
       }
-      if (!F.hog && !F.oppen && R() < (b.taxi ? 0.5 : 0.25)) I.doft = { x: fx + 26, y: F.tak[2] + 12, f: t(pick(R, DOFTER)), sp: t('#1a1b1e'), tr: t('#d8d4cc') };
+      if (!F.hog && !F.oppen && R() < (b.taxi ? 0.5 : 0.25) && !I.tarn) I.doft = { x: fx + 26, y: F.tak[2] + 12, f: t(pick(R, DOFTER)), sp: t('#1a1b1e'), tr: t('#d8d4cc') };
       d.sateM = mix(d.sate, '#000000', 0.25);
       // (föraren pratar med den bak, eller nickar i takten till radion; barnet vinkar; hunden flämtar)
       const R3 = froet(fro + 7);
@@ -2214,6 +2271,7 @@ window.RumFasadGatan = (() => {
         const u = (p.fas * 7.31) % 1;
         if (u < 0.2 && p.s === 1) { p.liv = 'tidning'; p.papper = t('#e8e4da'); p.tryck = t('#4a4a4a'); p.tryck2 = t('#c8262a'); }
         else if (u < 0.45) { p.liv = 'prat'; p.tur = Math.floor(p.fas) % 2; p.fasP = p.fas; }
+        else if (u < 0.53 && p.s === 1) p.liv = 'sover';
       }
       I.saten.push(...saten);
     });
@@ -2245,6 +2303,13 @@ window.RumFasadGatan = (() => {
         L.vrid += 0.025 * Math.sin(t * 2.7 + p.fas);
       } else if (Math.sin(t * 1.9 + p.fas) > 0.9) L.vrid += 0.05;
     } else if (p.liv === 'vinkar') L.vink = Math.sin(t * 8 + p.fas);
+    else if (p.liv === 'sover') {
+      // (huvudet sjunker sakta mot bröstet och rycker upp igen, ögonen stängda)
+      const u = (((t + p.fas) % 8) + 8) % 8 / 8;
+      const ss = (x) => { const q = Math.min(1, Math.max(0, x)); return q * q * (3 - 2 * q); };
+      L.vrid += u < 0.92 ? 0.05 + 0.32 * ss(u / 0.92) : 0.37 - 0.32 * ss((u - 0.92) / 0.05);
+      L.blund = true;
+    }
     else if (p.liv === 'tidning') L.vrid += 0.08;
     return L;
   }
@@ -2513,7 +2578,15 @@ window.RumFasadGatan = (() => {
       c.beginPath();
       c.ellipse(m[0], m[1], 4.2, r, a, 0, TAU);
       c.stroke();
-      armTill(c, p, E, L.hand ? [H[0], H[1] + L.hand] : H);
+      if (!p.biltel && !p.armUte) armTill(c, p, E, L.hand ? [H[0], H[1] + L.hand] : H);
+    }
+    if (p.biltel) {
+      c.strokeStyle = p.biltel.s;
+      c.lineWidth = 0.9;
+      c.stroke(vag(SLADD));
+      c.fillStyle = p.biltel.f;
+      c.fill(vag(BILTEL));
+      armTill(c, p, p.biltel.E, p.biltel.H);
     } else if (p.mobil) {
       c.fillStyle = p.mobil.f;
       c.fill(vag(MOBIL));
@@ -2523,6 +2596,59 @@ window.RumFasadGatan = (() => {
       armTill(c, p, p.mobil.E, p.mobil.H);
     }
     if (L.vink) vinka(c, p, L.vink);
+    c.restore();
+  }
+  // Armbågen i den nedvevade rutan: överarmen ut över dörrens överkant och underarmen framåt längs den, kortärmat när
+  // det är riktigt varmt. Ritas efter glaset (ritaBil), i förarens mått (p.sill: rutans underkant).
+  function armUte(c, p) {
+    c.save();
+    if (NIG) {
+      c.translate(p.x, p.y + 70);
+      c.rotate(NIG * 1.4);
+      c.translate(0, -70);
+    } else c.translate(p.x, p.y);
+    c.scale(p.s, p.s);
+    c.translate(-1, 166);
+    const y = p.sill;
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    c.lineWidth = 9;
+    c.strokeStyle = p.kortArm ? p.hy : p.jacka;
+    c.beginPath();
+    c.moveTo(12, y + 2.5);
+    c.lineTo(32, y - 0.5);
+    c.stroke();
+    c.strokeStyle = p.jacka;
+    c.beginPath();
+    c.moveTo(AXEL[0], AXEL[1]);
+    c.lineTo(p.kortArm ? 9 : 12, y + (p.kortArm ? 1.8 : 2.5));
+    c.stroke();
+    c.fillStyle = p.kortArm ? p.hy : p.hand;
+    c.beginPath();
+    c.ellipse(35.5, y - 1, 4.8, 3.4, -0.1, 0, TAU);
+    c.fill();
+    c.restore();
+  }
+  // de luddiga tärningarna i amerikanarens backspegel, som svänger när den bromsar och gungar lite med vägen
+  function tarningar(c, d, t) {
+    c.save();
+    c.translate(d.x, d.y);
+    c.fillStyle = d.sp;
+    c.fillRect(-4.5, -2, 9, 4.5);
+    c.rotate(-NIG * 6 + 0.07 * Math.sin(t * 2.3 + d.ph));
+    c.strokeStyle = d.tr;
+    c.lineWidth = 0.5;
+    c.beginPath();
+    c.moveTo(-1, 2.5);
+    c.lineTo(-2.4, 7.4);
+    c.moveTo(1, 2.5);
+    c.lineTo(2.6, 9);
+    c.stroke();
+    c.fillStyle = d.f;
+    c.fillRect(-5, 7.4, 4.6, 4.6);
+    c.fillRect(0.4, 9, 4.6, 4.6);
+    c.fillStyle = d.prick;
+    for (const [x, y] of [[-3.8, 8.6], [-1.6, 10.8], [1.6, 10.2], [3.8, 12.4], [2.7, 11.3]]) c.fillRect(x - 0.45, y - 0.45, 0.9, 0.9);
     c.restore();
   }
   // den närmre armen från axeln via armbågen E till handen H
@@ -2656,23 +2782,27 @@ window.RumFasadGatan = (() => {
     if (genom) c.fill(vag(F.hus + ' ' + F.rutor), 'evenodd');
     else c.fill(vag(F.hus));
     const R = vag(F.rutor);
+    const I = F.oppen ? null : inne(S, b);
+    // (i den nedvevade rutan, I.oppen, finns inget glas: varken toning, dis eller himmel)
+    const glas = I && I.oppen ? vag(rutorBak(F)) : R;
     c.fillStyle = S.glas;
     if (genom) c.globalAlpha = S.lamps ? 0.32 : 0.36;
-    c.fill(R);
+    c.fill(glas);
     c.globalAlpha = 1;
     c.save();
     c.clip(R);
-    if (!F.oppen) {
-      const I = inne(S, b);
+    if (I) {
       const fin = finare(c);
       for (const p of I.folk) manniska(c, p, fin, t);
       if (I.hund) hunden(c, I.hund, t);
       if (I.doft && fin) doften(c, I.doft);
+      if (I.tarn && fin) tarningar(c, I.tarn, t);
       c.globalAlpha = I.dis;
       c.fillStyle = S.glas;
-      c.fill(R);
+      c.fill(glas);
       c.globalAlpha = 1;
       lysen(c, I, S);
+      if (I.oppen) c.clip(glas);
     }
     if (!S.lamps) {
       c.globalAlpha = 0.18 + 0.22 * S.L.dag;
@@ -2696,6 +2826,7 @@ window.RumFasadGatan = (() => {
     }
     c.restore();
     c.globalAlpha = 1;
+    if (I && I.oppen) for (const p of I.folk) if (p.armUte) armUte(c, p);
     // kromlisterna kring rutorna, fogar och handtag
     if (F.krom) {
       c.lineWidth = 2.4;
