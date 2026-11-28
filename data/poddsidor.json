@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-28T09:46:44.752Z",
+ "uppdaterad": "2026-11-28T09:58:31.666Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -3940,10 +3940,10 @@
     "Oxford United"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T08:00:04.169Z",
-   "rubrik": "Oxford har räknat ut vad en mittback är värd",
+   "skriven": "2026-11-28T09:47:27.443Z",
+   "rubrik": "Oxford har räknat ut vad Helik är värd",
    "ingress": null,
-   "summering": "Luton vill ha Gore på mittfältet mot Brannagan och en fientlig läktare i ryggen. Oxford väntar på besked om Helik, för utan honom har backlinjen vacklat.",
+   "summering": "Luton har fått tillbaka Mengi och tron på att kunna vinna fult. Oxford håller tummarna för att mittbacken Helik hinner bli spelklar, och ser sig ändå som ligans bästa lag.",
    "delar": [
     {
      "lag": "Luton Town",
@@ -3953,6 +3953,13 @@
        "avsnitt": "Luton Town vs Oxford United: The Preview Show!",
        "datum": "2026-11-26",
        "adress": "https://podcasts.apple.com/gb/podcast/30-points-who-gives-a-pod/id1700311219?uo=4",
+       "typ": "podd"
+      },
+      {
+       "podd": "Oh When The Town",
+       "avsnitt": "Buton Albion Match reaction",
+       "datum": "2026-11-23",
+       "adress": "https://soundcloud.com/ohwhenthetown/buton-albion-match-reaction",
        "typ": "podd"
       },
       {
@@ -4035,6 +4042,22 @@
        ]
       },
       {
+       "amne": "klubb",
+       "punkter": [
+        {
+         "t": "Mengi har länge känts helt utanför laget, men mot Burton var han enligt värdarna matchens bäste. Om han säljs i januari får det vara så, men ingen vill hellre än Luton-fansen att han trivs och blir lagets främste försvarare.",
+         "s": "o",
+         "podd": [
+          "Oh When The Town"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        }
+       ]
+      },
+      {
        "amne": "match",
        "punkter": [
         {
@@ -4058,25 +4081,14 @@
           "2026-11-26"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Värdarna tror att Oxford, med en match mindre spelad och två poäng mer, nöjer sig med oavgjort. Därför måste Luton gå på dem direkt och vinna mittfältet de första tio minuterna, inte ge bort en tjugo minuter lång start som mot Burton.",
-         "s": "o",
-         "podd": [
-          "30 Points! Who Gives A Pod"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "I podden 30 Points! Who Gives A Pod vill man ha Daniel Gore framför backlinjen, skadad Walsh eller inte, för att stänga av Cameron Brannagan, ”hjärtat i deras lag”. Liam Walsh knuffas gång på gång bort från bollen när han spelar djupt, medan Gore har ”betydligt mer bett”.",
-      "Längre bak har Teden Mengi tagit befälet, fast värdarna inte trodde att han skulle spela för Luton igen. Han spelar som om han kunde dominera i Crocs.",
-      "Efter en höst av kritik mot spelarna är det nu läktarens tur att göra Kenilworth Road fientligt. Det blir också första hemmamatchen sedan Nicky Toons bortgång, och hyllningen väntas bli känslosam."
+      "Teden Mengi, som länge kändes helt utanför laget, har tagit kommandot i Lutons backlinje. I podden 30 Points säger man att han ser ut att kunna ”ha Crocs på fötterna och ändå dominera försvaret”.",
+      "På mittfältet vill supportrarna ha Daniel Gore framför Liam Walsh, som knuffas bort från bollen när han spelar djupt och sågs med armen i mitella efter Burton. Det är Oxfords hjärta Cameron Brannagan de fruktar.",
+      "Störst skillnad mot säsongsstarten är att laget kan förlora mittfältet i en halvtimme och ändå vinna fult, och tron på Jack Wilshere har vuxit."
      ],
      "citat": {
       "sagt": "Det känns verkligen som att tron är tillbaka i laget, att vi faktiskt är bättre än tre fjärdedelar av den här ligan.",
@@ -4086,14 +4098,13 @@
       "datum": "2026-11-23"
      },
      "namn": [
+      "Teden Mengi",
       "Daniel Gore",
-      "Walsh",
-      "Cameron Brannagan",
       "Liam Walsh",
-      "Gore",
-      "Teden Mengi"
+      "Cameron Brannagan",
+      "Jack Wilshere"
      ],
-     "paSpel": "Första hemmamatchen sedan Nicky Toons bortgång, och läktarens tur att leverera."
+     "paSpel": "Wilshere mot Ramsey, och första hemmamatchen sedan Nicky Toons bortgång."
     },
     {
      "lag": "Oxford United",
@@ -4231,9 +4242,8 @@
       }
      ],
      "text": [
-      "På Yellows Forum har man räknat ut att försvaret rasar utan Michal Helik: i snitt nästan tre insläppta mål per match när han saknas. Även Ciaron Brown ser mycket sämre ut utan honom bredvid sig. Supportrarna tror inte heller att Sam Long klarar Nahki Wells, Jamie Donley och Kasey Palmer.",
-      "Lokaltidningen skriver att Helik har varit med på åtminstone en del av träningen, så hoppet lever.",
-      "Självförtroendet saknas inte. Tabellen ljuger så här tidigt, menar man, för Oxford är ”helt uppenbart ligans bästa lag”."
+      "På Yellows Forum har man räknat ut att Oxford har släppt in fler mål på de tre matcher Michal Helik har missat än på resten av säsongen. Även Ciaron Brown ser sämre ut utan honom, och tanken på Sam Long mot Nahki Wells, Jamie Donley och Kasey Palmer skrämmer. Lokaltidningen uppger att Helik åtminstone delvis har tränat.",
+      "Annars retar man sig på Lutons supporterpodd, som målar upp ett felfritt lag, och på Jack Wilshere, som anses ha startat ett massbråk efter Barnsleymatchen. Själva är de övertygade om att Oxford är ”helt uppenbart ligans bästa lag”."
      ],
      "citat": {
       "sagt": "Jag hoppas att Helik är spelklar och att vi bjuder på en mästarklass i försvarsspel, för det kommer vi att behöva.",
@@ -4249,9 +4259,10 @@
       "Nahki Wells",
       "Jamie Donley",
       "Kasey Palmer",
-      "Helik"
+      "Helik",
+      "Jack Wilshere"
      ],
-     "paSpel": "Starten på en avgörande vecka som ska visa League One vad laget vill."
+     "paSpel": "Starten på en avgörande vecka, med tisdagens match som andra halva."
     }
    ]
   },
@@ -4264,10 +4275,10 @@
     "Reading"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T08:00:35.942Z",
-   "rubrik": "Kaptenen som ingen i Reading vågar peta",
+   "skriven": "2026-11-28T09:58:31.666Z",
+   "rubrik": "Reading vågar inte peta kaptenen som bromsar spelet",
    "ingress": null,
-   "summering": "Wednesday litar på Challinors klarspråk och veteranerna, men spelet har ännu inte övertygat. I Reading pyr frågan om Wing och om Richardsons framtid, medan chanserna fortfarande inte blir mål.",
+   "summering": "Wednesday bärs av sina veteraner men orkar ännu inte spela Challinors fotboll fullt ut. I Reading kretsar allt kring en kapten som ingen vågar röra och chanser som ingen sätter.",
    "delar": [
     {
      "lag": "Sheffield Wednesday",
@@ -4277,6 +4288,13 @@
        "avsnitt": "Hello From the Other Side 26/27- Reading (h)",
        "datum": "2026-11-26",
        "adress": "https://shows.acast.com/64abd7bfd593820011a68d78/episodes/hello-from-the-other-side-2627-reading-h",
+       "typ": "podd"
+      },
+      {
+       "podd": "The Wednesday Week",
+       "avsnitt": "Yorkshire Pride",
+       "datum": "2026-11-23",
+       "adress": "https://shows.acast.com/64abd7bfd593820011a68d78/episodes/yorkshire-pride",
        "typ": "podd"
       },
       {
@@ -4306,6 +4324,28 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Yan Valery räknas som en av lagets bästa men har underpresterat i två månader, och Barnsleys mål kom från hans kant. Värdarna anar att han inte har huvudet med sig sedan snacket om en flytt i somras.",
+         "s": "o",
+         "podd": [
+          "The Wednesday Week"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Barnsley vann bollinnehavet med 61 procent och nästan all statistik utom målen. Chaloner sade efteråt att Barnsley var yngre och piggare, och värdarna tror att Wednesday ännu inte har kondition nog för hans fotboll.",
+         "s": "o",
+         "podd": [
+          "The Wednesday Week"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Readinggästen säger att han fruktar Jamal Lowe. Wednesday-värden beskriver honom mindre smickrande: han är långsam, men ibland kommer det plötsligt en glimt av klass.",
          "s": "o",
          "podd": [
@@ -4317,13 +4357,13 @@
          "typ": "podd"
         },
         {
-         "t": "Det är veteranerna som bär Wednesday just nu, särskilt Barry Bannan på mittfältet och Liam Cooper i backlinjen, som har klivit fram i den nye tränarens första matcher.",
+         "t": "Jamal Lowe som vänster wingback beskrivs som en uppenbarelse efter två starka matcher, trots farhågor om en katastrof. Ash invänder att Lowe i praktiken inte har spelat som wingback.",
          "s": "o",
          "podd": [
           "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
          "typ": "podd"
         }
@@ -4333,24 +4373,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Wednesday-värden ser Reading som en spegelbild av den egna klubben: thailändskt ägande, ras ner i League One och en ny ägare. Han tror att Reading ligger ett eller två år före Wednesday på samma väg.",
+         "t": "Charlie tror att laget ligger högt tack vare en överraskande bra start i en ovanligt jämn och svag liga. Om några konkurrenter drar ifrån har Wednesday inte tuffheten för en riktig uppflyttningsstrid.",
          "s": "o",
          "podd": [
           "The Wednesday Week"
          ],
          "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Enligt Wednesday-supportrar som Stevenage-gästen Luca har pratat med har ingen gått i taket över de två segrarna under den nye tränaren Dave Challoner, eftersom spelet inte har imponerat.",
-         "s": "h",
-         "podd": [
-          "The Wednesday Week"
-         ],
-         "datum": [
-          "2026-11-22"
+          "2026-11-23"
          ],
          "typ": "podd"
         }
@@ -4391,25 +4420,14 @@
           "2026-11-26"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Readings supportrar kallar själva sitt lag för ”flat-track bullies”: det slår de svaga lagen men har inte besegrat ett enda av topplagen i ligan den här säsongen.",
-         "s": "o",
-         "podd": [
-          "The Wednesday Week"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "På Owlstalk har man redan fattat tycke för Dave Challinor, en tränare som pratar klarspråk och sunt förnuft. Ändå har ingen gått i taket över de två segrarna under honom, eftersom spelet inte har imponerat.",
-      "Det är veteranerna som bär laget. Barry Bannan på mittfältet och Liam Cooper i backlinjen har klivit fram i den nye tränarens första matcher.",
-      "I podden säger värden att Jamal Lowe springer ”som om han sprang i sirap”. Men han har satt en del straffar, och då och då kommer en glimt av klass."
+      "Jamal Lowe ”springer som om han sprang i sirap”, men i The Wednesday Week kallas han ändå en uppenbarelse som vänstervingback efter två starka matcher. Alla i podden håller inte med om att han ens har spelat som vingback.",
+      "Yan Valery är det större bekymret. En av lagets bästa har underpresterat i två månader, och värdarna anar att han inte har haft huvudet med sig sedan flyttsnacket i somras. Somliga vill ge Sean Fusire hans plats.",
+      "Under Dave Challinor bärs laget av Barry Bannan och Liam Cooper, men podden tror inte att truppen ännu har kondition nog för hans fotboll."
      ],
      "citat": {
       "sagt": "Det är så skönt att faktiskt förstå vad som sägs. Spelarna måste tycka likadant.",
@@ -4419,12 +4437,14 @@
       "datum": "2026-11-27"
      },
      "namn": [
+      "Jamal Lowe",
+      "Yan Valery",
+      "Sean Fusire",
       "Dave Challinor",
       "Barry Bannan",
-      "Liam Cooper",
-      "Jamal Lowe"
+      "Liam Cooper"
      ],
-     "paSpel": "Chansen för Challinor att få segrarna att också se bra ut."
+     "paSpel": "Ännu ett kapitel i grälet om huruvida kvalplats är ett krav eller en dröm."
     },
     {
      "lag": "Reading",
@@ -4543,12 +4563,12 @@
       }
      ],
      "text": [
-      "I The Tilehurst End vill man se kaptenen Lewis Wing petad, eftersom han troligen gav fel tecken vid en hörna mot Bromley och koncentrationen anses svika honom. Ändå tror en av värdarna att han startar, för Liam Richardson vet att det ”tänder en ny stubin” den dag han petar honom.",
-      "Richardson har aldrig riktigt fått supportrarna med sig, och flera spelare anses ha gått bakåt under honom. Hamnar laget under tolfteplatsen i mer än ett par veckor tror värden att han får gå.",
-      "Han får beröm för anfallsspelet, men chanserna blir inte mål. Jack Marriott räknas som den ende som kan avsluta."
+      "I The Tilehurst End vill man se kaptenen Lewis Wing på bänken. Koncentrationen sviker, och mot Bromley gav han troligen fel tecken vid en hörna. I Wednesdays podd påpekade Readingsupportern Ben att anfallsspelet gick betydligt snabbare i cupen mot Peterborough, när Wing vilade.",
+      "Ändå tror en av värdarna att Liam Richardson inte vågar, eftersom petningen ”tänder en ny stubin” och kan kosta honom jobbet. Tränaren har aldrig vunnit läktaren.",
+      "Han får beröm för att laget nu skapar chanser för över två förväntade mål per match, men bara Jack Marriott anses kunna avsluta."
      ],
      "citat": {
-      "sagt": "Det här är ingen trupp som går upp. Inte om de inte lägger rejält med pengar i januari och gör sig av med dödvikten.",
+      "sagt": "Så fort det blir minsta störning i laget faller de ihop. De faller fullständigt ihop.",
       "vem": null,
       "podd": "The Tilehurst End - A Reading FC Podcast",
       "typ": "podd",
@@ -4559,7 +4579,7 @@
       "Liam Richardson",
       "Jack Marriott"
      ],
-     "paSpel": "Richardsons jobb, i en bortamatch där supportrarna vore överlyckliga över en poäng."
+     "paSpel": "Tränarens jobb, och en bortamatch där supportrarna vore överlyckliga med en poäng."
     }
    ]
   },
