@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-28T08:01:06.429Z",
+ "uppdaterad": "2026-11-28T08:13:23.030Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -103,10 +103,10 @@
     "Aston Villa"
    ],
    "avspark": "2026-11-28T17:30:00.000Z",
-   "skriven": "2026-11-28T07:54:21.175Z",
-   "rubrik": "Ipswich tvivlar på O'Neil, Villa fruktar honom",
+   "skriven": "2026-11-28T08:13:23.030Z",
+   "rubrik": "Villa fruktar Gary O'Neil, Ipswich fruktar sig självt",
    "ingress": null,
-   "summering": "Ipswich har ett försvar som släpper igenom löpare och en läktare vars tålamod tryter. Villa har en tränare som letar efter sin elva och supportrar som oroar sig för att tappa poäng mot ännu ett bottenlag.",
+   "summering": "Hemma vacklar förtroendet för O'Neil medan samma försvarsmisstag kommer tillbaka. Borta ser man varje tappad poäng mot bottenlagen som ett tecken på att Emerys Villa har stannat av.",
    "delar": [
     {
      "lag": "Ipswich Town",
@@ -283,25 +283,32 @@
       }
      ],
      "text": [
-      "På forumet TWTD sägs Gary O'Neils förtroende vara nästan förbrukat, och inför tv-kamerorna vid tetid uppmanas supportrarna att stötta laget i stället för att bua åt varje felpass.",
-      "I podden Blue Monday svider Tottenhams andra mål mest. En motspelare fick löpa genom hela planen utan att någon gick in i en tackling, precis som mot Hull några veckor tidigare. ”Vi lärde oss ingenting.”",
-      "Eftersom laget inte har hållit nollan på så länge skulle en av värdarna helst se 0–0. Den andre vill hellre se kamp som ger självförtroende inför Coventry borta."
+      "Förtroendet för Gary O'Neil är nära förbrukat, skriver man på TWTD:s forum, och supportrarna uppmanas att stötta laget i stället för att bua åt varje felpass.",
+      "I podden Blue Monday oroar man sig mer för hur laget föll mot Tottenham än för själva förlusten. Sedan Fulhammatchen har säsongen börjat glida iväg, och värdarna känner igen tecken från nedflyttningsåret för två år sedan.",
+      "Mest svider ett fel som upprepas: ingen går ut och möter spelare som driver mot straffområdet, och Tottenhams andra mål var en kopia av ett mål från Hullmatchen. ”Vi lärde oss ingenting.”"
      ],
      "citat": {
-      "sagt": "Sedan Fulhammatchen känns det som att det börjar glida iväg lite, och en del av kännetecknen från för två år sedan börjar synas igen.",
-      "vem": null,
-      "podd": "Blue Monday: An Ipswich Town Podcast",
-      "typ": "podd",
-      "datum": "2026-11-26"
+      "sagt": "Och vad har hänt med vår press? Den var lysande i början av säsongen, men nu verkar den bara ha försvunnit.",
+      "vem": "itfcptc",
+      "podd": "NOT606",
+      "typ": "forum",
+      "datum": "2026-11-22"
      },
      "namn": [
       "Gary O'Neil"
      ],
-     "paSpel": "Läktarens tålamod med O'Neil, och fart inför Coventry borta."
+     "paSpel": "Förtroendet för O'Neil, och lite självförtroende inför bortamatchen mot Coventry."
     },
     {
      "lag": "Aston Villa",
      "kallor": [
+      {
+       "podd": "My Old Man Said — An Aston Villa Podcast",
+       "avsnitt": "Istanbul Issues: What Went Wrong in Aston Villa's Loss to Galatasaray",
+       "datum": "2026-11-28",
+       "adress": "https://shows.acast.com/myoldmansaid/episodes/istanbul-issues-what-went-wrong-in-aston-villas-loss-to-gala",
+       "typ": "podd"
+      },
       {
        "podd": "The Villa Filler Podcast",
        "avsnitt": "What is WRONG with Villa?! Galatasaray 1-0 Aston Villa REACTION - The Villa Filler Podcast",
@@ -314,13 +321,6 @@
        "avsnitt": "Aston Villa 0-0 Sunderland: Ponderous and Devoid of Ideas - the Midfield Problem Emery Hasn't Solved",
        "datum": "2026-11-22",
        "adress": "https://shows.acast.com/myoldmansaid/episodes/aston-villa-0-0-sunderland-ponderous-and-devoid-of-ideas-the",
-       "typ": "podd"
-      },
-      {
-       "podd": "The Villa Filler Podcast",
-       "avsnitt": "BORING SCORELESS DRAW - Aston Villa 0-0 Sunderland REACTION - The Villa Filler Podcast",
-       "datum": "2026-11-21",
-       "adress": "https://podcasters.spotify.com/pod/show/thevillafiller/episodes/BORING-SCORELESS-DRAW---Aston-Villa-0-0-Sunderland-REACTION---The-Villa-Filler-Podcast-e3spu9b",
        "typ": "podd"
       },
       {
@@ -378,6 +378,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "När Villa tappar kontrollen går det fel på samma sätt som sedan Emerys första säsong: de två sexorna blir överkörda, ytterbackarna blir isolerade och anfallaren blir ensam. Värdarna tycker att Emery är för principfast och naiv.",
+         "s": "o",
+         "podd": [
+          "My Old Man Said — An Aston Villa Podcast"
+         ],
+         "datum": [
+          "2026-11-28"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna ser de två defensiva mittfältarna som lagets stora svaghet just nu. Enligt dem är det de två sexorna som avgör om laget blir riktigt starkt eller skört, och just nu är det skört.",
          "s": "o",
          "podd": [
@@ -400,28 +411,6 @@
          "typ": "podd"
         },
         {
-         "t": "Villa har inte vunnit någon av sina tio senaste ligamatcher där det stått lika i halvtid; senast var mot Brighton i februari. Värdarna menar att bilden av ett Villa som tar över i andra halvlek inte längre stämmer.",
-         "s": "h",
-         "podd": [
-          "The Villa Filler Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna tror att Emery för första gången inte vet vilket hans bästa lag är. Bara målvakt, anfallare och ytterbackar är givna, och resten av elvan lägger han fortfarande pussel med.",
-         "s": "o",
-         "podd": [
-          "The Villa Filler Podcast"
-         ],
-         "datum": [
-          "2026-11-21"
-         ],
-         "typ": "podd"
-        },
-        {
          "t": "Kaoset i andra halvlek mot Manchester United gjorde laget rädt. Nu spelar det på säkerhet och vågar inte gå på motståndarna, av rädsla för misstag och kontringar. Ändå fortsätter misstagen att kosta poäng.",
          "s": "o",
          "podd": [
@@ -431,6 +420,28 @@
           "2026-11-25"
          ],
          "typ": "forum"
+        },
+        {
+         "t": "Värdarna tycker att laget är för snällt och saknar stridsvilja. Gomes är opålitlig och Kamara har tappat sin skärpa. Utan mer kämpaglöd tror de inte att Villa tar sig igenom tuffa matcher.",
+         "s": "o",
+         "podd": [
+          "My Old Man Said — An Aston Villa Podcast"
+         ],
+         "datum": [
+          "2026-11-28"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Manzambi, som såg ut som en stor förstärkning tidigare i höst, har blivit en annan spelare. Han har ännu inte spelat 90 minuter, byts ut efter en timme och tappar bollen. Värdarna undrar om han har en skada.",
+         "s": "h",
+         "podd": [
+          "My Old Man Said — An Aston Villa Podcast"
+         ],
+         "datum": [
+          "2026-11-28"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -438,13 +449,13 @@
        "amne": "klubb",
        "punkter": [
         {
-         "t": "Värdarna ser inte längre de tappade poängen som undantag. De börjar tro att det helt enkelt är så Villa är den här säsongen, och att Champions League kan vara ett steg för långt.",
-         "s": "o",
+         "t": "Garnacho var inte ens med på bänken, och Emery tog hellre med två målvakter och lämnade en plats tom. Värdarna är säkra på att något har hänt bakom kulisserna.",
+         "s": "h",
          "podd": [
-          "The Villa Filler Podcast"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-21"
+          "2026-11-28"
          ],
          "typ": "podd"
         }
@@ -454,24 +465,13 @@
        "amne": "match",
        "punkter": [
         {
-         "t": "Matcherna mot Bournemouth, Sunderland, Ipswich, Everton och Palace sågs som chansen att vända. Efter dem väntar PSG, Chelsea, Liverpool och Dortmund, så värdarna menar att allt annat än seger i Ipswich är oacceptabelt.",
+         "t": "Villa har inte slagit Forest, Sunderland eller Manchester United, tre av de fem sämsta lagen. Slår de inte heller Ipswich eller Palace ser värdarna det som en röd flagga, och då tror de inte på en plats bland de fyra eller fem bästa.",
          "s": "o",
          "podd": [
-          "The Villa Filler Podcast"
+          "My Old Man Said — An Aston Villa Podcast"
          ],
          "datum": [
-          "2026-11-25"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Trots kravet på seger är en av värdarna mörkrädd inför matchen. Han säger att självförtroendet är på botten och att han inte ser hur laget ska kunna vinna i Ipswich.",
-         "s": "o",
-         "podd": [
-          "The Villa Filler Podcast"
-         ],
-         "datum": [
-          "2026-11-25"
+          "2026-11-28"
          ],
          "typ": "podd"
         }
@@ -479,23 +479,24 @@
       }
      ],
      "text": [
-      "På Vital Villa-forumet fruktar man att Unai Emery än en gång ska bli utcoachad av en tränare han borde slå, den här gången Gary O'Neil.",
-      "I The Villa Filler tror man att Emery för första gången inte vet vilken som är hans bästa elva, och att rotationen gör att laget börjar om från noll i varje match. Den ende som har visat vilja är John McGinn, som väckte liv i laget när han byttes in mot Sunderland.",
-      "Värdarna kräver seger, men en av dem medger: ”Jag kan inte se oss vinna den matchen.”"
+      "Slår Villa inte Ipswich är det en röd flagga, menar man i podden My Old Man Said, när laget redan har tappat poäng mot Forest, Sunderland och Manchester United.",
+      "På forumet Vital Villa är rädslan mer konkret: att Unai Emery ska bli utcoachad av Gary O'Neil.",
+      "Sedan finns frågan om Garnacho, som inte ens fick plats på bänken när Emery hellre tog med två målvakter och lämnade en plats tom. Värdarna är säkra på att något har hänt bakom kulisserna, och enligt en tidningsartikel anser klubben att han gör för lite på träningarna."
      ],
      "citat": {
-      "sagt": "Det värsta är att inse att det kanske helt enkelt är sådant här Villa är i år.",
+      "sagt": "När vi tappar kontrollen över en match går det fel på precis samma sätt som det har gjort ända sedan han kom.",
       "vem": null,
-      "podd": "The Villa Filler Podcast",
+      "podd": "My Old Man Said — An Aston Villa Podcast",
       "typ": "podd",
-      "datum": "2026-11-21"
+      "datum": "2026-11-28"
      },
      "namn": [
       "Unai Emery",
       "Gary O'Neil",
-      "John McGinn"
+      "Garnacho",
+      "Emery"
      ],
-     "paSpel": "Sista chansen att vända innan PSG, Chelsea, Liverpool och Dortmund väntar."
+     "paSpel": "Allt annat än seger är oacceptabelt innan PSG, Chelsea, Liverpool och Dortmund väntar."
     }
    ]
   },
