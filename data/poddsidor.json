@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-28T08:44:31.687Z",
+ "uppdaterad": "2026-11-28T08:54:07.213Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2054,14 +2054,21 @@
     "Burnley"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T07:57:08.816Z",
-   "rubrik": "Burnley tar med sig rädslan för att vinna",
+   "skriven": "2026-11-28T08:54:07.213Z",
+   "rubrik": "Två lag som har slutat tro på varandra",
    "ingress": null,
-   "summering": "Millwall spelar inför en läktare som antingen sviker eller trotsar FA, och podden kallar matchen avgörande för Alex Neil. Burnley kommer med en segerlös tränare, ett splittrat omklädningsrum och en målvakt som bär allt.",
+   "summering": "Hos Millwall ses matchen som allt eller inget för Alex Neil, som öppet tvivlar på sin trupp. Burnley kommer med en tränare som själv talar om spelarnas rädsla för att vinna.",
    "delar": [
     {
      "lag": "Millwall",
      "kallor": [
+      {
+       "podd": "Achtung! Millwall Podcast",
+       "avsnitt": "STOKE CITY 2-1 MILLWALL | ACHTUNG! MILLWALL 906 - VOICEMAIL EDITION",
+       "datum": "2026-11-27",
+       "adress": "https://podcasts.apple.com/gb/podcast/achtung-millwall-podcast/id1469782502?uo=4",
+       "typ": "podd"
+      },
       {
        "podd": "The 1885 Show - A Millwall Podcast",
        "avsnitt": "FOUR DEFEATS IN A ROW… WHAT IS HAPPENING TO MILLWALL?! 😡 | STOKE 2-1 MILLWALL | THE COOL DOWN",
@@ -2100,43 +2107,27 @@
      ],
      "grupper": [
       {
-       "amne": "elva",
-       "punkter": [
-        {
-         "t": "Båda värdarna vill se Daniel Kelly på mittfältet efter inhoppet mot Stoke, där han verkade trygg och hade lite skinn på näsan. Den ena är säker på att varken Metcalfe eller Mazou-Sacko borde starta.",
-         "s": "o",
-         "podd": [
-          "The 1885 Show - A Millwall Podcast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        }
-       ]
-      },
-      {
        "amne": "spel",
        "punkter": [
         {
-         "t": "Frankie förstod inte vad Alex Neil ville i första halvlek mot Stoke. Han kunde inte se någon formation, och Osei-Tutu fick följa en Stokespelare över hela planen fast denne inte gjort ett enda mål eller en assist i ligan.",
+         "t": "Lagkaptenen Jake Cooper är för långsam och blev passerad vid båda Stoke-målen. Han har mycket tillgodo hos supportrarna, men ju längre han spelar, desto värre blir det. Laget behöver en mittback med fart som kan gå i närkamper.",
          "s": "o",
          "podd": [
-          "The 1885 Show - A Millwall Podcast"
+          "Achtung! Millwall Podcast"
          ],
          "datum": [
-          "2026-11-26"
+          "2026-11-27"
          ],
          "typ": "podd"
         },
         {
-         "t": "Värdarna är oense om andra halvlek. Den ena tycker att spelarna reagerade efter pausen. Den andra köper det inte: laget vaknar bara när matchen redan är förlorad, precis som mot Birmingham och West Brom.",
+         "t": "Det defensiva mittfältsparet Jenson Metcalfe och Derek Mazou-Sacko dras för ofta ur position. Då står de långsamma mittbackarna Caleb Taylor och Jake Cooper oskyddade mot snabba lag, och det har hänt match efter match.",
          "s": "o",
          "podd": [
-          "The 1885 Show - A Millwall Podcast"
+          "Achtung! Millwall Podcast"
          ],
          "datum": [
-          "2026-11-26"
+          "2026-11-27"
          ],
          "typ": "podd"
         }
@@ -2145,6 +2136,17 @@
       {
        "amne": "klubb",
        "punkter": [
+        {
+         "t": "Värden menar att det inte är Alex Neil som har tappat omklädningsrummet utan tvärtom: Neil har slutat tro på de flesta spelare han använder.",
+         "s": "o",
+         "podd": [
+          "Achtung! Millwall Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Millwall har alltid byggt på slitvarg och kämpaglöd, men supportrarna känner inte igen dagens lag. De säger att ingen i truppen kommer att minnas med värme, kanske med undantag för Cooper och Leonard.",
          "s": "o",
@@ -2209,12 +2211,12 @@
       }
      ],
      "text": [
-      "Det här är första hemmamatchen sedan FA:s straff mot klubben, och i podden The 1885 Show undrar man vad det gör med The Den. En av värdarna känner någon som har lämnat tillbaka sitt säsongskort, den andra väntar sig en läktare som ”visar fingret åt FA”.",
-      "Podden kallar matchen allt eller inget, också för Alex Neil, även om de flesta supportrar fortfarande skyller på sommarens värvningar.",
-      "Hårdast döms Mihailo Ivanovic, som varken hoppar, springer eller pressar. Om han jobbade hälften så hårt som agenten som varje sommar försöker få honom till Italien vore han ”en halvbra spelare”."
+      "I podden Achtung! Millwall tror man inte att Alex Neil har tappat omklädningsrummet, utan att han har slutat tro på de flesta spelarna.",
+      "Han sågar dem öppet i intervjuerna efter matcherna, och när Mark Sykes reducerade mot Stoke var jublet märkligt dämpat. Truppen tycks glida isär.",
+      "I The 1885 Show får anfallaren Mihailo Ivanovic det hårdaste omdömet: han hoppar inte, springer knappt och pressar inte. Hans agent sägs jobba hårdare varje sommar för att få honom till Italien."
      ],
      "citat": {
-      "sagt": "Det är lätt att spela lite fritt när pressen är borta. Det är lätt, för då har du redan förlorat matchen.",
+      "sagt": "Jag tror att det här är allt eller inget, inte bara för Millwall utan också för Alex Neil.",
       "vem": null,
       "podd": "The 1885 Show - A Millwall Podcast",
       "typ": "podd",
@@ -2222,9 +2224,10 @@
      },
      "namn": [
       "Alex Neil",
+      "Mark Sykes",
       "Mihailo Ivanovic"
      ],
-     "paSpel": "Allt eller inget för Alex Neil, och läktarens svar till FA."
+     "paSpel": "Alex Neils framtid, inför en trotsig läktare i första hemmamatchen efter FA-straffet."
     },
     {
      "lag": "Burnley",
@@ -2234,6 +2237,13 @@
        "avsnitt": "The Fan Reaction Podcast | BURNLEY 0-2 BIRMINGHAM CITY",
        "datum": "2026-11-26",
        "adress": "https://shows.acast.com/turfcastpodcast/episodes/the-fan-reaction-podcast-burnley-0-2-birmingham-city",
+       "typ": "podd"
+      },
+      {
+       "podd": "TurfCast",
+       "avsnitt": "The Glen Little Podcast | 'How do Bunrley get out of this mess?!'",
+       "datum": "2026-11-24",
+       "adress": "https://shows.acast.com/turfcastpodcast/episodes/the-glen-little-podcast-how-do-bunrley-get-out-of-this-mess",
        "typ": "podd"
       },
       {
@@ -2272,23 +2282,34 @@
           "2026-11-26"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "De förstår inte varför Anel Ahmedhodzic, enligt dem lagets bästa mittback, sitter på bänken medan unge Max Alleyne får fortsätta som mittback. De anser att Alleyne inte håller på den nivån och 'drunknar'. De undrar om något pågår bakom kulisserna.",
-         "s": "o",
-         "podd": [
-          "TurfCast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
         }
        ]
       },
       {
        "amne": "spel",
        "punkter": [
+        {
+         "t": "Glen Little menar att Burnley inte är ett dåligt lag, eftersom de har tagit ledningen ett elvatal gånger och tappat 24 poäng från ledningsläge. Joe Revan håller inte med: bra individer, men ett dåligt lag just nu.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Värdarna ser ett mentalt problem: så fort Burnley släpper in ett mål sjunker axlarna och spelarna klarar inte motgång. Glen Little säger att han numera blir orolig när laget tar ledningen.",
+         "s": "o",
+         "podd": [
+          "TurfCast"
+         ],
+         "datum": [
+          "2026-11-24"
+         ],
+         "typ": "podd"
+        },
         {
          "t": "Enligt supportrarna går det likadant varje vecka: Burnley är bättre och tar ledningen, gör sedan ett dumt misstag, backar hem och tappar greppet. Mot Blackburn släppte laget en ledning två gånger, och en värd räknar till 25 poäng som tappats från ledningsläge.",
          "s": "o",
@@ -2339,24 +2360,13 @@
          "typ": "podd"
         },
         {
-         "t": "Fabio Celestini anses inte kunna läsa en match. Han gör passiva byten och reagerade inte i halvtid trots att mittfältet var tomt. Han ses som en upprepning av sin företrädare.",
+         "t": "Värdarna misstänker att tränare tackade nej till Burnley för att ägarna har rykte om sig att vara svåra att arbeta för, med uppgifter om att Alan Pace detaljstyr. De tycker att ägarna saknar fotbollsförstånd.",
          "s": "o",
          "podd": [
           "TurfCast"
          ],
          "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "På Turf Moor var stämningen inte ilsken utan uppgiven. Publiken orkade inte ens bua, bara två till tre tusen var kvar vid slutet och många satt med mobilen.",
-         "s": "h",
-         "podd": [
-          "TurfCast"
-         ],
-         "datum": [
-          "2026-11-26"
+          "2026-11-24"
          ],
          "typ": "podd"
         }
@@ -2364,22 +2374,24 @@
       }
      ],
      "text": [
-      "”Rädslan för att vinna” var Fabio Celestinis egen diagnos före derbyt mot Blackburn, och under landslagsuppehållet tränade han lika mycket på mentaliteten som på taktiken.",
-      "Det hjälpte inte. Lokaltidningen räknar till 23 tappade poäng från ledningsläge, och Celestini säger själv att laget slutar spela med bollen och bara väntar på slutsignalen.",
-      "I podden TurfCast tror en av värdarna att omklädningsrummet redan är förlorat, med spelare som viftar ilsket med armarna åt varandra. Den ende som får beröm är målvakten Max Weiß, som räddade en straff och håller laget kvar i matcherna."
+      "Fabio Celestini sa själv före derbyt mot Blackburn att han har sett en rädsla hos spelarna: ”rädslan för att vinna”. I TurfCast ser man axlarna sjunka vid varje insläppt mål, och Glen Little säger att han numera blir orolig när Burnley tar ledningen.",
+      "I senaste matchen viftade varenda spelare ilsket åt en lagkamrat. En av värdarna tror inte att några nyförvärv i januari kan rädda omklädningsrummet.",
+      "Frågan om varför Anel Ahmedhodžić satt på bänken har fått sitt svar: han hade hjärnskakning när Celestini kom, men är nu ett alternativ."
      ],
      "citat": {
-      "sagt": "Jag tror faktiskt att vi blir bättre mot Millwall på lördag. Blind tro, antagligen. Jag vet inte.",
+      "sagt": "När Cantwell satte bollen i nätet sa killen bredvid mig bara: du vet vad som kommer nu, eller hur?",
       "vem": null,
       "podd": "TurfCast",
       "typ": "podd",
-      "datum": "2026-11-26"
+      "datum": "2026-11-24"
      },
      "namn": [
       "Fabio Celestini",
-      "Max Weiß"
+      "Glen Little",
+      "Anel Ahmedhodžić",
+      "Celestini"
      ],
-     "paSpel": "Celestinis första seger, på en bortaplan där laget brukar se bättre ut."
+     "paSpel": "Celestinis första seger, i en säsong som nu bara handlar om att hänga kvar."
     }
    ]
   },
