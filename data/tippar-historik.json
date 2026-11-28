@@ -163,6 +163,33 @@
         { "id": "401880149", "match": "Wolverhampton Wanderers – Charlton Athletic", "avspark": "2026-11-21T15:00:00.000Z", "tips": { "DL": "1", "DT": "1X", "DJ": "1", "HB": "1" }, "resultat": "2–1", "modell": [67, 20, 13] },
         { "id": "401879232", "match": "Newcastle United – Arsenal", "avspark": "2026-11-21T17:30:00.000Z", "tips": { "DL": "X2", "DT": "2", "DJ": "1X2", "HB": "2" }, "resultat": "2–2", "modell": [20, 23, 57] }
       ]
+    },
+    {
+      "id": "2026-11-28-st4981",
+      "namn": "Pochettino har också sagt upp sig",
+      "syftar": "Pochettino lämnade USA:s landslag för ett United som ligger näst sist, ungefär lika djärvt som att säga upp sig innan raden är rätt.",
+      "datum": "2026-11-28",
+      "gang": [
+        { "id": "DL", "namn": "Daniel Laino" },
+        { "id": "DT", "namn": "Daniel Tejder" },
+        { "id": "DJ", "namn": "Daniel Johansson" },
+        { "id": "HB", "namn": "Hasse Backe" }
+      ],
+      "matcher": [
+        { "id": "401879226", "match": "Manchester United – Brentford", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1X", "DT": "12", "DJ": "1X2", "HB": "1" } },
+        { "id": "401879227", "match": "Leeds United – Coventry City", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1", "DT": "1", "DJ": "1", "HB": "1" } },
+        { "id": "401880136", "match": "Birmingham City – Bolton Wanderers", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "12", "DT": "1", "DJ": "1", "HB": "1" } },
+        { "id": "401880134", "match": "Derby County – Watford", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X", "DJ": "1X", "HB": "1X2" } },
+        { "id": "401880132", "match": "Millwall – Burnley", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "X2", "DT": "1X", "DJ": "1", "HB": "1X2" } },
+        { "id": "401880127", "match": "West Bromwich Albion – Bristol City", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "12", "DT": "1X", "DJ": "12", "HB": "1" } },
+        { "id": "401880130", "match": "Queens Park Rangers – Sheffield United", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1", "DT": "1", "DJ": "1X2", "HB": "12" } },
+        { "id": "401880126", "match": "West Ham United – Stoke City", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "X2", "DJ": "1", "HB": "1X2" } },
+        { "id": "401880125", "match": "Wrexham – Portsmouth", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "12", "HB": "1X2" } },
+        { "id": "401880726", "match": "Luton Town – Oxford United", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1X2", "DT": "1X2", "DJ": "1X2", "HB": "12" } },
+        { "id": "401880723", "match": "Sheffield Wednesday – Reading", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "1", "DT": "1", "DJ": "12", "HB": "12" } },
+        { "id": "401880719", "match": "Wycombe Wanderers – Bradford City", "avspark": "2026-11-28T15:00:00.000Z", "tips": { "DL": "12", "DT": "1X2", "DJ": "1X2", "HB": "12" } },
+        { "id": "401878752", "match": "Ipswich Town – Aston Villa", "avspark": "2026-11-28T17:30:00.000Z", "tips": { "DL": "2", "DT": "1X2", "DJ": "X2", "HB": "12" } }
+      ]
     }
   ]
 }
