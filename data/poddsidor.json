@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-28T08:54:07.213Z",
+ "uppdaterad": "2026-11-28T09:14:23.262Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -2404,10 +2404,10 @@
     "Bristol City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T07:57:45.641Z",
-   "rubrik": "Skubala räddad av spelarna – nu räknar supportrarna med förlust",
+   "skriven": "2026-11-28T09:05:49.799Z",
+   "rubrik": "Bristol City spelar för tränarens jobb igen",
    "ingress": null,
-   "summering": "West Brom bärs av glädjen över spelet och en Molumby som är fri från kaptensbindeln. I Bristol har spelarna räddat Skubala en gång, men på läktaren tror ingen att det räcker länge.",
+   "summering": "Albion spelar sin roligaste fotboll på flera år och reser sig i paus när det går emot. Bristol Citys spelare har redan räddat Skubalas jobb en gång den här veckan.",
    "delar": [
     {
      "lag": "West Bromwich Albion",
@@ -2545,16 +2545,16 @@
       }
      ],
      "text": [
-      "På Albion Analysis är man närmast yr av glädje: för första gången på flera år är fotbollen rolig att se. Laget hamnar i underläge oftare än något annat i serien, men till skillnad från under Ryan Mason samlar det sig och kommer tillbaka.",
-      "Jayson Molumby spelar sin bästa fotboll i klubben sedan han blev av med kaptensbindeln och slutade jaga överallt.",
-      "När Isaac Price missade en Panenkastraff igen ställde sig James Morrison bakom honom. Tränaren sa att han hade hoppats att lagkamraterna skulle rädda Price, så som Price har räddat dem i månader."
+      "I podden Albion Analysis säger man sig vara ”nästan yr”: för första gången på flera år är Albion roligt att se. Laget går på direkt och samlar sig i paus vid underläge, i stället för att falla ihop som under Ryan Mason.",
+      "Jayson Molumby spelar sin bästa fotboll i klubben, och i Baggies Broadcast tror man att han mådde bra av att bli av med kaptensbindeln.",
+      "Isaac Price, nu skadad, missade ännu en Panenkastraff mot Swansea. James Morrison läxade inte upp honom, utan sa att lagkamraterna borde ha räddat Price, så som han har räddat dem."
      ],
      "citat": {
-      "sagt": "West Brom har fått ett självförtroende nu, de går på lagen direkt.",
-      "vem": "Paul Robinson",
-      "podd": "Baggies Broadcast",
+      "sagt": "Jag skulle inte vilja vara den tränare som just nu ska lista ut hur man försvarar sig mot West Bromwich Albion.",
+      "vem": "Chris Hall",
+      "podd": "Albion Analysis",
       "typ": "podd",
-      "datum": "2026-11-24"
+      "datum": "2026-11-22"
      },
      "namn": [
       "Ryan Mason",
@@ -2562,11 +2562,18 @@
       "Isaac Price",
       "James Morrison"
      ],
-     "paSpel": "Andra matchen på fyra dagar, men Bristol City hemma känns alltid som ett tillfälle."
+     "paSpel": "Ett tillfälle, som Bristol City hemma alltid känns, trots onsdagens resa från Bolton."
     },
     {
      "lag": "Bristol City",
      "kallor": [
+      {
+       "podd": "3 Peaps In A PodCast",
+       "avsnitt": "Robins Review - Bristol City vs Wrexham - 24th November 2026",
+       "datum": "2026-11-25",
+       "adress": "https://tpiapc.podbean.com/e/robins-review-bristol-city-vs-wrexham-24th-november-2026/",
+       "typ": "podd"
+      },
       {
        "podd": "Forever Bristol City Podcast",
        "avsnitt": "WREXHAM [H] the verdict ..... kicking the can down the road",
@@ -2645,6 +2652,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Värdarna tror att förlusten mot Southampton, där laget spelade offensivt och bra trots att det föll, fick Skubala att svänga åt andra hållet och börja spela betydligt mer försiktigt.",
+         "s": "o",
+         "podd": [
+          "3 Peaps In A PodCast"
+         ],
+         "datum": [
+          "2026-11-25"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "I andra halvlek spelade Scott Twine som en extra tia till vänster och Cameron Pring gick högt. Laget pressade hela tiden och hade fyra man i boxen vid målet. Det är mallen laget borde följa varje match.",
          "s": "h",
          "podd": [
@@ -2714,38 +2732,28 @@
           "2026-11-22"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Stämningen på Ashton Gate var dämpad och uppgiven. En värd jämför den med slutet av O'Driscoll-tiden, när laget åkte ur, och kallar läget ett recept för nedflyttning.",
-         "s": "h",
-         "podd": [
-          "Forever Bristol City Podcast"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Spelarna ”spelade för tränarens jobb och räddade det”, säger man i Forever Bristol City Podcast om vändningen mot Wrexham, matchen som skulle avgöra Michael Skubalas framtid. Lokaltidningens reporter håller med. På NOT606 tror man snarare att Wrexham bara drog sig tillbaka.",
-      "Förväntningarna inför West Brom är låga: en av poddvärdarna räknar med förlust, och då blir Swansea en match som måste vinnas.",
-      "På forumet väntar man sig också att Max O'Leary, som lämnade City i sin sämsta form, gör en av sina bästa matcher mot klubben som inte tyckte att han räckte till."
+      "Med Wrexham i ledning i paus hade spelarna kunnat ge upp och få Michael Skubala sparkad, men de vände matchen. I Forever Bristol City Podcast ser man det som ett bevis på att han har kvar omklädningsrummet. På forumet NOT606 tror man snarare att Wrexham drog sig tillbaka.",
+      "Grundfelet, menar supportrarna, är att Skubala tappade modet efter storförlusten mot Southampton och sedan dess låter laget vänta in motståndaren.",
+      "I Albions mål står dessutom Max O'Leary, och supportrarna väntar sig att han är som allra bäst mot klubben som ansåg att han inte räckte till."
      ],
      "citat": {
-      "sagt": "För första gången i mitt liv undrar jag om jag faktiskt vill att vi förlorar. För vinner han så fortsätter bara plågan.",
-      "vem": "Dave",
-      "podd": "Forever Bristol City Podcast",
+      "sagt": "Och jag är rädd att vi dras in i bottenstriden, och det är då man verkligen behöver sina supportrar.",
+      "vem": null,
+      "podd": "3 Peaps In A PodCast",
       "typ": "podd",
-      "datum": "2026-11-22"
+      "datum": "2026-11-25"
      },
      "namn": [
       "Michael Skubala",
+      "Skubala",
       "Max O'Leary"
      ],
-     "paSpel": "Skubalas jobb, igen – och en förlust gör Swansea till ett måste."
+     "paSpel": "Tränarens jobb, igen: en förlust gör Swanseamatchen till ett måste."
     }
    ]
   },
@@ -2758,10 +2766,10 @@
     "Sheffield United"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T07:58:25.690Z",
-   "rubrik": "Loftus Road har slutat nöja sig med en poäng",
+   "skriven": "2026-11-28T09:14:23.262Z",
+   "rubrik": "QPR har slutat nöja sig med oavgjort",
    "ingress": null,
-   "summering": "QPR:s supportrar nöjer sig inte längre med oavgjort men oroar sig för målskyttet och trötta ben. Sheffield United har en mittfältare på högerbacken och Jordan Ayew som motor.",
+   "summering": "QPR:s supportrar har slutat nöja sig, men laget gör för få mål på sina chanser. Sheffield United lever på Jordan Ayew och läcker på högerbacken, där Wilder redan blickar mot januari.",
    "delar": [
     {
      "lag": "Queens Park Rangers",
@@ -2771,6 +2779,13 @@
        "avsnitt": "4 Points Away, Olé Olé | Millwall 0-1 QPR, Norwich 1-1 QPR",
        "datum": "2026-11-26",
        "adress": "https://podcasts.apple.com/gb/podcast/qpr-podcast/id968873601?uo=4",
+       "typ": "podd"
+      },
+      {
+       "podd": "Hoopsa - a QPR Podcast",
+       "avsnitt": "Madsen downs 10-man Millwall for back-to-back QPR wins",
+       "datum": "2026-11-23",
+       "adress": "https://podcasters.spotify.com/pod/show/hoopsayt/episodes/Madsen-downs-10-man-Millwall-for-back-to-back-QPR-wins-e3ssj65",
        "typ": "podd"
       },
       {
@@ -2865,6 +2880,17 @@
        "amne": "spel",
        "punkter": [
         {
+         "t": "Nicolas Madsen höll sig enligt värden lite i bakgrunden i början av säsongen när han hade en stark partner bredvid sig. Mot Millwall tog han över mittfältet, hade flest bollkontakter på planen och har nu gjort mål i tre raka matcher.",
+         "s": "o",
+         "podd": [
+          "Hoopsa - a QPR Podcast"
+         ],
+         "datum": [
+          "2026-11-23"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna menar att QPR skapar mycket men sätter för lite. Laget har redan sju oavgjorda och tappar poäng mot lag som borde slås. Anfallarna Kone, Burrell och Kolli anses inte räcka mot ligans topplag.",
          "s": "o",
          "podd": [
@@ -2907,17 +2933,6 @@
           "2026-11-26"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Att Norwich var så tandlöst berodde enligt supportrarna främst på hur välorganiserat QPR försvarade sig. Ronnie Edwards, Kealey Adamson och Liam Morrison lyfts fram som utmärkta.",
-         "s": "o",
-         "podd": [
-          "NOT606"
-         ],
-         "datum": [
-          "2026-11-25"
-         ],
-         "typ": "forum"
         }
        ]
       },
@@ -2955,24 +2970,22 @@
       }
      ],
      "text": [
-      "På Loftus Road duger det inte längre med en poäng mot ett lag som Sheffield United: i QPR Podcast konstaterar man att de egna supportrarna nu kräver seger. Laget skapar mycket men gör för få mål, och på Loft For Words får Richard Kone och Rumarn Burrell höra det.",
-      "Hela spelstilen vilar på målvakten Pierce Charles passningar, och efter misstaget mot Norwich står Julien Stéphan fast: ”Vi fortsätter.”",
-      "Utan lagkaptenen Jimmy Dunne ser podden för första gången Ronnie Edwards som backlinjens fysiska ledare, han som tidigare har blivit överkörd mot Millwall."
+      "Förr var oavgjort hemma mot Sheffield United godkänt på Loftus Road, men i QPR Podcast konstaterar man att de egna supportrarna nu kräver seger.",
+      "Problemet är att målen inte följer med chanserna. Laget skapar mycket men sätter för lite, menar supportrarna på Loft For Words, och anfallarna Richard Kone och Rumarn Burrell får hård kritik.",
+      "Målvakten Pierce Charles slog passningen som gav Norwich kvitteringen, men Julien Stéphan står kvar vid både honom och uppspelet bakifrån. På NOT606 menar man att hela spelstilen vilar på hans passningar."
      ],
      "citat": {
-      "sagt": "De matcher vi har spelat utan mycket vila och förberedelsetid gör mig lite nervös.",
-      "vem": "Steve Bernard",
-      "podd": "QPR Podcast",
-      "typ": "podd",
-      "datum": "2026-11-26"
+      "sagt": "Jag har aldrig varit säkrare på att en ung spelare hos oss ska gå hela vägen till toppen, Eze och Walker inräknade.",
+      "vem": "Star of David Bardsley",
+      "podd": "NOT606",
+      "typ": "forum",
+      "datum": "2026-11-27"
      },
      "namn": [
       "Richard Kone",
       "Rumarn Burrell",
       "Pierce Charles",
-      "Julien Stéphan",
-      "Jimmy Dunne",
-      "Ronnie Edwards"
+      "Julien Stéphan"
      ],
      "paSpel": "Tredje matchen på en vecka, och ett prov på om playoffsnacket håller."
     },
@@ -2984,6 +2997,13 @@
        "avsnitt": "QPR AWAY! Can The Blades Deliver? | Sheffield United v QPR | Countdown To Kickoff ⚔️⏳",
        "datum": "2026-11-27",
        "adress": "https://podcasts.apple.com/gb/podcast/blades-ramble-a-sheffield-united-podcast/id1777788630?uo=4",
+       "typ": "podd"
+      },
+      {
+       "podd": "Sheff United Way",
+       "avsnitt": "Match Preview: QPR vs Sheff United",
+       "datum": "2026-11-27",
+       "adress": "https://www.youtube.com/SheffUnitedWay",
        "typ": "podd"
       },
       {
@@ -3095,17 +3115,6 @@
           "2026-11-27"
          ],
          "typ": "podd"
-        },
-        {
-         "t": "Wilder säger att Hamza Choudhury kan spela högerback, men aldrig att han är högerback. Värdarna tolkar det som att tränaren inte ser honom som en lösning och att det är en vink till ägarna om att det behövs en riktig högerback.",
-         "s": "o",
-         "podd": [
-          "Blades Ramble - A Sheffield United Podcast"
-         ],
-         "datum": [
-          "2026-11-23"
-         ],
-         "typ": "podd"
         }
        ]
       },
@@ -3133,6 +3142,17 @@
           "2026-11-27"
          ],
          "typ": "podd"
+        },
+        {
+         "t": "Värden räknade med att United skulle hamna i nedre halvan av mitten av tabellen. Andra halvleken mot Southampton har övertygat honom om att truppen är bättre än så och kan sikta högre.",
+         "s": "o",
+         "podd": [
+          "Sheff United Way"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
         }
        ]
       },
@@ -3154,11 +3174,12 @@
       }
      ],
      "text": [
-      "Sheffield Uniteds högerback är en mittfältare, och i podden Blades Ramble kallar man platsen ”en lysande svaghet i laget”. Southampton gick medvetet på Hamza Choudhury, och Tahith Chong framför honom hjälper inte till. Att Chris Wilder säger att Choudhury kan spela högerback, men aldrig att han är det, tolkas som en vink till ägarna inför januari.",
-      "Framåt bär den gratisvärvade Jordan Ayew anfallet, så pass att Patrick Bamford bara är tredjeval. Thomas Cannon står däremot enligt Vital Blades ”bokstavligen och tittar på” när bollen inte kommer till honom."
+      "Högerbacken är lagets stora hål, och i Blades Ramble säger man rakt ut att mittfältaren Hamza Choudhury inte är någon högerback.",
+      "Southampton gick medvetet på hans sida. När Chris Wilder säger att Choudhury kan spela där, men aldrig att han är högerback, tolkar värdarna det som en vink till ägarna inför transferfönstret i januari.",
+      "Ljuset finns längre fram. Jordan Ayew, som kom gratis och ansågs förbrukad, bär nu både anfallet och pressen, och i Sheff United Way berättar man att supportrarna har börjat kalla honom en ny David McGoldrick."
      ],
      "citat": {
-      "sagt": "Beror det på spelaren, eller delvis på rehabiliteringen bakom kulisserna? Det kan inte vara en slump.",
+      "sagt": "Han tycker att vi har fått lite för lite ut av resultaten. Jag tycker att vi har fått ut mer än vi borde.",
       "vem": null,
       "podd": "Blades Ramble - A Sheffield United Podcast",
       "typ": "podd",
@@ -3166,13 +3187,11 @@
      },
      "namn": [
       "Hamza Choudhury",
-      "Tahith Chong",
       "Chris Wilder",
       "Jordan Ayew",
-      "Patrick Bamford",
-      "Thomas Cannon"
+      "David McGoldrick"
      ],
-     "paSpel": "En etapp på vägen mot januarifönstret, där Wilder vill ha förstärkningar."
+     "paSpel": "Chansen att äntligen slå ett lag som hör till de bättre i ligan."
     }
    ]
   },
