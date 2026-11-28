@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-28T08:21:31.847Z",
+ "uppdaterad": "2026-11-28T08:44:31.687Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -1686,10 +1686,10 @@
     "Watford"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T07:56:35.912Z",
-   "rubrik": "Derbys enda plan heter 0–0",
+   "skriven": "2026-11-28T08:33:36.564Z",
+   "rubrik": "Plan A är 0–0, och julhandeln lockar mer",
    "ingress": null,
-   "summering": "Derby spelar om tränarens jobb inför en läktare som tappat intresset. Watford har bytt tränare men inte tro, och bortalaget har slutat vänta sig något.",
+   "summering": "Derby har ett lag som bara kan hålla nollan och en läktare som glesnar kring Eustace. Watford har en ny tränare som få tror på och supportrar där vissa helst ser förlust.",
    "delar": [
     {
      "lag": "Derby County",
@@ -1848,9 +1848,9 @@
       }
      ],
      "text": [
-      "I podden The Rams Review är domen hård: John Eustace har en plan, och den heter 0–0. När motståndarna gör mål vet ingen vad laget ska göra, och bytena i underläge mot Southampton var spelare mot spelare och kändes som att ge upp matchen.",
-      "Ägarna backar fortfarande tränaren. Men ligger Derby fem poäng eller mer från säker plats efter lördagen tror värdarna att ropen på att Eustace ska bort blir de högsta hittills.",
-      "Säsongskorten håller uppe publiksiffran, men många stolar väntas stå tomma. För många lockar julhandeln mer på lördagseftermiddagen."
+      "”Plan A är 0–0”, säger man om John Eustace i The Rams Review Podcast, och spricker den vet ingen vad laget ska göra. Bytena i underläge i Southampton var spelare mot spelare och kändes som att ge upp matchen.",
+      "Nu tröttnar läktaren. Säsongskorten håller uppe publiksiffran, men många tomma stolar väntas, och julhandeln lockar fler än Pride Park.",
+      "Ägarna backar fortfarande Eustace. Men krymper inte avståndet till säker plats på lördag tror podden att ropen på hans avgång blir de högsta hittills."
      ],
      "citat": {
       "sagt": "Nej, det fungerade inte, John, för vi blev bombarderade de första 35 minuterna.",
@@ -1863,7 +1863,7 @@
       "John Eustace",
       "Eustace"
      ],
-     "paSpel": "Eustaces jobb, och om läktaren ens bryr sig längre."
+     "paSpel": "Eustaces jobb, och om supportrarna alls tänker komma tillbaka."
     },
     {
      "lag": "Watford",
@@ -1871,6 +1871,13 @@
       {
        "podd": "Do Not Scratch Your Eyes",
        "avsnitt": "DERBY COUNTY v WATFORD | OPPOSITION VIEW",
+       "datum": "2026-11-26",
+       "adress": "https://podcasts.apple.com/gb/podcast/do-not-scratch-your-eyes/id1537939738?uo=4",
+       "typ": "podd"
+      },
+      {
+       "podd": "Do Not Scratch Your Eyes",
+       "avsnitt": "POST MATCH PHONE IN - WFC 0-1 BRFC",
        "datum": "2026-11-26",
        "adress": "https://podcasts.apple.com/gb/podcast/do-not-scratch-your-eyes/id1537939738?uo=4",
        "typ": "podd"
@@ -1939,6 +1946,17 @@
        "amne": "klubb",
        "punkter": [
         {
+         "t": "En långvarig supporter säger rakt ut att han hoppas att Watford förlorar varje match och åker ur. Han vill hellre se ägaren dömd eller klubben i konkurs än behålla dagens klubb.",
+         "s": "o",
+         "podd": [
+          "Do Not Scratch Your Eyes"
+         ],
+         "datum": [
+          "2026-11-26"
+         ],
+         "typ": "podd"
+        },
+        {
          "t": "Supportrarna har slutat vänta sig något på bortaplan. Laget har inte vunnit borta sedan mitten av februari, spelarna verkar gå på autopilot och på bortasektionen var det inte ens någon ilska efter 0–4, bara uppgivenhet.",
          "s": "h",
          "podd": [
@@ -2003,38 +2021,27 @@
           "2026-11-22"
          ],
          "typ": "media"
-        },
-        {
-         "t": "Supportrarna tycker att de har haft fel varje gång de trott att botten var nådd. Klubben har gång på gång visat att det kan bli ännu värre, och de kallar den en bilolycka.",
-         "s": "o",
-         "podd": [
-          "Do Not Scratch Your Eyes"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
         }
        ]
       }
      ],
      "text": [
-      "Nye tränaren Edward Iordănescu får enligt supportrarna mer än sex gånger så mycket betalt som Alessio Dionisi, men ingen väntar sig något lyft. På NOT606 undrar man varför spelarna skulle vilja imponera på en tränare som ”förmodligen är borta till påsk”.",
-      "Borta väntar sig supportrarna inget alls. Laget har inte vunnit på bortaplan sedan mitten av februari, och efter senaste raset i Sheffield fanns inte ens ilska kvar på bortasektionen, bara uppgivenhet.",
-      "Förra säsongens svit utan bortaseger bröts för övrigt just på Pride Park."
+      "En långvarig supporter säger i podden Do Not Scratch Your Eyes att han hoppas att Watford ”förlorar varje match och åker ur”. Hellre det än dagens klubb.",
+      "Av nye tränaren Edward Iordănescu väntar sig ingen någon nytändning. På NOT606 undrar man varför spelarna skulle vilja imponera på en tränare som ”förmodligen är borta till påsk”. Att Gino Pozzo betalar honom toppgage läses på forumen som panik, för att spelarna inte ska tappa i värde i tredjedivisionen.",
+      "Borta har supportrarna slutat vänta sig något. Efter 0–4 i Sheffield fanns ingen ilska på bortasektionen, bara uppgivenhet."
      ],
      "citat": {
-      "sagt": "Det känns nästan som att flera av spelarna går på autopilot när vi spelar borta.",
-      "vem": "Sam",
-      "podd": "From The Rookery End - A show about Watford FC",
-      "typ": "podd",
-      "datum": "2026-11-22"
+      "sagt": "Hur mycket jag än hatar allt med klubben vill jag desperat inte se oss spela i tredjedivisionen igen.",
+      "vem": "3000",
+      "podd": "WFC Forums",
+      "typ": "forum",
+      "datum": "2026-11-27"
      },
      "namn": [
       "Edward Iordănescu",
-      "Alessio Dionisi"
+      "Gino Pozzo"
      ],
-     "paSpel": "En sexpoängsmatch i botten, där en förlust enligt podden vore förödande."
+     "paSpel": "Sexpoängsmatch i botten, fast en del supportrar hoppas helst på förlust."
     }
    ]
   },
