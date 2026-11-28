@@ -5849,6 +5849,23 @@ att de blir yviga utan många trianglar. Utan högtid hämtas bara kalendern, oc
 går medan sidan står öppen byts pyntet (var tionde minut). Samma pynt finns bakom Hasse Backe (se *Högtidspyntet
 bakom honom* under [Hasse Backe](#hasse-backe)).
 
+**Mer jul i fönstret och ute på gatan** (2026-11-28, användarens önskemål: "mer julföremål på hemsidan - även i
+fönstret så att det syns ute i gatan! Det ska vara snyggt och bra men inte ta en massa grafik"). Sex saker skissades
+i den riktiga scenen; användaren valde fem (inte GOD JUL sprejat på rutan):
+
+- **Pappersflingor** (`snoflingor` i [public/rum-pynt.js](public/rum-pynt.js)): elva snöflingor klippta i papper,
+  tejpade på glaset – vikta i sex med grenar och hål, fyra sorter i en karta med en bit tejp upptill. Inifrån syns de
+  ovanför gänget, utifrån över hela rutan. Varje flinga är en platt ruta, alla i ett nät (22 trianglar).
+- **Konstsnö i hörnen** (`konstsno`): sprejad snö tätast i rutornas åtta hörn, glesare ut mot en båge, med stjärnor
+  ur schablonen. Inifrån syns de övre hörnen, utifrån alla (18 trianglar).
+- **Ljusstaken i skyltfönstret**: en adventsljusstake till (samma som på bardisken) mitt på fönsterbänken, vänd ut
+  mot gatan. Inifrån står den bakom bordet och gänget; utifrån lyser den nertill i fönstret.
+
+Allt ligger i fönstrets duk (`julFonster` i [public/rum-inredning.js](public/rum-inredning.js), glaset i planet `GZ`):
+ingen ny duk och inget nytt lager, ritat en gång, och utifrån genom samma kamera som det andra pyntet
+(`pyntUtifran`). Uppmätt i Chrome: samma 50 dukar inne med och utan, flingorna och snön byggs på 1–10 ms. Ute på
+fasaden står granen vid dörren och girlangen under skylten (se [Fasaden](#fasaden)).
+
 **Askkoppen, snusdosan och fläkten** står på pulten bakom högen, mellan kupongen och tidningen, i three.js som
 gänget ([public/rum-saker.js](public/rum-saker.js), med en egen duk i pultens plan): en
 askkopp i bärnstensfärgat glas med tre spår, aska och fimpar, där en cigarett ligger i ett
@@ -7809,6 +7826,13 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   som läses rätt härifrån och glappar samtidigt som inne (`neonOn`), och skivan med löpsedlarna med baksidan ut.
 - **Högtidspyntet:** runt högtiderna hänger samma pynt som inne i skyltfönstret och på dörrens glas, sett utifrån och
   spegelvänt (se *Högtidspyntet* ovan, `.rf-pynt`).
+- **Julen utanför (2026-11-28):** till jul (när julpyntet hänger inne, `o.hogtid` ur `pyntNamn` i rum-inredning.js)
+  står en gran i en zinkhink med ett rött band på trottoaren till höger om dörren, framför stupröret och så nära
+  dörren att den syns också i en telefon (`GRAN`, `granen`), och en girlang av granris hänger i fyra bågar under
+  skylten med röda rosetter vid krokarna (`girlangen`). Båda har varmvita lampor (`julLjus`) som på kvällen får en
+  liten gloria i `kvallsljus`, och granen ett hål i kvällens mörker; när det är snötäckt ligger snö på grenarna och
+  girlangen. Allt står still och ritas med huset (inga bilder, inga filter, inget nytt lager; ett par hundra
+  SVG-element till, som bara ritas om när ljuset eller vädret ändras).
 - **Glaset:** det sitter djupt i karmen (skugga upptill och till vänster), med imma nertill när det är kallt ute och
   varmt inne, droppar efter regn som små linser (mörk kant, en ljusprick nertill och en glans) och några som har runnit
   och lämnat ett spår ned mot blecket.

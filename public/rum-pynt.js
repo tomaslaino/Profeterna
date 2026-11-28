@@ -4,7 +4,9 @@
 //
 //   jul         fredagen före första advent (julskyltningen) till tjugondag Knut (13 januari): en
 //               adventsstjärna i papper som lyser i fönstret, en granrisgirlang med ljus, röda kulor och
-//               rosetter längs fönstrets överkant, och en elektrisk adventsljusstake på bardisken
+//               rosetter längs fönstrets överkant, och en elektrisk adventsljusstake på bardisken; sedan
+//               2026-11-28 också pappersflingor och konstsnö på glaset och en ljusstake på fönsterbänken, ut
+//               mot gatan (granen och girlangen ute på fasaden ritar rum-fasad.js)
 //   pask        lördagen före palmsöndagen till tisdagen efter annandag påsk: målade ägg i band i fönstret
 //               och påskris med fjädrar i en vas på bardisken
 //   midsommar   måndagen i midsommarveckan till söndagen efter midsommarafton: vimplar i blått och gult
@@ -25,7 +27,7 @@
 //
 // pyntet(v) → 'jul' | 'nyar' | 'pask' | 'midsommar' | 'kraftor' | 'halloween' | null (v = Vader.nu());
 //   ?rum-pynt=<namn> för bilder (?rum-pynt=inget: inget)
-// pyntSaker(mat) → { stjarna, ljusstake, girlang, agg, paskris, vimplar, blommor, lyktor, pumpa, vav, krans,
+// pyntSaker(mat) → { stjarna, ljusstake, girlang, snoflingor, konstsno, agg, paskris, vimplar, blommor, lyktor, pumpa, vav, krans,
 //   halmstjarna, julbock, serpentiner, ballonger, kycklingar, bjorkris, stang, kraftfat, fladdermoss }
 // pyntNatt(grupp, g) → pyntet i mörkret g (0–1)
 //
@@ -557,6 +559,167 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     mesh(ihop(hattor), m('#ffffff', { vertexColors: true, metalness: 0.9, roughness: 0.3 }), g);
     mesh(ihop(kottar), m('#ffffff', { vertexColors: true, roughness: 0.85 }), g);
     return g;
+  }
+
+  // Snöflingor klippta i papper (2026-11-28), tejpade på glaset: vikta i sex och klippta som i skolan, med
+  // grenar på armarna och hål i mitten och längs armarna. Fyra sorter i en karta (2 × 2) med en bit tejp
+  // upptill, och varje flinga är en enda platt ruta (två trianglar), alla i ett nät. Papperet syns från båda
+  // hållen (fasaden ser dem bakifrån). lista: [{ x, y, z, R, typ (0–3), vrid }], mitten i (x, y, z).
+  const flingTex = () => once('flingor', () => duk(512, 512, (c, S) => {
+    const T = S / 2;
+    const SORT = [
+      { grenar: [[0.42, 0.3], [0.68, 0.2]], mitt: 0.26, b: 0.15 },
+      { grenar: [[0.32, 0.36], [0.58, 0.26], [0.8, 0.13]], mitt: 0.2, b: 0.11 },
+      { grenar: [[0.5, 0.42]], mitt: 0.4, b: 0.17, ring: true },
+      { grenar: [[0.28, 0.18], [0.48, 0.28], [0.7, 0.2]], mitt: 0.18, b: 0.13 },
+    ];
+    SORT.forEach((s, k) => {
+      const R = T * 0.42;
+      c.save();
+      c.translate((k % 2) * T + T / 2, Math.floor(k / 2) * T + T / 2);
+      c.rotate(k * 0.4);
+      // (en svag skugga i kanten, så att papperet syns mot ett ljust glas)
+      c.shadowColor = 'rgba(60,50,40,.35)';
+      c.shadowBlur = 2;
+      c.fillStyle = '#f7f4ec';
+      c.strokeStyle = '#f7f4ec';
+      for (let i = 0; i < 6; i++) {
+        c.save();
+        c.rotate((i * Math.PI) / 3);
+        c.lineWidth = R * s.b;
+        c.beginPath();
+        c.moveTo(0, 0);
+        c.lineTo(R * 0.86, 0);
+        for (const [t, l] of s.grenar) {
+          for (const sy of [-1, 1]) {
+            c.moveTo(R * t, 0);
+            c.lineTo(R * (t + l * 0.6), sy * R * l * 0.8);
+          }
+        }
+        c.stroke();
+        // spetsen
+        c.beginPath();
+        c.moveTo(R * 0.8, -R * s.b);
+        c.lineTo(R, 0);
+        c.lineTo(R * 0.8, R * s.b);
+        c.fill();
+        c.restore();
+      }
+      c.beginPath();
+      for (let i = 0; i < 6; i++) c.lineTo(Math.cos((i * Math.PI) / 3 + Math.PI / 6) * R * s.mitt, Math.sin((i * Math.PI) / 3 + Math.PI / 6) * R * s.mitt);
+      c.fill();
+      if (s.ring) {
+        c.lineWidth = R * 0.07;
+        c.beginPath();
+        c.arc(0, 0, R * 0.62, 0, 2 * Math.PI);
+        c.stroke();
+      }
+      // hålen: en romb på varje arm, en sexhörning i mitten och små trianglar mellan armarna
+      c.shadowColor = 'transparent';
+      c.globalCompositeOperation = 'destination-out';
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI) / 3;
+        const rx = Math.cos(a);
+        const ry = Math.sin(a);
+        const romb = (t, l, w) => {
+          c.beginPath();
+          c.moveTo(rx * R * (t - l), ry * R * (t - l));
+          c.lineTo(rx * R * t - ry * R * w, ry * R * t + rx * R * w);
+          c.lineTo(rx * R * (t + l), ry * R * (t + l));
+          c.lineTo(rx * R * t + ry * R * w, ry * R * t - rx * R * w);
+          c.fill();
+        };
+        romb(s.mitt + 0.1, 0.06, s.b * 0.28);
+        if (s.grenar.length > 1) romb(s.grenar[1][0] + 0.07, 0.035, s.b * 0.2);
+        const b = a + Math.PI / 6;
+        const r0 = R * s.mitt * 0.55;
+        c.beginPath();
+        c.moveTo(Math.cos(b) * r0, Math.sin(b) * r0);
+        c.lineTo(Math.cos(b - 0.22) * r0 * 1.5, Math.sin(b - 0.22) * r0 * 1.5);
+        c.lineTo(Math.cos(b + 0.22) * r0 * 1.5, Math.sin(b + 0.22) * r0 * 1.5);
+        c.fill();
+      }
+      c.beginPath();
+      for (let i = 0; i < 6; i++) c.lineTo(Math.cos((i * Math.PI) / 3) * R * s.mitt * 0.3, Math.sin((i * Math.PI) / 3) * R * s.mitt * 0.3);
+      c.fill();
+      c.globalCompositeOperation = 'source-over';
+      // tejpen upptill, lite sned
+      c.rotate(-k * 0.4 + (k % 2 ? 0.12 : -0.1));
+      c.fillStyle = 'rgba(236,228,196,.6)';
+      c.fillRect(-R * 0.2, -R * 1.08, R * 0.4, R * 0.24);
+      c.restore();
+    });
+  }));
+  function snoflingor(lista) {
+    const geos = lista.map(({ x, y, z, R, typ = 0, vrid = 0 }) => {
+      const g = new THREE.PlaneGeometry(2 * R, 2 * R);
+      const uv = g.attributes.uv;
+      const tx = typ % 2;
+      const ty = Math.floor(typ / 2) % 2;
+      for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) + tx) / 2, (uv.getY(i) + 1 - ty) / 2);
+      g.rotateZ(vrid);
+      g.translate(x, y, z);
+      return g;
+    });
+    const x = new THREE.Mesh(mergeGeometries(geos), m('#ffffff', { map: flingTex(), transparent: true, alphaTest: 0.05, side: THREE.DoubleSide, roughness: 0.92, depthWrite: false }));
+    x.renderOrder = 4;
+    return x;
+  }
+
+  // Konstsnö på glaset (2026-11-28), sprejad genom en schablon som i en affär på nittiotalet: tätast i rutans
+  // hörn och glesare ut mot en båge, med några stjärnor i schablonens form. En karta, och varje hörn är en platt
+  // ruta som vänds efter hörnet, alla i ett nät. lista: [{ x, y, z, b (bredd, cm), h, horn 'ov' 'oh' 'nv' 'nh'
+  // (övre/nedre, vänster/höger) }], där (x, y) är rutans hörn.
+  const snoTex = () => once('konstsno', () => duk(256, 256, (c, w, h) => {
+    const q = rnd(31);
+    // (en mjuk grund i hörnet, sedan prickarna)
+    const r = c.createRadialGradient(0, 0, 0, 0, 0, w * 0.8);
+    r.addColorStop(0, 'rgba(255,255,255,.62)');
+    r.addColorStop(0.45, 'rgba(255,255,255,.28)');
+    r.addColorStop(0.8, 'rgba(255,255,255,0)');
+    c.fillStyle = r;
+    c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) {
+      const x = q() * w;
+      const y = q() * h;
+      const a = Math.atan2(y, x);
+      const kant = w * (0.66 + 0.06 * Math.sin(a * 7) + 0.04 * Math.sin(a * 13 + 1));
+      const d = Math.hypot(x, y);
+      const p = d < kant ? 0.85 - 0.5 * (d / kant) : 0.35 * Math.exp(-(d - kant) / (w * 0.05));
+      if (q() > p) continue;
+      c.fillStyle = `rgba(255,255,255,${0.35 + q() * 0.5})`;
+      const s = 0.6 + q() * 1.6;
+      c.fillRect(x, y, s, s);
+    }
+    // stjärnorna i schablonen, åttauddiga, vita med sprejad kant
+    c.shadowColor = 'rgba(255,255,255,.9)';
+    c.shadowBlur = 3;
+    c.fillStyle = 'rgba(255,255,255,.92)';
+    for (const [x, y, R] of [[0.62, 0.2, 0.11], [0.24, 0.6, 0.085], [0.5, 0.5, 0.06]]) {
+      c.beginPath();
+      for (let i = 0; i < 16; i++) {
+        const a = (i * Math.PI) / 8;
+        const rr = (i % 2 ? 0.38 : 1) * R * w;
+        c.lineTo(x * w + Math.cos(a) * rr, y * h + Math.sin(a) * rr);
+      }
+      c.fill();
+    }
+  }));
+  function konstsno(lista) {
+    const geos = lista.map(({ x, y, z, b, h = b, horn }) => {
+      const p = new THREE.PlaneGeometry(b, h);
+      // (kartans hörn uppe till vänster ligger i rutans hörn)
+      const sx = horn[1] === 'v' ? 1 : -1;
+      const sy = horn[0] === 'o' ? -1 : 1;
+      p.translate(b / 2, -h / 2, 0);
+      p.scale(sx, -sy, 1);
+      if (sx * -sy < 0) p.index.array.reverse();
+      p.translate(x, y, z);
+      return p;
+    });
+    const x = new THREE.Mesh(mergeGeometries(geos), m('#ffffff', { map: snoTex(), transparent: true, side: THREE.DoubleSide, roughness: 1, depthWrite: false }));
+    x.renderOrder = 3;
+    return x;
   }
 
   // ---------- påsk ----------
@@ -1550,7 +1713,7 @@ export function pyntSaker(mat = (c, o = {}) => new THREE.MeshPhysicalMaterial(Ob
     return g;
   }
 
-  return { stjarna, ljusstake, girlang, agg, paskris, vimplar, blommor, lyktor, pumpa, vav, krans, halmstjarna, julbock, serpentiner, ballonger, kycklingar, bjorkris, stang, kraftfat, fladdermoss };
+  return { stjarna, ljusstake, girlang, snoflingor, konstsno, agg, paskris, vimplar, blommor, lyktor, pumpa, vav, krans, halmstjarna, julbock, serpentiner, ballonger, kycklingar, bjorkris, stang, kraftfat, fladdermoss };
 }
 
 // Mörkret (0–1, lysröret släckt) på pyntet: det som inte lyser mörknar som väggen, och skenet kring det

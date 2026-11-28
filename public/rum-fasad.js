@@ -794,6 +794,170 @@ window.RumFasad = (() => {
     return s;
   }
 
+  // ---------- julen utanför ----------
+  //
+  // Till jul (2026-11-28; julpyntet inne, o.hogtid: 'jul' eller 'nyar') står en gran i en zinkhink med ett rött band
+  // på trottoaren till höger om dörren, framför stupröret och så nära dörren att den syns också i en telefon, och en
+  // girlang av granris hänger i bågar under skylten, med röda rosetter vid krokarna. Båda har en slinga varmvita
+  // lampor som lyser på kvällen (kvallsljus), och snö på grenarna när det är snötäckt. Allt står still och ritas med
+  // resten av fasaden, utan bilder och filter.
+  const julUte = (o) => Boolean(o.hogtid && ['jul', 'nyar'].includes(o.hogtid()));
+  // granen: x på fasaden, d meter ut från väggen, höjden (utan hinken) och bredden i meter
+  const GRAN = { x: 1150, d: 0.22, h: 1.45, b: 0.78, hink: 0.3 };
+  function granMatt() {
+    const k = skala(GRAN.d);
+    const mark = markY(GRAN.d);
+    const cx = OGA_X + (GRAN.x - OGA_X) * k;
+    const hink = GRAN.hink * M * k;
+    const y0 = mark - hink + 4 * k;
+    const H = GRAN.h * M * k;
+    const W = GRAN.b * M * k;
+    return { k, mark, cx, hink, y0, H, W };
+  }
+  // lamporna i granen: fyra varv i en slinga, nedifrån, inom granens form → [x, y]
+  function granLampor() {
+    const { cx, y0, H, W } = granMatt();
+    const ut = [];
+    for (let s = 0; s < 4; s++) {
+      const ya = y0 - H * (0.1 + 0.21 * s);
+      const yb = ya - H * 0.12;
+      const n = 7 - s;
+      for (let j = 0; j <= n; j++) {
+        const t = j / n;
+        const y = ya + (yb - ya) * t + Math.sin(Math.PI * t) * H * 0.035;
+        const w = (W / 2) * Math.max(0, 1 - (y0 - y) / H) * 0.86;
+        ut.push([r1(cx - w + 2 * w * t), r1(y)]);
+      }
+    }
+    return ut;
+  }
+  // girlangen under skylten: krokarna och bågarna
+  const GIRL = { n: 4, s: 15 };
+  function girlBana() {
+    const sk = SKYLT;
+    const y = sk.y + sk.h - 3;
+    const krokar = Array.from({ length: GIRL.n + 1 }, (x, i) => [sk.x + 8 + ((sk.w - 16) * i) / GIRL.n, y]);
+    let d = `M${r1(krokar[0][0])} ${y}`;
+    for (let i = 0; i < GIRL.n; i++) d += ` Q${r1((krokar[i][0] + krokar[i + 1][0]) / 2)} ${y + 2 * GIRL.s} ${r1(krokar[i + 1][0])} ${y}`;
+    return { krokar, d, y };
+  }
+  function girlLampor() {
+    const { krokar, y } = girlBana();
+    const ut = [];
+    for (let i = 0; i < GIRL.n; i++) {
+      const [x0] = krokar[i];
+      const [x1] = krokar[i + 1];
+      const n = Math.round((x1 - x0) / 15);
+      for (let j = 1; j < n; j++) {
+        const t = j / n;
+        const sag = 2 * GIRL.s * 2 * t * (1 - t);
+        ut.push([r1(x0 + (x1 - x0) * t), r1(y + sag + (j % 2 ? -4 : 4.5))]);
+      }
+    }
+    return ut;
+  }
+  // runda prickar i en enda form (lamporna), r i världens enheter
+  const prickar = (lista, r) => lista.map(([x, y]) => `M${r1(x - r)} ${y}a${r} ${r} 0 1 0 ${r1(2 * r)} 0a${r} ${r} 0 1 0 ${r1(-2 * r)} 0`).join('');
+  function julLjus(o) {
+    return julUte(o) ? [...granLampor(), ...girlLampor()] : [];
+  }
+  function granen(v, L) {
+    const sno = v.snotackt ? snoC(L) : null;
+    const { k, mark, cx, hink, y0, H, W } = granMatt();
+    const R = rng(77);
+    const morkG = tone('#0f2a18', L, 0.06);
+    const mellan = tone('#22512e', L, 0.08);
+    const ljusG = tone('#3d7a45', L, 0.12);
+    let s = `<defs><linearGradient id="rf-gran" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${morkG}"/><stop offset=".55" stop-color="${mellan}"/><stop offset="1" stop-color="${ljusG}"/></linearGradient>` +
+      `<linearGradient id="rf-hink" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${tone('#6c7276', L)}"/><stop offset=".35" stop-color="${tone('#b9bfc2', L)}"/><stop offset=".7" stop-color="${tone('#878d91', L)}"/><stop offset="1" stop-color="${tone('#5a5f62', L)}"/></linearGradient></defs>`;
+    // skuggan på stenen under hinken (och på väggen bakom, i sol)
+    s += `<ellipse cx="${r1(cx + 6)}" cy="${r1(mark + 2)}" rx="${r1(hink * 0.85)}" ry="${r1(6 * k)}" fill="#000" opacity="${r1(0.22 + 0.2 * L.dag)}"/>`;
+    if (L.sol > 0.05) s += `<path d="M${r1(cx - W * 0.2)} ${r1(y0)} L${r1(cx + W * 0.1)} ${r1(y0 - H)} L${r1(cx + W * 0.62)} ${r1(y0 - H * 0.1)} Z" fill="#000" opacity="${r1(0.08 * L.sol * L.dag)}"/>`;
+    // stammen, och grenarna i sju våningar nedifrån: en kil med taggiga kanter som hänger ut i spetsarna, mörk
+    // upptill där våningen ovanför skuggar (rf-gran), och ljusare åt höger
+    s += `<rect x="${r1(cx - 4 * k)}" y="${r1(y0 - 22 * k)}" width="${r1(8 * k)}" height="${r1(26 * k)}" fill="${tone('#3a2618', L)}"/>`;
+    const N = 7;
+    let lager = '';
+    for (let i = 0; i < N; i++) {
+      const bas = y0 - 10 * k - (i / N) * H * 0.86;
+      const topp = Math.max(y0 - H, bas - H * 0.3);
+      const w = (W / 2) * (1 - (i / N) * 0.9);
+      const hang = 9 * k * (1 - i / N * 0.6);
+      const pts = [[cx, topp]];
+      const tag = (x0, y0_, x1, y1, n, amp) => {
+        for (let j = 1; j <= n; j++) {
+          const t = j / n;
+          const x = x0 + (x1 - x0) * t;
+          const y = y0_ + (y1 - y0_) * t;
+          const ut = j % 2 ? amp * (0.6 + 0.6 * R()) : -amp * 0.3;
+          pts.push([x - ut * 0.5 * Math.sign(x1 - x0 || 1), y + ut * 0.6]);
+        }
+      };
+      tag(cx, topp, cx - w, bas + hang, 7, 5 * k);
+      tag(cx - w, bas + hang, cx + w, bas + hang, Math.max(6, Math.round(w / (5 * k))), 5 * k);
+      // (botten: mitten lite högre än spetsarna)
+      for (const p of pts.slice(-Math.max(6, Math.round(w / (5 * k))))) p[1] -= Math.sin(Math.PI * (p[0] - cx + w) / (2 * w)) * hang * 0.8;
+      tag(cx + w, bas + hang, cx, topp, 7, 5 * k);
+      const d = `M${pts.map(([x, y]) => `${r1(x)} ${r1(y)}`).join(' L')} Z`;
+      lager += `<path d="${d}" fill="url(#rf-gran)"/>`;
+      // (ljuset från vänster uppifrån: den högra halvan lite mörkare)
+      lager += `<path d="M${r1(cx)} ${r1(topp)} L${r1(cx + w)} ${r1(bas + hang * 0.4)} L${r1(cx + w * 0.2)} ${r1(bas)} Z" fill="#000" opacity=".16"/>`;
+      if (sno) {
+        // (snö på grenarna: små klumpar längs våningens ovansida, mest till vänster)
+        for (let j = 0; j < 4; j++) {
+          const t = 0.14 + j * 0.22 + R() * 0.05;
+          const x = cx - w * 0.8 + 1.6 * w * t;
+          const y = topp + (bas + hang * 0.5 - topp) * (Math.abs(x - cx) / w) + 1.5 * k;
+          lager += `<ellipse cx="${r1(x)}" cy="${r1(y)}" rx="${r1(Math.min(w * 0.16, (3 + 2 * R()) * k))}" ry="${r1(1.4 * k)}" fill="${sno}" opacity=".85" transform="rotate(${r1((x < cx ? -1 : 1) * 22)} ${r1(x)} ${r1(y)})"/>`;
+        }
+      }
+    }
+    s += lager;
+    // lamporna (lyser på kvällen: kvallsljus) och sladden mellan dem
+    const lampor = granLampor();
+    s += `<path d="M${lampor.map(([x, y]) => `${x} ${y}`).join(' L')}" fill="none" stroke="${tone('#1a2a1a', L)}" stroke-width="${r1(0.8 * k)}" opacity=".7"/>`;
+    s += `<path d="${prickar(lampor, r1(2.2 * k))}" fill="${mix('#d9d0b4', '#fff3c4', 1 - L.dag)}"/>`;
+    // hinken i zink, med två räfflor och öronen för handtaget, och ett rött band med rosett
+    const hb = hink * 1.15;
+    const ht = y0 - 4 * k;
+    s += `<path d="M${r1(cx - hb / 2)} ${r1(ht)} H${r1(cx + hb / 2)} L${r1(cx + hb * 0.42)} ${r1(mark)} H${r1(cx - hb * 0.42)} Z" fill="url(#rf-hink)"/>`;
+    s += `<rect x="${r1(cx - hb / 2 - 2 * k)}" y="${r1(ht - 3 * k)}" width="${r1(hb + 4 * k)}" height="${r1(5 * k)}" rx="${r1(2 * k)}" fill="${tone('#a4aaad', L)}"/>`;
+    for (const f of [0.3, 0.72]) {
+      const y = ht + (mark - ht) * f;
+      const b = hb / 2 - (hb / 2 - hb * 0.42) * f;
+      s += `<path d="M${r1(cx - b)} ${r1(y)} H${r1(cx + b)}" stroke="${tone('#5e6468', L)}" stroke-width="${r1(1.6 * k)}"/>`;
+    }
+    const by = ht + (mark - ht) * 0.5;
+    const bb = hb / 2 - (hb / 2 - hb * 0.42) * 0.5;
+    const rod = tone('#a3121c', L, 0.12);
+    s += `<rect x="${r1(cx - bb)}" y="${r1(by - 4 * k)}" width="${r1(2 * bb)}" height="${r1(8 * k)}" fill="${rod}"/>`;
+    s += `<g fill="${rod}" stroke="${tone('#5e0a10', L)}" stroke-width="${r1(0.6 * k)}"><ellipse cx="${r1(cx - 7 * k)}" cy="${r1(by - 2 * k)}" rx="${r1(7 * k)}" ry="${r1(4.5 * k)}" transform="rotate(-18 ${r1(cx - 7 * k)} ${r1(by - 2 * k)})"/><ellipse cx="${r1(cx + 7 * k)}" cy="${r1(by - 2 * k)}" rx="${r1(7 * k)}" ry="${r1(4.5 * k)}" transform="rotate(18 ${r1(cx + 7 * k)} ${r1(by - 2 * k)})"/>` +
+      `<path d="M${r1(cx - 2 * k)} ${r1(by)} l${r1(-6 * k)} ${r1(16 * k)} l${r1(4 * k)} ${r1(-1 * k)} Z M${r1(cx + 2 * k)} ${r1(by)} l${r1(6 * k)} ${r1(15 * k)} l${r1(-4 * k)} ${r1(-1 * k)} Z"/><circle cx="${r1(cx)}" cy="${r1(by - 1 * k)}" r="${r1(3.2 * k)}"/></g>`;
+    for (const sx of [-1, 1]) s += `<circle cx="${r1(cx + sx * (hb / 2 - 3 * k))}" cy="${r1(ht + 8 * k)}" r="${r1(2.4 * k)}" fill="${tone('#4e5356', L)}"/>`;
+    return s;
+  }
+  function girlangen(v, L) {
+    const sno = v.snotackt ? snoC(L) : null;
+    const { krokar, d } = girlBana();
+    let s = `<g fill="none" stroke-linecap="round">` +
+      `<path d="${d}" stroke="${tone('#10281a', L, 0.06)}" stroke-width="11"/>` +
+      `<path d="${d}" stroke="${tone('#24552f', L, 0.1)}" stroke-width="17" stroke-dasharray="1.4 2.6"/>` +
+      `<path d="${d}" stroke="${tone('#3f7d46', L, 0.14)}" stroke-width="13" stroke-dasharray="1 4.4" stroke-dashoffset="2"/>` +
+      `<path d="${d}" stroke="#000" stroke-width="5" opacity=".18" transform="translate(0 4)"/>` +
+      (sno ? `<path d="${d}" stroke="${sno}" stroke-width="3" stroke-dasharray="14 9 6 12" transform="translate(0 -5)" opacity=".85"/>` : '') +
+      '</g>';
+    const lampor = girlLampor();
+    s += `<path d="${prickar(lampor, 2)}" fill="${mix('#d9d0b4', '#fff3c4', 1 - L.dag)}"/>`;
+    // rosetterna vid krokarna
+    const rod = tone('#a3121c', L, 0.12);
+    const kant = tone('#5e0a10', L);
+    for (const [x, y] of krokar) {
+      s += `<g fill="${rod}" stroke="${kant}" stroke-width=".7"><ellipse cx="${r1(x - 7)}" cy="${y - 1}" rx="7.5" ry="4.6" transform="rotate(-16 ${r1(x - 7)} ${y - 1})"/><ellipse cx="${r1(x + 7)}" cy="${y - 1}" rx="7.5" ry="4.6" transform="rotate(16 ${r1(x + 7)} ${y - 1})"/>` +
+        `<path d="M${r1(x - 2)} ${y + 2} l-5 17 l4 -1.5 Z M${r1(x + 2)} ${y + 2} l6 16 l-4 -1 Z"/><circle cx="${r1(x)}" cy="${y}" r="3.4"/></g>`;
+    }
+    return s;
+  }
+
   // Ljuset. På dagen skuggor under gesimsen, skylten och svanhalsarna och i porten, så att fasaden får djup.
   // På kvällen är bottenvåningen och trottoaren mörkare (en mask med mjuka hål där något lyser) och ljuset
   // skarpt: käglor från svanhalsarna ned över skylten, en liten gloria kring lyktorna, rummets sken på
@@ -837,6 +1001,11 @@ window.RumFasad = (() => {
     if (L.lampor) hal.push([GATSKYLT.x + GATSKYLT.w / 2, GATSKYLT.y + GATSKYLT.h / 2, 120, 48]);
     if (L.lampor) hal.push([341, 380, 150, 160], [1720, MARK + 30, 330, 120]);
     hal.push([FON.x + FON.w / 2 + 40, MARK + 50, 520, 120]);
+    // (granen vid dörren i sina lampors sken)
+    if (julUte(o)) {
+      const g = granMatt();
+      hal.push([g.cx, g.y0 - g.H * 0.45, g.W * 0.95, g.H * 0.75]);
+    }
     d += `<mask id="rf-mork-m" maskUnits="userSpaceOnUse" x="${VARLD.x0}" y="${VARLD.y0}" width="${VARLD.x1 - VARLD.x0}" height="${VARLD.y1 - VARLD.y0}"><rect x="${VARLD.x0}" y="${VARLD.y0}" width="${VARLD.x1 - VARLD.x0}" height="${VARLD.y1 - VARLD.y0}" fill="#fff"/>` +
       hal.map(([cx, cy, rx, ry]) => `<ellipse cx="${r1(cx)}" cy="${r1(cy)}" rx="${r1(rx)}" ry="${r1(ry)}" fill="url(#rf-hol)"/>`).join('') +
       `<rect x="${FON.x}" y="${FON.y}" width="${FON.w}" height="${FON.h}" fill="#000"/><rect x="${DORR.x}" y="${DORR.y}" width="${DORR.w}" height="${DORR.h}" fill="#000"/></mask>` +
@@ -865,6 +1034,9 @@ window.RumFasad = (() => {
       s += `<circle cx="1720" cy="${LYKTA + 16}" r="${r1(120 * (1 + 0.6 * L.dimma))}" fill="url(#rf-glod)" opacity="${r1(0.8 * mork)}"/><ellipse cx="1720" cy="${LYKTA + 22}" rx="20" ry="7" fill="#fffaf0" opacity="${r1(mork)}"/>`;
       s += `<ellipse cx="1720" cy="${MARK + 34}" rx="300" ry="44" fill="url(#rf-glod)" opacity="${r1(0.3 * mork)}"/>`;
     }
+    // julens lampor: en liten gloria och en ljus kärna (granen och girlangen, julUte)
+    const jl = julLjus(o);
+    if (jl.length) s += `<g opacity="${r1(mork)}">${jl.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9" fill="url(#rf-glod)" opacity=".75"/>`).join('')}<path d="${prickar(jl, 1.7)}" fill="#fff8e6"/></g>`;
     // rummets ljus ut på trottoaren, mjukt och kort
     d += '<radialGradient id="rf-pol" cx=".5" cy="0" r=".5"><stop offset="0" stop-color="#ffcf8a" stop-opacity=".75"/><stop offset=".6" stop-color="#ffcf8a" stop-opacity=".2"/><stop offset="1" stop-color="#ffcf8a" stop-opacity="0"/></radialGradient>';
     const pol = 0.42 * mork * (0.35 + 0.65 * ljus);
@@ -4976,7 +5148,7 @@ window.RumFasad = (() => {
   function sig(V, v, L, o) {
     return [V.x, V.y, V.w, V.h, v.slag, bucket(v.mangd, 5), v.snotackt, v.blott, v.advent, v.arstid, lovet(v), v.timme >> 1, v.nyar,
       bucket(L.dag, 20), bucket(L.sol, 10), bucket(L.guld, 10), bucket(L.m, 10), bucket(L.tand, 30), L.lampor, bucket(L.dimma, 5),
-      Math.round(v.temp), Math.round(v.vind / 3), bucket(inne(o, L), 10)].join();
+      Math.round(v.temp), Math.round(v.vind / 3), bucket(inne(o, L), 10), o.hogtid ? o.hogtid() : ''].join();
   }
 
   function svg(V, inner, cls = '') {
@@ -5066,7 +5238,8 @@ window.RumFasad = (() => {
       // syns (ungefär 50 MB i stället för 10 i en iPhone).
       const sk = F.k;
       const pyntDukar = pyntBild.map((b, i) => (b ? duk('rf-pynt', i ? DORR : FON, pyntPx) : '')).join('');
-      const framfor = `<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}${texten(v, L)}`;
+      const framfor = `<g clip-path="url(#rf-hal)">${huset(V, v, L, o)}</g>${bron(V, v, L)}${marken(V, v, L)}${GATA() ? GATA().mark(V, v, L, gataMatt()) : ''}${texten(v, L)}` +
+        (julUte(o) ? girlangen(v, L) + granen(v, L) : '');
       scen.style.transform = '';
       scen.style.width = `${r1(V.w * sk)}px`;
       scen.style.height = `${r1(V.h * sk)}px`;

@@ -4672,6 +4672,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       natt: () => (window.RumFolk && RumFolk.nattGrad ? RumFolk.nattGrad() : 0),
       // högtidspyntet i fönstret och på dörren, utifrån (rum-inredning.js)
       pynt: (namn, x) => (R.inr && R.inr.pyntUtifran ? R.inr.pyntUtifran(namn, x) : null),
+      // (och vilken högtid det är: julgranen och girlangen ute till jul)
+      hogtid: () => (R.inr && R.inr.pyntNamn ? R.inr.pyntNamn() : null),
       // veckans löpsedel i stället på trottoaren (rum-affischer.js; samma som hänger hos Hasse Backe)
       sedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null),
       calm: () => RORELSE_AV.matches,

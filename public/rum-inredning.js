@@ -2054,6 +2054,26 @@ export async function inredning(el, opt = {}) {
   const PK = (x, y, z = FZ) => new THREE.Vector3(x / K, -y / K, z / K);
   const DISK_PLATS = { x: 1103, z: 100, vrid: -38, k: 0.82 };
   const KROKAR = [244, 420, 596, 772, 948].map((x) => PK(x, KARM));
+  // Mer jul i skyltfönstret (2026-11-28, användarens önskemål: "mer julföremål … även i fönstret så att det syns ute
+  // i gatan"): pappersflingor och konstsnö i hörnen på glaset, och en adventsljusstake på fönsterbänken med lamporna
+  // ut mot gatan. Inifrån syns flingorna och snön ovanför gänget; ljusstaken står bakom bordet och syns bäst utifrån
+  // (pyntUtifran), där också snön i de nedre hörnen syns. Glaset är rutorna 272–603 och 617–948 (mittposten
+  // emellan) från y 132 till 558, i planet GZ (kransen på dörrens glas sitter i -18); bänken är BANK_Y i väggens plan.
+  // Allt i fönstrets duk: ingen ny duk, och ritat en gång.
+  const GZ = -21;
+  const BANK_Y = 556;
+  function julFonster(S, F) {
+    F.push(S.snoflingor([[298, 178, 6.5, 0, 0.2], [322, 262, 5, 2, -0.3], [458, 250, 4.2, 1, 0.5], [632, 168, 4.6, 3, 0.1],
+      [652, 262, 5.6, 0, -0.4], [836, 172, 5.8, 2, 0.3], [902, 192, 4.4, 1, -0.2], [300, 470, 6, 3, 0.4], [930, 480, 5.5, 0, -0.2],
+      [520, 420, 5, 2, 0.1], [700, 430, 4.6, 1, 0.6]].map(([x, y, R, typ, vrid]) => ({ ...PK(x, y, GZ), R, typ, vrid }))));
+    const horn = [[272, 132, 'ov'], [603, 132, 'oh'], [617, 132, 'ov'], [948, 132, 'oh'], [272, 558, 'nv'], [603, 558, 'nh'], [617, 558, 'nv'], [948, 558, 'nh']];
+    F.push(S.konstsno(horn.map(([x, y, h]) => ({ ...PK(x, y, GZ), b: 54, horn: h }))));
+    // (vänd ut mot gatan, mitt i fönstret bakom bordet)
+    const st = S.ljusstake();
+    st.position.copy(PK(610, BANK_Y, -8));
+    st.rotation.y = Math.PI;
+    F.push(st);
+  }
   function pyntSakerna(P, namn) {
     const S = P.pyntSaker(mat);
     const F = [];
@@ -2077,6 +2097,7 @@ export async function inredning(el, opt = {}) {
       const kr = S.krans({ typ: 'gran', R: 16, band: 7 });
       kr.position.copy(PK(136, 366, -18));
       DR.push(kr);
+      julFonster(S, F);
       if (namn === 'nyar') {
         // serpentiner som hänger från girlangen, utom i bågen med stjärnan
         const ut = [];
@@ -2286,5 +2307,5 @@ export async function inredning(el, opt = {}) {
     rad: LP.rad,
     nu(id) { if (LP.nu(id)) B.radiolapp.paint(); },
   };
-  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp, pyntLjus, lampLjus, pyntUtifran };
+  return { draw: tick, namn: setNamn, skarp, natt, stopp, lapp, pyntLjus, lampLjus, pyntUtifran, pyntNamn: () => PY.namn || null };
 }
