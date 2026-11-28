@@ -5,7 +5,7 @@
   "namn": "Stryktipset",
   "nr": 4981
  },
- "uppdaterad": "2026-11-28T08:13:23.030Z",
+ "uppdaterad": "2026-11-28T08:21:31.847Z",
  "amnen": {
   "trupp": "Skador och trupp",
   "elva": "Väntad uppställning",
@@ -908,14 +908,21 @@
     "Coventry City"
    ],
    "avspark": "2026-11-28T15:00:00.000Z",
-   "skriven": "2026-11-28T07:55:26.458Z",
-   "rubrik": "Alla tärningar är riggade, och Leeds börjar tvivla",
+   "skriven": "2026-11-28T08:21:31.847Z",
+   "rubrik": "Allt talar för Leeds, och det är problemet",
    "ingress": null,
-   "summering": "Leeds möter den sortens match alla väntar sig att de ska vinna, och förtroendet för Farke hänger på den. Coventry saknar Awoniyi och har tankarna på Ipswich på tisdag.",
+   "summering": "Leeds har allt på sin sida och oroar sig just därför, med Farkes kredit hos läktaren som insats. Coventry kommer med ett vasst anfall, ett läckande försvar och tankarna på Ipswich.",
    "delar": [
     {
      "lag": "Leeds United",
      "kallor": [
+      {
+       "podd": "The Square Ball: Leeds United Podcast",
+       "avsnitt": "Hayden Evans: Celebrating Gary Speed | The West Stand",
+       "datum": "2026-11-27",
+       "adress": "https://thesquareball.net/plus",
+       "typ": "podd"
+      },
       {
        "podd": "The Square Ball: Leeds United Podcast",
        "avsnitt": "DCL the MVP | The Square Ball",
@@ -927,13 +934,6 @@
        "podd": "The Square Ball: Leeds United Podcast",
        "avsnitt": "Propaganda: Let It Die Down",
        "datum": "2026-11-25",
-       "adress": "https://thesquareball.net/plus",
-       "typ": "podd"
-      },
-      {
-       "podd": "The Square Ball: Leeds United Podcast",
-       "avsnitt": "Simon Grayson: We Just Bullied Them | The West Stand",
-       "datum": "2026-11-23",
        "adress": "https://thesquareball.net/plus",
        "typ": "podd"
       },
@@ -1040,35 +1040,13 @@
          "typ": "forum"
         },
         {
-         "t": "Supportrarna tycker inte att Calvert-Lewin är någon särskilt bra avslutare. Men han ställer till så mycket för motståndarna att det väger upp de chanser han missar, och mot försvarare som går att trycka undan är han en dröm.",
+         "t": "Harry Wilson har länge varit en besvikelse men börjar komma igång. Hayden Evans tror att den lysande senaste landskampen för Wales ger honom självförtroende att våga mer på Elland Road.",
          "s": "o",
          "podd": [
           "The Square Ball: Leeds United Podcast"
          ],
          "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Värdarna ser Calvert-Lewin som lagets viktigaste spelare, viktigare än Ampadu och Trafford. Utan dem går det att klara sig med en sämre kopia, men Nmecha gör inte alls samma sak som Calvert-Lewin.",
-         "s": "o",
-         "podd": [
-          "The Square Ball: Leeds United Podcast"
-         ],
-         "datum": [
-          "2026-11-26"
-         ],
-         "typ": "podd"
-        },
-        {
-         "t": "Enligt värdarna spelar Leeds mer som ett Bielsa-lag än folk tror. Mot Chelsea sprang laget 123,7 km, mest av alla lag i ligan i år. I trebackslinjen går Justin, Muharemovic och Bogle ofta framåt, och bara Elvedi stannar kvar.",
-         "s": "o",
-         "podd": [
-          "The Square Ball: Leeds United Podcast"
-         ],
-         "datum": [
-          "2026-11-26"
+          "2026-11-27"
          ],
          "typ": "podd"
         }
@@ -1105,13 +1083,35 @@
          "typ": "podd"
         },
         {
-         "t": "Efter segern mot Chelsea ses hemmamatchen mot Coventry som det verkliga provet. Coventry väntas ligga lågt och försvara sig, och förväntningarna på de 38 000 på läktaren riskerar att dämpa stämningen jämfört med bortapubliken på Stamford Bridge.",
+         "t": "Efter segern mot Chelsea menar värdarna att Leeds måste hålla samma nivå igen. Allt mindre än tre poäng mot Coventry skulle göra insatsen i London bortkastad.",
          "s": "o",
          "podd": [
           "The Square Ball: Leeds United Podcast"
          ],
          "datum": [
-          "2026-11-23"
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Supportrarna hoppas att Elland Road ligger på och ger sig på Coventrys tränare Frank. De noterar att han i en presskonferens moget erkände att han och Leedspubliken har en historia, men tänker ändå inte släppa trycket.",
+         "s": "o",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
+         ],
+         "typ": "podd"
+        },
+        {
+         "t": "Hayden Evans trodde för en månad sedan att Coventry skulle bli prügelknaben på Elland Road. Nu ser han ett lag som fått form och som antingen vinner eller förlorar, inte spelar oavgjort.",
+         "s": "o",
+         "podd": [
+          "The Square Ball: Leeds United Podcast"
+         ],
+         "datum": [
+          "2026-11-27"
          ],
          "typ": "podd"
         }
@@ -1119,23 +1119,23 @@
       }
      ],
      "text": [
-      "”Alla tärningar är riggade till vår fördel den här gången”, säger man i podden The Square Ball, och just därför smyger sig det gamla Leeds-tvivlet på. Efter den stora segern mot Newcastle väntade sig alla att ett formsvagt Palace skulle köras över, och det blev mållöst. På NOT606 påpekar man att laget saknar finessen att bryta ner ett lag som parkerar bussen.",
-      "Calvert-Lewin ses ändå som lagets viktigaste spelare, trots att han ”faktiskt ingen särskilt bra avslutare” är, och Nmecha gör inte alls samma sak.",
-      "Förtroendet för Daniel Farke växer men är skört, och före Spurs-matchen ville en del ha honom sparkad."
+      "”Alla tärningar är riggade till vår fördel”, säger man i The Square Ball, och just därför smyger sig det gamla Leeds-tvivlet på. Förtroendet för Daniel Farke har börjat växa, men det är skört: före Spurs-matchen ville en del ha honom sparkad, och en förlust nu kan vända allt snabbt.",
+      "Där ser man Dominic Calvert-Lewin som lagets viktigaste spelare, fast han inte är någon särskilt bra avslutare. Det han ställer till för försvararna väger tyngre än missarna.",
+      "Och Frank Lampard ska få höra det från läktaren, hur vuxet han än pratade om sin historia med Leedspubliken."
      ],
      "citat": {
-      "sagt": "Det enda som är säkert i helgen är att Frank Lampard inte kommer att få något fint mottagande, och det med rätta.",
-      "vem": "Simon Grayson",
-      "podd": "The Square Ball: Leeds United Podcast",
-      "typ": "podd",
+      "sagt": "Vi har det svårt mot fula lag som parkerar bussen. Vi saknar finessen för att bryta ner dem.",
+      "vem": "milkyboy",
+      "podd": "NOT606",
+      "typ": "forum",
       "datum": "2026-11-23"
      },
      "namn": [
-      "Calvert-Lewin",
-      "Nmecha",
-      "Daniel Farke"
+      "Daniel Farke",
+      "Dominic Calvert-Lewin",
+      "Frank Lampard"
      ],
-     "paSpel": "Farkes sköra förtroende: en förlust, och stämningen kan vända direkt."
+     "paSpel": "Att inte slösa bort Chelseasegern, och Farkes sköra förtroende på läktaren."
     },
     {
      "lag": "Coventry City",
@@ -1301,23 +1301,24 @@
       }
      ],
      "text": [
-      "På forumet Sky Blues Talk har många redan lagt blicken på tisdagens match mot Ipswich, ”en mycket viktigare match för oss”. Där räknar många med förlust på Elland Road, när Awoniyi saknas: han är den ende anfallaren som kan hålla i bollen och hjälpa laget upp i banan.",
-      "Bakåt är oron störst. I podden Sky Blue Fans TV upprepar man ”stoppa inlägget”, eftersom båda Palacemålen var hela lagets fel.",
-      "Ändå vill Jack inte att Lampard drar sig tillbaka av rädsla: senast lagen möttes lät Coventry Leeds komma, och ”de slet oss fullständigt i stycken”."
+      "På Sky Blues Talk har många redan räknat med förlust på Elland Road. Matchen som ska avgöra säsongen är den mot Ipswich på tisdag.",
+      "Framåt kan laget ställa till det för vem som helst, med Yann Gboho som en ”uppenbarelse” bredvid Rudoni, men bakåt känns varje motståndaranfall som ett möjligt insläppt mål. Utan Taiwo Awoniyi saknas dessutom den ende anfallaren som bollen fastnar hos.",
+      "Ett hopp finns ändå: Leedssupportrarna hatar Lampard, och ett sent segermål skulle ”verkligen reta upp” dem."
      ],
      "citat": {
-      "sagt": "Vi har ingen chans om vi är lika öppna som i de två senaste bortamatcherna.",
-      "vem": "Hincha",
+      "sagt": "Just nu inte bland de tre sista i Premier League, och det är ungefär det bästa vi kan begära den här säsongen.",
+      "vem": "TomRad85",
       "podd": "Sky Blues Talk",
       "typ": "forum",
-      "datum": "2026-11-26"
+      "datum": "2026-11-27"
      },
      "namn": [
-      "Awoniyi",
-      "Jack",
+      "Yann Gboho",
+      "Rudoni",
+      "Taiwo Awoniyi",
       "Lampard"
      ],
-     "paSpel": "Inte mycket: blicken är redan på tisdagens match mot Ipswich."
+     "paSpel": "Inte mycket: blicken är redan riktad mot Ipswich på tisdag."
     }
    ]
   },
