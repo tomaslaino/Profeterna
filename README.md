@@ -8280,6 +8280,28 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
     små sakerna. Fyra fordon med en full ledbuss: 0,10 → 0,14 ms per bild att rita i Chromium på datorn. Gatan
     inifrån och bron bakom Hasse Backe visar samma människor, eftersom de ritar med samma kod. Provat i bilder av alla
     former på nära håll dag och kväll och i fasaden på datorn; inte i en riktig telefon.
+  - **Ännu bättre (samma dag):** "kan du göra det ännu bättre". Tre förslag visades i fasaden bredvid hur det såg ut
+    (A ansikten och kläder, B liv, C genom bilen, B som film), och hen valde alla tre: "Bara se till så att det inte
+    drar för mycket grafik och att det alltså funkar bra på gamla mobiler och datorer också".
+    - **Ansikten och kläder:** ögonlock, näsborre, läppar (läppstift på några), rosiga kinder i kylan och på barnen,
+      glans i håret och lockar i permanentet, sömmen på nackstödet, och kläderna (`plagget`): dunjacka med sömmar och
+      hög krage, prasselåk i två färger med en rand, kavaj med slag (alltid skjorta), jeansjacka med fårskinnskrage,
+      och armen mot kroppen på dem som sitter still.
+    - **Liv** (`livet`, räknat ur tiden, var och en i sin egen takt): huvudet andas och vrids lite, de blinkar, föraren
+      pratar med den i baksätet i tur och ordning (käken, nickar när den andra pratar) eller nickar i takten till
+      radion och trummar på ratten, barnet i baksätet vinkar, hunden flämtar, någon i bussen läser kvällstidningen
+      och några pratar med den bredvid, de som står gungar med bussen, och cigaretten ger ett bloss då och då.
+    - **Genom bilen:** rutorna står öppna i karossen och det mörka bandet (`evenodd`), och glaset är tonat
+      (0,36 på dagen, 0,32 på kvällen, och glasets dis framför dem som åker), så att affären, skylten och de som går
+      förbi syns genom bilarna, skåpbilarna och lastbilens hytt; bussarnas rutor och dörrarnas glas på dagen (på
+      kvällen är bussen upplyst inne som förut).
+    - **Lätt för svaga enheter:** det nya lottas ur ett eget frö per person, så att alla andra drag och all trafik är
+      som förut. Rörelserna kostar inget att rita (fordonen ritas ändå om i varje bild), glaset bara en annan
+      fyllregel, och bussens säten ritas med tre anrop. De små dragen räknas nu efter punkter på skärmen, inte
+      bildpunkter (`finare` delar med fasadens högst två bildpunkter per punkt), så att en telefon med täta bildpunkter
+      inte ritar det som inte syns. Fyra fordon med en full ledbuss utan grafikkort: 1,6 → 1,8 ms per bild i stor
+      skala och 0,66 → 0,79 i telefonens; med grafikkort 3,2 → 3,4 och 2,2 → 2,4 (med läsning av duken varje bild).
+      Provat i fasaden på datorn dag och kväll (bilder och film); inte i en riktig telefon.
 
 Fasaden tonar fram medan man tar ett steg bakåt från dörren (`.in`), och ett klick var som helst, Esc, *Tillbaka* eller
 bakåt går in genom dörren igen (se [Bakåt](#bakåt)); klicket når inte gänget bakom (rum-folk.js valde annars den
