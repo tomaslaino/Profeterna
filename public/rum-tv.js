@@ -51,9 +51,11 @@
 // RumTv.html() → tv:n (i planet -470 i rum.js)
 // RumTv.mount(el, { calm, short, kort, wd, hm, matches, avVal, pa }) → { fill(rows, { spel, next }), tittar(on), matt(rekt) → frontens mått, zoom(on), key(k),
 //   av(on) → AV-ingången (rum-bild.js ritar i avEl), avEl, avPa(), glas → rutan, pa() → på eller av,
-//   ute(on) → rutan står i den lilla tv:n som följer med (rum-bild.js) och går också när rummet är dolt,
+//   ute(on, glid) → tv:n följer med (rum-bild.js): rutan står i den lilla tv:n och går också när rummet är dolt,
+//     och tv:n är borta från hyllan i rummet (glid: tonar bort eller fram), med() → om den följer med,
 //   rot(el) → tv:n har flyttats till el (rum.js: byggd utan rummet, sedan in i rummet) }
 // avVal(on): den som tittar bytte själv mellan text-tv:n och AV på tv:n. pa(on): tv:n slogs av eller på.
+// med(on): tv:n följer med eller står på sin hylla igen.
 
 window.RumTv = (() => {
   const COLS = 40;
@@ -793,6 +795,31 @@ window.RumTv = (() => {
       if (o.pa) o.pa(T.on);
     }
 
+    // Tv:n följer med (rum-bild.js): den tas ner med sin hylla, och armen står kvar på väggen med
+    // sladden, som ett fäste utan tv; skenet på väggen slocknar. Tillbaka står den där igen. Delarna
+    // tonar var för sig (opacitet på lådan själv plattar till den i 3D, som i tvBort i rum.js) och är
+    // sedan dolda, så att inget av tv:n ritas medan den är borta. Skenet tonar med sin egen övergång
+    // (rum-tv.css). Länken över fronten står kvar: ett klick där tv:n stod bär tillbaka den.
+    function borta(on, glid) {
+      const delar = [...box.querySelectorAll(':scope > :not(.rum-tv)')];
+      for (const a of T.tona || []) a.cancel();
+      T.tona = null;
+      sken.classList.toggle('borta', on);
+      const ms = glid && !o.calm() ? (on ? 260 : 420) : 0;
+      if (!on) box.classList.remove('borta');
+      if (!ms) {
+        box.classList.toggle('borta', on);
+        return;
+      }
+      const tona = (T.tona = delar.map((d) => d.animate(on ? [{ opacity: 0 }] : [{ opacity: 0, offset: 0 }], { duration: ms, easing: on ? 'ease-in' : 'ease-out', fill: on ? 'forwards' : 'none' })));
+      Promise.all(tona.map((a) => a.finished)).then(() => {
+        if (T.tona !== tona) return;
+        T.tona = null;
+        if (on) box.classList.add('borta');
+        for (const a of tona) a.cancel();
+      }, () => {});
+    }
+
     box.addEventListener('click', (e) => {
       if (!T.near) return;
       const b = e.target.closest('[data-tv], [data-sida], [data-visa]');
@@ -889,13 +916,20 @@ window.RumTv = (() => {
       avPa: () => T.ingang,
       glas,
       pa: () => T.on,
-      ute(on) {
-        T.ute = Boolean(on);
+      ute(on, glid = false) {
+        on = Boolean(on);
+        const byt = on !== T.ute;
+        T.ute = on;
         if (T.ute && T.on && !T.ingang) {
           draw(false);
           tick();
         }
+        if (byt) {
+          borta(on, glid);
+          if (o.med) o.med(on);
+        }
       },
+      med: () => T.ute,
       rot(el) { rot = el; },
       // Tangenterna när tv:n är nära: pilarna bläddrar, tre siffror väljer sida.
       key(k) {

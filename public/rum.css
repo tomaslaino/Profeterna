@@ -1160,10 +1160,8 @@ canvas.rum-svag { opacity: 0.05; }
    ryms inte bredvid namnet), tills den är släckt. */
 .rum.smal.tv-nara:has(.rum-bildknapp:not([hidden])) .rum-hdr { opacity: 0; pointer-events: none; }
 .rum.smal .rum-ft:has(.rum-bildknapp.pa:not([hidden])) .rum-vanlig { display: none; }
-/* Ta med tv:n går också till den vanliga sidan: där uppe står den i stället för Vanlig sida, och de tre står
-   lite tätare */
+/* Ta med tv:n står där uppe bredvid Visa dig på tv:n och Tillbaka, och de tre står lite tätare */
 .rum.smal.tv-nara .rum-ft:has(.rum-tamed:not([hidden])) { gap: 24px; }
-.rum.smal.tv-nara .rum-ft:has(.rum-tamed:not([hidden])) .rum-vanlig { display: none; }
 /* Rummet på höjden står längre bort än scenen är hög (fit i rum.js): taket och pulten fortsätter
    utanför, och ljuset och mörkret med dem. */
 .rum.smal .rum-stage { overflow: visible; background: none; }

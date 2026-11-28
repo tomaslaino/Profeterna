@@ -2092,6 +2092,8 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     calm, sedan, short, kort: (n) => BOARD[n] || short(n), wd, hm, matches: () => (state.all && state.all.matches) || [],
     avVal: (on) => { if (window.RumBild) RumBild.avVal(on); },
     pa: () => { if (window.RumBild && RumBild.knapp) RumBild.knapp(); },
+    // tv:n följer med eller är tillbaka: gänget slutar titta dit, eller tittar igen (gangLage)
+    med: () => { if (R.fig && R.fig.lage && R.lage) R.fig.lage(gangLage(), now()); },
   });
   function tvFyll() {
     if (!R.tv) return;
@@ -2865,6 +2867,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   // medan rummet står öppet: för var och en 1 när tipset blev rätt, −1 när det
   // blev fel och 0 annars, efter ens eget tips när det syns (annars gängets
   // kupong). Dolda resultat ger inga mål.
+  // Följer tv:n med (rum-bild.js) står bara armen kvar på väggen: då tittar gänget inte dit, och inget blått ljus
+  // faller på dem (borta, rum-3d.js).
+  function gangLage() {
+    const borta = Boolean(R.tv && R.tv.med());
+    return { ...R.lage, tv: R.lage.tv && !borta, borta };
+  }
   function gangTv(rd, rows, t, p) {
     const q = R.q;
     const soon = (x) => t - x.g.kick < 2.5 * 3600000;
@@ -2882,7 +2890,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (rum-inredning.js); ?rum-stopp räknas från urets tid
     R.stopp = rd && !rd.next && first ? (q.has('rum-stopp') ? (window.Vader ? Vader.nu().t : t) + h * 3600000 : first) : null;
     if (R.inr) R.inr.stopp(R.stopp);
-    if (R.fig && R.fig.lage) R.fig.lage(R.lage, now());
+    if (R.fig && R.fig.lage) R.fig.lage(gangLage(), now());
     // målen: ställningen mot förra gången (första gången inga)
     const s = p && p.s;
     const res = (sc) => SIGNS[signIdx(sc)];
@@ -3879,7 +3887,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         lappa();
         kval(R.kval);
         if (R.vem) R.fig.inne(R.vem, now());
-        if (R.lage) R.fig.lage(R.lage, now());
+        if (R.lage) R.fig.lage(gangLage(), now());
         if (R.spel) R.fig.spel(R.spel, now());
         if (R.nerv) R.fig.nerver(R.nerv, now());
         // de andra i gänget, natten och dagen efter (rum-folk.js)
@@ -4876,6 +4884,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     // (var den inte nära ska inget röra sig: tv:n svängde annars runt när
     // kupongen togs i handen, och kameran väntade in vridningen)
     if (!on && R.zoom === false) return;
+    // Följer tv:n med (den lilla i hörnet, rum-bild.js) står bara armen kvar: T och ett klick där bär
+    // tillbaka den, och då går kameran fram till den (RumBild.hem, som kommer tillbaka hit)
+    if (on && R.tv && R.tv.med() && window.RumBild && RumBild.hem) {
+      RumBild.hem();
+      return;
+    }
     // Var fronten hamnar när tv:n har vridits fram mäts en gång, med kameran
     // hemma och rummet rakt (matTv), innan något börjar röra sig. Förut mättes
     // den vid varje tryck – tv:n vreds fram och tillbaka och rummet lades ut
@@ -4900,6 +4914,33 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     else vridHem();
     if (on && R.tvMatt) aimTv(calm() ? null : 'zoom');
     else aim([800, 500], 1, [800, 500], calm() ? null : 'zoom');
+  }
+  // Fram till tv:n var man än är i rummet (den lilla tv:n som följer med, rum-bild.js): det som ligger
+  // framme läggs bort först, översta först som med Tillbaka, och sedan går kameran fram till tv:n.
+  // → var fronten hamnar i fönstret när kameran har gått fram (tvMal), eller null.
+  function tillTv() {
+    if (!R.on) return null;
+    if (!R.zoom) {
+      for (let i = 0; i < 6 && window.RumBak && RumBak.lager.length; i++) {
+        const n = RumBak.lager.length;
+        RumBak.ned();
+        if (RumBak.lager.length >= n) break;
+      }
+      zoomTv(true);
+    }
+    return tvMal();
+  }
+  // Frontens ruta i fönstret där kameran är på väg (R.kamMal, satt av aim), med tv:n vriden fram: scenens
+  // mått gånger kamerans förstoring, som i aim. Den lilla tv:n flyger dit när den bärs tillbaka.
+  function tvMal() {
+    const m = R.tvMatt;
+    const k = R.kamMal;
+    if (!m || !k || !R.zoom) return null;
+    const x = R.ox + R.k * (800 + k.dx + k.z * (m.c[0] - 800));
+    const y = R.oy + R.k * (500 + k.dy + k.z * (m.c[1] - 500));
+    const b = m.b * k.z * R.k;
+    const h = m.h * k.z * R.k;
+    return { left: x - b / 2, top: y - h / 2, width: b, height: h };
   }
   // Frontens mitt och mått i scenen när tv:n är vriden fram: mätta med rummet
   // rakt – och står planen vridna mot videon (och borta, lattVideo), raka och
@@ -7586,8 +7627,9 @@ ${window.RumRegister ? RumRegister.nara() : ''}
   return { fits, show, hide, kupong, bladet, summa: () => R.summa || null, lopsedel: () => (R.saker && R.saker.sedel ? R.saker.sedel() : null),
     // Helgarderats senaste nummer, samma som på pulten (Hasse Backe läser det ibland, rum-hasse.js). → Promise: upplagan eller null
     numret: hamtaTidning, smal: () => Boolean(R.smal),
-    // fram till tv:n (den lilla tv:n som följde med, rum-bild.js), och tv:n utan rummet (tvUtan)
-    tv: () => { if (R.on && !R.zoom) zoomTv(true); },
+    // fram till tv:n var man än är (den lilla tv:n som följer med, rum-bild.js; → var fronten hamnar,
+    // tillTv), tillbaka från den (Ta med tv:n), och tv:n utan rummet (tvUtan)
+    tv: tillTv, tvUt: () => { if (R.on && R.zoom) zoomTv(false); },
     tvUtan, redraw: () => { if (R.on) fill(); }, taGang, skriv: skrivPult, kval: () => R.kval, vila: (v) => {
       R.vilar = Boolean(v);
       // (rummet kommer tillbaka rakt: rum-hasse.js rätar upp det på vägen dit)

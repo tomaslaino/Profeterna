@@ -25,16 +25,21 @@
 //  – Fliken dold eller rummet stängt: kameran släcks och tänds igen av sig själv
 //    när man kommer tillbaka inom tio minuter (ATER) – så bryts inget när man
 //    växlar till telefonsamtalet en stund.
-//  – Ta med tv:n (i foten nära tv:n): man går till den vanliga sidan, och tv:n
-//    krymper till en liten tv uppe till höger som följer med vart man än går på
-//    sajten. Den visar tv:ns egen ruta – text-tv:n, som går vidare, eller AV –
-//    och byter till AV när någon visar sig, som i rummet; kameran och bilden
-//    fortsätter. Ett tryck på den lilla tv:n går tillbaka till tv:n i rummet, och
-//    krysset stänger den (kameran släcks, som när man lämnade rummet). Till
-//    Tabeller, Statistik och Om oss, som är egna sidor, följer den med genom att
-//    koppla upp sig igen (sessionStorage profeterna.tv.foljer, tv-med.js laddar
-//    det som behövs där); text-tv:n finns bara på förstasidan, så där syns den
-//    lilla tv:n bara med AV.
+//  – Ta med tv:n (i foten nära tv:n): man stannar i rummet, bilden krymper till
+//    en liten tv i hörnet medan kameran går tillbaka, och tv:n tas ner med sin
+//    hylla – armen står kvar på väggen. Den lilla tv:n följer med vart man än
+//    går: till datorn, Hasse Backe, kupongen, ut på trottoaren och ut ur rummet
+//    till resten av sajten.
+//    Den visar tv:ns egen ruta – text-tv:n, som går vidare, eller AV – och byter
+//    till AV när någon visar sig, som i rummet; kameran och bilden fortsätter.
+//    Ett tryck på den (eller T, eller ett klick där den stod) bär tillbaka
+//    tv:n: kameran går fram till den och bilden flyger in i den. Krysset stänger
+//    den (kameran släcks) och tv:n står på väggen igen. Den går att dra till ett
+//    annat hörn, och står där sedan (profeterna.tv.horn). Till Tabeller,
+//    Statistik och Om oss, som är egna sidor, följer den med genom att koppla upp
+//    sig igen (sessionStorage profeterna.tv.foljer, tv-med.js laddar det som
+//    behövs där); text-tv:n finns bara på förstasidan, så där syns den lilla
+//    tv:n bara med AV.
 //
 // Vem du är: den du har valt i rummet (Samtal.pult.du()), annars den enheten
 // minns från kupongen, annars frågar tv:n (Vem är du?, sparas för tv:n i
@@ -53,7 +58,8 @@
 //   RumBild.mount(el, { tv })   när tv:n är byggd (rum.js); tv = RumTv.mount(…)
 //   RumBild.on(true | false)    rummet visas eller inte
 //   RumBild.avVal(on)           den som tittar bytte själv på tv:n (TV/AV, en sida …)
-//   RumBild.foljer()            tv:n följer med utanför rummet (den lilla tv:n)
+//   RumBild.foljer()            tv:n följer med (den lilla tv:n), i rummet eller utanför
+//   RumBild.hem()               tv:n bärs tillbaka upp på väggen, och kameran går fram (T, där den stod)
 //   RumBild.knapp()             tv:n slogs av eller på (Ta med tv:n i foten)
 //
 // För prov: ?rum-bild=ws://127.0.0.1:8787/bild (en annan tjänst, t.ex. wrangler
@@ -77,10 +83,10 @@ window.RumBild = (() => {
 
   const B = {
     el: null, tv: null, knapp: null, tamed: null,
-    // ute: tv:n följer med utanför rummet (mini: den lilla tv:n), tamed: Ta med tv:n
-    // trycktes nyss (fran: var tv:n stod), tillTv: fram till tv:n när rummet visas,
+    // ute: tv:n följer med, i rummet och ut ur det (mini: den lilla tv:n, horn: dess hörn, fran: var
+    // tv:n stod när den togs med, drogs: den drogs nyss), tillTv: fram till tv:n när rummet visas,
     // ram: där tv:ns ruta sitter i tv:n
-    ute: false, mini: null, inne: null, tamedNu: false, fran: null, tillTv: false, samtal: null, ram: null,
+    ute: false, mini: null, horn: 'oh', drogs: false, inne: null, fran: null, tillTv: false, samtal: null, ram: null,
     on: false, ws: null, uppe: false, timer: 0, ping: 0, retry: 0, vem: null, vemT: 0,
     id: fonster(), ice: null, alla: [], peers: new Map(),
     stream: null, startar: false, fel: '', valj: null,
@@ -620,18 +626,19 @@ window.RumBild = (() => {
     return d;
   }
   // Tv:ns ruta (text-tv:n och AV) sitter i tv:n, och i den lilla tv:n när den
-  // följer med. Finns ingen tv på sidan (Tabeller, Statistik och Om oss) har den
-  // lilla tv:n en egen ruta med bara AV.
-  function plats() {
+  // följer med – då är tv:n borta från väggen i rummet (glid: den tonar bort eller
+  // fram). Finns ingen tv på sidan (Tabeller, Statistik och Om oss) har den lilla
+  // tv:n en egen ruta med bara AV.
+  function plats(glid = false) {
     const d = inne();
-    const ute = B.ute && !B.on;
+    const ute = B.ute;
     const g = B.tv && B.tv.glas;
     if (g) {
       if (d.parentNode !== B.tv.avEl) B.tv.avEl.append(d);
       const ram = ute ? mini().querySelector('.tv-ram') : B.ram;
       if (g.parentNode !== ram) ram.append(g);
       if (B.mini) B.mini.querySelector('.tv-glas.egen').hidden = ute;
-      B.tv.ute(ute);
+      B.tv.ute(ute, glid);
     } else if (ute) {
       const dit = mini().querySelector('.tv-av');
       if (d.parentNode !== dit) dit.append(d);
@@ -648,11 +655,15 @@ window.RumBild = (() => {
 
   // ---------- tv:n som följer med ----------
   //
-  // Den lilla tv:n uppe till höger, under sidhuvudet: samma Panasonic som i
-  // rummet utan panelen med knapparna (rum-tv.css). Ett tryck på den går till
-  // tv:n i rummet, krysset stänger den. Den ligger i det översta lagret
-  // (popover), så att den syns också över matchrutan.
+  // Den lilla tv:n: samma Panasonic som i rummet utan panelen med knapparna
+  // (rum-tv.css), i ett hörn av fönstret – uppe till höger från början, och där
+  // man har dragit den sedan (HORN). Ett tryck på den bär tillbaka tv:n till
+  // väggen i rummet, krysset stänger den. Den ligger i det översta lagret
+  // (popover), så att den syns över allt som kommer fram i rummet och över
+  // matchrutan.
 
+  const HORN = 'profeterna.tv.horn';
+  B.horn = /^[on][hv]$/.test(las(HORN) || '') ? las(HORN) : 'oh';
   const pop = (m) => typeof m.showPopover === 'function';
   const oppen = (m) => (pop(m) ? m.matches(':popover-open') : !m.hidden);
   function oppna(m, on) {
@@ -661,6 +672,8 @@ window.RumBild = (() => {
     else if (on) m.showPopover();
     else m.hidePopover();
   }
+  // (bara rörelserna som den lilla tv:n själv sätter igång, inte stilens egna)
+  const egna = (e) => e.getAnimations().filter((a) => !a.animationName && !a.transitionProperty);
   function mini() {
     if (B.mini) return B.mini;
     const m = document.createElement('div');
@@ -672,26 +685,117 @@ window.RumBild = (() => {
       '<i class="tv-namn">Panasonic</i><i class="tv-mini-lampa"></i></div>' +
       '<button type="button" class="tv-mini-x" aria-label="Stäng tv:n"></button>';
     if (!calm()) m.querySelector('.tv-glas').style.setProperty('--sno', sno());
-    m.querySelector('.tv-mini-in').addEventListener('click', tillbaka);
+    const inn = m.querySelector('.tv-mini-in');
+    inn.addEventListener('click', () => {
+      // (när man har dragit den är släppet inget tryck)
+      if (B.drogs) {
+        B.drogs = false;
+        return;
+      }
+      tillbaka();
+    });
     m.querySelector('.tv-mini-x').addEventListener('click', (e) => {
       e.stopPropagation();
       sluta(true);
     });
+    dra(m, inn);
     document.body.append(m);
     B.mini = m;
-    // under sidhuvudet, och uppåt med det när det skrollas undan i telefonen
+    // på sin plats igen när fönstret ändras, och på sidorna när sidhuvudet skrollas undan i telefonen
     let f = 0;
-    const topp = B.toppNu = () => {
-      f = 0;
-      const t = document.querySelector('.topbar');
-      const y = t && getComputedStyle(t).position !== 'static' ? Math.max(0, t.getBoundingClientRect().bottom) : 0;
-      m.style.setProperty('--topp', `${Math.round(y)}px`);
-    };
-    B.topp = () => { if (!f) f = requestAnimationFrame(topp); };
-    addEventListener('scroll', () => { if (B.ute) B.topp(); }, { passive: true });
-    addEventListener('resize', () => { if (B.ute) B.topp(); });
+    B.stall = () => { if (!f) f = requestAnimationFrame(() => { f = 0; stall(); }); };
+    addEventListener('scroll', () => { if (B.ute) B.stall(); }, { passive: true });
+    addEventListener('resize', () => { if (B.ute) B.stall(); });
     if (pop(m)) new MutationObserver((ms) => { if (ms.some((x) => x.target.tagName === 'DIALOG')) miniVard(); }).observe(document.body, { subtree: true, attributeFilter: ['open'] });
+    stall();
     return m;
+  }
+  // Var den lilla tv:n står i sitt hörn (B.horn: o/n uppe eller nere, h/v höger eller vänster), som
+  // avstånd från fönstrets kanter (--mx, --my; rum-tv.css lägger till telefonens säkra kanter). På
+  // sidorna står den under sidhuvudet, som följs när det skrollas undan i telefonen. I rummet har den
+  // samma kantluft som namnet och foten, och den hamnar aldrig över dem: står något av dem i samma hörn
+  // står tv:n under eller ovanför det.
+  function stall() {
+    const m = B.mini;
+    if (!m) return;
+    const [ver, hor] = B.horn;
+    for (const c of ['o', 'n', 'h', 'v']) m.classList.toggle(c, c === ver || c === hor);
+    let mx;
+    let my;
+    if (document.documentElement.classList.contains('i-rummet')) {
+      const liten = matchMedia('(max-width: 600px), (max-height: 500px)').matches;
+      mx = liten ? 20 : 44;
+      my = liten ? 16 : 26;
+      for (const el of document.querySelectorAll('#rum-section > .rum-hdr, #rum-section > .rum-ft')) {
+        const vis = el.querySelector('.rum-brand') || el;
+        const r = el.getBoundingClientRect();
+        if (!r.width || getComputedStyle(vis).visibility === 'hidden') continue;
+        const sida = (r.left + r.right) / 2 > innerWidth / 2 ? 'h' : 'v';
+        const rad = (r.top + r.bottom) / 2 < innerHeight / 2 ? 'o' : 'n';
+        if (sida === hor && rad === ver) my = Math.max(my, ver === 'o' ? r.bottom + 12 : innerHeight - r.top + 12);
+      }
+    } else {
+      const stor = matchMedia('(min-width: 761px)').matches;
+      mx = stor ? 20 : 10;
+      my = stor ? 14 : 10;
+      const t = ver === 'o' && document.querySelector('.topbar');
+      if (t && getComputedStyle(t).position !== 'static') my += Math.max(0, t.getBoundingClientRect().bottom);
+    }
+    m.style.setProperty('--mx', `${Math.round(mx)}px`);
+    m.style.setProperty('--my', `${Math.round(my)}px`);
+  }
+  // Från där den stod (fore, en ruta i fönstret) till där den står nu, mjukt.
+  function glid(fore, ms = 380) {
+    const m = B.mini;
+    if (!m || !fore || calm() || !oppen(m)) return;
+    const r = m.getBoundingClientRect();
+    const dx = fore.left - r.left;
+    const dy = fore.top - r.top;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    m.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0px 0px' }], { duration: ms, easing: 'cubic-bezier(0.2, 0.8, 0.25, 1)' });
+  }
+  // Den lilla tv:n går att dra till ett annat hörn: den följer fingret eller musen och glider till det
+  // hörn som är närmast när man släpper, och står där sedan (sparas på enheten). Ett tryck utan att dra
+  // går till tv:n i rummet.
+  function dra(m, inn) {
+    let d = null;
+    inn.addEventListener('pointerdown', (e) => {
+      if (!e.isPrimary || e.button > 0 || m.classList.contains('slocknar') || m.classList.contains('hem')) return;
+      d = { id: e.pointerId, x: e.clientX, y: e.clientY, gar: false };
+    });
+    inn.addEventListener('pointermove', (e) => {
+      if (!d || e.pointerId !== d.id) return;
+      const dx = e.clientX - d.x;
+      const dy = e.clientY - d.y;
+      if (!d.gar) {
+        if (Math.hypot(dx, dy) < 8) return;
+        d.gar = true;
+        try { inn.setPointerCapture(e.pointerId); } catch { /* släppt */ }
+        for (const a of egna(m)) a.finish();
+        m.classList.add('drar');
+      }
+      m.style.translate = `${dx}px ${dy}px`;
+    });
+    const slapp = (e) => {
+      if (!d || e.pointerId !== d.id) return;
+      const gick = d.gar;
+      d = null;
+      if (!gick) return;
+      B.drogs = true;
+      setTimeout(() => { B.drogs = false; }, 400);
+      const r = m.getBoundingClientRect();
+      const horn = `${(r.top + r.bottom) / 2 < innerHeight / 2 ? 'o' : 'n'}${(r.left + r.right) / 2 > innerWidth / 2 ? 'h' : 'v'}`;
+      m.classList.remove('drar');
+      m.style.translate = '';
+      if (horn !== B.horn) {
+        B.horn = horn;
+        spara(HORN, horn);
+      }
+      stall();
+      glid(r);
+    };
+    inn.addEventListener('pointerup', slapp);
+    inn.addEventListener('pointercancel', slapp);
   }
   // Matchrutan (en dialog) läggs överst och gör allt utanför sig obrukbart medan
   // den är öppen: den lilla tv:n flyttas in i den så länge och läggs överst igen.
@@ -712,7 +816,7 @@ window.RumBild = (() => {
     // (en popover som flyttas stängs, och läggs överst när den öppnas igen)
     if (oppen(m)) m.hidePopover();
     if (m.parentNode !== hem) hem.append(m);
-    if (syns && B.ute && !B.on) {
+    if (syns && B.ute) {
       m.showPopover();
       for (const v of m.querySelectorAll('video')) if (v.srcObject) v.play().catch(() => {});
     }
@@ -721,10 +825,9 @@ window.RumBild = (() => {
   function miniFram(hur) {
     const m = mini();
     const syns = oppen(m) && !m.classList.contains('slocknar');
-    // (bara det som miniFram och miniBort har satt igång, inte stilens egna)
-    for (const e of [m, m.querySelector('.tv-ram')]) for (const a of e.getAnimations()) if (!a.animationName && !a.transitionProperty) a.cancel();
-    m.classList.remove('slocknar');
-    B.toppNu();
+    for (const e of [m, m.querySelector('.tv-ram')]) for (const a of egna(e)) a.cancel();
+    m.classList.remove('slocknar', 'hem');
+    stall();
     lampa();
     oppna(m, true);
     miniVard();
@@ -738,7 +841,7 @@ window.RumBild = (() => {
       m.animate([
         { transform: `translate(${fran.left - r.left}px, ${fran.top - r.top}px) scale(${k})`, boxShadow: 'none' },
         { transform: 'none' },
-      ], { duration: 560, easing: 'cubic-bezier(0.3, 0, 0.15, 1)' });
+      ], { duration: 600, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' });
     } else {
       m.querySelector('.tv-ram').animate([
         { transform: 'scale(0.04, 0.012)', filter: 'brightness(3)' },
@@ -774,9 +877,9 @@ window.RumBild = (() => {
   }
   // Den lilla tv:n syns när tv:n följer med och har något att visa: tv:ns ruta,
   // eller AV i sin egen ruta där det inte finns någon tv.
-  const skaSynas = () => B.ute && !B.on && (B.visa || Boolean(B.tv));
+  const skaSynas = () => B.ute && (B.visa || Boolean(B.tv));
   function miniLage() {
-    if (!B.ute || B.on) return;
+    if (!B.ute) return;
     const m = mini();
     lampa();
     const syns = skaSynas();
@@ -795,19 +898,64 @@ window.RumBild = (() => {
     try { sessionStorage.removeItem(FOLJER); } catch { /* privat läge */ }
   };
 
-  // Ta med tv:n: till den vanliga sidan, med tv:n i hörnet (on(false) tar över).
+  // Ta med tv:n (i foten nära tv:n): bilden krymper till den lilla tv:n i hörnet
+  // medan kameran går tillbaka, och tv:n tas ner från väggen. Allt på rutan fortsätter
+  // där – i rummet, och ut ur det om man går till den vanliga sidan.
   function taMed() {
-    if (!B.on || !B.tv) return;
+    if (!B.on || !B.tv || B.ute) return;
     const f = document.getElementById('rum-tvfront');
     B.fran = f ? f.getBoundingClientRect() : null;
-    B.tamedNu = true;
-    setTimeout(() => { B.tamedNu = false; }, 1000);
-    location.hash = 'hem';
+    B.ute = true;
+    if (window.Rum && Rum.tvUt) Rum.tvUt();
+    plats(true);
+    miniFram('krymp');
+    ordna();
   }
-  // Ett tryck på den lilla tv:n: till tv:n i rummet. På förstasidan genast; från
-  // de andra sidorna laddas förstasidan, och tv:n följer med dit.
+  // Tv:n bärs tillbaka upp på väggen (ett tryck på den lilla tv:n, T eller ett klick
+  // där den stod): kameran går fram till den var man än är i rummet, och
+  // bilden i den lilla tv:n flyger in i den medan den kommer fram.
+  function hem() {
+    if (!B.ute || !B.on || !B.tv) return;
+    const m = B.mini;
+    const fran = m && oppen(m) && !m.classList.contains('slocknar') ? m.getBoundingClientRect() : null;
+    B.ute = false;
+    glom();
+    // (tv:n tonar fram på väggen, med rutan tom tills bilden är framme)
+    B.tv.ute(false, true);
+    const mal = window.Rum && Rum.tv ? Rum.tv() : null;
+    let klar = false;
+    const in_ = () => {
+      if (klar) return;
+      klar = true;
+      if (B.ute) return;
+      if (m) {
+        oppna(m, false);
+        m.classList.remove('hem');
+        for (const a of egna(m)) a.cancel();
+      }
+      plats();
+    };
+    if (!fran || !mal || calm()) {
+      in_();
+      return;
+    }
+    for (const e of [m, m.querySelector('.tv-ram')]) for (const a of egna(e)) a.cancel();
+    m.classList.add('hem');
+    const k = (mal.width * (238 / 292)) / fran.width;
+    m.animate([
+      { transform: 'none' },
+      { transform: `translate(${mal.left - fran.left}px, ${mal.top - fran.top}px) scale(${k})`, boxShadow: 'none' },
+    ], { duration: 600, easing: 'cubic-bezier(0.3, 0, 0.2, 1)', fill: 'forwards' }).finished.then(in_, in_);
+  }
+  // Ett tryck på den lilla tv:n: till tv:n i rummet. I rummet bärs den tillbaka
+  // genast; på förstasidan visas rummet först, och från de andra sidorna laddas
+  // förstasidan, och tv:n följer med dit.
   function tillbaka() {
     if (!B.ute) return;
+    if (B.on) {
+      hem();
+      return;
+    }
     if (window.Rum && Rum.fits()) {
       B.tillTv = true;
       location.hash = '';
@@ -818,25 +966,29 @@ window.RumBild = (() => {
     try { sessionStorage.setItem(TILL_TV, '1'); } catch { /* privat läge */ }
     location.href = './';
   }
-  // Tv:n följer inte med längre: kameran släcks och förbindelserna stängs, som
-  // när man lämnar rummet. slocknar: med en tv:s sista ljuspunkt.
+  // Tv:n följer inte med längre (krysset): kameran släcks, och utanför rummet
+  // stängs förbindelserna, som när man lämnar det. slocknar: med en tv:s sista
+  // ljuspunkt.
   function sluta(slocknar) {
     if (!B.ute) return;
     B.ute = false;
     glom();
-    clearInterval(B.vemT);
     B.ater = 0;
     if (B.stream) kameraAv();
-    kopplaNer();
-    // Rutan går tillbaka till tv:n när den lilla har slocknat. Tv:n står då på
-    // text-tv:n när man kommer till rummet; visar sig någon byter den själv.
+    if (!B.on) {
+      clearInterval(B.vemT);
+      kopplaNer();
+    }
+    // Rutan går tillbaka till tv:n när den lilla har slocknat, och tv:n står på
+    // väggen igen. Den står då på text-tv:n; visar sig någon ny byter den själv.
     miniBort(slocknar, () => {
-      if (B.ute || B.on) return;
+      if (B.ute) return;
       B.visa = false;
       B.valj = null;
       B.fel = '';
       if (B.tv) B.tv.av(false);
-      plats();
+      plats(true);
+      if (B.on) ordna();
     });
   }
   // Följde tv:n med från sidan innan (inom tio minuter)? Då kopplar den upp sig
@@ -918,31 +1070,41 @@ window.RumBild = (() => {
     v = Boolean(v);
     if (v === B.on) return;
     B.on = v;
+    const m = B.mini;
+    const fore = m && oppen(m) ? m.getBoundingClientRect() : null;
     if (v) {
-      // tv:n som följde med är tillbaka i rummet
-      const ute = B.ute;
-      B.ute = false;
-      glom();
-      plats();
-      miniBort(false);
-      if (ute && B.tv) B.tv.av(B.visa);
+      // Följer tv:n med står den lilla kvar i sitt hörn också i rummet, och
+      // bara armen står kvar på väggen (där namnet och foten står: när rummet är utlagt).
+      if (B.ute) {
+        plats();
+        requestAnimationFrame(() => {
+          if (!B.ute || !B.on) return;
+          stall();
+          glid(fore);
+          miniLage();
+        });
+      }
       koppla();
       if (!B.stream && B.ater && Date.now() - B.ater < ATER) kameraPa();
       vemKoll();
       if (B.tillTv) {
+        // (ett tryck på den lilla tv:n på den vanliga sidan: fram till tv:n när rummet står)
         B.tillTv = false;
-        setTimeout(() => { if (B.on && window.Rum && Rum.tv) Rum.tv(); }, 0);
+        setTimeout(() => {
+          if (!B.on) return;
+          if (B.ute) hem();
+          else if (window.Rum && Rum.tv) Rum.tv();
+        }, 0);
       }
-    } else if (B.tamedNu) {
-      // Ta med tv:n: allt fortsätter i den lilla tv:n
-      B.tamedNu = false;
-      B.ute = true;
+    } else if (B.ute) {
+      // tv:n följer med ut ur rummet: allt fortsätter i den lilla tv:n, som glider
+      // till sitt hörn på sidan
       minns();
-      plats();
-      koppla();
-      // (när den vanliga sidan har lagts ut: sidhuvudet syns inte i rummet)
       requestAnimationFrame(() => {
-        if (B.ute && !B.on) miniFram('krymp');
+        if (!B.ute || B.on) return;
+        stall();
+        glid(fore);
+        miniVard();
         ordna();
       });
     } else {
@@ -995,5 +1157,5 @@ window.RumBild = (() => {
 
   aterstall();
 
-  return { mount, on, avVal, knapp, pa: () => Boolean(B.stream), foljer: () => B.ute };
+  return { mount, on, avVal, knapp, hem, pa: () => Boolean(B.stream), foljer: () => B.ute };
 })();

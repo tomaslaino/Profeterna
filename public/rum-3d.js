@@ -4073,7 +4073,7 @@ export async function figurer(canvas, opt = {}) {
   // ---------- blickarna och målen ----------
   // S: pågår matcherna (tv, sedan tvAt, från tvFrom) och hur nära spelstoppet
   // är (nag 0–1); M: det senaste målet för var och en ({ k: 1|-1|0, at }).
-  const S = { tv: false, tvAt: -1e9, tvFrom: 0, nag: 0 };
+  const S = { tv: false, tvAt: -1e9, tvFrom: 0, nag: 0, borta: false };
   const M = {};
   // AV: när nästa avspark är (i t; lage), den förra och när den ändrades, så att
   // ett påhitt som redan har börjat inte försvinner när bollen rullar.
@@ -9249,12 +9249,13 @@ export async function figurer(canvas, opt = {}) {
     // neonen bakom dem slocknar när skylten glappar, och tv:n lyser i
     // ansiktena när de tittar på matcherna (svagt, och fladdrar som rutan)
     neon.intensity = neonPa === false ? 0 : NEON * UTE.neon;
-    // på natten är lysröret släckt och text-tv:n lyser svagt på dem
+    // på natten är lysröret släckt och text-tv:n lyser svagt på dem (inte när tv:n följer med och
+    // bara armen står kvar på väggen, S.borta)
     const natt = nattW(t);
     key.intensity = KEY * (1 - 0.86 * natt);
     fill.intensity = FILL * (1 - 0.6 * natt);
     hemi.intensity = hemiDag * (Q.enkel ? HEMI_ENKEL : 1) * (1 - 0.55 * natt);
-    const tv = Math.max(tvW(t), 0.55 * natt);
+    const tv = S.borta ? 0 : Math.max(tvW(t), 0.55 * natt);
     tvLjus.intensity = tv > 0 ? TVLJUS * tv * (0.86 + 0.08 * Math.sin(t * 2.3) + 0.06 * Math.sin(t * 13.1 + Math.sin(t * 3.7))) : 0;
     if (UTE.kam) r.render(scene, UTE.kam);
     else {
@@ -9614,8 +9615,8 @@ export async function figurer(canvas, opt = {}) {
     for (const o of nyss) inneOrsak(o, t);
   }
 
-  // Matcherna och spelstoppet ({ tv, nag }): första gången som det är, sedan
-  // vänder de sig mot tv:n (eller tillbaka) på en stund.
+  // Matcherna och spelstoppet ({ tv, nag, borta }): första gången som det är, sedan
+  // vänder de sig mot tv:n (eller tillbaka) på en stund. borta: tv:n följer med (rum-bild.js).
   let toldTv = false;
   function lage(x, t) {
     const on = Boolean(x && x.tv);
@@ -9628,6 +9629,7 @@ export async function figurer(canvas, opt = {}) {
       S.tv = on;
     }
     S.nag = Math.max(0, Math.min(1, (x && x.nag) || 0));
+    S.borta = Boolean(x && x.borta);
     const av = x && x.avspark > 0 ? t + x.avspark * 3600 : Infinity;
     if (av !== AV.t && !(Math.abs(av - AV.t) < 60)) { AV.fran = AV.t; AV.at = t; AV.t = av; }
     toldTv = true;

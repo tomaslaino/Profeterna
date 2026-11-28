@@ -562,7 +562,11 @@ ingen falsk precision · sidan kraschar aldrig av en död källa · endast fria 
   vanliga sidan, och tv:n krymper till en liten tv uppe till höger, under menyn, som följer med överallt på sajten –
   också över matchrutan och till Tabeller, Statistik och Om oss. Den visar det tv:n visar: text-tv:n, som går vidare,
   eller gänget i bild, och byter till AV när någon visar sig, som i rummet. Kameran och bilden fortsätter. Ett tryck på
-  den lilla tv:n går tillbaka till tv:n i rummet, krysset stänger den (se *Tv:n följer med* under [Tv:n](#tvn))
+  den lilla tv:n går tillbaka till tv:n i rummet, krysset stänger den (se *Tv:n följer med* under [Tv:n](#tvn)).
+  **Sedan 2026-11-28** ("ta med sig TV:n på animationssidan – alltså inte på den vanliga sidan") stannar man i rummet:
+  tv:n tas ner från väggen och följer med i hörnet till datorn, Hasse Backe, kupongen och ut på trottoaren, och vidare
+  till den vanliga sidan om man går dit. Den går att dra till ett annat hörn (se *Tv:n följer med i rummet* under
+  [Tv:n](#tvn))
 - [x] **Newsquests lokaltidningar via Yahoo Sports (2026-11-19, användarens beslut, efter att ha fått veta att både
   tidningarna och Yahoo säger nej till AI-läsare):** The Bolton News, Watford Observer, East Anglian Daily Times, Daily
   Echo och Newsquests andra tidningar går inte att läsa på sina egna sajter, men Yahoo Sports publicerar många av deras
@@ -8773,8 +8777,8 @@ när man ber om den, så att ingen kamera fortsätter utan att man vet om det ([
 stilen sist i [public/rum-tv.css](public/rum-tv.css)).
 
 - **Ta med tv:n** står i foten nära tv:n när den är på (inte medan den frågar *Vem är du?*), bredvid *Visa dig på
-  tv:n*. I telefonen på höjden står den där *Vanlig sida* stod, för den leder också dit. Ett tryck går till den vanliga
-  sidan (`#hem`), och tv:n krymper från sin plats i rummet till hörnet.
+  tv:n*. Till 2026-11-28 gick ett tryck till den vanliga sidan (`#hem`), och tv:n krympte från sin plats i rummet till
+  hörnet; nu stannar man i rummet (nedan).
 - **Den lilla tv:n** är samma Panasonic utan panelen med knapparna: fronten 238 × 196 förminskad till 162 × 133 i
   telefonen och i full storlek på större skärmar, uppe till höger under menyn. I telefonen följer den menyn uppåt när
   loggans rad skrollas undan (`--topp`). Rutan är tv:ns egen – den flyttas dit med text-tv:n och videorna, som går
@@ -8802,6 +8806,43 @@ skrollat, Matcher, matchrutan (tv:n syns och går att trycka på), den andra som
 till text-tv:n), Kupong och Olympen laddade på nytt (tv:n byggd utan rummet, och sedan in i rummet), Tabeller och
 Statistik (bara AV; kameran tänds igen och den andra ser en igen), ett tryck på den lilla tv:n (rummet med tv:n nära)
 och krysset. Inte provat: riktiga kameror, Safari i iPhone och appen.
+
+**Tv:n följer med i rummet (2026-11-28).** Användaren: "Jag vill att man ska kunna 'ta med sig' TV:n på
+animationssidan – alltså inte på den vanliga sidan – så att man kan se de andra om man vill fast på den där TV:n
+istället som man får med sig på animationssidan istället. Gör det på ett snyggt och bra sätt!"
+([public/rum-bild.js](public/rum-bild.js), `borta` i [public/rum-tv.js](public/rum-tv.js), `tillTv` och `tvMal` i
+[public/rum.js](public/rum.js), stilen sist i [public/rum-tv.css](public/rum-tv.css)).
+
+- **Ta med tv:n** (i foten nära tv:n) leder inte längre ut ur rummet. Bilden krymper till den lilla tv:n i hörnet medan
+  kameran går tillbaka, samma 0,6 s, och tv:n tas ner från väggen med sin hylla: armen står kvar med sladden, som ett
+  fäste utan tv, och skenet på väggen slocknar. Delarna tonar var för sig och är sedan dolda (inget av tv:n ritas
+  medan den är borta). Gänget tittar inte på väggen medan matcherna pågår, och inget blått ljus faller på dem
+  (`gangLage` i rum.js, `S.borta` i rum-3d.js).
+- **Den lilla tv:n följer med överallt i rummet** – till datorn, Hasse Backe, kupongen, tidningen, videon och ut på
+  trottoaren – och visar det tv:n visar, som på de andra sidorna: text-tv:n eller gänget i bild, med AV när någon
+  visar sig. Den ligger i det översta lagret, ovanpå allt som kommer fram. Går man till den vanliga sidan följer den
+  med dit, och tillbaka in i rummet (också efter en omladdning, med `profeterna.tv.foljer`).
+- **Ett tryck på den** (eller T, eller ett klick där tv:n stod) bär tillbaka tv:n var man än är: det som ligger
+  framme läggs bort som med Tillbaka (`tillTv`), kameran går fram till tv:n, tv:n tonar fram på väggen med tom ruta,
+  och bilden i den lilla tv:n flyger in i den och landar precis i rutan när kameran stannar (`tvMal` räknar ut var
+  fronten hamnar ur `R.tvMatt` och kamerans mål). Från den vanliga sidan visas rummet först, som förut.
+- **Krysset** stänger den: kameran släcks, och tv:n tonar tillbaka upp på väggen och står på text-tv:n tills någon ny
+  visar sig. I rummet står förbindelserna till de andra kvar, som för tv:n där; utanför stängs de som förut.
+- **Hörnet:** uppe till höger från början. Den går att dra med fingret eller musen till ett annat hörn – den lyfts
+  (större skugga), följer med och glider till det närmaste hörnet när man släpper – och står där sedan, i rummet och
+  på sidorna (`profeterna.tv.horn` i localStorage). Ett tryck utan att dra (mindre än 8 bildpunkter) är ett tryck. I
+  rummet har den samma kantluft som namnet och foten (44 × 26 på datorn, 20 × 16 i små fönster) och hamnar aldrig
+  över dem: i telefonen på höjden står den under foten uppe till höger, och nere till höger på datorn ovanför den.
+  På sidorna står den under sidhuvudet som förut. I telefonen på bredden är den lika liten som på höjden (162 × 133).
+
+Provat 2026-11-28 i huvudlös Chrome (också i bygget med `--minify`), på datorn (1440 × 900, 1280 × 800) och som
+telefon (412 × 780 med fingret, 844 × 390): Ta med tv:n, datorn, Hasse Backe, kupongen, tidningen och trottoaren med
+den lilla tv:n i hörnet, dragen till nere till vänster med musen och med fingret, ett tryck tillbaka från Hasse,
+kupongen, tidningen och trottoaren (bilden landar på bildpunkten i rutan: 139, 28, 1162 bred mot fronten 139, 28,
+1162), T vid den tomma väggen, till den vanliga sidan och tillbaka, en omladdning och krysset. Med låtsaskamera
+(utan tjänsten): den egna bilden spelar vidare i den lilla tv:n i rummet, vid datorn, på den vanliga sidan och tillbaka
+i tv:n, och krysset släcker kameran. Inga fel i konsolen. Inte provat: de andra i bild genom tjänsten, riktiga
+kameror, Safari i iPhone och appen.
 
 **Nära** (klick eller T) vrids tv:n rakt fram och kameran ställer sig rakt framför (musen
 vrider inte rummet medan tv:n är nära), så att rutan blir en rak rektangel – vriden mot

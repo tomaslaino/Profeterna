@@ -156,6 +156,10 @@
   transform: translate3d(-200px, 560px, -127px) scale(1.0679) translate(200px, -560px);
 }
 .tv-sken.av { opacity: 0; }
+/* tv:n följer med (rum-bild.js): den är nere med sin hylla, armen står kvar på väggen med sladden, och
+   skenet på väggen slocknar (sist dolt, så att det inte ritas) */
+.rum-tv3.borta > :not(.rum-tv) { visibility: hidden; }
+.tv-sken.borta { opacity: 0; visibility: hidden; transition: opacity 0.5s, visibility 0s 0.5s; }
 /* i telefonen en fjärdedel så stort och förstorat: Safari ritar ett lager i
    dess egen storlek (inte i den förstorade) gånger pixeltätheten, och
    skenet är suddigt ändå */
@@ -500,15 +504,15 @@
 }
 
 /* ---------- tv:n som följer med (rum-bild.js) ----------
-   Ta med tv:n: samma tv uppe till höger på de andra sidorna, under sidhuvudet (--topp, som rum-bild.js
-   följer när det skrollas undan i telefonen), utan panelen med knapparna – fronten 238 × 196, förminskad
-   (--s). Den ligger i det översta lagret (popover), så webbläsarens egna mått för det skrivs över. */
+   Ta med tv:n: samma tv i ett hörn av fönstret, i rummet och på de andra sidorna, utan panelen med
+   knapparna – fronten 238 × 196, förminskad (--s). Hörnet sätts med klasserna o/n (uppe, nere) och h/v
+   (höger, vänster), och avståndet från kanterna (--mx, --my) räknar rum-bild.js ut: under sidhuvudet på
+   sidorna, och i rummet utanför namnet och foten. Den ligger i det översta lagret (popover), så
+   webbläsarens egna mått för det skrivs över. Den går att dra (touch-action: none). */
 .tv-mini {
   --s: 0.68;
   position: fixed;
   inset: auto;
-  top: calc(var(--topp, 0px) + 10px);
-  right: max(10px, env(safe-area-inset-right));
   z-index: 60;
   width: calc(238px * var(--s));
   height: calc(196px * var(--s));
@@ -521,8 +525,18 @@
   overflow: visible;
   box-shadow: 0 16px 34px -10px rgba(0, 0, 0, 0.75), 0 3px 9px rgba(0, 0, 0, 0.45);
   transform-origin: 0 0;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: box-shadow 0.2s;
 }
-@media (min-width: 761px) { .tv-mini { --s: 1; top: calc(var(--topp, 0px) + 14px); right: max(20px, env(safe-area-inset-right)); } }
+.tv-mini.o { top: var(--my, 10px); }
+.tv-mini.n { bottom: calc(var(--my, 10px) + env(safe-area-inset-bottom)); }
+.tv-mini.h { right: max(var(--mx, 10px), env(safe-area-inset-right)); }
+.tv-mini.v { left: max(var(--mx, 10px), env(safe-area-inset-left)); }
+@media (min-width: 761px) { .tv-mini { --s: 1; } }
+/* telefonen på bredden: lika liten som på höjden (fönstret är lågt) */
+@media (max-height: 500px) { .tv-mini { --s: 0.68; } }
 .tv-mini[hidden] { display: none; }
 .tv-mini .tv-front { width: 238px; transform: scale(var(--s)); transform-origin: 0 0; pointer-events: none; }
 .tv-mini .tv-scan { opacity: 0.45; }
@@ -563,3 +577,8 @@
   .tv-mini:hover .tv-mini-x, .tv-mini-x:focus-visible { opacity: 1; }
 }
 .tv-mini.slocknar { pointer-events: none; }
+/* medan den dras: lyft, och handen som håller den; och på väg tillbaka till hyllan (hem) */
+.tv-mini.drar { box-shadow: 0 26px 48px -12px rgba(0, 0, 0, 0.8), 0 6px 14px rgba(0, 0, 0, 0.5); }
+.tv-mini.drar .tv-mini-in { cursor: grabbing; }
+.tv-mini.drar .tv-mini-x, .tv-mini.hem .tv-mini-x { opacity: 0; pointer-events: none; }
+.tv-mini.hem { pointer-events: none; }
