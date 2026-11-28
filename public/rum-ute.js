@@ -748,6 +748,8 @@ window.RumUte = (() => {
       if (halt && namn !== 'springer' && namn !== 'kapp' && R() < 0.65) namn = 'halkar';
       if (varmt && typ === 'gar' && !o.umb && !o.hatt && R() < 0.25) { o.hatt = 'keps'; o.hat = pick(R, ['#2a4a7a', '#e8e4dc', '#c8322a']); }
       const st = gangFor(GG, R, namn, kallt);
+      // (händerna på ryggen bara när de är lediga: den som grubblar med paraplyet går med armarna hängande)
+      if (st.armar === 'rygg' && (o.umb || typ !== 'gar')) st.armar = '';
       // (en del äldre går lite framåtböjda, och den som strosar har ibland händerna på ryggen)
       if (vem === 'aldre' && !['kapp', 'springer', 'halkar'].includes(st.namn) && R() < 0.4) st.lut += 4 + R() * 3;
       if (vem === 'aldre' && typ === 'gar' && !o.umb && ['strosar', 'rak', 'stram', 'lunkar'].includes(st.namn) && R() < 0.4) { st.armar = 'rygg'; st.ficka = ''; }

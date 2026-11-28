@@ -1304,6 +1304,8 @@ window.RumFasad = (() => {
   // dras ner mellan axlarna (cm), axlar hur mycket axlarna dras upp (cm, minus är uppåt), armFram och armBoj var armarna
   // hänger och hur böjda (grader), knack hur mycket armbågen böjs när armen svänger fram. Och rytmen: halta hur mycket
   // den haltar (gangen: kortare tid på det onda benet) och svaj hur mycket överkroppen svajar (på väg hem från krogen).
+  // Och: slag hur mycket huvudet nickar ner på varje steg (i takt med musiken, grader), skutt att det är skutt i stället
+  // för steg (skuttTab), armSen var i varvet armarna svänger som längst och lutGung hur mycket överkroppen gungar.
   const STILAR = {
     vanlig: { S: 128, B: 0.62, x0: 0.19, lyft: 55, kna: 62, hojd: 88.6, studs: 1.7, lut: 2.5, arm: 1, takt: 0.98, ficka: 0.12 },
     rask: { S: 142, B: 0.6, x0: 0.2, lyft: 58, kna: 65, hojd: 88.4, studs: 2, lut: 5, arm: 1.4, takt: 1.05, ficka: 0 },
@@ -1354,6 +1356,25 @@ window.RumFasad = (() => {
     dras: { S: 108, B: 0.62, x0: 0.22, lyft: 44, kna: 54, hojd: 88.2, studs: 1.4, lut: -6, arm: 0.6, takt: 0.96, ficka: 0, hal: -20, huvud: -2 },
     // tjurar: barnet som inte vill, släpar fötterna, lutar sig bakåt mot handen och hänger med huvudet
     tjurar: { S: 84, B: 0.7, x0: 0.15, lyft: 14, kna: 30, hojd: 88, studs: 0.6, lut: -10, arm: 0.2, takt: 1, ficka: 0, hal: -3, huvud: 14 },
+    // (2026-11-28, "fler naturliga gångstilar")
+    // skyndar: har bråttom utan att springa, snabba steg, framåtlutad med huvudet före och armbågarna böjda (i regnet
+    // utan paraply också med axlarna uppdragna och blicken ner, gangFor)
+    skyndar: { S: 136, B: 0.6, x0: 0.2, lyft: 60, kna: 64, hojd: 88.2, studs: 1.6, lut: 7, arm: 1.2, takt: 1.16, ficka: 0, hal: -14, huvud: 3, hfram: 1.6, armBoj: -32, knack: 16, armFram: -2 },
+    // småjoggar: springer en bit i vanliga kläder (efter bussen, undan regnet): kort stund i luften, landar på hela
+    // foten, knät inte så högt och armarna böjda men lösa
+    smajogg: { S: 164, B: 0.43, x0: 0.05, lyft: 46, kna: 88, hojd: 87.2, studs: 2.2, lut: 5, arm: 0.8, takt: 1.28, ficka: 0, hal: -6, lop: true, drive: 12, larS: 0.6, knaS: 0.4, armar: 'spring', huvud: 2 },
+    // stel: stela knän och höfter: korta steg med benen nästan raka, kroppen lyfts över benet som står och gungar fram
+    // och tillbaka, framåtböjd med huvudet före och armarna nästan stilla
+    stel: { S: 84, B: 0.67, x0: 0.16, lyft: 26, kna: 34, knaS: 0.4, hojd: 89.2, studs: 2, lut: 6, arm: 0.35, takt: 0.86, ficka: 0, hal: -6, huvud: 4, hfram: 1.8, lutGung: 1.5 },
+    // grubblar: i tankar, långsamt med blicken i marken och händerna på ryggen
+    grubblar: { S: 98, B: 0.65, x0: 0.18, lyft: 40, kna: 52, hojd: 88.6, studs: 1, lut: 4, arm: 0.2, takt: 0.76, ficka: 0, huvud: 13, hfram: 1.4, armar: 'rygg' },
+    // trött: på väg hem från jobbet, tunga steg med hälen först, axlarna nere, armarna hänger och huvudet lite fram
+    trott: { S: 106, B: 0.64, x0: 0.18, lyft: 40, kna: 50, hojd: 88, studs: 1.5, lut: 3.5, arm: 0.4, takt: 0.84, ficka: 0.25, hal: -9, huvud: 6, hfram: 1.4, axlar: 1.3, nick: 0.4 },
+    // takten: med walkman, går i takt till musiken: fjädrar, huvudet nickar ner på varje steg (slag) och axlarna rullar
+    takten: { S: 126, B: 0.6, x0: 0.19, lyft: 60, kna: 64, hojd: 88, studs: 2.4, lut: 1, arm: 1.05, takt: 0.96, ficka: 0.2, rull: 0.7, huvud: 1, knack: 14, slag: 6 },
+    // skuttar: barnet som skuttar (kliver och hoppar på samma fot, två skutt per varv, skuttTab), knät högt fram och
+    // armarna svänger stort
+    skuttar: { S: 108, B: 0.5, x0: 0, lyft: 0, kna: 0, hojd: 88.6, studs: 0, lut: 3, arm: 2.4, takt: 1, ficka: 0, armBoj: -24, knack: 24, armSen: -0.26, skutt: true },
     // cyklar: trampar runt (cykelTab), S hur långt cykeln rullar på ett varv med pedalerna, takt varv i sekunden,
     // lut hur framåtböjd (sätts efter cykeln, CYKLAR)
     cyklar: { S: 400, B: 0.5, x0: 0, lyft: 0, kna: 0, hojd: 95, studs: 0, lut: 10, arm: 0, takt: 0.62, ficka: 0 },
@@ -1370,13 +1391,13 @@ window.RumFasad = (() => {
     const ficka = !o.paraply && !o.hund && !s.armar && namn !== 'kapp' && namn !== 'skrinna' && namn !== 'cyklar' && R() < s.ficka + (o.kalla ? 0.15 : 0);
     const r = R();
     // (det som sitter i benen bara lite för den som springer, halkar, åker inlines eller cyklar: där är det sättet som syns)
-    const fri = !['springer', 'halkar', 'skrinna', 'cyklar'].includes(namn);
+    const fri = !['springer', 'smajogg', 'halkar', 'skrinna', 'cyklar', 'skuttar'].includes(namn);
     const v = fri ? 1 : 0.4;
     const st = {
-      ...s, namn, S: j(s.S, 9 * v), lyft: j(s.lyft, 7 * v), kna: j(s.kna, 5 * v), hojd: j(s.hojd, 0.4), studs: Math.max(0.3, j(s.studs, 0.5 * v)),
+      ...s, namn, S: j(s.S, 9 * v), lyft: j(s.lyft, 7 * v), kna: j(s.kna, 5 * v), hojd: j(s.hojd, 0.4), studs: s.skutt ? 0 : Math.max(0.3, j(s.studs, 0.5 * v)),
       lut: j(s.lut, 2), arm: Math.max(0.15, j(s.arm, 0.25 * v)), takt: j(s.takt, 0.05 * v), x0: j(s.x0, 0.015 * v),
-      armBoj: j(s.armBoj ?? -8, 6), armFram: j(s.armFram ?? 0, 4), armSen: j(0.04, 0.04), knack: Math.max(2, j(s.knack ?? 11, 4)),
-      lutGung: Math.max(0.15, j(0.6, 0.4)), huvud: j(s.huvud ?? 0, 3), hfram: Math.max(-0.6, j(s.hfram ?? 0, 0.8)), hned: s.hned ?? 0,
+      armBoj: j(s.armBoj ?? -8, 6), armFram: j(s.armFram ?? 0, 4), armSen: j(s.armSen ?? 0.04, 0.04), knack: Math.max(2, j(s.knack ?? 11, 4)),
+      lutGung: Math.max(0.15, j(s.lutGung ?? 0.6, 0.4)), huvud: j(s.huvud ?? 0, 3), hfram: Math.max(-0.6, j(s.hfram ?? 0, 0.8)), hned: s.hned ?? 0,
       ficka: ficka ? (r < 0.55 ? 'FB' : r < 0.8 ? 'F' : 'B') : '', tab: null, skrid: namn === 'skrinna', cykel: namn === 'cyklar',
     };
     if (fri) st.hal = j(s.hal ?? -12, s.hal != null ? 1.5 : 5);
@@ -1460,6 +1481,106 @@ window.RumFasad = (() => {
     P.aB = P.aF;
     return P;
   }
+  // Barnet som skuttar (skuttar): kliver ner på den ena foten och hoppar på den, kliver ner på den andra och hoppar på
+  // den, två skutt per varv. Varje fot står i marken två gånger efter varandra (k1: klivet, k2: där hoppet landar,
+  // hopp av S längre fram) med en stund i luften emellan, och förs sedan fram med knät högt medan den andra skuttar.
+  // Trampdynan står still i marken medan foten står, och foten landar på den och rullar upp på den igen innan den
+  // lämnar marken. Höften är lägst när foten tar emot och högst mitt i hoppet, och aldrig högre än att benet som står
+  // når marken. Benet som förs fram följer en bana för fotleden (fot: del av varvet, x framåt och y nedåt från höften,
+  // fotens vinkel) och benet följer med IK. Samma tabell som gångens (gangen); det bortre benet ett halvt varv efter.
+  const SKUTT = { k1: [0, 0.14], k2: [0.3, 0.43], hopp: 0.25, fram: 0.07, upp: 4.5, fot: [[0.52, -10, 58, 50], [0.62, 6, 51, 34], [0.72, 22, 47, 22], [0.87, 25, 66, 14]] };
+  function skuttTab(st) {
+    const { LAR: L1, SMA: L2, N } = GANG;
+    const { S } = st;
+    const [k1a, k1b] = SKUTT.k1;
+    const [k2a, k2b] = SKUTT.k2;
+    const TA = [16.5, 7];
+    const ss = (x) => { const q = Math.min(1, Math.max(0, x)); return q * q * (3 - 2 * q); };
+    const ik = (x, y) => {
+      const d = Math.max(5, Math.min(Math.hypot(x, y), L1 + L2 - 0.5));
+      const a = Math.atan2(-x, y) - Math.acos(Math.min(1, (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d)));
+      const kx = -L1 * Math.sin(a);
+      const ky = L1 * Math.cos(a);
+      return [a, Math.atan2(-(x - kx), y - ky) - a];
+    };
+    // Fotleden när trampdynan står i X (cm, där höften var i 0 vid q 0) och foten lutar psi (hälen uppe): [x, höjd]
+    const pa = (X, psi) => [X - (TA[0] * Math.cos(psi) - TA[1] * Math.sin(psi)), TA[0] * Math.sin(psi) + TA[1] * Math.cos(psi)];
+    const X1 = SKUTT.fram * S + TA[0];
+    const X2 = X1 + SKUTT.hopp * S;
+    // (landar på trampdynan med hälen lite uppe, sänker hälen, och rullar upp på dynan igen)
+    const rull = (u, n0, n1, a0, a1) => (u < n0 ? a0 * (1 - ss(u / n0)) : u < n1 ? 0 : a1 * ss((u - n1) / (1 - n1)));
+    const psi1 = (q) => rull((q - k1a) / (k1b - k1a), 0.25, 0.62, 12 * DEG, 32 * DEG);
+    const psi2 = (q) => rull((q - k2a) / (k2b - k2a), 0.25, 0.55, 18 * DEG, 48 * DEG);
+    // fotleden i världen (x, höjd) och fotens vinkel, för q i k1, i luften och i k2
+    const varld = (q) => {
+      if (q <= k1b) { const p = psi1(q); return [...pa(X1, p), p]; }
+      if (q < k2a) {
+        const u = (q - k1b) / (k2a - k1b);
+        const A = pa(X1, psi1(k1b));
+        const B = pa(X2, psi2(k2a));
+        const w = ss(u);
+        return [A[0] + (B[0] - A[0]) * w, A[1] + (B[1] - A[1]) * w + SKUTT.upp * Math.sin(Math.PI * u), psi1(k1b) + (psi2(k2a) - psi1(k1b)) * w + 8 * DEG * Math.sin(Math.PI * u)];
+      }
+      const p = psi2(Math.min(q, k2b));
+      return [...pa(X2, p), p];
+    };
+    // Höften: lägst mitt i varje nedslag, högst mitt i hoppet och lite uppe mellan k2 och nästa kliv (en halv period)
+    const hoj = st.hojd;
+    const nyck = [[0, hoj - 1.2], [0.07, hoj - 2.2], [0.22, hoj + 3.2], [0.365, hoj - 2.4], [0.465, hoj + 0.6]];
+    const bas = (q) => {
+      const x = (((q % 0.5) + 0.5) % 0.5);
+      for (let k = 0; k < nyck.length; k++) {
+        const [q0, v0] = nyck[k];
+        const [q1, v1] = k === nyck.length - 1 ? [0.5, nyck[0][1]] : nyck[k + 1];
+        if (x >= q0 && x <= q1) return v0 + (v1 - v0) * (1 - Math.cos(Math.PI * (x - q0) / (q1 - q0))) / 2;
+      }
+      return nyck[0][1];
+    };
+    // (benet som står i marken når den med knät böjt minst 6°)
+    const NA = Math.sqrt(L1 * L1 + L2 * L2 + 2 * L1 * L2 * Math.cos(6 * DEG));
+    const star = (q) => (q >= k1a && q <= k1b) || (q >= k2a && q <= k2b);
+    const ps = [...Array(N)].map((_, i) => i / N);
+    // (båda benen: det bortre är ett halvt varv efter, och höften går lika i båda halvorna)
+    const tak = ps.map((q) => Math.min(...[q, (q + 0.5) % 1].filter(star).map((u) => {
+      const [ax, ah] = varld(u);
+      const dx = ax - S * u;
+      return ah + Math.sqrt(Math.max(0, NA * NA - dx * dx));
+    }), 999));
+    let H = ps.map(bas);
+    for (let k = 0; k < 30; k++) {
+      H = H.map((h, i) => Math.min(h, tak[i]));
+      H = H.map((h, i) => (H[(i + N - 1) % N] + 2 * h + H[(i + 1) % N]) / 4);
+    }
+    H = H.map((h, i) => Math.min(h, tak[i]));
+    const Hq = (q) => { const x = (((q % 1) + 1) % 1) * N; const i = Math.floor(x); return H[i] + (H[(i + 1) % N] - H[i]) * (x - i); };
+    // fotleden mätt från höften (x framåt, y nedåt) och fotens vinkel, för q i det egna benets varv
+    const rel = (q) => { const [ax, ah, p] = varld(q); return [ax - S * q, Hq(q) - ah, p]; };
+    // Svingen (k2b … 1): mjuk kurva genom fotledens punkter, från där foten lämnar marken till nästa kliv (rel(0) ett
+    // varv längre fram), med farten där den lämnar och där den landar
+    const e = 1e-3;
+    const R0 = rel(k2b);
+    const V0 = rel(k2b - e).map((v, j) => (R0[j] - v) / e);
+    const R1 = rel(0);
+    const V1 = rel(e).map((v, j) => (v - R1[j]) / e);
+    const pk = [[k2b, ...R0], ...SKUTT.fot.map(([q, x, y, a]) => [q, x, y, a * DEG]), [1, ...R1]];
+    const tan = pk.map((p, i) => (i === 0 ? V0 : i === pk.length - 1 ? V1 : [1, 2, 3].map((j) => (pk[i + 1][j] - pk[i - 1][j]) / (pk[i + 1][0] - pk[i - 1][0]))));
+    const herm = (p0, p1, m0, m1, x) => {
+      const x2 = x * x; const x3 = x2 * x;
+      return (2 * x3 - 3 * x2 + 1) * p0 + (x3 - 2 * x2 + x) * m0 + (3 * x2 - 2 * x3) * p1 + (x3 - x2) * m1;
+    };
+    const sving = (q) => {
+      let i = 0;
+      while (i < pk.length - 2 && q > pk[i + 1][0]) i++;
+      const h = pk[i + 1][0] - pk[i][0];
+      const x = (q - pk[i][0]) / h;
+      return [0, 1, 2].map((j) => herm(pk[i][j + 1], pk[i + 1][j + 1], tan[i][j] * h, tan[i + 1][j] * h, x));
+    };
+    return ps.map((q) => {
+      const [x, y, p] = q <= k2b ? rel(q) : sving(q);
+      const [a, b] = ik(x, y);
+      return [0, GANG.HOFT - Hq(q), a, b, p - (a + b)];
+    });
+  }
   let gangVanlig = null;
   const stilVanlig = () => gangVanlig || (gangVanlig = gangStil(() => 0.5, { stil: 'vanlig' }));
   // Gångcykeln för sättet st: höftens förskjutning och höjd och benets vinklar per del av varvet, för det närmre benet
@@ -1469,6 +1590,7 @@ window.RumFasad = (() => {
     if (st.tab) return st.tab;
     if (st.skrid) return (st.tab = skridTab(st));
     if (st.cykel) return (st.tab = cykelTab(st));
+    if (st.skutt) return (st.tab = skuttTab(st));
     const { LAR: L1, SMA: L2, N } = GANG;
     const { S } = st;
     // foten från fotleden (x framåt, y nedåt): hälen och tån; vinkeln positiv när hälen lyfts
@@ -1595,21 +1717,25 @@ window.RumFasad = (() => {
       // så att hälen sätts i mjukt där den sedan står. Banan blandas in från s 0,62 och benet följer den (IK, knät
       // böjt minst 3°); foten behåller sin vinkel.
       const A1 = b.stod(0);
+      // Den som springer (st.lop) och den som går på halkan fäller dessutom upp foten mot nedslaget från halva svingen:
+      // med tån nedåt så länge skrapade den i stenen den sista biten före nedslaget (2026-11-28).
       const landa = (q, v) => {
         const w = ss(((q - b.B) / sw - 0.62) / 0.33);
-        if (w <= 0) return v;
+        const wf = st.lop || st.namn === 'halkar' ? ss(((q - b.B) / sw - 0.45) / 0.4) : 0;
+        const fot = (f2) => { const psi = v[0] + v[1] + v[2]; return psi + (A1[2] - psi) * wf + f2; };
+        if (w <= 0) return wf > 0 ? [v[0], v[1], fot(-(v[0] + v[1]))] : v;
         const p = q + b.off;
         const u = 1 - q;
         const ax = L1 * Math.sin(-v[0]) + L2 * Math.sin(-v[0] - v[1]);
         const ay = L1 * Math.cos(v[0]) + L2 * Math.cos(v[0] + v[1]);
         const tx = S + A1[0] - S * (0.5 * u + 2 * u * u) - S * q - fram(p);
-        const ty = Hp(p) + A1[1] - 300 * u * u;
+        const ty = Hp(p) + A1[1] - (st.lop ? 700 : 300) * u * u;
         const x = ax + (tx - ax) * w;
         const y = ay + (ty - ay) * w;
         const d = Math.min(Math.hypot(x, y), NA3);
         const f1 = Math.atan2(x, y) + Math.acos((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d));
         const f2 = Math.atan2(x - L1 * Math.sin(f1), y - L1 * Math.cos(f1));
-        return [-f1, f1 - f2, v[0] + v[1] + v[2] + f2];
+        return [-f1, f1 - f2, fot(f2)];
       };
       // per del av varvet: höftens förskjutning (x, y) och benets vinklar (lår, smalben, fot)
       const T = ps.map((q) => {
@@ -1670,9 +1796,11 @@ window.RumFasad = (() => {
     // andra lite mer; ofta svänger den ena mindre än den andra (armA). Den som springer har armarna böjda och pumpar
     // (utom den som bär något i handen, st.hang), den som powerwalkar har dem i rät vinkel och pumpar högt, på halkan
     // hålls de ute framför kroppen och den som har händerna på ryggen har armbågarna bakåt och händerna knäppta
-    // nedanför ryggen.
+    // nedanför ryggen. Den som bär en kasse eller väska (st.hangTyp, inte stavarna) låter den armen hänga nästan rak och
+    // stilla, så att det som hänger i den inte slänger, och den lediga armen svänger lite mer.
     const fi = st.ficka || '';
-    const A = st.arm * (fi.length === 1 ? 1.15 : 1) * (1 + 0.25 * svaj);
+    const tung = !!st.hangTyp && st.hangTyp !== 'stavar' && !st.armar;
+    const A = st.arm * (fi.length === 1 || tung ? 1.15 : 1) * (1 + 0.25 * svaj);
     const AA = st.armA || [1, 1];
     const cos = (q) => Math.cos(2 * Math.PI * (q - st.armSen));
     const arm = (q, ficka, bar, a) => {
@@ -1684,10 +1812,13 @@ window.RumFasad = (() => {
       if (st.armar === 'power' && !bar) return [(Aa * 22 * c - 8) * DEG, (-86 + 8 * c) * DEG];
       if (st.armar === 'balans') return [(-13 + 4 * Aa * c) * DEG, (-34 + 3 * c) * DEG];
       if (st.armar === 'rygg') return [(53 + 1.5 * c) * DEG, (-63 + c) * DEG];
+      if (bar && tung) { const k = st.hangTyp === 'portfolj' ? 0.55 : 0.3; return [(Aa * k * 15 * c + 0.4 * st.armFram) * DEG, (-3 - 4 * k * Aa * (1 - c)) * DEG]; }
       return [(Aa * 15 * c + st.armFram) * DEG, ((st.armBoj ?? -8) - (st.knack ?? 11) * Aa * (1 - c)) * DEG];
     };
     let lut = st.lut + (st.lutGung ?? 0.6) * Math.cos(4 * Math.PI * (p - PM - 0.1)) + 4 * svaj;
     let nick = (st.huvud || 0) + (st.nick ? st.nick * 2.2 * Math.sin(4 * Math.PI * (p - PM + 0.08)) : 0) + 3 * svaj;
+    // (den som går i takt till musiken nickar ner på slaget, strax efter att hälen slår i, och tillbaka mjukare)
+    if (st.slag) { const u = (((2 * (p - 0.02)) % 1) + 1) % 1; nick += st.slag * (u < 0.12 ? sm(0, 0.12, u) : 1 - sm(0.12, 0.62, u)); }
     // (den som haltar sjunker och nickar en gång per varv, när det onda benet tar emot)
     if (st.halta && st.ontMitt != null) {
       const w = 0.5 + 0.5 * Math.cos(2 * Math.PI * (p - st.ontMitt));
@@ -3967,24 +4098,45 @@ window.RumFasad = (() => {
   // den långa kliver ibland, i kylan fryser en del (axlarna upp och huvudet ner), och en och annan haltar. En del äldre
   // går framåtböjda, de flesta med huvudet lite framskjutet, och den som strosar har ibland händerna på ryggen. En hand
   // i fickan bara när den är ledig: med påsen i den ena handen eller paraplyet kan den andra vara i fickan. Lugnt
-  // framför affären (2026-11-17): färre raska och studsande, fler som går vanligt eller strosar.
+  // framför affären (2026-11-17): färre raska och studsande, fler som går vanligt eller strosar. 2026-11-28 ("fler
+  // naturliga gångstilar"): den som har bråttom, den som grubblar, den som är trött efter jobbet, äldre med stela knän
+  // och barn som skuttar; i regnet utan paraply skyndar en del med axlarna uppe, någon enstaka småjoggar en bit, och
+  // den unga med walkman går ibland i takt till musiken.
   const GSTIL = {
-    ung: ['vanlig', 'vanlig', 'strosar', 'flanerar', 'studsar', 'lunkar', 'slantrar', 'slantrar', 'hasar', 'hasar', 'kliver', 'trippar', 'stram'],
-    vuxen: ['vanlig', 'vanlig', 'flanerar', 'flanerar', 'strosar', 'strosar', 'rak', 'rask', 'trippar', 'kliver', 'stram', 'hasar'],
-    aldre: ['strosar', 'strosar', 'flanerar', 'flanerar', 'strosar', 'rak', 'lunkar', 'trippar', 'hasar', 'stram', 'vanlig'],
-    kostym: ['vanlig', 'vanlig', 'rask', 'rak', 'stram', 'stram', 'kliver'],
-    barn: ['studsar', 'studsar', 'vanlig', 'trippar'],
+    ung: ['vanlig', 'vanlig', 'strosar', 'flanerar', 'studsar', 'lunkar', 'slantrar', 'slantrar', 'hasar', 'hasar', 'kliver', 'trippar', 'stram', 'skyndar', 'grubblar'],
+    vuxen: ['vanlig', 'vanlig', 'flanerar', 'flanerar', 'strosar', 'strosar', 'rak', 'rask', 'trippar', 'kliver', 'stram', 'hasar', 'skyndar', 'grubblar', 'trott'],
+    aldre: ['strosar', 'strosar', 'flanerar', 'flanerar', 'strosar', 'rak', 'lunkar', 'trippar', 'hasar', 'stram', 'vanlig', 'stel', 'stel', 'stel', 'grubblar'],
+    kostym: ['vanlig', 'vanlig', 'rask', 'rak', 'stram', 'stram', 'kliver', 'skyndar', 'skyndar', 'trott'],
+    barn: ['studsar', 'studsar', 'vanlig', 'trippar', 'skuttar', 'skuttar'],
   };
+  // (?rum-fasad-gang=namn: alla som kan går så, för att prova ett sätt att gå)
+  const GANGV = (() => { try { return new URLSearchParams(location.search).get('rum-fasad-gang'); } catch (e) { return null; } })();
   function gangFor(R, o, W, namn) {
     if (W.halkar && o.vem !== 'barn' && !['springer', 'kapp', 'skrinna', 'cyklar'].includes(namn)) namn = 'halkar';
     const vuxen = o.vem !== 'barn';
+    // (barnet som håller någon i handen skuttar inte, och den som har händerna fulla grubblar inte med dem på ryggen)
+    const ledig = (s) => !(s === 'F' ? o.gF || o.kapp : o.gB) && o.parHand !== s && !(o.hang && o.hang.sida === s);
+    const fria = ledig('F') && ledig('B') && !o.paraply && !o.hund && !o.vagn && !o.tidning;
+    const blot = W.regn && !o.paraply && o.stil !== 'regn';
+    if (!namn && GANGV && STILAR[GANGV] && vuxen) namn = GANGV;
+    // (ett barn som går själv och studsar skuttar ibland i stället)
+    if (!vuxen && !o.gF && !o.gB && (namn === 'studsar' || (GANGV === 'skuttar' && namn !== 'cyklar')) && (GANGV === 'skuttar' || R() < 0.4)) namn = 'skuttar';
     if (!namn && o.ben === 'kjol' && R() < 0.4) namn = 'trippar';
     else if (!namn && o.mage && R() < 0.2) namn = 'vaggar';
     else if (!namn && vuxen && W.kall && !o.paraply && R() < 0.3) namn = 'frusen';
+    else if (!namn && vuxen && blot && R() < 0.4) namn = 'skyndar';
+    else if (!namn && vuxen && o.vem !== 'aldre' && fria && R() < (blot ? 0.06 : 0.02)) namn = 'smajogg';
+    else if (!namn && o.vem === 'ung' && o.walkman && R() < 0.45) namn = 'takten';
     else if (!namn && vuxen && o.h > 1.04 && R() < 0.3) namn = 'kliver';
     else if (!namn && vuxen && R() < 0.05) namn = 'haltar';
-    const st = gangStil(R, { stil: namn || (GSTIL[o.vem] ? pick(R, GSTIL[o.vem]) : undefined), kalla: W.kall });
-    const ledig = (s) => !(s === 'F' ? o.gF || o.kapp : o.gB) && o.parHand !== s && !(o.hang && o.hang.sida === s);
+    if (!namn && GSTIL[o.vem]) namn = pick(R, GSTIL[o.vem]);
+    if ((namn === 'skuttar' && (o.gF || o.gB)) || (namn === 'grubblar' && !fria)) namn = pick(R, ['vanlig', 'strosar']);
+    const st = gangStil(R, { stil: namn, kalla: W.kall });
+    if (st.namn === 'skyndar' && blot) {
+      st.huvud += 5;
+      st.axlar = -1.6;
+      st.hned = 1.2;
+    }
     st.ficka = o.hund || o.vagn || o.tidning ? '' : [...st.ficka].filter(ledig).join('');
     if (o.vem === 'aldre' && !['kapp', 'springer', 'halkar', 'cyklar'].includes(st.namn)) {
       if (R() < 0.4) st.lut += 4 + R() * 3;
@@ -3996,6 +4148,7 @@ window.RumFasad = (() => {
     }
     o.ficka = st.ficka;
     st.hang = o.hang ? o.hang.sida : '';
+    st.hangTyp = o.hang ? o.hang.typ : '';
     return st;
   }
   // Den som joggar: myskläder (vindtyg i färgblock) eller shorts och t-shirt när det är varmt, gympadojor,
