@@ -15,29 +15,29 @@
   "401880723",
   "401880719"
  ],
- "skriven": "2026-11-27T16:45:55.401Z",
+ "skriven": "2026-11-28T10:00:22.156Z",
  "model": "claude-opus-5-5",
  "version": "2026-11-14.1",
- "underlag": "2026-11-27T16:41:36.229Z",
+ "underlag": "2026-11-28T09:58:31.666Z",
  "rubrik": {
-  "id": "401879226",
-  "kick": "MAN UNITED",
+  "id": "401878752",
+  "kick": "ASTON VILLA",
   "rad": [
    [
-    "UNITED-FANS:",
+    "TOM STOL",
     0
    ],
    [
-    "”VI ÄR VANA",
+    "GICK FÖRE",
     0
    ],
    [
-    "VID DET”",
+    "GARNACHO",
     1
    ]
   ],
-  "under": "Pochettino väntar på första segern, och Bruno Fernandes missade fredagens träning sjuk",
-  "plus": "IPSWICH 34 RAKA UTAN NOLLA",
-  "plusId": "401878752"
+  "under": "Emery tog hellre med två målvakter och lämnade en plats tom: Garnacho fick inte ens plats på bänken",
+  "plus": "”RÄDSLAN FÖR ATT VINNA”",
+  "plusId": "401880132"
  }
 }
