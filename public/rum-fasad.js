@@ -23,7 +23,8 @@
 // ljuset eller vädret ändras (sig); det som rör sig (de som går, speglingarna, regnet och snön, molnen och
 // barberarens stång) ritas i tre dukar i en takt (TAKT), och står still med prefers-reduced-motion.
 //
-//   RumFasad.bygg(rum, o) → { el, ny(), ut(), glas(duk) } bygger fasaden i rum (.rum) och ritar den; glas(duk)
+//   RumFasad.bygg(rum, o) → { el, ny(), ut(), glas(duk), nara(pa, glid) } bygger fasaden i rum (.rum) och ritar den;
+//     nara(true) går kameran fram till löpsedelsstället, nara(false) tillbaka, nara() står den där; glas(duk)
 //     ställer gängets duk (rum-3d.js) i skyltfönstret, glas(null) tar bort den igen (rum.js ställer tillbaka den);
 //     o.gang({ w, h }) ritar gänget i den duken med w × h bildpunkter (false utan), o.takt() hur många gånger i sekunden (som inne),
 //     o.neon() neonen tänd just nu, o.natt() 0…1 hur släckt lysröret är, o.pynt(namn, { w, h, dag }) högtidspyntet
@@ -4987,10 +4988,12 @@ window.RumFasad = (() => {
     el.className = 'rum-fasad';
     el.setAttribute('role', 'img');
     el.setAttribute('aria-label', 'Matchfixarna utifrån: affären vid S:t Eriksbron, med gänget i fönstret');
-    el.innerHTML = '<div class="rf-scen"></div>';
+    // (kameran, .rf-kam, går fram till löpsedelsstället: nara)
+    el.innerHTML = '<div class="rf-kam"><div class="rf-scen"></div></div>';
     rum.append(el);
-    const scen = el.firstChild;
-    const F = { V: null, sig: '', gl: null, glasR: null, glasPx: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null };
+    const kam = el.firstChild;
+    const scen = kam.firstChild;
+    const F = { V: null, sig: '', gl: null, glasR: null, glasPx: null, raf: 0, sist: 0, tider: [], vantar: false, neon: null, klar: false, ro: null, stall: null, nara: false, framme: false };
     const calm = () => Boolean(o.calm && o.calm());
     // (dukarnas bildpunkter per enhet i världen: skärmens, högst två miljoner bildpunkter på hela fönstret)
     const tathet = (V) => {
@@ -5082,6 +5085,8 @@ window.RumFasad = (() => {
         duk('rf-fram', V, px);
       F.glasR = { x: r1(glasX * sk), y: r1(glasY * sk), w: r1(FON.w * sk), h: r1(FON.h * sk) };
       placera();
+      // (och kameran vid stället igen, om den står där: stället kan ha flyttat sig i en ny vy)
+      if (F.nara) kamera(false);
       // (getContext ger null när telefonen inte har mer minne till dukar: då står det som skulle ha ritats
       // där still och resten rör sig ändå – förut kastade det ett fel, och fasaden stod som en fast bild eller
       // gick inte att klicka bort)
@@ -5102,15 +5107,91 @@ window.RumFasad = (() => {
     }
     // Löpsedelsstället (stallet): ramen och benen i två SVG i ställets egen ruta, och sedeln emellan, i scenens
     // punkter. Sedeln läggs i av sedeln, när den finns.
+    // Ramen och benen tar emot klicket (rf-stall-knapp, nara), inte skuggan bredvid.
     function stallHtml(st) {
       const { S, bak, fram, vb } = st;
+      F.stall = S;
       const k = F.k;
       const box = S.box;
       const lag = (inner, cls) => `<svg class="${cls}" viewBox="${vb}" preserveAspectRatio="none" aria-hidden="true">${inner}</svg>`;
       return `<div class="rf-stall tom" aria-hidden="true" style="left:${r1((box.x - F.V.x) * k)}px; top:${r1((box.y - F.V.y) * k)}px; width:${r1(box.w * k)}px; height:${r1(box.h * k)}px; --ljus:${st.ljus}">` +
         lag(bak, 'rf-stall-bak') +
         `<span class="rf-stall-sedel" style="left:${r1((S.rx + S.b - box.x) * k)}px; top:${r1((S.ry + S.b - box.y) * k)}px; transform:scale(${(S.pw * k / 100).toFixed(4)})"></span>` +
-        lag(fram, 'rf-stall-fram') + '</div>';
+        lag(fram, 'rf-stall-fram') +
+        `<i class="rf-stall-knapp" style="left:${r1((S.rx - box.x) * k)}px; top:${r1((S.ry - box.y) * k)}px; width:${r1(S.rw * k)}px; height:${r1((S.y0 - S.ry) * k)}px"></i></div>`;
+    }
+    // ---------- närbilden av löpsedeln ----------
+    //
+    // Ett klick på löpsedelsstället och kameran går fram till det, som till affischerna inne (sak i rum.js): samma
+    // gata på närmare håll, stället står kvar där det står, och ramen fyller det mesta av höjden mellan namnet och
+    // foten, så att rubriken och det lilla trycket går att läsa. De som går och kör förbi framför går kameran förbi:
+    // det framför (.rf-fram) tonar bort och ritas inte medan den står där, och inte heller himlen och stången, som
+    // inte syns därifrån. Sedeln får mer ljus på kvällen, som affischerna inne (.nara i rum-fasad.css). Ett klick var
+    // som helst, Esc eller Tillbaka går tillbaka till hela fasaden (fasadSedel i rum.js). Förstoringen ändras lika
+    // många procent i varje steg, som kamerans väg till tv:n (zoomVag i rum.js). glid: med rörelse (annars genast).
+    //   nara() står den vid stället, nara(pa, glid) dit eller tillbaka; sant om den går dit
+    const NARA = { topp: 64, fot: 64, h: 0.94, b: 0.9, ms: 600, steg: 24 };
+    function kamMal() {
+      const S = F.stall;
+      if (!S || !F.V) return null;
+      const W = el.clientWidth || innerWidth;
+      const H = el.clientHeight || innerHeight;
+      const k = Math.max(W / F.V.w, H / F.V.h) || F.k;
+      const x = (S.rx - F.V.x) * k;
+      const y = (S.ry - F.V.y) * k;
+      const w = S.rw * k;
+      const h = S.rh * k;
+      const hojd = H - NARA.topp - NARA.fot;
+      const z = Math.min((W * NARA.b) / w, (hojd * NARA.h) / h);
+      return { dx: W / 2 - z * (x + w / 2), dy: NARA.topp + hojd / 2 - z * (y + h / 2), z };
+    }
+    const kamT = (m) => `translate(${r1(m.dx)}px, ${r1(m.dy)}px) scale(${+m.z.toFixed(5)})`;
+    // där kameran är just nu, också mitt i en glidning
+    function kamNu() {
+      const n = /matrix\(([^)]+)\)/.exec(getComputedStyle(kam).transform);
+      if (!n) return { dx: 0, dy: 0, z: 1 };
+      const v = n[1].split(',').map(Number);
+      return { dx: v[4], dy: v[5], z: v[0] };
+    }
+    function kamVag(a, b) {
+      const lz = Math.log(b.z / a.z);
+      const rak = Math.abs(a.z - b.z) < 1e-3;
+      const k = [];
+      for (let i = 0; i <= NARA.steg; i++) {
+        const s = i / NARA.steg;
+        const z = i === NARA.steg ? b.z : a.z * Math.exp(lz * s);
+        const u = rak ? s : (a.z - z) / (a.z - b.z);
+        k.push({ offset: s, transform: kamT({ dx: a.dx + (b.dx - a.dx) * u, dy: a.dy + (b.dy - a.dy) * u, z }) });
+      }
+      return k;
+    }
+    // kameran dit den ska stå (vid stället eller hemma), med glidning eller genast
+    function kamera(glid) {
+      const mal = F.nara ? kamMal() : null;
+      const fran = glid ? kamNu() : null;
+      if (F.kamA) F.kamA.cancel();
+      F.kamA = null;
+      kam.style.transform = mal ? kamT(mal) : '';
+      if (!glid) return;
+      const a = (F.kamA = kam.animate(kamVag(fran, mal || { dx: 0, dy: 0, z: 1 }), { duration: NARA.ms, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' }));
+      a.finished.then(() => { if (F.kamA === a) F.kamA = null; }, () => {});
+    }
+    function nara(pa, glid = !calm() && o.still == null) {
+      if (pa === undefined) return F.nara;
+      pa = Boolean(pa);
+      if (pa === F.nara || (pa && !kamMal())) return F.nara;
+      F.nara = pa;
+      clearTimeout(F.naraT);
+      el.classList.toggle('nara', pa);
+      if (!pa) {
+        // (det framför ritas genast igen, innan det tonar fram)
+        F.framme = false;
+        rorelse(true);
+      }
+      kamera(glid);
+      // framme: det framför, himlen och stången vilar
+      if (pa) F.naraT = setTimeout(() => { if (F.nara) F.framme = true; }, glid ? NARA.ms + 50 : 0);
+      return F.nara;
     }
     // Veckans löpsedel i stället (o.sedel: den som rummet har ritat, rum-affischer.js), kopierad när den har ändrats
     // (rubriken, numret, slitaget). Innan rummets saker är ritade finns ingen: då står stället undan och det
@@ -5225,7 +5306,8 @@ window.RumFasad = (() => {
       if (!R) return;
       const ms = performance.now();
       const t = o.still != null ? o.still : ms / 1000;
-      const dags = (sist, fps) => nu || ms - (sist || 0) >= 1000 / fps - 4;
+      // (vid löpsedelsstället, nara: inget av det syns)
+      const dags = (sist, fps) => !F.framme && (nu || ms - (sist || 0) >= 1000 / fps - 4);
       if (R.fram && dags(R.sFram, R.fortGata ? TAKT_GATA : TAKT)) {
         R.sFram = ms;
         ritaFram(R, t);
@@ -5277,6 +5359,7 @@ window.RumFasad = (() => {
     let storlekT = 0;
     const storlek = () => {
       passa();
+      if (F.nara) kamera(false);
       clearTimeout(storlekT);
       storlekT = setTimeout(() => { if (el.isConnected) rita(); }, 300);
     };
@@ -5293,11 +5376,13 @@ window.RumFasad = (() => {
       el,
       ny: () => { F.sig = ''; rita(); },
       glas,
+      nara,
       ut() {
         cancelAnimationFrame(F.raf);
         clearInterval(T);
         clearTimeout(storlekT);
         clearTimeout(F.sedelT);
+        clearTimeout(F.naraT);
         removeEventListener('resize', storlek);
         el.remove();
         for (const c of dukarna(F.ro)) slapp(c);

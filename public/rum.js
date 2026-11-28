@@ -47,7 +47,8 @@
 // hålls och vad man gör med den (två sekunder in), ?rum-ga=dl:5 att DL går iväg
 // (fem sekunder in), ?rum-video videon nära och
 // ?rum-sak=ur|skar|ram|kort|pokal|kork|vm94|ifk|nacional|chelsea|kupong|radio en närbild,
-// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr; ?rum-fasad-vem=inlines vilka som går förbi),
+// ?rum-fasad affären utifrån (rum-fasad.js; också ?rum-sak=dorr; ?rum-fasad=sedel löpsedelsstället nära;
+// ?rum-fasad-vem=inlines vilka som går förbi),
 // ?rum-radio-lage=fm:104.3 hur kassettradion står inställd (utan ljud).
 //
 // Läses efter kupong.js, samtal.js, tippare.js och kronan.js och använder
@@ -4631,6 +4632,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     if (!pa) {
       const f = R.fasad;
       if (!f) return false;
+      if (vidSedeln(f)) lagerUt('fasad-sedel');
       R.fasad = null;
       clearTimeout(R.fasadT);
       lagerUt('fasaden');
@@ -4669,9 +4671,12 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       still: still() ? R.frozen : null,
     });
     for (const n of ['pointerdown', 'pointerup', 'pointermove', 'mouseover', 'wheel', 'touchstart', 'touchmove']) f.el.addEventListener(n, (e) => e.stopPropagation());
+    // (ett klick på löpsedelsstället går fram till det, och därifrån går ett klick var som helst tillbaka ut)
     f.el.addEventListener('click', (e) => {
       e.stopPropagation();
-      fasad(false);
+      if (vidSedeln(f)) fasadSedel(false);
+      else if (f.nara && e.target instanceof Element && e.target.closest('.rf-stall-knapp')) fasadSedel(true);
+      else fasad(false);
     });
     // (framme: inget eget lager för toningen längre)
     if (glid) {
@@ -4693,6 +4698,22 @@ ${window.RumRegister ? RumRegister.nara() : ''}
     };
     if (glid) R.fasadT = setTimeout(tackt, 420);
     else tackt();
+    return true;
+  }
+  // Löpsedelsstället på trottoaren: kameran går fram till det (nara i rum-fasad.js), som till affischerna inne, och
+  // ett klick var som helst, Esc eller Tillbaka går tillbaka till hela fasaden (inte in i affären).
+  // (vidSedeln: också med en äldre rum-fasad.js i cachen, utan nara)
+  const vidSedeln = (f) => Boolean(f && f.nara && f.nara());
+  function fasadSedel(pa, glid = !calm()) {
+    const f = R.fasad;
+    if (!f || !f.nara) return false;
+    if (!pa) {
+      if (!f.nara()) return false;
+      lagerUt('fasad-sedel');
+      return f.nara(false, glid);
+    }
+    if (f.nara() || !f.nara(true, glid)) return f.nara();
+    lager('fasad-sedel', (nu) => fasadSedel(false, !nu));
     return true;
   }
   // Gängets duk (rum-3d.js) lånas ut till fasadens skyltfönster medan rummet inte syns, och ritar gänget
@@ -7221,9 +7242,13 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       }
       const k = e.key.toLowerCase();
       const fore = R.sak;
-      // ute på trottoaren (fasad): Esc går in igen, och inget annat i rummet går att nå därifrån
+      // ute på trottoaren (fasad): Esc går in igen (eller från löpsedelsstället tillbaka ut), och inget annat i
+      // rummet går att nå därifrån
       if (R.fasad) {
-        if (k === 'escape') fasad(false);
+        if (k === 'escape') {
+          if (vidSedeln(R.fasad)) fasadSedel(false);
+          else fasad(false);
+        }
         return;
       }
       if (R.tidning) {
@@ -7455,6 +7480,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
         if (q.has('rum-video')) zoomVideo(true);
         if (q.has('rum-sak')) sak(q.get('rum-sak'), null);
         if (q.has('rum-fasad') || q.get('rum-sak') === 'dorr') fasad(true, false);
+        if (q.get('rum-fasad') === 'sedel') fasadSedel(true, false);
         if (q.has('rum-register') && R.reg) {
           R.reg.wait().then(() => {
             register(true);
@@ -7469,7 +7495,7 @@ ${window.RumRegister ? RumRegister.nara() : ''}
       // (inte then(frame): frame tar emot dt, och kameran blev NaN så att gänget inte syntes)
       ready.then(() => frame());
     } else loop();
-    if (!still() && (q.has('rum-fasad') || q.get('rum-sak') === 'dorr')) ready.then(() => { if (R.on) fasad(true, false); });
+    if (!still() && (q.has('rum-fasad') || q.get('rum-sak') === 'dorr')) ready.then(() => { if (R.on && fasad(true, false) && q.get('rum-fasad') === 'sedel') setTimeout(() => fasadSedel(true), 1200); });
     clearInterval(R.poll);
     // omgången och liveställningen kan ändras medan rummet står öppet
     // (inte i en dold flik: varje gång är en fråga till tjänsten, samtal.js)

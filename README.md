@@ -7820,6 +7820,15 @@ kontaktledningarnas stolpar och stan på andra sidan med en kyrkspira och två l
   multiplikation över papperet): nästan vit på dagen, svalare i mulet, mörk och varm på kvällen; plasten blänker av
   himlen eller lamporna, stället skuggar stenen under och på dagen bröstningen bakom (inte glaset), och snö lägger
   sig på ramen. De som går förbi går framför det. Innan rummets saker är ritade står stället undan (`.tom`).
+- **Närbilden av löpsedeln (2026-11-28, användarens önskemål):** "Jag vill att man ska kunna zooma in på den här
+  tidningsrubriken utanför affären – såsom andra affischer som man zoomar in på alltså". Stället lyser när man pekar
+  på det, som sakerna inne, och ett klick på ramen eller benen (`.rf-stall-knapp`) och kameran går fram till det
+  (`nara` i rum-fasad.js, `fasadSedel` i rum.js), som till affischerna på skivan: samma gata på närmare håll, med
+  fönstret och dörren i kanterna, och ramen fyller det mesta av höjden mellan namnet och foten (i en telefon på höjden
+  bredden). Förstoringen ändras lika många procent i varje steg, som vägen till tv:n. De som går och kör förbi framför
+  går kameran förbi (`.rf-fram` tonar bort och ritas inte där, inte heller himlen och stången), och sedeln får mer ljus
+  på kvällen, som affischerna inne. Ett klick var som helst, Esc eller Tillbaka går tillbaka till hela fasaden (inte in
+  i affären). För bilder: `?rum-fasad=sedel`.
 - **Putsen har levt (2026-11-16):** stora mjuka fläckar i putsen, mörkare och ljusare, rinnmärken under blecken på
   våningarna, under gesimsen och från fönsterbänken ned över bröstningen, fukt nertill på väggen där regnet stänker upp
   (mörkare när stenen är våt) och en glans i sockelns överkant. Stupröret har fästen och en böj nertill; när det regnar
